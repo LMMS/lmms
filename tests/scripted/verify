@@ -159,47 +159,76 @@ with tempfile.TemporaryDirectory() as tmpdir:
 		test.expect('Error: debian/copyright: Glob/Path does not exist: NonExistent')
 		test.expect('1 errors')
 
-	# minimal working example
 	with ScriptTest(check_namespace) as test:
+		# minimal working example
 		test.run(0)  # exitcode 0 - no errors expected
 		test.expect('0 errors')
 
-	with ScriptTest(check_namespace) as test:
-		create_file('src/core/NoNamespace.cpp', '')
+		create_file('01_OddBraceWithinMacro.cpp', '''
+					#if HAS_EVEN_BRACES
+						namespace lmms {}
+					#endif
+					namespace lmms {
+					#if HAS_ODD_BRACE
+					}
+					#endif
+					''')
+		create_file('02_IncludeInCodeBlock.cpp', '''
+					#include <good>
+					extern "C" {
+						#include "alright.c"
+					}
+					namespace lmms {
+						#include <bad>
+					}
+					''')
+		create_file('03_MacroComments.h', '''
+					#ifndef HEADER_GUARD_NEEDS_NO_COMMENT
+					#define HEADER_GUARD_NEEDS_NO_COMMENT
+						#ifdef HAS_NESTED_NEEDS_COMMENT
+							#ifdef SHORT_NO_NESTED_NEEDS_NO_COMMENT
+								namespace lmms {}
+							#endif
+						#endif
+						#ifdef HAS_COMMENT
+							#ifdef SHORT_NO_NESTED_NEEDS_NO_COMMENT
+							#else
+							#endif
+						#endif // HAS_COMMENT
+					#endif
+					''')
+		create_file('04_NamespaceComments.cpp', '''
+					namespace lmms {
+						namespace ShortNamespace {
+							class WithDeclarationsOnly;
+						}
+						namespace LongNamespace {
+							class WithDefinition {
+								int x;
+							};
+						}
+					} // namespace lmms
+					''')
+		create_file('05_NoHeaderGuard.h', '''
+					#include <cstdio>
+					namespace lmms {}
+					''')
+		create_file('06_PragmaButNoLmms.h', '''
+					// should not cause header guard warning
+					#pragma once
+					namespace not_lmms {}
+					''')
 		test.run()
-		test.expect('Error: src/core/NoNamespace.cpp: File has no namespace lmms')
-		test.expect('1 errors')
-	if False:
-		with ScriptTest(check_namespace) as test:
-			create_file('src/core/Model.cpp', 'namespace lmms {\n\n} // namespace lmm')
-			test.run()
-			test.expect('Error: src/core/Model.cpp: namespace/macro ("lmms") does not match end ("lmm")')
-			test.expect('1 errors')
+		test.expect('6 errors')
+		test.expect('''
+Error: 01_OddBraceWithinMacro.cpp:7: Expected #endif before }
+Error: 02_IncludeInCodeBlock.cpp:7: #include inside a code block
+Error: 03_MacroComments.h:8: Missing comment // HAS_NESTED_NEEDS_COMMENT
+Error: 04_NamespaceComments.cpp:10: Missing comment // namespace LongNamespace
+Error: 05_NoHeaderGuard.h: First statement should be header guard
+Error: 06_PragmaButNoLmms.h: File has no namespace lmms
+''')
 
-		with ScriptTest(check_namespace) as test:
-			create_file('src/core/Model.cpp', '#ifdef LMMS_HAVE_LV2\nnamespace lmms {}\n#endif // LMMS_HAVE_LV')
-			test.run()
-			test.expect('Error: src/core/Model.cpp: namespace/macro ("LMMS_HAVE_LV2") does not match end ("LMMS_HAVE_LV")')
-			test.expect('1 errors')
-
-		with ScriptTest(check_namespace) as test:
-			create_file('include/Model.h', '#ifndef MODEL_H\n#define MODEL_H\nnamespace lmms {}\n#endif // MODEL_')
-			test.run()
-			test.expect('Error: include/Model.h: namespace/macro ("MODEL_H") does not match end ("MODEL_")')
-			test.expect('1 errors')
-
-		with ScriptTest(check_namespace) as test:
-			create_file('include/Model.h', '#ifndef MODEL_H\n#define MODEL_H\nnamespace lmms {\n#include "lmms_export.h"\n}#endif // MODEL_H')
-			# "include" inside namespace => user includes file into lmms namespace...
-			test.run()
-			test.expect('Error: include/Model.h: First statement should be header guard')
-			test.expect('1 errors')
-
-	with ScriptTest(check_namespace) as test:
-		create_file('include/Model.h', 'namespace lmms {\n}')
-		test.run()
-		test.expect('Error: include/Model.h: First statement should be header guard')
-		test.expect('1 errors')
 
 # if we made it until here without an exception, all tests have been passed
 print("SUCCESS")
