@@ -115,7 +115,6 @@ Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
 	m_chorusSpeed( FLUID_CHORUS_DEFAULT_SPEED, 0.29, 5.0, 0.01, this, tr( "Chorus speed" ) ),
 	m_chorusDepth( FLUID_CHORUS_DEFAULT_DEPTH, 0, 46.0, 0.05, this, tr( "Chorus depth" ) )
 {
-	m_notesRunning.fill(0);
 
 
 #if QT_VERSION_CHECK(FLUIDSYNTH_VERSION_MAJOR, FLUIDSYNTH_VERSION_MINOR, FLUIDSYNTH_VERSION_MICRO) >= QT_VERSION_CHECK(1,1,9)

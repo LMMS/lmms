@@ -72,7 +72,7 @@ protected:
 
 	std::string m_presetsDir;
 
-	std::array<int, NumKeys> m_runningNotes;
+	std::array<int, NumKeys> m_runningNotes = {};
 	Master * m_master;
 	NulEngine* m_ioEngine;
 
