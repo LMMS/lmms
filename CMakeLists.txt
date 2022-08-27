@@ -496,14 +496,14 @@ ENDIF()
 
 # check for Fluidsynth
 IF(WANT_SF2)
-	PKG_CHECK_MODULES(FLUIDSYNTH fluidsynth>=1.0.7)
-	IF(FLUIDSYNTH_FOUND)
+	find_package(FluidSynth 1.0.7)
+	if(FluidSynth_FOUND)
 		SET(LMMS_HAVE_FLUIDSYNTH TRUE)
 		SET(STATUS_FLUIDSYNTH "OK")
-	ELSE(FLUIDSYNTH_FOUND)
+	else()
 		SET(STATUS_FLUIDSYNTH "not found, libfluidsynth-dev (or similar)"
 			"is highly recommended")
-	ENDIF(FLUIDSYNTH_FOUND)
+	endif()
 ENDIF(WANT_SF2)
 
 # check for libgig
