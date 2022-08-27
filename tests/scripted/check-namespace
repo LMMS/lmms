@@ -10,6 +10,26 @@ import re
 import subprocess
 import sys
 from pathlib import Path
+from typing import NamedTuple
+
+
+# types
+
+class BlockType:
+    pass
+
+
+IF_MACRO = BlockType()
+HEADER_GUARD = BlockType()
+CODE_BLOCK = BlockType()
+EXTERN = BlockType()
+
+
+class Expectation(NamedTuple):
+    type: BlockType
+    statement: str  # expected end statement
+    name: str  # expected name in comment
+
 
 # global variables
 
@@ -78,15 +98,15 @@ statement_pattern = re.compile(
     # Macro followed by name or comment
     #  With (?P<name>...) you can do a backreference to \name later
     r'^ *# *(?P<named_macro>ifn?def|endif)(( *// *| +)(?P<macro_name>\w+))?|'
-    # Other macros
-    r'^ *# *(?P<macro>include|if|el)|'
+    # Other macros where we don't want the argument
+    r'^ *# *(?P<macro>include|if|el(se|if))|'
 
     # Namespace that contains no other braces needs no end comment
     #  With a (?=lookahead) we can let the "namespace" part be eaten by the parser
     #  but save the braces and their content for later so they can be matched again
     r'^ *namespace *[\w:]*\s*(?={[^{}]*})|'
-    # Start of named namespace, or just a opening brace
-    r'(^ *namespace *(?P<namespace_start>[\w:]+)\s*)?(?P<opening_brace>{)|'
+    # Start of named namespace, extern "C" or just a opening brace
+    r'(^ *(namespace +(?P<namespace>[\w:]+)|(?P<extern>extern *"C"))\s*)?(?P<opening_brace>{)|'
     # End of namespace including comment, or just a closing brace
     r'(?P<closing_brace>})( *// *namespace +(?P<namespace_end>[\w:]+))?|'
 
@@ -115,8 +135,7 @@ for cur_file in files:
             namespace_pattern.search(cur_text) or error(cur_file, None, f'File has no namespace lmms')
 
         header_guard = str(cur_file).endswith('.h')
-        found_start_of_code = False
-        expected_statements = []  # [(statement, argument)]
+        expectations: list[Expectation] = []
 
         if header_guard:
             if not header_guard_pattern.match(cur_text):
@@ -124,39 +143,51 @@ for cur_file in files:
                 header_guard = False
 
         for m in statement_pattern.finditer(cur_text):
-            macro = m.group('macro') or m.group('named_macro') or m.group('short_macro') or ''
-            name = m.group('macro_name') or m.group('namespace_start') or m.group('namespace_end') or ''
-            brace = m.group('opening_brace') or m.group('closing_brace') or ''
-
-            if not macro and not brace:
+            # Find the matched regex group
+            statement = m.group('opening_brace') or m.group('closing_brace')
+            if not statement:
+                statement = '#' + (m.group('macro') or m.group('named_macro') or m.group('short_macro') or '')
+            if not statement:
                 continue
-            elif brace:
-                found_start_of_code = True
 
-            if macro == 'include' and found_start_of_code:
-                error(cur_file, m, '#include after beginning of C++ code')
-            elif macro.startswith('if'):
-                # Require no end comment for the header guard
-                expected_statements.append(('endif', name if not header_guard else None))
+            # Start statements
+            if statement == '{':
+                etype = EXTERN if m.group('extern') else CODE_BLOCK
+                expectations.append(Expectation(etype, '}', m.group('namespace')))
+            elif statement.startswith('#if'):
+                etype = HEADER_GUARD if header_guard else IF_MACRO
+                expectations.append(Expectation(etype, '#endif', m.group('macro_name')))
                 header_guard = False
-            elif macro == 'el':
-                exp = expected_statements[-1][0]
-                if exp != 'endif':
-                    error(cur_file, m, f'Expected {exp} before #el')
-            elif macro == 'endif' or brace == '}':
-                if not expected_statements:
-                    error(cur_file, m, f'Unexpected {macro or brace}')
-                    continue
-                exp, expected_name = expected_statements.pop()
-                if (macro or brace) != exp:
-                    error(cur_file, m, f'Expected {exp} before {macro or brace}')
-                elif expected_name and name != expected_name:
-                    error(cur_file, m, f'Missing comment // {"namespace " if brace else ""}{expected_name}')
-            elif brace == '{':
-                expected_statements.append(('}', name))
 
-        for exp, name in reversed(expected_statements):
-            error(cur_file, None, f'Expected {exp} before end of file')
+            # End statements
+            elif statement == '#endif' or statement.startswith('#el') or statement == '}':
+                if not expectations:
+                    error(cur_file, m, f'Unexpected {statement}')
+                    break
+                # Don't pop the expectation for an #else tag, we are still waiting for the #endif
+                if statement.startswith('#el') and expectations[-1].statement == '#endif':
+                    continue
+                exp = expectations.pop()
+                name = m.group('macro_name') or m.group('namespace_end') or ''
+                if statement != exp.statement:
+                    error(cur_file, m, f'Expected {exp.statement} before {statement}')
+                    break
+                # Require no end comment for header guard
+                elif exp.type is HEADER_GUARD and not name:
+                    continue
+                elif exp.name and name != exp.name:
+                    comment = 'namespace ' if exp.type is CODE_BLOCK else ''
+                    error(cur_file, m, f'Missing comment // {comment}{exp.name}')
+
+            # Extra checks
+            elif statement == '#include':
+                if any(True for e in expectations if e.type is CODE_BLOCK):
+                    error(cur_file, m, '#include inside a code block')
+
+        else:
+            # Leftover expected statements
+            for exp in reversed(expectations):
+                error(cur_file, None, f'Expected {exp.statement} before end of file')
 
 caption('summary')
 
