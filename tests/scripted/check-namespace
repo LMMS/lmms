@@ -108,7 +108,7 @@ statement_pattern = re.compile(
     # Start of named namespace, extern "C" or just a opening brace
     r'(^ *(namespace +(?P<namespace>[\w:]+)|(?P<extern>extern *"C"))\s*)?(?P<opening_brace>{)|'
     # End of namespace including comment, or just a closing brace
-    r'(?P<closing_brace>})( *// *namespace +(?P<namespace_end>[\w:]+))?|'
+    r'(?P<closing_brace>})( *// *namespace +(?P<namespace_end>[\w:]+))?'
 
     # In all the regexes above match both tab and space when a space is used
     r''.replace(' ', r'[\t ]'),
