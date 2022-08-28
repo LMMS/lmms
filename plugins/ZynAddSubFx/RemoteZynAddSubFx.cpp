@@ -278,7 +278,7 @@ int main( int _argc, char * * _argv )
 	pthread_win32_process_attach_np();
 	pthread_win32_thread_attach_np();
 #endif
-#endif
+#endif // LMMS_BUILD_WIN32
 
 
 #ifdef SYNC_WITH_SHM_FIFO
@@ -298,7 +298,7 @@ int main( int _argc, char * * _argv )
 	pthread_win32_thread_detach_np();
 	pthread_win32_process_detach_np();
 #endif
-#endif
+#endif // LMMS_BUILD_WIN32
 
 	return 0;
 }

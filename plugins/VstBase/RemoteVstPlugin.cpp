@@ -57,7 +57,7 @@
 #include <wine/exception.h>
 #endif
 
-#endif
+#endif // LMMS_BUILD_LINUX
 
 #ifndef NATIVE_LINUX_VST
 #define USE_WS_PREFIX
@@ -883,7 +883,7 @@ void RemoteVstPlugin::initEditor()
 	
 	pluginDispatch(effEditTop);
 	m_x11WindowVisible = true;
-#endif
+#endif // NATIVE_LINUX_VST
 }
 
 
@@ -1090,16 +1090,16 @@ void RemoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 #ifdef OLD_VST_SDK
 	if( m_plugin->flags & effFlagsCanReplacing )
 	{
-#endif
 		m_plugin->processReplacing( m_plugin, m_inputs, m_outputs,
 								bufferSize() );
-#ifdef OLD_VST_SDK
 	}
 	else
 	{
 		m_plugin->process( m_plugin, m_inputs, m_outputs,
 								bufferSize() );
 	}
+#else
+	m_plugin->processReplacing(m_plugin, m_inputs, m_outputs, bufferSize());
 #endif
 
 	unlockShm();
@@ -1937,7 +1937,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			// TODO
 			// close window, platform specific handle in <ptr>
 			return 0;
-#endif
+#endif // OLD_VST_SDK
 
 		case audioMasterSizeWindow:
 		{
@@ -2334,7 +2334,7 @@ void RemoteVstPlugin::guiEventLoop()
 		}
 	}
 }
-#endif
+#endif // NATIVE_LINUX_VST
 
 
 #ifndef NATIVE_LINUX_VST
@@ -2385,7 +2385,7 @@ LRESULT CALLBACK RemoteVstPlugin::wndProc( HWND hwnd, UINT uMsg,
 }
 
 
-#endif
+#endif // NATIVE_LINUX_VST
 
 } // namespace lmms
 
@@ -2421,7 +2421,7 @@ int main( int _argc, char * * _argv )
 				sched_get_priority_min( SCHED_FIFO ) ) / 2;
 	sched_setscheduler( 0, SCHED_FIFO, &sparam );
 #endif
-#endif
+#endif // LMMS_BUILD_LINUX
 
 #ifdef LMMS_BUILD_WIN32
 	if( !SetPriorityClass( GetCurrentProcess(), HIGH_PRIORITY_CLASS ) )

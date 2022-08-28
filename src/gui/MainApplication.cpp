@@ -105,7 +105,7 @@ bool MainApplication::nativeEventFilter(const QByteArray& eventType,
 	}
 	return false;
 }
-#endif
+#endif // LMMS_BUILD_WIN32
 
 
 } // namespace lmms::gui

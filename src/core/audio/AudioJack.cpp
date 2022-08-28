@@ -339,7 +339,7 @@ void AudioJack::renamePort( AudioPort * _port )
 #endif
 		}
 	}
-#endif
+#endif // AUDIO_PORT_SUPPORT
 }
 
 
@@ -502,4 +502,4 @@ void AudioJack::setupWidget::saveSettings()
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_HAVE_JACK

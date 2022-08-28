@@ -143,7 +143,7 @@ private:
 		void *hostApiSpecificStreamInfo;
 
 	} PaStreamParameters;
-#endif
+#endif // PORTAUDIO_V19
 
 	PaStream * m_paStream;
 	PaStreamParameters m_outputParameters;

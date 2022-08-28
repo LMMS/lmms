@@ -215,4 +215,4 @@ void AudioSndio::setupWidget::saveSettings()
 
 } // namespace lmms
 
-#endif	/* LMMS_HAVE_SNDIO */
+#endif	// LMMS_HAVE_SNDIO

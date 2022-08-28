@@ -511,7 +511,7 @@ void AudioPortAudio::setupWidget::show()
 } // namespace lmms
 
 
-#endif
+#endif // LMMS_HAVE_PORTAUDIO
 
 
 

@@ -211,7 +211,7 @@ int PianoView::getKeyFromKeyEvent( QKeyEvent * _ke )
 		case 13: return 30; // =
 		case 27: return 31; // ]
 	}
-#endif
+#endif // LMMS_BUILD_WIN32
 #if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_OPENBSD) || defined(LMMS_BUILD_FREEBSD)
 	switch( k )
 	{
@@ -292,7 +292,7 @@ int PianoView::getKeyFromKeyEvent( QKeyEvent * _ke )
 		case 29: return 27; // 0 = d'#
 		case 35: return 28; // P = e'
 	}
-#endif
+#endif // LMMS_BUILD_APPLE
 
 	return -100;
 }

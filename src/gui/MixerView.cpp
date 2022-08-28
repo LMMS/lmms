@@ -624,4 +624,4 @@ void MixerView::updateFaders()
 }
 
 
-} // namesapce lmms::gui
+} // namespace lmms::gui

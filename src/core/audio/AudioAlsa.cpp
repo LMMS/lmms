@@ -542,4 +542,4 @@ int AudioAlsa::setSWParams()
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_HAVE_ALSA

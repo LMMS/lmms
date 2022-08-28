@@ -672,7 +672,7 @@ f_cnt_t SampleBuffer::decodeSampleOGGVorbis(
 
 	return frames;
 }
-#endif
+#endif // LMMS_HAVE_OGGVORBIS
 
 
 
@@ -1258,7 +1258,7 @@ void flacStreamEncoderMetadataCallback(
 	b->write((const char *) metadata, sizeof(*metadata));
 }
 
-#endif
+#endif // LMMS_HAVE_FLAC_STREAM_ENCODER_H
 
 
 
@@ -1314,12 +1314,12 @@ QString & SampleBuffer::toBase64(QString & dst) const
 
 	base64::encode(baWriter.buffer().data(), baWriter.buffer().size(), dst);
 
-#else	/* LMMS_HAVE_FLAC_STREAM_ENCODER_H */
+#else	// LMMS_HAVE_FLAC_STREAM_ENCODER_H
 
 	base64::encode((const char *) m_data,
 		m_frames * sizeof(sampleFrame), dst);
 
-#endif	/* LMMS_HAVE_FLAC_STREAM_ENCODER_H */
+#endif	// LMMS_HAVE_FLAC_STREAM_ENCODER_H
 
 	return dst;
 }
@@ -1461,7 +1461,7 @@ void flacStreamDecoderErrorCallback(
 	// what to do now??
 }
 
-#endif
+#endif // LMMS_HAVE_FLAC_STREAM_DECODER_H
 
 
 void SampleBuffer::loadFromBase64(const QString & data)
@@ -1517,7 +1517,7 @@ void SampleBuffer::loadFromBase64(const QString & data)
 	m_origData = MM_ALLOC<sampleFrame>( m_origFrames);
 	memcpy(m_origData, dst, dsize);
 
-#endif
+#endif // LMMS_HAVE_FLAC_STREAM_DECODER_H
 
 	delete[] dst;
 
