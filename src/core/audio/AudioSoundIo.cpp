@@ -34,18 +34,21 @@
 #include "ConfigManager.h"
 #include "gui_templates.h"
 #include "ComboBox.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 
-AudioSoundIo::AudioSoundIo( bool & outSuccessful, Mixer * _mixer ) :
+namespace lmms
+{
+
+AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 	AudioDevice( qBound<ch_cnt_t>(
 		DEFAULT_CHANNELS,
 		ConfigManager::inst()->value( "audiosoundio", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _mixer )
+		SURROUND_CHANNELS ), _audioEngine )
 {
 	outSuccessful = false;
-	m_soundio = NULL;
-	m_outstream = NULL;
-	m_outBuf = NULL;
+	m_soundio = nullptr;
+	m_outstream = nullptr;
+	m_outBuf = nullptr;
 	m_disconnectErr = 0;
 	m_outBufFrameIndex = 0;
 	m_outBufFramesTotal = 0;
@@ -168,7 +171,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, Mixer * _mixer ) :
 	}
 
 	m_outstream->name = "LMMS";
-	m_outstream->software_latency = (double)mixer()->framesPerPeriod() / (double)currentSampleRate;
+	m_outstream->software_latency = (double)audioEngine()->framesPerPeriod() / (double)currentSampleRate;
 	m_outstream->userdata = this;
 	m_outstream->write_callback = staticWriteCallback;
 	m_outstream->error_callback = staticErrorCallback;
@@ -206,7 +209,7 @@ AudioSoundIo::~AudioSoundIo()
 	if (m_soundio)
 	{
 		soundio_destroy(m_soundio);
-		m_soundio = NULL;
+		m_soundio = nullptr;
 	}
 }
 
@@ -216,7 +219,7 @@ void AudioSoundIo::startProcessing()
 	
 	m_outBufFrameIndex = 0;
 	m_outBufFramesTotal = 0;
-	m_outBufSize = mixer()->framesPerPeriod();
+	m_outBufSize = audioEngine()->framesPerPeriod();
 
 	m_outBuf = new surroundSampleFrame[m_outBufSize];
 
@@ -261,7 +264,7 @@ void AudioSoundIo::stopProcessing()
 	if (m_outBuf)
 	{
 		delete[] m_outBuf;
-		m_outBuf = NULL;
+		m_outBuf = nullptr;
 	}
 }
 
@@ -283,7 +286,7 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 	int bytesPerSample = m_outstream->bytes_per_sample;
 	int err;
 
-	const float gain = mixer()->masterGain();
+	const float gain = audioEngine()->masterGain();
 
 	int framesLeft = frameCountMax;
 
@@ -340,10 +343,6 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 
 		framesLeft -= frameCount;
 	}
-}
-
-AudioSoundIoSetupUtil::~AudioSoundIoSetupUtil()
-{
 }
 
 void AudioSoundIoSetupUtil::reconnectSoundIo()
@@ -452,14 +451,14 @@ AudioSoundIo::setupWidget::setupWidget( QWidget * _parent ) :
 {
 	m_setupUtil.m_setupWidget = this;
 
-	m_backend = new ComboBox( this, "BACKEND" );
+	m_backend = new gui::ComboBox( this, "BACKEND" );
 	m_backend->setGeometry( 64, 15, 260, 20 );
 
 	QLabel * backend_lbl = new QLabel( tr( "Backend" ), this );
 	backend_lbl->setFont( pointSize<7>( backend_lbl->font() ) );
 	backend_lbl->move( 8, 18 );
 
-	m_device = new ComboBox( this, "DEVICE" );
+	m_device = new gui::ComboBox( this, "DEVICE" );
 	m_device->setGeometry( 64, 35, 260, 20 );
 
 	QLabel * dev_lbl = new QLabel( tr( "Device" ), this );
@@ -489,7 +488,7 @@ AudioSoundIo::setupWidget::setupWidget( QWidget * _parent ) :
 
 	reconnectSoundIo();
 
-	bool ok = connect( &m_backendModel, SIGNAL( dataChanged() ), &m_setupUtil, SLOT( reconnectSoundIo() ) );
+	bool ok = connect( &m_backendModel, SIGNAL(dataChanged()), &m_setupUtil, SLOT(reconnectSoundIo()));
 	assert(ok);
 
 	m_backend->setModel( &m_backendModel );
@@ -498,12 +497,12 @@ AudioSoundIo::setupWidget::setupWidget( QWidget * _parent ) :
 
 AudioSoundIo::setupWidget::~setupWidget()
 {
-	bool ok = disconnect( &m_backendModel, SIGNAL( dataChanged() ), &m_setupUtil, SLOT( reconnectSoundIo() ) );
+	bool ok = disconnect( &m_backendModel, SIGNAL(dataChanged()), &m_setupUtil, SLOT(reconnectSoundIo()));
 	assert(ok);
 	if (m_soundio)
 	{
 		soundio_destroy(m_soundio);
-		m_soundio = NULL;
+		m_soundio = nullptr;
 	}
 }
 
@@ -518,5 +517,8 @@ void AudioSoundIo::setupWidget::saveSettings()
 	ConfigManager::inst()->setValue( "audiosoundio", "out_device_id", deviceId->id);
 	ConfigManager::inst()->setValue( "audiosoundio", "out_device_raw", configDeviceRaw);
 }
+
+
+} // namespace lmms
 
 #endif

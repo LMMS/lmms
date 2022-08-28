@@ -8,7 +8,7 @@
         <bbtrack>
           <trackcontainer visible="1" width="580" height="300" type="bbtrackcontainer" x="610" y="5" maximized="0" minimized="0">
             <track type="0" muted="0" name="kick_hard01.ogg" solo="0">
-              <instrumenttrack pitch="0" vol="59" fxch="0" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
+              <instrumenttrack pitch="0" vol="59" mixch="0" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
                 <instrument name="audiofileprocessor">
                   <audiofileprocessor interp="1" reversed="0" looped="0" sframe="0" lframe="0" eframe="0.999904" src="drums/kick_hard01.ogg" amp="204" stutter="0"/>
                 </instrument>
@@ -25,7 +25,7 @@
               <pattern type="0" muted="0" steps="16" name="kick_hard01.ogg" pos="0" len="192"/>
             </track>
             <track type="0" muted="0" name="kick04.ogg" solo="0">
-              <instrumenttrack pitch="0" vol="59" fxch="0" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
+              <instrumenttrack pitch="0" vol="59" mixch="0" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
                 <instrument name="audiofileprocessor">
                   <audiofileprocessor interp="1" reversed="0" looped="0" sframe="0" lframe="0" eframe="0.999893" src="drums/kick04.ogg" amp="100" stutter="0"/>
                 </instrument>
@@ -42,7 +42,7 @@
               <pattern type="0" muted="0" steps="16" name="kick04.ogg" pos="0" len="192"/>
             </track>
             <track type="0" muted="0" name="hihat_opened01.ogg" solo="0">
-              <instrumenttrack pitch="0" vol="59" fxch="0" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
+              <instrumenttrack pitch="0" vol="59" mixch="0" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
                 <instrument name="audiofileprocessor">
                   <audiofileprocessor interp="1" reversed="0" looped="0" sframe="0" lframe="0" eframe="0.99983" src="drums/hihat_opened01.ogg" amp="100" stutter="0"/>
                 </instrument>
@@ -59,7 +59,7 @@
               <pattern type="0" muted="0" steps="16" name="hihat_opened01.ogg" pos="0" len="192"/>
             </track>
             <track type="0" muted="0" name="hihat_opened02.ogg" solo="0">
-              <instrumenttrack pitch="0" vol="59" fxch="0" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
+              <instrumenttrack pitch="0" vol="59" mixch="0" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
                 <instrument name="audiofileprocessor">
                   <audiofileprocessor interp="1" reversed="0" looped="0" sframe="0" lframe="0" eframe="0.99989" src="drums/hihat_opened02.ogg" amp="100" stutter="0"/>
                 </instrument>
@@ -76,7 +76,7 @@
               <pattern type="0" muted="0" steps="16" name="hihat_opened02.ogg" pos="0" len="192"/>
             </track>
             <track type="0" muted="0" name="clap01.ogg" solo="0">
-              <instrumenttrack pitch="0" vol="59" fxch="0" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
+              <instrumenttrack pitch="0" vol="59" mixch="0" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
                 <instrument name="audiofileprocessor">
                   <audiofileprocessor interp="1" reversed="0" looped="0" sframe="0" lframe="0" eframe="0.999869" src="drums/clap01.ogg" amp="100" stutter="0"/>
                 </instrument>
@@ -93,7 +93,7 @@
               <pattern type="0" muted="0" steps="16" name="clap01.ogg" pos="0" len="192"/>
             </track>
             <track type="0" muted="0" name="shaker01.ogg" solo="0">
-              <instrumenttrack pitch="0" vol="59" fxch="0" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
+              <instrumenttrack pitch="0" vol="59" mixch="0" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
                 <instrument name="audiofileprocessor">
                   <audiofileprocessor interp="1" reversed="0" looped="0" sframe="0" lframe="0" eframe="0.998568" src="drums/shaker01.ogg" amp="100" stutter="0"/>
                 </instrument>
@@ -131,11 +131,11 @@
       <automationpattern prog="0" mute="0" name="Master volume" pos="0" tens="1" len="192"/>
       <automationpattern prog="0" mute="0" name="Master pitch" pos="0" tens="1" len="192"/>
     </track>
-    <fxmixer visible="1" width="561" height="332" x="10" y="314" maximized="0" minimized="0">
-      <fxchannel num="0" muted="0" volume="1" name="Master" soloed="0">
+    <mixer visible="1" width="561" height="332" x="10" y="314" maximized="0" minimized="0">
+      <mixerchannel num="0" muted="0" volume="1" name="Master" soloed="0">
         <fxchain numofeffects="0" enabled="0"/>
-      </fxchannel>
-    </fxmixer>
+      </mixerchannel>
+    </mixer>
     <ControllerRackView visible="1" width="258" height="142" x="608" y="307" maximized="0" minimized="0"/>
     <pianoroll visible="0" width="640" height="480" x="1" y="1" maximized="0" minimized="0"/>
     <automationeditor visible="0" width="640" height="400" x="56" y="255" maximized="0" minimized="0"/>

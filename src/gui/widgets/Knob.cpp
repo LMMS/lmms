@@ -24,7 +24,6 @@
 
 #include <memory>
 #include <QApplication>
-#include <QBitmap>
 #include <QFontMetrics>
 #include <QInputDialog>
 #include <QMouseEvent>
@@ -46,19 +45,21 @@
 #include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "ProjectJournal.h"
-#include "Song.h"
-#include "stdshims.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 
-TextFloat * Knob::s_textFloat = NULL;
+
+namespace lmms::gui
+{
+
+TextFloat * Knob::s_textFloat = nullptr;
 
 
 
 
 Knob::Knob( knobTypes _knob_num, QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
-	FloatModelView( new FloatModel( 0, 0, 0, 1, NULL, _name, true ), this ),
+	FloatModelView( new FloatModel( 0, 0, 0, 1, nullptr, _name, true ), this ),
 	m_label( "" ),
 	m_isHtmlLabel(false),
 	m_tdRenderer(nullptr),
@@ -83,7 +84,7 @@ Knob::Knob( QWidget * _parent, const QString & _name ) :
 
 void Knob::initUi( const QString & _name )
 {
-	if( s_textFloat == NULL )
+	if( s_textFloat == nullptr )
 	{
 		s_textFloat = new TextFloat;
 	}
@@ -153,7 +154,7 @@ void Knob::onKnobNumUpdated()
 		}
 
 		// If knobFilename is still empty here we should get the fallback pixmap of size 1x1
-		m_knobPixmap = make_unique<QPixmap>(QPixmap(embed::getIconPixmap(knobFilename.toUtf8().constData())));
+		m_knobPixmap = std::make_unique<QPixmap>(QPixmap(embed::getIconPixmap(knobFilename.toUtf8().constData())));
 		if (!this->isEnabled())
 		{
 			convertPixmapToGrayScale(*m_knobPixmap.get());
@@ -491,7 +492,7 @@ float Knob::getValue( const QPoint & _p )
 	value = .4f * _p.y();
 
 	// if shift pressed we want slower movement
-	if( gui->mainWindow()->isShiftPressed() )
+	if( getGUI()->mainWindow()->isShiftPressed() )
 	{
 		value /= 4.0f;
 		value = qBound( -4.0f, value, 4.0f );
@@ -508,13 +509,13 @@ void Knob::contextMenuEvent( QContextMenuEvent * )
 	// button, the context-menu appears while mouse-cursor is still hidden
 	// and it isn't shown again until user does something which causes
 	// an QApplication::restoreOverrideCursor()-call...
-	mouseReleaseEvent( NULL );
+	mouseReleaseEvent( nullptr );
 
 	CaptionMenu contextMenu( model()->displayName(), this );
 	addDefaultActions( &contextMenu );
 	contextMenu.addAction( QPixmap(),
 		model()->isScaleLogarithmic() ? tr( "Set linear" ) : tr( "Set logarithmic" ),
-		this, SLOT( toggleScale() ) );
+		this, SLOT(toggleScale()));
 	contextMenu.addSeparator();
 	contextMenu.exec( QCursor::pos() );
 }
@@ -551,7 +552,7 @@ void Knob::dropEvent( QDropEvent * _de )
 		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
 				Engine::projectJournal()->
 					journallingObject( val.toInt() ) );
-		if( mod != NULL )
+		if( mod != nullptr )
 		{
 			AutomatableModel::linkModels( model(), mod );
 			mod->setValue( model()->value() );
@@ -645,7 +646,7 @@ void Knob::mouseReleaseEvent( QMouseEvent* event )
 void Knob::focusOutEvent( QFocusEvent * _fe )
 {
 	// make sure we don't loose mouse release event
-	mouseReleaseEvent( NULL );
+	mouseReleaseEvent( nullptr );
 	QWidget::focusOutEvent( _fe );
 }
 
@@ -797,7 +798,7 @@ void Knob::enterValue()
 
 void Knob::friendlyUpdate()
 {
-	if (model() && (model()->controllerConnection() == NULL ||
+	if (model() && (model()->controllerConnection() == nullptr ||
 		model()->controllerConnection()->getController()->frequentUpdates() == false ||
 				Controller::runningFrames() % (256*4) == 0))
 	{
@@ -826,13 +827,13 @@ QString Knob::displayValue() const
 
 void Knob::doConnections()
 {
-	if( model() != NULL )
+	if( model() != nullptr )
 	{
-		QObject::connect( model(), SIGNAL( dataChanged() ),
-					this, SLOT( friendlyUpdate() ) );
+		QObject::connect( model(), SIGNAL(dataChanged()),
+					this, SLOT(friendlyUpdate()));
 
-		QObject::connect( model(), SIGNAL( propertiesChanged() ),
-						this, SLOT( update() ) );
+		QObject::connect( model(), SIGNAL(propertiesChanged()),
+						this, SLOT(update()));
 	}
 }
 
@@ -867,3 +868,6 @@ void convertPixmapToGrayScale(QPixmap& pixMap)
 	}
 	pixMap.convertFromImage(temp);
 }
+
+
+} // namespace lmms::gui

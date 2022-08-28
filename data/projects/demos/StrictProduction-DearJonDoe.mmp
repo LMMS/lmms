@@ -8,7 +8,7 @@
         <bbtrack>
           <trackcontainer maximized="0" height="352" visible="1" minimized="0" x="541" y="531" type="bbtrackcontainer" width="972">
             <track muted="0" name="latin_guitar03.ogg" solo="0" type="0">
-              <instrumenttrack pitch="0" fxch="0" basenote="57" usemasterpitch="1" pitchrange="1" vol="130" pan="14">
+              <instrumenttrack pitch="0" mixch="0" basenote="57" usemasterpitch="1" pitchrange="1" vol="130" pan="14">
                 <instrument name="audiofileprocessor">
                   <audiofileprocessor stutter="0" interp="1" reversed="1" looped="0" sframe="0.919998" lframe="0.919998" src="latin/latin_guitar03.ogg" eframe="0.999992" amp="100"/>
                 </instrument>
@@ -81,7 +81,7 @@
               <pattern len="192" muted="0" name="latin_guitar03.ogg" steps="16" pos="1536" type="0"/>
             </track>
             <track muted="0" name="steel_guitar01.ogg" solo="0" type="0">
-              <instrumenttrack pitch="0" fxch="0" basenote="57" usemasterpitch="1" pitchrange="1" vol="46" pan="2">
+              <instrumenttrack pitch="0" mixch="0" basenote="57" usemasterpitch="1" pitchrange="1" vol="46" pan="2">
                 <instrument name="audiofileprocessor">
                   <audiofileprocessor stutter="0" interp="1" reversed="0" looped="0" sframe="0" lframe="0" src="instruments/steel_guitar01.ogg" eframe="0.999986" amp="100"/>
                 </instrument>
@@ -128,7 +128,7 @@
               <pattern len="192" muted="0" name="steel_guitar01.ogg" steps="16" pos="1536" type="0"/>
             </track>
             <track muted="0" name="kick02.ogg" solo="0" type="0">
-              <instrumenttrack pitch="0" fxch="0" basenote="57" usemasterpitch="1" pitchrange="1" vol="100" pan="0">
+              <instrumenttrack pitch="0" mixch="0" basenote="57" usemasterpitch="1" pitchrange="1" vol="100" pan="0">
                 <instrument name="audiofileprocessor">
                   <audiofileprocessor stutter="0" interp="1" reversed="0" looped="0" sframe="0" lframe="0" src="drums/kick02.ogg" eframe="0.999953" amp="100"/>
                 </instrument>
@@ -157,7 +157,7 @@
               <pattern len="192" muted="0" name="kick02.ogg" steps="16" pos="1536" type="0"/>
             </track>
             <track muted="0" name="kick_soft02.ogg" solo="0" type="0">
-              <instrumenttrack pitch="0" fxch="0" basenote="57" usemasterpitch="1" pitchrange="1" vol="100" pan="0">
+              <instrumenttrack pitch="0" mixch="0" basenote="57" usemasterpitch="1" pitchrange="1" vol="100" pan="0">
                 <instrument name="audiofileprocessor">
                   <audiofileprocessor stutter="0" interp="1" reversed="0" looped="0" sframe="0" lframe="0" src="drums/kick_soft02.ogg" eframe="0.999899" amp="100"/>
                 </instrument>
@@ -187,7 +187,7 @@
               <pattern len="192" muted="0" name="kick_soft02.ogg" steps="16" pos="1536" type="0"/>
             </track>
             <track muted="0" name="kick02.ogg" solo="0" type="0">
-              <instrumenttrack pitch="0" fxch="0" basenote="48" usemasterpitch="1" pitchrange="1" vol="148" pan="0">
+              <instrumenttrack pitch="0" mixch="0" basenote="48" usemasterpitch="1" pitchrange="1" vol="148" pan="0">
                 <instrument name="audiofileprocessor">
                   <audiofileprocessor stutter="0" interp="1" reversed="0" looped="0" sframe="0" lframe="0" src="drums/kick02.ogg" eframe="0.999953" amp="100"/>
                 </instrument>
@@ -215,7 +215,7 @@
               <pattern len="192" muted="0" name="kick02.ogg" steps="16" pos="1536" type="0"/>
             </track>
             <track muted="0" name="crash02.ogg" solo="0" type="0">
-              <instrumenttrack pitch="0" fxch="0" basenote="77" usemasterpitch="1" pitchrange="1" vol="20" pan="36">
+              <instrumenttrack pitch="0" mixch="0" basenote="77" usemasterpitch="1" pitchrange="1" vol="20" pan="36">
                 <instrument name="audiofileprocessor">
                   <audiofileprocessor stutter="0" interp="1" reversed="1" looped="0" sframe="0.629998" lframe="0.629998" src="drums/crash02.ogg" eframe="0.999973" amp="100"/>
                 </instrument>
@@ -242,7 +242,7 @@
               <pattern len="192" muted="0" name="crash02.ogg" steps="16" pos="1536" type="0"/>
             </track>
             <track muted="0" name="sidestick01.ogg" solo="0" type="0">
-              <instrumenttrack pitch="0" fxch="0" basenote="57" usemasterpitch="1" pitchrange="1" vol="100" pan="0">
+              <instrumenttrack pitch="0" mixch="0" basenote="57" usemasterpitch="1" pitchrange="1" vol="100" pan="0">
                 <instrument name="audiofileprocessor">
                   <audiofileprocessor stutter="0" interp="1" reversed="0" looped="0" sframe="0" lframe="0" src="drums/sidestick01.ogg" eframe="0.998404" amp="100"/>
                 </instrument>
@@ -272,7 +272,7 @@
               <pattern len="192" muted="0" name="sidestick01.ogg" steps="16" pos="1536" type="0"/>
             </track>
             <track muted="0" name="snare07.ogg" solo="0" type="0">
-              <instrumenttrack pitch="0" fxch="0" basenote="57" usemasterpitch="1" pitchrange="1" vol="100" pan="0">
+              <instrumenttrack pitch="0" mixch="0" basenote="57" usemasterpitch="1" pitchrange="1" vol="100" pan="0">
                 <instrument name="audiofileprocessor">
                   <audiofileprocessor stutter="0" interp="1" reversed="0" looped="0" sframe="0" lframe="0" src="drums/snare07.ogg" eframe="0.0999283" amp="100"/>
                 </instrument>
@@ -304,7 +304,7 @@
               <pattern len="192" muted="0" name="snare07.ogg" steps="16" pos="1536" type="0"/>
             </track>
             <track muted="0" name="hihat_closed01.ogg" solo="0" type="0">
-              <instrumenttrack pitch="0" fxch="0" basenote="57" usemasterpitch="1" pitchrange="1" vol="196" pan="0">
+              <instrumenttrack pitch="0" mixch="0" basenote="57" usemasterpitch="1" pitchrange="1" vol="196" pan="0">
                 <instrument name="audiofileprocessor">
                   <audiofileprocessor stutter="0" interp="1" reversed="0" looped="0" sframe="0" lframe="0" src="drums/hihat_closed01.ogg" eframe="0.999815" amp="100"/>
                 </instrument>
@@ -673,11 +673,11 @@
         <time pos="384" value="-846"/>
       </automationpattern>
     </track>
-    <fxmixer maximized="0" height="332" visible="1" minimized="0" x="9" y="530" width="530">
-      <fxchannel muted="0" num="0" name="Master" volume="0.31" soloed="0">
+    <mixer maximized="0" height="332" visible="1" minimized="0" x="9" y="530" width="530">
+      <mixerchannel muted="0" num="0" name="Master" volume="0.31" soloed="0">
         <fxchain enabled="0" numofeffects="0"/>
-      </fxchannel>
-    </fxmixer>
+      </mixerchannel>
+    </mixer>
     <ControllerRackView maximized="0" height="300" visible="0" minimized="0" x="955" y="413" width="400"/>
     <pianoroll maximized="0" height="480" visible="0" minimized="0" x="37" y="69" width="640"/>
     <automationeditor maximized="0" height="400" visible="0" minimized="0" x="1" y="1" width="640"/>

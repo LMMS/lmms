@@ -26,20 +26,25 @@
 
 #include <cmath>
 
+#include <QHBoxLayout>
 #include <QGroupBox>
-#include <QLayout>
+#include <QVBoxLayout>
 
-#include "LadspaEffect.h"
+#include "LadspaBase.h"
+#include "LadspaControl.h"
+#include "LadspaControls.h"
 #include "LadspaControlDialog.h"
 #include "LadspaControlView.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 
+namespace lmms::gui
+{
 
 
 LadspaControlDialog::LadspaControlDialog( LadspaControls * _ctl ) :
 	EffectControlDialog( _ctl ),
-	m_effectLayout( NULL ),
-	m_stereoLink( NULL )
+	m_effectLayout( nullptr ),
+	m_stereoLink( nullptr )
 {
 	QVBoxLayout * mainLay = new QVBoxLayout( this );
 
@@ -57,13 +62,6 @@ LadspaControlDialog::LadspaControlDialog( LadspaControls * _ctl ) :
 		m_stereoLink->setModel( &_ctl->m_stereoLinkModel );
 		center->addWidget( m_stereoLink );
 	}
-}
-
-
-
-
-LadspaControlDialog::~LadspaControlDialog()
-{
 }
 
 
@@ -133,16 +131,15 @@ void LadspaControlDialog::updateEffectView( LadspaControls * _ctl )
 		m_effectLayout->addWidget( grouper );
 	}
 
-	if( _ctl->m_processors > 1 && m_stereoLink != NULL )
+	if( _ctl->m_processors > 1 && m_stereoLink != nullptr )
 	{
 		m_stereoLink->setModel( &_ctl->m_stereoLinkModel );
 	}
 
-	connect( _ctl, SIGNAL( effectModelChanged( LadspaControls * ) ),
-				this, SLOT( updateEffectView( LadspaControls * ) ),
+	connect( _ctl, SIGNAL( effectModelChanged( lmms::LadspaControls * ) ),
+				this, SLOT( updateEffectView( lmms::LadspaControls * ) ),
 							Qt::DirectConnection );
 }
 
 
-
-
+} // namespace lmms::gui

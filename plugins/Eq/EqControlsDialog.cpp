@@ -25,22 +25,21 @@
 
 #include "EqControlsDialog.h"
 
-#include <QGraphicsView>
-#include <QLayout>
 #include <QWidget>
 
 #include "AutomatableButton.h"
 #include "embed.h"
-#include "Engine.h"
 #include "Knob.h"
-#include "Fader.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "PixmapButton.h"
 
 #include "EqControls.h"
 #include "EqFader.h"
 #include "EqParameterWidget.h"
 #include "EqSpectrumView.h"
+
+namespace lmms::gui
+{
 
 
 EqControlsDialog::EqControlsDialog( EqControls *controls ) :
@@ -118,7 +117,7 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 		freqKnob->setHintText( tr( "Frequency:" ), "Hz" );
 
 		// adds the Number Active buttons
-		PixmapButton * activeButton = new PixmapButton( this, NULL );
+		PixmapButton * activeButton = new PixmapButton( this, nullptr );
 		activeButton->setCheckable(true);
 		activeButton->setModel( m_parameterWidget->getBandModels( i )->active );
 
@@ -151,38 +150,38 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	outSpecButton->move( 302, 240 );
 
 	//hp filter type
-	PixmapButton * hp12Button = new PixmapButton( this , NULL );
+	PixmapButton * hp12Button = new PixmapButton( this , nullptr );
 	hp12Button->setModel( m_parameterWidget->getBandModels( 0 )->hp12 );
 	hp12Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "12dB" ) );
 	hp12Button->setInactiveGraphic(  PLUGIN_NAME::getIconPixmap( "12dBoff" ) );
 	hp12Button->move( 79, 298 );
-	PixmapButton * hp24Button = new PixmapButton( this , NULL );
+	PixmapButton * hp24Button = new PixmapButton( this , nullptr );
 	hp24Button->setModel(m_parameterWidget->getBandModels( 0 )->hp24 );
 	hp24Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "24dB" ) );
 	hp24Button->setInactiveGraphic(  PLUGIN_NAME::getIconPixmap( "24dBoff" ) );
 
 	hp24Button->move( 79 , 328 );
-	PixmapButton * hp48Button = new PixmapButton( this , NULL );
+	PixmapButton * hp48Button = new PixmapButton( this , nullptr );
 	hp48Button->setModel( m_parameterWidget->getBandModels(0)->hp48 );
 	hp48Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "48dB" ) );
 	hp48Button->setInactiveGraphic(  PLUGIN_NAME::getIconPixmap( "48dBoff" ) );
 
 	hp48Button->move( 79, 358 );
 	//LP filter type
-	PixmapButton * lp12Button = new PixmapButton( this , NULL );
+	PixmapButton * lp12Button = new PixmapButton( this , nullptr );
 	lp12Button->setModel( m_parameterWidget->getBandModels( 7 )->lp12 );
 	lp12Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "12dB" ) );
 	lp12Button->setInactiveGraphic(  PLUGIN_NAME::getIconPixmap( "12dBoff" ) );
 
 	lp12Button->move( 387, 298 );
-	PixmapButton * lp24Button = new PixmapButton( this , NULL );
+	PixmapButton * lp24Button = new PixmapButton( this , nullptr );
 	lp24Button->setModel( m_parameterWidget->getBandModels( 7 )->lp24 );
 	lp24Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "24dB" ) );
 	lp24Button->setInactiveGraphic(  PLUGIN_NAME::getIconPixmap( "24dBoff" ) );
 
 	lp24Button->move( 387, 328 );
 
-	PixmapButton * lp48Button = new PixmapButton( this , NULL );
+	PixmapButton * lp48Button = new PixmapButton( this , nullptr );
 	lp48Button->setModel( m_parameterWidget->getBandModels( 7 )->lp48 );
 	lp48Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "48dB" ) );
 	lp48Button->setInactiveGraphic(  PLUGIN_NAME::getIconPixmap( "48dBoff" ) );
@@ -201,13 +200,13 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	lpBtnGrp->addButton( lp12Button );
 	lpBtnGrp->addButton( lp24Button );
 	lpBtnGrp->addButton( lp48Button );
-	lpBtnGrp->setModel( &m_controls->m_lpTypeModel, false);
+	lpBtnGrp->setModel(&m_controls->m_lpTypeModel);
 
 	automatableButtonGroup *hpBtnGrp = new automatableButtonGroup( this, tr( "HP group" ) );
 	hpBtnGrp->addButton( hp12Button );
 	hpBtnGrp->addButton( hp24Button );
 	hpBtnGrp->addButton( hp48Button );
-	hpBtnGrp->setModel( &m_controls->m_hpTypeModel,false);
+	hpBtnGrp->setModel(&m_controls->m_hpTypeModel);
 }
 
 
@@ -238,3 +237,6 @@ EqBand* EqControlsDialog::setBand(int index, BoolModel* active, FloatModel* freq
 	filterModels->lp48 = lp48;
 	return filterModels;
 }
+
+
+} // namespace lmms::gui

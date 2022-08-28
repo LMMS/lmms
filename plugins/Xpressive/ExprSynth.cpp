@@ -27,11 +27,9 @@
 
 #include <string>
 #include <vector>
-#include <math.h>
-#include <cstdlib>
+#include <cmath>
 #include <random>
 
-#include "Xpressive.h"
 
 #include "interpolation.h"
 #include "lmms_math.h"
@@ -41,9 +39,13 @@
 #include "exprtk.hpp"
 
 #define WARN_EXPRTK qWarning("ExprTk exception")
-typedef exprtk::symbol_table<float> symbol_table_t;
-typedef exprtk::expression<float> expression_t;
-typedef exprtk::parser<float> parser_t;
+
+namespace lmms
+{
+
+using symbol_table_t = exprtk::symbol_table<float>;
+using expression_t = exprtk::expression<float>;
+using parser_t = exprtk::parser<float>;
 
 template <typename T,typename Functor,bool optimize>
 struct freefunc0 : public exprtk::ifunction<T>
@@ -53,7 +55,7 @@ struct freefunc0 : public exprtk::ifunction<T>
 	freefunc0() : exprtk::ifunction<T>(0) {
 		if (optimize) { exprtk::disable_has_side_effects(*this); }
 	}
-	inline T operator()()
+	inline T operator()() override
 	{ return Functor::process(); }
 };
 template <typename T,typename Functor,bool optimize>
@@ -64,7 +66,7 @@ struct freefunc1 : public exprtk::ifunction<T>
 	freefunc1() : exprtk::ifunction<T>(1) {
 		if (optimize) { exprtk::disable_has_side_effects(*this); }
 	}
-	inline T operator()(const T& x)
+	inline T operator()(const T& x) override
 	{ return Functor::process(x); }
 };
 
@@ -73,7 +75,7 @@ struct IntegrateFunction : public exprtk::ifunction<T>
 {
 
 	using exprtk::ifunction<T>::operator();
-	virtual ~IntegrateFunction()
+	~IntegrateFunction() override
 	{
 		delete [] m_counters;
 	}
@@ -91,7 +93,7 @@ struct IntegrateFunction : public exprtk::ifunction<T>
 		clearArray(m_counters,max_counters);
 	}
 
-	inline T operator()(const T& x)
+	inline T operator()(const T& x) override
 	{
 		if (*m_frame == 0)
 		{
@@ -128,7 +130,7 @@ struct LastSampleFunction : public exprtk::ifunction<T>
 {
 
 	using exprtk::ifunction<T>::operator();
-	virtual ~LastSampleFunction()
+	~LastSampleFunction() override
 	{
 		delete [] m_samples;
 	}
@@ -142,7 +144,7 @@ struct LastSampleFunction : public exprtk::ifunction<T>
 		clearArray(m_samples, history_size);
 	}
 
-	inline T operator()(const T& x)
+	inline T operator()(const T& x) override
 	{
 		if (!std::isnan(x) && !std::isinf(x))
 		{
@@ -184,7 +186,7 @@ struct WaveValueFunction : public exprtk::ifunction<T>
 	m_size(s)
 	{}
 
-	inline T operator()(const T& index)
+	inline T operator()(const T& index) override
 	{
 		return m_vec[(int) ( positiveFraction(index) * m_size )];
 	}
@@ -202,7 +204,7 @@ struct WaveValueFunctionInterpolate : public exprtk::ifunction<T>
 	m_size(s)
 	{}
 
-	inline T operator()(const T& index)
+	inline T operator()(const T& index) override
 	{
 		const T x = positiveFraction(index) * m_size;
 		const int ix = (int)x;
@@ -318,7 +320,7 @@ struct RandomVectorSeedFunction : public exprtk::ifunction<float>
 		return static_cast<int>(res) / (float)(1 << 31);
 	}
 
-	inline float operator()(const float& index,const float& seed)
+	inline float operator()(const float& index,const float& seed) override
 	{
 		int irseed;
 		if (seed < 0 || std::isnan(seed) || std::isinf(seed))
@@ -343,7 +345,7 @@ struct RandomVectorFunction : public exprtk::ifunction<float>
 	m_rseed(seed)
 	{ exprtk::disable_has_side_effects(*this); }
 
-	inline float operator()(const float& index)
+	inline float operator()(const float& index) override
 	{
 		return RandomVectorSeedFunction::randv(index,m_rseed);
 	}
@@ -370,7 +372,7 @@ class ExprFrontData
 public:
 	ExprFrontData(int last_func_samples):
 	m_rand_vec(SimpleRandom::generator()),
-	m_integ_func(NULL),
+	m_integ_func(nullptr),
 	m_last_func(last_func_samples)
 	{}
 	~ExprFrontData()
@@ -670,7 +672,7 @@ size_t find_occurances(const std::string& haystack, const char* const needle)
 
 void ExprFront::setIntegrate(const unsigned int* const frameCounter, const unsigned int sample_rate)
 {
-	if (m_data->m_integ_func == NULL)
+	if (m_data->m_integ_func == nullptr)
 	{
 		const unsigned int ointeg = find_occurances(m_data->m_expression_string,"integrate");
 		if ( ointeg > 0 )
@@ -822,3 +824,6 @@ void ExprSynth::renderOutput(fpp_t frames, sampleFrame *buf)
 		WARN_EXPRTK;
 	}
 }
+
+
+} // namespace lmms

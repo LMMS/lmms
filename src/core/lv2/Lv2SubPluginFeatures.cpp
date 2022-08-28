@@ -28,13 +28,15 @@
 
 #ifdef LMMS_HAVE_LV2
 
-#include <QDebug>
 #include <QHBoxLayout>
 #include <QLabel>
 
 #include "Engine.h"
 #include "Lv2Basics.h"
 #include "Lv2Manager.h"
+
+namespace lmms
+{
 
 
 const LilvPlugin *Lv2SubPluginFeatures::getPlugin(
@@ -179,6 +181,9 @@ void Lv2SubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor *desc,
 		}
 	}
 }
+
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2
 

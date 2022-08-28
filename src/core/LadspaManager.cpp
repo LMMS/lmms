@@ -29,12 +29,15 @@
 #include <QDir>
 #include <QLibrary>
 
-#include <math.h>
+#include <cmath>
 
 #include "ConfigManager.h"
 #include "LadspaManager.h"
 #include "PluginFactory.h"
 
+
+namespace lmms
+{
 
 
 LadspaManager::LadspaManager()
@@ -86,7 +89,7 @@ LadspaManager::LadspaManager()
 				LADSPA_Descriptor_Function descriptorFunction =
 			( LADSPA_Descriptor_Function ) plugin_lib.resolve(
 							"ladspa_descriptor" );
-				if( descriptorFunction != NULL )
+				if( descriptorFunction != nullptr )
 				{
 					addPlugins( descriptorFunction,
 							f.fileName() );
@@ -113,7 +116,7 @@ LadspaManager::LadspaManager()
 
 LadspaManager::~LadspaManager()
 {
-	for( ladspaManagerMapType::iterator it = m_ladspaManagerMap.begin();
+	for( LadspaManagerMapType::iterator it = m_ladspaManagerMap.begin();
 					it != m_ladspaManagerMap.end(); ++it )
 	{
 		delete it.value();
@@ -123,7 +126,7 @@ LadspaManager::~LadspaManager()
 
 
 
-ladspaManagerDescription * LadspaManager::getDescription(
+LadspaManagerDescription * LadspaManager::getDescription(
 						const ladspa_key_t & _plugin )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
@@ -132,7 +135,7 @@ ladspaManagerDescription * LadspaManager::getDescription(
 	}
 	else
 	{
-		return( NULL );
+		return( nullptr );
 	}
 }
 
@@ -146,7 +149,7 @@ void LadspaManager::addPlugins(
 	const LADSPA_Descriptor * descriptor;
 
 	for( long pluginIndex = 0;
-		( descriptor = _descriptor_func( pluginIndex ) ) != NULL;
+		( descriptor = _descriptor_func( pluginIndex ) ) != nullptr;
 								++pluginIndex )
 	{
 		ladspa_key_t key( _file, QString( descriptor->Label ) );
@@ -155,8 +158,8 @@ void LadspaManager::addPlugins(
 			continue;
 		}
 
-		ladspaManagerDescription * plugIn = 
-				new ladspaManagerDescription;
+		LadspaManagerDescription * plugIn = 
+				new LadspaManagerDescription;
 		plugIn->descriptorFunction = _descriptor_func;
 		plugIn->index = pluginIndex;
 		plugIn->inputChannels = getPluginInputs( descriptor );
@@ -244,7 +247,7 @@ const LADSPA_PortDescriptor* LadspaManager::getPortDescriptor(const ladspa_key_t
 	{
 		return( & descriptor->PortDescriptors[_port] );
 	}
-	return( NULL );
+	return( nullptr );
 }
 
 const LADSPA_PortRangeHint *LadspaManager::getPortRangeHint(const ladspa_key_t &_plugin, uint32_t _port)
@@ -254,7 +257,7 @@ const LADSPA_PortRangeHint *LadspaManager::getPortRangeHint(const ladspa_key_t &
 	{
 		return( & descriptor->PortRangeHints[_port] );
 	}
-	return( NULL );
+	return( nullptr );
 }
 
 
@@ -565,7 +568,7 @@ const void * LadspaManager::getImplementationData(
 						const ladspa_key_t & _plugin )
 {
 	const LADSPA_Descriptor * descriptor = getDescriptor( _plugin );
-	return( descriptor ? descriptor->ImplementationData : NULL );
+	return( descriptor ? descriptor->ImplementationData : nullptr );
 }
 
 
@@ -585,7 +588,7 @@ const LADSPA_Descriptor * LadspaManager::getDescriptor(
 	}
 	else
 	{
-		return( NULL );
+		return( nullptr );
 	}
 }
 
@@ -599,7 +602,7 @@ LADSPA_Handle LadspaManager::instantiate(
 	const LADSPA_Descriptor * descriptor = getDescriptor( _plugin );
 	return( descriptor ?
 				( descriptor->instantiate )( descriptor, _sample_rate ) :
-				NULL );
+				nullptr );
 }
 
 
@@ -611,7 +614,7 @@ bool LadspaManager::connectPort( const ladspa_key_t & _plugin,
 						LADSPA_Data * _data_location )
 {
 	const LADSPA_Descriptor * descriptor = getDescriptor( _plugin );
-	if( descriptor && descriptor->connect_port != NULL &&
+	if( descriptor && descriptor->connect_port != nullptr &&
 			_port < getPortCount( _plugin ) )
 	{
 		( descriptor->connect_port )
@@ -628,7 +631,7 @@ bool LadspaManager::activate( const ladspa_key_t & _plugin,
 					LADSPA_Handle _instance )
 {
 	const LADSPA_Descriptor * descriptor = getDescriptor( _plugin );
-	if( descriptor && descriptor->activate != NULL )
+	if( descriptor && descriptor->activate != nullptr )
 	{
 		( descriptor->activate ) ( _instance );
 		return( true );
@@ -644,7 +647,7 @@ bool LadspaManager::run( const ladspa_key_t & _plugin,
 							uint32_t _sample_count )
 {
 	const LADSPA_Descriptor * descriptor = getDescriptor( _plugin );
-	if( descriptor && descriptor->run!= NULL )
+	if( descriptor && descriptor->run!= nullptr )
 	{
 		( descriptor->run ) ( _instance, _sample_count );
 		return( true );
@@ -660,8 +663,8 @@ bool LadspaManager::runAdding( const ladspa_key_t & _plugin,
 						uint32_t _sample_count )
 {
 	const LADSPA_Descriptor * descriptor = getDescriptor( _plugin );
-	if( descriptor && descriptor->run_adding!= NULL
-			&& descriptor->set_run_adding_gain != NULL )
+	if( descriptor && descriptor->run_adding!= nullptr
+			&& descriptor->set_run_adding_gain != nullptr )
 	{
 		( descriptor->run_adding ) ( _instance, _sample_count );
 		return( true );
@@ -677,8 +680,8 @@ bool LadspaManager::setRunAddingGain( const ladspa_key_t & _plugin,
 						LADSPA_Data _gain )
 {
 	const LADSPA_Descriptor * descriptor = getDescriptor( _plugin );
-	if( descriptor && descriptor->run_adding!= NULL
-			&& descriptor->set_run_adding_gain != NULL )
+	if( descriptor && descriptor->run_adding!= nullptr
+			&& descriptor->set_run_adding_gain != nullptr )
 	{
 		( descriptor->set_run_adding_gain ) ( _instance, _gain );
 		return( true );
@@ -693,7 +696,7 @@ bool LadspaManager::deactivate( const ladspa_key_t & _plugin,
 						LADSPA_Handle _instance )
 {
 	const LADSPA_Descriptor * descriptor = getDescriptor( _plugin );
-	if( descriptor && descriptor->deactivate!= NULL )
+	if( descriptor && descriptor->deactivate!= nullptr )
 	{
 		( descriptor->deactivate ) ( _instance );
 		return( true );
@@ -708,10 +711,13 @@ bool LadspaManager::cleanup( const ladspa_key_t & _plugin,
 						LADSPA_Handle _instance )
 {
 	const LADSPA_Descriptor * descriptor = getDescriptor( _plugin );
-	if( descriptor && descriptor->cleanup!= NULL )
+	if( descriptor && descriptor->cleanup!= nullptr )
 	{
 		( descriptor->cleanup ) ( _instance );
 		return( true );
 	}
 	return( false );
 }
+
+
+} // namespace lmms

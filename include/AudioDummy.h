@@ -27,21 +27,23 @@
 
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
+#include "AudioEngine.h"
 #include "MicroTimer.h"
-#include "Mixer.h"
 
+namespace lmms
+{
 
 class AudioDummy : public QThread, public AudioDevice
 {
 	Q_OBJECT
 public:
-	AudioDummy( bool & _success_ful, Mixer* mixer ) :
-		AudioDevice( DEFAULT_CHANNELS, mixer )
+	AudioDummy( bool & _success_ful, AudioEngine* audioEngine ) :
+		AudioDevice( DEFAULT_CHANNELS, audioEngine )
 	{
 		_success_ful = true;
 	}
 
-	virtual ~AudioDummy()
+	~AudioDummy() override
 	{
 		stopProcessing();
 	}
@@ -52,17 +54,15 @@ public:
 	}
 
 
-	class setupWidget : public AudioDeviceSetupWidget
+	class setupWidget : public gui::AudioDeviceSetupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent ) :
-			AudioDeviceSetupWidget( AudioDummy::name(), _parent )
+			gui::AudioDeviceSetupWidget( AudioDummy::name(), _parent )
 		{
 		}
 
-		virtual ~setupWidget()
-		{
-		}
+		~setupWidget() override = default;
 
 		void saveSettings() override
 		{
@@ -94,17 +94,17 @@ private:
 		while( true )
 		{
 			timer.reset();
-			const surroundSampleFrame* b = mixer()->nextBuffer();
+			const surroundSampleFrame* b = audioEngine()->nextBuffer();
 			if( !b )
 			{
 				break;
 			}
-			if( mixer()->hasFifoWriter() )
+			if( audioEngine()->hasFifoWriter() )
 			{
 				delete[] b;
 			}
 
-			const int microseconds = static_cast<int>( mixer()->framesPerPeriod() * 1000000.0f / mixer()->processingSampleRate() - timer.elapsed() );
+			const int microseconds = static_cast<int>( audioEngine()->framesPerPeriod() * 1000000.0f / audioEngine()->processingSampleRate() - timer.elapsed() );
 			if( microseconds > 0 )
 			{
 				usleep( microseconds );
@@ -114,5 +114,6 @@ private:
 
 } ;
 
+} // namespace lmms
 
 #endif

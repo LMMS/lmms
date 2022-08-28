@@ -31,15 +31,15 @@
 
 #include "lmms_export.h"
 
+namespace lmms::gui
+{
 
 class LMMS_EXPORT TextFloat : public QWidget
 {
 	Q_OBJECT
 public:
 	TextFloat();
-	virtual ~TextFloat()
-	{
-	}
+	~TextFloat() override = default;
 
 	void setTitle( const QString & _title );
 	void setText( const QString & _text );
@@ -50,14 +50,14 @@ public:
 
 	static TextFloat * displayMessage( const QString & _msg,
 						int _timeout = 2000,
-						QWidget * _parent = NULL,
+						QWidget * _parent = nullptr,
 						int _add_y_margin = 0 );
 	static TextFloat * displayMessage( const QString & _title,
 						const QString & _msg,
 						const QPixmap & _pixmap =
 								QPixmap(),
 						int _timeout = 2000,
-						QWidget * _parent = NULL );
+						QWidget * _parent = nullptr );
 
 	void moveGlobal( QWidget * _w, const QPoint & _offset )
 	{
@@ -78,5 +78,8 @@ private:
 	QPixmap m_pixmap;
 
 };
+
+
+} // namespace lmms::gui
 
 #endif

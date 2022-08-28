@@ -30,15 +30,21 @@
 
 #include "ModelView.h"
 
+namespace lmms
+{
+
 class EffectControls;
 
+
+namespace gui
+{
 
 class LMMS_EXPORT EffectControlDialog : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
 	EffectControlDialog( EffectControls * _controls );
-	virtual ~EffectControlDialog();
+	~EffectControlDialog() override = default;
 
 	virtual bool isResizable() const {return false;}
 
@@ -53,5 +59,9 @@ protected:
 	EffectControls * m_effectControls;
 
 } ;
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

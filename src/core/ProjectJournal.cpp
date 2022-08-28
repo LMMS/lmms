@@ -29,6 +29,9 @@
 #include "JournallingObject.h"
 #include "Song.h"
 
+namespace lmms
+{
+
 //! Avoid clashes between loaded IDs (have the bit cleared)
 //! and newly created IDs (have the bit set)
 static const int EO_ID_MSB = 1 << 23;
@@ -40,13 +43,6 @@ ProjectJournal::ProjectJournal() :
 	m_undoCheckPoints(),
 	m_redoCheckPoints(),
 	m_journalling( false )
-{
-}
-
-
-
-
-ProjectJournal::~ProjectJournal()
 {
 }
 
@@ -181,7 +177,7 @@ void ProjectJournal::clearJournal()
 
 	for( JoIdMap::Iterator it = m_joIDs.begin(); it != m_joIDs.end(); )
 	{
-		if( it.value() == NULL )
+		if( it.value() == nullptr )
 		{
 			it = m_joIDs.erase( it );
 		}
@@ -196,7 +192,7 @@ void ProjectJournal::stopAllJournalling()
 {
 	for( JoIdMap::Iterator it = m_joIDs.begin(); it != m_joIDs.end(); ++it)
 	{
-		if( it.value() != NULL ) 
+		if( it.value() != nullptr )
 		{
 			it.value()->setJournalling(false);
 		}
@@ -206,3 +202,4 @@ void ProjectJournal::stopAllJournalling()
 
 
 
+} // namespace lmms

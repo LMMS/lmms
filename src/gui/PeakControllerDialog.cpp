@@ -25,19 +25,15 @@
 
 
 #include <QLabel>
-#include <QPushButton>
-#include <QMdiArea>
 #include <QPainter>
+#include <QIcon>
 
-#include "CaptionMenu.h"
-#include "gui_templates.h"
 #include "embed.h"
-#include "MainWindow.h"
-#include "ToolTip.h"
 
 #include "PeakController.h"
-#include "Knob.h"
-#include "TempoSyncKnob.h"
+
+namespace lmms::gui
+{
 
 
 PeakControllerDialog::PeakControllerDialog( Controller * _model, QWidget * _parent ) :
@@ -47,7 +43,7 @@ PeakControllerDialog::PeakControllerDialog( Controller * _model, QWidget * _pare
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
 	setFixedSize( 256, 64 );
 	
-	ToolTip::add( this, tr( "LFO Controller" ) );
+	setToolTip(tr("LFO Controller"));
 
 	QLabel * l = new QLabel( this );
 	l->setText( "Use FX's controls" );
@@ -56,12 +52,6 @@ PeakControllerDialog::PeakControllerDialog( Controller * _model, QWidget * _pare
 	setModel( _model );
 }
 
-
-
-
-PeakControllerDialog::~PeakControllerDialog()
-{
-}
 
 
 
@@ -94,3 +84,4 @@ void PeakControllerDialog::modelChanged()
 }
 
 
+} // namespace lmms::gui

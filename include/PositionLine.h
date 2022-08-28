@@ -28,6 +28,9 @@
 
 #include <QWidget>
 
+namespace lmms::gui
+{
+
 class PositionLine : public QWidget
 {
 	Q_OBJECT
@@ -37,7 +40,7 @@ public:
 	PositionLine(QWidget* parent);
 
 public slots:
-	void zoomChange(double zoom);
+	void zoomChange(float zoom);
 
 private:
 	void paintEvent(QPaintEvent* pe) override;
@@ -45,5 +48,7 @@ private:
 	bool m_hasTailGradient;
 	QColor m_lineColor;
 };
+
+} // namespace lmms::gui
 
 #endif

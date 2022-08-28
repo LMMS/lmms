@@ -23,12 +23,14 @@
  */
 
 #include "FlangerControlsDialog.h"
-#include "FlangerControls.h"
+
 #include "embed.h"
-#include "LedCheckbox.h"
+#include "FlangerControls.h"
+#include "LedCheckBox.h"
 #include "TempoSyncKnob.h"
 
-
+namespace lmms::gui
+{
 
 
 FlangerControlsDialog::FlangerControlsDialog( FlangerControls *controls ) :
@@ -88,3 +90,6 @@ FlangerControlsDialog::FlangerControlsDialog( FlangerControls *controls ) :
 
 
 }
+
+
+} // namespace lmms::gui

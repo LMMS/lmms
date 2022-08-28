@@ -25,13 +25,21 @@
 
 #include "EqParameterWidget.h"
 
+#include <cmath>
 #include <QGraphicsScene>
 #include <QGraphicsView>
-#include <QMouseEvent>
+#include <QPainter>
+#include <QPen>
 #include <QWidget>
 
-#include "EqControls.h"
-#include "lmms_math.h"
+#include "AutomatableModel.h"
+#include "EqCurve.h"
+#include "EqParameterWidget.h"
+#include "lmms_constants.h"
+
+
+namespace lmms::gui
+{
 
 
 EqParameterWidget::EqParameterWidget( QWidget *parent, EqControls * controls ) :
@@ -240,3 +248,6 @@ EqBand::EqBand() :
 	peakR( 0 )
 {
 }
+
+
+} // namespace lmms::gui

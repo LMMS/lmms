@@ -23,12 +23,15 @@
  *
  */
 
-#include <QLayout>
 
 #include "AmplifierControlDialog.h"
 #include "AmplifierControls.h"
 #include "embed.h"
+#include "Knob.h"
 
+
+namespace lmms::gui
+{
 
 
 AmplifierControlDialog::AmplifierControlDialog( AmplifierControls* controls ) :
@@ -67,3 +70,6 @@ AmplifierControlDialog::AmplifierControlDialog( AmplifierControls* controls ) :
 	rightKnob->setLabel( tr( "RIGHT" ) );
 	rightKnob->setHintText( tr( "Right gain:" ) , "%" );
 }
+
+
+} // namespace lmms::gui

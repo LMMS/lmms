@@ -23,22 +23,24 @@
  *
  */
 
-#include <QLayout>
 
 #include "DualFilterControlDialog.h"
 #include "DualFilterControls.h"
-#include "embed.h"
-#include "LedCheckbox.h"
+#include "Knob.h"
+#include "LedCheckBox.h"
 #include "ComboBox.h"
-#include "ToolTip.h"
 #include "gui_templates.h"
+
+namespace lmms::gui
+{
+
 
 #define makeknob( name, x, y, model, label, hint, unit ) 	\
 	Knob * name = new Knob( knobBright_26, this); 			\
-	name -> move( x, y );									\
-	name ->setModel( &controls-> model );					\
-	name ->setLabel( label );							\
-	name ->setHintText( hint, unit );
+	(name) -> move( x, y );									\
+	(name) ->setModel( &controls-> model );					\
+	(name) ->setLabel( label );							\
+	(name) ->setHintText( hint, unit );
 
 
 
@@ -69,10 +71,10 @@ DualFilterControlDialog::DualFilterControlDialog( DualFilterControls* controls )
 
 	enabled1Toggle -> move( 12, 11 );
 	enabled1Toggle -> setModel( &controls -> m_enabled1Model );
-	ToolTip::add( enabled1Toggle, tr( "Enable/disable filter 1" ) );
+	enabled1Toggle->setToolTip(tr("Enable/disable filter 1"));
 	enabled2Toggle -> move( 210, 11 );
 	enabled2Toggle -> setModel( &controls -> m_enabled2Model );
-	ToolTip::add( enabled2Toggle, tr( "Enable/disable filter 2" ) );
+	enabled2Toggle->setToolTip(tr("Enable/disable filter 2"));
 
 	ComboBox * m_filter1ComboBox = new ComboBox( this );
 	m_filter1ComboBox->setGeometry( 19, 70, 137, ComboBox::DEFAULT_HEIGHT );
@@ -85,3 +87,5 @@ DualFilterControlDialog::DualFilterControlDialog( DualFilterControls* controls )
 	m_filter2ComboBox->setModel( &controls->m_filter2Model );
 }
 
+
+} // namespace lmms::gui

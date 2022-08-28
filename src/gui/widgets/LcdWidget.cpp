@@ -25,20 +25,17 @@
 
 
 
-#include <QApplication>
-#include <QLabel>
-#include <QMouseEvent>
+#include <QStyleOptionFrame>
 #include <QPainter>
-#include <QStyleOptionFrameV2>
 
 #include "LcdWidget.h"
 #include "DeprecationHelper.h"
 #include "embed.h"
 #include "gui_templates.h"
-#include "MainWindow.h"
 
 
-
+namespace lmms::gui
+{
 
 LcdWidget::LcdWidget(QWidget* parent, const QString& name, bool leadingZero) :
 	LcdWidget(1, parent, name, leadingZero)
@@ -294,3 +291,4 @@ void LcdWidget::initUi(const QString& name , const QString& style)
 	updateSize();
 }
 
+} // namespace lmms::gui

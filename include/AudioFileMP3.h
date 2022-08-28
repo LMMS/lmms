@@ -34,6 +34,8 @@
 
 #include "lame/lame.h"
 
+namespace lmms
+{
 
 class AudioFileMP3 : public AudioFileDevice
 {
@@ -42,21 +44,21 @@ public:
 			const ch_cnt_t _channels,
 			bool & successful,
 			const QString & _file,
-			Mixer* mixer );
-	virtual ~AudioFileMP3();
+			AudioEngine* audioEngine );
+	~AudioFileMP3() override;
 
 	static AudioFileDevice * getInst( const QString & outputFilename,
 					  OutputSettings const & outputSettings,
 					  const ch_cnt_t channels,
-					  Mixer* mixer,
+					  AudioEngine* audioEngine,
 					  bool & successful )
 	{
 		return new AudioFileMP3( outputSettings, channels, successful,
-					 outputFilename, mixer );
+					 outputFilename, audioEngine );
 	}
 
 protected:
-	virtual void writeBuffer( const surroundSampleFrame * /* _buf*/,
+	void writeBuffer( const surroundSampleFrame * /* _buf*/,
 				  const fpp_t /*_frames*/,
 				  const float /*_master_gain*/ ) override;
 
@@ -69,6 +71,8 @@ private:
 	lame_t m_lame;
 };
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_HAVE_MP3LAME
 
 #endif

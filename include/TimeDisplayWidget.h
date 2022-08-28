@@ -23,21 +23,23 @@
  *
  */
 
-#ifndef _TIME_DISPLAY_WIDGET
-#define _TIME_DISPLAY_WIDGET
+#ifndef TIME_DISPLAY_WIDGET_H
+#define TIME_DISPLAY_WIDGET_H
 
 #include <QWidget>
 #include <QHBoxLayout>
 
 #include "LcdWidget.h"
 
+namespace lmms::gui
+{
 
 class TimeDisplayWidget : public QWidget
 {
 	Q_OBJECT
 public:
 	TimeDisplayWidget();
-	virtual ~TimeDisplayWidget() = default;
+	~TimeDisplayWidget() override = default;
 
 
 protected:
@@ -55,7 +57,7 @@ private:
 		BarsTicks,
 		DisplayModeCount
 	};
-	typedef DisplayModes DisplayMode;
+	using DisplayMode = DisplayModes;
 
 	void setDisplayMode( DisplayMode displayMode );
 
@@ -67,4 +69,6 @@ private:
 
 } ;
 
-#endif
+} // namespace lmms::gui
+
+#endif // TIME_DISPLAY_WIDGET_H

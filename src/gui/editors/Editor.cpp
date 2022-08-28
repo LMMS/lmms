@@ -26,13 +26,15 @@
 
 #include "Song.h"
 
-#include "MainWindow.h"
 #include "embed.h"
 
 #include <QAction>
-#include <QMdiArea>
 #include <QShortcut>
 #include <QCloseEvent>
+
+
+namespace lmms::gui
+{
 
 
 void Editor::setPauseIcon(bool displayPauseIcon)
@@ -131,11 +133,6 @@ Editor::Editor(bool record, bool stepRecord) :
 	addButton(m_stopAction, "stopButton");
 }
 
-Editor::~Editor()
-{
-
-}
-
 QAction *Editor::playAction() const
 {
 	return m_playAction;
@@ -171,3 +168,4 @@ void DropToolBar::dropEvent(QDropEvent* event)
 
 
 
+} // namespace lmms::gui

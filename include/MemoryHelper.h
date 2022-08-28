@@ -27,6 +27,10 @@
 
 #include <cstddef>
 
+namespace lmms
+{
+
+
 /**
  * Helper class to alocate aligned memory and free it.
  */
@@ -39,6 +43,9 @@ public:
 
 private:
 };
+
+
+} // namespace lmms
 
 #endif
 

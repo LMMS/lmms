@@ -24,17 +24,18 @@
 
 #include "VecControlsDialog.h"
 
-#include <QGridLayout>
-#include <QLabel>
-#include <QResizeEvent>
-#include <QSizePolicy>
-#include <QWidget>
 
-#include "embed.h"
-#include "LedCheckbox.h"
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+
+#include "Knob.h"
+#include "LedCheckBox.h"
 #include "VecControls.h"
 #include "Vectorscope.h"
 #include "VectorView.h"
+
+namespace lmms::gui
+{
 
 
 // The entire GUI layout is built here.
@@ -92,3 +93,6 @@ QSize VecControlsDialog::sizeHint() const
 {
 	return QSize(275, 300);
 }
+
+
+} // namespace lmms::gui

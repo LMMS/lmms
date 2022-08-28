@@ -25,21 +25,32 @@
 #include "SampleTrackWindow.h"
 
 #include <QCloseEvent>
+#include <QGridLayout>
+#include <QLabel>
+#include <QLineEdit>
 #include <QMenu>
+#include <QVBoxLayout>
 
+#include "EffectRackView.h"
 #include "embed.h"
 #include "gui_templates.h"
 #include "GuiApplication.h"
 #include "Knob.h"
 #include "MainWindow.h"
+#include "MixerLineLcdSpinBox.h"
+#include "SampleTrackView.h"
 #include "Song.h"
+#include "SubWindow.h"
 #include "TabWidget.h"
 #include "TrackLabelButton.h"
- 
+
+namespace lmms::gui
+{
+
 
 SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	QWidget(),
-	ModelView(NULL, this),
+	ModelView(nullptr, this),
 	m_track(tv->model()),
 	m_stv(tv)
 {
@@ -64,8 +75,8 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	// setup line edit for changing sample track name
 	m_nameLineEdit = new QLineEdit;
 	m_nameLineEdit->setFont(pointSize<9>(m_nameLineEdit->font()));
-	connect(m_nameLineEdit, SIGNAL(textChanged(const QString &)),
-				this, SLOT(textChanged(const QString &)));
+	connect(m_nameLineEdit, SIGNAL(textChanged(const QString&)),
+				this, SLOT(textChanged(const QString&)));
 
 	m_nameLineEdit->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
 	nameLayout->addWidget(m_nameLineEdit);
@@ -84,7 +95,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	Qt::Alignment widgetAlignment = Qt::AlignHCenter | Qt::AlignCenter;
 
 	// set up volume knob
-	m_volumeKnob = new Knob(knobBright_26, NULL, tr("Sample volume"));
+	m_volumeKnob = new Knob(knobBright_26, nullptr, tr("Sample volume"));
 	m_volumeKnob->setVolumeKnob(true);
 	m_volumeKnob->setHintText(tr("Volume:"), "%");
 
@@ -98,7 +109,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 
 
 	// set up panning knob
-	m_panningKnob = new Knob(knobBright_26, NULL, tr("Panning"));
+	m_panningKnob = new Knob(knobBright_26, nullptr, tr("Panning"));
 	m_panningKnob->setHintText(tr("Panning:"), "");
 
 	basicControlsLayout->addWidget(m_panningKnob, 0, 1);
@@ -113,13 +124,13 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	basicControlsLayout->setColumnStretch(2, 1);
 
 
-	// setup spinbox for selecting FX-channel
-	m_effectChannelNumber = new FxLineLcdSpinBox(2, NULL, tr("FX channel"), m_stv);
+	// setup spinbox for selecting Mixer-channel
+	m_mixerChannelNumber = new MixerLineLcdSpinBox(2, nullptr, tr("Mixer channel"), m_stv);
 
-	basicControlsLayout->addWidget(m_effectChannelNumber, 0, 3);
-	basicControlsLayout->setAlignment(m_effectChannelNumber, widgetAlignment);
+	basicControlsLayout->addWidget(m_mixerChannelNumber, 0, 3);
+	basicControlsLayout->setAlignment(m_mixerChannelNumber, widgetAlignment);
 
-	label = new QLabel(tr("FX"), this);
+	label = new QLabel(tr("CHANNEL"), this);
 	label->setStyleSheet(labelStyleSheet);
 	basicControlsLayout->addWidget(label, 1, 3);
 	basicControlsLayout->setAlignment(label, labelAlignment);
@@ -135,7 +146,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 
 	setModel(tv->model());
 
-	QMdiSubWindow * subWin = gui->mainWindow()->addWindowedWidget(this);
+	QMdiSubWindow * subWin = getGUI()->mainWindow()->addWindowedWidget(this);
 	Qt::WindowFlags flags = subWin->windowFlags();
 	flags |= Qt::MSWindowsFixedSizeDialogHint;
 	flags &= ~Qt::WindowMaximizeButtonHint;
@@ -151,11 +162,6 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	subWin->setFixedSize(subWin->size());
 	subWin->hide();
 }
-
-SampleTrackWindow::~SampleTrackWindow()
-{
-}
-
 
 
 void SampleTrackWindow::setSampleTrackView(SampleTrackView* tv)
@@ -183,7 +189,7 @@ void SampleTrackWindow::modelChanged()
 
 	m_volumeKnob->setModel(&m_track->m_volumeModel);
 	m_panningKnob->setModel(&m_track->m_panningModel);
-	m_effectChannelNumber->setModel(&m_track->m_effectChannelModel);
+	m_mixerChannelNumber->setModel(&m_track->m_mixerChannelModel);
 
 	updateName();
 }
@@ -232,7 +238,7 @@ void SampleTrackWindow::closeEvent(QCloseEvent* ce)
 {
 	ce->ignore();
 
-	if(gui->mainWindow()->workspace())
+	if(getGUI()->mainWindow()->workspace())
 	{
 		parentWidget()->hide();
 	}
@@ -263,3 +269,6 @@ void SampleTrackWindow::loadSettings(const QDomElement& element)
 		m_stv->m_tlb->setChecked(true);
 	}
 }
+
+
+} // namespace lmms::gui

@@ -28,8 +28,13 @@
 #include "EffectControlDialog.h"
 #include "Lv2ViewBase.h"
 
+namespace lmms
+{
+
 class Lv2FxControls;
 
+namespace gui
+{
 
 class Lv2FxControlDialog : public EffectControlDialog, public Lv2ViewBase
 {
@@ -43,5 +48,9 @@ private:
 	void modelChanged() override;
 };
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif
