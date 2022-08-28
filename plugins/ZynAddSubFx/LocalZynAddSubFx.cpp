@@ -210,7 +210,7 @@ void LocalZynAddSubFx::setLmmsWorkingDir( const std::string & _dir )
 
 void LocalZynAddSubFx::setPitchWheelBendRange( int semitones )
 {
-	for (auto& part : m_master->part)
+	for (const auto& part : m_master->part)
 	{
 		part->ctl.setpitchwheelbendrange(semitones * 100);
 	}

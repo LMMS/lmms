@@ -226,7 +226,7 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 	}
 
 	// now save settings of all Clip's
-	for (auto& clip : m_clips)
+	for (const auto& clip : m_clips)
 	{
 		clip->saveState(doc, element);
 	}
@@ -511,7 +511,7 @@ void Track::insertBar( const TimePos & pos )
 {
 	// we'll increase the position of every Clip, positioned behind pos, by
 	// one bar
-	for (auto& clip : m_clips)
+	for (const auto& clip : m_clips)
 	{
 		if (clip->startPosition() >= pos)
 		{
@@ -531,7 +531,7 @@ void Track::removeBar( const TimePos & pos )
 {
 	// we'll decrease the position of every Clip, positioned behind pos, by
 	// one bar
-	for (auto& clip : m_clips)
+	for (const auto& clip : m_clips)
 	{
 		if (clip->startPosition() >= pos)
 		{
@@ -553,7 +553,7 @@ bar_t Track::length() const
 {
 	// find last end-position
 	tick_t last = 0;
-	for (auto& clip : m_clips)
+	for (const auto& clip : m_clips)
 	{
 		if (Engine::getSong()->isExporting() && clip->isMuted())
 		{
@@ -583,7 +583,7 @@ void Track::toggleSolo()
 	const TrackContainer::TrackList & tl = m_trackContainer->tracks();
 
 	bool soloBefore = false;
-	for (auto& track : tl)
+	for (const auto& track : tl)
 	{
 		if (track != this)
 		{
@@ -599,7 +599,7 @@ void Track::toggleSolo()
 	// Should we use the new behavior of solo or the older/legacy one?
 	const bool soloLegacyBehavior = ConfigManager::inst()->value("app", "sololegacybehavior", "0").toInt();
 
-	for (auto& track : tl)
+	for (const auto& track : tl)
 	{
 		if (solo)
 		{

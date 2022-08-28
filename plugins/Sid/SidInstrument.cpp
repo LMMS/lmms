@@ -227,7 +227,7 @@ f_cnt_t SidInstrument::desiredReleaseFrames() const
 {
 	const float samplerate = Engine::audioEngine()->processingSampleRate();
 	int maxrel = 0;
-	for (auto& voice : m_voice)
+	for (const auto& voice : m_voice)
 	{
 		if( maxrel < voice->m_releaseModel.value() )
 			maxrel = (int)voice->m_releaseModel.value();
@@ -750,7 +750,7 @@ void SidInstrumentView::modelChanged()
 					&k->m_voice[i]->m_testModel );
 	}
 
-	for (auto& voice : k->m_voice)
+	for (const auto& voice : k->m_voice)
 	{
 		connect(&voice->m_attackModel, SIGNAL(dataChanged()), this, SLOT(updateKnobHint()));
 		connect(&voice->m_decayModel, SIGNAL(dataChanged()), this, SLOT(updateKnobHint()));

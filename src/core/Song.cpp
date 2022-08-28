@@ -148,7 +148,7 @@ void Song::setTempo()
 	Engine::audioEngine()->requestChangeInModel();
 	const bpm_t tempo = ( bpm_t ) m_tempoModel.value();
 	PlayHandleList & playHandles = Engine::audioEngine()->playHandles();
-	for (auto& playHandle : playHandles)
+	for (const auto& playHandle : playHandles)
 	{
 		NotePlayHandle* nph = dynamic_cast<NotePlayHandle*>(playHandle);
 		if( nph && !nph->isReleased() )
@@ -1309,7 +1309,7 @@ void Song::saveControllerStates( QDomDocument & doc, QDomElement & element )
 	// save settings of controllers
 	QDomElement controllersNode = doc.createElement( "controllers" );
 	element.appendChild( controllersNode );
-	for (auto& controller : m_controllers)
+	for (const auto& controller : m_controllers)
 	{
 		controller->saveState(doc, controllersNode);
 	}
@@ -1355,7 +1355,7 @@ void Song::saveScaleStates(QDomDocument &doc, QDomElement &element)
 	QDomElement scalesNode = doc.createElement("scales");
 	element.appendChild(scalesNode);
 
-	for (auto& scale : m_scales)
+	for (const auto& scale : m_scales)
 	{
 		scale->saveState(doc, scalesNode);
 	}
@@ -1380,7 +1380,7 @@ void Song::saveKeymapStates(QDomDocument &doc, QDomElement &element)
 	QDomElement keymapsNode = doc.createElement("keymaps");
 	element.appendChild(keymapsNode);
 
-	for (auto& keymap : m_keymaps)
+	for (const auto& keymap : m_keymaps)
 	{
 		keymap->saveState(doc, keymapsNode);
 	}

@@ -387,9 +387,9 @@ void Mixer::moveChannelLeft( int index )
 	TrackContainer::TrackList songTrackList = Engine::getSong()->tracks();
 	TrackContainer::TrackList patternTrackList = Engine::patternStore()->tracks();
 
-	for (auto& trackList : {songTrackList, patternTrackList})
+	for (const auto& trackList : {songTrackList, patternTrackList})
 	{
-		for (auto& track : trackList)
+		for (const auto& track : trackList)
 		{
 			if (track->type() == Track::InstrumentTrack)
 			{
@@ -445,7 +445,7 @@ MixerRoute * Mixer::createChannelSend( mix_ch_t fromChannel, mix_ch_t toChannel,
 	MixerChannel * from = m_mixerChannels[fromChannel];
 	MixerChannel * to = m_mixerChannels[toChannel];
 
-	for (auto& send : from->m_sends)
+	for (const auto& send : from->m_sends)
 	{
 		if (send->receiver() == to)
 		{
@@ -491,7 +491,7 @@ void Mixer::deleteChannelSend( mix_ch_t fromChannel, mix_ch_t toChannel )
 	MixerChannel * to	 = m_mixerChannels[toChannel];
 
 	// find and delete the send entry
-	for (auto& send : from->m_sends)
+	for (const auto& send : from->m_sends)
 	{
 		if (send->receiver() == to)
 		{
@@ -542,7 +542,7 @@ bool Mixer::checkInfiniteLoop( MixerChannel * from, MixerChannel * to )
 
 	// follow sendTo's outputs recursively looking for something that sends
 	// to sendFrom
-	for (auto& send : to->m_sends)
+	for (const auto& send : to->m_sends)
 	{
 		if (checkInfiniteLoop(from, send->receiver()))
 		{
@@ -742,7 +742,7 @@ void Mixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		if( ch->m_hasColor ) mixch.setAttribute( "color", ch->m_color.name() );
 
 		// add the channel sends
-		for (auto& send : ch->m_sends)
+		for (const auto& send : ch->m_sends)
 		{
 			QDomElement sendsDom = _doc.createElement( QString( "send" ) );
 			mixch.appendChild( sendsDom );

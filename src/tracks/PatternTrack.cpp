@@ -109,7 +109,7 @@ bool PatternTrack::play( const TimePos & _start, const fpp_t _frames,
 
 	TimePos lastPosition;
 	TimePos lastLen;
-	for (auto& clip : clips)
+	for (const auto& clip : clips)
 	{
 		if (!clip->isMuted() && clip->startPosition() >= lastPosition)
 		{
@@ -182,7 +182,7 @@ void PatternTrack::loadTrackSpecificSettings(const QDomElement& _this)
 		const int dst = s_infoMap[this];
 		// copy clips of all tracks from source pattern (at bar "src") to destination
 		// clips (which are created if they do not exist yet)
-		for (auto& track : Engine::patternStore()->tracks())
+		for (const auto& track : Engine::patternStore()->tracks())
 		{
 			Clip::copyStateTo(track->getClip(src), track->getClip(dst));
 		}

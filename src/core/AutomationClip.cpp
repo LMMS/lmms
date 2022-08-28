@@ -893,11 +893,11 @@ bool AutomationClip::isAutomated( const AutomatableModel * _m )
 	l += Engine::patternStore()->tracks();
 	l += Engine::getSong()->globalAutomationTrack();
 
-	for (auto& track : l)
+	for (const auto& track : l)
 	{
 		if (track->type() == Track::AutomationTrack || track->type() == Track::HiddenAutomationTrack)
 		{
-			for (auto& clip : track->getClips())
+			for (const auto& clip : track->getClips())
 			{
 				const AutomationClip* a = dynamic_cast<const AutomationClip*>(clip);
 				if( a && a->hasAutomation() )
@@ -930,13 +930,13 @@ QVector<AutomationClip *> AutomationClip::clipsForModel( const AutomatableModel 
 	tracks += Engine::getSong()->globalAutomationTrack();
 
 	// go through all tracks...
-	for (auto& track : tracks)
+	for (const auto& track : tracks)
 	{
 		// we want only automation tracks...
 		if (track->type() == Track::AutomationTrack || track->type() == Track::HiddenAutomationTrack )
 		{
 			// go through all the clips...
-			for (auto& trackClip : track->getClips())
+			for (const auto& trackClip : track->getClips())
 			{
 				AutomationClip* a = dynamic_cast<AutomationClip*>(trackClip);
 				// check that the clip has automation
@@ -967,7 +967,7 @@ AutomationClip * AutomationClip::globalAutomationClip(
 							AutomatableModel * _m )
 {
 	AutomationTrack * t = Engine::getSong()->globalAutomationTrack();
-	for (auto& clip : t->getClips())
+	for (const auto& clip : t->getClips())
 	{
 		AutomationClip* a = dynamic_cast<AutomationClip*>(clip);
 		if( a )
@@ -996,16 +996,16 @@ void AutomationClip::resolveAllIDs()
 	TrackContainer::TrackList l = Engine::getSong()->tracks() +
 				Engine::patternStore()->tracks();
 	l += Engine::getSong()->globalAutomationTrack();
-	for (auto& track : l)
+	for (const auto& track : l)
 	{
 		if (track->type() == Track::AutomationTrack || track->type() == Track::HiddenAutomationTrack)
 		{
-			for (auto& clip : track->getClips())
+			for (const auto& clip : track->getClips())
 			{
 				AutomationClip* a = dynamic_cast<AutomationClip*>(clip);
 				if( a )
 				{
-					for (auto& id : a->m_idsToResolve)
+					for (const auto& id : a->m_idsToResolve)
 					{
 						JournallingObject* o = Engine::projectJournal()->journallingObject(id);
 						if( o && dynamic_cast<AutomatableModel *>( o ) )

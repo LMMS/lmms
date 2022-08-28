@@ -377,11 +377,11 @@ public:
 	{}
 	~ExprFrontData()
 	{
-		for (auto& cyclic : m_cyclics)
+		for (const auto& cyclic : m_cyclics)
 		{
 			delete cyclic;
 		}
-		for (auto& cyclic : m_cyclics_interp)
+		for (const auto& cyclic : m_cyclics_interp)
 		{
 			delete cyclic;
 		}

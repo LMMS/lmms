@@ -35,7 +35,7 @@ Ladspa2LMMS::Ladspa2LMMS()
 {
 	l_sortable_plugin_t plugins = getSortedPlugins();
 	
-	for (auto& plugin : plugins)
+	for (const auto& plugin : plugins)
 	{
 		ladspa_key_t key = plugin.second;
 		LadspaManagerDescription * desc = getDescription( key );

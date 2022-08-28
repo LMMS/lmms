@@ -287,7 +287,7 @@ void MidiExport::writeMidiClip(MidiNoteVector &midiClip, const QDomNode& n,
 
 void MidiExport::writeMidiClipToTrack(MTrack &mtrack, MidiNoteVector &nv)
 {
-	for (auto& note : nv)
+	for (const auto& note : nv)
 	{
 		mtrack.addNote(note.pitch, note.volume, note.time / 48.0, note.duration / 48.0);
 	}
@@ -302,7 +302,7 @@ void MidiExport::writePatternClip(MidiNoteVector& src, MidiNoteVector& dst,
 	start -= base;
 	end -= base;
 	std::sort(src.begin(), src.end());
-	for (auto& srcNote : src)
+	for (const auto& srcNote : src)
 	{
 		for (int time = srcNote.time + ceil((start - srcNote.time) / len) * len; time < end; time += len)
 		{

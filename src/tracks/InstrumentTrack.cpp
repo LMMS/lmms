@@ -621,7 +621,7 @@ void InstrumentTrack::setName( const QString & _new_name )
 void InstrumentTrack::updateBaseNote()
 {
 	Engine::audioEngine()->requestChangeInModel();
-	for (auto& processHandle : m_processHandles)
+	for (const auto& processHandle : m_processHandles)
 	{
 		processHandle->setFrequencyUpdate();
 	}
@@ -710,7 +710,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 	}
 
 	// Handle automation: detuning
-	for (auto& processHandle : m_processHandles)
+	for (const auto& processHandle : m_processHandles)
 	{
 		processHandle->processTimePos(_start);
 	}
@@ -723,7 +723,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 
 	bool played_a_note = false;	// will be return variable
 
-	for (auto& clip : clips)
+	for (const auto& clip : clips)
 	{
 		MidiClip* c = dynamic_cast<MidiClip*>(clip);
 		// everything which is not a MIDI clip won't be played

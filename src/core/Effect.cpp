@@ -66,7 +66,7 @@ Effect::Effect( const Plugin::Descriptor * _desc,
 
 Effect::~Effect()
 {
-	for (auto& state : m_srcState)
+	for (const auto& state : m_srcState)
 	{
 		if (state != nullptr)
 		{

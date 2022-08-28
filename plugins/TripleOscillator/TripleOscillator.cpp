@@ -409,7 +409,7 @@ gui::PluginView* TripleOscillator::instantiateView( QWidget * _parent )
 
 void TripleOscillator::updateAllDetuning()
 {
-	for (auto& osc : m_osc)
+	for (const auto& osc : m_osc)
 	{
 		osc->updateDetuningLeft();
 		osc->updateDetuningRight();

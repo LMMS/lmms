@@ -53,7 +53,7 @@ LadspaControls::LadspaControls( LadspaEffect * _eff ) :
 
 		const bool linked_control = ( m_processors > 1 && proc == 0 );
 
-		for (auto& control : controls)
+		for (const auto& control : controls)
 		{
 			if (control->proc == proc)
 			{
@@ -76,7 +76,7 @@ LadspaControls::LadspaControls( LadspaEffect * _eff ) :
 	// now link all controls
 	if( m_processors > 1 )
 	{
-		for (auto& control : controls)
+		for (const auto& control : controls)
 		{
 			if (control->proc == 0)
 			{
@@ -110,7 +110,7 @@ void LadspaControls::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	
 	multi_proc_t controls = m_effect->getPortControls();
 	_this.setAttribute( "ports", controls.count() );
-	for (auto& control : controls)
+	for (const auto& control : controls)
 	{
 		QString n = "port" + QString::number(control->proc) + QString::number(control->port_id);
 		control->control->saveSettings(_doc, _this, n);
@@ -128,7 +128,7 @@ void LadspaControls::loadSettings( const QDomElement & _this )
 	}
 	
 	multi_proc_t controls = m_effect->getPortControls();
-	for (auto& control : controls)
+	for (const auto& control : controls)
 	{
 		QString n = "port" + QString::number(control->proc) + QString::number(control->port_id);
 		control->control->loadSettings(_this, n);

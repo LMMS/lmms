@@ -305,7 +305,7 @@ void AutomatableModel::setValue( const float value )
 		addJournalCheckPoint();
 
 		// notify linked models
-		for (auto& linkedModel : m_linkedModels)
+		for (const auto& linkedModel : m_linkedModels)
 		{
 			if (linkedModel->m_setValueDepth < 1 && linkedModel->fittedValue(value) != linkedModel->m_value)
 			{
@@ -388,7 +388,7 @@ void AutomatableModel::setAutomatedValue( const float value )
 	if( oldValue != m_value )
 	{
 		// notify linked models
-		for (auto& linkedModel : m_linkedModels)
+		for (const auto& linkedModel : m_linkedModels)
 		{
 			if (!(linkedModel->controllerConnection()) && linkedModel->m_setValueDepth < 1 &&
 					linkedModel->fittedValue(m_value) != linkedModel->m_value)
@@ -732,7 +732,7 @@ float AutomatableModel::globalAutomationValueAt( const TimePos& time )
 		// of those clips:
 		// find the clips which overlap with the time position
 		QVector<AutomationClip *> clipsInRange;
-		for (auto& clip : clips)
+		for (const auto& clip : clips)
 		{
 			int s = clip->startPosition();
 			int e = clip->endPosition();
@@ -752,7 +752,7 @@ float AutomatableModel::globalAutomationValueAt( const TimePos& time )
 		{
 			int latestPosition = 0;
 
-			for (auto& clip : clips)
+			for (const auto& clip : clips)
 			{
 				int e = clip->endPosition();
 				if (e <= time && e > latestPosition)

@@ -155,13 +155,12 @@ void EffectRackView::update()
 	QVector<bool> view_map( qMax<int>( fxChain()->m_effects.size(),
 						m_effectViews.size() ), false );
 
-	for (auto& effect : fxChain()->m_effects)
+	for (const auto& effect : fxChain()->m_effects)
 	{
 		int i = 0;
-		for( QVector<EffectView *>::Iterator vit = m_effectViews.begin();
-				vit != m_effectViews.end(); ++vit, ++i )
+		for (const auto& effectView : m_effectViews)
 		{
-			if ((*vit)->model() == effect)
+			if (effectView->model() == effect)
 			{
 				view_map[i] = true;
 				break;
@@ -237,7 +236,7 @@ void EffectRackView::addEffect()
 	update();
 
 	// Find the effectView, and show the controls
-	for (auto& effectView : m_effectViews)
+	for (const auto& effectView : m_effectViews)
 	{
 		if (effectView->effect() == fx)
 		{

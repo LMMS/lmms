@@ -72,7 +72,7 @@ LadspaDescription::LadspaDescription( QWidget * _parent,
 	}
 
 	QList<QString> pluginNames;
-	for (auto& plugin : plugins)
+	for (const auto& plugin : plugins)
 	{
 		ch_cnt_t audioDeviceChannels = Engine::audioEngine()->audioDev()->channels();
 		if (_type != VALID || manager->getDescription(plugin.second)->inputChannels <= audioDeviceChannels)

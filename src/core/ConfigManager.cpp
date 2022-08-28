@@ -610,7 +610,7 @@ void ConfigManager::saveConfigFile()
 	for (auto it = m_settings.begin(); it != m_settings.end(); ++it)
 	{
 		QDomElement n = doc.createElement(it.key());
-		for (auto&& [first, second] : *it)
+		for (const auto& [first, second] : *it)
 		{
 			n.setAttribute(first, second);
 		}
@@ -619,7 +619,7 @@ void ConfigManager::saveConfigFile()
 
 	QDomElement recent_files = doc.createElement("recentfiles");
 
-	for (auto& recentlyOpenedProject : m_recentlyOpenedProjects)
+	for (const auto& recentlyOpenedProject : m_recentlyOpenedProjects)
 	{
 		QDomElement n = doc.createElement("file");
 		n.setAttribute("path", recentlyOpenedProject);

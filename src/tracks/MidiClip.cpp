@@ -68,7 +68,7 @@ MidiClip::MidiClip( const MidiClip& other ) :
 	m_clipType( other.m_clipType ),
 	m_steps( other.m_steps )
 {
-	for (auto& note : other.m_notes)
+	for (const auto& note : other.m_notes)
 	{
 		m_notes.push_back(new Note(*note));
 	}
@@ -93,7 +93,7 @@ MidiClip::~MidiClip()
 {
 	emit destroyedMidiClip( this );
 
-	for (auto& note : m_notes)
+	for (const auto& note : m_notes)
 	{
 		delete note;
 	}
@@ -109,7 +109,7 @@ void MidiClip::resizeToFirstTrack()
 	// Resize this track to be the same as existing tracks in the pattern
 	const TrackContainer::TrackList & tracks =
 		m_instrumentTrack->trackContainer()->tracks();
-	for (auto& track : tracks)
+	for (const auto& track : tracks)
 	{
 		if (track->type() == Track::InstrumentTrack)
 		{
@@ -153,7 +153,7 @@ void MidiClip::updateLength()
 
 	tick_t max_length = TimePos::ticksPerBar();
 
-	for (auto& note : m_notes)
+	for (const auto& note : m_notes)
 	{
 		if (note->length() > 0)
 		{
@@ -172,7 +172,7 @@ TimePos MidiClip::beatClipLength() const
 {
 	tick_t max_length = TimePos::ticksPerBar();
 
-	for (auto& note : m_notes)
+	for (const auto& note : m_notes)
 	{
 		if (note->length() < 0)
 		{
@@ -242,7 +242,7 @@ void MidiClip::removeNote( Note * _note_to_del )
 
 Note * MidiClip::noteAtStep( int _step )
 {
-	for (auto& note : m_notes)
+	for (const auto& note : m_notes)
 	{
 		if (note->pos() == TimePos::stepPosition(_step) && note->length() < 0)
 		{
@@ -265,7 +265,7 @@ void MidiClip::rearrangeAllNotes()
 void MidiClip::clearNotes()
 {
 	instrumentTrack()->lock();
-	for (auto& note : m_notes)
+	for (const auto& note : m_notes)
 	{
 		delete note;
 	}
@@ -314,7 +314,7 @@ void MidiClip::splitNotes(NoteVector notes, TimePos pos)
 
 	addJournalCheckPoint();
 
-	for (auto& note : notes)
+	for (const auto& note : notes)
 	{
 		int leftLength = pos.getTicks() - note->pos();
 		int rightLength = note->length() - leftLength;
@@ -395,7 +395,7 @@ void MidiClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "steps", m_steps );
 
 	// now save settings of all notes
-	for (auto& note : m_notes)
+	for (const auto& note : m_notes)
 	{
 		note->saveState( _doc, _this );
 	}
@@ -571,7 +571,7 @@ void MidiClip::updatePatternTrack()
 
 bool MidiClip::empty()
 {
-	for (auto& note : m_notes)
+	for (const auto& note : m_notes)
 	{
 		if (note->length() != 0)
 		{
@@ -587,7 +587,7 @@ bool MidiClip::empty()
 void MidiClip::changeTimeSignature()
 {
 	TimePos last_pos = TimePos::ticksPerBar() - 1;
-	for (auto& note : m_notes)
+	for (const auto& note : m_notes)
 	{
 		if (note->length() < 0 && note->pos() > last_pos)
 		{

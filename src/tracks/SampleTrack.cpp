@@ -135,7 +135,7 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 		setPlaying(nowPlaying);
 	}
 
-	for (auto& clip : clips)
+	for (const auto& clip : clips)
 	{
 		SampleClip* st = dynamic_cast<SampleClip*>(clip);
 		if( !st->isMuted() )
