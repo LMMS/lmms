@@ -218,8 +218,22 @@ with tempfile.TemporaryDirectory() as tmpdir:
 					#pragma once
 					namespace not_lmms {}
 					''')
+		create_file('07_MismatchingEndifName.h', '''
+					#ifndef ABC_H
+					namespace lmms {
+					\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
+					}
+					#endif // XYZ_H
+					''')
+		create_file('08_MismatchingNamespaceEndName.h', '''
+					#ifndef ABC_H
+					namespace lmms {
+					{}
+					} // namespace smml
+					#endif // ABC_H
+					''')
 		test.run()
-		test.expect('6 errors')
+		test.expect('8 errors')
 		test.expect('''
 Error: 01_OddBraceWithinMacro.cpp:7: Expected #endif before }
 Error: 02_IncludeInCodeBlock.cpp:7: #include inside a code block
@@ -227,6 +241,8 @@ Error: 03_MacroComments.h:8: Missing comment // HAS_NESTED_NEEDS_COMMENT
 Error: 04_NamespaceComments.cpp:10: Missing comment // namespace LongNamespace
 Error: 05_NoHeaderGuard.h: First statement should be header guard
 Error: 06_PragmaButNoLmms.h: File has no namespace lmms
+Error: 07_MismatchingEndifName.h:36: Missing comment // ABC_H
+Error: 08_MismatchingNamespaceEndName.h:5: Missing comment // namespace lmms
 ''')
 
 
