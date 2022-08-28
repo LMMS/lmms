@@ -30,9 +30,9 @@
 #include <QDomElement>
 #include <QMessageBox>
 
-#include "BandedWG.h"
-#include "ModalBar.h"
-#include "TubeBell.h"
+#include <stk/BandedWG.h>
+#include <stk/ModalBar.h>
+#include <stk/TubeBell.h>
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"

@@ -1,20 +1,23 @@
-FIND_PATH(STK_INCLUDE_DIR Stk.h /usr/include/stk /usr/local/include/stk ${CMAKE_INSTALL_PREFIX}/include/stk ${CMAKE_FIND_ROOT_PATH}/include/stk)
+find_path(STK_INCLUDE_DIR
+	NAMES stk/Stk.h
+	PATH /usr/include/stk /usr/local/include/stk "${CMAKE_INSTALL_PREFIX}/include/stk" "${CMAKE_FIND_ROOT_PATH}/include/stk"
+)
 
-FIND_LIBRARY(STK_LIBRARY NAMES stk PATH /usr/lib /usr/local/lib ${CMAKE_INSTALL_PREFIX}/lib ${CMAKE_FIND_ROOT_PATH}/lib) 
+find_library(STK_LIBRARY
+	NAMES stk
+	PATH /usr/lib /usr/local/lib "${CMAKE_INSTALL_PREFIX}/lib" "${CMAKE_FIND_ROOT_PATH}/lib"
+)
 
-IF (STK_INCLUDE_DIR AND STK_LIBRARY)
-   SET(STK_FOUND TRUE)
-ENDIF (STK_INCLUDE_DIR AND STK_LIBRARY)
+if(STK_INCLUDE_DIR AND STK_LIBRARY)
+	# Yes, this target name is hideous, but it matches that provided by vcpkg
+	add_library(unofficial::libstk::libstk UNKNOWN IMPORTED)
+	set_target_properties(unofficial::libstk::libstk PROPERTIES
+		INTERFACE_INCLUDE_DIRECTORIES "${STK_INCLUDE_DIR}"
+		IMPORTED_LOCATION "${STK_LIBRARY}"
+	)
+endif()
 
-
-IF (STK_FOUND)
-   IF (NOT STK_FIND_QUIETLY)
-      MESSAGE(STATUS "Found STK: ${STK_LIBRARY}")
-	SET(HAVE_STK TRUE)
-   ENDIF (NOT STK_FIND_QUIETLY)
-ELSE (STK_FOUND)
-   IF (STK_FIND_REQUIRED)
-      MESSAGE(FATAL_ERROR "Could not find STK")
-   ENDIF (STK_FIND_REQUIRED)
-ENDIF (STK_FOUND)
-
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(STK
+	REQUIRED_VARS STK_LIBRARY STK_INCLUDE_DIR
+)
