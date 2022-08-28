@@ -504,7 +504,7 @@ void ClipView::updateCursor(QMouseEvent * me)
 	SampleClip * sClip = dynamic_cast<SampleClip*>(m_clip);
 
 	// If we are at the edges, use the resize cursor
-	if ((!me->buttons() && !m_clip->getAutoResize() && !isSelected())
+	if (!me->buttons() && !m_clip->getAutoResize() && !isSelected()
 		&& ((me->x() > width() - RESIZE_GRIP_WIDTH) || (me->x() < RESIZE_GRIP_WIDTH && sClip)))
 	{
 		setCursor(Qt::SizeHorCursor);
