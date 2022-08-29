@@ -1009,7 +1009,7 @@ Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	m_chorusNumKnob->setHintText( tr("Voices:"), "" );
 	m_chorusNumKnob->move( 93, 206 );
 
-	m_chorusLevelKnob = new Knob( knobBright_26, this );
+	m_chorusLevelKnob = new Knob(knobBright_26, this);
 	m_chorusLevelKnob->setHintText( tr("Level:"), "" );
 	m_chorusLevelKnob->move( 130 , 206 );
 
