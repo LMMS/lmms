@@ -538,7 +538,6 @@ DataFile ClipView::createClipDataFiles(
 	DataFile dataFile( DataFile::DragNDropData );
 	QDomElement clipParent = dataFile.createElement("clips");
 
-	using clipViewVector = QVector<ClipView*>;
 	for (const auto& clipView : clipViews)
 	{
 		// Insert into the dom under the "clips" element
