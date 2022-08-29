@@ -923,7 +923,7 @@ Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 
 
 	// LCDs
-	m_bankNumLcd = new LcdSpinBox( 3, "19green", this );
+	m_bankNumLcd = new LcdSpinBox(3, "19green", this);
 	m_bankNumLcd->move(131, 62);
 //	m_bankNumLcd->addTextForValue( -1, "---" );
 //	m_bankNumLcd->setEnabled( false );
