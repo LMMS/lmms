@@ -970,7 +970,7 @@ Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	m_reverbButton->setToolTip(tr("Apply reverb (if supported)"));
 
 
-	m_reverbRoomSizeKnob = new Knob( knobBright_26, this );
+	m_reverbRoomSizeKnob = new Knob(knobBright_26, this);
 	m_reverbRoomSizeKnob->setHintText( tr("Room size:"), "" );
 	m_reverbRoomSizeKnob->move( 93, 160 );
 
