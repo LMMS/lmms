@@ -371,14 +371,14 @@ ENDIF(WANT_STK)
 
 # check for PortAudio
 IF(WANT_PORTAUDIO)
-	FIND_PACKAGE(Portaudio)
-	IF(PORTAUDIO_FOUND)
+	find_target_prefer_config(Portaudio portaudio portaudio)
+	IF(Portaudio_FOUND)
 		SET(LMMS_HAVE_PORTAUDIO TRUE)
 		SET(STATUS_PORTAUDIO "OK")
-	ELSE(PORTAUDIO_FOUND)
+	ELSE()
 		SET(STATUS_PORTAUDIO "not found, please install portaudio19-dev (or similar, version >= 1.9) "
 			"if you require PortAudio support")
-	ENDIF(PORTAUDIO_FOUND)
+	ENDIF()
 ENDIF(WANT_PORTAUDIO)
 
 # check for libsoundio
