@@ -1013,7 +1013,7 @@ Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	m_chorusLevelKnob->setHintText( tr("Level:"), "" );
 	m_chorusLevelKnob->move( 130 , 206 );
 
-	m_chorusSpeedKnob = new Knob( knobBright_26, this );
+	m_chorusSpeedKnob = new Knob(knobBright_26, this);
 	m_chorusSpeedKnob->setHintText( tr("Speed:"), "" );
 	m_chorusSpeedKnob->move( 167 , 206 );
 
