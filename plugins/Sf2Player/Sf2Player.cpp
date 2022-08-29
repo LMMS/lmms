@@ -978,7 +978,7 @@ Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	m_reverbDampingKnob->setHintText( tr("Damping:"), "" );
 	m_reverbDampingKnob->move( 130, 160 );
 
-	m_reverbWidthKnob = new Knob( knobBright_26, this );
+	m_reverbWidthKnob = new Knob(knobBright_26, this);
 	m_reverbWidthKnob->setHintText( tr("Width:"), "" );
 	m_reverbWidthKnob->move( 167, 160 );
 
