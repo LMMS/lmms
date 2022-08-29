@@ -71,12 +71,11 @@ void PatternEditor::removeSteps()
 {
 	TrackContainer::TrackList tl = model()->tracks();
 
-	for( TrackContainer::TrackList::iterator it = tl.begin();
-		it != tl.end(); ++it )
+	for (const auto& track : tl)
 	{
-		if( ( *it )->type() == Track::InstrumentTrack )
+		if (track->type() == Track::InstrumentTrack)
 		{
-			MidiClip* p = static_cast<MidiClip*>((*it)->getClip(m_ps->currentPattern()));
+			MidiClip* p = static_cast<MidiClip*>(track->getClip(m_ps->currentPattern()));
 			p->removeSteps();
 		}
 	}
@@ -179,12 +178,11 @@ void PatternEditor::makeSteps( bool clone )
 {
 	TrackContainer::TrackList tl = model()->tracks();
 
-	for( TrackContainer::TrackList::iterator it = tl.begin();
-		it != tl.end(); ++it )
+	for (const auto& track : tl)
 	{
-		if( ( *it )->type() == Track::InstrumentTrack )
+		if (track->type() == Track::InstrumentTrack)
 		{
-			MidiClip* p = static_cast<MidiClip*>((*it)->getClip(m_ps->currentPattern()));
+			MidiClip* p = static_cast<MidiClip*>(track->getClip(m_ps->currentPattern()));
 			if( clone )
 			{
 				p->cloneSteps();

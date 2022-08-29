@@ -192,10 +192,9 @@ automatableButtonGroup::automatableButtonGroup( QWidget * _parent,
 
 automatableButtonGroup::~automatableButtonGroup()
 {
-	for( QList<AutomatableButton *>::iterator it = m_buttons.begin();
-					it != m_buttons.end(); ++it )
+	for (const auto& button : m_buttons)
 	{
-		( *it )->m_group = nullptr;
+		button->m_group = nullptr;
 	}
 }
 

@@ -393,7 +393,10 @@ PianoRoll::PianoRoll() :
 	// Set up key selection dropdown
 	m_keyModel.addItem(tr("No key"));
 	// Use piano roll note strings for key dropdown
-	for (int i = 0; i < 12; i++) { m_keyModel.addItem(s_noteStrings[i]); }
+	for (const auto& noteString : s_noteStrings)
+	{
+		m_keyModel.addItem(noteString);
+	}
 	m_keyModel.setValue(0); // start with "No key"
 	connect(&m_keyModel, &ComboBoxModel::dataChanged, this, &PianoRoll::keyChanged);
 
@@ -558,9 +561,9 @@ void PianoRoll::markSemiTone(int i, bool fromMenu)
 			{
 				// lets erase all of the ones that match this by octave
 				QList<int>::iterator i;
-				for (int ix = 0; ix < aok.size(); ++ix)
+				for (int octave : aok)
 				{
-					i = std::find(m_markedSemiTones.begin(), m_markedSemiTones.end(), aok.at(ix));
+					i = std::find(m_markedSemiTones.begin(), m_markedSemiTones.end(), octave);
 					if (i != m_markedSemiTones.end())
 					{
 						m_markedSemiTones.erase(i);
@@ -5166,10 +5169,10 @@ void PianoRollWindow::saveSettings( QDomDocument & doc, QDomElement & de )
 	if (m_editor->m_markedSemiTones.length() > 0)
 	{
 		QDomElement markedSemiTonesRoot = doc.createElement("markedSemiTones");
-		for (int ix = 0; ix < m_editor->m_markedSemiTones.size(); ++ix)
+		for (int markedSemiTone : m_editor->m_markedSemiTones)
 		{
 			QDomElement semiToneNode = doc.createElement("semiTone");
-			semiToneNode.setAttribute("key", m_editor->m_markedSemiTones.at(ix));
+			semiToneNode.setAttribute("key", markedSemiTone);
 			markedSemiTonesRoot.appendChild(semiToneNode);
 		}
 		de.appendChild(markedSemiTonesRoot);

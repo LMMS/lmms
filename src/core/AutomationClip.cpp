@@ -972,13 +972,9 @@ AutomationClip * AutomationClip::globalAutomationClip(
 		AutomationClip* a = dynamic_cast<AutomationClip*>(clip);
 		if( a )
 		{
-			for( objectVector::const_iterator k = a->m_objects.begin();
-												k != a->m_objects.end(); ++k )
+			for (const auto& object : a->m_objects)
 			{
-				if( *k == _m )
-				{
-					return a;
-				}
+				if (object == _m) { return a; }
 			}
 		}
 	}

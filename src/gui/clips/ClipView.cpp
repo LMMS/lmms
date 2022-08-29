@@ -539,17 +539,16 @@ DataFile ClipView::createClipDataFiles(
 	QDomElement clipParent = dataFile.createElement("clips");
 
 	using clipViewVector = QVector<ClipView*>;
-	for( clipViewVector::const_iterator it = clipViews.begin();
-			it != clipViews.end(); ++it )
+	for (const auto& clipView : clipViews)
 	{
 		// Insert into the dom under the "clips" element
-		Track* clipTrack = ( *it )->m_trackView->getTrack();
+		Track* clipTrack = clipView->m_trackView->getTrack();
 		int trackIndex = tc->tracks().indexOf( clipTrack );
 		QDomElement clipElement = dataFile.createElement("clip");
 		clipElement.setAttribute( "trackIndex", trackIndex );
 		clipElement.setAttribute( "trackType", clipTrack->type() );
 		clipElement.setAttribute( "trackName", clipTrack->name() );
-		( *it )->m_clip->saveState( dataFile, clipElement );
+		clipView->m_clip->saveState(dataFile, clipElement);
 		clipParent.appendChild( clipElement );
 	}
 
@@ -796,10 +795,9 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 				// Collect all selected Clips
 				QVector<selectableObject *> so =
 					m_trackView->trackContainerView()->selectedObjects();
-				for( auto it = so.begin(); it != so.end(); ++it )
+				for (const auto& selectedClip : so)
 				{
-					ClipView * clipv =
-						dynamic_cast<ClipView *>( *it );
+					ClipView* clipv = dynamic_cast<ClipView*>(selectedClip);
 					if( clipv != nullptr )
 					{
 						clipViews.push_back( clipv );
@@ -1339,11 +1337,9 @@ void ClipView::setInitialOffsets()
 {
 	QVector<selectableObject *> so = m_trackView->trackContainerView()->selectedObjects();
 	QVector<TimePos> offsets;
-	for( QVector<selectableObject *>::iterator it = so.begin();
-						it != so.end(); ++it )
+	for (const auto& selectedClip : so)
 	{
-		ClipView * clipv =
-			dynamic_cast<ClipView *>( *it );
+		ClipView* clipv = dynamic_cast<ClipView*>(selectedClip);
 		if( clipv == nullptr )
 		{
 			continue;

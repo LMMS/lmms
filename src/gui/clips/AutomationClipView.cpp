@@ -197,15 +197,12 @@ void AutomationClipView::constructContextMenu( QMenu * _cm )
 		_cm->addSeparator();
 		QMenu * m = new QMenu( tr( "%1 Connections" ).
 				arg( m_clip->m_objects.count() ), _cm );
-		for( AutomationClip::objectVector::iterator it =
-						m_clip->m_objects.begin();
-					it != m_clip->m_objects.end(); ++it )
+		for (const auto& object : m_clip->m_objects)
 		{
-			if( *it )
+			if (object)
 			{
-				a = new QAction( tr( "Disconnect \"%1\"" ).
-					arg( ( *it )->fullDisplayName() ), m );
-				a->setData( ( *it )->id() );
+				a = new QAction(tr("Disconnect \"%1\"").arg(object->fullDisplayName()), m);
+				a->setData(object->id());
 				m->addAction( a );
 			}
 		}

@@ -258,11 +258,10 @@ void TrackContainerView::realignTracks()
 	m_scrollArea->widget()->setFixedHeight(
 				m_scrollArea->widget()->minimumSizeHint().height());
 
-	for( trackViewList::iterator it = m_trackViews.begin();
-						it != m_trackViews.end(); ++it )
+	for (const auto& trackView : m_trackViews)
 	{
-		( *it )->show();
-		( *it )->update();
+		trackView->show();
+		trackView->update();
 	}
 }
 
@@ -274,10 +273,9 @@ TrackView * TrackContainerView::createTrackView( Track * _t )
 	//m_tc->addJournalCheckPoint();
 
 	// Avoid duplicating track views
-	for( trackViewList::iterator it = m_trackViews.begin();
-						it != m_trackViews.end(); ++it )
+	for (const auto& trackView : m_trackViews)
 	{
-		if ( ( *it )->getTrack() == _t ) { return ( *it ); }
+		if (trackView->getTrack() == _t) { return trackView; }
 	}
 
 	return _t->createView( this );
@@ -310,15 +308,11 @@ const TrackView * TrackContainerView::trackViewAt( const int _y ) const
 //	debug code
 //	qDebug( "abs_y %d", abs_y );
 
-	for( trackViewList::const_iterator it = m_trackViews.begin();
-						it != m_trackViews.end(); ++it )
+	for (const auto& trackView : m_trackViews)
 	{
 		const int y_cnt1 = y_cnt;
-		y_cnt += ( *it )->height();
-		if( abs_y >= y_cnt1 && abs_y < y_cnt )
-		{
-			return( *it );
-		}
+		y_cnt += trackView->height();
+		if (abs_y >= y_cnt1 && abs_y < y_cnt) { return trackView; }
 	}
 	return( nullptr );
 }
@@ -347,10 +341,9 @@ void TrackContainerView::setPixelsPerBar( int ppb )
 	m_ppb = ppb;
 
 	// tell all TrackContentWidgets to update their background tile pixmap
-	for( trackViewList::Iterator it = m_trackViews.begin();
-						it != m_trackViews.end(); ++it )
+	for (const auto& trackView : m_trackViews)
 	{
-		( *it )->getTrackContentWidget()->updateBackground();
+		trackView->getTrackContentWidget()->updateBackground();
 	}
 }
 
