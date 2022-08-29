@@ -1005,7 +1005,7 @@ Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	m_chorusButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "chorus_off" ) );
 	m_chorusButton->setToolTip(tr("Apply chorus (if supported)"));
 
-	m_chorusNumKnob = new Knob( knobBright_26, this );
+	m_chorusNumKnob = new Knob(knobBright_26, this);
 	m_chorusNumKnob->setHintText( tr("Voices:"), "" );
 	m_chorusNumKnob->move( 93, 206 );
 
