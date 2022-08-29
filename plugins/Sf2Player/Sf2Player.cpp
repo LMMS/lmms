@@ -982,7 +982,7 @@ Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	m_reverbWidthKnob->setHintText( tr("Width:"), "" );
 	m_reverbWidthKnob->move( 167, 160 );
 
-	m_reverbLevelKnob = new Knob( knobBright_26, this );
+	m_reverbLevelKnob = new Knob(knobBright_26, this);
 	m_reverbLevelKnob->setHintText( tr("Level:"), "" );
 	m_reverbLevelKnob->move( 204, 160 );
 
