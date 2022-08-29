@@ -5,7 +5,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  check-strings:
+  scripted-checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
