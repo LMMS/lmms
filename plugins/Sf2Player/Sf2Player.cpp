@@ -1017,7 +1017,7 @@ Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	m_chorusSpeedKnob->setHintText( tr("Speed:"), "" );
 	m_chorusSpeedKnob->move( 167 , 206 );
 
-	m_chorusDepthKnob = new Knob( knobBright_26, this );
+	m_chorusDepthKnob = new Knob(knobBright_26, this);
 	m_chorusDepthKnob->setHintText( tr("Depth:"), "" );
 	m_chorusDepthKnob->move( 204 , 206 );
 /*
