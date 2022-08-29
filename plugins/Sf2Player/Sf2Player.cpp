@@ -953,7 +953,7 @@ Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 //	vl->addLayout( hl );
 
 	// Gain
-	m_gainKnob = new Knob( knobBright_26, this );
+	m_gainKnob = new Knob(knobBright_26, this);
 	m_gainKnob->setHintText( tr("Gain:"), "" );
 	m_gainKnob->move( 86, 55 );
 //	vl->addWidget( m_gainKnob );
