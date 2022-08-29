@@ -60,7 +60,7 @@ void ComboButton::addAction(QAction* action)
 
 QAction* ComboButton::addAction(const QString& pixmap, const QString& text)
 {
-	QAction* action = new QAction(embed::getIconPixmap(pixmap), text, this);
+	auto action = new QAction(embed::getIconPixmap(pixmap), text, this);
 	addAction(action);
 	return action;
 }
@@ -74,13 +74,13 @@ bool ComboButton::eventFilter(QObject *watched, QEvent *event)
 	// Only filter out wheel events (return false to pass on events)
 	if (event->type() != QEvent::Wheel) { return false; }
 
-	QWheelEvent* wheelEvent = static_cast<QWheelEvent*>(event);
+	auto wheelEvent = static_cast<QWheelEvent*>(event);
 
 	// Disgard high-resolution wheel movement (needs better implementation!!!)
 	int scroll = wheelEvent->angleDelta().y();
-	if (abs(scroll) < 30) { return true; }
+	if (std::abs(scroll) < 30) { return true; }
 
-	auto actionList = m_actionGroup ? m_actionGroup->actions() : actions();
+	const auto actionList = m_actionGroup ? m_actionGroup->actions() : actions();
 
 	// Trigger next/previous action depending on scroll direction
 	QAction* selected = m_actionGroup ? m_actionGroup->checkedAction() : defaultAction();

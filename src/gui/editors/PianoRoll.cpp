@@ -1571,12 +1571,12 @@ int PianoRoll::keyAreaBottom() const
 
 void PianoRoll::mousePressEvent(QMouseEvent * me )
 {
-	bool shift = m_startedWithShift = me->modifiers() & Qt::ShiftModifier;
+	if (!hasValidMidiClip()) { return; }
 
-	if( ! hasValidMidiClip() )
-	{
-		return;
-	}
+	const bool left = me->button() == Qt::LeftButton;
+	const bool right = me->button() == Qt::RightButton;
+	const bool shift = m_startedWithShift = me->modifiers() & Qt::ShiftModifier;
+	const bool anyDrawMode = m_editMode == ModeDraw || m_editMode == ModeBulldozer;
 
 	// -- Knife
 	if (m_editMode == ModeEditKnife && me->button() == Qt::LeftButton)
@@ -1704,9 +1704,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				mouseMoveEvent( me );
 				return;
 			}
-			// left button??
-			else if( me->button() == Qt::LeftButton &&
-				(m_editMode == ModeDraw || m_editMode == ModeBulldozer))
+			else if (left && anyDrawMode)
 			{
 				// whether this action creates new note(s) or not
 				bool is_new_note = false;
@@ -1792,7 +1790,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					if (m_editMode == ModeBulldozer && !resize && !shift && !created_new_note)
 					{
 						m_action = ActionBulldozerMove;
-						for (Note* note: m_midiClip->notes())
+						for (auto& note: m_midiClip->notes())
 						{
 							if (note->pos() >= current_note->pos())
 							{
@@ -1807,7 +1805,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				//Figure out the bounding box of all the selected notes
 				m_moveBoundary = boundsForNotes(selectedNotes).value();
 
-				for (Note *note: m_editMode == ModeBulldozer ? m_midiClip->notes() : selectedNotes)
+				for (auto& note: m_editMode == ModeBulldozer ? m_midiClip->notes() : selectedNotes)
 				{
 					// remember note starting positions
 					note->setOldKey( note->key() );
@@ -1881,9 +1879,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 				Engine::getSong()->setModified();
 			}
-			else if( ( me->buttons() == Qt::RightButton &&
-						 (m_editMode == ModeDraw || m_editMode == ModeBulldozer)) ||
-					m_editMode == ModeErase )
+			else if ((right && anyDrawMode) || m_editMode == ModeErase)
 			{
 				// erase single note
 				m_mouseDownRight = true;
@@ -2302,6 +2298,9 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 		return;
 	}
 
+	const bool right = me->buttons() & Qt::RightButton;
+	const bool anyDrawMode = m_editMode == ModeDraw || m_editMode == ModeBulldozer;
+
 	if( m_action == ActionNone && me->buttons() == 0 )
 	{
 		// When cursor is between note editing area and volume/panning
@@ -2494,11 +2493,11 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			m_midiClip->dataChanged();
 		}
 
-		else if (me->buttons() == Qt::NoButton && (m_editMode == ModeDraw || m_editMode == ModeBulldozer))
+		else if (me->buttons() == Qt::NoButton && anyDrawMode)
 		{
 			// set move- or resize-cursor
 
-			if (Note* note = noteUnderMouse())
+			if (const auto* note = noteUnderMouse())
 			{
 				setCursor(isHoveringResize(note) ? Qt::SizeHorCursor : Qt::SizeAllCursor);
 			}
@@ -2530,8 +2529,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				--m_selectedKeys;
 			}
 		}
-		else if (((m_editMode == ModeDraw || m_editMode == ModeBulldozer) && me->buttons() & Qt::RightButton)
-				|| ( m_editMode == ModeErase && me->buttons() ) )
+		else if ((anyDrawMode && right) || (m_editMode == ModeErase && me->buttons()))
 		{
 			// holding down right-click to delete notes or holding down
 			// any key if in erase mode
@@ -2760,7 +2758,7 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 		if (m_action == ActionBulldozerMove)
 		{
 			TimePos minLength = !alt ? quantization() : 1;
-			for (Note* note: notes)
+			for (const auto* note: notes)
 			{
 				if (note->oldPos() < selStart)
 				{
@@ -2796,7 +2794,7 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 		// Resize notes left of the selection in bulldozer mode
 		if (m_action == ActionBulldozerMove)
 		{
-			for (Note* note: notes)
+			for (auto& note: notes)
 			{
 				if (note->selected()) { continue; }
 				// Move end-points that touched or overlaped the selection initially
@@ -2811,7 +2809,6 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 				}
 			}
 		}
-
 	}
 	else if (m_action & ActionResizeAny)
 	{
@@ -2849,7 +2846,7 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 			float scaleFactor = std::max(0.0f, (stretchLength + off_ticks) / stretchLength);
 			TimePos selEndDiff = selStart + scaleFactor * (selEnd - selStart) - selEnd;
 
-			for (Note* note: (m_action == ActionBulldozerResize) ? notes : getSelectedNotes())
+			for (auto& note: (m_action == ActionBulldozerResize) ? notes : getSelectedNotes())
 			{
 				// scale relative start and end positions by scaleFactor
 				TimePos newStart = note->oldPos();
@@ -2884,7 +2881,7 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 			// shift is not pressed; stretch length of selected notes but not their position
 			int minLength = alt ? 1 : m_minResizeLen.getTicks();
 
-			for (Note *note : getSelectedNotes())
+			for (auto& note : getSelectedNotes())
 			{
 				int newLength = qMax(minLength, note->oldLength() + off_ticks);
 				note->setLength(TimePos(newLength));
@@ -4673,7 +4670,7 @@ Note * PianoRoll::noteUnderMouse()
  *
  *  Use noteUnderMouse() to make sure the note is hovered in the first place
  */
-bool PianoRoll::isHoveringResize(Note* note)
+bool PianoRoll::isHoveringResize(const Note* note) const
 {
 	if (note == nullptr || note->length() <= 0) { return false; }
 	int x = mapFromGlobal(QCursor::pos()).x();
@@ -4709,12 +4706,12 @@ PianoRollWindow::PianoRollWindow() :
 	// init edit-buttons at the top
 	// order of the actions in this group must exactly match order of PianoRoll::EditModes
 	ActionGroup* editModeGroup = new ActionGroup( this );
-	QAction* drawAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw (Shift+D)"));
-	QAction* eraseAction = editModeGroup->addAction(embed::getIconPixmap("edit_erase"), tr("Erase"));
-	QAction* selectAction = editModeGroup->addAction(embed::getIconPixmap("edit_select"), tr("Select"));
-	QAction* pitchBendAction = editModeGroup->addAction(embed::getIconPixmap("automation"), tr("Pitch Bend"));
-	QAction* knifeAction = editModeGroup->addAction(embed::getIconPixmap("edit_knife"), tr("Knife"));
-	QAction* bulldozerAction = editModeGroup->addAction(embed::getIconPixmap("bulldozer"), tr("Bulldozer"));
+	auto drawAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw (Shift+D)"));
+	auto eraseAction = editModeGroup->addAction(embed::getIconPixmap("edit_erase"), tr("Erase"));
+	auto selectAction = editModeGroup->addAction(embed::getIconPixmap("edit_select"), tr("Select"));
+	auto pitchBendAction = editModeGroup->addAction(embed::getIconPixmap("automation"), tr("Pitch Bend"));
+	auto knifeAction = editModeGroup->addAction(embed::getIconPixmap("edit_knife"), tr("Knife"));
+	auto bulldozerAction = editModeGroup->addAction(embed::getIconPixmap("bulldozer"), tr("Bulldozer"));
 
 	drawAction->setChecked( true );
 
@@ -4729,9 +4726,9 @@ PianoRollWindow::PianoRollWindow() :
 	connect(m_editor, &PianoRoll::editModeChanged, this,
 		[=](int mode) { editModeGroup->actions().at(mode)->trigger(); });
 
-	QToolButton* drawButton = new QToolButton(notesActionsToolBar);
+	auto drawButton = new QToolButton(notesActionsToolBar);
 	drawButton->setDefaultAction(drawAction);
-	ComboButton* editModesButton = new ComboButton(notesActionsToolBar);
+	auto editModesButton = new ComboButton(notesActionsToolBar);
 	editModesButton->addAction(eraseAction);
 	editModesButton->addAction(selectAction);
 	editModesButton->addAction(pitchBendAction);
@@ -4819,7 +4816,7 @@ PianoRollWindow::PianoRollWindow() :
 	m_editor->m_timeLine->addToolButtons( timeLineToolBar );
 
 	// -- Note modifier tools
-	ComboButton * noteToolsButton = new ComboButton(m_toolBar);
+	auto noteToolsButton = new ComboButton(m_toolBar);
 
 	QAction * glueAction = new QAction(embed::getIconPixmap("glue"),
 				tr("Glue"), noteToolsButton);

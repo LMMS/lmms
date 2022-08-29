@@ -436,7 +436,7 @@ private:
 	void drawDetuningInfo( QPainter & _p, const Note * _n, int _x, int _y ) const;
 	bool mouseOverNote();
 	Note * noteUnderMouse();
-	bool isHoveringResize(Note* note);
+	bool isHoveringResize(const Note* note) const;
 
 	// turn a selection rectangle into selected notes
 	void computeSelectedNotes( bool shift );
