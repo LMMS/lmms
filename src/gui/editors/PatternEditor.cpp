@@ -76,7 +76,7 @@ void PatternEditor::removeSteps()
 	{
 		if( ( *it )->type() == Track::InstrumentTrack )
 		{
-			MidiClip* p = static_cast<MidiClip*>((*it)->getClip(m_ps->currentPattern()));
+			auto p = static_cast<MidiClip*>((*it)->getClip(m_ps->currentPattern()));
 			p->removeSteps();
 		}
 	}
@@ -184,7 +184,7 @@ void PatternEditor::makeSteps( bool clone )
 	{
 		if( ( *it )->type() == Track::InstrumentTrack )
 		{
-			MidiClip* p = static_cast<MidiClip*>((*it)->getClip(m_ps->currentPattern()));
+			auto p = static_cast<MidiClip*>((*it)->getClip(m_ps->currentPattern()));
 			if( clone )
 			{
 				p->cloneSteps();
@@ -201,7 +201,7 @@ void PatternEditor::makeSteps( bool clone )
 void PatternEditor::cloneClip()
 {
 	// Get the current PatternTrack id
-	PatternStore* ps = static_cast<PatternStore*>(model());
+	auto ps = static_cast<PatternStore*>(model());
 	const int currentPattern = ps->currentPattern();
 
 	PatternTrack* pt = PatternTrack::findPatternTrack(currentPattern);
@@ -272,7 +272,7 @@ PatternEditorWindow::PatternEditorWindow(PatternStore* ps) :
 	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_automation"), tr("Add automation-track"),
 						m_editor, SLOT(addAutomationTrack()));
 
-	QWidget* stretch = new QWidget(m_toolBar);
+	auto stretch = new QWidget(m_toolBar);
 	stretch->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	trackAndStepActionsToolBar->addWidget(stretch);
 
@@ -288,13 +288,12 @@ PatternEditorWindow::PatternEditorWindow(PatternStore* ps) :
 	connect(&ps->m_patternComboBoxModel, SIGNAL(dataChanged()),
 			m_editor, SLOT(updatePosition()));
 
-
-	QAction* viewNext = new QAction(this);
+	auto viewNext = new QAction(this);
 	connect(viewNext, SIGNAL(triggered()), m_patternComboBox, SLOT(selectNext()));
 	viewNext->setShortcut(Qt::Key_Plus);
 	addAction(viewNext);
 
-	QAction* viewPrevious = new QAction(this);
+	auto viewPrevious = new QAction(this);
 	connect(viewPrevious, SIGNAL(triggered()), m_patternComboBox, SLOT(selectPrevious()));
 	viewPrevious->setShortcut(Qt::Key_Minus);
 	addAction(viewPrevious);

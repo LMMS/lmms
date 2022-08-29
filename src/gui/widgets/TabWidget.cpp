@@ -152,7 +152,7 @@ bool TabWidget::event(QEvent *event)
 
 	if ( event->type() == QEvent::ToolTip )
 	{
-		QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
+		auto helpEvent = static_cast<QHelpEvent*>(event);
 
 		int idx = findTabAtPos( & helpEvent->pos() );
 
