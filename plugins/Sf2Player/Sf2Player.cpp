@@ -1186,7 +1186,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
 	return new Sf2Instrument( static_cast<InstrumentTrack *>( m ) );
 }
-
 }
 
 

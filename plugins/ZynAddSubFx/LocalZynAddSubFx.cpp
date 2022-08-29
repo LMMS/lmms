@@ -51,7 +51,6 @@ LocalZynAddSubFx::LocalZynAddSubFx() :
 	m_master( nullptr ),
 	m_ioEngine( nullptr )
 {
-
 	if( s_instanceCount == 0 )
 	{
 #ifdef LMMS_BUILD_WIN32
