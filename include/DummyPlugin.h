@@ -66,6 +66,6 @@ protected:
 } ;
 
 
-} // namesplace lmms
+} // namespace lmms
 
 #endif

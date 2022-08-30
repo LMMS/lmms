@@ -111,7 +111,7 @@ private:
 	uchar* m_map;
 };
 
-}
+} // namespace PE
 
 namespace lmms
 {

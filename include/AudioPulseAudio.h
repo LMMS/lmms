@@ -102,6 +102,6 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_HAVE_PULSEAUDIO
 
 #endif

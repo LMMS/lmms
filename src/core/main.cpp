@@ -120,7 +120,7 @@ void consoleMessageHandler(QtMsgType type,
     QByteArray localMsg = msg.toLocal8Bit();
     fprintf(stderr, "%s\n", localMsg.constData());
 }
-#endif
+#endif // LMMS_BUILD_WIN32
 
 
 inline void loadTranslation( const QString & tname,
@@ -776,7 +776,7 @@ int main( int argc, char * * argv )
 		printf( "Notice: could not set realtime priority.\n" );
 	}
 #endif
-#endif
+#endif // LMMS_HAVE_SCHED_H
 #endif
 
 #ifdef LMMS_BUILD_WIN32
