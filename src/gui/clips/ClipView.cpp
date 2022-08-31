@@ -425,7 +425,7 @@ void ClipView::setColor(const QColor* color)
 void ClipView::dragEnterEvent( QDragEnterEvent * dee )
 {
 	TrackContentWidget * tcw = getTrackView()->getTrackContentWidget();
-	auto clipPos = TimePos(m_clip->startPosition());
+	TimePos clipPos{m_clip->startPosition()};
 
 	if( tcw->canPasteSelection( clipPos, dee ) == false )
 	{
@@ -465,7 +465,7 @@ void ClipView::dropEvent( QDropEvent * de )
 	if( m_trackView->trackContainerView()->allowRubberband() == true )
 	{
 		TrackContentWidget * tcw = getTrackView()->getTrackContentWidget();
-		auto clipPos = TimePos(m_clip->startPosition());
+		TimePos clipPos{m_clip->startPosition()};
 
 		if( tcw->pasteSelection( clipPos, de ) == true )
 		{
@@ -1205,7 +1205,7 @@ void ClipView::paste()
 	using namespace Clipboard;
 
 	// If possible, paste the selection on the TimePos of the selected Track and remove it
-	auto clipPos = TimePos(m_clip->startPosition());
+	TimePos clipPos{m_clip->startPosition()};
 
 	TrackContentWidget *tcw = getTrackView()->getTrackContentWidget();
 

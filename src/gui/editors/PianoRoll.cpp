@@ -1001,7 +1001,7 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 	float leftPercent = qMin<float>( 1.0f, leftPanSpan / panningRange * 2.0f );
 	float rightPercent = qMin<float>( 1.0f, rightPanSpan / panningRange * 2.0f );
 
-	auto col = QColor(noteCol);
+	QColor col{noteCol};
 	QPen pen;
 
 	if( n->selected() )
