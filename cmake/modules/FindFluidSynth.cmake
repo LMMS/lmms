@@ -85,29 +85,25 @@ function(_get_vcpkg_library_configs _release_out _debug_out _library)
 endfunction()
 
 if(FluidSynth_INCLUDE_DIR AND FluidSynth_LIBRARY)
-	add_library(fluidsynth SHARED IMPORTED)
+	add_library(fluidsynth UNKNOWN IMPORTED)
 	set_target_properties(fluidsynth PROPERTIES
 		INTERFACE_INCLUDE_DIRECTORIES "${FluidSynth_INCLUDE_DIR}"
 	)
-	if(WIN32)
-		if(VCPKG_INSTALLED_DIR)
-			_get_vcpkg_library_configs(FluidSynth_IMPLIB_RELEASE FluidSynth_IMPLIB_DEBUG "${FluidSynth_LIBRARY}")
-		else()
-			set(FluidSynth_IMPLIB_RELEASE "${FluidSynth_LIBRARY}")
-		endif()
-		if(FluidSynth_IMPLIB_DEBUG)
-			set_target_properties(fluidsynth PROPERTIES
-				IMPORTED_IMPLIB_RELEASE "${FluidSynth_IMPLIB_RELEASE}"
-				IMPORTED_IMPLIB_DEBUG "${FluidSynth_IMPLIB_DEBUG}"
-			)
-		else()
-			set_target_properties(fluidsynth PROPERTIES
-				IMPORTED_IMPLIB "${FluidSynth_IMPLIB_RELEASE}"
-			)
-		endif()
+
+	if(VCPKG_INSTALLED_DIR)
+		_get_vcpkg_library_configs(FluidSynth_IMPLIB_RELEASE FluidSynth_IMPLIB_DEBUG "${FluidSynth_LIBRARY}")
+	else()
+		set(FluidSynth_IMPLIB_RELEASE "${FluidSynth_LIBRARY}")
+	endif()
+
+	if(FluidSynth_IMPLIB_DEBUG)
+		set_target_properties(fluidsynth PROPERTIES
+			IMPORTED_LOCATION_RELEASE "${FluidSynth_IMPLIB_RELEASE}"
+			IMPORTED_LOCATION_DEBUG "${FluidSynth_IMPLIB_DEBUG}"
+		)
 	else()
 		set_target_properties(fluidsynth PROPERTIES
-			IMPORTED_LOCATION "${FluidSynth_LIBRARY}"
+			IMPORTED_LOCATION "${FluidSynth_IMPLIB_RELEASE}"
 		)
 	endif()
 
