@@ -28,67 +28,77 @@
 # (To distribute this file outside of CMake, substitute the full
 #  License text for the above reference.)
 
-set(SDL2_SEARCH_PATHS
-	~/Library/Frameworks
-	/Library/Frameworks
-	/usr/local
-	/usr
-	/sw # Fink
-	/opt/local # DarwinPorts
-	/opt/csw # Blastwave
-	/opt
-	${SDL2_PATH}
-)
+# Try config mode first - anything SDL2 itself provides is likely to be more
+# reliable than our guesses.
+find_package(SDL2 CONFIG QUIET)
 
-find_path(SDL2_INCLUDE_DIR
-	NAMES SDL.h
-	HINTS $ENV{SDL2DIR}
-	PATH_SUFFIXES SDL2 include/SDL2 include
-	PATHS ${SDL2_SEARCH_PATHS}
-)
-
-if(CMAKE_SIZEOF_VOID_P EQUAL 8) 
-	set(PATH_SUFFIXES lib64 lib/x64 lib)
-else() 
-	set(PATH_SUFFIXES lib/x86 lib)
-endif() 
-
-find_library(SDL2_LIBRARY
-	NAMES SDL2
-	HINTS $ENV{SDL2DIR}
-	PATH_SUFFIXES ${PATH_SUFFIXES}
-	PATHS ${SDL2_SEARCH_PATHS}
-)
-
-# SDL2 may require threads on your system.
-# The Apple build may not need an explicit flag because one of the
-# frameworks may already provide it.
-# But for non-OSX systems, I will use the CMake Threads package.
-if(NOT APPLE)
-	find_package(Threads)
-endif()
-
-if(SDL2_LIBRARY)
-	add_library(SDL2::SDL2 UNKNOWN IMPORTED)
-	set_target_properties(SDL2::SDL2 PROPERTIES
-		IMPORTED_LOCATION "${SDL2_LIBRARY}"
-		INTERFACE_INCLUDE_DIRECTORIES "${SDL2_INCLUDE_DIR}"
+if(TARGET SDL2::SDL2)
+	# Extract details for find_package_handle_standard_args
+	get_target_property(SDL2_LIBRARY SDL2::SDL2 LOCATION)
+	get_target_property(SDL2_INCLUDE_DIR SDL2::SDL2 INTERFACE_INCLUDE_DIRECTORIES)
+else()
+	set(SDL2_SEARCH_PATHS
+		~/Library/Frameworks
+		/Library/Frameworks
+		/usr/local
+		/usr
+		/sw # Fink
+		/opt/local # DarwinPorts
+		/opt/csw # Blastwave
+		/opt
+		${SDL2_PATH}
 	)
 
-	# For OS X, SDL2 uses Cocoa as a backend so it must link to Cocoa.
-	if(APPLE)
-		set_property(TARGET SDL2::SDL2 APPEND PROPERTY
-			INTERFACE_LINK_OPTIONS "-framework Cocoa"
-		)
+	find_path(SDL2_INCLUDE_DIR
+		NAMES SDL.h
+		HINTS $ENV{SDL2DIR}
+		PATH_SUFFIXES SDL2 include/SDL2 include
+		PATHS ${SDL2_SEARCH_PATHS}
+	)
+
+	if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+		set(PATH_SUFFIXES lib64 lib/x64 lib)
+	else()
+		set(PATH_SUFFIXES lib/x86 lib)
 	endif()
 
-	# For threads, as mentioned Apple doesn't need this.
-	# In fact, there seems to be a problem if I used the Threads package
-	# and try using this line, so I'm just skipping it entirely for OS X.
-	if(NOT APPLE AND Threads_FOUND)
-		set_property(TARGET SDL2::SDL2 APPEND PROPERTY
-			INTERFACE_LINK_LIBRARIES "Threads::Threads"
+	find_library(SDL2_LIBRARY
+		NAMES SDL2
+		HINTS $ENV{SDL2DIR}
+		PATH_SUFFIXES ${PATH_SUFFIXES}
+		PATHS ${SDL2_SEARCH_PATHS}
+	)
+
+	# SDL2 may require threads on your system.
+	# The Apple build may not need an explicit flag because one of the
+	# frameworks may already provide it.
+	# But for non-OSX systems, I will use the CMake Threads package.
+	if(NOT APPLE)
+		find_package(Threads)
+	endif()
+
+	if(SDL2_LIBRARY)
+		add_library(SDL2::SDL2 UNKNOWN IMPORTED)
+		set_target_properties(SDL2::SDL2 PROPERTIES
+			IMPORTED_LOCATION "${SDL2_LIBRARY}"
+			INTERFACE_INCLUDE_DIRECTORIES "${SDL2_INCLUDE_DIR}"
 		)
+
+		# For OS X, SDL2 uses Cocoa as a backend so it must link to Cocoa.
+		if(APPLE)
+			set_property(TARGET SDL2::SDL2 APPEND PROPERTY
+				INTERFACE_LINK_OPTIONS "-framework Cocoa"
+			)
+		endif()
+
+		# For threads, as mentioned Apple doesn't need this.
+		# In fact, there seems to be a problem if I used the Threads package
+		# and try using this line, so I'm just skipping it entirely for OS X.
+		if(NOT APPLE AND Threads_FOUND)
+			set_property(TARGET SDL2::SDL2 APPEND PROPERTY
+				INTERFACE_LINK_LIBRARIES "Threads::Threads"
+			)
+		endif()
 	endif()
 endif()
 

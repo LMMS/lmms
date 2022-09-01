@@ -203,27 +203,6 @@ CHECK_CXX_SOURCE_COMPILES(
 	LMMS_HAVE_SF_COMPLEVEL
 )
 
-# Search for a target in a package using config mode first, then fall back to
-# module mode. This allows us to use the package's own CMake configuration files
-# if available.
-# We use this macro instead of the CMAKE_FIND_PACKAGE_PREFER_CONFIG variable
-# since some packages on some systems provide a config file that doesn't create
-# a target, and some packages have unusual config file names.
-macro(find_target_prefer_config PACKAGE_NAME TARGET_NAME)
-	if("${ARGC}" GREATER 2)
-		# Handle optional third argument specifying a config name different from
-		# the module name
-		find_package("${ARGV2}" CONFIG QUIET)
-		set("${PACKAGE_NAME}_FOUND" "${${ARGV2}_FOUND}")
-	else()
-		find_package("${PACKAGE_NAME}" CONFIG QUIET)
-	endif()
-	if(NOT TARGET "${TARGET_NAME}")
-		unset("${PACKAGE_NAME}_FOUND")
-		find_package("${PACKAGE_NAME}" MODULE)
-	endif()
-endmacro()
-
 IF(WANT_LV2)
 	IF(PKG_CONFIG_FOUND)
 		PKG_CHECK_MODULES(LV2 lv2)
@@ -319,10 +298,7 @@ ENDIF(WANT_CARLA)
 
 # check for SDL2
 IF(WANT_SDL)
-	# Don't look for SDL2main
-	SET(SDL2_BUILDING_LIBRARY TRUE)
-
-	find_target_prefer_config(SDL2 SDL2::SDL2)
+	FIND_PACKAGE(SDL2)
 	IF(SDL2_FOUND)
 		SET(LMMS_HAVE_SDL TRUE)
 		SET(LMMS_HAVE_SDL2 TRUE)
@@ -358,7 +334,7 @@ ENDIF()
 
 # check for Stk
 IF(WANT_STK)
-	find_target_prefer_config(STK unofficial::libstk::libstk unofficial-libstk)
+	FIND_PACKAGE(STK)
 	IF(STK_FOUND)
 		SET(LMMS_HAVE_STK TRUE)
 		SET(STATUS_STK "OK")
@@ -372,7 +348,7 @@ ENDIF(WANT_STK)
 
 # check for PortAudio
 IF(WANT_PORTAUDIO)
-	find_target_prefer_config(Portaudio portaudio portaudio)
+	FIND_PACKAGE(Portaudio)
 	IF(Portaudio_FOUND)
 		SET(LMMS_HAVE_PORTAUDIO TRUE)
 		SET(STATUS_PORTAUDIO "OK")
