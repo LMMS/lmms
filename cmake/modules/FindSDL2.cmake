@@ -51,7 +51,7 @@ else()
 
 	find_path(SDL2_INCLUDE_DIR
 		NAMES SDL.h
-		HINTS $ENV{SDL2DIR}
+		HINTS $ENV{SDL2DIR} ${SDL2_INCLUDE_DIRS}
 		PATH_SUFFIXES SDL2 include/SDL2 include
 		PATHS ${SDL2_SEARCH_PATHS}
 	)
@@ -64,7 +64,7 @@ else()
 
 	find_library(SDL2_LIBRARY
 		NAMES SDL2
-		HINTS $ENV{SDL2DIR}
+		HINTS $ENV{SDL2DIR} ${SDL2_LIBDIR}
 		PATH_SUFFIXES ${PATH_SUFFIXES}
 		PATHS ${SDL2_SEARCH_PATHS}
 	)
@@ -77,7 +77,7 @@ else()
 		find_package(Threads)
 	endif()
 
-	if(SDL2_LIBRARY)
+	if(SDL2_LIBRARY AND SDL2_INCLUDE_DIR)
 		add_library(SDL2::SDL2 UNKNOWN IMPORTED)
 		set_target_properties(SDL2::SDL2 PROPERTIES
 			IMPORTED_LOCATION "${SDL2_LIBRARY}"
@@ -99,10 +99,20 @@ else()
 				INTERFACE_LINK_LIBRARIES "Threads::Threads"
 			)
 		endif()
+
+		if(EXISTS "${SDL2_INCLUDE_DIR}/SDL_version.h")
+			file(READ "${SDL2_INCLUDE_DIR}/SDL_version.h" _sdl_version_h)
+			string(REGEX REPLACE ".*#[\t ]*define[\t ]+SDL_MAJOR_VERSION[\t ]+([0-9]+).*" "\\1" SDL2_VERSION_MAJOR "${_sdl_version_h}")
+			string(REGEX REPLACE ".*#[\t ]*define[\t ]+SDL_MINOR_VERSION[\t ]+([0-9]+).*" "\\1" SDL2_VERSION_MINOR "${_sdl_version_h}")
+			string(REGEX REPLACE ".*#[\t ]*define[\t ]+SDL_PATCHLEVEL[\t ]+([0-9]+).*" "\\1" SDL2_VERSION_PATCH "${_sdl_version_h}")
+			set(SDL2_VERSION "${SDL2_VERSION_MAJOR}.${SDL2_VERSION_MINOR}.${SDL2_VERSION_PATCH}")
+			unset(_sdl_version_h)
+		endif()
 	endif()
 endif()
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(SDL2
 	REQUIRED_VARS SDL2_LIBRARY SDL2_INCLUDE_DIR
+	VERSION_VAR SDL2_VERSION
 )
