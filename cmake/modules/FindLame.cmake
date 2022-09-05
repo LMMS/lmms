@@ -16,7 +16,7 @@ else()
 	find_path(Lame_INCLUDE_DIRS lame/lame.h)
 	find_library(Lame_LIBRARIES mp3lame)
 
-	list(APPEND Lame_DEFINITIONS -DHAVE_LIBMP3LAME=1)
+	list(APPEND Lame_DEFINITIONS HAVE_LIBMP3LAME=1)
 
 	mark_as_advanced(Lame_INCLUDE_DIRS Lame_LIBRARIES Lame_DEFINITIONS)
 
