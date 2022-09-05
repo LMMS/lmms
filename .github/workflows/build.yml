@@ -222,7 +222,10 @@ jobs:
           set-env: ${{ matrix.arch == 'x86' }}
       - name: Install dependencies
         run: |
-          vcpkg install --triplet ${{ matrix.arch }}-windows --recurse `
+          vcpkg install `
+            --triplet=${{ matrix.arch }}-windows `
+            --host-triplet=${{ matrix.arch }}-windows `
+            --recurse `
             fftw3 fluidsynth[sndfile] libsamplerate libsndfile libstk lilv lv2 `
             portaudio sdl2
       - name: Set up build environment
