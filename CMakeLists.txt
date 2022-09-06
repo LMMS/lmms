@@ -604,6 +604,16 @@ SET(CMAKE_CXX_FLAGS "${WERROR_FLAGS} ${CMAKE_CXX_FLAGS}")
 SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DLMMS_DEBUG")
 SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DLMMS_DEBUG")
 
+if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.16")
+	set(NOOP_COMMAND "${CMAKE_COMMAND}" "-E" "true")
+else()
+	set(NOOP_COMMAND "${CMAKE_COMMAND}" "-E" "echo")
+endif()
+if(STRIP)
+	set(STRIP_COMMAND "$<IF:$<TARGET:Debug,RelWithDebInfo>,${NOOP_COMMAND},${STRIP}>")
+else()
+	set(STRIP_COMMAND "${NOOP_COMMAND}")
+endif()
 
 # people simply updating git will still have this and mess up build with it
 FILE(REMOVE include/lmmsconfig.h)
