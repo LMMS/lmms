@@ -202,14 +202,14 @@ IF(LMMS_BUILD_WIN32)
 	add_custom_command(
 		TARGET ZynAddSubFxCore
 		POST_BUILD
-		COMMAND "${STRIP_COMMAND}" \"$<TARGET_FILE:ZynAddSubFxCore>\"
+		COMMAND "${STRIP_COMMAND}" "$<TARGET_FILE:ZynAddSubFxCore>"
 		VERBATIM
 		COMMAND_EXPAND_LISTS
 	)
 	add_custom_command(
 		TARGET RemoteZynAddSubFx
 		POST_BUILD
-		COMMAND "${STRIP_COMMAND}" \"$<TARGET_FILE:RemoteZynAddSubFx>\"
+		COMMAND "${STRIP_COMMAND}" "$<TARGET_FILE:RemoteZynAddSubFx>"
 		VERBATIM
 		COMMAND_EXPAND_LISTS
 	)

@@ -45,7 +45,7 @@ FOREACH(_item ${XML_SOURCES})
 		add_custom_command(
 			TARGET "${_plugin}"
 			POST_BUILD
-			COMMAND "${STRIP_COMMAND}" \"$<TARGET_FILE:${_plugin}>\"
+			COMMAND "${STRIP_COMMAND}" "$<TARGET_FILE:${_plugin}>"
 			VERBATIM
 			COMMAND_EXPAND_LISTS
 		)
