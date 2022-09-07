@@ -97,6 +97,7 @@ SET(LMMS_SRCS
 	gui/widgets/CPULoadWidget.cpp
 	gui/widgets/CaptionMenu.cpp
 	gui/widgets/ComboBox.cpp
+	gui/widgets/ComboButton.cpp
 	gui/widgets/CustomTextKnob.cpp
 	gui/widgets/Fader.cpp
 	gui/widgets/Graph.cpp

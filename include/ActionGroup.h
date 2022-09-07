@@ -52,9 +52,6 @@ signals:
 
 private slots:
 	void actionTriggered_(QAction* action);
-
-private:
-	QList<QAction*> m_actions;
 };
 
 } // namespace lmms::gui
