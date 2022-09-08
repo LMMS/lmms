@@ -22,6 +22,14 @@ ENDIF(COMMAND CMAKE_POLICY)
 # Import of windows.h breaks min()/max()
 ADD_DEFINITIONS(-DNOMINMAX)
 
+# Treating imported target headers as system includes can change the header
+# search order if some targets have headers in the standard system include
+# directories, which can cause some headers not to be found due to the way
+# #include_next is used in the standard library.
+if(MINGW)
+	set(CMAKE_NO_SYSTEM_FROM_IMPORTED TRUE)
+endif()
+
 INCLUDE(PluginList)
 INCLUDE(CheckSubmodules)
 INCLUDE(AddFileDependencies)
