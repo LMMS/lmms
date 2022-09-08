@@ -500,6 +500,15 @@ void TrackContainerView::scrollArea::wheelEvent( QWheelEvent * _we )
 	}
 }
 
+int TrackContainerView::calcTotalHeightOfTracks(const trackViewList& trackViews)
+{
+    unsigned int heightSum = 0;
+    for(auto & trackView : trackViews)
+    {
+        heightSum += trackView->getTrack()->getHeight();
+    }
+    return heightSum;
+}
 
 } // namespace gui
 

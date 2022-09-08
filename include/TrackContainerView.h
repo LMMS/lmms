@@ -206,7 +206,15 @@ private:
 
 	RubberBand * m_rubberBand;
 
+public:
+    // public helpers
 
+    /**
+     * @brief sums up the heights of all of the tracks
+     * @param trackViews: a QList of track views
+     * @return the summed height as an int
+     */
+    static int calcTotalHeightOfTracks(const trackViewList& trackViews);
 
 signals:
 	void positionChanged( const lmms::TimePos & _pos );

@@ -54,6 +54,8 @@
 #include "TimeLineWidget.h"
 #include "TrackView.h"
 
+#include <iostream>
+
 namespace lmms::gui
 {
 
@@ -824,7 +826,8 @@ void SongEditor::updatePosition( const TimePos & t )
 		m_positionLine->hide();
 	}
 
-	m_positionLine->setFixedHeight( height() );
+    m_positionLine->setFixedHeight( TrackContainerView::calcTotalHeightOfTracks(this->trackViews()) );
+
 }
 
 
@@ -832,7 +835,7 @@ void SongEditor::updatePosition( const TimePos & t )
 
 void SongEditor::updatePositionLine()
 {
-	m_positionLine->setFixedHeight( height() );
+    m_positionLine->setFixedHeight( TrackContainerView::calcTotalHeightOfTracks(this->trackViews()) );
 }
 
 
