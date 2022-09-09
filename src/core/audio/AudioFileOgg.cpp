@@ -272,6 +272,6 @@ void AudioFileOgg::finishEncoding()
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_HAVE_OGGVORBIS
 
 

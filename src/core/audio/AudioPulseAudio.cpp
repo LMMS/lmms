@@ -353,5 +353,5 @@ void AudioPulseAudio::setupWidget::saveSettings()
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_HAVE_PULSEAUDIO
 

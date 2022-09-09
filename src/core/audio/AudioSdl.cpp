@@ -304,7 +304,7 @@ void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 		m_convertedBufPos += min_len;
 		m_convertedBufPos %= m_convertedBufSize;
 	}
-#endif
+#endif // LMMS_HAVE_SDL2
 }
 
 #ifdef LMMS_HAVE_SDL2
@@ -349,5 +349,5 @@ void AudioSdl::setupWidget::saveSettings()
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_HAVE_SDL
 

@@ -118,4 +118,4 @@ void MidiSndio::run()
 
 } // namespace lmms
 
-#endif	/* LMMS_HAVE_SNDIO */
+#endif	// LMMS_HAVE_SNDIO

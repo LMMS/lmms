@@ -118,7 +118,7 @@ static inline float absFraction( float _x )
 }
 #endif
 
-#endif
+#endif // __INTEL_COMPILER
 
 
 
@@ -153,7 +153,7 @@ static inline long double fastFmal( long double a, long double b, long double c 
 	#endif
 #else
 	return a * b + c;
-#endif
+#endif // FP_FAST_FMAL
 }
 
 //! @brief Takes advantage of fmaf() function if present in hardware
@@ -167,7 +167,7 @@ static inline float fastFmaf( float a, float b, float c )
 	#endif
 #else
 	return a * b + c;
-#endif
+#endif // FP_FAST_FMAF
 }
 
 //! @brief Takes advantage of fma() function if present in hardware

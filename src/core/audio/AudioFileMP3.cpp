@@ -134,4 +134,4 @@ void AudioFileMP3::tearDownEncoder()
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_HAVE_MP3LAME

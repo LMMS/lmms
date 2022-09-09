@@ -120,4 +120,4 @@ void AudioAlsaSetupWidget::onCurrentIndexChanged(int index)
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_HAVE_ALSA

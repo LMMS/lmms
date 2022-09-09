@@ -173,7 +173,7 @@ private:
 	std::condition_variable m_cv;
 	std::thread m_thread;
 };
-#endif
+#endif // LMMS_BUILD_WIN32
 
 #ifdef SYNC_WITH_SHM_FIFO
 RemotePluginClient::RemotePluginClient( const std::string& _shm_in, const std::string& _shm_out ) :

@@ -363,7 +363,7 @@ namespace SimpleRandom {
 			return dist(generator);
 		}
 	};
-}
+} // namespace SimpleRandom
 
 static freefunc0<float,SimpleRandom::float_random_with_engine,false> simple_rand;
 
