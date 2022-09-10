@@ -99,8 +99,7 @@ SongEditor::SongEditor( Song * song ) :
 			 this, SLOT(stopRubberBand()));
 
 	// when tracks realign, adjust height of position line
-	connect( this, SIGNAL(tracksRealigned()),
-			 this, SLOT(updatePositionLine()) );
+	connect(this, &TrackContainerView::tracksRealigned, this, &SongEditor::updatePositionLine);
 
 	m_positionLine = new PositionLine(this);
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 1, m_timeLine );
@@ -828,8 +827,7 @@ void SongEditor::updatePosition( const TimePos & t )
 		m_positionLine->hide();
 	}
 
-	m_positionLine->setFixedHeight( calcTotalHeightOfTracks() );
-
+	updatePositionLine();
 }
 
 
@@ -837,7 +835,7 @@ void SongEditor::updatePosition( const TimePos & t )
 
 void SongEditor::updatePositionLine()
 {
-	m_positionLine->setFixedHeight( calcTotalHeightOfTracks() );
+	m_positionLine->setFixedHeight(totalHeightOfTracks());
 }
 
 

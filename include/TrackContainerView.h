@@ -148,8 +148,7 @@ public:
 		return "trackcontainerview";
 	}
 
-	int calcTotalHeightOfTracks();
-
+	int totalHeightOfTracks();
 
 	RubberBand *rubberBand() const;
 
