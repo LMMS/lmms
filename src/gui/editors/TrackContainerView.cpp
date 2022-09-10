@@ -265,7 +265,7 @@ void TrackContainerView::realignTracks()
 		( *it )->update();
 	}
 
-    emit tracksRealigned();
+	emit tracksRealigned();
 }
 
 
@@ -504,12 +504,12 @@ void TrackContainerView::scrollArea::wheelEvent( QWheelEvent * _we )
 
 int TrackContainerView::calcTotalHeightOfTracks()
 {
-    unsigned int heightSum = 0;
-    for(auto & trackView : m_trackViews)
-    {
-        heightSum += trackView->getTrack()->getHeight();
-    }
-    return heightSum;
+	unsigned int heightSum = 0;
+	for (auto & trackView : m_trackViews)
+	{
+		heightSum += trackView->getTrack()->getHeight();
+	}
+	return heightSum;
 }
 
 } // namespace gui

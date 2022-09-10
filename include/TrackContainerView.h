@@ -148,7 +148,7 @@ public:
 		return "trackcontainerview";
 	}
 
-    int calcTotalHeightOfTracks();
+	int calcTotalHeightOfTracks();
 
 
 	RubberBand *rubberBand() const;
@@ -210,7 +210,7 @@ private:
 
 signals:
 	void positionChanged( const lmms::TimePos & _pos );
-    void tracksRealigned();
+	void tracksRealigned();
 
 
 } ;
