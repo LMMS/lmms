@@ -41,7 +41,7 @@ function skipped {
 }
 
 # Blindly assume system arch is appimage arch
-ARCH=$(arch)
+ARCH=$(uname -m)
 export ARCH
 
 # Check for problematic install locations
@@ -62,7 +62,7 @@ echo -e "\nDownloading linuxdeployqt to ${LINUXDEPLOYQT}..."
 if env -i which linuxdeployqt > /dev/null 2>&1; then
 	skipped "System already provides this utility"
 else
-	filename="linuxdeployqt-continuous-$(uname -p).AppImage"
+	filename="linuxdeployqt-continuous-$ARCH.AppImage"
 	url="https://github.com/probonopd/linuxdeployqt/releases/download/continuous/$filename"
 	down_file="$(pwd)/$filename"
 	if [ ! -f "$LINUXDEPLOYQT" ]; then
