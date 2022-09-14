@@ -139,7 +139,7 @@ gui::TrackView* PatternTrack::createView(gui::TrackContainerView* tcv)
 
 Clip* PatternTrack::createClip(const TimePos & pos)
 {
-	PatternClip* pc = new PatternClip(this);
+	auto pc = new PatternClip(this);
 	pc->movePosition(pos);
 	return pc;
 }
@@ -234,8 +234,8 @@ PatternTrack* PatternTrack::findPatternTrack(int pattern_num)
 
 void PatternTrack::swapPatternTracks(Track* track1, Track* track2)
 {
-	PatternTrack* t1 = dynamic_cast<PatternTrack*>(track1);
-	PatternTrack* t2 = dynamic_cast<PatternTrack*>(track2);
+	auto t1 = dynamic_cast<PatternTrack*>(track1);
+	auto t2 = dynamic_cast<PatternTrack*>(track2);
 	if( t1 != nullptr && t2 != nullptr )
 	{
 		qSwap( s_infoMap[t1], s_infoMap[t2] );

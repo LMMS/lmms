@@ -442,7 +442,7 @@ int AudioJack::staticProcessCallback( jack_nframes_t _nframes, void * _udata )
 
 void AudioJack::shutdownCallback( void * _udata )
 {
-	AudioJack * _this = static_cast<AudioJack *>( _udata );
+	auto _this = static_cast<AudioJack*>(_udata);
 	_this->m_client = nullptr;
 	_this->zombified();
 }
@@ -462,11 +462,11 @@ AudioJack::setupWidget::setupWidget( QWidget * _parent ) :
 	m_clientName = new QLineEdit( cn, this );
 	m_clientName->setGeometry( 10, 20, 160, 20 );
 
-	QLabel * cn_lbl = new QLabel( tr( "Client name" ), this );
+	auto cn_lbl = new QLabel(tr("Client name"), this);
 	cn_lbl->setFont( pointSize<7>( cn_lbl->font() ) );
 	cn_lbl->setGeometry( 10, 40, 160, 10 );
 
-	gui::LcdSpinBoxModel * m = new gui::LcdSpinBoxModel( /* this */ );
+	auto m = new gui::LcdSpinBoxModel(/* this */);
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
 	m->setStep( 2 );
 	m->setValue( ConfigManager::inst()->value( "audiojack",

@@ -85,9 +85,9 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	m_absLed = new LedCheckBox( tr( "Absolute value" ), this );
 	m_absLed->setModel( &_controls->m_absModel );
 
-	QVBoxLayout * mainLayout = new QVBoxLayout();
-	QHBoxLayout * knobLayout = new QHBoxLayout();
-	QHBoxLayout * ledLayout = new QHBoxLayout();
+	auto mainLayout = new QVBoxLayout();
+	auto knobLayout = new QHBoxLayout();
+	auto ledLayout = new QHBoxLayout();
 
 	knobLayout->addWidget( m_baseKnob );
 	knobLayout->addWidget( m_amountKnob );

@@ -92,7 +92,7 @@ GigInstrument::GigInstrument( InstrumentTrack * _instrument_track ) :
 	m_RandomSeed( 0 ),
 	m_currentKeyDimension( 0 )
 {
-	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
+	auto iph = new InstrumentPlayHandle(this, _instrument_track);
 	Engine::audioEngine()->addPlayHandle( iph );
 
 	updateSampleRate();
@@ -305,7 +305,7 @@ void GigInstrument::playNote( NotePlayHandle * _n, sampleFrame * )
 
 	if( tfp == 0 )
 	{
-		GIGPluginData * pluginData = new GIGPluginData;
+		auto pluginData = new GIGPluginData;
 		pluginData->midiNote = midiNote;
 		_n->m_pluginData = pluginData;
 
@@ -593,7 +593,7 @@ void GigInstrument::loadSample( GigSample& sample, sampleFrame* sampleData, f_cn
 	// Convert from 16 or 24 bit into 32-bit float
 	if( sample.sample->BitDepth == 24 ) // 24 bit
 	{
-		uint8_t * pInt = reinterpret_cast<uint8_t*>( &buffer );
+		auto pInt = reinterpret_cast<uint8_t*>(&buffer);
 
 		for( f_cnt_t i = 0; i < samples; ++i )
 		{
@@ -625,7 +625,7 @@ void GigInstrument::loadSample( GigSample& sample, sampleFrame* sampleData, f_cn
 	}
 	else // 16 bit
 	{
-		int16_t * pInt = reinterpret_cast<int16_t*>( &buffer );
+		auto pInt = reinterpret_cast<int16_t*>(&buffer);
 
 		for( f_cnt_t i = 0; i < samples; ++i )
 		{
@@ -684,7 +684,7 @@ f_cnt_t GigInstrument::getPingPongIndex( f_cnt_t index, f_cnt_t startf, f_cnt_t 
 // A key has been released
 void GigInstrument::deleteNotePluginData( NotePlayHandle * _n )
 {
-	GIGPluginData * pluginData = static_cast<GIGPluginData *>( _n->m_pluginData );
+	auto pluginData = static_cast<GIGPluginData*>(_n->m_pluginData);
 	QMutexLocker locker( &m_notesMutex );
 
 	// Mark the note as being released, but only if it was playing or was just
@@ -931,7 +931,7 @@ public:
 GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _parent ) :
         InstrumentViewFixedSize( _instrument, _parent )
 {
-	GigInstrument * k = castModel<GigInstrument>();
+	auto k = castModel<GigInstrument>();
 
 	connect( &k->m_bankNum, SIGNAL( dataChanged() ), this, SLOT( updatePatchName() ) );
 	connect( &k->m_patchNum, SIGNAL( dataChanged() ), this, SLOT( updatePatchName() ) );
@@ -990,7 +990,7 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 
 void GigInstrumentView::modelChanged()
 {
-	GigInstrument * k = castModel<GigInstrument>();
+	auto k = castModel<GigInstrument>();
 	m_bankNumLcd->setModel( &k->m_bankNum );
 	m_patchNumLcd->setModel( &k->m_patchNum );
 
@@ -1007,7 +1007,7 @@ void GigInstrumentView::modelChanged()
 
 void GigInstrumentView::updateFilename()
 {
-	GigInstrument * i = castModel<GigInstrument>();
+	auto i = castModel<GigInstrument>();
 	QFontMetrics fm( m_filenameLabel->font() );
 	QString file = i->m_filename.endsWith( ".gig", Qt::CaseInsensitive ) ?
 			i->m_filename.left( i->m_filename.length() - 4 ) :
@@ -1025,7 +1025,7 @@ void GigInstrumentView::updateFilename()
 
 void GigInstrumentView::updatePatchName()
 {
-	GigInstrument * i = castModel<GigInstrument>();
+	auto i = castModel<GigInstrument>();
 	QFontMetrics fm( font() );
 	QString patch = i->getCurrentPatchName();
 	m_patchLabel->setText( fm.elidedText( patch, Qt::ElideLeft, m_patchLabel->width() ) );
@@ -1046,7 +1046,7 @@ void GigInstrumentView::invalidateFile()
 
 void GigInstrumentView::showFileDialog()
 {
-	GigInstrument * k = castModel<GigInstrument>();
+	auto k = castModel<GigInstrument>();
 
 	FileDialog ofd( nullptr, tr( "Open GIG file" ) );
 	ofd.setFileMode( FileDialog::ExistingFiles );
@@ -1087,7 +1087,7 @@ void GigInstrumentView::showFileDialog()
 
 void GigInstrumentView::showPatchDialog()
 {
-	GigInstrument * k = castModel<GigInstrument>();
+	auto k = castModel<GigInstrument>();
 	PatchesDialog pd( this );
 	pd.setup( k->m_instance, 1, k->instrumentTrack()->name(), &k->m_bankNum, &k->m_patchNum, m_patchLabel );
 	pd.exec();
