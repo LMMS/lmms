@@ -22,11 +22,11 @@ ENDIF(COMMAND CMAKE_POLICY)
 # Import of windows.h breaks min()/max()
 ADD_DEFINITIONS(-DNOMINMAX)
 
-# Treating imported target headers as system includes can change the header
-# search order if some targets have headers in the standard system include
-# directories, which can cause some headers not to be found due to the way
-# #include_next is used in the standard library.
-if(MINGW)
+# CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES is not set correctly for MinGW until
+# CMake 3.14.1, so avoid specifying system include directories on affected
+# versions. Normal include directories are safe, since GCC ignores them if they
+# are already in the built-in search path.
+if(MINGW AND CMAKE_VERSION VERSION_LESS "3.14.1")
 	set(CMAKE_NO_SYSTEM_FROM_IMPORTED TRUE)
 endif()
 
