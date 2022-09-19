@@ -282,7 +282,7 @@ void Sf2Instrument::loadFile( const QString & _file )
 			fluid_preset_t preset;
 			fluid_preset_t *pCurPreset = &preset;
 #else
-			fluid_preset_t *pCurPreset;
+			fluid_preset_t *pCurPreset = nullptr;
 #endif
 
 			if ( ( pCurPreset = fluid_sfont_iteration_next_wrapper( pSoundFont, pCurPreset ) ) ) {
@@ -475,7 +475,7 @@ QString Sf2Instrument::getCurrentPatchName()
 			fluid_preset_t preset;
 			fluid_preset_t *pCurPreset = &preset;
 #else
-			fluid_preset_t *pCurPreset;
+			fluid_preset_t *pCurPreset = nullptr;
 #endif
 			while ((pCurPreset = fluid_sfont_iteration_next_wrapper(pSoundFont, pCurPreset)))
 			{
@@ -676,8 +676,13 @@ void Sf2Instrument::noteOn( Sf2PluginData * n )
 	// get list of current voice IDs so we can easily spot the new
 	// voice after the fluid_synth_noteon() call
 	const int poly = fluid_synth_get_polyphony( m_synth );
-	fluid_voice_t * voices[poly];
+#ifndef _MSC_VER
+	fluid_voice_t* voices[poly];
 	unsigned int id[poly];
+#else
+	const auto voices = static_cast<fluid_voice_t**>(_alloca(poly * sizeof(fluid_voice_t*)));
+	const auto id = static_cast<unsigned int*>(_alloca(poly * sizeof(unsigned int)));
+#endif
 	fluid_synth_get_voicelist( m_synth, voices, poly, -1 );
 	for( int i = 0; i < poly; ++i )
 	{
