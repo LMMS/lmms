@@ -538,7 +538,7 @@ size_t qfileReadCallback(void * ptr, size_t size, size_t n, void * udata )
 
 int qfileSeekCallback(void * udata, ogg_int64_t offset, int whence)
 {
-	QFile * f = static_cast<QFile *>(udata);
+	auto f = static_cast<QFile*>(udata);
 
 	if (whence == SEEK_CUR)
 	{
@@ -594,7 +594,7 @@ f_cnt_t SampleBuffer::decodeSampleOGGVorbis(
 
 	f_cnt_t frames = 0;
 
-	QFile * f = new QFile(fileName);
+	auto f = new QFile(fileName);
 	if (f->open(QFile::ReadOnly) == false)
 	{
 		delete f;
@@ -727,9 +727,7 @@ bool SampleBuffer::play(
 		m_sampleRate / Engine::audioEngine()->processingSampleRate();
 
 	// calculate how many frames we have in requested pitch
-	const f_cnt_t totalFramesForCurrentPitch = static_cast<f_cnt_t>(
-		(endFrame - startFrame) / freqFactor
-	);
+	const auto totalFramesForCurrentPitch = static_cast<f_cnt_t>((endFrame - startFrame) / freqFactor);
 
 	if (totalFramesForCurrentPitch == 0)
 	{
@@ -1331,8 +1329,8 @@ SampleBuffer * SampleBuffer::resample(const sample_rate_t srcSR, const sample_ra
 {
 	sampleFrame * data = m_data;
 	const f_cnt_t frames = m_frames;
-	const f_cnt_t dstFrames = static_cast<f_cnt_t>((frames / (float) srcSR) * (float) dstSR);
-	SampleBuffer * dstSB = new SampleBuffer(dstFrames);
+	const auto dstFrames = static_cast<f_cnt_t>((frames / (float)srcSR) * (float)dstSR);
+	auto dstSB = new SampleBuffer(dstFrames);
 	sampleFrame * dstBuf = dstSB->m_origData;
 
 	// yeah, libsamplerate, let's rock with sinc-interpolation!

@@ -152,7 +152,7 @@ static void stream_state_callback( pa_stream *s, void * userdata )
 /* This is called whenever the context status changes */
 static void context_state_callback(pa_context *c, void *userdata)
 {
-	AudioPulseAudio * _this = static_cast<AudioPulseAudio *>( userdata );
+	auto _this = static_cast<AudioPulseAudio*>(userdata);
 	switch( pa_context_get_state( c ) )
 	{
 		case PA_CONTEXT_CONNECTING:
@@ -247,7 +247,7 @@ void AudioPulseAudio::run()
 	else
 	{
 		const fpp_t fpp = audioEngine()->framesPerPeriod();
-		surroundSampleFrame * temp = new surroundSampleFrame[fpp];
+		auto temp = new surroundSampleFrame[fpp];
 		while( getNextBuffer( temp ) )
 		{
 		}
@@ -266,8 +266,8 @@ void AudioPulseAudio::run()
 void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 {
 	const fpp_t fpp = audioEngine()->framesPerPeriod();
-	surroundSampleFrame * temp = new surroundSampleFrame[fpp];
-	int_sample_t* pcmbuf = (int_sample_t *)pa_xmalloc( fpp * channels() * sizeof(int_sample_t) );
+	auto temp = new surroundSampleFrame[fpp];
+	auto pcmbuf = (int_sample_t*)pa_xmalloc(fpp * channels() * sizeof(int_sample_t));
 
 	size_t fd = 0;
 	while( fd < length/4 && m_quit == false )
@@ -315,11 +315,11 @@ AudioPulseAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	m_device = new QLineEdit( AudioPulseAudio::probeDevice(), this );
 	m_device->setGeometry( 10, 20, 160, 20 );
 
-	QLabel * dev_lbl = new QLabel( tr( "Device" ), this );
+	auto dev_lbl = new QLabel(tr("Device"), this);
 	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
 	dev_lbl->setGeometry( 10, 40, 160, 10 );
 
-	gui::LcdSpinBoxModel * m = new gui::LcdSpinBoxModel( /* this */ );
+	auto m = new gui::LcdSpinBoxModel(/* this */);
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
 	m->setStep( 2 );
 	m->setValue( ConfigManager::inst()->value( "audiopa",

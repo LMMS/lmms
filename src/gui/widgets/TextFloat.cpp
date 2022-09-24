@@ -92,7 +92,7 @@ TextFloat * TextFloat::displayMessage( const QString & _msg, int _timeout,
 					QWidget * _parent, int _add_y_margin )
 {
 	QWidget * mw = getGUI()->mainWindow();
-	TextFloat * tf = new TextFloat;
+	auto tf = new TextFloat;
 	if( _parent != nullptr )
 	{
 		tf->moveGlobal( _parent, QPoint( _parent->width() + 2, 0 ) );

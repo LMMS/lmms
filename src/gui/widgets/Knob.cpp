@@ -549,9 +549,7 @@ void Knob::dropEvent( QDropEvent * _de )
 	}
 	else if( type == "automatable_model" )
 	{
-		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
-				Engine::projectJournal()->
-					journallingObject( val.toInt() ) );
+		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
 		if( mod != nullptr )
 		{
 			AutomatableModel::linkModels( model(), mod );
@@ -709,7 +707,7 @@ void Knob::wheelEvent(QWheelEvent * we)
 void Knob::setPosition( const QPoint & _p )
 {
 	const float value = getValue( _p ) + m_leftOver;
-	const float step = model()->step<float>();
+	const auto step = model()->step<float>();
 	const float oldValue = model()->value();
 
 

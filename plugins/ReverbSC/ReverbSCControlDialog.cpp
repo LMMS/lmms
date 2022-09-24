@@ -41,26 +41,26 @@ ReverbSCControlDialog::ReverbSCControlDialog( ReverbSCControls* controls ) :
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
 	setFixedSize( 185, 55 );
-	
-	Knob * inputGainKnob = new Knob( knobBright_26, this);
+
+	auto inputGainKnob = new Knob(knobBright_26, this);
 	inputGainKnob -> move( 16, 10 );
 	inputGainKnob->setModel( &controls->m_inputGainModel );
 	inputGainKnob->setLabel( tr( "Input" ) );
 	inputGainKnob->setHintText( tr( "Input gain:" ) , "dB" );
 
-	Knob * sizeKnob = new Knob( knobBright_26, this);
+	auto sizeKnob = new Knob(knobBright_26, this);
 	sizeKnob -> move( 57, 10 );
 	sizeKnob->setModel( &controls->m_sizeModel );
 	sizeKnob->setLabel( tr( "Size" ) );
 	sizeKnob->setHintText( tr( "Size:" ) , "" );
 
-	Knob * colorKnob = new Knob( knobBright_26, this);
+	auto colorKnob = new Knob(knobBright_26, this);
 	colorKnob -> move( 98, 10 );
 	colorKnob->setModel( &controls->m_colorModel );
 	colorKnob->setLabel( tr( "Color" ) );
 	colorKnob->setHintText( tr( "Color:" ) , "" );
 
-	Knob * outputGainKnob = new Knob( knobBright_26, this);
+	auto outputGainKnob = new Knob(knobBright_26, this);
 	outputGainKnob -> move( 139, 10 );
 	outputGainKnob->setModel( &controls->m_outputGainModel );
 	outputGainKnob->setLabel( tr( "Output" ) );

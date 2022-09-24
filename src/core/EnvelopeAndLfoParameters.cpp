@@ -404,16 +404,13 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 				Engine::audioEngine()->processingSampleRate();
 
 	// TODO: Remove the expKnobVals, time should be linear
-	const f_cnt_t predelay_frames = static_cast<f_cnt_t>(
-							frames_per_env_seg *
-					expKnobVal( m_predelayModel.value() ) );
+	const auto predelay_frames = static_cast<f_cnt_t>(frames_per_env_seg * expKnobVal(m_predelayModel.value()));
 
 	const f_cnt_t attack_frames = qMax( minimumFrames,
 					static_cast<f_cnt_t>( frames_per_env_seg *
 					expKnobVal( m_attackModel.value() ) ) );
 
-	const f_cnt_t hold_frames = static_cast<f_cnt_t>( frames_per_env_seg *
-					expKnobVal( m_holdModel.value() ) );
+	const auto hold_frames = static_cast<f_cnt_t>(frames_per_env_seg * expKnobVal(m_holdModel.value()));
 
 	const f_cnt_t decay_frames = qMax( minimumFrames,
 					static_cast<f_cnt_t>( frames_per_env_seg *

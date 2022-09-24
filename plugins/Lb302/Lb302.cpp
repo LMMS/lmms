@@ -349,7 +349,7 @@ Lb302Synth::Lb302Synth( InstrumentTrack * _instrumentTrack ) :
 
 	filterChanged();
 
-	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrumentTrack );
+	auto iph = new InstrumentPlayHandle(this, _instrumentTrack);
 	Engine::audioEngine()->addPlayHandle( iph );
 }
 
@@ -869,7 +869,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	// move to 120,75
 	const int waveBtnX = 10;
 	const int waveBtnY = 96;
-	PixmapButton * sawWaveBtn = new PixmapButton( this, tr( "Saw wave" ) );
+	auto sawWaveBtn = new PixmapButton(this, tr("Saw wave"));
 	sawWaveBtn->move( waveBtnX, waveBtnY );
 	sawWaveBtn->setActiveGraphic( embed::getIconPixmap(
 						"saw_wave_active" ) );
@@ -878,8 +878,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	sawWaveBtn->setToolTip(
 			tr( "Click here for a saw-wave." ) );
 
-	PixmapButton * triangleWaveBtn =
-		new PixmapButton( this, tr( "Triangle wave" ) );
+	auto triangleWaveBtn = new PixmapButton(this, tr("Triangle wave"));
 	triangleWaveBtn->move( waveBtnX+(16*1), waveBtnY );
 	triangleWaveBtn->setActiveGraphic(
 		embed::getIconPixmap( "triangle_wave_active" ) );
@@ -888,7 +887,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	triangleWaveBtn->setToolTip(
 			tr( "Click here for a triangle-wave." ) );
 
-	PixmapButton * sqrWaveBtn = new PixmapButton( this, tr( "Square wave" ) );
+	auto sqrWaveBtn = new PixmapButton(this, tr("Square wave"));
 	sqrWaveBtn->move( waveBtnX+(16*2), waveBtnY );
 	sqrWaveBtn->setActiveGraphic( embed::getIconPixmap(
 					"square_wave_active" ) );
@@ -897,8 +896,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	sqrWaveBtn->setToolTip(
 			tr( "Click here for a square-wave." ) );
 
-	PixmapButton * roundSqrWaveBtn =
-		new PixmapButton( this, tr( "Rounded square wave" ) );
+	auto roundSqrWaveBtn = new PixmapButton(this, tr("Rounded square wave"));
 	roundSqrWaveBtn->move( waveBtnX+(16*3), waveBtnY );
 	roundSqrWaveBtn->setActiveGraphic( embed::getIconPixmap(
 					"round_square_wave_active" ) );
@@ -907,8 +905,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	roundSqrWaveBtn->setToolTip(
 			tr( "Click here for a square-wave with a rounded end." ) );
 
-	PixmapButton * moogWaveBtn =
-		new PixmapButton( this, tr( "Moog wave" ) );
+	auto moogWaveBtn = new PixmapButton(this, tr("Moog wave"));
 	moogWaveBtn->move( waveBtnX+(16*4), waveBtnY );
 	moogWaveBtn->setActiveGraphic(
 		embed::getIconPixmap( "moog_saw_wave_active" ) );
@@ -917,7 +914,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	moogWaveBtn->setToolTip(
 			tr( "Click here for a moog-like wave." ) );
 
-	PixmapButton * sinWaveBtn = new PixmapButton( this, tr( "Sine wave" ) );
+	auto sinWaveBtn = new PixmapButton(this, tr("Sine wave"));
 	sinWaveBtn->move( waveBtnX+(16*5), waveBtnY );
 	sinWaveBtn->setActiveGraphic( embed::getIconPixmap(
 						"sin_wave_active" ) );
@@ -926,8 +923,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	sinWaveBtn->setToolTip(
 			tr( "Click for a sine-wave." ) );
 
-	PixmapButton * exponentialWaveBtn =
-		new PixmapButton( this, tr( "White noise wave" ) );
+	auto exponentialWaveBtn = new PixmapButton(this, tr("White noise wave"));
 	exponentialWaveBtn->move( waveBtnX+(16*6), waveBtnY );
 	exponentialWaveBtn->setActiveGraphic(
 		embed::getIconPixmap( "exp_wave_active" ) );
@@ -936,9 +932,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	exponentialWaveBtn->setToolTip(
 			tr( "Click here for an exponential wave." ) );
 
-
-	PixmapButton * whiteNoiseWaveBtn =
-		new PixmapButton( this, tr( "White noise wave" ) );
+	auto whiteNoiseWaveBtn = new PixmapButton(this, tr("White noise wave"));
 	whiteNoiseWaveBtn->move( waveBtnX+(16*7), waveBtnY );
 	whiteNoiseWaveBtn->setActiveGraphic(
 		embed::getIconPixmap( "white_noise_wave_active" ) );
@@ -947,8 +941,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	whiteNoiseWaveBtn->setToolTip(
 			tr( "Click here for white-noise." ) );
 
-	PixmapButton * blSawWaveBtn =
-		new PixmapButton( this, tr( "Bandlimited saw wave" ) );
+	auto blSawWaveBtn = new PixmapButton(this, tr("Bandlimited saw wave"));
 	blSawWaveBtn->move( waveBtnX+(16*9)-8, waveBtnY );
 	blSawWaveBtn->setActiveGraphic(
 		embed::getIconPixmap( "saw_wave_active" ) );
@@ -957,8 +950,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	blSawWaveBtn->setToolTip(
 			tr( "Click here for bandlimited saw wave." ) );
 
-	PixmapButton * blSquareWaveBtn =
-		new PixmapButton( this, tr( "Bandlimited square wave" ) );
+	auto blSquareWaveBtn = new PixmapButton(this, tr("Bandlimited square wave"));
 	blSquareWaveBtn->move( waveBtnX+(16*10)-8, waveBtnY );
 	blSquareWaveBtn->setActiveGraphic(
 		embed::getIconPixmap( "square_wave_active" ) );
@@ -967,8 +959,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	blSquareWaveBtn->setToolTip(
 			tr( "Click here for bandlimited square wave." ) );
 
-	PixmapButton * blTriangleWaveBtn =
-		new PixmapButton( this, tr( "Bandlimited triangle wave" ) );
+	auto blTriangleWaveBtn = new PixmapButton(this, tr("Bandlimited triangle wave"));
 	blTriangleWaveBtn->move( waveBtnX+(16*11)-8, waveBtnY );
 	blTriangleWaveBtn->setActiveGraphic(
 		embed::getIconPixmap( "triangle_wave_active" ) );
@@ -977,8 +968,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	blTriangleWaveBtn->setToolTip(
 			tr( "Click here for bandlimited triangle wave." ) );
 
-	PixmapButton * blMoogWaveBtn =
-		new PixmapButton( this, tr( "Bandlimited moog saw wave" ) );
+	auto blMoogWaveBtn = new PixmapButton(this, tr("Bandlimited moog saw wave"));
 	blMoogWaveBtn->move( waveBtnX+(16*12)-8, waveBtnY );
 	blMoogWaveBtn->setActiveGraphic(
 		embed::getIconPixmap( "moog_saw_wave_active" ) );
@@ -1012,7 +1002,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 
 void Lb302SynthView::modelChanged()
 {
-	Lb302Synth * syn = castModel<Lb302Synth>();
+	auto syn = castModel<Lb302Synth>();
 
 	m_vcfCutKnob->setModel( &syn->vcf_cut_knob );
 	m_vcfResKnob->setModel( &syn->vcf_res_knob );

@@ -126,7 +126,7 @@ void AutomatableButton::mousePressEvent( QMouseEvent * _me )
 		if( m_group )
 		{
 			// A group, we must get process it instead
-			AutomatableModelView* groupView = (AutomatableModelView*)m_group;
+			auto groupView = (AutomatableModelView*)m_group;
 			new StringPairDrag( "automatable_model",
 					QString::number( groupView->modelUntyped()->id() ),
 					QPixmap(), widget() );

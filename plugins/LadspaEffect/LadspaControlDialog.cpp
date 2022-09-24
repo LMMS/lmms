@@ -46,7 +46,7 @@ LadspaControlDialog::LadspaControlDialog( LadspaControls * _ctl ) :
 	m_effectLayout( nullptr ),
 	m_stereoLink( nullptr )
 {
-	QVBoxLayout * mainLay = new QVBoxLayout( this );
+	auto mainLay = new QVBoxLayout(this);
 
 	m_effectLayout = new QHBoxLayout();
 	mainLay->addLayout( m_effectLayout );
@@ -56,7 +56,7 @@ LadspaControlDialog::LadspaControlDialog( LadspaControls * _ctl ) :
 	if( _ctl->m_processors > 1 )
 	{
 		mainLay->addSpacing( 3 );
-		QHBoxLayout * center = new QHBoxLayout();
+		auto center = new QHBoxLayout();
 		mainLay->addLayout( center );
 		m_stereoLink = new LedCheckBox( tr( "Link Channels" ), this );
 		m_stereoLink->setModel( &_ctl->m_stereoLinkModel );
@@ -101,7 +101,7 @@ void LadspaControlDialog::updateEffectView( LadspaControls * _ctl )
 			grouper = new QGroupBox( this );
 		}
 
-		QGridLayout * gl = new QGridLayout( grouper );
+		auto gl = new QGridLayout(grouper);
 		grouper->setLayout( gl );
 		grouper->setAlignment( Qt::Vertical );
 

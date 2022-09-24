@@ -164,8 +164,10 @@ for cur_file in files:
                 if not expectations:
                     error(cur_file, m, f'Unexpected {statement}')
                     break
-                # Don't pop the expectation for an #else tag, we are still waiting for the #endif
                 if statement.startswith('#el') and expectations[-1].statement == '#endif':
+                    # After an #else or #elif the comment is no longer mandatory, since it's hard to define
+                    expectations[-1] = Expectation(IF_MACRO, '#endif', '')
+                    # Don't pop the expectations, we are still waiting for the #endif
                     continue
                 exp = expectations.pop()
                 name = m.group('macro_name') or m.group('namespace_end') or ''

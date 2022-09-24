@@ -90,8 +90,8 @@ bool Lv2Effect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 	{
 		buf[f][0] = d * buf[f][0] + w * m_tmpOutputSmps[f][0];
 		buf[f][1] = d * buf[f][1] + w * m_tmpOutputSmps[f][1];
-		double l = static_cast<double>(buf[f][0]);
-		double r = static_cast<double>(buf[f][1]);
+		auto l = static_cast<double>(buf[f][0]);
+		auto r = static_cast<double>(buf[f][1]);
 		outSum += l*l + r*r;
 	}
 	checkGate(outSum / frames);
@@ -109,7 +109,7 @@ extern "C"
 PLUGIN_EXPORT Plugin *lmms_plugin_main(Model *_parent, void *_data)
 {
 	using KeyType = Plugin::Descriptor::SubPluginFeatures::Key;
-	Lv2Effect* eff = new Lv2Effect(_parent, static_cast<const KeyType*>(_data));
+	auto eff = new Lv2Effect(_parent, static_cast<const KeyType*>(_data));
 	if (!eff->isValid()) { delete eff; eff = nullptr; }
 	return eff;
 }

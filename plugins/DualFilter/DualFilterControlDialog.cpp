@@ -64,10 +64,8 @@ DualFilterControlDialog::DualFilterControlDialog( DualFilterControls* controls )
 	gain1Knob-> setVolumeKnob( true );
 	gain2Knob-> setVolumeKnob( true );
 
-	LedCheckBox * enabled1Toggle = new LedCheckBox( "", this,
-				tr( "Filter 1 enabled" ), LedCheckBox::Green );
-	LedCheckBox * enabled2Toggle = new LedCheckBox( "", this,
-				tr( "Filter 2 enabled" ), LedCheckBox::Green );
+	auto enabled1Toggle = new LedCheckBox("", this, tr("Filter 1 enabled"), LedCheckBox::Green);
+	auto enabled2Toggle = new LedCheckBox("", this, tr("Filter 2 enabled"), LedCheckBox::Green);
 
 	enabled1Toggle -> move( 12, 11 );
 	enabled1Toggle -> setModel( &controls -> m_enabled1Model );
@@ -76,12 +74,12 @@ DualFilterControlDialog::DualFilterControlDialog( DualFilterControls* controls )
 	enabled2Toggle -> setModel( &controls -> m_enabled2Model );
 	enabled2Toggle->setToolTip(tr("Enable/disable filter 2"));
 
-	ComboBox * m_filter1ComboBox = new ComboBox( this );
+	auto m_filter1ComboBox = new ComboBox(this);
 	m_filter1ComboBox->setGeometry( 19, 70, 137, ComboBox::DEFAULT_HEIGHT );
 	m_filter1ComboBox->setFont( pointSize<8>( m_filter1ComboBox->font() ) );
 	m_filter1ComboBox->setModel( &controls->m_filter1Model );
 
-	ComboBox * m_filter2ComboBox = new ComboBox( this );
+	auto m_filter2ComboBox = new ComboBox(this);
 	m_filter2ComboBox->setGeometry( 217, 70, 137, ComboBox::DEFAULT_HEIGHT );
 	m_filter2ComboBox->setFont( pointSize<8>( m_filter2ComboBox->font() ) );
 	m_filter2ComboBox->setModel( &controls->m_filter2Model );

@@ -46,7 +46,7 @@ PositionLine::PositionLine(QWidget* parent) :
 void PositionLine::paintEvent(QPaintEvent* pe)
 {
 	QPainter p(this);
-	QColor c = QColor(m_lineColor);
+	auto c = QColor(m_lineColor);
 
 	// If width is 1, we don't need a gradient
 	if (width() == 1)

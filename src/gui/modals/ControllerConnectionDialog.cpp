@@ -81,7 +81,7 @@ public:
 	// model has none.
 	MidiController* copyToMidiController( Model* parent )
 	{
-		MidiController* c = new MidiController( parent );
+		auto c = new MidiController(parent);
 		c->m_midiPort.setInputChannel( m_midiPort.inputChannel() );
 		c->m_midiPort.setInputController( m_midiPort.inputController() );
 		c->subscribeReadablePorts( m_midiPort.readablePorts() );
@@ -172,7 +172,7 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 		m_readablePorts = new MidiPortMenu( MidiPort::Input );
 		connect( m_readablePorts, SIGNAL(triggered(QAction*)),
 				this, SLOT(enableAutoDetect(QAction*)));
-		ToolButton * rp_btn = new ToolButton( m_midiGroupBox );
+		auto rp_btn = new ToolButton(m_midiGroupBox);
 		rp_btn->setText( tr( "MIDI-devices to receive "
 						"MIDI-events from" ) );
 		rp_btn->setIcon( embed::getIconPixmap( "piano" ) );
@@ -210,22 +210,18 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 
 
 	// Buttons
-	QWidget * buttons = new QWidget( this );
+	auto buttons = new QWidget(this);
 	buttons->setGeometry( 8, 240, 240, 32 );
 
-	QHBoxLayout * btn_layout = new QHBoxLayout( buttons );
+	auto btn_layout = new QHBoxLayout(buttons);
 	btn_layout->setSpacing( 0 );
 	btn_layout->setMargin( 0 );
-	
-	QPushButton * select_btn = new QPushButton( 
-					embed::getIconPixmap( "add" ),
-					tr( "OK" ), buttons );
+
+	auto select_btn = new QPushButton(embed::getIconPixmap("add"), tr("OK"), buttons);
 	connect( select_btn, SIGNAL(clicked()), 
 				this, SLOT(selectController()));
-	
-	QPushButton * cancel_btn = new QPushButton( 
-					embed::getIconPixmap( "cancel" ),
-					tr( "Cancel" ), buttons );
+
+	auto cancel_btn = new QPushButton(embed::getIconPixmap("cancel"), tr("Cancel"), buttons);
 	connect( cancel_btn, SIGNAL(clicked()),
 				this, SLOT(reject()));
 
@@ -253,8 +249,8 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 				m_midiGroupBox->model()->setValue( true );
 				// ensure controller is created
 				midiToggled();
-			
-				MidiController * cont = (MidiController*)( cc->getController() );
+
+				auto cont = (MidiController*)(cc->getController());
 				m_midiChannelSpinBox->model()->setValue( cont->m_midiPort.inputChannel() );
 				m_midiControllerSpinBox->model()->setValue( cont->m_midiPort.inputController() );
 

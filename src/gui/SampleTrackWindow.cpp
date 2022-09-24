@@ -56,19 +56,19 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 {
 	// init own layout + widgets
 	setFocusPolicy(Qt::StrongFocus);
-	QVBoxLayout * vlayout = new QVBoxLayout(this);
+	auto vlayout = new QVBoxLayout(this);
 	vlayout->setMargin(0);
 	vlayout->setSpacing(0);
 
-	TabWidget* generalSettingsWidget = new TabWidget(tr("GENERAL SETTINGS"), this);
+	auto generalSettingsWidget = new TabWidget(tr("GENERAL SETTINGS"), this);
 
-	QVBoxLayout* generalSettingsLayout = new QVBoxLayout(generalSettingsWidget);
+	auto generalSettingsLayout = new QVBoxLayout(generalSettingsWidget);
 
 	generalSettingsLayout->setContentsMargins(8, 18, 8, 8);
 	generalSettingsLayout->setSpacing(6);
 
-	QWidget* nameWidget = new QWidget(generalSettingsWidget);
-	QHBoxLayout* nameLayout = new QHBoxLayout(nameWidget);
+	auto nameWidget = new QWidget(generalSettingsWidget);
+	auto nameLayout = new QHBoxLayout(nameWidget);
 	nameLayout->setContentsMargins(0, 0, 0, 0);
 	nameLayout->setSpacing(2);
 
@@ -84,8 +84,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 
 	generalSettingsLayout->addWidget(nameWidget);
 
-
-	QGridLayout* basicControlsLayout = new QGridLayout;
+	auto basicControlsLayout = new QGridLayout;
 	basicControlsLayout->setHorizontalSpacing(3);
 	basicControlsLayout->setVerticalSpacing(0);
 	basicControlsLayout->setContentsMargins(0, 0, 0, 0);
@@ -102,7 +101,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	basicControlsLayout->addWidget(m_volumeKnob, 0, 0);
 	basicControlsLayout->setAlignment(m_volumeKnob, widgetAlignment);
 
-	QLabel *label = new QLabel(tr("VOL"), this);
+	auto label = new QLabel(tr("VOL"), this);
 	label->setStyleSheet(labelStyleSheet);
 	basicControlsLayout->addWidget(label, 1, 0);
 	basicControlsLayout->setAlignment(label, labelAlignment);
