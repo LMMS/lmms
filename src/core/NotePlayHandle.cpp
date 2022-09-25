@@ -459,7 +459,7 @@ int NotePlayHandle::index() const
 	int idx = 0;
 	for (const auto& playHandle : playHandles)
 	{
-		const NotePlayHandle* nph = dynamic_cast<const NotePlayHandle*>(playHandle);
+		const auto nph = dynamic_cast<const NotePlayHandle*>(playHandle);
 		if( nph == nullptr || nph->m_instrumentTrack != m_instrumentTrack || nph->isReleased() || nph->hasParent() )
 		{
 			continue;
@@ -483,7 +483,7 @@ ConstNotePlayHandleList NotePlayHandle::nphsOfInstrumentTrack( const InstrumentT
 
 	for (const auto& playHandle : playHandles)
 	{
-		const NotePlayHandle* nph = dynamic_cast<const NotePlayHandle *>(playHandle);
+		const auto nph = dynamic_cast<const NotePlayHandle*>(playHandle);
 		if( nph != nullptr && nph->m_instrumentTrack == _it && ( ( nph->isReleased() == false && nph->hasParent() == false ) || _all_ph == true ) )
 		{
 			cnphv.push_back( nph );
@@ -606,7 +606,7 @@ void NotePlayHandleManager::init()
 {
 	s_available = MM_ALLOC<NotePlayHandle*>( INITIAL_NPH_CACHE );
 
-	NotePlayHandle * n = MM_ALLOC<NotePlayHandle>( INITIAL_NPH_CACHE );
+	auto n = MM_ALLOC<NotePlayHandle>(INITIAL_NPH_CACHE);
 
 	for( int i=0; i < INITIAL_NPH_CACHE; ++i )
 	{
@@ -649,11 +649,11 @@ void NotePlayHandleManager::release( NotePlayHandle * nph )
 void NotePlayHandleManager::extend( int c )
 {
 	s_size += c;
-	NotePlayHandle ** tmp = MM_ALLOC<NotePlayHandle*>( s_size );
+	auto tmp = MM_ALLOC<NotePlayHandle*>(s_size);
 	MM_FREE( s_available );
 	s_available = tmp;
 
-	NotePlayHandle * n = MM_ALLOC<NotePlayHandle>( c );
+	auto n = MM_ALLOC<NotePlayHandle>(c);
 
 	for( int i=0; i < c; ++i )
 	{

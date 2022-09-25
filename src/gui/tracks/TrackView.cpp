@@ -74,7 +74,7 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 
 	m_trackSettingsWidget.setAutoFillBackground( true );
 
-	QHBoxLayout * layout = new QHBoxLayout( this );
+	auto layout = new QHBoxLayout(this);
 	layout->setMargin( 0 );
 	layout->setSpacing( 0 );
 	layout->addWidget( &m_trackOperationsWidget );

@@ -120,13 +120,13 @@ void consoleMessageHandler(QtMsgType type,
     QByteArray localMsg = msg.toLocal8Bit();
     fprintf(stderr, "%s\n", localMsg.constData());
 }
-#endif
+#endif // LMMS_BUILD_WIN32
 
 
 inline void loadTranslation( const QString & tname,
 	const QString & dir = lmms::ConfigManager::inst()->localeDir() )
 {
-	QTranslator * t = new QTranslator( QCoreApplication::instance() );
+	auto t = new QTranslator(QCoreApplication::instance());
 	QString name = tname + ".qm";
 
 	if (t->load(name, dir))
@@ -776,7 +776,7 @@ int main( int argc, char * * argv )
 		printf( "Notice: could not set realtime priority.\n" );
 	}
 #endif
-#endif
+#endif // LMMS_HAVE_SCHED_H
 #endif
 
 #ifdef LMMS_BUILD_WIN32
@@ -829,12 +829,12 @@ int main( int argc, char * * argv )
 		}
 
 		// create renderer
-		RenderManager * r = new RenderManager( qs, os, eff, renderOut );
+		auto r = new RenderManager(qs, os, eff, renderOut);
 		QCoreApplication::instance()->connect( r,
 				SIGNAL(finished()), SLOT(quit()));
 
 		// timer for progress-updates
-		QTimer * t = new QTimer( r );
+		auto t = new QTimer(r);
 		r->connect( t, SIGNAL(timeout()),
 				SLOT(updateConsoleProgress()));
 		t->start( 200 );

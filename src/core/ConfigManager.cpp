@@ -564,7 +564,7 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 		}
 #endif
 	}
-#endif
+#endif // LMMS_HAVE_STK
 
 	upgrade();
 

@@ -27,7 +27,7 @@
 #ifndef _MALLET_H
 #define _MALLET_H
 
-#include "Instrmnt.h"
+#include <stk/Instrmnt.h>
 
 #include "ComboBox.h"
 #include "Instrument.h"

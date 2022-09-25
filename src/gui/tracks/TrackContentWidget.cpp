@@ -454,7 +454,7 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, 
 
 	float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
 	// All clips should be offset the same amount as the grabbed clip
-	TimePos offset = TimePos(clipPos - grabbedClipPos);
+	auto offset = TimePos(clipPos - grabbedClipPos);
 	// Users expect clips to "fall" backwards, so bias the offset
 	offset -= TimePos::ticksPerBar() * snapSize / 2;
 	// The offset is quantized (rather than the positions) to preserve fine adjustments

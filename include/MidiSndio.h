@@ -73,6 +73,6 @@ private:
 
 } // namespace lmms
 
-#endif	/* LMMS_HAVE_SNDIO */
+#endif // LMMS_HAVE_SNDIO
 
-#endif	/* _MIDI_SNDIO_H */
+#endif	// _MIDI_SNDIO_H

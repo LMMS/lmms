@@ -42,49 +42,49 @@ FlangerControlsDialog::FlangerControlsDialog( FlangerControls *controls ) :
 	setPalette( pal );
 	setFixedSize( 233, 75 );
 
-	Knob* delayKnob = new Knob( knobBright_26, this );
+	auto delayKnob = new Knob(knobBright_26, this);
 	delayKnob->move( 10,10 );
 	delayKnob->setVolumeKnob( false );
 	delayKnob->setModel( &controls->m_delayTimeModel );
 	delayKnob->setLabel( tr( "DELAY" ) );
 	delayKnob->setHintText( tr( "Delay time:" ) + " ", "s" );
 
-	TempoSyncKnob * lfoFreqKnob = new TempoSyncKnob( knobBright_26, this );
+	auto lfoFreqKnob = new TempoSyncKnob(knobBright_26, this);
 	lfoFreqKnob->move( 48,10 );
 	lfoFreqKnob->setVolumeKnob( false );
 	lfoFreqKnob->setModel( &controls->m_lfoFrequencyModel );
 	lfoFreqKnob->setLabel( tr( "RATE" ) );
 	lfoFreqKnob->setHintText( tr( "Period:" ) , " Sec" );
 
-	Knob * lfoAmtKnob = new Knob( knobBright_26, this );
+	auto lfoAmtKnob = new Knob(knobBright_26, this);
 	lfoAmtKnob->move( 85,10 );
 	lfoAmtKnob->setVolumeKnob( false );
 	lfoAmtKnob->setModel( &controls->m_lfoAmountModel );
 	lfoAmtKnob->setLabel( tr( "AMNT" ) );
 	lfoAmtKnob->setHintText( tr( "Amount:" ) , "" );
 
-	Knob * lfoPhaseKnob = new Knob( knobBright_26, this );
+	auto lfoPhaseKnob = new Knob(knobBright_26, this);
 	lfoPhaseKnob->move( 123,10 );
 	lfoPhaseKnob->setVolumeKnob( false );
 	lfoPhaseKnob->setModel( &controls->m_lfoPhaseModel );
 	lfoPhaseKnob->setLabel( tr( "PHASE" ) );
 	lfoPhaseKnob->setHintText( tr( "Phase:" ) , " degrees" );
 
-	Knob * feedbackKnob = new Knob( knobBright_26, this );
+	auto feedbackKnob = new Knob(knobBright_26, this);
 	feedbackKnob->move( 160,10 );
 	feedbackKnob->setVolumeKnob( true) ;
 	feedbackKnob->setModel( &controls->m_feedbackModel );
 	feedbackKnob->setLabel( tr( "FDBK" ) );
 	feedbackKnob->setHintText( tr( "Feedback amount:" ) , "" );
 
-	Knob * whiteNoiseKnob = new Knob( knobBright_26, this );
+	auto whiteNoiseKnob = new Knob(knobBright_26, this);
 	whiteNoiseKnob->move( 196,10 );
 	whiteNoiseKnob->setVolumeKnob( true) ;
 	whiteNoiseKnob->setModel( &controls->m_whiteNoiseAmountModel );
 	whiteNoiseKnob->setLabel( tr( "NOISE" ) );
 	whiteNoiseKnob->setHintText( tr( "White noise amount:" ) , "" );
 
-	LedCheckBox * invertCb = new LedCheckBox( tr( "Invert" ), this );
+	auto invertCb = new LedCheckBox(tr("Invert"), this);
 	invertCb->move( 10,53 );
 
 

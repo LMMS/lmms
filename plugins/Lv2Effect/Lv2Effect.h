@@ -58,4 +58,4 @@ private:
 
 } // namespace lmms
 
-#endif // LMMS_HAVE_LV2
+#endif

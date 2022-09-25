@@ -162,8 +162,7 @@ void LmmsStyle::drawComplexControl( ComplexControl control,
 	// fix broken titlebar styling on win32
 	if( control == CC_TitleBar )
 	{
-		const QStyleOptionTitleBar * titleBar =
-			qstyleoption_cast<const QStyleOptionTitleBar *>(option );
+		const auto titleBar = qstyleoption_cast<const QStyleOptionTitleBar*>(option);
 		if( titleBar )
 		{
 			QStyleOptionTitleBar so( *titleBar );

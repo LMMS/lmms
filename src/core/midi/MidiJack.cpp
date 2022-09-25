@@ -41,7 +41,7 @@ namespace lmms
 /* callback functions for jack */
 static int JackMidiProcessCallback(jack_nframes_t nframes, void *arg)
 {
-	MidiJack *jmd = (MidiJack *)arg;
+	auto jmd = (MidiJack*)arg;
 
 	if (nframes <= 0)
 		return (0);

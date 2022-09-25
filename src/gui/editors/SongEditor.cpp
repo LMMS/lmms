@@ -145,8 +145,7 @@ SongEditor::SongEditor( Song * song ) :
 
 	getGUI()->mainWindow()->addSpacingToToolBar( 10 );
 
-
-	QLabel * master_vol_lbl = new QLabel( tb );
+	auto master_vol_lbl = new QLabel(tb);
 	master_vol_lbl->setPixmap( embed::getIconPixmap( "master_volume" ) );
 
 	m_masterVolumeSlider = new AutomatableSlider( tb,
@@ -178,8 +177,7 @@ SongEditor::SongEditor( Song * song ) :
 
 	getGUI()->mainWindow()->addSpacingToToolBar( 10 );
 
-
-	QLabel * master_pitch_lbl = new QLabel( tb );
+	auto master_pitch_lbl = new QLabel(tb);
 	master_pitch_lbl->setPixmap( embed::getIconPixmap( "master_pitch" ) );
 	master_pitch_lbl->setFixedHeight( 64 );
 
@@ -210,8 +208,8 @@ SongEditor::SongEditor( Song * song ) :
 	getGUI()->mainWindow()->addSpacingToToolBar( 10 );
 
 	// create widget for oscilloscope- and cpu-load-widget
-	QWidget * vc_w = new QWidget( tb );
-	QVBoxLayout * vcw_layout = new QVBoxLayout( vc_w );
+	auto vc_w = new QWidget(tb);
+	auto vcw_layout = new QVBoxLayout(vc_w);
 	vcw_layout->setMargin( 0 );
 	vcw_layout->setSpacing( 0 );
 
@@ -427,7 +425,7 @@ void SongEditor::updateRubberband()
 		//are clips in the rect of selection?
 		for (auto &it : findChildren<selectableObject *>())
 		{
-			ClipView * clip = dynamic_cast<ClipView*>(it);
+			auto clip = dynamic_cast<ClipView*>(it);
 			if (clip)
 			{
 				auto indexOfTrackView = trackViews().indexOf(clip->getTrackView());
@@ -511,7 +509,7 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 		QVector<selectableObject *> so = selectedObjects();
 		for (const auto& selectedClip : so)
 		{
-			ClipView* clipv = dynamic_cast<ClipView*>(selectedClip);
+			auto clipv = dynamic_cast<ClipView*>(selectedClip);
 			clipv->remove();
 		}
 	}
@@ -754,7 +752,7 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 	else
 	{
 		// do smooth scroll animation using QTimeLine
-		QTimeLine *t = scrollBar->findChild<QTimeLine *>();
+		auto t = scrollBar->findChild<QTimeLine*>();
 		if( t == nullptr )
 		{
 			t = new QTimeLine( 600, scrollBar );
@@ -987,7 +985,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	DropToolBar *zoomToolBar = addDropToolBarToTop(tr("Zoom controls"));
 
-	QLabel * zoom_lbl = new QLabel( m_toolBar );
+	auto zoom_lbl = new QLabel(m_toolBar);
 	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
 
 	//Set up zooming-stuff
@@ -1002,7 +1000,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	zoomToolBar->addWidget( m_zoomingComboBox );
 
 	DropToolBar *snapToolBar = addDropToolBarToTop(tr("Snap controls"));
-	QLabel * snap_lbl = new QLabel( m_toolBar );
+	auto snap_lbl = new QLabel(m_toolBar);
 	snap_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
 
 	//Set up quantization/snapping selector

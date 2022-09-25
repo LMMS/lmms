@@ -211,7 +211,7 @@ TimePos AutomationClip::timeMapLength() const
 	if (m_timeMap.isEmpty()) { return one_bar; }
 
 	timeMap::const_iterator it = m_timeMap.end();
-	tick_t last_tick = static_cast<tick_t>(POS(it - 1));
+	auto last_tick = static_cast<tick_t>(POS(it - 1));
 	// if last_tick is 0 (single item at tick 0)
 	// return length as a whole bar to prevent disappearing Clip
 	if (last_tick == 0) { return one_bar; }
@@ -374,8 +374,8 @@ void AutomationClip::removeNodes(const int tick0, const int tick1)
 		return;
 	}
 
-	TimePos start = TimePos(qMin(tick0, tick1));
-	TimePos end = TimePos(qMax(tick0, tick1));
+	auto start = TimePos(qMin(tick0, tick1));
+	auto end = TimePos(qMax(tick0, tick1));
 
 	// Make a list of TimePos with nodes to be removed
 	// because we can't simply remove the nodes from
@@ -410,8 +410,8 @@ void AutomationClip::resetNodes(const int tick0, const int tick1)
 		return;
 	}
 
-	TimePos start = TimePos(qMin(tick0, tick1));
-	TimePos end = TimePos(qMax(tick0, tick1));
+	auto start = TimePos(qMin(tick0, tick1));
+	auto end = TimePos(qMax(tick0, tick1));
 
 	for (auto it = m_timeMap.lowerBound(start), endIt = m_timeMap.upperBound(end); it != endIt; ++it)
 	{
@@ -610,7 +610,7 @@ float *AutomationClip::valuesAfter( const TimePos & _time ) const
 	}
 
 	int numValues = POS(v + 1) - POS(v);
-	float *ret = new float[numValues];
+	auto ret = new float[numValues];
 
 	for( int i = 0; i < numValues; i++ )
 	{
@@ -698,7 +698,7 @@ void AutomationClip::flipX(int length)
 				// We swap the inValue and outValue when flipping horizontally
 				tempValue = OUTVAL(it);
 				tempOutValue = INVAL(it);
-				TimePos newTime = TimePos(length - POS(it));
+				auto newTime = TimePos(length - POS(it));
 
 				tempMap[newTime] = AutomationNode(this, tempValue, tempOutValue, newTime);
 
@@ -740,7 +740,7 @@ void AutomationClip::flipX(int length)
 			tempValue = OUTVAL(it);
 			tempOutValue = INVAL(it);
 
-			TimePos newTime = TimePos(realLength - POS(it));
+			auto newTime = TimePos(realLength - POS(it));
 			tempMap[newTime] = AutomationNode(this, tempValue, tempOutValue, newTime);
 
 			++it;
@@ -899,7 +899,7 @@ bool AutomationClip::isAutomated( const AutomatableModel * _m )
 		{
 			for (const auto& clip : track->getClips())
 			{
-				const AutomationClip* a = dynamic_cast<const AutomationClip*>(clip);
+				const auto a = dynamic_cast<const AutomationClip*>(clip);
 				if( a && a->hasAutomation() )
 				{
 					for (const auto& object : a->m_objects)
@@ -938,7 +938,7 @@ QVector<AutomationClip *> AutomationClip::clipsForModel( const AutomatableModel 
 			// go through all the clips...
 			for (const auto& trackClip : track->getClips())
 			{
-				AutomationClip* a = dynamic_cast<AutomationClip*>(trackClip);
+				auto a = dynamic_cast<AutomationClip*>(trackClip);
 				// check that the clip has automation
 				if( a && a->hasAutomation() )
 				{
@@ -969,7 +969,7 @@ AutomationClip * AutomationClip::globalAutomationClip(
 	AutomationTrack * t = Engine::getSong()->globalAutomationTrack();
 	for (const auto& clip : t->getClips())
 	{
-		AutomationClip* a = dynamic_cast<AutomationClip*>(clip);
+		auto a = dynamic_cast<AutomationClip*>(clip);
 		if( a )
 		{
 			for (const auto& object : a->m_objects)
@@ -979,7 +979,7 @@ AutomationClip * AutomationClip::globalAutomationClip(
 		}
 	}
 
-	AutomationClip * a = new AutomationClip( t );
+	auto a = new AutomationClip(t);
 	a->addObject( _m, false );
 	return a;
 }
@@ -998,7 +998,7 @@ void AutomationClip::resolveAllIDs()
 		{
 			for (const auto& clip : track->getClips())
 			{
-				AutomationClip* a = dynamic_cast<AutomationClip*>(clip);
+				auto a = dynamic_cast<AutomationClip*>(clip);
 				if( a )
 				{
 					for (const auto& id : a->m_idsToResolve)

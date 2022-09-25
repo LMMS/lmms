@@ -111,7 +111,7 @@ private:
 	uchar* m_map;
 };
 
-}
+} // namespace PE
 
 namespace lmms
 {
@@ -788,7 +788,7 @@ void VstPlugin::createUI( QWidget * parent )
 		{
 			parent->setAttribute(Qt::WA_NativeWindow);
 		}
-		QX11EmbedContainer * embedContainer = new QX11EmbedContainer( parent );
+		auto embedContainer = new QX11EmbedContainer(parent);
 		connect(embedContainer, SIGNAL(clientIsEmbedded()), this, SLOT(handleClientEmbed()));
 		embedContainer->embedClient( m_pluginWindowID );
 		container = embedContainer;

@@ -427,7 +427,7 @@ bool DataFile::copyResources(const QString& resourcesDir)
 	// repeating filenames
 	std::list<QString> namesList;
 
-	ResourcesMap::const_iterator it = ELEMENTS_WITH_RESOURCES.begin();
+	auto it = ELEMENTS_WITH_RESOURCES.begin();
 
 	// Copy resources and manipulate the DataFile to have local paths to them
 	while (it != ELEMENTS_WITH_RESOURCES.end())
@@ -439,7 +439,7 @@ bool DataFile::copyResources(const QString& resourcesDir)
 		{
 			QDomElement el = list.item(i).toElement();
 
-			std::vector<QString>::const_iterator res = it->second.begin();
+			auto res = it->second.begin();
 
 			// Search for attributes that point to resources
 			while (res != it->second.end())

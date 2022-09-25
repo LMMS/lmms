@@ -292,8 +292,8 @@ void AudioOss::applyQualitySettings()
 
 void AudioOss::run()
 {
-	surroundSampleFrame * temp = new surroundSampleFrame[audioEngine()->framesPerPeriod()];
-	int_sample_t * outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];
+	auto temp = new surroundSampleFrame[audioEngine()->framesPerPeriod()];
+	auto outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];
 
 	while( true )
 	{
@@ -323,11 +323,11 @@ AudioOss::setupWidget::setupWidget( QWidget * _parent ) :
 	m_device = new QLineEdit( probeDevice(), this );
 	m_device->setGeometry( 10, 20, 160, 20 );
 
-	QLabel * dev_lbl = new QLabel( tr( "Device" ), this );
+	auto dev_lbl = new QLabel(tr("Device"), this);
 	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
 	dev_lbl->setGeometry( 10, 40, 160, 10 );
 
-	gui::LcdSpinBoxModel * m = new gui::LcdSpinBoxModel( /* this */ );
+	auto m = new gui::LcdSpinBoxModel(/* this */);
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
 	m->setStep( 2 );
 	m->setValue( ConfigManager::inst()->value( "audiooss",
@@ -362,5 +362,5 @@ void AudioOss::setupWidget::saveSettings()
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_HAVE_OSS
 

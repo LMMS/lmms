@@ -304,9 +304,9 @@ void InstrumentTrack::processCCEvent(int controller)
 	// Does nothing if the LED is disabled
 	if (!m_midiCCEnable->value()) { return; }
 
-	uint8_t channel = static_cast<uint8_t>(midiPort()->realOutputChannel());
-	uint16_t cc = static_cast<uint16_t>(controller);
-	uint16_t value = static_cast<uint16_t>(m_midiCCModel[controller]->value());
+	auto channel = static_cast<uint8_t>(midiPort()->realOutputChannel());
+	auto cc = static_cast<uint16_t>(controller);
+	auto value = static_cast<uint16_t>(m_midiCCModel[controller]->value());
 
 	// Process the MIDI CC event as an input event but with source set to Internal
 	// so we can know LMMS generated the event, not a controller, and can process it during
@@ -725,7 +725,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 
 	for (const auto& clip : clips)
 	{
-		MidiClip* c = dynamic_cast<MidiClip*>(clip);
+		auto c = dynamic_cast<MidiClip*>(clip);
 		// everything which is not a MIDI clip won't be played
 		// A MIDI clip playing in the Piano Roll window will always play
 		if (c == nullptr || (Engine::getSong()->playMode() != Song::Mode_PlayMidiClip && clip->isMuted()))
@@ -787,7 +787,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 
 Clip* InstrumentTrack::createClip(const TimePos & pos)
 {
-	MidiClip* p = new MidiClip(this);
+	auto p = new MidiClip(this);
 	p->movePosition(pos);
 	return p;
 }
