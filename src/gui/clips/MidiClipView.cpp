@@ -206,14 +206,12 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 {
 	bool isBeat = m_clip->type() == MidiClip::BeatClip;
 
-	QAction * a = new QAction( embed::getIconPixmap( "piano" ),
-					tr( "Open in piano-roll" ), _cm );
+	auto a = new QAction(embed::getIconPixmap("piano"), tr("Open in piano-roll"), _cm);
 	_cm->insertAction( _cm->actions()[0], a );
 	connect( a, SIGNAL(triggered(bool)),
 					this, SLOT(openInPianoRoll()));
 
-	QAction * b = new QAction( embed::getIconPixmap( "ghost_note" ),
-						tr( "Set as ghost in piano-roll" ), _cm );
+	auto b = new QAction(embed::getIconPixmap("ghost_note"), tr("Set as ghost in piano-roll"), _cm);
 	if( m_clip->empty() ) { b->setEnabled( false ); }
 	_cm->insertAction( _cm->actions()[1], b );
 	connect( b, SIGNAL(triggered(bool)),

@@ -23,11 +23,11 @@
  *
  */
 
-#include <QWidget>
-#include "lmms_export.h"
-
 #ifndef LMMSPALETTE_H
 #define LMMSPALETTE_H
+
+#include <QWidget>
+#include "lmms_export.h"
 
 
 namespace lmms::gui

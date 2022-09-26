@@ -199,7 +199,7 @@ TimePos MidiClip::beatClipLength() const
 
 Note * MidiClip::addNote( const Note & _new_note, const bool _quant_pos )
 {
-	Note * new_note = new Note( _new_note );
+	auto new_note = new Note(_new_note);
 	if (_quant_pos && gui::getGUI()->pianoRoll())
 	{
 		new_note->quantizePos(gui::getGUI()->pianoRoll()->quantization());
@@ -448,7 +448,7 @@ void MidiClip::loadSettings( const QDomElement & _this )
 		if( node.isElement() &&
 			!node.toElement().attribute( "metadata" ).toInt() )
 		{
-			Note * n = new Note;
+			auto n = new Note;
 			n->restoreState( node.toElement() );
 			m_notes.push_back( n );
 		}

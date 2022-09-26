@@ -64,7 +64,7 @@ LocalZynAddSubFx::LocalZynAddSubFx() :
 		pthread_win32_process_attach_np();
 		pthread_win32_thread_attach_np();
 #endif
-#endif
+#endif // LMMS_BUILD_WIN32
 
 		initConfig();
 

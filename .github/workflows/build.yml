@@ -248,8 +248,13 @@ jobs:
           set-env: ${{ matrix.arch == 'x86' }}
       - name: Install dependencies
         run: |
-          vcpkg install --triplet ${{ matrix.arch }}-windows --recurse `
-            fftw3 libsamplerate libsndfile lilv lv2 sdl2 ffmpeg[core,avcodec,avformat,avdevice,swresample]
+          vcpkg install `
+            --triplet=${{ matrix.arch }}-windows `
+            --host-triplet=${{ matrix.arch }}-windows `
+            --recurse `
+            fftw3 fluidsynth[sndfile] libsamplerate libsndfile libstk lilv lv2 `
+            ffmpeg[core,avcodec,avformat,avdevice,swresample] `
+            portaudio sdl2
       - name: Set up build environment
         uses: ilammy/msvc-dev-cmd@d8610e2b41c6d0f0c3b4c46dad8df0fd826c68e1
         with:

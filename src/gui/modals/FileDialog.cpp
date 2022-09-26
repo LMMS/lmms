@@ -104,7 +104,7 @@ QString FileDialog::getOpenFileName(QWidget *parent,
 
 void FileDialog::clearSelection()
 {
-    QListView *view = findChild<QListView*>();
+	auto view = findChild<QListView*>();
 	Q_ASSERT( view );
 	view->clearSelection();
 }

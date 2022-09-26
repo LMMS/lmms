@@ -81,6 +81,7 @@ lmms_main_path = Path(__file__).resolve().parent.parent.parent
 with tempfile.TemporaryDirectory() as tmpdir:
 	os.chdir(tmpdir)
 	check_strings = lmms_main_path / 'tests' / 'scripted' / 'check-strings'
+	check_namespace = lmms_main_path / 'tests' / 'scripted' / 'check-namespace'
 
 	# create dummy carla repo
 	Path('carla').mkdir()
@@ -157,6 +158,104 @@ with tempfile.TemporaryDirectory() as tmpdir:
 		test.run()
 		test.expect('Error: debian/copyright: Glob/Path does not exist: NonExistent')
 		test.expect('1 errors')
+
+	with ScriptTest(check_namespace) as test:
+		# minimal working example
+		test.run(0)  # exitcode 0 - no errors expected
+		test.expect('0 errors')
+
+		create_file('01_OddBraceWithinMacro.cpp', '''
+					#if HAS_EVEN_BRACES
+						namespace lmms {}
+					#endif
+					namespace lmms {
+					#if HAS_ODD_BRACE
+					}
+					#endif
+					''')
+		create_file('02_IncludeInCodeBlock.cpp', '''
+					#include <good>
+					extern "C" {
+						#include "alright.c"
+					}
+					namespace lmms {
+						#include <bad>
+					}
+					''')
+		create_file('03_MacroComments.h', '''
+					#ifndef HEADER_GUARD_NEEDS_NO_COMMENT
+					#define HEADER_GUARD_NEEDS_NO_COMMENT
+						#ifdef HAS_NESTED_NEEDS_COMMENT
+							#ifdef SHORT_NO_NESTED_NEEDS_NO_COMMENT
+								namespace lmms {}
+							#endif
+						#endif
+						#ifdef HAS_COMMENT
+							#ifdef SHORT_NO_NESTED_NEEDS_NO_COMMENT
+							#else
+							#endif
+						#endif // HAS_COMMENT
+					#endif
+					''')
+		create_file('04_NamespaceComments.cpp', '''
+					namespace lmms {
+						namespace ShortNamespace {
+							class WithDeclarationsOnly;
+						}
+						namespace LongNamespace {
+							class WithDefinition {
+								int x;
+							};
+						}
+					} // namespace lmms
+					''')
+		create_file('05_NoHeaderGuard.h', '''
+					#include <cstdio>
+					namespace lmms {}
+					''')
+		create_file('06_PragmaButNoLmms.h', '''
+					// should not cause header guard warning
+					#pragma once
+					namespace not_lmms {}
+					''')
+		create_file('07_MismatchingEndifName.h', '''
+					#ifndef ABC_H
+					namespace lmms {
+					\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
+					}
+					#endif // XYZ_H
+					''')
+		create_file('08_MismatchingNamespaceEndName.h', '''
+					#ifndef ABC_H
+					namespace lmms {
+					{}
+					} // namespace smml
+					#endif // ABC_H
+					''')
+		create_file('09_NoEndifAfterElseIsOk.cpp', '''
+					#ifdef XYZ
+					namespace lmms {
+					\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
+					}
+					#else
+					namespace lmms {
+					\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
+					}
+					#endif
+					''')
+		test.run()
+		test.expect('8 errors')
+		test.expect('''
+Error: 01_OddBraceWithinMacro.cpp:7: Expected #endif before }
+Error: 02_IncludeInCodeBlock.cpp:7: #include inside a code block
+Error: 03_MacroComments.h:8: Missing comment // HAS_NESTED_NEEDS_COMMENT
+Error: 04_NamespaceComments.cpp:10: Missing comment // namespace LongNamespace
+Error: 05_NoHeaderGuard.h: First statement should be header guard
+Error: 06_PragmaButNoLmms.h: File has no namespace lmms
+Error: 07_MismatchingEndifName.h:36: Missing comment // ABC_H
+Error: 08_MismatchingNamespaceEndName.h:5: Missing comment // namespace lmms
+''')
+
 
 # if we made it until here without an exception, all tests have been passed
 print("SUCCESS")

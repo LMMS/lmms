@@ -108,7 +108,7 @@ void LcdSpinBox::mouseMoveEvent( QMouseEvent* event )
 		int dy = event->globalY() - m_lastMousePos.y();
 		if( dy )
 		{
-			float fdy = static_cast<float>(dy);
+			auto fdy = static_cast<float>(dy);
 			if( event->modifiers() & Qt::ShiftModifier ) {
 				fdy = qBound( -4.f, fdy/4.f, 4.f );
 			}
