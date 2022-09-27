@@ -125,6 +125,7 @@ MainWindow::MainWindow() :
 
 	ConfigManager* confMgr = ConfigManager::inst();
 	bool sideBarOnRight = confMgr->value("ui", "sidebaronright").toInt();
+	sideBar->expanded = confMgr->value("ui", "expandSidebar").toInt();
 
 	emit initProgress(tr("Preparing plugin browser"));
 	sideBar->appendTab( new PluginBrowser( splitter ) );
@@ -133,7 +134,7 @@ MainWindow::MainWindow() :
 				confMgr->userProjectsDir() + "*" +
 				confMgr->factoryProjectsDir(),
 					"*.mmp *.mmpz *.xml *.mid",
-							tr( "My Projects" ),
+							tr( "Projects" ),
 					embed::getIconPixmap( "project_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter, false, true,
 				confMgr->userProjectsDir(),
@@ -141,7 +142,7 @@ MainWindow::MainWindow() :
 	sideBar->appendTab( new FileBrowser(
 				confMgr->userSamplesDir() + "*" +
 				confMgr->factorySamplesDir(),
-					"*", tr( "My Samples" ),
+					"*", tr( "Samples" ),
 					embed::getIconPixmap( "sample_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter, false, true,
 					confMgr->userSamplesDir(),
@@ -150,19 +151,19 @@ MainWindow::MainWindow() :
 				confMgr->userPresetsDir() + "*" +
 				confMgr->factoryPresetsDir(),
 					"*.xpf *.cs.xml *.xiz *.lv2",
-					tr( "My Presets" ),
+					tr( "Presets" ),
 					embed::getIconPixmap( "preset_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter , false, true,
 				confMgr->userPresetsDir(),
 				confMgr->factoryPresetsDir()));
 	sideBar->appendTab( new FileBrowser( QDir::homePath(), "*",
-							tr( "My Home" ),
+							tr( "Home" ),
 					embed::getIconPixmap( "home" ).transformed( QTransform().rotate( 90 ) ),
 							splitter, false, false ) );
 
 
 	QStringList root_paths;
-	QString title = tr( "Root directory" );
+	QString title = tr( "Root Directory" );
 	bool dirs_as_items = false;
 
 #ifdef LMMS_BUILD_APPLE

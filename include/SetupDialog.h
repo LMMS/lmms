@@ -74,6 +74,7 @@ protected slots:
 private slots:
 	// General settings widget.
 	void toggleDisplaydBFS(bool enabled);
+	void toggleExpandSidebar(bool enabled);
 	void toggleTooltips(bool enabled);
 	void toggleDisplayWaveform(bool enabled);
 	void toggleNoteLabels(bool enabled);
@@ -133,6 +134,7 @@ private:
 
 	// General settings widgets.
 	bool m_displaydBFS;
+	bool m_expandSidebar;
 	bool m_tooltips;
 	bool m_displayWaveform;
 	bool m_printNoteLabels;

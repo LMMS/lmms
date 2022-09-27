@@ -45,6 +45,8 @@ public:
 	~SideBar() override = default;
 
 	void appendTab( SideBarWidget * _sbw );
+ 
+	bool expanded;
 
 
 private slots:

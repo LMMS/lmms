@@ -29,6 +29,8 @@
 #include "SideBar.h"
 #include "SideBarWidget.h"
 
+#include "SetupDialog.h"
+
 namespace lmms::gui
 {
 
@@ -54,7 +56,7 @@ public:
 	QSize sizeHint() const override
 	{
 		QSize s = QToolButton::sizeHint();
-		s.setWidth( s.width() + 8 );
+		s.setWidth( s.width() + 3 );
 		if( orientation() == Qt::Horizontal )
 		{
 			return s;
@@ -101,12 +103,17 @@ SideBar::SideBar( Qt::Orientation _orientation, QWidget * _parent ) :
 
 
 
-void SideBar::appendTab( SideBarWidget *widget )
+void SideBar::appendTab( SideBarWidget *widget)
 {
 	auto button = new SideBarButton(orientation(), this);
-	button->setText( " " + widget->title() );
+
+	button->setText("      " + widget->title());
 	button->setIcon( widget->icon() );
 	button->setLayoutDirection( Qt::RightToLeft );
+	if (expanded) 
+	{ 
+		button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+	}
 	button->setCheckable( true );
 	m_widgets[button] = widget;
 	m_btnGroup.addButton( button );
@@ -142,7 +149,10 @@ void SideBar::toggleButton( QAbstractButton * button )
 		else
 		{
 			curBtn->setChecked( false );
-			curBtn->setToolButtonStyle( Qt::ToolButtonIconOnly );
+			if (!expanded) 
+			{ 
+				curBtn->setToolButtonStyle(Qt::ToolButtonIconOnly); 
+			}
 		}
 
 		if( curWidget )
@@ -154,8 +164,12 @@ void SideBar::toggleButton( QAbstractButton * button )
 	if( toolButton && activeWidget )
 	{
 		activeWidget->setVisible( button->isChecked() );
-		toolButton->setToolButtonStyle( button->isChecked() ?
-				Qt::ToolButtonTextBesideIcon : Qt::ToolButtonIconOnly );
+		if (!expanded) 
+		{
+			toolButton->setToolButtonStyle( button->isChecked() ? 
+					Qt::ToolButtonTextBesideIcon : Qt::ToolButtonIconOnly);
+		}
+
 	}
 }
 
