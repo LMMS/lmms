@@ -377,13 +377,13 @@ public:
 	{}
 	~ExprFrontData()
 	{
-		for (int i = 0; i < m_cyclics.size() ; ++i)
+		for (const auto& cyclic : m_cyclics)
 		{
-			delete m_cyclics[i];
+			delete cyclic;
 		}
-		for (int i = 0; i < m_cyclics_interp.size() ; ++i)
+		for (const auto& cyclic : m_cyclics_interp)
 		{
-			delete m_cyclics_interp[i];
+			delete cyclic;
 		}
 		if (m_integ_func)
 		{

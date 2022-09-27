@@ -378,9 +378,9 @@ void MidiPort::updateReadablePorts()
 	m_readablePorts.clear();
 	const QStringList& wp = m_midiClient->readablePorts();
 	// now insert new ports and restore selections
-	for( QStringList::ConstIterator it = wp.begin(); it != wp.end(); ++it )
+	for (const auto& port : wp)
 	{
-		m_readablePorts[*it] = ( selectedPorts.indexOf( *it ) != -1 );
+		m_readablePorts[port] = (selectedPorts.indexOf(port) != -1);
 	}
 
 	emit readablePortsChanged();
@@ -404,9 +404,9 @@ void MidiPort::updateWritablePorts()
 	m_writablePorts.clear();
 	const QStringList & wp = m_midiClient->writablePorts();
 	// now insert new ports and restore selections
-	for( QStringList::ConstIterator it = wp.begin(); it != wp.end(); ++it )
+	for (const auto& port : wp)
 	{
-		m_writablePorts[*it] = ( selectedPorts.indexOf( *it ) != -1 );
+		m_writablePorts[port] = (selectedPorts.indexOf(port) != -1);
 	}
 
 	emit writablePortsChanged();

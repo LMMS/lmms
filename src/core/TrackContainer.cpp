@@ -71,9 +71,9 @@ void TrackContainer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 	// save settings of each track
 	m_tracksMutex.lockForRead();
-	for( int i = 0; i < m_tracks.size(); ++i )
+	for (const auto& track : m_tracks)
 	{
-		m_tracks[i]->saveState( _doc, _this );
+		track->saveState(_doc, _this);
 	}
 	m_tracksMutex.unlock();
 }
@@ -160,9 +160,9 @@ int TrackContainer::countTracks( Track::TrackTypes _tt ) const
 {
 	int cnt = 0;
 	m_tracksMutex.lockForRead();
-	for( int i = 0; i < m_tracks.size(); ++i )
+	for (const auto& track : m_tracks)
 	{
-		if( m_tracks[i]->type() == _tt || _tt == Track::NumTrackTypes )
+		if (track->type() == _tt || _tt == Track::NumTrackTypes)
 		{
 			++cnt;
 		}
@@ -238,10 +238,9 @@ void TrackContainer::clearAllTracks()
 
 bool TrackContainer::isEmpty() const
 {
-	for( TrackList::const_iterator it = m_tracks.begin();
-						it != m_tracks.end(); ++it )
+	for (const auto& track : m_tracks)
 	{
-		if( !( *it )->getClips().isEmpty() )
+		if (!track->getClips().isEmpty())
 		{
 			return false;
 		}

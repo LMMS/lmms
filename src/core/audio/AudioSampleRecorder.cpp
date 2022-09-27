@@ -60,10 +60,9 @@ AudioSampleRecorder::~AudioSampleRecorder()
 f_cnt_t AudioSampleRecorder::framesRecorded() const
 {
 	f_cnt_t frames = 0;
-	for( BufferList::ConstIterator it = m_buffers.begin();
-						it != m_buffers.end(); ++it )
+	for (const auto& buffer : m_buffers)
 	{
-		frames += ( *it ).second;
+		frames += buffer.second;
 	}
 	return frames;
 }

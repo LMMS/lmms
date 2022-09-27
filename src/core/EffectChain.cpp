@@ -191,12 +191,12 @@ bool EffectChain::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames, b
 	MixHelpers::sanitize( _buf, _frames );
 
 	bool moreEffects = false;
-	for( EffectList::Iterator it = m_effects.begin(); it != m_effects.end(); ++it )
+	for (const auto& effect : m_effects)
 	{
-		if( hasInputNoise || ( *it )->isRunning() )
+		if (hasInputNoise || effect->isRunning())
 		{
-			moreEffects |= ( *it )->processAudioBuffer( _buf, _frames );
-			MixHelpers::sanitize( _buf, _frames );
+			moreEffects |= effect->processAudioBuffer(_buf, _frames);
+			MixHelpers::sanitize(_buf, _frames);
 		}
 	}
 
@@ -213,10 +213,9 @@ void EffectChain::startRunning()
 		return;
 	}
 
-	for( EffectList::Iterator it = m_effects.begin();
-						it != m_effects.end(); it++ )
+	for (const auto& effect : m_effects)
 	{
-		( *it )->startRunning();
+		effect->startRunning();
 	}
 }
 
