@@ -42,7 +42,7 @@ function skipped {
 # Run a command silently, but print output if it fails
 function try_quiet {
     output="$("$@" 2>&1)" && return
-    printf '%s\n' "$output"
+    echo "$output"
     return 1
 }
 
