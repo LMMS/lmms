@@ -402,7 +402,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 	const InstrumentFunctionNoteStacking::ChordTable & chord_table = InstrumentFunctionNoteStacking::ChordTable::getInstance();
 	const int cur_chord_size = chord_table.chords()[selected_arp].size();
 	const int repeats = m_arpRepeatsModel.value();
-	const int range = static_cast<int>(cur_chord_size * m_arpRangeModel.value() * repeats) + repeats;
+	const int range = static_cast<int>(cur_chord_size * m_arpRangeModel.value() * repeats);
 	const int total_range = range * cnphv.size();
 
 	// number of frames that every note should be played
