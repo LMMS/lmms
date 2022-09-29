@@ -227,10 +227,10 @@ f_cnt_t SidInstrument::desiredReleaseFrames() const
 {
 	const float samplerate = Engine::audioEngine()->processingSampleRate();
 	int maxrel = 0;
-	for( int i = 0 ; i < 3 ; ++i )
+	for (const auto& voice : m_voice)
 	{
-		if( maxrel < m_voice[i]->m_releaseModel.value() )
-			maxrel = (int)m_voice[i]->m_releaseModel.value();
+		if( maxrel < voice->m_releaseModel.value() )
+			maxrel = (int)voice->m_releaseModel.value();
 	}
 
 	return f_cnt_t( float(relTime[maxrel])*samplerate/1000.0 );
@@ -320,9 +320,9 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 	auto buf = reinterpret_cast<short*>(_working_buffer + offset);
 	unsigned char sidreg[NUMSIDREGS];
 
-	for (int c = 0; c < NUMSIDREGS; c++)
+	for (auto& reg : sidreg)
 	{
-		sidreg[c] = 0x00;
+		reg = 0x00;
 	}
 
 	if( (ChipModel)m_chipModel.value() == sidMOS6581 )
@@ -749,20 +749,14 @@ void SidInstrumentView::modelChanged()
 					&k->m_voice[i]->m_testModel );
 	}
 
-	for( int i = 0; i < 3; ++i )
+	for (const auto& voice : k->m_voice)
 	{
-		connect( &k->m_voice[i]->m_attackModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateKnobHint() ) );
-		connect( &k->m_voice[i]->m_decayModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateKnobHint() ) );
-		connect( &k->m_voice[i]->m_releaseModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateKnobHint() ) );
-		connect( &k->m_voice[i]->m_pulseWidthModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateKnobHint() ) );
-		connect( &k->m_voice[i]->m_sustainModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateKnobToolTip() ) );
-		connect( &k->m_voice[i]->m_coarseModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateKnobToolTip() ) );
+		connect(&voice->m_attackModel, SIGNAL(dataChanged()), this, SLOT(updateKnobHint()));
+		connect(&voice->m_decayModel, SIGNAL(dataChanged()), this, SLOT(updateKnobHint()));
+		connect(&voice->m_releaseModel, SIGNAL(dataChanged()), this, SLOT(updateKnobHint()));
+		connect(&voice->m_pulseWidthModel, SIGNAL(dataChanged()), this, SLOT(updateKnobHint()));
+		connect(&voice->m_sustainModel, SIGNAL(dataChanged()), this, SLOT(updateKnobToolTip()));
+		connect(&voice->m_coarseModel, SIGNAL(dataChanged()), this, SLOT(updateKnobToolTip()));
 	}
 	
 	connect( &k->m_volumeModel, SIGNAL( dataChanged() ),

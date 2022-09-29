@@ -533,9 +533,9 @@ bool DataFile::hasLocalPlugins(QDomElement parent /* = QDomElement()*/, bool fir
 		bool skipNode = false;
 		// Skip the nodes allowed to have "local:" attributes, but
 		// still check its children
-		for (auto it = ELEMENTS_WITH_RESOURCES.begin(); it != ELEMENTS_WITH_RESOURCES.end(); ++it)
+		for (const auto& element : ELEMENTS_WITH_RESOURCES)
 		{
-			if (childElement.tagName() == it->first)
+			if (childElement.tagName() == element.first)
 			{
 				skipNode = true;
 				break;

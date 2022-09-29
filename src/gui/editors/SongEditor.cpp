@@ -507,10 +507,9 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 	else if( ke->key() == Qt::Key_Delete || ke->key() == Qt::Key_Backspace )
 	{
 		QVector<selectableObject *> so = selectedObjects();
-		for( QVector<selectableObject *>::iterator it = so.begin();
-				it != so.end(); ++it )
+		for (const auto& selectedClip : so)
 		{
-			auto clipv = dynamic_cast<ClipView*>(*it);
+			auto clipv = dynamic_cast<ClipView*>(selectedClip);
 			clipv->remove();
 		}
 	}

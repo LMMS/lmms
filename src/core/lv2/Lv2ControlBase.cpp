@@ -111,7 +111,7 @@ const LinkedModelGroup *Lv2ControlBase::getGroup(std::size_t idx) const
 
 
 void Lv2ControlBase::copyModelsFromLmms() {
-	for (auto& c : m_procs) { c->copyModelsFromCore(); }
+	for (const auto& c : m_procs) { c->copyModelsFromCore(); }
 }
 
 
@@ -119,7 +119,7 @@ void Lv2ControlBase::copyModelsFromLmms() {
 
 void Lv2ControlBase::copyModelsToLmms() const
 {
-	for (auto& c : m_procs) { c->copyModelsToCore(); }
+	for (const auto& c : m_procs) { c->copyModelsToCore(); }
 }
 
 
@@ -127,7 +127,8 @@ void Lv2ControlBase::copyModelsToLmms() const
 
 void Lv2ControlBase::copyBuffersFromLmms(const sampleFrame *buf, fpp_t frames) {
 	unsigned firstChan = 0; // tell the procs which channels they shall read from
-	for (auto& c : m_procs) {
+	for (const auto& c : m_procs) 
+	{
 		c->copyBuffersFromCore(buf, firstChan, m_channelsPerProc, frames);
 		firstChan += m_channelsPerProc;
 	}
@@ -148,7 +149,7 @@ void Lv2ControlBase::copyBuffersToLmms(sampleFrame *buf, fpp_t frames) const {
 
 
 void Lv2ControlBase::run(fpp_t frames) {
-	for (auto& c : m_procs) { c->run(frames); }
+	for (const auto& c : m_procs) { c->run(frames); }
 }
 
 
@@ -211,7 +212,7 @@ bool Lv2ControlBase::hasNoteInput() const
 void Lv2ControlBase::handleMidiInputEvent(const MidiEvent &event,
 	const TimePos &time, f_cnt_t offset)
 {
-	for (auto& c : m_procs) { c->handleMidiInputEvent(event, time, offset); }
+	for (const auto& c : m_procs) { c->handleMidiInputEvent(event, time, offset); }
 }
 
 

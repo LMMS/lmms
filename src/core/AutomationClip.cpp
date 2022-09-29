@@ -786,15 +786,13 @@ void AutomationClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		_this.appendChild( element );
 	}
 
-	for( objectVector::const_iterator it = m_objects.begin();
-						it != m_objects.end(); ++it )
+	for (const auto& object : m_objects)
 	{
-		if( *it )
+		if (object)
 		{
 			QDomElement element = _doc.createElement( "object" );
-			element.setAttribute( "id",
-				ProjectJournal::idToSave( ( *it )->id() ) );
-			_this.appendChild( element );
+			element.setAttribute("id", ProjectJournal::idToSave(object->id()));
+			_this.appendChild(element);
 		}
 	}
 }
@@ -895,20 +893,18 @@ bool AutomationClip::isAutomated( const AutomatableModel * _m )
 	l += Engine::patternStore()->tracks();
 	l += Engine::getSong()->globalAutomationTrack();
 
-	for( TrackContainer::TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
+	for (const auto& track : l)
 	{
-		if( ( *it )->type() == Track::AutomationTrack ||
-			( *it )->type() == Track::HiddenAutomationTrack )
+		if (track->type() == Track::AutomationTrack || track->type() == Track::HiddenAutomationTrack)
 		{
-			const Track::clipVector & v = ( *it )->getClips();
-			for( Track::clipVector::ConstIterator j = v.begin(); j != v.end(); ++j )
+			for (const auto& clip : track->getClips())
 			{
-				const auto a = dynamic_cast<const AutomationClip*>(*j);
+				const auto a = dynamic_cast<const AutomationClip*>(clip);
 				if( a && a->hasAutomation() )
 				{
-					for( objectVector::const_iterator k = a->m_objects.begin(); k != a->m_objects.end(); ++k )
+					for (const auto& object : a->m_objects)
 					{
-						if( *k == _m )
+						if (object == _m)
 						{
 							return true;
 						}
@@ -927,34 +923,31 @@ bool AutomationClip::isAutomated( const AutomatableModel * _m )
  */
 QVector<AutomationClip *> AutomationClip::clipsForModel( const AutomatableModel * _m )
 {
-	QVector<AutomationClip *> clips;
-	TrackContainer::TrackList l;
-	l += Engine::getSong()->tracks();
-	l += Engine::patternStore()->tracks();
-	l += Engine::getSong()->globalAutomationTrack();
+	QVector<AutomationClip*> clips;
+	TrackContainer::TrackList tracks;
+	tracks += Engine::getSong()->tracks();
+	tracks += Engine::patternStore()->tracks();
+	tracks += Engine::getSong()->globalAutomationTrack();
 
 	// go through all tracks...
-	for( TrackContainer::TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
+	for (const auto& track : tracks)
 	{
 		// we want only automation tracks...
-		if( ( *it )->type() == Track::AutomationTrack ||
-			( *it )->type() == Track::HiddenAutomationTrack )
+		if (track->type() == Track::AutomationTrack || track->type() == Track::HiddenAutomationTrack )
 		{
-			// get clips in those tracks....
-			const Track::clipVector & v = ( *it )->getClips();
 			// go through all the clips...
-			for( Track::clipVector::ConstIterator j = v.begin(); j != v.end(); ++j )
+			for (const auto& trackClip : track->getClips())
 			{
-				auto a = dynamic_cast<AutomationClip*>(*j);
+				auto a = dynamic_cast<AutomationClip*>(trackClip);
 				// check that the clip has automation
 				if( a && a->hasAutomation() )
 				{
 					// now check is the clip is connected to the model we want by going through all the connections
 					// of the clip
 					bool has_object = false;
-					for( objectVector::const_iterator k = a->m_objects.begin(); k != a->m_objects.end(); ++k )
+					for (const auto& object : a->m_objects)
 					{
-						if( *k == _m )
+						if (object == _m)
 						{
 							has_object = true;
 						}
@@ -974,19 +967,14 @@ AutomationClip * AutomationClip::globalAutomationClip(
 							AutomatableModel * _m )
 {
 	AutomationTrack * t = Engine::getSong()->globalAutomationTrack();
-	Track::clipVector v = t->getClips();
-	for( Track::clipVector::const_iterator j = v.begin(); j != v.end(); ++j )
+	for (const auto& clip : t->getClips())
 	{
-		auto a = dynamic_cast<AutomationClip*>(*j);
+		auto a = dynamic_cast<AutomationClip*>(clip);
 		if( a )
 		{
-			for( objectVector::const_iterator k = a->m_objects.begin();
-												k != a->m_objects.end(); ++k )
+			for (const auto& object : a->m_objects)
 			{
-				if( *k == _m )
-				{
-					return a;
-				}
+				if (object == _m) { return a; }
 			}
 		}
 	}
@@ -1004,24 +992,18 @@ void AutomationClip::resolveAllIDs()
 	TrackContainer::TrackList l = Engine::getSong()->tracks() +
 				Engine::patternStore()->tracks();
 	l += Engine::getSong()->globalAutomationTrack();
-	for( TrackContainer::TrackList::iterator it = l.begin();
-							it != l.end(); ++it )
+	for (const auto& track : l)
 	{
-		if( ( *it )->type() == Track::AutomationTrack ||
-			 ( *it )->type() == Track::HiddenAutomationTrack )
+		if (track->type() == Track::AutomationTrack || track->type() == Track::HiddenAutomationTrack)
 		{
-			Track::clipVector v = ( *it )->getClips();
-			for( Track::clipVector::iterator j = v.begin();
-							j != v.end(); ++j )
+			for (const auto& clip : track->getClips())
 			{
-				auto a = dynamic_cast<AutomationClip*>(*j);
+				auto a = dynamic_cast<AutomationClip*>(clip);
 				if( a )
 				{
-					for( QVector<jo_id_t>::Iterator k = a->m_idsToResolve.begin();
-									k != a->m_idsToResolve.end(); ++k )
+					for (const auto& id : a->m_idsToResolve)
 					{
-						JournallingObject * o = Engine::projectJournal()->
-														journallingObject( *k );
+						JournallingObject* o = Engine::projectJournal()->journallingObject(id);
 						if( o && dynamic_cast<AutomatableModel *>( o ) )
 						{
 							a->addObject( dynamic_cast<AutomatableModel *>( o ), false );
@@ -1030,7 +1012,7 @@ void AutomationClip::resolveAllIDs()
 						{
 							// FIXME: Remove this block once the automation system gets fixed
 							// This is a temporary fix for https://github.com/LMMS/lmms/issues/3781
-							o = Engine::projectJournal()->journallingObject(ProjectJournal::idFromSave(*k));
+							o = Engine::projectJournal()->journallingObject(ProjectJournal::idFromSave(id));
 							if( o && dynamic_cast<AutomatableModel *>( o ) )
 							{
 								a->addObject( dynamic_cast<AutomatableModel *>( o ), false );
@@ -1039,7 +1021,7 @@ void AutomationClip::resolveAllIDs()
 							{
 								// FIXME: Remove this block once the automation system gets fixed
 								// This is a temporary fix for https://github.com/LMMS/lmms/issues/4781
-								o = Engine::projectJournal()->journallingObject(ProjectJournal::idToSave(*k));
+								o = Engine::projectJournal()->journallingObject(ProjectJournal::idToSave(id));
 								if( o && dynamic_cast<AutomatableModel *>( o ) )
 								{
 									a->addObject( dynamic_cast<AutomatableModel *>( o ), false );

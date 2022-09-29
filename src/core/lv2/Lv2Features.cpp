@@ -87,9 +87,9 @@ void Lv2Features::createFeatureVectors()
 
 	// create pointer vector (for lilv_plugin_instantiate)
 	m_featurePointers.reserve(m_features.size() + 1);
-	for(std::size_t i = 0; i < m_features.size(); ++i)
+	for (const auto& feature : m_features)
 	{
-		m_featurePointers.push_back(&m_features[i]);
+		m_featurePointers.push_back(&feature);
 	}
 	m_featurePointers.push_back(nullptr);
 }

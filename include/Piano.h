@@ -82,7 +82,7 @@ private:
 
 	InstrumentTrack* m_instrumentTrack;
 	MidiEventProcessor* m_midiEvProc;
-	bool m_pressedKeys[NumKeys];
+	std::array<bool, NumKeys> m_pressedKeys = {};
 
 } ;
 

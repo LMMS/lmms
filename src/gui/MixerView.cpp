@@ -168,9 +168,9 @@ MixerView::MixerView() :
 
 MixerView::~MixerView()
 {
-	for (int i=0; i<m_mixerChannelViews.size(); i++)
+	for (auto mixerChannelView : m_mixerChannelViews)
 	{
-		delete m_mixerChannelViews.at(i);
+		delete mixerChannelView;
 	}
 }
 
@@ -239,21 +239,19 @@ void MixerView::updateMaxChannelSelector()
 	TrackContainer::TrackList songTracks = Engine::getSong()->tracks();
 	TrackContainer::TrackList patternStoreTracks = Engine::patternStore()->tracks();
 
-	TrackContainer::TrackList trackLists[] = {songTracks, patternStoreTracks};
-	for(int tl=0; tl<2; ++tl)
+	for (const auto& trackList : {songTracks, patternStoreTracks})
 	{
-		TrackContainer::TrackList trackList = trackLists[tl];
-		for(int i=0; i<trackList.size(); ++i)
+		for (const auto& track : trackList)
 		{
-			if( trackList[i]->type() == Track::InstrumentTrack )
+			if (track->type() == Track::InstrumentTrack)
 			{
-				auto inst = (InstrumentTrack*)trackList[i];
+				auto inst = (InstrumentTrack*)track;
 				inst->mixerChannelModel()->setRange(0,
 					m_mixerChannelViews.size()-1,1);
 			}
-			else if( trackList[i]->type() == Track::SampleTrack )
+			else if (track->type() == Track::SampleTrack)
 			{
-				auto strk = (SampleTrack*)trackList[i];
+				auto strk = (SampleTrack*)track;
 				strk->mixerChannelModel()->setRange(0,
 					m_mixerChannelViews.size()-1,1);
 			}
