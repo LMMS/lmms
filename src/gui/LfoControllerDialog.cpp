@@ -81,7 +81,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	m_phaseKnob->move( CD_LFO_PHASE_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_phaseKnob->setHintText( tr( "Phase offset:" ) , "" + tr( " degrees" ) );
 
-	PixmapButton * sin_wave_btn = new PixmapButton( this, nullptr );
+	auto sin_wave_btn = new PixmapButton(this, nullptr);
 	sin_wave_btn->move( CD_LFO_SHAPES_X, CD_LFO_SHAPES_Y );
 	sin_wave_btn->setActiveGraphic( embed::getIconPixmap(
 						"sin_wave_active" ) );
@@ -90,8 +90,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	sin_wave_btn->setToolTip(
 			tr( "Sine wave" ) );
 
-	PixmapButton * triangle_wave_btn =
-					new PixmapButton( this, nullptr );
+	auto triangle_wave_btn = new PixmapButton(this, nullptr);
 	triangle_wave_btn->move( CD_LFO_SHAPES_X + 15, CD_LFO_SHAPES_Y );
 	triangle_wave_btn->setActiveGraphic(
 		embed::getIconPixmap( "triangle_wave_active" ) );
@@ -100,7 +99,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	triangle_wave_btn->setToolTip(
 			tr( "Triangle wave" ) );
 
-	PixmapButton * saw_wave_btn = new PixmapButton( this, nullptr );
+	auto saw_wave_btn = new PixmapButton(this, nullptr);
 	saw_wave_btn->move( CD_LFO_SHAPES_X + 30, CD_LFO_SHAPES_Y );
 	saw_wave_btn->setActiveGraphic( embed::getIconPixmap(
 						"saw_wave_active" ) );
@@ -109,7 +108,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	saw_wave_btn->setToolTip(
 			tr( "Saw wave" ) );
 
-	PixmapButton * sqr_wave_btn = new PixmapButton( this, nullptr );
+	auto sqr_wave_btn = new PixmapButton(this, nullptr);
 	sqr_wave_btn->move( CD_LFO_SHAPES_X + 45, CD_LFO_SHAPES_Y );
 	sqr_wave_btn->setActiveGraphic( embed::getIconPixmap(
 					"square_wave_active" ) );
@@ -118,8 +117,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	sqr_wave_btn->setToolTip(
 			tr( "Square wave" ) );
 
-	PixmapButton * moog_saw_wave_btn =
-					new PixmapButton( this, nullptr );
+	auto moog_saw_wave_btn = new PixmapButton(this, nullptr);
 	moog_saw_wave_btn->move( CD_LFO_SHAPES_X, CD_LFO_SHAPES_Y + 15 );
 	moog_saw_wave_btn->setActiveGraphic(
 		embed::getIconPixmap( "moog_saw_wave_active" ) );
@@ -128,7 +126,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	moog_saw_wave_btn->setToolTip(
 			tr( "Moog saw wave" ) );
 
-	PixmapButton * exp_wave_btn = new PixmapButton( this, nullptr );
+	auto exp_wave_btn = new PixmapButton(this, nullptr);
 	exp_wave_btn->move( CD_LFO_SHAPES_X + 15, CD_LFO_SHAPES_Y + 15 );
 	exp_wave_btn->setActiveGraphic( embed::getIconPixmap(
 						"exp_wave_active" ) );
@@ -137,7 +135,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	exp_wave_btn->setToolTip(
 			tr( "Exponential wave" ) );
 
-	PixmapButton * white_noise_btn = new PixmapButton( this, nullptr );
+	auto white_noise_btn = new PixmapButton(this, nullptr);
 	white_noise_btn->move( CD_LFO_SHAPES_X + 30, CD_LFO_SHAPES_Y + 15 );
 	white_noise_btn->setActiveGraphic(
 		embed::getIconPixmap( "white_noise_wave_active" ) );
@@ -168,8 +166,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	m_waveBtnGrp->addButton( white_noise_btn );
 	m_waveBtnGrp->addButton( m_userWaveBtn );
 
-
-	PixmapButton * x1 = new PixmapButton( this, nullptr );
+	auto x1 = new PixmapButton(this, nullptr);
 	x1->move( CD_LFO_MULTIPLIER_X, CD_LFO_SHAPES_Y +7);
 	x1->setActiveGraphic( embed::getIconPixmap(
 						"lfo_x1_active" ) );
@@ -178,7 +175,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	x1->setToolTip(
 				tr( "Mutliply modulation frequency by 1" ));
 
-	PixmapButton * x100 = new PixmapButton( this, nullptr );
+	auto x100 = new PixmapButton(this, nullptr);
 	x100->move( CD_LFO_MULTIPLIER_X, CD_LFO_SHAPES_Y - 8 );
 	x100->setActiveGraphic( embed::getIconPixmap(
 						"lfo_x100_active" ) );
@@ -187,7 +184,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	x100->setToolTip(
 				tr( "Mutliply modulation frequency by 100" ));
 
-	PixmapButton * d100 = new PixmapButton( this, nullptr );
+	auto d100 = new PixmapButton(this, nullptr);
 	d100->move( CD_LFO_MULTIPLIER_X, CD_LFO_SHAPES_Y + 22 );
 	d100->setActiveGraphic( embed::getIconPixmap(
 						"lfo_d100_active" ) );

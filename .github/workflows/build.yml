@@ -206,15 +206,14 @@ jobs:
           path: C:\vcpkg\installed
       - name: Install 64-bit Qt
         if: matrix.arch == 'x64'
-        # Temporary workaround until upstream install-qt-action is fixed
-        uses: PhysSong/install-qt-action@v3
+        uses: jurplel/install-qt-action@64bdb64f2c14311d23733a8463e5fcbc65e8775e
         with:
           version: ${{ env.qt-version }}
           arch: win64_msvc2019_64
           archives: qtbase qtsvg qttools
           cache: true
       - name: Install 32-bit Qt
-        uses: PhysSong/install-qt-action@v3
+        uses: jurplel/install-qt-action@64bdb64f2c14311d23733a8463e5fcbc65e8775e
         with:
           version: ${{ env.qt-version }}
           arch: win32_msvc2019
@@ -223,8 +222,12 @@ jobs:
           set-env: ${{ matrix.arch == 'x86' }}
       - name: Install dependencies
         run: |
-          vcpkg install --triplet ${{ matrix.arch }}-windows --recurse `
-            fftw3 libsamplerate libsndfile lilv lv2 sdl2
+          vcpkg install `
+            --triplet=${{ matrix.arch }}-windows `
+            --host-triplet=${{ matrix.arch }}-windows `
+            --recurse `
+            fftw3 fluidsynth[sndfile] libsamplerate libsndfile libstk lilv lv2 `
+            portaudio sdl2
       - name: Set up build environment
         uses: ilammy/msvc-dev-cmd@d8610e2b41c6d0f0c3b4c46dad8df0fd826c68e1
         with:

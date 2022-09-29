@@ -58,7 +58,7 @@ DropToolBar * Editor::addDropToolBar(Qt::ToolBarArea whereToAdd, QString const &
 
 DropToolBar * Editor::addDropToolBar(QWidget * parent, Qt::ToolBarArea whereToAdd, QString const & windowTitle)
 {
-	DropToolBar *toolBar = new DropToolBar(parent);
+	auto toolBar = new DropToolBar(parent);
 	addToolBar(whereToAdd, toolBar);
 	toolBar->setMovable(false);
 	toolBar->setFloatable(false);

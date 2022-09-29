@@ -76,14 +76,14 @@ LcdFloatSpinBox::LcdFloatSpinBox(int numWhole, int numFrac, const QString& style
 void LcdFloatSpinBox::layoutSetup(const QString &style)
 {
 	// Assemble the LCD parts
-	QHBoxLayout *lcdLayout = new QHBoxLayout();
+	auto lcdLayout = new QHBoxLayout();
 
 	m_wholeDisplay.setSeamless(false, true);
 	m_fractionDisplay.setSeamless(true, false);
 
 	lcdLayout->addWidget(&m_wholeDisplay);
 
-	QLabel *dotLabel = new QLabel("", this);
+	auto dotLabel = new QLabel("", this);
 	QPixmap dotPixmap(embed::getIconPixmap(QString("lcd_" + style + "_dot").toUtf8().constData()));
 	dotLabel->setPixmap(dotPixmap.copy(0, 0, dotPixmap.size().width(), dotPixmap.size().height() / 2));
 	lcdLayout->addWidget(dotLabel);
@@ -94,7 +94,7 @@ void LcdFloatSpinBox::layoutSetup(const QString &style)
 	lcdLayout->setSpacing(0);
 
 	// Add space for label
-	QVBoxLayout *outerLayout = new QVBoxLayout();
+	auto outerLayout = new QVBoxLayout();
 	outerLayout->addLayout(lcdLayout);
 	outerLayout->addSpacing(9);
 	outerLayout->setContentsMargins(0, 0, 0, 0);

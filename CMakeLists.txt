@@ -22,6 +22,14 @@ ENDIF(COMMAND CMAKE_POLICY)
 # Import of windows.h breaks min()/max()
 ADD_DEFINITIONS(-DNOMINMAX)
 
+# CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES is not set correctly for MinGW until
+# CMake 3.14.1, so avoid specifying system include directories on affected
+# versions. Normal include directories are safe, since GCC ignores them if they
+# are already in the built-in search path.
+if(MINGW AND CMAKE_VERSION VERSION_LESS "3.14.1")
+	set(CMAKE_NO_SYSTEM_FROM_IMPORTED TRUE)
+endif()
+
 INCLUDE(PluginList)
 INCLUDE(CheckSubmodules)
 INCLUDE(AddFileDependencies)
@@ -110,6 +118,7 @@ IF(LMMS_BUILD_WIN32)
 	SET(STATUS_ALSA "<not supported on this platform>")
 	SET(STATUS_PULSEAUDIO "<not supported on this platform>")
 	SET(STATUS_SOUNDIO "<disabled in this release>")
+	SET(STATUS_SNDIO "<not supported on this platform>")
 	SET(STATUS_WINMM "OK")
 	SET(STATUS_APPLEMIDI "<not supported on this platform>")
 ELSE(LMMS_BUILD_WIN32)
@@ -297,17 +306,7 @@ ENDIF(WANT_CARLA)
 
 # check for SDL2
 IF(WANT_SDL)
-	# Don't look for SDL2main
-	SET(SDL2_BUILDING_LIBRARY TRUE)
-
-	# Search for SDL2 using config mode first, then fall back to module mode.
-	# This allows us to use SDL2's own CMake configuration files if available.
-	FIND_PACKAGE(SDL2 CONFIG QUIET)
-	IF(NOT TARGET SDL2::SDL2)
-		UNSET(SDL2_FOUND)
-		FIND_PACKAGE(SDL2 MODULE)
-	ENDIF()
-
+	FIND_PACKAGE(SDL2)
 	IF(SDL2_FOUND)
 		SET(LMMS_HAVE_SDL TRUE)
 		SET(LMMS_HAVE_SDL2 TRUE)
@@ -358,13 +357,13 @@ ENDIF(WANT_STK)
 # check for PortAudio
 IF(WANT_PORTAUDIO)
 	FIND_PACKAGE(Portaudio)
-	IF(PORTAUDIO_FOUND)
+	IF(Portaudio_FOUND)
 		SET(LMMS_HAVE_PORTAUDIO TRUE)
 		SET(STATUS_PORTAUDIO "OK")
-	ELSE(PORTAUDIO_FOUND)
+	ELSE()
 		SET(STATUS_PORTAUDIO "not found, please install portaudio19-dev (or similar, version >= 1.9) "
 			"if you require PortAudio support")
-	ENDIF(PORTAUDIO_FOUND)
+	ENDIF()
 ENDIF(WANT_PORTAUDIO)
 
 # check for libsoundio
@@ -496,14 +495,14 @@ ENDIF()
 
 # check for Fluidsynth
 IF(WANT_SF2)
-	PKG_CHECK_MODULES(FLUIDSYNTH fluidsynth>=1.0.7)
-	IF(FLUIDSYNTH_FOUND)
+	find_package(FluidSynth 1.0.7)
+	if(FluidSynth_FOUND)
 		SET(LMMS_HAVE_FLUIDSYNTH TRUE)
 		SET(STATUS_FLUIDSYNTH "OK")
-	ELSE(FLUIDSYNTH_FOUND)
+	else()
 		SET(STATUS_FLUIDSYNTH "not found, libfluidsynth-dev (or similar)"
 			"is highly recommended")
-	ENDIF(FLUIDSYNTH_FOUND)
+	endif()
 ENDIF(WANT_SF2)
 
 # check for libgig
@@ -604,6 +603,16 @@ SET(CMAKE_CXX_FLAGS "${WERROR_FLAGS} ${CMAKE_CXX_FLAGS}")
 SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DLMMS_DEBUG")
 SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DLMMS_DEBUG")
 
+if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.16")
+	set(NOOP_COMMAND "${CMAKE_COMMAND}" "-E" "true")
+else()
+	set(NOOP_COMMAND "${CMAKE_COMMAND}" "-E" "echo")
+endif()
+if(STRIP)
+	set(STRIP_COMMAND "$<IF:$<TARGET:Debug,RelWithDebInfo>,${NOOP_COMMAND},${STRIP}>")
+else()
+	set(STRIP_COMMAND "${NOOP_COMMAND}")
+endif()
 
 # people simply updating git will still have this and mess up build with it
 FILE(REMOVE include/lmmsconfig.h)

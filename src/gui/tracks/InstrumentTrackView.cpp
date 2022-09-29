@@ -366,7 +366,7 @@ QMenu * InstrumentTrackView::createMixerMenu(QString title, QString newMixerLabe
 		title = title.arg( channelIndex ).arg( mixerChannel->m_name );
 	}
 
-	QMenu *mixerMenu = new QMenu( title );
+	auto mixerMenu = new QMenu(title);
 
 	mixerMenu->addAction( newMixerLabel, this, SLOT(createMixerLine()));
 	mixerMenu->addSeparator();

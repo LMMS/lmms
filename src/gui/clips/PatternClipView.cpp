@@ -52,9 +52,7 @@ PatternClipView::PatternClipView(Clip* _clip, TrackView* _tv) :
 
 void PatternClipView::constructContextMenu(QMenu* _cm)
 {
-	QAction* a = new QAction(embed::getIconPixmap("pattern_track"),
-					tr("Open in Pattern Editor"),
-					_cm );
+	auto a = new QAction(embed::getIconPixmap("pattern_track"), tr("Open in Pattern Editor"), _cm);
 	_cm->insertAction( _cm->actions()[0], a );
 	connect( a, SIGNAL(triggered(bool)),
 			this, SLOT(openInPatternEditor()));
