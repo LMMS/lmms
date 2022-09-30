@@ -64,8 +64,8 @@ Track::Track( TrackTypes type, TrackContainer * tc ) :
 	m_mutedModel( false, this, tr( "Mute" ) ), /*!< For controlling track muting */
 	m_soloModel( false, this, tr( "Solo" ) ), /*!< For controlling track soloing */
 	m_simpleSerializingMode( false ),
-	m_color(std::in_place, 0, 0, 0),
-	m_clips()        /*!< The clips (segments) */
+	m_clips(),        /*!< The clips (segments) */
+	m_color(std::in_place, 0, 0, 0)
 {	
 	m_trackContainer->addTrack( this );
 	m_height = -1;

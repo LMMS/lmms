@@ -76,16 +76,13 @@ class MixerChannel : public ThreadableJob
 		bool requiresProcessing() const override { return true; }
 		void unmuteForSolo();
 
-
 		void setColor (QColor newColor)
 		{
 			m_color = newColor;
 		}
 
-		// TODO C++17 and above: use std::optional instead
 		std::optional<QColor> m_color;
 
-	
 		std::atomic_int m_dependenciesMet;
 		void incrementDeps();
 		void processed();
