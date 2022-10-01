@@ -165,6 +165,7 @@ void EffectRackView::update()
 				view_map[i] = true;
 				break;
 			}
+			++i;
 		}
 		if( i >= m_effectViews.size() )
 		{
