@@ -4864,27 +4864,6 @@ PianoRollWindow::PianoRollWindow() :
 	notesActionsToolBar->addSeparator();
 	notesActionsToolBar->addWidget(quantizeButton);
 
-	// -- File actions
-	DropToolBar* fileActionsToolBar = addDropToolBarToTop(tr("File actions"));
-
-	// -- File ToolButton
-	m_fileToolsButton = new QToolButton(m_toolBar);
-	m_fileToolsButton->setIcon(embed::getIconPixmap("file"));
-	m_fileToolsButton->setPopupMode(QToolButton::InstantPopup);
-
-	// Import / export
-	auto importAction = new QAction(embed::getIconPixmap("project_import"), tr("Import clip"), m_fileToolsButton);
-
-	auto exportAction = new QAction(embed::getIconPixmap("project_export"), tr("Export clip"), m_fileToolsButton);
-
-	m_fileToolsButton->addAction(importAction);
-	m_fileToolsButton->addAction(exportAction);
-	fileActionsToolBar->addWidget(m_fileToolsButton);
-
-	connect(importAction, SIGNAL(triggered()), this, SLOT(importMidiClip()));
-	connect(exportAction, SIGNAL(triggered()), this, SLOT(exportMidiClip()));
-	// -- End File actions
-
 	// Copy + paste actions
 	DropToolBar *copyPasteActionsToolBar =  addDropToolBarToTop( tr( "Copy paste controls" ) );
 
@@ -4946,6 +4925,26 @@ PianoRollWindow::PianoRollWindow() :
 
 	notesActionsToolBar->addWidget(noteToolsButton);
 
+	// Other actions
+	DropToolBar* miscToolBar = addDropToolBarToTop(tr("Other actions"));
+
+	// -- File ToolButton
+	m_fileToolsButton = new QToolButton(m_toolBar);
+	m_fileToolsButton->setIcon(embed::getIconPixmap("file"));
+	m_fileToolsButton->setPopupMode(QToolButton::InstantPopup);
+
+	// Import / export
+	auto importAction = new QAction(embed::getIconPixmap("project_import"), tr("Import clip"), m_fileToolsButton);
+
+	auto exportAction = new QAction(embed::getIconPixmap("project_export"), tr("Export clip"), m_fileToolsButton);
+
+	m_fileToolsButton->addAction(importAction);
+	m_fileToolsButton->addAction(exportAction);
+	miscToolBar->addWidget(m_fileToolsButton);
+
+	connect(importAction, SIGNAL(triggered()), this, SLOT(importMidiClip()));
+	connect(exportAction, SIGNAL(triggered()), this, SLOT(exportMidiClip()));
+
 	// Ghost note button and menu
 	auto ghostButton = new QToolButton(m_toolBar);
 	auto ghostMenu = new QMenu(ghostButton);
@@ -4968,7 +4967,7 @@ PianoRollWindow::PianoRollWindow() :
 	ghostMenu->addSeparator();
 	ghostMenu->addAction(ghostRepeatAction);
 	ghostMenu->addAction(ghostStackAction);
-	m_toolBar->addWidget(ghostButton);
+	miscToolBar->addWidget(ghostButton);
 
 	addToolBarBreak();
 
