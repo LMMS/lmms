@@ -326,6 +326,13 @@ PianoRoll::PianoRoll() :
 
 	removeSelection();
 
+	m_pasteGhostAction = new QAction(tr("Paste ghost notes"), this);
+	m_pasteGhostAction->setDisabled(true);
+	connect(m_pasteGhostAction, &QAction::triggered, this, &PianoRoll::pasteGhostNotes);
+	connect(&m_ghostVisible, SIGNAL(dataChanged()), this, SLOT(update()));
+	connect(&m_ghostRepeated, SIGNAL(dataChanged()), this, SLOT(update()));
+	connect(&m_ghostStacked, SIGNAL(dataChanged()), this, SLOT(update()));
+
 	// init scrollbars
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
 	m_leftRightScroll->setSingleStep( 1 );
@@ -470,7 +477,8 @@ void PianoRoll::reset()
 {
 	m_lastNoteVolume = DefaultVolume;
 	m_lastNotePanning = DefaultPanning;
-	clearGhostClip();
+	m_ghostNotes.clear();
+	m_ghostVisible.setValue(false);
 }
 
 void PianoRoll::showTextFloat(const QString &text, const QPoint &pos, int timeout)
@@ -628,47 +636,112 @@ void PianoRoll::markSemiTone(int i, bool fromMenu)
 }
 
 
+
+
+/*! \brief Copy notes to the ghost note vector
+ *
+ *  This is a private method. It will also update GUI components related to ghost notes.
+ */
+void PianoRoll::setGhostNotes(const NoteVector& notes)
+{
+	// TODO undo ghost note changes
+
+	m_ghostNotes.clear();
+	for (auto& note: notes)
+	{
+		m_ghostNotes.push_back(new Note(note->length(), note->pos(), note->key()));
+	}
+	if (auto bounds = boundsForNotes(m_ghostNotes))
+	{
+		m_ghostBounds = bounds.value();
+	}
+	m_ghostVisible.setValue(!m_ghostNotes.empty());
+	m_pasteGhostAction->setEnabled(!m_ghostNotes.empty());
+	update();
+}
+
+
+
+/*! \brief Use selected notes as ghost notes
+ *
+ *  Use all notes in the current clip if there's no selection.
+ *  Ghost notes will be cleared if there are no notes in the current clip.
+ */
+void PianoRoll::setGhostNotesFromSelection()
+{
+	if (!hasValidMidiClip()) { return; }
+
+	auto selection = getSelectedNotes();
+	setGhostNotes(selection.empty() ? m_midiClip->notes() : selection);
+}
+
+
+
+/*! \brief Use notes from the given MidiClip as ghost notes */
 void PianoRoll::setGhostMidiClip( MidiClip* newMidiClip )
 {
 	// Expects a pointer to a MIDI clip or nullptr.
-	m_ghostNotes.clear();
 	if( newMidiClip != nullptr )
 	{
-		for( Note *note : newMidiClip->notes() )
-		{
-			auto new_note = new Note(note->length(), note->pos(), note->key());
-			m_ghostNotes.push_back( new_note );
-		}
-		emit ghostClipSet( true );
+		setGhostNotes(newMidiClip->notes());
 	}
 }
 
 
+
+
+/*! \brief Paste the ghost notes as regular notes */
+void PianoRoll::pasteGhostNotes()
+{
+	if (!hasValidMidiClip()) { return; }
+
+	clearSelectedNotes();
+	for (auto& note : m_ghostNotes)
+	{
+		auto newNote = m_midiClip->addNote(*note, false);
+		newNote->setSelected(true);
+	}
+}
+
+
+
+
+/*! \brief Load ghost notes and related settings from a DOM element */
 void PianoRoll::loadGhostNotes( const QDomElement & de )
 {
-	// Load ghost notes from DOM element.
-	if( de.isElement() )
+	m_ghostNotes.clear();
+
+	for (QDomNode node = de.firstChild(); !node.isNull(); node = node.nextSibling())
 	{
-		QDomNode node = de.firstChild();
-		while( !node.isNull() )
-		{
 			auto n = new Note;
 			n->restoreState( node.toElement() );
 			n->setVolume(DefaultVolume);
 			m_ghostNotes.push_back( n );
-			node = node.nextSibling();
-		}
-		emit ghostClipSet( true );
 	}
+	if (auto bounds = boundsForNotes(m_ghostNotes))
+	{
+		m_ghostBounds = bounds.value();
+	}
+	if (de.hasAttribute("repeat"))
+	{
+		m_ghostRepeated.setValue(de.attribute("repeat").toInt());
+	}
+	if (de.hasAttribute("stack"))
+	{
+		m_ghostStacked.setValue(de.attribute("stack").toInt());
+	}
+	if (de.hasAttribute("visible"))
+	{
+		m_ghostVisible.setValue(de.attribute("visible").toInt());
+	}
+	else
+	{
+		m_ghostVisible.setValue(!m_ghostNotes.empty());
+	}
+	m_pasteGhostAction->setEnabled(!m_ghostNotes.empty());
 }
 
 
-void PianoRoll::clearGhostClip()
-{
-	setGhostMidiClip( nullptr );
-	emit ghostClipSet( false );
-	update();
-}
 
 
 void PianoRoll::glueNotes()
@@ -3015,6 +3088,12 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 
 void PianoRoll::paintEvent(QPaintEvent * pe )
 {
+	// Lambda that takes a TimePos and returns a X coordinate
+	auto xCoordOfTick = [this](int tick)
+	{
+		return m_whiteKeyWidth + ((tick - m_currentPosition) * m_ppb / TimePos::ticksPerBar());
+	};
+
 	bool drawNoteNames = ConfigManager::inst()->value( "ui", "printnotelabels").toInt();
 
 	QStyleOption opt;
@@ -3110,11 +3189,6 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			// allow quantization grid up to 1/32 for normal notes
 			else if (q < 6) { q = 6; }
 		}
-		auto xCoordOfTick = [=](int tick) {
-			return m_whiteKeyWidth + (
-				(tick - m_currentPosition) * m_ppb / TimePos::ticksPerBar()
-			);
-		};
 		p.setPen(m_lineColor);
 		for (tick = m_currentPosition - m_currentPosition % q,
 			x = xCoordOfTick(tick);
@@ -3413,43 +3487,56 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		};
 
 		// -- Begin ghost MIDI clip
-		if( !m_ghostNotes.empty() )
+		if (!m_ghostNotes.empty() && m_ghostVisible.value())
 		{
-			for( const Note *note : m_ghostNotes )
+			// Lambda function that takes a value x and rounds it to the next/previous value evenly divisable by q
+			// a.k.a. quantizing... (unlike integer division this is the same for negative numbers)
+			auto roundDown = [](int x, int q) -> int { return std::floor(static_cast<float>(x) / q) * q; };
+			auto roundUp = [](int x, int q) -> int { return std::ceil(static_cast<float>(x) / q) * q; };
+
+			// Horizontal repeat
+			const bool loop = m_ghostRepeated.value();
+			// Round to whole bars
+			const int ghostLength = roundUp(m_ghostBounds.end - m_ghostBounds.start, TimePos::ticksPerBar());
+			// Offset of the leftmost visible repetition, relative to the original ghost notes
+			const int posOffBegin = loop ? roundDown(m_currentPosition - m_ghostBounds.start, ghostLength) : 0;
+			// Tick to the right of the visible area
+			const int rightmostTick = m_currentPosition + (width() - m_whiteKeyWidth) * TimePos::ticksPerBar() / m_ppb;
+			// Where to stop drawing
+			const int posEnd = loop ? rightmostTick : m_ghostBounds.end.getTicks();
+
+			// Vertical repeat
+			const bool stack = m_ghostStacked.value();
+			// Round to whole octaves
+			const int ghostRange = roundUp((m_ghostBounds.highest - m_ghostBounds.lowest + 1), KeysPerOctave);
+			// Offset of the bottommost visible repetition, relative to the original ghost notes
+			const int keyOffBegin = stack ? roundDown(m_startKey - m_ghostBounds.lowest, ghostRange) : 0;
+			// Where to stop drawing
+			const int keyEnd = stack ? topKey : m_ghostBounds.highest + 1;
+
+			for (const Note* note : m_ghostNotes)
 			{
-				int len_ticks = note->length();
+				if (note->length() == 0) { continue; }
+				const int noteLen = (note->length() > 0) ? note->length().getTicks() : 4;
+				const int noteWidth = noteLen * m_ppb / TimePos::ticksPerBar();
 
-				if( len_ticks == 0 )
+				for (int posOff = posOffBegin; m_ghostBounds.start + posOff < posEnd; posOff += ghostLength)
 				{
-					continue;
+					for (int keyOff = keyOffBegin; m_ghostBounds.lowest + keyOff < keyEnd; keyOff += ghostRange)
+					{
+						const int pos = note->pos() + posOff;
+						const int key = note->key() + keyOff;
+
+						// skip notes outside visible area
+						if (pos + noteLen <= m_currentPosition || pos >= rightmostTick
+							|| key < m_startKey || key > topKey) { continue; }
+
+						drawNoteRect(
+							p, xCoordOfTick(pos), noteYPos(key), noteWidth,
+							note, m_ghostNoteColor, m_ghostNoteTextColor, m_selectedNoteColor,
+							m_ghostNoteOpacity, m_ghostNoteBorders, drawNoteNames);
+					}
 				}
-				else if( len_ticks < 0 )
-				{
-					len_ticks = 4;
-				}
-
-				int pos_ticks = note->pos();
-
-				int note_width = len_ticks * m_ppb / TimePos::ticksPerBar();
-				const int x = ( pos_ticks - m_currentPosition ) *
-						m_ppb / TimePos::ticksPerBar();
-				// skip this note if not in visible area at all
-				if (!(x + note_width >= 0 && x <= width() - m_whiteKeyWidth))
-				{
-					continue;
-				}
-
-				// is the note in visible area?
-				if (note->key() > bottomKey && note->key() <= topKey)
-				{
-
-					// we've done and checked all, let's draw the note
-					drawNoteRect(
-						p, x + m_whiteKeyWidth, noteYPos(note->key()), note_width,
-						note, m_ghostNoteColor, m_ghostNoteTextColor, m_selectedNoteColor,
-						m_ghostNoteOpacity, m_ghostNoteBorders, drawNoteNames);
-				}
-
 			}
 		}
 		// -- End ghost MIDI clip
@@ -3544,10 +3631,6 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		// -- Knife tool (draw cut line)
 		if (m_action == ActionKnife)
 		{
-			auto xCoordOfTick = [this](int tick) {
-				return m_whiteKeyWidth + (
-					(tick - m_currentPosition) * m_ppb / TimePos::ticksPerBar());
-			};
 			Note* n = noteUnderMouse();
 			if (n)
 			{
@@ -4863,6 +4946,30 @@ PianoRollWindow::PianoRollWindow() :
 
 	notesActionsToolBar->addWidget(noteToolsButton);
 
+	// Ghost note button and menu
+	auto ghostButton = new QToolButton(m_toolBar);
+	auto ghostMenu = new QMenu(ghostButton);
+
+	auto ghostVisibleAction = qActionFromModel(m_editor->m_ghostVisible, tr("Show ghost notes"), this);
+	ghostVisibleAction->setIcon(embed::getIconPixmap("ghost_note"));
+
+	auto setGhostAction = new QAction(tr("Use selection as ghost"), this);
+	connect(setGhostAction, &QAction::triggered, m_editor, &PianoRoll::setGhostNotesFromSelection);
+
+	auto ghostRepeatAction = qActionFromModel(m_editor->m_ghostRepeated, tr("Repeat ghost"), this);
+
+	auto ghostStackAction = qActionFromModel(m_editor->m_ghostStacked, tr("Stack ghost"), this);
+
+	ghostButton->setDefaultAction(ghostVisibleAction);
+	ghostButton->setPopupMode(QToolButton::MenuButtonPopup);
+	ghostButton->setMenu(ghostMenu);
+	ghostMenu->addAction(setGhostAction);
+	ghostMenu->addAction(m_editor->m_pasteGhostAction);
+	ghostMenu->addSeparator();
+	ghostMenu->addAction(ghostRepeatAction);
+	ghostMenu->addAction(ghostStackAction);
+	m_toolBar->addWidget(ghostButton);
+
 	addToolBarBreak();
 
 
@@ -4935,14 +5042,6 @@ PianoRollWindow::PianoRollWindow() :
 	m_snapComboBox->setFixedSize(105, ComboBox::DEFAULT_HEIGHT);
 	m_snapComboBox->setToolTip(tr("Snap mode"));
 
-	// -- Clear ghost MIDI clip button
-	m_clearGhostButton = new QPushButton( m_toolBar );
-	m_clearGhostButton->setIcon( embed::getIconPixmap( "clear_ghost_note" ) );
-	m_clearGhostButton->setToolTip( tr( "Clear ghost notes" ) );
-	m_clearGhostButton->setEnabled( false );
-	connect( m_clearGhostButton, SIGNAL(clicked()), m_editor, SLOT(clearGhostClip()));
-	connect( m_editor, SIGNAL(ghostClipSet(bool)), this, SLOT(ghostClipSet(bool)));
-
 	// Wrap label icons and comboboxes in a single widget so when
 	// the window is resized smaller in width it hides both
 	auto zoom_widget = new QWidget();
@@ -4998,9 +5097,6 @@ PianoRollWindow::PianoRollWindow() :
 	chord_widget->setLayout(chord_hbox);
 	zoomAndNotesToolBar->addSeparator();
 	zoomAndNotesToolBar->addWidget(chord_widget);
-
-	zoomAndNotesToolBar->addSeparator();
-	zoomAndNotesToolBar->addWidget( m_clearGhostButton );
 
 	auto snapWidget = new QWidget();
 	auto snapHbox = new QHBoxLayout();
@@ -5156,6 +5252,9 @@ void PianoRollWindow::saveSettings( QDomDocument & doc, QDomElement & de )
 
 			ghostNotesRoot.appendChild(ghostNoteNode);
 		}
+		ghostNotesRoot.setAttribute("visible", m_editor->m_ghostVisible.value());
+		ghostNotesRoot.setAttribute("repeat", m_editor->m_ghostRepeated.value());
+		ghostNotesRoot.setAttribute("stack", m_editor->m_ghostStacked.value());
 		de.appendChild( ghostNotesRoot );
 	}
 
@@ -5228,14 +5327,6 @@ void PianoRollWindow::clipRenamed()
 		setWindowTitle( tr( "Piano-Roll - no clip" ) );
 		m_fileToolsButton->setEnabled(false);
 	}
-}
-
-
-
-
-void PianoRollWindow::ghostClipSet( bool state )
-{
-	m_clearGhostButton->setEnabled( state );
 }
 
 

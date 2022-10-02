@@ -37,6 +37,7 @@
 #include "MidiClip.h"
 #include "PianoRoll.h"
 #include "RenameDialog.h"
+#include "TextFloat.h"
 #include "TrackView.h"
 
 namespace lmms::gui
@@ -122,9 +123,11 @@ void MidiClipView::openInPianoRoll()
 void MidiClipView::setGhostInPianoRoll()
 {
 	getGUI()->pianoRoll()->setGhostMidiClip( m_clip );
-	getGUI()->pianoRoll()->parentWidget()->show();
-	getGUI()->pianoRoll()->show();
-	getGUI()->pianoRoll()->setFocus();
+	TextFloat::displayMessage(
+		tr("Ghost notes set"),
+		tr("Look inside Piano Roll if you dare!"),
+		embed::getIconPixmap("ghost_note", 24, 24),
+		3000);
 }
 
 

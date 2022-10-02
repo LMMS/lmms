@@ -307,4 +307,36 @@ static float floatFromClipboard(bool* ok)
 }
 
 
+
+
+/*! \brief Return a new QAction connected to a BoolModel
+ *
+ *  This makes it possible to connect a BoolModel to any widget that supports a checkable QAction.
+ *  When the model changes value the QAction gets toggled, and vice versa.
+ */
+QAction* qActionFromModel(BoolModel& model, const QString& text, QObject* parent)
+{
+	auto action = new QAction(text, parent);
+	action->setCheckable(true);
+	/*
+	 * Here we have two lambdas that capture a Model& and a QAction*
+	 * Usually connect() lambda shouldn't capture by reference because the lambda might outlive the captured object.
+	 * But the first argument to connect() should make sure the connection is broken if the object is deleted.
+	 * On the other hand, capturing &action won't work because "action" only exists in the scope of this function.
+	 */
+	action->connect(&model, &Model::dataChanged, action, [&model, action] {
+		if (model.value() != action->isChecked())
+		{
+			action->setChecked(model.value());
+		}
+	});
+	action->connect(action, &QAction::toggled, &model, [&model, action] {
+		if (model.value() != action->isChecked())
+		{
+			model.setValue(action->isChecked());
+		}
+	});
+	return action;
+}
+
 } // namespace lmms::gui
