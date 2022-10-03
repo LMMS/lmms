@@ -502,7 +502,10 @@ void TrackContainerView::scrollArea::wheelEvent( QWheelEvent * _we )
 	}
 }
 
-int TrackContainerView::totalHeightOfTracks()
+
+
+
+unsigned int TrackContainerView::totalHeightOfTracks() const
 {
 	unsigned int heightSum = 0;
 	for (auto & trackView : m_trackViews)
