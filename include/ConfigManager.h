@@ -33,7 +33,6 @@
 #include <QObject>
 
 #include <vector>
-#include <optional>
 #include "lmms_export.h"
 
 

@@ -336,7 +336,6 @@ void ConfigManager::addRecentlyOpenedProject(const QString & file)
 
 QString ConfigManager::value(const QString& cls, const QString& attribute, const QString& defaultVal) const
 {
-	std::optional<QString> val;
 	if (m_settings.find(cls) != m_settings.end())
 	{
 		for (const auto& setting : m_settings[cls])
@@ -347,8 +346,8 @@ QString ConfigManager::value(const QString& cls, const QString& attribute, const
 			}
 		}
 	}
-
-	return val.value_or(defaultVal);
+	
+	return defaultVal;
 }
 
 
