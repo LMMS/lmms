@@ -346,7 +346,6 @@ QString ConfigManager::value(const QString& cls, const QString& attribute, const
 			}
 		}
 	}
-	
 	return defaultVal;
 }
 
