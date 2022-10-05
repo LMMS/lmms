@@ -1169,7 +1169,6 @@ void Sf2InstrumentView::showPatchDialog()
 
 extern "C"
 {
-
 // necessary for getting instance out of shared lib
 PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
