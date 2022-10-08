@@ -87,7 +87,7 @@ if [[ -z $LINUXDEPLOYQT || -z $APPIMAGETOOL ]]; then
 	# Also, we need to set LD_LIBRARY_PATH, but linuxdepoyqt's AppRun unsets it
 	# See https://github.com/probonopd/linuxdeployqt/pull/370/
 	chmod +x "$filename"
-	"$filename" --appimage-extract > /dev/null 2>&1
+	./"$filename" --appimage-extract >/dev/null
 	success "Extracted $filename"
 
 	# We set PATH earlier to include the extracted ./squashfs-root
