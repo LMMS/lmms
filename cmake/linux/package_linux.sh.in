@@ -60,9 +60,8 @@ if [ "$INSTALL" == "/usr/local" ] || [ "$INSTALL" == "/usr" ] ; then
 	error "Incompatible CMAKE_INSTALL_PREFIX for creating AppImage: @CMAKE_INSTALL_PREFIX@"
 fi
 
-# Include content of linuxdeployqt's extracted AppImage in PATH
 # Ensure linuxdeployqt uses the same qmake version as cmake
-PATH="$(pwd -P)/squashfs-root/usr/bin:$(dirname "@QT_QMAKE_EXECUTABLE@")":$PATH
+PATH="$(dirname "@QT_QMAKE_EXECUTABLE@"):$PATH"
 export PATH
 
 # Use linuxdeployqt from env or in PATH
@@ -90,7 +89,8 @@ if [[ -z $LINUXDEPLOYQT || -z $APPIMAGETOOL ]]; then
 	./"$filename" --appimage-extract >/dev/null
 	success "Extracted $filename"
 
-	# We set PATH earlier to include the extracted ./squashfs-root
+	# Use the extracted linuxdeployqt and appimagetool
+	PATH="$(pwd -P)/squashfs-root/usr/bin:$PATH"
 	[[ $LINUXDEPLOYQT ]] || LINUXDEPLOYQT="$(which linuxdeployqt)"
 	[[ $APPIMAGETOOL ]] || APPIMAGETOOL="$(which appimagetool)"
 fi
