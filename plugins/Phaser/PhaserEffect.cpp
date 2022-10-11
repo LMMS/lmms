@@ -68,11 +68,6 @@ PhaserEffect::PhaserEffect(Model* parent, const Descriptor::SubPluginFeatures::K
 
 	m_lfo->setFrequency(1.0 / m_phaserControls.m_rateModel.value());
 	
-	m_oversampleAnalogIn1.resize(2);
-	m_oversampleAnalogIn2.resize(2);
-	m_oversampleAnalogOut.resize(2);
-	m_oversampleFeedbackIn.resize(2);
-	m_oversampleFeedbackOut.resize(2);
 	for (int i = 0; i < 2; ++i)
 	{
 		m_oversampleAnalogIn1[i] = new LinkwitzRiley<2>(Engine::audioEngine()->processingSampleRate() * 2);

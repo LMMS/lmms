@@ -100,11 +100,11 @@ private:
 
 	float m_aliasFlip = 1;
 	
-	std::vector<LinkwitzRiley<2>*> m_oversampleAnalogIn1;
-	std::vector<LinkwitzRiley<2>*> m_oversampleAnalogIn2;
-	std::vector<LinkwitzRiley<2>*> m_oversampleAnalogOut;
-	std::vector<LinkwitzRiley<2>*> m_oversampleFeedbackIn;
-	std::vector<LinkwitzRiley<2>*> m_oversampleFeedbackOut;
+	LinkwitzRiley<2>* m_oversampleAnalogIn1[2];
+	LinkwitzRiley<2>* m_oversampleAnalogIn2[2];
+	LinkwitzRiley<2>* m_oversampleAnalogOut[2];
+	LinkwitzRiley<2>* m_oversampleFeedbackIn[2];
+	LinkwitzRiley<2>* m_oversampleFeedbackOut[2];
 
 	friend class PhaserControls;
 
