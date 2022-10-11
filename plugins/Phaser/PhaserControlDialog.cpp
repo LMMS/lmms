@@ -239,5 +239,4 @@ void PhaserControlDialog::updateSliders()
 		log2(PHA_MAX_FREQ / PHA_MIN_FREQ) * PHA_DOT_SLIDER_LENGTH)) + 12, 183);
 }
 
-}
-
+} // namespace lmms::gui

@@ -101,7 +101,6 @@ PhaserEffect::PhaserEffect(Model* parent, const Descriptor::SubPluginFeatures::K
 }
 
 
-
 PhaserEffect::~PhaserEffect()
 {
 	delete m_lfo;
@@ -115,7 +114,6 @@ PhaserEffect::~PhaserEffect()
 		delete m_oversampleFeedbackOut[i];
 	}
 }
-
 
 
 void PhaserEffect::calcAttack()
@@ -142,8 +140,6 @@ void PhaserEffect::calcPhase()
 {
 	m_lfo->setOffset(m_phaserControls.m_phaseModel.value() / 180 * D_PI);
 }
-
-
 
 
 bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
@@ -606,7 +602,6 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 }
 
 
-
 sample_t PhaserEffect::calcAllpassFilter(sample_t inSamp, sample_rate_t Fs, int filtNum, int channel, float apCoeff1, float apCoeff2)
 {
 	// The original formula can be found here: https://pastebin.com/AyMH6k36
@@ -669,13 +664,11 @@ void PhaserEffect::restartLFO()
 }
 
 
-
 // Takes input of original Hz and the number of cents to detune it by, and returns the detuned result in Hz.
 float PhaserEffect::detuneWithOctaves(float pitchValue, float detuneValue)
 {
 	return pitchValue * std::exp2(detuneValue); 
 }
-
 
 
 extern "C"
@@ -686,8 +679,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main(Model* parent, void* data)
 {
 	return new PhaserEffect(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(data));
 }
-
 }
-
 
 } // namespace lmms
