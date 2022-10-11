@@ -120,12 +120,12 @@ PhaserEffect::~PhaserEffect()
 
 void PhaserEffect::calcAttack()
 {
-	m_attCoeff = exp10((PHA_LOG / (m_phaserControls.m_attackModel.value() * 0.001)) / Engine::audioEngine()->processingSampleRate());
+	m_attCoeff = pow(10.f, (PHA_LOG / (m_phaserControls.m_attackModel.value() * 0.001)) / Engine::audioEngine()->processingSampleRate());
 }
 
 void PhaserEffect::calcRelease()
 {
-	m_relCoeff = exp10((-PHA_LOG / (m_phaserControls.m_releaseModel.value() * 0.001)) / Engine::audioEngine()->processingSampleRate());
+	m_relCoeff = pow(10.f, (-PHA_LOG / (m_phaserControls.m_releaseModel.value() * 0.001)) / Engine::audioEngine()->processingSampleRate());
 }
 
 void PhaserEffect::calcOutGain()
