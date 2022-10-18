@@ -50,8 +50,7 @@ jobs:
       - name: Package
         run: |
           cmake --build build --target install
-          cmake --build build --target appimage \
-            || (cat build/appimage.log && false)
+          cmake --build build --target appimage
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
