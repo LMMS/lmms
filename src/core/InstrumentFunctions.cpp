@@ -358,7 +358,7 @@ void InstrumentFunctionArpeggio::updateNoteRange()
 	const int cur_chord_size = chord_table.chords()[m_arpModel.value()].size();
 	float noteRange = m_arpRangeModel.value() * cur_chord_size;
 
-	m_arpCycleModel.setRange( 0.0f, noteRange );
+	m_arpCycleModel.setRange( 0.0f, noteRange - 1 );
 
 	if( sticky )
 	{
