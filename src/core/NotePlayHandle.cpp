@@ -527,7 +527,7 @@ void NotePlayHandle::updateFrequency()
 	if (m_instrumentTrack->m_microtuner.enabled())
 	{
 		// custom key mapping and scale: get frequency from the microtuner
-		const int transposedKey = key() + masterPitch;
+		const auto transposedKey = key() + masterPitch;
 
 		if (m_instrumentTrack->isKeyMapped(transposedKey))
 		{
