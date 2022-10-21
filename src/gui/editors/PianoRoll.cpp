@@ -61,11 +61,13 @@
 #include "GuiApplication.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
+#include "Keymap.h"
 #include "MainWindow.h"
 #include "MidiClip.h"
 #include "PatternStore.h"
 #include "PianoView.h"
 #include "PositionLine.h"
+#include "Scale.h"
 #include "SongEditor.h"
 #include "StepRecorderWidget.h"
 #include "TextFloat.h"
@@ -1310,16 +1312,34 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 				int direction = (ke->key() == Qt::Key_Up ? +1 : -1);
 				if( ( ke->modifiers() & Qt::ControlModifier ) && m_action == ActionNone )
 				{
-					// shift selection up an octave
+					// shift selection by one octave
 					// if nothing selected, shift _everything_
 					if (hasValidMidiClip())
 					{
-						shiftSemiTone( 12 * direction );
+						// An octave could potentially be greater or less than twelve semitones if the microtuner is in use.
+						if (m_midiClip->instrumentTrack()->microtuner()->enabled())
+						{
+							int keymapSize = Engine::getSong()->getKeymap(m_midiClip->instrumentTrack()->microtuner()->currentKeymap())->getSize();
+							if (keymapSize > 0)
+							{
+								shiftSemiTone(keymapSize * direction);
+							}
+							else
+							{
+								// Determine octave size from the scale if the keymap isn't in use.
+								int scaleSize = Engine::getSong()->getScale(m_midiClip->instrumentTrack()->microtuner()->currentScale())->getIntervals().size() - 1;
+								shiftSemiTone(scaleSize * direction);
+							}
+						}
+						else
+						{
+							shiftSemiTone(12 * direction);
+						}
 					}
 				}
 				else if((ke->modifiers() & Qt::ShiftModifier) && m_action == ActionNone)
 				{
-					// Move selected notes up by one semitone
+					// Move selected notes by one semitone
 					if (hasValidMidiClip())
 					{
 						shiftSemiTone( 1 * direction );
