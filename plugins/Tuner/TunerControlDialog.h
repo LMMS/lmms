@@ -34,13 +34,32 @@ class TunerControls;
 class TunerControlDialog : public EffectControlDialog
 {
 public:
+	enum class NoteName 
+	{
+		A,
+		ASharp,
+		B,
+		C,
+		CSharp,
+		D,
+		DSharp,
+		E,
+		F,
+		FSharp,
+		G,
+		GSharp
+	};
+	
 	TunerControlDialog(TunerControls* controls);
+	void paintEvent(QPaintEvent* event) override;
+	void frequencyCalculated(float frequency);
 
 private:
 	LcdWidget* m_centsWidget;
 	LcdWidget* m_freqWidget;
 	QLabel* m_noteLabel;
-
+	QLabel* m_octaveLabel;
+	QLabel* m_centsLabel;
 	friend class TunerControls;
 };
 

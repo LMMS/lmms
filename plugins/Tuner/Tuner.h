@@ -31,10 +31,10 @@
 
 #include "Effect.h"
 #include "TunerControls.h"
-#include "TunerNote.h"
 
 class Tuner : public Effect
 {
+	Q_OBJECT
 public:
 	Tuner(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~Tuner() override;
@@ -42,23 +42,20 @@ public:
 	bool processAudioBuffer(sampleFrame* buf, const fpp_t frames) override;
 	EffectControls* controls() override;
 
-	void syncReferenceFrequency();
+signals:
+	void frequencyCalculated(float frequency);
 
 private:
 	TunerControls m_tunerControls;
-	TunerNote m_referenceNote;
+	float m_referenceFrequency = 0;
 
-	int m_aubioFramesCounter = 0;
-	int m_aubioWindowSize = 8192;
-	int m_aubioHopSize = 4096;
+	const int m_windowSize = 8192;
+	const int m_hopSize = 128;
+	int m_samplesCounter = 0;
 
 	aubio_pitch_t* m_aubioPitch;
-	fvec_t* m_aubioInputBuffer;
-	fvec_t* m_aubioOutputBuffer;
-
-	std::chrono::time_point<std::chrono::system_clock> m_intervalStart;
-	std::chrono::milliseconds m_interval;
-
+	fvec_t* m_inputBuffer;
+	fvec_t* m_outputBuffer;
 	friend class TunerControls;
 };
 

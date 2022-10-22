@@ -47,20 +47,17 @@ Plugin* PLUGIN_EXPORT lmms_plugin_main(Model* parent, void* _data)
 Tuner::Tuner(Model* parent, const Descriptor::SubPluginFeatures::Key* key)
 	: Effect(&tuner_plugin_descriptor, parent, key)
 	, m_tunerControls(this)
-	, m_referenceNote(TunerNote::NoteName::A, 4, 440.0f)
-	, m_aubioPitch(
-		  new_aubio_pitch("default", m_aubioWindowSize, m_aubioHopSize, Engine::audioEngine()->processingSampleRate()))
-	, m_aubioInputBuffer(new_fvec(m_aubioHopSize))
-	, m_aubioOutputBuffer(new_fvec(1))
-	, m_intervalStart(std::chrono::system_clock::now())
-	, m_interval(100)
+	, m_referenceFrequency(440.0f)
+	, m_aubioPitch(new_aubio_pitch("default", m_windowSize, m_hopSize, Engine::audioEngine()->processingSampleRate()))
+	, m_inputBuffer(new_fvec(m_hopSize))
+	, m_outputBuffer(new_fvec(1))
 {
 }
 
 Tuner::~Tuner()
 {
-	del_fvec(m_aubioInputBuffer);
-	del_fvec(m_aubioOutputBuffer);
+	del_fvec(m_inputBuffer);
+	del_fvec(m_outputBuffer);
 	del_aubio_pitch(m_aubioPitch);
 }
 
@@ -74,41 +71,24 @@ bool Tuner::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 	}
 
-	auto duration
-		= std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - m_intervalStart);
-	if (outSum > 0.0f && duration.count() >= m_interval.count())
+	if (outSum > 0.0f) 
 	{
-		int numFramesToAdd = std::min(m_aubioHopSize - m_aubioFramesCounter, static_cast<int>(frames));
-		if (numFramesToAdd > 0)
+		for (int i = 0; i < frames; ++i)
 		{
-			for (int i = 0; i < numFramesToAdd; ++i)
+			if (m_samplesCounter % m_hopSize == 0 && m_samplesCounter > 0) 
 			{
-				fvec_set_sample(m_aubioInputBuffer, (buf[i][0] + buf[i][1]) * 0.5f, m_aubioFramesCounter + i);
+				aubio_pitch_do(m_aubioPitch, m_inputBuffer, m_outputBuffer);
+				emit frequencyCalculated(fvec_get_sample(m_outputBuffer, 0));
+				m_samplesCounter = 0;
 			}
 
-			m_aubioFramesCounter += numFramesToAdd;
-		}
-		else
-		{
-			aubio_pitch_do(m_aubioPitch, m_aubioInputBuffer, m_aubioOutputBuffer);
-
-			float pitch = fvec_get_sample(m_aubioOutputBuffer, 0);
-			auto note = m_referenceNote.calculateNoteFromFrequency(pitch);
-			m_aubioFramesCounter = 0;
-
-			m_tunerControls.updateView(note);
-			m_intervalStart = std::chrono::system_clock::now();
+			fvec_set_sample(m_inputBuffer, (buf[i][0] + buf[i][1]) * 0.5f, m_samplesCounter);
+			++m_samplesCounter;
 		}
 	}
 
 	checkGate(outSum / frames);
 	return isRunning();
-}
-
-void Tuner::syncReferenceFrequency()
-{
-	float reference_freq = m_tunerControls.m_referenceFreqModel.value();
-	m_referenceNote.setFrequency(reference_freq);
 }
 
 EffectControls* Tuner::controls()

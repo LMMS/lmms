@@ -28,7 +28,6 @@
 #include "EffectControls.h"
 #include "LcdSpinBox.h"
 #include "TunerControlDialog.h"
-#include "TunerNote.h"
 
 class Tuner;
 class TunerControls : public EffectControls
@@ -43,7 +42,6 @@ public:
 	int controlCount() override;
 
 	EffectControlDialog* createView() override;
-	void updateView(TunerNote note);
 
 private:
 	Tuner* m_tuner = nullptr;
