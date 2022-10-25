@@ -1320,17 +1320,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 						auto microtuner = m_midiClip->instrumentTrack()->microtuner();
 						if (microtuner->enabled())
 						{
-							int keymapSize = Engine::getSong()->getKeymap(microtuner->currentKeymap())->getSize();
-							if (keymapSize > 0)
-							{
-								shiftSemiTone(keymapSize * direction);
-							}
-							else
-							{
-								// Determine octave size from the scale if the keymap isn't in use.
-								int scaleSize = Engine::getSong()->getScale(microtuner->currentScale())->getIntervals().size() - 1;
-								shiftSemiTone(scaleSize * direction);
-							}
+							shiftSemiTone(microtuner->octaveSize() * direction);
 						}
 						else
 						{
