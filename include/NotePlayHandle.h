@@ -353,6 +353,7 @@ public:
 	static void release( NotePlayHandle * nph );
 	static void extend( int i );
 	static void free();
+	static void freeAvailable();
 
 private:
 	static NotePlayHandle ** s_available;
