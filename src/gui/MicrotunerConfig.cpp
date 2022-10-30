@@ -105,7 +105,7 @@ MicrotunerConfig::MicrotunerConfig() :
 	microtunerLayout->addWidget(m_scaleTextEdit, 4, 0, 2, 2);
 
 	auto applyScaleButton = new QPushButton(tr("Apply scale changes"));
-	applyScaleButton->setToolTip(tr("Verify and apply changes made to the selected scale. To use the scale, set it as active in the settings of a supported instrument."));
+	applyScaleButton->setToolTip(tr("Verify and apply changes made to the selected scale. To use the scale, select it in the settings of a supported instrument."));
 	microtunerLayout->addWidget(applyScaleButton, 6, 0, 1, 2);
 	connect(applyScaleButton, &QPushButton::clicked, [=] {applyScale();});
 
@@ -177,7 +177,7 @@ MicrotunerConfig::MicrotunerConfig() :
 	keymapRangeLayout->addWidget(baseFreqSpin, 1, 1, 1, 2);
 
 	auto applyKeymapButton = new QPushButton(tr("Apply keymap changes"));
-	applyKeymapButton->setToolTip(tr("Verify and apply changes made to the selected key mapping. To use the mapping, set it as active in the settings of a supported instrument."));
+	applyKeymapButton->setToolTip(tr("Verify and apply changes made to the selected key mapping. To use the mapping, select it in the settings of a supported instrument."));
 	microtunerLayout->addWidget(applyKeymapButton, 6, 2, 1, 2);
 	connect(applyKeymapButton, &QPushButton::clicked, [=] {applyKeymap();});
 
