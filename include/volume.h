@@ -28,13 +28,19 @@
 
 #include "lmms_basics.h"
 
+namespace lmms
+{
+
+
 constexpr volume_t MinVolume = 0;
 constexpr volume_t MaxVolume = 200;
 constexpr volume_t DefaultVolume = 100;
 
-typedef struct
+struct StereoVolumeVector
 {
 	float vol[2];
-} stereoVolumeVector;
+};
+
+} // namespace lmms
 
 #endif

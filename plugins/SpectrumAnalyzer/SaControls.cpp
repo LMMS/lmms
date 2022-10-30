@@ -24,10 +24,13 @@
 
 #include "SaControls.h"
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "Analyzer.h"
 #include "SaControlsDialog.h"
+
+namespace lmms
+{
 
 
 SaControls::SaControls(Analyzer *effect) :
@@ -121,9 +124,9 @@ SaControls::SaControls(Analyzer *effect) :
 
 
 // Create the SaControlDialog widget which handles display of GUI elements.
-EffectControlDialog* SaControls::createView()
+gui::EffectControlDialog* SaControls::createView()
 {
-	return new SaControlsDialog(this, m_effect->getProcessor());
+	return new gui::SaControlsDialog(this, m_effect->getProcessor());
 }
 
 
@@ -174,3 +177,6 @@ void SaControls::saveSettings(QDomDocument &doc, QDomElement &parent)
 	m_zeroPaddingModel.saveSettings(doc, parent, "ZeroPadding");
 
 }
+
+
+} // namespace lmms

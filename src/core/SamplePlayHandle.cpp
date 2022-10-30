@@ -25,12 +25,14 @@
 #include "SamplePlayHandle.h"
 #include "AudioEngine.h"
 #include "AudioPort.h"
-#include "BBTrack.h"
 #include "Engine.h"
-#include "InstrumentTrack.h"
-#include "lmms_constants.h"
-#include "SampleTCO.h"
+#include "Note.h"
+#include "PatternTrack.h"
+#include "SampleClip.h"
+#include "SampleTrack.h"
 
+namespace lmms
+{
 
 
 SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer , bool ownAudioPort ) :
@@ -42,7 +44,7 @@ SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer , bool ownAudioPo
 	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
 	m_track( nullptr ),
-	m_bbTrack( nullptr )
+	m_patternTrack( nullptr )
 {
 	if (ownAudioPort)
 	{
@@ -62,11 +64,11 @@ SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
 
 
 
-SamplePlayHandle::SamplePlayHandle( SampleTCO* tco ) :
-	SamplePlayHandle( tco->sampleBuffer() , false)
+SamplePlayHandle::SamplePlayHandle( SampleClip* clip ) :
+	SamplePlayHandle( clip->sampleBuffer() , false)
 {
-	m_track = tco->getTrack();
-	setAudioPort( ( (SampleTrack *)tco->getTrack() )->audioPort() );
+	m_track = clip->getTrack();
+	setAudioPort( ( (SampleTrack *)clip->getTrack() )->audioPort() );
 }
 
 
@@ -106,9 +108,9 @@ void SamplePlayHandle::play( sampleFrame * buffer )
 	}
 
 	if( !( m_track && m_track->isMuted() )
-				&& !( m_bbTrack && m_bbTrack->isMuted() ) )
+				&& !(m_patternTrack && m_patternTrack->isMuted()))
 	{
-/*		stereoVolumeVector v =
+/*		StereoVolumeVector v =
 			{ { m_volumeModel->value() / DefaultVolume,
 				m_volumeModel->value() / DefaultVolume } };*/
 		// SamplePlayHandle always plays the sample at its original pitch;
@@ -135,7 +137,7 @@ bool SamplePlayHandle::isFinished() const
 
 bool SamplePlayHandle::isFromTrack( const Track * _track ) const
 {
-	return m_track == _track || m_bbTrack == _track;
+	return m_track == _track || m_patternTrack == _track;
 }
 
 
@@ -148,5 +150,4 @@ f_cnt_t SamplePlayHandle::totalFrames() const
 }
 
 
-
-
+} // namespace lmms

@@ -3,7 +3,7 @@
 <multimediaproject version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings>
-    <instrumenttrack muted="0" fxch="0" vol="59" name="Harp of a Fairy">
+    <instrumenttrack muted="0" mixch="0" vol="59" name="Harp of a Fairy">
       <tripleoscillator phoffset2="0" finer0="0" finer1="0" finer2="0" coarse0="-12" coarse1="0" coarse2="12" finel0="0" finel1="0" modalgo1="2" finel2="0" modalgo2="2" pan0="0" pan1="0" stphdetun0="0" pan2="0" stphdetun1="0" stphdetun2="0" wavetype0="0" wavetype1="1" wavetype2="0" vol0="35" vol1="35" phoffset0="0" vol2="35" phoffset1="89"/>
       <eldata fres="2" ftype="1" fcut="1457" fwet="0">
         <elvol lpdel="0" amt="1" rel="0.297" latt="0" sus="0.6" lspd="0.1" att="0.04" pdel="0" lamt="0" dec="0.15" x100="0" lshp="0" hold="0"/>

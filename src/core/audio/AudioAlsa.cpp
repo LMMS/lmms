@@ -22,8 +22,6 @@
  *
  */
 
-#include <QComboBox>
-#include <QLineEdit>
 
 #include "AudioAlsa.h"
 
@@ -33,8 +31,9 @@
 #include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "Engine.h"
-#include "gui_templates.h"
 
+namespace lmms
+{
 
 AudioAlsa::AudioAlsa( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	AudioDevice( qBound<ch_cnt_t>(
@@ -296,9 +295,9 @@ void AudioAlsa::applyQualitySettings()
 
 void AudioAlsa::run()
 {
-	surroundSampleFrame * temp = new surroundSampleFrame[audioEngine()->framesPerPeriod()];
-	int_sample_t * outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];
-	int_sample_t * pcmbuf = new int_sample_t[m_periodSize * channels()];
+	auto temp = new surroundSampleFrame[audioEngine()->framesPerPeriod()];
+	auto outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];
+	auto pcmbuf = new int_sample_t[m_periodSize * channels()];
 
 	int outbuf_size = audioEngine()->framesPerPeriod() * channels();
 	int outbuf_pos = 0;
@@ -541,4 +540,6 @@ int AudioAlsa::setSWParams()
 	return 0;	// all ok
 }
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_HAVE_ALSA

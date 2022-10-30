@@ -25,21 +25,24 @@
 
 #include "SampleRecordHandle.h"
 #include "AudioEngine.h"
-#include "BBTrack.h"
 #include "Engine.h"
-#include "InstrumentTrack.h"
+#include "PatternTrack.h"
 #include "SampleBuffer.h"
-#include "SampleTrack.h"
+#include "SampleClip.h"
 #include "debug.h"
 
 
-SampleRecordHandle::SampleRecordHandle( SampleTCO* tco ) :
+namespace lmms
+{
+
+
+SampleRecordHandle::SampleRecordHandle( SampleClip* clip ) :
 	PlayHandle( TypeSamplePlayHandle ),
 	m_framesRecorded( 0 ),
-	m_minLength( tco->length() ),
-	m_track( tco->getTrack() ),
-	m_bbTrack( nullptr ),
-	m_tco( tco )
+	m_minLength( clip->length() ),
+	m_track( clip->getTrack() ),
+	m_patternTrack( nullptr ),
+	m_clip( clip )
 {
 }
 
@@ -52,7 +55,7 @@ SampleRecordHandle::~SampleRecordHandle()
 	{
 		SampleBuffer* sb;
 		createSampleBuffer( &sb );
-		m_tco->setSampleBuffer( sb );
+		m_clip->setSampleBuffer( sb );
 	}
 	
 	while( !m_buffers.empty() )
@@ -60,7 +63,7 @@ SampleRecordHandle::~SampleRecordHandle()
 		delete[] m_buffers.front().first;
 		m_buffers.erase( m_buffers.begin() );
 	}
-	m_tco->setRecord( false );
+	m_clip->setRecord( false );
 }
 
 
@@ -76,7 +79,7 @@ void SampleRecordHandle::play( sampleFrame * /*_working_buffer*/ )
 	TimePos len = (tick_t)( m_framesRecorded / Engine::framesPerTick() );
 	if( len > m_minLength )
 	{
-//		m_tco->changeLength( len );
+//		m_clip->changeLength( len );
 		m_minLength = len;
 	}
 }
@@ -94,7 +97,7 @@ bool SampleRecordHandle::isFinished() const
 
 bool SampleRecordHandle::isFromTrack( const Track * _track ) const
 {
-	return( m_track == _track || m_bbTrack == _track );
+	return (m_track == _track || m_patternTrack == _track);
 }
 
 
@@ -112,7 +115,7 @@ void SampleRecordHandle::createSampleBuffer( SampleBuffer** sampleBuf )
 {
 	const f_cnt_t frames = framesRecorded();
 	// create buffer to store all recorded buffers in
-	sampleFrame * data = new sampleFrame[frames];
+	auto data = new sampleFrame[frames];
 	// make sure buffer is cleaned up properly at the end...
 	sampleFrame * data_ptr = data;
 
@@ -137,7 +140,7 @@ void SampleRecordHandle::createSampleBuffer( SampleBuffer** sampleBuf )
 
 void SampleRecordHandle::writeBuffer( const sampleFrame * _ab, const f_cnt_t _frames )
 {
-	sampleFrame * buf = new sampleFrame[_frames];
+	auto buf = new sampleFrame[_frames];
 	for( f_cnt_t frame = 0; frame < _frames; ++frame )
 	{
 		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
@@ -149,4 +152,4 @@ void SampleRecordHandle::writeBuffer( const sampleFrame * _ab, const f_cnt_t _fr
 }
 
 
-
+} // namespace lmms

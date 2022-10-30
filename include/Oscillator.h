@@ -28,11 +28,7 @@
 
 #include <cassert>
 #include <fftw3.h>
-#include <math.h>
-
-#ifdef LMMS_HAVE_STDLIB_H
-#include <stdlib.h>
-#endif
+#include <cstdlib>
 
 #include "Engine.h"
 #include "lmms_constants.h"
@@ -40,6 +36,10 @@
 #include "AudioEngine.h"
 #include "OscillatorConstants.h"
 #include "SampleBuffer.h"
+
+namespace lmms
+{
+
 
 class IntModel;
 
@@ -310,5 +310,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

@@ -29,10 +29,16 @@
 
 #include <QWidget>
 
+namespace lmms
+{
+
+class InstrumentTrack;
+
+namespace gui
+{
 
 class ComboBox;
 class GroupBox;
-class InstrumentTrack;
 class LedCheckBox;
 class QLabel;
 
@@ -64,5 +70,10 @@ private:
 
 	LedCheckBox *m_rangeImportCheckbox;
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

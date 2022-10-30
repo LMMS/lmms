@@ -24,10 +24,13 @@
 
 #include "MidiAlsaRaw.h"
 #include "ConfigManager.h"
-#include "gui_templates.h"
 
 
 #ifdef LMMS_HAVE_ALSA
+
+
+namespace lmms
+{
 
 
 MidiAlsaRaw::MidiAlsaRaw() :
@@ -170,5 +173,7 @@ void MidiAlsaRaw::run()
 
 }
 
-#endif
 
+} // namespace lmms
+
+#endif // LMMS_HAVE_ALSA

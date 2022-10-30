@@ -24,7 +24,6 @@
 
 #include <memory>
 #include <QApplication>
-#include <QBitmap>
 #include <QFontMetrics>
 #include <QInputDialog>
 #include <QMouseEvent>
@@ -46,9 +45,12 @@
 #include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "ProjectJournal.h"
-#include "Song.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
+
+
+namespace lmms::gui
+{
 
 TextFloat * Knob::s_textFloat = nullptr;
 
@@ -513,7 +515,7 @@ void Knob::contextMenuEvent( QContextMenuEvent * )
 	addDefaultActions( &contextMenu );
 	contextMenu.addAction( QPixmap(),
 		model()->isScaleLogarithmic() ? tr( "Set linear" ) : tr( "Set logarithmic" ),
-		this, SLOT( toggleScale() ) );
+		this, SLOT(toggleScale()));
 	contextMenu.addSeparator();
 	contextMenu.exec( QCursor::pos() );
 }
@@ -547,9 +549,7 @@ void Knob::dropEvent( QDropEvent * _de )
 	}
 	else if( type == "automatable_model" )
 	{
-		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
-				Engine::projectJournal()->
-					journallingObject( val.toInt() ) );
+		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
 		if( mod != nullptr )
 		{
 			AutomatableModel::linkModels( model(), mod );
@@ -707,7 +707,7 @@ void Knob::wheelEvent(QWheelEvent * we)
 void Knob::setPosition( const QPoint & _p )
 {
 	const float value = getValue( _p ) + m_leftOver;
-	const float step = model()->step<float>();
+	const auto step = model()->step<float>();
 	const float oldValue = model()->value();
 
 
@@ -827,11 +827,11 @@ void Knob::doConnections()
 {
 	if( model() != nullptr )
 	{
-		QObject::connect( model(), SIGNAL( dataChanged() ),
-					this, SLOT( friendlyUpdate() ) );
+		QObject::connect( model(), SIGNAL(dataChanged()),
+					this, SLOT(friendlyUpdate()));
 
-		QObject::connect( model(), SIGNAL( propertiesChanged() ),
-						this, SLOT( update() ) );
+		QObject::connect( model(), SIGNAL(propertiesChanged()),
+						this, SLOT(update()));
 	}
 }
 
@@ -866,3 +866,6 @@ void convertPixmapToGrayScale(QPixmap& pixMap)
 	}
 	pixMap.convertFromImage(temp);
 }
+
+
+} // namespace lmms::gui

@@ -27,7 +27,6 @@
 #define PROJECT_NOTES_H
 
 #include <QMainWindow>
-#include <QCloseEvent>
 
 #include "SerializingObject.h"
 
@@ -36,13 +35,16 @@ class QComboBox;
 class QTextCharFormat;
 class QTextEdit;
 
+namespace lmms::gui
+{
+
 
 class LMMS_EXPORT ProjectNotes : public QMainWindow, public SerializingObject
 {
 	Q_OBJECT
 public:
 	ProjectNotes();
-	virtual ~ProjectNotes();
+	~ProjectNotes() override = default;
 
 	void clear();
 	void setText( const QString & _text );
@@ -89,5 +91,7 @@ private:
 
 } ;
 
+
+} // namespace lmms::gui
 
 #endif

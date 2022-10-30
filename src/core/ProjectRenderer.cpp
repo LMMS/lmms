@@ -34,9 +34,10 @@
 #include "AudioFileMP3.h"
 #include "AudioFileFlac.h"
 
-#ifdef LMMS_HAVE_SCHED_H
-#include "sched.h"
-#endif
+
+namespace lmms
+{
+
 
 const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 {
@@ -102,13 +103,6 @@ ProjectRenderer::ProjectRenderer( const AudioEngine::qualitySettings & qualitySe
 			m_fileDev = nullptr;
 		}
 	}
-}
-
-
-
-
-ProjectRenderer::~ProjectRenderer()
-{
 }
 
 
@@ -239,7 +233,7 @@ void ProjectRenderer::updateConsoleProgress()
 	}
 	prog[cols] = 0;
 
-	const char * activity = (const char *) "|/-\\";
+	const auto activity = (const char*)"|/-\\";
 	memset( buf, 0, sizeof( buf ) );
 	sprintf( buf, "\r|%s|    %3d%%   %c  ", prog, m_progress,
 							activity[rot] );
@@ -250,3 +244,4 @@ void ProjectRenderer::updateConsoleProgress()
 }
 
 
+} // namespace lmms

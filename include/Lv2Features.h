@@ -29,10 +29,13 @@
 
 #ifdef LMMS_HAVE_LV2
 
-#include <lv2.h>
 #include <map>
 #include <vector>
 #include "Lv2Manager.h"
+
+
+namespace lmms
+{
 
 /**
 	Feature container
@@ -75,6 +78,9 @@ private:
 	//! features + data, ordered by URI
 	std::map<const char*, void*, Lv2Manager::CmpStr> m_featureByUri;
 };
+
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2
 

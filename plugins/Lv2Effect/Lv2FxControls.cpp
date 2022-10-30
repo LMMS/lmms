@@ -29,9 +29,9 @@
 #include "Engine.h"
 #include "Lv2Effect.h"
 #include "Lv2FxControlDialog.h"
-#include "Lv2Proc.h"
 
-
+namespace lmms
+{
 
 
 Lv2FxControls::Lv2FxControls(class Lv2Effect *effect, const QString& uri) :
@@ -72,9 +72,9 @@ int Lv2FxControls::controlCount()
 
 
 
-EffectControlDialog *Lv2FxControls::createView()
+gui::EffectControlDialog *Lv2FxControls::createView()
 {
-	return new Lv2FxControlDialog(this);
+	return new gui::Lv2FxControlDialog(this);
 }
 
 
@@ -102,3 +102,4 @@ void Lv2FxControls::setNameFromFile(const QString &name)
 }
 
 
+} // namespace lmms

@@ -25,9 +25,19 @@
 #ifndef DUMMY_EFFECT_H
 #define DUMMY_EFFECT_H
 
+#include <QDomElement>
+
 #include "Effect.h"
 #include "EffectControls.h"
 #include "EffectControlDialog.h"
+
+namespace lmms
+{
+
+namespace gui
+{
+
+class Knob;
 
 
 class DummyEffectControlDialog : public EffectControlDialog
@@ -40,6 +50,7 @@ public:
 
 } ;
 
+} // namespace gui
 
 class DummyEffectControls : public EffectControls
 {
@@ -49,9 +60,7 @@ public:
 	{
 	}
 
-	virtual ~DummyEffectControls()
-	{
-	}
+	~DummyEffectControls() override = default;
 
 	int controlCount() override
 	{
@@ -71,9 +80,9 @@ public:
 		return "DummyControls";
 	}
 
-	EffectControlDialog * createView() override
+	gui::EffectControlDialog * createView() override
 	{
-		return new DummyEffectControlDialog( this );
+		return new gui::DummyEffectControlDialog( this );
 	}
 } ;
 
@@ -91,9 +100,7 @@ public:
 		setName();
 	}
 
-	virtual ~DummyEffect()
-	{
-	}
+	~DummyEffect() override = default;
 
 	EffectControls * controls() override
 	{
@@ -139,5 +146,7 @@ private:
 	}
 } ;
 
+
+} // namespace lmms
 
 #endif

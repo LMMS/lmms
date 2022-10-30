@@ -28,6 +28,9 @@
 
 #include <atomic>
 
+namespace lmms
+{
+
 class sharedObject
 {
 public:
@@ -36,9 +39,7 @@ public:
 	{
 	}
 
-	virtual ~sharedObject()
-	{
-	}
+	virtual ~sharedObject() = default;
 
 	template<class T>
 	static T* ref( T* object )
@@ -81,5 +82,8 @@ public:
 private:
 	std::atomic_int m_referenceCount;
 } ;
+
+
+} // namespace lmms
 
 #endif

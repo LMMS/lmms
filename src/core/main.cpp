@@ -55,7 +55,7 @@
 #include <unistd.h>
 #endif
 
-#include <signal.h>
+#include <csignal>
 
 #include "MainApplication.h"
 #include "ConfigManager.h"
@@ -71,7 +71,6 @@
 #include "ProjectRenderer.h"
 #include "RenderManager.h"
 #include "Song.h"
-#include "SetupDialog.h"
 
 #ifdef LMMS_DEBUG_FPE
 #include <fenv.h> // For feenableexcept
@@ -121,13 +120,13 @@ void consoleMessageHandler(QtMsgType type,
     QByteArray localMsg = msg.toLocal8Bit();
     fprintf(stderr, "%s\n", localMsg.constData());
 }
-#endif
+#endif // LMMS_BUILD_WIN32
 
 
 inline void loadTranslation( const QString & tname,
-	const QString & dir = ConfigManager::inst()->localeDir() )
+	const QString & dir = lmms::ConfigManager::inst()->localeDir() )
 {
-	QTranslator * t = new QTranslator( QCoreApplication::instance() );
+	auto t = new QTranslator(QCoreApplication::instance());
 	QString name = tname + ".qm";
 
 	if (t->load(name, dir))
@@ -253,6 +252,8 @@ int noInputFileError()
 
 int main( int argc, char * * argv )
 {
+	using namespace lmms;
+
 #ifdef LMMS_DEBUG_FPE
 	// Enable exceptions for certain floating point results
 	// FE_UNDERFLOW is disabled for the time being
@@ -360,7 +361,7 @@ int main( int argc, char * * argv )
 #endif
 	QCoreApplication * app = coreOnly ?
 			new QCoreApplication( argc, argv ) :
-					new MainApplication( argc, argv );
+					new gui::MainApplication(argc, argv);
 
 	AudioEngine::qualitySettings qs( AudioEngine::qualitySettings::Mode_HighQuality );
 	OutputSettings os( 44100, OutputSettings::BitRateSettings(160, false), OutputSettings::Depth_16Bit, OutputSettings::StereoMode_JointStereo );
@@ -775,7 +776,7 @@ int main( int argc, char * * argv )
 		printf( "Notice: could not set realtime priority.\n" );
 	}
 #endif
-#endif
+#endif // LMMS_HAVE_SCHED_H
 #endif
 
 #ifdef LMMS_BUILD_WIN32
@@ -828,14 +829,14 @@ int main( int argc, char * * argv )
 		}
 
 		// create renderer
-		RenderManager * r = new RenderManager( qs, os, eff, renderOut );
+		auto r = new RenderManager(qs, os, eff, renderOut);
 		QCoreApplication::instance()->connect( r,
-				SIGNAL( finished() ), SLOT( quit() ) );
+				SIGNAL(finished()), SLOT(quit()));
 
 		// timer for progress-updates
-		QTimer * t = new QTimer( r );
-		r->connect( t, SIGNAL( timeout() ),
-				SLOT( updateConsoleProgress() ) );
+		auto t = new QTimer(r);
+		r->connect( t, SIGNAL(timeout()),
+				SLOT(updateConsoleProgress()));
 		t->start( 200 );
 
 		if( profilerOutputFile.isEmpty() == false )
@@ -855,6 +856,8 @@ int main( int argc, char * * argv )
 	}
 	else // otherwise, start the GUI
 	{
+		using namespace lmms::gui;
+
 		new GuiApplication();
 
 		// re-intialize RNG - shared libraries might have srand() or
@@ -1008,7 +1011,7 @@ int main( int argc, char * * argv )
 		// instances of LMMS.
 		if( autoSaveEnabled )
 		{
-			getGUI()->mainWindow()->autoSaveTimerReset();
+			gui::getGUI()->mainWindow()->autoSaveTimerReset();
 		}
 	}
 

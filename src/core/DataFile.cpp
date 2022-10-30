@@ -26,7 +26,7 @@
 
 #include "DataFile.h"
 
-#include <math.h>
+#include <cmath>
 #include <map>
 
 #include <QDebug>
@@ -45,16 +45,21 @@
 #include "ProjectVersion.h"
 #include "SongEditor.h"
 #include "TextFloat.h"
+#include "Track.h"
 #include "PathUtil.h"
 
 #include "lmmsversion.h"
+
+namespace lmms
+{
+
 
 static void findIds(const QDomElement& elem, QList<jo_id_t>& idList);
 
 
 // QMap with the DOM elements that access file resources
 const DataFile::ResourcesMap DataFile::ELEMENTS_WITH_RESOURCES = {
-{ "sampletco", {"src"} },
+{ "sampleclip", {"src"} },
 { "audiofileprocessor", {"src"} },
 };
 
@@ -70,7 +75,8 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_1_1_91           ,   &DataFile::upgrade_1_2_0_rc3,
 	&DataFile::upgrade_1_3_0            ,   &DataFile::upgrade_noHiddenClipNames,
 	&DataFile::upgrade_automationNodes  ,   &DataFile::upgrade_extendedNoteRange,
-	&DataFile::upgrade_defaultTripleOscillatorHQ
+	&DataFile::upgrade_defaultTripleOscillatorHQ,
+	&DataFile::upgrade_mixerRename      ,   &DataFile::upgrade_bbTcoRename,
 };
 
 // Vector of all versions that have upgrade routines.
@@ -94,7 +100,7 @@ DataFile::typeDescStruct
 	{ DataFile::ClipboardData, "clipboard-data" },
 	{ DataFile::JournalData, "journaldata" },
 	{ DataFile::EffectSettings, "effectsettings" },
-	{ DataFile::NotePattern, "pattern" }
+	{ DataFile::MidiClip, "midiclip" }
 } ;
 
 
@@ -137,11 +143,11 @@ DataFile::DataFile( const QString & _fileName ) :
 	QFile inFile( _fileName );
 	if( !inFile.open( QIODevice::ReadOnly ) )
 	{
-		if( getGUI() != nullptr )
+		if (gui::getGUI() != nullptr)
 		{
 			QMessageBox::critical( nullptr,
-				SongEditor::tr( "Could not open file" ),
-				SongEditor::tr( "Could not open file %1. You probably "
+				gui::SongEditor::tr( "Could not open file" ),
+				gui::SongEditor::tr( "Could not open file %1. You probably "
 						"have no permissions to read this "
 						"file.\n Please make sure to have at "
 						"least read permissions to the file "
@@ -170,12 +176,6 @@ DataFile::DataFile( const QByteArray & _data ) :
 
 
 
-DataFile::~DataFile()
-{
-}
-
-
-
 
 bool DataFile::validate( QString extension )
 {
@@ -199,7 +199,7 @@ bool DataFile::validate( QString extension )
 			return true;
 		}
 		break;
-	case Type::NotePattern:
+	case Type::MidiClip:
 		if (extension == "xpt" || extension == "xptz")
 		{
 			return true;
@@ -211,6 +211,9 @@ bool DataFile::validate( QString extension )
 				( extension == "xiz" && ! getPluginFactory()->pluginSupportingExtension(extension).isNull()) ||
 				extension == "sf2" || extension == "sf3" || extension == "pat" || extension == "mid" ||
 				extension == "dll"
+#ifdef LMMS_BUILD_LINUX
+				|| extension == "so"
+#endif
 #ifdef LMMS_HAVE_LV2
 				|| extension == "lv2"
 #endif
@@ -290,7 +293,7 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 {
 	// Small lambda function for displaying errors
 	auto showError = [this](QString title, QString body){
-		if (getGUI() != nullptr)
+		if (gui::getGUI() != nullptr)
 		{
 			QMessageBox mb;
 			mb.setWindowTitle(title);
@@ -319,6 +322,8 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 		: nameWithExtension(filename);
 	const QString fullNameTemp = fullName + ".new";
 	const QString fullNameBak = fullName + ".bak";
+
+	using gui::SongEditor;
 
 	// If we are saving with resources, setup the bundle folder first
 	if (withResources)
@@ -422,7 +427,7 @@ bool DataFile::copyResources(const QString& resourcesDir)
 	// repeating filenames
 	std::list<QString> namesList;
 
-	ResourcesMap::const_iterator it = ELEMENTS_WITH_RESOURCES.begin();
+	auto it = ELEMENTS_WITH_RESOURCES.begin();
 
 	// Copy resources and manipulate the DataFile to have local paths to them
 	while (it != ELEMENTS_WITH_RESOURCES.end())
@@ -434,7 +439,7 @@ bool DataFile::copyResources(const QString& resourcesDir)
 		{
 			QDomElement el = list.item(i).toElement();
 
-			std::vector<QString>::const_iterator res = it->second.begin();
+			auto res = it->second.begin();
 
 			// Search for attributes that point to resources
 			while (res != it->second.end())
@@ -528,14 +533,9 @@ bool DataFile::hasLocalPlugins(QDomElement parent /* = QDomElement()*/, bool fir
 		bool skipNode = false;
 		// Skip the nodes allowed to have "local:" attributes, but
 		// still check its children
-		for
-		(
-			ResourcesMap::const_iterator it = ELEMENTS_WITH_RESOURCES.begin();
-			it != ELEMENTS_WITH_RESOURCES.end();
-			++it
-		)
+		for (const auto& element : ELEMENTS_WITH_RESOURCES)
 		{
-			if (childElement.tagName() == it->first)
+			if (childElement.tagName() == element.first)
 			{
 				skipNode = true;
 				break;
@@ -1759,10 +1759,75 @@ void DataFile::upgrade_defaultTripleOscillatorHQ()
 }
 
 
+// Remove FX prefix from mixer and related nodes
+void DataFile::upgrade_mixerRename()
+{
+	// Change nodename <fxmixer> to <mixer>
+	QDomNodeList fxmixer = elementsByTagName("fxmixer");
+	for (int i = 0; !fxmixer.item(i).isNull(); ++i)
+	{
+		fxmixer.item(i).toElement().setTagName("mixer");
+	}
+
+	// Change nodename <fxchannel> to <mixerchannel>
+	QDomNodeList fxchannel = elementsByTagName("fxchannel");
+	for (int i = 0; !fxchannel.item(i).isNull(); ++i)
+	{
+		fxchannel.item(i).toElement().setTagName("mixerchannel");
+	}
+
+	// Change the attribute fxch of element <instrumenttrack> to mixch
+	QDomNodeList fxch = elementsByTagName("instrumenttrack");
+	for(int i = 0; !fxch.item(i).isNull(); ++i)
+	{
+		if(fxch.item(i).toElement().hasAttribute("fxch"))
+		{
+			fxch.item(i).toElement().setAttribute("mixch", fxch.item(i).toElement().attribute("fxch"));
+			fxch.item(i).toElement().removeAttribute("fxch");
+		}
+	}
+}
+
+
+// Rename BB to pattern and TCO to clip
+void DataFile::upgrade_bbTcoRename()
+{
+	std::vector<std::pair<const char *, const char *>> names {
+		{"automationpattern", "automationclip"},
+		{"bbtco", "patternclip"},
+		{"pattern", "midiclip"},
+		{"sampletco", "sampleclip"},
+		{"bbtrack", "patterntrack"},
+		{"bbtrackcontainer", "patternstore"},
+	};
+	// Replace names of XML tags
+	for (auto name : names)
+	{
+		QDomNodeList elements = elementsByTagName(name.first);
+		for (int i = 0; !elements.item(i).isNull(); ++i)
+		{
+			elements.item(i).toElement().setTagName(name.second);
+		}
+	}
+	// Replace "Beat/Bassline" with "Pattern" in track names
+	QDomNodeList elements = elementsByTagName("track");
+	for (int i = 0; !elements.item(i).isNull(); ++i)
+	{
+		auto e = elements.item(i).toElement();
+		static_assert(Track::PatternTrack == 1, "Must be type=1 for backwards compatibility");
+		if (e.attribute("type").toInt() == Track::PatternTrack)
+		{
+			e.setAttribute("name", e.attribute("name").replace("Beat/Bassline", "Pattern"));
+		}
+	}
+}
+
+
 void DataFile::upgrade()
 {
 	// Runs all necessary upgrade methods
-	std::for_each( UPGRADE_METHODS.begin() + m_fileVersion, UPGRADE_METHODS.end(),
+	std::size_t max = std::min(static_cast<std::size_t>(m_fileVersion), UPGRADE_METHODS.size());
+	std::for_each( UPGRADE_METHODS.begin() + max, UPGRADE_METHODS.end(),
 		[this](UpgradeMethod um)
 		{
 			(this->*um)();
@@ -1814,8 +1879,10 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 		}
 		if( line >= 0 && col >= 0 )
 		{
+			using gui::SongEditor;
+
 			qWarning() << "at line" << line << "column" << errorMsg;
-			if( getGUI() != nullptr )
+			if (gui::getGUI() != nullptr)
 			{
 				QMessageBox::critical( nullptr,
 					SongEditor::tr( "Error in file" ),
@@ -1848,20 +1915,20 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 
 	if (root.hasAttribute("creatorversion"))
 	{
+		using gui::SongEditor;
+
 		// compareType defaults to All, so it doesn't have to be set here
 		ProjectVersion createdWith = root.attribute("creatorversion");
 		ProjectVersion openedWith = LMMS_VERSION;
 
-		if (createdWith < openedWith) { upgrade(); }
-
 		if (createdWith.setCompareType(ProjectVersion::Minor)
 		 !=  openedWith.setCompareType(ProjectVersion::Minor)
-		 && getGUI() != nullptr && root.attribute("type") == "song"
+		 && gui::getGUI() != nullptr && root.attribute("type") == "song"
 		){
 			auto projectType = _sourceFile.endsWith(".mpt") ?
 				SongEditor::tr("template") : SongEditor::tr("project");
 
-			TextFloat::displayMessage(
+			gui::TextFloat::displayMessage(
 				SongEditor::tr("Version difference"),
 				SongEditor::tr("This %1 was created with LMMS %2")
 				.arg(projectType).arg(createdWith.getVersion()),
@@ -1870,6 +1937,9 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 			);
 		}
 	}
+
+	// Perform upgrade routines
+	if (m_fileVersion < UPGRADE_METHODS.size()) { upgrade(); }
 
 	m_content = root.elementsByTagName(typeName(m_type)).item(0).toElement();
 }
@@ -1902,3 +1972,6 @@ unsigned int DataFile::legacyFileVersion()
 	// Convert the iterator to an index, which is our file version (starting at 0)
 	return std::distance( UPGRADE_VERSIONS.begin(), firstRequiredUpgrade );
 }
+
+
+} // namespace lmms

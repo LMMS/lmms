@@ -28,11 +28,14 @@
 
 #include <QLabel>
 #include <QLineEdit>
+#include <SDL.h>
 
 #include "AudioEngine.h"
-#include "Engine.h"
 #include "ConfigManager.h"
 #include "gui_templates.h"
+
+namespace lmms
+{
 
 AudioSdl::AudioSdl( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	AudioDevice( DEFAULT_CHANNELS, _audioEngine ),
@@ -222,7 +225,7 @@ void AudioSdl::applyQualitySettings()
 
 void AudioSdl::sdlAudioCallback( void * _udata, Uint8 * _buf, int _len )
 {
-	AudioSdl * _this = static_cast<AudioSdl *>( _udata );
+	auto _this = static_cast<AudioSdl*>(_udata);
 
 	_this->sdlAudioCallback( _buf, _len );
 }
@@ -301,19 +304,19 @@ void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 		m_convertedBufPos += min_len;
 		m_convertedBufPos %= m_convertedBufSize;
 	}
-#endif
+#endif // LMMS_HAVE_SDL2
 }
 
 #ifdef LMMS_HAVE_SDL2
 
 void AudioSdl::sdlInputAudioCallback(void *_udata, Uint8 *_buf, int _len) {
-	AudioSdl * _this = static_cast<AudioSdl *>( _udata );
+	auto _this = static_cast<AudioSdl*>(_udata);
 
 	_this->sdlInputAudioCallback( _buf, _len );
 }
 
 void AudioSdl::sdlInputAudioCallback(Uint8 *_buf, int _len) {
-	sampleFrame *samples_buffer = (sampleFrame *) _buf;
+	auto samples_buffer = (sampleFrame*)_buf;
 	fpp_t frames = _len / sizeof ( sampleFrame );
 
 	audioEngine()->pushInputFrames (samples_buffer, frames);
@@ -328,17 +331,10 @@ AudioSdl::setupWidget::setupWidget( QWidget * _parent ) :
 	m_device = new QLineEdit( dev, this );
 	m_device->setGeometry( 10, 20, 160, 20 );
 
-	QLabel * dev_lbl = new QLabel( tr( "Device" ), this );
+	auto dev_lbl = new QLabel(tr("Device"), this);
 	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
 	dev_lbl->setGeometry( 10, 40, 160, 10 );
 
-}
-
-
-
-
-AudioSdl::setupWidget::~setupWidget()
-{
 }
 
 
@@ -351,5 +347,7 @@ void AudioSdl::setupWidget::saveSettings()
 }
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_HAVE_SDL
 

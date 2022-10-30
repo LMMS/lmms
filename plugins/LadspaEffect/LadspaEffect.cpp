@@ -24,20 +24,18 @@
  */
 
 
-#include <QtCore/QVarLengthArray>
+#include <QVarLengthArray>
 #include <QMessageBox>
 
 #include "LadspaEffect.h"
 #include "DataFile.h"
 #include "AudioDevice.h"
 #include "AudioEngine.h"
-#include "ConfigManager.h"
 #include "Ladspa2LMMS.h"
+#include "LadspaBase.h"
 #include "LadspaControl.h"
 #include "LadspaSubPluginFeatures.h"
-#include "EffectChain.h"
-#include "AutomationPattern.h"
-#include "ControllerConnection.h"
+#include "AutomationClip.h"
 #include "MemoryManager.h"
 #include "ValueBuffer.h"
 #include "Song.h"
@@ -46,12 +44,16 @@
 
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT ladspaeffect_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"LADSPA",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"plugin for using arbitrary LADSPA-effects "
@@ -122,7 +124,7 @@ void LadspaEffect::changeSampleRate()
 
 	// the IDs of re-created controls have been saved and now need to be
 	// resolved again
-	AutomationPattern::resolveAllIDs();
+	AutomationClip::resolveAllIDs();
 }
 
 
@@ -309,7 +311,7 @@ void LadspaEffect::pluginInstantiation()
 		multi_proc_t ports;
 		for( int port = 0; port < m_portCount; port++ )
 		{
-			port_desc_t * p = new PortDescription;
+			auto p = new port_desc_t;
 
 			p->name = manager->getPortName( m_key, port );
 			p->proc = proc;
@@ -606,5 +608,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * _parent, void * _data )
 }
 
 
-
-
+} // namespace lmms

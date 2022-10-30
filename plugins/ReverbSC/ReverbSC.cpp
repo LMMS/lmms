@@ -20,7 +20,7 @@
  *
  */
 
-#include <math.h>
+#include <cmath>
 #include "ReverbSC.h"
 
 #include "embed.h"
@@ -28,12 +28,16 @@
 
 #define DB2LIN(X) pow(10, X / 20.0f);
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT reverbsc_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"ReverbSC",
 	QT_TRANSLATE_NOOP( "PluginBrowser", "Reverb algorithm by Sean Costello" ),
 	"Paul Batchelor",
@@ -94,12 +98,10 @@ bool ReverbSCEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	{
 		sample_t s[2] = { buf[f][0], buf[f][1] };
 
-		const SPFLOAT inGain = (SPFLOAT)DB2LIN((inGainBuf ? 
-			inGainBuf->values()[f] 
-			: m_reverbSCControls.m_inputGainModel.value()));
-		const SPFLOAT outGain = (SPFLOAT)DB2LIN((outGainBuf ? 
-			outGainBuf->values()[f] 
-			: m_reverbSCControls.m_outputGainModel.value()));
+		const auto inGain
+			= (SPFLOAT)DB2LIN((inGainBuf ? inGainBuf->values()[f] : m_reverbSCControls.m_inputGainModel.value()));
+		const auto outGain
+			= (SPFLOAT)DB2LIN((outGainBuf ? outGainBuf->values()[f] : m_reverbSCControls.m_outputGainModel.value()));
 
 		s[0] *= inGain;
 		s[1] *= inGain;
@@ -161,3 +163,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 }
 
 }
+
+
+} // namespace lmms

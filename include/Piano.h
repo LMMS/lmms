@@ -28,6 +28,10 @@
 #include "Note.h"
 #include "Model.h"
 
+namespace lmms
+{
+
+
 class InstrumentTrack;
 class MidiEventProcessor;
 
@@ -78,9 +82,12 @@ private:
 
 	InstrumentTrack* m_instrumentTrack;
 	MidiEventProcessor* m_midiEvProc;
-	bool m_pressedKeys[NumKeys];
+	std::array<bool, NumKeys> m_pressedKeys = {};
 
 } ;
+
+
+} // namespace lmms
 
 #endif
 

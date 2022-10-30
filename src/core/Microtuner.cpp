@@ -27,11 +27,14 @@
 #include <vector>
 #include <cmath>
 
-#include "ConfigManager.h"
 #include "Engine.h"
 #include "Keymap.h"
+#include "Note.h"
 #include "Scale.h"
 #include "Song.h"
+
+namespace lmms
+{
 
 
 Microtuner::Microtuner() :
@@ -165,3 +168,6 @@ void Microtuner::loadSettings(const QDomElement &element)
 	m_keymapModel.loadSettings(element, "keymap");
 	m_keyRangeImportModel.loadSettings(element, "range_import");
 }
+
+
+} // namespace lmms

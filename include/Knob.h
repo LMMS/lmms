@@ -29,13 +29,18 @@
 #include <memory>
 #include <QPixmap>
 #include <QWidget>
-#include <QtCore/QPoint>
+#include <QPoint>
 #include <QTextDocument>
 
 #include "AutomatableModelView.h"
 
 
 class QPixmap;
+
+namespace lmms::gui
+{
+
+
 class TextFloat;
 
 enum knobTypes
@@ -205,5 +210,8 @@ private:
 	knobTypes m_knobNum;
 
 } ;
+
+
+} // namespace lmms::gui
 
 #endif

@@ -29,6 +29,9 @@
 
 #include <atomic>
 
+namespace lmms
+{
+
 template<typename T>
 class LocklessList
 {
@@ -91,5 +94,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif
