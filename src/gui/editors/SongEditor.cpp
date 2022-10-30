@@ -184,14 +184,14 @@ SongEditor::SongEditor( Song * song ) :
 	master_pitch_lbl->setPixmap( embed::getIconPixmap( "master_pitch" ) );
 	master_pitch_lbl->setFixedHeight( 64 );
 
-	m_masterPitchSlider = new AutomatableSlider( tb, tr( "Master pitch" ) );
+	m_masterPitchSlider = new AutomatableSlider( tb, tr( "Global transposition" ) );
 	m_masterPitchSlider->setModel( &m_song->m_masterPitchModel );
 	m_masterPitchSlider->setOrientation( Qt::Vertical );
 	m_masterPitchSlider->setPageStep( 1 );
 	m_masterPitchSlider->setTickPosition( QSlider::TicksLeft );
 	m_masterPitchSlider->setFixedSize( 26, 60 );
 	m_masterPitchSlider->setTickInterval( 12 );
-	m_masterPitchSlider->setToolTip(tr("Master pitch"));
+	m_masterPitchSlider->setToolTip(tr("Global transposition"));
 	connect( m_masterPitchSlider, SIGNAL(logicValueChanged(int)), this,
 			SLOT(setMasterPitch(int)));
 	connect( m_masterPitchSlider, SIGNAL(sliderPressed()), this,
@@ -202,7 +202,7 @@ SongEditor::SongEditor( Song * song ) :
 			SLOT(hideMasterPitchFloat()));
 
 	m_mpsStatus = new TextFloat;
-	m_mpsStatus->setTitle( tr( "Master pitch" ) );
+	m_mpsStatus->setTitle( tr( "Global transposition" ) );
 	m_mpsStatus->setPixmap( embed::getIconPixmap( "master_pitch" ) );
 
 	getGUI()->mainWindow()->addWidgetToToolBar( master_pitch_lbl );
@@ -723,7 +723,7 @@ void SongEditor::showMasterPitchFloat( void )
 
 void SongEditor::updateMasterPitchFloat( int new_val )
 {
-	m_mpsStatus->setText( tr( "Value: %1 semitones").arg( new_val ) );
+	m_mpsStatus->setText( tr( "Value: %1 notes").arg( new_val ) );
 
 }
 
