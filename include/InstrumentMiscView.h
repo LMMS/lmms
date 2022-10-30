@@ -29,6 +29,8 @@
 
 #include <QWidget>
 
+class QLabel;
+
 namespace lmms
 {
 
@@ -40,7 +42,6 @@ namespace gui
 class ComboBox;
 class GroupBox;
 class LedCheckBox;
-class QLabel;
 
 
 class InstrumentMiscView : public QWidget
