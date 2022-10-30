@@ -1,0 +1,323 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{900A2545-911E-4AE6-8E1C-B5769442DA0F}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>hiir</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Platform)'=='Win32'" Label="Configuration">
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Platform)'=='x64'" Label="Configuration">
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OutDir>$(ProjectDir)$(Configuration)$(Platform)\</OutDir>
+    <IntDir>$(ProjectDir)$(Configuration)$(Platform)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Platform)'=='Win32'">
+    <ClCompile>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Platform)'=='x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <Link>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <!-- EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet -->
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="def.h" />
+    <ClInclude Include="Downsampler2x16Avx512.h" />
+    <ClInclude Include="Downsampler2x16Avx512.hpp" />
+    <ClInclude Include="Downsampler2x2F64Sse2.h" />
+    <ClInclude Include="Downsampler2x2F64Sse2.hpp" />
+    <ClInclude Include="Downsampler2x3dnow.h" />
+    <ClInclude Include="Downsampler2x3dnow.hpp" />
+    <ClInclude Include="Downsampler2x4F64Avx.h" />
+    <ClInclude Include="Downsampler2x4F64Avx.hpp" />
+    <ClInclude Include="Downsampler2x4Neon.h" />
+    <ClInclude Include="Downsampler2x4Neon.hpp" />
+    <ClInclude Include="Downsampler2x4Sse.h" />
+    <ClInclude Include="Downsampler2x4Sse.hpp" />
+    <ClInclude Include="Downsampler2x8Avx.h" />
+    <ClInclude Include="Downsampler2x8Avx.hpp" />
+    <ClInclude Include="Downsampler2x8F64Avx512.h" />
+    <ClInclude Include="Downsampler2x8F64Avx512.hpp" />
+    <ClInclude Include="Downsampler2xF64Sse2.h" />
+    <ClInclude Include="Downsampler2xF64Sse2.hpp" />
+    <ClInclude Include="Downsampler2xFpu.h" />
+    <ClInclude Include="Downsampler2xF64Fpu.h" />
+    <ClInclude Include="Downsampler2xTpl.h" />
+    <ClInclude Include="Downsampler2xTpl.hpp" />
+    <ClInclude Include="Downsampler2xNeon.h" />
+    <ClInclude Include="Downsampler2xNeon.hpp" />
+    <ClInclude Include="Downsampler2xNeonOld.h" />
+    <ClInclude Include="Downsampler2xNeonOld.hpp" />
+    <ClInclude Include="Downsampler2xSseOld.h" />
+    <ClInclude Include="Downsampler2xSseOld.hpp" />
+    <ClInclude Include="Downsampler2xSse.h" />
+    <ClInclude Include="Downsampler2xSse.hpp" />
+    <ClInclude Include="fnc.h" />
+    <ClInclude Include="fnc.hpp" />
+    <ClInclude Include="fnc_neon.h" />
+    <ClInclude Include="fnc_neon.hpp" />
+    <ClInclude Include="HalfBand16Avx512.h" />
+    <ClInclude Include="HalfBand16Avx512.hpp" />
+    <ClInclude Include="HalfBand2F64Sse2.h" />
+    <ClInclude Include="HalfBand2F64Sse2.hpp" />
+    <ClInclude Include="HalfBand4F64Avx.h" />
+    <ClInclude Include="HalfBand4F64Avx.hpp" />
+    <ClInclude Include="HalfBand4Neon.h" />
+    <ClInclude Include="HalfBand4Neon.hpp" />
+    <ClInclude Include="HalfBand4Sse.h" />
+    <ClInclude Include="HalfBand4Sse.hpp" />
+    <ClInclude Include="HalfBand8Avx.h" />
+    <ClInclude Include="HalfBand8Avx.hpp" />
+    <ClInclude Include="HalfBand8F64Avx512.h" />
+    <ClInclude Include="HalfBand8F64Avx512.hpp" />
+    <ClInclude Include="HalfBandF64Fpu.h" />
+    <ClInclude Include="HalfBandF64Sse2.h" />
+    <ClInclude Include="HalfBandF64Sse2.hpp" />
+    <ClInclude Include="HalfBandFpu.h" />
+    <ClInclude Include="HalfBandNeon.h" />
+    <ClInclude Include="HalfBandNeon.hpp" />
+    <ClInclude Include="HalfBandSse.h" />
+    <ClInclude Include="HalfBandSse.hpp" />
+    <ClInclude Include="HalfBandTpl.h" />
+    <ClInclude Include="HalfBandTpl.hpp" />
+    <ClInclude Include="PhaseHalfPi16Avx512.h" />
+    <ClInclude Include="PhaseHalfPi16Avx512.hpp" />
+    <ClInclude Include="PhaseHalfPi2F64Sse2.h" />
+    <ClInclude Include="PhaseHalfPi2F64Sse2.hpp" />
+    <ClInclude Include="PhaseHalfPi3dnow.h" />
+    <ClInclude Include="PhaseHalfPi3dnow.hpp" />
+    <ClInclude Include="PhaseHalfPi4F64Avx.h" />
+    <ClInclude Include="PhaseHalfPi4F64Avx.hpp" />
+    <ClInclude Include="PhaseHalfPi4Neon.h" />
+    <ClInclude Include="PhaseHalfPi4Neon.hpp" />
+    <ClInclude Include="PhaseHalfPi4Sse.h" />
+    <ClInclude Include="PhaseHalfPi4Sse.hpp" />
+    <ClInclude Include="PhaseHalfPi8Avx.h" />
+    <ClInclude Include="PhaseHalfPi8Avx.hpp" />
+    <ClInclude Include="PhaseHalfPi8F64Avx512.h" />
+    <ClInclude Include="PhaseHalfPi8F64Avx512.hpp" />
+    <ClInclude Include="PhaseHalfPiF64Sse2.h" />
+    <ClInclude Include="PhaseHalfPiF64Sse2.hpp" />
+    <ClInclude Include="PhaseHalfPiFpu.h" />
+    <ClInclude Include="PhaseHalfPiF64Fpu.h" />
+    <ClInclude Include="PhaseHalfPiNeon.h" />
+    <ClInclude Include="PhaseHalfPiNeon.hpp" />
+    <ClInclude Include="PhaseHalfPiSse.h" />
+    <ClInclude Include="PhaseHalfPiSse.hpp" />
+    <ClInclude Include="PhaseHalfPiTpl.h" />
+    <ClInclude Include="PhaseHalfPiTpl.hpp" />
+    <ClInclude Include="PolyphaseIir2Designer.h" />
+    <ClInclude Include="StageData3dnow.h" />
+    <ClInclude Include="StageDataAvx.h" />
+    <ClInclude Include="StageDataAvx512.h" />
+    <ClInclude Include="StageDataF64Avx.h" />
+    <ClInclude Include="StageDataF64Avx512.h" />
+    <ClInclude Include="StageDataTpl.h" />
+    <ClInclude Include="StageDataNeonV2.h" />
+    <ClInclude Include="StageDataNeonV4.h" />
+    <ClInclude Include="StageDataSse.h" />
+    <ClInclude Include="StageDataF64Sse2.h" />
+    <ClInclude Include="StageProc16Avx512.h" />
+    <ClInclude Include="StageProc16Avx512.hpp" />
+    <ClInclude Include="StageProc2F64Sse2.h" />
+    <ClInclude Include="StageProc2F64Sse2.hpp" />
+    <ClInclude Include="StageProc3dnow.h" />
+    <ClInclude Include="StageProc3dnow.hpp" />
+    <ClInclude Include="StageProc4F64Avx.h" />
+    <ClInclude Include="StageProc4F64Avx.hpp" />
+    <ClInclude Include="StageProc4Neon.h" />
+    <ClInclude Include="StageProc4Neon.hpp" />
+    <ClInclude Include="StageProc4Sse.h" />
+    <ClInclude Include="StageProc4Sse.hpp" />
+    <ClInclude Include="StageProc8Avx.h" />
+    <ClInclude Include="StageProc8Avx.hpp" />
+    <ClInclude Include="StageProc8F64Avx512.h" />
+    <ClInclude Include="StageProc8F64Avx512.hpp" />
+    <ClInclude Include="StageProcF64Sse2.h" />
+    <ClInclude Include="StageProcF64Sse2.hpp" />
+    <ClInclude Include="StageProcTpl.h" />
+    <ClInclude Include="StageProcTpl.hpp" />
+    <ClInclude Include="StageProcNeonV2.h" />
+    <ClInclude Include="StageProcNeonV2.hpp" />
+    <ClInclude Include="StageProcNeonV4.h" />
+    <ClInclude Include="StageProcNeonV4.hpp" />
+    <ClInclude Include="StageProcSseV4.h" />
+    <ClInclude Include="StageProcSseV4.hpp" />
+    <ClInclude Include="StageProcSseV2.h" />
+    <ClInclude Include="StageProcSseV2.hpp" />
+    <ClInclude Include="test\AlignedObject.h" />
+    <ClInclude Include="test\AlignedObject.hpp" />
+    <ClInclude Include="test\BlockSplitter.h" />
+    <ClInclude Include="test\conf.h" />
+    <ClInclude Include="test\CpuId.h" />
+    <ClInclude Include="test\FileOp.h" />
+    <ClInclude Include="test\FileOp.hpp" />
+    <ClInclude Include="test\ResultCheck.h" />
+    <ClInclude Include="test\ResultCheck.hpp" />
+    <ClInclude Include="test\SpeedTester.h" />
+    <ClInclude Include="test\SpeedTester.hpp" />
+    <ClInclude Include="test\SpeedTesterBase.h" />
+    <ClInclude Include="test\SpeedTesterBase.hpp" />
+    <ClInclude Include="test\SweepingSine.h" />
+    <ClInclude Include="test\SweepingSine.hpp" />
+    <ClInclude Include="test\TestAllClassesFnc.h" />
+    <ClInclude Include="test\TestAllClassesFnc.hpp" />
+    <ClInclude Include="test\TestAllClassesSpeed.h" />
+    <ClInclude Include="test\TestAllClassesSpeed.hpp" />
+    <ClInclude Include="test\TestDelay.h" />
+    <ClInclude Include="test\TestDelay.hpp" />
+    <ClInclude Include="test\TestDownsampler2x.h" />
+    <ClInclude Include="test\TestDownsampler2x.hpp" />
+    <ClInclude Include="test\TestHalfBand.h" />
+    <ClInclude Include="test\TestHalfBand.hpp" />
+    <ClInclude Include="test\TestPhaseHalfPi.h" />
+    <ClInclude Include="test\TestPhaseHalfPi.hpp" />
+    <ClInclude Include="test\TestUpsampler2x.h" />
+    <ClInclude Include="test\TestUpsampler2x.hpp" />
+    <ClInclude Include="test\TimerAccurate.h" />
+    <ClInclude Include="test\TimerAccurate.hpp" />
+    <ClInclude Include="Upsampler2x16Avx512.h" />
+    <ClInclude Include="Upsampler2x16Avx512.hpp" />
+    <ClInclude Include="Upsampler2x2F64Sse2.h" />
+    <ClInclude Include="Upsampler2x2F64Sse2.hpp" />
+    <ClInclude Include="Upsampler2x3dnow.h" />
+    <ClInclude Include="Upsampler2x3dnow.hpp" />
+    <ClInclude Include="Upsampler2x4F64Avx.h" />
+    <ClInclude Include="Upsampler2x4F64Avx.hpp" />
+    <ClInclude Include="Upsampler2x4Neon.h" />
+    <ClInclude Include="Upsampler2x4Neon.hpp" />
+    <ClInclude Include="Upsampler2x4Sse.h" />
+    <ClInclude Include="Upsampler2x4Sse.hpp" />
+    <ClInclude Include="Upsampler2x8Avx.h" />
+    <ClInclude Include="Upsampler2x8Avx.hpp" />
+    <ClInclude Include="Upsampler2x8F64Avx512.h" />
+    <ClInclude Include="Upsampler2x8F64Avx512.hpp" />
+    <ClInclude Include="Upsampler2xF64Sse2.h" />
+    <ClInclude Include="Upsampler2xF64Sse2.hpp" />
+    <ClInclude Include="Upsampler2xFpu.h" />
+    <ClInclude Include="Upsampler2xF64Fpu.h" />
+    <ClInclude Include="Upsampler2xNeon.h" />
+    <ClInclude Include="Upsampler2xNeon.hpp" />
+    <ClInclude Include="Upsampler2xNeonOld.h" />
+    <ClInclude Include="Upsampler2xNeonOld.hpp" />
+    <ClInclude Include="Upsampler2xSse.h" />
+    <ClInclude Include="Upsampler2xSse.hpp" />
+    <ClInclude Include="Upsampler2xSseOld.h" />
+    <ClInclude Include="Upsampler2xSseOld.hpp" />
+    <ClInclude Include="Upsampler2xTpl.h" />
+    <ClInclude Include="Upsampler2xTpl.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="PolyphaseIir2Designer.cpp" />
+    <ClCompile Include="test\BlockSplitter.cpp" />
+    <ClCompile Include="test\CpuId_hiir_test.cpp" />
+    <ClCompile Include="test\main.cpp" />
+    <ClCompile Include="test\SweepingSine_hiir_test.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\license.txt" />
+    <None Include="..\readme.txt" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
