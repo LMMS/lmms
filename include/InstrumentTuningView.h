@@ -1,9 +1,9 @@
 /*
- * InstrumentMiscView.h - widget in instrument-track-window for setting up
- *                        miscellaneous options not covered by other tabs
+ * InstrumentTuningView.h - widget in instrument-track-window for setting up
+ *                          tuning and transposition options
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * Copyright (c) 2020 Martin Pavelek <he29.HS/at/gmail.com>
+ * Copyright (c) 2020-2022 Martin Pavelek <he29.HS/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef INSTRUMENT_MISC_VIEW_H
-#define INSTRUMENT_MISC_VIEW_H
+#ifndef INSTRUMENT_TUNING_VIEW_H
+#define INSTRUMENT_TUNING_VIEW_H
 
 #include <QWidget>
 
@@ -44,11 +44,11 @@ class GroupBox;
 class LedCheckBox;
 
 
-class InstrumentMiscView : public QWidget
+class InstrumentTuningView : public QWidget
 {
 	Q_OBJECT
 public:
-	InstrumentMiscView(InstrumentTrack *it, QWidget *parent);
+	InstrumentTuningView(InstrumentTrack *it, QWidget *parent);
 
 	GroupBox *pitchGroupBox() {return m_pitchGroupBox;}
 	GroupBox *microtunerGroupBox() {return m_microtunerGroupBox;}
