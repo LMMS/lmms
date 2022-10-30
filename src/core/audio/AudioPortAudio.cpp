@@ -332,7 +332,7 @@ int AudioPortAudio::_process_callback(
 	Q_UNUSED(_timeInfo);
 	Q_UNUSED(_statusFlags);
 
-	AudioPortAudio * _this  = static_cast<AudioPortAudio *> (_arg);
+	auto _this = static_cast<AudioPortAudio*>(_arg);
 	return _this->process_callback( (const float*)_inputBuffer,
 		(float*)_outputBuffer, _framesPerBuffer );
 }
@@ -422,14 +422,14 @@ AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	m_backend = new ComboBox( this, "BACKEND" );
 	m_backend->setGeometry( 64, 15, 260, ComboBox::DEFAULT_HEIGHT );
 
-	QLabel * backend_lbl = new QLabel( tr( "Backend" ), this );
+	auto backend_lbl = new QLabel(tr("Backend"), this);
 	backend_lbl->setFont( pointSize<7>( backend_lbl->font() ) );
 	backend_lbl->move( 8, 18 );
 
 	m_device = new ComboBox( this, "DEVICE" );
 	m_device->setGeometry( 64, 35, 260, ComboBox::DEFAULT_HEIGHT );
 
-	QLabel * dev_lbl = new QLabel( tr( "Device" ), this );
+	auto dev_lbl = new QLabel(tr("Device"), this);
 	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
 	dev_lbl->move( 8, 38 );
 	
@@ -511,7 +511,7 @@ void AudioPortAudio::setupWidget::show()
 } // namespace lmms
 
 
-#endif
+#endif // LMMS_HAVE_PORTAUDIO
 
 
 

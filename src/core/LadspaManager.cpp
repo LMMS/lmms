@@ -59,19 +59,15 @@ LadspaManager::LadspaManager()
 	ladspaDirectories.push_back( "/Library/Audio/Plug-Ins/LADSPA" );
 #endif
 
-	for( QStringList::iterator it = ladspaDirectories.begin(); 
-			 		   it != ladspaDirectories.end(); ++it )
+	for (const auto& ladspaDirectory : ladspaDirectories)
 	{
 		// Skip empty entries as QDir will interpret it as the working directory
-		if ((*it).isEmpty()) { continue; }
-		QDir directory( ( *it ) );
+		if (ladspaDirectory.isEmpty()) { continue; }
+		QDir directory(ladspaDirectory);
 		QFileInfoList list = directory.entryInfoList();
-		for( QFileInfoList::iterator file = list.begin();
-						file != list.end(); ++file )
+		for (const auto& f : list)
 		{
-			const QFileInfo & f = *file;
-			if( !f.isFile() ||
-				 f.fileName().right( 3 ).toLower() !=
+				if(!f.isFile() || f.fileName().right( 3 ).toLower() !=
 #ifdef LMMS_BUILD_WIN32
 													"dll"
 #else
@@ -86,9 +82,7 @@ LadspaManager::LadspaManager()
 
 			if( plugin_lib.load() == true )
 			{
-				LADSPA_Descriptor_Function descriptorFunction =
-			( LADSPA_Descriptor_Function ) plugin_lib.resolve(
-							"ladspa_descriptor" );
+				auto descriptorFunction = (LADSPA_Descriptor_Function)plugin_lib.resolve("ladspa_descriptor");
 				if( descriptorFunction != nullptr )
 				{
 					addPlugins( descriptorFunction,
@@ -103,10 +97,9 @@ LadspaManager::LadspaManager()
 	}
 	
 	l_ladspa_key_t keys = m_ladspaManagerMap.keys();
-	for( l_ladspa_key_t::iterator it = keys.begin();
-			it != keys.end(); ++it )
+	for (const auto& key : keys)
 	{
-		m_sortedPlugins.append( qMakePair( getName( *it ), *it ) );
+		m_sortedPlugins.append(qMakePair(getName(key), key));
 	}
 	std::sort( m_sortedPlugins.begin(), m_sortedPlugins.end() );
 }
@@ -158,8 +151,7 @@ void LadspaManager::addPlugins(
 			continue;
 		}
 
-		LadspaManagerDescription * plugIn = 
-				new LadspaManagerDescription;
+		auto plugIn = new LadspaManagerDescription;
 		plugIn->descriptorFunction = _descriptor_func;
 		plugIn->index = pluginIndex;
 		plugIn->inputChannels = getPluginInputs( descriptor );

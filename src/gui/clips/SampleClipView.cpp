@@ -142,7 +142,7 @@ void SampleClipView::mousePressEvent( QMouseEvent * _me )
 	{
 		if( _me->button() == Qt::MiddleButton && _me->modifiers() == Qt::ControlModifier )
 		{
-			SampleClip * sClip = dynamic_cast<SampleClip*>( getClip() );
+			auto sClip = dynamic_cast<SampleClip*>(getClip());
 			if( sClip )
 			{
 				sClip->updateTrackClips();
@@ -159,7 +159,7 @@ void SampleClipView::mouseReleaseEvent(QMouseEvent *_me)
 {
 	if( _me->button() == Qt::MiddleButton && !_me->modifiers() )
 	{
-		SampleClip * sClip = dynamic_cast<SampleClip*>( getClip() );
+		auto sClip = dynamic_cast<SampleClip*>(getClip());
 		if( sClip )
 		{
 			sClip->playbackPositionChanged();
@@ -344,7 +344,7 @@ bool SampleClipView::splitClip( const TimePos pos )
 		m_clip->getTrack()->addJournalCheckPoint();
 		m_clip->getTrack()->saveJournallingState( false );
 
-		SampleClip * rightClip = new SampleClip ( *m_clip );
+		auto rightClip = new SampleClip(*m_clip);
 
 		m_clip->changeLength( splitPos - m_initialClipPos );
 

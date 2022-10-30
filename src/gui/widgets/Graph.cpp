@@ -50,7 +50,7 @@ Graph::Graph( QWidget * _parent, graphStyle _style, int _width,
 	setAcceptDrops( true );
 	setCursor( Qt::CrossCursor );
 
-	graphModel * gModel = castModel<graphModel>();
+	auto gModel = castModel<graphModel>();
 
 	QObject::connect( gModel, SIGNAL(samplesChanged(int,int)),
 			this, SLOT(updateGraph(int,int)));
@@ -433,7 +433,7 @@ void Graph::dragEnterEvent( QDragEnterEvent * _dee )
 
 void Graph::modelChanged()
 {
-	graphModel * gModel = castModel<graphModel>();
+	auto gModel = castModel<graphModel>();
 
 	QObject::connect( gModel, SIGNAL(samplesChanged(int,int)),
 			this, SLOT(updateGraph(int,int)));
@@ -588,7 +588,7 @@ void graphModel::setWaveToNoise()
 
 QString graphModel::setWaveToUser()
 {
-	SampleBuffer * sampleBuffer = new SampleBuffer;
+	auto sampleBuffer = new SampleBuffer;
 	QString fileName = sampleBuffer->openAndSetWaveformFile();
 	if( fileName.isEmpty() == false )
 	{

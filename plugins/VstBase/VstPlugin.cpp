@@ -111,7 +111,7 @@ private:
 	uchar* m_map;
 };
 
-}
+} // namespace PE
 
 namespace lmms
 {
@@ -375,15 +375,12 @@ void VstPlugin::setParameterDump( const QMap<QString, QString> & _pdump )
 {
 	message m( IdVstSetParameterDump );
 	m.addInt( _pdump.size() );
-	for( QMap<QString, QString>::ConstIterator it = _pdump.begin();
-						it != _pdump.end(); ++it )
+	for (const auto& str : _pdump)
 	{
 		const VstParameterDumpItem item =
 		{
-			( *it ).section( ':', 0, 0 ).toInt(),
-			"",
-			LocaleHelper::toFloat((*it).section(':', 2, -1))
-		} ;
+			str.section(':', 0, 0).toInt(), "", LocaleHelper::toFloat(str.section(':', 2, -1))
+		};
 		m.addInt( item.index );
 		m.addString( item.shortLabel );
 		m.addFloat( item.value );
@@ -791,7 +788,7 @@ void VstPlugin::createUI( QWidget * parent )
 		{
 			parent->setAttribute(Qt::WA_NativeWindow);
 		}
-		QX11EmbedContainer * embedContainer = new QX11EmbedContainer( parent );
+		auto embedContainer = new QX11EmbedContainer(parent);
 		connect(embedContainer, SIGNAL(clientIsEmbedded()), this, SLOT(handleClientEmbed()));
 		embedContainer->embedClient( m_pluginWindowID );
 		container = embedContainer;

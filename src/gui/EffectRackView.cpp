@@ -41,13 +41,13 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 	QWidget( parent ),
 	ModelView( nullptr, this )
 {
-	QVBoxLayout* mainLayout = new QVBoxLayout( this );
+	auto mainLayout = new QVBoxLayout(this);
 	mainLayout->setMargin( 5 );
 
 	m_effectsGroupBox = new GroupBox( tr( "EFFECTS CHAIN" ) );
 	mainLayout->addWidget( m_effectsGroupBox );
 
-	QVBoxLayout* effectsLayout = new QVBoxLayout( m_effectsGroupBox );
+	auto effectsLayout = new QVBoxLayout(m_effectsGroupBox);
 	effectsLayout->setSpacing( 0 );
 	effectsLayout->setContentsMargins( 2, m_effectsGroupBox->titleBarHeight() + 2, 2, 2 );
 
@@ -60,7 +60,7 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 
 	effectsLayout->addWidget( m_scrollArea );
 
-	QPushButton* addButton = new QPushButton;
+	auto addButton = new QPushButton;
 	addButton->setText( tr( "Add effect" ) );
 
 	effectsLayout->addWidget( addButton );
@@ -155,22 +155,21 @@ void EffectRackView::update()
 	QVector<bool> view_map( qMax<int>( fxChain()->m_effects.size(),
 						m_effectViews.size() ), false );
 
-	for( QVector<Effect *>::Iterator it = fxChain()->m_effects.begin();
-					it != fxChain()->m_effects.end(); ++it )
+	for (const auto& effect : fxChain()->m_effects)
 	{
 		int i = 0;
-		for( QVector<EffectView *>::Iterator vit = m_effectViews.begin();
-				vit != m_effectViews.end(); ++vit, ++i )
+		for (const auto& effectView : m_effectViews)
 		{
-			if( ( *vit )->model() == *it )
+			if (effectView->model() == effect)
 			{
 				view_map[i] = true;
 				break;
 			}
+			++i;
 		}
 		if( i >= m_effectViews.size() )
 		{
-			EffectView * view = new EffectView( *it, w );
+			auto view = new EffectView(effect, w);
 			connect( view, SIGNAL(moveUp(lmms::gui::EffectView*)),
 					this, SLOT(moveUp(lmms::gui::EffectView*)));
 			connect( view, SIGNAL(moveDown(lmms::gui::EffectView*)),
@@ -238,13 +237,11 @@ void EffectRackView::addEffect()
 	update();
 
 	// Find the effectView, and show the controls
-	for( QVector<EffectView *>::Iterator vit = m_effectViews.begin();
-					vit != m_effectViews.end(); ++vit )
+	for (const auto& effectView : m_effectViews)
 	{
-		if( ( *vit )->effect() == fx )
+		if (effectView->effect() == fx)
 		{
-			( *vit )->editControls();
-
+			effectView->editControls();
 			break;
 		}
 	}

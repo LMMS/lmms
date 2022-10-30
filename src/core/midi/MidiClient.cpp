@@ -237,9 +237,9 @@ void MidiClientRaw::parseData( const unsigned char c )
 
 void MidiClientRaw::processParsedEvent()
 {
-	for( int i = 0; i < m_midiPorts.size(); ++i )
+	for (const auto& midiPort : m_midiPorts)
 	{
-		m_midiPorts[i]->processInEvent( m_midiParseData.m_midiEvent );
+		midiPort->processInEvent(m_midiParseData.m_midiEvent);
 	}
 }
 

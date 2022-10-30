@@ -67,11 +67,6 @@ Piano::Piano( InstrumentTrack* track ) :
 	m_instrumentTrack( track ),
 	m_midiEvProc( track )        /*!< the InstrumentTrack Model */
 {
-	for( int i = 0; i < NumKeys; ++i )
-	{
-		m_pressedKeys[i] = false;
-	}
-
 }
 
 /*! \brief Turn a key on or off

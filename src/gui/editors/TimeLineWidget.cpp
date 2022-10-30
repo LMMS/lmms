@@ -88,7 +88,7 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
 	setMouseTracking(true);
 	m_pos.m_timeLine = this;
 
-	QTimer * updateTimer = new QTimer( this );
+	auto updateTimer = new QTimer(this);
 	connect( updateTimer, SIGNAL(timeout()),
 					this, SLOT(updatePosition()));
 	updateTimer->start( 1000 / 60 );  // 60 fps
@@ -121,14 +121,14 @@ void TimeLineWidget::setXOffset(const int x)
 
 void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
 {
-	NStateButton * autoScroll = new NStateButton( _tool_bar );
+	auto autoScroll = new NStateButton(_tool_bar);
 	autoScroll->setGeneralToolTip( tr( "Auto scrolling" ) );
 	autoScroll->addState( embed::getIconPixmap( "autoscroll_on" ) );
 	autoScroll->addState( embed::getIconPixmap( "autoscroll_off" ) );
 	connect( autoScroll, SIGNAL(changedState(int)), this,
 					SLOT(toggleAutoScroll(int)));
 
-	NStateButton * loopPoints = new NStateButton( _tool_bar );
+	auto loopPoints = new NStateButton(_tool_bar);
 	loopPoints->setGeneralToolTip( tr( "Loop points" ) );
 	loopPoints->addState( embed::getIconPixmap( "loop_points_off" ) );
 	loopPoints->addState( embed::getIconPixmap( "loop_points_on" ) );
@@ -137,7 +137,7 @@ void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
 	connect( this, SIGNAL(loopPointStateLoaded(int)), loopPoints,
 					SLOT(changeState(int)));
 
-	NStateButton * behaviourAtStop = new NStateButton( _tool_bar );
+	auto behaviourAtStop = new NStateButton(_tool_bar);
 	behaviourAtStop->addState( embed::getIconPixmap( "back_to_zero" ),
 					tr( "After stopping go back to beginning" )
 									);

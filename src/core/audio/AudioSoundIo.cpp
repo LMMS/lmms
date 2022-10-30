@@ -521,4 +521,4 @@ void AudioSoundIo::setupWidget::saveSettings()
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_HAVE_SOUNDIO

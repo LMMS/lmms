@@ -63,7 +63,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	setToolTip(tr("Press <%1> while clicking on move-grip "
 				"to begin a new drag'n'drop action." ).arg(UI_CTRL_KEY) );
 
-	QMenu * toMenu = new QMenu( this );
+	auto toMenu = new QMenu(this);
 	toMenu->setFont( pointSize<9>( toMenu->font() ) );
 	connect( toMenu, SIGNAL(aboutToShow()), this, SLOT(updateMenu()));
 
@@ -195,7 +195,7 @@ bool TrackOperationsWidget::confirmRemoval()
 					.arg(m_trackView->getTrack()->name());
 	QString messageTitleRemoveTrack = tr("Confirm removal");
 	QString askAgainText = tr("Don't ask again");
-	QCheckBox* askAgainCheckBox = new QCheckBox(askAgainText, nullptr);
+	auto askAgainCheckBox = new QCheckBox(askAgainText, nullptr);
 	connect(askAgainCheckBox, &QCheckBox::stateChanged, [this](int state){
 		// Invert button state, if it's checked we *shouldn't* ask again
 		ConfigManager::inst()->setValue("ui", "trackdeletionwarning", state ? "0" : "1");
@@ -337,7 +337,7 @@ void TrackOperationsWidget::updateMenu()
 		toMenu->addMenu(mixerMenu);
 	}
 
-	if (InstrumentTrackView * trackView = dynamic_cast<InstrumentTrackView *>(m_trackView))
+	if (auto trackView = dynamic_cast<InstrumentTrackView*>(m_trackView))
 	{
 		toMenu->addSeparator();
 		toMenu->addMenu(trackView->midiMenu());
@@ -362,12 +362,12 @@ void TrackOperationsWidget::updateMenu()
 
 void TrackOperationsWidget::toggleRecording( bool on )
 {
-	AutomationTrackView * atv = dynamic_cast<AutomationTrackView *>( m_trackView );
+	auto atv = dynamic_cast<AutomationTrackView*>(m_trackView);
 	if( atv )
 	{
 		for( Clip * clip : atv->getTrack()->getClips() )
 		{
-			AutomationClip * ap = dynamic_cast<AutomationClip *>( clip );
+			auto ap = dynamic_cast<AutomationClip*>(clip);
 			if( ap ) { ap->setRecording( on ); }
 		}
 		atv->update();

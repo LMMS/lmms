@@ -33,7 +33,7 @@
 #ifndef NDEBUG
 	#define NDEBUG
 #endif
-#endif
+#endif // LMMS_DEBUG
 
 #include <cassert>
 #include <cstdio>

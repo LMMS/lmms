@@ -22,6 +22,8 @@
  *
  */
 
+#ifndef IO_HELPER_H
+#define IO_HELPER_H
 
 #include "lmmsconfig.h"
 
@@ -37,7 +39,7 @@
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>
 #endif
-#endif
+#endif // LMMS_BUILD_WIN32
 
 namespace lmms
 {
@@ -88,3 +90,5 @@ int fileToDescriptor(FILE* f, bool closeFile = true)
 
 
 } // namespace lmms
+
+#endif

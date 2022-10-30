@@ -233,7 +233,7 @@ void ProjectRenderer::updateConsoleProgress()
 	}
 	prog[cols] = 0;
 
-	const char * activity = (const char *) "|/-\\";
+	const auto activity = (const char*)"|/-\\";
 	memset( buf, 0, sizeof( buf ) );
 	sprintf( buf, "\r|%s|    %3d%%   %c  ", prog, m_progress,
 							activity[rot] );

@@ -305,13 +305,13 @@ void AutomatableModel::setValue( const float value )
 		addJournalCheckPoint();
 
 		// notify linked models
-		for( AutoModelVector::Iterator it = m_linkedModels.begin(); it != m_linkedModels.end(); ++it )
+		for (const auto& linkedModel : m_linkedModels)
 		{
-			if( (*it)->m_setValueDepth < 1 && (*it)->fittedValue( value ) != (*it)->m_value )
+			if (linkedModel->m_setValueDepth < 1 && linkedModel->fittedValue(value) != linkedModel->m_value)
 			{
-				bool journalling = (*it)->testAndSetJournalling( isJournalling() );
-				(*it)->setValue( value );
-				(*it)->setJournalling( journalling );
+				bool journalling = linkedModel->testAndSetJournalling(isJournalling());
+				linkedModel->setValue(value);
+				linkedModel->setJournalling(journalling);
 			}
 		}
 		m_valueChanged = true;
@@ -388,13 +388,12 @@ void AutomatableModel::setAutomatedValue( const float value )
 	if( oldValue != m_value )
 	{
 		// notify linked models
-		for (AutoModelVector::Iterator it = m_linkedModels.begin();
-			it != m_linkedModels.end(); ++it)
+		for (const auto& linkedModel : m_linkedModels)
 		{
-			if (!((*it)->controllerConnection()) && (*it)->m_setValueDepth < 1 &&
-					(*it)->fittedValue(m_value) != (*it)->m_value)
+			if (!(linkedModel->controllerConnection()) && linkedModel->m_setValueDepth < 1 &&
+					linkedModel->fittedValue(m_value) != linkedModel->m_value)
 			{
-				(*it)->setAutomatedValue(value);
+				linkedModel->setAutomatedValue(value);
 			}
 		}
 		m_valueChanged = true;
@@ -733,11 +732,11 @@ float AutomatableModel::globalAutomationValueAt( const TimePos& time )
 		// of those clips:
 		// find the clips which overlap with the time position
 		QVector<AutomationClip *> clipsInRange;
-		for( QVector<AutomationClip *>::ConstIterator it = clips.begin(); it != clips.end(); it++ )
+		for (const auto& clip : clips)
 		{
-			int s = ( *it )->startPosition();
-			int e = ( *it )->endPosition();
-			if( s <= time && e >= time ) { clipsInRange += ( *it ); }
+			int s = clip->startPosition();
+			int e = clip->endPosition();
+			if (s <= time && e >= time) { clipsInRange += clip; }
 		}
 
 		AutomationClip * latestClip = nullptr;
@@ -753,13 +752,13 @@ float AutomatableModel::globalAutomationValueAt( const TimePos& time )
 		{
 			int latestPosition = 0;
 
-			for( QVector<AutomationClip *>::ConstIterator it = clips.begin(); it != clips.end(); it++ )
+			for (const auto& clip : clips)
 			{
-				int e = ( *it )->endPosition();
-				if( e <= time && e > latestPosition )
+				int e = clip->endPosition();
+				if (e <= time && e > latestPosition)
 				{
 					latestPosition = e;
-					latestClip = ( *it );
+					latestClip = clip;
 				}
 			}
 		}
@@ -801,7 +800,7 @@ float FloatModel::getRoundedValue() const
 
 int FloatModel::getDigitCount() const
 {
-	float steptemp = step<float>();
+	auto steptemp = step<float>();
 	int digits = 0;
 	while ( steptemp < 1 )
 	{

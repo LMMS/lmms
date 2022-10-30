@@ -93,6 +93,12 @@ public:
 		return m_length;
 	}
 
+	/*! \brief Specify whether or not a TCO automatically resizes.
+	 *
+	 *  If a TCO does automatically resize, it cannot be manually
+	 *  resized by clicking and dragging its edge.
+	 *
+	 */
 	inline void setAutoResize( const bool r )
 	{
 		m_autoResize = r;

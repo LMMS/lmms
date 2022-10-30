@@ -216,27 +216,28 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 				int len = n.toElement().attribute("steps", "1").toInt() * 12;
 
 				// for each pattern clip of the current pattern track (in song editor)
-				for (auto it = plist.begin(); it != plist.end(); ++it)
+				for (const auto& position : plist)
 				{
-					while (!st.empty() && st.back().second <= it->first)
+					const auto& [start, end] = position;
+					while (!st.empty() && st.back().second <= start)
 					{
 						writePatternClip(midiClip, nv, len, st.back().first, pos, st.back().second);
 						pos = st.back().second;
 						st.pop_back();
 					}
 
-					if (!st.empty() && st.back().second <= it->second)
+					if (!st.empty() && st.back().second <= end)
 					{
-						writePatternClip(midiClip, nv, len, st.back().first, pos, it->first);
-						pos = it->first;
-						while (!st.empty() && st.back().second <= it->second)
+						writePatternClip(midiClip, nv, len, st.back().first, pos, start);
+						pos = start;
+						while (!st.empty() && st.back().second <= end)
 						{
 							st.pop_back();
 						}
 					}
 
-					st.push_back(*it);
-					pos = it->first;
+					st.push_back(position);
+					pos = start;
 				}
 
 				while (!st.empty())
@@ -286,9 +287,9 @@ void MidiExport::writeMidiClip(MidiNoteVector &midiClip, const QDomNode& n,
 
 void MidiExport::writeMidiClipToTrack(MTrack &mtrack, MidiNoteVector &nv)
 {
-	for (auto it = nv.begin(); it != nv.end(); ++it)
+	for (const auto& note : nv)
 	{
-		mtrack.addNote(it->pitch, it->volume, it->time / 48.0, it->duration / 48.0);
+		mtrack.addNote(note.pitch, note.volume, note.time / 48.0, note.duration / 48.0);
 	}
 }
 
@@ -301,16 +302,15 @@ void MidiExport::writePatternClip(MidiNoteVector& src, MidiNoteVector& dst,
 	start -= base;
 	end -= base;
 	std::sort(src.begin(), src.end());
-	for (auto it = src.begin(); it != src.end(); ++it)
+	for (const auto& srcNote : src)
 	{
-		for (int time = it->time  + ceil((start - it->time) / len)
-				* len; time < end; time += len)
+		for (int time = srcNote.time + ceil((start - srcNote.time) / len) * len; time < end; time += len)
 		{
 			MidiNote note;
-			note.duration = it->duration;
-			note.pitch = it->pitch;
+			note.duration = srcNote.duration;
+			note.pitch = srcNote.pitch;
 			note.time = base + time;
-			note.volume = it->volume;
+			note.volume = srcNote.volume;
 			dst.push_back(note);
 		}
 	}
