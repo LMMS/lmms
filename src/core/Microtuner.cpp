@@ -110,7 +110,7 @@ float Microtuner::keyToFreq(int key, int userBaseNote) const
 
 int Microtuner::octaveSize() const
 {
-	int keymapSize = Engine::getSong()->getKeymap(currentKeymap())->getSize();
+	const int keymapSize = Engine::getSong()->getKeymap(currentKeymap())->getSize();
 	if (keymapSize > 0)
 	{
 		return keymapSize;
