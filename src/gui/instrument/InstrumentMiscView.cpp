@@ -55,6 +55,7 @@ InstrumentMiscView::InstrumentMiscView(InstrumentTrack *it, QWidget *parent) :
 	masterPitchLayout->setContentsMargins(8, 18, 8, 8);
 
 	auto tlabel = new QLabel(tr("Enables the use of global transposition"));
+	tlabel->setWordWrap(true);
 	tlabel->setFont(pointSize<8>(tlabel->font()));
 	masterPitchLayout->addWidget(tlabel);
 
