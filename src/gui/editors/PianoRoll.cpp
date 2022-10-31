@@ -1315,7 +1315,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 					if (hasValidMidiClip())
 					{
 						// An octave could potentially be greater or less than twelve semitones if the microtuner is in use.
-						auto microtuner = m_midiClip->instrumentTrack()->microtuner();
+						const auto microtuner = m_midiClip->instrumentTrack()->microtuner();
 						if (microtuner->enabled())
 						{
 							shiftSemiTone(microtuner->octaveSize() * direction);
