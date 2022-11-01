@@ -40,7 +40,7 @@
 TunerControlDialog::TunerControlDialog(TunerControls* controls)
 	: EffectControlDialog(controls)
 {
-	setFixedSize(240, 240);
+	setFixedSize(128, 128);
 	setAutoFillBackground(true);
 
 	auto pal = QPalette();
@@ -75,16 +75,6 @@ TunerControlDialog::TunerControlDialog(TunerControls* controls)
 	QObject::connect(controls->m_tuner, &Tuner::frequencyCalculated, this, [this](float frequency){ frequencyCalculated(frequency); });
 }
 
-void TunerControlDialog::paintEvent(QPaintEvent* event) 
-{
-	auto painter = QPainter(this);
-	painter.setPen(Qt::white);
-	painter.drawArc(QRectF{20.0, 50.0, 200.0, 60.0}, 30 * 16, 120 * 16);
-
-	painter.setBrush(Qt::white);
-	painter.drawEllipse(QPoint{120, 50}, 8, 8);
-}
-
 void TunerControlDialog::frequencyCalculated(float frequency)
 {	
 	// A4 = referenceFrequency
@@ -94,77 +84,62 @@ void TunerControlDialog::frequencyCalculated(float frequency)
 	const int octavesFromReference = std::round(centsFromReference / 1200.0f);
 	const int octaveOfNote = 4 + octavesFromReference;
 	
-	int centsRemaining = (centsFromReference - (octavesFromReference * 1200));
-	int semitonesFromReference = centsRemaining / 100;
-	int centsOfNote = centsRemaining % 100;
-
-	// If it is over 50ct, we can roll over to the nearest semitone
-	if (centsOfNote >= 50 || centsOfNote <= -50) 
-	{
-		const auto centsOfNoteNormalized = centsOfNote / std::abs(centsOfNote);
-		semitonesFromReference += centsOfNoteNormalized;
-		centsOfNote = 100 - (centsOfNote * centsOfNoteNormalized);
-	}
+	int centsRemaining = centsFromReference - (octavesFromReference * 1200);
+	int semitonesFromReference = std::round(centsRemaining / 100);
+	int centsOfNote = centsRemaining - (semitonesFromReference * 100);
 
 	if (semitonesFromReference < 0) { semitonesFromReference += 12; }
-	std::string note = "";
-
-	switch (static_cast<NoteName>(semitonesFromReference))
-	{
-	case NoteName::A:
-		note = "A";
-		break;
-	case NoteName::ASharp:
-		note = "A#";
-		break;
-	case NoteName::B:
-		note = "B";
-		break;
-	case NoteName::C:
-		note = "C";
-		break;
-	case NoteName::CSharp:
-		note = "C#";
-		break;
-	case NoteName::D:
-		note = "D";
-		break;
-	case NoteName::DSharp:
-		note = "D#";
-		break;
-	case NoteName::E:
-		note = "E";
-		break;
-	case NoteName::F:
-		note = "F";
-		break;
-	case NoteName::FSharp:
-		note = "F#";
-		break;
-	case NoteName::G:
-		note = "G";
-		break;
-	case NoteName::GSharp:
-		note = "G#";
-		break;
-	default:
-		note = "";
-	};
-
+	auto note = noteToString(static_cast<NoteName>(semitonesFromReference));
 	m_noteLabel->setText(QString::fromStdString(note));
-	if (octaveOfNote >= -1) { m_octaveLabel->setText(QString::number(octaveOfNote)); };
-	m_centsLabel->setText((centsOfNote >= 0 ? "+" : "") + QString::number(centsOfNote) + "ct");
 
-	if (centsOfNote >= 0 && centsOfNote <= 10) 
+	//Only give back the octave if it is in a useful range
+	if (octaveOfNote >= -1 && octaveOfNote <= 8) { m_octaveLabel->setText(QString::number(octaveOfNote)); };
+	
+	m_centsLabel->setText((centsOfNote >= 0 ? "+" : "") + QString::number(centsOfNote) + "ct");
+	auto centDistance = std::abs(centsOfNote);
+	if (centDistance >= 0 && centDistance <= 10) 
 	{
 		m_centsLabel->setStyleSheet("QLabel { color : green; }");
 	}
-	else if (centsOfNote > 10 && centsOfNote <= 30) 
+	else if (centDistance > 10 && centDistance <= 30) 
 	{
 		m_centsLabel->setStyleSheet("QLabel { color : yellow; }");
 	}
-	else if (centsOfNote > 30) 
+	else if (centDistance > 30) 
 	{
 		m_centsLabel->setStyleSheet("QLabel { color : red; }");
 	}
 }
+
+std::string TunerControlDialog::noteToString(NoteName note) 
+{
+	switch (note)
+	{
+	case NoteName::A:
+		return "A";
+	case NoteName::ASharp:
+		return "A#";
+	case NoteName::B:
+		return "B";
+	case NoteName::C:
+		return "C";
+	case NoteName::CSharp:
+		return "C#";
+	case NoteName::D:
+		return "D";
+	case NoteName::DSharp:
+		return "D#";
+	case NoteName::E:
+		return "E";
+	case NoteName::F:
+		return "F";
+	case NoteName::FSharp:
+		return "F#";
+	case NoteName::G:
+		return "G";
+	case NoteName::GSharp:
+		return "G#";
+	default:
+		return "";
+	};
+} 

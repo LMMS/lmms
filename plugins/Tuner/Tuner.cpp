@@ -78,13 +78,31 @@ bool Tuner::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			if (m_samplesCounter % m_hopSize == 0 && m_samplesCounter > 0) 
 			{
 				aubio_pitch_do(m_aubioPitch, m_inputBuffer, m_outputBuffer);
-				emit frequencyCalculated(fvec_get_sample(m_outputBuffer, 0));
 				m_samplesCounter = 0;
+
+				const float frequency = fvec_get_sample(m_outputBuffer, 0);  
+				m_finalFrequency += (frequency - m_finalFrequency) / ++m_numOutputsCounter;
+
+				if (m_numOutputsCounter % m_numOutputsPerUpdate == 0)
+				{
+					emit frequencyCalculated(m_finalFrequency);
+					m_finalFrequency = 0.0f;
+					m_numOutputsCounter = 0;
+				}
 			}
 
-			fvec_set_sample(m_inputBuffer, (buf[i][0] + buf[i][1]) * 0.5f, m_samplesCounter);
-			++m_samplesCounter;
+			fvec_set_sample(m_inputBuffer, (buf[i][0] + buf[i][1]) * 0.5f, m_samplesCounter++);
 		}
+
+		if (!m_clearInputBuffer)
+		{
+			m_clearInputBuffer = true;
+		}
+	}
+	else if (m_clearInputBuffer)
+	{
+		fvec_zeros(m_inputBuffer);
+		m_clearInputBuffer = false;
 	}
 
 	checkGate(outSum / frames);

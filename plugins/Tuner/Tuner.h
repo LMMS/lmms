@@ -51,7 +51,11 @@ private:
 
 	const int m_windowSize = 8192;
 	const int m_hopSize = 128;
+	int m_numOutputsPerUpdate = 32;
+	int m_numOutputsCounter = 0;
 	int m_samplesCounter = 0;
+	float m_finalFrequency = 0.0f;
+	bool m_clearInputBuffer = false;
 
 	aubio_pitch_t* m_aubioPitch;
 	fvec_t* m_inputBuffer;

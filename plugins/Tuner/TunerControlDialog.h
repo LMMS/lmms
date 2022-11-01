@@ -49,17 +49,17 @@ public:
 		G,
 		GSharp
 	};
-	
-	TunerControlDialog(TunerControls* controls);
-	void paintEvent(QPaintEvent* event) override;
-	void frequencyCalculated(float frequency);
 
+	TunerControlDialog(TunerControls* controls);
+	void frequencyCalculated(float frequency);
+	std::string noteToString(NoteName name);
 private:
 	LcdWidget* m_centsWidget;
 	LcdWidget* m_freqWidget;
 	QLabel* m_noteLabel;
 	QLabel* m_octaveLabel;
 	QLabel* m_centsLabel;
+	QLabel* m_frequencyLabel;
 	friend class TunerControls;
 };
 
