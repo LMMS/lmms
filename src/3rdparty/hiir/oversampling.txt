@@ -1,0 +1,233 @@
+﻿
+Oversampling with HIIR
+======================
+
+– Purpose: upsampling + downsampling with an integer value for the total group
+delay of both operations. This helps reducing the frequency-dependant cancel-
+lation when mixing the processed signal with the original signal, because the
+original signal can be easily delay-compensated.
+
+– Bandwidth may vary. It is greater than 19 kHz at a 44.1 kHz sampling rate.
+
+– Group delay is measured at 1 kHz for a 44.1 kHz base sampling rate. For
+audio signals, this helps reaching the initial goal because small sub-sample
+delays on low-frequency content hava a neglictible impact on the cancellation
+issue. Moreover, the human ear is most sensitive in the 1–4 kHz range.
+
+– Single-trip filtering (upsampling or downsampling) is half the specified
+total group delay.
+
+
+
+2x, 118 dB
+¯¯¯¯¯¯¯¯¯¯
+
+Total GD : 4.0 spl
+Bandwidth: 19052 Hz
+
+Coefficients: 8
+Attenuation : 118.478 dB
+Trans BW:     0.0679698
+Group delay:  4 spl
+GD rel freq:  0.0113379
+Coefficient list:
+        0.029771566661791642
+        0.11293802507590323
+        0.23389457050522444
+        0.37412196640361606
+        0.51845353417401152
+        0.65849242953158127
+        0.79323734846738669
+        0.92851085864352823
+
+
+
+2x, 86 dB
+¯¯¯¯¯¯¯¯¯
+
+Total GD : 3.0 spl
+Bandwidth: 19321 Hz
+
+Coefficients: 6
+Attenuation : 86.1982 dB
+Trans BW:     0.0618657
+Group delay:  3 spl
+GD rel freq:  0.0113379
+Coefficient list:
+        0.05323124776609587
+        0.19364679870585294
+        0.3781496511483225
+        0.56780710799005629
+        0.74454888477791159
+        0.91259951273114115
+
+
+
+4x, 129 dB
+¯¯¯¯¯¯¯¯¯¯
+
+Total GD : 6.0 spl
+Bandwidth: 19003 Hz
+
+Coefficients: 4
+Attenuation : 129.641 dB
+Trans BW:     0.284545
+Group delay:  2.758 spl
+GD rel freq:  0.00566893
+Coefficient list:
+        0.039003493679774473
+        0.15935669751127579
+        0.3760341917496039
+        0.73417946269919343
+
+Coefficients: 10
+Attenuation : 132.717 dB
+Trans BW:     0.0495663
+Group delay:  4.621 spl
+GD rel freq:  0.0113379
+Coefficient list:
+        0.023789191663652412
+        0.091003977764246569
+        0.19073588674066314
+        0.3090618687854978
+        0.43300976404207037
+        0.55317581692160323
+        0.66459092050787805
+        0.76634854811343422
+        0.86077401891943195
+        0.95275154166139631
+
+
+
+4x, 103 dB
+¯¯¯¯¯¯¯¯¯¯
+
+Total GD : 5.0 spl
+Bandwidth: 20041 Hz
+
+Coefficients: 4
+Attenuation : 105.433 dB
+Trans BW:     0.216404
+Group delay:  2.65 spl
+GD rel freq:  0.00566893
+Coefficient list:
+        0.046884154411851092
+        0.18507704297612981
+        0.41449099059428018
+        0.75938167397962619
+
+Coefficients: 8
+Attenuation : 103.419 dB
+Trans BW:     0.0455352
+Group delay:  3.675 spl
+GD rel freq:  0.0113379
+Coefficient list:
+        0.03780557945623593
+        0.14087155204706456
+        0.28399647240907816
+        0.43963962549399588
+        0.58794744313411706
+        0.72007394134794878
+        0.8366526760248606
+        0.94507809950113342
+
+
+
+4x, 77 dB
+¯¯¯¯¯¯¯¯¯
+
+Total GD : 4.0 spl
+Bandwidth: 21335 Hz
+
+Coefficients: 3
+Attenuation : 79.6658 dB
+Trans BW:     0.212423
+Group delay:  2.06 spl
+GD rel freq:  0.00566893
+Coefficient list:
+        0.07819449364682253
+        0.30699114982473047
+        0.70279393407418822
+
+Coefficients: 8
+Attenuation : 77.468 dB
+Trans BW:     0.016203
+Group delay:  2.97 spl
+GD rel freq:  0.0113379
+Coefficient list:
+        0.063197755826959232
+        0.22379856090736752
+        0.41991987445736001
+        0.60001868664013414
+        0.74142961506492877
+        0.84386929889458695
+        0.917212853263219
+        0.97391838508705231
+
+
+
+8x, 97 dB
+¯¯¯¯¯¯¯¯¯
+
+Total GD : 5.0 spl
+Bandwidth: 19139 Hz
+
+Coefficients: 2
+Attenuation : 98.7099 dB
+Trans BW:     0.387032
+Group delay:  1.6 spl
+GD rel freq:  0.00283447
+Coefficient list:
+        0.11116740519894572
+        0.53837812120804285
+
+Coefficients: 3
+Attenuation : 99.0211 dB
+Trans BW:     0.283002
+Group delay:  2.15 spl
+GD rel freq:  0.00566893
+Coefficient list:
+        0.064957826108157521
+        0.27015213717425107
+        0.67154776115693604
+
+Coefficients: 8
+Attenuation : 97.2794 dB
+Trans BW:     0.0373821
+Group delay:  3.525 spl
+GD rel freq:  0.0113379
+Coefficient list:
+        0.042153109027814516
+        0.15563989022979918
+        0.30958383558775832
+        0.4717493609227047
+        0.6205678058528159
+        0.74780968500509482
+        0.85549697199148433
+        0.95204827732052744
+
+
+
+Calc helper
+¯¯¯¯¯¯¯¯¯¯¯
+
+total_dly_both = dly_21 + dly_42 / 2 + dly_84 / 4 + dly_168 / 8
+
+19 kHz @ 44.1 kHz base rate: TBW = 0.06916
+ 2x <-> 1x: TBW = (0.06916)                      = 0.06916
+ 4x <-> 2x: TBW = (0.06916)/2 + 1/4              = 0.28458
+ 8x <-> 4x: TBW = (0.06916)/4 + 1/8  + 1/4       = 0.39229
+16x <-> 8x: TBW = (0.06916)/8 + 1/16 + 1/8 + 1/4 = 0.446145
+
+Candidate for 16x <-> 8x, 1 coef:
+
+Coefficients: 1
+Attenuation : 76.1806 dB
+Trans BW:     0.44582
+Group delay:  0.994601 spl
+GD rel freq:  0.00141723
+Coefficient list:
+        0.33576377603533708
+
+FIR, 8x -> 4x, -90.4 dB, 8 coefs, 3.5 spl group delay, linear phase
+tbw = 0.39229; n = 8; att = 10^(-100*20); b = firpm (n - 1, [0 0.5-tbw 0.5+tbw 1], [1 1 att att], [1 100]); freqz (b);
