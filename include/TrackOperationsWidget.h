@@ -29,6 +29,9 @@
 
 class QPushButton;
 
+namespace lmms::gui
+{
+
 class PixmapButton;
 class TrackView;
 
@@ -37,22 +40,23 @@ class TrackOperationsWidget : public QWidget
 	Q_OBJECT
 public:
 	TrackOperationsWidget( TrackView * parent );
-	~TrackOperationsWidget();
+	~TrackOperationsWidget() override = default;
 
 
 protected:
 	void mousePressEvent( QMouseEvent * me ) override;
 	void paintEvent( QPaintEvent * pe ) override;
+	bool confirmRemoval();
 
 
 private slots:
 	void cloneTrack();
 	void removeTrack();
 	void updateMenu();
-	void changeTrackColor();
-	void randomTrackColor();
+	void selectTrackColor();
+	void randomizeTrackColor();
 	void resetTrackColor();
-	void useTrackColor();
+	void resetClipColors();
 	void toggleRecording(bool on);
 	void recordingOn();
 	void recordingOff();
@@ -69,11 +73,11 @@ private:
 	friend class TrackView;
 
 signals:
-	void trackRemovalScheduled( TrackView * t );
-	void colorChanged( QColor & c );
-	void colorParented();
-	void colorReset();
+	void trackRemovalScheduled( lmms::gui::TrackView * t );
 
 } ;
+
+
+} // namespace lmms::gui
 
 #endif

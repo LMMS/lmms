@@ -27,11 +27,17 @@
 
 #include <cstdint>
 
-typedef int16_t pitch_t;
+namespace lmms
+{
 
-const pitch_t CentsPerSemitone = 100;
-const pitch_t MinPitchDefault = -CentsPerSemitone;
-const pitch_t MaxPitchDefault = CentsPerSemitone;
-const pitch_t DefaultPitch = 0;
+using pitch_t = int16_t;
+
+constexpr pitch_t CentsPerSemitone = 100;
+constexpr pitch_t MinPitchDefault = -CentsPerSemitone;
+constexpr pitch_t MaxPitchDefault = CentsPerSemitone;
+constexpr pitch_t DefaultPitch = 0;
+
+
+} // namespace lmms
 
 #endif

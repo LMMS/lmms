@@ -31,10 +31,14 @@
 #include "lmms_constants.h"
 
 
+namespace lmms
+{
+
+
 Instrument::Instrument(InstrumentTrack * _instrument_track,
 			const Descriptor * _descriptor,
 			const Descriptor::SubPluginFeatures::Key *key) :
-	Plugin(_descriptor, NULL/* _instrument_track*/, key),
+	Plugin(_descriptor, nullptr/* _instrument_track*/, key),
 	m_instrumentTrack( _instrument_track )
 {
 }
@@ -176,7 +180,7 @@ void Instrument::applyFadeIn(sampleFrame * buf, NotePlayHandle * n)
 void Instrument::applyRelease( sampleFrame * buf, const NotePlayHandle * _n )
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
-	const fpp_t fpp = Engine::mixer()->framesPerPeriod();
+	const fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
 	const f_cnt_t fl = _n->framesLeft();
 	if( fl <= desiredReleaseFrames()+fpp )
 	{
@@ -201,3 +205,6 @@ QString Instrument::fullDisplayName() const
 {
 	return instrumentTrack()->displayName();
 }
+
+
+} // namespace lmms

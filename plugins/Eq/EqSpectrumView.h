@@ -23,13 +23,14 @@
 #ifndef EQSPECTRUMVIEW_H
 #define EQSPECTRUMVIEW_H
 
-#include <QPainter>
 #include <QPainterPath>
 #include <QWidget>
 
 #include "fft_helpers.h"
 #include "lmms_basics.h"
-#include "lmms_math.h"
+
+namespace lmms
+{
 
 
 const int MAX_BANDS = 2048;
@@ -65,22 +66,21 @@ private:
 };
 
 
-
+namespace gui
+{
 
 class EqSpectrumView : public QWidget
 {
 	Q_OBJECT
 public:
 	explicit EqSpectrumView( EqAnalyser *b, QWidget *_parent = 0 );
-	virtual ~EqSpectrumView()
-	{
-	}
+	~EqSpectrumView() override = default;
 
 	QColor getColor() const;
 	void setColor( const QColor &value );
 
 protected:
-	virtual void paintEvent( QPaintEvent *event );
+	void paintEvent( QPaintEvent *event ) override;
 
 private slots:
 	void periodicalUpdate();
@@ -98,4 +98,10 @@ private:
 
 	float bandToFreq ( int index );
 };
+
+
+} // namespace gui
+
+} // namespace lmms
+
 #endif // EQSPECTRUMVIEW_H

@@ -31,7 +31,17 @@
 
 
 class QHBoxLayout;
+
+namespace lmms
+{
+
 class LadspaControls;
+
+
+namespace gui
+{
+
+
 class LedCheckBox;
 
 
@@ -40,11 +50,11 @@ class LadspaControlDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	LadspaControlDialog( LadspaControls * _ctl );
-	~LadspaControlDialog();
+	~LadspaControlDialog() override = default;
 
 
 private slots:
-	void updateEffectView( LadspaControls * _ctl );
+	void updateEffectView( lmms::LadspaControls * _ctl );
 
 
 private:
@@ -52,5 +62,10 @@ private:
 	LedCheckBox * m_stereoLink;
 
 } ;
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

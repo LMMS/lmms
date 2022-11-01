@@ -23,10 +23,10 @@
  */
 
 #include "SampleBuffer.h"
+#include "Oscillator.h"
 
 #include <algorithm>
 
-#include <QBuffer>
 #include <QFile>
 #include <QFileInfo>
 #include <QMessageBox>
@@ -49,19 +49,23 @@
 #endif
 
 
+#include "AudioEngine.h"
 #include "base64.h"
 #include "ConfigManager.h"
 #include "DrumSynth.h"
 #include "endian_handling.h"
 #include "Engine.h"
 #include "GuiApplication.h"
-#include "Mixer.h"
+#include "Note.h"
 #include "PathUtil.h"
 
 #include "FileDialog.h"
 
+namespace lmms
+{
 
 SampleBuffer::SampleBuffer() :
+	m_userAntiAliasWaveTable(nullptr),
 	m_audioFile(""),
 	m_origData(nullptr),
 	m_origFrames(0),
@@ -73,11 +77,11 @@ SampleBuffer::SampleBuffer() :
 	m_loopEndFrame(0),
 	m_amplification(1.0f),
 	m_reversed(false),
-	m_frequency(BaseFreq),
-	m_sampleRate(mixerSampleRate())
+	m_frequency(DefaultBaseFreq),
+	m_sampleRate(audioEngineSampleRate())
 {
 
-	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(sampleRateChanged()));
+	connect(Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(sampleRateChanged()));
 	update();
 }
 
@@ -105,7 +109,7 @@ SampleBuffer::SampleBuffer(const sampleFrame * data, const f_cnt_t frames)
 {
 	if (frames > 0)
 	{
-		m_origData = MM_ALLOC(sampleFrame, frames);
+		m_origData = MM_ALLOC<sampleFrame>( frames);
 		memcpy(m_origData, data, frames * BYTES_PER_FRAME);
 		m_origFrames = frames;
 		update();
@@ -120,7 +124,7 @@ SampleBuffer::SampleBuffer(const f_cnt_t frames)
 {
 	if (frames > 0)
 	{
-		m_origData = MM_ALLOC(sampleFrame, frames);
+		m_origData = MM_ALLOC<sampleFrame>( frames);
 		memset(m_origData, 0, frames * BYTES_PER_FRAME);
 		m_origFrames = frames;
 		update();
@@ -136,9 +140,9 @@ SampleBuffer::SampleBuffer(const SampleBuffer& orig)
 
 	m_audioFile = orig.m_audioFile;
 	m_origFrames = orig.m_origFrames;
-	m_origData = (m_origFrames > 0) ? MM_ALLOC(sampleFrame, m_origFrames) : nullptr;
+	m_origData = (m_origFrames > 0) ? MM_ALLOC<sampleFrame>( m_origFrames) : nullptr;
 	m_frames = orig.m_frames;
-	m_data = (m_frames > 0) ? MM_ALLOC(sampleFrame, m_frames) : nullptr;
+	m_data = (m_frames > 0) ? MM_ALLOC<sampleFrame>( m_frames) : nullptr;
 	m_startFrame = orig.m_startFrame;
 	m_endFrame = orig.m_endFrame;
 	m_loopStartFrame = orig.m_loopStartFrame;
@@ -223,9 +227,9 @@ void SampleBuffer::sampleRateChanged()
 	update(true);
 }
 
-sample_rate_t SampleBuffer::mixerSampleRate()
+sample_rate_t SampleBuffer::audioEngineSampleRate()
 {
-	return Engine::mixer()->processingSampleRate();
+	return Engine::audioEngine()->processingSampleRate();
 }
 
 
@@ -234,7 +238,7 @@ void SampleBuffer::update(bool keepSettings)
 	const bool lock = (m_data != nullptr);
 	if (lock)
 	{
-		Engine::mixer()->requestChangeInModel();
+		Engine::audioEngine()->requestChangeInModel();
 		m_varLock.lockForWrite();
 		MM_FREE(m_data);
 	}
@@ -248,7 +252,7 @@ void SampleBuffer::update(bool keepSettings)
 	{
 		// TODO: reverse- and amplification-property is not covered
 		// by following code...
-		m_data = MM_ALLOC(sampleFrame, m_origFrames);
+		m_data = MM_ALLOC<sampleFrame>( m_origFrames);
 		memcpy(m_data, m_origData, m_origFrames * BYTES_PER_FRAME);
 		if (keepSettings == false)
 		{
@@ -263,7 +267,7 @@ void SampleBuffer::update(bool keepSettings)
 		int_sample_t * buf = nullptr;
 		sample_t * fbuf = nullptr;
 		ch_cnt_t channels = DEFAULT_CHANNELS;
-		sample_rate_t samplerate = mixerSampleRate();
+		sample_rate_t samplerate = audioEngineSampleRate();
 		m_frames = 0;
 
 		const QFileInfo fileInfo(file);
@@ -322,7 +326,7 @@ void SampleBuffer::update(bool keepSettings)
 		{
 			// sample couldn't be decoded, create buffer containing
 			// one sample-frame
-			m_data = MM_ALLOC(sampleFrame, 1);
+			m_data = MM_ALLOC<sampleFrame>( 1);
 			memset(m_data, 0, sizeof(*m_data));
 			m_frames = 1;
 			m_loopStartFrame = m_startFrame = 0;
@@ -337,7 +341,7 @@ void SampleBuffer::update(bool keepSettings)
 	{
 		// neither an audio-file nor a buffer to copy from, so create
 		// buffer containing one sample-frame
-		m_data = MM_ALLOC(sampleFrame, 1);
+		m_data = MM_ALLOC<sampleFrame>( 1);
 		memset(m_data, 0, sizeof(*m_data));
 		m_frames = 1;
 		m_loopStartFrame = m_startFrame = 0;
@@ -347,10 +351,17 @@ void SampleBuffer::update(bool keepSettings)
 	if (lock)
 	{
 		m_varLock.unlock();
-		Engine::mixer()->doneChangeInModel();
+		Engine::audioEngine()->doneChangeInModel();
 	}
 
 	emit sampleUpdated();
+
+	// allocate space for anti-aliased wave table
+	if (m_userAntiAliasWaveTable == nullptr)
+	{
+		m_userAntiAliasWaveTable = std::make_unique<OscillatorConstants::waveform_t>();
+	}
+	Oscillator::generateAntiAliasUserWaveTable(this);
 
 	if (fileLoadError)
 	{
@@ -358,7 +369,7 @@ void SampleBuffer::update(bool keepSettings)
 		QString message = tr("Audio files are limited to %1 MB "
 				"in size and %2 minutes of playing time"
 				).arg(fileSizeMax).arg(sampleLengthMax);
-		if (gui)
+		if (gui::getGUI() != nullptr)
 		{
 			QMessageBox::information(nullptr,
 				title, message,	QMessageBox::Ok);
@@ -379,7 +390,7 @@ void SampleBuffer::convertIntToFloat(
 {
 	// following code transforms int-samples into float-samples and does amplifying & reversing
 	const float fac = 1 / OUTPUT_SAMPLE_MULTIPLIER;
-	m_data = MM_ALLOC(sampleFrame, frames);
+	m_data = MM_ALLOC<sampleFrame>( frames);
 	const int ch = (channels > 1) ? 1 : 0;
 
 	// if reversing is on, we also reverse when scaling
@@ -402,7 +413,7 @@ void SampleBuffer::directFloatWrite(
 )
 {
 
-	m_data = MM_ALLOC(sampleFrame, frames);
+	m_data = MM_ALLOC<sampleFrame>( frames);
 	const int ch = (channels > 1) ? 1 : 0;
 
 	// if reversing is on, we also reverse when scaling
@@ -423,14 +434,14 @@ void SampleBuffer::normalizeSampleRate(const sample_rate_t srcSR, bool keepSetti
 {
 	const sample_rate_t oldRate = m_sampleRate;
 	// do samplerate-conversion to our default-samplerate
-	if (srcSR != mixerSampleRate())
+	if (srcSR != audioEngineSampleRate())
 	{
-		SampleBuffer * resampled = resample(srcSR, mixerSampleRate());
+		SampleBuffer * resampled = resample(srcSR, audioEngineSampleRate());
 
-		m_sampleRate = mixerSampleRate();
+		m_sampleRate = audioEngineSampleRate();
 		MM_FREE(m_data);
 		m_frames = resampled->frames();
-		m_data = MM_ALLOC(sampleFrame, m_frames);
+		m_data = MM_ALLOC<sampleFrame>( m_frames);
 		memcpy(m_data, resampled->data(), m_frames * sizeof(sampleFrame));
 		delete resampled;
 	}
@@ -441,15 +452,15 @@ void SampleBuffer::normalizeSampleRate(const sample_rate_t srcSR, bool keepSetti
 		m_loopStartFrame = m_startFrame = 0;
 		m_loopEndFrame = m_endFrame = m_frames;
 	}
-	else if (oldRate != mixerSampleRate())
+	else if (oldRate != audioEngineSampleRate())
 	{
-		auto oldRateToNewRateRatio = static_cast<float>(mixerSampleRate()) / oldRate;
+		auto oldRateToNewRateRatio = static_cast<float>(audioEngineSampleRate()) / oldRate;
 
 		m_startFrame = qBound(0, f_cnt_t(m_startFrame * oldRateToNewRateRatio), m_frames);
 		m_endFrame = qBound(m_startFrame, f_cnt_t(m_endFrame * oldRateToNewRateRatio), m_frames);
 		m_loopStartFrame = qBound(0, f_cnt_t(m_loopStartFrame * oldRateToNewRateRatio), m_frames);
 		m_loopEndFrame = qBound(m_loopStartFrame, f_cnt_t(m_loopEndFrame * oldRateToNewRateRatio), m_frames);
-		m_sampleRate = mixerSampleRate();
+		m_sampleRate = audioEngineSampleRate();
 	}
 }
 
@@ -527,7 +538,7 @@ size_t qfileReadCallback(void * ptr, size_t size, size_t n, void * udata )
 
 int qfileSeekCallback(void * udata, ogg_int64_t offset, int whence)
 {
-	QFile * f = static_cast<QFile *>(udata);
+	auto f = static_cast<QFile*>(udata);
 
 	if (whence == SEEK_CUR)
 	{
@@ -583,7 +594,7 @@ f_cnt_t SampleBuffer::decodeSampleOGGVorbis(
 
 	f_cnt_t frames = 0;
 
-	QFile * f = new QFile(fileName);
+	auto f = new QFile(fileName);
 	if (f->open(QFile::ReadOnly) == false)
 	{
 		delete f;
@@ -661,7 +672,7 @@ f_cnt_t SampleBuffer::decodeSampleOGGVorbis(
 
 	return frames;
 }
-#endif
+#endif // LMMS_HAVE_OGGVORBIS
 
 
 
@@ -709,13 +720,14 @@ bool SampleBuffer::play(
 	// variable for determining if we should currently be playing backwards in a ping-pong loop
 	bool isBackwards = state->isBackwards();
 
+	// The SampleBuffer can play a given sample with increased or decreased pitch. However, only
+	// samples that contain a tone that matches the default base note frequency of 440 Hz will
+	// produce the exact requested pitch in [Hz].
 	const double freqFactor = (double) freq / (double) m_frequency *
-		m_sampleRate / Engine::mixer()->processingSampleRate();
+		m_sampleRate / Engine::audioEngine()->processingSampleRate();
 
 	// calculate how many frames we have in requested pitch
-	const f_cnt_t totalFramesForCurrentPitch = static_cast<f_cnt_t>(
-		(endFrame - startFrame) / freqFactor
-	);
+	const auto totalFramesForCurrentPitch = static_cast<f_cnt_t>((endFrame - startFrame) / freqFactor);
 
 	if (totalFramesForCurrentPitch == 0)
 	{
@@ -893,7 +905,7 @@ sampleFrame * SampleBuffer::getSampleFragment(
 		}
 	}
 
-	*tmp = MM_ALLOC(sampleFrame, frames);
+	*tmp = MM_ALLOC<sampleFrame>( frames);
 
 	if (loopMode == LoopOff)
 	{
@@ -998,6 +1010,13 @@ f_cnt_t SampleBuffer::getPingPongIndex(f_cnt_t index, f_cnt_t startf, f_cnt_t en
 }
 
 
+/* @brief Draws a sample buffer on the QRect given in the range [fromFrame, toFrame)
+ * @param QPainter p: Painter object for the painting operations
+ * @param QRect dr: QRect where the buffer will be drawn in
+ * @param QRect clip: QRect used for clipping
+ * @param f_cnt_t fromFrame: First frame of the range
+ * @param f_cnt_t toFrame: Last frame of the range non-inclusive
+ */
 void SampleBuffer::visualize(
 	QPainter & p,
 	const QRect & dr,
@@ -1009,6 +1028,7 @@ void SampleBuffer::visualize(
 	if (m_frames == 0) { return; }
 
 	const bool focusOnRange = toFrame <= m_frames && 0 <= fromFrame && fromFrame < toFrame;
+	//TODO: If the clip QRect is not being used we should remove it
 	//p.setClipRect(clip);
 	const int w = dr.width();
 	const int h = dr.height();
@@ -1017,30 +1037,83 @@ void SampleBuffer::visualize(
 	const float ySpace = h * 0.5f;
 	const int nbFrames = focusOnRange ? toFrame - fromFrame : m_frames;
 
-	const int fpp = qBound<int>(1, nbFrames / w, 20);
-	QPointF * l = new QPointF[nbFrames / fpp + 1];
-	QPointF * r = new QPointF[nbFrames / fpp + 1];
-	int n = 0;
+	const double fpp = std::max(1., static_cast<double>(nbFrames) / w);
+	// There are 2 possibilities: Either nbFrames is bigger than
+	// the width, so we will have width points, or nbFrames is
+	// smaller than the width (fpp = 1) and we will have nbFrames
+	// points
+	const int totalPoints = nbFrames > w
+		? w
+		: nbFrames;
+	std::vector<QPointF> fEdgeMax(totalPoints);
+	std::vector<QPointF> fEdgeMin(totalPoints);
+	std::vector<QPointF> fRmsMax(totalPoints);
+	std::vector<QPointF> fRmsMin(totalPoints);
+	int curPixel = 0;
 	const int xb = dr.x();
 	const int first = focusOnRange ? fromFrame : 0;
 	const int last = focusOnRange ? toFrame - 1 : m_frames - 1;
+	// When the number of frames isn't perfectly divisible by the
+	// width, the remaining frames don't fit the last pixel and are
+	// past the visible area. lastVisibleFrame is the index number of
+	// the last visible frame.
+	const int visibleFrames = (fpp * w);
+	const int lastVisibleFrame = focusOnRange
+		? fromFrame + visibleFrames - 1
+		: visibleFrames - 1;
 
-	for (int frame = first; frame <= last; frame += fpp)
+	for (double frame = first; frame <= last && frame <= lastVisibleFrame; frame += fpp)
 	{
-		auto x = xb + ((frame - first) * double(w) / nbFrames);
+		float maxData = -1;
+		float minData = 1;
+
+		float rmsData[2] = {0, 0};
+
+		// Find maximum and minimum samples within range
+		for (int i = 0; i < fpp && frame + i <= last; ++i)
+		{
+			for (int j = 0; j < 2; ++j)
+			{
+				auto curData = m_data[static_cast<int>(frame) + i][j];
+
+				if (curData > maxData) { maxData = curData; }
+				if (curData < minData) { minData = curData; }
+
+				rmsData[j] += curData * curData;
+			}
+		}
+
+		const float trueRmsData = (rmsData[0] + rmsData[1]) / 2 / fpp;
+		const float sqrtRmsData = sqrt(trueRmsData);
+		const float maxRmsData = qBound(minData, sqrtRmsData, maxData);
+		const float minRmsData = qBound(minData, -sqrtRmsData, maxData);
+
+		// If nbFrames >= w, we can use curPixel to calculate X
+		// but if nbFrames < w, we need to calculate it proportionally
+		// to the total number of points
+		auto x = nbFrames >= w
+			? xb + curPixel
+			: xb + ((static_cast<double>(curPixel) / nbFrames) * w);
 		// Partial Y calculation
 		auto py = ySpace * m_amplification;
-		l[n] = QPointF(x, (yb - (m_data[frame][0] * py)));
-		r[n] = QPointF(x, (yb - (m_data[frame][1] * py)));
-		++n;
+		fEdgeMax[curPixel] = QPointF(x, (yb - (maxData * py)));
+		fEdgeMin[curPixel] = QPointF(x, (yb - (minData * py)));
+		fRmsMax[curPixel] = QPointF(x, (yb - (maxRmsData * py)));
+		fRmsMin[curPixel] = QPointF(x, (yb - (minRmsData * py)));
+		++curPixel;
 	}
 
-	p.setRenderHint(QPainter::Antialiasing);
-	p.drawPolyline(l, nbFrames / fpp);
-	p.drawPolyline(r, nbFrames / fpp);
+	for (int i = 0; i < totalPoints; ++i)
+	{
+		p.drawLine(fEdgeMax[i], fEdgeMin[i]);
+	}
 
-	delete[] l;
-	delete[] r;
+	p.setPen(p.pen().color().lighter(123));
+
+	for (int i = 0; i < totalPoints; ++i)
+	{
+		p.drawLine(fRmsMax[i], fRmsMin[i]);
+	}
 }
 
 
@@ -1048,7 +1121,7 @@ void SampleBuffer::visualize(
 
 QString SampleBuffer::openAudioFile() const
 {
-	FileDialog ofd(nullptr, tr("Open audio file"));
+	gui::FileDialog ofd(nullptr, tr("Open audio file"));
 
 	QString dir;
 	if (!m_audioFile.isEmpty())
@@ -1071,7 +1144,7 @@ QString SampleBuffer::openAudioFile() const
 	}
 	// change dir to position of previously opened file
 	ofd.setDirectory(dir);
-	ofd.setFileMode(FileDialog::ExistingFiles);
+	ofd.setFileMode(gui::FileDialog::ExistingFiles);
 
 	// set filters
 	QStringList types;
@@ -1183,7 +1256,7 @@ void flacStreamEncoderMetadataCallback(
 	b->write((const char *) metadata, sizeof(*metadata));
 }
 
-#endif
+#endif // LMMS_HAVE_FLAC_STREAM_ENCODER_H
 
 
 
@@ -1198,7 +1271,7 @@ QString & SampleBuffer::toBase64(QString & dst) const
 /*	FLAC__stream_encoder_set_do_exhaustive_model_search(flacEnc, true);
 	FLAC__stream_encoder_set_do_mid_side_stereo(flacEnc, true);*/
 	FLAC__stream_encoder_set_sample_rate(flacEnc,
-		Engine::mixer()->sampleRate());
+		Engine::audioEngine()->sampleRate());
 
 	QBuffer baWriter;
 	baWriter.open(QBuffer::WriteOnly);
@@ -1225,7 +1298,7 @@ QString & SampleBuffer::toBase64(QString & dst) const
 			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 			{
 				buf[f*DEFAULT_CHANNELS+ch] = (FLAC__int32)(
-					Mixer::clip(m_data[f+frameCnt][ch]) *
+					AudioEngine::clip(m_data[f+frameCnt][ch]) *
 						OUTPUT_SAMPLE_MULTIPLIER);
 			}
 		}
@@ -1239,12 +1312,12 @@ QString & SampleBuffer::toBase64(QString & dst) const
 
 	base64::encode(baWriter.buffer().data(), baWriter.buffer().size(), dst);
 
-#else	/* LMMS_HAVE_FLAC_STREAM_ENCODER_H */
+#else	// LMMS_HAVE_FLAC_STREAM_ENCODER_H
 
 	base64::encode((const char *) m_data,
 		m_frames * sizeof(sampleFrame), dst);
 
-#endif	/* LMMS_HAVE_FLAC_STREAM_ENCODER_H */
+#endif	// LMMS_HAVE_FLAC_STREAM_ENCODER_H
 
 	return dst;
 }
@@ -1256,8 +1329,8 @@ SampleBuffer * SampleBuffer::resample(const sample_rate_t srcSR, const sample_ra
 {
 	sampleFrame * data = m_data;
 	const f_cnt_t frames = m_frames;
-	const f_cnt_t dstFrames = static_cast<f_cnt_t>((frames / (float) srcSR) * (float) dstSR);
-	SampleBuffer * dstSB = new SampleBuffer(dstFrames);
+	const auto dstFrames = static_cast<f_cnt_t>((frames / (float)srcSR) * (float)dstSR);
+	auto dstSB = new SampleBuffer(dstFrames);
 	sampleFrame * dstBuf = dstSB->m_origData;
 
 	// yeah, libsamplerate, let's rock with sinc-interpolation!
@@ -1386,7 +1459,7 @@ void flacStreamDecoderErrorCallback(
 	// what to do now??
 }
 
-#endif
+#endif // LMMS_HAVE_FLAC_STREAM_DECODER_H
 
 
 void SampleBuffer::loadFromBase64(const QString & data)
@@ -1432,17 +1505,17 @@ void SampleBuffer::loadFromBase64(const QString & data)
 
 	m_origFrames = origData.size() / sizeof(sampleFrame);
 	MM_FREE(m_origData);
-	m_origData = MM_ALLOC(sampleFrame, m_origFrames);
+	m_origData = MM_ALLOC<sampleFrame>( m_origFrames);
 	memcpy(m_origData, origData.data(), origData.size());
 
 #else /* LMMS_HAVE_FLAC_STREAM_DECODER_H */
 
 	m_origFrames = dsize / sizeof(sampleFrame);
 	MM_FREE(m_origData);
-	m_origData = MM_ALLOC(sampleFrame, m_origFrames);
+	m_origData = MM_ALLOC<sampleFrame>( m_origFrames);
 	memcpy(m_origData, dst, dsize);
 
-#endif
+#endif // LMMS_HAVE_FLAC_STREAM_DECODER_H
 
 	delete[] dst;
 
@@ -1480,12 +1553,12 @@ void SampleBuffer::setAmplification(float a)
 
 void SampleBuffer::setReversed(bool on)
 {
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	m_varLock.lockForWrite();
 	if (m_reversed != on) { std::reverse(m_data, m_data + m_frames); }
 	m_reversed = on;
 	m_varLock.unlock();
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 	emit sampleUpdated();
 }
 
@@ -1514,3 +1587,5 @@ SampleBuffer::handleState::~handleState()
 {
 	src_delete(m_resamplingData);
 }
+
+} // namespace lmms

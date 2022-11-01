@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.3)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.8)
 
 PROJECT(lmms)
 
@@ -21,6 +21,14 @@ ENDIF(COMMAND CMAKE_POLICY)
 
 # Import of windows.h breaks min()/max()
 ADD_DEFINITIONS(-DNOMINMAX)
+
+# CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES is not set correctly for MinGW until
+# CMake 3.14.1, so avoid specifying system include directories on affected
+# versions. Normal include directories are safe, since GCC ignores them if they
+# are already in the built-in search path.
+if(MINGW AND CMAKE_VERSION VERSION_LESS "3.14.1")
+	set(CMAKE_NO_SYSTEM_FROM_IMPORTED TRUE)
+endif()
 
 INCLUDE(PluginList)
 INCLUDE(CheckSubmodules)
@@ -86,7 +94,7 @@ OPTION(BUNDLE_QT_TRANSLATIONS	"Install Qt translation files for LMMS" OFF)
 
 IF(LMMS_BUILD_APPLE)
 	# Fix linking on 10.14+. See issue #4762 on github
-	LINK_DIRECTORIES(/usr/local/lib)
+	LINK_DIRECTORIES("${APPLE_PREFIX}/lib")
 	SET(WANT_SOUNDIO OFF)
 	SET(WANT_ALSA OFF)
 	SET(WANT_PULSEAUDIO OFF)
@@ -110,6 +118,7 @@ IF(LMMS_BUILD_WIN32)
 	SET(STATUS_ALSA "<not supported on this platform>")
 	SET(STATUS_PULSEAUDIO "<not supported on this platform>")
 	SET(STATUS_SOUNDIO "<disabled in this release>")
+	SET(STATUS_SNDIO "<not supported on this platform>")
 	SET(STATUS_WINMM "OK")
 	SET(STATUS_APPLEMIDI "<not supported on this platform>")
 ELSE(LMMS_BUILD_WIN32)
@@ -128,14 +137,11 @@ ENDIF()
 
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-CHECK_INCLUDE_FILES(stdint.h LMMS_HAVE_STDINT_H)
-CHECK_INCLUDE_FILES(stdlib.h LMMS_HAVE_STDLIB_H)
 CHECK_INCLUDE_FILES(pthread.h LMMS_HAVE_PTHREAD_H)
 CHECK_INCLUDE_FILES(semaphore.h LMMS_HAVE_SEMAPHORE_H)
 CHECK_INCLUDE_FILES(unistd.h LMMS_HAVE_UNISTD_H)
 CHECK_INCLUDE_FILES(sys/types.h LMMS_HAVE_SYS_TYPES_H)
 CHECK_INCLUDE_FILES(sys/ipc.h LMMS_HAVE_SYS_IPC_H)
-CHECK_INCLUDE_FILES(sys/shm.h LMMS_HAVE_SYS_SHM_H)
 CHECK_INCLUDE_FILES(sys/time.h LMMS_HAVE_SYS_TIME_H)
 CHECK_INCLUDE_FILES(sys/times.h LMMS_HAVE_SYS_TIMES_H)
 CHECK_INCLUDE_FILES(sched.h LMMS_HAVE_SCHED_H)
@@ -147,6 +153,9 @@ CHECK_INCLUDE_FILES(ctype.h LMMS_HAVE_CTYPE_H)
 CHECK_INCLUDE_FILES(string.h LMMS_HAVE_STRING_H)
 CHECK_INCLUDE_FILES(process.h LMMS_HAVE_PROCESS_H)
 CHECK_INCLUDE_FILES(locale.h LMMS_HAVE_LOCALE_H)
+
+include(CheckLibraryExists)
+check_library_exists(rt shm_open "" LMMS_HAVE_LIBRT)
 
 LIST(APPEND CMAKE_PREFIX_PATH "${CMAKE_INSTALL_PREFIX}")
 
@@ -183,7 +192,7 @@ execute_process(COMMAND ${QT_QMAKE_EXECUTABLE} -query QT_INSTALL_TRANSLATIONS
 )
 IF(EXISTS "${QT_TRANSLATIONS_DIR}")
 	MESSAGE("-- Found Qt translations in ${QT_TRANSLATIONS_DIR}")
-	ADD_DEFINITIONS(-D'QT_TRANSLATIONS_DIR="${QT_TRANSLATIONS_DIR}"')
+	ADD_DEFINITIONS("-DQT_TRANSLATIONS_DIR=\"${QT_TRANSLATIONS_DIR}\"")
 ENDIF()
 
 FIND_PACKAGE(Qt5Test)
@@ -194,10 +203,13 @@ FIND_PACKAGE(SndFile REQUIRED)
 IF(NOT SNDFILE_FOUND)
 	MESSAGE(FATAL_ERROR "LMMS requires libsndfile1 and libsndfile1-dev >= 1.0.18 - please install, remove CMakeCache.txt and try again!")
 ENDIF()
-# check if we can use SF_SET_COMPRESSION_LEVEL
-IF(NOT SNDFILE_VERSION VERSION_LESS 1.0.26)
-	SET(LMMS_HAVE_SF_COMPLEVEL TRUE)
-ENDIF()
+# check if we can use SFC_SET_COMPRESSION_LEVEL
+INCLUDE(CheckCXXSourceCompiles)
+CHECK_CXX_SOURCE_COMPILES(
+	"#include <sndfile.h>
+		int main() {SFC_SET_COMPRESSION_LEVEL;}"
+	LMMS_HAVE_SF_COMPLEVEL
+)
 
 IF(WANT_LV2)
 	IF(PKG_CONFIG_FOUND)
@@ -205,6 +217,8 @@ IF(WANT_LV2)
 		PKG_CHECK_MODULES(LILV lilv-0)
 	ENDIF()
 	IF(NOT LV2_FOUND AND NOT LILV_FOUND)
+		UNSET(LV2_FOUND CACHE)
+		UNSET(LILV_FOUND CACHE)
 		FIND_PACKAGE(LV2 CONFIG)
 		FIND_PACKAGE(LILV CONFIG)
 		IF(LILV_FOUND)
@@ -292,16 +306,15 @@ ENDIF(WANT_CARLA)
 
 # check for SDL2
 IF(WANT_SDL)
-	SET(SDL2_BUILDING_LIBRARY TRUE)
 	FIND_PACKAGE(SDL2)
 	IF(SDL2_FOUND)
 		SET(LMMS_HAVE_SDL TRUE)
 		SET(LMMS_HAVE_SDL2 TRUE)
 		SET(STATUS_SDL "OK, using SDL2")
+		SET(SDL2_LIBRARY "SDL2::SDL2")
 		SET(SDL_INCLUDE_DIR "")
 		SET(SDL_LIBRARY "")
 	ELSE()
-		SET(SDL2_INCLUDE_DIR "")
 		SET(SDL2_LIBRARY "")
 	ENDIF()
 ENDIF()
@@ -344,13 +357,13 @@ ENDIF(WANT_STK)
 # check for PortAudio
 IF(WANT_PORTAUDIO)
 	FIND_PACKAGE(Portaudio)
-	IF(PORTAUDIO_FOUND)
+	IF(Portaudio_FOUND)
 		SET(LMMS_HAVE_PORTAUDIO TRUE)
 		SET(STATUS_PORTAUDIO "OK")
-	ELSE(PORTAUDIO_FOUND)
+	ELSE()
 		SET(STATUS_PORTAUDIO "not found, please install portaudio19-dev (or similar, version >= 1.9) "
 			"if you require PortAudio support")
-	ENDIF(PORTAUDIO_FOUND)
+	ENDIF()
 ENDIF(WANT_PORTAUDIO)
 
 # check for libsoundio
@@ -482,14 +495,14 @@ ENDIF()
 
 # check for Fluidsynth
 IF(WANT_SF2)
-	PKG_CHECK_MODULES(FLUIDSYNTH fluidsynth>=1.0.7)
-	IF(FLUIDSYNTH_FOUND)
+	find_package(FluidSynth 1.0.7)
+	if(FluidSynth_FOUND)
 		SET(LMMS_HAVE_FLUIDSYNTH TRUE)
 		SET(STATUS_FLUIDSYNTH "OK")
-	ELSE(FLUIDSYNTH_FOUND)
+	else()
 		SET(STATUS_FLUIDSYNTH "not found, libfluidsynth-dev (or similar)"
 			"is highly recommended")
-	ENDIF(FLUIDSYNTH_FOUND)
+	endif()
 ENDIF(WANT_SF2)
 
 # check for libgig
@@ -590,6 +603,16 @@ SET(CMAKE_CXX_FLAGS "${WERROR_FLAGS} ${CMAKE_CXX_FLAGS}")
 SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DLMMS_DEBUG")
 SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DLMMS_DEBUG")
 
+if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.16")
+	set(NOOP_COMMAND "${CMAKE_COMMAND}" "-E" "true")
+else()
+	set(NOOP_COMMAND "${CMAKE_COMMAND}" "-E" "echo")
+endif()
+if(STRIP)
+	set(STRIP_COMMAND "$<IF:$<TARGET:Debug,RelWithDebInfo>,${NOOP_COMMAND},${STRIP}>")
+else()
+	set(STRIP_COMMAND "${NOOP_COMMAND}")
+endif()
 
 # people simply updating git will still have this and mess up build with it
 FILE(REMOVE include/lmmsconfig.h)
@@ -662,18 +685,6 @@ IF(LMMS_BUILD_LINUX)
 		"${CMAKE_SOURCE_DIR}/src/gui/embed.cpp"
 		DESTINATION "${CMAKE_INSTALL_PREFIX}/include/lmms/")
 ENDIF(LMMS_BUILD_LINUX)
-
-# package ZynAddSubFX into win32 build
-IF(LMMS_BUILD_WIN32)
-	IF(EXISTS "${CMAKE_SOURCE_DIR}/extras")
-		ADD_SUBDIRECTORY("${CMAKE_SOURCE_DIR}/extras/data/presets")
-		FILE(GLOB ZASF_BINARIES
-			"${CMAKE_SOURCE_DIR}/extras/plugins/zynaddsubfx/zynaddsubfx.dll"
-			"${CMAKE_SOURCE_DIR}/extras/plugins/zynaddsubfx/remote_zynaddsubfx.exe")
-		LIST(SORT ZASF_BINARIES)
-		INSTALL(FILES "${ZASF_BINARIES}" DESTINATION "${PLUGIN_DIR}")
-	ENDIF(EXISTS "${CMAKE_SOURCE_DIR}/extras")
-ENDIF(LMMS_BUILD_WIN32)
 
 #
 # add distclean-target

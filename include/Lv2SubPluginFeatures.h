@@ -36,6 +36,10 @@
 #include "lmms_export.h"
 #include "Plugin.h"
 
+namespace lmms
+{
+
+
 class LMMS_EXPORT Lv2SubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures
 {
 private:
@@ -56,6 +60,9 @@ public:
 	void listSubPluginKeys(
 		const Plugin::Descriptor *desc, KeyList &kl) const override;
 };
+
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2
 

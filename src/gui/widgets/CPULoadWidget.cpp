@@ -26,10 +26,14 @@
 
 #include <QPainter>
 
+#include "AudioEngine.h"
 #include "CPULoadWidget.h"
 #include "embed.h"
 #include "Engine.h"
-#include "Mixer.h"
+
+
+namespace lmms::gui
+{
 
 CPULoadWidget::CPULoadWidget( QWidget * _parent ) :
 	QWidget( _parent ),
@@ -46,17 +50,13 @@ CPULoadWidget::CPULoadWidget( QWidget * _parent ) :
 	m_temp = QPixmap( width(), height() );
 	
 
-	connect( &m_updateTimer, SIGNAL( timeout() ),
-					this, SLOT( updateCpuLoad() ) );
+	connect( &m_updateTimer, SIGNAL(timeout()),
+					this, SLOT(updateCpuLoad()));
 	m_updateTimer.start( 100 );	// update cpu-load at 10 fps
 }
 
 
 
-
-CPULoadWidget::~CPULoadWidget()
-{
-}
 
 
 
@@ -83,7 +83,6 @@ void CPULoadWidget::paintEvent( QPaintEvent *  )
 	}
 	QPainter p( this );
 	p.drawPixmap( 0, 0, m_temp );
-
 }
 
 
@@ -93,17 +92,21 @@ void CPULoadWidget::updateCpuLoad()
 {
 	// Additional display smoothing for the main load-value. Stronger averaging
 	// cannot be used directly in the profiler: cpuLoad() must react fast enough
-	// to be useful as overload indicator in Mixer::criticalXRuns().
-	const int new_load = (m_currentLoad + Engine::mixer()->cpuLoad()) / 2;
+	// to be useful as overload indicator in AudioEngine::criticalXRuns().
+	const int new_load = (m_currentLoad + Engine::audioEngine()->cpuLoad()) / 2;
 
 	if (new_load != m_currentLoad)
 	{
 		setToolTip(
-			tr("DSP total: ") + QString::number(new_load) + " %\n" +
-			tr(" - Notes and setup: ") + QString::number(Engine::mixer()->detailLoad(MixerProfiler::DetailType::NoteSetup)) + " %\n" +
-			tr(" - Instruments: ") + QString::number(Engine::mixer()->detailLoad(MixerProfiler::DetailType::Instruments)) + " %\n" +
-			tr(" - Effects: ") + QString::number(Engine::mixer()->detailLoad(MixerProfiler::DetailType::Effects)) + " %\n" +
-			tr(" - Mixing: ") + QString::number(Engine::mixer()->detailLoad(MixerProfiler::DetailType::Mixing)) + " %"
+			tr("DSP total: ") + QString::number(new_load) + " %\n"
+			+ tr(" - Notes and setup: ")
+			+ QString::number(Engine::audioEngine()->detailLoad(AudioEngineProfiler::DetailType::NoteSetup)) + " %\n"
+			+ tr(" - Instruments: ")
+			+ QString::number(Engine::audioEngine()->detailLoad(AudioEngineProfiler::DetailType::Instruments)) + " %\n"
+			+ tr(" - Effects: ")
+			+ QString::number(Engine::audioEngine()->detailLoad(AudioEngineProfiler::DetailType::Effects)) + " %\n"
+			+ tr(" - Mixing: ")
+			+ QString::number(Engine::audioEngine()->detailLoad(AudioEngineProfiler::DetailType::Mixing)) + " %"
 		);
 		m_currentLoad = new_load;
 		m_changed = true;
@@ -111,3 +114,5 @@ void CPULoadWidget::updateCpuLoad()
 	}
 }
 
+
+} // namespace lmms::gui

@@ -35,6 +35,9 @@
 class QScrollArea;
 class QVBoxLayout;
 
+namespace lmms::gui
+{
+
 class EffectView;
 class GroupBox;
 
@@ -43,16 +46,16 @@ class EffectRackView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
-	EffectRackView( EffectChain* model, QWidget* parent = NULL );
-	virtual ~EffectRackView();
+	EffectRackView( EffectChain* model, QWidget* parent = nullptr );
+	~EffectRackView() override;
 
 	static constexpr int DEFAULT_WIDTH = 245;
 
 public slots:
 	void clearViews();
-	void moveUp( EffectView* view );
-	void moveDown( EffectView* view );
-	void deletePlugin( EffectView* view );
+	void moveUp( lmms::gui::EffectView* view );
+	void moveDown( lmms::gui::EffectView* view );
+	void deletePlugin( lmms::gui::EffectView* view );
 
 
 private slots:
@@ -82,5 +85,7 @@ private:
 	int m_lastY;
 
 } ;
+
+} // namespace lmms::gui
 
 #endif

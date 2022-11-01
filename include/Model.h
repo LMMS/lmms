@@ -25,11 +25,13 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include <QtCore/QString>
-#include <QtCore/QObject>
+#include <QString>
+#include <QObject>
 
 #include "lmms_export.h"
 
+namespace lmms
+{
 
 class LMMS_EXPORT Model : public QObject
 {
@@ -43,9 +45,7 @@ public:
 	{
 	}
 
-	virtual ~Model()
-	{
-	}
+	~Model() override = default;
 
 	bool isDefaultConstructed()
 	{
@@ -87,6 +87,8 @@ signals:
 
 } ;
 
+
+} // namespace lmms
 
 #endif
 

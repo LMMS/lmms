@@ -24,11 +24,14 @@
 
 #include "EqControls.h"
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "EqControlsDialog.h"
 #include "EqEffect.h"
 
+
+namespace lmms
+{
 
 
 EqControls::EqControls( EqEffect *effect ) :
@@ -149,9 +152,9 @@ void EqControls::loadSettings( const QDomElement &_this )
 	m_analyseOutModel.loadSettings( _this, "AnalyseOut" );
 }
 
-EffectControlDialog*EqControls::createView()
+gui::EffectControlDialog* EqControls::createView()
 {
-	return new EqControlsDialog( this );
+	return new gui::EqControlsDialog( this );
 }
 
 
@@ -202,3 +205,6 @@ void EqControls::saveSettings( QDomDocument &doc, QDomElement &parent )
 	m_analyseInModel.saveSettings( doc, parent, "AnalyseIn" );
 	m_analyseOutModel.saveSettings( doc, parent, "AnalyseOut" );
 }
+
+
+} // namespace lmms

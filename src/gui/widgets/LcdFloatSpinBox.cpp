@@ -28,14 +28,13 @@
 
 #include <cmath>
 
-#include <QApplication>
 #include <QHBoxLayout>
 #include <QInputDialog>
 #include <QLabel>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPixmap>
-#include <QStyleOptionFrameV2>
+#include <QStyleOptionFrame>
 #include <QVBoxLayout>
 
 #include "CaptionMenu.h"
@@ -43,6 +42,9 @@
 #include "GuiApplication.h"
 #include "gui_templates.h"
 #include "MainWindow.h"
+
+namespace lmms::gui
+{
 
 
 LcdFloatSpinBox::LcdFloatSpinBox(int numWhole, int numFrac, const QString& name, QWidget* parent) :
@@ -74,14 +76,14 @@ LcdFloatSpinBox::LcdFloatSpinBox(int numWhole, int numFrac, const QString& style
 void LcdFloatSpinBox::layoutSetup(const QString &style)
 {
 	// Assemble the LCD parts
-	QHBoxLayout *lcdLayout = new QHBoxLayout();
+	auto lcdLayout = new QHBoxLayout();
 
 	m_wholeDisplay.setSeamless(false, true);
 	m_fractionDisplay.setSeamless(true, false);
 
 	lcdLayout->addWidget(&m_wholeDisplay);
 
-	QLabel *dotLabel = new QLabel("", this);
+	auto dotLabel = new QLabel("", this);
 	QPixmap dotPixmap(embed::getIconPixmap(QString("lcd_" + style + "_dot").toUtf8().constData()));
 	dotLabel->setPixmap(dotPixmap.copy(0, 0, dotPixmap.size().width(), dotPixmap.size().height() / 2));
 	lcdLayout->addWidget(dotLabel);
@@ -92,7 +94,7 @@ void LcdFloatSpinBox::layoutSetup(const QString &style)
 	lcdLayout->setSpacing(0);
 
 	// Add space for label
-	QVBoxLayout *outerLayout = new QVBoxLayout();
+	auto outerLayout = new QVBoxLayout();
 	outerLayout->addLayout(lcdLayout);
 	outerLayout->addSpacing(9);
 	outerLayout->setContentsMargins(0, 0, 0, 0);
@@ -153,7 +155,7 @@ void LcdFloatSpinBox::mouseMoveEvent(QMouseEvent* event)
 	if (m_mouseMoving)
 	{
 		int dy = event->globalY() - m_origMousePos.y();
-		if (gui->mainWindow()->isShiftPressed()) { dy = qBound(-4, dy/4, 4); }
+		if (getGUI()->mainWindow()->isShiftPressed()) { dy = qBound(-4, dy/4, 4); }
 		if (dy > 1 || dy < -1)
 		{
 			model()->setValue(model()->value() - dy / 2 * getStep());
@@ -181,7 +183,7 @@ void LcdFloatSpinBox::wheelEvent(QWheelEvent *event)
 	else { m_intStep = false; }
 
 	event->accept();
-	model()->setValue(model()->value() + ((event->delta() > 0) ? 1 : -1) * getStep());
+	model()->setValue(model()->value() + ((event->angleDelta().y() > 0) ? 1 : -1) * getStep());
 	emit manualChange();
 }
 
@@ -242,3 +244,6 @@ void LcdFloatSpinBox::paintEvent(QPaintEvent*)
 		p.drawText(width() / 2 - p.fontMetrics().width(m_label) / 2, height() - 1, m_label);
 	}
 }
+
+
+} // namespace lmms::gui

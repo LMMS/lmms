@@ -26,7 +26,6 @@
 
 #include <QFile>
 #include <QApplication>
-#include <QFrame>
 #include <QPainter>
 #include <QPainterPath>
 #include <QStyleFactory>
@@ -34,7 +33,12 @@
 
 #include "LmmsStyle.h"
 
-QPalette * LmmsStyle::s_palette = NULL;
+
+namespace lmms::gui
+{
+
+
+QPalette * LmmsStyle::s_palette = nullptr;
 
 QLinearGradient getGradient( const QColor & _col, const QRectF & _rect )
 {
@@ -45,11 +49,11 @@ QLinearGradient getGradient( const QColor & _col, const QRectF & _rect )
 	qreal saturation = _col.saturationF();
 
 	QColor c = _col;
-	c.setHsvF( hue, 0.42 * saturation, 0.98 * value ); // TODO: pattern: 1.08
+	c.setHsvF( hue, 0.42 * saturation, 0.98 * value ); // TODO: MIDI clip: 1.08
 	g.setColorAt( 0, c );
-	c.setHsvF( hue, 0.58 * saturation, 0.95 * value ); // TODO: pattern: 1.05
+	c.setHsvF( hue, 0.58 * saturation, 0.95 * value ); // TODO: MIDI clip: 1.05
 	g.setColorAt( 0.25, c );
-	c.setHsvF( hue, 0.70 * saturation, 0.93 * value ); // TODO: pattern: 1.03
+	c.setHsvF( hue, 0.70 * saturation, 0.93 * value ); // TODO: MIDI clip: 1.03
 	g.setColorAt( 0.5, c );
 
 	c.setHsvF( hue, 0.95 * saturation, 0.9 * value );
@@ -67,9 +71,10 @@ QLinearGradient getGradient( const QColor & _col, const QRectF & _rect )
 QLinearGradient darken( const QLinearGradient & _gradient )
 {
 	QGradientStops stops = _gradient.stops();
-	for (int i = 0; i < stops.size(); ++i) {
-		QColor color = stops.at(i).second;
-		stops[i].second = color.lighter(133);
+	for (auto& stop : stops) 
+	{
+		QColor color = stop.second;
+		stop.second = color.lighter(133);
 	}
 
 	QLinearGradient g = _gradient;
@@ -115,7 +120,7 @@ void drawPath( QPainter *p, const QPainterPath &path,
 
 	p->setOpacity(0.5);
 
-	// highlight (bb)
+	// highlight (pattern)
 	if (dark)
 		p->strokePath(path, QPen(borderCol.lighter(133), 2));
 	else
@@ -131,7 +136,7 @@ LmmsStyle::LmmsStyle() :
 	file.open( QIODevice::ReadOnly );
 	qApp->setStyleSheet( file.readAll() );
 
-	if( s_palette != NULL ) { qApp->setPalette( *s_palette ); }
+	if( s_palette != nullptr ) { qApp->setPalette( *s_palette ); }
 
 	setBaseStyle( QStyleFactory::create( "Fusion" ) );
 }
@@ -139,9 +144,9 @@ LmmsStyle::LmmsStyle() :
 
 
 
-QPalette LmmsStyle::standardPalette( void ) const
+QPalette LmmsStyle::standardPalette() const
 {
-	if( s_palette != NULL) { return * s_palette; }
+	if( s_palette != nullptr) { return * s_palette; }
 
 	QPalette pal = QProxyStyle::standardPalette();
 
@@ -157,8 +162,7 @@ void LmmsStyle::drawComplexControl( ComplexControl control,
 	// fix broken titlebar styling on win32
 	if( control == CC_TitleBar )
 	{
-		const QStyleOptionTitleBar * titleBar =
-			qstyleoption_cast<const QStyleOptionTitleBar *>(option );
+		const auto titleBar = qstyleoption_cast<const QStyleOptionTitleBar*>(option);
 		if( titleBar )
 		{
 			QStyleOptionTitleBar so( *titleBar );
@@ -369,3 +373,6 @@ void LmmsStyle::hoverColors( bool sunken, bool hover, bool active, QColor& color
 		blend = QColor( 33, 33, 33 );
 	}
 }
+
+
+} // namespace lmms::gui

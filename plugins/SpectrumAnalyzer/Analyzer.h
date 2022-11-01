@@ -27,7 +27,6 @@
 #ifndef ANALYZER_H
 #define ANALYZER_H
 
-#include <QWaitCondition>
 
 #include "DataprocLauncher.h"
 #include "Effect.h"
@@ -35,13 +34,16 @@
 #include "SaControls.h"
 #include "SaProcessor.h"
 
+namespace lmms
+{
+
 
 //! Top level class; handles LMMS interface and feeds data to the data processor.
 class Analyzer : public Effect
 {
 public:
 	Analyzer(Model *parent, const Descriptor::SubPluginFeatures::Key *key);
-	virtual ~Analyzer();
+	~Analyzer() override;
 
 	bool processAudioBuffer(sampleFrame *buffer, const fpp_t frame_count) override;
 	EffectControls *controls() override {return &m_controls;}
@@ -70,6 +72,9 @@ private:
 		float m_max_execution;
 	#endif
 };
+
+
+} // namespace lmms
 
 #endif // ANALYZER_H
 

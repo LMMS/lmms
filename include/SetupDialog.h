@@ -27,11 +27,11 @@
 #define SETUP_DIALOG_H
 
 #include <QDialog>
-#include <QtCore/QMap>
+#include <QMap>
 
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "lmmsconfig.h"
 #include "MidiClient.h"
 #include "MidiSetupWidget.h"
@@ -41,6 +41,11 @@ class QComboBox;
 class QLabel;
 class QLineEdit;
 class QSlider;
+
+
+namespace lmms::gui
+{
+
 
 class TabBar;
 
@@ -59,7 +64,7 @@ public:
 	};
 
 	SetupDialog(ConfigTabs tab_to_open = GeneralSettings);
-	virtual ~SetupDialog();
+	~SetupDialog() override;
 
 
 protected slots:
@@ -77,6 +82,7 @@ private slots:
 	void toggleSideBarOnRight(bool enabled);
 	void toggleLetPreviewsFinish(bool enabled);
 	void toggleSoloLegacyBehavior(bool enabled);
+	void toggleTrackDeletionWarning(bool enabled);
 	void toggleMMPZ(bool enabled);
 	void toggleDisableBackup(bool enabled);
 	void toggleOpenLastProject(bool enabled);
@@ -89,7 +95,6 @@ private slots:
 	void toggleRunningAutoSave(bool enabled);
 	void toggleSmoothScroll(bool enabled);
 	void toggleAnimateAFP(bool enabled);
-	void toggleSyncVSTPlugins(bool enabled);
 	void vstEmbedMethodChanged();
 	void toggleVSTAlwaysOnTop(bool en);
 	void toggleDisableAutoQuit(bool enabled);
@@ -136,6 +141,7 @@ private:
 	bool m_sideBarOnRight;
 	bool m_letPreviewsFinish;
 	bool m_soloLegacyBehavior;
+	bool m_trackDeletionWarning;
 	bool m_MMPZ;
 	bool m_disableBackup;
 	bool m_openLastProject;
@@ -157,13 +163,11 @@ private:
 	QString m_vstEmbedMethod;
 	LedCheckBox * m_vstAlwaysOnTopCheckBox;
 	bool m_vstAlwaysOnTop;
-	bool m_syncVSTPlugins;
 	bool m_disableAutoQuit;
 
-
-	typedef QMap<QString, AudioDeviceSetupWidget *> AswMap;
-	typedef QMap<QString, MidiSetupWidget *> MswMap;
-	typedef QMap<QString, QString> trMap;
+	using AswMap = QMap<QString, AudioDeviceSetupWidget*>;
+	using MswMap = QMap<QString, MidiSetupWidget*>;
+	using trMap = QMap<QString, QString>;
 
 	// Audio settings widgets.
 	QComboBox * m_audioInterfaces;
@@ -206,4 +210,8 @@ private:
 
 	QLabel * restartWarningLbl;
 };
+
+
+} // namespace lmms::gui
+
 #endif

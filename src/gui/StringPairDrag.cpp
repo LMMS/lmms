@@ -35,6 +35,10 @@
 #include "Clipboard.h"
 
 
+namespace lmms::gui
+{
+
+
 StringPairDrag::StringPairDrag( const QString & _key, const QString & _value,
 					const QPixmap & _icon, QWidget * _w ) :
 	QDrag( _w )
@@ -54,7 +58,7 @@ StringPairDrag::StringPairDrag( const QString & _key, const QString & _value,
 		setPixmap( _icon );
 	}
 	QString txt = _key + ":" + _value;
-	QMimeData * m = new QMimeData();
+	auto m = new QMimeData();
 	m->setData( mimeType( MimeType::StringPair ), txt.toUtf8() );
 	setMimeData( m );
 	exec( Qt::LinkAction, Qt::LinkAction );
@@ -67,9 +71,9 @@ StringPairDrag::~StringPairDrag()
 {
 	// during a drag, we might have lost key-press-events, so reset
 	// modifiers of main-win
-	if( gui->mainWindow() )
+	if( getGUI()->mainWindow() )
 	{
-		gui->mainWindow()->clearKeyModifiers();
+		getGUI()->mainWindow()->clearKeyModifiers();
 	}
 }
 
@@ -111,3 +115,6 @@ QString StringPairDrag::decodeValue( QDropEvent * _de )
 {
 	return Clipboard::decodeValue( _de->mimeData() );
 }
+
+
+} // namespace lmms::gui

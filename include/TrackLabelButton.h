@@ -27,7 +27,9 @@
 #define TRACK_LABEL_BUTTON_H
 
 #include <QToolButton>
-#include <QLineEdit>
+
+namespace lmms::gui
+{
 
 class TrackView;
 
@@ -39,7 +41,7 @@ class TrackLabelButton : public QToolButton
 	Q_OBJECT
 public:
 	TrackLabelButton( TrackView * _tv, QWidget * _parent );
-	virtual ~TrackLabelButton();
+	~TrackLabelButton() override = default;
 
 
 public slots:
@@ -66,5 +68,8 @@ private:
 	QString elideName( const QString &name );
 
 } ;
+
+
+} // namespace lmms::gui
 
 #endif

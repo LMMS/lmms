@@ -26,10 +26,13 @@
 #ifndef LCD_WIDGET_H
 #define LCD_WIDGET_H
 
-#include <QtCore/QMap>
+#include <QMap>
 #include <QWidget>
 
 #include "lmms_export.h"
+
+namespace lmms::gui
+{
 
 class LMMS_EXPORT LcdWidget : public QWidget
 {
@@ -45,7 +48,7 @@ public:
 	LcdWidget(int numDigits, const QString& style, QWidget* parent, const QString& name = QString(),
 		bool leadingZero = false);
 
-	virtual ~LcdWidget();
+	~LcdWidget() override;
 
 	void setValue( int value );
 	void setLabel( const QString& label );
@@ -111,5 +114,7 @@ private:
 	void initUi( const QString& name, const QString &style ); //!< to be called by ctors
 
 };
+
+} // namespace lmms::gui
 
 #endif

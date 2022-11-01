@@ -43,6 +43,8 @@ private slots: // tests
 	//! but no downcast or any other casts
 	void CastTests()
 	{
+		using namespace lmms;
+
 		ComboBoxModel comboModel;
 		AutomatableModel* amPtr = &comboModel;
 		QVERIFY(nullptr == amPtr->dynamicCast<FloatModel>()); // not a parent class
@@ -60,6 +62,8 @@ private slots: // tests
 
 	void LinkTests()
 	{
+		using namespace lmms;
+
 		BoolModel m1(false), m2(false);
 
 		QObject::connect(&m1, SIGNAL(dataChanged()),
