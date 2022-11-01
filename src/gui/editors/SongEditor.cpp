@@ -723,7 +723,7 @@ void SongEditor::showMasterPitchFloat( void )
 
 void SongEditor::updateMasterPitchFloat( int new_val )
 {
-	m_mpsStatus->setText( tr( "Value: %1 notes").arg( new_val ) );
+	m_mpsStatus->setText( tr( "Value: %1 keys").arg( new_val ) );
 
 }
 
