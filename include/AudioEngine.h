@@ -407,7 +407,11 @@ private:
 	MidiClient * tryMidiClients();
 
 
-	const surroundSampleFrame * renderNextBuffer();
+	void renderStageNoteSetup();
+	void renderStageInstruments();
+	void renderStageEffects();
+	void renderStageMix();
+	const surroundSampleFrame *renderNextBuffer();
 
 	void swapBuffers();
 

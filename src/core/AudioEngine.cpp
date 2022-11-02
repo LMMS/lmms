@@ -333,15 +333,11 @@ void AudioEngine::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
 
 
 
-
-const surroundSampleFrame * AudioEngine::renderNextBuffer()
+void AudioEngine::renderStageNoteSetup()
 {
-	m_profiler.startPeriod();
 	m_profiler.startDetail(AudioEngineProfiler::DetailType::NoteSetup);
 
-	s_renderingThread = true;
-
-	if( m_clearSignal )
+	if (m_clearSignal)
 	{
 		m_clearSignal = false;
 		clearInternal();
@@ -351,28 +347,31 @@ const surroundSampleFrame * AudioEngine::renderNextBuffer()
 	// them if they still exist...
 	// maybe this algorithm could be optimized...
 	ConstPlayHandleList::Iterator it_rem = m_playHandlesToRemove.begin();
-	while( it_rem != m_playHandlesToRemove.end() )
+	while (it_rem != m_playHandlesToRemove.end())
 	{
-		PlayHandleList::Iterator it = std::find( m_playHandles.begin(), m_playHandles.end(), *it_rem );
+		PlayHandleList::Iterator it = std::find(m_playHandles.begin(), m_playHandles.end(), *it_rem);
 
-		if( it != m_playHandles.end() )
+		if (it != m_playHandles.end())
 		{
-			( *it )->audioPort()->removePlayHandle( ( *it ) );
-			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
+			(*it)->audioPort()->removePlayHandle((*it));
+			if ((*it)->type() == PlayHandle::TypeNotePlayHandle)
 			{
-				NotePlayHandleManager::release( (NotePlayHandle*) *it );
+				NotePlayHandleManager::release((NotePlayHandle*)*it);
 			}
-			else delete *it;
-			m_playHandles.erase( it );
+			else
+			{
+				delete *it;
+			}
+			m_playHandles.erase(it);
 		}
 
-		it_rem = m_playHandlesToRemove.erase( it_rem );
+		it_rem = m_playHandlesToRemove.erase(it_rem);
 	}
 
 	swapBuffers();
 
 	// prepare master mix (clear internal buffers etc.)
-	Mixer * mixer = Engine::mixer();
+	Mixer *mixer = Engine::mixer();
 	mixer->prepareMasterMix();
 
 	handleMetronome();
@@ -381,40 +380,43 @@ const surroundSampleFrame * AudioEngine::renderNextBuffer()
 	Engine::getSong()->processNextBuffer();
 
 	// add all play-handles that have to be added
-	for( LocklessListElement * e = m_newPlayHandles.popList(); e; )
+	for (LocklessListElement *e = m_newPlayHandles.popList(); e; )
 	{
 		m_playHandles += e->value;
-		LocklessListElement * next = e->next;
-		m_newPlayHandles.free( e );
+		LocklessListElement *next = e->next;
+		m_newPlayHandles.free(e);
 		e = next;
 	}
 
 	m_profiler.finishDetail(AudioEngineProfiler::DetailType::NoteSetup);
+}
 
-	// STAGE 1: run and render all play handles
+
+
+void AudioEngine::renderStageInstruments()
+{
 	m_profiler.startDetail(AudioEngineProfiler::DetailType::Instruments);
+
 	AudioEngineWorkerThread::fillJobQueue<PlayHandleList>(m_playHandles);
 	AudioEngineWorkerThread::startAndWaitForJobs();
 
 	// removed all play handles which are done
-	for( PlayHandleList::Iterator it = m_playHandles.begin();
-						it != m_playHandles.end(); )
+	for (PlayHandleList::Iterator it = m_playHandles.begin(); it != m_playHandles.end(); )
 	{
-		if( ( *it )->affinityMatters() &&
-			( *it )->affinity() != QThread::currentThread() )
+		if ((*it)->affinityMatters() && (*it)->affinity() != QThread::currentThread())
 		{
 			++it;
 			continue;
 		}
-		if( ( *it )->isFinished() )
+		if ((*it)->isFinished())
 		{
-			( *it )->audioPort()->removePlayHandle( ( *it ) );
-			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
+			(*it)->audioPort()->removePlayHandle((*it));
+			if ((*it)->type() == PlayHandle::TypeNotePlayHandle)
 			{
-				NotePlayHandleManager::release( (NotePlayHandle*) *it );
+				NotePlayHandleManager::release((NotePlayHandle*)*it);
 			}
 			else delete *it;
-			it = m_playHandles.erase( it );
+			it = m_playHandles.erase(it);
 		}
 		else
 		{
@@ -422,18 +424,28 @@ const surroundSampleFrame * AudioEngine::renderNextBuffer()
 		}
 	}
 	m_profiler.finishDetail(AudioEngineProfiler::DetailType::Instruments);
+}
 
-	// STAGE 2: process effects of all instrument- and sampletracks
+
+
+void AudioEngine::renderStageEffects()
+{
 	m_profiler.startDetail(AudioEngineProfiler::DetailType::Effects);
-	AudioEngineWorkerThread::fillJobQueue<QVector<AudioPort *>>(m_audioPorts);
+
+	AudioEngineWorkerThread::fillJobQueue<QVector<AudioPort*>>(m_audioPorts);
 	AudioEngineWorkerThread::startAndWaitForJobs();
+
 	m_profiler.finishDetail(AudioEngineProfiler::DetailType::Effects);
+}
 
 
-	// STAGE 3: do master mix in mixer
+
+void AudioEngine::renderStageMix()
+{
 	m_profiler.startDetail(AudioEngineProfiler::DetailType::Mixing);
-	mixer->masterMix(m_outputBufferWrite);
 
+	Mixer *mixer = Engine::mixer();
+	mixer->masterMix(m_outputBufferWrite);
 
 	emit nextAudioBuffer(m_outputBufferRead);
 
@@ -444,9 +456,22 @@ const surroundSampleFrame * AudioEngine::renderNextBuffer()
 	Controller::triggerFrameCounter();
 	AutomatableModel::incrementPeriodCounter();
 
-	s_renderingThread = false;
-
 	m_profiler.finishDetail(AudioEngineProfiler::DetailType::Mixing);
+}
+
+
+
+const surroundSampleFrame *AudioEngine::renderNextBuffer()
+{
+	m_profiler.startPeriod();
+	s_renderingThread = true;
+
+	renderStageNoteSetup();     // STAGE 0: clear old play handles and buffers, setup new play handles
+	renderStageInstruments();   // STAGE 1: run and render all play handles
+	renderStageEffects();       // STAGE 2: process effects of all instrument- and sampletracks
+	renderStageMix();           // STAGE 3: do master mix in mixer
+
+	s_renderingThread = false;
 	m_profiler.finishPeriod(processingSampleRate(), m_framesPerPeriod);
 
 	return m_outputBufferRead;
