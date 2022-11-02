@@ -24,9 +24,16 @@
 
 #include "LocalZynAddSubFx.h"
 
-#include <lmmsconfig.h>
-
 #include <ctime>
+
+#include "lmmsconfig.h"
+
+#ifdef LMMS_BUILD_WIN32
+#	include <wchar.h>
+#	include "IoHelper.h"
+#else
+#	include <unistd.h>
+#endif
 
 #include "MidiEvent.h"
 
@@ -142,7 +149,12 @@ void LocalZynAddSubFx::loadXML( const std::string & _filename )
 
 	m_master->applyparameters();
 
+#ifdef LMMS_BUILD_WIN32
+	_wunlink(toWString(_filename).c_str());
+#else
 	unlink( f );
+#endif
+
 	free( f );
 }
 
