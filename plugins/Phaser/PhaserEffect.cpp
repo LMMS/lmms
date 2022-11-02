@@ -38,11 +38,11 @@ namespace lmms
 extern "C"
 {
 
-Plugin::Descriptor PLUGIN_EXPORT Phaser_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT phaser_plugin_descriptor =
 {
 	LMMS_STRINGIFY(PLUGIN_NAME),
 	"Phaser",
-	QT_TRANSLATE_NOOP("pluginBrowser", "A versatile phaser plugin"),
+	QT_TRANSLATE_NOOP("PluginBrowser", "A versatile phaser plugin"),
 	"Lost Robot <r94231@gmail.com>",
 	0x0100,
 	Plugin::Effect,
@@ -59,7 +59,7 @@ constexpr double PHA_LOG = 2.2;
 
 
 PhaserEffect::PhaserEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
-	Effect(&Phaser_plugin_descriptor, parent, key),
+	Effect(&phaser_plugin_descriptor, parent, key),
 	m_phaserControls(this)
 {
 	m_currentPeak[0] = m_currentPeak[1] = PHA_NOISE_FLOOR;
