@@ -25,9 +25,7 @@
 #include "AudioEngineProfiler.h"
 
 #include <algorithm>
-#ifdef LMMS_HAVE_STDINT_H
 #include <cstdint>
-#endif
 
 namespace lmms
 {

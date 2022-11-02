@@ -73,11 +73,9 @@ private:
 	QFile m_outputFile;
 
 	// Use arrays to avoid dynamic allocations in realtime code
-	// NOTE: The double {} is a workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65815
-	// (Can be removed when LMMS CI updates to GCC 6 or higher.)
 	std::array<MicroTimer, DetailCount> m_detailTimer;
-	std::array<int, DetailCount> m_detailTime{{0}};
-	std::array<float, DetailCount> m_detailLoad{{0}};
+	std::array<int, DetailCount> m_detailTime{0};
+	std::array<float, DetailCount> m_detailLoad{0};
 };
 
 } // namespace lmms
