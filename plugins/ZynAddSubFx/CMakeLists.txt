@@ -4,6 +4,7 @@ endif()
 
 INCLUDE(BuildPlugin)
 
+find_package(Threads REQUIRED)
 find_package(ZLIB REQUIRED)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -118,6 +119,7 @@ target_link_libraries(ZynAddSubFxCore INTERFACE
 	${QT_LIBRARIES}
 	Qt5::Widgets
 	Qt5::Xml
+	Threads::Threads
 	ZLIB::ZLIB
 )
 
