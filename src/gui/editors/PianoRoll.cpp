@@ -1310,16 +1310,25 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 				int direction = (ke->key() == Qt::Key_Up ? +1 : -1);
 				if( ( ke->modifiers() & Qt::ControlModifier ) && m_action == ActionNone )
 				{
-					// shift selection up an octave
+					// shift selection by one octave
 					// if nothing selected, shift _everything_
 					if (hasValidMidiClip())
 					{
-						shiftSemiTone( 12 * direction );
+						// An octave could potentially be greater or less than twelve semitones if the microtuner is in use.
+						const auto microtuner = m_midiClip->instrumentTrack()->microtuner();
+						if (microtuner->enabled())
+						{
+							shiftSemiTone(microtuner->octaveSize() * direction);
+						}
+						else
+						{
+							shiftSemiTone(12 * direction);
+						}
 					}
 				}
 				else if((ke->modifiers() & Qt::ShiftModifier) && m_action == ActionNone)
 				{
-					// Move selected notes up by one semitone
+					// Move selected notes by one semitone
 					if (hasValidMidiClip())
 					{
 						shiftSemiTone( 1 * direction );
