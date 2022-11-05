@@ -25,13 +25,10 @@
 
 #include "InstrumentTuningView.h"
 
-#include <QAction>
 #include <QHBoxLayout>
-#include <QIcon>
 #include <QLabel>
 #include <QPixmap>
 #include <QVBoxLayout>
-#include <QHBoxLayout>
 
 #include "ComboBox.h"
 #include "GroupBox.h"
