@@ -271,7 +271,7 @@ void MidiClientRaw::processOutEvent(const MidiEvent& event, const TimePos&, cons
 
 
 // Taken from Nagano Daisuke's USB-MIDI driver
-static const unsigned char REMAINS_F0F6[] =
+static const auto REMAINS_F0F6 = std::array<unsigned char, 7>
 {
 	0,	/* 0xF0 */
 	2,	/* 0XF1 */
@@ -282,7 +282,7 @@ static const unsigned char REMAINS_F0F6[] =
 	1	/* 0XF6 */
 } ;
 
-static const unsigned char REMAINS_80E0[] =
+static const auto REMAINS_80E0 = std::array<unsigned char, 7>
 {
 	3,	/* 0x8X Note Off */
 	3,	/* 0x9X Note On */

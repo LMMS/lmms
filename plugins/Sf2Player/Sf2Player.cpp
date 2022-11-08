@@ -673,7 +673,7 @@ void Sf2Instrument::noteOn( Sf2PluginData * n )
 	// voice after the fluid_synth_noteon() call
 	const int poly = fluid_synth_get_polyphony( m_synth );
 #ifndef _MSC_VER
-	auto voices = std::vector<fluid_voice_t*>{poly};
+	auto voices = std::vector<fluid_voice_t*>{static_cast<size_t>(poly)};
 	auto id = std::vector<unsigned int>(poly);
 #else
 	const auto voices = static_cast<fluid_voice_t**>(_alloca(poly * sizeof(fluid_voice_t*)));
@@ -822,7 +822,7 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, sampleFrame * buf )
 							m_srcState != nullptr )
 	{
 		const fpp_t f = frames * m_internalSampleRate / Engine::audioEngine()->processingSampleRate();
-		auto tmp = std::vector<sampleFrame>{f};
+		auto tmp = std::vector<sampleFrame>{static_cast<size_t>(f)};
 		fluid_synth_write_float(m_synth, f, tmp.data(), 0, 2, tmp.data(), 1, 2);
 
 		SRC_DATA src_data;

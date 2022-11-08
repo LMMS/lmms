@@ -418,7 +418,7 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 
 	sidreg[24] = data8&0x00FF;
 		
-	int num = sid_fillbuffer(sidreg, sid,delta_t,buf, frames);
+	int num = sid_fillbuffer(sidreg.data(), sid, delta_t, buf, frames);
 	if(num!=frames)
 		printf("!!!Not enough samples\n");
 

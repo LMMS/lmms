@@ -214,7 +214,7 @@ struct WaveValueFunctionInterpolate : public exprtk::ifunction<T>
 	const T *m_vec;
 	const std::size_t m_size;
 };
-static const unsigned int random_data[257]={
+static const auto random_data = std::array<unsigned int, 257>{
 0xd76a33ec, 0x4a767724, 0xb34ebd08 ,0xf4024196,
 0x17b426e2, 0x8dc6389a, 0x1b5dcb93 ,0xa771bd3f,
 0x078d502e, 0x8980988a, 0x1f64f846 ,0xb5b48ed7,

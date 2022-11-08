@@ -401,7 +401,7 @@ void FreeBoyInstrument::playNote( NotePlayHandle * _n,
 		datalen = framesleft>avail?avail:framesleft;
 		datalen = datalen>buf_size?buf_size:datalen;
 
-		long count = papu->read_samples( buf, datalen*2)/2;
+		long count = papu->read_samples(buf.data(), datalen * 2) / 2;
 
 		for( fpp_t frame = 0; frame < count; ++frame )
 		{

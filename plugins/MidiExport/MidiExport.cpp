@@ -139,8 +139,8 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 			}
 			processPatternNotes(midiClip, INT_MAX);
 			writeMidiClipToTrack(mtrack, midiClip);
-			size = mtrack.writeToBuffer(buffer);
-			midiout.writeRawData((char *)buffer, size);
+			size = mtrack.writeToBuffer(buffer.data());
+			midiout.writeRawData((char *)buffer.data(), size);
 		}
 
 		if (track->type() == Track::PatternTrack)
@@ -254,8 +254,8 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 				++itr;
 			}
 		}
-		size = mtrack.writeToBuffer(buffer);
-		midiout.writeRawData((char *)buffer, size);
+		size = mtrack.writeToBuffer(buffer.data());
+		midiout.writeRawData((char *)buffer.data(), size);
 	}
 
 	return true;

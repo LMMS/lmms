@@ -343,7 +343,7 @@ private:
 	static QPixmap * s_toolOpen;
 	static QPixmap* s_toolKnife;
 
-	static PianoRollKeyTypes prKeyOrder[];
+	static std::array<PianoRollKeyTypes, 12> prKeyOrder;
 
 	static TextFloat * s_textFloat;
 

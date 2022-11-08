@@ -105,7 +105,7 @@ void MidiAlsaRaw::sendByte( unsigned char c )
 
 void MidiAlsaRaw::run()
 {
-	unsigned char buf[128];
+	auto buf = std::array<unsigned char, 128>{};
 	//int cnt = 0;
 	while( m_quit == false )
 	{
@@ -149,7 +149,7 @@ void MidiAlsaRaw::run()
 		{
 			continue;
 		}
-		err = snd_rawmidi_read( m_input, buf, sizeof( buf ) );
+		err = snd_rawmidi_read(m_input, buf.data(), sizeof(buf));
 		if( err == -EAGAIN )
 		{
 			continue;

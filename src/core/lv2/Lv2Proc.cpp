@@ -65,8 +65,8 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
 {
 	unsigned maxPorts = lilv_plugin_get_num_ports(plugin);
 	enum { inCount, outCount, maxCount };
-	unsigned audioChannels[maxCount] = { 0, 0 }; // audio input and output count
-	unsigned midiChannels[maxCount] = { 0, 0 }; // MIDI input and output count
+	auto audioChannels = std::array<unsigned, maxCount>{}; // audio input and output count
+	auto midiChannels = std::array<unsigned, maxCount>{}; // MIDI input and output count
 
 	const char* pluginUri = lilv_node_as_uri(lilv_plugin_get_uri(plugin));
 	//qDebug() << "Checking plugin" << pluginUri << "...";
@@ -247,11 +247,11 @@ void Lv2Proc::copyModelsFromCore()
 				ev.time.frames(Engine::framesPerTick()) + ev.offset;
 			uint32_t type = Engine::getLv2Manager()->
 				uridCache()[Lv2UridCache::Id::midi_MidiEvent];
-			uint8_t buf[4];
-			std::size_t bufsize = writeToByteSeq(ev.ev, buf, sizeof(buf));
+			auto buf = std::array<uint8_t, 4>{};
+			std::size_t bufsize = writeToByteSeq(ev.ev, buf.data(), sizeof(buf));
 			if(bufsize)
 			{
-				lv2_evbuf_write(&iter, atomStamp, type, bufsize, buf);
+				lv2_evbuf_write(&iter, atomStamp, type, bufsize, buf.data());
 			}
 		}
 	}

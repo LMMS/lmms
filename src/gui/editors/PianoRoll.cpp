@@ -129,7 +129,7 @@ QPixmap* PianoRoll::s_toolKnife = nullptr;
 
 TextFloat * PianoRoll::s_textFloat = nullptr;
 
-static QString s_noteStrings[12] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+static auto s_noteStrings = std::array<QString, 12>{"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
 
 static QString getNoteString(int key)
 {
@@ -137,7 +137,7 @@ static QString getNoteString(int key)
 }
 
 // used for drawing of piano
-PianoRoll::PianoRollKeyTypes PianoRoll::prKeyOrder[] =
+auto PianoRoll::prKeyOrder = std::array
 {
 	PR_WHITE_KEY_SMALL, PR_BLACK_KEY, PR_WHITE_KEY_BIG, PR_BLACK_KEY,
 	PR_WHITE_KEY_SMALL, PR_WHITE_KEY_SMALL, PR_BLACK_KEY, PR_WHITE_KEY_BIG,
@@ -369,10 +369,10 @@ PianoRoll::PianoRoll() :
 	// Set up note length model
 	m_noteLenModel.addItem( tr( "Last note" ),
 					std::make_unique<PixmapLoader>( "edit_draw" ) );
-	const QString pixmaps[] = { "whole", "half", "quarter", "eighth",
+	const auto pixmaps = std::array<QString, 11>{"whole", "half", "quarter", "eighth",
 						"sixteenth", "thirtysecond", "triplethalf",
 						"tripletquarter", "tripleteighth",
-						"tripletsixteenth", "tripletthirtysecond" } ;
+						"tripletsixteenth", "tripletthirtysecond"};
 
 	for( int i = 0; i < NUM_EVEN_LENGTHS; ++i )
 	{

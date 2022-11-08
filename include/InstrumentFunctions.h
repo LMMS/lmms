@@ -129,7 +129,7 @@ public:
 			ChordSemiTones m_semiTones;
 		};
 
-		static Init s_initTable[];
+		static std::vector<Init> s_initTable;
 
 	public:
 		static const ChordTable & getInstance()

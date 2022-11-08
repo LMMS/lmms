@@ -262,10 +262,10 @@ void LocalZynAddSubFx::processMidiEvent( const MidiEvent& event )
 
 void LocalZynAddSubFx::processAudio( sampleFrame * _out )
 {
-	float outputl[synth->buffersize];
-	float outputr[synth->buffersize];
+	auto outputl = std::vector<float>(synth->buffersize);
+	auto outputr = std::vector<float>(synth->buffersize);
 
-	m_master->GetAudioOutSamples( synth->buffersize, synth->samplerate, outputl, outputr );
+	m_master->GetAudioOutSamples(synth->buffersize, synth->samplerate, outputl.data(), outputr.data());
 
 	// TODO: move to MixHelpers
 	for( int f = 0; f < synth->buffersize; ++f )

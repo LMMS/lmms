@@ -96,7 +96,7 @@ void AudioFileFlac::writeBuffer(surroundSampleFrame const* _ab, fpp_t const fram
 
 	if (depth == OutputSettings::Depth_24Bit || depth == OutputSettings::Depth_32Bit) // Float encoding
 	{
-		std::unique_ptr<sample_t[]> buf{ new sample_t[frames*channels()] };
+		auto buf = std::make_unique<sample_t[]>(frames * channels());
 		for(fpp_t frame = 0; frame < frames; ++frame)
 		{
 			for(ch_cnt_t channel=0; channel<channels(); ++channel)
@@ -111,7 +111,7 @@ void AudioFileFlac::writeBuffer(surroundSampleFrame const* _ab, fpp_t const fram
 	}
 	else // integer PCM encoding
 	{
-		std::unique_ptr<int_sample_t[]> buf{ new int_sample_t[frames*channels()] };
+		auto buf = std::make_unique<int_sample_t[]>(frames * channels());
 		convertToS16(_ab, frames, master_gain, buf.get(), !isLittleEndian());
 		sf_writef_short(m_sf, static_cast<short*>(buf.get()), frames);
 	}

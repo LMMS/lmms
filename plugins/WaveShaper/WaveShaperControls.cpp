@@ -105,7 +105,7 @@ void WaveShaperControls::saveSettings( QDomDocument & _doc,
 
 void WaveShaperControls::setDefaultShape()
 {
-	float shp [200] = { };
+	auto shp = std::array<float, 200>{};
 	for ( int i = 0; i<200; i++)
 	{
 		shp[i] = ((float)i + 1.0f) / 200.0f;

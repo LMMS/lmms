@@ -149,7 +149,7 @@ private:
 		Type m_type;
 		QString m_name;
 	} ;
-	static typeDescStruct s_types[TypeCount];
+	static std::array<typeDescStruct, TypeCount> s_types;
 
 	QString m_fileName; //!< The origin file name or "" if this DataFile didn't originate from a file
 	QDomElement m_content;

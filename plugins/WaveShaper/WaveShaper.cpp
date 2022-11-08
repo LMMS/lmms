@@ -96,7 +96,7 @@ bool WaveShaperEffect::processAudioBuffer( sampleFrame * _buf,
 
 	for( fpp_t f = 0; f < _frames; ++f )
 	{
-		float s[2] = { _buf[f][0], _buf[f][1] };
+		auto s = std::array{_buf[f][0], _buf[f][1]};
 
 // apply input gain
 		s[0] *= *inputPtr;

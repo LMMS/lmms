@@ -89,18 +89,17 @@ const std::vector<ProjectVersion> DataFile::UPGRADE_VERSIONS = {
 	"1.2.0-rc3"        ,   "1.3.0"
 };
 
-DataFile::typeDescStruct
-		DataFile::s_types[DataFile::TypeCount] =
+auto DataFile::s_types = std::array
 {
-	{ DataFile::UnknownType, "unknown" },
-	{ DataFile::SongProject, "song" },
-	{ DataFile::SongProjectTemplate, "songtemplate" },
-	{ DataFile::InstrumentTrackSettings, "instrumenttracksettings" },
-	{ DataFile::DragNDropData, "dnddata" },
-	{ DataFile::ClipboardData, "clipboard-data" },
-	{ DataFile::JournalData, "journaldata" },
-	{ DataFile::EffectSettings, "effectsettings" },
-	{ DataFile::MidiClip, "midiclip" }
+	DataFile::typeDescStruct{ DataFile::UnknownType, "unknown" },
+	DataFile::typeDescStruct{ DataFile::SongProject, "song" },
+	DataFile::typeDescStruct{ DataFile::SongProjectTemplate, "songtemplate" },
+	DataFile::typeDescStruct{ DataFile::InstrumentTrackSettings, "instrumenttracksettings" },
+	DataFile::typeDescStruct{ DataFile::DragNDropData, "dnddata" },
+	DataFile::typeDescStruct{ DataFile::ClipboardData, "clipboard-data" },
+	DataFile::typeDescStruct{ DataFile::JournalData, "journaldata" },
+	DataFile::typeDescStruct{ DataFile::EffectSettings, "effectsettings" },
+	DataFile::typeDescStruct{ DataFile::MidiClip, "midiclip" }
 } ;
 
 

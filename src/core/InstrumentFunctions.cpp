@@ -33,9 +33,10 @@
 
 namespace lmms
 {
-
-
-InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking::ChordTable::s_initTable[] =
+	
+std::vector<InstrumentFunctionNoteStacking::ChordTable::Init>
+InstrumentFunctionNoteStacking::ChordTable::s_initTable 
+	= std::vector<InstrumentFunctionNoteStacking::ChordTable::Init>
 {
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "octave" ), { 0, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Major" ), { 0, 4, 7, -1 } },

@@ -583,7 +583,7 @@ void OpulenzInstrument::updatePatch() {
 #endif
 
 
-	loadPatch(inst);
+	loadPatch(inst.data());
 }
 
 // Load an SBI file into the knob models

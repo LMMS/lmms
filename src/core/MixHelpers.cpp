@@ -281,7 +281,7 @@ struct AddMultipliedStereoOp
 		dst[1] += src[1] * m_coeffs[1];
 	}
 
-	float m_coeffs[2];
+	std::array<float, 2> m_coeffs;
 } ;
 
 
@@ -309,7 +309,7 @@ struct MultiplyAndAddMultipliedOp
 		dst[1] = dst[1]*m_coeffs[0] + src[1]*m_coeffs[1];
 	}
 
-	float m_coeffs[2];
+	std::array<float, 2> m_coeffs;
 } ;
 
 
