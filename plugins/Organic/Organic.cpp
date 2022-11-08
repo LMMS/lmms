@@ -233,8 +233,8 @@ void OrganicInstrument::playNote( NotePlayHandle * _n,
 	
 	if( _n->totalFramesPlayed() == 0 || _n->m_pluginData == nullptr )
 	{
-		Oscillator * oscs_l[NUM_OSCILLATORS];
-		Oscillator * oscs_r[NUM_OSCILLATORS];
+		auto oscs_l = std::array<Oscillator*, NUM_OSCILLATORS>{};
+		auto oscs_r = std::array<Oscillator*, NUM_OSCILLATORS>{};
 
 		_n->m_pluginData = new oscPtr;
 
@@ -586,7 +586,7 @@ OscillatorObject::OscillatorObject( Model * _parent, int _index ) :
 void OscillatorObject::oscButtonChanged()
 {
 
-	static Oscillator::WaveShapes shapes[] =
+	static auto shapes = std::array
 	{
 		Oscillator::SineWave,
 		Oscillator::SawWave,

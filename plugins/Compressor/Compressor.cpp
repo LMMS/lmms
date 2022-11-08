@@ -292,7 +292,7 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 	for(fpp_t f = 0; f < frames; ++f)
 	{
-		sample_t drySignal[2] = {buf[f][0], buf[f][1]};
+		auto drySignal = std::array{buf[f][0], buf[f][1]};
 		sample_t s[2] = {drySignal[0] * m_inGainVal, drySignal[1] * m_inGainVal};
 
 		// Calculate tilt filters, to bias the sidechain to the low or high frequencies
@@ -512,7 +512,7 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 				m_inputBufLoc = 0;
 			}
 
-			const float temp[2] = {drySignal[0], drySignal[1]};
+			const auto temp = std::array{drySignal[0], drySignal[1]};
 			s[0] = m_inputBuf[0][m_inputBufLoc];
 			s[1] = m_inputBuf[1][m_inputBufLoc];
 
@@ -525,7 +525,7 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			s[1] = drySignal[1];
 		}
 
-		float delayedDrySignal[2] = {s[0], s[1]};
+		auto delayedDrySignal = std::array{s[0], s[1]};
 		
 		if (midside)// Convert left/right to mid/side
 		{

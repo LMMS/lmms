@@ -122,7 +122,7 @@ bool StereoEnhancerEffect::processAudioBuffer( sampleFrame * _buf,
 		}
 
 		//sample_t s[2] = { _buf[f][0], _buf[f][1] };	//Vanilla
-		sample_t s[2] = { _buf[f][0], m_delayBuffer[frameIndex][1] };	//Chocolate
+		auto s = std::array{_buf[f][0], m_delayBuffer[frameIndex][1]};	//Chocolate
 
 		m_seFX.nextSample( s[0], s[1] );
 

@@ -84,7 +84,7 @@ bool AmplifierEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	{
 //		qDebug( "offset %d, value %f", f, m_ampControls.m_volumeModel.value( f ) );
 	
-		sample_t s[2] = { buf[f][0], buf[f][1] };
+		auto s = std::array{buf[f][0], buf[f][1]};
 
 		// vol knob
 		if( volBuf )

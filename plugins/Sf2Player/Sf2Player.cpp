@@ -673,13 +673,13 @@ void Sf2Instrument::noteOn( Sf2PluginData * n )
 	// voice after the fluid_synth_noteon() call
 	const int poly = fluid_synth_get_polyphony( m_synth );
 #ifndef _MSC_VER
-	fluid_voice_t* voices[poly];
-	unsigned int id[poly];
+	auto voices = std::vector<fluid_voice_t*>{poly};
+	auto id = std::vector<unsigned int>(poly);
 #else
 	const auto voices = static_cast<fluid_voice_t**>(_alloca(poly * sizeof(fluid_voice_t*)));
 	const auto id = static_cast<unsigned int*>(_alloca(poly * sizeof(unsigned int)));
 #endif
-	fluid_synth_get_voicelist( m_synth, voices, poly, -1 );
+	fluid_synth_get_voicelist( m_synth, voices.data(), poly, -1 );
 	for( int i = 0; i < poly; ++i )
 	{
 		id[i] = 0;
@@ -692,7 +692,7 @@ void Sf2Instrument::noteOn( Sf2PluginData * n )
 	fluid_synth_noteon( m_synth, m_channel, n->midiNote, n->lastVelocity );
 
 	// get new voice and save it
-	fluid_synth_get_voicelist( m_synth, voices, poly, -1 );
+	fluid_synth_get_voicelist( m_synth, voices.data(), poly, -1 );
 	for( int i = 0; i < poly && voices[i]; ++i )
 	{
 		const unsigned int newID = fluid_voice_get_id( voices[i] );
@@ -822,24 +822,17 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, sampleFrame * buf )
 							m_srcState != nullptr )
 	{
 		const fpp_t f = frames * m_internalSampleRate / Engine::audioEngine()->processingSampleRate();
-#ifdef __GNUC__
-		sampleFrame tmp[f];
-#else
-		sampleFrame * tmp = new sampleFrame[f];
-#endif
-		fluid_synth_write_float( m_synth, f, tmp, 0, 2, tmp, 1, 2 );
+		auto tmp = std::vector<sampleFrame>{f};
+		fluid_synth_write_float(m_synth, f, tmp.data(), 0, 2, tmp.data(), 1, 2);
 
 		SRC_DATA src_data;
-		src_data.data_in = (float *)tmp;
+		src_data.data_in = (float *)tmp.data();
 		src_data.data_out = (float *)buf;
 		src_data.input_frames = f;
 		src_data.output_frames = frames;
 		src_data.src_ratio = (double) frames / f;
 		src_data.end_of_input = 0;
 		int error = src_process( m_srcState, &src_data );
-#ifndef __GNUC__
-		delete[] tmp;
-#endif
 		if( error )
 		{
 			qCritical( "Sf2Instrument: error while resampling: %s", src_strerror( error ) );

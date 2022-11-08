@@ -317,7 +317,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	pd.setValue( 1 );
 	
 	// 128 CC + Pitch Bend
-	smfMidiCC ccs[MIDI_CC_COUNT];
+	auto ccs = std::array<smfMidiCC, MIDI_CC_COUNT>{};
 
 	// channel to CC object for program changes
 	std::unordered_map<long, smfMidiCC> pcs;

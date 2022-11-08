@@ -310,8 +310,8 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 {
 	if( _n->totalFramesPlayed() == 0 || _n->m_pluginData == nullptr )
 	{
-		Oscillator * oscs_l[NUM_OF_OSCILLATORS];
-		Oscillator * oscs_r[NUM_OF_OSCILLATORS];
+		auto oscs_l = std::array<Oscillator*, NUM_OF_OSCILLATORS>{};
+		auto oscs_r = std::array<Oscillator*, NUM_OF_OSCILLATORS>{};
 
 		for( int i = NUM_OF_OSCILLATORS - 1; i >= 0; --i )
 		{

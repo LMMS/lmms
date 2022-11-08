@@ -653,8 +653,8 @@ inline void MonstroSynth::updateModulators( float * env1, float * env2, float * 
 	// frames played before
 	const f_cnt_t tfp = m_nph->totalFramesPlayed();
 
-	float * lfo [2];
-	float * env [2];
+	auto lfo = std::array<float*, 2>{};
+	auto env = std::array<float*, 2>{};
 	lfo[0] = lfo1;
 	lfo[1] = lfo2;
 	env[0] = env1;

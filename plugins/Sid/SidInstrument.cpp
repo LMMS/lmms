@@ -52,22 +52,22 @@ namespace lmms
 #define SIDWRITEDELAY 9 // lda $xxxx,x 4 cycles, sta $d400,x 5 cycles
 #define SIDWAVEDELAY 4 // and $xxxx,x 4 cycles extra
 
-unsigned char sidorder[] =
+auto sidorder = std::array<unsigned char, 25>
   {0x15,0x16,0x18,0x17,
    0x05,0x06,0x02,0x03,0x00,0x01,0x04,
    0x0c,0x0d,0x09,0x0a,0x07,0x08,0x0b,
    0x13,0x14,0x10,0x11,0x0e,0x0f,0x12};
 
-static const char *attackTime[16] = { "2 ms", "8 ms", "16 ms", "24 ms",
+static auto attackTime = std::array<const char*, 16>{ "2 ms", "8 ms", "16 ms", "24 ms",
 									"38 ms", "56 ms", "68 ms", "80 ms",
 									"100 ms", "250 ms", "500 ms", "800 ms",
 									"1 s", "3 s", "5 s", "8 s" };
-static const char *decRelTime[16] = { "6 ms", "24 ms", "48 ms", "72 ms",
+static auto decRelTime = std::array<const char*, 16>{ "6 ms", "24 ms", "48 ms", "72 ms",
 									"114 ms", "168 ms", "204 ms", "240 ms",
 									"300 ms", "750 ms", "1.5 s", "2.4 s",
 									"3 s", "9 s", "15 s", "24 s" };
 // release time time in ms
-static const int relTime[16] = { 6, 24, 48, 72, 114, 168, 204, 240, 300, 750,
+static const auto relTime = std::array{ 6, 24, 48, 72, 114, 168, 204, 240, 300, 750,
 								1500, 2400, 3000, 9000, 15000, 24000 };
 
 
@@ -318,7 +318,7 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 	int delta_t = clockrate * frames / samplerate + 4;
 	// avoid variable length array for msvc compat
 	auto buf = reinterpret_cast<short*>(_working_buffer + offset);
-	unsigned char sidreg[NUMSIDREGS];
+	auto sidreg = std::array<unsigned char, NUMSIDREGS>{};
 
 	for (auto& reg : sidreg)
 	{

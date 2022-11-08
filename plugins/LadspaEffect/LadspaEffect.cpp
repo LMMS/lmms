@@ -303,7 +303,7 @@ void LadspaEffect::pluginInstantiation()
 
 	int inputch = 0;
 	int outputch = 0;
-	LADSPA_Data * inbuf [2];
+	std::array<LADSPA_Data*, 2> inbuf;
 	inbuf[0] = nullptr;
 	inbuf[1] = nullptr;
 	for( ch_cnt_t proc = 0; proc < processorCount(); proc++ )

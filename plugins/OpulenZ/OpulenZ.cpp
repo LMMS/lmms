@@ -92,7 +92,7 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 QMutex OpulenzInstrument::emulatorMutex;
 
 // Weird ordering of voice parameters
-const unsigned int adlib_opadd[OPL2_VOICES] = {0x00, 0x01, 0x02, 0x08, 0x09, 0x0A, 0x10, 0x11, 0x12};
+const auto adlib_opadd = std::array<unsigned int, OPL2_VOICES>{0x00, 0x01, 0x02, 0x08, 0x09, 0x0A, 0x10, 0x11, 0x12};
 
 OpulenzInstrument::OpulenzInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &opulenz_plugin_descriptor ),
@@ -534,7 +534,7 @@ void OpulenzInstrument::loadGMPatch() {
 
 // Update patch from the models to the chip emulation
 void OpulenzInstrument::updatePatch() {
-	unsigned char inst[14] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	auto inst = std::array<unsigned char, 14>{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	inst[0] = ( op1_trem_mdl.value() ?  128 : 0  ) +
 		( op1_vib_mdl.value() ?  64 : 0 ) +
 		( op1_perc_mdl.value() ?  0 : 32 ) + // NB. This envelope mode is "perc", not "sus"
@@ -782,19 +782,19 @@ void OpulenzInstrumentView::updateKnobHints()
 {
 	// Envelope times in ms: t[0] = 0, t[n] = ( 1<<n ) * X, X = 0.11597 for A, 0.6311 for D/R
 	// Here some rounding has been applied.
-	const float attack_times[16] = { 
+	const auto attack_times = std::array<float, 16>{ 
 		0.0, 0.2, 0.4, 0.9, 1.8, 3.7, 7.4, 
 		15.0, 30.0, 60.0, 120.0, 240.0, 480.0,
 		950.0, 1900.0, 3800.0 
 	};
 
-	const float dr_times[16] = { 
+	const auto dr_times = std::array<float, 16>{ 
 		0.0, 1.2, 2.5, 5.0, 10.0, 20.0, 40.0, 
 		80.0, 160.0, 320.0, 640.0, 1300.0, 2600.0, 
 		5200.0, 10000.0, 20000.0 
 	};
 	
-	const int fmultipliers[16] = {
+	const auto fmultipliers = std::array<int, 16>{
 		-12, 0, 12, 19, 24, 28, 31, 34, 36, 38, 40, 40, 43, 43, 47, 47  
 	};
 

@@ -96,7 +96,7 @@ bool ReverbSCEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 
 	for( fpp_t f = 0; f < frames; ++f )
 	{
-		sample_t s[2] = { buf[f][0], buf[f][1] };
+		auto s = std::array{buf[f][0], buf[f][1]};
 
 		const auto inGain
 			= (SPFLOAT)DB2LIN((inGainBuf ? inGainBuf->values()[f] : m_reverbSCControls.m_inputGainModel.value()));

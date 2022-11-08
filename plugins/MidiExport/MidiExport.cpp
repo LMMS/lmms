@@ -81,7 +81,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 
 
 	int nTracks = 0;
-	uint8_t buffer[BUFFER_SIZE];
+	auto buffer = std::array<uint8_t, BUFFER_SIZE>{};
 	uint32_t size;
 
 	for (const Track* track : tracks) if (track->type() == Track::InstrumentTrack) nTracks++;
@@ -89,8 +89,8 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 
 	// midi header
 	MidiFile::MIDIHeader header(nTracks);
-	size = header.writeToBuffer(buffer);
-	midiout.writeRawData((char *)buffer, size);
+	size = header.writeToBuffer(buffer.data());
+	midiout.writeRawData((char *)buffer.data(), size);
 
 	std::vector<std::vector<std::pair<int,int>>> plists;
 

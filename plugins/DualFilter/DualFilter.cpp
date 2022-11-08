@@ -145,9 +145,9 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 		const float mix1 = 1.0f - mix2;
 		const float gain1 = *gain1Ptr * 0.01f;
 		const float gain2 = *gain2Ptr * 0.01f;
-		sample_t s[2] = { 0.0f, 0.0f };	// mix
-		sample_t s1[2] = { buf[f][0], buf[f][1] };	// filter 1
-		sample_t s2[2] = { buf[f][0], buf[f][1] };	// filter 2
+		auto s = std::array{0.0f, 0.0f};	// mix
+		auto s1 = std::array{buf[f][0], buf[f][1]};	// filter 1
+		auto s2 = std::array{buf[f][0], buf[f][1]};	// filter 2
 
 		// update filter 1
 		if( enabled1 )

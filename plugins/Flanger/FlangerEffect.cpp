@@ -104,7 +104,7 @@ bool FlangerEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 	m_lfo->setOffset( m_flangerControls.m_lfoPhaseModel.value() / 180 * D_PI );
 	m_lDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
 	m_rDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
-	sample_t dryS[2];
+	auto dryS = std::array<sample_t, 2>{};
 	float leftLfo;
 	float rightLfo;
 	for( fpp_t f = 0; f < frames; ++f )
