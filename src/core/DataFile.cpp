@@ -89,7 +89,7 @@ const std::vector<ProjectVersion> DataFile::UPGRADE_VERSIONS = {
 	"1.2.0-rc3"        ,   "1.3.0"
 };
 
-auto DataFile::s_types = std::array
+std::array<DataFile::typeDescStruct, DataFile::TypeCount> DataFile::s_types =
 {
 	DataFile::typeDescStruct{ DataFile::UnknownType, "unknown" },
 	DataFile::typeDescStruct{ DataFile::SongProject, "song" },
