@@ -235,11 +235,11 @@ void ProjectRenderer::updateConsoleProgress()
 
 	const auto activity = (const char*)"|/-\\";
 	memset(buf.data(), 0, sizeof(buf));
-	sprintf(buf.data(), "\r|%s|    %3d%%   %c  ", prog, m_progress,
+	sprintf(buf.data(), "\r|%s|    %3d%%   %c  ", prog.data(), m_progress,
 							activity[rot] );
 	rot = ( rot+1 ) % 4;
 
-	fprintf( stderr, "%s", buf );
+	fprintf( stderr, "%s", buf.data() );
 	fflush( stderr );
 }
 
