@@ -39,7 +39,7 @@ namespace lmms
 {
 
 
-const auto ProjectRenderer::fileEncodeDevices = std::array
+const std::array<ProjectRenderer::FileEncodeDevice, 5> ProjectRenderer::fileEncodeDevices
 {
 
 	FileEncodeDevice{ ProjectRenderer::WaveFile,
