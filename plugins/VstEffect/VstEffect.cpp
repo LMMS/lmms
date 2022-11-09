@@ -105,9 +105,6 @@ bool VstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 		{
 			out_sum += _buf[f][0]*_buf[f][0] + _buf[f][1]*_buf[f][1];
 		}
-#ifndef __GNUC__
-		delete[] buf;
-#endif
 
 		checkGate( out_sum / _frames );
 	}
