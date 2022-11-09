@@ -23,6 +23,7 @@
  *
  */
 
+#include <array>
 
 #include <QFile>
 #include <QApplication>
