@@ -55,14 +55,13 @@ const int     NEXTT =  4;
 
 // Bah, I'll move these into the class once I sepearate DrumsynthFile from DrumSynth
 // llama
-std::array<std::array<std::array<float, 32>, 3>, 8> envpts;    //envelope/time-level/point
-std::array<std::array<float, 6>, 8> envData; //envelope running status
-std::array<int, 8> chkOn, sliLev; //section on/off and level
+float envpts[8][3][32];    //envelope/time-level/point
+float envData[8][6];       //envelope running status
+int   chkOn[8], sliLev[8]; //section on/off and level
 float timestretch;         //overall time scaling
-std::array<short, 1200> DD;
-short clippoint;
-std::array<float, 1200> DF;
-std::array<float, 1200> phi;
+short DD[1200], clippoint;
+float DF[1200];
+float phi[1200];
 
 long  wavewords, wavemode=0;
 float mem_t=1.0f, mem_o=1.0f, mem_n=1.0f, mem_b=1.0f, mem_tune=1.0f, mem_time=1.0f;
@@ -118,10 +117,9 @@ void DrumSynth::UpdateEnv(int e, long t)
 
 void DrumSynth::GetEnv(int env, const char *sec, const char *key, QString ini)
 {
-  auto en = std::array<char, 256>{};
-  auto s = std::array<char, 8>{};
+  char en[256], s[8];
   int i=0, o=0, ep=0;
-  GetPrivateProfileString(sec, key, "0,0 100,0", en.data(), sizeof(en), ini);
+  GetPrivateProfileString(sec, key, "0,0 100,0", en, sizeof(en), ini);
 
   //be safe!
   en[255]=0;
@@ -131,18 +129,18 @@ void DrumSynth::GetEnv(int env, const char *sec, const char *key, QString ini)
   {
     if(en[i] == ',')
     {
-      if(sscanf(s.data(), "%f", &envpts[env][0][ep])==0) envpts[env][0][ep] = 0.f;
+      if(sscanf(s, "%f", &envpts[env][0][ep])==0) envpts[env][0][ep] = 0.f;
       o=0;
     }
     else if(en[i] == ' ')
     {
-      if(sscanf(s.data(), "%f", &envpts[env][1][ep])==0) envpts[env][1][ep] = 0.f;
+      if(sscanf(s, "%f", &envpts[env][1][ep])==0) envpts[env][1][ep] = 0.f;
       o=0; ep++;
     }
     else { s[o]=en[i]; o++; s[o]=0; }
     i++;
   }
-  if(sscanf(s.data(), "%f", &envpts[env][1][ep])==0) envpts[env][1][ep] = 0.f;
+  if(sscanf(s, "%f", &envpts[env][1][ep])==0) envpts[env][1][ep] = 0.f;
   envpts[env][0][ep + 1] = -1;
 
   envData[env][MAX] = envpts[env][0][ep];
@@ -238,22 +236,22 @@ int DrumSynth::GetPrivateProfileString(const char *sec, const char *key, const c
 
 int DrumSynth::GetPrivateProfileInt(const char *sec, const char *key, int def, QString file)
 {
-  auto tmp = std::array<char, 16>{};
+  char tmp[16];
   int i=0;
 
-  GetPrivateProfileString(sec, key, "", tmp.data(), sizeof(tmp), file);
-  sscanf(tmp.data(), "%d", &i); if(tmp[0]==0) i=def;
+  GetPrivateProfileString(sec, key, "", tmp, sizeof(tmp), file);
+  sscanf(tmp, "%d", &i); if(tmp[0]==0) i=def;
 
   return i;
 }
 
 float DrumSynth::GetPrivateProfileFloat(const char *sec, const char *key, float def, QString file)
 {
-    auto tmp = std::array<char, 16>{};
+    char tmp[16];
     float f=0.f;
 
-    GetPrivateProfileString(sec, key, "", tmp.data(), sizeof(tmp), file);
-    sscanf(tmp.data(), "%f", &f); if(tmp[0]==0) f=def;
+    GetPrivateProfileString(sec, key, "", tmp, sizeof(tmp), file);
+    sscanf(tmp, "%f", &f); if(tmp[0]==0) f=def;
 
     return f;
 }
@@ -267,14 +265,14 @@ float DrumSynth::GetPrivateProfileFloat(const char *sec, const char *key, float 
 int DrumSynth::GetDSFileSamples(QString dsfile, int16_t *&wave, int channels, sample_rate_t Fs)
 {
   //input file
-  auto sec = std::array<char, 32>{};
-  auto ver = std::array<char, 32>{};
-  auto comment = std::array<char, 256>{};
+  char sec[32];
+  char ver[32];
+  char comment[256];
   int commentLen=0;
 
   //generation
   long  Length, tpos=0, tplus, totmp, t, i, j;
-  auto x = std::array{0.f, 0.f, 0.f};
+  float x[3] = {0.f, 0.f, 0.f};
   float MasterTune, randmax, randmax2;
   int   MainFilter, HighPass;
 
@@ -287,8 +285,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t *&wave, int channels, sa
 
   long  OON, OF1Sync=0, OF2Sync=0, OMode, OW1, OW2;
   float Ophi1, Ophi2, OF1, OF2, OL, Ot=0 /*PG: init */, OBal1, OBal2, ODrive;
-  float Ocf1, Ocf2, OcF, OcQ, OcA;
-  std::array<std::array<float, 2>, 6> Oc;  //overtone cymbal mode
+  float Ocf1, Ocf2, OcF, OcQ, OcA, Oc[6][2];  //overtone cymbal mode
   float Oc0=0.0f, Oc1=0.0f, Oc2=0.0f;
 
   float MFfb, MFtmp, MFres, MFin=0.f, MFout=0.f;
@@ -307,45 +304,45 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t *&wave, int channels, sa
   }
 
   //try to read version from input file
-  strcpy(sec.data(), "General");
-  GetPrivateProfileString(sec.data(),"Version","",ver.data(),sizeof(ver),dsfile);
+  strcpy(sec, "General");
+  GetPrivateProfileString(sec,"Version","",ver,sizeof(ver),dsfile);
   ver[9]=0;
-  if(strcasecmp(ver.data(), "DrumSynth") != 0) {return 0;} //input fail
+  if(strcasecmp(ver, "DrumSynth") != 0) {return 0;} //input fail
   if(ver[11] != '1' && ver[11] != '2') {return 0;} //version fail
 
 
   //read master parameters
-  GetPrivateProfileString(sec.data(),"Comment","",comment.data(),sizeof(comment),dsfile);
+  GetPrivateProfileString(sec,"Comment","",comment,sizeof(comment),dsfile);
   while((comment[commentLen]!=0) && (commentLen<254)) commentLen++;
   if(commentLen==0) { comment[0]=32; comment[1]=0; commentLen=1;}
   comment[commentLen+1]=0; commentLen++;
   if((commentLen % 2)==1) commentLen++;
 
-  timestretch = .01f * mem_time * GetPrivateProfileFloat(sec.data(),"Stretch",100.0,dsfile);
+  timestretch = .01f * mem_time * GetPrivateProfileFloat(sec,"Stretch",100.0,dsfile);
   if(timestretch<0.2f) timestretch=0.2f;
   if(timestretch>10.f) timestretch=10.f;
   // the unit of envelope lengths is a sample in 44100Hz sample rate, so correct it
   timestretch *= Fs / 44100.f;
 
   DGain = 1.0f; //leave this here!
-  DGain = static_cast<float>(std::pow(10.0, 0.05 * GetPrivateProfileFloat(sec.data(),"Level",0,dsfile)));
+  DGain = static_cast<float>(std::pow(10.0, 0.05 * GetPrivateProfileFloat(sec,"Level",0,dsfile)));
 
-  MasterTune = GetPrivateProfileFloat(sec.data(),"Tuning",0.0,dsfile);
+  MasterTune = GetPrivateProfileFloat(sec,"Tuning",0.0,dsfile);
   MasterTune = static_cast<float>(std::pow(1.0594631f, MasterTune + mem_tune));
-  MainFilter = 2 * GetPrivateProfileInt(sec.data(),"Filter",0,dsfile);
-  MFres = 0.0101f * GetPrivateProfileFloat(sec.data(),"Resonance",0.0,dsfile);
+  MainFilter = 2 * GetPrivateProfileInt(sec,"Filter",0,dsfile);
+  MFres = 0.0101f * GetPrivateProfileFloat(sec,"Resonance",0.0,dsfile);
   MFres = static_cast<float>(std::pow(MFres, 0.5f));
 
-  HighPass = GetPrivateProfileInt(sec.data(),"HighPass",0,dsfile);
-  GetEnv(7, sec.data(), "FilterEnv", dsfile);
+  HighPass = GetPrivateProfileInt(sec,"HighPass",0,dsfile);
+  GetEnv(7, sec, "FilterEnv", dsfile);
 
 
   //read noise parameters
-  strcpy(sec.data(), "Noise");
-  chkOn[1] = GetPrivateProfileInt(sec.data(),"On",0,dsfile);
-  sliLev[1] = GetPrivateProfileInt(sec.data(),"Level",0,dsfile);
-  NT =  GetPrivateProfileInt(sec.data(),"Slope",0,dsfile);
-  GetEnv(2, sec.data(), "Envelope", dsfile);
+  strcpy(sec, "Noise");
+  chkOn[1] = GetPrivateProfileInt(sec,"On",0,dsfile);
+  sliLev[1] = GetPrivateProfileInt(sec,"Level",0,dsfile);
+  NT =  GetPrivateProfileInt(sec,"Slope",0,dsfile);
+  GetEnv(2, sec, "Envelope", dsfile);
   NON = chkOn[1];
   NL = (float)(sliLev[1] * sliLev[1]) * mem_n;
   if(NT<0)
@@ -358,15 +355,15 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t *&wave, int channels, sa
     //srand(1); //fixed random sequence
 
    //read tone parameters
-  strcpy(sec.data(), "Tone");
-  chkOn[0] = GetPrivateProfileInt(sec.data(),"On",0,dsfile); TON = chkOn[0];
-  sliLev[0] = GetPrivateProfileInt(sec.data(),"Level",128,dsfile);
+  strcpy(sec, "Tone");
+  chkOn[0] = GetPrivateProfileInt(sec,"On",0,dsfile); TON = chkOn[0];
+  sliLev[0] = GetPrivateProfileInt(sec,"Level",128,dsfile);
   TL = (float)(sliLev[0] * sliLev[0]) * mem_t;
-  GetEnv(1, sec.data(), "Envelope", dsfile);
-  F1 = MasterTune * TwoPi * GetPrivateProfileFloat(sec.data(),"F1",200.0,dsfile) / Fs;
+  GetEnv(1, sec, "Envelope", dsfile);
+  F1 = MasterTune * TwoPi * GetPrivateProfileFloat(sec,"F1",200.0,dsfile) / Fs;
   if(fabs(F1)<0.001f) F1=0.001f; //to prevent overtone ratio div0
-  F2 = MasterTune * TwoPi * GetPrivateProfileFloat(sec.data(),"F2",120.0,dsfile) / Fs;
-  TDroopRate = GetPrivateProfileFloat(sec.data(),"Droop",0.f,dsfile);
+  F2 = MasterTune * TwoPi * GetPrivateProfileFloat(sec,"F2",120.0,dsfile) / Fs;
+  TDroopRate = GetPrivateProfileFloat(sec,"Droop",0.f,dsfile);
   if(TDroopRate>0.f)
   {
     TDroopRate = static_cast<float>(std::pow(10.0f, (TDroopRate - 20.0f) / 30.0f));
@@ -377,31 +374,31 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t *&wave, int channels, sa
   }
   else ddF = F2-F1;
 
-  Tphi = GetPrivateProfileFloat(sec.data(),"Phase",90.f,dsfile) / 57.29578f; //degrees>radians
+  Tphi = GetPrivateProfileFloat(sec,"Phase",90.f,dsfile) / 57.29578f; //degrees>radians
 
   //read overtone parameters
-  strcpy(sec.data(), "Overtones");
-  chkOn[2] = GetPrivateProfileInt(sec.data(),"On",0,dsfile); OON = chkOn[2];
-  sliLev[2] = GetPrivateProfileInt(sec.data(),"Level",128,dsfile);
+  strcpy(sec, "Overtones");
+  chkOn[2] = GetPrivateProfileInt(sec,"On",0,dsfile); OON = chkOn[2];
+  sliLev[2] = GetPrivateProfileInt(sec,"Level",128,dsfile);
   OL = (float)(sliLev[2] * sliLev[2]) * mem_o;
-  GetEnv(3, sec.data(), "Envelope1", dsfile);
-  GetEnv(4, sec.data(), "Envelope2", dsfile);
-  OMode = GetPrivateProfileInt(sec.data(),"Method",2,dsfile);
-  OF1 = MasterTune * TwoPi * GetPrivateProfileFloat(sec.data(),"F1",200.0,dsfile) / Fs;
-  OF2 = MasterTune * TwoPi * GetPrivateProfileFloat(sec.data(),"F2",120.0,dsfile) / Fs;
-  OW1 = GetPrivateProfileInt(sec.data(),"Wave1",0,dsfile);
-  OW2 = GetPrivateProfileInt(sec.data(),"Wave2",0,dsfile);
-  OBal2 = (float)GetPrivateProfileInt(sec.data(),"Param",50,dsfile);
+  GetEnv(3, sec, "Envelope1", dsfile);
+  GetEnv(4, sec, "Envelope2", dsfile);
+  OMode = GetPrivateProfileInt(sec,"Method",2,dsfile);
+  OF1 = MasterTune * TwoPi * GetPrivateProfileFloat(sec,"F1",200.0,dsfile) / Fs;
+  OF2 = MasterTune * TwoPi * GetPrivateProfileFloat(sec,"F2",120.0,dsfile) / Fs;
+  OW1 = GetPrivateProfileInt(sec,"Wave1",0,dsfile);
+  OW2 = GetPrivateProfileInt(sec,"Wave2",0,dsfile);
+  OBal2 = (float)GetPrivateProfileInt(sec,"Param",50,dsfile);
   ODrive = static_cast<float>(std::pow(OBal2, 3.0f)) / std::pow(50.0f, 3.0f);
   OBal2 *= 0.01f;
   OBal1 = 1.f - OBal2;
   Ophi1 = Tphi;
   Ophi2 = Tphi;
   if(MainFilter==0)
-    MainFilter = GetPrivateProfileInt(sec.data(),"Filter",0,dsfile);
-  if((GetPrivateProfileInt(sec.data(),"Track1",0,dsfile)==1) && (TON==1))
+    MainFilter = GetPrivateProfileInt(sec,"Filter",0,dsfile);
+  if((GetPrivateProfileInt(sec,"Track1",0,dsfile)==1) && (TON==1))
   { OF1Sync = 1;  OF1 = OF1 / F1; }
-  if((GetPrivateProfileInt(sec.data(),"Track2",0,dsfile)==1) && (TON==1))
+  if((GetPrivateProfileInt(sec,"Track2",0,dsfile)==1) && (TON==1))
   { OF2Sync = 1;  OF2 = OF2 / F1; }
 
   OcA = 0.28f + OBal1 * OBal1;  //overtone cymbal mode
@@ -413,34 +410,34 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t *&wave, int channels, sa
   for(i=0; i<6; i++) Oc[i][0] = Oc[i][1] = Ocf1 + (Ocf2 - Ocf1) * 0.2f * (float)i;
 
   //read noise band parameters
-  strcpy(sec.data(), "NoiseBand");
-  chkOn[3] = GetPrivateProfileInt(sec.data(),"On",0,dsfile); BON = chkOn[3];
-  sliLev[3] = GetPrivateProfileInt(sec.data(),"Level",128,dsfile);
+  strcpy(sec, "NoiseBand");
+  chkOn[3] = GetPrivateProfileInt(sec,"On",0,dsfile); BON = chkOn[3];
+  sliLev[3] = GetPrivateProfileInt(sec,"Level",128,dsfile);
   BL = (float)(sliLev[3] * sliLev[3]) * mem_b;
-  BF = MasterTune * TwoPi * GetPrivateProfileFloat(sec.data(),"F",1000.0,dsfile) / Fs;
+  BF = MasterTune * TwoPi * GetPrivateProfileFloat(sec,"F",1000.0,dsfile) / Fs;
   BPhi = TwoPi / 8.f;
-  GetEnv(5, sec.data(), "Envelope", dsfile);
-  BFStep = GetPrivateProfileInt(sec.data(),"dF",50,dsfile);
+  GetEnv(5, sec, "Envelope", dsfile);
+  BFStep = GetPrivateProfileInt(sec,"dF",50,dsfile);
   BQ = (float)BFStep;
   BQ = BQ * BQ / (10000.f-6600.f*((float)sqrt(BF)-0.19f));
   BFStep = 1 + (int)((40.f - (BFStep / 2.5f)) / (BQ + 1.f + (1.f * BF)));
 
-  strcpy(sec.data(), "NoiseBand2");
-  chkOn[4] = GetPrivateProfileInt(sec.data(),"On",0,dsfile); BON2 = chkOn[4];
-  sliLev[4] = GetPrivateProfileInt(sec.data(),"Level",128,dsfile);
+  strcpy(sec, "NoiseBand2");
+  chkOn[4] = GetPrivateProfileInt(sec,"On",0,dsfile); BON2 = chkOn[4];
+  sliLev[4] = GetPrivateProfileInt(sec,"Level",128,dsfile);
   BL2 = (float)(sliLev[4] * sliLev[4]) * mem_b;
-  BF2 = MasterTune * TwoPi * GetPrivateProfileFloat(sec.data(),"F",1000.0,dsfile) / Fs;
+  BF2 = MasterTune * TwoPi * GetPrivateProfileFloat(sec,"F",1000.0,dsfile) / Fs;
   BPhi2 = TwoPi / 8.f;
-  GetEnv(6, sec.data(), "Envelope", dsfile);
-  BFStep2 = GetPrivateProfileInt(sec.data(),"dF",50,dsfile);
+  GetEnv(6, sec, "Envelope", dsfile);
+  BFStep2 = GetPrivateProfileInt(sec,"dF",50,dsfile);
   BQ2 = (float)BFStep2;
   BQ2 = BQ2 * BQ2 / (10000.f-6600.f*((float)sqrt(BF2)-0.19f));
   BFStep2 = 1 + (int)((40 - (BFStep2 / 2.5)) / (BQ2 + 1 + (1 * BF2)));
 
   //read distortion parameters
-  strcpy(sec.data(), "Distortion");
-  chkOn[5] = GetPrivateProfileInt(sec.data(),"On",0,dsfile); DiON = chkOn[5];
-  DStep = 1 + GetPrivateProfileInt(sec.data(),"Rate",0,dsfile);
+  strcpy(sec, "Distortion");
+  chkOn[5] = GetPrivateProfileInt(sec,"On",0,dsfile); DiON = chkOn[5];
+  DStep = 1 + GetPrivateProfileInt(sec,"Rate",0,dsfile);
   if(DStep==7) DStep=20;
   if(DStep==6) DStep=10;
   if(DStep==5) DStep=8;
@@ -452,8 +449,8 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t *&wave, int channels, sa
   {
     DAtten = DGain * (short)LoudestEnv();
     if(DAtten>32700) clippoint=32700; else clippoint=(short)DAtten;
-    DAtten = static_cast<float>(std::pow(2.0, 2.0 * GetPrivateProfileInt(sec.data(),"Bits",0,dsfile)));
-    DGain = DAtten * DGain * static_cast<float>(std::pow(10.0, 0.05 * GetPrivateProfileInt(sec.data(),"Clipping",0,dsfile)));
+    DAtten = static_cast<float>(std::pow(2.0, 2.0 * GetPrivateProfileInt(sec,"Bits",0,dsfile)));
+    DGain = DAtten * DGain * static_cast<float>(std::pow(10.0, 0.05 * GetPrivateProfileInt(sec,"Clipping",0,dsfile)));
   }
 
   //prepare envelopes
