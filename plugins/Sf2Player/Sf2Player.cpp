@@ -672,14 +672,9 @@ void Sf2Instrument::noteOn( Sf2PluginData * n )
 	// get list of current voice IDs so we can easily spot the new
 	// voice after the fluid_synth_noteon() call
 	const int poly = fluid_synth_get_polyphony( m_synth );
-#ifndef _MSC_VER
 	auto voices = std::vector<fluid_voice_t*>{static_cast<size_t>(poly)};
 	auto id = std::vector<unsigned int>(poly);
-#else
-	const auto voices = static_cast<fluid_voice_t**>(_alloca(poly * sizeof(fluid_voice_t*)));
-	const auto id = static_cast<unsigned int*>(_alloca(poly * sizeof(unsigned int)));
-#endif
-	fluid_synth_get_voicelist( m_synth, voices.data(), poly, -1 );
+	fluid_synth_get_voicelist(m_synth, voices.data(), poly, -1);
 	for( int i = 0; i < poly; ++i )
 	{
 		id[i] = 0;
