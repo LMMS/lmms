@@ -515,7 +515,7 @@ void CompressorControlDialog::redrawKnee()
 		m_p.setPen(QPen(m_kneeColor2, 3));
 
 		auto prevPoint = std::array{kneePoint1, kneePoint1};
-		auto newPoint = std::array{0, 0};
+		auto newPoint = std::array{0.f, 0.f};
 
 		// Draw knee curve using many straight lines.
 		for (int i = 0; i < COMP_KNEE_LINES; ++i)
