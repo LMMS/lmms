@@ -149,7 +149,7 @@ void MidiAlsaRaw::run()
 		{
 			continue;
 		}
-		err = snd_rawmidi_read(m_input, buf.data(), sizeof(buf));
+		err = snd_rawmidi_read(m_input, buf.data(), buf.size());
 		if( err == -EAGAIN )
 		{
 			continue;
