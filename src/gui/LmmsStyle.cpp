@@ -71,9 +71,10 @@ QLinearGradient getGradient( const QColor & _col, const QRectF & _rect )
 QLinearGradient darken( const QLinearGradient & _gradient )
 {
 	QGradientStops stops = _gradient.stops();
-	for (int i = 0; i < stops.size(); ++i) {
-		QColor color = stops.at(i).second;
-		stops[i].second = color.lighter(133);
+	for (auto& stop : stops) 
+	{
+		QColor color = stop.second;
+		stop.second = color.lighter(133);
 	}
 
 	QLinearGradient g = _gradient;
@@ -161,8 +162,7 @@ void LmmsStyle::drawComplexControl( ComplexControl control,
 	// fix broken titlebar styling on win32
 	if( control == CC_TitleBar )
 	{
-		const QStyleOptionTitleBar * titleBar =
-			qstyleoption_cast<const QStyleOptionTitleBar *>(option );
+		const auto titleBar = qstyleoption_cast<const QStyleOptionTitleBar*>(option);
 		if( titleBar )
 		{
 			QStyleOptionTitleBar so( *titleBar );

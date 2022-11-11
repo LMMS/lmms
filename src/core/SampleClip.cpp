@@ -102,7 +102,7 @@ SampleClip::SampleClip(const SampleClip& orig) :
 
 SampleClip::~SampleClip()
 {
-	SampleTrack * sampletrack = dynamic_cast<SampleTrack*>( getTrack() );
+	auto sampletrack = dynamic_cast<SampleTrack*>(getTrack());
 	if ( sampletrack )
 	{
 		sampletrack->updateClips();
@@ -180,7 +180,7 @@ void SampleClip::toggleRecord()
 void SampleClip::playbackPositionChanged()
 {
 	Engine::audioEngine()->removePlayHandlesOfTypes( getTrack(), PlayHandle::TypeSamplePlayHandle );
-	SampleTrack * st = dynamic_cast<SampleTrack*>( getTrack() );
+	auto st = dynamic_cast<SampleTrack*>(getTrack());
 	st->setPlayingClips( false );
 }
 
@@ -189,7 +189,7 @@ void SampleClip::playbackPositionChanged()
 
 void SampleClip::updateTrackClips()
 {
-	SampleTrack * sampletrack = dynamic_cast<SampleTrack*>( getTrack() );
+	auto sampletrack = dynamic_cast<SampleTrack*>(getTrack());
 	if( sampletrack)
 	{
 		sampletrack->updateClips();

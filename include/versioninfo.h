@@ -1,3 +1,6 @@
+#ifndef VERSION_INFO_H
+#define VERSION_INFO_H
+
 #include "lmms_basics.h"
 
 #ifdef __GNUC__
@@ -46,4 +49,6 @@ constexpr const char* LMMS_BUILDCONF_PLATFORM = "win32";
 
 #ifdef LMMS_BUILD_HAIKU
 constexpr const char* LMMS_BUILDCONF_PLATFORM = "Haiku";
+#endif
+
 #endif

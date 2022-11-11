@@ -365,7 +365,7 @@ void Lv2Proc::handleMidiInputEvent(const MidiEvent &event, const TimePos &time, 
 	else
 	{
 		qWarning() << "Warning: Caught MIDI event for an Lv2 instrument"
-					<< "that can not hande MIDI... Ignoring";
+					<< "that can not handle MIDI... Ignoring";
 	}
 }
 
@@ -500,7 +500,7 @@ void Lv2Proc::createPort(std::size_t portNum)
 	{
 		case Lv2Ports::Type::Control:
 		{
-			Lv2Ports::Control* ctrl = new Lv2Ports::Control;
+			auto ctrl = new Lv2Ports::Control;
 			if (meta.m_flow == Lv2Ports::Flow::Input)
 			{
 				AutoLilvNode node(lilv_port_get_name(m_plugin, lilvPort));
@@ -542,9 +542,7 @@ void Lv2Proc::createPort(std::size_t portNum)
 						break;
 					case Lv2Ports::Vis::Enumeration:
 					{
-						ComboBoxModel* comboModel
-							= new ComboBoxModel(
-								nullptr, dispName);
+						auto comboModel = new ComboBoxModel(nullptr, dispName);
 						LilvScalePoints* sps =
 							lilv_port_get_scale_points(m_plugin, lilvPort);
 						LILV_FOREACH(scale_points, i, sps)
@@ -578,18 +576,14 @@ void Lv2Proc::createPort(std::size_t portNum)
 		}
 		case Lv2Ports::Type::Audio:
 		{
-			Lv2Ports::Audio* audio =
-				new Lv2Ports::Audio(
-						static_cast<std::size_t>(
-							Engine::audioEngine()->framesPerPeriod()),
-						portIsSideChain(m_plugin, lilvPort)
-					);
+			auto audio = new Lv2Ports::Audio(static_cast<std::size_t>(Engine::audioEngine()->framesPerPeriod()),
+				portIsSideChain(m_plugin, lilvPort));
 			port = audio;
 			break;
 		}
 		case Lv2Ports::Type::AtomSeq:
 		{
-			Lv2Ports::AtomSeq* atomPort = new Lv2Ports::AtomSeq;
+			auto atomPort = new Lv2Ports::AtomSeq;
 
 			{
 				AutoLilvNode uriAtomSupports(Engine::getLv2Manager()->uri(LV2_ATOM__supports));

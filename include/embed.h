@@ -65,7 +65,7 @@ inline QPixmap getIconPixmap( const QString&  _name,
 }
 //QString getText( const char * _name );
 
-}
+} // namespace PLUGIN_NAME
 
 #endif // PLUGIN_NAME
 

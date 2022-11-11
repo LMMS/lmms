@@ -51,11 +51,6 @@ LocalZynAddSubFx::LocalZynAddSubFx() :
 	m_master( nullptr ),
 	m_ioEngine( nullptr )
 {
-	for( int i = 0; i < NumKeys; ++i )
-	{
-		m_runningNotes[i] = 0;
-	}
-
 	if( s_instanceCount == 0 )
 	{
 #ifdef LMMS_BUILD_WIN32
@@ -64,7 +59,7 @@ LocalZynAddSubFx::LocalZynAddSubFx() :
 		pthread_win32_process_attach_np();
 		pthread_win32_thread_attach_np();
 #endif
-#endif
+#endif // LMMS_BUILD_WIN32
 
 		initConfig();
 
@@ -182,14 +177,14 @@ void LocalZynAddSubFx::loadPreset( const std::string & _filename, int _part )
 void LocalZynAddSubFx::setPresetDir( const std::string & _dir )
 {
 	m_presetsDir = _dir;
-	for( int i = 0; i < MAX_BANK_ROOT_DIRS; ++i )
+	for (auto& bankRootDir : config.cfg.bankRootDirList)
 	{
-		if( config.cfg.bankRootDirList[i].empty() )
+		if (bankRootDir.empty())
 		{
-			config.cfg.bankRootDirList[i] = m_presetsDir;
+			bankRootDir = m_presetsDir;
 			break;
 		}
-		else if( config.cfg.bankRootDirList[i] == m_presetsDir )
+		else if (bankRootDir == m_presetsDir)
 		{
 			break;
 		}
@@ -214,9 +209,9 @@ void LocalZynAddSubFx::setLmmsWorkingDir( const std::string & _dir )
 
 void LocalZynAddSubFx::setPitchWheelBendRange( int semitones )
 {
-	for( int i = 0; i < NUM_MIDI_PARTS; ++i )
+	for (const auto& part : m_master->part)
 	{
-		m_master->part[i]->ctl.setpitchwheelbendrange( semitones * 100 );
+		part->ctl.setpitchwheelbendrange(semitones * 100);
 	}
 }
 

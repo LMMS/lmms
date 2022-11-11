@@ -227,19 +227,19 @@ PianoRoll::PianoRoll() :
 	m_noteEditMenu->clear();
 	for( int i = 0; i < m_nemStr.size(); ++i )
 	{
-		QAction * act = new QAction( m_nemStr.at(i), this );
+		auto act = new QAction(m_nemStr.at(i), this);
 		connect( act, &QAction::triggered, [this, i](){ changeNoteEditMode(i); } );
 		m_noteEditMenu->addAction( act );
 	}
 
 	m_semiToneMarkerMenu = new QMenu( this );
 
-	QAction* markSemitoneAction = new QAction( tr("Mark/unmark current semitone"), this );
-	QAction* markAllOctaveSemitonesAction = new QAction( tr("Mark/unmark all corresponding octave semitones"), this );
-	QAction* markScaleAction = new QAction( tr("Mark current scale"), this );
-	QAction* markChordAction = new QAction( tr("Mark current chord"), this );
-	QAction* unmarkAllAction = new QAction( tr("Unmark all"), this );
-	QAction* copyAllNotesAction = new QAction( tr("Select all notes on this key"), this);
+	auto markSemitoneAction = new QAction(tr("Mark/unmark current semitone"), this);
+	auto markAllOctaveSemitonesAction = new QAction(tr("Mark/unmark all corresponding octave semitones"), this);
+	auto markScaleAction = new QAction(tr("Mark current scale"), this);
+	auto markChordAction = new QAction(tr("Mark current chord"), this);
+	auto unmarkAllAction = new QAction(tr("Unmark all"), this);
+	auto copyAllNotesAction = new QAction(tr("Select all notes on this key"), this);
 
 	connect( markSemitoneAction, &QAction::triggered, [this](){ markSemiTone(stmaMarkCurrentSemiTone); });
 	connect( markAllOctaveSemitonesAction, &QAction::triggered, [this](){ markSemiTone(stmaMarkAllOctaveSemiTones); });
@@ -393,7 +393,10 @@ PianoRoll::PianoRoll() :
 	// Set up key selection dropdown
 	m_keyModel.addItem(tr("No key"));
 	// Use piano roll note strings for key dropdown
-	for (int i = 0; i < 12; i++) { m_keyModel.addItem(s_noteStrings[i]); }
+	for (const auto& noteString : s_noteStrings)
+	{
+		m_keyModel.addItem(noteString);
+	}
 	m_keyModel.setValue(0); // start with "No key"
 	connect(&m_keyModel, &ComboBoxModel::dataChanged, this, &PianoRoll::keyChanged);
 
@@ -558,9 +561,9 @@ void PianoRoll::markSemiTone(int i, bool fromMenu)
 			{
 				// lets erase all of the ones that match this by octave
 				QList<int>::iterator i;
-				for (int ix = 0; ix < aok.size(); ++ix)
+				for (int octave : aok)
 				{
-					i = std::find(m_markedSemiTones.begin(), m_markedSemiTones.end(), aok.at(ix));
+					i = std::find(m_markedSemiTones.begin(), m_markedSemiTones.end(), octave);
 					if (i != m_markedSemiTones.end())
 					{
 						m_markedSemiTones.erase(i);
@@ -633,7 +636,7 @@ void PianoRoll::setGhostMidiClip( MidiClip* newMidiClip )
 	{
 		for( Note *note : newMidiClip->notes() )
 		{
-			Note * new_note = new Note( note->length(), note->pos(), note->key() );
+			auto new_note = new Note(note->length(), note->pos(), note->key());
 			m_ghostNotes.push_back( new_note );
 		}
 		emit ghostClipSet( true );
@@ -649,7 +652,7 @@ void PianoRoll::loadGhostNotes( const QDomElement & de )
 		QDomNode node = de.firstChild();
 		while( !node.isNull() )
 		{
-			Note * n = new Note;
+			auto n = new Note;
 			n->restoreState( node.toElement() );
 			n->setVolume(DefaultVolume);
 			m_ghostNotes.push_back( n );
@@ -988,20 +991,20 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 	}
 
 	// Volume
-	float const volumeRange = static_cast<float>(MaxVolume - MinVolume);
-	float const volumeSpan = static_cast<float>(n->getVolume() - MinVolume);
+	auto const volumeRange = static_cast<float>(MaxVolume - MinVolume);
+	auto const volumeSpan = static_cast<float>(n->getVolume() - MinVolume);
 	float const volumeRatio = volumeSpan / volumeRange;
 	int volVal = qMin( 255, 100 + static_cast<int>( volumeRatio * 155.0f) );
 
 	// Panning
-	float const panningRange = static_cast<float>(PanningRight - PanningLeft);
-	float const leftPanSpan = static_cast<float>(PanningRight - n->getPanning());
-	float const rightPanSpan = static_cast<float>(n->getPanning() - PanningLeft);
+	auto const panningRange = static_cast<float>(PanningRight - PanningLeft);
+	auto const leftPanSpan = static_cast<float>(PanningRight - n->getPanning());
+	auto const rightPanSpan = static_cast<float>(n->getPanning() - PanningLeft);
 
 	float leftPercent = qMin<float>( 1.0f, leftPanSpan / panningRange * 2.0f );
 	float rightPercent = qMin<float>( 1.0f, rightPanSpan / panningRange * 2.0f );
 
-	QColor col = QColor( noteCol );
+	QColor col{noteCol};
 	QPen pen;
 
 	if( n->selected() )
@@ -1307,16 +1310,25 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 				int direction = (ke->key() == Qt::Key_Up ? +1 : -1);
 				if( ( ke->modifiers() & Qt::ControlModifier ) && m_action == ActionNone )
 				{
-					// shift selection up an octave
+					// shift selection by one octave
 					// if nothing selected, shift _everything_
 					if (hasValidMidiClip())
 					{
-						shiftSemiTone( 12 * direction );
+						// An octave could potentially be greater or less than twelve semitones if the microtuner is in use.
+						const auto microtuner = m_midiClip->instrumentTrack()->microtuner();
+						if (microtuner->enabled())
+						{
+							shiftSemiTone(microtuner->octaveSize() * direction);
+						}
+						else
+						{
+							shiftSemiTone(12 * direction);
+						}
 					}
 				}
 				else if((ke->modifiers() & Qt::ShiftModifier) && m_action == ActionNone)
 				{
-					// Move selected notes up by one semitone
+					// Move selected notes by one semitone
 					if (hasValidMidiClip())
 					{
 						shiftSemiTone( 1 * direction );
@@ -3651,8 +3663,8 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	}
 
 	// set line colors
-	QColor editAreaCol = QColor(m_lineColor);
-	QColor currentKeyCol = QColor(m_beatLineColor);
+	auto editAreaCol = QColor(m_lineColor);
+	auto currentKeyCol = QColor(m_beatLineColor);
 
 	editAreaCol.setAlpha( 64 );
 	currentKeyCol.setAlpha( 64 );
@@ -4738,7 +4750,7 @@ PianoRollWindow::PianoRollWindow() :
 	DropToolBar *notesActionsToolBar = addDropToolBarToTop( tr( "Edit actions" ) );
 
 	// init edit-buttons at the top
-	ActionGroup* editModeGroup = new ActionGroup( this );
+	auto editModeGroup = new ActionGroup(this);
 	QAction* drawAction = editModeGroup->addAction( embed::getIconPixmap( "edit_draw" ), tr( "Draw mode (Shift+D)" ) );
 	QAction* eraseAction = editModeGroup->addAction( embed::getIconPixmap( "edit_erase" ), tr("Erase mode (Shift+E)" ) );
 	QAction* selectAction = editModeGroup->addAction( embed::getIconPixmap( "edit_select" ), tr( "Select mode (Shift+S)" ) );
@@ -4754,12 +4766,12 @@ PianoRollWindow::PianoRollWindow() :
 	connect( editModeGroup, SIGNAL(triggered(int)), m_editor, SLOT(setEditMode(int)));
 
 	// Quantize combo button
-	QToolButton* quantizeButton = new QToolButton(notesActionsToolBar);
-	QMenu* quantizeButtonMenu = new QMenu(quantizeButton);
+	auto quantizeButton = new QToolButton(notesActionsToolBar);
+	auto quantizeButtonMenu = new QMenu(quantizeButton);
 
-	QAction* quantizeAction = new QAction(embed::getIconPixmap("quantize"), tr("Quantize"), this);
-	QAction* quantizePosAction = new QAction(tr("Quantize positions"), this);
-	QAction* quantizeLengthAction = new QAction(tr("Quantize lengths"), this);
+	auto quantizeAction = new QAction(embed::getIconPixmap("quantize"), tr("Quantize"), this);
+	auto quantizePosAction = new QAction(tr("Quantize positions"), this);
+	auto quantizeLengthAction = new QAction(tr("Quantize lengths"), this);
 
 	connect(quantizeAction, &QAction::triggered, [this](){ m_editor->quantizeNotes(); });
 	connect(quantizePosAction, &QAction::triggered, [this](){ m_editor->quantizeNotes(PianoRoll::QuantizePos); });
@@ -4787,11 +4799,9 @@ PianoRollWindow::PianoRollWindow() :
 	m_fileToolsButton->setPopupMode(QToolButton::InstantPopup);
 
 	// Import / export
-	QAction* importAction = new QAction(embed::getIconPixmap("project_import"),
-		tr("Import clip"), m_fileToolsButton);
+	auto importAction = new QAction(embed::getIconPixmap("project_import"), tr("Import clip"), m_fileToolsButton);
 
-	QAction* exportAction = new QAction(embed::getIconPixmap("project_export"),
-		tr("Export clip"), m_fileToolsButton);
+	auto exportAction = new QAction(embed::getIconPixmap("project_export"), tr("Export clip"), m_fileToolsButton);
 
 	m_fileToolsButton->addAction(importAction);
 	m_fileToolsButton->addAction(exportAction);
@@ -4804,14 +4814,11 @@ PianoRollWindow::PianoRollWindow() :
 	// Copy + paste actions
 	DropToolBar *copyPasteActionsToolBar =  addDropToolBarToTop( tr( "Copy paste controls" ) );
 
-	QAction* cutAction = new QAction(embed::getIconPixmap( "edit_cut" ),
-								tr( "Cut (%1+X)" ).arg(UI_CTRL_KEY), this );
+	auto cutAction = new QAction(embed::getIconPixmap("edit_cut"), tr("Cut (%1+X)").arg(UI_CTRL_KEY), this);
 
-	QAction* copyAction = new QAction(embed::getIconPixmap( "edit_copy" ),
-								 tr( "Copy (%1+C)" ).arg(UI_CTRL_KEY), this );
+	auto copyAction = new QAction(embed::getIconPixmap("edit_copy"), tr("Copy (%1+C)").arg(UI_CTRL_KEY), this);
 
-	QAction* pasteAction = new QAction(embed::getIconPixmap( "edit_paste" ),
-					tr( "Paste (%1+V)" ).arg(UI_CTRL_KEY), this );
+	auto pasteAction = new QAction(embed::getIconPixmap("edit_paste"), tr("Paste (%1+V)").arg(UI_CTRL_KEY), this);
 
 	cutAction->setShortcut( Qt::CTRL | Qt::Key_X );
 	copyAction->setShortcut( Qt::CTRL | Qt::Key_C );
@@ -4830,32 +4837,30 @@ PianoRollWindow::PianoRollWindow() :
 	m_editor->m_timeLine->addToolButtons( timeLineToolBar );
 
 	// -- Note modifier tools
-	QToolButton * noteToolsButton = new QToolButton(m_toolBar);
+	auto noteToolsButton = new QToolButton(m_toolBar);
 	noteToolsButton->setIcon(embed::getIconPixmap("tool"));
 	noteToolsButton->setPopupMode(QToolButton::InstantPopup);
 
-	QAction * glueAction = new QAction(embed::getIconPixmap("glue"),
-				tr("Glue"), noteToolsButton);
+	auto glueAction = new QAction(embed::getIconPixmap("glue"), tr("Glue"), noteToolsButton);
 	connect(glueAction, SIGNAL(triggered()), m_editor, SLOT(glueNotes()));
 	glueAction->setShortcut( Qt::SHIFT | Qt::Key_G );
 
-	QAction * knifeAction = new QAction(embed::getIconPixmap("edit_knife"),
-				tr("Knife"), noteToolsButton);
+	auto knifeAction = new QAction(embed::getIconPixmap("edit_knife"), tr("Knife"), noteToolsButton);
 	connect(knifeAction, &QAction::triggered, m_editor, &PianoRoll::setKnifeAction);
 	knifeAction->setShortcut( Qt::SHIFT | Qt::Key_K );
-        
-	QAction* fillAction = new QAction(embed::getIconPixmap("fill"), tr("Fill"), noteToolsButton);
+
+	auto fillAction = new QAction(embed::getIconPixmap("fill"), tr("Fill"), noteToolsButton);
 	connect(fillAction, &QAction::triggered, [this](){ m_editor->fitNoteLengths(true); });
 	fillAction->setShortcut(Qt::SHIFT | Qt::Key_F);
 
-	QAction* cutOverlapsAction = new QAction(embed::getIconPixmap("cut_overlaps"), tr("Cut overlaps"), noteToolsButton);
+	auto cutOverlapsAction = new QAction(embed::getIconPixmap("cut_overlaps"), tr("Cut overlaps"), noteToolsButton);
 	connect(cutOverlapsAction, &QAction::triggered, [this](){ m_editor->fitNoteLengths(false); });
 	cutOverlapsAction->setShortcut(Qt::SHIFT | Qt::Key_C);
 
-	QAction* minLengthAction = new QAction(embed::getIconPixmap("min_length"), tr("Min length as last"), noteToolsButton);
+	auto minLengthAction = new QAction(embed::getIconPixmap("min_length"), tr("Min length as last"), noteToolsButton);
 	connect(minLengthAction, &QAction::triggered, [this](){ m_editor->constrainNoteLengths(false); });
 
-	QAction* maxLengthAction = new QAction(embed::getIconPixmap("max_length"), tr("Max length as last"), noteToolsButton);
+	auto maxLengthAction = new QAction(embed::getIconPixmap("max_length"), tr("Max length as last"), noteToolsButton);
 	connect(maxLengthAction, &QAction::triggered, [this](){ m_editor->constrainNoteLengths(true); });
 
 	noteToolsButton->addAction(glueAction);
@@ -4872,7 +4877,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	DropToolBar *zoomAndNotesToolBar = addDropToolBarToTop( tr( "Zoom and note controls" ) );
 
-	QLabel * zoom_lbl = new QLabel( m_toolBar );
+	auto zoom_lbl = new QLabel(m_toolBar);
 	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom_x" ) );
 
 	m_zoomingComboBox = new ComboBox( m_toolBar );
@@ -4880,7 +4885,7 @@ PianoRollWindow::PianoRollWindow() :
 	m_zoomingComboBox->setFixedSize( 64, ComboBox::DEFAULT_HEIGHT );
 	m_zoomingComboBox->setToolTip( tr( "Horizontal zooming") );
 
-	QLabel * zoom_y_lbl = new QLabel(m_toolBar);
+	auto zoom_y_lbl = new QLabel(m_toolBar);
 	zoom_y_lbl->setPixmap(embed::getIconPixmap("zoom_y"));
 
 	m_zoomingYComboBox = new ComboBox(m_toolBar);
@@ -4889,7 +4894,7 @@ PianoRollWindow::PianoRollWindow() :
 	m_zoomingYComboBox->setToolTip(tr("Vertical zooming"));
 
 	// setup quantize-stuff
-	QLabel * quantize_lbl = new QLabel( m_toolBar );
+	auto quantize_lbl = new QLabel(m_toolBar);
 	quantize_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
 
 	m_quantizeComboBox = new ComboBox( m_toolBar );
@@ -4898,7 +4903,7 @@ PianoRollWindow::PianoRollWindow() :
 	m_quantizeComboBox->setToolTip( tr( "Quantization") );
 
 	// setup note-len-stuff
-	QLabel * note_len_lbl = new QLabel( m_toolBar );
+	auto note_len_lbl = new QLabel(m_toolBar);
 	note_len_lbl->setPixmap( embed::getIconPixmap( "note" ) );
 
 	m_noteLenComboBox = new ComboBox( m_toolBar );
@@ -4913,7 +4918,7 @@ PianoRollWindow::PianoRollWindow() :
 	m_keyComboBox->setToolTip(tr("Key"));
 
 	// setup scale-stuff
-	QLabel * scale_lbl = new QLabel( m_toolBar );
+	auto scale_lbl = new QLabel(m_toolBar);
 	scale_lbl->setPixmap( embed::getIconPixmap( "scale" ) );
 
 	m_scaleComboBox = new ComboBox( m_toolBar );
@@ -4922,7 +4927,7 @@ PianoRollWindow::PianoRollWindow() :
 	m_scaleComboBox->setToolTip( tr( "Scale") );
 
 	// setup chord-stuff
-	QLabel * chord_lbl = new QLabel( m_toolBar );
+	auto chord_lbl = new QLabel(m_toolBar);
 	chord_lbl->setPixmap( embed::getIconPixmap( "chord" ) );
 
 	m_chordComboBox = new ComboBox( m_toolBar );
@@ -4931,7 +4936,7 @@ PianoRollWindow::PianoRollWindow() :
 	m_chordComboBox->setToolTip( tr( "Chord" ) );
 
 	// setup snap-stuff
-	QLabel* snapLbl = new QLabel(m_toolBar);
+	auto snapLbl = new QLabel(m_toolBar);
 	snapLbl->setPixmap(embed::getIconPixmap("gridmode"));
 
 	m_snapComboBox = new ComboBox(m_toolBar);
@@ -4949,24 +4954,24 @@ PianoRollWindow::PianoRollWindow() :
 
 	// Wrap label icons and comboboxes in a single widget so when
 	// the window is resized smaller in width it hides both
-	QWidget * zoom_widget = new QWidget();
-	QHBoxLayout * zoom_hbox = new QHBoxLayout();
+	auto zoom_widget = new QWidget();
+	auto zoom_hbox = new QHBoxLayout();
 	zoom_hbox->setContentsMargins(0, 0, 0, 0);
 	zoom_hbox->addWidget(zoom_lbl);
 	zoom_hbox->addWidget(m_zoomingComboBox);
 	zoom_widget->setLayout(zoom_hbox);
 	zoomAndNotesToolBar->addWidget(zoom_widget);
 
-	QWidget * zoomY_widget = new QWidget();
-	QHBoxLayout * zoomY_hbox = new QHBoxLayout();
+	auto zoomY_widget = new QWidget();
+	auto zoomY_hbox = new QHBoxLayout();
 	zoomY_hbox->setContentsMargins(0, 0, 0, 0);
 	zoomY_hbox->addWidget(zoom_y_lbl);
 	zoomY_hbox->addWidget(m_zoomingYComboBox);
 	zoomY_widget->setLayout(zoomY_hbox);
 	zoomAndNotesToolBar->addWidget(zoomY_widget);
 
-	QWidget * quantize_widget = new QWidget();
-	QHBoxLayout * quantize_hbox = new QHBoxLayout();
+	auto quantize_widget = new QWidget();
+	auto quantize_hbox = new QHBoxLayout();
 	quantize_hbox->setContentsMargins(0, 0, 0, 0);
 	quantize_hbox->addWidget(quantize_lbl);
 	quantize_hbox->addWidget(m_quantizeComboBox);
@@ -4974,8 +4979,8 @@ PianoRollWindow::PianoRollWindow() :
 	zoomAndNotesToolBar->addSeparator();
 	zoomAndNotesToolBar->addWidget(quantize_widget);
 
-	QWidget * note_widget = new QWidget();
-	QHBoxLayout * note_hbox = new QHBoxLayout();
+	auto note_widget = new QWidget();
+	auto note_hbox = new QHBoxLayout();
 	note_hbox->setContentsMargins(0, 0, 0, 0);
 	note_hbox->addWidget(note_len_lbl);
 	note_hbox->addWidget(m_noteLenComboBox);
@@ -4983,8 +4988,8 @@ PianoRollWindow::PianoRollWindow() :
 	zoomAndNotesToolBar->addSeparator();
 	zoomAndNotesToolBar->addWidget(note_widget);
 
-	QWidget * scale_widget = new QWidget();
-	QHBoxLayout * scale_hbox = new QHBoxLayout();
+	auto scale_widget = new QWidget();
+	auto scale_hbox = new QHBoxLayout();
 	scale_hbox->setContentsMargins(0, 0, 0, 0);
 	scale_hbox->addWidget(scale_lbl);
 	// Add the key selection between scale label and key
@@ -4994,8 +4999,8 @@ PianoRollWindow::PianoRollWindow() :
 	zoomAndNotesToolBar->addSeparator();
 	zoomAndNotesToolBar->addWidget(scale_widget);
 
-	QWidget * chord_widget = new QWidget();
-	QHBoxLayout * chord_hbox = new QHBoxLayout();
+	auto chord_widget = new QWidget();
+	auto chord_hbox = new QHBoxLayout();
 	chord_hbox->setContentsMargins(0, 0, 0, 0);
 	chord_hbox->addWidget(chord_lbl);
 	chord_hbox->addWidget(m_chordComboBox);
@@ -5006,8 +5011,8 @@ PianoRollWindow::PianoRollWindow() :
 	zoomAndNotesToolBar->addSeparator();
 	zoomAndNotesToolBar->addWidget( m_clearGhostButton );
 
-	QWidget* snapWidget = new QWidget();
-	QHBoxLayout* snapHbox = new QHBoxLayout();
+	auto snapWidget = new QWidget();
+	auto snapHbox = new QHBoxLayout();
 	snapHbox->setContentsMargins(0, 0, 0, 0);
 	snapHbox->addWidget(snapLbl);
 	snapHbox->addWidget(m_snapComboBox);
@@ -5166,10 +5171,10 @@ void PianoRollWindow::saveSettings( QDomDocument & doc, QDomElement & de )
 	if (m_editor->m_markedSemiTones.length() > 0)
 	{
 		QDomElement markedSemiTonesRoot = doc.createElement("markedSemiTones");
-		for (int ix = 0; ix < m_editor->m_markedSemiTones.size(); ++ix)
+		for (int markedSemiTone : m_editor->m_markedSemiTones)
 		{
 			QDomElement semiToneNode = doc.createElement("semiTone");
-			semiToneNode.setAttribute("key", m_editor->m_markedSemiTones.at(ix));
+			semiToneNode.setAttribute("key", markedSemiTone);
 			markedSemiTonesRoot.appendChild(semiToneNode);
 		}
 		de.appendChild(markedSemiTonesRoot);

@@ -105,7 +105,7 @@ private:
 	float fphase;
 	float fdphase;
 	int iphase;
-	float phaser_buffer[1024];
+	std::array<float, 1024> phaser_buffer;
 	int ipp;
 	float noise_buffer[32];
 	float fltp;

@@ -78,17 +78,13 @@ Lv2Instrument::Lv2Instrument(InstrumentTrack *instrumentTrackArg,
 {
 	if (Lv2ControlBase::isValid())
 	{
-#ifdef LV2_INSTRUMENT_USE_MIDI
-		for (int i = 0; i < NumKeys; ++i) { m_runningNotes[i] = 0; }
-#endif
 		connect(instrumentTrack()->pitchRangeModel(), SIGNAL(dataChanged()),
 			this, SLOT(updatePitchRange()), Qt::DirectConnection);
 		connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged,
 			this, [this](){Lv2ControlBase::reloadPlugin();});
 
 		// now we need a play-handle which cares for calling play()
-		InstrumentPlayHandle *iph =
-			new InstrumentPlayHandle(this, instrumentTrackArg);
+		auto iph = new InstrumentPlayHandle(this, instrumentTrackArg);
 		Engine::audioEngine()->addPlayHandle(iph);
 	}
 }
@@ -299,9 +295,7 @@ extern "C"
 PLUGIN_EXPORT Plugin *lmms_plugin_main(Model *_parent, void *_data)
 {
 	using KeyType = Plugin::Descriptor::SubPluginFeatures::Key;
-	Lv2Instrument* ins = new Lv2Instrument(
-							static_cast<InstrumentTrack*>(_parent),
-							static_cast<KeyType*>(_data ));
+	auto ins = new Lv2Instrument(static_cast<InstrumentTrack*>(_parent), static_cast<KeyType*>(_data));
 	if (!ins->isValid()) { delete ins; ins = nullptr; }
 	return ins;
 }

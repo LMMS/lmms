@@ -168,7 +168,7 @@ VestigeInstrument::VestigeInstrument( InstrumentTrack * _instrument_track ) :
 	p_subWindow( nullptr )
 {
 	// now we need a play-handle which cares for calling play()
-	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
+	auto iph = new InstrumentPlayHandle(this, _instrument_track);
 	Engine::audioEngine()->addPlayHandle( iph );
 
 	connect( ConfigManager::inst(), SIGNAL( valueChanged(QString,QString,QString) ),
@@ -595,7 +595,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_selPresetButton = new QPushButton( tr( "" ), this );
 	m_selPresetButton->setGeometry( 228, 201, 16, 16 );
 
-	QMenu *menu = new QMenu;
+	auto menu = new QMenu;
 
 	connect( menu, SIGNAL( aboutToShow() ), this, SLOT( updateMenu() ) );
 
@@ -612,8 +612,9 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	connect( m_toggleGUIButton, SIGNAL( clicked() ), this,
 							SLOT( toggleGUI() ) );
 
-	QPushButton * note_off_all_btn = new QPushButton( tr( "Turn off all "
-							"notes" ), this );
+	auto note_off_all_btn = new QPushButton(tr("Turn off all "
+											   "notes"),
+		this);
 	note_off_all_btn->setGeometry( 20, 160, 200, 24 );
 	note_off_all_btn->setIcon( embed::getIconPixmap( "stop" ) );
 	note_off_all_btn->setFont( pointSize<8>( note_off_all_btn->font() ) );
@@ -804,14 +805,13 @@ void VestigeInstrumentView::previousProgram()
 
 void VestigeInstrumentView::selPreset( void )
 {
-
-     QAction *action = qobject_cast<QAction *>(sender());
-     if (action)
-         if ( m_vi->m_plugin != nullptr ) {
+	auto action = qobject_cast<QAction*>(sender());
+	if (action && m_vi->m_plugin != nullptr)
+	{
 		lastPosInMenu = action->data().toInt();
-		m_vi->m_plugin->setProgram( action->data().toInt() );
+		m_vi->m_plugin->setProgram(action->data().toInt());
 		QWidget::update();
-	 }
+	}
 }
 
 
