@@ -38,51 +38,51 @@
 namespace lmms::gui
 {
 
-LadspaMatrixControlView::LadspaMatrixControlView( QWidget * parent,
-						LadspaControl * ladspaControl ) :
-	QWidget( parent ),
-	ModelView( ladspaControl, this ),
-	m_ladspaControl( ladspaControl )
+LadspaMatrixControlView::LadspaMatrixControlView(QWidget * parent,
+						LadspaControl * ladspaControl) :
+	QWidget(parent),
+	ModelView(ladspaControl, this),
+	m_ladspaControl(ladspaControl)
 {
-	QHBoxLayout * layout = new QHBoxLayout( this );
-	layout->setMargin( 0 );
-	layout->setSpacing( 0 );
+	QHBoxLayout * layout = new QHBoxLayout(this);
+	layout->setMargin(0);
+	layout->setSpacing(0);
 
 	Knob * knob = NULL;
 
 	buffer_data_t dataType = m_ladspaControl->port()->data_type;
-	switch( dataType )
+	switch (dataType)
 	{
 		case TOGGLED:
 		{
 			LedCheckBox * toggle = new LedCheckBox(
-				"", this, QString(), LedCheckBox::Green );
-			toggle->setModel( m_ladspaControl->toggledModel() );
-			layout->addWidget( toggle );
-			setFixedSize( toggle->width(), toggle->height() );
+				"", this, QString(), LedCheckBox::Green);
+			toggle->setModel(m_ladspaControl->toggledModel());
+			layout->addWidget(toggle);
+			setFixedSize(toggle->width(), toggle->height());
 			break;
 		}
 
 		case INTEGER:
 		case FLOATING:
-			knob = new Knob( knobBright_26, this, m_ladspaControl->port()->name );
-			knob->setModel( m_ladspaControl->knobModel() );
+			knob = new Knob(knobBright_26, this, m_ladspaControl->port()->name);
+			knob->setModel(m_ladspaControl->knobModel());
 			break;
 
 		case TIME:
-			knob = new TempoSyncKnob( knobBright_26, this, m_ladspaControl->port()->name );
-			knob->setModel( m_ladspaControl->tempoSyncKnobModel() );
+			knob = new TempoSyncKnob(knobBright_26, this, m_ladspaControl->port()->name);
+			knob->setModel(m_ladspaControl->tempoSyncKnobModel());
 			break;
 
 		default:
 			break;
 	}
 
-	if( knob != NULL )
+	if (knob != NULL)
 	{
-		knob->setHintText( tr( "Value:" ), "" );
-		layout->addWidget( knob );
-		setFixedSize( knob->width(), knob->height() );
+		knob->setHintText(tr("Value:"), "");
+		layout->addWidget(knob);
+		setFixedSize(knob->width(), knob->height());
 	}
 }
 

@@ -46,19 +46,19 @@ class LadspaMatrixControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	LadspaMatrixControlDialog( LadspaControls * _ctl );
+	LadspaMatrixControlDialog(LadspaControls* ctl);
 
 	bool isResizable() const override { return true; }
 
 private slots:
-	void updateEffectView( LadspaControls * _ctl );
+	void updateEffectView(LadspaControls* ctl);
 
 
 private:
-	QGridLayout * m_effectGridLayout;
-	LedCheckBox * m_stereoLink;
+	QGridLayout* m_effectGridLayout;
+	LedCheckBox* m_stereoLink;
 
-} ;
+};
 
 } // namespace gui
 

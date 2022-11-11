@@ -50,36 +50,36 @@ static int const s_channelBaseColumn = 4;
 
 
 
-LadspaMatrixControlDialog::LadspaMatrixControlDialog( LadspaControls * ladspaControls ) :
-	EffectControlDialog( ladspaControls ),
-	m_effectGridLayout( NULL ),
-	m_stereoLink( NULL )
+LadspaMatrixControlDialog::LadspaMatrixControlDialog(LadspaControls * ladspaControls) :
+	EffectControlDialog(ladspaControls),
+	m_effectGridLayout(NULL),
+	m_stereoLink(NULL)
 {
-	QVBoxLayout * mainLayout = new QVBoxLayout( this );
+	QVBoxLayout * mainLayout = new QVBoxLayout(this);
 
 	m_effectGridLayout = new QGridLayout();
 	mainLayout->addLayout(m_effectGridLayout);
 
-	updateEffectView( ladspaControls );
+	updateEffectView(ladspaControls);
 
-	if( ladspaControls->m_processors > 1 )
+	if (ladspaControls->m_processors > 1)
 	{
-		mainLayout->addSpacing( 3 );
+		mainLayout->addSpacing(3);
 		QHBoxLayout * center = new QHBoxLayout();
-		mainLayout->addLayout( center );
-		m_stereoLink = new LedCheckBox( tr( "Link Channels" ), this );
-		m_stereoLink->setModel( &ladspaControls->m_stereoLinkModel );
-		center->addWidget( m_stereoLink );
+		mainLayout->addLayout(center);
+		m_stereoLink = new LedCheckBox(tr("Link Channels"), this);
+		m_stereoLink->setModel(&ladspaControls->m_stereoLinkModel);
+		center->addWidget(m_stereoLink);
 	}
 }
 
 
 
 
-void LadspaMatrixControlDialog::updateEffectView( LadspaControls * ladspaControls )
+void LadspaMatrixControlDialog::updateEffectView(LadspaControls * ladspaControls)
 {
 	QList<QWidget *> list = findChildren<QWidget *>();
-	for( QList<QWidget *>::iterator it = list.begin(); it != list.end(); ++it )
+	for (QList<QWidget *>::iterator it = list.begin(); it != list.end(); ++it)
 	{
 		delete *it;
 	}
@@ -90,71 +90,71 @@ void LadspaMatrixControlDialog::updateEffectView( LadspaControls * ladspaControl
 	QGridLayout *gridLayout = new QGridLayout(widget);
 	widget->setLayout(gridLayout);
 
-	gridLayout->addWidget( new QLabel( "<b>" + tr( "Parameter" )  + "</b>", widget ), 0, s_parameterNameBaseColumn, Qt::AlignRight );
+	gridLayout->addWidget(new QLabel("<b>" + tr("Parameter")  + "</b>", widget), 0, s_parameterNameBaseColumn, Qt::AlignRight);
 
 	bool linkLabelAdded = false;
 	ch_cnt_t const numberOfChannels = ladspaControls->m_processors;
 
 	gridLayout->setColumnMinimumWidth(1, 20);
 
-	for ( ch_cnt_t i = 0; i < numberOfChannels; ++i )
+	for (ch_cnt_t i = 0; i < numberOfChannels; ++i)
 	{
-		QString channelString( tr( "Channel %1" ) );
+		QString channelString(tr("Channel %1"));
 		int currentChannelColumn = s_channelBaseColumn + 2*i;
 
-		gridLayout->addWidget( new QLabel( "<b>" + channelString.arg( QString::number( i + 1 ) ) + "</b>", widget ), 0, currentChannelColumn, Qt::AlignHCenter );
+		gridLayout->addWidget(new QLabel("<b>" + channelString.arg(QString::number(i + 1)) + "</b>", widget), 0, currentChannelColumn, Qt::AlignHCenter);
 
 		control_list_t & controls = ladspaControls->m_controls[i];
 
 		int currentRow = 1;
 		control_list_t::iterator end = controls.end();
-		for( control_list_t::iterator it = controls.begin(); it != end; ++it )
+		for (control_list_t::iterator it = controls.begin(); it != end; ++it)
 		{
 			LadspaControl * ladspaControl = *it;
 
-			if ( i == 0 )
+			if (i == 0)
 			{
 				// TODO Assumes that all processors are equal! Change to more general approach, e.g. map from name to row
 
 				// Link
-				if ( ladspaControl->m_link )
+				if (ladspaControl->m_link)
 				{
-					if ( !linkLabelAdded )
+					if (!linkLabelAdded)
 					{
-						gridLayout->addWidget( new QLabel( "<b>" + tr( "Link" ) + "</b>", widget ), 0, s_linkBaseColumn, Qt::AlignHCenter );
+						gridLayout->addWidget(new QLabel("<b>" + tr("Link") + "</b>", widget), 0, s_linkBaseColumn, Qt::AlignHCenter);
 						linkLabelAdded = true;
 					}
-					LedCheckBox * linkCheckBox = new LedCheckBox( "", widget );
-					linkCheckBox->setModel( &ladspaControl->m_linkEnabledModel );
-					linkCheckBox->setToolTip( tr( "Link channels" ) );
-					gridLayout->addWidget( linkCheckBox, currentRow, s_linkBaseColumn, Qt::AlignHCenter );
+					LedCheckBox * linkCheckBox = new LedCheckBox("", widget);
+					linkCheckBox->setModel(&ladspaControl->m_linkEnabledModel);
+					linkCheckBox->setToolTip(tr("Link channels"));
+					gridLayout->addWidget(linkCheckBox, currentRow, s_linkBaseColumn, Qt::AlignHCenter);
 				}
 
 				// Parameter name
 				QString portName = ladspaControl->port()->name;
-				QLabel *portNameLabel = new QLabel( portName, widget );
-				gridLayout->addWidget( portNameLabel, currentRow, s_parameterNameBaseColumn, Qt::AlignRight );
+				QLabel *portNameLabel = new QLabel(portName, widget);
+				gridLayout->addWidget(portNameLabel, currentRow, s_parameterNameBaseColumn, Qt::AlignRight);
 			}
 
-			LadspaMatrixControlView *ladspaMatrixControlView = new LadspaMatrixControlView( widget, ladspaControl );
-			gridLayout->addWidget( ladspaMatrixControlView, currentRow, currentChannelColumn, Qt::AlignHCenter );
+			LadspaMatrixControlView *ladspaMatrixControlView = new LadspaMatrixControlView(widget, ladspaControl);
+			gridLayout->addWidget(ladspaMatrixControlView, currentRow, currentChannelColumn, Qt::AlignHCenter);
 			gridLayout->setColumnMinimumWidth(currentChannelColumn - 1, 20);
 
 			++currentRow;
 		}
 	}
 
-	QScrollArea *scrollArea = new QScrollArea( this );
-	scrollArea->setWidgetResizable( true );
-	scrollArea->setWidget( widget );
-	scrollArea->setFrameShape( QFrame::NoFrame );
+	QScrollArea *scrollArea = new QScrollArea(this);
+	scrollArea->setWidgetResizable(true);
+	scrollArea->setWidget(widget);
+	scrollArea->setFrameShape(QFrame::NoFrame);
 
-	m_effectGridLayout->addWidget( scrollArea, 0, 0 );
+	m_effectGridLayout->addWidget(scrollArea, 0, 0);
 	m_effectGridLayout->setMargin(0);
 
-	if( numberOfChannels > 1 && m_stereoLink != NULL )
+	if (numberOfChannels > 1 && m_stereoLink != NULL)
 	{
-		m_stereoLink->setModel( &ladspaControls->m_stereoLinkModel );
+		m_stereoLink->setModel(&ladspaControls->m_stereoLinkModel);
 	}
 
 	connect(ladspaControls, &LadspaControls::effectModelChanged,
