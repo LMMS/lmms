@@ -30,12 +30,19 @@
 
 #include "ModelView.h"
 
+class QToolButton;
+
+namespace lmms
+{
+
+class InstrumentTrack;
+
+namespace gui
+{
 
 class GroupBox;
 class LcdSpinBox;
-class QToolButton;
 class LedCheckBox;
-class InstrumentTrack;
 
 
 class InstrumentMidiIOView : public QWidget, public ModelView
@@ -43,11 +50,11 @@ class InstrumentMidiIOView : public QWidget, public ModelView
 	Q_OBJECT
 public:
 	InstrumentMidiIOView( QWidget* parent );
-	virtual ~InstrumentMidiIOView();
+	~InstrumentMidiIOView() override = default;
 
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	GroupBox * m_midiInputGroupBox;
 	LcdSpinBox * m_inputChannelSpinBox;
@@ -65,22 +72,9 @@ private:
 
 } ;
 
-class InstrumentMiscView : public QWidget
-{
-	Q_OBJECT
-public:
-	InstrumentMiscView( InstrumentTrack *it, QWidget* parent );
-	~InstrumentMiscView();
 
-	GroupBox * pitchGroupBox()
-	{
-		return m_pitchGroupBox;
-	}
+} // namespace gui
 
-private:
-
-	GroupBox * m_pitchGroupBox;
-
-};
+} // namespace lmms
 
 #endif

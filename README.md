@@ -1,10 +1,12 @@
-# ![LMMS Logo](http://lmms.sourceforge.net/Lmms_logo.png) LMMS
+# ![LMMS Logo](https://raw.githubusercontent.com/LMMS/artwork/master/Icon%20%26%20Mimetypes/lmms-64x64.svg) LMMS
 
-[![Build status](https://img.shields.io/travis/LMMS/lmms.svg?maxAge=3600)](https://travis-ci.org/LMMS/lmms)
+[![Build status](https://circleci.com/gh/LMMS/lmms.svg?style=shield)](https://circleci.com/gh/LMMS/lmms)
 [![Latest stable release](https://img.shields.io/github/release/LMMS/lmms.svg?maxAge=3600)](https://lmms.io/download)
 [![Overall downloads on Github](https://img.shields.io/github/downloads/LMMS/lmms/total.svg?maxAge=3600)](https://github.com/LMMS/lmms/releases)
 [![Join the chat at Discord](https://img.shields.io/badge/chat-on%20discord-7289DA.svg)](https://discord.gg/3sc5su7)
 [![Localise on transifex](https://img.shields.io/badge/localise-on_transifex-green.svg)](https://www.transifex.com/lmms/lmms/)
+
+**New PRs may be affected by ongoing reorganization ([#5592](https://github.com/LMMS/lmms/issues/5592)). Please be prepared to rebase your PR as necessary.**
 
 What is LMMS?
 --------------
@@ -26,9 +28,9 @@ Features
 ---------
 
 * Song-Editor for composing songs
-* A Beat+Bassline-Editor for creating beats and basslines
+* Pattern-Editor for creating beats and patterns
 * An easy-to-use Piano-Roll for editing patterns and melodies
-* An FX mixer with unlimited FX channels and arbitrary number of effects
+* A Mixer with unlimited mixer channels and arbitrary number of effects
 * Many powerful instrument and effect-plugins out of the box
 * Full user-defined track-based automation and computer-controlled automation sources
 * Compatible with many standards such as SoundFont2, VST(i), LADSPA, GUS Patches, and full MIDI support
@@ -53,7 +55,6 @@ Information about what you can do and how can be found in the
 
 Before coding a new big feature, please _always_
 [file an issue](https://github.com/LMMS/lmms/issues/new) for your idea and
-suggestions about your feature and about the intended implementation on GitHub
-or post to the LMMS developers mailinglist (lmms-devel@lists.sourceforge.net)
-and wait for replies! Maybe there are different ideas, improvements, hints or
+suggestions about your feature and about the intended implementation on GitHub,
+or ask in one of the tech channels on Discord and wait for replies! Maybe there are different ideas, improvements, or hints, or
 maybe your feature is not welcome/needed at the moment.

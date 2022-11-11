@@ -31,8 +31,13 @@
 
 #include "ModelView.h"
 
+namespace lmms
+{
+
 class LadspaControl;
 
+namespace gui
+{
 
 class LMMS_EXPORT LadspaMatrixControlView : public QWidget, public ModelView
 {
@@ -45,5 +50,9 @@ private:
 	LadspaControl * m_ladspaControl;
 
 } ;
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

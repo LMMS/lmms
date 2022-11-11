@@ -30,13 +30,18 @@
 #include <QScrollArea>
 #include <QScrollBar>
 
+#include "LadspaBase.h"
+#include "LadspaControl.h"
 #include "LadspaEffect.h"
 #include "LadspaMatrixControlDialog.h"
 #include "LadspaMatrixControlView.h"
 #include "LadspaControlView.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 
 
+
+namespace lmms::gui
+{
 
 static int const s_linkBaseColumn = 0;
 static int const s_parameterNameBaseColumn = 2;
@@ -163,3 +168,5 @@ void LadspaMatrixControlDialog::updateEffectView( LadspaControls * ladspaControl
 				this, SLOT( updateEffectView( LadspaControls * ) ),
 							Qt::DirectConnection );
 }
+
+} // namespace lmms::gui

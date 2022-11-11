@@ -27,6 +27,7 @@
 #ifndef DATA_FILE_H
 #define DATA_FILE_H
 
+#include <map>
 #include <QDomDocument>
 
 #include "lmms_export.h"
@@ -34,9 +35,18 @@
 
 class QTextStream;
 
+namespace lmms
+{
+
+class ProjectVersion;
+
+
 class LMMS_EXPORT DataFile : public QDomDocument
 {
 	MM_OPERATORS
+
+	using UpgradeMethod = void(DataFile::*)();
+
 public:
 	enum Types
 	{
@@ -48,15 +58,16 @@ public:
 		ClipboardData,
 		JournalData,
 		EffectSettings,
+		MidiClip,
 		TypeCount
 	} ;
-	typedef Types Type;
+	using Type = Types;
 
 	DataFile( const QString& fileName );
 	DataFile( const QByteArray& data );
 	DataFile( Type type );
 
-	virtual ~DataFile();
+	virtual ~DataFile() = default;
 
 	///
 	/// \brief validate
@@ -67,7 +78,9 @@ public:
 	QString nameWithExtension( const QString& fn ) const;
 
 	void write( QTextStream& strm );
-	bool writeFile( const QString& fn );
+	bool writeFile(const QString& fn, bool withResources = false);
+	bool copyResources(const QString& resourcesDir); //!< Copies resources to the resourcesDir and changes the DataFile to use local paths to them
+	bool hasLocalPlugins(QDomElement parent = QDomElement(), bool firstCall = true) const;
 
 	QDomElement& content()
 	{
@@ -83,6 +96,8 @@ public:
 	{
 		return m_type;
 	}
+
+	unsigned int legacyFileVersion();
 
 private:
 	static Type type( const QString& typeName );
@@ -107,8 +122,22 @@ private:
 	void upgrade_1_1_0();
 	void upgrade_1_1_91();
 	void upgrade_1_2_0_rc3();
-	void upgrade_1_2_0_rc2_42();
 	void upgrade_1_3_0();
+	void upgrade_noHiddenClipNames();
+	void upgrade_automationNodes();
+	void upgrade_extendedNoteRange();
+	void upgrade_defaultTripleOscillatorHQ();
+	void upgrade_mixerRename();
+	void upgrade_bbTcoRename();
+
+	// List of all upgrade methods
+	static const std::vector<UpgradeMethod> UPGRADE_METHODS;
+	// List of ProjectVersions for the legacyFileVersion method
+	static const std::vector<ProjectVersion> UPGRADE_VERSIONS;
+
+	// Map with DOM elements that access resources (for making bundles)
+	using ResourcesMap = std::map<QString, std::vector<QString>>;
+	static const ResourcesMap ELEMENTS_WITH_RESOURCES;
 
 	void upgrade();
 
@@ -122,17 +151,15 @@ private:
 	} ;
 	static typeDescStruct s_types[TypeCount];
 
+	QString m_fileName; //!< The origin file name or "" if this DataFile didn't originate from a file
 	QDomElement m_content;
 	QDomElement m_head;
 	Type m_type;
+	unsigned int m_fileVersion;
 
 } ;
 
 
-const int LDF_MAJOR_VERSION = 1;
-const int LDF_MINOR_VERSION = 0;
-const QString LDF_VERSION_STRING = QString::number( LDF_MAJOR_VERSION ) + "." + QString::number( LDF_MINOR_VERSION );
-
+} // namespace lmms
 
 #endif
-

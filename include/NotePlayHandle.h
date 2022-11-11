@@ -35,12 +35,15 @@
 #include "MemoryManager.h"
 
 class QReadWriteLock;
+
+namespace lmms
+{
+
 class InstrumentTrack;
 class NotePlayHandle;
 
-typedef QList<NotePlayHandle *> NotePlayHandleList;
-typedef QList<const NotePlayHandle *> ConstNotePlayHandleList;
-
+using NotePlayHandleList = QList<NotePlayHandle*>;
+using ConstNotePlayHandleList = QList<const NotePlayHandle*>;
 
 class LMMS_EXPORT NotePlayHandle : public PlayHandle, public Note
 {
@@ -49,33 +52,36 @@ public:
 	void * m_pluginData;
 	std::unique_ptr<BasicFilters<>> m_filter;
 
+	// length of the declicking fade in
+	fpp_t m_fadeInLength;
+
 	// specifies origin of NotePlayHandle
 	enum Origins
 	{
-		OriginPattern,		/*! playback of a note from a pattern */
+		OriginMidiClip,		/*! playback of a note from a MIDI clip */
 		OriginMidiInput,	/*! playback of a MIDI note input event */
 		OriginNoteStacking,	/*! created by note stacking instrument function */
 		OriginArpeggio,		/*! created by arpeggio instrument function */
 		OriginCount
 	};
-	typedef Origins Origin;
+	using Origin = Origins;
 
 	NotePlayHandle( InstrumentTrack* instrumentTrack,
 					const f_cnt_t offset,
 					const f_cnt_t frames,
 					const Note& noteToPlay,
-					NotePlayHandle* parent = NULL,
+					NotePlayHandle* parent = nullptr,
 					int midiEventChannel = -1,
-					Origin origin = OriginPattern );
-	virtual ~NotePlayHandle();
+					Origin origin = OriginMidiClip );
+	~NotePlayHandle() override;
 
 	void * operator new ( size_t size, void * p )
 	{
 		return p;
 	}
 
-	virtual void setVolume( volume_t volume );
-	virtual void setPanning( panning_t panning );
+	void setVolume( volume_t volume ) override;
+	void setPanning( panning_t panning ) override;
 
 	int midiKey() const;
 	int midiChannel() const
@@ -105,10 +111,10 @@ public:
 	}
 
 	/*! Renders one chunk using the attached instrument into the buffer */
-	virtual void play( sampleFrame* buffer );
+	void play( sampleFrame* buffer ) override;
 
 	/*! Returns whether playback of note is finished and thus handle can be deleted */
-	virtual bool isFinished() const
+	bool isFinished() const override
 	{
 		return m_released && framesLeft() <= 0;
 	}
@@ -120,9 +126,9 @@ public:
 	fpp_t framesLeftForCurrentPeriod() const;
 
 	/*! Returns whether the play handle plays on a certain track */
-	virtual bool isFromTrack( const Track* _track ) const;
+	bool isFromTrack( const Track* _track ) const override;
 
-	/*! Releases the note (and plays release frames */
+	/*! Releases the note (and plays release frames) */
 	void noteOff( const f_cnt_t offset = 0 );
 
 	/*! Returns number of frames to be played until the note is going to be released */
@@ -228,32 +234,32 @@ public:
 	/*! Returns whether given NotePlayHandle instance is equal to *this */
 	bool operator==( const NotePlayHandle & _nph ) const;
 
-	/*! Returns whether NotePlayHandle belongs to BB track and BB track is muted */
-	bool isBbTrackMuted()
+	/*! Returns whether NotePlayHandle belongs to pattern track and pattern track is muted */
+	bool isPatternTrackMuted()
 	{
-		return m_bbTrack && m_bbTrack->isMuted();
+		return m_patternTrack && m_patternTrack->isMuted();
 	}
 
-	/*! Sets attached BB track */
-	void setBBTrack( Track* t )
+	/*! Sets attached pattern track */
+	void setPatternTrack(Track* t)
 	{
-		m_bbTrack = t;
+		m_patternTrack = t;
 	}
 
 	/*! Process note detuning automation */
-	void processMidiTime( const MidiTime& time );
+	void processTimePos( const TimePos& time );
 
 	/*! Updates total length (m_frames) depending on a new tempo */
 	void resize( const bpm_t newTempo );
 
-	/*! Set song-global offset (relative to containing pattern) in order to properly perform the note detuning */
-	void setSongGlobalParentOffset( const MidiTime& offset )
+	/*! Set song-global offset (relative to containing MIDI clip) in order to properly perform the note detuning */
+	void setSongGlobalParentOffset( const TimePos& offset )
 	{
 		m_songGlobalParentOffset = offset;
 	}
 
 	/*! Returns song-global offset */
-	const MidiTime& songGlobalParentOffset() const
+	const TimePos& songGlobalParentOffset() const
 	{
 		return m_songGlobalParentOffset;
 	}
@@ -308,7 +314,7 @@ private:
 	NotePlayHandle * m_parent;			// parent note
 	bool m_hadChildren;
 	bool m_muted;							// indicates whether note is muted
-	Track* m_bbTrack;						// related BB track
+	Track* m_patternTrack;						// related pattern track
 
 	// tempo reaction
 	bpm_t m_origTempo;						// original tempo
@@ -320,7 +326,7 @@ private:
 	float m_unpitchedFrequency;
 
 	BaseDetuning* m_baseDetuning;
-	MidiTime m_songGlobalParentOffset;
+	TimePos m_songGlobalParentOffset;
 
 	int m_midiChannel;
 	Origin m_origin;
@@ -341,11 +347,12 @@ public:
 					const f_cnt_t offset,
 					const f_cnt_t frames,
 					const Note& noteToPlay,
-					NotePlayHandle* parent = NULL,
+					NotePlayHandle* parent = nullptr,
 					int midiEventChannel = -1,
-					NotePlayHandle::Origin origin = NotePlayHandle::OriginPattern );
+					NotePlayHandle::Origin origin = NotePlayHandle::OriginMidiClip );
 	static void release( NotePlayHandle * nph );
 	static void extend( int i );
+	static void free();
 
 private:
 	static NotePlayHandle ** s_available;
@@ -354,5 +361,7 @@ private:
 	static int s_size;
 };
 
+
+} // namespace lmms
 
 #endif

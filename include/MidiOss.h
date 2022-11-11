@@ -29,11 +29,14 @@
 
 #ifdef LMMS_HAVE_OSS
 
-#include <QtCore/QThread>
-#include <QtCore/QFile>
+#include <QThread>
+#include <QFile>
 
 #include "MidiClient.h"
 
+
+namespace lmms
+{
 
 
 class MidiOss : public QThread, public MidiClientRaw
@@ -41,7 +44,7 @@ class MidiOss : public QThread, public MidiClientRaw
 	Q_OBJECT
 public:
 	MidiOss();
-	virtual ~MidiOss();
+	~MidiOss() override;
 
 	static QString probeDevice();
 
@@ -58,8 +61,8 @@ public:
 	}
 
 protected:
-	virtual void sendByte( const unsigned char c );
-	virtual void run();
+	void sendByte( const unsigned char c ) override;
+	void run() override;
 
 
 private:
@@ -69,7 +72,11 @@ private:
 
 } ;
 
-#endif
+
+} // namespace lmms
+
+
+#endif // LMMS_HAVE_OSS
 
 
 #endif

@@ -1,4 +1,6 @@
 #!/bin/bash
+set -e
+
 ppa_dir=./ppa/
 
 pushd $ppa_dir

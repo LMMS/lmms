@@ -15,4 +15,4 @@ public:
     void get_remainder(std::string &field);
 };
 
-void string_escape(std::string &result, char *s, const char *quote);
+void string_escape(std::string &result, const char *s, const char *quote);

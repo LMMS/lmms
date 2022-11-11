@@ -26,13 +26,15 @@
 
 #include "Song.h"
 
-#include "MainWindow.h"
 #include "embed.h"
 
 #include <QAction>
-#include <QMdiArea>
 #include <QShortcut>
 #include <QCloseEvent>
+
+
+namespace lmms::gui
+{
 
 
 void Editor::setPauseIcon(bool displayPauseIcon)
@@ -56,7 +58,7 @@ DropToolBar * Editor::addDropToolBar(Qt::ToolBarArea whereToAdd, QString const &
 
 DropToolBar * Editor::addDropToolBar(QWidget * parent, Qt::ToolBarArea whereToAdd, QString const & windowTitle)
 {
-	DropToolBar *toolBar = new DropToolBar(parent);
+	auto toolBar = new DropToolBar(parent);
 	addToolBar(whereToAdd, toolBar);
 	toolBar->setMovable(false);
 	toolBar->setFloatable(false);
@@ -72,6 +74,16 @@ void Editor::togglePlayStop()
 		stop();
 	else
 		play();
+}
+
+void Editor::togglePause()
+{
+	Engine::getSong()->togglePause();
+}
+
+void Editor::toggleMaximize()
+{
+	isMaximized() ? showNormal() : showMaximized();
 }
 
 Editor::Editor(bool record, bool stepRecord) :
@@ -104,6 +116,8 @@ Editor::Editor(bool record, bool stepRecord) :
 	connect(m_toggleStepRecordingAction, SIGNAL(triggered()), this, SLOT(toggleStepRecording()));
 	connect(m_stopAction, SIGNAL(triggered()), this, SLOT(stop()));
 	new QShortcut(Qt::Key_Space, this, SLOT(togglePlayStop()));
+	new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Space), this, SLOT(togglePause()));
+	new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_F11), this, SLOT(toggleMaximize()));
 
 	// Add actions to toolbar
 	addButton(m_playAction, "playButton");
@@ -117,11 +131,6 @@ Editor::Editor(bool record, bool stepRecord) :
 		addButton(m_toggleStepRecordingAction, "stepRecordButton");
 	}
 	addButton(m_stopAction, "stopButton");
-}
-
-Editor::~Editor()
-{
-
 }
 
 QAction *Editor::playAction() const
@@ -159,3 +168,4 @@ void DropToolBar::dropEvent(QDropEvent* event)
 
 
 
+} // namespace lmms::gui

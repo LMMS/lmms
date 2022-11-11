@@ -35,17 +35,16 @@
 
 #include "OpulenZ.h"
 #include "Instrument.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
-#include "Mixer.h"
 
-#include <QDomDocument>
 #include <QFile>
 #include <QFileInfo>
 #include <QByteArray>
-#include <assert.h>
-#include <math.h>
+#include <cassert>
+#include <cmath>
 
 #include "opl.h"
 #include "temuopl.h"
@@ -55,27 +54,29 @@
 #include "debug.h"
 
 #include "Knob.h"
-#include "LcdSpinBox.h"
 #include "PixmapButton.h"
-#include "ToolTip.h"
 
 #include "plugin_export.h"
+
+namespace lmms
+{
+
 
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT opulenz_plugin_descriptor =
 {
-        STRINGIFY( PLUGIN_NAME ),
+        LMMS_STRINGIFY( PLUGIN_NAME ),
         "OpulenZ",
-        QT_TRANSLATE_NOOP( "pluginBrowser",
+        QT_TRANSLATE_NOOP( "PluginBrowser",
 			   "2-operator FM Synth" ),
         "Raine M. Ekman <raine/at/iki/fi>",
         0x0100,
         Plugin::Instrument,
         new PluginPixmapLoader( "logo" ),
         "sbi",
-        NULL
+        nullptr,
 };
 
 // necessary for getting instance out of shared lib
@@ -139,7 +140,7 @@ OpulenzInstrument::OpulenzInstrument( InstrumentTrack * _instrument_track ) :
 
 	// Create an emulator - samplerate, 16 bit, mono
 	emulatorMutex.lock();
-	theEmulator = new CTemuopl(Engine::mixer()->processingSampleRate(), true, false);
+	theEmulator = new CTemuopl(Engine::audioEngine()->processingSampleRate(), true, false);
 	theEmulator->init();
 	// Enable waveform selection
 	theEmulator->write(0x01,0x20);
@@ -158,7 +159,7 @@ OpulenzInstrument::OpulenzInstrument( InstrumentTrack * _instrument_track ) :
 	updatePatch();
 
 	// Can the buffer size change suddenly? I bet that would break lots of stuff
-	frameCount = Engine::mixer()->framesPerPeriod();
+	frameCount = Engine::audioEngine()->framesPerPeriod();
 	renderbuffer = new short[frameCount];
 
 	// Some kind of sane defaults
@@ -168,7 +169,7 @@ OpulenzInstrument::OpulenzInstrument( InstrumentTrack * _instrument_track ) :
 
 	tuneEqual(69, 440);
 
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
+	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ),
 		 this, SLOT( reloadEmulator() ) );
 	// Connect knobs
 	// This one's for testing...
@@ -213,14 +214,14 @@ OpulenzInstrument::OpulenzInstrument( InstrumentTrack * _instrument_track ) :
 	MOD_CON( vib_depth_mdl );
 	MOD_CON( trem_depth_mdl );
 
-	// Connect the plugin to the mixer...
-	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
-	Engine::mixer()->addPlayHandle( iph );
+	// Connect the plugin to the audio engine...
+	auto iph = new InstrumentPlayHandle(this, _instrument_track);
+	Engine::audioEngine()->addPlayHandle( iph );
 }
 
 OpulenzInstrument::~OpulenzInstrument() {
 	delete theEmulator;
-	Engine::mixer()->removePlayHandlesOfTypes( instrumentTrack(),
+	Engine::audioEngine()->removePlayHandlesOfTypes( instrumentTrack(),
 				PlayHandle::TypeNotePlayHandle
 				| PlayHandle::TypeInstrumentPlayHandle );
 	delete [] renderbuffer;
@@ -230,7 +231,7 @@ OpulenzInstrument::~OpulenzInstrument() {
 void OpulenzInstrument::reloadEmulator() {
 	delete theEmulator;
 	emulatorMutex.lock();
-	theEmulator = new CTemuopl(Engine::mixer()->processingSampleRate(), true, false);
+	theEmulator = new CTemuopl(Engine::audioEngine()->processingSampleRate(), true, false);
 	theEmulator->init();
 	theEmulator->write(0x01,0x20);
 	emulatorMutex.unlock();
@@ -293,15 +294,14 @@ int OpulenzInstrument::pushVoice(int v) {
 	return i;
 }
 
-bool OpulenzInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
+bool OpulenzInstrument::handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset )
 {
 	emulatorMutex.lock();
 	int key, vel, voice, tmp_pb;
 
 	switch(event.type()) {
         case MidiNoteOn:
-		// to get us in line with MIDI(?)
-		key = event.key() +12;
+		key = event.key();
 		vel = event.velocity();
 
 		voice = popVoice();
@@ -316,7 +316,7 @@ bool OpulenzInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime&
 		}
                 break;
         case MidiNoteOff:
-                key = event.key() +12;
+                key = event.key();
                 for(voice=0; voice<OPL2_VOICES; ++voice) {
                         if( voiceNote[voice] == key ) {
                                 theEmulator->write(0xA0+voice, fnums[key] & 0xff);
@@ -328,7 +328,7 @@ bool OpulenzInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime&
 		velocities[key] = 0;
                 break;
         case MidiKeyPressure:
-                key = event.key() +12;
+                key = event.key();
                 vel = event.velocity();
 		if( velocities[key] != 0) {
 			velocities[key] = vel;
@@ -392,9 +392,9 @@ QString OpulenzInstrument::nodeName() const
         return( opulenz_plugin_descriptor.name );
 }
 
-PluginView * OpulenzInstrument::instantiateView( QWidget * _parent )
+gui::PluginView* OpulenzInstrument::instantiateView( QWidget * _parent )
 {
-        return( new OpulenzInstrumentView( this, _parent ) );
+        return( new gui::OpulenzInstrumentView( this, _parent ) );
 }
 
 
@@ -414,7 +414,7 @@ void OpulenzInstrument::play( sampleFrame * _working_buffer )
 	emulatorMutex.unlock();
 
 	// Throw the data to the track...
-	instrumentTrack()->processAudioBuffer( _working_buffer, frameCount, NULL );
+	instrumentTrack()->processAudioBuffer( _working_buffer, frameCount, nullptr );
 
 }
 
@@ -677,7 +677,8 @@ void OpulenzInstrument::loadFile( const QString& file ) {
 
 
 
-
+namespace gui
+{
 
 OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
                                                         QWidget * _parent ) :
@@ -694,18 +695,18 @@ OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
 	knobname->move(xpos,ypos);
 
 #define BUTTON_GEN(buttname, tooltip, xpos, ypos) \
-	buttname = new PixmapButton( this, NULL );\
+	buttname = new PixmapButton( this, nullptr );\
         buttname->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "led_on" ) );\
         buttname->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "led_off" ) );\
 	buttname->setCheckable( true );\
-        ToolTip::add( buttname, tr( tooltip ) );\
+        buttname->setToolTip(tr(tooltip));\
         buttname->move( xpos, ypos );
 
 #define WAVEBUTTON_GEN(buttname, tooltip, xpos, ypos, icon_on, icon_off, buttgroup) \
-	buttname = new PixmapButton( this, NULL );\
+	buttname = new PixmapButton( this, nullptr );\
         buttname->setActiveGraphic( PLUGIN_NAME::getIconPixmap( icon_on ) ); \
         buttname->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( icon_off ) ); \
-        ToolTip::add( buttname, tr( tooltip ) );\
+        buttname->setToolTip(tr(tooltip));\
         buttname->move( xpos, ypos );\
 	buttgroup->addButton(buttname);
 
@@ -797,8 +798,7 @@ void OpulenzInstrumentView::updateKnobHints()
 		-12, 0, 12, 19, 24, 28, 31, 34, 36, 38, 40, 40, 43, 43, 47, 47  
 	};
 
-	OpulenzInstrument * m = castModel<OpulenzInstrument>();
-	
+	auto m = castModel<OpulenzInstrument>();
 
 	op1_a_kn->setHintText( tr( "Attack" ),
 						   " (" + knobHintHelper(attack_times[(int)m->op1_a_mdl.value()]) + ")");
@@ -820,7 +820,7 @@ void OpulenzInstrumentView::updateKnobHints()
 
 void OpulenzInstrumentView::modelChanged()
 {
-	OpulenzInstrument * m = castModel<OpulenzInstrument>();
+	auto m = castModel<OpulenzInstrument>();
 	// m_patch->setModel( &m->m_patchModel );
 
 	op1_a_kn->setModel( &m->op1_a_mdl );
@@ -874,4 +874,6 @@ void OpulenzInstrumentView::modelChanged()
 }
 
 
+} // namespace gui
 
+} // namespace lmms

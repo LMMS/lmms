@@ -28,16 +28,14 @@
 
 #include "lmmsconfig.h"
 
-// set whether debug-stuff (like messages on the console, asserts and other
-// additional range-checkings) should be compiled
-
-#ifdef LMMS_DEBUG
-	#include <assert.h>
-#else
-	#ifndef assert
-		#define assert(x) ((void)(x))
-	#endif
+// Define standard macro NDEBUG when building without debug flag to make sure asserts become no-ops.
+#ifndef LMMS_DEBUG
+#ifndef NDEBUG
+	#define NDEBUG
 #endif
+#endif // LMMS_DEBUG
+
+#include <cassert>
 #include <cstdio>
 
 

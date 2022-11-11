@@ -32,8 +32,18 @@
 #include "TempoSyncKnobModel.h"
 #include "ValueBuffer.h"
 
+namespace lmms
+{
 
-typedef struct PortDescription port_desc_t;
+struct port_desc_t;
+
+namespace gui
+{
+
+class LadspaControlView;
+class LadspaMatrixControlDialog;
+
+} // namespace gui
 
 
 class LMMS_EXPORT LadspaControl : public Model, public JournallingObject
@@ -42,7 +52,7 @@ class LMMS_EXPORT LadspaControl : public Model, public JournallingObject
 public:
 	LadspaControl( Model * _parent, port_desc_t * _port,
 							bool _link = false );
-	~LadspaControl();
+	~LadspaControl() override = default;
 
 	LADSPA_Data value();
 	ValueBuffer * valueBuffer();
@@ -74,7 +84,7 @@ public:
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent, const QString & _name );
 	virtual void loadSettings( const QDomElement & _this, const QString & _name );
-	inline virtual QString nodeName() const
+	inline QString nodeName() const override
 	{
 		return "port";
 	}
@@ -92,13 +102,13 @@ protected slots:
 	void linkStateChanged();
 
 protected:
-	virtual void saveSettings( QDomDocument& doc, QDomElement& element )
+	void saveSettings( QDomDocument& doc, QDomElement& element ) override
 	{
 		Q_UNUSED(doc)
 		Q_UNUSED(element)
 	}
 
-	virtual void loadSettings( const QDomElement& element )
+	void loadSettings( const QDomElement& element ) override
 	{
 		Q_UNUSED(element)
 	}
@@ -115,9 +125,12 @@ private:
 	TempoSyncKnobModel m_tempoSyncKnobModel;
 
 
-	friend class LadspaControlView;
-	friend class LadspaMatrixControlDialog;
+	friend class gui::LadspaControlView;
+	friend class gui::LadspaMatrixControlDialog;
 
 } ;
+
+
+} // namespace lmms
 
 #endif

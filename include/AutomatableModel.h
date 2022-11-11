@@ -25,15 +25,19 @@
 #ifndef AUTOMATABLE_MODEL_H
 #define AUTOMATABLE_MODEL_H
 
-#include <QtCore/QMap>
-#include <QtCore/QMutex>
+#include <QMap>
+#include <QMutex>
 
 #include "JournallingObject.h"
 #include "Model.h"
-#include "MidiTime.h"
+#include "TimePos.h"
 #include "ValueBuffer.h"
 #include "MemoryManager.h"
 #include "ModelVisitor.h"
+
+
+namespace lmms
+{
 
 // simple way to map a property of a view to a model
 #define mapPropertyFromModelPtr(type,getfunc,setfunc,modelname)	\
@@ -74,8 +78,7 @@ class LMMS_EXPORT AutomatableModel : public Model, public JournallingObject
 	Q_OBJECT
 	MM_OPERATORS
 public:
-
-	typedef QVector<AutomatableModel *> AutoModelVector;
+	using AutoModelVector = QVector<AutomatableModel*>;
 
 	enum ScaleType
 	{
@@ -85,7 +88,7 @@ public:
 	};
 
 
-	virtual ~AutomatableModel();
+	~AutomatableModel() override;
 
 	// Implement those by using the MODEL_IS_VISITABLE macro
 	virtual void accept(ModelVisitor& v) = 0;
@@ -120,7 +123,7 @@ public:
 	bool isAutomated() const;
 	bool isAutomatedOrControlled() const
 	{
-		return isAutomated() || m_controllerConnection != NULL;
+		return isAutomated() || m_controllerConnection != nullptr;
 	}
 
 	ControllerConnection* controllerConnection() const
@@ -148,7 +151,18 @@ public:
 	template<class T>
 	inline T value( int frameOffset = 0 ) const
 	{
-		if( unlikely( hasLinkedModels() || m_controllerConnection != NULL ) )
+		if (m_controllerConnection)
+		{
+			if (!m_useControllerValue)
+			{
+				return castValue<T>(m_value);
+			}
+			else
+			{
+				return castValue<T>(controllerValue(frameOffset));
+			}
+		}
+		else if (hasLinkedModels())
 		{
 			return castValue<T>( controllerValue( frameOffset ) );
 		}
@@ -236,6 +250,7 @@ public:
 		m_centerValue = centerVal;
 	}
 
+	//! link @p m1 and @p m2, let @p m1 take the values of @p m2
 	static void linkModels( AutomatableModel* m1, AutomatableModel* m2 );
 	static void unlinkModels( AutomatableModel* m1, AutomatableModel* m2 );
 
@@ -255,7 +270,7 @@ public:
 				specified DOM element using <name> as attribute/node name */
 	virtual void loadSettings( const QDomElement& element, const QString& name );
 
-	virtual QString nodeName() const
+	QString nodeName() const override
 	{
 		return "automatablemodel";
 	}
@@ -280,7 +295,7 @@ public:
 		return false;
 	}
 
-	float globalAutomationValueAt( const MidiTime& time );
+	float globalAutomationValueAt( const TimePos& time );
 
 	void setStrictStepSize( const bool b )
 	{
@@ -297,9 +312,15 @@ public:
 		s_periodCounter = 0;
 	}
 
+	bool useControllerValue()
+	{
+		return m_useControllerValue;
+	}
+
 public slots:
 	virtual void reset();
 	void unlinkControllerConnection();
+	void setUseControllerValue(bool b = true);
 
 
 protected:
@@ -308,7 +329,7 @@ protected:
 						const float min = 0,
 						const float max = 0,
 						const float step = 0,
-						Model* parent = NULL,
+						Model* parent = nullptr,
 						const QString& displayName = QString(),
 						bool defaultConstructed = false );
 	//! returns a value which is in range between min() and
@@ -337,12 +358,12 @@ private:
 
 	static bool mustQuoteName(const QString &name);
 
-	virtual void saveSettings( QDomDocument& doc, QDomElement& element )
+	void saveSettings( QDomDocument& doc, QDomElement& element ) override
 	{
 		saveSettings( doc, element, "value" );
 	}
 
-	virtual void loadSettings( const QDomElement& element )
+	void loadSettings( const QDomElement& element ) override
 	{
 		loadSettings( element, "value" );
 	}
@@ -359,7 +380,7 @@ private:
 	template<class T> void roundAt( T &value, const T &where ) const;
 
 
-	ScaleType m_scaleType; //! scale type, linear by default
+	ScaleType m_scaleType; //!< scale type, linear by default
 	float m_value;
 	float m_initValue;
 	float m_minValue;
@@ -394,9 +415,11 @@ private:
 	// prevent several threads from attempting to write the same vb at the same time
 	QMutex m_valueBufferMutex;
 
+	bool m_useControllerValue;
+
 signals:
 	void initValueChanged( float val );
-	void destroyed( jo_id_t id );
+	void destroyed( lmms::jo_id_t id );
 
 } ;
 
@@ -437,7 +460,7 @@ class LMMS_EXPORT FloatModel : public TypedAutomatableModel<float>
 	MODEL_IS_VISITABLE
 public:
 	FloatModel( float val = 0, float min = 0, float max = 0, float step = 0,
-				Model * parent = NULL,
+				Model * parent = nullptr,
 				const QString& displayName = QString(),
 				bool defaultConstructed = false ) :
 		TypedAutomatableModel( val, min, max, step, parent, displayName, defaultConstructed )
@@ -455,7 +478,7 @@ class LMMS_EXPORT IntModel : public TypedAutomatableModel<int>
 	MODEL_IS_VISITABLE
 public:
 	IntModel( int val = 0, int min = 0, int max = 0,
-				Model* parent = NULL,
+				Model* parent = nullptr,
 				const QString& displayName = QString(),
 				bool defaultConstructed = false ) :
 		TypedAutomatableModel( val, min, max, 1, parent, displayName, defaultConstructed )
@@ -471,7 +494,7 @@ class LMMS_EXPORT BoolModel : public TypedAutomatableModel<bool>
 	MODEL_IS_VISITABLE
 public:
 	BoolModel( const bool val = false,
-				Model* parent = NULL,
+				Model* parent = nullptr,
 				const QString& displayName = QString(),
 				bool defaultConstructed = false ) :
 		TypedAutomatableModel( val, false, true, 1, parent, displayName, defaultConstructed )
@@ -480,7 +503,9 @@ public:
 	QString displayValue( const float val ) const override;
 } ;
 
-typedef QMap<AutomatableModel*, float> AutomatedValueMap;
+using AutomatedValueMap = QMap<AutomatableModel*, float>;
+
+} // namespace lmms
 
 #endif
 

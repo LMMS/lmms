@@ -24,13 +24,11 @@
 
 #include "AudioDeviceSetupWidget.h"
 
-AudioDeviceSetupWidget::AudioDeviceSetupWidget( const QString & _caption, QWidget * _parent ) :
-	TabWidget( TabWidget::tr( "Settings for %1" ).arg(TabWidget::tr( _caption.toLatin1() ) ).toUpper(),
-			   _parent )
+namespace lmms::gui
 {
-}
 
-AudioDeviceSetupWidget::~AudioDeviceSetupWidget()
+AudioDeviceSetupWidget::AudioDeviceSetupWidget(const QString & caption, QWidget * parent) :
+	TabWidget(TabWidget::tr("Settings for %1").arg(tr(caption.toUtf8())), parent)
 {
 }
 
@@ -39,3 +37,5 @@ void AudioDeviceSetupWidget::show()
 	parentWidget()->show();
 	QWidget::show();
 }
+
+} // namespace lmms::gui

@@ -31,13 +31,15 @@
 #include "AutomatableModelView.h"
 
 
+namespace lmms::gui
+{
 
 class AutomatableSlider : public QSlider, public IntModelView
 {
 	Q_OBJECT
 public:
 	AutomatableSlider( QWidget * _parent, const QString & _name = QString() );
-	virtual ~AutomatableSlider();
+	~AutomatableSlider() override = default;
 
 	bool showStatus()
 	{
@@ -51,12 +53,12 @@ signals:
 
 
 protected:
-	virtual void contextMenuEvent( QContextMenuEvent * _me );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
-	virtual void wheelEvent( QWheelEvent * _me );
+	void contextMenuEvent( QContextMenuEvent * _me ) override;
+	void mousePressEvent( QMouseEvent * _me ) override;
+	void mouseReleaseEvent( QMouseEvent * _me ) override;
+	void wheelEvent( QWheelEvent * _me ) override;
 
-	virtual void modelChanged();
+	void modelChanged() override;
 
 
 private:
@@ -71,7 +73,8 @@ private slots:
 } ;
 
 
-typedef IntModel sliderModel;
+using sliderModel = IntModel;
 
+} // namespace lmms::gui
 
 #endif

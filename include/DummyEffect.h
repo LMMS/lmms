@@ -25,9 +25,19 @@
 #ifndef DUMMY_EFFECT_H
 #define DUMMY_EFFECT_H
 
+#include <QDomElement>
+
 #include "Effect.h"
 #include "EffectControls.h"
 #include "EffectControlDialog.h"
+
+namespace lmms
+{
+
+namespace gui
+{
+
+class Knob;
 
 
 class DummyEffectControlDialog : public EffectControlDialog
@@ -40,6 +50,7 @@ public:
 
 } ;
 
+} // namespace gui
 
 class DummyEffectControls : public EffectControls
 {
@@ -49,31 +60,29 @@ public:
 	{
 	}
 
-	virtual ~DummyEffectControls()
-	{
-	}
+	~DummyEffectControls() override = default;
 
-	virtual int controlCount()
+	int controlCount() override
 	{
 		return 0;
 	}
 
-	virtual void saveSettings( QDomDocument &, QDomElement & )
+	void saveSettings( QDomDocument &, QDomElement & ) override
 	{
 	}
 
-	virtual void loadSettings( const QDomElement & )
+	void loadSettings( const QDomElement & ) override
 	{
 	}
 
-	virtual QString nodeName() const
+	QString nodeName() const override
 	{
 		return "DummyControls";
 	}
 
-	virtual EffectControlDialog * createView()
+	gui::EffectControlDialog * createView() override
 	{
-		return new DummyEffectControlDialog( this );
+		return new gui::DummyEffectControlDialog( this );
 	}
 } ;
 
@@ -84,23 +93,21 @@ class DummyEffect : public Effect
 	Q_OBJECT
 public:
 	DummyEffect( Model * _parent, const QDomElement& originalPluginData ) :
-		Effect( NULL, _parent, NULL ),
+		Effect( nullptr, _parent, nullptr ),
 		m_controls( this ),
 		m_originalPluginData( originalPluginData )
 	{
 		setName();
 	}
 
-	virtual ~DummyEffect()
-	{
-	}
+	~DummyEffect() override = default;
 
-	virtual EffectControls * controls()
+	EffectControls * controls() override
 	{
 		return &m_controls;
 	}
 
-	bool processAudioBuffer( sampleFrame *, const fpp_t )
+	bool processAudioBuffer( sampleFrame *, const fpp_t ) override
 	{
 		return false;
 	}
@@ -139,5 +146,7 @@ private:
 	}
 } ;
 
+
+} // namespace lmms
 
 #endif

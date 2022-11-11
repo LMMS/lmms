@@ -27,10 +27,14 @@
 
 #include "AudioFileDevice.h"
 #include "lmmsconfig.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "OutputSettings.h"
 
 #include "lmms_export.h"
+
+namespace lmms
+{
+
 
 class LMMS_EXPORT ProjectRenderer : public QThread
 {
@@ -56,15 +60,15 @@ public:
 	} ;
 
 
-	ProjectRenderer( const Mixer::qualitySettings & _qs,
+	ProjectRenderer( const AudioEngine::qualitySettings & _qs,
 				const OutputSettings & _os,
 				ExportFileFormats _file_format,
 				const QString & _out_file );
-	virtual ~ProjectRenderer();
+	~ProjectRenderer() override = default;
 
 	bool isReady() const
 	{
-		return m_fileDev != NULL;
+		return m_fileDev != nullptr;
 	}
 
 	static ExportFileFormats getFileFormatFromExtension(
@@ -86,14 +90,17 @@ signals:
 
 
 private:
-	virtual void run();
+	void run() override;
 
 	AudioFileDevice * m_fileDev;
-	Mixer::qualitySettings m_qualitySettings;
+	AudioEngine::qualitySettings m_qualitySettings;
 
 	volatile int m_progress;
 	volatile bool m_abort;
 
 } ;
+
+
+} // namespace lmms
 
 #endif

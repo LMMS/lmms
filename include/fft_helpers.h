@@ -32,6 +32,9 @@
 #include <vector>
 #include <fftw3.h>
 
+namespace lmms
+{
+
 // NOTE: FFT_BUFFER_SIZE should be considered deprecated!
 // It is used by Eq plugin and some older code here, but this should be a user
 // switchable parameter, not a constant. Use a value from FFT_BLOCK_SIZES
@@ -104,15 +107,6 @@ int LMMS_EXPORT compressbands(const float * _absspec_buffer, float * _compressed
 			int _num_old, int _num_new, int _bottom, int _top);
 
 
-int LMMS_EXPORT calc13octaveband31(float * _absspec_buffer, float * _subbands,
-				int _num_spec, float _max_frequency);
-
-
-/**	Compute power of finite time sequence.
- *	Take care num_values is length of timesignal[].
- *
- *	@return power on success, else -1
- */
-float LMMS_EXPORT signalpower(const float *timesignal, int num_values);
+} // namespace lmms
 
 #endif

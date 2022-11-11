@@ -30,7 +30,15 @@
 
 
 class QGridLayout;
+
+namespace lmms
+{
+
 class LadspaControls;
+
+namespace gui
+{
+
 class LedCheckBox;
 
 
@@ -52,5 +60,9 @@ private:
 	LedCheckBox * m_stereoLink;
 
 } ;
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

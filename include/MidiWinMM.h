@@ -38,6 +38,10 @@
 class QLineEdit;
 
 
+namespace lmms
+{
+
+
 class MidiWinMM : public QObject, public MidiClient
 {
 	Q_OBJECT
@@ -64,7 +68,7 @@ public:
 
 
 	virtual void processOutEvent( const MidiEvent & _me,
-						const MidiTime & _time,
+						const TimePos & _time,
 						const MidiPort * _port );
 
 	virtual void applyPortMode( MidiPort * _port );
@@ -130,7 +134,7 @@ private:
 	QMap<HMIDIOUT, QString> m_outputDevices;
 
 	// subscriptions
-	typedef QMap<QString, MidiPortList> SubMap;
+	using SubMap = QMap<QString, MidiPortList>;
 	SubMap m_inputSubs;
 	SubMap m_outputSubs;
 
@@ -141,7 +145,10 @@ signals:
 
 } ;
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_BUILD_WIN32
 
 #endif
 

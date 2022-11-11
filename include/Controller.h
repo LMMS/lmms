@@ -33,12 +33,20 @@
 #include "JournallingObject.h"
 #include "ValueBuffer.h"
 
-class ControllerDialog;
+namespace lmms
+{
+
 class Controller;
 class ControllerConnection;
 
-typedef QVector<Controller *> ControllerVector;
+namespace gui
+{
 
+class ControllerDialog;
+
+} // namespace gui
+
+using ControllerVector = QVector<Controller*>;
 
 class LMMS_EXPORT Controller : public Model, public JournallingObject
 {
@@ -60,7 +68,7 @@ public:
 	Controller( ControllerTypes _type, Model * _parent,
 						const QString & _display_name );
 
-	virtual ~Controller();
+	~Controller() override;
 
 	virtual float currentValue( int _offset );
 	// The per-controller get-value-in-buffers function
@@ -101,9 +109,9 @@ public:
 	}
 
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
-	virtual void loadSettings( const QDomElement & _this );
-	virtual QString nodeName() const;
+	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
+	void loadSettings( const QDomElement & _this ) override;
+	QString nodeName() const override;
 
 	static Controller * create( ControllerTypes _tt, Model * _parent );
 	static Controller * create( const QDomElement & _this,
@@ -132,7 +140,7 @@ public:
 	bool hasModel( const Model * m ) const;
 
 public slots:
-	virtual ControllerDialog * createDialog( QWidget * _parent );
+	virtual gui::ControllerDialog * createDialog( QWidget * _parent );
 
 	virtual void setName( const QString & _new_name )
 	{
@@ -166,12 +174,15 @@ protected:
 
 
 signals:
-	// The value changed while the mixer isn't running (i.e: MIDI CC)
+	// The value changed while the audio engine isn't running (i.e: MIDI CC)
 	void valueChanged();
 
-	friend class ControllerDialog;
+	friend class gui::ControllerDialog;
 
 } ;
+
+
+} // namespace lmms
 
 #endif
 

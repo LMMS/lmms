@@ -34,15 +34,17 @@
 
 class QPixmap;
 
+namespace lmms::gui
+{
 
 class GroupBox : public QWidget, public BoolModelView
 {
 	Q_OBJECT
 public:
-	GroupBox( const QString & _caption, QWidget * _parent = NULL );
-	virtual ~GroupBox();
+	GroupBox( const QString & _caption, QWidget * _parent = nullptr );
+	~GroupBox() override;
 
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	PixmapButton * ledButton()
 	{
@@ -56,8 +58,8 @@ public:
 
 
 protected:
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void paintEvent( QPaintEvent * _pe );
+	void mousePressEvent( QMouseEvent * _me ) override;
+	void paintEvent( QPaintEvent * _pe ) override;
 
 
 private:
@@ -70,6 +72,7 @@ private:
 } ;
 
 
+} // namespace lmms::gui
 
 
 #endif
