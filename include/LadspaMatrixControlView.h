@@ -44,7 +44,6 @@ class LMMS_EXPORT LadspaMatrixControlView : public QWidget, public ModelView
 	Q_OBJECT
 public:
 	LadspaMatrixControlView( QWidget * parent, LadspaControl * ladspaControl );
-	virtual ~LadspaMatrixControlView();
 
 private:
 	LadspaControl * m_ladspaControl;

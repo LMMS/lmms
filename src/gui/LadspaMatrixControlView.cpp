@@ -86,11 +86,4 @@ LadspaMatrixControlView::LadspaMatrixControlView( QWidget * parent,
 	}
 }
 
-
-
-
-LadspaMatrixControlView::~LadspaMatrixControlView()
-{
-}
-
 } // namespace lmms::gui

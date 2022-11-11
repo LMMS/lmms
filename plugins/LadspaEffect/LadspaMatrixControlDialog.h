@@ -47,7 +47,6 @@ class LadspaMatrixControlDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	LadspaMatrixControlDialog( LadspaControls * _ctl );
-	~LadspaMatrixControlDialog();
 
 	virtual bool isResizable() const { return true; }
 

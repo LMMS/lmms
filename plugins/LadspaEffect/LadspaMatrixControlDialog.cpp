@@ -76,13 +76,6 @@ LadspaMatrixControlDialog::LadspaMatrixControlDialog( LadspaControls * ladspaCon
 
 
 
-LadspaMatrixControlDialog::~LadspaMatrixControlDialog()
-{
-}
-
-
-
-
 void LadspaMatrixControlDialog::updateEffectView( LadspaControls * ladspaControls )
 {
 	QList<QWidget *> list = findChildren<QWidget *>();
