@@ -78,10 +78,9 @@ LadspaMatrixControlDialog::LadspaMatrixControlDialog(LadspaControls * ladspaCont
 
 void LadspaMatrixControlDialog::updateEffectView(LadspaControls * ladspaControls)
 {
-	QList<QWidget *> list = findChildren<QWidget *>();
-	for (QList<QWidget *>::iterator it = list.begin(); it != list.end(); ++it)
+	for (auto child : findChildren<QWidget *>())
 	{
-		delete *it;
+		delete child;
 	}
 
 	m_effectControls = ladspaControls;
@@ -104,14 +103,9 @@ void LadspaMatrixControlDialog::updateEffectView(LadspaControls * ladspaControls
 
 		gridLayout->addWidget(new QLabel("<b>" + channelString.arg(QString::number(i + 1)) + "</b>", widget), 0, currentChannelColumn, Qt::AlignHCenter);
 
-		control_list_t & controls = ladspaControls->m_controls[i];
-
 		int currentRow = 1;
-		control_list_t::iterator end = controls.end();
-		for (control_list_t::iterator it = controls.begin(); it != end; ++it)
+		for (auto ladspaControl : ladspaControls->m_controls[i])
 		{
-			LadspaControl * ladspaControl = *it;
-
 			if (i == 0)
 			{
 				// TODO Assumes that all processors are equal! Change to more general approach, e.g. map from name to row
