@@ -164,8 +164,8 @@ void LadspaMatrixControlDialog::updateEffectView( LadspaControls * ladspaControl
 		m_stereoLink->setModel( &ladspaControls->m_stereoLinkModel );
 	}
 
-	connect( ladspaControls, SIGNAL( effectModelChanged( LadspaControls * ) ),
-				this, SLOT( updateEffectView( LadspaControls * ) ),
+	connect( ladspaControls, SIGNAL( effectModelChanged( lmms::LadspaControls * ) ),
+				this, SLOT( updateEffectView( lmms::LadspaControls * ) ),
 							Qt::DirectConnection );
 }
 

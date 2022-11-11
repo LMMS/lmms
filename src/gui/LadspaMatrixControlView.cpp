@@ -56,7 +56,7 @@ LadspaMatrixControlView::LadspaMatrixControlView( QWidget * parent,
 		case TOGGLED:
 		{
 			LedCheckBox * toggle = new LedCheckBox(
-				"", this, QString::null, LedCheckBox::Green );
+				"", this, QString(), LedCheckBox::Green );
 			toggle->setModel( m_ladspaControl->toggledModel() );
 			layout->addWidget( toggle );
 			setFixedSize( toggle->width(), toggle->height() );
@@ -81,7 +81,6 @@ LadspaMatrixControlView::LadspaMatrixControlView( QWidget * parent,
 	if( knob != NULL )
 	{
 		knob->setHintText( tr( "Value:" ), "" );
-		knob->setWhatsThis( tr( "Sorry, no help available." ) );
 		layout->addWidget( knob );
 		setFixedSize( knob->width(), knob->height() );
 	}
