@@ -164,9 +164,9 @@ void LadspaMatrixControlDialog::updateEffectView( LadspaControls * ladspaControl
 		m_stereoLink->setModel( &ladspaControls->m_stereoLinkModel );
 	}
 
-	connect( ladspaControls, SIGNAL( effectModelChanged( lmms::LadspaControls * ) ),
-				this, SLOT( updateEffectView( lmms::LadspaControls * ) ),
-							Qt::DirectConnection );
+	connect(ladspaControls, &LadspaControls::effectModelChanged,
+				this, &LadspaMatrixControlDialog::updateEffectView,
+				Qt::DirectConnection);
 }
 
 } // namespace lmms::gui
