@@ -48,7 +48,7 @@ LadspaMatrixControlView::LadspaMatrixControlView(QWidget * parent,
 	layout->setMargin(0);
 	layout->setSpacing(0);
 
-	Knob * knob = NULL;
+	Knob * knob = nullptr;
 
 	buffer_data_t dataType = m_ladspaControl->port()->data_type;
 	switch (dataType)
@@ -78,7 +78,7 @@ LadspaMatrixControlView::LadspaMatrixControlView(QWidget * parent,
 			break;
 	}
 
-	if (knob != NULL)
+	if (knob != nullptr)
 	{
 		knob->setHintText(tr("Value:"), "");
 		layout->addWidget(knob);

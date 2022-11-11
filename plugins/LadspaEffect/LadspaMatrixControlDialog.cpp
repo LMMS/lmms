@@ -52,8 +52,8 @@ static int const s_channelBaseColumn = 4;
 
 LadspaMatrixControlDialog::LadspaMatrixControlDialog(LadspaControls * ladspaControls) :
 	EffectControlDialog(ladspaControls),
-	m_effectGridLayout(NULL),
-	m_stereoLink(NULL)
+	m_effectGridLayout(nullptr),
+	m_stereoLink(nullptr)
 {
 	QVBoxLayout * mainLayout = new QVBoxLayout(this);
 
@@ -152,7 +152,7 @@ void LadspaMatrixControlDialog::updateEffectView(LadspaControls * ladspaControls
 	m_effectGridLayout->addWidget(scrollArea, 0, 0);
 	m_effectGridLayout->setMargin(0);
 
-	if (numberOfChannels > 1 && m_stereoLink != NULL)
+	if (numberOfChannels > 1 && m_stereoLink != nullptr)
 	{
 		m_stereoLink->setModel(&ladspaControls->m_stereoLinkModel);
 	}
