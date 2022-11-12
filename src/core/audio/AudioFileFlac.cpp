@@ -96,7 +96,7 @@ void AudioFileFlac::writeBuffer(surroundSampleFrame const* _ab, fpp_t const fram
 
 	if (depth == OutputSettings::Depth_24Bit || depth == OutputSettings::Depth_32Bit) // Float encoding
 	{
-		auto buf = std::make_unique<sample_t[]>(frames * channels());
+		auto buf = std::vector<sample_t>(frames * channels());
 		for(fpp_t frame = 0; frame < frames; ++frame)
 		{
 			for(ch_cnt_t channel=0; channel<channels(); ++channel)
@@ -107,7 +107,7 @@ void AudioFileFlac::writeBuffer(surroundSampleFrame const* _ab, fpp_t const fram
 				buf[frame*channels() + channel] = qMax( clipvalue, _ab[frame][channel] * master_gain );
 			}
 		}
-		sf_writef_float(m_sf,static_cast<float*>(buf.get()),frames);
+		sf_writef_float(m_sf, static_cast<float*>(buf.data()), frames);
 	}
 	else // integer PCM encoding
 	{
