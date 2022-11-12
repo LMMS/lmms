@@ -86,11 +86,15 @@ bool VstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 	if( m_plugin )
 	{
 		const float d = dryLevel();
-		auto buf = std::vector<sampleFrame>{static_cast<size_t>(_frames)};
-		memcpy(buf.data(), _buf, sizeof(sampleFrame) * _frames);
+#ifdef __GNUC__
+		sampleFrame buf[_frames];
+#else
+		sampleFrame * buf = new sampleFrame[_frames];
+#endif
+		memcpy( buf, _buf, sizeof( sampleFrame ) * _frames );
 		if (m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0))
 		{
-			m_plugin->process(buf.data(), buf.data());
+			m_plugin->process( buf, buf );
 			m_pluginMutex.unlock();
 		}
 
@@ -105,6 +109,9 @@ bool VstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 		{
 			out_sum += _buf[f][0]*_buf[f][0] + _buf[f][1]*_buf[f][1];
 		}
+#ifndef __GNUC__
+		delete[] buf;
+#endif
 
 		checkGate( out_sum / _frames );
 	}

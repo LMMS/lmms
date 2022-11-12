@@ -443,8 +443,8 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			}
 
 			// Load this note's data
-			auto sampleData = std::vector<sampleFrame>{static_cast<size_t>(samples)};
-			loadSample(sample, sampleData.data(), samples);
+			sampleFrame sampleData[samples];
+			loadSample(sample, sampleData, samples);
 
 			// Apply ADSR using a copy so if we don't use these samples when
 			// resampling, the ADSR doesn't get messed up
@@ -460,10 +460,10 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			// Output the data resampling if needed
 			if( resample == true )
 			{
-				auto convertBuf = std::vector<sampleFrame>{static_cast<size_t>(frames)};
+				sampleFrame convertBuf[frames];
 
 				// Only output if resampling is successful (note that "used" is output)
-				if (sample.convertSampleRate(*sampleData.data(), *convertBuf.data(), samples, frames, freq_factor, used))
+				if (sample.convertSampleRate(*sampleData, *convertBuf, samples, frames, freq_factor, used))
 				{
 					for( f_cnt_t i = 0; i < frames; ++i )
 					{
@@ -531,7 +531,7 @@ void GigInstrument::loadSample( GigSample& sample, sampleFrame* sampleData, f_cn
 	}
 
 	unsigned long allocationsize = samples * sample.sample->FrameSize;
-	auto buffer = std::vector<int8_t>(allocationsize);
+	int8_t buffer[allocationsize];
 
 	// Load the sample in different ways depending on if we're looping or not
 	if( loop == true && ( sample.pos >= loopStart || sample.pos + samples > loopStart ) )
