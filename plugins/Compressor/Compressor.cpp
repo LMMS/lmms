@@ -293,7 +293,7 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	for(fpp_t f = 0; f < frames; ++f)
 	{
 		auto drySignal = std::array{buf[f][0], buf[f][1]};
-		sample_t s[2] = {drySignal[0] * m_inGainVal, drySignal[1] * m_inGainVal};
+		auto s = std::array{drySignal[0] * m_inGainVal, drySignal[1] * m_inGainVal};
 
 		// Calculate tilt filters, to bias the sidechain to the low or high frequencies
 		if (m_tiltVal)
