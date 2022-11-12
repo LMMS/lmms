@@ -5,9 +5,9 @@
   <song>
     <trackcontainer width="600" x="5" y="5" maximized="0" height="300" visible="1" type="song" minimized="0">
       <track muted="0" type="0" name="TripleOscillator" solo="0">
-        <instrumenttrack pan="0" fxch="0" usemasterpitch="1" pitchrange="1" pitch="0" basenote="57" vol="100">
+        <instrumenttrack pan="0" mixch="0" usemasterpitch="1" pitchrange="1" pitch="0" basenote="57" vol="100">
           <instrument name="tripleoscillator">
-            <tripleoscillator phoffset2="0" userwavefile0="" finer0="0" userwavefile1="" finer1="0" userwavefile2="" finer2="0" coarse0="0" coarse1="-12" coarse2="-24" finel0="0" finel1="0" modalgo1="2" modalgo2="2" finel2="0" pan0="0" modalgo3="2" pan1="0" stphdetun0="0" pan2="0" stphdetun1="0" wavetype0="0" stphdetun2="0" wavetype1="0" wavetype2="0" vol0="33" vol1="33" phoffset0="0" phoffset1="0" vol2="33"/>
+            <tripleoscillator phoffset2="0" userwavefile0="" finer0="0" userwavefile1="" finer1="0" userwavefile2="" finer2="0" coarse0="0" coarse1="-12" coarse2="-24" finel0="0" finel1="0" modalgo1="2" modalgo2="2" finel2="0" pan0="0" modalgo3="2" pan1="0" stphdetun0="0" pan2="0" stphdetun1="0" wavetype0="0" stphdetun2="0" wavetype1="0" wavetype2="0" vol0="33" vol1="33" phoffset0="0" phoffset1="0" vol2="33" useWaveTable1="1" useWaveTable2="1" useWaveTable3="1"/>
           </instrument>
           <eldata fres="0.5" ftype="0" fcut="14000" fwet="0">
             <elvol lspd_denominator="4" sustain="0.5" pdel="0" userwavefile="" dec="0.5" lamt="0" latt="0" rel="0.1" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lspd_syncmode="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
@@ -25,11 +25,11 @@
           <fxchain numofeffects="0" enabled="0"/>
         </sampletrack>
       </track>
-      <track muted="0" type="1" name="Beat/Bassline 0" solo="0">
+      <track muted="0" type="1" name="Pattern 0" solo="0">
         <bbtrack>
           <trackcontainer width="640" x="610" y="5" maximized="0" height="400" visible="0" type="bbtrackcontainer" minimized="0">
             <track muted="0" type="0" name="Kicker" solo="0">
-              <instrumenttrack pan="0" fxch="0" usemasterpitch="1" pitchrange="1" pitch="0" basenote="57" vol="100">
+              <instrumenttrack pan="0" mixch="0" usemasterpitch="1" pitchrange="1" pitch="0" basenote="57" vol="100">
                 <instrument name="kicker">
                   <kicker decay_numerator="4" decay_denominator="4" distend="0.8" click="0.4" endnote="0" version="1" decay_syncmode="0" decay="440" noise="0" slope="0.06" dist="0.8" env="0.163" startnote="1" startfreq="150" endfreq="40" gain="1"/>
                 </instrument>
@@ -70,16 +70,179 @@
         <object id="5865711"/>
       </automationpattern>
     </track>
-    <fxmixer width="543" x="5" y="310" maximized="0" height="335" visible="1" minimized="0">
-      <fxchannel num="0" muted="0" volume="1" name="Master" soloed="0">
+    <mixer width="543" x="5" y="310" maximized="0" height="335" visible="1" minimized="0">
+      <mixerchannel num="0" muted="0" volume="1" name="Master" soloed="0">
         <fxchain numofeffects="0" enabled="0"/>
-      </fxchannel>
-    </fxmixer>
+      </mixerchannel>
+    </mixer>
     <ControllerRackView width="350" x="680" y="310" maximized="0" height="200" visible="1" minimized="0"/>
     <pianoroll width="640" x="5" y="5" maximized="0" height="480" visible="0" minimized="0"/>
     <automationeditor width="640" x="-36" y="0" maximized="0" height="400" visible="0" minimized="0"/>
     <projectnotes width="640" x="700" y="10" maximized="0" height="400" visible="0" minimized="0"></projectnotes>
     <timeline lp1pos="192" lp0pos="0" lpstate="0"/>
     <controllers/>
+    <scales>
+      <scale description="12-tone EDO (default)">
+        <interval num="1" den="1"/>
+        <interval cents="100"/>
+        <interval cents="200"/>
+        <interval cents="300"/>
+        <interval cents="400"/>
+        <interval cents="500"/>
+        <interval cents="600"/>
+        <interval cents="700"/>
+        <interval cents="800"/>
+        <interval cents="900"/>
+        <interval cents="1000"/>
+        <interval cents="1100"/>
+        <interval num="2" den="1"/>
+      </scale>
+      <scale description="24-tone EDO">
+        <interval num="1" den="1"/>
+        <interval cents="50"/>
+        <interval cents="100"/>
+        <interval cents="150"/>
+        <interval cents="200"/>
+        <interval cents="250"/>
+        <interval cents="300"/>
+        <interval cents="350"/>
+        <interval cents="400"/>
+        <interval cents="450"/>
+        <interval cents="500"/>
+        <interval cents="550"/>
+        <interval cents="600"/>
+        <interval cents="650"/>
+        <interval cents="700"/>
+        <interval cents="750"/>
+        <interval cents="800"/>
+        <interval cents="850"/>
+        <interval cents="900"/>
+        <interval cents="950"/>
+        <interval cents="1000"/>
+        <interval cents="1050"/>
+        <interval cents="1100"/>
+        <interval cents="1150"/>
+        <interval num="2" den="1"/>
+      </scale>
+      <scale description="7-tone JI C-major (Ptolemaic)">
+        <interval num="1" den="1"/>
+        <interval num="9" den="8"/>
+        <interval num="5" den="4"/>
+        <interval num="4" den="3"/>
+        <interval num="3" den="2"/>
+        <interval num="5" den="3"/>
+        <interval num="15" den="8"/>
+        <interval num="2" den="1"/>
+      </scale>
+      <scale description="12-tone JI (3-limit / Pythagorean)">
+        <interval num="1" den="1"/>
+        <interval num="256" den="243"/>
+        <interval num="9" den="8"/>
+        <interval num="32" den="27"/>
+        <interval num="81" den="64"/>
+        <interval num="4" den="3"/>
+        <interval num="729" den="512"/>
+        <interval num="3" den="2"/>
+        <interval num="128" den="81"/>
+        <interval num="27" den="16"/>
+        <interval num="16" den="9"/>
+        <interval num="243" den="128"/>
+        <interval num="2" den="1"/>
+      </scale>
+      <scale description="5-tone A-minor (3-limit / Pythagorean)">
+        <interval num="1" den="1"/>
+        <interval num="32" den="27"/>
+        <interval num="4" den="3"/>
+        <interval num="3" den="2"/>
+        <interval num="16" den="9"/>
+        <interval num="2" den="1"/>
+      </scale>
+    </scales>
+    <keymaps>
+      <keymap middle_key="0" description="all keys 1:1 (default)" base_freq="440" last_key="127" first_key="0" base_key="69">
+      </keymap>
+      <keymap middle_key="60" description="white keys to 7 degrees" base_freq="440" last_key="127" first_key="0" base_key="69">
+        <degree value="0"/>
+        <degree value="-1"/>
+        <degree value="1"/>
+        <degree value="-1"/>
+        <degree value="2"/>
+        <degree value="3"/>
+        <degree value="-1"/>
+        <degree value="4"/>
+        <degree value="-1"/>
+        <degree value="5"/>
+        <degree value="-1"/>
+        <degree value="6"/>
+      </keymap>
+      <keymap middle_key="60" description="white keys to 12 degrees" base_freq="440" last_key="127" first_key="0" base_key="69">
+        <degree value="0"/>
+        <degree value="-1"/>
+        <degree value="2"/>
+        <degree value="-1"/>
+        <degree value="4"/>
+        <degree value="5"/>
+        <degree value="-1"/>
+        <degree value="7"/>
+        <degree value="-1"/>
+        <degree value="9"/>
+        <degree value="-1"/>
+        <degree value="11"/>
+      </keymap>
+      <keymap middle_key="60" description="white keys to 24 degrees" base_freq="440" last_key="127" first_key="0" base_key="69">
+        <degree value="0"/>
+        <degree value="-1"/>
+        <degree value="2"/>
+        <degree value="-1"/>
+        <degree value="4"/>
+        <degree value="5"/>
+        <degree value="-1"/>
+        <degree value="7"/>
+        <degree value="-1"/>
+        <degree value="9"/>
+        <degree value="-1"/>
+        <degree value="11"/>
+        <degree value="12"/>
+        <degree value="-1"/>
+        <degree value="14"/>
+        <degree value="-1"/>
+        <degree value="16"/>
+        <degree value="17"/>
+        <degree value="-1"/>
+        <degree value="19"/>
+        <degree value="-1"/>
+        <degree value="21"/>
+        <degree value="-1"/>
+        <degree value="23"/>
+      </keymap>
+      <keymap middle_key="60" description="black keys to 5 degrees" base_freq="440" last_key="127" first_key="0" base_key="61">
+        <degree value="-1"/>
+        <degree value="0"/>
+        <degree value="-1"/>
+        <degree value="1"/>
+        <degree value="-1"/>
+        <degree value="-1"/>
+        <degree value="2"/>
+        <degree value="-1"/>
+        <degree value="3"/>
+        <degree value="-1"/>
+        <degree value="4"/>
+        <degree value="-1"/>
+      </keymap>
+      <keymap middle_key="60" description="black keys to 12 degrees" base_freq="466.165" last_key="127" first_key="0" base_key="70">
+        <degree value="-1"/>
+        <degree value="1"/>
+        <degree value="-1"/>
+        <degree value="3"/>
+        <degree value="-1"/>
+        <degree value="-1"/>
+        <degree value="6"/>
+        <degree value="-1"/>
+        <degree value="8"/>
+        <degree value="-1"/>
+        <degree value="10"/>
+        <degree value="-1"/>
+      </keymap>
+    </keymaps>
   </song>
 </lmms-project>

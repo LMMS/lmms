@@ -27,10 +27,18 @@
 
 #include "ComboBoxModel.h"
 
+namespace lmms
+{
+
 
 class InstrumentTrack;
 class EnvelopeAndLfoParameters;
 class NotePlayHandle;
+
+namespace gui
+{
+class InstrumentSoundShapingView;
+}
 
 
 class InstrumentSoundShaping : public Model, public JournallingObject
@@ -38,7 +46,7 @@ class InstrumentSoundShaping : public Model, public JournallingObject
 	Q_OBJECT
 public:
 	InstrumentSoundShaping( InstrumentTrack * _instrument_track );
-	virtual ~InstrumentSoundShaping();
+	~InstrumentSoundShaping() override = default;
 
 	void processAudioBuffer( sampleFrame * _ab, const fpp_t _frames,
 							NotePlayHandle * _n );
@@ -57,9 +65,9 @@ public:
 	float volumeLevel( NotePlayHandle * _n, const f_cnt_t _frame );
 
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName() const
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
+	inline QString nodeName() const override
 	{
 		return "eldata";
 	}
@@ -74,12 +82,14 @@ private:
 	FloatModel m_filterCutModel;
 	FloatModel m_filterResModel;
 
-	static const QString targetNames[InstrumentSoundShaping::NumTargets][3];
+	static const char *const targetNames[InstrumentSoundShaping::NumTargets][3];
 
 
-	friend class InstrumentSoundShapingView;
+	friend class gui::InstrumentSoundShapingView;
 
 } ;
 
+
+} // namespace lmms
 
 #endif

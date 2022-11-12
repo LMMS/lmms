@@ -36,37 +36,43 @@
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
 
-
-class LcdSpinBox;
 class QLineEdit;
+
+namespace lmms
+{
+
+namespace gui
+{
+class LcdSpinBox;
+}
 
 
 class AudioPulseAudio : public QThread, public AudioDevice
 {
 	Q_OBJECT
 public:
-	AudioPulseAudio( bool & _success_ful, Mixer* mixer );
-	virtual ~AudioPulseAudio();
+	AudioPulseAudio( bool & _success_ful, AudioEngine* audioEngine );
+	~AudioPulseAudio() override;
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "setupWidget", "PulseAudio" );
+		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget", "PulseAudio" );
 	}
 
 	static QString probeDevice();
 
 
-	class setupWidget : public AudioDeviceSetupWidget
+	class setupWidget : public gui::AudioDeviceSetupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );
-		virtual ~setupWidget();
+		~setupWidget() override;
 
-		virtual void saveSettings();
+		void saveSettings() override;
 
 	private:
 		QLineEdit * m_device;
-		LcdSpinBox * m_channels;
+		gui::LcdSpinBox * m_channels;
 
 	} ;
 
@@ -80,10 +86,10 @@ public:
 
 
 private:
-	virtual void startProcessing();
-	virtual void stopProcessing();
-	virtual void applyQualitySettings();
-	virtual void run();
+	void startProcessing() override;
+	void stopProcessing() override;
+	void applyQualitySettings() override;
+	void run() override;
 
 	volatile bool m_quit;
 
@@ -94,6 +100,8 @@ private:
 
 } ;
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_HAVE_PULSEAUDIO
 
 #endif

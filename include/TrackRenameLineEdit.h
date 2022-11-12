@@ -29,6 +29,9 @@
 
 #include <QLineEdit>
 
+namespace lmms::gui
+{
+
 class TrackRenameLineEdit : public QLineEdit
 {
 	Q_OBJECT
@@ -37,10 +40,12 @@ public:
 	void show();
 	
 protected:
-	virtual void keyPressEvent( QKeyEvent * ke );
+	void keyPressEvent( QKeyEvent * ke ) override;
 	
 private:
 	QString m_oldName;
 } ;
+
+} // namespace lmms::gui
 
 #endif

@@ -34,46 +34,53 @@
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
 
-
-class LcdSpinBox;
 class QLineEdit;
+
+namespace lmms
+{
+
+namespace gui
+{
+class LcdSpinBox;
+}
+
 
 
 class AudioOss : public QThread, public AudioDevice
 {
 	Q_OBJECT
 public:
-	AudioOss( bool & _success_ful, Mixer* mixer );
-	virtual ~AudioOss();
+	AudioOss( bool & _success_ful, AudioEngine* audioEngine );
+	~AudioOss() override;
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "setupWidget", "OSS (Open Sound System)" );
+		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget", "OSS (Open Sound System)" );
 	}
 
 	static QString probeDevice();
 
 
-	class setupWidget : public AudioDeviceSetupWidget
+class setupWidget : public gui::AudioDeviceSetupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );
-		virtual ~setupWidget();
+		~setupWidget() override;
 
-		virtual void saveSettings();
+		void saveSettings() override;
 
 	private:
 		QLineEdit * m_device;
-		LcdSpinBox * m_channels;
+		gui::LcdSpinBox * m_channels;
 
 	} ;
 
 
 private:
-	virtual void startProcessing();
-	virtual void stopProcessing();
-	virtual void applyQualitySettings();
-	virtual void run();
+	void startProcessing() override;
+	void stopProcessing() override;
+	void applyQualitySettings() override;
+	void run() override;
 
 	int m_audioFD;
 
@@ -81,7 +88,8 @@ private:
 
 } ;
 
+} // namespace lmms
 
-#endif
+#endif // LMMS_HAVE_OSS
 
 #endif

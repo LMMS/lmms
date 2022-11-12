@@ -30,7 +30,6 @@
 #ifdef LMMS_HAVE_SDL
 
 #ifdef LMMS_HAVE_SDL2
-#include <SDL2/SDL.h>
 #include <SDL2/SDL_audio.h>
 #else
 #include <SDL/SDL.h>
@@ -42,27 +41,29 @@
 
 class QLineEdit;
 
+namespace lmms
+{
 
 class AudioSdl : public AudioDevice
 {
 public:
-	AudioSdl( bool & _success_ful, Mixer* mixer );
-	virtual ~AudioSdl();
+	AudioSdl( bool & _success_ful, AudioEngine* audioEngine );
+	~AudioSdl() override;
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "setupWidget",
+		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget",
 					"SDL (Simple DirectMedia Layer)" );
 	}
 
 
-	class setupWidget : public AudioDeviceSetupWidget
+	class setupWidget : public gui::AudioDeviceSetupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );
-		virtual ~setupWidget();
+		~setupWidget() override = default;
 
-		virtual void saveSettings();
+		void saveSettings() override;
 
 	private:
 		QLineEdit * m_device;
@@ -71,9 +72,9 @@ public:
 
 
 private:
-	virtual void startProcessing();
-	virtual void stopProcessing();
-	virtual void applyQualitySettings();
+	void startProcessing() override;
+	void stopProcessing() override;
+	void applyQualitySettings() override;
 
 	static void sdlAudioCallback( void * _udata, Uint8 * _buf, int _len );
 	void sdlAudioCallback( Uint8 * _buf, int _len );
@@ -109,6 +110,9 @@ private:
 
 } ;
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_HAVE_SDL
 
 #endif

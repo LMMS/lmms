@@ -3,7 +3,6 @@
 #
 #  WINE_FOUND - System has wine
 #  WINE_INCLUDE_DIRS - The wine include directories
-#  WINE_LIBRARIES - The libraries needed to use wine
 #  WINE_DEFINITIONS - Compiler switches required for using wine
 #
 
@@ -11,8 +10,16 @@ MACRO(_findwine_find_flags output expression result)
 	STRING(REPLACE " " ";" WINEBUILD_FLAGS "${output}")
 	FOREACH(FLAG ${WINEBUILD_FLAGS})
 		IF("${FLAG}" MATCHES "${expression}")
-			SET(${result} "${FLAG}")
+			LIST(APPEND ${result} "${FLAG}")
 		ENDIF()
+	ENDFOREACH()
+ENDMACRO()
+
+MACRO(_regex_replace_foreach EXPRESSION REPLACEMENT RESULT INPUT)
+	SET(${RESULT} "")
+	FOREACH(ITEM ${INPUT})
+		STRING(REGEX REPLACE "${EXPRESSION}" "${REPLACEMENT}" ITEM "${ITEM}")
+		LIST(APPEND ${RESULT} "${ITEM}")
 	ENDFOREACH()
 ENDMACRO()
 
@@ -31,10 +38,10 @@ IF(WINE_CXX)
 	_findwine_find_flags("${WINEBUILD_OUTPUT_32}" "^-isystem" WINEGCC_INCLUDE_DIR)
 	_findwine_find_flags("${WINEBUILD_OUTPUT_32}" "libwinecrt0\\.a.*" WINECRT_32)
 	_findwine_find_flags("${WINEBUILD_OUTPUT_64}" "libwinecrt0\\.a.*" WINECRT_64)
-	STRING(REGEX REPLACE "^-isystem" "" WINE_INCLUDE_HINT "${WINEGCC_INCLUDE_DIR}")
-	STRING(REGEX REPLACE "/wine/windows$" "" WINE_INCLUDE_HINT "${WINE_INCLUDE_HINT}")
-	STRING(REGEX REPLACE "libwinecrt0\\.a.*" "" WINE_32_LIBRARY_DIR "${WINECRT_32}")
-	STRING(REGEX REPLACE "libwinecrt0\\.a.*" "" WINE_64_LIBRARY_DIR "${WINECRT_64}")
+	_regex_replace_foreach("^-isystem" "" WINE_INCLUDE_HINT "${WINEGCC_INCLUDE_DIR}")
+	_regex_replace_foreach("/wine/windows$" "" WINE_INCLUDE_HINT "${WINE_INCLUDE_HINT}")
+	STRING(REGEX REPLACE "wine/libwinecrt0\\.a.*" "" WINE_32_LIBRARY_DIR "${WINECRT_32}")
+	STRING(REGEX REPLACE "wine/libwinecrt0\\.a.*" "" WINE_64_LIBRARY_DIR "${WINECRT_64}")
 
 	IF(BUGGED_WINEGCC)
 		MESSAGE(WARNING "Your winegcc is unusable due to https://bugs.winehq.org/show_bug.cgi?id=46293,\n
@@ -52,16 +59,16 @@ IF(WINE_CXX)
 			# WineHQ (/opt/wine-stable, /opt/wine-devel, /opt/wine-staging)
 			STRING(REGEX REPLACE "/lib64/wine/$" "/lib/wine/" WINE_32_LIBRARY_DIR "${WINE_32_LIBRARY_DIR}")
 			STRING(REGEX REPLACE "/lib/wine/$" "/lib64/wine/" WINE_64_LIBRARY_DIR "${WINE_64_LIBRARY_DIR}")
-		ELSEIF(WINE_32_LIBRARY_DIR MATCHES "/lib32/.*/wine/")
+		ELSEIF(WINE_32_LIBRARY_DIR MATCHES "/lib32/")
 			# Systems with old multilib layout
 			STRING(REPLACE "/lib32/" "/lib/" WINE_64_LIBRARY_DIR "${WINE_32_LIBRARY_DIR}")
-		ELSEIF(WINE_32_LIBRARY_DIR MATCHES "/lib64/.*/wine/")
+		ELSEIF(WINE_32_LIBRARY_DIR MATCHES "/lib64/")
 			# We need to test if the corresponding 64bit library directory is lib or lib32
 			STRING(REPLACE "/lib64/" "/lib32/" WINE_32_LIBRARY_DIR "${WINE_64_LIBRARY_DIR}")
 			IF(NOT EXISTS "${WINE_32_LIBRARY_DIR}")
 				STRING(REPLACE "/lib64/" "/lib/" WINE_32_LIBRARY_DIR "${WINE_64_LIBRARY_DIR}")
 			ENDIF()
-		ELSEIF(WINE_32_LIBRARY_DIR MATCHES "/lib/.*/wine/")
+		ELSEIF(WINE_32_LIBRARY_DIR MATCHES "/lib/")
 			# Test if this directory is for 32bit or 64bit
 			STRING(REPLACE "/lib/" "/lib32/" WINE_32_LIBRARY_DIR "${WINE_64_LIBRARY_DIR}")
 			IF(NOT EXISTS "${WINE_32_LIBRARY_DIR}")
@@ -76,23 +83,17 @@ IF(WINE_CXX)
 ENDIF()
 
 FIND_PATH(WINE_INCLUDE_DIR wine/exception.h
-	HINTS "${WINE_INCLUDE_HINT}"
+	HINTS ${WINE_INCLUDE_HINT}
 )
 
 SET(_ARCHITECTURE ${CMAKE_LIBRARY_ARCHITECTURE})
 
-FIND_LIBRARY(WINE_LIBRARY NAMES wine
-	PATH_SUFFIXES wine i386-linux-gnu/wine
-	HINTS "${WINE_32_LIBRARY_DIR}" "${WINE_64_LIBRARY_DIR}"
-)
-
 SET(CMAKE_LIBRARY_ARCHITECTURE ${_ARCHITECTURE})
 
 SET(WINE_INCLUDE_DIRS ${WINE_INCLUDE_DIR} )
-SET(WINE_LIBRARIES ${WINE_LIBRARY})
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(Wine DEFAULT_MSG WINE_CXX WINE_LIBRARIES WINE_INCLUDE_DIRS)
+find_package_handle_standard_args(Wine DEFAULT_MSG WINE_CXX WINE_INCLUDE_DIRS)
 
 mark_as_advanced(WINE_INCLUDE_DIR WINE_LIBRARY WINE_CXX WINE_BUILD)
 
@@ -101,8 +102,8 @@ IF(WINE_32_LIBRARY_DIR)
 		SET(WINE_32_FLAGS "-L${WINE_32_LIBRARY_DIR} -L${WINE_32_LIBRARY_DIR}../")
 		SET(WINE_32_LIBRARY_DIRS "${WINE_32_LIBRARY_DIR}:${WINE_32_LIBRARY_DIR}/..")
 	ELSE()
-		SET(WINE_32_FLAGS "-L${WINE_32_LIBRARY_DIR}")
-		SET(WINE_32_LIBRARY_DIRS "${WINE_32_LIBRARY_DIR}")
+		SET(WINE_32_FLAGS "-L${WINE_32_LIBRARY_DIR} -L${WINE_32_LIBRARY_DIR}wine/")
+		SET(WINE_32_LIBRARY_DIRS "${WINE_32_LIBRARY_DIR}:${WINE_32_LIBRARY_DIR}wine/")
 	ENDIF()
 ENDIF()
 
@@ -111,8 +112,8 @@ IF(WINE_64_LIBRARY_DIR)
 		SET(WINE_64_FLAGS "-L${WINE_64_LIBRARY_DIR} -L${WINE_64_LIBRARY_DIR}../")
 		SET(WINE_64_LIBRARY_DIRS "${WINE_64_LIBRARY_DIR}:${WINE_64_LIBRARY_DIR}/..")
 	ELSE()
-		SET(WINE_64_FLAGS "-L${WINE_64_LIBRARY_DIR}")
-		SET(WINE_64_LIBRARY_DIRS "${WINE_64_LIBRARY_DIR}")
+		SET(WINE_64_FLAGS "-L${WINE_64_LIBRARY_DIR} -L${WINE_64_LIBRARY_DIR}wine/")
+		SET(WINE_64_LIBRARY_DIRS "${WINE_64_LIBRARY_DIR}:${WINE_64_LIBRARY_DIR}wine/")
 	ENDIF()
 ENDIF()
 

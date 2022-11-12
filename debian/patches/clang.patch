@@ -57,10 +57,10 @@ Index: lmms-1.1.3/plugins/LadspaEffect/calf/CMakeLists.txt
  
  IF(LMMS_BUILD_WIN32)
  	ADD_CUSTOM_COMMAND(TARGET calf POST_BUILD COMMAND "${STRIP}" "\"${CMAKE_CURRENT_BINARY_DIR}/calf.dll\"")
-Index: lmms-1.1.3/plugins/LadspaEffect/calf/src/calf/metadata.h
+Index: lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/metadata.h
 ===================================================================
---- lmms-1.1.3.orig/plugins/LadspaEffect/calf/src/calf/metadata.h	2017-01-03 17:41:17.000000000 +0100
-+++ lmms-1.1.3/plugins/LadspaEffect/calf/src/calf/metadata.h	2017-01-03 17:50:40.000000000 +0100
+--- lmms-1.1.3.orig/plugins/LadspaEffect/calf/veal/src/calf/metadata.h	2017-01-03 17:41:17.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/metadata.h	2017-01-03 17:50:40.000000000 +0100
 @@ -51,7 +51,7 @@
      enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, rt_capable = true, require_midi = false, support_midi = false };
      PLUGIN_NAME_ID_LABEL("filter", "filter", "Filter")
@@ -88,10 +88,10 @@ Index: lmms-1.1.3/plugins/LadspaEffect/calf/src/calf/metadata.h
      const char *const *get_configure_vars() const;
  };
  
-Index: lmms-1.1.3/plugins/LadspaEffect/calf/src/calf/modules.h
+Index: lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/modules.h
 ===================================================================
---- lmms-1.1.3.orig/plugins/LadspaEffect/calf/src/calf/modules.h	2017-01-03 19:02:59.000000000 +0100
-+++ lmms-1.1.3/plugins/LadspaEffect/calf/src/calf/modules.h	2017-01-03 19:30:35.000000000 +0100
+--- lmms-1.1.3.orig/plugins/LadspaEffect/calf/veal/src/calf/modules.h	2017-01-03 19:02:59.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/modules.h	2017-01-03 19:30:35.000000000 +0100
 @@ -89,13 +89,14 @@
      using audio_module<Metadata>::ins;
      using audio_module<Metadata>::outs;
@@ -117,10 +117,10 @@ Index: lmms-1.1.3/plugins/LadspaEffect/calf/src/calf/modules.h
      {
          last_generation = 0;
          old_mode = old_resonance = old_cutoff = -1;
-Index: lmms-1.1.3/plugins/LadspaEffect/calf/src/calf/modules_comp.h
+Index: lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/modules_comp.h
 ===================================================================
---- lmms-1.1.3.orig/plugins/LadspaEffect/calf/src/calf/modules_comp.h	2017-01-03 19:35:53.000000000 +0100
-+++ lmms-1.1.3/plugins/LadspaEffect/calf/src/calf/modules_comp.h	2017-01-03 19:38:06.000000000 +0100
+--- lmms-1.1.3.orig/plugins/LadspaEffect/calf/veal/src/calf/modules_comp.h	2017-01-03 19:35:53.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/modules_comp.h	2017-01-03 19:38:06.000000000 +0100
 @@ -39,10 +39,10 @@
  class gain_reduction_audio_module
  {
@@ -152,10 +152,10 @@ Index: lmms-1.1.3/plugins/LadspaEffect/calf/src/calf/modules_comp.h
      float f1_active, f2_active;
      stereo_in_out_metering<sidechaincompressor_metadata> meters;
      gain_reduction_audio_module compressor;
-Index: lmms-1.1.3/plugins/LadspaEffect/calf/src/calf/modules_limit.h
+Index: lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/modules_limit.h
 ===================================================================
---- lmms-1.1.3.orig/plugins/LadspaEffect/calf/src/calf/modules_limit.h	2017-01-03 19:39:00.000000000 +0100
-+++ lmms-1.1.3/plugins/LadspaEffect/calf/src/calf/modules_limit.h	2017-01-03 19:40:20.000000000 +0100
+--- lmms-1.1.3.orig/plugins/LadspaEffect/calf/veal/src/calf/modules_limit.h	2017-01-03 19:39:00.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/modules_limit.h	2017-01-03 19:40:20.000000000 +0100
 @@ -37,7 +37,6 @@
  private:
      typedef limiter_audio_module AM;
@@ -172,10 +172,10 @@ Index: lmms-1.1.3/plugins/LadspaEffect/calf/src/calf/modules_limit.h
      float weight[strips];
      float weight_old[strips];
      float limit_old;
-Index: lmms-1.1.3/plugins/LadspaEffect/calf/src/calf/modules_mod.h
+Index: lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/modules_mod.h
 ===================================================================
---- lmms-1.1.3.orig/plugins/LadspaEffect/calf/src/calf/modules_mod.h	2017-01-03 19:41:55.000000000 +0100
-+++ lmms-1.1.3/plugins/LadspaEffect/calf/src/calf/modules_mod.h	2017-01-03 19:42:19.000000000 +0100
+--- lmms-1.1.3.orig/plugins/LadspaEffect/calf/veal/src/calf/modules_mod.h	2017-01-03 19:41:55.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/modules_mod.h	2017-01-03 19:42:19.000000000 +0100
 @@ -160,8 +160,6 @@
      typedef pulsator_audio_module AM;
      uint32_t clip_inL, clip_inR, clip_outL, clip_outR;
@@ -185,10 +185,10 @@ Index: lmms-1.1.3/plugins/LadspaEffect/calf/src/calf/modules_mod.h
      bool clear_reset;
      dsp::simple_lfo lfoL, lfoR;
  public:
-Index: lmms-1.1.3/plugins/LadspaEffect/calf/src/calf/organ.h
+Index: lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/organ.h
 ===================================================================
---- lmms-1.1.3.orig/plugins/LadspaEffect/calf/src/calf/organ.h	2017-01-03 19:43:08.000000000 +0100
-+++ lmms-1.1.3/plugins/LadspaEffect/calf/src/calf/organ.h	2017-01-03 19:53:55.000000000 +0100
+--- lmms-1.1.3.orig/plugins/LadspaEffect/calf/veal/src/calf/organ.h	2017-01-03 19:43:08.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/organ.h	2017-01-03 19:53:55.000000000 +0100
 @@ -318,6 +318,7 @@
      using drawbar_organ::note_on;
      using drawbar_organ::note_off;
@@ -209,10 +209,10 @@ Index: lmms-1.1.3/plugins/LadspaEffect/calf/src/calf/organ.h
      void execute(int cmd_no);
      bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const;
      char *configure(const char *key, const char *value);
-Index: lmms-1.1.3/plugins/LadspaEffect/calf/src/calf/preset.h
+Index: lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/preset.h
 ===================================================================
---- lmms-1.1.3.orig/plugins/LadspaEffect/calf/src/calf/preset.h	2017-01-03 19:57:02.000000000 +0100
-+++ lmms-1.1.3/plugins/LadspaEffect/calf/src/calf/preset.h	2017-01-03 20:00:25.000000000 +0100
+--- lmms-1.1.3.orig/plugins/LadspaEffect/calf/veal/src/calf/preset.h	2017-01-03 19:57:02.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/preset.h	2017-01-03 20:00:25.000000000 +0100
 @@ -27,7 +27,7 @@
  
  namespace calf_plugins {
@@ -222,10 +222,10 @@ Index: lmms-1.1.3/plugins/LadspaEffect/calf/src/calf/preset.h
      
  /// Contents of single preset
  struct plugin_preset
-Index: lmms-1.1.3/plugins/LadspaEffect/calf/src/calf/primitives.h
+Index: lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/primitives.h
 ===================================================================
---- lmms-1.1.3.orig/plugins/LadspaEffect/calf/src/calf/primitives.h	2017-01-03 17:36:12.000000000 +0100
-+++ lmms-1.1.3/plugins/LadspaEffect/calf/src/calf/primitives.h	2017-01-03 16:22:16.000000000 +0100
+--- lmms-1.1.3.orig/plugins/LadspaEffect/calf/veal/src/calf/primitives.h	2017-01-03 17:36:12.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/primitives.h	2017-01-03 16:22:16.000000000 +0100
 @@ -370,11 +370,6 @@
          next_task = (unsigned)-1;
          eob = false;
@@ -253,10 +253,10 @@ Index: lmms-1.1.3/plugins/LadspaEffect/calf/src/calf/primitives.h
      bool is_eob() {
          return eob;
      }
-Index: lmms-1.1.3/plugins/LadspaEffect/calf/src/metadata.cpp
+Index: lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/metadata.cpp
 ===================================================================
---- lmms-1.1.3.orig/plugins/LadspaEffect/calf/src/metadata.cpp	2017-01-03 17:52:03.000000000 +0100
-+++ lmms-1.1.3/plugins/LadspaEffect/calf/src/metadata.cpp	2017-01-03 18:49:18.000000000 +0100
+--- lmms-1.1.3.orig/plugins/LadspaEffect/calf/veal/src/metadata.cpp	2017-01-03 17:52:03.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/metadata.cpp	2017-01-03 18:49:18.000000000 +0100
 @@ -29,6 +29,8 @@
  
  const char *calf_plugins::calf_copyright_info = "(C) 2001-2009 Krzysztof Foltman, Thor Harald Johanssen, Markus Schmidt and others; license: LGPL";
@@ -284,10 +284,10 @@ Index: lmms-1.1.3/plugins/LadspaEffect/calf/src/metadata.cpp
  calf_plugins::plugin_registry::plugin_registry()
  {
      #define PER_MODULE_ITEM(name, isSynth, jackname) plugins.push_back((new name##_metadata));
-Index: lmms-1.1.3/plugins/LadspaEffect/calf/src/modules.cpp
+Index: lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/modules.cpp
 ===================================================================
---- lmms-1.1.3.orig/plugins/LadspaEffect/calf/src/modules.cpp	2017-01-03 19:32:38.000000000 +0100
-+++ lmms-1.1.3/plugins/LadspaEffect/calf/src/modules.cpp	2017-01-03 19:33:13.000000000 +0100
+--- lmms-1.1.3.orig/plugins/LadspaEffect/calf/veal/src/modules.cpp	2017-01-03 19:32:38.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/modules.cpp	2017-01-03 19:33:13.000000000 +0100
 @@ -339,7 +339,7 @@
  ///////////////////////////////////////////////////////////////////////////////////////////////
  
@@ -297,10 +297,10 @@ Index: lmms-1.1.3/plugins/LadspaEffect/calf/src/modules.cpp
  , min_gain(1.0)
  , max_gain(32.0)
  , last_note(-1)
-Index: lmms-1.1.3/plugins/LadspaEffect/swh/flanger_1191.c
+Index: lmms-1.1.3/plugins/LadspaEffect/swh/ladspa/flanger_1191.c
 ===================================================================
---- lmms-1.1.3.orig/plugins/LadspaEffect/swh/flanger_1191.c	2017-01-03 15:44:13.000000000 +0100
-+++ lmms-1.1.3/plugins/LadspaEffect/swh/flanger_1191.c	2017-01-03 15:45:17.000000000 +0100
+--- lmms-1.1.3.orig/plugins/LadspaEffect/swh/ladspa/flanger_1191.c	2017-01-03 15:44:13.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/swh/ladspa/flanger_1191.c	2017-01-03 15:45:17.000000000 +0100
 @@ -266,7 +266,7 @@
  	
  	        // Calculate position in delay table
@@ -319,10 +319,10 @@ Index: lmms-1.1.3/plugins/LadspaEffect/swh/flanger_1191.c
  	        p_ph = n_ph + 0.5f;
  	        while (p_ph > 1.0f) {
  	                p_ph -= 1.0f;
-Index: lmms-1.1.3/plugins/LadspaEffect/swh/gsm/short_term.c
+Index: lmms-1.1.3/plugins/LadspaEffect/swh/ladspa/gsm/short_term.c
 ===================================================================
---- lmms-1.1.3.orig/plugins/LadspaEffect/swh/gsm/short_term.c	2017-01-03 15:35:13.000000000 +0100
-+++ lmms-1.1.3/plugins/LadspaEffect/swh/gsm/short_term.c	2017-01-03 15:35:55.000000000 +0100
+--- lmms-1.1.3.orig/plugins/LadspaEffect/swh/ladspa/gsm/short_term.c	2017-01-03 15:35:13.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/swh/ladspa/gsm/short_term.c	2017-01-03 15:35:55.000000000 +0100
 @@ -53,7 +53,7 @@
  #undef	STEP
  #define	STEP( B, MIC, INVA )	\
@@ -332,10 +332,10 @@ Index: lmms-1.1.3/plugins/LadspaEffect/swh/gsm/short_term.c
  		temp1    = GSM_MULT_R( INVA, temp1 );		\
  		*LARpp++ = GSM_ADD( temp1, temp1 );
  
-Index: lmms-1.1.3/plugins/LadspaEffect/swh/multivoice_chorus_1201.c
+Index: lmms-1.1.3/plugins/LadspaEffect/swh/ladspa/multivoice_chorus_1201.c
 ===================================================================
---- lmms-1.1.3.orig/plugins/LadspaEffect/swh/multivoice_chorus_1201.c	2017-01-03 15:47:51.000000000 +0100
-+++ lmms-1.1.3/plugins/LadspaEffect/swh/multivoice_chorus_1201.c	2017-01-03 15:48:18.000000000 +0100
+--- lmms-1.1.3.orig/plugins/LadspaEffect/swh/ladspa/multivoice_chorus_1201.c	2017-01-03 15:47:51.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/swh/ladspa/multivoice_chorus_1201.c	2017-01-03 15:48:18.000000000 +0100
 @@ -345,7 +345,7 @@
  	        if (count % 16 < laws) {
  	                unsigned int t = count % 16;
@@ -354,10 +354,10 @@ Index: lmms-1.1.3/plugins/LadspaEffect/swh/multivoice_chorus_1201.c
  	                float p_ph = n_ph + 0.5f;
  	                if (p_ph > 1.0f) {
  	                        p_ph -= 1.0f;
-Index: lmms-1.1.3/plugins/LadspaEffect/swh/retro_flange_1208.c
+Index: lmms-1.1.3/plugins/LadspaEffect/swh/ladspa/retro_flange_1208.c
 ===================================================================
---- lmms-1.1.3.orig/plugins/LadspaEffect/swh/retro_flange_1208.c	2017-01-03 15:46:35.000000000 +0100
-+++ lmms-1.1.3/plugins/LadspaEffect/swh/retro_flange_1208.c	2017-01-03 15:47:02.000000000 +0100
+--- lmms-1.1.3.orig/plugins/LadspaEffect/swh/ladspa/retro_flange_1208.c	2017-01-03 15:46:35.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/swh/ladspa/retro_flange_1208.c	2017-01-03 15:47:02.000000000 +0100
 @@ -321,7 +321,7 @@
  	                prev_law_pos = count + law_p;
  	        }
@@ -376,10 +376,10 @@ Index: lmms-1.1.3/plugins/LadspaEffect/swh/retro_flange_1208.c
  	        p_ph = n_ph + 0.5f;
  	        if (p_ph > 1.0f) {
  	                p_ph -= 1.0f;
-Index: lmms-1.1.3/plugins/LadspaEffect/swh/vynil_1905.c
+Index: lmms-1.1.3/plugins/LadspaEffect/swh/ladspa/vynil_1905.c
 ===================================================================
---- lmms-1.1.3.orig/plugins/LadspaEffect/swh/vynil_1905.c	2017-01-03 15:51:56.000000000 +0100
-+++ lmms-1.1.3/plugins/LadspaEffect/swh/vynil_1905.c	2017-01-03 16:01:32.000000000 +0100
+--- lmms-1.1.3.orig/plugins/LadspaEffect/swh/ladspa/vynil_1905.c	2017-01-03 15:51:56.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/swh/ladspa/vynil_1905.c	2017-01-03 16:01:32.000000000 +0100
 @@ -243,6 +243,8 @@
  	buffer_s = malloc(sizeof(LADSPA_Data) * buffer_size);
  	buffer_mask = buffer_size - 1;
@@ -441,10 +441,10 @@ Index: lmms-1.1.3/plugins/MidiImport/portsmf/allegrosmfwr.cpp
  
      int keysig;          // number of sharps (+) or flats (-), -99 for undefined
      char keysig_mode; // 'M' or 'm' for major/minor
-Index: lmms-1.1.3/plugins/delay/stereodelay.cpp
+Index: lmms-1.1.3/plugins/Delay/StereoDelay.cpp
 ===================================================================
---- lmms-1.1.3.orig/plugins/delay/stereodelay.cpp	2017-01-03 13:40:27.000000000 +0100
-+++ lmms-1.1.3/plugins/delay/stereodelay.cpp	2017-01-03 13:42:16.000000000 +0100
+--- lmms-1.1.3.orig/plugins/Delay/StereoDelay.cpp	2017-01-03 13:40:27.000000000 +0100
++++ lmms-1.1.3/plugins/Delay/StereoDelay.cpp	2017-01-03 13:42:16.000000000 +0100
 @@ -48,7 +48,7 @@
  {
  	if( m_buffer )
@@ -463,10 +463,10 @@ Index: lmms-1.1.3/plugins/delay/stereodelay.cpp
  	}
  
  	int bufferSize = ( int )( sampleRate * m_maxTime );
-Index: lmms-1.1.3/plugins/opl2/fmopl.c
+Index: lmms-1.1.3/plugins/OpulenZ/adplug/src/fmopl.c
 ===================================================================
---- lmms-1.1.3.orig/plugins/opl2/fmopl.c	2017-01-03 20:11:03.000000000 +0100
-+++ lmms-1.1.3/plugins/opl2/fmopl.c	2017-01-03 20:22:23.000000000 +0100
+--- lmms-1.1.3.orig/plugins/OpulenZ/adplug/src/fmopl.c	2017-01-03 20:11:03.000000000 +0100
++++ lmms-1.1.3/plugins/OpulenZ/adplug/src/fmopl.c	2017-01-03 20:22:23.000000000 +0100
 @@ -70,7 +70,7 @@
  /* final output shift , limit minimum and maximum */
  #define OPL_OUTSB   (TL_BITS+3-16)		/* OPL output final shift 16bit */

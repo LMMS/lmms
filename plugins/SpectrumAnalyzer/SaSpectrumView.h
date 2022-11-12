@@ -27,15 +27,26 @@
 #ifndef SASPECTRUMVIEW_H
 #define SASPECTRUMVIEW_H
 
+
 #include <string>
 #include <utility>
+#include <vector>
 #include <QPainterPath>
 #include <QWidget>
 
 class QMouseEvent;
 class QPainter;
+
+namespace lmms
+{
+
+
 class SaControls;
 class SaProcessor;
+
+namespace gui
+{
+
 
 //! Widget that displays a spectrum curve and frequency / amplitude grid
 class SaSpectrumView : public QWidget
@@ -43,7 +54,7 @@ class SaSpectrumView : public QWidget
 	Q_OBJECT
 public:
 	explicit SaSpectrumView(SaControls *controls, SaProcessor *processor, QWidget *_parent = 0);
-	virtual ~SaSpectrumView() {}
+	~SaSpectrumView() override = default;
 
 	QSize sizeHint() const override {return QSize(400, 200);}
 
@@ -84,7 +95,7 @@ private:
 	std::vector<float> m_displayBufferR;
 	std::vector<float> m_peakBufferL;
 	std::vector<float> m_peakBufferR;
-	void updateBuffers(float *spectrum, float *displayBuffer, float *peakBuffer);
+	void updateBuffers(const float *spectrum, float *displayBuffer, float *peakBuffer);
 
 	// final paths to be drawn by QPainter and methods to build them
 	QPainterPath m_pathL;
@@ -99,14 +110,11 @@ private:
 	bool m_freezeRequest;	// new reference should be acquired
 	bool m_frozen;			// a reference is currently stored in the peakBuffer
 
-	const float m_smoothFactor = 0.15;		// alpha for exponential smoothing
-	const float m_peakDecayFactor = 0.992;	// multiplier for gradual peak decay
-
 	// top level: refresh buffers, make paths and draw the spectrum
 	void drawSpectrum(QPainter &painter);
 
 	// current cursor location and a method to draw it
-	QPoint m_cursor;
+	QPointF m_cursor;
 	void drawCursor(QPainter &painter);
 
 	// wrappers for most used SaProcessor conversion helpers
@@ -121,6 +129,28 @@ private:
 	unsigned int m_displayLeft;
 	unsigned int m_displayRight;
 	unsigned int m_displayWidth;
+
+	// cached frequency bin → x position conversion for better performance
+	std::vector<float> m_cachedBinToX;
+	float m_cachedRangeMin;
+	float m_cachedRangeMax;
+	bool m_cachedLogX;
+	unsigned int m_cachedDisplayWidth;
+	unsigned int m_cachedBinCount;
+	unsigned int m_cachedSampleRate;
+
+	#ifdef SA_DEBUG
+		float m_execution_avg;
+		float m_refresh_avg;
+		float m_path_avg;
+		float m_draw_avg;
+	#endif
 };
+
+
+} // namespace gui
+
+} // namespace lmms
+
 #endif // SASPECTRUMVIEW_H
 

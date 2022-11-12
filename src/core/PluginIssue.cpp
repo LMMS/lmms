@@ -26,6 +26,10 @@
 
 #include "PluginIssue.h"
 
+namespace lmms
+{
+
+
 const char *PluginIssue::msgFor(const PluginIssueType &it)
 {
 	switch (it)
@@ -38,6 +42,10 @@ const char *PluginIssue::msgFor(const PluginIssueType &it)
 			return "too many audio input channels";
 		case tooManyOutputChannels:
 			return "too many audio output channels";
+		case tooManyMidiInputChannels:
+			return "too many MIDI input channels";
+		case tooManyMidiOutputChannels:
+			return "too many MIDI output channels";
 		case noOutputChannel:
 			return "no audio output channel";
 		case portHasNoDef:
@@ -46,10 +54,22 @@ const char *PluginIssue::msgFor(const PluginIssueType &it)
 			return "port is missing min value";
 		case portHasNoMax:
 			return "port is missing max value";
+		case minGreaterMax:
+			return "port minimum is greater than maximum";
+		case defaultValueNotInRange:
+			return "default value is not in range [min, max]";
+		case logScaleMinMissing:
+			return "logscale requires minimum value";
+		case logScaleMaxMissing:
+			return "logscale requires maximum value";
+		case logScaleMinMaxDifferentSigns:
+			return "logscale with min < 0 < max";
 		case featureNotSupported:
 			return "required feature not supported";
 		case badPortType:
 			return "unsupported port type";
+		case blacklisted:
+			return "blacklisted plugin";
 		case noIssue:
 			return nullptr;
 	}
@@ -57,6 +77,22 @@ const char *PluginIssue::msgFor(const PluginIssueType &it)
 }
 
 
+
+
+bool PluginIssue::operator==(const PluginIssue &other) const
+{
+	return (m_issueType == other.m_issueType) && (m_info == other.m_info);
+}
+
+
+
+
+bool PluginIssue::operator<(const PluginIssue &other) const
+{
+	return (m_issueType != other.m_issueType)
+			? m_issueType < other.m_issueType
+			: m_info < other.m_info;
+}
 
 
 QDebug operator<<(QDebug stream, const PluginIssue &iss)
@@ -68,5 +104,8 @@ QDebug operator<<(QDebug stream, const PluginIssue &iss)
 	}
 	return stream;
 }
+
+} // namespace lmms
+
 
 

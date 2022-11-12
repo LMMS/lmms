@@ -26,18 +26,21 @@
 #ifndef SUBWINDOW_H
 #define SUBWINDOW_H
 
-#include <QEvent>
-#include <QGraphicsDropShadowEffect>
 #include <QMdiSubWindow>
-#include <QLabel>
-#include <QPushButton>
 #include <QString>
 
 #include "lmms_export.h"
 
+class QGraphicsDropShadowEffect;
+class QLabel;
 class QMoveEvent;
+class QPushButton;
 class QResizeEvent;
 class QWidget;
+
+namespace lmms::gui
+{
+
 
 /**
  * @brief The SubWindow class
@@ -55,7 +58,7 @@ class LMMS_EXPORT SubWindow : public QMdiSubWindow
 	Q_PROPERTY( QColor borderColor READ borderColor WRITE setBorderColor )
 
 public:
-	SubWindow( QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0 );
+	SubWindow( QWidget *parent = nullptr, Qt::WindowFlags windowFlags = QFlag(0) );
 	// same as QWidet::normalGeometry, but works properly under X11 (see https://bugreports.qt.io/browse/QTBUG-256)
 	QRect getTrueNormalGeometry() const;
 	QBrush activeColor() const;
@@ -67,10 +70,10 @@ public:
 
 protected:
 	// hook the QWidget move/resize events to update the tracked geometry
-	virtual void moveEvent( QMoveEvent * event );
-	virtual void resizeEvent( QResizeEvent * event );
-	virtual void paintEvent( QPaintEvent * pe );
-	virtual void changeEvent( QEvent * event );
+	void moveEvent( QMoveEvent * event ) override;
+	void resizeEvent( QResizeEvent * event ) override;
+	void paintEvent( QPaintEvent * pe ) override;
+	void changeEvent( QEvent * event ) override;
 
 signals:
 	void focusLost();
@@ -96,5 +99,9 @@ private:
 private slots:
 	void focusChanged( QMdiSubWindow * subWindow );
 };
+
+
+
+} // namespace lmms::gui
 
 #endif

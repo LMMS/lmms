@@ -33,6 +33,10 @@
 
 class QPixmap;
 class QToolBar;
+
+namespace lmms::gui
+{
+
 class NStateButton;
 class TextFloat;
 class SongEditor;
@@ -72,15 +76,15 @@ public:
 	} ;
 
 
-	TimeLineWidget(int xoff, int yoff, float ppt, Song::PlayPos & pos,
-				const MidiTime & begin, Song::PlayModes mode, QWidget * parent);
-	virtual ~TimeLineWidget();
+	TimeLineWidget(int xoff, int yoff, float ppb, Song::PlayPos & pos,
+				const TimePos & begin, Song::PlayModes mode, QWidget * parent);
+	~TimeLineWidget() override;
 
 	inline QColor const & getBarLineColor() const { return m_barLineColor; }
-	inline void setBarLineColor(QColor const & tactLineColor) { m_barLineColor = tactLineColor; }
+	inline void setBarLineColor(QColor const & barLineColor) { m_barLineColor = barLineColor; }
 
 	inline QColor const & getBarNumberColor() const { return m_barNumberColor; }
-	inline void setBarNumberColor(QColor const & tactNumberColor) { m_barNumberColor = tactNumberColor; }
+	inline void setBarNumberColor(QColor const & barNumberColor) { m_barNumberColor = barNumberColor; }
 
 	inline QColor const & getInactiveLoopColor() const { return m_inactiveLoopColor; }
 	inline void setInactiveLoopColor(QColor const & inactiveLoopColor) { m_inactiveLoopColor = inactiveLoopColor; }
@@ -123,54 +127,56 @@ public:
 		return m_loopPoints == LoopPointsEnabled;
 	}
 
-	inline const MidiTime & loopBegin() const
+	inline const TimePos & loopBegin() const
 	{
 		return ( m_loopPos[0] < m_loopPos[1] ) ?
 						m_loopPos[0] : m_loopPos[1];
 	}
 
-	inline const MidiTime & loopEnd() const
+	inline const TimePos & loopEnd() const
 	{
 		return ( m_loopPos[0] > m_loopPos[1] ) ?
 						m_loopPos[0] : m_loopPos[1];
 	}
 
-	inline void setLoop( const MidiTime & _from, const MidiTime & _to ) {
-		m_loopPos[0] = _from;
-		m_loopPos[1] = _to;
+	inline void setLoop( const TimePos & from, const TimePos & to ) {
+		m_loopPos[0] = from;
+		m_loopPos[1] = to;
 		toggleLoopPoints( LoopPointsEnabled );
 		loopPointStateLoaded( LoopPointsEnabled );
 	}
 
-	inline void savePos( const MidiTime & _pos )
+	inline void savePos( const TimePos & pos )
 	{
-		m_savedPos = _pos;
+		m_savedPos = pos;
 	}
-	inline const MidiTime & savedPos() const
+	inline const TimePos & savedPos() const
 	{
 		return m_savedPos;
 	}
 
-	inline void setPixelsPerTact( float _ppt )
+	inline void setPixelsPerBar( float ppb )
 	{
-		m_ppt = _ppt;
+		m_ppb = ppb;
 		update();
 	}
+
+	void setXOffset(const int x);
 
 	void addToolButtons(QToolBar* _tool_bar );
 
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName() const
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
+	inline QString nodeName() const override
 	{
 		return "timeline";
 	}
 
-	inline int markerX( const MidiTime & _t ) const
+	inline int markerX( const TimePos & _t ) const
 	{
 		return m_xOffset + static_cast<int>( ( _t - m_begin ) *
-					m_ppt / MidiTime::ticksPerTact() );
+					m_ppb / TimePos::ticksPerBar() );
 	}
 
 signals:
@@ -180,10 +186,14 @@ signals:
 
 
 public slots:
-	void updatePosition( const MidiTime & );
+	void updatePosition( const lmms::TimePos & );
 	void updatePosition()
 	{
-		updatePosition( MidiTime() );
+		updatePosition( TimePos() );
+	}
+	void setSnapSize( const float snapSize )
+	{
+		m_snapSize = snapSize;
 	}
 	void toggleAutoScroll( int _n );
 	void toggleLoopPoints( int _n );
@@ -191,10 +201,10 @@ public slots:
 
 
 protected:
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseMoveEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
+	void paintEvent( QPaintEvent * _pe ) override;
+	void mousePressEvent( QMouseEvent * _me ) override;
+	void mouseMoveEvent( QMouseEvent * _me ) override;
+	void mouseReleaseEvent( QMouseEvent * _me ) override;
 
 
 private:
@@ -221,13 +231,14 @@ private:
 
 	int m_xOffset;
 	int m_posMarkerX;
-	float m_ppt;
+	float m_ppb;
+	float m_snapSize;
 	Song::PlayPos & m_pos;
-	const MidiTime & m_begin;
+	const TimePos & m_begin;
 	const Song::PlayModes m_mode;
-	MidiTime m_loopPos[2];
+	TimePos m_loopPos[2];
 
-	MidiTime m_savedPos;
+	TimePos m_savedPos;
 
 
 	TextFloat * m_hint;
@@ -240,18 +251,22 @@ private:
 		MovePositionMarker,
 		MoveLoopBegin,
 		MoveLoopEnd,
-		SelectSongTCO,
+		SelectSongClip,
 	} m_action;
 
 	int m_moveXOff;
 
 
 signals:
-	void positionChanged( const MidiTime & _t );
+	void positionChanged( const lmms::TimePos & _t );
 	void loopPointStateLoaded( int _n );
 	void positionMarkerMoved();
+	void loadBehaviourAtStop( int _n );
 
 } ;
 
+
+
+} // namespace lmms::gui
 
 #endif

@@ -26,8 +26,12 @@
 #ifndef FILE_BROWSER_H
 #define FILE_BROWSER_H
 
-#include <QtCore/QDir>
-#include <QtCore/QMutex>
+#include <QCheckBox>
+#include <QDir>
+#include <QMutex>
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	#include <QRecursiveMutex>
+#endif
 #include <QTreeWidget>
 
 
@@ -36,32 +40,48 @@
 
 class QLineEdit;
 
-class FileItem;
+namespace lmms
+{
+
 class InstrumentTrack;
-class FileBrowserTreeWidget;
 class PlayHandle;
 class TrackContainer;
 
+namespace gui
+{
 
+class FileItem;
+class FileBrowserTreeWidget;
 
 class FileBrowser : public SideBarWidget
 {
 	Q_OBJECT
 public:
+	/**
+		Create a file browser side bar widget
+		@param directories '*'-separated list of directories to search for.
+			If a directory of factory files should be in the list it
+			must be the last one (for the factory files delimiter to work)
+		@param filter Filter as used in QDir::match
+		@param recurse *to be documented*
+	*/
 	FileBrowser( const QString & directories, const QString & filter,
 			const QString & title, const QPixmap & pm,
-			QWidget * parent, bool dirs_as_items = false, bool recurse = false );
-	virtual ~FileBrowser() = default;
+			QWidget * parent, bool dirs_as_items = false, bool recurse = false,
+			const QString& userDir = "",
+			const QString& factoryDir = "");
+
+	~FileBrowser() override = default;
 
 private slots:
-	void reloadTree( void );
-	void expandItems( QTreeWidgetItem * item=NULL, QList<QString> expandedDirs = QList<QString>() );
+	void reloadTree();
+	void expandItems( QTreeWidgetItem * item=nullptr, QList<QString> expandedDirs = QList<QString>() );
 	// call with item=NULL to filter the entire tree
-	bool filterItems( const QString & filter, QTreeWidgetItem * item=NULL );
+	bool filterItems( const QString & filter, QTreeWidgetItem * item=nullptr );
 	void giveFocusToFilter();
 
 private:
-	virtual void keyPressEvent( QKeyEvent * ke );
+	void keyPressEvent( QKeyEvent * ke ) override;
 
 	void addItems( const QString & path );
 
@@ -69,12 +89,17 @@ private:
 
 	QLineEdit * m_filterEdit;
 
-	QString m_directories;
-	QString m_filter;
+	QString m_directories; //!< Directories to search, split with '*'
+	QString m_filter; //!< Filter as used in QDir::match()
 
 	bool m_dirsAsItems;
 	bool m_recurse;
 
+	void addContentCheckBox();
+	QCheckBox* m_showUserContent = nullptr;
+	QCheckBox* m_showFactoryContent = nullptr;
+	QString m_userDir;
+	QString m_factoryDir;
 } ;
 
 
@@ -85,7 +110,7 @@ class FileBrowserTreeWidget : public QTreeWidget
 	Q_OBJECT
 public:
 	FileBrowserTreeWidget( QWidget * parent );
-	virtual ~FileBrowserTreeWidget() = default;
+	~FileBrowserTreeWidget() override = default;
 
 	//! This method returns a QList with paths (QString's) of all directories
 	//! that are expanded in the tree.
@@ -93,32 +118,48 @@ public:
 
 
 protected:
-	virtual void contextMenuEvent( QContextMenuEvent * e );
-	virtual void mousePressEvent( QMouseEvent * me );
-	virtual void mouseMoveEvent( QMouseEvent * me );
-	virtual void mouseReleaseEvent( QMouseEvent * me );
+	void contextMenuEvent( QContextMenuEvent * e ) override;
+	void mousePressEvent( QMouseEvent * me ) override;
+	void mouseMoveEvent( QMouseEvent * me ) override;
+	void mouseReleaseEvent( QMouseEvent * me ) override;
+	void keyPressEvent( QKeyEvent * ke ) override;
+	void keyReleaseEvent( QKeyEvent * ke ) override;
+	void hideEvent( QHideEvent * he ) override;
+	void focusOutEvent( QFocusEvent * fe ) override;
 
 
 private:
+	//! Start a preview of a file item
+	void previewFileItem(FileItem* file);
+	//! If a preview is playing, stop it.
+	void stopPreview();
+
 	void handleFile( FileItem * fi, InstrumentTrack * it );
-	void openInNewInstrumentTrack( TrackContainer* tc );
+	void openInNewInstrumentTrack( TrackContainer* tc, FileItem* item );
 
 
 	bool m_mousePressed;
 	QPoint m_pressPos;
 
+	//! This should only be accessed or modified when m_pphMutex is held
 	PlayHandle* m_previewPlayHandle;
+	
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	QRecursiveMutex m_pphMutex;
+#else
 	QMutex m_pphMutex;
+#endif
 
-	FileItem * m_contextMenuItem;
+	QList<QAction*> getContextActions(FileItem* item, bool songEditor);
 
 
 private slots:
 	void activateListItem( QTreeWidgetItem * item, int column );
-	void openInNewInstrumentTrackBBE( void );
-	void openInNewInstrumentTrackSE( void );
-	void sendToActiveInstrumentTrack( void );
+	void openInNewInstrumentTrack( lmms::gui::FileItem* item, bool songEditor );
+	bool openInNewSampleTrack( lmms::gui::FileItem* item );
+	void sendToActiveInstrumentTrack( lmms::gui::FileItem* item );
 	void updateDirectory( QTreeWidgetItem * item );
+	void openContainingFolder( lmms::gui::FileItem* item );
 
 } ;
 
@@ -131,7 +172,7 @@ public:
 	Directory( const QString & filename, const QString & path,
 						const QString & filter );
 
-	void update( void );
+	void update();
 
 	inline QString fullName( QString path = QString() )
 	{
@@ -154,7 +195,7 @@ public:
 
 
 private:
-	void initPixmaps( void );
+	void initPixmaps();
 
 	bool addItems( const QString & path );
 
@@ -163,7 +204,14 @@ private:
 	static QPixmap * s_folderOpenedPixmap;
 	static QPixmap * s_folderLockedPixmap;
 
+	//! Directories that lead here
+	//! Initially, this is just set to the current path of a directory
+	//! If, however, you have e.g. 'TripleOscillator/xyz' in two of the
+	//! file browser's search directories 'a' and 'b', this will have two
+	//! entries 'a/TripleOscillator' and 'b/TripleOscillator'
+	//! and 'xyz' in the tree widget
 	QStringList m_directories;
+	//! Filter as used in QDir::match()
 	QString m_filter;
 
 	int m_dirCount;
@@ -208,23 +256,28 @@ public:
 		return QFileInfo(m_path, text(0)).absoluteFilePath();
 	}
 
-	inline FileTypes type( void ) const
+	inline FileTypes type() const
 	{
 		return( m_type );
 	}
 
-	inline FileHandling handling( void ) const
+	inline FileHandling handling() const
 	{
 		return( m_handling );
 	}
 
-	QString extension( void );
+	inline bool isTrack() const
+	{
+		return m_handling == LoadAsPreset || m_handling == LoadByPlugin;
+	}
+
+	QString extension();
 	static QString extension( const QString & file );
 
 
 private:
-	void initPixmaps( void );
-	void determineFileType( void );
+	void initPixmaps();
+	void determineFileType();
 
 	static QPixmap * s_projectFilePixmap;
 	static QPixmap * s_presetFilePixmap;
@@ -240,5 +293,9 @@ private:
 
 } ;
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

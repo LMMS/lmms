@@ -24,15 +24,25 @@
 
 #include "PluginFactory.h"
 
-#include <QtCore/QCoreApplication>
-#include <QtCore/QDebug>
-#include <QtCore/QDir>
-#include <QtCore/QLibrary>
+#include <QCoreApplication>
+#include <QDebug>
+#include <QDir>
+#include <QLibrary>
+#include <memory>
 #include "lmmsconfig.h"
 
 #include "ConfigManager.h"
 #include "Plugin.h"
-#include "embed.h"
+
+// QT qHash specialization, needs to be in global namespace
+qint64 qHash(const QFileInfo& fi)
+{
+	return qHash(fi.absoluteFilePath());
+}
+
+namespace lmms
+{
+
 
 #ifdef LMMS_BUILD_WIN32
 	QStringList nameFilters("*.dll");
@@ -40,21 +50,12 @@
 	QStringList nameFilters("lib*.so");
 #endif
 
-qint64 qHash(const QFileInfo& fi)
-{
-	return qHash(fi.absoluteFilePath());
-}
-
 std::unique_ptr<PluginFactory> PluginFactory::s_instance;
 
 PluginFactory::PluginFactory()
 {
 	setupSearchPaths();
 	discoverPlugins();
-}
-
-PluginFactory::~PluginFactory()
-{
 }
 
 void PluginFactory::setupSearchPaths()
@@ -94,9 +95,14 @@ void PluginFactory::setupSearchPaths()
 PluginFactory* PluginFactory::instance()
 {
 	if (s_instance == nullptr)
-		s_instance.reset(new PluginFactory());
+		s_instance = std::make_unique<PluginFactory>();
 
 	return s_instance.get();
+}
+
+PluginFactory* getPluginFactory()
+{
+	return PluginFactory::instance();
 }
 
 const Plugin::DescriptorList PluginFactory::descriptors() const
@@ -144,7 +150,12 @@ void PluginFactory::discoverPlugins()
 	QSet<QFileInfo> files;
 	for (const QString& searchPath : QDir::searchPaths("plugins"))
 	{
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+		auto discoveredPluginList = QDir(searchPath).entryInfoList(nameFilters);
+		files.unite(QSet<QFileInfo>(discoveredPluginList.begin(), discoveredPluginList.end()));
+#else
 		files.unite(QDir(searchPath).entryInfoList(nameFilters).toSet());
+#endif
 	}
 
 	// Cheap dependency handling: zynaddsubfx needs ZynAddSubFxCore. By loading
@@ -241,3 +252,6 @@ const QString PluginFactory::PluginInfo::name() const
 {
 	return descriptor ? descriptor->name : QString();
 }
+
+
+} // namespace lmms

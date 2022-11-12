@@ -32,18 +32,20 @@
 
 class QLineEdit;
 
+namespace lmms::gui
+{
 
 class RenameDialog : public QDialog
 {
 	Q_OBJECT
 public:
 	RenameDialog( QString & _string );
-	~RenameDialog();
+	~RenameDialog() override = default;
 
 
 protected:
-	void keyPressEvent( QKeyEvent * _ke );
-	virtual void resizeEvent(QResizeEvent * event);
+	void keyPressEvent( QKeyEvent * _ke ) override;
+	void resizeEvent(QResizeEvent * event) override;
 
 
 protected slots:
@@ -57,5 +59,7 @@ private:
 
 } ;
 
+
+} // namespace lmms::gui
 
 #endif

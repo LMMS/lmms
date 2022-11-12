@@ -25,17 +25,19 @@
 #ifndef PLAY_HANDLE_H
 #define PLAY_HANDLE_H
 
-#include <QtCore/QList>
-#include <QtCore/QMutex>
+#include <QList>
+#include <QMutex>
 
 #include "lmms_export.h"
 
-#include "MemoryManager.h"
 
 #include "ThreadableJob.h"
 #include "lmms_basics.h"
 
 class QThread;
+
+namespace lmms
+{
 
 class Track;
 class AudioPort;
@@ -50,7 +52,7 @@ public:
 		TypeSamplePlayHandle = 0x04,
 		TypePresetPreviewHandle = 0x08
 	} ;
-	typedef Types Type;
+	using Type = Types;
 
 	enum
 	{
@@ -87,9 +89,9 @@ public:
 	}
 
 	// required for ThreadableJob
-	virtual void doProcessing();
+	void doProcessing() override;
 
-	virtual bool requiresProcessing() const
+	bool requiresProcessing() const override
 	{
 		return !isFinished();
 	}
@@ -159,9 +161,9 @@ private:
 	AudioPort * m_audioPort;
 } ;
 
+using PlayHandleList = QList<PlayHandle*>;
+using ConstPlayHandleList = QList<const PlayHandle*>;
 
-typedef QList<PlayHandle *> PlayHandleList;
-typedef QList<const PlayHandle *> ConstPlayHandleList;
-
+} // namespace lmms
 
 #endif

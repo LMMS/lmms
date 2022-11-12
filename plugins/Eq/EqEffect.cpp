@@ -25,27 +25,29 @@
 #include "EqEffect.h"
 
 #include "Engine.h"
-#include "EqFader.h"
-#include "interpolation.h"
 #include "lmms_math.h"
 
 #include "embed.h"
 #include "plugin_export.h"
+
+namespace lmms
+{
+
 
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT eq_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Equalizer",
-	QT_TRANSLATE_NOOP( "pluginBrowser", "A native eq plugin" ),
+	QT_TRANSLATE_NOOP( "PluginBrowser", "A native eq plugin" ),
 	"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",
 	0x0100,
 	Plugin::Effect,
 	new PluginPixmapLoader("logo"),
-	NULL,
-	NULL
+	nullptr,
+	nullptr,
 } ;
 
 }
@@ -62,16 +64,9 @@ EqEffect::EqEffect( Model *parent, const Plugin::Descriptor::SubPluginFeatures::
 
 
 
-EqEffect::~EqEffect()
-{
-}
-
-
-
-
 bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 {
-	const int sampleRate = Engine::mixer()->processingSampleRate();
+	const int sampleRate = Engine::audioEngine()->processingSampleRate();
 
 	//wet/dry controls
 	const float dry = dryLevel();
@@ -365,3 +360,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 }
 
 }
+
+
+} // namespace lmms
