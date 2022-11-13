@@ -50,7 +50,7 @@ public:
 
 } ;
 
-}
+} // namespace gui
 
 class DummyEffectControls : public EffectControls
 {

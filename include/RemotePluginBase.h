@@ -341,7 +341,7 @@ private:
 	std::atomic_int m_lockDepth;
 
 } ;
-#endif
+#endif // SYNC_WITH_SHM_FIFO
 
 
 
@@ -530,7 +530,7 @@ public:
 		writeInt( len );
 		write( _s.c_str(), len );
 	}
-#endif
+#endif // SYNC_WITH_SHM_FIFO
 
 #ifndef BUILD_REMOTE_PLUGIN_CLIENT
 	inline bool messagesLeft()
@@ -562,7 +562,7 @@ public:
 	{
 		return waitDepthCounter() > 0;
 	}
-#endif
+#endif // BUILD_REMOTE_PLUGIN_CLIENT
 
 	virtual bool processMessage( const message & _m ) = 0;
 
@@ -667,7 +667,7 @@ private:
 
 	pthread_mutex_t m_receiveMutex;
 	pthread_mutex_t m_sendMutex;
-#endif
+#endif // SYNC_WITH_SHM_FIFO
 
 } ;
 

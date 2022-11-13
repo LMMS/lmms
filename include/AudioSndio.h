@@ -87,6 +87,6 @@ private:
 
 } // namespace lmms
 
-#endif	/* LMMS_HAVE_SNDIO */
+#endif	// LMMS_HAVE_SNDIO
 
-#endif	/* _AUDIO_SNDIO_H */
+#endif	// _AUDIO_SNDIO_H

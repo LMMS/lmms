@@ -354,7 +354,7 @@ void AutomationEditor::drawLine( int x0In, float y0, int x1In, float y1 )
 	int x0 = Note::quantized( x0In, AutomationClip::quantization() );
 	int x1 = Note::quantized( x1In, AutomationClip::quantization() );
 	int deltax = qAbs( x1 - x0 );
-	float deltay = qAbs<float>( y1 - y0 );
+	auto deltay = qAbs<float>(y1 - y0);
 	int x = x0;
 	float y = y0;
 	int xstep;
@@ -1112,8 +1112,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 	// print value numbers
 	int font_height = p.fontMetrics().height();
-	Qt::Alignment text_flags =
-		(Qt::Alignment)( Qt::AlignRight | Qt::AlignVCenter );
+	auto text_flags = (Qt::Alignment)(Qt::AlignRight | Qt::AlignVCenter);
 
 	if( validClip() )
 	{
@@ -2064,7 +2063,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	// Edit mode buttons
 	DropToolBar *editActionsToolBar = addDropToolBarToTop(tr("Edit actions"));
 
-	ActionGroup* editModeGroup = new ActionGroup(this);
+	auto editModeGroup = new ActionGroup(this);
 	m_drawAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode (Shift+D)"));
 	m_drawAction->setShortcut(Qt::SHIFT | Qt::Key_D);
 	m_drawAction->setChecked(true);
@@ -2094,7 +2093,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	// Interpolation actions
 	DropToolBar *interpolationActionsToolBar = addDropToolBarToTop(tr("Interpolation controls"));
 
-	ActionGroup* progression_type_group = new ActionGroup(this);
+	auto progression_type_group = new ActionGroup(this);
 
 	m_discreteAction = progression_type_group->addAction(
 				embed::getIconPixmap("progression_discrete"), tr("Discrete progression"));
@@ -2129,7 +2128,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	// Zoom controls
 	DropToolBar *zoomToolBar = addDropToolBarToTop(tr("Zoom controls"));
 
-	QLabel * zoom_x_label = new QLabel( zoomToolBar );
+	auto zoom_x_label = new QLabel(zoomToolBar);
 	zoom_x_label->setPixmap( embed::getIconPixmap( "zoom_x" ) );
 
 	m_zoomingXComboBox = new ComboBox( zoomToolBar );
@@ -2147,8 +2146,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	connect( &m_editor->m_zoomingXModel, SIGNAL(dataChanged()),
 			m_editor, SLOT(zoomingXChanged()));
 
-
-	QLabel * zoom_y_label = new QLabel( zoomToolBar );
+	auto zoom_y_label = new QLabel(zoomToolBar);
 	zoom_y_label->setPixmap( embed::getIconPixmap( "zoom_y" ) );
 
 	m_zoomingYComboBox = new ComboBox( zoomToolBar );
@@ -2176,7 +2174,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	// Quantization controls
 	DropToolBar *quantizationActionsToolBar = addDropToolBarToTop(tr("Quantization controls"));
 
-	QLabel * quantize_lbl = new QLabel( m_toolBar );
+	auto quantize_lbl = new QLabel(m_toolBar);
 	quantize_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
 
 	m_quantizeComboBox = new ComboBox( m_toolBar );
@@ -2261,9 +2259,7 @@ void AutomationEditorWindow::dropEvent( QDropEvent *_de )
 	QString val = StringPairDrag::decodeValue( _de );
 	if( type == "automatable_model" )
 	{
-		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
-				Engine::projectJournal()->
-					journallingObject( val.toInt() ) );
+		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
 		if (mod != nullptr)
 		{
 			bool added = m_editor->m_clip->addObject( mod );

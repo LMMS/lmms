@@ -427,7 +427,7 @@ bool DataFile::copyResources(const QString& resourcesDir)
 	// repeating filenames
 	std::list<QString> namesList;
 
-	ResourcesMap::const_iterator it = ELEMENTS_WITH_RESOURCES.begin();
+	auto it = ELEMENTS_WITH_RESOURCES.begin();
 
 	// Copy resources and manipulate the DataFile to have local paths to them
 	while (it != ELEMENTS_WITH_RESOURCES.end())
@@ -439,7 +439,7 @@ bool DataFile::copyResources(const QString& resourcesDir)
 		{
 			QDomElement el = list.item(i).toElement();
 
-			std::vector<QString>::const_iterator res = it->second.begin();
+			auto res = it->second.begin();
 
 			// Search for attributes that point to resources
 			while (res != it->second.end())
@@ -533,14 +533,9 @@ bool DataFile::hasLocalPlugins(QDomElement parent /* = QDomElement()*/, bool fir
 		bool skipNode = false;
 		// Skip the nodes allowed to have "local:" attributes, but
 		// still check its children
-		for
-		(
-			ResourcesMap::const_iterator it = ELEMENTS_WITH_RESOURCES.begin();
-			it != ELEMENTS_WITH_RESOURCES.end();
-			++it
-		)
+		for (const auto& element : ELEMENTS_WITH_RESOURCES)
 		{
-			if (childElement.tagName() == it->first)
+			if (childElement.tagName() == element.first)
 			{
 				skipNode = true;
 				break;

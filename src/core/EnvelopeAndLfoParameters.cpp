@@ -47,11 +47,10 @@ EnvelopeAndLfoParameters::LfoInstances * EnvelopeAndLfoParameters::s_lfoInstance
 void EnvelopeAndLfoParameters::LfoInstances::trigger()
 {
 	QMutexLocker m( &m_lfoListMutex );
-	for( LfoList::Iterator it = m_lfos.begin();
-							it != m_lfos.end(); ++it )
+	for (const auto& lfo : m_lfos)
 	{
-		( *it )->m_lfoFrame += Engine::audioEngine()->framesPerPeriod();
-		( *it )->m_bad_lfoShapeData = true;
+		lfo->m_lfoFrame += Engine::audioEngine()->framesPerPeriod();
+		lfo->m_bad_lfoShapeData = true;
 	}
 }
 
@@ -61,11 +60,10 @@ void EnvelopeAndLfoParameters::LfoInstances::trigger()
 void EnvelopeAndLfoParameters::LfoInstances::reset()
 {
 	QMutexLocker m( &m_lfoListMutex );
-	for( LfoList::Iterator it = m_lfos.begin();
-							it != m_lfos.end(); ++it )
+	for (const auto& lfo : m_lfos)
 	{
-		( *it )->m_lfoFrame = 0;
-		( *it )->m_bad_lfoShapeData = true;
+		lfo->m_lfoFrame = 0;
+		lfo->m_bad_lfoShapeData = true;
 	}
 }
 
@@ -404,16 +402,13 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 				Engine::audioEngine()->processingSampleRate();
 
 	// TODO: Remove the expKnobVals, time should be linear
-	const f_cnt_t predelay_frames = static_cast<f_cnt_t>(
-							frames_per_env_seg *
-					expKnobVal( m_predelayModel.value() ) );
+	const auto predelay_frames = static_cast<f_cnt_t>(frames_per_env_seg * expKnobVal(m_predelayModel.value()));
 
 	const f_cnt_t attack_frames = qMax( minimumFrames,
 					static_cast<f_cnt_t>( frames_per_env_seg *
 					expKnobVal( m_attackModel.value() ) ) );
 
-	const f_cnt_t hold_frames = static_cast<f_cnt_t>( frames_per_env_seg *
-					expKnobVal( m_holdModel.value() ) );
+	const auto hold_frames = static_cast<f_cnt_t>(frames_per_env_seg * expKnobVal(m_holdModel.value()));
 
 	const f_cnt_t decay_frames = qMax( minimumFrames,
 					static_cast<f_cnt_t>( frames_per_env_seg *
