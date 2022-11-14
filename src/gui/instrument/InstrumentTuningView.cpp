@@ -51,14 +51,15 @@ InstrumentTuningView::InstrumentTuningView(InstrumentTrack *it, QWidget *parent)
 	layout->setMargin(5);
 
 	// Master pitch toggle
-	m_pitchGroupBox = new GroupBox(tr("MASTER PITCH"));
+	m_pitchGroupBox = new GroupBox(tr("GLOBAL TRANSPOSITION"));
 	m_pitchGroupBox->setModel(&it->m_useMasterPitchModel);
 	layout->addWidget(m_pitchGroupBox);
 
 	auto masterPitchLayout = new QHBoxLayout(m_pitchGroupBox);
 	masterPitchLayout->setContentsMargins(8, 18, 8, 8);
 
-	auto tlabel = new QLabel(tr("Enables the use of master pitch"));
+	auto tlabel = new QLabel(tr("Enables the use of global transposition"));
+	tlabel->setWordWrap(true);
 	tlabel->setFont(pointSize<8>(tlabel->font()));
 	masterPitchLayout->addWidget(tlabel);
 

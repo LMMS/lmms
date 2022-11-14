@@ -54,6 +54,7 @@ public:
 	float baseFreq() const;
 
 	float keyToFreq(int key, int userBaseNote) const;
+	int octaveSize() const;
 
 	QString nodeName() const override {return "microtuner";}
 	void saveSettings(QDomDocument & document, QDomElement &element) override;
