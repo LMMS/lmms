@@ -504,20 +504,14 @@ QWidget *VstPlugin::editor()
 
 void VstPlugin::openPreset()
 {
-
-	gui::FileDialog ofd( nullptr, tr( "Open Preset" ), "",
-		tr( "Vst Plugin Preset (*.fxp *.fxb)" ) );
-	ofd.setFileMode( gui::FileDialog::ExistingFiles );
-	if( ofd.exec () == QDialog::Accepted &&
-					!ofd.selectedFiles().isEmpty() )
+	gui::FileDialog ofd(nullptr, tr("Open Preset"), "", tr("VST Plugin Preset (*.fxp *.fxb)"));
+	ofd.setFileMode(gui::FileDialog::ExistingFiles);
+	if (ofd.exec() == QDialog::Accepted && !ofd.selectedFiles().isEmpty())
 	{
 		lock();
-		sendMessage( message( IdLoadPresetFile ).
-			addString(
-				QSTR_TO_STDSTR(
-					QDir::toNativeSeparators( ofd.selectedFiles()[0] ) ) )
-			);
-		waitForMessage( IdLoadPresetFile, true );
+		sendMessage(message(IdLoadPresetFile).addString(QSTR_TO_STDSTR(
+			QDir::toNativeSeparators(ofd.selectedFiles()[0]))));
+		waitForMessage(IdLoadPresetFile, true);
 		unlock();
 	}
 }
@@ -586,7 +580,7 @@ void VstPlugin::savePreset()
 	presName.replace("\"", "'"); // QFileDialog unable to handle double quotes properly
 
 	gui::FileDialog sfd( nullptr, tr( "Save Preset" ), presName.section(": ", 1, 1) + tr(".fxp"),
-		tr( "Vst Plugin Preset (*.fxp *.fxb)" ) );
+		tr( "VST Plugin Preset (*.fxp *.fxb)" ) );
 
 	if( p_name != "" ) // remember last directory
 	{
