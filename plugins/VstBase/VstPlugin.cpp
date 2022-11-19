@@ -504,20 +504,14 @@ QWidget *VstPlugin::editor()
 
 void VstPlugin::openPreset()
 {
-
-	gui::FileDialog ofd( nullptr, tr( "Open Preset" ), "",
-		tr( "Vst Plugin Preset (*.fxp *.fxb)" ) );
-	ofd.setFileMode( gui::FileDialog::ExistingFiles );
-	if( ofd.exec () == QDialog::Accepted &&
-					!ofd.selectedFiles().isEmpty() )
+	gui::FileDialog ofd(nullptr, tr("Open Preset"), "", tr("VST Plugin Preset (*.fxp *.fxb)"));
+	ofd.setFileMode(gui::FileDialog::ExistingFiles);
+	if (ofd.exec() == QDialog::Accepted && !ofd.selectedFiles().isEmpty())
 	{
 		lock();
-		sendMessage( message( IdLoadPresetFile ).
-			addString(
-				QSTR_TO_STDSTR(
-					QDir::toNativeSeparators( ofd.selectedFiles()[0] ) ) )
-			);
-		waitForMessage( IdLoadPresetFile, true );
+		sendMessage(message(IdLoadPresetFile).addString(QSTR_TO_STDSTR(
+			QDir::toNativeSeparators(ofd.selectedFiles()[0]))));
+		waitForMessage(IdLoadPresetFile, true);
 		unlock();
 	}
 }
@@ -585,32 +579,32 @@ void VstPlugin::savePreset()
 	QString presName = currentProgramName().isEmpty() ? tr(": default") : currentProgramName();
 	presName.replace("\"", "'"); // QFileDialog unable to handle double quotes properly
 
-	gui::FileDialog sfd( nullptr, tr( "Save Preset" ), presName.section(": ", 1, 1) + tr(".fxp"),
-		tr( "Vst Plugin Preset (*.fxp *.fxb)" ) );
+	gui::FileDialog sfd(nullptr, tr("Save Preset"), presName.section(": ", 1, 1) + tr(".fxp"),
+		tr("VST Plugin Preset (*.fxp *.fxb)"));
 
-	if( p_name != "" ) // remember last directory
+	if (p_name != "") // remember last directory
 	{
-		sfd.setDirectory( QFileInfo( p_name ).absolutePath() );
+		sfd.setDirectory(QFileInfo(p_name).absolutePath());
 	}
 
-	sfd.setAcceptMode( gui::FileDialog::AcceptSave );
-	sfd.setFileMode( gui::FileDialog::AnyFile );
-	if( sfd.exec () == QDialog::Accepted &&
-				!sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "" )
+	sfd.setAcceptMode(gui::FileDialog::AcceptSave);
+	sfd.setFileMode(gui::FileDialog::AnyFile);
+	if (sfd.exec() == QDialog::Accepted && !sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "")
 	{
 		QString fns = sfd.selectedFiles()[0];
 		p_name = fns;
 
 		if ((fns.toUpper().indexOf(tr(".FXP")) == -1) && (fns.toUpper().indexOf(tr(".FXB")) == -1))
+		{
 			fns = fns + tr(".fxb");
-		else fns = fns.left(fns.length() - 4) + (fns.right( 4 )).toLower();
+		}
+		else
+		{
+			fns = fns.left(fns.length() - 4) + (fns.right(4)).toLower();
+		}
 		lock();
-		sendMessage( message( IdSavePresetFile ).
-			addString(
-				QSTR_TO_STDSTR(
-					QDir::toNativeSeparators( fns ) ) )
-			);
-		waitForMessage( IdSavePresetFile, true );
+		sendMessage(message(IdSavePresetFile).addString(QSTR_TO_STDSTR(QDir::toNativeSeparators(fns))));
+		waitForMessage(IdSavePresetFile, true);
 		unlock();
 	}
 }

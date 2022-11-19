@@ -240,7 +240,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	envelopeResolutionKnob->setModel(&controls->m_envelopeResolutionModel);
 	envelopeResolutionKnob->setLabel(tr("Envelope res."));
 	envelopeResolutionKnob->setToolTip(tr("Increase envelope resolution for better details, decrease for better GUI performance."));
-	envelopeResolutionKnob->setHintText(tr("Draw at most"), tr(" envelope points per pixel"));
+	envelopeResolutionKnob->setHintText(tr("Maximum number of envelope points drawn per pixel:"), "");
 	advanced_layout->addWidget(envelopeResolutionKnob, 0, 0, 1, 1, Qt::AlignCenter);
 
 	// Spectrum graph resolution
@@ -248,7 +248,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	spectrumResolutionKnob->setModel(&controls->m_spectrumResolutionModel);
 	spectrumResolutionKnob->setLabel(tr("Spectrum res."));
 	spectrumResolutionKnob->setToolTip(tr("Increase spectrum resolution for better details, decrease for better GUI performance."));
-	spectrumResolutionKnob->setHintText(tr("Draw at most"), tr(" spectrum points per pixel"));
+	spectrumResolutionKnob->setHintText(tr("Maximum number of spectrum points drawn per pixel:"), "");
 	advanced_layout->addWidget(spectrumResolutionKnob, 1, 0, 1, 1, Qt::AlignCenter);
 
 	// Peak falloff speed
@@ -272,7 +272,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	waterfallHeightKnob->setModel(&controls->m_waterfallHeightModel);
 	waterfallHeightKnob->setLabel(tr("Waterfall height"));
 	waterfallHeightKnob->setToolTip(tr("Increase to get slower scrolling, decrease to see fast transitions better. Warning: medium CPU usage."));
-	waterfallHeightKnob->setHintText(tr("Keep"), tr(" lines"));
+	waterfallHeightKnob->setHintText(tr("Number of lines to keep:"), "");
 	advanced_layout->addWidget(waterfallHeightKnob, 0, 2, 1, 1, Qt::AlignCenter);
 	processor->reallocateBuffers();
 	connect(&controls->m_waterfallHeightModel, &FloatModel::dataChanged, [=] {processor->reallocateBuffers();});
@@ -290,7 +290,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	windowOverlapKnob->setModel(&controls->m_windowOverlapModel);
 	windowOverlapKnob->setLabel(tr("Window overlap"));
 	windowOverlapKnob->setToolTip(tr("Increase to prevent missing fast transitions arriving near FFT window edges. Warning: high CPU usage."));
-	windowOverlapKnob->setHintText(tr("Each sample processed"), tr(" times"));
+	windowOverlapKnob->setHintText(tr("Number of times each sample is processed:"), "");
 	advanced_layout->addWidget(windowOverlapKnob, 0, 3, 1, 1, Qt::AlignCenter);
 
 	// FFT zero padding
