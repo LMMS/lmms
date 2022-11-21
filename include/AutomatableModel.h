@@ -25,8 +25,8 @@
 #ifndef AUTOMATABLE_MODEL_H
 #define AUTOMATABLE_MODEL_H
 
-#include <QtCore/QMap>
-#include <QtCore/QMutex>
+#include <QMap>
+#include <QMutex>
 
 #include "JournallingObject.h"
 #include "Model.h"
@@ -34,6 +34,10 @@
 #include "ValueBuffer.h"
 #include "MemoryManager.h"
 #include "ModelVisitor.h"
+
+
+namespace lmms
+{
 
 // simple way to map a property of a view to a model
 #define mapPropertyFromModelPtr(type,getfunc,setfunc,modelname)	\
@@ -74,8 +78,7 @@ class LMMS_EXPORT AutomatableModel : public Model, public JournallingObject
 	Q_OBJECT
 	MM_OPERATORS
 public:
-
-	typedef QVector<AutomatableModel *> AutoModelVector;
+	using AutoModelVector = QVector<AutomatableModel*>;
 
 	enum ScaleType
 	{
@@ -85,7 +88,7 @@ public:
 	};
 
 
-	virtual ~AutomatableModel();
+	~AutomatableModel() override;
 
 	// Implement those by using the MODEL_IS_VISITABLE macro
 	virtual void accept(ModelVisitor& v) = 0;
@@ -416,7 +419,7 @@ private:
 
 signals:
 	void initValueChanged( float val );
-	void destroyed( jo_id_t id );
+	void destroyed( lmms::jo_id_t id );
 
 } ;
 
@@ -500,7 +503,9 @@ public:
 	QString displayValue( const float val ) const override;
 } ;
 
-typedef QMap<AutomatableModel*, float> AutomatedValueMap;
+using AutomatedValueMap = QMap<AutomatableModel*, float>;
+
+} // namespace lmms
 
 #endif
 

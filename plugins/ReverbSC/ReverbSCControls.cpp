@@ -28,7 +28,10 @@
 #include "ReverbSCControls.h"
 #include "ReverbSC.h"
 #include "Engine.h"
-#include "Song.h"
+
+namespace lmms
+{
+
 
 ReverbSCControls::ReverbSCControls( ReverbSCEffect* effect ) :
 	EffectControls( effect ),
@@ -65,3 +68,6 @@ void ReverbSCControls::changeSampleRate()
 {
 	m_effect->changeSampleRate();
 }
+
+
+} // namespace lmms

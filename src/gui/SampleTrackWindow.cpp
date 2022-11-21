@@ -25,17 +25,28 @@
 #include "SampleTrackWindow.h"
 
 #include <QCloseEvent>
+#include <QGridLayout>
+#include <QLabel>
+#include <QLineEdit>
 #include <QMenu>
+#include <QVBoxLayout>
 
+#include "EffectRackView.h"
 #include "embed.h"
 #include "gui_templates.h"
 #include "GuiApplication.h"
 #include "Knob.h"
 #include "MainWindow.h"
+#include "MixerLineLcdSpinBox.h"
+#include "SampleTrackView.h"
 #include "Song.h"
+#include "SubWindow.h"
 #include "TabWidget.h"
 #include "TrackLabelButton.h"
- 
+
+namespace lmms::gui
+{
+
 
 SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	QWidget(),
@@ -45,27 +56,27 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 {
 	// init own layout + widgets
 	setFocusPolicy(Qt::StrongFocus);
-	QVBoxLayout * vlayout = new QVBoxLayout(this);
+	auto vlayout = new QVBoxLayout(this);
 	vlayout->setMargin(0);
 	vlayout->setSpacing(0);
 
-	TabWidget* generalSettingsWidget = new TabWidget(tr("GENERAL SETTINGS"), this);
+	auto generalSettingsWidget = new TabWidget(tr("GENERAL SETTINGS"), this);
 
-	QVBoxLayout* generalSettingsLayout = new QVBoxLayout(generalSettingsWidget);
+	auto generalSettingsLayout = new QVBoxLayout(generalSettingsWidget);
 
 	generalSettingsLayout->setContentsMargins(8, 18, 8, 8);
 	generalSettingsLayout->setSpacing(6);
 
-	QWidget* nameWidget = new QWidget(generalSettingsWidget);
-	QHBoxLayout* nameLayout = new QHBoxLayout(nameWidget);
+	auto nameWidget = new QWidget(generalSettingsWidget);
+	auto nameLayout = new QHBoxLayout(nameWidget);
 	nameLayout->setContentsMargins(0, 0, 0, 0);
 	nameLayout->setSpacing(2);
 
 	// setup line edit for changing sample track name
 	m_nameLineEdit = new QLineEdit;
 	m_nameLineEdit->setFont(pointSize<9>(m_nameLineEdit->font()));
-	connect(m_nameLineEdit, SIGNAL(textChanged(const QString &)),
-				this, SLOT(textChanged(const QString &)));
+	connect(m_nameLineEdit, SIGNAL(textChanged(const QString&)),
+				this, SLOT(textChanged(const QString&)));
 
 	m_nameLineEdit->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
 	nameLayout->addWidget(m_nameLineEdit);
@@ -73,8 +84,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 
 	generalSettingsLayout->addWidget(nameWidget);
 
-
-	QGridLayout* basicControlsLayout = new QGridLayout;
+	auto basicControlsLayout = new QGridLayout;
 	basicControlsLayout->setHorizontalSpacing(3);
 	basicControlsLayout->setVerticalSpacing(0);
 	basicControlsLayout->setContentsMargins(0, 0, 0, 0);
@@ -91,7 +101,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	basicControlsLayout->addWidget(m_volumeKnob, 0, 0);
 	basicControlsLayout->setAlignment(m_volumeKnob, widgetAlignment);
 
-	QLabel *label = new QLabel(tr("VOL"), this);
+	auto label = new QLabel(tr("VOL"), this);
 	label->setStyleSheet(labelStyleSheet);
 	basicControlsLayout->addWidget(label, 1, 0);
 	basicControlsLayout->setAlignment(label, labelAlignment);
@@ -113,13 +123,13 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	basicControlsLayout->setColumnStretch(2, 1);
 
 
-	// setup spinbox for selecting FX-channel
-	m_effectChannelNumber = new FxLineLcdSpinBox(2, nullptr, tr("FX channel"), m_stv);
+	// setup spinbox for selecting Mixer-channel
+	m_mixerChannelNumber = new MixerLineLcdSpinBox(2, nullptr, tr("Mixer channel"), m_stv);
 
-	basicControlsLayout->addWidget(m_effectChannelNumber, 0, 3);
-	basicControlsLayout->setAlignment(m_effectChannelNumber, widgetAlignment);
+	basicControlsLayout->addWidget(m_mixerChannelNumber, 0, 3);
+	basicControlsLayout->setAlignment(m_mixerChannelNumber, widgetAlignment);
 
-	label = new QLabel(tr("FX"), this);
+	label = new QLabel(tr("CHANNEL"), this);
 	label->setStyleSheet(labelStyleSheet);
 	basicControlsLayout->addWidget(label, 1, 3);
 	basicControlsLayout->setAlignment(label, labelAlignment);
@@ -152,11 +162,6 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	subWin->hide();
 }
 
-SampleTrackWindow::~SampleTrackWindow()
-{
-}
-
-
 
 void SampleTrackWindow::setSampleTrackView(SampleTrackView* tv)
 {
@@ -183,7 +188,7 @@ void SampleTrackWindow::modelChanged()
 
 	m_volumeKnob->setModel(&m_track->m_volumeModel);
 	m_panningKnob->setModel(&m_track->m_panningModel);
-	m_effectChannelNumber->setModel(&m_track->m_effectChannelModel);
+	m_mixerChannelNumber->setModel(&m_track->m_mixerChannelModel);
 
 	updateName();
 }
@@ -263,3 +268,6 @@ void SampleTrackWindow::loadSettings(const QDomElement& element)
 		m_stv->m_tlb->setChecked(true);
 	}
 }
+
+
+} // namespace lmms::gui

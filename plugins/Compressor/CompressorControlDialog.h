@@ -26,18 +26,23 @@
 #define COMPRESSOR_CONTROL_DIALOG_H
 
 #include <QBasicTimer>
-#include <QLabel>
-#include <QMouseEvent>
+#include <QElapsedTimer>
 #include <QPainter>
-#include <QTime>
 
-#include "../Eq/EqFader.h"
 #include "EffectControlDialog.h"
-#include "GuiApplication.h"
-#include "Knob.h"
-#include "MainWindow.h"
-#include "PixmapButton.h"
 
+class QLabel;
+
+namespace lmms
+{
+
+constexpr float COMP_NOISE_FLOOR = 0.000001;// -120 dbFs
+
+class CompressorControls;
+
+
+namespace gui
+{
 
 constexpr int COMP_MILLI_PER_PIXEL = 6;
 constexpr int MIN_COMP_SCREEN_X = 800;
@@ -54,11 +59,11 @@ constexpr int COMP_BOX_Y = 280;
 constexpr float COMP_GRID_SPACING = 3.f;// 3 db per grid line
 constexpr float COMP_GRID_MAX = 96.f;// Can't zoom out past 96 db
 
-constexpr float COMP_NOISE_FLOOR = 0.000001;// -120 dbFs
+class automatableButtonGroup;
+class Knob;
+class PixmapButton;
+class EqFader;
 
-
-
-class CompressorControls;
 
 class CompressorControlDialog : public EffectControlDialog
 {
@@ -214,5 +219,11 @@ private:
 
 	friend class CompressorControls;
 } ;
+
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

@@ -25,13 +25,15 @@
 #ifndef SCALE_H
 #define SCALE_H
 
-#include <cmath>
 #include <cstdint>
 #include <vector>
 #include <QObject>
 #include <QString>
 
 #include "SerializingObject.h"
+
+namespace lmms
+{
 
 class Interval : public SerializingObject
 {
@@ -83,5 +85,8 @@ private:
 	std::vector<Interval> m_intervals;      //!< a series of ratios that define the scale
 
 };
+
+
+} // namespace lmms
 
 #endif

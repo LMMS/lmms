@@ -28,15 +28,15 @@
 #include "MidiClient.h"
 
 
+namespace lmms
+{
+
+
 class MidiDummy : public MidiClientRaw
 {
 public:
-	MidiDummy()
-	{
-	}
-	virtual ~MidiDummy()
-	{
-	}
+	MidiDummy() = default;
+	~MidiDummy() override = default;
 
 	inline static QString name()
 	{
@@ -62,5 +62,7 @@ protected:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

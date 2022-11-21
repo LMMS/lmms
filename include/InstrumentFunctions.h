@@ -31,10 +31,19 @@
 #include "TempoSyncKnobModel.h"
 #include "ComboBoxModel.h"
 
+namespace lmms
+{
 
 class InstrumentTrack;
 class NotePlayHandle;
 
+namespace gui
+{
+
+class InstrumentFunctionNoteStackingView;
+class InstrumentFunctionArpeggioView;
+
+}
 
 
 class InstrumentFunctionNoteStacking : public Model, public JournallingObject
@@ -45,11 +54,11 @@ public:
 	static const int MAX_CHORD_POLYPHONY = 13;
 
 private:
-	typedef int8_t ChordSemiTones [MAX_CHORD_POLYPHONY];
+	using ChordSemiTones = std::array<int8_t, MAX_CHORD_POLYPHONY>;
 
 public:
 	InstrumentFunctionNoteStacking( Model * _parent );
-	virtual ~InstrumentFunctionNoteStacking();
+	~InstrumentFunctionNoteStacking() override = default;
 
 	void processNote( NotePlayHandle* n );
 
@@ -149,7 +158,7 @@ private:
 	FloatModel m_chordRangeModel;
 
 
-	friend class InstrumentFunctionNoteStackingView;
+	friend class gui::InstrumentFunctionNoteStackingView;
 
 } ;
 
@@ -171,7 +180,7 @@ public:
 	} ;
 
 	InstrumentFunctionArpeggio( Model * _parent );
-	virtual ~InstrumentFunctionArpeggio();
+	~InstrumentFunctionArpeggio() override = default;
 
 	void processNote( NotePlayHandle* n );
 
@@ -207,9 +216,11 @@ private:
 
 
 	friend class InstrumentTrack;
-	friend class InstrumentFunctionArpeggioView;
+	friend class gui::InstrumentFunctionArpeggioView;
 
 } ;
 
+
+} // namespace lmms
 
 #endif

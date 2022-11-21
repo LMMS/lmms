@@ -28,8 +28,11 @@
 
 #include "EffectControls.h"
 #include "DualFilterControlDialog.h"
-#include "Knob.h"
 #include "ComboBoxModel.h"
+
+namespace lmms
+{
+
 
 class DualFilterEffect;
 
@@ -39,25 +42,23 @@ class DualFilterControls : public EffectControls
 	Q_OBJECT
 public:
 	DualFilterControls( DualFilterEffect* effect );
-	virtual ~DualFilterControls()
-	{
-	}
+	~DualFilterControls() override = default;
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName() const
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
+	inline QString nodeName() const override
 	{
 		return "DualFilterControls";
 	}
 
-	virtual int controlCount()
+	int controlCount() override
 	{
 		return 11;
 	}
 
-	virtual EffectControlDialog* createView()
+	gui::EffectControlDialog* createView() override
 	{
-		return new DualFilterControlDialog( this );
+		return new gui::DualFilterControlDialog( this );
 	}
 
 
@@ -81,9 +82,12 @@ private:
 	FloatModel m_res2Model;
 	FloatModel m_gain2Model;
 
-	friend class DualFilterControlDialog;
+	friend class gui::DualFilterControlDialog;
 	friend class DualFilterEffect;
 
 } ;
+
+
+} // namespace lmms
 
 #endif

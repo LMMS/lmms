@@ -25,15 +25,10 @@
 
 #include "MidiClient.h"
 #include "MidiPort.h"
-#include "Note.h"
 
 
-MidiClient::MidiClient()
+namespace lmms
 {
-}
-
-
-
 
 MidiClient::~MidiClient()
 {
@@ -100,20 +95,6 @@ void MidiClient::subscribeWritablePort( MidiPort* , const QString& , bool )
 
 
 
-
-
-
-
-MidiClientRaw::MidiClientRaw()
-{
-}
-
-
-
-
-MidiClientRaw::~MidiClientRaw()
-{
-}
 
 
 
@@ -222,10 +203,13 @@ void MidiClientRaw::parseData( const unsigned char c )
 		case MidiNoteOff:
 		case MidiNoteOn:
 		case MidiKeyPressure:
-		case MidiChannelPressure:
-		case MidiProgramChange:
 			m_midiParseData.m_midiEvent.setKey(m_midiParseData.m_buffer[0]);
 			m_midiParseData.m_midiEvent.setVelocity(m_midiParseData.m_buffer[1]);
+			break;
+
+		case MidiChannelPressure:
+		case MidiProgramChange:
+			m_midiParseData.m_midiEvent.setParam(0, m_midiParseData.m_buffer[0]);
 			break;
 
 		case MidiControlChange:
@@ -253,9 +237,9 @@ void MidiClientRaw::parseData( const unsigned char c )
 
 void MidiClientRaw::processParsedEvent()
 {
-	for( int i = 0; i < m_midiPorts.size(); ++i )
+	for (const auto& midiPort : m_midiPorts)
 	{
-		m_midiPorts[i]->processInEvent( m_midiParseData.m_midiEvent );
+		midiPort->processInEvent(m_midiParseData.m_midiEvent);
 	}
 }
 
@@ -325,3 +309,5 @@ int MidiClientRaw::eventLength( const unsigned char event )
 	}
 	return 1;
 }
+
+} // namespace lmms

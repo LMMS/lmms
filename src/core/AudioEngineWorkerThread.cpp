@@ -30,11 +30,15 @@
 
 #include "denormals.h"
 #include "AudioEngine.h"
+#include "MemoryManager.h"
 #include "ThreadableJob.h"
 
 #if __SSE__
 #include <xmmintrin.h>
 #endif
+
+namespace lmms
+{
 
 AudioEngineWorkerThread::JobQueue AudioEngineWorkerThread::globalJobQueue;
 QWaitCondition * AudioEngineWorkerThread::queueReadyWaitCond = nullptr;
@@ -176,4 +180,4 @@ void AudioEngineWorkerThread::run()
 	}
 }
 
-
+} // namespace lmms

@@ -40,12 +40,11 @@
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 
-#include <QDomDocument>
 #include <QFile>
 #include <QFileInfo>
 #include <QByteArray>
-#include <assert.h>
-#include <math.h>
+#include <cassert>
+#include <cmath>
 
 #include "opl.h"
 #include "temuopl.h"
@@ -55,18 +54,20 @@
 #include "debug.h"
 
 #include "Knob.h"
-#include "LcdSpinBox.h"
 #include "PixmapButton.h"
-#include "ToolTip.h"
 
 #include "plugin_export.h"
+
+namespace lmms
+{
+
 
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT opulenz_plugin_descriptor =
 {
-        STRINGIFY( PLUGIN_NAME ),
+        LMMS_STRINGIFY( PLUGIN_NAME ),
         "OpulenZ",
         QT_TRANSLATE_NOOP( "PluginBrowser",
 			   "2-operator FM Synth" ),
@@ -214,7 +215,7 @@ OpulenzInstrument::OpulenzInstrument( InstrumentTrack * _instrument_track ) :
 	MOD_CON( trem_depth_mdl );
 
 	// Connect the plugin to the audio engine...
-	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
+	auto iph = new InstrumentPlayHandle(this, _instrument_track);
 	Engine::audioEngine()->addPlayHandle( iph );
 }
 
@@ -391,9 +392,9 @@ QString OpulenzInstrument::nodeName() const
         return( opulenz_plugin_descriptor.name );
 }
 
-PluginView * OpulenzInstrument::instantiateView( QWidget * _parent )
+gui::PluginView* OpulenzInstrument::instantiateView( QWidget * _parent )
 {
-        return( new OpulenzInstrumentView( this, _parent ) );
+        return( new gui::OpulenzInstrumentView( this, _parent ) );
 }
 
 
@@ -676,7 +677,8 @@ void OpulenzInstrument::loadFile( const QString& file ) {
 
 
 
-
+namespace gui
+{
 
 OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
                                                         QWidget * _parent ) :
@@ -697,14 +699,14 @@ OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
         buttname->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "led_on" ) );\
         buttname->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "led_off" ) );\
 	buttname->setCheckable( true );\
-        ToolTip::add( buttname, tr( tooltip ) );\
+        buttname->setToolTip(tr(tooltip));\
         buttname->move( xpos, ypos );
 
 #define WAVEBUTTON_GEN(buttname, tooltip, xpos, ypos, icon_on, icon_off, buttgroup) \
 	buttname = new PixmapButton( this, nullptr );\
         buttname->setActiveGraphic( PLUGIN_NAME::getIconPixmap( icon_on ) ); \
         buttname->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( icon_off ) ); \
-        ToolTip::add( buttname, tr( tooltip ) );\
+        buttname->setToolTip(tr(tooltip));\
         buttname->move( xpos, ypos );\
 	buttgroup->addButton(buttname);
 
@@ -796,8 +798,7 @@ void OpulenzInstrumentView::updateKnobHints()
 		-12, 0, 12, 19, 24, 28, 31, 34, 36, 38, 40, 40, 43, 43, 47, 47  
 	};
 
-	OpulenzInstrument * m = castModel<OpulenzInstrument>();
-	
+	auto m = castModel<OpulenzInstrument>();
 
 	op1_a_kn->setHintText( tr( "Attack" ),
 						   " (" + knobHintHelper(attack_times[(int)m->op1_a_mdl.value()]) + ")");
@@ -819,7 +820,7 @@ void OpulenzInstrumentView::updateKnobHints()
 
 void OpulenzInstrumentView::modelChanged()
 {
-	OpulenzInstrument * m = castModel<OpulenzInstrument>();
+	auto m = castModel<OpulenzInstrument>();
 	// m_patch->setModel( &m->m_patchModel );
 
 	op1_a_kn->setModel( &m->op1_a_mdl );
@@ -873,4 +874,6 @@ void OpulenzInstrumentView::modelChanged()
 }
 
 
+} // namespace gui
 
+} // namespace lmms

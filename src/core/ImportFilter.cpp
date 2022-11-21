@@ -33,6 +33,9 @@
 #include "ProjectJournal.h"
 
 
+namespace lmms
+{
+
 using std::unique_ptr;
 
 ImportFilter::ImportFilter( const QString & _file_name,
@@ -42,12 +45,6 @@ ImportFilter::ImportFilter( const QString & _file_name,
 {
 }
 
-
-
-
-ImportFilter::~ImportFilter()
-{
-}
 
 
 
@@ -117,3 +114,4 @@ bool ImportFilter::openFile()
 
 
 
+} // namespace lmms

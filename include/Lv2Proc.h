@@ -31,17 +31,20 @@
 
 #include <lilv/lilv.h>
 #include <memory>
-#include <QObject>
 
 #include "Lv2Basics.h"
 #include "Lv2Features.h"
 #include "Lv2Options.h"
 #include "LinkedModelGroups.h"
-#include "MidiEvent.h"
 #include "Plugin.h"
-#include "PluginIssue.h"
 #include "../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
 #include "TimePos.h"
+
+
+namespace lmms
+{
+
+class PluginIssue;
 
 // forward declare port structs/enums
 namespace Lv2Ports
@@ -212,6 +215,9 @@ private:
 	static bool portIsOptional(const LilvPlugin* plugin, const LilvPort *port);
 	static AutoLilvNode uri(const char* uriStr);
 };
+
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2
 #endif // LV2PROC_H

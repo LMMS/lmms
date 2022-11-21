@@ -1,0 +1,252 @@
+---
+name: build
+'on': [push, pull_request]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  linux:
+    name: linux
+    runs-on: ubuntu-latest
+    container: lmmsci/linux.gcc:18.04
+    env:
+      CMAKE_OPTS: >-
+        -DUSE_WERROR=ON
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo
+        -DUSE_COMPILE_CACHE=ON
+      CCACHE_MAXSIZE: 500M
+      MAKEFLAGS: -j2
+    steps:
+      - name: Update and configure Git
+        run: |
+          add-apt-repository ppa:git-core/ppa
+          apt-get update
+          apt-get --yes install git
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Check out
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - name: Cache ccache data
+        uses: actions/cache@v3
+        with:
+          key: ccache-${{ github.job }}-${{ github.ref }}-${{ github.run_id }}
+          restore-keys: |
+            ccache-${{ github.job }}-${{ github.ref }}-
+            ccache-${{ github.job }}-
+          path: ~/.ccache
+      - name: Configure
+        run: |
+          source /opt/qt5*/bin/qt5*-env.sh || true
+          mkdir build && cd build
+          cmake .. $CMAKE_OPTS -DCMAKE_INSTALL_PREFIX=./install
+      - name: Build
+        run: cmake --build build
+      - name: Build tests
+        run: cmake --build build --target tests
+      - name: Run tests
+        run: build/tests/tests
+      - name: Package
+        run: |
+          cmake --build build --target install
+          cmake --build build --target appimage
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux
+          path: build/lmms-*.AppImage
+      - name: Print ccache statistics
+        run: |
+          echo "[ccache config]"
+          ccache -p
+          echo "[ccache stats]"
+          ccache -s
+  macos:
+    name: macos
+    runs-on: macos-11
+    env:
+      CMAKE_OPTS: >-
+        -DUSE_WERROR=ON
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo
+        -DUSE_COMPILE_CACHE=ON
+      CCACHE_MAXSIZE: 500M
+      MAKEFLAGS: -j3
+      DEVELOPER_DIR: /Applications/Xcode_11.7.app/Contents/Developer
+    steps:
+      - name: Check out
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - name: Cache ccache data
+        uses: actions/cache@v3
+        with:
+          key: ccache-${{ github.job }}-${{ github.ref }}-${{ github.run_id }}
+          restore-keys: |
+            ccache-${{ github.job }}-${{ github.ref }}-
+            ccache-${{ github.job }}-
+          path: ~/Library/Caches/ccache
+      - name: Install dependencies
+        run: |
+          brew install ccache fftw pkg-config libogg libvorbis lame libsndfile \
+                       libsamplerate jack sdl libgig libsoundio lilv lv2 stk \
+                       fluid-synth portaudio fltk qt@5 carla
+          npm install --location=global appdmg
+      - name: Configure
+        run: |
+          mkdir build
+          cmake -S . \
+                -B build \
+                -DCMAKE_INSTALL_PREFIX="../target" \
+                -DCMAKE_PREFIX_PATH="$(brew --prefix qt5)" \
+                $CMAKE_OPTS \
+                -DUSE_WERROR=OFF
+      - name: Build
+        run: cmake --build build
+      - name: Build tests
+        run: cmake --build build --target tests
+      - name: Run tests
+        run: build/tests/tests
+      - name: Package
+        run: |
+          cmake --build build --target install
+          cmake --build build --target dmg
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: macos
+          path: build/lmms-*.dmg
+      - name: Print ccache statistics
+        run: |
+          echo "[ccache config]"
+          ccache -p
+          echo "[ccache stats]"
+          ccache -s
+  mingw:
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: ['32', '64']
+    name: mingw${{ matrix.arch }}
+    runs-on: ubuntu-latest
+    container: lmmsci/linux.mingw${{ matrix.arch }}:18.04
+    env:
+      CMAKE_OPTS: >-
+        -DUSE_WERROR=ON
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo
+        -DUSE_COMPILE_CACHE=ON
+      CCACHE_MAXSIZE: 500M
+      MAKEFLAGS: -j2
+    steps:
+      - name: Update and configure Git
+        run: |
+          add-apt-repository ppa:git-core/ppa
+          apt-get update
+          apt-get --yes install git
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Check out
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - name: Cache ccache data
+        uses: actions/cache@v3
+        with:
+          key: "ccache-${{ github.job }}-${{ matrix.arch }}-${{ github.ref }}\
+            -${{ github.run_id }}"
+          restore-keys: |
+            ccache-${{ github.job }}-${{ matrix.arch }}-${{ github.ref }}-
+            ccache-${{ github.job }}-${{ matrix.arch }}-
+          path: ~/.ccache
+      - name: Configure
+        run: |
+          mkdir build && cd build
+          ../cmake/build_win${{ matrix.arch }}.sh
+      - name: Build
+        run: cmake --build build
+      - name: Build tests
+        run: cmake --build build --target tests
+      - name: Package
+        run: cmake --build build --target package
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: mingw${{ matrix.arch }}
+          path: build/lmms-*.exe
+      - name: Print ccache statistics
+        run: |
+          echo "[ccache config]"
+          ccache -p
+          echo "[ccache stats]"
+          ccache -s
+  msvc:
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: ['x86', 'x64']
+    name: msvc-${{ matrix.arch }}
+    runs-on: windows-2019
+    env:
+      qt-version: '5.15.2'
+    steps:
+      - name: Check out
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - name: Cache vcpkg dependencies
+        uses: actions/cache@v3
+        with:
+          key: vcpkg-${{ matrix.arch }}-${{ github.ref }}-${{ github.run_id }}
+          restore-keys: |
+            vcpkg-${{ matrix.arch }}-${{ github.ref }}-
+            vcpkg-${{ matrix.arch }}-
+          path: C:\vcpkg\installed
+      - name: Install 64-bit Qt
+        if: matrix.arch == 'x64'
+        uses: jurplel/install-qt-action@64bdb64f2c14311d23733a8463e5fcbc65e8775e
+        with:
+          version: ${{ env.qt-version }}
+          arch: win64_msvc2019_64
+          archives: qtbase qtsvg qttools
+          cache: true
+      - name: Install 32-bit Qt
+        uses: jurplel/install-qt-action@64bdb64f2c14311d23733a8463e5fcbc65e8775e
+        with:
+          version: ${{ env.qt-version }}
+          arch: win32_msvc2019
+          archives: qtbase qtsvg qttools
+          cache: true
+          set-env: ${{ matrix.arch == 'x86' }}
+      - name: Install dependencies
+        run: |
+          vcpkg install `
+            --triplet=${{ matrix.arch }}-windows `
+            --host-triplet=${{ matrix.arch }}-windows `
+            --recurse `
+            fftw3 fluidsynth[sndfile] libsamplerate libsndfile libstk lilv lv2 `
+            portaudio sdl2
+      - name: Set up build environment
+        uses: ilammy/msvc-dev-cmd@d8610e2b41c6d0f0c3b4c46dad8df0fd826c68e1
+        with:
+          arch: ${{ matrix.arch }}
+      - name: Configure
+        run: |
+          mkdir build
+          cmake -S . `
+            -B build `
+            -G Ninja `
+            --toolchain C:/vcpkg/scripts/buildsystems/vcpkg.cmake `
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo
+      - name: Build
+        run: cmake --build build
+      - name: Build tests
+        run: cmake --build build --target tests
+      - name: Package
+        run: cmake --build build --target package
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: msvc-${{ matrix.arch }}
+          path: build\lmms-*.exe

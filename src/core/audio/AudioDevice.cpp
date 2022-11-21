@@ -29,7 +29,8 @@
 #include "ConfigManager.h"
 #include "debug.h"
 
-
+namespace lmms
+{
 
 AudioDevice::AudioDevice( const ch_cnt_t _channels, AudioEngine*  _audioEngine ) :
 	m_supportsCapture( false ),
@@ -263,7 +264,8 @@ void AudioDevice::clearS16Buffer( int_sample_t * _outbuf, const fpp_t _frames )
 
 bool AudioDevice::hqAudio() const
 {
-	return ConfigManager::inst()->value( "mixer", "hqaudio" ).toInt();
+	return ConfigManager::inst()->value( "audioengine", "hqaudio" ).toInt();
 }
 
 
+} // namespace lmms

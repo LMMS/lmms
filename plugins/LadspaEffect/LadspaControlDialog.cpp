@@ -26,14 +26,19 @@
 
 #include <cmath>
 
+#include <QHBoxLayout>
 #include <QGroupBox>
-#include <QLayout>
+#include <QVBoxLayout>
 
-#include "LadspaEffect.h"
+#include "LadspaBase.h"
+#include "LadspaControl.h"
+#include "LadspaControls.h"
 #include "LadspaControlDialog.h"
 #include "LadspaControlView.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 
+namespace lmms::gui
+{
 
 
 LadspaControlDialog::LadspaControlDialog( LadspaControls * _ctl ) :
@@ -41,7 +46,7 @@ LadspaControlDialog::LadspaControlDialog( LadspaControls * _ctl ) :
 	m_effectLayout( nullptr ),
 	m_stereoLink( nullptr )
 {
-	QVBoxLayout * mainLay = new QVBoxLayout( this );
+	auto mainLay = new QVBoxLayout(this);
 
 	m_effectLayout = new QHBoxLayout();
 	mainLay->addLayout( m_effectLayout );
@@ -51,7 +56,7 @@ LadspaControlDialog::LadspaControlDialog( LadspaControls * _ctl ) :
 	if( _ctl->m_processors > 1 )
 	{
 		mainLay->addSpacing( 3 );
-		QHBoxLayout * center = new QHBoxLayout();
+		auto center = new QHBoxLayout();
 		mainLay->addLayout( center );
 		m_stereoLink = new LedCheckBox( tr( "Link Channels" ), this );
 		m_stereoLink->setModel( &_ctl->m_stereoLinkModel );
@@ -62,20 +67,12 @@ LadspaControlDialog::LadspaControlDialog( LadspaControls * _ctl ) :
 
 
 
-LadspaControlDialog::~LadspaControlDialog()
-{
-}
-
-
-
-
 void LadspaControlDialog::updateEffectView( LadspaControls * _ctl )
 {
-	QList<QGroupBox *> list = findChildren<QGroupBox *>();
-	for( QList<QGroupBox *>::iterator it = list.begin(); it != list.end();
-									++it )
+	QList<QGroupBox *> groupBoxes = findChildren<QGroupBox *>();
+	for (const auto& groupBox : groupBoxes)
 	{
-		delete *it;
+		delete groupBox;
 	}
 
 	m_effectControls = _ctl;
@@ -103,16 +100,15 @@ void LadspaControlDialog::updateEffectView( LadspaControls * _ctl )
 			grouper = new QGroupBox( this );
 		}
 
-		QGridLayout * gl = new QGridLayout( grouper );
+		auto gl = new QGridLayout(grouper);
 		grouper->setLayout( gl );
 		grouper->setAlignment( Qt::Vertical );
 
-		for( control_list_t::iterator it = controls.begin(); 
-						it != controls.end(); ++it )
+		for (const auto& control : controls)
 		{
-			if( (*it)->port()->proc == proc )
+			if (control->port()->proc == proc)
 			{
-				buffer_data_t this_port = (*it)->port()->data_type;
+				buffer_data_t this_port = control->port()->data_type;
 				if( last_port != NONE &&
 					( this_port == TOGGLED || this_port == ENUM ) &&
 					( last_port != TOGGLED && last_port != ENUM ) )
@@ -120,13 +116,13 @@ void LadspaControlDialog::updateEffectView( LadspaControls * _ctl )
 					++row;
 					col = 0;
 				}
-				gl->addWidget( new LadspaControlView( grouper, *it ), row, col );
+				gl->addWidget(new LadspaControlView(grouper, control), row, col);
 				if( ++col == cols )
 				{
 					++row;
 					col = 0;
 				}
-				last_port = (*it)->port()->data_type;
+				last_port = control->port()->data_type;
 			}
 		}
 
@@ -138,11 +134,10 @@ void LadspaControlDialog::updateEffectView( LadspaControls * _ctl )
 		m_stereoLink->setModel( &_ctl->m_stereoLinkModel );
 	}
 
-	connect( _ctl, SIGNAL( effectModelChanged( LadspaControls * ) ),
-				this, SLOT( updateEffectView( LadspaControls * ) ),
+	connect( _ctl, SIGNAL( effectModelChanged( lmms::LadspaControls * ) ),
+				this, SLOT( updateEffectView( lmms::LadspaControls * ) ),
 							Qt::DirectConnection );
 }
 
 
-
-
+} // namespace lmms::gui

@@ -3,7 +3,7 @@
 <lmms-project version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings muted="0" type="0" name="Trap kick" solo="0">
-    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="93" vol="100">
+    <instrumenttrack pan="0" mixch="0" pitchrange="1" pitch="0" basenote="93" vol="100">
       <instrument name="kicker">
         <kicker decay_numerator="4" decay_denominator="4" distend="3.3" click="0.25" endnote="1" version="1" decay="1714" syncmode="0" noise="0.11" slope="0.484" dist="2.5" env="0.3" startnote="1" startfreq="5" endfreq="5" gain="0.9"/>
       </instrument>

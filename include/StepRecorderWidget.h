@@ -22,12 +22,14 @@
 #ifndef STEP_RECOREDER_WIDGET_H
 #define STEP_RECOREDER_WIDGET_H
 
-#include "lmms_basics.h"
-#include "Note.h"
 
 #include <QWidget>
 #include <QColor>
-#include <QPainter>
+
+#include "TimePos.h"
+
+namespace lmms::gui
+{
 
 class StepRecorderWidget : public QWidget
 {
@@ -88,7 +90,9 @@ private:
 	const int m_marginRight;
 
 signals:
-	void positionChanged(const TimePos & t);
+	void positionChanged(const lmms::TimePos & t);
 } ;
+
+} // namespace lmms::gui
 
 #endif //STEP_RECOREDER_WIDGET_H

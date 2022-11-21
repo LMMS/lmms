@@ -28,6 +28,8 @@
 #include "Oscillator.h"
 #include "DspEffectLibrary.h"
 
+namespace lmms
+{
 
 template<class FX = DspEffectLibrary::StereoBypass>
 class SweepOscillator
@@ -39,9 +41,7 @@ public:
 	{
 	}
 
-	virtual ~SweepOscillator()
-	{
-	}
+	virtual ~SweepOscillator() = default;
 
 	void update( sampleFrame* buf, const fpp_t frames, const float freq1, const float freq2, const float sampleRate )
 	{
@@ -66,5 +66,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

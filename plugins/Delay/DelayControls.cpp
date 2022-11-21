@@ -22,12 +22,14 @@
  *
  */
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "DelayControls.h"
 #include "DelayEffect.h"
 #include "Engine.h"
-#include "Song.h"
+
+namespace lmms
+{
 
 DelayControls::DelayControls( DelayEffect* effect ):
 	EffectControls( effect ),
@@ -73,3 +75,6 @@ void DelayControls::changeSampleRate()
 {
 	m_effect->changeSampleRate();
 }
+
+
+} // namespace lmms

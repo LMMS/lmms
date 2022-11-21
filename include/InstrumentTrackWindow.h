@@ -30,15 +30,25 @@
 #include "ModelView.h"
 #include "SerializingObject.h"
 
+class QLabel;
+class QLineEdit;
+class QWidget;
+
+namespace lmms
+{
+
+class InstrumentTrack;
+
+namespace gui
+{
 
 class EffectRackView;
-class FxLineLcdSpinBox;
+class MixerLineLcdSpinBox;
 class InstrumentFunctionArpeggioView;
 class InstrumentFunctionNoteStackingView;
 class InstrumentMidiIOView;
 class InstrumentMiscView;
 class InstrumentSoundShapingView;
-class InstrumentTrack;
 class InstrumentTrackShapingView;
 class InstrumentTrackView;
 class Knob;
@@ -46,9 +56,6 @@ class LcdSpinBox;
 class LeftRightNav;
 class PianoView;
 class PluginView;
-class QLabel;
-class QLineEdit;
-class QWidget;
 class TabWidget;
 
 
@@ -58,7 +65,7 @@ class InstrumentTrackWindow : public QWidget, public ModelView,
 	Q_OBJECT
 public:
 	InstrumentTrackWindow( InstrumentTrackView * _tv );
-	virtual ~InstrumentTrackWindow();
+	~InstrumentTrackWindow() override;
 
 	// parent for all internal tab-widgets
 	TabWidget * tabWidgetParent()
@@ -135,7 +142,7 @@ private:
 	QLabel * m_pitchLabel;
 	LcdSpinBox* m_pitchRangeSpinBox;
 	QLabel * m_pitchRangeLabel;
-	FxLineLcdSpinBox * m_effectChannelNumber;
+	MixerLineLcdSpinBox * m_mixerChannelNumber;
 
 
 
@@ -157,5 +164,9 @@ private:
 	friend class InstrumentTrackView;
 } ;
 
-#endif
 
+} // namespace gui
+
+} // namespace lmms
+
+#endif

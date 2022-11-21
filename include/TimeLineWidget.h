@@ -33,6 +33,10 @@
 
 class QPixmap;
 class QToolBar;
+
+namespace lmms::gui
+{
+
 class NStateButton;
 class TextFloat;
 class SongEditor;
@@ -74,7 +78,7 @@ public:
 
 	TimeLineWidget(int xoff, int yoff, float ppb, Song::PlayPos & pos,
 				const TimePos & begin, Song::PlayModes mode, QWidget * parent);
-	virtual ~TimeLineWidget();
+	~TimeLineWidget() override;
 
 	inline QColor const & getBarLineColor() const { return m_barLineColor; }
 	inline void setBarLineColor(QColor const & barLineColor) { m_barLineColor = barLineColor; }
@@ -175,10 +179,14 @@ signals:
 
 
 public slots:
-	void updatePosition( const TimePos & );
+	void updatePosition( const lmms::TimePos & );
 	void updatePosition()
 	{
 		updatePosition( TimePos() );
+	}
+	void setSnapSize( const float snapSize )
+	{
+		m_snapSize = snapSize;
 	}
 	void toggleAutoScroll( int _n );
 	void toggleLoopPoints( int _n );
@@ -217,6 +225,7 @@ private:
 	int m_xOffset;
 	int m_posMarkerX;
 	float m_ppb;
+	float m_snapSize;
 	Song::PlayPos & m_pos;
 	const TimePos & m_begin;
 	const Song::PlayModes m_mode;
@@ -235,19 +244,22 @@ private:
 		MovePositionMarker,
 		MoveLoopBegin,
 		MoveLoopEnd,
-		SelectSongTCO,
+		SelectSongClip,
 	} m_action;
 
 	int m_moveXOff;
 
 
 signals:
-	void positionChanged( const TimePos & _t );
+	void positionChanged( const lmms::TimePos & _t );
 	void loopPointStateLoaded( int _n );
 	void positionMarkerMoved();
 	void loadBehaviourAtStop( int _n );
 
 } ;
 
+
+
+} // namespace lmms::gui
 
 #endif

@@ -31,15 +31,20 @@
 #include "AutomatableModel.h"
 #include "ModelView.h"
 
+namespace lmms
+{
+
 class Piano;
 
+namespace gui
+{
 
 class PianoView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
 	PianoView( QWidget * _parent );
-	virtual ~PianoView() = default;
+	~PianoView() override = default;
 
 	static int getKeyFromKeyEvent( QKeyEvent * _ke );
 
@@ -93,5 +98,9 @@ signals:
 
 } ;
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

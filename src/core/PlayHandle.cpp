@@ -27,10 +27,11 @@
 #include "BufferManager.h"
 #include "Engine.h"
 
-#include <QtCore/QThread>
-#include <QDebug>
+#include <QThread>
 
-#include <iterator>
+
+namespace lmms
+{
 
 PlayHandle::PlayHandle(const Type type, f_cnt_t offset) :
 		m_type(type),
@@ -73,3 +74,5 @@ sampleFrame* PlayHandle::buffer()
 {
 	return m_bufferReleased ? nullptr : reinterpret_cast<sampleFrame*>(m_playHandleBuffer);
 };
+
+} // namespace lmms

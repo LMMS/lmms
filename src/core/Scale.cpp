@@ -24,7 +24,11 @@
 
 #include "Scale.h"
 
+#include <cmath>
 #include <QDomElement>
+
+namespace lmms
+{
 
 
 Interval::Interval(float cents) :
@@ -71,7 +75,7 @@ void Interval::loadSettings(const QDomElement &element)
 Scale::Scale() :
 	m_description(tr("empty"))
 {
-	m_intervals.push_back(Interval(1, 1));
+	m_intervals.emplace_back(1, 1);
 }
 
 Scale::Scale(QString description, std::vector<Interval> intervals) :
@@ -120,3 +124,6 @@ void Scale::loadSettings(const QDomElement &element)
 		node = node.nextSibling();
 	}
 }
+
+
+} // namespace lmms

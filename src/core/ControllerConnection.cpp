@@ -31,6 +31,9 @@
 #include "Song.h"
 #include "ControllerConnection.h"
 
+namespace lmms
+{
+
 
 ControllerConnectionVector ControllerConnection::s_connections;
 
@@ -116,8 +119,8 @@ void ControllerConnection::setController( Controller * _controller )
 	if( _controller->type() != Controller::DummyController )
 	{
 		_controller->addConnection( this );
-		QObject::connect( _controller, SIGNAL( valueChanged() ),
-				this, SIGNAL( valueChanged() ), Qt::DirectConnection );
+		QObject::connect( _controller, SIGNAL(valueChanged()),
+				this, SIGNAL(valueChanged()), Qt::DirectConnection );
 	}
 
 	m_ownsController =
@@ -126,8 +129,8 @@ void ControllerConnection::setController( Controller * _controller )
 	// If we don't own the controller, allow deletion of controller
 	// to delete the connection
 	if( !m_ownsController ) {
-		QObject::connect( _controller, SIGNAL( destroyed() ),
-				this, SLOT( deleteConnection() ) );
+		QObject::connect( _controller, SIGNAL(destroyed()),
+				this, SLOT(deleteConnection()));
 	}
 }
 
@@ -233,4 +236,4 @@ void ControllerConnection::deleteConnection()
 
 
 
-
+} // namespace lmms

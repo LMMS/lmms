@@ -25,17 +25,18 @@
  */
 
 #include <QDomElement>
-#include <QObject>
 #include <QVector>
 
 
-#include "Song.h"
 #include "AudioEngine.h"
 #include "ControllerConnection.h"
 #include "ControllerDialog.h"
 #include "LfoController.h"
 #include "MidiController.h"
 #include "PeakController.h"
+
+namespace lmms
+{
 
 
 long Controller::s_periods = 0;
@@ -196,7 +197,7 @@ Controller * Controller::create( ControllerTypes _ct, Model * _parent )
 			break;
 
 		case Controller::LfoController:
-			c = new ::LfoController( _parent );
+			c = new class LfoController( _parent );
 			break;
 
 		case Controller::PeakController:
@@ -205,7 +206,7 @@ Controller * Controller::create( ControllerTypes _ct, Model * _parent )
 			break;
 
 		case Controller::MidiController:
-			c = new ::MidiController( _parent );
+			c = new class MidiController( _parent );
 			break;
 
 		default: 
@@ -245,7 +246,7 @@ bool Controller::hasModel( const Model * m ) const
 {
 	for (QObject * c : children())
 	{
-		AutomatableModel * am = qobject_cast<AutomatableModel*>(c);
+		auto am = qobject_cast<AutomatableModel*>(c);
 		if( am != nullptr )
 		{
 			if( am == m )
@@ -293,9 +294,9 @@ QString Controller::nodeName() const
 
 
 
-ControllerDialog * Controller::createDialog( QWidget * _parent )
+gui::ControllerDialog * Controller::createDialog( QWidget * _parent )
 {
-	ControllerDialog * d = new ControllerDialog( this, _parent );
+	auto d = new gui::ControllerDialog(this, _parent);
 
 	return d;
 }
@@ -325,7 +326,7 @@ int Controller::connectionCount() const{
 }
 
 
-
+} // namespace lmms
 
 
 

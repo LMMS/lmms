@@ -25,7 +25,6 @@
 
 #include "NotePlayHandle.h"
 
-#include "lmms_constants.h"
 #include "AudioEngine.h"
 #include "BasicFilters.h"
 #include "DetuningHelper.h"
@@ -34,8 +33,11 @@
 #include "Instrument.h"
 #include "Song.h"
 
+namespace lmms
+{
+
 NotePlayHandle::BaseDetuning::BaseDetuning( DetuningHelper *detuning ) :
-	m_value( detuning ? detuning->automationPattern()->valueAt( 0 ) : 0 )
+	m_value( detuning ? detuning->automationClip()->valueAt( 0 ) : 0 )
 {
 }
 
@@ -68,7 +70,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_parent( parent ),
 	m_hadChildren( false ),
 	m_muted( false ),
-	m_bbTrack( nullptr ),
+	m_patternTrack( nullptr ),
 	m_origTempo( Engine::getSong()->getTempo() ),
 	m_origBaseNote( instrumentTrack->baseNote() ),
 	m_frequency( 0 ),
@@ -92,7 +94,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 		parent->m_subNotes.push_back( this );
 		parent->m_hadChildren = true;
 
-		m_bbTrack = parent->m_bbTrack;
+		m_patternTrack = parent->m_patternTrack;
 
 		parent->setUsesBuffer( false );
 	}
@@ -358,7 +360,7 @@ fpp_t NotePlayHandle::framesLeftForCurrentPeriod() const
 
 bool NotePlayHandle::isFromTrack( const Track * _track ) const
 {
-	return m_instrumentTrack == _track || m_bbTrack == _track;
+	return m_instrumentTrack == _track || m_patternTrack == _track;
 }
 
 
@@ -441,9 +443,9 @@ float NotePlayHandle::volumeLevel( const f_cnt_t _frame )
 void NotePlayHandle::mute()
 {
 	// mute all sub-notes
-	for( NotePlayHandleList::Iterator it = m_subNotes.begin(); it != m_subNotes.end(); ++it )
+	for (const auto& subNote : m_subNotes)
 	{
-		( *it )->mute();
+		subNote->mute();
 	}
 	m_muted = true;
 }
@@ -455,9 +457,9 @@ int NotePlayHandle::index() const
 {
 	const PlayHandleList & playHandles = Engine::audioEngine()->playHandles();
 	int idx = 0;
-	for( PlayHandleList::ConstIterator it = playHandles.begin(); it != playHandles.end(); ++it )
+	for (const auto& playHandle : playHandles)
 	{
-		const NotePlayHandle * nph = dynamic_cast<const NotePlayHandle *>( *it );
+		const auto nph = dynamic_cast<const NotePlayHandle*>(playHandle);
 		if( nph == nullptr || nph->m_instrumentTrack != m_instrumentTrack || nph->isReleased() || nph->hasParent() )
 		{
 			continue;
@@ -479,9 +481,9 @@ ConstNotePlayHandleList NotePlayHandle::nphsOfInstrumentTrack( const InstrumentT
 	const PlayHandleList & playHandles = Engine::audioEngine()->playHandles();
 	ConstNotePlayHandleList cnphv;
 
-	for( PlayHandleList::ConstIterator it = playHandles.begin(); it != playHandles.end(); ++it )
+	for (const auto& playHandle : playHandles)
 	{
-		const NotePlayHandle * nph = dynamic_cast<const NotePlayHandle *>( *it );
+		const auto nph = dynamic_cast<const NotePlayHandle*>(playHandle);
 		if( nph != nullptr && nph->m_instrumentTrack == _it && ( ( nph->isReleased() == false && nph->hasParent() == false ) || _all_ph == true ) )
 		{
 			cnphv.push_back( nph );
@@ -525,13 +527,13 @@ void NotePlayHandle::updateFrequency()
 	if (m_instrumentTrack->m_microtuner.enabled())
 	{
 		// custom key mapping and scale: get frequency from the microtuner
-		const float detuneMaster = detune + masterPitch;
+		const auto transposedKey = key() + masterPitch;
 
-		if (m_instrumentTrack->isKeyMapped(key()))
+		if (m_instrumentTrack->isKeyMapped(transposedKey))
 		{
-			const auto frequency = m_instrumentTrack->m_microtuner.keyToFreq(key(), baseNote);
-			m_frequency = frequency * powf(2.f, (detuneMaster + instrumentPitch / 100) / 12.f);
-			m_unpitchedFrequency = frequency * powf(2.f, detuneMaster / 12.f);
+			const auto frequency = m_instrumentTrack->m_microtuner.keyToFreq(transposedKey, baseNote);
+			m_frequency = frequency * powf(2.f, (detune + instrumentPitch / 100) / 12.f);
+			m_unpitchedFrequency = frequency * powf(2.f, detune / 12.f);
 		}
 		else
 		{
@@ -559,7 +561,7 @@ void NotePlayHandle::processTimePos( const TimePos& time )
 {
 	if( detuning() && time >= songGlobalParentOffset()+pos() )
 	{
-		const float v = detuning()->automationPattern()->valueAt( time - songGlobalParentOffset() - pos() );
+		const float v = detuning()->automationClip()->valueAt( time - songGlobalParentOffset() - pos() );
 		if( !typeInfo<float>::isEqual( v, m_baseDetuning->value() ) )
 		{
 			m_baseDetuning->setValue( v );
@@ -587,9 +589,9 @@ void NotePlayHandle::resize( const bpm_t _new_tempo )
 	m_frames = (f_cnt_t)new_frames;
 	m_totalFramesPlayed = (f_cnt_t)( completed * new_frames );
 
-	for( NotePlayHandleList::Iterator it = m_subNotes.begin(); it != m_subNotes.end(); ++it )
+	for (const auto& subNote : m_subNotes)
 	{
-		( *it )->resize( _new_tempo );
+		subNote->resize(_new_tempo);
 	}
 }
 
@@ -604,7 +606,7 @@ void NotePlayHandleManager::init()
 {
 	s_available = MM_ALLOC<NotePlayHandle*>( INITIAL_NPH_CACHE );
 
-	NotePlayHandle * n = MM_ALLOC<NotePlayHandle>( INITIAL_NPH_CACHE );
+	auto n = MM_ALLOC<NotePlayHandle>(INITIAL_NPH_CACHE);
 
 	for( int i=0; i < INITIAL_NPH_CACHE; ++i )
 	{
@@ -647,11 +649,11 @@ void NotePlayHandleManager::release( NotePlayHandle * nph )
 void NotePlayHandleManager::extend( int c )
 {
 	s_size += c;
-	NotePlayHandle ** tmp = MM_ALLOC<NotePlayHandle*>( s_size );
+	auto tmp = MM_ALLOC<NotePlayHandle*>(s_size);
 	MM_FREE( s_available );
 	s_available = tmp;
 
-	NotePlayHandle * n = MM_ALLOC<NotePlayHandle>( c );
+	auto n = MM_ALLOC<NotePlayHandle>(c);
 
 	for( int i=0; i < c; ++i )
 	{
@@ -664,3 +666,6 @@ void NotePlayHandleManager::free()
 {
 	MM_FREE(s_available);
 }
+
+
+} // namespace lmms

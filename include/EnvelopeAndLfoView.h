@@ -33,7 +33,13 @@
 class QPaintEvent;
 class QPixmap;
 
+namespace lmms
+{
+
 class EnvelopeAndLfoParameters;
+
+namespace gui
+{
 
 class automatableButtonGroup;
 class Knob;
@@ -48,7 +54,7 @@ class EnvelopeAndLfoView : public QWidget, public ModelView
 	Q_OBJECT
 public:
 	EnvelopeAndLfoView( QWidget * _parent );
-	virtual ~EnvelopeAndLfoView();
+	~EnvelopeAndLfoView() override;
 
 
 protected:
@@ -93,5 +99,9 @@ private:
 	
 	float m_randomGraph;
 } ;
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

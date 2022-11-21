@@ -25,15 +25,18 @@
 #ifndef AUDIO_DEVICE_H
 #define AUDIO_DEVICE_H
 
-#include <QtCore/QMutex>
+#include <QMutex>
 #include <samplerate.h>
 
 #include "lmms_basics.h"
 
+class QThread;
+
+namespace lmms
+{
 
 class AudioEngine;
 class AudioPort;
-class QThread;
 
 
 class AudioDevice
@@ -153,7 +156,8 @@ private:
 
 	surroundSampleFrame * m_buffer;
 
-} ;
+};
 
+} // namespace lmms
 
 #endif
