@@ -169,10 +169,33 @@ void MidiPort::processOutEvent( const MidiEvent& event, const TimePos& time )
 			outEvent.setVelocity( fixedOutputVelocity() );
 		}
 
-		if( fixedOutputNote() >= 0 &&
-			( event.type() == MidiNoteOn || event.type() == MidiNoteOff || event.type() == MidiKeyPressure ) )
+		auto activePitch = m_activeMIDIPitch.find(event.key());
+		if( activePitch != m_activeMIDIPitch.end() )
 		{
-			outEvent.setKey( fixedOutputNote() );
+			outEvent.setKey( *activePitch );
+			
+			if( event.type() == MidiNoteOff )
+			{
+				m_activeMIDIPitch.remove( event.key() );
+			}
+		}
+		else
+		{
+			int16_t outKey = event.key();
+
+			if( fixedOutputNote() >= 0 &&
+				( event.type() == MidiNoteOn ||
+				  event.type() == MidiNoteOff ||
+				  event.type() == MidiKeyPressure ) )
+			{
+				outKey = fixedOutputNote();
+			}
+
+			if( event.type() == MidiNoteOn || event.type() == MidiKeyPressure )
+			{
+				m_activeMIDIPitch.insert( event.key(), outKey );
+			}
+			outEvent.setKey( outKey );
 		}
 
 		m_midiClient->processOutEvent( outEvent, time, this );

@@ -174,6 +174,8 @@ private:
 	Map m_readablePorts;
 	Map m_writablePorts;
 
+	QMap<int16_t, int16_t> m_activeMIDIPitch;
+
 
 	friend class gui::ControllerConnectionDialog;
 	friend class gui::InstrumentMidiIOView;
