@@ -62,10 +62,10 @@ static const Piano::KeyTypes KEY_ORDER[] =
  *
  *  \param _it the InstrumentTrack window to attach to
  */
-Piano::Piano( InstrumentTrack* track ) :
-	Model( nullptr ),              /*!< base class ctor */
-	m_instrumentTrack( track ),
-	m_midiEvProc( track )        /*!< the InstrumentTrack Model */
+Piano::Piano(InstrumentTrack* track) :
+	Model(nullptr),              /*!< base class ctor */
+	m_instrumentTrack(track),
+	m_midiEvProc(track)        /*!< the InstrumentTrack Model */
 {
 }
 
@@ -74,9 +74,9 @@ Piano::Piano( InstrumentTrack* track ) :
  *  \param key the key number to change
  *  \param state the state to set the key to
  */
-void Piano::setKeyState( int key, bool state )
+void Piano::setKeyState(int key, bool state)
 {
-	if( isValidKey( key ) )
+	if (isValidKey(key))
 	{
 		m_pressedKeys[key] = state;
 
@@ -91,15 +91,15 @@ void Piano::setKeyState( int key, bool state )
  *
  *  \param key the key being pressed
  */
-void Piano::handleKeyPress( int key, int midiVelocity )
+void Piano::handleKeyPress(int key, int midiVelocity)
 {
-	if( midiVelocity == -1 )
+	if (midiVelocity == -1)
 	{
 		midiVelocity = m_instrumentTrack->midiPort()->baseVelocity();
 	}
-	if( isValidKey( key ) )
+	if (isValidKey(key))
 	{
-		m_midiEvProc->processInEvent( MidiEvent( MidiNoteOn, -1, key, midiVelocity ) );
+		m_midiEvProc->processInEvent(MidiEvent(MidiNoteOn, -1, key, midiVelocity));
 		m_pressedKeys[key] = true;
 	}
 }
@@ -112,18 +112,18 @@ void Piano::handleKeyPress( int key, int midiVelocity )
  *
  *  \param key the key being releassed
  */
-void Piano::handleKeyRelease( int key )
+void Piano::handleKeyRelease(int key)
 {
-	if( isValidKey( key ) )
+	if (isValidKey(key))
 	{
-		m_midiEvProc->processInEvent( MidiEvent( MidiNoteOff, -1, key, 0 ) );
+		m_midiEvProc->processInEvent(MidiEvent(MidiNoteOff, -1, key, 0));
 		m_pressedKeys[key] = false;
 	}
 }
 
 
 
-bool Piano::isBlackKey( int key )
+bool Piano::isBlackKey(int key)
 {
 	int keyCode = key % KeysPerOctave;
 
@@ -131,9 +131,9 @@ bool Piano::isBlackKey( int key )
 }
 
 
-bool Piano::isWhiteKey( int key )
+bool Piano::isWhiteKey(int key)
 {
-	return !isBlackKey( key );
+	return !isBlackKey(key);
 }
 
 
