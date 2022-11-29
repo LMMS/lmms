@@ -129,7 +129,7 @@ QPixmap* PianoRoll::s_toolKnife = nullptr;
 
 TextFloat * PianoRoll::s_textFloat = nullptr;
 
-static std::array<QString, 12> s_noteStrings {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+static auto s_noteStrings = std::array<QString, 12>{"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
 
 static QString getNoteString(int key)
 {
@@ -137,12 +137,12 @@ static QString getNoteString(int key)
 }
 
 // used for drawing of piano
-std::array<PianoRoll::PianoRollKeyTypes, 12> PianoRoll::prKeyOrder
+auto PianoRoll::prKeyOrder = std::array
 {
 	PR_WHITE_KEY_SMALL, PR_BLACK_KEY, PR_WHITE_KEY_BIG, PR_BLACK_KEY,
 	PR_WHITE_KEY_SMALL, PR_WHITE_KEY_SMALL, PR_BLACK_KEY, PR_WHITE_KEY_BIG,
 	PR_BLACK_KEY, PR_WHITE_KEY_BIG, PR_BLACK_KEY, PR_WHITE_KEY_SMALL
-} ;
+};
 
 
 const int DEFAULT_PR_PPB = DEFAULT_CELL_WIDTH * DefaultStepsPerBar;
