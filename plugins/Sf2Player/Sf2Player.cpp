@@ -551,25 +551,27 @@ void Sf2Instrument::updateTuning()
 	{
 		int baseNote = instrumentTrack()->baseNoteModel()->value();
 		double * centArray = new double[128];
-		double lowestHz = pow(2, -69.f / 12.f) * 440.f;// Frequency of MIDI note 0, which is approximately 8.175798916 Hz
+		double lowestHz = powf(2.f, -69.f / 12.f) * 440.f;// Frequency of MIDI note 0, which is approximately 8.175798916 Hz
 		for (int i = 0; i < 128; ++i)
 		{
+			// Get desired Hz of note
 			centArray[i] = instrumentTrack()->microtuner()->keyToFreq(i, DefaultBaseKey);
-			
 			// Convert Hz to cents
 			centArray[i] = 1200.f * log2(centArray[i] / lowestHz);
 		}
+		
 		fluid_synth_activate_key_tuning(m_synth, 0, 0, "", centArray, true);
-		for (int chan = 0 ; chan<16 ; chan++) {
+		for (int chan = 0; chan < 16; chan++)
+		{
 		    fluid_synth_activate_tuning(m_synth, chan, 0, 0, true);
 		}
-
 		delete[] centArray;
 	}
 	else
 	{
 		fluid_synth_activate_key_tuning(m_synth, 0, 0, "", NULL, true);
-		for (int chan = 0 ; chan<16 ; chan++) {
+		for (int chan = 0; chan < 16; chan++)
+		{
 		    fluid_synth_activate_tuning(m_synth, chan, 0, 0, true);
 		}
 	}
