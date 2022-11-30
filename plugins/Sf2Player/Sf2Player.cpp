@@ -549,7 +549,6 @@ void Sf2Instrument::updateTuning()
 {
 	if (instrumentTrack()->microtuner()->enabledModel()->value())
 	{
-		int baseNote = instrumentTrack()->baseNoteModel()->value();
 		double * centArray = new double[128];
 		double lowestHz = powf(2.f, -69.f / 12.f) * 440.f;// Frequency of MIDI note 0, which is approximately 8.175798916 Hz
 		for (int i = 0; i < 128; ++i)
