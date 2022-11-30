@@ -223,6 +223,11 @@ public:
 	{
 		return &m_mixerChannelModel;
 	}
+	
+	BoolModel * useMasterPitchModel()
+    {
+        return &m_useMasterPitchModel;
+    }
 
 	void setPreviewMode( const bool );
 

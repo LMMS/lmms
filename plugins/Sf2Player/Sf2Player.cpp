@@ -181,6 +181,14 @@ Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
 	connect( &m_chorusLevel, SIGNAL( dataChanged() ), this, SLOT( updateChorus() ) );
 	connect( &m_chorusSpeed, SIGNAL( dataChanged() ), this, SLOT( updateChorus() ) );
 	connect( &m_chorusDepth, SIGNAL( dataChanged() ), this, SLOT( updateChorus() ) );
+	
+	// Microtuning
+	connect(Engine::getSong(), SIGNAL(scaleListChanged(int)), this, SLOT(updateTuning()));
+	connect(Engine::getSong(), SIGNAL(keymapListChanged(int)), this, SLOT(updateTuning()));
+	connect(instrumentTrack()->microtuner()->enabledModel(), SIGNAL(dataChanged()), this, SLOT(updateTuning()), Qt::DirectConnection);
+	connect(instrumentTrack()->microtuner()->scaleModel(), SIGNAL(dataChanged()), this, SLOT(updateTuning()), Qt::DirectConnection);
+	connect(instrumentTrack()->microtuner()->keymapModel(), SIGNAL(dataChanged()), this, SLOT(updateTuning()), Qt::DirectConnection);
+	connect(instrumentTrack()->baseNoteModel(), SIGNAL(dataChanged()), this, SLOT(updateTuning()), Qt::DirectConnection);
 
 	auto iph = new InstrumentPlayHandle(this, _instrument_track);
 	Engine::audioEngine()->addPlayHandle( iph );
@@ -537,6 +545,38 @@ void  Sf2Instrument::updateChorus()
 
 
 
+void Sf2Instrument::updateTuning()
+{
+	if (instrumentTrack()->microtuner()->enabledModel()->value())
+	{
+		int baseNote = instrumentTrack()->baseNoteModel()->value();
+		double * centArray = new double[128];
+		double lowestHz = pow(2, -69.f / 12.f) * 440.f;// Frequency of MIDI note 0, which is approximately 8.175798916 Hz
+		for (int i = 0; i < 128; ++i)
+		{
+			centArray[i] = instrumentTrack()->microtuner()->keyToFreq(i, DefaultBaseKey);
+			
+			// Convert Hz to cents
+			centArray[i] = 1200.f * log2(centArray[i] / lowestHz);
+		}
+		fluid_synth_activate_key_tuning(m_synth, 0, 0, "", centArray, true);
+		for (int chan = 0 ; chan<16 ; chan++) {
+		    fluid_synth_activate_tuning(m_synth, chan, 0, 0, true);
+		}
+
+		delete[] centArray;
+	}
+	else
+	{
+		fluid_synth_activate_key_tuning(m_synth, 0, 0, "", NULL, true);
+		for (int chan = 0 ; chan<16 ; chan++) {
+		    fluid_synth_activate_tuning(m_synth, chan, 0, 0, true);
+		}
+	}
+}
+
+
+
 void Sf2Instrument::reloadSynth()
 {
 	double tempRate;
@@ -625,9 +665,9 @@ void Sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 
 	if( tfp == 0 )
 	{
-		const float LOG440 = 2.643452676f;
-
-		int midiNote = (int)floor( 12.0 * ( log2( _n->unpitchedFrequency() ) - LOG440 ) - 4.0 );
+		int masterPitch = instrumentTrack()->useMasterPitchModel()->value() ? Engine::getSong()->masterPitch() : 0;
+		int baseNote = instrumentTrack()->baseNoteModel()->value();
+		int midiNote = _n->midiKey() - baseNote + DefaultBaseKey + masterPitch;
 
 		// out of range?
 		if( midiNote <= 0 || midiNote >= 128 )
