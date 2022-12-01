@@ -567,7 +567,7 @@ void Sf2Instrument::updateTuning()
 	}
 	else
 	{
-		fluid_synth_activate_key_tuning(m_synth, 0, 0, "", NULL, true);
+		fluid_synth_activate_key_tuning(m_synth, 0, 0, "", nullptr, true);
 		for (int chan = 0; chan < 16; chan++)
 		{
 		    fluid_synth_activate_tuning(m_synth, chan, 0, 0, true);
