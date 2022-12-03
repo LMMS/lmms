@@ -1,7 +1,7 @@
 /*
  * Sample.h - Access samples with a file dialog
  *
- * Copyright (c) 2022 sakertooth <sakertooth@gmail.com>
+ * Copyright (c) 2022 saker <sakertooth@gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *

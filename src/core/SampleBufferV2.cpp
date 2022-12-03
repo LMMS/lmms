@@ -1,7 +1,7 @@
 /*
  * SampleBufferV2.cpp - container class for immutable sample data
  *
- * Copyright (c) 2022 sakertooth <sakertooth@gmail.com>
+ * Copyright (c) 2022 saker <sakertooth@gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
