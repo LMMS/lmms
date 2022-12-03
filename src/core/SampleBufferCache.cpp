@@ -27,13 +27,13 @@
 
 namespace lmms
 {
-	std::shared_ptr<const SampleBufferV2> SampleBufferCache::get(const std::string& id)
+	std::shared_ptr<const SampleBufferV2> SampleBufferCache::get(const QString& id)
 	{
 		if (m_map.find(id) == m_map.end()) { return nullptr; }
 		return m_map.at(id).lock();
 	}
 
-	std::shared_ptr<const SampleBufferV2> SampleBufferCache::add(const std::string& id)
+	std::shared_ptr<const SampleBufferV2> SampleBufferCache::add(const QString& id)
 	{
 		if (m_map.find(id) != m_map.end()) { return m_map.at(id).lock(); }
 

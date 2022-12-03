@@ -33,7 +33,7 @@ namespace lmms::gui
     class SampleFileDialog 
     {
     public:
-        static std::string openSampleFile(const Sample& sample);
+        static QString openSampleFile(const Sample& sample);
     };
 }
 

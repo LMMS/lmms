@@ -33,22 +33,22 @@
 
 namespace lmms::gui 
 {
-	std::string SampleFileDialog::openSampleFile(const Sample& sample) 
+	QString SampleFileDialog::openSampleFile(const Sample& sample) 
 	{
 		gui::FileDialog ofd(nullptr, QObject::tr("Open audio file"));
 		
 		const auto sampleFile = sample.sampleFile();
 		QString dir;
 
-		if (!sampleFile.empty())
+		if (!sampleFile.isEmpty())
 		{
-			QString f = SampleBufferV2::qStringFromFilePath(sampleFile);
+			auto f = sampleFile;
 			if (QFileInfo(f).isRelative())
 			{
 				f = ConfigManager::inst()->userSamplesDir() + f;
 				if (!QFileInfo(f).exists())
 				{
-					f = ConfigManager::inst()->factorySamplesDir() + SampleBufferV2::qStringFromFilePath(sampleFile);
+					f = ConfigManager::inst()->factorySamplesDir() + sampleFile;
 				}
 			}
 			dir = QFileInfo(f).absolutePath();
@@ -78,10 +78,10 @@ namespace lmms::gui
 
 		ofd.setNameFilters(filters);
 
-		if (!sampleFile.empty())
+		if (!sampleFile.isEmpty())
 		{
 			// select previously opened file
-			ofd.selectFile(QFileInfo(SampleBufferV2::qStringFromFilePath(sampleFile)).fileName());
+			ofd.selectFile(QFileInfo(sampleFile).fileName());
 		}
 
 		if (ofd.exec () == QDialog::Accepted)
@@ -91,7 +91,7 @@ namespace lmms::gui
 				return "";
 			}
 
-			return SampleBufferV2::qStringToFilePath(PathUtil::toShortestRelative(ofd.selectedFiles()[0])).generic_string();
+			return PathUtil::toShortestRelative(ofd.selectedFiles()[0]);
 		}
 
 		return "";

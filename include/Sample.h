@@ -49,7 +49,7 @@ namespace lmms
 		};
 
 		Sample() = default;
-		Sample(const fs::path& sampleFile);
+		Sample(const QString& sampleFile);
 		Sample(const sampleFrame* data, const int numFrames);
 		explicit Sample(const SampleBufferV2* buffer);
 		explicit Sample(const int numFrames);
@@ -62,7 +62,7 @@ namespace lmms
 		bool play(sampleFrame* dst, const int numFrames, const float freq, PlaybackType playback = PlaybackType::Regular);
 		void visualize(QPainter& painter, const QRect& drawingRect, const int fromFrame = 0, const int toFrame = 0);
 
-		std::string sampleFile() const;
+		QString sampleFile() const;
 		std::shared_ptr<const SampleBufferV2> sampleBuffer() const;
 		sample_rate_t sampleRate() const;
 		float amplification() const;
@@ -93,7 +93,7 @@ namespace lmms
 
 		std::string toBase64() const;
 
-		void loadSampleFile(const fs::path& sampleFile);
+		void loadSampleFile(const QString& sampleFile);
 		void loadBase64(const std::string& base64);
 		void resetMarkers();
 		

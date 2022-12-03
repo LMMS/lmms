@@ -116,7 +116,7 @@ void SampleClip::changeLength( const TimePos & _length )
 
 QString SampleClip::sampleFile() const
 {
-	return SampleBufferV2::qStringFromFilePath(m_sample.sampleFile());
+	return m_sample.sampleFile();
 }
 
 
@@ -142,7 +142,7 @@ void SampleClip::setSampleFile( const QString & _sf )
 	}
 	else
 	{	//Otherwise set it to the sample's length
-		m_sample.loadSampleFile(SampleBufferV2::qStringToFilePath(_sf));
+		m_sample.loadSampleFile(_sf);
 		length = sampleLength();
 	}
 	changeLength(length);

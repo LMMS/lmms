@@ -32,23 +32,12 @@
 #include "AudioEngine.h"
 #include "Engine.h"
 
-// TODO: Replace with just #include <filesystem> when all GHA builds fully support it
-#ifdef LMMS_HAVE_FILESYSTEM
-	#include <filesystem>
-	namespace fs = std::filesystem;
-#elif defined LMMS_HAVE_EXPERIMENTAL_FILESYSTEM
-	#include <experimental/filesystem>
-	namespace fs = std::experimental::filesystem;
-#else
-	#error "SampleBufferV2.h: No filesystem support available."
-#endif
-
 namespace lmms 
 {
 	class SampleBufferV2
 	{
 	public:
-		SampleBufferV2(const fs::path& sampleFile);
+		SampleBufferV2(const QString& sampleFile);
 		SampleBufferV2(const sampleFrame* data, const int numFrames);
 		explicit SampleBufferV2(const int numFrames);
 		SampleBufferV2(const SampleBufferV2& other) = delete;
@@ -58,35 +47,19 @@ namespace lmms
 		SampleBufferV2& operator=(SampleBufferV2&& other);
 
 		const std::vector<sampleFrame>& sampleData() const;
-		const std::optional<fs::path>& filePath() const;
+		const std::optional<QString>& filePath() const;
 		sample_rate_t sampleRate() const;
 		int numFrames() const;
 
 		static std::shared_ptr<const SampleBufferV2> loadFromBase64(const std::string& base64);
 
-		/**
-		 * @brief Convert a STL file path to a QString portably.
-		 * 
-		 * @param filePath 
-		 * @return QString 
-		 */
-		static QString qStringFromFilePath(const fs::path& filePath);
-		
-		/**
-		 * @brief Convert a QString to a STL file path portably.
-		 * 
-		 * @param str 
-		 * @return fs::path 
-		 */
-		static fs::path qStringToFilePath(const QString& str);
-
 	private:
-		void loadFromSampleFile(const fs::path& sampleFilePath);
-		void loadFromDrumSynthFile(const fs::path& drumSynthFilePath);
+		void loadFromSampleFile(const QString& sampleFilePath);
+		void loadFromDrumSynthFile(const QString& drumSynthFilePath);
 		
 	private:
 		std::vector<sampleFrame> m_sampleData;
-		std::optional<fs::path> m_filePath;
+		std::optional<QString> m_filePath;
 		sample_rate_t m_sampleRate = Engine::audioEngine()->processingSampleRate();
 	};
 }

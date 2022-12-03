@@ -38,7 +38,7 @@ namespace lmms
 {
 	std::array<int, 5> Sample::s_sampleMargin = {64, 64, 64, 4, 4};
 
-	Sample::Sample(const fs::path& sampleFile)
+	Sample::Sample(const QString& sampleFile)
 	{
 		loadSampleFile(sampleFile);
 	}
@@ -280,10 +280,10 @@ namespace lmms
 		}
 	}
 
-	std::string Sample::sampleFile() const
+	QString Sample::sampleFile() const
 	{
-		if (!m_sampleBuffer || !m_sampleBuffer->filePath()) { return ""; }
-		return m_sampleBuffer->filePath()->generic_string(); 
+		if (!m_sampleBuffer) { return ""; }
+		return m_sampleBuffer->filePath().value_or("");
 	}
 
 	std::shared_ptr<const SampleBufferV2> Sample::sampleBuffer() const
@@ -430,11 +430,11 @@ namespace lmms
 		return data.toBase64().constData();
 	}
 
-	void Sample::loadSampleFile(const fs::path& sampleFile)
+	void Sample::loadSampleFile(const QString& sampleFile)
 	{
-		auto cachedSampleBuffer = Engine::sampleBufferCache()->get(sampleFile.generic_string());
+		auto cachedSampleBuffer = Engine::sampleBufferCache()->get(sampleFile);
 		m_sampleBuffer = cachedSampleBuffer ? cachedSampleBuffer :
-			Engine::sampleBufferCache()->add(sampleFile.generic_string());
+			Engine::sampleBufferCache()->add(sampleFile);
 		resetMarkers();
 	}
 

@@ -23,21 +23,24 @@
  */
 
 #include "SampleBufferV2.h"
+#include "PathUtil.h"
+#include "DrumSynth.h"
 
-#include <DrumSynth.h>
+#include <QFileInfo>
 #include <sndfile.h>
 #include <stdexcept>
 
 namespace lmms
 {
-	SampleBufferV2::SampleBufferV2(const fs::path& sampleFile) 
+	SampleBufferV2::SampleBufferV2(const QString& sampleFile) 
 	{
-		if (!fs::exists(sampleFile))
+		const auto sampleFileInfo = QFileInfo{PathUtil::toAbsolute(sampleFile)};
+		if (!sampleFileInfo.exists())
 		{
 			throw std::runtime_error{"SampleBufferV2.cpp: Sample file does not exist"};
 		}
 
-		sampleFile.extension() == ".ds" ? 
+		sampleFileInfo.completeSuffix() == "ds" ? 
 			loadFromDrumSynthFile(sampleFile) : 
 			loadFromSampleFile(sampleFile);
 	}
@@ -79,7 +82,7 @@ namespace lmms
 		return m_sampleData;
 	}
 
-	const std::optional<fs::path>& SampleBufferV2::filePath() const
+	const std::optional<QString>& SampleBufferV2::filePath() const
 	{
 		return m_filePath;
 	}
@@ -94,32 +97,15 @@ namespace lmms
 		return m_sampleData.size();
 	}
 
-	QString SampleBufferV2::qStringFromFilePath(const fs::path& filePath) 
-	{
-		#ifdef LMMS_BUILD_WIN32
-			return QString::fromStdWString(filePath);
-		#else
-			return QString::fromStdString(filePath);
-		#endif
-	}
-	
-	fs::path SampleBufferV2::qStringToFilePath(const QString& str) 
-	{
-		#ifdef LMMS_BUILD_WIN32
-			return fs::path{str.toStdWString()};
-		#else
-			return fs::path{str.toStdString()};
-		#endif
-	}
-
-	void SampleBufferV2::loadFromSampleFile(const fs::path& sampleFilePath)
+	void SampleBufferV2::loadFromSampleFile(const QString& sampleFilePath)
 	{
 		SF_INFO sfInfo;
 		sfInfo.format = 0;
 
+		auto sampleFile = QFile{sampleFilePath};
 		auto sndFileDeleter = [](SNDFILE* ptr) { sf_close(ptr); };
 		auto sndFile = std::unique_ptr<SNDFILE, decltype(sndFileDeleter)>(
-				sf_open(sampleFilePath.generic_string().c_str(), SFM_READ, &sfInfo), sndFileDeleter);
+				sf_open_fd(sampleFile.handle(), SFM_READ, &sfInfo, false), sndFileDeleter);
 
 		if (!sndFile) { throw std::runtime_error{"SampleBufferV2.cpp: Failed to open sample file"}; };
 
@@ -143,13 +129,13 @@ namespace lmms
 		}
 	}
 
-	void SampleBufferV2::loadFromDrumSynthFile(const fs::path& drumSynthFilePath)
+	void SampleBufferV2::loadFromDrumSynthFile(const QString& drumSynthFilePath)
 	{
 		auto ds = DrumSynth();
 		auto samples = std::make_unique<int16_t>();
 		auto samplesRawPtr = samples.get();
 
-		int numSamples = ds.GetDSFileSamples(qStringFromFilePath(drumSynthFilePath), samplesRawPtr,
+		int numSamples = ds.GetDSFileSamples(drumSynthFilePath, samplesRawPtr,
 			DEFAULT_CHANNELS, Engine::audioEngine()->processingSampleRate());
 
 		if (numSamples == 0 || !samples)
