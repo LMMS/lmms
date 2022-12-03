@@ -644,6 +644,7 @@ void Sf2Instrument::reloadSynth()
 	updateReverbOn();
 	updateChorusOn();
 	updateGain();
+	updateTuning();
 
 	// Reset last MIDI pitch properties, which will be set to the correct values
 	// upon playing the next note
