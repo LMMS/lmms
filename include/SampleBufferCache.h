@@ -33,11 +33,12 @@
 
 namespace lmms 
 {
+	
 	class SampleBufferCache
 	{
-	public:		
+	public:
 		std::shared_ptr<const SampleBufferV2> get(const QString& id);
-		std::shared_ptr<const SampleBufferV2> add(const QString& id);
+		std::shared_ptr<const SampleBufferV2> add(const QString& id, bool isBase64);
 	private:
 		std::unordered_map<QString, std::weak_ptr<const SampleBufferV2>> m_map;
 	};

@@ -33,15 +33,17 @@ namespace lmms
 		return m_map.at(id).lock();
 	}
 
-	std::shared_ptr<const SampleBufferV2> SampleBufferCache::add(const QString& id)
+	std::shared_ptr<const SampleBufferV2> SampleBufferCache::add(const QString& id, bool isBase64)
 	{
 		if (m_map.find(id) != m_map.end()) { return m_map.at(id).lock(); }
 
-		auto sharedBuffer = std::shared_ptr<const SampleBufferV2>(new SampleBufferV2{id}, [this, id](const SampleBufferV2* ptr)
-		{
-			delete ptr;
-			m_map.erase(id);
-		});
+		auto sharedBuffer = std::shared_ptr<const SampleBufferV2>(new SampleBufferV2{id, isBase64}, 
+			[this, id](const SampleBufferV2* ptr)
+			{
+				delete ptr;
+				m_map.erase(id);
+			}
+		);
 
 		m_map.emplace(id, std::weak_ptr<const SampleBufferV2>(sharedBuffer));
 		return sharedBuffer;
