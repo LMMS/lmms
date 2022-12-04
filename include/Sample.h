@@ -39,6 +39,12 @@ namespace lmms
 	class Sample
 	{
 	public:
+		enum class LoopPlayback 
+		{
+			LoopPoints,
+			PingPong
+		};
+
 		Sample() = default;
 		Sample(const QString& sampleData, bool isBase64 = false);
 		Sample(const sampleFrame* data, const int numFrames);
@@ -52,9 +58,11 @@ namespace lmms
 		Sample& operator=(Sample&& other);
 		
 		bool play(sampleFrame *dst, const int numFramesRequested, const float frequencyToPlay);
+		bool play(sampleFrame *dst, const int numFramesRequested, const float frequencyToPlay, int loopStart, int loopEnd, const LoopPlayback loopPlayback);
 		void visualize(QPainter& painter, const QRect& drawingRect, const int fromFrame = 0, const int toFrame = 0, const float amplification = 1.0f);
 		
 		QString toBase64() const;
+		bool rescaleMarkers(int& start, int& end);
 		
 		QString sampleFile() const;
 		std::shared_ptr<const SampleBufferV2> sampleBuffer() const;

@@ -97,20 +97,9 @@ namespace lmms
 
 	bool Sample::play(sampleFrame* dst, const int numFramesRequested, const float frequencyToPlay) 
 	{
-		// Step 1: Rescale markers to match the current sample rate of the AudioEngine
-		const auto audioEngineSampleRate = Engine::audioEngine()->processingSampleRate();
-		if (m_sampleRate != audioEngineSampleRate) 
-		{
-			const auto sampleRateRatio = static_cast<float>(audioEngineSampleRate) / m_sampleRate;
-			m_startFrame = std::clamp(0, static_cast<int>(m_startFrame * sampleRateRatio), numFrames());
-			m_endFrame = std::clamp(0, static_cast<int>(m_endFrame * sampleRateRatio), numFrames());
-			m_sampleRate = audioEngineSampleRate;
-		}
-
-		// Step 2: Set boundary for the frame index
+		rescaleMarkers(m_startFrame, m_endFrame);
 		m_frameIndex = m_reversed ? std::min(m_frameIndex, m_endFrame) : std::max(m_startFrame, m_frameIndex);
 
-		// Step 3: Play
 		const auto numFramesAvailable = m_reversed ? m_frameIndex - m_startFrame : m_endFrame - m_frameIndex;
 		const auto& sampleData = m_sampleBuffer->sampleData();
 		if (numFramesAvailable <= 0) { return false; }
@@ -127,7 +116,6 @@ namespace lmms
 			m_frameIndex -= numFramesToPlay;
 		}
 
-		// Step 4: Resample to frequency
 		const auto frequencyFactor = frequencyToPlay / DefaultBaseFreq;
 		if (frequencyFactor != 1.0f)
 		{
@@ -163,9 +151,57 @@ namespace lmms
 			}
 		}
 
-
-		// Step 5: Fill unused frames with 0's
 		std::fill_n(dst + numFramesToPlay, numFramesRequested - numFramesToPlay, sampleFrame{0, 0});
+		return true;
+	}
+
+	bool Sample::play(sampleFrame *dst, const int numFramesRequested, const float frequencyToPlay, int loopStart, int loopEnd, const LoopPlayback loopPlayback) 
+	{
+		rescaleMarkers(m_startFrame, m_endFrame);
+		rescaleMarkers(loopStart, loopEnd);
+
+		auto boundedLoopStart = std::clamp(m_startFrame, loopStart, m_endFrame);
+		auto boundedLoopEnd = std::clamp(m_startFrame, loopEnd, m_endFrame);
+		if (loopStart != boundedLoopStart || loopEnd != boundedLoopEnd) { return false; }
+
+		const auto numFramesToCopy = std::min(loopEnd - loopStart, numFramesRequested);
+		const auto [numFrameBatches, remainingFrames] = std::div(numFramesRequested, numFramesToCopy);
+
+		if (loopPlayback == LoopPlayback::LoopPoints)
+		{
+			for (int i = 0; i < numFrameBatches; ++i)
+			{
+				m_frameIndex = loopStart;
+				play(dst + i * numFramesToCopy, numFramesToCopy, frequencyToPlay);
+			}
+
+			m_frameIndex = loopStart;
+			play(dst + numFrameBatches * numFramesToCopy, remainingFrames, frequencyToPlay);
+		}
+		else if (loopPlayback == LoopPlayback::PingPong) 
+		{
+			for (int i = 0; i < numFrameBatches; ++i)
+			{
+				if (i % 2 == 1)
+				{
+					m_reversed = !m_reversed;
+					m_frameIndex = loopEnd - m_frameIndex;
+				}
+				else 
+				{
+					m_frameIndex = loopStart;
+				}
+
+				play(dst + i * numFramesToCopy, numFramesToCopy, frequencyToPlay);
+			}
+
+			m_frameIndex = loopStart;
+			play(dst + numFrameBatches * numFramesToCopy, remainingFrames, frequencyToPlay);
+
+			m_reversed = !m_reversed;
+			m_frameIndex = loopEnd - m_frameIndex;
+		}
+
 		return true;
 	}
 
@@ -280,6 +316,22 @@ namespace lmms
 		const char* rawData = reinterpret_cast<const char*>(m_sampleBuffer.get());
 		QByteArray data = QByteArray(rawData, sizeof(SampleBufferV2));
 		return data.toBase64().constData();
+	}
+
+	bool Sample::rescaleMarkers(int& start, int& end) 
+	{
+		const auto audioEngineSampleRate = Engine::audioEngine()->processingSampleRate();
+		if (m_sampleRate != audioEngineSampleRate) 
+		{
+			const auto sampleRateRatio = static_cast<float>(audioEngineSampleRate) / m_sampleRate;
+			start = std::clamp(0, static_cast<int>(start * sampleRateRatio), numFrames());
+			end = std::clamp(0, static_cast<int>(end * sampleRateRatio), numFrames());
+			m_sampleRate = audioEngineSampleRate;
+
+			return true;
+		}
+
+		return false;
 	}
 
 	QString Sample::sampleFile() const 
