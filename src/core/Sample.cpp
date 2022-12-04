@@ -23,155 +23,149 @@
  */
 
 #include "Sample.h"
+#include "SampleBufferCache.h"
+#include "lmms_basics.h"
 
 #include <cmath>
-#include <cstring>
+#include <algorithm>
 #include <iostream>
-#include <variant>
 
-#include "ConfigManager.h"
-#include "FileDialog.h"
-#include "PathUtil.h"
-#include "SampleBufferV2.h"
-
-namespace lmms
+namespace lmms 
 {
-	std::array<int, 5> Sample::s_sampleMargin = {64, 64, 64, 4, 4};
-
-	Sample::Sample(const QString& sampleFile)
+	Sample::Sample(const QString& sampleData, bool isBase64)
 	{
-		loadSampleFile(sampleFile);
+		const auto cachedSampleBuffer = Engine::sampleBufferCache()->get(sampleData);
+		m_sampleBuffer = cachedSampleBuffer ? cachedSampleBuffer : Engine::sampleBufferCache()->add(sampleData, isBase64);
+		m_endFrame = m_sampleBuffer->numFrames();
 	}
 
-	Sample::Sample(const sampleFrame* data, const int numFrames)
-		: m_sampleBuffer(std::make_shared<const SampleBufferV2>(data, numFrames))
-		, m_endFrame(m_sampleBuffer->numFrames())
-	{
-	}
+	Sample::Sample(const sampleFrame* data, const int numFrames) :
+		m_sampleBuffer(std::make_shared<const SampleBufferV2>(data, numFrames)),
+		m_endFrame(m_sampleBuffer->numFrames()) {}
 
-	Sample::Sample(const SampleBufferV2* buffer)
-		: m_sampleBuffer(std::shared_ptr<const SampleBufferV2>(buffer))
-		, m_endFrame(m_sampleBuffer->numFrames())
-	{
-	}
+	Sample::Sample(const SampleBufferV2* buffer) :
+		m_sampleBuffer(std::shared_ptr<const SampleBufferV2>(buffer)),
+		m_endFrame(m_sampleBuffer->numFrames()) {}
 
-	Sample::Sample(const int numFrames)
-		: m_sampleBuffer(std::make_shared<const SampleBufferV2>(numFrames))
-		, m_endFrame(numFrames)
-	{
-	}
+	Sample::Sample(const int numFrames) :
+		m_sampleBuffer(std::make_shared<const SampleBufferV2>(numFrames)),
+		m_endFrame(m_sampleBuffer->numFrames()) {}
 
-	Sample::Sample(const Sample& other)
-		: m_sampleBuffer(other.m_sampleBuffer)
-		, m_sampleRate(other.m_sampleRate)
-		, m_amplification(other.m_amplification)
-		, m_frequency(other.m_frequency)
-		, m_reversed(other.m_reversed)
-		, m_varyingPitch(other.m_varyingPitch)
-		, m_interpolationMode(other.m_interpolationMode)
-		, m_startFrame(other.m_startFrame)
-		, m_endFrame(other.m_endFrame)
-		, m_frameIndex(other.m_frameIndex)
-	{
-	}
+	Sample::Sample(const Sample& other) :
+		m_sampleBuffer(other.m_sampleBuffer),
+		m_reversed(other.m_reversed),
+		m_startFrame(other.m_startFrame),
+		m_endFrame(other.m_endFrame),
+		m_frameIndex(other.m_frameIndex) {}
 
-	Sample::Sample(Sample&& other)
-		: m_sampleBuffer(std::exchange(other.m_sampleBuffer, nullptr))
-		, m_sampleRate(std::exchange(other.m_sampleRate, 0))
-		, m_amplification(std::exchange(other.m_amplification, 1.0f))
-		, m_frequency(std::exchange(other.m_frequency, 0.0f))
-		, m_varyingPitch(std::exchange(other.m_varyingPitch, false))
-		, m_interpolationMode(std::exchange(other.m_interpolationMode, SRC_LINEAR))
-		, m_startFrame(std::exchange(other.m_startFrame, 0))
-		, m_endFrame(std::exchange(other.m_endFrame, 0))
-		, m_frameIndex(std::exchange(other.m_frameIndex, 0))
-	{
-	}
+	Sample::Sample(Sample&& other) :
+		m_sampleBuffer(std::exchange(other.m_sampleBuffer, nullptr)),
+		m_reversed(std::exchange(other.m_reversed, false)),
+		m_startFrame(std::exchange(other.m_startFrame, 0)),
+		m_endFrame(std::exchange(other.m_endFrame, 0)),
+		m_frameIndex(std::exchange(other.m_frameIndex, 0)) {}
 
-	Sample& Sample::operator=(Sample other)
+	Sample& Sample::operator=(const Sample& other) 
 	{
-		std::swap(*this, other);
+		m_sampleBuffer = other.m_sampleBuffer;
+		m_reversed = other.m_reversed;
+		m_startFrame = other.m_startFrame;
+		m_endFrame = other.m_endFrame;
+		m_frameIndex = other.m_frameIndex;
+
 		return *this;
 	}
 
-	void swap(Sample& first, Sample& second)
+	Sample& Sample::operator=(Sample&& other) 
 	{
-		first.m_sampleBuffer.swap(second.m_sampleBuffer);
-		std::swap(first.m_sampleRate, second.m_sampleRate);
-		std::swap(first.m_amplification, second.m_amplification);
-		std::swap(first.m_frequency, second.m_frequency);
-		std::swap(first.m_reversed, second.m_reversed);
-		std::swap(first.m_varyingPitch, second.m_varyingPitch);
-		std::swap(first.m_pingPongBackwards, second.m_pingPongBackwards);
-		std::swap(first.m_interpolationMode, second.m_interpolationMode);
-		std::swap(first.m_startFrame, second.m_startFrame);
-		std::swap(first.m_endFrame, second.m_endFrame);
-		std::swap(first.m_loopStartFrame, second.m_loopStartFrame);
-		std::swap(first.m_loopEndFrame, second.m_loopEndFrame);
-		std::swap(first.m_frameIndex, second.m_frameIndex);
-		std::swap(first.m_resampleState, second.m_resampleState);
+		m_sampleBuffer = std::exchange(other.m_sampleBuffer, nullptr);
+		m_reversed = std::exchange(other.m_reversed, false);
+		m_startFrame = std::exchange(other.m_startFrame, 0);
+		m_endFrame = std::exchange(other.m_endFrame, 0);
+		m_frameIndex = std::exchange(other.m_frameIndex, 0);
+
+		return *this;
 	}
 
-	bool Sample::play(sampleFrame* dst, const int framesToPlay, const float freq, PlaybackType playback)
+	Sample::~Sample() 
 	{
-		if (!m_sampleBuffer || framesToPlay <= 0) { return false; }
-
-		const auto freqFactor = static_cast<double>(freq) / static_cast<double>(m_frequency) 
-			* m_sampleRate / Engine::audioEngine()->processingSampleRate();
-
-		const f_cnt_t totalFramesForCurrentPitch = static_cast<f_cnt_t>((m_endFrame - m_startFrame) / freqFactor);
-		if (totalFramesForCurrentPitch == 0) { return false; }
-
-		if (playback == PlaybackType::Regular && (m_frameIndex >= m_endFrame || (m_endFrame - m_frameIndex) / freqFactor == 0)) 
+		if (m_resampleState) 
 		{
-			return false;
+			src_delete(m_resampleState);
+		}
+	}
+
+	bool Sample::play(sampleFrame* dst, const int numFramesRequested, const float frequencyToPlay) 
+	{
+		// Step 1: Rescale markers to match the current sample rate of the AudioEngine
+		const auto audioEngineSampleRate = Engine::audioEngine()->processingSampleRate();
+		if (m_sampleRate != audioEngineSampleRate) 
+		{
+			const auto sampleRateRatio = static_cast<float>(audioEngineSampleRate) / m_sampleRate;
+			m_startFrame = std::clamp(0, static_cast<int>(m_startFrame * sampleRateRatio), numFrames());
+			m_endFrame = std::clamp(0, static_cast<int>(m_endFrame * sampleRateRatio), numFrames());
+			m_sampleRate = audioEngineSampleRate;
 		}
 
-		m_frameIndex = calculatePlaybackIndex(playback);
+		// Step 2: Set boundary for the frame index
+		m_frameIndex = m_reversed ? std::min(m_frameIndex, m_endFrame) : std::max(m_startFrame, m_frameIndex);
 
-		f_cnt_t fragmentSize = static_cast<f_cnt_t>(framesToPlay * freqFactor) + s_sampleMargin[m_interpolationMode];
-		f_cnt_t framesUsed = framesToPlay;
+		// Step 3: Play
+		const auto numFramesAvailable = m_reversed ? m_frameIndex - m_startFrame : m_endFrame - m_frameIndex;
+		const auto& sampleData = m_sampleBuffer->sampleData();
+		if (numFramesAvailable <= 0) { return false; }
 
-		auto& sampleData = m_sampleBuffer->sampleData();
-		if (freqFactor != 1.0 || m_varyingPitch) 
+		auto numFramesToPlay = std::min(numFramesAvailable, numFramesRequested);	
+		if (!m_reversed) 
 		{
+			std::copy(sampleData.begin() + m_frameIndex, sampleData.begin() + m_frameIndex + numFramesToPlay, dst);
+			m_frameIndex += numFramesToPlay;
+		}
+		else
+		{
+			std::reverse_copy(sampleData.begin() + m_frameIndex - numFramesToPlay, sampleData.begin() + m_frameIndex, dst);
+			m_frameIndex -= numFramesToPlay;
+		}
+
+		// Step 4: Resample to frequency
+		const auto frequencyFactor = frequencyToPlay / DefaultBaseFreq;
+		if (frequencyFactor != 1.0f)
+		{
+			int error = 0;
+			if (!m_resampleState && (m_resampleState = src_new(SRC_LINEAR, DEFAULT_CHANNELS, &error)) == nullptr)
+			{
+				std::cerr << "Sample.cpp: src_new() failed\n";
+			}
+			
 			SRC_DATA srcData;
-			srcData.data_in = (sampleData.data() + m_frameIndex)->data();
+			srcData.data_in = m_reversed ? sampleData.data()->data() + m_frameIndex - numFramesToPlay : sampleData.data()->data() + m_frameIndex;
 			srcData.data_out = dst->data();
-			srcData.input_frames = fragmentSize;
-			srcData.output_frames = framesToPlay;
-			srcData.src_ratio = 1.0 / freqFactor;
+			srcData.input_frames = numFramesToPlay;
+			srcData.output_frames = numFramesRequested;
+			srcData.src_ratio = 1.0 / frequencyFactor;
 			srcData.end_of_input = 0;
 
-			int error = src_process(m_resampleState, &srcData);
-			if (error) 
+			error = src_process(m_resampleState, &srcData);
+			if (error)
 			{
-				std::cout << "SampleBuffer: error while resampling: " <<
-					src_strerror(error) << '\n';
-				return false;
+				std::cerr << "Sample.cpp: error while resampling: " << src_strerror(error) << '\n';
 			}
 
-			if (srcData.output_frames_gen > framesToPlay)
+			if (srcData.output_frames_gen > numFramesRequested)
 			{
-				std::cout << "SampleBuffer: not enough frames: " <<
-					srcData.output_frames_gen << "/" << framesToPlay << '\n';
-				return false;
+				std::cerr << "Sample.cpp: not enough frames: " << srcData.output_frames_gen << "/" <<  numFramesRequested << '\n';
 			}
 
-			framesUsed = srcData.input_frames_used;
+			numFramesToPlay = srcData.output_frames_gen;
+			if (m_reversed) 
+			{
+				std::reverse(dst, dst + numFramesToPlay);
+			}
 		}
 
-		m_reversed ? 
-			std::reverse_copy(sampleData.end() - m_frameIndex - framesUsed - 1, sampleData.end() - m_frameIndex - 1, dst) :
-			std::copy(sampleData.begin() + m_frameIndex, sampleData.begin() + m_frameIndex + framesUsed, dst);
 
-		advanceFrameIndex(framesUsed, playback);
-		for (int i = 0; i < framesToPlay; ++i) 
-		{
-			dst[i][0] *= m_amplification;
-			dst[i][1] *= m_amplification;
-		}
-
+		// Step 5: Fill unused frames with 0's
+		std::fill_n(dst + numFramesToPlay, numFramesRequested - numFramesToPlay, sampleFrame{0, 0});
 		return true;
 	}
 
@@ -182,7 +176,7 @@ namespace lmms
 	* @param int fromFrame: First frame of the range
 	* @param int toFrame: Last frame of the range non-inclusive
 	*/
-	void Sample::visualize(QPainter& painter, const QRect& drawingRect, int fromFrame, int toFrame)
+	void Sample::visualize(QPainter& painter, const QRect& drawingRect, int fromFrame, int toFrame, const float amplification)
 	{
 		/*TODO:
 			This function needs to be optimized.
@@ -250,16 +244,16 @@ namespace lmms
 			}
 
 			const float trueRmsData = (rmsData[0] + rmsData[1]) / 2 / fpp;
-			const float sqrtRmsData = sqrt(trueRmsData);
-			const float maxRmsData = qBound(minData, sqrtRmsData, maxData);
-			const float minRmsData = qBound(minData, -sqrtRmsData, maxData);
+			const float sqrtRmsData = std::sqrt(trueRmsData);
+			const float maxRmsData = std::clamp(minData, sqrtRmsData, maxData);
+			const float minRmsData = std::clamp(minData, -sqrtRmsData, maxData);
 
 			// If nbFrames >= w, we can use curPixel to calculate X
 			// but if nbFrames < w, we need to calculate it proportionally
 			// to the total number of points
 			auto x = nbFrames >= w ? xb + curPixel : xb + ((static_cast<double>(curPixel) / nbFrames) * w);
 			// Partial Y calculation
-			auto py = ySpace * m_amplification;
+			auto py = ySpace * amplification;
 			fEdgeMax[curPixel] = QPointF(x, (yb - (maxData * py)));
 			fEdgeMin[curPixel] = QPointF(x, (yb - (minData * py)));
 			fRmsMax[curPixel] = QPointF(x, (yb - (maxRmsData * py)));
@@ -280,139 +274,73 @@ namespace lmms
 		}
 	}
 
-	QString Sample::sampleFile() const
+	QString Sample::toBase64() const
 	{
-		if (!m_sampleBuffer) { return ""; }
+		// TODO: Base64 encoding without the use of Qt
+		const char* rawData = reinterpret_cast<const char*>(m_sampleBuffer.get());
+		QByteArray data = QByteArray(rawData, sizeof(SampleBufferV2));
+		return data.toBase64().constData();
+	}
+
+	QString Sample::sampleFile() const 
+	{
 		return m_sampleBuffer->filePath().value_or("");
 	}
 
-	std::shared_ptr<const SampleBufferV2> Sample::sampleBuffer() const
+	std::shared_ptr<const SampleBufferV2> Sample::sampleBuffer() const 
 	{
 		return m_sampleBuffer;
 	}
-
-	sample_rate_t Sample::sampleRate() const 
-	{
-		return m_sampleRate;
-	}
-
-	float Sample::amplification() const
-	{
-		return m_amplification;
-	}
-
-	float Sample::frequency() const
-	{
-		return m_frequency;
-	}
-
-	bool Sample::reversed() const
+	
+	bool Sample::reversed() const 
 	{
 		return m_reversed;
 	}
-
-	bool Sample::varyingPitch() const
-	{
-		return m_varyingPitch;
-	}
-
-	int Sample::interpolationMode() const
-	{
-		return m_interpolationMode;
-	}
-
-	int Sample::startFrame() const
+	
+	int Sample::startFrame() const 
 	{
 		return m_startFrame;
 	}
 
-	int Sample::endFrame() const
+	int Sample::endFrame() const 
 	{
 		return m_endFrame;
 	}
-
-	int Sample::loopStartFrame() const
-	{
-		return m_loopStartFrame;
-	}
-
-	int Sample::loopEndFrame() const
-	{
-		return m_loopEndFrame;
-	}
-
+	
 	int Sample::frameIndex() const
 	{
 		return m_frameIndex;
 	}
 
-	int Sample::numFrames() const
+	int Sample::sampleRate() const 
+	{
+		return m_sampleRate;
+	}
+
+	int Sample::numFrames() const 
 	{
 		return m_sampleBuffer ? m_sampleBuffer->numFrames() : 0;
 	}
-
+	
 	void Sample::setSampleBuffer(const SampleBufferV2* buffer)
 	{
-		m_sampleBuffer.reset(buffer);
-		resetMarkers();
+		m_sampleBuffer = std::shared_ptr<const SampleBufferV2>(buffer);
 	}
-
-	void Sample::setSampleRate(const sample_rate_t sampleRate) 
-	{
-		m_sampleRate = sampleRate;
-	}
-
-	void Sample::setAmplification(const float amplification)
-	{
-		m_amplification = amplification;
-	}
-
-	void Sample::setFrequency(const float frequency)
-	{
-		m_frequency = frequency;
-	}
-
-	void Sample::setReversed(const bool reversed)
+	
+	void Sample::setReversed(const bool reversed) 
 	{
 		m_reversed = reversed;
+		m_frameIndex = m_endFrame - m_frameIndex;
 	}
-
-	void Sample::setVaryingPitch(const bool varyingPitch)
-	{
-		m_varyingPitch = varyingPitch;
-	}
-
-	void Sample::setInterpolationMode(const int interpolationMode)
-	{
-		m_interpolationMode = interpolationMode;
-	}
-
-	void Sample::setStartFrame(const int start)
+	
+	void Sample::setStartFrame(const int start) 
 	{
 		m_startFrame = start;
 	}
-
-	void Sample::setEndFrame(const int end)
+	
+	void Sample::setEndFrame(const int end) 
 	{
 		m_endFrame = end;
-	}
-
-	void Sample::setLoopStartFrame(const int loopStart)
-	{
-		m_loopStartFrame = loopStart;
-	}
-
-	void Sample::setLoopEndFrame(const int loopEnd)
-	{
-		m_loopEndFrame = loopEnd;
-	}
-
-	void Sample::setAllPointFrames(const int start, const int end, const int loopStart, const int loopEnd) 
-	{
-		m_startFrame = start;
-		m_endFrame = end;
-		m_loopStartFrame = loopStart;
-		m_loopEndFrame = loopEnd;
 	}
 
 	void Sample::setFrameIndex(const int frameIndex)
@@ -420,113 +348,8 @@ namespace lmms
 		m_frameIndex = frameIndex;
 	}
 
-	std::string Sample::toBase64() const
+	void Sample::setSampleRate(const int sampleRate) 
 	{
-		if (!m_sampleBuffer) { return ""; }
-		
-		//TODO: Base64 encoding without the use of Qt
-		const char* rawData = reinterpret_cast<const char*>(m_sampleBuffer->sampleData().data());
-		QByteArray data = QByteArray(rawData, m_sampleBuffer->sampleData().size() * sizeof(sampleFrame));
-		return data.toBase64().constData();
+		m_sampleRate = sampleRate;
 	}
-
-	void Sample::loadSampleFile(const QString& sampleFile)
-	{
-		auto cachedSampleBuffer = Engine::sampleBufferCache()->get(sampleFile);
-		m_sampleBuffer = cachedSampleBuffer ? cachedSampleBuffer :
-			Engine::sampleBufferCache()->add(sampleFile);
-		resetMarkers();
-	}
-
-	void Sample::loadBase64(const std::string& base64)
-	{
-		m_sampleBuffer = SampleBufferV2::loadFromBase64(base64);
-		resetMarkers();
-	}
-
-	void Sample::resetMarkers()
-	{
-		m_startFrame = 0;
-		m_endFrame = m_sampleBuffer->numFrames();
-		m_loopStartFrame = std::clamp(0, m_loopStartFrame, m_endFrame);
-		m_loopEndFrame = std::clamp(0, m_loopEndFrame, m_endFrame);
-		m_frameIndex = std::clamp(0, m_frameIndex, m_endFrame);
-	}
-
-	int Sample::calculateLength() const 
-	{
-		return static_cast<double>(m_endFrame - m_startFrame) / m_sampleRate * 1000;
-	}
-
-	int Sample::calculateTickLength() const
-	{
-		return 1 / Engine::framesPerTick() * m_sampleBuffer->numFrames();
-	}
-
-	void Sample::advanceFrameIndex(f_cnt_t amount, PlaybackType playback) 
-	{
-		if (playback == PlaybackType::Regular || playback == PlaybackType::LoopPoints) 
-		{
-			m_frameIndex += amount;
-		}
-		else if (playback == PlaybackType::PingPong) 
-		{
-			f_cnt_t left = amount;
-				
-			if (m_reversed)
-			{
-				m_frameIndex -= amount;
-				if (m_frameIndex < m_loopStartFrame)
-				{
-					left -= (m_loopStartFrame - m_frameIndex);
-					m_frameIndex = m_loopStartFrame;
-				}
-				else left = 0;
-			}
-			
-			m_frameIndex += left;
-		}
-
-		m_frameIndex = calculatePlaybackIndex(playback);
-	}
-
-	f_cnt_t Sample::calculatePlaybackIndex(PlaybackType playback)
-	{
-		if (playback == PlaybackType::Regular) 
-		{
-			return std::max(m_frameIndex, m_startFrame);
-		}
-		else if (playback == PlaybackType::LoopPoints) 
-		{
-			if (m_frameIndex < m_loopEndFrame) { return m_frameIndex; }
-			return m_frameIndex + (m_frameIndex - m_loopStartFrame) % (m_loopEndFrame - m_loopStartFrame);
-		}
-		else if (playback == PlaybackType::PingPong) 
-		{
-			if (m_frameIndex < m_loopEndFrame) { return m_frameIndex; }
-			
-			const f_cnt_t loopLen = m_loopEndFrame - m_loopStartFrame;
-			const f_cnt_t loopPos = (m_frameIndex - m_loopEndFrame) % (loopLen * 2);
-
-			return (loopPos < loopLen)
-				? m_loopEndFrame - loopPos
-				: m_loopStartFrame + (loopPos - loopLen);
-		}
-
-		return m_frameIndex;
-	}
-
-	SRC_STATE* Sample::createResampleState() 
-	{
-		int error = 0;
-		SRC_STATE* state = src_new(m_interpolationMode, DEFAULT_CHANNELS, &error);
-
-		if (error != 0)
-		{
-			throw std::runtime_error{"Sample.cpp: Failed to create resample state"};
-		}
-
-		return state;
-	}
-}
-
+};

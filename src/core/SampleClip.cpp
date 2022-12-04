@@ -142,7 +142,7 @@ void SampleClip::setSampleFile( const QString & _sf )
 	}
 	else
 	{	//Otherwise set it to the sample's length
-		m_sample.loadSampleFile(_sf);
+		m_sample = Sample{_sf};
 		length = sampleLength();
 	}
 	changeLength(length);
@@ -252,7 +252,7 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	
 	if (m_sample.sampleBuffer() && sampleFile() == "")
 	{
-		_this.setAttribute("data", QString::fromStdString(m_sample.toBase64()));
+		_this.setAttribute("data", m_sample.toBase64());
 	}
 
 	_this.setAttribute("sample_rate", m_sample.sampleRate());
@@ -279,7 +279,7 @@ void SampleClip::loadSettings( const QDomElement & _this )
 	setSampleFile( _this.attribute( "src" ) );
 	if( sampleFile().isEmpty() && _this.hasAttribute( "data" ) )
 	{
-		m_sample.loadBase64(_this.attribute("data").toStdString());
+		m_sample = Sample{_this.attribute("data"), true};
 	}
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );

@@ -32,96 +32,54 @@
 #include <string>
 
 #include "Note.h"
-#include "SampleBufferCache.h"
 #include "SampleBufferV2.h"
-#include "lmms_basics.h"
 
 namespace lmms 
 {
 	class Sample
 	{
 	public:
-		enum class PlaybackType
-		{
-			Regular,
-			LoopPoints,
-			PingPong
-		};
-
 		Sample() = default;
-		Sample(const QString& sampleFile);
+		Sample(const QString& sampleData, bool isBase64 = false);
 		Sample(const sampleFrame* data, const int numFrames);
 		explicit Sample(const SampleBufferV2* buffer);
 		explicit Sample(const int numFrames);
 		Sample(const Sample& other);
 		Sample(Sample&& other);
-
-		Sample& operator=(Sample other);
-		friend void swap(Sample& first, Sample& second);
-
-		bool play(sampleFrame* dst, const int numFrames, const float freq, PlaybackType playback = PlaybackType::Regular);
-		void visualize(QPainter& painter, const QRect& drawingRect, const int fromFrame = 0, const int toFrame = 0);
-
+		~Sample();
+		
+		Sample& operator=(const Sample& other);
+		Sample& operator=(Sample&& other);
+		
+		bool play(sampleFrame *dst, const int numFramesRequested, const float frequencyToPlay);
+		void visualize(QPainter& painter, const QRect& drawingRect, const int fromFrame = 0, const int toFrame = 0, const float amplification = 1.0f);
+		
+		QString toBase64() const;
+		
 		QString sampleFile() const;
 		std::shared_ptr<const SampleBufferV2> sampleBuffer() const;
-		sample_rate_t sampleRate() const;
-		float amplification() const;
-		float frequency() const;
 		bool reversed() const;
-		bool varyingPitch() const;
-		int interpolationMode() const;
 		int startFrame() const;
 		int endFrame() const;
-		int loopStartFrame() const;
-		int loopEndFrame() const;
 		int frameIndex() const;
+		int sampleRate() const;
 		int numFrames() const;
-
+		
 		void setSampleBuffer(const SampleBufferV2* buffer);
-		void setSampleRate(const sample_rate_t sampleRate);
-		void setAmplification(const float amplification);
-		void setFrequency(const float frequency);
 		void setReversed(const bool reversed);
-		void setVaryingPitch(const bool varyingPitch);
-		void setInterpolationMode(const int interpolationMode);
 		void setStartFrame(const int start);
 		void setEndFrame(const int end);
-		void setLoopStartFrame(const int loopStart);
-		void setLoopEndFrame(const int loopEnd);
-		void setAllPointFrames(const int start, const int end, const int loopStart, const int loopEnd);
 		void setFrameIndex(const int frameIndex);
-
-		std::string toBase64() const;
-
-		void loadSampleFile(const QString& sampleFile);
-		void loadBase64(const std::string& base64);
-		void resetMarkers();
-		
-		int calculateLength() const;
-		int calculateTickLength() const;
-
-		void advanceFrameIndex(f_cnt_t amount, PlaybackType playback);
-		f_cnt_t calculatePlaybackIndex(PlaybackType playback);
-
-	private:
-		SRC_STATE* createResampleState();
+		void setSampleRate(const int sampleRate);
 
 	private:
 		std::shared_ptr<const SampleBufferV2> m_sampleBuffer;
-		sample_rate_t m_sampleRate = Engine::audioEngine()->processingSampleRate();
-		float m_amplification = 1.0f;
-		float m_frequency = DefaultBaseFreq;
 		bool m_reversed = false;
-		bool m_varyingPitch = false;
-		bool m_pingPongBackwards = false;
-		int m_interpolationMode = SRC_LINEAR;
 		int m_startFrame = 0;
 		int m_endFrame = 0;
-		int m_loopStartFrame = 0;
-		int m_loopEndFrame = 0;
 		int m_frameIndex = 0;
-		SRC_STATE* m_resampleState = createResampleState();
-		static std::array<int, 5> s_sampleMargin;
+		int m_sampleRate = Engine::audioEngine()->processingSampleRate();
+		SRC_STATE* m_resampleState = nullptr;
 	};
 }
 

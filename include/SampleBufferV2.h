@@ -34,33 +34,35 @@
 
 namespace lmms 
 {
-	class SampleBufferV2
+	class SampleBufferV2 : public QObject
 	{
 	public:
-		SampleBufferV2(const QString& sampleFile);
+		SampleBufferV2(const QString& sampleData, bool isBase64);
 		SampleBufferV2(const sampleFrame* data, const int numFrames);
 		explicit SampleBufferV2(const int numFrames);
-		SampleBufferV2(const SampleBufferV2& other) = delete;
+		SampleBufferV2(const SampleBufferV2& other);
 		SampleBufferV2(SampleBufferV2&& other);
 
-		SampleBufferV2& operator=(SampleBufferV2& other) = delete;
+		SampleBufferV2& operator=(const SampleBufferV2& other);
 		SampleBufferV2& operator=(SampleBufferV2&& other);
 
 		const std::vector<sampleFrame>& sampleData() const;
 		const std::optional<QString>& filePath() const;
-		sample_rate_t sampleRate() const;
+		sample_rate_t originalSampleRate() const;
+		sample_rate_t currentSampleRate() const;
 		int numFrames() const;
-
-		static std::shared_ptr<const SampleBufferV2> loadFromBase64(const std::string& base64);
 
 	private:
 		void loadFromSampleFile(const QString& sampleFilePath);
 		void loadFromDrumSynthFile(const QString& drumSynthFilePath);
+		void loadFromBase64(const QString& base64);
+		void resample(const int newSampleRate);
 		
 	private:
 		std::vector<sampleFrame> m_sampleData;
 		std::optional<QString> m_filePath;
-		sample_rate_t m_sampleRate = Engine::audioEngine()->processingSampleRate();
+		sample_rate_t m_originalSampleRate = 0;
+		sample_rate_t m_currentSampleRate = 0;
 	};
 }
 

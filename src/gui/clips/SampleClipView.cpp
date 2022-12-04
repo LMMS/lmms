@@ -115,7 +115,7 @@ void SampleClipView::dropEvent( QDropEvent * _de )
 	}
 	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )
 	{
-		m_clip->m_sample.loadBase64(StringPairDrag::decodeValue(_de).toStdString());
+		m_clip->m_sample = Sample{StringPairDrag::decodeValue(_de), true};
 		m_clip->updateLength();
 		update();
 		_de->accept();
