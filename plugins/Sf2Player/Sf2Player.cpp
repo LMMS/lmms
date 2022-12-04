@@ -663,18 +663,19 @@ void Sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 	}
 
 	const f_cnt_t tfp = _n->totalFramesPlayed();
+	
+	int masterPitch = instrumentTrack()->useMasterPitchModel()->value() ? Engine::getSong()->masterPitch() : 0;
+	int baseNote = instrumentTrack()->baseNoteModel()->value();
+	int midiNote = _n->midiKey() - baseNote + DefaultBaseKey + masterPitch;
+
+	// out of range?
+	if( midiNote <= 0 || midiNote >= 128 )
+	{
+		return;
+	}
 
 	if( tfp == 0 )
 	{
-		int masterPitch = instrumentTrack()->useMasterPitchModel()->value() ? Engine::getSong()->masterPitch() : 0;
-		int baseNote = instrumentTrack()->baseNoteModel()->value();
-		int midiNote = _n->midiKey() - baseNote + DefaultBaseKey + masterPitch;
-
-		// out of range?
-		if( midiNote <= 0 || midiNote >= 128 )
-		{
-			return;
-		}
 		const int baseVelocity = instrumentTrack()->midiPort()->baseVelocity();
 
 		auto pluginData = new Sf2PluginData;
