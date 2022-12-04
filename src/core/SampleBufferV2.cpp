@@ -243,11 +243,11 @@ namespace lmms
 			srcData.data_out = outputFrames.data()->data();
 			srcData.input_frames = m_sampleData.size();
 			srcData.output_frames = numOutputFrames;
-			srcData.src_ratio = static_cast<double>(newSampleRate / m_currentSampleRate);
+			srcData.src_ratio = static_cast<double>(newSampleRate) / m_currentSampleRate;
 
 			if ((error = src_process(state, &srcData)))
 			{
-				std::cerr << "Error in SampleBuffer.cpp::resample: Error while sampling: " << src_strerror(error) << '\n';
+				std::cerr << "Error in SampleBuffer.cpp::resample: Error while resampling: " << src_strerror(error) << '\n';
 			}
 
 			src_delete(state);
