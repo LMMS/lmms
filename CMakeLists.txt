@@ -34,7 +34,6 @@ INCLUDE(PluginList)
 INCLUDE(CheckSubmodules)
 INCLUDE(AddFileDependencies)
 INCLUDE(CheckIncludeFiles)
-INCLUDE(CheckIncludeFileCXX)
 INCLUDE(FindPkgConfig)
 INCLUDE(GenerateExportHeader)
 
