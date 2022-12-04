@@ -48,4 +48,9 @@ namespace lmms
 		m_map.emplace(id, std::weak_ptr<const SampleBufferV2>(sharedBuffer));
 		return sharedBuffer;
 	}
+
+	size_t SampleBufferCache::Hash::operator()(const QString& str) const noexcept 
+	{
+		return qHash(str);
+	}
 }

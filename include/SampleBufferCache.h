@@ -37,10 +37,15 @@ namespace lmms
 	class SampleBufferCache
 	{
 	public:
+		struct Hash
+		{
+			size_t operator()(const QString& str) const noexcept;
+		};
+
 		std::shared_ptr<const SampleBufferV2> get(const QString& id);
 		std::shared_ptr<const SampleBufferV2> add(const QString& id, bool isBase64);
 	private:
-		std::unordered_map<QString, std::weak_ptr<const SampleBufferV2>> m_map;
+		std::unordered_map<QString, std::weak_ptr<const SampleBufferV2>, SampleBufferCache::Hash> m_map;
 	};
 }
 
