@@ -191,15 +191,6 @@ SET(LMMS_REQUIRED_LIBS ${LMMS_REQUIRED_LIBS}
 	rpmalloc
 )
 
-# Link filesystem library if std::experimental::filesystem must be used
-if(NOT LMMS_HAVE_FILESYSTEM AND LMMS_HAVE_EXPERIMENTAL_FILESYSTEM)
-	if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-		SET(LMMS_REQUIRED_LIBS ${LMMS_REQUIRED_LIBS} stdc++fs)
-	elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-		SET(LMMS_REQUIRED_LIBS ${LMMS_REQUIRED_LIBS} c++fs)
-	endif()
-endif()
-
 # Expose required libs for tests binary
 SET(LMMS_REQUIRED_LIBS ${LMMS_REQUIRED_LIBS} PARENT_SCOPE)
 
