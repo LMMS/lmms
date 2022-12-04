@@ -35,6 +35,6 @@ namespace lmms::gui
     public:
         static QString openSampleFile(const Sample& sample);
     };
-}
+} // namespace lmms::gui
 
 #endif

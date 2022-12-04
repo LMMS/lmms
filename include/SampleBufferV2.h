@@ -64,6 +64,6 @@ namespace lmms
 		sample_rate_t m_originalSampleRate = 0;
 		sample_rate_t m_currentSampleRate = 0;
 	};
-}
+} // namespace lmms
 
 #endif

@@ -96,4 +96,4 @@ namespace lmms::gui
 
 		return "";
 	}
-}
+} // namespace lmms::gui

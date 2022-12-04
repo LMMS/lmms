@@ -404,4 +404,4 @@ namespace lmms
 	{
 		m_sampleRate = sampleRate;
 	}
-};
+}; // namespace lmms

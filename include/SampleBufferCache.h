@@ -47,6 +47,6 @@ namespace lmms
 	private:
 		std::unordered_map<QString, std::weak_ptr<const SampleBufferV2>, SampleBufferCache::Hash> m_map;
 	};
-}
+} // namespace lmms
 
 #endif

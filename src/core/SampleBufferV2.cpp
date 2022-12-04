@@ -260,4 +260,4 @@ namespace lmms
 		m_sampleData = outputFrames;
 		m_currentSampleRate = newSampleRate;
 	}
-}
+} // namespace lmms

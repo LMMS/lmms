@@ -89,6 +89,6 @@ namespace lmms
 		int m_sampleRate = Engine::audioEngine()->processingSampleRate();
 		SRC_STATE* m_resampleState = nullptr;
 	};
-}
+} // namespace lmms
 
 #endif

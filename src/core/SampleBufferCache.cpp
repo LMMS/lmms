@@ -53,4 +53,4 @@ namespace lmms
 	{
 		return qHash(str);
 	}
-}
+} // namespace lmms
