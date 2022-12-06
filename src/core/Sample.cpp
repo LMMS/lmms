@@ -98,35 +98,27 @@ namespace lmms
 	bool Sample::play(sampleFrame* dst, const int numFramesRequested, const float frequencyToPlay) 
 	{
 		rescaleMarkers(m_startFrame, m_endFrame);
-		m_frameIndex = m_reversed ? std::min(m_frameIndex, m_endFrame) : std::max(m_startFrame, m_frameIndex);
+		m_frameIndex = std::max(m_startFrame, m_frameIndex);
 
-		const auto numFramesAvailable = m_reversed ? m_frameIndex - m_startFrame : m_endFrame - m_frameIndex;
+		const auto numFramesAvailable = m_endFrame - m_frameIndex;
 		const auto& sampleData = m_sampleBuffer->sampleData();
 		if (numFramesAvailable <= 0) { return false; }
 
-		auto numFramesToPlay = std::min(numFramesAvailable, numFramesRequested);	
-		if (!m_reversed) 
-		{
-			std::copy(sampleData.begin() + m_frameIndex, sampleData.begin() + m_frameIndex + numFramesToPlay, dst);
-			m_frameIndex += numFramesToPlay;
-		}
-		else
-		{
-			std::reverse_copy(sampleData.begin() + m_frameIndex - numFramesToPlay, sampleData.begin() + m_frameIndex, dst);
-			m_frameIndex -= numFramesToPlay;
-		}
-
+		auto numFramesToPlay = std::min(numFramesAvailable, numFramesRequested);
 		const auto frequencyFactor = frequencyToPlay / DefaultBaseFreq;
-		if (frequencyFactor != 1.0f)
+
+		if (frequencyFactor != 1.0f) 
 		{
 			int error = 0;
 			if (!m_resampleState && (m_resampleState = src_new(SRC_LINEAR, DEFAULT_CHANNELS, &error)) == nullptr)
 			{
 				std::cerr << "Sample.cpp: src_new() failed\n";
+				return false;
 			}
 			
 			SRC_DATA srcData;
-			srcData.data_in = m_reversed ? sampleData.data()->data() + m_frameIndex - numFramesToPlay : sampleData.data()->data() + m_frameIndex;
+			srcData.data_in = m_reversed ? (sampleData.rbegin() + m_frameIndex + numFramesToPlay)->data() 
+								: (sampleData.begin() + m_frameIndex)->data();
 			srcData.data_out = dst->data();
 			srcData.input_frames = numFramesToPlay;
 			srcData.output_frames = numFramesRequested;
@@ -150,8 +142,20 @@ namespace lmms
 				std::reverse(dst, dst + numFramesToPlay);
 			}
 		}
+		else 
+		{
+			if (m_reversed) 
+			{
+				std::copy(sampleData.rbegin() + m_frameIndex, sampleData.rbegin() + m_frameIndex + numFramesToPlay, dst);
+			}
+			else
+			{
+				std::copy(sampleData.begin() + m_frameIndex, sampleData.begin() + m_frameIndex + numFramesToPlay, dst);
+			}
+		}
 
-		std::fill_n(dst + numFramesToPlay, numFramesRequested - numFramesToPlay, sampleFrame{0, 0});
+		m_frameIndex += numFramesToPlay;
+		std::fill_n(dst + numFramesToPlay, numFramesRequested, sampleFrame{0, 0});
 		return true;
 	}
 
@@ -336,7 +340,7 @@ namespace lmms
 
 	QString Sample::sampleFile() const 
 	{
-		return m_sampleBuffer->filePath().value_or("");
+		return m_sampleBuffer ? m_sampleBuffer->filePath().value_or("") : "";
 	}
 
 	std::shared_ptr<const SampleBufferV2> Sample::sampleBuffer() const 
@@ -369,7 +373,7 @@ namespace lmms
 		return m_sampleRate;
 	}
 
-	int Sample::numFrames() const 
+	int Sample::numFrames() const
 	{
 		return m_sampleBuffer ? m_sampleBuffer->numFrames() : 0;
 	}
@@ -382,7 +386,6 @@ namespace lmms
 	void Sample::setReversed(const bool reversed) 
 	{
 		m_reversed = reversed;
-		m_frameIndex = m_endFrame - m_frameIndex;
 	}
 	
 	void Sample::setStartFrame(const int start) 
