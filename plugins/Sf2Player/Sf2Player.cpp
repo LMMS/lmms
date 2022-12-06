@@ -550,13 +550,13 @@ void Sf2Instrument::updateTuning()
 	if (instrumentTrack()->microtuner()->enabledModel()->value())
 	{
 		auto centArray = std::array<double, 128>{};
-		double lowestHz = powf(2.f, -69.f / 12.f) * 440.f;// Frequency of MIDI note 0, which is approximately 8.175798916 Hz
+		double lowestHz = pow(2., -69. / 12.) * 440.;// Frequency of MIDI note 0, which is approximately 8.175798916 Hz
 		for (int i = 0; i < 128; ++i)
 		{
 			// Get desired Hz of note
-			centArray[i] = instrumentTrack()->microtuner()->keyToFreq(i, DefaultBaseKey);
+			double noteHz = instrumentTrack()->microtuner()->keyToFreq(i, DefaultBaseKey);
 			// Convert Hz to cents
-			centArray[i] = 1200.f * log2(centArray[i] / lowestHz);
+			centArray[i] = 1200. * log2(noteHz / lowestHz);
 		}
 		
 		fluid_synth_activate_key_tuning(m_synth, 0, 0, "", centArray.data(), true);
@@ -669,12 +669,12 @@ void Sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 	int midiNote = _n->midiKey() - baseNote + DefaultBaseKey + masterPitch;
 
 	// out of range?
-	if( midiNote <= 0 || midiNote >= 128 )
+	if (midiNote < 0 || midiNote >= 128)
 	{
 		return;
 	}
 
-	if( tfp == 0 )
+	if (tfp == 0)
 	{
 		const int baseVelocity = instrumentTrack()->midiPort()->baseVelocity();
 
