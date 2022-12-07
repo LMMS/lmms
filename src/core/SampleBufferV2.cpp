@@ -205,8 +205,7 @@ namespace lmms
 		auto samplesRawPtr = samples.get();
 		const auto audioEngineSampleRate = Engine::audioEngine()->processingSampleRate();
 
-		int numSamples = ds.GetDSFileSamples(drumSynthFilePath, samplesRawPtr,
-			DEFAULT_CHANNELS, audioEngineSampleRate);
+		int numSamples = ds.GetDSFileSamples(drumSynthFilePath, samplesRawPtr, DEFAULT_CHANNELS, audioEngineSampleRate);
 
 		if (numSamples == 0 || !samples)
 		{
@@ -218,12 +217,7 @@ namespace lmms
 		m_originalSampleRate = audioEngineSampleRate;
 		m_currentSampleRate = audioEngineSampleRate;
 
-		for (int sampleIndex = 0; sampleIndex < numSamples; ++sampleIndex)
-		{
-			int frameIndex = sampleIndex / DEFAULT_CHANNELS;
-			m_sampleData[frameIndex][sampleIndex % DEFAULT_CHANNELS]
-				= samplesRawPtr[sampleIndex] * (1 / OUTPUT_SAMPLE_MULTIPLIER);
-		}
+		src_short_to_float_array(samplesRawPtr, m_sampleData.data()->data(), m_sampleData.size());
 	}
 
 	void SampleBufferV2::loadFromBase64(const QString& base64)
