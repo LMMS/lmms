@@ -101,24 +101,33 @@ namespace lmms
 		m_frameIndex = std::max(m_startFrame, m_frameIndex);
 
 		const auto numFramesAvailable = m_endFrame - m_frameIndex;
-		const auto& sampleData = m_sampleBuffer->sampleData();
 		if (numFramesAvailable <= 0) { return false; }
 
 		auto numFramesToPlay = std::min(numFramesAvailable, numFramesRequested);
 		const auto frequencyFactor = frequencyToPlay / DefaultBaseFreq;
 
-		if (frequencyFactor != 1.0f) 
+		const auto& sampleData = m_sampleBuffer->sampleData();
+		auto sampleBlock = std::vector<sampleFrame>(numFramesToPlay);
+		if (m_reversed) 
+		{
+			std::copy(sampleData.rbegin() + m_frameIndex, sampleData.rbegin() + m_frameIndex + numFramesToPlay, sampleBlock.begin());
+		}
+		else 
+		{
+			std::copy(sampleData.begin() + m_frameIndex, sampleData.begin() + m_frameIndex + numFramesToPlay, sampleBlock.begin());
+		}
+
+		if (frequencyFactor != 1.0f)
 		{
 			int error = 0;
-			if (!m_resampleState && (m_resampleState = src_new(SRC_LINEAR, DEFAULT_CHANNELS, &error)) == nullptr)
+			if (!m_resampleState && (m_resampleState = src_new(SRC_SINC_FASTEST, DEFAULT_CHANNELS, &error)) == nullptr)
 			{
 				std::cerr << "Sample.cpp: src_new() failed\n";
 				return false;
 			}
 			
 			SRC_DATA srcData;
-			srcData.data_in = m_reversed ? (sampleData.rbegin() + m_frameIndex + numFramesToPlay)->data() 
-								: (sampleData.begin() + m_frameIndex)->data();
+			srcData.data_in = sampleBlock.data()->data();
 			srcData.data_out = dst->data();
 			srcData.input_frames = numFramesToPlay;
 			srcData.output_frames = numFramesRequested;
@@ -129,30 +138,13 @@ namespace lmms
 			if (error)
 			{
 				std::cerr << "Sample.cpp: error while resampling: " << src_strerror(error) << '\n';
-			}
-
-			if (srcData.output_frames_gen > numFramesRequested)
-			{
-				std::cerr << "Sample.cpp: not enough frames: " << srcData.output_frames_gen << "/" <<  numFramesRequested << '\n';
+				return false;
 			}
 
 			numFramesToPlay = srcData.output_frames_gen;
-			if (m_reversed) 
-			{
-				std::reverse(dst, dst + numFramesToPlay);
-			}
 		}
-		else 
-		{
-			if (m_reversed) 
-			{
-				std::copy(sampleData.rbegin() + m_frameIndex, sampleData.rbegin() + m_frameIndex + numFramesToPlay, dst);
-			}
-			else
-			{
-				std::copy(sampleData.begin() + m_frameIndex, sampleData.begin() + m_frameIndex + numFramesToPlay, dst);
-			}
-		}
+
+		std::copy(sampleBlock.begin(), sampleBlock.end(), dst);
 
 		m_frameIndex += numFramesToPlay;
 		std::fill_n(dst + numFramesToPlay, numFramesRequested, sampleFrame{0, 0});
