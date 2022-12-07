@@ -31,7 +31,6 @@
 #include "embed.h"
 #include "PathUtil.h"
 #include "SampleBuffer.h"
-#include "SampleFileDialog.h"
 #include "SampleClip.h"
 #include "Song.h"
 #include "StringPairDrag.h"
@@ -173,7 +172,7 @@ void SampleClipView::mouseReleaseEvent(QMouseEvent *_me)
 
 void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 {
-	auto openedSample = SampleFileDialog::openSampleFile(m_clip->sample());
+	auto openedSample = openSampleFile(m_clip->sample());
 	if (openedSample == m_clip->sampleFile()) 
 	{
 		//Instead of reloading the existing file, just reset the size
@@ -358,5 +357,68 @@ bool SampleClipView::splitClip( const TimePos pos )
 	else { return false; }
 }
 
+QString SampleClipView::openSampleFile(const Sample& sample) 
+{
+	gui::FileDialog ofd(nullptr, QObject::tr("Open audio file"));
+		
+		const auto sampleFile = sample.sampleFile();
+		QString dir;
+
+		if (!sampleFile.isEmpty())
+		{
+			auto f = sampleFile;
+			if (QFileInfo(f).isRelative())
+			{
+				f = ConfigManager::inst()->userSamplesDir() + f;
+				if (!QFileInfo(f).exists())
+				{
+					f = ConfigManager::inst()->factorySamplesDir() + sampleFile;
+				}
+			}
+			dir = QFileInfo(f).absolutePath();
+		}
+		else
+		{
+			dir = ConfigManager::inst()->userSamplesDir();
+		}
+
+		// change dir to position of previously opened file
+		ofd.setDirectory(dir);
+		ofd.setFileMode(gui::FileDialog::ExistingFiles);
+
+		QStringList filters
+		{
+			QObject::tr("All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)"),
+			QObject::tr("Wave-Files (*.wav)"),
+			QObject::tr("OGG-Files (*.ogg)"),
+			QObject::tr("DrumSynth-Files (*.ds)"),
+			QObject::tr("FLAC-Files (*.flac)"),
+			QObject::tr("SPEEX-Files (*.spx)"),
+			QObject::tr("VOC-Files (*.voc)"),
+			QObject::tr("AIFF-Files (*.aif *.aiff)"),
+			QObject::tr("AU-Files (*.au)"),
+			QObject::tr("RAW-Files (*.raw)")	
+		};
+
+		ofd.setNameFilters(filters);
+
+		if (!sampleFile.isEmpty())
+		{
+			// select previously opened file
+			ofd.selectFile(QFileInfo(sampleFile).fileName());
+		}
+
+		if (ofd.exec () == QDialog::Accepted)
+		{
+			if (ofd.selectedFiles().isEmpty())
+			{
+				return "";
+			}
+
+			return PathUtil::toShortestRelative(ofd.selectedFiles()[0]);
+		}
+
+	return "";
+}
 
 } // namespace lmms::gui

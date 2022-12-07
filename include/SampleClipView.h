@@ -47,7 +47,6 @@ class SampleClipView : public ClipView
 public:
 	SampleClipView( SampleClip * _clip, TrackView * _tv );
 	~SampleClipView() override = default;
-	static std::string openSampleFile(const Sample& sample);
 
 public slots:
 	void updateSample();
@@ -69,6 +68,7 @@ private:
 	SampleClip * m_clip;
 	QPixmap m_paintPixmap;
 	bool splitClip( const TimePos pos ) override;
+	static QString openSampleFile(const Sample& sample);
 } ;
 
 
