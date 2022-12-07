@@ -57,7 +57,9 @@ namespace lmms
 		void loadFromDrumSynthFile(const QString& drumSynthFilePath);
 		void loadFromBase64(const QString& base64);
 		void resample(const int newSampleRate);
-		
+		std::vector<sampleFrame> mixMonoToStereo(const std::vector<float>& data);
+		std::vector<sampleFrame> mixDownToStereo(const std::vector<float>& data, int numChannels);
+
 	private:
 		std::vector<sampleFrame> m_sampleData;
 		std::optional<QString> m_filePath;

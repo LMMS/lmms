@@ -179,15 +179,22 @@ namespace lmms
 			throw std::runtime_error{"SampleBufferV2.cpp: samplesRead != numSamples"};
 		}
 
-		m_sampleData = std::vector<sampleFrame>(sfInfo.frames);
 		m_originalSampleRate = sfInfo.samplerate;
 		m_currentSampleRate = sfInfo.samplerate;
 		m_filePath = sampleFilePath;
 
-		for (sf_count_t frameIndex = 0; frameIndex < sfInfo.frames; ++frameIndex)
+		if (sfInfo.channels > 2) 
 		{
-			m_sampleData[frameIndex][0] = samples[frameIndex * sfInfo.channels];
-			m_sampleData[frameIndex][1] = samples[frameIndex * sfInfo.channels + (sfInfo.channels > 1 ? 1 : 0)];
+			m_sampleData = mixDownToStereo(samples, sfInfo.channels);
+		}
+		else if (sfInfo.channels < 2) 
+		{
+			m_sampleData = mixMonoToStereo(samples);
+		}
+		else 
+		{
+			m_sampleData = std::vector<sampleFrame>(sfInfo.frames);
+			std::copy(samples.begin(), samples.end(), m_sampleData.begin()->data());
 		}
 	}
 
@@ -260,4 +267,30 @@ namespace lmms
 		m_sampleData = outputFrames;
 		m_currentSampleRate = newSampleRate;
 	}
+
+	std::vector<sampleFrame> SampleBufferV2::mixMonoToStereo(const std::vector<float>& data) 
+	{
+		auto result = std::vector<sampleFrame>(data.size());
+		for (const auto sample : data)
+		{
+			result.push_back(sampleFrame{sample, sample});
+		}
+
+		return result;
+	}
+	
+	std::vector<sampleFrame> SampleBufferV2::mixDownToStereo(const std::vector<float>& data, int numChannels)
+	{
+		if (numChannels < 2) { throw std::runtime_error{"Error in SampleBuffer.cpp::mixDownToStereo: numChannels is < 2"}; }
+
+		auto result = std::vector<sampleFrame>(data.size() / numChannels);
+		for (int i = 0; i < data.size(); i += numChannels)
+		{
+			const auto averageSample = std::accumulate(data.begin() + i, data.begin() + i + numChannels, 0.0f) / numChannels;
+			result.push_back(sampleFrame{averageSample, averageSample});
+		}
+
+		return result;
+	}
+
 } // namespace lmms
