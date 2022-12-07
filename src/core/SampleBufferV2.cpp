@@ -255,6 +255,8 @@ namespace lmms
 			if ((error = src_process(state, &srcData)))
 			{
 				std::cerr << "Error in SampleBuffer.cpp::resample: Error while resampling: " << src_strerror(error) << '\n';
+				src_delete(state);
+				return;
 			}
 
 			src_delete(state);
@@ -262,6 +264,7 @@ namespace lmms
 		else
 		{
 			std::cerr << "Error in SampleBuffer.cpp::resample: src_new() failed\n";
+			return;
 		}
 
 		m_sampleData = outputFrames;
