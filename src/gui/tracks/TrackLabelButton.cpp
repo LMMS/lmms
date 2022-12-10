@@ -105,6 +105,7 @@ void TrackLabelButton::renameFinished()
 {
 	if( !( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() ) )
 	{
+		m_renameLineEdit->clearFocus();
 		m_renameLineEdit->hide();
 		if( m_renameLineEdit->text() != "" )
 		{
