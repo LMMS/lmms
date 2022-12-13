@@ -32,6 +32,7 @@
 #include "lmms_math.h"
 
 #include "MixerView.h"
+#include "MixerDbMarkers.h"
 #include "Knob.h"
 #include "MixerLine.h"
 #include "Mixer.h"
@@ -312,6 +313,12 @@ MixerView::MixerChannelView::MixerChannelView(QWidget * _parent, MixerView * _mv
 	connect(&mixerChannel->m_soloModel, SIGNAL(dataChanged()),
 			_mv, SLOT ( toggledSolo() ), Qt::DirectConnection );
 	m_soloBtn->setToolTip(tr("Solo this channel"));
+
+	auto mixerDbMarkers = new MixerDbMarkers{m_mixerLine};
+	mixerDbMarkers->setMinDb(static_cast<int>(ampToDbfs(m_fader->getMinPeak())));
+	mixerDbMarkers->setMaxDb(static_cast<int>(ampToDbfs(m_fader->getMaxPeak())));
+	mixerDbMarkers->setFixedSize(20, m_fader->height());
+	mixerDbMarkers->move(m_fader->x() + m_fader->width() + 2, m_fader->y() + 5);
 
 	// Create EffectRack for the channel
 	m_rackView = new EffectRackView( &mixerChannel->m_fxChain, _mv->m_racksWidget );
