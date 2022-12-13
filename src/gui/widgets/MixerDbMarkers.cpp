@@ -72,8 +72,7 @@ namespace lmms::gui
             }
 
             markerDb -= 3;
-        }
-        
+        }        
     }
 
 } // namespace lmms::gui
