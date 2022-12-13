@@ -91,7 +91,7 @@ MixerLine::MixerLine( QWidget * _parent, MixerView * _mv, int _channelIndex ) :
 		s_receiveBgArrow = new QPixmap( embed::getIconPixmap( "receive_bg_arrow", 29, 56 ) );
 	}
 
-	setFixedSize( 33, MixerLineHeight );
+	setFixedSize(53, MixerLineHeight);
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
 
@@ -121,7 +121,7 @@ MixerLine::MixerLine( QWidget * _parent, MixerView * _mv, int _channelIndex ) :
 	m_renameLineEdit->installEventFilter( this );
 
 	auto scene = new QGraphicsScene();
-	scene->setSceneRect( 0, 0, 33, MixerLineHeight );
+	scene->setSceneRect(0, 0, 53, MixerLineHeight);
 
 	m_view = new QGraphicsView( this );
 	m_view->setStyleSheet( "border-style: none; background: transparent;" );
