@@ -89,24 +89,27 @@ const std::vector<ProjectVersion> DataFile::UPGRADE_VERSIONS = {
 	"1.2.0-rc3"        ,   "1.3.0"
 };
 
-struct LMMS_EXPORT typeDescStruct
+namespace 
 {
-	DataFile::Type m_type;
-	QString m_name;
-};
+	struct LMMS_EXPORT typeDescStruct
+	{
+		DataFile::Type m_type;
+		QString m_name;
+	};
 
-auto s_types = std::array<typeDescStruct, DataFile::TypeCount>
-{
-	typeDescStruct{ DataFile::UnknownType, "unknown" },
-	typeDescStruct{ DataFile::SongProject, "song" },
-	typeDescStruct{ DataFile::SongProjectTemplate, "songtemplate" },
-	typeDescStruct{ DataFile::InstrumentTrackSettings, "instrumenttracksettings" },
-	typeDescStruct{ DataFile::DragNDropData, "dnddata" },
-	typeDescStruct{ DataFile::ClipboardData, "clipboard-data" },
-	typeDescStruct{ DataFile::JournalData, "journaldata" },
-	typeDescStruct{ DataFile::EffectSettings, "effectsettings" },
-	typeDescStruct{ DataFile::MidiClip, "midiclip" }
-};
+	auto s_types = std::array<typeDescStruct, DataFile::TypeCount>
+	{
+		typeDescStruct{ DataFile::UnknownType, "unknown" },
+		typeDescStruct{ DataFile::SongProject, "song" },
+		typeDescStruct{ DataFile::SongProjectTemplate, "songtemplate" },
+		typeDescStruct{ DataFile::InstrumentTrackSettings, "instrumenttracksettings" },
+		typeDescStruct{ DataFile::DragNDropData, "dnddata" },
+		typeDescStruct{ DataFile::ClipboardData, "clipboard-data" },
+		typeDescStruct{ DataFile::JournalData, "journaldata" },
+		typeDescStruct{ DataFile::EffectSettings, "effectsettings" },
+		typeDescStruct{ DataFile::MidiClip, "midiclip" }
+	};
+}
 
 
 
