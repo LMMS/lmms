@@ -248,7 +248,7 @@ void Lv2Proc::copyModelsFromCore()
 			uint32_t type = Engine::getLv2Manager()->
 				uridCache()[Lv2UridCache::Id::midi_MidiEvent];
 			auto buf = std::array<uint8_t, 4>{};
-			std::size_t bufsize = writeToByteSeq(ev.ev, buf.data(), sizeof(buf));
+			std::size_t bufsize = writeToByteSeq(ev.ev, buf.data(), buf.size());
 			if(bufsize)
 			{
 				lv2_evbuf_write(&iter, atomStamp, type, bufsize, buf.data());
