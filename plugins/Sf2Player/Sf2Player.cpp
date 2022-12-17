@@ -183,12 +183,13 @@ Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
 	connect( &m_chorusDepth, SIGNAL( dataChanged() ), this, SLOT( updateChorus() ) );
 	
 	// Microtuning
-	connect(Engine::getSong(), SIGNAL(scaleListChanged(int)), this, SLOT(updateTuning()));
-	connect(Engine::getSong(), SIGNAL(keymapListChanged(int)), this, SLOT(updateTuning()));
-	connect(instrumentTrack()->microtuner()->enabledModel(), SIGNAL(dataChanged()), this, SLOT(updateTuning()), Qt::DirectConnection);
-	connect(instrumentTrack()->microtuner()->scaleModel(), SIGNAL(dataChanged()), this, SLOT(updateTuning()), Qt::DirectConnection);
-	connect(instrumentTrack()->microtuner()->keymapModel(), SIGNAL(dataChanged()), this, SLOT(updateTuning()), Qt::DirectConnection);
-	connect(instrumentTrack()->baseNoteModel(), SIGNAL(dataChanged()), this, SLOT(updateTuning()), Qt::DirectConnection);
+	connect(Engine::getSong(), &Song::scaleListChanged, this, &Sf2Instrument::updateTuning);
+	connect(Engine::getSong(), &Song::keymapListChanged, this, &Sf2Instrument::updateTuning);
+	connect(instrumentTrack()->microtuner()->enabledModel(), &Model::dataChanged, this, &Sf2Instrument::updateTuning, Qt::DirectConnection);
+	connect(instrumentTrack()->microtuner()->scaleModel(), &Model::dataChanged, this, &Sf2Instrument::updateTuning, Qt::DirectConnection);
+	connect(instrumentTrack()->microtuner()->keymapModel(), &Model::dataChanged, this, &Sf2Instrument::updateTuning, Qt::DirectConnection);
+	connect(instrumentTrack()->microtuner()->keyRangeImportModel(), &Model::dataChanged, this, &Sf2Instrument::updateTuning, Qt::DirectConnection);
+	connect(instrumentTrack()->baseNoteModel(), &Model::dataChanged, this, &Sf2Instrument::updateTuning, Qt::DirectConnection);
 
 	auto iph = new InstrumentPlayHandle(this, _instrument_track);
 	Engine::audioEngine()->addPlayHandle( iph );
@@ -556,9 +557,9 @@ void Sf2Instrument::updateTuning()
 			// Get desired Hz of note
 			double noteHz = instrumentTrack()->microtuner()->keyToFreq(i, DefaultBaseKey);
 			// Convert Hz to cents
-			centArray[i] = 1200. * log2(noteHz / lowestHz);
+			centArray[i] = noteHz == 0. ? 0. : 1200. * log2(noteHz / lowestHz);
 		}
-		
+
 		fluid_synth_activate_key_tuning(m_synth, 0, 0, "", centArray.data(), true);
 		for (int chan = 0; chan < 16; chan++)
 		{
