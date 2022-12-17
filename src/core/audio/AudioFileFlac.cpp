@@ -111,9 +111,9 @@ void AudioFileFlac::writeBuffer(surroundSampleFrame const* _ab, fpp_t const fram
 	}
 	else // integer PCM encoding
 	{
-		auto buf = std::make_unique<int_sample_t[]>(frames * channels());
-		convertToS16(_ab, frames, master_gain, buf.get(), !isLittleEndian());
-		sf_writef_short(m_sf, static_cast<short*>(buf.get()), frames);
+		auto buf = std::vector<int_sample_t>(frames * channels());
+		convertToS16(_ab, frames, master_gain, buf.data(), !isLittleEndian());
+		sf_writef_short(m_sf, static_cast<short*>(buf.data()), frames);
 	}
 
 }
