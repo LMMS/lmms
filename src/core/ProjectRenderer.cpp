@@ -234,7 +234,7 @@ void ProjectRenderer::updateConsoleProgress()
 	prog[cols] = 0;
 
 	const auto activity = (const char*)"|/-\\";
-	memset(buf.data(), 0, sizeof(buf));
+	std::fill(buf.begin(), buf.end(), 0);
 	sprintf(buf.data(), "\r|%s|    %3d%%   %c  ", prog.data(), m_progress,
 							activity[rot] );
 	rot = ( rot+1 ) % 4;
