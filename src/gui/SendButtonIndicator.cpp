@@ -2,7 +2,6 @@
 
 #include "embed.h"
 #include "Mixer.h"
-#include "MixerLine.h"
 #include "MixerChannelView.h"
 #include "MixerView.h"
 
@@ -37,7 +36,7 @@ SendButtonIndicator:: SendButtonIndicator(QWidget * _parent, MixerChannelView * 
 void SendButtonIndicator::mousePressEvent( QMouseEvent * e )
 {
 	Mixer * mix = Engine::mixer();
-	int from = m_mv->currentMixerLine()->channelIndex();
+	int from = m_mv->currentMixerChannel()->channelIndex();
 	int to = m_parent->channelIndex();
 	FloatModel * sendModel = mix->channelSendModel(from, to);
 	if( sendModel == nullptr )
@@ -51,15 +50,14 @@ void SendButtonIndicator::mousePressEvent( QMouseEvent * e )
 		mix->deleteChannelSend( from, to );
 	}
 
-	m_mv->updateMixerLine(m_parent->channelIndex());
+	m_mv->updateMixerChannel(m_parent->channelIndex());
 	updateLightStatus();
 }
 
 FloatModel * SendButtonIndicator::getSendModel()
 {
 	Mixer * mix = Engine::mixer();
-	return mix->channelSendModel(
-		m_mv->currentMixerLine()->channelIndex(), m_parent->channelIndex());
+	return mix->channelSendModel(m_mv->currentMixerChannel()->channelIndex(), m_parent->channelIndex());
 }
 
 void SendButtonIndicator::updateLightStatus()

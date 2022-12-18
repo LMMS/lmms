@@ -30,6 +30,7 @@
 #include <QStackedLayout>
 #include <QScrollArea>
 
+#include "MixerChannelView.h"
 #include "ModelView.h"
 #include "Engine.h"
 #include "Fader.h"
