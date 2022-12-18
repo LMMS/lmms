@@ -69,7 +69,7 @@ MixerView::MixerView() :
 	setWindowIcon( embed::getIconPixmap( "mixer" ) );
 
 	// main-layout
-	auto ml = new QHBoxLayout;
+	auto ml = new QHBoxLayout{this};
 
 	// Set margins
 	ml->setContentsMargins( 0, 4, 0, 0 );
@@ -78,8 +78,8 @@ MixerView::MixerView() :
 	m_channelAreaWidget = new QWidget;
 	chLayout = new QHBoxLayout( m_channelAreaWidget );
 	chLayout->setSizeConstraint( QLayout::SetMinimumSize );
-	chLayout->setSpacing( 0 );
-	chLayout->setMargin( 0 );
+	chLayout->setSpacing(5);
+	chLayout->setMargin(0);
 	m_channelAreaWidget->setLayout(chLayout);
 
 	// create rack layout before creating the first channel
@@ -143,7 +143,6 @@ MixerView::MixerView() :
 
 	setCurrentMixerChannel(m_mixerChannelViews[0]);
 
-	setLayout( ml );
 	updateGeometry();
 
 	// timer for updating faders

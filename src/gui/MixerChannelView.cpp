@@ -42,13 +42,15 @@ namespace lmms::gui
         m_mixerView(mixerView),
         m_channelIndex(channelIndex)
     {
-        // assert(dynamic_cast<MixerView*>(parent) != nullptr);
         setAttribute(Qt::WA_StyledBackground);
+        setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
+        setFixedWidth(MIXER_CHANNEL_WIDTH);
+        setMinimumHeight(MIXER_CHANNEL_HEIGHT);
 
-        m_sendButton = new SendButtonIndicator{nullptr, this, mixerView}; 
-        m_sendKnob = new Knob{knobBright_26, nullptr, tr("Channel send amount")};
+        m_sendButton = new SendButtonIndicator{this, this, mixerView}; 
+        m_sendKnob = new Knob{knobBright_26, this, tr("Channel send amount")};
 
-        m_channelNumberLcd = new LcdWidget{2, nullptr};
+        m_channelNumberLcd = new LcdWidget{2, this};
         m_channelNumberLcd->setValue(channelIndex);
 
         auto mixerChannel = Engine::mixer()->mixerChannel(channelIndex);
@@ -79,22 +81,22 @@ namespace lmms::gui
         m_receiveArrow->setPixmap(embed::getIconPixmap("receive_bg_arrow"));
         m_receiveArrow->setVisible(m_sendReceiveState == SendReceiveState::Receive);
 
-        m_muteButton = new PixmapButton(nullptr, tr("Mute"));
+        m_muteButton = new PixmapButton(this, tr("Mute"));
         m_muteButton->setModel(&mixerChannel->m_muteModel);
         m_muteButton->setActiveGraphic(embed::getIconPixmap("led_off"));
         m_muteButton->setInactiveGraphic(embed::getIconPixmap("led_green"));
         m_muteButton->setCheckable(true);
         m_muteButton->setToolTip(tr("Mute this channel"));
 
-        m_soloButton = new PixmapButton(nullptr, tr("Solo"));
+        m_soloButton = new PixmapButton(this, tr("Solo"));
         m_soloButton->setModel(&mixerChannel->m_soloModel);
         m_soloButton->setActiveGraphic(embed::getIconPixmap("led_red"));
         m_soloButton->setInactiveGraphic(embed::getIconPixmap("led_off"));
         m_soloButton->setCheckable(true);
         m_soloButton->setToolTip(tr("Solo this channel"));
-        connect(&mixerChannel->m_soloModel, SIGNAL(dataChanged()), mixerView, SLOT(toggledSolo()), Qt::DirectConnection);
+        connect(&mixerChannel->m_soloModel, &BoolModel::dataChanged, mixerView, &MixerView::toggledSolo, Qt::DirectConnection);
 
-        m_fader = new Fader{&mixerChannel->m_volumeModel, tr("Fader %1").arg(channelIndex), nullptr};
+        m_fader = new Fader{&mixerChannel->m_volumeModel, tr("Fader %1").arg(channelIndex), this};
         m_fader->setLevelsDisplayedInDBFS();
         m_fader->setMinPeak(dbfsToAmp(-42));
         m_fader->setMaxPeak(dbfsToAmp(9));
