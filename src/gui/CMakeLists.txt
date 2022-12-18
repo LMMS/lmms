@@ -26,7 +26,7 @@ SET(LMMS_SRCS
 	gui/MicrotunerConfig.cpp
 	gui/MidiCCRackView.cpp
 	gui/MidiSetupWidget.cpp
-	gui/MixerLine.cpp
+	gui/MixerChannelView.cpp
 	gui/MixerView.cpp
 	gui/ModelView.cpp
 	gui/PeakControllerDialog.cpp
@@ -108,7 +108,6 @@ SET(LMMS_SRCS
 	gui/widgets/LedCheckBox.cpp
 	gui/widgets/LeftRightNav.cpp
 	gui/widgets/MeterDialog.cpp
-	gui/widgets/MixerChannelView.cpp
 	gui/widgets/MixerLineLcdSpinBox.cpp
 	gui/widgets/NStateButton.cpp
 	gui/widgets/Oscilloscope.cpp
