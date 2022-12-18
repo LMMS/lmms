@@ -199,14 +199,8 @@ void MixerView::refreshDisplay()
 	// delete all views and re-add them
 	for( int i = 1; i<m_mixerChannelViews.size(); ++i )
 	{
-		chLayout->removeWidget(m_mixerChannelViews[i]->m_mixerLine);
-		m_racksLayout->removeWidget( m_mixerChannelViews[i]->m_rackView );
-		delete m_mixerChannelViews[i]->m_fader;
-		delete m_mixerChannelViews[i]->m_muteBtn;
-		delete m_mixerChannelViews[i]->m_soloBtn;
-		delete m_mixerChannelViews[i]->m_mixerLine;
-		delete m_mixerChannelViews[i]->m_rackView;
-		delete m_mixerChannelViews[i];
+		chLayout->removeWidget(m_mixerChannelViews[i]);
+		m_racksLayout->removeWidget(m_mixerChannelViews[i]->m_effectRackView);
 	}
 	m_channelAreaWidget->adjustSize();
 
@@ -214,18 +208,18 @@ void MixerView::refreshDisplay()
 	m_mixerChannelViews.resize(Engine::mixer()->numChannels());
 	for( int i = 1; i < m_mixerChannelViews.size(); ++i )
 	{
-		m_mixerChannelViews[i] = new MixerChannelView(m_channelAreaWidget, this, i);
-		chLayout->addWidget(m_mixerChannelViews[i]->m_mixerLine);
-		m_racksLayout->addWidget( m_mixerChannelViews[i]->m_rackView );
+		m_mixerChannelViews[i] = new MixerChannelView(i, this, m_channelAreaWidget);
+		chLayout->addWidget(m_mixerChannelViews[i]);
+		m_racksLayout->addWidget( m_mixerChannelViews[i]->m_effectRackView);
 	}
 
-	// set selected mixer line to 0
-	setCurrentMixerLine( 0 );
+	// set selected mixer channel to 0
+	setCurrentMixerChannel( 0 );
 
 	// update all mixer lines
 	for( int i = 0; i < m_mixerChannelViews.size(); ++i )
 	{
-		updateMixerLine( i );
+		updateMixerChannel(i);
 	}
 
 	updateMaxChannelSelector();
