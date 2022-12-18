@@ -160,7 +160,21 @@ namespace lmms::gui
 
     bool MixerChannelView::eventFilter(QObject* dist, QEvent* event) 
     {
-
+        // If we are in a rename, capture the enter/return events and handle them
+        if (event->type() == QEvent::KeyPress)
+        {
+            auto keyEvent = static_cast<QKeyEvent*>(event);
+            if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return)
+            {
+                if (m_inRename)
+                {
+                    renameFinished();
+                    event->accept(); // Stop the event from propagating
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     int MixerChannelView::channelIndex() const 
