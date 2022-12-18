@@ -50,21 +50,6 @@ class LMMS_EXPORT MixerView : public QWidget, public ModelView,
 {
 	Q_OBJECT
 public:
-	class MixerChannelView
-	{
-	public:
-		MixerChannelView(QWidget * _parent, MixerView * _mv, int _chIndex );
-
-		void setChannelIndex( int index );
-
-		MixerLine * m_mixerLine;
-		PixmapButton * m_muteBtn;
-		PixmapButton * m_soloBtn;
-		Fader * m_fader;
-		EffectRackView * m_rackView;
-	};
-
-
 	MixerView();
 	~MixerView() override;
 
