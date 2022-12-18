@@ -649,7 +649,7 @@ lmms--gui--ControllerRackView QPushButton {
 	font-size: 10px;
 }
 
-lmms--gui--MixerLine {
+lmms--gui--MixerChannelView {
 	background: #14161A;
 	color: #d1d8e4;
 	qproperty-backgroundActive: #3B424A;
