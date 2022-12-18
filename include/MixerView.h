@@ -45,8 +45,6 @@ class LMMS_EXPORT MixerView : public QWidget, public ModelView,
 	Q_OBJECT
 public:
 	MixerView();
-	~MixerView() override;
-
 	void keyPressEvent(QKeyEvent * e) override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;

@@ -166,13 +166,6 @@ MixerView::MixerView() :
 	setModel( m );
 }
 
-MixerView::~MixerView()
-{
-	for (auto mixerChannelView : m_mixerChannelViews)
-	{
-		delete mixerChannelView;
-	}
-}
 
 
 
@@ -334,19 +327,6 @@ void MixerView::deleteChannel(int index)
 
 	// delete the real channel
 	Engine::mixer()->deleteChannel(index);
-
-	// delete the view
-	chLayout->removeWidget(m_mixerChannelViews[index]);
-	m_racksLayout->removeWidget( m_mixerChannelViews[index]);
-	delete m_mixerChannelViews[index]->m_fader;
-	delete m_mixerChannelViews[index]->m_muteButton;
-	delete m_mixerChannelViews[index]->m_soloButton;
-	// delete mixerLine later to prevent a crash when deleting from context menu
-	m_mixerChannelViews[index]->hide();
-	m_mixerChannelViews[index]->deleteLater();
-	delete m_mixerChannelViews[index]->m_effectRackView;
-	delete m_mixerChannelViews[index];
-	m_channelAreaWidget->adjustSize();
 
 	// make sure every channel knows what index it is
 	for(int i=index + 1; i<m_mixerChannelViews.size(); ++i)
