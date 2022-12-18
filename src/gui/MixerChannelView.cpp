@@ -148,6 +148,21 @@ namespace lmms::gui
         delete contextMenu;
     }
 
+    void MixerChannelView::mousePressEvent(QMouseEvent*) 
+    {
+
+    }
+    
+    void MixerChannelView::mouseDoubleClickEvent(QMouseEvent*) 
+    {
+
+    }
+
+    bool MixerChannelView::eventFilter(QObject* dist, QEvent* event) 
+    {
+
+    }
+
     int MixerChannelView::channelIndex() const 
     {
         return m_channelIndex;

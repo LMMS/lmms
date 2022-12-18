@@ -57,6 +57,7 @@ namespace lmms::gui
         void contextMenuEvent(QContextMenuEvent*) override;
         void mousePressEvent(QMouseEvent*) override;
 	    void mouseDoubleClickEvent(QMouseEvent*) override;
+        bool eventFilter(QObject* dist, QEvent* event) override;
 
         int channelIndex() const;
         void setChannelIndex(int index);
@@ -65,7 +66,6 @@ namespace lmms::gui
         void setSendReceiveState(const SendReceiveState& state);
         
         QSize sizeHint() const override;
-        bool eventFilter (QObject *dist, QEvent *event) override;
     
     public slots:
         void renameChannel();
