@@ -454,23 +454,23 @@ void MixerView::keyPressEvent(QKeyEvent * e)
 		case Qt::Key_Left:
 			if( e->modifiers() & Qt::AltModifier )
 			{
-				moveChannelLeft( m_currentMixerLine->channelIndex() );
+				moveChannelLeft(m_currentMixerChannel->channelIndex());
 			}
 			else
 			{
 				// select channel to the left
-				setCurrentMixerLine( m_currentMixerLine->channelIndex()-1 );
+				setCurrentMixerChannel(m_currentMixerChannel->channelIndex() - 1);
 			}
 			break;
 		case Qt::Key_Right:
 			if( e->modifiers() & Qt::AltModifier )
 			{
-				moveChannelRight( m_currentMixerLine->channelIndex() );
+				moveChannelRight(m_currentMixerChannel->channelIndex());
 			}
 			else
 			{
 				// select channel to the right
-				setCurrentMixerLine( m_currentMixerLine->channelIndex()+1 );
+				setCurrentMixerChannel(m_currentMixerChannel->channelIndex() + 1);
 			}
 			break;
 		case Qt::Key_Insert:
@@ -482,7 +482,7 @@ void MixerView::keyPressEvent(QKeyEvent * e)
 		case Qt::Key_Enter:
 		case Qt::Key_Return:
 		case Qt::Key_F2:
-			renameChannel( m_currentMixerLine->channelIndex() );
+			renameChannel(m_currentMixerChannel->channelIndex());
 			break;
 	}
 }
@@ -504,11 +504,11 @@ void MixerView::closeEvent( QCloseEvent * _ce )
 
 
 
-void MixerView::setCurrentMixerLine( int _line )
+void MixerView::setCurrentMixerChannel(int channel)
 {
-	if( _line >= 0 && _line < m_mixerChannelViews.size() )
+	if (channel >= 0 && channel < m_mixerChannelViews.size())
 	{
-		setCurrentMixerLine( m_mixerChannelViews[_line]->m_mixerLine );
+		setCurrentMixerChannel(m_mixerChannelViews[channel]);
 	}
 }
 
