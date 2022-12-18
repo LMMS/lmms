@@ -97,6 +97,9 @@ namespace lmms::gui
         fader->setLevelsDisplayedInDBFS();
         fader->setMinPeak(dbfsToAmp(-42));
         fader->setMaxPeak(dbfsToAmp(9));
+        
+        m_effectRackView = new EffectRackView{&mixerChannel->m_fxChain, mixerView->m_racksWidget};
+        m_effectRackView->setFixedSize(EffectRackView::DEFAULT_WIDTH, MIXER_CHANNEL_HEIGHT);
 
         auto mainLayout = new QVBoxLayout{this};
         mainLayout->addWidget(receiveArrow, 0, Qt::AlignHCenter);
@@ -174,8 +177,7 @@ namespace lmms::gui
     
     QSize MixerChannelView::sizeHint() const
     {
-        const auto parentHeight = static_cast<QWidget*>(parent())->height();
-        return QSize{MIXER_CHANNEL_WIDTH, parentHeight};
+        return QSize{MIXER_CHANNEL_WIDTH, MIXER_CHANNEL_HEIGHT};
     }
 
     void MixerChannelView::renameChannel() 

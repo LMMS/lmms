@@ -40,6 +40,7 @@
 namespace lmms::gui 
 {
     constexpr int MIXER_CHANNEL_WIDTH = 53;
+    constexpr int MIXER_CHANNEL_HEIGHT = 287;
     constexpr int MIXER_CHANNEL_INNER_BORDER_SIZE = 3;
     constexpr int MIXER_CHANNEL_OUTER_BORDER_SIZE = 1;
     
@@ -84,6 +85,7 @@ namespace lmms::gui
 
     private:
         MixerView* m_mixerView;
+        EffectRackView* m_effectRackView;
         SendReceiveState m_sendReceiveState = SendReceiveState::None;
         int m_channelIndex = 0;
         bool m_inRename = false;
