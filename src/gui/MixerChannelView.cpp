@@ -47,8 +47,18 @@ namespace lmms::gui
         setFixedWidth(MIXER_CHANNEL_WIDTH);
         setMinimumHeight(MIXER_CHANNEL_HEIGHT);
 
+        auto retainSizeWhenHidden = [](QWidget* widget) 
+        {
+            auto sizePolicy = widget->sizePolicy();
+            sizePolicy.setRetainSizeWhenHidden(true);
+            widget->setSizePolicy(sizePolicy);
+        };
+
         m_sendButton = new SendButtonIndicator{this, this, mixerView}; 
+        retainSizeWhenHidden(m_sendButton);
+        
         m_sendKnob = new Knob{knobBright_26, this, tr("Channel send amount")};
+        retainSizeWhenHidden(m_sendKnob);
 
         m_channelNumberLcd = new LcdWidget{2, this};
         m_channelNumberLcd->setValue(channelIndex);
@@ -75,10 +85,12 @@ namespace lmms::gui
 
         m_sendArrow = new QLabel{};
         m_sendArrow->setPixmap(embed::getIconPixmap("send_bg_arrow"));
+        retainSizeWhenHidden(m_sendArrow);
         m_sendArrow->setVisible(m_sendReceiveState == SendReceiveState::Send);
 
         m_receiveArrow = new QLabel{};
         m_receiveArrow->setPixmap(embed::getIconPixmap("receive_bg_arrow"));
+        retainSizeWhenHidden(m_receiveArrow);
         m_receiveArrow->setVisible(m_sendReceiveState == SendReceiveState::Receive);
 
         m_muteButton = new PixmapButton(this, tr("Mute"));
@@ -119,7 +131,6 @@ namespace lmms::gui
 
         connect(m_renameLineEdit, &QLineEdit::editingFinished, this, &MixerChannelView::renameFinished);
         connect(&Engine::mixer()->mixerChannel(m_channelIndex)->m_muteModel, SIGNAL(dataChanged()), this, SLOT(update()));
-
     }
 
     void MixerChannelView::contextMenuEvent(QContextMenuEvent*)
@@ -154,12 +165,12 @@ namespace lmms::gui
 
     void MixerChannelView::mousePressEvent(QMouseEvent*) 
     {
-
+        m_mixerView->setCurrentMixerChannel(this);
     }
     
     void MixerChannelView::mouseDoubleClickEvent(QMouseEvent*) 
     {
-
+        renameChannel();
     }
 
     bool MixerChannelView::eventFilter(QObject* dist, QEvent* event) 
