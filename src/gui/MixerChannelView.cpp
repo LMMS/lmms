@@ -155,6 +155,11 @@ namespace lmms::gui
     
     void MixerChannelView::setChannelIndex(int index) 
     {
+        MixerChannel* mixerChannel = Engine::mixer()->mixerChannel( index );
+        m_fader->setModel( &mixerChannel->m_volumeModel );
+        m_muteButton->setModel(&mixerChannel->m_muteModel);
+        m_soloButton->setModel(&mixerChannel->m_soloModel);
+        m_effectRackView->setModel(&mixerChannel->m_fxChain);
         m_channelIndex = index;
     }
 

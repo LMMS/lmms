@@ -267,60 +267,7 @@ void MixerView::loadSettings( const QDomElement & _this )
 }
 
 
-MixerView::MixerChannelView::MixerChannelView(QWidget * _parent, MixerView * _mv,
-										  int channelIndex )
-{
-	m_mixerLine = new MixerLine(_parent, _mv, channelIndex);
 
-	MixerChannel *mixerChannel = Engine::mixer()->mixerChannel(channelIndex);
-
-	m_fader = new Fader( &mixerChannel->m_volumeModel,
-					tr( "Fader %1" ).arg( channelIndex ), m_mixerLine );
-	m_fader->setLevelsDisplayedInDBFS();
-	m_fader->setMinPeak(dbfsToAmp(-42));
-	m_fader->setMaxPeak(dbfsToAmp(9));
-
-	m_fader->move( 16-m_fader->width()/2,
-					m_mixerLine->height()-
-					m_fader->height()-5 );
-
-	m_muteBtn = new PixmapButton( m_mixerLine, tr( "Mute" ) );
-	m_muteBtn->setModel( &mixerChannel->m_muteModel );
-	m_muteBtn->setActiveGraphic(
-				embed::getIconPixmap( "led_off" ) );
-	m_muteBtn->setInactiveGraphic(
-				embed::getIconPixmap( "led_green" ) );
-	m_muteBtn->setCheckable( true );
-	m_muteBtn->move( 9,  m_fader->y()-11);
-	m_muteBtn->setToolTip(tr("Mute this channel"));
-
-	m_soloBtn = new PixmapButton( m_mixerLine, tr( "Solo" ) );
-	m_soloBtn->setModel( &mixerChannel->m_soloModel );
-	m_soloBtn->setActiveGraphic(
-				embed::getIconPixmap( "led_red" ) );
-	m_soloBtn->setInactiveGraphic(
-				embed::getIconPixmap( "led_off" ) );
-	m_soloBtn->setCheckable( true );
-	m_soloBtn->move( 9,  m_fader->y()-21);
-	connect(&mixerChannel->m_soloModel, SIGNAL(dataChanged()),
-			_mv, SLOT ( toggledSolo() ), Qt::DirectConnection );
-	m_soloBtn->setToolTip(tr("Solo this channel"));
-
-	// Create EffectRack for the channel
-	m_rackView = new EffectRackView( &mixerChannel->m_fxChain, _mv->m_racksWidget );
-	m_rackView->setFixedSize( EffectRackView::DEFAULT_WIDTH, MixerLine::MixerLineHeight );
-}
-
-
-void MixerView::MixerChannelView::setChannelIndex( int index )
-{
-	MixerChannel* mixerChannel = Engine::mixer()->mixerChannel( index );
-
-	m_fader->setModel( &mixerChannel->m_volumeModel );
-	m_muteBtn->setModel( &mixerChannel->m_muteModel );
-	m_soloBtn->setModel( &mixerChannel->m_soloModel );
-	m_rackView->setModel( &mixerChannel->m_fxChain );
-}
 
 
 void MixerView::toggledSolo()
