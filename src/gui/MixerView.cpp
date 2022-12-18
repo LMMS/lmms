@@ -277,16 +277,16 @@ void MixerView::toggledSolo()
 
 
 
-void MixerView::setCurrentMixerLine( MixerLine * _line )
+void MixerView::setCurrentMixerChannel(MixerChannelView* channel)
 {
 	// select
-	m_currentMixerLine = _line;
-	m_racksLayout->setCurrentWidget( m_mixerChannelViews[ _line->channelIndex() ]->m_rackView );
+	m_currentMixerChannel = channel;
+	m_racksLayout->setCurrentWidget(m_mixerChannelViews[channel->channelIndex()]->m_effectRackView);
 
 	// set up send knob
 	for(int i = 0; i < m_mixerChannelViews.size(); ++i)
 	{
-		updateMixerLine(i);
+		updateMixerChannel(i);
 	}
 }
 
@@ -314,8 +314,8 @@ void MixerView::updateMixerChannel(int index)
 	}
 
 	// disable the send button if it would cause an infinite loop
-	thisLine->m_sendBtn->setVisible(! mix->isInfiniteLoop(selIndex, index));
-	thisLine->m_sendBtn->updateLightStatus();
+	thisLine->m_sendButton->setVisible(! mix->isInfiniteLoop(selIndex, index));
+	thisLine->m_sendButton->updateLightStatus();
 	thisLine->update();
 }
 
@@ -326,7 +326,7 @@ void MixerView::deleteChannel(int index)
 	if( index == 0 ) return;
 
 	// remember selected line
-	int selLine = m_currentMixerLine->channelIndex();
+	int selLine = m_currentMixerChannel->channelIndex();
 
 	// in case the deleted channel is soloed or the remaining
 	// channels will be left in a muted state
@@ -336,22 +336,22 @@ void MixerView::deleteChannel(int index)
 	Engine::mixer()->deleteChannel(index);
 
 	// delete the view
-	chLayout->removeWidget(m_mixerChannelViews[index]->m_mixerLine);
-	m_racksLayout->removeWidget( m_mixerChannelViews[index]->m_rackView );
+	chLayout->removeWidget(m_mixerChannelViews[index]);
+	m_racksLayout->removeWidget( m_mixerChannelViews[index]);
 	delete m_mixerChannelViews[index]->m_fader;
-	delete m_mixerChannelViews[index]->m_muteBtn;
-	delete m_mixerChannelViews[index]->m_soloBtn;
+	delete m_mixerChannelViews[index]->m_muteButton;
+	delete m_mixerChannelViews[index]->m_soloButton;
 	// delete mixerLine later to prevent a crash when deleting from context menu
-	m_mixerChannelViews[index]->m_mixerLine->hide();
-	m_mixerChannelViews[index]->m_mixerLine->deleteLater();
-	delete m_mixerChannelViews[index]->m_rackView;
+	m_mixerChannelViews[index]->hide();
+	m_mixerChannelViews[index]->deleteLater();
+	delete m_mixerChannelViews[index]->m_effectRackView;
 	delete m_mixerChannelViews[index];
 	m_channelAreaWidget->adjustSize();
 
 	// make sure every channel knows what index it is
 	for(int i=index + 1; i<m_mixerChannelViews.size(); ++i)
 	{
-		m_mixerChannelViews[i]->m_mixerLine->setChannelIndex(i-1);
+		m_mixerChannelViews[i]->setChannelIndex(i - 1);
 	}
 	m_mixerChannelViews.remove(index);
 
@@ -360,7 +360,7 @@ void MixerView::deleteChannel(int index)
 	{
 		selLine = m_mixerChannelViews.size()-1;
 	}
-	setCurrentMixerLine(selLine);
+	setCurrentMixerChannel(selLine);
 
 	updateMaxChannelSelector();
 }
@@ -419,7 +419,7 @@ void MixerView::moveChannelLeft(int index, int focusIndex)
 	m_mixerChannelViews[index - 1]->setChannelIndex( index - 1 );
 
 	// Focus on new position
-	setCurrentMixerLine( focusIndex );
+	setCurrentMixerChannel(focusIndex);
 }
 
 
@@ -439,7 +439,7 @@ void MixerView::moveChannelRight(int index)
 
 void MixerView::renameChannel(int index)
 {
-	m_mixerChannelViews[index]->m_mixerLine->renameChannel();
+	m_mixerChannelViews[index]->renameChannel();
 }
 
 
@@ -449,7 +449,7 @@ void MixerView::keyPressEvent(QKeyEvent * e)
 	switch(e->key())
 	{
 		case Qt::Key_Delete:
-			deleteChannel(m_currentMixerLine->channelIndex());
+			deleteChannel(m_currentMixerChannel->channelIndex());
 			break;
 		case Qt::Key_Left:
 			if( e->modifiers() & Qt::AltModifier )
