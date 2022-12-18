@@ -37,20 +37,19 @@ namespace gui
 
 class MixerLine;
 class MixerView;
-
+class MixerChannelView;
 
 class SendButtonIndicator : public QLabel 
 {
 public:
-	SendButtonIndicator( QWidget * _parent, MixerLine * _owner,
-						 MixerView * _mv);
+	SendButtonIndicator(QWidget * _parent, MixerChannelView * _owner, MixerView * _mv);
 
 	void mousePressEvent( QMouseEvent * e ) override;
 	void updateLightStatus();
 
 private:
 
-	MixerLine * m_parent;
+	MixerChannelView * m_parent;
 	MixerView * m_mv;
 	static QPixmap * s_qpmOn;
 	static QPixmap * s_qpmOff;

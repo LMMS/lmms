@@ -3,6 +3,7 @@
 #include "embed.h"
 #include "Mixer.h"
 #include "MixerLine.h"
+#include "MixerChannelView.h"
 #include "MixerView.h"
 
 namespace lmms::gui
@@ -12,8 +13,7 @@ namespace lmms::gui
 QPixmap * SendButtonIndicator::s_qpmOff = nullptr;
 QPixmap * SendButtonIndicator::s_qpmOn = nullptr;
 
-SendButtonIndicator:: SendButtonIndicator( QWidget * _parent, MixerLine * _owner,
-										   MixerView * _mv) :
+SendButtonIndicator:: SendButtonIndicator(QWidget * _parent, MixerChannelView * _owner, MixerView * _mv) :
 	QLabel( _parent ),
 	m_parent( _owner ),
 	m_mv( _mv )
