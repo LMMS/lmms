@@ -40,7 +40,7 @@ void MixerLineLcdSpinBox::setTrackView(TrackView * tv)
 
 void MixerLineLcdSpinBox::mouseDoubleClickEvent(QMouseEvent* event)
 {
-	getGUI()->mixerView()->setCurrentMixerLine(model()->value());
+	getGUI()->mixerView()->setCurrentMixerChannel(model()->value());
 
 	getGUI()->mixerView()->parentWidget()->show();
 	getGUI()->mixerView()->show();// show Mixer window
