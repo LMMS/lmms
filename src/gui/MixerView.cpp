@@ -92,18 +92,18 @@ MixerView::MixerView() :
 	m_mixerChannelViews.resize( m->numChannels() );
 	m_mixerChannelViews[0] = new MixerChannelView(0, this, this);
 
-	m_racksLayout->addWidget( m_mixerChannelViews[0]->m_rackView );
+	m_racksLayout->addWidget(m_mixerChannelViews[0]->m_effectRackView);
 
 	MixerChannelView * masterView = m_mixerChannelViews[0];
-	ml->addWidget( masterView->m_mixerLine, 0, Qt::AlignTop );
+	ml->addWidget(masterView, 0, Qt::AlignTop);
 
-	QSize mixerLineSize = masterView->m_mixerLine->size();
+	QSize mixerChannelSize = masterView->size();
 
 	// add mixer channels
 	for( int i = 1; i < m_mixerChannelViews.size(); ++i )
 	{
-		m_mixerChannelViews[i] = new MixerChannelView(m_channelAreaWidget, this, i);
-		chLayout->addWidget( m_mixerChannelViews[i]->m_mixerLine );
+		m_mixerChannelViews[i] = new MixerChannelView(i, this, m_channelAreaWidget);
+		chLayout->addWidget(m_mixerChannelViews[i]);
 	}
 
 	// add the scrolling section to the main layout
@@ -125,15 +125,15 @@ MixerView::MixerView() :
 	channelArea->setWidget( m_channelAreaWidget );
 	channelArea->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 	channelArea->setFrameStyle( QFrame::NoFrame );
-	channelArea->setMinimumWidth( mixerLineSize.width() * 6 );
-	channelArea->setFixedHeight( mixerLineSize.height() +
+	channelArea->setMinimumWidth(mixerChannelSize.width() * 6);
+	channelArea->setFixedHeight(mixerChannelSize.height() +
 			style()->pixelMetric( QStyle::PM_ScrollBarExtent ) );
 	ml->addWidget( channelArea, 1, Qt::AlignTop );
 
 	// show the add new mixer channel button
 	auto newChannelBtn = new QPushButton(embed::getIconPixmap("new_channel"), QString(), this);
 	newChannelBtn->setObjectName( "newChannelBtn" );
-	newChannelBtn->setFixedSize( mixerLineSize );
+	newChannelBtn->setFixedSize( mixerChannelSize );
 	connect( newChannelBtn, SIGNAL(clicked()), this, SLOT(addNewChannel()));
 	ml->addWidget( newChannelBtn, 0, Qt::AlignTop );
 
@@ -141,7 +141,7 @@ MixerView::MixerView() :
 	// add the stacked layout for the effect racks of mixer channels
 	ml->addWidget( m_racksWidget, 0, Qt::AlignTop | Qt::AlignRight );
 
-	setCurrentMixerLine( m_mixerChannelViews[0]->m_mixerLine );
+	setCurrentMixerChannel(m_mixerChannelViews[0]);
 
 	setLayout( ml );
 	updateGeometry();
