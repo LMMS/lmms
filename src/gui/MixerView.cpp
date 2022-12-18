@@ -182,12 +182,11 @@ int MixerView::addNewChannel()
 	Mixer * mix = Engine::mixer();
 
 	int newChannelIndex = mix->createChannel();
-	m_mixerChannelViews.push_back(new MixerChannelView(m_channelAreaWidget, this,
-												 newChannelIndex));
-	chLayout->addWidget( m_mixerChannelViews[newChannelIndex]->m_mixerLine );
-	m_racksLayout->addWidget( m_mixerChannelViews[newChannelIndex]->m_rackView );
+	m_mixerChannelViews.push_back(new MixerChannelView(newChannelIndex, this, m_channelAreaWidget));
+	chLayout->addWidget(m_mixerChannelViews[newChannelIndex]);
+	m_racksLayout->addWidget(m_mixerChannelViews[newChannelIndex]);
 
-	updateMixerLine(newChannelIndex);
+	updateMixerChannel(newChannelIndex);
 
 	updateMaxChannelSelector();
 
@@ -351,13 +350,13 @@ void MixerView::setCurrentMixerLine( MixerLine * _line )
 }
 
 
-void MixerView::updateMixerLine(int index)
+void MixerView::updateMixerChannel(int index)
 {
 	Mixer * mix = Engine::mixer();
 
 	// does current channel send to this channel?
-	int selIndex = m_currentMixerLine->channelIndex();
-	MixerLine * thisLine = m_mixerChannelViews[index]->m_mixerLine;
+	int selIndex = m_currentMixerChannel->channelIndex();
+	auto thisLine = m_mixerChannelViews[index];
 	thisLine->setToolTip( Engine::mixer()->mixerChannel( index )->m_name );
 
 	FloatModel * sendModel = mix->channelSendModel(selIndex, index);
