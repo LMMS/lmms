@@ -37,14 +37,8 @@
 #include "embed.h"
 #include "EffectRackView.h"
 
-class QButtonGroup;
-
-
 namespace lmms::gui
 {
-
-class MixerLine;
-
 class LMMS_EXPORT MixerView : public QWidget, public ModelView,
 					public SerializingObjectHook
 {
@@ -58,9 +52,9 @@ public:
 	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
 	void loadSettings( const QDomElement & _this ) override;
 
-	inline MixerLine * currentMixerLine()
+	inline MixerChannelView* currentMixerChannel()
 	{
-		return m_currentMixerLine;
+		return m_currentMixerChannel;
 	}
 
 	inline MixerChannelView * channelView(int index)
@@ -69,14 +63,14 @@ public:
 	}
 
 
-	void setCurrentMixerLine( MixerLine * _line );
-	void setCurrentMixerLine( int _line );
+	void setCurrentMixerChannel(MixerChannelView* channel);
+	void setCurrentMixerChannel(int channel);
 
 	void clear();
 
 
 	// display the send button and knob correctly
-	void updateMixerLine(int index);
+	void updateMixerChannel(int index);
 
 	// notify the view that a mixer channel was deleted
 	void deleteChannel(int index);
@@ -108,7 +102,7 @@ private slots:
 private:
 	QVector<MixerChannelView *> m_mixerChannelViews;
 
-	MixerLine * m_currentMixerLine;
+	MixerChannelView* m_currentMixerChannel;
 
 	QScrollArea * channelArea;
 	QHBoxLayout * chLayout;
