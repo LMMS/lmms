@@ -177,7 +177,7 @@ int MixerView::addNewChannel()
 	int newChannelIndex = mix->createChannel();
 	m_mixerChannelViews.push_back(new MixerChannelView(newChannelIndex, this, m_channelAreaWidget));
 	chLayout->addWidget(m_mixerChannelViews[newChannelIndex]);
-	m_racksLayout->addWidget(m_mixerChannelViews[newChannelIndex]);
+	m_racksLayout->addWidget(m_mixerChannelViews[newChannelIndex]->m_effectRackView);
 
 	updateMixerChannel(newChannelIndex);
 
@@ -327,6 +327,13 @@ void MixerView::deleteChannel(int index)
 
 	// delete the real channel
 	Engine::mixer()->deleteChannel(index);
+
+	chLayout->removeWidget(m_mixerChannelViews[index]);
+	m_racksLayout->removeWidget( m_mixerChannelViews[index]);
+	// delete mixerLine later to prevent a crash when deleting from context menu
+	m_mixerChannelViews[index]->hide();
+	m_mixerChannelViews[index]->deleteLater();
+	m_channelAreaWidget->adjustSize();
 
 	// make sure every channel knows what index it is
 	for(int i=index + 1; i<m_mixerChannelViews.size(); ++i)
