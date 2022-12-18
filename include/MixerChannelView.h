@@ -47,6 +47,11 @@ namespace lmms::gui
     class MixerChannelView : public QWidget
     {
         Q_OBJECT
+        Q_PROPERTY(QBrush backgroundActive READ backgroundActive WRITE setBackgroundActive)
+        Q_PROPERTY(QColor strokeOuterActive READ strokeOuterActive WRITE setStrokeOuterActive)
+        Q_PROPERTY(QColor strokeOuterInactive READ strokeOuterInactive WRITE setStrokeOuterInactive)
+        Q_PROPERTY(QColor strokeInnerActive READ strokeInnerActive WRITE setStrokeInnerActive)
+        Q_PROPERTY(QColor strokeInnerInactive READ strokeInnerInactive WRITE setStrokeInnerInactive)
     public:
         enum class SendReceiveState 
         {
@@ -58,14 +63,30 @@ namespace lmms::gui
         void mousePressEvent(QMouseEvent*) override;
 	    void mouseDoubleClickEvent(QMouseEvent*) override;
         bool eventFilter(QObject* dist, QEvent* event) override;
+        QSize sizeHint() const override;
 
         int channelIndex() const;
         void setChannelIndex(int index);
 
         SendReceiveState sendReceiveState() const;
         void setSendReceiveState(const SendReceiveState& state);
+
+        QBrush backgroundActive() const;
+        void setBackgroundActive(const QBrush & c);
         
-        QSize sizeHint() const override;
+        QColor strokeOuterActive() const;
+        void setStrokeOuterActive(const QColor & c);
+        
+        QColor strokeOuterInactive() const;
+        void setStrokeOuterInactive(const QColor & c );
+        
+        QColor strokeInnerActive() const;
+        void setStrokeInnerActive(const QColor & c );
+        
+        QColor strokeInnerInactive() const;
+        void setStrokeInnerInactive(const QColor& c);
+
+        
     
     public slots:
         void renameChannel();
@@ -98,6 +119,13 @@ namespace lmms::gui
         SendReceiveState m_sendReceiveState = SendReceiveState::None;
         int m_channelIndex = 0;
         bool m_inRename = false;
+
+        QBrush m_backgroundActive;
+        QColor m_strokeOuterActive;
+        QColor m_strokeOuterInactive;
+        QColor m_strokeInnerActive;
+        QColor m_strokeInnerInactive;
+        
         friend class MixerView;
     };
 } // namespace lmms::gui

@@ -43,6 +43,7 @@ namespace lmms::gui
         m_channelIndex(channelIndex)
     {
         // assert(dynamic_cast<MixerView*>(parent) != nullptr);
+        setAttribute(Qt::WA_StyledBackground);
 
         m_sendButton = new SendButtonIndicator{nullptr, this, mixerView}; 
         m_sendKnob = new Knob{knobBright_26, nullptr, tr("Channel send amount")};
@@ -116,6 +117,7 @@ namespace lmms::gui
 
         connect(m_renameLineEdit, &QLineEdit::editingFinished, this, &MixerChannelView::renameFinished);
         connect(&Engine::mixer()->mixerChannel(m_channelIndex)->m_muteModel, SIGNAL(dataChanged()), this, SLOT(update()));
+
     }
 
     void MixerChannelView::contextMenuEvent(QContextMenuEvent*)
@@ -184,8 +186,8 @@ namespace lmms::gui
     
     void MixerChannelView::setChannelIndex(int index) 
     {
-        MixerChannel* mixerChannel = Engine::mixer()->mixerChannel( index );
-        m_fader->setModel( &mixerChannel->m_volumeModel );
+        MixerChannel* mixerChannel = Engine::mixer()->mixerChannel(index);
+        m_fader->setModel(&mixerChannel->m_volumeModel);
         m_muteButton->setModel(&mixerChannel->m_muteModel);
         m_soloButton->setModel(&mixerChannel->m_soloModel);
         m_effectRackView->setModel(&mixerChannel->m_fxChain);
@@ -212,6 +214,56 @@ namespace lmms::gui
     QSize MixerChannelView::sizeHint() const
     {
         return QSize{MIXER_CHANNEL_WIDTH, MIXER_CHANNEL_HEIGHT};
+    }
+
+    QBrush MixerChannelView::backgroundActive() const 
+    {
+        return m_backgroundActive;
+    }
+    
+    void MixerChannelView::setBackgroundActive(const QBrush & c) 
+    {
+        m_backgroundActive = c;
+    }
+    
+    QColor MixerChannelView::strokeOuterActive() const 
+    {
+        return m_strokeOuterActive;
+    }
+
+    void MixerChannelView::setStrokeOuterActive(const QColor & c) 
+    {
+        m_strokeOuterActive = c;
+    }
+
+    QColor MixerChannelView::strokeOuterInactive() const 
+    {
+        return m_strokeOuterInactive;
+    }
+
+    void MixerChannelView::setStrokeOuterInactive(const QColor& c) 
+    {
+        m_strokeOuterInactive = c;
+    }
+    
+    QColor MixerChannelView::strokeInnerActive() const 
+    {
+        return m_strokeInnerActive;
+    }
+
+    void MixerChannelView::setStrokeInnerActive(const QColor& c) 
+    {
+        m_strokeInnerActive = c;
+    }
+    
+    QColor MixerChannelView::strokeInnerInactive() const 
+    {
+        return m_strokeInnerInactive;
+    }
+
+    void MixerChannelView::setStrokeInnerInactive(const QColor& c) 
+    {
+        m_strokeInnerInactive = c;
     }
 
     void MixerChannelView::renameChannel() 
