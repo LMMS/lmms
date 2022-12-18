@@ -44,20 +44,20 @@ namespace lmms::gui
     {
         // assert(dynamic_cast<MixerView*>(parent) != nullptr);
 
-        auto sendButton = new SendButtonIndicator{nullptr, this, mixerView}; 
-        auto sendKnob = new Knob{knobBright_26, nullptr, tr("Channel send amount")};
+        m_sendButton = new SendButtonIndicator{nullptr, this, mixerView}; 
+        m_sendKnob = new Knob{knobBright_26, nullptr, tr("Channel send amount")};
 
-        auto channelNumberLcd = new LcdWidget{2, nullptr};
-        channelNumberLcd->setValue(channelIndex);
+        m_channelNumberLcd = new LcdWidget{2, nullptr};
+        m_channelNumberLcd->setValue(channelIndex);
 
         auto mixerChannel = Engine::mixer()->mixerChannel(channelIndex);
         auto mixerName = mixerChannel->m_name;
     	setToolTip(mixerName);
 
-        auto renameLineEdit = new QLineEdit{};
-        renameLineEdit->setText(mixerName);
-        renameLineEdit->setFont(pointSizeF(font(), 7.5f));
-    	renameLineEdit->installEventFilter(this);
+        m_renameLineEdit = new QLineEdit{};
+        m_renameLineEdit->setText(mixerName);
+        m_renameLineEdit->setFont(pointSizeF(font(), 7.5f));
+    	m_renameLineEdit->installEventFilter(this);
 
         auto renameLineEditScene = new QGraphicsScene{};        
         auto renameLineEditView = new QGraphicsView{};
@@ -67,54 +67,54 @@ namespace lmms::gui
         renameLineEditView->setAttribute(Qt::WA_TransparentForMouseEvents, true);
         renameLineEditView->setScene(renameLineEditScene);
         
-        auto renameLineEditProxy = renameLineEditScene->addWidget(renameLineEdit);
+        auto renameLineEditProxy = renameLineEditScene->addWidget(m_renameLineEdit);
         renameLineEditProxy->setRotation(-90);
 
-        auto sendArrow = new QLabel{};
-        sendArrow->setPixmap(embed::getIconPixmap("send_bg_arrow"));
-        sendArrow->setVisible(m_sendReceiveState == SendReceiveState::Send);
+        m_sendArrow = new QLabel{};
+        m_sendArrow->setPixmap(embed::getIconPixmap("send_bg_arrow"));
+        m_sendArrow->setVisible(m_sendReceiveState == SendReceiveState::Send);
 
-        auto receiveArrow = new QLabel{};
-        receiveArrow->setPixmap(embed::getIconPixmap("receive_bg_arrow"));
-        receiveArrow->setVisible(m_sendReceiveState == SendReceiveState::Receive);
+        m_receiveArrow = new QLabel{};
+        m_receiveArrow->setPixmap(embed::getIconPixmap("receive_bg_arrow"));
+        m_receiveArrow->setVisible(m_sendReceiveState == SendReceiveState::Receive);
 
-        auto muteBtn = new PixmapButton(nullptr, tr("Mute"));
-        muteBtn->setModel(&mixerChannel->m_muteModel);
-        muteBtn->setActiveGraphic(embed::getIconPixmap("led_off"));
-        muteBtn->setInactiveGraphic(embed::getIconPixmap("led_green"));
-        muteBtn->setCheckable(true);
-        muteBtn->setToolTip(tr("Mute this channel"));
+        m_muteButton = new PixmapButton(nullptr, tr("Mute"));
+        m_muteButton->setModel(&mixerChannel->m_muteModel);
+        m_muteButton->setActiveGraphic(embed::getIconPixmap("led_off"));
+        m_muteButton->setInactiveGraphic(embed::getIconPixmap("led_green"));
+        m_muteButton->setCheckable(true);
+        m_muteButton->setToolTip(tr("Mute this channel"));
 
-        auto soloBtn = new PixmapButton(nullptr, tr("Solo"));
-        soloBtn->setModel(&mixerChannel->m_soloModel);
-        soloBtn->setActiveGraphic(embed::getIconPixmap("led_red"));
-        soloBtn->setInactiveGraphic(embed::getIconPixmap("led_off"));
-        soloBtn->setCheckable(true);
+        m_soloButton = new PixmapButton(nullptr, tr("Solo"));
+        m_soloButton->setModel(&mixerChannel->m_soloModel);
+        m_soloButton->setActiveGraphic(embed::getIconPixmap("led_red"));
+        m_soloButton->setInactiveGraphic(embed::getIconPixmap("led_off"));
+        m_soloButton->setCheckable(true);
+        m_soloButton->setToolTip(tr("Solo this channel"));
         connect(&mixerChannel->m_soloModel, SIGNAL(dataChanged()), mixerView, SLOT(toggledSolo()), Qt::DirectConnection);
-        soloBtn->setToolTip(tr("Solo this channel"));
 
-        auto fader = new Fader{&mixerChannel->m_volumeModel, tr("Fader %1").arg(channelIndex), nullptr};
-        fader->setLevelsDisplayedInDBFS();
-        fader->setMinPeak(dbfsToAmp(-42));
-        fader->setMaxPeak(dbfsToAmp(9));
+        m_fader = new Fader{&mixerChannel->m_volumeModel, tr("Fader %1").arg(channelIndex), nullptr};
+        m_fader->setLevelsDisplayedInDBFS();
+        m_fader->setMinPeak(dbfsToAmp(-42));
+        m_fader->setMaxPeak(dbfsToAmp(9));
         
         m_effectRackView = new EffectRackView{&mixerChannel->m_fxChain, mixerView->m_racksWidget};
         m_effectRackView->setFixedSize(EffectRackView::DEFAULT_WIDTH, MIXER_CHANNEL_HEIGHT);
 
         auto mainLayout = new QVBoxLayout{this};
-        mainLayout->addWidget(receiveArrow, 0, Qt::AlignHCenter);
-        mainLayout->addWidget(sendButton, 0, Qt::AlignHCenter);
-        mainLayout->addWidget(sendKnob, 0, Qt::AlignHCenter);
-        mainLayout->addWidget(sendArrow, 0, Qt::AlignHCenter);
-        mainLayout->addWidget(channelNumberLcd, 0, Qt::AlignHCenter);
+        mainLayout->addWidget(m_receiveArrow, 0, Qt::AlignHCenter);
+        mainLayout->addWidget(m_sendButton, 0, Qt::AlignHCenter);
+        mainLayout->addWidget(m_sendKnob, 0, Qt::AlignHCenter);
+        mainLayout->addWidget(m_sendArrow, 0, Qt::AlignHCenter);
+        mainLayout->addWidget(m_channelNumberLcd, 0, Qt::AlignHCenter);
         mainLayout->addStretch();
         mainLayout->addWidget(renameLineEditView, 0, Qt::AlignHCenter);
         mainLayout->addStretch();
-        mainLayout->addWidget(soloBtn, 0, Qt::AlignHCenter);
-        mainLayout->addWidget(muteBtn, 0, Qt::AlignHCenter);
-        mainLayout->addWidget(fader, 0, Qt::AlignHCenter);
+        mainLayout->addWidget(m_soloButton, 0, Qt::AlignHCenter);
+        mainLayout->addWidget(m_muteButton, 0, Qt::AlignHCenter);
+        mainLayout->addWidget(m_fader, 0, Qt::AlignHCenter);
 
-        connect(renameLineEdit, &QLineEdit::editingFinished, this, &MixerChannelView::renameFinished);
+        connect(m_renameLineEdit, &QLineEdit::editingFinished, this, &MixerChannelView::renameFinished);
         connect(&Engine::mixer()->mixerChannel(m_channelIndex)->m_muteModel, SIGNAL(dataChanged()), this, SLOT(update()));
     }
 

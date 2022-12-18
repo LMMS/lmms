@@ -84,8 +84,17 @@ namespace lmms::gui
         QString elideName(const QString& name);
 
     private:
-        MixerView* m_mixerView;
+        SendButtonIndicator* m_sendButton;
+        Knob* m_sendKnob;
+        LcdWidget* m_channelNumberLcd;
+        QLineEdit* m_renameLineEdit;
+        QLabel* m_sendArrow;
+        QLabel* m_receiveArrow;
+        PixmapButton* m_muteButton;
+        PixmapButton* m_soloButton;
+        Fader* m_fader;
         EffectRackView* m_effectRackView;
+        MixerView* m_mixerView;
         SendReceiveState m_sendReceiveState = SendReceiveState::None;
         int m_channelIndex = 0;
         bool m_inRename = false;
