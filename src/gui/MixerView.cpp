@@ -31,9 +31,9 @@
 
 #include "lmms_math.h"
 
+#include "MixerChannelView.h"
 #include "MixerView.h"
 #include "Knob.h"
-#include "MixerLine.h"
 #include "Mixer.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
@@ -90,7 +90,7 @@ MixerView::MixerView() :
 
 	// add master channel
 	m_mixerChannelViews.resize( m->numChannels() );
-	m_mixerChannelViews[0] = new MixerChannelView( this, this, 0 );
+	m_mixerChannelViews[0] = new MixerChannelView(0, this, this);
 
 	m_racksLayout->addWidget( m_mixerChannelViews[0]->m_rackView );
 
