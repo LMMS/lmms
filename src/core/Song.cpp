@@ -620,6 +620,7 @@ void Song::togglePause()
 	{
 		m_playing = false;
 		m_paused = true;
+		Engine::audioEngine()->clear();
 	}
 
 	m_vstSyncController.setPlaybackState( m_playing );

@@ -863,6 +863,10 @@ void PianoRoll::setCurrentMidiClip( MidiClip* newMidiClip )
 	{
 		Engine::getSong()->playMidiClip( nullptr );
 	}
+	else if (Engine::getSong()->isPaused())
+	{
+		Engine::getSong()->playMidiClip(nullptr);
+	}
 
 	if(m_stepRecorder.isRecording())
 	{
