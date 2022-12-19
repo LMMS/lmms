@@ -39,6 +39,8 @@
 #include <QPainter>
 #include <QFont>
 
+#include <cassert>
+
 namespace lmms::gui
 {
     MixerChannelView::MixerChannelView(int channelIndex, MixerView* mixerView, QWidget* parent) : 
