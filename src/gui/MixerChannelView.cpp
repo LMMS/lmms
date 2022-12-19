@@ -24,6 +24,7 @@
 
 #include "CaptionMenu.h"
 #include "ColorChooser.h"
+#include "GuiApplication.h"
 #include "Mixer.h"
 #include "MixerChannelView.h"
 #include "MixerView.h"
@@ -404,22 +405,26 @@ namespace lmms::gui
 
     void MixerChannelView::removeChannel() 
     {
-
+        auto mix = getGUI()->mixerView();
+	    mix->deleteChannel(m_channelIndex);
     }
 
     void MixerChannelView::removeUnusedChannels() 
     {
-
+        auto mix = getGUI()->mixerView();
+	    mix->deleteUnusedChannels();
     }
 
     void MixerChannelView::moveChannelLeft() 
     {
-
+        auto mix = getGUI()->mixerView();
+	    mix->moveChannelLeft(m_channelIndex);
     }
 
     void MixerChannelView::moveChannelRight() 
     {
-
+        auto mix = getGUI()->mixerView();
+	    mix->moveChannelRight(m_channelIndex);
     }
 
     QString MixerChannelView::elideName(const QString& name) 
