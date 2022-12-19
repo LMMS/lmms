@@ -32,10 +32,11 @@
 #include "PixmapButton.h"
 #include "SendButtonIndicator.h"
 
-#include <QWidget>
-#include <QPixmap>
+#include <QGraphicsView>
 #include <QLabel>
 #include <QLineEdit>
+#include <QPixmap>
+#include <QWidget>
 
 namespace lmms::gui 
 {
@@ -108,6 +109,7 @@ namespace lmms::gui
         Knob* m_sendKnob;
         LcdWidget* m_channelNumberLcd;
         QLineEdit* m_renameLineEdit;
+        QGraphicsView* m_renameLineEditView;
         QLabel* m_sendArrow;
         QLabel* m_receiveArrow;
         PixmapButton* m_muteButton;

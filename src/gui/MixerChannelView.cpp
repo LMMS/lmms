@@ -26,12 +26,12 @@
 #include "Mixer.h"
 #include "MixerChannelView.h"
 #include "MixerView.h"
+#include "Song.h"
 #include "gui_templates.h"
 #include "lmms_math.h"
 
 #include <QGraphicsProxyWidget>
 #include <QGraphicsScene>
-#include <QGraphicsView>
 #include <QMenu>
 #include <QPainter>
 #include <QFont>
@@ -74,12 +74,12 @@ namespace lmms::gui
     	m_renameLineEdit->installEventFilter(this);
 
         auto renameLineEditScene = new QGraphicsScene{};        
-        auto renameLineEditView = new QGraphicsView{};
-        renameLineEditView->setStyleSheet("border-style: none; background: transparent;");
-        renameLineEditView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        renameLineEditView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        renameLineEditView->setAttribute(Qt::WA_TransparentForMouseEvents, true);
-        renameLineEditView->setScene(renameLineEditScene);
+        m_renameLineEditView = new QGraphicsView{};
+        m_renameLineEditView->setStyleSheet("border-style: none; background: transparent;");
+        m_renameLineEditView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        m_renameLineEditView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        m_renameLineEditView->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+        m_renameLineEditView->setScene(renameLineEditScene);
         
         auto renameLineEditProxy = renameLineEditScene->addWidget(m_renameLineEdit);
         renameLineEditProxy->setRotation(-90);
@@ -124,7 +124,7 @@ namespace lmms::gui
         mainLayout->addWidget(m_sendArrow, 0, Qt::AlignHCenter);
         mainLayout->addWidget(m_channelNumberLcd, 0, Qt::AlignHCenter);
         mainLayout->addStretch();
-        mainLayout->addWidget(renameLineEditView, 0, Qt::AlignHCenter);
+        mainLayout->addWidget(m_renameLineEditView, 0, Qt::AlignHCenter);
         mainLayout->addStretch();
         mainLayout->addWidget(m_soloButton, 0, Qt::AlignHCenter);
         mainLayout->addWidget(m_muteButton, 0, Qt::AlignHCenter);
@@ -227,7 +227,6 @@ namespace lmms::gui
         {
             m_mixerView->setCurrentMixerChannel(this);
         }
-
     }
     
     void MixerChannelView::mouseDoubleClickEvent(QMouseEvent*) 
@@ -338,12 +337,41 @@ namespace lmms::gui
 
     void MixerChannelView::renameChannel() 
     {
+        m_inRename = true;
+        setToolTip("");
+        m_renameLineEdit->setReadOnly(false);
+        
+        m_channelNumberLcd->hide();
+        m_renameLineEdit->setFixedWidth(m_renameLineEdit->width());
+        m_renameLineEdit->setText(Engine::mixer()->mixerChannel(m_channelIndex)->m_name);
+        
+        m_renameLineEditView->setFocus();
+        m_renameLineEdit->selectAll();
+        m_renameLineEdit->setFocus();
 
     }
 
     void MixerChannelView::renameFinished() 
     {
+        m_inRename = false;
+        
+        m_renameLineEdit->deselect();
+        m_renameLineEdit->setReadOnly(true);
+        m_renameLineEdit->setFixedWidth(m_renameLineEdit->width());
+        m_channelNumberLcd->show();
 
+        auto newName = m_renameLineEdit->text();
+        setFocus();
+
+        const auto mixerChannel = Engine::mixer()->mixerChannel(m_channelIndex);
+        if (!newName.isEmpty() && mixerChannel->m_name != newName)
+        {
+            mixerChannel->m_name = newName;
+            m_renameLineEdit->setText(elideName(newName));
+            Engine::getSong()->setModified();
+        }
+
+        setToolTip(mixerChannel->m_name);
     }
 
     void MixerChannelView::resetColor() 
@@ -383,7 +411,7 @@ namespace lmms::gui
 
     QString MixerChannelView::elideName(const QString& name) 
     {
-        constexpr auto maxTextHeight = 60;
+        const auto maxTextHeight = m_renameLineEdit->width();
         const auto metrics = QFontMetrics{m_renameLineEdit->font()};
         const auto elidedName = metrics.elidedText(name, Qt::ElideRight, maxTextHeight);
         return elidedName;
