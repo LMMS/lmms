@@ -29,6 +29,7 @@
 #include "MixerChannelView.h"
 #include "MixerView.h"
 #include "Song.h"
+
 #include "gui_templates.h"
 #include "lmms_math.h"
 
@@ -66,8 +67,8 @@ namespace lmms::gui
         m_channelNumberLcd = new LcdWidget{2, this};
         m_channelNumberLcd->setValue(channelIndex);
 
-        auto mixerChannel = Engine::mixer()->mixerChannel(channelIndex);
-        auto mixerName = mixerChannel->m_name;
+        const auto mixerChannel = Engine::mixer()->mixerChannel(channelIndex);
+        const auto mixerName = mixerChannel->m_name;
     	setToolTip(mixerName);
 
         m_renameLineEdit = new QLineEdit{};
@@ -133,36 +134,38 @@ namespace lmms::gui
         mainLayout->addWidget(m_fader, 0, Qt::AlignHCenter);
 
         connect(m_renameLineEdit, &QLineEdit::editingFinished, this, &MixerChannelView::renameFinished);
-        connect(&Engine::mixer()->mixerChannel(m_channelIndex)->m_muteModel, SIGNAL(dataChanged()), this, SLOT(update()));
     }
 
     void MixerChannelView::contextMenuEvent(QContextMenuEvent*)
     {
-        QPointer<CaptionMenu> contextMenu = new CaptionMenu( Engine::mixer()->mixerChannel( m_channelIndex )->m_name, this );
-        if( m_channelIndex != 0 ) // no move-options in master
+        auto contextMenu = new CaptionMenu( Engine::mixer()->mixerChannel( m_channelIndex )->m_name, this );
+        
+        if (m_channelIndex != 0) // no move-options in master
         {
-            contextMenu->addAction( tr( "Move &left" ),	this, SLOT(moveChannelLeft()));
-            contextMenu->addAction( tr( "Move &right" ), this, SLOT(moveChannelRight()));
+            contextMenu->addAction(tr("Move &left"), this, &MixerChannelView::moveChannelLeft);
+            contextMenu->addAction(tr("Move &right"), this, &MixerChannelView::moveChannelRight);
         }
-        contextMenu->addAction( tr( "Rename &channel" ), this, SLOT(renameChannel()));
+
+        contextMenu->addAction(tr("Rename &channel"), this, &MixerChannelView::renameChannel);
         contextMenu->addSeparator();
 
-        if( m_channelIndex != 0 ) // no remove-option in master
+        if (m_channelIndex != 0) // no remove-option in master
         {
-            contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "R&emove channel" ), this, SLOT(removeChannel()));
+            contextMenu->addAction(embed::getIconPixmap("cancel"), tr("R&emove channel"), this, &MixerChannelView::removeChannel);
             contextMenu->addSeparator();
         }
-        contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "Remove &unused channels" ), this, SLOT(removeUnusedChannels()));
+
+        contextMenu->addAction(embed::getIconPixmap("cancel"), tr("Remove &unused channels"), this, &MixerChannelView::removeUnusedChannels);
         contextMenu->addSeparator();
 
-        QMenu colorMenu(tr("Color"), this);
+        auto colorMenu = QMenu{tr("Color"), this};
         colorMenu.setIcon(embed::getIconPixmap("colorize"));
-        colorMenu.addAction(tr("Change"), this, SLOT(selectColor()));
-        colorMenu.addAction(tr("Reset"), this, SLOT(resetColor()));
-        colorMenu.addAction(tr("Pick random"), this, SLOT(randomizeColor()));
+        colorMenu.addAction(tr("Change"), this, &MixerChannelView::selectColor);
+        colorMenu.addAction(tr("Reset"), this, &MixerChannelView::resetColor);
+        colorMenu.addAction(tr("Pick random"), this, &MixerChannelView::randomizeColor);
         contextMenu->addMenu(&colorMenu);
 
-        contextMenu->exec( QCursor::pos() );
+        contextMenu->exec(QCursor::pos());
         delete contextMenu;
     }
 
@@ -189,8 +192,7 @@ namespace lmms::gui
         }
         else
         {
-            painter.fillRect(rect(), 
-                isActive ? backgroundActive().color() : painter.background().color());
+            painter.fillRect(rect(), isActive ? backgroundActive().color() : painter.background().color());
         }
         
         // inner border
@@ -211,11 +213,11 @@ namespace lmms::gui
         m_sendArrow->setVisible(sendToThis);
         m_receiveArrow->setVisible(receiveFromThis);
 
-        if (sendReceiveStateNone) 
+        if (sendReceiveStateNone)
         {
             setSendReceiveState(SendReceiveState::None);
         }
-        else 
+        else
         {
             setSendReceiveState(sendToThis ? SendReceiveState::SendToThis : SendReceiveState::ReceiveFromThis);
         }
