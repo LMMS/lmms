@@ -329,7 +329,7 @@ void MixerView::deleteChannel(int index)
 
 	chLayout->removeWidget(m_mixerChannelViews[index]);
 	m_racksLayout->removeWidget( m_mixerChannelViews[index]);
-	// delete mixerLine later to prevent a crash when deleting from context menu
+	// delete MixerChannelView later to prevent a crash when deleting from context menu
 	m_mixerChannelViews[index]->hide();
 	m_mixerChannelViews[index]->deleteLater();
 	m_channelAreaWidget->adjustSize();

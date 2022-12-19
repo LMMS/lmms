@@ -27,7 +27,7 @@ SendButtonIndicator:: SendButtonIndicator(QWidget * _parent, MixerChannelView * 
 		s_qpmOn = new QPixmap( embed::getIconPixmap( "mixer_send_on", 29, 20 ) );
 	}
 	
-	// don't do any initializing yet, because the MixerView and MixerLine
+	// don't do any initializing yet, because the MixerView and MixerChannelView
 	// that were passed to this constructor are not done with their constructors
 	// yet.
 	setPixmap( *s_qpmOff );

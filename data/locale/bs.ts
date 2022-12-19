@@ -2698,14 +2698,14 @@ Please make sure you have write-permission to the file and the directory contain
     </message>
 </context>
 <context>
-    <name>MixerLine</name>
+    <name>MixerChannelView</name>
     <message>
-        <location filename="src/gui/MixerLine.cpp" line="71"/>
+        <location filename="src/gui/MixerChannelView.cpp" line="71"/>
         <source>Channel send amount</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/MixerLine.cpp" line="85"/>
+        <location filename="src/gui/MixerChannelView.cpp" line="85"/>
         <source>The Mixer channel receives input from one or more instrument tracks.
  It in turn can be routed to multiple other mixer channels. LMMS automatically takes care of preventing infinite loops for you and doesn't allow making a connection that would result in an infinite loop.
 
@@ -2716,27 +2716,27 @@ You can remove and move mixer channels in the context menu, which is accessed by
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/MixerLine.cpp" line="213"/>
+        <location filename="src/gui/MixerChannelView.cpp" line="213"/>
         <source>Move &amp;left</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/MixerLine.cpp" line="214"/>
+        <location filename="src/gui/MixerChannelView.cpp" line="214"/>
         <source>Move &amp;right</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/MixerLine.cpp" line="216"/>
+        <location filename="src/gui/MixerChannelView.cpp" line="216"/>
         <source>Rename &amp;channel</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/MixerLine.cpp" line="221"/>
+        <location filename="src/gui/MixerChannelView.cpp" line="221"/>
         <source>R&amp;emove channel</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/MixerLine.cpp" line="226"/>
+        <location filename="src/gui/MixerChannelView.cpp" line="226"/>
         <source>Remove &amp;unused channels</source>
         <translation type="unfinished"/>
     </message>
@@ -2789,12 +2789,12 @@ You can remove and move mixer channels in the context menu, which is accessed by
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/MixerLine.cpp" line="241"/>
+        <location filename="src/gui/MixerChannelView.cpp" line="241"/>
         <source>Rename mixer channel</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/MixerLine.cpp" line="242"/>
+        <location filename="src/gui/MixerChannelView.cpp" line="242"/>
         <source>Enter the new name for this mixer channel</source>
         <translation type="unfinished"/>
     </message>
@@ -9752,7 +9752,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>MixerLineLcdSpinBox</name>
+    <name>MixerChannelLcdSpinBox</name>
     <message>
         <location filename="src/tracks/InstrumentTrack.cpp" line="1246"/>
         <source>Assign to:</source>

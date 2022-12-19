@@ -35,7 +35,7 @@ class FloatModel;
 namespace gui
 {
 
-class MixerLine;
+class MixerChannelView;
 class MixerView;
 class MixerChannelView;
 
