@@ -199,20 +199,32 @@ namespace lmms::gui
         painter.setPen(isActive ? strokeOuterActive() : strokeOuterInactive());
         painter.drawRect(0, 0, width - MIXER_CHANNEL_OUTER_BORDER_SIZE, height - MIXER_CHANNEL_OUTER_BORDER_SIZE);
 
-        m_sendArrow->setVisible(m_sendReceiveState == SendReceiveState::SendToThis);
-        m_receiveArrow->setVisible(m_sendReceiveState == SendReceiveState::ReceiveFromThis);
+        const auto sendToThis = Engine::mixer()->channelSendModel(m_mixerView->currentMixerChannel()->m_channelIndex, m_channelIndex) != nullptr;
+	    const auto receiveFromThis = Engine::mixer()->channelSendModel(m_channelIndex, m_mixerView->currentMixerChannel()->m_channelIndex) != nullptr;
+        const auto sendReceiveStateNone = !sendToThis && !receiveFromThis;
+
+        // Only one or none of them can be on
+        assert(sendToThis ^ receiveFromThis || sendReceiveStateNone);
+
+        m_sendArrow->setVisible(sendToThis);
+        m_receiveArrow->setVisible(receiveFromThis);
+
+        if (sendReceiveStateNone) 
+        {
+            setSendReceiveState(SendReceiveState::None);
+        }
+        else 
+        {
+            setSendReceiveState(sendToThis ? SendReceiveState::SendToThis : SendReceiveState::ReceiveFromThis);
+        }
 
         QWidget::paintEvent(event);
     }
 
     void MixerChannelView::mousePressEvent(QMouseEvent*) 
     {
-        if (m_mixerView->currentMixerChannel() != this) 
+        if (m_mixerView->currentMixerChannel() != this)
         {
-            auto pal = QPalette{};
-            pal.setColor(QPalette::Window, m_strokeInnerActive);
-            pal.setColor(QPalette::WindowText, m_strokeInnerActive);
-            setPalette(pal);
             m_mixerView->setCurrentMixerChannel(this);
         }
 
@@ -371,7 +383,7 @@ namespace lmms::gui
 
     QString MixerChannelView::elideName(const QString& name) 
     {
-        const auto maxTextHeight = 60;
+        constexpr auto maxTextHeight = 60;
         const auto metrics = QFontMetrics{m_renameLineEdit->font()};
         const auto elidedName = metrics.elidedText(name, Qt::ElideRight, maxTextHeight);
         return elidedName;
