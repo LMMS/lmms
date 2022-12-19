@@ -23,6 +23,7 @@
  */
 
 #include "CaptionMenu.h"
+#include "ColorChooser.h"
 #include "Mixer.h"
 #include "MixerChannelView.h"
 #include "MixerView.h"
@@ -376,17 +377,29 @@ namespace lmms::gui
 
     void MixerChannelView::resetColor() 
     {
-
+        Engine::mixer()->mixerChannel(m_channelIndex)->m_hasColor = false;
+        Engine::getSong()->setModified();
+        update();
     }
 
     void MixerChannelView::selectColor() 
     {
-
+        auto channel = Engine::mixer()->mixerChannel(m_channelIndex);
+        auto new_color = ColorChooser(this).withPalette(ColorChooser::Palette::Mixer)->getColor(channel->m_color);
+        
+        if (!new_color.isValid()) { return; }
+        channel->setColor(new_color);
+        
+        Engine::getSong()->setModified();
+        update();
     }
 
     void MixerChannelView::randomizeColor() 
     {
-
+        auto channel = Engine::mixer()->mixerChannel(m_channelIndex);
+        channel->setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[rand() % 48]);
+        Engine::getSong()->setModified();
+        update();
     }
 
     void MixerChannelView::removeChannel() 
