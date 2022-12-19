@@ -34,6 +34,7 @@
 #include <QGraphicsView>
 #include <QMenu>
 #include <QPainter>
+#include <QFont>
 
 namespace lmms::gui
 {
@@ -42,7 +43,7 @@ namespace lmms::gui
         m_mixerView(mixerView),
         m_channelIndex(channelIndex)
     {
-        setAttribute(Qt::WA_StyledBackground);
+        setAutoFillBackground(true);
         setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
         setFixedWidth(MIXER_CHANNEL_WIDTH);
         setMinimumHeight(MIXER_CHANNEL_HEIGHT);
@@ -86,12 +87,12 @@ namespace lmms::gui
         m_sendArrow = new QLabel{};
         m_sendArrow->setPixmap(embed::getIconPixmap("send_bg_arrow"));
         retainSizeWhenHidden(m_sendArrow);
-        m_sendArrow->setVisible(m_sendReceiveState == SendReceiveState::Send);
+        m_sendArrow->setVisible(m_sendReceiveState == SendReceiveState::SendToThis);
 
         m_receiveArrow = new QLabel{};
         m_receiveArrow->setPixmap(embed::getIconPixmap("receive_bg_arrow"));
         retainSizeWhenHidden(m_receiveArrow);
-        m_receiveArrow->setVisible(m_sendReceiveState == SendReceiveState::Receive);
+        m_receiveArrow->setVisible(m_sendReceiveState == SendReceiveState::ReceiveFromThis);
 
         m_muteButton = new PixmapButton(this, tr("Mute"));
         m_muteButton->setModel(&mixerChannel->m_muteModel);
@@ -163,9 +164,58 @@ namespace lmms::gui
         delete contextMenu;
     }
 
+    void MixerChannelView::paintEvent(QPaintEvent* event) 
+    {
+        const auto channel = Engine::mixer()->mixerChannel(m_channelIndex);
+        const bool muted = channel->m_muteModel.value();
+        const auto name = channel->m_name;
+        const auto elidedName = elideName(name);
+        const auto isActive = m_mixerView->currentMixerChannel() == this;
+
+        if (!m_inRename && m_renameLineEdit->text() != elidedName)
+        {
+            m_renameLineEdit->setText(elidedName);
+        }
+
+        const auto width = rect().width();
+        const auto height = rect().height();
+        auto painter = QPainter{this};
+        
+        if (channel->m_hasColor && !muted)
+        {
+            painter.fillRect(rect(), channel->m_color.darker(isActive ? 120 : 150));
+        }
+        else
+        {
+            painter.fillRect(rect(), 
+                isActive ? backgroundActive().color() : painter.background().color());
+        }
+        
+        // inner border
+        painter.setPen(isActive ? strokeInnerActive() : strokeInnerInactive());
+        painter.drawRect(1, 1, width - MIXER_CHANNEL_INNER_BORDER_SIZE, height - MIXER_CHANNEL_INNER_BORDER_SIZE);
+        
+        // outer border
+        painter.setPen(isActive ? strokeOuterActive() : strokeOuterInactive());
+        painter.drawRect(0, 0, width - MIXER_CHANNEL_OUTER_BORDER_SIZE, height - MIXER_CHANNEL_OUTER_BORDER_SIZE);
+
+        m_sendArrow->setVisible(m_sendReceiveState == SendReceiveState::SendToThis);
+        m_receiveArrow->setVisible(m_sendReceiveState == SendReceiveState::ReceiveFromThis);
+
+        QWidget::paintEvent(event);
+    }
+
     void MixerChannelView::mousePressEvent(QMouseEvent*) 
     {
-        m_mixerView->setCurrentMixerChannel(this);
+        if (m_mixerView->currentMixerChannel() != this) 
+        {
+            auto pal = QPalette{};
+            pal.setColor(QPalette::Window, m_strokeInnerActive);
+            pal.setColor(QPalette::WindowText, m_strokeInnerActive);
+            setPalette(pal);
+            m_mixerView->setCurrentMixerChannel(this);
+        }
+
     }
     
     void MixerChannelView::mouseDoubleClickEvent(QMouseEvent*) 
@@ -214,14 +264,9 @@ namespace lmms::gui
 
     void MixerChannelView::setSendReceiveState(const SendReceiveState& state) 
     {
-        m_sendReceiveState = state;        
-        switch (state) 
-        {
-            case SendReceiveState::Send:
-                break;
-            case SendReceiveState::Receive:
-                break;
-        }
+        m_sendReceiveState = state;
+        m_sendArrow->setVisible(state == SendReceiveState::SendToThis);        
+        m_receiveArrow->setVisible(state == SendReceiveState::ReceiveFromThis);
     }
     
     QSize MixerChannelView::sizeHint() const
@@ -322,6 +367,14 @@ namespace lmms::gui
     void MixerChannelView::moveChannelRight() 
     {
 
+    }
+
+    QString MixerChannelView::elideName(const QString& name) 
+    {
+        const auto maxTextHeight = 60;
+        const auto metrics = QFontMetrics{m_renameLineEdit->font()};
+        const auto elidedName = metrics.elidedText(name, Qt::ElideRight, maxTextHeight);
+        return elidedName;
     }
     
 } // namespace lmms::gui

@@ -55,10 +55,11 @@ namespace lmms::gui
     public:
         enum class SendReceiveState 
         {
-            None, Send, Receive
+            None, SendToThis, ReceiveFromThis
         };
 
         MixerChannelView(int channelIndex, MixerView* mixerView, QWidget* parent = nullptr);
+        void paintEvent(QPaintEvent* event) override;
         void contextMenuEvent(QContextMenuEvent*) override;
         void mousePressEvent(QMouseEvent*) override;
 	    void mouseDoubleClickEvent(QMouseEvent*) override;
@@ -86,8 +87,6 @@ namespace lmms::gui
         QColor strokeInnerInactive() const;
         void setStrokeInnerInactive(const QColor& c);
 
-        
-    
     public slots:
         void renameChannel();
         void resetColor();
