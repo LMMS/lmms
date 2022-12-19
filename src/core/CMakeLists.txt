@@ -106,6 +106,8 @@ set(LMMS_SRCS
 	core/audio/AudioSampleRecorder.cpp
 	core/audio/AudioSdl.cpp
 
+	core/clap/ClapManager.cpp
+
 	core/lv2/Lv2Basics.cpp
 	core/lv2/Lv2ControlBase.cpp
 	core/lv2/Lv2Evbuf.cpp
