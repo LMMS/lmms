@@ -116,7 +116,7 @@ Song::Song() :
 /*	connect( &m_masterPitchModel, SIGNAL(dataChanged()),
 			this, SLOT(masterPitchChanged()));*/
 
-	qRegisterMetaType<Note>( "Note" );
+	qRegisterMetaType<lmms::Note>( "lmms::Note" );
 	setType( SongContainer );
 
 	for (auto& scale : m_scales) {scale = std::make_shared<Scale>();}
