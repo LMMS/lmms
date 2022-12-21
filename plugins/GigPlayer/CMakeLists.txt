@@ -3,14 +3,16 @@ if(LMMS_HAVE_GIG)
 	INCLUDE_DIRECTORIES(${GIG_INCLUDE_DIRS})
 
 	# Required for not crashing loading files with libgig
-	SET(GCC_COVERAGE_COMPILE_FLAGS "-fexceptions")
-	add_definitions(${GCC_COVERAGE_COMPILE_FLAGS})
+	if(NOT MSVC)
+		SET(GCC_COVERAGE_COMPILE_FLAGS "-fexceptions")
+		add_definitions(${GCC_COVERAGE_COMPILE_FLAGS})
+	endif(NOT MSVC)
 
 	# disable deprecated check for mingw-x-libgig
-	if(LMMS_BUILD_WIN32)
+	if(LMMS_BUILD_WIN32 AND MINGW)
 		SET(GCC_GIG_COMPILE_FLAGS "-Wno-deprecated")
 		add_definitions(${GCC_GIG_COMPILE_FLAGS})
-	endif(LMMS_BUILD_WIN32)
+	endif(LMMS_BUILD_WIN32 AND MINGW)
 
 	LINK_DIRECTORIES(${GIG_LIBRARY_DIRS} ${SAMPLERATE_LIBRARY_DIRS})
 	LINK_LIBRARIES(${GIG_LIBRARIES} ${SAMPLERATE_LIBRARIES})

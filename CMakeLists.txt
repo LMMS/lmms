@@ -507,13 +507,13 @@ ENDIF(WANT_SF2)
 
 # check for libgig
 If(WANT_GIG)
-	PKG_CHECK_MODULES(GIG gig)
-	IF(GIG_FOUND)
+	find_package(Gig)
+	IF(Gig_FOUND)
 		SET(LMMS_HAVE_GIG TRUE)
 		SET(STATUS_GIG "OK")
-	ELSE(GIG_FOUND)
+	ELSE(Gig_FOUND)
 		SET(STATUS_GIG "not found, libgig needed for decoding .gig files")
-	ENDIF(GIG_FOUND)
+	ENDIF(Gig_FOUND)
 ENDIF(WANT_GIG)
 
 # check for pthreads

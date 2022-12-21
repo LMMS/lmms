@@ -443,7 +443,11 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			}
 
 			// Load this note's data
+#ifndef _MSC_VER
 			sampleFrame sampleData[samples];
+#else
+			const auto sampleData = static_cast<sampleFrame*>(_alloca(samples * sizeof(sampleFrame)));
+#endif
 			loadSample(sample, sampleData, samples);
 
 			// Apply ADSR using a copy so if we don't use these samples when
@@ -460,7 +464,11 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			// Output the data resampling if needed
 			if( resample == true )
 			{
+#ifndef _MSC_VER
 				sampleFrame convertBuf[frames];
+#else
+				const auto convertBuf = static_cast<sampleFrame*>(_alloca(frames * sizeof(sampleFrame)));
+#endif
 
 				// Only output if resampling is successful (note that "used" is output)
 				if (sample.convertSampleRate(*sampleData, *convertBuf, samples, frames, freq_factor, used))
@@ -531,7 +539,11 @@ void GigInstrument::loadSample( GigSample& sample, sampleFrame* sampleData, f_cn
 	}
 
 	unsigned long allocationsize = samples * sample.sample->FrameSize;
+#ifndef _MSC_VER
 	int8_t buffer[allocationsize];
+#else
+	auto buffer = static_cast<int8_t*>(_alloca(allocationsize * sizeof(int8_t)));
+#endif
 
 	// Load the sample in different ways depending on if we're looping or not
 	if( loop == true && ( sample.pos >= loopStart || sample.pos + samples > loopStart ) )
@@ -576,14 +588,14 @@ void GigInstrument::loadSample( GigSample& sample, sampleFrame* sampleData, f_cn
 	{
 		sample.sample->SetPos( sample.pos );
 
-		unsigned long size = sample.sample->Read( &buffer, samples ) * sample.sample->FrameSize;
-		std::memset( (int8_t*) &buffer + size, 0, allocationsize - size );
+		unsigned long size = sample.sample->Read( buffer, samples ) * sample.sample->FrameSize;
+		std::memset( (int8_t*) buffer + size, 0, allocationsize - size );
 	}
 
 	// Convert from 16 or 24 bit into 32-bit float
 	if( sample.sample->BitDepth == 24 ) // 24 bit
 	{
-		auto pInt = reinterpret_cast<uint8_t*>(&buffer);
+		auto pInt = reinterpret_cast<uint8_t*>(buffer);
 
 		for( f_cnt_t i = 0; i < samples; ++i )
 		{
@@ -615,7 +627,7 @@ void GigInstrument::loadSample( GigSample& sample, sampleFrame* sampleData, f_cn
 	}
 	else // 16 bit
 	{
-		auto pInt = reinterpret_cast<int16_t*>(&buffer);
+		auto pInt = reinterpret_cast<int16_t*>(buffer);
 
 		for( f_cnt_t i = 0; i < samples; ++i )
 		{
