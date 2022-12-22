@@ -244,7 +244,6 @@ void VectorGraph::mousePressEvent(QMouseEvent *event)
 		}
 		else if (tensionHandleIndex > -1)
 		{
-			setCursor(Qt::BlankCursor);
 			model()->setStoredCursorPos(cursor().pos());
 			model()->setCurrentDraggedTensionHandle(tensionHandleIndex);
 		}
@@ -266,10 +265,8 @@ void VectorGraph::mouseMoveEvent(QMouseEvent *event)
 
 	if (model()->getCurrentDraggedTensionHandle() != -1)
 	{
-		QCursor c = cursor();
-		float delta = c.pos().y() - model()->getStoredCursorPos().y();
-		c.setPos(model()->getStoredCursorPos());
-		setCursor(c);
+		float delta = cursor().pos().y() - model()->getStoredCursorPos().y();
+		model()->setStoredCursorPos(cursor().pos());
 
 		int index = model()->getCurrentDraggedTensionHandle();
 		VectorGraphPoint * previousPoint = model()->getPoint(index - 1);
@@ -304,7 +301,6 @@ void VectorGraph::mouseReleaseEvent(QMouseEvent * event)
 		QPoint newCursorPoint(
 					rawToCoordX(getTensionHandleXVal(model()->getCurrentDraggedTensionHandle())),
 					rawToCoordY(getTensionHandleYVal(model()->getCurrentDraggedTensionHandle())));
-		c.setPos(mapToGlobal(newCursorPoint));
 		c.setShape(Qt::ArrowCursor);
 		setCursor(c);
 		model()->resetCurrentDraggedTensionHandle();
