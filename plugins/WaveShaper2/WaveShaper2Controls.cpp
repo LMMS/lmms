@@ -44,7 +44,7 @@ WaveShaper2Controls::WaveShaper2Controls( WaveShaper2Effect * _eff ) :
 	m_effect( _eff ),
 	m_inputModel( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Input gain" ) ),
 	m_outputModel( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Output gain" ) ),
-	m_vectorGraphModel( this, true ),
+	m_vectorGraphModel( this, false ),
 	m_clipModel( false, this )
 {
 }
