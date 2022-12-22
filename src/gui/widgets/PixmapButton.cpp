@@ -28,9 +28,10 @@
 #include <QPainter>
 
 #include "PixmapButton.h"
-#include "MainWindow.h"
 #include "embed.h"
 
+namespace lmms::gui
+{
 
 
 PixmapButton::PixmapButton( QWidget * _parent, const QString & _name ) :
@@ -46,10 +47,6 @@ PixmapButton::PixmapButton( QWidget * _parent, const QString & _name ) :
 
 
 
-PixmapButton::~PixmapButton()
-{
-}
-
 
 
 
@@ -57,7 +54,7 @@ void PixmapButton::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
-	if( ( model() != NULL && model()->value() ) || m_pressed )
+	if( ( model() != nullptr && model()->value() ) || m_pressed )
 	{
 		if( !m_activePixmap.isNull() )
 		{
@@ -132,17 +129,15 @@ void PixmapButton::setInactiveGraphic( const QPixmap & _pm, bool _update )
 
 QSize PixmapButton::sizeHint() const
 {
-	if( ( model() != NULL && model()->value() ) || m_pressed )
+	if( ( model() != nullptr && model()->value() ) || m_pressed )
 	{
-		return m_activePixmap.size();
+		return m_activePixmap.size() / devicePixelRatio();
 	}
 	else 
 	{
-		return m_inactivePixmap.size();
+		return m_inactivePixmap.size() / devicePixelRatio();
 	}
 }
 
 
-
-
-
+} // namespace lmms::gui

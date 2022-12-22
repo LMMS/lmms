@@ -36,6 +36,11 @@
 
 #include <CoreMIDI/CoreMIDI.h>
 
+
+namespace lmms
+{
+
+
 const unsigned int SYSEX_LENGTH=1024;
 
 MidiApple::MidiApple() :
@@ -57,7 +62,7 @@ MidiApple::~MidiApple()
 
 
 
-void MidiApple::processOutEvent( const MidiEvent& event, const MidiTime& time, const MidiPort* port )
+void MidiApple::processOutEvent( const MidiEvent& event, const TimePos& time, const MidiPort* port )
 {
 	qDebug("MidiApple:processOutEvent displayName:'%s'",port->displayName().toLatin1().constData());
 	
@@ -318,28 +323,28 @@ void MidiApple::HandleReadCallback( const MIDIPacketList *pktlist, void *srcConn
 				}
 				
 				unsigned char messageChannel = status & 0xF;
-				const MidiEventTypes cmdtype = static_cast<MidiEventTypes>( status & 0xF0 );
+				const MidiEventTypes cmdtype = static_cast<MidiEventTypes>(status & 0xF0);
 				const int par1 = packet->data[iByte + 1];
 				const int par2 = packet->data[iByte + 2];
 
 				switch (cmdtype)
 				{
-					case MidiNoteOff: //0x80:
-					case MidiNoteOn: //0x90:
-					case MidiKeyPressure: //0xA0:
-						notifyMidiPortList(m_inputSubs[refName],MidiEvent( cmdtype, messageChannel, par1 - KeysPerOctave, par2 & 0xff, &endPointRef ));
+					case MidiNoteOff:			//0x80:
+					case MidiNoteOn:			//0x90:
+					case MidiKeyPressure:		//0xA0:
+					case MidiControlChange:		//0xB0:
+					case MidiProgramChange:		//0xC0:
+					case MidiChannelPressure:	//0xD0:
+						notifyMidiPortList(
+							m_inputSubs[refName],
+							MidiEvent(cmdtype, messageChannel, par1, par2 & 0xff, &endPointRef));
 						break;
-						
-					case MidiControlChange: //0xB0:
-					case MidiProgramChange: //0xC0:
-					case MidiChannelPressure: //0xD0:
-						notifyMidiPortList(m_inputSubs[refName],MidiEvent( cmdtype, messageChannel, par1, par2 & 0xff, &endPointRef ));
+					case MidiPitchBend:			//0xE0:
+						notifyMidiPortList(
+							m_inputSubs[refName],
+							MidiEvent(cmdtype, messageChannel, par1 + par2 * 128, 0, &endPointRef));
 						break;
-						
-					case MidiPitchBend: //0xE0:
-						notifyMidiPortList(m_inputSubs[refName],MidiEvent( cmdtype, messageChannel, par1 + par2 * 128, 0, &endPointRef ));
-						break;
-					case MidiActiveSensing: //0xF0
+					case MidiActiveSensing:		//0xF0
 					case 0xF0:
 						break;
 					default:
@@ -401,9 +406,9 @@ void MidiApple::midiInClose( MIDIEndpointRef reference )
 char *getName( MIDIObjectRef &object )
 {
 	// Returns the name of a given MIDIObjectRef as char *
-	CFStringRef name = nil;
+	CFStringRef name = nullptr;
 	if (noErr != MIDIObjectGetStringProperty(object, kMIDIPropertyName, &name))
-		return nil;
+		return nullptr;
 	int len = CFStringGetLength(name)+1;
 	char *value = (char *) malloc(len);
 	
@@ -615,12 +620,16 @@ char * MidiApple::getFullName(MIDIEndpointRef &endpoint_ref)
 	char * deviceName = getName(device);
 	char * endPointName = getName(endpoint_ref);
 	qDebug("device name='%s' endpoint name='%s'",deviceName,endPointName);
-	char * fullName = (char *)malloc(strlen(deviceName) + strlen(":") + strlen(endPointName)+1);
+	size_t deviceNameLen = deviceName == nullptr ? 0 : strlen(deviceName);
+	size_t endPointNameLen = endPointName == nullptr ? 0 : strlen(endPointName);
+	char * fullName = (char *)malloc(deviceNameLen + endPointNameLen + 2);
 	sprintf(fullName, "%s:%s", deviceName,endPointName);
+	if (deviceName != nullptr) { free(deviceName); }
+	if (endPointName != nullptr) { free(endPointName); }
 	return fullName;
 }
 
 
-#endif
+} // namespace lmms
 
-
+#endif // LMMS_BUILD_APPLE

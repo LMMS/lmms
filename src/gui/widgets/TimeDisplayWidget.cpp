@@ -28,10 +28,11 @@
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "Engine.h"
-#include "ToolTip.h"
 #include "Song.h"
 
 
+namespace lmms::gui
+{
 
 TimeDisplayWidget::TimeDisplayWidget() :
 	QWidget(),
@@ -49,13 +50,13 @@ TimeDisplayWidget::TimeDisplayWidget() :
 
 	setMaximumHeight( 32 );
 
-	ToolTip::add( this, tr( "click to change time units" ) );
+	setToolTip(tr("Time units"));
 
 	// update labels of LCD spinboxes
 	setDisplayMode( m_displayMode );
 
-	connect( gui->mainWindow(), SIGNAL( periodicUpdate() ),
-					this, SLOT( updateTime() ) );
+	connect( getGUI()->mainWindow(), SIGNAL(periodicUpdate()),
+					this, SLOT(updateTime()));
 }
 
 void TimeDisplayWidget::setDisplayMode( DisplayMode displayMode )
@@ -100,11 +101,11 @@ void TimeDisplayWidget::updateTime()
 		case BarsTicks:
 			int tick;
 			tick = s->getPlayPos().getTicks();
-			m_majorLCD.setValue((int)(tick / s->ticksPerTact()) + 1);
-			m_minorLCD.setValue((tick % s->ticksPerTact()) /
-						 (s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) +1);
-			m_milliSecondsLCD.setValue((tick % s->ticksPerTact()) %
-							(s->ticksPerTact() / s->getTimeSigModel().getNumerator()));
+			m_majorLCD.setValue((int)(tick / s->ticksPerBar()) + 1);
+			m_minorLCD.setValue((tick % s->ticksPerBar()) /
+						 (s->ticksPerBar() / s->getTimeSigModel().getNumerator() ) +1);
+			m_milliSecondsLCD.setValue((tick % s->ticksPerBar()) %
+							(s->ticksPerBar() / s->getTimeSigModel().getNumerator()));
 			break;
 
 		default: break;
@@ -128,3 +129,5 @@ void TimeDisplayWidget::mousePressEvent( QMouseEvent* mouseEvent )
 		}
 	}
 }
+
+} // namespace lmms::gui

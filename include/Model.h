@@ -25,17 +25,19 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include <QtCore/QString>
-#include <QtCore/QObject>
+#include <QString>
+#include <QObject>
 
-#include "export.h"
+#include "lmms_export.h"
 
+namespace lmms
+{
 
-class EXPORT Model : public QObject
+class LMMS_EXPORT Model : public QObject
 {
 	Q_OBJECT
 public:
-	Model( Model * _parent, QString _display_name = QString::null,
+	Model( Model * _parent, QString _display_name = QString(),
 					bool _default_constructed = false ) :
 		QObject( _parent ),
 		m_displayName( _display_name ),
@@ -43,9 +45,7 @@ public:
 	{
 	}
 
-	virtual ~Model()
-	{
-	}
+	~Model() override = default;
 
 	bool isDefaultConstructed()
 	{
@@ -87,6 +87,8 @@ signals:
 
 } ;
 
+
+} // namespace lmms
 
 #endif
 

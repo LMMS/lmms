@@ -22,11 +22,20 @@
 
 #include "EqSpectrumView.h"
 
+#include <cmath>
+#include <QPainter>
+#include <QPen>
+
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "EqCurve.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
-#include "Mixer.h"
+#include "lmms_constants.h"
+
+namespace lmms
+{
+
 
 EqAnalyser::EqAnalyser() :
 	m_framesFilledUp ( 0 ),
@@ -45,11 +54,11 @@ EqAnalyser::EqAnalyser() :
 	const float a2 = 0.14128;
 	const float a3 = 0.01168;
 
-	for(int i = 0; i < FFT_BUFFER_SIZE; i++)
+	for (int i = 0; i < FFT_BUFFER_SIZE; i++)
 	{
-		m_fftWindow[i] = ( a0 - a1 * cosf( 2 * F_PI * i / (float)FFT_BUFFER_SIZE - 1 )
-									  + a2 * cosf( 4 * F_PI * i / (float)FFT_BUFFER_SIZE-1)
-									  - a3 * cos( 6 * F_PI * i / (float)FFT_BUFFER_SIZE - 1.0 ));
+		m_fftWindow[i] = (a0 - a1 * cos(2 * F_PI * i / ((float)FFT_BUFFER_SIZE - 1.0))
+								+ a2 * cos(4 * F_PI * i / ((float)FFT_BUFFER_SIZE - 1.0))
+								- a3 * cos(6 * F_PI * i / ((float)FFT_BUFFER_SIZE - 1.0)));
 	}
 	clear();
 }
@@ -93,7 +102,7 @@ void EqAnalyser::analyze( sampleFrame *buf, const fpp_t frames )
 			return;
 		}
 
-		m_sampleRate = Engine::mixer()->processingSampleRate();
+		m_sampleRate = Engine::audioEngine()->processingSampleRate();
 		const int LOWEST_FREQ = 0;
 		const int HIGHEST_FREQ = m_sampleRate / 2;
 
@@ -171,6 +180,8 @@ void EqAnalyser::clear()
 
 
 
+namespace gui
+{
 
 EqSpectrumView::EqSpectrumView(EqAnalyser *b, QWidget *_parent) :
 	QWidget( _parent ),
@@ -178,11 +189,11 @@ EqSpectrumView::EqSpectrumView(EqAnalyser *b, QWidget *_parent) :
 	m_periodicalUpdate( false )
 {
 	setFixedSize( 450, 200 );
-	connect( gui->mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( periodicalUpdate() ) );
+	connect( getGUI()->mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( periodicalUpdate() ) );
 	setAttribute( Qt::WA_TranslucentBackground, true );
 	m_skipBands = MAX_BANDS * 0.5;
 	float totalLength = log10( 20000 );
-	m_pixelsPerUnitWidth = width( ) / totalLength ;
+	m_pixelsPerUnitWidth = width() / totalLength ;
 	m_scale = 1.5;
 	m_color = QColor( 255, 255, 255, 255 );
 	for ( int i = 0 ; i < MAX_BANDS ; i++ )
@@ -196,8 +207,6 @@ EqSpectrumView::EqSpectrumView(EqAnalyser *b, QWidget *_parent) :
 
 void EqSpectrumView::paintEvent(QPaintEvent *event)
 {
-	//only analyse if the view is visible
-	m_analyser->setActive( isVisible() );
 	const float energy =  m_analyser->getEnergy();
 	if( energy <= 0 && m_peakSum <= 0 )
 	{		
@@ -209,6 +218,7 @@ void EqSpectrumView::paintEvent(QPaintEvent *event)
 	const int LOWER_Y = -36;	// dB
 	QPainter painter( this );
 	painter.setPen( QPen( m_color, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin ) );
+	painter.setRenderHint(QPainter::Antialiasing, true);
 
 	if( m_analyser->getInProgress() || m_periodicalUpdate == false )
 	{
@@ -224,7 +234,7 @@ void EqSpectrumView::paintEvent(QPaintEvent *event)
 	float peak;
 	m_path.moveTo( 0, height() );
 	m_peakSum = 0;
-	float fallOff = 1.2;
+	const float fallOff = 1.07;
 	for( int x = 0; x < MAX_BANDS; ++x, ++bands )
 	{
 		peak = ( fh * 2.0 / 3.0 * ( 20 * ( log10( *bands / energy ) ) - LOWER_Y ) / ( - LOWER_Y ) );
@@ -291,5 +301,11 @@ float EqSpectrumView::bandToFreq( int index )
 void EqSpectrumView::periodicalUpdate()
 {
 	m_periodicalUpdate = true;
+	m_analyser->setActive( isVisible() );
 	update();
 }
+
+
+} // namespace gui
+
+} // namespace lmms

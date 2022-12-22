@@ -23,14 +23,18 @@
  *
  */
 
-#include <QWidget>
-#include "export.h"
-
 #ifndef LMMSPALETTE_H
 #define LMMSPALETTE_H
 
+#include <QWidget>
+#include "lmms_export.h"
 
-class EXPORT LmmsPalette : public QWidget
+
+namespace lmms::gui
+{
+
+
+class LMMS_EXPORT LmmsPalette : public QWidget
 {
 	Q_OBJECT
 	Q_PROPERTY( QColor background READ background WRITE setBackground )
@@ -43,12 +47,10 @@ class EXPORT LmmsPalette : public QWidget
 	Q_PROPERTY( QColor brightText READ brightText WRITE setBrightText )
 	Q_PROPERTY( QColor highlight READ highlight WRITE setHighlight )
 	Q_PROPERTY( QColor highlightedText READ highlightedText WRITE setHighlightedText )
-	Q_PROPERTY( QColor toolTipText READ toolTipText WRITE setToolTipText )
-	Q_PROPERTY( QColor toolTipBase READ toolTipBase WRITE setToolTipBase )
 
 public:
 	LmmsPalette( QWidget * parent, QStyle * stylearg  ); 
-	virtual ~LmmsPalette();
+	~LmmsPalette() override = default;
 
 #define ACCESSMET( read, write ) \
 	QColor read () const; \
@@ -65,8 +67,6 @@ public:
 	ACCESSMET( brightText, setBrightText )
 	ACCESSMET( highlight, setHighlight )
 	ACCESSMET( highlightedText, setHighlightedText )
-	ACCESSMET( toolTipText, setToolTipText )
-	ACCESSMET( toolTipBase, setToolTipBase )
 
 #undef ACCESSMET
 
@@ -83,11 +83,10 @@ private:
 	QColor m_brightText;
 	QColor m_highlight;
 	QColor m_highlightedText;
-	QColor m_toolTipText;
-	QColor m_toolTipBase;
 };
 
 
 
+} // namespace lmms::gui
 
 #endif

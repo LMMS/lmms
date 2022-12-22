@@ -1,4 +1,4 @@
-SET(MACOSX_BUNDLE_ICON_FILE             "lmms.icns")
+SET(MACOSX_BUNDLE_ICON_FILE             "icon.icns")
 SET(MACOSX_BUNDLE_GUI_IDENTIFIER        "${PROJECT_NAME_UCASE}")
 SET(MACOSX_BUNDLE_LONG_VERSION_STRING   "${VERSION}")
 SET(MACOSX_BUNDLE_BUNDLE_NAME           "${PROJECT_NAME_UCASE}")
@@ -9,6 +9,11 @@ SET(MACOSX_BUNDLE_MIMETYPE              "application/x-lmms-project")
 SET(MACOSX_BUNDLE_MIMETYPE_ICON         "project.icns")
 SET(MACOSX_BUNDLE_MIMETYPE_ID           "io.lmms")
 SET(MACOSX_BUNDLE_PROJECT_URL           "${PROJECT_URL}")
+SET(MACOSX_BUNDLE_DMG_TITLE             "${MACOSX_BUNDLE_BUNDLE_NAME} ${MACOSX_BUNDLE_LONG_VERSION_STRING}")
+
+# FIXME: appdmg won't allow volume names > 27 char
+# See also https://github.com/LinusU/node-appdmg/issues/48
+STRING(SUBSTRING "${MACOSX_BUNDLE_DMG_TITLE}" 0 27 MACOSX_BUNDLE_DMG_TITLE)
 
 CONFIGURE_FILE("lmms.plist.in"          "${CMAKE_BINARY_DIR}/Info.plist")
 CONFIGURE_FILE("install_apple.sh.in"    "${CMAKE_BINARY_DIR}/install_apple.sh" @ONLY)

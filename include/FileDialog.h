@@ -28,9 +28,13 @@
 
 #include <QFileDialog>
 
-#include "export.h"
+#include "lmms_export.h"
 
-class EXPORT FileDialog : public QFileDialog
+namespace lmms::gui
+{
+
+
+class LMMS_EXPORT FileDialog : public QFileDialog
 {
 	Q_OBJECT
 public:
@@ -46,9 +50,11 @@ public:
 									const QString &caption = QString(),
 									const QString &directory = QString(),
 									const QString &filter = QString(),
-									QString *selectedFilter = 0,
-									QFileDialog::Options options = 0);
+									QString *selectedFilter = 0);
 	void clearSelection();
 };
 
-#endif // FILEDIALOG_HPP
+
+} // namespace lmms::gui
+
+#endif // FILEDIALOG_H

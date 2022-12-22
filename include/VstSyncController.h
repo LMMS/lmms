@@ -26,10 +26,13 @@
 #ifndef VST_SYNC_CONTROLLER_H
 #define VST_SYNC_CONTROLLER_H
 
-#include <QtCore/QObject>
-#include <QtCore/QSharedMemory>
+#include <QObject>
 
+#include "SharedMemory.h"
 #include "VstSyncData.h"
+
+namespace lmms
+{
 
 
 class VstSyncController : public QObject
@@ -37,44 +40,26 @@ class VstSyncController : public QObject
 	Q_OBJECT
 public:
 	VstSyncController();
-	~VstSyncController();
 
-	void setAbsolutePosition( int ticks );
-
-	void setPlaybackState( bool enabled )
-	{
-		m_syncData->isPlaying = enabled;
-	}
-
-	void setTempo( int newTempo );
-
-	void setTimeSignature( int num, int denom )
-	{
-		m_syncData->timeSigNumer = num;
-		m_syncData->timeSigDenom = denom;
-	}
-
-	void startCycle( int startTick, int endTick );
-
-	void stopCycle()
-	{
-		m_syncData->isCycle = false;
-	}
-
+	void setAbsolutePosition(double ticks);
+	void setPlaybackState(bool enabled);
+	void setTempo(int newTempo);
+	void setTimeSignature(int num, int denom);
+	void startCycle(int startTick, int endTick);
+	void stopCycle();
+	void setPlaybackJumped(bool jumped);
 	void update();
 
+	const std::string& sharedMemoryKey() const noexcept { return m_syncData.key(); }
 
 private slots:
 	void updateSampleRate();
 
-
 private:
-	VstSyncData* m_syncData;
-
-	int m_shmID;
-
-	QSharedMemory m_shm;
-
+	SharedMemory<VstSyncData> m_syncData;
 };
+
+
+} // namespace lmms
 
 #endif

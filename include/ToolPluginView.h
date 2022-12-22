@@ -28,14 +28,25 @@
 
 #include "PluginView.h"
 
+namespace lmms
+{
+
 class ToolPlugin;
 
-class EXPORT ToolPluginView : public PluginView
+namespace gui
+{
+
+
+class LMMS_EXPORT ToolPluginView : public PluginView
 {
 public:
 	ToolPluginView( ToolPlugin * _toolPlugin );
 
 } ;
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

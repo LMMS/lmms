@@ -30,6 +30,8 @@
 
 #include "ui_about_dialog.h"
 
+namespace lmms::gui
+{
 
 class AboutDialog : public QDialog, public Ui::AboutDialog
 {
@@ -38,6 +40,7 @@ public:
 
 } ;
 
+} // namespace lmms::gui
 
 #endif
 

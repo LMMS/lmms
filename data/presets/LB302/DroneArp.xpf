@@ -3,7 +3,7 @@
 <lmms-project version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings muted="0" type="0" name="Drone Arp" solo="0">
-    <instrumenttrack pan="0" fxch="1" pitchrange="1" pitch="0" basenote="69" vol="100">
+    <instrumenttrack pan="0" mixch="1" pitchrange="1" pitch="0" basenote="69" vol="100">
       <instrument name="lb302">
         <lb302 db24="1" vcf_res="0.37" vcf_dec="0.11" dead="0" vcf_cut="0.585" vcf_mod="0.33" dist="0.24" slide_dec="0.6" slide="0" shape="11"/>
       </instrument>

@@ -37,10 +37,12 @@
 
 #include "AudioDevice.h"
 
-
-class AudioAlsa : public AudioDevice, public QThread
+namespace lmms
 {
-	// Public classes and enums
+
+class AudioAlsa : public QThread, public AudioDevice
+{
+	Q_OBJECT
 public:
 	/**
 	 * @brief Contains the relevant information about available ALSA devices
@@ -52,7 +54,7 @@ public:
 			m_deviceName(deviceName),
 			m_deviceDescription(deviceDescription)
 		{}
-		~DeviceInfo() {}
+		~DeviceInfo() = default;
 
 		QString const & getDeviceName() const { return m_deviceName; }
 		QString const & getDeviceDescription() const { return m_deviceDescription; }
@@ -63,15 +65,15 @@ public:
 
 	};
 
-	typedef std::vector<DeviceInfo> DeviceInfoCollection;
+	using DeviceInfoCollection = std::vector<DeviceInfo>;
 
 public:
-	AudioAlsa( bool & _success_ful, Mixer* mixer );
-	virtual ~AudioAlsa();
+	AudioAlsa( bool & _success_ful, AudioEngine* audioEngine );
+	~AudioAlsa() override;
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "setupWidget",
+		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget",
 			"ALSA (Advanced Linux Sound Architecture)" );
 	}
 
@@ -80,10 +82,10 @@ public:
 	static DeviceInfoCollection getAvailableDevices();
 
 private:
-	virtual void startProcessing();
-	virtual void stopProcessing();
-	virtual void applyQualitySettings();
-	virtual void run();
+	void startProcessing() override;
+	void stopProcessing() override;
+	void applyQualitySettings() override;
+	void run() override;
 
 	int setHWParams( const ch_cnt_t _channels, snd_pcm_access_t _access );
 	int setSWParams();
@@ -102,6 +104,8 @@ private:
 
 } ;
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_HAVE_ALSA
 
 #endif

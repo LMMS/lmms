@@ -32,11 +32,14 @@
 class QMenu;
 class QMouseEvent;
 
-class EXPORT AutomatableModelView : public ModelView
+namespace lmms::gui
+{
+
+class LMMS_EXPORT AutomatableModelView : public ModelView
 {
 public:
 	AutomatableModelView( Model* model, QWidget* _this );
-	virtual ~AutomatableModelView() = default;
+	~AutomatableModelView() override = default;
 
 	// some basic functions for convenience
 	AutomatableModel* modelUntyped()
@@ -49,7 +52,8 @@ public:
 		return castModel<AutomatableModel>();
 	}
 
-	virtual void setModel( Model* model, bool isOldModelValid = true );
+	void setModel( Model* model, bool isOldModelValid = true ) override;
+	void unsetModel() override;
 
 	template<typename T>
 	inline T value() const
@@ -69,12 +73,16 @@ public:
 
 	void addDefaultActions( QMenu* menu );
 
+	void setConversionFactor( float factor );
+	float getConversionFactor();
+
 
 protected:
 	virtual void mousePressEvent( QMouseEvent* event );
 
 	QString m_description;
 	QString m_unit;
+	float m_conversionFactor; // Factor to be applied when the m_model->value is displayed
 } ;
 
 
@@ -106,7 +114,7 @@ protected:
 
 
 
-template <typename ModelType> class EXPORT TypedModelView : public AutomatableModelView
+template <typename ModelType> class LMMS_EXPORT TypedModelView : public AutomatableModelView
 {
 public:
 	TypedModelView( Model* model, QWidget* _this) :
@@ -127,6 +135,7 @@ using FloatModelView = TypedModelView<FloatModel>;
 using IntModelView = TypedModelView<IntModel>;
 using BoolModelView = TypedModelView<BoolModel>;
 
+} // namespace lmms::gui
 
 #endif
 

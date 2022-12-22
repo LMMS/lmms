@@ -29,13 +29,17 @@
 #include <vector>
 
 #include "MemoryManager.h"
-#include "export.h"
+#include "lmms_export.h"
 
-class EXPORT ValueBuffer : public std::vector<float>
+namespace lmms
+{
+
+
+class LMMS_EXPORT ValueBuffer : public std::vector<float>
 {
 	MM_OPERATORS
 public:
-	ValueBuffer();
+	ValueBuffer() = default;
 	ValueBuffer(int length);
 
 	void fill(float value);
@@ -49,5 +53,8 @@ public:
 
 	void interpolate(float start, float end);
 };
+
+
+} // namespace lmms
 
 #endif

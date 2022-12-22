@@ -31,20 +31,24 @@
 
 #include <alsa/asoundlib.h>
 
-#include <QtCore/QThread>
+#include <QMap>
+#include <QThread>
 
 #include "MidiClient.h"
 
 
 struct pollfd;
-class QLineEdit;
 
 
-class MidiAlsaRaw : public MidiClientRaw , public QThread
+namespace lmms
 {
+
+class MidiAlsaRaw : public QThread, public MidiClientRaw
+{
+	Q_OBJECT
 public:
 	MidiAlsaRaw();
-	virtual ~MidiAlsaRaw();
+	~MidiAlsaRaw() override;
 
 	static QString probeDevice();
 
@@ -62,8 +66,8 @@ public:
 
 
 protected:
-	virtual void sendByte( const unsigned char c );
-	virtual void run();
+	void sendByte( const unsigned char c ) override;
+	void run() override;
 
 
 private:
@@ -76,6 +80,9 @@ private:
 
 } ;
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_HAVE_ALSA
 
 #endif

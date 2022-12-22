@@ -36,39 +36,47 @@
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
 
-class LcdSpinBox;
 class QLineEdit;
 
-
-class AudioSndio : public AudioDevice, public QThread
+namespace lmms
 {
-public:
-	AudioSndio( bool & _success_ful, Mixer * _mixer );
-	virtual ~AudioSndio();
 
-	inline static QString name( void )
+namespace gui
+{
+class LcdSpinBox;
+}
+
+
+class AudioSndio : public QThread, public AudioDevice
+{
+	Q_OBJECT
+public:
+	AudioSndio( bool & _success_ful, AudioEngine * _audioEngine );
+	~AudioSndio() override;
+
+	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "setupWidget", "sndio" );
+		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget", "sndio" );
 	}
 
-	class setupWidget : public AudioDeviceSetupWidget
+	class setupWidget : public gui::AudioDeviceSetupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );
-		virtual ~setupWidget();
+		~setupWidget() override = default;
 
-		virtual void saveSettings( void );
+		void saveSettings() override;
 
 	private:
 		QLineEdit * m_device;
-		LcdSpinBox * m_channels;
+		gui::LcdSpinBox * m_channels;
 	} ;
 
 private:
-	virtual void startProcessing( void );
-	virtual void stopProcessing( void );
-	virtual void applyQualitySettings( void );
-	virtual void run( void );
+	void startProcessing() override;
+	void stopProcessing() override;
+	void applyQualitySettings() override;
+	void run() override;
 
 	struct sio_hdl *m_hdl;
 	struct sio_par m_par;
@@ -77,6 +85,8 @@ private:
 } ;
 
 
-#endif	/* LMMS_HAVE_SNDIO */
+} // namespace lmms
 
-#endif	/* _AUDIO_SNDIO_H */
+#endif	// LMMS_HAVE_SNDIO
+
+#endif	// _AUDIO_SNDIO_H

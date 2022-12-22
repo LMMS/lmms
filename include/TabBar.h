@@ -26,23 +26,27 @@
 #ifndef TAB_BAR_H
 #define TAB_BAR_H
 
-#include <QtCore/QMap>
-#include <QLayout>
+#include <QBoxLayout>
+#include <QMap>
 #include <QWidget>
 
-#include "export.h"
+#include "lmms_export.h"
+
+
+namespace lmms::gui
+{
 
 
 class TabButton;
 
 
-class EXPORT TabBar : public QWidget
+class LMMS_EXPORT TabBar : public QWidget
 {
 	Q_OBJECT
 public:
 	TabBar( QWidget * _parent,
 			QBoxLayout::Direction _dir = QBoxLayout::LeftToRight );
-	virtual ~TabBar() = default;
+	~TabBar() override = default;
 
 	TabButton * addTab( QWidget * _w, const QString & _text,
 					int _id, bool _add_stretch = false,
@@ -84,5 +88,7 @@ signals:
 
 } ;
 
+
+} // namespace lmms::gui
 
 #endif

@@ -34,9 +34,10 @@
 #include "AudioFileMP3.h"
 #include "AudioFileFlac.h"
 
-#ifdef LMMS_HAVE_SCHED_H
-#include "sched.h"
-#endif
+
+namespace lmms
+{
+
 
 const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 {
@@ -55,7 +56,7 @@ const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 #ifdef LMMS_HAVE_OGGVORBIS
 					&AudioFileOgg::getInst
 #else
-					NULL
+					nullptr
 #endif
 									},
 	{ ProjectRenderer::MP3File,
@@ -64,25 +65,25 @@ const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 #ifdef LMMS_HAVE_MP3LAME
 					&AudioFileMP3::getInst
 #else
-					NULL
+					nullptr
 #endif
 									},
 	// Insert your own file-encoder infos here.
 	// Maybe one day the user can add own encoders inside the program.
 
-	{ ProjectRenderer::NumFileFormats, NULL, NULL, NULL }
+	{ ProjectRenderer::NumFileFormats, nullptr, nullptr, nullptr }
 
 } ;
 
 
 
 
-ProjectRenderer::ProjectRenderer( const Mixer::qualitySettings & qualitySettings,
+ProjectRenderer::ProjectRenderer( const AudioEngine::qualitySettings & qualitySettings,
 					const OutputSettings & outputSettings,
 					ExportFileFormats exportFileFormat,
 					const QString & outputFilename ) :
-	QThread( Engine::mixer() ),
-	m_fileDev( NULL ),
+	QThread( Engine::audioEngine() ),
+	m_fileDev( nullptr ),
 	m_qualitySettings( qualitySettings ),
 	m_progress( 0 ),
 	m_abort( false )
@@ -95,20 +96,13 @@ ProjectRenderer::ProjectRenderer( const Mixer::qualitySettings & qualitySettings
 
 		m_fileDev = audioEncoderFactory(
 					outputFilename, outputSettings, DEFAULT_CHANNELS,
-					Engine::mixer(), successful );
+					Engine::audioEngine(), successful );
 		if( !successful )
 		{
 			delete m_fileDev;
-			m_fileDev = NULL;
+			m_fileDev = nullptr;
 		}
 	}
-}
-
-
-
-
-ProjectRenderer::~ProjectRenderer()
-{
 }
 
 
@@ -149,10 +143,9 @@ void ProjectRenderer::startProcessing()
 
 	if( isReady() )
 	{
-		// Have to do mixer stuff with GUI-thread affinity in order to
+		// Have to do audio engine stuff with GUI-thread affinity in order to
 		// make slots connected to sampleRateChanged()-signals being called immediately.
-		Engine::mixer()->setAudioDevice( m_fileDev,
-						m_qualitySettings, false );
+		Engine::audioEngine()->setAudioDevice( m_fileDev, m_qualitySettings, false, false );
 
 		start(
 #ifndef LMMS_BUILD_WIN32
@@ -168,7 +161,7 @@ void ProjectRenderer::run()
 {
 	MemoryManager::ThreadGuard mmThreadGuard; Q_UNUSED(mmThreadGuard);
 #if 0
-#ifdef LMMS_BUILD_LINUX
+#if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_FREEBSD)
 #ifdef LMMS_HAVE_SCHED_H
 	cpu_set_t mask;
 	CPU_ZERO( &mask );
@@ -181,34 +174,28 @@ void ProjectRenderer::run()
 	PerfLogTimer perfLog("Project Render");
 
 	Engine::getSong()->startExport();
-	Engine::getSong()->updateLength();
 	// Skip first empty buffer.
-	Engine::mixer()->nextBuffer();
+	Engine::audioEngine()->nextBuffer();
 
-	const Song::PlayPos & exportPos = Engine::getSong()->getPlayPos(
-							Song::Mode_PlaySong );
 	m_progress = 0;
-	std::pair<MidiTime, MidiTime> exportEndpoints = Engine::getSong()->getExportEndpoints();
-	tick_t startTick = exportEndpoints.first.getTicks();
-	tick_t endTick = exportEndpoints.second.getTicks();
-	tick_t lengthTicks = endTick - startTick;
+
+	// Now start processing
+	Engine::audioEngine()->startProcessing(false);
 
 	// Continually track and emit progress percentage to listeners.
-	while( exportPos.getTicks() < endTick &&
-				Engine::getSong()->isExporting() == true
-							&& !m_abort )
+	while (!Engine::getSong()->isExportDone() && !m_abort)
 	{
 		m_fileDev->processNextBuffer();
-		const int nprog = lengthTicks == 0 ? 100 : (exportPos.getTicks()-startTick) * 100 / lengthTicks;
-		if( m_progress != nprog )
+		const int nprog = Engine::getSong()->getExportProgress();
+		if (m_progress != nprog)
 		{
 			m_progress = nprog;
 			emit progressChanged( m_progress );
 		}
 	}
 
-	// Notify mixer of the end of processing.
-	Engine::mixer()->stopProcessing();
+	// Notify the audio engine of the end of processing.
+	Engine::audioEngine()->stopProcessing();
 
 	Engine::getSong()->stopExport();
 
@@ -246,7 +233,7 @@ void ProjectRenderer::updateConsoleProgress()
 	}
 	prog[cols] = 0;
 
-	const char * activity = (const char *) "|/-\\";
+	const auto activity = (const char*)"|/-\\";
 	memset( buf, 0, sizeof( buf ) );
 	sprintf( buf, "\r|%s|    %3d%%   %c  ", prog, m_progress,
 							activity[rot] );
@@ -257,3 +244,4 @@ void ProjectRenderer::updateConsoleProgress()
 }
 
 
+} // namespace lmms

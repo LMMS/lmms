@@ -8,13 +8,6 @@ ELSE()
 	SET(PIC_FLAGS "-fPIC -DPIC")
 ENDIF()
 
-# Additional link flags
-IF(LMMS_BUILD_WIN32 AND MINGW_PREFIX)
-	SET(LINK_FLAGS "${LINK_FLAGS} -shared -Wl,-no-undefined -Wl,-Bsymbolic -lm")
-ELSEIF(LMMS_BUILD_APPLE)
-	SET(LINK_FLAGS "${LINK_FLAGS} -Bsymbolic -lm")
-ENDIF()
-
 # Additional compile flags
 SET(COMPILE_FLAGS "${COMPILE_FLAGS} -O3 -Wall")
 SET(COMPILE_FLAGS "${COMPILE_FLAGS} -fomit-frame-pointer -funroll-loops -ffast-math -c -fno-strict-aliasing")
@@ -42,8 +35,21 @@ FOREACH(_item ${XML_SOURCES})
 
 	# Vocoder does not use fftw
 	IF(NOT ("${_plugin}" STREQUAL "vocoder_1337"))
-		TARGET_LINK_LIBRARIES("${_plugin}" -lfftw3f)
+		TARGET_LINK_LIBRARIES("${_plugin}" ${FFTW3F_LIBRARIES})
 	ENDIF()
+	IF(NOT MSVC)
+		TARGET_LINK_LIBRARIES("${_plugin}" m)
+	ENDIF()
+
+	if(LMMS_BUILD_WIN32)
+		add_custom_command(
+			TARGET "${_plugin}"
+			POST_BUILD
+			COMMAND "${STRIP_COMMAND}" "$<TARGET_FILE:${_plugin}>"
+			VERBATIM
+			COMMAND_EXPAND_LISTS
+		)
+	endif(LMMS_BUILD_WIN32)
 
 	SET_TARGET_PROPERTIES("${_plugin}" PROPERTIES PREFIX "")
 	SET_TARGET_PROPERTIES("${_plugin}" PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS}")
@@ -55,10 +61,9 @@ ADD_DEFINITIONS(-DFFTW3)
 INCLUDE_DIRECTORIES(
 	"${CMAKE_SOURCE_DIR}/include"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ladspa"
-	${FFTW3F_INCLUDE_DIRS}
+	"${FFTW3F_INCLUDE_DIRS}"
 	"${CMAKE_BINARY_DIR}"
 )
-LINK_DIRECTORIES(${FFTW3F_LIBRARY_DIRS})
 
 ADD_LIBRARY(iir STATIC ladspa/util/iir.c)
 SET_TARGET_PROPERTIES(iir PROPERTIES COMPILE_FLAGS "${PIC_FLAGS}")

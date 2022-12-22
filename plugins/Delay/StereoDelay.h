@@ -27,6 +27,10 @@
 
 #include "lmms_basics.h"
 
+
+namespace lmms
+{
+
 class StereoDelay
 {
 public:
@@ -45,7 +49,7 @@ public:
 		m_feedback = feedback;
 	}
 
-	void tick( sampleFrame frame );
+	void tick( sampleFrame& frame );
 	void setSampleRate( int sampleRate );
 
 private:
@@ -56,5 +60,8 @@ private:
 	float m_feedback;
 	float m_maxTime;
 };
+
+
+} // namespace lmms
 
 #endif // STEREODELAY_H

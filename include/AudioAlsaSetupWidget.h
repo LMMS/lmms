@@ -35,8 +35,11 @@
 
 
 class QComboBox;
-class LcdSpinBox;
 
+namespace lmms::gui
+{
+
+class LcdSpinBox;
 
 class AudioAlsaSetupWidget : public AudioDeviceSetupWidget
 {
@@ -44,9 +47,9 @@ class AudioAlsaSetupWidget : public AudioDeviceSetupWidget
 
 public:
 	AudioAlsaSetupWidget( QWidget * _parent );
-	virtual ~AudioAlsaSetupWidget();
+	~AudioAlsaSetupWidget() override;
 
-	virtual void saveSettings();
+	void saveSettings() override;
 
 public slots:
 	void onCurrentIndexChanged(int index);
@@ -59,6 +62,8 @@ private:
 	AudioAlsa::DeviceInfoCollection m_deviceInfos;
 };
 
-#endif
+} // namespace lmms::gui
+
+#endif // LMMS_HAVE_ALSA
 
 #endif

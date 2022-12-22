@@ -26,34 +26,31 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
-#include <QtCore/QString>
-#include <QtCore/QObject>
+#include <QString>
+#include <QObject>
 
 
-#include "export.h"
+#include "lmmsconfig.h"
+#include "lmms_export.h"
+#include "lmms_basics.h"
 
-class BBTrackContainer;
-class DummyTrackContainer;
-class FxMixer;
-class ProjectJournal;
+namespace lmms
+{
+
+class AudioEngine;
 class Mixer;
+class PatternStore;
+class ProjectJournal;
 class Song;
 class Ladspa2LMMS;
 
+namespace gui
+{
+class GuiApplication;
+}
 
-// Note: This class is called 'LmmsCore' instead of 'Engine' because of naming
-// conflicts caused by ZynAddSubFX. See https://github.com/LMMS/lmms/issues/2269
-// and https://github.com/LMMS/lmms/pull/2118 for more details.
-//
-// The workaround was to rename Lmms' Engine so that it has a different symbol
-// name in the object files, but typedef it back to 'Engine' and keep it inside
-// of Engine.h so that the rest of the codebase can be oblivious to this issue
-// (and it could be fixed without changing every single file).
 
-class LmmsCore;
-typedef LmmsCore Engine;
-
-class EXPORT LmmsCore : public QObject
+class LMMS_EXPORT Engine : public QObject
 {
 	Q_OBJECT
 public:
@@ -61,14 +58,14 @@ public:
 	static void destroy();
 
 	// core
-	static Mixer *mixer()
+	static AudioEngine *audioEngine()
 	{
-		return s_mixer;
+		return s_audioEngine;
 	}
 
-	static FxMixer * fxMixer()
+	static Mixer * mixer()
 	{
-		return s_fxMixer;
+		return s_mixer;
 	}
 
 	static Song * getSong()
@@ -76,9 +73,9 @@ public:
 		return s_song;
 	}
 
-	static BBTrackContainer * getBBTrackContainer()
+	static PatternStore * patternStore()
 	{
-		return s_bbTrackContainer;
+		return s_patternStore;
 	}
 
 	static ProjectJournal * projectJournal()
@@ -86,30 +83,40 @@ public:
 		return s_projectJournal;
 	}
 
+	static bool ignorePluginBlacklist();
+
+#ifdef LMMS_HAVE_LV2
+	static class Lv2Manager * getLv2Manager()
+	{
+		return s_lv2Manager;
+	}
+#endif
+
 	static Ladspa2LMMS * getLADSPAManager()
 	{
 		return s_ladspaManager;
-	}
-
-	static DummyTrackContainer * dummyTrackContainer()
-	{
-		return s_dummyTC;
 	}
 
 	static float framesPerTick()
 	{
 		return s_framesPerTick;
 	}
+
+	static float framesPerTick(sample_rate_t sample_rate);
+
 	static void updateFramesPerTick();
 
-	static inline LmmsCore * inst()
+	static inline Engine * inst()
 	{
-		if( s_instanceOfMe == NULL )
+		if( s_instanceOfMe == nullptr )
 		{
-			s_instanceOfMe = new LmmsCore();
+			s_instanceOfMe = new Engine();
 		}
 		return s_instanceOfMe;
 	}
+
+	static void setDndPluginKey(void* newKey);
+	static void* pickDndPluginKey();
 
 signals:
 	void initProgress(const QString &msg);
@@ -119,31 +126,36 @@ private:
 	// small helper function which sets the pointer to NULL before actually deleting
 	// the object it refers to
 	template<class T>
-	static inline void deleteHelper( T * * ptr )
+	static inline void deleteHelper(T** ptr)
 	{
-		T * tmp = *ptr;
-		*ptr = NULL;
+		T* tmp = *ptr;
+		*ptr = nullptr;
 		delete tmp;
 	}
 
 	static float s_framesPerTick;
 
 	// core
-	static Mixer *s_mixer;
-	static FxMixer * s_fxMixer;
+	static AudioEngine *s_audioEngine;
+	static Mixer * s_mixer;
 	static Song * s_song;
-	static BBTrackContainer * s_bbTrackContainer;
+	static PatternStore * s_patternStore;
 	static ProjectJournal * s_projectJournal;
-	static DummyTrackContainer * s_dummyTC;
 
-	static Ladspa2LMMS * s_ladspaManager;
+#ifdef LMMS_HAVE_LV2
+	static class Lv2Manager* s_lv2Manager;
+#endif
+	static Ladspa2LMMS* s_ladspaManager;
+	static void* s_dndPluginKey;
 
 	// even though most methods are static, an instance is needed for Qt slots/signals
-	static LmmsCore * s_instanceOfMe;
+	static Engine* s_instanceOfMe;
 
-	friend class GuiApplication;
+	friend class gui::GuiApplication;
 };
 
+
+} // namespace lmms
 
 #endif
 

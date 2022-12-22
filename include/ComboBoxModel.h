@@ -32,24 +32,29 @@
 #include "AutomatableModel.h"
 #include "embed.h"
 
+namespace lmms
+{
 
-class EXPORT ComboBoxModel : public IntModel
+class LMMS_EXPORT ComboBoxModel : public IntModel
 {
 	Q_OBJECT
+	MODEL_IS_VISITABLE
 public:
-	ComboBoxModel( Model* parent = NULL,
+	ComboBoxModel( Model* parent = nullptr,
 					const QString& displayName = QString(),
 					bool isDefaultConstructed = false ) :
 		IntModel( 0, 0, 0, parent, displayName, isDefaultConstructed )
 	{
 	}
 
-	virtual ~ComboBoxModel()
+	~ComboBoxModel() override
 	{
 		clear();
 	}
 
 	void addItem( QString item, std::unique_ptr<PixmapLoader> loader = nullptr );
+
+	void replaceItem(std::size_t index, QString item, std::unique_ptr<PixmapLoader> loader = nullptr);
 
 	void clear();
 
@@ -82,11 +87,12 @@ public:
 
 
 private:
-	typedef std::pair<QString, std::unique_ptr<PixmapLoader> > Item;
+	using Item = std::pair<QString, std::unique_ptr<PixmapLoader>>;
 
 	std::vector<Item> m_items;
 
 } ;
 
+} // namespace lmms
 
 #endif

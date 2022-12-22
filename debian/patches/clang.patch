@@ -1,0 +1,601 @@
+Description: Fix build with Clang
+ Several issues are present:
+ - Unused private elements.
+ - Wrong use of delete.
+ - Unsupported compiler options.
+ - Shifting negative values.
+ - Possible truncations.
+ - Uninitialized variables.
+ - Unused code.
+ - Hiding overloaded virtual functions.
+ - Declarations outside namespace.
+ - Mismatched class tag.
+ .
+ Be careful editing this patch because allegrosmfwr.cpp has CRLF terminators.
+Author: Javier Serrano Polo <javier@jasp.net>
+Bug: https://github.com/LMMS/lmms/issues/3073
+
+Index: lmms-1.1.3/include/AutomatableModel.h
+===================================================================
+--- lmms-1.1.3.orig/include/AutomatableModel.h	2017-01-03 13:01:47.000000000 +0100
++++ lmms-1.1.3/include/AutomatableModel.h	2017-01-03 13:11:25.000000000 +0100
+@@ -307,7 +307,6 @@
+ 
+ 	// most objects will need this temporarily (until sampleExact is
+ 	// standard)
+-	float m_oldValue;
+ 	int m_setValueDepth;
+ 
+ 	AutoModelVector m_linkedModels;
+Index: lmms-1.1.3/plugins/LadspaEffect/calf/CMakeLists.txt
+===================================================================
+--- lmms-1.1.3.orig/plugins/LadspaEffect/calf/CMakeLists.txt	2017-01-03 16:03:14.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/calf/CMakeLists.txt	2017-01-03 16:14:28.000000000 +0100
+@@ -7,11 +7,22 @@
+                     "${CMAKE_CURRENT_SOURCE_DIR}/src")
+ INSTALL(TARGETS calf LIBRARY DESTINATION "${PLUGIN_DIR}/ladspa")
+ SET_TARGET_PROPERTIES(calf PROPERTIES PREFIX "")
++
+ SET(INLINE_FLAGS "")
+-IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+-SET(INLINE_FLAGS "-finline-functions-called-once -finline-limit=80")
++
++INCLUDE(CheckCXXCompilerFlag)
++CHECK_CXX_COMPILER_FLAG(-finline-functions CXX_HAVE_INLINE_FUNCTIONS)
++IF(${CXX_HAVE_INLINE_FUNCTIONS})
++	SET(INLINE_FLAGS "${INLINE_FLAGS} -finline-functions")
+ ENDIF()
+-SET_TARGET_PROPERTIES(calf PROPERTIES COMPILE_FLAGS "-O2 -finline-functions ${INLINE_FLAGS}")
++CHECK_CXX_COMPILER_FLAG(-finline-functions-called-once
++	CXX_HAVE_INLINE_FUNCTIONS_CALLED_ONCE)
++IF(${CXX_HAVE_INLINE_FUNCTIONS_CALLED_ONCE})
++	SET(INLINE_FLAGS "${INLINE_FLAGS} -finline-functions-called-once \
++		-finline-limit=80")
++ENDIF()
++
++SET_TARGET_PROPERTIES(calf PROPERTIES COMPILE_FLAGS "-O2 ${INLINE_FLAGS}")
+ 
+ IF(LMMS_BUILD_WIN32)
+ 	ADD_CUSTOM_COMMAND(TARGET calf POST_BUILD COMMAND "${STRIP}" "\"${CMAKE_CURRENT_BINARY_DIR}/calf.dll\"")
+Index: lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/metadata.h
+===================================================================
+--- lmms-1.1.3.orig/plugins/LadspaEffect/calf/veal/src/calf/metadata.h	2017-01-03 17:41:17.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/metadata.h	2017-01-03 17:50:40.000000000 +0100
+@@ -51,7 +51,7 @@
+     enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, rt_capable = true, require_midi = false, support_midi = false };
+     PLUGIN_NAME_ID_LABEL("filter", "filter", "Filter")
+     /// do not export mode and inertia as CVs, as those are settings and not parameters
+-    bool is_cv(int param_no) { return param_no != par_mode && param_no != par_inertia; }
++    bool is_cv(int param_no) const { return param_no != par_mode && param_no != par_inertia; }
+ };
+ 
+ /// Filterclavier - metadata
+@@ -61,7 +61,7 @@
+     enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, rt_capable = true, require_midi = true, support_midi = true };
+     PLUGIN_NAME_ID_LABEL("filterclavier", "filterclavier", "Filterclavier")
+     /// do not export mode and inertia as CVs, as those are settings and not parameters
+-    bool is_cv(int param_no) { return param_no != par_mode && param_no != par_inertia; }
++    bool is_cv(int param_no) const { return param_no != par_mode && param_no != par_inertia; }
+ };
+ 
+ struct reverb_metadata: public plugin_metadata<reverb_metadata>
+@@ -499,7 +499,7 @@
+     PLUGIN_NAME_ID_LABEL("organ", "organ", "Organ")
+ 
+ public:
+-    plugin_command_info *get_commands();
++    plugin_command_info *get_commands() const;
+     const char *const *get_configure_vars() const;
+ };
+ 
+Index: lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/modules.h
+===================================================================
+--- lmms-1.1.3.orig/plugins/LadspaEffect/calf/veal/src/calf/modules.h	2017-01-03 19:02:59.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/modules.h	2017-01-03 19:30:35.000000000 +0100
+@@ -89,13 +89,14 @@
+     using audio_module<Metadata>::ins;
+     using audio_module<Metadata>::outs;
+     using audio_module<Metadata>::params;
++    using FilterClass::calculate_filter;
+     
+     dsp::inertia<dsp::exponential_ramp> inertia_cutoff, inertia_resonance, inertia_gain;
+     dsp::once_per_n timer;
+     bool is_active;    
+     mutable volatile int last_generation, last_calculated_generation;
+     
+-    filter_module_with_inertia(float **ins, float **outs, float **params)
++    filter_module_with_inertia()
+     : inertia_cutoff(dsp::exponential_ramp(128), 20)
+     , inertia_resonance(dsp::exponential_ramp(128), 20)
+     , inertia_gain(dsp::exponential_ramp(128), 1.0)
+@@ -193,7 +194,7 @@
+     mutable float old_cutoff, old_resonance, old_mode;
+ public:    
+     filter_audio_module()
+-    : filter_module_with_inertia<dsp::biquad_filter_module, filter_metadata>(ins, outs, params)
++    : filter_module_with_inertia<dsp::biquad_filter_module, filter_metadata>()
+     {
+         last_generation = 0;
+         old_mode = old_resonance = old_cutoff = -1;
+Index: lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/modules_comp.h
+===================================================================
+--- lmms-1.1.3.orig/plugins/LadspaEffect/calf/veal/src/calf/modules_comp.h	2017-01-03 19:35:53.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/modules_comp.h	2017-01-03 19:38:06.000000000 +0100
+@@ -39,10 +39,10 @@
+ class gain_reduction_audio_module
+ {
+ private:
+-    float linSlope, detected, kneeSqrt, kneeStart, linKneeStart, kneeStop;
++    float linSlope, detected, kneeStart, linKneeStart, kneeStop;
+     float compressedKneeStop, adjKneeStart, thres;
+     float attack, release, threshold, ratio, knee, makeup, detection, stereo_link, bypass, mute, meter_out, meter_comp;
+-    mutable float old_threshold, old_ratio, old_knee, old_makeup, old_bypass, old_mute, old_detection, old_stereo_link;
++    mutable float old_threshold, old_ratio, old_knee, old_makeup, old_bypass, old_mute, old_detection;
+     mutable volatile int last_generation;
+     uint32_t srate;
+     bool is_active;
+@@ -69,7 +69,7 @@
+ /// Main gate routine by Damien called by various audio modules
+ class expander_audio_module {
+ private:
+-    float linSlope, peak, detected, kneeSqrt, kneeStart, linKneeStart, kneeStop, linKneeStop;
++    float linSlope, detected, kneeStart, linKneeStart, kneeStop, linKneeStop;
+     float compressedKneeStop, adjKneeStart, range, thres, attack_coeff, release_coeff;
+     float attack, release, threshold, ratio, knee, makeup, detection, stereo_link, bypass, mute, meter_out, meter_gate;
+     mutable float old_threshold, old_ratio, old_knee, old_makeup, old_bypass, old_range, old_trigger, old_mute, old_detection, old_stereo_link;
+@@ -142,7 +142,7 @@
+     mutable float f1_freq_old, f2_freq_old, f1_level_old, f2_level_old;
+     mutable float f1_freq_old1, f2_freq_old1, f1_level_old1, f2_level_old1;
+     CalfScModes sc_mode;
+-    mutable CalfScModes sc_mode_old, sc_mode_old1;
++    mutable CalfScModes sc_mode_old1;
+     float f1_active, f2_active;
+     stereo_in_out_metering<sidechaincompressor_metadata> meters;
+     gain_reduction_audio_module compressor;
+Index: lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/modules_limit.h
+===================================================================
+--- lmms-1.1.3.orig/plugins/LadspaEffect/calf/veal/src/calf/modules_limit.h	2017-01-03 19:39:00.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/modules_limit.h	2017-01-03 19:40:20.000000000 +0100
+@@ -37,7 +37,6 @@
+ private:
+     typedef limiter_audio_module AM;
+     uint32_t clip_inL, clip_inR, clip_outL, clip_outR, asc_led;
+-    int mode, mode_old;
+     float meter_inL, meter_inR, meter_outL, meter_outR;
+     dsp::lookahead_limiter limiter;
+ public:
+@@ -73,7 +72,6 @@
+     unsigned int overall_buffer_size;
+     float *buffer;
+     int channels;
+-    float striprel[strips];
+     float weight[strips];
+     float weight_old[strips];
+     float limit_old;
+Index: lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/modules_mod.h
+===================================================================
+--- lmms-1.1.3.orig/plugins/LadspaEffect/calf/veal/src/calf/modules_mod.h	2017-01-03 19:41:55.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/modules_mod.h	2017-01-03 19:42:19.000000000 +0100
+@@ -160,8 +160,6 @@
+     typedef pulsator_audio_module AM;
+     uint32_t clip_inL, clip_inR, clip_outL, clip_outR;
+     float meter_inL, meter_inR, meter_outL, meter_outR;
+-    float offset_old;
+-    int mode_old;
+     bool clear_reset;
+     dsp::simple_lfo lfoL, lfoR;
+ public:
+Index: lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/organ.h
+===================================================================
+--- lmms-1.1.3.orig/plugins/LadspaEffect/calf/veal/src/calf/organ.h	2017-01-03 19:43:08.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/organ.h	2017-01-03 19:53:55.000000000 +0100
+@@ -318,6 +318,7 @@
+     using drawbar_organ::note_on;
+     using drawbar_organ::note_off;
+     using drawbar_organ::control_change;
++    using drawbar_organ::pitch_bend;
+     enum { param_count = drawbar_organ::param_count};
+     dsp::organ_parameters par_values;
+     uint32_t srate;
+@@ -338,9 +339,9 @@
+     void deactivate();
+     uint32_t process(uint32_t offset, uint32_t nsamples, uint32_t inputs_mask, uint32_t outputs_mask);
+     /// No CV inputs for now
+-    bool is_cv(int param_no) { return false; }
++    bool is_cv(int param_no) const { return false; }
+     /// Practically all the stuff here is noisy
+-    bool is_noisy(int param_no) { return true; }
++    bool is_noisy(int param_no) const { return true; }
+     void execute(int cmd_no);
+     bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const;
+     char *configure(const char *key, const char *value);
+Index: lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/preset.h
+===================================================================
+--- lmms-1.1.3.orig/plugins/LadspaEffect/calf/veal/src/calf/preset.h	2017-01-03 19:57:02.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/preset.h	2017-01-03 20:00:25.000000000 +0100
+@@ -27,7 +27,7 @@
+ 
+ namespace calf_plugins {
+ 
+-class plugin_ctl_iface;
++struct plugin_ctl_iface;
+     
+ /// Contents of single preset
+ struct plugin_preset
+Index: lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/primitives.h
+===================================================================
+--- lmms-1.1.3.orig/plugins/LadspaEffect/calf/veal/src/calf/primitives.h	2017-01-03 17:36:12.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/calf/primitives.h	2017-01-03 16:22:16.000000000 +0100
+@@ -370,11 +370,6 @@
+         next_task = (unsigned)-1;
+         eob = false;
+     }
+-    inline bool is_next_tick() {
+-        if (time < next_task)
+-            return true;
+-        do_tasks();
+-    }
+     inline void next_tick() {
+         time++;
+     }
+@@ -382,14 +377,6 @@
+         timeline.insert(std::pair<unsigned int, task *>(time+pos, t));
+         next_task = timeline.begin()->first;
+     }
+-    void do_tasks() {
+-        std::multimap<unsigned int, task *>::iterator i = timeline.begin();
+-        while(i != timeline.end() && i->first == time) {
+-            i->second->execute(this);
+-            i->second->dispose();
+-            timeline.erase(i);
+-        }
+-    }
+     bool is_eob() {
+         return eob;
+     }
+Index: lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/metadata.cpp
+===================================================================
+--- lmms-1.1.3.orig/plugins/LadspaEffect/calf/veal/src/metadata.cpp	2017-01-03 17:52:03.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/metadata.cpp	2017-01-03 18:49:18.000000000 +0100
+@@ -29,6 +29,8 @@
+ 
+ const char *calf_plugins::calf_copyright_info = "(C) 2001-2009 Krzysztof Foltman, Thor Harald Johanssen, Markus Schmidt and others; license: LGPL";
+ 
++namespace calf_plugins {
++
+ ////////////////////////////////////////////////////////////////////////////
+ 
+ CALF_PORT_NAMES(flanger) = {"In L", "In R", "Out L", "Out R"};
+@@ -1105,7 +1107,7 @@
+ 
+ CALF_PLUGIN_INFO(organ) = { 0x8481, "Organ", "Calf Organ", "Krzysztof Foltman", calf_plugins::calf_copyright_info, "SynthesizerPlugin" };
+ 
+-plugin_command_info *organ_metadata::get_commands()
++plugin_command_info *organ_metadata::get_commands() const
+ {
+     static plugin_command_info cmds[] = {
+         { "cmd_panic", "Panic!", "Stop all sounds and reset all controllers" },
+@@ -1439,6 +1441,8 @@
+ 
+ ////////////////////////////////////////////////////////////////////////////
+ 
++}; // namespace calf_plugins
++
+ calf_plugins::plugin_registry::plugin_registry()
+ {
+     #define PER_MODULE_ITEM(name, isSynth, jackname) plugins.push_back((new name##_metadata));
+Index: lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/modules.cpp
+===================================================================
+--- lmms-1.1.3.orig/plugins/LadspaEffect/calf/veal/src/modules.cpp	2017-01-03 19:32:38.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/calf/veal/src/modules.cpp	2017-01-03 19:33:13.000000000 +0100
+@@ -339,7 +339,7 @@
+ ///////////////////////////////////////////////////////////////////////////////////////////////
+ 
+ filterclavier_audio_module::filterclavier_audio_module() 
+-: filter_module_with_inertia<biquad_filter_module, filterclavier_metadata>(ins, outs, params)
++: filter_module_with_inertia<biquad_filter_module, filterclavier_metadata>()
+ , min_gain(1.0)
+ , max_gain(32.0)
+ , last_note(-1)
+Index: lmms-1.1.3/plugins/LadspaEffect/swh/ladspa/flanger_1191.c
+===================================================================
+--- lmms-1.1.3.orig/plugins/LadspaEffect/swh/ladspa/flanger_1191.c	2017-01-03 15:44:13.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/swh/ladspa/flanger_1191.c	2017-01-03 15:45:17.000000000 +0100
+@@ -266,7 +266,7 @@
+ 	
+ 	        // Calculate position in delay table
+ 	        d_base = LIN_INTERP(frac, old_d_base, new_d_base);
+-	        n_ph = (float)(law_p - abs(next_law_pos - count))/(float)law_p;
++	        n_ph = (float)(law_p - labs(next_law_pos - count))/(float)law_p;
+ 	        p_ph = n_ph + 0.5f;
+ 	        while (p_ph > 1.0f) {
+ 	                p_ph -= 1.0f;
+@@ -392,7 +392,7 @@
+ 	
+ 	        // Calculate position in delay table
+ 	        d_base = LIN_INTERP(frac, old_d_base, new_d_base);
+-	        n_ph = (float)(law_p - abs(next_law_pos - count))/(float)law_p;
++	        n_ph = (float)(law_p - labs(next_law_pos - count))/(float)law_p;
+ 	        p_ph = n_ph + 0.5f;
+ 	        while (p_ph > 1.0f) {
+ 	                p_ph -= 1.0f;
+Index: lmms-1.1.3/plugins/LadspaEffect/swh/ladspa/gsm/short_term.c
+===================================================================
+--- lmms-1.1.3.orig/plugins/LadspaEffect/swh/ladspa/gsm/short_term.c	2017-01-03 15:35:13.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/swh/ladspa/gsm/short_term.c	2017-01-03 15:35:55.000000000 +0100
+@@ -53,7 +53,7 @@
+ #undef	STEP
+ #define	STEP( B, MIC, INVA )	\
+ 		temp1    = GSM_ADD( *LARc++, MIC ) << 10;	\
+-		temp1    = GSM_SUB( temp1, B << 1 );		\
++		temp1    = GSM_SUB( temp1, B * 2 );		\
+ 		temp1    = GSM_MULT_R( INVA, temp1 );		\
+ 		*LARpp++ = GSM_ADD( temp1, temp1 );
+ 
+Index: lmms-1.1.3/plugins/LadspaEffect/swh/ladspa/multivoice_chorus_1201.c
+===================================================================
+--- lmms-1.1.3.orig/plugins/LadspaEffect/swh/ladspa/multivoice_chorus_1201.c	2017-01-03 15:47:51.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/swh/ladspa/multivoice_chorus_1201.c	2017-01-03 15:48:18.000000000 +0100
+@@ -345,7 +345,7 @@
+ 	        if (count % 16 < laws) {
+ 	                unsigned int t = count % 16;
+ 	                // Calculate sinus phases
+-	                float n_ph = (float)(law_p - abs(next_peak_pos[t] - count))/law_p;
++	                float n_ph = (float)(law_p - labs(next_peak_pos[t] - count))/law_p;
+ 	                float p_ph = n_ph + 0.5f;
+ 	                if (p_ph > 1.0f) {
+ 	                        p_ph -= 1.0f;
+@@ -488,7 +488,7 @@
+ 	        if (count % 16 < laws) {
+ 	                unsigned int t = count % 16;
+ 	                // Calculate sinus phases
+-	                float n_ph = (float)(law_p - abs(next_peak_pos[t] - count))/law_p;
++	                float n_ph = (float)(law_p - labs(next_peak_pos[t] - count))/law_p;
+ 	                float p_ph = n_ph + 0.5f;
+ 	                if (p_ph > 1.0f) {
+ 	                        p_ph -= 1.0f;
+Index: lmms-1.1.3/plugins/LadspaEffect/swh/ladspa/retro_flange_1208.c
+===================================================================
+--- lmms-1.1.3.orig/plugins/LadspaEffect/swh/ladspa/retro_flange_1208.c	2017-01-03 15:46:35.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/swh/ladspa/retro_flange_1208.c	2017-01-03 15:47:02.000000000 +0100
+@@ -321,7 +321,7 @@
+ 	                prev_law_pos = count + law_p;
+ 	        }
+ 	
+-	        n_ph = (float)(law_p - abs(next_law_pos - count))/(float)law_p;
++	        n_ph = (float)(law_p - labs(next_law_pos - count))/(float)law_p;
+ 	        p_ph = n_ph + 0.5f;
+ 	        if (p_ph > 1.0f) {
+ 	                p_ph -= 1.0f;
+@@ -446,7 +446,7 @@
+ 	                prev_law_pos = count + law_p;
+ 	        }
+ 	
+-	        n_ph = (float)(law_p - abs(next_law_pos - count))/(float)law_p;
++	        n_ph = (float)(law_p - labs(next_law_pos - count))/(float)law_p;
+ 	        p_ph = n_ph + 0.5f;
+ 	        if (p_ph > 1.0f) {
+ 	                p_ph -= 1.0f;
+Index: lmms-1.1.3/plugins/LadspaEffect/swh/ladspa/vynil_1905.c
+===================================================================
+--- lmms-1.1.3.orig/plugins/LadspaEffect/swh/ladspa/vynil_1905.c	2017-01-03 15:51:56.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/swh/ladspa/vynil_1905.c	2017-01-03 16:01:32.000000000 +0100
+@@ -243,6 +243,8 @@
+ 	buffer_s = malloc(sizeof(LADSPA_Data) * buffer_size);
+ 	buffer_mask = buffer_size - 1;
+ 	buffer_pos = 0;
++	click_buffer_omega.all = 0;
++	click_buffer_pos.all = 0;
+ 	click_gain = 0;
+ 	phi = 0.0f; /* Angular phase */
+ 
+Index: lmms-1.1.3/plugins/LadspaEffect/tap/CMakeLists.txt
+===================================================================
+--- lmms-1.1.3.orig/plugins/LadspaEffect/tap/CMakeLists.txt	2017-01-03 13:52:28.000000000 +0100
++++ lmms-1.1.3/plugins/LadspaEffect/tap/CMakeLists.txt	2017-01-03 15:12:14.000000000 +0100
+@@ -1,7 +1,15 @@
+ INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/include")
+ FILE(GLOB PLUGIN_SOURCES *.c)
+ LIST(SORT PLUGIN_SOURCES)
+-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -Wno-write-strings -fomit-frame-pointer -fno-strict-aliasing -fstrength-reduce -funroll-loops -ffast-math")
++SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -Wno-write-strings \
++	-fomit-frame-pointer -fno-strict-aliasing -funroll-loops -ffast-math")
++
++INCLUDE(CheckCCompilerFlag)
++CHECK_C_COMPILER_FLAG(-fstrength-reduce C_HAVE_STRENGTH_REDUCE)
++IF(${C_HAVE_STRENGTH_REDUCE})
++	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fstrength-reduce")
++ENDIF()
++
+ FOREACH(_item ${PLUGIN_SOURCES})
+ 	GET_FILENAME_COMPONENT(_plugin "${_item}" NAME_WE)
+ 	ADD_LIBRARY("${_plugin}" MODULE "${_item}")
+Index: lmms-1.1.3/plugins/MidiImport/portsmf/allegro.h
+===================================================================
+--- lmms-1.1.3.orig/plugins/MidiImport/portsmf/allegro.h	2017-01-03 20:02:37.000000000 +0100
++++ lmms-1.1.3/plugins/MidiImport/portsmf/allegro.h	2017-01-03 20:06:48.000000000 +0100
+@@ -842,6 +842,8 @@
+     Alg_event_ptr write_track_name(std::ostream &file, int n, 
+                                    Alg_events &events);
+ public:
++    using Alg_track::paste;
++
+     int channel_offset_per_track; // used to encode track_num into channel
+     Alg_tracks track_list;       // array of Alg_events
+     Alg_time_sigs time_sig;
+Index: lmms-1.1.3/plugins/MidiImport/portsmf/allegrosmfwr.cpp
+===================================================================
+--- lmms-1.1.3.orig/plugins/MidiImport/portsmf/allegrosmfwr.cpp	2017-01-03 20:07:50.000000000 +0100
++++ lmms-1.1.3/plugins/MidiImport/portsmf/allegrosmfwr.cpp	2017-01-03 20:08:34.000000000 +0100
+@@ -57,13 +57,11 @@
+ 
+     Alg_seq_ptr seq;
+ 
+-    int num_tracks; // number of tracks not counting tempo track
+     int division; // divisions per quarter note, default = 120
+     int initial_tempo;
+ 
+     int timesig_num; // numerator of time signature
+     int timesig_den; // denominator of time signature
+-    double timesig_when; // time of time signature
+ 
+     int keysig;          // number of sharps (+) or flats (-), -99 for undefined
+     char keysig_mode; // 'M' or 'm' for major/minor
+Index: lmms-1.1.3/plugins/Delay/StereoDelay.cpp
+===================================================================
+--- lmms-1.1.3.orig/plugins/Delay/StereoDelay.cpp	2017-01-03 13:40:27.000000000 +0100
++++ lmms-1.1.3/plugins/Delay/StereoDelay.cpp	2017-01-03 13:42:16.000000000 +0100
+@@ -48,7 +48,7 @@
+ {
+ 	if( m_buffer )
+ 	{
+-		delete m_buffer;
++		delete[] m_buffer;
+ 	}
+ }
+ 
+@@ -84,7 +84,7 @@
+ {
+ 	if( m_buffer )
+ 	{
+-		delete m_buffer;
++		delete[] m_buffer;
+ 	}
+ 
+ 	int bufferSize = ( int )( sampleRate * m_maxTime );
+Index: lmms-1.1.3/plugins/OpulenZ/adplug/src/fmopl.c
+===================================================================
+--- lmms-1.1.3.orig/plugins/OpulenZ/adplug/src/fmopl.c	2017-01-03 20:11:03.000000000 +0100
++++ lmms-1.1.3/plugins/OpulenZ/adplug/src/fmopl.c	2017-01-03 20:22:23.000000000 +0100
+@@ -70,7 +70,7 @@
+ /* final output shift , limit minimum and maximum */
+ #define OPL_OUTSB   (TL_BITS+3-16)		/* OPL output final shift 16bit */
+ #define OPL_MAXOUT (0x7fff<<OPL_OUTSB)
+-#define OPL_MINOUT (-0x8000<<OPL_OUTSB)
++#define OPL_MINOUT (~((0x8000<<OPL_OUTSB)-1))
+ 
+ /* -------------------- quality selection --------------------- */
+ 
+Index: lmms-1.1.3/src/core/track.cpp
+===================================================================
+--- lmms-1.1.3.orig/src/core/track.cpp	2017-01-03 13:16:46.000000000 +0100
++++ lmms-1.1.3/src/core/track.cpp	2017-01-03 13:18:33.000000000 +0100
+@@ -75,11 +75,6 @@
+  */
+ const int RESIZE_GRIP_WIDTH = 4;
+ 
+-/*! The size of the track buttons in pixels
+- */
+-const int TRACK_OP_BTN_WIDTH = 20;
+-const int TRACK_OP_BTN_HEIGHT = 14;
+-
+ 
+ /*! A pointer for that text bubble used when moving segments, etc.
+  *
+Index: lmms-1.1.3/src/gui/LfoControllerDialog.cpp
+===================================================================
+--- lmms-1.1.3.orig/src/gui/LfoControllerDialog.cpp	2017-01-03 13:24:43.000000000 +0100
++++ lmms-1.1.3/src/gui/LfoControllerDialog.cpp	2017-01-03 13:25:24.000000000 +0100
+@@ -50,7 +50,6 @@
+ const int CD_LFO_SHAPES_X = 6;
+ const int CD_LFO_SHAPES_Y = 36;
+ 
+-const int CD_LFO_GRAPH_X = 6;
+ const int CD_LFO_GRAPH_Y = CD_ENV_KNOBS_LBL_Y+15;
+ const int CD_LFO_CD_KNOB_Y = CD_LFO_GRAPH_Y-2;
+ const int CD_LFO_BASE_CD_KNOB_X = CD_LFO_SHAPES_X + 64;
+Index: lmms-1.1.3/src/gui/LmmsStyle.cpp
+===================================================================
+--- lmms-1.1.3.orig/src/gui/LmmsStyle.cpp	2017-01-03 13:27:38.000000000 +0100
++++ lmms-1.1.3/src/gui/LmmsStyle.cpp	2017-01-03 13:29:35.000000000 +0100
+@@ -34,78 +34,6 @@
+ #include "LmmsStyle.h"
+ #include "LmmsPalette.h"
+ 
+-const int BUTTON_LENGTH = 24;
+-
+-static const char * const s_scrollbarArrowUpXpm[] = {
+-		"7 6 8 1",
+-		" 	g None",
+-		".	g #000000",
+-		"+	g #101010",
+-		"@	g #A0A0A0",
+-		"#	g #C0C0C0",
+-		"$	g #FFFFFF",
+-		"%	g #808080",
+-		"&	g #202020",
+-		"..+@+..",
+-		"..#$#..",
+-		".%$$$%.",
+-		"&$$$$$&",
+-		"@$$$$$@",
+-		"@#####@"};
+-
+-static const char * const s_scrollbarArrowRightXpm[] = {
+-		"6 7 8 1",
+-		" 	c None",
+-		".	c #A0A0A0",
+-		"+	c #202020",
+-		"@	c #000000",
+-		"#	c #C0C0C0",
+-		"$	c #FFFFFF",
+-		"%	c #808080",
+-		"&	c #101010",
+-		"..+@@@",
+-		"#$$%@@",
+-		"#$$$#&",
+-		"#$$$$.",
+-		"#$$$#&",
+-		"#$$%@@",
+-		"..+@@@"};
+-
+-static const char * const s_scrollbarArrowDownXpm[] = {
+-		"7 6 8 1",
+-		" 	g None",
+-		".	g #000000",
+-		"+	g #101010",
+-		"@	g #A0A0A0",
+-		"#	g #C0C0C0",
+-		"$	g #FFFFFF",
+-		"%	g #808080",
+-		"&	g #202020",
+-		"@#####@",
+-		"@$$$$$@",
+-		"&$$$$$&",
+-		".%$$$%.",
+-		"..#$#..",
+-		"..+@+.."};
+-
+-static const char * const s_scrollbarArrowLeftXpm[] = {
+-		"6 7 8 1",
+-		" 	g None",
+-		".	g #000000",
+-		"+	g #202020",
+-		"@	g #A0A0A0",
+-		"#	g #808080",
+-		"$	g #FFFFFF",
+-		"%	g #C0C0C0",
+-		"&	g #101010",
+-		"...+@@",
+-		"..#$$%",
+-		"&%$$$%",
+-		"@$$$$%",
+-		"&%$$$%",
+-		"..#$$%",
+-		"...+@@"};
+-
+ QPalette * LmmsStyle::s_palette = NULL;
+ 
+ QLinearGradient getGradient( const QColor & _col, const QRectF & _rect )
+Index: lmms-1.1.3/src/gui/PianoRoll.cpp
+===================================================================
+--- lmms-1.1.3.orig/src/gui/PianoRoll.cpp	2017-01-03 13:30:47.000000000 +0100
++++ lmms-1.1.3/src/gui/PianoRoll.cpp	2017-01-03 13:34:14.000000000 +0100
+@@ -88,7 +88,6 @@
+ const int PIANO_X = 0;
+ 
+ const int WHITE_KEY_WIDTH = 64;
+-const int BLACK_KEY_WIDTH = 41;
+ const int WHITE_KEY_SMALL_HEIGHT = 18;
+ const int WHITE_KEY_BIG_HEIGHT = 24;
+ const int BLACK_KEY_HEIGHT = 16;

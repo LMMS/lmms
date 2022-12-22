@@ -23,8 +23,6 @@
  *
  */
 
-#include <QPaintEvent>
-#include <QFontMetrics>
 #include <QPainter>
 
 #include "Graph.h"
@@ -32,12 +30,17 @@
 #include "SampleBuffer.h"
 #include "Oscillator.h"
 
+namespace lmms
+{
+
+namespace gui
+{
 
 Graph::Graph( QWidget * _parent, graphStyle _style, int _width,
 		int _height ) :
 	QWidget( _parent ),
 	/* TODO: size, background? */
-	ModelView( new graphModel( -1.0, 1.0, 128, NULL, true ), this ),
+	ModelView( new graphModel( -1.0, 1.0, 128, nullptr, true ), this ),
 	m_graphStyle( _style )
 {
 	m_mouseDown = false;
@@ -47,13 +50,13 @@ Graph::Graph( QWidget * _parent, graphStyle _style, int _width,
 	setAcceptDrops( true );
 	setCursor( Qt::CrossCursor );
 
-	graphModel * gModel = castModel<graphModel>();
+	auto gModel = castModel<graphModel>();
 
-	QObject::connect( gModel, SIGNAL( samplesChanged( int, int ) ),
-			this, SLOT( updateGraph( int, int ) ) );
+	QObject::connect( gModel, SIGNAL(samplesChanged(int,int)),
+			this, SLOT(updateGraph(int,int)));
 
-	QObject::connect( gModel, SIGNAL( lengthChanged( ) ),
-			this, SLOT( updateGraph( ) ) );
+	QObject::connect( gModel, SIGNAL(lengthChanged()),
+			this, SLOT(updateGraph()));
 }
 
 void Graph::setForeground( const QPixmap &_pixmap )
@@ -235,8 +238,9 @@ void Graph::drawLineAt( int _x, int _y, int _lastx )
 		model()->drawSampleAt( sample_begin + i , val_begin + ((i ) * ystep));
 	}
 
-	
-	model()->samplesChanged( sample_begin, sample_end );
+	// We've changed [sample_end, sample_begin)
+	// However, samplesChanged expects two end points
+	model()->samplesChanged(sample_begin, sample_end - 1);
 }
 
 void Graph::changeSampleAt( int _x, int _y )
@@ -429,13 +433,13 @@ void Graph::dragEnterEvent( QDragEnterEvent * _dee )
 
 void Graph::modelChanged()
 {
-	graphModel * gModel = castModel<graphModel>();
+	auto gModel = castModel<graphModel>();
 
-	QObject::connect( gModel, SIGNAL( samplesChanged( int, int ) ),
-			this, SLOT( updateGraph( int, int ) ) );
+	QObject::connect( gModel, SIGNAL(samplesChanged(int,int)),
+			this, SLOT(updateGraph(int,int)));
 
-	QObject::connect( gModel, SIGNAL( lengthChanged( ) ),
-			this, SLOT( updateGraph( ) ) );
+	QObject::connect( gModel, SIGNAL(lengthChanged()),
+			this, SLOT(updateGraph()));
 }
 
 
@@ -452,8 +456,10 @@ void Graph::updateGraph()
 }
 
 
+} // namespace gui
+
 graphModel::graphModel( float _min, float _max, int _length,
-			::Model * _parent, bool _default_constructed,  float _step ) :
+			Model* _parent, bool _default_constructed,  float _step ) :
 	Model( _parent, tr( "Graph" ), _default_constructed ),
 	m_samples( _length ),
 	m_length( _length ),
@@ -510,7 +516,7 @@ void graphModel::setSampleAt( int x, float val )
 
 void graphModel::setSamples( const float * _samples )
 {
-	qCopy( _samples, _samples + length(), m_samples.begin());
+	std::copy( _samples, _samples + length(), m_samples.begin());
 
 	emit samplesChanged( 0, length()-1 );
 }
@@ -582,7 +588,7 @@ void graphModel::setWaveToNoise()
 
 QString graphModel::setWaveToUser()
 {
-	SampleBuffer * sampleBuffer = new SampleBuffer;
+	auto sampleBuffer = new SampleBuffer;
 	QString fileName = sampleBuffer->openAndSetWaveformFile();
 	if( fileName.isEmpty() == false )
 	{
@@ -635,13 +641,14 @@ void graphModel::smoothNonCyclic()
 	emit samplesChanged(0, length()-1);
 }
 
-//makes a cyclic convolution.
-void graphModel::convolve(const float *convolution, const int convolutionLength, const int centerOffset)
+void graphModel::convolve(const float *convolution,
+	const int convolutionLength, const int centerOffset)
 {
 	// store values in temporary array
 	QVector<float> temp = m_samples;
 	const int graphLength = length();
 	float sum;
+	// make a cyclic convolution
 	for ( int i = 0; i <  graphLength; i++ )
 	{
 		sum = 0;
@@ -720,6 +727,15 @@ void graphModel::clear()
 }
 
 
+// Clear any part of the graph that isn't displayed
+void graphModel::clearInvisible()
+{
+	const int graph_length = length();
+	const int full_graph_length = m_samples.size();
+	for( int i = graph_length; i < full_graph_length; i++ )
+		m_samples[i] = 0;
+	emit samplesChanged( graph_length, full_graph_length - 1 );
+}
 
 void graphModel::drawSampleAt( int x, float val )
 {
@@ -735,6 +751,4 @@ void graphModel::drawSampleAt( int x, float val )
 }
 
 
-
-
-
+} // namespace lmms

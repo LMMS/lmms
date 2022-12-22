@@ -26,10 +26,11 @@
 
 #include "SerializingObject.h"
 
-
+namespace lmms
+{
 
 SerializingObject::SerializingObject() :
-	m_hook( NULL )
+	m_hook( nullptr )
 {
 }
 
@@ -40,7 +41,7 @@ SerializingObject::~SerializingObject()
 {
 	if( m_hook )
 	{
-		m_hook->m_hookedIn = NULL;
+		m_hook->m_hookedIn = nullptr;
 	}
 }
 
@@ -82,7 +83,7 @@ void SerializingObject::setHook( SerializingObjectHook* hook )
 {
 	if( m_hook )
 	{
-		m_hook->m_hookedIn = NULL;
+		m_hook->m_hookedIn = nullptr;
 	}
 
 	m_hook = hook;
@@ -110,4 +111,4 @@ void SerializingObject::loadSettings( const QDomElement& element )
 	Q_UNUSED(element)
 }
 
-
+} // namespace lmms

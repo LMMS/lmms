@@ -23,9 +23,11 @@
  */
 
 #include "Lfo.h"
-#include "lmms_math.h"
 
+#include <cmath>
 
+namespace lmms
+{
 
 
 Lfo::Lfo( int samplerate )
@@ -44,3 +46,6 @@ float Lfo::tick()
 
 	return output;
 }
+
+
+} // namespace lmms

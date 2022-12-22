@@ -22,25 +22,38 @@
  *
  */
 
+#include <QAction>
 #include <QDomElement>
+#include <QGridLayout>
+#include <QMenu>
+#include <QPushButton>
+#include <QScrollArea>
 
+#include "embed.h"
+#include "CustomTextKnob.h"
 #include "VstEffectControls.h"
+#include "VstEffectControlDialog.h"
 #include "VstEffect.h"
+#include "VstPlugin.h"
 
+#include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "GuiApplication.h"
-#include <QMdiArea>
+#include "SubWindow.h"
 #include <QApplication>
 
+namespace lmms
+{
 
 
 VstEffectControls::VstEffectControls( VstEffect * _eff ) :
 	EffectControls( _eff ),
 	m_effect( _eff ),
-	m_subWindow( NULL ),
-	knobFModel( NULL ),
-	ctrHandle( NULL ),
-	lastPosInMenu (0)
+	m_subWindow( nullptr ),
+	knobFModel( nullptr ),
+	ctrHandle( nullptr ),
+	lastPosInMenu (0),
+	m_vstGuiVisible ( true )
 //	m_presetLabel ( NULL )
 {
 }
@@ -51,7 +64,7 @@ VstEffectControls::VstEffectControls( VstEffect * _eff ) :
 VstEffectControls::~VstEffectControls()
 {
 	delete ctrHandle;
-	ctrHandle = NULL;
+	ctrHandle = nullptr;
 }
 
 
@@ -62,8 +75,10 @@ void VstEffectControls::loadSettings( const QDomElement & _this )
 	//m_effect->closePlugin();
 	//m_effect->openPlugin( _this.attribute( "plugin" ) );
 	m_effect->m_pluginMutex.lock();
-	if( m_effect->m_plugin != NULL )
+	if( m_effect->m_plugin != nullptr )
 	{
+		m_vstGuiVisible = _this.attribute( "guivisible" ).toInt();
+
 		m_effect->m_plugin->loadSettings( _this );
 
 		const QMap<QString, QString> & dump = m_effect->m_plugin->parameterDump();
@@ -82,11 +97,12 @@ void VstEffectControls::loadSettings( const QDomElement & _this )
 			if( !( knobFModel[ i ]->isAutomated() ||
 						knobFModel[ i ]->controllerConnection() ) )
 			{
-				knobFModel[ i ]->setValue( (s_dumpValues.at( 2 ) ).toFloat() );
-				knobFModel[ i ]->setInitValue( (s_dumpValues.at( 2 ) ).toFloat() );
+				knobFModel[ i ]->setValue(LocaleHelper::toFloat(s_dumpValues.at(2)));
+				knobFModel[ i ]->setInitValue(LocaleHelper::toFloat(s_dumpValues.at(2)));
 			}
 
-			connect( knobFModel[i], SIGNAL( dataChanged() ), this, SLOT( setParameter() ) );
+			connect( knobFModel[i], &FloatModel::dataChanged, this,
+				[this, i]() { setParameter( knobFModel[i] ); }, Qt::DirectConnection);
 		}
 
 	}
@@ -96,13 +112,11 @@ void VstEffectControls::loadSettings( const QDomElement & _this )
 
 
 
-void VstEffectControls::setParameter( void )
+void VstEffectControls::setParameter( Model * action )
 {
-
-	Model *action = qobject_cast<Model *>(sender());
 	int knobUNID = action->displayName().toInt();
 
-	if ( m_effect->m_plugin != NULL ) {
+	if ( m_effect->m_plugin != nullptr ) {
 		m_effect->m_plugin->setParam( knobUNID, knobFModel[knobUNID]->value() );
 	}
 }
@@ -114,10 +128,10 @@ void VstEffectControls::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "plugin", m_effect->m_key.attributes["file"] );
 	m_effect->m_pluginMutex.lock();
-	if( m_effect->m_plugin != NULL )
+	if( m_effect->m_plugin != nullptr )
 	{
 		m_effect->m_plugin->saveSettings( _doc, _this );
-		if (knobFModel != NULL) {
+		if (knobFModel != nullptr) {
 			const QMap<QString, QString> & dump = m_effect->m_plugin->parameterDump();
 			paramCount = dump.size();
 			char paramStr[35];
@@ -138,19 +152,27 @@ void VstEffectControls::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 int VstEffectControls::controlCount()
 {
-	return m_effect->m_plugin != NULL &&
-		m_effect->m_plugin->hasEditor() ?  1 : 0;
+	return m_effect->m_plugin != nullptr ? 1 : 0;
+}
+
+
+
+gui::EffectControlDialog* VstEffectControls::createView()
+{
+	auto dialog = new gui::VstEffectControlDialog( this );
+	dialog->togglePluginUI( m_vstGuiVisible );
+	return dialog;
 }
 
 
 
 
-void VstEffectControls::managePlugin( void )
+void VstEffectControls::managePlugin()
 {
-	if ( m_effect->m_plugin != NULL && m_subWindow == NULL ) {
-		manageVSTEffectView * tt = new manageVSTEffectView( m_effect, this);
+	if ( m_effect->m_plugin != nullptr && m_subWindow == nullptr ) {
+		auto tt = new gui::ManageVSTEffectView(m_effect, this);
 		ctrHandle = (QObject *)tt;
-	} else if (m_subWindow != NULL) {
+	} else if (m_subWindow != nullptr) {
 		if (m_subWindow->widget()->isVisible() == false ) { 
 			m_scrollArea->show();
 			m_subWindow->show();
@@ -165,11 +187,11 @@ void VstEffectControls::managePlugin( void )
 
 
 
-void VstEffectControls::savePreset( void )
+void VstEffectControls::savePreset()
 {
 
-	if ( m_effect->m_plugin != NULL ) {
-		m_effect->m_plugin->savePreset( );
+	if ( m_effect->m_plugin != nullptr ) {
+		m_effect->m_plugin->savePreset();
 /*    		bool converted;
     		QString str = m_vi->m_plugin->currentProgramName().section("/", 0, 0);
      		if (str != "")
@@ -182,11 +204,11 @@ void VstEffectControls::savePreset( void )
 
 
 
-void VstEffectControls::updateMenu( void )
+void VstEffectControls::updateMenu()
 {
 
 	// get all presets -
-	if ( m_effect->m_plugin != NULL )
+	if ( m_effect->m_plugin != nullptr )
 	{
 		m_effect->m_plugin->loadProgramNames();
 		///QWidget::update();
@@ -198,18 +220,16 @@ void VstEffectControls::updateMenu( void )
      		QMenu * to_menu = m_selPresetButton->menu();
     		to_menu->clear();
 
-    		QAction *presetActions[list1.size()];
-
      		for (int i = 0; i < list1.size(); i++) {
-			presetActions[i] = new QAction(this);
-			connect(presetActions[i], SIGNAL(triggered()), this, SLOT(selPreset()));
+				auto presetAction = new QAction(this);
+				connect(presetAction, SIGNAL(triggered()), this, SLOT(selPreset()));
 
-        		presetActions[i]->setText(QString("%1. %2").arg(QString::number(i+1), list1.at(i)));
-        		presetActions[i]->setData(i);
+        		presetAction->setText(QString("%1. %2").arg(QString::number(i+1), list1.at(i)));
+        		presetAction->setData(i);
 			if (i == lastPosInMenu) {
-        			presetActions[i]->setIcon(embed::getIconPixmap( "sample_file", 16, 16 ));
-			} else  presetActions[i]->setIcon(embed::getIconPixmap( "edit_copy", 16, 16 ));
-			to_menu->addAction( presetActions[i] );
+        			presetAction->setIcon(embed::getIconPixmap( "sample_file", 16, 16 ));
+			} else  presetAction->setIcon(embed::getIconPixmap( "edit_copy", 16, 16 ));
+			to_menu->addAction( presetAction );
      		}
 
 	}
@@ -219,11 +239,11 @@ void VstEffectControls::updateMenu( void )
 
 
 
-void VstEffectControls::openPreset( void )
+void VstEffectControls::openPreset()
 {
 
-	if ( m_effect->m_plugin != NULL ) {
-		m_effect->m_plugin->openPreset( );
+	if ( m_effect->m_plugin != nullptr ) {
+		m_effect->m_plugin->openPreset();
     		bool converted;
     		QString str = m_effect->m_plugin->currentProgramName().section("/", 0, 0);
      		if (str != "")
@@ -236,10 +256,10 @@ void VstEffectControls::openPreset( void )
 
 
 
-void VstEffectControls::rollPreset( void )
+void VstEffectControls::rollPreset()
 {
 
-	if ( m_effect->m_plugin != NULL ) {
+	if ( m_effect->m_plugin != nullptr ) {
 		m_effect->m_plugin->rotateProgram( 1 );
     		bool converted;
     		QString str = m_effect->m_plugin->currentProgramName().section("/", 0, 0);
@@ -252,10 +272,10 @@ void VstEffectControls::rollPreset( void )
 
 
 
-void VstEffectControls::rolrPreset( void )
+void VstEffectControls::rolrPreset()
 {
 
-	if ( m_effect->m_plugin != NULL ) {
+	if ( m_effect->m_plugin != nullptr ) {
 		m_effect->m_plugin->rotateProgram( -1 );
     		bool converted;
     		QString str = m_effect->m_plugin->currentProgramName().section("/", 0, 0);
@@ -268,16 +288,15 @@ void VstEffectControls::rolrPreset( void )
 
 
 
-void VstEffectControls::selPreset( void )
+void VstEffectControls::selPreset()
 {
-
-     QAction *action = qobject_cast<QAction *>(sender());
-     if (action)
-         if ( m_effect->m_plugin != NULL ) {
+	auto action = qobject_cast<QAction*>(sender());
+	if (action && m_effect->m_plugin != nullptr)
+	{
 		lastPosInMenu = action->data().toInt();
-		m_effect->m_plugin->setProgram( lastPosInMenu );
-		//QWidget::update();
-	 }
+		m_effect->m_plugin->setProgram(lastPosInMenu);
+		// QWidget::update();
+	}
 }
 
 
@@ -290,8 +309,11 @@ void VstEffectControls::paintEvent( QPaintEvent * )
 
 
 
+namespace gui
+{
 
-manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * m_vi ) :
+
+ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * m_vi ) :
 	m_effect( _eff )
 {
 	m_vi2 = m_vi;
@@ -299,33 +321,29 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
         m_vi->m_scrollArea = new QScrollArea( widget );
 	l = new QGridLayout( widget );
 
-	m_vi->m_subWindow = gui->mainWindow()->addWindowedWidget(NULL, Qt::SubWindow | 
+	m_vi->m_subWindow = getGUI()->mainWindow()->addWindowedWidget(nullptr, Qt::SubWindow |
 			Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
 	m_vi->m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
 	m_vi->m_subWindow->setFixedSize( 960, 300);
 	m_vi->m_subWindow->setWidget(m_vi->m_scrollArea);
 	m_vi->m_subWindow->setWindowTitle( _eff->m_plugin->name() + tr( " - VST parameter control" ) );
 	m_vi->m_subWindow->setWindowIcon( PLUGIN_NAME::getIconPixmap( "logo" ) );
-	//m_vi->m_subWindow->setAttribute(Qt::WA_DeleteOnClose);
+	m_vi->m_subWindow->setAttribute(Qt::WA_DeleteOnClose, false);
 
 
 	l->setContentsMargins( 20, 10, 10, 10 );
 	l->setVerticalSpacing( 10 );
 	l->setHorizontalSpacing( 23 );
 
-	m_syncButton = new QPushButton( tr( "VST Sync" ), widget );
+	m_syncButton = new QPushButton( tr( "VST sync" ), widget );
 	connect( m_syncButton, SIGNAL( clicked() ), this,
 							SLOT( syncPlugin() ) );
-	m_syncButton->setWhatsThis(
-		tr( "Click here if you want to synchronize all parameters with VST plugin." ) );
 
 	l->addWidget( m_syncButton, 0, 0, 1, 2, Qt::AlignLeft );
 
 	m_displayAutomatedOnly = new QPushButton( tr( "Automated" ), widget );
 	connect( m_displayAutomatedOnly, SIGNAL( clicked() ), this,
 							SLOT( displayAutomatedOnly() ) );
-	m_displayAutomatedOnly->setWhatsThis(
-		tr( "Click here if you want to display automated parameters only." ) );
 
 	l->addWidget( m_displayAutomatedOnly, 0, 1, 1, 2, Qt::AlignLeft );
 
@@ -333,8 +351,6 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 	m_closeButton = new QPushButton( tr( "    Close    " ), widget );
 	connect( m_closeButton, SIGNAL( clicked() ), this,
 							SLOT( closeWindow() ) );
-	m_closeButton->setWhatsThis(
-		tr( "Close VST effect knob-controller window." ) );
 
 	l->addWidget( m_closeButton, 0, 2, 1, 7, Qt::AlignLeft );
 
@@ -347,10 +363,10 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 	const QMap<QString, QString> & dump = m_effect->m_plugin->parameterDump();
 	m_vi->paramCount = dump.size();
 
-	vstKnobs = new Knob *[ m_vi->paramCount ];
+	vstKnobs = new CustomTextKnob *[ m_vi->paramCount ];
 
 	bool hasKnobModel = true;
-	if (m_vi->knobFModel == NULL) {
+	if (m_vi->knobFModel == nullptr) {
 		m_vi->knobFModel = new FloatModel *[ m_vi->paramCount ];
 		hasKnobModel = false;
 	}
@@ -363,20 +379,23 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 		sprintf( paramStr, "param%d", i);
 		s_dumpValues = dump[ paramStr ].split( ":" );
 
-		vstKnobs[ i ] = new Knob( knobBright_26, widget, s_dumpValues.at( 1 ) );
-		vstKnobs[ i ]->setHintText( s_dumpValues.at( 1 ) + ":", "" );
+		vstKnobs[ i ] = new CustomTextKnob( knobBright_26, widget, s_dumpValues.at( 1 ) );
+		vstKnobs[ i ]->setDescription( s_dumpValues.at( 1 ) + ":" );
 		vstKnobs[ i ]->setLabel( s_dumpValues.at( 1 ).left( 15 ) );
 
 		if( !hasKnobModel )
 		{
 			sprintf( paramStr, "%d", i);
-			m_vi->knobFModel[ i ] = new FloatModel( ( s_dumpValues.at( 2 ) ).toFloat(), 
-					0.0f, 1.0f, 0.01f, _eff, tr( paramStr ) );
+			m_vi->knobFModel[ i ] = new FloatModel( LocaleHelper::toFloat(s_dumpValues.at(2)),
+					0.0f, 1.0f, 0.01f, _eff, paramStr );
 		}
-		connect( m_vi->knobFModel[ i ], SIGNAL( dataChanged() ), this, 
-								SLOT( setParameter() ) );
-		vstKnobs[ i ] ->setModel( m_vi->knobFModel[ i ] );
+
+		FloatModel * model = m_vi->knobFModel[i];
+		connect( model, &FloatModel::dataChanged, this,
+			[this, model]() { setParameter( model ); }, Qt::DirectConnection);
+		vstKnobs[ i ] ->setModel( model );
 	}
+	syncParameterText();
 
 	int i = 0;
 	for( int lrow = 1; lrow < ( int( m_vi->paramCount / 10 ) + 1 ) + 1; lrow++ )
@@ -410,7 +429,7 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 
 
 
-void manageVSTEffectView::closeWindow()
+void ManageVSTEffectView::closeWindow()
 {
 	m_vi2->m_subWindow->hide();
 }
@@ -418,7 +437,7 @@ void manageVSTEffectView::closeWindow()
 
 
 
-void manageVSTEffectView::syncPlugin( void )
+void ManageVSTEffectView::syncPlugin()
 {
 	char paramStr[35];
 	QStringList s_dumpValues;
@@ -434,16 +453,17 @@ void manageVSTEffectView::syncPlugin( void )
 		{
 			sprintf( paramStr, "param%d", i );
     			s_dumpValues = dump[ paramStr ].split( ":" );
-			f_value = ( s_dumpValues.at( 2 ) ).toFloat();
+			f_value = LocaleHelper::toFloat(s_dumpValues.at(2));
 			m_vi2->knobFModel[ i ]->setAutomatedValue( f_value );
 			m_vi2->knobFModel[ i ]->setInitValue( f_value );
 		}
 	}
+	syncParameterText();
 }
 
 
 
-void manageVSTEffectView::displayAutomatedOnly( void )
+void ManageVSTEffectView::displayAutomatedOnly()
 {
 	bool isAuto = QString::compare( m_displayAutomatedOnly->text(), tr( "Automated" ) ) == 0;
 
@@ -468,23 +488,52 @@ void manageVSTEffectView::displayAutomatedOnly( void )
 
 
 
-void manageVSTEffectView::setParameter( void )
+void ManageVSTEffectView::setParameter( Model * action )
 {
-
-	Model *action = qobject_cast<Model *>(sender());
 	int knobUNID = action->displayName().toInt();
 
-	if ( m_effect->m_plugin != NULL ) {
+	if ( m_effect->m_plugin != nullptr ) {
 		m_effect->m_plugin->setParam( knobUNID, m_vi2->knobFModel[knobUNID]->value() );
+		syncParameterText();
+	}
+}
+
+void ManageVSTEffectView::syncParameterText()
+{
+	m_effect->m_plugin->loadParameterLabels();
+	m_effect->m_plugin->loadParameterDisplays();
+
+	QString paramLabelStr   = m_effect->m_plugin->allParameterLabels();
+	QString paramDisplayStr = m_effect->m_plugin->allParameterDisplays();
+
+	QStringList paramLabelList;
+	QStringList paramDisplayList;
+
+	for( int i = 0; i < paramLabelStr.size(); )
+	{
+		const int length = paramLabelStr[i].digitValue();
+		paramLabelList.append(paramLabelStr.mid(i + 1, length));
+		i += length + 1;
+	}
+
+	for( int i = 0; i < paramDisplayStr.size(); )
+	{
+		const int length = paramDisplayStr[i].digitValue();
+		paramDisplayList.append(paramDisplayStr.mid(i + 1, length));
+		i += length + 1;
+	}
+
+	for( int i = 0; i < paramLabelList.size(); ++i )
+	{
+		vstKnobs[i]->setValueText(paramDisplayList[i] + ' ' + paramLabelList[i]);
 	}
 }
 
 
 
-
-manageVSTEffectView::~manageVSTEffectView()
+ManageVSTEffectView::~ManageVSTEffectView()
 {
-	if( m_vi2->knobFModel != NULL )
+	if( m_vi2->knobFModel != nullptr )
 	{ 
 		for( int i = 0; i < m_vi2->paramCount; i++ )
 		{
@@ -493,41 +542,40 @@ manageVSTEffectView::~manageVSTEffectView()
 		}
 	}
 
-	if( vstKnobs != NULL )
+	if( vstKnobs != nullptr )
 	{
 		delete [] vstKnobs;
-		vstKnobs = NULL;
+		vstKnobs = nullptr;
 	}
 
-	if( m_vi2->knobFModel != NULL )
+	if( m_vi2->knobFModel != nullptr )
 	{
 		delete [] m_vi2->knobFModel;
-		m_vi2->knobFModel = NULL;
+		m_vi2->knobFModel = nullptr;
 	}
  
-	if( m_vi2->m_scrollArea != NULL )
+	if( m_vi2->m_scrollArea != nullptr )
 	{
 		delete m_vi2->m_scrollArea;
-		m_vi2->m_scrollArea = NULL;
+		m_vi2->m_scrollArea = nullptr;
 	}
  
-	if( m_vi2->m_subWindow != NULL )
+	if( m_vi2->m_subWindow != nullptr )
 	{
 		m_vi2->m_subWindow->setAttribute( Qt::WA_DeleteOnClose );
 		m_vi2->m_subWindow->close();
  
-		if( m_vi2->m_subWindow != NULL )
+		if( m_vi2->m_subWindow != nullptr )
 		{
 			delete m_vi2->m_subWindow;
 		}
-		m_vi2->m_subWindow = NULL;
+		m_vi2->m_subWindow = nullptr;
 	}
 	//delete m_vi2->m_subWindow;
 	//m_vi2->m_subWindow = NULL;
 }
 
 
+} // namespace gui
 
-
-
-
+} // namespace lmms

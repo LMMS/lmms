@@ -22,23 +22,25 @@
  *
  */
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "DelayControls.h"
 #include "DelayEffect.h"
 #include "Engine.h"
-#include "Song.h"
+
+namespace lmms
+{
 
 DelayControls::DelayControls( DelayEffect* effect ):
 	EffectControls( effect ),
 	m_effect ( effect ),
-	m_delayTimeModel( 0.5, 0.01, 5.0, 0.0001, 5000.0, this, tr( "Delay Samples" )) ,
+	m_delayTimeModel( 0.5, 0.01, 5.0, 0.0001, 5000.0, this, tr( "Delay samples" )) ,
 	m_feedbackModel(0.0f,0.0f,1.0f,0.01f,this,tr( "Feedback" ) ),
-	m_lfoTimeModel(2.0, 0.01, 5.0, 0.0001, 20000.0, this, tr( "Lfo Frequency" ) ),
-	m_lfoAmountModel(0.0, 0.0, 0.5, 0.0001, 2000.0, this, tr ( "Lfo Amount" ) ),
+	m_lfoTimeModel(2.0, 0.01, 5.0, 0.0001, 20000.0, this, tr( "LFO frequency" ) ),
+	m_lfoAmountModel(0.0, 0.0, 0.5, 0.0001, 2000.0, this, tr ( "LFO amount" ) ),
 	m_outGainModel( 0.0, -60.0, 20.0, 0.01, this, tr( "Output gain" ) )
 {
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( changeSampleRate() ) );
+	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( changeSampleRate() ) );
 	m_outPeakL = 0.0;
 	m_outPeakR = 0.0;
 }
@@ -73,3 +75,6 @@ void DelayControls::changeSampleRate()
 {
 	m_effect->changeSampleRate();
 }
+
+
+} // namespace lmms
