@@ -24,20 +24,22 @@
  */
 
 
-#ifndef _WAVESHAPER_H
-#define _WAVESHAPER_H
+#ifndef WAVESHAPER2_H
+#define WAVESHAPER2_H
 
 #include "Effect.h"
-#include "waveshaper2_controls.h"
+#include "WaveShaper2Controls.h"
 
 
+namespace lmms
+{
 
-class waveShaper2Effect : public Effect
+class WaveShaper2Effect : public Effect
 {
 public:
-	waveShaper2Effect( Model * _parent,
+	WaveShaper2Effect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key );
-	virtual ~waveShaper2Effect();
+	virtual ~WaveShaper2Effect();
 	virtual bool processAudioBuffer( sampleFrame * _buf,
 							const fpp_t _frames );
 
@@ -49,13 +51,13 @@ public:
 
 private:
 
-	waveShaper2Controls m_wsControls;
+	WaveShaper2Controls m_wsControls;
 
-	friend class waveShaper2Controls;
+	friend class WaveShaper2Controls;
 
 } ;
 
-
+} // namespace lmms
 
 
 

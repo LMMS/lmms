@@ -26,16 +26,22 @@
 // https://github.com/SecondFlight/lmms/wiki/VectorGraph
 
 #include <QMouseEvent>
+#include <QPainterPath>
 
 #include "VectorGraph.h"
 #include "lmms_math.h"
 #include "CaptionMenu.h"
 
+namespace lmms
+{
+
+namespace gui
+{
+
 VectorGraph::VectorGraph( QWidget * _parent, int _width, int _height ) :
 	QWidget( _parent ),
 	ModelView(new VectorGraphModel(NULL, true), this)
 {
-
 	resize( _width, _height );
 
 	m_width = _width;
@@ -413,17 +419,20 @@ void VectorGraph::setLastModifiedPoint(int pointIndex)
 	model()->setLastModifiedTensionType(point->tensionType());
 }
 
+} // namespace gui
 
-VectorGraphModel::VectorGraphModel(::Model * _parent, bool _default_constructed):
+
+
+VectorGraphModel::VectorGraphModel(Model * _parent, bool _default_constructed):
 	Model(_parent, tr("VectorGraph"), _default_constructed)
 {
 	m_points = QVector<VectorGraphPoint>();
 
-	auto firstPoint = VectorGraphPoint(0, 0, 0, VectorGraph::TensionType::SingleCurve);
+	auto firstPoint = VectorGraphPoint(0, 0, 0, gui::VectorGraph::TensionType::SingleCurve);
 	firstPoint.permaLockX();
 	firstPoint.setDeletable(false);
 	m_points.append(firstPoint);
-	auto finalPoint = VectorGraphPoint(1, 1, 0, VectorGraph::TensionType::SingleCurve);
+	auto finalPoint = VectorGraphPoint(1, 1, 0, gui::VectorGraph::TensionType::SingleCurve);
 	finalPoint.permaLockX();
 	finalPoint.setDeletable(false);
 	m_points.append(finalPoint);
@@ -431,7 +440,7 @@ VectorGraphModel::VectorGraphModel(::Model * _parent, bool _default_constructed)
 	m_currentDraggedPoint = -1;
 	m_currentDraggedTensionHandle = -1;
 	m_lastModifiedTension = 0;
-	m_lastModifiedTensionType = VectorGraph::TensionType::SingleCurve;
+	m_lastModifiedTensionType = gui::VectorGraph::TensionType::SingleCurve;
 	m_gridEnabled = true;
 	m_numGridLines = 12;
 	m_gridSnapEnabled = false;
@@ -472,15 +481,15 @@ float VectorGraphModel::calculateSectionSample(float input, int sectionStartInde
 	}
 
 	VectorGraphPoint * point = getPoint(sectionStartIndex + 1);
-	if (point->getTensionType() == VectorGraph::TensionType::Hold)
+	if (point->getTensionType() == gui::VectorGraph::TensionType::Hold)
 	{
 		return 0;
 	}
-	else if (point->getTensionType() == VectorGraph::TensionType::SingleCurve)
+	else if (point->getTensionType() == gui::VectorGraph::TensionType::SingleCurve)
 	{
 		return CalculateSingleCurve(input, point);
 	}
-	else if (point->getTensionType() == VectorGraph::TensionType::DoubleCurve)
+	else if (point->getTensionType() == gui::VectorGraph::TensionType::DoubleCurve)
 	{
 		if (input < 0.5)
 		{
@@ -499,7 +508,7 @@ float VectorGraphModel::calculateSectionSample(float input, int sectionStartInde
 			return result * 0.5 + 0.5;
 		}
 	}
-	else if (point->getTensionType() == VectorGraph::TensionType::Stairs)
+	else if (point->getTensionType() == gui::VectorGraph::TensionType::Stairs)
 	{
 		// maybe make this one keep the tension from going below 0
 		// also maybe make this one discrete instead of continuous
@@ -509,11 +518,11 @@ float VectorGraphModel::calculateSectionSample(float input, int sectionStartInde
 		float output = scaledInput * 1.0 / (scalar);
 		return output;
 	}
-	else if (point->getTensionType() == VectorGraph::TensionType::Pulse)
+	else if (point->getTensionType() == gui::VectorGraph::TensionType::Pulse)
 	{
 		return ((int) (input * (int) ((point->tension() + 1.05) * 50))) % 2;
 	}
-	else if (point->getTensionType() == VectorGraph::TensionType::Wave)
+	else if (point->getTensionType() == gui::VectorGraph::TensionType::Wave)
 	{
 		// triangle case
 		if (point->tension() > 0)
@@ -691,16 +700,16 @@ int VectorGraphModel::getPointIndexFromTensionHandleCoords(int x, int y, int can
 	{
 		VectorGraphPoint * startPoint = getPoint(i - 1);
 		VectorGraphPoint * endPoint = getPoint(i);
-		if (endPoint->tensionType() == VectorGraph::TensionType::Hold)
+		if (endPoint->tensionType() == gui::VectorGraph::TensionType::Hold)
 			return -1;
 
 		float tensionHandleCenterX;
 		float tensionHandleCenterY;
 
-		if (endPoint->tensionType() == VectorGraph::TensionType::DoubleCurve ||
-				 endPoint->tensionType() == VectorGraph::TensionType::Pulse ||
-				 endPoint->tensionType() == VectorGraph::TensionType::Stairs ||
-				 endPoint->tensionType() == VectorGraph::TensionType::Wave)
+		if (endPoint->tensionType() == gui::VectorGraph::TensionType::DoubleCurve ||
+				 endPoint->tensionType() == gui::VectorGraph::TensionType::Pulse ||
+				 endPoint->tensionType() == gui::VectorGraph::TensionType::Stairs ||
+				 endPoint->tensionType() == gui::VectorGraph::TensionType::Wave)
 		{
 			tensionHandleCenterX = ((startPoint->x() + endPoint->x())/2) * canvasWidth;
 			tensionHandleCenterY = ((startPoint->y() + endPoint->y())/2) * canvasHeight;
@@ -723,7 +732,7 @@ void VectorGraphModel::deletePoint(int index)
 	m_points.removeAt(index);
 }
 
-void VectorGraphModel::setTensionTypeOnPoint(int index, VectorGraph::TensionType type)
+void VectorGraphModel::setTensionTypeOnPoint(int index, gui::VectorGraph::TensionType type)
 {
 	getPoint(index)->setTensionType(type);
 }
@@ -732,7 +741,7 @@ void VectorGraphModel::setTensionTypeOnPoint(int index, VectorGraph::TensionType
 
 
 
-VectorGraphPoint::VectorGraphPoint(float x, float y, float tension, VectorGraph::TensionType type)
+VectorGraphPoint::VectorGraphPoint(float x, float y, float tension, gui::VectorGraph::TensionType type)
 {
 	m_x = x;
 	m_y = y;
@@ -768,10 +777,12 @@ VectorGraphPoint::VectorGraphPoint()
 	m_x = 0;
 	m_y = 0;
 	setTension(0);
-	m_tensionType = VectorGraph::TensionType::SingleCurve;
+	m_tensionType = gui::VectorGraph::TensionType::SingleCurve;
 	m_isXLocked = false;
 	m_isYLocked = false;
 	m_isXPermaLocked = false;
 	m_isYPermaLocked = false;
 	m_canBeDeleted = true;
 }
+
+} // namespace lmms

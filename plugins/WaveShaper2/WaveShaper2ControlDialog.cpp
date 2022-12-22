@@ -26,18 +26,19 @@
 
 #include <QLayout>
 
-#include "waveshaper2_control_dialog.h"
-#include "waveshaper2_controls.h"
+#include "WaveShaper2ControlDialog.h"
+#include "WaveShaper2Controls.h"
 #include "embed.h"
 //#include "Graph.h"
 #include "VectorGraph.h"
 #include "PixmapButton.h"
-#include "ToolTip.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 
+namespace lmms::gui
+{
 
-waveShaper2ControlDialog::waveShaper2ControlDialog(
-					waveShaper2Controls * _controls ) :
+WaveShaper2ControlDialog::WaveShaper2ControlDialog(
+					WaveShaper2Controls * _controls ) :
 	EffectControlDialog( _controls )
 {
 	setAutoFillBackground( true );
@@ -74,6 +75,8 @@ waveShaper2ControlDialog::waveShaper2ControlDialog(
 							tr( "Clip input" ), LedCheckBox::Green );
 	clipInputToggle -> move( 131, 252 );
 	clipInputToggle -> setModel( &_controls -> m_clipModel );
-	ToolTip::add( clipInputToggle, tr( "Clip input signal to 0dB" ) );
+	clipInputToggle->setToolTip( tr( "Clip input signal to 0dB" ) );
 }
+
+} // namespace lmms::gui
 

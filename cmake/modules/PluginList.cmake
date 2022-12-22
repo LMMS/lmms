@@ -67,7 +67,7 @@ SET(LMMS_PLUGIN_LIST
 	VstEffect
 	Watsyn
 	WaveShaper
-	waveshaper2
+	WaveShaper2
 	Vectorscope
 	Vibed
 	Xpressive

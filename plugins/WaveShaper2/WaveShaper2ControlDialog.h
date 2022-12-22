@@ -23,27 +23,33 @@
  *
  */
 
-#ifndef _WAVESHAPER_CONTROL_DIALOG_H
-#define _WAVESHAPER_CONTROL_DIALOG_H
+#ifndef WAVESHAPER2_CONTROL_DIALOG_H
+#define WAVESHAPER2_CONTROL_DIALOG_H
 
 #include "EffectControlDialog.h"
 #include "VectorGraph.h"
 
+namespace lmms
+{
+class WaveShaper2Controls;
+} // namespace lmms
 
-class waveShaper2Controls;
+namespace lmms::gui
+{
 
-
-class waveShaper2ControlDialog : public EffectControlDialog
+class WaveShaper2ControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	waveShaper2ControlDialog( waveShaper2Controls * _controls );
-	virtual ~waveShaper2ControlDialog()
+	WaveShaper2ControlDialog( WaveShaper2Controls * _controls );
+	virtual ~WaveShaper2ControlDialog()
 	{
 	}
 
 
 private:
 } ;
+
+} // namespace lmms::gui
 
 #endif

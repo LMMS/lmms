@@ -24,19 +24,24 @@
  *
  */
 
+#include "plugin_export.h"
 
-#include "waveshaper2.h"
+#include "WaveShaper2.h"
 #include "lmms_math.h"
 #include "embed.h"
 #include "interpolation.h"
 
+
+
+namespace lmms
+{
 
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT waveshaper2_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Waveshaper 2",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
 				"plugin for waveshaping" ),
@@ -51,8 +56,7 @@ Plugin::Descriptor PLUGIN_EXPORT waveshaper2_plugin_descriptor =
 }
 
 
-
-waveShaper2Effect::waveShaper2Effect( Model * _parent,
+WaveShaper2Effect::WaveShaper2Effect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
 	Effect( &waveshaper2_plugin_descriptor, _parent, _key ),
 	m_wsControls( this )
@@ -62,14 +66,14 @@ waveShaper2Effect::waveShaper2Effect( Model * _parent,
 
 
 
-waveShaper2Effect::~waveShaper2Effect()
+WaveShaper2Effect::~WaveShaper2Effect()
 {
 }
 
 
 
 
-bool waveShaper2Effect::processAudioBuffer( sampleFrame * _buf,
+bool WaveShaper2Effect::processAudioBuffer( sampleFrame * _buf,
 							const fpp_t _frames )
 {
 	if( !isEnabled() || !isRunning () )
@@ -148,17 +152,18 @@ bool waveShaper2Effect::processAudioBuffer( sampleFrame * _buf,
 
 
 
-
 extern "C"
 {
 
 // necessary for getting instance out of shared lib
 PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * _parent, void * _data )
 {
-	return( new waveShaper2Effect( _parent,
+	return( new WaveShaper2Effect( _parent,
 		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(
 								_data ) ) );
 }
 
 }
+
+} // namespace lmms
 

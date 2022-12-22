@@ -26,8 +26,8 @@
 
 #include <QDomElement>
 
-#include "waveshaper2_controls.h"
-#include "waveshaper2.h"
+#include "WaveShaper2Controls.h"
+#include "WaveShaper2.h"
 #include "base64.h"
 #include "Graph.h"
 #include "Engine.h"
@@ -36,7 +36,10 @@
 
 #define onedB 1.1220184543019633f
 
-waveShaper2Controls::waveShaper2Controls( waveShaper2Effect * _eff ) :
+namespace lmms
+{
+
+WaveShaper2Controls::WaveShaper2Controls( WaveShaper2Effect * _eff ) :
 	EffectControls( _eff ),
 	m_effect( _eff ),
 	m_inputModel( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Input gain" ) ),
@@ -49,7 +52,7 @@ waveShaper2Controls::waveShaper2Controls( waveShaper2Effect * _eff ) :
 
 
 
-void waveShaper2Controls::loadSettings( const QDomElement & _this )
+void WaveShaper2Controls::loadSettings( const QDomElement & _this )
 {
 //load input, output knobs
 	m_inputModel.loadSettings( _this, "inputGain" );
@@ -61,7 +64,7 @@ void waveShaper2Controls::loadSettings( const QDomElement & _this )
 
 
 
-void waveShaper2Controls::saveSettings( QDomDocument & _doc,
+void WaveShaper2Controls::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
 //save input, output knobs
@@ -73,7 +76,9 @@ void waveShaper2Controls::saveSettings( QDomDocument & _doc,
 }
 
 
-void waveShaper2Controls::setDefaultShape()
+void WaveShaper2Controls::setDefaultShape()
 {
 	//
 }
+
+} // namespace lmms

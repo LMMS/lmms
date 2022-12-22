@@ -23,23 +23,26 @@
  *
  */
 
-#ifndef WAVESHAPER_CONTROLS_H
-#define WAVESHAPER_CONTROLS_H
+#ifndef WAVESHAPER2_CONTROLS_H
+#define WAVESHAPER2_CONTROLS_H
 
 #include "EffectControls.h"
-#include "waveshaper2_control_dialog.h"
+#include "WaveShaper2ControlDialog.h"
 #include "Knob.h"
 #include "Graph.h"
 
-class waveShaper2Effect;
+namespace lmms
+{
+
+class WaveShaper2Effect;
 
 
-class waveShaper2Controls : public EffectControls
+class WaveShaper2Controls : public EffectControls
 {
 	Q_OBJECT
 public:
-	waveShaper2Controls( waveShaper2Effect * _eff );
-	virtual ~waveShaper2Controls()
+	WaveShaper2Controls( WaveShaper2Effect * _eff );
+	virtual ~WaveShaper2Controls()
 	{
 	}
 
@@ -57,21 +60,23 @@ public:
 		return( 4 );
 	}
 
-	virtual EffectControlDialog * createView()
+	virtual gui::EffectControlDialog * createView()
 	{
-		return( new waveShaper2ControlDialog( this ) );
+		return( new gui::WaveShaper2ControlDialog( this ) );
 	}
 
 private:
-	waveShaper2Effect * m_effect;
+	WaveShaper2Effect * m_effect;
 	FloatModel m_inputModel;
 	FloatModel m_outputModel;
 	VectorGraphModel m_vectorGraphModel;
 	BoolModel  m_clipModel;
 
-	friend class waveShaper2ControlDialog;
-	friend class waveShaper2Effect;
+	friend class gui::WaveShaper2ControlDialog;
+	friend class WaveShaper2Effect;
 
 } ;
+
+} // namespace lmms
 
 #endif
