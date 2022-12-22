@@ -68,17 +68,20 @@ namespace lmms::gui
 
         m_channelNumberLcd = new LcdWidget{2, this};
         m_channelNumberLcd->setValue(channelIndex);
+        retainSizeWhenHidden(m_channelNumberLcd);
 
         const auto mixerChannel = Engine::mixer()->mixerChannel(channelIndex);
         const auto mixerName = mixerChannel->m_name;
     	setToolTip(mixerName);
 
         m_renameLineEdit = new QLineEdit{};
+        m_renameLineEdit->setStyleSheet("border-style: none; background: transparent;");
         m_renameLineEdit->setText(mixerName);
+        m_renameLineEdit->setFixedWidth(65);
         m_renameLineEdit->setFont(pointSizeF(font(), 7.5f));
     	m_renameLineEdit->installEventFilter(this);
 
-        auto renameLineEditScene = new QGraphicsScene{};        
+        auto renameLineEditScene = new QGraphicsScene{};
         m_renameLineEditView = new QGraphicsView{};
         m_renameLineEditView->setStyleSheet("border-style: none; background: transparent;");
         m_renameLineEditView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -130,7 +133,6 @@ namespace lmms::gui
         mainLayout->addWidget(m_channelNumberLcd, 0, Qt::AlignHCenter);
         mainLayout->addStretch();
         mainLayout->addWidget(m_renameLineEditView, 0, Qt::AlignHCenter);
-        mainLayout->addStretch();
         mainLayout->addWidget(m_soloButton, 0, Qt::AlignHCenter);
         mainLayout->addWidget(m_muteButton, 0, Qt::AlignHCenter);
         mainLayout->addWidget(m_fader, 0, Qt::AlignHCenter);
