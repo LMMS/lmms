@@ -1,7 +1,7 @@
 # Attempt to find libigg using PkgConfig
 find_package(PkgConfig QUIET)
 if(PKG_CONFIG_FOUND)
-	pkg_check_modules(LIBGIG_PKG gig libgig libgig::libgig)
+	pkg_check_modules(LIBGIG_PKG gig)
 endif()
 
 if(WIN32)
@@ -16,11 +16,11 @@ endif()
 # Find the library and headers using the results from PkgConfig as a guide
 find_path(LIBGIG_INCLUDE_DIR
 	NAMES gig.h
-	PATHS ${LIBGIG_PKG_INCLUDE_DIRS} ${libgig_Include_Path} "${libgig_Include_Path}/libgig"
+	PATHS ${LIBGIG_PKG_INCLUDE_DIRS} "${libgig_Include_Path}/libgig"
 )
 
 find_library(LIBGIG_LIBRARY
-	NAMES gig libgig
+	NAMES gig
 	PATHS ${LIBGIG_PKG_LIBRARY_DIRS} ${libgig_Path}
 )
 
