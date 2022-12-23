@@ -89,7 +89,7 @@ const std::vector<ProjectVersion> DataFile::UPGRADE_VERSIONS = {
 	"1.2.0-rc3"        ,   "1.3.0"
 };
 
-namespace 
+namespace
 {
 	struct TypeDescStruct
 	{

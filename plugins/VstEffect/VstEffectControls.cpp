@@ -173,7 +173,7 @@ void VstEffectControls::managePlugin()
 		auto tt = new gui::ManageVSTEffectView(m_effect, this);
 		ctrHandle = (QObject *)tt;
 	} else if (m_subWindow != nullptr) {
-		if (m_subWindow->widget()->isVisible() == false ) { 
+		if (m_subWindow->widget()->isVisible() == false ) {
 			m_scrollArea->show();
 			m_subWindow->show();
 		} else {
@@ -477,7 +477,7 @@ void ManageVSTEffectView::displayAutomatedOnly()
 			{
 				vstKnobs[ i ]->hide();
 				m_displayAutomatedOnly->setText( "All" );
-			} else {	
+			} else {
 				vstKnobs[ i ]->show();
 				m_displayAutomatedOnly->setText( "Automated" );
 			}
@@ -534,7 +534,7 @@ void ManageVSTEffectView::syncParameterText()
 ManageVSTEffectView::~ManageVSTEffectView()
 {
 	if( m_vi2->knobFModel != nullptr )
-	{ 
+	{
 		for( int i = 0; i < m_vi2->paramCount; i++ )
 		{
 			delete m_vi2->knobFModel[ i ];
@@ -553,18 +553,18 @@ ManageVSTEffectView::~ManageVSTEffectView()
 		delete [] m_vi2->knobFModel;
 		m_vi2->knobFModel = nullptr;
 	}
- 
+
 	if( m_vi2->m_scrollArea != nullptr )
 	{
 		delete m_vi2->m_scrollArea;
 		m_vi2->m_scrollArea = nullptr;
 	}
- 
+
 	if( m_vi2->m_subWindow != nullptr )
 	{
 		m_vi2->m_subWindow->setAttribute( Qt::WA_DeleteOnClose );
 		m_vi2->m_subWindow->close();
- 
+
 		if( m_vi2->m_subWindow != nullptr )
 		{
 			delete m_vi2->m_subWindow;

@@ -74,7 +74,7 @@ bool AmplifierEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	double outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
-	
+
 	const ValueBuffer * volBuf = m_ampControls.m_volumeModel.valueBuffer();
 	const ValueBuffer * panBuf = m_ampControls.m_panModel.valueBuffer();
 	const ValueBuffer * leftBuf = m_ampControls.m_leftModel.valueBuffer();
@@ -83,7 +83,7 @@ bool AmplifierEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	for( fpp_t f = 0; f < frames; ++f )
 	{
 //		qDebug( "offset %d, value %f", f, m_ampControls.m_volumeModel.value( f ) );
-	
+
 		auto s = std::array{buf[f][0], buf[f][1]};
 
 		// vol knob
@@ -99,8 +99,8 @@ bool AmplifierEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 		}
 
 		// convert pan values to left/right values
-		const float pan = panBuf 
-			? panBuf->value( f ) 
+		const float pan = panBuf
+			? panBuf->value( f )
 			: m_ampControls.m_panModel.value();
 		const float left1 = pan <= 0
 			? 1.0
@@ -111,12 +111,12 @@ bool AmplifierEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 
 		// second stage amplification
 		const float left2 = leftBuf
-			? leftBuf->value( f ) 
+			? leftBuf->value( f )
 			: m_ampControls.m_leftModel.value();
 		const float right2 = rightBuf
-			? rightBuf->value( f ) 
+			? rightBuf->value( f )
 			: m_ampControls.m_rightModel.value();
-			
+
 		s[0] *= left1 * left2 * 0.01;
 		s[1] *= right1 * right2 * 0.01;
 

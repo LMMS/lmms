@@ -526,14 +526,14 @@ ExprFront::ExprFront(const char * expr, int last_func_samples)
 	try
 	{
 		m_data = new ExprFrontData(last_func_samples);
-	
+
 		m_data->m_expression_string = expr;
 		m_data->m_symbol_table.add_pi();
-	
+
 		m_data->m_symbol_table.add_constant("e", F_E);
 
 		m_data->m_symbol_table.add_constant("seed", SimpleRandom::generator() & max_float_integer_mask);
-	
+
 		m_data->m_symbol_table.add_function("sinew", sin_wave_func);
 		m_data->m_symbol_table.add_function("squarew", square_wave_func);
 		m_data->m_symbol_table.add_function("trianglew", triangle_wave_func);
@@ -577,7 +577,7 @@ bool ExprFront::compile()
 		sstore.disable_all_assignment_ops();
 		sstore.disable_all_control_structures();
 		parser_t parser(sstore);
-	
+
 		m_valid=parser.compile(m_data->m_expression_string, m_data->m_expression);
 	}
 	catch(...)
@@ -600,7 +600,7 @@ float ExprFront::evaluate()
 		WARN_EXPRTK;
 	}
 	return 0;
-	
+
 }
 bool ExprFront::add_variable(const char* name, float& ref)
 {
@@ -757,7 +757,7 @@ void ExprSynth::renderOutput(fpp_t frames, sampleFrame *buf)
 		const float new_freq = m_nph->frequency();
 		const float freq_inc = (new_freq - m_frequency) / frames;
 		const bool is_released = m_nph->isReleased();
-	
+
 		expression_t *o1_rawExpr = &(m_exprO1->getData()->m_expression);
 		expression_t *o2_rawExpr = &(m_exprO2->getData()->m_expression);
 		LastSampleFunction<float> * last_func1 = &m_exprO1->getData()->m_last_func;
@@ -791,7 +791,7 @@ void ExprSynth::renderOutput(fpp_t frames, sampleFrame *buf)
 		}
 		else
 		{
-			
+
 			if (o2_valid)
 			{
 				o1_rawExpr = o2_rawExpr;

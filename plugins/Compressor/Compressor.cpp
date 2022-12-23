@@ -276,7 +276,7 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	float rOutPeak = 0.0;
 	float lInPeak = 0.0;
 	float rInPeak = 0.0;
-	
+
 	const bool midside = m_compressorControls.m_midsideModel.value();
 	const bool peakmode = m_compressorControls.m_peakmodeModel.value();
 	const float inBalance = m_compressorControls.m_inBalanceModel.value();
@@ -526,7 +526,7 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		}
 
 		auto delayedDrySignal = std::array{s[0], s[1]};
-		
+
 		if (midside)// Convert left/right to mid/side
 		{
 			const float temp = s[0];

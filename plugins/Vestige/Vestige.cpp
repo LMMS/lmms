@@ -938,7 +938,7 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 	using ::operator|;
 
 #endif
-	
+
 	m_vi = m_vi2;
 	m_vi->m_scrollArea = new QScrollArea( this );
 	widget = new QWidget(this);

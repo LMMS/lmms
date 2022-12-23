@@ -62,7 +62,7 @@ ReverbSCEffect::ReverbSCEffect( Model* parent, const Descriptor::SubPluginFeatur
 
 	sp_dcblock_create(&dcblk[0]);
 	sp_dcblock_create(&dcblk[1]);
-	
+
 	sp_dcblock_init(sp, dcblk[0], Engine::audioEngine()->currentQualitySettings().sampleRateMultiplier() );
 	sp_dcblock_init(sp, dcblk[1], Engine::audioEngine()->currentQualitySettings().sampleRateMultiplier() );
 }
@@ -88,7 +88,7 @@ bool ReverbSCEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 
 	SPFLOAT tmpL, tmpR;
 	SPFLOAT dcblkL, dcblkR;
-	
+
 	ValueBuffer * inGainBuf = m_reverbSCControls.m_inputGainModel.valueBuffer();
 	ValueBuffer * sizeBuf = m_reverbSCControls.m_sizeModel.valueBuffer();
 	ValueBuffer * colorBuf = m_reverbSCControls.m_colorModel.valueBuffer();
@@ -105,12 +105,12 @@ bool ReverbSCEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 
 		s[0] *= inGain;
 		s[1] *= inGain;
-		revsc->feedback = (SPFLOAT)(sizeBuf ? 
-			sizeBuf->values()[f] 
+		revsc->feedback = (SPFLOAT)(sizeBuf ?
+			sizeBuf->values()[f]
 			: m_reverbSCControls.m_sizeModel.value());
 
-		revsc->lpfreq = (SPFLOAT)(colorBuf ? 
-			colorBuf->values()[f] 
+		revsc->lpfreq = (SPFLOAT)(colorBuf ?
+			colorBuf->values()[f]
 			: m_reverbSCControls.m_colorModel.value());
 
 
@@ -128,7 +128,7 @@ bool ReverbSCEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 
 	return isRunning();
 }
-	
+
 void ReverbSCEffect::changeSampleRate()
 {
 	// Change sr variable in Soundpipe. does not need to be destroyed
@@ -144,7 +144,7 @@ void ReverbSCEffect::changeSampleRate()
 
 	sp_dcblock_create(&dcblk[0]);
 	sp_dcblock_create(&dcblk[1]);
-	
+
 	sp_dcblock_init(sp, dcblk[0], Engine::audioEngine()->currentQualitySettings().sampleRateMultiplier() );
 	sp_dcblock_init(sp, dcblk[1], Engine::audioEngine()->currentQualitySettings().sampleRateMultiplier() );
 	mutex.unlock();
@@ -156,9 +156,9 @@ extern "C"
 // necessary for getting instance out of shared lib
 PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 {
-	return new ReverbSCEffect( 
-		parent, 
-		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data) 
+	return new ReverbSCEffect(
+		parent,
+		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data)
 	);
 }
 

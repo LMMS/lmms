@@ -69,7 +69,7 @@ void WaveShaperControls::loadSettings( const QDomElement & _this )
 //load input, output knobs
 	m_inputModel.loadSettings( _this, "inputGain" );
 	m_outputModel.loadSettings( _this, "outputGain" );
-	
+
 	m_clipModel.loadSettings( _this, "clipInput" );
 
 //load waveshape

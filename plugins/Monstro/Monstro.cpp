@@ -1694,8 +1694,8 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	m_lfo2WaveBox -> setGeometry( 127, LFOROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
 	m_lfo2WaveBox->setFont( pointSize<8>( m_lfo2WaveBox->font() ) );
 
-	maketsknob(m_lfo2AttKnob, LFOCOL4, LFOROW, tr("Attack"), " ms", "lfoKnob") 
-	maketsknob(m_lfo2RateKnob, LFOCOL5, LFOROW, tr("Rate"), " ms", "lfoKnob") 
+	maketsknob(m_lfo2AttKnob, LFOCOL4, LFOROW, tr("Attack"), " ms", "lfoKnob")
+	maketsknob(m_lfo2RateKnob, LFOCOL5, LFOROW, tr("Rate"), " ms", "lfoKnob")
 	makeknob(m_lfo2PhsKnob, LFOCOL6, LFOROW, tr("Phase"), tr(" deg"), "lfoKnob")
 
 	maketsknob(m_env1PreKnob, KNOBCOL1, E1ROW, tr("Pre-delay"), " ms", "envKnob")

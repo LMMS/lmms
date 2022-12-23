@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008 Csaba Hruska <csaba.hruska/at/gmail.com>
  *                    Attila Herman <attila589/at/gmail.com>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -118,11 +118,11 @@ VoiceObject::VoiceObject( Model * _parent, int _idx ) :
 
 SidInstrument::SidInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &sid_plugin_descriptor ),
-	// filter	
+	// filter
 	m_filterFCModel( 1024.0f, 0.0f, 2047.0f, 1.0f, this, tr( "Cutoff frequency" ) ),
 	m_filterResonanceModel( 8.0f, 0.0f, 15.0f, 1.0f, this, tr( "Resonance" ) ),
 	m_filterModeModel( LowPass, 0, NumFilterTypes-1, this, tr( "Filter type" )),
-	
+
 	// misc
 	m_voice3OffModel( false, this, tr( "Voice 3 off" ) ),
 	m_volumeModel( 15.0f, 0.0f, 15.0f, 1.0f, this, tr( "Volume" ) ),
@@ -167,11 +167,11 @@ void SidInstrument::saveSettings( QDomDocument & _doc,
 										_doc, _this, "test" + is );
 	}
 
-	// filter	
+	// filter
 	m_filterFCModel.saveSettings( _doc, _this, "filterFC" );
 	m_filterResonanceModel.saveSettings( _doc, _this, "filterResonance" );
 	m_filterModeModel.saveSettings( _doc, _this, "filterMode" );
-	
+
 	// misc
 	m_voice3OffModel.saveSettings( _doc, _this, "voice3Off" );
 	m_volumeModel.saveSettings( _doc, _this, "volume" );
@@ -200,12 +200,12 @@ void SidInstrument::loadSettings( const QDomElement & _this )
 		m_voice[i]->m_filteredModel.loadSettings( _this, "filtered" + is );
 		m_voice[i]->m_testModel.loadSettings( _this, "test" + is );
 	}
-	
-	// filter	
+
+	// filter
 	m_filterFCModel.loadSettings( _this, "filterFC" );
 	m_filterResonanceModel.loadSettings( _this, "filterResonance" );
 	m_filterModeModel.loadSettings( _this, "filterMode" );
-	
+
 	// misc
 	m_voice3OffModel.loadSettings( _this, "voice3Off" );
 	m_volumeModel.loadSettings( _this, "volume" );
@@ -354,7 +354,7 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 		sidreg[base+1] = (data16>>8)&0x00FF;
 		// pw
 		data16 = (int)m_voice[i]->m_pulseWidthModel.value();
-		
+
 		sidreg[base+2] = data16&0x00FF;
 		sidreg[base+3] = (data16>>8)&0x000F;
 		// control: wave form, (test), ringmod, sync, gate
@@ -363,7 +363,7 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 		data8 += m_voice[i]->m_ringModModel.value()?4:0;
 		data8 += m_voice[i]->m_testModel.value()?8:0;
 		switch( m_voice[i]->m_waveFormModel.value() )
-		{	
+		{
 			default: break;
 			case VoiceObject::NoiseWave:	data8 += 128; break;
 			case VoiceObject::SquareWave:	data8 += 64; break;
@@ -394,7 +394,7 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 	data16 = (int)m_filterFCModel.value();
 	sidreg[21] = data16&0x0007;
 	sidreg[22] = (data16>>3)&0x00FF;
-	
+
 	// res, filt ex,3,2,1
 	data16 = (int)m_filterResonanceModel.value();
 	data8 = (data16&0x000F)<<4;
@@ -409,7 +409,7 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 	data8 += m_voice3OffModel.value()?128:0;
 
 	switch( m_filterModeModel.value() )
-	{	
+	{
 		default: break;
 		case LowPass:	data8 += 16; break;
 		case BandPass:	data8 += 32; break;
@@ -417,7 +417,7 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 	}
 
 	sidreg[24] = data8&0x00FF;
-		
+
 	int num = sid_fillbuffer(sidreg.data(), sid, delta_t, buf, frames);
 	if(num!=frames)
 		printf("!!!Not enough samples\n");
@@ -544,7 +544,7 @@ SidInstrumentView::SidInstrumentView( Instrument * _instrument,
 	m_sidTypeBtnGrp->addButton( mos6581_btn );
 	m_sidTypeBtnGrp->addButton( mos8580_btn );
 
-	for( int i = 0; i < 3; i++ ) 
+	for( int i = 0; i < 3; i++ )
 	{
 		Knob *ak = new sidKnob( this );
 		ak->setHintText( tr("Attack:"), "" );
@@ -674,7 +674,7 @@ void SidInstrumentView::updateKnobHint()
 				m_releaseModel.value()] )  + ")" );
 		m_voiceKnobs[i].m_relKnob->setToolTip(
 						decRelTime[(int)k->m_voice[i]->m_releaseModel.value()]);
-	
+
 		m_voiceKnobs[i].m_pwKnob->setHintText( tr( "Pulse width:" )+ " ", " (" +
 				QString::number(  (double)k->m_voice[i]->
 				m_pulseWidthModel.value() / 40.95 ) + "%)" );
@@ -758,7 +758,7 @@ void SidInstrumentView::modelChanged()
 		connect(&voice->m_sustainModel, SIGNAL(dataChanged()), this, SLOT(updateKnobToolTip()));
 		connect(&voice->m_coarseModel, SIGNAL(dataChanged()), this, SLOT(updateKnobToolTip()));
 	}
-	
+
 	connect( &k->m_volumeModel, SIGNAL( dataChanged() ),
 		this, SLOT( updateKnobToolTip() ) );
 	connect( &k->m_filterResonanceModel, SIGNAL( dataChanged() ),
