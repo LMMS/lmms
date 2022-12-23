@@ -43,7 +43,7 @@
 
 namespace lmms::gui
 {
-    MixerChannelView::MixerChannelView(int channelIndex, MixerView* mixerView, QWidget* parent) : 
+    MixerChannelView::MixerChannelView(int channelIndex, MixerView* mixerView, QWidget* parent) :
         QWidget(parent),
         m_mixerView(mixerView),
         m_channelIndex(channelIndex)
@@ -53,16 +53,16 @@ namespace lmms::gui
         setFixedWidth(MIXER_CHANNEL_WIDTH);
         setMinimumHeight(MIXER_CHANNEL_HEIGHT);
 
-        auto retainSizeWhenHidden = [](QWidget* widget) 
+        auto retainSizeWhenHidden = [](QWidget* widget)
         {
             auto sizePolicy = widget->sizePolicy();
             sizePolicy.setRetainSizeWhenHidden(true);
             widget->setSizePolicy(sizePolicy);
         };
 
-        m_sendButton = new SendButtonIndicator{this, this, mixerView}; 
+        m_sendButton = new SendButtonIndicator{this, this, mixerView};
         retainSizeWhenHidden(m_sendButton);
-        
+
         m_sendKnob = new Knob{knobBright_26, this, tr("Channel send amount")};
         retainSizeWhenHidden(m_sendKnob);
 
@@ -88,7 +88,7 @@ namespace lmms::gui
         m_renameLineEditView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         m_renameLineEditView->setAttribute(Qt::WA_TransparentForMouseEvents, true);
         m_renameLineEditView->setScene(renameLineEditScene);
-        
+
         auto renameLineEditProxy = renameLineEditScene->addWidget(m_renameLineEdit);
         renameLineEditProxy->setRotation(-90);
 
@@ -121,7 +121,7 @@ namespace lmms::gui
         m_fader->setLevelsDisplayedInDBFS();
         m_fader->setMinPeak(dbfsToAmp(-42));
         m_fader->setMaxPeak(dbfsToAmp(9));
-        
+
         m_effectRackView = new EffectRackView{&mixerChannel->m_fxChain, mixerView->m_racksWidget};
         m_effectRackView->setFixedSize(EffectRackView::DEFAULT_WIDTH, MIXER_CHANNEL_HEIGHT);
 
@@ -143,7 +143,7 @@ namespace lmms::gui
     void MixerChannelView::contextMenuEvent(QContextMenuEvent*)
     {
         auto contextMenu = new CaptionMenu( Engine::mixer()->mixerChannel( m_channelIndex )->m_name, this );
-        
+
         if (m_channelIndex != 0) // no move-options in master
         {
             contextMenu->addAction(tr("Move &left"), this, &MixerChannelView::moveChannelLeft);
@@ -173,7 +173,7 @@ namespace lmms::gui
         delete contextMenu;
     }
 
-    void MixerChannelView::paintEvent(QPaintEvent* event) 
+    void MixerChannelView::paintEvent(QPaintEvent* event)
     {
         const auto channel = Engine::mixer()->mixerChannel(m_channelIndex);
         const bool muted = channel->m_muteModel.value();
@@ -189,7 +189,7 @@ namespace lmms::gui
         const auto width = rect().width();
         const auto height = rect().height();
         auto painter = QPainter{this};
-        
+
         if (channel->m_hasColor && !muted)
         {
             painter.fillRect(rect(), channel->m_color.darker(isActive ? 120 : 150));
@@ -198,11 +198,11 @@ namespace lmms::gui
         {
             painter.fillRect(rect(), isActive ? backgroundActive().color() : painter.background().color());
         }
-        
+
         // inner border
         painter.setPen(isActive ? strokeInnerActive() : strokeInnerInactive());
         painter.drawRect(1, 1, width - MIXER_CHANNEL_INNER_BORDER_SIZE, height - MIXER_CHANNEL_INNER_BORDER_SIZE);
-        
+
         // outer border
         painter.setPen(isActive ? strokeOuterActive() : strokeOuterInactive());
         painter.drawRect(0, 0, width - MIXER_CHANNEL_OUTER_BORDER_SIZE, height - MIXER_CHANNEL_OUTER_BORDER_SIZE);
@@ -229,20 +229,20 @@ namespace lmms::gui
         QWidget::paintEvent(event);
     }
 
-    void MixerChannelView::mousePressEvent(QMouseEvent*) 
+    void MixerChannelView::mousePressEvent(QMouseEvent*)
     {
         if (m_mixerView->currentMixerChannel() != this)
         {
             m_mixerView->setCurrentMixerChannel(this);
         }
     }
-    
-    void MixerChannelView::mouseDoubleClickEvent(QMouseEvent*) 
+
+    void MixerChannelView::mouseDoubleClickEvent(QMouseEvent*)
     {
         renameChannel();
     }
 
-    bool MixerChannelView::eventFilter(QObject* dist, QEvent* event) 
+    bool MixerChannelView::eventFilter(QObject* dist, QEvent* event)
     {
         // If we are in a rename, capture the enter/return events and handle them
         if (event->type() == QEvent::KeyPress)
@@ -261,12 +261,12 @@ namespace lmms::gui
         return false;
     }
 
-    int MixerChannelView::channelIndex() const 
+    int MixerChannelView::channelIndex() const
     {
         return m_channelIndex;
     }
-    
-    void MixerChannelView::setChannelIndex(int index) 
+
+    void MixerChannelView::setChannelIndex(int index)
     {
         MixerChannel* mixerChannel = Engine::mixer()->mixerChannel(index);
         m_fader->setModel(&mixerChannel->m_volumeModel);
@@ -276,93 +276,93 @@ namespace lmms::gui
         m_channelIndex = index;
     }
 
-    MixerChannelView::SendReceiveState MixerChannelView::sendReceiveState() const 
+    MixerChannelView::SendReceiveState MixerChannelView::sendReceiveState() const
     {
         return m_sendReceiveState;
     }
 
-    void MixerChannelView::setSendReceiveState(const SendReceiveState& state) 
+    void MixerChannelView::setSendReceiveState(const SendReceiveState& state)
     {
         m_sendReceiveState = state;
-        m_sendArrow->setVisible(state == SendReceiveState::SendToThis);        
+        m_sendArrow->setVisible(state == SendReceiveState::SendToThis);
         m_receiveArrow->setVisible(state == SendReceiveState::ReceiveFromThis);
     }
-    
+
     QSize MixerChannelView::sizeHint() const
     {
         return QSize{MIXER_CHANNEL_WIDTH, MIXER_CHANNEL_HEIGHT};
     }
 
-    QBrush MixerChannelView::backgroundActive() const 
+    QBrush MixerChannelView::backgroundActive() const
     {
         return m_backgroundActive;
     }
-    
-    void MixerChannelView::setBackgroundActive(const QBrush & c) 
+
+    void MixerChannelView::setBackgroundActive(const QBrush & c)
     {
         m_backgroundActive = c;
     }
-    
-    QColor MixerChannelView::strokeOuterActive() const 
+
+    QColor MixerChannelView::strokeOuterActive() const
     {
         return m_strokeOuterActive;
     }
 
-    void MixerChannelView::setStrokeOuterActive(const QColor & c) 
+    void MixerChannelView::setStrokeOuterActive(const QColor & c)
     {
         m_strokeOuterActive = c;
     }
 
-    QColor MixerChannelView::strokeOuterInactive() const 
+    QColor MixerChannelView::strokeOuterInactive() const
     {
         return m_strokeOuterInactive;
     }
 
-    void MixerChannelView::setStrokeOuterInactive(const QColor& c) 
+    void MixerChannelView::setStrokeOuterInactive(const QColor& c)
     {
         m_strokeOuterInactive = c;
     }
-    
-    QColor MixerChannelView::strokeInnerActive() const 
+
+    QColor MixerChannelView::strokeInnerActive() const
     {
         return m_strokeInnerActive;
     }
 
-    void MixerChannelView::setStrokeInnerActive(const QColor& c) 
+    void MixerChannelView::setStrokeInnerActive(const QColor& c)
     {
         m_strokeInnerActive = c;
     }
-    
-    QColor MixerChannelView::strokeInnerInactive() const 
+
+    QColor MixerChannelView::strokeInnerInactive() const
     {
         return m_strokeInnerInactive;
     }
 
-    void MixerChannelView::setStrokeInnerInactive(const QColor& c) 
+    void MixerChannelView::setStrokeInnerInactive(const QColor& c)
     {
         m_strokeInnerInactive = c;
     }
 
-    void MixerChannelView::renameChannel() 
+    void MixerChannelView::renameChannel()
     {
         m_inRename = true;
         setToolTip("");
         m_renameLineEdit->setReadOnly(false);
-        
+
         m_channelNumberLcd->hide();
         m_renameLineEdit->setFixedWidth(m_renameLineEdit->width());
         m_renameLineEdit->setText(Engine::mixer()->mixerChannel(m_channelIndex)->m_name);
-        
+
         m_renameLineEditView->setFocus();
         m_renameLineEdit->selectAll();
         m_renameLineEdit->setFocus();
 
     }
 
-    void MixerChannelView::renameFinished() 
+    void MixerChannelView::renameFinished()
     {
         m_inRename = false;
-        
+
         m_renameLineEdit->deselect();
         m_renameLineEdit->setReadOnly(true);
         m_renameLineEdit->setFixedWidth(m_renameLineEdit->width());
@@ -382,26 +382,26 @@ namespace lmms::gui
         setToolTip(mixerChannel->m_name);
     }
 
-    void MixerChannelView::resetColor() 
+    void MixerChannelView::resetColor()
     {
         Engine::mixer()->mixerChannel(m_channelIndex)->m_hasColor = false;
         Engine::getSong()->setModified();
         update();
     }
 
-    void MixerChannelView::selectColor() 
+    void MixerChannelView::selectColor()
     {
         auto channel = Engine::mixer()->mixerChannel(m_channelIndex);
         auto new_color = ColorChooser(this).withPalette(ColorChooser::Palette::Mixer)->getColor(channel->m_color);
-        
+
         if (!new_color.isValid()) { return; }
         channel->setColor(new_color);
-        
+
         Engine::getSong()->setModified();
         update();
     }
 
-    void MixerChannelView::randomizeColor() 
+    void MixerChannelView::randomizeColor()
     {
         auto channel = Engine::mixer()->mixerChannel(m_channelIndex);
         channel->setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[rand() % 48]);
@@ -409,36 +409,36 @@ namespace lmms::gui
         update();
     }
 
-    void MixerChannelView::removeChannel() 
+    void MixerChannelView::removeChannel()
     {
         auto mix = getGUI()->mixerView();
 	    mix->deleteChannel(m_channelIndex);
     }
 
-    void MixerChannelView::removeUnusedChannels() 
+    void MixerChannelView::removeUnusedChannels()
     {
         auto mix = getGUI()->mixerView();
 	    mix->deleteUnusedChannels();
     }
 
-    void MixerChannelView::moveChannelLeft() 
+    void MixerChannelView::moveChannelLeft()
     {
         auto mix = getGUI()->mixerView();
 	    mix->moveChannelLeft(m_channelIndex);
     }
 
-    void MixerChannelView::moveChannelRight() 
+    void MixerChannelView::moveChannelRight()
     {
         auto mix = getGUI()->mixerView();
 	    mix->moveChannelRight(m_channelIndex);
     }
 
-    QString MixerChannelView::elideName(const QString& name) 
+    QString MixerChannelView::elideName(const QString& name)
     {
         const auto maxTextHeight = m_renameLineEdit->width();
         const auto metrics = QFontMetrics{m_renameLineEdit->font()};
         const auto elidedName = metrics.elidedText(name, Qt::ElideRight, maxTextHeight);
         return elidedName;
     }
-    
+
 } // namespace lmms::gui

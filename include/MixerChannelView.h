@@ -38,13 +38,13 @@
 #include <QPixmap>
 #include <QWidget>
 
-namespace lmms::gui 
+namespace lmms::gui
 {
     constexpr int MIXER_CHANNEL_WIDTH = 48;
     constexpr int MIXER_CHANNEL_HEIGHT = 350;
     constexpr int MIXER_CHANNEL_INNER_BORDER_SIZE = 3;
     constexpr int MIXER_CHANNEL_OUTER_BORDER_SIZE = 1;
-    
+
     class MixerChannelView : public QWidget
     {
         Q_OBJECT
@@ -54,7 +54,7 @@ namespace lmms::gui
         Q_PROPERTY(QColor strokeInnerActive READ strokeInnerActive WRITE setStrokeInnerActive)
         Q_PROPERTY(QColor strokeInnerInactive READ strokeInnerInactive WRITE setStrokeInnerInactive)
     public:
-        enum class SendReceiveState 
+        enum class SendReceiveState
         {
             None, SendToThis, ReceiveFromThis
         };
@@ -75,16 +75,16 @@ namespace lmms::gui
 
         QBrush backgroundActive() const;
         void setBackgroundActive(const QBrush & c);
-        
+
         QColor strokeOuterActive() const;
         void setStrokeOuterActive(const QColor & c);
-        
+
         QColor strokeOuterInactive() const;
         void setStrokeOuterInactive(const QColor & c );
-        
+
         QColor strokeInnerActive() const;
         void setStrokeInnerActive(const QColor & c );
-        
+
         QColor strokeInnerInactive() const;
         void setStrokeInnerInactive(const QColor& c);
 
@@ -126,7 +126,7 @@ namespace lmms::gui
         QColor m_strokeOuterInactive;
         QColor m_strokeInnerActive;
         QColor m_strokeInnerInactive;
-        
+
         friend class MixerView;
     };
 } // namespace lmms::gui

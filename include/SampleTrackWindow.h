@@ -21,8 +21,8 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
- 
+
+
 #ifndef SAMPLE_TRACK_WINDOW_H
 #define SAMPLE_TRACK_WINDOW_H
 
@@ -43,7 +43,7 @@ class EffectRackView;
 class Knob;
 class MixerChannelLcdSpinBox;
 class SampleTrackView;
- 
+
 
 class SampleTrackWindow : public QWidget, public ModelView, public SerializingObjectHook
 {

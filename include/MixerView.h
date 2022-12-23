@@ -2,7 +2,7 @@
  * MixerView.h - effect-mixer-view for LMMS
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -93,7 +93,7 @@ public slots:
 
 protected:
 	void closeEvent( QCloseEvent * _ce ) override;
-	
+
 private slots:
 	void updateFaders();
 	void toggledSolo();
@@ -110,7 +110,7 @@ private:
 	QWidget * m_racksWidget;
 
 	void updateMaxChannelSelector();
-	
+
 	friend class MixerChannelView;
 } ;
 
