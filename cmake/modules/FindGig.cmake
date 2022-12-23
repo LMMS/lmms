@@ -20,7 +20,7 @@ find_path(LIBGIG_INCLUDE_DIR
 )
 
 find_library(LIBGIG_LIBRARY
-	NAMES gig
+	NAMES gig libgig
 	PATHS ${LIBGIG_PKG_LIBRARY_DIRS} ${libgig_Path}
 )
 
