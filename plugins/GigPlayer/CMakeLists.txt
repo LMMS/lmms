@@ -2,12 +2,6 @@ if(LMMS_HAVE_GIG)
 	INCLUDE(BuildPlugin)
 	INCLUDE_DIRECTORIES(${GIG_INCLUDE_DIRS})
 
-	# Required for not crashing loading files with libgig
-	if(NOT MSVC)
-		SET(GCC_COVERAGE_COMPILE_FLAGS "-fexceptions")
-		add_definitions(${GCC_COVERAGE_COMPILE_FLAGS})
-	endif(NOT MSVC)
-
 	# disable deprecated check for mingw-x-libgig
 	if(LMMS_BUILD_WIN32 AND MINGW)
 		SET(GCC_GIG_COMPILE_FLAGS "-Wno-deprecated")
