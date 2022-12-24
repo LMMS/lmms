@@ -542,7 +542,7 @@ void GigInstrument::loadSample( GigSample& sample, sampleFrame* sampleData, f_cn
 #ifndef _MSC_VER
 	int8_t buffer[allocationsize];
 #else
-	auto buffer = static_cast<int8_t*>(_alloca(allocationsize * sizeof(int8_t)));
+	const auto buffer = static_cast<int8_t*>(_alloca(allocationsize * sizeof(int8_t)));
 #endif
 
 	// Load the sample in different ways depending on if we're looping or not
