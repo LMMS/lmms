@@ -74,11 +74,10 @@ namespace lmms::gui
         const auto mixerName = mixerChannel->m_name;
     	setToolTip(mixerName);
 
-        m_renameLineEdit = new QLineEdit{};
-        m_renameLineEdit->setStyleSheet("border-style: none; background: transparent;");
-        m_renameLineEdit->setText(mixerName);
+        m_renameLineEdit = new QLineEdit{mixerName, nullptr};
         m_renameLineEdit->setFixedWidth(65);
         m_renameLineEdit->setFont(pointSizeF(font(), 7.5f));
+        m_renameLineEdit->setReadOnly(true);
     	m_renameLineEdit->installEventFilter(this);
 
         auto renameLineEditScene = new QGraphicsScene{};
@@ -91,6 +90,7 @@ namespace lmms::gui
 
         auto renameLineEditProxy = renameLineEditScene->addWidget(m_renameLineEdit);
         renameLineEditProxy->setRotation(-90);
+        m_renameLineEditView->setFixedSize(m_renameLineEdit->height() + 5, m_renameLineEdit->width() + 5);
 
         m_sendArrow = new QLabel{};
         m_sendArrow->setPixmap(embed::getIconPixmap("send_bg_arrow"));
