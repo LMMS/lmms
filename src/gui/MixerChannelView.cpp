@@ -50,8 +50,6 @@ namespace lmms::gui
     {
         setAutoFillBackground(true);
         setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
-        setFixedWidth(MIXER_CHANNEL_WIDTH);
-        setMinimumHeight(MIXER_CHANNEL_HEIGHT);
 
         auto retainSizeWhenHidden = [](QWidget* widget)
         {
@@ -286,11 +284,6 @@ namespace lmms::gui
         m_sendReceiveState = state;
         m_sendArrow->setVisible(state == SendReceiveState::SendToThis);
         m_receiveArrow->setVisible(state == SendReceiveState::ReceiveFromThis);
-    }
-
-    QSize MixerChannelView::sizeHint() const
-    {
-        return QSize{MIXER_CHANNEL_WIDTH, MIXER_CHANNEL_HEIGHT};
     }
 
     QBrush MixerChannelView::backgroundActive() const
