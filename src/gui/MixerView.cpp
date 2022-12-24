@@ -97,7 +97,7 @@ MixerView::MixerView() :
 	MixerChannelView * masterView = m_mixerChannelViews[0];
 	ml->addWidget(masterView, 0, Qt::AlignTop);
 
-	QSize mixerChannelSize = masterView->size();
+	auto mixerChannelSize = masterView->sizeHint();
 
 	// add mixer channels
 	for( int i = 1; i < m_mixerChannelViews.size(); ++i )
@@ -139,7 +139,8 @@ MixerView::MixerView() :
 
 
 	// add the stacked layout for the effect racks of mixer channels
-	ml->addWidget( m_racksWidget, 0, Qt::AlignTop | Qt::AlignRight );
+	m_racksWidget->setFixedHeight(mixerChannelSize.height());
+	ml->addWidget(m_racksWidget);
 
 	setCurrentMixerChannel(m_mixerChannelViews[0]);
 

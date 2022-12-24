@@ -48,7 +48,6 @@ namespace lmms::gui
         m_mixerView(mixerView),
         m_channelIndex(channelIndex)
     {
-        setAutoFillBackground(true);
         setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
 
         auto retainSizeWhenHidden = [](QWidget* widget)
@@ -121,7 +120,7 @@ namespace lmms::gui
         m_fader->setMaxPeak(dbfsToAmp(9));
 
         m_effectRackView = new EffectRackView{&mixerChannel->m_fxChain, mixerView->m_racksWidget};
-        m_effectRackView->setFixedSize(EffectRackView::DEFAULT_WIDTH, MIXER_CHANNEL_HEIGHT);
+        m_effectRackView->setFixedWidth(EffectRackView::DEFAULT_WIDTH);
 
         auto mainLayout = new QVBoxLayout{this};
         mainLayout->addWidget(m_receiveArrow, 0, Qt::AlignHCenter);
