@@ -78,8 +78,8 @@ MixerView::MixerView() :
 	m_channelAreaWidget = new QWidget;
 	chLayout = new QHBoxLayout( m_channelAreaWidget );
 	chLayout->setSizeConstraint( QLayout::SetMinimumSize );
-	chLayout->setSpacing(5);
-	chLayout->setMargin(0);
+	chLayout->setSpacing( 0 );
+	chLayout->setMargin( 0 );
 	m_channelAreaWidget->setLayout(chLayout);
 
 	// create rack layout before creating the first channel
