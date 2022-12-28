@@ -78,8 +78,8 @@ exclude_files = re.compile(
     'plugins/ReverbSC/[a-z]|'
     'plugins/Sf2Player/fluidsynthshims.h|'
     '/portsmf/|'
-	# only forward to headers that are not ours:
-	'plugins/ZynAddSubFx/ThreadShims.h'
+    # only forward to headers that are not ours:
+    'plugins/ZynAddSubFx/ThreadShims.h'
 )
 
 files = [Path(f) for f in result.stdout.splitlines() if not exclude_files.search(f)]
