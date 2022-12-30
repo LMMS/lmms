@@ -39,18 +39,18 @@ namespace lmms
 {
 
 
-const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
+const std::array<ProjectRenderer::FileEncodeDevice, 5> ProjectRenderer::fileEncodeDevices
 {
 
-	{ ProjectRenderer::WaveFile,
+	FileEncodeDevice{ ProjectRenderer::WaveFile,
 		QT_TRANSLATE_NOOP( "ProjectRenderer", "WAV (*.wav)" ),
 					".wav", &AudioFileWave::getInst },
-	{ ProjectRenderer::FlacFile,
+	FileEncodeDevice{ ProjectRenderer::FlacFile,
 		QT_TRANSLATE_NOOP("ProjectRenderer", "FLAC (*.flac)"),
 		".flac",
 		&AudioFileFlac::getInst
 	},
-	{ ProjectRenderer::OggFile,
+	FileEncodeDevice{ ProjectRenderer::OggFile,
 		QT_TRANSLATE_NOOP( "ProjectRenderer", "OGG (*.ogg)" ),
 					".ogg",
 #ifdef LMMS_HAVE_OGGVORBIS
@@ -59,7 +59,7 @@ const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 					nullptr
 #endif
 									},
-	{ ProjectRenderer::MP3File,
+	FileEncodeDevice{ ProjectRenderer::MP3File,
 		QT_TRANSLATE_NOOP( "ProjectRenderer", "MP3 (*.mp3)" ),
 					".mp3",
 #ifdef LMMS_HAVE_MP3LAME
@@ -71,7 +71,7 @@ const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 	// Insert your own file-encoder infos here.
 	// Maybe one day the user can add own encoders inside the program.
 
-	{ ProjectRenderer::NumFileFormats, nullptr, nullptr, nullptr }
+	FileEncodeDevice{ ProjectRenderer::NumFileFormats, nullptr, nullptr, nullptr }
 
 } ;
 
@@ -224,8 +224,8 @@ void ProjectRenderer::updateConsoleProgress()
 {
 	const int cols = 50;
 	static int rot = 0;
-	char buf[80];
-	char prog[cols+1];
+	auto buf = std::array<char, 80>{};
+	auto prog = std::array<char, cols + 1>{};
 
 	for( int i = 0; i < cols; ++i )
 	{
@@ -234,12 +234,12 @@ void ProjectRenderer::updateConsoleProgress()
 	prog[cols] = 0;
 
 	const auto activity = (const char*)"|/-\\";
-	memset( buf, 0, sizeof( buf ) );
-	sprintf( buf, "\r|%s|    %3d%%   %c  ", prog, m_progress,
+	std::fill(buf.begin(), buf.end(), 0);
+	sprintf(buf.data(), "\r|%s|    %3d%%   %c  ", prog.data(), m_progress,
 							activity[rot] );
 	rot = ( rot+1 ) % 4;
 
-	fprintf( stderr, "%s", buf );
+	fprintf( stderr, "%s", buf.data() );
 	fflush( stderr );
 }
 

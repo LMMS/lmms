@@ -102,7 +102,7 @@ bool BassBoosterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 		m_bbFX.leftFX().setGain( gain );
 		m_bbFX.rightFX().setGain( gain);
 
-		sample_t s[2] = { buf[f][0], buf[f][1] };
+		auto s = std::array{buf[f][0], buf[f][1]};
 		m_bbFX.nextSample( s[0], s[1] );
 
 		buf[f][0] = d * buf[f][0] + w * s[0];

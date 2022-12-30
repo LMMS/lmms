@@ -76,7 +76,7 @@ public:
 
 	static QString getFileExtensionFromFormat( ExportFileFormats fmt );
 
-	static const FileEncodeDevice fileEncodeDevices[];
+	static const std::array<FileEncodeDevice, 5> fileEncodeDevices;
 
 public slots:
 	void startProcessing();

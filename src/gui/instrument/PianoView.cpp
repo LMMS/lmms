@@ -62,7 +62,7 @@ namespace lmms::gui
 
 /*! The scale of C Major - white keys only.
  */
-Keys WhiteKeys[] =
+auto WhiteKeys = std::array
 {
 	Key_C, Key_D, Key_E, Key_F, Key_G, Key_A, Key_H
 } ;

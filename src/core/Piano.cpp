@@ -47,7 +47,7 @@ namespace lmms
 
 /*! The black / white order of keys as they appear on the keyboard.
  */
-static const Piano::KeyTypes KEY_ORDER[] =
+static const auto KEY_ORDER = std::array
 {
 //	C                CIS              D                DIS
 	Piano::WhiteKey, Piano::BlackKey, Piano::WhiteKey, Piano::BlackKey,
