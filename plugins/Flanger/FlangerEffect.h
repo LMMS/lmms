@@ -28,16 +28,13 @@
 
 #include "Effect.h"
 #include "FlangerControls.h"
-#include "MonoDelay.h"
-#include "Noise.h"
-#include "QuadratureLfo.h"
+
+namespace lmms
+{
 
 class MonoDelay;
 class Noise;
 class QuadratureLfo;
-
-namespace lmms
-{
 
 
 class FlangerEffect : public Effect
