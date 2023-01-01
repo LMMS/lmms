@@ -857,7 +857,7 @@ void AutomationClip::loadSettings( const QDomElement & _this )
 
 
 
-const QString AutomationClip::name() const
+QString AutomationClip::name() const
 {
 	QMutexLocker m(&m_clipMutex);
 
