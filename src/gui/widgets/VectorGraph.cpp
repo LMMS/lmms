@@ -49,7 +49,6 @@ VectorGraph::VectorGraph( QWidget * _parent, int _width, int _height ) :
 
 	m_resolution = m_width;
 	m_currentPoint = -1;
-	installEventFilter(this);
 	setMargin(3);
 }
 
@@ -62,11 +61,11 @@ void VectorGraph::paintEvent( QPaintEvent * event )
 	QColor borderDark = QColor(32, 40, 50);
 	QColor gridColor = QColor(56, 66, 78);
 
-	QPainter m_canvas( this );
+	QPainter canvas(this);
 
 	// Background
-	m_canvas.setBrush(QBrush(backgroundColor));
-	m_canvas.drawRect(QRect(QPoint(0, 1), QPoint(m_width - 1, m_height - 1)));
+	canvas.setBrush(QBrush(backgroundColor));
+	canvas.drawRect(QRect(QPoint(0, 1), QPoint(m_width - 1, m_height - 1)));
 
 
 
@@ -77,36 +76,36 @@ void VectorGraph::paintEvent( QPaintEvent * event )
 		QPen gridPen = QPen();
 		gridPen.setWidth(1);
 		gridPen.setColor(gridColor);
-		m_canvas.setPen(gridPen);
+		canvas.setPen(gridPen);
 
 
 		int gridAreaWidth = (m_width - 2 * m_margin);
 		int gridAreaHeight = (m_height - 2 * m_margin);
 
-		m_canvas.drawLine(m_margin, m_margin, m_margin, m_margin + gridAreaHeight);
-		m_canvas.drawLine(m_margin, m_margin + gridAreaHeight, m_margin + gridAreaWidth, m_margin + gridAreaHeight);
-		m_canvas.drawLine(m_margin + gridAreaWidth, m_margin + gridAreaHeight, m_margin + gridAreaWidth, m_margin);
-		m_canvas.drawLine(m_margin + gridAreaWidth, m_margin, m_margin, m_margin);
+		canvas.drawLine(m_margin, m_margin, m_margin, m_margin + gridAreaHeight);
+		canvas.drawLine(m_margin, m_margin + gridAreaHeight, m_margin + gridAreaWidth, m_margin + gridAreaHeight);
+		canvas.drawLine(m_margin + gridAreaWidth, m_margin + gridAreaHeight, m_margin + gridAreaWidth, m_margin);
+		canvas.drawLine(m_margin + gridAreaWidth, m_margin, m_margin, m_margin);
 		for (int i = 1; i < model()->getNumGridLines(); i++)
 		{
 			int x = qRound((gridAreaWidth / (float) model()->getNumGridLines()) * i) + m_margin;
 			int y = qRound((gridAreaHeight / (float) model()->getNumGridLines()) * i) + m_margin;
-			m_canvas.drawLine(x, m_margin, x, m_margin + gridAreaHeight);
-			m_canvas.drawLine(m_margin, y, m_margin + gridAreaWidth, y);
+			canvas.drawLine(x, m_margin, x, m_margin + gridAreaHeight);
+			canvas.drawLine(m_margin, y, m_margin + gridAreaWidth, y);
 		}
 	}
 
 
 
-	m_canvas.setRenderHint(QPainter::Antialiasing);
+	canvas.setRenderHint(QPainter::Antialiasing);
 
 
 	QPen pen = QPen();
 	pen.setWidthF(1.2);
 	pen.setColor(lineColor);
-	m_canvas.setPen(pen);
+	canvas.setPen(pen);
 
-	m_canvas.setBrush(QBrush(invisible));
+	canvas.setBrush(QBrush(invisible));
 
 	QPainterPath path;
 	VectorGraphPoint * firstPoint = model()->getPoint(0);
@@ -131,18 +130,18 @@ void VectorGraph::paintEvent( QPaintEvent * event )
 
 	path.lineTo(rawToCoordX(lastPoint->x()), rawToCoordY(lastPoint->y()));
 
-	m_canvas.drawPath(path);
+	canvas.drawPath(path);
 
-	m_canvas.setBrush(QBrush(lineColor));
+	canvas.setBrush(QBrush(lineColor));
 
 	for (int i = 0; i < model()->getPointCount(); i++)
 	{
 		auto point = model()->getPoint(i);
 		int ps = model()->getPointSize();
-		m_canvas.drawEllipse(QPointF(rawToCoordX(point->x()), rawToCoordY(point->y())), ps, ps);
+		canvas.drawEllipse(QPointF(rawToCoordX(point->x()), rawToCoordY(point->y())), ps, ps);
 	}
 
-	m_canvas.setBrush(QBrush(invisible));
+	canvas.setBrush(QBrush(invisible));
 
 	for (int i = 1; i < model()->getPointCount(); i++)
 	{
@@ -161,43 +160,43 @@ void VectorGraph::paintEvent( QPaintEvent * event )
 			tensionType == Pulse ||
 			tensionType == Wave)
 		{
-			m_canvas.drawEllipse(QPointF(rawToCoordX((thisPoint->x() + prevPoint->x()) / 2), rawToCoordY((thisPoint->y() + prevPoint->y()) / 2)), ths, ths);
+			canvas.drawEllipse(QPointF(rawToCoordX((thisPoint->x() + prevPoint->x()) / 2), rawToCoordY((thisPoint->y() + prevPoint->y()) / 2)), ths, ths);
 			continue;
 		}
 
 		if (model()->floatEqual(thisPoint->x(), prevPoint->x(), 0.00001))
 		{
-			m_canvas.drawEllipse(QPointF(rawToCoordX(thisPoint->x()), rawToCoordY((thisPoint->y() + prevPoint->y()) / 2)), ths, ths);
+			canvas.drawEllipse(QPointF(rawToCoordX(thisPoint->x()), rawToCoordY((thisPoint->y() + prevPoint->y()) / 2)), ths, ths);
 			continue;
 		}
 
 		float xValueToDrawAt = rawToCoordX(getTensionHandleXVal(i));
 		float yValueToDrawAt = rawToCoordY(getTensionHandleYVal(i));
-		m_canvas.drawEllipse(QPointF(xValueToDrawAt, yValueToDrawAt), ths, ths);
+		canvas.drawEllipse(QPointF(xValueToDrawAt, yValueToDrawAt), ths, ths);
 	}
 
 
 
-	m_canvas.setRenderHint(QPainter::Antialiasing, false);
+	canvas.setRenderHint(QPainter::Antialiasing, false);
 
 	// Border
 	QPen borderPen = QPen();
 	borderPen.setWidth(1);
 	borderPen.setColor(borderLight);
-	m_canvas.setPen(borderPen);
+	canvas.setPen(borderPen);
 
-	m_canvas.drawLine(0, 0, 0, m_height - 1);
-	m_canvas.drawLine(0, m_height - 1, m_width - 1, m_height - 1);
-	m_canvas.drawLine(m_width - 1, m_height - 1, m_width - 1, 0);
-	m_canvas.drawLine(m_width - 1, 0, 0, 0);
+	canvas.drawLine(0, 0, 0, m_height - 1);
+	canvas.drawLine(0, m_height - 1, m_width - 1, m_height - 1);
+	canvas.drawLine(m_width - 1, m_height - 1, m_width - 1, 0);
+	canvas.drawLine(m_width - 1, 0, 0, 0);
 
 	borderPen.setColor(borderDark);
-	m_canvas.setPen(borderPen);
+	canvas.setPen(borderPen);
 
-	m_canvas.drawLine(1, 1, 1, m_height - 2);
-	m_canvas.drawLine(1, m_height - 2, m_width - 2, m_height - 2);
-	m_canvas.drawLine(m_width - 2, m_height - 2, m_width - 2, 1);
-	m_canvas.drawLine(m_width - 2, 1, 1, 1);
+	canvas.drawLine(1, 1, 1, m_height - 2);
+	canvas.drawLine(1, m_height - 2, m_width - 2, m_height - 2);
+	canvas.drawLine(m_width - 2, m_height - 2, m_width - 2, 1);
+	canvas.drawLine(m_width - 2, 1, 1, 1);
 }
 
 
@@ -307,36 +306,33 @@ void VectorGraph::mouseReleaseEvent(QMouseEvent * event)
 	}
 }
 
-bool VectorGraph::eventFilter(QObject *watched, QEvent *event)
+void VectorGraph::contextMenuEvent(QContextMenuEvent* event)
 {
-	if (event->type() == QEvent::ContextMenu)
+	if (model()->getCurrentDraggedPoint() >= 0)
 	{
-		if (model()->getCurrentDraggedPoint() >= 0)
-			return false;
-
-		QContextMenuEvent * menuEvent = static_cast<QContextMenuEvent*>(event);
-
-		m_currentPoint = model()->getPointIndexFromCoords(coordToRawX(menuEvent->x()) * m_width, coordToRawY(menuEvent->y()) * m_height, m_width, m_height);
-
-		if (m_currentPoint < 0)
-			return false;
-
-		CaptionMenu contextMenu(model()->displayName(), this);
-		contextMenu.addAction(QPixmap(), tr("Hold"), this, SLOT(setTensionToHold()));
-		contextMenu.addAction(QPixmap(), tr("Single Curve"), this, SLOT(setTensionToSingle()));
-		contextMenu.addAction(QPixmap(), tr("Double Curve"), this, SLOT(setTensionToDouble()));
-		contextMenu.addAction(QPixmap(), tr("Stairs"), this, SLOT(setTensionToStairs()));
-		contextMenu.addAction(QPixmap(), tr("Pulse"), this, SLOT(setTensionToPulse()));
-		contextMenu.addAction(QPixmap(), tr("Wave"), this, SLOT(setTensionToWave()));
-		if (model()->getPoint(m_currentPoint)->canBeDeleted())
-		{
-			contextMenu.addSeparator();
-			contextMenu.addAction(QPixmap(), tr("&Delete"), this, SLOT(deletePoint()));
-		}
-		contextMenu.exec(QCursor::pos());
-		return true;
+		return;
 	}
-	return false;
+
+	m_currentPoint = model()->getPointIndexFromCoords(coordToRawX(event->x()) * m_width, coordToRawY(event->y()) * m_height, m_width, m_height);
+
+	if (m_currentPoint < 0)
+	{
+		return;
+	}
+
+	CaptionMenu contextMenu(model()->displayName(), this);
+	contextMenu.addAction(QPixmap(), tr("Hold"), this, SLOT(setTensionToHold()));
+	contextMenu.addAction(QPixmap(), tr("Single Curve"), this, SLOT(setTensionToSingle()));
+	contextMenu.addAction(QPixmap(), tr("Double Curve"), this, SLOT(setTensionToDouble()));
+	contextMenu.addAction(QPixmap(), tr("Stairs"), this, SLOT(setTensionToStairs()));
+	contextMenu.addAction(QPixmap(), tr("Pulse"), this, SLOT(setTensionToPulse()));
+	contextMenu.addAction(QPixmap(), tr("Wave"), this, SLOT(setTensionToWave()));
+	if (model()->getPoint(m_currentPoint)->canBeDeleted())
+	{
+		contextMenu.addSeparator();
+		contextMenu.addAction(QPixmap(), tr("&Delete"), this, SLOT(deletePoint()));
+	}
+	contextMenu.exec(QCursor::pos());
 }
 
 float VectorGraph::calculateSample(float input)
@@ -483,13 +479,13 @@ float VectorGraphModel::calculateSectionSample(float input, int sectionStartInde
 	}
 	else if (point->getTensionType() == gui::VectorGraph::TensionType::SingleCurve)
 	{
-		return CalculateSingleCurve(input, point);
+		return calculateSingleCurve(input, point);
 	}
 	else if (point->getTensionType() == gui::VectorGraph::TensionType::DoubleCurve)
 	{
 		if (input < 0.5)
 		{
-			return CalculateSingleCurve(input * 2, point) * 0.5;
+			return calculateSingleCurve(input * 2, point) * 0.5;
 		}
 		else
 		{
@@ -499,7 +495,7 @@ float VectorGraphModel::calculateSectionSample(float input, int sectionStartInde
 			//point->setTension(point->tension() * -1);
 			newPoint->invertTension();
 
-			auto result = CalculateSingleCurve((input - 0.5) * 2, newPoint);
+			auto result = calculateSingleCurve((input - 0.5) * 2, newPoint);
 			delete newPoint;
 			return result * 0.5 + 0.5;
 		}
@@ -543,7 +539,7 @@ float VectorGraphModel::calculateSectionSample(float input, int sectionStartInde
 	return 0;
 }
 
-float VectorGraphModel::CalculateSingleCurve(float input, VectorGraphPoint * point)
+float VectorGraphModel::calculateSingleCurve(float input, VectorGraphPoint * point)
 {
 	// I'm not convinced that the code below provides any sort of speedup.
 	// Might be useful for preventing edge cases though.

@@ -120,15 +120,15 @@ public:
 	}
 
 	float calculateSample(float input);
-	bool eventFilter(QObject *watched, QEvent *event);
 
 signals:
 	void drawn();
 protected:
-	void paintEvent( QPaintEvent * event ) override;
-	void mousePressEvent( QMouseEvent * event );
-	void mouseMoveEvent( QMouseEvent * event );
-	void mouseReleaseEvent( QMouseEvent * event );
+	void contextMenuEvent(QContextMenuEvent* event) override;
+	void paintEvent(QPaintEvent* event) override;
+	void mousePressEvent(QMouseEvent* event) override;
+	void mouseMoveEvent(QMouseEvent* event) override;
+	void mouseReleaseEvent(QMouseEvent* event) override;
 
 private slots:
 	void deletePoint();
@@ -302,7 +302,7 @@ private:
 		return result;
 	}
 
-	float CalculateSingleCurve(float input, VectorGraphPoint * point);
+	float calculateSingleCurve(float input, VectorGraphPoint * point);
 };
 
 
