@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef PIANO_ROLL_H
-#define PIANO_ROLL_H
+#ifndef LMMS_GUI_PIANO_ROLL_H
+#define LMMS_GUI_PIANO_ROLL_H
 
 #include <QVector>
 #include <QWidget>

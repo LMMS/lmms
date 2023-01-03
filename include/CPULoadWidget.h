@@ -23,9 +23,8 @@
  *
  */
 
-
-#ifndef CPULOAD_WIDGET_H
-#define CPULOAD_WIDGET_H
+#ifndef LMMS_GUI_CPU_LOAD_WIDGET_H
+#define LMMS_GUI_CPU_LOAD_WIDGET_H
 
 #include <QTimer>
 #include <QPixmap>

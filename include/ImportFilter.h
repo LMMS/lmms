@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef IMPORT_FILTER_H
-#define IMPORT_FILTER_H
+#ifndef LMMS_IMPORT_FILTER_H
+#define LMMS_IMPORT_FILTER_H
 
 #include <QFile>
 

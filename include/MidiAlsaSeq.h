@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MIDI_ALSA_SEQ_H
-#define MIDI_ALSA_SEQ_H
+#ifndef LMMS_MIDI_ALSA_SEQ_H
+#define LMMS_MIDI_ALSA_SEQ_H
 
 #include "lmmsconfig.h"
 
@@ -159,4 +159,3 @@ signals:
 #endif // LMMS_HAVE_ALSA
 
 #endif
-

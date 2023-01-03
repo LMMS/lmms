@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef PEAK_CONTROLLER_H
-#define PEAK_CONTROLLER_H
+#ifndef LMMS_PEAK_CONTROLLER_H
+#define LMMS_PEAK_CONTROLLER_H
 
 #include "Controller.h"
 #include "ControllerDialog.h"

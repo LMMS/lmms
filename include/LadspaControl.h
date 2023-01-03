@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef LADSPA_CONTROL_H
-#define LADSPA_CONTROL_H
+#ifndef LMMS_LADSPA_CONTROL_H
+#define LMMS_LADSPA_CONTROL_H
 
 #include <ladspa.h>
 

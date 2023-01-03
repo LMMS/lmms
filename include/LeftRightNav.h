@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LEFT_RIGHT_NAV_H
-#define LEFT_RIGHT_NAV_H
+#ifndef LMMS_GUI_LEFT_RIGHT_NAV_H
+#define LMMS_GUI_LEFT_RIGHT_NAV_H
 
 #include "PixmapButton.h"
 

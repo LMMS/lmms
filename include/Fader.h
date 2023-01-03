@@ -44,9 +44,8 @@
  *
  */
 
-
-#ifndef FADER_H
-#define FADER_H
+#ifndef LMMS_GUI_FADER_H
+#define LMMS_GUI_FADER_H
 
 #include <QElapsedTimer>
 #include <QPixmap>

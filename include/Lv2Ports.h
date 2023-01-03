@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LV2PORTS_H
-#define LV2PORTS_H
+#ifndef LMMS_LV2PORTS_H
+#define LMMS_LV2PORTS_H
 
 #include "lmmsconfig.h"
 
@@ -270,4 +270,5 @@ const Target* dcast(const PortBase* base)
 } // namespace lmms
 
 #endif // LMMS_HAVE_LV2
-#endif // LV2PORTS_H
+
+#endif

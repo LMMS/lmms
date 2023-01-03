@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef INSTRUMENT_TRACK_VIEW_H
-#define INSTRUMENT_TRACK_VIEW_H
+#ifndef LMMS_GUI_INSTRUMENT_TRACK_VIEW_H
+#define LMMS_GUI_INSTRUMENT_TRACK_VIEW_H
 
 #include "TrackView.h"
 

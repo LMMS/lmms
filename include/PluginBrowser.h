@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef PLUGIN_BROWSER_H
-#define PLUGIN_BROWSER_H
+#ifndef LMMS_GUI_PLUGIN_BROWSER_H
+#define LMMS_GUI_PLUGIN_BROWSER_H
 
 #include <QPixmap>
 
@@ -54,8 +54,6 @@ private:
 	QWidget * m_view;
 	QTreeWidget * m_descTree;
 };
-
-
 
 
 class PluginDescWidget : public QWidget

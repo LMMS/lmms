@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef EFFECT_CONTROLS_H
-#define EFFECT_CONTROLS_H
+#ifndef LMMS_EFFECT_CONTROLS_H
+#define LMMS_EFFECT_CONTROLS_H
 
 #include "Model.h"
 #include "JournallingObject.h"

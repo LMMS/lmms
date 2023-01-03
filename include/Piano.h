@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef PIANO_H
-#define PIANO_H
+#ifndef LMMS_PIANO_H
+#define LMMS_PIANO_H
 
 #include "Note.h"
 #include "Model.h"
@@ -90,4 +90,3 @@ private:
 } // namespace lmms
 
 #endif
-

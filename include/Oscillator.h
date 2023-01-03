@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef OSCILLATOR_H
-#define OSCILLATOR_H
+#ifndef LMMS_OSCILLATOR_H
+#define LMMS_OSCILLATOR_H
 
 #include <cassert>
 #include <fftw3.h>

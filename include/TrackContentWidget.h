@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef TRACK_CONTENT_WIDGET_H
-#define TRACK_CONTENT_WIDGET_H
+#ifndef LMMS_GUI_TRACK_CONTENT_WIDGET_H
+#define LMMS_GUI_TRACK_CONTENT_WIDGET_H
 
 #include <QWidget>
 

@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef INTERPOLATION_H
-#define INTERPOLATION_H
+#ifndef LMMS_INTERPOLATION_H
+#define LMMS_INTERPOLATION_H
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN

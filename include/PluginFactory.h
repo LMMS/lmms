@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef PLUGINFACTORY_H
-#define PLUGINFACTORY_H
+#ifndef LMMS_PLUGIN_FACTORY_H
+#define LMMS_PLUGIN_FACTORY_H
 
 #include <memory>
 #include <string>
@@ -111,4 +111,4 @@ LMMS_EXPORT PluginFactory* getPluginFactory();
 
 } // namespace lmms
 
-#endif // PLUGINFACTORY_H
+#endif

@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef PANNING_CONSTANTS_H
-#define PANNING_CONSTANTS_H
+#ifndef LMMS_PANNING_CONSTANTS_H
+#define LMMS_PANNING_CONSTANTS_H
 
 namespace lmms
 {

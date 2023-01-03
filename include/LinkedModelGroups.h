@@ -22,14 +22,12 @@
  *
  */
 
-#ifndef LINKEDMODELGROUPS_H
-#define LINKEDMODELGROUPS_H
-
+#ifndef LMMS_LINKEDMODELGROUPS_H
+#define LMMS_LINKEDMODELGROUPS_H
 
 #include <cstddef>
 
 #include "Model.h"
-
 
 class QDomDocument;
 class QDomElement;
@@ -178,4 +176,4 @@ public:
 
 } // namespace lmms
 
-#endif // LINKEDMODELGROUPS_H
+#endif

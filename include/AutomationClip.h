@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef AUTOMATION_CLIP_H
-#define AUTOMATION_CLIP_H
+#ifndef LMMS_AUTOMATION_CLIP_H
+#define LMMS_AUTOMATION_CLIP_H
 
 #include <QMap>
 #include <QPointer>

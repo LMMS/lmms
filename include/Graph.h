@@ -23,9 +23,8 @@
  *
  */
 
-
-#ifndef GRAPH_H
-#define GRAPH_H
+#ifndef LMMS_GUI_GRAPH_H
+#define LMMS_GUI_GRAPH_H
 
 #include <QWidget>
 #include <QPixmap>

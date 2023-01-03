@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef LV2_SUBPLUGIN_FEATURES_H
-#define LV2_SUBPLUGIN_FEATURES_H
+#ifndef LMMS_LV2_SUBPLUGIN_FEATURES_H
+#define LMMS_LV2_SUBPLUGIN_FEATURES_H
 
 #include "lmmsconfig.h"
 

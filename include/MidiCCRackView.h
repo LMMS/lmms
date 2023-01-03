@@ -1,5 +1,5 @@
-#ifndef MIDI_CC_RACK_VIEW_H
-#define MIDI_CC_RACK_VIEW_H
+#ifndef LMMS_GUI_MIDI_CC_RACK_VIEW_H
+#define LMMS_GUI_MIDI_CC_RACK_VIEW_H
 
 #include <QWidget>
 

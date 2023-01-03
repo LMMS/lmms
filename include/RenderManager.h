@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef RENDER_MANAGER_H
-#define RENDER_MANAGER_H
+#ifndef LMMS_RENDER_MANAGER_H
+#define LMMS_RENDER_MANAGER_H
 
 #include <memory>
 

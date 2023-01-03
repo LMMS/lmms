@@ -22,13 +22,12 @@
  *
  */
 
-#ifndef LV2VIEWBASE_H
-#define LV2VIEWBASE_H
+#ifndef LMMS_LV2_VIEW_BASE_H
+#define LMMS_LV2_VIEW_BASE_H
 
 #include "lmmsconfig.h"
 
 #ifdef LMMS_HAVE_LV2
-
 
 
 #include "LinkedModelGroupViews.h"
@@ -109,4 +108,5 @@ private:
 } // namespace lmms
 
 #endif // LMMS_HAVE_LV2
-#endif // LV2VIEWBASE_H
+
+#endif

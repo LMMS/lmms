@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef VST_SYNC_DATA_H
-#define VST_SYNC_DATA_H
+#ifndef LMMS_VST_SYNC_DATA_H
+#define LMMS_VST_SYNC_DATA_H
 
 namespace lmms
 {

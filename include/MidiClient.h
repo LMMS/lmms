@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MIDI_CLIENT_H
-#define MIDI_CLIENT_H
+#ifndef LMMS_MIDI_CLIENT_H
+#define LMMS_MIDI_CLIENT_H
 
 #include <QStringList>
 #include <QVector>
@@ -174,4 +174,3 @@ private:
 } // namespace lmms
 
 #endif
-

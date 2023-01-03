@@ -1,5 +1,5 @@
-#ifndef VERSION_INFO_H
-#define VERSION_INFO_H
+#ifndef LMMS_VERSION_INFO_H
+#define LMMS_VERSION_INFO_H
 
 #include "lmms_basics.h"
 

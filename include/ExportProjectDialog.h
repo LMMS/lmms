@@ -23,9 +23,8 @@
  *
  */
 
-
-#ifndef EXPORT_PROJECT_DIALOG_H
-#define EXPORT_PROJECT_DIALOG_H
+#ifndef LMMS_GUI_EXPORT_PROJECT_DIALOG_H
+#define LMMS_GUI_EXPORT_PROJECT_DIALOG_H
 
 #include <QDialog>
 #include <memory>

@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef LMMS_MATH_H
 #define LMMS_MATH_H
 

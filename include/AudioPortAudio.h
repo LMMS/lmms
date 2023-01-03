@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_PORTAUDIO_H
-#define AUDIO_PORTAUDIO_H
+#ifndef LMMS_AUDIO_PORTAUDIO_H
+#define LMMS_AUDIO_PORTAUDIO_H
 
 #include <QObject>
 

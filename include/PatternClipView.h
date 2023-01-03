@@ -21,11 +21,9 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
 
-#ifndef PATTERN_CLIP_VIEW_H
-#define PATTERN_CLIP_VIEW_H
-
+#ifndef LMMS_GUI_PATTERN_CLIP_VIEW_H
+#define LMMS_GUI_PATTERN_CLIP_VIEW_H
 
 #include <QStaticText>
 

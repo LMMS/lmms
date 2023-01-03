@@ -23,9 +23,8 @@
  *
  */
 
-
-#ifndef PROJECT_VERSION_H
-#define PROJECT_VERSION_H
+#ifndef LMMS_PROJECT_VERSION_H
+#define LMMS_PROJECT_VERSION_H
 
 #include <QString>
 #include <QStringList>

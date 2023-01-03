@@ -28,9 +28,8 @@
  *
  */
 
-
-#ifndef BASIC_FILTERS_H
-#define BASIC_FILTERS_H
+#ifndef LMMS_BASIC_FILTERS_H
+#define LMMS_BASIC_FILTERS_H
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN

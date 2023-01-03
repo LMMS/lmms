@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef EDITOR_COMMON_H
-#define EDITOR_COMMON_H
+#ifndef LMMS_EDITOR_H
+#define LMMS_EDITOR_H
 
 #include <QMainWindow>
 #include <QToolBar>

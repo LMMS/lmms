@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef VST_SYNC_CONTROLLER_H
-#define VST_SYNC_CONTROLLER_H
+#ifndef LMMS_VST_SYNC_CONTROLLER_H
+#define LMMS_VST_SYNC_CONTROLLER_H
 
 #include <QObject>
 

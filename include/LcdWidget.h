@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef LCD_WIDGET_H
-#define LCD_WIDGET_H
+#ifndef LMMS_GUI_LCD_WIDGET_H
+#define LMMS_GUI_LCD_WIDGET_H
 
 #include <QMap>
 #include <QWidget>

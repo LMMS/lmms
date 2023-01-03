@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef REMOTE_PLUGIN_BASE_H
-#define REMOTE_PLUGIN_BASE_H
+#ifndef LMMS_REMOTE_PLUGIN_BASE_H
+#define LMMS_REMOTE_PLUGIN_BASE_H
 
 #include "MidiEvent.h"
 
@@ -673,4 +673,4 @@ private:
 
 } // namespace lmms
 
-#endif // REMOTE_PLUGIN_BASE_H
+#endif

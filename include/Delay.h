@@ -22,10 +22,9 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
- 
-#ifndef DELAY_H
-#define DELAY_H
+
+#ifndef LMMS_DELAY_H
+#define LMMS_DELAY_H
 
 #include "lmms_basics.h"
 #include "lmms_math.h"

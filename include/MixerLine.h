@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef MIXERLINE_H
-#define MIXERLINE_H
+#ifndef LMMS_GUI_MIXER_LINE_H
+#define LMMS_GUI_MIXER_LINE_H
 
 #include <QWidget>
 
@@ -117,4 +117,4 @@ private slots:
 
 } // namespace lmms::gui
 
-#endif // MIXERLINE_H
+#endif

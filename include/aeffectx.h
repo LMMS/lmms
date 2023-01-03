@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef AEFFECTX_H
 #define AEFFECTX_H
 

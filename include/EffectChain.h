@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef EFFECT_CHAIN_H
-#define EFFECT_CHAIN_H
+#ifndef LMMS_EFFECT_CHAIN_H
+#define LMMS_EFFECT_CHAIN_H
 
 #include "Model.h"
 #include "SerializingObject.h"
@@ -86,4 +86,3 @@ signals:
 } // namespace lmms
 
 #endif
-

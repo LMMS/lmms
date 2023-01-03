@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LV2PROC_H
-#define LV2PROC_H
+#ifndef LMMS_LV2_PROC_H
+#define LMMS_LV2_PROC_H
 
 #include "lmmsconfig.h"
 
@@ -220,4 +220,5 @@ private:
 } // namespace lmms
 
 #endif // LMMS_HAVE_LV2
-#endif // LV2PROC_H
+
+#endif

@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MIDI_WINMM_H
-#define MIDI_WINMM_H
+#ifndef LMMS_MIDI_WINMM_H
+#define LMMS_MIDI_WINMM_H
 
 #include "lmmsconfig.h"
 
@@ -151,4 +151,3 @@ signals:
 #endif // LMMS_BUILD_WIN32
 
 #endif
-

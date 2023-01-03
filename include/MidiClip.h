@@ -23,9 +23,8 @@
  *
  */
 
-#ifndef MIDI_CLIP_H
-#define MIDI_CLIP_H
-
+#ifndef LMMS_MIDI_CLIP_H
+#define LMMS_MIDI_CLIP_H
 
 #include "Clip.h"
 #include "Note.h"

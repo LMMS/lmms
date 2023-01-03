@@ -22,13 +22,11 @@
  *
  */
 
-
-#ifndef ENGINE_H
-#define ENGINE_H
+#ifndef LMMS_ENGINE_H
+#define LMMS_ENGINE_H
 
 #include <QString>
 #include <QObject>
-
 
 #include "lmmsconfig.h"
 #include "lmms_export.h"
@@ -158,4 +156,3 @@ private:
 } // namespace lmms
 
 #endif
-

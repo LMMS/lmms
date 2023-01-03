@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef TYPES_H
-#define TYPES_H
+#ifndef LMMS_TYPES_H
+#define LMMS_TYPES_H
 
 #include <cstddef>
 #include <limits>

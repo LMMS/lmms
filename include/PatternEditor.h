@@ -22,10 +22,8 @@
  *
  */
 
-
-#ifndef PATTERN_EDITOR_H
-#define PATTERN_EDITOR_H
-
+#ifndef LMMS_GUI_PATTERN_EDITOR_H
+#define LMMS_GUI_PATTERN_EDITOR_H
 
 #include "Editor.h"
 #include "TrackContainerView.h"

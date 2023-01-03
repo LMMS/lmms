@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUTOMATABLE_MODEL_H
-#define AUTOMATABLE_MODEL_H
+#ifndef LMMS_AUTOMATABLE_MODEL_H
+#define LMMS_AUTOMATABLE_MODEL_H
 
 #include <QMap>
 #include <QMutex>

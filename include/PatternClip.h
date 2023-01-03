@@ -21,10 +21,9 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
 
-#ifndef PATTERN_CLIP_H
-#define PATTERN_CLIP_H
+#ifndef LMMS_PATTERN_CLIP_H
+#define LMMS_PATTERN_CLIP_H
 
 #include "Clip.h"
 

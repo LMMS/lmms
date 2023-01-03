@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef AUTOMATION_NODE_H
-#define AUTOMATION_NODE_H
+#ifndef LMMS_AUTOMATION_NODE_H
+#define LMMS_AUTOMATION_NODE_H
 
 namespace lmms
 {

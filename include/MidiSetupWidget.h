@@ -22,9 +22,8 @@
  *
  */
 
-#ifndef MIDISETUPWIDGET_H
-#define MIDISETUPWIDGET_H
-
+#ifndef LMMS_GUI_MIDI_SETUP_WIDGET_H
+#define LMMS_GUI_MIDI_SETUP_WIDGET_H
 
 #include "TabWidget.h"
 

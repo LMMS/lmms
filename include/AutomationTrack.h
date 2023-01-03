@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef AUTOMATION_TRACK_H
-#define AUTOMATION_TRACK_H
+#ifndef LMMS_AUTOMATION_TRACK_H
+#define LMMS_AUTOMATION_TRACK_H
 
 #include "Track.h"
 

@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef BUFFER_MANAGER_H
-#define BUFFER_MANAGER_H
+#ifndef LMMS_BUFFER_MANAGER_H
+#define LMMS_BUFFER_MANAGER_H
 
 #include "lmms_export.h"
 #include "lmms_basics.h"

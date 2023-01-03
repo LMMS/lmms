@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef PLUGIN_H
-#define PLUGIN_H
+#ifndef LMMS_PLUGIN_H
+#define LMMS_PLUGIN_H
 
 #include <QStringList>
 #include <QMap>

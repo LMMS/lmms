@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef COMBOBOX_H
-#define COMBOBOX_H
+#ifndef LMMS_GUI_COMBOBOX_H
+#define LMMS_GUI_COMBOBOX_H
 
 #include <QMenu>
 #include <QWidget>

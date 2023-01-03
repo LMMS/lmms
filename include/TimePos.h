@@ -23,10 +23,8 @@
  *
  */
 
-
-#ifndef TIME_POS_H
-#define TIME_POS_H
-
+#ifndef LMMS_TIME_POS_H
+#define LMMS_TIME_POS_H
 
 #include "lmms_export.h"
 #include "lmms_basics.h"

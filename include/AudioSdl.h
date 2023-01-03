@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_SDL_H
-#define AUDIO_SDL_H
+#ifndef LMMS_AUDIO_SDL_H
+#define LMMS_AUDIO_SDL_H
 
 #include "lmmsconfig.h"
 

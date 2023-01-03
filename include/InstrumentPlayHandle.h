@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef INSTRUMENT_PLAY_HANDLE_H
-#define INSTRUMENT_PLAY_HANDLE_H
+#ifndef LMMS_INSTRUMENT_PLAY_HANDLE_H
+#define LMMS_INSTRUMENT_PLAY_HANDLE_H
 
 #include "PlayHandle.h"
 #include "Instrument.h"

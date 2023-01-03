@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef VOLUME_H
-#define VOLUME_H
+#ifndef LMMS_VOLUME_H
+#define LMMS_VOLUME_H
 
 #include "lmms_basics.h"
 

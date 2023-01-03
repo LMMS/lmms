@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef NSTATE_BUTTON_H
-#define NSTATE_BUTTON_H
+#ifndef LMMS_GUI_NSTATE_BUTTON_H
+#define LMMS_GUI_NSTATE_BUTTON_H
 
 #include <QPixmap>
 #include <QVector>

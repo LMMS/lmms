@@ -22,14 +22,12 @@
  *
  */
 
-#ifndef LINKEDMODELGROUPVIEWS_H
-#define LINKEDMODELGROUPVIEWS_H
-
+#ifndef LMMS_GUI_LINKEDMODELGROUPVIEWS_H
+#define LMMS_GUI_LINKEDMODELGROUPVIEWS_H
 
 #include <cstddef>
 #include <memory>
 #include <QWidget>
-
 
 namespace lmms
 {
@@ -120,4 +118,4 @@ private:
 
 } // namespace lmms
 
-#endif // LINKEDMODELGROUPVIEWS_H
+#endif

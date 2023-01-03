@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef PITCH_H
-#define PITCH_H
+#ifndef LMMS_PITCH_H
+#define LMMS_PITCH_H
 
 #include <cstdint>
 

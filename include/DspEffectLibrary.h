@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef DSP_EFFECT_LIBRARY_H
-#define DSP_EFFECT_LIBRARY_H
+#ifndef LMMS_DSPEFFECTLIBRARY_H
+#define LMMS_DSPEFFECTLIBRARY_H
 
 #include "lmms_math.h"
 #include "lmms_constants.h"

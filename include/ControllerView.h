@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef CONTROLLER_VIEW_H
-#define CONTROLLER_VIEW_H
+#ifndef LMMS_GUI_CONTROLLER_VIEW_H
+#define LMMS_GUI_CONTROLLER_VIEW_H
 
 #include <QFrame>
 

@@ -1,6 +1,6 @@
 /* Text customizable knob */
-#ifndef CUSTOM_TEXT_KNOB_H
-#define CUSTOM_TEXT_KNOB_H
+#ifndef LMMS_GUI_CUSTOM_TEXT_KNOB_H
+#define LMMS_GUI_CUSTOM_TEXT_KNOB_H
 
 #include "Knob.h"
 

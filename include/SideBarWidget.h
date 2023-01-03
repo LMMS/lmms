@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef SIDE_BAR_WIDGET_H
-#define SIDE_BAR_WIDGET_H
+#ifndef LMMS_GUI_SIDE_BAR_WIDGET_H
+#define LMMS_GUI_SIDE_BAR_WIDGET_H
 
 #include <QPixmap>
 #include <QVBoxLayout>

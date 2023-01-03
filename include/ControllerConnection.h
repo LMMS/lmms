@@ -26,9 +26,8 @@
  *
  */
 
-
-#ifndef CONTROLLER_CONNECTION_H
-#define CONTROLLER_CONNECTION_H
+#ifndef LMMS_CONTROLLER_CONNECTION_H
+#define LMMS_CONTROLLER_CONNECTION_H
 
 #include <QObject>
 #include <QVector>
@@ -129,4 +128,3 @@ signals:
 } // namespace lmms
 
 #endif
-

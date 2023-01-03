@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef DUMMY_EFFECT_H
-#define DUMMY_EFFECT_H
+#ifndef LMMS_DUMMY_EFFECT_H
+#define LMMS_DUMMY_EFFECT_H
 
 #include <QDomElement>
 

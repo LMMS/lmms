@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef TOOL_PLUGIN_H
-#define TOOL_PLUGIN_H
+#ifndef LMMS_TOOL_PLUGIN_H
+#define LMMS_TOOL_PLUGIN_H
 
 #include "Plugin.h"
 

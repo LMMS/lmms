@@ -23,9 +23,8 @@
  *
  */
 
-
-#ifndef LCD_FLOATSPINBOX_H
-#define LCD_FLOATSPINBOX_H
+#ifndef LMMS_GUI_LCD_FLOATSPINBOX_H
+#define LMMS_GUI_LCD_FLOATSPINBOX_H
 
 #include <QString>
 

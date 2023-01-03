@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_FILE_FLAC_H
-#define AUDIO_FILE_FLAC_H
+#ifndef LMMS_AUDIO_FILE_FLAC_H
+#define LMMS_AUDIO_FILE_FLAC_H
 
 #include "lmmsconfig.h"
 
@@ -33,7 +33,7 @@
 namespace lmms
 {
 
-class AudioFileFlac: public AudioFileDevice
+class AudioFileFlac : public AudioFileDevice
 {
 public:
 	AudioFileFlac(OutputSettings const& outputSettings,
@@ -77,4 +77,4 @@ private:
 
 } // namespace lmms
 
-#endif //AUDIO_FILE_FLAC_H
+#endif

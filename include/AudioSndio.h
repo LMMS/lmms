@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _AUDIO_SNDIO_H
-#define _AUDIO_SNDIO_H
+#ifndef LMMS_AUDIO_SNDIO_H
+#define LMMS_AUDIO_SNDIO_H
 
 #include "lmmsconfig.h"
 
@@ -87,6 +87,6 @@ private:
 
 } // namespace lmms
 
-#endif	// LMMS_HAVE_SNDIO
+#endif // LMMS_HAVE_SNDIO
 
-#endif	// _AUDIO_SNDIO_H
+#endif

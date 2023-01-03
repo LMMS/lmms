@@ -23,9 +23,8 @@
  *
  */
 
-
-#ifndef DATA_FILE_H
-#define DATA_FILE_H
+#ifndef LMMS_DATA_FILE_H
+#define LMMS_DATA_FILE_H
 
 #include <map>
 #include <QDomDocument>

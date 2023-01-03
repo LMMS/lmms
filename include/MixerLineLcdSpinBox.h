@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MIXER_LINE_LCD_SPIN_BOX_H
-#define MIXER_LINE_LCD_SPIN_BOX_H
+#ifndef LMMS_GUI_MIXER_LINE_LCD_SPIN_BOX_H
+#define LMMS_GUI_MIXER_LINE_LCD_SPIN_BOX_H
 
 #include "LcdSpinBox.h"
 

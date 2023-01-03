@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MIDI_DUMMY_H
-#define MIDI_DUMMY_H
+#ifndef LMMS_MIDI_DUMMY_H
+#define LMMS_MIDI_DUMMY_H
 
 #include "MidiClient.h"
 

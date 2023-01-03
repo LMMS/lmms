@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef TRACK_CONTENT_OBJECT_VIEW_H
-#define TRACK_CONTENT_OBJECT_VIEW_H
+#ifndef LMMS_GUI_CLIP_VIEW_H
+#define LMMS_GUI_CLIP_VIEW_H
 
 
 #include <QVector>

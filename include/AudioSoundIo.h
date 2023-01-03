@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_SOUNDIO_H
-#define AUDIO_SOUNDIO_H
+#ifndef LMMS_AUDIO_SOUNDIO_H
+#define LMMS_AUDIO_SOUNDIO_H
 
 #include <QObject>
 

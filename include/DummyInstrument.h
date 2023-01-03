@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef DUMMY_INSTRUMENT_H
-#define DUMMY_INSTRUMENT_H
+#ifndef LMMS_DUMMY_INSTRUMENT_H
+#define LMMS_DUMMY_INSTRUMENT_H
 
 #include "Instrument.h"
 #include "InstrumentView.h"

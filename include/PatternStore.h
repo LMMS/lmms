@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef PATTERN_STORE_H
-#define PATTERN_STORE_H
+#ifndef LMMS_PATTERN_STORE_H
+#define LMMS_PATTERN_STORE_H
 
 #include "TrackContainer.h"
 #include "ComboBoxModel.h"

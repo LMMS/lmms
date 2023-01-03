@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MIXER_VIEW_H
-#define MIXER_VIEW_H
+#ifndef LMMS_GUI_MIXER_VIEW_H
+#define LMMS_GUI_MIXER_VIEW_H
 
 #include <QWidget>
 #include <QHBoxLayout>
@@ -132,7 +132,7 @@ private:
 	QWidget * m_racksWidget;
 
 	void updateMaxChannelSelector();
-	
+
 	friend class MixerChannelView;
 } ;
 

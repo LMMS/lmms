@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef PIANO_VIEW_H
-#define PIANO_VIEW_H
+#ifndef LMMS_GUI_PIANO_VIEW_H
+#define LMMS_GUI_PIANO_VIEW_H
 
 #include <QPixmap>
 #include <QScrollBar>

@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef SAMPLE_RECORD_HANDLE_H
-#define SAMPLE_RECORD_HANDLE_H
+#ifndef LMMS_SAMPLE_RECORD_HANDLE_H
+#define LMMS_SAMPLE_RECORD_HANDLE_H
 
 #include <QList>
 #include <QPair>

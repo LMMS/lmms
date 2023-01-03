@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef ENDIAN_HANDLING_H
-#define ENDIAN_HANDLING_H
+#ifndef LMMS_ENDIAN_HANDLING_H
+#define LMMS_ENDIAN_HANDLING_H
 
 #include <QSysInfo>
 

@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef OSCILLOSCOPE_H
-#define OSCILLOSCOPE_H
+#ifndef LMMS_GUI_OSCILLOSCOPE_H
+#define LMMS_GUI_OSCILLOSCOPE_H
 
 #include <QWidget>
 #include <QPixmap>
@@ -79,4 +78,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif // OSCILLOSCOPE_H
+#endif

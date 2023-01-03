@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef PERFLOG_H
-#define PERFLOG_H
+#ifndef LMMS_PERFLOG_H
+#define LMMS_PERFLOG_H
 
 #include <ctime>
 #include <QString>

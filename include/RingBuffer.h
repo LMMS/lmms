@@ -23,9 +23,8 @@
  *
  */
 
-
-#ifndef RINGBUFFER_H
-#define RINGBUFFER_H
+#ifndef LMMS_RING_BUFFER_H
+#define LMMS_RING_BUFFER_H
 
 #include <cmath>
 #include <QObject>

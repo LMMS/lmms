@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef TAB_BAR_H
-#define TAB_BAR_H
+#ifndef LMMS_GUI_TAB_BAR_H
+#define LMMS_GUI_TAB_BAR_H
 
 #include <QBoxLayout>
 #include <QMap>

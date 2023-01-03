@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MIDI_EVENT_PROCESSOR_H
-#define MIDI_EVENT_PROCESSOR_H
+#ifndef LMMS_MIDI_EVENT_PROCESSOR_H
+#define LMMS_MIDI_EVENT_PROCESSOR_H
 
 #include "MidiEvent.h"
 #include "MemoryManager.h"

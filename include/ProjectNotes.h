@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef PROJECT_NOTES_H
-#define PROJECT_NOTES_H
+#ifndef LMMS_GUI_PROJECT_NOTES_H
+#define LMMS_GUI_PROJECT_NOTES_H
 
 #include <QMainWindow>
 

@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef LCD_SPINBOX_H
-#define LCD_SPINBOX_H
+#ifndef LMMS_GUI_LCD_SPINBOX_H
+#define LMMS_GUI_LCD_SPINBOX_H
 
 #include "LcdWidget.h"
 #include "AutomatableModelView.h"

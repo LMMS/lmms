@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef TIMELINE_H
-#define TIMELINE_H
+#ifndef LMMS_GUI_TIMELINE_WIDGET_H
+#define LMMS_GUI_TIMELINE_WIDGET_H
 
 #include <QWidget>
 

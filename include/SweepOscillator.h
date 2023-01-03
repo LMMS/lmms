@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef SWEEP_OSCILLATOR_H
-#define SWEEP_OSCILLATOR_H
+#ifndef LMMS_SWEEP_OSCILLATOR_H
+#define LMMS_SWEEP_OSCILLATOR_H
 
 #include "Oscillator.h"
 #include "DspEffectLibrary.h"

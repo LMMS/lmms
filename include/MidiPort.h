@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef MIDI_PORT_H
-#define MIDI_PORT_H
+#ifndef LMMS_MIDI_PORT_H
+#define LMMS_MIDI_PORT_H
 
 #include <QString>
 #include <QList>

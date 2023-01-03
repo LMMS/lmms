@@ -23,9 +23,8 @@
  *
  */
 
-
-#ifndef FFT_HELPERS_H
-#define FFT_HELPERS_H
+#ifndef LMMS_FFT_HELPERS_H
+#define LMMS_FFT_HELPERS_H
 
 #include "lmms_export.h"
 

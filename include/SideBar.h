@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef SIDE_BAR_H
-#define SIDE_BAR_H
+#ifndef LMMS_GUI_SIDE_BAR_H
+#define LMMS_GUI_SIDE_BAR_H
 
 #include <QMap>
 #include <QButtonGroup>

@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MICROTUNER_H
-#define MICROTUNER_H
+#ifndef LMMS_MICROTUNER_H
+#define LMMS_MICROTUNER_H
 
 #include "AutomatableModel.h"
 #include "ComboBoxModel.h"

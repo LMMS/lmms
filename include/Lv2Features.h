@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LV2FEATURES_H
-#define LV2FEATURES_H
+#ifndef LMMS_LV2_FEATURES_H
+#define LMMS_LV2_FEATURES_H
 
 #include "lmmsconfig.h"
 
@@ -84,4 +84,4 @@ private:
 
 #endif // LMMS_HAVE_LV2
 
-#endif // LV2FEATURES_H
+#endif

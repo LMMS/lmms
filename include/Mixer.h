@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MIXER_H
-#define MIXER_H
+#ifndef LMMS_MIXER_H
+#define LMMS_MIXER_H
 
 #include "Model.h"
 #include "EffectChain.h"
@@ -100,37 +100,37 @@ class MixerChannel : public ThreadableJob
 class MixerRoute : public QObject
 {
 	Q_OBJECT
-	public:		
-		MixerRoute( MixerChannel * from, MixerChannel * to, float amount );
-		~MixerRoute() override = default;
-		
+public:
+	MixerRoute( MixerChannel * from, MixerChannel * to, float amount );
+	~MixerRoute() override = default;
+
 	mix_ch_t senderIndex() const
 	{
 		return m_from->m_channelIndex;
 	}
-	
+
 	mix_ch_t receiverIndex() const
 	{
 		return m_to->m_channelIndex;
 	}
-	
+
 	FloatModel * amount()
 	{
 		return &m_amount;
 	}
-	
+
 	MixerChannel * sender() const
 	{
 		return m_from;
 	}
-	
+
 	MixerChannel * receiver() const
 	{
 		return m_to;
 	}
-	
+
 	void updateName();
-		
+
 	private:
 		MixerChannel * m_from;
 		MixerChannel * m_to;

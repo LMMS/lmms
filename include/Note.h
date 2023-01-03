@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef NOTE_H
-#define NOTE_H
+#ifndef LMMS_NOTE_H
+#define LMMS_NOTE_H
 
 #include <optional>
 #include <QVector>

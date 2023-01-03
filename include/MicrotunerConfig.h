@@ -22,9 +22,8 @@
  *
  */
 
-#ifndef MICROTUNER_CONFIG_H
-#define MICROTUNER_CONFIG_H
-
+#ifndef LMMS_GUI_MICROTUNER_CONFIG_H
+#define LMMS_GUI_MICROTUNER_CONFIG_H
 
 #include <QWidget>
 

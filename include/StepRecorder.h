@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef STEP_RECORDER_H
-#define STEP_RECORDER_H
+#ifndef LMMS_STEP_RECORDER_H
+#define LMMS_STEP_RECORDER_H
 
 #include <QColor>
 #include <QElapsedTimer>
@@ -152,4 +152,4 @@ class StepRecorder : public QObject
 
 } // namespace lmms
 
-#endif //STEP_RECORDER_H
+#endif

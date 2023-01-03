@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef BANDLIMITEDWAVE_H
-#define BANDLIMITEDWAVE_H
+#ifndef LMMS_BANDLIMITEDWAVE_H
+#define LMMS_BANDLIMITEDWAVE_H
 
 class QDataStream;
 class QString;

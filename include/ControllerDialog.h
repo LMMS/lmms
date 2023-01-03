@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef CONTROLLER_DIALOG_H
-#define CONTROLLER_DIALOG_H
+#ifndef LMMS_GUI_CONTROLLER_DIALOG_H
+#define LMMS_GUI_CONTROLLER_DIALOG_H
 
 #include <QWidget>
 

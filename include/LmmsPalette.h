@@ -23,12 +23,11 @@
  *
  */
 
-#ifndef LMMSPALETTE_H
-#define LMMSPALETTE_H
+#ifndef LMMS_GUI_LMMS_PALETTE_H
+#define LMMS_GUI_LMMS_PALETTE_H
 
 #include <QWidget>
 #include "lmms_export.h"
-
 
 namespace lmms::gui
 {
@@ -84,7 +83,6 @@ private:
 	QColor m_highlight;
 	QColor m_highlightedText;
 };
-
 
 
 } // namespace lmms::gui

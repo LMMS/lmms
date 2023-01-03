@@ -22,10 +22,8 @@
  *
  */
 
-
-#ifndef PATTERN_TRACK_H
-#define PATTERN_TRACK_H
-
+#ifndef LMMS_PATTERN_TRACK_H
+#define LMMS_PATTERN_TRACK_H
 
 #include <QMap>
 

@@ -23,9 +23,8 @@
  *
  */
 
-
-#ifndef LMMS_STYLE_H
-#define LMMS_STYLE_H
+#ifndef LMMS_GUI_LMMS_STYLE_H
+#define LMMS_GUI_LMMS_STYLE_H
 
 #include <QProxyStyle>
 
