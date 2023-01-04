@@ -28,6 +28,7 @@
 #include <memory>
 #include <string>
 
+#include <QCoreApplication>
 #include <QFileInfo>
 #include <QList>
 #include <QString>
@@ -43,6 +44,8 @@ namespace lmms
 
 class LMMS_EXPORT PluginFactory
 {
+	Q_DECLARE_TR_FUNCTIONS(lmms::PluginFactory)
+
 public:
 	struct PluginInfo
 	{

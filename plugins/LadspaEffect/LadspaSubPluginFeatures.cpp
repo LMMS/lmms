@@ -64,10 +64,10 @@ void LadspaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 	Ladspa2LMMS * lm = Engine::getLADSPAManager();
 
 	auto label = new QLabel(_parent);
-	label->setText( QWidget::tr( "Name: " ) + lm->getName( lkey ) );
+	label->setText(tr("Name: ") + lm->getName(lkey));
 
 	auto fileInfo = new QLabel(_parent);
-	fileInfo->setText( QWidget::tr( "File: %1" ).arg( lkey.first ) );
+	fileInfo->setText(tr("File: %1").arg(lkey.first));
 
 	auto maker = new QWidget(_parent);
 	auto l = new QHBoxLayout(maker);
@@ -75,7 +75,7 @@ void LadspaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 	l->setSpacing( 0 );
 
 	auto maker_label = new QLabel(maker);
-	maker_label->setText( QWidget::tr( "Maker: " ) );
+	maker_label->setText(tr("Maker: "));
 	maker_label->setAlignment( Qt::AlignTop );
 	auto maker_content = new QLabel(maker);
 	maker_content->setText( lm->getMaker( lkey ) );
@@ -90,7 +90,7 @@ void LadspaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 
 	copyright->setMinimumWidth( _parent->minimumWidth() );
 	auto copyright_label = new QLabel(copyright);
-	copyright_label->setText( QWidget::tr( "Copyright: " ) );
+	copyright_label->setText(tr("Copyright: "));
 	copyright_label->setAlignment( Qt::AlignTop );
 
 	auto copyright_content = new QLabel(copyright);
@@ -100,29 +100,29 @@ void LadspaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 	l->addWidget( copyright_content, 1 );
 
 	auto requiresRealTime = new QLabel(_parent);
-	requiresRealTime->setText( QWidget::tr( "Requires Real Time: " ) +
+	requiresRealTime->setText(tr("Requires Real Time: ") +
 					( lm->hasRealTimeDependency( lkey ) ?
-							QWidget::tr( "Yes" ) :
-							QWidget::tr( "No" ) ) );
+							tr("Yes") :
+							tr("No")));
 
 	auto realTimeCapable = new QLabel(_parent);
-	realTimeCapable->setText( QWidget::tr( "Real Time Capable: " ) +
+	realTimeCapable->setText(tr("Real Time Capable: ") +
 					( lm->isRealTimeCapable( lkey ) ?
-							QWidget::tr( "Yes" ) :
-							QWidget::tr( "No" ) ) );
+							tr("Yes") :
+							tr("No")));
 
 	auto inplaceBroken = new QLabel(_parent);
-	inplaceBroken->setText( QWidget::tr( "In Place Broken: " ) +
+	inplaceBroken->setText(tr("In Place Broken: ") +
 					( lm->isInplaceBroken( lkey ) ?
-							QWidget::tr( "Yes" ) :
-							QWidget::tr( "No" ) ) );
+							tr("Yes") :
+							tr("No")));
 
 	auto channelsIn = new QLabel(_parent);
-	channelsIn->setText( QWidget::tr( "Channels In: " ) +
+	channelsIn->setText(tr("Channels In: ") +
 		QString::number( lm->getDescription( lkey )->inputChannels ) );
 
 	auto channelsOut = new QLabel(_parent);
-	channelsOut->setText( QWidget::tr( "Channels Out: " ) +
+	channelsOut->setText(tr("Channels Out: ") +
 		QString::number( lm->getDescription( lkey )->outputChannels ) );	
 }
 

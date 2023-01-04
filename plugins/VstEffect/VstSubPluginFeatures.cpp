@@ -45,8 +45,8 @@ VstSubPluginFeatures::VstSubPluginFeatures( Plugin::PluginTypes _type ) :
 void VstSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 													const Key * _key  ) const
 {
-	new QLabel( QWidget::tr( "Name: " ) + _key->name, _parent );
-	new QLabel( QWidget::tr( "File: " ) + _key->attributes["file"], _parent );
+	new QLabel(tr("Name: ") + _key->name, _parent);
+	new QLabel(tr("File: ") + _key->attributes["file"], _parent);
 }
 
 

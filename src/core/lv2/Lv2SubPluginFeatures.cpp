@@ -73,10 +73,10 @@ void Lv2SubPluginFeatures::fillDescriptionWidget(QWidget *parent,
 	const LilvPlugin *plug = getPlugin(*k);
 
 	auto label = new QLabel(parent);
-	label->setText(QWidget::tr("Name: ") + pluginName(plug));
+	label->setText(tr("Name: ") + pluginName(plug));
 
 	auto label2 = new QLabel(parent);
-	label2->setText(QWidget::tr("URI: ") +
+	label2->setText(tr("URI: ") +
 		lilv_node_as_uri(lilv_plugin_get_uri(plug)));
 
 	auto maker = new QWidget(parent);
@@ -85,7 +85,7 @@ void Lv2SubPluginFeatures::fillDescriptionWidget(QWidget *parent,
 	l->setSpacing(0);
 
 	auto maker_label = new QLabel(maker);
-	maker_label->setText(QWidget::tr("Maker: "));
+	maker_label->setText(tr("Maker: "));
 	maker_label->setAlignment(Qt::AlignTop);
 
 	auto maker_content = new QLabel(maker);
@@ -103,7 +103,7 @@ void Lv2SubPluginFeatures::fillDescriptionWidget(QWidget *parent,
 	copyright->setMinimumWidth(parent->minimumWidth());
 
 	auto copyright_label = new QLabel(copyright);
-	copyright_label->setText(QWidget::tr("Copyright: "));
+	copyright_label->setText(tr("Copyright: "));
 	copyright_label->setAlignment(Qt::AlignTop);
 
 	auto copyright_content = new QLabel(copyright);
