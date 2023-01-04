@@ -42,26 +42,16 @@ namespace lmms
 const std::array<ProjectRenderer::FileEncodeDevice, 5> ProjectRenderer::fileEncodeDevices
 {
 
-	FileEncodeDevice{ ProjectRenderer::WaveFile,
-		QT_TRANSLATE_NOOP( "ProjectRenderer", "WAV (*.wav)" ),
-					".wav", &AudioFileWave::getInst },
-	FileEncodeDevice{ ProjectRenderer::FlacFile,
-		QT_TRANSLATE_NOOP("ProjectRenderer", "FLAC (*.flac)"),
-		".flac",
-		&AudioFileFlac::getInst
-	},
-	FileEncodeDevice{ ProjectRenderer::OggFile,
-		QT_TRANSLATE_NOOP( "ProjectRenderer", "OGG (*.ogg)" ),
-					".ogg",
+	FileEncodeDevice{ProjectRenderer::WaveFile, QT_TR_NOOP("WAV (*.wav)"), ".wav", &AudioFileWave::getInst},
+	FileEncodeDevice{ProjectRenderer::FlacFile, QT_TR_NOOP("FLAC (*.flac)"), ".flac", &AudioFileFlac::getInst},
+	FileEncodeDevice{ProjectRenderer::OggFile, QT_TR_NOOP("OGG (*.ogg)"), ".ogg",
 #ifdef LMMS_HAVE_OGGVORBIS
 					&AudioFileOgg::getInst
 #else
 					nullptr
 #endif
 									},
-	FileEncodeDevice{ ProjectRenderer::MP3File,
-		QT_TRANSLATE_NOOP( "ProjectRenderer", "MP3 (*.mp3)" ),
-					".mp3",
+	FileEncodeDevice{ProjectRenderer::MP3File, QT_TR_NOOP("MP3 (*.mp3)"), ".mp3",
 #ifdef LMMS_HAVE_MP3LAME
 					&AudioFileMP3::getInst
 #else

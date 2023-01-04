@@ -47,12 +47,9 @@ const float RES_PRECISION = 1000.0f;
 // and second one is used internally, e.g. for saving/restoring settings
 const char *const InstrumentSoundShaping::targetNames[InstrumentSoundShaping::NumTargets][3] =
 {
-	{ QT_TRANSLATE_NOOP("InstrumentSoundShaping", "VOLUME"), "vol",
-			QT_TRANSLATE_NOOP("InstrumentSoundShaping", "Volume") },
-	{ QT_TRANSLATE_NOOP("InstrumentSoundShaping", "CUTOFF"), "cut",
-			QT_TRANSLATE_NOOP("InstrumentSoundShaping", "Cutoff frequency") },
-	{ QT_TRANSLATE_NOOP("InstrumentSoundShaping", "RESO"), "res",
-			QT_TRANSLATE_NOOP("InstrumentSoundShaping", "Resonance") }
+	{QT_TR_NOOP("VOLUME"), "vol", QT_TR_NOOP("Volume")},
+	{QT_TR_NOOP("CUTOFF"), "cut", QT_TR_NOOP("Cutoff frequency")},
+	{QT_TR_NOOP("RESO"), "res", QT_TR_NOOP("Resonance")}
 } ;
  
 
