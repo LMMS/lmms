@@ -120,7 +120,7 @@ private slots:
 			QCOMPARE(element.construction, Construction::Copy);
 		}
 		// Ensure the container has the correct size
-		QCOMPARE(v.size(), 1);
+		QCOMPARE(v.size(), std::size_t{1});
 	}
 
 	void fillDefaultConstructorTest()
@@ -131,7 +131,7 @@ private slots:
 			QCOMPARE(element.construction, Construction::Default);
 		}
 		// Ensure the container has the correct size
-		QCOMPARE(v.size(), 1);
+		QCOMPARE(v.size(), std::size_t{1});
 	}
 
 	void rangeConstructorTest()
@@ -199,7 +199,7 @@ private slots:
 			const auto src = ArrayVector<Constructible, 5>(3);
 			auto dst = ArrayVector<Constructible, 5>(5);
 			dst = src;
-			QCOMPARE(dst.size(), 3);
+			QCOMPARE(dst.size(), std::size_t{3});
 			for (const auto& element : dst) {
 				QCOMPARE(element.construction, Construction::CopyAssign);
 			}
@@ -209,7 +209,7 @@ private slots:
 			const auto src = ArrayVector<Constructible, 5>(3);
 			auto dst = ArrayVector<Constructible, 5>{};
 			dst = src;
-			QCOMPARE(dst.size(), 3);
+			QCOMPARE(dst.size(), std::size_t{3});
 			for (const auto& element : dst) {
 				QCOMPARE(element.construction, Construction::Copy);
 			}
@@ -237,7 +237,7 @@ private slots:
 			auto src = ArrayVector<Constructible, 5>(3);
 			auto dst = ArrayVector<Constructible, 5>(5);
 			dst = std::move(src);
-			QCOMPARE(dst.size(), 3);
+			QCOMPARE(dst.size(), std::size_t{3});
 			for (const auto& element : dst) {
 				QCOMPARE(element.construction, Construction::MoveAssign);
 			}
@@ -247,7 +247,7 @@ private slots:
 			auto src = ArrayVector<Constructible, 5>(3);
 			auto dst = ArrayVector<Constructible, 5>{};
 			dst = std::move(src);
-			QCOMPARE(dst.size(), 3);
+			QCOMPARE(dst.size(), std::size_t{3});
 			for (const auto& element : dst) {
 				QCOMPARE(element.construction, Construction::Move);
 			}
@@ -267,7 +267,7 @@ private slots:
 			// Assignment to a larger container should copy assign
 			auto v = ArrayVector<Constructible, 2>(2);
 			v = {Constructible{}};
-			QCOMPARE(v.size(), 1);
+			QCOMPARE(v.size(), std::size_t{1});
 			for (const auto& element : v) {
 				QCOMPARE(element.construction, Construction::CopyAssign);
 			}
@@ -276,7 +276,7 @@ private slots:
 			// Assignment to a smaller container should copy construct
 			auto v = ArrayVector<Constructible, 2>{};
 			v = {Constructible{}};
-			QCOMPARE(v.size(), 1);
+			QCOMPARE(v.size(), std::size_t{1});
 			for (const auto& element : v) {
 				QCOMPARE(element.construction, Construction::Copy);
 			}
@@ -295,7 +295,7 @@ private slots:
 			// Assignment to a larger container should copy assign
 			auto v = ArrayVector<Constructible, 5>(5);
 			v.assign(3, {});
-			QCOMPARE(v.size(), 3);
+			QCOMPARE(v.size(), std::size_t{3});
 			for (const auto& element : v) {
 				QCOMPARE(element.construction, Construction::CopyAssign);
 			}
@@ -304,7 +304,7 @@ private slots:
 			// Assignment to a smaller container should copy construct
 			auto v = ArrayVector<Constructible, 5>{};
 			v.assign(3, {});
-			QCOMPARE(v.size(), 3);
+			QCOMPARE(v.size(), std::size_t{3});
 			for (const auto& element : v) {
 				QCOMPARE(element.construction, Construction::Copy);
 			}
@@ -324,7 +324,7 @@ private slots:
 			const auto data = std::array{Constructible{}};
 			auto v = ArrayVector<Constructible, 2>(2);
 			v.assign(data.begin(), data.end());
-			QCOMPARE(v.size(), 1);
+			QCOMPARE(v.size(), std::size_t{1});
 			for (const auto& element : v) {
 				QCOMPARE(element.construction, Construction::CopyAssign);
 			}
@@ -334,7 +334,7 @@ private slots:
 			const auto data = std::array{Constructible{}};
 			auto v = ArrayVector<Constructible, 2>{};
 			v.assign(data.begin(), data.end());
-			QCOMPARE(v.size(), 1);
+			QCOMPARE(v.size(), std::size_t{1});
 			for (const auto& element : v) {
 				QCOMPARE(element.construction, Construction::Copy);
 			}
@@ -457,30 +457,30 @@ private slots:
 		auto v = ArrayVector<int, 2>{};
 		QVERIFY(v.empty());
 		QVERIFY(!v.full());
-		QCOMPARE(v.size(), 0);
-		QCOMPARE(v.max_size(), 2);
-		QCOMPARE(v.capacity(), 2);
+		QCOMPARE(v.size(), std::size_t{0});
+		QCOMPARE(v.max_size(), std::size_t{2});
+		QCOMPARE(v.capacity(), std::size_t{2});
 
 		v.push_back(1);
 		QVERIFY(!v.empty());
 		QVERIFY(!v.full());
-		QCOMPARE(v.size(), 1);
-		QCOMPARE(v.max_size(), 2);
-		QCOMPARE(v.capacity(), 2);
+		QCOMPARE(v.size(), std::size_t{1});
+		QCOMPARE(v.max_size(), std::size_t{2});
+		QCOMPARE(v.capacity(), std::size_t{2});
 
 		v.push_back(2);
 		QVERIFY(!v.empty());
 		QVERIFY(v.full());
-		QCOMPARE(v.size(), 2);
-		QCOMPARE(v.max_size(), 2);
-		QCOMPARE(v.capacity(), 2);
+		QCOMPARE(v.size(), std::size_t{2});
+		QCOMPARE(v.max_size(), std::size_t{2});
+		QCOMPARE(v.capacity(), std::size_t{2});
 
 		auto empty = ArrayVector<int, 0>{};
 		QVERIFY(empty.empty());
 		QVERIFY(empty.full());
-		QCOMPARE(empty.size(), 0);
-		QCOMPARE(empty.max_size(), 0);
-		QCOMPARE(empty.capacity(), 0);
+		QCOMPARE(empty.size(), std::size_t{0});
+		QCOMPARE(empty.max_size(), std::size_t{0});
+		QCOMPARE(empty.capacity(), std::size_t{0});
 	}
 
 	void insertValueTest()
@@ -490,14 +490,14 @@ private slots:
 			const auto data = Constructible{};
 			auto v = ArrayVector<Constructible, 1>{};
 			v.insert(v.cbegin(), data);
-			QCOMPARE(v.size(), 1);
+			QCOMPARE(v.size(), std::size_t{1});
 			QCOMPARE(v[0].construction, Construction::Copy);
 		}
 		{
 			// Move
 			auto v = ArrayVector<Constructible, 1>{};
 			v.insert(v.cbegin(), Constructible{});
-			QCOMPARE(v.size(), 1);
+			QCOMPARE(v.size(), std::size_t{1});
 			QCOMPARE(v[0].construction, Construction::Move);
 		}
 		{
@@ -521,7 +521,7 @@ private slots:
 			// Insertion should copy construct
 			auto v = ArrayVector<Constructible, 5>{};
 			v.insert(v.cbegin(), 3, {});
-			QCOMPARE(v.size(), 3);
+			QCOMPARE(v.size(), std::size_t{3});
 			for (const auto& element : v) {
 				QCOMPARE(element.construction, Construction::Copy);
 			}
@@ -541,7 +541,7 @@ private slots:
 			const auto data = std::array{Constructible{}};
 			auto v = ArrayVector<Constructible, 2>{};
 			v.insert(v.cbegin(), data.begin(), data.end());
-			QCOMPARE(v.size(), 1);
+			QCOMPARE(v.size(), std::size_t{1});
 			for (const auto& element : v) {
 				QCOMPARE(element.construction, Construction::Copy);
 			}
@@ -561,7 +561,7 @@ private slots:
 			// Insertion should copy construct
 			auto v = ArrayVector<Constructible, 2>{};
 			v.insert(v.cbegin(), {Constructible{}});
-			QCOMPARE(v.size(), 1);
+			QCOMPARE(v.size(), std::size_t{1});
 			for (const auto& element : v) {
 				QCOMPARE(element.construction, Construction::Copy);
 			}
@@ -580,7 +580,7 @@ private slots:
 			// Ensure the value is constructed in-place
 			auto v = ArrayVector<Constructible, 1>{};
 			v.emplace(v.cbegin());
-			QCOMPARE(v.size(), 1);
+			QCOMPARE(v.size(), std::size_t{1});
 			QCOMPARE(v[0].construction, Construction::Default);
 		}
 		{
@@ -632,14 +632,14 @@ private slots:
 			const auto data = Constructible{};
 			auto v = ArrayVector<Constructible, 1>{};
 			v.push_back(data);
-			QCOMPARE(v.size(), 1);
+			QCOMPARE(v.size(), std::size_t{1});
 			QCOMPARE(v[0].construction, Construction::Copy);
 		}
 		{
 			// Move
 			auto v = ArrayVector<Constructible, 1>{};
 			v.push_back({});
-			QCOMPARE(v.size(), 1);
+			QCOMPARE(v.size(), std::size_t{1});
 			QCOMPARE(v[0].construction, Construction::Move);
 		}
 		{
@@ -663,7 +663,7 @@ private slots:
 			// Ensure the value is constructed in-place
 			auto v = ArrayVector<Constructible, 1>{};
 			v.emplace_back();
-			QCOMPARE(v.size(), 1);
+			QCOMPARE(v.size(), std::size_t{1});
 			QCOMPARE(v[0].construction, Construction::Default);
 		}
 		{
@@ -697,17 +697,17 @@ private slots:
 			// Smaller
 			auto destructed = false;
 			auto v = ArrayVector<DestructorCheck, 1>{{&destructed}};
-			QCOMPARE(v.size(), 1);
+			QCOMPARE(v.size(), std::size_t{1});
 			v.resize(0);
-			QCOMPARE(v.size(), 0);
+			QCOMPARE(v.size(), std::size_t{0});
 			QVERIFY(destructed);
 		}
 		{
 			// Bigger
 			auto v = ArrayVector<Constructible, 1>{};
-			QCOMPARE(v.size(), 0);
+			QCOMPARE(v.size(), std::size_t{0});
 			v.resize(1);
-			QCOMPARE(v.size(), 1);
+			QCOMPARE(v.size(), std::size_t{1});
 			QCOMPARE(v[0].construction, Construction::Default);
 		}
 		{
@@ -721,19 +721,20 @@ private slots:
 	{
 		{
 			// Smaller
+			auto dummy = false;
 			auto destructed = false;
 			auto v = ArrayVector<DestructorCheck, 1>{{&destructed}};
-			QCOMPARE(v.size(), 1);
-			v.resize(0);
-			QCOMPARE(v.size(), 0);
+			QCOMPARE(v.size(), std::size_t{1});
+			v.resize(0, {&dummy});
+			QCOMPARE(v.size(), std::size_t{0});
 			QVERIFY(destructed);
 		}
 		{
 			// Bigger
 			auto v = ArrayVector<Constructible, 1>{};
-			QCOMPARE(v.size(), 0);
+			QCOMPARE(v.size(), std::size_t{0});
 			v.resize(1, {});
-			QCOMPARE(v.size(), 1);
+			QCOMPARE(v.size(), std::size_t{1});
 			QCOMPARE(v[0].construction, Construction::Copy);
 		}
 		{
