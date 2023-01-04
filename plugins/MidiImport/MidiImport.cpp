@@ -67,7 +67,7 @@ Plugin::Descriptor PLUGIN_EXPORT midiimport_plugin_descriptor =
 {
 	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"MIDI Import",
-	QT_TRANSLATE_NOOP( "PluginBrowser",
+	QT_TRANSLATE_NOOP("lmms::gui::PluginBrowser",
 				"Filter for importing MIDI-files into LMMS" ),
 	"Tobias Doerffel <tobydox/at/users/dot/sf/dot/net>",
 	0x0100,

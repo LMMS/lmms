@@ -69,7 +69,7 @@ Plugin::Descriptor PLUGIN_EXPORT opulenz_plugin_descriptor =
 {
         LMMS_STRINGIFY( PLUGIN_NAME ),
         "OpulenZ",
-        QT_TRANSLATE_NOOP( "PluginBrowser",
+        QT_TRANSLATE_NOOP("lmms::gui::PluginBrowser",
 			   "2-operator FM Synth" ),
         "Raine M. Ekman <raine/at/iki/fi>",
         0x0100,

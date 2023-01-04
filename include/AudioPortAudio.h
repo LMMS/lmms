@@ -81,7 +81,7 @@ public:
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget", "PortAudio" );
+		return QT_TRANSLATE_NOOP("lmms::gui::AudioDeviceSetupWidget", "PortAudio");
 	}
 
 

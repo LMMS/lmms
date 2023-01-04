@@ -54,7 +54,7 @@ Plugin::Descriptor PLUGIN_EXPORT vibedstrings_plugin_descriptor =
 {
 	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Vibed",
-	QT_TRANSLATE_NOOP( "PluginBrowser",
+	QT_TRANSLATE_NOOP("lmms::gui::PluginBrowser",
 					"Vibrating string modeler" ),
 	"Danny McRae <khjklujn/at/yahoo/com>",
 	0x0100,

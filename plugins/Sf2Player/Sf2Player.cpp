@@ -60,7 +60,7 @@ Plugin::Descriptor PLUGIN_EXPORT sf2player_plugin_descriptor =
 {
 	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Sf2 Player",
-	QT_TRANSLATE_NOOP( "PluginBrowser", "Player for SoundFont files" ),
+	QT_TRANSLATE_NOOP("lmms::gui::PluginBrowser", "Player for SoundFont files"),
 	"Paul Giblock <drfaygo/at/gmail/dot/com>",
 	0x0100,
 	Plugin::Instrument,

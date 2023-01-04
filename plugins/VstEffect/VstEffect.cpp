@@ -45,7 +45,7 @@ Plugin::Descriptor PLUGIN_EXPORT vsteffect_plugin_descriptor =
 {
 	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"VST",
-	QT_TRANSLATE_NOOP( "PluginBrowser",
+	QT_TRANSLATE_NOOP("lmms::gui::PluginBrowser",
 				"plugin for using arbitrary VST effects inside LMMS." ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0200,

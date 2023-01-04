@@ -56,7 +56,7 @@ Plugin::Descriptor PLUGIN_EXPORT bitinvader_plugin_descriptor =
 {
 	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"BitInvader",
-	QT_TRANSLATE_NOOP( "PluginBrowser",
+	QT_TRANSLATE_NOOP("lmms::gui::PluginBrowser",
 				"Customizable wavetable synthesizer" ),
 	"Andreas Brandmaier <andreas/at/brandmaier/dot/de>",
 	0x0100,

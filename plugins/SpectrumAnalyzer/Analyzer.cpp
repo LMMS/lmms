@@ -45,7 +45,7 @@ extern "C" {
 	{
 		"spectrumanalyzer",
 		"Spectrum Analyzer",
-		QT_TRANSLATE_NOOP("PluginBrowser", "A graphical spectrum analyzer."),
+		QT_TRANSLATE_NOOP("lmms::gui::PluginBrowser", "A graphical spectrum analyzer."),
 		"Martin Pavelek <he29/dot/HS/at/gmail/dot/com>",
 		0x0112,
 		Plugin::Effect,

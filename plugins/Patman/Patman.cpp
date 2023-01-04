@@ -57,7 +57,7 @@ Plugin::Descriptor PLUGIN_EXPORT patman_plugin_descriptor =
 {
 	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"PatMan",
-	QT_TRANSLATE_NOOP( "PluginBrowser",
+	QT_TRANSLATE_NOOP("lmms::gui::PluginBrowser",
 				"GUS-compatible patch instrument" ),
 	"Javier Serrano Polo <jasp00/at/users.sourceforge.net>",
 	0x0100,

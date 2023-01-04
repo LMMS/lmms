@@ -54,7 +54,7 @@ Plugin::Descriptor PLUGIN_EXPORT freeboy_plugin_descriptor =
 {
 	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"FreeBoy",
-	QT_TRANSLATE_NOOP( "PluginBrowser", "Emulation of GameBoy (TM) APU" ),
+	QT_TRANSLATE_NOOP("lmms::gui::PluginBrowser", "Emulation of GameBoy (TM) APU"),
 
 	"Attila Herman <attila589/at/gmail.com>"
 	"Csaba Hruska <csaba.hruska/at/gmail.com>",

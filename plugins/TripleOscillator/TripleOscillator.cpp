@@ -52,7 +52,7 @@ Plugin::Descriptor PLUGIN_EXPORT tripleoscillator_plugin_descriptor =
 {
 	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"TripleOscillator",
-	QT_TRANSLATE_NOOP( "PluginBrowser",
+	QT_TRANSLATE_NOOP("lmms::gui::PluginBrowser",
 				"Three powerful oscillators you can modulate "
 				"in several ways" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",

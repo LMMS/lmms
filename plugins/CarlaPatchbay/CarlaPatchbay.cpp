@@ -39,7 +39,7 @@ Plugin::Descriptor PLUGIN_EXPORT carlapatchbay_plugin_descriptor =
 {
     LMMS_STRINGIFY( PLUGIN_NAME ),
     "Carla Patchbay",
-    QT_TRANSLATE_NOOP( "PluginBrowser",
+    QT_TRANSLATE_NOOP("lmms::gui::PluginBrowser",
                        "Carla Patchbay Instrument" ),
     "falkTX <falktx/at/falktx.com>",
     CARLA_VERSION_HEX,

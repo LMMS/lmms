@@ -40,7 +40,7 @@ Plugin::Descriptor PLUGIN_EXPORT dualfilter_plugin_descriptor =
 {
 	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Dual Filter",
-	QT_TRANSLATE_NOOP( "PluginBrowser", "A Dual filter plugin" ),
+	QT_TRANSLATE_NOOP("lmms::gui::PluginBrowser", "A Dual filter plugin"),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Effect,

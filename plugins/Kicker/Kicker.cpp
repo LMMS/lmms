@@ -51,7 +51,7 @@ Plugin::Descriptor PLUGIN_EXPORT kicker_plugin_descriptor =
 {
 	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Kicker",
-	QT_TRANSLATE_NOOP( "PluginBrowser",
+	QT_TRANSLATE_NOOP("lmms::gui::PluginBrowser",
 				"Versatile drum synthesizer" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,

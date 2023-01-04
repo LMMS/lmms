@@ -39,7 +39,7 @@ Plugin::Descriptor PLUGIN_EXPORT stereomatrix_plugin_descriptor =
 {
 	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Stereo Matrix",
-	QT_TRANSLATE_NOOP( "PluginBrowser",
+	QT_TRANSLATE_NOOP("lmms::gui::PluginBrowser",
 				"Plugin for freely manipulating stereo output" ),
 	"Paul Giblock <drfaygo/at/gmail.com>",
 	0x0100,

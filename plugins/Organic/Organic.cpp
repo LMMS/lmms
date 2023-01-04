@@ -52,7 +52,7 @@ Plugin::Descriptor PLUGIN_EXPORT organic_plugin_descriptor =
 {
 	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Organic",
-	QT_TRANSLATE_NOOP( "PluginBrowser",
+	QT_TRANSLATE_NOOP("lmms::gui::PluginBrowser",
 				"Additive Synthesizer for organ-like sounds" ),
 	"Andreas Brandmaier <andreas/at/brandmaier.de>",
 	0x0100,

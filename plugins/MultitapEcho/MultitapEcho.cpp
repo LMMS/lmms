@@ -38,7 +38,7 @@ Plugin::Descriptor PLUGIN_EXPORT multitapecho_plugin_descriptor =
 {
 	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Multitap Echo",
-	QT_TRANSLATE_NOOP( "PluginBrowser", "A multitap echo delay plugin" ),
+	QT_TRANSLATE_NOOP("lmms::gui::PluginBrowser", "A multitap echo delay plugin"),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Effect,

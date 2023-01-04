@@ -45,7 +45,7 @@ Plugin::Descriptor PLUGIN_EXPORT bitcrush_plugin_descriptor =
 {
 	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Bitcrush",
-	QT_TRANSLATE_NOOP( "PluginBrowser", "An oversampling bitcrusher" ),
+	QT_TRANSLATE_NOOP("lmms::gui::PluginBrowser", "An oversampling bitcrusher"),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Effect,

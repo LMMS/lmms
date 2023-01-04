@@ -62,7 +62,7 @@ Plugin::Descriptor PLUGIN_EXPORT zynaddsubfx_plugin_descriptor =
 {
 	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"ZynAddSubFX",
-	QT_TRANSLATE_NOOP( "PluginBrowser",
+	QT_TRANSLATE_NOOP("lmms::gui::PluginBrowser",
 			"Embedded ZynAddSubFX" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,

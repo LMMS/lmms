@@ -40,7 +40,7 @@ Plugin::Descriptor PLUGIN_EXPORT compressor_plugin_descriptor =
 {
 	LMMS_STRINGIFY(PLUGIN_NAME),
 	"Compressor",
-	QT_TRANSLATE_NOOP("PluginBrowser", "A dynamic range compressor."),
+	QT_TRANSLATE_NOOP("lmms::gui::PluginBrowser", "A dynamic range compressor."),
 	"Lost Robot <r94231@gmail.com>",
 	0x0100,
 	Plugin::Effect,

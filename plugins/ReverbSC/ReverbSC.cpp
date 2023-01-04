@@ -39,7 +39,7 @@ Plugin::Descriptor PLUGIN_EXPORT reverbsc_plugin_descriptor =
 {
 	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"ReverbSC",
-	QT_TRANSLATE_NOOP( "PluginBrowser", "Reverb algorithm by Sean Costello" ),
+	QT_TRANSLATE_NOOP("lmms::gui::PluginBrowser", "Reverb algorithm by Sean Costello"),
 	"Paul Batchelor",
 	0x0123,
 	Plugin::Effect,

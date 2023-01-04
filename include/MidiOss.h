@@ -51,7 +51,7 @@ public:
 
 	inline static QString name()
 	{
-		return( QT_TRANSLATE_NOOP( "MidiSetupWidget",
+		return( QT_TRANSLATE_NOOP("lmms::gui::MidiSetupWidget",
 			"OSS Raw-MIDI (Open Sound System)" ) );
 	}
 
