@@ -123,12 +123,15 @@ bool VstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 
 void VstEffect::openPlugin( const QString & _plugin )
 {
+	// For some reason lupdate does not capture the namespace when just using VstPlugin::tr() here,
+	// so we have to explicitly write the namespace to get the right context
+
 	gui::TextFloat* tf = nullptr;
 	if( gui::getGUI() != nullptr )
 	{
 		tf = gui::TextFloat::displayMessage(
-			VstPlugin::tr( "Loading plugin" ),
-			VstPlugin::tr( "Please wait while loading VST plugin..." ),
+			lmms::VstPlugin::tr("Loading plugin"),
+			lmms::VstPlugin::tr("Please wait while loading the VST plugin..."),
 				PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
 	}
 
@@ -138,7 +141,7 @@ void VstEffect::openPlugin( const QString & _plugin )
 	{
 		m_plugin.clear();
 		delete tf;
-		collectErrorForUI( VstPlugin::tr( "The VST plugin %1 could not be loaded." ).arg( _plugin ) );
+		collectErrorForUI(lmms::VstPlugin::tr("The VST plugin %1 could not be loaded.").arg(_plugin));
 		return;
 	}
 

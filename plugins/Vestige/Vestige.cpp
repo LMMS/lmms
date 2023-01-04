@@ -354,11 +354,15 @@ void VestigeInstrument::loadFile( const QString & _file )
 	}
 	m_pluginDLL = PathUtil::toShortestRelative( _file );
 	gui::TextFloat * tf = nullptr;
+
+	// For some reason lupdate does not capture the namespace when just using VstPlugin::tr() here,
+	// so we have to explicitly write the namespace to get the right context
+
 	if( gui::getGUI() != nullptr )
 	{
 		tf = gui::TextFloat::displayMessage(
-				tr( "Loading plugin" ),
-				tr( "Please wait while loading the VST plugin..." ),
+				lmms::VstPlugin::tr("Loading plugin"),
+				lmms::VstPlugin::tr("Please wait while loading the VST plugin..."),
 				PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
 	}
 
@@ -369,7 +373,7 @@ void VestigeInstrument::loadFile( const QString & _file )
 		m_pluginMutex.unlock();
 		closePlugin();
 		delete tf;
-		collectErrorForUI( VstPlugin::tr( "The VST plugin %1 could not be loaded." ).arg( m_pluginDLL ) );
+		collectErrorForUI(lmms::VstPlugin::tr("The VST plugin %1 could not be loaded.").arg(m_pluginDLL));
 		m_pluginDLL = "";
 		return;
 	}
