@@ -780,6 +780,7 @@ void Sf2Instrument::noteOn( Sf2PluginData * n )
 		}
 	}
 
+#if FLUIDSYNTH_VERSION_MAJOR >= 2
 	// Smallest balance value that results in full attenuation of one channel.
 	// Corresponds to internal FluidSynth macro `FLUID_CB_AMP_SIZE`.
 	constexpr static auto maxBalance = 1441.f;
@@ -797,6 +798,7 @@ void Sf2Instrument::noteOn( Sf2PluginData * n )
 			fluid_voice_update_param(voice.get(), GEN_CUSTOM_BALANCE);
 		}
 	}
+#endif
 
 	m_synthMutex.unlock();
 
