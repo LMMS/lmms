@@ -30,6 +30,7 @@
 #include <cstddef>
 #include <iterator>
 #include <memory>
+#include <new>
 #include <stdexcept>
 #include <utility>
 #include <type_traits>
@@ -216,8 +217,8 @@ public:
 	reference back() noexcept { return operator[](m_size - 1); }
 	const_reference back() const noexcept { return operator[](m_size - 1); }
 
-	pointer data() noexcept { return *std::launder(reinterpret_cast<T(*)[]>(m_data)); }
-	const_pointer data() const noexcept { return *std::launder(reinterpret_cast<const T(*)[]>(m_data)); }
+	pointer data() noexcept { return *std::launder(reinterpret_cast<T(*)[N]>(m_data)); }
+	const_pointer data() const noexcept { return *std::launder(reinterpret_cast<const T(*)[N]>(m_data)); }
 
 	iterator begin() noexcept { return data(); }
 	const_iterator begin() const noexcept { return data(); }
