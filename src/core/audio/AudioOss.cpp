@@ -323,7 +323,7 @@ AudioOss::setupWidget::setupWidget( QWidget * _parent ) :
 	m_device = new QLineEdit( probeDevice(), this );
 	m_device->setGeometry( 10, 20, 160, 20 );
 
-	auto dev_lbl = new QLabel(tr("Device"), this);
+	auto dev_lbl = new QLabel(gui::AudioDeviceSetupWidget::tr("Device"), this);
 	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
 	dev_lbl->setGeometry( 10, 40, 160, 10 );
 
@@ -335,7 +335,7 @@ AudioOss::setupWidget::setupWidget( QWidget * _parent ) :
 
 	m_channels = new gui::LcdSpinBox( 1, this );
 	m_channels->setModel( m );
-	m_channels->setLabel( tr( "Channels" ) );
+	m_channels->setLabel(gui::AudioDeviceSetupWidget::tr("Channels"));
 	m_channels->move( 180, 20 );
 
 }
