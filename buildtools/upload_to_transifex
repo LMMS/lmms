@@ -1,0 +1,22 @@
+#!/bin/bash
+aberr(){ printf "[\e[31mERROR\e[0m]: \e[1m%s\e[0m\n" "$*" >&2; exit 1; }
+abinfo(){ printf "[\e[96mINFO\e[0m]: \e[1m%s\e[0m\n" "$*" >&2; }
+
+[[ $1 ]] && exec cat<<EOF
+Usage: upload_to_transifex
+Update, validate and upload English strings to Transifex
+EOF
+
+which tx &>/dev/null || aberr "You don't have Transifex client installed.\n" \
+	"\tRun \`pip install transifex-client\` to install it."
+
+./buildtools/update_locales data/locale/en.ts || exit
+
+abinfo "Validating translation file..."
+lconvert-qt5 -i "data/locale/en.ts" -o "/tmp/test.qm" -of qm || aberr "Validation failed"
+
+abinfo "Uploading to transifex..."
+
+# This will push the source_file configured in .tx/config
+tx push -s || aberr "Problems occurred when uploading strings to Transifex.\n" \
+	"\tEither there are syntax errors in the source file or you don't have permission to update it."
