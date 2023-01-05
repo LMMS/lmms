@@ -131,18 +131,16 @@ ts_context_pattern = re.compile(r'[^<]*|<(?!context>)|<context>(.|\n)*?<name>(?P
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--delete-old-translations', action='store_true')
-parser.add_argument('files', nargs='*', type=Path)
 args = parser.parse_args()
 
 # Make a list of all source files
-if not args.files:
-    if not Path('.gitmodules').is_file():
-        print('You need to call this script from the LMMS top directory', file=sys.stderr)
-        exit(1)
+if not Path('.gitmodules').is_file():
+    print('You need to call this script from the LMMS top directory', file=sys.stderr)
+    exit(1)
 
-    result = subprocess.run(['git', 'ls-files', '*.[ch]', '*.[ch]pp', ':!tests/*'],
-                            capture_output=True, text=True, check=True)
-    args.files = [Path(f) for f in result.stdout.splitlines() if not exclude_files.search(f)]
+result = subprocess.run(['git', 'ls-files', '*.[ch]', '*.[ch]pp', ':!tests/*'],
+                        capture_output=True, text=True, check=True)
+files = [Path(f) for f in result.stdout.splitlines() if not exclude_files.search(f)]
 
 #
 # the real code
@@ -152,7 +150,7 @@ caption('namespace checks')
 
 known_classes = set()
 
-for cur_file in args.files:
+for cur_file in files:
     if cur_file.is_file():
         cur_text = cur_file.read_text(errors='replace')
 
