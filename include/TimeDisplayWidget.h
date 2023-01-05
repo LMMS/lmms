@@ -71,4 +71,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_TIME_DISPLAY_WIDGET_H

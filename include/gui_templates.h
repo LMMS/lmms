@@ -68,4 +68,4 @@ inline QFont pointSizeF( QFont _f, float SIZE )
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_TEMPLATES_H

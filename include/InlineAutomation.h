@@ -99,4 +99,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_INLINE_AUTOMATION_H

@@ -108,4 +108,4 @@ int LMMS_EXPORT compressbands(const float * _absspec_buffer, float * _compressed
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_FFT_HELPERS_H

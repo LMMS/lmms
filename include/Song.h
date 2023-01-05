@@ -528,4 +528,4 @@ signals:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_SONG_H

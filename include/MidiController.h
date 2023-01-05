@@ -92,4 +92,4 @@ protected:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_MIDI_CONTROLLER_H

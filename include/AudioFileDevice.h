@@ -73,4 +73,4 @@ using AudioFileDeviceInstantiaton
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AUDIO_FILE_DEVICE_H

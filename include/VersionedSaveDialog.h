@@ -68,4 +68,4 @@ public slots:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_VERSIONED_SAVE_DIALOG_H

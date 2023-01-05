@@ -144,4 +144,4 @@ public:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_CONTROLS_H

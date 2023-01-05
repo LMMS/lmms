@@ -107,4 +107,4 @@ protected:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_PEAK_CONTROLLER_H

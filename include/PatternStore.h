@@ -113,4 +113,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_PATTERN_STORE_H

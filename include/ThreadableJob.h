@@ -90,4 +90,4 @@ protected:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_THREADABLE_JOB_H

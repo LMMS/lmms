@@ -364,4 +364,4 @@ using StereoAllpassDelay = AllpassDelay<2>;
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_DELAY_H

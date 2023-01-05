@@ -78,4 +78,4 @@ private:
 
 #endif // LMMS_HAVE_OSS
 
-#endif
+#endif // LMMS_MIDI_OSS_H

@@ -68,4 +68,4 @@ namespace lmms::Clipboard
 
 } // namespace lmms::Clipboard
 
-#endif
+#endif // LMMS_CLIPBOARD_H

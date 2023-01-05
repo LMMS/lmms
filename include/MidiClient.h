@@ -173,4 +173,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_MIDI_CLIENT_H

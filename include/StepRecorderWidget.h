@@ -95,4 +95,4 @@ signals:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_STEP_RECOREDER_WIDGET_H

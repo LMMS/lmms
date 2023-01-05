@@ -104,4 +104,4 @@ private:
 
 #endif // LMMS_HAVE_PULSEAUDIO
 
-#endif
+#endif // LMMS_AUDIO_PULSEAUDIO_H

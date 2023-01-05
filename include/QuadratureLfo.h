@@ -100,4 +100,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_QUADRATURE_LFO_H

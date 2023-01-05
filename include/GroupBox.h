@@ -73,5 +73,4 @@ private:
 
 } // namespace lmms::gui
 
-
-#endif
+#endif // LMMS_GUI_GROUP_BOX_H

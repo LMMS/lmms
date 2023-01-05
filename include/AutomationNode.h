@@ -156,4 +156,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AUTOMATION_NODE_H

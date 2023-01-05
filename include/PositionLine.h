@@ -51,4 +51,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_POSITION_LINE_H

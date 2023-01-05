@@ -76,4 +76,4 @@ using sliderModel = IntModel;
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_AUTOMATABLE_SLIDER_H

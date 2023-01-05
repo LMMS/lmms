@@ -77,4 +77,4 @@ class PerfLogTimer
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_PERFLOG_H

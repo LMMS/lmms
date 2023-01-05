@@ -154,4 +154,4 @@ signals:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_MIDI_CLIP_H

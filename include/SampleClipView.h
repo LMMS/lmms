@@ -71,4 +71,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_SAMPLE_CLIP_VIEW_H

@@ -89,4 +89,4 @@ private:
 
 #endif // LMMS_HAVE_SNDIO
 
-#endif
+#endif // LMMS_AUDIO_SNDIO_H

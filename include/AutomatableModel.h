@@ -507,5 +507,4 @@ using AutomatedValueMap = QMap<AutomatableModel*, float>;
 
 } // namespace lmms
 
-#endif
-
+#endif // LMMS_AUTOMATABLE_MODEL_H

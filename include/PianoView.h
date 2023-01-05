@@ -103,4 +103,4 @@ signals:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_PIANO_VIEW_H

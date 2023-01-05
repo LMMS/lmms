@@ -99,5 +99,4 @@ private:
 
 } // namespace lmms::gui
 
-
-#endif
+#endif // LMMS_GUI_SAMPLE_TRACK_WINDOW_H

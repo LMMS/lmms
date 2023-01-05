@@ -60,4 +60,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_SIDE_BAR_H

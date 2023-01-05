@@ -145,4 +145,4 @@ constexpr const char* UI_CTRL_KEY =
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_TYPES_H

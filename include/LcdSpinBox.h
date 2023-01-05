@@ -89,4 +89,4 @@ using LcdSpinBoxModel = IntModel;
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_LCD_SPINBOX_H

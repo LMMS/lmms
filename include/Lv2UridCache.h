@@ -75,4 +75,4 @@ template<> struct Lv2UridCache::IdForType<std::int32_t> { static constexpr auto 
 
 #endif // LMMS_HAVE_LV2
 
-#endif
+#endif // LMMS_LV2_URID_CACHE_H

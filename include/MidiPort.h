@@ -190,4 +190,4 @@ using MidiPortList = QList<MidiPort*>;
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_MIDI_PORT_H

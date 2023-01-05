@@ -68,4 +68,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_METER_MODEL_H

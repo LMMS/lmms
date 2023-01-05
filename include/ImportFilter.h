@@ -114,4 +114,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_IMPORT_FILTER_H

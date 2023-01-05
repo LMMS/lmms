@@ -194,4 +194,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_CLIP_H

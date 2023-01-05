@@ -78,4 +78,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_OSCILLOSCOPE_H

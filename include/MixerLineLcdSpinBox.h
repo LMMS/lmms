@@ -56,4 +56,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_MIXER_LINE_LCD_SPIN_BOX_H

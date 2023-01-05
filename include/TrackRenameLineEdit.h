@@ -47,4 +47,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_TRACK_RENAME_LINE_EDIT_H

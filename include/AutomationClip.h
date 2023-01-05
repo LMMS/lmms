@@ -260,4 +260,4 @@ inline int POS(AutomationClip::TimemapIterator it)
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AUTOMATION_CLIP_H

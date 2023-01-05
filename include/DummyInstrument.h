@@ -77,4 +77,4 @@ public:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_DUMMY_INSTRUMENT_H

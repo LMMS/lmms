@@ -149,4 +149,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_SHARED_MEMORY_H

@@ -115,4 +115,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_TEMPO_SYNC_KNOB_MODEL_H

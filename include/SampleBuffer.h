@@ -355,4 +355,4 @@ signals:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_SAMPLE_BUFFER_H

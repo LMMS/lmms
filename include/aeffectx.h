@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AEFFECTX_H
-#define AEFFECTX_H
+#ifndef LMMS_AEFFECTX_H
+#define LMMS_AEFFECTX_H
 
 #include <stdint.h>
 #include <type_traits>
@@ -297,4 +297,4 @@ public:
 
 using audioMasterCallback = intptr_t (VST_CALL_CONV*)(AEffect*, int32_t, int32_t, intptr_t, void*, float);
 
-#endif
+#endif // LMMS_AEFFECTX_H

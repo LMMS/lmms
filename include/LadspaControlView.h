@@ -55,4 +55,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_LADSPA_CONTROL_VIEW_H

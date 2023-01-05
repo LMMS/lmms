@@ -166,4 +166,4 @@ using ConstPlayHandleList = QList<const PlayHandle*>;
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_PLAY_HANDLE_H

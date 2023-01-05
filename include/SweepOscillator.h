@@ -69,4 +69,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_SWEEP_OSCILLATOR_H

@@ -224,4 +224,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_RING_BUFFER_H

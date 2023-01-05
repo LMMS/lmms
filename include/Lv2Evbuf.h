@@ -155,4 +155,4 @@ lv2_evbuf_write(	LV2_Evbuf_Iterator* iter,
 
 #endif // LMMS_HAVE_LV2
 
-#endif
+#endif // LMMS_LV2_EVBUF_H

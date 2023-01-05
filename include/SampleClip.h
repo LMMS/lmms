@@ -100,4 +100,4 @@ signals:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_SAMPLE_CLIP_H

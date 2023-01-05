@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_LINKEDMODELGROUPS_H
-#define LMMS_LINKEDMODELGROUPS_H
+#ifndef LMMS_LINKED_MODEL_GROUPS_H
+#define LMMS_LINKED_MODEL_GROUPS_H
 
 #include <cstddef>
 
@@ -176,4 +176,4 @@ public:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_LINKED_MODEL_GROUPS_H

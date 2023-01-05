@@ -113,4 +113,4 @@ private:
 
 #endif // LMMS_HAVE_OGGVORBIS
 
-#endif
+#endif // LMMS_AUDIO_FILE_OGG_H

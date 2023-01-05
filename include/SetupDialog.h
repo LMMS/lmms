@@ -213,4 +213,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_SETUP_DIALOG_H

@@ -141,4 +141,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_CONTROL_LAYOUT_H

@@ -221,4 +221,4 @@ private:
 
 #endif // LMMS_HAVE_LV2
 
-#endif
+#endif // LMMS_LV2_PROC_H

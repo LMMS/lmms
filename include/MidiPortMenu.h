@@ -61,4 +61,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_MIDI_PORT_MENU_H

@@ -84,5 +84,4 @@ QDebug operator<<(QDebug stream, const PluginIssue& iss);
 
 } // namespace lmms
 
-
-#endif
+#endif // LMMS_PLUGIN_ISSUE_H

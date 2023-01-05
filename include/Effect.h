@@ -241,4 +241,4 @@ using EffectKeyList = Effect::Descriptor::SubPluginFeatures::KeyList;
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_EFFECT_H

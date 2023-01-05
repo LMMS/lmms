@@ -48,4 +48,4 @@ public:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_TOOL_BUTTON_H

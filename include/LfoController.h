@@ -136,4 +136,4 @@ private slots:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_LFO_CONTROLLER_H

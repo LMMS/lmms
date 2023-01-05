@@ -50,4 +50,4 @@ public:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_TOOL_PLUGIN_H

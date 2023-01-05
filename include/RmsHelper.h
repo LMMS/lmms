@@ -98,4 +98,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_RMS_HELPER_H

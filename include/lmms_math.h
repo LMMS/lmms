@@ -328,4 +328,4 @@ static inline T absMin( T a, T b )
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_MATH_H

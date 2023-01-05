@@ -183,4 +183,4 @@ signals:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_CONTROLLER_H

@@ -80,4 +80,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_KEYMAP_H

@@ -226,4 +226,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_MIXER_H

@@ -56,4 +56,4 @@ inline int panningToMidi( panning_t _p )
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_PANNING_H

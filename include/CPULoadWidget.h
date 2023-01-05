@@ -69,4 +69,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_CPU_LOAD_WIDGET_H

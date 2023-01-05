@@ -105,4 +105,4 @@ private slots:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_SUBWINDOW_H

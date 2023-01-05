@@ -139,4 +139,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_MIXER_VIEW_H

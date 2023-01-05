@@ -92,4 +92,4 @@ private:
 
 #endif // LMMS_HAVE_OSS
 
-#endif
+#endif // LMMS_AUDIO_OSS_H

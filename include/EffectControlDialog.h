@@ -64,4 +64,4 @@ protected:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_EFFECT_CONTROL_DIALOG_H

@@ -176,4 +176,4 @@ private slots:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_TRACK_VIEW_H

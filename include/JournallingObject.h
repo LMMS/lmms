@@ -103,4 +103,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_JOURNALLING_OBJECT_H

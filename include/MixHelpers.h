@@ -81,4 +81,4 @@ void multiplyAndAddMultipliedJoined( sampleFrame* dst, const sample_t* srcLeft, 
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_MIX_HELPERS_H

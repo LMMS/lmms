@@ -83,4 +83,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_PLUGIN_BROWSER_H

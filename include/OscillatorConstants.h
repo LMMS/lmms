@@ -55,4 +55,4 @@ namespace lmms::OscillatorConstants
 
 } // namespace lmms::OscillatorConstants
 
-#endif
+#endif // LMMS_OSCILLATORCONSTANTS_H

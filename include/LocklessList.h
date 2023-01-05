@@ -97,4 +97,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_LOCKLESS_LIST_H

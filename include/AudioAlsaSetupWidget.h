@@ -66,4 +66,4 @@ private:
 
 #endif // LMMS_HAVE_ALSA
 
-#endif
+#endif // LMMS_GUI_AUDIO_ALSA_SETUP_WIDGET_H

@@ -355,4 +355,4 @@ void RemotePluginClient::doProcessing()
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_REMOTE_PLUGIN_CLIENT_H

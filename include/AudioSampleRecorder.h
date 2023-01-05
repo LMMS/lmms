@@ -59,4 +59,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AUDIO_SAMPLE_RECORDER_H

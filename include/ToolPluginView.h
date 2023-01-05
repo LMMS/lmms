@@ -49,4 +49,4 @@ public:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_TOOL_PLUGIN_VIEW_H

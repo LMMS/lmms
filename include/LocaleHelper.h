@@ -67,4 +67,4 @@ inline float toFloat(QString str, bool* ok = nullptr)
 
 } // namespace lmms::LocaleHelper
 
-#endif
+#endif // LMMS_LOCALEHELPER_H

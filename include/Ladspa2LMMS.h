@@ -81,4 +81,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_LADSPA_2_LMMS_H

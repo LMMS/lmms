@@ -119,4 +119,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_OUTPUT_SETTINGS_H

@@ -84,4 +84,4 @@ using LcdFloatSpinBoxModel = FloatModel;
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_LCD_FLOATSPINBOX_H

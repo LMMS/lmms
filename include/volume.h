@@ -43,4 +43,4 @@ struct StereoVolumeVector
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_VOLUME_H

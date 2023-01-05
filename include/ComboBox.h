@@ -82,4 +82,4 @@ private slots:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_COMBOBOX_H

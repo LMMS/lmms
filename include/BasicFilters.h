@@ -917,4 +917,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_BASIC_FILTERS_H

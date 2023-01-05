@@ -261,4 +261,4 @@ signals:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_TIMELINE_WIDGET_H

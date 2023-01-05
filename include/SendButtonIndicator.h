@@ -64,4 +64,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_SEND_BUTTON_INDICATOR_H

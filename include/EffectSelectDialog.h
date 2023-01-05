@@ -70,5 +70,4 @@ private:
 
 } // namespace lmms::gui
 
-
-#endif
+#endif // LMMS_GUI_EFFECT_SELECT_DIALOG_H

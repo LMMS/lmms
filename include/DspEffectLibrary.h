@@ -330,5 +330,4 @@ namespace lmms::DspEffectLibrary
 
 } // namespace lmms::DspEffectLibrary
 
-
-#endif
+#endif // LMMS_DSPEFFECTLIBRARY_H

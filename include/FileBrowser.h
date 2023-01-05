@@ -297,4 +297,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_FILE_BROWSER_H

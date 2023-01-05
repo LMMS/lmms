@@ -68,4 +68,4 @@ public:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_MODEL_VISITOR_H

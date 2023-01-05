@@ -116,4 +116,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_LCD_WIDGET_H

@@ -80,4 +80,4 @@ signals:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_TRACK_OPERATIONS_WIDGET_H

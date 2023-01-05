@@ -83,4 +83,4 @@ inline Plugin::Descriptor::SubPluginFeatures::Key ladspaKeyToSubPluginKey(
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_LADSPA_BASE_H

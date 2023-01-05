@@ -56,4 +56,4 @@ class DrumSynth {
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_DRUM_SYNTH_H

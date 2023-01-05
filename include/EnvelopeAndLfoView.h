@@ -104,4 +104,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_ENVELOPE_AND_LFO_VIEW_H

@@ -312,4 +312,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_PLUGIN_H

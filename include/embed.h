@@ -139,4 +139,4 @@ public:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_EMBED_H

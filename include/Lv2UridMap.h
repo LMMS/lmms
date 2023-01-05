@@ -76,4 +76,4 @@ public:
 
 #endif // LMMS_HAVE_LV2
 
-#endif
+#endif // LMMS_LV2_URID_MAP_H

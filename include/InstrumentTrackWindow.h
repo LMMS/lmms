@@ -169,4 +169,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_INSTRUMENT_TRACK_WINDOW_H

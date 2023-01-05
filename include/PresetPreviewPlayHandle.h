@@ -69,4 +69,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_PRESET_PREVIEW_PLAY_HANDLE_H

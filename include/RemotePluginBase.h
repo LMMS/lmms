@@ -673,4 +673,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_REMOTE_PLUGIN_BASE_H

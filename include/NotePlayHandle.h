@@ -364,4 +364,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_NOTE_PLAY_HANDLE_H

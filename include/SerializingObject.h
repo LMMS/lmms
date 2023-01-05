@@ -101,4 +101,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_SERIALIZING_OBJECT_H

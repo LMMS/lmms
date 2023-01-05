@@ -154,4 +154,4 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(Instrument::Flags)
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_INSTRUMENT_H

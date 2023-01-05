@@ -88,4 +88,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_CONTROLLER_VIEW_H

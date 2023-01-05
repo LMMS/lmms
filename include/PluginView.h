@@ -47,4 +47,4 @@ public:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_PLUGIN_VIEW_H

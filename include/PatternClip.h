@@ -58,4 +58,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_PATTERN_CLIP_H

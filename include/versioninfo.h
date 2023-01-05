@@ -51,4 +51,4 @@ constexpr const char* LMMS_BUILDCONF_PLATFORM = "win32";
 constexpr const char* LMMS_BUILDCONF_PLATFORM = "Haiku";
 #endif
 
-#endif
+#endif // LMMS_VERSION_INFO_H

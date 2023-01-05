@@ -76,4 +76,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_FADE_BUTTON_H

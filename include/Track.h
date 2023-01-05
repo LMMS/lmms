@@ -25,7 +25,6 @@
 #ifndef LMMS_TRACK_H
 #define LMMS_TRACK_H
 
-
 #include <QVector>
 #include <QColor>
 
@@ -257,4 +256,4 @@ signals:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_TRACK_H

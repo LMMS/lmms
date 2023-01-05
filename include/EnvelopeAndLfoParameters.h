@@ -190,4 +190,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_ENVELOPE_AND_LFO_PARAMETERS_H

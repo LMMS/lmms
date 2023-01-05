@@ -61,4 +61,4 @@ struct VstSyncData
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_VST_SYNC_DATA_H

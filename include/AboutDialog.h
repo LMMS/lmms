@@ -41,4 +41,4 @@ public:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_ABOUT_DIALOG_H

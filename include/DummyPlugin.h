@@ -68,4 +68,4 @@ protected:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_DUMMY_PLUGIN_H

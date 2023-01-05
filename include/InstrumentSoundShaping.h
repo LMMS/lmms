@@ -92,4 +92,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_INSTRUMENT_SOUND_SHAPING_H

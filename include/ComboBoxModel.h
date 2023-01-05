@@ -95,4 +95,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_COMBOBOX_MODEL_H

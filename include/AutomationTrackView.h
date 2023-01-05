@@ -52,4 +52,4 @@ public:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_AUTOMATION_TRACK_VIEW_H

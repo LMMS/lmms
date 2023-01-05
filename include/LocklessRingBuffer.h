@@ -89,4 +89,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_LOCKLESS_RING_BUFFER_H

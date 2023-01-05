@@ -102,4 +102,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_PATTERN_TRACK_H

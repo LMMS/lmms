@@ -94,4 +94,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_FIFO_BUFFER_H

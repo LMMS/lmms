@@ -46,4 +46,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_MEMORY_HELPER_H

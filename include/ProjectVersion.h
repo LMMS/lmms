@@ -81,4 +81,4 @@ inline bool operator!=(const ProjectVersion & v1, const ProjectVersion & v2) { r
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_PROJECT_VERSION_H

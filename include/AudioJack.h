@@ -144,4 +144,4 @@ signals:
 
 #endif // LMMS_HAVE_JACK
 
-#endif
+#endif // LMMS_AUDIO_JACK_H

@@ -85,4 +85,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_INSTRUMENT_PLAY_HANDLE_H

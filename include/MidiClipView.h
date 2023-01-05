@@ -108,4 +108,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_MIDI_CLIP_VIEW_H

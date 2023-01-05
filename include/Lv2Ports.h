@@ -271,4 +271,4 @@ const Target* dcast(const PortBase* base)
 
 #endif // LMMS_HAVE_LV2
 
-#endif
+#endif // LMMS_LV2PORTS_H

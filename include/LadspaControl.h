@@ -131,4 +131,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_LADSPA_CONTROL_H

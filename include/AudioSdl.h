@@ -115,4 +115,4 @@ private:
 
 #endif // LMMS_HAVE_SDL
 
-#endif
+#endif // LMMS_AUDIO_SDL_H

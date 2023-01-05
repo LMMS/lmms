@@ -45,4 +45,4 @@ public:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_AUDIO_DEVICE_SETUP_WIDGET_H

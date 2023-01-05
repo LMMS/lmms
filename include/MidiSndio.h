@@ -75,4 +75,4 @@ private:
 
 #endif // LMMS_HAVE_SNDIO
 
-#endif
+#endif // LMMS_MIDI_SNDIO_H

@@ -137,5 +137,4 @@ using BoolModelView = TypedModelView<BoolModel>;
 
 } // namespace lmms::gui
 
-#endif
-
+#endif // LMMS_GUI_AUTOMATABLE_MODEL_VIEW_H

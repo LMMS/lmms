@@ -51,4 +51,4 @@ std::size_t LMMS_EXPORT writeToByteSeq( const class MidiEvent& ev,
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_MIDIEVENTTOBYTESEQ_H

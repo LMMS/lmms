@@ -103,4 +103,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_PROJECT_RENDERER_H

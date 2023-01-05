@@ -227,4 +227,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_GRAPH_H

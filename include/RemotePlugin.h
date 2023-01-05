@@ -197,4 +197,4 @@ LMMS_EXPORT inline std::string QSTR_TO_STDSTR(QString const& qstr)
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_REMOTE_PLUGIN_H

@@ -58,4 +58,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_ACTION_GROUP_H

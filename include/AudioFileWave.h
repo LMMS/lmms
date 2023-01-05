@@ -71,4 +71,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AUDIO_FILE_WAVE_H

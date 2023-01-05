@@ -149,7 +149,8 @@ public:
 
 		return sr;
 
-/*		lookup = lookup << 1;
+		/*
+		lookup = lookup << 1;
 		tlen = tlen << 1;
 		t += 1;
 		const sample_t s3 = s_waveforms[ _wave ].sampleAt( t, lookup );
@@ -159,7 +160,7 @@ public:
 		const float ip2 = ( ( tlen - _wavelen ) / tlen - 0.5 ) * 2.0;
 
 		return linearInterpolate( s12, s34, ip2 );
-	*/
+		*/
 	};
 
 
@@ -174,4 +175,4 @@ public:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_BANDLIMITEDWAVE_H

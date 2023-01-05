@@ -84,4 +84,4 @@ public:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_LOCKLESS_ALLOCATOR_H

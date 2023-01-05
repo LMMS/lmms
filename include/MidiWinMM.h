@@ -150,4 +150,4 @@ signals:
 
 #endif // LMMS_BUILD_WIN32
 
-#endif
+#endif // LMMS_MIDI_WINMM_H

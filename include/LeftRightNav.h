@@ -51,4 +51,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_LEFT_RIGHT_NAV_H

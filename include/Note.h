@@ -265,4 +265,4 @@ std::optional<NoteBounds> boundsForNotes(const NoteVector& notes);
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_NOTE_H

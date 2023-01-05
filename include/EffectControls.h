@@ -82,4 +82,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_EFFECT_CONTROLS_H

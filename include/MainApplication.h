@@ -64,4 +64,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_MAIN_APPLICATION_H

@@ -160,4 +160,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AUDIO_DEVICE_H

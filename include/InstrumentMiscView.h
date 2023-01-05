@@ -71,4 +71,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_INSTRUMENT_MISC_VIEW_H

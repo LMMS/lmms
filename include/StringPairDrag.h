@@ -55,4 +55,4 @@ public:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_STRING_PAIR_DRAG_H

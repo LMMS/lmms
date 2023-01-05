@@ -573,4 +573,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_PIANO_ROLL_H

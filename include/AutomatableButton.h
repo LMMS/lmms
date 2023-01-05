@@ -108,4 +108,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_AUTOMATABLE_BUTTON_H

@@ -127,4 +127,4 @@ signals:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_CONTROLLER_CONNECTION_H

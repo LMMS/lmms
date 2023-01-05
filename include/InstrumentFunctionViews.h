@@ -99,4 +99,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_INSTRUMENT_FUNCTION_VIEWS_H

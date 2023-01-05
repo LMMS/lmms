@@ -69,5 +69,4 @@ private:
 
 } // namespace lmms::gui
 
-
-#endif
+#endif // LMMS_GUI_EXPORT_PROJECT_DIALOG_H

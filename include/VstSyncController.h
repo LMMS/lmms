@@ -62,4 +62,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_VST_SYNC_CONTROLLER_H

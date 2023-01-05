@@ -35,7 +35,7 @@ int inline can_we_daz()
 
 #endif // __SSE__
 
-// Set denormal protection for this thread. 
+// Set denormal protection for this thread.
 void inline disable_denormals()
 {
 #ifdef __SSE__
@@ -50,4 +50,4 @@ void inline disable_denormals()
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_DENORMALS_H

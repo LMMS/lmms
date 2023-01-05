@@ -38,4 +38,4 @@
 #include <cstdio>
 
 
-#endif
+#endif // LMMS_DEBUG_H

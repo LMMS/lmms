@@ -108,4 +108,4 @@ void MM_FREE(T* ptr)
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_MEMORY_MANAGER_H

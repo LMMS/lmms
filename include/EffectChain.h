@@ -85,4 +85,4 @@ signals:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_EFFECT_CHAIN_H

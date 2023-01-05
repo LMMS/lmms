@@ -75,4 +75,4 @@ private:
 
 #endif // LMMS_HAVE_MP3LAME
 
-#endif
+#endif // LMMS_AUDIO_FILE_MP3_H

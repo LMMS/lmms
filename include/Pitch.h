@@ -40,4 +40,4 @@ constexpr pitch_t DefaultPitch = 0;
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_PITCH_H

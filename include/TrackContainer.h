@@ -124,4 +124,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_TRACK_CONTAINER_H

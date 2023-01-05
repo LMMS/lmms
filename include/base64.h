@@ -53,4 +53,4 @@ namespace lmms::base64
 
 } // namespace lmms::base64
 
-#endif
+#endif // LMMS_BASE64_H

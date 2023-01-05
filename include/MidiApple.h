@@ -155,4 +155,4 @@ signals:
 
 #endif // LMMS_BUILD_APPLE
 
-#endif
+#endif // LMMS_MIDI_APPLE_H

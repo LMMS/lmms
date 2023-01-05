@@ -81,4 +81,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_TEXT_FLOAT_H

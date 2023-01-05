@@ -73,4 +73,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_INSTRUMENT_SOUND_SHAPING_VIEW_H

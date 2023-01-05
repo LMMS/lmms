@@ -49,4 +49,4 @@ public:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_MIDI_EVENT_PROCESSOR_H

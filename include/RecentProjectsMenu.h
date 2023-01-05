@@ -45,4 +45,4 @@ private slots:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_RECENT_PROJECTS_MENU_H

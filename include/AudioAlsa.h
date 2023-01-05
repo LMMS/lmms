@@ -108,4 +108,4 @@ private:
 
 #endif // LMMS_HAVE_ALSA
 
-#endif
+#endif // LMMS_AUDIO_ALSA_H

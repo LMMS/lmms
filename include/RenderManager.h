@@ -85,4 +85,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_RENDER_MANAGER_H

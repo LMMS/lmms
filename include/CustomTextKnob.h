@@ -57,4 +57,4 @@ protected:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_CUSTOM_TEXT_KNOB_H

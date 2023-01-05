@@ -77,4 +77,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_NSTATE_BUTTON_H

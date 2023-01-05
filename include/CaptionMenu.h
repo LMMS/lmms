@@ -46,4 +46,4 @@ public:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_CAPTION_MENU_H

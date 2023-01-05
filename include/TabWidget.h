@@ -111,4 +111,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_TAB_WIDGET_H

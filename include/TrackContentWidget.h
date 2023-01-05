@@ -149,4 +149,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_TRACK_CONTENT_WIDGET_H

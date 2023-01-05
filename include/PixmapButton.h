@@ -67,4 +67,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_PIXMAP_BUTTON_H

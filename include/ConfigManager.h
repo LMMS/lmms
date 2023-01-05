@@ -313,4 +313,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_CONFIG_MANAGER_H

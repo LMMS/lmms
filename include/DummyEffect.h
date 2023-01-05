@@ -149,4 +149,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_DUMMY_EFFECT_H

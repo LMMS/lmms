@@ -70,4 +70,4 @@ namespace lmms::PathUtil
 
 } // namespace lmms::PathUtil
 
-#endif
+#endif // LMMS_PATHUTIL_H

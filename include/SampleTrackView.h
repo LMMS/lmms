@@ -109,4 +109,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_SAMPLE_TRACK_VIEW_H

@@ -75,4 +75,4 @@ public:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_INSTRUMENT_VIEW_H

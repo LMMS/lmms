@@ -221,4 +221,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_MIDI_EVENT_H

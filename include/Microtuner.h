@@ -74,4 +74,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_MICROTUNER_H

@@ -73,4 +73,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_MIDI_CC_RACK_VIEW_H

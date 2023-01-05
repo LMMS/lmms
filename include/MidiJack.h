@@ -102,4 +102,4 @@ private:
 
 #endif // LMMS_HAVE_JACK
 
-#endif
+#endif // LMMS_MIDI_JACK_H

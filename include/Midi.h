@@ -143,4 +143,4 @@ const int MidiMaxPitchBend = 16383;
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_MIDI_H

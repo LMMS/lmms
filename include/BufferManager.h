@@ -54,4 +54,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_BUFFER_MANAGER_H

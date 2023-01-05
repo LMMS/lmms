@@ -48,4 +48,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_MICRO_TIMER_H

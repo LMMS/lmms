@@ -85,4 +85,4 @@ private:
 
 #endif // LMMS_HAVE_ALSA
 
-#endif
+#endif // LMMS_MIDI_ALSA_RAW_H

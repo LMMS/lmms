@@ -59,4 +59,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_MIDI_SETUP_WIDGET_H

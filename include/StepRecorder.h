@@ -152,4 +152,4 @@ class StepRecorder : public QObject
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_STEP_RECORDER_H

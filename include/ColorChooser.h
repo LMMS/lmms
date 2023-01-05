@@ -68,4 +68,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_COLOR_CHOOSER_H

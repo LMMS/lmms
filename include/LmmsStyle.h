@@ -95,4 +95,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_LMMS_STYLE_H

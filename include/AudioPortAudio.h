@@ -163,4 +163,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AUDIO_PORTAUDIO_H

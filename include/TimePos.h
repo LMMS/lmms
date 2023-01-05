@@ -116,4 +116,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_TIME_POS_H

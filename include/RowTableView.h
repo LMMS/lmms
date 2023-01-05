@@ -56,4 +56,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_ROW_TABLE_VIEW_H

@@ -65,4 +65,4 @@ protected:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_MIDI_DUMMY_H

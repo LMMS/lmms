@@ -113,4 +113,4 @@ protected:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_EDITOR_H

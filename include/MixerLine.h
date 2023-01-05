@@ -117,4 +117,4 @@ private slots:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_MIXER_LINE_H

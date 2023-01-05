@@ -90,4 +90,4 @@ signals:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_MODEL_H

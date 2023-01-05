@@ -110,4 +110,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_CONTROLLER_CONNECTION_DIALOG_H

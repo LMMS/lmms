@@ -96,4 +96,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_EFFECT_VIEW_H

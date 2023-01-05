@@ -100,4 +100,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_SAMPLE_PLAY_HANDLE_H

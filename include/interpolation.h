@@ -139,4 +139,4 @@ inline float lagrangeInterpolate( float v0, float v1, float v2, float v3, float 
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_INTERPOLATION_H

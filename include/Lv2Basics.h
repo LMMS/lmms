@@ -68,4 +68,4 @@ std::string stdStringFromPortName(const LilvPlugin* plug, const LilvPort* port);
 
 #endif // LMMS_HAVE_LV2
 
-#endif
+#endif // LMMS_LV2BASICS_H

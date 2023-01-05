@@ -111,4 +111,4 @@ LMMS_EXPORT PluginFactory* getPluginFactory();
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_PLUGIN_FACTORY_H

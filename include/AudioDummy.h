@@ -116,4 +116,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AUDIO_DUMMY_H

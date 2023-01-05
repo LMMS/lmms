@@ -97,4 +97,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_PATTERN_EDITOR_H

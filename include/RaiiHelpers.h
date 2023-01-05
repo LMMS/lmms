@@ -64,4 +64,4 @@ using UniqueNullableResource = std::unique_ptr<T, NullableResourceDeleter<T, Nul
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_RAII_HELPERS_H

@@ -93,4 +93,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_RUBBERBAND_H

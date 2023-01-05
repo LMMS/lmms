@@ -57,4 +57,4 @@ public:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_VALUE_BUFFER_H

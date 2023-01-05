@@ -91,4 +91,4 @@ int fileToDescriptor(FILE* f, bool closeFile = true)
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_IO_HELPER_H

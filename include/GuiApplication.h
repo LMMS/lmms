@@ -93,4 +93,4 @@ LMMS_EXPORT GuiApplication* getGUI();
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_GUI_APPLICATION_H

@@ -77,4 +77,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_INSTRUMENT_MIDI_IO_VIEW_H

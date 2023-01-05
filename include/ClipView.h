@@ -252,4 +252,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_CLIP_VIEW_H

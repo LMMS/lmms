@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_GUI_LINKEDMODELGROUPVIEWS_H
-#define LMMS_GUI_LINKEDMODELGROUPVIEWS_H
+#ifndef LMMS_GUI_LINKED_MODEL_GROUP_VIEWS_H
+#define LMMS_GUI_LINKED_MODEL_GROUP_VIEWS_H
 
 #include <cstddef>
 #include <memory>
@@ -118,4 +118,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_LINKED_MODEL_GROUP_VIEWS_H

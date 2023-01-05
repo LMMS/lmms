@@ -64,4 +64,4 @@ public:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_DETUNING_HELPER_H

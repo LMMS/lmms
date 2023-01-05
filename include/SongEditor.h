@@ -226,4 +226,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_SONG_EDITOR_H

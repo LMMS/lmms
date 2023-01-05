@@ -54,4 +54,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_METER_DIALOG_H

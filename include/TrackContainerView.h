@@ -218,4 +218,4 @@ signals:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_TRACK_CONTAINER_VIEW_H
