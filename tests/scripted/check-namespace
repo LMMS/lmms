@@ -6,11 +6,16 @@
 #       difficulties with this tests, it could be a fault of your
 #       changes, but it could also be a fault of this script.
 
+import argparse
 import re
 import subprocess
 import sys
+import tempfile
+import xml.etree.ElementTree as ElementTree
 from pathlib import Path
-from typing import NamedTuple
+from typing import NamedTuple, Union
+
+
 
 
 # types
@@ -39,24 +44,21 @@ errors = 0
 # functions
 
 def caption(my_str):
-    print(f'\n# {my_str}\n')
+    print(f'\n# {my_str}\n', file=sys.stderr)
 
 
-def error(where, match, my_str):
+def error(message: str, file: Union[str, Path], line: int = None):
     global errors
     errors += 1
-    if match:
-        line = match.string[:match.start()].count('\n') + 1  # first line is 1
-        where = f'{where}:{line}'
-    print(f'Error: {where}: {my_str}')
+    if line is not None:
+        file = f'{file}:{line}'
+    print(f'Error: {file}: {message}', file=sys.stderr)
 
 
-if not Path('.gitmodules').is_file():
-    print('You need to call this script from the LMMS top directory')
-    exit(1)
+def line(match: re.Match):
+    """Return line number of match"""
+    return match.string[:match.start()].count('\n') + 1  # first line is 1
 
-result = subprocess.run(['git', 'ls-files', '*.[ch]', '*.[ch]pp', ':!tests/*'],
-                        capture_output=True, text=True, check=True)
 
 known_no_namespace_lmms = {
     # main.cpp
@@ -82,12 +84,6 @@ exclude_files = re.compile(
     'plugins/ZynAddSubFx/ThreadShims.h'
 )
 
-files = [Path(f) for f in result.stdout.splitlines() if not exclude_files.search(f)]
-
-# Debug argument
-if len(sys.argv) > 1:
-    files = [Path(arg) for arg in sys.argv[1:]]
-
 statement_pattern = re.compile(
     # Capture comments first to prevent them from matching any other regex
     #  Include next line if line ends with backslash
@@ -110,7 +106,10 @@ statement_pattern = re.compile(
     # Start of named namespace, extern "C" or just a opening brace
     r'(^ *(namespace +(?P<namespace>[\w:]+)|(?P<extern>extern *"C"))\s*)?(?P<opening_brace>{)|'
     # End of namespace including comment, or just a closing brace
-    r'(?P<closing_brace>})( *// *namespace +(?P<namespace_end>[\w:]+))?'
+    r'(?P<closing_brace>})( *// *namespace +(?P<namespace_end>[\w:]+))?|'
+
+    # Class declaration
+    r'(^ *class +([A-Z_]+_EXPORT +)*(?P<class>[\w]+))'
 
     # In all the regexes above match both tab and space when a space is used
     r''.replace(' ', r'[\t ]'),
@@ -123,33 +122,65 @@ header_guard_pattern = re.compile(r'^(/[*](.|\n)*?[*]/|//.*|\s)*#\s*(ifndef|prag
 # Namespace lmms
 namespace_pattern = re.compile(r'^\s*namespace\s+lmms', re.MULTILINE)
 
+# Context block in a .ts file
+ts_context_pattern = re.compile(r'[^<]*|<(?!context>)|<context>(.|\n)*?<name>(?P<name>.+?)</name>(.|\n)*?</context>\n')
+
+#
+# command line arguments
+#
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--delete-old-translations', action='store_true')
+parser.add_argument('files', nargs='*', type=Path)
+args = parser.parse_args()
+
+# Make a list of all source files
+if not args.files:
+    if not Path('.gitmodules').is_file():
+        print('You need to call this script from the LMMS top directory', file=sys.stderr)
+        exit(1)
+
+    result = subprocess.run(['git', 'ls-files', '*.[ch]', '*.[ch]pp', ':!tests/*'],
+                            capture_output=True, text=True, check=True)
+    args.files = [Path(f) for f in result.stdout.splitlines() if not exclude_files.search(f)]
+
 #
 # the real code
 #
 
 caption('namespace checks')
 
-for cur_file in files:
+known_classes = set()
+
+for cur_file in args.files:
     if cur_file.is_file():
         cur_text = cur_file.read_text(errors='replace')
 
         if cur_file.as_posix() not in known_no_namespace_lmms:
-            namespace_pattern.search(cur_text) or error(cur_file, None, f'File has no namespace lmms')
+            namespace_pattern.search(cur_text) or error('File has no namespace lmms', cur_file)
 
-        header_guard = str(cur_file).endswith('.h')
+        is_header = str(cur_file).endswith('.h')
+        header_guard = is_header
         expectations = []  # type: list[Expectation]
 
         if header_guard:
             if not header_guard_pattern.match(cur_text):
-                error(cur_file, None, 'First statement should be header guard')
+                error('First statement should be header guard', cur_file)
                 header_guard = False
 
         for m in statement_pattern.finditer(cur_text):
+            # Keep a list of all class names
+            if is_header and m.group('class'):
+                cls = [e.name for e in expectations if e.type is CODE_BLOCK and e.name]
+                cls.append(m.group('class'))
+                known_classes.add('::'.join(cls))
+                continue
+
             # Find the matched regex group
             statement = m.group('opening_brace') or m.group('closing_brace')
             if not statement:
                 statement = '#' + (m.group('macro') or m.group('named_macro') or m.group('short_macro') or '')
-            if not statement:
+            if not statement or statement == '#':
                 continue
 
             # Start statements
@@ -164,7 +195,7 @@ for cur_file in files:
             # End statements
             elif statement == '#endif' or statement.startswith('#el') or statement == '}':
                 if not expectations:
-                    error(cur_file, m, f'Unexpected {statement}')
+                    error(f'Unexpected {statement}', cur_file, line(m))
                     break
                 if statement.startswith('#el') and expectations[-1].statement == '#endif':
                     # After an #else or #elif the comment is no longer mandatory, since it's hard to define
@@ -174,26 +205,85 @@ for cur_file in files:
                 exp = expectations.pop()
                 name = m.group('macro_name') or m.group('namespace_end') or ''
                 if statement != exp.statement:
-                    error(cur_file, m, f'Expected {exp.statement} before {statement}')
+                    error(f'Expected {exp.statement} before {statement}', cur_file, line(m))
                     break
                 # Require no end comment for header guard
                 elif exp.type is HEADER_GUARD and not name:
                     continue
                 elif exp.name and name != exp.name:
                     comment = 'namespace ' if exp.type is CODE_BLOCK else ''
-                    error(cur_file, m, f'Missing comment // {comment}{exp.name}')
+                    error(f'Missing comment // {comment}{exp.name}', cur_file, line(m))
 
             # Extra checks
             elif statement == '#include':
                 if any(True for e in expectations if e.type is CODE_BLOCK):
-                    error(cur_file, m, '#include inside a code block')
+                    error('#include inside a code block', cur_file, line(m))
 
         else:
             # Leftover expected statements
             for exp in reversed(expectations):
-                error(cur_file, None, f'Expected {exp.statement} before end of file')
+                error(f'Expected {exp.statement} before end of file', cur_file)
+
+
+caption('generating localization files')
+
+# Generate a .ts file with the strings currently in the code
+temp = Path(tempfile.gettempdir()) / 'lmms_strings_temp.ts'
+try:
+    # In case the file exists already we overwrite it with a valid content
+    temp.write_text('<TS></TS>\n')
+    subprocess.run(['./buildtools/update_locales', str(temp)], check=True, stdout=subprocess.DEVNULL)
+    text = temp.read_text()
+finally:
+    temp.unlink()
+
+
+caption('localization checks')
+
+# Compare the classes found in the just generated .ts file with the classes in our code
+root = ElementTree.fromstring(text)
+for context in root.iterfind('context'):
+    # <name> should be a class in the lmms namespace
+    name = context.find('name')
+    if name is None or name.text is None:
+        continue
+    elif not name.text.startswith('lmms::'):
+        msg = f'Translation context "{name.text}" is outside the lmms namespace'
+    elif name.text not in known_classes:
+        msg = f'Translation context "{name.text}" is not a known class'
+    else:
+        continue
+    # Repeat error message for every occurrence in the code
+    for location in context.iter('location'):
+        error(msg, location.attrib.get('filename'), int(location.attrib.get('line')))
+
+
+# Go through all .ts files and find classes not present in the current code
+old_translations = False
+for file in Path('./data/locale').glob('*.ts'):
+    text = file.read_text()
+    output = ''
+    for match in ts_context_pattern.finditer(text):
+        name = match.group('name')
+        if name and name not in known_classes:
+            if not args.delete_old_translations:
+                old_translations = True
+                error(f'Translation context "{name}" is outdated', file)
+        elif args.delete_old_translations:
+            # The regex matches everything, so if it didn't catch it as an error we write it out
+            output += match.group(0)
+    if output:
+        print(f'Cleaning up {file}', file=sys.stderr)
+        file.write_text(output)
+
+if old_translations:
+    print('\nThe translations in `data/locale` are outdated. If you have renamed a class, please update all',
+          '.ts files accordingly using search and replace. If you have deleted a class you can remove the',
+          'outdated translations by running `tests/scripted/check-namespace --delete-old-translations`.\n',
+          file=sys.stderr, sep='\n')
+
 
 caption('summary')
 
-print(f'{str(errors)} errors.')
+print(f'{str(errors)} errors.', file=sys.stderr)
 exit(1 if errors > 0 else 0)
