@@ -38,7 +38,7 @@
 namespace lmms
 {
 
-GrooveExperiments::GrooveExperiments(QObject * parent) :
+GrooveExperiments::GrooveExperiments(QObject* parent) :
 	Groove(parent)
 {
 	m_amount = 0;
@@ -55,20 +55,20 @@ GrooveExperiments::~GrooveExperiments()
 void GrooveExperiments::init()
 {
 
-	Song * s = Engine::getSong();
-	connect(s, SIGNAL(projectLoaded()),        this, SLOT(update()));
-	connect(s, SIGNAL(lengthChanged(int)),        this, SLOT(update()));
-	connect(s, SIGNAL(tempoChanged(bpm_t)),         this, SLOT(update()));
+	Song* s = Engine::getSong();
+	connect(s, SIGNAL(projectLoaded()), this, SLOT(update()));
+	connect(s, SIGNAL(lengthChanged(int)), this, SLOT(update()));
+	connect(s, SIGNAL(tempoChanged(bpm_t)), this, SLOT(update()));
 	connect(s, SIGNAL(timeSignatureChanged(int, int)), this, SLOT(update()));
 
 }
 
 void GrooveExperiments::update()
 {
-	m_framesPerTick =  Engine::framesPerTick();
+	m_framesPerTick = Engine::framesPerTick();
 }
 
-int GrooveExperiments::isInTick(TimePos * curStart, const fpp_t frames, const f_cnt_t offset, Note * n, MidiClip* c)
+int GrooveExperiments::isInTick(TimePos* curStart, const fpp_t frames, const f_cnt_t offset, Note* n, MidiClip* c)
 {
 	// TODO why is this wrong on boot how do we set it once not every loop
 	if (m_framesPerTick == 0)
@@ -101,7 +101,7 @@ int GrooveExperiments::isInTick(TimePos * curStart, const fpp_t frames, const f_
 
 		float ticksToShift = ((posInEigth - 12) * -m_swingFactor);
 
-		f_cnt_t framesToShift = (int)(ticksToShift * m_framesPerTick);
+		f_cnt_t framesToShift = (int)(ticksToShift* m_framesPerTick);
 
 		int tickOffset = (int)(framesToShift / m_framesPerTick); // round down
 
@@ -124,7 +124,7 @@ int GrooveExperiments::isInTick(TimePos * curStart, const fpp_t frames, const f_
 	return n->pos().getTicks() == curStart->getTicks() ? 0 : -1;
 }
 
-QWidget * GrooveExperiments::instantiateView(QWidget * parent)
+QWidget* GrooveExperiments::instantiateView(QWidget* parent)
 {
 	return new gui::GrooveExperimentsView(this, parent);
 }
@@ -135,7 +135,7 @@ namespace gui
 
 // VIEW //
 
-GrooveExperimentsView::GrooveExperimentsView(GrooveExperiments * groove, QWidget * parent) :
+GrooveExperimentsView::GrooveExperimentsView(GrooveExperiments* groove, QWidget* parent) :
 	QWidget(parent)
 {
 	m_sliderModel = new IntModel(0, 0, 127); // Unused

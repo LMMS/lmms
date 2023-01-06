@@ -292,7 +292,7 @@ public:
 		return m_globalAutomationTrack;
 	}
 
-	Groove * globalGroove()
+	Groove* globalGroove()
 	{
 		return m_globalGroove;
 	}
@@ -307,7 +307,7 @@ public:
 	bool guiSaveProject();
 	bool guiSaveProjectAs(const QString & filename);
 	bool saveProjectFile(const QString & filename, bool withResources = false);
-	void setGlobalGroove(Groove * groove);
+	void setGlobalGroove(Groove* groove);
 
 	const QString & projectFileName() const
 	{
@@ -454,7 +454,7 @@ private:
 	void setProjectFileName(QString const & projectFileName);
 
 	AutomationTrack * m_globalAutomationTrack;
-	Groove * m_globalGroove;
+	Groove* m_globalGroove;
 
 	IntModel m_tempoModel;
 	MeterModel m_timeSigModel;

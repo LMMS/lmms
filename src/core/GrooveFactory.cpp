@@ -21,8 +21,8 @@ GrooveFactory::GrooveFactory()
  *
  * TODO this is a bit Java-like how does C++ do this kind of thing normally
  */
-Groove * GrooveFactory::create(QString grooveType) {
-	if (grooveType == NULL || grooveType == "none") {
+Groove* GrooveFactory::create(const QString& grooveType) {
+	if (grooveType.isEmpty() || grooveType == "none") {
 		return new Groove();
 	}
 	if (grooveType == "hydrogen") {

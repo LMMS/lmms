@@ -45,7 +45,7 @@ enum MidiEventTypes
 	// system exclusive
 	MidiSysEx= 0xF0,
 	// system common - never in midi files
-	TimePosCode= 0xF1,
+	MidiTimeCode= 0xF1,
 	MidiSongPosition = 0xF2,
 	MidiSongSelect = 0xF3,
 	MidiTuneRequest = 0xF6,
@@ -75,7 +75,7 @@ enum MidiMetaEventTypes
 	MidiEOT = 0x2f,
 	MidiSetTempo = 0x51,
 	MidiSMPTEOffset = 0x54,
-	TimePosSignature = 0x58,
+	MidiTimeSignature = 0x58,
 	MidiKeySignature = 0x59,
 	MidiSequencerEvent = 0x7f,
 	MidiMetaCustom = 0x80,

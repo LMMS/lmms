@@ -30,7 +30,7 @@
 namespace lmms
 {
 
-MidiSwing::MidiSwing(QObject * parent) :
+MidiSwing::MidiSwing(QObject* parent) :
 	Groove(parent)
 {
 }
@@ -41,13 +41,13 @@ MidiSwing::~MidiSwing()
 
 static int applyMidiSwing(int posInEight);
 
-int MidiSwing::isInTick(TimePos * curStart, const fpp_t frames, const f_cnt_t offset,
-					Note * n, MidiClip* c)
+int MidiSwing::isInTick(TimePos* curStart, const fpp_t frames, const f_cnt_t offset,
+					Note* n, MidiClip* c)
 {
 	return isInTick(curStart, n, c);
 }
 
-int MidiSwing::isInTick(TimePos * curStart, Note * n, MidiClip* c)
+int MidiSwing::isInTick(TimePos* curStart, Note* n, MidiClip* c)
 {
 
 	// Where are we in the beat
@@ -75,7 +75,7 @@ int MidiSwing::isInTick(TimePos * curStart, Note * n, MidiClip* c)
 
 }
 
-QWidget * MidiSwing::instantiateView(QWidget * parent)
+QWidget* MidiSwing::instantiateView(QWidget* parent)
 {
 	return new QLabel("");
 }

@@ -12,7 +12,7 @@
 namespace lmms
 {
 
-Groove::Groove(QObject *parent) :
+Groove::Groove(QObject* parent) :
 	QObject(parent)
 {
 }
@@ -21,15 +21,14 @@ Groove::Groove(QObject *parent) :
  * Default groove is no groove. Not even a wiggle.
  * @return 0 or -1
  */
-int Groove::isInTick(TimePos * curStart, fpp_t frames, f_cnt_t offset,
-						Note * n, MidiClip* c) {
-
+int Groove::isInTick(TimePos* curStart, fpp_t frames, f_cnt_t offset,
+						Note* n, MidiClip* c)
+{
 	return n->pos().getTicks() == curStart->getTicks() ? 0 : -1;
 }
 
 void Groove::setAmount(int amount)
 {
-
 	if (amount < 0) {
 		amount = 0;
 	}
@@ -63,7 +62,7 @@ void Groove::loadSettings(const QDomElement & element)
 	}
 }
 
-QWidget * Groove::instantiateView(QWidget * parent)
+QWidget* Groove::instantiateView(QWidget* parent)
 {
 	return new QLabel("");
 }

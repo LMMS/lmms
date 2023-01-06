@@ -1,8 +1,5 @@
 /*
- * Groove.h - classes for addinng swing/funk/groove/slide (you can't name it but you can feel it)
- *  to midi which is not precise enough at 192 ticks per tact to make your arse move.
- *
- * In it simplest terms a groove is a subtle delay on some notes in a pattern.
+ * GrooveFactory.h - a factory class for grooves
  *
  * Copyright (c) 2005-2008 teknopaul <teknopaul/at/users.sourceforge.net>
  *
@@ -23,6 +20,7 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301 USA.
  **/
+
 #ifndef GROOVEFACTORY_H
 #define GROOVEFACTORY_H
 
@@ -33,9 +31,8 @@ namespace lmms
 
 class GrooveFactory
 {
-
 public:
-	static Groove * create(QString grooveType);
+	static Groove* create(const QString& grooveType);
 
 private:
 	GrooveFactory();

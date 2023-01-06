@@ -40,7 +40,7 @@
 namespace lmms
 {
 
-HalfSwing::HalfSwing(QObject * parent) :
+HalfSwing::HalfSwing(QObject* parent) :
 	Groove(parent)
 {
 	m_amount = 0;
@@ -57,10 +57,10 @@ HalfSwing::~HalfSwing()
 void HalfSwing::init()
 {
 
-	Song * s = Engine::getSong();
-	connect(s, SIGNAL(projectLoaded()),        this, SLOT(update()));
-	connect(s, SIGNAL(lengthChanged(int)),        this, SLOT(update()));
-	connect(s, SIGNAL(tempoChanged(bpm_t)),         this, SLOT(update()));
+	Song* s = Engine::getSong();
+	connect(s, SIGNAL(projectLoaded()), this, SLOT(update()));
+	connect(s, SIGNAL(lengthChanged(int)), this, SLOT(update()));
+	connect(s, SIGNAL(tempoChanged(bpm_t)), this, SLOT(update()));
 	connect(s, SIGNAL(timeSignatureChanged(int, int)), this, SLOT(update()));
 
 }
@@ -72,8 +72,8 @@ void HalfSwing::update()
 }
 
 
-int HalfSwing::isInTick(TimePos * curStart, const fpp_t frames, const f_cnt_t offset,
-					Note * n, MidiClip* c)
+int HalfSwing::isInTick(TimePos* curStart, const fpp_t frames, const f_cnt_t offset,
+					Note* n, MidiClip* c)
 {
 	// TODO why is this wrong on boot how do we set it once not every loop
 	if (m_framesPerTick == 0)
@@ -109,7 +109,7 @@ int HalfSwing::isInTick(TimePos * curStart, const fpp_t frames, const f_cnt_t of
 
 		float ticksToShift = ((posInEigth - 6) * -m_swingFactor);
 
-		f_cnt_t framesToShift = (int)(ticksToShift * m_framesPerTick);
+		f_cnt_t framesToShift = (int)(ticksToShift* m_framesPerTick);
 
 		int tickOffset = (int)(framesToShift / m_framesPerTick); // round down
 
@@ -132,7 +132,7 @@ int HalfSwing::isInTick(TimePos * curStart, const fpp_t frames, const f_cnt_t of
 	return n->pos().getTicks() == curStart->getTicks() ? 0 : -1;
 }
 
-QWidget * HalfSwing::instantiateView(QWidget * parent)
+QWidget* HalfSwing::instantiateView(QWidget* parent)
 {
 	return new gui::HalfSwingView(this, parent);
 }
@@ -143,7 +143,7 @@ namespace gui
 
 // VIEW //
 
-HalfSwingView::HalfSwingView(HalfSwing * halfSwing, QWidget * parent) :
+HalfSwingView::HalfSwingView(HalfSwing* halfSwing, QWidget* parent) :
 	QWidget(parent)
 {
 	m_sliderModel = new IntModel(0, 0, 127); // Unused

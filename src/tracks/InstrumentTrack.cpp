@@ -60,8 +60,8 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr( "Volume" ) ),
 	m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f, this, tr( "Panning" ) ),
 	m_audioPort( tr( "unnamed_track" ), true, &m_volumeModel, &m_panningModel, &m_mutedModel ),
-	m_groove( NULL ),
-	m_noGroove( NULL ),
+	m_groove( nullptr ),
+	m_noGroove( nullptr ),
 	m_pitchModel( 0, MinPitchDefault, MaxPitchDefault, 1, this, tr( "Pitch" ) ),
 	m_pitchRangeModel( 1, 1, 60, this, tr( "Pitch range" ) ),
 	m_mixerChannelModel( 0, 0, 0, this, tr( "Mixer channel" ) ),
@@ -217,7 +217,7 @@ InstrumentTrack::~InstrumentTrack()
 	// now we're save deleting the instrument
 	if( m_instrument ) delete m_instrument;
 
-	if (m_noGroove != NULL) {
+	if (m_noGroove != nullptr) {
 		delete m_noGroove;
 	}
 }
@@ -756,7 +756,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 		NoteVector::ConstIterator nit = notes.begin();
 
 		Groove * groove = this->groove();
-		if ( groove == NULL ) {
+		if (!groove) {
 				groove = globalGroove;
 		}
 		int groove_offset = 0;
@@ -812,7 +812,7 @@ Groove * InstrumentTrack::groove()
 {
 	if (m_grooveOn)
 	{
-		// NULL: Use global groove
+		// nullptr: Use global groove
 		return m_groove;
 	}
 	else
@@ -831,7 +831,7 @@ void InstrumentTrack::updateGroove()
 	}
 	else
 	{
-		if (m_noGroove == NULL)
+		if (!m_noGroove)
 		{
 			m_noGroove = new Groove();
 		}
