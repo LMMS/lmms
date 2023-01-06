@@ -122,8 +122,12 @@ header_guard_pattern = re.compile(r'^(/[*](.|\n)*?[*]/|//.*|\s)*#\s*(ifndef|prag
 # Namespace lmms
 namespace_pattern = re.compile(r'^\s*namespace\s+lmms', re.MULTILINE)
 
-# Context block in a .ts file
-ts_context_pattern = re.compile(r'[^<]*|<(?!context>)|<context>(.|\n)*?<name>(?P<name>.+?)</name>(.|\n)*?</context>\n')
+# Match <context> blocks in a .ts file
+# The|or|statment will match in order of appearance, so if the <context> matches, it will eat the whole block.
+# If not, it will match anything but "<" and at last matching a single "<".
+# This will make sure it stops at every bracket and checks if it's a <context>.
+# The {CLASSES} are for pythons format() to be able to insert names of the classes we want to delete.
+ts_pattern_template = r'<context[^>]*>.*?<name[^>]*>({CLASSES})</name *>.*?</context *>\n|[^<]*|<'
 
 #
 # command line arguments
@@ -225,20 +229,20 @@ for cur_file in files:
 
 caption('generating localization files')
 
-# Generate a .ts file with the strings currently in the code
-temp = Path(tempfile.gettempdir()) / 'lmms_strings_temp.ts'
+# Let lupdate extract the context/class names of all translatable strings currently in the code
+temp = tempfile.NamedTemporaryFile(mode='wt', dir='.', suffix='.ts', delete=False)
+temp.write('<TS></TS>\n')
+temp.close()
 try:
-    # In case the file exists already we overwrite it with a valid content
-    temp.write_text('<TS></TS>\n')
-    subprocess.run(['./buildtools/update_locales', str(temp)], check=True, stdout=subprocess.DEVNULL)
-    text = temp.read_text()
+    subprocess.run(['bash', 'buildtools/update_locales', temp.name], check=True, stdout=subprocess.DEVNULL)
+    text = Path(temp.name).read_text()
 finally:
-    temp.unlink()
+    Path(temp.name).unlink()
 
 
 caption('localization checks')
 
-# Compare the classes found in the just generated .ts file with the classes in our code
+# Find invalid class names in the just generated .ts file
 root = ElementTree.fromstring(text)
 for context in root.iterfind('context'):
     # <name> should be a class in the lmms namespace
@@ -255,30 +259,38 @@ for context in root.iterfind('context'):
     for location in context.iter('location'):
         error(msg, location.attrib.get('filename'), int(location.attrib.get('line')))
 
-
-# Go through all .ts files and find classes not present in the current code
-old_translations = False
-for file in Path('./data/locale').glob('*.ts'):
-    text = file.read_text()
-    output = ''
-    for match in ts_context_pattern.finditer(text):
-        name = match.group('name')
-        if name and name not in known_classes:
+# Find invalid class names or missing paths in all our translation files
+outdated_files = set()
+outdated_classes = set()
+for file in Path('data/locale').glob('*.ts'):
+    tree = ElementTree.parse(str(file))
+    root = tree.getroot()
+    for location in root.iterfind('./context/message/location'):
+        filename = location.attrib.get('filename')
+        # The files sometimes are relative to data/local and sometimes to the git tree's root...
+        if filename and not Path(filename).is_file() and not Path(f'data/locale/{filename}').is_file():
+            error(f'Source file does not exist: {filename}', file)
+    for name in root.iterfind('./context/name'):
+        if name.text and name.text not in known_classes:
+            outdated_files.add(str(file))
+            outdated_classes.add(name.text)
             if not args.delete_old_translations:
-                old_translations = True
-                error(f'Translation context "{name}" is outdated', file)
-        elif args.delete_old_translations:
-            # The regex matches everything, so if it didn't catch it as an error we write it out
-            output += match.group(0)
-    if output:
-        print(f'Cleaning up {file}', file=sys.stderr)
-        file.write_text(output)
+                error(f'Translation context "{name.text}" is outdated', file)
 
-if old_translations:
-    print('\nThe translations in `data/locale` are outdated. If you have renamed a class, please update all',
-          '.ts files accordingly using search and replace. If you have deleted a class you can remove the',
-          'outdated translations by running `tests/scripted/check-namespace --delete-old-translations`.\n',
-          file=sys.stderr, sep='\n')
+# Remove the outdated translations, or display a helpful warning
+# Use regex here instead of XML parser because we want to cause minimal impact to whitespace etc
+if outdated_files:
+    if args.delete_old_translations:
+        # Insert the class names into the regex pattern before compiling it
+        ts_pattern = re.compile(ts_pattern_template.format('|'.join(outdated_classes)))
+        for file in outdated_files:
+            output = ts_pattern.sub('', Path(file).read_text())
+            Path(file).write_text(output)
+    else:
+        print('\nThe translations in `data/locale` are outdated. If you have renamed a class, please update all',
+              '.ts files accordingly using search and replace. If you have deleted a class you can remove the',
+              'outdated translations by running `tests/scripted/check-namespace --delete-old-translations`.\n',
+              file=sys.stderr, sep='\n')
 
 
 caption('summary')

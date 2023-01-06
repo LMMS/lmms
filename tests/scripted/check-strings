@@ -69,26 +69,6 @@ for p in re.findall(r'\[submodule "([^"]+)"\]\s*$', Path('.gitmodules').read_tex
         error('.gitmodules', f'Directory does not exist: {p}')
 
 
-caption('locale')
-
-filenames = set()
-classes_found = set()
-for cur_file in Path('data/locale').glob('*.ts'):
-    tree = ElementTree.parse(str(cur_file))
-    root = tree.getroot()
-    for location in root.findall('./context/message/location'):
-        filenames.add(location.attrib['filename'])
-    for location in root.findall('./context/name'):
-        classes_found.add(location.text)
-for f in sorted(filenames):
-    # The files sometimes are relative to data/local and sometimes to the git tree's root...
-    if not Path(f).is_file() and not Path(f'data/locale/{f}').is_file():
-        error('data/locale', f'Source file does not exist: {f}')
-for c in sorted(classes_found):
-    if is_our_class(c) and '::' not in c and c not in classes:
-        error('data/locale', f'Class does not exist in source code: {c}')
-
-
 caption('themes')
 
 
