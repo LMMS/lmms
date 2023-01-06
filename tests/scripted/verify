@@ -30,25 +30,9 @@ class ScriptTest():
 		"""Create temporary, minimal test environment, and change to it"""
 		self.lmms_tmpdir = tempfile.TemporaryDirectory(dir='.')
 		os.chdir(self.lmms_tmpdir.name)
-		# prerequirements
-		Path('data/themes').mkdir(parents=True)
 		subprocess.run(['git', 'init', '-b', 'main'], check=True)
 		set_git_config()
 		subprocess.run(['git', 'submodule', 'add', '../../carla', 'plugins/CarlaBase/carla'], check=True)
-		create_file('src/core/classes.cpp', 'namespace lmms {\nclass TestClass\n}')
-		create_file('debian/lmms-common.docs', '')
-		create_file('debian/copyright', '')
-		create_file('data/locale/de.ts',
-					'<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" version="2.1">\n'
-					'    <context>\n'
-					'    <name>TestClass</name>\n'
-					'     <message>\n'
-					'        <location filename="../../src/core/classes.cpp" line="20"/>\n'
-					'        <source>About LMMS</source>\n'
-					'        <translation>Über LMMS</translation>\n'
-					'    </message>\n'
-					'</context>\n'
-					'</TS>\n')
 		subprocess.run(['git', 'commit', '-m', 'Initial commit'], check=True)
 		return self
 
@@ -64,7 +48,7 @@ class ScriptTest():
 
 	def run(self, expected_returncode: int = 1):  # default: something goes wrong ("to the safe side")
 		"""Run the script, check the exit code and store the result"""
-		self.result = subprocess.run([str(self.scriptpath)], capture_output=True, text=True)
+		self.result = subprocess.run([str(self.scriptpath)], text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 		print('--->8--- Script output BEGIN --->8---')
 		print(self.result.stdout)
 		print('--->8--- Script output END   --->8---')
@@ -84,6 +68,7 @@ with tempfile.TemporaryDirectory() as tmpdir:
 	os.chdir(tmpdir)
 	check_strings = lmms_main_path / 'tests' / 'scripted' / 'check-strings'
 	check_namespace = lmms_main_path / 'tests' / 'scripted' / 'check-namespace'
+	update_locales = lmms_main_path / 'buildtools' / 'update_locales'
 
 	# create dummy carla repo
 	Path('carla').mkdir()
@@ -99,10 +84,13 @@ with tempfile.TemporaryDirectory() as tmpdir:
 
 	# minimal working example
 	with ScriptTest(check_strings) as test:
+		Path('data/themes').mkdir(parents=True)
+		create_file('src/core/classes.cpp', 'namespace lmms {\nclass TestClass\n}')
+		create_file('debian/lmms-common.docs', '')
+		create_file('debian/copyright', '')
 		test.run(0)  # exitcode 0 - no errors expected
 		test.expect('0 errors')
 
-	with ScriptTest(check_strings) as test:
 		create_file('data/locale/fr.ts',
 					'<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" version="2.1">\n'
 					'    <context>\n'
@@ -114,12 +102,8 @@ with tempfile.TemporaryDirectory() as tmpdir:
 					'    </message>\n'
 					'</context>\n'
 					'</TS>\n')
-		test.run()
-		test.expect('Error: data/locale: Source file does not exist: ../../src/core/non-existent.cpp')
-		test.expect('1 errors')
 
-	with ScriptTest(check_strings) as test:
-		create_file('data/locale/fr.ts',
+		create_file('data/locale/sv.ts',
 					'<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" version="2.1">\n'
 					'    <context>\n'
 					'    <name>NonExistentClass</name>\n'
@@ -130,39 +114,24 @@ with tempfile.TemporaryDirectory() as tmpdir:
 					'    </message>\n'
 					'</context>\n'
 					'</TS>\n')
-		test.run()
-		test.expect('Error: data/locale: Class does not exist in source code: NonExistentClass')
-		test.expect('1 errors')
-
-	with ScriptTest(check_strings) as test:
 		create_file('data/themes/classic/style.css',
 					'lmms--gui--NonExistentClass {'
 					'\tcolor: #d1d8e4;\n'
 					'}')
+		create_file('debian/patches/clang.patch', '/plugins/non-existent-file')
+		create_file('debian/lmms-common.docs', '/plugins/caps.html')
+		create_file('debian/copyright', 'Files: NonExistent')
+
 		test.run()
 		test.expect('Error: data/themes/classic/style.css: Class does not exist in source code: NonExistentClass')
-		test.expect('1 errors')
-
-	with ScriptTest(check_strings) as test:
-		create_file('debian/patches/clang.patch', '/plugins/non-existent-file')
-		test.run()
 		test.expect('Error: debian/patches/clang.patch: Source file does not exist: plugins/non-existent-file')
-		test.expect('1 errors')
-
-	with ScriptTest(check_strings) as test:
-		create_file('debian/lmms-common.docs', '/plugins/caps.html')
-		test.run()
 		test.expect('Error: debian/lmms-common.docs: Path does not exist: /plugins/caps.html')
-		test.expect('1 errors')
-
-	with ScriptTest(check_strings) as test:
-		create_file('debian/copyright', 'Files: NonExistent')
-		test.run()
 		test.expect('Error: debian/copyright: Glob/Path does not exist: NonExistent')
-		test.expect('1 errors')
+		test.expect('4 errors')
 
 	with ScriptTest(check_namespace) as test:
 		# minimal working example
+		create_file('buildtools/update_locales', update_locales.read_text())
 		test.run(0)  # exitcode 0 - no errors expected
 		test.expect('0 errors')
 
@@ -245,6 +214,7 @@ with tempfile.TemporaryDirectory() as tmpdir:
 					}
 					#endif
 					''')
+
 		test.run()
 		test.expect('8 errors')
 		test.expect('''
@@ -257,6 +227,75 @@ Error: 06_PragmaButNoLmms.h: File has no namespace lmms
 Error: 07_MismatchingEndifName.h:36: Missing comment // ABC_H
 Error: 08_MismatchingNamespaceEndName.h:5: Missing comment // namespace lmms
 ''')
+
+	with ScriptTest(check_namespace) as test:
+		create_file('buildtools/update_locales', update_locales.read_text())
+
+		create_file('GoodExample.h', '''
+					#pragma once
+					#include <QObject>
+					namespace lmms {
+					class ExampleClass : public QObject
+					{
+						Q_OBJECT
+					public:
+						ExampleClass()
+						{
+							tr("Translation on this object");
+							QT_TRANSLATE_NOOP("lmms::ExampleClass", "Translation macro with context");
+						}
+					};
+					} // namespace lmms
+					''')
+		create_file('BadExample.h', '''
+					#pragma once
+					#include <QObject>
+					namespace lmms {
+					class BadExampleClass : public QObject
+					{
+						Q_OBJECT
+					public:
+						BadExampleClass()
+						{
+							QWidget::tr("Class is not inside lmms namespace");
+							QT_TRANSLATE_NOOP("lmms::NonExistentClass", "No such class");
+							QT_TRANSLATE_NOOP("ExampleClass", "Valid class, but missing namespace");
+						}
+					};
+					} // namespace lmms
+					''')
+		create_file('data/locale/valid.ts', '''<?xml version="1.0" ?><!DOCTYPE TS>
+					<TS language="de" version="2.1">
+					<context>
+						<name>lmms::ExampleClass</name>
+						<message>
+							<location filename="../../GoodExample.h" line="20"/>
+							<source>About LMMS</source>
+							<translation>Über LMMS</translation>
+						</message>
+					</context>
+					</TS>
+					''')
+		create_file('data/locale/invalid.ts', '''<?xml version="1.0" ?><!DOCTYPE TS>
+					<TS language="de" version="2.1">
+					<context>
+						<name>lmms::NoSuchClass</name>
+						<message>
+							<location filename="../../NoSuchFile.cpp" line="20"/>
+							<source>About LMMS</source>
+							<translation>À propos de LMMS</translation>
+						</message>
+					</context>
+					</TS>
+					''')
+		test.run()
+		test.expect('5 errors')
+		test.expect('BadExample.h:13: Translation context "ExampleClass" is outside the lmms namespace')
+		test.expect('BadExample.h:11: Translation context "QWidget" is outside the lmms namespace')
+		test.expect('BadExample.h:12: Translation context "lmms::NonExistentClass" is not a known class')
+		test.expect('data/locale/invalid.ts: Source file does not exist: ../../NoSuchFile.cpp')
+		test.expect('data/locale/invalid.ts: Translation context "lmms::NoSuchClass" is outdated')
+
 
 
 # if we made it until here without an exception, all tests have been passed
