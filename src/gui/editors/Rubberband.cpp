@@ -26,16 +26,12 @@
 
 #include "Rubberband.h"
 
+namespace lmms::gui
+{
+
 
 RubberBand::RubberBand( QWidget * _parent ) :
 	QRubberBand( Rectangle, _parent )
-{
-}
-
-
-
-
-RubberBand::~RubberBand()
 {
 }
 
@@ -81,17 +77,12 @@ QVector<selectableObject *> RubberBand::selectableObjects() const
 
 	QList<selectableObject *> l =
 			parentWidget()->findChildren<selectableObject *>();
-	for( QList<selectableObject *>::iterator it = l.begin(); it != l.end();
-									++it )
+	for (const auto& obj : l)
 	{
-		so.push_back( *it );
+		so.push_back(obj);
 	}
 	return( so );
 }
 
 
-
-
-
-
-
+} // namespace lmms::gui

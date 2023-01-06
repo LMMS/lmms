@@ -31,12 +31,19 @@
 #include "Instrument.h"
 #include "InstrumentView.h"
 
+namespace lmms
+{
 
-class Knob;
-class SidInstrumentView;
+
 class NotePlayHandle;
+
+namespace gui
+{
+class Knob;
 class automatableButtonGroup;
+class SidInstrumentView;
 class PixmapButton;
+}
 
 class VoiceObject : public Model
 {
@@ -51,7 +58,7 @@ public:
 		NumWaveShapes
 	};
 	VoiceObject( Model * _parent, int _idx );
-	virtual ~VoiceObject();
+	~VoiceObject() override = default;
 
 
 private:
@@ -68,7 +75,7 @@ private:
 	BoolModel m_testModel;
 
 	friend class SidInstrument;
-	friend class SidInstrumentView;
+	friend class gui::SidInstrumentView;
 } ;
 
 class SidInstrument : public Instrument
@@ -90,21 +97,21 @@ public:
 
 
 	SidInstrument( InstrumentTrack * _instrument_track );
-	virtual ~SidInstrument();
+	~SidInstrument() override = default;
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	void playNote( NotePlayHandle * _n,
+						sampleFrame * _working_buffer ) override;
+	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
-	virtual f_cnt_t desiredReleaseFrames() const;
+	f_cnt_t desiredReleaseFrames() const override;
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 
 /*public slots:
@@ -126,10 +133,13 @@ private:
 
 	IntModel m_chipModel;
 
-	friend class SidInstrumentView;
+	friend class gui::SidInstrumentView;
 
 } ;
 
+
+namespace gui
+{
 
 
 class SidInstrumentView : public InstrumentViewFixedSize
@@ -137,10 +147,10 @@ class SidInstrumentView : public InstrumentViewFixedSize
 	Q_OBJECT
 public:
 	SidInstrumentView( Instrument * _instrument, QWidget * _parent );
-	virtual ~SidInstrumentView();
+	~SidInstrumentView() override = default;
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 	
 	automatableButtonGroup * m_passBtnGrp;
 	automatableButtonGroup * m_sidTypeBtnGrp;
@@ -171,9 +181,7 @@ private:
 			m_testButton( testb )
 		{
 		}
-		voiceKnobs()
-		{
-		}
+		voiceKnobs() = default;
 		Knob * m_attKnob;
 		Knob * m_decKnob;
 		Knob * m_sustKnob;
@@ -199,5 +207,9 @@ protected slots:
 	void updateKnobToolTip();
 } ;
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

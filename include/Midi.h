@@ -28,6 +28,10 @@
 #include "lmms_basics.h"
 
 
+namespace lmms
+{
+
+
 enum MidiEventTypes
 {
 	// messages
@@ -77,8 +81,7 @@ enum MidiMetaEventTypes
 	MidiMetaCustom = 0x80,
 	MidiNotePanning
 } ;
-typedef MidiMetaEventTypes MidiMetaEventType;
-
+using MidiMetaEventType = MidiMetaEventTypes;
 
 enum MidiStandardControllers
 {
@@ -136,5 +139,8 @@ const int MidiMinPanning = -128;
 
 const int MidiMinPitchBend = 0;
 const int MidiMaxPitchBend = 16383;
+
+
+} // namespace lmms
 
 #endif

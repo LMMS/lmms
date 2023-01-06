@@ -10,6 +10,9 @@
 #include "Note.h"
 #include "MidiClip.h"
 
+namespace lmms
+{
+
 /**
  * A groove that mimics Hydrogen drum machine's swing feature
  */
@@ -42,6 +45,10 @@ private:
 	int m_framesPerTick;
 } ;
 
+
+namespace gui
+{
+
 class HydrogenSwingView : public QWidget
 {
 	Q_OBJECT
@@ -59,5 +66,9 @@ private:
 	AutomatableSlider * m_slider;
 
 } ;
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif // HYDROGENSWING_H

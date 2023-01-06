@@ -35,6 +35,9 @@
 #include "TempoSyncKnob.h"
 
 
+namespace lmms::gui
+{
+
 InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( InstrumentFunctionNoteStacking* cc, QWidget* parent ) :
 	QWidget( parent ),
 	ModelView( nullptr, this ),
@@ -43,17 +46,17 @@ InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( Instrume
 	m_chordsComboBox( new ComboBox() ),
 	m_chordRangeKnob( new Knob( knobBright_26 ) )
 {
-	QHBoxLayout* topLayout = new QHBoxLayout( this );
+	auto topLayout = new QHBoxLayout(this);
 	topLayout->setMargin( 0 );
 	topLayout->addWidget( m_chordsGroupBox );
 
-	QGridLayout* mainLayout = new QGridLayout( m_chordsGroupBox );
+	auto mainLayout = new QGridLayout(m_chordsGroupBox);
 	mainLayout->setContentsMargins( 8, 18, 8, 8 );
 	mainLayout->setColumnStretch( 0, 1 );
 	mainLayout->setHorizontalSpacing( 20 );
 	mainLayout->setVerticalSpacing( 1 );
 
-	QLabel* chordLabel = new QLabel( tr( "Chord:" ) );
+	auto chordLabel = new QLabel(tr("Chord:"));
 	chordLabel->setFont( pointSize<8>( chordLabel->font() ) );
 
 	m_chordRangeKnob->setLabel( tr( "RANGE" ) );
@@ -105,11 +108,11 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	m_arpDirectionComboBox( new ComboBox() ),
 	m_arpModeComboBox( new ComboBox() )
 {
-	QHBoxLayout* topLayout = new QHBoxLayout( this );
+	auto topLayout = new QHBoxLayout(this);
 	topLayout->setMargin( 0 );
 	topLayout->addWidget( m_arpGroupBox );
 
-	QGridLayout* mainLayout = new QGridLayout( m_arpGroupBox );
+	auto mainLayout = new QGridLayout(m_arpGroupBox);
 	mainLayout->setContentsMargins( 8, 18, 8, 8 );
 	mainLayout->setColumnStretch( 0, 1 );
 	mainLayout->setHorizontalSpacing( 20 );
@@ -142,14 +145,13 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	m_arpGateKnob->setLabel( tr( "GATE" ) );
 	m_arpGateKnob->setHintText( tr( "Arpeggio gate:" ), tr( "%" ) );
 
-
-	QLabel* arpChordLabel = new QLabel( tr( "Chord:" ) );
+	auto arpChordLabel = new QLabel(tr("Chord:"));
 	arpChordLabel->setFont( pointSize<8>( arpChordLabel->font() ) );
 
-	QLabel* arpDirectionLabel = new QLabel( tr( "Direction:" ) );
+	auto arpDirectionLabel = new QLabel(tr("Direction:"));
 	arpDirectionLabel->setFont( pointSize<8>( arpDirectionLabel->font() ) );
 
-	QLabel* arpModeLabel = new QLabel( tr( "Mode:" ) );
+	auto arpModeLabel = new QLabel(tr("Mode:"));
 	arpModeLabel->setFont( pointSize<8>( arpModeLabel->font() ) );
 
 	mainLayout->addWidget( arpChordLabel, 0, 0 );
@@ -201,4 +203,4 @@ void InstrumentFunctionArpeggioView::modelChanged()
 
 
 
-
+} // namespace lmms::gui

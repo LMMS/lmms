@@ -38,6 +38,10 @@ class QPushButton;
 class QResizeEvent;
 class QWidget;
 
+namespace lmms::gui
+{
+
+
 /**
  * @brief The SubWindow class
  * 
@@ -95,5 +99,9 @@ private:
 private slots:
 	void focusChanged( QMdiSubWindow * subWindow );
 };
+
+
+
+} // namespace lmms::gui
 
 #endif

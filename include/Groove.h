@@ -35,6 +35,9 @@
 #include "MidiClip.h"
 #include "SerializingObject.h"
 
+namespace lmms
+{
+
 class Groove : public QObject, public SerializingObject
 {
 	Q_OBJECT
@@ -79,5 +82,7 @@ protected:
 	int m_amount;
 	float m_swingFactor; // = (m_amount / 127)
 };
+
+} // namespace lmms
 
 #endif // GROOVE_H

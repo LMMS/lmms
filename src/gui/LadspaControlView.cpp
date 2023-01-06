@@ -33,13 +33,16 @@
 #include "TempoSyncKnob.h"
 
 
+namespace lmms::gui
+{
+
 LadspaControlView::LadspaControlView( QWidget * _parent,
 						LadspaControl * _ctl ) :
 	QWidget( _parent ),
 	ModelView( _ctl, this ),
 	m_ctl( _ctl )
 {
-	QHBoxLayout * layout = new QHBoxLayout( this );
+	auto layout = new QHBoxLayout(this);
 	layout->setMargin( 0 );
 	layout->setSpacing( 0 );
 
@@ -59,8 +62,7 @@ LadspaControlView::LadspaControlView( QWidget * _parent,
 	{
 		case TOGGLED:
 		{
-			LedCheckBox * toggle = new LedCheckBox(
-				m_ctl->port()->name, this, QString(), LedCheckBox::Green );
+			auto toggle = new LedCheckBox(m_ctl->port()->name, this, QString(), LedCheckBox::Green);
 			toggle->setModel( m_ctl->toggledModel() );
 			layout->addWidget( toggle );
 			if( link != nullptr )
@@ -118,11 +120,4 @@ LadspaControlView::LadspaControlView( QWidget * _parent,
 
 
 
-LadspaControlView::~LadspaControlView()
-{
-}
-
-
-
-
-
+} // namespace lmms::gui

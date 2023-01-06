@@ -14,12 +14,17 @@
 #include "plugin_export.h"
 
 #define MAX_LAYERS 4
+
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT hydrogenimport_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Hydrogen Import",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Filter for importing Hydrogen files into LMMS" ),
@@ -129,9 +134,6 @@ HydrogenImport::HydrogenImport( const QString & _file ) :
 
 
 
-HydrogenImport::~HydrogenImport()
-{
-}
 Instrument * ins;
 bool HydrogenImport::readSong() 
 {
@@ -274,7 +276,7 @@ bool HydrogenImport::readSong()
 				QString instrId = LocalFileMng::readXmlString( noteNode, "instrument", 0,false, false );
 				int i = pattern_count - 1 + existing_patterns;
 				pattern_id[sName] = pattern_count - 1;
-				MidiClip*p = dynamic_cast<MidiClip*>( drum_track[instrId]->getClip( i ) );
+				auto p = dynamic_cast<MidiClip*>(drum_track[instrId]->getClip(i));
 				Note n; 
 				n.setPos( nPosition );
 				if ( (nPosition + 48) <= nSize ) 
@@ -351,3 +353,5 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
 
 }
 
+
+} // namespace lmms

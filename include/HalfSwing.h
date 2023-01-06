@@ -10,6 +10,9 @@
 #include "Note.h"
 #include "MidiClip.h"
 
+namespace lmms
+{
+
 /**
  * A groove thatjust latter half of the HydrogenSwing algo.
  */
@@ -40,6 +43,10 @@ private:
 	int m_framesPerTick;
 } ;
 
+
+namespace gui
+{
+
 class HalfSwingView : public QWidget
 {
 	Q_OBJECT
@@ -57,5 +64,9 @@ private:
 	AutomatableSlider * m_slider;
 
 } ;
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif // HALFSWING_H

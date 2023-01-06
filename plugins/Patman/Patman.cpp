@@ -46,13 +46,16 @@
 
 #include "plugin_export.h"
 
+namespace lmms
+{
+
 
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT patman_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"PatMan",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"GUS-compatible patch instrument" ),
@@ -122,7 +125,7 @@ void PatmanInstrument::loadFile( const QString & _file )
 
 
 
-QString PatmanInstrument::nodeName( void ) const
+QString PatmanInstrument::nodeName() const
 {
 	return( patman_plugin_descriptor.name );
 }
@@ -145,7 +148,7 @@ void PatmanInstrument::playNote( NotePlayHandle * _n,
 	{
 		selectSample( _n );
 	}
-	handle_data * hdata = (handle_data *)_n->m_pluginData;
+	auto hdata = (handle_data*)_n->m_pluginData;
 
 	float play_freq = hdata->tuned ? _n->frequency() :
 						hdata->sample->frequency();
@@ -168,7 +171,7 @@ void PatmanInstrument::playNote( NotePlayHandle * _n,
 
 void PatmanInstrument::deleteNotePluginData( NotePlayHandle * _n )
 {
-	handle_data * hdata = (handle_data *)_n->m_pluginData;
+	auto hdata = (handle_data*)_n->m_pluginData;
 	sharedObject::unref( hdata->sample );
 	delete hdata->state;
 	delete hdata;
@@ -222,11 +225,11 @@ PatmanInstrument::LoadErrors PatmanInstrument::loadPatch(
 		return( LoadOpen );
 	}
 
-	unsigned char header[239];
+	auto header = std::array<unsigned char, 239>{};
 
-	if( fread( header, 1, 239, fd ) != 239 ||
-			( memcmp( header, "GF1PATCH110\0ID#000002", 22 )
-			&& memcmp( header, "GF1PATCH100\0ID#000002", 22 ) ) )
+	if (fread(header.data(), 1, 239, fd ) != 239 ||
+			(memcmp(header.data(), "GF1PATCH110\0ID#000002", 22)
+			&& memcmp(header.data(), "GF1PATCH100\0ID#000002", 22)))
 	{
 		fclose( fd );
 		return( LoadNotGUS );
@@ -344,7 +347,7 @@ PatmanInstrument::LoadErrors PatmanInstrument::loadPatch(
 			}
 		}
 
-		sampleFrame * data = new sampleFrame[frames];
+		auto data = new sampleFrame[frames];
 
 		for( f_cnt_t frame = 0; frame < frames; ++frame )
 		{
@@ -355,7 +358,7 @@ PatmanInstrument::LoadErrors PatmanInstrument::loadPatch(
 			}
 		}
 
-		SampleBuffer* psample = new SampleBuffer( data, frames );
+		auto psample = new SampleBuffer(data, frames);
 		psample->setFrequency( root_freq / 1000.0f );
 		psample->setSampleRate( sample_rate );
 
@@ -377,7 +380,7 @@ PatmanInstrument::LoadErrors PatmanInstrument::loadPatch(
 
 
 
-void PatmanInstrument::unloadCurrentPatch( void )
+void PatmanInstrument::unloadCurrentPatch()
 {
 	while( !m_patchSamples.empty() )
 	{
@@ -396,20 +399,20 @@ void PatmanInstrument::selectSample( NotePlayHandle * _n )
 	float min_dist = HUGE_VALF;
 	SampleBuffer* sample = nullptr;
 
-	for( QVector<SampleBuffer *>::iterator it = m_patchSamples.begin(); it != m_patchSamples.end(); ++it )
+	for (const auto& patchSample : m_patchSamples)
 	{
-		float patch_freq = ( *it )->frequency();
+		float patch_freq = patchSample->frequency();
 		float dist = freq >= patch_freq ? freq / patch_freq :
 							patch_freq / freq;
 
 		if( dist < min_dist )
 		{
 			min_dist = dist;
-			sample = *it;
+			sample = patchSample;
 		}
 	}
 
-	handle_data * hdata = new handle_data;
+	auto hdata = new handle_data;
 	hdata->tuned = m_tunedModel.value();
 	if( sample )
 	{
@@ -427,9 +430,9 @@ void PatmanInstrument::selectSample( NotePlayHandle * _n )
 
 
 
-PluginView * PatmanInstrument::instantiateView( QWidget * _parent )
+gui::PluginView * PatmanInstrument::instantiateView( QWidget * _parent )
 {
-	return( new PatmanView( this, _parent ) );
+	return( new gui::PatmanView( this, _parent ) );
 }
 
 
@@ -437,8 +440,8 @@ PluginView * PatmanInstrument::instantiateView( QWidget * _parent )
 
 
 
-
-
+namespace gui
+{
 
 
 PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
@@ -492,14 +495,7 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 
 
 
-PatmanView::~PatmanView()
-{
-}
-
-
-
-
-void PatmanView::openFile( void )
+void PatmanView::openFile()
 {
 	FileDialog ofd( nullptr, tr( "Open patch file" ) );
 	ofd.setFileMode( FileDialog::ExistingFiles );
@@ -551,7 +547,7 @@ void PatmanView::openFile( void )
 
 
 
-void PatmanView::updateFilename( void )
+void PatmanView::updateFilename()
 {
  	m_displayFilename = "";
 	int idx = m_pi->m_patchFile.length();
@@ -635,7 +631,7 @@ void PatmanView::paintEvent( QPaintEvent * )
 
 
 
-void PatmanView::modelChanged( void )
+void PatmanView::modelChanged()
 {
 	m_pi = castModel<PatmanInstrument>();
 	m_loopButton->setModel( &m_pi->m_loopedModel );
@@ -643,3 +639,8 @@ void PatmanView::modelChanged( void )
 	connect( m_pi, SIGNAL( fileChanged() ),
 			this, SLOT( updateFilename() ) );
 }
+
+
+} // namespace gui
+
+} // namespace lmms

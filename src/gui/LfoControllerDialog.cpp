@@ -32,6 +32,10 @@
 #include "TempoSyncKnob.h"
 #include "PixmapButton.h"
 
+namespace lmms::gui
+{
+
+
 const int CD_ENV_KNOBS_LBL_Y = 11;
 const int CD_KNOB_X_SPACING = 32;
 
@@ -77,7 +81,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	m_phaseKnob->move( CD_LFO_PHASE_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_phaseKnob->setHintText( tr( "Phase offset:" ) , "" + tr( " degrees" ) );
 
-	PixmapButton * sin_wave_btn = new PixmapButton( this, nullptr );
+	auto sin_wave_btn = new PixmapButton(this, nullptr);
 	sin_wave_btn->move( CD_LFO_SHAPES_X, CD_LFO_SHAPES_Y );
 	sin_wave_btn->setActiveGraphic( embed::getIconPixmap(
 						"sin_wave_active" ) );
@@ -86,8 +90,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	sin_wave_btn->setToolTip(
 			tr( "Sine wave" ) );
 
-	PixmapButton * triangle_wave_btn =
-					new PixmapButton( this, nullptr );
+	auto triangle_wave_btn = new PixmapButton(this, nullptr);
 	triangle_wave_btn->move( CD_LFO_SHAPES_X + 15, CD_LFO_SHAPES_Y );
 	triangle_wave_btn->setActiveGraphic(
 		embed::getIconPixmap( "triangle_wave_active" ) );
@@ -96,7 +99,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	triangle_wave_btn->setToolTip(
 			tr( "Triangle wave" ) );
 
-	PixmapButton * saw_wave_btn = new PixmapButton( this, nullptr );
+	auto saw_wave_btn = new PixmapButton(this, nullptr);
 	saw_wave_btn->move( CD_LFO_SHAPES_X + 30, CD_LFO_SHAPES_Y );
 	saw_wave_btn->setActiveGraphic( embed::getIconPixmap(
 						"saw_wave_active" ) );
@@ -105,7 +108,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	saw_wave_btn->setToolTip(
 			tr( "Saw wave" ) );
 
-	PixmapButton * sqr_wave_btn = new PixmapButton( this, nullptr );
+	auto sqr_wave_btn = new PixmapButton(this, nullptr);
 	sqr_wave_btn->move( CD_LFO_SHAPES_X + 45, CD_LFO_SHAPES_Y );
 	sqr_wave_btn->setActiveGraphic( embed::getIconPixmap(
 					"square_wave_active" ) );
@@ -114,8 +117,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	sqr_wave_btn->setToolTip(
 			tr( "Square wave" ) );
 
-	PixmapButton * moog_saw_wave_btn =
-					new PixmapButton( this, nullptr );
+	auto moog_saw_wave_btn = new PixmapButton(this, nullptr);
 	moog_saw_wave_btn->move( CD_LFO_SHAPES_X, CD_LFO_SHAPES_Y + 15 );
 	moog_saw_wave_btn->setActiveGraphic(
 		embed::getIconPixmap( "moog_saw_wave_active" ) );
@@ -124,7 +126,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	moog_saw_wave_btn->setToolTip(
 			tr( "Moog saw wave" ) );
 
-	PixmapButton * exp_wave_btn = new PixmapButton( this, nullptr );
+	auto exp_wave_btn = new PixmapButton(this, nullptr);
 	exp_wave_btn->move( CD_LFO_SHAPES_X + 15, CD_LFO_SHAPES_Y + 15 );
 	exp_wave_btn->setActiveGraphic( embed::getIconPixmap(
 						"exp_wave_active" ) );
@@ -133,7 +135,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	exp_wave_btn->setToolTip(
 			tr( "Exponential wave" ) );
 
-	PixmapButton * white_noise_btn = new PixmapButton( this, nullptr );
+	auto white_noise_btn = new PixmapButton(this, nullptr);
 	white_noise_btn->move( CD_LFO_SHAPES_X + 30, CD_LFO_SHAPES_Y + 15 );
 	white_noise_btn->setActiveGraphic(
 		embed::getIconPixmap( "white_noise_wave_active" ) );
@@ -149,8 +151,8 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	m_userWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 						"usr_wave_inactive" ) );
 	connect( m_userWaveBtn,
-					SIGNAL( doubleClicked() ),
-			this, SLOT( askUserDefWave() ) );
+					SIGNAL(doubleClicked()),
+			this, SLOT(askUserDefWave()));
 	m_userWaveBtn->setToolTip(
 				tr( "User-defined shape.\nDouble click to pick a file." ) );
 	
@@ -164,33 +166,23 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	m_waveBtnGrp->addButton( white_noise_btn );
 	m_waveBtnGrp->addButton( m_userWaveBtn );
 
+	auto x1 = new PixmapButton(this, nullptr);
+	x1->move(CD_LFO_MULTIPLIER_X, CD_LFO_SHAPES_Y + 7);
+	x1->setActiveGraphic(embed::getIconPixmap("lfo_x1_active"));
+	x1->setInactiveGraphic(embed::getIconPixmap("lfo_x1_inactive"));
+	x1->setToolTip(tr("Multiply modulation frequency by 1"));
 
-	PixmapButton * x1 = new PixmapButton( this, nullptr );
-	x1->move( CD_LFO_MULTIPLIER_X, CD_LFO_SHAPES_Y +7);
-	x1->setActiveGraphic( embed::getIconPixmap(
-						"lfo_x1_active" ) );
-	x1->setInactiveGraphic( embed::getIconPixmap(
-						"lfo_x1_inactive" ) );
-	x1->setToolTip(
-				tr( "Mutliply modulation frequency by 1" ));
+	auto x100 = new PixmapButton(this, nullptr);
+	x100->move(CD_LFO_MULTIPLIER_X, CD_LFO_SHAPES_Y - 8);
+	x100->setActiveGraphic(embed::getIconPixmap("lfo_x100_active"));
+	x100->setInactiveGraphic(embed::getIconPixmap("lfo_x100_inactive"));
+	x100->setToolTip(tr("Multiply modulation frequency by 100"));
 
-	PixmapButton * x100 = new PixmapButton( this, nullptr );
-	x100->move( CD_LFO_MULTIPLIER_X, CD_LFO_SHAPES_Y - 8 );
-	x100->setActiveGraphic( embed::getIconPixmap(
-						"lfo_x100_active" ) );
-	x100->setInactiveGraphic( embed::getIconPixmap(
-						"lfo_x100_inactive" ) );
-	x100->setToolTip(
-				tr( "Mutliply modulation frequency by 100" ));
-
-	PixmapButton * d100 = new PixmapButton( this, nullptr );
-	d100->move( CD_LFO_MULTIPLIER_X, CD_LFO_SHAPES_Y + 22 );
-	d100->setActiveGraphic( embed::getIconPixmap(
-						"lfo_d100_active" ) );
-	d100->setInactiveGraphic( embed::getIconPixmap(
-						"lfo_d100_inactive" ) );
-	d100->setToolTip(
-				tr( "Divide modulation frequency by 100" ));
+	auto d100 = new PixmapButton(this, nullptr);
+	d100->move(CD_LFO_MULTIPLIER_X, CD_LFO_SHAPES_Y + 22);
+	d100->setActiveGraphic(embed::getIconPixmap("lfo_d100_active"));
+	d100->setInactiveGraphic(embed::getIconPixmap("lfo_d100_inactive"));
+	d100->setToolTip(tr("Divide modulation frequency by 100"));
 
 	m_multiplierBtnGrp = new automatableButtonGroup( this );
 	m_multiplierBtnGrp->addButton( x1 );
@@ -240,14 +232,14 @@ void LfoControllerDialog::contextMenuEvent( QContextMenuEvent * )
 		//   should be replaced by Model::displayName
 	contextMenu->addAction( embed::getIconPixmap( "arp_up_on" ),
 						tr( "Move &up" ),
-						this, SLOT( moveUp() ) );
+						this, SLOT(moveUp()));
 	contextMenu->addAction( embed::getIconPixmap( "arp_down_on" ),
 						tr( "Move &down" ),
-						this, SLOT( moveDown() ) );
+						this, SLOT(moveDown()));
 	contextMenu->addSeparator();
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
 						tr( "&Remove this plugin" ),
-						this, SLOT( deletePlugin() ) );
+						this, SLOT(deletePlugin()));
 	contextMenu->exec( QCursor::pos() );
 	delete contextMenu;
 	*/
@@ -268,3 +260,4 @@ void LfoControllerDialog::modelChanged()
 }
 
 
+} // namespace lmms::gui

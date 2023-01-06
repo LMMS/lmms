@@ -37,6 +37,9 @@
 #include "stdio.h"
 
 
+namespace lmms
+{
+
 HalfSwing::HalfSwing(QObject * parent) :
 	Groove(parent)
 {
@@ -131,10 +134,12 @@ int HalfSwing::isInTick(TimePos * curStart, const fpp_t frames, const f_cnt_t of
 
 QWidget * HalfSwing::instantiateView(QWidget * parent)
 {
-	return new HalfSwingView(this, parent);
+	return new gui::HalfSwingView(this, parent);
 }
 
 
+namespace gui
+{
 
 // VIEW //
 
@@ -170,3 +175,7 @@ void HalfSwingView::modelChanged()
 {
 	m_swing->setAmount(m_sliderModel->value());
 }
+
+} // namespace gui
+
+} // namespace lmms

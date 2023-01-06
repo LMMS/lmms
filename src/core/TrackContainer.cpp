@@ -41,6 +41,10 @@
 #include "MainWindow.h"
 #include "TextFloat.h"
 
+namespace lmms
+{
+
+
 TrackContainer::TrackContainer() :
 	Model( nullptr ),
 	JournallingObject(),
@@ -67,9 +71,9 @@ void TrackContainer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 	// save settings of each track
 	m_tracksMutex.lockForRead();
-	for( int i = 0; i < m_tracks.size(); ++i )
+	for (const auto& track : m_tracks)
 	{
-		m_tracks[i]->saveState( _doc, _this );
+		track->saveState(_doc, _this);
 	}
 	m_tracksMutex.unlock();
 }
@@ -87,14 +91,14 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 
 	static QProgressDialog * pd = nullptr;
 	bool was_null = ( pd == nullptr );
-	if( !journalRestore && getGUI() != nullptr )
+	if (!journalRestore && gui::getGUI() != nullptr)
 	{
 		if( pd == nullptr )
 		{
 			pd = new QProgressDialog( tr( "Loading project..." ),
 						tr( "Cancel" ), 0,
 						Engine::getSong()->getLoadingTrackCount(),
-						getGUI()->mainWindow() );
+						gui::getGUI()->mainWindow());
 			pd->setWindowModality( Qt::ApplicationModal );
 			pd->setWindowTitle( tr( "Please wait..." ) );
 			pd->show();
@@ -111,9 +115,9 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 						QEventLoop::AllEvents, 100 );
 			if( pd->wasCanceled() )
 			{
-				if ( getGUI() != nullptr )
+				if (gui::getGUI() != nullptr)
 				{
-					TextFloat::displayMessage( tr( "Loading cancelled" ),
+					gui::TextFloat::displayMessage( tr( "Loading cancelled" ),
 					tr( "Project loading was cancelled." ),
 					embed::getIconPixmap( "project_file", 24, 24 ),
 					2000 );
@@ -156,9 +160,9 @@ int TrackContainer::countTracks( Track::TrackTypes _tt ) const
 {
 	int cnt = 0;
 	m_tracksMutex.lockForRead();
-	for( int i = 0; i < m_tracks.size(); ++i )
+	for (const auto& track : m_tracks)
 	{
-		if( m_tracks[i]->type() == _tt || _tt == Track::NumTrackTypes )
+		if (track->type() == _tt || _tt == Track::NumTrackTypes)
 		{
 			++cnt;
 		}
@@ -234,10 +238,9 @@ void TrackContainer::clearAllTracks()
 
 bool TrackContainer::isEmpty() const
 {
-	for( TrackList::const_iterator it = m_tracks.begin();
-						it != m_tracks.end(); ++it )
+	for (const auto& track : m_tracks)
 	{
-		if( !( *it )->getClips().isEmpty() )
+		if (!track->getClips().isEmpty())
 		{
 			return false;
 		}
@@ -330,3 +333,5 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 	return valueMap;
 };
 
+
+} // namespace lmms

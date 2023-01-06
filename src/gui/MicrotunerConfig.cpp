@@ -50,6 +50,9 @@
 #include "Song.h"
 #include "SubWindow.h"
 
+namespace lmms::gui
+{
+
 
 MicrotunerConfig::MicrotunerConfig() :
 	QWidget(),
@@ -65,20 +68,20 @@ MicrotunerConfig::MicrotunerConfig() :
 	setWindowTitle(tr("Microtuner"));
 
 	// Organize into 2 main columns: scales and keymaps
-	QGridLayout *microtunerLayout = new QGridLayout();
+	auto microtunerLayout = new QGridLayout();
 	microtunerLayout->setSpacing(2);
 
 	// ----------------------------------
 	// Scale sub-column
 	//
-	QLabel *scaleLabel = new QLabel(tr("Scale:"));
+	auto scaleLabel = new QLabel(tr("Scale:"));
 	microtunerLayout->addWidget(scaleLabel, 0, 0, 1, 2, Qt::AlignBottom);
 
 	for (unsigned int i = 0; i < MaxScaleCount; i++)
 	{
 		m_scaleComboModel.addItem(QString::number(i) + ": " + Engine::getSong()->getScale(i)->getDescription());
 	}
-	ComboBox *scaleCombo = new ComboBox();
+	auto scaleCombo = new ComboBox();
 	scaleCombo->setModel(&m_scaleComboModel);
 	microtunerLayout->addWidget(scaleCombo, 1, 0, 1, 2);
 	connect(&m_scaleComboModel, &ComboBoxModel::dataChanged, [=] {updateScaleForm();});
@@ -87,8 +90,8 @@ MicrotunerConfig::MicrotunerConfig() :
 	m_scaleNameEdit->setToolTip(tr("Scale description. Cannot start with \"!\" and cannot contain a newline character."));
 	microtunerLayout->addWidget(m_scaleNameEdit, 2, 0, 1, 2);
 
-	QPushButton *loadScaleButton = new QPushButton(tr("Load"));
-	QPushButton *saveScaleButton = new QPushButton(tr("Save"));
+	auto loadScaleButton = new QPushButton(tr("Load"));
+	auto saveScaleButton = new QPushButton(tr("Save"));
 	microtunerLayout->addWidget(loadScaleButton, 3, 0, 1, 1);
 	microtunerLayout->addWidget(saveScaleButton, 3, 1, 1, 1);
 	connect(loadScaleButton, &QPushButton::clicked, [=] {loadScaleFromFile();});
@@ -99,21 +102,21 @@ MicrotunerConfig::MicrotunerConfig() :
 	m_scaleTextEdit->setToolTip(tr("Enter intervals on separate lines. Numbers containing a decimal point are treated as cents.\nOther inputs are treated as integer ratios and must be in the form of \'a/b\' or \'a\'.\nUnity (0.0 cents or ratio 1/1) is always present as a hidden first value; do not enter it manually."));
 	microtunerLayout->addWidget(m_scaleTextEdit, 4, 0, 2, 2);
 
-	QPushButton *applyScaleButton = new QPushButton(tr("Apply scale"));
+	auto applyScaleButton = new QPushButton(tr("Apply scale"));
 	microtunerLayout->addWidget(applyScaleButton, 6, 0, 1, 2);
 	connect(applyScaleButton, &QPushButton::clicked, [=] {applyScale();});
 
 	// ----------------------------------
 	// Mapping sub-column
 	//
-	QLabel *keymapLabel = new QLabel(tr("Keymap:"));
+	auto keymapLabel = new QLabel(tr("Keymap:"));
 	microtunerLayout->addWidget(keymapLabel, 0, 2, 1, 2, Qt::AlignBottom);
 
 	for (unsigned int i = 0; i < MaxKeymapCount; i++)
 	{
 		m_keymapComboModel.addItem(QString::number(i) + ": " + Engine::getSong()->getKeymap(i)->getDescription());
 	}
-	ComboBox *keymapCombo = new ComboBox();
+	auto keymapCombo = new ComboBox();
 	keymapCombo->setModel(&m_keymapComboModel);
 	microtunerLayout->addWidget(keymapCombo, 1, 2, 1, 2);
 	connect(&m_keymapComboModel, &ComboBoxModel::dataChanged, [=] {updateKeymapForm();});
@@ -122,8 +125,8 @@ MicrotunerConfig::MicrotunerConfig() :
 	m_keymapNameEdit->setToolTip(tr("Keymap description. Cannot start with \"!\" and cannot contain a newline character."));
 	microtunerLayout->addWidget(m_keymapNameEdit, 2, 2, 1, 2);
 
-	QPushButton *loadKeymapButton = new QPushButton(tr("Load"));
-	QPushButton *saveKeymapButton = new QPushButton(tr("Save"));
+	auto loadKeymapButton = new QPushButton(tr("Load"));
+	auto saveKeymapButton = new QPushButton(tr("Save"));
 	microtunerLayout->addWidget(loadKeymapButton, 3, 2, 1, 1);
 	microtunerLayout->addWidget(saveKeymapButton, 3, 3, 1, 1);
 	connect(loadKeymapButton, &QPushButton::clicked, [=] {loadKeymapFromFile();});
@@ -135,40 +138,40 @@ MicrotunerConfig::MicrotunerConfig() :
 	microtunerLayout->addWidget(m_keymapTextEdit, 4, 2, 1, 2);
 
 	// Mapping ranges
-	QGridLayout *keymapRangeLayout = new QGridLayout();
+	auto keymapRangeLayout = new QGridLayout();
 	microtunerLayout->addLayout(keymapRangeLayout, 5, 2, 1, 2, Qt::AlignCenter | Qt::AlignTop);
 
-	LcdSpinBox *firstKeySpin = new LcdSpinBox(3, nullptr, tr("First key"));
+	auto firstKeySpin = new LcdSpinBox(3, nullptr, tr("First key"));
 	firstKeySpin->setLabel(tr("FIRST"));
 	firstKeySpin->setToolTip(tr("First MIDI key that will be mapped"));
 	firstKeySpin->setModel(&m_firstKeyModel);
 	keymapRangeLayout->addWidget(firstKeySpin, 0, 0);
 
-	LcdSpinBox *lastKeySpin = new LcdSpinBox(3, nullptr, tr("Last key"));
+	auto lastKeySpin = new LcdSpinBox(3, nullptr, tr("Last key"));
 	lastKeySpin->setLabel(tr("LAST"));
 	lastKeySpin->setToolTip(tr("Last MIDI key that will be mapped"));
 	lastKeySpin->setModel(&m_lastKeyModel);
 	keymapRangeLayout->addWidget(lastKeySpin, 0, 1);
 
-	LcdSpinBox *middleKeySpin = new LcdSpinBox(3, nullptr, tr("Middle key"));
+	auto middleKeySpin = new LcdSpinBox(3, nullptr, tr("Middle key"));
 	middleKeySpin->setLabel(tr("MIDDLE"));
 	middleKeySpin->setToolTip(tr("First line in the keymap refers to this MIDI key"));
 	middleKeySpin->setModel(&m_middleKeyModel);
 	keymapRangeLayout->addWidget(middleKeySpin, 0, 2);
 
-	LcdSpinBox *baseKeySpin = new LcdSpinBox(3, nullptr, tr("Base key"));
+	auto baseKeySpin = new LcdSpinBox(3, nullptr, tr("Base key"));
 	baseKeySpin->setLabel(tr("BASE N."));
 	baseKeySpin->setToolTip(tr("Base note frequency will be assigned to this MIDI key"));
 	baseKeySpin->setModel(&m_baseKeyModel);
 	keymapRangeLayout->addWidget(baseKeySpin, 1, 0);
 
-	LcdFloatSpinBox *baseFreqSpin = new LcdFloatSpinBox(4, 3, tr("Base note frequency"));
+	auto baseFreqSpin = new LcdFloatSpinBox(4, 3, tr("Base note frequency"));
 	baseFreqSpin->setLabel(tr("BASE NOTE FREQ"));
 	baseFreqSpin->setModel(&m_baseFreqModel);
 	baseFreqSpin->setToolTip(tr("Base note frequency"));
 	keymapRangeLayout->addWidget(baseFreqSpin, 1, 1, 1, 2);
 
-	QPushButton *applyKeymapButton = new QPushButton(tr("Apply keymap"));
+	auto applyKeymapButton = new QPushButton(tr("Apply keymap"));
 	microtunerLayout->addWidget(applyKeymapButton, 6, 2, 1, 2);
 	connect(applyKeymapButton, &QPushButton::clicked, [=] {applyKeymap();});
 
@@ -283,9 +286,9 @@ void MicrotunerConfig::updateKeymapForm()
 
 	m_keymapTextEdit->setPlainText("");
 	const std::vector<int> &map = newMap->getMap();
-	for (std::size_t i = 0; i < map.size(); i++)
+	for (int value : map)
 	{
-		if (map[i] >= 0) {m_keymapTextEdit->appendPlainText(QString::number(map[i]));}
+		if (value >= 0) {m_keymapTextEdit->appendPlainText(QString::number(value));}
 		else {m_keymapTextEdit->appendPlainText("x");}
 	}
 	QTextCursor tmp = m_keymapTextEdit->textCursor();
@@ -314,7 +317,11 @@ bool MicrotunerConfig::validateScaleForm()
 	if (name.contains('\n')) {fail(tr("Scale name cannot contain a new-line character")); return false;}
 
 	// check intervals
-	QStringList input = m_scaleTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
+	#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+		QStringList input = m_scaleTextEdit->toPlainText().split('\n', Qt::SkipEmptyParts);
+	#else
+		QStringList input = m_scaleTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
+	#endif
 	for (auto &line: input)
 	{
 		if (line.isEmpty()) {continue;}
@@ -358,7 +365,11 @@ bool MicrotunerConfig::validateKeymapForm()
 	if (name.contains('\n')) {fail(tr("Keymap name cannot contain a new-line character")); return false;}
 
 	// check key mappings
-	QStringList input = m_keymapTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
+	#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+		QStringList input = m_keymapTextEdit->toPlainText().split('\n', Qt::SkipEmptyParts);
+	#else
+		QStringList input = m_keymapTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
+	#endif
 	for (auto &line: input)
 	{
 		if (line.isEmpty()) {continue;}
@@ -386,9 +397,13 @@ bool MicrotunerConfig::applyScale()
 	if (!validateScaleForm()) {return false;};
 
 	std::vector<Interval> newIntervals;
-	newIntervals.push_back(Interval(1, 1));
+	newIntervals.emplace_back(1, 1);
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	QStringList input = m_scaleTextEdit->toPlainText().split('\n', Qt::SkipEmptyParts);
+#else
 	QStringList input = m_scaleTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
+#endif
 	for (auto &line: input)
 	{
 		if (line.isEmpty()) {continue;}
@@ -396,7 +411,7 @@ bool MicrotunerConfig::applyScale()
 		QString firstSection = line.section(QRegExp("\\s+|/"), 0, 0, QString::SectionSkipEmpty);
 		if (firstSection.contains('.'))		// cent mode
 		{
-			newIntervals.push_back(Interval(firstSection.toFloat()));
+			newIntervals.emplace_back(firstSection.toFloat());
 		}
 		else								// ratio mode
 		{
@@ -406,7 +421,7 @@ bool MicrotunerConfig::applyScale()
 			{
 				den = line.split('/').at(1).section(QRegExp("\\s+"), 0, 0, QString::SectionSkipEmpty).toInt();
 			}
-			newIntervals.push_back(Interval(num, den));
+			newIntervals.emplace_back(num, den);
 		}
 	}
 
@@ -430,7 +445,11 @@ bool MicrotunerConfig::applyKeymap()
 
 	std::vector<int> newMap;
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	QStringList input = m_keymapTextEdit->toPlainText().split('\n', Qt::SkipEmptyParts);
+#else
 	QStringList input = m_keymapTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
+#endif
 	for (auto &line: input)
 	{
 		if (line.isEmpty()) {continue;}
@@ -651,3 +670,6 @@ void MicrotunerConfig::closeEvent(QCloseEvent *ce)
 	else {hide();}
 	ce->ignore();
 }
+
+
+} // namespace lmms::gui

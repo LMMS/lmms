@@ -35,6 +35,9 @@
 
 #include "stdio.h"
 
+namespace lmms
+{
+
 GrooveExperiments::GrooveExperiments(QObject * parent) :
 	Groove(parent)
 {
@@ -123,10 +126,12 @@ int GrooveExperiments::isInTick(TimePos * curStart, const fpp_t frames, const f_
 
 QWidget * GrooveExperiments::instantiateView(QWidget * parent)
 {
-	return new GrooveExperimentsView(this, parent);
+	return new gui::GrooveExperimentsView(this, parent);
 }
 
 
+namespace gui
+{
 
 // VIEW //
 
@@ -162,3 +167,7 @@ void GrooveExperimentsView::modelChanged()
 {
 	m_groove->setAmount(m_sliderModel->value());
 }
+
+} // namespace gui
+
+} // namespace lmms

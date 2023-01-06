@@ -56,6 +56,9 @@
 #include "ConfigManager.h"
 #include "TextFloat.h"
 
+namespace lmms::gui
+{
+
 
 TextFloat * Fader::s_textFloat = nullptr;
 QPixmap * Fader::s_back = nullptr;
@@ -165,7 +168,7 @@ void Fader::mouseMoveEvent( QMouseEvent *mouseEvent )
 
 		float delta = dy * ( model()->maxValue() - model()->minValue() ) / (float) ( height() - ( *m_knob ).height() );
 
-		const float step = model()->step<float>();
+		const auto step = model()->step<float>();
 		float newValue = static_cast<float>( static_cast<int>( ( m_startValue + delta ) / step + 0.5 ) ) * step;
 		model()->setValue( newValue );
 
@@ -478,3 +481,6 @@ void Fader::setPeakYellow( const QColor & c )
 {
 	m_peakYellow = c;
 }
+
+
+} // namespace lmms::gui

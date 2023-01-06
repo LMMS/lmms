@@ -38,7 +38,8 @@
 #include "TrackRenameLineEdit.h"
 #include "TrackView.h"
 
-
+namespace lmms::gui
+{
 
 TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 	QToolButton( _parent ),
@@ -61,20 +62,15 @@ TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 		setFixedSize( 160, 29 );
 		m_renameLineEdit->move( 30, ( height() / 2 ) - ( m_renameLineEdit->sizeHint().height() / 2 ) );
 		m_renameLineEdit->setFixedWidth( width() - 33 );
-		connect( m_renameLineEdit, SIGNAL( editingFinished() ), this, SLOT( renameFinished() ) );
+		connect( m_renameLineEdit, SIGNAL(editingFinished()), this, SLOT(renameFinished()));
 	}
 	
 	setIconSize( QSize( 24, 24 ) );
-	connect( m_trackView->getTrack(), SIGNAL( dataChanged() ), this, SLOT( update() ) );
-	connect( m_trackView->getTrack(), SIGNAL( nameChanged() ), this, SLOT( nameChanged() ) );
+	connect( m_trackView->getTrack(), SIGNAL(dataChanged()), this, SLOT(update()));
+	connect( m_trackView->getTrack(), SIGNAL(nameChanged()), this, SLOT(nameChanged()));
 }
 
 
-
-
-TrackLabelButton::~TrackLabelButton()
-{
-}
 
 
 
@@ -109,6 +105,7 @@ void TrackLabelButton::renameFinished()
 {
 	if( !( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() ) )
 	{
+		m_renameLineEdit->clearFocus();
 		m_renameLineEdit->hide();
 		if( m_renameLineEdit->text() != "" )
 		{
@@ -192,8 +189,7 @@ void TrackLabelButton::paintEvent( QPaintEvent * _pe )
 {
 	if( m_trackView->getTrack()->type() == Track::InstrumentTrack )
 	{
-		InstrumentTrack * it =
-			dynamic_cast<InstrumentTrack *>( m_trackView->getTrack() );
+		auto it = dynamic_cast<InstrumentTrack*>(m_trackView->getTrack());
 		const PixmapLoader * pl;
 		auto get_logo = [](InstrumentTrack* it) -> const PixmapLoader*
 		{
@@ -240,3 +236,6 @@ QString TrackLabelButton::elideName( const QString &name )
 	QString elidedName = metrics.elidedText( name, Qt::ElideRight, maxTextWidth );
 	return elidedName;
 }
+
+
+} // namespace lmms::gui

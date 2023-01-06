@@ -33,8 +33,13 @@
 #include "lmms_export.h"
 #include "MemoryManager.h"
 
-class ProjectVersion;
 class QTextStream;
+
+namespace lmms
+{
+
+class ProjectVersion;
+
 
 class LMMS_EXPORT DataFile : public QDomDocument
 {
@@ -56,13 +61,13 @@ public:
 		MidiClip,
 		TypeCount
 	} ;
-	typedef Types Type;
+	using Type = Types;
 
 	DataFile( const QString& fileName );
 	DataFile( const QByteArray& data );
 	DataFile( Type type );
 
-	virtual ~DataFile();
+	virtual ~DataFile() = default;
 
 	///
 	/// \brief validate
@@ -131,20 +136,12 @@ private:
 	static const std::vector<ProjectVersion> UPGRADE_VERSIONS;
 
 	// Map with DOM elements that access resources (for making bundles)
-	typedef std::map<QString, std::vector<QString>> ResourcesMap;
+	using ResourcesMap = std::map<QString, std::vector<QString>>;
 	static const ResourcesMap ELEMENTS_WITH_RESOURCES;
 
 	void upgrade();
 
 	void loadData( const QByteArray & _data, const QString & _sourceFile );
-
-
-	struct LMMS_EXPORT typeDescStruct
-	{
-		Type m_type;
-		QString m_name;
-	} ;
-	static typeDescStruct s_types[TypeCount];
 
 	QString m_fileName; //!< The origin file name or "" if this DataFile didn't originate from a file
 	QDomElement m_content;
@@ -154,5 +151,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

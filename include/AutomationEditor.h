@@ -40,9 +40,16 @@ class QPainter;
 class QPixmap;
 class QScrollBar;
 
-class ComboBox;
-class Knob;
+namespace lmms
+{
+
 class NotePlayHandle;
+
+namespace gui
+{
+
+class Knob;
+class ComboBox;
 class TimeLineWidget;
 
 
@@ -92,7 +99,7 @@ public slots:
 
 
 protected:
-	typedef AutomationClip::timeMap timeMap;
+	using timeMap = AutomationClip::timeMap;
 
 	void keyPressEvent(QKeyEvent * ke) override;
 	void leaveEvent(QEvent * e) override;
@@ -128,7 +135,7 @@ protected slots:
 	void setProgressionType(int type);
 	void setTension();
 
-	void updatePosition( const TimePos & t );
+	void updatePosition( const lmms::TimePos & t );
 
 	void zoomingXChanged();
 	void zoomingYChanged();
@@ -160,7 +167,7 @@ private:
 
 	AutomationEditor();
 	AutomationEditor( const AutomationEditor & );
-	virtual ~AutomationEditor();
+	~AutomationEditor() override;
 
 	static QPixmap * s_toolDraw;
 	static QPixmap * s_toolErase;
@@ -234,7 +241,7 @@ private:
 
 signals:
 	void currentClipChanged();
-	void positionChanged( const TimePos & );
+	void positionChanged( const lmms::TimePos & );
 } ;
 
 
@@ -248,7 +255,7 @@ class AutomationEditorWindow : public Editor
 	static const int INITIAL_HEIGHT = 480;
 public:
 	AutomationEditorWindow();
-	~AutomationEditorWindow();
+	~AutomationEditorWindow() override = default;
 
 	void setCurrentClip(AutomationClip* clip);
 	const AutomationClip* currentClip();
@@ -293,5 +300,8 @@ private:
 	ComboBox * m_quantizeComboBox;
 };
 
+} // namespace gui
+
+} // namespace lmms
 
 #endif

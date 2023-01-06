@@ -44,12 +44,16 @@
 
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT ladspaeffect_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"LADSPA",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"plugin for using arbitrary LADSPA-effects "
@@ -126,7 +130,7 @@ void LadspaEffect::changeSampleRate()
 
 
 
-bool LadspaEffect::processAudioBuffer( sampleFrame * _buf, 
+bool LadspaEffect::processAudioBuffer( sampleFrame * _buf,
 							const fpp_t _frames )
 {
 	m_pluginMutex.lock();
@@ -150,7 +154,7 @@ bool LadspaEffect::processAudioBuffer( sampleFrame * _buf,
 	}
 
 	// Copy the LMMS audio buffer to the LADSPA input buffer and initialize
-	// the control ports.  
+	// the control ports.
 	ch_cnt_t channel = 0;
 	for( ch_cnt_t proc = 0; proc < processorCount(); ++proc )
 	{
@@ -160,10 +164,10 @@ bool LadspaEffect::processAudioBuffer( sampleFrame * _buf,
 			switch( pp->rate )
 			{
 				case CHANNEL_IN:
-					for( fpp_t frame = 0; 
+					for( fpp_t frame = 0;
 						frame < frames; ++frame )
 					{
-						pp->buffer[frame] = 
+						pp->buffer[frame] =
 							_buf[frame][channel];
 					}
 					++channel;
@@ -177,15 +181,15 @@ bool LadspaEffect::processAudioBuffer( sampleFrame * _buf,
 					}
 					else
 					{
-						pp->value = static_cast<LADSPA_Data>( 
+						pp->value = static_cast<LADSPA_Data>(
 											pp->control->value() / pp->scale );
 						// This only supports control rate ports, so the audio rates are
 						// treated as though they were control rate by setting the
 						// port buffer to all the same value.
-						for( fpp_t frame = 0; 
+						for( fpp_t frame = 0;
 							frame < frames; ++frame )
 						{
-							pp->buffer[frame] = 
+							pp->buffer[frame] =
 								pp->value;
 						}
 					}
@@ -196,9 +200,9 @@ bool LadspaEffect::processAudioBuffer( sampleFrame * _buf,
 					{
 						break;
 					}
-					pp->value = static_cast<LADSPA_Data>( 
+					pp->value = static_cast<LADSPA_Data>(
 										pp->control->value() / pp->scale );
-					pp->buffer[0] = 
+					pp->buffer[0] =
 						pp->value;
 					break;
 				case CHANNEL_OUT:
@@ -235,7 +239,7 @@ bool LadspaEffect::processAudioBuffer( sampleFrame * _buf,
 				case CONTROL_RATE_INPUT:
 					break;
 				case CHANNEL_OUT:
-					for( fpp_t frame = 0; 
+					for( fpp_t frame = 0;
 						frame < frames; ++frame )
 					{
 						_buf[frame][channel] = d * _buf[frame][channel] + w * pp->buffer[frame];
@@ -299,7 +303,7 @@ void LadspaEffect::pluginInstantiation()
 
 	int inputch = 0;
 	int outputch = 0;
-	LADSPA_Data * inbuf [2];
+	std::array<LADSPA_Data*, 2> inbuf;
 	inbuf[0] = nullptr;
 	inbuf[1] = nullptr;
 	for( ch_cnt_t proc = 0; proc < processorCount(); proc++ )
@@ -307,7 +311,7 @@ void LadspaEffect::pluginInstantiation()
 		multi_proc_t ports;
 		for( int port = 0; port < m_portCount; port++ )
 		{
-			port_desc_t * p = new PortDescription;
+			auto p = new port_desc_t;
 
 			p->name = manager->getPortName( m_key, port );
 			p->proc = proc;
@@ -459,9 +463,9 @@ void LadspaEffect::pluginInstantiation()
 
 			ports.append( p );
 
-	// For convenience, keep a separate list of the ports that are used 
+	// For convenience, keep a separate list of the ports that are used
 	// to control the processors.
-			if( p->rate == AUDIO_RATE_INPUT || 
+			if( p->rate == AUDIO_RATE_INPUT ||
 					p->rate == CONTROL_RATE_INPUT )
 			{
 				p->control_id = m_portControls.count();
@@ -475,7 +479,7 @@ void LadspaEffect::pluginInstantiation()
 	m_descriptor = manager->getDescriptor( m_key );
 	if( m_descriptor == nullptr )
 	{
-		QMessageBox::warning( 0, "Effect", 
+		QMessageBox::warning( 0, "Effect",
 			"Can't get LADSPA descriptor function: " + m_key.second,
 			QMessageBox::Ok, QMessageBox::NoButton );
 		setOkay( false );
@@ -514,8 +518,8 @@ void LadspaEffect::pluginInstantiation()
 						port,
 						pp->buffer ) )
 			{
-				QMessageBox::warning( 0, "Effect", 
-				"Failed to connect port: " + m_key.second, 
+				QMessageBox::warning( 0, "Effect",
+				"Failed to connect port: " + m_key.second,
 				QMessageBox::Ok, QMessageBox::NoButton );
 				setDontRun( true );
 				return;
@@ -604,5 +608,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * _parent, void * _data )
 }
 
 
-
-
+} // namespace lmms

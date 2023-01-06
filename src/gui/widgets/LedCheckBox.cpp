@@ -31,8 +31,11 @@
 #include "embed.h"
 #include "gui_templates.h"
 
+namespace lmms::gui
+{
 
-static const QString names[LedCheckBox::NumColors] =
+
+static const auto names = std::array<QString, 3>
 {
 	"led_yellow", "led_green", "led_red"
 } ;
@@ -127,6 +130,4 @@ void LedCheckBox::onTextUpdated()
 }
 
 
-
-
-
+} // namespace lmms::gui

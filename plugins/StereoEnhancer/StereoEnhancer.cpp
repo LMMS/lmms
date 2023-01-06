@@ -28,12 +28,16 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT stereoenhancer_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"StereoEnhancer Effect",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Plugin for enhancing stereo separation of a stereo input file" ),
@@ -81,15 +85,15 @@ StereoEnhancerEffect::~StereoEnhancerEffect()
 bool StereoEnhancerEffect::processAudioBuffer( sampleFrame * _buf,
 							const fpp_t _frames )
 {
-	
+
 	// This appears to be used for determining whether or not to continue processing
-	// audio with this effect	
+	// audio with this effect
 	double out_sum = 0.0;
-	
+
 	float width;
 	int frameIndex = 0;
-	
-	
+
+
 	if( !isEnabled() || !isRunning() )
 	{
 		return( false );
@@ -100,7 +104,7 @@ bool StereoEnhancerEffect::processAudioBuffer( sampleFrame * _buf,
 
 	for( fpp_t f = 0; f < _frames; ++f )
 	{
-		
+
 		// copy samples into the delay buffer
 		m_delayBuffer[m_currFrame][0] = _buf[f][0];
 		m_delayBuffer[m_currFrame][1] = _buf[f][1];
@@ -118,7 +122,7 @@ bool StereoEnhancerEffect::processAudioBuffer( sampleFrame * _buf,
 		}
 
 		//sample_t s[2] = { _buf[f][0], _buf[f][1] };	//Vanilla
-		sample_t s[2] = { _buf[f][0], m_delayBuffer[frameIndex][1] };	//Chocolate
+		auto s = std::array{_buf[f][0], m_delayBuffer[frameIndex][1]};	//Chocolate
 
 		m_seFX.nextSample( s[0], s[1] );
 
@@ -172,3 +176,5 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * _parent, void * _data )
 
 }
 
+
+} // namespace lmms

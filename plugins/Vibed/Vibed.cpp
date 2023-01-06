@@ -43,12 +43,16 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT vibedstrings_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Vibed",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 					"Vibrating string modeler" ),
@@ -69,7 +73,7 @@ Vibed::Vibed( InstrumentTrack * _instrumentTrack ) :
 
 	FloatModel * knob;
 	BoolModel * led;
-	NineButtonSelectorModel * harmonic;
+	gui::NineButtonSelectorModel * harmonic;
 	graphModel * graphTmp;
 
 	for( int harm = 0; harm < 9; harm++ )
@@ -114,7 +118,7 @@ Vibed::Vibed( InstrumentTrack * _instrumentTrack ) :
 				tr( "String %1" ).arg( harm+1 )  );
 		m_powerButtons.append( led );
 
-		harmonic = new NineButtonSelectorModel( 2, 0, 8, this );
+		harmonic = new gui::NineButtonSelectorModel( 2, 0, 8, this );
 		m_harmonics.append( harmonic );
 
 		graphTmp = new graphModel( -1.0, 1.0, __sampleLength, this );
@@ -123,13 +127,6 @@ Vibed::Vibed( InstrumentTrack * _instrumentTrack ) :
 		m_graphs.append( graphTmp );
 
 	}
-}
-
-
-
-
-Vibed::~Vibed()
-{
 }
 
 
@@ -304,8 +301,7 @@ void Vibed::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
-	StringContainer * ps = static_cast<StringContainer *>(
-							_n->m_pluginData );
+	auto ps = static_cast<StringContainer*>(_n->m_pluginData);
 
 	for( fpp_t i = offset; i < frames + offset; ++i )
 	{
@@ -340,13 +336,15 @@ void Vibed::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-PluginView * Vibed::instantiateView( QWidget * _parent )
+gui::PluginView * Vibed::instantiateView( QWidget * _parent )
 {
-	return( new VibedView( this, _parent ) );
+	return( new gui::VibedView( this, _parent ) );
 }
 
 
 
+namespace gui
+{
 
 
 VibedView::VibedView( Instrument * _instrument,
@@ -493,7 +491,7 @@ VibedView::VibedView( Instrument * _instrument,
 	m_triangleWaveBtn->setToolTip(
 			tr( "Triangle wave" ) );
 	connect( m_triangleWaveBtn, SIGNAL ( clicked () ),
-			this, SLOT ( triangleWaveClicked( ) ) );
+			this, SLOT ( triangleWaveClicked() ) );
 
 	
 	m_sawWaveBtn = new PixmapButton( this, tr( "Saw wave" ) );
@@ -584,8 +582,8 @@ void VibedView::modelChanged()
 
 void VibedView::showString( int _string )
 {
-	Vibed * v = castModel<Vibed>();
-	
+	auto v = castModel<Vibed>();
+
 	m_pickKnob->setModel( v->m_pickKnobs[_string] );
 	m_pickupKnob->setModel( v->m_pickupKnobs[_string] );
 	m_stiffnessKnob->setModel( v->m_stiffnessKnobs[_string] );
@@ -679,6 +677,8 @@ void VibedView::contextMenuEvent( QContextMenuEvent * )
 }
 
 
+} // namespace gui
+
 extern "C"
 {
 
@@ -692,4 +692,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 }
 
 
-
+} // namespace lmms

@@ -51,12 +51,16 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT zynaddsubfx_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"ZynAddSubFX",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 			"Embedded ZynAddSubFX" ),
@@ -76,13 +80,6 @@ ZynAddSubFxRemotePlugin::ZynAddSubFxRemotePlugin() :
 	RemotePlugin()
 {
 	init( "RemoteZynAddSubFx", false );
-}
-
-
-
-
-ZynAddSubFxRemotePlugin::~ZynAddSubFxRemotePlugin()
-{
 }
 
 
@@ -138,7 +135,7 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 			this, SLOT( updateResBandwidth() ), Qt::DirectConnection );
 
 	// now we need a play-handle which cares for calling play()
-	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrumentTrack );
+	auto iph = new InstrumentPlayHandle(this, _instrumentTrack);
 	Engine::audioEngine()->addPlayHandle( iph );
 
 	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ),
@@ -485,15 +482,16 @@ void ZynAddSubFxInstrument::sendControlChange( MidiControllers midiCtl, float va
 
 
 
-PluginView * ZynAddSubFxInstrument::instantiateView( QWidget * _parent )
+gui::PluginView* ZynAddSubFxInstrument::instantiateView( QWidget * _parent )
 {
-	return new ZynAddSubFxView( this, _parent );
+	return new gui::ZynAddSubFxView( this, _parent );
 }
 
 
 
 
-
+namespace gui
+{
 
 
 ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) :
@@ -505,7 +503,7 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 								"artwork" ) );
 	setPalette( pal );
 
-	QGridLayout * l = new QGridLayout( this );
+	auto l = new QGridLayout(this);
 	l->setContentsMargins( 20, 80, 10, 10 );
 	l->setVerticalSpacing( 16 );
 	l->setHorizontalSpacing( 10 );
@@ -568,14 +566,6 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 
 
 
-
-ZynAddSubFxView::~ZynAddSubFxView()
-{
-}
-
-
-
-
 void ZynAddSubFxView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	// For mimeType() and MimeType enum class
@@ -621,7 +611,7 @@ void ZynAddSubFxView::dropEvent( QDropEvent * _de )
 
 void ZynAddSubFxView::modelChanged()
 {
-	ZynAddSubFxInstrument * m = castModel<ZynAddSubFxInstrument>();
+	auto m = castModel<ZynAddSubFxInstrument>();
 
 	// set models for controller knobs
 	m_portamento->setModel( &m->m_portamentoModel );
@@ -642,7 +632,7 @@ void ZynAddSubFxView::modelChanged()
 
 void ZynAddSubFxView::toggleUI()
 {
-	ZynAddSubFxInstrument * model = castModel<ZynAddSubFxInstrument>();
+	auto model = castModel<ZynAddSubFxInstrument>();
 	if( model->m_hasGUI != m_toggleUIButton->isChecked() )
 	{
 		model->m_hasGUI = m_toggleUIButton->isChecked();
@@ -657,6 +647,7 @@ void ZynAddSubFxView::toggleUI()
 }
 
 
+} // namespace gui
 
 
 
@@ -673,3 +664,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main(Model * m, void *)
 }
 
 
+} // namespace lmms

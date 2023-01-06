@@ -31,6 +31,10 @@
 #include "FileDialog.h"
 
 
+namespace lmms::gui
+{
+
+
 FileDialog::FileDialog( QWidget *parent, const QString &caption,
 					   const QString &directory, const QString &filter ) :
 	QFileDialog( parent, caption, directory, filter )
@@ -100,8 +104,10 @@ QString FileDialog::getOpenFileName(QWidget *parent,
 
 void FileDialog::clearSelection()
 {
-    QListView *view = findChild<QListView*>();
+	auto view = findChild<QListView*>();
 	Q_ASSERT( view );
 	view->clearSelection();
 }
 
+
+} // namespace lmms::gui

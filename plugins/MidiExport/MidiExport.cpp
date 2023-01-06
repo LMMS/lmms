@@ -5,7 +5,7 @@
  * Copyright (c) 2017 Hyunjin Song <tteu.ingog/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either
@@ -35,12 +35,16 @@
 
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT midiexport_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"MIDI Export",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Filter for exporting MIDI-files from LMMS" ),
@@ -63,12 +67,6 @@ MidiExport::MidiExport() : ExportFilter( &midiexport_plugin_descriptor)
 
 
 
-MidiExport::~MidiExport()
-{
-}
-
-
-
 bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 			const TrackContainer::TrackList &patternStoreTracks,
 			int tempo, int masterPitch, const QString &filename)
@@ -83,7 +81,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 
 
 	int nTracks = 0;
-	uint8_t buffer[BUFFER_SIZE];
+	auto buffer = std::array<uint8_t, BUFFER_SIZE>{};
 	uint32_t size;
 
 	for (const Track* track : tracks) if (track->type() == Track::InstrumentTrack) nTracks++;
@@ -91,8 +89,8 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 
 	// midi header
 	MidiFile::MIDIHeader header(nTracks);
-	size = header.writeToBuffer(buffer);
-	midiout.writeRawData((char *)buffer, size);
+	size = header.writeToBuffer(buffer.data());
+	midiout.writeRawData((char *)buffer.data(), size);
 
 	std::vector<std::vector<std::pair<int,int>>> plists;
 
@@ -141,8 +139,8 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 			}
 			processPatternNotes(midiClip, INT_MAX);
 			writeMidiClipToTrack(mtrack, midiClip);
-			size = mtrack.writeToBuffer(buffer);
-			midiout.writeRawData((char *)buffer, size);
+			size = mtrack.writeToBuffer(buffer.data());
+			midiout.writeRawData((char *)buffer.data(), size);
 		}
 
 		if (track->type() == Track::PatternTrack)
@@ -159,7 +157,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 					QDomElement it = n.toElement();
 					int pos = it.attribute("pos", "0").toInt();
 					int len = it.attribute("len", "0").toInt();
-					plist.push_back(std::pair<int,int>(pos, pos+len));
+					plist.emplace_back(pos, pos+len);
 				}
 			}
 			std::sort(plist.begin(), plist.end());
@@ -218,27 +216,28 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 				int len = n.toElement().attribute("steps", "1").toInt() * 12;
 
 				// for each pattern clip of the current pattern track (in song editor)
-				for (auto it = plist.begin(); it != plist.end(); ++it)
+				for (const auto& position : plist)
 				{
-					while (!st.empty() && st.back().second <= it->first)
+					const auto& [start, end] = position;
+					while (!st.empty() && st.back().second <= start)
 					{
 						writePatternClip(midiClip, nv, len, st.back().first, pos, st.back().second);
 						pos = st.back().second;
 						st.pop_back();
 					}
 
-					if (!st.empty() && st.back().second <= it->second)
+					if (!st.empty() && st.back().second <= end)
 					{
-						writePatternClip(midiClip, nv, len, st.back().first, pos, it->first);
-						pos = it->first;
-						while (!st.empty() && st.back().second <= it->second)
+						writePatternClip(midiClip, nv, len, st.back().first, pos, start);
+						pos = start;
+						while (!st.empty() && st.back().second <= end)
 						{
 							st.pop_back();
 						}
 					}
 
-					st.push_back(*it);
-					pos = it->first;
+					st.push_back(position);
+					pos = start;
 				}
 
 				while (!st.empty())
@@ -255,8 +254,8 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 				++itr;
 			}
 		}
-		size = mtrack.writeToBuffer(buffer);
-		midiout.writeRawData((char *)buffer, size);
+		size = mtrack.writeToBuffer(buffer.data());
+		midiout.writeRawData((char *)buffer.data(), size);
 	}
 
 	return true;
@@ -288,9 +287,9 @@ void MidiExport::writeMidiClip(MidiNoteVector &midiClip, const QDomNode& n,
 
 void MidiExport::writeMidiClipToTrack(MTrack &mtrack, MidiNoteVector &nv)
 {
-	for (auto it = nv.begin(); it != nv.end(); ++it)
+	for (const auto& note : nv)
 	{
-		mtrack.addNote(it->pitch, it->volume, it->time / 48.0, it->duration / 48.0);
+		mtrack.addNote(note.pitch, note.volume, note.time / 48.0, note.duration / 48.0);
 	}
 }
 
@@ -303,16 +302,15 @@ void MidiExport::writePatternClip(MidiNoteVector& src, MidiNoteVector& dst,
 	start -= base;
 	end -= base;
 	std::sort(src.begin(), src.end());
-	for (auto it = src.begin(); it != src.end(); ++it)
+	for (const auto& srcNote : src)
 	{
-		for (int time = it->time  + ceil((start - it->time) / len)
-				* len; time < end; time += len)
+		for (int time = srcNote.time + ceil((start - srcNote.time) / len) * len; time < end; time += len)
 		{
 			MidiNote note;
-			note.duration = it->duration;
-			note.pitch = it->pitch;
+			note.duration = srcNote.duration;
+			note.pitch = srcNote.pitch;
 			note.time = base + time;
-			note.volume = it->volume;
+			note.volume = srcNote.volume;
 			dst.push_back(note);
 		}
 	}
@@ -359,3 +357,5 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
 
 }
 
+
+} // namespace lmms

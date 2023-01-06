@@ -36,21 +36,26 @@
 #include "LedCheckBox.h"
 
 
+namespace lmms::gui
+{
+
+
 InstrumentMiscView::InstrumentMiscView(InstrumentTrack *it, QWidget *parent) :
 	QWidget(parent)
 {
-	QVBoxLayout *layout = new QVBoxLayout(this);
+	auto layout = new QVBoxLayout(this);
 	layout->setMargin(5);
 
 	// Master pitch toggle
-	m_pitchGroupBox = new GroupBox(tr("MASTER PITCH"));
+	m_pitchGroupBox = new GroupBox(tr("GLOBAL TRANSPOSITION"));
 	m_pitchGroupBox->setModel(&it->m_useMasterPitchModel);
 	layout->addWidget(m_pitchGroupBox);
 
-	QHBoxLayout *masterPitchLayout = new QHBoxLayout(m_pitchGroupBox);
+	auto masterPitchLayout = new QHBoxLayout(m_pitchGroupBox);
 	masterPitchLayout->setContentsMargins(8, 18, 8, 8);
 
-	QLabel *tlabel = new QLabel(tr("Enables the use of master pitch"));
+	auto tlabel = new QLabel(tr("Enables the use of global transposition"));
+	tlabel->setWordWrap(true);
 	tlabel->setFont(pointSize<8>(tlabel->font()));
 	masterPitchLayout->addWidget(tlabel);
 
@@ -59,17 +64,17 @@ InstrumentMiscView::InstrumentMiscView(InstrumentTrack *it, QWidget *parent) :
 	m_microtunerGroupBox->setModel(it->m_microtuner.enabledModel());
 	layout->addWidget(m_microtunerGroupBox);
 
-	QVBoxLayout *microtunerLayout = new QVBoxLayout(m_microtunerGroupBox);
+	auto microtunerLayout = new QVBoxLayout(m_microtunerGroupBox);
 	microtunerLayout->setContentsMargins(8, 18, 8, 8);
 
-	QLabel *scaleLabel = new QLabel(tr("Active scale:"));
+	auto scaleLabel = new QLabel(tr("Active scale:"));
 	microtunerLayout->addWidget(scaleLabel);
 
 	m_scaleCombo = new ComboBox();
 	m_scaleCombo->setModel(it->m_microtuner.scaleModel());
 	microtunerLayout->addWidget(m_scaleCombo);
 
-	QLabel *keymapLabel = new QLabel(tr("Active keymap:"));
+	auto keymapLabel = new QLabel(tr("Active keymap:"));
 	microtunerLayout->addWidget(keymapLabel);
 
 	m_keymapCombo = new ComboBox();
@@ -97,3 +102,6 @@ InstrumentMiscView::InstrumentMiscView(InstrumentTrack *it, QWidget *parent) :
 	// Fill remaining space
 	layout->addStretch();
 }
+
+
+} // namespace lmms::gui

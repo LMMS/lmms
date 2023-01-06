@@ -46,6 +46,10 @@
 #include "SubWindow.h"
 #include "TrackContainer.h" // For TrackContainer::TrackList typedef
 
+namespace lmms::gui
+{
+
+
 MixerView::MixerView() :
 	QWidget(),
 	ModelView( nullptr, this ),
@@ -65,7 +69,7 @@ MixerView::MixerView() :
 	setWindowIcon( embed::getIconPixmap( "mixer" ) );
 
 	// main-layout
-	QHBoxLayout * ml = new QHBoxLayout;
+	auto ml = new QHBoxLayout;
 
 	// Set margins
 	ml->setContentsMargins( 0, 4, 0, 0 );
@@ -109,7 +113,7 @@ MixerView::MixerView() :
 		public:
 			ChannelArea( QWidget * parent, MixerView * mv ) :
 				QScrollArea( parent ), m_mv( mv ) {}
-			~ChannelArea() {}
+			~ChannelArea() override = default;
 			void keyPressEvent( QKeyEvent * e ) override
 			{
 				m_mv->keyPressEvent( e );
@@ -127,10 +131,10 @@ MixerView::MixerView() :
 	ml->addWidget( channelArea, 1, Qt::AlignTop );
 
 	// show the add new mixer channel button
-	QPushButton * newChannelBtn = new QPushButton( embed::getIconPixmap( "new_channel" ), QString(), this );
+	auto newChannelBtn = new QPushButton(embed::getIconPixmap("new_channel"), QString(), this);
 	newChannelBtn->setObjectName( "newChannelBtn" );
 	newChannelBtn->setFixedSize( mixerLineSize );
-	connect( newChannelBtn, SIGNAL( clicked() ), this, SLOT( addNewChannel() ) );
+	connect( newChannelBtn, SIGNAL(clicked()), this, SLOT(addNewChannel()));
 	ml->addWidget( newChannelBtn, 0, Qt::AlignTop );
 
 
@@ -143,8 +147,8 @@ MixerView::MixerView() :
 	updateGeometry();
 
 	// timer for updating faders
-	connect( getGUI()->mainWindow(), SIGNAL( periodicUpdate() ),
-					this, SLOT( updateFaders() ) );
+	connect( getGUI()->mainWindow(), SIGNAL(periodicUpdate()),
+					this, SLOT(updateFaders()));
 
 
 	// add ourself to workspace
@@ -164,9 +168,9 @@ MixerView::MixerView() :
 
 MixerView::~MixerView()
 {
-	for (int i=0; i<m_mixerChannelViews.size(); i++)
+	for (auto mixerChannelView : m_mixerChannelViews)
 	{
-		delete m_mixerChannelViews.at(i);
+		delete mixerChannelView;
 	}
 }
 
@@ -235,21 +239,19 @@ void MixerView::updateMaxChannelSelector()
 	TrackContainer::TrackList songTracks = Engine::getSong()->tracks();
 	TrackContainer::TrackList patternStoreTracks = Engine::patternStore()->tracks();
 
-	TrackContainer::TrackList trackLists[] = {songTracks, patternStoreTracks};
-	for(int tl=0; tl<2; ++tl)
+	for (const auto& trackList : {songTracks, patternStoreTracks})
 	{
-		TrackContainer::TrackList trackList = trackLists[tl];
-		for(int i=0; i<trackList.size(); ++i)
+		for (const auto& track : trackList)
 		{
-			if( trackList[i]->type() == Track::InstrumentTrack )
+			if (track->type() == Track::InstrumentTrack)
 			{
-				InstrumentTrack * inst = (InstrumentTrack *) trackList[i];
+				auto inst = (InstrumentTrack*)track;
 				inst->mixerChannelModel()->setRange(0,
 					m_mixerChannelViews.size()-1,1);
 			}
-			else if( trackList[i]->type() == Track::SampleTrack )
+			else if (track->type() == Track::SampleTrack)
 			{
-				SampleTrack * strk = (SampleTrack *) trackList[i];
+				auto strk = (SampleTrack*)track;
 				strk->mixerChannelModel()->setRange(0,
 					m_mixerChannelViews.size()-1,1);
 			}
@@ -307,7 +309,7 @@ MixerView::MixerChannelView::MixerChannelView(QWidget * _parent, MixerView * _mv
 				embed::getIconPixmap( "led_off" ) );
 	m_soloBtn->setCheckable( true );
 	m_soloBtn->move( 9,  m_fader->y()-21);
-	connect(&mixerChannel->m_soloModel, SIGNAL( dataChanged() ),
+	connect(&mixerChannel->m_soloModel, SIGNAL(dataChanged()),
 			_mv, SLOT ( toggledSolo() ), Qt::DirectConnection );
 	m_soloBtn->setToolTip(tr("Solo this channel"));
 
@@ -441,12 +443,12 @@ void MixerView::deleteUnusedChannels()
 		int channel = 0;
 		if (t->type() == Track::InstrumentTrack)
 		{
-			InstrumentTrack* inst = dynamic_cast<InstrumentTrack *>(t);
+			auto inst = dynamic_cast<InstrumentTrack*>(t);
 			channel = inst->mixerChannelModel()->value();
 		}
 		else if (t->type() == Track::SampleTrack)
 		{
-			SampleTrack *strack = dynamic_cast<SampleTrack *>(t);
+			auto strack = dynamic_cast<SampleTrack*>(t);
 			channel = strack->mixerChannelModel()->value();
 		}
 		inUse[channel] = true;
@@ -618,3 +620,6 @@ void MixerView::updateFaders()
 		}
 	}
 }
+
+
+} // namespace lmms::gui

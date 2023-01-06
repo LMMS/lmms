@@ -30,6 +30,8 @@
 
 #include <cassert>
 
+namespace lmms
+{
 
 AudioFileMP3::AudioFileMP3(	OutputSettings const & outputSettings,
 				const ch_cnt_t channels,
@@ -130,4 +132,6 @@ void AudioFileMP3::tearDownEncoder()
 	lame_close(m_lame);
 }
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_HAVE_MP3LAME

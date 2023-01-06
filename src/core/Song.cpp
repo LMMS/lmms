@@ -60,6 +60,9 @@
 #include "PeakController.h"
 
 
+namespace lmms
+{
+
 tick_t TimePos::s_ticksPerBar = DefaultTicksPerBar;
 
 
@@ -99,28 +102,28 @@ Song::Song() :
 	m_loopRenderRemaining(1),
 	m_oldAutomatedValues()
 {
-	for(int i = 0; i < Mode_Count; ++i) m_elapsedMilliSeconds[i] = 0;
-	connect( &m_tempoModel, SIGNAL( dataChanged() ),
-			this, SLOT( setTempo() ), Qt::DirectConnection );
-	connect( &m_tempoModel, SIGNAL( dataUnchanged() ),
-			this, SLOT( setTempo() ), Qt::DirectConnection );
-	connect( &m_timeSigModel, SIGNAL( dataChanged() ),
-			this, SLOT( setTimeSignature() ), Qt::DirectConnection );
+	for (double& millisecondsElapsed : m_elapsedMilliSeconds) { millisecondsElapsed = 0; }
+	connect( &m_tempoModel, SIGNAL(dataChanged()),
+			this, SLOT(setTempo()), Qt::DirectConnection );
+	connect( &m_tempoModel, SIGNAL(dataUnchanged()),
+			this, SLOT(setTempo()), Qt::DirectConnection );
+	connect( &m_timeSigModel, SIGNAL(dataChanged()),
+			this, SLOT(setTimeSignature()), Qt::DirectConnection );
 
 
-	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this,
-						SLOT( updateFramesPerTick() ) );
+	connect( Engine::audioEngine(), SIGNAL(sampleRateChanged()), this,
+						SLOT(updateFramesPerTick()));
 
-	connect( &m_masterVolumeModel, SIGNAL( dataChanged() ),
-			this, SLOT( masterVolumeChanged() ), Qt::DirectConnection );
-/*	connect( &m_masterPitchModel, SIGNAL( dataChanged() ),
-			this, SLOT( masterPitchChanged() ) );*/
+	connect( &m_masterVolumeModel, SIGNAL(dataChanged()),
+			this, SLOT(masterVolumeChanged()), Qt::DirectConnection );
+/*	connect( &m_masterPitchModel, SIGNAL(dataChanged()),
+			this, SLOT(masterPitchChanged()));*/
 
-	qRegisterMetaType<Note>( "Note" );
+	qRegisterMetaType<lmms::Note>( "lmms::Note" );
 	setType( SongContainer );
 
-	for (int i = 0; i < MaxScaleCount; i++) {m_scales[i] = std::make_shared<Scale>();}
-	for (int i = 0; i < MaxKeymapCount; i++) {m_keymaps[i] = std::make_shared<Keymap>();}
+	for (auto& scale : m_scales) {scale = std::make_shared<Scale>();}
+	for (auto& keymap : m_keymaps) {keymap = std::make_shared<Keymap>();}
 }
 
 
@@ -147,12 +150,11 @@ void Song::masterVolumeChanged()
 void Song::setTempo()
 {
 	Engine::audioEngine()->requestChangeInModel();
-	const bpm_t tempo = ( bpm_t ) m_tempoModel.value();
+	const auto tempo = (bpm_t)m_tempoModel.value();
 	PlayHandleList & playHandles = Engine::audioEngine()->playHandles();
-	for( PlayHandleList::Iterator it = playHandles.begin();
-						it != playHandles.end(); ++it )
+	for (const auto& playHandle : playHandles)
 	{
-		NotePlayHandle * nph = dynamic_cast<NotePlayHandle *>( *it );
+		auto nph = dynamic_cast<NotePlayHandle*>(playHandle);
 		if( nph && !nph->isReleased() )
 		{
 			nph->lock();
@@ -188,7 +190,7 @@ void Song::setTimeSignature()
 
 void Song::savePos()
 {
-	TimeLineWidget * tl = m_playPos[m_playMode].m_timeLine;
+	gui::TimeLineWidget* tl = m_playPos[m_playMode].m_timeLine;
 
 	if( tl != nullptr )
 	{
@@ -322,7 +324,7 @@ void Song::processNextBuffer()
 		}
 
 		const f_cnt_t framesUntilNextPeriod = framesPerPeriod - frameOffsetInPeriod;
-		const f_cnt_t framesUntilNextTick = static_cast<f_cnt_t>(std::ceil(framesPerTick - frameOffsetInTick));
+		const auto framesUntilNextTick = static_cast<f_cnt_t>(std::ceil(framesPerTick - frameOffsetInTick));
 
 		// We want to proceed to the next buffer or tick, whichever is closer
 		const auto framesToPlay = std::min(framesUntilNextPeriod, framesUntilNextTick);
@@ -638,6 +640,8 @@ void Song::stop()
 		return;
 	}
 
+	using gui::TimeLineWidget;
+
 	// To avoid race conditions with the processing threads
 	Engine::audioEngine()->requestChangeInModel();
 
@@ -853,6 +857,8 @@ AutomatedValueMap Song::automatedValuesAt(TimePos time, int clipNum) const
 
 void Song::clearProject()
 {
+	using gui::getGUI;
+
 	Engine::projectJournal()->setJournalling( false );
 
 	if( m_playing )
@@ -1010,6 +1016,8 @@ void Song::createNewProjectFromTemplate( const QString & templ )
 // load given song
 void Song::loadProject( const QString & fileName )
 {
+	using gui::getGUI;
+
 	QDomNode node;
 
 	m_loadingProject = true;
@@ -1239,6 +1247,8 @@ void Song::loadProject( const QString & fileName )
 // only save current song as filename and do nothing else
 bool Song::saveProjectFile(const QString & filename, bool withResources)
 {
+	using gui::getGUI;
+
 	DataFile dataFile( DataFile::SongProject );
 	m_savingProject = true;
 
@@ -1323,9 +1333,9 @@ void Song::saveControllerStates( QDomDocument & doc, QDomElement & element )
 	// save settings of controllers
 	QDomElement controllersNode = doc.createElement( "controllers" );
 	element.appendChild( controllersNode );
-	for( int i = 0; i < m_controllers.size(); ++i )
+	for (const auto& controller : m_controllers)
 	{
-		m_controllers[i]->saveState( doc, controllersNode );
+		controller->saveState(doc, controllersNode);
 	}
 }
 
@@ -1369,9 +1379,9 @@ void Song::saveScaleStates(QDomDocument &doc, QDomElement &element)
 	QDomElement scalesNode = doc.createElement("scales");
 	element.appendChild(scalesNode);
 
-	for (int i = 0; i < MaxScaleCount; i++)
+	for (const auto& scale : m_scales)
 	{
-		m_scales[i]->saveState(doc, scalesNode);
+		scale->saveState(doc, scalesNode);
 	}
 }
 
@@ -1394,9 +1404,9 @@ void Song::saveKeymapStates(QDomDocument &doc, QDomElement &element)
 	QDomElement keymapsNode = doc.createElement("keymaps");
 	element.appendChild(keymapsNode);
 
-	for (int i = 0; i < MaxKeymapCount; i++)
+	for (const auto& keymap : m_keymaps)
 	{
-		m_keymaps[i]->saveState(doc, keymapsNode);
+		keymap->saveState(doc, keymapsNode);
 	}
 }
 
@@ -1575,3 +1585,6 @@ void Song::setKeymap(unsigned int index, std::shared_ptr<Keymap> newMap)
 	emit keymapListChanged(index);
 	Engine::audioEngine()->doneChangeInModel();
 }
+
+
+} // namespace lmms

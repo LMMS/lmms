@@ -31,6 +31,8 @@
 
 #include <sndfile.h>
 
+namespace lmms
+{
 
 class AudioFileWave : public AudioFileDevice
 {
@@ -40,7 +42,7 @@ public:
 			bool & successful,
 			const QString & file,
 			AudioEngine* audioEngine );
-	virtual ~AudioFileWave();
+	~AudioFileWave() override;
 
 	static AudioFileDevice * getInst( const QString & outputFilename,
 					  OutputSettings const & outputSettings,
@@ -54,7 +56,7 @@ public:
 
 
 private:
-	virtual void writeBuffer( const surroundSampleFrame * _ab,
+	void writeBuffer( const surroundSampleFrame * _ab,
 						const fpp_t _frames,
 						float _master_gain ) override;
 
@@ -65,5 +67,8 @@ private:
 	SF_INFO m_si;
 	SNDFILE * m_sf;
 } ;
+
+
+} // namespace lmms
 
 #endif

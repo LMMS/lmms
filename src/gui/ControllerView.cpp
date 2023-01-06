@@ -40,6 +40,9 @@
 #include "MainWindow.h"
 #include "SubWindow.h"
 
+namespace lmms::gui
+{
+
 
 ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	QFrame( _parent ),
@@ -51,20 +54,20 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	this->setFrameStyle( QFrame::StyledPanel );
 	this->setFrameShadow( QFrame::Raised );
 
-	QVBoxLayout *vBoxLayout = new QVBoxLayout(this);
+	auto vBoxLayout = new QVBoxLayout(this);
 
-	QHBoxLayout *hBox = new QHBoxLayout();
+	auto hBox = new QHBoxLayout();
 	vBoxLayout->addLayout(hBox);
 
-	QLabel *label = new QLabel( "<b>" + _model->displayName() + "</b>", this);
+	auto label = new QLabel("<b>" + _model->displayName() + "</b>", this);
 	QSizePolicy sizePolicy = label->sizePolicy();
 	sizePolicy.setHorizontalStretch(1);
 	label->setSizePolicy(sizePolicy);
 
 	hBox->addWidget(label);
 
-	QPushButton * controlsButton = new QPushButton( tr( "Controls" ), this );
-	connect( controlsButton, SIGNAL( clicked() ), SLOT( editControls() ) );
+	auto controlsButton = new QPushButton(tr("Controls"), this);
+	connect( controlsButton, SIGNAL(clicked()), SLOT(editControls()));
 
 	hBox->addWidget(controlsButton);
 
@@ -83,8 +86,8 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 
 	m_subWindow->setWindowIcon( m_controllerDlg->windowIcon() );
 
-	connect( m_controllerDlg, SIGNAL( closed() ),
-		this, SLOT( closeControls() ) );
+	connect( m_controllerDlg, SIGNAL(closed()),
+		this, SLOT(closeControls()));
 
 	m_subWindow->hide();
 
@@ -138,7 +141,7 @@ void ControllerView::deleteController()
 void ControllerView::renameController()
 {
 	bool ok;
-	Controller * c = castModel<Controller>();
+	auto c = castModel<Controller>();
 	QString new_name = QInputDialog::getText( this,
 			tr( "Rename controller" ),
 			tr( "Enter the new name for this controller" ),
@@ -173,9 +176,12 @@ void ControllerView::contextMenuEvent( QContextMenuEvent * )
 	QPointer<CaptionMenu> contextMenu = new CaptionMenu( model()->displayName(), this );
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
 						tr( "&Remove this controller" ),
-						this, SLOT( deleteController() ) );
-	contextMenu->addAction( tr("Re&name this controller"), this, SLOT( renameController() ));
+						this, SLOT(deleteController()));
+	contextMenu->addAction( tr("Re&name this controller"), this, SLOT(renameController()));
 	contextMenu->addSeparator();
 	contextMenu->exec( QCursor::pos() );
 	delete contextMenu;
 }
+
+
+} // namespace lmms::gui

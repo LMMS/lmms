@@ -28,6 +28,9 @@
 
 #include "Groove.h"
 
+namespace lmms
+{
+
 class GrooveFactory
 {
 
@@ -37,5 +40,7 @@ public:
 private:
 	GrooveFactory();
 };
+
+} // namespace lmms
 
 #endif // GROOVEFACTORY_H

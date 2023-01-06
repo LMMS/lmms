@@ -33,6 +33,9 @@
 #include "ProjectJournal.h"
 #include "Song.h"
 
+namespace lmms
+{
+
 long AutomatableModel::s_periodCounter = 0;
 
 
@@ -302,13 +305,13 @@ void AutomatableModel::setValue( const float value )
 		addJournalCheckPoint();
 
 		// notify linked models
-		for( AutoModelVector::Iterator it = m_linkedModels.begin(); it != m_linkedModels.end(); ++it )
+		for (const auto& linkedModel : m_linkedModels)
 		{
-			if( (*it)->m_setValueDepth < 1 && (*it)->fittedValue( value ) != (*it)->m_value )
+			if (linkedModel->m_setValueDepth < 1 && linkedModel->fittedValue(value) != linkedModel->m_value)
 			{
-				bool journalling = (*it)->testAndSetJournalling( isJournalling() );
-				(*it)->setValue( value );
-				(*it)->setJournalling( journalling );
+				bool journalling = linkedModel->testAndSetJournalling(isJournalling());
+				linkedModel->setValue(value);
+				linkedModel->setJournalling(journalling);
 			}
 		}
 		m_valueChanged = true;
@@ -326,7 +329,7 @@ void AutomatableModel::setValue( const float value )
 
 template<class T> T AutomatableModel::logToLinearScale( T value ) const
 {
-	return castValue<T>( ::logToLinearScale( minValue<float>(), maxValue<float>(), static_cast<float>( value ) ) );
+	return castValue<T>( lmms::logToLinearScale( minValue<float>(), maxValue<float>(), static_cast<float>( value ) ) );
 }
 
 
@@ -342,7 +345,7 @@ float AutomatableModel::inverseScaledValue( float value ) const
 {
 	return m_scaleType == Linear
 		? value
-		: ::linearToLogScale( minValue<float>(), maxValue<float>(), value );
+		: lmms::linearToLogScale( minValue<float>(), maxValue<float>(), value );
 }
 
 
@@ -364,7 +367,7 @@ void roundAt( T& value, const T& where, const T& step_size )
 template<class T>
 void AutomatableModel::roundAt( T& value, const T& where ) const
 {
-	::roundAt(value, where, m_step);
+	lmms::roundAt(value, where, m_step);
 }
 
 
@@ -385,13 +388,12 @@ void AutomatableModel::setAutomatedValue( const float value )
 	if( oldValue != m_value )
 	{
 		// notify linked models
-		for (AutoModelVector::Iterator it = m_linkedModels.begin();
-			it != m_linkedModels.end(); ++it)
+		for (const auto& linkedModel : m_linkedModels)
 		{
-			if (!((*it)->controllerConnection()) && (*it)->m_setValueDepth < 1 &&
-					(*it)->fittedValue(m_value) != (*it)->m_value)
+			if (!(linkedModel->controllerConnection()) && linkedModel->m_setValueDepth < 1 &&
+					linkedModel->fittedValue(m_value) != linkedModel->m_value)
 			{
-				(*it)->setAutomatedValue(value);
+				linkedModel->setAutomatedValue(value);
 			}
 		}
 		m_valueChanged = true;
@@ -477,8 +479,8 @@ void AutomatableModel::linkModel( AutomatableModel* model )
 
 		if( !model->hasLinkedModels() )
 		{
-			QObject::connect( this, SIGNAL( dataChanged() ),
-					model, SIGNAL( dataChanged() ), Qt::DirectConnection );
+			QObject::connect( this, SIGNAL(dataChanged()),
+					model, SIGNAL(dataChanged()), Qt::DirectConnection );
 		}
 	}
 }
@@ -549,9 +551,9 @@ void AutomatableModel::setControllerConnection( ControllerConnection* c )
 	m_controllerConnection = c;
 	if( c )
 	{
-		QObject::connect( m_controllerConnection, SIGNAL( valueChanged() ),
-				this, SIGNAL( dataChanged() ), Qt::DirectConnection );
-		QObject::connect( m_controllerConnection, SIGNAL( destroyed() ), this, SLOT( unlinkControllerConnection() ) );
+		QObject::connect( m_controllerConnection, SIGNAL(valueChanged()),
+				this, SIGNAL(dataChanged()), Qt::DirectConnection );
+		QObject::connect( m_controllerConnection, SIGNAL(destroyed()), this, SLOT(unlinkControllerConnection()));
 		m_valueChanged = true;
 		emit dataChanged();
 	}
@@ -730,11 +732,11 @@ float AutomatableModel::globalAutomationValueAt( const TimePos& time )
 		// of those clips:
 		// find the clips which overlap with the time position
 		QVector<AutomationClip *> clipsInRange;
-		for( QVector<AutomationClip *>::ConstIterator it = clips.begin(); it != clips.end(); it++ )
+		for (const auto& clip : clips)
 		{
-			int s = ( *it )->startPosition();
-			int e = ( *it )->endPosition();
-			if( s <= time && e >= time ) { clipsInRange += ( *it ); }
+			int s = clip->startPosition();
+			int e = clip->endPosition();
+			if (s <= time && e >= time) { clipsInRange += clip; }
 		}
 
 		AutomationClip * latestClip = nullptr;
@@ -750,13 +752,13 @@ float AutomatableModel::globalAutomationValueAt( const TimePos& time )
 		{
 			int latestPosition = 0;
 
-			for( QVector<AutomationClip *>::ConstIterator it = clips.begin(); it != clips.end(); it++ )
+			for (const auto& clip : clips)
 			{
-				int e = ( *it )->endPosition();
-				if( e <= time && e > latestPosition )
+				int e = clip->endPosition();
+				if (e <= time && e > latestPosition)
 				{
 					latestPosition = e;
-					latestClip = ( *it );
+					latestClip = clip;
 				}
 			}
 		}
@@ -798,7 +800,7 @@ float FloatModel::getRoundedValue() const
 
 int FloatModel::getDigitCount() const
 {
-	float steptemp = step<float>();
+	auto steptemp = step<float>();
 	int digits = 0;
 	while ( steptemp < 1 )
 	{
@@ -824,3 +826,6 @@ QString BoolModel::displayValue( const float val ) const
 {
 	return QString::number( castValue<bool>( scaledValue( val ) ) );
 }
+
+
+} // namespace lmms

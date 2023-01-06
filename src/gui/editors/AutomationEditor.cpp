@@ -62,6 +62,9 @@
 #include "TimeLineWidget.h"
 
 
+namespace lmms::gui
+{
+
 QPixmap * AutomationEditor::s_toolDraw = nullptr;
 QPixmap * AutomationEditor::s_toolErase = nullptr;
 QPixmap * AutomationEditor::s_toolDrawOut = nullptr;
@@ -107,11 +110,11 @@ AutomationEditor::AutomationEditor() :
 	m_crossColor(0, 0, 0),
 	m_backgroundShade(0, 0, 0)
 {
-	connect( this, SIGNAL( currentClipChanged() ),
-				this, SLOT( updateAfterClipChange() ),
+	connect( this, SIGNAL(currentClipChanged()),
+				this, SLOT(updateAfterClipChange()),
 				Qt::QueuedConnection );
-	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
-						this, SLOT( update() ) );
+	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
+						this, SLOT(update()));
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
@@ -119,15 +122,15 @@ AutomationEditor::AutomationEditor() :
 	setLayoutDirection( Qt::LeftToRight );
 
 	m_tensionModel = new FloatModel(1.0, 0.0, 1.0, 0.01);
-	connect( m_tensionModel, SIGNAL( dataChanged() ),
-				this, SLOT( setTension() ) );
+	connect( m_tensionModel, SIGNAL(dataChanged()),
+				this, SLOT(setTension()));
 
 	for (auto q : Quantizations) {
 		m_quantizeModel.addItem(QString("1/%1").arg(q));
 	}
 
-	connect( &m_quantizeModel, SIGNAL(dataChanged() ),
-					this, SLOT( setQuantization() ) );
+	connect( &m_quantizeModel, SIGNAL(dataChanged()),
+					this, SLOT(setQuantization()));
 	m_quantizeModel.setValue( m_quantizeModel.findText( "1/8" ) );
 
 	if (s_toolYFlip == nullptr)
@@ -147,22 +150,22 @@ AutomationEditor::AutomationEditor() :
 					Song::Mode_PlayAutomationClip ),
 					m_currentPosition,
 					Song::Mode_PlayAutomationClip, this );
-	connect( this, SIGNAL( positionChanged( const TimePos & ) ),
-		m_timeLine, SLOT( updatePosition( const TimePos & ) ) );
-	connect( m_timeLine, SIGNAL( positionChanged( const TimePos & ) ),
-			this, SLOT( updatePosition( const TimePos & ) ) );
+	connect( this, SIGNAL( positionChanged( const lmms::TimePos& ) ),
+		m_timeLine, SLOT( updatePosition( const lmms::TimePos& ) ) );
+	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos& ) ),
+			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
 
 	// init scrollbars
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
 	m_leftRightScroll->setSingleStep( 1 );
-	connect( m_leftRightScroll, SIGNAL( valueChanged( int ) ), this,
-						SLOT( horScrolled( int ) ) );
+	connect( m_leftRightScroll, SIGNAL(valueChanged(int)), this,
+						SLOT(horScrolled(int)));
 
 	m_topBottomScroll = new QScrollBar( Qt::Vertical, this );
 	m_topBottomScroll->setSingleStep( 1 );
 	m_topBottomScroll->setPageStep( 20 );
-	connect( m_topBottomScroll, SIGNAL( valueChanged( int ) ), this,
-						SLOT( verScrolled( int ) ) );
+	connect( m_topBottomScroll, SIGNAL(valueChanged(int)), this,
+						SLOT(verScrolled(int)));
 
 	// init pixmaps
 	if (s_toolDraw == nullptr)
@@ -345,7 +348,7 @@ void AutomationEditor::drawLine( int x0In, float y0, int x1In, float y1 )
 	int x0 = Note::quantized( x0In, AutomationClip::quantization() );
 	int x1 = Note::quantized( x1In, AutomationClip::quantization() );
 	int deltax = qAbs( x1 - x0 );
-	float deltay = qAbs<float>( y1 - y0 );
+	auto deltay = qAbs<float>(y1 - y0);
 	int x = x0;
 	float y = y0;
 	int xstep;
@@ -959,15 +962,14 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 	// print value numbers
 	int font_height = p.fontMetrics().height();
-	Qt::Alignment text_flags =
-		(Qt::Alignment)( Qt::AlignRight | Qt::AlignVCenter );
+	auto text_flags = (Qt::Alignment)(Qt::AlignRight | Qt::AlignVCenter);
 
 	if( validClip() )
 	{
 		if( m_y_auto )
 		{
-			int y[] = { grid_bottom, TOP_MARGIN + font_height / 2 };
-			float level[] = { m_minLevel, m_maxLevel };
+			auto y = std::array{grid_bottom, TOP_MARGIN + font_height / 2};
+			auto level = std::array{m_minLevel, m_maxLevel};
 			for( int i = 0; i < 2; ++i )
 			{
 				const QString & label = m_clip->firstObject()
@@ -1836,7 +1838,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	// Edit mode buttons
 	DropToolBar *editActionsToolBar = addDropToolBarToTop(tr("Edit actions"));
 
-	ActionGroup* editModeGroup = new ActionGroup(this);
+	auto editModeGroup = new ActionGroup(this);
 	QAction* drawAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode (Shift+D)"));
 	drawAction->setShortcut(Qt::SHIFT | Qt::Key_D);
 	drawAction->setChecked(true);
@@ -1861,7 +1863,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	// Interpolation actions
 	DropToolBar *interpolationActionsToolBar = addDropToolBarToTop(tr("Interpolation controls"));
 
-	ActionGroup* progression_type_group = new ActionGroup(this);
+	auto progression_type_group = new ActionGroup(this);
 
 	m_discreteAction = progression_type_group->addAction(
 				embed::getIconPixmap("progression_discrete"), tr("Discrete progression"));
@@ -1896,7 +1898,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	// Zoom controls
 	DropToolBar *zoomToolBar = addDropToolBarToTop(tr("Zoom controls"));
 
-	QLabel * zoom_x_label = new QLabel( zoomToolBar );
+	auto zoom_x_label = new QLabel(zoomToolBar);
 	zoom_x_label->setPixmap( embed::getIconPixmap( "zoom_x" ) );
 
 	m_zoomingXComboBox = new ComboBox( zoomToolBar );
@@ -1911,11 +1913,10 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	m_zoomingXComboBox->setModel( &m_editor->m_zoomingXModel );
 
-	connect( &m_editor->m_zoomingXModel, SIGNAL( dataChanged() ),
-			m_editor, SLOT( zoomingXChanged() ) );
+	connect( &m_editor->m_zoomingXModel, SIGNAL(dataChanged()),
+			m_editor, SLOT(zoomingXChanged()));
 
-
-	QLabel * zoom_y_label = new QLabel( zoomToolBar );
+	auto zoom_y_label = new QLabel(zoomToolBar);
 	zoom_y_label->setPixmap( embed::getIconPixmap( "zoom_y" ) );
 
 	m_zoomingYComboBox = new ComboBox( zoomToolBar );
@@ -1931,8 +1932,8 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	m_zoomingYComboBox->setModel( &m_editor->m_zoomingYModel );
 
-	connect( &m_editor->m_zoomingYModel, SIGNAL( dataChanged() ),
-			m_editor, SLOT( zoomingYChanged() ) );
+	connect( &m_editor->m_zoomingYModel, SIGNAL(dataChanged()),
+			m_editor, SLOT(zoomingYChanged()));
 
 	zoomToolBar->addWidget( zoom_x_label );
 	zoomToolBar->addWidget( m_zoomingXComboBox );
@@ -1943,7 +1944,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	// Quantization controls
 	DropToolBar *quantizationActionsToolBar = addDropToolBarToTop(tr("Quantization controls"));
 
-	QLabel * quantize_lbl = new QLabel( m_toolBar );
+	auto quantize_lbl = new QLabel(m_toolBar);
 	quantize_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
 
 	m_quantizeComboBox = new ComboBox( m_toolBar );
@@ -1961,11 +1962,6 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	setWindowIcon( embed::getIconPixmap( "automation" ) );
 	setAcceptDrops( true );
 	m_toolBar->setAcceptDrops( true );
-}
-
-
-AutomationEditorWindow::~AutomationEditorWindow()
-{
 }
 
 
@@ -2011,7 +2007,7 @@ void AutomationEditorWindow::setCurrentClip(AutomationClip* clip)
 	if (clip)
 	{
 		connect(clip, SIGNAL(dataChanged()), this, SLOT(update()));
-		connect( clip, SIGNAL( dataChanged() ), this, SLOT( updateWindowTitle() ) );
+		connect( clip, SIGNAL(dataChanged()), this, SLOT(updateWindowTitle()));
 		connect(clip, SIGNAL(destroyed()), this, SLOT(clearCurrentClip()));
 
 		connect(m_flipXAction, SIGNAL(triggered()), clip, SLOT(flipX()));
@@ -2033,9 +2029,7 @@ void AutomationEditorWindow::dropEvent( QDropEvent *_de )
 	QString val = StringPairDrag::decodeValue( _de );
 	if( type == "automatable_model" )
 	{
-		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
-				Engine::projectJournal()->
-					journallingObject( val.toInt() ) );
+		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
 		if (mod != nullptr)
 		{
 			bool added = m_editor->m_clip->addObject( mod );
@@ -2107,3 +2101,6 @@ void AutomationEditorWindow::updateWindowTitle()
 
 	setWindowTitle( tr( "Automation Editor - %1" ).arg( m_editor->m_clip->name() ) );
 }
+
+
+} // namespace lmms::gui

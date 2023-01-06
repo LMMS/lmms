@@ -27,6 +27,9 @@
 
 #include "MidiSwing.h"
 
+namespace lmms
+{
+
 MidiSwing::MidiSwing(QObject * parent) :
 	Groove(parent)
 {
@@ -89,3 +92,5 @@ static int applyMidiSwing(int posInEight)
 	if (posInEight == 5) return 5;
 	return 0;
 }
+
+} // namespace lmms

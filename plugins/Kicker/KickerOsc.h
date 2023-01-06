@@ -33,6 +33,9 @@
 #include "interpolation.h"
 #include "MemoryManager.h"
 
+namespace lmms
+{
+
 
 template<class FX = DspEffectLibrary::StereoBypass>
 class KickerOsc
@@ -57,9 +60,7 @@ public:
 	{
 	}
 
-	virtual ~KickerOsc()
-	{
-	}
+	virtual ~KickerOsc() = default;
 
 	void update( sampleFrame* buf, const fpp_t frames, const float sampleRate )
 	{
@@ -106,5 +107,7 @@ private:
 
 };
 
+
+} // namespace lmms
 
 #endif

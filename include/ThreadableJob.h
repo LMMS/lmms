@@ -29,6 +29,9 @@
 
 #include <atomic>
 
+namespace lmms
+{
+
 class ThreadableJob
 {
 public:
@@ -84,5 +87,7 @@ protected:
 
 	std::atomic<ProcessingState> m_state;
 } ;
+
+} // namespace lmms
 
 #endif

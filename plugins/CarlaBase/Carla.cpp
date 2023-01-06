@@ -58,6 +58,9 @@
 
 #include "embed.h"
 
+namespace lmms
+{
+
 // this doesn't seem to be defined anywhere
 static const double ticksPerBeat = 48.0;
 
@@ -145,6 +148,7 @@ static const char* host_ui_save_file(NativeHostHandle, bool isDir, const char* t
 
 // -----------------------------------------------------------------------
 
+
 CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const Descriptor* const descriptor, const bool isPatchbay)
     : Instrument(instrumentTrack, descriptor),
       kIsPatchbay(isPatchbay),
@@ -190,8 +194,8 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
         fDescriptor->activate(fHandle);
 
     // we need a play-handle which cares for calling play()
-    InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, instrumentTrack );
-    Engine::audioEngine()->addPlayHandle( iph );
+	auto iph = new InstrumentPlayHandle(this, instrumentTrack);
+	Engine::audioEngine()->addPlayHandle( iph );
 
 #if CARLA_VERSION_HEX >= CARLA_MIN_PARAM_VERSION
     // text filter completion
@@ -575,7 +579,7 @@ bool CarlaInstrument::handleMidiEvent(const MidiEvent& event, const TimePos&, f_
     return true;
 }
 
-PluginView* CarlaInstrument::instantiateView(QWidget* parent)
+gui::PluginView* CarlaInstrument::instantiateView(QWidget* parent)
 {
 // Disable plugin focus per https://bugreports.qt.io/browse/QTBUG-30181
 #ifndef CARLA_OS_MAC
@@ -592,7 +596,7 @@ PluginView* CarlaInstrument::instantiateView(QWidget* parent)
     //fHost.uiName = strdup(parent->windowTitle().toUtf8().constData());
     fHost.uiName = strdup(kIsPatchbay ? "CarlaPatchbay-LMMS" : "CarlaRack-LMMS");
 
-    return new CarlaInstrumentView(this, parent);
+    return new gui::CarlaInstrumentView(this, parent);
 }
 
 void CarlaInstrument::sampleRateChanged()
@@ -601,6 +605,9 @@ void CarlaInstrument::sampleRateChanged()
 }
 
 // -------------------------------------------------------------------
+
+namespace gui
+{
 
 CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWidget* const parent)
     : InstrumentViewFixedSize(instrument, parent),
@@ -618,8 +625,8 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
     pal.setBrush(backgroundRole(), instrument->kIsPatchbay ? PLUGIN_NAME::getIconPixmap("artwork-patchbay") : PLUGIN_NAME::getIconPixmap("artwork-rack"));
     setPalette(pal);
 
-    QHBoxLayout* l = new QHBoxLayout(this);
-    l->setContentsMargins( 20, 180, 10, 10 );
+	auto l = new QHBoxLayout(this);
+	l->setContentsMargins( 20, 180, 10, 10 );
     l->setSpacing(3);
     l->setAlignment(Qt::AlignTop);
 
@@ -743,8 +750,8 @@ CarlaParamsView::CarlaParamsView(CarlaInstrumentView* const instrumentView, QWid
 	m_curOutColumn(0),
 	m_curOutRow(0)
 {
-	QWidget* centralWidget = new QWidget(this);
-	QVBoxLayout* verticalLayout = new QVBoxLayout(centralWidget);
+	auto centralWidget = new QWidget(this);
+	auto verticalLayout = new QVBoxLayout(centralWidget);
 
 	// -- Toolbar
 	m_toolBarLayout = new QHBoxLayout();
@@ -787,9 +794,9 @@ CarlaParamsView::CarlaParamsView(CarlaInstrumentView* const instrumentView, QWid
 	m_toolBarLayout->addWidget(m_groupFilterCombo);
 
 	// -- Input params
-	QFrame* inputFrame = new QFrame(this);
-	QVBoxLayout* inputLayout = new QVBoxLayout(inputFrame);
-	QLabel* inputLabel = new QLabel("Input parameters", inputFrame);
+	auto inputFrame = new QFrame(this);
+	auto inputLayout = new QVBoxLayout(inputFrame);
+	auto inputLabel = new QLabel("Input parameters", inputFrame);
 
 	m_inputScrollArea = new QScrollArea(inputFrame);
 	m_inputScrollAreaWidgetContent = new QWidget();
@@ -813,9 +820,9 @@ CarlaParamsView::CarlaParamsView(CarlaInstrumentView* const instrumentView, QWid
 	inputLayout->addWidget(m_inputScrollArea);
 
 	// -- Output params
-	QFrame* outputFrame = new QFrame(this);
-	QVBoxLayout* outputLayout = new QVBoxLayout(outputFrame);
-	QLabel* outputLabel = new QLabel("Output parameters", outputFrame);
+	auto outputFrame = new QFrame(this);
+	auto outputLayout = new QVBoxLayout(outputFrame);
+	auto outputLabel = new QLabel("Output parameters", outputFrame);
 
 	m_outputScrollArea = new QScrollArea(outputFrame);
 	m_outputScrollAreaWidgetContent = new QWidget();
@@ -839,7 +846,7 @@ CarlaParamsView::CarlaParamsView(CarlaInstrumentView* const instrumentView, QWid
 	outputLayout->addWidget(m_outputScrollArea);
 
 	// -- QSplitter
-	QSplitter* splitter = new QSplitter(Qt::Vertical, this);
+	auto splitter = new QSplitter(Qt::Vertical, this);
 
 	// -- Add layout and widgets.
 	verticalLayout->addLayout(m_toolBarLayout);
@@ -847,9 +854,20 @@ CarlaParamsView::CarlaParamsView(CarlaInstrumentView* const instrumentView, QWid
 	splitter->addWidget(outputFrame);
 	verticalLayout->addWidget(splitter);
 
+#if QT_VERSION < 0x50C00
+	// Workaround for a bug in Qt versions below 5.12,
+	// where argument-dependent-lookup fails for QFlags operators
+	// declared inside a namepsace.
+	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
+	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
+
+	using ::operator|;
+
+#endif
+
 	// -- Sub window
-	CarlaParamsSubWindow* win = new CarlaParamsSubWindow(getGUI()->mainWindow()->workspace()->viewport(), Qt::SubWindow |
-		Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+	auto win = new CarlaParamsSubWindow(getGUI()->mainWindow()->workspace()->viewport(),
+		Qt::SubWindow | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
 	m_carlaInstrumentView->m_paramsSubWindow = getGUI()->mainWindow()->workspace()->addSubWindow(win);
 	m_carlaInstrumentView->m_paramsSubWindow->setSizePolicy(
 		QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
@@ -958,7 +976,7 @@ void CarlaParamsView::filterKnobs()
 	}
 
 	// Add spacer so all knobs go to top
-	QSpacerItem* verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+	auto verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 	m_inputScrollAreaLayout->addItem(verticalSpacer, m_curRow+1, 0, 1, 1);
 }
 
@@ -1043,6 +1061,17 @@ void CarlaParamsView::windowResized()
 
 void CarlaParamsView::addKnob(uint32_t index)
 {
+#if QT_VERSION < 0x50C00
+	// Workaround for a bug in Qt versions below 5.12,
+	// where argument-dependent-lookup fails for QFlags operators
+	// declared inside a namepsace.
+	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
+	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
+
+	using ::operator|;
+
+#endif
+
 	bool output = m_carlaInstrument->m_paramModels[index]->isOutput();
 	if (output)
 	{
@@ -1111,3 +1140,8 @@ void CarlaParamsView::clearKnobs()
 	m_curOutColumn = 0;
 	m_curOutRow = 0;
 }
+
+
+} // namespace gui
+
+} // namespace lmms

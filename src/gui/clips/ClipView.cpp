@@ -52,6 +52,9 @@
 #include "TrackContainerView.h"
 #include "TrackView.h"
 
+namespace lmms::gui
+{
+
 
 /*! The width of the resize grip in pixels
  */
@@ -118,12 +121,12 @@ ClipView::ClipView( Clip * clip,
 	setAcceptDrops( true );
 	setMouseTracking( true );
 
-	connect( m_clip, SIGNAL( lengthChanged() ),
-			this, SLOT( updateLength() ) );
-	connect( getGUI()->songEditor()->m_editor->zoomingModel(), SIGNAL( dataChanged() ), this, SLOT( updateLength() ) );
-	connect( m_clip, SIGNAL( positionChanged() ),
-			this, SLOT( updatePosition() ) );
-	connect( m_clip, SIGNAL( destroyedClip() ), this, SLOT( close() ) );
+	connect( m_clip, SIGNAL(lengthChanged()),
+			this, SLOT(updateLength()));
+	connect( getGUI()->songEditor()->m_editor->zoomingModel(), SIGNAL(dataChanged()), this, SLOT(updateLength()));
+	connect( m_clip, SIGNAL(positionChanged()),
+			this, SLOT(updatePosition()));
+	connect( m_clip, SIGNAL(destroyedClip()), this, SLOT(close()));
 	setModel( m_clip );
 	connect(m_clip, SIGNAL(colorChanged()), this, SLOT(update()));
 
@@ -422,7 +425,7 @@ void ClipView::setColor(const QColor* color)
 void ClipView::dragEnterEvent( QDragEnterEvent * dee )
 {
 	TrackContentWidget * tcw = getTrackView()->getTrackContentWidget();
-	TimePos clipPos = TimePos( m_clip->startPosition() );
+	TimePos clipPos{m_clip->startPosition()};
 
 	if( tcw->canPasteSelection( clipPos, dee ) == false )
 	{
@@ -462,7 +465,7 @@ void ClipView::dropEvent( QDropEvent * de )
 	if( m_trackView->trackContainerView()->allowRubberband() == true )
 	{
 		TrackContentWidget * tcw = getTrackView()->getTrackContentWidget();
-		TimePos clipPos = TimePos( m_clip->startPosition() );
+		TimePos clipPos{m_clip->startPosition()};
 
 		if( tcw->pasteSelection( clipPos, de ) == true )
 		{
@@ -498,16 +501,16 @@ void ClipView::dropEvent( QDropEvent * de )
  */
 void ClipView::updateCursor(QMouseEvent * me)
 {
-	SampleClip * sClip = dynamic_cast<SampleClip*>(m_clip);
+	auto sClip = dynamic_cast<SampleClip*>(m_clip);
 
 	// If we are at the edges, use the resize cursor
-	if ((me->x() > width() - RESIZE_GRIP_WIDTH && !me->buttons() && !m_clip->getAutoResize())
-		|| (me->x() < RESIZE_GRIP_WIDTH && !me->buttons() && sClip && !m_clip->getAutoResize()))
+	if (!me->buttons() && !m_clip->getAutoResize() && !isSelected()
+		&& ((me->x() > width() - RESIZE_GRIP_WIDTH) || (me->x() < RESIZE_GRIP_WIDTH && sClip)))
 	{
 		setCursor(Qt::SizeHorCursor);
 	}
 	// If we are in the middle on knife mode, use the knife cursor
-	else if (sClip && m_trackView->trackContainerView()->knifeMode())
+	else if (sClip && m_trackView->trackContainerView()->knifeMode() && !isSelected())
 	{
 		setCursor(m_cursorKnife);
 	}
@@ -535,18 +538,16 @@ DataFile ClipView::createClipDataFiles(
 	DataFile dataFile( DataFile::DragNDropData );
 	QDomElement clipParent = dataFile.createElement("clips");
 
-	typedef QVector<ClipView *> clipViewVector;
-	for( clipViewVector::const_iterator it = clipViews.begin();
-			it != clipViews.end(); ++it )
+	for (const auto& clipView : clipViews)
 	{
 		// Insert into the dom under the "clips" element
-		Track* clipTrack = ( *it )->m_trackView->getTrack();
+		Track* clipTrack = clipView->m_trackView->getTrack();
 		int trackIndex = tc->tracks().indexOf( clipTrack );
 		QDomElement clipElement = dataFile.createElement("clip");
 		clipElement.setAttribute( "trackIndex", trackIndex );
 		clipElement.setAttribute( "trackType", clipTrack->type() );
 		clipElement.setAttribute( "trackName", clipTrack->name() );
-		( *it )->m_clip->saveState( dataFile, clipElement );
+		clipView->m_clip->saveState(dataFile, clipElement);
 		clipParent.appendChild( clipElement );
 	}
 
@@ -631,7 +632,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 	setInitialOffsets();
 	if( !fixedClips() && me->button() == Qt::LeftButton )
 	{
-		SampleClip * sClip = dynamic_cast<SampleClip*>( m_clip );
+		auto sClip = dynamic_cast<SampleClip*>(m_clip);
 		const bool knifeMode = m_trackView->trackContainerView()->knifeMode();
 
 		if ( me->modifiers() & Qt::ControlModifier && !(sClip && knifeMode) )
@@ -744,7 +745,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 		if (m_action == Split)
 		{
 			m_action = NoAction;
-			SampleClip * sClip = dynamic_cast<SampleClip*>( m_clip );
+			auto sClip = dynamic_cast<SampleClip*>(m_clip);
 			if (sClip)
 			{
 				setMarkerEnabled( false );
@@ -752,7 +753,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 			}
 		}
 	}
-	else if( me->button() == Qt::MidButton )
+	else if( me->button() == Qt::MiddleButton )
 	{
 		if( me->modifiers() & Qt::ControlModifier )
 		{
@@ -793,10 +794,9 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 				// Collect all selected Clips
 				QVector<selectableObject *> so =
 					m_trackView->trackContainerView()->selectedObjects();
-				for( auto it = so.begin(); it != so.end(); ++it )
+				for (const auto& selectedClip : so)
 				{
-					ClipView * clipv =
-						dynamic_cast<ClipView *>( *it );
+					auto clipv = dynamic_cast<ClipView*>(selectedClip);
 					if( clipv != nullptr )
 					{
 						clipViews.push_back( clipv );
@@ -860,8 +860,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 		for( QVector<selectableObject *>::iterator it = so.begin();
 							it != so.end(); ++it )
 		{
-			ClipView* clipv =
-				dynamic_cast<ClipView *>( *it );
+			auto clipv = dynamic_cast<ClipView*>(*it);
 			if( clipv == nullptr ) { continue; }
 			clips.push_back( clipv->m_clip );
 			int index = std::distance( so.begin(), it );
@@ -909,14 +908,14 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 				TimePos initialLength = m_initialClipEnd - m_initialClipPos;
 				TimePos offset = TimePos( l - initialLength ).quantize( snapSize );
 				// Don't resize to less than 1 tick
-				TimePos min = TimePos( initialLength % snapLength );
+				auto min = TimePos(initialLength % snapLength);
 				if (min < 1) min += snapLength;
 				m_clip->changeLength( qMax<int>( min, initialLength + offset) );
 			}
 		}
 		else
 		{
-			SampleClip * sClip = dynamic_cast<SampleClip*>( m_clip );
+			auto sClip = dynamic_cast<SampleClip*>(m_clip);
 			if( sClip )
 			{
 				const int x = mapToParent( me->pos() ).x() - m_initialMousePos.x();
@@ -943,7 +942,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 				{	// Otherwise, resize in fixed increments
 					// Don't resize to less than 1 tick
 					TimePos initialLength = m_initialClipEnd - m_initialClipPos;
-					TimePos minLength = TimePos( initialLength % snapLength );
+					auto minLength = TimePos(initialLength % snapLength);
 					if (minLength < 1) minLength += snapLength;
 					TimePos offset = TimePos(t - m_initialClipPos).quantize( snapSize );
 					t = qMin<int>( m_initialClipEnd - minLength, m_initialClipPos + offset );
@@ -972,7 +971,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 	}
 	else if( m_action == Split )
 	{
-		SampleClip * sClip = dynamic_cast<SampleClip*>( m_clip );
+		auto sClip = dynamic_cast<SampleClip*>(m_clip);
 		if (sClip) {
 			setCursor( m_cursorKnife );
 			setMarkerPos( knifeMarkerPos( me ) );
@@ -1154,7 +1153,7 @@ QVector<ClipView *> ClipView::getClickedClips()
 	selection.reserve( sos.size() );
 	for( auto so: sos )
 	{
-		ClipView *clipv = dynamic_cast<ClipView *> ( so );
+		auto clipv = dynamic_cast<ClipView*>(so);
 		if( clipv != nullptr )
 		{
 			selection.append( clipv );
@@ -1204,7 +1203,7 @@ void ClipView::paste()
 	using namespace Clipboard;
 
 	// If possible, paste the selection on the TimePos of the selected Track and remove it
-	TimePos clipPos = TimePos( m_clip->startPosition() );
+	TimePos clipPos{m_clip->startPosition()};
 
 	TrackContentWidget *tcw = getTrackView()->getTrackContentWidget();
 
@@ -1243,8 +1242,7 @@ bool ClipView::canMergeSelection(QVector<ClipView*> clipvs)
 void ClipView::mergeClips(QVector<ClipView*> clipvs)
 {
 	// Get the track that we are merging Clips in
-	InstrumentTrack* track =
-		dynamic_cast<InstrumentTrack*>(clipvs.at(0)->getTrackView()->getTrack());
+	auto track = dynamic_cast<InstrumentTrack*>(clipvs.at(0)->getTrackView()->getTrack());
 
 	if (!track)
 	{
@@ -1268,7 +1266,7 @@ void ClipView::mergeClips(QVector<ClipView*> clipvs)
 	const TimePos earliestPos = (*earliestClipV)->getClip()->startPosition();
 
 	// Create a clip where all notes will be added
-	MidiClip* newMidiClip = dynamic_cast<MidiClip*>(track->createClip(earliestPos));
+	auto newMidiClip = dynamic_cast<MidiClip*>(track->createClip(earliestPos));
 	if (!newMidiClip)
 	{
 		qWarning("Warning: Failed to convert Clip to MidiClip on mergeClips");
@@ -1281,7 +1279,7 @@ void ClipView::mergeClips(QVector<ClipView*> clipvs)
 	for (auto clipv: clipvs)
 	{
 		// Convert ClipV to MidiClipView
-		MidiClipView* mcView = dynamic_cast<MidiClipView*>(clipv);
+		auto mcView = dynamic_cast<MidiClipView*>(clipv);
 
 		if (!mcView)
 		{
@@ -1336,11 +1334,9 @@ void ClipView::setInitialOffsets()
 {
 	QVector<selectableObject *> so = m_trackView->trackContainerView()->selectedObjects();
 	QVector<TimePos> offsets;
-	for( QVector<selectableObject *>::iterator it = so.begin();
-						it != so.end(); ++it )
+	for (const auto& selectedClip : so)
 	{
-		ClipView * clipv =
-			dynamic_cast<ClipView *>( *it );
+		auto clipv = dynamic_cast<ClipView*>(selectedClip);
 		if( clipv == nullptr )
 		{
 			continue;
@@ -1502,3 +1498,6 @@ QColor ClipView::getColorForDisplay( QColor defaultColor )
 	// Return color to caller
 	return c;
 }
+
+
+} // namespace lmms::gui

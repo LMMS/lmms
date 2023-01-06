@@ -51,6 +51,19 @@
 #include <windows.h>
 #endif
 
+namespace lmms
+{
+
+
+namespace gui
+{
+
+GuiApplication* getGUI()
+{
+	return GuiApplication::instance();
+}
+
+
 GuiApplication* GuiApplication::s_instance = nullptr;
 
 GuiApplication* GuiApplication::instance()
@@ -58,10 +71,7 @@ GuiApplication* GuiApplication::instance()
 	return s_instance;
 }
 
-GuiApplication* getGUI()
-{
-	return GuiApplication::instance();
-}
+
 
 GuiApplication::GuiApplication()
 {
@@ -81,11 +91,11 @@ GuiApplication::GuiApplication()
 	QDir::addSearchPath("artwork", ConfigManager::inst()->defaultThemeDir());
 	QDir::addSearchPath("artwork", ":/artwork");
 
-	LmmsStyle* lmmsstyle = new LmmsStyle();
+	auto lmmsstyle = new LmmsStyle();
 	QApplication::setStyle(lmmsstyle);
 
-	LmmsPalette* lmmspal = new LmmsPalette(nullptr, lmmsstyle);
-	QPalette* lpal = new QPalette(lmmspal->palette());
+	auto lmmspal = new LmmsPalette(nullptr, lmmsstyle);
+	auto lpal = new QPalette(lmmspal->palette());
 
 	QApplication::setPalette( *lpal );
 	LmmsStyle::s_palette = lpal;
@@ -249,3 +259,8 @@ QFont GuiApplication::getWin32SystemFont()
 	return QFont( QString::fromUtf8( metrics.lfMessageFont.lfFaceName ), pointSize );
 }
 #endif
+
+
+} // namespace gui
+
+} // namespace lmms

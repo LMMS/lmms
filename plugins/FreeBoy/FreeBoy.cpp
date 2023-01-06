@@ -41,6 +41,10 @@
 
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 const blip_time_t FRAME_LENGTH = 70224;
 const long CLOCK_RATE = 4194304;
 
@@ -48,7 +52,7 @@ extern "C"
 {
 Plugin::Descriptor PLUGIN_EXPORT freeboy_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"FreeBoy",
 	QT_TRANSLATE_NOOP( "PluginBrowser", "Emulation of GameBoy (TM) APU" ),
 
@@ -117,11 +121,6 @@ FreeBoyInstrument::FreeBoyInstrument( InstrumentTrack * _instrument_track ) :
 	m_graphModel( 0, 15, 32, this, false, 1 ),
 
 	m_time(0)
-{
-}
-
-
-FreeBoyInstrument::~FreeBoyInstrument()
 {
 }
 
@@ -252,7 +251,7 @@ void FreeBoyInstrument::playNote( NotePlayHandle * _n,
 
 	if ( tfp == 0 )
 	{
-		Gb_Apu_Buffer *papu = new Gb_Apu_Buffer();
+		auto papu = new Gb_Apu_Buffer();
 		papu->set_sample_rate( samplerate, CLOCK_RATE );
 
 		// Master sound circuitry power control
@@ -283,7 +282,7 @@ void FreeBoyInstrument::playNote( NotePlayHandle * _n,
 		_n->m_pluginData = papu;
 	}
 
-	Gb_Apu_Buffer *papu = static_cast<Gb_Apu_Buffer *>( _n->m_pluginData );
+	auto papu = static_cast<Gb_Apu_Buffer*>(_n->m_pluginData);
 
 	papu->treble_eq( m_trebleModel.value() );
 	papu->bass_freq( m_bassModel.value() );
@@ -312,7 +311,7 @@ void FreeBoyInstrument::playNote( NotePlayHandle * _n,
 	data = 128;
 	papu->write_register( fakeClock(),  0xff1a, data );
 
-	int ch3voldata[4] = { 0, 3, 2, 1 };
+	auto ch3voldata = std::array{0, 3, 2, 1};
 	data = ch3voldata[(int)m_ch3VolumeModel.value()];
 	data = data<<5;
 	papu->write_register( fakeClock(),  0xff1c, data );
@@ -389,7 +388,7 @@ void FreeBoyInstrument::playNote( NotePlayHandle * _n,
 	int const buf_size = 2048;
 	int framesleft = frames;
 	int datalen = 0;
-	blip_sample_t buf [buf_size*2];
+	auto buf = std::array<blip_sample_t, buf_size * 2>{};
 	while( framesleft > 0 )
 	{
 		int avail = papu->samples_avail();
@@ -402,7 +401,7 @@ void FreeBoyInstrument::playNote( NotePlayHandle * _n,
 		datalen = framesleft>avail?avail:framesleft;
 		datalen = datalen>buf_size?buf_size:datalen;
 
-		long count = papu->read_samples( buf, datalen*2)/2;
+		long count = papu->read_samples(buf.data(), datalen * 2) / 2;
 
 		for( fpp_t frame = 0; frame < count; ++frame )
 		{
@@ -427,10 +426,14 @@ void FreeBoyInstrument::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-PluginView * FreeBoyInstrument::instantiateView( QWidget * _parent )
+gui::PluginView * FreeBoyInstrument::instantiateView( QWidget * _parent )
 {
-	return( new FreeBoyInstrumentView( this, _parent ) );
+	return( new gui::FreeBoyInstrumentView( this, _parent ) );
 }
+
+
+namespace gui
+{
 
 
 class FreeBoyKnob : public Knob
@@ -676,14 +679,9 @@ FreeBoyInstrumentView::FreeBoyInstrumentView( Instrument * _instrument,
 }
 
 
-FreeBoyInstrumentView::~FreeBoyInstrumentView()
-{
-}
-
-
 void FreeBoyInstrumentView::modelChanged()
 {
-	FreeBoyInstrument * p = castModel<FreeBoyInstrument>();
+	auto p = castModel<FreeBoyInstrument>();
 
 	m_ch1SweepTimeKnob->setModel( &p->m_ch1SweepTimeModel );
 	m_ch1SweepDirButton->setModel( &p->m_ch1SweepDirModel );
@@ -721,6 +719,9 @@ void FreeBoyInstrumentView::modelChanged()
 	m_graph->setModel( &p->m_graphModel );
 }
 
+
+} // namespace gui
+
 extern "C"
 {
 
@@ -735,3 +736,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 }
 
 
+} // namespace lmms

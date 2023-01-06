@@ -23,8 +23,7 @@
  *
  */
  
- #include "AutomationTrackView.h"
- 
+#include "AutomationTrackView.h"
 #include "AutomationClip.h"
 #include "AutomationTrack.h"
 #include "embed.h"
@@ -33,18 +32,19 @@
 #include "StringPairDrag.h"
 #include "TrackContainerView.h"
 #include "TrackLabelButton.h"
- 
+
+namespace lmms::gui
+{
 
 AutomationTrackView::AutomationTrackView( AutomationTrack * _at, TrackContainerView* tcv ) :
 	TrackView( _at, tcv )
 {
         setFixedHeight( 32 );
-	TrackLabelButton * tlb = new TrackLabelButton( this,
-						getTrackSettingsWidget() );
-	tlb->setIcon( embed::getIconPixmap( "automation_track" ) );
-	tlb->move( 3, 1 );
-	tlb->show();
-	setModel( _at );
+		auto tlb = new TrackLabelButton(this, getTrackSettingsWidget());
+		tlb->setIcon(embed::getIconPixmap("automation_track"));
+		tlb->move(3, 1);
+		tlb->show();
+		setModel(_at);
 }
 
 void AutomationTrackView::dragEnterEvent( QDragEnterEvent * _dee )
@@ -61,9 +61,7 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 	QString val = StringPairDrag::decodeValue( _de );
 	if( type == "automatable_model" )
 	{
-		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
-				Engine::projectJournal()->
-					journallingObject( val.toInt() ) );
+		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
 		if( mod != nullptr )
 		{
 			TimePos pos = TimePos( trackContainerView()->
@@ -80,10 +78,13 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 			}
 
 			Clip * clip = getTrack()->createClip( pos );
-			AutomationClip * autoClip = dynamic_cast<AutomationClip *>( clip );
+			auto autoClip = dynamic_cast<AutomationClip*>(clip);
 			autoClip->addObject( mod );
 		}
 	}
 
 	update();
 }
+
+
+} // namespace lmms::gui

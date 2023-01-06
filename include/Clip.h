@@ -30,10 +30,19 @@
 #include "AutomatableModel.h"
 
 
+namespace lmms
+{
+
 class Track;
-class ClipView;
 class TrackContainer;
+
+namespace gui
+{
+
+class ClipView;
 class TrackView;
+
+} // namespace gui
 
 
 class LMMS_EXPORT Clip : public Model, public JournallingObject
@@ -44,7 +53,7 @@ class LMMS_EXPORT Clip : public Model, public JournallingObject
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
 	Clip( Track * track );
-	virtual ~Clip();
+	~Clip() override;
 
 	inline Track * getTrack() const
 	{
@@ -84,6 +93,12 @@ public:
 		return m_length;
 	}
 
+	/*! \brief Specify whether or not a TCO automatically resizes.
+	 *
+	 *  If a TCO does automatically resize, it cannot be manually
+	 *  resized by clicking and dragging its edge.
+	 *
+	 */
 	inline void setAutoResize( const bool r )
 	{
 		m_autoResize = r;
@@ -116,7 +131,7 @@ public:
 	virtual void movePosition( const TimePos & pos );
 	virtual void changeLength( const TimePos & length );
 
-	virtual ClipView * createView( TrackView * tv ) = 0;
+	virtual gui::ClipView * createView( gui::TrackView * tv ) = 0;
 
 	inline void selectViewOnCreate( bool select )
 	{
@@ -176,5 +191,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

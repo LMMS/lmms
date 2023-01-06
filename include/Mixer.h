@@ -34,8 +34,12 @@
 
 #include <QColor>
 
+namespace lmms
+{
+
+
 class MixerRoute;
-typedef QVector<MixerRoute *> MixerRouteVector;
+using MixerRouteVector = QVector<MixerRoute*>;
 
 class MixerChannel : public ThreadableJob
 {
@@ -98,7 +102,7 @@ class MixerRoute : public QObject
 	Q_OBJECT
 	public:		
 		MixerRoute( MixerChannel * from, MixerChannel * to, float amount );
-		virtual ~MixerRoute();
+		~MixerRoute() override = default;
 		
 	mix_ch_t senderIndex() const
 	{
@@ -139,7 +143,7 @@ class LMMS_EXPORT Mixer : public Model, public JournallingObject
 	Q_OBJECT
 public:
 	Mixer();
-	virtual ~Mixer();
+	~Mixer() override;
 
 	void mixToChannel( const sampleFrame * _buf, mix_ch_t _ch );
 
@@ -219,5 +223,7 @@ private:
 	int m_lastSoloed;
 } ;
 
+
+} // namespace lmms
 
 #endif

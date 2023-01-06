@@ -8,6 +8,9 @@
 #include "HalfSwing.h"
 #include "HydrogenSwing.h"
 
+namespace lmms
+{
+
 GrooveFactory::GrooveFactory()
 {
 }
@@ -37,3 +40,4 @@ Groove * GrooveFactory::create(QString grooveType) {
 	return new Groove();
 }
 
+} // namespace lmms

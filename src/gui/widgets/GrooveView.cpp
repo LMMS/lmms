@@ -17,6 +17,9 @@
 #include "MidiSwing.h"
 
 
+namespace lmms::gui
+{
+
 GrooveView::GrooveView(QWidget * parent) :
 	QWidget(parent)
 {
@@ -132,3 +135,5 @@ void GrooveView::setView(Groove * groove)
 
 	m_layout->addWidget(view);
 }
+
+} // namespace lmms::gui

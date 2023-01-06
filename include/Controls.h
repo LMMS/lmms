@@ -34,8 +34,20 @@
 
 class QString;
 class QWidget;
+class QLabel;
+
+namespace lmms
+{
+
 class AutomatableModel;
 
+namespace gui
+{
+
+class AutomatableModelView;
+class Knob;
+class ComboBox;
+class LedCheckBox;
 
 /**
 	These classes provide
@@ -52,15 +64,15 @@ public:
 
 	virtual void setModel(AutomatableModel* model) = 0;
 	virtual AutomatableModel* model() = 0;
-	virtual class AutomatableModelView* modelView() = 0;
+	virtual AutomatableModelView* modelView() = 0;
 
-	virtual ~Control();
+	virtual ~Control() = default;
 };
 
 
 class KnobControl : public Control
 {
-	class Knob* m_knob;
+	Knob* m_knob;
 
 public:
 	void setText(const QString& text) override;
@@ -68,18 +80,18 @@ public:
 
 	void setModel(AutomatableModel* model) override;
 	FloatModel* model() override;
-	class AutomatableModelView* modelView() override;
+	AutomatableModelView* modelView() override;
 
 	KnobControl(QWidget* parent = nullptr);
-	~KnobControl() override;
+	~KnobControl() override = default;
 };
 
 
 class ComboControl : public Control
 {
 	QWidget* m_widget;
-	class ComboBox* m_combo;
-	class QLabel* m_label;
+	ComboBox* m_combo;
+	QLabel* m_label;
 
 public:
 	void setText(const QString& text) override;
@@ -87,10 +99,10 @@ public:
 
 	void setModel(AutomatableModel* model) override;
 	ComboBoxModel* model() override;
-	class AutomatableModelView* modelView() override;
+	AutomatableModelView* modelView() override;
 
 	ComboControl(QWidget* parent = nullptr);
-	~ComboControl() override;
+	~ComboControl() override = default;
 };
 
 
@@ -104,17 +116,17 @@ public:
 
 	void setModel(AutomatableModel* model) override;
 	IntModel* model() override;
-	class AutomatableModelView* modelView() override;
+	AutomatableModelView* modelView() override;
 
 	LcdControl(int numDigits, QWidget* parent = nullptr);
-	~LcdControl() override;
+	~LcdControl() override = default;
 };
 
 
 class CheckControl : public Control
 {
 	QWidget* m_widget;
-	class LedCheckBox* m_checkBox;
+	LedCheckBox* m_checkBox;
 	QLabel* m_label;
 
 public:
@@ -122,12 +134,16 @@ public:
 	QWidget* topWidget() override;
 
 	void setModel(AutomatableModel* model) override;
-	BoolModel *model() override;
-	class AutomatableModelView* modelView() override;
+	BoolModel* model() override;
+	AutomatableModelView* modelView() override;
 
 	CheckControl(QWidget* parent = nullptr);
-	~CheckControl() override;
+	~CheckControl() override = default;
 };
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif // CONTROLS_H

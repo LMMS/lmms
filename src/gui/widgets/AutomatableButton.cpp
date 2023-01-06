@@ -31,6 +31,8 @@
 #include "StringPairDrag.h"
 
 
+namespace lmms::gui
+{
 
 AutomatableButton::AutomatableButton( QWidget * _parent,
 						const QString & _name ) :
@@ -124,7 +126,7 @@ void AutomatableButton::mousePressEvent( QMouseEvent * _me )
 		if( m_group )
 		{
 			// A group, we must get process it instead
-			AutomatableModelView* groupView = (AutomatableModelView*)m_group;
+			auto groupView = (AutomatableModelView*)m_group;
 			new StringPairDrag( "automatable_model",
 					QString::number( groupView->modelUntyped()->id() ),
 					QPixmap(), widget() );
@@ -190,10 +192,9 @@ automatableButtonGroup::automatableButtonGroup( QWidget * _parent,
 
 automatableButtonGroup::~automatableButtonGroup()
 {
-	for( QList<AutomatableButton *>::iterator it = m_buttons.begin();
-					it != m_buttons.end(); ++it )
+	for (const auto& button : m_buttons)
 	{
-		( *it )->m_group = nullptr;
+		button->m_group = nullptr;
 	}
 }
 
@@ -244,8 +245,8 @@ void automatableButtonGroup::activateButton( AutomatableButton * _btn )
 
 void automatableButtonGroup::modelChanged()
 {
-	connect( model(), SIGNAL( dataChanged() ),
-			this, SLOT( updateButtons() ) );
+	connect( model(), SIGNAL(dataChanged()),
+			this, SLOT(updateButtons()));
 	IntModelView::modelChanged();
 	updateButtons();
 }
@@ -266,4 +267,4 @@ void automatableButtonGroup::updateButtons()
 
 
 
-
+} // namespace lmms::gui

@@ -33,6 +33,9 @@
 #include "Engine.h"
 #include "Ladspa2LMMS.h"
 
+namespace lmms::gui
+{
+
 
 LadspaPortDialog::LadspaPortDialog( const ladspa_key_t & _key )
 {
@@ -42,13 +45,13 @@ LadspaPortDialog::LadspaPortDialog( const ladspa_key_t & _key )
 	setWindowTitle( tr( "Ports" ) );
 	setModal( true );
 
-	QVBoxLayout * vlayout = new QVBoxLayout( this );
+	auto vlayout = new QVBoxLayout(this);
 	vlayout->setSpacing( 0 );
 	vlayout->setMargin( 0 );
 
 	int pc = manager->getPortCount( _key );
 
-	QTableWidget * settings = new QTableWidget( pc, 7, this );
+	auto settings = new QTableWidget(pc, 7, this);
 
 	QStringList ports;
 	ports.append( tr( "Name" ) );
@@ -64,7 +67,7 @@ LadspaPortDialog::LadspaPortDialog( const ladspa_key_t & _key )
 	{
 		for( int col = 0; col < 7; ++col )
 		{
-			QTableWidgetItem * item = new QTableWidgetItem;
+			auto item = new QTableWidgetItem;
 			item->setFlags(QFlag(0));
 			settings->setItem( row, col, item );
 		}
@@ -165,11 +168,4 @@ LadspaPortDialog::LadspaPortDialog( const ladspa_key_t & _key )
 
 
 
-LadspaPortDialog::~LadspaPortDialog()
-{
-}
-
-
-
-
-
+} // namespace lmms::gui

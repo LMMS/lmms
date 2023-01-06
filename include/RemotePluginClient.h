@@ -39,6 +39,10 @@
 #endif
 
 #include "SharedMemory.h"
+#include "VstSyncData.h"
+
+namespace lmms
+{
 
 class RemotePluginClient : public RemotePluginBase
 {
@@ -48,11 +52,11 @@ public:
 #else
 	RemotePluginClient( const char * socketPath );
 #endif
-	virtual ~RemotePluginClient();
+	~RemotePluginClient() override;
 
 	const VstSyncData* getVstSyncData();
 
-	virtual bool processMessage( const message & _m );
+	bool processMessage( const message & _m ) override;
 
 	virtual void process( const sampleFrame * _in_buf,
 					sampleFrame * _out_buf ) = 0;
@@ -121,8 +125,7 @@ private:
 	void doProcessing();
 
 	SharedMemory<float[]> m_audioBuffer;
-	SharedMemory<const VstSyncData> m_vstSyncShm;
-	const VstSyncData* m_vstSyncData;
+	SharedMemory<const VstSyncData> m_vstSyncData;
 
 	int m_inputCount;
 	int m_outputCount;
@@ -170,7 +173,7 @@ private:
 	std::condition_variable m_cv;
 	std::thread m_thread;
 };
-#endif
+#endif // LMMS_BUILD_WIN32
 
 #ifdef SYNC_WITH_SHM_FIFO
 RemotePluginClient::RemotePluginClient( const std::string& _shm_in, const std::string& _shm_out ) :
@@ -179,7 +182,6 @@ RemotePluginClient::RemotePluginClient( const std::string& _shm_in, const std::s
 RemotePluginClient::RemotePluginClient( const char * socketPath ) :
 	RemotePluginBase(),
 #endif
-	m_vstSyncData( nullptr ),
 	m_inputCount( 0 ),
 	m_outputCount( 0 ),
 	m_sampleRate( 44100 ),
@@ -208,26 +210,6 @@ RemotePluginClient::RemotePluginClient( const char * socketPath ) :
 		fprintf( stderr, "Could not connect to local server.\n" );
 	}
 #endif
-
-	try
-	{
-		m_vstSyncShm.attach("usr_bin_lmms");
-		m_vstSyncData = m_vstSyncShm.get();
-		m_bufferSize = m_vstSyncData->m_bufferSize;
-		m_sampleRate = m_vstSyncData->m_sampleRate;
-	}
-	catch (const std::runtime_error&)
-	{
-		// if attaching shared memory fails
-		sendMessage( IdSampleRateInformation );
-		sendMessage( IdBufferSizeInformation );
-		if( waitForMessage( IdBufferSizeInformation ).id
-							!= IdBufferSizeInformation )
-		{
-			fprintf( stderr, "Could not get buffer size information\n" );
-		}
-	}
-	sendMessage( IdHostInfoGotten );
 }
 
 
@@ -250,7 +232,7 @@ RemotePluginClient::~RemotePluginClient()
 
 const VstSyncData* RemotePluginClient::getVstSyncData()
 {
-	return m_vstSyncData;
+	return m_vstSyncData.get();
 }
 
 
@@ -264,6 +246,22 @@ bool RemotePluginClient::processMessage( const message & _m )
 	{
 		case IdUndefined:
 			return false;
+
+		case IdSyncKey:
+			try
+			{
+				m_vstSyncData.attach(_m.getString(0));
+			}
+			catch (const std::runtime_error& error)
+			{
+				debugMessage(std::string{"Failed to attach sync data: "} + error.what() + '\n');
+				std::exit(EXIT_FAILURE);
+			}
+			m_bufferSize = m_vstSyncData->m_bufferSize;
+			m_sampleRate = m_vstSyncData->m_sampleRate;
+			reply_message.id = IdHostInfoGotten;
+			reply = true;
+			break;
 
 		case IdSampleRateInformation:
 			m_sampleRate = _m.getInt();
@@ -354,5 +352,7 @@ void RemotePluginClient::doProcessing()
 	}
 }
 
+
+} // namespace lmms
 
 #endif // REMOTE_PLUGIN_CLIENT_H

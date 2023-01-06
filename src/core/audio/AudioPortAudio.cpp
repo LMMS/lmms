@@ -27,6 +27,10 @@
 #include "AudioPortAudio.h"
 
 #ifndef LMMS_HAVE_PORTAUDIO
+namespace lmms
+{
+
+
 void AudioPortAudioSetupUtil::updateBackends()
 {
 }
@@ -38,6 +42,9 @@ void AudioPortAudioSetupUtil::updateDevices()
 void AudioPortAudioSetupUtil::updateChannels()
 {
 }
+
+
+} // namespace lmms
 #endif
 
 #ifdef LMMS_HAVE_PORTAUDIO
@@ -49,6 +56,9 @@ void AudioPortAudioSetupUtil::updateChannels()
 #include "gui_templates.h"
 #include "ComboBox.h"
 #include "AudioEngine.h"
+
+namespace lmms
+{
 
 
 AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine ) :
@@ -322,7 +332,7 @@ int AudioPortAudio::_process_callback(
 	Q_UNUSED(_timeInfo);
 	Q_UNUSED(_statusFlags);
 
-	AudioPortAudio * _this  = static_cast<AudioPortAudio *> (_arg);
+	auto _this = static_cast<AudioPortAudio*>(_arg);
 	return _this->process_callback( (const float*)_inputBuffer,
 		(float*)_outputBuffer, _framesPerBuffer );
 }
@@ -407,17 +417,19 @@ void AudioPortAudioSetupUtil::updateChannels()
 AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	AudioDeviceSetupWidget( AudioPortAudio::name(), _parent )
 {
+	using gui::ComboBox;
+
 	m_backend = new ComboBox( this, "BACKEND" );
 	m_backend->setGeometry( 64, 15, 260, ComboBox::DEFAULT_HEIGHT );
 
-	QLabel * backend_lbl = new QLabel( tr( "Backend" ), this );
+	auto backend_lbl = new QLabel(tr("Backend"), this);
 	backend_lbl->setFont( pointSize<7>( backend_lbl->font() ) );
 	backend_lbl->move( 8, 18 );
 
 	m_device = new ComboBox( this, "DEVICE" );
 	m_device->setGeometry( 64, 35, 260, ComboBox::DEFAULT_HEIGHT );
 
-	QLabel * dev_lbl = new QLabel( tr( "Device" ), this );
+	auto dev_lbl = new QLabel(tr("Device"), this);
 	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
 	dev_lbl->move( 8, 38 );
 	
@@ -432,11 +444,11 @@ AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	m_channels->setLabel( tr( "Channels" ) );
 	m_channels->move( 308, 20 );*/
 
-	connect( &m_setupUtil.m_backendModel, SIGNAL( dataChanged() ),
-			&m_setupUtil, SLOT( updateDevices() ) );
+	connect( &m_setupUtil.m_backendModel, SIGNAL(dataChanged()),
+			&m_setupUtil, SLOT(updateDevices()));
 			
-	connect( &m_setupUtil.m_deviceModel, SIGNAL( dataChanged() ),
-			&m_setupUtil, SLOT( updateChannels() ) );
+	connect( &m_setupUtil.m_deviceModel, SIGNAL(dataChanged()),
+			&m_setupUtil, SLOT(updateChannels()));
 			
 	m_backend->setModel( &m_setupUtil.m_backendModel );
 	m_device->setModel( &m_setupUtil.m_deviceModel );
@@ -447,11 +459,11 @@ AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 
 AudioPortAudio::setupWidget::~setupWidget()
 {
-	disconnect( &m_setupUtil.m_backendModel, SIGNAL( dataChanged() ),
-			&m_setupUtil, SLOT( updateDevices() ) );
+	disconnect( &m_setupUtil.m_backendModel, SIGNAL(dataChanged()),
+			&m_setupUtil, SLOT(updateDevices()));
 			
-	disconnect( &m_setupUtil.m_deviceModel, SIGNAL( dataChanged() ),
-			&m_setupUtil, SLOT( updateChannels() ) );
+	disconnect( &m_setupUtil.m_deviceModel, SIGNAL(dataChanged()),
+			&m_setupUtil, SLOT(updateChannels()));
 }
 
 
@@ -496,8 +508,10 @@ void AudioPortAudio::setupWidget::show()
 	AudioDeviceSetupWidget::show();
 }
 
+} // namespace lmms
 
-#endif
+
+#endif // LMMS_HAVE_PORTAUDIO
 
 
 

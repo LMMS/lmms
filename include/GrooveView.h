@@ -10,6 +10,9 @@
 #include "Groove.h"
 #include "SerializingObject.h"
 
+namespace lmms::gui
+{
+
 class GrooveView : public QWidget
 {
 	Q_OBJECT
@@ -31,5 +34,7 @@ private:
 	QVBoxLayout * m_layout;
 	QComboBox * m_comboBox;
 };
+
+} // namespace lmms
 
 #endif // GROOVEVIEW_H

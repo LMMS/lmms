@@ -27,6 +27,9 @@
 #include "AutomationClip.h"
 
 
+namespace lmms
+{
+
 // Dummy constructor for the QMap
 AutomationNode::AutomationNode() :
 	m_clip(nullptr),
@@ -107,3 +110,5 @@ void AutomationNode::resetOutValue()
 	// the tangents
 	setOutValue(m_inValue);
 }
+
+} // namespace lmms

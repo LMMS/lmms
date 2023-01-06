@@ -42,6 +42,10 @@
 
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 static const int wavetableSize = 200;
 static const float defaultNormalizationFactor = 1.0f;
 
@@ -50,7 +54,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT bitinvader_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"BitInvader",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Customizable wavetable synthesizer" ),
@@ -99,10 +103,8 @@ BSynth::~BSynth()
 
 sample_t BSynth::nextStringSample( float sample_length )
 {
-	float sample_step = 
-		static_cast<float>( sample_length / ( sample_rate / nph->frequency() ) );
+	auto sample_step = static_cast<float>(sample_length / (sample_rate / nph->frequency()));
 
-	
 	// check overflow
 	while (sample_realindex >= sample_length) {
 		sample_realindex -= sample_length;
@@ -157,8 +159,8 @@ BitInvader::BitInvader( InstrumentTrack * _instrument_track ) :
 	m_graph.setWaveToSine();
 	lengthChanged();
 
-	connect( &m_sampleLength, SIGNAL( dataChanged( ) ),
-			this, SLOT( lengthChanged( ) ), Qt::DirectConnection );
+	connect( &m_sampleLength, SIGNAL( dataChanged() ),
+			this, SLOT( lengthChanged() ), Qt::DirectConnection );
 
 	connect( &m_graph, SIGNAL( samplesChanged( int, int ) ),
 			this, SLOT( samplesChanged( int, int ) ) );
@@ -166,10 +168,6 @@ BitInvader::BitInvader( InstrumentTrack * _instrument_track ) :
 
 
 
-
-BitInvader::~BitInvader()
-{
-}
 
 
 
@@ -299,7 +297,7 @@ void BitInvader::playNote( NotePlayHandle * _n,
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 
-	BSynth * ps = static_cast<BSynth *>( _n->m_pluginData );
+	auto ps = static_cast<BSynth*>(_n->m_pluginData);
 	for( fpp_t frame = offset; frame < frames + offset; ++frame )
 	{
 		const sample_t cur = ps->nextStringSample( m_graph.length() );
@@ -325,15 +323,16 @@ void BitInvader::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-PluginView * BitInvader::instantiateView( QWidget * _parent )
+gui::PluginView * BitInvader::instantiateView( QWidget * _parent )
 {
-	return( new BitInvaderView( this, _parent ) );
+	return( new gui::BitInvaderView( this, _parent ) );
 }
 
 
 
 
-
+namespace gui
+{
 
 
 BitInvaderView::BitInvaderView( Instrument * _instrument,
@@ -471,7 +470,7 @@ BitInvaderView::BitInvaderView( Instrument * _instrument,
 
 void BitInvaderView::modelChanged()
 {
-	BitInvader * b = castModel<BitInvader>();
+	auto b = castModel<BitInvader>();
 
 	m_graph->setModel( &b->m_graph );
 	m_sampleLengthKnob->setModel( &b->m_sampleLength );
@@ -571,6 +570,7 @@ void BitInvaderView::normalizeToggled( bool value )
 }
 
 
+} // namespace gui
 
 
 extern "C"
@@ -584,3 +584,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 
 
 }
+
+
+} // namespace lmms

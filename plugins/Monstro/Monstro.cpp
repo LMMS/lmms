@@ -38,12 +38,16 @@
 
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT monstro_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Monstro",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Monstrous 3-oscillator synth with modulation matrix" ),
@@ -83,7 +87,7 @@ MonstroSynth::MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph ) :
 
 	m_lfo_next[0] = Oscillator::noiseSample( 0.0f );
 	m_lfo_next[1] = Oscillator::noiseSample( 0.0f );
-	
+
 	m_osc1l_last = 0.0f;
 	m_osc1r_last = 0.0f;
 
@@ -104,11 +108,6 @@ MonstroSynth::MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph ) :
 	m_lfo[1].resize( m_parent->m_fpp );
 	m_env[0].resize( m_parent->m_fpp );
 	m_env[1].resize( m_parent->m_fpp );
-}
-
-
-MonstroSynth::~MonstroSynth()
-{
 }
 
 
@@ -653,14 +652,14 @@ inline void MonstroSynth::updateModulators( float * env1, float * env2, float * 
 {
 	// frames played before
 	const f_cnt_t tfp = m_nph->totalFramesPlayed();
-	
-	float * lfo [2];
-	float * env [2];
+
+	auto lfo = std::array<float*, 2>{};
+	auto env = std::array<float*, 2>{};
 	lfo[0] = lfo1;
 	lfo[1] = lfo2;
 	env[0] = env1;
 	env[1] = env2;
-	
+
 	for( int i = 0; i < 2; ++i )
 	{
 		switch( m_lfovalue[i] )
@@ -741,7 +740,7 @@ inline void MonstroSynth::updateModulators( float * env1, float * env2, float * 
 				{
 					const f_cnt_t tm = ( tfp + f ) % static_cast<int>( m_lfo_rate[i] );
 					if( tm == 0 )
-					{ 
+					{
 						m_lfo_last[i] = m_lfo_next[i];
 						m_lfo_next[i] = Oscillator::noiseSample( 0.0f );
 					}
@@ -756,9 +755,9 @@ inline void MonstroSynth::updateModulators( float * env1, float * env2, float * 
 		{
 			if( tfp + f < m_lfoatt[i] ) lfo[i][f] *= ( static_cast<sample_t>( tfp ) / m_lfoatt[i] );
 		}
-		
-		
-		
+
+
+
 	/////////////////////////////////////////////
 	//                                         //
 	//                                         //
@@ -766,7 +765,7 @@ inline void MonstroSynth::updateModulators( float * env1, float * env2, float * 
 	//                                         //
 	//                                         //
 	/////////////////////////////////////////////
-		
+
 		for( f_cnt_t f = 0; f < frames; ++f )
 		{
 			if( m_env_phase[i] < 4.0f && m_nph->isReleased() && f >= m_nph->framesBeforeRelease() )
@@ -1025,11 +1024,6 @@ MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 }
 
 
-MonstroInstrument::~MonstroInstrument()
-{
-}
-
-
 void MonstroInstrument::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
@@ -1041,7 +1035,7 @@ void MonstroInstrument::playNote( NotePlayHandle * _n,
 		_n->m_pluginData = new MonstroSynth( this, _n );
 	}
 
-	MonstroSynth * ms = static_cast<MonstroSynth *>( _n->m_pluginData );
+	auto ms = static_cast<MonstroSynth*>(_n->m_pluginData);
 
 	ms->renderOutput( frames, _working_buffer + offset );
 
@@ -1304,9 +1298,9 @@ f_cnt_t MonstroInstrument::desiredReleaseFrames() const
 }
 
 
-PluginView * MonstroInstrument::instantiateView( QWidget * _parent )
+gui::PluginView* MonstroInstrument::instantiateView( QWidget * _parent )
 {
-	return( new MonstroView( this, _parent ) );
+	return( new gui::MonstroView( this, _parent ) );
 }
 
 
@@ -1420,7 +1414,7 @@ void MonstroInstrument::updateLFOAtts()
 void MonstroInstrument::updateSamplerate()
 {
 	m_samplerate = Engine::audioEngine()->processingSampleRate();
-	
+
 	m_integrator = 0.5f - ( 0.5f - INTEGRATOR ) * 44100.0f / m_samplerate;
 	m_fmCorrection = 44100.f / m_samplerate * FM_AMOUNT;
 	m_counterMax = ( m_samplerate * 5 ) / 44100;
@@ -1445,6 +1439,10 @@ void MonstroInstrument::updateSlope2()
 }
 
 
+namespace gui
+{
+
+
 MonstroView::MonstroView( Instrument * _instrument,
 					QWidget * _parent ) :
 					InstrumentViewFixedSize( _instrument, _parent )
@@ -1461,13 +1459,13 @@ MonstroView::MonstroView( Instrument * _instrument,
 
 // "tab buttons"
 
-	PixmapButton * m_opViewButton = new PixmapButton( this, nullptr );
+	auto m_opViewButton = new PixmapButton(this, nullptr);
 	m_opViewButton -> move( 0,0 );
 	m_opViewButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "opview_active" ) );
 	m_opViewButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "opview_inactive" ) );
 	m_opViewButton->setToolTip(tr("Operators view"));
 
-	PixmapButton * m_matViewButton = new PixmapButton( this, nullptr );
+	auto m_matViewButton = new PixmapButton(this, nullptr);
 	m_matViewButton -> move( 125,0 );
 	m_matViewButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "matview_active" ) );
 	m_matViewButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "matview_inactive" ) );
@@ -1479,11 +1477,6 @@ MonstroView::MonstroView( Instrument * _instrument,
 
 	connect( m_opViewButton, SIGNAL( clicked() ), this, SLOT( updateLayout() ) );
 	connect( m_matViewButton, SIGNAL( clicked() ), this, SLOT( updateLayout() ) );
-}
-
-
-MonstroView::~MonstroView()
-{
 }
 
 
@@ -1505,7 +1498,7 @@ void MonstroView::updateLayout()
 
 void MonstroView::modelChanged()
 {
-	MonstroInstrument * m = castModel<MonstroInstrument>();
+	auto m = castModel<MonstroInstrument>();
 
 	m_osc1VolKnob-> setModel( &m-> m_osc1Vol );
 	m_osc1PanKnob-> setModel( &m-> m_osc1Pan );
@@ -1638,7 +1631,7 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 {
 	// operators view
 
-	QWidget * view = new QWidget( _parent );
+	auto view = new QWidget(_parent);
 	view-> setFixedSize( 250, 250 );
 
 	makeknob( m_osc1VolKnob, KNOBCOL1, O1ROW, tr( "Volume" ), "%", "osc1Knob" )
@@ -1701,46 +1694,47 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	m_lfo2WaveBox -> setGeometry( 127, LFOROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
 	m_lfo2WaveBox->setFont( pointSize<8>( m_lfo2WaveBox->font() ) );
 
-	maketsknob( m_lfo2AttKnob, LFOCOL4, LFOROW, tr( "Attack" ), " ms", "lfoKnob" )
-	maketsknob( m_lfo2RateKnob, LFOCOL5, LFOROW, tr( "Rate" ), " ms", "lfoKnob" )
-	makeknob( m_lfo2PhsKnob, LFOCOL6, LFOROW, tr( "Phase" ), tr( " deg" ), "lfoKnob" )
+	maketsknob(m_lfo2AttKnob, LFOCOL4, LFOROW, tr("Attack"), " ms", "lfoKnob")
+	maketsknob(m_lfo2RateKnob, LFOCOL5, LFOROW, tr("Rate"), " ms", "lfoKnob")
+	makeknob(m_lfo2PhsKnob, LFOCOL6, LFOROW, tr("Phase"), tr(" deg"), "lfoKnob")
 
-	maketsknob( m_env1PreKnob, KNOBCOL1, E1ROW, tr( "Pre-delay" ), " ms", "envKnob" )
-	maketsknob( m_env1AttKnob, KNOBCOL2, E1ROW, tr( "Attack" ), " ms", "envKnob" )
-	maketsknob( m_env1HoldKnob, KNOBCOL3, E1ROW, tr( "Hold" ), " ms", "envKnob" )
-	maketsknob( m_env1DecKnob, KNOBCOL4, E1ROW, tr( "Decay" ), " ms", "envKnob" )
-	makeknob( m_env1SusKnob, KNOBCOL5, E1ROW, tr( "Sustain" ), "", "envKnob" )
-	maketsknob( m_env1RelKnob, KNOBCOL6, E1ROW, tr( "Release" ), " ms", "envKnob" )
-	makeknob( m_env1SlopeKnob, KNOBCOL7, E1ROW, tr( "Slope" ), "", "envKnob" )
+	maketsknob(m_env1PreKnob, KNOBCOL1, E1ROW, tr("Pre-delay"), " ms", "envKnob")
+	maketsknob(m_env1AttKnob, KNOBCOL2, E1ROW, tr("Attack"), " ms", "envKnob")
+	maketsknob(m_env1HoldKnob, KNOBCOL3, E1ROW, tr("Hold"), " ms", "envKnob")
+	maketsknob(m_env1DecKnob, KNOBCOL4, E1ROW, tr("Decay"), " ms", "envKnob")
 
-	maketsknob( m_env2PreKnob, KNOBCOL1, E2ROW, tr( "Pre-delay" ), " ms", "envKnob" )
-	maketsknob( m_env2AttKnob, KNOBCOL2, E2ROW, tr( "Attack" ), " ms", "envKnob" )
-	maketsknob( m_env2HoldKnob, KNOBCOL3, E2ROW, tr( "Hold" ), " ms", "envKnob" )
-	maketsknob( m_env2DecKnob, KNOBCOL4, E2ROW, tr( "Decay" ), " ms", "envKnob" )
-	makeknob( m_env2SusKnob, KNOBCOL5, E2ROW, tr( "Sustain" ), "", "envKnob" )
-	maketsknob( m_env2RelKnob, KNOBCOL6, E2ROW, tr( "Release" ), " ms", "envKnob" )
-	makeknob( m_env2SlopeKnob, KNOBCOL7, E2ROW, tr( "Slope" ), "", "envKnob" )
+	makeknob(m_env1SusKnob, KNOBCOL5, E1ROW, tr("Sustain"), "", "envKnob")
+	maketsknob(m_env1RelKnob, KNOBCOL6, E1ROW, tr("Release"), " ms", "envKnob")
+	makeknob(m_env1SlopeKnob, KNOBCOL7, E1ROW, tr("Slope"), "", "envKnob")
+
+	maketsknob(m_env2PreKnob, KNOBCOL1, E2ROW, tr("Pre-delay"), " ms", "envKnob")
+	maketsknob(m_env2AttKnob, KNOBCOL2, E2ROW, tr("Attack"), " ms", "envKnob")
+	maketsknob(m_env2HoldKnob, KNOBCOL3, E2ROW, tr("Hold"), " ms", "envKnob")
+	maketsknob(m_env2DecKnob, KNOBCOL4, E2ROW, tr("Decay"), " ms", "envKnob")
+	makeknob(m_env2SusKnob, KNOBCOL5, E2ROW, tr("Sustain"), "", "envKnob")
+	maketsknob(m_env2RelKnob, KNOBCOL6, E2ROW, tr("Release"), " ms", "envKnob")
+	makeknob(m_env2SlopeKnob, KNOBCOL7, E2ROW, tr("Slope"), "", "envKnob")
 
 	// mod selector
-	PixmapButton * m_mixButton = new PixmapButton( view, nullptr );
+	auto m_mixButton = new PixmapButton(view, nullptr);
 	m_mixButton -> move( 225, 185 );
 	m_mixButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "mix_active" ) );
 	m_mixButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "mix_inactive" ) );
 	m_mixButton->setToolTip(tr("Mix osc 2 with osc 3"));
 
-	PixmapButton * m_amButton = new PixmapButton( view, nullptr );
+	auto m_amButton = new PixmapButton(view, nullptr);
 	m_amButton -> move( 225, 185 + 15 );
 	m_amButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "am_active" ) );
 	m_amButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "am_inactive" ) );
 	m_amButton->setToolTip(tr("Modulate amplitude of osc 3 by osc 2"));
 
-	PixmapButton * m_fmButton = new PixmapButton( view, nullptr );
+	auto m_fmButton = new PixmapButton(view, nullptr);
 	m_fmButton -> move( 225, 185 + 15*2 );
 	m_fmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "fm_active" ) );
 	m_fmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "fm_inactive" ) );
 	m_fmButton->setToolTip(tr("Modulate frequency of osc 3 by osc 2"));
 
-	PixmapButton * m_pmButton = new PixmapButton( view, nullptr );
+	auto m_pmButton = new PixmapButton(view, nullptr);
 	m_pmButton -> move( 225, 185 + 15*3 );
 	m_pmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "pm_active" ) );
 	m_pmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "pm_inactive" ) );
@@ -1762,7 +1756,7 @@ QWidget * MonstroView::setupMatrixView( QWidget * _parent )
 {
 	// matrix view
 
-	QWidget * view = new QWidget( _parent );
+	auto view = new QWidget(_parent);
 	view-> setFixedSize( 250, 250 );
 
 	makeknob( m_vol1env1Knob, MATCOL1, MATROW1, tr( "Modulation amount" ), "", "matrixKnob" )
@@ -1823,6 +1817,10 @@ QWidget * MonstroView::setupMatrixView( QWidget * _parent )
 	return( view );
 }
 
+
+} // namespace gui
+
+
 extern "C"
 {
 
@@ -1836,5 +1834,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 }
 
 
-
-
+} // namespace lmms

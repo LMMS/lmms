@@ -48,6 +48,10 @@
 #include "TrackLabelButton.h"
 
 
+namespace lmms::gui
+{
+
+
 InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerView* tcv ) :
 	TrackView( _it, tcv ),
 	m_window( nullptr ),
@@ -62,14 +66,14 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_tlb->move( 3, 1 );
 	m_tlb->show();
 
-	connect( m_tlb, SIGNAL( toggled( bool ) ),
-			this, SLOT( toggleInstrumentWindow( bool ) ) );
+	connect( m_tlb, SIGNAL(toggled(bool)),
+			this, SLOT(toggleInstrumentWindow(bool)));
 
-	connect( _it, SIGNAL( nameChanged() ),
-			m_tlb, SLOT( update() ) );
+	connect( _it, SIGNAL(nameChanged()),
+			m_tlb, SLOT(update()));
 
-	connect(ConfigManager::inst(), SIGNAL(valueChanged(QString, QString, QString)),
-			this, SLOT(handleConfigChange(QString, QString, QString)));
+	connect(ConfigManager::inst(), SIGNAL(valueChanged(QString,QString,QString)),
+			this, SLOT(handleConfigChange(QString,QString,QString)));
 
 	// creation of widgets for track-settings-widget
 	int widgetWidth;
@@ -124,12 +128,12 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 		m_midiOutputAction = m_midiMenu->addAction( "" );
 		m_midiInputAction->setCheckable( true );
 		m_midiOutputAction->setCheckable( true );
-		connect( m_midiInputAction, SIGNAL( changed() ), this,
-						SLOT( midiInSelected() ) );
-		connect( m_midiOutputAction, SIGNAL( changed() ), this,
-					SLOT( midiOutSelected() ) );
-		connect( &_it->m_midiPort, SIGNAL( modeChanged() ),
-				this, SLOT( midiConfigChanged() ) );
+		connect( m_midiInputAction, SIGNAL(changed()), this,
+						SLOT(midiInSelected()));
+		connect( m_midiOutputAction, SIGNAL(changed()), this,
+					SLOT(midiOutSelected()));
+		connect( &_it->m_midiPort, SIGNAL(modeChanged()),
+				this, SLOT(midiConfigChanged()));
 	}
 
 	m_midiInputAction->setText( tr( "Input" ) );
@@ -141,7 +145,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 		this, SLOT(toggleMidiCCRack()));
 
 	m_activityIndicator = new FadeButton( QApplication::palette().color( QPalette::Active,
-							QPalette::Background),
+							QPalette::Window),
 						QApplication::palette().color( QPalette::Active,
 							QPalette::BrightText ),
 						QApplication::palette().color( QPalette::Active,
@@ -150,14 +154,14 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_activityIndicator->setGeometry(
 					 widgetWidth-2*24-11, 2, 8, 28 );
 	m_activityIndicator->show();
-	connect( m_activityIndicator, SIGNAL( pressed() ),
-				this, SLOT( activityIndicatorPressed() ) );
-	connect( m_activityIndicator, SIGNAL( released() ),
-				this, SLOT( activityIndicatorReleased() ) );
-	connect( _it, SIGNAL( newNote() ),
-			 m_activityIndicator, SLOT( activate() ) );
-	connect( _it, SIGNAL( endNote() ),
-	 		m_activityIndicator, SLOT( noteEnd() ) );
+	connect( m_activityIndicator, SIGNAL(pressed()),
+				this, SLOT(activityIndicatorPressed()));
+	connect( m_activityIndicator, SIGNAL(released()),
+				this, SLOT(activityIndicatorReleased()));
+	connect( _it, SIGNAL(newNote()),
+			 m_activityIndicator, SLOT(activate()));
+	connect( _it, SIGNAL(endNote()),
+	 		m_activityIndicator, SLOT(noteEnd()));
 
 	setModel( _it );
 }
@@ -362,9 +366,9 @@ QMenu * InstrumentTrackView::createMixerMenu(QString title, QString newMixerLabe
 		title = title.arg( channelIndex ).arg( mixerChannel->m_name );
 	}
 
-	QMenu *mixerMenu = new QMenu( title );
+	auto mixerMenu = new QMenu(title);
 
-	mixerMenu->addAction( newMixerLabel, this, SLOT( createMixerLine() ) );
+	mixerMenu->addAction( newMixerLabel, this, SLOT(createMixerLine()));
 	mixerMenu->addSeparator();
 
 	for (int i = 0; i < Engine::mixer()->numChannels(); ++i)
@@ -384,3 +388,5 @@ QMenu * InstrumentTrackView::createMixerMenu(QString title, QString newMixerLabe
 	return mixerMenu;
 }
 
+
+} // namespace lmms::gui

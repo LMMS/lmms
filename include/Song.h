@@ -38,13 +38,23 @@
 #include "VstSyncController.h"
 #include "Groove.h"
 
+namespace lmms
+{
 
 class AutomationTrack;
+class Groove;
 class Keymap;
 class MidiClip;
 class Scale;
+
+namespace gui
+{
+
 class TimeLineWidget;
-class Groove;
+class SongEditor;
+class ControllerRackView;
+
+}
 
 
 const bpm_t MinTempo = 10;
@@ -116,7 +126,7 @@ public:
 		{
 			return m_jumped;
 		}
-		TimeLineWidget * m_timeLine;
+		gui::TimeLineWidget * m_timeLine;
 
 	private:
 		float m_currentFrame;
@@ -364,12 +374,14 @@ public:
 	void setScale(unsigned int index, std::shared_ptr<Scale> newScale);
 	void setKeymap(unsigned int index, std::shared_ptr<Keymap> newMap);
 
+	const std::string& syncKey() const noexcept { return m_vstSyncController.sharedMemoryKey(); }
+
 public slots:
 	void playSong();
 	void record();
 	void playAndRecord();
 	void playPattern();
-	void playMidiClip( const MidiClip * midiClipToPlay, bool loop = true );
+	void playMidiClip( const lmms::MidiClip * midiClipToPlay, bool loop = true );
 	void togglePause();
 	void stop();
 	void setPlayPos( tick_t ticks, PlayModes playMode );
@@ -405,7 +417,7 @@ private slots:
 private:
 	Song();
 	Song( const Song & );
-	virtual ~Song();
+	~Song() override;
 
 
 	inline bar_t currentBar() const
@@ -500,20 +512,19 @@ private:
 
 	AutomatedValueMap m_oldAutomatedValues;
 
-	friend class LmmsCore;
-	friend class SongEditor;
-	friend class mainWindow;
-	friend class ControllerRackView;
+	friend class Engine;
+	friend class gui::SongEditor;
+	friend class gui::ControllerRackView;
 
 signals:
 	void projectLoaded();
 	void playbackStateChanged();
 	void playbackPositionChanged();
 	void lengthChanged( int bars );
-	void tempoChanged( bpm_t newBPM );
+	void tempoChanged( lmms::bpm_t newBPM );
 	void timeSignatureChanged( int oldTicksPerBar, int ticksPerBar );
-	void controllerAdded( Controller * );
-	void controllerRemoved( Controller * );
+	void controllerAdded( lmms::Controller * );
+	void controllerRemoved( lmms::Controller * );
 	void updateSampleTracks();
 	void stopped();
 	void modified();
@@ -522,5 +533,7 @@ signals:
 	void keymapListChanged(int index);
 } ;
 
+
+} // namespace lmms
 
 #endif

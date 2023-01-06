@@ -111,7 +111,10 @@ private:
 	uchar* m_map;
 };
 
-}
+} // namespace PE
+
+namespace lmms
+{
 
 enum class ExecutableType
 {
@@ -121,7 +124,7 @@ enum class ExecutableType
 VstPlugin::VstPlugin( const QString & _plugin ) :
 	m_plugin( PathUtil::toAbsolute(_plugin) ),
 	m_pluginWindowID( 0 ),
-	m_embedMethod( (getGUI() != nullptr)
+	m_embedMethod( (gui::getGUI() != nullptr)
 			? ConfigManager::inst()->vstEmbedMethod()
 			: "headless" ),
 	m_version( 0 ),
@@ -179,8 +182,8 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 
 	setTempo( Engine::getSong()->getTempo() );
 
-	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
-			this, SLOT( setTempo( bpm_t ) ), Qt::DirectConnection );
+	connect( Engine::getSong(), SIGNAL( tempoChanged( lmms::bpm_t ) ),
+			this, SLOT( setTempo( lmms::bpm_t ) ), Qt::DirectConnection );
 	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ),
 				this, SLOT( updateSampleRate() ) );
 
@@ -372,15 +375,12 @@ void VstPlugin::setParameterDump( const QMap<QString, QString> & _pdump )
 {
 	message m( IdVstSetParameterDump );
 	m.addInt( _pdump.size() );
-	for( QMap<QString, QString>::ConstIterator it = _pdump.begin();
-						it != _pdump.end(); ++it )
+	for (const auto& str : _pdump)
 	{
 		const VstParameterDumpItem item =
 		{
-			( *it ).section( ':', 0, 0 ).toInt(),
-			"",
-			LocaleHelper::toFloat((*it).section(':', 2, -1))
-		} ;
+			str.section(':', 0, 0).toInt(), "", LocaleHelper::toFloat(str.section(':', 2, -1))
+		};
 		m.addInt( item.index );
 		m.addString( item.shortLabel );
 		m.addFloat( item.value );
@@ -413,13 +413,13 @@ bool VstPlugin::processMessage( const message & _m )
 			// so this is legal despite MSDN's warning
 			SetWindowLongPtr( (HWND)(intptr_t) m_pluginWindowID,
 					GWLP_HWNDPARENT,
-					(LONG_PTR) getGUI()->mainWindow()->winId() );
+					(LONG_PTR) gui::getGUI()->mainWindow()->winId() );
 #endif
 
 #ifdef LMMS_BUILD_LINUX
 			XSetTransientForHint( QX11Info::display(),
 					m_pluginWindowID,
-					getGUI()->mainWindow()->winId() );
+					gui::getGUI()->mainWindow()->winId() );
 #endif
 		}
 		break;
@@ -502,22 +502,16 @@ QWidget *VstPlugin::editor()
 }
 
 
-void VstPlugin::openPreset( )
+void VstPlugin::openPreset()
 {
-
-	FileDialog ofd( nullptr, tr( "Open Preset" ), "",
-		tr( "Vst Plugin Preset (*.fxp *.fxb)" ) );
-	ofd.setFileMode( FileDialog::ExistingFiles );
-	if( ofd.exec () == QDialog::Accepted &&
-					!ofd.selectedFiles().isEmpty() )
+	gui::FileDialog ofd(nullptr, tr("Open Preset"), "", tr("VST Plugin Preset (*.fxp *.fxb)"));
+	ofd.setFileMode(gui::FileDialog::ExistingFiles);
+	if (ofd.exec() == QDialog::Accepted && !ofd.selectedFiles().isEmpty())
 	{
 		lock();
-		sendMessage( message( IdLoadPresetFile ).
-			addString(
-				QSTR_TO_STDSTR(
-					QDir::toNativeSeparators( ofd.selectedFiles()[0] ) ) )
-			);
-		waitForMessage( IdLoadPresetFile, true );
+		sendMessage(message(IdLoadPresetFile).addString(QSTR_TO_STDSTR(
+			QDir::toNativeSeparators(ofd.selectedFiles()[0]))));
+		waitForMessage(IdLoadPresetFile, true);
 		unlock();
 	}
 }
@@ -580,37 +574,37 @@ void VstPlugin::loadParameterDisplays()
 
 
 
-void VstPlugin::savePreset( )
+void VstPlugin::savePreset()
 {
 	QString presName = currentProgramName().isEmpty() ? tr(": default") : currentProgramName();
 	presName.replace("\"", "'"); // QFileDialog unable to handle double quotes properly
 
-	FileDialog sfd( nullptr, tr( "Save Preset" ), presName.section(": ", 1, 1) + tr(".fxp"),
-		tr( "Vst Plugin Preset (*.fxp *.fxb)" ) );
+	gui::FileDialog sfd(nullptr, tr("Save Preset"), presName.section(": ", 1, 1) + tr(".fxp"),
+		tr("VST Plugin Preset (*.fxp *.fxb)"));
 
-	if( p_name != "" ) // remember last directory
+	if (p_name != "") // remember last directory
 	{
-		sfd.setDirectory( QFileInfo( p_name ).absolutePath() );
+		sfd.setDirectory(QFileInfo(p_name).absolutePath());
 	}
 
-	sfd.setAcceptMode( FileDialog::AcceptSave );
-	sfd.setFileMode( FileDialog::AnyFile );
-	if( sfd.exec () == QDialog::Accepted &&
-				!sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "" )
+	sfd.setAcceptMode(gui::FileDialog::AcceptSave);
+	sfd.setFileMode(gui::FileDialog::AnyFile);
+	if (sfd.exec() == QDialog::Accepted && !sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "")
 	{
 		QString fns = sfd.selectedFiles()[0];
 		p_name = fns;
 
 		if ((fns.toUpper().indexOf(tr(".FXP")) == -1) && (fns.toUpper().indexOf(tr(".FXB")) == -1))
+		{
 			fns = fns + tr(".fxb");
-		else fns = fns.left(fns.length() - 4) + (fns.right( 4 )).toLower();
+		}
+		else
+		{
+			fns = fns.left(fns.length() - 4) + (fns.right(4)).toLower();
+		}
 		lock();
-		sendMessage( message( IdSavePresetFile ).
-			addString(
-				QSTR_TO_STDSTR(
-					QDir::toNativeSeparators( fns ) ) )
-			);
-		waitForMessage( IdSavePresetFile, true );
+		sendMessage(message(IdSavePresetFile).addString(QSTR_TO_STDSTR(QDir::toNativeSeparators(fns))));
+		waitForMessage(IdSavePresetFile, true);
 		unlock();
 	}
 }
@@ -788,7 +782,7 @@ void VstPlugin::createUI( QWidget * parent )
 		{
 			parent->setAttribute(Qt::WA_NativeWindow);
 		}
-		QX11EmbedContainer * embedContainer = new QX11EmbedContainer( parent );
+		auto embedContainer = new QX11EmbedContainer(parent);
 		connect(embedContainer, SIGNAL(clientIsEmbedded()), this, SLOT(handleClientEmbed()));
 		embedContainer->embedClient( m_pluginWindowID );
 		container = embedContainer;
@@ -823,3 +817,6 @@ QString VstPlugin::embedMethod() const
 {
 	return m_embedMethod;
 }
+
+
+} // namespace lmms

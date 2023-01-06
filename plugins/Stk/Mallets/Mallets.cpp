@@ -30,9 +30,9 @@
 #include <QDomElement>
 #include <QMessageBox>
 
-#include "BandedWG.h"
-#include "ModalBar.h"
-#include "TubeBell.h"
+#include <stk/BandedWG.h>
+#include <stk/ModalBar.h>
+#include <stk/TubeBell.h>
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"
@@ -44,12 +44,16 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT malletsstk_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Mallets",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Tuneful things to bang on" ),
@@ -121,13 +125,6 @@ MalletsInstrument::MalletsInstrument( InstrumentTrack * _instrument_track ):
 	m_scalers.append( 16.0 );
 	m_presetsModel.addItem( tr( "Tibetan bowl" ) );
 	m_scalers.append( 7.0 );
-}
-
-
-
-
-MalletsInstrument::~MalletsInstrument()
-{
 }
 
 
@@ -345,7 +342,7 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 
-	MalletsSynth * ps = static_cast<MalletsSynth *>( _n->m_pluginData );
+	auto ps = static_cast<MalletsSynth*>(_n->m_pluginData);
 	ps->setFrequency( freq );
 	p = ps->presetIndex();
 
@@ -377,12 +374,14 @@ void MalletsInstrument::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-PluginView * MalletsInstrument::instantiateView( QWidget * _parent )
+gui::PluginView * MalletsInstrument::instantiateView( QWidget * _parent )
 {
-	return( new MalletsInstrumentView( this, _parent ) );
+	return( new gui::MalletsInstrumentView( this, _parent ) );
 }
 
 
+namespace gui
+{
 
 
 MalletsInstrumentView::MalletsInstrumentView( MalletsInstrument * _instrument,
@@ -429,12 +428,6 @@ MalletsInstrumentView::MalletsInstrumentView( MalletsInstrument * _instrument,
 
 
 
-MalletsInstrumentView::~MalletsInstrumentView()
-{
-}
-
-
-
 void MalletsInstrumentView::setWidgetBackground( QWidget * _widget, const QString & _pic )
 {
 	_widget->setAutoFillBackground( true );
@@ -449,7 +442,7 @@ void MalletsInstrumentView::setWidgetBackground( QWidget * _widget, const QStrin
 
 QWidget * MalletsInstrumentView::setupModalBarControls( QWidget * _parent )
 {
-	QWidget * widget = new QWidget( _parent );
+	auto widget = new QWidget(_parent);
 	widget->setFixedSize( 250, 250 );
 		
 	m_hardnessKnob = new Knob( knobVintage_32, widget );
@@ -485,7 +478,7 @@ QWidget * MalletsInstrumentView::setupModalBarControls( QWidget * _parent )
 
 QWidget * MalletsInstrumentView::setupTubeBellControls( QWidget * _parent )
 {
-	QWidget * widget = new QWidget( _parent );
+	auto widget = new QWidget(_parent);
 	widget->setFixedSize( 250, 250 );
 	
 	m_modulatorKnob = new Knob( knobVintage_32, widget );
@@ -522,7 +515,7 @@ QWidget * MalletsInstrumentView::setupTubeBellControls( QWidget * _parent )
 QWidget * MalletsInstrumentView::setupBandedWGControls( QWidget * _parent )
 {
 	// BandedWG
-	QWidget * widget = new QWidget( _parent );
+	auto widget = new QWidget(_parent);
 	widget->setFixedSize( 250, 250 );
 	
 /*	m_strikeLED = new LedCheckBox( tr( "Bowed" ), widget );
@@ -556,7 +549,7 @@ QWidget * MalletsInstrumentView::setupBandedWGControls( QWidget * _parent )
 
 void MalletsInstrumentView::modelChanged()
 {
-	MalletsInstrument * inst = castModel<MalletsInstrument>();
+	auto inst = castModel<MalletsInstrument>();
 	m_hardnessKnob->setModel( &inst->m_hardnessModel );
 	m_positionKnob->setModel( &inst->m_positionModel );
 	m_vibratoGainKnob->setModel( &inst->m_vibratoGainModel );
@@ -581,7 +574,7 @@ void MalletsInstrumentView::modelChanged()
 
 void MalletsInstrumentView::changePreset()
 {
-	MalletsInstrument * inst = castModel<MalletsInstrument>();
+	auto inst = castModel<MalletsInstrument>();
 	int _preset = inst->m_presetsModel.value();
 
 	if( _preset < 9 )
@@ -604,6 +597,8 @@ void MalletsInstrumentView::changePreset()
 	}
 }
 
+
+} // namespace gui
 
 
 // ModalBar
@@ -770,6 +765,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * m, void * )
 }
 
 
-
-
-
+} // namespace lmms

@@ -37,6 +37,9 @@
 #include "stdio.h"
 
 
+namespace lmms
+{
+
 HydrogenSwing::HydrogenSwing(QObject * _parent) :
 	Groove(_parent)
 {
@@ -135,8 +138,11 @@ int HydrogenSwing::isInTick(TimePos * curStart, const fpp_t frames, const f_cnt_
 
 QWidget * HydrogenSwing::instantiateView(QWidget * parent)
 {
-	return new HydrogenSwingView(this, parent);
+	return new gui::HydrogenSwingView(this, parent);
 }
+
+namespace gui
+{
 
 // VIEW //
 
@@ -172,3 +178,7 @@ void HydrogenSwingView::modelChanged()
 {
 	m_swing->setAmount(m_sliderModel->value());
 }
+
+} // namespace gui
+
+} // namespace lmms

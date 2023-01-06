@@ -33,6 +33,10 @@
 #include "MainWindow.h"
 #include "lmms_constants.h"
 
+namespace lmms
+{
+
+
 EqAnalyser::EqAnalyser() :
 	m_framesFilledUp ( 0 ),
 	m_energy ( 0 ),
@@ -176,6 +180,8 @@ void EqAnalyser::clear()
 
 
 
+namespace gui
+{
 
 EqSpectrumView::EqSpectrumView(EqAnalyser *b, QWidget *_parent) :
 	QWidget( _parent ),
@@ -187,7 +193,7 @@ EqSpectrumView::EqSpectrumView(EqAnalyser *b, QWidget *_parent) :
 	setAttribute( Qt::WA_TranslucentBackground, true );
 	m_skipBands = MAX_BANDS * 0.5;
 	float totalLength = log10( 20000 );
-	m_pixelsPerUnitWidth = width( ) / totalLength ;
+	m_pixelsPerUnitWidth = width() / totalLength ;
 	m_scale = 1.5;
 	m_color = QColor( 255, 255, 255, 255 );
 	for ( int i = 0 ; i < MAX_BANDS ; i++ )
@@ -298,3 +304,8 @@ void EqSpectrumView::periodicalUpdate()
 	m_analyser->setActive( isVisible() );
 	update();
 }
+
+
+} // namespace gui
+
+} // namespace lmms

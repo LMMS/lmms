@@ -27,6 +27,10 @@
 
 #include "LcdSpinBox.h"
 
+namespace lmms::gui
+{
+
+
 class TrackView;
 
 
@@ -37,7 +41,7 @@ public:
 	MixerLineLcdSpinBox(int numDigits, QWidget * parent, const QString& name, TrackView * tv = nullptr) :
 		LcdSpinBox(numDigits, parent, name), m_tv(tv)
 	{}
-	virtual ~MixerLineLcdSpinBox() {}
+	~MixerLineLcdSpinBox() override = default;
 
 	void setTrackView(TrackView * tv);
 
@@ -48,5 +52,8 @@ protected:
 private:
 	TrackView * m_tv;
 };
+
+
+} // namespace lmms::gui
 
 #endif

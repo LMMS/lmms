@@ -43,6 +43,9 @@
 #include "Song.h"
 
 
+namespace lmms
+{
+
 /*! \brief Create a new (empty) track object
  *
  *  The track object is the whole track, linking its contents, its
@@ -106,14 +109,14 @@ Track * Track::create( TrackTypes tt, TrackContainer * tc )
 
 	switch( tt )
 	{
-		case InstrumentTrack: t = new ::InstrumentTrack( tc ); break;
-		case PatternTrack: t = new ::PatternTrack( tc ); break;
-		case SampleTrack: t = new ::SampleTrack( tc ); break;
+		case InstrumentTrack: t = new class InstrumentTrack( tc ); break;
+		case PatternTrack: t = new class PatternTrack( tc ); break;
+		case SampleTrack: t = new class SampleTrack( tc ); break;
 //		case EVENT_TRACK:
 //		case VIDEO_TRACK:
-		case AutomationTrack: t = new ::AutomationTrack( tc ); break;
+		case AutomationTrack: t = new class AutomationTrack( tc ); break;
 		case HiddenAutomationTrack:
-						t = new ::AutomationTrack( tc, true ); break;
+						t = new class AutomationTrack( tc, true ); break;
 		default: break;
 	}
 
@@ -223,10 +226,9 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 	}
 
 	// now save settings of all Clip's
-	for( clipVector::const_iterator it = m_clips.begin();
-				it != m_clips.end(); ++it )
+	for (const auto& clip : m_clips)
 	{
-		( *it )->saveState( doc, element );
+		clip->saveState(doc, element);
 	}
 }
 
@@ -509,13 +511,11 @@ void Track::insertBar( const TimePos & pos )
 {
 	// we'll increase the position of every Clip, positioned behind pos, by
 	// one bar
-	for( clipVector::iterator it = m_clips.begin();
-				it != m_clips.end(); ++it )
+	for (const auto& clip : m_clips)
 	{
-		if( ( *it )->startPosition() >= pos )
+		if (clip->startPosition() >= pos)
 		{
-			( *it )->movePosition( (*it)->startPosition() +
-						TimePos::ticksPerBar() );
+			clip->movePosition(clip->startPosition() + TimePos::ticksPerBar());
 		}
 	}
 }
@@ -531,11 +531,11 @@ void Track::removeBar( const TimePos & pos )
 {
 	// we'll decrease the position of every Clip, positioned behind pos, by
 	// one bar
-	for( clipVector::iterator it = m_clips.begin(); it != m_clips.end(); ++it )
+	for (const auto& clip : m_clips)
 	{
-		if( ( *it )->startPosition() >= pos )
+		if (clip->startPosition() >= pos)
 		{
-			(*it)->movePosition((*it)->startPosition() - TimePos::ticksPerBar());
+			clip->movePosition(clip->startPosition() - TimePos::ticksPerBar());
 		}
 	}
 }
@@ -553,15 +553,14 @@ bar_t Track::length() const
 {
 	// find last end-position
 	tick_t last = 0;
-	for( clipVector::const_iterator it = m_clips.begin(); it != m_clips.end(); ++it )
+	for (const auto& clip : m_clips)
 	{
-		if( Engine::getSong()->isExporting() &&
-				( *it )->isMuted() )
+		if (Engine::getSong()->isExporting() && clip->isMuted())
 		{
 			continue;
 		}
 
-		const tick_t cur = ( *it )->endPosition();
+		const tick_t cur = clip->endPosition();
 		if( cur > last )
 		{
 			last = cur;
@@ -584,12 +583,11 @@ void Track::toggleSolo()
 	const TrackContainer::TrackList & tl = m_trackContainer->tracks();
 
 	bool soloBefore = false;
-	for( TrackContainer::TrackList::const_iterator it = tl.begin();
-							it != tl.end(); ++it )
+	for (const auto& track : tl)
 	{
-		if( *it != this )
+		if (track != this)
 		{
-			if( ( *it )->m_soloModel.value() )
+			if (track->m_soloModel.value())
 			{
 				soloBefore = true;
 				break;
@@ -601,37 +599,36 @@ void Track::toggleSolo()
 	// Should we use the new behavior of solo or the older/legacy one?
 	const bool soloLegacyBehavior = ConfigManager::inst()->value("app", "sololegacybehavior", "0").toInt();
 
-	for( TrackContainer::TrackList::const_iterator it = tl.begin();
-							it != tl.end(); ++it )
+	for (const auto& track : tl)
 	{
-		if( solo )
+		if (solo)
 		{
 			// save mute-state in case no track was solo before
-			if( !soloBefore )
+			if (!soloBefore)
 			{
-				( *it )->m_mutedBeforeSolo = ( *it )->isMuted();
+				track->m_mutedBeforeSolo = track->isMuted();
 			}
 			// Don't mute AutomationTracks (keep their original state) unless we are on the sololegacybehavior mode
-			if( *it == this )
+			if (track == this)
 			{
-				( *it )->setMuted( false );
+				track->setMuted(false);
 			}
-			else if( soloLegacyBehavior || ( *it )->type() != AutomationTrack )
+			else if (soloLegacyBehavior || track->type() != AutomationTrack)
 			{
-				( *it )->setMuted( true );
+				track->setMuted(true);
 			}
-			if( *it != this )
+			if (track != this)
 			{
-				( *it )->m_soloModel.setValue( false );
+				track->m_soloModel.setValue(false);
 			}
 		}
-		else if( !soloBefore )
+		else if (!soloBefore)
 		{
 			// Unless we are on the sololegacybehavior mode, only restores the
 			// mute state if the track isn't an Automation Track
-			if( soloLegacyBehavior || ( *it )->type() != AutomationTrack )
+			if (soloLegacyBehavior || track->type() != AutomationTrack)
 			{
-				( *it )->setMuted( ( *it )->m_mutedBeforeSolo );
+				track->setMuted(track->m_mutedBeforeSolo);
 			}
 		}
 	}
@@ -656,3 +653,4 @@ BoolModel *Track::getMutedModel()
 	return &m_mutedModel;
 }
 
+} // namespace lmms

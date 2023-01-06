@@ -37,6 +37,9 @@
 
 #include "lmmsversion.h"
 
+namespace lmms
+{
+
 
 // Vector with all the upgrade methods
 const std::vector<ConfigManager::UpgradeMethod> ConfigManager::UPGRADE_METHODS = {
@@ -336,13 +339,11 @@ const QString & ConfigManager::value(const QString & cls,
 {
 	if(m_settings.contains(cls))
 	{
-		for(stringPairVector::const_iterator it =
-						m_settings[cls].begin();
-					it != m_settings[cls].end(); ++it)
+		for (const auto& setting : m_settings[cls])
 		{
-			if((*it).first == attribute)
+			if (setting.first == attribute)
 			{
-				return (*it).second ;
+				return setting.second;
 			}
 		}
 	}
@@ -514,10 +515,10 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 		#endif
 			setBackgroundPicFile(value("paths", "backgroundtheme"));
 		}
-		else if(getGUI() != nullptr)
+		else if (gui::getGUI() != nullptr)
 		{
-			QMessageBox::warning(nullptr, MainWindow::tr("Configuration file"),
-									MainWindow::tr("Error while parsing configuration file at line %1:%2: %3").
+			QMessageBox::warning(nullptr, gui::MainWindow::tr("Configuration file"),
+									gui::MainWindow::tr("Error while parsing configuration file at line %1:%2: %3").
 													arg(errorLine).
 													arg(errorCol).
 													arg(errorString));
@@ -563,7 +564,7 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 		}
 #endif
 	}
-#endif
+#endif // LMMS_HAVE_STK
 
 	upgrade();
 
@@ -606,25 +607,22 @@ void ConfigManager::saveConfigFile()
 	lmms_config.setAttribute("configversion", m_configVersion);
 	doc.appendChild(lmms_config);
 
-	for(settingsMap::iterator it = m_settings.begin();
-						it != m_settings.end(); ++it)
+	for (auto it = m_settings.begin(); it != m_settings.end(); ++it)
 	{
 		QDomElement n = doc.createElement(it.key());
-		for(stringPairVector::iterator it2 = (*it).begin();
-						it2 != (*it).end(); ++it2)
+		for (const auto& [first, second] : *it)
 		{
-			n.setAttribute((*it2).first, (*it2).second);
+			n.setAttribute(first, second);
 		}
 		lmms_config.appendChild(n);
 	}
 
 	QDomElement recent_files = doc.createElement("recentfiles");
 
-	for(QStringList::iterator it = m_recentlyOpenedProjects.begin();
-				it != m_recentlyOpenedProjects.end(); ++it)
+	for (const auto& recentlyOpenedProject : m_recentlyOpenedProjects)
 	{
 		QDomElement n = doc.createElement("file");
-		n.setAttribute("path", *it);
+		n.setAttribute("path", recentlyOpenedProject);
 		recent_files.appendChild(n);
 	}
 	lmms_config.appendChild(recent_files);
@@ -634,6 +632,8 @@ void ConfigManager::saveConfigFile()
 	QFile outfile(m_lmmsRcFile);
 	if(!outfile.open(QIODevice::WriteOnly | QIODevice::Truncate))
 	{
+		using gui::MainWindow;
+
 		QString title, message;
 		title = MainWindow::tr("Could not open file");
 		message = MainWindow::tr("Could not open file %1 "
@@ -643,7 +643,7 @@ void ConfigManager::saveConfigFile()
 					"the directory containing the "
 					"file and try again!"
 						).arg(m_lmmsRcFile);
-		if(getGUI() != nullptr)
+		if (gui::getGUI() != nullptr)
 		{
 			QMessageBox::critical(nullptr, title, message,
 						QMessageBox::Ok,
@@ -734,3 +734,6 @@ unsigned int ConfigManager::legacyConfigVersion()
 		return 2;
 	}
 }
+
+
+} // namespace lmms

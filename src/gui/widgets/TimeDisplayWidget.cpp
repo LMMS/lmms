@@ -31,6 +31,8 @@
 #include "Song.h"
 
 
+namespace lmms::gui
+{
 
 TimeDisplayWidget::TimeDisplayWidget() :
 	QWidget(),
@@ -53,8 +55,8 @@ TimeDisplayWidget::TimeDisplayWidget() :
 	// update labels of LCD spinboxes
 	setDisplayMode( m_displayMode );
 
-	connect( getGUI()->mainWindow(), SIGNAL( periodicUpdate() ),
-					this, SLOT( updateTime() ) );
+	connect( getGUI()->mainWindow(), SIGNAL(periodicUpdate()),
+					this, SLOT(updateTime()));
 }
 
 void TimeDisplayWidget::setDisplayMode( DisplayMode displayMode )
@@ -127,3 +129,5 @@ void TimeDisplayWidget::mousePressEvent( QMouseEvent* mouseEvent )
 		}
 	}
 }
+
+} // namespace lmms::gui

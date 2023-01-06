@@ -42,12 +42,16 @@
 struct pollfd;
 
 
+namespace lmms
+{
+
+
 class MidiAlsaSeq : public QThread, public MidiClient
 {
 	Q_OBJECT
 public:
 	MidiAlsaSeq();
-	virtual ~MidiAlsaSeq();
+	~MidiAlsaSeq() override;
 
 	static QString probeDevice();
 
@@ -66,7 +70,7 @@ public:
 
 
 
-	virtual void processOutEvent( const MidiEvent & _me,
+	void processOutEvent( const MidiEvent & _me,
 						const TimePos & _time,
 						const MidiPort * _port ) override;
 
@@ -91,20 +95,20 @@ public:
 	QString sourcePortName( const MidiEvent & ) const override;
 
 	// (un)subscribe given MidiPort to/from destination-port
-	virtual void subscribeReadablePort( MidiPort * _port,
+	void subscribeReadablePort( MidiPort * _port,
 						const QString & _dest,
 						bool _subscribe = true ) override;
-	virtual void subscribeWritablePort( MidiPort * _port,
+	void subscribeWritablePort( MidiPort * _port,
 						const QString & _dest,
 						bool _subscribe = true ) override;
-	virtual void connectRPChanged( QObject * _receiver,
+	void connectRPChanged( QObject * _receiver,
 							const char * _member ) override
 	{
 		connect( this, SIGNAL( readablePortsChanged() ),
 							_receiver, _member );
 	}
 
-	virtual void connectWPChanged( QObject * _receiver,
+	void connectWPChanged( QObject * _receiver,
 							const char * _member ) override
 	{
 		connect( this, SIGNAL( writablePortsChanged() ),
@@ -113,7 +117,7 @@ public:
 
 
 private slots:
-	void changeQueueTempo( bpm_t _bpm );
+	void changeQueueTempo( lmms::bpm_t _bpm );
 	void updatePortList();
 
 
@@ -149,7 +153,10 @@ signals:
 
 } ;
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_HAVE_ALSA
 
 #endif
 

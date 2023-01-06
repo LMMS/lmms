@@ -9,6 +9,9 @@
 #include "MidiClip.h"
 #include "Song.h"
 
+namespace lmms
+{
+
 Groove::Groove(QObject *parent) :
 	QObject(parent)
 {
@@ -64,3 +67,5 @@ QWidget * Groove::instantiateView(QWidget * parent)
 {
 	return new QLabel("");
 }
+
+} // namespace lmms

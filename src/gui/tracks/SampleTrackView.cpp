@@ -42,6 +42,10 @@
 #include "TrackLabelButton.h"
 
 
+namespace lmms::gui
+{
+
+
 SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	TrackView( _t, tcv )
 {
@@ -49,7 +53,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 
 	m_tlb = new TrackLabelButton(this, getTrackSettingsWidget());
 	m_tlb->setCheckable(true);
-	connect(m_tlb, SIGNAL(clicked( bool )),
+	connect(m_tlb, SIGNAL(clicked(bool)),
 			this, SLOT(showEffects()));
 	m_tlb->setIcon(embed::getIconPixmap("sample_track"));
 	m_tlb->move(3, 1);
@@ -130,7 +134,7 @@ QMenu * SampleTrackView::createMixerMenu(QString title, QString newMixerLabel)
 		title = title.arg(channelIndex).arg(mixerChannel->m_name);
 	}
 
-	QMenu *mixerMenu = new QMenu(title);
+	auto mixerMenu = new QMenu(title);
 
 	mixerMenu->addAction(newMixerLabel, this, SLOT(createMixerLine()));
 	mixerMenu->addSeparator();
@@ -164,7 +168,7 @@ void SampleTrackView::showEffects()
 
 void SampleTrackView::modelChanged()
 {
-	SampleTrack * st = castModel<SampleTrack>();
+	auto st = castModel<SampleTrack>();
 	m_volumeKnob->setModel(&st->m_volumeModel);
 
 	TrackView::modelChanged();
@@ -202,7 +206,7 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 							* TimePos::ticksPerBar()) + trackContainerView()->currentPosition()
 						).quantize(1.0);
 
-		SampleClip * sClip = static_cast<SampleClip*>(getTrack()->createClip(clipPos));
+		auto sClip = static_cast<SampleClip*>(getTrack()->createClip(clipPos));
 		if (sClip) { sClip->setSampleFile(value); }
 	}
 }
@@ -232,3 +236,6 @@ void SampleTrackView::assignMixerLine(int channelIndex)
 
 	getGUI()->mixerView()->setCurrentMixerLine(channelIndex);
 }
+
+
+} // namespace lmms::gui

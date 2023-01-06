@@ -61,8 +61,10 @@
 
 #include "BufferManager.h"
 
-typedef LocklessList<PlayHandle *>::Element LocklessListElement;
+namespace lmms
+{
 
+using LocklessListElement = LocklessList<PlayHandle*>::Element;
 
 static thread_local bool s_renderingThread;
 
@@ -90,7 +92,9 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	m_clearSignal( false ),
 	m_changesSignal( false ),
 	m_changes( 0 ),
+#if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
 	m_doChangesMutex( QMutex::Recursive ),
+#endif
 	m_waitingForWrite( false )
 {
 	for( int i = 0; i < 2; ++i )
@@ -144,7 +148,7 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 
 	for( int i = 0; i < m_numWorkers+1; ++i )
 	{
-		AudioEngineWorkerThread * wt = new AudioEngineWorkerThread( this );
+		auto wt = new AudioEngineWorkerThread(this);
 		if( i < m_numWorkers )
 		{
 			wt->start( QThread::TimeCriticalPriority );
@@ -184,9 +188,9 @@ AudioEngine::~AudioEngine()
 	MemoryHelper::alignedFree(m_outputBufferRead);
 	MemoryHelper::alignedFree(m_outputBufferWrite);
 
-	for( int i = 0; i < 2; ++i )
+	for (const auto& input : m_inputBuffer)
 	{
-		delete[] m_inputBuffer[i];
+		delete[] input;
 	}
 }
 
@@ -311,7 +315,7 @@ void AudioEngine::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
 	if( frames + _frames > size )
 	{
 		size = qMax( size * 2, frames + _frames );
-		sampleFrame * ab = new sampleFrame[ size ];
+		auto ab = new sampleFrame[size];
 		memcpy( ab, buf, frames * sizeof( sampleFrame ) );
 		delete [] buf;
 
@@ -1109,7 +1113,7 @@ MidiClient * AudioEngine::tryMidiClients()
 #ifdef LMMS_HAVE_ALSA
 	if( client_name == MidiAlsaSeq::name() || client_name == "" )
 	{
-		MidiAlsaSeq * malsas = new MidiAlsaSeq;
+		auto malsas = new MidiAlsaSeq;
 		if( malsas->isRunning() )
 		{
 			m_midiClientName = MidiAlsaSeq::name();
@@ -1120,7 +1124,7 @@ MidiClient * AudioEngine::tryMidiClients()
 
 	if( client_name == MidiAlsaRaw::name() || client_name == "" )
 	{
-		MidiAlsaRaw * malsar = new MidiAlsaRaw;
+		auto malsar = new MidiAlsaRaw;
 		if( malsar->isRunning() )
 		{
 			m_midiClientName = MidiAlsaRaw::name();
@@ -1133,7 +1137,7 @@ MidiClient * AudioEngine::tryMidiClients()
 #ifdef LMMS_HAVE_JACK
 	if( client_name == MidiJack::name() || client_name == "" )
 	{
-		MidiJack * mjack = new MidiJack;
+		auto mjack = new MidiJack;
 		if( mjack->isRunning() )
 		{
 			m_midiClientName = MidiJack::name();
@@ -1146,7 +1150,7 @@ MidiClient * AudioEngine::tryMidiClients()
 #ifdef LMMS_HAVE_OSS
 	if( client_name == MidiOss::name() || client_name == "" )
 	{
-		MidiOss * moss = new MidiOss;
+		auto moss = new MidiOss;
 		if( moss->isRunning() )
 		{
 			m_midiClientName = MidiOss::name();
@@ -1257,7 +1261,7 @@ void AudioEngine::fifoWriter::run()
 	const fpp_t frames = m_audioEngine->framesPerPeriod();
 	while( m_writing )
 	{
-		surroundSampleFrame * buffer = new surroundSampleFrame[frames];
+		auto buffer = new surroundSampleFrame[frames];
 		const surroundSampleFrame * b = m_audioEngine->renderNextBuffer();
 		memcpy( buffer, b, frames * sizeof( surroundSampleFrame ) );
 		write( buffer );
@@ -1284,3 +1288,5 @@ void AudioEngine::fifoWriter::write( surroundSampleFrame * buffer )
 	m_audioEngine->m_waitingForWrite = false;
 	m_audioEngine->m_doChangesMutex.unlock();
 }
+
+} // namespace lmms

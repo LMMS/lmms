@@ -29,8 +29,9 @@
 #include "Clipboard.h"
 
 
-namespace Clipboard
+namespace lmms::Clipboard
 {
+
 	const QMimeData * getMimeData()
 	{
 		return QApplication::clipboard()->mimeData( QClipboard::Clipboard );
@@ -49,7 +50,7 @@ namespace Clipboard
 
 	void copyString( const QString & str, MimeType mT )
 	{
-		QMimeData *content = new QMimeData;
+		auto content = new QMimeData;
 
 		content->setData( mimeType( mT ), str.toUtf8() );
 		QApplication::clipboard()->setMimeData( content, QClipboard::Clipboard );
@@ -70,7 +71,7 @@ namespace Clipboard
 	{
 		QString finalString = key + ":" + value;
 
-		QMimeData *content = new QMimeData;
+		auto content = new QMimeData;
 		content->setData( mimeType( MimeType::StringPair ), finalString.toUtf8() );
 		QApplication::clipboard()->setMimeData( content, QClipboard::Clipboard );
 	}
@@ -90,4 +91,6 @@ namespace Clipboard
 	{
 		return( QString::fromUtf8( mimeData->data( mimeType( MimeType::StringPair ) ) ).section( ':', 1, -1 ) );
 	}
-}
+
+
+} // namespace lmms::Clipboard

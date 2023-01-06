@@ -36,6 +36,9 @@
 #include "embed.h"
 #include "BufferManager.h"
 
+namespace lmms::gui
+{
+
 
 Oscilloscope::Oscilloscope( QWidget * _p ) :
 	QWidget( _p ),
@@ -88,20 +91,20 @@ void Oscilloscope::setActive( bool _active )
 	if( m_active )
 	{
 		connect( getGUI()->mainWindow(),
-					SIGNAL( periodicUpdate() ),
-					this, SLOT( update() ) );
+					SIGNAL(periodicUpdate()),
+					this, SLOT(update()));
 		connect( Engine::audioEngine(),
-			SIGNAL( nextAudioBuffer( const surroundSampleFrame* ) ),
-			this, SLOT( updateAudioBuffer( const surroundSampleFrame* ) ) );
+			SIGNAL(nextAudioBuffer(const lmms::surroundSampleFrame*)),
+			this, SLOT(updateAudioBuffer(const lmms::surroundSampleFrame*)) );
 	}
 	else
 	{
 		disconnect( getGUI()->mainWindow(),
-					SIGNAL( periodicUpdate() ),
-					this, SLOT( update() ) );
+					SIGNAL(periodicUpdate()),
+					this, SLOT(update()));
 		disconnect( Engine::audioEngine(),
-			SIGNAL( nextAudioBuffer( const surroundSampleFrame* ) ),
-			this, SLOT( updateAudioBuffer( const surroundSampleFrame* ) ) );
+			SIGNAL( nextAudioBuffer( const lmms::surroundSampleFrame* ) ),
+			this, SLOT( updateAudioBuffer( const lmms::surroundSampleFrame* ) ) );
 		// we have to update (remove last waves),
 		// because timer doesn't do that anymore
 		update();
@@ -204,4 +207,4 @@ QColor const & Oscilloscope::determineLineColor(float level) const
 }
 
 
-
+} // namespace lmms::gui

@@ -41,13 +41,16 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
 
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT ladspabrowser_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"LADSPA Plugin Browser",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"List installed LADSPA plugins" ),
@@ -79,13 +82,6 @@ LadspaBrowser::LadspaBrowser() :
 
 
 
-LadspaBrowser::~LadspaBrowser()
-{
-}
-
-
-
-
 QString LadspaBrowser::nodeName() const
 {
 	return ladspabrowser_plugin_descriptor.name;
@@ -93,13 +89,14 @@ QString LadspaBrowser::nodeName() const
 
 
 
-
+namespace gui
+{
 
 
 LadspaBrowserView::LadspaBrowserView( ToolPlugin * _tool ) :
 	ToolPluginView( _tool  )
 {
-	QHBoxLayout * hlayout = new QHBoxLayout( this );
+	auto hlayout = new QHBoxLayout(this);
 	hlayout->setSpacing( 0 );
 	hlayout->setMargin( 0 );
 
@@ -107,7 +104,7 @@ LadspaBrowserView::LadspaBrowserView( ToolPlugin * _tool ) :
 	m_tabBar->setExclusive( true );
 	m_tabBar->setFixedWidth( 72 );
 
-	QWidget * ws = new QWidget( this );
+	auto ws = new QWidget(this);
 	ws->setFixedSize( 500, 480 );
 
 	QWidget * available = createTab( ws, tr( "Available Effects" ), VALID );
@@ -162,24 +159,17 @@ LadspaBrowserView::LadspaBrowserView( ToolPlugin * _tool ) :
 
 
 
-LadspaBrowserView::~LadspaBrowserView()
-{
-}
-
-
-
-
 QWidget * LadspaBrowserView::createTab( QWidget * _parent, const QString & _txt,
 							LadspaPluginType _type )
 {
-	QWidget * tab = new QWidget( _parent );
+	auto tab = new QWidget(_parent);
 	tab->setFixedSize( 500, 400 );
-	QVBoxLayout * layout = new QVBoxLayout( tab );
+	auto layout = new QVBoxLayout(tab);
 	layout->setSpacing( 0 );
 	layout->setMargin( 0 );
 
 	const QString type = "<b>" + tr( "Type:" ) + "</b> ";
-	QLabel * title = new QLabel( type + _txt, tab );
+	auto title = new QLabel(type + _txt, tab);
 	QFont f = title->font();
 	f.setBold( true );
 	title->setFont( pointSize<12>( f ) );
@@ -188,9 +178,9 @@ QWidget * LadspaBrowserView::createTab( QWidget * _parent, const QString & _txt,
 	layout->addWidget( title );
 	layout->addSpacing( 10 );
 
-	LadspaDescription * description = new LadspaDescription( tab, _type );
-	connect( description, SIGNAL( doubleClicked( const ladspa_key_t & ) ),
-				SLOT( showPorts( const ladspa_key_t & ) ) );
+	auto description = new LadspaDescription(tab, _type);
+	connect( description, SIGNAL( doubleClicked( const ::lmms::ladspa_key_t & ) ),
+				SLOT( showPorts( const ::lmms::ladspa_key_t & ) ) );
 	layout->addWidget( description, 1 );
 
 	return tab;
@@ -199,13 +189,13 @@ QWidget * LadspaBrowserView::createTab( QWidget * _parent, const QString & _txt,
 
 
 
-void LadspaBrowserView::showPorts( const ladspa_key_t & _key )
+void LadspaBrowserView::showPorts( const ::lmms::ladspa_key_t & _key )
 {
 	LadspaPortDialog ports( _key );
 	ports.exec();
 }
 
 
+} // namespace gui
 
-
-
+} // namespace lmms

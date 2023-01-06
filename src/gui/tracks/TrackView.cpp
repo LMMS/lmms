@@ -45,6 +45,9 @@
 #include "ClipView.h"
 
 
+namespace lmms::gui
+{
+
 /*! \brief Create a new track View.
  *
  *  The track View is handles the actual display of the track, including
@@ -71,7 +74,7 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 
 	m_trackSettingsWidget.setAutoFillBackground( true );
 
-	QHBoxLayout * layout = new QHBoxLayout( this );
+	auto layout = new QHBoxLayout(this);
 	layout->setMargin( 0 );
 	layout->setSpacing( 0 );
 	layout->addWidget( &m_trackOperationsWidget );
@@ -85,25 +88,25 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 	setAttribute( Qt::WA_DeleteOnClose, true );
 
 
-	connect( m_track, SIGNAL( destroyedTrack() ), this, SLOT( close() ) );
+	connect( m_track, SIGNAL(destroyedTrack()), this, SLOT(close()));
 	connect( m_track,
-		SIGNAL( clipAdded( Clip * ) ),
-			this, SLOT( createClipView( Clip * ) ),
+		SIGNAL(clipAdded(lmms::Clip*)),
+			this, SLOT(createClipView(lmms::Clip*)),
 			Qt::QueuedConnection );
 
-	connect( &m_track->m_mutedModel, SIGNAL( dataChanged() ),
-			&m_trackContentWidget, SLOT( update() ) );
+	connect( &m_track->m_mutedModel, SIGNAL(dataChanged()),
+			&m_trackContentWidget, SLOT(update()));
 
 	connect(&m_track->m_mutedModel, SIGNAL(dataChanged()),
 			this, SLOT(muteChanged()));
 
-	connect( &m_track->m_soloModel, SIGNAL( dataChanged() ),
-			m_track, SLOT( toggleSolo() ), Qt::DirectConnection );
+	connect( &m_track->m_soloModel, SIGNAL(dataChanged()),
+			m_track, SLOT(toggleSolo()), Qt::DirectConnection );
 
 	// create views for already existing clips
-	for( Track::clipVector::iterator it = m_track->m_clips.begin(); it != m_track->m_clips.end(); ++it )
+	for (const auto& clip : m_track->m_clips)
 	{
-		createClipView( *it );
+		createClipView(clip);
 	}
 
 	m_trackContainerView->addTrackView( this );
@@ -112,12 +115,6 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 
 
 
-/*! \brief Destroy this track View.
- *
- */
-TrackView::~TrackView()
-{
-}
 
 
 
@@ -193,7 +190,7 @@ void TrackView::modelChanged()
 {
 	m_track = castModel<Track>();
 	Q_ASSERT( m_track != nullptr );
-	connect( m_track, SIGNAL( destroyedTrack() ), this, SLOT( close() ) );
+	connect( m_track, SIGNAL(destroyedTrack()), this, SLOT(close()));
 	m_trackOperationsWidget.m_muteBtn->setModel( &m_track->m_mutedModel );
 	m_trackOperationsWidget.m_soloBtn->setModel( &m_track->m_soloModel );
 	ModelView::modelChanged();
@@ -446,3 +443,6 @@ void TrackView::setIndicatorMute(FadeButton* indicator, bool muted)
 	QPalette::ColorRole role = muted ? QPalette::Highlight : QPalette::BrightText;
 	indicator->setActiveColor(QApplication::palette().color(QPalette::Active, role));
 }
+
+
+} // namespace lmms::gui

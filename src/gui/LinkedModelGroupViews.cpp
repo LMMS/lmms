@@ -29,6 +29,9 @@
 #include "ControlLayout.h"
 #include "LinkedModelGroups.h"
 
+namespace lmms::gui
+{
+
 
 /*
 	LinkedModelGroupViewBase
@@ -48,11 +51,6 @@ LinkedModelGroupView::LinkedModelGroupView(QWidget* parent,
 	// quickly play notes on the virtual keyboard.
 	setFocusPolicy( Qt::StrongFocus );
 }
-
-
-
-
-LinkedModelGroupView::~LinkedModelGroupView() {}
 
 
 
@@ -88,13 +86,13 @@ void LinkedModelGroupView::addControl(Control* ctrl, const std::string& id,
 {
 	if (ctrl)
 	{
-		QWidget* box = new QWidget(this);
-		QHBoxLayout* boxLayout = new QHBoxLayout(box);
+		auto box = new QWidget(this);
+		auto boxLayout = new QHBoxLayout(box);
 		boxLayout->addWidget(ctrl->topWidget());
 
 		if (removable)
 		{
-			QPushButton* removeBtn = new QPushButton;
+			auto removeBtn = new QPushButton;
 			removeBtn->setIcon( embed::getIconPixmap( "discard" ) );
 			QObject::connect(removeBtn, &QPushButton::clicked,
 				this, [this,ctrl](bool){
@@ -169,3 +167,4 @@ void LinkedModelGroupsView::modelChanged(LinkedModelGroups *groups)
 }
 
 
+} // namespace lmms::gui

@@ -34,11 +34,21 @@
 #include "TimePos.h"
 #include "AutomatableModel.h"
 
+namespace lmms
+{
 
 class MidiClient;
 class MidiEvent;
 class MidiEventProcessor;
+
+namespace gui
+{
+
 class MidiPortMenu;
+class ControllerConnectionDialog;
+class InstrumentMidiIOView;
+
+}
 
 
 // class for abstraction of MIDI-port
@@ -57,7 +67,7 @@ class MidiPort : public Model, public SerializingObject
 	mapPropertyFromModel(bool,isReadable,setReadable,m_readableModel);
 	mapPropertyFromModel(bool,isWritable,setWritable,m_writableModel);
 public:
-	typedef QMap<QString, bool> Map;
+	using Map = QMap<QString, bool>;
 
 	enum Modes
 	{
@@ -66,14 +76,14 @@ public:
 		Output,		// from MIDI-event-processor to MIDI-client
 		Duplex		// both directions
 	} ;
-	typedef Modes Mode;
+	using Mode = Modes;
 
 	MidiPort( const QString& name,
 			MidiClient* client,
 			MidiEventProcessor* eventProcessor,
 			Model* parent = nullptr,
 			Mode mode = Disabled );
-	virtual ~MidiPort();
+	~MidiPort() override;
 
 	void setName( const QString& name );
 
@@ -129,8 +139,8 @@ public:
 
 	void invalidateCilent();
 
-	MidiPortMenu* m_readablePortsMenu;
-	MidiPortMenu* m_writablePortsMenu;
+	gui::MidiPortMenu* m_readablePortsMenu;
+	gui::MidiPortMenu* m_writablePortsMenu;
 
 
 public slots:
@@ -165,8 +175,8 @@ private:
 	Map m_writablePorts;
 
 
-	friend class ControllerConnectionDialog;
-	friend class InstrumentMidiIOView;
+	friend class gui::ControllerConnectionDialog;
+	friend class gui::InstrumentMidiIOView;
 
 
 signals:
@@ -176,8 +186,8 @@ signals:
 
 } ;
 
+using MidiPortList = QList<MidiPort*>;
 
-typedef QList<MidiPort *> MidiPortList;
-
+} // namespace lmms
 
 #endif

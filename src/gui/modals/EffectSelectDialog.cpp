@@ -34,6 +34,10 @@
 #include <QLabel>
 
 
+namespace lmms::gui
+{
+
+
 EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 	QDialog( _parent ),
 	ui( new Ui::EffectSelectDialog ),
@@ -94,27 +98,27 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 	m_model.setSourceModel( &m_sourceModel );
 	m_model.setFilterCaseSensitivity( Qt::CaseInsensitive );
 
-	connect( ui->filterEdit, SIGNAL( textChanged( const QString & ) ),
-				&m_model, SLOT( setFilterFixedString( const QString & ) ) );
-	connect( ui->filterEdit, SIGNAL( textChanged( const QString & ) ),
-					this, SLOT( updateSelection() ) );
-	connect( ui->filterEdit, SIGNAL( textChanged( const QString & ) ),
-							SLOT( sortAgain() ) );
+	connect( ui->filterEdit, SIGNAL( textChanged( const QString& ) ),
+				&m_model, SLOT( setFilterFixedString( const QString& ) ) );
+	connect( ui->filterEdit, SIGNAL( textChanged( const QString& ) ),
+					this, SLOT(updateSelection()));
+	connect( ui->filterEdit, SIGNAL( textChanged( const QString& ) ),
+							SLOT(sortAgain()));
 
 	ui->pluginList->setModel( &m_model );
 
 	// setup selection model
-	QItemSelectionModel * selectionModel = new QItemSelectionModel( &m_model );
+	auto selectionModel = new QItemSelectionModel(&m_model);
 	ui->pluginList->setSelectionModel( selectionModel );
-	connect( selectionModel, SIGNAL( currentRowChanged( const QModelIndex &,
+	connect( selectionModel, SIGNAL( currentRowChanged( const QModelIndex&,
 														const QModelIndex & ) ),
-			SLOT( rowChanged( const QModelIndex &, const QModelIndex & ) ) );
-	connect( ui->pluginList, SIGNAL( doubleClicked( const QModelIndex & ) ),
-				SLOT( acceptSelection() ) );
+			SLOT( rowChanged( const QModelIndex &, const QModelIndex& ) ) );
+	connect( ui->pluginList, SIGNAL( doubleClicked( const QModelIndex& ) ),
+				SLOT(acceptSelection()));
 
 	// try to accept current selection when pressing "OK"
-	connect( ui->buttonBox, SIGNAL( accepted() ),
-				this, SLOT( acceptSelection() ) );
+	connect( ui->buttonBox, SIGNAL(accepted()),
+				this, SLOT(acceptSelection()));
 
 	ui->filterEdit->setClearButtonEnabled( true );
 	ui->pluginList->verticalHeader()->setSectionResizeMode(
@@ -189,14 +193,14 @@ void EffectSelectDialog::rowChanged( const QModelIndex & _idx,
 	{
 		m_descriptionWidget = new QWidget;
 
-		QHBoxLayout *hbox = new QHBoxLayout( m_descriptionWidget );
+		auto hbox = new QHBoxLayout(m_descriptionWidget);
 
 		Plugin::Descriptor const & descriptor = *( m_currentSelection.desc );
 
 		const PixmapLoader* pixLoa = m_currentSelection.logo();
 		if (pixLoa)
 		{
-			QLabel *logoLabel = new QLabel( m_descriptionWidget );
+			auto logoLabel = new QLabel(m_descriptionWidget);
 			logoLabel->setPixmap(pixLoa->pixmap());
 			logoLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
@@ -204,18 +208,18 @@ void EffectSelectDialog::rowChanged( const QModelIndex & _idx,
 			hbox->setAlignment( logoLabel, Qt::AlignTop);
 		}
 
-		QWidget *textualInfoWidget = new QWidget( m_descriptionWidget );
+		auto textualInfoWidget = new QWidget(m_descriptionWidget);
 
 		hbox->addWidget(textualInfoWidget);
 
-		QVBoxLayout * textWidgetLayout = new QVBoxLayout( textualInfoWidget);
+		auto textWidgetLayout = new QVBoxLayout(textualInfoWidget);
 		textWidgetLayout->setMargin( 4 );
 		textWidgetLayout->setSpacing( 0 );
 
 		if ( m_currentSelection.desc->subPluginFeatures )
 		{
-			QWidget *subWidget = new QWidget(textualInfoWidget);
-			QVBoxLayout * subLayout = new QVBoxLayout( subWidget );
+			auto subWidget = new QWidget(textualInfoWidget);
+			auto subLayout = new QVBoxLayout(subWidget);
 			subLayout->setMargin( 4 );
 			subLayout->setSpacing( 0 );
 			m_currentSelection.desc->subPluginFeatures->
@@ -232,7 +236,7 @@ void EffectSelectDialog::rowChanged( const QModelIndex & _idx,
 		}
 		else
 		{
-			QLabel *label = new QLabel(m_descriptionWidget);
+			auto label = new QLabel(m_descriptionWidget);
 			QString labelText = "<p><b>" + tr("Name") + ":</b> " + QString::fromUtf8(descriptor.displayName) + "</p>";
 			labelText += "<p><b>" + tr("Description") + ":</b> " + qApp->translate( "PluginBrowser", descriptor.description ) + "</p>";
 			labelText += "<p><b>" + tr("Author") + ":</b> " + QString::fromUtf8(descriptor.author) + "</p>";
@@ -271,6 +275,4 @@ void EffectSelectDialog::updateSelection()
 }
 
 
-
-
-
+} // namespace lmms::gui

@@ -9,6 +9,9 @@
 #include "Note.h"
 #include "MidiClip.h"
 
+namespace lmms
+{
+
 /*
  * A swing groove that adjusts by whole ticks.
  * Someone might like it, also might be able to save the output to a midi file later.
@@ -33,5 +36,7 @@ public:
 	QWidget * instantiateView(QWidget * parent);
 
 };
+
+}
 
 #endif // MIDISWING_H

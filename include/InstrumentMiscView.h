@@ -29,9 +29,16 @@
 
 #include <QWidget>
 
+namespace lmms
+{
+
+class InstrumentTrack;
+
+namespace gui
+{
+
 class ComboBox;
 class GroupBox;
-class InstrumentTrack;
 class LedCheckBox;
 
 
@@ -63,5 +70,10 @@ private:
 
 	GroupBox * m_grooveGroupBox;
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

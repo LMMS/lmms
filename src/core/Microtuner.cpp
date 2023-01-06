@@ -33,6 +33,9 @@
 #include "Scale.h"
 #include "Song.h"
 
+namespace lmms
+{
+
 
 Microtuner::Microtuner() :
 	Model(nullptr, tr("Microtuner")),
@@ -105,6 +108,17 @@ float Microtuner::keyToFreq(int key, int userBaseNote) const
 	return middleFreq * intervals[scaleDegree].getRatio() * pow(octaveRatio, keymapOctave + scaleOctave);
 }
 
+int Microtuner::octaveSize() const
+{
+	const int keymapSize = Engine::getSong()->getKeymap(currentKeymap())->getSize();
+	if (keymapSize > 0)
+	{
+		return keymapSize;
+	}
+
+	// Determine octave size from the scale if the keymap isn't in use.
+	return Engine::getSong()->getScale(currentScale())->getIntervals().size() - 1;
+}
 
 /**
  * \brief Update scale name displayed in the microtuner scale list.
@@ -165,3 +179,6 @@ void Microtuner::loadSettings(const QDomElement &element)
 	m_keymapModel.loadSettings(element, "keymap");
 	m_keyRangeImportModel.loadSettings(element, "range_import");
 }
+
+
+} // namespace lmms

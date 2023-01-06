@@ -32,6 +32,9 @@
 
 #include "SerializingObject.h"
 
+namespace lmms
+{
+
 class Interval : public SerializingObject
 {
 public:
@@ -44,7 +47,7 @@ public:
 	QString getString() const
 	{
 		if (m_denominator) {return QString::number(m_numerator) + "/" + QString::number(m_denominator);}
-		else {return QString().sprintf("%.4f", m_cents);}
+		else {return QString("%1").arg(m_cents, 0, 'f', 4);}
 	}
 
 	void saveSettings(QDomDocument &doc, QDomElement &element) override;
@@ -82,5 +85,8 @@ private:
 	std::vector<Interval> m_intervals;      //!< a series of ratios that define the scale
 
 };
+
+
+} // namespace lmms
 
 #endif

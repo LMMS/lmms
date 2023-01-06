@@ -42,9 +42,15 @@
 #include "TextFloat.h"
 #include "Track.h"
 
+namespace lmms
+{
 
 extern const float SECS_PER_ENV_SEGMENT;
 extern const float SECS_PER_LFO_OSCILLATION;
+
+
+namespace gui
+{
 
 
 const int ENV_GRAPH_X = 6;
@@ -160,29 +166,28 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	m_lfoAmountKnob->move( LFO_AMOUNT_KNOB_X, LFO_KNOB_Y );
 	m_lfoAmountKnob->setHintText( tr( "Modulation amount:" ), "" );
 
-
-	PixmapButton * sin_lfo_btn = new PixmapButton( this, nullptr );
+	auto sin_lfo_btn = new PixmapButton(this, nullptr);
 	sin_lfo_btn->move( LFO_SHAPES_X, LFO_SHAPES_Y );
 	sin_lfo_btn->setActiveGraphic( embed::getIconPixmap(
 							"sin_wave_active" ) );
 	sin_lfo_btn->setInactiveGraphic( embed::getIconPixmap(
 							"sin_wave_inactive" ) );
 
-	PixmapButton * triangle_lfo_btn = new PixmapButton( this, nullptr );
+	auto triangle_lfo_btn = new PixmapButton(this, nullptr);
 	triangle_lfo_btn->move( LFO_SHAPES_X+15, LFO_SHAPES_Y );
 	triangle_lfo_btn->setActiveGraphic( embed::getIconPixmap(
 						"triangle_wave_active" ) );
 	triangle_lfo_btn->setInactiveGraphic( embed::getIconPixmap(
 						"triangle_wave_inactive" ) );
 
-	PixmapButton * saw_lfo_btn = new PixmapButton( this, nullptr );
+	auto saw_lfo_btn = new PixmapButton(this, nullptr);
 	saw_lfo_btn->move( LFO_SHAPES_X+30, LFO_SHAPES_Y );
 	saw_lfo_btn->setActiveGraphic( embed::getIconPixmap(
 							"saw_wave_active" ) );
 	saw_lfo_btn->setInactiveGraphic( embed::getIconPixmap(
 							"saw_wave_inactive" ) );
 
-	PixmapButton * sqr_lfo_btn = new PixmapButton( this, nullptr );
+	auto sqr_lfo_btn = new PixmapButton(this, nullptr);
 	sqr_lfo_btn->move( LFO_SHAPES_X+45, LFO_SHAPES_Y );
 	sqr_lfo_btn->setActiveGraphic( embed::getIconPixmap(
 						"square_wave_active" ) );
@@ -196,10 +201,10 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	m_userLfoBtn->setInactiveGraphic( embed::getIconPixmap(
 							"usr_wave_inactive" ) );
 
-	connect( m_userLfoBtn, SIGNAL( toggled( bool ) ),
-				this, SLOT( lfoUserWaveChanged() ) );
+	connect( m_userLfoBtn, SIGNAL(toggled(bool)),
+				this, SLOT(lfoUserWaveChanged()));
 
-	PixmapButton * random_lfo_btn = new PixmapButton( this, nullptr );
+	auto random_lfo_btn = new PixmapButton(this, nullptr);
 	random_lfo_btn->move( LFO_SHAPES_X+60, LFO_SHAPES_Y );
 	random_lfo_btn->setActiveGraphic( embed::getIconPixmap(
 						"random_wave_active" ) );
@@ -528,4 +533,6 @@ void EnvelopeAndLfoView::lfoUserWaveChanged()
 
 
 
+} // namespace gui
 
+} // namespace lmms

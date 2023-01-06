@@ -47,12 +47,17 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT audiofileprocessor_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"AudioFileProcessor",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Simple sampler with various settings for "
@@ -105,13 +110,6 @@ AudioFileProcessor::AudioFileProcessor( InstrumentTrack * _instrument_track ) :
 	m_interpolationModel.setValue( 1 );
 
 	pointChanged();
-}
-
-
-
-
-AudioFileProcessor::~AudioFileProcessor()
-{
 }
 
 
@@ -291,7 +289,7 @@ void AudioFileProcessor::loadFile( const QString & _file )
 
 
 
-QString AudioFileProcessor::nodeName( void ) const
+QString AudioFileProcessor::nodeName() const
 {
 	return audiofileprocessor_plugin_descriptor.name;
 }
@@ -312,9 +310,9 @@ int AudioFileProcessor::getBeatLen( NotePlayHandle * _n ) const
 
 
 
-PluginView * AudioFileProcessor::instantiateView( QWidget * _parent )
+gui::PluginView* AudioFileProcessor::instantiateView( QWidget * _parent )
 {
-	return new AudioFileProcessorView( this, _parent );
+	return new gui::AudioFileProcessorView( this, _parent );
 }
 
 
@@ -341,7 +339,7 @@ void AudioFileProcessor::setAudioFile( const QString & _audio_file,
 
 
 
-void AudioFileProcessor::reverseModelChanged( void )
+void AudioFileProcessor::reverseModelChanged()
 {
 	m_sampleBuffer.setReversed( m_reverseModel.value() );
 	m_nextPlayStartPoint = m_sampleBuffer.startFrame();
@@ -351,7 +349,7 @@ void AudioFileProcessor::reverseModelChanged( void )
 
 
 
-void AudioFileProcessor::ampModelChanged( void )
+void AudioFileProcessor::ampModelChanged()
 {
 	m_sampleBuffer.setAmplification( m_ampModel.value() / 100.0f );
 }
@@ -364,7 +362,7 @@ void AudioFileProcessor::stutterModelChanged()
 }
 
 
-void AudioFileProcessor::startPointChanged( void )
+void AudioFileProcessor::startPointChanged()
 {
 	// check if start is over end and swap values if so
 	if( m_startPointModel.value() > m_endPointModel.value() )
@@ -396,14 +394,14 @@ void AudioFileProcessor::startPointChanged( void )
 
 }
 
-void AudioFileProcessor::endPointChanged( void )
+void AudioFileProcessor::endPointChanged()
 {
 	// same as start, for now
 	startPointChanged();
 
 }
 
-void AudioFileProcessor::loopPointChanged( void )
+void AudioFileProcessor::loopPointChanged()
 {
 
 	// check that loop point is between start-end points and not overlapping with endpoint
@@ -426,11 +424,11 @@ void AudioFileProcessor::loopPointChanged( void )
 	pointChanged();
 }
 
-void AudioFileProcessor::pointChanged( void )
+void AudioFileProcessor::pointChanged()
 {
-	const f_cnt_t f_start = static_cast<f_cnt_t>( m_startPointModel.value() *	( m_sampleBuffer.frames()-1 ) );
-	const f_cnt_t f_end = static_cast<f_cnt_t>( m_endPointModel.value() * ( m_sampleBuffer.frames()-1 ) );
-	const f_cnt_t f_loop = static_cast<f_cnt_t>( m_loopPointModel.value() * ( m_sampleBuffer.frames()-1 ) );
+	const auto f_start = static_cast<f_cnt_t>(m_startPointModel.value() * m_sampleBuffer.frames());
+	const auto f_end = static_cast<f_cnt_t>(m_endPointModel.value() * m_sampleBuffer.frames());
+	const auto f_loop = static_cast<f_cnt_t>(m_loopPointModel.value() * m_sampleBuffer.frames());
 
 	m_nextPlayStartPoint = f_start;
 	m_nextPlayBackwards = false;
@@ -442,6 +440,8 @@ void AudioFileProcessor::pointChanged( void )
 
 
 
+namespace gui
+{
 
 
 QPixmap * AudioFileProcessorView::s_artwork = nullptr;
@@ -479,7 +479,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 
 // loop button group
 
-	PixmapButton * m_loopOffButton = new PixmapButton( this );
+	auto m_loopOffButton = new PixmapButton(this);
 	m_loopOffButton->setCheckable( true );
 	m_loopOffButton->move( 190, 105 );
 	m_loopOffButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -488,8 +488,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 							"loop_off_off" ) );
 	m_loopOffButton->setToolTip(tr("Disable loop"));
 
-
-	PixmapButton * m_loopOnButton = new PixmapButton( this );
+	auto m_loopOnButton = new PixmapButton(this);
 	m_loopOnButton->setCheckable( true );
 	m_loopOnButton->move( 190, 124 );
 	m_loopOnButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -498,7 +497,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 							"loop_on_off" ) );
 	m_loopOnButton->setToolTip(tr("Enable loop"));
 
-	PixmapButton * m_loopPingPongButton = new PixmapButton( this );
+	auto m_loopPingPongButton = new PixmapButton(this);
 	m_loopPingPongButton->setCheckable( true );
 	m_loopPingPongButton->move( 216, 124 );
 	m_loopPingPongButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -548,10 +547,10 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 	m_waveView = 0;
 	newWaveView();
 
-	connect( castModel<AudioFileProcessor>(), SIGNAL( isPlaying( f_cnt_t ) ),
-			m_waveView, SLOT( isPlaying( f_cnt_t ) ) );
+	connect( castModel<AudioFileProcessor>(), SIGNAL( isPlaying( lmms::f_cnt_t ) ),
+			m_waveView, SLOT( isPlaying( lmms::f_cnt_t ) ) );
 
-	qRegisterMetaType<f_cnt_t>( "f_cnt_t" );
+	qRegisterMetaType<lmms::f_cnt_t>( "lmms::f_cnt_t" );
 
 	setAcceptDrops( true );
 }
@@ -559,9 +558,6 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 
 
 
-AudioFileProcessorView::~AudioFileProcessorView()
-{
-}
 
 
 
@@ -648,9 +644,9 @@ void AudioFileProcessorView::paintEvent( QPaintEvent * )
 
 	p.drawPixmap( 0, 0, *s_artwork );
 
-	AudioFileProcessor * a = castModel<AudioFileProcessor>();
+	auto a = castModel<AudioFileProcessor>();
 
- 	QString file_name = "";
+	QString file_name = "";
 	int idx = a->m_sampleBuffer.audioFile().length();
 
 	p.setFont( pointSize<8>( font() ) );
@@ -677,7 +673,7 @@ void AudioFileProcessorView::paintEvent( QPaintEvent * )
 
 
 
-void AudioFileProcessorView::sampleUpdated( void )
+void AudioFileProcessorView::sampleUpdated()
 {
 	m_waveView->updateSampleRange();
 	m_waveView->update();
@@ -688,7 +684,7 @@ void AudioFileProcessorView::sampleUpdated( void )
 
 
 
-void AudioFileProcessorView::openAudioFile( void )
+void AudioFileProcessorView::openAudioFile()
 {
 	QString af = castModel<AudioFileProcessor>()->m_sampleBuffer.
 							openAudioFile();
@@ -703,9 +699,9 @@ void AudioFileProcessorView::openAudioFile( void )
 
 
 
-void AudioFileProcessorView::modelChanged( void )
+void AudioFileProcessorView::modelChanged()
 {
-	AudioFileProcessor * a = castModel<AudioFileProcessor>();
+	auto a = castModel<AudioFileProcessor>();
 	connect( &a->m_sampleBuffer, SIGNAL( sampleUpdated() ),
 					this, SLOT( sampleUpdated() ) );
 	m_ampKnob->setModel( &a->m_ampModel );
@@ -1242,7 +1238,7 @@ float AudioFileProcessorWaveView::knob::getValue( const QPoint & _p )
 	const double dec_fact = ! m_waveView ? 1 :
 		double( m_waveView->m_to - m_waveView->m_from )
 			/ m_waveView->m_sampleBuffer.frames();
-	const float inc = ::Knob::getValue( _p ) * dec_fact;
+	const float inc = Knob::getValue( _p ) * dec_fact;
 
 	return inc;
 }
@@ -1273,6 +1269,7 @@ bool AudioFileProcessorWaveView::knob::checkBound( double _v ) const
 }
 
 
+} // namespace gui
 
 
 
@@ -1288,3 +1285,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main(Model * model, void *)
 
 
 }
+
+
+} // namespace lmms

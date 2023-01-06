@@ -28,6 +28,7 @@
 #include <stdexcept>
 
 #include <QDebug>
+#include <QUuid>
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"
@@ -35,36 +36,20 @@
 #include "RemotePlugin.h"
 
 
-VstSyncController::VstSyncController() :
-	m_syncData( nullptr )
+namespace lmms
 {
-	if( ConfigManager::inst()->value( "ui", "syncvstplugins" ).toInt() )
-	{
-		connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
 
-		try
-		{
-			m_shm.create("usr_bin_lmms");
-			m_syncData = m_shm.get();
-		}
-		catch (const std::runtime_error& error)
-		{
-			qWarning() << "Failed to allocate shared memory for VST sync:" << error.what();
-		}
-	}
-	else
-	{
-		qWarning( "VST sync support disabled in your configuration" );
-	}
 
-	if( m_syncData == nullptr )
+VstSyncController::VstSyncController()
+{
+	try
 	{
-		m_syncData = new VstSyncData;
-		m_syncData->hasSHM = false;
+		m_syncData.create(QUuid::createUuid().toString().toStdString());
 	}
-	else
+	catch (const std::runtime_error& error)
 	{
-		m_syncData->hasSHM = true;
+		qCritical() << "Failed to allocate shared memory for VST sync:" << error.what();
+		return;
 	}
 
 	m_syncData->isPlaying = false;
@@ -72,23 +57,16 @@ VstSyncController::VstSyncController() :
 	m_syncData->timeSigNumer = 4;
 	m_syncData->timeSigDenom = 4;
 
+	connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged, this, &VstSyncController::updateSampleRate);
 	updateSampleRate();
 }
 
 
 
-VstSyncController::~VstSyncController()
+void VstSyncController::setAbsolutePosition(double ticks)
 {
-	if( m_syncData->hasSHM == false )
-	{
-		delete m_syncData;
-	}
-}
+	if (!m_syncData) { return; }
 
-
-
-void VstSyncController::setAbsolutePosition( double ticks )
-{
 #ifdef VST_SNC_LATENCY
 	m_syncData->ppqPos = ( ( ticks + 0 ) / 48.0 ) - m_syncData->m_latency;
 #else
@@ -98,8 +76,19 @@ void VstSyncController::setAbsolutePosition( double ticks )
 
 
 
-void VstSyncController::setTempo( int newTempo )
+void VstSyncController::setPlaybackState(bool enabled)
 {
+	if (!m_syncData) { return; }
+
+	m_syncData->isPlaying = enabled;
+}
+
+
+
+void VstSyncController::setTempo(int newTempo)
+{
+	if (!m_syncData) { return; }
+
 	m_syncData->m_bpm = newTempo;
 
 #ifdef VST_SNC_LATENCY
@@ -110,8 +99,20 @@ void VstSyncController::setTempo( int newTempo )
 
 
 
-void VstSyncController::startCycle( int startTick, int endTick )
+void VstSyncController::setTimeSignature(int num, int denom)
 {
+	if (!m_syncData) { return; }
+
+	m_syncData->timeSigNumer = num;
+	m_syncData->timeSigDenom = denom;
+}
+
+
+
+void VstSyncController::startCycle(int startTick, int endTick)
+{
+	if (!m_syncData) { return; }
+
 	m_syncData->isCycle = true;
 	m_syncData->cycleStart = startTick / (float)48;
 	m_syncData->cycleEnd = endTick / (float)48;
@@ -119,8 +120,28 @@ void VstSyncController::startCycle( int startTick, int endTick )
 
 
 
+void VstSyncController::stopCycle()
+{
+	if (!m_syncData) { return; }
+
+	m_syncData->isCycle = false;
+}
+
+
+
+void VstSyncController::setPlaybackJumped(bool jumped)
+{
+	if (!m_syncData) { return; }
+
+	m_syncData->m_playbackJumped = jumped;
+}
+
+
+
 void VstSyncController::update()
 {
+	if (!m_syncData) { return; }
+
 	m_syncData->m_bufferSize = Engine::audioEngine()->framesPerPeriod();
 
 #ifdef VST_SNC_LATENCY
@@ -132,6 +153,8 @@ void VstSyncController::update()
 
 void VstSyncController::updateSampleRate()
 {
+	if (!m_syncData) { return; }
+
 	m_syncData->m_sampleRate = Engine::audioEngine()->processingSampleRate();
 
 #ifdef VST_SNC_LATENCY
@@ -140,6 +163,4 @@ void VstSyncController::updateSampleRate()
 }
 
 
-
-
-
+} // namespace lmms

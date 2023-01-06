@@ -37,6 +37,10 @@
 #include <QToolBar>
 #include <QLabel>
 
+namespace lmms::gui
+{
+
+
 VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 	EffectControlDialog( _ctl ),
 	m_pluginWidget( nullptr ),
@@ -44,7 +48,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 	m_plugin( nullptr ),
 	tbLabel( nullptr )
 {
-	QGridLayout * l = new QGridLayout( this );
+	auto l = new QGridLayout(this);
 	l->setContentsMargins( 10, 10, 10, 10 );
 	l->setVerticalSpacing( 2 );
 	l->setHorizontalSpacing( 2 );
@@ -69,7 +73,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 	{
 		setWindowTitle( m_plugin->name() );
 
-		QPushButton * btn = new QPushButton( tr( "Show/hide" ));
+		auto btn = new QPushButton(tr("Show/hide"));
 
 		if (embed_vst) {
 			btn->setCheckable( true );
@@ -169,7 +173,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		_ctl->m_selPresetButton->setCursor( Qt::PointingHandCursor );
 		_ctl->m_selPresetButton->setIcon( embed::getIconPixmap( "stepper-down" ) );
 
-		QMenu * menu = new QMenu;
+		auto menu = new QMenu;
 		connect( menu, SIGNAL( aboutToShow() ), _ctl, SLOT( updateMenu() ) );
 
  		_ctl->m_selPresetButton->setMenu(menu);
@@ -202,11 +206,11 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		}
 		newSize = std::max(newSize, 250);
 
-		QWidget* resize = new QWidget(this);
+		auto resize = new QWidget(this);
 		resize->resize( newSize, 10 );
-		QWidget* space0 = new QWidget(this);
+		auto space0 = new QWidget(this);
 		space0->resize(8, 10);
-		QWidget* space1 = new QWidget(this);
+		auto space1 = new QWidget(this);
 		space1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 		QFont f( "Arial", 10 );
 
@@ -219,7 +223,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		l->setRowStretch( 5, 1 );
 		l->setColumnStretch( 1, 1 );
 
-		QToolBar * tb = new QToolBar( this );
+		auto tb = new QToolBar(this);
 		tb->resize( newSize , 32 );
 		tb->addWidget(space0);
 		tb->addWidget( m_rolLPresetButton );
@@ -294,3 +298,5 @@ void VstEffectControlDialog::togglePluginUI( bool checked )
 	}
 }
 
+
+} // namespace lmms::gui

@@ -55,6 +55,9 @@
 
 #include "AutomatableModelView.h"
 
+namespace lmms::gui
+{
+
 class TextFloat;
 
 
@@ -69,7 +72,7 @@ public:
 
 	Fader( FloatModel * _model, const QString & _name, QWidget * _parent );
 	Fader( FloatModel * _model, const QString & _name, QWidget * _parent, QPixmap * back, QPixmap * leds, QPixmap * knob );
-	virtual ~Fader() = default;
+	~Fader() override = default;
 
 	void init(FloatModel * model, QString const & name);
 
@@ -167,6 +170,9 @@ private:
 	QColor m_peakRed;
 	QColor m_peakYellow;
 } ;
+
+
+} // namespace lmms::gui
 
 
 #endif

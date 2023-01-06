@@ -34,11 +34,8 @@
 #include "Knob.h"
 
 
-
-
-Control::~Control() {}
-
-
+namespace lmms::gui
+{
 
 
 void KnobControl::setText(const QString &text) { m_knob->setLabel(text); }
@@ -56,10 +53,6 @@ AutomatableModelView* KnobControl::modelView() { return m_knob; }
 
 KnobControl::KnobControl(QWidget *parent) :
 	m_knob(new Knob(parent)) {}
-
-KnobControl::~KnobControl() {}
-
-
 
 
 void ComboControl::setText(const QString &text) { m_label->setText(text); }
@@ -79,14 +72,11 @@ ComboControl::ComboControl(QWidget *parent) :
 	m_label(new QLabel(m_widget))
 {
 	m_combo->setFixedSize(64, ComboBox::DEFAULT_HEIGHT);
-	QVBoxLayout* vbox = new QVBoxLayout(m_widget);
+	auto vbox = new QVBoxLayout(m_widget);
 	vbox->addWidget(m_combo);
 	vbox->addWidget(m_label);
 	m_combo->repaint();
 }
-
-ComboControl::~ComboControl() {}
-
 
 
 
@@ -108,12 +98,10 @@ CheckControl::CheckControl(QWidget *parent) :
 	m_checkBox(new LedCheckBox(nullptr, QString(), LedCheckBox::Green)),
 	m_label(new QLabel(m_widget))
 {
-	QVBoxLayout* vbox = new QVBoxLayout(m_widget);
+	auto vbox = new QVBoxLayout(m_widget);
 	vbox->addWidget(m_checkBox);
 	vbox->addWidget(m_label);
 }
-
-CheckControl::~CheckControl() {}
 
 
 
@@ -136,5 +124,5 @@ LcdControl::LcdControl(int numDigits, QWidget *parent) :
 {
 }
 
-LcdControl::~LcdControl() {}
 
+} // namespace lmms::gui

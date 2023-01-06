@@ -69,6 +69,10 @@
 #include "TrackLabelButton.h"
 
 
+namespace lmms::gui
+{
+
+
 const int INSTRUMENT_WIDTH	= 254;
 const int INSTRUMENT_HEIGHT	= INSTRUMENT_WIDTH;
 const int PIANO_HEIGHT		= 80;
@@ -85,27 +89,27 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 	// init own layout + widgets
 	setFocusPolicy( Qt::StrongFocus );
-	QVBoxLayout * vlayout = new QVBoxLayout( this );
+	auto vlayout = new QVBoxLayout(this);
 	vlayout->setMargin( 0 );
 	vlayout->setSpacing( 0 );
 
-	TabWidget* generalSettingsWidget = new TabWidget( tr( "GENERAL SETTINGS" ), this );
+	auto generalSettingsWidget = new TabWidget(tr("GENERAL SETTINGS"), this);
 
-	QVBoxLayout* generalSettingsLayout = new QVBoxLayout( generalSettingsWidget );
+	auto generalSettingsLayout = new QVBoxLayout(generalSettingsWidget);
 
 	generalSettingsLayout->setContentsMargins( 8, 18, 8, 8 );
 	generalSettingsLayout->setSpacing( 6 );
 
-	QWidget* nameAndChangeTrackWidget = new QWidget( generalSettingsWidget );
-	QHBoxLayout* nameAndChangeTrackLayout = new QHBoxLayout( nameAndChangeTrackWidget );
+	auto nameAndChangeTrackWidget = new QWidget(generalSettingsWidget);
+	auto nameAndChangeTrackLayout = new QHBoxLayout(nameAndChangeTrackWidget);
 	nameAndChangeTrackLayout->setContentsMargins( 0, 0, 0, 0 );
 	nameAndChangeTrackLayout->setSpacing( 2 );
 
 	// setup line edit for changing instrument track name
 	m_nameLineEdit = new QLineEdit;
 	m_nameLineEdit->setFont( pointSize<9>( m_nameLineEdit->font() ) );
-	connect( m_nameLineEdit, SIGNAL( textChanged( const QString & ) ),
-				this, SLOT( textChanged( const QString & ) ) );
+	connect( m_nameLineEdit, SIGNAL( textChanged( const QString& ) ),
+				this, SLOT( textChanged( const QString& ) ) );
 
 	m_nameLineEdit->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
 	nameAndChangeTrackLayout->addWidget(m_nameLineEdit, 1);
@@ -113,22 +117,31 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 	// set up left/right arrows for changing instrument
 	m_leftRightNav = new LeftRightNav(this);
-	connect( m_leftRightNav, SIGNAL( onNavLeft() ), this,
-						SLOT( viewPrevInstrument() ) );
-	connect( m_leftRightNav, SIGNAL( onNavRight() ), this,
-						SLOT( viewNextInstrument() ) );
+	connect( m_leftRightNav, SIGNAL(onNavLeft()), this,
+						SLOT(viewPrevInstrument()));
+	connect( m_leftRightNav, SIGNAL(onNavRight()), this,
+						SLOT(viewNextInstrument()));
 	// m_leftRightNav->setShortcuts();
 	nameAndChangeTrackLayout->addWidget(m_leftRightNav);
 
 
 	generalSettingsLayout->addWidget( nameAndChangeTrackWidget );
 
-
-
-	QGridLayout* basicControlsLayout = new QGridLayout;
+	auto basicControlsLayout = new QGridLayout;
 	basicControlsLayout->setHorizontalSpacing(3);
 	basicControlsLayout->setVerticalSpacing(0);
 	basicControlsLayout->setContentsMargins(0, 0, 0, 0);
+
+#if QT_VERSION < 0x50C00
+	// Workaround for a bug in Qt versions below 5.12,
+	// where argument-dependent-lookup fails for QFlags operators
+	// declared inside a namepsace.
+	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
+	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
+
+	using ::operator|;
+
+#endif
 
 	QString labelStyleSheet = "font-size: 6pt;";
 	Qt::Alignment labelAlignment = Qt::AlignHCenter | Qt::AlignTop;
@@ -142,7 +155,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	basicControlsLayout->addWidget( m_volumeKnob, 0, 0 );
 	basicControlsLayout->setAlignment( m_volumeKnob, widgetAlignment );
 
-	QLabel *label = new QLabel( tr( "VOL" ), this );
+	auto label = new QLabel(tr("VOL"), this);
 	label->setStyleSheet( labelStyleSheet );
 	basicControlsLayout->addWidget( label, 1, 0);
 	basicControlsLayout->setAlignment( label, labelAlignment );
@@ -203,10 +216,10 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	basicControlsLayout->addWidget( label, 1, 6);
 	basicControlsLayout->setAlignment( label, labelAlignment );
 
-	QPushButton* saveSettingsBtn = new QPushButton( embed::getIconPixmap( "project_save" ), QString() );
+	auto saveSettingsBtn = new QPushButton(embed::getIconPixmap("project_save"), QString());
 	saveSettingsBtn->setMinimumSize( 32, 32 );
 
-	connect( saveSettingsBtn, SIGNAL( clicked() ), this, SLOT( saveSettingsBtnClicked() ) );
+	connect( saveSettingsBtn, SIGNAL(clicked()), this, SLOT(saveSettingsBtnClicked()));
 
 	saveSettingsBtn->setToolTip(tr("Save current instrument track settings in a preset file"));
 
@@ -231,8 +244,8 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	m_ssView = new InstrumentSoundShapingView( m_tabWidget );
 
 	// FUNC tab
-	QWidget* instrumentFunctions = new QWidget( m_tabWidget );
-	QVBoxLayout* instrumentFunctionsLayout = new QVBoxLayout( instrumentFunctions );
+	auto instrumentFunctions = new QWidget(m_tabWidget);
+	auto instrumentFunctionsLayout = new QVBoxLayout(instrumentFunctions);
 	instrumentFunctionsLayout->setMargin( 5 );
 	m_noteStackingView = new InstrumentFunctionNoteStackingView( &m_track->m_noteStacking );
 	m_arpeggioView = new InstrumentFunctionArpeggioView( &m_track->m_arpeggio );
@@ -330,13 +343,13 @@ void InstrumentTrackWindow::modelChanged()
 
 	m_nameLineEdit->setText( m_track->name() );
 
-	m_track->disconnect( SIGNAL( nameChanged() ), this );
-	m_track->disconnect( SIGNAL( instrumentChanged() ), this );
+	m_track->disconnect( SIGNAL(nameChanged()), this );
+	m_track->disconnect( SIGNAL(instrumentChanged()), this );
 
-	connect( m_track, SIGNAL( nameChanged() ),
-			this, SLOT( updateName() ) );
-	connect( m_track, SIGNAL( instrumentChanged() ),
-			this, SLOT( updateInstrumentView() ) );
+	connect( m_track, SIGNAL(nameChanged()),
+			this, SLOT(updateName()));
+	connect( m_track, SIGNAL(instrumentChanged()),
+			this, SLOT(updateInstrumentView()));
 
 	m_volumeKnob->setModel( &m_track->m_volumeModel );
 	m_panningKnob->setModel( &m_track->m_panningModel );
@@ -679,3 +692,5 @@ void InstrumentTrackWindow::adjustTabSize(QWidget *w)
 	w->setMinimumSize(INSTRUMENT_WIDTH - 4, INSTRUMENT_HEIGHT - 4 - 1);
 }
 
+
+} // namespace lmms::gui

@@ -33,6 +33,9 @@
 #include "PlayHandle.h"
 
 
+namespace lmms
+{
+
 
 PatternTrack::infoMap PatternTrack::s_infoMap;
 
@@ -48,7 +51,7 @@ PatternTrack::PatternTrack(TrackContainer* tc) :
 	Engine::patternStore()->setCurrentPattern(patternNum);
 	Engine::patternStore()->updateComboBox();
 
-	connect( this, SIGNAL( nameChanged() ),
+	connect( this, SIGNAL(nameChanged()),
 		Engine::patternStore(), SLOT(updateComboBox()));
 }
 
@@ -106,13 +109,12 @@ bool PatternTrack::play( const TimePos & _start, const fpp_t _frames,
 
 	TimePos lastPosition;
 	TimePos lastLen;
-	for( clipVector::iterator it = clips.begin(); it != clips.end(); ++it )
+	for (const auto& clip : clips)
 	{
-		if( !( *it )->isMuted() &&
-				( *it )->startPosition() >= lastPosition )
+		if (!clip->isMuted() && clip->startPosition() >= lastPosition)
 		{
-			lastPosition = ( *it )->startPosition();
-			lastLen = ( *it )->length();
+			lastPosition = clip->startPosition();
+			lastLen = clip->length();
 		}
 	}
 
@@ -126,9 +128,9 @@ bool PatternTrack::play( const TimePos & _start, const fpp_t _frames,
 
 
 
-TrackView* PatternTrack::createView(TrackContainerView* tcv)
+gui::TrackView* PatternTrack::createView(gui::TrackContainerView* tcv)
 {
-	return new PatternTrackView(this, tcv);
+	return new gui::PatternTrackView(this, tcv);
 }
 
 
@@ -136,7 +138,7 @@ TrackView* PatternTrack::createView(TrackContainerView* tcv)
 
 Clip* PatternTrack::createClip(const TimePos & pos)
 {
-	PatternClip* pc = new PatternClip(this);
+	auto pc = new PatternClip(this);
 	pc->movePosition(pos);
 	return pc;
 }
@@ -178,15 +180,11 @@ void PatternTrack::loadTrackSpecificSettings(const QDomElement& _this)
 	{
 		const int src = _this.attribute("sourcepattern").toInt();
 		const int dst = s_infoMap[this];
-		TrackContainer::TrackList tl =
-					Engine::patternStore()->tracks();
 		// copy clips of all tracks from source pattern (at bar "src") to destination
 		// clips (which are created if they do not exist yet)
-		for( TrackContainer::TrackList::iterator it = tl.begin();
-							it != tl.end(); ++it )
+		for (const auto& track : Engine::patternStore()->tracks())
 		{
-			Clip::copyStateTo( ( *it )->getClip( src ),
-				( *it )->getClip( dst ) );
+			Clip::copyStateTo(track->getClip(src), track->getClip(dst));
 		}
 		setName( tr( "Clone of %1" ).arg(
 					_this.parentNode().toElement().attribute( "name" ) ) );
@@ -231,8 +229,8 @@ PatternTrack* PatternTrack::findPatternTrack(int pattern_num)
 
 void PatternTrack::swapPatternTracks(Track* track1, Track* track2)
 {
-	PatternTrack* t1 = dynamic_cast<PatternTrack*>(track1);
-	PatternTrack* t2 = dynamic_cast<PatternTrack*>(track2);
+	auto t1 = dynamic_cast<PatternTrack*>(track1);
+	auto t2 = dynamic_cast<PatternTrack*>(track2);
 	if( t1 != nullptr && t2 != nullptr )
 	{
 		qSwap( s_infoMap[t1], s_infoMap[t2] );
@@ -240,3 +238,6 @@ void PatternTrack::swapPatternTracks(Track* track1, Track* track2)
 		Engine::patternStore()->setCurrentPattern(s_infoMap[t1]);
 	}
 }
+
+
+} // namespace lmms

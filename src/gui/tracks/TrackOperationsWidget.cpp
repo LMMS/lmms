@@ -47,6 +47,9 @@
 #include "TrackContainerView.h"
 #include "TrackView.h"
 
+namespace lmms::gui
+{
+
 /*! \brief Create a new trackOperationsWidget
  *
  * The trackOperationsWidget is the grip and the mute button of a track.
@@ -60,9 +63,9 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	setToolTip(tr("Press <%1> while clicking on move-grip "
 				"to begin a new drag'n'drop action." ).arg(UI_CTRL_KEY) );
 
-	QMenu * toMenu = new QMenu( this );
+	auto toMenu = new QMenu(this);
 	toMenu->setFont( pointSize<9>( toMenu->font() ) );
-	connect( toMenu, SIGNAL( aboutToShow() ), this, SLOT( updateMenu() ) );
+	connect( toMenu, SIGNAL(aboutToShow()), this, SLOT(updateMenu()));
 
 
 	setObjectName( "automationEnabled" );
@@ -103,26 +106,19 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	m_soloBtn->show();
 	m_soloBtn->setToolTip(tr("Solo"));
 
-	connect( this, SIGNAL( trackRemovalScheduled( TrackView * ) ),
+	connect( this, SIGNAL(trackRemovalScheduled(lmms::gui::TrackView*)),
 			m_trackView->trackContainerView(),
-				SLOT( deleteTrackView( TrackView * ) ),
+				SLOT(deleteTrackView(lmms::gui::TrackView*)),
 							Qt::QueuedConnection );
 
-	connect( m_trackView->getTrack()->getMutedModel(), SIGNAL( dataChanged() ),
-			this, SLOT( update() ) );
+	connect( m_trackView->getTrack()->getMutedModel(), SIGNAL(dataChanged()),
+			this, SLOT(update()));
 
 	connect(m_trackView->getTrack(), SIGNAL(colorChanged()), this, SLOT(update()));
 }
 
 
 
-
-/*! \brief Destroy an existing trackOperationsWidget
- *
- */
-TrackOperationsWidget::~TrackOperationsWidget()
-{
-}
 
 
 
@@ -175,7 +171,7 @@ void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
 {
 	QPainter p( this );
 
-	p.fillRect( rect(), palette().brush(QPalette::Background) );
+	p.fillRect(rect(), palette().brush(QPalette::Window));
 
 	if( m_trackView->getTrack()->useColor() && ! m_trackView->getTrack()->getMutedModel()->value() ) 
 	{
@@ -199,7 +195,7 @@ bool TrackOperationsWidget::confirmRemoval()
 					.arg(m_trackView->getTrack()->name());
 	QString messageTitleRemoveTrack = tr("Confirm removal");
 	QString askAgainText = tr("Don't ask again");
-	QCheckBox* askAgainCheckBox = new QCheckBox(askAgainText, nullptr);
+	auto askAgainCheckBox = new QCheckBox(askAgainText, nullptr);
 	connect(askAgainCheckBox, &QCheckBox::stateChanged, [this](int state){
 		// Invert button state, if it's checked we *shouldn't* ask again
 		ConfigManager::inst()->setValue("ui", "trackdeletionwarning", state ? "0" : "1");
@@ -327,29 +323,29 @@ void TrackOperationsWidget::updateMenu()
 	toMenu->clear();
 	toMenu->addAction( embed::getIconPixmap( "edit_copy", 16, 16 ),
 						tr( "Clone this track" ),
-						this, SLOT( cloneTrack() ) );
+						this, SLOT(cloneTrack()));
 	toMenu->addAction( embed::getIconPixmap( "cancel", 16, 16 ),
 						tr( "Remove this track" ),
-						this, SLOT( removeTrack() ) );
+						this, SLOT(removeTrack()));
 
 	if( ! m_trackView->trackContainerView()->fixedClips() )
 	{
-		toMenu->addAction( tr( "Clear this track" ), this, SLOT( clearTrack() ) );
+		toMenu->addAction( tr( "Clear this track" ), this, SLOT(clearTrack()));
 	}
 	if (QMenu *mixerMenu = m_trackView->createMixerMenu(tr("Channel %1: %2"), tr("Assign to new Mixer Channel")))
 	{
 		toMenu->addMenu(mixerMenu);
 	}
 
-	if (InstrumentTrackView * trackView = dynamic_cast<InstrumentTrackView *>(m_trackView))
+	if (auto trackView = dynamic_cast<InstrumentTrackView*>(m_trackView))
 	{
 		toMenu->addSeparator();
 		toMenu->addMenu(trackView->midiMenu());
 	}
 	if( dynamic_cast<AutomationTrackView *>( m_trackView ) )
 	{
-		toMenu->addAction( tr( "Turn all recording on" ), this, SLOT( recordingOn() ) );
-		toMenu->addAction( tr( "Turn all recording off" ), this, SLOT( recordingOff() ) );
+		toMenu->addAction( tr( "Turn all recording on" ), this, SLOT(recordingOn()));
+		toMenu->addAction( tr( "Turn all recording off" ), this, SLOT(recordingOff()));
 	}
 
 	toMenu->addSeparator();
@@ -366,12 +362,12 @@ void TrackOperationsWidget::updateMenu()
 
 void TrackOperationsWidget::toggleRecording( bool on )
 {
-	AutomationTrackView * atv = dynamic_cast<AutomationTrackView *>( m_trackView );
+	auto atv = dynamic_cast<AutomationTrackView*>(m_trackView);
 	if( atv )
 	{
 		for( Clip * clip : atv->getTrack()->getClips() )
 		{
-			AutomationClip * ap = dynamic_cast<AutomationClip *>( clip );
+			auto ap = dynamic_cast<AutomationClip*>(clip);
 			if( ap ) { ap->setRecording( on ); }
 		}
 		atv->update();
@@ -391,3 +387,5 @@ void TrackOperationsWidget::recordingOff()
 	toggleRecording( false );
 }
 
+
+} // namespace lmms::gui

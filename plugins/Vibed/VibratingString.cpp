@@ -28,6 +28,9 @@
 #include "AudioEngine.h"
 #include "Engine.h"
 
+namespace lmms
+{
+
 
 VibratingString::VibratingString(	float _pitch, 
 					float _pick,
@@ -92,7 +95,7 @@ VibratingString::VibratingString(	float _pitch,
 VibratingString::delayLine * VibratingString::initDelayLine( int _len,
 								int _pick )
 {
-	delayLine * dl = new VibratingString::delayLine[_len];
+	auto dl = new VibratingString::delayLine[_len];
 	dl->length = _len;
 	if( _len > 0 )
 	{
@@ -156,3 +159,5 @@ void VibratingString::resample( float *_src, f_cnt_t _src_frames,
 	}
 }
 
+
+} // namespace lmms

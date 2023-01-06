@@ -35,6 +35,10 @@
 #include "Song.h"
 #include "StringPairDrag.h"
 
+namespace lmms::gui
+{
+
+
 SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 	ClipView( _clip, _tv ),
 	m_clip( _clip ),
@@ -70,7 +74,7 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 
 	/*contextMenu.addAction( embed::getIconPixmap( "record" ),
 				tr( "Set/clear record" ),
-						m_clip, SLOT( toggleRecord() ) );*/
+						m_clip, SLOT(toggleRecord()));*/
 
 	cm->addAction(
 		embed::getIconPixmap("flip_x"),
@@ -136,7 +140,7 @@ void SampleClipView::mousePressEvent( QMouseEvent * _me )
 	{
 		if( _me->button() == Qt::MiddleButton && _me->modifiers() == Qt::ControlModifier )
 		{
-			SampleClip * sClip = dynamic_cast<SampleClip*>( getClip() );
+			auto sClip = dynamic_cast<SampleClip*>(getClip());
 			if( sClip )
 			{
 				sClip->updateTrackClips();
@@ -153,7 +157,7 @@ void SampleClipView::mouseReleaseEvent(QMouseEvent *_me)
 {
 	if( _me->button() == Qt::MiddleButton && !_me->modifiers() )
 	{
-		SampleClip * sClip = dynamic_cast<SampleClip*>( getClip() );
+		auto sClip = dynamic_cast<SampleClip*>(getClip());
 		if( sClip )
 		{
 			sClip->playbackPositionChanged();
@@ -338,7 +342,7 @@ bool SampleClipView::splitClip( const TimePos pos )
 		m_clip->getTrack()->addJournalCheckPoint();
 		m_clip->getTrack()->saveJournallingState( false );
 
-		SampleClip * rightClip = new SampleClip ( *m_clip );
+		auto rightClip = new SampleClip(*m_clip);
 
 		m_clip->changeLength( splitPos - m_initialClipPos );
 
@@ -351,3 +355,6 @@ bool SampleClipView::splitClip( const TimePos pos )
 	}
 	else { return false; }
 }
+
+
+} // namespace lmms::gui
