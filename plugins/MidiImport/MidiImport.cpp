@@ -358,7 +358,11 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	pd.setValue( 2 );
 
 	// Tempo stuff
-	AutomationClip * tap = tc->tempoAutomationClip();
+	auto tt = dynamic_cast<AutomationTrack*>(Track::create(Track::AutomationTrack, Engine::getSong()));
+	tt->setName(tr("Tempo"));
+	auto tap = new AutomationClip(tt);
+	tap->setDisplayName(tr("Tempo"));
+	tap->addObject(&Engine::getSong()->tempoModel());
 	if( tap )
 	{
 		tap->clear();
