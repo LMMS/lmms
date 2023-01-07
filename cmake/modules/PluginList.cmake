@@ -54,7 +54,7 @@ SET(LMMS_PLUGIN_LIST
 	Patman
 	PeakControllerEffect
 	GigPlayer
-	ReverbSC
+	Reverb
 	Sf2Player
 	Sfxr
 	Sid

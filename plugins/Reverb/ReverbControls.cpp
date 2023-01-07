@@ -1,5 +1,5 @@
 /*
- * ReverbSCControls.cpp - controls for ReverbSC
+ * ReverbControls.cpp - controls for Reverb
  *
  * Copyright (c) 2017 Paul Batchelor
  *
@@ -25,15 +25,15 @@
 
 #include <QDomElement>
 
-#include "ReverbSCControls.h"
-#include "ReverbSC.h"
+#include "ReverbControls.h"
+#include "Reverb.h"
 #include "Engine.h"
 
 namespace lmms
 {
 
 
-ReverbSCControls::ReverbSCControls( ReverbSCEffect* effect ) :
+ReverbControls::ReverbControls( ReverbEffect* effect ) :
 	EffectControls( effect ),
 	m_effect( effect ),
 	m_inputGainModel( 0.0f, -60.0f, 15, 0.1f, this, tr( "Input gain" ) ),
@@ -42,13 +42,17 @@ ReverbSCControls::ReverbSCControls( ReverbSCEffect* effect ) :
 	m_outputGainModel( 0.0f, -60.0f, 15, 0.1f, this, tr( "Output gain" ) )
 {
 	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( changeSampleRate() ));
+	m_inPeakL = 0.0;
+	m_inPeakR = 0.0;
+	m_outPeakL = 0.0;
+	m_outPeakR = 0.0;
 }
 
-void ReverbSCControls::changeControl()
+void ReverbControls::changeControl()
 {
 }
 
-void ReverbSCControls::loadSettings( const QDomElement& _this )
+void ReverbControls::loadSettings( const QDomElement& _this )
 {
 	m_inputGainModel.loadSettings( _this, "input_gain" );
 	m_sizeModel.loadSettings( _this, "size" );
@@ -56,7 +60,7 @@ void ReverbSCControls::loadSettings( const QDomElement& _this )
 	m_outputGainModel.loadSettings( _this, "output_gain" );
 }
 
-void ReverbSCControls::saveSettings( QDomDocument& doc, QDomElement& _this )
+void ReverbControls::saveSettings( QDomDocument& doc, QDomElement& _this )
 {
 	m_inputGainModel.saveSettings( doc, _this, "input_gain" ); 
 	m_sizeModel.saveSettings( doc, _this, "size" ); 
@@ -64,7 +68,7 @@ void ReverbSCControls::saveSettings( QDomDocument& doc, QDomElement& _this )
 	m_outputGainModel.saveSettings( doc, _this, "output_gain" ); 
 }
 
-void ReverbSCControls::changeSampleRate()
+void ReverbControls::changeSampleRate()
 {
 	m_effect->changeSampleRate();
 }

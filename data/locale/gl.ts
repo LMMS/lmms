@@ -10343,7 +10343,7 @@ Razón: «%2»</translation>
         <translation>Engadido para controlar botóns con picos de son</translation>
     </message>
     <message>
-        <location filename="../../plugins/ReverbSC/ReverbSC.cpp" line="38"/>
+        <location filename="../../plugins/Reverb/Reverb.cpp" line="38"/>
         <source>Reverb algorithm by Sean Costello</source>
         <translation type="unfinished"/>
     </message>
@@ -11455,67 +11455,67 @@ You can disable these checks to get a faster scanning time (at your own risk).</
     </message>
 </context>
 <context>
-    <name>ReverbSCControlDialog</name>
+    <name>ReverbControlDialog</name>
     <message>
-        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="43"/>
+        <location filename="../../plugins/Reverb/ReverbControlDialog.cpp" line="43"/>
         <source>Input</source>
         <translation>Entrada</translation>
     </message>
     <message>
-        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="44"/>
+        <location filename="../../plugins/Reverb/ReverbControlDialog.cpp" line="44"/>
         <source>Input gain:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="49"/>
+        <location filename="../../plugins/Reverb/ReverbControlDialog.cpp" line="49"/>
         <source>Size</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="50"/>
+        <location filename="../../plugins/Reverb/ReverbControlDialog.cpp" line="50"/>
         <source>Size:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="55"/>
+        <location filename="../../plugins/Reverb/ReverbControlDialog.cpp" line="55"/>
         <source>Color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="56"/>
+        <location filename="../../plugins/Reverb/ReverbControlDialog.cpp" line="56"/>
         <source>Color:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="61"/>
+        <location filename="../../plugins/Reverb/ReverbControlDialog.cpp" line="61"/>
         <source>Output</source>
         <translation>Saída</translation>
     </message>
     <message>
-        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="62"/>
+        <location filename="../../plugins/Reverb/ReverbControlDialog.cpp" line="62"/>
         <source>Output gain:</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
-    <name>ReverbSCControls</name>
+    <name>ReverbControls</name>
     <message>
-        <location filename="../../plugins/ReverbSC/ReverbSCControls.cpp" line="36"/>
+        <location filename="../../plugins/Reverb/ReverbControls.cpp" line="36"/>
         <source>Input gain</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/ReverbSC/ReverbSCControls.cpp" line="37"/>
+        <location filename="../../plugins/Reverb/ReverbControls.cpp" line="37"/>
         <source>Size</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/ReverbSC/ReverbSCControls.cpp" line="38"/>
+        <location filename="../../plugins/Reverb/ReverbControls.cpp" line="38"/>
         <source>Color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/ReverbSC/ReverbSCControls.cpp" line="39"/>
+        <location filename="../../plugins/Reverb/ReverbControls.cpp" line="39"/>
         <source>Output gain</source>
         <translation type="unfinished"/>
     </message>

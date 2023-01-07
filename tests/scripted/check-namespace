@@ -75,7 +75,7 @@ exclude_files = re.compile(
     'include/(aeffectx|fenv|ladspa).h|'
     'plugins/LadspaEffect/(calf|caps|cmt|swh|tap)/|'
     'plugins/MidiExport/MidiFile.hpp|'
-    'plugins/ReverbSC/[a-z]|'
+    'plugins/Reverb/[a-z]|'
     'plugins/Sf2Player/fluidsynthshims.h|'
     '/portsmf/|'
     # only forward to headers that are not ours:

@@ -1,5 +1,5 @@
 /*
- * ReverbSCControls.h 
+ * ReverbControls.h 
  *
  * Copyright (c) 2017 Paul Batchelor
  * 
@@ -22,31 +22,31 @@
  *
  */
 
-#ifndef REVERBSC_CONTROLS_H
-#define REVERBSC_CONTROLS_H
+#ifndef Reverb_CONTROLS_H
+#define Reverb_CONTROLS_H
 
 #include "EffectControls.h"
-#include "ReverbSCControlDialog.h"
+#include "ReverbControlDialog.h"
 
 
 namespace lmms
 {
 
 
-class ReverbSCEffect;
+class ReverbEffect;
 
-class ReverbSCControls : public EffectControls
+class ReverbControls : public EffectControls
 {
 	Q_OBJECT
 public:
-	ReverbSCControls( ReverbSCEffect* effect );
-	~ReverbSCControls() override = default;
+	ReverbControls( ReverbEffect* effect );
+	~ReverbControls() override = default;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
 	inline QString nodeName() const override
 	{
-		return "ReverbSCControls";
+		return "ReverbControls";
 	}
 
 	int controlCount() override
@@ -56,8 +56,12 @@ public:
 
 	gui::EffectControlDialog* createView() override
 	{
-		return new gui::ReverbSCControlDialog( this );
+		return new gui::ReverbControlDialog( this );
 	}
+	float m_inPeakL;
+	float m_inPeakR;
+	float m_outPeakL;
+	float m_outPeakR;
 
 
 private slots:
@@ -65,14 +69,14 @@ private slots:
 	void changeSampleRate();
 
 private:
-	ReverbSCEffect* m_effect;
+	ReverbEffect* m_effect;
 	FloatModel m_inputGainModel;
 	FloatModel m_sizeModel;
 	FloatModel m_colorModel;
 	FloatModel m_outputGainModel;
 
-	friend class gui::ReverbSCControlDialog;
-	friend class ReverbSCEffect;
+	friend class gui::ReverbControlDialog;
+	friend class ReverbEffect;
 
 } ;
 

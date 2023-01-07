@@ -1,19 +1,20 @@
 INCLUDE(BuildPlugin)
 
 BUILD_PLUGIN(
-	reverbsc
-	ReverbSC.cpp
-	ReverbSCControls.cpp
-	ReverbSCControlDialog.cpp
+	Reverb
+	Reverb.cpp
+	ReverbControls.cpp
+	ReverbControlDialog.cpp
 	base.c
 	revsc.c
 	base.h
 	revsc.h
 	dcblock.h
 	dcblock.c
-	ReverbSC.h
+	Reverb.h
 	MOCFILES
-	ReverbSCControls.h
-	ReverbSCControlDialog.h
+	ReverbControls.h
+	ReverbControlDialog.h
+	../Eq/EqFader.h
 	EMBEDDED_RESOURCES artwork.png logo.png
 )

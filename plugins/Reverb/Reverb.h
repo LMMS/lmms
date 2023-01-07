@@ -1,5 +1,5 @@
 /*
- * ReverbSCControlDialog.h - control dialog for ReverbSC
+ * RerverbSC.h - Reverb algorithm by Sean Costello
  *
  * Copyright (c) 2017 Paul Batchelor
  *
@@ -22,32 +22,47 @@
  *
  */
 
-#ifndef REVERBSC_CONTROL_DIALOG_H
-#define REVERBSC_CONTROL_DIALOG_H
 
-#include "EffectControlDialog.h"
+#ifndef Reverb_H
+#define Reverb_H
+
+#include "Effect.h"
+#include "ReverbControls.h"
+
+extern "C" {
+    #include "base.h"
+    #include "revsc.h"
+    #include "dcblock.h"
+}
 
 
 namespace lmms
 {
 
-class ReverbSCControls;
 
-
-namespace gui
+class ReverbEffect : public Effect
 {
-
-class ReverbSCControlDialog : public EffectControlDialog
-{
-	Q_OBJECT
 public:
-	ReverbSCControlDialog( ReverbSCControls* controls );
-	~ReverbSCControlDialog() override = default;
+	ReverbEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
+	~ReverbEffect() override;
+	bool processAudioBuffer( sampleFrame* buf, const fpp_t frames ) override;
 
+	EffectControls* controls() override
+	{
+		return &m_ReverbControls;
+	}
+
+	void changeSampleRate();
+
+private:
+	ReverbControls m_ReverbControls;
+	sp_data *sp;
+	sp_revsc *revsc;
+	sp_dcblock *dcblk[2];
+	QMutex mutex;
+	friend class ReverbControls;
 } ;
 
-
-} // namespace gui
 
 } // namespace lmms
 
