@@ -27,9 +27,10 @@
 #define TEXT_FLOAT_H
 
 #include <QWidget>
-#include <QPixmap>
 
 #include "lmms_export.h"
+
+class QLabel;
 
 namespace lmms::gui
 {
@@ -47,11 +48,6 @@ public:
 
 	void setVisibilityTimeOut( int _msecs );
 
-
-	static TextFloat * displayMessage( const QString & _msg,
-						int _timeout = 2000,
-						QWidget * _parent = nullptr,
-						int _add_y_margin = 0 );
 	static TextFloat * displayMessage( const QString & _title,
 						const QString & _msg,
 						const QPixmap & _pixmap =
@@ -66,16 +62,15 @@ public:
 
 
 protected:
-	void paintEvent( QPaintEvent * _me ) override;
 	void mousePressEvent( QMouseEvent * _me ) override;
 
 
 private:
-	void updateSize();
+	TextFloat(const QString & _title, const QString & _text, const QPixmap & _pixmap);
 
-	QString m_title;
-	QString m_text;
-	QPixmap m_pixmap;
+	QLabel * m_pixmapLabel;
+	QLabel * m_titleLabel;
+	QLabel * m_textLabel;
 
 };
 

@@ -22,12 +22,15 @@
  *
  */
 
+#include "TextFloat.h"
+
 #include <QTimer>
 #include <QPainter>
 #include <QStyleOption>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QLabel>
 
-#include "TextFloat.h"
-#include "gui_templates.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
 
@@ -36,48 +39,57 @@ namespace lmms::gui
 
 
 TextFloat::TextFloat() :
-	QWidget( getGUI()->mainWindow(), Qt::ToolTip ),
-	m_title(),
-	m_text(),
-	m_pixmap()
+	TextFloat("", "", QPixmap())
 {
-	resize( 20, 20 );
-	hide();
-
-	setAttribute( Qt::WA_TranslucentBackground, true );
-	setStyle( QApplication::style() );
-	setFont( pointSize<8>( font() ) );
 }
 
+TextFloat::TextFloat(const QString & _title, const QString & _text, const QPixmap & _pixmap) :
+	QWidget( getGUI()->mainWindow(), Qt::ToolTip )
+{
+	QHBoxLayout * mainLayout = new QHBoxLayout();
+	setLayout(mainLayout);
 
+	// Create the label that displays the pixmap
+	m_pixmapLabel = new QLabel(this);
+	mainLayout->addWidget(m_pixmapLabel);
 
+	// Create the widget that displays the title and the text
+	QWidget * titleAndTextWidget = new QWidget(this);
+	QVBoxLayout * titleAndTextLayout = new QVBoxLayout();
+	titleAndTextWidget->setLayout(titleAndTextLayout);
+
+	m_titleLabel = new QLabel(titleAndTextWidget);
+	m_titleLabel->setStyleSheet("font-weight: bold;");
+	titleAndTextLayout->addWidget(m_titleLabel);
+
+	m_textLabel = new QLabel(titleAndTextWidget);
+	titleAndTextLayout->addWidget(m_textLabel);
+
+	mainLayout->addWidget(titleAndTextWidget);
+
+	// Call the setters so that the hidden state is updated
+	setTitle(_title);
+	setText(_text);
+	setPixmap(_pixmap);
+}
 
 void TextFloat::setTitle( const QString & _title )
 {
-	m_title = _title;
-	updateSize();
+	m_titleLabel->setText(_title);
+	m_titleLabel->setHidden(_title.isEmpty());
 }
-
-
-
 
 void TextFloat::setText( const QString & _text )
 {
-	m_text = _text;
-	updateSize();
+	m_textLabel->setText(_text);
+	m_textLabel->setHidden(_text.isEmpty());
 }
-
-
-
 
 void TextFloat::setPixmap( const QPixmap & _pixmap )
 {
-	m_pixmap = _pixmap;
-	updateSize();
+	m_pixmapLabel->setPixmap(_pixmap);
+	m_pixmapLabel->setHidden(_pixmap.isNull());
 }
-
-
-
 
 void TextFloat::setVisibilityTimeOut( int _msecs )
 {
@@ -85,121 +97,39 @@ void TextFloat::setVisibilityTimeOut( int _msecs )
 	show();
 }
 
-
-
-
-TextFloat * TextFloat::displayMessage( const QString & _msg, int _timeout,
-					QWidget * _parent, int _add_y_margin )
+TextFloat * TextFloat::displayMessage( const QString & _title,
+					const QString & _msg,
+					const QPixmap & _pixmap,
+					int _timeout, QWidget * _parent )
 {
-	QWidget * mw = getGUI()->mainWindow();
-	auto tf = new TextFloat;
+	auto tf = new TextFloat(_title, _msg, _pixmap);
+
+	// Show the widget so that the correct height is calculated in the code that follows
+	tf->show();
+
 	if( _parent != nullptr )
 	{
 		tf->moveGlobal( _parent, QPoint( _parent->width() + 2, 0 ) );
 	}
 	else
 	{
-		tf->moveGlobal( mw, QPoint( 32, mw->height() - tf->height() - 8 - _add_y_margin ) );
+		// If no parent is given move the window to the lower left area of the main window
+		QWidget * mw = getGUI()->mainWindow();
+		tf->moveGlobal( mw, QPoint( 32, mw->height() - tf->height() - 8 ) );
 	}
-	tf->setText( _msg );
-	tf->show();
+
 	if( _timeout > 0 )
 	{
 		tf->setAttribute( Qt::WA_DeleteOnClose, true );
 		QTimer::singleShot( _timeout, tf, SLOT(close()));
 	}
-	return( tf );
+
+	return tf;
 }
-
-
-
-
-TextFloat * TextFloat::displayMessage( const QString & _title,
-					const QString & _msg,
-					const QPixmap & _pixmap,
-					int _timeout, QWidget * _parent )
-{
-	TextFloat * tf = displayMessage( _msg, _timeout, _parent, 16 );
-	tf->setTitle( _title );
-	tf->setPixmap( _pixmap );
-	return( tf );
-}
-
-
-
-
-void TextFloat::paintEvent( QPaintEvent * _pe )
-{
-	QStyleOption opt;
-    opt.init( this );
-	QPainter p( this );
-	p.fillRect( 0, 0, width(), height(), QColor( 0, 0, 0, 0 ) );
-
-/*	p.setPen( p.pen().brush().color() );
-	p.setBrush( p.background() );*/
-
-	p.setFont( pointSize<8>( p.font() ) );
-	
-	style()->drawPrimitive( QStyle::PE_Widget, &opt, &p, this );
-
-/*	p.drawRect( 0, 0, rect().right(), rect().bottom() );*/
-
-	if( m_title.isEmpty() )
-	{
-		p.drawText( opt.rect, Qt::AlignCenter, m_text );
-	}
-	else
-	{
-		int text_x = opt.rect.left() + 2;
-		int text_y = opt.rect.top() + 12;
-		if( m_pixmap.isNull() == false )
-		{
-			p.drawPixmap( opt.rect.topLeft() + QPoint( 5, 5 ), m_pixmap );
-			text_x += m_pixmap.width() + 8;
-		}
-		p.drawText( text_x, text_y + 16, m_text );
-		QFont f = p.font();
-		f.setBold( true );
-		p.setFont( f );
-		p.drawText( text_x, text_y, m_title );
-	}
-}
-
-
-
 
 void TextFloat::mousePressEvent( QMouseEvent * )
 {
 	close();
 }
-
-
-
-
-void TextFloat::updateSize()
-{
-	QFontMetrics metrics( pointSize<8>( font() ) );
-	QRect textBound = metrics.boundingRect( m_text );
-	if( !m_title.isEmpty() )
-	{
-		QFont f = pointSize<8>( font() );
-		f.setBold( true );
-		int title_w = QFontMetrics( f ).boundingRect( m_title ).width();
-		if( title_w > textBound.width() )
-		{
-			textBound.setWidth( title_w );
-		}
-		textBound.setHeight( textBound.height() * 2 + 8 );
-	}
-	if( m_pixmap.isNull() == false )
-	{
-		textBound.setWidth( textBound.width() + m_pixmap.width() + 10 );
-	}
-	resize( textBound.width() + 5, textBound.height()+2 );
-	//move( QPoint( parentWidget()->width() + 5, 5 ) );
-	update();
-}
-
-
 
 } // namespace lmms::gui
