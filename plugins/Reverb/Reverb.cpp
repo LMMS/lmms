@@ -34,7 +34,6 @@ namespace lmms
 
 extern "C"
 {
-
 Plugin::Descriptor PLUGIN_EXPORT Reverb_plugin_descriptor =
 {
 	LMMS_STRINGIFY( PLUGIN_NAME ),
@@ -47,7 +46,6 @@ Plugin::Descriptor PLUGIN_EXPORT Reverb_plugin_descriptor =
 	nullptr,
 	nullptr,
 } ;
-
 }
 
 ReverbEffect::ReverbEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key ) :
@@ -140,7 +138,6 @@ bool ReverbEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 		
 	}
 
-
 	checkGate( outSum / frames );
 	m_ReverbControls.m_inPeakL = inLPeak;
 	m_ReverbControls.m_inPeakR = inRPeak;
@@ -173,7 +170,6 @@ void ReverbEffect::changeSampleRate()
 
 extern "C"
 {
-
 // necessary for getting instance out of shared lib
 PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 {
@@ -182,7 +178,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data)
 	);
 }
-
 }
 
 

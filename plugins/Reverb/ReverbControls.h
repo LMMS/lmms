@@ -77,7 +77,6 @@ private:
 
 	friend class gui::ReverbControlDialog;
 	friend class ReverbEffect;
-
 } ;
 
 

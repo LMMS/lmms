@@ -68,7 +68,6 @@ ReverbControlDialog::ReverbControlDialog( ReverbControls* controls ) :
 	outFader->move( 106, 16 );
 	outFader->setDisplayConversion( false );
 	outFader->setHintText( tr( "Gain" ), "dBFS" );
-	
 }
 
 
