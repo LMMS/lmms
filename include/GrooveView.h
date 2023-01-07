@@ -56,6 +56,6 @@ private:
 	QComboBox* m_comboBox;
 };
 
-} // namespace lmms
+} // namespace lmms::gui
 
 #endif // GROOVEVIEW_H

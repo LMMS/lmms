@@ -58,6 +58,6 @@ public:
 	QWidget* instantiateView(QWidget* parent);
 };
 
-}
+} // namespace lmms
 
 #endif // MIDISWING_H
