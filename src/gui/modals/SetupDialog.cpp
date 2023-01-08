@@ -264,11 +264,22 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	QStringList fileNames = dir.entryList(QStringList("*.qm"));
 	for(int i = 0; i < fileNames.size(); ++i)
 	{
-		// Get locale extracted by filename.
+		// Extract ISO-639 language code from filename
 		fileNames[i].truncate(fileNames[i].lastIndexOf('.'));
+		// Skip invalid language codes
+		QLocale locale(fileNames[i]);
+		if (locale.language() == QLocale::C)
+		{
+			continue;
+		}
+		// Display the native language name or fallback to the English name
+		QString langName = locale.nativeLanguageName();
+		if (langName.isEmpty())
+		{
+			langName = QLocale::languageToString(locale.language());
+		}
 		m_languages.append(fileNames[i]);
-		QString lang = QLocale(m_languages.last()).nativeLanguageName();
-		changeLang->addItem(lang);
+		changeLang->addItem(langName);
 	}
 
 	// If language unset, fallback to system language when available.

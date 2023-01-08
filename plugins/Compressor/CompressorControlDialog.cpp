@@ -206,7 +206,7 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	peakButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("peak_sel"));
 	peakButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("peak_unsel"));
 	peakButton->setToolTip(tr("Use absolute value of the input"));
-	
+
 	rmsPeakGroup = new automatableButtonGroup(this);
 	rmsPeakGroup->addButton(rmsButton);
 	rmsPeakGroup->addButton(peakButton);
@@ -221,7 +221,7 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	midSideButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("midside_sel"));
 	midSideButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("midside_unsel"));
 	midSideButton->setToolTip(tr("Compress mid and side audio"));
-	
+
 	leftRightMidSideGroup = new automatableButtonGroup(this);
 	leftRightMidSideGroup->addButton(leftRightButton);
 	leftRightMidSideGroup->addButton(midSideButton);
@@ -514,8 +514,8 @@ void CompressorControlDialog::redrawKnee()
 	{
 		m_p.setPen(QPen(m_kneeColor2, 3));
 
-		float prevPoint[2] = {kneePoint1, kneePoint1};
-		float newPoint[2] = {0, 0};
+		auto prevPoint = std::array{kneePoint1, kneePoint1};
+		auto newPoint = std::array{0.f, 0.f};
 
 		// Draw knee curve using many straight lines.
 		for (int i = 0; i < COMP_KNEE_LINES; ++i)
@@ -542,7 +542,7 @@ void CompressorControlDialog::redrawKnee()
 	m_p.end();
 
 	m_p.begin(&m_kneePixmap2);
-	
+
 	m_p.setCompositionMode(QPainter::CompositionMode_Source);
 	m_p.fillRect(0, 0, m_windowSizeX, m_kneeWindowSizeY, QColor("transparent"));
 	m_p.setCompositionMode(QPainter::CompositionMode_SourceOver);

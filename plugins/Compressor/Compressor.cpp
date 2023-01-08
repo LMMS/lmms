@@ -276,7 +276,7 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	float rOutPeak = 0.0;
 	float lInPeak = 0.0;
 	float rInPeak = 0.0;
-	
+
 	const bool midside = m_compressorControls.m_midsideModel.value();
 	const bool peakmode = m_compressorControls.m_peakmodeModel.value();
 	const float inBalance = m_compressorControls.m_inBalanceModel.value();
@@ -292,8 +292,8 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 	for(fpp_t f = 0; f < frames; ++f)
 	{
-		sample_t drySignal[2] = {buf[f][0], buf[f][1]};
-		sample_t s[2] = {drySignal[0] * m_inGainVal, drySignal[1] * m_inGainVal};
+		auto drySignal = std::array{buf[f][0], buf[f][1]};
+		auto s = std::array{drySignal[0] * m_inGainVal, drySignal[1] * m_inGainVal};
 
 		// Calculate tilt filters, to bias the sidechain to the low or high frequencies
 		if (m_tiltVal)
@@ -512,7 +512,7 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 				m_inputBufLoc = 0;
 			}
 
-			const float temp[2] = {drySignal[0], drySignal[1]};
+			const auto temp = std::array{drySignal[0], drySignal[1]};
 			s[0] = m_inputBuf[0][m_inputBufLoc];
 			s[1] = m_inputBuf[1][m_inputBufLoc];
 
@@ -525,8 +525,8 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			s[1] = drySignal[1];
 		}
 
-		float delayedDrySignal[2] = {s[0], s[1]};
-		
+		auto delayedDrySignal = std::array{s[0], s[1]};
+
 		if (midside)// Convert left/right to mid/side
 		{
 			const float temp = s[0];
