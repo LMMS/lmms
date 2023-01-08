@@ -1,12 +1,12 @@
 /*
  * RevSC
  *
- * This code has been extracted from the Csound opcode "Reverb".
+ * This code has been extracted from the Csound opcode "reverbsc".
  * It has been modified to work as a Soundpipe module.
  *
  * Original Author(s): Sean Costello, Istvan Varga
  * Year: 1999, 2005
- * Location: Opcodes/Reverb.c
+ * Location: Opcodes/reverbsc.c
  *
  */
 #include <math.h>

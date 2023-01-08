@@ -10368,7 +10368,7 @@ Reason: &quot;%2&quot;</source>
         <translation>Модуль для установки значений регуляторов по пикам громкости</translation>
     </message>
     <message>
-        <location filename="../../plugins/Reverb/Reverb.cpp" line="38"/>
+        <location filename="../../plugins/ReverbSC/ReverbSC.cpp" line="38"/>
         <source>Reverb algorithm by Sean Costello</source>
         <translation>Алгоритм реверберации Шона Костелло</translation>
     </message>
@@ -11483,67 +11483,67 @@ You can disable these checks to get a faster scanning time (at your own risk).</
     </message>
 </context>
 <context>
-    <name>ReverbControlDialog</name>
+    <name>ReverbSCControlDialog</name>
     <message>
-        <location filename="../../plugins/Reverb/ReverbControlDialog.cpp" line="43"/>
+        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="43"/>
         <source>Input</source>
         <translation>Вход</translation>
     </message>
     <message>
-        <location filename="../../plugins/Reverb/ReverbControlDialog.cpp" line="44"/>
+        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="44"/>
         <source>Input gain:</source>
         <translation>Входное усиление:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Reverb/ReverbControlDialog.cpp" line="49"/>
+        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="49"/>
         <source>Size</source>
         <translation>Размер</translation>
     </message>
     <message>
-        <location filename="../../plugins/Reverb/ReverbControlDialog.cpp" line="50"/>
+        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="50"/>
         <source>Size:</source>
         <translation>Размер:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Reverb/ReverbControlDialog.cpp" line="55"/>
+        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="55"/>
         <source>Color</source>
         <translation>Цвет</translation>
     </message>
     <message>
-        <location filename="../../plugins/Reverb/ReverbControlDialog.cpp" line="56"/>
+        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="56"/>
         <source>Color:</source>
         <translation>Цвет:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Reverb/ReverbControlDialog.cpp" line="61"/>
+        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="61"/>
         <source>Output</source>
         <translation>Выход</translation>
     </message>
     <message>
-        <location filename="../../plugins/Reverb/ReverbControlDialog.cpp" line="62"/>
+        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="62"/>
         <source>Output gain:</source>
         <translation>Выходное усиление:</translation>
     </message>
 </context>
 <context>
-    <name>ReverbControls</name>
+    <name>ReverbSCControls</name>
     <message>
-        <location filename="../../plugins/Reverb/ReverbControls.cpp" line="36"/>
+        <location filename="../../plugins/ReverbSC/ReverbSCControls.cpp" line="36"/>
         <source>Input gain</source>
         <translation>Входное усиление</translation>
     </message>
     <message>
-        <location filename="../../plugins/Reverb/ReverbControls.cpp" line="37"/>
+        <location filename="../../plugins/ReverbSC/ReverbSCControls.cpp" line="37"/>
         <source>Size</source>
         <translation>Размер</translation>
     </message>
     <message>
-        <location filename="../../plugins/Reverb/ReverbControls.cpp" line="38"/>
+        <location filename="../../plugins/ReverbSC/ReverbSCControls.cpp" line="38"/>
         <source>Color</source>
         <translation>Цвет</translation>
     </message>
     <message>
-        <location filename="../../plugins/Reverb/ReverbControls.cpp" line="39"/>
+        <location filename="../../plugins/ReverbSC/ReverbSCControls.cpp" line="39"/>
         <source>Output gain</source>
         <translation>Выходное усиление</translation>
     </message>

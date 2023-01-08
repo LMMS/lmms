@@ -1,5 +1,5 @@
 /*
- * ReverbControlDialog.cpp - control dialog for Reverb
+ * ReverbSCControlDialog.cpp - control dialog for ReverbSC
  *
  * Copyright (c) 2017 Paul Batchelor
  *
@@ -23,25 +23,25 @@
  */
 
 
-#include "ReverbControlDialog.h"
+#include "ReverbSCControlDialog.h"
 
 #include "embed.h"
 #include "Knob.h"
-#include "ReverbControls.h"
+#include "ReverbSCControls.h"
 #include "../Eq/EqFader.h"
 
 namespace lmms::gui
 {
 
 
-ReverbControlDialog::ReverbControlDialog( ReverbControls* controls ) :
+ReverbSCControlDialog::ReverbSCControlDialog( ReverbSCControls* controls ) :
 	EffectControlDialog( controls )
 {
 	setAutoFillBackground( true );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-	setFixedSize( 144, 144);
+	setFixedSize( 144, 144 );
 
 	auto inFader
 		= new EqFader(&controls->m_inputGainModel, tr("Input gain"), this, &controls->m_inPeakL, &controls->m_inPeakR);
