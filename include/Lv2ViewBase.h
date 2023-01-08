@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_LV2_VIEW_BASE_H
-#define LMMS_LV2_VIEW_BASE_H
+#ifndef LMMS_GUI_LV2_VIEW_BASE_H
+#define LMMS_GUI_LV2_VIEW_BASE_H
 
 #include "lmmsconfig.h"
 
@@ -109,4 +109,4 @@ private:
 
 #endif // LMMS_HAVE_LV2
 
-#endif // LMMS_LV2_VIEW_BASE_H
+#endif // LMMS_GUI_LV2_VIEW_BASE_H
