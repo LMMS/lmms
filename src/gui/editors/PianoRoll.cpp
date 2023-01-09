@@ -2287,7 +2287,7 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 			// select the notes within the selection rectangle and
 			// then destroy the selection rectangle
 			computeSelectedNotes(
-					me->modifiers() & Qt::ShiftModifier );
+					me->modifiers() & (Qt::ShiftModifier | Qt::ControlModifier));
 		}
 		else if( m_action == ActionMoveNote )
 		{
