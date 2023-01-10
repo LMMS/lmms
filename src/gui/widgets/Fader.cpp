@@ -54,13 +54,13 @@
 #include "embed.h"
 #include "CaptionMenu.h"
 #include "ConfigManager.h"
-#include "TextFloat.h"
+#include "SimpleTextFloat.h"
 
 namespace lmms::gui
 {
 
 
-TextFloat * Fader::s_textFloat = nullptr;
+SimpleTextFloat * Fader::s_textFloat = nullptr;
 QPixmap * Fader::s_back = nullptr;
 QPixmap * Fader::s_leds = nullptr;
 QPixmap * Fader::s_knob = nullptr;
@@ -83,7 +83,7 @@ Fader::Fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 {
 	if( s_textFloat == nullptr )
 	{
-		s_textFloat = new TextFloat;
+		s_textFloat = new SimpleTextFloat;
 	}
 	if( ! s_back )
 	{
@@ -125,7 +125,7 @@ Fader::Fader( FloatModel * model, const QString & name, QWidget * parent, QPixma
 {
 	if( s_textFloat == nullptr )
 	{
-		s_textFloat = new TextFloat;
+		s_textFloat = new SimpleTextFloat;
 	}
 
 	m_back = back;

@@ -60,7 +60,7 @@ namespace gui
 
 class ComboBox;
 class PositionLine;
-class TextFloat;
+class SimpleTextFloat;
 class TimeLineWidget;
 
 
@@ -345,7 +345,7 @@ private:
 
 	static std::array<PianoRollKeyTypes, 12> prKeyOrder;
 
-	static TextFloat * s_textFloat;
+	static SimpleTextFloat * s_textFloat;
 
 	ComboBoxModel m_zoomingModel;
 	ComboBoxModel m_zoomingYModel;
