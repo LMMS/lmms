@@ -1625,8 +1625,8 @@ void DataFile::upgrade_noHiddenAutomationTracks()
 	if (!gaTrack.isNull()
 		&& gaTrack.attribute("type").toInt() == Track::HiddenAutomationTrack)
 	{
-		// global automationpatterns
-		QDomNodeList aps = gaTrack.elementsByTagName("automationpattern");
+		// global automationclips
+		QDomNodeList aps = gaTrack.elementsByTagName("automationclip");
 		for (int i = 0; i < aps.length(); ++i)
 		{
 			QDomElement ap = aps.item(i).toElement();
