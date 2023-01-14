@@ -33,7 +33,6 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QShortcut>
-#include <QLibrary>
 #include <QSplitter>
 
 #include "AboutDialog.h"
@@ -78,22 +77,6 @@
 namespace lmms::gui
 {
 
-#if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_APPLE) && !defined(LMMS_BUILD_HAIKU)
-//Work around an issue on KDE5 as per https://bugs.kde.org/show_bug.cgi?id=337491#c21
-void disableAutoKeyAccelerators(QWidget* mainWindow)
-{
-	using DisablerFunc = void(*)(QWidget*);
-	QLibrary kf5WidgetsAddon("KF5WidgetsAddons", 5);
-	auto setNoAccelerators
-		= reinterpret_cast<DisablerFunc>(kf5WidgetsAddon.resolve("_ZN19KAcceleratorManager10setNoAccelEP7QWidget"));
-	if(setNoAccelerators)
-	{
-		setNoAccelerators(mainWindow);
-	}
-	kf5WidgetsAddon.unload();
-}
-#endif
-
 
 MainWindow::MainWindow() :
 	m_workspace( nullptr ),
@@ -103,9 +86,6 @@ MainWindow::MainWindow() :
 	m_metronomeToggle( 0 ),
 	m_session( Normal )
 {
-#if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_APPLE) && !defined(LMMS_BUILD_HAIKU)
-	disableAutoKeyAccelerators(this);
-#endif
 	setAttribute( Qt::WA_DeleteOnClose );
 
 	auto main_widget = new QWidget(this);
