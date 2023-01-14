@@ -61,7 +61,7 @@ QVariant decode( const QString & _b64, QVariant::Type _force_type )
  * @param data
  * @return std::string containing the Base64 encoded data.
  */
-std::string encode(std::string_view data)
+auto encode(std::string_view data) -> std::string
 {
 	if (data.empty()) { return ""; }
 
@@ -69,7 +69,9 @@ std::string encode(std::string_view data)
 	std::string result;
 
 	// number of chunks to process + padding
-	auto [numChunks, numTrailingBytes] = std::div(data.length(), numBytesPerChunk);
+	auto div_result = std::div(data.length(), numBytesPerChunk);
+	auto numChunks = div_result.quot;
+	auto numTrailingBytes = div_result.rem;
 
 	// add 1 chunk to handle last padded chunk
 	if (numTrailingBytes) { ++numChunks; }
@@ -110,7 +112,7 @@ std::string encode(std::string_view data)
 	for (int currentChunk = 0; currentChunk < numChunks; ++currentChunk)
 	{
 		std::string_view chunk = data.substr(currentChunk * numBytesPerChunk, numBytesPerChunk);
-		std::string output{
+		std::array<char, 4> output{
 			map[b64char1(chunk)],
 			map[b64char2(chunk)],
 			pad,
@@ -123,7 +125,7 @@ std::string encode(std::string_view data)
 				output[2] = map[b64char3(chunk)];
 			default: /* no-op */;
 		};
-		result += output;
+		result.append(output.data(), output.size());
 	}
 	return result;
 }
@@ -133,7 +135,7 @@ std::string encode(std::string_view data)
  * @param data
  * @return std::string containing the original data.
  */
-std::string decode(std::string_view data)
+auto decode(std::string_view data) -> std::string
 {
 	if (data.empty()) { return ""; }
 	if (data.length() % numBase64CharPerChunk != 0) {

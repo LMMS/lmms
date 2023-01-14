@@ -30,9 +30,11 @@
 #include <QString>
 #include <QVariant>
 
+#include <array>
+#include <map>
+#include <numeric>
 #include <string>
 #include <string_view>
-#include <cmath>
 
 namespace lmms::base64
 {
@@ -58,14 +60,14 @@ namespace lmms::base64
 } // namespace lmms::base64
 
 namespace lmms::base64 {
-	constexpr std::array<char, 64> map =
+	constexpr inline std::array<char, 64> map =
 	{
 		'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
 		'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
 		'0','1','2','3','4','5','6','7','8','9',
 		'-','_'
 	};
-	const std::map<char, int> rmap {
+	const inline std::map<char, int> rmap {
 		{'A',  0}, {'B',  1}, {'C',  2}, {'D',  3}, {'E',  4},
 		{'F',  5}, {'G',  6}, {'H',  7}, {'I',  8}, {'J',  9},
 		{'K', 10}, {'L', 11}, {'M', 12}, {'N', 13}, {'O', 14},
@@ -104,8 +106,8 @@ namespace lmms::base64 {
 	// double check math works and bit width matches
 	static_assert(numBytesPerChunk * numBitsPerChar == numBase64CharPerChunk * numBitsPerBase64Char);
 
-	std::string encode(std::string_view data);
-	std::string decode(std::string_view data);
+	auto encode(std::string_view data) -> std::string;
+	auto decode(std::string_view data) -> std::string;
 } // namespace lmms::base64
 
 #endif // _BASE64_H

@@ -30,25 +30,43 @@ class Base64Test : QTestSuite
 {
     Q_OBJECT
 private slots:
-    void Base64Tests()
+    void create_test_data()
+    {
+        QTest::addColumn<QString>("original");
+        QTest::addColumn<QString>("encoded");
+
+        // Test Vectors from RFC 4648 Section 10
+        QTest::newRow("empty string")  << ""       << "";
+        QTest::newRow("1 chunk 2 pad") << "f"      << "Zg==";
+        QTest::newRow("1 chunk 1 pad") << "fo"     << "Zm8=";
+        QTest::newRow("1 chunk 0 pad") << "foo"    << "Zm9v";
+        QTest::newRow("2 chunk 2 pad") << "foob"   << "Zm9vYg==";
+        QTest::newRow("2 chunk 1 pad") << "fooba"  << "Zm9vYmE=";
+        QTest::newRow("2 chunk 0 pad") << "foobar" << "Zm9vYmFy";
+    }
+    void b64_encode_data()
+    {
+        create_test_data();
+    }
+    void b64_encode()
     {
         using namespace lmms::base64;
 
-        // Test Vectors from RFC 4648 Section 10
-        std::vector<std::pair<std::string, std::string>> test_vectors{
-            {"", ""},
-            {"f", "Zg=="},
-            {"fo", "Zm8="},
-            {"foo", "Zm9v"},
-            {"foob", "Zm9vYg=="},
-            {"fooba", "Zm9vYmE="},
-            {"foobar", "Zm9vYmFy"},
-        };
-        for (auto vector : test_vectors)
-        {
-            QCOMPARE(QString(encode(vector.first).c_str()), QString(vector.second.c_str()));
-            QCOMPARE(QString(vector.first.c_str()), QString(decode(vector.second).c_str()));
-        }
+        QFETCH(QString, original);
+        QFETCH(QString, encoded);
+        QCOMPARE(QString(encode(original.toStdString()).c_str()), encoded);
+    }
+    void b64_decode_data()
+    {
+        create_test_data();
+    }
+    void b64_decode()
+    {
+        using namespace lmms::base64;
+
+        QFETCH(QString, original);
+        QFETCH(QString, encoded);
+        QCOMPARE(original, QString(decode(encoded.toStdString()).c_str()));
     }
 } Base64Tests;
 
