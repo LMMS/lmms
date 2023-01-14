@@ -27,23 +27,29 @@
 #ifndef SONG_EDITOR_H
 #define SONG_EDITOR_H
 
-#include <QVector>
-#include <QLinearGradient>
 
-#include "ActionGroup.h"
 #include "Editor.h"
 #include "TrackContainerView.h"
-#include "PositionLine.h"
 
 class QLabel;
 class QScrollBar;
 
+namespace lmms
+{
+
+class Song;
+class ComboBoxModel;
+
+namespace gui
+{
+
+
+class ActionGroup;
 class AutomatableSlider;
 class ComboBox;
-class ComboBoxModel;
 class LcdSpinBox;
 class MeterDialog;
-class Song;
+class PositionLine;
 class TextFloat;
 class TimeLineWidget;
 
@@ -55,11 +61,12 @@ public:
 	enum EditMode
 	{
 		DrawMode,
+		KnifeMode,
 		SelectMode
 	};
 
 	SongEditor( Song * song );
-	~SongEditor();
+	~SongEditor() override = default;
 
 	void saveSettings( QDomDocument& doc, QDomElement& element ) override;
 	void loadSettings( const QDomElement& element ) override;
@@ -75,14 +82,15 @@ public slots:
 	void stopSelectRegion();
 	void updateRubberband();
 
-	void setEditMode( EditMode mode );
+	void setEditMode( lmms::gui::SongEditor::EditMode mode );
 	void setEditModeDraw();
+	void setEditModeKnife();
 	void setEditModeSelect();
 	void toggleProportionalSnap();
 
-	void updatePosition( const MidiTime & t );
+	void updatePosition( const lmms::TimePos & t );
 	void updatePositionLine();
-	void selectAllTcos( bool select );
+	void selectAllClips( bool select );
 
 protected:
 	void closeEvent( QCloseEvent * ce ) override;
@@ -112,6 +120,7 @@ private:
 	void wheelEvent( QWheelEvent * we ) override;
 
 	bool allowRubberband() const override;
+	bool knifeMode() const override;
 
 	int trackIndexFromSelectionPoint(int yPos);
 	int indexOfTrackView(const TrackView* tv);
@@ -138,7 +147,7 @@ private:
 	ComboBoxModel* m_snappingModel;
 	bool m_proportionalSnap;
 
-	static const QVector<double> m_zoomLevels;
+	static const QVector<float> m_zoomLevels;
 
 	bool m_scrollBack;
 	bool m_smoothScroll;
@@ -150,7 +159,7 @@ private:
 	QPoint m_scrollPos;
 	QPoint m_mousePos;
 	int m_rubberBandStartTrackview;
-	MidiTime m_rubberbandStartMidipos;
+	TimePos m_rubberbandStartTimePos;
 	int m_currentZoomingValue;
 	int m_trackHeadWidth;
 	bool m_selectRegion;
@@ -158,7 +167,7 @@ private:
 	friend class SongEditorWindow;
 
 signals:
-	void zoomingValueChanged( double );
+	void zoomingValueChanged( float );
 } ;
 
 
@@ -173,6 +182,7 @@ public:
 	QSize sizeHint() const override;
 
 	SongEditor* m_editor;
+	void syncEditMode();
 
 protected:
 	void resizeEvent( QResizeEvent * event ) override;
@@ -194,16 +204,14 @@ signals:
 	void resized();
 
 private:
-	void keyPressEvent( QKeyEvent * ke ) override;
-	void keyReleaseEvent( QKeyEvent * ke ) override;
-
-	QAction* m_addBBTrackAction;
+	QAction* m_addPatternTrackAction;
 	QAction* m_addSampleTrackAction;
 	QAction* m_addAutomationTrackAction;
 	QAction* m_setProportionalSnapAction;
 
 	ActionGroup * m_editModeGroup;
 	QAction* m_drawModeAction;
+	QAction* m_knifeModeAction;
 	QAction* m_selectModeAction;
 	QAction* m_crtlAction;
 
@@ -214,5 +222,10 @@ private:
 	QAction* m_insertBarAction;
 	QAction* m_removeBarAction;
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

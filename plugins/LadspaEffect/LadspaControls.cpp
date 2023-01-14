@@ -24,7 +24,12 @@
 
 #include <QDomElement>
 
+#include "LadspaBase.h"
+#include "LadspaControl.h"
 #include "LadspaEffect.h"
+
+namespace lmms
+{
 
 
 LadspaControls::LadspaControls( LadspaEffect * _eff ) :
@@ -48,20 +53,19 @@ LadspaControls::LadspaControls( LadspaEffect * _eff ) :
 
 		const bool linked_control = ( m_processors > 1 && proc == 0 );
 
-		for( multi_proc_t::Iterator it = controls.begin(); it != controls.end(); it++ )
+		for (const auto& control : controls)
 		{
-			if( (*it)->proc == proc )
+			if (control->proc == proc)
 			{
-				(*it)->control = new LadspaControl( this, *it,
-							linked_control );
+				control->control = new LadspaControl(this, control, linked_control);
 
-				p.append( (*it)->control );
+				p.append(control->control);
 
-				if( linked_control )
+				if (linked_control)
 				{
-					connect( (*it)->control, SIGNAL( linkChanged( int, bool ) ),
-								this, SLOT( linkPort( int, bool ) ),
-								Qt::DirectConnection );
+					connect(control->control, SIGNAL(linkChanged(int, bool)),
+								this, SLOT(linkPort(int, bool)),
+								Qt::DirectConnection);
 				}
 			}
 		}
@@ -72,12 +76,11 @@ LadspaControls::LadspaControls( LadspaEffect * _eff ) :
 	// now link all controls
 	if( m_processors > 1 )
 	{
-		for( multi_proc_t::Iterator it = controls.begin(); 
-						it != controls.end(); it++ )
+		for (const auto& control : controls)
 		{
-			if( (*it)->proc == 0 )
+			if (control->proc == 0)
 			{
-				linkPort( ( *it )->control_id, true );
+				linkPort(control->control_id, true);
 			}
 		}
 	}
@@ -107,12 +110,10 @@ void LadspaControls::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	
 	multi_proc_t controls = m_effect->getPortControls();
 	_this.setAttribute( "ports", controls.count() );
-	for( multi_proc_t::Iterator it = controls.begin(); 
-						it != controls.end(); it++ )
+	for (const auto& control : controls)
 	{
-		QString n = "port" + QString::number( (*it)->proc ) + 
-					QString::number( (*it)->port_id );
-		(*it)->control->saveSettings( _doc, _this, n );
+		QString n = "port" + QString::number(control->proc) + QString::number(control->port_id);
+		control->control->saveSettings(_doc, _this, n);
 	}
 }
 
@@ -127,12 +128,10 @@ void LadspaControls::loadSettings( const QDomElement & _this )
 	}
 	
 	multi_proc_t controls = m_effect->getPortControls();
-	for( multi_proc_t::Iterator it = controls.begin(); 
-						it != controls.end(); it++ )
+	for (const auto& control : controls)
 	{
-		QString n = "port" + QString::number( (*it)->proc ) + 
-					QString::number( (*it)->port_id );
-		(*it)->control->loadSettings( _this, n );
+		QString n = "port" + QString::number(control->proc) + QString::number(control->port_id);
+		control->control->loadSettings(_this, n);
 	}
 }
 
@@ -188,5 +187,4 @@ void LadspaControls::updateLinkStatesFromGlobal()
 }
 
 
-
-
+} // namespace lmms

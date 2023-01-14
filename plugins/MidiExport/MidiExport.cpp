@@ -5,7 +5,7 @@
  * Copyright (c) 2017 Hyunjin Song <tteu.ingog/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either
@@ -24,28 +24,27 @@
  */
 
 
-#include <QDomDocument>
-#include <QDir>
-#include <QApplication>
-#include <QMessageBox>
-#include <QProgressDialog>
 
 #include "MidiExport.h"
 
-#include "lmms_math.h"
 #include "TrackContainer.h"
-#include "BBTrack.h"
+#include "DataFile.h"
 #include "InstrumentTrack.h"
 #include "LocaleHelper.h"
+#include "PatternTrack.h"
 
 #include "plugin_export.h"
+
+namespace lmms
+{
+
 
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT midiexport_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"MIDI Export",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Filter for exporting MIDI-files from LMMS" ),
@@ -53,9 +52,9 @@ Plugin::Descriptor PLUGIN_EXPORT midiexport_plugin_descriptor =
 	"Hyunjin Song <tteu.ingog/at/gmail.com>",
 	0x0100,
 	Plugin::ExportFilter,
-	NULL,
-	NULL,
-	NULL
+	nullptr,
+	nullptr,
+	nullptr,
 } ;
 
 }
@@ -68,14 +67,8 @@ MidiExport::MidiExport() : ExportFilter( &midiexport_plugin_descriptor)
 
 
 
-MidiExport::~MidiExport()
-{
-}
-
-
-
 bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
-			const TrackContainer::TrackList &tracks_BB,
+			const TrackContainer::TrackList &patternStoreTracks,
 			int tempo, int masterPitch, const QString &filename)
 {
 	QFile f(filename);
@@ -83,21 +76,21 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 	QDataStream midiout(&f);
 
 	InstrumentTrack* instTrack;
-	BBTrack* bbTrack;
+	PatternTrack* patternTrack;
 	QDomElement element;
 
 
 	int nTracks = 0;
-	uint8_t buffer[BUFFER_SIZE];
+	auto buffer = std::array<uint8_t, BUFFER_SIZE>{};
 	uint32_t size;
 
 	for (const Track* track : tracks) if (track->type() == Track::InstrumentTrack) nTracks++;
-	for (const Track* track : tracks_BB) if (track->type() == Track::InstrumentTrack) nTracks++;
+	for (const Track* track : patternStoreTracks) if (track->type() == Track::InstrumentTrack) nTracks++;
 
 	// midi header
 	MidiFile::MIDIHeader header(nTracks);
-	size = header.writeToBuffer(buffer);
-	midiout.writeRawData((char *)buffer, size);
+	size = header.writeToBuffer(buffer.data());
+	midiout.writeRawData((char *)buffer.data(), size);
 
 	std::vector<std::vector<std::pair<int,int>>> plists;
 
@@ -121,7 +114,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 			double base_volume = 1.0;
 			int base_time = 0;
 
-			MidiNoteVector pat;
+			MidiNoteVector midiClip;
 
 			for (QDomNode n = element.firstChild(); !n.isNull(); n = n.nextSibling())
 			{
@@ -129,8 +122,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 				if (n.nodeName() == "instrumenttrack")
 				{
 					QDomElement it = n.toElement();
-					// transpose +12 semitones, workaround for #1857
-					base_pitch = (69 - it.attribute("basenote", "57").toInt());
+					base_pitch = (69 - it.attribute("basenote", "69").toInt());
 					if (it.attribute("usemasterpitch", "1").toInt())
 					{
 						base_pitch += masterPitch;
@@ -138,34 +130,34 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 					base_volume = LocaleHelper::toDouble(it.attribute("volume", "100"))/100.0;
 				}
 
-				if (n.nodeName() == "pattern")
+				if (n.nodeName() == "midiclip")
 				{
 					base_time = n.toElement().attribute("pos", "0").toInt();
-					writePattern(pat, n, base_pitch, base_volume, base_time);
+					writeMidiClip(midiClip, n, base_pitch, base_volume, base_time);
 				}
 
 			}
-			ProcessBBNotes(pat, INT_MAX);
-			writePatternToTrack(mtrack, pat);
-			size = mtrack.writeToBuffer(buffer);
-			midiout.writeRawData((char *)buffer, size);
+			processPatternNotes(midiClip, INT_MAX);
+			writeMidiClipToTrack(mtrack, midiClip);
+			size = mtrack.writeToBuffer(buffer.data());
+			midiout.writeRawData((char *)buffer.data(), size);
 		}
 
-		if (track->type() == Track::BBTrack)
+		if (track->type() == Track::PatternTrack)
 		{
-			bbTrack = dynamic_cast<BBTrack *>(track);
-			element = bbTrack->saveState(dataFile, dataFile.content());
+			patternTrack = dynamic_cast<PatternTrack*>(track);
+			element = patternTrack->saveState(dataFile, dataFile.content());
 
 			std::vector<std::pair<int,int>> plist;
 			for (QDomNode n = element.firstChild(); !n.isNull(); n = n.nextSibling())
 			{
 
-				if (n.nodeName() == "bbtco")
+				if (n.nodeName() == "patternclip")
 				{
 					QDomElement it = n.toElement();
 					int pos = it.attribute("pos", "0").toInt();
 					int len = it.attribute("len", "0").toInt();
-					plist.push_back(std::pair<int,int>(pos, pos+len));
+					plist.emplace_back(pos, pos+len);
 				}
 			}
 			std::sort(plist.begin(), plist.end());
@@ -174,13 +166,15 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 		}
 	} // for each track
 
-	// midi tracks in BB tracks
-	for (Track* track : tracks_BB)
+	// for each instrument in the pattern editor
+	for (Track* track : patternStoreTracks)
 	{
 		DataFile dataFile(DataFile::SongProject);
 		MTrack mtrack;
 
+		// begin at the first pattern track (first pattern)
 		auto itr = plists.begin();
+
 		std::vector<std::pair<int,int>> st;
 
 		if (track->type() != Track::InstrumentTrack) continue;
@@ -195,13 +189,13 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 		int base_pitch = 0;
 		double base_volume = 1.0;
 
+		// for each pattern in the pattern editor
 		for (QDomNode n = element.firstChild(); !n.isNull(); n = n.nextSibling())
 		{
 			if (n.nodeName() == "instrumenttrack")
 			{
 				QDomElement it = n.toElement();
-				// transpose +12 semitones, workaround for #1857
-				base_pitch = (69 - it.attribute("basenote", "57").toInt());
+				base_pitch = (69 - it.attribute("basenote", "69").toInt());
 				if (it.attribute("usemasterpitch", "1").toInt())
 				{
 					base_pitch += masterPitch;
@@ -209,53 +203,59 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 				base_volume = LocaleHelper::toDouble(it.attribute("volume", "100")) / 100.0;
 			}
 
-			if (n.nodeName() == "pattern")
+			if (n.nodeName() == "midiclip")
 			{
 				std::vector<std::pair<int,int>> &plist = *itr;
 
-				MidiNoteVector nv, pat;
-				writePattern(pat, n, base_pitch, base_volume, 0);
+				MidiNoteVector nv, midiClip;
+				writeMidiClip(midiClip, n, base_pitch, base_volume, 0);
 
-				// workaround for nested BBTCOs
+
+				// FIXME better variable names and comments
 				int pos = 0;
 				int len = n.toElement().attribute("steps", "1").toInt() * 12;
-				for (auto it = plist.begin(); it != plist.end(); ++it)
+
+				// for each pattern clip of the current pattern track (in song editor)
+				for (const auto& position : plist)
 				{
-					while (!st.empty() && st.back().second <= it->first)
+					const auto& [start, end] = position;
+					while (!st.empty() && st.back().second <= start)
 					{
-						writeBBPattern(pat, nv, len, st.back().first, pos, st.back().second);
+						writePatternClip(midiClip, nv, len, st.back().first, pos, st.back().second);
 						pos = st.back().second;
 						st.pop_back();
 					}
 
-					if (!st.empty() && st.back().second <= it->second)
+					if (!st.empty() && st.back().second <= end)
 					{
-						writeBBPattern(pat, nv, len, st.back().first, pos, it->first);
-						pos = it->first;
-						while (!st.empty() && st.back().second <= it->second)
+						writePatternClip(midiClip, nv, len, st.back().first, pos, start);
+						pos = start;
+						while (!st.empty() && st.back().second <= end)
 						{
 							st.pop_back();
 						}
 					}
 
-					st.push_back(*it);
-					pos = it->first;
+					st.push_back(position);
+					pos = start;
 				}
 
 				while (!st.empty())
 				{
-					writeBBPattern(pat, nv, len, st.back().first, pos, st.back().second);
+					writePatternClip(midiClip, nv, len, st.back().first, pos, st.back().second);
 					pos = st.back().second;
 					st.pop_back();
 				}
 
-				ProcessBBNotes(nv, pos);
-				writePatternToTrack(mtrack, nv);
+				processPatternNotes(nv, pos);
+				writeMidiClipToTrack(mtrack, nv);
+
+				// next pattern track
 				++itr;
 			}
 		}
-		size = mtrack.writeToBuffer(buffer);
-		midiout.writeRawData((char *)buffer, size);
+		size = mtrack.writeToBuffer(buffer.data());
+		midiout.writeRawData((char *)buffer.data(), size);
 	}
 
 	return true;
@@ -264,7 +264,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 
 
 
-void MidiExport::writePattern(MidiNoteVector &pat, QDomNode n,
+void MidiExport::writeMidiClip(MidiNoteVector &midiClip, const QDomNode& n,
 				int base_pitch, double base_volume, int base_time)
 {
 	// TODO interpret steps="12" muted="0" type="1" name="Piano1"  len="2592"
@@ -272,46 +272,45 @@ void MidiExport::writePattern(MidiNoteVector &pat, QDomNode n,
 	{
 		QDomElement note = nn.toElement();
 		if (note.attribute("len", "0") == "0") continue;
-		// TODO interpret pan="0" fxch="0" pitchrange="1"
+		// TODO interpret pan="0" mixch="0" pitchrange="1"
 		MidiNote mnote;
 		mnote.pitch = qMax(0, qMin(127, note.attribute("key", "0").toInt() + base_pitch));
 		 // Map from LMMS volume to MIDI velocity
 		mnote.volume = qMin(qRound(base_volume * LocaleHelper::toDouble(note.attribute("vol", "100")) * (127.0 / 200.0)), 127);
 		mnote.time = base_time + note.attribute("pos", "0").toInt();
 		mnote.duration = note.attribute("len", "0").toInt();
-		pat.push_back(mnote);
+		midiClip.push_back(mnote);
 	}
 }
 
 
 
-void MidiExport::writePatternToTrack(MTrack &mtrack, MidiNoteVector &nv)
+void MidiExport::writeMidiClipToTrack(MTrack &mtrack, MidiNoteVector &nv)
 {
-	for (auto it = nv.begin(); it != nv.end(); ++it)
+	for (const auto& note : nv)
 	{
-		mtrack.addNote(it->pitch, it->volume, it->time / 48.0, it->duration / 48.0);
+		mtrack.addNote(note.pitch, note.volume, note.time / 48.0, note.duration / 48.0);
 	}
 }
 
 
 
-void MidiExport::writeBBPattern(MidiNoteVector &src, MidiNoteVector &dst,
+void MidiExport::writePatternClip(MidiNoteVector& src, MidiNoteVector& dst,
 				int len, int base, int start, int end)
 {
 	if (start >= end) { return; }
 	start -= base;
 	end -= base;
 	std::sort(src.begin(), src.end());
-	for (auto it = src.begin(); it != src.end(); ++it)
+	for (const auto& srcNote : src)
 	{
-		for (int time = it->time  + ceil((start - it->time) / len)
-				* len; time < end; time += len)
+		for (int time = srcNote.time + ceil((start - srcNote.time) / len) * len; time < end; time += len)
 		{
 			MidiNote note;
-			note.duration = it->duration;
-			note.pitch = it->pitch;
+			note.duration = srcNote.duration;
+			note.pitch = srcNote.pitch;
 			note.time = base + time;
-			note.volume = it->volume;
+			note.volume = srcNote.volume;
 			dst.push_back(note);
 		}
 	}
@@ -319,7 +318,7 @@ void MidiExport::writeBBPattern(MidiNoteVector &src, MidiNoteVector &dst,
 
 
 
-void MidiExport::ProcessBBNotes(MidiNoteVector &nv, int cutPos)
+void MidiExport::processPatternNotes(MidiNoteVector& nv, int cutPos)
 {
 	std::sort(nv.begin(), nv.end());
 	int cur = INT_MAX, next = INT_MAX;
@@ -358,3 +357,5 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
 
 }
 
+
+} // namespace lmms

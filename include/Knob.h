@@ -29,12 +29,18 @@
 #include <memory>
 #include <QPixmap>
 #include <QWidget>
-#include <QtCore/QPoint>
+#include <QPoint>
+#include <QTextDocument>
 
 #include "AutomatableModelView.h"
 
 
 class QPixmap;
+
+namespace lmms::gui
+{
+
+
 class TextFloat;
 
 enum knobTypes
@@ -78,8 +84,8 @@ class LMMS_EXPORT Knob : public QWidget, public FloatModelView
 	void onKnobNumUpdated(); //!< to be called when you updated @a m_knobNum
 
 public:
-	Knob( knobTypes _knob_num, QWidget * _parent = NULL, const QString & _name = QString() );
-	Knob( QWidget * _parent = NULL, const QString & _name = QString() ); //!< default ctor
+	Knob( knobTypes _knob_num, QWidget * _parent = nullptr, const QString & _name = QString() );
+	Knob( QWidget * _parent = nullptr, const QString & _name = QString() ); //!< default ctor
 	Knob( const Knob& other ) = delete;
 
 	// TODO: remove
@@ -90,6 +96,7 @@ public:
 		setUnit( _txt_after );
 	}
 	void setLabel( const QString & txt );
+	void setHtmlLabel( const QString &htmltxt );
 
 	void setTotalAngle( float angle );
 
@@ -171,6 +178,8 @@ private:
 	static TextFloat * s_textFloat;
 
 	QString m_label;
+	bool m_isHtmlLabel;
+	QTextDocument* m_tdRenderer;
 
 	std::unique_ptr<QPixmap> m_knobPixmap;
 	BoolModel m_volumeKnob;
@@ -201,5 +210,8 @@ private:
 	knobTypes m_knobNum;
 
 } ;
+
+
+} // namespace lmms::gui
 
 #endif

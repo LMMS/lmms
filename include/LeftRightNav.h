@@ -27,13 +27,15 @@
 
 #include "PixmapButton.h"
 
-#include <QLayout>
+
+namespace lmms::gui
+{
 
 class LeftRightNav : public QWidget
 {
 	Q_OBJECT
 public:
-	LeftRightNav(QWidget *parent=NULL);
+	LeftRightNav(QWidget *parent=nullptr);
 	PixmapButton* getLeftBtn();
 	PixmapButton* getRightBtn();
 	void setShortcuts(const QKeySequence &leftShortcut=Qt::Key_Minus, const QKeySequence &rightShortcut=Qt::Key_Plus);
@@ -45,5 +47,8 @@ private:
 	PixmapButton m_leftBtn;
 	PixmapButton m_rightBtn;
 };
+
+
+} // namespace lmms::gui
 
 #endif

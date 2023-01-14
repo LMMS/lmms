@@ -19,21 +19,27 @@
  */
 
 #include "StepRecorder.h"
+
+#include <QKeyEvent>
+
+#include "MidiClip.h"
 #include "StepRecorderWidget.h"
 #include "PianoRoll.h"
 
-#include <QPainter>
 
-#include <climits>
+namespace lmms
+{
+
+
 using std::min;
 using std::max;
 
 const int REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS = 70;
 
-StepRecorder::StepRecorder(PianoRoll& pianoRoll, StepRecorderWidget& stepRecorderWidget):
+StepRecorder::StepRecorder(gui::PianoRoll& pianoRoll, gui::StepRecorderWidget& stepRecorderWidget):
 	m_pianoRoll(pianoRoll),
 	m_stepRecorderWidget(stepRecorderWidget),
-	m_pattern(nullptr)
+	m_midiClip(nullptr)
 {
 	m_stepRecorderWidget.hide();
 }
@@ -43,7 +49,7 @@ void StepRecorder::initialize()
 	connect(&m_updateReleasedTimer, SIGNAL(timeout()), this, SLOT(removeNotesReleasedForTooLong()));
 }
 
-void StepRecorder::start(const MidiTime& currentPosition, const MidiTime& stepLength)
+void StepRecorder::start(const TimePos& currentPosition, const TimePos& stepLength)
 {
 	m_isRecording = true;
 
@@ -53,7 +59,7 @@ void StepRecorder::start(const MidiTime& currentPosition, const MidiTime& stepLe
 	const int q = m_pianoRoll.quantization();
 	const int curPosTicks = currentPosition.getTicks();
 	const int QuantizedPosTicks = (curPosTicks / q) * q;
-	const MidiTime& QuantizedPos = MidiTime(QuantizedPosTicks);
+	const TimePos& QuantizedPos = TimePos(QuantizedPosTicks);
 
 	m_curStepStartPos = QuantizedPos;
 	m_curStepLength = 0;
@@ -109,7 +115,7 @@ void StepRecorder::noteReleased(const Note & n)
 			m_updateReleasedTimer.start(REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS);
 		}
 
-		//check if all note are released, apply notes to pattern(or dimiss if length is zero) and prepare to record next step
+		//check if all note are released, apply notes to clips (or dimiss if length is zero) and prepare to record next step
 		if(allCurStepNotesReleased())
 		{
 			if(m_curStepLength > 0)
@@ -154,7 +160,7 @@ bool StepRecorder::keyPressEvent(QKeyEvent* ke)
 	return event_handled;
 }
 
-void StepRecorder::setStepsLength(const MidiTime& newLength)
+void StepRecorder::setStepsLength(const TimePos& newLength)
 {
 	if(m_isStepInProgress)
 	{
@@ -226,16 +232,16 @@ void StepRecorder::stepBackwards()
 
 void StepRecorder::applyStep()
 {
-	m_pattern->addJournalCheckPoint();
+	m_midiClip->addJournalCheckPoint();
 
 	for (const StepNote* stepNote : m_curStepNotes)
 	{
-		m_pattern->addNote(stepNote->m_note, false);
+		m_midiClip->addNote(stepNote->m_note, false);
 	}
 
-	m_pattern->rearrangeAllNotes();
-	m_pattern->updateLength();
-	m_pattern->dataChanged();
+	m_midiClip->rearrangeAllNotes();
+	m_midiClip->updateLength();
+	m_midiClip->dataChanged();
 	Engine::getSong()->setModified();
 
 	prepareNewStep();
@@ -267,14 +273,14 @@ void StepRecorder::prepareNewStep()
 	updateWidget();
 }
 
-void StepRecorder::setCurrentPattern( Pattern* newPattern )
+void StepRecorder::setCurrentMidiClip( MidiClip* newMidiClip )
 {
-	if(m_pattern != NULL && m_pattern != newPattern)
+	if(m_midiClip != nullptr && m_midiClip != newMidiClip)
 	{
 		dismissStep();
 	}
 
-	m_pattern = newPattern;
+	m_midiClip = newMidiClip;
 }
 
 void StepRecorder::removeNotesReleasedForTooLong()
@@ -319,7 +325,7 @@ void StepRecorder::removeNotesReleasedForTooLong()
 	}
 }
 
-MidiTime StepRecorder::getCurStepEndPos()
+TimePos StepRecorder::getCurStepEndPos()
 {
 	return m_curStepStartPos + m_curStepLength;
 }
@@ -365,3 +371,5 @@ StepRecorder::StepNote* StepRecorder::findCurStepNote(const int key)
 
 	return nullptr;
 }
+
+} // namespace lmms

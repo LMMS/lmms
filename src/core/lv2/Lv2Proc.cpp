@@ -33,6 +33,7 @@
 #include <QDebug>
 #include <QtGlobal>
 
+#include "AudioEngine.h"
 #include "AutomatableModel.h"
 #include "ComboBoxModel.h"
 #include "Engine.h"
@@ -40,17 +41,19 @@
 #include "Lv2Manager.h"
 #include "Lv2Ports.h"
 #include "Lv2Evbuf.h"
+#include "MidiEvent.h"
 #include "MidiEventToByteSeq.h"
-#include "Mixer.h"
 
 
+namespace lmms
+{
 
 
 // container for everything required to store MIDI events going to the plugin
 struct MidiInputEvent
 {
 	MidiEvent ev;
-	MidiTime time;
+	TimePos time;
 	f_cnt_t offset;
 };
 
@@ -62,8 +65,8 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
 {
 	unsigned maxPorts = lilv_plugin_get_num_ports(plugin);
 	enum { inCount, outCount, maxCount };
-	unsigned audioChannels[maxCount] = { 0, 0 }; // audio input and output count
-	unsigned midiChannels[maxCount] = { 0, 0 }; // MIDI input and output count
+	auto audioChannels = std::array<unsigned, maxCount>{}; // audio input and output count
+	auto midiChannels = std::array<unsigned, maxCount>{}; // MIDI input and output count
 
 	const char* pluginUri = lilv_node_as_uri(lilv_plugin_get_uri(plugin));
 	//qDebug() << "Checking plugin" << pluginUri << "...";
@@ -125,6 +128,23 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
 		if(!Lv2Features::isFeatureSupported(reqFeatName))
 		{
 			issues.emplace_back(featureNotSupported, reqFeatName);
+		}
+	}
+
+	Lv2Manager* mgr = Engine::getLv2Manager();
+	AutoLilvNode requiredOptionNode(mgr->uri(LV2_OPTIONS__requiredOption));
+	AutoLilvNodes requiredOptions = mgr->findNodes(lilv_plugin_get_uri (plugin), requiredOptionNode.get(), nullptr);
+	if (requiredOptions)
+	{
+		LILV_FOREACH(nodes, i, requiredOptions.get())
+		{
+			const char* ro = lilv_node_as_uri (lilv_nodes_get (requiredOptions.get(), i));
+			if (!Lv2Options::isOptionSupported(mgr->uridMap().map(ro)))
+			{
+				// yes, this is not a Lv2 feature,
+				// but it's a feature in abstract sense
+				issues.emplace_back(featureNotSupported, ro);
+			}
 		}
 	}
 
@@ -227,11 +247,11 @@ void Lv2Proc::copyModelsFromCore()
 				ev.time.frames(Engine::framesPerTick()) + ev.offset;
 			uint32_t type = Engine::getLv2Manager()->
 				uridCache()[Lv2UridCache::Id::midi_MidiEvent];
-			uint8_t buf[4];
-			std::size_t bufsize = writeToByteSeq(ev.ev, buf, sizeof(buf));
+			auto buf = std::array<uint8_t, 4>{};
+			std::size_t bufsize = writeToByteSeq(ev.ev, buf.data(), buf.size());
 			if(bufsize)
 			{
-				lv2_evbuf_write(&iter, atomStamp, type, bufsize, buf);
+				lv2_evbuf_write(&iter, atomStamp, type, bufsize, buf.data());
 			}
 		}
 	}
@@ -320,7 +340,7 @@ void Lv2Proc::run(fpp_t frames)
 // in case there will be a PR which removes this callback and instead adds a
 // `ringbuffer_t<MidiEvent + time info>` to `class Instrument`, this
 // function (and the ringbuffer and its reader in `Lv2Proc`) will simply vanish
-void Lv2Proc::handleMidiInputEvent(const MidiEvent &event, const MidiTime &time, f_cnt_t offset)
+void Lv2Proc::handleMidiInputEvent(const MidiEvent &event, const TimePos &time, f_cnt_t offset)
 {
 	if(m_midiIn)
 	{
@@ -345,7 +365,7 @@ void Lv2Proc::handleMidiInputEvent(const MidiEvent &event, const MidiTime &time,
 	else
 	{
 		qWarning() << "Warning: Caught MIDI event for an Lv2 instrument"
-					<< "that can not hande MIDI... Ignoring";
+					<< "that can not handle MIDI... Ignoring";
 	}
 }
 
@@ -374,7 +394,7 @@ void Lv2Proc::initPlugin()
 	createPorts();
 
 	m_instance = lilv_plugin_instantiate(m_plugin,
-		Engine::mixer()->processingSampleRate(),
+		Engine::audioEngine()->processingSampleRate(),
 		m_features.featurePointers());
 
 	if (m_instance)
@@ -422,11 +442,38 @@ bool Lv2Proc::hasNoteInput() const
 
 
 
+void Lv2Proc::initMOptions()
+{
+	/*
+		sampleRate:
+		LMMS can in theory inform plugins of a new sample rate.
+		However, Lv2 plugins seem to not allow sample rate changes
+		(not even through LV2_Options_Interface) - it's assumed to be
+		fixed after being passed via LV2_Descriptor::instantiate.
+		So, if the sampleRate would change, the plugin will need to
+		re-initialize, and this code section will be
+		executed again, creating a new option vector.
+	*/
+	float sampleRate = Engine::audioEngine()->processingSampleRate();
+	int32_t blockLength = Engine::audioEngine()->framesPerPeriod();
+	int32_t sequenceSize = defaultEvbufSize();
+
+	using Id = Lv2UridCache::Id;
+	m_options.initOption<float>(Id::param_sampleRate, sampleRate);
+	m_options.initOption<int32_t>(Id::bufsz_maxBlockLength, blockLength);
+	m_options.initOption<int32_t>(Id::bufsz_minBlockLength, blockLength);
+	m_options.initOption<int32_t>(Id::bufsz_nominalBlockLength, blockLength);
+	m_options.initOption<int32_t>(Id::bufsz_sequenceSize, sequenceSize);
+	m_options.createOptionVectors();
+}
+
+
+
+
 void Lv2Proc::initPluginSpecificFeatures()
 {
-	// nothing yet
-	// it would look like this:
-	// m_features[LV2_URID__map] = m_uridMapFeature
+	initMOptions();
+	m_features[LV2_OPTIONS__options] = const_cast<LV2_Options_Option*>(m_options.feature());
 }
 
 
@@ -453,12 +500,12 @@ void Lv2Proc::createPort(std::size_t portNum)
 	{
 		case Lv2Ports::Type::Control:
 		{
-			Lv2Ports::Control* ctrl = new Lv2Ports::Control;
+			auto ctrl = new Lv2Ports::Control;
 			if (meta.m_flow == Lv2Ports::Flow::Input)
 			{
 				AutoLilvNode node(lilv_port_get_name(m_plugin, lilvPort));
 				QString dispName = lilv_node_as_string(node.get());
-				sample_rate_t sr = Engine::mixer()->processingSampleRate();
+				sample_rate_t sr = Engine::audioEngine()->processingSampleRate();
 				if(meta.def() < meta.min(sr) || meta.def() > meta.max(sr))
 				{
 					qWarning()	<< "Warning: Plugin"
@@ -471,7 +518,7 @@ void Lv2Proc::createPort(std::size_t portNum)
 				}
 				switch (meta.m_vis)
 				{
-					case Lv2Ports::Vis::None:
+					case Lv2Ports::Vis::Generic:
 					{
 						// allow ~1000 steps
 						float stepSize = (meta.max(sr) - meta.min(sr)) / 1000.0f;
@@ -495,9 +542,7 @@ void Lv2Proc::createPort(std::size_t portNum)
 						break;
 					case Lv2Ports::Vis::Enumeration:
 					{
-						ComboBoxModel* comboModel
-							= new ComboBoxModel(
-								nullptr, dispName);
+						auto comboModel = new ComboBoxModel(nullptr, dispName);
 						LilvScalePoints* sps =
 							lilv_port_get_scale_points(m_plugin, lilvPort);
 						LILV_FOREACH(scale_points, i, sps)
@@ -531,18 +576,14 @@ void Lv2Proc::createPort(std::size_t portNum)
 		}
 		case Lv2Ports::Type::Audio:
 		{
-			Lv2Ports::Audio* audio =
-				new Lv2Ports::Audio(
-						static_cast<std::size_t>(
-							Engine::mixer()->framesPerPeriod()),
-						portIsSideChain(m_plugin, lilvPort)
-					);
+			auto audio = new Lv2Ports::Audio(static_cast<std::size_t>(Engine::audioEngine()->framesPerPeriod()),
+				portIsSideChain(m_plugin, lilvPort));
 			port = audio;
 			break;
 		}
 		case Lv2Ports::Type::AtomSeq:
 		{
-			Lv2Ports::AtomSeq* atomPort = new Lv2Ports::AtomSeq;
+			auto atomPort = new Lv2Ports::AtomSeq;
 
 			{
 				AutoLilvNode uriAtomSupports(Engine::getLv2Manager()->uri(LV2_ATOM__supports));
@@ -558,7 +599,7 @@ void Lv2Proc::createPort(std::size_t portNum)
 				}
 			}
 
-			int minimumSize = minimumEvbufSize();
+			int minimumSize = defaultEvbufSize();
 
 			Lv2Manager* mgr = Engine::getLv2Manager();
 
@@ -709,10 +750,8 @@ struct ConnectPortVisitor : public Lv2Ports::Visitor
 		connectPort((audio.mustBeUsed()) ? audio.m_buffer.data() : nullptr);
 	}
 	void visit(Lv2Ports::Unknown&) override { connectPort(nullptr); }
-	~ConnectPortVisitor() override;
+	~ConnectPortVisitor() override = default;
 };
-
-ConnectPortVisitor::~ConnectPortVisitor() {}
 
 // !This function must be realtime safe!
 // use createPort to create any port before connecting
@@ -755,7 +794,7 @@ void Lv2Proc::dumpPort(std::size_t num)
 	qDebug() << "  visualization: " << Lv2Ports::toStr(port.m_vis);
 	if (port.m_type == Lv2Ports::Type::Control || port.m_type == Lv2Ports::Type::Cv)
 	{
-		sample_rate_t sr = Engine::mixer()->processingSampleRate();
+		sample_rate_t sr = Engine::audioEngine()->processingSampleRate();
 		qDebug() << "  default:" << port.def();
 		qDebug() << "  min:" << port.min(sr);
 		qDebug() << "  max:" << port.max(sr);
@@ -793,5 +832,7 @@ AutoLilvNode Lv2Proc::uri(const char *uriStr)
 	return Engine::getLv2Manager()->uri(uriStr);
 }
 
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2

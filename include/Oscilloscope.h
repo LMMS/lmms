@@ -23,13 +23,16 @@
  */
 
 
-#ifndef _OSCILLOSCOPE
-#define _OSCILLOSCOPE
+#ifndef OSCILLOSCOPE_H
+#define OSCILLOSCOPE_H
 
 #include <QWidget>
 #include <QPixmap>
 
 #include "lmms_basics.h"
+
+namespace lmms::gui
+{
 
 
 class Oscilloscope : public QWidget
@@ -40,7 +43,7 @@ public:
 	Q_PROPERTY( QColor clippingColor READ clippingColor WRITE setClippingColor )
 
 	Oscilloscope( QWidget * _parent );
-	virtual ~Oscilloscope();
+	~Oscilloscope() override;
 
 	void setActive( bool _active );
 
@@ -57,7 +60,7 @@ protected:
 
 
 protected slots:
-	void updateAudioBuffer( const surroundSampleFrame * buffer );
+	void updateAudioBuffer( const lmms::surroundSampleFrame * buffer );
 
 private:
 	QColor const & determineLineColor(float level) const;
@@ -73,4 +76,7 @@ private:
 	QColor m_clippingColor;
 } ;
 
-#endif
+
+} // namespace lmms::gui
+
+#endif // OSCILLOSCOPE_H

@@ -26,25 +26,30 @@
 #ifndef AUTOMATION_EDITOR_H
 #define AUTOMATION_EDITOR_H
 
-#include <QtCore/QMutex>
-#include <QVector>
 #include <QWidget>
 
 #include "Editor.h"
 
 #include "lmms_basics.h"
 #include "JournallingObject.h"
-#include "MidiTime.h"
-#include "AutomationPattern.h"
+#include "TimePos.h"
+#include "AutomationClip.h"
 #include "ComboBoxModel.h"
-#include "Knob.h"
 
 class QPainter;
 class QPixmap;
 class QScrollBar;
 
-class ComboBox;
+namespace lmms
+{
+
 class NotePlayHandle;
+
+namespace gui
+{
+
+class Knob;
+class ComboBox;
 class TimeLineWidget;
 
 
@@ -52,25 +57,26 @@ class TimeLineWidget;
 class AutomationEditor : public QWidget, public JournallingObject
 {
 	Q_OBJECT
-	Q_PROPERTY(QColor barLineColor READ barLineColor WRITE setBarLineColor)
-	Q_PROPERTY(QColor beatLineColor READ beatLineColor WRITE setBeatLineColor)
-	Q_PROPERTY(QColor lineColor READ lineColor WRITE setLineColor)
-	Q_PROPERTY(QColor vertexColor READ vertexColor WRITE setVertexColor)
-	Q_PROPERTY(QBrush scaleColor READ scaleColor WRITE setScaleColor)
-	Q_PROPERTY(QBrush graphColor READ graphColor WRITE setGraphColor)
-	Q_PROPERTY(QColor crossColor READ crossColor WRITE setCrossColor)
-	Q_PROPERTY(QColor backgroundShade READ backgroundShade WRITE setBackgroundShade)
+	Q_PROPERTY(QColor barLineColor MEMBER m_barLineColor)
+	Q_PROPERTY(QColor beatLineColor MEMBER m_beatLineColor)
+	Q_PROPERTY(QColor lineColor MEMBER m_lineColor)
+	Q_PROPERTY(QColor nodeInValueColor MEMBER m_nodeInValueColor)
+	Q_PROPERTY(QColor nodeOutValueColor MEMBER m_nodeOutValueColor)
+	Q_PROPERTY(QBrush scaleColor MEMBER m_scaleColor)
+	Q_PROPERTY(QBrush graphColor MEMBER m_graphColor)
+	Q_PROPERTY(QColor crossColor MEMBER m_crossColor)
+	Q_PROPERTY(QColor backgroundShade MEMBER m_backgroundShade)
 public:
-	void setCurrentPattern(AutomationPattern * new_pattern);
+	void setCurrentClip(AutomationClip * new_clip);
 
-	inline const AutomationPattern * currentPattern() const
+	inline const AutomationClip * currentClip() const
 	{
-		return m_pattern;
+		return m_clip;
 	}
 
-	inline bool validPattern() const
+	inline bool validClip() const
 	{
-		return m_pattern != nullptr && m_pattern->hasAutomation();
+		return m_clip != nullptr;
 	}
 
 	void saveSettings(QDomDocument & doc, QDomElement & parent) override;
@@ -80,43 +86,25 @@ public:
 		return "automationeditor";
 	}
 
-	// qproperty access methods
-	QColor barLineColor() const;
-	void setBarLineColor(const QColor & c);
-	QColor beatLineColor() const;
-	void setBeatLineColor(const QColor & c);
-	QColor lineColor() const;
-	void setLineColor(const QColor & c);
-	QBrush graphColor() const;
-	void setGraphColor(const QBrush & c);
-	QColor vertexColor() const;
-	void setVertexColor(const QColor & c);
-	QBrush scaleColor() const;
-	void setScaleColor(const QBrush & c);
-	QColor crossColor() const;
-	void setCrossColor(const QColor & c);
-	QColor backgroundShade() const;
-	void setBackgroundShade(const QColor & c);
-
 	enum EditModes
 	{
 		DRAW,
 		ERASE,
-		SELECT,
-		MOVE
+		DRAW_OUTVALUES
 	};
 
 public slots:
 	void update();
-	void updateAfterPatternChange();
+	void updateAfterClipChange();
 
 
 protected:
-	typedef AutomationPattern::timeMap timeMap;
+	using timeMap = AutomationClip::timeMap;
 
 	void keyPressEvent(QKeyEvent * ke) override;
 	void leaveEvent(QEvent * e) override;
 	void mousePressEvent(QMouseEvent * mouseEvent) override;
+	void mouseDoubleClickEvent(QMouseEvent * mouseEvent) override;
 	void mouseReleaseEvent(QMouseEvent * mouseEvent) override;
 	void mouseMoveEvent(QMouseEvent * mouseEvent) override;
 	void paintEvent(QPaintEvent * pe) override;
@@ -126,13 +114,12 @@ protected:
 	float getLevel( int y );
 	int xCoordOfTick( int tick );
 	float yCoordOfLevel( float level );
-	inline void drawLevelTick( QPainter & p, int tick, float value);// bool is_selected ); //NEEDS Change in CSS
-	void removeSelection();
-	void selectAll();
-	void getSelectedValues(timeMap & selected_values );
+	inline void drawLevelTick(QPainter & p, int tick, float value);
+
+	timeMap::iterator getNodeAt(int x, int y, bool outValue = false, int r = 5);
 
 	void drawLine( int x0, float y0, int x1, float y1 );
-	void removePoints( int x0, int x1 );
+	bool fineTuneValue(timeMap::iterator node, bool editingOutValue);
 
 protected slots:
 	void play();
@@ -144,21 +131,16 @@ protected slots:
 	void setEditMode(AutomationEditor::EditModes mode);
 	void setEditMode(int mode);
 
-	void setProgressionType(AutomationPattern::ProgressionTypes type);
+	void setProgressionType(AutomationClip::ProgressionTypes type);
 	void setProgressionType(int type);
 	void setTension();
 
-	void copySelectedValues();
-	void cutSelectedValues();
-	void pasteValues();
-	void deleteSelectedValues();
-
-	void updatePosition( const MidiTime & t );
+	void updatePosition( const lmms::TimePos & t );
 
 	void zoomingXChanged();
 	void zoomingYChanged();
 
-	/// Updates the pattern's quantization using the current user selected value.
+	/// Updates the clip's quantization using the current user selected value.
 	void setQuantization();
 
 private:
@@ -167,8 +149,10 @@ private:
 	{
 		NONE,
 		MOVE_VALUE,
-		SELECT_VALUES,
-		MOVE_SELECTION
+		ERASE_VALUES,
+		MOVE_OUTVALUE,
+		RESET_OUTVALUES,
+		DRAW_LINE
 	} ;
 
 	// some constants...
@@ -183,11 +167,11 @@ private:
 
 	AutomationEditor();
 	AutomationEditor( const AutomationEditor & );
-	virtual ~AutomationEditor();
+	~AutomationEditor() override;
 
 	static QPixmap * s_toolDraw;
 	static QPixmap * s_toolErase;
-	static QPixmap * s_toolSelect;
+	static QPixmap * s_toolDrawOut;
 	static QPixmap * s_toolMove;
 	static QPixmap * s_toolYFlip;
 	static QPixmap * s_toolXFlip;
@@ -196,12 +180,11 @@ private:
 	ComboBoxModel m_zoomingYModel;
 	ComboBoxModel m_quantizeModel;
 
-	static const QVector<double> m_zoomXLevels;
+	static const QVector<float> m_zoomXLevels;
 
 	FloatModel * m_tensionModel;
 
-	QMutex m_patternMutex;
-	AutomationPattern * m_pattern;
+	AutomationClip * m_clip;
 	float m_minLevel;
 	float m_maxLevel;
 	float m_step;
@@ -215,17 +198,10 @@ private:
 	QScrollBar * m_leftRightScroll;
 	QScrollBar * m_topBottomScroll;
 
-	MidiTime m_currentPosition;
+	TimePos m_currentPosition;
 
 	Actions m_action;
 
-	tick_t m_selectStartTick;
-	tick_t m_selectedTick;
-	float m_selectStartLevel;
-	float m_selectedLevels;
-
-	float m_moveStartLevel;
-	tick_t m_moveStartTick;
 	int m_moveXOffset;
 
 	float m_drawLastLevel;
@@ -235,9 +211,8 @@ private:
 	int m_y_delta;
 	bool m_y_auto;
 
-	timeMap m_valuesToCopy;
-	timeMap m_selValuesForMove;
-
+	// Time position (key) of automation node whose outValue is being dragged
+	int m_draggedOutValueKey;
 
 	EditModes m_editMode;
 
@@ -249,13 +224,14 @@ private:
 
 	void drawCross(QPainter & p );
 	void drawAutomationPoint( QPainter & p, timeMap::iterator it );
-	bool inBBEditor();
+	bool inPatternEditor();
 
 	QColor m_barLineColor;
 	QColor m_beatLineColor;
 	QColor m_lineColor;
 	QBrush m_graphColor;
-	QColor m_vertexColor;
+	QColor m_nodeInValueColor;
+	QColor m_nodeOutValueColor;
 	QBrush m_scaleColor;
 	QColor m_crossColor;
 	QColor m_backgroundShade;
@@ -264,8 +240,8 @@ private:
 
 
 signals:
-	void currentPatternChanged();
-	void positionChanged( const MidiTime & );
+	void currentClipChanged();
+	void positionChanged( const lmms::TimePos & );
 } ;
 
 
@@ -279,25 +255,25 @@ class AutomationEditorWindow : public Editor
 	static const int INITIAL_HEIGHT = 480;
 public:
 	AutomationEditorWindow();
-	~AutomationEditorWindow();
+	~AutomationEditorWindow() override = default;
 
-	void setCurrentPattern(AutomationPattern* pattern);
-	const AutomationPattern* currentPattern();
+	void setCurrentClip(AutomationClip* clip);
+	const AutomationClip* currentClip();
 
 	void dropEvent( QDropEvent * _de ) override;
 	void dragEnterEvent( QDragEnterEvent * _dee ) override;
 
-	void open(AutomationPattern* pattern);
+	void open(AutomationClip* clip);
 
 	AutomationEditor* m_editor;
 
 	QSize sizeHint() const override;
 
 public slots:
-	void clearCurrentPattern();
+	void clearCurrentClip();
 
 signals:
-	void currentPatternChanged();
+	void currentClipChanged();
 
 protected:
 	void focusInEvent(QFocusEvent * event) override;
@@ -324,5 +300,8 @@ private:
 	ComboBox * m_quantizeComboBox;
 };
 
+} // namespace gui
+
+} // namespace lmms
 
 #endif

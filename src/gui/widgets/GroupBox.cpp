@@ -34,10 +34,13 @@
 #include "gui_templates.h"
 
 
+namespace lmms::gui
+{
+
 
 GroupBox::GroupBox( const QString & _caption, QWidget * _parent ) :
 	QWidget( _parent ),
-	BoolModelView( NULL, this ),
+	BoolModelView( nullptr, this ),
 	m_caption( _caption ),
 	m_titleBarHeight( 11 )
 {
@@ -47,7 +50,7 @@ GroupBox::GroupBox( const QString & _caption, QWidget * _parent ) :
 	m_led->setActiveGraphic( embed::getIconPixmap( "led_green" ) );
 	m_led->setInactiveGraphic( embed::getIconPixmap( "led_off" ) );
 
-	setModel( new BoolModel( false, NULL, _caption, true ) );
+	setModel( new BoolModel( false, nullptr, _caption, true ) );
 	setAutoFillBackground( true );
 	unsetCursor();
 }
@@ -101,3 +104,6 @@ void GroupBox::paintEvent( QPaintEvent * pe )
 	p.setFont( pointSize<8>( font() ) );
 	p.drawText( 22, m_titleBarHeight, m_caption );
 }
+
+
+} // namespace lmms::gui

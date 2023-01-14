@@ -30,6 +30,8 @@
 #include "Plugin.h"
 #include "ModelView.h"
 
+namespace lmms::gui
+{
 
 class LMMS_EXPORT PluginView  : public QWidget, public ModelView
 {
@@ -42,5 +44,7 @@ public:
 
 } ;
 
+
+} // namespace lmms::gui
 
 #endif

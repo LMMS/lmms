@@ -30,11 +30,16 @@
 #ifdef LMMS_HAVE_LV2
 
 #include <lilv/lilv.h>
+#include <memory>
 
 #include "DataFile.h"
 #include "LinkedModelGroups.h"
 #include "lmms_export.h"
 #include "Plugin.h"
+
+namespace lmms
+{
+
 
 class Lv2Proc;
 class PluginIssue;
@@ -134,7 +139,7 @@ protected:
 	QString nodeName() const { return "lv2controls"; }
 	bool hasNoteInput() const;
 	void handleMidiInputEvent(const class MidiEvent &event,
-		const class MidiTime &time, f_cnt_t offset);
+		const class TimePos &time, f_cnt_t offset);
 
 private:
 	//! Return the DataFile settings type
@@ -153,6 +158,9 @@ private:
 
 	const LilvPlugin* m_plugin;
 };
+
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2
 #endif // LV2_CONTROL_BASE_H

@@ -22,11 +22,20 @@
 
 #include "EqSpectrumView.h"
 
+#include <cmath>
+#include <QPainter>
+#include <QPen>
+
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "EqCurve.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
-#include "Mixer.h"
+#include "lmms_constants.h"
+
+namespace lmms
+{
+
 
 EqAnalyser::EqAnalyser() :
 	m_framesFilledUp ( 0 ),
@@ -93,7 +102,7 @@ void EqAnalyser::analyze( sampleFrame *buf, const fpp_t frames )
 			return;
 		}
 
-		m_sampleRate = Engine::mixer()->processingSampleRate();
+		m_sampleRate = Engine::audioEngine()->processingSampleRate();
 		const int LOWEST_FREQ = 0;
 		const int HIGHEST_FREQ = m_sampleRate / 2;
 
@@ -171,6 +180,8 @@ void EqAnalyser::clear()
 
 
 
+namespace gui
+{
 
 EqSpectrumView::EqSpectrumView(EqAnalyser *b, QWidget *_parent) :
 	QWidget( _parent ),
@@ -178,11 +189,11 @@ EqSpectrumView::EqSpectrumView(EqAnalyser *b, QWidget *_parent) :
 	m_periodicalUpdate( false )
 {
 	setFixedSize( 450, 200 );
-	connect( gui->mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( periodicalUpdate() ) );
+	connect( getGUI()->mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( periodicalUpdate() ) );
 	setAttribute( Qt::WA_TranslucentBackground, true );
 	m_skipBands = MAX_BANDS * 0.5;
 	float totalLength = log10( 20000 );
-	m_pixelsPerUnitWidth = width( ) / totalLength ;
+	m_pixelsPerUnitWidth = width() / totalLength ;
 	m_scale = 1.5;
 	m_color = QColor( 255, 255, 255, 255 );
 	for ( int i = 0 ; i < MAX_BANDS ; i++ )
@@ -293,3 +304,8 @@ void EqSpectrumView::periodicalUpdate()
 	m_analyser->setActive( isVisible() );
 	update();
 }
+
+
+} // namespace gui
+
+} // namespace lmms

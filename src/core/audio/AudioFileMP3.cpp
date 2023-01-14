@@ -27,17 +27,18 @@
 
 #ifdef LMMS_HAVE_MP3LAME
 
-#include "Mixer.h"
 
 #include <cassert>
 
+namespace lmms
+{
 
 AudioFileMP3::AudioFileMP3(	OutputSettings const & outputSettings,
 				const ch_cnt_t channels,
 				bool & successful,
 				const QString & file,
-				Mixer* mixer ) :
-	AudioFileDevice( outputSettings, channels, file, mixer )
+				AudioEngine* audioEngine ) :
+	AudioFileDevice( outputSettings, channels, file, audioEngine )
 {
 	successful = true;
 	// For now only accept stereo sources
@@ -131,4 +132,6 @@ void AudioFileMP3::tearDownEncoder()
 	lame_close(m_lame);
 }
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_HAVE_MP3LAME

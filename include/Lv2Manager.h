@@ -39,6 +39,9 @@
 #include "Plugin.h"
 
 
+namespace lmms
+{
+
 /*
 	all Lv2 classes in relation (use our "4 spaces per tab rule" to view):
 
@@ -130,6 +133,8 @@ public:
 		return m_supportedFeatureURIs;
 	}
 	bool isFeatureSupported(const char* featName) const;
+	AutoLilvNodes findNodes(const LilvNode *subject,
+		const LilvNode *predicate, const LilvNode *object);
 
 	static const std::set<const char*, Lv2Manager::CmpStr>& getPluginBlacklist()
 	{
@@ -155,6 +160,9 @@ private:
 	// functions
 	bool isSubclassOf(const LilvPluginClass *clvss, const char *uriStr);
 };
+
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2
 

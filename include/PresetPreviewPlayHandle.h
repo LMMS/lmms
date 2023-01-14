@@ -28,7 +28,11 @@
 
 #include "NotePlayHandle.h"
 
+namespace lmms
+{
 
+
+class DataFile;
 class InstrumentTrack;
 class PreviewTrackContainer;
 
@@ -36,7 +40,7 @@ class LMMS_EXPORT PresetPreviewPlayHandle : public PlayHandle
 {
 public:
 	PresetPreviewPlayHandle( const QString& presetFile, bool loadByPlugin = false, DataFile *dataFile = 0 );
-	virtual ~PresetPreviewPlayHandle();
+	~PresetPreviewPlayHandle() override;
 
 	inline bool affinityMatters() const override
 	{
@@ -62,5 +66,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

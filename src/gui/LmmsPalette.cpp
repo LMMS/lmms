@@ -28,6 +28,9 @@
 #include "LmmsPalette.h"
 
 
+namespace lmms::gui
+{
+
 LmmsPalette::LmmsPalette( QWidget * parent, QStyle * stylearg ) : 
 	QWidget( parent ),
 	
@@ -47,10 +50,6 @@ LmmsPalette::LmmsPalette( QWidget * parent, QStyle * stylearg ) :
 	setStyle( stylearg );
 	stylearg->polish( this );
 	ensurePolished();
-}
-
-LmmsPalette::~LmmsPalette()
-{
 }
 
 #define ACCESSMET( read, write ) \
@@ -90,4 +89,4 @@ QPalette LmmsPalette::palette() const
 }
 
 
-
+} // namespace lmms::gui

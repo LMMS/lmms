@@ -30,27 +30,105 @@
 #include <cstdlib>
 #include <cstring>
 #include <lilv/lilv.h>
-#include <lv2.h>
+#include <lv2/lv2plug.in/ns/ext/buf-size/buf-size.h>
+#include <lv2/lv2plug.in/ns/ext/options/options.h>
 #include <QDebug>
-#include <QDir>
-#include <QLibrary>
 #include <QElapsedTimer>
 
-#include "ConfigManager.h"
 #include "Engine.h"
 #include "Plugin.h"
-#include "PluginFactory.h"
 #include "Lv2ControlBase.h"
+#include "Lv2Options.h"
 #include "PluginIssue.h"
 
 
+namespace lmms
+{
 
 
 const std::set<const char*, Lv2Manager::CmpStr> Lv2Manager::pluginBlacklist =
 {
 	// github.com/calf-studio-gear/calf, #278
 	"http://calf.sourceforge.net/plugins/Analyzer",
-	"http://calf.sourceforge.net/plugins/BassEnhancer"
+	"http://calf.sourceforge.net/plugins/BassEnhancer",
+	"http://calf.sourceforge.net/plugins/CompensationDelay",
+	"http://calf.sourceforge.net/plugins/Crusher",
+	"http://calf.sourceforge.net/plugins/Exciter",
+	"http://calf.sourceforge.net/plugins/Saturator",
+	"http://calf.sourceforge.net/plugins/StereoTools",
+	"http://calf.sourceforge.net/plugins/TapeSimulator",
+	"http://calf.sourceforge.net/plugins/TransientDesigner",
+	"http://calf.sourceforge.net/plugins/Vinyl",
+
+	// Visualization, meters, and scopes etc., won't work until we have gui support
+	"http://distrho.sf.net/plugins/ProM",
+	"http://distrho.sf.net/plugins/glBars",
+	"http://gareus.org/oss/lv2/meters#spectr30mono",
+	"http://gareus.org/oss/lv2/meters#spectr30stereo",
+	"http://gareus.org/oss/lv2/meters#bitmeter",
+	"http://gareus.org/oss/lv2/meters#BBCM6",
+	"http://gareus.org/oss/lv2/meters#BBCmono",
+	"http://gareus.org/oss/lv2/meters#BBCstereo",
+	"http://gareus.org/oss/lv2/meters#DINmono",
+	"http://gareus.org/oss/lv2/meters#DINstereo",
+	"http://gareus.org/oss/lv2/meters#EBUmono",
+	"http://gareus.org/oss/lv2/meters#EBUstereo",
+	"http://gareus.org/oss/lv2/meters#EBUr128",
+	"http://gareus.org/oss/lv2/meters#BBCM6",
+	"http://gareus.org/oss/lv2/meters#dr14mono",
+	"http://gareus.org/oss/lv2/meters#dr14stereo",
+	"http://gareus.org/oss/lv2/meters#K12mono",
+	"http://gareus.org/oss/lv2/meters#K12stereo",
+	"http://gareus.org/oss/lv2/meters#K14mono",
+	"http://gareus.org/oss/lv2/meters#K14stereo",
+	"http://gareus.org/oss/lv2/meters#K20mono",
+	"http://gareus.org/oss/lv2/meters#K20stereo",
+	"http://gareus.org/oss/lv2/meters#NORmono",
+	"http://gareus.org/oss/lv2/meters#NORstereo",
+	"http://gareus.org/oss/lv2/meters#COR",
+	"http://gareus.org/oss/lv2/meters#dBTPmono",
+	"http://gareus.org/oss/lv2/meters#dBTPstereo",
+	"http://gareus.org/oss/lv2/meters#TPnRMSmono",
+	"http://gareus.org/oss/lv2/meters#TPnRMSstereo",
+	"http://gareus.org/oss/lv2/meters#VUmono",
+	"http://gareus.org/oss/lv2/meters#VUstereo",
+	"http://gareus.org/oss/lv2/meters#goniometer",
+	"http://gareus.org/oss/lv2/meters#stereoscope",
+	"http://gareus.org/oss/lv2/meters#SigDistHist",
+	"http://gareus.org/oss/lv2/tuna#one",
+	"http://gareus.org/oss/lv2/tuna#two",
+	"http://gareus.org/oss/lv2/sisco#Mono",
+	"http://gareus.org/oss/lv2/sisco#Stereo",
+	"http://gareus.org/oss/lv2/spectra#Mono",
+	"http://gareus.org/oss/lv2/convoLV2#Mono",
+	"http://gareus.org/oss/lv2/convoLV2#MonoToStereo",
+	"http://gareus.org/oss/lv2/convoLV2#Stereo",
+	"http://gareus.org/oss/lv2/zeroconvolv#CfgMono",
+	"http://gareus.org/oss/lv2/zeroconvolv#CfgMonoToStereo",
+	"http://gareus.org/oss/lv2/zeroconvolv#CfgStereo",
+	"http://gareus.org/oss/lv2/zeroconvolv#Mono",
+	"http://gareus.org/oss/lv2/zeroconvolv#MonoToStereo",
+	"http://gareus.org/oss/lv2/zeroconvolv#Stereo",
+	"http://lsp-plug.in/plugins/lv2/latency_meter",
+	"http://lsp-plug.in/plugins/lv2/spectrum_analyzer_x1",
+	"http://lsp-plug.in/plugins/lv2/spectrum_analyzer_x2",
+	"http://lsp-plug.in/plugins/lv2/phase_detector",
+	"http://lsp-plug.in/plugins/lv2/profiler_mono",
+	"http://lsp-plug.in/plugins/lv2/profiler_stereo",
+	"http://invadarecords.com/plugins/lv2/meter",
+	"http://guitarix.sourceforge.net/plugins/gxtuner#tuner",
+	"https://github.com/jpcima/ADLplug",
+	"https://github.com/HiFi-LoFi/KlangFalter",
+	"https://github.com/klangfreund/SpectrumAnalyser",
+	"https://github.com/klangfreund/lufsmeter",
+	"https://github.com/laixinyuan/StereoSourceSepartion",
+	"urn:juce:TalFilter2",
+	"urn:juce:Vex",
+	"http://zynaddsubfx.sourceforge.net",
+	"http://geontime.com/geonkick/single",
+
+	// unstable
+	"urn:juced:DrumSynth"
 };
 
 
@@ -67,6 +145,21 @@ Lv2Manager::Lv2Manager() :
 
 	m_supportedFeatureURIs.insert(LV2_URID__map);
 	m_supportedFeatureURIs.insert(LV2_URID__unmap);
+	m_supportedFeatureURIs.insert(LV2_OPTIONS__options);
+	// min/max is always passed in the options
+	m_supportedFeatureURIs.insert(LV2_BUF_SIZE__boundedBlockLength);
+	// block length is only changed initially in AudioEngine CTOR
+	m_supportedFeatureURIs.insert(LV2_BUF_SIZE__fixedBlockLength);
+
+	auto supportOpt = [this](Lv2UridCache::Id id)
+	{
+		Lv2Options::supportOption(uridCache()[id]);
+	};
+	supportOpt(Lv2UridCache::Id::param_sampleRate);
+	supportOpt(Lv2UridCache::Id::bufsz_maxBlockLength);
+	supportOpt(Lv2UridCache::Id::bufsz_minBlockLength);
+	supportOpt(Lv2UridCache::Id::bufsz_nominalBlockLength);
+	supportOpt(Lv2UridCache::Id::bufsz_sequenceSize);
 }
 
 
@@ -205,6 +298,15 @@ bool Lv2Manager::isFeatureSupported(const char *featName) const
 
 
 
+AutoLilvNodes Lv2Manager::findNodes(const LilvNode *subject,
+	const LilvNode *predicate, const LilvNode *object)
+{
+	return AutoLilvNodes(lilv_world_find_nodes (m_world, subject, predicate, object));
+}
+
+
+
+
 // unused + untested yet
 bool Lv2Manager::isSubclassOf(const LilvPluginClass* clvss, const char* uriStr)
 {
@@ -230,6 +332,6 @@ bool Lv2Manager::isSubclassOf(const LilvPluginClass* clvss, const char* uriStr)
 }
 
 
-
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2

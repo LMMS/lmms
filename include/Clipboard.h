@@ -1,5 +1,5 @@
 /*
- * Clipboard.h - the clipboard for patterns, notes etc.
+ * Clipboard.h - the clipboard for clips, notes etc.
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -25,12 +25,14 @@
 #ifndef CLIPBOARD_H
 #define CLIPBOARD_H
 
-#include <QtCore/QMap>
+#include <QMap>
 #include <QDomElement>
 
+class QMimeData;
 
-namespace Clipboard
+namespace lmms::Clipboard
 {
+
 	enum class MimeType
 	{
 		StringPair,
@@ -63,6 +65,7 @@ namespace Clipboard
 				break;
 		}
 	}
-} ;
+
+} // namespace lmms::Clipboard
 
 #endif

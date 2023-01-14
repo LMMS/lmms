@@ -28,8 +28,12 @@
 #include <QMutex>
 #include <QWaitCondition>
 
+#include "lmms_basics.h"
 #include "../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
 
+
+namespace lmms
+{
 
 //! A convenience layer for a realtime-safe and thread-safe multi-reader ringbuffer
 template <class T>
@@ -42,7 +46,7 @@ public:
 	{
 		m_buffer.touch();	// reserve storage space before realtime operation starts
 	}
-	~LocklessRingBuffer() {};
+	~LocklessRingBuffer() = default;
 
 	std::size_t capacity() const {return m_buffer.maximum_eventual_write_space();}
 	std::size_t free() const {return m_buffer.write_space();}
@@ -81,5 +85,8 @@ public:
 private:
 	QWaitCondition *m_notifier;
 };
+
+
+} // namespace lmms
 
 #endif //LOCKLESSRINGBUFFER_H

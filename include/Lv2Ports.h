@@ -36,8 +36,13 @@
 #include "lmms_basics.h"
 #include "PluginIssue.h"
 
+
+namespace lmms
+{
+
+
 struct ConnectPortVisitor;
-typedef struct LV2_Evbuf_Impl LV2_Evbuf;
+using LV2_Evbuf = struct LV2_Evbuf_Impl;
 
 namespace Lv2Ports {
 
@@ -61,10 +66,10 @@ enum class Type {
 //! Port visualization
 //! @note All Lv2 audio ports are float, this is only the visualisation
 enum class Vis {
-	None,
-	Integer,
-	Enumeration,
-	Toggled
+	Generic, //!< nothing specific, a generic knob or slider shall be used
+	Integer, //!< counter
+	Enumeration, //!< selection from enumerated values
+	Toggled //!< boolean widget
 };
 
 const char* toStr(Lv2Ports::Flow pf);
@@ -87,7 +92,7 @@ struct ConstVisitor
 	virtual void visit(const Lv2Ports::AtomSeq& ) {}
 	virtual void visit(const Lv2Ports::Unknown& ) {}
 
-	virtual ~ConstVisitor();
+	virtual ~ConstVisitor() = default;
 };
 
 struct Visitor
@@ -99,14 +104,14 @@ struct Visitor
 	virtual void visit(Lv2Ports::AtomSeq& ) {}
 	virtual void visit(Lv2Ports::Unknown& ) {}
 
-	virtual ~Visitor();
+	virtual ~Visitor() = default;
 };
 
 struct Meta
 {
 	Type m_type = Type::Unknown;
 	Flow m_flow = Flow::Unknown;
-	Vis m_vis = Vis::None;
+	Vis m_vis = Vis::Generic;
 
 	bool m_logarithmic = false;
 
@@ -134,7 +139,7 @@ struct PortBase : public Meta
 	QString name() const;
 	QString uri() const;
 
-	virtual ~PortBase();
+	virtual ~PortBase() = default;
 };
 
 template<typename Derived, typename Base>
@@ -200,7 +205,7 @@ private:
 	bool m_sidechain;
 
 	// the only case when data of m_buffer may be referenced:
-	friend struct ::ConnectPortVisitor;
+	friend struct lmms::ConnectPortVisitor;
 };
 
 struct AtomSeq : public VisitablePort<AtomSeq, PortBase>
@@ -260,6 +265,9 @@ const Target* dcast(const PortBase* base)
 }
 
 } // namespace Lv2Ports
+
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2
 #endif // LV2PORTS_H

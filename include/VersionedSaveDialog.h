@@ -32,6 +32,10 @@
 #include "Song.h"
 
 class QLineEdit;
+
+namespace lmms::gui
+{
+
 class LedCheckBox;
 
 class SaveOptionsWidget : public QWidget {
@@ -40,6 +44,7 @@ public:
 
 private:
 	LedCheckBox *m_discardMIDIConnectionsCheckbox;
+	LedCheckBox *m_saveAsProjectBundleCheckbox;
 };
 
 class VersionedSaveDialog : public FileDialog
@@ -60,5 +65,8 @@ public slots:
 	void incrementVersion();
 	void decrementVersion();
 };
+
+
+} // namespace lmms::gui
 
 #endif // VERSIONEDSAVEDIALOG_H

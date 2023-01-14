@@ -31,6 +31,10 @@
 #include "ColorChooser.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "VecControls.h"
+
+namespace lmms::gui
+{
 
 
 VectorView::VectorView(VecControls *controls, LocklessRingBuffer<sampleFrame> *inputBuffer, unsigned short displaySize, QWidget *parent) :
@@ -49,7 +53,7 @@ VectorView::VectorView(VecControls *controls, LocklessRingBuffer<sampleFrame> *i
 	setMinimumSize(200, 200);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-	connect(gui->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicUpdate()));
+	connect(getGUI()->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicUpdate()));
 
 	m_displayBuffer.resize(sizeof qRgb(0,0,0) * m_displaySize * m_displaySize, 0);
 
@@ -168,7 +172,7 @@ void VectorView::paintEvent(QPaintEvent *event)
 				// To better preserve shapes, the log scale is applied to the distance from origin,
 				// not the individual channels.
 				const float distance = sqrt(inLeft * inLeft + inRight * inRight);
-				const float distanceLog = log10(1 + 9 * abs(distance));
+				const float distanceLog = log10(1 + 9 * std::abs(distance));
 				const float angleCos = inLeft / distance;
 				const float angleSin = inRight / distance;
 				left  = distanceLog * angleCos * (activeSize - 1) / 4;
@@ -222,7 +226,7 @@ void VectorView::paintEvent(QPaintEvent *event)
 			float inRight = inBuffer[frame][1] * m_zoom;
 			if (logScale) {
 				const float distance = sqrt(inLeft * inLeft + inRight * inRight);
-				const float distanceLog = log10(1 + 9 * abs(distance));
+				const float distanceLog = log10(1 + 9 * std::abs(distance));
 				const float angleCos = inLeft / distance;
 				const float angleSin = inRight / distance;
 				left  = distanceLog * angleCos * (activeSize - 1) / 4;
@@ -303,7 +307,7 @@ void VectorView::periodicUpdate()
 // More of an Easter egg, to avoid cluttering the interface with non-essential functionality.
 void VectorView::mouseDoubleClickEvent(QMouseEvent *event)
 {
-	ColorChooser *colorDialog = new ColorChooser(m_controls->m_colorFG, this);
+	auto colorDialog = new ColorChooser(m_controls->m_colorFG, this);
 	if (colorDialog->exec())
 	{
 		m_controls->m_colorFG = colorDialog->currentColor();
@@ -326,3 +330,6 @@ void VectorView::wheelEvent(QWheelEvent *event)
 	).count();
 
 }
+
+
+} // namespace lmms::gui
