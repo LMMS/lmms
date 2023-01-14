@@ -28,6 +28,9 @@
 #include <QWidget>
 #include <QString>
 
+namespace lmms::gui
+{
+
 class Menu: public QMenu
 {
 public:
@@ -36,5 +39,7 @@ public:
 
 	void keyReleaseEvent(QKeyEvent *event) override;
 };
+
+} // namespace lmms::gui
 
 #endif

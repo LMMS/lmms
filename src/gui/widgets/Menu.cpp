@@ -26,8 +26,14 @@
 #include <QApplication>
 #include <QKeyEvent>
 
+
+namespace lmms::gui
+{
+
 void Menu::keyReleaseEvent(QKeyEvent *event)
 {
 	QKeyEvent e(*event);
 	QApplication::sendEvent(parentWidget(),&e);
 }
+
+} // namespace lmms::gui
