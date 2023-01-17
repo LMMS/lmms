@@ -63,12 +63,6 @@ public:
 
 	void loadSettings( const QDomElement & _this ) override;
 
-
-	virtual AutomationClip * tempoAutomationClip()
-	{
-		return nullptr;
-	}
-
 	int countTracks( Track::TrackTypes _tt = Track::NumTrackTypes ) const;
 
 
