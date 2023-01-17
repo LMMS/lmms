@@ -59,7 +59,7 @@ MixerView::MixerView() :
 	m->setHook( this );
 
 	//QPalette pal = palette();
-	//pal.setColor( QPalette::Background, QColor( 72, 76, 88 ) );
+	//pal.setColor( QPalette::Window, QColor( 72, 76, 88 ) );
 	//setPalette( pal );
 
 	setAutoFillBackground( true );
