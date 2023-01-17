@@ -175,12 +175,12 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	// Vertical layout.
 	auto vlayout = new QVBoxLayout(this);
 	vlayout->setSpacing(0);
-	vlayout->setMargin(0);
+	vlayout->setContentsMargins(0, 0, 0, 0);
 
 	// Horizontal layout.
 	auto hlayout = new QHBoxLayout(main_w);
 	hlayout->setSpacing(0);
-	hlayout->setMargin(0);
+	hlayout->setContentsMargins(0, 0, 0, 0);
 
 	// Tab bar for the main tabs.
 	m_tabBar = new TabBar(main_w, QBoxLayout::TopToBottom);
@@ -195,7 +195,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	auto general_w = new QWidget(settings_w);
 	auto general_layout = new QVBoxLayout(general_w);
 	general_layout->setSpacing(10);
-	general_layout->setMargin(0);
+	general_layout->setContentsMargins(0, 0, 0, 0);
 	labelWidget(general_w, tr("General"));
 
 	auto addLedCheckBox = [&XDelta, &YDelta, this](const QString& ledText, TabWidget* tw, int& counter,
@@ -324,7 +324,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	auto performance_w = new QWidget(settings_w);
 	auto performance_layout = new QVBoxLayout(performance_w);
 	performance_layout->setSpacing(10);
-	performance_layout->setMargin(0);
+	performance_layout->setContentsMargins(0, 0, 0, 0);
 	labelWidget(performance_w,
 			tr("Performance"));
 
@@ -442,7 +442,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	auto audio_w = new QWidget(settings_w);
 	auto audio_layout = new QVBoxLayout(audio_w);
 	audio_layout->setSpacing(10);
-	audio_layout->setMargin(0);
+	audio_layout->setContentsMargins(0, 0, 0, 0);
 	labelWidget(audio_w,
 			tr("Audio"));
 
@@ -460,7 +460,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	auto as_w_layout = new QHBoxLayout(as_w);
 	as_w_layout->setSpacing(0);
-	as_w_layout->setMargin(0);
+	as_w_layout->setContentsMargins(0, 0, 0, 0);
 
 #ifdef LMMS_HAVE_JACK
 	m_audioIfaceSetupWidgets[AudioJack::name()] =
@@ -592,7 +592,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	auto midi_w = new QWidget(settings_w);
 	auto midi_layout = new QVBoxLayout(midi_w);
 	midi_layout->setSpacing(10);
-	midi_layout->setMargin(0);
+	midi_layout->setContentsMargins(0, 0, 0, 0);
 	labelWidget(midi_w,
 			tr("MIDI"));
 
@@ -609,7 +609,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	auto ms_w_layout = new QHBoxLayout(ms_w);
 	ms_w_layout->setSpacing(0);
-	ms_w_layout->setMargin(0);
+	ms_w_layout->setContentsMargins(0, 0, 0, 0);
 
 #ifdef LMMS_HAVE_ALSA
 	m_midiIfaceSetupWidgets[MidiAlsaSeq::name()] =
@@ -709,7 +709,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	auto paths_layout = new QVBoxLayout(paths_w);
 	paths_layout->setSpacing(10);
-	paths_layout->setMargin(0);
+	paths_layout->setContentsMargins(0, 0, 0, 0);
 
 	labelWidget(paths_w, tr("Paths"));
 
@@ -823,7 +823,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	auto extras_w = new QWidget(this);
 	auto extras_layout = new QHBoxLayout(extras_w);
 	extras_layout->setSpacing(0);
-	extras_layout->setMargin(0);
+	extras_layout->setContentsMargins(0, 0, 0, 0);
 
 	// Restart warning label.
 	restartWarningLbl = new QLabel(

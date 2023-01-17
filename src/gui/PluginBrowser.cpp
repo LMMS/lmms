@@ -52,7 +52,7 @@ PluginBrowser::PluginBrowser( QWidget * _parent ) :
 	addContentWidget( m_view );
 
 	auto view_layout = new QVBoxLayout(m_view);
-	view_layout->setMargin( 5 );
+	view_layout->setContentsMargins(5, 5, 5, 5);
 	view_layout->setSpacing( 5 );
 
 

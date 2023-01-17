@@ -91,12 +91,12 @@ MainWindow::MainWindow() :
 	auto main_widget = new QWidget(this);
 	auto vbox = new QVBoxLayout(main_widget);
 	vbox->setSpacing( 0 );
-	vbox->setMargin( 0 );
+	vbox->setContentsMargins(0, 0, 0, 0);
 
 	auto w = new QWidget(main_widget);
 	auto hbox = new QHBoxLayout(w);
 	hbox->setSpacing( 0 );
-	hbox->setMargin( 0 );
+	hbox->setContentsMargins(0, 0, 0, 0);
 
 	auto sideBar = new SideBar(Qt::Vertical, w);
 
@@ -206,7 +206,7 @@ MainWindow::MainWindow() :
 
 	// add layout for organizing quite complex toolbar-layouting
 	m_toolBarLayout = new QGridLayout( m_toolBar/*, 2, 1*/ );
-	m_toolBarLayout->setMargin( 0 );
+	m_toolBarLayout->setContentsMargins(0, 0, 0, 0);
 	m_toolBarLayout->setSpacing( 0 );
 
 	vbox->addWidget( m_toolBar );

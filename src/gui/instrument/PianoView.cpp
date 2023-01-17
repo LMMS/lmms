@@ -147,7 +147,7 @@ PianoView::PianoView(QWidget *parent) :
 	// create a layout for ourselves
 	auto layout = new QVBoxLayout(this);
 	layout->setSpacing( 0 );
-	layout->setMargin( 0 );
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->addSpacing( PIANO_BASE+PW_WHITE_KEY_HEIGHT );
 	layout->addWidget( m_pianoScroll );
 
