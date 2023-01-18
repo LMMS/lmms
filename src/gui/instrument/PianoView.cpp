@@ -158,7 +158,7 @@ PianoView::PianoView(QWidget *parent) :
 
 /*! \brief list of note strings
  */
-const QString PianoView::noteStrings[12] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+std::array<QString, 12> PianoView::s_noteStrings {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
 
 
 /*! \brief return a note string (e.g. "C4") based on the key number
@@ -166,7 +166,7 @@ const QString PianoView::noteStrings[12] = {"C", "C#", "D", "D#", "E", "F", "F#"
  */
 QString PianoView::getNoteStringByKey(int key)
 {
-	return noteStrings[key % 12] + QString::number(static_cast<int>(FirstOctave + key / KeysPerOctave));
+	return s_noteStrings[key % 12] + QString::number(static_cast<int>(FirstOctave + key / KeysPerOctave));
 }
 
 

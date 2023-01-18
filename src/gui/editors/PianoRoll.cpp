@@ -129,16 +129,6 @@ QPixmap* PianoRoll::s_toolKnife = nullptr;
 
 TextFloat * PianoRoll::s_textFloat = nullptr;
 
-<<<<<<< HEAD
-static std::array<QString, 12> s_noteStrings {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
-
-static QString getNoteString(int key)
-{
-	return s_noteStrings[key % 12] + QString::number(static_cast<int>(FirstOctave + key / KeysPerOctave));
-}
-
-=======
->>>>>>> d6080034a (added pianoview context menu for first/last/base, fixed small reset value bug)
 // used for drawing of piano
 std::array<PianoRoll::PianoRollKeyTypes, 12> PianoRoll::prKeyOrder
 {
@@ -396,14 +386,10 @@ PianoRoll::PianoRoll() :
 	// Set up key selection dropdown
 	m_keyModel.addItem(tr("No key"));
 	// Use piano roll note strings for key dropdown
-<<<<<<< HEAD
-	for (const auto& noteString : s_noteStrings)
+	for (const auto& noteString : PianoView::s_noteStrings)
 	{
 		m_keyModel.addItem(noteString);
 	}
-=======
-	for (int i = 0; i < 12; i++) { m_keyModel.addItem(PianoView::noteStrings[i]); }
->>>>>>> d6080034a (added pianoview context menu for first/last/base, fixed small reset value bug)
 	m_keyModel.setValue(0); // start with "No key"
 	connect(&m_keyModel, &ComboBoxModel::dataChanged, this, &PianoRoll::keyChanged);
 

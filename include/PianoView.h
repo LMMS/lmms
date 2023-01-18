@@ -47,8 +47,8 @@ public:
 	~PianoView() override = default;
 
 	static int getKeyFromKeyEvent( QKeyEvent * _ke );
-	static QString getNoteStringByKey(int key);
-	const static QString noteStrings[];
+	static QString getNoteStringByKey(int key);	
+	static std::array<QString, 12> s_noteStrings;
 
 public:
 	void keyPressEvent( QKeyEvent * ke ) override;
