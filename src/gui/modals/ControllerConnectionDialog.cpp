@@ -215,7 +215,7 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 
 	auto btn_layout = new QHBoxLayout(buttons);
 	btn_layout->setSpacing( 0 );
-	btn_layout->setMargin( 0 );
+	btn_layout->setContentsMargins(0, 0, 0, 0);
 
 	auto select_btn = new QPushButton(embed::getIconPixmap("add"), tr("OK"), buttons);
 	connect( select_btn, SIGNAL(clicked()), 

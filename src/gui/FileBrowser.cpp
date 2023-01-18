@@ -76,7 +76,7 @@ void FileBrowser::addContentCheckBox()
 	auto filterWidget = new QWidget(contentParent());
 	filterWidget->setFixedHeight(15);
 	auto filterWidgetLayout = new QHBoxLayout(filterWidget);
-	filterWidgetLayout->setMargin(0);
+	filterWidgetLayout->setContentsMargins(0, 0, 0, 0);
 	filterWidgetLayout->setSpacing(0);
 
 	auto configCheckBox = [this, &filterWidgetLayout](QCheckBox* box)
@@ -119,7 +119,7 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	searchWidget->setFixedHeight( 24 );
 
 	auto searchWidgetLayout = new QHBoxLayout(searchWidget);
-	searchWidgetLayout->setMargin( 0 );
+	searchWidgetLayout->setContentsMargins(0, 0, 0, 0);
 	searchWidgetLayout->setSpacing( 0 );
 
 	m_filterEdit = new QLineEdit( searchWidget );

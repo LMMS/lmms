@@ -29,6 +29,7 @@
 #include <string>
 
 #include <QFileInfo>
+#include <QHash>
 #include <QList>
 #include <QString>
 #include <QVector>

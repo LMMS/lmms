@@ -189,7 +189,7 @@ void LmmsStyle::drawComplexControl( ComplexControl control,
 /*	else if( control == CC_ScrollBar )
 	{
 		painter->fillRect( option->rect, QApplication::palette().color( QPalette::Active,
-							QPalette::Background ) );
+							QPalette::Window ) );
 
 	}*/
 	QProxyStyle::drawComplexControl( control, option, painter, widget );

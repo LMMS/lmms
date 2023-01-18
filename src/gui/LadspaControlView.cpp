@@ -43,7 +43,7 @@ LadspaControlView::LadspaControlView( QWidget * _parent,
 	m_ctl( _ctl )
 {
 	auto layout = new QHBoxLayout(this);
-	layout->setMargin( 0 );
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing( 0 );
 
 	LedCheckBox * link = nullptr;

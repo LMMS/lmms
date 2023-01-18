@@ -59,7 +59,7 @@ MixerView::MixerView() :
 	m->setHook( this );
 
 	//QPalette pal = palette();
-	//pal.setColor( QPalette::Background, QColor( 72, 76, 88 ) );
+	//pal.setColor( QPalette::Window, QColor( 72, 76, 88 ) );
 	//setPalette( pal );
 
 	setAutoFillBackground( true );
@@ -79,7 +79,7 @@ MixerView::MixerView() :
 	chLayout = new QHBoxLayout( m_channelAreaWidget );
 	chLayout->setSizeConstraint( QLayout::SetMinimumSize );
 	chLayout->setSpacing( 0 );
-	chLayout->setMargin( 0 );
+	chLayout->setContentsMargins(0, 0, 0, 0);
 	m_channelAreaWidget->setLayout(chLayout);
 
 	// create rack layout before creating the first channel
