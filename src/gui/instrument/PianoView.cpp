@@ -97,7 +97,7 @@ PianoView::PianoView(QWidget *parent) :
 	m_piano(nullptr),                /*!< Our piano Model */
 	m_startKey(Key_C + Octave_3*KeysPerOctave), /*!< The first key displayed? */
 	m_lastKey(-1),                   /*!< The last key displayed? */
-	m_movedNoteModel(nullptr)
+	m_movedNoteModel(nullptr)        /*!< Key marker which is being moved */
 {
 	if (s_whiteKeyPm == nullptr)
 	{
