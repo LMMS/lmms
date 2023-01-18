@@ -439,9 +439,6 @@ void PianoView::contextMenuEvent(QContextMenuEvent *me)
 
 	if (me->pos().y() > PIANO_BASE)
 	{
-		// context menu for the key area
-		m_lastContextMenuKey = key_num;
-
 		title = QString("Key %1 [%2]").arg(getNoteStringByKey(key_num)).arg(key_num);
 
 		CaptionMenu contextMenu(title);

@@ -90,7 +90,6 @@ private:
 	int m_startKey;					//!< first key when drawing
 	int m_lastKey;					//!< previously pressed key
 	IntModel *m_movedNoteModel;		//!< note marker which is being moved
-	int m_lastContextMenuKey;		//!< previous key selected by the context menu
 
 private slots:
 	void pianoScrolled( int _new_pos );
