@@ -49,3 +49,6 @@
 [submodule "plugins/LadspaEffect/cmt/cmt"]
 	path = plugins/LadspaEffect/cmt/cmt
 	url = https://github.com/lmms/cmt
+[submodule "src/3rdparty/hiir/hiir"]
+	path = src/3rdparty/hiir/hiir
+	url = https://github.com/unevens/hiir
