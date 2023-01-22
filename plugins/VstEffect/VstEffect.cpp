@@ -70,7 +70,7 @@ VstEffect::VstEffect( Model * _parent,
 		openPlugin( m_key.attributes["file"] );
 	}
 	setDisplayName( m_key.attributes["file"].section( ".dll", 0, 0 ).isEmpty()
-		? m_key.name : m_key.attributes["file"].section( ".dll", 0, 0 ).section("\\", -1));
+		? m_key.name : m_key.attributes["file"].section( ".dll", 0, 0 ).section("\\", -1).section("/", -1));
 }
 
 
