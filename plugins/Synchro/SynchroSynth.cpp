@@ -23,25 +23,26 @@
  */
 
 #include "SynchroSynth.h"
-//Standard headers
-#include <cmath>
 //QT headers
-#include <QDomDocument>
+#include <QDomElement>
 //LMMS headers
+#include "AudioEngine.h" //Required to access sample rate
 #include "Engine.h" //Required to access sample rate
 #include "InstrumentTrack.h" //Required for the plugin to appear in LMMS
+#include "interpolation.h" //literally just for lerp
 #include "lmms_constants.h" //Greater precision than math.h constants?
 #include "lmms_math.h" //Faster math
-#include "Mixer.h" //Required to access sample rate
-#include "NotePlayHandle.h" //Required for audio rendering
 #include "plugin_export.h" //Required for the plugin to appear in LMMS
+
+namespace lmms
+{
 
 //Plugin metadata
 extern "C"
 {
 	Plugin::Descriptor PLUGIN_EXPORT synchro_plugin_descriptor =
 	{
-		STRINGIFY(PLUGIN_NAME),
+		LMMS_STRINGIFY(PLUGIN_NAME),
 		"Synchro",
 		QT_TRANSLATE_NOOP("PluginBrowser", "2-oscillator PM synth"),
 		"Ian Sannar <ian/dot/sannar/at/gmail/dot/com>",
@@ -59,12 +60,9 @@ extern "C"
 }
 
 //Keeps a phase value between 0 and 360
-static inline float wrapPhase(float phase) {
-	//Make sure phase is always between 0 and 2PI
-	while (phase >= F_2PI) { phase -= F_2PI; }
-	//Extra check since phase modulation can push it below 0
-	while (phase < 0) { phase += F_2PI; }
-	return phase;
+static inline float wrapPhase(float x)
+{
+	return fmod(F_2PI + fmod(x, F_2PI), F_2PI);
 }
 
 //Triangle waveform generator
@@ -80,15 +78,6 @@ static inline float trih(float x, float harmonic)
 {
 	return tri(x) + ((tri(MAGIC_HARMONICS[0][0] * x) * MAGIC_HARMONICS[0][1]
 		+ tri(MAGIC_HARMONICS[1][0] * x) * MAGIC_HARMONICS[1][1])) * harmonic;
-}
-
-//Linear interpolation for envelopes
-//from: the initial value at x = 0
-//to: the final value at x = 1
-//x: the progress between the two values between 0 and 1
-static inline float lerp(float from, float to, float x)
-{
-	return from + x * (to - from);
 }
 
 //Exponential interpolation for envelopes
@@ -132,13 +121,13 @@ static inline float SynchroWaveform(float x, float drive, float sync, float chop
 //Envelope function
 static inline float ADSR(float attack, float decay, float sustain, float release, float time, bool isReleased, float releaseFramesDone) {
 	float envelope;
-	float a = attack * 0.001 * Engine::mixer()->processingSampleRate();
-	float d = decay * 0.001 * Engine::mixer()->processingSampleRate();
-	float r = release * 0.001 * Engine::mixer()->processingSampleRate();
+	float a = attack * 0.001 * Engine::audioEngine()->processingSampleRate();
+	float d = decay * 0.001 * Engine::audioEngine()->processingSampleRate();
+	float r = release * 0.001 * Engine::audioEngine()->processingSampleRate();
 	if (time < a) //Attack
 	{
 		//Linear attack sounds better
-		envelope = lerp(0, 1, time / a);
+		envelope = linearInterpolate(0, 1, time / a);
 	}
 	else if (time <= a + d) //Decay
 	{
@@ -167,7 +156,7 @@ SynchroNote::SynchroNote(NotePlayHandle * notePlayHandle) :
 void SynchroNote::nextSample(sampleFrame &outputSample, const float modulationStrength, const float modulationAmount,
 	const float harmonics, const SynchroOscillatorSettings & carrier, const SynchroOscillatorSettings & modulator)
 {
-	float freqToSampleStep = F_2PI / (Engine::mixer()->processingSampleRate() * SYNCHRO_OVERSAMPLE);
+	float freqToSampleStep = F_2PI / (Engine::audioEngine()->processingSampleRate() * SYNCHRO_OVERSAMPLE);
 
 	//Modulator is calculated first because it is used by the carrier
 	//Find position in modulator waveform
@@ -200,9 +189,12 @@ void SynchroNote::nextSample(sampleFrame &outputSample, const float modulationSt
 	outputSample[1] = outputSample[0];
 }
 
+namespace gui
+{
+
 //GUI layout & style
 SynchroSynthView::SynchroSynthView(Instrument * instrument, QWidget * parent) :
-	InstrumentView(instrument, parent)
+	InstrumentViewFixedSize(instrument, parent)
 {
 	setAutoFillBackground(true);
 	QPalette pal;
@@ -343,6 +335,8 @@ void SynchroSynthView::modelChanged()
 	m_modulatorGraph->setModel(&b->m_modulatorGraph);
 }
 
+} //namespace gui
+
 //Synth constructor
 SynchroSynth::SynchroSynth(InstrumentTrack * instrument_track) :
 	Instrument(instrument_track, &synchro_plugin_descriptor),
@@ -445,7 +439,7 @@ void SynchroSynth::playNote(NotePlayHandle * n, sampleFrame * working_buffer)
 //Tells LMMS how much extra time Synchro needs at the end of a note to finish our envelopes
 f_cnt_t SynchroSynth::desiredReleaseFrames() const
 {
-	return static_cast<f_cnt_t>(m_carrierRelease.value() * 0.001 * Engine::mixer()->processingSampleRate());
+	return static_cast<f_cnt_t>(m_carrierRelease.value() * 0.001 * Engine::audioEngine()->processingSampleRate());
 }
 
 void SynchroSynth::saveSettings(QDomDocument & doc, QDomElement & thisElement)
@@ -551,3 +545,5 @@ void SynchroSynth::generalChanged()
 			m_carrierChop.value(), 0));
 	}
 }
+
+} //namespace lmms

@@ -31,6 +31,9 @@
 #include "Knob.h" //Required to use knobs
 #include "NotePlayHandle.h" //Required for audio rendering
 
+namespace lmms
+{
+
 constexpr char SYNCHRO_VERSION [] = "0.6";
 constexpr float SYNCHRO_VOLUME_CONST = 0.15f; //Prevents clipping
 constexpr int SYNCHRO_OVERSAMPLE = 4; //Anti-aliasing samples
@@ -67,8 +70,11 @@ private:
 	float m_ModulatorSampleIndex = 0; //The index (or phase) of the modulator oscillator
 };
 
+namespace gui
+{
+
 //Synth GUI
-class SynchroSynthView : public InstrumentView
+class SynchroSynthView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
@@ -104,7 +110,8 @@ private:
 	Graph * m_resultGraph;
 };
 
-//Middleman between the GUI, LMMS, and each note (SynchroNote)
+} //namespace gui
+
 class SynchroSynth : public Instrument
 {
 	Q_OBJECT
@@ -115,7 +122,7 @@ public:
 	void saveSettings(QDomDocument & doc, QDomElement & parent) override;
 	void loadSettings(const QDomElement & thisElement) override;
 	QString nodeName() const override;
-	PluginView * instantiateView(QWidget * parent) override { return new SynchroSynthView(this, parent); };
+	gui::PluginView * instantiateView(QWidget * parent) override { return new lmms::gui::SynchroSynthView(this, parent); };
 	void deleteNotePluginData(NotePlayHandle * n) override { delete static_cast<SynchroNote *>(n->m_pluginData); };
 protected slots:
 	void carrierChanged();
@@ -147,7 +154,9 @@ private:
 	graphModel m_carrierGraph;
 	graphModel m_modulatorGraph;
 	graphModel m_resultGraph;
-	friend class SynchroSynthView;
+	friend class gui::SynchroSynthView;
 };
+
+} //namespace lmms
 
 #endif
