@@ -55,3 +55,6 @@
 [submodule "src/3rdparty/clap/clap"]
 	path = src/3rdparty/clap/clap
 	url = https://github.com/free-audio/clap.git
+[submodule "src/3rdparty/clap/clap-helpers"]
+	path = src/3rdparty/clap/clap-helpers
+	url = https://github.com/free-audio/clap-helpers.git
