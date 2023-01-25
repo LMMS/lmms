@@ -51,4 +51,4 @@
 	url = https://github.com/lmms/cmt
 [submodule "src/3rdparty/hiir/hiir"]
 	path = src/3rdparty/hiir/hiir
-	url = https://github.com/unevens/hiir
+	url = https://github.com/LostRobotMusic/hiir
