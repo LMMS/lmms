@@ -90,13 +90,13 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	//keeps the direction of the widget, undepended on the locale
 	setLayoutDirection( Qt::LeftToRight );
 	auto layout = new QVBoxLayout(this);
-	layout->setMargin( 0 );
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing( 0 );
 	layout->addWidget( m_scrollArea );
 
 	auto scrollContent = new QWidget;
 	m_scrollLayout = new QVBoxLayout( scrollContent );
-	m_scrollLayout->setMargin( 0 );
+	m_scrollLayout->setContentsMargins(0, 0, 0, 0);
 	m_scrollLayout->setSpacing( 0 );
 	m_scrollLayout->setSizeConstraint( QLayout::SetMinAndMaxSize );
 

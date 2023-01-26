@@ -154,7 +154,7 @@ public:
 	float valueAt( const TimePos & _time ) const;
 	float *valuesAfter( const TimePos & _time ) const;
 
-	const QString name() const;
+	QString name() const;
 
 	// settings-management
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;

@@ -283,7 +283,6 @@ public:
 
 
 	bpm_t getTempo();
-	AutomationClip * tempoAutomationClip() override;
 
 	AutomationTrack * globalAutomationTrack()
 	{
@@ -350,6 +349,11 @@ public:
 	MeterModel & getTimeSigModel()
 	{
 		return m_timeSigModel;
+	}
+
+	IntModel& tempoModel()
+	{
+		return m_tempoModel;
 	}
 
 	void exportProjectMidi(QString const & exportFileName) const;

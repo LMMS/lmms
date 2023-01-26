@@ -225,8 +225,8 @@ jobs:
             --triplet=${{ matrix.arch }}-windows `
             --host-triplet=${{ matrix.arch }}-windows `
             --recurse `
-            fftw3 fluidsynth[sndfile] libsamplerate libsndfile libstk lilv lv2 `
-            portaudio sdl2
+            fftw3 fltk fluidsynth[sndfile] libsamplerate libsndfile libstk `
+            lilv lv2 portaudio sdl2
       - name: Set up build environment
         uses: ilammy/msvc-dev-cmd@d8610e2b41c6d0f0c3b4c46dad8df0fd826c68e1
         with:

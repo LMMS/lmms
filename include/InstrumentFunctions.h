@@ -52,6 +52,7 @@ class InstrumentFunctionNoteStacking : public Model, public JournallingObject
 
 public:
 	static const int MAX_CHORD_POLYPHONY = 13;
+	static const int NUM_CHORD_TABLES = 95;
 
 private:
 	using ChordSemiTones = std::array<int8_t, MAX_CHORD_POLYPHONY>;
@@ -129,7 +130,7 @@ public:
 			ChordSemiTones m_semiTones;
 		};
 
-		static Init s_initTable[];
+		static std::array<Init, NUM_CHORD_TABLES> s_initTable;
 
 	public:
 		static const ChordTable & getInstance()

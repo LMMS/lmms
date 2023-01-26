@@ -111,7 +111,7 @@ public slots:
 	void updateChorusOn();
 	void updateChorus();
 	void updateGain();
-
+	void updateTuning();
 
 private:
 	static QMutex s_fontsMutex;

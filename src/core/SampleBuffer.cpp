@@ -1067,7 +1067,7 @@ void SampleBuffer::visualize(
 		float maxData = -1;
 		float minData = 1;
 
-		float rmsData[2] = {0, 0};
+		auto rmsData = std::array<float, 2>{};
 
 		// Find maximum and minimum samples within range
 		for (int i = 0; i < fpp && frame + i <= last; ++i)

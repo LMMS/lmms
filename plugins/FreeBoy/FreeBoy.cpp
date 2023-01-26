@@ -311,7 +311,7 @@ void FreeBoyInstrument::playNote( NotePlayHandle * _n,
 	data = 128;
 	papu->write_register( fakeClock(),  0xff1a, data );
 
-	int ch3voldata[4] = { 0, 3, 2, 1 };
+	auto ch3voldata = std::array{0, 3, 2, 1};
 	data = ch3voldata[(int)m_ch3VolumeModel.value()];
 	data = data<<5;
 	papu->write_register( fakeClock(),  0xff1c, data );
@@ -388,7 +388,7 @@ void FreeBoyInstrument::playNote( NotePlayHandle * _n,
 	int const buf_size = 2048;
 	int framesleft = frames;
 	int datalen = 0;
-	blip_sample_t buf [buf_size*2];
+	auto buf = std::array<blip_sample_t, buf_size * 2>{};
 	while( framesleft > 0 )
 	{
 		int avail = papu->samples_avail();
@@ -401,7 +401,7 @@ void FreeBoyInstrument::playNote( NotePlayHandle * _n,
 		datalen = framesleft>avail?avail:framesleft;
 		datalen = datalen>buf_size?buf_size:datalen;
 
-		long count = papu->read_samples( buf, datalen*2)/2;
+		long count = papu->read_samples(buf.data(), datalen * 2) / 2;
 
 		for( fpp_t frame = 0; frame < count; ++frame )
 		{

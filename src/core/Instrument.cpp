@@ -90,7 +90,7 @@ bool Instrument::isFromTrack( const Track * _track ) const
 static int countZeroCrossings(sampleFrame *buf, fpp_t start, fpp_t frames)
 {
 	// zero point crossing counts of all channels
-	int zeroCrossings[DEFAULT_CHANNELS] = {0};
+	auto zeroCrossings = std::array<int, DEFAULT_CHANNELS>{};
 	// maximum zero point crossing of all channels
 	int maxZeroCrossings = 0;
 
