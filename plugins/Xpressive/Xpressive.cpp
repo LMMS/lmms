@@ -938,7 +938,7 @@ QString XpressiveHelpView::s_helpText=
 "<b>key</b> - Note's keyboard key. 0 denotes C-1, 60 denotes C4, 127 denotes G9. Available only in the output expressions.<br>"
 "<b>bnote</b> - Base note. By default it is 69 which means A4, unless you change it.<br>"
 #endif
-"<b>key</b> - Note's keyboard key. 0 denotes C-1, 60 denotes C4, 127 denotes G9. Available only in the output expressions.<br>"
+"<b>key</b> - Note's keyboard key. 0 denotes C1, 60 denotes C4, 127 denotes G9. Available only in the output expressions.<br>"
 "<b>bnote</b> - Base note. By default it is 69 which means A4, unless you change it.<br>"
 "<b>srate</b> - Sample rate. In wave expression it returns the wave's number of samples.<br>"
 "<b>tempo</b> - Song's Tempo. Available only in the output expressions.<br>"
