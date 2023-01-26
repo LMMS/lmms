@@ -157,11 +157,11 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	auto arpDirectionLabel = new QLabel(tr("Direction:"));
 	arpDirectionLabel->setFont( pointSize<8>( arpDirectionLabel->font() ) );
 
+	auto arpRandomLabel = new QLabel(tr("Distribution:"));
+	arpRandomLabel->setFont(pointSize<8>(arpRandomLabel->font()));
+
 	auto arpModeLabel = new QLabel(tr("Mode:"));
 	arpModeLabel->setFont( pointSize<8>( arpModeLabel->font() ) );
-
-	QLabel* arpRandomLabel = new QLabel(tr("Distribution:"));
-	arpRandomLabel->setFont(pointSize<8>(arpRandomLabel->font()));
 
 	mainLayout->addWidget( arpChordLabel, 0, 0 );
 	mainLayout->addWidget( m_arpComboBox, 1, 0 );
