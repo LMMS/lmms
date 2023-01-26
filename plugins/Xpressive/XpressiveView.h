@@ -15,29 +15,29 @@
 
 class Highlighter : public QSyntaxHighlighter
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    Highlighter(QTextDocument *parent = 0);
+	Highlighter(QTextDocument *parent = 0);
 
 protected:
-    void highlightBlock(const QString &text) override;
+	void highlightBlock(const QString &text) override;
 
 private:
-    struct HighlightingRule
-    {
-        QRegularExpression pattern;
-        QTextCharFormat format;
-    };
-    QVector<HighlightingRule> highlightingRules;
+	struct HighlightingRule
+	{
+		QRegularExpression pattern;
+		QTextCharFormat format;
+	};
+	QVector<HighlightingRule> highlightingRules;
 
 
-    QTextCharFormat keywordClass1Format;
-    QTextCharFormat keywordClass2Format;
-    QTextCharFormat keywordClass3Format;
-    QTextCharFormat keywordClass4Format;
-    QTextCharFormat numericFormat;
-    QTextCharFormat badFormat;
+	QTextCharFormat keywordClass1Format;
+	QTextCharFormat keywordClass2Format;
+	QTextCharFormat keywordClass3Format;
+	QTextCharFormat keywordClass4Format;
+	QTextCharFormat numericFormat;
+	QTextCharFormat badFormat;
 
 
 };
@@ -77,7 +77,7 @@ private:
 	Knob *m_panningKnob[2];
 	Knob *m_relKnob;
 	Knob *m_smoothKnob;
-    QTextEdit * m_expressionEditor;
+	QTextEdit * m_expressionEditor;
 
 	automatableButtonGroup *m_selectedGraphGroup;
 	PixmapButton *m_w1Btn;
@@ -93,9 +93,9 @@ private:
 	PixmapButton *m_usrWaveBtn;
 	PixmapButton *m_moogWaveBtn;
 	PixmapButton *m_expWaveBtn;
-    QWidget *m_smoothOverlay;
+	QWidget *m_smoothOverlay;
 #ifndef QT_NO_SYNTAXHIGHLIGHTER
-    Highlighter *m_highlighter;
+	Highlighter *m_highlighter;
 #endif
 
 	static QPixmap *s_artwork;

@@ -73,15 +73,17 @@ public:
 
 	graphModel& graphO1() { return m_graphO1; }
 	graphModel& graphO2() { return m_graphO2; }
-    graphModel& graphW1() { return m_graphW1; } //after smoothing
-    graphModel& graphW2() { return m_graphW2; } //after smoothing
-    graphModel& graphW3() { return m_graphW3; } //after smoothing
-    graphModel& rawgraphW1() { return m_rawgraphW1; } //before smoothing
-    graphModel& rawgraphW2() { return m_rawgraphW2; } //before smoothing
-    graphModel& rawgraphW3() { return m_rawgraphW3; } //before smoothing
+	graphModel& graphW1() { return m_graphW1; } //after smoothing
+	graphModel& graphW2() { return m_graphW2; } //after smoothing
+	graphModel& graphW3() { return m_graphW3; } //after smoothing
+	graphModel& rawgraphW1() { return m_rawgraphW1; } //before smoothing
+	graphModel& rawgraphW2() { return m_rawgraphW2; } //before smoothing
+	graphModel& rawgraphW3() { return m_rawgraphW3; } //before smoothing
 	IntModel& selectedGraph() { return m_selectedGraph; }
 	QByteArray& wavesExpression(int i) { return m_wavesExpression[i]; }
 	QByteArray& outputExpression(int i) { return m_outputExpression[i]; }
+	void recalculateWaves();
+
 
 	FloatModel& parameterA1() { return m_parameterA1; }
 	FloatModel& parameterA2() { return m_parameterA2; }
@@ -133,8 +135,8 @@ private:
 	WaveSample m_W1, m_W2, m_W3;
 
 	BoolModel m_exprValid;
-    float m_previous_frequency;
-    NotePlayHandle* m_nph_of_previous;
+	float m_previous_frequency;
+	NotePlayHandle* m_nph_of_previous;
 } ;
 
 

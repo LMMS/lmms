@@ -207,6 +207,26 @@ struct WaveValueFunction : public exprtk::ifunction<T>
 	const std::size_t m_size;
 };
 template <typename T>
+struct EnvelopeFunction : public exprtk::ifunction<T>
+{
+	using exprtk::ifunction<T>::operator();
+
+	EnvelopeFunction(const T* v, std::size_t s)
+	: exprtk::ifunction<T>(1),
+	m_vec(v),
+	m_size(s)
+	{}
+
+	inline T operator()(const T& index)
+	{
+		if (index< 1 && index>=0)
+			return m_vec[(int) ( index * m_size )];
+		return 0;
+	}
+	const T *m_vec;
+	const std::size_t m_size;
+};
+template <typename T>
 struct WaveValueFunctionInterpolate : public exprtk::ifunction<T>
 {
 	using exprtk::ifunction<T>::operator();
@@ -398,6 +418,10 @@ public:
 		{
 			delete m_cyclics_interp[i];
 		}
+		for (int i = 0; i < m_envelopes.size() ; ++i)
+		{
+			delete m_envelopes[i];
+		}
 		if (m_integ_func)
 		{
 			delete m_integ_func;
@@ -409,6 +433,7 @@ public:
 	std::string m_expression_string;
 	std::vector<WaveValueFunction<float>* > m_cyclics;
 	std::vector<WaveValueFunctionInterpolate<float>* > m_cyclics_interp;
+	std::vector<EnvelopeFunction<float>* > m_envelopes;
 	RandomVectorFunction m_rand_vec;
 	IntegrateFunction<float> *m_integ_func;
 	LastSampleFunction<float> m_last_func;
@@ -543,7 +568,7 @@ ExprFront::ExprFront(const char * expr, int last_func_samples)
 		m_data->m_expression_string = expr;
 		m_data->m_symbol_table.add_pi();
 	
-        //m_data->m_symbol_table.add_constant("e", F_E); // use exp function instead...
+		//m_data->m_symbol_table.add_constant("e", F_E); // use exp function instead...
 
 		m_data->m_symbol_table.add_constant("seed", SimpleRandom::generator() & max_float_integer_mask);
 	
@@ -587,7 +612,7 @@ bool ExprFront::compile()
 		m_data->m_expression.register_symbol_table(m_data->m_symbol_table);
 		parser_t::settings_store sstore;
 		sstore.disable_all_logic_ops();
-        //sstore.disable_all_assignment_ops();
+		//sstore.disable_all_assignment_ops();
 		sstore.disable_all_control_structures();
 		parser_t parser(sstore);
 	
@@ -664,6 +689,20 @@ bool ExprFront::add_cyclic_vector(const char* name, const float* data, size_t le
 	}
 	return false;
 }
+bool ExprFront::add_envelope(const char* name, const float* data, size_t length)
+{
+	try
+	{
+		EnvelopeFunction<float> *wvf = new EnvelopeFunction<float>(data, length);
+		m_data->m_envelopes.push_back(wvf);
+		return m_data->m_symbol_table.add_function(name, *wvf);
+	}
+	catch(...)
+	{
+		WARN_EXPRTK;
+	}
+	return false;
+}
 size_t find_occurances(const std::string& haystack, const char* const needle)
 {
 	size_t last_pos = 0;
@@ -730,6 +769,9 @@ ExprSynth::ExprSynth(const WaveSample *gW1, const WaveSample *gW2, const WaveSam
 		e->add_cyclic_vector("W1", m_W1->m_samples,m_W1->m_length, m_W1->m_interpolate);
 		e->add_cyclic_vector("W2", m_W2->m_samples,m_W2->m_length, m_W2->m_interpolate);
 		e->add_cyclic_vector("W3", m_W3->m_samples,m_W3->m_length, m_W3->m_interpolate);
+		e->add_envelope("N1", m_W1->m_samples,m_W1->m_length);
+		e->add_envelope("N2", m_W2->m_samples,m_W2->m_length);
+		e->add_envelope("N3", m_W3->m_samples,m_W3->m_length);
 		e->add_variable("t", m_note_sample_sec);
 		e->add_variable("f", m_frequency);
 		e->add_variable("rel",m_released);
