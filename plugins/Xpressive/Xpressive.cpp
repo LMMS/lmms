@@ -1126,7 +1126,7 @@ void Highlighter::highlightBlock(const QString &text)
 	}
 
 }
-#endif
+#endif // QT_NO_SYNTAXHIGHLIGHTER
 
 
 
