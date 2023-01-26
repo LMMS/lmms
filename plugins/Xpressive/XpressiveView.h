@@ -5,11 +5,20 @@
 #include <QSyntaxHighlighter>
 #include <QRegularExpression>
 
+#include "Graph.h"
+#include "Instrument.h"
 #include "InstrumentView.h"
 #include "Knob.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "PixmapButton.h"
-#include "Graph.h"
+
+
+namespace lmms
+{
+
+namespace gui
+{
+
 
 #ifndef QT_NO_SYNTAXHIGHLIGHTER
 
@@ -125,6 +134,9 @@ private:
 	XpressiveHelpView();
 	static QString s_helpText;
 };
+
+} // namespace gui
+} // namespace lmms
 
 
 #endif // XPRESSIVEVIEW_H

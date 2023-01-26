@@ -34,13 +34,15 @@
 
 class QPixmap;
 
+namespace lmms::gui
+{
 
 class GroupBox : public QWidget, public BoolModelView
 {
 	Q_OBJECT
 public:
 	GroupBox( const QString & _caption, QWidget * _parent = nullptr );
-	virtual ~GroupBox();
+	~GroupBox() override;
 
 	void modelChanged() override;
 
@@ -70,6 +72,7 @@ private:
 } ;
 
 
+} // namespace lmms::gui
 
 
 #endif

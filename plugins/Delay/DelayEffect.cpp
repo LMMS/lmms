@@ -25,15 +25,21 @@
 #include "DelayEffect.h"
 #include "Engine.h"
 #include "embed.h"
-#include "interpolation.h"
+#include "Lfo.h"
+#include "lmms_math.h"
 #include "plugin_export.h"
+#include "StereoDelay.h"
+
+namespace lmms
+{
+
 
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT delay_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Delay",
 	QT_TRANSLATE_NOOP( "PluginBrowser", "A native delay plugin" ),
 	"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",
@@ -85,7 +91,7 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	const float sr = Engine::audioEngine()->processingSampleRate();
 	const float d = dryLevel();
 	const float w = wetLevel();
-	sample_t dryS[2];
+	auto dryS = std::array<sample_t, 2>{};
 	float lPeak = 0.0;
 	float rPeak = 0.0;
 	float length = m_delayControls.m_delayTimeModel.value();
@@ -164,3 +170,5 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 
 }}
 
+
+} // namespace lmms

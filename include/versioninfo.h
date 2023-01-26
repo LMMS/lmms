@@ -1,9 +1,12 @@
+#ifndef VERSION_INFO_H
+#define VERSION_INFO_H
+
 #include "lmms_basics.h"
 
 #ifdef __GNUC__
 constexpr const char* LMMS_BUILDCONF_COMPILER_VERSION = "GCC " __VERSION__;
 #elif defined(_MSC_VER)
-constexpr const char* LMMS_BUILDCONF_COMPILER_VERSION = "MSVC " STRINGIFY(_MSC_FULL_VER);
+constexpr const char* LMMS_BUILDCONF_COMPILER_VERSION = "MSVC " LMMS_STRINGIFY(_MSC_FULL_VER);
 #else
 constexpr const char* LMMS_BUILDCONF_COMPILER_VERSION = "unknown compiler";
 #endif
@@ -46,4 +49,6 @@ constexpr const char* LMMS_BUILDCONF_PLATFORM = "win32";
 
 #ifdef LMMS_BUILD_HAIKU
 constexpr const char* LMMS_BUILDCONF_PLATFORM = "Haiku";
+#endif
+
 #endif

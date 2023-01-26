@@ -27,9 +27,9 @@
 #include "endian_handling.h"
 #include "AudioEngine.h"
 
-#include <QFile>
-#include <QDebug>
 
+namespace lmms
+{
 
 AudioFileWave::AudioFileWave( OutputSettings const & outputSettings,
 				const ch_cnt_t channels, bool & successful,
@@ -104,7 +104,7 @@ void AudioFileWave::writeBuffer( const surroundSampleFrame * _ab,
 
 	if( bitDepth == OutputSettings::Depth_32Bit || bitDepth == OutputSettings::Depth_24Bit )
 	{
-		float *  buf = new float[_frames*channels()];
+		auto buf = new float[_frames * channels()];
 		for( fpp_t frame = 0; frame < _frames; ++frame )
 		{
 			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
@@ -118,7 +118,7 @@ void AudioFileWave::writeBuffer( const surroundSampleFrame * _ab,
 	}
 	else
 	{
-		int_sample_t * buf = new int_sample_t[_frames * channels()];
+		auto buf = new int_sample_t[_frames * channels()];
 		convertToS16( _ab, _frames, _master_gain, buf,
 							!isLittleEndian() );
 
@@ -138,3 +138,4 @@ void AudioFileWave::finishEncoding()
 	}
 }
 
+} // namespace lmms

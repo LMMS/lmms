@@ -26,6 +26,7 @@
 #include "XpressiveView.h"
 
 #include <QDomElement>
+#include <QPlainTextEdit>
 
 #include "AudioEngine.h"
 #include "Engine.h"
@@ -33,14 +34,11 @@
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "MainWindow.h"
 #include "NotePlayHandle.h"
-#include "Oscillator.h"
 #include "PixmapButton.h"
 #include "Song.h"
-#include "SubWindow.h"
-#include "ToolTip.h"
 
 #include "base64.h"
 #include "lmms_constants.h"
@@ -51,9 +49,13 @@
 
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C" {
 
-Plugin::Descriptor PLUGIN_EXPORT xpressive_plugin_descriptor = { STRINGIFY(
+Plugin::Descriptor PLUGIN_EXPORT xpressive_plugin_descriptor = { LMMS_STRINGIFY(
 	PLUGIN_NAME), "Xpressive", QT_TRANSLATE_NOOP("PluginBrowser",
 	"Mathematical expression parser"), "Orr Dvori", 0x0100,
 	Plugin::Instrument, new PluginPixmapLoader("logo"), nullptr, nullptr };
@@ -117,8 +119,6 @@ Xpressive::Xpressive(InstrumentTrack* instrument_track) :
 
 }
 
-Xpressive::~Xpressive() {
-}
 
 void calculateWaveGraph(QByteArray text, float smoothness, graphModel * raw_graph, graphModel * smooth_graph)
 {
@@ -145,7 +145,6 @@ void calculateWaveGraph(QByteArray text, float smoothness, graphModel * raw_grap
 			}
 			raw_graph->setSamples(samples);
 			delete[] samples;
-			qDebug("||PARSE_OK");
 			Xpressive::smooth(smoothness,raw_graph,smooth_graph);
 		}
 	}
@@ -159,6 +158,7 @@ void Xpressive::recalculateWaves()
 	m_W2.copyFrom(&m_graphW2);
 	m_W3.copyFrom(&m_graphW3);
 }
+
 
 
 void Xpressive::saveSettings(QDomDocument & _doc, QDomElement & _this) {
@@ -254,6 +254,7 @@ void Xpressive::playNote(NotePlayHandle* nph, sampleFrame* working_buffer) {
 	if (/*nph->totalFramesPlayed() == 0 ||*/ nph->m_pluginData == nullptr) {
 		nph->m_pluginData = (void*)1;
 
+
 		ExprFront *exprO1 = new ExprFront(m_outputExpression[0].constData(),Engine::audioEngine()->processingSampleRate());//give the "last" function a whole second
 		ExprFront *exprO2 = new ExprFront(m_outputExpression[1].constData(),Engine::audioEngine()->processingSampleRate());
 		float previous_frequency;
@@ -269,6 +270,7 @@ void Xpressive::playNote(NotePlayHandle* nph, sampleFrame* working_buffer) {
 			m_nph_of_previous = nph;
 			m_previous_frequency = nph->frequency();
 		}
+
 
 		auto init_expression_step1 = [this, nph,previous_frequency](ExprFront* e) { //lambda function to init exprO1 and exprO2
 			//add the constants and the variables to the expression.
@@ -297,10 +299,7 @@ void Xpressive::playNote(NotePlayHandle* nph, sampleFrame* working_buffer) {
 				Engine::audioEngine()->processingSampleRate(), &m_panning1, &m_panning2, m_relTransition.value());
 	}
 
-
-
-
-	ExprSynth *ps = static_cast<ExprSynth*>(nph->m_pluginData);
+	auto ps = static_cast<ExprSynth*>(nph->m_pluginData);
 	const fpp_t frames = nph->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = nph->noteOffset();
 
@@ -317,9 +316,42 @@ void Xpressive::deleteNotePluginData(NotePlayHandle* nph) {
 	delete static_cast<ExprSynth *>(nph->m_pluginData);
 }
 
-PluginView * Xpressive::instantiateView(QWidget* parent) {
-	return (new XpressiveView(this, parent));
+gui::PluginView* Xpressive::instantiateView(QWidget* parent) {
+	return (new gui::XpressiveView(this, parent));
 }
+
+
+void Xpressive::smooth(float smoothness,const graphModel * in,graphModel * out)
+{
+	out->setSamples(in->samples());
+	if (smoothness>0)
+	{
+		const int guass_size = (int)(smoothness * 5) | 1;
+		const int guass_center = guass_size/2;
+		const float delta = smoothness;
+		const float a= 1.0f / (sqrtf(2.0f * F_PI) * delta);
+		auto const guassian = new float[guass_size];
+		float sum = 0.0f;
+		float temp = 0.0f;
+		int i;
+		for (i = 0; i < guass_size; i++ )
+		{
+			temp = (i - guass_center) / delta;
+			sum += guassian[i] = a * powf(F_E, -0.5f * temp * temp);
+		}
+		for (i = 0; i < guass_size; i++ )
+		{
+			guassian[i] = guassian[i] / sum;
+		}
+		out->convolve(guassian, guass_size, guass_center);
+		delete [] guassian;
+	}
+}
+
+
+namespace gui
+{
+
 
 class XpressiveKnob: public Knob {
 public:
@@ -334,15 +366,16 @@ public:
 		setLineWidth(3);
 	}
 	XpressiveKnob(QWidget * _parent, const QString & _name) :
-			Knob(knobStyled, _parent,_name) {
+		Knob(knobStyled, _parent,_name) {
 		setStyle();
 	}
 	XpressiveKnob(QWidget * _parent) :
-			Knob(knobStyled, _parent) {
+		Knob(knobStyled, _parent) {
 		setStyle();
 	}
 
 };
+
 
 
 XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
@@ -374,7 +407,7 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_graph->setGraphColor(QColor(255, 255, 255));
 	m_graph->setEnabled(false);
 
-	ToolTip::add(m_graph, tr("Draw your own waveform here "
+	m_graph->setToolTip(tr("Draw your own waveform here "
 			"by dragging your mouse on this graph."));
 
 	pal = QPalette();
@@ -392,37 +425,37 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_w1Btn->move(3, ROW_BTN);
 	m_w1Btn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("w1_active"));
 	m_w1Btn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("w1_inactive"));
-	ToolTip::add(m_w1Btn, tr("Select oscillator W1"));
+	m_w1Btn->setToolTip(tr("Select oscillator W1"));
 
 	m_w2Btn = new PixmapButton(this, nullptr);
 	m_w2Btn->move(26, ROW_BTN);
 	m_w2Btn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("w2_active"));
 	m_w2Btn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("w2_inactive"));
-	ToolTip::add(m_w2Btn, tr("Select oscillator W2"));
+	m_w2Btn->setToolTip(tr("Select oscillator W2"));
 
 	m_w3Btn = new PixmapButton(this, nullptr);
 	m_w3Btn->move(49, ROW_BTN);
 	m_w3Btn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("w3_active"));
 	m_w3Btn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("w3_inactive"));
-	ToolTip::add(m_w3Btn, tr("Select oscillator W3"));
+	m_w3Btn->setToolTip(tr("Select oscillator W3"));
 
 	m_o1Btn = new PixmapButton(this, nullptr);
 	m_o1Btn->move(79, ROW_BTN);
 	m_o1Btn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("o1_active"));
 	m_o1Btn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("o1_inactive"));
-	ToolTip::add(m_o1Btn, tr("Select output O1"));
+	m_o1Btn->setToolTip(tr("Select output O1"));
 
 	m_o2Btn = new PixmapButton(this, nullptr);
 	m_o2Btn->move(101, ROW_BTN);
 	m_o2Btn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("o2_active"));
 	m_o2Btn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("o2_inactive"));
-	ToolTip::add(m_o2Btn, tr("Select output O2"));
+	m_o2Btn->setToolTip(tr("Select output O2"));
 
 	m_helpBtn = new PixmapButton(this, nullptr);
 	m_helpBtn->move(133, ROW_BTN);
 	m_helpBtn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("help_active"));
 	m_helpBtn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("help_inactive"));
-	ToolTip::add(m_helpBtn, tr("Open help window"));
+	m_helpBtn->setToolTip(tr("Open help window"));
 
 	m_selectedGraphGroup = new automatableButtonGroup(this);
 	m_selectedGraphGroup->addButton(m_w1Btn);
@@ -431,7 +464,7 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_selectedGraphGroup->addButton(m_o1Btn);
 	m_selectedGraphGroup->addButton(m_o2Btn);
 
-	Xpressive *e = castModel<Xpressive>();
+	auto e = castModel<Xpressive>();
 	m_selectedGraphGroup->setModel(&e->selectedGraph());
 	m_selectedGraphGroup->model()->setValue(O1_EXPR);
 
@@ -439,55 +472,55 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_sinWaveBtn->move(4, ROW_WAVEBTN);
 	m_sinWaveBtn->setActiveGraphic(embed::getIconPixmap("sin_wave_active"));
 	m_sinWaveBtn->setInactiveGraphic(embed::getIconPixmap("sin_wave_inactive"));
-	ToolTip::add(m_sinWaveBtn, tr("Sine wave"));
+	m_sinWaveBtn->setToolTip(tr("Sine wave"));
 
 	m_moogWaveBtn = new PixmapButton(this, tr("Moog-saw wave"));
 	m_moogWaveBtn->move(4, ROW_WAVEBTN-14);
 	m_moogWaveBtn->setActiveGraphic(
 		embed::getIconPixmap( "moog_saw_wave_active" ) );
 	m_moogWaveBtn->setInactiveGraphic(embed::getIconPixmap("moog_saw_wave_inactive"));
-	ToolTip::add(m_moogWaveBtn, tr("Moog-saw wave"));
+	m_moogWaveBtn->setToolTip(tr("Moog-saw wave"));
 
 	m_expWaveBtn = new PixmapButton(this, tr("Exponential wave"));
 	m_expWaveBtn->move(4 +14, ROW_WAVEBTN-14);
 	m_expWaveBtn->setActiveGraphic(embed::getIconPixmap( "exp_wave_active" ) );
 	m_expWaveBtn->setInactiveGraphic(embed::getIconPixmap( "exp_wave_inactive" ) );
-	ToolTip::add(m_expWaveBtn, tr("Exponential wave"));
+	m_expWaveBtn->setToolTip(tr("Exponential wave"));
 
 	m_sawWaveBtn = new PixmapButton(this, tr("Saw wave"));
 	m_sawWaveBtn->move(4 + 14 * 2, ROW_WAVEBTN-14);
 	m_sawWaveBtn->setActiveGraphic(embed::getIconPixmap("saw_wave_active"));
 	m_sawWaveBtn->setInactiveGraphic(embed::getIconPixmap("saw_wave_inactive"));
-	ToolTip::add(m_sawWaveBtn, tr("Saw wave"));
+	m_sawWaveBtn->setToolTip(tr("Saw wave"));
 
 	m_usrWaveBtn = new PixmapButton(this, tr("User-defined wave"));
 	m_usrWaveBtn->move(4 + 14 * 3, ROW_WAVEBTN-14);
 	m_usrWaveBtn->setActiveGraphic(embed::getIconPixmap("usr_wave_active"));
 	m_usrWaveBtn->setInactiveGraphic(embed::getIconPixmap("usr_wave_inactive"));
-	ToolTip::add(m_usrWaveBtn, tr("User-defined wave"));
+	m_usrWaveBtn->setToolTip(tr("User-defined wave"));
 
 	m_triangleWaveBtn = new PixmapButton(this, tr("Triangle wave"));
 	m_triangleWaveBtn->move(4 + 14, ROW_WAVEBTN);
 	m_triangleWaveBtn->setActiveGraphic(
-			embed::getIconPixmap("triangle_wave_active"));
+		embed::getIconPixmap("triangle_wave_active"));
 	m_triangleWaveBtn->setInactiveGraphic(
 			embed::getIconPixmap("triangle_wave_inactive"));
-	ToolTip::add(m_triangleWaveBtn, tr("Triangle wave"));
+	m_triangleWaveBtn->setToolTip(tr("Triangle wave"));
 
 	m_sqrWaveBtn = new PixmapButton(this, tr("Square wave"));
 	m_sqrWaveBtn->move(4 + 14 * 2, ROW_WAVEBTN);
 	m_sqrWaveBtn->setActiveGraphic(embed::getIconPixmap("square_wave_active"));
 	m_sqrWaveBtn->setInactiveGraphic(
 			embed::getIconPixmap("square_wave_inactive"));
-	ToolTip::add(m_sqrWaveBtn, tr("Square wave"));
+	m_sqrWaveBtn->setToolTip(tr("Square wave"));
 
 	m_whiteNoiseWaveBtn = new PixmapButton(this, tr("White noise"));
 	m_whiteNoiseWaveBtn->move(4 + 14 * 3, ROW_WAVEBTN);
 	m_whiteNoiseWaveBtn->setActiveGraphic(
-			embed::getIconPixmap("white_noise_wave_active"));
+		embed::getIconPixmap("white_noise_wave_active"));
 	m_whiteNoiseWaveBtn->setInactiveGraphic(
 			embed::getIconPixmap("white_noise_wave_inactive"));
-	ToolTip::add(m_whiteNoiseWaveBtn, tr("White noise"));
+	m_whiteNoiseWaveBtn->setToolTip(tr("White noise"));
 
 
 	m_waveInterpolate  = new LedCheckBox("Interpolate", this, tr("WaveInterpolate"),
@@ -495,7 +528,7 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_waveInterpolate->move(2, 230);
 
 	m_expressionValidToggle = new LedCheckBox("", this, tr("ExpressionValid"),
-			LedCheckBox::Red);
+											  LedCheckBox::Red);
 	m_expressionValidToggle->move(168, EXPR_TEXT_Y+EXPR_TEXT_H-2);
 	m_expressionValidToggle->setEnabled( false );
 
@@ -590,33 +623,29 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	updateLayout();
 }
 
-XpressiveView::~XpressiveView()
-{
-}
-
-
+XpressiveView::~XpressiveView(){}
 
 
 void XpressiveView::expressionChanged() {
-	Xpressive * e = castModel<Xpressive>();
+	auto e = castModel<Xpressive>();
 	QByteArray text = m_expressionEditor->toPlainText().toLatin1();
 
 	switch (m_selectedGraphGroup->model()->value()) {
-	case W1_EXPR:
-		e->wavesExpression(0) = text;
-		break;
-	case W2_EXPR:
-		e->wavesExpression(1) = text;
-		break;
-	case W3_EXPR:
-		e->wavesExpression(2) = text;
-		break;
-	case O1_EXPR:
-		e->outputExpression(0) = text;
-		break;
-	case O2_EXPR:
-		e->outputExpression(1) = text;
-		break;
+		case W1_EXPR:
+			e->wavesExpression(0) = text;
+			break;
+		case W2_EXPR:
+			e->wavesExpression(1) = text;
+			break;
+		case W3_EXPR:
+			e->wavesExpression(2) = text;
+			break;
+		case O1_EXPR:
+			e->outputExpression(0) = text;
+			break;
+		case O2_EXPR:
+			e->outputExpression(1) = text;
+			break;
 	}
 	if (m_wave_expr)
 		m_graph->setEnabled(m_smoothKnob->model()->value() == 0 && text.size() == 0);
@@ -660,7 +689,7 @@ void XpressiveView::expressionChanged() {
 		if (parse_ok) {
 			e->exprValid().setValue(0);
 			const int length = m_raw_graph->length();
-			float * const samples = new float[length];
+			auto const samples = new float[length];
 			for (i = 0; i < length; i++) {
 				t = i / (float) length;
 				samples[i] = expr.evaluate();
@@ -694,39 +723,13 @@ void XpressiveView::expressionChanged() {
 }
 
 
-void Xpressive::smooth(float smoothness,const graphModel * in,graphModel * out)
-{
-	out->setSamples(in->samples());
-	if (smoothness>0)
-	{
-		const int guass_size = (int)(smoothness * 5) | 1;
-		const int guass_center = guass_size/2;
-		const float delta = smoothness;
-		const float a= 1.0f / (sqrtf(2.0f * F_PI) * delta);
-		float * const guassian = new float [guass_size];
-		float sum = 0.0f;
-		float temp = 0.0f;
-		int i;
-		for (i = 0; i < guass_size; i++ )
-		{
-			temp = (i - guass_center) / delta;
-			sum += guassian[i] = a * powf(F_E, -0.5f * temp * temp);
-		}
-		for (i = 0; i < guass_size; i++ )
-		{
-			guassian[i] = guassian[i] / sum;
-		}
-		out->convolve(guassian, guass_size, guass_center);
-		delete [] guassian;
-	}
-}
 
 
 
 void XpressiveView::smoothChanged()
 {
-	
-	Xpressive * e = castModel<Xpressive>();
+
+	auto e = castModel<Xpressive>();
 	float smoothness=0;
 	switch (m_selectedGraphGroup->model()->value()) {
 	case W1_EXPR:
@@ -758,7 +761,7 @@ void XpressiveView::smoothChanged()
 void XpressiveView::graphDrawn()
 {
 	m_raw_graph->setSamples(m_graph->model()->samples());
-	Xpressive * e = castModel<Xpressive>();
+	auto e = castModel<Xpressive>();
 	switch (m_selectedGraphGroup->model()->value()) {
 	case W1_EXPR:
 		e->W1().copyFrom(m_graph->model());
@@ -774,7 +777,7 @@ void XpressiveView::graphDrawn()
 }
 
 void XpressiveView::modelChanged() {
-	Xpressive * b = castModel<Xpressive>();
+	auto b = castModel<Xpressive>();
 
 	m_expressionValidToggle->setModel( &b->exprValid() );
 	m_generalPurposeKnob[0]->setModel( &b->parameterA1() );
@@ -790,7 +793,7 @@ void XpressiveView::modelChanged() {
 }
 
 void XpressiveView::updateLayout() {
-	Xpressive * e = castModel<Xpressive>();
+	auto e = castModel<Xpressive>();
 	m_output_expr=false;
 	m_wave_expr=false;
 	switch (m_selectedGraphGroup->model()->value()) {
@@ -997,6 +1000,18 @@ QString XpressiveHelpView::s_helpText=
 
 XpressiveHelpView::XpressiveHelpView():QTextEdit(s_helpText)
 {
+
+#if QT_VERSION < 0x50C00
+	// Workaround for a bug in Qt versions below 5.12,
+	// where argument-dependent-lookup fails for QFlags operators
+	// declared inside a namepsace.
+	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
+	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
+
+	using ::operator|;
+
+#endif
+
 	setWindowTitle ( "Xpressive Help" );
 	setTextInteractionFlags ( Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse );
 	getGUI()->mainWindow()->addWindowedWidget( this );
@@ -1014,6 +1029,7 @@ void XpressiveView::helpClicked() {
 	XpressiveHelpView::getInstance()->show();
 
 }
+
 
 #ifndef QT_NO_SYNTAXHIGHLIGHTER
 Highlighter::Highlighter(QTextDocument *parent)
@@ -1113,15 +1129,18 @@ void Highlighter::highlightBlock(const QString &text)
 #endif
 
 
+
+} // namespace gui
+
+
 extern "C" {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main(Model *m, void *) {
-	return (new Xpressive(static_cast<InstrumentTrack *>(m)));
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * ) {
+	return ( new Xpressive( static_cast<InstrumentTrack *>( m ) ) );
 }
 
 }
 
 
-
-
+} // namespace lmms

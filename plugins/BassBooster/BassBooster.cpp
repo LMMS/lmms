@@ -27,12 +27,16 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT bassbooster_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"BassBooster",
 	QT_TRANSLATE_NOOP( "PluginBrowser", "Boost your bass the fast and simple way" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
@@ -61,9 +65,6 @@ BassBoosterEffect::BassBoosterEffect( Model* parent, const Descriptor::SubPlugin
 
 
 
-BassBoosterEffect::~BassBoosterEffect()
-{
-}
 
 
 
@@ -101,7 +102,7 @@ bool BassBoosterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 		m_bbFX.leftFX().setGain( gain );
 		m_bbFX.rightFX().setGain( gain);
 
-		sample_t s[2] = { buf[f][0], buf[f][1] };
+		auto s = std::array{buf[f][0], buf[f][1]};
 		m_bbFX.nextSample( s[0], s[1] );
 
 		buf[f][0] = d * buf[f][0] + w * s[0];
@@ -155,3 +156,5 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 
 }
 
+
+} // namespace lmms

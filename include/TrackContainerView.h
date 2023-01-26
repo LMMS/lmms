@@ -26,7 +26,7 @@
 #ifndef TRACK_CONTAINER_VIEW_H
 #define TRACK_CONTAINER_VIEW_H
 
-#include <QtCore/QVector>
+#include <QVector>
 #include <QScrollArea>
 #include <QWidget>
 #include <QThread>
@@ -34,14 +34,37 @@
 #include "JournallingObject.h"
 #include "ModelView.h"
 #include "Rubberband.h"
-#include "TrackView.h"
+#include "TimePos.h"
 
 
 class QVBoxLayout;
 
+namespace lmms
+{
+
 class InstrumentTrack;
+class Track;
 class TrackContainer;
 
+class InstrumentLoaderThread : public QThread
+{
+Q_OBJECT
+public:
+	InstrumentLoaderThread( QObject *parent = 0, InstrumentTrack *it = 0,
+		QString name = "" );
+
+	void run() override;
+
+private:
+	InstrumentTrack *m_it;
+	QString m_name;
+	QThread *m_containerThread;
+};
+
+namespace gui
+{
+
+class TrackView;
 
 class TrackContainerView : public QWidget, public ModelView,
 						public JournallingObject,
@@ -50,7 +73,7 @@ class TrackContainerView : public QWidget, public ModelView,
 	Q_OBJECT
 public:
 	TrackContainerView( TrackContainer* tc );
-	virtual ~TrackContainerView();
+	~TrackContainerView() override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
 	void loadSettings( const QDomElement & _this ) override;
@@ -65,7 +88,7 @@ public:
 		return m_currentPosition;
 	}
 
-	virtual bool fixedTCOs() const
+	virtual bool fixedClips() const
 	{
 		return false;
 	}
@@ -125,13 +148,14 @@ public:
 		return "trackcontainerview";
 	}
 
+	unsigned int totalHeightOfTracks() const;
 
 	RubberBand *rubberBand() const;
 
 public slots:
 	void realignTracks();
-	TrackView * createTrackView( Track * _t );
-	void deleteTrackView( TrackView * _tv );
+	lmms::gui::TrackView * createTrackView( lmms::Track * _t );
+	void deleteTrackView( lmms::gui::TrackView * _tv );
 
 	void dropEvent( QDropEvent * _de ) override;
 	void dragEnterEvent( QDragEnterEvent * _dee ) override;
@@ -161,7 +185,7 @@ private:
 	{
 	public:
 		scrollArea( TrackContainerView* parent );
-		virtual ~scrollArea();
+		~scrollArea() override = default;
 
 	protected:
 		void wheelEvent( QWheelEvent * _we ) override;
@@ -173,7 +197,7 @@ private:
 	friend class TrackContainerView::scrollArea;
 
 	TrackContainer* m_tc;
-	typedef QList<TrackView *> trackViewList;
+	using trackViewList = QList<TrackView*>;
 	trackViewList m_trackViews;
 
 	scrollArea * m_scrollArea;
@@ -183,27 +207,16 @@ private:
 
 	RubberBand * m_rubberBand;
 
-
-
 signals:
-	void positionChanged( const TimePos & _pos );
+	void positionChanged( const lmms::TimePos & _pos );
+	void tracksRealigned();
 
 
 } ;
 
-class InstrumentLoaderThread : public QThread
-{
-	Q_OBJECT
-public:
-	InstrumentLoaderThread( QObject *parent = 0, InstrumentTrack *it = 0,
-							QString name = "" );
 
-	void run() override;
+} // namespace gui
 
-private:
-	InstrumentTrack *m_it;
-	QString m_name;
-	QThread *m_containerThread;
-};
+} // namespace lmms
 
 #endif

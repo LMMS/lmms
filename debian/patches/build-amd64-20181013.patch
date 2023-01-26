@@ -19,10 +19,10 @@ Index: lmms-1.1.3/plugins/LadspaEffect/caps/dsp/FPTruncateMode.h
  			}
  
  		~FPTruncateMode()
-Index: lmms-1.1.3/plugins/zynaddsubfx/zynaddsubfx/src/Synth/OscilGen.cpp
+Index: lmms-1.1.3/plugins/ZynAddSubFx/zynaddsubfx/src/Synth/OscilGen.cpp
 ===================================================================
---- lmms-1.1.3.orig/plugins/zynaddsubfx/zynaddsubfx/src/Synth/OscilGen.cpp
-+++ lmms-1.1.3/plugins/zynaddsubfx/zynaddsubfx/src/Synth/OscilGen.cpp
+--- lmms-1.1.3.orig/plugins/ZynAddSubFx/zynaddsubfx/src/Synth/OscilGen.cpp
++++ lmms-1.1.3/plugins/ZynAddSubFx/zynaddsubfx/src/Synth/OscilGen.cpp
 @@ -33,7 +33,8 @@
  //operations on FFTfreqs
  inline void clearAll(fft_t *freqs)

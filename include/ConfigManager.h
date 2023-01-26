@@ -28,16 +28,20 @@
 
 #include "lmmsconfig.h"
 
-#include <QtCore/QMap>
-#include <QtCore/QPair>
-#include <QtCore/QStringList>
-#include <QtCore/QVector>
-#include <QtCore/QObject>
+#include <QMap>
+#include <QPair>
+#include <QStringList>
+#include <QVector>
+#include <QObject>
 
 #include "lmms_export.h"
 
 
-class LmmsCore;
+namespace lmms
+{
+
+
+class Engine;
 
 const QString PROJECTS_PATH = "projects/";
 const QString TEMPLATE_PATH = "templates/";
@@ -270,7 +274,7 @@ private:
 
 	ConfigManager();
 	ConfigManager(const ConfigManager & _c);
-	~ConfigManager();
+	~ConfigManager() override;
 
 	void upgrade_1_1_90();
 	void upgrade_1_1_91();
@@ -299,11 +303,15 @@ private:
 	unsigned int m_configVersion;
 	QStringList m_recentlyOpenedProjects;
 
-	typedef QVector<QPair<QString, QString> > stringPairVector;
-	typedef QMap<QString, stringPairVector> settingsMap;
+	using stringPairVector = QVector<QPair<QString, QString>>;
+	using settingsMap = QMap<QString, stringPairVector>;
 	settingsMap m_settings;
 
 
-	friend class LmmsCore;
+	friend class Engine;
 };
+
+
+} // namespace lmms
+
 #endif

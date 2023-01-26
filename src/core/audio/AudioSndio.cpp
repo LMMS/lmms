@@ -27,7 +27,7 @@
 
 #ifdef LMMS_HAVE_SNDIO
 
-#include <QFileInfo>
+#include <cstdlib>
 #include <QLabel>
 #include <QLineEdit>
 
@@ -37,16 +37,11 @@
 #include "Engine.h"
 #include "gui_templates.h"
 
-#ifdef LMMS_HAVE_UNISTD_H
-#include <unistd.h>
-#endif
-#ifdef LMMS_HAVE_STDLIB_H
-#include <stdlib.h>
-#endif
-
 #include "ConfigManager.h"
 
 
+namespace lmms
+{
 
 AudioSndio::AudioSndio(bool & _success_ful, AudioEngine * _audioEngine) :
 	AudioDevice( qBound<ch_cnt_t>(
@@ -131,7 +126,7 @@ AudioSndio::~AudioSndio()
 }
 
 
-void AudioSndio::startProcessing( void )
+void AudioSndio::startProcessing()
 {
 	if( !isRunning() )
 	{
@@ -140,13 +135,13 @@ void AudioSndio::startProcessing( void )
 }
 
 
-void AudioSndio::stopProcessing( void )
+void AudioSndio::stopProcessing()
 {
 	stopProcessingThread( this );
 }
 
 
-void AudioSndio::applyQualitySettings( void )
+void AudioSndio::applyQualitySettings()
 {
 	if( hqAudio() )
 	{
@@ -159,7 +154,7 @@ void AudioSndio::applyQualitySettings( void )
 }
 
 
-void AudioSndio::run( void )
+void AudioSndio::run()
 {
 	surroundSampleFrame * temp = new surroundSampleFrame[audioEngine()->framesPerPeriod()];
 	int_sample_t * outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];
@@ -195,13 +190,13 @@ AudioSndio::setupWidget::setupWidget( QWidget * _parent ) :
 	dev_lbl->setFont( pointSize<6>( dev_lbl->font() ) );
 	dev_lbl->setGeometry( 10, 40, 160, 10 );
 
-	LcdSpinBoxModel * m = new LcdSpinBoxModel( /* this */ );	
+	gui::LcdSpinBoxModel * m = new gui::LcdSpinBoxModel( /* this */ );
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
 	m->setStep( 2 );
 	m->setValue( ConfigManager::inst()->value( "audiosndio",
 	    "channels" ).toInt() );
 
-	m_channels = new LcdSpinBox( 1, this );
+	m_channels = new gui::LcdSpinBox( 1, this );
 	m_channels->setModel( m );
 	m_channels->setLabel( tr( "Channels" ) );
 	m_channels->move( 180, 20 );
@@ -209,13 +204,7 @@ AudioSndio::setupWidget::setupWidget( QWidget * _parent ) :
 }
 
 
-AudioSndio::setupWidget::~setupWidget()
-{
-
-}
-
-
-void AudioSndio::setupWidget::saveSettings( void )
+void AudioSndio::setupWidget::saveSettings()
 {
 	ConfigManager::inst()->setValue( "audiosndio", "device",
 	    m_device->text() );
@@ -224,4 +213,6 @@ void AudioSndio::setupWidget::saveSettings( void )
 }
 
 
-#endif	/* LMMS_HAVE_SNDIO */
+} // namespace lmms
+
+#endif	// LMMS_HAVE_SNDIO

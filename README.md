@@ -6,8 +6,6 @@
 [![Join the chat at Discord](https://img.shields.io/badge/chat-on%20discord-7289DA.svg)](https://discord.gg/3sc5su7)
 [![Localise on transifex](https://img.shields.io/badge/localise-on_transifex-green.svg)](https://www.transifex.com/lmms/lmms/)
 
-**New PRs may be affected by ongoing reorganization ([#5592](https://github.com/LMMS/lmms/issues/5592)). Please be prepared to rebase your PR as necessary.**
-
 What is LMMS?
 --------------
 
@@ -28,9 +26,9 @@ Features
 ---------
 
 * Song-Editor for composing songs
-* A Beat+Bassline-Editor for creating beats and basslines
+* Pattern-Editor for creating beats and patterns
 * An easy-to-use Piano-Roll for editing patterns and melodies
-* An FX mixer with unlimited FX channels and arbitrary number of effects
+* A Mixer with unlimited mixer channels and arbitrary number of effects
 * Many powerful instrument and effect-plugins out of the box
 * Full user-defined track-based automation and computer-controlled automation sources
 * Compatible with many standards such as SoundFont2, VST(i), LADSPA, GUS Patches, and full MIDI support

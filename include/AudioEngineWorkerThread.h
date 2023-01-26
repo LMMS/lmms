@@ -25,12 +25,16 @@
 #ifndef AUDIO_ENGINE_WORKER_THREAD_H
 #define AUDIO_ENGINE_WORKER_THREAD_H
 
-#include <QtCore/QThread>
+#include <QThread>
 
 #include <atomic>
 
-class AudioEngine;
 class QWaitCondition;
+
+namespace lmms
+{
+
+class AudioEngine;
 class ThreadableJob;
 
 class AudioEngineWorkerThread : public QThread
@@ -74,7 +78,7 @@ public:
 
 
 	AudioEngineWorkerThread( AudioEngine* audioEngine );
-	virtual ~AudioEngineWorkerThread();
+	~AudioEngineWorkerThread() override;
 
 	virtual void quit();
 
@@ -115,5 +119,6 @@ private:
 	volatile bool m_quit;
 } ;
 
+} // namespace lmms
 
 #endif

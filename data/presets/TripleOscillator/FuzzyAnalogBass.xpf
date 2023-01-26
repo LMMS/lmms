@@ -3,7 +3,7 @@
 <lmms-project version="1.0" creatorversion="1.2.1.698" creator="LMMS" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings solo="0" type="0" muted="0" name="Fuzzy Analog Bass">
-    <instrumenttrack pan="0" usemasterpitch="1" pitch="0" basenote="69" fxch="0" pitchrange="1" vol="44">
+    <instrumenttrack pan="0" usemasterpitch="1" pitch="0" basenote="69" mixch="0" pitchrange="1" vol="44">
       <instrument name="tripleoscillator">
         <tripleoscillator modalgo1="2" modalgo2="2" modalgo3="0" stphdetun0="0" stphdetun1="0" wavetype0="5" wavetype1="2" stphdetun2="0" wavetype2="4" vol0="100" phoffset0="101" vol1="100" phoffset1="0" vol2="100" pan0="0" phoffset2="0" pan1="0" pan2="0" finel0="0" finer0="0" finel1="0" finer1="0" finel2="0" finer2="0" coarse0="-12" coarse1="0" coarse2="0" userwavefile0="" userwavefile1="" userwavefile2="">
           <key/>

@@ -36,8 +36,13 @@
 #endif
 #include <QMutexLocker>
 
-#include "lmms_math.h"
+#include "fft_helpers.h"
+#include "lmms_constants.h"
 #include "LocklessRingBuffer.h"
+#include "SaControls.h"
+
+namespace lmms
+{
 
 
 SaProcessor::SaProcessor(const SaControls *controls) :
@@ -194,7 +199,7 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 				if (m_waterfallActive && m_waterfallNotEmpty)
 				{
 					// move waterfall history one line down and clear the top line
-					QRgb *pixel = (QRgb *)m_history_work.data();
+					auto pixel = (QRgb*)m_history_work.data();
 					std::copy(pixel,
 							  pixel + waterfallWidth() * m_waterfallHeight - waterfallWidth(),
 							  pixel + waterfallWidth());
@@ -225,12 +230,9 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 							if (band_end - band_start > 1.0)
 							{
 								// band spans multiple pixels: draw all pixels it covers
-								for (target = (int)band_start; target < (int)band_end; target++)
+								for (target = std::max((int)band_start, 0); target < band_end && target < waterfallWidth(); target++)
 								{
-									if (target >= 0 && target < waterfallWidth())
-									{
-										pixel[target] = makePixel(m_normSpectrumL[i], m_normSpectrumR[i]);
-									}
+									pixel[target] = makePixel(m_normSpectrumL[i], m_normSpectrumR[i]);
 								}
 								// save remaining portion of the band for the following band / pixel
 								// (in case the next band uses sub-pixel drawing)
@@ -265,12 +267,9 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 						else
 						{
 							// Linear: always draws one or more pixels per band
-							for (target = (int)band_start; target < band_end; target++)
+							for (target = std::max((int)band_start, 0); target < band_end && target < waterfallWidth(); target++)
 							{
-								if (target >= 0 && target < waterfallWidth())
-								{
-									pixel[target] = makePixel(m_normSpectrumL[i], m_normSpectrumR[i]);
-								}
+								pixel[target] = makePixel(m_normSpectrumL[i], m_normSpectrumR[i]);
 							}
 						}
 					}
@@ -573,6 +572,9 @@ float SaProcessor::getFreqRangeMax() const
 
 
 // Map frequency to pixel x position on a display of given width.
+// NOTE: Results of this function may be cached by SaSpectrumView. If you use
+// a new function call or variable that can affect results of this function,
+// make sure to also add it as a trigger for cache update in SaSpectrumView.
 float SaProcessor::freqToXPixel(float freq, unsigned int width) const
 {
 	if (m_controls->m_logXModel.value())
@@ -690,3 +692,5 @@ float SaProcessor::yPixelToAmp(float y, unsigned int height) const
 	}
 }
 
+
+} // namespace lmms

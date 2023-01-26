@@ -24,6 +24,8 @@
 
 #include "AudioEngineProfiler.h"
 
+namespace lmms
+{
 
 AudioEngineProfiler::AudioEngineProfiler() :
 	m_periodTimer(),
@@ -32,11 +34,6 @@ AudioEngineProfiler::AudioEngineProfiler() :
 {
 }
 
-
-
-AudioEngineProfiler::~AudioEngineProfiler()
-{
-}
 
 
 void AudioEngineProfiler::finishPeriod( sample_rate_t sampleRate, fpp_t framesPerPeriod )
@@ -61,3 +58,4 @@ void AudioEngineProfiler::setOutputFile( const QString& outputFile )
 	m_outputFile.open( QFile::WriteOnly | QFile::Truncate );
 }
 
+} // namespace lmms

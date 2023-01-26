@@ -25,6 +25,10 @@
 #ifndef LMMS_CONSTANTS_H
 #define LMMS_CONSTANTS_H
 
+namespace lmms
+{
+
+
 constexpr long double LD_PI = 3.14159265358979323846264338327950288419716939937510;
 constexpr long double LD_2PI = LD_PI * 2.0;
 constexpr long double LD_PI_2 = LD_PI * 0.5;
@@ -95,5 +99,8 @@ constexpr int ARANGE_LOUD_START = -30;
 constexpr int ARANGE_LOUD_END = 0;
 constexpr int ARANGE_SILENT_START = -60;
 constexpr int ARANGE_SILENT_END = -10;
+
+
+} // namespace lmms
 
 #endif

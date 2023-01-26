@@ -30,16 +30,28 @@
 #include <limits>
 #include "AutomatableModel.h"
 #include "Graph.h"
-#include "Instrument.h"
 #include "MemoryManager.h"
+
+namespace lmms
+{
 
 
 class ExprFrontData;
+class NotePlayHandle;
+
+namespace gui
+{
+class automatableButtonGroup;
+class Knob;
+class LedCheckBox;
+class PixmapButton;
+}
+
 
 class ExprFront
 {
 public:
-	typedef float (*ff1data_functor)(void*, float);
+	using ff1data_functor = float (*)(void*, float);
 	ExprFront(const char* expr, int last_func_samples);
 	~ExprFront();
 	bool compile();
@@ -142,5 +154,6 @@ inline void clearArray(T* arr,unsigned int size)
 }
 
 
+} // namespace lmms
 
 #endif

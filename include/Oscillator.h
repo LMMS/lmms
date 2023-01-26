@@ -28,11 +28,7 @@
 
 #include <cassert>
 #include <fftw3.h>
-#include <math.h>
-
-#ifdef LMMS_HAVE_STDLIB_H
-#include <stdlib.h>
-#endif
+#include <cstdlib>
 
 #include "Engine.h"
 #include "lmms_constants.h"
@@ -40,6 +36,10 @@
 #include "AudioEngine.h"
 #include "OscillatorConstants.h"
 #include "SampleBuffer.h"
+
+namespace lmms
+{
+
 
 class IntModel;
 
@@ -255,7 +255,7 @@ private:
 	static fftwf_plan s_fftPlan;
 	static fftwf_plan s_ifftPlan;
 	static fftwf_complex * s_specBuf;
-	static float s_sampleBuffer[OscillatorConstants::WAVETABLE_LENGTH];
+	static std::array<float, OscillatorConstants::WAVETABLE_LENGTH> s_sampleBuffer;
 
 	static void generateSawWaveTable(int bands, sample_t* table, int firstBand = 1);
 	static void generateTriangleWaveTable(int bands, sample_t* table, int firstBand = 1);
@@ -310,5 +310,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

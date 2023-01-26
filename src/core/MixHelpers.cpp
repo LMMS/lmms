@@ -24,18 +24,21 @@
 
 #include "MixHelpers.h"
 
+#ifdef LMMS_DEBUG
 #include <cstdio>
+#endif
 
-#include "lmms_math.h"
+#include <cmath>
+#include <QtGlobal>
+
 #include "ValueBuffer.h"
 
-#include <cstdio>
 
 
 static bool s_NaNHandler;
 
 
-namespace MixHelpers
+namespace lmms::MixHelpers
 {
 
 /*! \brief Function for applying MIXOP on all sample frames */
@@ -102,6 +105,7 @@ bool sanitize( sampleFrame * src, int frames )
 			if( std::isinf( src[f][c] ) || std::isnan( src[f][c] ) )
 			{
 				#ifdef LMMS_DEBUG
+					// TODO don't use printf here
 					printf("Bad data, clearing buffer. frame: ");
 					printf("%d: value %f\n", f, src[f][c]);
 				#endif
@@ -277,7 +281,7 @@ struct AddMultipliedStereoOp
 		dst[1] += src[1] * m_coeffs[1];
 	}
 
-	float m_coeffs[2];
+	std::array<float, 2> m_coeffs;
 } ;
 
 
@@ -305,7 +309,7 @@ struct MultiplyAndAddMultipliedOp
 		dst[1] = dst[1]*m_coeffs[0] + src[1]*m_coeffs[1];
 	}
 
-	float m_coeffs[2];
+	std::array<float, 2> m_coeffs;
 } ;
 
 
@@ -324,5 +328,5 @@ void multiplyAndAddMultipliedJoined( sampleFrame* dst,
 	run<>( dst, srcLeft, srcRight, frames, MultiplyAndAddMultipliedOp(coeffDst, coeffSrc) );
 }
 
-}
+} // namespace lmms::MixHelpers
 

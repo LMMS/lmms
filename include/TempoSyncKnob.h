@@ -27,10 +27,13 @@
 #define TEMPO_SYNC_KNOB_H
 
 #include <QPixmap>
-#include <QtCore/QPointer>
+#include <QPointer>
 
 #include "Knob.h"
 #include "TempoSyncKnobModel.h"
+
+namespace lmms::gui
+{
 
 class MeterDialog;
 
@@ -39,7 +42,7 @@ class LMMS_EXPORT TempoSyncKnob : public Knob
 	Q_OBJECT
 public:
 	TempoSyncKnob( knobTypes knobNum, QWidget* parent = nullptr, const QString& name = QString() );
-	virtual ~TempoSyncKnob();
+	~TempoSyncKnob() override;
 
 	const QString & syncDescription();
 	void setSyncDescription( const QString & _new_description );
@@ -78,5 +81,7 @@ private:
 } ;
 
 
+
+} // namespace lmms::gui
 
 #endif

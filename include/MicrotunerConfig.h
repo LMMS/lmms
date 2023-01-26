@@ -25,16 +25,19 @@
 #ifndef MICROTUNER_CONFIG_H
 #define MICROTUNER_CONFIG_H
 
-#include <QCloseEvent>
-#include <QLineEdit>
-#include <QMainWindow>
-#include <QPlainTextEdit>
+
+#include <QWidget>
 
 #include "AutomatableModel.h"
 #include "ComboBoxModel.h"
-#include "LcdFloatSpinBox.h"
-#include "LcdSpinBox.h"
 #include "SerializingObject.h"
+
+class QLineEdit;
+class QPlainTextEdit;
+
+namespace lmms::gui
+{
+
 
 class LMMS_EXPORT MicrotunerConfig : public QWidget, public SerializingObject
 {
@@ -89,5 +92,8 @@ private:
 	IntModel m_baseKeyModel;                //!< model for spinbox of currently edited base key
 	FloatModel m_baseFreqModel;             //!< model for spinbox of currently edited base note frequency
 };
+
+
+} // namespace lmms::gui
 
 #endif

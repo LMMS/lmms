@@ -30,11 +30,16 @@
 #ifdef LMMS_HAVE_LV2
 
 #include <lilv/lilv.h>
+#include <memory>
 
 #include "DataFile.h"
 #include "LinkedModelGroups.h"
 #include "lmms_export.h"
 #include "Plugin.h"
+
+namespace lmms
+{
+
 
 class Lv2Proc;
 class PluginIssue;
@@ -153,6 +158,9 @@ private:
 
 	const LilvPlugin* m_plugin;
 };
+
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2
 #endif // LV2_CONTROL_BASE_H

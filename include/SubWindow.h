@@ -26,18 +26,21 @@
 #ifndef SUBWINDOW_H
 #define SUBWINDOW_H
 
-#include <QEvent>
-#include <QGraphicsDropShadowEffect>
 #include <QMdiSubWindow>
-#include <QLabel>
-#include <QPushButton>
 #include <QString>
 
 #include "lmms_export.h"
 
+class QGraphicsDropShadowEffect;
+class QLabel;
 class QMoveEvent;
+class QPushButton;
 class QResizeEvent;
 class QWidget;
+
+namespace lmms::gui
+{
+
 
 /**
  * @brief The SubWindow class
@@ -96,5 +99,9 @@ private:
 private slots:
 	void focusChanged( QMdiSubWindow * subWindow );
 };
+
+
+
+} // namespace lmms::gui
 
 #endif

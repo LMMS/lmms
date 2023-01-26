@@ -21,10 +21,14 @@
  *
  */
 
-#include <stdlib.h>
+#include <cstdlib>
 
 #include "lmms_basics.h"
 #include "MemoryHelper.h"
+
+namespace lmms
+{
+
 
 /**
  * Allocate a number of bytes and return them.
@@ -63,3 +67,5 @@ void MemoryHelper::alignedFree( void* _buffer )
 	}
 }
 
+
+} // namespace lmms

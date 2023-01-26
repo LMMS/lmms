@@ -3,7 +3,7 @@
 <lmms-project version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings muted="0" type="0" name="Angry Lead" solo="0">
-    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="57" vol="100">
+    <instrumenttrack pan="0" mixch="0" pitchrange="1" pitch="0" basenote="57" vol="100">
       <instrument name="lb302">
         <lb302 db24="0" vcf_res="0.765" vcf_dec="0.28" dead="1" vcf_cut="0.615" vcf_mod="0.27" dist="0.08" slide_dec="0.575" slide="1" shape="4"/>
       </instrument>

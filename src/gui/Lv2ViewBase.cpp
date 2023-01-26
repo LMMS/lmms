@@ -27,11 +27,11 @@
 #ifdef LMMS_HAVE_LV2
 
 #include <QGridLayout>
-#include <QGroupBox>
-#include <QMdiSubWindow>
 #include <QPushButton>
 #include <QHBoxLayout>
+#include <QLabel>
 #include <lilv/lilv.h>
+#include <lv2/lv2plug.in/ns/ext/port-props/port-props.h>
 
 #include "AudioEngine.h"
 #include "Controls.h"
@@ -39,7 +39,6 @@
 #include "GuiApplication.h"
 #include "embed.h"
 #include "gui_templates.h"
-#include "LedCheckbox.h"
 #include "Lv2ControlBase.h"
 #include "Lv2Manager.h"
 #include "Lv2Proc.h"
@@ -48,6 +47,8 @@
 #include "SubWindow.h"
 
 
+namespace lmms::gui
+{
 
 
 Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum) :
@@ -102,26 +103,25 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum) :
 	ctrlBase->foreach_port(
 		[this, &commentUri](const Lv2Ports::PortBase* port)
 		{
-			SetupWidget setup;
-			setup.m_par = this;
-			setup.m_commentUri = commentUri.get();
-			port->accept(setup);
-
-			if (setup.m_control)
+			if(!lilv_port_has_property(port->m_plugin, port->m_port,
+										uri(LV2_PORT_PROPS__notOnGUI).get()))
 			{
-				addControl(setup.m_control,
-					lilv_node_as_string(lilv_port_get_symbol(
-						port->m_plugin, port->m_port)),
-					port->name().toUtf8().data(),
-					false);
+				SetupWidget setup;
+				setup.m_par = this;
+				setup.m_commentUri = commentUri.get();
+				port->accept(setup);
+
+				if (setup.m_control)
+				{
+					addControl(setup.m_control,
+						lilv_node_as_string(lilv_port_get_symbol(
+							port->m_plugin, port->m_port)),
+						port->name().toUtf8().data(),
+						false);
+				}
 			}
 		});
 }
-
-
-
-
-Lv2ViewProc::~Lv2ViewProc() {}
 
 
 
@@ -136,9 +136,9 @@ AutoLilvNode Lv2ViewProc::uri(const char *uriStr)
 
 Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 {
-	QGridLayout* grid = new QGridLayout(meAsWidget);
+	auto grid = new QGridLayout(meAsWidget);
 
-	QHBoxLayout* btnBox = new QHBoxLayout();
+	auto btnBox = new QHBoxLayout();
 	if (/* DISABLES CODE */ (false))
 	{
 		m_reloadPluginButton = new QPushButton(QObject::tr("Reload Plugin"),
@@ -169,7 +169,7 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 	LILV_FOREACH(nodes, itr, props.get())
 	{
 		const LilvNode* node = lilv_nodes_get(props.get(), itr);
-		QLabel* infoLabel = new QLabel(lilv_node_as_string(node));
+		auto infoLabel = new QLabel(lilv_node_as_string(node));
 		infoLabel->setWordWrap(true);
 		infoLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 
@@ -244,5 +244,7 @@ AutoLilvNode Lv2ViewBase::uri(const char *uriStr)
 	return Engine::getLv2Manager()->uri(uriStr);
 }
 
+
+} // namespace lmms::gui
 
 #endif // LMMS_HAVE_LV2

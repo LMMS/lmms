@@ -28,14 +28,22 @@
 
 
 
+#include <QTextEdit>
+
 #include "Graph.h"
 #include "Instrument.h"
 
 
+
 #include "ExprSynth.h"
 
+class QPlainTextEdit;
+
+namespace lmms
+{
+
+
 class oscillator;
-class XpressiveView;
 
 const int	W1_EXPR = 0;
 const int	W2_EXPR = 1;
@@ -47,7 +55,13 @@ const int	NUM_EXPRS = 5;
 
 class ExprFront;
 
+
+namespace gui
+{
+
 class SubWindow;
+class XpressiveView;
+}
 
 
 
@@ -56,20 +70,19 @@ class Xpressive : public Instrument
 	Q_OBJECT
 public:
 	Xpressive(InstrumentTrack* instrument_track );
-	virtual ~Xpressive();
 
-	virtual void playNote(NotePlayHandle* nph,
-						sampleFrame* working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle* nph );
+	void playNote(NotePlayHandle* nph,
+						sampleFrame* working_buffer ) override;
+	void deleteNotePluginData( NotePlayHandle* nph ) override;
 
 
-	virtual void saveSettings( QDomDocument& _doc,
-							QDomElement& _this );
-	virtual void loadSettings( const QDomElement& _this );
+	void saveSettings( QDomDocument& _doc,
+							QDomElement& _this ) override;
+	void loadSettings( const QDomElement& _this ) override;
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
-	virtual PluginView* instantiateView( QWidget * parent );
+	gui::PluginView* instantiateView( QWidget * parent ) override;
 
 	graphModel& graphO1() { return m_graphO1; }
 	graphModel& graphO2() { return m_graphO2; }
@@ -135,10 +148,15 @@ private:
 	WaveSample m_W1, m_W2, m_W3;
 
 	BoolModel m_exprValid;
+
 	float m_previous_frequency;
 	NotePlayHandle* m_nph_of_previous;
+
+	
 } ;
 
 
+
+} // namespace lmms
 
 #endif
