@@ -5,9 +5,9 @@ OPTION(LMMS_MINIMAL "Build a minimal list of plug-ins" OFF)
 OPTION(LIST_PLUGINS "Lists the available plugins for building" OFF)
 
 SET(MINIMAL_LIST
-	audio_file_processor
-	kicker
-	triple_oscillator
+	AudioFileProcessor
+	Kicker
+	TripleOscillator
 )
 
 IF(LMMS_MINIMAL)
@@ -25,52 +25,52 @@ SET(LMMS_PLUGIN_LIST
 	${MINIMAL_LIST}
 	Amplifier
 	BassBooster
-	bit_invader
+	BitInvader
 	Bitcrush
-	carlabase
-	carlapatchbay
-	carlarack
+	CarlaBase
+	CarlaPatchbay
+	CarlaRack
 	Compressor
 	CrossoverEQ
 	Delay
 	DualFilter
-	dynamics_processor
+	DynamicsProcessor
 	Eq
 	Flanger
 	HydrogenImport
-	ladspa_browser
+	LadspaBrowser
 	LadspaEffect
 	Lv2Effect
 	Lv2Instrument
-	lb302
+	Lb302
 	MidiImport
 	MidiExport
 	MultitapEcho
-	monstro
-	nes
+	Monstro
+	Nes
 	OpulenZ
-	organic
+	Organic
 	FreeBoy
-	patman
-	peak_controller_effect
+	Patman
+	PeakControllerEffect
 	GigPlayer
 	ReverbSC
-	sf2_player
-	sfxr
+	Sf2Player
+	Sfxr
 	Sid
 	SpectrumAnalyzer
-	stereo_enhancer
-	stereo_matrix
-	stk
-	vst_base
-	vestige
+	StereoEnhancer
+	StereoMatrix
+	Stk
+	VstBase
+	Vestige
 	VstEffect
-	watsyn
-	waveshaper
+	Watsyn
+	WaveShaper
 	Vectorscope
-	vibed
+	Vibed
 	Xpressive
-	zynaddsubfx
+	ZynAddSubFx
 )
 
 IF("${PLUGIN_LIST}" STREQUAL "")
@@ -100,7 +100,6 @@ ENDIF()
 IF(MSVC)
 	SET(MSVC_INCOMPATIBLE_PLUGINS
 		LadspaEffect
-		zynaddsubfx
 	)
 	message(WARNING "Compiling with MSVC. The following plugins are not available: ${MSVC_INCOMPATIBLE_PLUGINS}")
 	LIST(REMOVE_ITEM PLUGIN_LIST ${MSVC_INCOMPATIBLE_PLUGINS})

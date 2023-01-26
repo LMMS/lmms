@@ -29,6 +29,10 @@
 #include <cmath>
 #include "lmms_constants.h"
 
+namespace lmms
+{
+
+
 /* Returns biggest value from abs_spectrum[spec_size] array.
  *
  * return -1 on error, otherwise the maximum value
@@ -212,3 +216,6 @@ int compressbands(const float *absspec_buffer, float *compressedband, int num_ol
 
 	return 0;
 }
+
+
+} // namespace lmms

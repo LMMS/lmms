@@ -29,7 +29,7 @@ public:
 class Alg_smf_write {
 public:
     Alg_smf_write(Alg_seq_ptr seq);
-    ~Alg_smf_write();
+    ~Alg_smf_write() = default;
     long channels_per_track; // used to encode track number into chan field
     // chan is actual_channel + channels_per_track * track_number
     // default is 100, set this to 0 to merge all tracks to 16 channels
@@ -95,11 +95,6 @@ Alg_smf_write::Alg_smf_write(Alg_seq_ptr a_seq)
     seq = a_seq;
 
     previous_divs = 0; // used to compute deltas for midifile
-}
-
-
-Alg_smf_write::~Alg_smf_write()
-{
 }
 
 

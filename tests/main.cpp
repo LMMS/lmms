@@ -1,6 +1,6 @@
 #include "QTestSuite.h"
 
-#include <QtTest/QTest>
+#include <QTest>
 
 #include <QDebug>
 
@@ -9,7 +9,7 @@
 int main(int argc, char* argv[])
 {
 	new QCoreApplication(argc, argv);
-	Engine::init(true);
+	lmms::Engine::init(true);
 
 	int numsuites = QTestSuite::suites().size();
 	qDebug() << ">> Will run" << numsuites << "test suites";

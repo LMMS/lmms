@@ -28,6 +28,9 @@
 #include "Engine.h"
 #include "MixHelpers.h"
 
+namespace lmms
+{
+
  
 RingBuffer::RingBuffer( f_cnt_t size ) : 
 	m_fpp( Engine::audioEngine()->framesPerPeriod() ),
@@ -88,11 +91,11 @@ void RingBuffer::setSamplerateAware( bool b )
 {
 	if( b )
 	{
-		connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSamplerate() ), Qt::UniqueConnection );
+		connect( Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(updateSamplerate()), Qt::UniqueConnection );
 	}
 	else
 	{
-		disconnect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSamplerate() ) );
+		disconnect( Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(updateSamplerate()));
 	}
 }
 
@@ -314,3 +317,4 @@ void RingBuffer::updateSamplerate()
 }
 
 
+} // namespace lmms

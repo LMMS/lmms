@@ -31,6 +31,10 @@
 #include <QElapsedTimer>
 
 
+namespace lmms::gui
+{
+
+
 class FadeButton : public QAbstractButton
 {
 	Q_OBJECT
@@ -40,7 +44,7 @@ public:
 		const QColor & _hold_color,
 		QWidget * _parent );
 
-	virtual ~FadeButton();
+	~FadeButton() override = default;
 	void setActiveColor( const QColor & activated_color );
 
 
@@ -70,5 +74,7 @@ private:
 
 } ;
 
+
+} // namespace lmms::gui
 
 #endif

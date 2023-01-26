@@ -38,6 +38,9 @@
 #include "fft_helpers.h"
 
 
+namespace lmms
+{
+
 
 void Oscillator::waveTableInit()
 {
@@ -175,7 +178,7 @@ void Oscillator::generateFromFFT(int bands, sample_t* table)
 	//ifft
 	fftwf_execute(s_ifftPlan);
 	//normalize and copy to result buffer
-	normalize(s_sampleBuffer, table, OscillatorConstants::WAVETABLE_LENGTH, 2*OscillatorConstants::WAVETABLE_LENGTH + 1);
+	normalize(s_sampleBuffer.data(), table, OscillatorConstants::WAVETABLE_LENGTH, 2*OscillatorConstants::WAVETABLE_LENGTH + 1);
 }
 
 void Oscillator::generateAntiAliasUserWaveTable(SampleBuffer *sampleBuffer)
@@ -202,15 +205,15 @@ sample_t Oscillator::s_waveTables
 fftwf_plan Oscillator::s_fftPlan;
 fftwf_plan Oscillator::s_ifftPlan;
 fftwf_complex * Oscillator::s_specBuf;
-float Oscillator::s_sampleBuffer[OscillatorConstants::WAVETABLE_LENGTH];
+std::array<float, OscillatorConstants::WAVETABLE_LENGTH> Oscillator::s_sampleBuffer;
 
 
 
 void Oscillator::createFFTPlans()
 {
 	Oscillator::s_specBuf = ( fftwf_complex * ) fftwf_malloc( ( OscillatorConstants::WAVETABLE_LENGTH * 2 + 1 ) * sizeof( fftwf_complex ) );
-	Oscillator::s_fftPlan = fftwf_plan_dft_r2c_1d(OscillatorConstants::WAVETABLE_LENGTH, s_sampleBuffer, s_specBuf, FFTW_MEASURE );
-	Oscillator::s_ifftPlan = fftwf_plan_dft_c2r_1d(OscillatorConstants::WAVETABLE_LENGTH, s_specBuf, s_sampleBuffer, FFTW_MEASURE);
+	Oscillator::s_fftPlan = fftwf_plan_dft_r2c_1d(OscillatorConstants::WAVETABLE_LENGTH, s_sampleBuffer.data(), s_specBuf, FFTW_MEASURE );
+	Oscillator::s_ifftPlan = fftwf_plan_dft_c2r_1d(OscillatorConstants::WAVETABLE_LENGTH, s_specBuf, s_sampleBuffer.data(), FFTW_MEASURE);
 	// initialize s_specBuf content to zero, since the values are used in a condition inside generateFromFFT()
 	for (int i = 0; i < OscillatorConstants::WAVETABLE_LENGTH * 2 + 1; i++)
 	{
@@ -231,7 +234,7 @@ void Oscillator::generateWaveTables()
 	// Generate tables for simple shaped (constructed by summing sine waves).
 	// Start from the table that contains the least number of bands, and re-use each table in the following
 	// iteration, adding more bands in each step and avoiding repeated computation of earlier bands.
-	typedef void (*generator_t)(int, sample_t*, int);
+	using generator_t = void (*)(int, sample_t*, int);
 	auto simpleGen = [](WaveShapes shape, generator_t generator)
 	{
 		const int shapeID = shape - FirstWaveShapeTable;
@@ -814,4 +817,4 @@ inline sample_t Oscillator::getSample<Oscillator::UserDefinedWave>(
 }
 
 
-
+} // namespace lmms

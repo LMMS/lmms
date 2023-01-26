@@ -110,7 +110,7 @@ Copyright:
  Jousboxx
 License: CC-BY-SA-4
 
-Files: data/projects/CoolSongs/Saber-*
+Files: data/projects/demos/Saber-*
 Copyright:
  Saber Rastikerdar
 License: BSD-2-clause
@@ -122,7 +122,7 @@ Copyright:
  2000-2002 Stefan Westerfeld
 License: LGPL-2.1+
 
-Files: plugins/LadspaEffect/calf/*
+Files: plugins/LadspaEffect/calf/veal/*
 Copyright:
  2001-2010 Krzysztof Foltman <wdev@foltman.com>
  2001-2010 Markus Schmidt <schmidt@boomshop.net>
@@ -143,7 +143,7 @@ Comment:
  COPYING is the GNU Lesser General Public License. Headers refer to version 2 of
  this license instead of version 2.1.
 
-Files: plugins/LadspaEffect/calf/src/calf/vumeter.h
+Files: plugins/LadspaEffect/calf/veal/src/calf/vumeter.h
 Copyright:
  2007 Krzysztof Foltman <wdev@foltman.com>
 License: GPL-2+
@@ -165,7 +165,7 @@ Copyright:
  2002 Nathaniel Virgo
 License: GPL-2+
 
-Files: plugins/LadspaEffect/swh/*
+Files: plugins/LadspaEffect/swh/ladspa/*
 Copyright:
  1999 Juhana Sadeharju <kouhia@nic.funet.fi>
  2000-2003 Alexander Ehlert <mag@glame.de>
@@ -183,18 +183,18 @@ Copyright:
  Paul Winkler
 License: GPL-2+
 
-Files: plugins/LadspaEffect/swh/gsm/*
+Files: plugins/LadspaEffect/swh/ladspa/gsm/*
 Copyright:
  1992-1994 Carsten Bormann <cabo@cs.tu-berlin.de>
  1992-1994 Jutta Degener <jutta@cs.tu-berlin.de>
 License: Bormann-Degener
 
-Files: plugins/LadspaEffect/swh/util/pitchscale.c
+Files: plugins/LadspaEffect/swh/ladspa/util/pitchscale.c
 Copyright:
  1999 Stephan M. Sprenger <sms@dspdimension.com>
 License: WOL
 
-Files: plugins/LadspaEffect/swh/vocoder_1337.c
+Files: plugins/LadspaEffect/swh/ladspa/vocoder_1337.c
 Copyright:
  Achim Settelmeier <settel-linux@sirlab.de>
  Hexasoft <hexasoft.corp@free.fr>
@@ -223,23 +223,23 @@ Comment:
  requested that these non-binding requests be included along with the
  license above.
 
-Files: plugins/opl2/fmopl.*
- plugins/opl2/mididata.h
- plugins/opl2/opl.h
- plugins/opl2/temuopl.*
+Files: plugins/OpulenZ/adplug/src/fmopl.*
+ plugins/OpulenZ/adplug/src/mididata.h
+ plugins/OpulenZ/adplug/src/opl.h
+ plugins/OpulenZ/adplug/src/temuopl.*
 Copyright:
  1999-2007 Simon Peter <dn.tlp@gmx.net>
  1999-2000 Tatsuyuki Satoh
 License: LGPL-2.1+
 
-Files: plugins/sfxr/readme.*
- plugins/sfxr/sfxr.*
+Files: plugins/Sfxr/readme.*
+ plugins/Sfxr/Sfxr.*
 Copyright:
  2007 Tomas Pettersson <drpetter@gmail.com>
  2014 Wong Cho Ching <chwongie-banana@yahoo.com>
 License: Expat and GPL-2+
 
-Files: plugins/zynaddsubfx/zynaddsubfx/*
+Files: plugins/ZynAddSubFx/zynaddsubfx/*
 Copyright:
  2002-2009 Nasca Octavian Paul
  2009-2010 Mark McCurry

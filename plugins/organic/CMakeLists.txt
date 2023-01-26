@@ -1,3 +1,0 @@
-INCLUDE(BuildPlugin)
-
-BUILD_PLUGIN(organic organic.cpp organic.h MOCFILES organic.h EMBEDDED_RESOURCES *.png)

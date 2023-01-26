@@ -24,10 +24,13 @@
 
 #include "MidiAlsaRaw.h"
 #include "ConfigManager.h"
-#include "gui_templates.h"
 
 
 #ifdef LMMS_HAVE_ALSA
+
+
+namespace lmms
+{
 
 
 MidiAlsaRaw::MidiAlsaRaw() :
@@ -102,7 +105,7 @@ void MidiAlsaRaw::sendByte( unsigned char c )
 
 void MidiAlsaRaw::run()
 {
-	unsigned char buf[128];
+	auto buf = std::array<unsigned char, 128>{};
 	//int cnt = 0;
 	while( m_quit == false )
 	{
@@ -146,7 +149,7 @@ void MidiAlsaRaw::run()
 		{
 			continue;
 		}
-		err = snd_rawmidi_read( m_input, buf, sizeof( buf ) );
+		err = snd_rawmidi_read(m_input, buf.data(), buf.size());
 		if( err == -EAGAIN )
 		{
 			continue;
@@ -170,5 +173,7 @@ void MidiAlsaRaw::run()
 
 }
 
-#endif
 
+} // namespace lmms
+
+#endif // LMMS_HAVE_ALSA

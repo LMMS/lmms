@@ -23,9 +23,19 @@
  */
 #include "EqCurve.h"
 
-#include "Effect.h"
+#include <cmath>
+#include <QGraphicsSceneMouseEvent>
+#include <QPainter>
+
+#include "AudioEngine.h"
 #include "embed.h"
-#include "lmms_math.h"
+#include "Engine.h"
+#include "lmms_constants.h"
+
+
+namespace lmms::gui
+{
+
 
 EqHandle::EqHandle( int num, int x, int y ):
 	m_numb( num ),
@@ -809,3 +819,6 @@ void EqCurve::setModelChanged( bool mc )
 {
 	m_modelChanged = mc;
 }
+
+
+} // namespace lmms::gui

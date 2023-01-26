@@ -25,19 +25,22 @@
 #ifndef GUIAPPLICATION_H
 #define GUIAPPLICATION_H
 
-#include <QtCore/QObject>
+#include <QObject>
 
 #include "lmms_export.h"
 #include "lmmsconfig.h"
 
 class QLabel;
 
+namespace lmms::gui
+{
+
 class AutomationEditorWindow;
-class BBEditor;
 class ControllerRackView;
-class FxMixerView;
+class MixerView;
 class MainWindow;
 class MicrotunerConfig;
+class PatternEditorWindow;
 class PianoRollWindow;
 class ProjectNotes;
 class SongEditorWindow;
@@ -47,7 +50,7 @@ class LMMS_EXPORT GuiApplication : public QObject
 	Q_OBJECT;
 public:
 	explicit GuiApplication();
-	~GuiApplication();
+	~GuiApplication() override;
 
 	static GuiApplication* instance();
 #ifdef LMMS_BUILD_WIN32
@@ -55,9 +58,9 @@ public:
 #endif
 
 	MainWindow* mainWindow() { return m_mainWindow; }
-	FxMixerView* fxMixerView() { return m_fxMixerView; }
+	MixerView* mixerView() { return m_mixerView; }
 	SongEditorWindow* songEditor() { return m_songEditor; }
-	BBEditor* getBBEditor() { return m_bbEditor; }
+	PatternEditorWindow* patternEditor() { return m_patternEditor; }
 	PianoRollWindow* pianoRoll() { return m_pianoRoll; }
 	ProjectNotes* getProjectNotes() { return m_projectNotes; }
 	MicrotunerConfig* getMicrotunerConfig() { return m_microtunerConfig; }
@@ -74,10 +77,10 @@ private:
 	static GuiApplication* s_instance;
 
 	MainWindow* m_mainWindow;
-	FxMixerView* m_fxMixerView;
+	MixerView* m_mixerView;
 	SongEditorWindow* m_songEditor;
 	AutomationEditorWindow* m_automationEditor;
-	BBEditor* m_bbEditor;
+	PatternEditorWindow* m_patternEditor;
 	PianoRollWindow* m_pianoRoll;
 	ProjectNotes* m_projectNotes;
 	MicrotunerConfig* m_microtunerConfig;
@@ -87,5 +90,7 @@ private:
 
 // Short-hand function
 LMMS_EXPORT GuiApplication* getGUI();
+
+} // namespace lmms::gui
 
 #endif // GUIAPPLICATION_H

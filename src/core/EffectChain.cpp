@@ -30,7 +30,9 @@
 #include "Effect.h"
 #include "DummyEffect.h"
 #include "MixHelpers.h"
-#include "Song.h"
+
+namespace lmms
+{
 
 
 EffectChain::EffectChain( Model * _parent ) :
@@ -58,10 +60,7 @@ void EffectChain::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 	for( Effect* effect : m_effects)
 	{
-		if( DummyEffect* dummy = dynamic_cast<DummyEffect*>(effect) )
-		{
-			_this.appendChild( dummy->originalPluginData() );
-		}
+		if (auto dummy = dynamic_cast<DummyEffect*>(effect)) { _this.appendChild(dummy->originalPluginData()); }
 		else
 		{
 			QDomElement ef = effect->saveState( _doc, _this );
@@ -192,12 +191,12 @@ bool EffectChain::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames, b
 	MixHelpers::sanitize( _buf, _frames );
 
 	bool moreEffects = false;
-	for( EffectList::Iterator it = m_effects.begin(); it != m_effects.end(); ++it )
+	for (const auto& effect : m_effects)
 	{
-		if( hasInputNoise || ( *it )->isRunning() )
+		if (hasInputNoise || effect->isRunning())
 		{
-			moreEffects |= ( *it )->processAudioBuffer( _buf, _frames );
-			MixHelpers::sanitize( _buf, _frames );
+			moreEffects |= effect->processAudioBuffer(_buf, _frames);
+			MixHelpers::sanitize(_buf, _frames);
 		}
 	}
 
@@ -214,10 +213,9 @@ void EffectChain::startRunning()
 		return;
 	}
 
-	for( EffectList::Iterator it = m_effects.begin();
-						it != m_effects.end(); it++ )
+	for (const auto& effect : m_effects)
 	{
-		( *it )->startRunning();
+		effect->startRunning();
 	}
 }
 
@@ -241,3 +239,6 @@ void EffectChain::clear()
 
 	m_enabledModel.setValue( false );
 }
+
+
+} // namespace lmms

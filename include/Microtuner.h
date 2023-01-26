@@ -28,8 +28,9 @@
 #include "AutomatableModel.h"
 #include "ComboBoxModel.h"
 #include "JournallingObject.h"
-#include "lmms_constants.h"
-#include "Note.h"
+
+namespace lmms
+{
 
 class LMMS_EXPORT Microtuner : public Model, public JournallingObject
 {
@@ -53,6 +54,7 @@ public:
 	float baseFreq() const;
 
 	float keyToFreq(int key, int userBaseNote) const;
+	int octaveSize() const;
 
 	QString nodeName() const override {return "microtuner";}
 	void saveSettings(QDomDocument & document, QDomElement &element) override;
@@ -69,5 +71,7 @@ private:
 	BoolModel m_keyRangeImportModel;
 
 };
+
+} // namespace lmms
 
 #endif

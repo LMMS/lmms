@@ -32,6 +32,10 @@
 #include "Engine.h"
 
 
+namespace lmms::gui
+{
+
+
 CPULoadWidget::CPULoadWidget( QWidget * _parent ) :
 	QWidget( _parent ),
 	m_currentLoad( 0 ),
@@ -47,17 +51,13 @@ CPULoadWidget::CPULoadWidget( QWidget * _parent ) :
 	m_temp = QPixmap( width(), height() );
 	
 
-	connect( &m_updateTimer, SIGNAL( timeout() ),
-					this, SLOT( updateCpuLoad() ) );
+	connect( &m_updateTimer, SIGNAL(timeout()),
+					this, SLOT(updateCpuLoad()));
 	m_updateTimer.start( 100 );	// update cpu-load at 10 fps
 }
 
 
 
-
-CPULoadWidget::~CPULoadWidget()
-{
-}
 
 
 
@@ -102,7 +102,4 @@ void CPULoadWidget::updateCpuLoad()
 }
 
 
-
-
-
-
+} // namespace lmms::gui

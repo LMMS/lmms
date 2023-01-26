@@ -36,6 +36,9 @@ class QString;
 #include "Engine.h"
 #include "AudioEngine.h"
 
+namespace lmms
+{
+
 constexpr int MAXLEN = 11;
 constexpr int MIPMAPSIZE = 2 << ( MAXLEN + 1 );
 constexpr int MIPMAPSIZE3 = 3 << ( MAXLEN + 1 );
@@ -51,29 +54,30 @@ const int TLENS[MAXTBL+1] = { 2 << 0, 3 << 0, 2 << 1, 3 << 1,
 					2 << 8, 3 << 8, 2 << 9, 3 << 9,
 					2 << 10, 3 << 10, 2 << 11, 3 << 11 };
 
-typedef struct
+struct WaveMipMap
 {
 public:
-	inline sample_t sampleAt( int table, int ph )
+	inline sample_t sampleAt(int table, int ph)
 	{
-		if( table % 2 == 0 )
-		{	return m_data[ TLENS[ table ] + ph ]; }
+		if (table % 2 == 0) { return m_data[TLENS[table] + ph]; }
 		else
-		{	return m_data3[ TLENS[ table ] + ph ]; }
+		{
+			return m_data3[TLENS[table] + ph];
+		}
 	}
-	inline void setSampleAt( int table, int ph, sample_t sample )
+	inline void setSampleAt(int table, int ph, sample_t sample)
 	{
-		if( table % 2 == 0 )
-		{	m_data[ TLENS[ table ] + ph ] = sample; }
+		if (table % 2 == 0) { m_data[TLENS[table] + ph] = sample; }
 		else
-		{ 	m_data3[ TLENS[ table ] + ph ] = sample; }
+		{
+			m_data3[TLENS[table] + ph] = sample;
+		}
 	}
+
 private:
-	sample_t m_data [ MIPMAPSIZE ];
-	sample_t m_data3 [ MIPMAPSIZE3 ];
-
-} WaveMipMap;
-
+	sample_t m_data[MIPMAPSIZE];
+	sample_t m_data3[MIPMAPSIZE3];
+};
 
 QDataStream& operator<< ( QDataStream &out, WaveMipMap &waveMipMap );
 
@@ -94,8 +98,8 @@ public:
 		NumBLWaveforms
 	};
 
-	BandLimitedWave() {};
-	virtual ~BandLimitedWave() {};
+	BandLimitedWave() = default;
+	virtual ~BandLimitedWave() = default;
 
 	/*! \brief This method converts frequency to wavelength. The oscillate function takes wavelength as argument so
 	 * use this to convert your note frequency to wavelength before using it.
@@ -163,10 +167,11 @@ public:
 
 	static bool s_wavesGenerated;
 
-	static WaveMipMap s_waveforms [NumBLWaveforms];
+	static std::array<WaveMipMap, NumBLWaveforms> s_waveforms;
 
 	static QString s_wavetableDir;
 };
 
+} // namespace lmms
 
 #endif
