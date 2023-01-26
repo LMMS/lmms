@@ -65,16 +65,18 @@ PhaserEffect::PhaserEffect(Model* parent, const Descriptor::SubPluginFeatures::K
 	m_currentPeak[0] = m_currentPeak[1] = PHA_NOISE_FLOOR;
 
 	m_lfo = new QuadratureLfo(Engine::audioEngine()->processingSampleRate());
-
 	m_lfo->setFrequency(1.0 / m_phaserControls.m_rateModel.value());
 	
+	// Prepare the oversampling filters
+	double coefs[PHASER_OVERSAMPLE_COEFS];
+	hiir::PolyphaseIir2Designer::compute_coefs_spec_order_tbw(coefs, PHASER_OVERSAMPLE_COEFS, 0.04);
 	for (int i = 0; i < 2; ++i)
 	{
-		m_oversampleAnalogIn1[i] = new LinkwitzRiley<2>(Engine::audioEngine()->processingSampleRate() * 2);
-		m_oversampleAnalogIn2[i] = new LinkwitzRiley<2>(Engine::audioEngine()->processingSampleRate() * 2);
-		m_oversampleAnalogOut[i] = new LinkwitzRiley<2>(Engine::audioEngine()->processingSampleRate() * 2);
-		m_oversampleFeedbackIn[i] = new LinkwitzRiley<2>(Engine::audioEngine()->processingSampleRate() * 2);
-		m_oversampleFeedbackOut[i] = new LinkwitzRiley<2>(Engine::audioEngine()->processingSampleRate() * 2);
+		m_oversampleAnalogIn1[i].set_coefs(coefs);
+		m_oversampleAnalogIn2[i].set_coefs(coefs);
+		m_oversampleAnalogOut[i].set_coefs(coefs);
+		m_oversampleFeedbackIn[i].set_coefs(coefs);
+		m_oversampleFeedbackOut[i].set_coefs(coefs);
 	}
 
 	changeSampleRate();
@@ -99,15 +101,6 @@ PhaserEffect::PhaserEffect(Model* parent, const Descriptor::SubPluginFeatures::K
 PhaserEffect::~PhaserEffect()
 {
 	delete m_lfo;
-	
-	for (int i = 0; i < 2; ++i)
-	{
-		delete m_oversampleAnalogIn1[i];
-		delete m_oversampleAnalogIn2[i];
-		delete m_oversampleAnalogOut[i];
-		delete m_oversampleFeedbackIn[i];
-		delete m_oversampleFeedbackOut[i];
-	}
 }
 
 
@@ -392,26 +385,22 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		{
 			for (int i = 0; i < 2; ++i)
 			{
-				// 2x upsample and filter in preparation for distortion
-				float oversampledS1 = m_oversampleAnalogIn1[0]->update(s[i], i) * 2;// * 2 is normalization for 2x oversampling with zero stuffing
-				float oversampledS2 = m_oversampleAnalogIn1[0]->update(0, i);
-				oversampledS1 = m_oversampleAnalogIn1[1]->update(oversampledS1, i);
-				oversampledS2 = m_oversampleAnalogIn1[1]->update(oversampledS2, i);
+				// Upsample
+				float oversampledS1;
+				float oversampledS2;
+				m_oversampleAnalogIn1[i].process_sample(oversampledS1, oversampledS2, s[i]);
 				
-				float oversampledAdd1 = m_oversampleAnalogIn2[0]->update(tempAdd[i], i) * 2;
-				float oversampledAdd2 = m_oversampleAnalogIn2[0]->update(0, i);
-				oversampledAdd1 = m_oversampleAnalogIn2[1]->update(oversampledAdd1, i);
-				oversampledAdd2 = m_oversampleAnalogIn2[1]->update(oversampledAdd2, i);
+				float oversampledAdd1;
+				float oversampledAdd2;
+				m_oversampleAnalogIn2[i].process_sample(oversampledAdd1, oversampledAdd2, tempAdd[i]);
 			
 				// Waveshaping
 				float analogOut1 = tanh(oversampledS1 * analogDist) / analogDist + tanh(oversampledAdd1 * analogDist) / analogDist;
 				float analogOut2 = tanh(oversampledS2 * analogDist) / analogDist + tanh(oversampledAdd2 * analogDist) / analogDist;
 				
-				// Filter at nyquist to reduce aliasing, and downsample
-				analogOut1 = m_oversampleAnalogOut[0]->update(analogOut1, i);
-				analogOut2 = m_oversampleAnalogOut[0]->update(analogOut2, i);
-				firstAdd[i] = m_oversampleAnalogOut[1]->update(analogOut1, i);
-				m_oversampleAnalogOut[1]->update(analogOut2, i);
+				// Downsample
+				float downsampleIn[2] = {analogOut1, analogOut2};
+				firstAdd[i] = m_oversampleFeedbackOut[i].process_sample(&downsampleIn[0]);
 			}
 		}
 		else
@@ -506,21 +495,15 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		const float trueDistVal = distortion * 1.5;
 		for (int i = 0; i < 2; ++i)
 		{
-			// 2x upsample and filter in preparation for distortion
-			float tempAdd1 = m_oversampleFeedbackIn[0]->update(tempAdd[i], i) * 2;// * 2 is normalization for 2x oversampling with zero stuffing
-			float tempAdd2 = m_oversampleFeedbackIn[0]->update(0, i);
-			tempAdd1 = m_oversampleFeedbackIn[1]->update(tempAdd1, i);
-			tempAdd2 = m_oversampleFeedbackIn[1]->update(tempAdd2, i);
+			// Upsample
+			float tempAdd1;
+			float tempAdd2;
+			m_oversampleFeedbackIn[i].process_sample(tempAdd1, tempAdd2, tempAdd[i]);
 
 
-			/*
-			Some gentle feedback distortion to prevent infinite loops.
-
-			I used tanh(x/2)*2 rather than just tanh(x) because tanh(x)
-			decreased the volume too much for my liking.
-			*/
-			tempAdd1 = tanh(tempAdd1 * 0.5) * 2;
-			tempAdd2 = tanh(tempAdd2 * 0.5) * 2;
+			//Some gentle feedback distortion to prevent infinite loops.
+			tempAdd1 = tanh(tempAdd1 * 0.25) * 4;
+			tempAdd2 = tanh(tempAdd2 * 0.25) * 4;
 
 			if (distortion)
 			{
@@ -543,11 +526,9 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 				tempAdd2 = abs(tempAdd2 + 1.5 - trueDistVal) - 1.5 + trueDistVal;
 			}
 			
-			// Filter at nyquist to reduce aliasing, and downsample
-			tempAdd1 = m_oversampleFeedbackOut[0]->update(tempAdd1, i);
-			tempAdd2 = m_oversampleFeedbackOut[0]->update(tempAdd2, i);
-			tempAdd[i] = m_oversampleFeedbackOut[1]->update(tempAdd1, i);
-			m_oversampleFeedbackOut[1]->update(tempAdd2, i);
+			// Downsample
+			float downsampleIn[2] = {tempAdd1, tempAdd2};
+			tempAdd[i] = m_oversampleFeedbackOut[i].process_sample(&downsampleIn[0]);
 		}
 
 		// Remove DC Offset
@@ -629,40 +610,12 @@ void PhaserEffect::changeSampleRate()
 		m_delayBufSize = Engine::audioEngine()->processingSampleRate() * 0.03 + 1;
 		m_filtDelayBuf[b].resize(m_delayBufSize);
 	}
-	
-	for (int i = 0; i < 2; ++i)
-	{
-		m_oversampleAnalogIn1[i]->clearHistory();
-		m_oversampleAnalogIn2[i]->clearHistory();
-		m_oversampleAnalogOut[i]->clearHistory();
-		m_oversampleFeedbackIn[i]->clearHistory();
-		m_oversampleFeedbackOut[i]->clearHistory();
-	
-		m_oversampleAnalogIn1[i]->setSampleRate(Engine::audioEngine()->processingSampleRate() * 2);
-		m_oversampleAnalogIn2[i]->setSampleRate(Engine::audioEngine()->processingSampleRate() * 2);
-		m_oversampleAnalogOut[i]->setSampleRate(Engine::audioEngine()->processingSampleRate() * 2);
-		m_oversampleFeedbackIn[i]->setSampleRate(Engine::audioEngine()->processingSampleRate() * 2);
-		m_oversampleFeedbackOut[i]->setSampleRate(Engine::audioEngine()->processingSampleRate() * 2);
-		
-		m_oversampleAnalogIn1[i]->setLowpass(Engine::audioEngine()->processingSampleRate() * 0.5f);
-		m_oversampleAnalogIn2[i]->setLowpass(Engine::audioEngine()->processingSampleRate() * 0.5f);
-		m_oversampleAnalogOut[i]->setLowpass(Engine::audioEngine()->processingSampleRate() * 0.5f);
-		m_oversampleFeedbackIn[i]->setLowpass(Engine::audioEngine()->processingSampleRate() * 0.5f);
-		m_oversampleFeedbackOut[i]->setLowpass(Engine::audioEngine()->processingSampleRate() * 0.5f);
-	}
 }
 
 
 void PhaserEffect::restartLFO()
 {
 	m_lfo->restart();
-}
-
-
-// Takes input of original Hz and the number of cents to detune it by, and returns the detuned result in Hz.
-float PhaserEffect::detuneWithOctaves(float pitchValue, float detuneValue)
-{
-	return pitchValue * std::exp2(detuneValue); 
 }
 
 

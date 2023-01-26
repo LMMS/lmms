@@ -29,9 +29,15 @@
 #include "PhaserControls.h"
 #include "Effect.h"
 
+#include "hiir/PolyphaseIir2Designer.h"
+#include "hiir/Downsampler2xFpu.h"
+#include "hiir/Upsampler2xFpu.h"
+
 #include "BasicFilters.h"
 #include "QuadratureLfo.h"
 #include "ValueBuffer.h"
+
+constexpr int PHASER_OVERSAMPLE_COEFS = 8;
 
 namespace lmms
 {
@@ -53,6 +59,12 @@ public:
 	{
 		return m_displayCutoff[channel];
 	}
+	
+	sample_t calcAllpassFilter(sample_t inSamp, sample_rate_t Fs, int filtNum, int channel, float apCoeff1, float apCoeff2);
+	inline float detuneWithOctaves(float pitchValue, float detuneValue)
+	{
+		return pitchValue * std::exp2(detuneValue); 
+	}
 
 private slots:
 	void calcAttack();
@@ -64,9 +76,6 @@ private slots:
 	void restartLFO();
 
 private:
-	sample_t calcAllpassFilter(sample_t inSamp, sample_rate_t Fs, int filtNum, int channel, float apCoeff1, float apCoeff2);
-	static float detuneWithOctaves(float pitchValue, float detuneValue);
-
 	PhaserControls m_phaserControls;
 
 	float m_filtX[32][2][2] = {{{0}}};// [filter number][channel][samples back in time]
@@ -100,11 +109,11 @@ private:
 
 	float m_aliasFlip = 1;
 	
-	LinkwitzRiley<2> * m_oversampleAnalogIn1[2];
-	LinkwitzRiley<2> * m_oversampleAnalogIn2[2];
-	LinkwitzRiley<2> * m_oversampleAnalogOut[2];
-	LinkwitzRiley<2> * m_oversampleFeedbackIn[2];
-	LinkwitzRiley<2> * m_oversampleFeedbackOut[2];
+	hiir::Upsampler2xFpu<PHASER_OVERSAMPLE_COEFS> m_oversampleAnalogIn1[2];
+	hiir::Upsampler2xFpu<PHASER_OVERSAMPLE_COEFS> m_oversampleAnalogIn2[2];
+	hiir::Downsampler2xFpu<PHASER_OVERSAMPLE_COEFS> m_oversampleAnalogOut[2];
+	hiir::Upsampler2xFpu<PHASER_OVERSAMPLE_COEFS> m_oversampleFeedbackIn[2];
+	hiir::Downsampler2xFpu<PHASER_OVERSAMPLE_COEFS> m_oversampleFeedbackOut[2];
 
 	friend class PhaserControls;
 
