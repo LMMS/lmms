@@ -87,11 +87,11 @@ class MixerChannel : public ThreadableJob
 		QColor m_color;
 		bool m_hasColor;
 
-	
+
 		std::atomic_int m_dependenciesMet;
 		void incrementDeps();
 		void processed();
-		
+
 	private:
 		void doProcessing() override;
 };
@@ -100,9 +100,9 @@ class MixerChannel : public ThreadableJob
 class MixerRoute : public QObject
 {
 	Q_OBJECT
-public:
-	MixerRoute( MixerChannel * from, MixerChannel * to, float amount );
-	~MixerRoute() override = default;
+	public:
+		MixerRoute( MixerChannel * from, MixerChannel * to, float amount );
+		~MixerRoute() override = default;
 
 	mix_ch_t senderIndex() const
 	{

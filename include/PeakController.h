@@ -2,7 +2,7 @@
  * PeakController.h - peak-controller class
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -77,7 +77,7 @@ private:
 	static int m_getCount;
 	static int m_loadCount;
 	static bool m_buggedFile;
-	
+
 	float m_attackCoeff;
 	float m_decayCoeff;
 	bool m_coeffNeedsUpdate;

@@ -516,7 +516,7 @@ void Mixer::deleteChannelSend( MixerRoute * route )
 {
 	Engine::audioEngine()->requestChangeInModel();
 
-	auto removeFromMixerRoute = [route](MixerRouteVector& routeVec) 
+	auto removeFromMixerRoute = [route](MixerRouteVector& routeVec)
 	{
 		auto it = std::find(routeVec.begin(), routeVec.end(), route);
 		if (it != routeVec.end()) { routeVec.erase(it); }

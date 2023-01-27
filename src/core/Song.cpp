@@ -450,7 +450,7 @@ bool Song::isExportDone() const
 int Song::getExportProgress() const
 {
 	TimePos pos = m_playPos[m_playMode];
-    
+
 	if (pos >= m_exportSongEnd)
 	{
 		return 100;
@@ -729,16 +729,16 @@ void Song::startExport()
 	else
 	{
 		m_exportSongEnd = TimePos(m_length, 0);
-        
+
 		// Handle potentially ridiculous loop points gracefully.
-		if (m_loopRenderCount > 1 && m_playPos[Mode_PlaySong].m_timeLine->loopEnd() > m_exportSongEnd) 
+		if (m_loopRenderCount > 1 && m_playPos[Mode_PlaySong].m_timeLine->loopEnd() > m_exportSongEnd)
 		{
 			m_exportSongEnd = m_playPos[Mode_PlaySong].m_timeLine->loopEnd();
 		}
 
-		if (!m_exportLoop) 
+		if (!m_exportLoop)
 			m_exportSongEnd += TimePos(1,0);
-        
+
 		m_exportSongBegin = TimePos(0,0);
 		// FIXME: remove this check once we load timeline in headless mode
 		if (m_playPos[Mode_PlaySong].m_timeLine)
@@ -754,7 +754,7 @@ void Song::startExport()
 		m_playPos[Mode_PlaySong].setTicks( 0 );
 	}
 
-	m_exportEffectiveLength = (m_exportLoopBegin - m_exportSongBegin) + (m_exportLoopEnd - m_exportLoopBegin) 
+	m_exportEffectiveLength = (m_exportLoopBegin - m_exportSongBegin) + (m_exportLoopEnd - m_exportLoopBegin)
 		* m_loopRenderCount + (m_exportSongEnd - m_exportLoopEnd);
 	m_loopRenderRemaining = m_loopRenderCount;
 

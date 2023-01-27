@@ -161,9 +161,9 @@ void PeakController::loadSettings( const QDomElement & _this )
 		effectId = m_loadCount++;
 	}
 
-	for (const auto& effect : s_effects) 
+	for (const auto& effect : s_effects)
 	{
-		if (effect->m_effectId == effectId) 
+		if (effect->m_effectId == effectId)
 		{
 			m_peakEffect = effect;
 			return;
@@ -194,7 +194,7 @@ PeakController * PeakController::getControllerBySetting(const QDomElement & _thi
 	int foundCount = 0;
 	if( m_buggedFile == false )
 	{
-		for (const auto& effect : s_effects) 
+		for (const auto& effect : s_effects)
 		{
 			if (effect->m_effectId == effectId )
 			{

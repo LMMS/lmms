@@ -112,7 +112,7 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	// size from user configuration
 	if( renderOnly == false )
 	{
-		m_framesPerPeriod = 
+		m_framesPerPeriod =
 			( fpp_t ) ConfigManager::inst()->value( "audioengine", "framesperaudiobuffer" ).toInt();
 
 		// if the value read from user configuration is not set or

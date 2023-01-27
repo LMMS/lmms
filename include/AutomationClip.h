@@ -189,12 +189,12 @@ private:
 	void generateTangents();
 	void generateTangents(timeMap::iterator it, int numToGenerate);
 	float valueAt( timeMap::const_iterator v, int offset ) const;
-	
+
 	/**
-	 * @brief 
+	 * @brief
 	 * This function combines the song tracks, pattern store tracks,
 	 * and the global automation track all in one vector.
-	 * 
+	 *
 	 * @return std::vector<Track*>
 	 */
 	static std::vector<Track*> combineAllTracks();

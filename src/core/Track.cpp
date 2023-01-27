@@ -208,12 +208,12 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 	{
 		element.setAttribute( "trackheight", m_height );
 	}
-	
+
 	if( m_hasColor )
 	{
 		element.setAttribute( "color", m_color.name() );
 	}
-	
+
 	QDomElement tsDe = doc.createElement( nodeName() );
 	// let actual track (InstrumentTrack, PatternTrack, SampleTrack etc.) save its settings
 	element.appendChild( tsDe );
