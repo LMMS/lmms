@@ -558,7 +558,9 @@ DataFile ClipView::createClipDataFiles(
 
 	// Add extra metadata needed for calculations later
 
-	int initialTrackIndex = std::distance(tc->tracks().begin(), std::find(tc->tracks().begin(), tc->tracks().end(), t));
+	const auto initialTrackIt = std::find(tc->tracks().begin(), tc->tracks().end(), t);
+	const int initialTrackIndex = initialTrackIt != tc->tracks().end() ? std::distance(tc->tracks().begin(), initialTrackIt) : -1;
+
 	if (initialTrackIndex < 0)
 	{
 		printf("Failed to find selected track in the TrackContainer.\n");
