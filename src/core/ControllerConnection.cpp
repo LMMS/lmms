@@ -193,8 +193,8 @@ void ControllerConnection::saveSettings( QDomDocument & _doc, QDomElement & _thi
 			const auto it = std::find(controllers.begin(), controllers.end(), m_controller);
 			if (it != controllers.end())
 			{
-						const int id = std::distance(controllers.begin(), it);
-						_this.setAttribute("id", id);
+				const int id = std::distance(controllers.begin(), it);
+				_this.setAttribute("id", id);
 			}
 		}
 	}
