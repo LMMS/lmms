@@ -32,8 +32,8 @@
 #include <QLabel>
 #include <QDebug>
 
-#include "Engine.h"
 #include "ClapManager.h"
+#include "Engine.h"
 
 namespace lmms
 {
@@ -51,24 +51,39 @@ void ClapSubPluginFeatures::fillDescriptionWidget(QWidget* parent, const Key* ke
 	auto label = new QLabel(parent);
 	label->setText(QWidget::tr("Name: ") + QString::fromUtf8(descriptor->name));
 
-	auto label2 = new QLabel(parent);
-	label2->setText(QWidget::tr("URI: ") + QString::fromUtf8(descriptor->id));
+	auto versionLabel = new QLabel(parent);
+	versionLabel->setText(QWidget::tr("Version: ") + QString::fromUtf8(descriptor->version));
 
-	auto maker = new QWidget(parent);
-	auto l = new QHBoxLayout(maker);
+	auto urlLabel = new QLabel(parent);
+	urlLabel->setText(QWidget::tr("URL: ") + QString::fromUtf8(descriptor->url));
+
+	if (descriptor->manual_url && descriptor->manual_url[0] != '\0')
+	{
+		auto urlLabel = new QLabel(parent);
+		urlLabel->setText(QWidget::tr("Manual URL: ") + QString::fromUtf8(descriptor->manual_url));
+	}
+
+	if (descriptor->support_url && descriptor->support_url[0] != '\0')
+	{
+		auto urlLabel = new QLabel(parent);
+		urlLabel->setText(QWidget::tr("Support URL: ") + QString::fromUtf8(descriptor->support_url));
+	}
+
+	auto author = new QWidget(parent);
+	auto l = new QHBoxLayout(author);
 	l->setContentsMargins(0, 0, 0, 0);
 	l->setSpacing(0);
 
-	auto maker_label = new QLabel(maker);
-	maker_label->setText(QWidget::tr("Maker: "));
-	maker_label->setAlignment(Qt::AlignTop);
+	auto authorLabel = new QLabel(author);
+	authorLabel->setText(QWidget::tr("Author: "));
+	authorLabel->setAlignment(Qt::AlignTop);
 
-	auto maker_content = new QLabel(maker);
-	maker_content->setText(QString::fromUtf8(descriptor->vendor));
-	maker_content->setWordWrap(true);
+	auto authorContent = new QLabel(author);
+	authorContent->setText(QString::fromUtf8(descriptor->vendor));
+	authorContent->setWordWrap(true);
 
-	l->addWidget(maker_label);
-	l->addWidget(maker_content, 1);
+	l->addWidget(authorLabel);
+	l->addWidget(authorContent, 1);
 
 	auto copyright = new QWidget(parent);
 	l = new QHBoxLayout(copyright);
@@ -76,42 +91,17 @@ void ClapSubPluginFeatures::fillDescriptionWidget(QWidget* parent, const Key* ke
 	l->setSpacing(0);
 	copyright->setMinimumWidth(parent->minimumWidth());
 
-	auto copyright_label = new QLabel(copyright);
-	copyright_label->setText(QWidget::tr("Copyright: "));
-	copyright_label->setAlignment(Qt::AlignTop);
+	auto copyrightLabel = new QLabel(copyright);
+	copyrightLabel->setText(QWidget::tr("Copyright: "));
+	copyrightLabel->setAlignment(Qt::AlignTop);
 
-	auto copyright_content = new QLabel(copyright);
-	copyright_content->setText("<unknown>");
-	copyright_content->setWordWrap(true);
-	l->addWidget(copyright_label);
-	l->addWidget(copyright_content, 1);
+	auto copyrightContent = new QLabel(copyright);
+	copyrightContent->setText("<unknown>");
+	copyrightContent->setWordWrap(true);
+	l->addWidget(copyrightLabel);
+	l->addWidget(copyrightContent, 1);
 
-	// TODO: extensions?
-
-	// possibly TODO: version, project, plugin type, number of channels
-}
-
-QString ClapSubPluginFeatures::additionalFileExtensions(const Plugin::Descriptor::SubPluginFeatures::Key& key) const
-{
-	(void)key;
-	// CLAP only loads .clap files
-	return QString{};
-}
-
-QString ClapSubPluginFeatures::displayName(const Plugin::Descriptor::SubPluginFeatures::Key& key) const
-{
-	return QString::fromUtf8(getPlugin(key)->getDescriptor()->name);
-}
-
-QString ClapSubPluginFeatures::description(const Plugin::Descriptor::SubPluginFeatures::Key& key) const
-{
-	return QString::fromUtf8(getPlugin(key)->getDescriptor()->description);
-}
-
-const PixmapLoader* ClapSubPluginFeatures::logo(const Plugin::Descriptor::SubPluginFeatures::Key& key) const
-{
-	(void)key; // TODO
-	return nullptr;
+	// Possibly TODO: project, plugin type, number of channels
 }
 
 void ClapSubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor* desc, KeyList& kl) const
@@ -133,7 +123,30 @@ void ClapSubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor* desc, Ke
 	}
 }
 
-const ClapPlugin* ClapSubPluginFeatures::getPlugin(const Plugin::Descriptor::SubPluginFeatures::Key& key)
+auto ClapSubPluginFeatures::additionalFileExtensions(const Plugin::Descriptor::SubPluginFeatures::Key& key) const -> QString
+{
+	(void)key;
+	// CLAP only loads .clap files
+	return QString{};
+}
+
+auto ClapSubPluginFeatures::displayName(const Plugin::Descriptor::SubPluginFeatures::Key& key) const -> QString
+{
+	return QString::fromUtf8(getPlugin(key)->getDescriptor()->name);
+}
+
+auto ClapSubPluginFeatures::description(const Plugin::Descriptor::SubPluginFeatures::Key& key) const -> QString
+{
+	return QString::fromUtf8(getPlugin(key)->getDescriptor()->description);
+}
+
+auto ClapSubPluginFeatures::logo(const Plugin::Descriptor::SubPluginFeatures::Key& key) const -> const PixmapLoader*
+{
+	(void)key; // TODO
+	return nullptr;
+}
+
+auto ClapSubPluginFeatures::getPlugin(const Plugin::Descriptor::SubPluginFeatures::Key& key) -> const ClapPlugin*
 {
 	const auto result = Engine::getClapManager()->getPlugin(key.attributes["uri"]);
 	Q_ASSERT(result);

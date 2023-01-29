@@ -48,16 +48,14 @@ public:
 	ClapSubPluginFeatures(Plugin::PluginTypes type);
 
 	void fillDescriptionWidget(QWidget* parent, const Key* key) const override;
-
-	QString additionalFileExtensions(const Key& key) const override;
-	QString displayName(const Key& key) const override;
-	QString description(const Key& key) const override;
-	const PixmapLoader* logo(const Key& key) const override;
-
 	void listSubPluginKeys(const Plugin::Descriptor* desc, KeyList& kl) const override;
+	auto additionalFileExtensions(const Key& key) const -> QString override;
+	auto displayName(const Key& key) const -> QString override;
+	auto description(const Key& key) const -> QString override;
+	auto logo(const Key& key) const -> const PixmapLoader* override;
 
 private:
-	static const ClapPlugin* getPlugin(const Key& key);
+	static auto getPlugin(const Key& key) -> const ClapPlugin*;
 };
 
 
