@@ -41,6 +41,9 @@
 #include <QDir>
 #endif
 
+#include <clap/clap.h>
+
+#include "ClapFile.h"
 #include "Engine.h"
 #include "Plugin.h"
 #include "PluginIssue.h"
@@ -64,16 +67,12 @@ namespace
 	}
 }
 
-////////////////////////////////
-// ClapManager
-////////////////////////////////
-
-bool ClapManager::m_debug = false;
+bool ClapManager::kDebug = false;
 
 ClapManager::ClapManager()
 {
 	const char* dbgStr = getenv("LMMS_CLAP_DEBUG");
-	m_debug = (dbgStr && *dbgStr);
+	kDebug = (dbgStr && *dbgStr);
 
 	m_host.host_data = this;
 	m_host.clap_version = CLAP_VERSION;
@@ -96,7 +95,7 @@ ClapManager::~ClapManager()
 void ClapManager::initPlugins()
 {
 	findSearchPaths();
-	if (m_debug)
+	if (kDebug)
 		qDebug() << "Found .clap files:";
 	findClapFiles(getSearchPaths());
 }
@@ -185,7 +184,7 @@ void ClapManager::findSearchPaths()
 		m_searchPaths.emplace_back(std::move(path.make_preferred()));
 #endif
 
-	if (m_debug)
+	if (kDebug)
 	{
 		qDebug() << "CLAP search paths:";
 		for (const auto& path : m_searchPaths)
@@ -218,10 +217,10 @@ void ClapManager::findClapFiles(const std::vector<std::filesystem::path>& search
 
 			++totalClapFiles;
 
-			if (m_debug)
+			if (kDebug)
 				qDebug() << "-" << entryPath.c_str();
 
-			auto clapFile = ClapFile{*this, std::move(entryPath)};
+			auto clapFile = ClapFile{this, std::move(entryPath)};
 			if (!clapFile.isValid())
 			{
 				qWarning() << "Failed to load .clap file";
@@ -239,12 +238,12 @@ void ClapManager::findClapFiles(const std::vector<std::filesystem::path>& search
 	}
 
 	qDebug() << "CLAP plugin SUMMARY:"
-		<< m_clapFiles.size() << "of" << totalClapFiles << " .clap files"
-		<< "containing" << m_plugins.size() << "of" << totalClapPlugins
+		<< m_clapFiles.size() << "of" << totalClapFiles << ".clap files containing"
+		<< m_plugins.size() << "of" << totalClapPlugins
 		<< "CLAP plugins loaded in" << timer.elapsed() << "msecs.";
 	if (m_clapFiles.size() != totalClapFiles || m_plugins.size() != totalClapPlugins)
 	{
-		if (m_debug)
+		if (kDebug)
 		{
 			qDebug() <<
 				"If you don't want to see all this debug output, please set\n"
@@ -295,23 +294,23 @@ const void* ClapManager::hostGetExtension(const clap_host* host, const char* ext
 
 void ClapManager::hostRequestCallback(const clap_host* host)
 {
-   //auto h = fromHost(host);
-   //h->_scheduleMainThreadCallback = true;
-   //qDebug() << "hostRequestCallback called";
+	//auto h = fromHost(host);
+	//h->_scheduleMainThreadCallback = true;
+	//qDebug() << "hostRequestCallback called";
 }
 
 void ClapManager::hostRequestProcess(const clap_host* host)
 {
-   //auto h = fromHost(host);
-   //h->_scheduleProcess = true;
-   //qDebug() << "hostRequestProcess called";
+	//auto h = fromHost(host);
+	//h->_scheduleProcess = true;
+	//qDebug() << "hostRequestProcess called";
 }
 
 void ClapManager::hostRequestRestart(const clap_host* host)
 {
-   //auto h = fromHost(host);
-   //h->_scheduleRestart = true;
-   //qDebug() << "hostRequestRestart called";
+	//auto h = fromHost(host);
+	//h->_scheduleRestart = true;
+	//qDebug() << "hostRequestRestart called";
 }
 
 /*
@@ -327,180 +326,6 @@ const clap_plugin_t* ClapManager::getPlugin(const QString& uri)
 	return getPlugin(uri.toStdString());
 }
 */
-
-////////////////////////////////
-// ClapFile
-////////////////////////////////
-
-ClapManager::ClapFile::ClapFile(const ClapManager& manager, std::filesystem::path&& filename)
-	: m_parent(manager), m_filename(std::move(filename))
-{
-	m_filename.make_preferred();
-	m_library = std::make_shared<QLibrary>();
-	m_library->setFileName(QString::fromUtf8(m_filename.c_str()));
-	m_library->setLoadHints(QLibrary::ResolveAllSymbolsHint | QLibrary::DeepBindHint);
-	load();
-}
-
-ClapManager::ClapFile::ClapFile(ClapFile&& other) noexcept
-	: m_parent(other.m_parent)
-{
-	m_filename = std::move(other.m_filename);
-	m_library = std::exchange(other.m_library, nullptr);
-	m_factory = std::exchange(other.m_factory, nullptr);
-	m_pluginCount = other.m_pluginCount;
-	m_valid = std::exchange(other.m_valid, false);
-	m_plugins = std::move(other.m_plugins);
-}
-
-auto ClapManager::ClapFile::load() -> bool
-{
-	m_valid = false;
-	if (!m_library)
-		return false;
-
-	// Do not allow reloading yet
-	if (m_library->isLoaded())
-		return false;
-
-	if (!m_library->load())
-	{
-		qWarning() << m_library->errorString();
-		return false;
-	}
-
-	const auto pluginEntry = reinterpret_cast<const clap_plugin_entry_t*>(m_library->resolve("clap_entry"));
-	if (!pluginEntry)
-	{
-		qWarning() << "Unable to resolve entry point 'clap_entry' in '" << getFilename().c_str() << "'";
-		m_library->unload();
-		return false;
-	}
-
-	pluginEntry->init(getFilename().c_str());
-	m_factory = static_cast<const clap_plugin_factory_t*>(pluginEntry->get_factory(CLAP_PLUGIN_FACTORY_ID));
-
-	m_pluginCount = m_factory->get_plugin_count(m_factory);
-	if (m_debug)
-		qDebug() << "m_pluginCount:" << m_pluginCount;
-	if (m_pluginCount <= 0)
-		return false;
-
-	m_plugins.clear();
-	for (uint32_t i = 0; i < m_pluginCount; ++i)
-	{
-		const auto desc = m_factory->get_plugin_descriptor(m_factory, i);
-		if (!desc)
-		{
-			qWarning() << "no plugin descriptor";
-			continue;
-		}
-
-		if (!clap_version_is_compatible(desc->clap_version))
-		{
-			qWarning() << "Incompatible CLAP version: Plugin is: " << desc->clap_version.major << "."
-						<< desc->clap_version.minor << "." << desc->clap_version.revision << " Host is "
-						<< CLAP_VERSION.major << "." << CLAP_VERSION.minor << "." << CLAP_VERSION.revision;
-			continue;
-		}
-
-		if (m_debug)
-		{
-			qDebug() << "name:" << desc->name;
-			qDebug() << "description:" << desc->description;
-		}
-
-		auto plugin = ClapPlugin{*this, i, desc}; // Prints warning if anything goes wrong
-		if (!plugin.isValid())
-			continue;
-
-		m_plugins.emplace_back(std::move(plugin));
-	}
-
-	m_valid = true;
-	return true;
-}
-
-void ClapManager::ClapFile::unload()
-{
-	// TODO: Need to implement
-	return;
-}
-
-////////////////////////////////
-// ClapPlugin
-////////////////////////////////
-
-ClapManager::ClapFile::ClapPlugin::ClapPlugin(const ClapFile& parent, uint32_t index, const clap_plugin_descriptor_t* desc)
-	: m_parent(parent), m_host(parent.getParent().getHost())
-{
-	m_valid = false;
-	m_index = index;
-	m_descriptor = desc;
-
-	m_type = Plugin::PluginTypes::Undefined;
-	auto features = desc->features;
-	while (features && *features)
-	{
-		std::string_view feature = *features;
-		if (m_debug)
-			qDebug() << "feature:" << feature.data();
-		if (feature == CLAP_PLUGIN_FEATURE_INSTRUMENT)
-			m_type = Plugin::PluginTypes::Instrument;
-		else if (feature == CLAP_PLUGIN_FEATURE_AUDIO_EFFECT
-				|| feature == CLAP_PLUGIN_FEATURE_NOTE_EFFECT
-				|| feature == "effect" /* non-standard, but used by Surge XT Effects */)
-			m_type = Plugin::PluginTypes::Effect;
-		else if (feature == CLAP_PLUGIN_FEATURE_ANALYZER)
-			m_type = Plugin::PluginTypes::Tool;
-		++features;
-	}
-
-	if (m_type != Plugin::PluginTypes::Undefined)
-		m_valid = true;
-	else
-	{
-		qWarning() << "CLAP plugin is not recognized as an instrument, effect, or tool";
-	}
-}
-
-ClapManager::ClapFile::ClapPlugin::ClapPlugin(ClapPlugin&& other) noexcept
-	: m_parent(other.m_parent)
-{
-	m_host = std::exchange(other.m_host, nullptr);
-	m_index = other.m_index;
-	m_descriptor = std::exchange(other.m_descriptor, nullptr);
-	m_type = std::exchange(other.m_type, Plugin::PluginTypes::Undefined);
-	m_valid = std::exchange(other.m_valid, false);
-	m_plugin = std::exchange(other.m_plugin, nullptr);
-}
-
-auto ClapManager::ClapFile::ClapPlugin::activate() -> bool
-{
-	if (!isValid() || isActivated())
-		return false;
-
-	const auto factory = getParent().getFactory();
-	m_plugin = ClapPluginPtr{ factory->create_plugin(factory, m_host, getDescriptor()->id) };
-	if (!m_plugin)
-	{
-		qWarning() << "could not create the plugin with id: " << getDescriptor()->id;
-		return false;
-	}
-
-	if (!m_plugin->init(m_plugin.get()))
-	{
-		qWarning() << "could not init the plugin with id: " << getDescriptor()->id;
-		return false;
-	}
-
-	return true;
-}
-
-void ClapManager::ClapFile::ClapPlugin::deactivate()
-{
-	// TODO
-}
 
 } // namespace lmms
 

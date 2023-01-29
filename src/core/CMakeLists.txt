@@ -107,6 +107,7 @@ set(LMMS_SRCS
 	core/audio/AudioSdl.cpp
 
 	core/clap/ClapManager.cpp
+	core/clap/ClapFile.cpp
 
 	core/lv2/Lv2Basics.cpp
 	core/lv2/Lv2ControlBase.cpp
