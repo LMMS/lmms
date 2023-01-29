@@ -231,6 +231,7 @@ void ClapManager::findClapFiles(const std::vector<std::filesystem::path>& search
 			for (const auto& plugin : clapFile.getPlugins())
 			{
 				m_plugins.push_back(plugin.getPlugin());
+				m_uriToPlugin.emplace(std::string{plugin.getDescriptor()->id}, &plugin); // TODO: Does this pointer remain valid after clapFile is moved?
 			}
 
 			m_clapFiles.emplace_back(std::move(clapFile));
@@ -313,19 +314,16 @@ void ClapManager::hostRequestRestart(const clap_host* host)
 	//qDebug() << "hostRequestRestart called";
 }
 
-/*
-const clap_plugin_t* ClapManager::getPlugin(const std::string& uri)
+const ClapPlugin* ClapManager::getPlugin(const std::string& uri)
 {
-	auto iter = m_clapInfoMap.find(uri);
-	return iter != m_clapInfoMap.end() ? iter->second.plugin() : nullptr;
+	const auto iter = m_uriToPlugin.find(uri);
+	return iter != m_uriToPlugin.end() ? iter->second : nullptr;
 }
 
-
-const clap_plugin_t* ClapManager::getPlugin(const QString& uri)
+const ClapPlugin* ClapManager::getPlugin(const QString& uri)
 {
 	return getPlugin(uri.toStdString());
 }
-*/
 
 } // namespace lmms
 

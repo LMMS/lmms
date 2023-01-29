@@ -101,6 +101,12 @@ auto ClapFile::load() -> bool
 			continue;
 		}
 
+		if (!desc->id || !desc->name)
+		{
+			qWarning() << "invalid plugin descriptor";
+			continue;
+		}
+
 		if (!clap_version_is_compatible(desc->clap_version))
 		{
 			qWarning() << "Incompatible CLAP version: Plugin is: " << desc->clap_version.major << "."
