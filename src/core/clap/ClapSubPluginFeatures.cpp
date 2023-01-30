@@ -46,7 +46,7 @@ ClapSubPluginFeatures::ClapSubPluginFeatures(Plugin::PluginTypes type)
 
 void ClapSubPluginFeatures::fillDescriptionWidget(QWidget* parent, const Key* key) const
 {
-	const auto descriptor = getPlugin(*key)->getDescriptor();
+	const auto descriptor = getPluginInfo(*key)->getDescriptor();
 
 	auto label = new QLabel(parent);
 	label->setText(QWidget::tr("Name: ") + QString::fromUtf8(descriptor->name));
@@ -132,12 +132,12 @@ auto ClapSubPluginFeatures::additionalFileExtensions(const Plugin::Descriptor::S
 
 auto ClapSubPluginFeatures::displayName(const Plugin::Descriptor::SubPluginFeatures::Key& key) const -> QString
 {
-	return QString::fromUtf8(getPlugin(key)->getDescriptor()->name);
+	return QString::fromUtf8(getPluginInfo(key)->getDescriptor()->name);
 }
 
 auto ClapSubPluginFeatures::description(const Plugin::Descriptor::SubPluginFeatures::Key& key) const -> QString
 {
-	return QString::fromUtf8(getPlugin(key)->getDescriptor()->description);
+	return QString::fromUtf8(getPluginInfo(key)->getDescriptor()->description);
 }
 
 auto ClapSubPluginFeatures::logo(const Plugin::Descriptor::SubPluginFeatures::Key& key) const -> const PixmapLoader*
@@ -146,9 +146,9 @@ auto ClapSubPluginFeatures::logo(const Plugin::Descriptor::SubPluginFeatures::Ke
 	return nullptr;
 }
 
-auto ClapSubPluginFeatures::getPlugin(const Plugin::Descriptor::SubPluginFeatures::Key& key) -> const ClapPlugin*
+auto ClapSubPluginFeatures::getPluginInfo(const Plugin::Descriptor::SubPluginFeatures::Key& key) -> const ClapPluginInfo*
 {
-	const auto result = Engine::getClapManager()->getPlugin(key.attributes["uri"]);
+	const auto result = Engine::getClapManager()->getPluginInfo(key.attributes["uri"]);
 	Q_ASSERT(result);
 	return result;
 }

@@ -24,6 +24,8 @@
 
 #include "ClapFile.h"
 
+#ifdef LMMS_HAVE_CLAP
+
 #include "ClapManager.h"
 #include "ClapPorts.h"
 
@@ -47,15 +49,23 @@ ClapFile::ClapFile(const ClapManager* manager, std::filesystem::path&& filename)
 	load();
 }
 
+ClapFile::~ClapFile()
+{
+	if (ClapManager::kDebug)
+		qDebug() << "ClapFile::~ClapFile(): m_library=" << (m_library != nullptr ? "non-null" : "null");
+	unload();
+}
+
 ClapFile::ClapFile(ClapFile&& other) noexcept
 	: m_parent(other.m_parent)
 {
 	m_filename = std::move(other.m_filename);
 	m_library = std::exchange(other.m_library, nullptr);
+	m_entry = std::exchange(other.m_entry, nullptr);
 	m_factory = std::exchange(other.m_factory, nullptr);
 	m_pluginCount = other.m_pluginCount;
 	m_valid = std::exchange(other.m_valid, false);
-	m_plugins = std::move(other.m_plugins);
+	m_pluginInfo = std::move(other.m_pluginInfo);
 }
 
 auto ClapFile::load() -> bool
@@ -91,7 +101,7 @@ auto ClapFile::load() -> bool
 	if (m_pluginCount <= 0)
 		return false;
 
-	m_plugins.clear();
+	m_pluginInfo.clear();
 	for (uint32_t i = 0; i < m_pluginCount; ++i)
 	{
 		const auto desc = m_factory->get_plugin_descriptor(m_factory, i);
@@ -121,14 +131,14 @@ auto ClapFile::load() -> bool
 			qDebug() << "description:" << desc->description;
 		}
 
-		auto plugin = ClapPlugin{this, i, desc}; // Prints warning if anything goes wrong
+		auto plugin = ClapPluginInfo{this, i, desc}; // Prints warning if anything goes wrong
 		if (!plugin.isValid())
 			continue;
 
-		if (ClapManager::kDebug)
-			plugin.activate(); // TEMPORARY! (debug purposes currently)
+		//if (ClapManager::kDebug)
+		//	plugin.activate(); // TEMPORARY! (debug purposes currently)
 
-		m_plugins.emplace_back(std::move(plugin));
+		m_pluginInfo.emplace_back(std::move(plugin));
 	}
 
 	m_valid = true;
@@ -137,16 +147,29 @@ auto ClapFile::load() -> bool
 
 void ClapFile::unload()
 {
-	// TODO: Need to implement
-	return;
+	// Need to destroy any plugin instances from this .clap file before
+	// calling this method. See ClapManager::unload().
+
+	if (m_entry)
+	{
+		// No more calls into the shared library can be made after this
+		m_entry->deinit();
+		m_entry = nullptr;
+	}
+
+	if (m_library)
+	{
+		m_library->unload();
+		m_library = nullptr;
+	}
 }
 
 ////////////////////////////////
-// ClapPlugin
+// ClapPluginInfo
 ////////////////////////////////
 
-ClapPlugin::ClapPlugin(const ClapFile* parent, uint32_t index, const clap_plugin_descriptor_t* desc)
-	: m_parent(parent), m_host(parent->getParent()->getHost())
+ClapPluginInfo::ClapPluginInfo(const ClapFile* file, uint32_t index, const clap_plugin_descriptor_t* desc)
+	: m_file(file)
 {
 	m_valid = false;
 	m_index = index;
@@ -178,29 +201,18 @@ ClapPlugin::ClapPlugin(const ClapFile* parent, uint32_t index, const clap_plugin
 	}
 }
 
-ClapPlugin::ClapPlugin(ClapPlugin&& other) noexcept
-	: m_parent(other.m_parent)
+ClapPluginInfo::ClapPluginInfo(ClapPluginInfo&& other) noexcept
+	: m_file(other.m_file)
 {
-	m_host = std::exchange(other.m_host, nullptr);
 	m_index = other.m_index;
 	m_descriptor = std::exchange(other.m_descriptor, nullptr);
 	m_type = std::exchange(other.m_type, Plugin::PluginTypes::Undefined);
 	m_valid = std::exchange(other.m_valid, false);
 	m_issues = std::move(other.m_issues);
-	m_plugin = std::exchange(other.m_plugin, nullptr);
-
-	m_extParams = std::exchange(other.m_extParams, nullptr);
-	//m_extQuickControls = std::exchange(m_extQuickControls, nullptr);
-	m_extAudioPorts = std::exchange(other.m_extAudioPorts, nullptr);
-	m_extGui = std::exchange(other.m_extGui, nullptr);
-	m_extTimerSupport = std::exchange(other.m_extTimerSupport, nullptr);
-	m_extPosixFdSupport = std::exchange(other.m_extPosixFdSupport, nullptr);
-	m_extThreadPool = std::exchange(other.m_extThreadPool, nullptr);
-	m_extPresetLoad = std::exchange(other.m_extPresetLoad, nullptr);
-	m_extState = std::exchange(other.m_extState, nullptr);
 }
 
-auto ClapPlugin::activate() -> bool
+/*
+auto ClapPluginInfo::activate() -> bool
 {
 	if (!isValid() || isActivated())
 		return false;
@@ -229,49 +241,9 @@ auto ClapPlugin::activate() -> bool
 
 	return true;
 }
+*/
 
-void ClapPlugin::deactivate()
-{
-	// TODO
-}
-
-auto ClapPlugin::check() -> bool
-{
-	m_issues.clear();
-
-	// TODO: Check if blacklisted
-
-	if (!m_extAudioPorts)
-	{
-		m_issues.emplace(PluginIssueType::noOutputChannel);
-		return false; // No ports
-	}
-
-
-
-	//if (ClapPorts::check(m_extAudioPorts, m_issues))
-	//	return false; // failure
-
-	return true;
-}
-
-void ClapPlugin::initExtensions()
-{
-	initPluginExtension(m_extParams, CLAP_EXT_PARAMS);
-	//initPluginExtension(m_extQuickControls, CLAP_EXT_QUICK_CONTROLS);
-	initPluginExtension(m_extAudioPorts, CLAP_EXT_AUDIO_PORTS);
-	initPluginExtension(m_extGui, CLAP_EXT_GUI);
-	initPluginExtension(m_extTimerSupport, CLAP_EXT_TIMER_SUPPORT);
-	initPluginExtension(m_extPosixFdSupport, CLAP_EXT_POSIX_FD_SUPPORT);
-	initPluginExtension(m_extThreadPool, CLAP_EXT_THREAD_POOL);
-	initPluginExtension(m_extPresetLoad, CLAP_EXT_PRESET_LOAD);
-	initPluginExtension(m_extState, CLAP_EXT_STATE);
-}
-
-void ClapPlugin::ClapPluginDeleter::operator()(const clap_plugin_t* p) const noexcept
-{
-	// NOTE: Need to deactivate plugin first
-	p->destroy(p);
-}
 
 } // namespace lmms
+
+#endif // LMMS_HAVE_CLAP

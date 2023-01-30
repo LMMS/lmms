@@ -36,8 +36,6 @@
 
 #include "lmms_export.h"
 
-#include <clap/clap.h>
-
 namespace lmms
 {
 
@@ -55,7 +53,7 @@ public:
 	auto logo(const Key& key) const -> const PixmapLoader* override;
 
 private:
-	static auto getPlugin(const Key& key) -> const ClapPlugin*;
+	static auto getPluginInfo(const Key& key) -> const ClapPluginInfo*;
 };
 
 
