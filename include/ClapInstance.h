@@ -29,15 +29,17 @@
 
 #ifdef LMMS_HAVE_CLAP
 
-#include "ClapFile.h"
+#include "ClapPluginInstance.h"
 
 #include <memory>
+#include <queue>
+#include <functional>
 
 namespace lmms
 {
 
 /**
- * ClapInstance stores a CLAP host/plugin instance pair.
+ * @brief ClapInstance stores a CLAP host/plugin instance pair.
  *
  * When a new CLAP plugin instance is created by the ClapManager,
  * a new CLAP host instance needs to be passed to the plugin instance,
@@ -57,85 +59,70 @@ namespace lmms
 class ClapInstance
 {
 public:
-	class Host;
-	class Plugin;
-
-	ClapInstance(const ClapPluginInfo& pluginInfo);
+	ClapInstance() = delete;
+	ClapInstance(const ClapPluginInfo* pluginInfo);
+	ClapInstance(const ClapInstance&) = delete;
+	ClapInstance& operator=(const ClapInstance&) = delete;
+	ClapInstance(ClapInstance&& other) noexcept;
+	ClapInstance& operator=(ClapInstance&& rhs) noexcept;
 	~ClapInstance();
 
 	//! Host instance
 	class Host
 	{
 	public:
-		//! Creates a clap_host_t host instance
-		Host(const ClapInstance& parent);
+		//! Creates a clap_host host instance
+		Host() = delete;
+		Host(const ClapInstance* parent);
+		Host(const Host&) = delete;
+		Host& operator=(const Host&) = delete;
+		Host(Host&& other) noexcept;
+		Host& operator=(Host&& rhs) noexcept;
+		~Host();
 
-		auto getHost() const -> const clap_host_t* { return &m_host; }
-		auto getPlugin() const -> const clap_plugin_t* { return m_parent.getPlugin(); }
+		void destroy();
+		auto getHost() const -> const clap_host* { return &m_host; }
+		auto getPlugin() const -> const clap_plugin*;
 		auto isValid() const -> bool { return true; }
 
+		//! Executes tasks in idle queue
+		void idle();
+
 	private:
+
+		void setHost();
+		void pushToIdleQueue(std::function<bool()>&& functor);
+
 		static Host* fromHost(const clap_host* host);
-		static auto getExtension(const clap_host_t* host, const char* extension_id) -> const void*;
+		static auto getExtension(const clap_host* host, const char* extension_id) -> const void*;
 		static void requestCallback(const clap_host* host);
 		static void requestProcess(const clap_host* host);
 		static void requestRestart(const clap_host* host);
 
-		const ClapInstance& m_parent;
-		clap_host_t m_host;
+		const ClapInstance* m_parent;
+		clap_host m_host;
+
+		std::queue<std::function<bool()>> m_idleQueue;
 	};
 
-	//! Plugin instance
-	class Plugin
-	{
-	public:
-		//! Creates a clap_plugin_t plugin instance
-		Plugin(const ClapInstance& parent, const ClapPluginInfo& info);
-
-		//! Deactivates and destroys plugin instance as needed
-		~Plugin();
-
-		//! Initializes extensions for plugin instance; Returns true when successful
-		auto initExtensions() -> bool;
-
-		auto getHost() const -> const clap_host_t* { return m_parent.getHost(); }
-		auto getPlugin() const -> const clap_plugin_t* { return m_plugin; }
-		auto getPluginInfo() const -> const ClapPluginInfo& { return m_info; }
-		auto isValid() const -> bool { return m_plugin != nullptr; }
-
-	private:
-
-		template<typename T>
-		void initExtension(const T*& ext, const char* id)
-		{
-			// Must be on main thread
-			if (!ext)
-				ext = static_cast<const T*>(m_plugin->get_extension(m_plugin, id));
-		}
-
-		const ClapInstance& m_parent;
-		const clap_plugin_t* m_plugin;
-		const ClapPluginInfo& m_info;
-		bool m_active{false};
-
-		// TODO: Add plugin extension pointers here as support is implemented in the host
-		const clap_plugin_audio_ports_t* m_extAudioPorts{nullptr};
-		const clap_plugin_params_t* m_extParams{nullptr};
-	};
-
+	//! Destroy the plugin instance
 	void destroy();
-	auto getHost() const -> const clap_host_t* { return m_host != nullptr ? m_host->getHost() : nullptr; }
-	auto getPlugin() const -> const clap_plugin_t* { return m_plugin != nullptr ? m_plugin->getPlugin() : nullptr; }
-	auto getHostInstance() const -> const Host* { return m_host.get(); }
-	auto getPluginInstance() const -> const Plugin* { return m_plugin.get(); }
-	auto getPluginInfo() const -> const ClapPluginInfo& { return m_pluginInfo; }
+
+	//! Loads/reloads the plugin instance
+	void load();
+
+	auto getHost() const -> const clap_host* { return m_host.getHost(); }
+	auto getPlugin() const -> const clap_plugin* { return m_plugin != nullptr ? m_plugin->getPlugin() : nullptr; }
+	auto getHostInstance() const -> const Host& { return m_host; }
+	auto getPluginInstance() const -> const ClapPluginInstance* { return m_plugin.get(); }
+	auto getPluginInfo() const -> const ClapPluginInfo& { return *m_pluginInfo; }
 	auto isValid() const -> bool;
 
 private:
-	std::unique_ptr<Host> m_host; //!< Host instance
-	std::unique_ptr<Plugin> m_plugin; //!< Plugin instance
+	Host m_host; //!< Host instance
+	std::unique_ptr<ClapPluginInstance> m_plugin; //!< Plugin instance
 
-	const ClapPluginInfo& m_pluginInfo;
+	const ClapPluginInfo* m_pluginInfo; //!< Never null
 };
 
 }

@@ -40,54 +40,138 @@ namespace lmms
 // ClapInstance
 ////////////////////////////////
 
-ClapInstance::ClapInstance(const ClapPluginInfo& pluginInfo)
-	: m_pluginInfo(pluginInfo)
+ClapInstance::ClapInstance(const ClapPluginInfo* pluginInfo)
+	: m_host(this), m_pluginInfo(pluginInfo)
 {
-	m_host = std::make_unique<Host>(*this);
-	if (!m_host || !m_host->isValid())
-	{
-		m_host.reset();
-		return;
-	}
+}
 
-	m_plugin = std::make_unique<Plugin>(*this, m_pluginInfo);
-	if (!m_plugin || !m_plugin->isValid())
-	{
-		m_plugin.reset();
-		m_host.reset();
-		return;
-	}
+ClapInstance::ClapInstance(ClapInstance&& other) noexcept
+	: m_host(std::move(other.m_host)), m_pluginInfo(other.m_pluginInfo)
+{
+	m_plugin = std::exchange(other.m_plugin, nullptr);
+}
 
-	// TODO
+ClapInstance& ClapInstance::operator=(ClapInstance&& rhs) noexcept
+{
+	if (this != &rhs)
+	{
+		m_host = std::move(rhs.m_host);
+		m_plugin = std::exchange(rhs.m_plugin, nullptr);
+		m_pluginInfo = rhs.m_pluginInfo;
+	}
+	return *this;
 }
 
 ClapInstance::~ClapInstance()
 {
-	if (ClapManager::kDebug)
-		qDebug() << "ClapInstance::~ClapInstance()";
+	//if (ClapManager::kDebug)
+	//	qDebug() << "ClapInstance::~ClapInstance()";
 	destroy();
 }
 
 void ClapInstance::destroy()
 {
-	m_plugin.reset(); // Deactivates and destroys clap_plugin_t* as needed
-	m_host.reset();
+	m_host.idle(); // ???
+
+	// Deactivates and destroys clap_plugin* as needed
+	m_plugin.reset();
+	m_host.destroy();
+}
+
+void ClapInstance::load()
+{
+	qDebug() << "ClapInstance::load()";
+	if (!m_host.isValid())
+	{
+		m_host.destroy();
+		return;
+	}
+
+	// Create plugin instance, destroying any previous plugin instance first
+	m_plugin = std::make_unique<ClapPluginInstance>(this, m_pluginInfo);
+	if (!m_plugin || !m_plugin->isValid())
+	{
+		qWarning() << "Failed to create instance of CLAP plugin";
+		m_plugin.reset();
+		m_host.destroy();
+		return;
+	}
+
+	// For testing:
+	m_plugin->activate();
+
+	// TODO
 }
 
 auto ClapInstance::isValid() const -> bool
 {
-	if (!m_plugin || !m_host)
+	if (!m_plugin)
 		return false;
 
-	return m_plugin->isValid() && m_host->isValid();
+	return m_plugin->isValid() && m_host.isValid();
 }
 
 ////////////////////////////////
 // ClapInstance::Host
 ////////////////////////////////
 
-ClapInstance::Host::Host(const ClapInstance& parent)
+ClapInstance::Host::Host(const ClapInstance* parent)
 	: m_parent(parent)
+{
+	setHost();
+}
+
+ClapInstance::Host::Host(Host&& other) noexcept
+	: m_parent(other.m_parent)
+{
+	setHost();
+	m_idleQueue = std::move(other.m_idleQueue);
+}
+
+ClapInstance::Host& ClapInstance::Host::operator=(Host&& rhs) noexcept
+{
+	if (this != &rhs)
+	{
+		m_parent = rhs.m_parent;
+		setHost();
+		m_idleQueue = std::move(rhs.m_idleQueue);
+	}
+	return *this;
+}
+
+ClapInstance::Host::~Host()
+{
+	//if (ClapManager::kDebug)
+	//	qDebug() << "ClapInstance::Host::~Host()";
+	destroy();
+}
+
+void ClapInstance::Host::destroy()
+{
+	// Clear queue just in case
+	while (!m_idleQueue.empty())
+	{
+		m_idleQueue.pop();
+	}
+}
+
+auto ClapInstance::Host::getPlugin() const -> const clap_plugin*
+{
+	return m_parent->getPlugin();
+}
+
+void ClapInstance::Host::idle()
+{
+	// NOTE: Must run on main thread
+	while (!m_idleQueue.empty())
+	{
+		// Execute task then pop
+		m_idleQueue.front()();
+		m_idleQueue.pop();
+	}
+}
+
+void ClapInstance::Host::setHost()
 {
 	m_host.host_data = this;
 	m_host.clap_version = CLAP_VERSION;
@@ -99,6 +183,11 @@ ClapInstance::Host::Host(const ClapInstance& parent)
 	m_host.request_callback = requestCallback;
 	m_host.request_process = requestProcess;
 	m_host.request_restart = requestRestart;
+}
+
+void ClapInstance::Host::pushToIdleQueue(std::function<bool()>&& functor)
+{
+	m_idleQueue.push(std::move(functor));
 }
 
 auto ClapInstance::Host::fromHost(const clap_host* host) -> Host*
@@ -117,7 +206,7 @@ auto ClapInstance::Host::fromHost(const clap_host* host) -> Host*
 	return h;
 }
 
-auto ClapInstance::Host::getExtension(const clap_host_t* host, const char* extension_id) -> const void*
+auto ClapInstance::Host::getExtension(const clap_host* host, const char* extension_id) -> const void*
 {
 	auto h = fromHost(host);
 	(void)h;
@@ -127,10 +216,16 @@ auto ClapInstance::Host::getExtension(const clap_host_t* host, const char* exten
 
 void ClapInstance::Host::requestCallback(const clap_host* host)
 {
-	auto h = fromHost(host);
-	(void)h;
-	//h->_scheduleMainThreadCallback = true;
-	//qDebug() << "hostRequestCallback called";
+	const auto h = fromHost(host);
+
+	auto mainThreadCallback = [h]() -> bool {
+		const auto plugin = h->getPlugin();
+		plugin->on_main_thread(plugin);
+		return false;
+	};
+
+	h->pushToIdleQueue(std::move(mainThreadCallback));
+	qDebug() << "Host::requestCallback called";
 }
 
 void ClapInstance::Host::requestProcess(const clap_host* host)
@@ -149,41 +244,6 @@ void ClapInstance::Host::requestRestart(const clap_host* host)
 	//qDebug() << "hostRequestRestart called";
 }
 
-////////////////////////////////
-// ClapInstance::Plugin
-////////////////////////////////
-
-ClapInstance::Plugin::Plugin(const ClapInstance& parent, const ClapPluginInfo& info)
-	: m_parent(parent), m_info(info)
-{
-	const auto factory = m_info.getFile()->getFactory();
-	m_plugin = factory->create_plugin(factory, m_parent.getHost(), m_info.getDescriptor()->id);
-}
-
-ClapInstance::Plugin::~Plugin()
-{
-	if (ClapManager::kDebug)
-		qDebug() << "ClapInstance::Plugin::~Plugin()";
-	if (m_plugin)
-	{
-		if (m_active)
-			m_plugin->deactivate(m_plugin);
-
-		m_plugin->destroy(m_plugin);
-		m_plugin = nullptr;
-	}
-}
-
-auto ClapInstance::Plugin::initExtensions() -> bool
-{
-	if (!m_plugin)
-		return false;
-
-	initExtension(m_extAudioPorts, CLAP_EXT_AUDIO_PORTS);
-	// ...
-
-	return true;
-}
 
 } // namespace lmms
 

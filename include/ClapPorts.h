@@ -40,22 +40,33 @@
 namespace lmms
 {
 
+class ClapPluginInstance;
+
 //! Manages CLAP ports for a CLAP plugin
 class ClapPorts
 {
 public:
-	ClapPorts(const clap_plugin_t* plugin, const clap_plugin_audio_ports* ports);
+	ClapPorts(const ClapPluginInstance* plugin, const clap_plugin_audio_ports* ports);
 
-	auto check(const clap_plugin_audio_ports_t* ports, std::unordered_set<PluginIssue, PluginIssueHash>& issues) -> bool;
+	auto check(std::unordered_set<PluginIssue, PluginIssueHash>& issues) -> bool;
 
 private:
-	const clap_plugin_t* m_plugin;
+	const ClapPluginInstance* m_plugin;
 	const clap_plugin_audio_ports* m_ports;
 	uint32_t m_inputCount{0};
 	uint32_t m_outputCount{0};
 
 	bool m_valid{false};
 	std::unordered_set<PluginIssue, PluginIssueHash> m_issues;
+};
+
+class ClapPort
+{
+public:
+	ClapPort(const clap_audio_port_info* portInfo);
+
+private:
+	const clap_audio_port_info* m_portInfo;
 };
 
 } // namespace lmms

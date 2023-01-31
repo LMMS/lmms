@@ -23,22 +23,26 @@
  */
 
 #include "ClapPorts.h"
+#include "ClapPluginInstance.h"
 
 #include <string>
+#include <stdexcept>
 
 #include <QDebug>
 
 namespace lmms
 {
 
-ClapPorts::ClapPorts(const clap_plugin_t* plugin, const clap_plugin_audio_ports* ports)
+ClapPorts::ClapPorts(const ClapPluginInstance* plugin, const clap_plugin_audio_ports* ports)
 	: m_plugin(plugin), m_ports(ports)
 {
-	// NOTE: plugin must not be active
-	if (!m_ports || !m_plugin)
-		return;
+	// NOTE: plugin must be deactivated when ports are scanned
+	if (!m_ports || m_plugin->isActive())
+		throw std::runtime_error{"Cannot initialize CLAP ports - ports not set or plugin instance is active"};
 
-	const auto outCount = m_ports->count(plugin, false);
+	const auto p = m_plugin->getPlugin();
+
+	const auto outCount = m_ports->count(p, false);
 	if (outCount == 0)
 		m_issues.emplace(PluginIssueType::noOutputChannel);
 	//if (outCount > 2)
@@ -49,7 +53,7 @@ ClapPorts::ClapPorts(const clap_plugin_t* plugin, const clap_plugin_audio_ports*
 	for (uint32_t i = 0; i < outCount; ++i)
 	{
 		clap_audio_port_info_t info;
-		if (!m_ports->get(m_plugin, i, false, &info))
+		if (!m_ports->get(p, i, false, &info))
 		{
 			qWarning() << "Unknown error calling m_ports->get(...)";
 			continue;
@@ -62,14 +66,14 @@ ClapPorts::ClapPorts(const clap_plugin_t* plugin, const clap_plugin_audio_ports*
 		qDebug() << "- port in place pair:" << info.in_place_pair;
 	}
 
-	const auto inCount = m_ports->count(plugin, true);
+	const auto inCount = m_ports->count(p, true);
 
 	qDebug() << "~~~Printing port info (inCount:" << inCount << ")";
 
 	for (uint32_t i = 0; i < inCount; ++i)
 	{
 		clap_audio_port_info_t info;
-		if (!m_ports->get(m_plugin, i, true, &info))
+		if (!m_ports->get(p, i, true, &info))
 		{
 			qWarning() << "Unknown error calling m_ports->get(...)";
 			continue;
@@ -83,9 +87,9 @@ ClapPorts::ClapPorts(const clap_plugin_t* plugin, const clap_plugin_audio_ports*
 	}
 }
 
-auto ClapPorts::check(const clap_plugin_audio_ports_t* ports, std::unordered_set<PluginIssue, PluginIssueHash>& issues) -> bool
+auto ClapPorts::check(std::unordered_set<PluginIssue, PluginIssueHash>& issues) -> bool
 {
-	if (!ports)
+	if (!m_ports)
 	{
 		issues.emplace(PluginIssueType::noOutputChannel);
 		return false; // No ports

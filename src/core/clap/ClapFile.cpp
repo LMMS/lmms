@@ -43,17 +43,6 @@ ClapFile::ClapFile(const ClapManager* manager, std::filesystem::path&& filename)
 	: m_parent(manager), m_filename(std::move(filename))
 {
 	m_filename.make_preferred();
-	m_library = std::make_unique<QLibrary>();
-	m_library->setFileName(QString::fromUtf8(m_filename.c_str()));
-	m_library->setLoadHints(QLibrary::ResolveAllSymbolsHint | QLibrary::DeepBindHint);
-	load();
-}
-
-ClapFile::~ClapFile()
-{
-	if (ClapManager::kDebug)
-		qDebug() << "ClapFile::~ClapFile(): m_library=" << (m_library != nullptr ? "non-null" : "null");
-	unload();
 }
 
 ClapFile::ClapFile(ClapFile&& other) noexcept
@@ -68,11 +57,23 @@ ClapFile::ClapFile(ClapFile&& other) noexcept
 	m_pluginInfo = std::move(other.m_pluginInfo);
 }
 
+ClapFile::~ClapFile()
+{
+	//if (ClapManager::kDebug)
+	//	qDebug() << "ClapFile::~ClapFile(): m_library=" << (m_library != nullptr ? "non-null" : "null");
+	unload();
+}
+
 auto ClapFile::load() -> bool
 {
 	m_valid = false;
+
+	m_library = std::make_unique<QLibrary>();
 	if (!m_library)
 		return false;
+
+	m_library->setFileName(QString::fromUtf8(m_filename.c_str()));
+	m_library->setLoadHints(QLibrary::ResolveAllSymbolsHint | QLibrary::DeepBindHint);
 
 	// Do not allow reloading yet
 	if (m_library->isLoaded())
@@ -84,7 +85,7 @@ auto ClapFile::load() -> bool
 		return false;
 	}
 
-	const auto pluginEntry = reinterpret_cast<const clap_plugin_entry_t*>(m_library->resolve("clap_entry"));
+	const auto pluginEntry = reinterpret_cast<const clap_plugin_entry*>(m_library->resolve("clap_entry"));
 	if (!pluginEntry)
 	{
 		qWarning() << "Unable to resolve entry point 'clap_entry' in '" << getFilename().c_str() << "'";
@@ -93,7 +94,7 @@ auto ClapFile::load() -> bool
 	}
 
 	pluginEntry->init(getFilename().c_str());
-	m_factory = static_cast<const clap_plugin_factory_t*>(pluginEntry->get_factory(CLAP_PLUGIN_FACTORY_ID));
+	m_factory = static_cast<const clap_plugin_factory*>(pluginEntry->get_factory(CLAP_PLUGIN_FACTORY_ID));
 
 	m_pluginCount = m_factory->get_plugin_count(m_factory);
 	if (ClapManager::kDebug)
@@ -168,7 +169,7 @@ void ClapFile::unload()
 // ClapPluginInfo
 ////////////////////////////////
 
-ClapPluginInfo::ClapPluginInfo(const ClapFile* file, uint32_t index, const clap_plugin_descriptor_t* desc)
+ClapPluginInfo::ClapPluginInfo(const ClapFile* file, uint32_t index, const clap_plugin_descriptor* desc)
 	: m_file(file)
 {
 	m_valid = false;
@@ -211,37 +212,10 @@ ClapPluginInfo::ClapPluginInfo(ClapPluginInfo&& other) noexcept
 	m_issues = std::move(other.m_issues);
 }
 
-/*
-auto ClapPluginInfo::activate() -> bool
+auto ClapPluginInfo::getFactory() const -> const clap_plugin_factory*
 {
-	if (!isValid() || isActivated())
-		return false;
-
-	const auto factory = getParent()->getFactory();
-	m_plugin = ClapPluginPtr{ factory->create_plugin(factory, m_host, getDescriptor()->id) };
-	if (!m_plugin)
-	{
-		qWarning() << "could not create the plugin with id: " << getDescriptor()->id;
-		return false;
-	}
-
-	if (!m_plugin->init(m_plugin.get()))
-	{
-		qWarning() << "could not init the plugin with id: " << getDescriptor()->id;
-		m_plugin.reset(); // Calls destroy
-		return false;
-	}
-
-	// Need to init extensions before activating the plugin
-	initExtensions();
-
-	auto ports = ClapPorts{m_plugin.get(), m_extAudioPorts};
-
-	//m_plugin->activate(m_plugin.get(), );
-
-	return true;
+	return getFile()->getFactory();
 }
-*/
 
 
 } // namespace lmms

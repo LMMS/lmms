@@ -77,8 +77,8 @@ ClapManager::ClapManager()
 
 ClapManager::~ClapManager()
 {
-	if (ClapManager::kDebug)
-		qDebug() << "ClapManager::~ClapManager()";
+	//if (ClapManager::kDebug)
+	//	qDebug() << "ClapManager::~ClapManager()";
 
 	// Deactivate and destroy plugin instances first
 	m_instances.clear();
@@ -217,6 +217,7 @@ void ClapManager::findClapFiles(const std::vector<std::filesystem::path>& search
 				qDebug() << "-" << entryPath.c_str();
 
 			auto& clapFile = m_clapFiles.emplace_back(this, std::move(entryPath));
+			clapFile.load();
 			if (!clapFile.isValid())
 			{
 				qWarning() << "Failed to load .clap file";
@@ -229,6 +230,8 @@ void ClapManager::findClapFiles(const std::vector<std::filesystem::path>& search
 			{
 				m_pluginInfo.push_back(&plugin);
 				m_uriToPluginInfo.emplace(std::string{plugin.getDescriptor()->id}, &plugin); // TODO: Does this pointer remain valid after clapFile is moved?
+				auto& test = m_instances.emplace_back(&plugin); // TEMPORARY: Testing purposes
+				test.load();
 			}
 		}
 	}
