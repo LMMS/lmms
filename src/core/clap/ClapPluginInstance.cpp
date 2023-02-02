@@ -39,16 +39,15 @@ namespace lmms
 {
 
 ClapPluginInstance::ClapPluginInstance(const ClapInstance* parent, const ClapPluginInfo* info)
-	: m_parent(parent), m_info(info)
+	: m_info(info)
 {
 	const auto factory = getInfo().getFactory();
-	m_plugin = factory->create_plugin(factory, m_parent->getHost(), m_info->getDescriptor()->id);
+	m_plugin = factory->create_plugin(factory, parent->getHost(), m_info->getDescriptor()->id);
+	// NOTE: Do not store the parent pointer. It becomes invalid if the parent is moved.
 }
 
 ClapPluginInstance::~ClapPluginInstance()
 {
-	if (ClapManager::kDebug)
-		qDebug() << "ClapPluginInstance::~ClapPluginInstance()";
 	if (m_plugin)
 	{
 		deactivate();
@@ -103,11 +102,6 @@ auto ClapPluginInstance::deactivate() -> bool
 		return true;
 	}
 	return false;
-}
-
-auto ClapPluginInstance::getHost() const -> const clap_host*
-{
-	return m_parent->getHost();
 }
 
 auto ClapPluginInstance::initExtensions() -> bool

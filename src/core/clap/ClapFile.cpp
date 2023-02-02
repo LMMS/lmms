@@ -46,8 +46,8 @@ ClapFile::ClapFile(const ClapManager* manager, std::filesystem::path&& filename)
 }
 
 ClapFile::ClapFile(ClapFile&& other) noexcept
-	: m_parent(other.m_parent)
 {
+	m_parent = std::exchange(other.m_parent, nullptr);
 	m_filename = std::move(other.m_filename);
 	m_library = std::exchange(other.m_library, nullptr);
 	m_entry = std::exchange(other.m_entry, nullptr);
@@ -57,10 +57,24 @@ ClapFile::ClapFile(ClapFile&& other) noexcept
 	m_pluginInfo = std::move(other.m_pluginInfo);
 }
 
+ClapFile& ClapFile::operator=(ClapFile&& rhs) noexcept
+{
+	if (this != &rhs)
+	{
+		m_parent = std::exchange(rhs.m_parent, nullptr);
+		m_filename = std::move(rhs.m_filename);
+		m_library = std::exchange(rhs.m_library, nullptr);
+		m_entry = std::exchange(rhs.m_entry, nullptr);
+		m_factory = std::exchange(rhs.m_factory, nullptr);
+		m_pluginCount = rhs.m_pluginCount;
+		m_valid = std::exchange(rhs.m_valid, false);
+		m_pluginInfo = std::move(rhs.m_pluginInfo);
+	}
+	return *this;
+}
+
 ClapFile::~ClapFile()
 {
-	//if (ClapManager::kDebug)
-	//	qDebug() << "ClapFile::~ClapFile(): m_library=" << (m_library != nullptr ? "non-null" : "null");
 	unload();
 }
 
@@ -105,41 +119,12 @@ auto ClapFile::load() -> bool
 	m_pluginInfo.clear();
 	for (uint32_t i = 0; i < m_pluginCount; ++i)
 	{
-		const auto desc = m_factory->get_plugin_descriptor(m_factory, i);
-		if (!desc)
+		auto& plugin = m_pluginInfo.emplace_back(std::make_shared<ClapPluginInfo>(m_factory, i));
+		if (!plugin || !plugin->isValid())
 		{
-			qWarning() << "no plugin descriptor";
+			m_pluginInfo.pop_back();
 			continue;
 		}
-
-		if (!desc->id || !desc->name)
-		{
-			qWarning() << "invalid plugin descriptor";
-			continue;
-		}
-
-		if (!clap_version_is_compatible(desc->clap_version))
-		{
-			qWarning() << "Incompatible CLAP version: Plugin is: " << desc->clap_version.major << "."
-						<< desc->clap_version.minor << "." << desc->clap_version.revision << " Host is "
-						<< CLAP_VERSION.major << "." << CLAP_VERSION.minor << "." << CLAP_VERSION.revision;
-			continue;
-		}
-
-		if (ClapManager::kDebug)
-		{
-			qDebug() << "name:" << desc->name;
-			qDebug() << "description:" << desc->description;
-		}
-
-		auto plugin = ClapPluginInfo{this, i, desc}; // Prints warning if anything goes wrong
-		if (!plugin.isValid())
-			continue;
-
-		//if (ClapManager::kDebug)
-		//	plugin.activate(); // TEMPORARY! (debug purposes currently)
-
-		m_pluginInfo.emplace_back(std::move(plugin));
 	}
 
 	m_valid = true;
@@ -165,19 +150,55 @@ void ClapFile::unload()
 	}
 }
 
+void ClapFile::purgeInvalidPlugins()
+{
+	m_pluginInfo.erase(std::remove_if(
+		m_pluginInfo.begin(), m_pluginInfo.end(),
+		[](auto& pi){
+			return !pi || !pi->isValid();
+		})
+	);
+}
+
 ////////////////////////////////
 // ClapPluginInfo
 ////////////////////////////////
 
-ClapPluginInfo::ClapPluginInfo(const ClapFile* file, uint32_t index, const clap_plugin_descriptor* desc)
-	: m_file(file)
+ClapPluginInfo::ClapPluginInfo(const clap_plugin_factory* factory, uint32_t index)
 {
 	m_valid = false;
+	m_factory = factory;
 	m_index = index;
-	m_descriptor = desc;
+
+	m_descriptor = m_factory->get_plugin_descriptor(m_factory, m_index);
+	if (!m_descriptor)
+	{
+		qWarning() << "No CLAP plugin descriptor";
+		return;
+	}
+
+	if (!m_descriptor->id || !m_descriptor->name)
+	{
+		qWarning() << "Invalid CLAP plugin descriptor";
+		return;
+	}
+
+	if (!clap_version_is_compatible(m_descriptor->clap_version))
+	{
+		qWarning() << "Incompatible CLAP version: Plugin is: " << m_descriptor->clap_version.major << "."
+					<< m_descriptor->clap_version.minor << "." << m_descriptor->clap_version.revision << " Host is "
+					<< CLAP_VERSION.major << "." << CLAP_VERSION.minor << "." << CLAP_VERSION.revision;
+		return;
+	}
+
+	if (ClapManager::kDebug)
+	{
+		qDebug() << "name:" << m_descriptor->name;
+		qDebug() << "description:" << m_descriptor->description;
+	}
 
 	m_type = Plugin::PluginTypes::Undefined;
-	auto features = desc->features;
+	auto features = m_descriptor->features;
 	while (features && *features)
 	{
 		std::string_view feature = *features;
@@ -186,7 +207,6 @@ ClapPluginInfo::ClapPluginInfo(const ClapFile* file, uint32_t index, const clap_
 		if (feature == CLAP_PLUGIN_FEATURE_INSTRUMENT)
 			m_type = Plugin::PluginTypes::Instrument;
 		else if (feature == CLAP_PLUGIN_FEATURE_AUDIO_EFFECT
-				|| feature == CLAP_PLUGIN_FEATURE_NOTE_EFFECT
 				|| feature == "effect" /* non-standard, but used by Surge XT Effects */)
 			m_type = Plugin::PluginTypes::Effect;
 		else if (feature == CLAP_PLUGIN_FEATURE_ANALYZER)
@@ -194,27 +214,24 @@ ClapPluginInfo::ClapPluginInfo(const ClapFile* file, uint32_t index, const clap_
 		++features;
 	}
 
-	if (m_type != Plugin::PluginTypes::Undefined)
-		m_valid = true;
-	else
+	if (m_type == Plugin::PluginTypes::Undefined)
 	{
 		qWarning() << "CLAP plugin is not recognized as an instrument, effect, or tool";
+		return;
 	}
+
+	// So far the plugin is valid, but it may be invalidated later
+	m_valid = true;
 }
 
 ClapPluginInfo::ClapPluginInfo(ClapPluginInfo&& other) noexcept
-	: m_file(other.m_file)
 {
+	m_factory = std::exchange(other.m_factory, nullptr);
 	m_index = other.m_index;
 	m_descriptor = std::exchange(other.m_descriptor, nullptr);
 	m_type = std::exchange(other.m_type, Plugin::PluginTypes::Undefined);
 	m_valid = std::exchange(other.m_valid, false);
 	m_issues = std::move(other.m_issues);
-}
-
-auto ClapPluginInfo::getFactory() const -> const clap_plugin_factory*
-{
-	return getFile()->getFactory();
 }
 
 

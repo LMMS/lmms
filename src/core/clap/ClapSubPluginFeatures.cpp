@@ -106,51 +106,51 @@ void ClapSubPluginFeatures::fillDescriptionWidget(QWidget* parent, const Key* ke
 
 void ClapSubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor* desc, KeyList& kl) const
 {
-	qDebug() << "ClapSubPluginFeatures::listSubPluginKeys";
 	const auto& manager = *Engine::getClapManager();
-	for (const auto& [uri, plugin] : manager)
+	for (const auto& file : manager.files())
 	{
-		if (plugin->getType() == m_type && plugin->isValid())
+		for (const auto& pluginInfo : file.pluginInfo())
 		{
-			using KeyType = Plugin::Descriptor::SubPluginFeatures::Key;
-			KeyType::AttributeMap atm;
-			atm["uri"] = QString::fromUtf8(uri.c_str());
+			if (pluginInfo->getType() == m_type && pluginInfo->isValid())
+			{
+				const auto clapDesc = pluginInfo->getDescriptor();
+				Key::AttributeMap atm;
+				atm["uri"] = QString::fromUtf8(clapDesc->id);
 
-			kl.push_back(KeyType{desc, QString::fromUtf8(plugin->getDescriptor()->name), atm});
-			qDebug() << "Found CLAP sub plugin key of type" <<
-				m_type << ":" << uri.c_str();
+				kl.push_back(Key{desc, QString::fromUtf8(clapDesc->name), atm});
+				if (ClapManager::kDebug)
+					qDebug() << "Found CLAP sub plugin key of type" << m_type << ":" << clapDesc->id;
+			}
 		}
 	}
 }
 
-auto ClapSubPluginFeatures::additionalFileExtensions(const Plugin::Descriptor::SubPluginFeatures::Key& key) const -> QString
+auto ClapSubPluginFeatures::additionalFileExtensions([[maybe_unused]] const Key& key) const -> QString
 {
-	(void)key;
 	// CLAP only loads .clap files
 	return QString{};
 }
 
-auto ClapSubPluginFeatures::displayName(const Plugin::Descriptor::SubPluginFeatures::Key& key) const -> QString
+auto ClapSubPluginFeatures::displayName(const Key& key) const -> QString
 {
 	return QString::fromUtf8(getPluginInfo(key)->getDescriptor()->name);
 }
 
-auto ClapSubPluginFeatures::description(const Plugin::Descriptor::SubPluginFeatures::Key& key) const -> QString
+auto ClapSubPluginFeatures::description(const Key& key) const -> QString
 {
 	return QString::fromUtf8(getPluginInfo(key)->getDescriptor()->description);
 }
 
-auto ClapSubPluginFeatures::logo(const Plugin::Descriptor::SubPluginFeatures::Key& key) const -> const PixmapLoader*
+auto ClapSubPluginFeatures::logo([[maybe_unused]] const Key& key) const -> const PixmapLoader*
 {
-	(void)key; // TODO
 	return nullptr;
 }
 
-auto ClapSubPluginFeatures::getPluginInfo(const Plugin::Descriptor::SubPluginFeatures::Key& key) -> const ClapPluginInfo*
+auto ClapSubPluginFeatures::getPluginInfo(const Key& key) -> std::shared_ptr<const ClapPluginInfo>
 {
 	const auto result = Engine::getClapManager()->getPluginInfo(key.attributes["uri"]);
-	Q_ASSERT(result);
-	return result;
+	Q_ASSERT(!result.expired());
+	return result.lock();
 }
 
 } // namespace lmms

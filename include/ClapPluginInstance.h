@@ -40,7 +40,7 @@ class ClapInstance;
 class ClapPluginInstance
 {
 public:
-	//! Creates a clap_plugin plugin instance
+	//! Creates a clap_plugin plugin instance; TODO: Remove parent pointer?
 	ClapPluginInstance(const ClapInstance* parent, const ClapPluginInfo* info);
 
 	//! Deactivates and destroys plugin instance as needed
@@ -55,15 +55,15 @@ public:
 	//! Deactivates plugin instance, returning true if successful
 	auto deactivate() -> bool;
 
-	auto getHost() const -> const clap_host*;
 	auto getPlugin() const -> const clap_plugin* { return m_plugin; }
-	auto getInfo() const -> const ClapPluginInfo& { return *m_info; }
 	auto isValid() const -> bool { return m_plugin != nullptr; }
 	auto isInitialized() const -> bool { return m_initialized; }
 	auto isActive() const -> bool { return m_active; }
 	auto isProcessing() const -> bool { return m_processing; }
 
 private:
+
+	auto getInfo() const -> const ClapPluginInfo& { return *m_info; }
 
 	//! Initializes extensions for plugin instance, returning true if successful
 	auto initExtensions() -> bool;
@@ -76,9 +76,9 @@ private:
 			ext = static_cast<const T*>(m_plugin->get_extension(m_plugin, id));
 	}
 
-	const ClapInstance* m_parent; //!< Never null
-	const clap_plugin* m_plugin;
-	const ClapPluginInfo* m_info; //!< Never null
+	const clap_plugin* m_plugin; //!< Has sole ownership of
+	const ClapPluginInfo* m_info; //!< Never null?
+	//std::weak_ptr<const ClapPluginInfo> m_info; //!< Never null?
 
 	/**
 	 * Plugin instance state

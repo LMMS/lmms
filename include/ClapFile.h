@@ -55,7 +55,7 @@ public:
 	ClapFile(const ClapFile&) = delete;
 	ClapFile(ClapFile&& other) noexcept;
 	ClapFile& operator=(const ClapFile&) = delete;
-	ClapFile& operator=(ClapFile&&) noexcept = delete;
+	ClapFile& operator=(ClapFile&& rhs) noexcept;
 	~ClapFile();
 
 	//! Represents a CLAP plugin within a .clap file
@@ -63,31 +63,29 @@ public:
 	{
 	public:
 		//! Loads plugin info but does not activate
-		ClapPluginInfo(const ClapFile* file, uint32_t index, const clap_plugin_descriptor* desc);
+		ClapPluginInfo(const clap_plugin_factory* factory, uint32_t index);
 		ClapPluginInfo(const ClapPluginInfo&) = delete;
 		ClapPluginInfo(ClapPluginInfo&& other) noexcept;
 		ClapPluginInfo& operator=(const ClapPluginInfo&) = delete;
-		ClapPluginInfo& operator=(ClapPluginInfo&&) noexcept = delete;
+		ClapPluginInfo& operator=(ClapPluginInfo&& rhs) noexcept = delete;
 		~ClapPluginInfo() = default;
 
 		auto isValid() const -> bool { return m_valid; }
+		void invalidate() const { m_valid = false; }
 
-		auto getFile() const -> const ClapFile* { return m_file; }
-		auto getFactory() const -> const clap_plugin_factory*;
+		auto getFactory() const -> const clap_plugin_factory* { return m_factory; };
 		auto getIndex() const -> uint32_t { return m_index; }
 		auto getType() const -> Plugin::PluginTypes { return m_type; }
 		auto getDescriptor() const -> const clap_plugin_descriptor* { return m_descriptor; }
 
 	private:
 
-		//auto check() -> bool;
-
 		// Are set when the .clap file is loaded:
-		const ClapFile* m_file;
-		uint32_t m_index{0}; //!< Plugin index within the .clap file
-		const clap_plugin_descriptor* m_descriptor{nullptr};
+		const clap_plugin_factory* m_factory;
+		uint32_t m_index; //!< Plugin index within the .clap file
+		const clap_plugin_descriptor* m_descriptor;
 		Plugin::PluginTypes m_type{Plugin::PluginTypes::Undefined};
-		bool m_valid{false};
+		mutable bool m_valid{false};
 		std::unordered_set<PluginIssue, PluginIssueHash> m_issues;
 	};
 
@@ -99,23 +97,26 @@ public:
 	auto getFactory() const -> const clap_plugin_factory* { return m_factory; }
 
 	//! Only includes plugins that successfully loaded
-	auto getPluginInfo() const -> const std::vector<ClapPluginInfo>& { return m_pluginInfo; }
+	auto pluginInfo() const -> const std::vector<std::shared_ptr<const ClapPluginInfo>>& { return m_pluginInfo; }
 
 	//! Includes plugins that failed to load
 	auto getPluginCount() const -> uint32_t { return m_pluginCount; }
 	auto isValid() const -> bool { return m_valid; }
+
+	//! Removes any invalid plugin info objects - be careful when using
+	void purgeInvalidPlugins();
 
 private:
 
 	void unload();
 
 	// Are set when the .clap file is loaded:
-	const ClapManager* m_parent;
+	const ClapManager* m_parent; //!< Always valid, so storing it is okay
 	std::filesystem::path m_filename;
 	std::unique_ptr<QLibrary> m_library;
 	const clap_plugin_entry* m_entry{nullptr};
 	const clap_plugin_factory* m_factory{nullptr};
-	std::vector<ClapPluginInfo> m_pluginInfo; //!< Only includes info for plugins that successfully loaded
+	std::vector<std::shared_ptr<const ClapPluginInfo>> m_pluginInfo; //!< Only includes info for plugins that successfully loaded
 	uint32_t m_pluginCount{0}; //!< Includes plugins that failed to load
 	bool m_valid{false};
 };

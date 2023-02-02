@@ -34,6 +34,8 @@
 
 #include <filesystem>
 #include <vector>
+#include <string_view>
+#include <memory>
 
 #include <QString>
 #include <clap/clap.h>
@@ -41,40 +43,55 @@
 namespace lmms
 {
 
-//! Manages CLAP plugins and implements CLAP host
+
+//! Manages loaded .clap files, plugin info, and plugin instances
 class ClapManager
 {
 public:
 	ClapManager();
 	~ClapManager();
 
-	// For iterating over m_uriToPluginInfo
-	auto begin() const { return m_uriToPluginInfo.cbegin(); }
-	auto end() const { return m_uriToPluginInfo.cend(); }
+	//! Allows access to loaded .clap files
+	auto files() const -> const std::vector<ClapFile>& { return m_files; }
 
-	auto getPluginInfo() const -> const std::vector<const ClapPluginInfo*>& { return m_pluginInfo; }
-	auto getInstances() const -> const std::vector<ClapInstance>& { return m_instances; }
+	/**
+	 * Returns a cached plugin info vector
+	 * ClapManager doesn't own the ClapPluginInfo objects, so pointers may be invalidated.
+	*/
+	auto pluginInfo() const -> const std::vector<std::weak_ptr<const ClapPluginInfo>>& { return m_pluginInfo; }
 
-	//! Return descriptor with URI @p uri or nullptr if none exists
-	auto getPluginInfo(const std::string& uri) -> const ClapPluginInfo*;
-	//! Return descriptor with URI @p uri or nullptr if none exists
-	auto getPluginInfo(const QString& uri) -> const ClapPluginInfo*;
+	/**
+	 * Returns a cached URI-to-PluginInfo map
+	 * ClapManager doesn't own the ClapPluginInfo objects, so pointers may be invalidated.
+	*/
+	auto uriPluginInfo() const -> const std::unordered_map<std::string, std::weak_ptr<const ClapPluginInfo>>& { return m_uriToPluginInfo; }
 
-	void initPlugins(); //!< Called by Engine at LMMS startup
+	//! Allows access to plugin instances
+	auto instances() const -> const std::vector<std::shared_ptr<ClapInstance>>& { return m_instances; }
 
-	void unload(ClapFile* file);
+	//! Return plugin info with URI @p uri or nullptr if none exists
+	auto getPluginInfo(const std::string& uri) -> std::weak_ptr<const ClapPluginInfo>;
+	//! Return plugin info with URI @p uri or nullptr if none exists
+	auto getPluginInfo(const QString& uri) -> std::weak_ptr<const ClapPluginInfo>;
 
-	static bool kDebug; //!< If set, debug output will be printed
+	//! Called by Engine at LMMS startup
+	void initPlugins();
+
+	//! Creates a plugin instance given plugin info; Plugin instance is owned by ClapManager
+	auto createInstance(const ClapPluginInfo* info) -> std::weak_ptr<ClapPluginInstance>;
+
+	static bool kDebug; //!< If LMMS_CLAP_DEBUG is set, debug output will be printed
 
 private:
 
 	std::vector<std::filesystem::path> m_searchPaths; //!< Owns all CLAP search paths; Populated by findSearchPaths()
-	std::vector<ClapFile> m_clapFiles; //!< Owns all loaded .clap files; Populated by findClapFiles()
-	std::vector<ClapInstance> m_instances; //!< Owns all fully initialized CLAP host/plugin instance pairs
+	std::vector<ClapFile> m_files; //!< Owns all loaded .clap files; Populated by loadClapFiles()
+	std::vector<std::shared_ptr<ClapInstance>> m_instances; //!< Owns all fully initialized CLAP host/plugin instance pairs
 
 	// Non-owning plugin caches (for fast iteration/lookup)
-	std::vector<const ClapPluginInfo*> m_pluginInfo; //!< Non-owning vector of info for all successfully loaded CLAP plugins
-	std::unordered_map<std::string, const ClapPluginInfo*> m_uriToPluginInfo; //!< Non-owning map of plugin URIs (IDs) to ClapPluginInfo
+	std::vector<std::weak_ptr<const ClapPluginInfo>> m_pluginInfo; //!< Non-owning vector of info for all successfully loaded CLAP plugins
+	std::unordered_map<std::string, std::weak_ptr<const ClapPluginInfo>> m_uriToPluginInfo; //!< Non-owning map of plugin URIs (IDs) to ClapPluginInfo // TODO: Any changes to m_instances must be done here too
+	//std::unordered_multimap<std::string, std::string_ptr<ClapPluginInstance>> m_uriToPluginInstance; //!< Non-owning map of plugin URIs (IDs) to ClapPluginInstances
 	//std::vector<const clap_plugin_t*> m_plugins; //!< Non-owning vector of all CLAP plugin instances
 
 	//! Finds all CLAP search paths and populates m_searchPaths
@@ -84,11 +101,9 @@ private:
 	auto getSearchPaths() const -> const std::vector<std::filesystem::path>& { return m_searchPaths; }
 
 	//! Finds and loads all .clap files in the provided search paths @p searchPaths
-	void findClapFiles(const std::vector<std::filesystem::path>& searchPaths);
-
-	//! Returns ClapFile vector found by prior call to findClapFiles()
-	auto getFiles() const -> const std::vector<ClapFile>& { return m_clapFiles; }
+	void loadClapFiles(const std::vector<std::filesystem::path>& searchPaths);
 };
+
 
 
 } // namespace lmms

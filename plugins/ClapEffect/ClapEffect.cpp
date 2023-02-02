@@ -29,6 +29,8 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+#include <memory>
+
 namespace lmms
 {
 
@@ -67,15 +69,15 @@ bool ClapEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 	// TODO
 
-	///m_controls.copyBuffersFromLmms(buf, frames);
-	///m_controls.copyModelsFromLmms();
+	//m_controls.copyBuffersFromLmms(buf, frames);
+	//m_controls.copyModelsFromLmms();
 
 //	m_pluginMutex.lock();
-	///m_controls.run(frames);
+	//m_controls.run(frames);
 //	m_pluginMutex.unlock();
 
-	///m_controls.copyModelsToLmms();
-	///m_controls.copyBuffersToLmms(m_tempOutputSamples.data(), frames);
+	//m_controls.copyModelsToLmms();
+	//m_controls.copyBuffersToLmms(m_tempOutputSamples.data(), frames);
 
 	double outSum = 0.0;
 	bool corrupt = wetLevel() < 0.f; // #3261 - if w < 0, bash w := 0, d := 1
@@ -102,9 +104,10 @@ extern "C"
 PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* _parent, void* _data)
 {
 	using KeyType = Plugin::Descriptor::SubPluginFeatures::Key;
-	auto eff = new ClapEffect(_parent, static_cast<const KeyType*>(_data));
-	if (!eff->isValid()) { delete eff; eff = nullptr; }
-	return eff;
+	auto effect = std::make_unique<ClapEffect>(_parent, static_cast<const KeyType*>(_data));
+	if (!effect || !effect->isValid())
+		return nullptr;
+	return effect.release();
 }
 
 }

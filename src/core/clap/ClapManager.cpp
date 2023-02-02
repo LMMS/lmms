@@ -77,14 +77,11 @@ ClapManager::ClapManager()
 
 ClapManager::~ClapManager()
 {
-	//if (ClapManager::kDebug)
-	//	qDebug() << "ClapManager::~ClapManager()";
-
 	// Deactivate and destroy plugin instances first
 	m_instances.clear();
 
 	// Then deinit the .clap files and unload the shared libraries
-	m_clapFiles.clear();
+	m_files.clear();
 }
 
 void ClapManager::initPlugins()
@@ -92,7 +89,18 @@ void ClapManager::initPlugins()
 	findSearchPaths();
 	if (kDebug)
 		qDebug() << "Found .clap files:";
-	findClapFiles(getSearchPaths());
+	loadClapFiles(getSearchPaths());
+
+	// TEMPORARY: Testing purposes
+	for (const auto& file : files())
+	{
+		for (auto& plugin : file.pluginInfo())
+		{
+			qDebug() << plugin->getDescriptor()->name;
+			auto& test = m_instances.emplace_back(std::make_shared<ClapInstance>(plugin.get()));
+			test->load();
+		}
+	}
 }
 
 void ClapManager::findSearchPaths()
@@ -189,14 +197,15 @@ void ClapManager::findSearchPaths()
 	}
 }
 
-void ClapManager::findClapFiles(const std::vector<std::filesystem::path>& searchPaths)
+void ClapManager::loadClapFiles(const std::vector<std::filesystem::path>& searchPaths)
 {
-	if (!m_clapFiles.empty())
+	if (!m_files.empty())
 		return; // Cannot unload CLAP plugins yet
 
 	m_instances.clear();
-	m_clapFiles.clear();
+	m_files.clear();
 	m_uriToPluginInfo.clear();
+	m_pluginInfo.clear();
 
 	QElapsedTimer timer;
 	timer.start();
@@ -216,31 +225,42 @@ void ClapManager::findClapFiles(const std::vector<std::filesystem::path>& search
 			if (kDebug)
 				qDebug() << "-" << entryPath.c_str();
 
-			auto& clapFile = m_clapFiles.emplace_back(this, std::move(entryPath));
+			auto& clapFile = m_files.emplace_back(this, std::move(entryPath));
 			clapFile.load();
 			if (!clapFile.isValid())
 			{
 				qWarning() << "Failed to load .clap file";
-				m_clapFiles.pop_back(); // Remove/unload invalid clap file
+				m_files.pop_back(); // Remove/unload invalid clap file
 				continue;
 			}
 
+			bool purgeNeeded = false;
 			totalClapPlugins += clapFile.getPluginCount();
-			for (const auto& plugin : clapFile.getPluginInfo())
+			for (const auto& plugin : clapFile.pluginInfo())
 			{
-				m_pluginInfo.push_back(&plugin);
-				m_uriToPluginInfo.emplace(std::string{plugin.getDescriptor()->id}, &plugin); // TODO: Does this pointer remain valid after clapFile is moved?
-				auto& test = m_instances.emplace_back(&plugin); // TEMPORARY: Testing purposes
-				test.load();
+				auto [ignore, added] = m_uriToPluginInfo.emplace(std::string{plugin->getDescriptor()->id}, std::weak_ptr{plugin});
+				if (!added)
+				{
+					qWarning().nospace() << "The CLAP plugin ID '" << plugin->getDescriptor()->id
+						<< "' is identical to an ID in a previously loaded plugin file: '"
+						<< entryPath.c_str() <<  "'. Skipping the duplicate CLAP plugin.";
+					plugin->invalidate();
+					purgeNeeded = true;
+					continue;
+				}
+				m_pluginInfo.push_back(plugin);
 			}
+
+			if (purgeNeeded)
+				clapFile.purgeInvalidPlugins();
 		}
 	}
 
 	qDebug() << "CLAP plugin SUMMARY:"
-		<< m_clapFiles.size() << "of" << totalClapFiles << ".clap files containing"
+		<< m_files.size() << "of" << totalClapFiles << ".clap files containing"
 		<< m_pluginInfo.size() << "of" << totalClapPlugins
 		<< "CLAP plugins loaded in" << timer.elapsed() << "msecs.";
-	if (m_clapFiles.size() != totalClapFiles || m_pluginInfo.size() != totalClapPlugins)
+	if (m_files.size() != totalClapFiles || m_pluginInfo.size() != totalClapPlugins)
 	{
 		if (kDebug)
 		{
@@ -258,52 +278,13 @@ void ClapManager::findClapFiles(const std::vector<std::filesystem::path>& search
 	}
 }
 
-void ClapManager::unload(ClapFile* file)
-{
-	// This method deactivates and destroys any plugins from the given file,
-	// then clears any values left in the cache, then deinits and unloads
-	// the .clap shared library.
-
-	// TODO: Could be dangerous to call this method if LMMS is not shutting down
-/*
-	// Clear from m_pluginInfo cache
-	m_pluginInfo.erase(std::remove_if(
-		m_pluginInfo.begin(), m_pluginInfo.end(),
-		[file](const ClapPluginInfo* pi){
-			return pi->getFile() == file;
-		}
-	));
-
-	// Clear from m_uriToPluginInfo cache
-	m_uriToPluginInfo.erase(std::remove_if(
-		m_uriToPluginInfo.begin(), m_uriToPluginInfo.end(),
-		[file](const auto& mapPair){
-			return mapPair->second->getFile() == file;
-		}
-	));
-
-	// Destroy CLAP instances then remove from m_instances.
-	// ClapInstance destructor deactivates and destroys plugin instances
-	m_instances.erase(std::remove_if(
-		m_instances.begin(), m_instances.end(),
-		[file](ClapInstance& inst) -> bool {
-			return inst.getPluginInfo().getFile() == file;
-		}
-	));
-
-	// Remove CLAP file from vector.
-	// ClapFile destructor handles cleanup and unloads shared library
-	m_clapFiles.erase(std::remove(m_clapFiles.begin(), m_clapFiles.end(), file));
-	*/
-}
-
-auto ClapManager::getPluginInfo(const std::string& uri) -> const ClapPluginInfo*
+auto ClapManager::getPluginInfo(const std::string& uri) -> std::weak_ptr<const ClapPluginInfo>
 {
 	const auto iter = m_uriToPluginInfo.find(uri);
-	return iter != m_uriToPluginInfo.end() ? iter->second : nullptr;
+	return iter != m_uriToPluginInfo.end() ? iter->second : std::weak_ptr<const ClapPluginInfo>{};
 }
 
-auto ClapManager::getPluginInfo(const QString& uri) -> const ClapPluginInfo*
+auto ClapManager::getPluginInfo(const QString& uri) -> std::weak_ptr<const ClapPluginInfo>
 {
 	return getPluginInfo(uri.toStdString());
 }

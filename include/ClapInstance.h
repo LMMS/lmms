@@ -42,19 +42,19 @@ namespace lmms
  * @brief ClapInstance stores a CLAP host/plugin instance pair.
  *
  * When a new CLAP plugin instance is created by the ClapManager,
- * a new CLAP host instance needs to be passed to the plugin instance,
+ * a new clap_host instance needs to be passed to the plugin instance,
  * creating a CLAP host instance / CLAP plugin instance pair.
  * The plugin instance will pass the host pointer whenever it calls the
  * host's API (instead of passing the plugin pointer), and that is how
  * the host instance can know which plugin instance called the host API.
  * 
- * The ClapInstance::Host class implements the CLAP host API and
- *     stores the pointer to the clap_host_t object.
+ * The ClapInstance class implements the CLAP host API and
+ *     stores the pointer to the clap_host object.
  * The ClapInstance::Plugin class provides access to the plugin instance
- *     for making plugin API calls
+ *     for making plugin API calls. TODO: Merge into ClapInstance?
  *
- * Every ClapInstance is owned by the ClapManager, though other classes may
- * work with non-owned references borrowed from the ClapManager.
+ * Every ClapInstance is owned by the ClapManager, though other classes
+ * may borrow from the ClapManager.
  */
 class ClapInstance
 {
@@ -64,46 +64,13 @@ public:
 	ClapInstance(const ClapInstance&) = delete;
 	ClapInstance& operator=(const ClapInstance&) = delete;
 	ClapInstance(ClapInstance&& other) noexcept;
-	ClapInstance& operator=(ClapInstance&& rhs) noexcept;
+	ClapInstance& operator=(ClapInstance&& rhs) noexcept = delete;
 	~ClapInstance();
 
-	//! Host instance
-	class Host
-	{
-	public:
-		//! Creates a clap_host host instance
-		Host() = delete;
-		Host(const ClapInstance* parent);
-		Host(const Host&) = delete;
-		Host& operator=(const Host&) = delete;
-		Host(Host&& other) noexcept;
-		Host& operator=(Host&& rhs) noexcept;
-		~Host();
+	void hostDestroy();
 
-		void destroy();
-		auto getHost() const -> const clap_host* { return &m_host; }
-		auto getPlugin() const -> const clap_plugin*;
-		auto isValid() const -> bool { return true; }
-
-		//! Executes tasks in idle queue
-		void idle();
-
-	private:
-
-		void setHost();
-		void pushToIdleQueue(std::function<bool()>&& functor);
-
-		static Host* fromHost(const clap_host* host);
-		static auto getExtension(const clap_host* host, const char* extension_id) -> const void*;
-		static void requestCallback(const clap_host* host);
-		static void requestProcess(const clap_host* host);
-		static void requestRestart(const clap_host* host);
-
-		const ClapInstance* m_parent;
-		clap_host m_host;
-
-		std::queue<std::function<bool()>> m_idleQueue;
-	};
+	//! Executes tasks in idle queue
+	void hostIdle();
 
 	//! Destroy the plugin instance
 	void destroy();
@@ -111,18 +78,39 @@ public:
 	//! Loads/reloads the plugin instance
 	void load();
 
-	auto getHost() const -> const clap_host* { return m_host.getHost(); }
+	auto getHost() const -> const clap_host* { return &m_host; }
 	auto getPlugin() const -> const clap_plugin* { return m_plugin != nullptr ? m_plugin->getPlugin() : nullptr; }
-	auto getHostInstance() const -> const Host& { return m_host; }
-	auto getPluginInstance() const -> const ClapPluginInstance* { return m_plugin.get(); }
+	auto getPluginInstance() const -> std::weak_ptr<ClapPluginInstance> { return m_plugin; }
+
+	//! The value obtained may become invalid later, so do not store it
 	auto getPluginInfo() const -> const ClapPluginInfo& { return *m_pluginInfo; }
 	auto isValid() const -> bool;
 
 private:
-	Host m_host; //!< Host instance
-	std::unique_ptr<ClapPluginInstance> m_plugin; //!< Plugin instance
 
-	const ClapPluginInfo* m_pluginInfo; //!< Never null
+	/**
+	 * Host-related methods
+	 */
+	void setHost();
+	void hostPushToIdleQueue(std::function<bool()>&& functor);
+	static auto fromHost(const clap_host* host) -> ClapInstance*;
+	static auto hostGetExtension(const clap_host* host, const char* extension_id) -> const void*;
+	static void hostRequestCallback(const clap_host* host);
+	static void hostRequestProcess(const clap_host* host);
+	static void hostRequestRestart(const clap_host* host);
+
+	/**
+	 * Host-related member variables
+	 */
+	clap_host m_host;
+	std::queue<std::function<bool()>> m_idleQueue;
+
+	/**
+	 * Misc.
+	 */
+	std::shared_ptr<ClapPluginInstance> m_plugin; //!< Plugin instance
+	const ClapPluginInfo* m_pluginInfo; // TODO: Use weak_ptr instead?
+	//std::weak_ptr<const ClapPluginInfo> m_pluginInfo;
 };
 
 }
