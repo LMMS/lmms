@@ -91,6 +91,7 @@ Song::Song() :
 	m_isCancelled( false ),
 	m_playMode( Mode_None ),
 	m_length( 0 ),
+	m_shouldUpdateLength( true ),
 	m_midiClipToPlay( nullptr ),
 	m_loopMidiClip( false ),
 	m_elapsedTicks( 0 ),
@@ -115,6 +116,10 @@ Song::Song() :
 			this, SLOT(masterVolumeChanged()), Qt::DirectConnection );
 /*	connect( &m_masterPitchModel, SIGNAL(dataChanged()),
 			this, SLOT(masterPitchChanged()));*/
+			
+	QTimer *timer = new QTimer(this);
+	connect(timer, &QTimer::timeout, [this](){Song::checkUpdateLength();});
+	timer->start(1000.f / 60.f);
 
 	qRegisterMetaType<lmms::Note>( "lmms::Note" );
 	setType( SongContainer );
@@ -566,6 +571,20 @@ void Song::playMidiClip( const MidiClip* midiClipToPlay, bool loop )
 
 void Song::updateLength()
 {
+	m_shouldUpdateLength = true;
+}
+
+void Song::checkUpdateLength()
+{
+	if (m_shouldUpdateLength)
+	{
+		m_shouldUpdateLength = false;
+		recalcLength();
+	}
+}
+
+void Song::recalcLength()
+{
 	m_length = 0;
 	m_tracksMutex.lockForRead();
 	for (auto track : tracks())
@@ -576,14 +595,14 @@ void Song::updateLength()
 		}
 
 		const bar_t cur = track->length();
-		if( cur > m_length )
+		if (cur > m_length)
 		{
 			m_length = cur;
 		}
 	}
 	m_tracksMutex.unlock();
 
-	emit lengthChanged( m_length );
+	emit lengthChanged(m_length);
 }
 
 
@@ -716,7 +735,7 @@ void Song::startExport()
 	stop();
 
 	m_exporting = true;
-	updateLength();
+	recalcLength();
 
 	if (m_renderBetweenMarkers)
 	{

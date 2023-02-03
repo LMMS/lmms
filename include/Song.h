@@ -276,6 +276,7 @@ public:
 	}
 
 	void updateLength();
+	void recalcLength();
 	bar_t length() const
 	{
 		return m_length;
@@ -390,6 +391,8 @@ public slots:
 	void clearProject();
 
 	void addPatternTrack();
+	
+	void checkUpdateLength();
 
 
 private slots:
@@ -485,6 +488,7 @@ private:
 	PlayModes m_playMode;
 	PlayPos m_playPos[Mode_Count];
 	bar_t m_length;
+	bool m_shouldUpdateLength;
 
 	const MidiClip* m_midiClipToPlay;
 	bool m_loopMidiClip;
