@@ -145,7 +145,7 @@ bool HydrogenImport::readSong()
 	int song_num_tracks = s->tracks().size();
 	if ( QFile( filename ).exists() == false ) 
 	{
-		printf( "Song file not found \n" );
+		printf( "Song file not found\n" );
 		return false;
 	}
 	QDomDocument doc = LocalFileMng::openXmlDocument( filename );
