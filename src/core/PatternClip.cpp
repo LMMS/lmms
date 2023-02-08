@@ -78,7 +78,7 @@ void PatternClip::loadSettings(const QDomElement& element)
 		movePosition( element.attribute( "pos" ).toInt() );
 	}
 	changeLength( element.attribute( "len" ).toInt() );
-	if( element.attribute( "muted" ).toInt() != isMuted() )
+	if( (bool)element.attribute( "muted" ).toInt() != isMuted() )
 	{
 		toggleMute();
 	}
