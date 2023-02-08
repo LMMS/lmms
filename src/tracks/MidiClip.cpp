@@ -424,7 +424,7 @@ void MidiClip::loadSettings( const QDomElement & _this )
 	{
 		movePosition( _this.attribute( "pos" ).toInt() );
 	}
-	if( _this.attribute( "muted" ).toInt() != isMuted() )
+	if( (bool)_this.attribute( "muted" ).toInt() != isMuted() )
 	{
 		toggleMute();
 	}
