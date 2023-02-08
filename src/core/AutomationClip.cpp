@@ -189,7 +189,7 @@ const AutomatableModel * AutomationClip::firstObject() const
 		return model;
 	}
 
-	static FloatModel fm(0, DEFAULT_MIN_VALUE, DEFAULT_MAX_VALUE, 0.001);
+	static FloatModel fm(0, DEFAULT_MIN_VALUE, DEFAULT_MAX_VALUE, 0.001f);
 	return &fm;
 }
 
