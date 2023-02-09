@@ -66,6 +66,6 @@ if [[ "$TX" == "y" || "$TX" == "Y" ]]; then
   upload_to_tx
 fi
 
-abinfo "No upload as required."
+abinfo "No upload is required."
 
 exit 0
