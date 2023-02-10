@@ -135,7 +135,7 @@ void ControllerView::closeControls()
 
 void ControllerView::deleteController()
 {
-	emit( deleteController( this ) );
+	emit deleteController( this );
 }
 
 void ControllerView::renameController()
