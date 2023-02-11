@@ -185,7 +185,7 @@ bool HydrogenImport::readSong()
 			float fPan_R = LocalFileMng::readXmlFloat( instrumentNode, "pan_R", 0.5 );	// pan R
 
 			if ( sId.isEmpty() ) {
-				printf( "Empty ID for instrument. skipping \n" );
+				printf( "Empty ID for instrument. skipping\n" );
 				instrumentNode = (QDomNode) instrumentNode.nextSiblingElement( "instrument" );
 				continue;
 			}
