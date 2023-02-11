@@ -243,7 +243,7 @@ void Lv2Manager::initPlugins()
 	}
 
 	qDebug() << "Lv2 plugin SUMMARY:"
-		<< pluginsLoaded << "of" << pluginCount << " loaded in"
+		<< pluginsLoaded << "of" << pluginCount << "loaded in"
 		<< timer.elapsed() << "msecs.";
 	if(pluginsLoaded != pluginCount)
 	{
