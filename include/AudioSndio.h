@@ -56,7 +56,7 @@ public:
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget", "sndio" );
+		return QT_TRANSLATE_NOOP("lmms::gui::AudioDeviceSetupWidget", "sndio");
 	}
 
 	class setupWidget : public gui::AudioDeviceSetupWidget

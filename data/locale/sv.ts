@@ -1,6 +1,6 @@
 <?xml version="1.0" ?><!DOCTYPE TS><TS language="sv" version="2.1">
 <context>
-    <name>AboutDialog</name>
+    <name>lmms::gui::AboutDialog</name>
     <message>
         <location filename="../../src/gui/modals/about_dialog.ui" line="20"/>
         <source>About LMMS</source>
@@ -70,7 +70,7 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     </message>
 </context>
 <context>
-    <name>AmplifierControlDialog</name>
+    <name>lmms::gui::AmplifierControlDialog</name>
     <message>
         <location filename="../../plugins/Amplifier/AmplifierControlDialog.cpp" line="47"/>
         <source>VOL</source>
@@ -113,7 +113,7 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     </message>
 </context>
 <context>
-    <name>AmplifierControls</name>
+    <name>lmms::AmplifierControls</name>
     <message>
         <location filename="../../plugins/Amplifier/AmplifierControls.cpp" line="38"/>
         <source>Volume</source>
@@ -136,7 +136,7 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     </message>
 </context>
 <context>
-    <name>AudioAlsaSetupWidget</name>
+    <name>lmms::gui::AudioAlsaSetupWidget</name>
     <message>
         <location filename="../../src/gui/AudioAlsaSetupWidget.cpp" line="68"/>
         <source>DEVICE</source>
@@ -149,7 +149,7 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     </message>
 </context>
 <context>
-    <name>AudioFileProcessorView</name>
+    <name>lmms::gui::AudioFileProcessorView</name>
     <message>
         <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="470"/>
         <source>Open sample</source>
@@ -202,7 +202,7 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     </message>
 </context>
 <context>
-    <name>AudioFileProcessorWaveView</name>
+    <name>lmms::gui::AudioFileProcessorWaveView</name>
     <message>
         <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="986"/>
         <source>Sample length:</source>
@@ -210,7 +210,7 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     </message>
 </context>
 <context>
-    <name>AudioJack</name>
+    <name>lmms::AudioJack</name>
     <message>
         <location filename="../../src/core/audio/AudioJack.cpp" line="107"/>
         <source>JACK client restarted</source>
@@ -243,7 +243,7 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     </message>
 </context>
 <context>
-    <name>AudioOss</name>
+    <name>lmms::AudioOss</name>
     <message>
         <location filename="../../src/core/audio/AudioOss.cpp" line="330"/>
         <source>Device</source>
@@ -256,7 +256,7 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     </message>
 </context>
 <context>
-    <name>AudioPortAudio::setupWidget</name>
+    <name>lmms::gui::AudioDeviceSetupWidget</name>
     <message>
         <location filename="../../src/core/audio/AudioPortAudio.cpp" line="415"/>
         <source>Backend</source>
@@ -269,7 +269,7 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     </message>
 </context>
 <context>
-    <name>AudioPulseAudio</name>
+    <name>lmms::AudioPulseAudio</name>
     <message>
         <location filename="../../src/core/audio/AudioPulseAudio.cpp" line="317"/>
         <source>Device</source>
@@ -282,7 +282,7 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     </message>
 </context>
 <context>
-    <name>AudioSdl::setupWidget</name>
+    <name>lmms::gui::AudioDeviceSetupWidget</name>
     <message>
         <location filename="../../src/core/audio/AudioSdl.cpp" line="331"/>
         <source>Device</source>
@@ -290,7 +290,7 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     </message>
 </context>
 <context>
-    <name>AudioSndio</name>
+    <name>lmms::AudioSndio</name>
     <message>
         <location filename="../../src/core/audio/AudioSndio.cpp" line="196"/>
         <source>Device</source>
@@ -303,7 +303,7 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     </message>
 </context>
 <context>
-    <name>AudioSoundIo::setupWidget</name>
+    <name>lmms::gui::AudioDeviceSetupWidget</name>
     <message>
         <location filename="../../src/core/audio/AudioSoundIo.cpp" line="458"/>
         <source>Backend</source>
@@ -316,7 +316,7 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     </message>
 </context>
 <context>
-    <name>AutomatableModel</name>
+    <name>lmms::AutomatableModel</name>
     <message>
         <location filename="../../src/gui/AutomatableModelView.cpp" line="59"/>
         <source>&amp;Reset (%1%2)</source>
@@ -379,7 +379,7 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     </message>
 </context>
 <context>
-    <name>AutomationEditor</name>
+    <name>lmms::gui::AutomationEditor</name>
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="409"/>
         <source>Edit Value</source>
@@ -402,7 +402,7 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     </message>
 </context>
 <context>
-    <name>AutomationEditorWindow</name>
+    <name>lmms::gui::AutomationEditorWindow</name>
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="1835"/>
         <source>Play/pause current clip (Space)</source>
@@ -517,7 +517,7 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     </message>
 </context>
 <context>
-    <name>AutomationClip</name>
+    <name>lmms::AutomationClip</name>
     <message>
         <location filename="../../src/core/AutomationClip.cpp" line="866"/>
         <source>Drag a control while pressing &lt;%1&gt;</source>
@@ -525,7 +525,7 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     </message>
 </context>
 <context>
-    <name>AutomationClipView</name>
+    <name>lmms::gui::AutomationClipView</name>
     <message>
         <location filename="../../src/gui/clips/AutomationClipView.cpp" line="173"/>
         <source>Open in Automation editor</source>
@@ -578,7 +578,7 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     </message>
 </context>
 <context>
-    <name>AutomationTrack</name>
+    <name>lmms::AutomationTrack</name>
     <message>
         <location filename="../../src/tracks/AutomationTrack.cpp" line="34"/>
         <source>Automation track</source>
@@ -586,7 +586,7 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     </message>
 </context>
 <context>
-    <name>PatternEditor</name>
+    <name>lmms::gui::PatternEditor</name>
     <message>
         <location filename="../../src/gui/editors/PatternEditor.cpp" line="49"/>
         <source>Beat+Bassline Editor</source>
@@ -649,7 +649,7 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     </message>
 </context>
 <context>
-    <name>PatternClipView</name>
+    <name>lmms::gui::PatternClipView</name>
     <message>
         <location filename="../../src/gui/clips/PatternClipView.cpp" line="53"/>
         <source>Open in Beat+Bassline-Editor</source>
@@ -667,7 +667,7 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     </message>
 </context>
 <context>
-    <name>PatternTrack</name>
+    <name>lmms::PatternTrack</name>
     <message>
         <location filename="../../src/tracks/PatternTrack.cpp" line="45"/>
         <source>Beat/Bassline %1</source>
@@ -680,7 +680,7 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     </message>
 </context>
 <context>
-    <name>BassBoosterControlDialog</name>
+    <name>lmms::gui::BassBoosterControlDialog</name>
     <message>
         <location filename="../../plugins/BassBooster/BassBoosterControlDialog.cpp" line="49"/>
         <source>FREQ</source>
@@ -713,7 +713,7 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     </message>
 </context>
 <context>
-    <name>BassBoosterControls</name>
+    <name>lmms::BassBoosterControls</name>
     <message>
         <location filename="../../plugins/BassBooster/BassBoosterControls.cpp" line="36"/>
         <source>Frequency</source>
@@ -731,7 +731,7 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     </message>
 </context>
 <context>
-    <name>BitcrushControlDialog</name>
+    <name>lmms::gui::BitcrushControlDialog</name>
     <message>
         <location filename="../../plugins/Bitcrush/BitcrushControlDialog.cpp" line="47"/>
         <source>IN</source>
@@ -830,7 +830,7 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     </message>
 </context>
 <context>
-    <name>BitcrushControls</name>
+    <name>lmms::BitcrushControls</name>
     <message>
         <location filename="../../plugins/Bitcrush/BitcrushControls.cpp" line="37"/>
         <source>Input gain</source>
@@ -878,1335 +878,7 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     </message>
 </context>
 <context>
-    <name>CarlaAboutW</name>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="14"/>
-        <source>About Carla</source>
-        <translation>Om Carla</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="24"/>
-        <source>About</source>
-        <translation>Om</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="30"/>
-        <source>About text here</source>
-        <translation>Om-text här</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="102"/>
-        <source>Extended licensing here</source>
-        <translation>Utökad licensiering här</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="113"/>
-        <source>Artwork</source>
-        <translation>Bilder</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="144"/>
-        <source>Using KDE Oxygen icon set, designed by Oxygen Team.</source>
-        <translation>Använder KDE:s Oxygen ikonuppsättning, designad av Oxygen-gruppen.</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="230"/>
-        <source>Contains some knobs, backgrounds and other small artwork from Calf Studio Gear, OpenAV and OpenOctave projects.</source>
-        <translation>Innehåller vissa rattar, bakgrunder och andra små bilder från Calf Studio Gear-, OpenAV- och OpenOctave-projekten.</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="465"/>
-        <source>VST is a trademark of Steinberg Media Technologies GmbH.</source>
-        <translation>VST är ett registrerat varumärke av Steinberg Media Technologies GmbH.</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="579"/>
-        <source>Special thanks to António Saraiva for a few extra icons and artwork!</source>
-        <translation>Speciellt tack till António Saraiva för ett antal extra ikoner och bilder!</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="589"/>
-        <source>The LV2 logo has been designed by Thorsten Wilms, based on a concept from Peter Shorthose.</source>
-        <translation>LV2-logotypen har designats av Thorsten Wilms, baserat på ett koncept från Peter Shorthose.</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="605"/>
-        <source>MIDI Keyboard designed by Thorsten Wilms.</source>
-        <translation>MIDI-keyboard designad av Thorsten Wilms.</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="647"/>
-        <source>Carla, Carla-Control and Patchbay icons designed by DoosC.</source>
-        <translation>Ikoner för Carla, Carla-styrning och kopplingsplint designade av DoosC.</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="671"/>
-        <source>Features</source>
-        <translation>Funktioner</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="677"/>
-        <source>AU/AudioUnit:</source>
-        <translation>AU/AudioUnit:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="697"/>
-        <source>LADSPA:</source>
-        <translation>LADSPA:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="716"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="774"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="806"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="825"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="929"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="942"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="1015"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="1022"/>
-        <source>TextLabel</source>
-        <translation>TextLabel</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="742"/>
-        <source>VST2:</source>
-        <translation>VST2:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="755"/>
-        <source>DSSI:</source>
-        <translation>DSSI:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="787"/>
-        <source>LV2:</source>
-        <translation>LV2:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="916"/>
-        <source>VST3:</source>
-        <translation>VST3:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="956"/>
-        <source>OSC</source>
-        <translation>OSC</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="962"/>
-        <source>Host URLs:</source>
-        <translation>Värd-URL:er:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="982"/>
-        <source>Valid commands:</source>
-        <translation>Giltiga kommandon:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="992"/>
-        <source>valid osc commands here</source>
-        <translation>giltiga osc-kommandon här</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="1005"/>
-        <source>Example:</source>
-        <translation>Exempel:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="1072"/>
-        <source>License</source>
-        <translation>Licens</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="1081"/>
-        <source>                    GNU GENERAL PUBLIC LICENSE
-                       Version 2, June 1991
-
- Copyright (C) 1989, 1991 Free Software Foundation, Inc.,
- 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- Everyone is permitted to copy and distribute verbatim copies
- of this license document, but changing it is not allowed.
-
-                            Preamble
-
-  The licenses for most software are designed to take away your
-freedom to share and change it.  By contrast, the GNU General Public
-License is intended to guarantee your freedom to share and change free
-software--to make sure the software is free for all its users.  This
-General Public License applies to most of the Free Software
-Foundation's software and to any other program whose authors commit to
-using it.  (Some other Free Software Foundation software is covered by
-the GNU Lesser General Public License instead.)  You can apply it to
-your programs, too.
-
-  When we speak of free software, we are referring to freedom, not
-price.  Our General Public Licenses are designed to make sure that you
-have the freedom to distribute copies of free software (and charge for
-this service if you wish), that you receive source code or can get it
-if you want it, that you can change the software or use pieces of it
-in new free programs; and that you know you can do these things.
-
-  To protect your rights, we need to make restrictions that forbid
-anyone to deny you these rights or to ask you to surrender the rights.
-These restrictions translate to certain responsibilities for you if you
-distribute copies of the software, or if you modify it.
-
-  For example, if you distribute copies of such a program, whether
-gratis or for a fee, you must give the recipients all the rights that
-you have.  You must make sure that they, too, receive or can get the
-source code.  And you must show them these terms so they know their
-rights.
-
-  We protect your rights with two steps: (1) copyright the software, and
-(2) offer you this license which gives you legal permission to copy,
-distribute and/or modify the software.
-
-  Also, for each author's protection and ours, we want to make certain
-that everyone understands that there is no warranty for this free
-software.  If the software is modified by someone else and passed on, we
-want its recipients to know that what they have is not the original, so
-that any problems introduced by others will not reflect on the original
-authors' reputations.
-
-  Finally, any free program is threatened constantly by software
-patents.  We wish to avoid the danger that redistributors of a free
-program will individually obtain patent licenses, in effect making the
-program proprietary.  To prevent this, we have made it clear that any
-patent must be licensed for everyone's free use or not licensed at all.
-
-  The precise terms and conditions for copying, distribution and
-modification follow.
-
-                    GNU GENERAL PUBLIC LICENSE
-   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
-
-  0. This License applies to any program or other work which contains
-a notice placed by the copyright holder saying it may be distributed
-under the terms of this General Public License.  The &quot;Program&quot;, below,
-refers to any such program or work, and a &quot;work based on the Program&quot;
-means either the Program or any derivative work under copyright law:
-that is to say, a work containing the Program or a portion of it,
-either verbatim or with modifications and/or translated into another
-language.  (Hereinafter, translation is included without limitation in
-the term &quot;modification&quot;.)  Each licensee is addressed as &quot;you&quot;.
-
-Activities other than copying, distribution and modification are not
-covered by this License; they are outside its scope.  The act of
-running the Program is not restricted, and the output from the Program
-is covered only if its contents constitute a work based on the
-Program (independent of having been made by running the Program).
-Whether that is true depends on what the Program does.
-
-  1. You may copy and distribute verbatim copies of the Program's
-source code as you receive it, in any medium, provided that you
-conspicuously and appropriately publish on each copy an appropriate
-copyright notice and disclaimer of warranty; keep intact all the
-notices that refer to this License and to the absence of any warranty;
-and give any other recipients of the Program a copy of this License
-along with the Program.
-
-You may charge a fee for the physical act of transferring a copy, and
-you may at your option offer warranty protection in exchange for a fee.
-
-  2. You may modify your copy or copies of the Program or any portion
-of it, thus forming a work based on the Program, and copy and
-distribute such modifications or work under the terms of Section 1
-above, provided that you also meet all of these conditions:
-
-    a) You must cause the modified files to carry prominent notices
-    stating that you changed the files and the date of any change.
-
-    b) You must cause any work that you distribute or publish, that in
-    whole or in part contains or is derived from the Program or any
-    part thereof, to be licensed as a whole at no charge to all third
-    parties under the terms of this License.
-
-    c) If the modified program normally reads commands interactively
-    when run, you must cause it, when started running for such
-    interactive use in the most ordinary way, to print or display an
-    announcement including an appropriate copyright notice and a
-    notice that there is no warranty (or else, saying that you provide
-    a warranty) and that users may redistribute the program under
-    these conditions, and telling the user how to view a copy of this
-    License.  (Exception: if the Program itself is interactive but
-    does not normally print such an announcement, your work based on
-    the Program is not required to print an announcement.)
-
-These requirements apply to the modified work as a whole.  If
-identifiable sections of that work are not derived from the Program,
-and can be reasonably considered independent and separate works in
-themselves, then this License, and its terms, do not apply to those
-sections when you distribute them as separate works.  But when you
-distribute the same sections as part of a whole which is a work based
-on the Program, the distribution of the whole must be on the terms of
-this License, whose permissions for other licensees extend to the
-entire whole, and thus to each and every part regardless of who wrote it.
-
-Thus, it is not the intent of this section to claim rights or contest
-your rights to work written entirely by you; rather, the intent is to
-exercise the right to control the distribution of derivative or
-collective works based on the Program.
-
-In addition, mere aggregation of another work not based on the Program
-with the Program (or with a work based on the Program) on a volume of
-a storage or distribution medium does not bring the other work under
-the scope of this License.
-
-  3. You may copy and distribute the Program (or a work based on it,
-under Section 2) in object code or executable form under the terms of
-Sections 1 and 2 above provided that you also do one of the following:
-
-    a) Accompany it with the complete corresponding machine-readable
-    source code, which must be distributed under the terms of Sections
-    1 and 2 above on a medium customarily used for software interchange; or,
-
-    b) Accompany it with a written offer, valid for at least three
-    years, to give any third party, for a charge no more than your
-    cost of physically performing source distribution, a complete
-    machine-readable copy of the corresponding source code, to be
-    distributed under the terms of Sections 1 and 2 above on a medium
-    customarily used for software interchange; or,
-
-    c) Accompany it with the information you received as to the offer
-    to distribute corresponding source code.  (This alternative is
-    allowed only for noncommercial distribution and only if you
-    received the program in object code or executable form with such
-    an offer, in accord with Subsection b above.)
-
-The source code for a work means the preferred form of the work for
-making modifications to it.  For an executable work, complete source
-code means all the source code for all modules it contains, plus any
-associated interface definition files, plus the scripts used to
-control compilation and installation of the executable.  However, as a
-special exception, the source code distributed need not include
-anything that is normally distributed (in either source or binary
-form) with the major components (compiler, kernel, and so on) of the
-operating system on which the executable runs, unless that component
-itself accompanies the executable.
-
-If distribution of executable or object code is made by offering
-access to copy from a designated place, then offering equivalent
-access to copy the source code from the same place counts as
-distribution of the source code, even though third parties are not
-compelled to copy the source along with the object code.
-
-  4. You may not copy, modify, sublicense, or distribute the Program
-except as expressly provided under this License.  Any attempt
-otherwise to copy, modify, sublicense or distribute the Program is
-void, and will automatically terminate your rights under this License.
-However, parties who have received copies, or rights, from you under
-this License will not have their licenses terminated so long as such
-parties remain in full compliance.
-
-  5. You are not required to accept this License, since you have not
-signed it.  However, nothing else grants you permission to modify or
-distribute the Program or its derivative works.  These actions are
-prohibited by law if you do not accept this License.  Therefore, by
-modifying or distributing the Program (or any work based on the
-Program), you indicate your acceptance of this License to do so, and
-all its terms and conditions for copying, distributing or modifying
-the Program or works based on it.
-
-  6. Each time you redistribute the Program (or any work based on the
-Program), the recipient automatically receives a license from the
-original licensor to copy, distribute or modify the Program subject to
-these terms and conditions.  You may not impose any further
-restrictions on the recipients' exercise of the rights granted herein.
-You are not responsible for enforcing compliance by third parties to
-this License.
-
-  7. If, as a consequence of a court judgment or allegation of patent
-infringement or for any other reason (not limited to patent issues),
-conditions are imposed on you (whether by court order, agreement or
-otherwise) that contradict the conditions of this License, they do not
-excuse you from the conditions of this License.  If you cannot
-distribute so as to satisfy simultaneously your obligations under this
-License and any other pertinent obligations, then as a consequence you
-may not distribute the Program at all.  For example, if a patent
-license would not permit royalty-free redistribution of the Program by
-all those who receive copies directly or indirectly through you, then
-the only way you could satisfy both it and this License would be to
-refrain entirely from distribution of the Program.
-
-If any portion of this section is held invalid or unenforceable under
-any particular circumstance, the balance of the section is intended to
-apply and the section as a whole is intended to apply in other
-circumstances.
-
-It is not the purpose of this section to induce you to infringe any
-patents or other property right claims or to contest validity of any
-such claims; this section has the sole purpose of protecting the
-integrity of the free software distribution system, which is
-implemented by public license practices.  Many people have made
-generous contributions to the wide range of software distributed
-through that system in reliance on consistent application of that
-system; it is up to the author/donor to decide if he or she is willing
-to distribute software through any other system and a licensee cannot
-impose that choice.
-
-This section is intended to make thoroughly clear what is believed to
-be a consequence of the rest of this License.
-
-  8. If the distribution and/or use of the Program is restricted in
-certain countries either by patents or by copyrighted interfaces, the
-original copyright holder who places the Program under this License
-may add an explicit geographical distribution limitation excluding
-those countries, so that distribution is permitted only in or among
-countries not thus excluded.  In such case, this License incorporates
-the limitation as if written in the body of this License.
-
-  9. The Free Software Foundation may publish revised and/or new versions
-of the General Public License from time to time.  Such new versions will
-be similar in spirit to the present version, but may differ in detail to
-address new problems or concerns.
-
-Each version is given a distinguishing version number.  If the Program
-specifies a version number of this License which applies to it and &quot;any
-later version&quot;, you have the option of following the terms and conditions
-either of that version or of any later version published by the Free
-Software Foundation.  If the Program does not specify a version number of
-this License, you may choose any version ever published by the Free Software
-Foundation.
-
-  10. If you wish to incorporate parts of the Program into other free
-programs whose distribution conditions are different, write to the author
-to ask for permission.  For software which is copyrighted by the Free
-Software Foundation, write to the Free Software Foundation; we sometimes
-make exceptions for this.  Our decision will be guided by the two goals
-of preserving the free status of all derivatives of our free software and
-of promoting the sharing and reuse of software generally.
-
-                            NO WARRANTY
-
-  11. BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
-FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW.  EXCEPT WHEN
-OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
-PROVIDE THE PROGRAM &quot;AS IS&quot; WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
-OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE ENTIRE RISK AS
-TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU.  SHOULD THE
-PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING,
-REPAIR OR CORRECTION.
-
-  12. IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
-WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
-REDISTRIBUTE THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES,
-INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING
-OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED
-TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY
-YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER
-PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE
-POSSIBILITY OF SUCH DAMAGES.
-
-                     END OF TERMS AND CONDITIONS
-</source>
-        <translation>  GNU GENERAL PUBLIC LICENSE
-Version 2, Juni 1991
-
-Copyright (C) 1989, 1991 Free Software Foundation, Inc.
-59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-Var och en äger kopiera och distribuera exakta kopior av detta
-licensavtal, men att ändra det är inte tillåtet.
-
-BAKGRUND
-
-De flesta programvarulicenser är skapade för att ta bort din frihet
-att ändra och dela med dig av programvaran. GNU General Public License
-är tvärtom skapad för att garantera din frihet att dela med dig av och
-förändra fri programvara -- för att försäkra att programvaran är fri för alla
-dess användare. Denna licens [General Public License] används för de
-flesta av Free Software Foundations programvaror och för alla andra
-program vars upphovsmän använder sig av General Public License. (Viss
-programvara från Free Software Foundation använder istället GNU 
-Library General Public License.) Du kan använda licensen för dina program.
-
-När vi talar om fri programvara syftar vi på frihet och inte på pris. 
-Våra [General Public License-] licenser är skapade för att garantera din
-rätt distribuera och sprida kopior av fri programvara (och ta betalt för
-denna tjänst om du önskar), att garantera att du får källkoden till
-programvaran eller kan få den om du så önskar, att garantera att du 
-kan ändra och modifiera programvaran eller använda dess delar i ny fri
-programvara samt slutligen att garantera att du är medveten om dessa
-rättigheter.
-
-För att skydda dina rättigheter, måste vi begränsa var och ens möjlighet
-att hindra dig från att använda dig av dessa rättigheter samt från att kräva
-att du ger upp dessa rättigheter. Dessa begränsningar motsvaras av en
-förpliktelse för dig om du distribuerar kopior av programvaran eller om du
-ändrar eller modifierar programvaran.
-
-Om du exempelvis distribuerar kopior av en fri programvara, oavsett om
-du gör det gratis eller mot en avgift, måste du ge mottagaren alla de
-rättigheter du själv har. Du måste också tillse att mottagaren får källkoden
-eller kan få den om mottagaren så önskar. Du måste också visa dessa
-licensvillkor för mottagaren så att mottagaren känner till sina rättigheter.
-
-Vi skyddar dina rättigheter i två steg: (1) upphovsrätt till programvaran
-och (2) dessa licensvillkor som ger dig rätt att kopiera, distribuera och eller
-ändra programvaran.
-
-För varje upphovsmans säkerhet och vår säkerhet vill vi för tydlighets skull
-klargöra att det inte lämnas några garantier för denna fria programvara. Om
-programvaran förändras av någon annan än upphovsmannen vill vi klargöra för
-mottagaren att det som mottagaren har är inte originalversionen av
-programvaran och att förändringar av och felaktigheter i programvaran inte skall
-belasta den ursprunglige upphovsmannen.
-
-Slutligen skall det sägas att all fri programvara ständigt hotas av
-mjukvarupatent. Vi vill undvika att en distributör [eller vidareutvecklare]
-av fri programvara individuellt skaffar patentlicenser till programvaran och
-därmed gör programvaran till föremål för äganderätt. För att undvika detta
-har vi gjorde det tydligt att samtliga mjukvarupatent måste registreras för
-allas fria användning eller inte registreras alls.
-
-Här nedan följer licensvillkoren för att kopiera, distribuera och ändra
-programvaran.
-
-GNU GENERAL PUBLIC LICENSE
-VILLKOR FÖR ATT KOPIERA, DISTRIBUERA OCH ÄNDRA PROGRAMVARAN
-
-Dessa licensvillkor gäller varje programvara eller annat verk som innehåller
-en hänvisning till dessa licensvillkor där upphovsrättsinnehavaren stadgat att
-programvaran kan distribueras enligt [General Public License] dessa villkor.
-&quot;Programvaran&quot; enligt nedan syftar på varje sådan programvara eller verk
-och &quot;Verk baserat på Programvaran&quot; syftar på antingen Programvaran eller
-på derivativa verk, såsom ett verk som innehåller Programvaran eller en del
-av Programvaran, antingen en exakt kopia eller en ändrad kopia och/eller
-översatt till ett annat språk. (översättningar ingår nedan utan begränsningar i
-begreppet &quot;förändringar&quot;, &quot;förändra&quot; samt &quot;ändringar&quot; eller &quot;ändra&quot;.) Varje
-licenstagare benämns som &quot;Du&quot;.
-
-Åtgärder utom kopiering, distribution och ändringar täcks inte av dessa
-licensvillkor. Användningen av Programvaran är inte begränsad och
-resultatet av användningen av Programvaran täcks endast av dessa
-licensvillkor om resultatet utgör ett Verk baserat på Programvaran
-(oberoende av att det skapats av att programmet körts). Det beror på
-vad Programvaran gör.
-
-1. Du äger kopiera och distribuera exakta kopior av Programvarans källkod
-såsom Du mottog den, i alla medier, förutsatt att Du tydligt och på ett skäligt
-sätt på varje exemplar fäster en riktig upphovsrättsklausul och
-garantiavsägelse, vidhåller alla hänvisningar till dessa licensvillkor och till alla
-garantiavsägelser samt att till alla mottagaren av Programvaran ge en kopia
-av dessa licensvillkor tillsammans med Programvaran.
-
-Du äger utta en avgift för mekaniseringen [att fysiskt fästa Programvaran
-på ett medium, såsom en diskett eller en CD-ROM-skiva] eller överföringen
-av en kopia och du äger erbjuda en garanti för Programvaran mot en avgift.
-
-2. Du äger ändra ditt exemplar eller andra kopior av Programvaran eller
-någon del av Programvaran och därmed skapa ett Verk baserat på
-Programvaran, samt att kopiera och distribuera sådana förändrade versioner
-av Programvaran eller verk enligt villkoren i paragraf 1 ovan, förutsatt att du
-också uppfyller följande villkor:
-
-a) Du tillser att de förändrade filerna har ett tydligt meddelande som
-berättar att Du ändrat filerna samt vilket datum dessa ändringar gjordes.
-
-b) Du tillser att alla verk som du distribuerar eller offentliggör som till en
-del eller i sin helhet innehåller eller är härlett från Programvaran eller en
-del av Programvaran, licensieras i sin helhet, utan kostnad till tredje man
-enligt dessa licensvillkor.
-
-c) Om den förändrade Programvaran i sitt normala utförande kan utföra
-interaktiv kommandon när det körs, måste Du tillse att när
-Programmet startas skall det skriva ut eller visa, på ett enkelt tillgängligt sätt,
-ett meddelande som tydligt och på ett skäligt sätt på varje exemplar fäster
-en riktig upphovsrättsklausul och garantiavsägelse (eller i förekommande fall
-ett meddelande som klargör att du tillhandahåller en garanti) samt att
-mottagaren äger distribuera Programvaran enligt dessa licensvillkor samt
-berätta hur mottagaren kan se dessa licensvillkor. (Från denna skyldighet
-undantas det fall att Programvaran förvisso är interaktiv, men i sitt normala
-utförande inte visar ett meddelande av denna typ. I sådant fall behöver Verk
-baserat Programvaran inte visa ett sådant meddelande som nämns ovan.)
-
-Dessa krav gäller det förändrade verket i dess helhet. Om identifierbara delar
-av verket inte härrör från Programvaran och skäligen kan anses vara fristående
-och självständiga verk i sig, då skall dessa licensvillkor inte gälla i de delarna när
-de distribueras som egna verk. Men om samma delar distribueras tillsammans
-med en helhet som innehåller verk som härrör från Programvaran, måste
-distributionen i sin helhet ske enligt dessa licensvillkor. Licensvillkoren skall i
-sådant fall gälla för andra licenstagare för hela verket och sålunda till alla delar
-av Programvaran, oavsett vem som är upphovsman till vilka delar av verket.
-
-Denna paragraf skall sålunda inte tolkas som att anspråk görs på rättigheter
-eller att ifrågasätta Dina rättigheter till programvara som skrivits helt av Dig.
-Syftet är att tillse att rätten att kontrollera distributionen av derivativa eller
-samlingsverk av Programvaran.
-
-Förekomsten av ett annat verk på ett lagringsmedium eller samlingsmedium
-som innehåller Programvaran eller Verk baserat på Programvaran leder inte
-till att det andra verket omfattas av dessa licensvillkor.
-
-3. Du äger kopiera och distribuera Programvaran (eller Verk baserat på
-Programvaran enligt paragraf 2) i objektkod eller i körbar form enligt villkoren i
-paragraf 1 och paragraf 2 förutsatt att Du också gör en av följande saker:
-
-a) Bifogar den kompletta källkoden i maskinläsbar form, som måste
-distribueras enligt villkoren i paragraf 1 och 2 på ett medium som i allmänhet
-används för utbyte av programvara, eller
-
-b) Bifogar ett skriftligt erbjudande, med minst tre års giltighet, att ge tredje
-man, mot en avgift som högst uppgår till Din kostnad att utföra fysisk
-distribution, en fullständig kopia av källkoden i maskinläsbar form, distribuerad
-enligt villkoren i paragraf 1 och 2 på ett medium som i allmänhet används för
-utbyte av programvara, eller
-
-c) Bifogar det skriftligt erbjudande Du fick att erhålla källkoden. (Detta
-alternativ kan endast användas för icke-kommersiell distribution och endast
-om Du erhållit ett program i objektkod eller körbar form med ett erbjudande i
-enlighet med b ovan.)
-
-Källkoden för ett verk avser den form av ett verk som är att föredra för att göra
-förändringar av verket. För ett körbart verk avser källkoden all källkod för
-moduler det innehåller, samt alla tillhörande gränssnittsfiler, definitioner, scripts
-för att kontrollera kompilering och installation av den körbara Programvaran. Ett
-undantag kan dock göras för sådant som normalt distribueras, antingen i binär
-form eller som källkod, med huvudkomponterna i operativsystemet (kompliator,
-kärna och så vidare) i vilket den körbara programvaran körs, om inte denna
-komponent medföljer den körbara programvaran.
-
-Om distributionen av körbar Programvara eller objektkod görs genom att
-erbjuda tillgång till att kopiera från en bestämd plats, då skall motsvarande
-tillgång till att kopiera källkoden från samma plats räknas som distribution av
-källkoden, även om trejde man inte behöver kopiera källkoden tillsammans med
-objektkoden.
-
-4. Du äger inte kopiera, ändra, licensiera eller distribuera Programvaran
-utom på dessa licensvillkor. All övrig kopiering, ändringar, licensiering eller
-distribution av Programvaran är ogiltig och kommer automatiskt medföra att
-Du förlorar Dina rättigheter enligt dessa licensvillkor. Tredje man som har
-mottagit kopior eller rättigheter från Dig enligt dessa licensvillkor kommer dock
-inte att förlora sina rättigheter så länge de följer licensvillkoren.
-
-5. Du åläggs inte att acceptera licensvillkoren, då du inte har skrivit under
-detta avtal. Du har dock ingen rätt att ändra eller distribuera Programvaran
-eller Verk baserat på Programvaran. Sådan verksamhet är förbjuden i lag om
-du inte accepterar och följer dessa licensvillkor. Genom att ändra eller
-distribuera Programvaran (eller verk baserat på Programvaran) visar du med
-genom ditt handlande att du accepterar licensvillkoren och alla villkor för att
-kopiera, distribuera eller ändra Programvaran eller Verk baserat på
-Programvaran.
-
-6. Var gång du distributerar Progamvaran (eller Verk baserat på
-Programvaran), kommer mottagaren per automatik att få en licens från den
-första licensgivaren att kopiera, distribuera eller ändra Programvaran enligt
-dessa licensvillkor. Du äger inte ålägga mottagaren några andra restriktioner
-än de som följer av licensvillkoren. Du är inte skyldig att tillse att tredje man
-följer licensvillkoren.
-
-7. Om Du på grund av domstols dom eller anklagelse om patentintrång
-eller på grund av annan anledning (ej begränsat till patentfrågor), Du får villkor
-(oavsett om de kommer via domstols dom, avtal eller på annat sätt) som
-strider mot dessa licensvillkor så fråntar de inte Dina förpliktelser enligt
-dessa licensvillkor. Om du inte kan distribuera Programvaran och samtidigt
-uppfylla licensvillkor och andra skyldigheter, får du som en konsekvens inte
-distribuera Programvaran. Om exempelvis ett patent gör att Du inte distribuera
-Programvaran fritt till alla de som mottager kopior direkt eller indirekt från Dig,
-så måste Du helt sluta distribuera Programvaran.
-
-Om delar av denna paragraf förklaras ogiltig eller annars inte kan verkställas
-skall resten av paragrafen äga fortsatt giltighet och paragrafen i sin helhet äga
-fortsatt giltighet i andra sammanhang.
-
-Syftet med denna paragraf är inte att förmå Dig att begå patentintrång eller
-att begå intrång i andra rättigheter eller att förmå Dig att betrida giltigheten i
-sådana rättigheter. Denna paragraf har ett enda syfte, vilket är att skydda
-distributionssystemet för fri programvara vilket görs genom användandet av
-dessa licensvillkor. Många har bidragit till det stora utbudet av programvara
-som distribueras med hjälp av dessa licensvillkor och den fortsatta giltigheten
-och användningen av detta system, men det är upphovsmannen själv som
-måste besluta om han eller hon vill distribuera Programvaran genom detta
-system eller ett annat och en licenstagare kan inte tvinga en upphovsman till
-ett annat beslut.
-
-Denna paragraf har till syfte att ställa det utom tvivel vad som anses följa
-av resten av dessa licensvillkor.
-
-8. Om distributionen och/eller användningen av Programvaran är begränsad
-i vissa länder på grund av patent eller upphovsrättsligt skyddade gränssnitt
-kan upphovsmannen till Programvaran lägga till en geografisk spridningsklausul,
-enligt vilken distribution är tillåten i länder förutom dem i vilket det är förbjudet.
-Om så är fallet kommer begränsningen att utgöra en fullvärdig del av
-licensvillkoren.
-
-9. The Free Software Foundation kan offentliggöra ändrade och/eller nya
-versioner av the General Public License från tid till annan. Sådana nya
-versioner kommer i sin helhet att påminna om nuvarande version av the
-General Public License, men kan vara ändrade i detaljer för att behandla nya
-problem eller göra nya överväganden. Varje version ges ett särskiljande
-versionsnummer. Om Programvaran specificerar ett versionsnummer av
-licensvillkoren samt &quot;alla senare versioner&quot; kan Du välja mellan att följa
-dessa licensvillkor eller licensvillkoren i alla senare versioner offentliggjorda
-av the Free Software Foundation. Om Programvaran inte specificerar ett
-versionnummer av licensvillkoren kan Du välja fritt bland samtliga versioner
-som någonsin offentligjorts.
-
-10. Om du vill använda delar av Programvaran i annan fri programvara som
-distribueras enligt andra licensvillkor, begär tillstånd från upphovsmannen. För
-Programvaran var upphovsrätt innehas av Free Software Foundation, tillskriv
-Free Software Foundation, vi gör ibland undantag för detta. Vårt beslut grundas
-på våra två mål att bibehålla den fria statusen av alla verk som härleds från vår
-Programvara och främjandet av att dela med sig av och återanvända mjukvara
-i allmänhet.
-
-INGEN GARANTI
-
-11. DÅ DENNA PROGRAMVARA LICENSIERAS UTAN KOSTNAD GES INGEN
-GARANTI FÖR PROGRAMMET, UTOM SÅDAN GARANTI SOM MÅSTE GES ENLIGT
-TILLÄMPLIG LAG. FÖRUTOM DÅ DET UTTRYCKS I SKRIFT TILLHANDAHÅLLER
-UPPHOVSRÄTTSINNEHAVAREN OCH/ELLER ANDRA PARTER PROGRAMMET &quot;I
-BEFINTLIGT SKICK&quot; (&quot;AS IS&quot;) UTAN GARANTIER AV NÅGRA SLAG, VARKEN
-UTTRYCKLIGA ELLER UNDERFÖRSTÅDDA, INKLUSIVE, MEN INTE BEGRÄNSAT
-TILL, UNDERFÖRSTÅDDA GARANTIER VID KÖP OCH LÄMPLIGHET FÖR ETT
-SÄRSKILT ÄNDAMÅL. HELA RISKEN FÖR KVALITET OCH ANVÄNDBARHET BÄRS
-AV DIG. OM PROGRAMMET SKULLE VISA SIG HA DEFEKTER SKALL DU BÄRA
-ALLA KOSTNADER FöR FELETS AVHJÄLPANDE, REPARATIONER ELLER
-NÖDVÄNDIG SERVICE.
-
-12. INTE I NÅGOT FALL, UTOM NÄR DET GÄLLER ENLIGT TILLÄMPLIG LAG
-ELLER NÄR DET ÖVERENSKOMMITS SKRIFTLIGEN, SKALL EN
-UPPHOVSRÄTTSINNEHAVARE ELLER ANNAN PART SOM ÄGER ÄNDRA
-OCH/ELLER DISTRIBUERA PROGRAMVARAN ENLIGT OVAN, VARA SKYLDIG UTGE
-ERSÄTTNING FÖR SKADA DU LIDER, INKLUSIVE ALLMÄN, DIREKT ELLER INDIREKT
-SKADA SOM FÖLJER PÅ GRUND AV ANVÄNDNING ELLER OMÖJLIGHET ATT
-ANVÄNDA PROGRAMVARAN (INKLUSIVE MEN INTE BEGRÄNSAT TILL FÖRLUST
-AV DATA OCH INFORMATION ELLER DATA OCH INFORMATION SOM
-FRAMSTÄLLTS FELAKTIGT AV DIG ELLER TREDJE PART ELLER FEL DÄR
-PROGRAMMET INTE KUNNAT KÖRAS SAMTIDIGT MED ANNAN PROGRAMVARA),
-ÄVEN OM EN SÅDAN UPPHOVSRÄTTSINNEHAVAREN ELLER ANNAN PART
-UPPLYSTS OM MÖJLIGHETEN TILL SÅDAN SKADA.
-
-SLUT PÅ LICENSVILLKOR
-</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="67"/>
-        <source>OSC Bridge Version</source>
-        <translation>OSC-bryggversion</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="69"/>
-        <source>Plugin Version</source>
-        <translation>Tilläggsversion</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="71"/>
-        <source>&lt;br&gt;Version %1&lt;br&gt;Carla is a fully-featured audio plugin host%2.&lt;br&gt;&lt;br&gt;Copyright (C) 2011-2019 falkTX&lt;br&gt;</source>
-        <translation>&lt;br&gt;Version %1&lt;br&gt;Carla är en fullt utrustad ljudtilläggsvärd%2.&lt;br&gt;&lt;br&gt;Copyright (C) 2011-2019 falkTX&lt;br&gt;</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="100"/>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="101"/>
-        <source>(Engine not running)</source>
-        <translation>(Motor kör inte)</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="123"/>
-        <source>Everything! (Including LRDF)</source>
-        <translation>Allt! (Inklusive LRDF)</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="124"/>
-        <source>Everything! (Including CustomData/Chunks)</source>
-        <translation>Allting! (Inklusive CustomData/Chunks)</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="125"/>
-        <source>About 110&amp;#37; complete (using custom extensions)&lt;br/&gt;Implemented Feature/Extensions:&lt;ul&gt;&lt;li&gt;http://lv2plug.in/ns/ext/atom&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/buf-size&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/data-access&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/event&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/instance-access&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/log&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/midi&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/options&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/parameters&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/port-props&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/presets&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/resize-port&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/state&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/time&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/uri-map&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/urid&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/worker&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/extensions/ui&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/extensions/units&lt;/li&gt;&lt;li&gt;http://home.gna.org/lv2dynparam/rtmempool/v1&lt;/li&gt;&lt;li&gt;http://kxstudio.sf.net/ns/lv2ext/external-ui&lt;/li&gt;&lt;li&gt;http://kxstudio.sf.net/ns/lv2ext/programs&lt;/li&gt;&lt;li&gt;http://kxstudio.sf.net/ns/lv2ext/props&lt;/li&gt;&lt;li&gt;http://kxstudio.sf.net/ns/lv2ext/rtmempool&lt;/li&gt;&lt;li&gt;http://ll-plugins.nongnu.org/lv2/ext/midimap&lt;/li&gt;&lt;li&gt;http://ll-plugins.nongnu.org/lv2/ext/miditype&lt;/li&gt;&lt;/ul&gt;</source>
-        <translation>Om 110&amp;#37; komplett (med anpassade tillägg)&lt;br/&gt;Implementerad funktion/tillägg:&lt;ul&gt;&lt;li&gt;http://lv2plug.in/ns/ext/atom&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/buf-size&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/data-access&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/event&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/instance-access&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/log&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/midi&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/options&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/parameters&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/port-props&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/presets&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/resize-port&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/state&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/time&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/uri-map&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/urid&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/worker&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/extensions/ui&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/extensions/units&lt;/li&gt;&lt;li&gt;http://home.gna.org/lv2dynparam/rtmempool/v1&lt;/li&gt;&lt;li&gt;http://kxstudio.sf.net/ns/lv2ext/external-ui&lt;/li&gt;&lt;li&gt;http://kxstudio.sf.net/ns/lv2ext/programs&lt;/li&gt;&lt;li&gt;http://kxstudio.sf.net/ns/lv2ext/props&lt;/li&gt;&lt;li&gt;http://kxstudio.sf.net/ns/lv2ext/rtmempool&lt;/li&gt;&lt;li&gt;http://ll-plugins.nongnu.org/lv2/ext/midimap&lt;/li&gt;&lt;li&gt;http://ll-plugins.nongnu.org/lv2/ext/miditype&lt;/li&gt;&lt;/ul&gt;</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="161"/>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="162"/>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="171"/>
-        <source>Using Juce host</source>
-        <translation>Använder Juce-värd</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="164"/>
-        <source>About 85% complete (missing vst bank/presets and some minor stuff)</source>
-        <translation>Omkring 85% färdigställt (saknar vst-bank/förinställningar och vissa mindre grejor)</translation>
-    </message>
-</context>
-<context>
-    <name>CarlaHostW</name>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="14"/>
-        <source>MainWindow</source>
-        <translation>HuvudFönster</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="40"/>
-        <source>Rack</source>
-        <translation>Rack</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="144"/>
-        <source>Patchbay</source>
-        <translation>Kopplingsplint</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="179"/>
-        <source>Logs</source>
-        <translation>Loggar</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="214"/>
-        <source>Loading...</source>
-        <translation>Läser in...</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="249"/>
-        <source>Buffer Size:</source>
-        <translation>Buffertstorlek:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="272"/>
-        <source>Sample Rate:</source>
-        <translation>Samplingsfrekvens:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="295"/>
-        <source>? Xruns</source>
-        <translation>? Överskridanden</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="324"/>
-        <source>DSP Load: %p%</source>
-        <translation>DSP-belastning: %p%</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="344"/>
-        <source>&amp;File</source>
-        <translation>&amp;Arkiv</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="357"/>
-        <source>&amp;Engine</source>
-        <translation>&amp;Motor</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="367"/>
-        <source>&amp;Plugin</source>
-        <translation>&amp;Tillägg</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="371"/>
-        <source>Macros (all plugins)</source>
-        <translation>Makron (alla tillägg)</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="395"/>
-        <source>&amp;Canvas</source>
-        <translation>&amp;Duk</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="399"/>
-        <source>Zoom</source>
-        <translation>Zooma</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="418"/>
-        <source>&amp;Settings</source>
-        <translation>&amp;Inställningar</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="429"/>
-        <source>&amp;Help</source>
-        <translation>&amp;Hjälp</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="444"/>
-        <source>toolBar</source>
-        <translation>verktygsFält</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="540"/>
-        <source>Disk</source>
-        <translation>Disk</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="564"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1190"/>
-        <source>Home</source>
-        <translation>Hem</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="613"/>
-        <source>Transport</source>
-        <translation>Transport</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="619"/>
-        <source>Playback Controls</source>
-        <translation>Uppspelningskontroller</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="681"/>
-        <source>Time Information</source>
-        <translation>Tidinformation</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="689"/>
-        <source>Frame:</source>
-        <translation>Bild:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="704"/>
-        <source>000&apos;000&apos;000</source>
-        <translation>000&apos;000&apos;000</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="731"/>
-        <source>Time:</source>
-        <translation>Tid:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="746"/>
-        <source>00:00:00</source>
-        <translation>00:00:00</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="773"/>
-        <source>BBT:</source>
-        <translation>BBT:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="788"/>
-        <source>000|00|0000</source>
-        <translation>000|00|0000</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="816"/>
-        <source>Settings</source>
-        <translation>Inställningar</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="822"/>
-        <source> BPM</source>
-        <translation>BPM</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="838"/>
-        <source>Use JACK Transport</source>
-        <translation>Använd JACK-transport</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="845"/>
-        <source>Use Ableton Link</source>
-        <translation>Använd Ableton Link</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="955"/>
-        <source>&amp;New</source>
-        <translation>&amp;Ny</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="958"/>
-        <source>Ctrl+N</source>
-        <translation>Ctrl+N</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="967"/>
-        <source>&amp;Open...</source>
-        <translation>&amp;Öppna...</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="970"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="973"/>
-        <source>Open...</source>
-        <translation>Öppna...</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="976"/>
-        <source>Ctrl+O</source>
-        <translation>Ctrl+O</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="985"/>
-        <source>&amp;Save</source>
-        <translation>&amp;Spara</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="988"/>
-        <source>Ctrl+S</source>
-        <translation>Ctrl+S</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="997"/>
-        <source>Save &amp;As...</source>
-        <translation>Spara &amp;som...</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1000"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1003"/>
-        <source>Save As...</source>
-        <translation>Spara som...</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1006"/>
-        <source>Ctrl+Shift+S</source>
-        <translation>Ctrl+Shift+S</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1015"/>
-        <source>&amp;Quit</source>
-        <translation>&amp;Avsluta</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1018"/>
-        <source>Ctrl+Q</source>
-        <translation>Ctrl+Q</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1027"/>
-        <source>&amp;Start</source>
-        <translation>&amp;Starta</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1030"/>
-        <source>F5</source>
-        <translation>F5</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1039"/>
-        <source>St&amp;op</source>
-        <translation>St&amp;opp</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1042"/>
-        <source>F6</source>
-        <translation>F6</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1051"/>
-        <source>&amp;Add Plugin...</source>
-        <translation>&amp;Lägg till tillägg...</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1054"/>
-        <source>Ctrl+A</source>
-        <translation>Ctrl+A</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1063"/>
-        <source>&amp;Remove All</source>
-        <translation>&amp;Ta bort alla</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1068"/>
-        <source>Enable</source>
-        <translation>Aktivera</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1073"/>
-        <source>Disable</source>
-        <translation>Inaktivera</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1078"/>
-        <source>0% Wet (Bypass)</source>
-        <translation>0% effekt (förbikoppla)</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1083"/>
-        <source>100% Wet</source>
-        <translation>100% effekt</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1088"/>
-        <source>0% Volume (Mute)</source>
-        <translation>0% volym (tyst)</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1093"/>
-        <source>100% Volume</source>
-        <translation>100% volym</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1098"/>
-        <source>Center Balance</source>
-        <translation>Centrumbalans</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1110"/>
-        <source>&amp;Play</source>
-        <translation>&amp;Spela</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1113"/>
-        <source>Ctrl+Shift+P</source>
-        <translation>Ctrl+Shift+P</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1122"/>
-        <source>&amp;Stop</source>
-        <translation>&amp;Stopp</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1125"/>
-        <source>Ctrl+Shift+X</source>
-        <translation>Ctrl+Shift+X</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1134"/>
-        <source>&amp;Backwards</source>
-        <translation>&amp;Bakåt</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1137"/>
-        <source>Ctrl+Shift+B</source>
-        <translation>Ctrl+Shift+B</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1146"/>
-        <source>&amp;Forwards</source>
-        <translation>&amp;Framåt</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1149"/>
-        <source>Ctrl+Shift+F</source>
-        <translation>Ctrl+Shift+F</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1158"/>
-        <source>&amp;Arrange</source>
-        <translation>&amp;Arrangera</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1161"/>
-        <source>Ctrl+G</source>
-        <translation>Ctrl+G</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1170"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1324"/>
-        <source>&amp;Refresh</source>
-        <translation>&amp;Uppdatera</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1173"/>
-        <source>Ctrl+R</source>
-        <translation>Ctrl+R</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1178"/>
-        <source>Save &amp;Image...</source>
-        <translation>Spara &amp;bild...</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1187"/>
-        <source>Auto-Fit</source>
-        <translation>Autoanpassa</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1199"/>
-        <source>Zoom In</source>
-        <translation>Zooma in</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1202"/>
-        <source>Ctrl++</source>
-        <translation>Ctrl++</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1211"/>
-        <source>Zoom Out</source>
-        <translation>Zooma ut</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1214"/>
-        <source>Ctrl+-</source>
-        <translation>Ctrl+-</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1223"/>
-        <source>Zoom 100%</source>
-        <translation>Zooma 100%</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1226"/>
-        <source>Ctrl+1</source>
-        <translation>Ctrl+1</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1234"/>
-        <source>Show &amp;Toolbar</source>
-        <translation>Visa &amp;verktygsfält</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1243"/>
-        <source>&amp;Configure Carla</source>
-        <translation>&amp;Konfigurera Carla</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1248"/>
-        <source>&amp;About</source>
-        <translation>&amp;Om</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1253"/>
-        <source>About &amp;JUCE</source>
-        <translation>Om &amp;JUCE</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1258"/>
-        <source>About &amp;Qt</source>
-        <translation>Om &amp;Qt</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1266"/>
-        <source>Show Canvas &amp;Meters</source>
-        <translation>Visa Duk&amp;mätare</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1274"/>
-        <source>Show Canvas &amp;Keyboard</source>
-        <translation>Visa Duk&amp;tangentbord</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1282"/>
-        <source>Show Internal</source>
-        <translation>Visa intern</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1290"/>
-        <source>Show External</source>
-        <translation>Visa extern</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1298"/>
-        <source>Show Time Panel</source>
-        <translation>Visa tidspanel</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1306"/>
-        <source>Show &amp;Side Panel</source>
-        <translation>Visa &amp;sidopanel</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1315"/>
-        <source>&amp;Connect...</source>
-        <translation>&amp;Anslut...</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1329"/>
-        <source>Compact Slots</source>
-        <translation>Komprimera fack</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1334"/>
-        <source>Expand Slots</source>
-        <translation>Expandera fack</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1339"/>
-        <source>Perform secret 1</source>
-        <translation>Utför hemlighet 1</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1344"/>
-        <source>Perform secret 2</source>
-        <translation>Utför hemlighet 2</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1349"/>
-        <source>Perform secret 3</source>
-        <translation>Utför hemlighet 3</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1354"/>
-        <source>Perform secret 4</source>
-        <translation>Utför hemlighet 4</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1359"/>
-        <source>Perform secret 5</source>
-        <translation>Utför hemlighet 5</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1368"/>
-        <source>Add &amp;JACK Application...</source>
-        <translation>Lägg till &amp;JACK-program…</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1377"/>
-        <source>&amp;Configure driver...</source>
-        <translation>&amp;Konfigurera drivrutin...</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1386"/>
-        <source>Panic</source>
-        <translation>Panik</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1391"/>
-        <source>Open custom driver panel...</source>
-        <translation>Öppna anpassad drivrutinspanel…</translation>
-    </message>
-</context>
-<context>
-    <name>CarlaHostWindow</name>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_host.cpp" line="313"/>
-        <source>Export as...</source>
-        <translation>Exportera som...</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_host.cpp" line="703"/>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_host.cpp" line="721"/>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_host.cpp" line="1716"/>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_host.cpp" line="1722"/>
-        <source>Error</source>
-        <translation>Fel</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_host.cpp" line="704"/>
-        <source>Failed to load project</source>
-        <translation>Det gick inte att läsa in projektet</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_host.cpp" line="721"/>
-        <source>Failed to save project</source>
-        <translation>Det gick inte att spara projektet</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_host.cpp" line="1335"/>
-        <source>Quit</source>
-        <translation>Avsluta</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_host.cpp" line="1336"/>
-        <source>Are you sure you want to quit Carla?</source>
-        <translation>Är du säker på att du vill stänga Carla?</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_host.cpp" line="1717"/>
-        <source>Could not connect to Audio backend '%1', possible reasons:
-%2</source>
-        <translation>Kunde inte ansluta till Ljudbakände ”%1”, möjliga skäl:
-%2</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_host.cpp" line="1723"/>
-        <source>Could not connect to Audio backend &apos;%1&apos;</source>
-        <translation>Kunde inte ansluta till Ljudbakände ”%1”</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_host.cpp" line="1740"/>
-        <source>Warning</source>
-        <translation>Varning</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_host.cpp" line="1741"/>
-        <source>There are still some plugins loaded, you need to remove them to stop the engine.
-Do you want to do this now?</source>
-        <translation>Det finns fortfarande några tillägg inlästa, du måste ta bort dem för att stoppa motorn.
-Vill du göra det nu?</translation>
-    </message>
-</context>
-<context>
-    <name>CarlaInstrumentView</name>
+    <name>lmms::gui::CarlaInstrumentView</name>
     <message>
         <location filename="../../plugins/CarlaBase/Carla.cpp" line="420"/>
         <source>Show GUI</source>
@@ -2214,644 +886,7 @@ Vill du göra det nu?</translation>
     </message>
 </context>
 <context>
-    <name>CarlaSettingsW</name>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="20"/>
-        <source>Settings</source>
-        <translation>Inställningar</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="71"/>
-        <source>main</source>
-        <translation>huvud</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="76"/>
-        <source>canvas</source>
-        <translation>duk</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="81"/>
-        <source>engine</source>
-        <translation>motor</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="86"/>
-        <source>osc</source>
-        <translation>osc</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="91"/>
-        <source>file-paths</source>
-        <translation>filsökvägar</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="96"/>
-        <source>plugin-paths</source>
-        <translation>tilläggssökvägar</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="101"/>
-        <source>wine</source>
-        <translation>wine</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="106"/>
-        <source>experimental</source>
-        <translation>experimentell</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="111"/>
-        <source>Widget</source>
-        <translation>Kontroll</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="116"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2675"/>
-        <source>Main</source>
-        <translation>Huvud</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="134"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2722"/>
-        <source>Canvas</source>
-        <translation>Duk</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="152"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2762"/>
-        <source>Engine</source>
-        <translation>Motor</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="194"/>
-        <source>File Paths</source>
-        <translation>Filsökvägar</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="212"/>
-        <source>Plugin Paths</source>
-        <translation>Tilläggssökvägar</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="230"/>
-        <source>Wine</source>
-        <translation>Wine</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="248"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="504"/>
-        <source>Experimental</source>
-        <translation>Experimentell</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="284"/>
-        <source>&lt;b&gt;Main&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Huvud&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="331"/>
-        <source>Paths</source>
-        <translation>Sökvägar</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="339"/>
-        <source>Default project folder:</source>
-        <translation>Standardprojektmapp:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="377"/>
-        <source>Interface</source>
-        <translation>Gränssnitt</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="383"/>
-        <source>Interface refresh interval:</source>
-        <translation>Gränssnittets uppdateringsintervall:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="393"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1023"/>
-        <source> ms</source>
-        <translation> ms</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="425"/>
-        <source>Show console output in Logs tab (needs engine restart)</source>
-        <translation>Visa konsolutmatning i Loggflik (kräver motoromstart)</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="432"/>
-        <source>Show a confirmation dialog before quitting</source>
-        <translation>Visa en bekräftelsedialog innan avslut</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="442"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="580"/>
-        <source>Theme</source>
-        <translation>Tema</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="448"/>
-        <source>Use Carla &quot;PRO&quot; theme (needs restart)</source>
-        <translation>Använd Carla ”PRO”-tema (kräver omstart)</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="458"/>
-        <source>Color scheme:</source>
-        <translation>Färgschema:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="472"/>
-        <source>Black</source>
-        <translation>Svart</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="477"/>
-        <source>System</source>
-        <translation>System</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="510"/>
-        <source>Enable experimental features</source>
-        <translation>Aktivera experimentella funktioner</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="542"/>
-        <source>&lt;b&gt;Canvas&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Duk&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="612"/>
-        <source>Bezier Lines</source>
-        <translation>Bézierlinjer</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="622"/>
-        <source>Theme:</source>
-        <translation>Tema:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="658"/>
-        <source>Size:</source>
-        <translation>Storlek:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="669"/>
-        <source>775x600</source>
-        <translation>775x600</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="674"/>
-        <source>1550x1200</source>
-        <translation>1550x1200</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="679"/>
-        <source>3100x2400</source>
-        <translation>3100x2400</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="684"/>
-        <source>4650x3600</source>
-        <translation>4650x3600</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="689"/>
-        <source>6200x4800</source>
-        <translation>6200x4800</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="713"/>
-        <source>Options</source>
-        <translation>Alternativ</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="719"/>
-        <source>Auto-hide groups with no ports</source>
-        <translation>Dölj grupper utan portar automatiskt</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="726"/>
-        <source>Auto-select items on hover</source>
-        <translation>Automarkera objekt vid hovring</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="733"/>
-        <source>Basic eye-candy (group shadows)</source>
-        <translation>Grundläggande ögongodis (gruppskuggor)</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="743"/>
-        <source>Render Hints</source>
-        <translation>Renderingstips</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="749"/>
-        <source>Anti-Aliasing</source>
-        <translation>Kantutjämning</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="759"/>
-        <source>Full canvas repaints (slower, but prevents drawing issues)</source>
-        <translation>Fullständiga dukomritningar (långsammare, men förhindrar uppritningsproblem)</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="791"/>
-        <source>&lt;b&gt;Engine&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Motor&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="829"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1224"/>
-        <source>Core</source>
-        <translation>Kärna</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="858"/>
-        <source>Single Client</source>
-        <translation>Enkel klient</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="863"/>
-        <source>Multiple Clients</source>
-        <translation>Flera klienter</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="868"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="892"/>
-        <source>Continuous Rack</source>
-        <translation>Kontinuerligt rack</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="873"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="897"/>
-        <source>Patchbay</source>
-        <translation>Kopplingsplint</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="909"/>
-        <source>Audio driver:</source>
-        <translation>Ljuddrivrutin:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="919"/>
-        <source>Process mode:</source>
-        <translation>Hanteringsläge:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="929"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="942"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1373"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1444"/>
-        <source>Maximum number of parameters to allow in the built-in &apos;Edit&apos; dialog</source>
-        <translation>Maximalt antal parametrar att tillåta i den inbyggda ”Redigera”-dialogen</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="932"/>
-        <source>Max Parameters:</source>
-        <translation>Max parametrar:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="952"/>
-        <source>...</source>
-        <translation>...</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="991"/>
-        <source>Reset Xrun counter after project load</source>
-        <translation>Återställ Överskridsräknaren efter projektinläsning</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1001"/>
-        <source>Plugin UIs</source>
-        <translation>Tilläggsgränssnitt</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1007"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1020"/>
-        <source>How much time to wait for OSC GUIs to ping back the host</source>
-        <translation>Hur lång tid att vänta för OSC-användargränssnitt att pinga tillbaka till värden</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1010"/>
-        <source>UI Bridge Timeout:</source>
-        <translation>Tidsgräns för användargränssnittsbryggor:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1049"/>
-        <source>Use OSC-GUI bridges when possible, this way separating the UI from DSP code</source>
-        <translation>Använd OSC-GUI-bryggor när möjligt, för att på detta sätt separera användargränssnittet från DSP-koden.</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1052"/>
-        <source>Use UI bridges instead of direct handling when possible</source>
-        <translation>Använd gränssnittsbryggor istället för direkthantering när möjligt</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1059"/>
-        <source>Make plugin UIs always-on-top</source>
-        <translation>Placera alltid tilläggsgränssnitt överst</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1066"/>
-        <source>Make plugin UIs appear on top of Carla (needs restart)</source>
-        <translation>Placera tilläggsgränssnitt ovanpå Carla (kräver omstart)</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1073"/>
-        <source>NOTE: Plugin-bridge UIs cannot be managed by Carla on macOS</source>
-        <translation>OBSERVERA: Tilläggsgränssnitt över bryggor kan inte hanteras av Carla på macOS</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1133"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1582"/>
-        <source>Restart the engine to load the new settings</source>
-        <translation>Starta om motorn för att läsa in de nya inställningarna</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1177"/>
-        <source>&lt;b&gt;OSC&lt;/b&gt;</source>
-        <translation>&lt;b&gt;OSC&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1230"/>
-        <source>Enable OSC</source>
-        <translation>Aktivera OSC</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1266"/>
-        <source>Enable TCP port</source>
-        <translation>Aktivera TCP-port</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1275"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1408"/>
-        <source>Use specific port:</source>
-        <translation>Använd specifik port:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1319"/>
-        <source>Overridden by CARLA_OSC_TCP_PORT env var</source>
-        <translation>Åsidosatt av miljövariabeln CARLA_OSC_TCP_PORT</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1386"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1457"/>
-        <source>Use randomly assigned port</source>
-        <translation>Använd slumpmässigt tilldelad port</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1399"/>
-        <source>Enable UDP port</source>
-        <translation>Aktivera UDP-port</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1504"/>
-        <source>Overridden by CARLA_OSC_UDP_PORT env var</source>
-        <translation>Åsidosatt av miljövariabeln CARLA_OSC_UDP_PORT</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1641"/>
-        <source>DSSI UIs require OSC UDP port enabled</source>
-        <translation>DSSI-användargränssnit kräver att OSC UDP-port är aktiverad</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1690"/>
-        <source>&lt;b&gt;File Paths&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Filsökvägar&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1749"/>
-        <source>Audio</source>
-        <translation>Ljud</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1754"/>
-        <source>MIDI</source>
-        <translation>MIDI</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1781"/>
-        <source>Used for the &quot;audiofile&quot; plugin</source>
-        <translation>Används för tillägget &quot;audiofile&quot;</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1798"/>
-        <source>Used for the &quot;midifile&quot; plugin</source>
-        <translation>Används för tillägget &quot;midifile&quot;</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1861"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2185"/>
-        <source>Add...</source>
-        <translation>Lägg till...</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1872"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2196"/>
-        <source>Remove</source>
-        <translation>Ta bort</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1899"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2223"/>
-        <source>Change...</source>
-        <translation>Ändra...</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1936"/>
-        <source>&lt;b&gt;Plugin Paths&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Tilläggssökvägar&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1995"/>
-        <source>LADSPA</source>
-        <translation>LADSPA</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2000"/>
-        <source>DSSI</source>
-        <translation>DSSI</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2005"/>
-        <source>LV2</source>
-        <translation>LV2</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2010"/>
-        <source>VST2</source>
-        <translation>VST2</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2015"/>
-        <source>VST3</source>
-        <translation>VST3</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2020"/>
-        <source>SF2/3</source>
-        <translation>SF2/3</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2025"/>
-        <source>SFZ</source>
-        <translation>SFZ</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2120"/>
-        <source>Restart Carla to find new plugins</source>
-        <translation>Starta om Carla för att hitta nya tillägg</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2260"/>
-        <source>&lt;b&gt;Wine&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Wine&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2307"/>
-        <source>Executable</source>
-        <translation>Körbar</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2313"/>
-        <source>Path to &apos;wine&apos; binary:</source>
-        <translation>Sökväg till &quot;wine&quot;-binär:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2329"/>
-        <source>Prefix</source>
-        <translation>Prefix</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2335"/>
-        <source>Auto-detect Wine prefix based on plugin filename</source>
-        <translation>Automatisk detektering av Wine-prefix baserat på filnamn för tillägg</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2342"/>
-        <source>Fallback:</source>
-        <translation>Reservinställning:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2355"/>
-        <source>Note: WINEPREFIX env var is preferred over this fallback</source>
-        <translation>Notera: Miljövariabeln WINEPREFIX föredras framför denna reservinställning</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2368"/>
-        <source>Realtime Priority</source>
-        <translation>Realtidsprioritet</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2413"/>
-        <source>Base priority:</source>
-        <translation>Grundprioritet:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2423"/>
-        <source>WineServer priority:</source>
-        <translation>WineServer-prioritet:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2509"/>
-        <source>These options are not available for Carla as plugin</source>
-        <translation>Dessa alternativ finns inte tillgängliga för Carla som tillägg</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2566"/>
-        <source>&lt;b&gt;Experimental&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Experimentell&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2653"/>
-        <source>Experimental options! Likely to be unstable!</source>
-        <translation>Experimentalla alternativ! Förmodligen instabila!</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2681"/>
-        <source>Enable plugin bridges</source>
-        <translation>Aktivera tilläggsbryggor</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2691"/>
-        <source>Enable Wine bridges</source>
-        <translation>Aktivera Wine-bryggor</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2698"/>
-        <source>Enable jack applications</source>
-        <translation>Aktivera jack-program</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2705"/>
-        <source>Export single plugins to LV2</source>
-        <translation>Exportera enskilda tillägg till LV2</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2712"/>
-        <source>Load Carla backend in global namespace (NOT RECOMMENDED)</source>
-        <translation>Läs in Carla-bakände i global namnrymd (INTE REKOMMENDERAT)</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2728"/>
-        <source>Fancy eye-candy (fade-in/out groups, glow connections)</source>
-        <translation>Snyggt ögongodisk (grupper tonas in/ut, glödande anslutningar)</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2735"/>
-        <source>Use OpenGL for rendering (needs restart)</source>
-        <translation>Använd OpenGL för rendering (kräver omstart)</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2745"/>
-        <source>High Quality Anti-Aliasing (OpenGL only)</source>
-        <translation>Högkvalitativ kantutjämning (endast OpenGL)</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2752"/>
-        <source>Render Ardour-style &quot;Inline Displays&quot;</source>
-        <translation>Rendera Ardour-liknande ”inbyggda visningar”</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2768"/>
-        <source>Force mono plugins as stereo by running 2 instances at the same time.
-This mode is not available for VST plugins.</source>
-        <translation>Tvinga mono-tillägg att använda stereo genom att köra 2 instanser av det samtidigt.
-Detta läge är inte tillgängligt för VST-tillägg.</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2772"/>
-        <source>Force mono plugins as stereo</source>
-        <translation>Tvinga mono-tillägg att vara stereo</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2779"/>
-        <source>Prevent plugins from doing bad stuff (needs restart)</source>
-        <translation>Förhindra tillägg från att göra dumheter (kräver omstart)</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2789"/>
-        <source>Whenever possible, run the plugins in bridge mode.</source>
-        <translation>När det är möjligt, kör tillägget i bryggat läge.</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2792"/>
-        <source>Run plugins in bridge mode when possible</source>
-        <translation>Kör tillägg i bryggat läge när det är möjligt</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_settings.cpp" line="1457"/>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_settings.cpp" line="1547"/>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_settings.cpp" line="1626"/>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_settings.cpp" line="1671"/>
-        <source>Add Path</source>
-        <translation>Lägg till sökväg</translation>
-    </message>
-</context>
-<context>
-    <name>CompressorControlDialog</name>
+    <name>lmms::gui::CompressorControlDialog</name>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="93"/>
         <source>Threshold:</source>
@@ -3206,7 +1241,7 @@ Detta läge är inte tillgängligt för VST-tillägg.</translation>
     </message>
 </context>
 <context>
-    <name>CompressorControls</name>
+    <name>lmms::CompressorControls</name>
     <message>
         <location filename="../../plugins/Compressor/CompressorControls.cpp" line="38"/>
         <source>Threshold</source>
@@ -3349,7 +1384,7 @@ Detta läge är inte tillgängligt för VST-tillägg.</translation>
     </message>
 </context>
 <context>
-    <name>Controller</name>
+    <name>lmms::Controller</name>
     <message>
         <location filename="../../src/core/Controller.cpp" line="61"/>
         <source>Controller %1</source>
@@ -3357,7 +1392,7 @@ Detta läge är inte tillgängligt för VST-tillägg.</translation>
     </message>
 </context>
 <context>
-    <name>ControllerConnectionDialog</name>
+    <name>lmms::gui::ControllerConnectionDialog</name>
     <message>
         <location filename="../../src/gui/modals/ControllerConnectionDialog.cpp" line="136"/>
         <source>Connection Settings</source>
@@ -3431,7 +1466,7 @@ Detta läge är inte tillgängligt för VST-tillägg.</translation>
     </message>
 </context>
 <context>
-    <name>ControllerRackView</name>
+    <name>lmms::gui::ControllerRackView</name>
     <message>
         <location filename="../../src/gui/ControllerRackView.cpp" line="49"/>
         <source>Controller Rack</source>
@@ -3454,7 +1489,7 @@ Detta läge är inte tillgängligt för VST-tillägg.</translation>
     </message>
 </context>
 <context>
-    <name>ControllerView</name>
+    <name>lmms::gui::ControllerView</name>
     <message>
         <location filename="../../src/gui/ControllerView.cpp" line="69"/>
         <source>Controls</source>
@@ -3487,7 +1522,7 @@ Detta läge är inte tillgängligt för VST-tillägg.</translation>
     </message>
 </context>
 <context>
-    <name>CrossoverEQControlDialog</name>
+    <name>lmms::gui::CrossoverEQControlDialog</name>
     <message>
         <location filename="../../plugins/CrossoverEQ/CrossoverEQControlDialog.cpp" line="52"/>
         <source>Band 1/2 crossover:</source>
@@ -3585,7 +1620,7 @@ Detta läge är inte tillgängligt för VST-tillägg.</translation>
     </message>
 </context>
 <context>
-    <name>DelayControls</name>
+    <name>lmms::DelayControls</name>
     <message>
         <location filename="../../plugins/Delay/DelayControls.cpp" line="35"/>
         <source>Delay samples</source>
@@ -3613,7 +1648,7 @@ Detta läge är inte tillgängligt för VST-tillägg.</translation>
     </message>
 </context>
 <context>
-    <name>DelayControlsDialog</name>
+    <name>lmms::gui::DelayControlsDialog</name>
     <message>
         <location filename="../../plugins/Delay/DelayControlsDialog.cpp" line="49"/>
         <source>DELAY</source>
@@ -3666,225 +1701,7 @@ Detta läge är inte tillgängligt för VST-tillägg.</translation>
     </message>
 </context>
 <context>
-    <name>Dialog</name>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="14"/>
-        <source>Add JACK Application</source>
-        <translation>Lägga till JACK-program</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="20"/>
-        <source>Note: Features not implemented yet are greyed out</source>
-        <translation>Notera: Funktioner som inte är implementerade än är utgråade</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="27"/>
-        <source>Application</source>
-        <translation>Program</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="49"/>
-        <source>Name:</source>
-        <translation>Namn:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="85"/>
-        <source>Application:</source>
-        <translation>Program:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="104"/>
-        <source>From template</source>
-        <translation>Från mall</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="117"/>
-        <source>Custom</source>
-        <translation>Anpassad</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="137"/>
-        <source>Template:</source>
-        <translation>Mall:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="167"/>
-        <source>Command:</source>
-        <translation>Kommando:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="187"/>
-        <source>Setup</source>
-        <translation>Inställning</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="224"/>
-        <source>Session Manager:</source>
-        <translation>Sessionshanterare:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="238"/>
-        <source>None</source>
-        <translation>Ingen</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="277"/>
-        <source>Audio inputs:</source>
-        <translation>Ljudingångar:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="339"/>
-        <source>MIDI inputs:</source>
-        <translation>MIDI-ingångar:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="391"/>
-        <source>Audio outputs:</source>
-        <translation>Ljudutgångar:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="440"/>
-        <source>MIDI outputs:</source>
-        <translation>MIDI-utgångar:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="470"/>
-        <source>Take control of main application window</source>
-        <translation>Ta kontroll över programmets huvudfönster</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="480"/>
-        <source>Workarounds</source>
-        <translation>Lösningar</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="486"/>
-        <source>Wait for external application start (Advanced, for Debug only)</source>
-        <translation>Vänta på att externt program startar (Avancerad, endast för felsökning)</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="496"/>
-        <source>Capture only the first X11 Window</source>
-        <translation>Fånga endast det första X11-fönstret</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="532"/>
-        <source>Use previous client output buffer as input for the next client</source>
-        <translation>Använd föregående klients utgångsbuffert som ingångsbuffert för nästa klient</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="539"/>
-        <source>Simulate 16 JACK MIDI outputs, with MIDI channel as port index</source>
-        <translation>Simulera 16 JACK MIDI-ingångar, med MIDI-kanal som portindex</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="583"/>
-        <source>Error here</source>
-        <translation>Fel här</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_osc_connect.ui" line="14"/>
-        <source>Carla Control - Connect</source>
-        <translation>Carla-kontroll - Anslut</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_osc_connect.ui" line="20"/>
-        <source>Remote setup</source>
-        <translation>Fjärrinställning</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_osc_connect.ui" line="26"/>
-        <source>UDP Port:</source>
-        <translation>UDP-port:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_osc_connect.ui" line="36"/>
-        <source>Remote host:</source>
-        <translation>Fjärrvärd:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_osc_connect.ui" line="66"/>
-        <source>TCP Port:</source>
-        <translation>TCP-port:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_osc_connect.ui" line="114"/>
-        <source>Reported host</source>
-        <translation>Rapporterad värd</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_osc_connect.ui" line="142"/>
-        <source>Automatic</source>
-        <translation>Automatisk</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_osc_connect.ui" line="171"/>
-        <source>Custom:</source>
-        <translation>Anpassad:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_osc_connect.ui" line="220"/>
-        <source>In some networks (like USB connections), the remote system cannot reach the local network. You can specify here which hostname or IP to make the remote Carla connect to.
-If you are unsure, leave it as &apos;Automatic&apos;.</source>
-        <translation>På vissa nätverk (så som USB-anslutningar), kan fjärrsystemet inte nå det lokala nätverket. Du kan här ange vilket värdnamn eller IP som fjärr-Carla ska ansluta till.
-Om du är osäker lämna värdet ”Automatisk”.</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/inputdialog_value.ui" line="14"/>
-        <source>Set value</source>
-        <translation>Ställ in värde</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/inputdialog_value.ui" line="20"/>
-        <source>TextLabel</source>
-        <translation>TextLabel</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/inputdialog_value.ui" line="30"/>
-        <source>Scale Points</source>
-        <translation>Skala punkter</translation>
-    </message>
-</context>
-<context>
-    <name>DriverSettingsW</name>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings_driver.ui" line="20"/>
-        <source>Driver Settings</source>
-        <translation>Drivrutinsinställningar</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings_driver.ui" line="79"/>
-        <source>Device:</source>
-        <translation>Enhet:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings_driver.ui" line="95"/>
-        <source>Buffer size:</source>
-        <translation>Buffertstorlek:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings_driver.ui" line="114"/>
-        <source>Sample rate:</source>
-        <translation>Samplingsfrekvens:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings_driver.ui" line="141"/>
-        <source>Triple buffer</source>
-        <translation>Trippelbuffring</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings_driver.ui" line="187"/>
-        <source>Show Driver Control Panel</source>
-        <translation>Visa kontrollpanel för drivrutin</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings_driver.ui" line="249"/>
-        <source>Restart the engine to load the new settings</source>
-        <translation>Starta om motorn för att läsa in de nya inställningarna</translation>
-    </message>
-</context>
-<context>
-    <name>DualFilterControlDialog</name>
+    <name>lmms::gui::DualFilterControlDialog</name>
     <message>
         <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="54"/>
         <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="58"/>
@@ -3953,7 +1770,7 @@ Om du är osäker lämna värdet ”Automatisk”.</translation>
     </message>
 </context>
 <context>
-    <name>DualFilterControls</name>
+    <name>lmms::DualFilterControls</name>
     <message>
         <location filename="../../plugins/DualFilter/DualFilterControls.cpp" line="40"/>
         <source>Filter 1 enabled</source>
@@ -4143,7 +1960,7 @@ Om du är osäker lämna värdet ”Automatisk”.</translation>
     </message>
 </context>
 <context>
-    <name>Editor</name>
+    <name>lmms::gui::Editor</name>
     <message>
         <location filename="../../src/gui/editors/Editor.cpp" line="95"/>
         <source>Transport controls</source>
@@ -4176,7 +1993,7 @@ Om du är osäker lämna värdet ”Automatisk”.</translation>
     </message>
 </context>
 <context>
-    <name>Effect</name>
+    <name>lmms::Effect</name>
     <message>
         <location filename="../../src/core/Effect.cpp" line="46"/>
         <source>Effect enabled</source>
@@ -4199,7 +2016,7 @@ Om du är osäker lämna värdet ”Automatisk”.</translation>
     </message>
 </context>
 <context>
-    <name>EffectChain</name>
+    <name>lmms::EffectChain</name>
     <message>
         <location filename="../../src/core/EffectChain.cpp" line="39"/>
         <source>Effects enabled</source>
@@ -4207,7 +2024,7 @@ Om du är osäker lämna värdet ”Automatisk”.</translation>
     </message>
 </context>
 <context>
-    <name>EffectRackView</name>
+    <name>lmms::gui::EffectRackView</name>
     <message>
         <location filename="../../src/gui/EffectRackView.cpp" line="44"/>
         <source>EFFECTS CHAIN</source>
@@ -4220,7 +2037,7 @@ Om du är osäker lämna värdet ”Automatisk”.</translation>
     </message>
 </context>
 <context>
-    <name>EffectSelectDialog</name>
+    <name>lmms::gui::EffectSelectDialog</name>
     <message>
         <location filename="../../src/gui/modals/EffectSelectDialog.ui" line="14"/>
         <source>Add effect</source>
@@ -4249,7 +2066,7 @@ Om du är osäker lämna värdet ”Automatisk”.</translation>
     </message>
 </context>
 <context>
-    <name>EffectView</name>
+    <name>lmms::gui::EffectView</name>
     <message>
         <location filename="../../src/gui/EffectView.cpp" line="60"/>
         <source>On/Off</source>
@@ -4307,7 +2124,7 @@ Om du är osäker lämna värdet ”Automatisk”.</translation>
     </message>
 </context>
 <context>
-    <name>EnvelopeAndLfoParameters</name>
+    <name>lmms::EnvelopeAndLfoParameters</name>
     <message>
         <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="96"/>
         <source>Env pre-delay</source>
@@ -4380,7 +2197,7 @@ Om du är osäker lämna värdet ”Automatisk”.</translation>
     </message>
 </context>
 <context>
-    <name>EnvelopeAndLfoView</name>
+    <name>lmms::gui::EnvelopeAndLfoView</name>
     <message>
         <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="98"/>
         <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="142"/>
@@ -4504,7 +2321,7 @@ Om du är osäker lämna värdet ”Automatisk”.</translation>
     </message>
 </context>
 <context>
-    <name>EqControls</name>
+    <name>lmms::EqControls</name>
     <message>
         <location filename="../../plugins/Eq/EqControls.cpp" line="37"/>
         <source>Input gain</source>
@@ -4717,7 +2534,7 @@ Om du är osäker lämna värdet ”Automatisk”.</translation>
     </message>
 </context>
 <context>
-    <name>EqControlsDialog</name>
+    <name>lmms::gui::EqControlsDialog</name>
     <message>
         <location filename="../../plugins/Eq/EqControlsDialog.cpp" line="67"/>
         <source>HP</source>
@@ -4807,7 +2624,7 @@ Om du är osäker lämna värdet ”Automatisk”.</translation>
     </message>
 </context>
 <context>
-    <name>EqHandle</name>
+    <name>lmms::gui::EqHandle</name>
     <message>
         <location filename="../../plugins/Eq/EqCurve.cpp" line="132"/>
         <source>Reso: </source>
@@ -4826,7 +2643,7 @@ Om du är osäker lämna värdet ”Automatisk”.</translation>
     </message>
 </context>
 <context>
-    <name>ExportProjectDialog</name>
+    <name>lmms::gui::ExportProjectDialog</name>
     <message>
         <location filename="../../src/gui/modals/export_project.ui" line="26"/>
         <source>Export project</source>
@@ -5086,7 +2903,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>Fader</name>
+    <name>lmms::gui::Fader</name>
     <message>
         <location filename="../../src/gui/widgets/Fader.cpp" line="220"/>
         <source>Set value</source>
@@ -5099,7 +2916,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>FileBrowser</name>
+    <name>lmms::gui::FileBrowser</name>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="83"/>
         <source>User content</source>
@@ -5127,7 +2944,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>FileBrowserTreeWidget</name>
+    <name>lmms::gui::FileBrowserTreeWidget</name>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="506"/>
         <source>Send to active instrument-track</source>
@@ -5195,7 +3012,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>FlangerControls</name>
+    <name>lmms::FlangerControls</name>
     <message>
         <location filename="../../plugins/Flanger/FlangerControls.cpp" line="37"/>
         <source>Delay samples</source>
@@ -5233,7 +3050,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>FlangerControlsDialog</name>
+    <name>lmms::gui::FlangerControlsDialog</name>
     <message>
         <location filename="../../plugins/Flanger/FlangerControlsDialog.cpp" line="47"/>
         <source>DELAY</source>
@@ -5301,7 +3118,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>FreeBoyInstrument</name>
+    <name>lmms::FreeBoyInstrument</name>
     <message>
         <location filename="../../plugins/FreeBoy/FreeBoy.cpp" line="72"/>
         <source>Sweep time</source>
@@ -5424,7 +3241,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>FreeBoyInstrumentView</name>
+    <name>lmms::gui::FreeBoyInstrumentView</name>
     <message>
         <location filename="../../plugins/FreeBoy/FreeBoy.cpp" line="469"/>
         <source>Sweep time:</source>
@@ -5617,7 +3434,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>MixerLine</name>
+    <name>lmms::gui::MixerLine</name>
     <message>
         <location filename="../../src/gui/MixerLine.cpp" line="86"/>
         <source>Channel send amount</source>
@@ -5665,7 +3482,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>MixerLineLcdSpinBox</name>
+    <name>lmms::gui::MixerLineLcdSpinBox</name>
     <message>
         <location filename="../../src/gui/widgets/MixerLineLcdSpinBox.cpp" line="58"/>
         <source>Assign to:</source>
@@ -5678,7 +3495,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>Mixer</name>
+    <name>lmms::Mixer</name>
     <message>
         <location filename="../../src/core/Mixer.cpp" line="704"/>
         <source>Master</source>
@@ -5708,7 +3525,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>MixerView</name>
+    <name>lmms::gui::MixerView</name>
     <message>
         <location filename="../../src/gui/MixerView.cpp" line="70"/>
         <source>Mixer</source>
@@ -5741,7 +3558,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>MixerRoute</name>
+    <name>lmms::MixerRoute</name>
     <message>
         <location filename="../../src/core/Mixer.cpp" line="43"/>
         <location filename="../../src/core/Mixer.cpp" line="58"/>
@@ -5750,7 +3567,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>GigInstrument</name>
+    <name>lmms::GigInstrument</name>
     <message>
         <location filename="../../plugins/GigPlayer/GigPlayer.cpp" line="85"/>
         <source>Bank</source>
@@ -5768,7 +3585,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>GigInstrumentView</name>
+    <name>lmms::gui::GigInstrumentView</name>
     <message>
         <location filename="../../plugins/GigPlayer/GigPlayer.cpp" line="942"/>
         <location filename="../../plugins/GigPlayer/GigPlayer.cpp" line="1052"/>
@@ -5792,7 +3609,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>GuiApplication</name>
+    <name>lmms::gui::GuiApplication</name>
     <message>
         <location filename="../../src/gui/GuiApplication.cpp" line="66"/>
         <source>Working directory</source>
@@ -5845,7 +3662,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>InstrumentFunctionArpeggio</name>
+    <name>lmms::InstrumentFunctionArpeggio</name>
     <message>
         <location filename="../../src/core/InstrumentFunctions.cpp" line="300"/>
         <source>Arpeggio</source>
@@ -5943,7 +3760,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>InstrumentFunctionArpeggioView</name>
+    <name>lmms::gui::InstrumentFunctionArpeggioView</name>
     <message>
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="95"/>
         <source>ARPEGGIO</source>
@@ -6063,7 +3880,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>InstrumentFunctionNoteStacking</name>
+    <name>lmms::InstrumentFunctionNoteStacking</name>
     <message>
         <location filename="../../src/core/InstrumentFunctions.cpp" line="37"/>
         <source>octave</source>
@@ -6552,7 +4369,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>InstrumentFunctionNoteStackingView</name>
+    <name>lmms::gui::InstrumentFunctionNoteStackingView</name>
     <message>
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="41"/>
         <source>STACKING</source>
@@ -6580,7 +4397,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>InstrumentMidiIOView</name>
+    <name>lmms::gui::InstrumentMidiIOView</name>
     <message>
         <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="51"/>
         <source>ENABLE MIDI INPUT</source>
@@ -6644,7 +4461,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>InstrumentMiscView</name>
+    <name>lmms::gui::InstrumentMiscView</name>
     <message>
         <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="221"/>
         <source>MASTER PITCH</source>
@@ -6657,7 +4474,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>InstrumentSoundShaping</name>
+    <name>lmms::InstrumentSoundShaping</name>
     <message>
         <location filename="../../src/core/InstrumentSoundShaping.cpp" line="47"/>
         <source>VOLUME</source>
@@ -6816,7 +4633,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>InstrumentSoundShapingView</name>
+    <name>lmms::gui::InstrumentSoundShapingView</name>
     <message>
         <location filename="../../src/gui/instrument/InstrumentSoundShapingView.cpp" line="55"/>
         <source>TARGET</source>
@@ -6859,7 +4676,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>InstrumentTrack</name>
+    <name>lmms::InstrumentTrack</name>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="91"/>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="103"/>
@@ -6929,7 +4746,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>InstrumentTrackView</name>
+    <name>lmms::gui::InstrumentTrackView</name>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="1065"/>
         <source>Volume</source>
@@ -6987,7 +4804,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>InstrumentTrackWindow</name>
+    <name>lmms::gui::InstrumentTrackWindow</name>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="1384"/>
         <source>GENERAL SETTINGS</source>
@@ -7115,67 +4932,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>JackApplicationW</name>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_database.cpp" line="356"/>
-        <source>NSM applications cannot use abstract or absolute paths</source>
-        <translation>NSM-program kan inte använda abstracta eller absoluta sökvägar</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_database.cpp" line="358"/>
-        <source>NSM applications cannot use CLI arguments</source>
-        <translation>NSM-program kan inte använda kommandoradsargument</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_database.cpp" line="360"/>
-        <source>You need to save the current Carla project before NSM can be used</source>
-        <translation>Du måste spara det aktuella Carla-projektet innan NSM kan avändas</translation>
-    </message>
-</context>
-<context>
-    <name>JuceAboutW</name>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about_juce.ui" line="14"/>
-        <source>About JUCE</source>
-        <translation>Om JUCE</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about_juce.ui" line="61"/>
-        <source>&lt;b&gt;About JUCE&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Om JUCE&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about_juce.ui" line="84"/>
-        <source>This program uses JUCE version 3.x.x.</source>
-        <translation>Detta program använder JUCE version 3.x.x.</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about_juce.ui" line="107"/>
-        <source>JUCE (Jules' Utility Class Extensions) is an all-encompassing C++ class library for developing cross-platform software.
-
-It contains pretty much everything you're likely to need to create most applications, and is particularly well-suited for building highly-customised GUIs, and for handling graphics and sound.
-
-JUCE is licensed under the GNU Public Licence version 2.0.
-One module (juce_core) is permissively licensed under the ISC.
-
-Copyright (C) 2017 ROLI Ltd.</source>
-        <translation>JUCE (Jules&apos; Utility Class Extensions) är ett allomfattande C++-klassbibliotek för utveckling av programvara över plattformsgränser.
-
-Det innehåller i princip allting som du troligen kommer att använda för att skapa de flera program, och är speciellt väl lämpat för att bygga anpassningsbara användargränssnitt och för att hantera grafik och ljud.
-
-JUCE licensieras under GNU Public Licence version 2.0.
-En modul (juce_core) licensierad under ISC.
-
-Copyright (C) 2017 ROLI Ltd.</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="217"/>
-        <source>This program uses JUCE version %1.</source>
-        <translation>Detta program använder JUCE version %1.</translation>
-    </message>
-</context>
-<context>
-    <name>Knob</name>
+    <name>lmms::gui::Knob</name>
     <message>
         <location filename="../../src/gui/widgets/Knob.cpp" line="516"/>
         <source>Set linear</source>
@@ -7204,7 +4961,7 @@ Copyright (C) 2017 ROLI Ltd.</translation>
     </message>
 </context>
 <context>
-    <name>LadspaControl</name>
+    <name>lmms::LadspaControl</name>
     <message>
         <location filename="../../src/core/LadspaControl.cpp" line="37"/>
         <source>Link channels</source>
@@ -7212,7 +4969,7 @@ Copyright (C) 2017 ROLI Ltd.</translation>
     </message>
 </context>
 <context>
-    <name>LadspaControlDialog</name>
+    <name>lmms::gui::LadspaControlDialog</name>
     <message>
         <location filename="../../plugins/LadspaEffect/LadspaControlDialog.cpp" line="56"/>
         <source>Link Channels</source>
@@ -7225,7 +4982,7 @@ Copyright (C) 2017 ROLI Ltd.</translation>
     </message>
 </context>
 <context>
-    <name>LadspaControlView</name>
+    <name>lmms::gui::LadspaControlView</name>
     <message>
         <location filename="../../src/gui/LadspaControlView.cpp" line="52"/>
         <source>Link channels</source>
@@ -7238,7 +4995,7 @@ Copyright (C) 2017 ROLI Ltd.</translation>
     </message>
 </context>
 <context>
-    <name>LadspaEffect</name>
+    <name>lmms::LadspaEffect</name>
     <message>
         <location filename="../../plugins/LadspaEffect/LadspaEffect.cpp" line="80"/>
         <source>Unknown LADSPA plugin %1 requested.</source>
@@ -7246,7 +5003,7 @@ Copyright (C) 2017 ROLI Ltd.</translation>
     </message>
 </context>
 <context>
-    <name>LcdFloatSpinBox</name>
+    <name>lmms::gui::LcdFloatSpinBox</name>
     <message>
         <location filename="../../src/gui/widgets/LcdFloatSpinBox.cpp" line="201"/>
         <source>Set value</source>
@@ -7259,7 +5016,7 @@ Copyright (C) 2017 ROLI Ltd.</translation>
     </message>
 </context>
 <context>
-    <name>LcdSpinBox</name>
+    <name>lmms::gui::LcdSpinBox</name>
     <message>
         <location filename="../../src/gui/widgets/LcdSpinBox.cpp" line="163"/>
         <source>Set value</source>
@@ -7272,7 +5029,7 @@ Copyright (C) 2017 ROLI Ltd.</translation>
     </message>
 </context>
 <context>
-    <name>LeftRightNav</name>
+    <name>lmms::gui::LeftRightNav</name>
     <message>
         <location filename="../../src/gui/widgets/LeftRightNav.cpp" line="34"/>
         <location filename="../../src/gui/widgets/LeftRightNav.cpp" line="61"/>
@@ -7299,7 +5056,7 @@ Copyright (C) 2017 ROLI Ltd.</translation>
     </message>
 </context>
 <context>
-    <name>LfoController</name>
+    <name>lmms::LfoController</name>
     <message>
         <location filename="../../src/core/LfoController.cpp" line="36"/>
         <source>LFO Controller</source>
@@ -7337,7 +5094,7 @@ Copyright (C) 2017 ROLI Ltd.</translation>
     </message>
 </context>
 <context>
-    <name>LfoControllerDialog</name>
+    <name>lmms::gui::LfoControllerDialog</name>
     <message>
         <location filename="../../src/gui/LfoControllerDialog.cpp" line="61"/>
         <source>LFO</source>
@@ -7447,7 +5204,7 @@ Dubbelklicka för att välja en fil.</translation>
     </message>
 </context>
 <context>
-    <name>Engine</name>
+    <name>lmms::Engine</name>
     <message>
         <location filename="../../src/core/Engine.cpp" line="58"/>
         <source>Generating wavetables</source>
@@ -7470,7 +5227,7 @@ Dubbelklicka för att välja en fil.</translation>
     </message>
 </context>
 <context>
-    <name>MainWindow</name>
+    <name>lmms::gui::MainWindow</name>
     <message>
         <location filename="../../src/core/ConfigManager.cpp" line="498"/>
         <source>Configuration file</source>
@@ -7951,7 +5708,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     </message>
 </context>
 <context>
-    <name>MeterDialog</name>
+    <name>lmms::gui::MeterDialog</name>
     <message>
         <location filename="../../src/gui/widgets/MeterDialog.cpp" line="52"/>
         <location filename="../../src/gui/widgets/MeterDialog.cpp" line="59"/>
@@ -7981,7 +5738,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     </message>
 </context>
 <context>
-    <name>MeterModel</name>
+    <name>lmms::MeterModel</name>
     <message>
         <location filename="../../src/core/MeterModel.cpp" line="32"/>
         <source>Numerator</source>
@@ -7994,7 +5751,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     </message>
 </context>
 <context>
-    <name>MidiCCRackView</name>
+    <name>lmms::gui::MidiCCRackView</name>
     <message>
         <location filename="../../src/gui/MidiCCRackView.cpp" line="48"/>
         <location filename="../../src/gui/MidiCCRackView.cpp" line="124"/>
@@ -8013,7 +5770,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     </message>
 </context>
 <context>
-    <name>MidiController</name>
+    <name>lmms::MidiController</name>
     <message>
         <location filename="../../src/core/midi/MidiController.cpp" line="36"/>
         <source>MIDI Controller</source>
@@ -8026,7 +5783,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     </message>
 </context>
 <context>
-    <name>MidiImport</name>
+    <name>lmms::MidiImport</name>
     <message>
         <location filename="../../plugins/MidiImport/MidiImport.cpp" line="110"/>
         <location filename="../../plugins/MidiImport/MidiImport.cpp" line="122"/>
@@ -8070,7 +5827,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     </message>
 </context>
 <context>
-    <name>MidiJack</name>
+    <name>lmms::MidiJack</name>
     <message>
         <location filename="../../src/core/midi/MidiJack.cpp" line="56"/>
         <source>JACK server down</source>
@@ -8085,242 +5842,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     </message>
 </context>
 <context>
-    <name>MidiPatternW</name>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="14"/>
-        <source>MIDI Pattern</source>
-        <translation>MIDI-mönster</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="39"/>
-        <source>Time Signature:</source>
-        <translation>Tidsignatur:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="56"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="259"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="339"/>
-        <source>1/4</source>
-        <translation>1/4</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="61"/>
-        <source>2/4</source>
-        <translation>2/4</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="66"/>
-        <source>3/4</source>
-        <translation>3/4</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="71"/>
-        <source>4/4</source>
-        <translation>4/4</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="76"/>
-        <source>5/4</source>
-        <translation>5/4</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="81"/>
-        <source>6/4</source>
-        <translation>6/4</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="105"/>
-        <source>Measures:</source>
-        <translation>Takter:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="119"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="274"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="354"/>
-        <source>1</source>
-        <translation>1</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="124"/>
-        <source>2</source>
-        <translation>2</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="129"/>
-        <source>3</source>
-        <translation>3</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="134"/>
-        <source>4</source>
-        <translation>4</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="139"/>
-        <source>5</source>
-        <translation>5</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="144"/>
-        <source>6</source>
-        <translation>6</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="149"/>
-        <source>7</source>
-        <translation>7</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="154"/>
-        <source>8</source>
-        <translation>8</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="159"/>
-        <source>9</source>
-        <translation>9</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="164"/>
-        <source>10</source>
-        <translation>10</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="169"/>
-        <source>11</source>
-        <translation>11</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="174"/>
-        <source>12</source>
-        <translation>12</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="179"/>
-        <source>13</source>
-        <translation>13</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="184"/>
-        <source>14</source>
-        <translation>14</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="189"/>
-        <source>15</source>
-        <translation>15</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="194"/>
-        <source>16</source>
-        <translation>16</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="218"/>
-        <source>Default Length:</source>
-        <translation>Standardlängd:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="229"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="309"/>
-        <source>1/16</source>
-        <translation>1/16</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="234"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="314"/>
-        <source>1/15</source>
-        <translation>1/15</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="239"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="319"/>
-        <source>1/12</source>
-        <translation>1/12</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="244"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="324"/>
-        <source>1/9</source>
-        <translation>1/9</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="249"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="329"/>
-        <source>1/8</source>
-        <translation>1/8</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="254"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="334"/>
-        <source>1/6</source>
-        <translation>1/6</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="264"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="344"/>
-        <source>1/3</source>
-        <translation>1/3</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="269"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="349"/>
-        <source>1/2</source>
-        <translation>1/2</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="298"/>
-        <source>Quantize:</source>
-        <translation>Kvantisera:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="411"/>
-        <source>&amp;File</source>
-        <translation>&amp;Arkiv</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="417"/>
-        <source>&amp;Edit</source>
-        <translation>&amp;Redigera</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="429"/>
-        <source>&amp;Quit</source>
-        <translation>&amp;Avsluta</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="437"/>
-        <source>&amp;Insert Mode</source>
-        <translation>&amp;Infogningsläge</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="440"/>
-        <source>F</source>
-        <translation>F</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="448"/>
-        <source>&amp;Velocity Mode</source>
-        <translation>&amp;Hastighetsläge</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="451"/>
-        <source>D</source>
-        <translation>D</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="456"/>
-        <source>Select All</source>
-        <translation>Välj alla</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="459"/>
-        <source>A</source>
-        <translation>A</translation>
-    </message>
-</context>
-<context>
-    <name>MidiPort</name>
+    <name>lmms::MidiPort</name>
     <message>
         <location filename="../../src/core/midi/MidiPort.cpp" line="49"/>
         <source>Input channel</source>
@@ -8378,7 +5900,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     </message>
 </context>
 <context>
-    <name>MidiSetupWidget</name>
+    <name>lmms::gui::MidiSetupWidget</name>
     <message>
         <location filename="../../src/gui/MidiSetupWidget.cpp" line="45"/>
         <source>Device</source>
@@ -8386,7 +5908,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     </message>
 </context>
 <context>
-    <name>MonstroInstrument</name>
+    <name>lmms::MonstroInstrument</name>
     <message>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="832"/>
         <source>Osc 1 volume</source>
@@ -8982,7 +6504,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     </message>
 </context>
 <context>
-    <name>MonstroView</name>
+    <name>lmms::gui::MonstroView</name>
     <message>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1468"/>
         <source>Operators view</source>
@@ -9223,7 +6745,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     </message>
 </context>
 <context>
-    <name>MultitapEchoControlDialog</name>
+    <name>lmms::gui::MultitapEchoControlDialog</name>
     <message>
         <location filename="../../plugins/MultitapEcho/MultitapEchoControlDialog.cpp" line="84"/>
         <source>Length</source>
@@ -9266,7 +6788,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     </message>
 </context>
 <context>
-    <name>NesInstrument</name>
+    <name>lmms::NesInstrument</name>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="489"/>
         <source>Channel 1 coarse detune</source>
@@ -9369,7 +6891,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     </message>
 </context>
 <context>
-    <name>NesInstrumentView</name>
+    <name>lmms::gui::NesInstrumentView</name>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="762"/>
         <location filename="../../plugins/Nes/Nes.cpp" line="793"/>
@@ -9525,7 +7047,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     </message>
 </context>
 <context>
-    <name>OpulenzInstrument</name>
+    <name>lmms::OpulenzInstrument</name>
     <message>
         <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="98"/>
         <source>Patch</source>
@@ -9673,7 +7195,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     </message>
 </context>
 <context>
-    <name>OpulenzInstrumentView</name>
+    <name>lmms::gui::OpulenzInstrumentView</name>
     <message>
         <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="802"/>
         <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="804"/>
@@ -9700,7 +7222,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     </message>
 </context>
 <context>
-    <name>OscillatorObject</name>
+    <name>lmms::OscillatorObject</name>
     <message>
         <location filename="../../plugins/Organic/Organic.cpp" line="568"/>
         <source>Osc %1 waveform</source>
@@ -9761,7 +7283,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     </message>
 </context>
 <context>
-    <name>Oscilloscope</name>
+    <name>lmms::gui::Oscilloscope</name>
     <message>
         <location filename="../../src/gui/widgets/Oscilloscope.cpp" line="59"/>
         <source>Oscilloscope</source>
@@ -9774,7 +7296,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     </message>
 </context>
 <context>
-    <name>PatchesDialog</name>
+    <name>lmms::gui::PatchesDialog</name>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="39"/>
         <source>Qsynth: Channel Preset</source>
@@ -9817,7 +7339,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     </message>
 </context>
 <context>
-    <name>PatmanView</name>
+    <name>lmms::gui::PatmanView</name>
     <message>
         <location filename="../../plugins/Patman/Patman.cpp" line="466"/>
         <source>Open patch</source>
@@ -9860,7 +7382,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     </message>
 </context>
 <context>
-    <name>MidiClipView</name>
+    <name>lmms::gui::MidiClipView</name>
     <message>
         <location filename="../../src/gui/clips/MidiClipView.cpp" line="143"/>
         <source>Open in piano-roll</source>
@@ -9903,7 +7425,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     </message>
 </context>
 <context>
-    <name>PeakController</name>
+    <name>lmms::PeakController</name>
     <message>
         <location filename="../../src/core/PeakController.cpp" line="45"/>
         <source>Peak Controller</source>
@@ -9921,7 +7443,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     </message>
 </context>
 <context>
-    <name>PeakControllerDialog</name>
+    <name>lmms::gui::PeakControllerDialog</name>
     <message>
         <location filename="../../src/gui/PeakControllerDialog.cpp" line="46"/>
         <source>PEAK</source>
@@ -9934,7 +7456,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     </message>
 </context>
 <context>
-    <name>PeakControllerEffectControlDialog</name>
+    <name>lmms::gui::PeakControllerEffectControlDialog</name>
     <message>
         <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControlDialog.cpp" line="50"/>
         <source>BASE</source>
@@ -10007,7 +7529,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     </message>
 </context>
 <context>
-    <name>PeakControllerEffectControls</name>
+    <name>lmms::PeakControllerEffectControls</name>
     <message>
         <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControls.cpp" line="39"/>
         <source>Base value</source>
@@ -10050,7 +7572,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     </message>
 </context>
 <context>
-    <name>PianoRoll</name>
+    <name>lmms::gui::PianoRoll</name>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="216"/>
         <source>Note Velocity</source>
@@ -10169,7 +7691,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     </message>
 </context>
 <context>
-    <name>PianoRollWindow</name>
+    <name>lmms::gui::PianoRollWindow</name>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="4714"/>
         <source>Play/pause current clip (Space)</source>
@@ -10411,7 +7933,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     </message>
 </context>
 <context>
-    <name>PianoView</name>
+    <name>lmms::gui::PianoView</name>
     <message>
         <location filename="../../src/gui/instrument/PianoView.cpp" line="813"/>
         <source>Base note</source>
@@ -10429,7 +7951,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     </message>
 </context>
 <context>
-    <name>Plugin</name>
+    <name>lmms::Plugin</name>
     <message>
         <location filename="../../src/core/Plugin.cpp" line="225"/>
         <source>Plugin not found</source>
@@ -10454,7 +7976,7 @@ Orsak: &quot;%2&quot;</translation>
     </message>
 </context>
 <context>
-    <name>PluginBrowser</name>
+    <name>lmms::gui::PluginBrowser</name>
     <message>
         <location filename="../../src/gui/PluginBrowser.cpp" line="43"/>
         <source>Instrument Plugins</source>
@@ -10724,488 +8246,7 @@ Detta chip användes i datorn Commodore 64.</translation>
     </message>
 </context>
 <context>
-    <name>PluginDatabaseW</name>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="14"/>
-        <source>Carla - Add New</source>
-        <translation>Carla - Lägg till ny</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="32"/>
-        <source>Format</source>
-        <translation>Format</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="38"/>
-        <source>Internal</source>
-        <translation>Intern</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="45"/>
-        <source>LADSPA</source>
-        <translation>LADSPA</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="52"/>
-        <source>DSSI</source>
-        <translation>DSSI</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="59"/>
-        <source>LV2</source>
-        <translation>LV2</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="66"/>
-        <source>VST2</source>
-        <translation>VST2</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="73"/>
-        <source>VST3</source>
-        <translation>VST3</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="80"/>
-        <source>AU</source>
-        <translation>AU</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="87"/>
-        <source>Sound Kits</source>
-        <translation>Ljuduppsättning</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="116"/>
-        <source>Type</source>
-        <translation>Typ</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="122"/>
-        <source>Effects</source>
-        <translation>Effekter</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="129"/>
-        <source>Instruments</source>
-        <translation>Instrument</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="136"/>
-        <source>MIDI Plugins</source>
-        <translation>MIDI-tillägg</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="143"/>
-        <source>Other/Misc</source>
-        <translation>Annat/diverse</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="172"/>
-        <source>Architecture</source>
-        <translation>Arkitektur</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="178"/>
-        <source>Native</source>
-        <translation>Inbyggt</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="185"/>
-        <source>Bridged</source>
-        <translation>Bryggad</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="192"/>
-        <source>Bridged (Wine)</source>
-        <translation>Bryggad (Wine)</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="251"/>
-        <source>Requirements</source>
-        <translation>Krav</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="258"/>
-        <source>With Custom GUI </source>
-        <translation>Med anpassat användargränssnitt</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="265"/>
-        <source>With CV Ports</source>
-        <translation>Med CV-portar</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="272"/>
-        <source>Real-time safe only</source>
-        <translation>Endast realtidssäkert</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="279"/>
-        <source>Stereo only</source>
-        <translation>Endast stereo</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="286"/>
-        <source>With Inline Display</source>
-        <translation>Med inbyggd visning</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="293"/>
-        <source>Favorites only</source>
-        <translation>Endast favoriter</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="306"/>
-        <source>(Number of Plugins go here)</source>
-        <translation>(Antal tillägg placeras här)</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="329"/>
-        <source>&amp;Add Plugin</source>
-        <translation>&amp;Lägg till tillägg</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="340"/>
-        <source>Cancel</source>
-        <translation>Avbryt</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="362"/>
-        <source>Refresh</source>
-        <translation>Uppdatera</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="373"/>
-        <source>Reset filters</source>
-        <translation>Återställ filter</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="409"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="436"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="453"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="603"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="610"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="617"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="624"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="631"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="638"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="645"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="652"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="659"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="666"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="673"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="680"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="687"/>
-        <source>TextLabel</source>
-        <translation>TextLabel</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="416"/>
-        <source>Format:</source>
-        <translation>Format:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="426"/>
-        <source>Architecture:</source>
-        <translation>Arkitektur:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="443"/>
-        <source>Type:</source>
-        <translation>Typ:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="473"/>
-        <source>MIDI Ins:</source>
-        <translation>MIDI in:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="483"/>
-        <source>Audio Ins:</source>
-        <translation>Ljudingångar:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="493"/>
-        <source>CV Outs:</source>
-        <translation>CV-utgångar:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="503"/>
-        <source>MIDI Outs:</source>
-        <translation>MIDI ut:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="513"/>
-        <source>Parameter Ins:</source>
-        <translation>Parameteringångar:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="523"/>
-        <source>Parameter Outs:</source>
-        <translation>Parameterutgångar:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="533"/>
-        <source>Audio Outs:</source>
-        <translation>Ljudutgångar:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="543"/>
-        <source>CV Ins:</source>
-        <translation>CV-ingångar:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="553"/>
-        <source>UniqueID:</source>
-        <translation>UniqueID:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="563"/>
-        <source>Has Inline Display:</source>
-        <translation>Har inbyggd visning:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="573"/>
-        <source>Has Custom GUI:</source>
-        <translation>Has anpassat användargränssnitt:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="583"/>
-        <source>Is Synth:</source>
-        <translation>Är en synth:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="593"/>
-        <source>Is Bridged:</source>
-        <translation>Är bryggad:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="700"/>
-        <source>Information</source>
-        <translation>Information</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="804"/>
-        <source>Name</source>
-        <translation>Namn</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="809"/>
-        <source>Label/URI</source>
-        <translation>Etikett/URI</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="814"/>
-        <source>Maker</source>
-        <translation>Tillverkare</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="819"/>
-        <source>Binary/Filename</source>
-        <translation>Binär/filnamn</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="827"/>
-        <source>Focus Text Search</source>
-        <translation>Fokusera på textsökning</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="830"/>
-        <source>Ctrl+F</source>
-        <translation>Ctrl+F</translation>
-    </message>
-</context>
-<context>
-    <name>PluginEdit</name>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="14"/>
-        <source>Plugin Editor</source>
-        <translation>Tilläggsredigerare</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="27"/>
-        <source>Edit</source>
-        <translation>Redigera</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="33"/>
-        <source>Control</source>
-        <translation>Kontroll</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="54"/>
-        <source>MIDI Control Channel:</source>
-        <translation>MIDI-kontrollkanal:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="67"/>
-        <source>N</source>
-        <translation>N</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="128"/>
-        <source>Output dry/wet (100%)</source>
-        <translation>Utgång original/effekt (100%)</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="150"/>
-        <source>Output volume (100%)</source>
-        <translation>Utgångsvolym (100%)</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="203"/>
-        <source>Balance Left (0%)</source>
-        <translation>Balans vänster (0%)</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="225"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="266"/>
-        <source>Balance Right (0%)</source>
-        <translation>Balans höger (0%)</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="282"/>
-        <source>Use Balance</source>
-        <translation>Använd balans</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="292"/>
-        <source>Use Panning</source>
-        <translation>Använd panorering</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="325"/>
-        <source>Settings</source>
-        <translation>Inställningar</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="331"/>
-        <source>Use Chunks</source>
-        <translation>Använd stycken</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="357"/>
-        <source>    Audio:</source>
-        <translation>    Ljud:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="364"/>
-        <source>Fixed-Size Buffer</source>
-        <translation>Buffer med fix storlek</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="371"/>
-        <source>Force Stereo (needs reload)</source>
-        <translation>Tvingad stereo (kräver omstart)</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="397"/>
-        <source>    MIDI:</source>
-        <translation>    MIDI:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="404"/>
-        <source>Map Program Changes</source>
-        <translation>Mapp programändringar</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="411"/>
-        <source>Send Bank/Program Changes</source>
-        <translation>Skicka bank-/programändringar</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="418"/>
-        <source>Send Control Changes</source>
-        <translation>Skicka kontrolländringar</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="425"/>
-        <source>Send Channel Pressure</source>
-        <translation>Skicka kanaltryck</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="432"/>
-        <source>Send Note Aftertouch</source>
-        <translation>Skicka efterberöring för noter</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="439"/>
-        <source>Send Pitchbend</source>
-        <translation>Skicka tonhöjdsböjning</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="446"/>
-        <source>Send All Sound/Notes Off</source>
-        <translation>Skicka alla ljud/noter av</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="474"/>
-        <source>
-Plugin Name
-</source>
-        <translation>
-Tilläggsnamn
-</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="554"/>
-        <source>Program:</source>
-        <translation>Program:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="609"/>
-        <source>MIDI Program:</source>
-        <translation>MIDI-program:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="633"/>
-        <source>Save State</source>
-        <translation>Spara tillstånd</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="647"/>
-        <source>Load State</source>
-        <translation>Ladda tillstånd</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="684"/>
-        <source>Information</source>
-        <translation>Information</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="708"/>
-        <source>Label/URI:</source>
-        <translation>Etikett/URI:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="718"/>
-        <source>Name:</source>
-        <translation>Namn:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="792"/>
-        <source>Type:</source>
-        <translation>Typ:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="802"/>
-        <source>Maker:</source>
-        <translation>Tillverkare:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="812"/>
-        <source>Copyright:</source>
-        <translation>Upphovsrätt:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="822"/>
-        <source>Unique ID:</source>
-        <translation>Unikt ID:</translation>
-    </message>
-</context>
-<context>
-    <name>PluginFactory</name>
+    <name>lmms::PluginFactory</name>
     <message>
         <location filename="../../src/core/PluginFactory.cpp" line="134"/>
         <source>Plugin not found.</source>
@@ -11218,245 +8259,7 @@ Tilläggsnamn
     </message>
 </context>
 <context>
-    <name>PluginParameter</name>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_parameter.ui" line="14"/>
-        <source>Form</source>
-        <translation>Form</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_parameter.ui" line="23"/>
-        <source>Parameter Name</source>
-        <translation>Parameternamn</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_parameter.ui" line="46"/>
-        <source>...</source>
-        <translation>...</translation>
-    </message>
-</context>
-<context>
-    <name>PluginRefreshW</name>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="14"/>
-        <source>Carla - Refresh</source>
-        <translation>Carla - Uppdatera</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="38"/>
-        <source>Search for new...</source>
-        <translation>Sök efter nya...</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="49"/>
-        <source>LADSPA</source>
-        <translation>LADSPA</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="56"/>
-        <source>DSSI</source>
-        <translation>DSSI</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="63"/>
-        <source>LV2</source>
-        <translation>LV2</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="70"/>
-        <source>VST2</source>
-        <translation>VST2</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="77"/>
-        <source>VST3</source>
-        <translation>VST3</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="84"/>
-        <source>AU</source>
-        <translation>AU</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="104"/>
-        <source>SF2/3</source>
-        <translation>SF2/3</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="111"/>
-        <source>SFZ</source>
-        <translation>SFZ</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="161"/>
-        <source>Native</source>
-        <translation>Inbyggt</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="168"/>
-        <source>POSIX 32bit</source>
-        <translation>POSIX 32bit</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="175"/>
-        <source>POSIX 64bit</source>
-        <translation>POSIX 64bit</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="182"/>
-        <source>Windows 32bit</source>
-        <translation>Windows 32bit</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="189"/>
-        <source>Windows 64bit</source>
-        <translation>Windows 64bit</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="232"/>
-        <source>Available tools:</source>
-        <translation>Tillgängliga verktyg:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="282"/>
-        <source>python3-rdflib (LADSPA-RDF support)</source>
-        <translation>python3-rdflib (LADSPA-RDF-stöd)</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="289"/>
-        <source>carla-discovery-win64</source>
-        <translation>carla-discovery-win64</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="296"/>
-        <source>carla-discovery-native</source>
-        <translation>carla-discovery-native</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="341"/>
-        <source>carla-discovery-posix32</source>
-        <translation>carla-discovery-posix32</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="386"/>
-        <source>carla-discovery-posix64</source>
-        <translation>carla-discovery-posix64</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="393"/>
-        <source>carla-discovery-win32</source>
-        <translation>carla-discovery-win32</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="416"/>
-        <source>Options:</source>
-        <translation>Alternativ:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="428"/>
-        <source>Carla will run small processing checks when scanning the plugins (to make sure they won't crash).
-You can disable these checks to get a faster scanning time (at your own risk).</source>
-        <translation>Carla kommer att köra små bearbetningskontroller vid skanning av tillägg (för att se till att de inte kraschar).
-Du kan inaktivera dessa kontroller för att få en snabbare skanningstid (på egen risk).</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="432"/>
-        <source>Run processing checks while scanning</source>
-        <translation>Kör processkontroller under detektering</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="502"/>
-        <source>Press &apos;Scan&apos; to begin the search</source>
-        <translation>Tryck på &apos;Skanna&apos; för att påbörja sökningen</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="509"/>
-        <source>Scan</source>
-        <translation>Skanna</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="520"/>
-        <source>&gt;&gt; Skip</source>
-        <translation>&gt;&gt; Hoppa</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="527"/>
-        <source>Close</source>
-        <translation>Stäng</translation>
-    </message>
-</context>
-<context>
-    <name>PluginWidget</name>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_calf.ui" line="17"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_classic.ui" line="17"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_compact.ui" line="17"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_default.ui" line="17"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_presets.ui" line="17"/>
-        <source>Frame</source>
-        <translation>Bild</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_calf.ui" line="64"/>
-        <source>Enable</source>
-        <translation>Aktivera</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_calf.ui" line="74"/>
-        <source>On/Off</source>
-        <translation>På/Av</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_calf.ui" line="147"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_compact.ui" line="227"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_default.ui" line="232"/>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_presets.ui" line="229"/>
-        <source>PluginName</source>
-        <translation>Tilläggsnamn</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_calf.ui" line="178"/>
-        <source>MIDI</source>
-        <translation>MIDI</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_calf.ui" line="223"/>
-        <source>AUDIO IN</source>
-        <translation>LJUDINGÅNG</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_calf.ui" line="250"/>
-        <source>AUDIO OUT</source>
-        <translation>LJUDUTGÅNG</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_calf.ui" line="306"/>
-        <source>GUI</source>
-        <translation>Användargränssnitt</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_calf.ui" line="316"/>
-        <source>Edit</source>
-        <translation>Redigera</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_calf.ui" line="326"/>
-        <source>Remove</source>
-        <translation>Ta bort</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_classic.ui" line="164"/>
-        <source>Plugin Name</source>
-        <translation>Tilläggsnamn</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_presets.ui" line="266"/>
-        <source>Preset:</source>
-        <translation>Förinställning:</translation>
-    </message>
-</context>
-<context>
-    <name>ProjectNotes</name>
+    <name>lmms::gui::ProjectNotes</name>
     <message>
         <location filename="../../src/gui/ProjectNotes.cpp" line="70"/>
         <source>Project Notes</source>
@@ -11604,7 +8407,7 @@ Du kan inaktivera dessa kontroller för att få en snabbare skanningstid (på eg
     </message>
 </context>
 <context>
-    <name>ProjectRenderer</name>
+    <name>lmms::ProjectRenderer</name>
     <message>
         <location filename="../../src/core/ProjectRenderer.cpp" line="45"/>
         <source>WAV (*.wav)</source>
@@ -11627,7 +8430,7 @@ Du kan inaktivera dessa kontroller för att få en snabbare skanningstid (på eg
     </message>
 </context>
 <context>
-    <name>QObject</name>
+    <name>lmms::gui::Lv2ViewBase</name>
     <message>
         <location filename="../../src/gui/Lv2ViewBase.cpp" line="144"/>
         <source>Reload Plugin</source>
@@ -11645,7 +8448,7 @@ Du kan inaktivera dessa kontroller för att få en snabbare skanningstid (på eg
     </message>
 </context>
 <context>
-    <name>QWidget</name>
+    <name>lmms::gui::PluginBrowser</name>
     <message>
         <location filename="../../src/core/lv2/Lv2SubPluginFeatures.cpp" line="74"/>
         <location filename="../../plugins/LadspaBrowser/LadspaDescription.cpp" line="134"/>
@@ -11735,7 +8538,7 @@ Du kan inaktivera dessa kontroller för att få en snabbare skanningstid (på eg
     </message>
 </context>
 <context>
-    <name>RecentProjectsMenu</name>
+    <name>lmms::gui::RecentProjectsMenu</name>
     <message>
         <location filename="../../src/gui/menus/RecentProjectsMenu.cpp" line="14"/>
         <source>&amp;Recently Opened Projects</source>
@@ -11743,7 +8546,7 @@ Du kan inaktivera dessa kontroller för att få en snabbare skanningstid (på eg
     </message>
 </context>
 <context>
-    <name>RenameDialog</name>
+    <name>lmms::gui::RenameDialog</name>
     <message>
         <location filename="../../src/gui/modals/RenameDialog.cpp" line="38"/>
         <source>Rename...</source>
@@ -11751,7 +8554,7 @@ Du kan inaktivera dessa kontroller för att få en snabbare skanningstid (på eg
     </message>
 </context>
 <context>
-    <name>ReverbSCControlDialog</name>
+    <name>lmms::gui::ReverbSCControlDialog</name>
     <message>
         <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="43"/>
         <source>Input</source>
@@ -11794,7 +8597,7 @@ Du kan inaktivera dessa kontroller för att få en snabbare skanningstid (på eg
     </message>
 </context>
 <context>
-    <name>ReverbSCControls</name>
+    <name>lmms::ReverbSCControls</name>
     <message>
         <location filename="../../plugins/ReverbSC/ReverbSCControls.cpp" line="36"/>
         <source>Input gain</source>
@@ -11817,7 +8620,7 @@ Du kan inaktivera dessa kontroller för att få en snabbare skanningstid (på eg
     </message>
 </context>
 <context>
-    <name>SaControls</name>
+    <name>lmms::SaControls</name>
     <message>
         <location filename="../../plugins/SpectrumAnalyzer/SaControls.cpp" line="38"/>
         <source>Pause</source>
@@ -11994,7 +8797,7 @@ Du kan inaktivera dessa kontroller för att få en snabbare skanningstid (på eg
     </message>
 </context>
 <context>
-    <name>SaControlsDialog</name>
+    <name>lmms::gui::SaControlsDialog</name>
     <message>
         <location filename="../../plugins/SpectrumAnalyzer/SaControlsDialog.cpp" line="86"/>
         <source>Pause</source>
@@ -12252,7 +9055,7 @@ Du kan inaktivera dessa kontroller för att få en snabbare skanningstid (på eg
     </message>
 </context>
 <context>
-    <name>SampleBuffer</name>
+    <name>lmms::SampleBuffer</name>
     <message>
         <location filename="../../src/core/SampleBuffer.cpp" line="357"/>
         <source>Fail to open file</source>
@@ -12320,7 +9123,7 @@ Du kan inaktivera dessa kontroller för att få en snabbare skanningstid (på eg
     </message>
 </context>
 <context>
-    <name>SampleClipView</name>
+    <name>lmms::gui::SampleClipView</name>
     <message>
         <location filename="../../src/gui/clips/SampleClipView.cpp" line="60"/>
         <source>Double-click to open sample</source>
@@ -12388,7 +9191,7 @@ Du kan inaktivera dessa kontroller för att få en snabbare skanningstid (på eg
     </message>
 </context>
 <context>
-    <name>SampleTrack</name>
+    <name>lmms::SampleTrack</name>
     <message>
         <location filename="../../src/tracks/SampleTrack.cpp" line="39"/>
         <source>Volume</source>
@@ -12412,7 +9215,7 @@ Du kan inaktivera dessa kontroller för att få en snabbare skanningstid (på eg
     </message>
 </context>
 <context>
-    <name>SampleTrackView</name>
+    <name>lmms::gui::SampleTrackView</name>
     <message>
         <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="56"/>
         <source>Track volume</source>
@@ -12450,7 +9253,7 @@ Du kan inaktivera dessa kontroller för att få en snabbare skanningstid (på eg
     </message>
 </context>
 <context>
-    <name>SampleTrackWindow</name>
+    <name>lmms::gui::SampleTrackWindow</name>
     <message>
         <location filename="../../src/gui/SampleTrackWindow.cpp" line="52"/>
         <source>GENERAL SETTINGS</source>
@@ -12498,7 +9301,7 @@ Du kan inaktivera dessa kontroller för att få en snabbare skanningstid (på eg
     </message>
 </context>
 <context>
-    <name>SaveOptionsWidget</name>
+    <name>lmms::gui::SaveOptionsWidget</name>
     <message>
         <location filename="../../src/gui/modals/VersionedSaveDialog.cpp" line="182"/>
         <source>Discard MIDI connections</source>
@@ -12511,7 +9314,7 @@ Du kan inaktivera dessa kontroller för att få en snabbare skanningstid (på eg
     </message>
 </context>
 <context>
-    <name>SetupDialog</name>
+    <name>lmms::gui::SetupDialog</name>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="594"/>
         <source>Reset to default value</source>
@@ -12861,7 +9664,7 @@ Latens: %2 ms</translation>
     </message>
 </context>
 <context>
-    <name>SidInstrument</name>
+    <name>lmms::SidInstrument</name>
     <message>
         <location filename="../../plugins/Sid/SidInstrument.cpp" line="125"/>
         <source>Cutoff frequency</source>
@@ -12894,7 +9697,7 @@ Latens: %2 ms</translation>
     </message>
 </context>
 <context>
-    <name>SidInstrumentView</name>
+    <name>lmms::gui::SidInstrumentView</name>
     <message>
         <location filename="../../plugins/Sid/SidInstrument.cpp" line="495"/>
         <source>Volume:</source>
@@ -13021,7 +9824,7 @@ Latens: %2 ms</translation>
     </message>
 </context>
 <context>
-    <name>SideBarWidget</name>
+    <name>lmms::gui::SideBarWidget</name>
     <message>
         <location filename="../../src/gui/SideBarWidget.cpp" line="47"/>
         <source>Close</source>
@@ -13029,7 +9832,7 @@ Latens: %2 ms</translation>
     </message>
 </context>
 <context>
-    <name>Song</name>
+    <name>lmms::Song</name>
     <message>
         <location filename="../../src/core/Song.cpp" line="71"/>
         <source>Tempo</source>
@@ -13077,7 +9880,7 @@ Latens: %2 ms</translation>
     </message>
 </context>
 <context>
-    <name>SongEditor</name>
+    <name>lmms::gui::SongEditor</name>
     <message>
         <location filename="../../src/core/DataFile.cpp" line="142"/>
         <source>Could not open file</source>
@@ -13208,7 +10011,7 @@ Latens: %2 ms</translation>
     </message>
 </context>
 <context>
-    <name>SongEditorWindow</name>
+    <name>lmms::gui::SongEditorWindow</name>
     <message>
         <location filename="../../src/gui/editors/SongEditor.cpp" line="918"/>
         <source>Song-Editor</source>
@@ -13327,7 +10130,7 @@ Latens: %2 ms</translation>
     </message>
 </context>
 <context>
-    <name>StepRecorderWidget</name>
+    <name>lmms::gui::StepRecorderWidget</name>
     <message>
         <location filename="../../src/gui/editors/StepRecorderWidget.cpp" line="92"/>
         <source>Hint</source>
@@ -13340,7 +10143,7 @@ Latens: %2 ms</translation>
     </message>
 </context>
 <context>
-    <name>SubWindow</name>
+    <name>lmms::gui::SubWindow</name>
     <message>
         <location filename="../../src/gui/SubWindow.cpp" line="61"/>
         <source>Close</source>
@@ -13358,7 +10161,7 @@ Latens: %2 ms</translation>
     </message>
 </context>
 <context>
-    <name>TabWidget</name>
+    <name>lmms::gui::TabWidget</name>
     <message>
         <location filename="../../src/gui/AudioDeviceSetupWidget.cpp" line="29"/>
         <location filename="../../src/gui/MidiSetupWidget.cpp" line="34"/>
@@ -13367,7 +10170,7 @@ Latens: %2 ms</translation>
     </message>
 </context>
 <context>
-    <name>TemplatesMenu</name>
+    <name>lmms::gui::TemplatesMenu</name>
     <message>
         <location filename="../../src/gui/menus/TemplatesMenu.cpp" line="12"/>
         <source>New from template</source>
@@ -13375,7 +10178,7 @@ Latens: %2 ms</translation>
     </message>
 </context>
 <context>
-    <name>TempoSyncKnob</name>
+    <name>lmms::gui::TempoSyncKnob</name>
     <message>
         <location filename="../../src/gui/widgets/TempoSyncKnob.cpp" line="44"/>
         <location filename="../../src/gui/widgets/TempoSyncKnob.cpp" line="205"/>
@@ -13469,7 +10272,7 @@ Latens: %2 ms</translation>
     </message>
 </context>
 <context>
-    <name>TimeDisplayWidget</name>
+    <name>lmms::gui::TimeDisplayWidget</name>
     <message>
         <location filename="../../src/gui/widgets/TimeDisplayWidget.cpp" line="52"/>
         <source>Time units</source>
@@ -13507,7 +10310,7 @@ Latens: %2 ms</translation>
     </message>
 </context>
 <context>
-    <name>TimeLineWidget</name>
+    <name>lmms::gui::TimeLineWidget</name>
     <message>
         <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="124"/>
         <source>Auto scrolling</source>
@@ -13545,7 +10348,7 @@ Latens: %2 ms</translation>
     </message>
 </context>
 <context>
-    <name>Track</name>
+    <name>lmms::Track</name>
     <message>
         <location filename="../../src/core/Track.cpp" line="60"/>
         <source>Mute</source>
@@ -13558,7 +10361,7 @@ Latens: %2 ms</translation>
     </message>
 </context>
 <context>
-    <name>TrackContainer</name>
+    <name>lmms::TrackContainer</name>
     <message>
         <location filename="../../src/core/ImportFilter.cpp" line="83"/>
         <source>Couldn&apos;t import file</source>
@@ -13622,7 +10425,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>Clip</name>
+    <name>lmms::Clip</name>
     <message>
         <location filename="../../src/core/Clip.cpp" line="47"/>
         <source>Mute</source>
@@ -13630,7 +10433,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>ClipView</name>
+    <name>lmms::gui::ClipView</name>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="647"/>
         <source>Current position</source>
@@ -13724,7 +10527,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>TrackContentWidget</name>
+    <name>lmms::gui::TrackContentWidget</name>
     <message>
         <location filename="../../src/gui/tracks/TrackContentWidget.cpp" line="670"/>
         <source>Paste</source>
@@ -13732,7 +10535,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>TrackOperationsWidget</name>
+    <name>lmms::gui::TrackOperationsWidget</name>
     <message>
         <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="61"/>
         <source>Press &lt;%1&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop action.</source>
@@ -13827,7 +10630,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>TripleOscillatorView</name>
+    <name>lmms::gui::TripleOscillatorView</name>
     <message>
         <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="444"/>
         <source>Modulate phase of oscillator 1 by oscillator 2</source>
@@ -13972,7 +10775,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>VecControls</name>
+    <name>lmms::VecControls</name>
     <message>
         <location filename="../../plugins/Vectorscope/VecControls.cpp" line="38"/>
         <source>Display persistence amount</source>
@@ -13990,7 +10793,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>VecControlsDialog</name>
+    <name>lmms::gui::VecControlsDialog</name>
     <message>
         <location filename="../../plugins/Vectorscope/VecControlsDialog.cpp" line="63"/>
         <source>HQ</source>
@@ -14028,7 +10831,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>VersionedSaveDialog</name>
+    <name>lmms::gui::VersionedSaveDialog</name>
     <message>
         <location filename="../../src/gui/modals/VersionedSaveDialog.cpp" line="51"/>
         <source>Increment version number</source>
@@ -14051,7 +10854,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>VestigeInstrumentView</name>
+    <name>lmms::gui::VestigeInstrumentView</name>
     <message>
         <location filename="../../plugins/Vestige/Vestige.cpp" line="507"/>
         <location filename="../../plugins/Vestige/Vestige.cpp" line="679"/>
@@ -14125,7 +10928,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>VstEffectControlDialog</name>
+    <name>lmms::gui::VstEffectControlDialog</name>
     <message>
         <location filename="../../plugins/VstEffect/VstEffectControlDialog.cpp" line="76"/>
         <source>Show/hide</source>
@@ -14169,7 +10972,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>VstPlugin</name>
+    <name>lmms::VstPlugin</name>
     <message>
         <location filename="../../plugins/Vestige/Vestige.cpp" line="366"/>
         <location filename="../../plugins/VstEffect/VstEffect.cpp" line="144"/>
@@ -14229,7 +11032,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>WatsynInstrument</name>
+    <name>lmms::WatsynInstrument</name>
     <message>
         <location filename="../../plugins/Watsyn/Watsyn.cpp" line="234"/>
         <source>Volume A1</source>
@@ -14377,7 +11180,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>WatsynView</name>
+    <name>lmms::gui::WatsynView</name>
     <message>
         <location filename="../../plugins/Watsyn/Watsyn.cpp" line="679"/>
         <location filename="../../plugins/Watsyn/Watsyn.cpp" line="680"/>
@@ -14602,7 +11405,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>Xpressive</name>
+    <name>lmms::Xpressive</name>
     <message>
         <location filename="../../plugins/Xpressive/Xpressive.cpp" line="90"/>
         <source>Selected graph</source>
@@ -14655,7 +11458,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>XpressiveView</name>
+    <name>lmms::gui::XpressiveView</name>
     <message>
         <location filename="../../plugins/Xpressive/Xpressive.cpp" line="304"/>
         <source>Draw your own waveform here by dragging your mouse on this graph.</source>
@@ -14786,7 +11589,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>ZynAddSubFxInstrument</name>
+    <name>lmms::ZynAddSubFxInstrument</name>
     <message>
         <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="115"/>
         <source>Portamento</source>
@@ -14829,7 +11632,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>ZynAddSubFxView</name>
+    <name>lmms::gui::ZynAddSubFxView</name>
     <message>
         <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="515"/>
         <source>Portamento:</source>
@@ -14912,7 +11715,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>AudioFileProcessor</name>
+    <name>lmms::AudioFileProcessor</name>
     <message>
         <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="79"/>
         <source>Amplify</source>
@@ -14975,7 +11778,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>BitInvader</name>
+    <name>lmms::BitInvader</name>
     <message>
         <location filename="../../plugins/BitInvader/BitInvader.cpp" line="154"/>
         <source>Sample length</source>
@@ -14983,7 +11786,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>BitInvaderView</name>
+    <name>lmms::gui::BitInvaderView</name>
     <message>
         <location filename="../../plugins/BitInvader/BitInvader.cpp" line="354"/>
         <source>Sample length</source>
@@ -15048,7 +11851,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>DynProcControlDialog</name>
+    <name>lmms::gui::DynProcControlDialog</name>
     <message>
         <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="65"/>
         <source>INPUT</source>
@@ -15145,7 +11948,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>DynProcControls</name>
+    <name>lmms::DynProcControls</name>
     <message>
         <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControls.cpp" line="42"/>
         <source>Input gain</source>
@@ -15173,7 +11976,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>graphModel</name>
+    <name>lmms::graphModel</name>
     <message>
         <location filename="../../src/gui/widgets/Graph.cpp" line="458"/>
         <source>Graph</source>
@@ -15181,7 +11984,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>KickerInstrument</name>
+    <name>lmms::KickerInstrument</name>
     <message>
         <location filename="../../plugins/Kicker/Kicker.cpp" line="63"/>
         <source>Start frequency</source>
@@ -15244,7 +12047,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>KickerInstrumentView</name>
+    <name>lmms::gui::KickerInstrumentView</name>
     <message>
         <location filename="../../plugins/Kicker/Kicker.cpp" line="284"/>
         <source>Start frequency:</source>
@@ -15297,7 +12100,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>LadspaBrowserView</name>
+    <name>lmms::gui::LadspaBrowserView</name>
     <message>
         <location filename="../../plugins/LadspaBrowser/LadspaBrowser.cpp" line="113"/>
         <location filename="../../plugins/LadspaBrowser/LadspaBrowser.cpp" line="121"/>
@@ -15335,7 +12138,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>LadspaDescription</name>
+    <name>lmms::gui::LadspaDescription</name>
     <message>
         <location filename="../../plugins/LadspaBrowser/LadspaDescription.cpp" line="84"/>
         <source>Plugins</source>
@@ -15348,7 +12151,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>LadspaPortDialog</name>
+    <name>lmms::gui::LadspaPortDialog</name>
     <message>
         <location filename="../../plugins/LadspaBrowser/LadspaPortDialog.cpp" line="42"/>
         <source>Ports</source>
@@ -15432,7 +12235,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>Lb302Synth</name>
+    <name>lmms::Lb302Synth</name>
     <message>
         <location filename="../../plugins/Lb302/Lb302.cpp" line="279"/>
         <source>VCF Cutoff Frequency</source>
@@ -15490,7 +12293,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>Lb302SynthView</name>
+    <name>lmms::gui::Lb302SynthView</name>
     <message>
         <location filename="../../plugins/Lb302/Lb302.cpp" line="821"/>
         <source>Cutoff Freq:</source>
@@ -15644,7 +12447,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>MalletsInstrument</name>
+    <name>lmms::MalletsInstrument</name>
     <message>
         <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="68"/>
         <source>Hardness</source>
@@ -15792,7 +12595,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>MalletsInstrumentView</name>
+    <name>lmms::gui::MalletsInstrumentView</name>
     <message>
         <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="405"/>
         <source>Instrument</source>
@@ -15940,7 +12743,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>ManageVSTEffectView</name>
+    <name>lmms::gui::ManageVSTEffectView</name>
     <message>
         <location filename="../../plugins/VstEffect/VstEffectControls.cpp" line="316"/>
         <source> - VST parameter control</source>
@@ -15964,7 +12767,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>ManageVestigeInstrumentView</name>
+    <name>lmms::gui::ManageVestigeInstrumentView</name>
     <message>
         <location filename="../../plugins/Vestige/Vestige.cpp" line="937"/>
         <location filename="../../plugins/Vestige/Vestige.cpp" line="1226"/>
@@ -15989,7 +12792,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>OrganicInstrument</name>
+    <name>lmms::OrganicInstrument</name>
     <message>
         <location filename="../../plugins/Organic/Organic.cpp" line="81"/>
         <source>Distortion</source>
@@ -16002,7 +12805,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>OrganicInstrumentView</name>
+    <name>lmms::gui::OrganicInstrumentView</name>
     <message>
         <location filename="../../plugins/Organic/Organic.cpp" line="435"/>
         <source>Distortion:</source>
@@ -16051,7 +12854,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>PatchesDialog</name>
+    <name>lmms::gui::PatchesDialog</name>
     <message>
         <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="39"/>
         <source>Qsynth: Channel Preset</source>
@@ -16094,7 +12897,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>Sf2Instrument</name>
+    <name>lmms::Sf2Instrument</name>
     <message>
         <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="100"/>
         <source>Bank</source>
@@ -16167,7 +12970,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>Sf2InstrumentView</name>
+    <name>lmms::gui::Sf2InstrumentView</name>
     <message>
         <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="924"/>
         <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1141"/>
@@ -16237,7 +13040,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>SfxrInstrument</name>
+    <name>lmms::SfxrInstrument</name>
     <message>
         <location filename="../../plugins/Sfxr/Sfxr.cpp" line="356"/>
         <source>Wave</source>
@@ -16245,7 +13048,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>StereoEnhancerControlDialog</name>
+    <name>lmms::gui::StereoEnhancerControlDialog</name>
     <message>
         <location filename="../../plugins/StereoEnhancer/StereoEnhancerControlDialog.cpp" line="42"/>
         <source>WIDTH</source>
@@ -16258,7 +13061,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>StereoEnhancerControls</name>
+    <name>lmms::StereoEnhancerControls</name>
     <message>
         <location filename="../../plugins/StereoEnhancer/StereoEnhancerControls.cpp" line="35"/>
         <source>Width</source>
@@ -16266,7 +13069,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>StereoMatrixControlDialog</name>
+    <name>lmms::gui::StereoMatrixControlDialog</name>
     <message>
         <location filename="../../plugins/StereoMatrix/StereoMatrixControlDialog.cpp" line="52"/>
         <source>Left to Left Vol:</source>
@@ -16289,7 +13092,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>StereoMatrixControls</name>
+    <name>lmms::StereoMatrixControls</name>
     <message>
         <location filename="../../plugins/StereoMatrix/StereoMatrixControls.cpp" line="35"/>
         <source>Left to Left</source>
@@ -16312,7 +13115,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>VestigeInstrument</name>
+    <name>lmms::VestigeInstrument</name>
     <message>
         <location filename="../../plugins/Vestige/Vestige.cpp" line="354"/>
         <source>Loading plugin</source>
@@ -16325,7 +13128,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>Vibed</name>
+    <name>lmms::Vibed</name>
     <message>
         <location filename="../../plugins/Vibed/Vibed.cpp" line="76"/>
         <source>String %1 volume</source>
@@ -16378,7 +13181,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>VibedView</name>
+    <name>lmms::gui::VibedView</name>
     <message>
         <location filename="../../plugins/Vibed/Vibed.cpp" line="363"/>
         <source>String volume:</source>
@@ -16499,7 +13302,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>VoiceObject</name>
+    <name>lmms::VoiceObject</name>
     <message>
         <location filename="../../plugins/Sid/SidInstrument.cpp" line="95"/>
         <source>Voice %1 pulse width</source>
@@ -16557,7 +13360,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>WaveShaperControlDialog</name>
+    <name>lmms::gui::WaveShaperControlDialog</name>
     <message>
         <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="65"/>
         <source>INPUT</source>
@@ -16614,7 +13417,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>WaveShaperControls</name>
+    <name>lmms::WaveShaperControls</name>
     <message>
         <location filename="../../plugins/WaveShaper/WaveShaperControls.cpp" line="42"/>
         <source>Input gain</source>

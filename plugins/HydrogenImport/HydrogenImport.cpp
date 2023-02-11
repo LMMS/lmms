@@ -26,7 +26,7 @@ Plugin::Descriptor PLUGIN_EXPORT hydrogenimport_plugin_descriptor =
 {
 	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Hydrogen Import",
-	QT_TRANSLATE_NOOP( "PluginBrowser",
+	QT_TRANSLATE_NOOP("lmms::gui::PluginBrowser",
 				"Filter for importing Hydrogen files into LMMS" ),
 	"frank mather",
 	0x0100,

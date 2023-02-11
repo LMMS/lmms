@@ -1,6 +1,6 @@
 <?xml version="1.0" ?><!DOCTYPE TS><TS language="bs" version="2.1">
 <context>
-    <name>AboutDialog</name>
+    <name>lmms::gui::AboutDialog</name>
     <message>
         <location filename="src/gui/modals/about_dialog.ui" line="14"/>
         <source>About LMMS</source>
@@ -70,7 +70,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>AmplifierControlDialog</name>
+    <name>lmms::gui::AmplifierControlDialog</name>
     <message>
         <location filename="plugins/Amplifier/AmplifierControlDialog.cpp" line="47"/>
         <source>VOL</source>
@@ -113,7 +113,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>AmplifierControls</name>
+    <name>lmms::AmplifierControls</name>
     <message>
         <location filename="plugins/Amplifier/AmplifierControls.cpp" line="38"/>
         <source>Volume</source>
@@ -136,7 +136,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>AudioAlsaSetupWidget</name>
+    <name>lmms::gui::AudioAlsaSetupWidget</name>
     <message>
         <location filename="src/gui/AudioAlsaSetupWidget.cpp" line="71"/>
         <source>DEVICE</source>
@@ -149,7 +149,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>AudioFileProcessorView</name>
+    <name>lmms::gui::AudioFileProcessorView</name>
     <message>
         <location filename="plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="467"/>
         <source>Open other sample</source>
@@ -248,7 +248,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>AudioFileProcessorWaveView</name>
+    <name>lmms::gui::AudioFileProcessorWaveView</name>
     <message>
         <location filename="plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="1039"/>
         <source>Sample length:</source>
@@ -256,7 +256,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>AudioJack</name>
+    <name>lmms::AudioJack</name>
     <message>
         <location filename="src/core/audio/AudioJack.cpp" line="105"/>
         <source>JACK client restarted</source>
@@ -289,7 +289,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>AudioOss::setupWidget</name>
+    <name>lmms::gui::AudioDeviceSetupWidget</name>
     <message>
         <location filename="src/core/audio/AudioOss.cpp" line="337"/>
         <source>DEVICE</source>
@@ -302,7 +302,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>AudioPortAudio::setupWidget</name>
+    <name>lmms::gui::AudioDeviceSetupWidget</name>
     <message>
         <location filename="src/core/audio/AudioPortAudio.cpp" line="397"/>
         <source>BACKEND</source>
@@ -315,7 +315,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>AudioPulseAudio::setupWidget</name>
+    <name>lmms::gui::AudioDeviceSetupWidget</name>
     <message>
         <location filename="src/core/audio/AudioPulseAudio.cpp" line="288"/>
         <source>DEVICE</source>
@@ -328,7 +328,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>AudioSdl::setupWidget</name>
+    <name>lmms::gui::AudioDeviceSetupWidget</name>
     <message>
         <location filename="src/core/audio/AudioSdl.cpp" line="205"/>
         <source>DEVICE</source>
@@ -336,7 +336,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>AudioSoundIo::setupWidget</name>
+    <name>lmms::gui::AudioDeviceSetupWidget</name>
     <message>
         <location filename="src/core/audio/AudioSoundIo.cpp" line="393"/>
         <source>BACKEND</source>
@@ -349,7 +349,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>AutomatableModel</name>
+    <name>lmms::AutomatableModel</name>
     <message>
         <location filename="src/gui/AutomatableModelView.cpp" line="67"/>
         <source>&amp;Reset (%1%2)</source>
@@ -407,7 +407,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>AutomationEditor</name>
+    <name>lmms::gui::AutomationEditor</name>
     <message>
         <location filename="src/gui/editors/AutomationEditor.cpp" line="1282"/>
         <source>Please open an automation clip with the context menu of a control!</source>
@@ -425,7 +425,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>AutomationEditorWindow</name>
+    <name>lmms::gui::AutomationEditorWindow</name>
     <message>
         <location filename="src/gui/editors/AutomationEditor.cpp" line="2020"/>
         <source>Play/pause current clip (Space)</source>
@@ -603,7 +603,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>AutomationClip</name>
+    <name>lmms::AutomationClip</name>
     <message>
         <location filename="src/core/AutomationClip.cpp" line="598"/>
         <source>Drag a control while pressing &lt;%1&gt;</source>
@@ -611,7 +611,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>AutomationClipView</name>
+    <name>lmms::gui::AutomationClipView</name>
     <message>
         <location filename="src/gui/clips/AutomationClipView.cpp" line="57"/>
         <source>double-click to open this pattern in automation editor</source>
@@ -669,7 +669,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>AutomationTrack</name>
+    <name>lmms::AutomationTrack</name>
     <message>
         <location filename="src/tracks/AutomationTrack.cpp" line="40"/>
         <source>Automation track</source>
@@ -677,7 +677,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>PatternEditor</name>
+    <name>lmms::gui::PatternEditor</name>
     <message>
         <location filename="src/gui/editors/PatternEditor.cpp" line="52"/>
         <source>Beat+Bassline Editor</source>
@@ -740,7 +740,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>PatternClipView</name>
+    <name>lmms::gui::PatternClipView</name>
     <message>
         <location filename="src/tracks/PatternTrack.cpp" line="185"/>
         <source>Open in Beat+Bassline-Editor</source>
@@ -768,7 +768,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>PatternTrack</name>
+    <name>lmms::PatternTrack</name>
     <message>
         <location filename="src/tracks/PatternTrack.cpp" line="414"/>
         <source>Beat/Bassline %1</source>
@@ -781,7 +781,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>BassBoosterControlDialog</name>
+    <name>lmms::gui::BassBoosterControlDialog</name>
     <message>
         <location filename="plugins/BassBooster/BassBoosterControlDialog.cpp" line="49"/>
         <source>FREQ</source>
@@ -814,7 +814,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>BassBoosterControls</name>
+    <name>lmms::BassBoosterControls</name>
     <message>
         <location filename="plugins/BassBooster/BassBoosterControls.cpp" line="36"/>
         <source>Frequency</source>
@@ -832,7 +832,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>BitcrushControlDialog</name>
+    <name>lmms::gui::BitcrushControlDialog</name>
     <message>
         <location filename="plugins/Bitcrush/BitcrushControlDialog.cpp" line="47"/>
         <source>IN</source>
@@ -937,7 +937,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>CaptionMenu</name>
+    <name>lmms::gui::CaptionMenu</name>
     <message>
         <location filename="src/gui/widgets/CaptionMenu.cpp" line="57"/>
         <source>&amp;Help</source>
@@ -950,7 +950,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>CarlaInstrumentView</name>
+    <name>lmms::gui::CarlaInstrumentView</name>
     <message>
         <location filename="plugins/CarlaBase/Carla.cpp" line="486"/>
         <source>Show GUI</source>
@@ -963,7 +963,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>Controller</name>
+    <name>lmms::Controller</name>
     <message>
         <location filename="src/core/Controller.cpp" line="63"/>
         <source>Controller %1</source>
@@ -971,7 +971,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>ControllerConnectionDialog</name>
+    <name>lmms::gui::ControllerConnectionDialog</name>
     <message>
         <location filename="src/gui/modals/ControllerConnectionDialog.cpp" line="136"/>
         <source>Connection Settings</source>
@@ -1045,7 +1045,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>ControllerRackView</name>
+    <name>lmms::gui::ControllerRackView</name>
     <message>
         <location filename="src/gui/ControllerRackView.cpp" line="52"/>
         <source>Controller Rack</source>
@@ -1068,7 +1068,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>ControllerView</name>
+    <name>lmms::gui::ControllerView</name>
     <message>
         <location filename="src/gui/ControllerView.cpp" line="71"/>
         <source>Controls</source>
@@ -1096,7 +1096,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>CrossoverEQControlDialog</name>
+    <name>lmms::gui::CrossoverEQControlDialog</name>
     <message>
         <location filename="plugins/CrossoverEQ/CrossoverEQControlDialog.cpp" line="52"/>
         <source>Band 1/2 Crossover:</source>
@@ -1174,7 +1174,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>DelayControls</name>
+    <name>lmms::DelayControls</name>
     <message>
         <location filename="plugins/Delay/DelayControls.cpp" line="35"/>
         <source>Delay Samples</source>
@@ -1202,7 +1202,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>DelayControlsDialog</name>
+    <name>lmms::gui::DelayControlsDialog</name>
     <message>
         <location filename="plugins/Delay/DelayControlsDialog.cpp" line="49"/>
         <source>Delay</source>
@@ -1251,7 +1251,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>DualFilterControlDialog</name>
+    <name>lmms::gui::DualFilterControlDialog</name>
     <message>
         <location filename="plugins/DualFilter/DualFilterControlDialog.cpp" line="54"/>
         <location filename="plugins/DualFilter/DualFilterControlDialog.cpp" line="58"/>
@@ -1320,7 +1320,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>DualFilterControls</name>
+    <name>lmms::DualFilterControls</name>
     <message>
         <location filename="plugins/DualFilter/DualFilterControls.cpp" line="40"/>
         <source>Filter 1 enabled</source>
@@ -1510,7 +1510,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>Editor</name>
+    <name>lmms::gui::Editor</name>
     <message>
         <location filename="src/gui/editors/Editor.cpp" line="82"/>
         <source>Transport controls</source>
@@ -1538,7 +1538,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>Effect</name>
+    <name>lmms::Effect</name>
     <message>
         <location filename="src/core/Effect.cpp" line="48"/>
         <source>Effect enabled</source>
@@ -1561,7 +1561,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>EffectChain</name>
+    <name>lmms::EffectChain</name>
     <message>
         <location filename="src/core/EffectChain.cpp" line="40"/>
         <source>Effects enabled</source>
@@ -1569,7 +1569,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>EffectRackView</name>
+    <name>lmms::gui::EffectRackView</name>
     <message>
         <location filename="src/gui/EffectRackView.cpp" line="45"/>
         <source>EFFECTS CHAIN</source>
@@ -1582,7 +1582,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>EffectSelectDialog</name>
+    <name>lmms::gui::EffectSelectDialog</name>
     <message>
         <location filename="src/gui/modals/EffectSelectDialog.ui" line="14"/>
         <source>Add effect</source>
@@ -1605,7 +1605,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>EffectView</name>
+    <name>lmms::gui::EffectView</name>
     <message>
         <location filename="src/gui/EffectView.cpp" line="62"/>
         <source>Toggles the effect on or off.</source>
@@ -1700,7 +1700,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
 </context>
 <context>
-    <name>EnvelopeAndLfoParameters</name>
+    <name>lmms::EnvelopeAndLfoParameters</name>
     <message>
         <location filename="src/core/EnvelopeAndLfoParameters.cpp" line="94"/>
         <source>Predelay</source>
@@ -1773,7 +1773,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
 </context>
 <context>
-    <name>EnvelopeAndLfoView</name>
+    <name>lmms::gui::EnvelopeAndLfoView</name>
     <message>
         <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="98"/>
         <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="177"/>
@@ -2000,7 +2000,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
 </context>
 <context>
-    <name>EqControls</name>
+    <name>lmms::EqControls</name>
     <message>
         <location filename="plugins/Eq/EqControls.cpp" line="35"/>
         <source>Input gain</source>
@@ -2213,7 +2213,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
 </context>
 <context>
-    <name>EqControlsDialog</name>
+    <name>lmms::gui::EqControlsDialog</name>
     <message>
         <location filename="plugins/Eq/EqControlsDialog.cpp" line="62"/>
         <source>HP</source>
@@ -2319,7 +2319,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
 </context>
 <context>
-    <name>EqHandle</name>
+    <name>lmms::gui::EqHandle</name>
     <message>
         <location filename="plugins/Eq/EqCurve.cpp" line="108"/>
         <source>Reso: </source>
@@ -2338,7 +2338,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
 </context>
 <context>
-    <name>ExportProjectDialog</name>
+    <name>lmms::gui::ExportProjectDialog</name>
     <message>
         <location filename="src/gui/modals/export_project.ui" line="14"/>
         <source>Export project</source>
@@ -2547,7 +2547,7 @@ Please make sure you have write-permission to the file and the directory contain
     </message>
 </context>
 <context>
-    <name>Fader</name>
+    <name>lmms::gui::Fader</name>
     <message>
         <location filename="src/gui/widgets/Fader.cpp" line="219"/>
         <location filename="src/gui/widgets/Fader.cpp" line="229"/>
@@ -2556,7 +2556,7 @@ Please make sure you have write-permission to the file and the directory contain
     </message>
 </context>
 <context>
-    <name>FileBrowser</name>
+    <name>lmms::gui::FileBrowser</name>
     <message>
         <location filename="src/gui/FileBrowser.cpp" line="76"/>
         <source>Browser</source>
@@ -2564,7 +2564,7 @@ Please make sure you have write-permission to the file and the directory contain
     </message>
 </context>
 <context>
-    <name>FileBrowserTreeWidget</name>
+    <name>lmms::gui::FileBrowserTreeWidget</name>
     <message>
         <location filename="src/gui/FileBrowser.cpp" line="339"/>
         <source>Send to active instrument-track</source>
@@ -2612,7 +2612,7 @@ Please make sure you have write-permission to the file and the directory contain
     </message>
 </context>
 <context>
-    <name>FlangerControls</name>
+    <name>lmms::FlangerControls</name>
     <message>
         <location filename="plugins/Flanger/FlangerControls.cpp" line="37"/>
         <source>Delay Samples</source>
@@ -2645,7 +2645,7 @@ Please make sure you have write-permission to the file and the directory contain
     </message>
 </context>
 <context>
-    <name>FlangerControlsDialog</name>
+    <name>lmms::gui::FlangerControlsDialog</name>
     <message>
         <location filename="plugins/Flanger/FlangerControlsDialog.cpp" line="47"/>
         <source>Delay</source>
@@ -2698,7 +2698,7 @@ Please make sure you have write-permission to the file and the directory contain
     </message>
 </context>
 <context>
-    <name>MixerLine</name>
+    <name>lmms::gui::MixerLine</name>
     <message>
         <location filename="src/gui/MixerLine.cpp" line="71"/>
         <source>Channel send amount</source>
@@ -2742,7 +2742,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>Mixer</name>
+    <name>lmms::Mixer</name>
     <message>
         <location filename="src/core/Mixer.cpp" line="655"/>
         <source>Master</source>
@@ -2757,7 +2757,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>MixerView</name>
+    <name>lmms::gui::MixerView</name>
     <message>
         <location filename="src/gui/MixerView.cpp" line="66"/>
         <source>Mixer</source>
@@ -2800,7 +2800,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>MixerRoute</name>
+    <name>lmms::MixerRoute</name>
     <message>
         <location filename="src/core/Mixer.cpp" line="41"/>
         <location filename="src/core/Mixer.cpp" line="56"/>
@@ -2809,7 +2809,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>GigInstrument</name>
+    <name>lmms::GigInstrument</name>
     <message>
         <location filename="plugins/GigPlayer/GigPlayer.cpp" line="82"/>
         <source>Bank</source>
@@ -2827,7 +2827,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>GigInstrumentView</name>
+    <name>lmms::gui::GigInstrumentView</name>
     <message>
         <location filename="plugins/GigPlayer/GigPlayer.cpp" line="939"/>
         <source>Open other GIG file</source>
@@ -2886,7 +2886,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>GuiApplication</name>
+    <name>lmms::gui::GuiApplication</name>
     <message>
         <location filename="src/gui/GuiApplication.cpp" line="60"/>
         <source>Working directory</source>
@@ -2939,7 +2939,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>InstrumentFunctionArpeggio</name>
+    <name>lmms::InstrumentFunctionArpeggio</name>
     <message>
         <location filename="src/core/InstrumentFunctions.cpp" line="301"/>
         <source>Arpeggio</source>
@@ -3017,7 +3017,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>InstrumentFunctionArpeggioView</name>
+    <name>lmms::gui::InstrumentFunctionArpeggioView</name>
     <message>
         <location filename="src/gui/instrument/InstrumentFunctionViews.cpp" line="103"/>
         <source>ARPEGGIO</source>
@@ -3105,7 +3105,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>InstrumentFunctionNoteStacking</name>
+    <name>lmms::InstrumentFunctionNoteStacking</name>
     <message>
         <location filename="src/core/InstrumentFunctions.cpp" line="38"/>
         <source>octave</source>
@@ -3584,7 +3584,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>InstrumentFunctionNoteStackingView</name>
+    <name>lmms::gui::InstrumentFunctionNoteStackingView</name>
     <message>
         <location filename="src/gui/instrument/InstrumentFunctionViews.cpp" line="45"/>
         <source>STACKING</source>
@@ -3617,7 +3617,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>InstrumentMidiIOView</name>
+    <name>lmms::gui::InstrumentMidiIOView</name>
     <message>
         <location filename="src/gui/instrument/InstrumentMidiIOView.cpp" line="53"/>
         <source>ENABLE MIDI INPUT</source>
@@ -3677,7 +3677,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>InstrumentMiscView</name>
+    <name>lmms::gui::InstrumentMiscView</name>
     <message>
         <location filename="src/gui/instrument/InstrumentMidiIOView.cpp" line="213"/>
         <source>MASTER PITCH</source>
@@ -3690,7 +3690,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>InstrumentSoundShaping</name>
+    <name>lmms::InstrumentSoundShaping</name>
     <message>
         <location filename="src/core/InstrumentSoundShaping.cpp" line="47"/>
         <source>VOLUME</source>
@@ -3849,7 +3849,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>InstrumentSoundShapingView</name>
+    <name>lmms::gui::InstrumentSoundShapingView</name>
     <message>
         <location filename="src/gui/instrument/InstrumentSoundShapingView.cpp" line="55"/>
         <source>TARGET</source>
@@ -3912,7 +3912,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>InstrumentTrack</name>
+    <name>lmms::InstrumentTrack</name>
     <message>
         <location filename="plugins/Vestige/Vestige.cpp" line="246"/>
         <location filename="src/tracks/InstrumentTrack.cpp" line="137"/>
@@ -3967,7 +3967,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>InstrumentTrackView</name>
+    <name>lmms::gui::InstrumentTrackView</name>
     <message>
         <location filename="src/tracks/InstrumentTrack.cpp" line="864"/>
         <source>Volume</source>
@@ -4020,7 +4020,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>InstrumentTrackWindow</name>
+    <name>lmms::gui::InstrumentTrackWindow</name>
     <message>
         <location filename="src/tracks/InstrumentTrack.cpp" line="1275"/>
         <source>GENERAL SETTINGS</source>
@@ -4154,7 +4154,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>Knob</name>
+    <name>lmms::gui::Knob</name>
     <message>
         <location filename="src/gui/widgets/Knob.cpp" line="501"/>
         <source>Set linear</source>
@@ -4177,7 +4177,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>LadspaControl</name>
+    <name>lmms::LadspaControl</name>
     <message>
         <location filename="src/core/LadspaControl.cpp" line="37"/>
         <source>Link channels</source>
@@ -4185,7 +4185,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>LadspaControlDialog</name>
+    <name>lmms::gui::LadspaControlDialog</name>
     <message>
         <location filename="plugins/LadspaEffect/LadspaControlDialog.cpp" line="55"/>
         <source>Link Channels</source>
@@ -4198,7 +4198,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>LadspaControlView</name>
+    <name>lmms::gui::LadspaControlView</name>
     <message>
         <location filename="src/gui/LadspaControlView.cpp" line="52"/>
         <source>Link channels</source>
@@ -4216,7 +4216,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>LadspaEffect</name>
+    <name>lmms::LadspaEffect</name>
     <message>
         <location filename="plugins/LadspaEffect/LadspaEffect.cpp" line="78"/>
         <source>Unknown LADSPA plugin %1 requested.</source>
@@ -4224,7 +4224,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>LcdSpinBox</name>
+    <name>lmms::gui::LcdSpinBox</name>
     <message>
         <location filename="src/gui/widgets/LcdSpinBox.cpp" line="181"/>
         <source>Please enter a new value between %1 and %2:</source>
@@ -4232,7 +4232,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>LeftRightNav</name>
+    <name>lmms::gui::LeftRightNav</name>
     <message>
         <location filename="src/gui/widgets/LeftRightNav.cpp" line="34"/>
         <location filename="src/gui/widgets/LeftRightNav.cpp" line="61"/>
@@ -4259,7 +4259,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>LfoController</name>
+    <name>lmms::LfoController</name>
     <message>
         <location filename="src/core/LfoController.cpp" line="38"/>
         <source>LFO Controller</source>
@@ -4297,7 +4297,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>LfoControllerDialog</name>
+    <name>lmms::gui::LfoControllerDialog</name>
     <message>
         <location filename="src/gui/LfoControllerDialog.cpp" line="64"/>
         <source>LFO</source>
@@ -4416,7 +4416,7 @@ Double click to pick a file.</source>
     </message>
 </context>
 <context>
-    <name>Engine</name>
+    <name>lmms::Engine</name>
     <message>
         <location filename="src/core/Engine.cpp" line="57"/>
         <source>Generating wavetables</source>
@@ -4439,7 +4439,7 @@ Double click to pick a file.</source>
     </message>
 </context>
 <context>
-    <name>MainWindow</name>
+    <name>lmms::gui::MainWindow</name>
     <message>
         <location filename="src/core/ConfigManager.cpp" line="420"/>
         <source>Configuration file</source>
@@ -4941,7 +4941,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
 </context>
 <context>
-    <name>MeterDialog</name>
+    <name>lmms::gui::MeterDialog</name>
     <message>
         <location filename="src/gui/widgets/MeterDialog.cpp" line="52"/>
         <location filename="src/gui/widgets/MeterDialog.cpp" line="58"/>
@@ -4961,7 +4961,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
 </context>
 <context>
-    <name>MeterModel</name>
+    <name>lmms::MeterModel</name>
     <message>
         <location filename="src/core/MeterModel.cpp" line="32"/>
         <source>Numerator</source>
@@ -4974,7 +4974,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
 </context>
 <context>
-    <name>MidiController</name>
+    <name>lmms::MidiController</name>
     <message>
         <location filename="src/core/midi/MidiController.cpp" line="38"/>
         <source>MIDI Controller</source>
@@ -4987,7 +4987,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
 </context>
 <context>
-    <name>MidiImport</name>
+    <name>lmms::MidiImport</name>
     <message>
         <location filename="plugins/MidiImport/MidiImport.cpp" line="104"/>
         <location filename="plugins/MidiImport/MidiImport.cpp" line="116"/>
@@ -5011,7 +5011,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
 </context>
 <context>
-    <name>MidiPort</name>
+    <name>lmms::MidiPort</name>
     <message>
         <location filename="src/core/midi/MidiPort.cpp" line="45"/>
         <source>Input channel</source>
@@ -5069,7 +5069,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
 </context>
 <context>
-    <name>MidiSetupWidget</name>
+    <name>lmms::gui::MidiSetupWidget</name>
     <message>
         <location filename="src/gui/MidiSetupWidget.cpp" line="46"/>
         <source>DEVICE</source>
@@ -5077,7 +5077,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
 </context>
 <context>
-    <name>MonstroInstrument</name>
+    <name>lmms::MonstroInstrument</name>
     <message>
         <location filename="plugins/Monstro/Monstro.cpp" line="831"/>
         <source>Osc 1 Volume</source>
@@ -5673,7 +5673,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
 </context>
 <context>
-    <name>MonstroView</name>
+    <name>lmms::gui::MonstroView</name>
     <message>
         <location filename="plugins/Monstro/Monstro.cpp" line="1467"/>
         <source>Operators view</source>
@@ -6107,7 +6107,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
 </context>
 <context>
-    <name>MultitapEchoControlDialog</name>
+    <name>lmms::gui::MultitapEchoControlDialog</name>
     <message>
         <location filename="plugins/MultitapEcho/MultitapEchoControlDialog.cpp" line="84"/>
         <source>Length</source>
@@ -6150,7 +6150,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
 </context>
 <context>
-    <name>NesInstrument</name>
+    <name>lmms::NesInstrument</name>
     <message>
         <location filename="plugins/Nes/Nes.cpp" line="489"/>
         <source>Channel 1 Coarse detune</source>
@@ -6253,7 +6253,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
 </context>
 <context>
-    <name>NesInstrumentView</name>
+    <name>lmms::gui::NesInstrumentView</name>
     <message>
         <location filename="plugins/Nes/Nes.cpp" line="762"/>
         <location filename="plugins/Nes/Nes.cpp" line="793"/>
@@ -6409,7 +6409,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
 </context>
 <context>
-    <name>OscillatorObject</name>
+    <name>lmms::OscillatorObject</name>
     <message>
         <location filename="plugins/Organic/Organic.cpp" line="574"/>
         <source>Osc %1 waveform</source>
@@ -6470,7 +6470,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
 </context>
 <context>
-    <name>PatchesDialog</name>
+    <name>lmms::gui::PatchesDialog</name>
     <message>
         <location filename="plugins/GigPlayer/PatchesDialog.ui" line="39"/>
         <source>Qsynth: Channel Preset</source>
@@ -6513,7 +6513,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
 </context>
 <context>
-    <name>PatmanView</name>
+    <name>lmms::gui::PatmanView</name>
     <message>
         <location filename="plugins/Patman/Patman.cpp" line="461"/>
         <source>Open other patch</source>
@@ -6571,7 +6571,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
 </context>
 <context>
-    <name>MidiClipView</name>
+    <name>lmms::gui::MidiClipView</name>
     <message>
         <location filename="src/tracks/MidiClip.cpp" line="730"/>
         <source>use mouse wheel to set velocity of a step</source>
@@ -6614,7 +6614,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
 </context>
 <context>
-    <name>PeakController</name>
+    <name>lmms::PeakController</name>
     <message>
         <location filename="src/core/PeakController.cpp" line="49"/>
         <source>Peak Controller</source>
@@ -6632,7 +6632,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
 </context>
 <context>
-    <name>PeakControllerDialog</name>
+    <name>lmms::gui::PeakControllerDialog</name>
     <message>
         <location filename="src/gui/PeakControllerDialog.cpp" line="50"/>
         <source>PEAK</source>
@@ -6645,7 +6645,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
 </context>
 <context>
-    <name>PeakControllerEffectControlDialog</name>
+    <name>lmms::gui::PeakControllerEffectControlDialog</name>
     <message>
         <location filename="plugins/PeakControllerEffect/PeakControllerEffectControlDialog.cpp" line="54"/>
         <source>BASE</source>
@@ -6708,7 +6708,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
 </context>
 <context>
-    <name>PeakControllerEffectControls</name>
+    <name>lmms::PeakControllerEffectControls</name>
     <message>
         <location filename="plugins/PeakControllerEffect/PeakControllerEffectControls.cpp" line="40"/>
         <source>Base value</source>
@@ -6751,7 +6751,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
 </context>
 <context>
-    <name>PianoRoll</name>
+    <name>lmms::gui::PianoRoll</name>
     <message>
         <location filename="src/gui/editors/PianoRoll.cpp" line="202"/>
         <source>Note Velocity</source>
@@ -6845,7 +6845,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
 </context>
 <context>
-    <name>PianoRollWindow</name>
+    <name>lmms::gui::PianoRollWindow</name>
     <message>
         <location filename="src/gui/editors/PianoRoll.cpp" line="3970"/>
         <source>Play/pause current clip (Space)</source>
@@ -7013,7 +7013,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
 </context>
 <context>
-    <name>PianoView</name>
+    <name>lmms::gui::PianoView</name>
     <message>
         <location filename="src/gui/instrument/PianoView.cpp" line="408"/>
         <source>Base note</source>
@@ -7021,7 +7021,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
 </context>
 <context>
-    <name>Plugin</name>
+    <name>lmms::Plugin</name>
     <message>
         <location filename="src/core/Plugin.cpp" line="104"/>
         <source>Plugin not found</source>
@@ -7045,7 +7045,7 @@ Reason: &quot;%2&quot;</source>
     </message>
 </context>
 <context>
-    <name>PluginBrowser</name>
+    <name>lmms::gui::PluginBrowser</name>
     <message>
         <location filename="src/gui/PluginBrowser.cpp" line="53"/>
         <source>Instrument plugins</source>
@@ -7063,7 +7063,7 @@ Reason: &quot;%2&quot;</source>
     </message>
 </context>
 <context>
-    <name>PluginFactory</name>
+    <name>lmms::PluginFactory</name>
     <message>
         <location filename="src/core/PluginFactory.cpp" line="123"/>
         <source>Plugin not found.</source>
@@ -7076,7 +7076,7 @@ Reason: &quot;%2&quot;</source>
     </message>
 </context>
 <context>
-    <name>ProjectNotes</name>
+    <name>lmms::gui::ProjectNotes</name>
     <message>
         <location filename="src/gui/ProjectNotes.cpp" line="71"/>
         <source>Project notes</source>
@@ -7224,7 +7224,7 @@ Reason: &quot;%2&quot;</source>
     </message>
 </context>
 <context>
-    <name>ProjectRenderer</name>
+    <name>lmms::ProjectRenderer</name>
     <message>
         <location filename="src/core/ProjectRenderer.cpp" line="44"/>
         <source>WAV-File (*.wav)</source>
@@ -7237,7 +7237,7 @@ Reason: &quot;%2&quot;</source>
     </message>
 </context>
 <context>
-    <name>QWidget</name>
+    <name>lmms::gui::PluginBrowser</name>
     <message>
         <location filename="plugins/LadspaBrowser/LadspaDescription.cpp" line="134"/>
         <location filename="plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="54"/>
@@ -7319,7 +7319,7 @@ Reason: &quot;%2&quot;</source>
     </message>
 </context>
 <context>
-    <name>RenameDialog</name>
+    <name>lmms::gui::RenameDialog</name>
     <message>
         <location filename="src/gui/modals/RenameDialog.cpp" line="38"/>
         <source>Rename...</source>
@@ -7327,7 +7327,7 @@ Reason: &quot;%2&quot;</source>
     </message>
 </context>
 <context>
-    <name>SampleBuffer</name>
+    <name>lmms::SampleBuffer</name>
     <message>
         <location filename="src/core/SampleBuffer.cpp" line="946"/>
         <source>Open audio file</source>
@@ -7385,7 +7385,7 @@ Reason: &quot;%2&quot;</source>
     </message>
 </context>
 <context>
-    <name>SampleClipView</name>
+    <name>lmms::gui::SampleClipView</name>
     <message>
         <location filename="src/tracks/SampleTrack.cpp" line="235"/>
         <source>double-click to select sample</source>
@@ -7418,7 +7418,7 @@ Reason: &quot;%2&quot;</source>
     </message>
 </context>
 <context>
-    <name>SampleTrack</name>
+    <name>lmms::SampleTrack</name>
     <message>
         <location filename="src/tracks/SampleTrack.cpp" line="451"/>
         <source>Volume</source>
@@ -7437,7 +7437,7 @@ Reason: &quot;%2&quot;</source>
     </message>
 </context>
 <context>
-    <name>SampleTrackView</name>
+    <name>lmms::gui::SampleTrackView</name>
     <message>
         <location filename="src/tracks/SampleTrack.cpp" line="586"/>
         <source>Track volume</source>
@@ -7470,7 +7470,7 @@ Reason: &quot;%2&quot;</source>
     </message>
 </context>
 <context>
-    <name>SetupDialog</name>
+    <name>lmms::gui::SetupDialog</name>
     <message>
         <location filename="src/gui/modals/SetupDialog.cpp" line="145"/>
         <source>Setup LMMS</source>
@@ -7796,7 +7796,7 @@ Remember to also save your project manually.</source>
     </message>
 </context>
 <context>
-    <name>Song</name>
+    <name>lmms::Song</name>
     <message>
         <location filename="src/core/Song.cpp" line="79"/>
         <source>Tempo</source>
@@ -7898,7 +7898,7 @@ Remember to also save your project manually.</source>
     </message>
 </context>
 <context>
-    <name>SongEditor</name>
+    <name>lmms::gui::SongEditor</name>
     <message>
         <location filename="src/core/DataFile.cpp" line="132"/>
         <source>Could not open file</source>
@@ -7999,7 +7999,7 @@ Remember to also save your project manually.</source>
     </message>
 </context>
 <context>
-    <name>SongEditorWindow</name>
+    <name>lmms::gui::SongEditorWindow</name>
     <message>
         <location filename="src/gui/editors/SongEditor.cpp" line="620"/>
         <source>Song-Editor</source>
@@ -8082,7 +8082,7 @@ Remember to also save your project manually.</source>
     </message>
 </context>
 <context>
-    <name>SaControlsDialog</name>
+    <name>lmms::gui::SaControlsDialog</name>
     <message>
         <location filename="plugins/SpectrumAnalyzer/SaControlsDialog.cpp" line="161"/>
         <source>Linear spectrum</source>
@@ -8095,7 +8095,7 @@ Remember to also save your project manually.</source>
     </message>
 </context>
 <context>
-    <name>SaControls</name>
+    <name>lmms::SaControls</name>
     <message>
         <location filename="plugins/SpectrumAnalyzer/SaControls.cpp" line="34"/>
         <source>Linear spectrum</source>
@@ -8113,7 +8113,7 @@ Remember to also save your project manually.</source>
     </message>
 </context>
 <context>
-    <name>TabWidget</name>
+    <name>lmms::gui::TabWidget</name>
     <message>
         <location filename="src/gui/AudioDeviceSetupWidget.cpp" line="28"/>
         <location filename="src/gui/MidiSetupWidget.cpp" line="34"/>
@@ -8122,7 +8122,7 @@ Remember to also save your project manually.</source>
     </message>
 </context>
 <context>
-    <name>TempoSyncKnob</name>
+    <name>lmms::gui::TempoSyncKnob</name>
     <message>
         <location filename="src/gui/widgets/TempoSyncKnob.cpp" line="44"/>
         <location filename="src/gui/widgets/TempoSyncKnob.cpp" line="207"/>
@@ -8216,7 +8216,7 @@ Remember to also save your project manually.</source>
     </message>
 </context>
 <context>
-    <name>TimeDisplayWidget</name>
+    <name>lmms::gui::TimeDisplayWidget</name>
     <message>
         <location filename="src/gui/widgets/TimeDisplayWidget.cpp" line="52"/>
         <source>click to change time units</source>
@@ -8224,7 +8224,7 @@ Remember to also save your project manually.</source>
     </message>
 </context>
 <context>
-    <name>TimeLineWidget</name>
+    <name>lmms::gui::TimeLineWidget</name>
     <message>
         <location filename="src/gui/editors/TimeLineWidget.cpp" line="123"/>
         <source>Enable/disable auto-scrolling</source>
@@ -8268,7 +8268,7 @@ Remember to also save your project manually.</source>
     </message>
 </context>
 <context>
-    <name>Track</name>
+    <name>lmms::Track</name>
     <message>
         <location filename="src/core/Track.cpp" line="1896"/>
         <source>Mute</source>
@@ -8281,7 +8281,7 @@ Remember to also save your project manually.</source>
     </message>
 </context>
 <context>
-    <name>TrackContainer</name>
+    <name>lmms::TrackContainer</name>
     <message>
         <location filename="plugins/MidiImport/MidiImport.cpp" line="287"/>
         <location filename="src/core/TrackContainer.cpp" line="91"/>
@@ -8328,7 +8328,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>Clip</name>
+    <name>lmms::Clip</name>
     <message>
         <location filename="src/core/Track.cpp" line="106"/>
         <source>Mute</source>
@@ -8336,7 +8336,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>ClipView</name>
+    <name>lmms::gui::ClipView</name>
     <message>
         <location filename="src/core/Track.cpp" line="696"/>
         <source>Current position</source>
@@ -8395,7 +8395,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>TrackOperationsWidget</name>
+    <name>lmms::gui::TrackOperationsWidget</name>
     <message>
         <location filename="src/core/Track.cpp" line="1633"/>
         <source>Press &lt;%1&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
@@ -8459,7 +8459,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>TripleOscillatorView</name>
+    <name>lmms::gui::TripleOscillatorView</name>
     <message>
         <location filename="plugins/TripleOscillator/TripleOscillator.cpp" line="442"/>
         <source>Use phase modulation for modulating oscillator 1 with oscillator 2</source>
@@ -8639,7 +8639,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>VersionedSaveDialog</name>
+    <name>lmms::gui::VersionedSaveDialog</name>
     <message>
         <location filename="src/gui/modals/VersionedSaveDialog.cpp" line="47"/>
         <source>Increment version number</source>
@@ -8652,7 +8652,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>VestigeInstrumentView</name>
+    <name>lmms::gui::VestigeInstrumentView</name>
     <message>
         <location filename="plugins/Vestige/Vestige.cpp" line="415"/>
         <source>Open other VST-plugin</source>
@@ -8766,7 +8766,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>Oscilloscope</name>
+    <name>lmms::gui::Oscilloscope</name>
     <message>
         <location filename="src/gui/widgets/Oscilloscope.cpp" line="60"/>
         <source>click to enable/disable visualization of master-output</source>
@@ -8779,7 +8779,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>VstEffectControlDialog</name>
+    <name>lmms::gui::VstEffectControlDialog</name>
     <message>
         <location filename="plugins/VstEffect/VstEffectControlDialog.cpp" line="76"/>
         <source>Show/hide</source>
@@ -8849,7 +8849,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>VstPlugin</name>
+    <name>lmms::VstPlugin</name>
     <message>
         <location filename="plugins/Vestige/Vestige.cpp" line="269"/>
         <location filename="plugins/VstEffect/VstEffect.cpp" line="138"/>
@@ -8919,7 +8919,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>WatsynInstrument</name>
+    <name>lmms::WatsynInstrument</name>
     <message>
         <location filename="plugins/Watsyn/Watsyn.cpp" line="233"/>
         <source>Volume A1</source>
@@ -9067,7 +9067,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>WatsynView</name>
+    <name>lmms::gui::WatsynView</name>
     <message>
         <location filename="plugins/Watsyn/Watsyn.cpp" line="678"/>
         <location filename="plugins/Watsyn/Watsyn.cpp" line="679"/>
@@ -9316,7 +9316,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>ZynAddSubFxInstrument</name>
+    <name>lmms::ZynAddSubFxInstrument</name>
     <message>
         <location filename="plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="112"/>
         <source>Portamento</source>
@@ -9359,7 +9359,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>ZynAddSubFxView</name>
+    <name>lmms::gui::ZynAddSubFxView</name>
     <message>
         <location filename="plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="505"/>
         <source>Portamento:</source>
@@ -9447,7 +9447,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>AudioFileProcessor</name>
+    <name>lmms::AudioFileProcessor</name>
     <message>
         <location filename="plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="75"/>
         <source>Amplify</source>
@@ -9510,7 +9510,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>BitInvader</name>
+    <name>lmms::BitInvader</name>
     <message>
         <location filename="plugins/BitInvader/BitInvader.cpp" line="140"/>
         <source>Samplelength</source>
@@ -9518,7 +9518,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>BitInvaderView</name>
+    <name>lmms::gui::BitInvaderView</name>
     <message>
         <location filename="plugins/BitInvader/BitInvader.cpp" line="338"/>
         <source>Sample Length</source>
@@ -9611,7 +9611,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>DynProcControlDialog</name>
+    <name>lmms::gui::DynProcControlDialog</name>
     <message>
         <location filename="plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="65"/>
         <source>INPUT</source>
@@ -9724,7 +9724,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>DynProcControls</name>
+    <name>lmms::DynProcControls</name>
     <message>
         <location filename="plugins/DynamicsProcessor/DynamicsProcessorControls.cpp" line="42"/>
         <source>Input gain</source>
@@ -9752,7 +9752,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>MixerLineLcdSpinBox</name>
+    <name>lmms::gui::MixerLineLcdSpinBox</name>
     <message>
         <location filename="src/tracks/InstrumentTrack.cpp" line="1246"/>
         <source>Assign to:</source>
@@ -9765,7 +9765,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>graphModel</name>
+    <name>lmms::graphModel</name>
     <message>
         <location filename="src/gui/widgets/Graph.cpp" line="448"/>
         <source>Graph</source>
@@ -9773,7 +9773,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>KickerInstrument</name>
+    <name>lmms::KickerInstrument</name>
     <message>
         <location filename="plugins/Kicker/Kicker.cpp" line="62"/>
         <source>Start frequency</source>
@@ -9836,7 +9836,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>KickerInstrumentView</name>
+    <name>lmms::gui::KickerInstrumentView</name>
     <message>
         <location filename="plugins/Kicker/Kicker.cpp" line="283"/>
         <source>Start frequency:</source>
@@ -9889,7 +9889,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>LadspaBrowserView</name>
+    <name>lmms::gui::LadspaBrowserView</name>
     <message>
         <location filename="plugins/LadspaBrowser/LadspaBrowser.cpp" line="113"/>
         <location filename="plugins/LadspaBrowser/LadspaBrowser.cpp" line="121"/>
@@ -9944,7 +9944,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>LadspaDescription</name>
+    <name>lmms::gui::LadspaDescription</name>
     <message>
         <location filename="plugins/LadspaBrowser/LadspaDescription.cpp" line="84"/>
         <source>Plugins</source>
@@ -9957,7 +9957,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>LadspaPortDialog</name>
+    <name>lmms::gui::LadspaPortDialog</name>
     <message>
         <location filename="plugins/LadspaBrowser/LadspaPortDialog.cpp" line="42"/>
         <source>Ports</source>
@@ -10041,7 +10041,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>Lb302Synth</name>
+    <name>lmms::Lb302Synth</name>
     <message>
         <location filename="plugins/Lb302/Lb302.cpp" line="277"/>
         <source>VCF Cutoff Frequency</source>
@@ -10099,7 +10099,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>Lb302SynthView</name>
+    <name>lmms::gui::Lb302SynthView</name>
     <message>
         <location filename="plugins/Lb302/Lb302.cpp" line="833"/>
         <source>Cutoff Freq:</source>
@@ -10253,7 +10253,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>MalletsInstrument</name>
+    <name>lmms::MalletsInstrument</name>
     <message>
         <location filename="plugins/Stk/Mallets/Mallets.cpp" line="65"/>
         <source>Hardness</source>
@@ -10401,7 +10401,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>MalletsInstrumentView</name>
+    <name>lmms::gui::MalletsInstrumentView</name>
     <message>
         <location filename="plugins/Stk/Mallets/Mallets.cpp" line="317"/>
         <source>Instrument</source>
@@ -10575,7 +10575,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>ManageVSTEffectView</name>
+    <name>lmms::gui::ManageVSTEffectView</name>
     <message>
         <location filename="plugins/VstEffect/VstEffectControls.cpp" line="318"/>
         <source> - VST parameter control</source>
@@ -10614,7 +10614,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>ManageVestigeInstrumentView</name>
+    <name>lmms::gui::ManageVestigeInstrumentView</name>
     <message>
         <location filename="plugins/Vestige/Vestige.cpp" line="887"/>
         <location filename="plugins/Vestige/Vestige.cpp" line="1145"/>
@@ -10654,7 +10654,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>OpulenzInstrument</name>
+    <name>lmms::OpulenzInstrument</name>
     <message>
         <location filename="plugins/OpulenZ/OpulenZ.cpp" line="95"/>
         <source>Patch</source>
@@ -10802,7 +10802,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>OpulenzInstrumentView</name>
+    <name>lmms::gui::OpulenzInstrumentView</name>
     <message>
         <location filename="plugins/OpulenZ/OpulenZ.cpp" line="800"/>
         <location filename="plugins/OpulenZ/OpulenZ.cpp" line="802"/>
@@ -10829,7 +10829,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>OrganicInstrument</name>
+    <name>lmms::OrganicInstrument</name>
     <message>
         <location filename="plugins/Organic/Organic.cpp" line="81"/>
         <source>Distortion</source>
@@ -10842,7 +10842,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>OrganicInstrumentView</name>
+    <name>lmms::gui::OrganicInstrumentView</name>
     <message>
         <location filename="plugins/Organic/Organic.cpp" line="436"/>
         <source>Distortion:</source>
@@ -10906,7 +10906,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>FreeBoyInstrument</name>
+    <name>lmms::FreeBoyInstrument</name>
     <message>
         <location filename="plugins/FreeBoy/FreeBoy.cpp" line="65"/>
         <source>Sweep time</source>
@@ -11029,7 +11029,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>FreeBoyInstrumentView</name>
+    <name>lmms::gui::FreeBoyInstrumentView</name>
     <message>
         <location filename="plugins/FreeBoy/FreeBoy.cpp" line="459"/>
         <source>Sweep Time:</source>
@@ -11258,7 +11258,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>PatchesDialog</name>
+    <name>lmms::gui::PatchesDialog</name>
     <message>
         <location filename="plugins/Sf2Player/PatchesDialog.ui" line="39"/>
         <source>Qsynth: Channel Preset</source>
@@ -11301,7 +11301,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>PluginBrowser</name>
+    <name>lmms::gui::PluginBrowser</name>
     <message>
         <location filename="plugins/Amplifier/Amplifier.cpp" line="38"/>
         <source>A native amplifier plugin</source>
@@ -11525,7 +11525,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>Sf2Instrument</name>
+    <name>lmms::Sf2Instrument</name>
     <message>
         <location filename="plugins/Sf2Player/Sf2Player.cpp" line="94"/>
         <source>Bank</source>
@@ -11598,7 +11598,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>Sf2InstrumentView</name>
+    <name>lmms::gui::Sf2InstrumentView</name>
     <message>
         <location filename="plugins/Sf2Player/Sf2Player.cpp" line="845"/>
         <source>Open other SoundFont file</source>
@@ -11691,7 +11691,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>SfxrInstrument</name>
+    <name>lmms::SfxrInstrument</name>
     <message>
         <location filename="plugins/Sfxr/Sfxr.cpp" line="354"/>
         <source>Wave Form</source>
@@ -11699,7 +11699,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>SidInstrument</name>
+    <name>lmms::SidInstrument</name>
     <message>
         <location filename="plugins/Sid/SidInstrument.cpp" line="122"/>
         <source>Cutoff</source>
@@ -11732,7 +11732,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>SidInstrumentView</name>
+    <name>lmms::gui::SidInstrumentView</name>
     <message>
         <location filename="plugins/Sid/SidInstrument.cpp" line="490"/>
         <source>Volume:</source>
@@ -11905,7 +11905,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>StereoEnhancerControlDialog</name>
+    <name>lmms::gui::StereoEnhancerControlDialog</name>
     <message>
         <location filename="plugins/StereoEnhancer/StereoEnhancerControlDialog.cpp" line="42"/>
         <source>WIDE</source>
@@ -11918,7 +11918,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>StereoEnhancerControls</name>
+    <name>lmms::StereoEnhancerControls</name>
     <message>
         <location filename="plugins/StereoEnhancer/StereoEnhancerControls.cpp" line="35"/>
         <source>Width</source>
@@ -11926,7 +11926,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>StereoMatrixControlDialog</name>
+    <name>lmms::gui::StereoMatrixControlDialog</name>
     <message>
         <location filename="plugins/StereoMatrix/StereoMatrixControlDialog.cpp" line="52"/>
         <source>Left to Left Vol:</source>
@@ -11949,7 +11949,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>StereoMatrixControls</name>
+    <name>lmms::StereoMatrixControls</name>
     <message>
         <location filename="plugins/StereoMatrix/StereoMatrixControls.cpp" line="35"/>
         <source>Left to Left</source>
@@ -11972,7 +11972,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>VestigeInstrument</name>
+    <name>lmms::VestigeInstrument</name>
     <message>
         <location filename="plugins/Vestige/Vestige.cpp" line="258"/>
         <source>Loading plugin</source>
@@ -11985,7 +11985,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>Vibed</name>
+    <name>lmms::Vibed</name>
     <message>
         <location filename="plugins/Vibed/Vibed.cpp" line="77"/>
         <source>String %1 volume</source>
@@ -12038,7 +12038,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>VibedView</name>
+    <name>lmms::gui::VibedView</name>
     <message>
         <location filename="plugins/Vibed/Vibed.cpp" line="364"/>
         <source>Volume:</source>
@@ -12272,7 +12272,7 @@ The LED in the lower right corner of the waveform editor determines whether the 
     </message>
 </context>
 <context>
-    <name>VoiceObject</name>
+    <name>lmms::VoiceObject</name>
     <message>
         <location filename="plugins/Sid/SidInstrument.cpp" line="92"/>
         <source>Voice %1 pulse width</source>
@@ -12330,7 +12330,7 @@ The LED in the lower right corner of the waveform editor determines whether the 
     </message>
 </context>
 <context>
-    <name>WaveShaperControlDialog</name>
+    <name>lmms::gui::WaveShaperControlDialog</name>
     <message>
         <location filename="plugins/WaveShaper/WaveShaperControlDialog.cpp" line="65"/>
         <source>INPUT</source>
@@ -12403,7 +12403,7 @@ The LED in the lower right corner of the waveform editor determines whether the 
     </message>
 </context>
 <context>
-    <name>WaveShaperControls</name>
+    <name>lmms::WaveShaperControls</name>
     <message>
         <location filename="plugins/WaveShaper/WaveShaperControls.cpp" line="42"/>
         <source>Input gain</source>

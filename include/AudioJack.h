@@ -69,7 +69,7 @@ public:
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget",
+		return QT_TRANSLATE_NOOP("lmms::gui::AudioDeviceSetupWidget",
 			"JACK (JACK Audio Connection Kit)" );
 	}
 

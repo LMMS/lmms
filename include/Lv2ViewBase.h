@@ -30,6 +30,7 @@
 #ifdef LMMS_HAVE_LV2
 
 
+#include <QCoreApplication>
 
 #include "LinkedModelGroupViews.h"
 #include "lmms_export.h"
@@ -68,6 +69,8 @@ private:
 //! Base class for view for one Lv2 plugin
 class LMMS_EXPORT Lv2ViewBase : public LinkedModelGroupsView
 {
+	Q_DECLARE_TR_FUNCTIONS(lmms::gui::Lv2ViewBase)
+
 protected:
 	//! @param pluginWidget A child class which inherits QWidget
 	Lv2ViewBase(class QWidget *pluginWidget, Lv2ControlBase *ctrlBase);

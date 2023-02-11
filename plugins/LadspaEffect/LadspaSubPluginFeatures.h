@@ -28,6 +28,8 @@
 #ifndef LADSPA_SUBPLUGIN_FEATURES_H
 #define LADSPA_SUBPLUGIN_FEATURES_H
 
+#include <QCoreApplication>
+
 #include "LadspaManager.h"
 #include "Plugin.h"
 
@@ -37,6 +39,8 @@ namespace lmms
 
 class LadspaSubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures
 {
+	Q_DECLARE_TR_FUNCTIONS(lmms::gui::PluginBrowser)
+
 public:
 	LadspaSubPluginFeatures( Plugin::PluginTypes _type );
 

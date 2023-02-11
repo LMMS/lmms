@@ -32,10 +32,10 @@
 #include "Effect.h"
 
 
-namespace Ui { class EffectSelectDialog; }
-
 namespace lmms::gui
 {
+
+namespace Ui { class EffectSelectDialog; }
 
 
 class EffectSelectDialog : public QDialog

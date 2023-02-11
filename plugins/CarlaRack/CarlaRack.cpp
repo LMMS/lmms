@@ -39,7 +39,7 @@ Plugin::Descriptor PLUGIN_EXPORT carlarack_plugin_descriptor =
 {
     LMMS_STRINGIFY( PLUGIN_NAME ),
     "Carla Rack",
-    QT_TRANSLATE_NOOP( "PluginBrowser",
+    QT_TRANSLATE_NOOP("lmms::gui::PluginBrowser",
                        "Carla Rack Instrument" ),
     "falkTX <falktx/at/falktx.com>",
     CARLA_VERSION_HEX,

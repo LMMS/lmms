@@ -82,7 +82,7 @@ Plugin::Descriptor PLUGIN_EXPORT lb302_plugin_descriptor =
 {
 	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"LB302",
-	QT_TRANSLATE_NOOP( "PluginBrowser",
+	QT_TRANSLATE_NOOP("lmms::gui::PluginBrowser",
 			"Incomplete monophonic imitation TB-303" ),
 	"Paul Giblock <pgib/at/users.sf.net>",
 	0x0100,

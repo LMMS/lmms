@@ -38,7 +38,7 @@ Plugin::Descriptor PLUGIN_EXPORT bassbooster_plugin_descriptor =
 {
 	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"BassBooster",
-	QT_TRANSLATE_NOOP( "PluginBrowser", "Boost your bass the fast and simple way" ),
+	QT_TRANSLATE_NOOP("lmms::gui::PluginBrowser", "Boost your bass the fast and simple way"),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
 	Plugin::Effect,

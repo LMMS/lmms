@@ -24,6 +24,7 @@
 
 #include "LadspaDescription.h"
 
+#include <QApplication>
 #include <QGroupBox>
 #include <QLabel>
 #include <QListWidget>
@@ -125,7 +126,7 @@ void LadspaDescription::update( const ladspa_key_t & _key )
 	Ladspa2LMMS * manager = Engine::getLADSPAManager();
 
 	auto name = new QLabel(description);
-	name->setText( QWidget::tr( "Name: " ) + manager->getName( _key ) );
+	name->setText(qApp->translate("lmms::gui::PluginBrowser", "Name: ") + manager->getName(_key));
 	layout->addWidget( name );
 
 	auto maker = new QWidget(description);
@@ -135,7 +136,7 @@ void LadspaDescription::update( const ladspa_key_t & _key )
 	layout->addWidget( maker );
 
 	auto maker_label = new QLabel(maker);
-	maker_label->setText( QWidget::tr( "Maker: " ) );
+	maker_label->setText(qApp->translate("lmms::gui::PluginBrowser", "Maker: "));
 	maker_label->setAlignment( Qt::AlignTop );
 	auto maker_content = new QLabel(maker);
 	maker_content->setText( manager->getMaker( _key ) );
@@ -150,7 +151,7 @@ void LadspaDescription::update( const ladspa_key_t & _key )
 	layout->addWidget( copyright );
 
 	auto copyright_label = new QLabel(copyright);
-	copyright_label->setText( QWidget::tr( "Copyright: " ) );
+	copyright_label->setText(qApp->translate("lmms::gui::PluginBrowser", "Copyright: "));
 	copyright_label->setAlignment( Qt::AlignTop );
 
 	auto copyright_content = new QLabel(copyright);
@@ -160,33 +161,33 @@ void LadspaDescription::update( const ladspa_key_t & _key )
 	copyrightLayout->addWidget( copyright_content, 1 );
 
 	auto requiresRealTime = new QLabel(description);
-	requiresRealTime->setText( QWidget::tr( "Requires Real Time: " ) +
+	requiresRealTime->setText(qApp->translate("lmms::gui::PluginBrowser", "Requires Real Time: ") +
 				( manager->hasRealTimeDependency( _key ) ?
-							QWidget::tr( "Yes" ) :
-							QWidget::tr( "No" ) ) );
+							qApp->translate("lmms::gui::PluginBrowser", "Yes") :
+							qApp->translate("lmms::gui::PluginBrowser", "No")));
 	layout->addWidget( requiresRealTime );
 
 	auto realTimeCapable = new QLabel(description);
-	realTimeCapable->setText( QWidget::tr( "Real Time Capable: " ) +
+	realTimeCapable->setText(qApp->translate("lmms::gui::PluginBrowser", "Real Time Capable: ") +
 					( manager->isRealTimeCapable( _key ) ?
-							QWidget::tr( "Yes" ) :
-							QWidget::tr( "No" ) ) );
+							qApp->translate("lmms::gui::PluginBrowser", "Yes") :
+							qApp->translate("lmms::gui::PluginBrowser", "No")));
 	layout->addWidget( realTimeCapable );
 
 	auto inplaceBroken = new QLabel(description);
-	inplaceBroken->setText( QWidget::tr( "In Place Broken: " ) +
+	inplaceBroken->setText(qApp->translate("lmms::gui::PluginBrowser", "In Place Broken: ") +
 					( manager->isInplaceBroken( _key ) ?
-							QWidget::tr( "Yes" ) :
-							QWidget::tr( "No" ) ) );
+							qApp->translate("lmms::gui::PluginBrowser", "Yes") :
+							qApp->translate("lmms::gui::PluginBrowser", "No")));
 	layout->addWidget( inplaceBroken );
 
 	auto channelsIn = new QLabel(description);
-	channelsIn->setText( QWidget::tr( "Channels In: " ) + QString::number(
+	channelsIn->setText(qApp->translate("lmms::gui::PluginBrowser", "Channels In: ") + QString::number(
 			manager->getDescription( _key )->inputChannels ) );
 	layout->addWidget( channelsIn );
 
 	auto channelsOut = new QLabel(description);
-	channelsOut->setText( QWidget::tr( "Channels Out: " ) + QString::number(
+	channelsOut->setText(qApp->translate("lmms::gui::PluginBrowser", "Channels Out: ") + QString::number(
 			manager->getDescription( _key )->outputChannels ) );
 	layout->addWidget( channelsOut );
 }

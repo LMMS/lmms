@@ -39,6 +39,7 @@ namespace lmms::gui
 class LedCheckBox;
 
 class SaveOptionsWidget : public QWidget {
+	Q_OBJECT
 public:
 	SaveOptionsWidget(Song::SaveOptions &saveOptions);
 

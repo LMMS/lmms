@@ -27,7 +27,7 @@ FOREACH(_ts_file ${lmms_LOCALES})
 	STRING(REPLACE ".ts" ".qm" _qm_file "${_ts_file}")
 	STRING(REPLACE ".ts" ".qm" _qm_target "${_ts_target}")
 	ADD_CUSTOM_TARGET(${_ts_target}
-		COMMAND "${QT_LUPDATE_EXECUTABLE}" -locations none -no-obsolete -I ${CMAKE_SOURCE_DIR}/include/ ${LMMS_SRCS}  ${LMMS_UIS} ${CMAKE_SOURCE_DIR}/plugins  -ts "\"${_ts_file}\""
+		COMMAND "${CMAKE_SOURCE_DIR}/buildtools/update_locales" "\"${_ts_file}\""
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 	add_custom_command(
 		OUTPUT "${_qm_file}"

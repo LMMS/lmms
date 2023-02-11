@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>EffectSelectDialog</class>
- <widget class="QDialog" name="EffectSelectDialog">
+ <class>lmms::gui::EffectSelectDialog</class>
+ <widget class="QDialog" name="lmms::gui::EffectSelectDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -85,7 +85,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>EffectSelectDialog</receiver>
+   <receiver>lmms::gui::EffectSelectDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

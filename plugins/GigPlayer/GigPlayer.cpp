@@ -66,7 +66,7 @@ Plugin::Descriptor PLUGIN_EXPORT gigplayer_plugin_descriptor =
 {
 	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"GIG Player",
-	QT_TRANSLATE_NOOP( "PluginBrowser", "Player for GIG files" ),
+	QT_TRANSLATE_NOOP("lmms::gui::PluginBrowser", "Player for GIG files"),
 	"Garrett Wilson <g/at/floft/dot/net>",
 	0x0100,
 	Plugin::Instrument,

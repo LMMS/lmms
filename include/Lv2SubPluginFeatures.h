@@ -32,6 +32,7 @@
 #ifdef LMMS_HAVE_LV2
 
 #include <lilv/lilv.h>
+#include <QCoreApplication>
 
 #include "lmms_export.h"
 #include "Plugin.h"
@@ -42,6 +43,8 @@ namespace lmms
 
 class LMMS_EXPORT Lv2SubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures
 {
+	Q_DECLARE_TR_FUNCTIONS(lmms::gui::PluginBrowser)
+
 private:
 	static const LilvPlugin *getPlugin(const Key &k);
 	static QString pluginName(const LilvPlugin *plug);

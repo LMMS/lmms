@@ -57,7 +57,7 @@ public:
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "MidiSetupWidget", "WinMM MIDI" );
+		return QT_TRANSLATE_NOOP("lmms::gui::MidiSetupWidget", "WinMM MIDI");
 	}
 
 	inline static QString configSection()

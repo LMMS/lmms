@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>AboutDialog</class>
- <widget class="QDialog" name="AboutDialog">
+ <class>lmms::gui::AboutDialog</class>
+ <widget class="QDialog" name="lmms::gui::AboutDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -257,13 +257,13 @@ If you're interested in translating LMMS in another language or want to improve 
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>AboutDialog</receiver>
+   <receiver>lmms::gui::AboutDialog</receiver>
    <slot>accept()</slot>
   </connection>
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>AboutDialog</receiver>
+   <receiver>lmms::gui::AboutDialog</receiver>
    <slot>reject()</slot>
   </connection>
  </connections>

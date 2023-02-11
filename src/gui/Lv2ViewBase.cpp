@@ -141,14 +141,14 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 	auto btnBox = new QHBoxLayout();
 	if (/* DISABLES CODE */ (false))
 	{
-		m_reloadPluginButton = new QPushButton(QObject::tr("Reload Plugin"),
+		m_reloadPluginButton = new QPushButton(tr("Reload Plugin"),
 			meAsWidget);
 		btnBox->addWidget(m_reloadPluginButton, 0);
 	}
 
 	if (/* DISABLES CODE */ (false)) // TODO: check if the plugin has the UI extension
 	{
-		m_toggleUIButton = new QPushButton(QObject::tr("Show GUI"),
+		m_toggleUIButton = new QPushButton(tr("Show GUI"),
 											meAsWidget);
 		m_toggleUIButton->setCheckable(true);
 		m_toggleUIButton->setChecked(false);
@@ -173,7 +173,7 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 		infoLabel->setWordWrap(true);
 		infoLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 
-		m_helpButton = new QPushButton(QObject::tr("Help"));
+		m_helpButton = new QPushButton(tr("Help"));
 		m_helpButton->setCheckable(true);
 		btnBox->addWidget(m_helpButton);
 

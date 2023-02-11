@@ -52,7 +52,7 @@ public:
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP("MidiSetupWidget", "sndio MIDI");
+		return QT_TRANSLATE_NOOP("lmms::gui::MidiSetupWidget", "sndio MIDI");
 	}
 
 	inline static QString configSection()

@@ -50,7 +50,7 @@ public:
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget", "Dummy (no sound output)" );
+		return QT_TRANSLATE_NOOP("lmms::gui::AudioDeviceSetupWidget", "Dummy (no sound output)");
 	}
 
 

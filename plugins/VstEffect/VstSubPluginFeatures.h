@@ -27,6 +27,7 @@
 #ifndef _VST_SUBPLUGIN_FEATURES_H
 #define _VST_SUBPLUGIN_FEATURES_H
 
+#include <QCoreApplication>
 
 #include "Effect.h"
 #include "Plugin.h"
@@ -37,6 +38,8 @@ namespace lmms
 
 class VstSubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures
 {
+	Q_DECLARE_TR_FUNCTIONS(lmms::gui::PluginBrowser)
+
 public:
 	VstSubPluginFeatures( Plugin::PluginTypes _type );
 
