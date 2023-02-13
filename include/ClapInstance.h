@@ -83,9 +83,13 @@ public:
 
 	enum class PluginState
 	{
-		// The plugin hasn't been created yet
+		// The plugin hasn't been created yet or failed to load (NoneWithError)
 		None,
-		// The plugin is inactive, only the main thread uses it
+		// The plugin has been created but not initialized
+		Loaded,
+		// Initialization failed - LMMS probably does not support this plugin yet
+		LoadedWithError,
+		// The plugin is initialized and inactive, only the main thread uses it
 		Inactive,
 		// Activation failed
 		InactiveWithError,
@@ -174,7 +178,6 @@ public:
 	/////////////////////////////////////////
 
 	auto getPluginState() const -> PluginState { return m_pluginState; };
-	auto isPluginErrorState() const -> bool { return m_pluginState == PluginState::ActiveWithError || m_pluginState == PluginState::InactiveWithError; };
 
 	// Call order: pluginLoad() --> pluginInit() --> pluginActivate()
 
@@ -185,9 +188,9 @@ public:
 	auto pluginActivate() -> bool;
 	auto pluginDeactivate() -> bool;
 
-	auto pluginProcessBegin() -> bool;
-	auto pluginProcess() -> bool;
-	auto pluginProcessEnd() -> bool;
+	auto pluginProcessBegin(uint32_t frames) -> bool;
+	auto pluginProcess(uint32_t frames) -> bool;
+	auto pluginProcessEnd(uint32_t frames) -> bool;
 
 	void paramFlushOnMainThread();
 	void handlePluginOutputEvents();
@@ -196,6 +199,7 @@ public:
 	auto isPluginActive() const -> bool;
 	auto isPluginProcessing() const -> bool;
 	auto isPluginSleeping() const -> bool;
+	auto isPluginErrorState() const -> bool;
 
 private:
 
@@ -218,6 +222,8 @@ private:
 
 	clap_host m_host;
 	std::queue<std::function<bool()>> m_idleQueue;
+
+	//int64_t m_steadyTime = 0;
 
 	/////////////////////////////////////////
 	// Plugin
@@ -251,8 +257,10 @@ private:
 	/**
 	 * Process-related
 	*/
-	clap_audio_buffer m_audioIn = {};
-	clap_audio_buffer m_audioOut = {};
+	std::unique_ptr<clap_audio_buffer_t[]> m_audioIn, m_audioOut;
+	clap_audio_buffer_t* m_audioInActive = nullptr; //!< Pointer to m_audioIn element used by LMMS
+	clap_audio_buffer_t* m_audioOutActive = nullptr; //!< Pointer to m_audioOut element used by LMMS
+
 	clap::helpers::EventList m_evIn;
 	clap::helpers::EventList m_evOut;
 	clap_process m_process;
@@ -329,8 +337,8 @@ private:
 	};
 
 	std::vector<AudioPort> m_audioPortsIn, m_audioPortsOut;
-	AudioPort* m_audioPortInActive = nullptr; //!< Pointer to m_audioPortsIn element
-	AudioPort* m_audioPortOutActive = nullptr; //!< Pointer to m_audioPortsOut element
+	AudioPort* m_audioPortInActive = nullptr; //!< Pointer to m_audioPortsIn element used by LMMS
+	AudioPort* m_audioPortOutActive = nullptr; //!< Pointer to m_audioPortsOut element used by LMMS
 
 	/**
 	 * Plugin/Host extension pointers

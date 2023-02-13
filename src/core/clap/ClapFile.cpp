@@ -27,7 +27,6 @@
 #ifdef LMMS_HAVE_CLAP
 
 #include "ClapManager.h"
-#include "ClapPorts.h"
 
 #include <QDebug>
 #include <clap/clap.h>

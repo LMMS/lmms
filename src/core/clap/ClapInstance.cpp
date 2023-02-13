@@ -52,9 +52,15 @@ ClapInstance::ClapInstance(const ClapPluginInfo* pluginInfo, Model* parent)
 {
 	m_pluginState = PluginState::None;
 	setHost();
+
+	m_process = {};
+	m_process.steady_time = -1; // Not supported yet
+
 	if (!pluginLoad())
 		return;
 	if (!pluginInit())
+		return;
+	if (!pluginActivate())
 		return;
 }
 
@@ -112,20 +118,11 @@ auto ClapInstance::hasNoteInput() const -> bool
 	return false;
 }
 
-
-
-
 void ClapInstance::destroy()
 {
 	hostIdle(); // ???
 
-	// Deactivates and destroys clap_plugin* as needed
-	if (m_plugin)
-	{
-		pluginDeactivate();
-		m_plugin->destroy(m_plugin);
-		m_plugin = nullptr;
-	}
+	pluginUnload();
 
 	hostDestroy();
 }
@@ -144,7 +141,8 @@ auto ClapInstance::isMono() const -> bool
 auto ClapInstance::pluginLoad() -> bool
 {
 	checkPluginStateCurrent(PluginState::None);
-	checkPluginStateNext(PluginState::Inactive);
+	checkPluginStateNext(PluginState::Loaded); // success
+	checkPluginStateNext(PluginState::None); // failure (stay None)
 
 	qDebug() << "Loading plugin instance:" << m_pluginInfo->getDescriptor()->name;
 
@@ -158,7 +156,7 @@ auto ClapInstance::pluginLoad() -> bool
 		return false;
 	}
 
-	setPluginState(PluginState::Inactive);
+	setPluginState(PluginState::Loaded);
 	return true;
 }
 
@@ -171,36 +169,50 @@ auto ClapInstance::pluginUnload() -> bool
 		m_plugin->destroy(m_plugin);
 		m_plugin = nullptr;
 	}
+
+	setPluginState(PluginState::None);
 	return true;
 }
 
 auto ClapInstance::pluginInit() -> bool
 {
-	checkPluginStateCurrent(PluginState::Inactive);
-	checkPluginStateNext(PluginState::ActiveAndSleeping);
-	checkPluginStateNext(PluginState::InactiveWithError);
+	if (isPluginErrorState())
+		return false;
+	checkPluginStateCurrent(PluginState::Loaded);
+	checkPluginStateNext(PluginState::Inactive); // success
+	checkPluginStateNext(PluginState::LoadedWithError); // failure (init fail)
 
-	if (getPluginState() != PluginState::Inactive)
+	if (getPluginState() != PluginState::Loaded)
 		return false;
 
 	if (!m_plugin->init(m_plugin))
 	{
 		qWarning() << "Could not init the plugin with id:" << getInfo().getDescriptor()->id;
+		setPluginState(PluginState::LoadedWithError);
 		m_plugin->destroy(m_plugin);
 		return false;
 	}
-	setPluginState(PluginState::ActiveAndSleeping);
 
+	// Clear everything just to be safe
 	m_pluginIssues.clear();
+	m_audioIn.reset();
+	m_audioOut.reset();
+	m_audioInActive = m_audioOutActive = nullptr;
+	m_audioPortsIn.clear();
+	m_audioPortsOut.clear();
+	m_audioPortInActive = m_audioPortOutActive = nullptr;
 
 	// TODO: Need to init extensions before activating the plugin
 	if (!pluginExtensionInit(m_pluginExtAudioPorts, CLAP_EXT_AUDIO_PORTS))
 	{
 		qWarning() << "The required CLAP audio port extension is not supported by the plugin";
+		setPluginState(PluginState::LoadedWithError);
 		return false;
 	}
 
-	auto readPorts = [this](std::vector<AudioPort>& audioPorts, bool is_input) -> AudioPort*
+	auto readPorts = [this](std::vector<AudioPort>& audioPorts,
+		std::unique_ptr<clap_audio_buffer[]>& audioBuffers,
+		bool is_input) -> AudioPort*
 	{
 		const auto portCount = m_pluginExtAudioPorts->count(m_plugin, is_input);
 
@@ -222,16 +234,18 @@ auto ClapInstance::pluginInit() -> bool
 			
 		}
 
+		qDebug() << (is_input ? "Input ports:" : "Output ports:");
+
 		clap_id monoPort = CLAP_INVALID_ID, stereoPort = CLAP_INVALID_ID;
 		//clap_id mainPort = CLAP_INVALID_ID;
-		uint32_t lmmsIdx = 0;
 		for (uint32_t idx = 0; idx < portCount; ++idx)
 		{
 			clap_audio_port_info info;
 			if (!m_pluginExtAudioPorts->get(m_plugin, idx, is_input, &info))
 			{
 				qWarning() << "Unknown error calling m_pluginExtAudioPorts->get(...)";
-				continue;
+				m_pluginIssues.emplace_back(PluginIssueType::portHasNoDef);
+				return nullptr;
 			}
 
 			qDebug() << "- port id:" << info.id;
@@ -247,7 +261,7 @@ auto ClapInstance::pluginInit() -> bool
 			}
 
 			//if (info.flags & CLAP_AUDIO_PORT_IS_MAIN)
-			//	mainPort = lmmsIdx;
+			//	mainPort = idx;
 
 			AudioPortType type = AudioPortType::Unsupported;
 			if (strcmp(CLAP_PORT_MONO, info.port_type) == 0)
@@ -255,7 +269,7 @@ auto ClapInstance::pluginInit() -> bool
 				assert(info.channel_count == 1);
 				type = AudioPortType::Mono;
 				if (monoPort == CLAP_INVALID_ID)
-					monoPort = lmmsIdx;
+					monoPort = idx;
 			}
 
 			if (strcmp(CLAP_PORT_STEREO, info.port_type) == 0)
@@ -263,17 +277,23 @@ auto ClapInstance::pluginInit() -> bool
 				assert(info.channel_count == 2);
 				type = AudioPortType::Stereo;
 				if (stereoPort == CLAP_INVALID_ID)
-					stereoPort = lmmsIdx;
+					stereoPort = idx;
 			}
 
 			audioPorts.emplace_back(AudioPort{info, idx, is_input, type, false});
-			++lmmsIdx;
 		}
 
 		if (is_input && !needInputPort)
 			return nullptr;
 		if (!is_input && !needOutputPort)
 			return nullptr;
+
+		assert(portCount == audioPorts.size());
+		audioBuffers = std::make_unique<clap_audio_buffer[]>(audioPorts.size());
+		for (uint32_t idx = 0; idx < audioPorts.size(); ++idx)
+		{
+			audioBuffers[idx].channel_count = audioPorts[idx].info.channel_count;
+		}
 
 		if (stereoPort != CLAP_INVALID_ID)
 		{
@@ -291,17 +311,33 @@ auto ClapInstance::pluginInit() -> bool
 			return port;
 		}
 
+		// Missing a required port type that LMMS supports - i.e. an effect where the only input is surround sound
 		qWarning() << "An" << (is_input ? "input" : "output") << "port is required, but CLAP plugin has none that are usable";
+		m_pluginIssues.emplace_back(PluginIssueType::unknownPortType);
 		return nullptr;
 	};
 
-	m_audioPortInActive = readPorts(m_audioPortsIn, true);
+	m_audioPortInActive = readPorts(m_audioPortsIn, m_audioIn, true);
 	if (!m_pluginIssues.empty())
+	{
+		setPluginState(PluginState::LoadedWithError);
 		return false;
+	}
 
-	m_audioPortOutActive = readPorts(m_audioPortsOut, false);
+	m_process.audio_inputs = m_audioIn.get();
+	m_process.audio_inputs_count = m_audioPortsIn.size();
+	m_audioInActive = m_audioPortInActive ? &m_audioIn[m_audioPortInActive->index] : nullptr;
+
+	m_audioPortOutActive = readPorts(m_audioPortsOut, m_audioOut, false);
 	if (!m_pluginIssues.empty())
+	{
+		setPluginState(PluginState::LoadedWithError);
 		return false;
+	}
+
+	m_process.audio_outputs = m_audioOut.get();
+	m_process.audio_outputs_count = m_audioPortsOut.size();
+	m_audioOutActive = m_audioPortOutActive ? &m_audioOut[m_audioPortOutActive->index] : nullptr;
 
 	// TODO: Temporary
 	if (isMono())
@@ -320,14 +356,19 @@ auto ClapInstance::pluginInit() -> bool
 	//scanParams();
 	//scanQuickControls();
 
+	setPluginState(PluginState::Inactive);
+
 	return true;
 }
 
 auto ClapInstance::pluginActivate() -> bool
 {
 	// Must be on main thread
-	if (!m_plugin)
+	if (isPluginErrorState())
 		return false;
+	checkPluginStateCurrent(PluginState::Inactive);
+	checkPluginStateNext(PluginState::ActiveAndSleeping); // success
+	checkPluginStateNext(PluginState::InactiveWithError); // failure (activation fail)
 
 	const auto sampleRate = Engine::audioEngine()->processingSampleRate();
 	static_assert(DEFAULT_BUFFER_SIZE > MINIMUM_BUFFER_SIZE);
@@ -346,28 +387,37 @@ auto ClapInstance::pluginActivate() -> bool
 
 auto ClapInstance::pluginDeactivate() -> bool
 {
+	qDebug() << "ClapInstance::pluginDeactivate";
 	if (!isPluginActive())
 		return false;
 
+	// TODO: May cause hang
+	/*
 	while (isPluginProcessing() || isPluginSleeping())
 	{
 		m_scheduleDeactivate = true;
 		QThread::msleep(10);
 	}
 	m_scheduleDeactivate = false;
+	*/
 
 	m_plugin->deactivate(m_plugin);
 	setPluginState(PluginState::Inactive);
+	qDebug() << "ClapInstance::pluginDeactivate end";
 	return true;
 }
 
-auto ClapInstance::pluginProcessBegin() -> bool
+auto ClapInstance::pluginProcessBegin(uint32_t frames) -> bool
 {
+	m_process.frames_count = frames;
+	//m_process.steady_time = m_steadyTime;
 	return false;
 }
 
-auto ClapInstance::pluginProcess() -> bool
+auto ClapInstance::pluginProcess(uint32_t frames) -> bool
 {
+	//m_steadyTime += frames;
+
 	// Must be audio thread
 	if (!m_plugin)
 		return false;
@@ -395,11 +445,6 @@ auto ClapInstance::pluginProcess() -> bool
 
 	m_process.in_events = m_evIn.clapInputEvents();
 	m_process.out_events = m_evOut.clapOutputEvents();
-
-	m_process.audio_inputs = &m_audioIn;
-	m_process.audio_inputs_count = 1;
-	m_process.audio_outputs = &m_audioOut;
-	m_process.audio_outputs_count = 1;
 
 	m_evOut.clear();
 	generatePluginInputEvents();
@@ -440,8 +485,10 @@ auto ClapInstance::pluginProcess() -> bool
 	return true;
 }
 
-auto ClapInstance::pluginProcessEnd() -> bool
+auto ClapInstance::pluginProcessEnd(uint32_t frames) -> bool
 {
+	m_process.frames_count = frames;
+	//m_process.steady_time = m_steadyTime;
 	return false;
 }
 
@@ -559,12 +606,13 @@ auto ClapInstance::isPluginActive() const -> bool
 {
 	switch (m_pluginState)
 	{
-	case PluginState::None: [[fallthrough]];
-	case PluginState::Inactive: [[fallthrough]];
-	case PluginState::InactiveWithError:
-		return false;
-	default:
+	case PluginState::ActiveAndSleeping: [[fallthrough]];
+	case PluginState::ActiveWithError: [[fallthrough]];
+	case PluginState::ActiveAndProcessing: [[fallthrough]];
+	case PluginState::ActiveAndReadyToDeactivate:
 		return true;
+	default:
+		return false;
 	}
 }
 
@@ -578,16 +626,33 @@ auto ClapInstance::isPluginSleeping() const -> bool
 	return m_pluginState == PluginState::ActiveAndSleeping;
 }
 
+auto ClapInstance::isPluginErrorState() const -> bool
+{
+	return m_pluginState == PluginState::None
+		|| m_pluginState == PluginState::LoadedWithError
+		|| m_pluginState == PluginState::InactiveWithError
+		|| m_pluginState == PluginState::ActiveWithError;
+}
+
 void ClapInstance::checkPluginStateNext(PluginState next)
 {
 	switch (next)
 	{
 	case PluginState::None:
 		assert(m_pluginState == PluginState::Inactive
-			|| m_pluginState == PluginState::InactiveWithError); // TODO
+			|| m_pluginState == PluginState::InactiveWithError
+			|| m_pluginState == PluginState::Loaded
+			|| m_pluginState == PluginState::LoadedWithError
+			|| m_pluginState == PluginState::None); // TODO
+		break;
+	case PluginState::Loaded:
+		assert(m_pluginState == PluginState::None);
+		break;
+	case PluginState::LoadedWithError:
+		assert(m_pluginState == PluginState::Loaded);
 		break;
 	case PluginState::Inactive:
-		assert(m_pluginState == PluginState::None
+		assert(m_pluginState == PluginState::Loaded
 			|| m_pluginState == PluginState::ActiveAndReadyToDeactivate);
 		break;
 	case PluginState::InactiveWithError:
@@ -616,6 +681,27 @@ void ClapInstance::checkPluginStateNext(PluginState next)
 void ClapInstance::setPluginState(PluginState state)
 {
 	m_pluginState = state;
+	switch (state)
+	{
+		case PluginState::None:
+			qDebug() << "Set state to None"; break;
+		case PluginState::Loaded:
+			qDebug() << "Set state to Loaded"; break;
+		case PluginState::LoadedWithError:
+			qDebug() << "Set state to LoadedWithError"; break;
+		case PluginState::Inactive:
+			qDebug() << "Set state to Inactive"; break;
+		case PluginState::InactiveWithError:
+			qDebug() << "Set state to InactiveWithError"; break;
+		case PluginState::ActiveAndSleeping:
+			qDebug() << "Set state to ActiveAndSleeping"; break;
+		case PluginState::ActiveAndProcessing:
+			qDebug() << "Set state to ActiveAndProcessing"; break;
+		case PluginState::ActiveWithError:
+			qDebug() << "Set state to ActiveWithError"; break;
+		case PluginState::ActiveAndReadyToDeactivate:
+			qDebug() << "Set state to ActiveAndReadyToDeactivate"; break;
+	}
 }
 
 
