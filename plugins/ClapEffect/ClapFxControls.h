@@ -1,5 +1,5 @@
 /*
- * ClapEffect.h - implementation of CLAP effect
+ * ClapFxControls.h - ClapFxControls implementation
  *
  * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -22,38 +22,52 @@
  *
  */
 
-#ifndef LMMS_CLAP_EFFECT_H
-#define LMMS_CLAP_EFFECT_H
+#ifndef LMMS_CLAP_FX_CONTROLS_H
+#define LMMS_CLAP_FX_CONTROLS_H
 
-#include "Effect.h"
-#include "ClapFxControls.h"
+#include "EffectControls.h"
+#include "ClapControlBase.h"
 
 namespace lmms
 {
 
 
-class ClapEffect : public Effect
+class ClapEffect;
+
+namespace gui
+{
+class ClapFxControlDialog;
+}
+
+
+class ClapFxControls : public EffectControls, public ClapControlBase
 {
 	Q_OBJECT
-
 public:
-	ClapEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* _key);
+	ClapFxControls(ClapEffect* effect, const QString& uri);
 
-	//! Must be checked after ctor or reload
-	auto isValid() const -> bool { return m_controls.isValid(); }
+	void saveSettings(QDomDocument& _doc, QDomElement& _parent) override;
+	void loadSettings(const QDomElement& that) override;
+	inline auto nodeName() const -> QString override
+	{
+		return ClapControlBase::nodeName();
+	}
 
-	auto processAudioBuffer(sampleFrame* buf, const fpp_t frames) -> bool override;
-	auto controls() -> EffectControls* override { return &m_controls; }
+	auto controlCount() -> int override;
+	auto createView() -> gui::EffectControlDialog* override;
 
-	auto clapControls() -> ClapFxControls* { return &m_controls; }
-	auto clapControls() const -> const ClapFxControls* { return &m_controls; }
+private slots:
+	void changeControl();
 
 private:
-	ClapFxControls m_controls;
-	std::vector<sampleFrame> m_tempOutputSamples;
+	auto settingsType() -> DataFile::Types override;
+	void setNameFromFile(const QString& name) override;
+
+	friend class gui::ClapFxControlDialog;
+	friend class ClapEffect;
 };
 
 
 } // namespace lmms
 
-#endif // LMMS_CLAP_EFFECT_H
+#endif // LMMS_CLAP_FX_CONTROLS_H

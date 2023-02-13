@@ -57,7 +57,7 @@ Plugin::Descriptor PLUGIN_EXPORT clapeffect_plugin_descriptor =
 
 ClapEffect::ClapEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key)
 	: Effect(&clapeffect_plugin_descriptor, parent, key),
-	/*m_controls(this, key->attributes["uri"]),*/
+	m_controls(this, key->attributes["uri"]),
 	m_tempOutputSamples(Engine::audioEngine()->framesPerPeriod())
 {
 }
@@ -101,10 +101,10 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* _parent, void* _data)
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data)
 {
 	using KeyType = Plugin::Descriptor::SubPluginFeatures::Key;
-	auto effect = std::make_unique<ClapEffect>(_parent, static_cast<const KeyType*>(_data));
+	auto effect = std::make_unique<ClapEffect>(parent, static_cast<const KeyType*>(data));
 	if (!effect || !effect->isValid())
 		return nullptr;
 	return effect.release();

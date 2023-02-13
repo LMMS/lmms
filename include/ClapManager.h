@@ -78,7 +78,9 @@ public:
 	void initPlugins();
 
 	//! Creates a plugin instance given plugin info; Plugin instance is owned by ClapManager
-	auto createInstance(const ClapPluginInfo* info) -> std::weak_ptr<ClapPluginInstance>;
+	//auto createInstance(const ClapPluginInfo* info) -> std::weak_ptr<ClapPluginInstance>;
+
+	static auto getClapGuiApi() -> const char*;
 
 	static bool kDebug; //!< If LMMS_CLAP_DEBUG is set, debug output will be printed
 

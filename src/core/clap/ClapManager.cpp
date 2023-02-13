@@ -92,15 +92,17 @@ void ClapManager::initPlugins()
 	loadClapFiles(getSearchPaths());
 
 	// TEMPORARY: Testing purposes
+	/*
 	for (const auto& file : files())
 	{
 		for (auto& plugin : file.pluginInfo())
 		{
 			qDebug() << plugin->getDescriptor()->name;
 			auto& test = m_instances.emplace_back(std::make_shared<ClapInstance>(plugin.get()));
-			test->load();
+			test->pluginLoad();
 		}
 	}
+	*/
 }
 
 void ClapManager::findSearchPaths()
@@ -276,6 +278,20 @@ void ClapManager::loadClapFiles(const std::vector<std::filesystem::path>& search
 				"  environment variable \"LMMS_CLAP_DEBUG\" to nonempty.";
 		}
 	}
+}
+
+auto ClapManager::getClapGuiApi() -> const char*
+{
+#if defined(LMMS_BUILD_LINUX)
+	return CLAP_WINDOW_API_X11;
+#elif defined(LMMS_BUILD_WIN32)
+	return CLAP_WINDOW_API_WIN32;
+#elif defined(LMMS_BUILD_APPLE)
+	return CLAP_WINDOW_API_COCOA;
+#else
+	// Unsupported platform
+	return nullptr;
+#endif
 }
 
 auto ClapManager::getPluginInfo(const std::string& uri) -> std::weak_ptr<const ClapPluginInfo>

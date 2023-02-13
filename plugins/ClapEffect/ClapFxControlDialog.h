@@ -1,5 +1,5 @@
 /*
- * ClapEffect.h - implementation of CLAP effect
+ * ClapFxControlDialog.h - ClapFxControlDialog implementation
  *
  * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -22,38 +22,35 @@
  *
  */
 
-#ifndef LMMS_CLAP_EFFECT_H
-#define LMMS_CLAP_EFFECT_H
+#ifndef LMMS_GUI_CLAP_FX_CONTROL_DIALOG_H
+#define LMMS_GUI_CLAP_FX_CONTROL_DIALOG_H
 
-#include "Effect.h"
-#include "ClapFxControls.h"
+#include "ClapViewBase.h"
+#include "EffectControlDialog.h"
 
 namespace lmms
 {
 
+class ClapFxControls;
 
-class ClapEffect : public Effect
+namespace gui
+{
+
+class ClapFxControlDialog : public EffectControlDialog, public ClapViewBase
 {
 	Q_OBJECT
 
 public:
-	ClapEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* _key);
-
-	//! Must be checked after ctor or reload
-	auto isValid() const -> bool { return m_controls.isValid(); }
-
-	auto processAudioBuffer(sampleFrame* buf, const fpp_t frames) -> bool override;
-	auto controls() -> EffectControls* override { return &m_controls; }
-
-	auto clapControls() -> ClapFxControls* { return &m_controls; }
-	auto clapControls() const -> const ClapFxControls* { return &m_controls; }
+	ClapFxControlDialog(ClapFxControls* controls);
 
 private:
-	ClapFxControls m_controls;
-	std::vector<sampleFrame> m_tempOutputSamples;
+	ClapFxControls* clapControls();
+	void modelChanged() override;
 };
 
 
+} // namespace gui
+
 } // namespace lmms
 
-#endif // LMMS_CLAP_EFFECT_H
+#endif // LMMS_GUI_CLAP_FX_CONTROL_DIALOG_H
