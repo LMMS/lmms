@@ -122,7 +122,7 @@ fpp_t getFadeInLength(float maxLength, fpp_t frames, int zeroCrossings)
 	// Length is inversely proportional to the max of zeroCrossings,
 	// because for low frequencies, we need a longer fade in to
 	// prevent clicking.
-	return (fpp_t) (maxLength  / ((float) zeroCrossings / ((float) frames / 128.0f) + 1.0f));
+	return (fpp_t) (maxLength / ((float) zeroCrossings / ((float) frames / 128.0f) + 1.0f));
 }
 
 
