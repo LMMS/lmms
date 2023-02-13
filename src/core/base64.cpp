@@ -50,7 +50,7 @@ QVariant decode( const QString & _b64, QVariant::Type _force_type )
 		in >> ret;
 	}
 	delete[] dst;
-	return( ret );
+	return ret;
 }
 
 
