@@ -81,7 +81,7 @@ namespace lmms::Clipboard
 
 	QString decodeKey( const QMimeData * mimeData )
 	{
-		return( QString::fromUtf8( mimeData->data( mimeType( MimeType::StringPair ) ) ).section( ':', 0, 0 ) );
+		return QString::fromUtf8( mimeData->data( mimeType( MimeType::StringPair ) ) ).section( ':', 0, 0 );
 	}
 
 
@@ -89,7 +89,7 @@ namespace lmms::Clipboard
 
 	QString decodeValue( const QMimeData * mimeData )
 	{
-		return( QString::fromUtf8( mimeData->data( mimeType( MimeType::StringPair ) ) ).section( ':', 1, -1 ) );
+		return QString::fromUtf8( mimeData->data( mimeType( MimeType::StringPair ) ) ).section( ':', 1, -1 );
 	}
 
 
