@@ -157,20 +157,17 @@ void ClapInstance::copyBuffersFromCore(const sampleFrame* buf, unsigned firstCha
 		if (!isMonoInput())
 		{
 			// Stereo LMMS to Stereo CLAP
-			//qDebug() << "Stereo LMMS to Stereo CLAP";
 			copyBuffersHostToPlugin<true>(buf, m_audioInActive->data32, firstChan, frames);
 		}
 		else
 		{
 			// Stereo LMMS to Mono CLAP
-			//qDebug() << "Stereo LMMS to Mono CLAP";
 			copyBuffersStereoHostToMonoPlugin(buf, m_audioInActive->data32, firstChan, frames);
 		}
 	}
 	else
 	{
 		// Mono LMMS to Mono CLAP
-		//qDebug() << "Mono LMMS to Mono CLAP";
 		copyBuffersHostToPlugin<false>(buf, m_audioInActive->data32, firstChan, frames);
 	}
 }
@@ -293,6 +290,8 @@ auto ClapInstance::pluginInit() -> bool
 	m_audioPortsIn.clear();
 	m_audioPortsOut.clear();
 	m_audioPortInActive = m_audioPortOutActive = nullptr;
+	m_audioInBuffers.clear();
+	m_audioOutBuffers.clear();
 
 	// TODO: Need to init extensions before activating the plugin
 	if (!pluginExtensionInit(m_pluginExtAudioPorts, CLAP_EXT_AUDIO_PORTS))
@@ -304,6 +303,7 @@ auto ClapInstance::pluginInit() -> bool
 
 	auto readPorts = [this](std::vector<AudioPort>& audioPorts,
 		std::unique_ptr<clap_audio_buffer[]>& audioBuffers,
+		std::vector<AudioBuffer>& rawAudioBuffers,
 		bool is_input) -> AudioPort*
 	{
 		const auto portCount = m_pluginExtAudioPorts->count(m_plugin, is_input);
@@ -401,9 +401,17 @@ auto ClapInstance::pluginInit() -> bool
 
 		assert(portCount == audioPorts.size());
 		audioBuffers = std::make_unique<clap_audio_buffer[]>(audioPorts.size());
-		for (uint32_t idx = 0; idx < audioPorts.size(); ++idx)
+		for (uint32_t port = 0; port < audioPorts.size(); ++port)
 		{
-			audioBuffers[idx].channel_count = audioPorts[idx].info.channel_count;
+			const auto channelCount = audioPorts[port].info.channel_count;
+			if (channelCount <= 0)
+				return nullptr;
+			audioBuffers[port].channel_count = channelCount;
+			audioBuffers[port].constant_mask = 0;
+			auto& rawBuffer = rawAudioBuffers.emplace_back(channelCount, DEFAULT_BUFFER_SIZE);
+			audioBuffers[port].data32 = rawBuffer.data();
+			audioBuffers[port].data64 = nullptr;
+			audioBuffers[port].latency = 0; // TODO
 		}
 
 		if (stereoPort != CLAP_INVALID_ID)
@@ -428,7 +436,7 @@ auto ClapInstance::pluginInit() -> bool
 		return nullptr;
 	};
 
-	m_audioPortInActive = readPorts(m_audioPortsIn, m_audioIn, true);
+	m_audioPortInActive = readPorts(m_audioPortsIn, m_audioIn, m_audioInBuffers, true);
 	if (!m_pluginIssues.empty())
 	{
 		setPluginState(PluginState::LoadedWithError);
@@ -439,7 +447,7 @@ auto ClapInstance::pluginInit() -> bool
 	m_process.audio_inputs_count = m_audioPortsIn.size();
 	m_audioInActive = m_audioPortInActive ? &m_audioIn[m_audioPortInActive->index] : nullptr;
 
-	m_audioPortOutActive = readPorts(m_audioPortsOut, m_audioOut, false);
+	m_audioPortOutActive = readPorts(m_audioPortsOut, m_audioOut, m_audioOutBuffers, false);
 	if (!m_pluginIssues.empty())
 	{
 		setPluginState(PluginState::LoadedWithError);
@@ -815,12 +823,9 @@ void ClapInstance::setPluginState(PluginState state)
 }
 
 
-
-
 ////////////////////////////////
 // ClapInstance host
 ////////////////////////////////
-
 
 void ClapInstance::hostDestroy()
 {

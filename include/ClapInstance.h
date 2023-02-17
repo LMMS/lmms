@@ -260,9 +260,43 @@ private:
 	/**
 	 * Process-related
 	*/
-	std::unique_ptr<clap_audio_buffer_t[]> m_audioIn, m_audioOut;
+	std::unique_ptr<clap_audio_buffer_t[]> m_audioIn, m_audioOut; // TODO: Why not use a std::vector?
 	clap_audio_buffer_t* m_audioInActive = nullptr; //!< Pointer to m_audioIn element used by LMMS
 	clap_audio_buffer_t* m_audioOutActive = nullptr; //!< Pointer to m_audioOut element used by LMMS
+
+	//! RAII-enabled CLAP AudioBuffer
+	class AudioBuffer
+	{
+	public:
+		AudioBuffer(uint32_t channels, uint32_t frames)
+			: m_channels(channels), m_frames(frames)
+		{
+			m_data = new float*[channels];
+			for (uint32_t channel = 0; channel < channels; ++channel)
+			{
+				m_data[channel] = new float[frames]();
+			}
+		}
+
+		~AudioBuffer()
+		{
+			for (uint32_t channel = 0; channel < m_channels; ++channel)
+			{
+				delete[] m_data[channel];
+			}
+			delete[] m_data;
+		}
+
+		//! [channel][frame]
+		auto data() -> float** { return m_data; }
+
+	private:
+		uint32_t m_channels;
+		uint32_t m_frames;
+		float** m_data{nullptr};
+	};
+
+	std::vector<AudioBuffer> m_audioInBuffers, m_audioOutBuffers; //!< [port][channel][frame]
 
 	clap::helpers::EventList m_evIn;
 	clap::helpers::EventList m_evOut;
