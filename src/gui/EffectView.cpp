@@ -25,9 +25,9 @@
 
 #include <QGraphicsOpacityEffect>
 #include <QLayout>
+#include <QMouseEvent>
 #include <QPushButton>
 #include <QPainter>
-#include <QMouseEvent>
 
 #include "EffectView.h"
 #include "DummyEffect.h"
