@@ -23,9 +23,10 @@
  *
  */
 
+#include <QLayout>
 #include <QPushButton>
 #include <QPainter>
-#include <QLayout>
+#include <QMouseEvent>
 
 #include "EffectView.h"
 #include "DummyEffect.h"
@@ -47,9 +48,10 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	PluginView( _model, _parent ),
 	m_bg( embed::getIconPixmap( "effect_plugin" ) ),
 	m_subWindow( nullptr ),
-	m_controlView( nullptr )
+	m_controlView( nullptr ),
+	m_dragging( false )
 {
-	setFixedSize( EffectView::DEFAULT_WIDTH, 60 );
+	setFixedSize( EffectView::DEFAULT_WIDTH, EffectView::DEFAULT_HEIGHT );
 
 	// Disable effects that are of type "DummyEffect"
 	bool isEnabled = !dynamic_cast<DummyEffect *>( effect() );
@@ -208,10 +210,42 @@ void EffectView::contextMenuEvent( QContextMenuEvent * )
 
 
 
+void EffectView::mousePressEvent(QMouseEvent* event)
+{
+	if (event->button() == Qt::LeftButton)
+	{
+		m_dragging = true;
+		update();
+	}
+}
+
+void EffectView::mouseReleaseEvent(QMouseEvent* event)
+{
+	if (event->button() == Qt::LeftButton)
+	{
+		m_dragging = false;
+		update();
+	}
+}
+
+void EffectView::mouseMoveEvent(QMouseEvent* event)
+{
+    if (event->pos().y() < 0)
+    {
+		moveUp();
+    }
+    else if (event->pos().y() > EffectView::DEFAULT_HEIGHT)
+    {
+		moveDown();
+    }
+}
+
+
 
 void EffectView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
+	if (m_dragging) {p.setOpacity(0.5);}
 	p.drawPixmap( 0, 0, m_bg );
 
 	QFont f = pointSizeF( font(), 7.5f );
