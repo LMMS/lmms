@@ -157,17 +157,20 @@ void ClapInstance::copyBuffersFromCore(const sampleFrame* buf, unsigned firstCha
 		if (!isMonoInput())
 		{
 			// Stereo LMMS to Stereo CLAP
+			//qDebug() << "Stereo LMMS to Stereo CLAP";
 			copyBuffersHostToPlugin<true>(buf, m_audioInActive->data32, firstChan, frames);
 		}
 		else
 		{
 			// Stereo LMMS to Mono CLAP
+			//qDebug() << "Stereo LMMS to Mono CLAP";
 			copyBuffersStereoHostToMonoPlugin(buf, m_audioInActive->data32, firstChan, frames);
 		}
 	}
 	else
 	{
 		// Mono LMMS to Mono CLAP
+		//qDebug() << "Mono LMMS to Mono CLAP";
 		copyBuffersHostToPlugin<false>(buf, m_audioInActive->data32, firstChan, frames);
 	}
 }
@@ -353,20 +356,39 @@ auto ClapInstance::pluginInit() -> bool
 			//	mainPort = idx;
 
 			AudioPortType type = AudioPortType::Unsupported;
-			if (strcmp(CLAP_PORT_MONO, info.port_type) == 0)
-			{
-				assert(info.channel_count == 1);
-				type = AudioPortType::Mono;
-				if (monoPort == CLAP_INVALID_ID)
-					monoPort = idx;
-			}
 
-			if (strcmp(CLAP_PORT_STEREO, info.port_type) == 0)
+			if (info.port_type)
 			{
-				assert(info.channel_count == 2);
-				type = AudioPortType::Stereo;
-				if (stereoPort == CLAP_INVALID_ID)
-					stereoPort = idx;
+				if (strcmp(CLAP_PORT_MONO, info.port_type) == 0)
+				{
+					assert(info.channel_count == 1);
+					type = AudioPortType::Mono;
+					if (monoPort == CLAP_INVALID_ID)
+						monoPort = idx;
+				}
+
+				if (strcmp(CLAP_PORT_STEREO, info.port_type) == 0)
+				{
+					assert(info.channel_count == 2);
+					type = AudioPortType::Stereo;
+					if (stereoPort == CLAP_INVALID_ID)
+						stereoPort = idx;
+				}
+			}
+			else
+			{
+				if (info.channel_count == 1)
+				{
+					type = AudioPortType::Mono;
+					if (monoPort == CLAP_INVALID_ID)
+						monoPort = idx;
+				}
+				else if (info.channel_count == 2)
+				{
+					type = AudioPortType::Stereo;
+					if (stereoPort == CLAP_INVALID_ID)
+						stereoPort = idx;
+				}
 			}
 
 			audioPorts.emplace_back(AudioPort{info, idx, is_input, type, false});
@@ -912,6 +934,8 @@ void ClapInstance::hostRequestCallback(const clap_host* host)
 {
 	const auto h = fromHost(host);
 
+	qDebug() << "ClapInstance::hostRequestCallback";
+
 	auto mainThreadCallback = [h]() -> bool {
 		const auto plugin = h->getPlugin();
 		plugin->on_main_thread(plugin);
@@ -926,7 +950,7 @@ void ClapInstance::hostRequestProcess(const clap_host* host)
 	[[maybe_unused]] auto h = fromHost(host);
 	// TODO
 	//h->_scheduleProcess = true;
-	//qDebug() << "hostRequestProcess called";
+	qDebug() << "ClapInstance::hostRequestProcess";
 }
 
 void ClapInstance::hostRequestRestart(const clap_host* host)
@@ -934,7 +958,7 @@ void ClapInstance::hostRequestRestart(const clap_host* host)
 	[[maybe_unused]] auto h = fromHost(host);
 	// TODO
 	//h->_scheduleRestart = true;
-	//qDebug() << "hostRequestRestart called";
+	qDebug() << "ClapInstance::hostRequestRestart";
 }
 
 void ClapInstance::hostExtStateMarkDirty(const clap_host* host)
