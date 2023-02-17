@@ -42,6 +42,62 @@
 namespace lmms
 {
 
+namespace
+{
+	template<bool stereo>
+	inline void copyBuffersHostToPlugin(const sampleFrame* hostBuf, float** pluginBuf,
+		unsigned channel, fpp_t frames)
+	{
+		for (fpp_t f = 0; f < frames; ++f)
+		{
+			pluginBuf[0][f] = hostBuf[f][channel];
+			if constexpr (stereo)
+				pluginBuf[1][f] = hostBuf[f][channel + 1];
+		}
+	}
+
+	inline void copyBuffersStereoHostToMonoPlugin(const sampleFrame* hostBuf, float** pluginBuf, unsigned channel, fpp_t frames)
+	{
+		for (fpp_t f = 0; f < frames; ++f)
+		{
+			pluginBuf[0][f] = (hostBuf[f][channel] + hostBuf[f][channel + 1]) / 2.0f;
+		}
+	}
+
+	template<bool stereo>
+	inline void copyBuffersPluginToHost(float** pluginBuf, sampleFrame* hostBuf,
+		std::uint64_t constantMask, unsigned channel, fpp_t frames)
+	{
+		const bool isLeftConstant = (constantMask & (1 << 0)) != 0;
+		if constexpr (stereo)
+		{
+			const bool isRightConstant = (constantMask & (1 << 1)) != 0;
+			for (fpp_t f = 0; f < frames; ++f)
+			{
+				hostBuf[f][channel] = pluginBuf[0][isLeftConstant ? 0 : f];
+				hostBuf[f][channel + 1] = pluginBuf[1][isRightConstant ? 0 : f];
+			}
+		}
+		else
+		{
+			for (fpp_t f = 0; f < frames; ++f)
+			{
+				hostBuf[f][channel] = pluginBuf[0][isLeftConstant ? 0 : f];
+			}
+		}
+	}
+
+	inline void copyBuffersMonoPluginToStereoHost(float** pluginBuf, sampleFrame* hostBuf,
+		std::uint64_t constantMask, unsigned channel, fpp_t frames)
+	{
+		const bool isConstant = (constantMask & (1 << 0)) != 0;
+		for (fpp_t f = 0; f < frames; ++f)
+		{
+			hostBuf[f][channel] = hostBuf[f][channel + 1] = pluginBuf[0][isConstant ? 0 : f];
+		}
+	}
+}
+
 
 ////////////////////////////////
 // ClapInstance
@@ -79,6 +135,7 @@ ClapInstance::ClapInstance(ClapInstance&& other) noexcept
 
 ClapInstance::~ClapInstance()
 {
+	qDebug() << "ClapInstance::~ClapInstance";
 	destroy();
 }
 
@@ -94,17 +151,54 @@ void ClapInstance::copyModelsToCore()
 
 void ClapInstance::copyBuffersFromCore(const sampleFrame* buf, unsigned firstChan, unsigned num, fpp_t frames)
 {
-	//
+	// LMMS to CLAP
+	if (num > 1)
+	{
+		if (!isMonoInput())
+		{
+			// Stereo LMMS to Stereo CLAP
+			copyBuffersHostToPlugin<true>(buf, m_audioInActive->data32, firstChan, frames);
+		}
+		else
+		{
+			// Stereo LMMS to Mono CLAP
+			copyBuffersStereoHostToMonoPlugin(buf, m_audioInActive->data32, firstChan, frames);
+		}
+	}
+	else
+	{
+		// Mono LMMS to Mono CLAP
+		copyBuffersHostToPlugin<false>(buf, m_audioInActive->data32, firstChan, frames);
+	}
 }
 
 void ClapInstance::copyBuffersToCore(sampleFrame* buf, unsigned firstChan, unsigned num, fpp_t frames) const
 {
-	//
+	if (num > 1)
+	{
+		if (!isMonoOutput())
+		{
+			// Stereo CLAP to Stereo LMMS
+			copyBuffersPluginToHost<true>(m_audioOutActive->data32, buf, m_audioOutActive->constant_mask, firstChan, frames);
+		}
+		else
+		{
+			// Mono CLAP to Stereo LMMS
+			copyBuffersMonoPluginToStereoHost(m_audioOutActive->data32, buf, m_audioOutActive->constant_mask, firstChan, frames);
+		}
+	}
+	else
+	{
+		// Mono CLAP to Mono LMMS
+		copyBuffersPluginToHost<false>(m_audioOutActive->data32, buf, m_audioOutActive->constant_mask, firstChan, frames);
+	}
 }
 
 void ClapInstance::run(fpp_t frames)
 {
-	//
+	pluginProcessBegin(frames);
+	pluginProcess(frames);
+	pluginProcessEnd(frames);
 }
 
 void ClapInstance::handleMidiInputEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset)
@@ -133,18 +227,12 @@ auto ClapInstance::isValid() const -> bool
 	return m_plugin != nullptr && !isPluginErrorState() && m_pluginIssues.empty();
 }
 
-auto ClapInstance::isMono() const -> bool
-{
-	return m_monoPlugin;
-}
-
 auto ClapInstance::pluginLoad() -> bool
 {
+	qDebug() << "Loading plugin instance:" << m_pluginInfo->getDescriptor()->name;
 	checkPluginStateCurrent(PluginState::None);
 	checkPluginStateNext(PluginState::Loaded); // success
 	checkPluginStateNext(PluginState::None); // failure (stay None)
-
-	qDebug() << "Loading plugin instance:" << m_pluginInfo->getDescriptor()->name;
 
 	// Create plugin instance, destroying any previous plugin instance first
 	const auto factory = m_pluginInfo->getFactory();
@@ -176,6 +264,7 @@ auto ClapInstance::pluginUnload() -> bool
 
 auto ClapInstance::pluginInit() -> bool
 {
+	qDebug() << "ClapInstance::pluginInit()";
 	if (isPluginErrorState())
 		return false;
 	checkPluginStateCurrent(PluginState::Loaded);
@@ -297,7 +386,7 @@ auto ClapInstance::pluginInit() -> bool
 
 		if (stereoPort != CLAP_INVALID_ID)
 		{
-			m_monoPlugin = false;
+			if (is_input) { m_monoInput = false; } else { m_monoOutput = false; }
 			auto port = &audioPorts[stereoPort];
 			port->used = true;
 			return port;
@@ -305,7 +394,7 @@ auto ClapInstance::pluginInit() -> bool
 
 		if (monoPort != CLAP_INVALID_ID)
 		{
-			m_monoPlugin = true;
+			if (is_input) { m_monoInput = true; } else { m_monoOutput = true; }
 			auto port = &audioPorts[monoPort];
 			port->used = true;
 			return port;
@@ -340,16 +429,15 @@ auto ClapInstance::pluginInit() -> bool
 	m_audioOutActive = m_audioPortOutActive ? &m_audioOut[m_audioPortOutActive->index] : nullptr;
 
 	// TODO: Temporary
-	if (isMono())
-	{
+	if (isMonoInput())
 		assert(m_audioPortInActive->type == AudioPortType::Mono);
-		assert(m_audioPortOutActive->type == AudioPortType::Mono);
-	}
 	else
-	{
 		assert(m_audioPortInActive->type == AudioPortType::Stereo);
+
+	if (isMonoOutput())
+		assert(m_audioPortOutActive->type == AudioPortType::Mono);
+	else
 		assert(m_audioPortOutActive->type == AudioPortType::Stereo);
-	}
 
 	// TODO: Then, need to scan params and quick controls:
 
@@ -363,6 +451,7 @@ auto ClapInstance::pluginInit() -> bool
 
 auto ClapInstance::pluginActivate() -> bool
 {
+	qDebug() << "ClapInstance::pluginActivate()";
 	// Must be on main thread
 	if (isPluginErrorState())
 		return false;
@@ -403,7 +492,6 @@ auto ClapInstance::pluginDeactivate() -> bool
 
 	m_plugin->deactivate(m_plugin);
 	setPluginState(PluginState::Inactive);
-	qDebug() << "ClapInstance::pluginDeactivate end";
 	return true;
 }
 
@@ -813,6 +901,10 @@ auto ClapInstance::hostGetExtension(const clap_host* host, const char* extension
 	if (ClapManager::kDebug)
 		qDebug() << "--Plugin requested host extension:" << extension_id;
 
+	const std::string_view extensionId = extension_id;
+	if (extensionId == CLAP_EXT_LOG)
+		return &m_hostExtLog;
+
 	return nullptr;
 }
 
@@ -856,6 +948,36 @@ void ClapInstance::hostExtStateMarkDirty(const clap_host* host)
 			"provide a complete clap_plugin_state interface.");
 
 	h->m_hostExtStateIsDirty = true;
+}
+
+void ClapInstance::hostExtLogLog(const clap_host_t* host, clap_log_severity severity, const char* msg)
+{
+	// Thread-safe
+	if (!ClapManager::kDebug)
+		return;
+
+	std::string severityStr;
+	switch (severity)
+	{
+	case CLAP_LOG_DEBUG:
+		severityStr += "DEBUG"; break;
+	case CLAP_LOG_INFO:
+		severityStr += "INFO"; break;
+	case CLAP_LOG_WARNING:
+		severityStr += "WARNING"; break;
+	case CLAP_LOG_ERROR:
+		severityStr += "ERROR"; break;
+	case CLAP_LOG_FATAL:
+		severityStr += "FATAL"; break;
+	case CLAP_LOG_HOST_MISBEHAVING:
+		severityStr += "HOST_MISBEHAVING"; break;
+	case CLAP_LOG_PLUGIN_MISBEHAVING:
+		severityStr += "PLUGIN_MISBEHAVING"; break;
+	default:
+		severityStr += "UNKNOWN"; break;
+	}
+
+	qDebug().nospace() << "CLAP LOG: severity=" << severityStr.c_str() << "; msg='" << msg << "'";
 }
 
 /*

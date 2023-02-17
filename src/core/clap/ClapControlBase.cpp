@@ -40,6 +40,7 @@ namespace lmms
 
 ClapControlBase::ClapControlBase(Model* that, const QString& uri)
 {
+	qDebug() << "ClapControlBase::ClapControlBase";
 	auto manager = Engine::getClapManager();
 	m_info = manager->getPluginInfo(uri).lock().get();
 	if (!m_info)
@@ -49,6 +50,7 @@ ClapControlBase::ClapControlBase(Model* that, const QString& uri)
 		return;
 	}
 
+	qDebug() << "Creating CLAP instance (#1)";
 	m_instances.clear();
 	auto& first = m_instances.emplace_back(std::make_unique<ClapInstance>(m_info, that));
 	if (!first || !first->isValid())
@@ -59,8 +61,9 @@ ClapControlBase::ClapControlBase(Model* that, const QString& uri)
 		return;
 	}
 
-	if (first->isMono())
+	if (first->isMonoOutput())
 	{
+		qDebug() << "Creating CLAP instance (#2)";
 		// A second instance is needed for stereo input/output
 		auto& second = m_instances.emplace_back(std::make_unique<ClapInstance>(m_info, that));
 		if (!second || !second->isValid())

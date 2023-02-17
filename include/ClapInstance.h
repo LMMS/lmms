@@ -158,7 +158,8 @@ public:
 	void destroy();
 
 	auto isValid() const -> bool;
-	auto isMono() const -> bool; //!< Can call after pluginInit()
+	auto isMonoInput() const -> bool { return m_monoInput; } //!< Can call after pluginInit()
+	auto isMonoOutput() const -> bool { return m_monoOutput; } //!< Can call after pluginInit()
 
 	auto getHost() const -> const clap_host* { return &m_host; }
 	auto getPlugin() const -> const clap_plugin* { return m_plugin; }
@@ -215,6 +216,7 @@ private:
 	static void hostRequestProcess(const clap_host* host);
 	static void hostRequestRestart(const clap_host* host);
 	static void hostExtStateMarkDirty(const clap_host* host);
+	static void hostExtLogLog(const clap_host_t* host, clap_log_severity severity, const char* msg);
 
 	//bool canUsePluginParams() const noexcept;
 	//bool canUsePluginGui() const noexcept;
@@ -250,7 +252,8 @@ private:
 
 
 	PluginState m_pluginState{PluginState::Inactive};
-	bool m_monoPlugin{false};
+	bool m_monoInput{false};
+	bool m_monoOutput{false};
 
 	std::vector<PluginIssue> m_pluginIssues;
 
@@ -350,6 +353,9 @@ private:
 		&ClapInstance::hostExtStateMarkDirty
 	};
 
+	static const constexpr clap_host_log m_hostExtLog {
+		&ClapInstance::hostExtLogLog
+	};
 
 	/**
 	 * Plugin/Host extension data

@@ -73,15 +73,19 @@ ClapManager::ClapManager()
 {
 	const char* dbgStr = getenv("LMMS_CLAP_DEBUG");
 	kDebug = (dbgStr && *dbgStr);
+	if (kDebug)
+		qDebug() << "CLAP host debugging enabled";
 }
 
 ClapManager::~ClapManager()
 {
+	qDebug() << "ClapManager::~ClapManager";
 	// Deactivate and destroy plugin instances first
 	m_instances.clear();
 
 	// Then deinit the .clap files and unload the shared libraries
 	m_files.clear();
+	qDebug() << "ClapManager::~ClapManager end";
 }
 
 void ClapManager::initPlugins()
