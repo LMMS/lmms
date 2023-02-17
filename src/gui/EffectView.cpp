@@ -23,6 +23,7 @@
  *
  */
 
+#include <QGraphicsOpacityEffect>
 #include <QLayout>
 #include <QPushButton>
 #include <QPainter>
@@ -118,7 +119,10 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 			m_subWindow->hide();
 		}
 	}
-
+	
+	m_opacityEffect = new QGraphicsOpacityEffect(this);
+	m_opacityEffect->setOpacity(1);
+	setGraphicsEffect(m_opacityEffect);
 
 	//move above vst effect view creation
 	//setModel( _model );
@@ -215,6 +219,7 @@ void EffectView::mousePressEvent(QMouseEvent* event)
 	if (event->button() == Qt::LeftButton)
 	{
 		m_dragging = true;
+		m_opacityEffect->setOpacity(0.3);
 		update();
 	}
 }
@@ -224,20 +229,24 @@ void EffectView::mouseReleaseEvent(QMouseEvent* event)
 	if (event->button() == Qt::LeftButton)
 	{
 		m_dragging = false;
+		m_opacityEffect->setOpacity(1);
 		update();
 	}
 }
 
 void EffectView::mouseMoveEvent(QMouseEvent* event)
 {
-    if (event->pos().y() < 0)
-    {
-		moveUp();
-    }
-    else if (event->pos().y() > EffectView::DEFAULT_HEIGHT)
-    {
-		moveDown();
-    }
+	if (m_dragging)
+	{
+		if (event->pos().y() < 0)
+		{
+			moveUp();
+		}
+		else if (event->pos().y() > EffectView::DEFAULT_HEIGHT)
+		{
+			moveDown();
+		}
+	}
 }
 
 
@@ -245,7 +254,6 @@ void EffectView::mouseMoveEvent(QMouseEvent* event)
 void EffectView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
-	if (m_dragging) {p.setOpacity(0.5);}
 	p.drawPixmap( 0, 0, m_bg );
 
 	QFont f = pointSizeF( font(), 7.5f );

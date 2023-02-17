@@ -30,6 +30,7 @@
 #include "PluginView.h"
 #include "Effect.h"
 
+class QGraphicsOpacityEffect;
 class QGroupBox;
 class QLabel;
 class QPushButton;
@@ -97,6 +98,7 @@ private:
 	EffectControlDialog * m_controlView;
 	
 	bool m_dragging;
+	QGraphicsOpacityEffect * m_opacityEffect;
 
 } ;
 
