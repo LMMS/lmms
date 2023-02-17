@@ -48,10 +48,10 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	PluginView( _model, _parent ),
 	m_bg( embed::getIconPixmap( "effect_plugin" ) ),
 	m_subWindow( nullptr ),
-	m_controlView( nullptr ),
-	m_dragging( false )
+	m_controlView(nullptr),
+	m_dragging(false)
 {
-	setFixedSize( EffectView::DEFAULT_WIDTH, EffectView::DEFAULT_HEIGHT );
+	setFixedSize(EffectView::DEFAULT_WIDTH, EffectView::DEFAULT_HEIGHT);
 
 	// Disable effects that are of type "DummyEffect"
 	bool isEnabled = !dynamic_cast<DummyEffect *>( effect() );
