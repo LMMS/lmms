@@ -220,8 +220,8 @@ void EffectView::mousePressEvent(QMouseEvent* event)
 	{
 		m_dragging = true;
 		m_opacityEffect->setOpacity(0.3);
-		QCursor c( Qt::SizeVerCursor );
-		QApplication::setOverrideCursor( c );
+		QCursor c(Qt::SizeVerCursor);
+		QApplication::setOverrideCursor(c);
 		update();
 	}
 }
@@ -239,7 +239,7 @@ void EffectView::mouseReleaseEvent(QMouseEvent* event)
 
 void EffectView::mouseMoveEvent(QMouseEvent* event)
 {
-	if (!m_dragging) {return;}
+	if (!m_dragging) { return; }
 	if (event->pos().y() < 0)
 	{
 		moveUp();
