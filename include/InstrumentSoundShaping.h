@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef INSTRUMENT_SOUND_SHAPING_H
-#define INSTRUMENT_SOUND_SHAPING_H
+#ifndef LMMS_INSTRUMENT_SOUND_SHAPING_H
+#define LMMS_INSTRUMENT_SOUND_SHAPING_H
 
 #include "ComboBoxModel.h"
 
@@ -92,4 +92,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_INSTRUMENT_SOUND_SHAPING_H

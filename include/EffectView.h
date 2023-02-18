@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef EFFECT_VIEW_H
-#define EFFECT_VIEW_H
+#ifndef LMMS_GUI_EFFECT_VIEW_H
+#define LMMS_GUI_EFFECT_VIEW_H
 
 #include "AutomatableModel.h"
 #include "PluginView.h"
@@ -105,4 +105,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_EFFECT_VIEW_H

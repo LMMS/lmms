@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef LED_CHECKBOX_H
-#define LED_CHECKBOX_H
+#ifndef LMMS_GUI_LED_CHECKBOX_H
+#define LMMS_GUI_LED_CHECKBOX_H
 
 #include "AutomatableButton.h"
 
@@ -84,4 +83,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_LED_CHECKBOX_H

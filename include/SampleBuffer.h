@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef SAMPLE_BUFFER_H
-#define SAMPLE_BUFFER_H
+#ifndef LMMS_SAMPLE_BUFFER_H
+#define LMMS_SAMPLE_BUFFER_H
 
 #include <memory>
 #include <QReadWriteLock>
@@ -356,4 +355,4 @@ signals:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_SAMPLE_BUFFER_H

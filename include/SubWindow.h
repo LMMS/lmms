@@ -23,8 +23,9 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-#ifndef SUBWINDOW_H
-#define SUBWINDOW_H
+
+#ifndef LMMS_GUI_SUBWINDOW_H
+#define LMMS_GUI_SUBWINDOW_H
 
 #include <QMdiSubWindow>
 #include <QString>
@@ -104,4 +105,4 @@ private slots:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_SUBWINDOW_H

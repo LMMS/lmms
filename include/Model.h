@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MODEL_H
-#define MODEL_H
+#ifndef LMMS_MODEL_H
+#define LMMS_MODEL_H
 
 #include <QString>
 #include <QObject>
@@ -90,5 +90,4 @@ signals:
 
 } // namespace lmms
 
-#endif
-
+#endif // LMMS_MODEL_H

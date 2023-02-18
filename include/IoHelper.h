@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef IO_HELPER_H
-#define IO_HELPER_H
+#ifndef LMMS_IO_HELPER_H
+#define LMMS_IO_HELPER_H
 
 #include "lmmsconfig.h"
 
@@ -91,4 +91,4 @@ inline int fileToDescriptor(FILE* f, bool closeFile = true)
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_IO_HELPER_H

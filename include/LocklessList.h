@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LOCKLESS_LIST_H
-#define LOCKLESS_LIST_H
+#ifndef LMMS_LOCKLESS_LIST_H
+#define LMMS_LOCKLESS_LIST_H
 
 #include "LocklessAllocator.h"
 
@@ -97,4 +97,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_LOCKLESS_LIST_H

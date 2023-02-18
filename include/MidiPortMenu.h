@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef MIDI_PORT_MENU_H
-#define MIDI_PORT_MENU_H
+#ifndef LMMS_GUI_MIDI_PORT_MENU_H
+#define LMMS_GUI_MIDI_PORT_MENU_H
 
 #include <QMenu>
 
@@ -61,4 +61,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_MIDI_PORT_MENU_H

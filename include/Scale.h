@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef SCALE_H
-#define SCALE_H
+#ifndef LMMS_SCALE_H
+#define LMMS_SCALE_H
 
 #include <cstdint>
 #include <vector>
@@ -89,4 +89,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_SCALE_H

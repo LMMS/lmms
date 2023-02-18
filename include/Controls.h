@@ -22,10 +22,8 @@
  *
  */
 
-#ifndef CONTROLS_H
-#define CONTROLS_H
-
-
+#ifndef LMMS_GUI_CONTROLS_H
+#define LMMS_GUI_CONTROLS_H
 
 // headers only required for covariance
 #include "AutomatableModel.h"
@@ -146,4 +144,4 @@ public:
 
 } // namespace lmms
 
-#endif // CONTROLS_H
+#endif // LMMS_GUI_CONTROLS_H

@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef TRACK_CONTAINER_H
-#define TRACK_CONTAINER_H
+#ifndef LMMS_TRACK_CONTAINER_H
+#define LMMS_TRACK_CONTAINER_H
 
 #include <QReadWriteLock>
 
@@ -118,4 +118,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_TRACK_CONTAINER_H

@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MAINAPPLICATION_H
-#define MAINAPPLICATION_H
+#ifndef LMMS_GUI_MAIN_APPLICATION_H
+#define LMMS_GUI_MAIN_APPLICATION_H
 
 #include "lmmsconfig.h"
 
@@ -64,4 +64,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif // MAINAPPLICATION_H
+#endif // LMMS_GUI_MAIN_APPLICATION_H

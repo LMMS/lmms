@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef SAMPLE_TRACK_VIEW_H
-#define SAMPLE_TRACK_VIEW_H
+#ifndef LMMS_GUI_SAMPLE_TRACK_VIEW_H
+#define LMMS_GUI_SAMPLE_TRACK_VIEW_H
 
 
 #include "TrackView.h"
@@ -109,4 +109,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_SAMPLE_TRACK_VIEW_H

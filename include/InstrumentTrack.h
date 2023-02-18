@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef INSTRUMENT_TRACK_H
-#define INSTRUMENT_TRACK_H
+#ifndef LMMS_INSTRUMENT_TRACK_H
+#define LMMS_INSTRUMENT_TRACK_H
 
 #include "AudioPort.h"
 #include "InstrumentFunctions.h"
@@ -325,4 +325,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_INSTRUMENT_TRACK_H
