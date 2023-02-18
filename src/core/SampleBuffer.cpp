@@ -408,7 +408,7 @@ void SampleBuffer::update(bool keepSettings)
 
 		if (getGUI() != nullptr)
 		{
-			QMessageBox::information(nullptr, title, message,	QMessageBox::Ok);
+			QMessageBox::information(nullptr, title, message, QMessageBox::Ok);
 		}
 		else
 		{

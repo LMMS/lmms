@@ -159,11 +159,6 @@ private:
 
 
 } // namespace gui
-<<<<<<< HEAD
-=======
-
-} // namespace lmms
->>>>>>> 0b8b8dc25 (Namespace `lmms` (#6174))
 
 } // namespace lmms
 
