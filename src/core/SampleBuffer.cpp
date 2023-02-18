@@ -254,7 +254,7 @@ void SampleBuffer::update(bool keepSettings)
 		TooLarge,
 		Invalid
 	};
-	FileLoadError fileLoadError = None;
+	FileLoadError fileLoadError = FileLoadError::None;
 
 	if (m_audioFile.isEmpty() && m_origData != nullptr && m_origFrames > 0)
 	{
@@ -281,11 +281,11 @@ void SampleBuffer::update(bool keepSettings)
 		const QFileInfo fileInfo(file);
 		if (!fileInfo.isReadable())
 		{
-			fileLoadError = ReadPermissionDenied;
+			fileLoadError = FileLoadError::ReadPermissionDenied;
 		}
 		else if (fileInfo.size() > fileSizeMax * 1024 * 1024)
 		{
-			fileLoadError = TooLarge;
+			fileLoadError = FileLoadError::TooLarge;
 		}
 		else
 		{
@@ -301,18 +301,18 @@ void SampleBuffer::update(bool keepSettings)
 				int rate = sfInfo.samplerate;
 				if (frames / rate > sampleLengthMax * 60)
 				{
-					fileLoadError = TooLarge;
+					fileLoadError = FileLoadError::TooLarge;
 				}
 				sf_close(sndFile);
 			}
 			else
 			{
-				fileLoadError = Invalid;
+				fileLoadError = FileLoadError::Invalid;
 			}
 			f.close();
 		}
 
-		if (fileLoadError == None)
+		if (fileLoadError == FileLoadError::None)
 		{
 #ifdef LMMS_HAVE_OGGVORBIS
 			// workaround for a bug in libsndfile or our libsndfile decoder
@@ -339,7 +339,7 @@ void SampleBuffer::update(bool keepSettings)
 			}
 		}
 
-		if (m_frames == 0 || fileLoadError != None)  // if still no frames, bail
+		if (m_frames == 0 || fileLoadError != FileLoadError::None)  // if still no frames, bail
 		{
 			// sample couldn't be decoded, create buffer containing
 			// one sample-frame
@@ -380,33 +380,33 @@ void SampleBuffer::update(bool keepSettings)
 	}
 	Oscillator::generateAntiAliasUserWaveTable(this);
 
-	if (fileLoadError != None)
+	if (fileLoadError != FileLoadError::None)
 	{
 		QString title = tr("Fail to open file");
 		QString message;
 
 		switch (fileLoadError)
 		{
-			case None:
+			case FileLoadError::None:
 				// present just to avoid a compiler warning
 				break;
 
-			case ReadPermissionDenied:
+			case FileLoadError::ReadPermissionDenied:
 				message = tr("Read permission denied");
 				break;
 
-			case TooLarge:
+			case FileLoadError::TooLarge:
 				message = tr("Audio files are limited to %1 MB "
 					"in size and %2 minutes of playing time"
 					).arg(fileSizeMax).arg(sampleLengthMax);
 				break;
 
-			case Invalid:
+			case FileLoadError::Invalid:
 				message = tr("Invalid audio file");
 				break;
 		}
 
-		if (getGUI() != nullptr)
+		if (gui::getGUI() != nullptr)
 		{
 			QMessageBox::information(nullptr, title, message, QMessageBox::Ok);
 		}
