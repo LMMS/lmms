@@ -98,7 +98,7 @@ private:
 	EffectControlDialog * m_controlView;
 	
 	bool m_dragging;
-	QGraphicsOpacityEffect * m_opacityEffect;
+	QGraphicsOpacityEffect* m_opacityEffect;
 
 } ;
 

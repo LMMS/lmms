@@ -239,16 +239,14 @@ void EffectView::mouseReleaseEvent(QMouseEvent* event)
 
 void EffectView::mouseMoveEvent(QMouseEvent* event)
 {
-	if (m_dragging)
+	if (!m_dragging) {return;}
+	if (event->pos().y() < 0)
 	{
-		if (event->pos().y() < 0)
-		{
-			moveUp();
-		}
-		else if (event->pos().y() > EffectView::DEFAULT_HEIGHT)
-		{
-			moveDown();
-		}
+		moveUp();
+	}
+	else if (event->pos().y() > EffectView::DEFAULT_HEIGHT)
+	{
+		moveDown();
 	}
 }
 
