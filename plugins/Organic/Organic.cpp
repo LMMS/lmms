@@ -528,7 +528,7 @@ void OrganicInstrumentView::modelChanged()
 		// setup knob for fine-detuning
 		Knob * detuneKnob = new OrganicKnob( this );
 		detuneKnob->move( x + i * colWidth, y + rowHeight*3 );
-		detuneKnob->setHintText( tr( "Osc %1 stereo detuning" ).arg( i + 1 )
+		detuneKnob->setHintText( tr( "Osc %1 stereo detuning:" ).arg( i + 1 )
 							, " " +
 							tr( "cents" ) );
 

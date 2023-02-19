@@ -80,19 +80,20 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 		&controls->m_inPeakL, &controls->m_inPeakR);
 	GainFaderIn->move( 23, 295 );
 	GainFaderIn->setDisplayConversion( false );
-	GainFaderIn->setHintText( tr( "Gain" ), "dBv");
+	GainFaderIn->setHintText( tr( "Gain:" ), " dB");
 
 	auto GainFaderOut = new EqFader(&controls->m_outGainModel, tr("Output gain"), this, faderBg, faderLeds, faderKnob,
 		&controls->m_outPeakL, &controls->m_outPeakR);
 	GainFaderOut->move( 453, 295);
 	GainFaderOut->setDisplayConversion( false );
-	GainFaderOut->setHintText( tr( "Gain" ), "dBv" );
+	GainFaderOut->setHintText( tr( "Gain:" ), " dB" );
 
 	// Gain Fader for each Filter exepts the pass filter
 	int distance = 126;
 	for( int i = 1; i < m_parameterWidget->bandCount() - 1; i++ )
 	{
-		auto gainFader = new EqFader(m_parameterWidget->getBandModels(i)->gain, tr(""), this, faderBg, faderLeds,
+		// TODO: Display Shelf bands separately so that the label makes more sense
+		auto gainFader = new EqFader(m_parameterWidget->getBandModels(i)->gain, tr("Band gain"), this, faderBg, faderLeds,
 			faderKnob, m_parameterWidget->getBandModels(i)->peakL, m_parameterWidget->getBandModels(i)->peakR);
 		gainFader->move( distance, 295 );
 		distance += 44;
@@ -110,14 +111,14 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 		resKnob->move( distance, 440 );
 		resKnob->setVolumeKnob(false);
 		resKnob->setModel( m_parameterWidget->getBandModels( i )->res );
-		if(i > 1 && i < 6) { resKnob->setHintText( tr( "Bandwidth: " ) , tr( " Octave" ) ); }
-		else { resKnob->setHintText( tr( "Resonance : " ) , "" ); }
+		if(i > 1 && i < 6) { resKnob->setHintText( tr( "Bandwidth: " ) , tr( " octave(s)" ) ); }
+		else { resKnob->setHintText( tr( "Resonance: " ) , "" ); }
 
 		auto freqKnob = new Knob(knobBright_26, this);
 		freqKnob->move( distance, 396 );
 		freqKnob->setVolumeKnob( false );
 		freqKnob->setModel( m_parameterWidget->getBandModels( i )->freq );
-		freqKnob->setHintText( tr( "Frequency:" ), "Hz" );
+		freqKnob->setHintText( tr( "Frequency:" ), " Hz" );
 
 		// adds the Number Active buttons
 		auto activeButton = new PixmapButton(this, nullptr);

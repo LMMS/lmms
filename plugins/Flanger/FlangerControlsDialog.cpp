@@ -47,14 +47,14 @@ FlangerControlsDialog::FlangerControlsDialog( FlangerControls *controls ) :
 	delayKnob->setVolumeKnob( false );
 	delayKnob->setModel( &controls->m_delayTimeModel );
 	delayKnob->setLabel( tr( "DELAY" ) );
-	delayKnob->setHintText( tr( "Delay time:" ) + " ", "s" );
+	delayKnob->setHintText( tr( "Delay time:" ), " s" );
 
 	auto lfoFreqKnob = new TempoSyncKnob(knobBright_26, this);
 	lfoFreqKnob->move( 48,10 );
 	lfoFreqKnob->setVolumeKnob( false );
 	lfoFreqKnob->setModel( &controls->m_lfoFrequencyModel );
 	lfoFreqKnob->setLabel( tr( "RATE" ) );
-	lfoFreqKnob->setHintText( tr( "Period:" ) , " Sec" );
+	lfoFreqKnob->setHintText( tr( "Period:" ) , " s" );
 
 	auto lfoAmtKnob = new Knob(knobBright_26, this);
 	lfoAmtKnob->move( 85,10 );

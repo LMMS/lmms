@@ -78,13 +78,13 @@ DynProcControlDialog::DynProcControlDialog(
 	attackKnob -> move( 24, 268 );
 	attackKnob->setModel( &_controls->m_attackModel );
 	attackKnob->setLabel( tr( "ATTACK" ) );
-	attackKnob->setHintText( tr( "Peak attack time:" ) , "ms" );
+	attackKnob->setHintText( tr( "Peak attack time:" ) , " ms" );
 
 	auto releaseKnob = new Knob(knobBright_26, this);
 	releaseKnob -> move( 74, 268 );
 	releaseKnob->setModel( &_controls->m_releaseModel );
 	releaseKnob->setLabel( tr( "RELEASE" ) );
-	releaseKnob->setHintText( tr( "Peak release time:" ) , "ms" );
+	releaseKnob->setHintText( tr( "Peak release time:" ) , " ms" );
 
 //wavegraph control buttons
 
