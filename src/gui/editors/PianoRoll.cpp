@@ -858,14 +858,9 @@ void PianoRoll::setCurrentMidiClip( MidiClip* newMidiClip )
 	}
 
 	// force the song-editor to stop playing if it played a MIDI clip before
-	if( Engine::getSong()->isPlaying() &&
-		Engine::getSong()->playMode() == Song::Mode_PlayMidiClip )
+	if (Engine::getSong()->playMode() == Song::Mode_PlayMidiClip)
 	{
 		Engine::getSong()->playMidiClip( nullptr );
-	}
-	else if (Engine::getSong()->isPaused())
-	{
-		Engine::getSong()->playMidiClip(nullptr);
 	}
 
 	if(m_stepRecorder.isRecording())
