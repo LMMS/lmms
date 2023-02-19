@@ -23,9 +23,8 @@
  *
  */
 
-
-#ifndef DATA_FILE_H
-#define DATA_FILE_H
+#ifndef LMMS_DATA_FILE_H
+#define LMMS_DATA_FILE_H
 
 #include <map>
 #include <QDomDocument>
@@ -143,14 +142,6 @@ private:
 
 	void loadData( const QByteArray & _data, const QString & _sourceFile );
 
-
-	struct LMMS_EXPORT typeDescStruct
-	{
-		Type m_type;
-		QString m_name;
-	} ;
-	static typeDescStruct s_types[TypeCount];
-
 	QString m_fileName; //!< The origin file name or "" if this DataFile didn't originate from a file
 	QDomElement m_content;
 	QDomElement m_head;
@@ -162,4 +153,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_DATA_FILE_H

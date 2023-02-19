@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_PORT_H
-#define AUDIO_PORT_H
+#ifndef LMMS_AUDIO_PORT_H
+#define LMMS_AUDIO_PORT_H
 
 #include <memory>
 #include <QString>
@@ -138,4 +138,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AUDIO_PORT_H

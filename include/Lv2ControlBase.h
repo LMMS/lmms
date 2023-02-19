@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LV2_CONTROL_BASE_H
-#define LV2_CONTROL_BASE_H
+#ifndef LMMS_LV2_CONTROL_BASE_H
+#define LMMS_LV2_CONTROL_BASE_H
 
 #include "lmmsconfig.h"
 
@@ -163,4 +163,5 @@ private:
 } // namespace lmms
 
 #endif // LMMS_HAVE_LV2
-#endif // LV2_CONTROL_BASE_H
+
+#endif // LMMS_LV2_CONTROL_BASE_H

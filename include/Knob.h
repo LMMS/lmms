@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef KNOB_H
-#define KNOB_H
+#ifndef LMMS_GUI_KNOB_H
+#define LMMS_GUI_KNOB_H
 
 #include <memory>
 #include <QPixmap>
@@ -214,4 +213,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_KNOB_H

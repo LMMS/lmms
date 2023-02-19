@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef PANNING_H
-#define PANNING_H
+#ifndef LMMS_PANNING_H
+#define LMMS_PANNING_H
 
 #include "lmms_basics.h"
 #include "panning_constants.h"
@@ -56,4 +56,4 @@ inline int panningToMidi( panning_t _p )
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_PANNING_H

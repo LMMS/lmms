@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef LADSPA_BASE_H
-#define LADSPA_BASE_H
+#ifndef LMMS_LADSPA_BASE_H
+#define LMMS_LADSPA_BASE_H
 
 #include "LadspaManager.h"
 #include "Plugin.h"
@@ -83,4 +83,4 @@ inline Plugin::Descriptor::SubPluginFeatures::Key ladspaKeyToSubPluginKey(
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_LADSPA_BASE_H

@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef INTERPOLATION_H
-#define INTERPOLATION_H
+#ifndef LMMS_INTERPOLATION_H
+#define LMMS_INTERPOLATION_H
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -140,4 +139,4 @@ inline float lagrangeInterpolate( float v0, float v1, float v2, float v3, float 
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_INTERPOLATION_H

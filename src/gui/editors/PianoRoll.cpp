@@ -129,7 +129,7 @@ QPixmap* PianoRoll::s_toolKnife = nullptr;
 
 TextFloat * PianoRoll::s_textFloat = nullptr;
 
-static QString s_noteStrings[12] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+static std::array<QString, 12> s_noteStrings {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
 
 static QString getNoteString(int key)
 {
@@ -137,7 +137,7 @@ static QString getNoteString(int key)
 }
 
 // used for drawing of piano
-PianoRoll::PianoRollKeyTypes PianoRoll::prKeyOrder[] =
+std::array<PianoRoll::PianoRollKeyTypes, 12> PianoRoll::prKeyOrder
 {
 	PR_WHITE_KEY_SMALL, PR_BLACK_KEY, PR_WHITE_KEY_BIG, PR_BLACK_KEY,
 	PR_WHITE_KEY_SMALL, PR_WHITE_KEY_SMALL, PR_BLACK_KEY, PR_WHITE_KEY_BIG,
@@ -369,10 +369,10 @@ PianoRoll::PianoRoll() :
 	// Set up note length model
 	m_noteLenModel.addItem( tr( "Last note" ),
 					std::make_unique<PixmapLoader>( "edit_draw" ) );
-	const QString pixmaps[] = { "whole", "half", "quarter", "eighth",
+	const auto pixmaps = std::array<QString, 11>{"whole", "half", "quarter", "eighth",
 						"sixteenth", "thirtysecond", "triplethalf",
 						"tripletquarter", "tripleteighth",
-						"tripletsixteenth", "tripletthirtysecond" } ;
+						"tripletsixteenth", "tripletthirtysecond"};
 
 	for( int i = 0; i < NUM_EVEN_LENGTHS; ++i )
 	{
@@ -5180,6 +5180,8 @@ void PianoRollWindow::saveSettings( QDomDocument & doc, QDomElement & de )
 		de.appendChild(markedSemiTonesRoot);
 	}
 
+	de.setAttribute("stopbehaviour", m_editor->m_timeLine->behaviourAtStop());
+
 	MainWindow::saveWidgetState( this, de );
 }
 
@@ -5192,6 +5194,8 @@ void PianoRollWindow::loadSettings( const QDomElement & de )
 	m_editor->loadMarkedSemiTones(de.firstChildElement("markedSemiTones"));
 
 	MainWindow::restoreWidgetState( this, de );
+
+	m_editor->m_timeLine->setBehaviourAtStop(de.attribute("stopbehaviour").toInt());
 
 	// update margins here because we're later in the startup process
 	// We can't earlier because everything is still starting with the

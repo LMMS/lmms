@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef PIANO_ROLL_H
-#define PIANO_ROLL_H
+#ifndef LMMS_GUI_PIANO_ROLL_H
+#define LMMS_GUI_PIANO_ROLL_H
 
 #include <QVector>
 #include <QWidget>
@@ -343,7 +343,7 @@ private:
 	static QPixmap * s_toolOpen;
 	static QPixmap* s_toolKnife;
 
-	static PianoRollKeyTypes prKeyOrder[];
+	static std::array<PianoRollKeyTypes, 12> prKeyOrder;
 
 	static TextFloat * s_textFloat;
 
@@ -573,4 +573,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_PIANO_ROLL_H

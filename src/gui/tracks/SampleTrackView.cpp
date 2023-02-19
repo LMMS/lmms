@@ -82,7 +82,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	m_panningKnob->show();
 
 	m_activityIndicator = new FadeButton(
-		QApplication::palette().color(QPalette::Active, QPalette::Background),
+		QApplication::palette().color(QPalette::Active, QPalette::Window),
 		QApplication::palette().color(QPalette::Active, QPalette::BrightText),
 		QApplication::palette().color(QPalette::Active, QPalette::BrightText).darker(),
 		getTrackSettingsWidget()

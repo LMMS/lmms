@@ -103,4 +103,4 @@ constexpr int ARANGE_SILENT_END = -10;
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_CONSTANTS_H

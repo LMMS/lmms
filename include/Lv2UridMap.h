@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LV2URIDMAP_H
-#define LV2URIDMAP_H
+#ifndef LMMS_LV2_URID_MAP_H
+#define LMMS_LV2_URID_MAP_H
 
 #include "lmmsconfig.h"
 
@@ -75,4 +75,5 @@ public:
 } // namespace lmms
 
 #endif // LMMS_HAVE_LV2
-#endif // LV2URIDMAP_H
+
+#endif // LMMS_LV2_URID_MAP_H

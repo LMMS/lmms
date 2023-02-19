@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef TRACK_CONTAINER_H
-#define TRACK_CONTAINER_H
+#ifndef LMMS_TRACK_CONTAINER_H
+#define LMMS_TRACK_CONTAINER_H
 
 #include <QReadWriteLock>
 
@@ -62,12 +62,6 @@ public:
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 
 	void loadSettings( const QDomElement & _this ) override;
-
-
-	virtual AutomationClip * tempoAutomationClip()
-	{
-		return nullptr;
-	}
 
 	int countTracks( Track::TrackTypes _tt = Track::NumTrackTypes ) const;
 
@@ -124,4 +118,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_TRACK_CONTAINER_H

@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef PRESET_PREVIEW_PLAY_HANDLE_H
-#define PRESET_PREVIEW_PLAY_HANDLE_H
+#ifndef LMMS_PRESET_PREVIEW_PLAY_HANDLE_H
+#define LMMS_PRESET_PREVIEW_PLAY_HANDLE_H
 
 #include "NotePlayHandle.h"
 
@@ -69,4 +69,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_PRESET_PREVIEW_PLAY_HANDLE_H
