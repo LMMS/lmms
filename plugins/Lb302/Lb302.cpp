@@ -80,14 +80,14 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT lb302_plugin_descriptor =
 {
-	LMMS_STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY(PLUGIN_NAME),
 	"LB302",
-	QT_TRANSLATE_NOOP( "PluginBrowser",
-			"Incomplete monophonic imitation TB-303" ),
+	QT_TRANSLATE_NOOP("PluginBrowser",
+			"Incomplete monophonic imitation TB-303"),
 	"Paul Giblock <pgib/at/users.sf.net>",
 	0x0100,
 	Plugin::Instrument,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,
 };
@@ -145,7 +145,7 @@ Lb302FilterIIR2::Lb302FilterIIR2(Lb302FilterKnobState* p_fs) :
 	vcf_c(1)
 {
 
-	m_dist = new DspEffectLibrary::Distortion( 1.0, 1.0f);
+	m_dist = new DspEffectLibrary::Distortion(1.0, 1.0f);
 
 };
 
@@ -232,7 +232,7 @@ void Lb302Filter3Pole::envRecalc()
     // behavior without any modification to its controls.
 	kfco = 50.f + (k)*((2300.f-1600.f*(fs->envmod))+(w) *
 	                   (700.f+1500.f*(k)+(1500.f+(k)*(sampleRateCutoff/2.f-6000.f)) *
-	                   (fs->envmod)) );
+	                   (fs->envmod)));
 	//+iacc*(.3+.7*kfco*kenvmod)*kaccent*kaccurve*2000
 
 
@@ -251,7 +251,7 @@ void Lb302Filter3Pole::envRecalc()
 #else
 	kres = (((fs->reso))) * (((-2.7079*kp1 + 10.963)*kp1 - 14.934)*kp1 + 8.4974);
 #endif
-	value = 1.0+( (fs->dist) *(1.5 + 2.0*kres*(1.0-kfcn))); // ENVMOD was DIST
+	value = 1.0+((fs->dist) *(1.5 + 2.0*kres*(1.0-kfcn))); // ENVMOD was DIST
 }
 
 
@@ -273,19 +273,19 @@ float Lb302Filter3Pole::process(const float& samp)
 // LBSynth
 //
 
-Lb302Synth::Lb302Synth( InstrumentTrack * _instrumentTrack ) :
-	Instrument( _instrumentTrack, &lb302_plugin_descriptor ),
-	vcf_cut_knob( 0.75f, 0.0f, 1.5f, 0.005f, this, tr( "VCF Cutoff Frequency" ) ),
-	vcf_res_knob( 0.75f, 0.0f, 1.25f, 0.005f, this, tr( "VCF Resonance" ) ),
-	vcf_mod_knob( 0.1f, 0.0f, 1.0f, 0.005f, this, tr( "VCF Envelope Mod" ) ),
-	vcf_dec_knob( 0.1f, 0.0f, 1.0f, 0.005f, this, tr( "VCF Envelope Decay" ) ),
-	dist_knob( 0.0f, 0.0f, 1.0f, 0.01f, this, tr( "Distortion" ) ),
-	wave_shape( 8.0f, 0.0f, 11.0f, this, tr( "Waveform" ) ),
-	slide_dec_knob( 0.6f, 0.0f, 1.0f, 0.005f, this, tr( "Slide Decay" ) ),
-	slideToggle( false, this, tr( "Slide" ) ),
-	accentToggle( false, this, tr( "Accent" ) ),
-	deadToggle( false, this, tr( "Dead" ) ),
-	db24Toggle( false, this, tr( "24dB/oct Filter" ) ),
+Lb302Synth::Lb302Synth(InstrumentTrack * _instrumentTrack) :
+	Instrument(_instrumentTrack, &lb302_plugin_descriptor),
+	vcf_cut_knob(0.75f, 0.0f, 1.5f, 0.005f, this, tr("VCF Cutoff Frequency")),
+	vcf_res_knob(0.75f, 0.0f, 1.25f, 0.005f, this, tr("VCF Resonance")),
+	vcf_mod_knob(0.1f, 0.0f, 1.0f, 0.005f, this, tr("VCF Envelope Mod")),
+	vcf_dec_knob(0.1f, 0.0f, 1.0f, 0.005f, this, tr("VCF Envelope Decay")),
+	dist_knob(0.0f, 0.0f, 1.0f, 0.01f, this, tr("Distortion")),
+	wave_shape(8.0f, 0.0f, 11.0f, this, tr("Waveform")),
+	slide_dec_knob(0.6f, 0.0f, 1.0f, 0.005f, this, tr("Slide Decay")),
+	slideToggle(false, this, tr("Slide")),
+	accentToggle(false, this, tr("Accent")),
+	deadToggle(false, this, tr("Dead")),
+	db24Toggle(false, this, tr("24dB/oct Filter")),
 	vca_attack(1.0 - 0.96406088),
 	vca_decay(0.99897516),
 	vca_a0(0.5),
@@ -293,26 +293,26 @@ Lb302Synth::Lb302Synth( InstrumentTrack * _instrumentTrack ) :
 	vca_mode(never_played)
 {
 
-	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ),
-	         this, SLOT ( filterChanged() ) );
+	connect(Engine::audioEngine(), SIGNAL(sampleRateChanged()),
+	         this, SLOT (filterChanged()));
 
-	connect( &vcf_cut_knob, SIGNAL( dataChanged() ),
-	         this, SLOT ( filterChanged() ) );
+	connect(&vcf_cut_knob, SIGNAL(dataChanged()),
+	         this, SLOT (filterChanged()));
 
-	connect( &vcf_res_knob, SIGNAL( dataChanged() ),
-	         this, SLOT ( filterChanged() ) );
+	connect(&vcf_res_knob, SIGNAL(dataChanged()),
+	         this, SLOT (filterChanged()));
 
-	connect( &vcf_mod_knob, SIGNAL( dataChanged() ),
-	         this, SLOT ( filterChanged() ) );
+	connect(&vcf_mod_knob, SIGNAL(dataChanged()),
+	         this, SLOT (filterChanged()));
 
-	connect( &vcf_dec_knob, SIGNAL( dataChanged() ),
-	         this, SLOT ( filterChanged() ) );
+	connect(&vcf_dec_knob, SIGNAL(dataChanged()),
+	         this, SLOT (filterChanged()));
 
-	connect( &db24Toggle, SIGNAL( dataChanged() ),
-	         this, SLOT ( db24Toggled() ) );
+	connect(&db24Toggle, SIGNAL(dataChanged()),
+	         this, SLOT (db24Toggled()));
 
-	connect( &dist_knob, SIGNAL( dataChanged() ),
-	         this, SLOT ( filterChanged()));
+	connect(&dist_knob, SIGNAL(dataChanged()),
+	         this, SLOT (filterChanged()));
 
 
 	// SYNTH
@@ -350,50 +350,50 @@ Lb302Synth::Lb302Synth( InstrumentTrack * _instrumentTrack ) :
 	filterChanged();
 
 	auto iph = new InstrumentPlayHandle(this, _instrumentTrack);
-	Engine::audioEngine()->addPlayHandle( iph );
+	Engine::audioEngine()->addPlayHandle(iph);
 }
 
 
 Lb302Synth::~Lb302Synth()
 {
-	for (const auto& vcf : vcfs) 
+	for (const auto& vcf : vcfs)
 	{
 		delete vcf;
 	}
 }
 
 
-void Lb302Synth::saveSettings( QDomDocument & _doc,
-	                             QDomElement & _this )
+void Lb302Synth::saveSettings(QDomDocument & _doc,
+	                             QDomElement & _this)
 {
-	vcf_cut_knob.saveSettings( _doc, _this, "vcf_cut" );
-	vcf_res_knob.saveSettings( _doc, _this, "vcf_res" );
-	vcf_mod_knob.saveSettings( _doc, _this, "vcf_mod" );
-	vcf_dec_knob.saveSettings( _doc, _this, "vcf_dec" );
+	vcf_cut_knob.saveSettings(_doc, _this, "vcf_cut");
+	vcf_res_knob.saveSettings(_doc, _this, "vcf_res");
+	vcf_mod_knob.saveSettings(_doc, _this, "vcf_mod");
+	vcf_dec_knob.saveSettings(_doc, _this, "vcf_dec");
 
-	wave_shape.saveSettings( _doc, _this, "shape");
-	dist_knob.saveSettings( _doc, _this, "dist");
-	slide_dec_knob.saveSettings( _doc, _this, "slide_dec");
+	wave_shape.saveSettings(_doc, _this, "shape");
+	dist_knob.saveSettings(_doc, _this, "dist");
+	slide_dec_knob.saveSettings(_doc, _this, "slide_dec");
 
-	slideToggle.saveSettings( _doc, _this, "slide");
-	deadToggle.saveSettings( _doc, _this, "dead");
-	db24Toggle.saveSettings( _doc, _this, "db24");
+	slideToggle.saveSettings(_doc, _this, "slide");
+	deadToggle.saveSettings(_doc, _this, "dead");
+	db24Toggle.saveSettings(_doc, _this, "db24");
 }
 
 
-void Lb302Synth::loadSettings( const QDomElement & _this )
+void Lb302Synth::loadSettings(const QDomElement & _this)
 {
-	vcf_cut_knob.loadSettings( _this, "vcf_cut" );
-	vcf_res_knob.loadSettings( _this, "vcf_res" );
-	vcf_mod_knob.loadSettings( _this, "vcf_mod" );
-	vcf_dec_knob.loadSettings( _this, "vcf_dec" );
+	vcf_cut_knob.loadSettings(_this, "vcf_cut");
+	vcf_res_knob.loadSettings(_this, "vcf_res");
+	vcf_mod_knob.loadSettings(_this, "vcf_mod");
+	vcf_dec_knob.loadSettings(_this, "vcf_dec");
 
-	dist_knob.loadSettings( _this, "dist");
-	slide_dec_knob.loadSettings( _this, "slide_dec");
-	wave_shape.loadSettings( _this, "shape");
-	slideToggle.loadSettings( _this, "slide");
-	deadToggle.loadSettings( _this, "dead");
-	db24Toggle.loadSettings( _this, "db24");
+	dist_knob.loadSettings(_this, "dist");
+	slide_dec_knob.loadSettings(_this, "slide_dec");
+	wave_shape.loadSettings(_this, "shape");
+	slideToggle.loadSettings(_this, "slide");
+	deadToggle.loadSettings(_this, "dead");
+	db24Toggle.loadSettings(_this, "db24");
  	db24Toggled();
 
 	filterChanged();
@@ -429,7 +429,7 @@ void Lb302Synth::db24Toggled()
 
 QString Lb302Synth::nodeName() const
 {
-	return( lb302_plugin_descriptor.name );
+	return(lb302_plugin_descriptor.name);
 }
 
 
@@ -449,7 +449,7 @@ void Lb302Synth::recalcFilter()
 	kp1  = kp+1.0;
 	kp1h = 0.5*kp1;
 	kres = (((vcf_reso))) * (((-2.7079*kp1 + 10.963)*kp1 - 14.934)*kp1 + 8.4974);
-	value = 1.0+( (((0))) *(1.5 + 2.0*kres*(1.0-kfcn))); // ENVMOD was DIST*/
+	value = 1.0+((((0))) *(1.5 + 2.0*kres*(1.0-kfcn))); // ENVMOD was DIST*/
 
 	vcf_envpos = ENVINC; // Trigger filter update in process()
 }
@@ -467,16 +467,16 @@ int Lb302Synth::process(sampleFrame *outbuf, const int size)
 	// Hold on to the current VCF, and use it throughout this period
 	Lb302Filter *filter = vcf.loadAcquire();
 
-	if( release_frame == 0 || ! m_playingNote ) 
+	if(release_frame == 0 || ! m_playingNote)
 	{
 		vca_mode = decay;
 	}
 
-	if( new_freq ) 
+	if(new_freq)
 	{
 		//printf("  playing new note..\n");
 		Lb302Note note;
-		note.vco_inc = GET_INC( true_freq );
+		note.vco_inc = GET_INC(true_freq);
 		note.dead = deadToggle.value();
 		initNote(&note);
 
@@ -488,10 +488,10 @@ int Lb302Synth::process(sampleFrame *outbuf, const int size)
 	// TODO: NORMAL RELEASE
 	// vca_mode = 1;
 
-	for( int i=0; i<size; i++ ) 
+	for(int i=0; i<size; i++)
 	{
 		// start decay if we're past release
-		if( i >= release_frame )
+		if(i >= release_frame)
 		{
 			vca_mode = decay;
 		}
@@ -505,7 +505,7 @@ int Lb302Synth::process(sampleFrame *outbuf, const int size)
 			if (vco_slide) {
 					vco_inc = vco_slidebase - vco_slide;
 					// Calculate coeff from dec_knob on knob change.
-					vco_slide -= vco_slide * ( 0.1f - slide_dec_knob.value() * 0.0999f ) * sampleRatio; // TODO: Adjust for ENVINC
+					vco_slide -= vco_slide * (0.1f - slide_dec_knob.value() * 0.0999f) * sampleRatio; // TODO: Adjust for ENVINC
 
 			}
 		}
@@ -574,31 +574,31 @@ int Lb302Synth::process(sampleFrame *outbuf, const int size)
 
 			case SINE:
 				// [-0.5, 0.5]  : [-pi, pi]
-				vco_k = 0.5f * Oscillator::sinSample( vco_c );
+				vco_k = 0.5f * Oscillator::sinSample(vco_c);
 				break;
 
 			case EXPONENTIAL:
-				vco_k = 0.5 * Oscillator::expSample( vco_c );
+				vco_k = 0.5 * Oscillator::expSample(vco_c);
 				break;
 
 			case WHITE_NOISE:
-				vco_k = 0.5 * Oscillator::noiseSample( vco_c );
+				vco_k = 0.5 * Oscillator::noiseSample(vco_c);
 				break;
 
 			case BL_SAWTOOTH:
-				vco_k = BandLimitedWave::oscillate( vco_c + 0.5f, BandLimitedWave::pdToLen( vco_inc ), BandLimitedWave::BLSaw ) * 0.5f;
+				vco_k = BandLimitedWave::oscillate(vco_c + 0.5f, BandLimitedWave::pdToLen(vco_inc), BandLimitedWave::BLSaw) * 0.5f;
 				break;
 
 			case BL_SQUARE:
-				vco_k = BandLimitedWave::oscillate( vco_c + 0.5f, BandLimitedWave::pdToLen( vco_inc ), BandLimitedWave::BLSquare ) * 0.5f;
+				vco_k = BandLimitedWave::oscillate(vco_c + 0.5f, BandLimitedWave::pdToLen(vco_inc), BandLimitedWave::BLSquare) * 0.5f;
 				break;
 
 			case BL_TRIANGLE:
-				vco_k = BandLimitedWave::oscillate( vco_c + 0.5f, BandLimitedWave::pdToLen( vco_inc ), BandLimitedWave::BLTriangle ) * 0.5f;
+				vco_k = BandLimitedWave::oscillate(vco_c + 0.5f, BandLimitedWave::pdToLen(vco_inc), BandLimitedWave::BLTriangle) * 0.5f;
 				break;
 
 			case BL_MOOG:
-				vco_k = BandLimitedWave::oscillate( vco_c + 0.5f, BandLimitedWave::pdToLen( vco_inc ), BandLimitedWave::BLMoog );
+				vco_k = BandLimitedWave::oscillate(vco_c + 0.5f, BandLimitedWave::pdToLen(vco_inc), BandLimitedWave::BLMoog);
 				break;
 		}
 
@@ -613,7 +613,7 @@ int Lb302Synth::process(sampleFrame *outbuf, const int size)
 
 		//samp = vco_k * vca_a;
 
-		if( sample_cnt <= 4 )
+		if(sample_cnt <= 4)
 		{
 	//			vca_a = 0;
 		}
@@ -627,7 +627,7 @@ int Lb302Synth::process(sampleFrame *outbuf, const int size)
 		*/
 		//LB302 samp *= (float)(decay_frames - catch_decay)/(float)decay_frames;
 
-		for( int c = 0; c < DEFAULT_CHANNELS; c++ ) 
+		for(int c = 0; c < DEFAULT_CHANNELS; c++)
 		{
 			outbuf[i][c] = samp;
 		}
@@ -658,7 +658,7 @@ int Lb302Synth::process(sampleFrame *outbuf, const int size)
  *  to be called from process() when a prior edge-to-edge note is done releasing.
  */
 
-void Lb302Synth::initNote( Lb302Note *n)
+void Lb302Synth::initNote(Lb302Note *n)
 {
 	catch_decay = 0;
 
@@ -719,151 +719,151 @@ void Lb302Synth::initSlide()
 }
 
 
-void Lb302Synth::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
+void Lb302Synth::playNote(NotePlayHandle * _n, sampleFrame * _working_buffer)
 {
-	if( _n->isMasterNote() || ( _n->hasParent() && _n->isReleased() ) )
+	if(_n->isMasterNote() || (_n->hasParent() && _n->isReleased()))
 	{
 		return;
 	}
 
 	// sort notes: new notes to the end
 	m_notesMutex.lock();
-	if( _n->totalFramesPlayed() == 0 )
+	if(_n->totalFramesPlayed() == 0)
 	{
-		m_notes.append( _n );
+		m_notes.append(_n);
 	}
 	else
 	{
-		m_notes.prepend( _n );
+		m_notes.prepend(_n);
 	}
 	m_notesMutex.unlock();
 	
-	release_frame = qMax( release_frame, _n->framesLeft() + _n->offset() );
+	release_frame = qMax(release_frame, _n->framesLeft() + _n->offset());
 }
 
 
 
-void Lb302Synth::processNote( NotePlayHandle * _n )
+void Lb302Synth::processNote(NotePlayHandle * _n)
 {
 		/// Start a new note.
-		if( _n->m_pluginData != this ) 
+		if(_n->m_pluginData != this)
 		{
 			m_playingNote = _n;
 			new_freq = true;
 			_n->m_pluginData = this;
 		}
 		
-		if( ! m_playingNote && ! _n->isReleased() && release_frame > 0 )
+		if(! m_playingNote && ! _n->isReleased() && release_frame > 0)
 		{
 			m_playingNote = _n;
-			if ( slideToggle.value() ) 
+			if (slideToggle.value())
 			{
-				vco_slideinc = GET_INC( _n->frequency() );
+				vco_slideinc = GET_INC(_n->frequency());
 			}
 		}
 
 		// Check for slide
-		if( m_playingNote == _n ) 
+		if(m_playingNote == _n)
 		{
 			true_freq = _n->frequency();
 
-			if( slideToggle.value() ) {
-				vco_slidebase = GET_INC( true_freq );			// The REAL frequency
+			if(slideToggle.value()) {
+				vco_slidebase = GET_INC(true_freq);			// The REAL frequency
 			}
 			else {
-				vco_inc = GET_INC( true_freq );
+				vco_inc = GET_INC(true_freq);
 			}
 		}
 }
 
 
 
-void Lb302Synth::play( sampleFrame * _working_buffer )
+void Lb302Synth::play(sampleFrame * _working_buffer)
 {
 	m_notesMutex.lock();
-	while( ! m_notes.isEmpty() )
+	while(! m_notes.isEmpty())
 	{
-		processNote( m_notes.takeFirst() );
+		processNote(m_notes.takeFirst());
 	};
 	m_notesMutex.unlock();
 	
 	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 
-	process( _working_buffer, frames );
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames, nullptr );
+	process(_working_buffer, frames);
+	instrumentTrack()->processAudioBuffer(_working_buffer, frames, nullptr);
 //	release_frame = 0; //removed for issue # 1432
 }
 
 
 
-void Lb302Synth::deleteNotePluginData( NotePlayHandle * _n )
+void Lb302Synth::deleteNotePluginData(NotePlayHandle * _n)
 {
 	//printf("GONE\n");
-	if( m_playingNote == _n )
+	if(m_playingNote == _n)
 	{
 		m_playingNote = nullptr;
 	}
 }
 
 
-gui::PluginView * Lb302Synth::instantiateView( QWidget * _parent )
+gui::PluginView * Lb302Synth::instantiateView(QWidget * _parent)
 {
-	return( new gui::Lb302SynthView( this, _parent ) );
+	return(new gui::Lb302SynthView(this, _parent));
 }
 
 namespace gui
 {
 
 
-Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
-	InstrumentViewFixedSize( _instrument, _parent )
+Lb302SynthView::Lb302SynthView(Instrument * _instrument, QWidget * _parent) :
+	InstrumentViewFixedSize(_instrument, _parent)
 {
 	// GUI
-	m_vcfCutKnob = new Knob( knobBright_26, this );
-	m_vcfCutKnob->move( 75, 130 );
-	m_vcfCutKnob->setHintText( tr( "Cutoff Freq:" ), "" );
-	m_vcfCutKnob->setLabel( "" );
+	m_vcfCutKnob = new Knob(knobBright_26, this);
+	m_vcfCutKnob->move(75, 130);
+	m_vcfCutKnob->setHintText(tr("Cutoff Freq:"), "");
+	m_vcfCutKnob->setLabel("");
 
-	m_vcfResKnob = new Knob( knobBright_26, this );
-	m_vcfResKnob->move( 120, 130 );
-	m_vcfResKnob->setHintText( tr( "Resonance:" ), "" );
-	m_vcfResKnob->setLabel( "" );
+	m_vcfResKnob = new Knob(knobBright_26, this);
+	m_vcfResKnob->move(120, 130);
+	m_vcfResKnob->setHintText(tr("Resonance:"), "");
+	m_vcfResKnob->setLabel("");
 
-	m_vcfModKnob = new Knob( knobBright_26, this );
-	m_vcfModKnob->move( 165, 130 );
-	m_vcfModKnob->setHintText( tr( "Env Mod:" ), "" );
-	m_vcfModKnob->setLabel( "" );
+	m_vcfModKnob = new Knob(knobBright_26, this);
+	m_vcfModKnob->move(165, 130);
+	m_vcfModKnob->setHintText(tr("Env Mod:"), "");
+	m_vcfModKnob->setLabel("");
 
-	m_vcfDecKnob = new Knob( knobBright_26, this );
-	m_vcfDecKnob->move( 210, 130 );
-	m_vcfDecKnob->setHintText( tr( "Decay:" ), "" );
-	m_vcfDecKnob->setLabel( "" );
+	m_vcfDecKnob = new Knob(knobBright_26, this);
+	m_vcfDecKnob->move(210, 130);
+	m_vcfDecKnob->setHintText(tr("Decay:"), "");
+	m_vcfDecKnob->setLabel("");
 
-	m_slideToggle = new LedCheckBox( "", this );
-	m_slideToggle->move( 10, 180 );
+	m_slideToggle = new LedCheckBox("", this);
+	m_slideToggle->move(10, 180);
 
-/*	m_accentToggle = new LedCheckBox( "", this );
-	m_accentToggle->move( 10, 200 );
+/*	m_accentToggle = new LedCheckBox("", this);
+	m_accentToggle->move(10, 200);
 	m_accentToggle->setDisabled(true);*/ // accent removed pending real implementation - no need for non-functional buttons
 
-	m_deadToggle = new LedCheckBox( "", this );
-	m_deadToggle->move( 10, 200 );
+	m_deadToggle = new LedCheckBox("", this);
+	m_deadToggle->move(10, 200);
 
-	m_db24Toggle = new LedCheckBox( "", this );
-	m_db24Toggle->move( 10, 150);
+	m_db24Toggle = new LedCheckBox("", this);
+	m_db24Toggle->move(10, 150);
 	m_db24Toggle->setToolTip(
-			tr( "303-es-que, 24dB/octave, 3 pole filter" ) );
+			tr("303-es-que, 24dB/octave, 3 pole filter"));
 
 
-	m_slideDecKnob = new Knob( knobBright_26, this );
-	m_slideDecKnob->move( 210, 75 );
-	m_slideDecKnob->setHintText( tr( "Slide Decay:" ), "" );
-	m_slideDecKnob->setLabel( "");
+	m_slideDecKnob = new Knob(knobBright_26, this);
+	m_slideDecKnob->move(210, 75);
+	m_slideDecKnob->setHintText(tr("Slide Decay:"), "");
+	m_slideDecKnob->setLabel("");
 
-	m_distKnob = new Knob( knobBright_26, this );
-	m_distKnob->move( 210, 190 );
-	m_distKnob->setHintText( tr( "Distortion:" ), "" );
-	m_distKnob->setLabel( tr( ""));
+	m_distKnob = new Knob(knobBright_26, this);
+	m_distKnob->move(210, 190);
+	m_distKnob->setHintText(tr("Distortion:"), "");
+	m_distKnob->setLabel(tr(""));
 
 
 	// Shapes
@@ -871,133 +871,133 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	const int waveBtnX = 10;
 	const int waveBtnY = 96;
 	auto sawWaveBtn = new PixmapButton(this, tr("Saw wave"));
-	sawWaveBtn->move( waveBtnX, waveBtnY );
-	sawWaveBtn->setActiveGraphic( embed::getIconPixmap(
-						"saw_wave_active" ) );
-	sawWaveBtn->setInactiveGraphic( embed::getIconPixmap(
-						"saw_wave_inactive" ) );
+	sawWaveBtn->move(waveBtnX, waveBtnY);
+	sawWaveBtn->setActiveGraphic(embed::getIconPixmap(
+						"saw_wave_active"));
+	sawWaveBtn->setInactiveGraphic(embed::getIconPixmap(
+						"saw_wave_inactive"));
 	sawWaveBtn->setToolTip(
-			tr( "Click here for a saw-wave." ) );
+			tr("Click here for a saw-wave."));
 
 	auto triangleWaveBtn = new PixmapButton(this, tr("Triangle wave"));
-	triangleWaveBtn->move( waveBtnX+(16*1), waveBtnY );
+	triangleWaveBtn->move(waveBtnX+(16*1), waveBtnY);
 	triangleWaveBtn->setActiveGraphic(
-		embed::getIconPixmap( "triangle_wave_active" ) );
+		embed::getIconPixmap("triangle_wave_active"));
 	triangleWaveBtn->setInactiveGraphic(
-		embed::getIconPixmap( "triangle_wave_inactive" ) );
+		embed::getIconPixmap("triangle_wave_inactive"));
 	triangleWaveBtn->setToolTip(
-			tr( "Click here for a triangle-wave." ) );
+			tr("Click here for a triangle-wave."));
 
 	auto sqrWaveBtn = new PixmapButton(this, tr("Square wave"));
-	sqrWaveBtn->move( waveBtnX+(16*2), waveBtnY );
-	sqrWaveBtn->setActiveGraphic( embed::getIconPixmap(
-					"square_wave_active" ) );
-	sqrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
-					"square_wave_inactive" ) );
+	sqrWaveBtn->move(waveBtnX+(16*2), waveBtnY);
+	sqrWaveBtn->setActiveGraphic(embed::getIconPixmap(
+					"square_wave_active"));
+	sqrWaveBtn->setInactiveGraphic(embed::getIconPixmap(
+					"square_wave_inactive"));
 	sqrWaveBtn->setToolTip(
-			tr( "Click here for a square-wave." ) );
+			tr("Click here for a square-wave."));
 
 	auto roundSqrWaveBtn = new PixmapButton(this, tr("Rounded square wave"));
-	roundSqrWaveBtn->move( waveBtnX+(16*3), waveBtnY );
-	roundSqrWaveBtn->setActiveGraphic( embed::getIconPixmap(
-					"round_square_wave_active" ) );
-	roundSqrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
-					"round_square_wave_inactive" ) );
+	roundSqrWaveBtn->move(waveBtnX+(16*3), waveBtnY);
+	roundSqrWaveBtn->setActiveGraphic(embed::getIconPixmap(
+					"round_square_wave_active"));
+	roundSqrWaveBtn->setInactiveGraphic(embed::getIconPixmap(
+					"round_square_wave_inactive"));
 	roundSqrWaveBtn->setToolTip(
-			tr( "Click here for a square-wave with a rounded end." ) );
+			tr("Click here for a square-wave with a rounded end."));
 
 	auto moogWaveBtn = new PixmapButton(this, tr("Moog wave"));
-	moogWaveBtn->move( waveBtnX+(16*4), waveBtnY );
+	moogWaveBtn->move(waveBtnX+(16*4), waveBtnY);
 	moogWaveBtn->setActiveGraphic(
-		embed::getIconPixmap( "moog_saw_wave_active" ) );
+		embed::getIconPixmap("moog_saw_wave_active"));
 	moogWaveBtn->setInactiveGraphic(
-		embed::getIconPixmap( "moog_saw_wave_inactive" ) );
+		embed::getIconPixmap("moog_saw_wave_inactive"));
 	moogWaveBtn->setToolTip(
-			tr( "Click here for a moog-like wave." ) );
+			tr("Click here for a moog-like wave."));
 
 	auto sinWaveBtn = new PixmapButton(this, tr("Sine wave"));
-	sinWaveBtn->move( waveBtnX+(16*5), waveBtnY );
-	sinWaveBtn->setActiveGraphic( embed::getIconPixmap(
-						"sin_wave_active" ) );
-	sinWaveBtn->setInactiveGraphic( embed::getIconPixmap(
-						"sin_wave_inactive" ) );
+	sinWaveBtn->move(waveBtnX+(16*5), waveBtnY);
+	sinWaveBtn->setActiveGraphic(embed::getIconPixmap(
+						"sin_wave_active"));
+	sinWaveBtn->setInactiveGraphic(embed::getIconPixmap(
+						"sin_wave_inactive"));
 	sinWaveBtn->setToolTip(
-			tr( "Click for a sine-wave." ) );
+			tr("Click for a sine-wave."));
 
 	auto exponentialWaveBtn = new PixmapButton(this, tr("White noise wave"));
-	exponentialWaveBtn->move( waveBtnX+(16*6), waveBtnY );
+	exponentialWaveBtn->move(waveBtnX+(16*6), waveBtnY);
 	exponentialWaveBtn->setActiveGraphic(
-		embed::getIconPixmap( "exp_wave_active" ) );
+		embed::getIconPixmap("exp_wave_active"));
 	exponentialWaveBtn->setInactiveGraphic(
-		embed::getIconPixmap( "exp_wave_inactive" ) );
+		embed::getIconPixmap("exp_wave_inactive"));
 	exponentialWaveBtn->setToolTip(
-			tr( "Click here for an exponential wave." ) );
+			tr("Click here for an exponential wave."));
 
 	auto whiteNoiseWaveBtn = new PixmapButton(this, tr("White noise wave"));
-	whiteNoiseWaveBtn->move( waveBtnX+(16*7), waveBtnY );
+	whiteNoiseWaveBtn->move(waveBtnX+(16*7), waveBtnY);
 	whiteNoiseWaveBtn->setActiveGraphic(
-		embed::getIconPixmap( "white_noise_wave_active" ) );
+		embed::getIconPixmap("white_noise_wave_active"));
 	whiteNoiseWaveBtn->setInactiveGraphic(
-		embed::getIconPixmap( "white_noise_wave_inactive" ) );
+		embed::getIconPixmap("white_noise_wave_inactive"));
 	whiteNoiseWaveBtn->setToolTip(
-			tr( "Click here for white-noise." ) );
+			tr("Click here for white-noise."));
 
 	auto blSawWaveBtn = new PixmapButton(this, tr("Bandlimited saw wave"));
-	blSawWaveBtn->move( waveBtnX+(16*9)-8, waveBtnY );
+	blSawWaveBtn->move(waveBtnX+(16*9)-8, waveBtnY);
 	blSawWaveBtn->setActiveGraphic(
-		embed::getIconPixmap( "saw_wave_active" ) );
+		embed::getIconPixmap("saw_wave_active"));
 	blSawWaveBtn->setInactiveGraphic(
-		embed::getIconPixmap( "saw_wave_inactive" ) );
+		embed::getIconPixmap("saw_wave_inactive"));
 	blSawWaveBtn->setToolTip(
-			tr( "Click here for bandlimited saw wave." ) );
+			tr("Click here for bandlimited saw wave."));
 
 	auto blSquareWaveBtn = new PixmapButton(this, tr("Bandlimited square wave"));
-	blSquareWaveBtn->move( waveBtnX+(16*10)-8, waveBtnY );
+	blSquareWaveBtn->move(waveBtnX+(16*10)-8, waveBtnY);
 	blSquareWaveBtn->setActiveGraphic(
-		embed::getIconPixmap( "square_wave_active" ) );
+		embed::getIconPixmap("square_wave_active"));
 	blSquareWaveBtn->setInactiveGraphic(
-		embed::getIconPixmap( "square_wave_inactive" ) );
+		embed::getIconPixmap("square_wave_inactive"));
 	blSquareWaveBtn->setToolTip(
-			tr( "Click here for bandlimited square wave." ) );
+			tr("Click here for bandlimited square wave."));
 
 	auto blTriangleWaveBtn = new PixmapButton(this, tr("Bandlimited triangle wave"));
-	blTriangleWaveBtn->move( waveBtnX+(16*11)-8, waveBtnY );
+	blTriangleWaveBtn->move(waveBtnX+(16*11)-8, waveBtnY);
 	blTriangleWaveBtn->setActiveGraphic(
-		embed::getIconPixmap( "triangle_wave_active" ) );
+		embed::getIconPixmap("triangle_wave_active"));
 	blTriangleWaveBtn->setInactiveGraphic(
-		embed::getIconPixmap( "triangle_wave_inactive" ) );
+		embed::getIconPixmap("triangle_wave_inactive"));
 	blTriangleWaveBtn->setToolTip(
-			tr( "Click here for bandlimited triangle wave." ) );
+			tr("Click here for bandlimited triangle wave."));
 
 	auto blMoogWaveBtn = new PixmapButton(this, tr("Bandlimited moog saw wave"));
-	blMoogWaveBtn->move( waveBtnX+(16*12)-8, waveBtnY );
+	blMoogWaveBtn->move(waveBtnX+(16*12)-8, waveBtnY);
 	blMoogWaveBtn->setActiveGraphic(
-		embed::getIconPixmap( "moog_saw_wave_active" ) );
+		embed::getIconPixmap("moog_saw_wave_active"));
 	blMoogWaveBtn->setInactiveGraphic(
-		embed::getIconPixmap( "moog_saw_wave_inactive" ) );
+		embed::getIconPixmap("moog_saw_wave_inactive"));
 	blMoogWaveBtn->setToolTip(
-			tr( "Click here for bandlimited moog saw wave." ) );
+			tr("Click here for bandlimited moog saw wave."));
 
 
-	m_waveBtnGrp = new automatableButtonGroup( this );
-	m_waveBtnGrp->addButton( sawWaveBtn );
-	m_waveBtnGrp->addButton( triangleWaveBtn );
-	m_waveBtnGrp->addButton( sqrWaveBtn );
-	m_waveBtnGrp->addButton( roundSqrWaveBtn );
-	m_waveBtnGrp->addButton( moogWaveBtn );
-	m_waveBtnGrp->addButton( sinWaveBtn );
-	m_waveBtnGrp->addButton( exponentialWaveBtn );
-	m_waveBtnGrp->addButton( whiteNoiseWaveBtn );
-	m_waveBtnGrp->addButton( blSawWaveBtn );
-	m_waveBtnGrp->addButton( blSquareWaveBtn );
-	m_waveBtnGrp->addButton( blTriangleWaveBtn );
-	m_waveBtnGrp->addButton( blMoogWaveBtn );
+	m_waveBtnGrp = new automatableButtonGroup(this);
+	m_waveBtnGrp->addButton(sawWaveBtn);
+	m_waveBtnGrp->addButton(triangleWaveBtn);
+	m_waveBtnGrp->addButton(sqrWaveBtn);
+	m_waveBtnGrp->addButton(roundSqrWaveBtn);
+	m_waveBtnGrp->addButton(moogWaveBtn);
+	m_waveBtnGrp->addButton(sinWaveBtn);
+	m_waveBtnGrp->addButton(exponentialWaveBtn);
+	m_waveBtnGrp->addButton(whiteNoiseWaveBtn);
+	m_waveBtnGrp->addButton(blSawWaveBtn);
+	m_waveBtnGrp->addButton(blSquareWaveBtn);
+	m_waveBtnGrp->addButton(blTriangleWaveBtn);
+	m_waveBtnGrp->addButton(blMoogWaveBtn);
 
-	setAutoFillBackground( true );
+	setAutoFillBackground(true);
 	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
-			"artwork" ) );
-	setPalette( pal );
+	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap(
+			"artwork"));
+	setPalette(pal);
 }
 
 
@@ -1005,19 +1005,19 @@ void Lb302SynthView::modelChanged()
 {
 	auto syn = castModel<Lb302Synth>();
 
-	m_vcfCutKnob->setModel( &syn->vcf_cut_knob );
-	m_vcfResKnob->setModel( &syn->vcf_res_knob );
-	m_vcfDecKnob->setModel( &syn->vcf_dec_knob );
-	m_vcfModKnob->setModel( &syn->vcf_mod_knob );
-	m_slideDecKnob->setModel( &syn->slide_dec_knob );
+	m_vcfCutKnob->setModel(&syn->vcf_cut_knob);
+	m_vcfResKnob->setModel(&syn->vcf_res_knob);
+	m_vcfDecKnob->setModel(&syn->vcf_dec_knob);
+	m_vcfModKnob->setModel(&syn->vcf_mod_knob);
+	m_slideDecKnob->setModel(&syn->slide_dec_knob);
 
-	m_distKnob->setModel( &syn->dist_knob );
-	m_waveBtnGrp->setModel( &syn->wave_shape );
+	m_distKnob->setModel(&syn->dist_knob);
+	m_waveBtnGrp->setModel(&syn->wave_shape);
 
-	m_slideToggle->setModel( &syn->slideToggle );
-	/*m_accentToggle->setModel( &syn->accentToggle );*/
-	m_deadToggle->setModel( &syn->deadToggle );
-	m_db24Toggle->setModel( &syn->db24Toggle );
+	m_slideToggle->setModel(&syn->slideToggle);
+	/*m_accentToggle->setModel(&syn->accentToggle);*/
+	m_deadToggle->setModel(&syn->deadToggle);
+	m_db24Toggle->setModel(&syn->db24Toggle);
 }
 
 
@@ -1028,11 +1028,11 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * m, void * )
+PLUGIN_EXPORT Plugin * lmms_plugin_main(Model * m, void *)
 {
 
-	return( new Lb302Synth(
-		static_cast<InstrumentTrack *>( m ) ) );
+	return(new Lb302Synth(
+		static_cast<InstrumentTrack *>(m)));
 }
 
 

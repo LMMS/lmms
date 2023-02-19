@@ -99,7 +99,7 @@ Xpressive::Xpressive(InstrumentTrack* instrument_track) :
 	m_interpolateW1(false, this),
 	m_interpolateW2(false, this),
 	m_interpolateW3(false, this),
-	m_panning1( 1, -1.0f, 1.0f, 0.01f, this, tr("Panning 1")),
+	m_panning1(1, -1.0f, 1.0f, 0.01f, this, tr("Panning 1")),
 	m_panning2(-1, -1.0f, 1.0f, 0.01f, this, tr("Panning 2")),
 	m_relTransition(50.0f, 0.0f, 500.0f, 1.0f, this, tr("Release transition")),
 	m_W1(GRAPH_LENGTH),
@@ -120,18 +120,18 @@ void Xpressive::saveSettings(QDomDocument & _doc, QDomElement & _this) {
 	_this.setAttribute("W1", QString(m_wavesExpression[0]));
 	// Save sample shape base64-encoded
 	QString sampleString;
-	base64::encode( (const char*)m_rawgraphW1.samples(),
-		 m_rawgraphW1.length() * sizeof(float), sampleString );
-	_this.setAttribute( "W1sample", sampleString );
+	base64::encode((const char*)m_rawgraphW1.samples(),
+		 m_rawgraphW1.length() * sizeof(float), sampleString);
+	_this.setAttribute("W1sample", sampleString);
 
 	_this.setAttribute("W2", QString(m_wavesExpression[1]));
-	base64::encode( (const char*)m_rawgraphW2.samples(),
-		 m_rawgraphW2.length() * sizeof(float), sampleString );
-	_this.setAttribute( "W2sample", sampleString );
+	base64::encode((const char*)m_rawgraphW2.samples(),
+		 m_rawgraphW2.length() * sizeof(float), sampleString);
+	_this.setAttribute("W2sample", sampleString);
 	_this.setAttribute("W3", QString(m_wavesExpression[2]));
-	base64::encode( (const char*)m_rawgraphW3.samples(),
-		 m_rawgraphW3.length() * sizeof(float), sampleString );
-	_this.setAttribute( "W3sample", sampleString );
+	base64::encode((const char*)m_rawgraphW3.samples(),
+		 m_rawgraphW3.length() * sizeof(float), sampleString);
+	_this.setAttribute("W3sample", sampleString);
 	m_smoothW1.saveSettings(_doc,_this,"smoothW1");
 	m_smoothW2.saveSettings(_doc,_this,"smoothW2");
 	m_smoothW3.saveSettings(_doc,_this,"smoothW3");
@@ -149,11 +149,11 @@ void Xpressive::saveSettings(QDomDocument & _doc, QDomElement & _this) {
 
 void Xpressive::loadSettings(const QDomElement & _this) {
 
-	m_outputExpression[0]=_this.attribute( "O1").toLatin1();
-	m_outputExpression[1]=_this.attribute( "O2").toLatin1();
-	m_wavesExpression[0]=_this.attribute( "W1").toLatin1();
-	m_wavesExpression[1]=_this.attribute( "W2").toLatin1();
-	m_wavesExpression[2]=_this.attribute( "W3").toLatin1();
+	m_outputExpression[0]=_this.attribute("O1").toLatin1();
+	m_outputExpression[1]=_this.attribute("O2").toLatin1();
+	m_wavesExpression[0]=_this.attribute("W1").toLatin1();
+	m_wavesExpression[1]=_this.attribute("W2").toLatin1();
+	m_wavesExpression[2]=_this.attribute("W3").toLatin1();
 
 	m_smoothW1.loadSettings(_this,"smoothW1");
 	m_smoothW2.loadSettings(_this,"smoothW2");
@@ -170,17 +170,17 @@ void Xpressive::loadSettings(const QDomElement & _this) {
 
 	int size = 0;
 	char * dst = 0;
-	base64::decode( _this.attribute( "W1sample"), &dst, &size );
+	base64::decode(_this.attribute("W1sample"), &dst, &size);
 
-	m_rawgraphW1.setSamples( (float*) dst );
+	m_rawgraphW1.setSamples((float*) dst);
 	delete[] dst;
-	base64::decode( _this.attribute( "W2sample"), &dst, &size );
+	base64::decode(_this.attribute("W2sample"), &dst, &size);
 
-	m_rawgraphW2.setSamples( (float*) dst );
+	m_rawgraphW2.setSamples((float*) dst);
 	delete[] dst;
-	base64::decode( _this.attribute( "W3sample"), &dst, &size );
+	base64::decode(_this.attribute("W3sample"), &dst, &size);
 
-	m_rawgraphW3.setSamples( (float*) dst );
+	m_rawgraphW3.setSamples((float*) dst);
 	delete[] dst;
 
 	smooth(m_smoothW1.value(),&m_rawgraphW1,&m_graphW1);
@@ -259,12 +259,12 @@ void Xpressive::smooth(float smoothness,const graphModel * in,graphModel * out)
 		float sum = 0.0f;
 		float temp = 0.0f;
 		int i;
-		for (i = 0; i < guass_size; i++ )
+		for (i = 0; i < guass_size; i++)
 		{
 			temp = (i - guass_center) / delta;
 			sum += guassian[i] = a * powf(F_E, -0.5f * temp * temp);
 		}
-		for (i = 0; i < guass_size; i++ )
+		for (i = 0; i < guass_size; i++)
 		{
 			guassian[i] = guassian[i] / sum;
 		}
@@ -400,14 +400,14 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_moogWaveBtn = new PixmapButton(this, tr("Moog-saw wave"));
 	m_moogWaveBtn->move(4, ROW_WAVEBTN-14);
 	m_moogWaveBtn->setActiveGraphic(
-		embed::getIconPixmap( "moog_saw_wave_active" ) );
+		embed::getIconPixmap("moog_saw_wave_active"));
 	m_moogWaveBtn->setInactiveGraphic(embed::getIconPixmap("moog_saw_wave_inactive"));
 	m_moogWaveBtn->setToolTip(tr("Moog-saw wave"));
 
 	m_expWaveBtn = new PixmapButton(this, tr("Exponential wave"));
 	m_expWaveBtn->move(4 +14, ROW_WAVEBTN-14);
-	m_expWaveBtn->setActiveGraphic(embed::getIconPixmap( "exp_wave_active" ) );
-	m_expWaveBtn->setInactiveGraphic(embed::getIconPixmap( "exp_wave_inactive" ) );
+	m_expWaveBtn->setActiveGraphic(embed::getIconPixmap("exp_wave_active"));
+	m_expWaveBtn->setInactiveGraphic(embed::getIconPixmap("exp_wave_inactive"));
 	m_expWaveBtn->setToolTip(tr("Exponential wave"));
 
 	m_sawWaveBtn = new PixmapButton(this, tr("Saw wave"));
@@ -453,7 +453,7 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_expressionValidToggle = new LedCheckBox("", this, tr("ExpressionValid"),
 											  LedCheckBox::Red);
 	m_expressionValidToggle->move(168, EXPR_TEXT_Y+EXPR_TEXT_H-2);
-	m_expressionValidToggle->setEnabled( false );
+	m_expressionValidToggle->setEnabled(false);
 
 	m_expressionEditor = new QPlainTextEdit(this);
 	m_expressionEditor->move(3, EXPR_TEXT_Y);
@@ -676,15 +676,15 @@ void XpressiveView::graphDrawn()
 void XpressiveView::modelChanged() {
 	auto b = castModel<Xpressive>();
 
-	m_expressionValidToggle->setModel( &b->exprValid() );
-	m_generalPurposeKnob[0]->setModel( &b->parameterA1() );
-	m_generalPurposeKnob[1]->setModel( &b->parameterA2() );
-	m_generalPurposeKnob[2]->setModel( &b->parameterA3() );
+	m_expressionValidToggle->setModel(&b->exprValid());
+	m_generalPurposeKnob[0]->setModel(&b->parameterA1());
+	m_generalPurposeKnob[1]->setModel(&b->parameterA2());
+	m_generalPurposeKnob[2]->setModel(&b->parameterA3());
 
-	m_panningKnob[0]->setModel( &b->panning1() );
-	m_panningKnob[1]->setModel( &b->panning2() );
-	m_relKnob->setModel( &b->relTransition() );
-	m_selectedGraphGroup->setModel( &b->selectedGraph() );
+	m_panningKnob[0]->setModel(&b->panning1());
+	m_panningKnob[1]->setModel(&b->panning2());
+	m_relKnob->setModel(&b->relTransition());
+	m_selectedGraphGroup->setModel(&b->selectedGraph());
 
 	updateLayout();
 }
@@ -861,9 +861,9 @@ QString XpressiveHelpView::s_helpText=
 "<b>Operands + - * / % ^ &gt; &lt; &gt;= &lt;= == != &amp; | are also available.</b><br>"
 "<b>Amplitude Modulation</b> - W1(t*f)*(1+W2(t*f))<br>"
 "<b>Ring Modulation</b> - W1(t * f)*W2(t * f)<br>"
-"<b>Mix Modulation</b> - 0.5*( W1(t * f) + W2(t * f) )<br>"
-"<b>Frequency Modulation</b> - [vol1]*W1( integrate( f + srate*[vol2]*W2( integrate(f) ) ) )<br>"
-"<b>Phase Modulation</b> - [vol1]*W1( integrate(f) + [vol2]*W2( integrate(f) ) )<br>"
+"<b>Mix Modulation</b> - 0.5*(W1(t * f) + W2(t * f))<br>"
+"<b>Frequency Modulation</b> - [vol1]*W1(integrate(f + srate*[vol2]*W2(integrate(f))))<br>"
+"<b>Phase Modulation</b> - [vol1]*W1(integrate(f) + [vol2]*W2(integrate(f)))<br>"
 		;
 
 XpressiveHelpView::XpressiveHelpView():QTextEdit(s_helpText)
@@ -880,17 +880,17 @@ XpressiveHelpView::XpressiveHelpView():QTextEdit(s_helpText)
 
 #endif
 
-	setWindowTitle ( "Xpressive Help" );
-	setTextInteractionFlags ( Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse );
-	getGUI()->mainWindow()->addWindowedWidget( this );
-	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
-	parentWidget()->setWindowIcon( PLUGIN_NAME::getIconPixmap( "logo" ) );
-	parentWidget()->setFixedSize( 300, 500);
+	setWindowTitle ("Xpressive Help");
+	setTextInteractionFlags (Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse);
+	getGUI()->mainWindow()->addWindowedWidget(this);
+	parentWidget()->setAttribute(Qt::WA_DeleteOnClose, false);
+	parentWidget()->setWindowIcon(PLUGIN_NAME::getIconPixmap("logo"));
+	parentWidget()->setFixedSize(300, 500);
 	
 	// No maximize button
 	Qt::WindowFlags flags = parentWidget()->windowFlags();
 	flags &= ~Qt::WindowMaximizeButtonHint;
-	parentWidget()->setWindowFlags( flags );
+	parentWidget()->setWindowFlags(flags);
 }
 
 void XpressiveView::helpClicked() {

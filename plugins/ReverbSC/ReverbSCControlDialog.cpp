@@ -33,38 +33,38 @@ namespace lmms::gui
 {
 
 
-ReverbSCControlDialog::ReverbSCControlDialog( ReverbSCControls* controls ) :
-	EffectControlDialog( controls )
+ReverbSCControlDialog::ReverbSCControlDialog(ReverbSCControls* controls) :
+	EffectControlDialog(controls)
 {
-	setAutoFillBackground( true );
+	setAutoFillBackground(true);
 	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
-	setPalette( pal );
-	setFixedSize( 185, 55 );
+	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
+	setPalette(pal);
+	setFixedSize(185, 55);
 
 	auto inputGainKnob = new Knob(knobBright_26, this);
-	inputGainKnob -> move( 16, 10 );
-	inputGainKnob->setModel( &controls->m_inputGainModel );
-	inputGainKnob->setLabel( tr( "Input" ) );
-	inputGainKnob->setHintText( tr( "Input gain:" ) , " dB" );
+	inputGainKnob -> move(16, 10);
+	inputGainKnob->setModel(&controls->m_inputGainModel);
+	inputGainKnob->setLabel(tr("Input"));
+	inputGainKnob->setHintText(tr("Input gain:") , " dB");
 
 	auto sizeKnob = new Knob(knobBright_26, this);
-	sizeKnob -> move( 57, 10 );
-	sizeKnob->setModel( &controls->m_sizeModel );
-	sizeKnob->setLabel( tr( "Size" ) );
-	sizeKnob->setHintText( tr( "Size:" ) , "" );
+	sizeKnob -> move(57, 10);
+	sizeKnob->setModel(&controls->m_sizeModel);
+	sizeKnob->setLabel(tr("Size"));
+	sizeKnob->setHintText(tr("Size:") , "");
 
 	auto colorKnob = new Knob(knobBright_26, this);
-	colorKnob -> move( 98, 10 );
-	colorKnob->setModel( &controls->m_colorModel );
-	colorKnob->setLabel( tr( "Color" ) );
-	colorKnob->setHintText( tr( "Color:" ) , "" );
+	colorKnob -> move(98, 10);
+	colorKnob->setModel(&controls->m_colorModel);
+	colorKnob->setLabel(tr("Color"));
+	colorKnob->setHintText(tr("Color:") , "");
 
 	auto outputGainKnob = new Knob(knobBright_26, this);
-	outputGainKnob -> move( 139, 10 );
-	outputGainKnob->setModel( &controls->m_outputGainModel );
-	outputGainKnob->setLabel( tr( "Output" ) );
-	outputGainKnob->setHintText( tr( "Output gain:" ) , " dB" );
+	outputGainKnob -> move(139, 10);
+	outputGainKnob->setModel(&controls->m_outputGainModel);
+	outputGainKnob->setLabel(tr("Output"));
+	outputGainKnob->setHintText(tr("Output gain:") , " dB");
 }
 
 
