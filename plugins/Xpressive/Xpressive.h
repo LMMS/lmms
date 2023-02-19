@@ -27,11 +27,13 @@
 #define XPRESSIVE_H
 
 
+
 #include <QTextEdit>
 
 #include "Graph.h"
 #include "Instrument.h"
-#include "InstrumentView.h"
+
+
 
 #include "ExprSynth.h"
 
@@ -53,8 +55,10 @@ const int	NUM_EXPRS = 5;
 
 class ExprFront;
 
+
 namespace gui
 {
+
 class SubWindow;
 class XpressiveView;
 }
@@ -82,15 +86,17 @@ public:
 
 	graphModel& graphO1() { return m_graphO1; }
 	graphModel& graphO2() { return m_graphO2; }
-	graphModel& graphW1() { return m_graphW1; }
-	graphModel& graphW2() { return m_graphW2; }
-	graphModel& graphW3() { return m_graphW3; }
-	graphModel& rawgraphW1() { return m_rawgraphW1; }
-	graphModel& rawgraphW2() { return m_rawgraphW2; }
-	graphModel& rawgraphW3() { return m_rawgraphW3; }
+	graphModel& graphW1() { return m_graphW1; } //after smoothing
+	graphModel& graphW2() { return m_graphW2; } //after smoothing
+	graphModel& graphW3() { return m_graphW3; } //after smoothing
+	graphModel& rawgraphW1() { return m_rawgraphW1; } //before smoothing
+	graphModel& rawgraphW2() { return m_rawgraphW2; } //before smoothing
+	graphModel& rawgraphW3() { return m_rawgraphW3; } //before smoothing
 	IntModel& selectedGraph() { return m_selectedGraph; }
 	QByteArray& wavesExpression(int i) { return m_wavesExpression[i]; }
 	QByteArray& outputExpression(int i) { return m_outputExpression[i]; }
+	void recalculateWaves();
+
 
 	FloatModel& parameterA1() { return m_parameterA1; }
 	FloatModel& parameterA2() { return m_parameterA2; }
@@ -142,93 +148,14 @@ private:
 	WaveSample m_W1, m_W2, m_W3;
 
 	BoolModel m_exprValid;
+
+	float m_previous_frequency;
+	NotePlayHandle* m_nph_of_previous;
+
 	
 } ;
 
-namespace gui
-{
 
-
-class XpressiveView : public InstrumentViewFixedSize
-{
-	Q_OBJECT
-public:
-	XpressiveView( Instrument* _instrument,
-					QWidget* _parent );
-
-protected:
-
-
-protected slots:
-	void updateLayout();
-
-	void sinWaveClicked();
-	void triangleWaveClicked();
-	void sqrWaveClicked();
-	void sawWaveClicked();
-	void noiseWaveClicked();
-	void moogSawWaveClicked();
-	void expWaveClicked();
-	void usrWaveClicked();
-	void helpClicked();
-	void expressionChanged();
-	void smoothChanged();
-	void graphDrawn();
-
-private:
-	void modelChanged() override;
-
-	Knob *m_generalPurposeKnob[3];
-	Knob *m_panningKnob[2];
-	Knob *m_relKnob;
-	Knob *m_smoothKnob;
-	QPlainTextEdit * m_expressionEditor;
-
-	automatableButtonGroup *m_selectedGraphGroup;
-	PixmapButton *m_w1Btn;
-	PixmapButton *m_w2Btn;
-	PixmapButton *m_w3Btn;
-	PixmapButton *m_o1Btn;
-	PixmapButton *m_o2Btn;
-	PixmapButton *m_sinWaveBtn;
-	PixmapButton *m_triangleWaveBtn;
-	PixmapButton *m_sqrWaveBtn;
-	PixmapButton *m_sawWaveBtn;
-	PixmapButton *m_whiteNoiseWaveBtn;
-	PixmapButton *m_usrWaveBtn;
-	PixmapButton *m_moogWaveBtn;
-	PixmapButton *m_expWaveBtn;
-
-	static QPixmap *s_artwork;
-
-	Graph *m_graph;
-	graphModel *m_raw_graph;
-	LedCheckBox *m_expressionValidToggle;
-	LedCheckBox *m_waveInterpolate;
-	bool m_output_expr;
-	bool m_wave_expr;
-} ;
-
-class XpressiveHelpView: public QTextEdit
-{
-	Q_OBJECT
-public:
-	static XpressiveHelpView* getInstance()
-	{
-		static XpressiveHelpView instance;
-		return &instance;
-	}
-	static void finalize()
-	{
-	}
-
-private:
-	XpressiveHelpView();
-	static QString s_helpText;
-};
-
-
-} // namespace gui
 
 } // namespace lmms
 

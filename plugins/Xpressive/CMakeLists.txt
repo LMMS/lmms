@@ -20,8 +20,10 @@ BUILD_PLUGIN(xpressive
 	Xpressive.cpp
 	ExprSynth.cpp
 	Xpressive.h
+	XpressiveView.h
 	exprtk/exprtk.hpp
 	MOCFILES Xpressive.h
+	MOCFILES XpressiveView.h
 	EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.png"
 )
 
