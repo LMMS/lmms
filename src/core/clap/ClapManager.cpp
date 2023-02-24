@@ -223,7 +223,8 @@ void ClapManager::loadClapFiles(const std::vector<std::filesystem::path>& search
 		for (const auto& entry : std::filesystem::recursive_directory_iterator(path))
 		{
 			auto entryPath = entry.path();
-			if (entryPath.extension() != ".clap")
+			std::error_code ec;
+			if (!entry.is_regular_file(ec) || entryPath.extension() != ".clap")
 				continue;
 
 			++totalClapFiles;
@@ -248,8 +249,8 @@ void ClapManager::loadClapFiles(const std::vector<std::filesystem::path>& search
 				if (!added)
 				{
 					qWarning().nospace() << "The CLAP plugin ID '" << plugin->getDescriptor()->id
-						<< "' is identical to an ID in a previously loaded plugin file: '"
-						<< entryPath.c_str() <<  "'. Skipping the duplicate CLAP plugin.";
+						<< "' in the plugin file '" << entry.path().c_str() << "' is identical to an ID"
+						<< " in a previously loaded plugin file. Skipping the duplicate CLAP plugin.";
 					plugin->invalidate();
 					purgeNeeded = true;
 					continue;

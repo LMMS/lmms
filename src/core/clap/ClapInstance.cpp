@@ -31,8 +31,11 @@
 #include "AudioEngine.h"
 #include "MidiEvent.h"
 
+#include <QApplication>
 #include <QThread>
 #include <QDebug>
+
+#include <algorithm>
 #include <cassert>
 
 #include "lmmsversion.h"
@@ -56,7 +59,8 @@ namespace
 		}
 	}
 
-	inline void copyBuffersStereoHostToMonoPlugin(const sampleFrame* hostBuf, float** pluginBuf, unsigned channel, fpp_t frames)
+	inline void copyBuffersStereoHostToMonoPlugin(const sampleFrame* hostBuf, float** pluginBuf,
+		unsigned channel, fpp_t frames)
 	{
 		for (fpp_t f = 0; f < frames; ++f)
 		{
@@ -174,6 +178,7 @@ void ClapInstance::copyBuffersFromCore(const sampleFrame* buf, unsigned firstCha
 
 void ClapInstance::copyBuffersToCore(sampleFrame* buf, unsigned firstChan, unsigned num, fpp_t frames) const
 {
+	// CLAP to LMMS
 	if (num > 1)
 	{
 		if (!isMonoOutput())
@@ -301,16 +306,17 @@ auto ClapInstance::pluginInit() -> bool
 		return false;
 	}
 
-	auto readPorts = [this](std::vector<AudioPort>& audioPorts,
+	// Effect, Instrument, and Tool are the only options
+	const bool needInputPort = m_pluginInfo->getType() != Plugin::PluginTypes::Instrument;
+	const bool needOutputPort = m_pluginInfo->getType() != Plugin::PluginTypes::Tool;
+
+	auto readPorts = [this, needInputPort, needOutputPort](
+		std::vector<AudioPort>& audioPorts,
 		std::unique_ptr<clap_audio_buffer[]>& audioBuffers,
 		std::vector<AudioBuffer>& rawAudioBuffers,
 		bool is_input) -> AudioPort*
 	{
 		const auto portCount = m_pluginExtAudioPorts->count(m_plugin, is_input);
-
-		// Effect, Instrument, and Tool are the only options
-		const bool needOutputPort = m_pluginInfo->getType() != Plugin::PluginTypes::Tool;
-		const bool needInputPort = m_pluginInfo->getType() != Plugin::PluginTypes::Instrument;
 
 		if (is_input)
 		{
@@ -404,10 +410,22 @@ auto ClapInstance::pluginInit() -> bool
 		for (uint32_t port = 0; port < audioPorts.size(); ++port)
 		{
 			const auto channelCount = audioPorts[port].info.channel_count;
-			if (channelCount <= 0)
-				return nullptr;
+			if (channelCount <= 0) { return nullptr; }
+
 			audioBuffers[port].channel_count = channelCount;
-			audioBuffers[port].constant_mask = 0;
+
+			if (is_input && ((port != stereoPort && stereoPort != CLAP_INVALID_ID) || (port != monoPort && stereoPort == CLAP_INVALID_ID)))
+			{
+				// This input port will not be used by LMMS
+				// TODO: Will a mono port ever need to be used if a stereo port is available?
+				constexpr uint32_t maxChannels = sizeof(clap_audio_buffer::constant_mask) * 8;
+				audioBuffers[port].constant_mask = (1u << std::min(maxChannels, channelCount)) - 1u;
+			}
+			else
+			{
+				audioBuffers[port].constant_mask = 0;
+			}
+
 			auto& rawBuffer = rawAudioBuffers.emplace_back(channelCount, DEFAULT_BUFFER_SIZE);
 			audioBuffers[port].data32 = rawBuffer.data();
 			audioBuffers[port].data64 = nullptr;
@@ -437,7 +455,7 @@ auto ClapInstance::pluginInit() -> bool
 	};
 
 	m_audioPortInActive = readPorts(m_audioPortsIn, m_audioIn, m_audioInBuffers, true);
-	if (!m_pluginIssues.empty())
+	if (!m_pluginIssues.empty() || (!m_audioPortInActive && needInputPort))
 	{
 		setPluginState(PluginState::LoadedWithError);
 		return false;
@@ -448,7 +466,7 @@ auto ClapInstance::pluginInit() -> bool
 	m_audioInActive = m_audioPortInActive ? &m_audioIn[m_audioPortInActive->index] : nullptr;
 
 	m_audioPortOutActive = readPorts(m_audioPortsOut, m_audioOut, m_audioOutBuffers, false);
-	if (!m_pluginIssues.empty())
+	if (!m_pluginIssues.empty() || (!m_audioPortOutActive && needOutputPort))
 	{
 		setPluginState(PluginState::LoadedWithError);
 		return false;
@@ -482,7 +500,10 @@ auto ClapInstance::pluginInit() -> bool
 auto ClapInstance::pluginActivate() -> bool
 {
 	qDebug() << "ClapInstance::pluginActivate()";
+
 	// Must be on main thread
+	assert(isMainThread());
+
 	if (isPluginErrorState())
 		return false;
 	checkPluginStateCurrent(PluginState::Inactive);
@@ -701,8 +722,7 @@ void ClapInstance::handlePluginOutputEvents()
 
 void ClapInstance::paramFlushOnMainThread()
 {
-	// NOTE: Must be on main thread
-
+	assert(isMainThread());
 	assert(!isPluginActive());
 
 	m_scheduleParamFlush = false;
@@ -822,6 +842,17 @@ void ClapInstance::setPluginState(PluginState state)
 	}
 }
 
+auto ClapInstance::isMainThread() -> bool
+{
+	return QThread::currentThread() == QCoreApplication::instance()->thread();
+}
+
+auto ClapInstance::isAudioThread() -> bool
+{
+	// Assume any non-GUI thread is an audio thread
+	return QThread::currentThread() != QCoreApplication::instance()->thread();
+}
+
 
 ////////////////////////////////
 // ClapInstance host
@@ -838,7 +869,7 @@ void ClapInstance::hostDestroy()
 
 void ClapInstance::hostIdle()
 {
-	// NOTE: Must run on main thread
+	assert(isMainThread());
 
 	// Try to send events to the audio engine
 	m_appToEngineValueQueue.producerDone();
@@ -931,6 +962,8 @@ auto ClapInstance::hostGetExtension(const clap_host* host, const char* extension
 	const std::string_view extensionId = extension_id;
 	if (extensionId == CLAP_EXT_LOG)
 		return &m_hostExtLog;
+	if (extensionId == CLAP_EXT_THREAD_CHECK)
+		return &m_hostExtThreadCheck;
 
 	return nullptr;
 }
@@ -1007,6 +1040,16 @@ void ClapInstance::hostExtLogLog(const clap_host_t* host, clap_log_severity seve
 	}
 
 	qDebug().nospace() << "CLAP LOG: severity=" << severityStr.c_str() << "; msg='" << msg << "'";
+}
+
+auto ClapInstance::hostExtThreadCheckIsMainThread(const clap_host_t* host) -> bool
+{
+	return isMainThread();
+}
+
+auto ClapInstance::hostExtThreadCheckIsAudioThread(const clap_host_t* host) -> bool
+{
+	return isAudioThread();
 }
 
 /*

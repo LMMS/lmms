@@ -63,12 +63,10 @@ class PluginParam {}; // TODO
  * the host instance can know which plugin instance called the host API.
  * 
  * The ClapInstance class implements the CLAP host API and
- *     stores the pointer to the clap_host object.
- * The ClapInstance::Plugin class provides access to the plugin instance
- *     for making plugin API calls. TODO: Merge into ClapInstance?
+ *     stores a pointer to a clap_host object. It also provides access
+ *     to the plugin instance for making plugin API calls.
  *
- * Every ClapInstance is owned by the ClapManager, though other classes
- * may borrow from the ClapManager.
+ * Every ClapInstance is owned by a ClapControlBase object.
  */
 class ClapInstance : public LinkedModelGroup
 {
@@ -217,6 +215,8 @@ private:
 	static void hostRequestRestart(const clap_host* host);
 	static void hostExtStateMarkDirty(const clap_host* host);
 	static void hostExtLogLog(const clap_host_t* host, clap_log_severity severity, const char* msg);
+	static auto hostExtThreadCheckIsMainThread(const clap_host_t* host) -> bool;
+	static auto hostExtThreadCheckIsAudioThread(const clap_host_t* host) -> bool;
 
 	//bool canUsePluginParams() const noexcept;
 	//bool canUsePluginGui() const noexcept;
@@ -237,11 +237,13 @@ private:
 	}
 	void checkPluginStateNext(PluginState next);
 	void setPluginState(PluginState state);
+	static inline auto isMainThread() -> bool;
+	static inline auto isAudioThread() -> bool;
 
 	template<typename T>
 	auto pluginExtensionInit(const T*& ext, const char* id) -> bool
 	{
-		//checkForMainThread();
+		assert(isMainThread());
 		assert(ext == nullptr && "Plugin extension already initialized");
 		ext = static_cast<const T*>(m_plugin->get_extension(m_plugin, id));
 		return ext != nullptr;
@@ -249,7 +251,6 @@ private:
 
 	const clap_plugin* m_plugin{nullptr};
 	const ClapPluginInfo* m_pluginInfo; // TODO: Use weak_ptr instead?
-
 
 	PluginState m_pluginState{PluginState::Inactive};
 	bool m_monoInput{false};
@@ -271,26 +272,63 @@ private:
 		AudioBuffer(uint32_t channels, uint32_t frames)
 			: m_channels(channels), m_frames(frames)
 		{
-			m_data = new float*[channels];
-			for (uint32_t channel = 0; channel < channels; ++channel)
+			m_data = new float*[m_channels]();
+			for (uint32_t channel = 0; channel < m_channels; ++channel)
 			{
-				m_data[channel] = new float[frames]();
+				m_data[channel] = new float[m_frames]();
 			}
+		}
+
+		AudioBuffer(const AudioBuffer&) = delete;
+		AudioBuffer& operator=(const AudioBuffer&) = delete;
+
+		AudioBuffer(AudioBuffer&& other) :
+			m_channels(std::exchange(other.m_channels, 0)),
+			m_frames(std::exchange(other.m_frames, 0)),
+			m_data(std::exchange(other.m_data, nullptr))
+		{
+		}
+
+		AudioBuffer& operator=(AudioBuffer&& other) noexcept
+		{
+			if (this != &other)
+			{
+				free();
+				m_channels = std::exchange(other.m_channels, 0);
+				m_frames = std::exchange(other.m_frames, 0);
+				m_data = std::exchange(other.m_data, nullptr);
+			}
+			return *this;
 		}
 
 		~AudioBuffer()
 		{
-			for (uint32_t channel = 0; channel < m_channels; ++channel)
-			{
-				delete[] m_data[channel];
-			}
-			delete[] m_data;
+			free();
 		}
 
 		//! [channel][frame]
 		auto data() -> float** { return m_data; }
 
 	private:
+
+		void free()
+		{
+			if (!m_data) { return; }
+			for (uint32_t channel = 0; channel < m_channels; ++channel)
+			{
+				if (m_data[channel])
+				{
+					delete[] m_data[channel];
+					m_data[channel] = nullptr;
+				}
+			}
+			if (m_data)
+			{
+				delete[] m_data;
+				m_data = nullptr;
+			}
+		}
+
 		uint32_t m_channels;
 		uint32_t m_frames;
 		float** m_data{nullptr};
@@ -389,6 +427,11 @@ private:
 
 	static const constexpr clap_host_log m_hostExtLog {
 		&ClapInstance::hostExtLogLog
+	};
+
+	static const constexpr clap_host_thread_check m_hostExtThreadCheck {
+		&ClapInstance::hostExtThreadCheckIsMainThread,
+		&ClapInstance::hostExtThreadCheckIsAudioThread
 	};
 
 	/**
