@@ -419,7 +419,7 @@ auto ClapInstance::pluginInit() -> bool
 				// This input port will not be used by LMMS
 				// TODO: Will a mono port ever need to be used if a stereo port is available?
 				constexpr uint32_t maxChannels = sizeof(clap_audio_buffer::constant_mask) * 8;
-				audioBuffers[port].constant_mask = (1u << std::min(maxChannels, channelCount)) - 1u;
+				audioBuffers[port].constant_mask = channelCount < maxChannels ? (1u << channelCount) - 1 : static_cast<uint64_t>(-1);
 			}
 			else
 			{
