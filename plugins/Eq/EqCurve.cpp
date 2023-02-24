@@ -741,14 +741,17 @@ void EqCurve::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, 
 		}
 		//compute a QPainterPath
 		m_curve = QPainterPath();
-		for ( int x = 0; x < m_width ; x++ )
+		if (activeHandles != 0) 
 		{
-			mainCurve[x] = ( ( mainCurve[x] / activeHandles ) ) - ( m_heigth/2 );
-			if ( x==0 )
+			for ( int x = 0; x < m_width ; x++ )
 			{
-				m_curve.moveTo( x, mainCurve[x] );
+				mainCurve[x] = ( ( mainCurve[x] / activeHandles ) ) - ( m_heigth/2 );
+				if ( x==0 )
+				{
+					m_curve.moveTo( x, mainCurve[x] );
+				}
+				m_curve.lineTo( x, mainCurve[x] );
 			}
-			m_curve.lineTo( x, mainCurve[x] );
 		}
 		//we cache the curve painting in a pixmap for saving cpu
 		QPixmap cacheMap( boundingRect().size().toSize() );
