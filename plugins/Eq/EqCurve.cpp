@@ -65,6 +65,7 @@ QRectF EqHandle::boundingRect() const
 
 float EqHandle::freqToXPixel( float freq , int w )
 {
+	if (freq == 0) { return 0; }
 	float min = log10f( 20 );
 	float max = log10f( 20000 );
 	float range = max - min;
