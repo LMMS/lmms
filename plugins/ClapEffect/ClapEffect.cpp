@@ -58,8 +58,11 @@ Plugin::Descriptor PLUGIN_EXPORT clapeffect_plugin_descriptor =
 ClapEffect::ClapEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key)
 	: Effect(&clapeffect_plugin_descriptor, parent, key),
 	m_controls(this, key->attributes["uri"]),
-	m_tempOutputSamples(Engine::audioEngine()->framesPerPeriod())
+	m_tempOutputSamples(Engine::audioEngine()->framesPerPeriod()),
+	m_idleTimer(this)
 {
+	connect(&m_idleTimer, &QTimer::timeout, this, QOverload<>::of(&ClapEffect::callHostIdle));
+	m_idleTimer.start(1000 / 30);
 }
 
 bool ClapEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)

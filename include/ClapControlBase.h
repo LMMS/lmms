@@ -84,6 +84,8 @@ public:
 	bool hasGui() const { return m_hasGUI; }
 	void setHasGui(bool val) { m_hasGUI = val; }
 
+	void callHostIdle();
+
 protected:
 
 	//! @param that the class inheriting this class and inheriting Model;

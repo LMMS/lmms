@@ -30,6 +30,7 @@
 #ifdef LMMS_HAVE_CLAP
 
 #include "ClapFile.h"
+#include "ClapParam.h"
 
 #include "LinkedModelGroups.h"
 #include "Plugin.h"
@@ -50,8 +51,6 @@ namespace lmms
 {
 
 
-class PluginParam {}; // TODO
-
 /**
  * @brief ClapInstance stores a CLAP host/plugin instance pair.
  *
@@ -68,8 +67,10 @@ class PluginParam {}; // TODO
  *
  * Every ClapInstance is owned by a ClapControlBase object.
  */
-class ClapInstance : public LinkedModelGroup
+class ClapInstance final : public LinkedModelGroup
 {
+	Q_OBJECT;
+
 public:
 	ClapInstance() = delete;
 	ClapInstance(const ClapPluginInfo* pluginInfo, Model* parent);
@@ -99,7 +100,7 @@ public:
 		ActiveWithError,
 		// The plugin is not used anymore by the audio engine and can be deactivated on the main
 		// thread
-		ActiveAndReadyToDeactivate,
+		ActiveAndReadyToDeactivate
 	};
 
 
@@ -200,6 +201,13 @@ public:
 	auto isPluginSleeping() const -> bool;
 	auto isPluginErrorState() const -> bool;
 
+signals:
+
+	void paramsChanged();
+	//void quickControlsPagesChanged();
+	//void quickControlsSelectedPageChanged();
+	void paramAdjusted(clap_id paramId);
+
 private:
 
 	/////////////////////////////////////////
@@ -217,10 +225,19 @@ private:
 	static void hostExtLogLog(const clap_host_t* host, clap_log_severity severity, const char* msg);
 	static auto hostExtThreadCheckIsMainThread(const clap_host_t* host) -> bool;
 	static auto hostExtThreadCheckIsAudioThread(const clap_host_t* host) -> bool;
+	static void hostExtParamsRescan(const clap_host* host, uint32_t flags);
+	static void hostExtParamsClear(const clap_host* host, clap_id param_id, clap_param_clear_flags flags);
+	static void hostExtParamsRequestFlush(const clap_host* host);
 
-	//bool canUsePluginParams() const noexcept;
+	auto canUsePluginParams() const noexcept -> bool;
 	//bool canUsePluginGui() const noexcept;
 	//static const char* getCurrentClapGuiApi();
+
+	void scanParams() { hostExtParamsRescan(&m_host, CLAP_PARAM_RESCAN_ALL); }
+	void checkValidParamValue(const ClapParam& param, double value);
+	auto getParamValue(const clap_param_info& info) -> double;
+	static auto clapParamsRescanMayValueChange(uint32_t flags) -> bool { return flags & (CLAP_PARAM_RESCAN_ALL | CLAP_PARAM_RESCAN_VALUES); }
+	static auto clapParamsRescanMayInfoChange(uint32_t flags) -> bool { return flags & (CLAP_PARAM_RESCAN_ALL | CLAP_PARAM_RESCAN_INFO); }
 
 	clap_host m_host;
 	std::queue<std::function<bool()>> m_idleQueue;
@@ -249,12 +266,12 @@ private:
 		return ext != nullptr;
 	}
 
-	const clap_plugin* m_plugin{nullptr};
+	const clap_plugin* m_plugin = nullptr;
 	const ClapPluginInfo* m_pluginInfo; // TODO: Use weak_ptr instead?
 
-	PluginState m_pluginState{PluginState::Inactive};
-	bool m_monoInput{false};
-	bool m_monoOutput{false};
+	PluginState m_pluginState = PluginState::Inactive;
+	bool m_monoInput = false;
+	bool m_monoOutput = false;
 
 	std::vector<PluginIssue> m_pluginIssues;
 
@@ -331,7 +348,7 @@ private:
 
 		uint32_t m_channels;
 		uint32_t m_frames;
-		float** m_data{nullptr};
+		float** m_data = nullptr;
 	};
 
 	std::vector<AudioBuffer> m_audioInBuffers, m_audioOutBuffers; //!< [port][channel][frame]
@@ -343,7 +360,7 @@ private:
 	/**
 	 * Parameter update queues
 	*/
-	std::unordered_map<clap_id, std::unique_ptr<PluginParam>> m_params;
+	std::unordered_map<clap_id, std::unique_ptr<ClapParam>> m_params;
 
 	struct AppToEngineParamQueueValue
 	{
@@ -381,16 +398,16 @@ private:
 
 	std::unordered_map<clap_id, bool> m_isAdjustingParameter;
 
-	static constexpr bool m_hostShouldProvideParamCookie{true};
+	static constexpr bool m_hostShouldProvideParamCookie = true;
 
 	/**
 	 * Scheduling
 	*/
-	bool m_scheduleRestart{false};
-	bool m_scheduleDeactivate{false};
-	bool m_scheduleProcess{true};
-	bool m_scheduleParamFlush{false};
-	bool m_scheduleMainThreadCallback{false};
+	bool m_scheduleRestart = false;
+	bool m_scheduleDeactivate = false;
+	bool m_scheduleProcess = true;
+	bool m_scheduleParamFlush = false;
+	bool m_scheduleMainThreadCallback = false;
 
 	/**
 	 * Ports
@@ -404,7 +421,7 @@ private:
 
 	struct AudioPort
 	{
-		clap_audio_port_info info = {};
+		clap_audio_port_info info{};
 		uint32_t index = 0; //!< Index on plugin side, not m_audioPorts***
 		bool is_input = false;
 		AudioPortType type = AudioPortType::Unsupported;
@@ -434,10 +451,17 @@ private:
 		&ClapInstance::hostExtThreadCheckIsAudioThread
 	};
 
+	const clap_plugin_params* m_pluginExtParams = nullptr;
+	static const constexpr clap_host_params m_hostExtParams {
+		&ClapInstance::hostExtParamsRescan,
+		&ClapInstance::hostExtParamsClear,
+		&ClapInstance::hostExtParamsRequestFlush,
+	};
+
 	/**
 	 * Plugin/Host extension data
 	*/
-	bool m_hostExtStateIsDirty{false};
+	bool m_hostExtStateIsDirty = false;
 
 };
 

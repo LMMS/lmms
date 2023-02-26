@@ -489,7 +489,7 @@ auto ClapInstance::pluginInit() -> bool
 
 	// TODO: Then, need to scan params and quick controls:
 
-	//scanParams();
+	scanParams();
 	//scanQuickControls();
 
 	setPluginState(PluginState::Inactive);
@@ -528,6 +528,7 @@ auto ClapInstance::pluginActivate() -> bool
 auto ClapInstance::pluginDeactivate() -> bool
 {
 	qDebug() << "ClapInstance::pluginDeactivate";
+	assert(isMainThread());
 	if (!isPluginActive())
 		return false;
 
@@ -541,8 +542,9 @@ auto ClapInstance::pluginDeactivate() -> bool
 	m_scheduleDeactivate = false;
 	*/
 
-	m_plugin->deactivate(m_plugin);
+	m_plugin->deactivate(m_plugin); // TODO: Not audio thread!!!
 	setPluginState(PluginState::Inactive);
+	qDebug() << "ClapInstance::pluginDeactivate end";
 	return true;
 }
 
@@ -557,7 +559,7 @@ auto ClapInstance::pluginProcess(uint32_t frames) -> bool
 {
 	//m_steadyTime += frames;
 
-	// Must be audio thread
+	assert(isAudioThread());
 	if (!m_plugin)
 		return false;
 
@@ -592,8 +594,8 @@ auto ClapInstance::pluginProcess(uint32_t frames) -> bool
 	{
 		if (!m_scheduleProcess && m_evIn.empty())
 		{
-			// The plugin is sleeping, there is no request to wake it up and there are no events to
-			// process
+			// The plugin is sleeping, there is no request to wake it up
+			// and there are no events to process
 			return true;
 		}
 
@@ -634,7 +636,7 @@ auto ClapInstance::pluginProcessEnd(uint32_t frames) -> bool
 void ClapInstance::generatePluginInputEvents()
 {
 	m_appToEngineValueQueue.consume(
-		[this](clap_id param_id, const AppToEngineParamQueueValue &value) {
+		[this](clap_id param_id, const AppToEngineParamQueueValue& value) {
 			clap_event_param_value ev;
 			ev.header.time = 0;
 			ev.header.type = CLAP_EVENT_PARAM_VALUE;
@@ -651,7 +653,7 @@ void ClapInstance::generatePluginInputEvents()
 			m_evIn.push(&ev.header);
 		});
 
-	m_appToEngineModQueue.consume([this](clap_id param_id, const AppToEngineParamQueueValue &value) {
+	m_appToEngineModQueue.consume([this](clap_id param_id, const AppToEngineParamQueueValue& value) {
 		clap_event_param_mod ev;
 		ev.header.time = 0;
 		ev.header.type = CLAP_EVENT_PARAM_MOD;
@@ -732,8 +734,8 @@ void ClapInstance::paramFlushOnMainThread()
 
 	generatePluginInputEvents();
 
-	///if (canUsePluginParams())
-	///	m_pluginParams->flush(m_plugin, m_evIn.clapInputEvents(), m_evOut.clapOutputEvents());
+	if (canUsePluginParams())
+		m_pluginExtParams->flush(m_plugin, m_evIn.clapInputEvents(), m_evOut.clapOutputEvents());
 	handlePluginOutputEvents();
 
 	m_evOut.clear();
@@ -875,7 +877,6 @@ void ClapInstance::hostIdle()
 	m_appToEngineValueQueue.producerDone();
 	m_appToEngineModQueue.producerDone();
 
-	/*
 	m_engineToAppValueQueue.consume(
 		[this](clap_id param_id, const EngineToAppParamQueueValue &value) {
 			auto it = m_params.find(param_id);
@@ -895,7 +896,6 @@ void ClapInstance::hostIdle()
 			emit paramAdjusted(param_id);
 		}
 	);
-	*/
 
 	if (m_scheduleParamFlush && !isPluginActive())
 	{
@@ -922,12 +922,12 @@ void ClapInstance::setHost()
 	m_host.clap_version = CLAP_VERSION;
 	m_host.name = "LMMS";
 	m_host.version = LMMS_VERSION;
-	m_host.vendor = nullptr;
+	m_host.vendor = "";
 	m_host.url = "https://lmms.io/";
-	m_host.get_extension = hostGetExtension;
-	m_host.request_callback = hostRequestCallback;
-	m_host.request_process = hostRequestProcess;
-	m_host.request_restart = hostRequestRestart;
+	m_host.get_extension = &hostGetExtension;
+	m_host.request_callback = &hostRequestCallback;
+	m_host.request_process = &hostRequestProcess;
+	m_host.request_restart = &hostRequestRestart;
 }
 
 void ClapInstance::hostPushToIdleQueue(std::function<bool()>&& functor)
@@ -951,29 +951,30 @@ auto ClapInstance::fromHost(const clap_host* host) -> ClapInstance*
 	return h;
 }
 
-auto ClapInstance::hostGetExtension(const clap_host* host, const char* extension_id) -> const void*
+auto ClapInstance::hostGetExtension(const clap_host* host, const char* extensionId) -> const void*
 {
 	[[maybe_unused]] auto h = fromHost(host);
-	// TODO
 
 	if (ClapManager::kDebug)
-		qDebug() << "--Plugin requested host extension:" << extension_id;
+		qDebug() << "--Plugin requested host extension:" << extensionId;
 
-	const std::string_view extensionId = extension_id;
-	if (extensionId == CLAP_EXT_LOG)
+	const std::string_view extensionIdView = extensionId;
+	if (extensionIdView == CLAP_EXT_LOG)
 		return &m_hostExtLog;
-	if (extensionId == CLAP_EXT_THREAD_CHECK)
+	if (extensionIdView == CLAP_EXT_THREAD_CHECK)
 		return &m_hostExtThreadCheck;
+	if (extensionIdView == CLAP_EXT_PARAMS)
+		return &m_hostExtParams;
 
 	return nullptr;
 }
 
 void ClapInstance::hostRequestCallback(const clap_host* host)
 {
+	qDebug() << "ClapInstance::hostRequestCallback";
 	const auto h = fromHost(host);
 
-	qDebug() << "ClapInstance::hostRequestCallback";
-
+	/*
 	auto mainThreadCallback = [h]() -> bool {
 		const auto plugin = h->getPlugin();
 		plugin->on_main_thread(plugin);
@@ -981,27 +982,27 @@ void ClapInstance::hostRequestCallback(const clap_host* host)
 	};
 
 	h->hostPushToIdleQueue(std::move(mainThreadCallback));
+	*/
+	h->m_scheduleMainThreadCallback = true;
 }
 
 void ClapInstance::hostRequestProcess(const clap_host* host)
 {
-	[[maybe_unused]] auto h = fromHost(host);
-	// TODO
-	//h->_scheduleProcess = true;
 	qDebug() << "ClapInstance::hostRequestProcess";
+	[[maybe_unused]] auto h = fromHost(host);
+	h->m_scheduleProcess = true;
 }
 
 void ClapInstance::hostRequestRestart(const clap_host* host)
 {
-	[[maybe_unused]] auto h = fromHost(host);
-	// TODO
-	//h->_scheduleRestart = true;
 	qDebug() << "ClapInstance::hostRequestRestart";
+	[[maybe_unused]] auto h = fromHost(host);
+	h->m_scheduleRestart = true;
 }
 
 void ClapInstance::hostExtStateMarkDirty(const clap_host* host)
 {
-	//checkForMainThread();
+	assert(isMainThread());
 
 	auto h = fromHost(host);
 
@@ -1052,14 +1053,176 @@ auto ClapInstance::hostExtThreadCheckIsAudioThread(const clap_host_t* host) -> b
 	return isAudioThread();
 }
 
-/*
-bool ClapInstance::canUsePluginParams() const noexcept
+void ClapInstance::hostExtParamsRescan(const clap_host* host, uint32_t flags)
 {
-	return m_pluginParams && m_pluginParams->count && m_pluginParams->flush
-		&& m_pluginParams->get_info && m_pluginParams->get_value && m_pluginParams->text_to_value
-		&& m_pluginParams->value_to_text;
+	qDebug() << "ClapInstance::hostExtParamsRescan";
+	assert(isMainThread());
+	auto h = fromHost(host);
+
+	if (!h->canUsePluginParams()) { return; }
+
+	// 1. It is forbidden to use CLAP_PARAM_RESCAN_ALL if the plugin is active
+	if (h->isPluginActive() && (flags & CLAP_PARAM_RESCAN_ALL))
+	{
+		throw std::logic_error("clap_host_params.recan(CLAP_PARAM_RESCAN_ALL) was called while the plugin is active!");
+		return;
+	}
+
+	// 2. Scan the params
+	auto count = h->m_pluginExtParams->count(h->m_plugin);
+	std::unordered_set<clap_id> paramIds(count * 2);
+
+	for (int32_t i = 0; i < count; ++i)
+	{
+		clap_param_info info;
+		if (!h->m_pluginExtParams->get_info(h->m_plugin, i, &info))
+		{
+			throw std::logic_error("clap_plugin_params.get_info did return false!");
+		}
+
+		if (info.id == CLAP_INVALID_ID)
+		{
+			std::ostringstream msg;
+			msg << "clap_plugin_params.get_info() reported a parameter with id = CLAP_INVALID_ID"
+				<< std::endl
+				<< " 2. name: " << info.name << ", module: " << info.module << std::endl;
+			throw std::logic_error{msg.str()};
+		}
+
+		auto it = h->m_params.find(info.id);
+
+		// Check that the parameter is not declared twice
+		if (paramIds.count(info.id) > 0)
+		{
+			assert(it != h->m_params.end());
+
+			std::ostringstream msg;
+			msg << "the parameter with id: " << info.id << " was declared twice." << std::endl
+				<< " 1. name: " << it->second->info().name << ", module: " << it->second->info().module
+				<< std::endl
+				<< " 2. name: " << info.name << ", module: " << info.module << std::endl;
+			throw std::logic_error(msg.str());
+		}
+		paramIds.insert(info.id);
+
+		if (it == h->m_params.end())
+		{
+			if (!(flags & CLAP_PARAM_RESCAN_ALL))
+			{
+				std::ostringstream msg;
+				msg << "a new parameter was declared, but the flag CLAP_PARAM_RESCAN_ALL was not "
+					"specified; id: "
+					<< info.id << ", name: " << info.name << ", module: " << info.module << std::endl;
+				throw std::logic_error(msg.str());
+			}
+
+			double value = h->getParamValue(info);
+			auto param = std::make_unique<ClapParam>(h, info, value);
+			h->checkValidParamValue(*param, value);
+			h->m_params.insert_or_assign(info.id, std::move(param));
+		}
+		else
+		{
+			// Update param info
+			if (!it->second->isInfoEqualTo(info))
+			{
+				if (!clapParamsRescanMayInfoChange(flags))
+				{
+					std::ostringstream msg;
+					msg << "a parameter's info did change, but the flag CLAP_PARAM_RESCAN_INFO "
+						"was not specified; id: "
+						<< info.id << ", name: " << info.name << ", module: " << info.module
+						<< std::endl;
+					throw std::logic_error(msg.str());
+				}
+
+				if (!(flags & CLAP_PARAM_RESCAN_ALL) && !it->second->isInfoCriticallyDifferentTo(info))
+				{
+					std::ostringstream msg;
+					msg << "a parameter's info has critical changes, but the flag CLAP_PARAM_RESCAN_ALL "
+							"was not specified; id: "
+						<< info.id << ", name: " << info.name << ", module: " << info.module
+						<< std::endl;
+					throw std::logic_error(msg.str());
+				}
+
+				it->second->setInfo(info);
+			}
+
+			double value = h->getParamValue(info);
+			if (it->second->value() != value)
+			{
+				if (!clapParamsRescanMayValueChange(flags))
+				{
+					std::ostringstream msg;
+					msg << "a parameter's value did change but, but the flag CLAP_PARAM_RESCAN_VALUES "
+						"was not specified; id: "
+						<< info.id << ", name: " << info.name << ", module: " << info.module
+						<< std::endl;
+					throw std::logic_error(msg.str());
+				}
+
+				// Update param value
+				h->checkValidParamValue(*it->second, value);
+				it->second->setValue(value);
+				it->second->setModulation(value);
+			}
+		}
+	}
+
+	// 3. Remove parameters which are gone
+	for (auto it = h->m_params.begin(); it != h->m_params.end();)
+	{
+		if (paramIds.find(it->first) == paramIds.end())
+		{
+			if (!(flags & CLAP_PARAM_RESCAN_ALL))
+			{
+				std::ostringstream msg;
+				auto &info = it->second->info();
+				msg << "a parameter was removed, but the flag CLAP_PARAM_RESCAN_ALL was not "
+					"specified; id: "
+					<< info.id << ", name: " << info.name << ", module: " << info.module << std::endl;
+				throw std::logic_error(msg.str());
+			}
+			it = h->m_params.erase(it);
+		}
+		else { ++it; }
+	}
+
+	if (flags & CLAP_PARAM_RESCAN_ALL) { h->paramsChanged(); }
 }
 
+void ClapInstance::hostExtParamsClear(const clap_host* host, clap_id param_id, clap_param_clear_flags flags)
+{
+	assert(isMainThread());
+	qDebug() << "ClapInstance::hostExtParamsClear";
+	// TODO
+}
+
+void ClapInstance::hostExtParamsRequestFlush(const clap_host* host)
+{
+	qDebug() << "ClapInstance::hostExtParamsRequestFlush";
+	auto h = fromHost(host);
+
+	if (!h->isPluginActive() && hostExtThreadCheckIsMainThread(host))
+	{
+		// Perform the flush immediately
+		h->paramFlushOnMainThread();
+		return;
+	}
+
+	h->m_scheduleParamFlush = true;
+}
+
+
+auto ClapInstance::canUsePluginParams() const noexcept -> bool
+{
+	return m_pluginExtParams && m_pluginExtParams->count && m_pluginExtParams->flush
+		&& m_pluginExtParams->get_info && m_pluginExtParams->get_value && m_pluginExtParams->text_to_value
+		&& m_pluginExtParams->value_to_text;
+}
+
+/*
 bool ClapInstance::canUsePluginGui() const noexcept
 {
 	return m_pluginGui && m_pluginGui->create && m_pluginGui->destroy && m_pluginGui->can_resize
@@ -1068,6 +1231,35 @@ bool ClapInstance::canUsePluginGui() const noexcept
 	&& m_pluginGui->suggest_title && m_pluginGui->is_api_supported;
 }
 */
+
+void ClapInstance::checkValidParamValue(const ClapParam& param, double value)
+{
+	assert(isMainThread());
+	if (!param.isValueValid(value))
+	{
+		std::ostringstream msg;
+		msg << "Invalid value for param. ";
+		param.printInfo(msg);
+		msg << "; value: " << value;
+		// std::cerr << msg.str() << std::endl;
+		throw std::invalid_argument{msg.str()};
+	}
+}
+
+auto ClapInstance::getParamValue(const clap_param_info& info) -> double
+{
+	assert(isMainThread());
+
+	if (!canUsePluginParams()) { return 0.0; }
+
+	double value;
+	if (m_pluginExtParams->get_value(m_plugin, info.id, &value)) { return value; }
+
+	std::ostringstream msg;
+	msg << "failed to get the param value, id: " << info.id << ", name: " << info.name
+		<< ", module: " << info.module;
+	throw std::logic_error{msg.str()};
+}
 
 
 } // namespace lmms

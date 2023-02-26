@@ -28,6 +28,8 @@
 #include "Effect.h"
 #include "ClapFxControls.h"
 
+#include <QTimer>
+
 namespace lmms
 {
 
@@ -49,8 +51,13 @@ public:
 	auto clapControls() const -> const ClapFxControls* { return &m_controls; }
 
 private:
+
+	void callHostIdle() { m_controls.callHostIdle(); }
+
 	ClapFxControls m_controls;
 	std::vector<sampleFrame> m_tempOutputSamples;
+
+	QTimer m_idleTimer;
 };
 
 

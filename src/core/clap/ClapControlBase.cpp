@@ -184,6 +184,13 @@ void ClapControlBase::handleMidiInputEvent(const MidiEvent& event, const TimePos
 	}
 }
 
+void ClapControlBase::callHostIdle()
+{
+	for (const auto& instance : m_instances)
+	{
+		instance->hostIdle();
+	}
+}
 
 } // namespace lmms
 
