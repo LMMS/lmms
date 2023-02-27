@@ -168,8 +168,6 @@ public slots:
 protected:
 	static const int DEFAULT_PIXELS_PER_BAR = 16;
 
-	void resizeEvent( QResizeEvent * ) override;
-
 	TimePos m_currentPosition;
 
 
