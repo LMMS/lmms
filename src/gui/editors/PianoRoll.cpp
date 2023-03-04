@@ -600,7 +600,7 @@ void PianoRoll::markSemiTone(int i, bool fromMenu)
 
 			const int first = chord->isScale() ? 0 : key;
 			const int last = chord->isScale() ? NumKeys : key + chord->last();
-			const int cap = ( chord->isScale() || chord->last() == 0 ) ? trackOctaveSize() : chord->last();
+			const int cap = (chord->isScale() || chord->last() == 0) ? trackOctaveSize() : chord->last();
 
 			for( int i = first; i <= last; i++ )
 			{
@@ -3958,7 +3958,7 @@ QList<int> PianoRoll::getAllOctavesForKey( int keyToMirror ) const
 	QList<int> keys;
 
 	int trackKeysPerOctave = trackOctaveSize();
-	for (int i=keyToMirror % trackKeysPerOctave; i < NumKeys; i += trackKeysPerOctave)
+	for (int i = keyToMirror % trackKeysPerOctave; i < NumKeys; i += trackKeysPerOctave)
 	{
 		keys.append(i);
 	}
