@@ -600,7 +600,7 @@ void PianoRoll::markSemiTone(int i, bool fromMenu)
 
 			const int first = chord->isScale() ? 0 : key;
 			const int last = chord->isScale() ? NumKeys : key + chord->last();
-			const int cap = ( chord->isScale() || chord->last() == 0 ) ? KeysPerOctave : chord->last();
+			const int cap = ( chord->isScale() || chord->last() == 0 ) ? trackOctaveSize() : chord->last();
 
 			for( int i = first; i <= last; i++ )
 			{
@@ -936,6 +936,13 @@ void PianoRoll::hideMidiClip( MidiClip* clip )
 		setCurrentMidiClip( nullptr );
 	}
 }
+
+
+int PianoRoll::trackOctaveSize() const
+{
+	return m_midiClip->instrumentTrack()->microtuner()->octaveSize();
+}
+
 
 void PianoRoll::selectRegionFromPixels( int xStart, int xEnd )
 {
@@ -3950,7 +3957,8 @@ QList<int> PianoRoll::getAllOctavesForKey( int keyToMirror ) const
 {
 	QList<int> keys;
 
-	for (int i=keyToMirror % KeysPerOctave; i < NumKeys; i += KeysPerOctave)
+	int trackKeysPerOctave = trackOctaveSize();
+	for (int i=keyToMirror % trackKeysPerOctave; i < NumKeys; i += trackKeysPerOctave)
 	{
 		keys.append(i);
 	}
