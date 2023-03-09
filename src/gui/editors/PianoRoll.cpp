@@ -940,7 +940,7 @@ void PianoRoll::hideMidiClip( MidiClip* clip )
 
 int PianoRoll::trackOctaveSize() const
 {
-	return m_midiClip->instrumentTrack()->microtuner()->octaveSize();
+	return m_midiClip->instrumentTrack()->microtuner()->enabled() ? m_midiClip->instrumentTrack()->microtuner()->octaveSize() : KeysPerOctave;
 }
 
 
