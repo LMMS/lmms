@@ -273,9 +273,11 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	for( int i = 0; x + i * m_ppb < width(); ++i )
 	{
 		++barNumber;
+		// round m_ppb to the nearest power of two
+		float ppbP2 = pow(2, round(log2(m_ppb)));
 		if( ( barNumber - 1 ) %
 			qMax( 1, qRound( 1.0f / 3.0f *
-				TimePos::ticksPerBar() / m_ppb ) ) == 0 )
+				TimePos::ticksPerBar() / ppbP2 ) ) == 0 )
 		{
 			const int cx = x + qRound( i * m_ppb );
 			p.setPen( barLineColor );
