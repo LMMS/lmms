@@ -425,7 +425,7 @@ lmms--gui--AutomatableSlider::groove:horizontal {
 	border: 1px inset rgba(100,100,100, 64);
 	border-radius: 2px;
 	height: 2px;
-	margin: 2px 2px;
+	margin: 2px;
 }
 
 lmms--gui--AutomatableSlider::handle:horizontal {
@@ -434,7 +434,7 @@ lmms--gui--AutomatableSlider::handle:horizontal {
 	width: 10px;
 	height: 26px;
 	border-radius: 2px;
-	margin: -12px -2px -12px;
+	margin: -12px -2px;
 }
 
 /* about dialog */
