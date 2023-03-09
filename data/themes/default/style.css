@@ -443,6 +443,25 @@ lmms--gui--AutomatableSlider::handle:vertical {
 	margin: -4px -12px -2px;
 }
 
+/* main horizontal sliders (zoom) */
+
+lmms--gui--AutomatableSlider::groove:horizontal {
+	background: #040506;
+	border: none;
+	border-radius: 2px;
+	height: 2px;
+	margin: 2px 2px;
+}
+
+lmms--gui--AutomatableSlider::handle:horizontal {
+	background: none;
+	border-image: url(resources:horizontal_slider.png);
+	width: 10px;
+	height: 26px;
+	border-radius: 2px;
+	margin: -12px -2px -12px;
+}
+
 /* window that shows up when you add effects */
 
 lmms--gui--EffectSelectDialog QScrollArea {
