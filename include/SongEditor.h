@@ -26,6 +26,7 @@
 #ifndef LMMS_GUI_SONG_EDITOR_H
 #define LMMS_GUI_SONG_EDITOR_H
 
+#include "AutomatableModel.h"
 #include "Editor.h"
 #include "TrackContainerView.h"
 
@@ -69,7 +70,7 @@ public:
 	void saveSettings( QDomDocument& doc, QDomElement& element ) override;
 	void loadSettings( const QDomElement& element ) override;
 
-	ComboBoxModel *zoomingModel() const;
+	IntModel * zoomingModel() const;
 	ComboBoxModel *snappingModel() const;
 	float getSnapSize() const;
 	QString getSnapSizeString() const;
@@ -123,6 +124,8 @@ private:
 	int trackIndexFromSelectionPoint(int yPos);
 	int indexOfTrackView(const TrackView* tv);
 
+	bool zoomingFloatVisible;
+	TextFloat * m_zvsStatus;
 
 	Song * m_song;
 
@@ -141,11 +144,9 @@ private:
 
 	PositionLine * m_positionLine;
 
-	ComboBoxModel* m_zoomingModel;
+	IntModel * m_zoomingModel;
 	ComboBoxModel* m_snappingModel;
 	bool m_proportionalSnap;
-
-	static const QVector<float> m_zoomLevels;
 
 	bool m_scrollBack;
 	bool m_smoothScroll;
@@ -161,6 +162,7 @@ private:
 	int m_currentZoomingValue;
 	int m_trackHeadWidth;
 	bool m_selectRegion;
+	int m_iniBar;
 
 	friend class SongEditorWindow;
 
@@ -197,6 +199,13 @@ protected slots:
 
 	void updateSnapLabel();
 
+	void showZoomingSliderFloat();
+	void updateZoomingSliderFloat(int new_val);
+	void hideZoomingSliderFloat();
+
+	void keyPressEvent(QKeyEvent* ke) override;
+	void keyReleaseEvent(QKeyEvent* ke) override;
+
 signals:
 	void playTriggered();
 	void resized();
@@ -213,12 +222,14 @@ private:
 	QAction* m_selectModeAction;
 	QAction* m_crtlAction;
 
-	ComboBox * m_zoomingComboBox;
+	AutomatableSlider * m_zoomingSlider;
 	ComboBox * m_snappingComboBox;
 	QLabel* m_snapSizeLabel;
 
 	QAction* m_insertBarAction;
 	QAction* m_removeBarAction;
+
+	TextFloat * m_zvsStatus;
 };
 
 
