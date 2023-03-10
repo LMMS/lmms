@@ -592,7 +592,7 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		// update slider with new zooming value
 		m_zoomingModel->setValue(z);
 
-		m_zvsStatus->move(QPoint(we->globalPosition().x() + 6, we->globalPosition().y()));
+		m_zvsStatus->move(QPoint(we->globalPos().x() + 6, we->globalPos().y()));
 		m_zvsStatus->show();
 		m_zvsStatus->setText(tr("Value: %1 \%").arg(m_zoomingModel->value()));
 
