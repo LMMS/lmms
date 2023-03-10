@@ -545,7 +545,7 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		int z = m_zoomingModel->value();
 		unsigned pos = 0;
 
-		// if Control && Shitf Modifiers, use predefinedZoom values
+		// if Control && Shift Modifiers, use predefinedZoom values
 		if (we->modifiers() & Qt::ShiftModifier)
 		{
 			int i = 1;
