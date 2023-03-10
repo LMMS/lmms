@@ -573,7 +573,7 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 				: z = static_cast<int>(floor((ceil(z / 100.0f * DEFAULT_PIXELS_PER_BAR) - 1) * 100.0f / DEFAULT_PIXELS_PER_BAR));
 		}
 		
-		z = qBound(ZOOM_MIN, z, ZOOM_MAX);
+		z = std::clamp(z, ZOOM_MIN, ZOOM_MAX);
 
 		int x = (position(we).x() - m_trackHeadWidth > 0) 
 			? position(we).x() - m_trackHeadWidth 
