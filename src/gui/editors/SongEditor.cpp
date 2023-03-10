@@ -562,9 +562,9 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 
 		if(we->angleDelta().y() > 0)
 		{
-			(we->modifiers() & Qt::ShiftModifier)
-				? z = PredefinedZoom[(pos < (PredefinedZoom.size() - 1)) ? pos + 1 : pos]
-				: z = static_cast<int>(ceil((floor(z / 100.0f * DEFAULT_PIXELS_PER_BAR) + 1) * 100.0f / DEFAULT_PIXELS_PER_BAR));
+			z = (we->modifiers() & Qt::ShiftModifier)
+				? PredefinedZoom[std::min(pos + 1, PredefinedZoom.size() - 1)]
+				: static_cast<int>(std::ceil((std::floor(z / 100.0f * DEFAULT_PIXELS_PER_BAR) + 1) * 100.0f / DEFAULT_PIXELS_PER_BAR));
 		}
 		else if(we->angleDelta().y() < 0)
 		{
