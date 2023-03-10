@@ -543,7 +543,7 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 	if( we->modifiers() & Qt::ControlModifier )
 	{
 		int z = m_zoomingModel->value();
-		unsigned pos = 0;
+		int pos = 0;
 
 		// if Control && Shift Modifiers, use predefinedZoom values
 		if (we->modifiers() & Qt::ShiftModifier)
@@ -563,7 +563,7 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		if(we->angleDelta().y() > 0)
 		{
 			z = (we->modifiers() & Qt::ShiftModifier)
-				? PredefinedZoom[std::min(pos + 1, PredefinedZoom.size() - 1)]
+				? PredefinedZoom[std::min(pos + 1, static_cast<int>(PredefinedZoom.size() - 1))]
 				: static_cast<int>(std::ceil((std::floor(z / 100.0f * DEFAULT_PIXELS_PER_BAR) + 1) * 100.0f / DEFAULT_PIXELS_PER_BAR));
 		}
 		else if(we->angleDelta().y() < 0)
