@@ -577,7 +577,7 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 
 		int x = (position(we).x() - m_trackHeadWidth > 0) 
 			? position(we).x() - m_trackHeadWidth 
-			: m_trackHeadWidth + 1 ;
+			: m_trackHeadWidth + 1;
 		// save the pixels up to the cursor next bar when starting zooming
 		if (!m_zvsStatus->isVisible()) { m_iniBar = static_cast<int>(x / pixelsPerBar()); }
 
