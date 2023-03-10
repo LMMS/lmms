@@ -61,9 +61,11 @@
 namespace lmms::gui
 {
 
-const int ZOOM_MIN = 13;
-const int ZOOM_MAX = 1600;
-const int ZOOM_INI = 100;
+namespace
+{
+constexpr int ZOOM_MIN = 13;
+constexpr int ZOOM_MAX = 1600;
+constexpr int ZOOM_INI = 100;
 
 // predefined zoom values used for Shift+Ctrl+mouseWheel
 const std::vector<int> PredefinedZoom = {13, 20, 30, 40, 50, 60, 80, 100, 150, 200, 300, 400, 600, 800, 1000, 1200, 1400, 1600};
