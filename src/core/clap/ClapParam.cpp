@@ -28,11 +28,57 @@
 
 #include "ClapInstance.h"
 
+#include <cmath>
+
+#include <QString>
+#include <QDebug>
+
 namespace lmms
 {
 
 ClapParam::ClapParam(ClapInstance* pluginHost, const clap_param_info& info, double value)
-	: QObject{pluginHost}, m_info{info}, m_value{value} {}
+	: QObject{pluginHost}, m_info{info}, m_value{value}
+{
+	qDebug() << "ClapParam::ClapParam";
+	const auto flags = m_info.flags;
+
+	// If the user cannot control this param, no AutomatableModel is needed
+	if (flags & CLAP_PARAM_IS_HIDDEN
+		|| flags & CLAP_PARAM_IS_READONLY
+		|| flags & CLAP_PARAM_IS_BYPASS /* TODO */) { return; }
+
+	// TODO: CLAP_PARAM_IS_BYPASS
+	if (flags & CLAP_PARAM_IS_STEPPED)
+	{
+		qDebug() << "PARAMS: Creating IntModel";
+		m_valueType = ParamType::Integer;
+		m_connectedModel = std::make_unique<IntModel>(
+			static_cast<int>(m_info.default_value),
+			static_cast<int>(m_info.min_value),
+			static_cast<int>(m_info.max_value),
+			pluginHost, QString::fromUtf8(m_info.name));
+	}
+	else
+	{
+		qDebug() << "PARAMS: Creating FloatModel";
+		m_valueType = ParamType::Float;
+
+		// allow ~1000 steps
+		double stepSize = (m_info.max_value - m_info.min_value) / 1000.0f;
+
+		// make multiples of 0.01 (or 0.1 for larger values)
+		const double minStep = (stepSize >= 1.0) ? 0.1 : 0.01;
+		stepSize -= std::fmod(stepSize, minStep);
+		stepSize = std::max(stepSize, minStep);
+
+		m_connectedModel = std::make_unique<FloatModel>(
+			static_cast<float>(m_info.default_value),
+			static_cast<float>(m_info.min_value),
+			static_cast<float>(m_info.max_value),
+			static_cast<float>(stepSize),
+			pluginHost, QString::fromUtf8(m_info.name));
+	}
+}
 
 void ClapParam::setValue(double v)
 {

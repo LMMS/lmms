@@ -163,6 +163,7 @@ public:
 	auto getHost() const -> const clap_host* { return &m_host; }
 	auto getPlugin() const -> const clap_plugin* { return m_plugin; }
 	auto getInfo() const -> const ClapPluginInfo& { return *m_pluginInfo; }
+	auto getParams() const -> const std::vector<ClapParam*>& { return m_params; }
 
 	/////////////////////////////////////////
 	// Host
@@ -300,7 +301,7 @@ private:
 		AudioBuffer(const AudioBuffer&) = delete;
 		AudioBuffer& operator=(const AudioBuffer&) = delete;
 
-		AudioBuffer(AudioBuffer&& other) :
+		AudioBuffer(AudioBuffer&& other) noexcept :
 			m_channels(std::exchange(other.m_channels, 0)),
 			m_frames(std::exchange(other.m_frames, 0)),
 			m_data(std::exchange(other.m_data, nullptr))
@@ -329,22 +330,14 @@ private:
 
 	private:
 
-		void free()
+		void free() noexcept
 		{
 			if (!m_data) { return; }
 			for (uint32_t channel = 0; channel < m_channels; ++channel)
 			{
-				if (m_data[channel])
-				{
-					delete[] m_data[channel];
-					m_data[channel] = nullptr;
-				}
+				if (m_data[channel]) { delete[] m_data[channel]; }
 			}
-			if (m_data)
-			{
-				delete[] m_data;
-				m_data = nullptr;
-			}
+			delete[] m_data;
 		}
 
 		uint32_t m_channels;

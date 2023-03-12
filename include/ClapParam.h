@@ -29,9 +29,13 @@
 
 #ifdef LMMS_HAVE_CLAP
 
+#include "AutomatableModel.h"
+
+#include <string>
 #include <ostream>
 #include <unordered_map>
 #include <algorithm>
+#include <memory>
 
 #include <QObject>
 
@@ -46,7 +50,19 @@ class ClapParam : public QObject
 	Q_OBJECT;
 
 public:
+
+	enum class ParamType
+	{
+		Undefined,
+		Integer,
+		Float
+	};
+
 	ClapParam(ClapInstance* pluginHost, const clap_param_info& info, double value);
+
+	auto model() const -> AutomatableModel* { return m_connectedModel.get(); }
+	auto valueType() const -> ParamType { return m_valueType; }
+	auto getId() const -> std::string { return std::to_string(m_info.id); }
 
 	auto value() const -> double { return m_value; }
 	void setValue(double v);
@@ -101,6 +117,11 @@ private:
 	double m_value = 0.0;
 	double m_modulation = 0.0;
 	std::unordered_map<int64_t, std::string> m_enumEntries;
+
+	//! An AutomatableModel is created if the param is to be shown to the user
+	std::unique_ptr<AutomatableModel> m_connectedModel;
+
+	ParamType m_valueType = ParamType::Undefined;
 };
 
 } // namespace lmms

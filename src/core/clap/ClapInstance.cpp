@@ -492,9 +492,26 @@ auto ClapInstance::pluginInit() -> bool
 		return false;
 	}
 
-	// TODO: Then, need to scan params and quick controls:
+	// Now initialize params and add param models
 
-	hostExtParamsRescan(&m_host, CLAP_PARAM_RESCAN_ALL);
+	if (pluginExtensionInit(m_pluginExtParams, CLAP_EXT_PARAMS))
+	{
+		hostExtParamsRescan(&m_host, CLAP_PARAM_RESCAN_ALL);
+		qDebug() << "PARAMS: m_params.size():" << m_params.size();
+		for (auto param : m_params)
+		{
+			if (param && param->model())
+			{
+				const auto uri = QString::fromStdString(param->getId());
+				addModel(param->model(), uri);
+			}
+		}
+	}
+	else
+	{
+		qWarning() << "The params extension is not supported by the CLAP plugin";
+	}
+
 	//scanQuickControls();
 
 	setPluginState(PluginState::Inactive);
@@ -1054,11 +1071,11 @@ void ClapInstance::hostExtParamsRescan(const clap_host* host, uint32_t flags)
 	if (h->isPluginActive() && (flags & CLAP_PARAM_RESCAN_ALL))
 	{
 		throw std::logic_error{"clap_host_params.recan(CLAP_PARAM_RESCAN_ALL) was called while the plugin is active!"};
-		return;
 	}
 
 	// 2. Scan the params
 	auto count = h->m_pluginExtParams->count(h->m_plugin);
+	qDebug() << "PARAMS: count:" << count;
 	std::unordered_set<clap_id> paramIds(count * 2);
 	bool needToUpdateParamsCache = false;
 

@@ -1,5 +1,5 @@
 /*
- * ClapViewBase.cpp - base class for CLAP plugin views
+ * ClapViewBase.cpp - Base class for CLAP plugin views
  *
  * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -41,7 +41,7 @@
 #include "ClapControlBase.h"
 #include "ClapManager.h"
 #include "ClapInstance.h"
-//#include "ClapPorts.h"
+#include "ClapParam.h"
 #include "MainWindow.h"
 #include "SubWindow.h"
 
@@ -122,7 +122,36 @@ ClapViewInstance::ClapViewInstance(QWidget* parent, ClapInstance* ctrlBase, int 
 			}
 		});
 
-		*/
+	*/
+
+	for (auto param : ctrlBase->getParams())
+	{
+		if (!param || !param->model()) { continue; }
+
+		Control* control = nullptr;
+
+		switch (param->valueType())
+		{
+		case ClapParam::ParamType::Integer:
+			// TODO: What if more digits are needed? Lv2 uses KnobControl in this case.
+			control = new LcdControl{ param->info().max_value <= 9.0 ? 1 : 2, this};
+			break;
+		case ClapParam::ParamType::Float:
+			control = new KnobControl{this};
+			break;
+		default:
+			throw std::runtime_error{"Invalid CLAP param value type"};
+		}
+
+		if (!control) { continue; }
+
+		control->setText(QString::fromUtf8(param->info().module));
+
+		// TODO: control->topWidget()->setToolTip(...)
+
+		addControl(control, param->getId(), param->info().name, false);
+	}
+
 }
 
 /*
@@ -206,17 +235,16 @@ void ClapViewBase::toggleUI()
 
 void ClapViewBase::toggleHelp(bool visible)
 {
-	if (m_helpWindow)
+	if (!m_helpWindow) { return; }
+
+	if (visible)
 	{
-		if (visible)
-		{
-			m_helpWindow->show();
-			m_helpWindow->raise();
-		}
-		else
-		{
-			m_helpWindow->hide();
-		}
+		m_helpWindow->show();
+		m_helpWindow->raise();
+	}
+	else
+	{
+		m_helpWindow->hide();
 	}
 }
 
