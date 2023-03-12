@@ -100,6 +100,9 @@ protected:
 	//! Must be checked after ctor or reload
 	auto isValid() const -> bool { return m_valid; }
 
+	//! TODO: not implemented
+	void reload();
+
 	/*
 		overrides
 	*/
@@ -128,8 +131,6 @@ protected:
 	void saveSettings(QDomDocument& doc, QDomElement& that);
 	void loadSettings(const QDomElement& that);
 	void loadFile(const QString& file);
-	//! TODO: not implemented
-	void reloadPlugin();
 
 	/*
 		more functions that must be called from virtuals

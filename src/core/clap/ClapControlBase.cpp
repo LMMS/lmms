@@ -155,9 +155,10 @@ void ClapControlBase::loadFile([[maybe_unused]] const QString& file)
 	// TODO: load preset using clap_plugin_preset_load if supported by plugin
 }
 
-void ClapControlBase::reloadPlugin()
+void ClapControlBase::reload()
 {
 	// TODO
+	throw std::runtime_error{"ClapControlBase::reload() not impl yet"};
 }
 
 auto ClapControlBase::controlCount() const -> std::size_t

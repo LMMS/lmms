@@ -43,8 +43,11 @@ class ClapFxControlDialog;
 class ClapFxControls : public EffectControls, public ClapControlBase
 {
 	Q_OBJECT
+signals:
+	void modelChanged();
 public:
 	ClapFxControls(ClapEffect* effect, const QString& uri);
+	void reload();
 
 	void saveSettings(QDomDocument& _doc, QDomElement& _parent) override;
 	void loadSettings(const QDomElement& that) override;

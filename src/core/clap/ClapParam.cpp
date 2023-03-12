@@ -63,10 +63,10 @@ ClapParam::ClapParam(ClapInstance* pluginHost, const clap_param_info& info, doub
 		qDebug() << "PARAMS: Creating FloatModel";
 		m_valueType = ParamType::Float;
 
-		// allow ~1000 steps
+		// Allow ~1000 steps
 		double stepSize = (m_info.max_value - m_info.min_value) / 1000.0f;
 
-		// make multiples of 0.01 (or 0.1 for larger values)
+		// Make multiples of 0.01 (or 0.1 for larger values)
 		const double minStep = (stepSize >= 1.0) ? 0.1 : 0.01;
 		stepSize -= std::fmod(stepSize, minStep);
 		stepSize = std::max(stepSize, minStep);

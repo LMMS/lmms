@@ -34,14 +34,20 @@ namespace lmms
 {
 
 
-ClapFxControls::ClapFxControls(ClapEffect* effect, const QString& uri) :
-	EffectControls(effect), ClapControlBase(this, uri)
+ClapFxControls::ClapFxControls(ClapEffect* effect, const QString& uri)
+	: EffectControls(effect), ClapControlBase(this, uri)
 {
 	if (isValid())
 	{
 		connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged,
-			this, [this](){ ClapControlBase::reloadPlugin(); });
+			this, [this](){ ClapControlBase::reload(); });
 	}
+}
+
+void ClapFxControls::reload()
+{
+	ClapControlBase::reload();
+	emit modelChanged();
 }
 
 void ClapFxControls::saveSettings(QDomDocument& doc, QDomElement& that)

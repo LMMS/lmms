@@ -45,7 +45,7 @@ public:
 
 private:
 	ClapFxControls* clapControls();
-	void modelChanged() override;
+	void modelChanged() final;
 };
 
 

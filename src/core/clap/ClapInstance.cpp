@@ -144,7 +144,10 @@ void ClapInstance::copyModelsFromCore()
 	/*
 	for (auto param : m_params)
 	{
-		// TODO
+		if (!param || !param->model()) { continue; }
+
+		// ERROR: Cannot do this on the audio thread - doing in main thread instead
+		setParamValueByHost(*param, param->model()->value<float>());
 	}
 	*/
 }
@@ -504,6 +507,16 @@ auto ClapInstance::pluginInit() -> bool
 			{
 				const auto uri = QString::fromStdString(param->getId());
 				addModel(param->model(), uri);
+
+				// Tell plugin when param value changes in host
+				auto updateParam = [this, param]() {
+					setParamValueByHost(*param, param->model()->value<float>());
+				};
+
+				connect(param->model(), &Model::dataChanged, this, updateParam);
+
+				// Initially assign model value to param value
+				updateParam();
 			}
 		}
 	}

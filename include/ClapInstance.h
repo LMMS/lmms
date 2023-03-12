@@ -204,7 +204,7 @@ public:
 
 signals:
 
-	void paramsChanged();
+	void paramsChanged(); //!< Called when CLAP plugin changes params and LMMS core needs to update
 	//void quickControlsPagesChanged();
 	//void quickControlsSelectedPageChanged();
 	void paramAdjusted(clap_id paramId);

@@ -38,7 +38,7 @@ ClapFxControlDialog::ClapFxControlDialog(ClapFxControls* controls)
 	if (m_reloadPluginButton)
 	{
 		connect(m_reloadPluginButton, &QPushButton::clicked,
-			this, [this](){ clapControls()->reloadPlugin(); });
+			this, [this](){ clapControls()->reload(); });
 	}
 
 	if (m_toggleUIButton)
@@ -66,6 +66,8 @@ auto ClapFxControlDialog::clapControls() -> ClapFxControls*
 void ClapFxControlDialog::modelChanged()
 {
 	ClapViewBase::modelChanged(clapControls());
+	connect(clapControls(), &ClapFxControls::modelChanged,
+		this, [this](){ this->modelChanged();} );
 }
 
 
