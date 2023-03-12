@@ -222,7 +222,7 @@ private:
 	static void hostRequestProcess(const clap_host* host);
 	static void hostRequestRestart(const clap_host* host);
 	static void hostExtStateMarkDirty(const clap_host* host);
-	static void hostExtLogLog(const clap_host_t* host, clap_log_severity severity, const char* msg);
+	static void hostExtLogLog([[maybe_unused]] const clap_host_t* host, clap_log_severity severity, const char* msg);
 	static auto hostExtThreadCheckIsMainThread(const clap_host_t* host) -> bool;
 	static auto hostExtThreadCheckIsAudioThread(const clap_host_t* host) -> bool;
 	static void hostExtParamsRescan(const clap_host* host, uint32_t flags);
@@ -233,7 +233,8 @@ private:
 	//bool canUsePluginGui() const noexcept;
 	//static const char* getCurrentClapGuiApi();
 
-	void scanParams() { hostExtParamsRescan(&m_host, CLAP_PARAM_RESCAN_ALL); }
+	void setParamValueByHost(ClapParam& param, double value);
+	void setParamModulationByHost(ClapParam& param, double value);
 	void checkValidParamValue(const ClapParam& param, double value);
 	auto getParamValue(const clap_param_info& info) -> double;
 	static auto clapParamsRescanMayValueChange(uint32_t flags) -> bool { return flags & (CLAP_PARAM_RESCAN_ALL | CLAP_PARAM_RESCAN_VALUES); }
@@ -360,7 +361,8 @@ private:
 	/**
 	 * Parameter update queues
 	*/
-	std::unordered_map<clap_id, std::unique_ptr<ClapParam>> m_params;
+	std::unordered_map<clap_id, std::unique_ptr<ClapParam>> m_paramMap;
+	std::vector<ClapParam*> m_params; //!< Cache for faster iteration
 
 	struct AppToEngineParamQueueValue
 	{

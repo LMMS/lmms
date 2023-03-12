@@ -31,6 +31,7 @@
 
 #include <ostream>
 #include <unordered_map>
+#include <algorithm>
 
 #include <QObject>
 
@@ -55,7 +56,7 @@ public:
 
 	auto modulatedValue() const -> double
 	{
-		return std::min(m_info.max_value, std::max(m_info.min_value, m_value + m_modulation));
+		return std::clamp(m_value + m_modulation, m_info.min_value, m_info.max_value);
 	}
 
 	auto isValueValid(const double v) const -> bool;
@@ -97,8 +98,8 @@ signals:
 private:
 	bool m_isBeingAdjusted = false;
 	clap_param_info m_info;
-	double m_value = 0;
-	double m_modulation = 0;
+	double m_value = 0.0;
+	double m_modulation = 0.0;
 	std::unordered_map<int64_t, std::string> m_enumEntries;
 };
 

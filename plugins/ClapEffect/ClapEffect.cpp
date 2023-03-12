@@ -70,8 +70,6 @@ bool ClapEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	if (!isEnabled() || !isRunning()) { return false; }
 	Q_ASSERT(frames <= static_cast<fpp_t>(m_tempOutputSamples.size()));
 
-	// TODO
-
 	m_controls.copyBuffersFromLmms(buf, frames);
 	m_controls.copyModelsFromLmms();
 
@@ -86,7 +84,7 @@ bool ClapEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	bool corrupt = wetLevel() < 0.f; // #3261 - if w < 0, bash w := 0, d := 1
 	const float d = corrupt ? 1.f : dryLevel();
 	const float w = corrupt ? 0.f : wetLevel();
-	for(fpp_t f = 0; f < frames; ++f)
+	for (fpp_t f = 0; f < frames; ++f)
 	{
 		buf[f][0] = d * buf[f][0] + w * m_tempOutputSamples[f][0];
 		buf[f][1] = d * buf[f][1] + w * m_tempOutputSamples[f][1];

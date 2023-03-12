@@ -50,7 +50,7 @@ void ClapParam::setModulation(double v)
 
 auto ClapParam::isValueValid(const double v) const -> bool
 {
-   return m_info.min_value <= v && v <= m_info.max_value;
+	return m_info.min_value <= v && v <= m_info.max_value;
 }
 
 void ClapParam::printShortInfo(std::ostream& os) const
