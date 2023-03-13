@@ -42,21 +42,40 @@ ClapParam::ClapParam(ClapInstance* pluginHost, const clap_param_info& info, doub
 	qDebug() << "ClapParam::ClapParam";
 	const auto flags = m_info.flags;
 
+	m_id = "p" + std::to_string(m_info.id);
+	m_displayName = m_info.name;
+
+	qDebug().nospace() << "--id:" << info.id << "; name:'" << info.name << "'; module:'" << info.module << "'; flags:" << info.flags;
+
 	// If the user cannot control this param, no AutomatableModel is needed
 	if (flags & CLAP_PARAM_IS_HIDDEN
 		|| flags & CLAP_PARAM_IS_READONLY
 		|| flags & CLAP_PARAM_IS_BYPASS /* TODO */) { return; }
 
+	auto displayName = QString::fromUtf8(getDisplayName().data());
+
 	// TODO: CLAP_PARAM_IS_BYPASS
 	if (flags & CLAP_PARAM_IS_STEPPED)
 	{
-		qDebug() << "PARAMS: Creating IntModel";
-		m_valueType = ParamType::Integer;
-		m_connectedModel = std::make_unique<IntModel>(
-			static_cast<int>(m_info.default_value),
-			static_cast<int>(m_info.min_value),
-			static_cast<int>(m_info.max_value),
-			pluginHost, QString::fromUtf8(m_info.name));
+		const auto minVal = static_cast<int>(m_info.min_value);
+		const auto maxVal = static_cast<int>(m_info.max_value);
+
+		if (minVal == 0 && maxVal == 1)
+		{
+			qDebug() << "PARAMS: Creating BoolModel";
+			m_valueType = ParamType::Bool;
+			m_connectedModel = std::make_unique<BoolModel>(
+				static_cast<int>(m_info.default_value),
+				pluginHost, displayName);
+		}
+		else
+		{
+			qDebug() << "PARAMS: Creating IntModel";
+			m_valueType = ParamType::Integer;
+			m_connectedModel = std::make_unique<IntModel>(
+				static_cast<int>(m_info.default_value),
+				minVal, maxVal, pluginHost, displayName);
+		}
 	}
 	else
 	{
@@ -76,8 +95,19 @@ ClapParam::ClapParam(ClapInstance* pluginHost, const clap_param_info& info, doub
 			static_cast<float>(m_info.min_value),
 			static_cast<float>(m_info.max_value),
 			static_cast<float>(stepSize),
-			pluginHost, QString::fromUtf8(m_info.name));
+			pluginHost, displayName);
 	}
+}
+
+auto ClapParam::getValueText(const clap_plugin* plugin, const clap_plugin_params* params, clap_id paramId, double value) -> std::string
+{
+	constexpr uint32_t bufferSize = 256;
+	std::string buffer((std::size_t)bufferSize, '\0');
+	if (!params->value_to_text(plugin, paramId, value, &buffer[0], bufferSize))
+	{
+		return std::to_string(value);
+	}
+	return buffer;
 }
 
 void ClapParam::setValue(double v)

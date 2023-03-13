@@ -196,6 +196,7 @@ public:
 	void paramFlushOnMainThread();
 	void handlePluginOutputEvents();
 	void generatePluginInputEvents();
+	auto getParamValueText(clap_id paramId, double value) const -> std::string;
 
 	auto isPluginActive() const -> bool;
 	auto isPluginProcessing() const -> bool;
@@ -237,7 +238,7 @@ private:
 	void setParamValueByHost(ClapParam& param, double value);
 	void setParamModulationByHost(ClapParam& param, double value);
 	void checkValidParamValue(const ClapParam& param, double value);
-	auto getParamValue(const clap_param_info& info) -> double;
+	auto getParamValue(const clap_param_info& info) const -> double;
 	static auto clapParamsRescanMayValueChange(uint32_t flags) -> bool { return flags & (CLAP_PARAM_RESCAN_ALL | CLAP_PARAM_RESCAN_VALUES); }
 	static auto clapParamsRescanMayInfoChange(uint32_t flags) -> bool { return flags & (CLAP_PARAM_RESCAN_ALL | CLAP_PARAM_RESCAN_INFO); }
 

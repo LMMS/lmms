@@ -505,7 +505,7 @@ auto ClapInstance::pluginInit() -> bool
 		{
 			if (param && param->model())
 			{
-				const auto uri = QString::fromStdString(param->getId());
+				const auto uri = QString::fromUtf8(param->getId().data());
 				addModel(param->model(), uri);
 
 				// Tell plugin when param value changes in host
@@ -1234,7 +1234,7 @@ void ClapInstance::hostExtParamsClear(const clap_host* host, clap_id param_id, c
 
 void ClapInstance::hostExtParamsRequestFlush(const clap_host* host)
 {
-	qDebug() << "ClapInstance::hostExtParamsRequestFlush";
+	//qDebug() << "ClapInstance::hostExtParamsRequestFlush";
 	auto h = fromHost(host);
 
 	if (!h->isPluginActive() && hostExtThreadCheckIsMainThread(host))
@@ -1300,7 +1300,7 @@ void ClapInstance::checkValidParamValue(const ClapParam& param, double value)
 	}
 }
 
-auto ClapInstance::getParamValue(const clap_param_info& info) -> double
+auto ClapInstance::getParamValue(const clap_param_info& info) const -> double
 {
 	assert(isMainThread());
 
@@ -1313,6 +1313,11 @@ auto ClapInstance::getParamValue(const clap_param_info& info) -> double
 	msg << "failed to get the param value, id: " << info.id << ", name: " << info.name
 		<< ", module: " << info.module;
 	throw std::logic_error{msg.str()};
+}
+
+auto ClapInstance::getParamValueText(clap_id paramId, double value) const -> std::string
+{
+	return ClapParam::getValueText(m_plugin, m_pluginExtParams, paramId, value);
 }
 
 

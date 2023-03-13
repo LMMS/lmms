@@ -50,8 +50,8 @@ namespace lmms::gui
 {
 
 
-ClapViewInstance::ClapViewInstance(QWidget* parent, ClapInstance* ctrlBase, int colNum)
-	: LinkedModelGroupView(parent, ctrlBase, colNum)
+ClapViewInstance::ClapViewInstance(QWidget* parent, ClapInstance* instance, int colNum)
+	: LinkedModelGroupView(parent, instance, colNum)
 {
 	/*
 	class SetupWidget : public ClapPorts::ConstVisitor
@@ -100,7 +100,7 @@ ClapViewInstance::ClapViewInstance(QWidget* parent, ClapInstance* ctrlBase, int 
 	};
 
 	AutoLilvNode commentUri = uri(LILV_NS_RDFS "comment");
-	ctrlBase->foreach_port(
+	instance->foreach_port(
 		[this, &commentUri](const Lv2Ports::PortBase* port)
 		{
 			if(!lilv_port_has_property(port->m_plugin, port->m_port,
@@ -124,7 +124,7 @@ ClapViewInstance::ClapViewInstance(QWidget* parent, ClapInstance* ctrlBase, int 
 
 	*/
 
-	for (auto param : ctrlBase->getParams())
+	for (auto param : instance->getParams())
 	{
 		if (!param || !param->model()) { continue; }
 
@@ -132,24 +132,32 @@ ClapViewInstance::ClapViewInstance(QWidget* parent, ClapInstance* ctrlBase, int 
 
 		switch (param->valueType())
 		{
+		case ClapParam::ParamType::Bool:
+			control = new CheckControl{this};
+			break;
 		case ClapParam::ParamType::Integer:
 			// TODO: What if more digits are needed? Lv2 uses KnobControl in this case.
-			control = new LcdControl{ param->info().max_value <= 9.0 ? 1 : 2, this};
+			control = new LcdControl{(param->info().max_value <= 9.0) ? 1 : 2, this};
 			break;
 		case ClapParam::ParamType::Float:
 			control = new KnobControl{this};
 			break;
 		default:
 			throw std::runtime_error{"Invalid CLAP param value type"};
+			// TODO: Use ComboControl for params with enum-like values? Use clap_plugin_params::value_to_text
 		}
 
 		if (!control) { continue; }
 
-		control->setText(QString::fromUtf8(param->info().module));
+		// This is the param name seen in the GUI
+		control->setText(QString::fromUtf8(param->getDisplayName().data()));
 
-		// TODO: control->topWidget()->setToolTip(...)
+		if (param->info().module[0] != '\0')
+		{
+			control->topWidget()->setToolTip(QString::fromUtf8(param->info().module));
+		}
 
-		addControl(control, param->getId(), param->info().name, false);
+		addControl(control, param->getId().data(), param->getDisplayName().data(), false);
 	}
 
 }

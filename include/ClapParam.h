@@ -32,6 +32,7 @@
 #include "AutomatableModel.h"
 
 #include <string>
+#include <string_view>
 #include <ostream>
 #include <unordered_map>
 #include <algorithm>
@@ -54,6 +55,7 @@ public:
 	enum class ParamType
 	{
 		Undefined,
+		Bool,
 		Integer,
 		Float
 	};
@@ -62,7 +64,10 @@ public:
 
 	auto model() const -> AutomatableModel* { return m_connectedModel.get(); }
 	auto valueType() const -> ParamType { return m_valueType; }
-	auto getId() const -> std::string { return std::to_string(m_info.id); }
+	auto getId() const -> std::string_view { return m_id; }
+	auto getDisplayName() const -> std::string_view { return m_displayName; }
+
+	static auto getValueText(const clap_plugin* plugin, const clap_plugin_params* params, clap_id paramId, double value) -> std::string;
 
 	auto value() const -> double { return m_value; }
 	void setValue(double v);
@@ -122,6 +127,9 @@ private:
 	std::unique_ptr<AutomatableModel> m_connectedModel;
 
 	ParamType m_valueType = ParamType::Undefined;
+
+	std::string m_id;
+	std::string m_displayName;
 };
 
 } // namespace lmms
