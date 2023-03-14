@@ -202,7 +202,7 @@ void OrganicInstrument::loadSettings( const QDomElement & _this )
 		m_osc[i]->m_panModel.loadSettings( _this, "pan" + is );
 		m_osc[i]->m_oscModel.loadSettings( _this, "wavetype" + is );
 
-		if( _this.hasAttribute( "newharmonic" + is ) )
+		if (_this.hasAttribute("newharmonic" + is) || !(_this.firstChildElement("newharmonic" + is).isNull()))
 		{
 			m_osc[i]->m_harmModel.loadSettings( _this, "newharmonic" + is );
 		}
