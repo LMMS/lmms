@@ -266,7 +266,7 @@ void AudioFileProcessor::loadSettings( const QDomElement & _this )
 	m_reverseModel.loadSettings( _this, "reversed" );
 
 	m_stutterModel.loadSettings( _this, "stutter" );
-	if( _this.hasAttribute( "interp" ) )
+	if (_this.hasAttribute("interp") || !(_this.firstChildElement("interp").isNull()))
 	{
 		m_interpolationModel.loadSettings( _this, "interp" );
 	}
