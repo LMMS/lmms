@@ -28,12 +28,8 @@
 
 #include "AudioEngine.h"
 #include "Engine.h"
-#include "Graph.h"
 #include "InstrumentTrack.h"
-#include "Knob.h"
-#include "LedCheckBox.h"
 #include "NotePlayHandle.h"
-#include "PixmapButton.h"
 #include "base64.h"
 #include "CaptionMenu.h"
 #include "StringContainer.h"
@@ -52,85 +48,59 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT vibedstrings_plugin_descriptor =
 {
-	LMMS_STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY(PLUGIN_NAME),
 	"Vibed",
-	QT_TRANSLATE_NOOP( "PluginBrowser",
-					"Vibrating string modeler" ),
+	QT_TRANSLATE_NOOP("PluginBrowser", "Vibrating string modeler"),
 	"Danny McRae <khjklujn/at/yahoo/com>",
 	0x0100,
 	Plugin::Instrument,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader("logo"),
 	nullptr,
-	nullptr,
+	nullptr
 };
 
 }
 
 
-Vibed::Vibed( InstrumentTrack * _instrumentTrack ) :
-	Instrument( _instrumentTrack, &vibedstrings_plugin_descriptor )
+Vibed::Vibed(InstrumentTrack* instrumentTrack) :
+	Instrument(instrumentTrack, &vibedstrings_plugin_descriptor)
 {
-
-	FloatModel * knob;
-	BoolModel * led;
-	gui::NineButtonSelectorModel * harmonic;
-	graphModel * graphTmp;
-
-	for( int harm = 0; harm < 9; harm++ )
+	for (int harm = 0; harm < 9; ++harm)
 	{
-		knob = new FloatModel( DefaultVolume, MinVolume, MaxVolume,
-				1.0f, this, tr( "String %1 volume" ).arg( harm+1 ) );
-		m_volumeKnobs.append( knob );
+		m_volumeKnobs.emplace_back(std::make_unique<FloatModel>(
+			DefaultVolume, MinVolume, MaxVolume, 1.0f, this, tr("String %1 volume").arg(harm + 1)));
 
-		knob = new FloatModel( 0.0f, 0.0f, 0.05f, 0.001f, this,
-				tr( "String %1 stiffness" ).arg( harm+1 ) );
-		m_stiffnessKnobs.append( knob );
+		m_stiffnessKnobs.emplace_back(std::make_unique<FloatModel>(
+			0.0f, 0.0f, 0.05f, 0.001f, this, tr("String %1 stiffness").arg(harm + 1)));
 
-		knob = new FloatModel( 0.0f, 0.0f, 0.05f, 0.005f, this,
-				tr( "Pick %1 position" ).arg( harm+1 )  );
-		m_pickKnobs.append( knob );
+		m_pickKnobs.emplace_back(std::make_unique<FloatModel>(
+			0.0f, 0.0f, 0.05f, 0.005f, this, tr("Pick %1 position").arg(harm + 1)));
 
-		knob = new FloatModel( 0.05f, 0.0f, 0.05f, 0.005f, this,
-				tr( "Pickup %1 position" ).arg( harm+1 ) );
-		m_pickupKnobs.append( knob );
+		m_pickupKnobs.emplace_back(std::make_unique<FloatModel>(
+			0.05f, 0.0f, 0.05f, 0.005f, this, tr("Pickup %1 position").arg( harm + 1)));
 
-		knob = new FloatModel( 0.0f, -1.0f, 1.0f, 0.01f, this,
-				tr( "String %1 panning" ).arg( harm+1 )  );
-		m_panKnobs.append( knob );
+		m_panKnobs.emplace_back(std::make_unique<FloatModel>(
+			0.0f, -1.0f, 1.0f, 0.01f, this, tr("String %1 panning").arg(harm + 1)));
 
-		knob = new FloatModel( 0.0f, -0.1f, 0.1f, 0.001f, this,
-				tr( "String %1 detune" ).arg( harm+1 ) );
-		m_detuneKnobs.append( knob );
+		m_detuneKnobs.emplace_back(std::make_unique<FloatModel>(
+			0.0f, -0.1f, 0.1f, 0.001f, this, tr("String %1 detune").arg(harm + 1)));
 
-		knob = new FloatModel( 0.0f, 0.0f, 0.75f, 0.01f, this,
-				tr( "String %1 fuzziness" ).arg( harm+1 ) );
-		m_randomKnobs.append( knob );
+		m_randomKnobs.emplace_back(std::make_unique<FloatModel>(
+			0.0f, 0.0f, 0.75f, 0.01f, this, tr("String %1 fuzziness").arg(harm + 1)));
 
-		knob = new FloatModel( 1, 1, 16, 1, this,
-				tr( "String %1 length" ).arg( harm+1 ) );
-		m_lengthKnobs.append( knob );
+		m_lengthKnobs.emplace_back(std::make_unique<FloatModel>(
+			1, 1, 16, 1, this, tr("String %1 length").arg(harm + 1)));
 
-		led = new BoolModel( false, this,
-				tr( "Impulse %1" ).arg( harm+1 ) );
-		m_impulses.append( led );
+		m_impulses.emplace_back(std::make_unique<BoolModel>(false, this, tr("Impulse %1").arg(harm + 1)));
 
-		led = new BoolModel( harm==0, this,
-				tr( "String %1" ).arg( harm+1 )  );
-		m_powerButtons.append( led );
+		m_powerButtons.emplace_back(std::make_unique<BoolModel>(harm == 0, this, tr("String %1").arg(harm + 1)));
 
-		harmonic = new gui::NineButtonSelectorModel( 2, 0, 8, this );
-		m_harmonics.append( harmonic );
+		m_harmonics.emplace_back(std::make_unique<gui::NineButtonSelectorModel>(2, 0, 8, this));
 
-		graphTmp = new graphModel( -1.0, 1.0, s_sampleLength, this );
-		graphTmp->setWaveToSine();
-
-		m_graphs.append( graphTmp );
-
+		m_graphs.emplace_back(std::make_unique<graphModel>(-1.0, 1.0, s_sampleLength, this));
+		m_graphs.back()->setWaveToSine();
 	}
 }
-
-
-
 
 void Vibed::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
@@ -160,8 +130,6 @@ void Vibed::saveSettings(QDomDocument& doc, QDomElement& elem)
 		elem.setAttribute("graph" + is, sampleString);
 	}
 }
-
-
 
 void Vibed::loadSettings(const QDomElement& elem)
 {
@@ -213,421 +181,324 @@ void Vibed::loadSettings(const QDomElement& elem)
 	// update();
 }
 
-
-
-
 QString Vibed::nodeName() const
 {
-	return( vibedstrings_plugin_descriptor.name );
+	return vibedstrings_plugin_descriptor.name;
 }
 
-
-
-
-void Vibed::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
+void Vibed::playNote(NotePlayHandle* n, sampleFrame* workingBuffer)
 {
-	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == nullptr )
+	if (n->totalFramesPlayed() == 0 || n->m_pluginData == nullptr)
 	{
-		_n->m_pluginData = new StringContainer( _n->frequency(),
+		n->m_pluginData = new StringContainer(n->frequency(),
 				Engine::audioEngine()->processingSampleRate(),
-						s_sampleLength );
-		
-		for( int i = 0; i < 9; ++i )
+						s_sampleLength);
+
+		for (int i = 0; i < 9; ++i)
 		{
-			if( m_powerButtons[i]->value() )
+			if (m_powerButtons[i]->value())
 			{
-				static_cast<StringContainer*>(
-					_n->m_pluginData )->addString(
-				m_harmonics[i]->value(),
-				m_pickKnobs[i]->value(),
-				m_pickupKnobs[i]->value(),
-				m_graphs[i]->samples(),
-				m_randomKnobs[i]->value(),
-				m_stiffnessKnobs[i]->value(),
-				m_detuneKnobs[i]->value(),
-				static_cast<int>(
-					m_lengthKnobs[i]->value() ),
-				m_impulses[i]->value(),
-				i );
+				static_cast<StringContainer*>(n->m_pluginData)->addString(
+					m_harmonics[i]->value(),
+					m_pickKnobs[i]->value(),
+					m_pickupKnobs[i]->value(),
+					m_graphs[i]->samples(),
+					m_randomKnobs[i]->value(),
+					m_stiffnessKnobs[i]->value(),
+					m_detuneKnobs[i]->value(),
+					static_cast<int>(m_lengthKnobs[i]->value()),
+					m_impulses[i]->value(),
+					i);
 			}
 		}
 	}
 
-	const fpp_t frames = _n->framesLeftForCurrentPeriod();
-	const f_cnt_t offset = _n->noteOffset();
-	auto ps = static_cast<StringContainer*>(_n->m_pluginData);
+	const fpp_t frames = n->framesLeftForCurrentPeriod();
+	const f_cnt_t offset = n->noteOffset();
+	auto ps = static_cast<StringContainer*>(n->m_pluginData);
 
-	for( fpp_t i = offset; i < frames + offset; ++i )
+	for (fpp_t i = offset; i < frames + offset; ++i)
 	{
-		_working_buffer[i][0] = 0.0f;
-		_working_buffer[i][1] = 0.0f;
+		workingBuffer[i][0] = 0.0f;
+		workingBuffer[i][1] = 0.0f;
 		int s = 0;
-		for( int string = 0; string < 9; ++string )
+		for (int str = 0; str < 9; ++str)
 		{
-			if( ps->exists( string ) )
+			if (ps->exists(str))
 			{
 				// pan: 0 -> left, 1 -> right
-				const float pan = ( m_panKnobs[string]->value() + 1 ) / 2.0f;
-				const sample_t sample = ps->getStringSample( s ) * m_volumeKnobs[string]->value() / 100.0f;
-				_working_buffer[i][0] += ( 1.0f - pan ) * sample;
-				_working_buffer[i][1] += pan * sample;
-				s++;
+				const float pan = (m_panKnobs[str]->value() + 1) / 2.0f;
+				const sample_t sample = ps->getStringSample(s) * m_volumeKnobs[str]->value() / 100.0f;
+				workingBuffer[i][0] += (1.0f - pan) * sample;
+				workingBuffer[i][1] += pan * sample;
+				++s;
 			}
 		}
 	}
 
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
+	instrumentTrack()->processAudioBuffer(workingBuffer, frames + offset, n);
 }
 
-
-
-
-void Vibed::deleteNotePluginData( NotePlayHandle * _n )
+void Vibed::deleteNotePluginData(NotePlayHandle* n)
 {
-	delete static_cast<StringContainer *>( _n->m_pluginData );
+	delete static_cast<StringContainer*>(n->m_pluginData);
 }
 
-
-
-
-gui::PluginView * Vibed::instantiateView( QWidget * _parent )
+gui::PluginView* Vibed::instantiateView(QWidget* parent)
 {
-	return( new gui::VibedView( this, _parent ) );
+	return new gui::VibedView(this, parent);
 }
-
 
 
 namespace gui
 {
 
 
-VibedView::VibedView( Instrument * _instrument,
-				QWidget * _parent ) :
-	InstrumentViewFixedSize( _instrument, _parent )
+VibedView::VibedView(Instrument* instrument, QWidget* parent) :
+	InstrumentViewFixedSize(instrument, parent),
+	m_volumeKnob(knobBright_26, this),
+	m_stiffnessKnob(knobBright_26, this),
+	m_pickKnob(knobBright_26, this),
+	m_pickupKnob(knobBright_26, this),
+	m_panKnob(knobBright_26, this),
+	m_detuneKnob(knobBright_26, this),
+	m_randomKnob(knobBright_26, this),
+	m_lengthKnob(knobBright_26, this),
+	m_graph(this),
+	m_impulse("", this),
+	m_power("", this, tr("Enable waveform")),
+	m_smoothBtn(this, tr("Smooth waveform")),
+	m_normalizeBtn(this, tr("Normalize waveform")),
+	m_sinWaveBtn(this, tr("Sine wave")),
+	m_triangleWaveBtn(this, tr("Triangle wave")),
+	m_sawWaveBtn(this, tr("Saw wave")),
+	m_sqrWaveBtn(this, tr("Square wave")),
+	m_whiteNoiseWaveBtn(this, tr("White noise")),
+	m_usrWaveBtn(this, tr("User-defined wave"))
 {
-	setAutoFillBackground( true );
+	setAutoFillBackground(true);
 	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
-								"artwork" ) );
-	setPalette( pal );
-	
-	m_volumeKnob = new Knob( knobBright_26, this );
-	m_volumeKnob->setVolumeKnob( true );
-	m_volumeKnob->move( 103, 142 );
-	m_volumeKnob->setHintText( tr( "String volume:" ), "" );
+	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
+	setPalette(pal);
 
-	m_stiffnessKnob = new Knob( knobBright_26, this );
-	m_stiffnessKnob->move( 129, 142 );
-	m_stiffnessKnob->setHintText( tr( "String stiffness:" )
-							, "" );
-	
-	
-	m_pickKnob = new Knob( knobBright_26, this );
-	m_pickKnob->move( 153, 142 );
-	m_pickKnob->setHintText( tr( "Pick position:" ), "" );
+	m_volumeKnob.setVolumeKnob(true);
+	m_volumeKnob.move(103, 142);
+	m_volumeKnob.setHintText(tr("String volume:"), "");
 
-	m_pickupKnob = new Knob( knobBright_26, this );
-	m_pickupKnob->move( 177, 142 );
-	m_pickupKnob->setHintText( tr( "Pickup position:" )
-						, "" );
+	m_stiffnessKnob.move(129, 142);
+	m_stiffnessKnob.setHintText(tr("String stiffness:"), "");
 
-	m_panKnob = new Knob( knobBright_26, this );
-	m_panKnob->move( 105, 187 );
-    m_panKnob->setHintText( tr( "String panning:" ), "" );
-	
-	m_detuneKnob = new Knob( knobBright_26, this );
-	m_detuneKnob->move( 150, 187 );
-	m_detuneKnob->setHintText( tr( "String detune:" ), "" );
+	m_pickKnob.move(153, 142);
+	m_pickKnob.setHintText(tr("Pick position:"), "");
 
-	m_randomKnob = new Knob( knobBright_26, this );
-	m_randomKnob->move( 194, 187 );
-	m_randomKnob->setHintText( tr( "String fuzziness:" )
-						, "" );
+	m_pickupKnob.move(177, 142);
+	m_pickupKnob.setHintText(tr("Pickup position:"), "");
 
-	m_lengthKnob = new Knob( knobBright_26, this );
-	m_lengthKnob->move( 23, 193 );
-	m_lengthKnob->setHintText( tr( "String length:" )
-						, "" );
+	m_panKnob.move(105, 187);
+	m_panKnob.setHintText(tr("String panning:"), "");
 
-	m_impulse = new LedCheckBox( "", this );
-	m_impulse->move( 23, 94 );
-	m_impulse->setToolTip(
-			tr( "Impulse" ) );
+	m_detuneKnob.move(150, 187);
+	m_detuneKnob.setHintText(tr("String detune:"), "");
 
-	m_harmonic = new NineButtonSelector(
-		PLUGIN_NAME::getIconPixmap( "button_-2_on" ),
-		PLUGIN_NAME::getIconPixmap( "button_-2_off" ),
-		PLUGIN_NAME::getIconPixmap( "button_-1_on" ),
-		PLUGIN_NAME::getIconPixmap( "button_-1_off" ),
-		PLUGIN_NAME::getIconPixmap( "button_f_on" ),
-		PLUGIN_NAME::getIconPixmap( "button_f_off" ),
-		PLUGIN_NAME::getIconPixmap( "button_2_on" ),
-		PLUGIN_NAME::getIconPixmap( "button_2_off" ),
-		PLUGIN_NAME::getIconPixmap( "button_3_on" ),
-		PLUGIN_NAME::getIconPixmap( "button_3_off" ),
-		PLUGIN_NAME::getIconPixmap( "button_4_on" ),
-		PLUGIN_NAME::getIconPixmap( "button_4_off" ),
-		PLUGIN_NAME::getIconPixmap( "button_5_on" ),
-		PLUGIN_NAME::getIconPixmap( "button_5_off" ),
-		PLUGIN_NAME::getIconPixmap( "button_6_on" ),
-		PLUGIN_NAME::getIconPixmap( "button_6_off" ),
-		PLUGIN_NAME::getIconPixmap( "button_7_on" ),
-		PLUGIN_NAME::getIconPixmap( "button_7_off" ),
+	m_randomKnob.move(194, 187);
+	m_randomKnob.setHintText(tr("String fuzziness:"), "");
+
+	m_lengthKnob.move(23, 193);
+	m_lengthKnob.setHintText(tr("String length:"), "");
+
+	m_graph.setWindowTitle(tr("Impulse Editor"));
+	m_graph.setForeground(PLUGIN_NAME::getIconPixmap("wavegraph4"));
+	m_graph.move(76, 21);
+	m_graph.resize(132, 104);
+
+	m_impulse.move(23, 94);
+	m_impulse.setToolTip(tr("Impulse"));
+
+	m_power.move(212, 130);
+	m_power.setToolTip(tr("Enable/disable string"));
+
+	m_harmonic = std::make_unique<NineButtonSelector>(
+		PLUGIN_NAME::getIconPixmap("button_-2_on"),
+		PLUGIN_NAME::getIconPixmap("button_-2_off"),
+		PLUGIN_NAME::getIconPixmap("button_-1_on"),
+		PLUGIN_NAME::getIconPixmap("button_-1_off"),
+		PLUGIN_NAME::getIconPixmap("button_f_on"),
+		PLUGIN_NAME::getIconPixmap("button_f_off"),
+		PLUGIN_NAME::getIconPixmap("button_2_on"),
+		PLUGIN_NAME::getIconPixmap("button_2_off"),
+		PLUGIN_NAME::getIconPixmap("button_3_on"),
+		PLUGIN_NAME::getIconPixmap("button_3_off"),
+		PLUGIN_NAME::getIconPixmap("button_4_on"),
+		PLUGIN_NAME::getIconPixmap("button_4_off"),
+		PLUGIN_NAME::getIconPixmap("button_5_on"),
+		PLUGIN_NAME::getIconPixmap("button_5_off"),
+		PLUGIN_NAME::getIconPixmap("button_6_on"),
+		PLUGIN_NAME::getIconPixmap("button_6_off"),
+		PLUGIN_NAME::getIconPixmap("button_7_on"),
+		PLUGIN_NAME::getIconPixmap("button_7_off"),
 		2,
 		21, 127,
-		this );
+		this);
 
-	m_harmonic->setWindowTitle( tr( "Octave" ) );
-	
+	m_harmonic->setWindowTitle(tr("Octave"));
 
-	m_stringSelector = new NineButtonSelector(
-			PLUGIN_NAME::getIconPixmap( "button_1_on" ),
-			PLUGIN_NAME::getIconPixmap( "button_1_off" ),
-			PLUGIN_NAME::getIconPixmap( "button_2_on" ),
-			PLUGIN_NAME::getIconPixmap( "button_2_off" ),
-			PLUGIN_NAME::getIconPixmap( "button_3_on" ),
-			PLUGIN_NAME::getIconPixmap( "button_3_off" ),
-			PLUGIN_NAME::getIconPixmap( "button_4_on" ),
-			PLUGIN_NAME::getIconPixmap( "button_4_off" ),
-			PLUGIN_NAME::getIconPixmap( "button_5_on" ),
-			PLUGIN_NAME::getIconPixmap( "button_5_off" ),
-			PLUGIN_NAME::getIconPixmap( "button_6_on" ),
-			PLUGIN_NAME::getIconPixmap( "button_6_off" ),
-			PLUGIN_NAME::getIconPixmap( "button_7_on" ),
-			PLUGIN_NAME::getIconPixmap( "button_7_off" ),
-			PLUGIN_NAME::getIconPixmap( "button_8_on" ),
-			PLUGIN_NAME::getIconPixmap( "button_8_off" ),
-			PLUGIN_NAME::getIconPixmap( "button_9_on" ),
-			PLUGIN_NAME::getIconPixmap( "button_9_off" ),
-			0,
-			21, 39,
-			this);
+	m_stringSelector = std::make_unique<NineButtonSelector>(
+		PLUGIN_NAME::getIconPixmap("button_1_on"),
+		PLUGIN_NAME::getIconPixmap("button_1_off"),
+		PLUGIN_NAME::getIconPixmap("button_2_on"),
+		PLUGIN_NAME::getIconPixmap("button_2_off"),
+		PLUGIN_NAME::getIconPixmap("button_3_on"),
+		PLUGIN_NAME::getIconPixmap("button_3_off"),
+		PLUGIN_NAME::getIconPixmap("button_4_on"),
+		PLUGIN_NAME::getIconPixmap("button_4_off"),
+		PLUGIN_NAME::getIconPixmap("button_5_on"),
+		PLUGIN_NAME::getIconPixmap("button_5_off"),
+		PLUGIN_NAME::getIconPixmap("button_6_on"),
+		PLUGIN_NAME::getIconPixmap("button_6_off"),
+		PLUGIN_NAME::getIconPixmap("button_7_on"),
+		PLUGIN_NAME::getIconPixmap("button_7_off"),
+		PLUGIN_NAME::getIconPixmap("button_8_on"),
+		PLUGIN_NAME::getIconPixmap("button_8_off"),
+		PLUGIN_NAME::getIconPixmap("button_9_on"),
+		PLUGIN_NAME::getIconPixmap("button_9_off"),
+		0,
+		21, 39,
+		this);
 
-	m_graph = new Graph( this );
-	m_graph->setWindowTitle( tr( "Impulse Editor" ) );
-	m_graph->setForeground( PLUGIN_NAME::getIconPixmap( "wavegraph4" ) );
-	m_graph->move( 76, 21 );
-	m_graph->resize(132, 104);
-
-
-	m_power = new LedCheckBox( "", this, tr( "Enable waveform" ) );
-	m_power->move( 212, 130 );
-	m_power->setToolTip(
-			tr( "Enable/disable string" ) );
-
-	
 	// String selector is not a part of the model
-	m_stringSelector->setWindowTitle( tr( "String" ) );
+	m_stringSelector->setWindowTitle(tr("String"));
 
-	connect( m_stringSelector, SIGNAL( NineButtonSelection( int ) ),
-			this, SLOT( showString( int ) ) );
+	connect(m_stringSelector.get(), SIGNAL(NineButtonSelection(int)), this, SLOT(showString(int)));
 
-	showString( 0 );
+	showString(0);
 
-	m_sinWaveBtn = new PixmapButton( this, tr( "Sine wave" ) );
-	m_sinWaveBtn->move( 212, 24 );
-	m_sinWaveBtn->setActiveGraphic( embed::getIconPixmap(
-				"sin_wave_active" ) );
-	m_sinWaveBtn->setInactiveGraphic( embed::getIconPixmap(
-				"sin_wave_inactive" ) );
-	m_sinWaveBtn->setToolTip(
-				tr( "Sine wave" ) );
-	connect( m_sinWaveBtn, SIGNAL (clicked () ),
-			this, SLOT ( sinWaveClicked() ) );
+	m_smoothBtn.move(79, 129);
+	m_smoothBtn.setActiveGraphic(PLUGIN_NAME::getIconPixmap("smooth_active"));
+	m_smoothBtn.setInactiveGraphic(PLUGIN_NAME::getIconPixmap("smooth_inactive"));
+	m_smoothBtn.setChecked(false);
+	m_smoothBtn.setToolTip(tr("Smooth waveform"));
+	connect(&m_smoothBtn, SIGNAL(clicked()), this, SLOT(smoothClicked()));
 
-	
-	m_triangleWaveBtn = new PixmapButton( this, tr( "Triangle wave" ) );
-	m_triangleWaveBtn->move( 212, 41 );
-	m_triangleWaveBtn->setActiveGraphic(
-			embed::getIconPixmap( "triangle_wave_active" ) );
-	m_triangleWaveBtn->setInactiveGraphic(
-			embed::getIconPixmap( "triangle_wave_inactive" ) );
-	m_triangleWaveBtn->setToolTip(
-			tr( "Triangle wave" ) );
-	connect( m_triangleWaveBtn, SIGNAL ( clicked () ),
-			this, SLOT ( triangleWaveClicked() ) );
+	m_normalizeBtn.move(96, 129);
+	m_normalizeBtn.setActiveGraphic(PLUGIN_NAME::getIconPixmap("normalize_active"));
+	m_normalizeBtn.setInactiveGraphic(PLUGIN_NAME::getIconPixmap("normalize_inactive"));
+	m_normalizeBtn.setChecked(false);
+	m_normalizeBtn.setToolTip(tr("Normalize waveform"));
+	connect(&m_normalizeBtn, SIGNAL(clicked()), this, SLOT(normalizeClicked()));
 
-	
-	m_sawWaveBtn = new PixmapButton( this, tr( "Saw wave" ) );
-	m_sawWaveBtn->move( 212, 58 );
-	m_sawWaveBtn->setActiveGraphic( embed::getIconPixmap(
-				"saw_wave_active" ) );
-	m_sawWaveBtn->setInactiveGraphic( embed::getIconPixmap(
-				"saw_wave_inactive" ) );
-	m_sawWaveBtn->setToolTip(
-				tr( "Saw wave" ) );
-	connect( m_sawWaveBtn, SIGNAL (clicked () ),
-			this, SLOT ( sawWaveClicked() ) );
+	m_sinWaveBtn.move(212, 24);
+	m_sinWaveBtn.setActiveGraphic(embed::getIconPixmap("sin_wave_active"));
+	m_sinWaveBtn.setInactiveGraphic(embed::getIconPixmap("sin_wave_inactive"));
+	m_sinWaveBtn.setToolTip(tr("Sine wave"));
+	connect(&m_sinWaveBtn, SIGNAL(clicked()), this, SLOT(sinWaveClicked()));
 
-	
-	m_sqrWaveBtn = new PixmapButton( this, tr( "Square wave" ) );
-	m_sqrWaveBtn->move( 212, 75 );
-	m_sqrWaveBtn->setActiveGraphic( embed::getIconPixmap(
-				"square_wave_active" ) );
-	m_sqrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
-				"square_wave_inactive" ) );
-	m_sqrWaveBtn->setToolTip(
-			tr( "Square wave" ) );
-	connect( m_sqrWaveBtn, SIGNAL ( clicked () ),
-			this, SLOT ( sqrWaveClicked() ) );
+	m_triangleWaveBtn.move(212, 41);
+	m_triangleWaveBtn.setActiveGraphic(embed::getIconPixmap("triangle_wave_active"));
+	m_triangleWaveBtn.setInactiveGraphic(embed::getIconPixmap("triangle_wave_inactive"));
+	m_triangleWaveBtn.setToolTip(tr("Triangle wave"));
+	connect(&m_triangleWaveBtn, SIGNAL(clicked()), this, SLOT(triangleWaveClicked()));
 
-	
-	m_whiteNoiseWaveBtn = new PixmapButton( this, tr( "White noise" ) );
-	m_whiteNoiseWaveBtn->move( 212, 92 );
-	m_whiteNoiseWaveBtn->setActiveGraphic(
-			embed::getIconPixmap( "white_noise_wave_active" ) );
-	m_whiteNoiseWaveBtn->setInactiveGraphic(
-			embed::getIconPixmap( "white_noise_wave_inactive" ) );
-	m_whiteNoiseWaveBtn->setToolTip(
-			tr( "White noise" ) );
-	connect( m_whiteNoiseWaveBtn, SIGNAL ( clicked () ),
-			this, SLOT ( noiseWaveClicked() ) );
+	m_sawWaveBtn.move(212, 58);
+	m_sawWaveBtn.setActiveGraphic(embed::getIconPixmap("saw_wave_active"));
+	m_sawWaveBtn.setInactiveGraphic(embed::getIconPixmap("saw_wave_inactive"));
+	m_sawWaveBtn.setToolTip(tr("Saw wave"));
+	connect(&m_sawWaveBtn, SIGNAL(clicked()), this, SLOT(sawWaveClicked()));
 
-	
-	m_usrWaveBtn = new PixmapButton( this, tr( "User-defined wave" ) );
-	m_usrWaveBtn->move( 212, 109 );
-	m_usrWaveBtn->setActiveGraphic( embed::getIconPixmap(
-				"usr_wave_active" ) );
-	m_usrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
-				"usr_wave_inactive" ) );
-	m_usrWaveBtn->setToolTip(
-			tr( "User-defined wave" ) );
-	connect( m_usrWaveBtn, SIGNAL ( clicked () ),
-			this, SLOT ( usrWaveClicked() ) );
+	m_sqrWaveBtn.move(212, 75);
+	m_sqrWaveBtn.setActiveGraphic(embed::getIconPixmap("square_wave_active"));
+	m_sqrWaveBtn.setInactiveGraphic(embed::getIconPixmap("square_wave_inactive"));
+	m_sqrWaveBtn.setToolTip(tr("Square wave"));
+	connect(&m_sqrWaveBtn, SIGNAL(clicked()), this, SLOT(sqrWaveClicked()));
 
+	m_whiteNoiseWaveBtn.move(212, 92);
+	m_whiteNoiseWaveBtn.setActiveGraphic(embed::getIconPixmap("white_noise_wave_active"));
+	m_whiteNoiseWaveBtn.setInactiveGraphic(embed::getIconPixmap("white_noise_wave_inactive"));
+	m_whiteNoiseWaveBtn.setToolTip(tr("White noise"));
+	connect(&m_whiteNoiseWaveBtn, SIGNAL(clicked()), this, SLOT(noiseWaveClicked()));
 
-	m_smoothBtn = new PixmapButton( this, tr( "Smooth waveform" ) );
-	m_smoothBtn->move( 79, 129 );
-	m_smoothBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-			"smooth_active" ) );
-	m_smoothBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-			"smooth_inactive" ) );
-	m_smoothBtn->setChecked( false );
-	m_smoothBtn->setToolTip(
-			tr( "Smooth waveform" ) );
-	connect( m_smoothBtn, SIGNAL ( clicked () ),
-			this, SLOT ( smoothClicked() ) );
-	
-	m_normalizeBtn = new PixmapButton( this, tr( "Normalize waveform" ) );
-	m_normalizeBtn->move( 96, 129 );
-	m_normalizeBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-			"normalize_active" ) );
-	m_normalizeBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-			"normalize_inactive" ) );
-	m_normalizeBtn->setChecked( false );
-	m_normalizeBtn->setToolTip(
-			tr( "Normalize waveform" ) );
-
-	connect( m_normalizeBtn, SIGNAL ( clicked () ),
-			this, SLOT ( normalizeClicked() ) );
-
+	m_usrWaveBtn.move(212, 109);
+	m_usrWaveBtn.setActiveGraphic(embed::getIconPixmap("usr_wave_active"));
+	m_usrWaveBtn.setInactiveGraphic(embed::getIconPixmap("usr_wave_inactive"));
+	m_usrWaveBtn.setToolTip(tr("User-defined wave"));
+	connect(&m_usrWaveBtn, SIGNAL(clicked()),this, SLOT(usrWaveClicked()));
 }
-
-
-
 
 void VibedView::modelChanged()
 {
-	showString( 0 );
+	showString(0);
 }
 
-
-
-
-void VibedView::showString( int _string )
+void VibedView::showString(int str)
 {
 	auto v = castModel<Vibed>();
 
-	m_pickKnob->setModel( v->m_pickKnobs[_string] );
-	m_pickupKnob->setModel( v->m_pickupKnobs[_string] );
-	m_stiffnessKnob->setModel( v->m_stiffnessKnobs[_string] );
-	m_volumeKnob->setModel( v->m_volumeKnobs[_string] );
-	m_panKnob->setModel( v->m_panKnobs[_string] );
-	m_detuneKnob->setModel( v->m_detuneKnobs[_string] );
-	m_randomKnob->setModel( v->m_randomKnobs[_string] );
-	m_lengthKnob->setModel( v->m_lengthKnobs[_string] );
-	m_graph->setModel( v->m_graphs[_string] );
-	m_impulse->setModel( v->m_impulses[_string] );
-	m_harmonic->setModel( v->m_harmonics[_string] );
-	m_power->setModel( v->m_powerButtons[_string] );
-
+	m_pickKnob.setModel(v->m_pickKnobs[str].get());
+	m_pickupKnob.setModel(v->m_pickupKnobs[str].get());
+	m_stiffnessKnob.setModel(v->m_stiffnessKnobs[str].get());
+	m_volumeKnob.setModel(v->m_volumeKnobs[str].get());
+	m_panKnob.setModel(v->m_panKnobs[str].get());
+	m_detuneKnob.setModel(v->m_detuneKnobs[str].get());
+	m_randomKnob.setModel(v->m_randomKnobs[str].get());
+	m_lengthKnob.setModel(v->m_lengthKnobs[str].get());
+	m_graph.setModel(v->m_graphs[str].get());
+	m_impulse.setModel(v->m_impulses[str].get());
+	m_harmonic->setModel(v->m_harmonics[str].get());
+	m_power.setModel(v->m_powerButtons[str].get());
 }
-
-
-
 
 void VibedView::sinWaveClicked()
 {
-	m_graph->model()->setWaveToSine();
+	m_graph.model()->setWaveToSine();
 	Engine::getSong()->setModified();
 }
-
-
 
 void VibedView::triangleWaveClicked()
 {
-	m_graph->model()->setWaveToTriangle();
+	m_graph.model()->setWaveToTriangle();
 	Engine::getSong()->setModified();
 }
-
-
 
 void VibedView::sawWaveClicked()
 {
-	m_graph->model()->setWaveToSaw();
+	m_graph.model()->setWaveToSaw();
 	Engine::getSong()->setModified();
 }
-
-
 
 void VibedView::sqrWaveClicked()
 {
-	m_graph->model()->setWaveToSquare();
+	m_graph.model()->setWaveToSquare();
 	Engine::getSong()->setModified();
 }
-
-
 
 void VibedView::noiseWaveClicked()
 {
-	m_graph->model()->setWaveToNoise();
+	m_graph.model()->setWaveToNoise();
 	Engine::getSong()->setModified();
 }
-
-
 
 void VibedView::usrWaveClicked()
 {
-	QString fileName = m_graph->model()->setWaveToUser();
-	m_usrWaveBtn->setToolTip(fileName);
+	QString fileName = m_graph.model()->setWaveToUser();
+	m_usrWaveBtn.setToolTip(fileName);
 	Engine::getSong()->setModified();
 }
-
-
 
 void VibedView::smoothClicked()
 {
-	m_graph->model()->smooth();
+	m_graph.model()->smooth();
 	Engine::getSong()->setModified();
 }
-
-
 
 void VibedView::normalizeClicked()
 {
-	m_graph->model()->normalize();
+	m_graph.model()->normalize();
 	Engine::getSong()->setModified();
 }
 
-
-
-
-void VibedView::contextMenuEvent( QContextMenuEvent * )
+void VibedView::contextMenuEvent(QContextMenuEvent*)
 {
-
-	CaptionMenu contextMenu( model()->displayName(), this );
-	contextMenu.exec( QCursor::pos() );
-
+	CaptionMenu contextMenu(model()->displayName(), this);
+	contextMenu.exec(QCursor::pos());
 }
 
 
@@ -637,11 +508,10 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
 {
-	return( new Vibed( static_cast<InstrumentTrack *>( m ) ) );
+	return new Vibed(static_cast<InstrumentTrack*>(m));
 }
-
 
 }
 
