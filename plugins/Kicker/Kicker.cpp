@@ -114,7 +114,7 @@ void KickerInstrument::loadSettings( const QDomElement & _this )
 	m_endFreqModel.loadSettings( _this, "endfreq" );
 	m_decayModel.loadSettings( _this, "decay" );
 	m_distModel.loadSettings( _this, "dist" );
-	if( _this.hasAttribute( "distend" ) )
+	if (_this.hasAttribute("distend") || !(_this.firstChildElement("distend").isNull()))
 	{
 		m_distEndModel.loadSettings( _this, "distend" );
 	}
