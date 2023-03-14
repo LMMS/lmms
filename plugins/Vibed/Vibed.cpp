@@ -202,8 +202,8 @@ void Vibed::loadSettings( const QDomElement & _this )
 		name = "active" + QString::number( i );
 		m_powerButtons[i]->setValue( _this.attribute( name ).toInt() );
 		
-		if( m_powerButtons[i]->value() &&
-			_this.hasAttribute( "volume" + QString::number( i ) ) )
+		if (m_powerButtons[i]->value() &&
+			(_this.hasAttribute("volume" + QString::number(i)) || !(_this.firstChildElement("volume" + QString::number(i)).isNull())))
 		{
 			name = "volume" + QString::number( i );
 			m_volumeKnobs[i]->loadSettings( _this, name );
