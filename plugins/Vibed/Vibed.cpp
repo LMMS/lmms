@@ -22,10 +22,10 @@
  *
  */
 
+#include "Vibed.h"
 
 #include <QDomElement>
 
-#include "Vibed.h"
 #include "AudioEngine.h"
 #include "Engine.h"
 #include "Graph.h"
@@ -121,7 +121,7 @@ Vibed::Vibed( InstrumentTrack * _instrumentTrack ) :
 		harmonic = new gui::NineButtonSelectorModel( 2, 0, 8, this );
 		m_harmonics.append( harmonic );
 
-		graphTmp = new graphModel( -1.0, 1.0, __sampleLength, this );
+		graphTmp = new graphModel( -1.0, 1.0, s_sampleLength, this );
 		graphTmp->setWaveToSine();
 
 		m_graphs.append( graphTmp );
@@ -132,120 +132,70 @@ Vibed::Vibed( InstrumentTrack * _instrumentTrack ) :
 
 
 
-void Vibed::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void Vibed::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
-
-	QString name;
-	
 	// Save plugin version
-	_this.setAttribute( "version", "0.1" );
-	
-	for( int i = 0; i < 9; i++ )
+	elem.setAttribute("version", "0.1");
+
+	for (int i = 0; i < 9; ++i)
 	{
-		name = "active" + QString::number( i );
-		_this.setAttribute( name, QString::number(
-				m_powerButtons[i]->value() ) );
+		const auto is = QString::number(i);
 
-		if( m_powerButtons[i]->value() )
+		elem.setAttribute("active" + is, QString::number(m_powerButtons[i]->value()));
+
+		if (m_powerButtons[i]->value())
 		{
-			name = "volume" + QString::number( i );
-			m_volumeKnobs[i]->saveSettings( _doc, _this, name );
-	
-			name = "stiffness" + QString::number( i );
-			m_stiffnessKnobs[i]->saveSettings( _doc, _this, name );
-
-			name = "pick" + QString::number( i );
-			m_pickKnobs[i]->saveSettings( _doc, _this, name );
-
-			name = "pickup" + QString::number( i );
-			m_pickupKnobs[i]->saveSettings( _doc, _this, name );
-
-			name = "octave" + QString::number( i );
-			m_harmonics[i]->saveSettings( _doc, _this, name );
-
-			name = "length" + QString::number( i );
-			m_lengthKnobs[i]->saveSettings( _doc, _this, name );
-
-			name = "pan" + QString::number( i );
-			m_panKnobs[i]->saveSettings( _doc, _this, name );
-
-			name = "detune" + QString::number( i );
-			m_detuneKnobs[i]->saveSettings( _doc, _this, name );
-
-			name = "slap" + QString::number( i );
-			m_randomKnobs[i]->saveSettings( _doc, _this, name );
-
-			name = "impulse" + QString::number( i );
-			m_impulses[i]->saveSettings( _doc, _this, name );
+			m_volumeKnobs[i]->saveSettings(doc, elem, "volume" + is);
+			m_stiffnessKnobs[i]->saveSettings(doc, elem, "stiffness" + is);
+			m_pickKnobs[i]->saveSettings(doc, elem, "pick" + is);
+			m_pickupKnobs[i]->saveSettings(doc, elem, "pickup" + is);
+			m_harmonics[i]->saveSettings(doc, elem, "octave" + is);
+			m_lengthKnobs[i]->saveSettings(doc, elem, "length" + is);
+			m_panKnobs[i]->saveSettings(doc, elem, "pan" + is);
+			m_detuneKnobs[i]->saveSettings(doc, elem, "detune" + is);
+			m_randomKnobs[i]->saveSettings(doc, elem, "slap" + is);
+			m_impulses[i]->saveSettings(doc, elem, "impulse" + is);
 
 			QString sampleString;
-			base64::encode(
-				(const char *)m_graphs[i]->samples(),
-				__sampleLength * sizeof(float),
-				sampleString );
-			name = "graph" + QString::number( i );
-			_this.setAttribute( name, sampleString );
+			base64::encode((const char*)m_graphs[i]->samples(), s_sampleLength * sizeof(float), sampleString);
+
+			elem.setAttribute("graph" + is, sampleString);
 		}
 	}
-
 }
 
 
 
-void Vibed::loadSettings( const QDomElement & _this )
+void Vibed::loadSettings(const QDomElement& elem)
 {
-
-	QString name;
-
-	for( int i = 0; i < 9; i++ )
+	for (int i = 0; i < 9; ++i)
 	{
-		name = "active" + QString::number( i );
-		m_powerButtons[i]->setValue( _this.attribute( name ).toInt() );
-		
+		const auto is = QString::number(i);
+
+		m_powerButtons[i]->setValue(elem.attribute("active" + is).toInt());
+
 		if (m_powerButtons[i]->value() &&
-			(_this.hasAttribute("volume" + QString::number(i)) || !(_this.firstChildElement("volume" + QString::number(i)).isNull())))
+			(elem.hasAttribute("volume" + is) || !elem.firstChildElement("volume" + is).isNull()))
 		{
-			name = "volume" + QString::number( i );
-			m_volumeKnobs[i]->loadSettings( _this, name );
-		
-			name = "stiffness" + QString::number( i );
-			m_stiffnessKnobs[i]->loadSettings( _this, name );
-		
-			name = "pick" + QString::number( i );
-			m_pickKnobs[i]->loadSettings( _this, name );
-		
-			name = "pickup" + QString::number( i );
-			m_pickupKnobs[i]->loadSettings( _this, name );
-		
-			name = "octave" + QString::number( i );
-			m_harmonics[i]->loadSettings( _this, name );
-			
-			name = "length" + QString::number( i );
-			m_lengthKnobs[i]->loadSettings( _this, name );
-		
-			name = "pan" + QString::number( i );
-			m_panKnobs[i]->loadSettings( _this, name );
-		
-			name = "detune" + QString::number( i );
-			m_detuneKnobs[i]->loadSettings( _this, name );
-		
-			name = "slap" + QString::number( i );
-			m_randomKnobs[i]->loadSettings( _this, name );
-		
-			name = "impulse" + QString::number( i );
-			m_impulses[i]->loadSettings( _this, name );
+			m_volumeKnobs[i]->loadSettings(elem, "volume" + is);
+			m_stiffnessKnobs[i]->loadSettings(elem, "stiffness" + is);
+			m_pickKnobs[i]->loadSettings(elem, "pick" + is);
+			m_pickupKnobs[i]->loadSettings(elem, "pickup" + is);
+			m_harmonics[i]->loadSettings(elem, "octave" + is);
+			m_lengthKnobs[i]->loadSettings(elem, "length" + is);
+			m_panKnobs[i]->loadSettings(elem, "pan" + is);
+			m_detuneKnobs[i]->loadSettings(elem, "detune" + is);
+			m_randomKnobs[i]->loadSettings(elem, "slap" + is);
+			m_impulses[i]->loadSettings(elem, "impulse" + is);
 
 			int size = 0;
-			float * shp = 0;
-			base64::decode( _this.attribute( "graph" +
-						QString::number( i ) ),
-						&shp,
-						&size );
-			// TODO: check whether size == 128 * sizeof( float ),
+			float* shp = nullptr;
+			base64::decode(elem.attribute("graph" + is), &shp, &size);
+
+			// TODO: check whether size == 128 * sizeof(float),
 			// otherwise me might and up in a segfault
-			m_graphs[i]->setSamples( shp );
+			m_graphs[i]->setSamples(shp);
 			delete[] shp;
-			
 
 			// TODO: do one of the following to avoid
 			// "uninitialized" wave-shape-buttongroup
@@ -255,8 +205,7 @@ void Vibed::loadSettings( const QDomElement & _this )
 			// - save and restore selected wave-shape-button
 		}
 	}
-	
-//	update();
+	// update();
 }
 
 
@@ -276,7 +225,7 @@ void Vibed::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 	{
 		_n->m_pluginData = new StringContainer( _n->frequency(),
 				Engine::audioEngine()->processingSampleRate(),
-						__sampleLength );
+						s_sampleLength );
 		
 		for( int i = 0; i < 9; ++i )
 		{

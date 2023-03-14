@@ -21,8 +21,9 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-#ifndef _VIBED_H
-#define _VIBED_H
+
+#ifndef LMMS_VIBED_H
+#define LMMS_VIBED_H
 
 #include "Instrument.h"
 #include "InstrumentView.h"
@@ -53,8 +54,8 @@ public:
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
-	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
-	void loadSettings( const QDomElement & _this ) override;
+	void saveSettings(QDomDocument& doc, QDomElement& elem) override;
+	void loadSettings(const QDomElement& elem) override;
 
 	QString nodeName() const override;
 
@@ -81,7 +82,7 @@ private:
 	QList<BoolModel*> m_impulses;
 	QList<gui::NineButtonSelectorModel*> m_harmonics;
 
-	static const int __sampleLength = 128;
+	static constexpr int s_sampleLength = 128;
 
 	friend class gui::VibedView;
 } ;
@@ -152,4 +153,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_VIBED_H
