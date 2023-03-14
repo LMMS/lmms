@@ -135,7 +135,7 @@ Vibed::Vibed( InstrumentTrack * _instrumentTrack ) :
 void Vibed::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
 	// Save plugin version
-	elem.setAttribute("version", "0.1");
+	elem.setAttribute("version", "0.2");
 
 	for (int i = 0; i < 9; ++i)
 	{
@@ -143,24 +143,21 @@ void Vibed::saveSettings(QDomDocument& doc, QDomElement& elem)
 
 		elem.setAttribute("active" + is, QString::number(m_powerButtons[i]->value()));
 
-		if (m_powerButtons[i]->value())
-		{
-			m_volumeKnobs[i]->saveSettings(doc, elem, "volume" + is);
-			m_stiffnessKnobs[i]->saveSettings(doc, elem, "stiffness" + is);
-			m_pickKnobs[i]->saveSettings(doc, elem, "pick" + is);
-			m_pickupKnobs[i]->saveSettings(doc, elem, "pickup" + is);
-			m_harmonics[i]->saveSettings(doc, elem, "octave" + is);
-			m_lengthKnobs[i]->saveSettings(doc, elem, "length" + is);
-			m_panKnobs[i]->saveSettings(doc, elem, "pan" + is);
-			m_detuneKnobs[i]->saveSettings(doc, elem, "detune" + is);
-			m_randomKnobs[i]->saveSettings(doc, elem, "slap" + is);
-			m_impulses[i]->saveSettings(doc, elem, "impulse" + is);
+		m_volumeKnobs[i]->saveSettings(doc, elem, "volume" + is);
+		m_stiffnessKnobs[i]->saveSettings(doc, elem, "stiffness" + is);
+		m_pickKnobs[i]->saveSettings(doc, elem, "pick" + is);
+		m_pickupKnobs[i]->saveSettings(doc, elem, "pickup" + is);
+		m_harmonics[i]->saveSettings(doc, elem, "octave" + is);
+		m_lengthKnobs[i]->saveSettings(doc, elem, "length" + is);
+		m_panKnobs[i]->saveSettings(doc, elem, "pan" + is);
+		m_detuneKnobs[i]->saveSettings(doc, elem, "detune" + is);
+		m_randomKnobs[i]->saveSettings(doc, elem, "slap" + is);
+		m_impulses[i]->saveSettings(doc, elem, "impulse" + is);
 
-			QString sampleString;
-			base64::encode((const char*)m_graphs[i]->samples(), s_sampleLength * sizeof(float), sampleString);
+		QString sampleString;
+		base64::encode((const char*)m_graphs[i]->samples(), s_sampleLength * sizeof(float), sampleString);
 
-			elem.setAttribute("graph" + is, sampleString);
-		}
+		elem.setAttribute("graph" + is, sampleString);
 	}
 }
 
@@ -168,14 +165,22 @@ void Vibed::saveSettings(QDomDocument& doc, QDomElement& elem)
 
 void Vibed::loadSettings(const QDomElement& elem)
 {
+	// Load plugin version
+	bool newVersion = false;
+	if (elem.hasAttribute("version"))
+	{
+		newVersion = elem.attribute("version").toFloat() >= 0.2f;
+	}
+
 	for (int i = 0; i < 9; ++i)
 	{
 		const auto is = QString::number(i);
 
 		m_powerButtons[i]->setValue(elem.attribute("active" + is).toInt());
 
-		if (m_powerButtons[i]->value() &&
-			(elem.hasAttribute("volume" + is) || !elem.firstChildElement("volume" + is).isNull()))
+		// Version 0.2 saves/loads all instrument data unconditionally
+		if (newVersion || (m_powerButtons[i]->value() &&
+			(elem.hasAttribute("volume" + is) || !elem.firstChildElement("volume" + is).isNull())))
 		{
 			m_volumeKnobs[i]->loadSettings(elem, "volume" + is);
 			m_stiffnessKnobs[i]->loadSettings(elem, "stiffness" + is);
