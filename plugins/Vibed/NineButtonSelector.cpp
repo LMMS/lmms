@@ -27,233 +27,167 @@
 #include "NineButtonSelector.h"
 
 #include "CaptionMenu.h"
-#include "PixmapButton.h"
 
 namespace lmms::gui
 {
 
 
-NineButtonSelector::NineButtonSelector(	QPixmap _button0_on,
-					QPixmap _button0_off,
-					QPixmap _button1_on,
-					QPixmap _button1_off,
-					QPixmap _button2_on,
-					QPixmap _button2_off,
-					QPixmap _button3_on,
-					QPixmap _button3_off,
-					QPixmap _button4_on,
-					QPixmap _button4_off,
-					QPixmap _button5_on,
-					QPixmap _button5_off,
-					QPixmap _button6_on,
-					QPixmap _button6_off,
-					QPixmap _button7_on,
-					QPixmap _button7_off,
-					QPixmap _button8_on,
-					QPixmap _button8_off,
-					int _default,
-					int _x, int _y,
-					QWidget * _parent ):
-	QWidget( _parent ),
-	IntModelView( new NineButtonSelectorModel(0, 8, _default, nullptr,
-				QString(), true ), this )
+NineButtonSelector::NineButtonSelector(
+		QPixmap button0On, QPixmap button0Off,
+		QPixmap button1On, QPixmap button1Off,
+		QPixmap button2On, QPixmap button2Off,
+		QPixmap button3On, QPixmap button3Off,
+		QPixmap button4On, QPixmap button4Off,
+		QPixmap button5On, QPixmap button5Off,
+		QPixmap button6On, QPixmap button6Off,
+		QPixmap button7On, QPixmap button7Off,
+		QPixmap button8On, QPixmap button8Off,
+		int defaultButton, int x, int y, QWidget* parent) :
+	QWidget{parent},
+	IntModelView{new NineButtonSelectorModel{defaultButton, 0, 8, nullptr, QString{}, true}, this}
 {
-	setFixedSize( 50, 50 );
-	move( _x, _y );
+	setFixedSize(50, 50);
+	move(x, y);
 
-	m_button = new PixmapButton( this, nullptr );
-	m_button->move( 1, 1 );
-	m_button->setActiveGraphic( _button0_on );
-	m_button->setInactiveGraphic( _button0_off );
-	m_button->setChecked( false );
-	connect( m_button, SIGNAL ( clicked () ),
-		 this, SLOT ( button0Clicked() ) );
-	m_buttons.append( m_button );
-	
-	m_button = new PixmapButton( this, nullptr );
-	m_button->move( 18, 1 );
-	m_button->setActiveGraphic( _button1_on );
-	m_button->setInactiveGraphic( _button1_off );
-	m_button->setChecked( false );
-	connect( m_button, SIGNAL ( clicked () ),
-		 this, SLOT ( button1Clicked() ) );
-	m_buttons.append( m_button );
-	
-	m_button = new PixmapButton( this, nullptr );
-	m_button->move( 35, 1 );
-	m_button->setActiveGraphic( _button2_on );
-	m_button->setInactiveGraphic( _button2_off );
-	m_button->setChecked( false );
-	connect( m_button, SIGNAL ( clicked () ),
-		 this, SLOT ( button2Clicked() ) );
-	m_buttons.append( m_button );
-	
-	m_button = new PixmapButton( this, nullptr );
-	m_button->move( 1, 18 );
-	m_button->setActiveGraphic( _button3_on );
-	m_button->setInactiveGraphic( _button3_off );
-	m_button->setChecked( false );
-	connect( m_button, SIGNAL ( clicked () ),
-		 this, SLOT ( button3Clicked() ) );
-	m_buttons.append( m_button );
-	
-	m_button = new PixmapButton( this, nullptr );
-	m_button->move( 18, 18 );
-	m_button->setActiveGraphic( _button4_on );
-	m_button->setInactiveGraphic( _button4_off );
-	m_button->setChecked( false );
-	connect( m_button, SIGNAL ( clicked () ),
-		 this, SLOT ( button4Clicked() ) );
-	m_buttons.append( m_button );
-	
-	m_button = new PixmapButton( this, nullptr );
-	m_button->move( 35, 18 );
-	m_button->setActiveGraphic( _button5_on );
-	m_button->setInactiveGraphic( _button5_off );
-	m_button->setChecked( false );
-	connect( m_button, SIGNAL ( clicked () ),
-		 this, SLOT ( button5Clicked() ) );
-	m_buttons.append( m_button );
-	
-	m_button = new PixmapButton( this, nullptr );
-	m_button->move( 1, 35 );
-	m_button->setActiveGraphic( _button6_on );
-	m_button->setInactiveGraphic( _button6_off );
-	m_button->setChecked( false );
-	connect( m_button, SIGNAL ( clicked () ),
-		 this, SLOT ( button6Clicked() ) );
-	m_buttons.append( m_button );
-	
-	m_button = new PixmapButton( this, nullptr );
-	m_button->move( 18, 35 );
-	m_button->setActiveGraphic( _button7_on );
-	m_button->setInactiveGraphic( _button7_off );
-	m_button->setChecked( false );
-	connect( m_button, SIGNAL ( clicked () ),
-		 this, SLOT ( button7Clicked() ) );
-	m_buttons.append( m_button );
-	
-	m_button = new PixmapButton( this, nullptr );
-	m_button->move( 35, 35 );
-	m_button->setActiveGraphic( _button8_on );
-	m_button->setInactiveGraphic( _button8_off );
-	m_button->setChecked( false );
-	connect( m_button, SIGNAL ( clicked () ),
-		 this, SLOT ( button8Clicked() ) );
-	m_buttons.append( m_button );
-	
-	m_lastBtn = m_buttons[_default];
-	m_lastBtn->setChecked( true );
+	m_buttons[0] = std::make_unique<PixmapButton>(this, nullptr);
+	m_buttons[0]->move(1, 1);
+	m_buttons[0]->setActiveGraphic(button0On);
+	m_buttons[0]->setInactiveGraphic(button0Off);
+	m_buttons[0]->setChecked(false);
+	connect(m_buttons[0].get(), SIGNAL(clicked()), this, SLOT(button0Clicked()));
+
+	m_buttons[1] = std::make_unique<PixmapButton>(this, nullptr);
+	m_buttons[1]->move(18, 1);
+	m_buttons[1]->setActiveGraphic(button1On);
+	m_buttons[1]->setInactiveGraphic(button1Off);
+	m_buttons[1]->setChecked(false);
+	connect(m_buttons[1].get(), SIGNAL(clicked()), this, SLOT(button1Clicked()));
+
+	m_buttons[2] = std::make_unique<PixmapButton>(this, nullptr);
+	m_buttons[2]->move(35, 1);
+	m_buttons[2]->setActiveGraphic(button2On);
+	m_buttons[2]->setInactiveGraphic(button2Off);
+	m_buttons[2]->setChecked(false);
+	connect(m_buttons[2].get(), SIGNAL(clicked()), this, SLOT(button2Clicked()));
+
+	m_buttons[3] = std::make_unique<PixmapButton>(this, nullptr);
+	m_buttons[3]->move(1, 18);
+	m_buttons[3]->setActiveGraphic(button3On);
+	m_buttons[3]->setInactiveGraphic(button3Off);
+	m_buttons[3]->setChecked(false);
+	connect(m_buttons[3].get(), SIGNAL(clicked()), this, SLOT(button3Clicked()));
+
+	m_buttons[4] = std::make_unique<PixmapButton>(this, nullptr);
+	m_buttons[4]->move(18, 18);
+	m_buttons[4]->setActiveGraphic(button4On);
+	m_buttons[4]->setInactiveGraphic(button4Off);
+	m_buttons[4]->setChecked(false);
+	connect(m_buttons[4].get(), SIGNAL(clicked()), this, SLOT(button4Clicked()));
+
+	m_buttons[5] = std::make_unique<PixmapButton>(this, nullptr);
+	m_buttons[5]->move(35, 18);
+	m_buttons[5]->setActiveGraphic(button5On);
+	m_buttons[5]->setInactiveGraphic(button5Off);
+	m_buttons[5]->setChecked(false);
+	connect(m_buttons[5].get(), SIGNAL(clicked()), this, SLOT(button5Clicked()));
+
+	m_buttons[6] = std::make_unique<PixmapButton>(this, nullptr);
+	m_buttons[6]->move(1, 35);
+	m_buttons[6]->setActiveGraphic(button6On);
+	m_buttons[6]->setInactiveGraphic(button6Off);
+	m_buttons[6]->setChecked(false);
+	connect(m_buttons[6].get(), SIGNAL(clicked()), this, SLOT(button6Clicked()));
+
+	m_buttons[7] = std::make_unique<PixmapButton>(this, nullptr);
+	m_buttons[7]->move(18, 35);
+	m_buttons[7]->setActiveGraphic(button7On);
+	m_buttons[7]->setInactiveGraphic(button7Off);
+	m_buttons[7]->setChecked(false);
+	connect(m_buttons[7].get(), SIGNAL(clicked()), this, SLOT(button7Clicked()));
+
+	m_buttons[8] = std::make_unique<PixmapButton>(this, nullptr);
+	m_buttons[8]->move(35, 35);
+	m_buttons[8]->setActiveGraphic(button8On);
+	m_buttons[8]->setInactiveGraphic(button8Off);
+	m_buttons[8]->setChecked(false);
+	connect(m_buttons[8].get(), SIGNAL(clicked()), this, SLOT(button8Clicked()));
+
+	m_lastBtn = m_buttons[defaultButton].get();
+	m_lastBtn->setChecked(true);
 }
-
-
-NineButtonSelector::~ NineButtonSelector()
-{
-	for( int i = 0; i < 9; i++ )
-	{
-		delete m_buttons[i];
-	}
-}
-
-
-
 
 void NineButtonSelector::button0Clicked()
 {
-	setSelected( 0 );
+	setSelected(0);
 }
-
-
-
 
 void NineButtonSelector::button1Clicked()
 {
-	setSelected( 1 );
+	setSelected(1);
 }
-
-
-
 
 void NineButtonSelector::button2Clicked()
 {
-	setSelected( 2 );
+	setSelected(2);
 }
-
-
-
 
 void NineButtonSelector::button3Clicked()
 {
-	setSelected( 3 );
+	setSelected(3);
 }
-
-
-
 
 void NineButtonSelector::button4Clicked()
 {
-	setSelected( 4 );
+	setSelected(4);
 }
-
-
-
 
 void NineButtonSelector::button5Clicked()
 {
-	setSelected( 5 );
+	setSelected(5);
 }
-
-
-
 
 void NineButtonSelector::button6Clicked()
 {
-	setSelected( 6 );
+	setSelected(6);
 }
-
-
-
 
 void NineButtonSelector::button7Clicked()
 {
-	setSelected( 7 );
+	setSelected(7);
 }
-
-
-
 
 void NineButtonSelector::button8Clicked()
 {
-	setSelected( 8 );
+	setSelected(8);
 }
 
 void NineButtonSelector::modelChanged()
 {
-	updateButton( model()->value() );
+	updateButton(model()->value());
 }
 
-void NineButtonSelector::setSelected( int _new_button )
+void NineButtonSelector::setSelected(int newButton)
 {
-	model()->setValue(_new_button);
-	updateButton( _new_button );
+	model()->setValue(newButton);
+	updateButton(newButton);
 }
 
-void NineButtonSelector::updateButton( int _new_button )
+void NineButtonSelector::updateButton(int newButton)
 {
-	m_lastBtn->setChecked( false );
+	m_lastBtn->setChecked(false);
 	m_lastBtn->update();
 
-	m_lastBtn = m_buttons[_new_button];
-	m_lastBtn->setChecked( true );
+	m_lastBtn = m_buttons[newButton].get();
+	m_lastBtn->setChecked(true);
 	m_lastBtn->update();
-	
-	emit NineButtonSelection( _new_button );
+
+	emit NineButtonSelection(newButton);
 }
 
-void NineButtonSelector::contextMenuEvent( QContextMenuEvent * )
+void NineButtonSelector::contextMenuEvent(QContextMenuEvent*)
 {
-	CaptionMenu contextMenu( windowTitle(), this );
-	contextMenu.exec( QCursor::pos() );
+	CaptionMenu contextMenu{windowTitle(), this};
+	contextMenu.exec(QCursor::pos());
 }
 
 

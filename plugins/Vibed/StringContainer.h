@@ -1,4 +1,5 @@
-/* StringContainer.h - contains a collection of strings
+/*
+ * StringContainer.h - contains a collection of strings
  *
  * Copyright (c) 2006 Danny McRae <khjklujn/at/yahoo/com>
  * 
@@ -21,10 +22,11 @@
  *
  */
 
-#ifndef _STRING_CONTAINER_H
-#define _STRING_CONTAINER_H
+#ifndef LMMS_STRING_CONTAINER_H
+#define LMMS_STRING_CONTAINER_H
 
-#include <QVector>
+#include <vector>
+#include <memory>
 
 #include "VibratingString.h"
 #include "MemoryManager.h"
@@ -37,50 +39,28 @@ class StringContainer
 {
 	MM_OPERATORS
 public:
-	StringContainer(const float _pitch, 
-			const sample_rate_t _sample_rate,
-			const int _buffer_length,
-			const int _strings = 9 );
-	
-	void addString(	int _harm,
-			const float _pick,
-			const float _pickup,
-			const float * _impluse,
-			const float _randomize,
-			const float _string_loss,
-			const float _detune,
-			const int _oversample,
-			const bool _state,
-			const int _id );
-	
-	bool exists( int _id ) const
+	StringContainer(float pitch, sample_rate_t sampleRate, int bufferLength, int strings = 9);
+	~StringContainer() = default;
+
+	void addString(int harm, float pick, float pickup, const float* impulse, float randomize,
+		float stringLoss, float detune, int oversample, bool state, int id);
+
+	bool exists(int id) const { return m_exists[id]; }
+
+	sample_t getStringSample(int str)
 	{
-		return m_exists[_id];
+		return m_strings[str].nextSample();
 	}
-	
-	~StringContainer()
-	{
-		int strings = m_strings.count();
-		for( int i = 0; i < strings; i++ )
-		{
-			delete m_strings[i];
-		}
-	}
-	
-	float getStringSample( int _string )
-	{
-		return m_strings[_string]->nextSample();
-	}
-	
+
 private:
-	QVector<VibratingString *> m_strings;
+	std::vector<VibratingString> m_strings;
 	const float m_pitch;
 	const sample_rate_t m_sampleRate;
 	const int m_bufferLength;
-	QVector<bool> m_exists;
-} ;
+	std::vector<bool> m_exists;
+};
 
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_STRING_CONTAINER_H

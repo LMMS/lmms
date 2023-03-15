@@ -22,60 +22,47 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-#ifndef _NINE_BUTTON_SELECTOR_H
-#define _NINE_BUTTON_SELECTOR_H
 
+#ifndef LMMS_GUI_NINE_BUTTON_SELECTOR_H
+#define LMMS_GUI_NINE_BUTTON_SELECTOR_H
+
+#include <array>
+#include <memory>
 #include <QWidget>
+
 #include "AutomatableModelView.h"
+#include "PixmapButton.h"
 
 namespace lmms
 {
-class graphModel;
-}
 
-namespace lmms::gui
+
+namespace gui
 {
 
 
-class Knob;	
-class PixmapButton;
-
-
-class NineButtonSelector: public QWidget , public IntModelView
+class NineButtonSelector : public QWidget, public IntModelView
 {
 	Q_OBJECT
-			
 public:
-	NineButtonSelector( 	QPixmap _button0_on,
-				QPixmap _button0_off,
-				QPixmap _button1_on,
-				QPixmap _button1_off,
-				QPixmap _button2_on,
-				QPixmap _button2_off,
-				QPixmap _button3_on,
-				QPixmap _button3_off,
-				QPixmap _button4_on,
-				QPixmap _button4_off,
-				QPixmap _button5_on,
-				QPixmap _button5_off,
-				QPixmap _button6_on,
-				QPixmap _button6_off,
-				QPixmap _button7_on,
-				QPixmap _button7_off,
-				QPixmap _button8_on,
-				QPixmap _button8_off,
-				int _default,
-				int _x, int _y,
-				QWidget * _parent);
-	~NineButtonSelector() override;
-	
-//	inline int getSelected() { 
-//		return( castModel<NineButtonSelectorModel>()->value() );
-//	};
+	NineButtonSelector(
+		QPixmap button0On, QPixmap button0Off,
+		QPixmap button1On, QPixmap button1Off,
+		QPixmap button2On, QPixmap button2Off,
+		QPixmap button3On, QPixmap button3Off,
+		QPixmap button4On, QPixmap button4Off,
+		QPixmap button5On, QPixmap button5Off,
+		QPixmap button6On, QPixmap button6Off,
+		QPixmap button7On, QPixmap button7Off,
+		QPixmap button8On, QPixmap button8Off,
+		int defaultButton, int x, int y, QWidget* parent);
+	~NineButtonSelector() override = default;
+
+	// int getSelected() { return castModel<NineButtonSelectorModel>()->value(); }
 
 protected:
-	void setSelected( int _new_button );
-	
+	void setSelected(int newButton);
+
 public slots:
 	void button0Clicked();
 	void button1Clicked();
@@ -86,23 +73,25 @@ public slots:
 	void button6Clicked();
 	void button7Clicked();
 	void button8Clicked();
-	void contextMenuEvent( QContextMenuEvent * ) override;
-	
+	void contextMenuEvent(QContextMenuEvent*) override;
+
 signals:
-	void NineButtonSelection( int );
-	
+	void NineButtonSelection(int);
+
 private:
 	void modelChanged() override;
-	void updateButton( int );
+	void updateButton(int);
 
-	QList<PixmapButton *> m_buttons;
-	PixmapButton * m_button;
-	PixmapButton * m_lastBtn;
+	std::array<std::unique_ptr<PixmapButton>, 9> m_buttons;
+	PixmapButton* m_lastBtn;
+};
 
-} ;
+
+} // namespace gui
 
 using NineButtonSelectorModel = IntModel;
 
-} // namespace lmms::gui
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_GUI_NINE_BUTTON_SELECTOR_H

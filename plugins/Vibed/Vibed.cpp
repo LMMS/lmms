@@ -24,15 +24,17 @@
 
 #include "Vibed.h"
 
+#include <array>
 #include <QDomElement>
 
 #include "AudioEngine.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "NotePlayHandle.h"
+#include "VibratingString.h"
+#include "MemoryManager.h"
 #include "base64.h"
 #include "CaptionMenu.h"
-#include "StringContainer.h"
 #include "volume.h"
 #include "Song.h"
 
@@ -62,41 +64,76 @@ Plugin::Descriptor PLUGIN_EXPORT vibedstrings_plugin_descriptor =
 }
 
 
+class Vibed::StringContainer
+{
+	MM_OPERATORS
+public:
+	StringContainer(float pitch, sample_rate_t sampleRate, int bufferLength) :
+		m_pitch(pitch), m_sampleRate(sampleRate), m_bufferLength(bufferLength), m_strings({}), m_exists({}) {}
+
+	~StringContainer() = default;
+
+	void addString(int harm, float pick, float pickup, const float* impulse, float randomize,
+		float stringLoss, float detune, int oversample, bool state, int id)
+	{
+		float harmFloat = 1.0f;
+		switch (harm)
+		{
+		case 0: harmFloat = 0.25f; break;
+		case 1: harmFloat = 0.5f; break;
+		case 2: harmFloat = 1.0f; break;
+		case 3: harmFloat = 2.0f; break;
+		case 4: harmFloat = 3.0f; break;
+		case 5: harmFloat = 4.0f; break;
+		case 6: harmFloat = 5.0f; break;
+		case 7: harmFloat = 6.0f; break;
+		case 8: harmFloat = 7.0f; break;
+		default: break;
+		}
+
+		m_strings[id] = VibratingString{m_pitch * harmFloat, pick, pickup, impulse, m_bufferLength,
+			m_sampleRate, oversample, randomize, stringLoss, detune, state};
+
+		m_exists[id] = true;
+	}
+
+	bool exists(int id) const { return m_exists[id]; }
+
+	sample_t getStringSample(int str) { return m_strings[str].nextSample(); }
+
+private:
+	const float m_pitch;
+	const sample_rate_t m_sampleRate;
+	const int m_bufferLength;
+	std::array<VibratingString, s_stringCount> m_strings;
+	std::array<bool, s_stringCount> m_exists;
+};
+
 Vibed::Vibed(InstrumentTrack* instrumentTrack) :
 	Instrument(instrumentTrack, &vibedstrings_plugin_descriptor)
 {
-	for (int harm = 0; harm < 9; ++harm)
+	for (int harm = 0; harm < s_stringCount; ++harm)
 	{
 		m_volumeKnobs.emplace_back(std::make_unique<FloatModel>(
 			DefaultVolume, MinVolume, MaxVolume, 1.0f, this, tr("String %1 volume").arg(harm + 1)));
-
 		m_stiffnessKnobs.emplace_back(std::make_unique<FloatModel>(
 			0.0f, 0.0f, 0.05f, 0.001f, this, tr("String %1 stiffness").arg(harm + 1)));
-
 		m_pickKnobs.emplace_back(std::make_unique<FloatModel>(
 			0.0f, 0.0f, 0.05f, 0.005f, this, tr("Pick %1 position").arg(harm + 1)));
-
 		m_pickupKnobs.emplace_back(std::make_unique<FloatModel>(
 			0.05f, 0.0f, 0.05f, 0.005f, this, tr("Pickup %1 position").arg( harm + 1)));
-
 		m_panKnobs.emplace_back(std::make_unique<FloatModel>(
 			0.0f, -1.0f, 1.0f, 0.01f, this, tr("String %1 panning").arg(harm + 1)));
-
 		m_detuneKnobs.emplace_back(std::make_unique<FloatModel>(
 			0.0f, -0.1f, 0.1f, 0.001f, this, tr("String %1 detune").arg(harm + 1)));
-
 		m_randomKnobs.emplace_back(std::make_unique<FloatModel>(
 			0.0f, 0.0f, 0.75f, 0.01f, this, tr("String %1 fuzziness").arg(harm + 1)));
-
 		m_lengthKnobs.emplace_back(std::make_unique<FloatModel>(
 			1, 1, 16, 1, this, tr("String %1 length").arg(harm + 1)));
 
 		m_impulses.emplace_back(std::make_unique<BoolModel>(false, this, tr("Impulse %1").arg(harm + 1)));
-
 		m_powerButtons.emplace_back(std::make_unique<BoolModel>(harm == 0, this, tr("String %1").arg(harm + 1)));
-
-		m_harmonics.emplace_back(std::make_unique<gui::NineButtonSelectorModel>(2, 0, 8, this));
-
+		m_harmonics.emplace_back(std::make_unique<NineButtonSelectorModel>(2, 0, 8, this));
 		m_graphs.emplace_back(std::make_unique<graphModel>(-1.0, 1.0, s_sampleLength, this));
 		m_graphs.back()->setWaveToSine();
 	}
@@ -107,7 +144,7 @@ void Vibed::saveSettings(QDomDocument& doc, QDomElement& elem)
 	// Save plugin version
 	elem.setAttribute("version", "0.2");
 
-	for (int i = 0; i < 9; ++i)
+	for (int i = 0; i < s_stringCount; ++i)
 	{
 		const auto is = QString::number(i);
 
@@ -188,17 +225,18 @@ QString Vibed::nodeName() const
 
 void Vibed::playNote(NotePlayHandle* n, sampleFrame* workingBuffer)
 {
-	if (n->totalFramesPlayed() == 0 || n->m_pluginData == nullptr)
+	if (/*n->totalFramesPlayed() == 0 ||*/ n->m_pluginData == nullptr)
 	{
-		n->m_pluginData = new StringContainer(n->frequency(),
-				Engine::audioEngine()->processingSampleRate(),
-						s_sampleLength);
+		const auto newContainer = new StringContainer(n->frequency(),
+			Engine::audioEngine()->processingSampleRate(), s_sampleLength);
 
-		for (int i = 0; i < 9; ++i)
+		n->m_pluginData = newContainer;
+
+		for (int i = 0; i < s_stringCount; ++i)
 		{
 			if (m_powerButtons[i]->value())
 			{
-				static_cast<StringContainer*>(n->m_pluginData)->addString(
+				newContainer->addString(
 					m_harmonics[i]->value(),
 					m_pickKnobs[i]->value(),
 					m_pickupKnobs[i]->value(),
@@ -221,17 +259,15 @@ void Vibed::playNote(NotePlayHandle* n, sampleFrame* workingBuffer)
 	{
 		workingBuffer[i][0] = 0.0f;
 		workingBuffer[i][1] = 0.0f;
-		int s = 0;
-		for (int str = 0; str < 9; ++str)
+		for (int str = 0; str < s_stringCount; ++str)
 		{
 			if (ps->exists(str))
 			{
 				// pan: 0 -> left, 1 -> right
 				const float pan = (m_panKnobs[str]->value() + 1) / 2.0f;
-				const sample_t sample = ps->getStringSample(s) * m_volumeKnobs[str]->value() / 100.0f;
+				const sample_t sample = ps->getStringSample(str) * m_volumeKnobs[str]->value() / 100.0f;
 				workingBuffer[i][0] += (1.0f - pan) * sample;
 				workingBuffer[i][1] += pan * sample;
-				++s;
 			}
 		}
 	}

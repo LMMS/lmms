@@ -1,5 +1,5 @@
 /*
- * vibrating_sring.h - model of a vibrating string lifted from pluckedSynth
+ * VibratingString.h - model of a vibrating string lifted from pluckedSynth
  *
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/yahoo/com>
  * 
@@ -21,93 +21,90 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-#include <cmath>
 
 #include "VibratingString.h"
 #include "interpolation.h"
 #include "AudioEngine.h"
 #include "Engine.h"
 
+#include <algorithm>
+#include <cstdlib>
+
 namespace lmms
 {
 
 
-VibratingString::VibratingString(	float _pitch, 
-					float _pick,
-					float _pickup,
-					float * _impulse, 
-					int _len,
-					sample_rate_t _sample_rate,
-					int _oversample,
-					float _randomize,
-					float _string_loss,
-					float _detune,
-					bool _state ) :
-	m_oversample( 2 * _oversample / (int)( _sample_rate /
-				Engine::audioEngine()->baseSampleRate() ) ),
-	m_randomize( _randomize ),
-	m_stringLoss( 1.0f - _string_loss ),
-	m_state( 0.1f )
+VibratingString::VibratingString(float pitch, float pick, float pickup, const float* impulse, int len,
+	sample_rate_t sampleRate, int oversample, float randomize, float stringLoss, float detune, bool state) :
+	m_oversample{2 * oversample / (int)(sampleRate / Engine::audioEngine()->baseSampleRate())},
+	m_randomize{randomize},
+	m_stringLoss{1.0f - stringLoss},
+	m_state{0.1f}
 {
 	m_outsamp = new sample_t[m_oversample];
-	int string_length;
-	
-	string_length = static_cast<int>( m_oversample * _sample_rate /
-								_pitch ) + 1;
-	string_length += static_cast<int>( string_length * -_detune );
 
-	int pick = static_cast<int>( ceil( string_length * _pick ) );
-	
-	if( ! _state )
+	int stringLength = static_cast<int>(m_oversample * sampleRate / pitch) + 1;
+	stringLength += static_cast<int>(stringLength * -detune);
+
+	int pickInt = static_cast<int>(std::ceil(stringLength * pick));
+
+	if (!state)
 	{
-		m_impulse = new float[string_length];
-		resample( _impulse, _len, string_length );
+		m_impulse = new float[stringLength];
+		resample(impulse, len, stringLength);
 	}
 	else
- 	{
-		m_impulse = new float[_len];
-		for( int i = 0; i < _len; i++ )
+	{
+		m_impulse = new float[len];
+		for (int i = 0; i < len; ++i)
 		{
-			m_impulse[i] = _impulse[i];
+			m_impulse[i] = impulse[i];
 		}
 	}
-	
-	m_toBridge = VibratingString::initDelayLine( string_length, pick );
-	m_fromBridge = VibratingString::initDelayLine( string_length, pick );
 
-	
-	VibratingString::setDelayLine( m_toBridge, pick, 
-						m_impulse, _len, 0.5f, 
-						_state );
-	VibratingString::setDelayLine( m_fromBridge, pick, 
-						m_impulse, _len, 0.5f,
-						_state);
-	
-	m_choice = static_cast<int>( m_oversample * 
-				static_cast<float>( rand() ) / RAND_MAX ); 
-	
-	m_pickupLoc = static_cast<int>( _pickup * string_length );
+	m_toBridge = VibratingString::initDelayLine(stringLength, pickInt);
+	m_fromBridge = VibratingString::initDelayLine(stringLength, pickInt);
+
+	VibratingString::setDelayLine(m_toBridge, pickInt, m_impulse, len, 0.5f, state);
+	VibratingString::setDelayLine(m_fromBridge, pickInt, m_impulse, len, 0.5f, state);
+
+	m_choice = static_cast<int>(m_oversample * static_cast<float>(std::rand()) / RAND_MAX);
+
+	m_pickupLoc = static_cast<int>(pickup * stringLength);
 }
 
-
-
-
-VibratingString::delayLine * VibratingString::initDelayLine( int _len,
-								int _pick )
+VibratingString& VibratingString::operator=(VibratingString&& other) noexcept
 {
-	auto dl = new VibratingString::delayLine[_len];
-	dl->length = _len;
-	if( _len > 0 )
+	if (this != &other)
 	{
-		dl->data = new sample_t[_len];
+		freeAll();
+		m_fromBridge = std::exchange(other.m_fromBridge, nullptr);
+		m_toBridge = std::exchange(other.m_toBridge, nullptr);
+		m_pickupLoc = other.m_pickupLoc;
+		m_oversample = other.m_oversample;
+		m_randomize = other.m_randomize;
+		m_stringLoss = other.m_stringLoss;
+		m_impulse = std::exchange(other.m_impulse, nullptr);
+		m_choice = other.m_choice;
+		m_state = other.m_state;
+		m_outsamp = std::exchange(other.m_outsamp, nullptr);
+	}
+	return *this;
+}
+
+VibratingString::DelayLine* VibratingString::initDelayLine(int len, int pick)
+{
+	auto dl = new VibratingString::DelayLine[len]; // TODO: ???
+	dl->length = len;
+	if (len > 0)
+	{
+		dl->data = new sample_t[len];
 		float r;
 		float offset = 0.0f;
-		for( int i = 0; i < dl->length; i++ )
+		for (int i = 0; i < dl->length; ++i)
 		{
-			r = static_cast<float>( rand() ) /
-					RAND_MAX;
-			offset =  ( m_randomize / 2.0f -
-					m_randomize ) * r;
+			r = static_cast<float>(std::rand()) / RAND_MAX;
+			offset = (m_randomize / 2.0f - m_randomize) * r;
 			dl->data[i] = offset;
 		}
 	}
@@ -117,45 +114,33 @@ VibratingString::delayLine * VibratingString::initDelayLine( int _len,
 	}
 
 	dl->pointer = dl->data;
-	dl->end = dl->data + _len - 1;
+	dl->end = dl->data + len - 1;
 
-	return( dl );
+	return dl;
 }
 
-
-
-
-void VibratingString::freeDelayLine( delayLine * _dl )
+void VibratingString::freeDelayLine(DelayLine* dl)
 {
-	if( _dl )
+	if (dl)
 	{
-		delete[] _dl->data;
-		delete[] _dl;
+		if (dl->data) { delete[] dl->data; }
+		delete[] dl;
 	}
 }
 
-
-
-
-void VibratingString::resample( float *_src, f_cnt_t _src_frames,
-							 f_cnt_t _dst_frames )
+void VibratingString::resample(const float* src, f_cnt_t srcFrames, f_cnt_t dstFrames)
 {
-	for( f_cnt_t frame = 0; frame < _dst_frames; ++frame )
+	for (f_cnt_t frame = 0; frame < dstFrames; ++frame)
 	{
-		const float src_frame_float = frame * 
-						(float) _src_frames / 
-							_dst_frames;
-		const float frac_pos = src_frame_float -
-				static_cast<f_cnt_t>( src_frame_float );
-		const f_cnt_t src_frame = qBound<f_cnt_t>(
-				1, static_cast<f_cnt_t>( src_frame_float ),
-							_src_frames - 3 );
+		const float srcFrameFloat = frame * static_cast<float>(srcFrames) / dstFrames;
+		const float fracPos = srcFrameFloat - static_cast<f_cnt_t>(srcFrameFloat);
+		const f_cnt_t srcFrame = std::clamp(static_cast<f_cnt_t>(srcFrameFloat), 1, srcFrames - 3);
 		m_impulse[frame] = cubicInterpolate(
-						_src[src_frame - 1],
-						_src[src_frame + 0],
-						_src[src_frame + 1],
-						_src[src_frame + 2],
-						frac_pos );
+						src[srcFrame - 1],
+						src[srcFrame + 0],
+						src[srcFrame + 1],
+						src[srcFrame + 2],
+						fracPos);
 	}
 }
 

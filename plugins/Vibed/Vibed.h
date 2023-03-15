@@ -55,6 +55,7 @@ class Vibed : public Instrument
 	Q_OBJECT
 public:
 	Vibed(InstrumentTrack* instrumentTrack);
+	~Vibed() override = default;
 
 	void playNote(NotePlayHandle* n, sampleFrame* workingBuffer) override;
 	void deleteNotePluginData(NotePlayHandle* n) override;
@@ -64,14 +65,17 @@ public:
 
 	QString nodeName() const override;
 
-	Flags flags() const override
-	{
-		return IsNotBendable;
-	}
+	Flags flags() const override { return IsNotBendable; }
 
 	gui::PluginView* instantiateView(QWidget* parent) override;
 
 private:
+
+	class StringContainer;
+
+	static constexpr int s_sampleLength = 128;
+	static constexpr unsigned s_stringCount = 9;
+
 	std::vector<std::unique_ptr<FloatModel>> m_pickKnobs;
 	std::vector<std::unique_ptr<FloatModel>> m_pickupKnobs;
 	std::vector<std::unique_ptr<FloatModel>> m_stiffnessKnobs;
@@ -83,9 +87,7 @@ private:
 	std::vector<std::unique_ptr<BoolModel>> m_powerButtons;
 	std::vector<std::unique_ptr<graphModel>> m_graphs;
 	std::vector<std::unique_ptr<BoolModel>> m_impulses;
-	std::vector<std::unique_ptr<gui::NineButtonSelectorModel>> m_harmonics;
-
-	static constexpr int s_sampleLength = 128;
+	std::vector<std::unique_ptr<NineButtonSelectorModel>> m_harmonics;
 
 	friend class gui::VibedView;
 };
