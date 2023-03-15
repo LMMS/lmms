@@ -184,8 +184,8 @@ void Vibed::loadSettings(const QDomElement& elem)
 		m_powerButtons[i]->setValue(elem.attribute("active" + is).toInt());
 
 		// Version 0.2 saves/loads all instrument data unconditionally
-		if (newVersion || (m_powerButtons[i]->value() &&
-			(elem.hasAttribute("volume" + is) || !elem.firstChildElement("volume" + is).isNull())))
+		const bool hasVolumeAttr = elem.hasAttribute("volume" + is) || !elem.firstChildElement("volume" + is).isNull();
+		if (newVersion || (m_powerButtons[i]->value() && hasVolumeAttr))
 		{
 			m_volumeKnobs[i]->loadSettings(elem, "volume" + is);
 			m_stiffnessKnobs[i]->loadSettings(elem, "stiffness" + is);
