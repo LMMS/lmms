@@ -69,7 +69,7 @@ class Vibed::StringContainer
 	MM_OPERATORS
 public:
 	StringContainer(float pitch, sample_rate_t sampleRate, int bufferLength) :
-		m_pitch(pitch), m_sampleRate(sampleRate), m_bufferLength(bufferLength), m_strings({}), m_exists({}) {}
+		m_pitch(pitch), m_sampleRate(sampleRate), m_bufferLength(bufferLength), m_strings{}, m_exists{} {}
 
 	~StringContainer() = default;
 
