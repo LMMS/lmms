@@ -25,6 +25,7 @@
 #ifndef LMMS_VIBRATING_STRING_H
 #define LMMS_VIBRATING_STRING_H
 
+#include <memory>
 #include <cstdlib>
 
 #include "lmms_basics.h"
@@ -40,20 +41,12 @@ public:
 	VibratingString(float pitch, float pick, float pickup, const float* impulse, int len,
 		sample_rate_t sampleRate, int oversample, float randomize, float stringLoss, float detune, bool state);
 
-	~VibratingString() { freeAll(); }
+	~VibratingString() = default;
 
 	VibratingString(const VibratingString&) = delete;
 	VibratingString& operator=(const VibratingString&) = delete;
 	VibratingString(VibratingString&&) noexcept = delete;
 	VibratingString& operator=(VibratingString&& other) noexcept;
-
-	void freeAll()
-	{
-		if (m_outsamp) { delete[] m_outsamp; }
-		if (m_impulse) { delete[] m_impulse; }
-		freeDelayLine(m_fromBridge);
-		freeDelayLine(m_toBridge);
-	}
 
 	sample_t nextSample()
 	{
@@ -62,20 +55,20 @@ public:
 		for (int i = 0; i < m_oversample; ++i)
 		{
 			// Output at pickup position
-			m_outsamp[i] = fromBridgeAccess(m_fromBridge, m_pickupLoc);
-			m_outsamp[i] += toBridgeAccess(m_toBridge, m_pickupLoc);
+			m_outsamp[i] = fromBridgeAccess(m_fromBridge.get(), m_pickupLoc);
+			m_outsamp[i] += toBridgeAccess(m_toBridge.get(), m_pickupLoc);
 
 			// Sample traveling into "bridge"
-			ym0 = toBridgeAccess(m_toBridge, 1);
+			ym0 = toBridgeAccess(m_toBridge.get(), 1);
 			// Sample to "nut"
-			ypM = fromBridgeAccess(m_fromBridge, m_fromBridge->length - 2);
+			ypM = fromBridgeAccess(m_fromBridge.get(), m_fromBridge->length - 2);
 
 			// String state update
 
 			// Decrement pointer and then update
-			fromBridgeUpdate(m_fromBridge, -bridgeReflection(ym0));
+			fromBridgeUpdate(m_fromBridge.get(), -bridgeReflection(ym0));
 			// Update and then increment pointer
-			toBridgeUpdate(m_toBridge, -ypM);
+			toBridgeUpdate(m_toBridge.get(), -ypM);
 		}
 
 		return m_outsamp[m_choice];
@@ -84,27 +77,26 @@ public:
 private:
 	struct DelayLine
 	{
-		sample_t* data = nullptr;
-		int length = 0;
-		sample_t* pointer = nullptr;
-		sample_t* end = nullptr;
+		std::unique_ptr<sample_t[]> data;
+		int length;
+		sample_t* pointer;
+		sample_t* end;
 	};
 
-	DelayLine* m_fromBridge = nullptr;
-	DelayLine* m_toBridge = nullptr;
+	std::unique_ptr<DelayLine> m_fromBridge;
+	std::unique_ptr<DelayLine> m_toBridge;
 	int m_pickupLoc;
 	int m_oversample;
 	float m_randomize;
 	float m_stringLoss;
 
-	float* m_impulse = nullptr;
-	int m_choice = 0;
+	std::unique_ptr<float[]> m_impulse;
+	int m_choice;
 	float m_state;
 
-	sample_t* m_outsamp = nullptr;
+	std::unique_ptr<sample_t[]> m_outsamp;
 
-	DelayLine* initDelayLine(int len, int pick);
-	static void freeDelayLine(DelayLine* dl);
+	std::unique_ptr<DelayLine> initDelayLine(int len, int pick);
 	void resample(const float* src, f_cnt_t srcFrames, f_cnt_t dstFrames);
 
 	/* setDelayLine initializes the string with an impulse at the pick
@@ -167,7 +159,7 @@ private:
 		++ptr;
 		if (ptr > dl->end)
 		{
-			ptr = dl->data;
+			ptr = dl->data.get();
 		}
 		dl->pointer = ptr;
 	}
@@ -182,7 +174,7 @@ private:
 	{
 		sample_t* ptr = dl->pointer;
 		--ptr;
-		if (ptr < dl->data)
+		if (ptr < dl->data.get())
 		{
 			ptr = dl->end;
 		}
@@ -196,7 +188,7 @@ private:
 	static sample_t dlAccess(DelayLine* dl, int position)
 	{
 		sample_t* outpos = dl->pointer + position;
-		while (outpos < dl->data)
+		while (outpos < dl->data.get())
 		{
 			outpos += dl->length;
 		}

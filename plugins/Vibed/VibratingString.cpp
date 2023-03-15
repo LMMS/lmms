@@ -41,7 +41,7 @@ VibratingString::VibratingString(float pitch, float pick, float pickup, const fl
 	m_stringLoss{1.0f - stringLoss},
 	m_state{0.1f}
 {
-	m_outsamp = new sample_t[m_oversample];
+	m_outsamp = std::make_unique<sample_t[]>(m_oversample);
 
 	int stringLength = static_cast<int>(m_oversample * sampleRate / pitch) + 1;
 	stringLength += static_cast<int>(stringLength * -detune);
@@ -50,23 +50,20 @@ VibratingString::VibratingString(float pitch, float pick, float pickup, const fl
 
 	if (!state)
 	{
-		m_impulse = new float[stringLength];
+		m_impulse = std::make_unique<float[]>(stringLength);
 		resample(impulse, len, stringLength);
 	}
 	else
 	{
-		m_impulse = new float[len];
-		for (int i = 0; i < len; ++i)
-		{
-			m_impulse[i] = impulse[i];
-		}
+		m_impulse = std::make_unique<float[]>(len);
+		std::copy_n(impulse, len, m_impulse.get());
 	}
 
 	m_toBridge = VibratingString::initDelayLine(stringLength, pickInt);
 	m_fromBridge = VibratingString::initDelayLine(stringLength, pickInt);
 
-	VibratingString::setDelayLine(m_toBridge, pickInt, m_impulse, len, 0.5f, state);
-	VibratingString::setDelayLine(m_fromBridge, pickInt, m_impulse, len, 0.5f, state);
+	VibratingString::setDelayLine(m_toBridge.get(), pickInt, m_impulse.get(), len, 0.5f, state);
+	VibratingString::setDelayLine(m_fromBridge.get(), pickInt, m_impulse.get(), len, 0.5f, state);
 
 	m_choice = static_cast<int>(m_oversample * static_cast<float>(std::rand()) / RAND_MAX);
 
@@ -77,7 +74,6 @@ VibratingString& VibratingString::operator=(VibratingString&& other) noexcept
 {
 	if (this != &other)
 	{
-		freeAll();
 		m_fromBridge = std::exchange(other.m_fromBridge, nullptr);
 		m_toBridge = std::exchange(other.m_toBridge, nullptr);
 		m_pickupLoc = other.m_pickupLoc;
@@ -92,13 +88,13 @@ VibratingString& VibratingString::operator=(VibratingString&& other) noexcept
 	return *this;
 }
 
-VibratingString::DelayLine* VibratingString::initDelayLine(int len, int pick)
+std::unique_ptr<VibratingString::DelayLine> VibratingString::initDelayLine(int len, int pick)
 {
-	auto dl = new VibratingString::DelayLine[len]; // TODO: ???
+	auto dl = std::make_unique<VibratingString::DelayLine>(); // TODO: ???
 	dl->length = len;
 	if (len > 0)
 	{
-		dl->data = new sample_t[len];
+		dl->data = std::make_unique<sample_t[]>(len);
 		float r;
 		float offset = 0.0f;
 		for (int i = 0; i < dl->length; ++i)
@@ -113,19 +109,10 @@ VibratingString::DelayLine* VibratingString::initDelayLine(int len, int pick)
 		dl->data = nullptr;
 	}
 
-	dl->pointer = dl->data;
-	dl->end = dl->data + len - 1;
+	dl->pointer = dl->data.get();
+	dl->end = dl->data.get() + len - 1;
 
 	return dl;
-}
-
-void VibratingString::freeDelayLine(DelayLine* dl)
-{
-	if (dl)
-	{
-		if (dl->data) { delete[] dl->data; }
-		delete[] dl;
-	}
 }
 
 void VibratingString::resample(const float* src, f_cnt_t srcFrames, f_cnt_t dstFrames)
