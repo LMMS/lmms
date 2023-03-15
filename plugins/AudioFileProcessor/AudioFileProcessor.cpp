@@ -207,7 +207,7 @@ void AudioFileProcessor::deleteNotePluginData( NotePlayHandle * _n )
 void AudioFileProcessor::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
 	elem.setAttribute("src", m_sampleBuffer.audioFile());
-	if (m_sampleBuffer.audioFile() == "")
+	if (m_sampleBuffer.audioFile().isEmpty())
 	{
 		QString s;
 		elem.setAttribute("sampledata", m_sampleBuffer.toBase64(s));
@@ -227,7 +227,7 @@ void AudioFileProcessor::saveSettings(QDomDocument& doc, QDomElement& elem)
 
 void AudioFileProcessor::loadSettings(const QDomElement& elem)
 {
-	if (elem.attribute("src") != "")
+	if (!elem.attribute("src").isEmpty())
 	{
 		setAudioFile(elem.attribute("src"), false);
 
@@ -238,7 +238,7 @@ void AudioFileProcessor::loadSettings(const QDomElement& elem)
 			Engine::getSong()->collectError(message);
 		}
 	}
-	else if (elem.attribute("sampledata") != "")
+	else if (!elem.attribute("sampledata").isEmpty())
 	{
 		m_sampleBuffer.loadFromBase64(elem.attribute("srcdata"));
 	}
@@ -681,11 +681,10 @@ void AudioFileProcessorView::sampleUpdated()
 
 void AudioFileProcessorView::openAudioFile()
 {
-	QString af = castModel<AudioFileProcessor>()->m_sampleBuffer.
-							openAudioFile();
-	if( af != "" )
+	QString af = castModel<AudioFileProcessor>()->m_sampleBuffer.openAudioFile();
+	if (!af.isEmpty())
 	{
-		castModel<AudioFileProcessor>()->setAudioFile( af );
+		castModel<AudioFileProcessor>()->setAudioFile(af);
 		Engine::getSong()->setModified();
 		m_waveView->updateSampleRange();
 	}

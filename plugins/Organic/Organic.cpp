@@ -177,8 +177,6 @@ void OrganicInstrument::saveSettings(QDomDocument& doc, QDomElement& elem)
 
 void OrganicInstrument::loadSettings(const QDomElement& elem)
 {
-	// m_numOscillators = elem.attribute("num_osc").toInt();
-
 	for (int i = 0; i < m_numOscillators; ++i)
 	{
 		const auto is = QString::number(i);

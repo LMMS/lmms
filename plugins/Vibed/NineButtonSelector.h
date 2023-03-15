@@ -58,8 +58,6 @@ public:
 		int defaultButton, int x, int y, QWidget* parent);
 	~NineButtonSelector() override = default;
 
-	// int getSelected() { return castModel<NineButtonSelectorModel>()->value(); }
-
 protected:
 	void setSelected(int newButton);
 

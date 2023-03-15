@@ -25,6 +25,7 @@
 #include "Vibed.h"
 
 #include <array>
+#include <cassert>
 #include <QDomElement>
 
 #include "AudioEngine.h"
@@ -202,20 +203,11 @@ void Vibed::loadSettings(const QDomElement& elem)
 			float* shp = nullptr;
 			base64::decode(elem.attribute("graph" + is), &shp, &size);
 
-			// TODO: check whether size == 128 * sizeof(float),
-			// otherwise me might and up in a segfault
+			assert(size == 128 * sizeof(float));
 			m_graphs[i]->setSamples(shp);
 			delete[] shp;
-
-			// TODO: do one of the following to avoid
-			// "uninitialized" wave-shape-buttongroup
-			// - activate random-wave-shape-button here
-			// - make wave-shape-buttons simple toggle-buttons
-			//   instead of checkable buttons
-			// - save and restore selected wave-shape-button
 		}
 	}
-	// update();
 }
 
 QString Vibed::nodeName() const
