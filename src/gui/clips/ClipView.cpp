@@ -314,10 +314,25 @@ void ClipView::updateLength()
 	}
 	else
 	{
-		setFixedWidth(
-		static_cast<int>( m_clip->length() * pixelsPerBar() /
-					TimePos::ticksPerBar() ) + 1 /*+
-						BORDER_WIDTH * 2-1*/ );
+		float w = 0;
+
+		// beat not ends at tick ticksPerBar (both starting at tick 0 and not starting)
+		if (m_clip->endPosition() % TimePos::ticksPerBar() != 0)
+		{
+			w = std::floor(static_cast<float>(m_clip->length()) * pixelsPerBar() / TimePos::ticksPerBar());
+		}
+		// beat not starts at tick 0
+		else if (m_clip->startPosition() % TimePos::ticksPerBar() != 0)
+		{
+			w = std::ceil(static_cast<float>(m_clip->length()) * pixelsPerBar() / TimePos::ticksPerBar()) + 1;
+		}
+		// if beat starts at tick 0 and ends at tick ticksPerBar
+		else
+		{
+			w = static_cast<float>(m_clip->length()) * pixelsPerBar() / TimePos::ticksPerBar() + 1;
+		}
+
+		setFixedWidth(static_cast<int>(w));
 	}
 	m_trackView->trackContainerView()->update();
 }
