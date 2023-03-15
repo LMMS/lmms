@@ -2,7 +2,7 @@
  * Vibed.h - combination of PluckedStringSynth and BitInvader
  *
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/yahoo/com>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or

@@ -2,7 +2,7 @@
  * VibratingString.h - model of a vibrating string lifted from pluckedSynth
  *
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/yahoo/com>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -96,7 +96,7 @@ private:
 
 	std::unique_ptr<sample_t[]> m_outsamp;
 
-	std::unique_ptr<DelayLine> initDelayLine(int len, int pick);
+	std::unique_ptr<DelayLine> initDelayLine(int len);
 	void resample(const float* src, f_cnt_t srcFrames, f_cnt_t dstFrames);
 
 	/* setDelayLine initializes the string with an impulse at the pick

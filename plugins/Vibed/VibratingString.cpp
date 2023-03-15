@@ -2,7 +2,7 @@
  * VibratingString.h - model of a vibrating string lifted from pluckedSynth
  *
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/yahoo/com>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -46,7 +46,7 @@ VibratingString::VibratingString(float pitch, float pick, float pickup, const fl
 	int stringLength = static_cast<int>(m_oversample * sampleRate / pitch) + 1;
 	stringLength += static_cast<int>(stringLength * -detune);
 
-	int pickInt = static_cast<int>(std::ceil(stringLength * pick));
+	const int pickInt = static_cast<int>(std::ceil(stringLength * pick));
 
 	if (!state)
 	{
@@ -59,8 +59,8 @@ VibratingString::VibratingString(float pitch, float pick, float pickup, const fl
 		std::copy_n(impulse, len, m_impulse.get());
 	}
 
-	m_toBridge = VibratingString::initDelayLine(stringLength, pickInt);
-	m_fromBridge = VibratingString::initDelayLine(stringLength, pickInt);
+	m_toBridge = VibratingString::initDelayLine(stringLength);
+	m_fromBridge = VibratingString::initDelayLine(stringLength);
 
 	VibratingString::setDelayLine(m_toBridge.get(), pickInt, m_impulse.get(), len, 0.5f, state);
 	VibratingString::setDelayLine(m_fromBridge.get(), pickInt, m_impulse.get(), len, 0.5f, state);
@@ -88,9 +88,9 @@ VibratingString& VibratingString::operator=(VibratingString&& other) noexcept
 	return *this;
 }
 
-std::unique_ptr<VibratingString::DelayLine> VibratingString::initDelayLine(int len, int pick)
+std::unique_ptr<VibratingString::DelayLine> VibratingString::initDelayLine(int len)
 {
-	auto dl = std::make_unique<VibratingString::DelayLine>(); // TODO: ???
+	auto dl = std::make_unique<VibratingString::DelayLine>();
 	dl->length = len;
 	if (len > 0)
 	{
