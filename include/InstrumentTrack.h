@@ -248,6 +248,8 @@ public:
 	{
 		return m_previewMode;
 	}
+
+	bool processPresetSelectEvents(const MidiEvent& event);
 	
 	void replaceInstrument(DataFile dataFile);
 
@@ -284,6 +286,8 @@ protected slots:
 
 private:
 	void processCCEvent(int controller);
+
+	void changePreset();
 
 	MidiPort m_midiPort;
 
@@ -326,6 +330,10 @@ private:
 	Piano m_piano;
 
 	Microtuner m_microtuner;
+
+	int m_programNumber;
+	int m_programBankMSB;
+	int m_programBankLSB;
 
 	std::unique_ptr<BoolModel> m_midiCCEnable;
 	std::unique_ptr<FloatModel> m_midiCCModel[MidiControllerCount];
