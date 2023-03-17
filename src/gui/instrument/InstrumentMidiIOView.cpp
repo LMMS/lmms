@@ -36,7 +36,8 @@
 #include "gui_templates.h"
 #include "LcdSpinBox.h"
 #include "MidiClient.h"
-
+#include "ComboBox.h"
+#include "ComboBoxModel.h"
 namespace lmms::gui
 {
 
@@ -45,7 +46,8 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	QWidget( parent ),
 	ModelView( nullptr, this ),
 	m_rpBtn( nullptr ),
-	m_wpBtn( nullptr )
+	m_wpBtn( nullptr ),
+	m_presetSelectPolicyComboBox(new ComboBox())
 {
 	auto layout = new QVBoxLayout(this);
 	layout->setContentsMargins(5, 5, 5, 5);
@@ -144,6 +146,20 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 		midiOutputLayout->insertWidget( 0, m_wpBtn );
 	}
 
+	m_presetSelectGroupBox = new GroupBox(tr("ENABLE PRESET SELECTION"));
+	layout->addWidget( m_presetSelectGroupBox );
+
+	QHBoxLayout * presetSelectLayout = new QHBoxLayout(m_presetSelectGroupBox);
+	presetSelectLayout->setContentsMargins( 8, 18, 8, 8 );
+	presetSelectLayout->setSpacing( 6 );
+	m_presetSelectPolicyComboBox->setFixedSize(QSize(220, 20));
+	m_presetSelectPolicyComboBox->setEnabled(false);
+
+	presetSelectLayout->addWidget(m_presetSelectPolicyComboBox);
+	presetSelectLayout->addStretch();
+
+	connect( m_presetSelectGroupBox->ledButton(), SIGNAL( toggled( bool ) ),
+			m_presetSelectPolicyComboBox, SLOT( setEnabled( bool ) ) );
 	auto baseVelocityGroupBox = new GroupBox(tr("CUSTOM BASE VELOCITY"));
 	layout->addWidget( baseVelocityGroupBox );
 
@@ -197,6 +213,8 @@ void InstrumentMidiIOView::modelChanged()
 	{
 		m_wpBtn->setMenu( mp->m_writablePortsMenu );
 	}
+	m_presetSelectGroupBox->setModel(&mp->m_captureProgramChangeModel);
+	m_presetSelectPolicyComboBox->setModel(&mp->m_presetSelectPolicyModel);
 }
 
 

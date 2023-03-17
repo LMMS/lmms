@@ -33,6 +33,7 @@
 #include "Midi.h"
 #include "TimePos.h"
 #include "AutomatableModel.h"
+#include "ComboBoxModel.h"
 
 namespace lmms
 {
@@ -171,12 +172,22 @@ private:
 	BoolModel m_readableModel;
 	BoolModel m_writableModel;
 
+	BoolModel m_captureProgramChangeModel;
+
+	enum PresetSelectPolicy
+	{
+		BankSelectIgnore,
+		BankSelectMSB,
+		BankSelectBoth
+	};
+	ComboBoxModel m_presetSelectPolicyModel;
+
 	Map m_readablePorts;
 	Map m_writablePorts;
 
-
 	friend class gui::ControllerConnectionDialog;
 	friend class gui::InstrumentMidiIOView;
+	friend class InstrumentTrack;
 
 
 signals:

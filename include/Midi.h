@@ -85,7 +85,7 @@ using MidiMetaEventType = MidiMetaEventTypes;
 
 enum MidiStandardControllers
 {
-	MidiControllerBankSelect = 0,
+	MidiControllerBankSelectMSB = 0,
 	MidiControllerModulationWheel = 1,
 	MidiControllerBreathController = 2,
 	MidiControllerFootController = 4,
@@ -96,6 +96,7 @@ enum MidiStandardControllers
 	MidiControllerPan = 10,
 	MidiControllerEffectControl1 = 12,
 	MidiControllerEffectControl2 = 13,
+	MidiControllerBankSelectLSB = 32,
 	MidiControllerSustain = 64,
 	MidiControllerPortamento = 65,
 	MidiControllerSostenuto = 66,

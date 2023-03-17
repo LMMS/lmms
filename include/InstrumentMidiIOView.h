@@ -43,6 +43,7 @@ namespace gui
 class GroupBox;
 class LcdSpinBox;
 class LedCheckBox;
+class ComboBox;
 
 
 class InstrumentMidiIOView : public QWidget, public ModelView
@@ -67,6 +68,9 @@ private:
 	LcdSpinBox * m_outputProgramSpinBox;
 	LcdSpinBox * m_fixedOutputNoteSpinBox;
 	QToolButton * m_wpBtn;
+
+	ComboBox * m_presetSelectPolicyComboBox;
+	GroupBox * m_presetSelectGroupBox;
 
 	LcdSpinBox* m_baseVelocitySpinBox;
 

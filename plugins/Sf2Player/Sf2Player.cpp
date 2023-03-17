@@ -919,6 +919,33 @@ void Sf2Instrument::deleteNotePluginData( NotePlayHandle * _n )
 	delete pluginData;
 }
 
+bool Sf2Instrument::presetChangeSupported()
+{
+	return true;
+}
+
+void Sf2Instrument::changePreset(int bank, unsigned int preset)
+{
+	bool presetChanged = false;
+	if (bank != -1)
+	{
+		if (m_bankNum.value() != bank)
+		{
+			m_bankNum.setValue(bank);
+			presetChanged = true;
+		}
+	}
+	if (m_patchNum.value() != preset)
+	{
+		m_patchNum.setValue(preset);
+		presetChanged = true;
+	}
+
+	if (presetChanged)
+	{
+		emit patchChanged();
+	}
+}
 
 
 
@@ -1120,7 +1147,7 @@ void Sf2InstrumentView::modelChanged()
 
 
 	connect( k, SIGNAL( fileChanged() ), this, SLOT( updateFilename() ) );
-
+	connect( k, SIGNAL( patchChanged() ), this, SLOT( updatePatchName() ) );
 	connect( k, SIGNAL( fileLoading() ), this, SLOT( invalidateFile() ) );
 
 	updateFilename();

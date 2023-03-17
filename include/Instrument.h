@@ -114,6 +114,20 @@ public:
 
 	QString fullDisplayName() const override;
 
+	// An indication if the plugin supports natively preset change.
+	// If the function returns false, the appropriate control might
+	// be hidden.
+	inline virtual bool presetChangeSupported()
+	{
+		return false;
+	}
+
+	// An instruction to change the preset.
+	// The preset number is always an integer between 0 and 127
+	// The bank number can be equal to -1, meaning that bank selection
+	// is ignored. The plugin should decide what to do in such situation.
+	inline virtual void changePreset(int bank, unsigned int preset) {}
+
 	// --------------------------------------------------------------------
 	// provided functions:
 	// --------------------------------------------------------------------
