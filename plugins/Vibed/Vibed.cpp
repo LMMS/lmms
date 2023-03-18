@@ -217,7 +217,7 @@ QString Vibed::nodeName() const
 
 void Vibed::playNote(NotePlayHandle* n, sampleFrame* workingBuffer)
 {
-	if (/*n->totalFramesPlayed() == 0 ||*/ n->m_pluginData == nullptr)
+	if (!n->m_pluginData)
 	{
 		const auto newContainer = new StringContainer(n->frequency(),
 			Engine::audioEngine()->processingSampleRate(), s_sampleLength);
