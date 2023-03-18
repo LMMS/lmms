@@ -70,7 +70,6 @@ public:
 	gui::PluginView* instantiateView(QWidget* parent) override;
 
 private:
-
 	class StringContainer;
 
 	static constexpr int s_sampleLength = 128;

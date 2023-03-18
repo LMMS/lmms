@@ -100,7 +100,7 @@ public:
 
 	bool exists(int id) const { return m_exists[id]; }
 
-	sample_t getStringSample(int str) { return m_strings[str].nextSample(); }
+	sample_t getStringSample(int id) { return m_strings[id].nextSample(); }
 
 private:
 	const float m_pitch;
@@ -135,8 +135,8 @@ Vibed::Vibed(InstrumentTrack* instrumentTrack) :
 		m_impulses.emplace_back(std::make_unique<BoolModel>(false, this, tr("Impulse %1").arg(harm + 1)));
 		m_powerButtons.emplace_back(std::make_unique<BoolModel>(harm == 0, this, tr("String %1").arg(harm + 1)));
 		m_harmonics.emplace_back(std::make_unique<NineButtonSelectorModel>(2, 0, 8, this));
-		m_graphs.emplace_back(std::make_unique<graphModel>(-1.0, 1.0, s_sampleLength, this));
-		m_graphs.back()->setWaveToSine();
+		auto& model = m_graphs.emplace_back(std::make_unique<graphModel>(-1.0, 1.0, s_sampleLength, this));
+		model->setWaveToSine();
 	}
 }
 

@@ -40,7 +40,6 @@ public:
 	VibratingString() = default;
 	VibratingString(float pitch, float pick, float pickup, const float* impulse, int len,
 		sample_rate_t sampleRate, int oversample, float randomize, float stringLoss, float detune, bool state);
-
 	~VibratingString() = default;
 
 	VibratingString(const VibratingString&) = delete;
@@ -99,9 +98,11 @@ private:
 	std::unique_ptr<DelayLine> initDelayLine(int len);
 	void resample(const float* src, f_cnt_t srcFrames, f_cnt_t dstFrames);
 
-	/* setDelayLine initializes the string with an impulse at the pick
+	/**
+	 * setDelayLine initializes the string with an impulse at the pick
 	 * position unless the impulse is longer than the string, in which
-	 * case the impulse gets truncated. */
+	 * case the impulse gets truncated.
+	 */
 	void setDelayLine(DelayLine* dl, int pick, const float* values, int len, float scale, bool state)
 	{
 		float r;
@@ -145,13 +146,15 @@ private:
 		}
 	}
 
-	/* toBridgeUpdate(dl, insamp);
-	* Places "nut-reflected" sample from upper delay-line into
-	* current lower delay-line pointer position (which represents
-	* x = 0 position).  The pointer is then incremented (i.e. the
-	* wave travels one sample to the left), turning the previous
-	* position into an "effective" x = L position for the next
-	* iteration. */
+	/**
+	 * toBridgeUpdate(dl, insamp);
+	 * Places "nut-reflected" sample from upper delay-line into
+	 * current lower delay-line pointer position (which represents
+	 * x = 0 position). The pointer is then incremented (i.e. the
+	 * wave travels one sample to the left), turning the previous
+	 * position into an "effective" x = L position for the next
+	 * iteration.
+	 */
 	void toBridgeUpdate(DelayLine* dl, sample_t insamp)
 	{
 		sample_t* ptr = dl->pointer;
@@ -164,12 +167,14 @@ private:
 		dl->pointer = ptr;
 	}
 
-	/* fromBridgeUpdate(dl, insamp);
-	* Decrements current upper delay-line pointer position (i.e.
-	* the wave travels one sample to the right), moving it to the
-	* "effective" x = 0 position for the next iteration.  The
-	* "bridge-reflected" sample from lower delay-line is then placed
-	* into this position. */
+	/**
+	 * fromBridgeUpdate(dl, insamp);
+	 * Decrements current upper delay-line pointer position (i.e.
+	 * the wave travels one sample to the right), moving it to the
+	 * "effective" x = 0 position for the next iteration. The
+	 * "bridge-reflected" sample from lower delay-line is then placed
+	 * into this position.
+	 */
 	void fromBridgeUpdate(DelayLine* dl, sample_t insamp)
 	{
 		sample_t* ptr = dl->pointer;
@@ -182,9 +187,11 @@ private:
 		dl->pointer = ptr;
 	}
 
-	/* dlAccess(dl, position);
-	* Returns sample "position" samples into delay-line's past.
-	* Position "0" points to the most recently inserted sample. */
+	/**
+	 * dlAccess(dl, position);
+	 * Returns sample "position" samples into delay-line's past.
+	 * Position "0" points to the most recently inserted sample.
+	 */
 	static sample_t dlAccess(DelayLine* dl, int position)
 	{
 		sample_t* outpos = dl->pointer + position;
@@ -200,31 +207,35 @@ private:
 	}
 
 	/*
-	*  Right-going delay line:
-	*  -->---->---->--- 
-	*  x=0
-	*  (pointer)
-	*  Left-going delay line:
-	*  --<----<----<--- 
-	*  x=0
-	*  (pointer)
-	*/
+	 * Right-going delay line:
+	 * -->---->---->---
+	 * x=0
+	 * (pointer)
+	 * Left-going delay line:
+	 * --<----<----<---
+	 * x=0
+	 * (pointer)
+	 */
 
-	/* fromBridgeAccess(dl, position);
-	* Returns spatial sample at position "position", where position zero
-	* is equal to the current upper delay-line pointer position (x = 0).
-	* In a right-going delay-line, position increases to the right, and
-	* delay increases to the right => left = past and right = future. */
+	/**
+	 * fromBridgeAccess(dl, position);
+	 * Returns spatial sample at position "position", where position zero
+	 * is equal to the current upper delay-line pointer position (x = 0).
+	 * In a right-going delay-line, position increases to the right, and
+	 * delay increases to the right => left = past and right = future.
+	 */
 	static sample_t fromBridgeAccess(DelayLine* dl, int position)
 	{
 		return dlAccess(dl, position);
 	}
 
-	/* toBridgeAccess(dl, position);
-	* Returns spatial sample at position "position", where position zero
-	* is equal to the current lower delay-line pointer position (x = 0).
-	* In a left-going delay-line, position increases to the right, and
-	* delay DEcreases to the right => left = future and right = past. */
+	/**
+	 * toBridgeAccess(dl, position);
+	 * Returns spatial sample at position "position", where position zero
+	 * is equal to the current lower delay-line pointer position (x = 0).
+	 * In a left-going delay-line, position increases to the right, and
+	 * delay DEcreases to the right => left = future and right = past.
+	 */
 	static inline sample_t toBridgeAccess(DelayLine* dl, int position)
 	{
 		return dlAccess(dl, position);

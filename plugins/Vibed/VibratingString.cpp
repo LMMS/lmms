@@ -1,5 +1,5 @@
 /*
- * VibratingString.h - model of a vibrating string lifted from pluckedSynth
+ * VibratingString.cpp - model of a vibrating string lifted from pluckedSynth
  *
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/yahoo/com>
  *
@@ -36,13 +36,13 @@ namespace lmms
 
 VibratingString::VibratingString(float pitch, float pick, float pickup, const float* impulse, int len,
 	sample_rate_t sampleRate, int oversample, float randomize, float stringLoss, float detune, bool state) :
-	m_oversample{2 * oversample / (int)(sampleRate / Engine::audioEngine()->baseSampleRate())},
+	m_oversample{2 * oversample / static_cast<int>(sampleRate / Engine::audioEngine()->baseSampleRate())},
 	m_randomize{randomize},
 	m_stringLoss{1.0f - stringLoss},
-	m_state{0.1f}
+	m_choice{static_cast<int>(m_oversample * static_cast<float>(std::rand()) / RAND_MAX)},
+	m_state{0.1f},
+	m_outsamp{std::make_unique<sample_t[]>(m_oversample)}
 {
-	m_outsamp = std::make_unique<sample_t[]>(m_oversample);
-
 	int stringLength = static_cast<int>(m_oversample * sampleRate / pitch) + 1;
 	stringLength += static_cast<int>(stringLength * -detune);
 
@@ -64,8 +64,6 @@ VibratingString::VibratingString(float pitch, float pick, float pickup, const fl
 
 	VibratingString::setDelayLine(m_toBridge.get(), pickInt, m_impulse.get(), len, 0.5f, state);
 	VibratingString::setDelayLine(m_fromBridge.get(), pickInt, m_impulse.get(), len, 0.5f, state);
-
-	m_choice = static_cast<int>(m_oversample * static_cast<float>(std::rand()) / RAND_MAX);
 
 	m_pickupLoc = static_cast<int>(pickup * stringLength);
 }
