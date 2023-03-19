@@ -45,32 +45,14 @@ class NineButtonSelector : public QWidget, public IntModelView
 {
 	Q_OBJECT
 public:
-	NineButtonSelector(
-		QPixmap button0On, QPixmap button0Off,
-		QPixmap button1On, QPixmap button1Off,
-		QPixmap button2On, QPixmap button2Off,
-		QPixmap button3On, QPixmap button3Off,
-		QPixmap button4On, QPixmap button4Off,
-		QPixmap button5On, QPixmap button5Off,
-		QPixmap button6On, QPixmap button6Off,
-		QPixmap button7On, QPixmap button7Off,
-		QPixmap button8On, QPixmap button8Off,
-		int defaultButton, int x, int y, QWidget* parent);
+	NineButtonSelector(std::array<QPixmap, 18> onOffIcons, int defaultButton, int x, int y, QWidget* parent);
 	~NineButtonSelector() override = default;
 
 protected:
 	void setSelected(int newButton);
 
 public slots:
-	void button0Clicked();
-	void button1Clicked();
-	void button2Clicked();
-	void button3Clicked();
-	void button4Clicked();
-	void button5Clicked();
-	void button6Clicked();
-	void button7Clicked();
-	void button8Clicked();
+	void buttonClicked(int id);
 	void contextMenuEvent(QContextMenuEvent*) override;
 
 signals:
