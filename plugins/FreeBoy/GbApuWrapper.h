@@ -1,7 +1,7 @@
 /*
- * Gb_Apu_Buffer.cpp - Gb_Apu subclass which allows direct buffer access
+ * GbApuWrapper.h - Gb_Apu subclass which allows direct buffer access
  * Copyright (c) 2017 Tres Finocchiaro <tres.finocchiaro/at/gmail.com>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -20,8 +20,9 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-#ifndef GB_APU_BUFFER_H
-#define GB_APU_BUFFER_H
+
+#ifndef LMMS_GB_APU_WRAPPER_H
+#define LMMS_GB_APU_WRAPPER_H
 
 #include "Gb_Apu.h"
 #include "Multi_Buffer.h"
@@ -31,25 +32,30 @@ namespace lmms
 {
 
 
-class Gb_Apu_Buffer : public Gb_Apu {
+class GbApuWrapper : private Gb_Apu
+{
 	MM_OPERATORS
 public:
-	Gb_Apu_Buffer() = default;
-	~Gb_Apu_Buffer() = default;
+	GbApuWrapper() = default;
+	~GbApuWrapper() = default;
 
-	void end_frame(blip_time_t);
+	blargg_err_t setSampleRate(long sampleRate, long clockRate);
+	void writeRegister(unsigned addr, int data) { Gb_Apu::write_register(fakeClock(), addr, data); }
+	long samplesAvail() const;
+	long readSamples(blip_sample_t* out, long count);
+	void trebleEq(const blip_eq_t& eq) { Gb_Apu::treble_eq(eq); }
+	void bassFreq(int freq);
+	void endFrame(blip_time_t endTime);
 
-	blargg_err_t set_sample_rate(long sample_rate, long clock_rate);
-	long samples_avail() const;
-	using sample_t = blip_sample_t;
-	long read_samples(sample_t* out, long count);
-	void bass_freq(int freq);
 private:
 	Stereo_Buffer m_buf;
+
+	// Fake CPU timing
+	blip_time_t fakeClock() { return m_time += 4; }
+	blip_time_t m_time = 0;
 };
 
 
 } // namespace lmms
 
-#endif
-
+#endif // LMMS_GB_APU_WRAPPER_H
