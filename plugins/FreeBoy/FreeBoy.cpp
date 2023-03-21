@@ -249,7 +249,7 @@ void FreeBoyInstrument::playNote( NotePlayHandle * _n,
 	int data = 0;
 	int freq = _n->frequency();
 
-	if ( tfp == 0 )
+	if (!_n->m_pluginData)
 	{
 		auto papu = new Gb_Apu_Buffer();
 		papu->set_sample_rate( samplerate, CLOCK_RATE );

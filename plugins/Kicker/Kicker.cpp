@@ -163,7 +163,7 @@ void KickerInstrument::playNote( NotePlayHandle * _n,
 	const float decfr = m_decayModel.value() * Engine::audioEngine()->processingSampleRate() / 1000.0f;
 	const f_cnt_t tfp = _n->totalFramesPlayed();
 
-	if ( tfp == 0 )
+	if (!_n->m_pluginData)
 	{
 		_n->m_pluginData = new SweepOsc(
 					DistFX( m_distModel.value(),

@@ -201,7 +201,7 @@ void Xpressive::playNote(NotePlayHandle* nph, sampleFrame* working_buffer) {
 	m_A2=m_parameterA2.value();
 	m_A3=m_parameterA3.value();
 
-	if (nph->totalFramesPlayed() == 0 || nph->m_pluginData == nullptr) {
+	if (!nph->m_pluginData) {
 
 		auto exprO1 = new ExprFront(m_outputExpression[0].constData(),
 			Engine::audioEngine()->processingSampleRate()); // give the "last" function a whole second

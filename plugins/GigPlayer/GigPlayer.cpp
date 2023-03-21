@@ -293,8 +293,6 @@ void GigInstrument::playNote( NotePlayHandle * _n, sampleFrame * )
 {
 	const float LOG440 = 2.643452676f;
 
-	const f_cnt_t tfp = _n->totalFramesPlayed();
-
 	int midiNote = (int) floor( 12.0 * ( log2( _n->unpitchedFrequency() ) - LOG440 ) - 4.0 );
 
 	// out of range?
@@ -303,7 +301,7 @@ void GigInstrument::playNote( NotePlayHandle * _n, sampleFrame * )
 		return;
 	}
 
-	if( tfp == 0 )
+	if (!_n->m_pluginData)
 	{
 		auto pluginData = new GIGPluginData;
 		pluginData->midiNote = midiNote;

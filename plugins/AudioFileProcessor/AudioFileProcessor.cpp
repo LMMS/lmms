@@ -130,7 +130,7 @@ void AudioFileProcessor::playNote( NotePlayHandle * _n,
 		return;
 	}
 
-	if( !_n->m_pluginData )
+	if (!_n->m_pluginData)
 	{
 		if( m_stutterModel.value() == true && m_nextPlayStartPoint >= m_sampleBuffer.endFrame() )
 		{
