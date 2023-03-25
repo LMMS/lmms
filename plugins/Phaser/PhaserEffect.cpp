@@ -69,7 +69,7 @@ PhaserEffect::PhaserEffect(Model* parent, const Descriptor::SubPluginFeatures::K
 	
 	// Prepare the oversampling filters
 	double coefs[PHASER_OVERSAMPLE_COEFS];
-	hiir::PolyphaseIir2Designer::compute_coefs_spec_order_tbw(coefs, PHASER_OVERSAMPLE_COEFS, 0.01);
+	hiir::PolyphaseIir2Designer::compute_coefs_spec_order_tbw(coefs, PHASER_OVERSAMPLE_COEFS, 0.04);
 	for (int i = 0; i < 2; ++i)
 	{
 		m_oversampleAnalogIn1[i].set_coefs(coefs);
