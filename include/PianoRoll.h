@@ -149,6 +149,8 @@ public:
 	{
 		return m_midiClip != nullptr;
 	}
+	
+	int trackOctaveSize() const;
 
 	Song::PlayModes desiredPlayModeForAccompany() const;
 
