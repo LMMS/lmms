@@ -259,6 +259,7 @@ SongEditor::SongEditor( Song * song ) :
 	m_zvsStatus = new TextFloat;
 	m_zvsStatus->setTitle(tr("Zoom"));
 	m_zvsStatus->setPixmap(embed::getIconPixmap("zoom"));
+	m_zvsStatus->setVisibilityTimeOut(1000);
 
 	//Set up snapping model, 2^i
 	for ( int i = 3; i >= -4; i-- )
@@ -540,7 +541,7 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 
 void SongEditor::wheelEvent( QWheelEvent * we )
 {
-	if( we->modifiers() & Qt::ControlModifier )
+	if ((we->modifiers() & Qt::ControlModifier) && (position(we).x() > m_trackHeadWidth))
 	{
 		int z = m_zoomingModel->value();
 		int pos = 0;
@@ -592,9 +593,10 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		// update slider with new zooming value
 		m_zoomingModel->setValue(z);
 
+		if (!m_zvsStatus->isVisible()) { m_zvsStatus->setVisibilityTimeOut(1000); }
 		m_zvsStatus->move(QPoint(globalPosition(we).x() + 6, globalPosition(we).y()));
 		m_zvsStatus->show();
-		m_zvsStatus->setText(tr("Value: %1 \%").arg(m_zoomingModel->value()));
+		m_zvsStatus->setText(tr("Value: %1%").arg(m_zoomingModel->value()));
 
 
 		// update timeline
@@ -1035,6 +1037,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_zoomingSlider->setPageStep(1);
 	m_zoomingSlider->setFixedSize(100, 26);
 	m_zoomingSlider->setToolTip(tr("Zoom"));
+	m_zoomingSlider->setContextMenuPolicy(Qt::NoContextMenu);
 	connect(m_editor->zoomingModel(), SIGNAL(dataChanged()), this, SLOT(updateSnapLabel()));
 	connect(m_zoomingSlider, SIGNAL(sliderPressed()), this, SLOT(showZoomingSliderFloat()));
 	connect(m_zoomingSlider, SIGNAL(logicSliderMoved(int)), this, SLOT(updateZoomingSliderFloat(int)));
@@ -1179,7 +1182,7 @@ void SongEditorWindow::showZoomingSliderFloat()
 
 void SongEditorWindow::updateZoomingSliderFloat(int new_val)
 {
-	m_zvsStatus->setText(tr("Value: %1 \%").arg(new_val));
+	m_zvsStatus->setText(tr("Value: %1%").arg(new_val));
 }
 
 void SongEditorWindow::hideZoomingSliderFloat()
@@ -1202,7 +1205,7 @@ void SongEditorWindow::keyPressEvent(QKeyEvent* ke)
 
 void SongEditorWindow::keyReleaseEvent(QKeyEvent* ke)
 {
-	if ((ke->key() == Qt::Key_Control) && m_editor->m_zvsStatus->isVisible()) { m_editor->m_zvsStatus->hide(); }
+	if (m_editor->m_zvsStatus->isVisible()) { m_editor->m_zvsStatus->hide(); }
 	QWidget::keyPressEvent(ke);
 }
 

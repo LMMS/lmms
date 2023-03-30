@@ -22,18 +22,19 @@
  *
  */
 
+#include "TimeLineWidget.h"
+
+#include <cmath>
 
 #include <QDomElement>
-#include <QTimer>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QTimer>
 #include <QToolBar>
 
-
-#include "TimeLineWidget.h"
 #include "embed.h"
-#include "NStateButton.h"
 #include "GuiApplication.h"
+#include "NStateButton.h"
 #include "TextFloat.h"
 
 namespace lmms::gui
@@ -274,8 +275,8 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	{
 		++barNumber;
 		// round m_ppb to the nearest power of two
-		float ppbP2 = pow(2, round(log2(m_ppb)));
-		if ((barNumber - 1) % qMax(1, qRound(1.0f / 3.0f * TimePos::ticksPerBar() / ppbP2)) == 0)
+		const float ppbP2 = pow(2, round(log2(m_ppb)));
+		if ((barNumber - 1) % std::max(1l, std::lround((1.0f / 3.0f) * TimePos::ticksPerBar() / ppbP2)) == 0)
 		{
 			const int cx = x + qRound( i * m_ppb );
 			p.setPen( barLineColor );
