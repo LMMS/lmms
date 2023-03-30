@@ -77,9 +77,9 @@ bool DispersionEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	
 	// Allpass coefficient calculation
 	const float w0 = (F_2PI / m_sampleRate) * freq;
-	const float a0 = 1 + (qFastSin(w0) / (reso * 2.f));
+	const float a0 = 1 + (std::sin(w0) / (reso * 2.f));
 	float apCoeff1 = (1 - (a0 - 1)) / a0;
-	float apCoeff2 = (-2 * qFastCos(w0)) / a0;
+	float apCoeff2 = (-2 * std::cos(w0)) / a0;
 	
 	float dcCoeff = 0.001 * (44100.f / m_sampleRate);
 	
