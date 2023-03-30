@@ -34,7 +34,7 @@
 namespace lmms
 {
 
-constexpr int MAX_DISPERSION_FILTERS = 400;
+constexpr int MAX_DISPERSION_FILTERS = 999;
 
 class DispersionEffect : public Effect
 {
