@@ -60,7 +60,7 @@ DispersionEffect::DispersionEffect(Model* parent, const Descriptor::SubPluginFea
 
 bool DispersionEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 {
-	if(!isEnabled() || !isRunning ())
+	if (!isEnabled() || !isRunning())
 	{
 		return false;
 	}
@@ -75,7 +75,7 @@ bool DispersionEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	const float feedback = m_dispersionControls.m_feedbackModel.value();
 	const bool dc = m_dispersionControls.m_dcModel.value();
 	
-	// Allpass coefficient calculation.
+	// Allpass coefficient calculation
 	const float w0 = (F_2PI / m_sampleRate) * freq;
 	const float a0 = 1 + (qFastSin(w0) / (reso * 2.f));
 	float apCoeff1 = (1 - (a0 - 1)) / a0;
@@ -87,7 +87,7 @@ bool DispersionEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	{
 		if (amount < m_amountVal)
 		{
-			// Flush filter buffers when they're no longer in use.
+			// Flush filter buffers when they're no longer in use
 			for (int i = amount; i < m_amountVal; ++i)
 			{
 				m_apX0[i][0] = m_apX0[i][1] = m_apX1[i][0] = m_apX1[i][1] = 0;
@@ -107,7 +107,7 @@ bool DispersionEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		
 		if (dc)
 		{
-			// DC offset removal.
+			// DC offset removal
 			for (int i = 0; i < 2; ++i)
 			{
 				m_integrator[i] = m_integrator[i] * (1.f - dcCoeff) + s[i] * dcCoeff;
@@ -121,12 +121,11 @@ bool DispersionEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	}
 
 	checkGate(outSum / frames);
-
 	return isRunning();
 }
 
 
-void DispersionEffect::runDispersionAP(int filtNum, float apCoeff1, float apCoeff2, sample_t * put)
+void DispersionEffect::runDispersionAP(int filtNum, float apCoeff1, float apCoeff2, sample_t* put)
 {
 	for (int i = 0; i < 2; ++i)
 	{
@@ -135,15 +134,14 @@ void DispersionEffect::runDispersionAP(int filtNum, float apCoeff1, float apCoef
 		{
 			const sample_t currentInput = filterOutput;
 			filterOutput = apCoeff1 * (currentInput - m_apY1[j][i]) +
-			  apCoeff2 * (m_apX0[j][i] - m_apY0[j][i]) +
-			  m_apX1[j][i];
-
+				apCoeff2 * (m_apX0[j][i] - m_apY0[j][i]) +
+				m_apX1[j][i];
+			
 			m_apX1[j][i] = m_apX0[j][i];
 			m_apX0[j][i] = currentInput;
 			m_apY1[j][i] = m_apY0[j][i];
 			m_apY0[j][i] = filterOutput;
 		}
-		
 		put[i] = filterOutput;
 	}
 }

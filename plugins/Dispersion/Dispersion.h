@@ -48,7 +48,7 @@ public:
 		return &m_dispersionControls;
 	}
 	
-	void runDispersionAP(int filtNum, float apCoeff1, float apCoeff2, float * put);
+	void runDispersionAP(int filtNum, float apCoeff1, float apCoeff2, sample_t* put);
 
 private:
 	DispersionControls m_dispersionControls;
