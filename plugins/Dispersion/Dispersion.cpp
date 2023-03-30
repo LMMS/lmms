@@ -75,6 +75,7 @@ bool DispersionEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	const float feedback = m_dispersionControls.m_feedbackModel.value();
 	const bool dc = m_dispersionControls.m_dcModel.value();
 	
+	// Allpass coefficient calculation.
 	const float w0 = (F_2PI / m_sampleRate) * freq;
 	const float a0 = 1 + (qFastSin(w0) / (reso * 2.f));
 	float apCoeff1 = (1 - (a0 - 1)) / a0;
@@ -86,6 +87,7 @@ bool DispersionEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	{
 		if (amount < m_amountVal)
 		{
+			// Flush filter buffers when they're no longer in use.
 			for (int i = amount; i < m_amountVal; ++i)
 			{
 				m_apX0[i][0] = m_apX0[i][1] = m_apX1[i][0] = m_apX1[i][1] = 0;
@@ -95,16 +97,17 @@ bool DispersionEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		m_amountVal = amount;
 	}
 
-	for(fpp_t f = 0; f < frames; ++f)
+	for (fpp_t f = 0; f < frames; ++f)
 	{
 		sample_t s[2] = { buf[f][0] + m_feedbackVal[0], buf[f][1] + m_feedbackVal[1] };
 		
-		runDispersionAP(amount, apCoeff1, apCoeff2, s);
+		runDispersionAP(m_amountVal, apCoeff1, apCoeff2, s);
 		m_feedbackVal[0] = s[0] * feedback;
 		m_feedbackVal[1] = s[1] * feedback;
 		
 		if (dc)
 		{
+			// DC offset removal.
 			for (int i = 0; i < 2; ++i)
 			{
 				m_integrator[i] = m_integrator[i] * (1.f - dcCoeff) + s[i] * dcCoeff;
