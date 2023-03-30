@@ -62,6 +62,8 @@ private:
 	
 	float m_feedbackVal[2] = {0};
 	float m_integrator[2] = {0};
+	
+	int m_amountVal;
 
 	friend class DispersionControls;
 } ;

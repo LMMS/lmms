@@ -52,7 +52,8 @@ Plugin::Descriptor PLUGIN_EXPORT dispersion_plugin_descriptor =
 DispersionEffect::DispersionEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
 	Effect(&dispersion_plugin_descriptor, parent, key),
 	m_dispersionControls(this),
-	m_sampleRate(Engine::audioEngine()->processingSampleRate())
+	m_sampleRate(Engine::audioEngine()->processingSampleRate()),
+	m_amountVal(0)
 {
 }
 
@@ -80,6 +81,19 @@ bool DispersionEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	float apCoeff2 = (-2 * qFastCos(w0)) / a0;
 	
 	float dcCoeff = 0.001 * (44100.f / m_sampleRate);
+	
+	if (amount != m_amountVal)
+	{
+		if (amount < m_amountVal)
+		{
+			for (int i = amount; i < m_amountVal; ++i)
+			{
+				m_apX0[i][0] = m_apX0[i][1] = m_apX1[i][0] = m_apX1[i][1] = 0;
+				m_apY0[i][0] = m_apY0[i][1] = m_apY1[i][0] = m_apY1[i][1] = 0;
+			}
+		}
+		m_amountVal = amount;
+	}
 
 	for(fpp_t f = 0; f < frames; ++f)
 	{
