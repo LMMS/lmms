@@ -29,7 +29,6 @@
 #include "Effect.h"
 #include "DispersionControls.h"
 #include "lmms_math.h"
-#include <qmath.h>
 
 namespace lmms
 {
