@@ -46,7 +46,8 @@ DispersionControlDialog::DispersionControlDialog(DispersionControls* controls) :
 
 	LcdSpinBox * m_amountBox = new LcdSpinBox(3, this, "Amount");
 	m_amountBox->setModel(&controls->m_amountModel);
-	m_amountBox->move(5, 13);
+	m_amountBox->move(5, 10);
+	m_amountBox->setLabel(tr("AMOUNT"));
 	m_amountBox->setToolTip(tr("Number of allpass filters"));
 	
 	Knob * freqKnob = new Knob(knobBright_26, this);
