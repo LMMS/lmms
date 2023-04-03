@@ -72,7 +72,7 @@ bool DispersionEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	const int amount = m_dispersionControls.m_amountModel.value();
 	const float freq = m_dispersionControls.m_freqModel.value();
 	const float reso = m_dispersionControls.m_resoModel.value();
-	const float feedback = m_dispersionControls.m_feedbackModel.value();
+	float feedback = m_dispersionControls.m_feedbackModel.value();
 	const bool dc = m_dispersionControls.m_dcModel.value();
 	
 	// Allpass coefficient calculation
@@ -95,6 +95,11 @@ bool DispersionEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			}
 		}
 		m_amountVal = amount;
+	}
+	
+	if (amount == 0)
+	{
+		feedback = 0;
 	}
 
 	for (fpp_t f = 0; f < frames; ++f)
