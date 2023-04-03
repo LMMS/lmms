@@ -63,12 +63,12 @@ namespace lmms::gui
 
 namespace
 {
-constexpr int ZOOM_MIN = 13;
+constexpr int ZOOM_MIN = 15;
 constexpr int ZOOM_MAX = 1600;
 constexpr int ZOOM_INI = 100;
 
 // predefined zoom values used for Shift+Ctrl+mouseWheel
-constexpr auto PredefinedZoom = std::array{13, 20, 30, 40, 50, 60, 80, 100, 150, 200, 300, 400, 600, 800, 1000, 1200, 1400, 1600};
+constexpr auto PredefinedZoom = std::array{15, 20, 30, 40, 50, 60, 80, 100, 150, 200, 300, 400, 600, 800, 1000, 1200, 1400, 1600};
 }
 
 SongEditor::SongEditor( Song * song ) :
@@ -576,9 +576,7 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		
 		z = std::clamp(z, ZOOM_MIN, ZOOM_MAX);
 
-		int x = (position(we).x() - m_trackHeadWidth > 0) 
-			? position(we).x() - m_trackHeadWidth 
-			: m_trackHeadWidth + 1;
+		int x = position(we).x() - m_trackHeadWidth;
 		// save the pixels up to the cursor next bar when starting zooming
 		if (!m_zvsStatus->isVisible()) { m_iniBar = static_cast<int>(x / pixelsPerBar()); }
 
@@ -1206,7 +1204,7 @@ void SongEditorWindow::keyPressEvent(QKeyEvent* ke)
 void SongEditorWindow::keyReleaseEvent(QKeyEvent* ke)
 {
 	if (m_editor->m_zvsStatus->isVisible()) { m_editor->m_zvsStatus->hide(); }
-	QWidget::keyPressEvent(ke);
+	QWidget::keyReleaseEvent(ke);
 }
 
 
