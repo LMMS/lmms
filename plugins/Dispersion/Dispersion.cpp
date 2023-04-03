@@ -100,6 +100,7 @@ bool DispersionEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	if (amount == 0)
 	{
 		feedback = 0;
+		m_feedbackVal[0] = m_feedbackVal[1] = 0;
 	}
 
 	for (fpp_t f = 0; f < frames; ++f)
