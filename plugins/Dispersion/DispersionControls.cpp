@@ -23,10 +23,10 @@
  */
 
 
-#include <QDomElement>
-
 #include "DispersionControls.h"
 #include "Dispersion.h"
+
+#include <QDomElement>
 
 namespace lmms
 {
@@ -46,25 +46,25 @@ DispersionControls::DispersionControls(DispersionEffect* effect) :
 
 
 
-void DispersionControls::loadSettings(const QDomElement& _this)
+void DispersionControls::loadSettings(const QDomElement& elem)
 {
-	m_amountModel.loadSettings(_this, "amount");
-	m_freqModel.loadSettings(_this, "freq");
-	m_resoModel.loadSettings(_this, "reso");
-	m_feedbackModel.loadSettings(_this, "feedback");
-	m_dcModel.loadSettings(_this, "dc");
+	m_amountModel.loadSettings(elem, "amount");
+	m_freqModel.loadSettings(elem, "freq");
+	m_resoModel.loadSettings(elem, "reso");
+	m_feedbackModel.loadSettings(elem, "feedback");
+	m_dcModel.loadSettings(elem, "dc");
 }
 
 
 
 
-void DispersionControls::saveSettings(QDomDocument& doc, QDomElement& _this)
+void DispersionControls::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
-	m_amountModel.saveSettings(doc, _this, "amount");
-	m_freqModel.saveSettings(doc, _this, "freq");
-	m_resoModel.saveSettings(doc, _this, "reso");
-	m_feedbackModel.saveSettings(doc, _this, "feedback");
-	m_dcModel.saveSettings(doc, _this, "dc");
+	m_amountModel.saveSettings(doc, elem, "amount");
+	m_freqModel.saveSettings(doc, elem, "freq");
+	m_resoModel.saveSettings(doc, elem, "reso");
+	m_feedbackModel.saveSettings(doc, elem, "feedback");
+	m_dcModel.saveSettings(doc, elem, "dc");
 }
 
 

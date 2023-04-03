@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef DISPERSION_CONTROLS_H
-#define DISPERSION_CONTROLS_H
+#ifndef LMMS_DISPERSION_CONTROLS_H
+#define LMMS_DISPERSION_CONTROLS_H
 
 #include "EffectControls.h"
 #include "DispersionControlDialog.h"
@@ -74,9 +74,9 @@ private:
 	friend class gui::DispersionControlDialog;
 	friend class DispersionEffect;
 
-} ;
+};
 
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_DISPERSION_CONTROLS_H

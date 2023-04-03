@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef DISPERSION_CONTROL_DIALOG_H
-#define DISPERSION_CONTROL_DIALOG_H
+#ifndef LMMS_GUI_DISPERSION_CONTROL_DIALOG_H
+#define LMMS_GUI_DISPERSION_CONTROL_DIALOG_H
 
 #include "EffectControlDialog.h"
 
@@ -42,11 +42,11 @@ class DispersionControlDialog : public EffectControlDialog
 public:
 	DispersionControlDialog(DispersionControls* controls);
 	~DispersionControlDialog() override = default;
-} ;
+};
 
 
 } // namespace gui
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_DISPERSION_CONTROL_DIALOG_H

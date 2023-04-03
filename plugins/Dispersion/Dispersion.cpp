@@ -44,7 +44,7 @@ Plugin::Descriptor PLUGIN_EXPORT dispersion_plugin_descriptor =
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,
-} ;
+};
 
 }
 

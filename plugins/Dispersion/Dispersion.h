@@ -23,8 +23,8 @@
  */
 
 
-#ifndef DISPERSION_H
-#define DISPERSION_H
+#ifndef LMMS_DISPERSION_H
+#define LMMS_DISPERSION_H
 
 #include "Effect.h"
 #include "DispersionControls.h"
@@ -33,7 +33,7 @@
 namespace lmms
 {
 
-constexpr int MAX_DISPERSION_FILTERS = 999;
+constexpr inline int MAX_DISPERSION_FILTERS = 999;
 
 class DispersionEffect : public Effect
 {
@@ -65,9 +65,9 @@ private:
 	int m_amountVal;
 
 	friend class DispersionControls;
-} ;
+};
 
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_DISPERSION_H
