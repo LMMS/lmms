@@ -49,7 +49,7 @@ DispersionControlDialog::DispersionControlDialog(DispersionControls* controls) :
 	m_amountBox->setModel(&controls->m_amountModel);
 	m_amountBox->move(5, 10);
 	m_amountBox->setLabel(tr("AMOUNT"));
-	m_amountBox->setToolTip(tr("Number of allpass filters"));
+	m_amountBox->setToolTip(tr("Number of all-pass filters"));
 	
 	Knob * freqKnob = new Knob(knobBright_26, this);
 	freqKnob->move(59, 8);

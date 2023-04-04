@@ -59,15 +59,15 @@ private:
 	
 	using Filter = std::array<sample_t, MAX_DISPERSION_FILTERS * 2>;
 	struct FilterState {
-		Filter x0 = {0};
-		Filter x1 = {0};
-		Filter y0 = {0};
-		Filter y1 = {0};
+		Filter x0{};
+		Filter x1{};
+		Filter y0{};
+		Filter y1{};
 	};
 	FilterState m_state = {};
 	
-	std::array<float, 2> m_feedbackVal = {0};
-	std::array<float, 2> m_integrator = {0};
+	std::array<float, 2> m_feedbackVal{};
+	std::array<float, 2> m_integrator{};
 
 	friend class DispersionControls;
 };

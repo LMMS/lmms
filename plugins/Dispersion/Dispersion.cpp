@@ -37,7 +37,7 @@ Plugin::Descriptor PLUGIN_EXPORT dispersion_plugin_descriptor =
 {
 	LMMS_STRINGIFY(PLUGIN_NAME),
 	"Dispersion",
-	QT_TRANSLATE_NOOP("PluginBrowser", "An allpass filter allowing for extremely high orders."),
+	QT_TRANSLATE_NOOP("PluginBrowser", "An all-pass filter allowing for extremely high orders."),
 	"Lost Robot <r94231/at/gmail/dot/com>",
 	0x0100,
 	Plugin::Effect,
@@ -75,7 +75,7 @@ bool DispersionEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	float feedback = m_dispersionControls.m_feedbackModel.value();
 	const bool dc = m_dispersionControls.m_dcModel.value();
 	
-	// Allpass coefficient calculation
+	// All-pass coefficient calculation
 	const float w0 = (F_2PI / m_sampleRate) * freq;
 	const float a0 = 1 + (std::sin(w0) / (reso * 2.f));
 	float apCoeff1 = (1 - (a0 - 1)) / a0;
