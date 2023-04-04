@@ -133,18 +133,18 @@ bool DispersionEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 void DispersionEffect::runDispersionAP(const int filtNum, const float apCoeff1, const float apCoeff2, std::array<sample_t, 2> &put)
 {
 	for (int i = 0; i < filtNum * 2; ++i)
-    {
-        const int channel = i % 2;
-        const sample_t currentInput = put[channel];
-        const sample_t filterOutput = apCoeff1 * (currentInput - m_state.y1[i])
-            + apCoeff2 * (m_state.x0[i] - m_state.y0[i]) + m_state.x1[i];
-        m_state.x1[i] = m_state.x0[i];
-        m_state.x0[i] = currentInput;
-        m_state.y1[i] = m_state.y0[i];
-        m_state.y0[i] = filterOutput;
+	{
+		const int channel = i % 2;
+		const sample_t currentInput = put[channel];
+		const sample_t filterOutput = apCoeff1 * (currentInput - m_state.y1[i])
+			+ apCoeff2 * (m_state.x0[i] - m_state.y0[i]) + m_state.x1[i];
+		m_state.x1[i] = m_state.x0[i];
+		m_state.x0[i] = currentInput;
+		m_state.y1[i] = m_state.y0[i];
+		m_state.y0[i] = filterOutput;
 
-        put[channel] = filterOutput;
-    }
+		put[channel] = filterOutput;
+	}
 }
 
 
