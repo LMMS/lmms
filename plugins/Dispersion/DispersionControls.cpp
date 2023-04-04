@@ -46,25 +46,25 @@ DispersionControls::DispersionControls(DispersionEffect* effect) :
 
 
 
-void DispersionControls::loadSettings(const QDomElement& elem)
+void DispersionControls::loadSettings(const QDomElement& parent)
 {
-	m_amountModel.loadSettings(elem, "amount");
-	m_freqModel.loadSettings(elem, "freq");
-	m_resoModel.loadSettings(elem, "reso");
-	m_feedbackModel.loadSettings(elem, "feedback");
-	m_dcModel.loadSettings(elem, "dc");
+	m_amountModel.loadSettings(parent, "amount");
+	m_freqModel.loadSettings(parent, "freq");
+	m_resoModel.loadSettings(parent, "reso");
+	m_feedbackModel.loadSettings(parent, "feedback");
+	m_dcModel.loadSettings(parent, "dc");
 }
 
 
 
 
-void DispersionControls::saveSettings(QDomDocument& doc, QDomElement& elem)
+void DispersionControls::saveSettings(QDomDocument& doc, QDomElement& parent)
 {
-	m_amountModel.saveSettings(doc, elem, "amount");
-	m_freqModel.saveSettings(doc, elem, "freq");
-	m_resoModel.saveSettings(doc, elem, "reso");
-	m_feedbackModel.saveSettings(doc, elem, "feedback");
-	m_dcModel.saveSettings(doc, elem, "dc");
+	m_amountModel.saveSettings(doc, parent, "amount");
+	m_freqModel.saveSettings(doc, parent, "freq");
+	m_resoModel.saveSettings(doc, parent, "reso");
+	m_feedbackModel.saveSettings(doc, parent, "feedback");
+	m_dcModel.saveSettings(doc, parent, "dc");
 }
 
 

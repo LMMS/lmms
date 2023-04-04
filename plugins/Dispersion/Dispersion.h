@@ -26,8 +26,9 @@
 #ifndef LMMS_DISPERSION_H
 #define LMMS_DISPERSION_H
 
-#include "Effect.h"
 #include "DispersionControls.h"
+#include "Effect.h"
+
 #include "lmms_math.h"
 
 namespace lmms

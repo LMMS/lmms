@@ -100,7 +100,6 @@ bool DispersionEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	if (amount == 0)
 	{
 		feedback = 0;
-		m_feedbackVal[0] = m_feedbackVal[1] = 0;
 	}
 
 	for (fpp_t f = 0; f < frames; ++f)
@@ -139,9 +138,8 @@ void DispersionEffect::runDispersionAP(int filtNum, float apCoeff1, float apCoef
 		for (int j = 0; j < filtNum; ++j)
 		{
 			const sample_t currentInput = filterOutput;
-			filterOutput = apCoeff1 * (currentInput - m_apY1[j][i]) +
-				apCoeff2 * (m_apX0[j][i] - m_apY0[j][i]) +
-				m_apX1[j][i];
+			filterOutput = apCoeff1 * (currentInput - m_apY1[j][i])
+				+ apCoeff2 * (m_apX0[j][i] - m_apY0[j][i]) + m_apX1[j][i];
 			
 			m_apX1[j][i] = m_apX0[j][i];
 			m_apX0[j][i] = currentInput;

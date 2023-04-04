@@ -25,8 +25,8 @@
 #ifndef LMMS_DISPERSION_CONTROLS_H
 #define LMMS_DISPERSION_CONTROLS_H
 
-#include "EffectControls.h"
 #include "DispersionControlDialog.h"
+#include "EffectControls.h"
 
 namespace lmms
 {
@@ -46,8 +46,8 @@ public:
 	DispersionControls(DispersionEffect* effect);
 	~DispersionControls() override = default;
 
-	void saveSettings(QDomDocument & _doc, QDomElement & _parent) override;
-	void loadSettings(const QDomElement & _this) override;
+	void saveSettings(QDomDocument & doc, QDomElement & parent) override;
+	void loadSettings(const QDomElement & parent) override;
 	inline QString nodeName() const override
 	{
 		return "DispersionControls";
@@ -73,7 +73,6 @@ private:
 
 	friend class gui::DispersionControlDialog;
 	friend class DispersionEffect;
-
 };
 
 
