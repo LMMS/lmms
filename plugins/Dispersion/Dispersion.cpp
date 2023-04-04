@@ -88,10 +88,9 @@ bool DispersionEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		if (amount < m_amountVal)
 		{
 			// Flush filter buffers when they're no longer in use
-			for (int i = amount; i < m_amountVal; ++i)
+			for (int i = amount * 2; i < m_amountVal * 2; ++i)
 			{
-				m_apX0[i][0] = m_apX0[i][1] = m_apX1[i][0] = m_apX1[i][1] = 0;
-				m_apY0[i][0] = m_apY0[i][1] = m_apY1[i][0] = m_apY1[i][1] = 0;
+				m_state.x0[i] = m_state.x1[i] = m_state.y0[i] = m_state.y1[i] = 0;
 			}
 		}
 		m_amountVal = amount;
@@ -100,11 +99,12 @@ bool DispersionEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	if (amount == 0)
 	{
 		feedback = 0;
+		m_feedbackVal[0] = m_feedbackVal[1] = 0;
 	}
 
 	for (fpp_t f = 0; f < frames; ++f)
 	{
-		sample_t s[2] = { buf[f][0] + m_feedbackVal[0], buf[f][1] + m_feedbackVal[1] };
+		std::array<sample_t, 2> s = { buf[f][0] + m_feedbackVal[0], buf[f][1] + m_feedbackVal[1] };
 		
 		runDispersionAP(m_amountVal, apCoeff1, apCoeff2, s);
 		m_feedbackVal[0] = s[0] * feedback;
@@ -130,24 +130,21 @@ bool DispersionEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 }
 
 
-void DispersionEffect::runDispersionAP(int filtNum, float apCoeff1, float apCoeff2, sample_t* put)
+void DispersionEffect::runDispersionAP(const int filtNum, const float apCoeff1, const float apCoeff2, std::array<sample_t, 2> &put)
 {
-	for (int i = 0; i < 2; ++i)
-	{
-		sample_t filterOutput = put[i];
-		for (int j = 0; j < filtNum; ++j)
-		{
-			const sample_t currentInput = filterOutput;
-			filterOutput = apCoeff1 * (currentInput - m_apY1[j][i])
-				+ apCoeff2 * (m_apX0[j][i] - m_apY0[j][i]) + m_apX1[j][i];
-			
-			m_apX1[j][i] = m_apX0[j][i];
-			m_apX0[j][i] = currentInput;
-			m_apY1[j][i] = m_apY0[j][i];
-			m_apY0[j][i] = filterOutput;
-		}
-		put[i] = filterOutput;
-	}
+	for (int i = 0; i < filtNum * 2; ++i)
+    {
+        const int channel = i % 2;
+        const sample_t currentInput = put[channel];
+        const sample_t filterOutput = apCoeff1 * (currentInput - m_state.y1[i])
+            + apCoeff2 * (m_state.x0[i] - m_state.y0[i]) + m_state.x1[i];
+        m_state.x1[i] = m_state.x0[i];
+        m_state.x0[i] = currentInput;
+        m_state.y1[i] = m_state.y0[i];
+        m_state.y0[i] = filterOutput;
+
+        put[channel] = filterOutput;
+    }
 }
 
 

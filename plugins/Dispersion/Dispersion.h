@@ -48,22 +48,26 @@ public:
 		return &m_dispersionControls;
 	}
 	
-	void runDispersionAP(int filtNum, float apCoeff1, float apCoeff2, sample_t* put);
+	void runDispersionAP(const int filtNum, const float apCoeff1, const float apCoeff2, std::array<sample_t, 2> &put);
 
 private:
 	DispersionControls m_dispersionControls;
 	
 	float m_sampleRate;
 	
-	sample_t m_apX0[MAX_DISPERSION_FILTERS][2] = {{0}};
-	sample_t m_apX1[MAX_DISPERSION_FILTERS][2] = {{0}};
-	sample_t m_apY0[MAX_DISPERSION_FILTERS][2] = {{0}};
-	sample_t m_apY1[MAX_DISPERSION_FILTERS][2] = {{0}};
-	
-	float m_feedbackVal[2] = {0};
-	float m_integrator[2] = {0};
-	
 	int m_amountVal;
+	
+	using Filter = std::array<sample_t, MAX_DISPERSION_FILTERS * 2>;
+	struct FilterState {
+		Filter x0 = {0};
+		Filter x1 = {0};
+		Filter y0 = {0};
+		Filter y1 = {0};
+	};
+	FilterState m_state = {};
+	
+	std::array<float, 2> m_feedbackVal = {0};
+	std::array<float, 2> m_integrator = {0};
 
 	friend class DispersionControls;
 };
