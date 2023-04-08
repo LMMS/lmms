@@ -47,6 +47,7 @@
 #include "GuiApplication.h"
 #include "qslider.h"
 #include "LcdSpinBox.h"
+#include "lmms_math.h"
 #include "MainWindow.h"
 #include "MeterDialog.h"
 #include "Oscilloscope.h"
@@ -74,7 +75,8 @@ constexpr auto PredefinedZoom = std::array{15, 20, 30, 40, 50, 60, 80, 100, 150,
 SongEditor::SongEditor( Song * song ) :
 	TrackContainerView( song ),
 	m_song( song ),
-	m_zoomingModel(new IntModel(ZOOM_INI, ZOOM_MIN, ZOOM_MAX, nullptr, tr("Zoom"))), 
+	m_zoomingLinearModel(new IntModel(scaleFunction(ZOOM_INI, false), ZOOM_MIN, ZOOM_MAX, nullptr, tr("Zoom"))),
+	m_zoomingLogModel(new IntModel(ZOOM_INI, ZOOM_MIN, ZOOM_MAX, nullptr, tr("Zoom"))),
 	m_snappingModel(new ComboBoxModel()),
 	m_proportionalSnap( false ),
 	m_scrollBack( false ),
@@ -85,15 +87,15 @@ SongEditor::SongEditor( Song * song ) :
 	m_mousePos(),
 	m_rubberBandStartTrackview(0),
 	m_rubberbandStartTimePos(0),
-	m_currentZoomingValue(m_zoomingModel->value()),
+	m_currentZoomingValue(m_zoomingLogModel->value()),
 	m_trackHeadWidth(ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt()==1
 					 ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
 					 : DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH),
 	m_selectRegion(false)
 {
 	m_snappingModel->setParent(this);
-	m_zoomingModel->setParent(this);
-	m_zoomingModel->setScaleLogarithmic();
+	m_zoomingLogModel->setParent(this);
+	m_zoomingLinearModel->setParent(this);
 
 	m_timeLine = new TimeLineWidget( m_trackHeadWidth, 32,
 					pixelsPerBar(),
@@ -253,8 +255,8 @@ SongEditor::SongEditor( Song * song ) :
 	connect(m_timeLine, SIGNAL(selectionFinished()), this, SLOT(stopSelectRegion()));
 
 	//zoom connects
-	connect(m_zoomingModel, SIGNAL(dataChanged()), this, SLOT(zoomingChanged()));
-	connect(m_zoomingModel, SIGNAL(dataChanged()), m_positionLine, SLOT(update()));
+	connect(m_zoomingLogModel, SIGNAL(dataChanged()), this, SLOT(zoomingChanged()));
+	connect(m_zoomingLogModel, SIGNAL(dataChanged()), m_positionLine, SLOT(update()));
 
 	m_zvsStatus = new TextFloat;
 	m_zvsStatus->setTitle(tr("Zoom"));
@@ -306,7 +308,7 @@ float SongEditor::getSnapSize() const
 	// If proportional snap is on, we snap to finer values when zoomed in
 	if (m_proportionalSnap)
 	{
-		val = val - static_cast<int>(round(log2(m_zoomingModel->value() / ZOOM_MIN))) + 3;
+		val = val - static_cast<int>(round(log2(m_zoomingLogModel->value() / ZOOM_MIN))) + 3;
 	}
 	val = std::max(val, -6); // -6 gives 1/64th bar snapping. Lower values cause crashing.
 
@@ -321,7 +323,7 @@ float SongEditor::getSnapSize() const
 QString SongEditor::getSnapSizeString() const
 {
 	int val = -m_snappingModel->value() + 3;
-	val = val - static_cast<int>(round(log2(m_zoomingModel->value() / ZOOM_MIN))) + 3;
+	val = val - static_cast<int>(round(log2(m_zoomingLogModel->value() / ZOOM_MIN))) + 3;
 	val = std::max(val, -6); // -6 gives 1/64th bar snapping. Lower values cause crashing.
 
 	if ( val >= 0 ){
@@ -407,10 +409,10 @@ void SongEditor::updateRubberband()
 		int originX = m_origin.x();
 
 		//take care of the zooming
-		if (m_currentZoomingValue != m_zoomingModel->value())
+		if (m_currentZoomingValue != m_zoomingLogModel->value())
 		{
 			originX = m_trackHeadWidth + (originX - m_trackHeadWidth)
-					* (m_zoomingModel->value() / 100) / (m_currentZoomingValue / 100);
+					* (m_zoomingLogModel->value() / 100) / (m_currentZoomingValue / 100);
 		}
 
 		//take care of the scrollbar position
@@ -543,65 +545,84 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 {
 	if ((we->modifiers() & Qt::ControlModifier) && (position(we).x() > m_trackHeadWidth))
 	{
-		int z = m_zoomingModel->value();
+		// calculate the min zoom based on song length and song editor size
+		int minZoom = calculateMinZoom();
+
+		
+		int z = m_zoomingLogModel->value();
+		if (we->angleDelta().y() > 0)
+			z = static_cast<int>(
+				std::ceil((std::floor(z / 100.0f * DEFAULT_PIXELS_PER_BAR) + 1) * 100.0f / DEFAULT_PIXELS_PER_BAR));
+		else
+			z = std::floor((std::ceil(z / 100.0f * DEFAULT_PIXELS_PER_BAR) - 1) * 100.0f / DEFAULT_PIXELS_PER_BAR);
+		//int z = scaleFunction(sli, true);
 		int pos = 0;
 
-		// if Control && Shift Modifiers, use predefinedZoom values
-		if (we->modifiers() & Qt::ShiftModifier)
+		if (z >= minZoom || we->angleDelta().y() > 0)
 		{
-			int i = 1;
-			do
+			// if Control && Shift Modifiers, use predefinedZoom values
+			if (we->modifiers() & Qt::ShiftModifier)
 			{
-				if (PredefinedZoom[i] >= z)
+				int i = 0;
+				do
 				{
-					pos = i;
-					i = PredefinedZoom.size() + 1;
-				}
+					if (we->angleDelta().y() > 0)
+					{
+						// zooming out
+						pos = i;
+						if (PredefinedZoom[pos] > z) 
+						{ 
+							z = PredefinedZoom[std::min(pos, static_cast<int>(PredefinedZoom.size() - 1))];
+							break; 
+						}
+					}
+					else
+					{
+						// zooming in
+						pos = PredefinedZoom.size() - i - 1;
+						if (PredefinedZoom[pos] < z) 
+						{
+							z = PredefinedZoom[std::max(pos, 0)]; 
+							break;
+						}
+					}
+				} while (++i < PredefinedZoom.size());
+			}
 
-			} while (i++ < PredefinedZoom.size());
+			z = std::clamp(z, minZoom, ZOOM_MAX);
+
+			int x = position(we).x() - m_trackHeadWidth;
+			// save the pixels up to the cursor next bar when starting zooming
+			if (!m_zvsStatus->isVisible()) { m_iniBar = static_cast<int>(x / pixelsPerBar()); }
+
+			// scroll to zooming around cursor's bar
+			int newBar = static_cast<int>(x / static_cast<int>(z / 100.0f * DEFAULT_PIXELS_PER_BAR));
+
+			// update slider & model with new zooming value
+			m_zoomingLinearModel->setValue(scaleFunction(z, false));
+			m_zoomingLogModel->setValue(z);
+
+			// update timeline
+			m_song->m_playPos[Song::Mode_PlaySong].m_timeLine->setPixelsPerBar(pixelsPerBar());
+			// and make sure, all Clip's are resized and relocated
+			realignTracks();
+
+			// scroll, if necessary
+			if (m_iniBar != newBar)
+			{
+				m_leftRightScroll->setValue(m_leftRightScroll->value() + m_iniBar - newBar);
+				m_iniBar = newBar;
+			}
 		}
-
-		if(we->angleDelta().y() > 0)
+		else
 		{
-			z = (we->modifiers() & Qt::ShiftModifier)
-				? PredefinedZoom[std::min(pos + 1, static_cast<int>(PredefinedZoom.size() - 1))]
-				: static_cast<int>(std::ceil((std::floor(z / 100.0f * DEFAULT_PIXELS_PER_BAR) + 1) * 100.0f / DEFAULT_PIXELS_PER_BAR));
+			// move scroll bar -slowly-, so if continuing zooming in all song bars will be visible
+			m_leftRightScroll->setValue(static_cast<int>(m_leftRightScroll->value() / 2));
 		}
-		else if(we->angleDelta().y() < 0)
-		{
-			z = (we->modifiers() & Qt::ShiftModifier) 
-				? PredefinedZoom[std::max(pos - 1, 0)]
-				: static_cast<int>(std::floor((std::ceil(z / 100.0f * DEFAULT_PIXELS_PER_BAR) - 1) * 100.0f / DEFAULT_PIXELS_PER_BAR));
-		}
-		
-		z = std::clamp(z, ZOOM_MIN, ZOOM_MAX);
-
-		int x = position(we).x() - m_trackHeadWidth;
-		// save the pixels up to the cursor next bar when starting zooming
-		if (!m_zvsStatus->isVisible()) { m_iniBar = static_cast<int>(x / pixelsPerBar()); }
-
-		// scroll to zooming around cursor's bar		
-		int newBar = static_cast<int>(x / (z / 100.0f * DEFAULT_PIXELS_PER_BAR));
-		if (m_iniBar != newBar)
-		{
-			m_leftRightScroll->setValue(m_leftRightScroll->value() + m_iniBar - newBar);
-			m_iniBar = newBar;
-		}
-
-		// update slider with new zooming value
-		m_zoomingModel->setValue(z);
-
 		if (!m_zvsStatus->isVisible()) { m_zvsStatus->setVisibilityTimeOut(1000); }
 		m_zvsStatus->move(QPoint(globalPosition(we).x() + 6, globalPosition(we).y()));
 		m_zvsStatus->show();
-		m_zvsStatus->setText(tr("Value: %1%").arg(m_zoomingModel->value()));
-
-
-		// update timeline
-		m_song->m_playPos[Song::Mode_PlaySong].m_timeLine->
-					setPixelsPerBar( pixelsPerBar() );
-		// and make sure, all Clip's are resized and relocated
-		realignTracks();
+		m_zvsStatus->setText(tr("Value: %1%").arg(m_zoomingLogModel->value()));
 	}
 
 	// FIXME: Reconsider if determining orientation is necessary in Qt6.
@@ -875,7 +896,7 @@ void SongEditor::updatePositionLine()
 
 void SongEditor::zoomingChanged()
 {
-	setPixelsPerBar(static_cast<int>(m_zoomingModel->value() / 100.0f * DEFAULT_PIXELS_PER_BAR));
+	setPixelsPerBar(static_cast<int>(m_zoomingLogModel->value() / 100.0f * DEFAULT_PIXELS_PER_BAR));
 
 	m_song->m_playPos[Song::Mode_PlaySong].m_timeLine->
 					setPixelsPerBar( pixelsPerBar() );
@@ -883,7 +904,37 @@ void SongEditor::zoomingChanged()
 	updateRubberband();
 	m_timeLine->setSnapSize(getSnapSize());
 	
-	emit zoomingValueChanged(m_zoomingModel->value() / 100.0f);
+	emit zoomingValueChanged(m_zoomingLogModel->value() / 100.0f);
+}
+
+
+int SongEditor::scaleFunction(int val, bool exp)
+{
+	if (exp)
+	{
+		// log: val should be between [0..1]
+		float normVal = (static_cast<float>(val) - ZOOM_MIN) / (ZOOM_MAX - ZOOM_MIN);
+		float logVal = logToLinearScale(ZOOM_MIN, ZOOM_MAX, normVal);
+		return std::clamp(static_cast<int>(std::round(logVal)), ZOOM_MIN, ZOOM_MAX);
+	}
+	else
+	{
+		// linear: value should be in min - max range.
+		float linVal = linearToLogScale(ZOOM_MIN, ZOOM_MAX, val);
+		return std::clamp(static_cast<int>(std::round(linVal)), ZOOM_MIN, ZOOM_MAX);
+	}
+}
+
+
+int SongEditor::calculateMinZoom()
+{
+	// calculate the min zoom based on song length and song editor size
+	float w = m_songEditorViewSize - m_trackHeadWidth;
+	float songBars = m_song->length() + (std::min(5.0, m_song->length() * 0.05));
+	int minZoom = (songBars == 0 ? 100 : ((w / songBars) * 100 / DEFAULT_PIXELS_PER_BAR));
+	minZoom = std::min(minZoom, 100);
+
+	return minZoom;
 }
 
 
@@ -937,10 +988,14 @@ int SongEditor::indexOfTrackView(const TrackView *tv)
 
 IntModel * SongEditor::zoomingModel() const
 {
-	return m_zoomingModel;
+	return m_zoomingLogModel;
 }
 
 
+IntModel* SongEditor::zoomingModelSlider() const
+{
+	return m_zoomingLinearModel;
+}
 
 
 ComboBoxModel *SongEditor::snappingModel() const
@@ -1029,14 +1084,14 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	// Set slider zoom
 	m_zoomingSlider = new AutomatableSlider(m_toolBar, tr("Zoom"));
-	m_zoomingSlider->setValue(m_editor->m_zoomingModel->value());
-	m_zoomingSlider->setModel(m_editor->m_zoomingModel);
+	m_zoomingSlider->setValue(m_editor->m_zoomingLinearModel->value());
+	m_zoomingSlider->setModel(m_editor->m_zoomingLinearModel);
 	m_zoomingSlider->setOrientation(Qt::Horizontal);
 	m_zoomingSlider->setPageStep(1);
 	m_zoomingSlider->setFixedSize(100, 26);
 	m_zoomingSlider->setToolTip(tr("Zoom"));
 	m_zoomingSlider->setContextMenuPolicy(Qt::NoContextMenu);
-	connect(m_editor->zoomingModel(), SIGNAL(dataChanged()), this, SLOT(updateSnapLabel()));
+	connect(m_editor->zoomingModelSlider(), SIGNAL(dataChanged()), this, SLOT(updateSnapLabel()));
 	connect(m_zoomingSlider, SIGNAL(sliderPressed()), this, SLOT(showZoomingSliderFloat()));
 	connect(m_zoomingSlider, SIGNAL(logicSliderMoved(int)), this, SLOT(updateZoomingSliderFloat(int)));
 	connect(m_zoomingSlider, SIGNAL(sliderReleased()), this, SLOT(hideZoomingSliderFloat()));
@@ -1108,6 +1163,7 @@ void SongEditorWindow::syncEditMode(){
 
 void SongEditorWindow::resizeEvent(QResizeEvent *event)
 {
+	m_editor->m_songEditorViewSize = event->size().width();
 	emit resized();
 }
 
@@ -1175,12 +1231,20 @@ void SongEditorWindow::showZoomingSliderFloat()
 {
 	m_zvsStatus->moveGlobal(m_zoomingSlider, QPoint(m_zoomingSlider->width() + 2, -2));
 	m_zvsStatus->show();
-	updateZoomingSliderFloat(m_editor->m_zoomingModel->value());
+	updateZoomingSliderFloat(m_editor->scaleFunction(m_editor->m_zoomingLogModel->value(), false));
 }
 
-void SongEditorWindow::updateZoomingSliderFloat(int new_val)
+void SongEditorWindow::updateZoomingSliderFloat(int newVal)
 {
-	m_zvsStatus->setText(tr("Value: %1%").arg(new_val));
+	// calculate the min zoom based on song length and song editor size
+	int minZoom = m_editor->calculateMinZoom();
+
+	newVal = m_editor->scaleFunction(newVal, true);
+	newVal = std::max(newVal, minZoom);
+	if (newVal <= minZoom) { m_zoomingSlider->setValue(m_editor->scaleFunction(minZoom, false)); }
+
+	m_editor->m_zoomingLogModel->setValue(newVal);
+	m_zvsStatus->setText(tr("Value: %1%").arg(newVal));
 }
 
 void SongEditorWindow::hideZoomingSliderFloat()
@@ -1193,7 +1257,8 @@ void SongEditorWindow::keyPressEvent(QKeyEvent* ke)
 {
 	if (ke->key() == Qt::Key_0 && ke->modifiers() & Qt::ControlModifier)
 	{
-		m_editor->m_zoomingModel->setValue(m_editor->m_zoomingModel->initValue());
+		m_editor->m_zoomingLogModel->setValue(m_editor->m_zoomingLogModel->initValue());
+		m_editor->m_zoomingLinearModel->setValue(m_editor->scaleFunction(m_editor->m_zoomingLogModel->initValue(), false));
 	}
 	else
 	{
