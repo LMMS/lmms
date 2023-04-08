@@ -70,8 +70,8 @@ public:
 	void saveSettings( QDomDocument& doc, QDomElement& element ) override;
 	void loadSettings( const QDomElement& element ) override;
 
-	IntModel* zoomingModelSlider() const;
-	IntModel* zoomingModel() const;
+	IntModel* zoomingLinearModelSlider() const;
+	IntModel* zoomingLogModel() const;
 	ComboBoxModel *snappingModel() const;
 	float getSnapSize() const;
 	QString getSnapSizeString() const;

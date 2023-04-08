@@ -377,7 +377,7 @@ void SongEditor::selectRegionFromPixels(int xStart, int xEnd)
 		//we save the position of scrollbars, mouse position and zooming level
 		m_origin = QPoint(xStart, 0);
 		m_scrollPos = QPoint(m_leftRightScroll->value(), contentWidget()->verticalScrollBar()->value());
-		m_currentZoomingValue = zoomingModel()->value();
+		m_currentZoomingValue = zoomingLogModel()->value();
 
 		//calculate the song position where the mouse was clicked
 		m_rubberbandStartTimePos = TimePos((xStart - m_trackHeadWidth)
@@ -669,7 +669,7 @@ void SongEditor::mousePressEvent(QMouseEvent *me)
 		//we save the position of scrollbars, mouse position and zooming level
 		m_scrollPos = QPoint(m_leftRightScroll->value(), contentWidget()->verticalScrollBar()->value());
 		m_origin = contentWidget()->mapFromParent(QPoint(me->pos().x(), me->pos().y()));
-		m_currentZoomingValue = zoomingModel()->value();
+		m_currentZoomingValue = zoomingLogModel()->value();
 
 		//paint the rubberband
 		rubberBand()->setEnabled(true);
@@ -986,13 +986,13 @@ int SongEditor::indexOfTrackView(const TrackView *tv)
 
 
 
-IntModel * SongEditor::zoomingModel() const
+IntModel * SongEditor::zoomingLogModel() const
 {
 	return m_zoomingLogModel;
 }
 
 
-IntModel* SongEditor::zoomingModelSlider() const
+IntModel* SongEditor::zoomingLinearModelSlider() const
 {
 	return m_zoomingLinearModel;
 }
@@ -1092,7 +1092,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_zoomingSlider->setToolTip(tr("Zoom"));
 	m_zoomingSlider->setContextMenuPolicy(Qt::NoContextMenu);
 	m_zoomingSlider->setAllowDragOptions(false);
-	connect(m_editor->zoomingModelSlider(), SIGNAL(dataChanged()), this, SLOT(updateSnapLabel()));
+	connect(m_editor->zoomingLinearModelSlider(), SIGNAL(dataChanged()), this, SLOT(updateSnapLabel()));
 	connect(m_zoomingSlider, SIGNAL(sliderPressed()), this, SLOT(showZoomingSliderFloat()));
 	connect(m_zoomingSlider, SIGNAL(logicSliderMoved(int)), this, SLOT(updateZoomingSliderFloat(int)));
 	connect(m_zoomingSlider, SIGNAL(sliderReleased()), this, SLOT(hideZoomingSliderFloat()));
