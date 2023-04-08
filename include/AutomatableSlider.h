@@ -45,6 +45,16 @@ public:
 		return( m_showStatus );
 	}
 
+	void setAllowDragOptions(bool opt) 
+	{ 
+		m_allowDragOptions = opt;
+	}
+
+	bool getAllowDragOption() 
+	{ 
+		return (m_allowDragOptions);
+	}
+
 
 signals:
 	void logicValueChanged( int _value );
@@ -62,6 +72,7 @@ protected:
 
 private:
 	bool m_showStatus;
+	bool m_allowDragOptions;
 
 
 private slots:

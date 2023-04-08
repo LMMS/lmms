@@ -1091,6 +1091,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_zoomingSlider->setFixedSize(100, 26);
 	m_zoomingSlider->setToolTip(tr("Zoom"));
 	m_zoomingSlider->setContextMenuPolicy(Qt::NoContextMenu);
+	m_zoomingSlider->setAllowDragOptions(false);
 	connect(m_editor->zoomingModelSlider(), SIGNAL(dataChanged()), this, SLOT(updateSnapLabel()));
 	connect(m_zoomingSlider, SIGNAL(sliderPressed()), this, SLOT(showZoomingSliderFloat()));
 	connect(m_zoomingSlider, SIGNAL(logicSliderMoved(int)), this, SLOT(updateZoomingSliderFloat(int)));

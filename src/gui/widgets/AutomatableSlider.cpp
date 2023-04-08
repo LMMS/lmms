@@ -38,7 +38,8 @@ AutomatableSlider::AutomatableSlider( QWidget * _parent,
 						const QString & _name ) :
 	QSlider( _parent ),
 	IntModelView( new IntModel( 0, 0, 0, nullptr, _name, true ), this ),
-	m_showStatus( false )
+	m_showStatus( false ),
+	m_allowDragOptions(true)
 {
 	setWindowTitle( _name );
 
@@ -74,7 +75,7 @@ void AutomatableSlider::mousePressEvent( QMouseEvent * _me )
 	}
 	else
 	{
-		IntModelView::mousePressEvent( _me );
+		if (m_allowDragOptions) { IntModelView::mousePressEvent(_me); }
 	}
 }
 
