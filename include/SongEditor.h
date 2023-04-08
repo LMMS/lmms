@@ -70,7 +70,8 @@ public:
 	void saveSettings( QDomDocument& doc, QDomElement& element ) override;
 	void loadSettings( const QDomElement& element ) override;
 
-	IntModel * zoomingModel() const;
+	IntModel* zoomingModelSlider() const;
+	IntModel* zoomingModel() const;
 	ComboBoxModel *snappingModel() const;
 	float getSnapSize() const;
 	QString getSnapSizeString() const;
@@ -124,6 +125,9 @@ private:
 	int trackIndexFromSelectionPoint(int yPos);
 	int indexOfTrackView(const TrackView* tv);
 
+	int scaleFunction(int x, bool exp);
+	int calculateMinZoom();
+
 	bool zoomingFloatVisible;
 	TextFloat * m_zvsStatus;
 
@@ -144,7 +148,8 @@ private:
 
 	PositionLine * m_positionLine;
 
-	IntModel * m_zoomingModel;
+	IntModel* m_zoomingLinearModel;
+	IntModel* m_zoomingLogModel;
 	ComboBoxModel* m_snappingModel;
 	bool m_proportionalSnap;
 
@@ -163,6 +168,7 @@ private:
 	int m_trackHeadWidth;
 	bool m_selectRegion;
 	int m_iniBar;
+	int m_songEditorViewSize;
 
 	friend class SongEditorWindow;
 
