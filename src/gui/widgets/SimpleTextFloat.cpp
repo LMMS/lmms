@@ -47,15 +47,15 @@ SimpleTextFloat::SimpleTextFloat() :
 	layout->addWidget(m_textLabel);
 }
 
-void SimpleTextFloat::setText( const QString & _text )
+void SimpleTextFloat::setText(const QString & text)
 {
-	m_textLabel->setText(_text);
+	m_textLabel->setText(text);
 }
 
 
-void SimpleTextFloat::setVisibilityTimeOut( int _msecs )
+void SimpleTextFloat::setVisibilityTimeOut(int msecs)
 {
-	QTimer::singleShot( _msecs, this, SLOT(hide()));
+	QTimer::singleShot(msecs, this, SLOT(hide()));
 	show();
 }
 

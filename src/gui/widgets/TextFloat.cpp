@@ -43,8 +43,8 @@ TextFloat::TextFloat() :
 {
 }
 
-TextFloat::TextFloat(const QString & _title, const QString & _text, const QPixmap & _pixmap) :
-	QWidget( getGUI()->mainWindow(), Qt::ToolTip )
+TextFloat::TextFloat(const QString & title, const QString & text, const QPixmap & pixmap) :
+	QWidget(getGUI()->mainWindow(), Qt::ToolTip)
 {
 	QHBoxLayout * mainLayout = new QHBoxLayout();
 	setLayout(mainLayout);
@@ -68,66 +68,66 @@ TextFloat::TextFloat(const QString & _title, const QString & _text, const QPixma
 	mainLayout->addWidget(titleAndTextWidget);
 
 	// Call the setters so that the hidden state is updated
-	setTitle(_title);
-	setText(_text);
-	setPixmap(_pixmap);
+	setTitle(title);
+	setText(text);
+	setPixmap(pixmap);
 }
 
-void TextFloat::setTitle( const QString & _title )
+void TextFloat::setTitle(const QString & title)
 {
-	m_titleLabel->setText(_title);
-	m_titleLabel->setHidden(_title.isEmpty());
+	m_titleLabel->setText(title);
+	m_titleLabel->setHidden(title.isEmpty());
 }
 
-void TextFloat::setText( const QString & _text )
+void TextFloat::setText(const QString & text)
 {
-	m_textLabel->setText(_text);
-	m_textLabel->setHidden(_text.isEmpty());
+	m_textLabel->setText(text);
+	m_textLabel->setHidden(text.isEmpty());
 }
 
-void TextFloat::setPixmap( const QPixmap & _pixmap )
+void TextFloat::setPixmap(const QPixmap & pixmap)
 {
-	m_pixmapLabel->setPixmap(_pixmap);
-	m_pixmapLabel->setHidden(_pixmap.isNull());
+	m_pixmapLabel->setPixmap(pixmap);
+	m_pixmapLabel->setHidden(pixmap.isNull());
 }
 
-void TextFloat::setVisibilityTimeOut( int _msecs )
+void TextFloat::setVisibilityTimeOut(int msecs)
 {
-	QTimer::singleShot( _msecs, this, SLOT(hide()));
+	QTimer::singleShot(msecs, this, SLOT(hide()));
 	show();
 }
 
-TextFloat * TextFloat::displayMessage( const QString & _title,
-					const QString & _msg,
-					const QPixmap & _pixmap,
-					int _timeout, QWidget * _parent )
+TextFloat * TextFloat::displayMessage(const QString & title,
+					const QString & msg,
+					const QPixmap & pixmap,
+					int timeout, QWidget * parent)
 {
-	auto tf = new TextFloat(_title, _msg, _pixmap);
+	auto tf = new TextFloat(title, msg, pixmap);
 
 	// Show the widget so that the correct height is calculated in the code that follows
 	tf->show();
 
-	if( _parent != nullptr )
+	if(parent != nullptr)
 	{
-		tf->moveGlobal( _parent, QPoint( _parent->width() + 2, 0 ) );
+		tf->moveGlobal(parent, QPoint(parent->width() + 2, 0));
 	}
 	else
 	{
 		// If no parent is given move the window to the lower left area of the main window
 		QWidget * mw = getGUI()->mainWindow();
-		tf->moveGlobal( mw, QPoint( 32, mw->height() - tf->height() - 8 ) );
+		tf->moveGlobal(mw, QPoint(32, mw->height() - tf->height() - 8));
 	}
 
-	if( _timeout > 0 )
+	if (timeout > 0)
 	{
-		tf->setAttribute( Qt::WA_DeleteOnClose, true );
-		QTimer::singleShot( _timeout, tf, SLOT(close()));
+		tf->setAttribute(Qt::WA_DeleteOnClose, true);
+		QTimer::singleShot(timeout, tf, SLOT(close()));
 	}
 
 	return tf;
 }
 
-void TextFloat::mousePressEvent( QMouseEvent * )
+void TextFloat::mousePressEvent(QMouseEvent *)
 {
 	close();
 }

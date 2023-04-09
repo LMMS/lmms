@@ -329,7 +329,7 @@ void Fader::updateTextFloat()
 		s_textFloat->setText( m_description + " " + QString("%1 ").arg( model()->value() * m_conversionFactor ) + " " + m_unit );
 	}
 
-	s_textFloat->moveGlobal( this, QPoint( width() + 2, knobPosY() - s_textFloat->height() / 2 ) );
+	s_textFloat->moveGlobal(this, QPoint(width() + 2, knobPosY() - s_textFloat->height() / 2));
 }
 
 

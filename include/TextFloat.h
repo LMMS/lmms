@@ -42,31 +42,30 @@ public:
 	TextFloat();
 	~TextFloat() override = default;
 
-	void setTitle( const QString & _title );
-	void setText( const QString & _text );
-	void setPixmap( const QPixmap & _pixmap );
+	void setTitle(const QString & title);
+	void setText(const QString & text);
+	void setPixmap(const QPixmap & pixmap);
 
-	void setVisibilityTimeOut( int _msecs );
+	void setVisibilityTimeOut(int msecs);
 
-	static TextFloat * displayMessage( const QString & _title,
-						const QString & _msg,
-						const QPixmap & _pixmap =
-								QPixmap(),
-						int _timeout = 2000,
-						QWidget * _parent = nullptr );
+	static TextFloat * displayMessage(const QString & title,
+						const QString & msg,
+						const QPixmap & pixmap = QPixmap(),
+						int timeout = 2000,
+						QWidget * parent = nullptr);
 
-	void moveGlobal( QWidget * _w, const QPoint & _offset )
+	void moveGlobal(QWidget * w, const QPoint & offset)
 	{
-		move( _w->mapToGlobal( QPoint( 0, 0 ) )+_offset );
+		move(w->mapToGlobal(QPoint(0, 0)) + offset);
 	}
 
 
 protected:
-	void mousePressEvent( QMouseEvent * _me ) override;
+	void mousePressEvent(QMouseEvent * me) override;
 
 
 private:
-	TextFloat(const QString & _title, const QString & _text, const QPixmap & _pixmap);
+	TextFloat(const QString & title, const QString & text, const QPixmap & pixmap);
 
 	QLabel * m_pixmapLabel;
 	QLabel * m_titleLabel;
