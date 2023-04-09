@@ -547,8 +547,7 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 	{
 		// calculate the min zoom based on song length and song editor size
 		int minZoom = calculateMinZoom();
-
-		
+				
 		int z = m_zoomingLogModel->value();
 		if (we->angleDelta().y() > 0)
 			z = static_cast<int>(
@@ -598,15 +597,6 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 			// scroll to zooming around cursor's bar
 			int newBar = static_cast<int>(x / static_cast<int>(z / 100.0f * DEFAULT_PIXELS_PER_BAR));
 
-			// update slider & model with new zooming value
-			m_zoomingLinearModel->setValue(scaleFunction(z, false));
-			m_zoomingLogModel->setValue(z);
-
-			// update timeline
-			m_song->m_playPos[Song::Mode_PlaySong].m_timeLine->setPixelsPerBar(pixelsPerBar());
-			// and make sure, all Clip's are resized and relocated
-			realignTracks();
-
 			// scroll, if necessary
 			if (m_iniBar != newBar)
 			{
@@ -616,9 +606,19 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		}
 		else
 		{
+			z = minZoom;
 			// move scroll bar -slowly-, so if continuing zooming in all song bars will be visible
 			m_leftRightScroll->setValue(static_cast<int>(m_leftRightScroll->value() / 2));
 		}
+		
+		// update slider & model with new zooming value
+		m_zoomingLinearModel->setValue(scaleFunction(minZoom, false));
+		m_zoomingLogModel->setValue(z);
+		// update timeline
+		m_song->m_playPos[Song::Mode_PlaySong].m_timeLine->setPixelsPerBar(pixelsPerBar());
+		// and make sure, all Clip's are resized and relocated
+		realignTracks();
+
 		if (!m_zvsStatus->isVisible()) { m_zvsStatus->setVisibilityTimeOut(1000); }
 		m_zvsStatus->move(QPoint(globalPosition(we).x() + 6, globalPosition(we).y()));
 		m_zvsStatus->show();
@@ -928,10 +928,10 @@ int SongEditor::scaleFunction(int val, bool exp)
 
 int SongEditor::calculateMinZoom()
 {
-	// calculate the min zoom based on song length and song editor size
+	// calculate the min zoom based on double song length and song editor width
 	float w = m_songEditorViewSize - m_trackHeadWidth;
-	float songBars = m_song->length() + (std::min(5.0, m_song->length() * 0.05));
-	int minZoom = (songBars == 0 ? 100 : ((w / songBars) * 100 / DEFAULT_PIXELS_PER_BAR));
+	float maxBars = m_song->length() * 2;
+	int minZoom = (maxBars == 0 ? 100 : ((w / maxBars) * 100 / DEFAULT_PIXELS_PER_BAR));
 	minZoom = std::min(minZoom, 100);
 
 	return minZoom;
