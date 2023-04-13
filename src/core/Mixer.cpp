@@ -110,8 +110,49 @@ void MixerChannel::incrementDeps()
 
 void MixerChannel::unmuteForSolo()
 {
-	//TODO: Recursively activate every channel, this channel sends to
 	m_muteModel.setValue(false);
+
+	// if channel is not master, unmute also every channel it sends to/receives from
+	if (m_channelIndex != 0)
+	{
+		for (const MixerRoute* sendsRoute : m_sends)
+		{
+			sendsRoute->receiver()->unmuteSenderForSolo();
+		}
+		for (const MixerRoute* receiverRoute : m_receives)
+		{
+			receiverRoute->sender()->unmuteReceiverForSolo();
+		}
+	}
+}
+
+void MixerChannel::unmuteSenderForSolo()
+{
+	m_muteModel.setValue(false);
+
+	// if channel is not master, unmute also every channel it sends to
+	if (m_channelIndex != 0)
+	{
+		for (const MixerRoute* sendsRoute : m_sends)
+		{
+			sendsRoute->receiver()->unmuteSenderForSolo();
+		}
+	}
+}
+
+
+void MixerChannel::unmuteReceiverForSolo()
+{
+	m_muteModel.setValue(false);
+
+	// if channel is not master, unmute also every channel it receives from
+	if (m_channelIndex != 0)
+	{
+		for (const MixerRoute* receiverRoute : m_receives)
+		{
+			receiverRoute->sender()->unmuteReceiverForSolo();
+		}
+	}
 }
 
 
@@ -269,7 +310,7 @@ void Mixer::toggledSolo()
 		} else {
 			activateSolo();
 		}
-		// unmute the soloed chan and every channel it sends to
+		// unmute the soloed chan and every channel it sends to/receives from
 		m_mixerChannels[soloedChan]->unmuteForSolo();
 	} else {
 		deactivateSolo();
