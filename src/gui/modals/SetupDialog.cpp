@@ -112,6 +112,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			"app", "sololegacybehavior", "0").toInt()),
 	m_trackDeletionWarning(ConfigManager::inst()->value(
 			"ui", "trackdeletionwarning", "1").toInt()),
+	m_mixerChannelDeletionWarning(ConfigManager::inst()->value(
+			"ui", "mixerchanneldeletionwarning", "1").toInt()),
 	m_MMPZ(!ConfigManager::inst()->value(
 			"app", "nommpz").toInt()),
 	m_disableBackup(!ConfigManager::inst()->value(
@@ -198,6 +200,18 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	general_layout->setContentsMargins(0, 0, 0, 0);
 	labelWidget(general_w, tr("General"));
 
+	// General scroll area.
+	auto generalScroll = new QScrollArea(general_w);
+	generalScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	generalScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+	// General controls widget.
+	auto generalControls = new QWidget(general_w);
+
+	// Path selectors layout.
+	auto generalControlsLayout = new QVBoxLayout;
+	generalControlsLayout->setSpacing(10);
+
 	auto addLedCheckBox = [&XDelta, &YDelta, this](const QString& ledText, TabWidget* tw, int& counter,
 							  bool initialState, const char* toggledSlot, bool showRestartWarning) {
 		auto checkBox = new LedCheckBox(ledText, tw);
@@ -214,7 +228,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	int counter = 0;
 
 	// GUI tab.
-	auto gui_tw = new TabWidget(tr("Graphical user interface (GUI)"), general_w);
+	auto gui_tw = new TabWidget(tr("Graphical user interface (GUI)"), generalControls);
 
 	addLedCheckBox(tr("Display volume as dBFS "), gui_tw, counter,
 		m_displaydBFS, SLOT(toggleDisplaydBFS(bool)), true);
@@ -236,14 +250,19 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 		m_soloLegacyBehavior, SLOT(toggleSoloLegacyBehavior(bool)), false);
 	addLedCheckBox(tr("Show warning when deleting tracks"), gui_tw, counter,
 		m_trackDeletionWarning, SLOT(toggleTrackDeletionWarning(bool)), false);
+	addLedCheckBox(tr("Show warning when deleting a mixer channel that is in use"), gui_tw, counter, 
+		m_mixerChannelDeletionWarning,	SLOT(toggleMixerChannelDeletionWarning(bool)), false);
 
 	gui_tw->setFixedHeight(YDelta + YDelta * counter);
+
+	generalControlsLayout->addWidget(gui_tw);
+	generalControlsLayout->addSpacing(10);
 
 
 	counter = 0;
 
 	// Projects tab.
-	auto projects_tw = new TabWidget(tr("Projects"), general_w);
+	auto projects_tw = new TabWidget(tr("Projects"), generalControls);
 
 	addLedCheckBox(tr("Compress project files by default"), projects_tw, counter,
 		m_MMPZ, SLOT(toggleMMPZ(bool)), true);
@@ -254,8 +273,12 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	projects_tw->setFixedHeight(YDelta + YDelta * counter);
 
+	generalControlsLayout->addWidget(projects_tw);
+	generalControlsLayout->addSpacing(10);
+
+
 	// Language tab.
-	auto lang_tw = new TabWidget(tr("Language"), general_w);
+	auto lang_tw = new TabWidget(tr("Language"), generalControls);
 	lang_tw->setFixedHeight(48);
 	auto changeLang = new QComboBox(lang_tw);
 	changeLang->move(XDelta, 20);
@@ -310,11 +333,15 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	connect(changeLang, SIGNAL(currentIndexChanged(int)),
 			this, SLOT(showRestartWarning()));
 
+	generalControlsLayout->addWidget(lang_tw);
+	generalControlsLayout->addSpacing(10);
 
 	// General layout ordering.
-	general_layout->addWidget(gui_tw);
-	general_layout->addWidget(projects_tw);
-	general_layout->addWidget(lang_tw);
+	generalControlsLayout->addStretch();
+	generalControls->setLayout(generalControlsLayout);
+	generalScroll->setWidget(generalControls);
+	generalScroll->setWidgetResizable(true);
+	general_layout->addWidget(generalScroll);
 	general_layout->addStretch();
 
 
@@ -896,6 +923,8 @@ void SetupDialog::accept()
 					QString::number(m_soloLegacyBehavior));
 	ConfigManager::inst()->setValue("ui", "trackdeletionwarning",
 					QString::number(m_trackDeletionWarning));
+	ConfigManager::inst()->setValue("ui", "mixerchanneldeletionwarning", 
+					QString::number(m_mixerChannelDeletionWarning));
 	ConfigManager::inst()->setValue("app", "nommpz",
 					QString::number(!m_MMPZ));
 	ConfigManager::inst()->setValue("app", "disablebackup",
@@ -1015,6 +1044,11 @@ void SetupDialog::toggleLetPreviewsFinish(bool enabled)
 void SetupDialog::toggleTrackDeletionWarning(bool enabled)
 {
 	m_trackDeletionWarning = enabled;
+}
+
+void SetupDialog::toggleMixerChannelDeletionWarning(bool enabled)
+{
+	m_mixerChannelDeletionWarning = enabled;
 }
 
 

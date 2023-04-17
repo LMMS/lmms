@@ -23,7 +23,9 @@
  */
 
 
+#include <QCheckBox>
 #include <QLayout>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QStyle>
@@ -385,46 +387,119 @@ void MixerView::deleteChannel(int index)
 	// can't delete master
 	if( index == 0 ) return;
 
-	// remember selected line
-	int selLine = m_currentMixerLine->channelIndex();
-
-	// in case the deleted channel is soloed or the remaining
-	// channels will be left in a muted state
-	Engine::mixer()->clearChannel(index);
-
-	// delete the real channel
-	Engine::mixer()->deleteChannel(index);
-
-	// delete the view
-	chLayout->removeWidget(m_mixerChannelViews[index]->m_mixerLine);
-	m_racksLayout->removeWidget( m_mixerChannelViews[index]->m_rackView );
-	delete m_mixerChannelViews[index]->m_fader;
-	delete m_mixerChannelViews[index]->m_muteBtn;
-	delete m_mixerChannelViews[index]->m_soloBtn;
-	// delete mixerLine later to prevent a crash when deleting from context menu
-	m_mixerChannelViews[index]->m_mixerLine->hide();
-	m_mixerChannelViews[index]->m_mixerLine->deleteLater();
-	delete m_mixerChannelViews[index]->m_rackView;
-	delete m_mixerChannelViews[index];
-	m_channelAreaWidget->adjustSize();
-
-	// make sure every channel knows what index it is
-	for(int i=index + 1; i<m_mixerChannelViews.size(); ++i)
+	// if channel is "used", confirm that the user want to delete the channel anyway
+	if (confirmRemoval(index))
 	{
-		m_mixerChannelViews[i]->m_mixerLine->setChannelIndex(i-1);
-	}
-	m_mixerChannelViews.remove(index);
+		// remember selected line
+		int selLine = m_currentMixerLine->channelIndex();
 
-	// select the next channel
-	if( selLine >= m_mixerChannelViews.size() )
-	{
-		selLine = m_mixerChannelViews.size()-1;
-	}
-	setCurrentMixerLine(selLine);
+		// in case the deleted channel is soloed or the remaining
+		// channels will be left in a muted state
+		Engine::mixer()->clearChannel(index);
 
-	updateMaxChannelSelector();
+		// delete the real channel
+		Engine::mixer()->deleteChannel(index);
+
+		// delete the view
+		chLayout->removeWidget(m_mixerChannelViews[index]->m_mixerLine);
+		m_racksLayout->removeWidget(m_mixerChannelViews[index]->m_rackView);
+		delete m_mixerChannelViews[index]->m_fader;
+		delete m_mixerChannelViews[index]->m_muteBtn;
+		delete m_mixerChannelViews[index]->m_soloBtn;
+		// delete mixerLine later to prevent a crash when deleting from context menu
+		m_mixerChannelViews[index]->m_mixerLine->hide();
+		m_mixerChannelViews[index]->m_mixerLine->deleteLater();
+		delete m_mixerChannelViews[index]->m_rackView;
+		delete m_mixerChannelViews[index];
+		m_channelAreaWidget->adjustSize();
+
+		// make sure every channel knows what index it is
+		for (int i = index + 1; i < m_mixerChannelViews.size(); ++i)
+		{
+			m_mixerChannelViews[i]->m_mixerLine->setChannelIndex(i - 1);
+		}
+		m_mixerChannelViews.remove(index);
+
+		// select the next channel
+		if (selLine >= m_mixerChannelViews.size()) 
+		{ 
+			selLine = m_mixerChannelViews.size() - 1; 
+		}
+		setCurrentMixerLine(selLine);
+
+		updateMaxChannelSelector();
+	}
 }
 
+bool MixerView::confirmRemoval(int index)
+{
+	bool needConfirm = ConfigManager::inst()->value("ui", "mixerchanneldeletionwarning", "1").toInt();
+	if (!needConfirm) { return true; }
+
+	TrackContainer::TrackList tracks;
+	tracks += Engine::getSong()->tracks();
+	tracks += Engine::patternStore()->tracks();
+
+	bool inUse = false;
+
+	//check if the index mixer channel receives from other channels
+	if (!Engine::mixer()->mixerChannel(index)->m_receives.isEmpty())
+	{
+		inUse = true;
+	}
+	else
+	{
+		// check if the destination mixer channel on any track is the one to be deleted
+		for (Track* t : tracks)
+		{
+			if (t->type() == Track::InstrumentTrack)
+			{
+				auto inst = dynamic_cast<InstrumentTrack*>(t);
+				if (inst->mixerChannelModel()->value() == index) { inUse = true; }
+			}
+			else if (t->type() == Track::SampleTrack)
+			{
+				auto strack = dynamic_cast<SampleTrack*>(t);
+				if (strack->mixerChannelModel()->value() == index) { inUse = true; }
+			}
+
+			if (inUse) { break; }
+		}
+	}
+
+	if (inUse) 
+	{
+		QString messageRemoveTrack = tr("This Mixer Channel is being used.\n"
+										"Are you sure you want to remove this channel?\n\n" 
+										"Warning: This operation can not be undone.");
+										
+		QString messageTitleRemoveTrack = tr("Confirm removal");
+		QString askAgainText = tr("Don't ask again");
+		auto askAgainCheckBox = new QCheckBox(askAgainText, nullptr);
+		connect(askAgainCheckBox, &QCheckBox::stateChanged, [this](int state) {
+			// Invert button state, if it's checked we *shouldn't* ask again
+			ConfigManager::inst()->setValue("ui", "mixerchanneldeletionwarning", state ? "0" : "1");
+		});
+		
+		QMessageBox mb(this);
+		mb.setText(messageRemoveTrack);
+		mb.setWindowTitle(messageTitleRemoveTrack);
+		mb.setIcon(QMessageBox::Warning);
+		mb.addButton(QMessageBox::Cancel);
+		mb.addButton(QMessageBox::Ok);
+		mb.setCheckBox(askAgainCheckBox);
+		mb.setDefaultButton(QMessageBox::Cancel);
+
+		int answer = mb.exec();
+
+		if (answer == QMessageBox::Ok) { return true; }
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}
 
 
 void MixerView::deleteUnusedChannels()
