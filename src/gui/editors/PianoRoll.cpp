@@ -1458,9 +1458,47 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 
 		case Qt::Key_Backspace:
 		case Qt::Key_Delete:
-			deleteSelectedNotes();
-			ke->accept();
-			break;
+			{
+				// Get start pos and end pos of selection; used for shift + delete
+				auto selectedNotes = getSelectedNotes();
+				if (selectedNotes.empty()) { break; }
+				TimePos delStartPos = selectedNotes.first()->pos();
+				TimePos delEndPos = selectedNotes.last()->endPos();
+				TimePos delEndLen = selectedNotes.last()->length();
+
+				deleteSelectedNotes();
+
+				// Shift notes on the right of deleted notes to the left to fill deleted note gap
+				if (ke->modifiers() & Qt::ShiftModifier)
+				{
+					// Beat/Bassline editor notes have negative length; this adjusts for that
+					if (delEndLen < 0)
+					{
+						delEndPos -= delEndLen;
+					}
+					
+					NoteVector rightNotes;
+					for (Note* n : m_midiClip->notes())
+					{
+						if (n->pos() >= delEndPos)
+						{
+							rightNotes.push_back(n);
+						}
+					}
+
+					// In the case of the last deleted note having negative length...
+					// Assume that intended length is gap until the first note
+					// to the right of the deleted region in this case
+					if (delEndLen < 0 && !rightNotes.isEmpty())
+					{
+						delEndPos = rightNotes.first()->pos();
+					}
+
+					shiftPos(rightNotes, delStartPos - delEndPos);
+				}
+				ke->accept();
+				break;
+			}
 
 		case Qt::Key_Home:
 			m_timeLine->pos().setTicks( 0 );
