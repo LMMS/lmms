@@ -2,7 +2,7 @@
  * FreeBoy.cpp - GameBoy papu based instrument
  *
  * Copyright (c) 2008 Attila Herman <attila589/at/gmail.com>
- *				Csaba Hruska <csaba.hruska/at/gmail.com>
+ *                    Csaba Hruska <csaba.hruska/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -23,11 +23,12 @@
  *
  */
 
-#include <cmath>
-
-#include <QDomElement>
 #include "FreeBoy.h"
-#include "Gb_Apu_Buffer.h"
+
+#include <cmath>
+#include <QDomElement>
+
+#include "GbApuWrapper.h"
 #include "base64.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
@@ -45,8 +46,11 @@ namespace lmms
 {
 
 
-const blip_time_t FRAME_LENGTH = 70224;
-const long CLOCK_RATE = 4194304;
+namespace
+{
+constexpr blip_time_t FRAME_LENGTH = 70224;
+constexpr long CLOCK_RATE = 4194304;
+}
 
 extern "C"
 {
@@ -118,9 +122,7 @@ FreeBoyInstrument::FreeBoyInstrument( InstrumentTrack * _instrument_track ) :
 	m_trebleModel( -20.0f, -100.0f, 200.0f, 1.0f, this, tr( "Treble" ) ),
 	m_bassModel( 461.0f, -1.0f, 600.0f, 1.0f, this, tr( "Bass" ) ),
 
-	m_graphModel( 0, 15, 32, this, false, 1 ),
-
-	m_time(0)
+	m_graphModel( 0, 15, 32, this, false, 1 )
 {
 }
 
@@ -238,189 +240,189 @@ f_cnt_t FreeBoyInstrument::desiredReleaseFrames() const
 
 
 
-void FreeBoyInstrument::playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer )
+void FreeBoyInstrument::playNote(NotePlayHandle* nph, sampleFrame* workingBuffer)
 {
-	const f_cnt_t tfp = _n->totalFramesPlayed();
+	const f_cnt_t tfp = nph->totalFramesPlayed();
 	const int samplerate = Engine::audioEngine()->processingSampleRate();
-	const fpp_t frames = _n->framesLeftForCurrentPeriod();
-	const f_cnt_t offset = _n->noteOffset();
+	const fpp_t frames = nph->framesLeftForCurrentPeriod();
+	const f_cnt_t offset = nph->noteOffset();
 
 	int data = 0;
-	int freq = _n->frequency();
+	int freq = nph->frequency();
 
 	if (!_n->m_pluginData)
 	{
-		auto papu = new Gb_Apu_Buffer();
-		papu->set_sample_rate( samplerate, CLOCK_RATE );
+		auto papu = new GbApuWrapper{};
+		papu->setSampleRate(samplerate, CLOCK_RATE);
 
 		// Master sound circuitry power control
-		papu->write_register( fakeClock(),  0xff26, 0x80 );
+		papu->writeRegister(0xff26, 0x80);
 
 		data = m_ch1VolumeModel.value();
-		data = data<<1;
+		data = data << 1;
 		data += m_ch1VolSweepDirModel.value();
-		data = data<<3;
+		data = data << 3;
 		data += m_ch1SweepStepLengthModel.value();
-		papu->write_register( fakeClock(),  0xff12, data );
+		papu->writeRegister(0xff12, data);
 
 		data = m_ch2VolumeModel.value();
-		data = data<<1;
+		data = data << 1;
 		data += m_ch2VolSweepDirModel.value();
-		data = data<<3;
+		data = data << 3;
 		data += m_ch2SweepStepLengthModel.value();
-		papu->write_register( fakeClock(),  0xff17, data );
+		papu->writeRegister(0xff17, data);
 
 		//channel 4 - noise
 		data = m_ch4VolumeModel.value();
-		data = data<<1;
+		data = data << 1;
 		data += m_ch4VolSweepDirModel.value();
-		data = data<<3;
+		data = data << 3;
 		data += m_ch4SweepStepLengthModel.value();
-		papu->write_register( fakeClock(),  0xff21, data );
+		papu->writeRegister(0xff21, data);
 
-		_n->m_pluginData = papu;
+		nph->m_pluginData = papu;
 	}
 
-	auto papu = static_cast<Gb_Apu_Buffer*>(_n->m_pluginData);
+	auto papu = static_cast<GbApuWrapper*>(nph->m_pluginData);
 
-	papu->treble_eq( m_trebleModel.value() );
-	papu->bass_freq( m_bassModel.value() );
+	papu->trebleEq(m_trebleModel.value());
+	papu->bassFreq(m_bassModel.value());
 
 	//channel 1 - square
 	data = m_ch1SweepTimeModel.value();
-	data = data<<1;
+	data = data << 1;
 	data += m_ch1SweepDirModel.value();
 	data = data << 3;
 	data += m_ch1SweepRtShiftModel.value();
-	papu->write_register( fakeClock(),  0xff10, data );
+	papu->writeRegister(0xff10, data);
 
 	data = m_ch1WavePatternDutyModel.value();
-	data = data<<6;
-	papu->write_register( fakeClock(),  0xff11, data );
-
+	data = data << 6;
+	papu->writeRegister(0xff11, data);
 
 	//channel 2 - square
 	data = m_ch2WavePatternDutyModel.value();
-	data = data<<6;
-	papu->write_register( fakeClock(),  0xff16, data );
-
+	data = data << 6;
+	papu->writeRegister(0xff16, data);
 
 	//channel 3 - wave
-	//data = m_ch3OnModel.value()?128:0;
+	//data = m_ch3OnModel.value() ? 128 : 0;
 	data = 128;
-	papu->write_register( fakeClock(),  0xff1a, data );
+	papu->writeRegister(0xff1a, data);
 
 	auto ch3voldata = std::array{0, 3, 2, 1};
 	data = ch3voldata[(int)m_ch3VolumeModel.value()];
-	data = data<<5;
-	papu->write_register( fakeClock(),  0xff1c, data );
-
+	data = data << 5;
+	papu->writeRegister(0xff1c, data);
 
 	//controls
 	data = m_so1VolumeModel.value();
-	data = data<<4;
+	data = data << 4;
 	data += m_so2VolumeModel.value();
-	papu->write_register( fakeClock(),  0xff24, data );
+	papu->writeRegister(0xff24, data);
 
-	data = m_ch4So2Model.value()?128:0;
-	data += m_ch3So2Model.value()?64:0;
-	data += m_ch2So2Model.value()?32:0;
-	data += m_ch1So2Model.value()?16:0;
-	data += m_ch4So1Model.value()?8:0;
-	data += m_ch3So1Model.value()?4:0;
-	data += m_ch2So1Model.value()?2:0;
-	data += m_ch1So1Model.value()?1:0;
-	papu->write_register( fakeClock(),  0xff25, data );
+	data = m_ch4So2Model.value() ? 128 : 0;
+	data += m_ch3So2Model.value() ? 64 : 0;
+	data += m_ch2So2Model.value() ? 32 : 0;
+	data += m_ch1So2Model.value() ? 16 : 0;
+	data += m_ch4So1Model.value() ? 8 : 0;
+	data += m_ch3So1Model.value() ? 4 : 0;
+	data += m_ch2So1Model.value() ? 2 : 0;
+	data += m_ch1So1Model.value() ? 1 : 0;
+	papu->writeRegister(0xff25, data);
 
-	const float * wpm = m_graphModel.samples();
+	const float* wpm = m_graphModel.samples();
 
-	for( char i=0; i<16; i++ )
+	for (char i = 0; i < 16; ++i)
 	{
-		data = (int)floor(wpm[i*2]) << 4;
-		data += (int)floor(wpm[i*2+1]);
-		papu->write_register( fakeClock(),  0xff30 + i, data );
+		data = static_cast<int>(std::floor(wpm[i * 2])) << 4;
+		data += static_cast<int>(std::floor(wpm[(i * 2) + 1]));
+		papu->writeRegister(0xff30 + i, data);
 	}
 
-	if( ( freq >= 65 ) && ( freq <=4000 ) )
+	if ((freq >= 65) && (freq <= 4000))
 	{
-		int initflag = (tfp==0)?128:0;
-		// Hz = 4194304 / ( ( 2048 - ( 11-bit-freq ) ) << 5 )
-		data = 2048 - ( ( 4194304 / freq )>>5 );
-		if( tfp==0 )
+		int initFlag = (tfp == 0) ? 128 : 0;
+		// Hz = 4194304 / ((2048 - (11-bit-freq)) << 5)
+		data = 2048 - ((4194304 / freq) >> 5);
+		if (tfp == 0)
 		{
-			papu->write_register( fakeClock(),  0xff13, data & 0xff );
-			papu->write_register( fakeClock(),  0xff14, (data>>8) | initflag );
+			papu->writeRegister(0xff13, data & 0xff);
+			papu->writeRegister(0xff14, (data >> 8) | initFlag);
 		}
-		papu->write_register( fakeClock(),  0xff18, data & 0xff );
-		papu->write_register( fakeClock(),  0xff19, (data>>8) | initflag );
-		papu->write_register( fakeClock(),  0xff1d, data & 0xff );
-		papu->write_register( fakeClock(),  0xff1e, (data>>8) | initflag );
+		papu->writeRegister(0xff18, data & 0xff);
+		papu->writeRegister(0xff19, (data >> 8) | initFlag);
+		papu->writeRegister(0xff1d, data & 0xff);
+		papu->writeRegister(0xff1e, (data >> 8) | initFlag);
 	}
 
-	if( tfp == 0 )
+	if (tfp == 0)
 	{
 		//PRNG Frequency = (1048576 Hz / (ratio + 1)) / 2 ^ (shiftclockfreq + 1)
-		char sopt=0;
-		char ropt=1;
-		float fopt = 524288.0 / ( ropt * pow( 2.0, sopt + 1.0 ) );
+		char sopt = 0;
+		char ropt = 1;
+		float fopt = 524288.0 / (ropt * std::pow(2.0, sopt + 1.0));
 		float f;
-		for ( char s=0; s<16; s++ )
-		for ( char r=0; r<8; r++ ) {
-			f = 524288.0 / ( r * pow( 2.0, s + 1.0 ) );
-			if( fabs( freq-fopt ) > fabs( freq-f ) ) {
-				fopt = f;
-				ropt = r;
-				sopt = s;
+		for (char s = 0; s < 16; ++s)
+		{
+			for (char r = 0; r < 8; ++r)
+			{
+				f = 524288.0 / (r * std::pow(2.0, s + 1.0));
+				if (std::fabs(freq - fopt) > std::fabs(freq - f))
+				{
+					fopt = f;
+					ropt = r;
+					sopt = s;
+				}
 			}
 		}
+
 		data = sopt;
 		data = data << 1;
 		data += m_ch4ShiftRegWidthModel.value();
 		data = data << 3;
 		data += ropt;
-		papu->write_register( fakeClock(),  0xff22, data );
+		papu->writeRegister(0xff22, data);
 
 		//channel 4 init
-		papu->write_register( fakeClock(),  0xff23, 128 );
+		papu->writeRegister(0xff23, 128);
 	}
 
-	int const buf_size = 2048;
-	int framesleft = frames;
-	int datalen = 0;
-	auto buf = std::array<blip_sample_t, buf_size * 2>{};
-	while( framesleft > 0 )
+	constexpr int bufSize = 2048;
+	int framesLeft = frames;
+	int dataLen = 0;
+	auto buf = std::array<blip_sample_t, bufSize * 2>{};
+	while (framesLeft > 0)
 	{
-		int avail = papu->samples_avail();
-		if( avail <= 0 )
+		int avail = papu->samplesAvail();
+		if (avail <= 0)
 		{
-			m_time = 0;
-			papu->end_frame(FRAME_LENGTH);
-			avail = papu->samples_avail();
+			papu->endFrame(FRAME_LENGTH);
+			avail = papu->samplesAvail();
 		}
-		datalen = framesleft>avail?avail:framesleft;
-		datalen = datalen>buf_size?buf_size:datalen;
+		dataLen = framesLeft > avail ? avail : framesLeft;
+		dataLen = dataLen > bufSize ? bufSize : dataLen;
 
-		long count = papu->read_samples(buf.data(), datalen * 2) / 2;
+		long count = papu->readSamples(buf.data(), dataLen * 2) / 2;
 
-		for( fpp_t frame = 0; frame < count; ++frame )
+		for (fpp_t frame = 0; frame < count; ++frame)
 		{
-			for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
+			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 			{
-				sample_t s = float(buf[frame*2+ch])/32768.0;
-				_working_buffer[frames-framesleft+frame+offset][ch] = s;
+				sample_t s = static_cast<float>(buf[(frame * 2) + ch]) / 32768.0f;
+				workingBuffer[frames - framesLeft + frame + offset][ch] = s;
 			}
 		}
-		framesleft -= count;
+		framesLeft -= count;
 	}
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
+	instrumentTrack()->processAudioBuffer(workingBuffer, frames + offset, nph);
 }
 
 
 
-void FreeBoyInstrument::deleteNotePluginData( NotePlayHandle * _n )
+void FreeBoyInstrument::deleteNotePluginData(NotePlayHandle* nph)
 {
-	delete static_cast<Gb_Apu_Buffer *>( _n->m_pluginData );
+	delete static_cast<GbApuWrapper*>(nph->m_pluginData);
 }
 
 
