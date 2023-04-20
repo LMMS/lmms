@@ -1076,6 +1076,7 @@ void RemoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 		return;
 	}
 
+	// Set up input and output pointers for processing
 	for( int i = 0; i < inputCount(); ++i )
 	{
 		m_inputs[i] = &((float *) _in)[i * bufferSize()];
@@ -1087,21 +1088,41 @@ void RemoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 		memset( m_outputs[i], 0, bufferSize() * sizeof( float ) );
 	}
 
-#ifdef OLD_VST_SDK
-	if( m_plugin->flags & effFlagsCanReplacing )
+	int numInputChannels = inputCount();
+	int numOutputChannels = outputCount();
+
+	// Handle the case where the plugin can only process mono input but needs to produce stereo output
+	if( numInputChannels == 1 && numOutputChannels == 2 )
 	{
-		m_plugin->processReplacing( m_plugin, m_inputs, m_outputs,
+		float * leftInput = m_inputs[0];
+		float * leftOutput = m_outputs[0];
+		float * rightOutput = m_outputs[1];
+
+		// Process left channel using the mono input data
+		m_plugin->processReplacing( m_plugin, &leftInput, &leftOutput,
+								bufferSize() );
+
+		// Process right channel using the mono input data
+		m_plugin->processReplacing( m_plugin, &leftInput, &rightOutput,
 								bufferSize() );
 	}
 	else
 	{
-		m_plugin->process( m_plugin, m_inputs, m_outputs,
-								bufferSize() );
-	}
+		// Standard processing for plugins that support the required number of input and output channels
+#ifdef OLD_VST_SDK
+		if( m_plugin->flags & effFlagsCanReplacing )
+		{
+			m_plugin->processReplacing( m_plugin, m_inputs, m_outputs,
+									bufferSize() );
+		}
+		else { m_plugin->process(m_plugin, m_inputs, m_outputs,
+								bufferSize() ); }
 #else
 	m_plugin->processReplacing(m_plugin, m_inputs, m_outputs, bufferSize());
 #endif
+	}
 
+	// Unlock shared memory and update the current sample position
 	unlockShm();
 
 	m_currentSamplePos += bufferSize();
