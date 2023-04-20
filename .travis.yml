@@ -1,3 +1,4 @@
 language: cpp
 compiler: clang
 os: windows
+script: make && make test
