@@ -1110,13 +1110,13 @@ void RemoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 	{
 		// Standard processing for plugins that support the required number of input and output channels
 #ifdef OLD_VST_SDK
-		if( m_plugin->flags & effFlagsCanReplacing )
-		{
-			m_plugin->processReplacing( m_plugin, m_inputs, m_outputs,
-									bufferSize() );
-		}
-		else { m_plugin->process(m_plugin, m_inputs, m_outputs,
-								bufferSize() ); }
+	if( m_plugin->flags & effFlagsCanReplacing )
+	{
+		m_plugin->processReplacing( m_plugin, m_inputs, m_outputs,
+								bufferSize() );
+	}
+	else { m_plugin->process(m_plugin, m_inputs, m_outputs,
+							bufferSize() ); }
 #else
 	m_plugin->processReplacing(m_plugin, m_inputs, m_outputs, bufferSize());
 #endif
