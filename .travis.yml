@@ -1,2 +1,4 @@
 language: cpp
 compiler: clang
+install: make get-deps
+os: windows
