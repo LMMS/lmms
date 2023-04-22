@@ -178,7 +178,7 @@ void Vibed::loadSettings(const QDomElement& elem)
 		newVersion = elem.attribute("version").toFloat() >= 0.2f;
 	}
 
-	for (int i = 0; i < 9; ++i)
+	for (int i = 0; i < s_stringCount; ++i)
 	{
 		const auto is = QString::number(i);
 
@@ -219,8 +219,8 @@ void Vibed::playNote(NotePlayHandle* n, sampleFrame* workingBuffer)
 {
 	if (!n->m_pluginData)
 	{
-		const auto newContainer = new StringContainer(n->frequency(),
-			Engine::audioEngine()->processingSampleRate(), s_sampleLength);
+		const auto newContainer = new StringContainer{n->frequency(),
+			Engine::audioEngine()->processingSampleRate(), s_sampleLength};
 
 		n->m_pluginData = newContainer;
 

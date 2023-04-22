@@ -73,7 +73,7 @@ private:
 	class StringContainer;
 
 	static constexpr int s_sampleLength = 128;
-	static constexpr unsigned s_stringCount = 9;
+	static constexpr int s_stringCount = 9;
 
 	std::vector<std::unique_ptr<FloatModel>> m_pickKnobs;
 	std::vector<std::unique_ptr<FloatModel>> m_pickupKnobs;
