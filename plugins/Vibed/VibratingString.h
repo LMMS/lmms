@@ -236,12 +236,12 @@ private:
 	 * In a left-going delay-line, position increases to the right, and
 	 * delay DEcreases to the right => left = future and right = past.
 	 */
-	static inline sample_t toBridgeAccess(DelayLine* dl, int position)
+	static sample_t toBridgeAccess(DelayLine* dl, int position)
 	{
 		return dlAccess(dl, position);
 	}
 
-	inline sample_t bridgeReflection(sample_t insamp)
+	sample_t bridgeReflection(sample_t insamp)
 	{
 		m_state = (m_state + insamp) * 0.5;
 		return m_state;

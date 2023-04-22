@@ -115,28 +115,28 @@ Vibed::Vibed(InstrumentTrack* instrumentTrack) :
 {
 	for (int harm = 0; harm < s_stringCount; ++harm)
 	{
-		m_volumeKnobs.emplace_back(std::make_unique<FloatModel>(
-			DefaultVolume, MinVolume, MaxVolume, 1.0f, this, tr("String %1 volume").arg(harm + 1)));
-		m_stiffnessKnobs.emplace_back(std::make_unique<FloatModel>(
-			0.0f, 0.0f, 0.05f, 0.001f, this, tr("String %1 stiffness").arg(harm + 1)));
-		m_pickKnobs.emplace_back(std::make_unique<FloatModel>(
-			0.0f, 0.0f, 0.05f, 0.005f, this, tr("Pick %1 position").arg(harm + 1)));
-		m_pickupKnobs.emplace_back(std::make_unique<FloatModel>(
-			0.05f, 0.0f, 0.05f, 0.005f, this, tr("Pickup %1 position").arg( harm + 1)));
-		m_panKnobs.emplace_back(std::make_unique<FloatModel>(
-			0.0f, -1.0f, 1.0f, 0.01f, this, tr("String %1 panning").arg(harm + 1)));
-		m_detuneKnobs.emplace_back(std::make_unique<FloatModel>(
-			0.0f, -0.1f, 0.1f, 0.001f, this, tr("String %1 detune").arg(harm + 1)));
-		m_randomKnobs.emplace_back(std::make_unique<FloatModel>(
-			0.0f, 0.0f, 0.75f, 0.01f, this, tr("String %1 fuzziness").arg(harm + 1)));
-		m_lengthKnobs.emplace_back(std::make_unique<FloatModel>(
-			1, 1, 16, 1, this, tr("String %1 length").arg(harm + 1)));
+		m_volumeKnobs[harm] = std::make_unique<FloatModel>(
+			DefaultVolume, MinVolume, MaxVolume, 1.0f, this, tr("String %1 volume").arg(harm + 1));
+		m_stiffnessKnobs[harm] = std::make_unique<FloatModel>(
+			0.0f, 0.0f, 0.05f, 0.001f, this, tr("String %1 stiffness").arg(harm + 1));
+		m_pickKnobs[harm] = std::make_unique<FloatModel>(
+			0.0f, 0.0f, 0.05f, 0.005f, this, tr("Pick %1 position").arg(harm + 1));
+		m_pickupKnobs[harm] = std::make_unique<FloatModel>(
+			0.05f, 0.0f, 0.05f, 0.005f, this, tr("Pickup %1 position").arg( harm + 1));
+		m_panKnobs[harm] = std::make_unique<FloatModel>(
+			0.0f, -1.0f, 1.0f, 0.01f, this, tr("String %1 panning").arg(harm + 1));
+		m_detuneKnobs[harm] = std::make_unique<FloatModel>(
+			0.0f, -0.1f, 0.1f, 0.001f, this, tr("String %1 detune").arg(harm + 1));
+		m_randomKnobs[harm] = std::make_unique<FloatModel>(
+			0.0f, 0.0f, 0.75f, 0.01f, this, tr("String %1 fuzziness").arg(harm + 1));
+		m_lengthKnobs[harm] = std::make_unique<FloatModel>(
+			1, 1, 16, 1, this, tr("String %1 length").arg(harm + 1));
 
-		m_impulses.emplace_back(std::make_unique<BoolModel>(false, this, tr("Impulse %1").arg(harm + 1)));
-		m_powerButtons.emplace_back(std::make_unique<BoolModel>(harm == 0, this, tr("String %1").arg(harm + 1)));
-		m_harmonics.emplace_back(std::make_unique<NineButtonSelectorModel>(2, 0, 8, this));
-		auto& model = m_graphs.emplace_back(std::make_unique<graphModel>(-1.0, 1.0, s_sampleLength, this));
-		model->setWaveToSine();
+		m_impulses[harm] = std::make_unique<BoolModel>(false, this, tr("Impulse %1").arg(harm + 1));
+		m_powerButtons[harm] = std::make_unique<BoolModel>(harm == 0, this, tr("String %1").arg(harm + 1));
+		m_harmonics[harm] = std::make_unique<NineButtonSelectorModel>(2, 0, 8, this);
+		m_graphs[harm] = std::make_unique<graphModel>(-1.0, 1.0, s_sampleLength, this);
+		m_graphs[harm]->setWaveToSine();
 	}
 }
 

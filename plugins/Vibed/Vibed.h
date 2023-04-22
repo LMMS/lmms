@@ -33,7 +33,7 @@
 #include "Graph.h"
 #include "PixmapButton.h"
 
-#include <vector>
+#include <array>
 #include <memory>
 
 namespace lmms
@@ -75,18 +75,18 @@ private:
 	static constexpr int s_sampleLength = 128;
 	static constexpr int s_stringCount = 9;
 
-	std::vector<std::unique_ptr<FloatModel>> m_pickKnobs;
-	std::vector<std::unique_ptr<FloatModel>> m_pickupKnobs;
-	std::vector<std::unique_ptr<FloatModel>> m_stiffnessKnobs;
-	std::vector<std::unique_ptr<FloatModel>> m_volumeKnobs;
-	std::vector<std::unique_ptr<FloatModel>> m_panKnobs;
-	std::vector<std::unique_ptr<FloatModel>> m_detuneKnobs;
-	std::vector<std::unique_ptr<FloatModel>> m_randomKnobs;
-	std::vector<std::unique_ptr<FloatModel>> m_lengthKnobs;
-	std::vector<std::unique_ptr<BoolModel>> m_powerButtons;
-	std::vector<std::unique_ptr<graphModel>> m_graphs;
-	std::vector<std::unique_ptr<BoolModel>> m_impulses;
-	std::vector<std::unique_ptr<NineButtonSelectorModel>> m_harmonics;
+	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_pickKnobs;
+	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_pickupKnobs;
+	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_stiffnessKnobs;
+	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_volumeKnobs;
+	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_panKnobs;
+	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_detuneKnobs;
+	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_randomKnobs;
+	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_lengthKnobs;
+	std::array<std::unique_ptr<BoolModel>, s_stringCount> m_powerButtons;
+	std::array<std::unique_ptr<graphModel>, s_stringCount> m_graphs;
+	std::array<std::unique_ptr<BoolModel>, s_stringCount> m_impulses;
+	std::array<std::unique_ptr<NineButtonSelectorModel>, s_stringCount> m_harmonics;
 
 	friend class gui::VibedView;
 };
