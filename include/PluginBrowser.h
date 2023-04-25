@@ -63,13 +63,14 @@ public:
 	using PluginKey = Plugin::Descriptor::SubPluginFeatures::Key;
 	PluginDescWidget( const PluginKey & _pk, QWidget * _parent );
 	QString name() const;
-
+	void openInNewInstrumentTrack(QString value);
 
 protected:
 	void enterEvent( QEvent * _e ) override;
 	void leaveEvent( QEvent * _e ) override;
 	void mousePressEvent( QMouseEvent * _me ) override;
 	void paintEvent( QPaintEvent * _pe ) override;
+	void contextMenuEvent(QContextMenuEvent * e ) override;
 
 private:
 	constexpr static int DEFAULT_HEIGHT{24};
