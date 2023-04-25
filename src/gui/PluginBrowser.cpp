@@ -291,7 +291,7 @@ void PluginDescWidget::mousePressEvent( QMouseEvent * _me )
 }
 
 
-void PluginDescWidget::contextMenuEvent(QContextMenuEvent * e)
+void PluginDescWidget::contextMenuEvent(QContextMenuEvent* e)
 {
 	QMenu contextMenu(this);
 
@@ -308,10 +308,10 @@ void PluginDescWidget::openInNewInstrumentTrack(QString value)
 {
 	TrackContainer* tc = Engine::getSong();
 	
-	InstrumentTrack * it = dynamic_cast<InstrumentTrack*>(
+	auto it = dynamic_cast<InstrumentTrack*>(
 			Track::create(Track::InstrumentTrack,
 							tc));
-	InstrumentLoaderThread *ilt = new InstrumentLoaderThread(
+	auto ilt = new InstrumentLoaderThread(
 				this, it, value);
 	ilt->start();
 }

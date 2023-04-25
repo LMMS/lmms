@@ -70,7 +70,7 @@ protected:
 	void leaveEvent( QEvent * _e ) override;
 	void mousePressEvent( QMouseEvent * _me ) override;
 	void paintEvent( QPaintEvent * _pe ) override;
-	void contextMenuEvent(QContextMenuEvent * e) override;
+	void contextMenuEvent(QContextMenuEvent* e) override;
 
 private:
 	constexpr static int DEFAULT_HEIGHT{24};
