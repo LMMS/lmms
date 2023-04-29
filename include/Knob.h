@@ -40,7 +40,7 @@ namespace lmms::gui
 {
 
 
-class TextFloat;
+class SimpleTextFloat;
 
 enum knobTypes
 {
@@ -174,7 +174,7 @@ private:
 	}
 
 
-	static TextFloat * s_textFloat;
+	static SimpleTextFloat * s_textFloat;
 
 	QString m_label;
 	bool m_isHtmlLabel;
