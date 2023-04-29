@@ -1,7 +1,7 @@
 /*
- * Lv2FxControls.h - Lv2FxControls implementation
+ * DispersionControls.h
  *
- * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2023 Lost Robot <r94231/at/gmail/dot/com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,54 +22,60 @@
  *
  */
 
-#ifndef LV2_FX_CONTROLS_H
-#define LV2_FX_CONTROLS_H
+#ifndef LMMS_DISPERSION_CONTROLS_H
+#define LMMS_DISPERSION_CONTROLS_H
 
+#include "DispersionControlDialog.h"
 #include "EffectControls.h"
-#include "Lv2ControlBase.h"
 
 namespace lmms
 {
 
-
-class Lv2Effect;
+class DispersionEffect;
 
 namespace gui
 {
-class Lv2FxControlDialog;
+class DispersionControlDialog;
 }
 
 
-class Lv2FxControls : public EffectControls, public Lv2ControlBase
+class DispersionControls : public EffectControls
 {
 	Q_OBJECT
-signals:
-	void modelChanged();
 public:
-	Lv2FxControls(Lv2Effect *effect, const QString &uri);
-	void reload();
+	DispersionControls(DispersionEffect* effect);
+	~DispersionControls() override = default;
 
-	void saveSettings(QDomDocument &_doc, QDomElement &_parent) override;
-	void loadSettings(const QDomElement &that) override;
+	void saveSettings(QDomDocument & doc, QDomElement & parent) override;
+	void loadSettings(const QDomElement & parent) override;
 	inline QString nodeName() const override
 	{
-		return Lv2ControlBase::nodeName();
+		return "DispersionControls";
 	}
 
-	int controlCount() override;
-	gui::EffectControlDialog* createView() override;
+	int controlCount() override
+	{
+		return 5;
+	}
 
-private slots:
-	void changeControl();
+	gui::EffectControlDialog* createView() override
+	{
+		return new gui::DispersionControlDialog(this);
+	}
 
 private:
-	void onSampleRateChanged();
+	DispersionEffect* m_effect;
+	IntModel m_amountModel;
+	FloatModel m_freqModel;
+	FloatModel m_resoModel;
+	FloatModel m_feedbackModel;
+	BoolModel m_dcModel;
 
-	friend class gui::Lv2FxControlDialog;
-	friend class Lv2Effect;
+	friend class gui::DispersionControlDialog;
+	friend class DispersionEffect;
 };
 
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_DISPERSION_CONTROLS_H

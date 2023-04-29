@@ -131,6 +131,8 @@ public:
 
 private:
 	//! models for the controls
+	//! @note The AutomatableModels behind the ModelInfo are not owned,
+	//!   but referenced after `addModel` is being called.
 	std::map<std::string, ModelInfo> m_models;
 };
 

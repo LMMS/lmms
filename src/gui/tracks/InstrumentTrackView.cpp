@@ -211,7 +211,7 @@ InstrumentTrackWindow * InstrumentTrackView::topLevelInstrumentTrackWindow()
 				getGUI()->mainWindow()->workspace()->subWindowList(
 											QMdiArea::ActivationHistoryOrder ) )
 	{
-		if( sw->isVisible() && sw->widget()->inherits( "InstrumentTrackWindow" ) )
+		if( sw->isVisible() && sw->widget()->inherits( "lmms::gui::InstrumentTrackWindow" ) )
 		{
 			w = qobject_cast<InstrumentTrackWindow *>( sw->widget() );
 		}

@@ -1,9 +1,9 @@
 /*
- * Lv2FxControlDialog.h - Lv2FxControlDialog implementation
+ * TextFloat.h - class textFloat, a floating text-label
  *
- * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
- *
- * This file is part of LMMS - https://lmms.io
+ * Copyright (c) 2023 LMMS team
+*
+* This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -20,37 +20,42 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301 USA.
  *
- */
+*/
 
-#ifndef LV2_FX_CONTROL_DIALOG_H
-#define LV2_FX_CONTROL_DIALOG_H
 
-#include "EffectControlDialog.h"
-#include "Lv2ViewBase.h"
+#ifndef SIMPLE_TEXT_FLOAT_H
+#define SIMPLE_TEXT_FLOAT_H
 
-namespace lmms
+#include <QWidget>
+
+#include "lmms_export.h"
+
+class QLabel;
+
+namespace lmms::gui
 {
 
-class Lv2FxControls;
-
-namespace gui
-{
-
-class Lv2FxControlDialog : public EffectControlDialog, public Lv2ViewBase
+class LMMS_EXPORT SimpleTextFloat : public QWidget
 {
 	Q_OBJECT
-
 public:
-	Lv2FxControlDialog(Lv2FxControls *controls);
+	SimpleTextFloat();
+	~SimpleTextFloat() override = default;
+
+	void setText(const QString & text);
+
+	void setVisibilityTimeOut(int msecs);
+
+	void moveGlobal(QWidget * w, const QPoint & offset)
+	{
+		move(w->mapToGlobal(QPoint(0, 0)) + offset);
+	}
 
 private:
-	Lv2FxControls *lv2Controls();
-	void modelChanged() final;
+	QLabel * m_textLabel;
 };
 
 
-} // namespace gui
-
-} // namespace lmms
+} // namespace lmms::gui
 
 #endif

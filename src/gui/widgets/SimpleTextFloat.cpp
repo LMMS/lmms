@@ -1,7 +1,7 @@
 /*
- * Lv2FxControlDialog.h - Lv2FxControlDialog implementation
+ * TextFloat.cpp - class textFloat, a floating text-label
  *
- * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) LMMS team
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,35 +22,41 @@
  *
  */
 
-#ifndef LV2_FX_CONTROL_DIALOG_H
-#define LV2_FX_CONTROL_DIALOG_H
+#include "SimpleTextFloat.h"
 
-#include "EffectControlDialog.h"
-#include "Lv2ViewBase.h"
+#include <QTimer>
+#include <QStyleOption>
+#include <QHBoxLayout>
+#include <QLabel>
 
-namespace lmms
+#include "GuiApplication.h"
+#include "MainWindow.h"
+
+namespace lmms::gui
 {
 
-class Lv2FxControls;
 
-namespace gui
+SimpleTextFloat::SimpleTextFloat() :
+	QWidget(getGUI()->mainWindow(), Qt::ToolTip)
 {
+	QHBoxLayout * layout = new QHBoxLayout(this);
+	layout->setMargin(3);
+	setLayout(layout);
 
-class Lv2FxControlDialog : public EffectControlDialog, public Lv2ViewBase
+	m_textLabel = new QLabel(this);
+	layout->addWidget(m_textLabel);
+}
+
+void SimpleTextFloat::setText(const QString & text)
 {
-	Q_OBJECT
-
-public:
-	Lv2FxControlDialog(Lv2FxControls *controls);
-
-private:
-	Lv2FxControls *lv2Controls();
-	void modelChanged() final;
-};
+	m_textLabel->setText(text);
+}
 
 
-} // namespace gui
+void SimpleTextFloat::setVisibilityTimeOut(int msecs)
+{
+	QTimer::singleShot(msecs, this, SLOT(hide()));
+	show();
+}
 
-} // namespace lmms
-
-#endif
+} // namespace lmms::gui
