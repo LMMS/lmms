@@ -38,6 +38,7 @@
 #include "PianoRoll.h"
 #include "RenameDialog.h"
 #include "TrackView.h"
+#include "ScrollHelpers.h"
 
 namespace lmms::gui
 {
@@ -322,9 +323,12 @@ void MidiClipView::mouseDoubleClickEvent(QMouseEvent *_me)
 
 void MidiClipView::wheelEvent(QWheelEvent * we)
 {
-	if(m_clip->m_clipType == MidiClip::BeatClip &&
-				(fixedClips() || pixelsPerBar() >= 96) &&
-				position(we).y() > height() - s_stepBtnOff->height())
+	bool isBeat = m_clip->m_clipType == MidiClip::BeatClip;
+	bool showBeat = fixedClips() || (pixelsPerBar() >= 96 && m_legacySEPattern);
+	bool hoveringEdit = position(we).y() > height() - s_stepBtnOff->height();
+	bool scrolledVertical = we->angleDelta().y();
+
+	if (isBeat && showBeat && hoveringEdit && scrolledVertical)
 	{
 //	get the step number that was wheeled on and
 //	do calculations in floats to prevent rounding errors...
@@ -335,34 +339,23 @@ void MidiClipView::wheelEvent(QWheelEvent * we)
 
 		if( step >= m_clip->m_steps )
 		{
+			ClipView::wheelEvent(we);
 			return;
 		}
 
 		Note * n = m_clip->noteAtStep( step );
-		if(!n && we->angleDelta().y() > 0)
+		int volumeSteps = verticalScroll(we, 5);
+
+		if (!n && volumeSteps > 0)
 		{
 			n = m_clip->addStepNote( step );
 			n->setVolume( 0 );
 		}
-		if( n != nullptr )
+		if (n && volumeSteps)
 		{
-			int vol = n->getVolume();
-
-			if(we->angleDelta().y() > 0)
-			{
-				n->setVolume( qMin( 100, vol + 5 ) );
-			}
-			else
-			{
-				n->setVolume( qMax( 0, vol - 5 ) );
-			}
-
-			Engine::getSong()->setModified();
-			update();
-			if( getGUI()->pianoRoll()->currentMidiClip() == m_clip )
-			{
-				getGUI()->pianoRoll()->update();
-			}
+			// Volume is unsigned so it must not go negative
+			n->setVolume(std::max(0, n->getVolume() + volumeSteps));
+			m_clip->dataChanged();
 		}
 		we->accept();
 	}
