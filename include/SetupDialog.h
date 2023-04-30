@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef SETUP_DIALOG_H
-#define SETUP_DIALOG_H
+#ifndef LMMS_GUI_SETUP_DIALOG_H
+#define LMMS_GUI_SETUP_DIALOG_H
 
 #include <QDialog>
 #include <QMap>
@@ -214,4 +213,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_SETUP_DIALOG_H

@@ -22,12 +22,11 @@
  *
  */
 
-#ifndef PLUGINISSUE_H
-#define PLUGINISSUE_H
+#ifndef LMMS_PLUGIN_ISSUE_H
+#define LMMS_PLUGIN_ISSUE_H
 
 #include <QDebug>
 #include <string>
-
 
 namespace lmms
 {
@@ -85,5 +84,4 @@ QDebug operator<<(QDebug stream, const PluginIssue& iss);
 
 } // namespace lmms
 
-
-#endif // PLUGINISSUE_H
+#endif // LMMS_PLUGIN_ISSUE_H

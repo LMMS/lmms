@@ -1,7 +1,7 @@
 /*
  * Lv2Manager.cpp - Implementation of Lv2Manager class
  *
- * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -59,6 +59,12 @@ const std::set<const char*, Lv2Manager::CmpStr> Lv2Manager::pluginBlacklist =
 	"http://calf.sourceforge.net/plugins/TapeSimulator",
 	"http://calf.sourceforge.net/plugins/TransientDesigner",
 	"http://calf.sourceforge.net/plugins/Vinyl",
+
+	// https://gitlab.com/drobilla/blop-lv2/-/issues/3
+	"http://drobilla.net/plugins/blop/pulse",
+	"http://drobilla.net/plugins/blop/sawtooth",
+	"http://drobilla.net/plugins/blop/square",
+	"http://drobilla.net/plugins/blop/triangle",
 
 	// Visualization, meters, and scopes etc., won't work until we have gui support
 	"http://distrho.sf.net/plugins/ProM",

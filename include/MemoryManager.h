@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef MEMORY_MANAGER_H
-#define MEMORY_MANAGER_H
+#ifndef LMMS_MEMORY_MANAGER_H
+#define LMMS_MEMORY_MANAGER_H
 
 #include <cstddef>
 #include <vector>
@@ -108,4 +108,4 @@ void MM_FREE(T* ptr)
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_MEMORY_MANAGER_H

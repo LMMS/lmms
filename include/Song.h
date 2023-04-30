@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef SONG_H
-#define SONG_H
+#ifndef LMMS_SONG_H
+#define LMMS_SONG_H
 
 #include <memory>
 
@@ -532,4 +532,4 @@ signals:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_SONG_H

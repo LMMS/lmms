@@ -24,9 +24,8 @@
  *
  */
 
-
-#ifndef LADSPA_MANAGER_H
-#define LADSPA_MANAGER_H
+#ifndef LMMS_LADSPA_MANAGER_H
+#define LMMS_LADSPA_MANAGER_H
 
 #include <ladspa.h>
 
@@ -350,4 +349,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_LADSPA_MANAGER_H

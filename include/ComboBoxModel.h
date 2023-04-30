@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef COMBOBOX_MODEL_H
-#define COMBOBOX_MODEL_H
+#ifndef LMMS_COMBOBOX_MODEL_H
+#define LMMS_COMBOBOX_MODEL_H
 
 #include <memory>
 #include <utility>
@@ -95,4 +95,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_COMBOBOX_MODEL_H

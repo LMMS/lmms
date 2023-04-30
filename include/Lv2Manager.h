@@ -1,7 +1,7 @@
 /*
  * Lv2Manager.h - Implementation of Lv2Manager class
  *
- * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LV2MANAGER_H
-#define LV2MANAGER_H
+#ifndef LMMS_LV2_MANAGER_H
+#define LMMS_LV2_MANAGER_H
 
 #include "lmmsconfig.h"
 
@@ -166,4 +166,4 @@ private:
 
 #endif // LMMS_HAVE_LV2
 
-#endif // LV2MANAGER_H
+#endif // LMMS_LV2_MANAGER_H

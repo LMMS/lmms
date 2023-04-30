@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef PLUGIN_BROWSER_H
-#define PLUGIN_BROWSER_H
+#ifndef LMMS_GUI_PLUGIN_BROWSER_H
+#define LMMS_GUI_PLUGIN_BROWSER_H
 
 #include <QPixmap>
 
@@ -56,8 +56,6 @@ private:
 };
 
 
-
-
 class PluginDescWidget : public QWidget
 {
 	Q_OBJECT
@@ -85,4 +83,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_PLUGIN_BROWSER_H

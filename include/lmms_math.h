@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef LMMS_MATH_H
 #define LMMS_MATH_H
 
@@ -329,4 +328,4 @@ static inline T absMin( T a, T b )
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_MATH_H

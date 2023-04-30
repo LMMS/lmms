@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_ENGINE_H
-#define AUDIO_ENGINE_H
+#ifndef LMMS_AUDIO_ENGINE_H
+#define LMMS_AUDIO_ENGINE_H
 
 #include <QMutex>
 
@@ -487,4 +487,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AUDIO_ENGINE_H
