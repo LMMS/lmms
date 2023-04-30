@@ -3768,8 +3768,13 @@ void PianoRoll::resizeEvent(QResizeEvent* re)
 void PianoRoll::wheelEvent(QWheelEvent * we )
 {
 	we->accept();
+
+	// Qt swaps x/y scroll when holding alt
+	bool altPressed = we->modifiers() & Qt::AltModifier;
+	bool physicallyVertical = altPressed ? we->angleDelta().x() : we->angleDelta().y();
+
 	// handle wheel events for note edit area - for editing note vol/pan with mousewheel
-	if(position(we).x() > noteEditLeft() && position(we).x() < noteEditRight()
+	if (physicallyVertical && position(we).x() < noteEditRight()
 	&& position(we).y() > noteEditTop() && position(we).y() < noteEditBottom())
 	{
 		if (!hasValidMidiClip()) {return;}
@@ -3781,12 +3786,11 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		int ticks_end = ( x + pixel_range / 2 ) *
 					TimePos::ticksPerBar() / m_ppb + m_currentPosition;
 
-		// When alt is pressed we only edit the note under the cursor
-		bool altPressed = we->modifiers() & Qt::AltModifier;
 		// go through notes to figure out which one we want to change
 		NoteVector nv;
 		for ( Note * i : m_midiClip->notes() )
 		{
+			// When alt is pressed we only edit the note under the cursor
 			if( i->withinRange( ticks_start, ticks_end ) || ( i->selected() && !altPressed ) )
 			{
 				nv += i;
@@ -3794,7 +3798,8 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		}
 		if( nv.size() > 0 )
 		{
-			const int step = we->angleDelta().y() > 0 ? 1 : -1;
+			// Qt swaps x/y scroll when holding alt
+			const int step = altPressed ? horizontalScroll(we) : verticalScroll(we);
 			if( m_noteEditMode == NoteEditVolume )
 			{
 				for ( Note * n : nv )
