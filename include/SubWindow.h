@@ -37,6 +37,7 @@ class QLabel;
 class QMoveEvent;
 class QPushButton;
 class QResizeEvent;
+class QWheelEvent;
 class QWidget;
 
 namespace lmms::gui
@@ -75,6 +76,7 @@ protected:
 	void resizeEvent( QResizeEvent * event ) override;
 	void paintEvent( QPaintEvent * pe ) override;
 	void changeEvent( QEvent * event ) override;
+	void wheelEvent(QWheelEvent* event) override;
 
 signals:
 	void focusLost();

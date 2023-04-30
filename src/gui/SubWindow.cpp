@@ -382,4 +382,18 @@ void SubWindow::resizeEvent( QResizeEvent * event )
 }
 
 
+
+
+/**
+ * @brief SubWindow::wheelEvent
+ *
+ *  Capture all WheelEvents that we receive directly or from our subwidgets.
+ *  Don't let them propagate up further to the MDI area.
+ */
+void SubWindow::wheelEvent(QWheelEvent* event)
+{
+	event->accept();
+}
+
+
 } // namespace lmms::gui
