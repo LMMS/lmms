@@ -35,6 +35,7 @@
 #include "CaptionMenu.h"
 #include "embed.h"
 #include "gui_templates.h"
+#include "ScrollHelpers.h"
 
 namespace lmms::gui
 {
@@ -227,12 +228,12 @@ void ComboBox::paintEvent( QPaintEvent * _pe )
 
 void ComboBox::wheelEvent( QWheelEvent* event )
 {
-	if( model() )
-	{
-		model()->setInitValue(model()->value() + ((event->angleDelta().y() < 0) ? 1 : -1));
-		update();
-		event->accept();
-	}
+	if (ignoreScroll(Qt::Horizontal, event)) { return; }
+
+	if (!model()) { return; }
+
+	model()->setValue(model()->value() + verticalScroll(event));
+	update();
 }
 
 

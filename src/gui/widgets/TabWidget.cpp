@@ -34,6 +34,7 @@
 #include "DeprecationHelper.h"
 #include "embed.h"
 #include "gui_templates.h"
+#include "ScrollHelpers.h"
 
 namespace lmms::gui
 {
@@ -293,11 +294,14 @@ void TabWidget::wheelEvent( QWheelEvent * we )
 {
 	if(position(we).y() > m_tabheight)
 	{
+		we->ignore();
 		return;
 	}
 
 	we->accept();
-	int dir = (we->angleDelta().y() < 0) ? 1 : -1;
+
+	int steps = 0 - horizontalScroll(we) - verticalScroll(we);
+	int dir = std::clamp(steps, -1, 1);
 	int tab = m_activeTab;
 	while( tab > -1 && static_cast<int>( tab ) < m_widgets.count() )
 	{

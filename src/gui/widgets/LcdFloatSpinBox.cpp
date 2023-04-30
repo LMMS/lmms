@@ -43,6 +43,7 @@
 #include "GuiApplication.h"
 #include "gui_templates.h"
 #include "MainWindow.h"
+#include "ScrollHelpers.h"
 
 namespace lmms::gui
 {
@@ -179,12 +180,13 @@ void LcdFloatSpinBox::mouseReleaseEvent(QMouseEvent*)
 
 void LcdFloatSpinBox::wheelEvent(QWheelEvent *event)
 {
+	if (ignoreScroll(Qt::Horizontal, event)) { return; }
+
 	// switch between integer and fractional step based on cursor position
 	if (position(event).x() < m_wholeDisplay.width()) { m_intStep = true; }
 	else { m_intStep = false; }
 
-	event->accept();
-	model()->setValue(model()->value() + ((event->angleDelta().y() > 0) ? 1 : -1) * getStep());
+	model()->setValue(model()->value() + verticalScroll(event) * getStep());
 	emit manualChange();
 }
 

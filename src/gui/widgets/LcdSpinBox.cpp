@@ -29,7 +29,7 @@
 
 #include "LcdSpinBox.h"
 #include "CaptionMenu.h"
-
+#include "ScrollHelpers.h"
 
 namespace lmms::gui
 {
@@ -140,8 +140,9 @@ void LcdSpinBox::mouseReleaseEvent(QMouseEvent*)
 
 void LcdSpinBox::wheelEvent(QWheelEvent * we)
 {
-	we->accept();
-	model()->setValue(model()->value() + ((we->angleDelta().y() > 0) ? 1 : -1) * model()->step<int>());
+	if (ignoreScroll(Qt::Horizontal, we)) { return; }
+
+	model()->setValue(model()->value() + verticalScroll(we) * model()->step<int>());
 	emit manualChange();
 }
 

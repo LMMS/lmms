@@ -40,6 +40,7 @@
 #include "NotePlayHandle.h"
 #include "PathUtil.h"
 #include "PixmapButton.h"
+#include "ScrollHelpers.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "Clipboard.h"
@@ -864,9 +865,14 @@ void AudioFileProcessorWaveView::mouseMoveEvent( QMouseEvent * _me )
 
 
 
-void AudioFileProcessorWaveView::wheelEvent( QWheelEvent * _we )
+void AudioFileProcessorWaveView::wheelEvent(QWheelEvent* we)
 {
-	zoom( _we->angleDelta().y() > 0 );
+	if (ignoreScroll(Qt::Horizontal, we)) { return; }
+
+	int steps = verticalScroll(we);
+	if (steps == 0) { return; }
+
+	zoom(steps < 0);
 	update();
 }
 

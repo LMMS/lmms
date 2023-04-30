@@ -38,6 +38,7 @@
 #include "Knob.h"
 #include "MainWindow.h"
 #include "PixmapButton.h"
+#include "ScrollHelpers.h"
 
 namespace lmms::gui
 {
@@ -646,8 +647,10 @@ void CompressorControlDialog::resizeEvent(QResizeEvent *event)
 
 void CompressorControlDialog::wheelEvent(QWheelEvent * event)
 {
+	if (ignoreScroll(Qt::Horizontal, event)) { return; }
+
 	const float temp = m_dbRange;
-	const float dbRangeNew = m_dbRange - copysignf(COMP_GRID_SPACING, event->angleDelta().y());
+	const float dbRangeNew = m_dbRange - COMP_GRID_SPACING * verticalScroll(event);
 	m_dbRange = round(qBound(COMP_GRID_SPACING, dbRangeNew, COMP_GRID_MAX) / COMP_GRID_SPACING) * COMP_GRID_SPACING;
 
 	// Only reset view if the scolling had an effect
