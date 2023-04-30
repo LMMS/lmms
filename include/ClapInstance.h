@@ -180,11 +180,11 @@ public:
 
 	auto getPluginState() const -> PluginState { return m_pluginState; };
 
-	// Call order: pluginLoad() --> pluginInit() --> pluginActivate()
+	auto pluginStart() -> bool; //!< Loads, inits, and activates in that order
+	auto pluginRestart() -> bool;
 
-	auto pluginLoad() -> bool; //!< Can also reload plugin
+	auto pluginLoad() -> bool;
 	auto pluginUnload() -> bool;
-
 	auto pluginInit() -> bool;
 	auto pluginActivate() -> bool;
 	auto pluginDeactivate() -> bool;
@@ -350,7 +350,7 @@ private:
 
 	clap::helpers::EventList m_evIn;
 	clap::helpers::EventList m_evOut;
-	clap_process m_process;
+	clap_process m_process{};
 
 	/**
 	 * Parameter update queues

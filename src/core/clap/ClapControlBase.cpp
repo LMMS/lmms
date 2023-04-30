@@ -136,16 +136,16 @@ void ClapControlBase::run(fpp_t frames)
 	}
 }
 
-void ClapControlBase::saveSettings(QDomDocument& doc, QDomElement& that)
+void ClapControlBase::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
-	LinkedModelGroups::saveSettings(doc, that);
+	LinkedModelGroups::saveSettings(doc, elem);
 
 	// TODO: save state using clap_plugin_state if supported by plugin
 }
 
-void ClapControlBase::loadSettings(const QDomElement& that)
+void ClapControlBase::loadSettings(const QDomElement& elem)
 {
-	LinkedModelGroups::loadSettings(that);
+	LinkedModelGroups::loadSettings(elem);
 
 	// TODO: load state using clap_plugin_state if supported by plugin
 }
@@ -157,8 +157,10 @@ void ClapControlBase::loadFile([[maybe_unused]] const QString& file)
 
 void ClapControlBase::reload()
 {
-	// TODO
-	throw std::runtime_error{"ClapControlBase::reload() not impl yet"};
+	for (const auto& instance : m_instances)
+	{
+		instance->pluginRestart();
+	}
 }
 
 auto ClapControlBase::controlCount() const -> std::size_t

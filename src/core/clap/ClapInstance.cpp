@@ -112,12 +112,9 @@ ClapInstance::ClapInstance(const ClapPluginInfo* pluginInfo, Model* parent)
 	m_pluginState = PluginState::None;
 	setHost();
 
-	m_process = {};
 	m_process.steady_time = -1; // Not supported yet
 
-	if (!pluginLoad()) { return; }
-	if (!pluginInit()) { return; }
-	if (!pluginActivate()) { return; }
+	pluginStart();
 }
 
 ClapInstance::ClapInstance(ClapInstance&& other) noexcept
@@ -236,6 +233,19 @@ auto ClapInstance::isValid() const -> bool
 	return m_plugin != nullptr && !isPluginErrorState() && m_pluginIssues.empty();
 }
 
+auto ClapInstance::pluginStart() -> bool
+{
+	if (!pluginLoad()) { return false; }
+	if (!pluginInit()) { return false; }
+	return pluginActivate();
+}
+
+auto ClapInstance::pluginRestart() -> bool
+{
+	if (!pluginUnload()) { return false; }
+	return pluginStart();
+}
+
 auto ClapInstance::pluginLoad() -> bool
 {
 	qDebug() << "Loading plugin instance:" << m_pluginInfo->getDescriptor()->name;
@@ -259,6 +269,7 @@ auto ClapInstance::pluginLoad() -> bool
 
 auto ClapInstance::pluginUnload() -> bool
 {
+	qDebug() << "Unloading plugin instance:" << m_pluginInfo->getDescriptor()->name;
 	pluginDeactivate();
 
 	if (m_plugin)
@@ -513,6 +524,7 @@ auto ClapInstance::pluginInit() -> bool
 					setParamValueByHost(*param, param->model()->value<float>());
 				};
 
+				// This is used for updating input parameters instead of copyModelsFromCore()
 				connect(param->model(), &Model::dataChanged, this, updateParam);
 
 				// Initially assign model value to param value
@@ -770,6 +782,7 @@ void ClapInstance::paramFlushOnMainThread()
 
 	if (canUsePluginParams())
 	{
+		// ZaMaximX2 crashes here:
 		m_pluginExtParams->flush(m_plugin, m_evIn.clapInputEvents(), m_evOut.clapOutputEvents());
 	}
 
