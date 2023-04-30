@@ -300,7 +300,7 @@ void TabWidget::wheelEvent( QWheelEvent * we )
 
 	we->accept();
 
-	int steps = 0 - horizontalScroll(we) - verticalScroll(we);
+	int steps = 0 - horizontalScroll(we, 1, true) - verticalScroll(we, 1, true);
 	int dir = std::clamp(steps, -1, 1);
 	int tab = m_activeTab;
 	while( tab > -1 && static_cast<int>( tab ) < m_widgets.count() )
