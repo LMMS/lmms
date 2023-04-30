@@ -54,6 +54,7 @@
 #include "embed.h"
 #include "CaptionMenu.h"
 #include "ConfigManager.h"
+#include "ScrollHelpers.h"
 #include "SimpleTextFloat.h"
 
 namespace lmms::gui
@@ -252,16 +253,17 @@ void Fader::mouseReleaseEvent( QMouseEvent * mouseEvent )
 
 void Fader::wheelEvent ( QWheelEvent *ev )
 {
-	ev->accept();
+	if (ignoreScroll(Qt::Horizontal, ev)) { return; }
 
-	if (ev->angleDelta().y() > 0)
-	{
-		model()->incValue( 1 );
-	}
-	else
-	{
-		model()->incValue( -1 );
-	}
+	if (!model()) { return; }
+
+	// Number of steps in the model
+	const float modelSteps = model()->range() / model()->step<float>();
+	// Scrolling 200 physical steps should take us from start to end
+	const float scrollFactor = modelSteps / 200;
+
+	model()->incValue(verticalScroll(ev, scrollFactor));
+
 	updateTextFloat();
 	s_textFloat->setVisibilityTimeOut( 1000 );
 }

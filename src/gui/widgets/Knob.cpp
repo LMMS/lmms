@@ -45,6 +45,7 @@
 #include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "ProjectJournal.h"
+#include "ScrollHelpers.h"
 #include "SimpleTextFloat.h"
 #include "StringPairDrag.h"
 
@@ -689,10 +690,15 @@ void Knob::paintEvent( QPaintEvent * _me )
 void Knob::wheelEvent(QWheelEvent * we)
 {
 	we->accept();
-	const float stepMult = model()->range() / 2000 / model()->step<float>();
-	const int inc = ((we->angleDelta().y() > 0 ) ? 1 : -1) * ((stepMult < 1 ) ? 1 : stepMult);
-	model()->incValue( inc );
 
+	if (!model()) { return; }
+
+	// Number of steps in the model
+	const float modelSteps = model()->range() / model()->step<float>();
+		// Scrolling 200 physical steps should take us from start to end
+	const float scrollFactor = modelSteps / 200;
+
+	model()->incValue(verticalScroll(we, scrollFactor) - horizontalScroll(we, scrollFactor));
 
 	s_textFloat->setText( displayValue() );
 	s_textFloat->moveGlobal( this, QPoint( width() + 2, 0 ) );
