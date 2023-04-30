@@ -44,12 +44,12 @@ bool LMMS_EXPORT ignoreScroll(const Qt::Orientation orientation, QWheelEvent* ev
 
 
 
-/*! \brief Return number scrolled steps
+/*! \brief Return number of scrolled steps.
  *
  *  By default it counts standard scroll wheel steps of 15°.
  *
  *  If you intend to round or divide WheelEvent::angleDelta() this function should ALWAYS be used to get proper
- *  support for mice and trackpads that report scroll in very small values.
+ *  support for smooth scrolling mice and trackpads.
  *
  *  Only call this function ONCE per event and orientation. Never call it if the event will be ignored.
  *

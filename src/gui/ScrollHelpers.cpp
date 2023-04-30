@@ -49,7 +49,7 @@ int getScroll(const QWheelEvent* event, const Qt::Orientation orientation, const
 	int& remainder = orientation == Qt::Horizontal ? xRemainder : yRemainder;
 
 	int delta = orientation == Qt::Horizontal ? event->angleDelta().x() : event->angleDelta().y();
-	if (event->inverted() and !allowNatural)
+	if (event->inverted() && !allowNatural)
 	{
 		delta = -delta;
 	}
