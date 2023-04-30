@@ -66,6 +66,7 @@
 #include "PatternStore.h"
 #include "PianoView.h"
 #include "PositionLine.h"
+#include "ScrollHelpers.h"
 #include "SimpleTextFloat.h"
 #include "SongEditor.h"
 #include "StepRecorderWidget.h"
@@ -3840,71 +3841,35 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 	else
 	if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::AltModifier )
 	{
-		int q = m_quantizeModel.value();
-		if((we->angleDelta().x() + we->angleDelta().y()) > 0) // alt + scroll becomes horizontal scroll on KDE
-		{
-			q--;
-		}
-		else if((we->angleDelta().x() + we->angleDelta().y()) < 0) // alt + scroll becomes horizontal scroll on KDE
-		{
-			q++;
-		}
-		q = qBound( 0, q, m_quantizeModel.size() - 1 );
-		m_quantizeModel.setValue( q );
+		// Qt swaps x/y scroll when holding alt
+		m_quantizeModel.setValue(m_quantizeModel.value() - horizontalScroll(we));
 	}
 	else if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::ShiftModifier )
 	{
-		int l = m_noteLenModel.value();
-		if(we->angleDelta().y() > 0)
-		{
-			l--;
-		}
-		else if(we->angleDelta().y() < 0)
-		{
-			l++;
-		}
-		l = qBound( 0, l, m_noteLenModel.size() - 1 );
-		m_noteLenModel.setValue( l );
+		m_noteLenModel.setValue(m_noteLenModel.value() - verticalScroll(we));
 	}
 	else if( we->modifiers() & Qt::ControlModifier )
 	{
-		int z = m_zoomingModel.value();
-		if(we->angleDelta().y() > 0)
-		{
-			z++;
-		}
-		else if(we->angleDelta().y() < 0)
-		{
-			z--;
-		}
-		z = qBound( 0, z, m_zoomingModel.size() - 1 );
-
 		int x = (position(we).x() - m_whiteKeyWidth) * TimePos::ticksPerBar();
 		// ticks based on the mouse x-position where the scroll wheel was used
 		int ticks = x / m_ppb;
-		// what would be the ticks in the new zoom level on the very same mouse x
-		int newTicks = x / (DEFAULT_PR_PPB * m_zoomLevels[z]);
+		// update combobox with zooming-factor
+		m_zoomingModel.setValue(m_zoomingModel.value() + verticalScroll(we));
+		// ticks in the new zoom level
+		int newTicks = x / m_ppb;
 		// scroll so the tick "selected" by the mouse x doesn't move on the screen
 		m_leftRightScroll->setValue(m_leftRightScroll->value() + ticks - newTicks);
-		// update combobox with zooming-factor
-		m_zoomingModel.setValue( z );
-	}
-
-	// FIXME: Reconsider if determining orientation is necessary in Qt6.
-	else if(abs(we->angleDelta().x()) > abs(we->angleDelta().y())) // scrolling is horizontal
-	{
-		m_leftRightScroll->setValue(m_leftRightScroll->value() -
-							we->angleDelta().x() * 2 / 15);
-	}
-	else if(we->modifiers() & Qt::ShiftModifier)
-	{
-		m_leftRightScroll->setValue(m_leftRightScroll->value() -
-							we->angleDelta().y() * 2 / 15);
 	}
 	else
 	{
-		m_topBottomScroll->setValue(m_topBottomScroll->value() -
-							we->angleDelta().y() / 30);
+		// TODO does Qt swap x/y when holding Option on Mac?
+
+		// Move 48 ticks per wheel step at 100% horizontal zoom
+		const float ticksPerStep = 48 / m_zoomLevels[m_zoomingModel.value()];
+		m_leftRightScroll->setValue(m_leftRightScroll->value() - horizontalScroll(we, ticksPerStep, true));
+
+		const float keysPerStep = 4;
+		m_topBottomScroll->setValue(m_topBottomScroll->value() - verticalScroll(we, keysPerStep, true));
 	}
 }
 

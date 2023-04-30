@@ -180,8 +180,6 @@ private:
 	ComboBoxModel m_zoomingYModel;
 	ComboBoxModel m_quantizeModel;
 
-	static const QVector<float> m_zoomXLevels;
-
 	FloatModel * m_tensionModel;
 
 	AutomationClip * m_clip;

@@ -57,6 +57,7 @@
 #include "PatternStore.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
+#include "ScrollHelpers.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
@@ -65,16 +66,16 @@
 namespace lmms::gui
 {
 
+const std::vector<float> zoomXLevels = {0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f};
+const std::vector<float> zoomYLevels = {0.25f, 0.50f, 1.0f, 2.0f, 4.0f, 8.0f, 16.0f};
+
+
 QPixmap * AutomationEditor::s_toolDraw = nullptr;
 QPixmap * AutomationEditor::s_toolErase = nullptr;
 QPixmap * AutomationEditor::s_toolDrawOut = nullptr;
 QPixmap * AutomationEditor::s_toolMove = nullptr;
 QPixmap * AutomationEditor::s_toolYFlip = nullptr;
 QPixmap * AutomationEditor::s_toolXFlip = nullptr;
-
-const QVector<float> AutomationEditor::m_zoomXLevels =
-		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f };
-
 
 
 AutomationEditor::AutomationEditor() :
@@ -1089,7 +1090,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		// alternating shades for better contrast
 		float timeSignature = static_cast<float>( Engine::getSong()->getTimeSigModel().getNumerator() )
 				/ static_cast<float>( Engine::getSong()->getTimeSigModel().getDenominator() );
-		float zoomFactor = m_zoomXLevels[m_zoomingXModel.value()];
+		float zoomFactor = zoomXLevels[m_zoomingXModel.value()];
 		//the bars which disappears at the left side by scrolling
 		int leftBars = m_currentPosition * zoomFactor / TimePos::ticksPerBar();
 
@@ -1417,74 +1418,38 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 	we->accept();
 	if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::ShiftModifier )
 	{
-		int y = m_zoomingYModel.value();
-		if(we->angleDelta().y() > 0)
-		{
-			y++;
-		}
-		else if(we->angleDelta().y() < 0)
-		{
-			y--;
-		}
-		y = qBound( 0, y, m_zoomingYModel.size() - 1 );
-		m_zoomingYModel.setValue( y );
+		m_zoomingYModel.setValue(m_zoomingYModel.value() + verticalScroll(we));
 	}
 	else if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::AltModifier )
 	{
-		int q = m_quantizeModel.value();
-		if((we->angleDelta().x() + we->angleDelta().y()) > 0) // alt + scroll becomes horizontal scroll on KDE
-		{
-			q--;
-		}
-		else if((we->angleDelta().x() + we->angleDelta().y()) < 0) // alt + scroll becomes horizontal scroll on KDE
-		{
-			q++;
-		}
-		q = qBound( 0, q, m_quantizeModel.size() - 1 );
-		m_quantizeModel.setValue( q );
+		// Qt swaps x/y scroll when holding alt
+		m_quantizeModel.setValue(m_quantizeModel.value() - horizontalScroll(we));
 		update();
 	}
 	else if( we->modifiers() & Qt::ControlModifier )
 	{
-		int x = m_zoomingXModel.value();
-		if(we->angleDelta().y() > 0)
-		{
-			x++;
-		}
-		else if(we->angleDelta().y() < 0)
-		{
-			x--;
-		}
-		x = qBound( 0, x, m_zoomingXModel.size() - 1 );
-
 		int mouseX = (position( we ).x() - VALUES_WIDTH)* TimePos::ticksPerBar();
 		// ticks based on the mouse x-position where the scroll wheel was used
 		int ticks = mouseX / m_ppb;
-		// what would be the ticks in the new zoom level on the very same mouse x
-		int newTicks = mouseX / (DEFAULT_PPB * m_zoomXLevels[x]);
 
+		m_zoomingXModel.setValue(m_zoomingXModel.value() + verticalScroll(we));
+
+		// ticks in the new zoom level on the very same mouse x
+		int newTicks = mouseX / m_ppb;
 		// scroll so the tick "selected" by the mouse x doesn't move on the screen
 		m_leftRightScroll->setValue(m_leftRightScroll->value() + ticks - newTicks);
-
-
-		m_zoomingXModel.setValue( x );
-	}
-
-	// FIXME: Reconsider if determining orientation is necessary in Qt6.
-	else if(abs(we->angleDelta().x()) > abs(we->angleDelta().y())) // scrolling is horizontal
-	{
-		m_leftRightScroll->setValue(m_leftRightScroll->value() -
-							we->angleDelta().x() * 2 / 15);
-	}
-	else if(we->modifiers() & Qt::ShiftModifier)
-	{
-		m_leftRightScroll->setValue(m_leftRightScroll->value() -
-							we->angleDelta().y() * 2 / 15);
 	}
 	else
 	{
-		m_topBottomScroll->setValue(m_topBottomScroll->value() -
-							(we->angleDelta().x() + we->angleDelta().y()) / 30);
+		// TODO does Qt swap x/y when holding Option on Mac?
+
+		// Move 48 ticks per wheel step at 100% horizontal zoom
+		const float ticksPerStep = 48 / zoomXLevels[m_zoomingXModel.value()];
+		m_leftRightScroll->setValue(m_leftRightScroll->value() - horizontalScroll(we, ticksPerStep, true));
+
+		// Move 10 levels per wheel step at 100% vertical zoom
+		const float levelsPerStep = 10 / zoomYLevels[m_zoomingYModel.value() - 1];
+		m_topBottomScroll->setValue(m_topBottomScroll->value() - verticalScroll(we, levelsPerStep, true));
 	}
 }
 
@@ -1680,7 +1645,7 @@ void AutomationEditor::updatePosition(const TimePos & t )
 
 void AutomationEditor::zoomingXChanged()
 {
-	m_ppb = m_zoomXLevels[m_zoomingXModel.value()] * DEFAULT_PPB;
+	m_ppb = zoomXLevels[m_zoomingXModel.value()] * DEFAULT_PPB;
 
 	assert( m_ppb > 0 );
 
@@ -1693,12 +1658,12 @@ void AutomationEditor::zoomingXChanged()
 
 void AutomationEditor::zoomingYChanged()
 {
-	const QString & zfac = m_zoomingYModel.currentText();
-	m_y_auto = zfac == "Auto";
+	// First value of model is "Auto"
+	m_y_auto = m_zoomingYModel.value() == 0;
+
 	if( !m_y_auto )
 	{
-		m_y_delta = zfac.left( zfac.length() - 1 ).toInt()
-							* DEFAULT_Y_DELTA / 100;
+		m_y_delta = zoomYLevels[m_zoomingYModel.value() - 1] * DEFAULT_Y_DELTA;
 	}
 #ifdef LMMS_DEBUG
 	assert( m_y_delta > 0 );
@@ -1905,7 +1870,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	m_zoomingXComboBox->setFixedSize( 80, ComboBox::DEFAULT_HEIGHT );
 	m_zoomingXComboBox->setToolTip( tr( "Horizontal zooming" ) );
 
-	for( float const & zoomLevel : m_editor->m_zoomXLevels )
+	for (const auto& zoomLevel : zoomXLevels)
 	{
 		m_editor->m_zoomingXModel.addItem( QString( "%1\%" ).arg( zoomLevel * 100 ) );
 	}
@@ -1923,12 +1888,12 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	m_zoomingYComboBox->setFixedSize( 80, ComboBox::DEFAULT_HEIGHT );
 	m_zoomingYComboBox->setToolTip( tr( "Vertical zooming" ) );
 
-	m_editor->m_zoomingYModel.addItem( "Auto" );
-	for( int i = 0; i < 7; ++i )
+	m_editor->m_zoomingYModel.addItem(tr("Auto"));
+	for (const auto& zoomLevel : zoomYLevels)
 	{
-		m_editor->m_zoomingYModel.addItem( QString::number( 25 << i ) + "%" );
+		m_editor->m_zoomingYModel.addItem(QString("%1\%").arg(zoomLevel * 100));
 	}
-	m_editor->m_zoomingYModel.setValue( m_editor->m_zoomingYModel.findText( "Auto" ) );
+	m_editor->m_zoomingYModel.setValue(0);
 
 	m_zoomingYComboBox->setModel( &m_editor->m_zoomingYModel );
 
