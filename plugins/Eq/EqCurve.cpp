@@ -570,43 +570,19 @@ void EqHandle::mouseReleaseEvent( QGraphicsSceneMouseEvent *event )
 
 void EqHandle::wheelEvent( QGraphicsSceneWheelEvent *wevent )
 {
-	float highestBandwich;
-	if( m_type != para )
-	{
-		highestBandwich = 10;
-	}
-	else
-	{
-		highestBandwich = 4;
-	}
+	wevent->setAccepted(wevent->orientation() == Qt::Vertical);
+	if (!wevent->isAccepted()) { return; }
 
-	int numDegrees = wevent->delta() / 120;
-	float numSteps = 0;
-	if( wevent->modifiers() == Qt::ControlModifier )
-	{
-		numSteps = numDegrees * 0.01;
-	}
-	else
-	{
-		 numSteps = numDegrees * 0.15;
-	}
+	float highestBandwidth = m_type != para ? 10 : 4;
 
-	if( wevent->orientation() == Qt::Vertical )
-	{
-		m_resonance = m_resonance + ( numSteps );
+	// TODO check inverted() for natural scrolling when made available
 
-		if( m_resonance < 0.1 )
-		{
-			m_resonance = 0.1;
-		}
+	float wheelStepDelta = 120; // Qt unit
+	float changePerStep = wevent->modifiers() & Qt::ControlModifier ? 0.01f : 0.15f;
+	float change = wevent->delta() / wheelStepDelta * changePerStep;
 
-		if( m_resonance > highestBandwich )
-		{
-			m_resonance = highestBandwich;
-		}
-		emit positionChanged();
-	}
-	wevent->accept();
+	m_resonance = std::clamp(m_resonance + change, 0.1f, highestBandwidth);
+	emit positionChanged();
 }
 
 
