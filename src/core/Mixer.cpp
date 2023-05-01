@@ -825,5 +825,43 @@ void Mixer::validateChannelName( int index, int oldIndex )
 	}
 }
 
+bool Mixer::isChannelInUse(int index)
+{
+	// check if the index mixer channel receives audio from any other channel
+	if (!m_mixerChannels[index]->m_receives.isEmpty()) 
+	{ 
+		return true; 
+	}
+	else
+	{
+		TrackContainer::TrackList tracks;
+		tracks += Engine::getSong()->tracks();
+		tracks += Engine::patternStore()->tracks();
+
+		// check if the destination mixer channel on any track is index mixer channel
+		for (Track* t : tracks)
+		{
+			if (t->type() == Track::InstrumentTrack)
+			{
+				auto inst = dynamic_cast<InstrumentTrack*>(t);
+				if (inst->mixerChannelModel()->value() == index) 
+				{ 
+					return true; 
+				}
+			}
+			else if (t->type() == Track::SampleTrack)
+			{
+				auto strack = dynamic_cast<SampleTrack*>(t);
+				if (strack->mixerChannelModel()->value() == index) 
+				{ 
+					return true; 
+				}
+			}
+		}
+
+		return false;
+	}
+}
+
 
 } // namespace lmms
