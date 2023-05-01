@@ -387,8 +387,12 @@ void MixerView::deleteChannel(int index)
 	// can't delete master
 	if( index == 0 ) return;
 
-	// if channel is "used", confirm that the user want to delete the channel anyway
-	if (confirmRemoval(index))
+	// if there is user no confirmation, do nothing
+	if (!confirmRemoval(index))
+	{ 
+		return;
+	}
+	else
 	{
 		// remember selected line
 		int selLine = m_currentMixerLine->channelIndex();
@@ -433,41 +437,18 @@ void MixerView::deleteChannel(int index)
 
 bool MixerView::confirmRemoval(int index)
 {
+	// if config variable is set to false, there is no need for user confirmation
 	bool needConfirm = ConfigManager::inst()->value("ui", "mixerchanneldeletionwarning", "1").toInt();
 	if (!needConfirm) { return true; }
 
-	TrackContainer::TrackList tracks;
-	tracks += Engine::getSong()->tracks();
-	tracks += Engine::patternStore()->tracks();
-
-	bool inUse = false;
-
-	//check if the index mixer channel receives from other channels
-	if (!Engine::mixer()->mixerChannel(index)->m_receives.isEmpty())
-	{
-		inUse = true;
+	Mixer* mix = Engine::mixer();
+	
+	if (!mix->isChannelInUse(index))
+	{ 
+		// is the channel is not in use, there is no need for user confirmation
+		return true;
 	}
 	else
-	{
-		// check if the destination mixer channel on any track is the one to be deleted
-		for (Track* t : tracks)
-		{
-			if (t->type() == Track::InstrumentTrack)
-			{
-				auto inst = dynamic_cast<InstrumentTrack*>(t);
-				if (inst->mixerChannelModel()->value() == index) { inUse = true; }
-			}
-			else if (t->type() == Track::SampleTrack)
-			{
-				auto strack = dynamic_cast<SampleTrack*>(t);
-				if (strack->mixerChannelModel()->value() == index) { inUse = true; }
-			}
-
-			if (inUse) { break; }
-		}
-	}
-
-	if (inUse) 
 	{
 		QString messageRemoveTrack = tr("This Mixer Channel is being used.\n"
 										"Are you sure you want to remove this channel?\n\n" 
@@ -495,45 +476,20 @@ bool MixerView::confirmRemoval(int index)
 		if (answer == QMessageBox::Ok) { return true; }
 		return false;
 	}
-	else
-	{
-		return true;
-	}
 }
 
 
 void MixerView::deleteUnusedChannels()
 {
-	TrackContainer::TrackList tracks;
-	tracks += Engine::getSong()->tracks();
-	tracks += Engine::patternStore()->tracks();
+	Mixer* mix = Engine::mixer();
 
-	std::vector<bool> inUse(m_mixerChannelViews.size(), false);
-
-	//Populate inUse by checking the destination channel for every track
-	for (Track* t: tracks)
+	// Check all channels except master, delete those with no incoming sends
+	for (int i = m_mixerChannelViews.size() - 1; i > 0; --i)
 	{
-		//The channel that this track sends to. Since master channel is always in use,
-		//setting this to 0 is a safe default (for tracks that don't sent to the mixer).
-		int channel = 0;
-		if (t->type() == Track::InstrumentTrack)
+		if (!mix->isChannelInUse(i))
 		{
-			auto inst = dynamic_cast<InstrumentTrack*>(t);
-			channel = inst->mixerChannelModel()->value();
+			deleteChannel(i); 
 		}
-		else if (t->type() == Track::SampleTrack)
-		{
-			auto strack = dynamic_cast<SampleTrack*>(t);
-			channel = strack->mixerChannelModel()->value();
-		}
-		inUse[channel] = true;
-	}
-
-	//Check all channels except master, delete those with no incoming sends
-	for(int i = m_mixerChannelViews.size()-1; i > 0; --i)
-	{
-		if (!inUse[i] && Engine::mixer()->mixerChannel(i)->m_receives.isEmpty())
-		{ deleteChannel(i); }
 	}
 }
 
