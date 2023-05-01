@@ -278,6 +278,11 @@ auto ClapInstance::pluginUnload() -> bool
 		m_plugin = nullptr;
 	}
 
+	// Clear all plugin extensions
+	m_pluginExtAudioPorts = nullptr;
+	m_pluginExtState = nullptr;
+	m_pluginExtParams = nullptr;
+
 	setPluginState(PluginState::None);
 	return true;
 }
