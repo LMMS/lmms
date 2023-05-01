@@ -28,6 +28,7 @@
 #include <QMouseEvent>
 
 #include "CaptionMenu.h"
+#include "ScrollHelpers.h"
 
 
 namespace lmms::gui
@@ -90,11 +91,11 @@ void AutomatableSlider::mouseReleaseEvent( QMouseEvent * _me )
 
 
 
-void AutomatableSlider::wheelEvent( QWheelEvent * _me )
+void AutomatableSlider::wheelEvent(QWheelEvent* we)
 {
 	bool old_status = m_showStatus;
 	m_showStatus = true;
-	QSlider::wheelEvent( _me );
+	model()->incValue(verticalScroll(we) - horizontalScroll(we));
 	m_showStatus = old_status;
 }
 
