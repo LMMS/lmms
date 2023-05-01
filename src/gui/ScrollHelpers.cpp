@@ -32,7 +32,9 @@ namespace lmms {
 
 bool ignoreScroll(const Qt::Orientation orientation, QWheelEvent* event)
 {
-	bool hasOtherOrientation = orientation == Qt::Horizontal ? event->angleDelta().y() : event->angleDelta().x();
+	bool hasOtherOrientation = orientation == Qt::Horizontal
+		? event->angleDelta().y() != 0
+		: event->angleDelta().x() != 0;
 	event->setAccepted(hasOtherOrientation);
 	return !hasOtherOrientation;
 }
