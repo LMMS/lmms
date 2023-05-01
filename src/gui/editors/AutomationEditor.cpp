@@ -66,8 +66,8 @@
 namespace lmms::gui
 {
 
-const std::vector<float> zoomXLevels = {0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f};
-const std::vector<float> zoomYLevels = {0.25f, 0.50f, 1.0f, 2.0f, 4.0f, 8.0f, 16.0f};
+constexpr std::array<float, 7> zoomXLevels = {0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f};
+constexpr std::array<float, 7> zoomYLevels = {0.25f, 0.50f, 1.0f, 2.0f, 4.0f, 8.0f, 16.0f};
 
 
 QPixmap * AutomationEditor::s_toolDraw = nullptr;
