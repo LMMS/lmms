@@ -1,4 +1,4 @@
-# ![LMMS Logo](https://raw.githubusercontent.com/LMMS/artwork/master/Icon%20%26%20Mimetypes/lmms-64x64.svg) LMMS
+# ![LMMS Logo](cmake/linux/scalable/apps/lmms.svg) LMMS
 
 [![Build status](https://circleci.com/gh/LMMS/lmms.svg?style=shield)](https://circleci.com/gh/LMMS/lmms)
 [![Latest stable release](https://img.shields.io/github/release/LMMS/lmms.svg?maxAge=3600)](https://lmms.io/download)

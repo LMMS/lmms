@@ -2,4 +2,4 @@
 .gitignore export-ignore
 data/locale/* linguist-documentation
 * text=auto eol=lf
-*.{bin,bmp,flac,icns,ico,mmpz,ogg,png,xiz,xmz,wav} binary
+*.{bin,bmp,flac,icns,ico,mmpz,ogg,png,xiz,xmz,wav,svg} binary

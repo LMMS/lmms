@@ -27,4 +27,6 @@ ELSE()
 	ADD_SUBDIRECTORY(linux)
 ENDIF()
 
+ADD_SUBDIRECTORY(branding)
+
 INCLUDE(CPack)

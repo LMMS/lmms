@@ -1,4 +1,5 @@
 FIND_PACKAGE(Git)
+SET(LMMS_RELEASE_TYPE "Stable" CACHE STRING "Release type for branding")
 IF(GIT_FOUND AND NOT FORCE_VERSION)
 	SET(MAJOR_VERSION 0)
 	SET(MINOR_VERSION 0)
@@ -35,13 +36,18 @@ IF(GIT_FOUND AND NOT FORCE_VERSION)
 		LIST(GET MAJ_MIN_PAT 1 MINOR_VERSION)
 		LIST(GET MAJ_MIN_PAT 2 PATCH_VERSION)
 	ENDIF()
+	# no dashes total: No dashes in latest tag, no additional commits => stable
+	IF(TAG_LIST_LENGTH LESS 2)
+		SET(LMMS_RELEASE_TYPE "Stable")
 	# 1 dash total: Dash in latest tag, no additional commits => pre-release
-	IF(TAG_LIST_LENGTH EQUAL 2)
+	ELSEIF(TAG_LIST_LENGTH EQUAL 2)
+		SET(LMMS_RELEASE_TYPE "Beta")
 		# Get the pre-release stage
 		LIST(GET TAG_LIST 1 VERSION_STAGE)
 		list(APPEND PRERELEASE_DATA "${VERSION_STAGE}")
 	# 2 dashes: Assume untagged with no dashes in latest tag name => stable + commits
 	ELSEIF(TAG_LIST_LENGTH EQUAL 3)
+		SET(LMMS_RELEASE_TYPE "Unknown")
 		# Get the number of commits and latest commit hash
 		LIST(GET TAG_LIST 1 EXTRA_COMMITS)
 		LIST(GET TAG_LIST 2 COMMIT_HASH)
@@ -54,6 +60,7 @@ IF(GIT_FOUND AND NOT FORCE_VERSION)
 		set(FORCE_VERSION "${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}")
 	# 3 dashes: Assume untagged with 1 dash in latest tag name => pre-release + commits
 	ELSEIF(TAG_LIST_LENGTH EQUAL 4)
+		SET(LMMS_RELEASE_TYPE "Unknown")
 		# Get the pre-release stage, number of commits, and latest commit hash
 		LIST(GET TAG_LIST 1 VERSION_STAGE)
 		LIST(GET TAG_LIST 2 EXTRA_COMMITS)
