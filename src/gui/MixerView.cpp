@@ -389,7 +389,7 @@ void MixerView::deleteChannel(int index)
 
 	// if there is user no confirmation, do nothing
 	if (!confirmRemoval(index))
-	{ 
+	{
 		return;
 	}
 
@@ -424,9 +424,9 @@ void MixerView::deleteChannel(int index)
 	m_mixerChannelViews.remove(index);
 
 	// select the next channel
-	if (selLine >= m_mixerChannelViews.size()) 
-	{ 
-		selLine = m_mixerChannelViews.size() - 1; 
+	if (selLine >= m_mixerChannelViews.size())
+	{
+		selLine = m_mixerChannelViews.size() - 1;
 	}
 	setCurrentMixerLine(selLine);
 
@@ -440,17 +440,17 @@ bool MixerView::confirmRemoval(int index)
 	if (!needConfirm) { return true; }
 
 	Mixer* mix = Engine::mixer();
-	
+
 	if (!mix->isChannelInUse(index))
-	{ 
+	{
 		// is the channel is not in use, there is no need for user confirmation
 		return true;
 	}
 
 	QString messageRemoveTrack = tr("This Mixer Channel is being used.\n"
-									"Are you sure you want to remove this channel?\n\n" 
+									"Are you sure you want to remove this channel?\n\n"
 									"Warning: This operation can not be undone.");
-										
+
 	QString messageTitleRemoveTrack = tr("Confirm removal");
 	QString askAgainText = tr("Don't ask again");
 	auto askAgainCheckBox = new QCheckBox(askAgainText, nullptr);
@@ -458,7 +458,7 @@ bool MixerView::confirmRemoval(int index)
 		// Invert button state, if it's checked we *shouldn't* ask again
 		ConfigManager::inst()->setValue("ui", "mixerchanneldeletionwarning", state ? "0" : "1");
 	});
-		
+
 	QMessageBox mb(this);
 	mb.setText(messageRemoveTrack);
 	mb.setWindowTitle(messageTitleRemoveTrack);
@@ -470,8 +470,7 @@ bool MixerView::confirmRemoval(int index)
 
 	int answer = mb.exec();
 
-	if (answer == QMessageBox::Ok) { return true; }
-	return false;
+	return answer == QMessageBox::Ok;
 }
 
 
@@ -484,7 +483,7 @@ void MixerView::deleteUnusedChannels()
 	{
 		if (!mix->isChannelInUse(i))
 		{
-			deleteChannel(i); 
+			deleteChannel(i);
 		}
 	}
 }
