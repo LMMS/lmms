@@ -923,7 +923,7 @@ void SetupDialog::accept()
 					QString::number(m_soloLegacyBehavior));
 	ConfigManager::inst()->setValue("ui", "trackdeletionwarning",
 					QString::number(m_trackDeletionWarning));
-	ConfigManager::inst()->setValue("ui", "mixerchanneldeletionwarning", 
+	ConfigManager::inst()->setValue("ui", "mixerchanneldeletionwarning",
 					QString::number(m_mixerChannelDeletionWarning));
 	ConfigManager::inst()->setValue("app", "nommpz",
 					QString::number(!m_MMPZ));
