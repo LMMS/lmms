@@ -250,7 +250,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 		m_soloLegacyBehavior, SLOT(toggleSoloLegacyBehavior(bool)), false);
 	addLedCheckBox(tr("Show warning when deleting tracks"), gui_tw, counter,
 		m_trackDeletionWarning, SLOT(toggleTrackDeletionWarning(bool)), false);
-	addLedCheckBox(tr("Show warning when deleting a mixer channel that is in use"), gui_tw, counter, 
+	addLedCheckBox(tr("Show warning when deleting a mixer channel that is in use"), gui_tw, counter,
 		m_mixerChannelDeletionWarning,	SLOT(toggleMixerChannelDeletionWarning(bool)), false);
 
 	gui_tw->setFixedHeight(YDelta + YDelta * counter);
