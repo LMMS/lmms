@@ -838,7 +838,7 @@ bool Mixer::isChannelInUse(int index)
 	tracks += Engine::getSong()->tracks();
 	tracks += Engine::patternStore()->tracks();
 
-	for (Track* t : tracks)
+	for (const auto t : tracks)
 	{
 		if (t->type() == Track::InstrumentTrack)
 		{
