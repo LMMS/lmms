@@ -387,7 +387,7 @@ void MixerView::deleteChannel(int index)
 	// can't delete master
 	if( index == 0 ) return;
 
-	// if there is user no confirmation, do nothing
+	// if there is no user confirmation, do nothing
 	if (!confirmRemoval(index))
 	{
 		return;
