@@ -93,22 +93,6 @@ public:
 		return m_length;
 	}
 
-	/*! \brief Specify whether or not a TCO automatically resizes.
-	 *
-	 *  If a TCO does automatically resize, it cannot be manually
-	 *  resized by clicking and dragging its edge.
-	 *
-	 */
-	inline void setAutoResize( const bool r )
-	{
-		m_autoResize = r;
-	}
-
-	inline const bool getAutoResize() const
-	{
-		return m_autoResize;
-	}
-
 	QColor color() const
 	{
 		return m_color;
@@ -128,6 +112,12 @@ public:
 		return m_useCustomClipColor;
 	}
 
+	Clip* split(const TimePos& splitPos);
+	//! If the clip can be split with knife tool
+	virtual bool canSplit() const { return supportsStartTimeOffset(); }
+	virtual bool truncate(const TimePos& cutPos, bool removeLeft = false);
+
+	virtual bool allowUserResize() const;
 	virtual void movePosition( const TimePos & pos );
 	virtual void changeLength( const TimePos & length );
 
@@ -148,6 +138,8 @@ public:
 
 	TimePos startTimeOffset() const;
 	void setStartTimeOffset( const TimePos &startTimeOffset );
+	//! If the clip may be resized from the left
+	virtual bool supportsStartTimeOffset() const { return true; }
 
 	// Will copy the state of a clip to another clip
 	static void copyStateTo( Clip *src, Clip *dst );
@@ -180,7 +172,6 @@ private:
 
 	BoolModel m_mutedModel;
 	BoolModel m_soloModel;
-	bool m_autoResize;
 
 	bool m_selectViewOnCreate;
 

@@ -45,7 +45,6 @@ PatternClip::PatternClip(Track* track) :
 		changeLength( TimePos( t, 0 ) );
 		restoreJournallingState();
 	}
-	setAutoResize( false );
 }
 
 void PatternClip::saveSettings(QDomDocument& doc, QDomElement& element)

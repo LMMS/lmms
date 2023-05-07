@@ -56,7 +56,6 @@ MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
 		resizeToFirstTrack();
 	}
 	init();
-	setAutoResize( true );
 }
 
 
@@ -74,18 +73,6 @@ MidiClip::MidiClip( const MidiClip& other ) :
 	}
 
 	init();
-	switch( getTrack()->trackContainer()->type() )
-	{
-		case TrackContainer::PatternContainer:
-			setAutoResize( true );
-			break;
-
-		case TrackContainer::SongContainer:
-			// move down
-		default:
-			setAutoResize( false );
-			break;
-	}
 }
 
 
@@ -335,6 +322,47 @@ void MidiClip::splitNotes(NoteVector notes, TimePos pos)
 
 		addNote(newNote, false);
 	}
+}
+
+
+/*! \brief Remove start or end of clip
+ *
+ *  Notes are split at the given position.
+ *
+ *  \param cutPos position relative to clip
+ *  \param removeLeft remove start of clip
+ *  \return true if result is non-empty
+ */
+bool MidiClip::truncate(const TimePos& cutPos, bool removeLeft)
+{
+	splitNotes(m_notes, cutPos);
+
+	instrumentTrack()->lock();
+
+	for (auto it = m_notes.begin(); it != m_notes.end(); )
+	{
+		Note* note = *it;
+		if (removeLeft ? (note->pos() < cutPos) : (note->pos() >= cutPos))
+		{
+			delete note;
+			it = m_notes.erase(it);
+			continue;
+		}
+		else if (removeLeft)
+		{
+			// Move notes from right half to left half
+			note->setPos(note->pos() - cutPos);
+		}
+		++it;
+	}
+
+	instrumentTrack()->unlock();
+	checkType();
+	updateLength();
+
+	emit dataChanged();
+
+	return !m_notes.empty();
 }
 
 
