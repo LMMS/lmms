@@ -71,7 +71,6 @@ public:
 	void loadSettings( const QDomElement& element ) override;
 
 	IntModel* zoomingLinearModelSlider() const;
-	IntModel* zoomingLogModel() const;
 	ComboBoxModel *snappingModel() const;
 	float getSnapSize() const;
 	QString getSnapSizeString() const;
@@ -117,6 +116,7 @@ private slots:
 
 private:
 	void keyPressEvent( QKeyEvent * ke ) override;
+	void keyReleaseEvent(QKeyEvent* ke) override;
 	void wheelEvent( QWheelEvent * we ) override;
 
 	bool allowRubberband() const override;
@@ -124,12 +124,6 @@ private:
 
 	int trackIndexFromSelectionPoint(int yPos);
 	int indexOfTrackView(const TrackView* tv);
-
-	int scaleFunction(int x, bool exp);
-	int calculateMinZoom();
-
-	bool zoomingFloatVisible;
-	TextFloat * m_zvsStatus;
 
 	Song * m_song;
 
@@ -149,7 +143,7 @@ private:
 	PositionLine * m_positionLine;
 
 	IntModel* m_zoomingLinearModel;
-	IntModel* m_zoomingLogModel;
+	int m_zoomingLogValue;
 	ComboBoxModel* m_snappingModel;
 	bool m_proportionalSnap;
 
@@ -167,8 +161,7 @@ private:
 	int m_currentZoomingValue;
 	int m_trackHeadWidth;
 	bool m_selectRegion;
-	int m_iniBar;
-	int m_songEditorViewSize;
+	int m_iniBar = -1;
 
 	friend class SongEditorWindow;
 
@@ -209,9 +202,6 @@ protected slots:
 	void updateZoomingSliderFloat(int new_val);
 	void hideZoomingSliderFloat();
 
-	void keyPressEvent(QKeyEvent* ke) override;
-	void keyReleaseEvent(QKeyEvent* ke) override;
-
 signals:
 	void playTriggered();
 	void resized();
@@ -235,9 +225,8 @@ private:
 	QAction* m_insertBarAction;
 	QAction* m_removeBarAction;
 
-	TextFloat * m_zvsStatus;
+	TextFloat * m_zoomStatus;
 };
-
 
 } // namespace gui
 
