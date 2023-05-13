@@ -125,7 +125,7 @@ ClipView::ClipView( Clip * clip,
 
 	connect( m_clip, SIGNAL(lengthChanged()),
 			this, SLOT(updateLength()));
-	connect(getGUI()->songEditor()->m_editor->zoomingLinearModelSlider(), SIGNAL(dataChanged()), this,	SLOT(updateLength()));
+	connect(getGUI()->songEditor()->m_editor, &SongEditor::pixelsPerBarChanged, this, &ClipView::updateLength);
 	connect( m_clip, SIGNAL(positionChanged()),
 			this, SLOT(updatePosition()));
 	connect( m_clip, SIGNAL(destroyedClip()), this, SLOT(close()));
@@ -314,8 +314,7 @@ void ClipView::updateLength()
 	}
 	else
 	{
-		// 3 is the minimun width needed to paint a clip
-		setFixedWidth(std::max(static_cast<int>(m_clip->length() * pixelsPerBar() / TimePos::ticksPerBar() + 1), 3));
+		setFixedWidth(static_cast<int>(m_clip->length() * pixelsPerBar() / TimePos::ticksPerBar() + 1));
 	}
 	m_trackView->trackContainerView()->update();
 }
