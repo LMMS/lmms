@@ -542,7 +542,7 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 
 void SongEditor::wheelEvent( QWheelEvent * we )
 {
-	if (we->modifiers() & Qt::ControlModifier)
+	if ((we->modifiers() & Qt::ControlModifier) && (position(we).x() > m_trackHeadWidth))
 	{
 		int x = position(we).x() - m_trackHeadWidth;
 		// bar based on the mouse x-position where the scroll wheel was used
