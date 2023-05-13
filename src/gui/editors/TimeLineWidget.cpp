@@ -40,6 +40,11 @@
 namespace lmms::gui
 {
 
+namespace
+{
+	static const int MIN_BAR_LABEL_DISTANCE = 35;
+}
+
 
 QPixmap * TimeLineWidget::s_posMarkerPixmap = nullptr;
 
@@ -271,12 +276,14 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	int const x = m_xOffset + s_posMarkerPixmap->width() / 2 -
 			( ( static_cast<int>( m_begin * m_ppb ) / TimePos::ticksPerBar() ) % static_cast<int>( m_ppb ) );
 
+	// Double the interval between bar numbers until they are far enough appart
+	int barLabelInterval = 1;
+	while (barLabelInterval * m_ppb < MIN_BAR_LABEL_DISTANCE) { barLabelInterval *= 2; }
+
 	for( int i = 0; x + i * m_ppb < width(); ++i )
 	{
 		++barNumber;
-		// round m_ppb to the nearest power of two
-		const float ppbP2 = pow(2, round(log2(m_ppb)));
-		if ((barNumber - 1) % std::max(1l, std::lround((1.0f / 3.0f) * TimePos::ticksPerBar() / ppbP2)) == 0)
+		if ((barNumber - 1) % barLabelInterval == 0)
 		{
 			const int cx = x + qRound( i * m_ppb );
 			p.setPen( barLineColor );
