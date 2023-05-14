@@ -95,7 +95,7 @@ void AutomatableSlider::wheelEvent(QWheelEvent* we)
 {
 	bool old_status = m_showStatus;
 	m_showStatus = true;
-	model()->incValue(verticalScroll(we) - horizontalScroll(we));
+	model()->incValue(getScroll(we) - getScroll(HorizontalScroll, we));
 	m_showStatus = old_status;
 }
 

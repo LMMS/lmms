@@ -867,9 +867,9 @@ void AudioFileProcessorWaveView::mouseMoveEvent( QMouseEvent * _me )
 
 void AudioFileProcessorWaveView::wheelEvent(QWheelEvent* we)
 {
-	if (ignoreScroll(Qt::Horizontal, we)) { return; }
+	if (ignoreScroll(HorizontalScroll, we)) { return; }
 
-	int steps = verticalScroll(we);
+	int steps = getScroll(we);
 	if (steps == 0) { return; }
 
 	zoom(steps < 0);

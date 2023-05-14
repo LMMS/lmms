@@ -180,13 +180,13 @@ void LcdFloatSpinBox::mouseReleaseEvent(QMouseEvent*)
 
 void LcdFloatSpinBox::wheelEvent(QWheelEvent *event)
 {
-	if (ignoreScroll(Qt::Horizontal, event)) { return; }
+	if (ignoreScroll(HorizontalScroll, event)) { return; }
 
 	// switch between integer and fractional step based on cursor position
 	if (position(event).x() < m_wholeDisplay.width()) { m_intStep = true; }
 	else { m_intStep = false; }
 
-	model()->setValue(model()->value() + verticalScroll(event) * getStep());
+	model()->setValue(model()->value() + getScroll(event) * getStep());
 	emit manualChange();
 }
 

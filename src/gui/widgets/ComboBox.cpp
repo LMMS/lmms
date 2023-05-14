@@ -228,11 +228,11 @@ void ComboBox::paintEvent( QPaintEvent * _pe )
 
 void ComboBox::wheelEvent( QWheelEvent* event )
 {
-	if (ignoreScroll(Qt::Horizontal, event)) { return; }
+	if (ignoreScroll(HorizontalScroll, event)) { return; }
 
 	if (!model()) { return; }
 
-	model()->setValue(model()->value() + verticalScroll(event));
+	model()->setValue(model()->value() + getScroll(event));
 	update();
 }
 

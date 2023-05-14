@@ -30,11 +30,25 @@
 namespace lmms {
 
 
-bool ignoreScroll(const Qt::Orientation orientation, QWheelEvent* event)
+int getAngleDelta(ScrollFlags options, QWheelEvent* event)
 {
-	bool hasOtherOrientation = orientation == Qt::Horizontal
-		? event->angleDelta().y() != 0
-		: event->angleDelta().x() != 0;
+	bool getX = options & HorizontalScroll;
+#ifndef LMMS_BUILD_APPLE
+	if (options & CustomAltModifierScroll && event->modifiers() & Qt::AltModifier)
+	{
+		// Qt inverts X and Y when holding Alt on Windows/Linux - here we invert it back
+		getX = !getX;
+	}
+#endif
+	return getX ? event->angleDelta().x() : event->angleDelta().y();
+}
+
+
+
+
+bool ignoreScroll(ScrollFlags options, QWheelEvent* event)
+{
+	bool hasOtherOrientation = getAngleDelta(options ^ HorizontalScroll, event) != 0;
 	event->setAccepted(hasOtherOrientation);
 	return !hasOtherOrientation;
 }
@@ -42,16 +56,35 @@ bool ignoreScroll(const Qt::Orientation orientation, QWheelEvent* event)
 
 
 
-// TODO: is there a good way to prevent calling this method multiple times with the same event?
-int getScroll(const QWheelEvent* event, const Qt::Orientation orientation, const float factor, const bool allowNatural)
+bool hasScroll(ScrollFlags options, QWheelEvent* event)
 {
+	return getAngleDelta(options, event) != 0;
+}
+
+
+
+
+
+int getScroll(ScrollFlags options, QWheelEvent* event, const float factor)
+{
+	/* TODO: is there a good way to prevent calling this method multiple times with the same event and orientation?
+	 *
+	 * for (auto child: children)
+	 * {
+	 *     child->move(getScroll(ev));
+	 * }
+	 *
+	 * Here the internal yRemainder will be increased by angleDelta().y() for every child until it reaches a full step,
+	 * whereby getScroll() will return non-zero for that child only. For regular mice angleDelta() is always a full step
+	 * so the bug will go unnoticed, but for many trackpads this won't work.
+	 */
 	static int xRemainder;
 	static int yRemainder;
 
-	int& remainder = orientation == Qt::Horizontal ? xRemainder : yRemainder;
+	int& remainder = options & HorizontalScroll ? xRemainder : yRemainder;
+	int delta = getAngleDelta(options, event);
 
-	int delta = orientation == Qt::Horizontal ? event->angleDelta().x() : event->angleDelta().y();
-	if (event->inverted() && !allowNatural)
+	if (event->inverted() && !(options & AllowNaturalScroll))
 	{
 		delta = -delta;
 	}
@@ -75,17 +108,9 @@ int getScroll(const QWheelEvent* event, const Qt::Orientation orientation, const
 
 
 
-int horizontalScroll(const QWheelEvent* event, const float factor, const bool allowNatural)
+int getScroll(QWheelEvent* event, const float factor)
 {
-	return getScroll(event, Qt::Horizontal, factor, allowNatural);
-}
-
-
-
-
-int verticalScroll(const QWheelEvent* event, const float factor, const bool allowNatural)
-{
-	return getScroll(event, Qt::Vertical, factor, allowNatural);
+	return getScroll(VerticalScroll, event, factor);
 }
 
 

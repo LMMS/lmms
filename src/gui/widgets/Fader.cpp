@@ -253,7 +253,7 @@ void Fader::mouseReleaseEvent( QMouseEvent * mouseEvent )
 
 void Fader::wheelEvent ( QWheelEvent *ev )
 {
-	if (ignoreScroll(Qt::Horizontal, ev)) { return; }
+	if (ignoreScroll(HorizontalScroll, ev)) { return; }
 
 	if (!model()) { return; }
 
@@ -262,7 +262,7 @@ void Fader::wheelEvent ( QWheelEvent *ev )
 	// Scrolling 200 physical steps should take us from start to end
 	const float scrollFactor = modelSteps / 200;
 
-	model()->incValue(verticalScroll(ev, scrollFactor));
+	model()->incValue(getScroll(ev, scrollFactor));
 
 	updateTextFloat();
 	s_textFloat->setVisibilityTimeOut( 1000 );

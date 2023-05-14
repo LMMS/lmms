@@ -140,9 +140,9 @@ void LcdSpinBox::mouseReleaseEvent(QMouseEvent*)
 
 void LcdSpinBox::wheelEvent(QWheelEvent * we)
 {
-	if (ignoreScroll(Qt::Horizontal, we)) { return; }
+	if (ignoreScroll(HorizontalScroll, we)) { return; }
 
-	model()->setValue(model()->value() + verticalScroll(we) * model()->step<int>());
+	model()->setValue(model()->value() + getScroll(we) * model()->step<int>());
 	emit manualChange();
 }
 

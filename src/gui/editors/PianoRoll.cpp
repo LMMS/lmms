@@ -3769,12 +3769,8 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 {
 	we->accept();
 
-	// Qt swaps x/y scroll when holding alt
-	bool altPressed = we->modifiers() & Qt::AltModifier;
-	bool physicallyVertical = altPressed ? we->angleDelta().x() : we->angleDelta().y();
-
 	// handle wheel events for note edit area - for editing note vol/pan with mousewheel
-	if (physicallyVertical && position(we).x() < noteEditRight()
+	if (hasScroll(VerticalScroll | CustomAltModifierScroll, we) && position(we).x() < noteEditRight()
 	&& position(we).y() > noteEditTop() && position(we).y() < noteEditBottom())
 	{
 		if (!hasValidMidiClip()) {return;}
@@ -3786,11 +3782,12 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		int ticks_end = ( x + pixel_range / 2 ) *
 					TimePos::ticksPerBar() / m_ppb + m_currentPosition;
 
+		// When alt is pressed we only edit the note under the cursor
+		bool altPressed = we->modifiers() & Qt::AltModifier;
 		// go through notes to figure out which one we want to change
 		NoteVector nv;
 		for ( Note * i : m_midiClip->notes() )
 		{
-			// When alt is pressed we only edit the note under the cursor
 			if( i->withinRange( ticks_start, ticks_end ) || ( i->selected() && !altPressed ) )
 			{
 				nv += i;
@@ -3798,8 +3795,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		}
 		if( nv.size() > 0 )
 		{
-			// Qt swaps x/y scroll when holding alt
-			const int step = altPressed ? horizontalScroll(we) : verticalScroll(we);
+			const int step = getScroll(VerticalScroll | CustomAltModifierScroll, we);
 			if( m_noteEditMode == NoteEditVolume )
 			{
 				for ( Note * n : nv )
@@ -3846,12 +3842,11 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 	else
 	if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::AltModifier )
 	{
-		// Qt swaps x/y scroll when holding alt
-		m_quantizeModel.setValue(m_quantizeModel.value() - horizontalScroll(we));
+		m_quantizeModel.setValue(m_quantizeModel.value() - getScroll(CustomAltModifierScroll, we));
 	}
 	else if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::ShiftModifier )
 	{
-		m_noteLenModel.setValue(m_noteLenModel.value() - verticalScroll(we));
+		m_noteLenModel.setValue(m_noteLenModel.value() - getScroll(we));
 	}
 	else if( we->modifiers() & Qt::ControlModifier )
 	{
@@ -3859,7 +3854,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		// ticks based on the mouse x-position where the scroll wheel was used
 		int ticks = x / m_ppb;
 		// update combobox with zooming-factor
-		m_zoomingModel.setValue(m_zoomingModel.value() + verticalScroll(we));
+		m_zoomingModel.setValue(m_zoomingModel.value() + getScroll(we));
 		// ticks in the new zoom level
 		int newTicks = x / m_ppb;
 		// scroll so the tick "selected" by the mouse x doesn't move on the screen
@@ -3867,14 +3862,14 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 	}
 	else
 	{
-		// TODO does Qt swap x/y when holding Option on Mac?
-
 		// Move 48 ticks per wheel step at 100% horizontal zoom
 		const float ticksPerStep = 48 / m_zoomLevels[m_zoomingModel.value()];
-		m_leftRightScroll->setValue(m_leftRightScroll->value() - horizontalScroll(we, ticksPerStep, true));
+		const int ticks = getScroll(HorizontalScroll | AllowNaturalScroll, we, ticksPerStep);
+		m_leftRightScroll->setValue(m_leftRightScroll->value() - ticks);
 
 		const float keysPerStep = 4;
-		m_topBottomScroll->setValue(m_topBottomScroll->value() - verticalScroll(we, keysPerStep, true));
+		const int keys = getScroll(VerticalScroll | AllowNaturalScroll, we, keysPerStep);
+		m_topBottomScroll->setValue(m_topBottomScroll->value() - keys);
 	}
 }
 

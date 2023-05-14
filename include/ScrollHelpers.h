@@ -25,7 +25,7 @@
 #ifndef SCROLL_HELPERS_H
 #define SCROLL_HELPERS_H
 
-#include <Qt>
+#include <QFlags>
 
 #include "lmms_export.h"
 
@@ -34,46 +34,57 @@ class QWheelEvent;
 
 namespace lmms {
 
+enum ScrollFlag
+{
+	//! Default orientation - placeholder value.
+	VerticalScroll = 0,
 
-/*! \brief Mark event as ignored and return true if it matches the orientation
+	//! Use horizontal orientation INSTEAD of vertical.
+	//! Values will be positive if the finger is moving to the left.
+	HorizontalScroll = 1 << 1,
+
+	//! Pass-through natural (reversed) scroll on macOS.
+	//! By default natural scroll will be inverted to normal scroll.
+	AllowNaturalScroll = 1 << 2,
+
+	//! Deactivate Qt's built-in Alt modifier behavior.
+	//! By default Alt on Windows/Linux will swap scroll orientation.
+	CustomAltModifierScroll = 1 << 3,
+};
+
+Q_DECLARE_FLAGS(ScrollFlags, ScrollFlag);
+Q_DECLARE_OPERATORS_FOR_FLAGS(ScrollFlags);
+
+
+/*! \brief If event matches orientation, ignore() it and return true.
  *
- *  Convenience function that may be used for early return in wheelEvent.
- *  Events that doesn't match the orientation are marked accepted.
+ *  Convenience function for early return in wheelEvent().
  */
-bool LMMS_EXPORT ignoreScroll(const Qt::Orientation orientation, QWheelEvent* event);
+bool LMMS_EXPORT ignoreScroll(ScrollFlags options, QWheelEvent* event);
 
+
+/*! \brief Return true if event matches given orientation
+ *
+ *  Convenience function. Especially useful for CustomAltModifierScroll.
+ */
+bool LMMS_EXPORT hasScroll(ScrollFlags options, QWheelEvent* event);
 
 
 /*! \brief Return number of scrolled steps.
  *
- *  By default it counts standard scroll wheel steps of 15°.
+ *  This function should ALWAYS be used to get proper support for smooth scrolling mice and trackpads.
+ *  Only call this function ONCE per event and orientation. Never call it on events that will be ignored.
  *
- *  If you intend to round or divide WheelEvent::angleDelta() this function should ALWAYS be used to get proper
- *  support for smooth scrolling mice and trackpads.
+ *  For vertical orientation (default), the return value is positive if the finger moving forward.
  *
- *  Only call this function ONCE per event and orientation. Never call it if the event will be ignored.
+ *  If factor=1 it counts number of completed 15° scroll wheel steps. If factor=2 it counts halfsteps, and so on.
  *
- *  \param event - QWheelEvent to get delta value from.
- *  \param orientation - Vertical or horizontal.
- *  \param factor - Scroll speed/precision. If factor=2 it returns 2 for a complete step and 1 for a halfstep.
- *  \param allowNatural - Whether macOS-style natural scroll should be allowed or inverted to regular scroll.
+ *  \param options - see ScrollFlag
+ *  \param event - QWheelEvent
+ *  \param factor - speed/precision
  */
-int LMMS_EXPORT getScroll(const QWheelEvent* event, const Qt::Orientation orientation, const float factor,
-	const bool allowNatural);
-
-
-/*! \brief Overload of getScroll
- *
- * Returns a positive value if the top of the wheel is moved to the left
- */
-int LMMS_EXPORT horizontalScroll(const QWheelEvent* event, const float factor = 1, const bool allowNatural = true);
-
-
-/*! \brief Overload of getScroll
- *
- *  Returns a positive value if the top of the wheel is rotating away from the hand operating it
- */
-int LMMS_EXPORT verticalScroll(const QWheelEvent* event, const float factor = 1, const bool allowNatural = true);
+int LMMS_EXPORT getScroll(ScrollFlags options, QWheelEvent* event, const float factor = 1);
+int LMMS_EXPORT getScroll(QWheelEvent* event, const float factor = 1);
 
 
 } // namespace lmms

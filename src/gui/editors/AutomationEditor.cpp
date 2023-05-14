@@ -1418,12 +1418,11 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 	we->accept();
 	if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::ShiftModifier )
 	{
-		m_zoomingYModel.setValue(m_zoomingYModel.value() + verticalScroll(we));
+		m_zoomingYModel.setValue(m_zoomingYModel.value() + getScroll(we));
 	}
 	else if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::AltModifier )
 	{
-		// Qt swaps x/y scroll when holding alt
-		m_quantizeModel.setValue(m_quantizeModel.value() - horizontalScroll(we));
+		m_quantizeModel.setValue(m_quantizeModel.value() - getScroll(CustomAltModifierScroll, we));
 		update();
 	}
 	else if( we->modifiers() & Qt::ControlModifier )
@@ -1432,7 +1431,7 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 		// ticks based on the mouse x-position where the scroll wheel was used
 		int ticks = mouseX / m_ppb;
 
-		m_zoomingXModel.setValue(m_zoomingXModel.value() + verticalScroll(we));
+		m_zoomingXModel.setValue(m_zoomingXModel.value() + getScroll(we));
 
 		// ticks in the new zoom level on the very same mouse x
 		int newTicks = mouseX / m_ppb;
@@ -1441,15 +1440,15 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 	}
 	else
 	{
-		// TODO does Qt swap x/y when holding Option on Mac?
-
 		// Move 48 ticks per wheel step at 100% horizontal zoom
 		const float ticksPerStep = 48 / zoomXLevels[m_zoomingXModel.value()];
-		m_leftRightScroll->setValue(m_leftRightScroll->value() - horizontalScroll(we, ticksPerStep, true));
+		const int ticks = getScroll(HorizontalScroll | AllowNaturalScroll, we, ticksPerStep);
+		m_leftRightScroll->setValue(m_leftRightScroll->value() - ticks);
 
 		// Move 10 levels per wheel step at 100% vertical zoom
 		const float levelsPerStep = 10 / zoomYLevels[m_zoomingYModel.value() - 1];
-		m_topBottomScroll->setValue(m_topBottomScroll->value() - verticalScroll(we, levelsPerStep, true));
+		const int levels = getScroll(VerticalScroll | AllowNaturalScroll, we, levelsPerStep);
+		m_topBottomScroll->setValue(m_topBottomScroll->value() - levels);
 	}
 }
 

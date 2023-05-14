@@ -326,9 +326,8 @@ void MidiClipView::wheelEvent(QWheelEvent * we)
 	bool isBeat = m_clip->m_clipType == MidiClip::BeatClip;
 	bool showBeat = fixedClips() || (pixelsPerBar() >= 96 && m_legacySEPattern);
 	bool hoveringEdit = position(we).y() > height() - s_stepBtnOff->height();
-	bool scrolledVertical = we->angleDelta().y();
 
-	if (isBeat && showBeat && hoveringEdit && scrolledVertical)
+	if (isBeat && showBeat && hoveringEdit && hasScroll(VerticalScroll, we))
 	{
 //	get the step number that was wheeled on and
 //	do calculations in floats to prevent rounding errors...
@@ -344,7 +343,7 @@ void MidiClipView::wheelEvent(QWheelEvent * we)
 		}
 
 		Note * n = m_clip->noteAtStep( step );
-		int volumeSteps = verticalScroll(we, 5);
+		int volumeSteps = getScroll(we, 5);
 
 		if (!n && volumeSteps > 0)
 		{

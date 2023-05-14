@@ -536,13 +536,13 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 
 void SongEditor::wheelEvent( QWheelEvent * we )
 {
-	if (we->modifiers() & Qt::ControlModifier && we->angleDelta().y())
+	if (we->modifiers() & Qt::ControlModifier && hasScroll(VerticalScroll, we))
 	{
 		int x = position(we).x() - m_trackHeadWidth;
 		// bar based on the mouse x-position where the scroll wheel was used
 		int bar = x / pixelsPerBar();
 		// update combobox with zooming-factor
-		m_zoomingModel->setValue(m_zoomingModel->value() + verticalScroll(we));
+		m_zoomingModel->setValue(m_zoomingModel->value() + getScroll(we));
 		// the bar in the new zoom level on the very same mouse x
 		int newBar = x / pixelsPerBar();
 		// scroll so the bar "selected" by the mouse x doesn't move on the screen
@@ -554,11 +554,11 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		// and make sure, all Clip's are resized and relocated
 		realignTracks();
 	}
-	else if (we->angleDelta().x())
+	else if (hasScroll(HorizontalScroll, we))
 	{
 		// Move 2 bars per wheel step at 100% zoom, and more when we zoom out
 		float barsPerStep = 2.0f * DEFAULT_PIXELS_PER_BAR / pixelsPerBar();
-		m_leftRightScroll->setValue(m_leftRightScroll->value() - horizontalScroll(we, barsPerStep, true));
+		m_leftRightScroll->setValue(m_leftRightScroll->value() - getScroll(HorizontalScroll | AllowNaturalScroll, we, barsPerStep));
 	}
 	else
 	{

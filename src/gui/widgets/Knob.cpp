@@ -698,7 +698,7 @@ void Knob::wheelEvent(QWheelEvent * we)
 		// Scrolling 200 physical steps should take us from start to end
 	const float scrollFactor = modelSteps / 200;
 
-	model()->incValue(verticalScroll(we, scrollFactor) - horizontalScroll(we, scrollFactor));
+	model()->incValue(getScroll(VerticalScroll, we, scrollFactor) - getScroll(HorizontalScroll, we, scrollFactor));
 
 	s_textFloat->setText( displayValue() );
 	s_textFloat->moveGlobal( this, QPoint( width() + 2, 0 ) );
