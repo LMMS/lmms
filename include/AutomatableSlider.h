@@ -45,6 +45,7 @@ public:
 		return( m_showStatus );
 	}
 
+
 signals:
 	void logicValueChanged( int _value );
 	void logicSliderMoved( int _value );

@@ -64,21 +64,6 @@ inline QPoint position(QWheelEvent *wheelEvent)
 #endif
 }
 
-/**
- * @brief globalPosition is a backwards-compatible adapter for
- * QWheelEvent::globalPosition and globalPos functions.
- * @param wheelEvent
- * @Returns the position of the point in this event on the screen or virtual desktop.
- */
-inline QPointF globalPosition(QWheelEvent* wheelEvent)
-{
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
-	return wheelEvent->globalPosition();
-#else
-	return wheelEvent->globalPos();
-#endif
-}
-
 } // namespace lmms
 
 #endif // LMMS_DEPRECATIONHELPER_H

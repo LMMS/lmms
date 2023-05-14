@@ -74,7 +74,7 @@ void AutomatableSlider::mousePressEvent( QMouseEvent * _me )
 	}
 	else
 	{
-		IntModelView::mousePressEvent(_me);
+		IntModelView::mousePressEvent( _me );
 	}
 }
 

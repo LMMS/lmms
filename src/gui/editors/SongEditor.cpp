@@ -93,8 +93,8 @@ SongEditor::SongEditor( Song * song ) :
 					 : DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH),
 	m_selectRegion(false)
 {
-	m_snappingModel->setParent(this);
 	m_zoomingModel->setParent(this);
+	m_snappingModel->setParent(this);
 
 	m_timeLine = new TimeLineWidget( m_trackHeadWidth, 32,
 					pixelsPerBar(),
