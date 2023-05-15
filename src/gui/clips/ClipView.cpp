@@ -314,7 +314,9 @@ void ClipView::updateLength()
 	}
 	else
 	{
-		setFixedWidth(static_cast<int>(m_clip->length() * pixelsPerBar() / TimePos::ticksPerBar() + 1));
+		// this std::max function is needed for clips that do not start or end on the beat, otherwise, they "disappear" when zooming to min 
+		// 3 is the minimun width needed to make a clip visible
+		setFixedWidth(std::max(static_cast<int>(m_clip->length() * pixelsPerBar() / TimePos::ticksPerBar() + 1), 3));
 	}
 	m_trackView->trackContainerView()->update();
 }
