@@ -260,7 +260,7 @@ SongEditor::SongEditor( Song * song ) :
 	connect(m_zoomingModel, SIGNAL(dataChanged()), this, SLOT(zoomingChanged()));
 
 	// Set up snapping model
-	for (float bars: SNAP_SIZES)
+	for (float bars : SNAP_SIZES)
 	{
 		if (bars > 1.0f)
 		{
