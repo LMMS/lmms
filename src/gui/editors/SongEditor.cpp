@@ -186,7 +186,7 @@ SongEditor::SongEditor( Song * song ) :
 	connect( m_masterVolumeSlider, SIGNAL(sliderReleased()), this,
 			SLOT(hideMasterVolumeFloat()));
 
-	m_mvsStatus	= new TextFloat;
+	m_mvsStatus = new TextFloat;
 	m_mvsStatus->setTitle(tr("Master volume"));
 	m_mvsStatus->setPixmap(embed::getIconPixmap("master_volume"));
 
