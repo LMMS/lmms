@@ -852,9 +852,9 @@ int SongEditor::calculatePixelsPerBar() const
 int SongEditor::calculateZoomSliderValue(int pixelsPerBar) const
 {
 	// What we need to raise 2 by to get MIN_PIXELS_PER_BAR and MAX_PIXELS_PER_BAR
-	double minExp = log2(MIN_PIXELS_PER_BAR);
-	double maxExp = log2(MAX_PIXELS_PER_BAR);
-	double exponent = log2(pixelsPerBar);
+	static const double minExp = std::log2(MIN_PIXELS_PER_BAR);
+	static const double maxExp = std::log2(MAX_PIXELS_PER_BAR);
+	double exponent = std::log2(pixelsPerBar);
 
 	double sliderValue = (exponent - minExp) / (maxExp - minExp) * ZOOM_STEPS;
 
