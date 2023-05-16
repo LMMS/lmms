@@ -42,7 +42,7 @@ namespace lmms::gui
 
 namespace
 {
-	static const int MIN_BAR_LABEL_DISTANCE = 35;
+	constexpr int MIN_BAR_LABEL_DISTANCE = 35;
 }
 
 
