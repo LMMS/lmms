@@ -836,11 +836,11 @@ void SongEditor::updatePositionLine()
 int SongEditor::calculatePixelsPerBar() const
 {
 	// What we need to raise 2 by to get MIN_PIXELS_PER_BAR and MAX_PIXELS_PER_BAR
-	double minExp = log2(MIN_PIXELS_PER_BAR);
-	double maxExp = log2(MAX_PIXELS_PER_BAR);
-	double exponent = m_zoomingModel->value() / double(ZOOM_STEPS) * (maxExp - minExp) + minExp;
+	static const double minExp = std::log2(MIN_PIXELS_PER_BAR);
+	static const double maxExp = std::log2(MAX_PIXELS_PER_BAR);
+	double exponent = m_zoomingModel->value() / static_cast<double>(ZOOM_STEPS) * (maxExp - minExp) + minExp;
 
-	double ppb = pow(2, exponent);
+	double ppb = std::pow(2, exponent);
 
 	return static_cast<int>(std::round(ppb));
 }
