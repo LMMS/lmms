@@ -307,7 +307,7 @@ float SongEditor::getSnapSize() const
 	{
 		// Finds the closest available snap size
 		const float optimalSize = snapSize * DEFAULT_PIXELS_PER_BAR / pixelsPerBar();
-		return *std::min_element(SNAP_SIZES.begin(), SNAP_SIZES.end(), [&](float a, float b)
+		return *std::min_element(SNAP_SIZES.begin(), SNAP_SIZES.end(), [optimalSize](float a, float b)
 		{
 			return std::abs(a - optimalSize) < std::abs(b - optimalSize);
 		});
