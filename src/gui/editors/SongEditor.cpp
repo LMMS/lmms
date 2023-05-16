@@ -272,7 +272,7 @@ SongEditor::SongEditor( Song * song ) :
 		}
 		else
 		{
-			m_snappingModel->addItem(QString("1/%1 Bar").arg(1/bars));
+			m_snappingModel->addItem(QString("1/%1 Bar").arg(1 / bars));
 		}
 	}
 	m_snappingModel->setInitValue( m_snappingModel->findText( "1 Bar" ) );
