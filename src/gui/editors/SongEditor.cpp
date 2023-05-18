@@ -67,7 +67,7 @@ constexpr int MIN_PIXELS_PER_BAR = 2;
 constexpr int MAX_PIXELS_PER_BAR = 400;
 constexpr int ZOOM_STEPS = 200;
 
-constexpr std::array SNAP_SIZES{8.f, 4.f, 2.f, 1.f, 1/2.f, 1/4.f, 1/8.f, 1/16.f};
+constexpr std::array SNAP_SIZES{8.f, 4.f, 2.f, 1.f, 1/2.f, 1/4.f, 1/8.f, 1/16.f, 1/32.f, 1/64.f};
 
 }
 
@@ -270,7 +270,7 @@ SongEditor::SongEditor( Song * song ) :
 		{
 			m_snappingModel->addItem( "1 Bar" );
 		}
-		else
+		else if (bars >= 1/16.f)
 		{
 			m_snappingModel->addItem(QString("1/%1 Bar").arg(1 / bars));
 		}
@@ -839,9 +839,10 @@ int SongEditor::calculatePixelsPerBar() const
 	// What we need to raise 2 by to get MIN_PIXELS_PER_BAR and MAX_PIXELS_PER_BAR
 	static const double minExp = std::log2(MIN_PIXELS_PER_BAR);
 	static const double maxExp = std::log2(MAX_PIXELS_PER_BAR);
-	double exponent = m_zoomingModel->value() / static_cast<double>(ZOOM_STEPS) * (maxExp - minExp) + minExp;
+	static const double stepsInv = 1 / static_cast<double>(ZOOM_STEPS) * (maxExp - minExp);
+	double exponent = m_zoomingModel->value() * stepsInv + minExp;
 
-	double ppb = std::pow(2, exponent);
+	double ppb = std::exp2(exponent);
 
 	return static_cast<int>(std::round(ppb));
 }
