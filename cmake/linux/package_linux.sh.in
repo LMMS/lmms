@@ -201,6 +201,9 @@ fi
 rm -f "${APPDIR}/AppRun"
 ln -sr "${APPDIR}/usr/bin/lmms" "${APPDIR}/AppRun"
 
+# Add icon
+cp "@CMAKE_SOURCE_DIR@/cmake/linux/icons/128x128@2/apps/lmms.png" "${APPDIR}/.DirIcon"
+
 # Create AppImage
 echo -e "\nFinishing the AppImage..."
 run_and_log "$APPIMAGETOOL" "${APPDIR}" "@APPIMAGE_FILE@"
