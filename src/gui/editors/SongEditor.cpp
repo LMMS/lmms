@@ -67,7 +67,8 @@ constexpr int MIN_PIXELS_PER_BAR = 2;
 constexpr int MAX_PIXELS_PER_BAR = 400;
 constexpr int ZOOM_STEPS = 200;
 
-constexpr std::array SNAP_SIZES{8.f, 4.f, 2.f, 1.f, 1/2.f, 1/4.f, 1/8.f, 1/16.f, 1/32.f, 1/64.f};
+constexpr std::array SNAP_SIZES{8.f, 4.f, 2.f, 1.f, 1/2.f, 1/4.f, 1/8.f, 1/16.f};
+constexpr std::array PROPORTIONAL_SNAP_SIZES{64.f, 32.f, 16.f, 8.f, 4.f, 2.f, 1.f, 1/2.f, 1/4.f, 1/8.f, 1/16.f, 1/32.f, 1/64.f};
 
 }
 
@@ -270,7 +271,7 @@ SongEditor::SongEditor( Song * song ) :
 		{
 			m_snappingModel->addItem( "1 Bar" );
 		}
-		else if (bars >= 1/16.f)
+		else
 		{
 			m_snappingModel->addItem(QString("1/%1 Bar").arg(1 / bars));
 		}
@@ -307,7 +308,7 @@ float SongEditor::getSnapSize() const
 	{
 		// Finds the closest available snap size
 		const float optimalSize = snapSize * DEFAULT_PIXELS_PER_BAR / pixelsPerBar();
-		return *std::min_element(SNAP_SIZES.begin(), SNAP_SIZES.end(), [optimalSize](float a, float b)
+		return *std::min_element(PROPORTIONAL_SNAP_SIZES.begin(), PROPORTIONAL_SNAP_SIZES.end(), [optimalSize](float a, float b)
 		{
 			return std::abs(a - optimalSize) < std::abs(b - optimalSize);
 		});
