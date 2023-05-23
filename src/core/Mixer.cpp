@@ -190,9 +190,9 @@ void MixerChannel::doProcessing()
 Mixer::Mixer() :
 	Model( nullptr ),
 	JournallingObject(),
-	m_mixerChannels()
+	m_mixerChannels(),
+	m_lastSoloed(-1)
 {
-	m_lastSoloed = -1;
 	// create master channel
 	createChannel();
 }
