@@ -54,7 +54,7 @@ public:
 
 	Model* parentModel() const
 	{
-		return static_cast<Model *>( parent() );
+		return dynamic_cast<Model *>( parent() );
 	}
 
 	virtual QString displayName() const
