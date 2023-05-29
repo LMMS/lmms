@@ -35,7 +35,11 @@
 #include <cmath>
 #include <string>
 
+#include "AudioEngine.h"
+#include "Engine.h"
 #include "LedCheckBox.h"
+#include "SamplePlayHandle.h"
+#include "Song.h"
 #include "embed.h"
 #include "plugin_export.h"
 
@@ -91,6 +95,13 @@ TapTempoView::TapTempoView(ToolPlugin* _tool)
 void TapTempoView::onBpmClick()
 {
 	auto currentTime = std::chrono::steady_clock::now();
+	if (!m_ui.muteCheckBox->isChecked())
+	{
+		auto timeSigNumerator = Engine::getSong()->getTimeSigModel().getNumerator();
+		m_numTaps % timeSigNumerator == 0
+			? Engine::audioEngine()->addPlayHandle(new SamplePlayHandle("misc/metronome02.ogg"))
+			: Engine::audioEngine()->addPlayHandle(new SamplePlayHandle("misc/metronome01.ogg"));
+	}
 
 	if (asSeconds(currentTime - m_previousTime) > 2.0)
 	{
@@ -103,10 +114,9 @@ void TapTempoView::onBpmClick()
 	}
 
 	++m_numTaps;
-
 	m_bpm = (m_numTaps - 1) / std::max(DBL_MIN, asSeconds(currentTime - m_firstTime)) * 60;
-	updateLabels();
 	m_previousTime = currentTime;
+	updateLabels();
 }
 
 void TapTempoView::updateLabels()
