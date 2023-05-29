@@ -29,6 +29,7 @@
 
 #include <chrono>
 
+#include "TapTempoUi.h"
 #include "ToolPlugin.h"
 #include "ToolPluginView.h"
 
@@ -59,11 +60,9 @@ private:
 	std::chrono::time_point<std::chrono::steady_clock> m_firstTime;
 	std::chrono::time_point<std::chrono::steady_clock> m_previousTime;
 	int m_numTaps;
-	QPushButton* m_bpmButton;
-	QLabel* m_msLabel;
-	QLabel* m_hzLabel;
 	double m_bpm = 0;
 	bool m_showDecimal = false;
+	Ui::TapTempo m_ui;
 };
 } // namespace gui
 

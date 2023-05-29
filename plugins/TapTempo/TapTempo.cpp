@@ -72,50 +72,20 @@ TapTempoView::TapTempoView(ToolPlugin* _tool)
 	: ToolPluginView(_tool)
 	, m_numTaps(0)
 {
-	setFixedSize(200, 200);
-	m_bpmButton = new QPushButton;
-	m_bpmButton->setText("0");
-	m_bpmButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
-	QFont font = m_bpmButton->font();
-	font.setPointSize(25);
-	m_bpmButton->setFont(font);
-
-	QWidget* labelArea = new QWidget(this);
-	m_msLabel = new QLabel;
-	m_hzLabel = new QLabel;
-
-	LedCheckBox* checkBox = new LedCheckBox(labelArea, tr("Display high precision"));
-	checkBox->setToolTip(tr("Display high precision"));
-	connect(checkBox, &LedCheckBox::toggled, [this](bool checked) {
+	m_ui.setupUi(this);
+	connect(m_ui.precisionCheckBox, &LedCheckBox::toggled, [this](bool checked) {
 		m_showDecimal = checked;
 		updateLabels();
 	});
 
-	QVBoxLayout* layout = new QVBoxLayout(this);
-	layout->setAlignment(Qt::AlignCenter);
-	layout->addWidget(m_bpmButton, Qt::AlignCenter);
-	layout->addWidget(labelArea);
-	QHBoxLayout* labelLayout = new QHBoxLayout(labelArea);
-	labelLayout->addWidget(m_msLabel, 1);
-	labelLayout->addWidget(m_hzLabel, 1);
-	labelLayout->addWidget(checkBox, 0);
+	connect(m_ui.tapButton, &QPushButton::pressed, this, &TapTempoView::onBpmClick);
+	updateLabels();
 
-	connect(m_bpmButton, &QPushButton::pressed, this, &TapTempoView::onBpmClick);
-
-	hide();
 	if (parentWidget())
 	{
 		parentWidget()->hide();
 		parentWidget()->layout()->setSizeConstraint(QLayout::SetFixedSize);
-
-		Qt::WindowFlags flags = parentWidget()->windowFlags();
-		flags |= Qt::MSWindowsFixedSizeDialogHint;
-		flags &= ~Qt::WindowMaximizeButtonHint;
-		parentWidget()->setWindowFlags(flags);
 	}
-
-	updateLabels();
 }
 
 void TapTempoView::onBpmClick()
@@ -146,9 +116,9 @@ void TapTempoView::updateLabels()
 	double hz = bpm / 60;
 	double ms = bpm > 0 ? 1 / hz * 1000 : 0;
 
-	m_bpmButton->setText(QString::number(bpm, 'f', m_showDecimal ? 1 : 0));
-	m_msLabel->setText(tr("%1 ms").arg(ms, 0, 'f', m_showDecimal ? 1 : 0));
-	m_hzLabel->setText(tr("%1 Hz").arg(hz, 0, 'f', 4));
+	m_ui.tapButton->setText(QString::number(bpm, 'f', m_showDecimal ? 1 : 0));
+	m_ui.msLabel->setText(tr("%1 ms").arg(ms, 0, 'f', m_showDecimal ? 1 : 0));
+	m_ui.hzLabel->setText(tr("%1 Hz").arg(hz, 0, 'f', 4));
 }
 
 void TapTempoView::keyPressEvent(QKeyEvent* event)
