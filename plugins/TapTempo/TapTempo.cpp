@@ -2,9 +2,9 @@
  * TapTempo.cpp - plugin to count beats per minute
  *
  *
- * Copyright (c) 2022 sakertooth <sakertooth@gmail.com>
- * 
- * 
+ * Copyright (c) 2022 saker <sakertooth@gmail.com>
+ *
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -26,52 +26,39 @@
 
 #include "TapTempo.h"
 
+#include <QFont>
+#include <QKeyEvent>
+#include <QLabel>
+#include <QPushButton>
+#include <QVBoxLayout>
 #include <cfloat>
 #include <cmath>
 #include <string>
 
-#include <QFont>
-#include <QLabel>
-#include <QKeyEvent>
-#include <QVBoxLayout>
-#include <QPushButton>
-
-#include "embed.h"
 #include "LedCheckBox.h"
+#include "embed.h"
 #include "plugin_export.h"
 
-
+namespace lmms {
 double asSeconds(std::chrono::duration<double> duration)
 {
 	return duration.count();
 }
 
-
-extern "C"
-{
-Plugin::Descriptor PLUGIN_EXPORT taptempo_plugin_descriptor =
-{
-		STRINGIFY( PLUGIN_NAME ),
-		"Tap Tempo",
-		QT_TRANSLATE_NOOP( "PluginBrowser",
-							"Tap to the beat" ),
-		"sakertooth <sakertooth@gmail.com>",
-		0x0100,
-		Plugin::Tool,
-		new PluginPixmapLoader("logo"),
-		nullptr,
-		nullptr
-} ;
+extern "C" {
+Plugin::Descriptor PLUGIN_EXPORT taptempo_plugin_descriptor
+	= {LMMS_STRINGIFY(PLUGIN_NAME), "Tap Tempo", QT_TRANSLATE_NOOP("PluginBrowser", "Tap to the beat"),
+		"sakertooth <sakertooth@gmail.com>", 0x0100, Plugin::Tool, new PluginPixmapLoader("logo"), nullptr, nullptr};
 
 // neccessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main(Model *, void *)
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model*, void*)
 {
 	return new TapTempo;
 }
 }
 
-TapTempo::TapTempo() : 
-	ToolPlugin(&taptempo_plugin_descriptor, nullptr)
+TapTempo::TapTempo()
+	: ToolPlugin(&taptempo_plugin_descriptor, nullptr)
 {
 }
 
@@ -80,15 +67,16 @@ QString TapTempo::nodeName() const
 	return taptempo_plugin_descriptor.name;
 }
 
-TapTempoView::TapTempoView(ToolPlugin * _tool) :
-	ToolPluginView(_tool),
-	m_numTaps(0)
+namespace gui {
+TapTempoView::TapTempoView(ToolPlugin* _tool)
+	: ToolPluginView(_tool)
+	, m_numTaps(0)
 {
 	setFixedSize(200, 200);
 	m_bpmButton = new QPushButton;
 	m_bpmButton->setText("0");
 	m_bpmButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	
+
 	QFont font = m_bpmButton->font();
 	font.setPointSize(25);
 	m_bpmButton->setFont(font);
@@ -99,9 +87,12 @@ TapTempoView::TapTempoView(ToolPlugin * _tool) :
 
 	LedCheckBox* checkBox = new LedCheckBox(labelArea, tr("Display high precision"));
 	checkBox->setToolTip(tr("Display high precision"));
-	connect(checkBox, &LedCheckBox::toggled, [this](bool checked){ m_showDecimal = checked; updateLabels(); });
-	
-	QVBoxLayout * layout = new QVBoxLayout(this);
+	connect(checkBox, &LedCheckBox::toggled, [this](bool checked) {
+		m_showDecimal = checked;
+		updateLabels();
+	});
+
+	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->setAlignment(Qt::AlignCenter);
 	layout->addWidget(m_bpmButton, Qt::AlignCenter);
 	layout->addWidget(labelArea);
@@ -113,7 +104,7 @@ TapTempoView::TapTempoView(ToolPlugin * _tool) :
 	connect(m_bpmButton, &QPushButton::pressed, this, &TapTempoView::onBpmClick);
 
 	hide();
-	if(parentWidget())
+	if (parentWidget())
 	{
 		parentWidget()->hide();
 		parentWidget()->layout()->setSizeConstraint(QLayout::SetFixedSize);
@@ -126,7 +117,6 @@ TapTempoView::TapTempoView(ToolPlugin * _tool) :
 
 	updateLabels();
 }
-
 
 void TapTempoView::onBpmClick()
 {
@@ -143,13 +133,11 @@ void TapTempoView::onBpmClick()
 	}
 
 	++m_numTaps;
-	
+
 	m_bpm = (m_numTaps - 1) / std::max(DBL_MIN, asSeconds(currentTime - m_firstTime)) * 60;
 	updateLabels();
-
 	m_previousTime = currentTime;
 }
-
 
 void TapTempoView::updateLabels()
 {
@@ -163,14 +151,10 @@ void TapTempoView::updateLabels()
 	m_hzLabel->setText(tr("%1 Hz").arg(hz, 0, 'f', 4));
 }
 
-
-void TapTempoView::keyPressEvent(QKeyEvent* event) 
+void TapTempoView::keyPressEvent(QKeyEvent* event)
 {
 	QWidget::keyPressEvent(event);
-	if (!event->isAutoRepeat()) 
-	{
-		onBpmClick();
-	}
+	if (!event->isAutoRepeat()) { onBpmClick(); }
 }
 
 void TapTempoView::closeEvent(QCloseEvent* event)
@@ -179,3 +163,5 @@ void TapTempoView::closeEvent(QCloseEvent* event)
 	m_bpm = 0;
 	updateLabels();
 }
+} // namespace gui
+} // namespace lmms

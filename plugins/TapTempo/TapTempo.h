@@ -2,9 +2,9 @@
  * TapTempo.h - plugin to count beats per minute
  *
  *
- * Copyright (c) 2022 sakertooth <sakertooth@gmail.com>
- * 
- * 
+ * Copyright (c) 2022 saker <sakertooth@gmail.com>
+ *
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -36,15 +36,19 @@ class QLabel;
 class QPushButton;
 class LedCheckBox;
 
-class TapTempoView : public ToolPluginView 
+namespace lmms {
+
+namespace gui {
+
+class TapTempoView : public ToolPluginView
 {
 	Q_OBJECT
 public:
-	TapTempoView(ToolPlugin *);
-	
+	TapTempoView(ToolPlugin*);
+
 	void onBpmClick();
-	
-	void keyPressEvent(QKeyEvent *) override;
+
+	void keyPressEvent(QKeyEvent*) override;
 	void closeEvent(QCloseEvent*) override;
 
 private:
@@ -61,30 +65,27 @@ private:
 	double m_bpm = 0;
 	bool m_showDecimal = false;
 };
+} // namespace gui
 
 class TapTempo : public ToolPlugin
 {
 	Q_OBJECT;
+
 public:
 	TapTempo();
-	
-	virtual PluginView * instantiateView(QWidget *)
-	{
-		return new TapTempoView(this);
-	}
+
+	virtual gui::PluginView* instantiateView(QWidget*) { return new gui::TapTempoView(this); }
 
 	virtual QString nodeName() const;
 
-	virtual void saveSettings( QDomDocument& doc, QDomElement& element )
+	virtual void saveSettings(QDomDocument& doc, QDomElement& element)
 	{
 		Q_UNUSED(doc)
 		Q_UNUSED(element)
 	}
 
-	virtual void loadSettings( const QDomElement& element )
-	{
-		Q_UNUSED(element)
-	}
+	virtual void loadSettings(const QDomElement& element) { Q_UNUSED(element) }
 };
+} // namespace lmms
 
 #endif
