@@ -379,16 +379,16 @@ void MainWindow::finalize()
 	m_toolsMenu = new QMenu( this );
 	for( const Plugin::Descriptor* desc : getPluginFactory()->descriptors(Plugin::Tool) )
 	{
-		m_toolsMenu->addAction( desc->logo->pixmap(), desc->displayName );
-		m_tools.push_back( ToolPlugin::instantiate( desc->name, /*this*/nullptr )
-						   ->createView(this) );
+		auto objectName = QString("ToolsMenuAction") + desc->displayName;
+		m_tools[objectName] = ToolPlugin::instantiate(desc->name, nullptr)->createView(this);
+
+		//GUI
+		auto* action = m_toolsMenu->addAction( desc->logo->pixmap(), desc->displayName );
+		action->setObjectName(objectName);
+		connect(action, &QAction::triggered,
+				this, [this, action]{ this->showPluginTool(action->objectName()); });
 	}
-	if( !m_toolsMenu->isEmpty() )
-	{
-		menuBar()->addMenu( m_toolsMenu )->setText( tr( "&Tools" ) );
-		connect( m_toolsMenu, SIGNAL(triggered(QAction*)),
-					this, SLOT(showTool(QAction*)));
-	}
+	menuBar()->addMenu( m_toolsMenu )->setText( tr( "&Tools" ) );
 
 
 	// help-popup-menu
@@ -1376,12 +1376,15 @@ void MainWindow::timerEvent( QTimerEvent * _te)
 
 
 
-void MainWindow::showTool( QAction * _idx )
+void MainWindow::showPluginTool( const QString& which )
 {
-	PluginView * p = m_tools[m_toolsMenu->actions().indexOf( _idx )];
-	p->show();
-	p->parentWidget()->show();
-	p->setFocus();
+	if (m_tools.contains(which))
+	{
+		PluginView* p = m_tools[which];
+		p->show();
+		p->parentWidget()->show();
+		p->setFocus();
+	}
 }
 
 

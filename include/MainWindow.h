@@ -65,11 +65,11 @@ public:
 		return m_toolBar;
 	}
 
-	int addWidgetToToolBar( QWidget * _w, int _row = -1, int _col = -1 );
+	int addWidgetToToolBar( QWidget* _w, int _row = -1, int _col = -1 );
 	void addSpacingToToolBar( int _size );
 
 	// wrap the widget with a window decoration and add it to the workspace
-	LMMS_EXPORT SubWindow* addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags = QFlag(0));
+	LMMS_EXPORT SubWindow* addWindowedWidget(QWidget* w, Qt::WindowFlags windowFlags = QFlag(0));
 
 
 	///
@@ -140,8 +140,8 @@ public:
 		return m_keyMods.m_shift;
 	}
 
-	static void saveWidgetState( QWidget * _w, QDomElement & _de );
-	static void restoreWidgetState( QWidget * _w, const QDomElement & _de );
+	static void saveWidgetState( QWidget* _w, QDomElement& _de );
+	static void restoreWidgetState( QWidget* _w, const QDomElement& _de );
 
 	bool eventFilter(QObject* watched, QEvent* event) override;
 
@@ -180,32 +180,32 @@ private slots:
 	void onExportProjectMidi();
 
 protected:
-	void closeEvent( QCloseEvent * _ce ) override;
-	void focusOutEvent( QFocusEvent * _fe ) override;
-	void keyPressEvent( QKeyEvent * _ke ) override;
-	void keyReleaseEvent( QKeyEvent * _ke ) override;
-	void timerEvent( QTimerEvent * _ev ) override;
+	void closeEvent( QCloseEvent* _ce ) override;
+	void focusOutEvent( QFocusEvent* _fe ) override;
+	void keyPressEvent( QKeyEvent* _ke ) override;
+	void keyReleaseEvent( QKeyEvent* _ke ) override;
+	void timerEvent( QTimerEvent* _ev ) override;
 
 
 private:
 	MainWindow();
-	MainWindow( const MainWindow & );
+	MainWindow( const MainWindow& );
 	~MainWindow() override;
 
 	void finalize();
 
-	void toggleWindow( QWidget *window, bool forceShow = false );
+	void toggleWindow( QWidget* window, bool forceShow = false );
 	void refocus();
 
 	void exportProject(bool multiExport = false);
-	void handleSaveResult(QString const & filename, bool songSavedSuccessfully);
+	void handleSaveResult(const QString& filename, bool songSavedSuccessfully);
 	bool guiSaveProject();
-	bool guiSaveProjectAs( const QString & filename );
+	bool guiSaveProjectAs( const QString& filename );
 
-	QMdiArea * m_workspace;
+	QMdiArea* m_workspace;
 
-	QWidget * m_toolBar;
-	QGridLayout * m_toolBarLayout;
+	QWidget* m_toolBar;
+	QGridLayout* m_toolBarLayout;
 
 	struct keyModifiers
 	{
@@ -220,30 +220,29 @@ private:
 		bool m_alt;
 	} m_keyMods;
 
-	QMenu * m_toolsMenu;
-	QAction * m_undoAction;
-	QAction * m_redoAction;
-	QList<PluginView *> m_tools;
-
+	QMenu* m_toolsMenu;
+	QAction* m_undoAction;
+	QAction* m_redoAction;
+	QMap<QString, PluginView*> m_tools;
 	QBasicTimer m_updateTimer;
 	QTimer m_autoSaveTimer;
 	int m_autoSaveInterval;
 
 	friend class GuiApplication;
 
-	QMenu * m_viewMenu;
+	QMenu* m_viewMenu;
 
-	ToolButton * m_metronomeToggle;
+	ToolButton* m_metronomeToggle;
 
 	SessionState m_session;
-	
+
 	bool maximized;
 
 private slots:
 	void browseHelp();
-	void showTool( QAction * _idx );
+	void showPluginTool( const QString& which );
 	void updateViewMenu();
-	void updateConfig( QAction * _who );
+	void updateConfig( QAction* _who );
 	void onToggleMetronome();
 	void onExportProject();
 	void onExportProjectTracks();
@@ -254,7 +253,7 @@ private slots:
 
 signals:
 	void periodicUpdate();
-	void initProgress(const QString &msg);
+	void initProgress(const QString& msg);
 
 } ;
 
