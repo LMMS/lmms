@@ -388,7 +388,7 @@ void MainWindow::finalize()
 		connect(action, &QAction::triggered,
 				this, [this, action]{ this->showPluginTool(action->objectName()); });
 	}
-	menuBar()->addMenu( m_toolsMenu )->setText( tr( "&Tools" ) );
+	menuBar()->addMenu(m_toolsMenu)->setText(tr("&Tools"));
 
 
 	// help-popup-menu
