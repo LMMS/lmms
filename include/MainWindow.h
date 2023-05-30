@@ -180,11 +180,11 @@ private slots:
 	void onExportProjectMidi();
 
 protected:
-	void closeEvent( QCloseEvent* _ce ) override;
-	void focusOutEvent( QFocusEvent* _fe ) override;
-	void keyPressEvent( QKeyEvent* _ke ) override;
-	void keyReleaseEvent( QKeyEvent* _ke ) override;
-	void timerEvent( QTimerEvent* _ev ) override;
+	void closeEvent(QCloseEvent* _ce) override;
+	void focusOutEvent(QFocusEvent* _fe) override;
+	void keyPressEvent(QKeyEvent* _ke) override;
+	void keyReleaseEvent(QKeyEvent* _ke) override;
+	void timerEvent(QTimerEvent* _ev) override;
 
 
 private:
