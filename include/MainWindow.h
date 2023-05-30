@@ -65,7 +65,7 @@ public:
 		return m_toolBar;
 	}
 
-	int addWidgetToToolBar( QWidget* _w, int _row = -1, int _col = -1 );
+	int addWidgetToToolBar(QWidget* _w, int _row = -1, int _col = -1);
 	void addSpacingToToolBar( int _size );
 
 	// wrap the widget with a window decoration and add it to the workspace
