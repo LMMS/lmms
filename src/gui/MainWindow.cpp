@@ -1380,10 +1380,10 @@ void MainWindow::showPluginTool(const QString& which)
 {
 	if (m_tools.contains(which))
 	{
-		PluginView* p = m_tools[which];
-		p->show();
-		p->parentWidget()->show();
-		p->setFocus();
+		auto* pluginView = m_tools[which];
+		pluginView->show();
+		pluginView->parentWidget()->show();
+		pluginView->setFocus();
 	}
 }
 
