@@ -19,6 +19,8 @@
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
+namespace lmms {
+
 QT_BEGIN_NAMESPACE
 
 class Ui_TapTempo
@@ -188,5 +190,6 @@ class TapTempo : public Ui_TapTempo
 } // namespace Ui
 
 QT_END_NAMESPACE
+} // namespace lmms
 
 #endif // UI_TAPTEMPO_H
