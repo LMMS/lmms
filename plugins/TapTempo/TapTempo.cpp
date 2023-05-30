@@ -1,5 +1,5 @@
 /*
- * TapTempo.cpp - plugin to count beats per minute
+ * TapTempo.cpp - Plugin to count beats per minute
  *
  *
  * Copyright (c) 2022 saker <sakertooth@gmail.com>
@@ -44,10 +44,6 @@
 #include "plugin_export.h"
 
 namespace lmms {
-double asSeconds(std::chrono::duration<double> duration)
-{
-	return duration.count();
-}
 
 extern "C" {
 Plugin::Descriptor PLUGIN_EXPORT taptempo_plugin_descriptor
@@ -94,37 +90,60 @@ TapTempoView::TapTempoView(ToolPlugin* _tool)
 
 void TapTempoView::onBpmClick()
 {
-	auto currentTime = std::chrono::steady_clock::now();
+	const auto currentTime = std::chrono::steady_clock::now();
 	if (!m_ui.muteCheckBox->isChecked())
 	{
-		auto timeSigNumerator = Engine::getSong()->getTimeSigModel().getNumerator();
+		const auto timeSigNumerator = Engine::getSong()->getTimeSigModel().getNumerator();
 		m_numTaps % timeSigNumerator == 0
 			? Engine::audioEngine()->addPlayHandle(new SamplePlayHandle("misc/metronome02.ogg"))
 			: Engine::audioEngine()->addPlayHandle(new SamplePlayHandle("misc/metronome01.ogg"));
 	}
 
-	if (asSeconds(currentTime - m_previousTime) > 2.0)
+	if (m_numTaps == 0)
 	{
-		m_numTaps = 1;
-		m_firstTime = currentTime;
-		m_previousTime = currentTime;
-		m_bpm = 0;
-		updateLabels();
-		return;
+		m_startTime = currentTime;
+		m_prevTime = currentTime;
+		m_lastPrevTime = currentTime;
+	}
+	else if (m_numTaps == 1) { m_prevTime = currentTime; }
+	else if (m_numTaps >= 2)
+	{
+		const std::chrono::milliseconds tapInterval
+			= std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - m_prevTime);
+		const std::chrono::milliseconds prevTapInterval
+			= std::chrono::duration_cast<std::chrono::milliseconds>(m_prevTime - m_lastPrevTime);
+
+		if (std::abs(tapInterval.count() - prevTapInterval.count()) > TAP_INTERVAL_THRESHOLD_MS)
+		{
+			reset();
+			m_startTime = currentTime;
+			m_prevTime = currentTime;
+			m_lastPrevTime = currentTime;
+		}
+		else
+		{
+			m_lastPrevTime = m_prevTime;
+			m_prevTime = currentTime;
+		}
 	}
 
-	++m_numTaps;
-	m_bpm = (m_numTaps - 1) / std::max(DBL_MIN, asSeconds(currentTime - m_firstTime)) * 60;
-	m_previousTime = currentTime;
+	const std::chrono::duration<double> totalSecondsElapsed = currentTime - m_startTime;
+	m_bpm = m_numTaps / std::max(DBL_MIN, totalSecondsElapsed.count()) * 60;
 	updateLabels();
+	++m_numTaps;
+}
+
+void TapTempoView::reset()
+{
+	m_numTaps = 0;
+	m_bpm = 0;
 }
 
 void TapTempoView::updateLabels()
 {
-	// Round the BPM before calculating Hz and ms
-	double bpm = m_showDecimal ? m_bpm : std::round(m_bpm);
-	double hz = bpm / 60;
-	double ms = bpm > 0 ? 1 / hz * 1000 : 0;
+	const double bpm = m_showDecimal ? m_bpm : std::round(m_bpm);
+	const double hz = bpm / 60;
+	const double ms = bpm > 0 ? 1 / hz * 1000 : 0;
 
 	m_ui.tapButton->setText(QString::number(bpm, 'f', m_showDecimal ? 1 : 0));
 	m_ui.msLabel->setText(tr("%1 ms").arg(ms, 0, 'f', m_showDecimal ? 1 : 0));
@@ -139,8 +158,7 @@ void TapTempoView::keyPressEvent(QKeyEvent* event)
 
 void TapTempoView::closeEvent(QCloseEvent* event)
 {
-	m_numTaps = 0;
-	m_bpm = 0;
+	reset();
 	updateLabels();
 }
 } // namespace gui
