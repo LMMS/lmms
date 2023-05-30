@@ -194,13 +194,13 @@ private:
 
 	void finalize();
 
-	void toggleWindow( QWidget* window, bool forceShow = false );
+	void toggleWindow(QWidget* window, bool forceShow = false);
 	void refocus();
 
 	void exportProject(bool multiExport = false);
 	void handleSaveResult(const QString& filename, bool songSavedSuccessfully);
 	bool guiSaveProject();
-	bool guiSaveProjectAs( const QString& filename );
+	bool guiSaveProjectAs(const QString& filename);
 
 	QMdiArea* m_workspace;
 
@@ -240,9 +240,9 @@ private:
 
 private slots:
 	void browseHelp();
-	void showPluginTool( const QString& which );
+	void showPluginTool(const QString& which);
 	void updateViewMenu();
-	void updateConfig( QAction* _who );
+	void updateConfig(QAction* _who);
 	void onToggleMetronome();
 	void onExportProject();
 	void onExportProjectTracks();

@@ -1376,7 +1376,7 @@ void MainWindow::timerEvent( QTimerEvent * _te)
 
 
 
-void MainWindow::showPluginTool( const QString& which )
+void MainWindow::showPluginTool(const QString& which)
 {
 	if (m_tools.contains(which))
 	{
