@@ -71,7 +71,6 @@ private:
 	int m_numTaps = 0;
 	double m_bpm = 0.0;
 	bool m_showDecimal = false;
-	Ui::TapTempo m_ui;
 };
 } // namespace gui
 
