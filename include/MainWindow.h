@@ -140,7 +140,7 @@ public:
 		return m_keyMods.m_shift;
 	}
 
-	static void saveWidgetState( QWidget* _w, QDomElement& _de );
+	static void saveWidgetState(QWidget* _w, QDomElement& _de);
 	static void restoreWidgetState( QWidget* _w, const QDomElement& _de );
 
 	bool eventFilter(QObject* watched, QEvent* event) override;
