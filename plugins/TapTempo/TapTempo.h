@@ -46,7 +46,7 @@ namespace gui {
  * the most recent interval each between two taps in milliseconds.
  * If this threshold is passed, the counter gets reset.
 **/
-constexpr int TAP_INTERVAL_THRESHOLD_MS = 500;
+constexpr double TAP_INTERVAL_THRESHOLD_MS = 500.0;
 
 class TapTempoView : public ToolPluginView
 {

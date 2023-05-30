@@ -108,10 +108,8 @@ void TapTempoView::onBpmClick()
 	else if (m_numTaps == 1) { m_prevTime = currentTime; }
 	else if (m_numTaps >= 2)
 	{
-		const std::chrono::milliseconds tapInterval
-			= std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - m_prevTime);
-		const std::chrono::milliseconds prevTapInterval
-			= std::chrono::duration_cast<std::chrono::milliseconds>(m_prevTime - m_lastPrevTime);
+		const std::chrono::duration<double, std::milli> tapInterval = currentTime - m_prevTime;
+		const std::chrono::duration<double, std::milli> prevTapInterval = m_prevTime - m_lastPrevTime;
 
 		if (std::abs(tapInterval.count() - prevTapInterval.count()) > TAP_INTERVAL_THRESHOLD_MS)
 		{
