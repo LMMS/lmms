@@ -379,7 +379,7 @@ void MainWindow::finalize()
 	m_toolsMenu = new QMenu( this );
 	for( const Plugin::Descriptor* desc : getPluginFactory()->descriptors(Plugin::Tool) )
 	{
-		auto objectName = QString("ToolsMenuAction") + desc->displayName;
+		const auto objectName = QString("ToolsMenuAction") + desc->displayName;
 		m_tools[objectName] = ToolPlugin::instantiate(desc->name, nullptr)->createView(this);
 
 		//GUI
