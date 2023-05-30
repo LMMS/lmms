@@ -42,16 +42,17 @@ namespace lmms {
 namespace gui {
 
 /**
- * This is a threshold for the difference between the length of the previous interval and 
+ * This is a threshold for the difference between the length of the previous interval and
  * the most recent interval each between two taps in milliseconds.
  * If this threshold is passed, the counter gets reset.
-**/
+ **/
 constexpr double TAP_INTERVAL_THRESHOLD_MS = 500.0;
 
 class TapTempoView : public ToolPluginView
 {
 	Q_OBJECT
 public:
+	using clock = std::chrono::steady_clock;
 	TapTempoView(ToolPlugin*);
 
 	void onBpmClick();
@@ -64,9 +65,9 @@ private:
 	void updateLabels();
 
 private:
-	std::chrono::time_point<std::chrono::steady_clock> m_startTime;
-	std::chrono::time_point<std::chrono::steady_clock> m_prevTime;
-	std::chrono::time_point<std::chrono::steady_clock> m_lastPrevTime;
+	std::chrono::time_point<clock> m_startTime;
+	std::chrono::time_point<clock> m_prevTime;
+	std::chrono::time_point<clock> m_lastPrevTime;
 	Ui::TapTempo m_ui;
 	int m_numTaps = 0;
 	double m_bpm = 0.0;

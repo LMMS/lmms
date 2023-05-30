@@ -90,7 +90,7 @@ TapTempoView::TapTempoView(ToolPlugin* _tool)
 
 void TapTempoView::onBpmClick()
 {
-	const auto currentTime = std::chrono::steady_clock::now();
+	const auto currentTime = clock::now();
 	if (!m_ui.muteCheckBox->isChecked())
 	{
 		const auto timeSigNumerator = Engine::getSong()->getTimeSigModel().getNumerator();
