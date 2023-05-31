@@ -157,6 +157,11 @@ public:
 	{
 		m_noRun = _state;
 	}
+	
+	inline void setAutoQuitDisabled(bool state)
+	{
+		m_autoQuitDisabled = state;
+	}
 
 	EffectChain * effectChain() const
 	{
