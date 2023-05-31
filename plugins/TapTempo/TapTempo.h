@@ -61,15 +61,15 @@ public:
 	void closeEvent(QCloseEvent*) override;
 
 private:
-	void reset();
 	void updateLabels();
 
 private:
 	std::chrono::time_point<clock> m_startTime;
 	std::chrono::time_point<clock> m_prevTime;
-	std::chrono::time_point<clock> m_lastPrevTime;
 	Ui::TapTempo m_ui;
 	int m_numTaps = 0;
+	static constexpr int s_numRecentTaps = 3;
+	static constexpr int s_bpmDifferenceThreshold = 30;
 	double m_bpm = 0.0;
 	bool m_showDecimal = false;
 };

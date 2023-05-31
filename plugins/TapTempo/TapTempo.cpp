@@ -90,7 +90,6 @@ TapTempoView::TapTempoView(ToolPlugin* _tool)
 
 void TapTempoView::onBpmClick()
 {
-	const auto currentTime = clock::now();
 	if (!m_ui.muteCheckBox->isChecked())
 	{
 		const auto timeSigNumerator = Engine::getSong()->getTimeSigModel().getNumerator();
@@ -99,42 +98,41 @@ void TapTempoView::onBpmClick()
 			: Engine::audioEngine()->addPlayHandle(new SamplePlayHandle("misc/metronome01.ogg"));
 	}
 
+	const auto currentTime = clock::now();
 	if (m_numTaps == 0)
 	{
 		m_startTime = currentTime;
 		m_prevTime = currentTime;
-		m_lastPrevTime = currentTime;
 	}
-	else if (m_numTaps == 1) { m_prevTime = currentTime; }
-	else if (m_numTaps >= 2)
+	else
 	{
-		const std::chrono::duration<double, std::milli> tapInterval = currentTime - m_prevTime;
-		const std::chrono::duration<double, std::milli> prevTapInterval = m_prevTime - m_lastPrevTime;
-
-		if (std::abs(tapInterval.count() - prevTapInterval.count()) > TAP_INTERVAL_THRESHOLD_MS)
-		{
-			reset();
-			m_startTime = currentTime;
-			m_prevTime = currentTime;
-			m_lastPrevTime = currentTime;
-		}
-		else
-		{
-			m_lastPrevTime = m_prevTime;
-			m_prevTime = currentTime;
-		}
+		const std::chrono::duration<double> fullInterval = currentTime - m_startTime;
+		m_bpm = m_numTaps / std::max(DBL_MIN, fullInterval.count()) * 60;
+		updateLabels();
 	}
 
-	const std::chrono::duration<double> totalSecondsElapsed = currentTime - m_startTime;
-	m_bpm = m_numTaps / std::max(DBL_MIN, totalSecondsElapsed.count()) * 60;
-	updateLabels();
-	++m_numTaps;
-}
+	if (m_numTaps > 0 && m_numTaps % s_numRecentTaps == 0)
+	{
+		if (m_prevTime != m_startTime)
+		{
+			const std::chrono::duration<double> recentInveral = currentTime - m_prevTime;
+			const auto recentBpm = s_numRecentTaps / std::max(DBL_MIN, recentInveral.count()) * 60;
 
-void TapTempoView::reset()
-{
-	m_numTaps = 0;
-	m_bpm = 0;
+			if (std::abs(m_bpm - recentBpm) > s_bpmDifferenceThreshold)
+			{
+				m_numTaps = 0;
+				m_bpm = 0;
+				m_startTime = currentTime;
+				m_prevTime = currentTime;
+				updateLabels();
+				return;
+			}
+		}
+
+		m_prevTime = currentTime;
+	}
+
+	++m_numTaps;
 }
 
 void TapTempoView::updateLabels()
@@ -156,7 +154,8 @@ void TapTempoView::keyPressEvent(QKeyEvent* event)
 
 void TapTempoView::closeEvent(QCloseEvent* event)
 {
-	reset();
+	m_numTaps = 0;
+	m_bpm = 0;
 	updateLabels();
 }
 } // namespace gui
