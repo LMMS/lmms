@@ -161,6 +161,10 @@ public:
 	inline void setAutoQuitDisabled(bool state)
 	{
 		m_autoQuitDisabled = state;
+		if (m_autoQuitDisabled && !m_running)
+		{
+			startRunning();
+		}
 	}
 
 	EffectChain * effectChain() const
