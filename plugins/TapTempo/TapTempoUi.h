@@ -1,29 +1,43 @@
-/********************************************************************************
-** Form generated from reading UI file 'taptempo.ui'
-**
-** Created by: Qt User Interface Compiler version 5.15.9
-**
-** WARNING! All changes made in this file will be lost when recompiling UI file!
-********************************************************************************/
+/*
+ * TapTempoUi.h - Tap Tempo UI designer file
+ *
+ * Copyright (c) 2022 saker <sakertooth@gmail.com>
+ *
+ * This file is part of LMMS - https://lmms.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ *
+ */
 
 #ifndef UI_TAPTEMPO_H
 #define UI_TAPTEMPO_H
 
-#include <QtCore/QVariant>
-#include <QtGui/QIcon>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QCheckBox>
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QPushButton>
-#include <QtWidgets/QVBoxLayout>
-#include <QtWidgets/QWidget>
+#include <QApplication>
+#include <QCheckBox>
+#include <QHBoxLayout>
+#include <QIcon>
+#include <QLabel>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QVariant>
+#include <QWidget>
 
-namespace lmms {
+namespace lmms::gui {
 
-QT_BEGIN_NAMESPACE
-
-class Ui_TapTempo
+class TapTempoUi
 {
 public:
 	QVBoxLayout* windowLayout;
@@ -36,45 +50,52 @@ public:
 	QCheckBox* precisionCheckBox;
 	QCheckBox* muteCheckBox;
 
-	void setupUi(QWidget* TapTempo)
+	void setupUi(QWidget* tapTempo)
 	{
-		if (TapTempo->objectName().isEmpty()) TapTempo->setObjectName(QString::fromUtf8("TapTempo"));
-		TapTempo->setWindowModality(Qt::NonModal);
-		TapTempo->setEnabled(true);
-		TapTempo->resize(250, 288);
+		if (tapTempo->objectName().isEmpty()) tapTempo->setObjectName(QString::fromUtf8("tapTempo"));
+		tapTempo->setWindowModality(Qt::NonModal);
+		tapTempo->setEnabled(true);
+		tapTempo->resize(250, 288);
+
 		QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 		sizePolicy.setHorizontalStretch(0);
 		sizePolicy.setVerticalStretch(0);
-		sizePolicy.setHeightForWidth(TapTempo->sizePolicy().hasHeightForWidth());
-		TapTempo->setSizePolicy(sizePolicy);
-		TapTempo->setMinimumSize(QSize(250, 288));
-		TapTempo->setMaximumSize(QSize(250, 288));
+		sizePolicy.setHeightForWidth(tapTempo->sizePolicy().hasHeightForWidth());
+
+		tapTempo->setSizePolicy(sizePolicy);
+		tapTempo->setMinimumSize(QSize(250, 288));
+		tapTempo->setMaximumSize(QSize(250, 288));
+
 		QIcon icon;
 		icon.addFile(QString::fromUtf8("logo.png"), QSize(), QIcon::Normal, QIcon::Off);
-		TapTempo->setWindowIcon(icon);
-		TapTempo->setAutoFillBackground(true);
-		TapTempo->setStyleSheet(QString::fromUtf8("QLabel {\n"
+		tapTempo->setWindowIcon(icon);
+		tapTempo->setAutoFillBackground(true);
+		tapTempo->setStyleSheet(QString::fromUtf8("QLabel {\n"
 												  " color: rgb(255, 255, 255);\n"
 												  " background-color: transparent;\n"
 												  "}\n"
 												  ""));
-		windowLayout = new QVBoxLayout(TapTempo);
+		windowLayout = new QVBoxLayout(tapTempo);
 		windowLayout->setSpacing(0);
 		windowLayout->setObjectName(QString::fromUtf8("windowLayout"));
 		windowLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
 		windowLayout->setContentsMargins(0, 0, 0, 0);
+
 		mainLayout = new QVBoxLayout();
 		mainLayout->setSpacing(5);
 		mainLayout->setObjectName(QString::fromUtf8("mainLayout"));
 		mainLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
 		mainLayout->setContentsMargins(2, 2, 2, 2);
-		tapButton = new QPushButton(TapTempo);
+
+		tapButton = new QPushButton(tapTempo);
 		tapButton->setObjectName(QString::fromUtf8("tapButton"));
 		tapButton->setEnabled(true);
+
 		QSizePolicy sizePolicy1(QSizePolicy::Minimum, QSizePolicy::Minimum);
 		sizePolicy1.setHorizontalStretch(0);
 		sizePolicy1.setVerticalStretch(0);
 		sizePolicy1.setHeightForWidth(tapButton->sizePolicy().hasHeightForWidth());
+
 		tapButton->setSizePolicy(sizePolicy1);
 		tapButton->setMinimumSize(QSize(200, 200));
 		tapButton->setMaximumSize(QSize(16777215, 16777215));
@@ -113,13 +134,14 @@ public:
 		sidebarLayout->setSpacing(5);
 		sidebarLayout->setObjectName(QString::fromUtf8("sidebarLayout"));
 		sidebarLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
-		msLabel = new QLabel(TapTempo);
+
+		msLabel = new QLabel(tapTempo);
 		msLabel->setObjectName(QString::fromUtf8("msLabel"));
 		msLabel->setStyleSheet(QString::fromUtf8(""));
 
 		sidebarLayout->addWidget(msLabel, 0, Qt::AlignHCenter);
 
-		hzLabel = new QLabel(TapTempo);
+		hzLabel = new QLabel(tapTempo);
 		hzLabel->setObjectName(QString::fromUtf8("hzLabel"));
 		hzLabel->setStyleSheet(QString::fromUtf8(""));
 
@@ -128,18 +150,18 @@ public:
 		verticalLayout = new QVBoxLayout();
 		verticalLayout->setSpacing(5);
 		verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-		precisionCheckBox = new QCheckBox(TapTempo);
+
+		precisionCheckBox = new QCheckBox(tapTempo);
 		precisionCheckBox->setObjectName(QString::fromUtf8("precisionCheckBox"));
 		precisionCheckBox->setStyleSheet(QString::fromUtf8("color: rgb(255, 255, 255);\n"
 														   "\n"
 														   "QCheckBox::indicator::checked {\n"
 														   "	color: rgb(0, 0, 0)\n"
 														   "}"));
-		precisionCheckBox->setTristate(false);
 
 		verticalLayout->addWidget(precisionCheckBox);
 
-		muteCheckBox = new QCheckBox(TapTempo);
+		muteCheckBox = new QCheckBox(tapTempo);
 		muteCheckBox->setObjectName(QString::fromUtf8("muteCheckBox"));
 		muteCheckBox->setStyleSheet(QString::fromUtf8("color: rgb(255, 255, 255);"));
 
@@ -151,45 +173,25 @@ public:
 
 		windowLayout->addLayout(mainLayout);
 
-		retranslateUi(TapTempo);
+		retranslateUi(tapTempo);
 
-		QMetaObject::connectSlotsByName(TapTempo);
+		QMetaObject::connectSlotsByName(tapTempo);
 	} // setupUi
 
-	void retranslateUi(QWidget* TapTempo)
+	void retranslateUi(QWidget* tapTempo)
 	{
-		TapTempo->setWindowTitle(QCoreApplication::translate("TapTempo", "Tap Tempo", nullptr));
-		tapButton->setText(QCoreApplication::translate("TapTempo", "TAP", nullptr));
-#if QT_CONFIG(tooltip)
-		msLabel->setToolTip(QCoreApplication::translate(
-			"TapTempo", "<html><head/><body><p>BPM in milliseconds</p></body></html>", nullptr));
-#endif // QT_CONFIG(tooltip)
-		msLabel->setText(QCoreApplication::translate("TapTempo", "0.0 ms", nullptr));
-#if QT_CONFIG(tooltip)
-		hzLabel->setToolTip(QCoreApplication::translate(
-			"TapTempo", "<html><head/><body><p>Frequency of BPM</p></body></html>", nullptr));
-#endif // QT_CONFIG(tooltip)
-		hzLabel->setText(QCoreApplication::translate("TapTempo", "0.0 hz", nullptr));
-#if QT_CONFIG(tooltip)
-		precisionCheckBox->setToolTip(QCoreApplication::translate(
-			"TapTempo", "<html><head/><body><p>Display in high precision</p></body></html>", nullptr));
-#endif // QT_CONFIG(tooltip)
-		precisionCheckBox->setText(QCoreApplication::translate("TapTempo", "Precision", nullptr));
-#if QT_CONFIG(tooltip)
-		muteCheckBox->setToolTip(
-			QCoreApplication::translate("TapTempo", "<html><head/><body><p>Mute metronome</p></body></html>", nullptr));
-#endif // QT_CONFIG(tooltip)
-		muteCheckBox->setText(QCoreApplication::translate("TapTempo", "Mute", nullptr));
+		tapTempo->setWindowTitle(QObject::tr("Tap Tempo"));
+		tapButton->setText(QObject::tr("TAP"));
+		msLabel->setToolTip(QObject::tr("BPM in milliseconds"));
+		msLabel->setText(QObject::tr("0.0 ms"));
+		hzLabel->setToolTip(QObject::tr("Frequency of BPM"));
+		hzLabel->setText(QObject::tr("0.0 hz"));
+		precisionCheckBox->setToolTip(QObject::tr("Display in high precision"));
+		precisionCheckBox->setText(QObject::tr("Precision"));
+		muteCheckBox->setToolTip(QObject::tr("Mute metronome"));
+		muteCheckBox->setText(QObject::tr("Mute"));
 	} // retranslateUi
 };
-
-namespace Ui {
-class TapTempo : public Ui_TapTempo
-{
-};
-} // namespace Ui
-
-QT_END_NAMESPACE
 } // namespace lmms
 
 #endif // UI_TAPTEMPO_H

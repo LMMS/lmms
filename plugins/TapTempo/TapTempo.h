@@ -1,9 +1,7 @@
 /*
  * TapTempo.h - Plugin to count beats per minute
  *
- *
  * Copyright (c) 2022 saker <sakertooth@gmail.com>
- *
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -41,13 +39,6 @@ namespace lmms {
 
 namespace gui {
 
-/**
- * This is a threshold for the difference between the length of the previous interval and
- * the most recent interval each between two taps in milliseconds.
- * If this threshold is passed, the counter gets reset.
- **/
-constexpr double TAP_INTERVAL_THRESHOLD_MS = 500.0;
-
 class TapTempoView : public ToolPluginView
 {
 	Q_OBJECT
@@ -67,7 +58,7 @@ private:
 private:
 	std::chrono::time_point<clock> m_startTime;
 	std::chrono::time_point<clock> m_prevTime;
-	Ui::TapTempo m_ui;
+	TapTempoUi m_ui;
 	int m_numTaps = 0;
 	static constexpr int s_numRecentTaps = 3;
 	static constexpr int s_bpmDifferenceThreshold = 30;
@@ -79,7 +70,6 @@ private:
 class TapTempo : public ToolPlugin
 {
 	Q_OBJECT
-
 public:
 	TapTempo();
 
