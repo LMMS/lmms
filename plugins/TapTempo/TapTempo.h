@@ -77,7 +77,7 @@ private:
 
 class TapTempo : public ToolPlugin
 {
-	Q_OBJECT;
+	Q_OBJECT
 
 public:
 	TapTempo();
