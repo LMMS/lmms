@@ -235,10 +235,6 @@ void FileBrowser::expandItems( QTreeWidgetItem * item, QList<QString> expandedDi
 	for (int i = 0; i < numChildren; ++i)
 	{
 		QTreeWidgetItem * it = item ? item->child( i ) : m_fileBrowserTreeWidget->topLevelItem(i);
-		if ( m_recurse )
-		{
-			it->setExpanded( true );
-		}
 		auto d = dynamic_cast<Directory*>(it);
 		if (d)
 		{
