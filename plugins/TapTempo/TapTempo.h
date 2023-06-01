@@ -53,6 +53,7 @@ class TapTempoView : public ToolPluginView
 	Q_OBJECT
 public:
 	using clock = std::chrono::steady_clock;
+
 	TapTempoView(ToolPlugin*);
 
 	void onBpmClick();
