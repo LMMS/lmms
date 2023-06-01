@@ -192,6 +192,6 @@ public:
 		muteCheckBox->setText(QObject::tr("Mute"));
 	} // retranslateUi
 };
-} // namespace lmms
+} // namespace lmms::gui
 
 #endif // UI_TAPTEMPO_H
