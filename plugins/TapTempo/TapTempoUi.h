@@ -194,4 +194,4 @@ public:
 };
 } // namespace lmms::gui
 
-#endif // UI_TAPTEMPO_H
+#endif // LMMS_GUI_TAP_TEMPO_UI_H
