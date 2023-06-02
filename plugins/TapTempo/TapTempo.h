@@ -87,4 +87,4 @@ public:
 };
 } // namespace lmms
 
-#endif
+#endif // LMMS_TAP_TEMPO_H
