@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef TAPTEMPO_H
-#define TAPTEMPO_H
+#ifndef LMMS_TAP_TEMPO_H
+#define LMMS_TAP_TEMPO_H
 
 #include <chrono>
 
