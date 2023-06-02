@@ -77,13 +77,8 @@ public:
 
 	virtual QString nodeName() const;
 
-	virtual void saveSettings(QDomDocument& doc, QDomElement& element)
-	{
-		Q_UNUSED(doc)
-		Q_UNUSED(element)
-	}
-
-	virtual void loadSettings(const QDomElement& element) { Q_UNUSED(element) }
+	void saveSettings(QDomDocument&, QDomElement&) override {}
+	void loadSettings(const QDomElement&) override {}
 };
 } // namespace lmms
 
