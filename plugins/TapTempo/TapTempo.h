@@ -73,9 +73,9 @@ class TapTempo : public ToolPlugin
 public:
 	TapTempo();
 
-	virtual gui::PluginView* instantiateView(QWidget*) { return new gui::TapTempoView(this); }
+	gui::PluginView* instantiateView(QWidget*) override { return new gui::TapTempoView(this); }
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
 	void saveSettings(QDomDocument&, QDomElement&) override {}
 	void loadSettings(const QDomElement&) override {}
