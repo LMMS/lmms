@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef UI_TAPTEMPO_H
-#define UI_TAPTEMPO_H
+#ifndef LMMS_GUI_TAP_TEMPO_UI_H
+#define LMMS_GUI_TAP_TEMPO_UI_H
 
 #include <QApplication>
 #include <QCheckBox>
