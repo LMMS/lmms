@@ -37,8 +37,8 @@ class LMMS_EXPORT Model : public QObject
 {
 	Q_OBJECT
 public:
-	Model(Model * parent, QString displayName = QString(),
-		  bool defaultConstructed = false );
+	Model(Model* parent, QString displayName = QString(),
+		  bool defaultConstructed = false);
 
 	~Model() override = default;
 
