@@ -56,22 +56,16 @@ void Model::setDisplayName( const QString& displayName )
 
 QString Model::fullDisplayName() const
 {
-	const QString & n = displayName();
+	const QString n = displayName();
 
 	if(parentModel())
 	{
 		const QString p = parentModel()->fullDisplayName();
 
-		if(n.isEmpty() && p.isEmpty())
+		if (!p.isEmpty())
 		{
-			return QString();
+			return p + ">" + n;
 		}
-		else if(p.isEmpty())
-		{
-			return n;
-		}
-
-		return p + ">" + n;
 	}
 
 	return n;
