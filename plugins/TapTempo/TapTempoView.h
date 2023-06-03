@@ -1,7 +1,9 @@
 /*
- * TapTempo.h - Plugin to count beats per minute
+ * TapTempoView.h - Plugin to count beats per minute
+ *
  *
  * Copyright (c) 2022 saker <sakertooth@gmail.com>
+ *
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,42 +24,47 @@
  *
  */
 
-#ifndef LMMS_TAP_TEMPO_H
-#define LMMS_TAP_TEMPO_H
+#ifndef LMMS_GUI_TAP_TEMPO_VIEW_H
+#define LMMS_GUI_TAP_TEMPO_VIEW_H
 
-#include <chrono>
+#include "ToolPluginView.h"
 
-#include "TapTempoView.h"
-#include "ToolPlugin.h"
+class QVBoxLayout;
+class QHBoxLayout;
+class QPushButton;
+class QLabel;
+class QCloseEvent;
+class QKeyEvent;
+class QCheckBox;
 
 namespace lmms {
+class TapTempo;
+}
 
-class TapTempo : public ToolPlugin
+namespace lmms::gui {
+
+class TapTempoView : public ToolPluginView
 {
 	Q_OBJECT
 public:
-	using clock = std::chrono::steady_clock;
-
-	TapTempo();
-	void onBpmClick();
-
-	QString nodeName() const override;
-	void saveSettings(QDomDocument&, QDomElement&) override {}
-	void loadSettings(const QDomElement&) override {}
-
-	gui::PluginView* instantiateView(QWidget*) override { return new gui::TapTempoView(this); }
+	TapTempoView(ToolPlugin*);
+	void closeEvent(QCloseEvent*) override;
+	void keyPressEvent(QKeyEvent*) override;
+	void updateLabels();
 
 private:
-	std::chrono::time_point<clock> m_startTime;
-	std::chrono::time_point<clock> m_prevTime;
-	int m_numTaps = 0;
-	static constexpr int s_numRecentTaps = 3;
-	static constexpr int s_bpmDifferenceThreshold = 30;
-	double m_bpm = 0.0;
-	bool m_showDecimal = false;
-
-	friend class gui::TapTempoView;
+	QVBoxLayout* m_windowLayout;
+	QVBoxLayout* m_mainLayout;
+	QPushButton* m_tapButton;
+	QHBoxLayout* m_sidebarLayout;
+	QLabel* m_msLabel;
+	QLabel* m_hzLabel;
+	QVBoxLayout* m_verticalLayout;
+	QCheckBox* m_precisionCheckBox;
+	QCheckBox* m_muteCheckBox;
+	TapTempo* m_plugin;
+	friend class TapTempo;
 };
-} // namespace lmms
+} // namespace lmms::gui
 
-#endif // LMMS_TAP_TEMPO_H
+#endif

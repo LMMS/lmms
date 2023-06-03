@@ -48,56 +48,15 @@ namespace lmms {
 extern "C" {
 Plugin::Descriptor PLUGIN_EXPORT taptempo_plugin_descriptor
 	= {LMMS_STRINGIFY(PLUGIN_NAME), "Tap Tempo", QT_TRANSLATE_NOOP("PluginBrowser", "Tap to the beat"),
-		"sakertooth <sakertooth@gmail.com>", 0x0100, Plugin::Tool, new PluginPixmapLoader("logo"), nullptr, nullptr};
-
-// neccessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin* lmms_plugin_main(Model*, void*)
-{
-	return new TapTempo;
-}
-}
+		"saker <sakertooth@gmail.com>", 0x0100, Plugin::Tool, new PluginPixmapLoader("logo"), nullptr, nullptr};
 
 TapTempo::TapTempo()
 	: ToolPlugin(&taptempo_plugin_descriptor, nullptr)
 {
 }
 
-QString TapTempo::nodeName() const
+void TapTempo::onBpmClick()
 {
-	return taptempo_plugin_descriptor.name;
-}
-
-namespace gui {
-TapTempoView::TapTempoView(ToolPlugin* _tool)
-	: ToolPluginView(_tool)
-	, m_numTaps(0)
-{
-	m_ui.setupUi(this);
-	connect(m_ui.precisionCheckBox, &LedCheckBox::toggled, [this](bool checked) {
-		m_showDecimal = checked;
-		updateLabels();
-	});
-
-	connect(m_ui.tapButton, &QPushButton::pressed, this, &TapTempoView::onBpmClick);
-	updateLabels();
-
-	if (parentWidget())
-	{
-		parentWidget()->hide();
-		parentWidget()->layout()->setSizeConstraint(QLayout::SetFixedSize);
-	}
-}
-
-void TapTempoView::onBpmClick()
-{
-	if (!m_ui.muteCheckBox->isChecked())
-	{
-		const auto timeSigNumerator = Engine::getSong()->getTimeSigModel().getNumerator();
-		m_numTaps % timeSigNumerator == 0
-			? Engine::audioEngine()->addPlayHandle(new SamplePlayHandle("misc/metronome02.ogg"))
-			: Engine::audioEngine()->addPlayHandle(new SamplePlayHandle("misc/metronome01.ogg"));
-	}
-
 	const auto currentTime = clock::now();
 	if (m_numTaps == 0)
 	{
@@ -108,7 +67,6 @@ void TapTempoView::onBpmClick()
 	{
 		const std::chrono::duration<double> fullInterval = currentTime - m_startTime;
 		m_bpm = m_numTaps / std::max(DBL_MIN, fullInterval.count()) * 60;
-		updateLabels();
 	}
 
 	if (m_numTaps > 0 && m_numTaps % s_numRecentTaps == 0)
@@ -124,39 +82,23 @@ void TapTempoView::onBpmClick()
 				m_bpm = 0;
 				m_startTime = currentTime;
 				m_prevTime = currentTime;
-				updateLabels();
 				return;
 			}
 		}
 
 		m_prevTime = currentTime;
 	}
-
 	++m_numTaps;
 }
 
-void TapTempoView::updateLabels()
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model*, void*)
 {
-	const double bpm = m_showDecimal ? m_bpm : std::round(m_bpm);
-	const double hz = bpm / 60;
-	const double ms = bpm > 0 ? 1 / hz * 1000 : 0;
-
-	m_ui.tapButton->setText(QString::number(bpm, 'f', m_showDecimal ? 1 : 0));
-	m_ui.msLabel->setText(tr("%1 ms").arg(ms, 0, 'f', m_showDecimal ? 1 : 0));
-	m_ui.hzLabel->setText(tr("%1 Hz").arg(hz, 0, 'f', 4));
+	return new TapTempo;
+}
 }
 
-void TapTempoView::keyPressEvent(QKeyEvent* event)
+QString TapTempo::nodeName() const
 {
-	QWidget::keyPressEvent(event);
-	if (!event->isAutoRepeat()) { onBpmClick(); }
+	return taptempo_plugin_descriptor.name;
 }
-
-void TapTempoView::closeEvent(QCloseEvent* event)
-{
-	m_numTaps = 0;
-	m_bpm = 0;
-	updateLabels();
-}
-} // namespace gui
 } // namespace lmms
