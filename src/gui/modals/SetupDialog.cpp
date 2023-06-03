@@ -146,6 +146,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			"audioengine", "hqaudio").toInt()),
 	m_bufferSize(ConfigManager::inst()->value(
 			"audioengine", "framesperaudiobuffer").toInt()),
+	m_midiAutoQuantize(ConfigManager::inst()->value(
+			"midi", "autoquantize").toInt()),
 	m_workingDir(QDir::toNativeSeparators(ConfigManager::inst()->workingDir())),
 	m_vstDir(QDir::toNativeSeparators(ConfigManager::inst()->vstDir())),
 	m_ladspaDir(QDir::toNativeSeparators(ConfigManager::inst()->ladspaDir())),
@@ -159,8 +161,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 {
 	setWindowIcon(embed::getIconPixmap("setup_general"));
 	setWindowTitle(tr("Settings"));
-	// TODO: Equivalent to the new setWindowFlag(Qt::WindowContextHelpButtonHint, false)
-	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+	setWindowFlag(Qt::WindowContextHelpButtonHint, false);
 	setModal(true);
 	setFixedSize(454, 400);
 
@@ -723,10 +724,18 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 		m_assignableMidiDevices->setCurrentIndex(current);
 	}
 
+	// MIDI Recording tab
+	auto* midiRecordingTab = new TabWidget(tr("Behavior when recording"), midi_w);
+	int mwCounter=0;
+	addLedCheckBox(tr("Auto-quantize notes in Piano Roll"), midiRecordingTab, mwCounter,
+		m_midiAutoQuantize, SLOT(toggleMidiAutoQuantization(bool)), false);
+	midiRecordingTab->setFixedHeight(YDelta + YDelta * mwCounter);
+
 	// MIDI layout ordering.
 	midi_layout->addWidget(midiiface_tw);
 	midi_layout->addWidget(ms_w);
 	midi_layout->addWidget(midiAutoAssign_tw);
+	midi_layout->addWidget(midiRecordingTab);
 	midi_layout->addStretch();
 
 
@@ -960,6 +969,7 @@ void SetupDialog::accept()
 					m_midiIfaceNames[m_midiInterfaces->currentText()]);
 	ConfigManager::inst()->setValue("midi", "midiautoassign",
 					m_assignableMidiDevices->currentText());
+	ConfigManager::inst()->setValue("midi", "autoquantize", QString::number(m_midiAutoQuantize));
 
 
 	ConfigManager::inst()->setWorkingDir(QDir::fromNativeSeparators(m_workingDir));
@@ -1217,6 +1227,11 @@ void SetupDialog::midiInterfaceChanged(const QString & iface)
 	}
 
 	m_midiIfaceSetupWidgets[m_midiIfaceNames[iface]]->show();
+}
+
+void SetupDialog::toggleMidiAutoQuantization(bool enabled)
+{
+	m_midiAutoQuantize = enabled;
 }
 
 
