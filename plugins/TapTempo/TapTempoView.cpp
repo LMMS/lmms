@@ -40,9 +40,9 @@
 #include "TapTempo.h"
 
 namespace lmms::gui {
-TapTempoView::TapTempoView(ToolPlugin* plugin)
+TapTempoView::TapTempoView(TapTempo* plugin)
 	: ToolPluginView(plugin)
-	, m_plugin(dynamic_cast<TapTempo*>(plugin))
+	, m_plugin(plugin)
 {
 	setFixedSize(250, 288);
 
