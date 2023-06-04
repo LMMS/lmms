@@ -67,4 +67,4 @@ private:
 };
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_TAP_TEMPO_VIEW_H
