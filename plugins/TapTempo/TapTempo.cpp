@@ -50,6 +50,12 @@ Plugin::Descriptor PLUGIN_EXPORT taptempo_plugin_descriptor
 	= {LMMS_STRINGIFY(PLUGIN_NAME), "Tap Tempo", QT_TRANSLATE_NOOP("PluginBrowser", "Tap to the beat"),
 		"saker <sakertooth@gmail.com>", 0x0100, Plugin::Tool, new PluginPixmapLoader("logo"), nullptr, nullptr};
 
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model*, void*)
+{
+	return new TapTempo;
+}
+}
+
 TapTempo::TapTempo()
 	: ToolPlugin(&taptempo_plugin_descriptor, nullptr)
 {
@@ -89,12 +95,6 @@ void TapTempo::onBpmClick()
 		m_prevTime = currentTime;
 	}
 	++m_numTaps;
-}
-
-PLUGIN_EXPORT Plugin* lmms_plugin_main(Model*, void*)
-{
-	return new TapTempo;
-}
 }
 
 QString TapTempo::nodeName() const
