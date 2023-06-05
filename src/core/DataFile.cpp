@@ -28,6 +28,7 @@
 
 #include <cmath>
 #include <map>
+#include <set>
 
 #include <QDebug>
 #include <QFile>
@@ -1723,6 +1724,71 @@ void DataFile::upgrade_extendedNoteRange()
 				}
 			}
 		}
+
+		// Fix the base notes that are used in automations and the automations that use them.
+
+		// First fix the base notes used in automations and collect their ids while doing so.
+		// Base notes that are used in automations appear as elements in the document.
+		// The ids are used later to find the automations that automate these corrected base
+		// notes so that we can correct the automation values as well.
+		std::set<unsigned int> baseNoteIds;
+
+		QDomNodeList baseNotes = elementsByTagName("basenote");
+		for (int j = 0; j < baseNotes.size(); ++j)
+		{
+			QDomElement baseNote = baseNotes.item(j).toElement();
+			if (!baseNote.isNull())
+			{
+				if (baseNote.hasAttribute("value"))
+				{
+					int const value = baseNote.attribute("value").toInt();
+					baseNote.setAttribute("value", value + 12);
+				}
+
+				// The ids of base notes are of type jo_id_t which are in fact uint32_t.
+				// So let's just use these here to save some casting.
+				unsigned int const id = baseNote.attribute("id").toUInt();
+				baseNoteIds.insert(id);
+			}
+		}
+
+		// Now collect all automation patterns and correct all their automations that
+		// use the corrected base notes.
+		QDomNodeList automationPatterns = elementsByTagName("automationpattern");
+		for (int j = 0; j < automationPatterns.size(); ++j)
+		{
+			QDomElement automationPattern = automationPatterns.item(j).toElement();
+			if (!automationPattern.isNull())
+			{
+				// Iterate the objects. These contain the ids of the automated objects.
+				QDomElement object = automationPattern.firstChildElement("object");
+				while(!object.isNull()) {
+					unsigned int const id = object.attribute("id").toUInt();
+					if (baseNoteIds.find(id) != baseNoteIds.end())
+					{
+						// The automation pattern belongs to a corrected base note.
+						// Collect all time elements to correct their values and out
+						// values.
+						QDomElement time = automationPattern.firstChildElement("time");
+						while(!time.isNull()) {
+							// Value is in fact a float but if we save automations for
+							// base notes we in fact save integer values.
+							int const value = time.attribute("value").toInt();
+							time.setAttribute("value", value + 12);
+
+							// The method "upgrade_automationNodes" adds some attributes
+							// with the name "outValue". We have to correct these as well.
+							int const outValue = time.attribute("outValue").toInt();
+							time.setAttribute("outValue", outValue + 12);
+
+							time = time.nextSiblingElement("time");
+						}
+					}
+
+					object = object.nextSiblingElement("object");
+				}
+			}
+		}
 	}
 	else
 	{
@@ -1837,8 +1903,11 @@ void DataFile::upgrade_bbTcoRename()
 void DataFile::upgrade()
 {
 	// Runs all necessary upgrade methods
-	std::size_t max = std::min(static_cast<std::size_t>(m_fileVersion), UPGRADE_METHODS.size());
-	std::for_each( UPGRADE_METHODS.begin() + max, UPGRADE_METHODS.end(),
+	size_t const upgradedVersion = static_cast<std::size_t>(m_fileVersion);
+	size_t const numberOfVersions = UPGRADE_METHODS.size();
+	std::size_t offsetToUpgradeStart = std::min(upgradedVersion, numberOfVersions);
+	auto upgradeMethodIt = UPGRADE_VERSIONS.begin() + offsetToUpgradeStart;
+	std::for_each( UPGRADE_METHODS.begin() + offsetToUpgradeStart, UPGRADE_METHODS.end(),
 		[this](UpgradeMethod um)
 		{
 			(this->*um)();
