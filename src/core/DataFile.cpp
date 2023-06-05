@@ -1903,11 +1903,8 @@ void DataFile::upgrade_bbTcoRename()
 void DataFile::upgrade()
 {
 	// Runs all necessary upgrade methods
-	size_t const upgradedVersion = static_cast<std::size_t>(m_fileVersion);
-	size_t const numberOfVersions = UPGRADE_METHODS.size();
-	std::size_t offsetToUpgradeStart = std::min(upgradedVersion, numberOfVersions);
-	auto upgradeMethodIt = UPGRADE_VERSIONS.begin() + offsetToUpgradeStart;
-	std::for_each( UPGRADE_METHODS.begin() + offsetToUpgradeStart, UPGRADE_METHODS.end(),
+	std::size_t max = std::min(static_cast<std::size_t>(m_fileVersion), UPGRADE_METHODS.size());
+	std::for_each( UPGRADE_METHODS.begin() + max, UPGRADE_METHODS.end(),
 		[this](UpgradeMethod um)
 		{
 			(this->*um)();
