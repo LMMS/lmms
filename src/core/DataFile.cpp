@@ -1670,6 +1670,76 @@ void DataFile::upgrade_automationNodes()
 	}
 }
 
+/**
+ * @brief Used by the helper function that analyzes automation patterns.
+ */
+struct PatternAnalysisResult
+{
+	PatternAnalysisResult(bool hasBaseNoteAutomations, bool hasNonBaseNoteAutomations)
+	{
+		this->hasBaseNoteAutomations = hasBaseNoteAutomations;
+		this->hasNonBaseNoteAutomations = hasNonBaseNoteAutomations;
+	}
+	bool hasBaseNoteAutomations;
+	bool hasNonBaseNoteAutomations;
+};
+
+/**
+ * @brief Helper function that checks for an automation pattern if it contains automation for
+ * targets that are base notes and/or other targets.
+ * @param automationPattern The automation pattern to be checked.
+ * @param automatedBaseNoteIds A set of id of automated base notes that are used in the check.
+ * @return A struct that contains the results.
+ */
+static PatternAnalysisResult analyzeAutomationPattern(QDomElement const & automationPattern, std::set<unsigned int> const & automatedBaseNoteIds)
+{
+	bool hasBaseNoteAutomations = false;
+	bool hasNonBaseNoteAutomations = false;
+
+	// Iterate the objects. These contain the ids of the automated objects.
+	QDomElement object = automationPattern.firstChildElement("object");
+	while(!object.isNull())
+	{
+		unsigned int const id = object.attribute("id").toUInt();
+
+		// Check if the automated object is a base note.
+		if (automatedBaseNoteIds.find(id) != automatedBaseNoteIds.end())
+		{
+			hasBaseNoteAutomations = true;
+		}
+		else
+		{
+			hasNonBaseNoteAutomations = true;
+		}
+
+		object = object.nextSiblingElement("object");
+	}
+
+	return PatternAnalysisResult(hasBaseNoteAutomations, hasNonBaseNoteAutomations);
+}
+
+/**
+ * @brief Helper method that fixes the values and out values for an automation pattern.
+ * @param automationPattern The automation pattern to be fixed.
+ */
+static void fixAutomationPattern(QDomElement & automationPattern)
+{
+	QDomElement time = automationPattern.firstChildElement("time");
+	while(!time.isNull())
+	{
+		// Automation patterns can automate base notes as floats
+		// so we read and correct them as floats here.
+		float const value = time.attribute("value").toFloat();
+		time.setAttribute("value", value + 12.);
+
+		// The method "upgrade_automationNodes" adds some attributes
+		// with the name "outValue". We have to correct these as well.
+		float const outValue = time.attribute("outValue").toFloat();
+		time.setAttribute("outValue", outValue + 12.);
+
+		time = time.nextSiblingElement("time");
+	};
+}
 
 /** \brief Note range has been extended to match MIDI specification
  *
@@ -1680,37 +1750,100 @@ void DataFile::upgrade_extendedNoteRange()
 {
 	auto affected = [](const QDomElement& instrument)
 	{
-		return instrument.attribute("name") == "zynaddsubfx" ||
-			instrument.attribute("name") == "vestige" ||
-			instrument.attribute("name") == "lv2instrument" ||
-			instrument.attribute("name") == "carlapatchbay" ||
-			instrument.attribute("name") == "carlarack";
+		assert(instrument.hasAttribute("name"));
+		QString const name = instrument.attribute("name");
+
+		return name == "zynaddsubfx" ||
+			name  == "vestige" || name == "lv2instrument" ||
+			name  == "carlapatchbay" || name == "carlarack";
 	};
 
 	if (!elementsByTagName("song").item(0).isNull())
 	{
+		// This set will later contain all ids of automated base notes. They are
+		// used to find out which automation patterns must to be corrected, i.e. to
+		// check if an automation pattern has one or more base notes as its target.
+		std::set<unsigned int> automatedBaseNoteIds;
+
 		// Dealing with a project file, go through all the tracks
 		QDomNodeList tracks = elementsByTagName("track");
-		for (int i = 0; !tracks.item(i).isNull(); i++)
+		for (int i = 0; i < tracks.size(); ++i)
 		{
-			// Ignore BB container tracks
-			if (tracks.item(i).toElement().attribute("type").toInt() == 1) { continue; }
+			QDomElement currentTrack = tracks.item(i).toElement();
+			if (!currentTrack.hasAttribute("type"))
+			{
+				continue;
+			}
+			Track::TrackTypes const trackType = static_cast<Track::TrackTypes>(currentTrack.attribute("type").toInt());
 
-			QDomNodeList instruments = tracks.item(i).toElement().elementsByTagName("instrument");
-			if (instruments.isEmpty()) { continue; }
+			// Ignore BB container tracks
+			if (trackType == Track::PatternTrack)
+			{
+				continue;
+			}
+
+			QDomNodeList instruments = currentTrack.elementsByTagName("instrument");
+
+			if (instruments.isEmpty())
+			{
+				continue;
+			}
+
+			assert(instruments.size() < 2 && "More than one instrument found in a track!");
+
 			QDomElement instrument = instruments.item(0).toElement();
+
+			if (instrument.isNull())
+			{
+				continue;
+			}
+
 			// Raise the base note of every instrument by 12 to compensate for the change
 			// of A4 key code from 57 to 69. This ensures that notes are labeled correctly.
-			instrument.parentNode().toElement().setAttribute(
-				"basenote",
-				instrument.parentNode().toElement().attribute("basenote").toInt() + 12);
+			QDomElement instrumentParent = instrument.parentNode().toElement();
+
+			// Correct the base note of the instrument. Base notes which are automated are
+			// stored as elements. Non-automated base notes are stored as attributes.
+			if (instrumentParent.hasAttribute("basenote"))
+			{
+				// TODO Base notes can have float values in the save file! This might need to be changed!
+				int const currentBaseNote = instrumentParent.attribute("basenote").toInt();
+				instrumentParent.setAttribute("basenote", currentBaseNote + 12);
+			}
+			else
+			{
+				// Check if the instrument track has an automated base note.
+				// Correct the value of the base note and collect their ids while doing so.
+				// The ids are used later to find the automations that automate these corrected base
+				// notes so that we can correct the automation values as well.
+				QDomNodeList baseNotes = instrumentParent.elementsByTagName("basenote");
+				for (int j = 0; j < baseNotes.size(); ++j)
+				{
+					QDomElement baseNote = baseNotes.item(j).toElement();
+					if (!baseNote.isNull())
+					{
+						if (baseNote.hasAttribute("value"))
+						{
+							// TODO Base notes can have float values in the save file! This might need to be changed!
+							int const value = baseNote.attribute("value").toInt();
+							baseNote.setAttribute("value", value + 12);
+						}
+
+						// The ids of base notes are of type jo_id_t which are in fact uint32_t.
+						// So let's just use these here to save some casting.
+						unsigned int const id = baseNote.attribute("id").toUInt();
+						automatedBaseNoteIds.insert(id);
+					}
+				}
+			}
+
 			// Raise the pitch of all notes in patterns assigned to instruments not affected
 			// by #1857 by an octave. This negates the base note change for normal instruments,
 			// but leaves the MIDI-based instruments sounding an octave lower, preserving their
 			// pitch in existing projects.
 			if (!affected(instrument))
 			{
-				QDomNodeList patterns = tracks.item(i).toElement().elementsByTagName("pattern");
+				QDomNodeList patterns = currentTrack.elementsByTagName("pattern");
 				for (int i = 0; !patterns.item(i).isNull(); i++)
 				{
 					QDomNodeList notes = patterns.item(i).toElement().elementsByTagName("note");
@@ -1725,69 +1858,151 @@ void DataFile::upgrade_extendedNoteRange()
 			}
 		}
 
-		// Fix the base notes that are used in automations and the automations that use them.
+		// Now fix all the automation tracks.
+		// We have to collect the tracks that we need to duplicate and cannot do this in-place
+		// because if we did the iteration might never stop.
+		std::vector<QDomElement> tracksToDuplicate;
+		tracksToDuplicate.reserve(tracks.size());
 
-		// First fix the base notes used in automations and collect their ids while doing so.
-		// Base notes that are used in automations appear as elements in the document.
-		// The ids are used later to find the automations that automate these corrected base
-		// notes so that we can correct the automation values as well.
-		std::set<unsigned int> baseNoteIds;
-
-		QDomNodeList baseNotes = elementsByTagName("basenote");
-		for (int j = 0; j < baseNotes.size(); ++j)
+		// Iterate the tracks again. This time work on all automation tracks.
+		for (int i = 0; i < tracks.size(); ++i)
 		{
-			QDomElement baseNote = baseNotes.item(j).toElement();
-			if (!baseNote.isNull())
+			QDomElement currentTrack = tracks.item(i).toElement();
+			if (currentTrack.attribute("type").toInt() != Track::AutomationTrack)
 			{
-				if (baseNote.hasAttribute("value"))
-				{
-					int const value = baseNote.attribute("value").toInt();
-					baseNote.setAttribute("value", value + 12);
-				}
+				continue;
+			}
 
-				// The ids of base notes are of type jo_id_t which are in fact uint32_t.
-				// So let's just use these here to save some casting.
-				unsigned int const id = baseNote.attribute("id").toUInt();
-				baseNoteIds.insert(id);
+			// Check each track for the types of automations it contains in its patterns.
+			bool containsPatternsWithBaseNoteTargets = false;
+			bool containsPatternsWithNonBaseNoteTargets = false;
+
+			QDomElement automationPattern = currentTrack.firstChildElement("automationpattern");
+			while (!automationPattern.isNull())
+			{
+				auto const analysis = analyzeAutomationPattern(automationPattern, automatedBaseNoteIds);
+				containsPatternsWithBaseNoteTargets |= analysis.hasBaseNoteAutomations;
+				containsPatternsWithNonBaseNoteTargets |= analysis.hasNonBaseNoteAutomations;
+
+				automationPattern = automationPattern.nextSiblingElement("automationpattern");
+			}
+
+			if (!containsPatternsWithBaseNoteTargets)
+			{
+				// No base notes are automated by this automation track so we have nothing to do
+				continue;
+			}
+			else
+			{
+				if (!containsPatternsWithNonBaseNoteTargets)
+				{
+					// Only base note targets. This means we can simply keep the track and fix it.
+					automationPattern = currentTrack.firstChildElement("automationpattern");
+					while (!automationPattern.isNull())
+					{
+						fixAutomationPattern(automationPattern);
+
+						automationPattern = automationPattern.nextSiblingElement("automationpattern");
+					}
+				}
+				else
+				{
+					// The automation track has automations for base notes and other targets in its patterns.
+					// We will later need to duplicate/split the track.
+					tracksToDuplicate.push_back(currentTrack);
+				}
 			}
 		}
 
-		// Now collect all automation patterns and correct all their automations that
-		// use the corrected base notes.
-		QDomNodeList automationPatterns = elementsByTagName("automationpattern");
-		for (int j = 0; j < automationPatterns.size(); ++j)
+		// Now fix the tracks that need duplication/splitting
+		for (QDomElement & track : tracksToDuplicate)
 		{
-			QDomElement automationPattern = automationPatterns.item(j).toElement();
-			if (!automationPattern.isNull())
+			// First clone the original track
+			QDomNode cloneOfTrack = track.cloneNode();
+
+			// Now that we have the original and the clone we can manipulate both of them.
+			// The original track will keep only patterns without base note automations.
+			// Note: for the original track these might also be automation patterns without
+			// any targets. We will keep these because they might have been saved by the users
+			// like this.
+			QDomElement automationPattern = track.firstChildElement("automationpattern");
+			while (!automationPattern.isNull())
 			{
-				// Iterate the objects. These contain the ids of the automated objects.
-				QDomElement object = automationPattern.firstChildElement("object");
-				while(!object.isNull()) {
-					unsigned int const id = object.attribute("id").toUInt();
-					if (baseNoteIds.find(id) != baseNoteIds.end())
+				auto const analysis = analyzeAutomationPattern(automationPattern, automatedBaseNoteIds);
+				if (!analysis.hasBaseNoteAutomations)
+				{
+					// This pattern has no base note automations. Leave it alone.
+					automationPattern = automationPattern.nextSiblingElement("automationpattern");
+				}
+				else if (!analysis.hasNonBaseNoteAutomations)
+				{
+					// The pattern only has base note automations. Remove it completely as it would become empty.
+					QDomElement patternToRemove = automationPattern;
+					automationPattern = automationPattern.nextSiblingElement("automationpattern");
+					track.removeChild(patternToRemove);
+				}
+				else
+				{
+					// The pattern itself is mixed. Remove the base note objects.
+					QDomElement object = automationPattern.firstChildElement("object");
+					while(!object.isNull())
 					{
-						// The automation pattern belongs to a corrected base note.
-						// Collect all time elements to correct their values and out
-						// values.
-						QDomElement time = automationPattern.firstChildElement("time");
-						while(!time.isNull()) {
-							// Value is in fact a float but if we save automations for
-							// base notes we in fact save integer values.
-							int const value = time.attribute("value").toInt();
-							time.setAttribute("value", value + 12);
+						unsigned int const id = object.attribute("id").toUInt();
 
-							// The method "upgrade_automationNodes" adds some attributes
-							// with the name "outValue". We have to correct these as well.
-							int const outValue = time.attribute("outValue").toInt();
-							time.setAttribute("outValue", outValue + 12);
-
-							time = time.nextSiblingElement("time");
+						if (automatedBaseNoteIds.find(id) != automatedBaseNoteIds.end())
+						{
+							QDomElement objectToRemove = object;
+							object = object.nextSiblingElement("object");
+							automationPattern.removeChild(objectToRemove);
+						}
+						else
+						{
+							object = object.nextSiblingElement("object");
 						}
 					}
 
-					object = object.nextSiblingElement("object");
+					automationPattern = automationPattern.nextSiblingElement("automationpattern");
 				}
 			}
+
+			// The clone will only keep non-empty patterns with base note automations and the values of the patterns will be corrected.
+			automationPattern = cloneOfTrack.firstChildElement("automationpattern");
+			while (!automationPattern.isNull())
+			{
+				auto const analysis = analyzeAutomationPattern(automationPattern, automatedBaseNoteIds);
+				if (analysis.hasBaseNoteAutomations)
+				{
+					// This pattern has base note automations. Remove all other ones and fix the pattern.
+					QDomElement object = automationPattern.firstChildElement("object");
+					while(!object.isNull())
+					{
+						unsigned int const id = object.attribute("id").toUInt();
+
+						if (automatedBaseNoteIds.find(id) == automatedBaseNoteIds.end())
+						{
+							QDomElement objectToRemove = object;
+							object = object.nextSiblingElement("object");
+							automationPattern.removeChild(objectToRemove);
+						}
+						else
+						{
+							object = object.nextSiblingElement("object");
+						}
+					}
+
+					fixAutomationPattern(automationPattern);
+
+					automationPattern = automationPattern.nextSiblingElement("automationpattern");
+				}
+				else
+				{
+					// The pattern has no base note automations. Remove it completely.
+					QDomElement patternToRemove = automationPattern;
+					automationPattern = automationPattern.nextSiblingElement("automationpattern");
+					cloneOfTrack.removeChild(patternToRemove);
+				}
+			}
+			track.parentNode().appendChild(cloneOfTrack);
 		}
 	}
 	else
