@@ -29,6 +29,7 @@
 #include <cmath>
 #include <map>
 #include <set>
+#include <cassert>
 
 #include <QDebug>
 #include <QFile>
