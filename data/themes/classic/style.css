@@ -187,6 +187,7 @@ lmms--gui--TabWidget {
 	qproperty-tabText: rgba(255, 255, 255, 180);
 	qproperty-tabTitleText: #fff;
 	qproperty-tabSelected: #61666b;
+	qproperty-tabTextSelected: rgba(255, 255, 255, 180);
 	qproperty-tabBackground: #3c434b;
 	qproperty-tabBorder: #3c434b;
 }

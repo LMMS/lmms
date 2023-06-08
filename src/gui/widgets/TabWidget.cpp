@@ -48,6 +48,7 @@ TabWidget::TabWidget(const QString & caption, QWidget * parent, bool usePixmap,
 	m_tabText( 0, 0, 0 ),
 	m_tabTitleText( 0, 0, 0 ),
 	m_tabSelected( 0, 0, 0 ),
+	m_tabTextSelected( 0, 0, 0 ),
 	m_tabBackground( 0, 0, 0 ),
 	m_tabBorder( 0, 0, 0 )
 {
@@ -274,10 +275,15 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 			if( it.key() == m_activeTab )
 			{
 				p.fillRect( tab_x_offset, 2, ( *it ).nwidth - 6, m_tabbarHeight - 4, tabSelected() );
+				p.setPen(tabTextSelected());
+				p.drawText( tab_x_offset + 3, m_tabheight + 1, ( *it ).name );
 			}
-
-			// Draw text
-			p.drawText( tab_x_offset + 3, m_tabheight + 1, ( *it ).name );
+			else
+			{
+				// Draw text
+				p.setPen( tabText() );
+				p.drawText( tab_x_offset + 3, m_tabheight + 1, ( *it ).name );
+			}
 		}
 
 		// Next tab's horizontal position
@@ -390,6 +396,18 @@ QColor TabWidget::tabSelected() const
 void TabWidget::setTabSelected( const QColor & c )
 {
 	m_tabSelected = c;
+}
+
+// Return the text color of the selected tab
+QColor TabWidget::tabTextSelected() const
+{
+	return m_tabTextSelected;
+}
+
+// Set the text color of the selected tab
+void TabWidget::setTabTextSelected( const QColor & c )
+{
+	m_tabTextSelected = c;
 }
 
 // Return the color to be used for the TabWidget's background
