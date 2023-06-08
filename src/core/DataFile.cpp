@@ -1719,6 +1719,23 @@ static PatternAnalysisResult analyzeAutomationPattern(QDomElement const & automa
 	return PatternAnalysisResult(hasBaseNoteAutomations, hasNonBaseNoteAutomations);
 }
 
+static void fixNotePatterns(QDomNodeList & patterns)
+{
+	for (int i = 0; i < patterns.size(); ++i)
+	{
+		QDomNodeList notes = patterns.item(i).toElement().elementsByTagName("note");
+		for (int j = 0; j < notes.size(); ++j)
+		{
+			QDomElement note = notes.item(j).toElement();
+			if (note.hasAttribute("key"))
+			{
+				int const currentKey = note.attribute("key").toInt();
+				note.setAttribute("key", currentKey + 12);
+			}
+		}
+	}
+}
+
 /**
  * @brief Helper method that fixes the values and out values for an automation pattern.
  * @param automationPattern The automation pattern to be fixed.
@@ -1845,17 +1862,7 @@ void DataFile::upgrade_extendedNoteRange()
 			if (!affected(instrument))
 			{
 				QDomNodeList patterns = currentTrack.elementsByTagName("pattern");
-				for (int i = 0; !patterns.item(i).isNull(); i++)
-				{
-					QDomNodeList notes = patterns.item(i).toElement().elementsByTagName("note");
-					for (int i = 0; !notes.item(i).isNull(); i++)
-					{
-						notes.item(i).toElement().setAttribute(
-							"key",
-							notes.item(i).toElement().attribute("key").toInt() + 12
-						);
-					}
-				}
+				fixNotePatterns(patterns);
 			}
 		}
 
