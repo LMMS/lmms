@@ -234,16 +234,12 @@ void FileBrowser::expandItems(QTreeWidgetItem * item, QList<QString> expandedDir
 	int numChildren = item ? item->childCount() : m_fileBrowserTreeWidget->topLevelItemCount();
 	for (int i = 0; i < numChildren; ++i)
 	{
-		QTreeWidgetItem * it = item ? item->child(i) : m_fileBrowserTreeWidget->topLevelItem(i);
-		Directory *d = dynamic_cast<Directory*>(it);
+		auto it = item ? item->child(i) : m_fileBrowserTreeWidget->topLevelItem(i);
+		auto d = dynamic_cast<Directory*>(it);
 		if (d)
 		{
-			if (m_recurse)
-			{
-				d->setExpanded(true);
-			}
-			bool expand = expandedDirs.contains(d->fullName());
-			d->setExpanded(expand);
+			if (m_recurse) { d->setExpanded(true); }
+			d->setExpanded(expandedDirs.contains(d->fullName()));
 			if (m_recurse && it->childCount())
 			{
 				expandItems(it, expandedDirs);
@@ -1008,10 +1004,7 @@ void Directory::update()
 bool Directory::addItems(const QString& path)
 {
     QDir thisDir(path);
-    if (!thisDir.isReadable())
-    {
-        return false;
-    }
+    if (!thisDir.isReadable()) { return false; }
 
     treeWidget()->setUpdatesEnabled(false);
 
@@ -1019,37 +1012,35 @@ bool Directory::addItems(const QString& path)
     QStringList files;
 
     QFileInfoList entries = thisDir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
-    for (const QFileInfo& entry : entries)
+    for (auto& entry : entries)
     {
         QString fileName = entry.fileName();
-        if (entry.isDir() && fileName[0] != '.')
+        if (entry.isDir())
         {
             directories.append(fileName);
         }
-        else if (entry.isFile() && fileName[0] != '.' && thisDir.match(m_filter, fileName.toLower()))
+        else if (entry.isFile() && thisDir.match(m_filter, fileName.toLower()))
         {
             files.append(fileName);
         }
     }
 
-    directories.sort(Qt::CaseInsensitive);
     for (const QString& dirName : directories)
     {
-        Directory* dir = new Directory(dirName, path, m_filter);
+        auto dir = new Directory(dirName, path, m_filter);
         addChild(dir);
         m_dirCount++;
     }
 
-    files.sort(Qt::CaseInsensitive);
     for (const QString& fileName : files)
     {
-        FileItem* fileItem = new FileItem(fileName, path);
+        auto fileItem = new FileItem(fileName, path);
         addChild(fileItem);
     }
 
     treeWidget()->setUpdatesEnabled(true);
 
-    return !directories.isEmpty() || !files.isEmpty();
+    return !(directories.isEmpty() && files.isEmpty());
 }
 
 
