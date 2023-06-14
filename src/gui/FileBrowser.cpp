@@ -238,6 +238,7 @@ void FileBrowser::expandItems(QTreeWidgetItem* item, QList<QString> expandedDirs
 		auto d = dynamic_cast<Directory*>(it);
 		if (d)
 		{
+			// Expanding is required when recursive to load in its contents, even if it's collapsed right afterward
 			if (m_recurse) { d->setExpanded(true); }
 			d->setExpanded(expandedDirs.contains(d->fullName()));
 			if (m_recurse && it->childCount())
@@ -1003,32 +1004,32 @@ void Directory::update()
 
 bool Directory::addItems(const QString& path)
 {
-    QDir thisDir(path);
-    if (!thisDir.isReadable()) { return false; }
+	QDir thisDir(path);
+	if (!thisDir.isReadable()) { return false; }
 
-    treeWidget()->setUpdatesEnabled(false);
+	treeWidget()->setUpdatesEnabled(false);
 
-    QFileInfoList entries = thisDir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::LocaleAware | QDir::DirsFirst | QDir::Name);
-    for (auto& entry : entries)
-    {
-        QString fileName = entry.fileName();
-        if (entry.isDir())
-        {
-            auto dir = new Directory(fileName, path, m_filter);
-            addChild(dir);
-            m_dirCount++;
-        }
-        else if (entry.isFile() && thisDir.match(m_filter, fileName.toLower()))
-        {
-            auto fileItem = new FileItem(fileName, path);
-            addChild(fileItem);
-        }
-    }
-    
-    treeWidget()->setUpdatesEnabled(true);
-    
-    // return true if we added any child items
-    return childCount() > 0;
+	QFileInfoList entries = thisDir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::LocaleAware | QDir::DirsFirst | QDir::Name);
+	for (auto& entry : entries)
+	{
+		QString fileName = entry.fileName();
+		if (entry.isDir())
+		{
+			auto dir = new Directory(fileName, path, m_filter);
+			addChild(dir);
+			m_dirCount++;
+		}
+		else if (entry.isFile() && thisDir.match(m_filter, fileName.toLower()))
+		{
+			auto fileItem = new FileItem(fileName, path);
+			addChild(fileItem);
+		}
+	}
+	
+	treeWidget()->setUpdatesEnabled(true);
+	
+	// return true if we added any child items
+	return childCount() > 0;
 }
 
 
