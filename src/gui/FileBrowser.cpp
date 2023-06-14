@@ -229,13 +229,13 @@ void FileBrowser::reloadTree()
 
 
 
-void FileBrowser::expandItems( QTreeWidgetItem * item, QList<QString> expandedDirs )
+void FileBrowser::expandItems(QTreeWidgetItem * item, QList<QString> expandedDirs)
 {
 	int numChildren = item ? item->childCount() : m_fileBrowserTreeWidget->topLevelItemCount();
 	for (int i = 0; i < numChildren; ++i)
 	{
-		QTreeWidgetItem * it = item ? item->child( i ) : m_fileBrowserTreeWidget->topLevelItem(i);
-		Directory *d = dynamic_cast<Directory *> ( it );
+		QTreeWidgetItem * it = item ? item->child(i) : m_fileBrowserTreeWidget->topLevelItem(i);
+		Directory *d = dynamic_cast<Directory *>(it);
 		if (d)
 		{
 			if (m_recurse)
