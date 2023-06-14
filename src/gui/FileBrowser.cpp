@@ -235,16 +235,19 @@ void FileBrowser::expandItems( QTreeWidgetItem * item, QList<QString> expandedDi
 	for (int i = 0; i < numChildren; ++i)
 	{
 		QTreeWidgetItem * it = item ? item->child( i ) : m_fileBrowserTreeWidget->topLevelItem(i);
-		auto d = dynamic_cast<Directory*>(it);
+		Directory *d = dynamic_cast<Directory *> ( it );
 		if (d)
 		{
-			d->update();
-			bool expand = expandedDirs.contains( d->fullName() );
-			d->setExpanded( expand );
-		}
-		if (m_recurse && it->childCount())
-		{
-			expandItems(it, expandedDirs);
+			if (m_recurse)
+			{
+				d->setExpanded(true);
+			}
+			bool expand = expandedDirs.contains(d->fullName());
+			d->setExpanded(expand);
+			if (m_recurse && it->childCount())
+			{
+				expandItems(it, expandedDirs);
+			}
 		}
 	}
 }
@@ -1002,88 +1005,52 @@ void Directory::update()
 
 
 
-bool Directory::addItems(const QString & path )
+bool Directory::addItems(const QString& path)
 {
-	QDir thisDir( path );
-	if( !thisDir.isReadable() )
-	{
-		return false;
-	}
+    QDir thisDir(path);
+    if (!thisDir.isReadable())
+    {
+        return false;
+    }
 
-	treeWidget()->setUpdatesEnabled( false );
+    treeWidget()->setUpdatesEnabled(false);
 
-	bool added_something = false;
+    QStringList directories;
+    QStringList files;
 
-	// try to add all directories from file system alphabetically into the tree
-	QStringList files = thisDir.entryList( QDir::Dirs, QDir::Name );
-	for( QStringList::const_iterator it = files.constBegin();
-						it != files.constEnd(); ++it )
-	{
-		QString cur_file = *it;
-		if( cur_file[0] != '.' )
-		{
-			bool orphan = true;
-			for( int i = 0; i < childCount(); ++i )
-			{
-				auto d = dynamic_cast<Directory*>(child(i));
-				if( d == nullptr || cur_file < d->text( 0 ) )
-				{
-					// insert before item, we're done
-					insertChild( i, new Directory( cur_file,
-							path, m_filter ) );
-					orphan = false;
-					m_dirCount++;
-					break;
-				}
-				else if( cur_file == d->text( 0 ) )
-				{
-					// imagine we have top-level subdirs named "TripleOscillator" in
-					// two directories from FileBrowser::m_directories
-					// and imagine both have a sub folder named "xyz"
-					// then only add one tree widget for both
-					// so we don't add a new Directory - we just
-					// add the path to the current directory
-					d->addDirectory( path );
-					orphan = false;
-					break;
-				}
-			}
-			if( orphan )
-			{
-				// it has not yet been added yet, so it's (lexically)
-				// larger than all other dirs => append it at the bottom
-				addChild( new Directory( cur_file, path,
-								m_filter ) );
-				m_dirCount++;
-			}
+    QFileInfoList entries = thisDir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
+    for (const QFileInfo& entry : entries)
+    {
+        QString fileName = entry.fileName();
+        if (entry.isDir() && fileName[0] != '.')
+        {
+            directories.append(fileName);
+        }
+        else if (entry.isFile() && fileName[0] != '.' && thisDir.match(m_filter, fileName.toLower()))
+        {
+            files.append(fileName);
+        }
+    }
 
-			added_something = true;
-		}
-	}
+    directories.sort(Qt::CaseInsensitive);
 
-	// sorts the path alphabetically instead of just appending to the bottom (see "orphans")
-	if (added_something)
-		sortChildren(0, Qt::AscendingOrder);
+    for (const QString& dirName : directories)
+    {
+        Directory* dir = new Directory(dirName, path, m_filter);
+        addChild(dir);
+        m_dirCount++;
+    }
 
-	QList<QTreeWidgetItem*> items;
-	files = thisDir.entryList( QDir::Files, QDir::Name );
-	files.sort(Qt::CaseInsensitive);
-	for( QStringList::const_iterator it = files.constBegin();
-						it != files.constEnd(); ++it )
-	{
-		QString cur_file = *it;
-		if( cur_file[0] != '.' &&
-				thisDir.match( m_filter, cur_file.toLower() ) )
-		{
-			items << new FileItem( cur_file, path );
-			added_something = true;
-		}
-	}
-	addChildren( items );
+    files.sort(Qt::CaseInsensitive);
+    for (const QString& fileName : files)
+    {
+        FileItem* fileItem = new FileItem(fileName, path);
+        addChild(fileItem);
+    }
 
-	treeWidget()->setUpdatesEnabled( true );
+    treeWidget()->setUpdatesEnabled(true);
 
-	return added_something;
+    return !directories.isEmpty() || !files.isEmpty();
 }
 
 
