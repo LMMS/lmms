@@ -1025,14 +1025,14 @@ bool Directory::addItems(const QString& path)
         }
     }
 
-    for (const QString& dirName : directories)
+    for (auto& dirName : directories)
     {
         auto dir = new Directory(dirName, path, m_filter);
         addChild(dir);
         m_dirCount++;
     }
 
-    for (const QString& fileName : files)
+    for (auto& fileName : files)
     {
         auto fileItem = new FileItem(fileName, path);
         addChild(fileItem);
