@@ -1008,39 +1008,27 @@ bool Directory::addItems(const QString& path)
 
     treeWidget()->setUpdatesEnabled(false);
 
-    QStringList directories;
-    QStringList files;
-
-    QFileInfoList entries = thisDir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
+    QFileInfoList entries = thisDir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::LocaleAware | QDir::DirsFirst | QDir::Name);
     for (auto& entry : entries)
     {
         QString fileName = entry.fileName();
         if (entry.isDir())
         {
-            directories.append(fileName);
+            auto dir = new Directory(fileName, path, m_filter);
+            addChild(dir);
+            m_dirCount++;
         }
         else if (entry.isFile() && thisDir.match(m_filter, fileName.toLower()))
         {
-            files.append(fileName);
+            auto fileItem = new FileItem(fileName, path);
+            addChild(fileItem);
         }
     }
-
-    for (auto& dirName : directories)
-    {
-        auto dir = new Directory(dirName, path, m_filter);
-        addChild(dir);
-        m_dirCount++;
-    }
-
-    for (auto& fileName : files)
-    {
-        auto fileItem = new FileItem(fileName, path);
-        addChild(fileItem);
-    }
-
+    
     treeWidget()->setUpdatesEnabled(true);
-
-    return !(directories.isEmpty() && files.isEmpty());
+    
+    // return true if we added any child items
+    return childCount() > 0;
 }
 
 
