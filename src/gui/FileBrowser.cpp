@@ -1033,7 +1033,6 @@ bool Directory::addItems(const QString& path)
     }
 
     directories.sort(Qt::CaseInsensitive);
-
     for (const QString& dirName : directories)
     {
         Directory* dir = new Directory(dirName, path, m_filter);
