@@ -229,7 +229,7 @@ void FileBrowser::reloadTree()
 
 
 
-void FileBrowser::expandItems(QTreeWidgetItem * item, QList<QString> expandedDirs)
+void FileBrowser::expandItems(QTreeWidgetItem* item, QList<QString> expandedDirs)
 {
 	int numChildren = item ? item->childCount() : m_fileBrowserTreeWidget->topLevelItemCount();
 	for (int i = 0; i < numChildren; ++i)
