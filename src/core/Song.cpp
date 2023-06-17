@@ -99,7 +99,7 @@ Song::Song() :
 	m_loopRenderRemaining(1),
 	m_oldAutomatedValues()
 {
-	for(int i = 0; i < Mode_Count; ++i) m_elapsedMilliSeconds[i] = 0;
+	for (double& millisecondsElapsed : m_elapsedMilliSeconds) { millisecondsElapsed = 0; }
 	connect( &m_tempoModel, SIGNAL(dataChanged()),
 			this, SLOT(setTempo()), Qt::DirectConnection );
 	connect( &m_tempoModel, SIGNAL(dataUnchanged()),
@@ -116,11 +116,11 @@ Song::Song() :
 /*	connect( &m_masterPitchModel, SIGNAL(dataChanged()),
 			this, SLOT(masterPitchChanged()));*/
 
-	qRegisterMetaType<Note>( "Note" );
+	qRegisterMetaType<lmms::Note>( "lmms::Note" );
 	setType( SongContainer );
 
-	for (int i = 0; i < MaxScaleCount; i++) {m_scales[i] = std::make_shared<Scale>();}
-	for (int i = 0; i < MaxKeymapCount; i++) {m_keymaps[i] = std::make_shared<Keymap>();}
+	for (auto& scale : m_scales) {scale = std::make_shared<Scale>();}
+	for (auto& keymap : m_keymaps) {keymap = std::make_shared<Keymap>();}
 }
 
 
@@ -146,12 +146,11 @@ void Song::masterVolumeChanged()
 void Song::setTempo()
 {
 	Engine::audioEngine()->requestChangeInModel();
-	const bpm_t tempo = ( bpm_t ) m_tempoModel.value();
+	const auto tempo = (bpm_t)m_tempoModel.value();
 	PlayHandleList & playHandles = Engine::audioEngine()->playHandles();
-	for( PlayHandleList::Iterator it = playHandles.begin();
-						it != playHandles.end(); ++it )
+	for (const auto& playHandle : playHandles)
 	{
-		NotePlayHandle * nph = dynamic_cast<NotePlayHandle *>( *it );
+		auto nph = dynamic_cast<NotePlayHandle*>(playHandle);
 		if( nph && !nph->isReleased() )
 		{
 			nph->lock();
@@ -321,7 +320,7 @@ void Song::processNextBuffer()
 		}
 
 		const f_cnt_t framesUntilNextPeriod = framesPerPeriod - frameOffsetInPeriod;
-		const f_cnt_t framesUntilNextTick = static_cast<f_cnt_t>(std::ceil(framesPerTick - frameOffsetInTick));
+		const auto framesUntilNextTick = static_cast<f_cnt_t>(std::ceil(framesPerTick - frameOffsetInTick));
 
 		// We want to proceed to the next buffer or tick, whichever is closer
 		const auto framesToPlay = std::min(framesUntilNextPeriod, framesUntilNextTick);
@@ -621,6 +620,7 @@ void Song::togglePause()
 	{
 		m_playing = false;
 		m_paused = true;
+		Engine::audioEngine()->clear();
 	}
 
 	m_vstSyncController.setPlaybackState( m_playing );
@@ -838,14 +838,6 @@ bpm_t Song::getTempo()
 }
 
 
-
-
-AutomationClip * Song::tempoAutomationClip()
-{
-	return AutomationClip::globalAutomationClip( &m_tempoModel );
-}
-
-
 AutomatedValueMap Song::automatedValuesAt(TimePos time, int clipNum) const
 {
 	return TrackContainer::automatedValuesFromTracks(TrackList{m_globalAutomationTrack} << tracks(), time, clipNum);
@@ -1052,7 +1044,12 @@ void Song::loadProject( const QString & fileName )
 			else
 			{
 				QTextStream(stderr) << tr("Can't load project: "
-					"Project file contains local paths to plugins.") << endl;
+					"Project file contains local paths to plugins.")
+#if (QT_VERSION >= QT_VERSION_CHECK(5,15,0))
+					<< Qt::endl;
+#else
+					<< endl;
+#endif
 			}
 		}
 	}
@@ -1310,9 +1307,9 @@ void Song::saveControllerStates( QDomDocument & doc, QDomElement & element )
 	// save settings of controllers
 	QDomElement controllersNode = doc.createElement( "controllers" );
 	element.appendChild( controllersNode );
-	for( int i = 0; i < m_controllers.size(); ++i )
+	for (const auto& controller : m_controllers)
 	{
-		m_controllers[i]->saveState( doc, controllersNode );
+		controller->saveState(doc, controllersNode);
 	}
 }
 
@@ -1356,9 +1353,9 @@ void Song::saveScaleStates(QDomDocument &doc, QDomElement &element)
 	QDomElement scalesNode = doc.createElement("scales");
 	element.appendChild(scalesNode);
 
-	for (int i = 0; i < MaxScaleCount; i++)
+	for (const auto& scale : m_scales)
 	{
-		m_scales[i]->saveState(doc, scalesNode);
+		scale->saveState(doc, scalesNode);
 	}
 }
 
@@ -1381,9 +1378,9 @@ void Song::saveKeymapStates(QDomDocument &doc, QDomElement &element)
 	QDomElement keymapsNode = doc.createElement("keymaps");
 	element.appendChild(keymapsNode);
 
-	for (int i = 0; i < MaxKeymapCount; i++)
+	for (const auto& keymap : m_keymaps)
 	{
-		m_keymaps[i]->saveState(doc, keymapsNode);
+		keymap->saveState(doc, keymapsNode);
 	}
 }
 

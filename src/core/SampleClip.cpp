@@ -102,7 +102,7 @@ SampleClip::SampleClip(const SampleClip& orig) :
 
 SampleClip::~SampleClip()
 {
-	SampleTrack * sampletrack = dynamic_cast<SampleTrack*>( getTrack() );
+	auto sampletrack = dynamic_cast<SampleTrack*>(getTrack());
 	if ( sampletrack )
 	{
 		sampletrack->updateClips();
@@ -180,7 +180,7 @@ void SampleClip::toggleRecord()
 void SampleClip::playbackPositionChanged()
 {
 	Engine::audioEngine()->removePlayHandlesOfTypes( getTrack(), PlayHandle::TypeSamplePlayHandle );
-	SampleTrack * st = dynamic_cast<SampleTrack*>( getTrack() );
+	auto st = dynamic_cast<SampleTrack*>(getTrack());
 	st->setPlayingClips( false );
 }
 
@@ -189,7 +189,7 @@ void SampleClip::playbackPositionChanged()
 
 void SampleClip::updateTrackClips()
 {
-	SampleTrack * sampletrack = dynamic_cast<SampleTrack*>( getTrack() );
+	auto sampletrack = dynamic_cast<SampleTrack*>(getTrack());
 	if( sampletrack)
 	{
 		sampletrack->updateClips();
@@ -292,14 +292,14 @@ void SampleClip::loadSettings( const QDomElement & _this )
 	if( sampleFile().isEmpty() && _this.hasAttribute( "data" ) )
 	{
 		m_sampleBuffer->loadFromBase64( _this.attribute( "data" ) );
+		if (_this.hasAttribute("sample_rate"))
+		{
+			m_sampleBuffer->setSampleRate(_this.attribute("sample_rate").toInt());
+		}
 	}
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );
 	setStartTimeOffset( _this.attribute( "off" ).toInt() );
-
-	if ( _this.hasAttribute( "sample_rate" ) ) {
-		m_sampleBuffer->setSampleRate( _this.attribute( "sample_rate" ).toInt() );
-	}
 
 	if( _this.hasAttribute( "color" ) )
 	{

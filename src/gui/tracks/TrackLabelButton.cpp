@@ -105,6 +105,7 @@ void TrackLabelButton::renameFinished()
 {
 	if( !( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() ) )
 	{
+		m_renameLineEdit->clearFocus();
 		m_renameLineEdit->hide();
 		if( m_renameLineEdit->text() != "" )
 		{
@@ -188,8 +189,7 @@ void TrackLabelButton::paintEvent( QPaintEvent * _pe )
 {
 	if( m_trackView->getTrack()->type() == Track::InstrumentTrack )
 	{
-		InstrumentTrack * it =
-			dynamic_cast<InstrumentTrack *>( m_trackView->getTrack() );
+		auto it = dynamic_cast<InstrumentTrack*>(m_trackView->getTrack());
 		const PixmapLoader * pl;
 		auto get_logo = [](InstrumentTrack* it) -> const PixmapLoader*
 		{

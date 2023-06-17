@@ -1,7 +1,7 @@
 /*
- * Gb_Apu_Buffer.cpp - Gb_Apu subclass which allows direct buffer access
+ * GbApuWrapper.h - Gb_Apu subclass which allows direct buffer access
  * Copyright (c) 2017 Tres Finocchiaro <tres.finocchiaro/at/gmail.com>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -20,37 +20,42 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-#include "Gb_Apu_Buffer.h"
+
+#ifndef LMMS_GB_APU_WRAPPER_H
+#define LMMS_GB_APU_WRAPPER_H
+
+#include "Gb_Apu.h"
+#include "Multi_Buffer.h"
+#include "MemoryManager.h"
 
 namespace lmms
 {
 
 
-void Gb_Apu_Buffer::end_frame(blip_time_t end_time) {
-	Gb_Apu::end_frame(end_time);
-	m_buf.end_frame(end_time);
-}
+class GbApuWrapper : private Gb_Apu
+{
+	MM_OPERATORS
+public:
+	GbApuWrapper() = default;
+	~GbApuWrapper() = default;
 
-// Sets specified sample rate and clock rate in Multi_Buffer
-blargg_err_t Gb_Apu_Buffer::set_sample_rate(long sample_rate, long clock_rate) {
-	Gb_Apu_Buffer::output(m_buf.center(), m_buf.left(), m_buf.right());
-	m_buf.clock_rate(clock_rate);
-	return m_buf.set_sample_rate(sample_rate);
-}
+	blargg_err_t setSampleRate(long sampleRate, long clockRate);
+	void writeRegister(unsigned addr, int data) { Gb_Apu::write_register(fakeClock(), addr, data); }
+	long samplesAvail() const;
+	long readSamples(blip_sample_t* out, long count);
+	void trebleEq(const blip_eq_t& eq) { Gb_Apu::treble_eq(eq); }
+	void bassFreq(int freq);
+	void endFrame(blip_time_t endTime);
 
-// Wrap Multi_Buffer::samples_avail()
-long Gb_Apu_Buffer::samples_avail() const {
-	return m_buf.samples_avail();
-}
+private:
+	Stereo_Buffer m_buf;
 
-// Wrap Multi_Buffer::read_samples(...)
-long Gb_Apu_Buffer::read_samples(sample_t* out, long count) {
-	return m_buf.read_samples(out, count);
-}
-
-void Gb_Apu_Buffer::bass_freq(int freq) {
-	m_buf.bass_freq(freq);
-}
+	// Fake CPU timing
+	blip_time_t fakeClock() { return m_time += 4; }
+	blip_time_t m_time = 0;
+};
 
 
 } // namespace lmms
+
+#endif // LMMS_GB_APU_WRAPPER_H

@@ -199,7 +199,7 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 				if (m_waterfallActive && m_waterfallNotEmpty)
 				{
 					// move waterfall history one line down and clear the top line
-					QRgb *pixel = (QRgb *)m_history_work.data();
+					auto pixel = (QRgb*)m_history_work.data();
 					std::copy(pixel,
 							  pixel + waterfallWidth() * m_waterfallHeight - waterfallWidth(),
 							  pixel + waterfallWidth());

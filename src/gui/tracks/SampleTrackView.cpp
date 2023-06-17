@@ -82,7 +82,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	m_panningKnob->show();
 
 	m_activityIndicator = new FadeButton(
-		QApplication::palette().color(QPalette::Active, QPalette::Background),
+		QApplication::palette().color(QPalette::Active, QPalette::Window),
 		QApplication::palette().color(QPalette::Active, QPalette::BrightText),
 		QApplication::palette().color(QPalette::Active, QPalette::BrightText).darker(),
 		getTrackSettingsWidget()
@@ -134,7 +134,7 @@ QMenu * SampleTrackView::createMixerMenu(QString title, QString newMixerLabel)
 		title = title.arg(channelIndex).arg(mixerChannel->m_name);
 	}
 
-	QMenu *mixerMenu = new QMenu(title);
+	auto mixerMenu = new QMenu(title);
 
 	mixerMenu->addAction(newMixerLabel, this, SLOT(createMixerLine()));
 	mixerMenu->addSeparator();
@@ -168,7 +168,7 @@ void SampleTrackView::showEffects()
 
 void SampleTrackView::modelChanged()
 {
-	SampleTrack * st = castModel<SampleTrack>();
+	auto st = castModel<SampleTrack>();
 	m_volumeKnob->setModel(&st->m_volumeModel);
 
 	TrackView::modelChanged();
@@ -206,7 +206,7 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 							* TimePos::ticksPerBar()) + trackContainerView()->currentPosition()
 						).quantize(1.0);
 
-		SampleClip * sClip = static_cast<SampleClip*>(getTrack()->createClip(clipPos));
+		auto sClip = static_cast<SampleClip*>(getTrack()->createClip(clipPos));
 		if (sClip) { sClip->setSampleFile(value); }
 	}
 }

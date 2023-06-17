@@ -1,7 +1,7 @@
 /*
  * Lv2Effect.h - implementation of LV2 effect
  *
- * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -58,4 +58,4 @@ private:
 
 } // namespace lmms
 
-#endif // LMMS_HAVE_LV2
+#endif

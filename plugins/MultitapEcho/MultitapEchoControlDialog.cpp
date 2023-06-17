@@ -47,10 +47,10 @@ MultitapEchoControlDialog::MultitapEchoControlDialog( MultitapEchoControls * con
 	setFixedSize( 245, 300 );
 	
 	// graph widgets
-	
-	Graph * ampGraph = new Graph( this, Graph::BarStyle, 204, 105 );
-	Graph * lpGraph = new Graph( this, Graph::BarStyle, 204, 105 );
-	
+
+	auto ampGraph = new Graph(this, Graph::BarStyle, 204, 105);
+	auto lpGraph = new Graph(this, Graph::BarStyle, 204, 105);
+
 	ampGraph->move( 30, 10 );
 	lpGraph->move( 30, 125 );
 	
@@ -71,33 +71,33 @@ MultitapEchoControlDialog::MultitapEchoControlDialog( MultitapEchoControls * con
 	lpGraph -> setMaximumSize( 204, 105 );
 	
 	// steps spinbox
-	
-	LcdSpinBox * steps = new LcdSpinBox( 2, this, "Steps" );
+
+	auto steps = new LcdSpinBox(2, this, "Steps");
 	steps->move( 20, 245 );
 	steps->setModel( & controls->m_steps );
 	
 	// knobs
 
-	TempoSyncKnob * stepLength = new TempoSyncKnob( knobBright_26, this );
+	auto stepLength = new TempoSyncKnob(knobBright_26, this);
 	stepLength->move( 100, 245 );
 	stepLength->setModel( & controls->m_stepLength );
 	stepLength->setLabel( tr( "Length" ) );
 	stepLength->setHintText( tr( "Step length:" ) , " ms" );
-	
-	Knob * dryGain = new Knob( knobBright_26, this );
+
+	auto dryGain = new Knob(knobBright_26, this);
 	dryGain->move( 150, 245 );
 	dryGain->setModel( & controls->m_dryGain );
 	dryGain->setLabel( tr( "Dry" ) );
 	dryGain->setHintText( tr( "Dry gain:" ) , " dBFS" );
 
-	Knob * stages = new Knob( knobBright_26, this );
+	auto stages = new Knob(knobBright_26, this);
 	stages->move( 200, 245 );
 	stages->setModel( & controls->m_stages );
 	stages->setLabel( tr( "Stages" ) );
 	stages->setHintText( tr( "Low-pass stages:" ) , "x" );
 	// switch led
-	
-	LedCheckBox * swapInputs = new LedCheckBox( "Swap inputs", this, tr( "Swap inputs" ), LedCheckBox::Green );
+
+	auto swapInputs = new LedCheckBox("Swap inputs", this, tr("Swap inputs"), LedCheckBox::Green);
 	swapInputs->move( 20, 275 );
 	swapInputs->setModel( & controls->m_swapInputs );
 	swapInputs->setToolTip(tr("Swap left and right input channels for reflections"));

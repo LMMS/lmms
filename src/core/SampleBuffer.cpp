@@ -538,7 +538,7 @@ size_t qfileReadCallback(void * ptr, size_t size, size_t n, void * udata )
 
 int qfileSeekCallback(void * udata, ogg_int64_t offset, int whence)
 {
-	QFile * f = static_cast<QFile *>(udata);
+	auto f = static_cast<QFile*>(udata);
 
 	if (whence == SEEK_CUR)
 	{
@@ -594,7 +594,7 @@ f_cnt_t SampleBuffer::decodeSampleOGGVorbis(
 
 	f_cnt_t frames = 0;
 
-	QFile * f = new QFile(fileName);
+	auto f = new QFile(fileName);
 	if (f->open(QFile::ReadOnly) == false)
 	{
 		delete f;
@@ -672,7 +672,7 @@ f_cnt_t SampleBuffer::decodeSampleOGGVorbis(
 
 	return frames;
 }
-#endif
+#endif // LMMS_HAVE_OGGVORBIS
 
 
 
@@ -727,9 +727,7 @@ bool SampleBuffer::play(
 		m_sampleRate / Engine::audioEngine()->processingSampleRate();
 
 	// calculate how many frames we have in requested pitch
-	const f_cnt_t totalFramesForCurrentPitch = static_cast<f_cnt_t>(
-		(endFrame - startFrame) / freqFactor
-	);
+	const auto totalFramesForCurrentPitch = static_cast<f_cnt_t>((endFrame - startFrame) / freqFactor);
 
 	if (totalFramesForCurrentPitch == 0)
 	{
@@ -1069,7 +1067,7 @@ void SampleBuffer::visualize(
 		float maxData = -1;
 		float minData = 1;
 
-		float rmsData[2] = {0, 0};
+		auto rmsData = std::array<float, 2>{};
 
 		// Find maximum and minimum samples within range
 		for (int i = 0; i < fpp && frame + i <= last; ++i)
@@ -1258,7 +1256,7 @@ void flacStreamEncoderMetadataCallback(
 	b->write((const char *) metadata, sizeof(*metadata));
 }
 
-#endif
+#endif // LMMS_HAVE_FLAC_STREAM_ENCODER_H
 
 
 
@@ -1314,12 +1312,12 @@ QString & SampleBuffer::toBase64(QString & dst) const
 
 	base64::encode(baWriter.buffer().data(), baWriter.buffer().size(), dst);
 
-#else	/* LMMS_HAVE_FLAC_STREAM_ENCODER_H */
+#else	// LMMS_HAVE_FLAC_STREAM_ENCODER_H
 
 	base64::encode((const char *) m_data,
 		m_frames * sizeof(sampleFrame), dst);
 
-#endif	/* LMMS_HAVE_FLAC_STREAM_ENCODER_H */
+#endif	// LMMS_HAVE_FLAC_STREAM_ENCODER_H
 
 	return dst;
 }
@@ -1331,8 +1329,8 @@ SampleBuffer * SampleBuffer::resample(const sample_rate_t srcSR, const sample_ra
 {
 	sampleFrame * data = m_data;
 	const f_cnt_t frames = m_frames;
-	const f_cnt_t dstFrames = static_cast<f_cnt_t>((frames / (float) srcSR) * (float) dstSR);
-	SampleBuffer * dstSB = new SampleBuffer(dstFrames);
+	const auto dstFrames = static_cast<f_cnt_t>((frames / (float)srcSR) * (float)dstSR);
+	auto dstSB = new SampleBuffer(dstFrames);
 	sampleFrame * dstBuf = dstSB->m_origData;
 
 	// yeah, libsamplerate, let's rock with sinc-interpolation!
@@ -1461,7 +1459,7 @@ void flacStreamDecoderErrorCallback(
 	// what to do now??
 }
 
-#endif
+#endif // LMMS_HAVE_FLAC_STREAM_DECODER_H
 
 
 void SampleBuffer::loadFromBase64(const QString & data)
@@ -1517,7 +1515,7 @@ void SampleBuffer::loadFromBase64(const QString & data)
 	m_origData = MM_ALLOC<sampleFrame>( m_origFrames);
 	memcpy(m_origData, dst, dsize);
 
-#endif
+#endif // LMMS_HAVE_FLAC_STREAM_DECODER_H
 
 	delete[] dst;
 

@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_PORTAUDIO_H
-#define AUDIO_PORTAUDIO_H
+#ifndef LMMS_AUDIO_PORTAUDIO_H
+#define LMMS_AUDIO_PORTAUDIO_H
 
 #include <QObject>
 
@@ -143,7 +143,7 @@ private:
 		void *hostApiSpecificStreamInfo;
 
 	} PaStreamParameters;
-#endif
+#endif // PORTAUDIO_V19
 
 	PaStream * m_paStream;
 	PaStreamParameters m_outputParameters;
@@ -163,4 +163,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AUDIO_PORTAUDIO_H

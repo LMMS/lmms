@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef DEBUG_H
-#define DEBUG_H
+#ifndef LMMS_DEBUG_H
+#define LMMS_DEBUG_H
 
 #include "lmmsconfig.h"
 
@@ -33,10 +32,10 @@
 #ifndef NDEBUG
 	#define NDEBUG
 #endif
-#endif
+#endif // LMMS_DEBUG
 
 #include <cassert>
 #include <cstdio>
 
 
-#endif
+#endif // LMMS_DEBUG_H

@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef TEMPO_SYNC_KNOB_MODEL_H
-#define TEMPO_SYNC_KNOB_MODEL_H
+#ifndef LMMS_TEMPO_SYNC_KNOB_MODEL_H
+#define LMMS_TEMPO_SYNC_KNOB_MODEL_H
 
 #include "MeterModel.h"
 
@@ -115,4 +115,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_TEMPO_SYNC_KNOB_MODEL_H

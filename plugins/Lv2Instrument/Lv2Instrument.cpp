@@ -1,7 +1,7 @@
 /*
  * Lv2Instrument.cpp - implementation of LV2 instrument
  *
- * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -78,17 +78,15 @@ Lv2Instrument::Lv2Instrument(InstrumentTrack *instrumentTrackArg,
 {
 	if (Lv2ControlBase::isValid())
 	{
-#ifdef LV2_INSTRUMENT_USE_MIDI
-		for (int i = 0; i < NumKeys; ++i) { m_runningNotes[i] = 0; }
-#endif
+		clearRunningNotes();
+
 		connect(instrumentTrack()->pitchRangeModel(), SIGNAL(dataChanged()),
 			this, SLOT(updatePitchRange()), Qt::DirectConnection);
 		connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged,
-			this, [this](){Lv2ControlBase::reloadPlugin();});
+			this, [this](){onSampleRateChanged();});
 
 		// now we need a play-handle which cares for calling play()
-		InstrumentPlayHandle *iph =
-			new InstrumentPlayHandle(this, instrumentTrackArg);
+		auto iph = new InstrumentPlayHandle(this, instrumentTrackArg);
 		Engine::audioEngine()->addPlayHandle(iph);
 	}
 }
@@ -100,6 +98,37 @@ Lv2Instrument::~Lv2Instrument()
 {
 	Engine::audioEngine()->removePlayHandlesOfTypes(instrumentTrack(),
 		PlayHandle::TypeNotePlayHandle | PlayHandle::TypeInstrumentPlayHandle);
+}
+
+
+
+
+void Lv2Instrument::reload()
+{
+	Lv2ControlBase::reload();
+	clearRunningNotes();
+	emit modelChanged();
+}
+
+
+
+
+void Lv2Instrument::clearRunningNotes()
+{
+#ifdef LV2_INSTRUMENT_USE_MIDI
+	for (int i = 0; i < NumKeys; ++i) { m_runningNotes[i] = 0; }
+#endif
+}
+
+
+
+
+void Lv2Instrument::onSampleRateChanged()
+{
+	// TODO: once lv2 options are implemented,
+	//       plugins that support it might allow changing their samplerate
+	//       through it instead of reloading
+	reload();
 }
 
 
@@ -200,24 +229,8 @@ QString Lv2Instrument::nodeName() const
 
 
 
-DataFile::Types Lv2Instrument::settingsType()
-{
-	return DataFile::InstrumentTrackSettings;
-}
-
-
-
-
-void Lv2Instrument::setNameFromFile(const QString &name)
-{
-	instrumentTrack()->setName(name);
-}
-
-
-
 namespace gui
 {
-
 
 /*
 	Lv2InsView
@@ -231,7 +244,7 @@ Lv2InsView::Lv2InsView(Lv2Instrument *_instrument, QWidget *_parent) :
 	setAutoFillBackground(true);
 	if (m_reloadPluginButton) {
 		connect(m_reloadPluginButton, &QPushButton::clicked,
-			this, [this](){ this->castModel<Lv2Instrument>()->reloadPlugin();} );
+			this, [this](){ this->castModel<Lv2Instrument>()->reload();} );
 	}
 	if (m_toggleUIButton) {
 		connect(m_toggleUIButton, &QPushButton::toggled,
@@ -287,6 +300,8 @@ void Lv2InsView::dropEvent(QDropEvent *_de)
 void Lv2InsView::modelChanged()
 {
 	Lv2ViewBase::modelChanged(castModel<Lv2Instrument>());
+	connect(castModel<Lv2Instrument>(), &Lv2Instrument::modelChanged,
+		this, [this](){ this->modelChanged();} );
 }
 
 
@@ -299,9 +314,7 @@ extern "C"
 PLUGIN_EXPORT Plugin *lmms_plugin_main(Model *_parent, void *_data)
 {
 	using KeyType = Plugin::Descriptor::SubPluginFeatures::Key;
-	Lv2Instrument* ins = new Lv2Instrument(
-							static_cast<InstrumentTrack*>(_parent),
-							static_cast<KeyType*>(_data ));
+	auto ins = new Lv2Instrument(static_cast<InstrumentTrack*>(_parent), static_cast<KeyType*>(_data));
 	if (!ins->isValid()) { delete ins; ins = nullptr; }
 	return ins;
 }

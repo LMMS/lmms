@@ -1,7 +1,7 @@
 /*
  * Lv2Instrument.h - implementation of LV2 instrument
  *
- * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -50,6 +50,8 @@ class Lv2InsView;
 class Lv2Instrument : public Instrument, public Lv2ControlBase
 {
 	Q_OBJECT
+signals:
+	void modelChanged();
 public:
 	/*
 		initialization
@@ -57,6 +59,8 @@ public:
 	Lv2Instrument(InstrumentTrack *instrumentTrackArg,
 		 Descriptor::SubPluginFeatures::Key* key);
 	~Lv2Instrument() override;
+	void reload();
+	void onSampleRateChanged();
 	//! Must be checked after ctor or reload
 	bool isValid() const;
 
@@ -97,12 +101,11 @@ private slots:
 
 private:
 	QString nodeName() const override;
-	DataFile::Types settingsType() override;
-	void setNameFromFile(const QString &name) override;
 
 #ifdef LV2_INSTRUMENT_USE_MIDI
-	int m_runningNotes[NumKeys];
+	std::array<int, NumKeys> m_runningNotes = {};
 #endif
+	void clearRunningNotes();
 
 	friend class gui::Lv2InsView;
 };

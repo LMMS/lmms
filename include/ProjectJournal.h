@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef PROJECT_JOURNAL_H
-#define PROJECT_JOURNAL_H
+#ifndef LMMS_PROJECT_JOURNAL_H
+#define LMMS_PROJECT_JOURNAL_H
 
 #include <QHash>
 #include <QStack>
@@ -122,5 +122,4 @@ private:
 
 } // namespace lmms
 
-#endif
-
+#endif // LMMS_PROJECT_JOURNAL_H

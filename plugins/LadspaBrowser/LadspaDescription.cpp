@@ -72,20 +72,18 @@ LadspaDescription::LadspaDescription( QWidget * _parent,
 	}
 
 	QList<QString> pluginNames;
-	for( l_sortable_plugin_t::iterator it = plugins.begin();
-			it != plugins.end(); ++it )
+	for (const auto& plugin : plugins)
 	{
-		if( _type != VALID || 
-			manager->getDescription( ( *it ).second )->inputChannels
-				<= Engine::audioEngine()->audioDev()->channels() )
-		{ 
-			pluginNames.push_back( ( *it ).first );
-			m_pluginKeys.push_back( ( *it ).second );
+		ch_cnt_t audioDeviceChannels = Engine::audioEngine()->audioDev()->channels();
+		if (_type != VALID || manager->getDescription(plugin.second)->inputChannels <= audioDeviceChannels)
+		{
+			pluginNames.push_back(plugin.first);
+			m_pluginKeys.push_back(plugin.second);
 		}
 	}
 
-	QGroupBox * pluginsBox = new QGroupBox( tr( "Plugins" ), this );
-	QListWidget * pluginList = new QListWidget( pluginsBox );
+	auto pluginsBox = new QGroupBox(tr("Plugins"), this);
+	auto pluginList = new QListWidget(pluginsBox);
 	pluginList->addItems( pluginNames );
 	connect( pluginList, SIGNAL( currentRowChanged( int ) ),
 						SLOT( rowChanged( int ) ) );
@@ -93,15 +91,15 @@ LadspaDescription::LadspaDescription( QWidget * _parent,
 				SLOT( onDoubleClicked( QListWidgetItem * ) ) );
 	( new QVBoxLayout( pluginsBox ) )->addWidget( pluginList );
 
-	QGroupBox * descriptionBox = new QGroupBox( tr( "Description" ), this );
-	QVBoxLayout * descriptionLayout = new QVBoxLayout( descriptionBox );
+	auto descriptionBox = new QGroupBox(tr("Description"), this);
+	auto descriptionLayout = new QVBoxLayout(descriptionBox);
 	descriptionLayout->setSpacing( 0 );
-	descriptionLayout->setMargin( 0 );
+	descriptionLayout->setContentsMargins(0, 0, 0, 0);
 
 	m_scrollArea = new QScrollArea( descriptionBox );
 	descriptionLayout->addWidget( m_scrollArea );
 
-	QVBoxLayout * layout = new QVBoxLayout( this );
+	auto layout = new QVBoxLayout(this);
 	layout->addWidget( pluginsBox );
 	layout->addWidget( descriptionBox );
 
@@ -118,76 +116,76 @@ LadspaDescription::LadspaDescription( QWidget * _parent,
 
 void LadspaDescription::update( const ladspa_key_t & _key )
 {
-	QWidget * description = new QWidget;
+	auto description = new QWidget;
 	m_scrollArea->setWidget( description );
 
-	QVBoxLayout * layout = new QVBoxLayout( description );
+	auto layout = new QVBoxLayout(description);
 	layout->setSizeConstraint( QLayout::SetFixedSize );
 
 	Ladspa2LMMS * manager = Engine::getLADSPAManager();
 
-	QLabel * name = new QLabel( description );
+	auto name = new QLabel(description);
 	name->setText( QWidget::tr( "Name: " ) + manager->getName( _key ) );
 	layout->addWidget( name );
 
-	QWidget * maker = new QWidget( description );
-	QHBoxLayout * makerLayout = new QHBoxLayout( maker );
-	makerLayout->setMargin( 0 );
+	auto maker = new QWidget(description);
+	auto makerLayout = new QHBoxLayout(maker);
+	makerLayout->setContentsMargins(0, 0, 0, 0);
 	makerLayout->setSpacing( 0 );
 	layout->addWidget( maker );
 
-	QLabel * maker_label = new QLabel( maker );
+	auto maker_label = new QLabel(maker);
 	maker_label->setText( QWidget::tr( "Maker: " ) );
 	maker_label->setAlignment( Qt::AlignTop );
-	QLabel * maker_content = new QLabel( maker );
+	auto maker_content = new QLabel(maker);
 	maker_content->setText( manager->getMaker( _key ) );
 	maker_content->setWordWrap( true );
 	makerLayout->addWidget( maker_label );
 	makerLayout->addWidget( maker_content, 1 );
 
-	QWidget * copyright = new QWidget( description );
-	QHBoxLayout * copyrightLayout = new QHBoxLayout( copyright );
-	copyrightLayout->setMargin( 0 );
+	auto copyright = new QWidget(description);
+	auto copyrightLayout = new QHBoxLayout(copyright);
+	copyrightLayout->setContentsMargins(0, 0, 0, 0);
 	copyrightLayout->setSpacing( 0 );
 	layout->addWidget( copyright );
 
-	QLabel * copyright_label = new QLabel( copyright );
+	auto copyright_label = new QLabel(copyright);
 	copyright_label->setText( QWidget::tr( "Copyright: " ) );
 	copyright_label->setAlignment( Qt::AlignTop );
 
-	QLabel * copyright_content = new QLabel( copyright );
+	auto copyright_content = new QLabel(copyright);
 	copyright_content->setText( manager->getCopyright( _key ) );
 	copyright_content->setWordWrap( true );
 	copyrightLayout->addWidget( copyright_label );
 	copyrightLayout->addWidget( copyright_content, 1 );
 
-	QLabel * requiresRealTime = new QLabel( description );
+	auto requiresRealTime = new QLabel(description);
 	requiresRealTime->setText( QWidget::tr( "Requires Real Time: " ) +
 				( manager->hasRealTimeDependency( _key ) ?
 							QWidget::tr( "Yes" ) :
 							QWidget::tr( "No" ) ) );
 	layout->addWidget( requiresRealTime );
 
-	QLabel * realTimeCapable = new QLabel( description );
+	auto realTimeCapable = new QLabel(description);
 	realTimeCapable->setText( QWidget::tr( "Real Time Capable: " ) +
 					( manager->isRealTimeCapable( _key ) ?
 							QWidget::tr( "Yes" ) :
 							QWidget::tr( "No" ) ) );
 	layout->addWidget( realTimeCapable );
 
-	QLabel * inplaceBroken = new QLabel( description );
+	auto inplaceBroken = new QLabel(description);
 	inplaceBroken->setText( QWidget::tr( "In Place Broken: " ) +
 					( manager->isInplaceBroken( _key ) ?
 							QWidget::tr( "Yes" ) :
 							QWidget::tr( "No" ) ) );
 	layout->addWidget( inplaceBroken );
 
-	QLabel * channelsIn = new QLabel( description );
+	auto channelsIn = new QLabel(description);
 	channelsIn->setText( QWidget::tr( "Channels In: " ) + QString::number(
 			manager->getDescription( _key )->inputChannels ) );
 	layout->addWidget( channelsIn );
 
-	QLabel * channelsOut = new QLabel( description );
+	auto channelsOut = new QLabel(description);
 	channelsOut->setText( QWidget::tr( "Channels Out: " ) + QString::number(
 			manager->getDescription( _key )->outputChannels ) );
 	layout->addWidget( channelsOut );

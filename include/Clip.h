@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef TRACK_CONTENT_OBJECT_H
-#define TRACK_CONTENT_OBJECT_H
+#ifndef LMMS_CLIP_H
+#define LMMS_CLIP_H
 
 #include <QColor>
 
@@ -93,6 +93,12 @@ public:
 		return m_length;
 	}
 
+	/*! \brief Specify whether or not a TCO automatically resizes.
+	 *
+	 *  If a TCO does automatically resize, it cannot be manually
+	 *  resized by clicking and dragging its edge.
+	 *
+	 */
 	inline void setAutoResize( const bool r )
 	{
 		m_autoResize = r;
@@ -188,4 +194,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_CLIP_H

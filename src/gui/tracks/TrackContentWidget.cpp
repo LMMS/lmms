@@ -174,11 +174,10 @@ void TrackContentWidget::removeClipView( ClipView * clipv )
  */
 void TrackContentWidget::update()
 {
-	for( clipViewVector::iterator it = m_clipViews.begin();
-				it != m_clipViews.end(); ++it )
+	for (const auto& clipView : m_clipViews)
 	{
-		( *it )->setFixedHeight( height() - 1 );
-		( *it )->update();
+		clipView->setFixedHeight(height() - 1);
+		clipView->update();
 	}
 	QWidget::update();
 }
@@ -200,28 +199,20 @@ void TrackContentWidget::changePosition( const TimePos & newPos )
 		setUpdatesEnabled( false );
 
 		// first show clip for current pattern...
-		for( clipViewVector::iterator it = m_clipViews.begin();
-						it != m_clipViews.end(); ++it )
+		for (const auto& clipView : m_clipViews)
 		{
-		if ((*it)->getClip()->startPosition().getBar() == curPattern)
+			if (clipView->getClip()->startPosition().getBar() == curPattern)
 			{
-				( *it )->move( 0, ( *it )->y() );
-				( *it )->raise();
-				( *it )->show();
+				clipView->move(0, clipView->y());
+				clipView->raise();
+				clipView->show();
 			}
-			else
-			{
-				( *it )->lower();
-			}
+			else { clipView->lower(); }
 		}
 		// ...then hide others to avoid flickering
-		for( clipViewVector::iterator it = m_clipViews.begin();
-					it != m_clipViews.end(); ++it )
+		for (const auto& clipView : m_clipViews)
 		{
-			if ((*it)->getClip()->startPosition().getBar() != curPattern)
-			{
-				( *it )->hide();
-			}
+			if (clipView->getClip()->startPosition().getBar() != curPattern) { clipView->hide(); }
 		}
 		setUpdatesEnabled( true );
 		return;
@@ -238,11 +229,9 @@ void TrackContentWidget::changePosition( const TimePos & newPos )
 	const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
 
 	setUpdatesEnabled( false );
-	for( clipViewVector::iterator it = m_clipViews.begin();
-						it != m_clipViews.end(); ++it )
+	for (const auto& clipView : m_clipViews)
 	{
-		ClipView * clipv = *it;
-		Clip * clip = clipv->getClip();
+		Clip* clip = clipView->getClip();
 
 		clip->changeLength( clip->length() );
 
@@ -252,17 +241,15 @@ void TrackContentWidget::changePosition( const TimePos & newPos )
 			( te >= begin && te <= end ) ||
 			( ts <= begin && te >= end ) )
 		{
-			clipv->move( static_cast<int>( ( ts - begin ) * ppb /
-						TimePos::ticksPerBar() ),
-								clipv->y() );
-			if( !clipv->isVisible() )
+			clipView->move(static_cast<int>((ts - begin) * ppb / TimePos::ticksPerBar()), clipView->y());
+			if (!clipView->isVisible())
 			{
-				clipv->show();
+				clipView->show();
 			}
 		}
 		else
 		{
-			clipv->move( -clipv->width()-10, clipv->y() );
+			clipView->move(-clipView->width() - 10, clipView->y());
 		}
 	}
 	setUpdatesEnabled( true );
@@ -456,10 +443,9 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, 
 	// Unselect the old group
 		const QVector<selectableObject *> so =
 			m_trackView->trackContainerView()->selectedObjects();
-		for( QVector<selectableObject *>::const_iterator it = so.begin();
-		    	it != so.end(); ++it )
+		for (const auto& obj : so)
 		{
-			( *it )->setSelected( false );
+			obj->setSelected(false);
 		}
 
 
@@ -468,7 +454,7 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, 
 
 	float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
 	// All clips should be offset the same amount as the grabbed clip
-	TimePos offset = TimePos(clipPos - grabbedClipPos);
+	auto offset = TimePos(clipPos - grabbedClipPos);
 	// Users expect clips to "fall" backwards, so bias the offset
 	offset -= TimePos::ticksPerBar() * snapSize / 2;
 	// The offset is quantized (rather than the positions) to preserve fine adjustments

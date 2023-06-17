@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef REMOTE_PLUGIN_CLIENT_H
-#define REMOTE_PLUGIN_CLIENT_H
+#ifndef LMMS_REMOTE_PLUGIN_CLIENT_H
+#define LMMS_REMOTE_PLUGIN_CLIENT_H
 
 #include "RemotePluginBase.h"
 
@@ -173,7 +173,7 @@ private:
 	std::condition_variable m_cv;
 	std::thread m_thread;
 };
-#endif
+#endif // LMMS_BUILD_WIN32
 
 #ifdef SYNC_WITH_SHM_FIFO
 RemotePluginClient::RemotePluginClient( const std::string& _shm_in, const std::string& _shm_out ) :
@@ -355,4 +355,4 @@ void RemotePluginClient::doProcessing()
 
 } // namespace lmms
 
-#endif // REMOTE_PLUGIN_CLIENT_H
+#endif // LMMS_REMOTE_PLUGIN_CLIENT_H

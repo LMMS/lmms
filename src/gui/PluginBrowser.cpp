@@ -27,6 +27,7 @@
 #include <QHeaderView>
 #include <QLabel>
 #include <QLineEdit>
+#include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QStyleOption>
@@ -34,7 +35,10 @@
 
 #include "embed.h"
 #include "Engine.h"
+#include "InstrumentTrack.h"
+#include "Song.h"
 #include "StringPairDrag.h"
+#include "TrackContainerView.h"
 #include "PluginFactory.h"
 
 namespace lmms::gui
@@ -51,8 +55,8 @@ PluginBrowser::PluginBrowser( QWidget * _parent ) :
 
 	addContentWidget( m_view );
 
-	QVBoxLayout * view_layout = new QVBoxLayout( m_view );
-	view_layout->setMargin( 5 );
+	auto view_layout = new QVBoxLayout(m_view);
+	view_layout->setContentsMargins(5, 5, 5, 5);
 	view_layout->setSpacing( 5 );
 
 
@@ -63,7 +67,7 @@ PluginBrowser::PluginBrowser( QWidget * _parent ) :
 								m_view );
 	hint->setWordWrap( true );
 
-	QLineEdit * searchBar = new QLineEdit( m_view );
+	auto searchBar = new QLineEdit(m_view);
 	searchBar->setPlaceholderText( "Search" );
 	searchBar->setMaxLength( 64 );
 	searchBar->setClearButtonEnabled( true );
@@ -120,8 +124,7 @@ void PluginBrowser::onFilterChanged( const QString & filter )
 		for (int itemIndex = 0; itemIndex < itemCount; ++itemIndex)
 		{
 			QTreeWidgetItem * item = root->child( itemIndex );
-			PluginDescWidget * descWidget = static_cast<PluginDescWidget *>
-							(m_descTree->itemWidget( item, 0));
+			auto descWidget = static_cast<PluginDescWidget*>(m_descTree->itemWidget(item, 0));
 			if (descWidget->name().contains(filter, Qt::CaseInsensitive))
 			{
 				item->setHidden( false );
@@ -285,6 +288,26 @@ void PluginDescWidget::mousePressEvent( QMouseEvent * _me )
 			QString::fromUtf8(m_pluginKey.desc->name), m_logo, this);
 		leaveEvent( _me );
 	}
+}
+
+
+void PluginDescWidget::contextMenuEvent(QContextMenuEvent* e)
+{
+	QMenu contextMenu(this);
+	contextMenu.addAction(
+		tr("Send to new instrument track"),
+		[=]{ openInNewInstrumentTrack(m_pluginKey.desc->name); }
+	);
+	contextMenu.exec(e->globalPos());
+}
+
+
+void PluginDescWidget::openInNewInstrumentTrack(QString value)
+{
+	TrackContainer* tc = Engine::getSong();
+	auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::InstrumentTrack, tc));
+	auto ilt = new InstrumentLoaderThread(this, it, value);
+	ilt->start();
 }
 
 

@@ -62,7 +62,7 @@ namespace lmms::gui
 
 /*! The scale of C Major - white keys only.
  */
-Keys WhiteKeys[] =
+auto WhiteKeys = std::array
 {
 	Key_C, Key_D, Key_E, Key_F, Key_G, Key_A, Key_H
 } ;
@@ -145,9 +145,9 @@ PianoView::PianoView(QWidget *parent) :
 			this, SLOT(pianoScrolled(int)));
 
 	// create a layout for ourselves
-	QVBoxLayout * layout = new QVBoxLayout( this );
+	auto layout = new QVBoxLayout(this);
 	layout->setSpacing( 0 );
-	layout->setMargin( 0 );
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->addSpacing( PIANO_BASE+PW_WHITE_KEY_HEIGHT );
 	layout->addWidget( m_pianoScroll );
 
@@ -211,7 +211,7 @@ int PianoView::getKeyFromKeyEvent( QKeyEvent * _ke )
 		case 13: return 30; // =
 		case 27: return 31; // ]
 	}
-#endif
+#endif // LMMS_BUILD_WIN32
 #if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_OPENBSD) || defined(LMMS_BUILD_FREEBSD)
 	switch( k )
 	{
@@ -292,7 +292,7 @@ int PianoView::getKeyFromKeyEvent( QKeyEvent * _ke )
 		case 29: return 27; // 0 = d'#
 		case 35: return 28; // P = e'
 	}
-#endif
+#endif // LMMS_BUILD_APPLE
 
 	return -100;
 }

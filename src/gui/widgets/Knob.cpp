@@ -45,14 +45,14 @@
 #include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "ProjectJournal.h"
+#include "SimpleTextFloat.h"
 #include "StringPairDrag.h"
-#include "TextFloat.h"
 
 
 namespace lmms::gui
 {
 
-TextFloat * Knob::s_textFloat = nullptr;
+SimpleTextFloat * Knob::s_textFloat = nullptr;
 
 
 
@@ -86,7 +86,7 @@ void Knob::initUi( const QString & _name )
 {
 	if( s_textFloat == nullptr )
 	{
-		s_textFloat = new TextFloat;
+		s_textFloat = new SimpleTextFloat;
 	}
 
 	setWindowTitle( _name );
@@ -550,9 +550,8 @@ void Knob::dropEvent( QDropEvent * _de )
 	else if( type == "automatable_model" )
 	{
 		auto journalID = Uuid::FromString(val.toStdString() );
-		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
-				Engine::projectJournal()->
-					journallingObject( journalID ) );
+		auto* mod = dynamic_cast<AutomatableModel*>(
+				Engine::projectJournal()->journallingObject(journalID));
 		if( mod != nullptr )
 		{
 			AutomatableModel::linkModels( model(), mod );
@@ -710,7 +709,7 @@ void Knob::wheelEvent(QWheelEvent * we)
 void Knob::setPosition( const QPoint & _p )
 {
 	const float value = getValue( _p ) + m_leftOver;
-	const float step = model()->step<float>();
+	const auto step = model()->step<float>();
 	const float oldValue = model()->value();
 
 

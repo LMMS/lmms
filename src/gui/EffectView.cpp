@@ -23,9 +23,11 @@
  *
  */
 
+#include <QGraphicsOpacityEffect>
+#include <QLayout>
+#include <QMouseEvent>
 #include <QPushButton>
 #include <QPainter>
-#include <QLayout>
 
 #include "EffectView.h"
 #include "DummyEffect.h"
@@ -47,9 +49,10 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	PluginView( _model, _parent ),
 	m_bg( embed::getIconPixmap( "effect_plugin" ) ),
 	m_subWindow( nullptr ),
-	m_controlView( nullptr )
+	m_controlView(nullptr),
+	m_dragging(false)
 {
-	setFixedSize( EffectView::DEFAULT_WIDTH, 60 );
+	setFixedSize(EffectView::DEFAULT_WIDTH, EffectView::DEFAULT_HEIGHT);
 
 	// Disable effects that are of type "DummyEffect"
 	bool isEnabled = !dynamic_cast<DummyEffect *>( effect() );
@@ -85,8 +88,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 	if( effect()->controls()->controlCount() > 0 )
 	{
-		QPushButton * ctls_btn = new QPushButton( tr( "Controls" ),
-									this );
+		auto ctls_btn = new QPushButton(tr("Controls"), this);
 		QFont f = ctls_btn->font();
 		ctls_btn->setFont( pointSize<8>( f ) );
 		ctls_btn->setGeometry( 150, 14, 50, 20 );
@@ -117,7 +119,10 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 			m_subWindow->hide();
 		}
 	}
-
+	
+	m_opacityEffect = new QGraphicsOpacityEffect(this);
+	m_opacityEffect->setOpacity(1);
+	setGraphicsEffect(m_opacityEffect);
 
 	//move above vst effect view creation
 	//setModel( _model );
@@ -207,6 +212,43 @@ void EffectView::contextMenuEvent( QContextMenuEvent * )
 	delete contextMenu;
 }
 
+
+
+void EffectView::mousePressEvent(QMouseEvent* event)
+{
+	if (event->button() == Qt::LeftButton)
+	{
+		m_dragging = true;
+		m_opacityEffect->setOpacity(0.3);
+		QCursor c(Qt::SizeVerCursor);
+		QApplication::setOverrideCursor(c);
+		update();
+	}
+}
+
+void EffectView::mouseReleaseEvent(QMouseEvent* event)
+{
+	if (event->button() == Qt::LeftButton)
+	{
+		m_dragging = false;
+		m_opacityEffect->setOpacity(1);
+		QApplication::restoreOverrideCursor();
+		update();
+	}
+}
+
+void EffectView::mouseMoveEvent(QMouseEvent* event)
+{
+	if (!m_dragging) { return; }
+	if (event->pos().y() < 0)
+	{
+		moveUp();
+	}
+	else if (event->pos().y() > EffectView::DEFAULT_HEIGHT)
+	{
+		moveDown();
+	}
+}
 
 
 

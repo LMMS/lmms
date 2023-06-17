@@ -166,8 +166,7 @@ void AutomationClipView::flipX()
 
 void AutomationClipView::constructContextMenu( QMenu * _cm )
 {
-	QAction * a = new QAction( embed::getIconPixmap( "automation" ),
-				tr( "Open in Automation editor" ), _cm );
+	auto a = new QAction(embed::getIconPixmap("automation"), tr("Open in Automation editor"), _cm);
 	_cm->insertAction( _cm->actions()[0], a );
 	connect(a, SIGNAL(triggered()), this, SLOT(openInAutomationEditor()));
 	_cm->insertSeparator( _cm->actions()[1] );
@@ -195,17 +194,13 @@ void AutomationClipView::constructContextMenu( QMenu * _cm )
 	if( !m_clip->m_objects.isEmpty() )
 	{
 		_cm->addSeparator();
-		QMenu * m = new QMenu( tr( "%1 Connections" ).
-				arg( m_clip->m_objects.count() ), _cm );
-		for( AutomationClip::objectVector::iterator it =
-						m_clip->m_objects.begin();
-					it != m_clip->m_objects.end(); ++it )
+		auto m = new QMenu(tr("%1 Connections").arg(m_clip->m_objects.count()), _cm);
+		for (const auto& object : m_clip->m_objects)
 		{
-			if( *it )
+			if (object)
 			{
-				a = new QAction( tr( "Disconnect \"%1\"" ).
-					arg( ( *it )->fullDisplayName() ), m );
-				a->setData( ( *it )->id() );
+				a = new QAction(tr("Disconnect \"%1\"").arg(object->fullDisplayName()), m);
+				a->setData(object->id());
 				m->addAction( a );
 			}
 		}
@@ -276,8 +271,8 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 				/ (float) m_clip->timeMapLength().getBar() :
 								pixelsPerBar();
 
-	const float min = m_clip->firstObject()->minValue<float>();
-	const float max = m_clip->firstObject()->maxValue<float>();
+	const auto min = m_clip->firstObject()->minValue<float>();
+	const auto max = m_clip->firstObject()->maxValue<float>();
 
 	const float y_scale = max - min;
 	const float h = ( height() - 2 * BORDER_WIDTH ) / y_scale;
@@ -303,7 +298,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 		if( it+1 == m_clip->getTimeMap().end() )
 		{
 			const float x1 = POS(it) * ppTick;
-			const float x2 = (float)( width() - BORDER_WIDTH );
+			const auto x2 = (float)(width() - BORDER_WIDTH);
 			if( x1 > ( width() - BORDER_WIDTH ) ) break;
 			// We are drawing the space after the last node, so we use the outValue
 			if( gradient() )
@@ -434,10 +429,9 @@ void AutomationClipView::dropEvent( QDropEvent * _de )
 	QString val = StringPairDrag::decodeValue( _de );
 	if( type == "automatable_model" )
 	{
-		auto journalID = Uuid::FromString(val.toStdString() );
-		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
-				Engine::projectJournal()->
-					journallingObject( journalID ) );
+		auto journalID = Uuid::FromString(val.toStdString());
+		auto* mod = dynamic_cast<AutomatableModel*>(
+				Engine::projectJournal()->journallingObject( journalID));
 		if( mod != nullptr )
 		{
 			bool added = m_clip->addObject( mod );

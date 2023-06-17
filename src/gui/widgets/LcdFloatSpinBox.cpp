@@ -38,6 +38,7 @@
 #include <QVBoxLayout>
 
 #include "CaptionMenu.h"
+#include "DeprecationHelper.h"
 #include "embed.h"
 #include "GuiApplication.h"
 #include "gui_templates.h"
@@ -76,14 +77,14 @@ LcdFloatSpinBox::LcdFloatSpinBox(int numWhole, int numFrac, const QString& style
 void LcdFloatSpinBox::layoutSetup(const QString &style)
 {
 	// Assemble the LCD parts
-	QHBoxLayout *lcdLayout = new QHBoxLayout();
+	auto lcdLayout = new QHBoxLayout();
 
 	m_wholeDisplay.setSeamless(false, true);
 	m_fractionDisplay.setSeamless(true, false);
 
 	lcdLayout->addWidget(&m_wholeDisplay);
 
-	QLabel *dotLabel = new QLabel("", this);
+	auto dotLabel = new QLabel("", this);
 	QPixmap dotPixmap(embed::getIconPixmap(QString("lcd_" + style + "_dot").toUtf8().constData()));
 	dotLabel->setPixmap(dotPixmap.copy(0, 0, dotPixmap.size().width(), dotPixmap.size().height() / 2));
 	lcdLayout->addWidget(dotLabel);
@@ -94,7 +95,7 @@ void LcdFloatSpinBox::layoutSetup(const QString &style)
 	lcdLayout->setSpacing(0);
 
 	// Add space for label
-	QVBoxLayout *outerLayout = new QVBoxLayout();
+	auto outerLayout = new QVBoxLayout();
 	outerLayout->addLayout(lcdLayout);
 	outerLayout->addSpacing(9);
 	outerLayout->setContentsMargins(0, 0, 0, 0);
@@ -179,7 +180,7 @@ void LcdFloatSpinBox::mouseReleaseEvent(QMouseEvent*)
 void LcdFloatSpinBox::wheelEvent(QWheelEvent *event)
 {
 	// switch between integer and fractional step based on cursor position
-	if (event->x() < m_wholeDisplay.width()) { m_intStep = true; }
+	if (position(event).x() < m_wholeDisplay.width()) { m_intStep = true; }
 	else { m_intStep = false; }
 
 	event->accept();
@@ -239,9 +240,9 @@ void LcdFloatSpinBox::paintEvent(QPaintEvent*)
 	{
 		p.setFont(pointSizeF(p.font(), 6.5));
 		p.setPen(m_wholeDisplay.textShadowColor());
-		p.drawText(width() / 2 - p.fontMetrics().width(m_label) / 2 + 1, height(), m_label);
+		p.drawText(width() / 2 - horizontalAdvance(p.fontMetrics(), m_label) / 2 + 1, height(), m_label);
 		p.setPen(m_wholeDisplay.textColor());
-		p.drawText(width() / 2 - p.fontMetrics().width(m_label) / 2, height() - 1, m_label);
+		p.drawText(width() / 2 - horizontalAdvance(p.fontMetrics(), m_label) / 2, height() - 1, m_label);
 	}
 }
 

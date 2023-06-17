@@ -304,9 +304,9 @@ void InstrumentTrack::processCCEvent(int controller)
 	// Does nothing if the LED is disabled
 	if (!m_midiCCEnable->value()) { return; }
 
-	uint8_t channel = static_cast<uint8_t>(midiPort()->realOutputChannel());
-	uint16_t cc = static_cast<uint16_t>(controller);
-	uint16_t value = static_cast<uint16_t>(m_midiCCModel[controller]->value());
+	auto channel = static_cast<uint8_t>(midiPort()->realOutputChannel());
+	auto cc = static_cast<uint16_t>(controller);
+	auto value = static_cast<uint16_t>(m_midiCCModel[controller]->value());
 
 	// Process the MIDI CC event as an input event but with source set to Internal
 	// so we can know LMMS generated the event, not a controller, and can process it during
@@ -621,10 +621,9 @@ void InstrumentTrack::setName( const QString & _new_name )
 void InstrumentTrack::updateBaseNote()
 {
 	Engine::audioEngine()->requestChangeInModel();
-	for( NotePlayHandleList::Iterator it = m_processHandles.begin();
-					it != m_processHandles.end(); ++it )
+	for (const auto& processHandle : m_processHandles)
 	{
-		( *it )->setFrequencyUpdate();
+		processHandle->setFrequencyUpdate();
 	}
 	Engine::audioEngine()->doneChangeInModel();
 }
@@ -711,10 +710,9 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 	}
 
 	// Handle automation: detuning
-	for( NotePlayHandleList::Iterator it = m_processHandles.begin();
-					it != m_processHandles.end(); ++it )
+	for (const auto& processHandle : m_processHandles)
 	{
-		( *it )->processTimePos( _start );
+		processHandle->processTimePos(_start);
 	}
 
 	if ( clips.size() == 0 )
@@ -725,14 +723,12 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 
 	bool played_a_note = false;	// will be return variable
 
-	for( clipVector::Iterator it = clips.begin(); it != clips.end(); ++it )
+	for (const auto& clip : clips)
 	{
-		MidiClip* c = dynamic_cast<MidiClip*>( *it );
+		auto c = dynamic_cast<MidiClip*>(clip);
 		// everything which is not a MIDI clip won't be played
 		// A MIDI clip playing in the Piano Roll window will always play
-		if(c == nullptr ||
-			(Engine::getSong()->playMode() != Song::Mode_PlayMidiClip
-			&& (*it)->isMuted()))
+		if (c == nullptr || (Engine::getSong()->playMode() != Song::Mode_PlayMidiClip && clip->isMuted()))
 		{
 			continue;
 		}
@@ -791,7 +787,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 
 Clip* InstrumentTrack::createClip(const TimePos & pos)
 {
-	MidiClip* p = new MidiClip(this);
+	auto p = new MidiClip(this);
 	p->movePosition(pos);
 	return p;
 }

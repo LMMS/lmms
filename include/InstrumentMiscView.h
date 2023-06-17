@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef INSTRUMENT_MISC_VIEW_H
-#define INSTRUMENT_MISC_VIEW_H
+#ifndef LMMS_GUI_INSTRUMENT_MISC_VIEW_H
+#define LMMS_GUI_INSTRUMENT_MISC_VIEW_H
 
 #include <QWidget>
 
@@ -71,4 +71,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_INSTRUMENT_MISC_VIEW_H

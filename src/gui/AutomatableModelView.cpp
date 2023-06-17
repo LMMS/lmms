@@ -55,7 +55,7 @@ void AutomatableModelView::addDefaultActions( QMenu* menu )
 {
 	AutomatableModel* model = modelUntyped();
 
-	AutomatableModelViewSlots* amvSlots = new AutomatableModelViewSlots( this, menu );
+	auto amvSlots = new AutomatableModelViewSlots(this, menu);
 
 	menu->addAction( embed::getIconPixmap( "reload" ),
 						AutomatableModel::tr( "&Reset (%1%2)" ).
@@ -176,7 +176,7 @@ void AutomatableModelView::mousePressEvent( QMouseEvent* event )
 		new gui::StringPairDrag("automatable_model", QString::fromStdString(Uuid::AsString(modelUntyped()->id()) ), QPixmap(), widget() );
 		event->accept();
 	}
-	else if( event->button() == Qt::MidButton )
+	else if( event->button() == Qt::MiddleButton )
 	{
 		modelUntyped()->reset();
 	}
@@ -230,7 +230,7 @@ void AutomatableModelViewSlots::execConnectionDialog()
 			// New
 			else
 			{
-				ControllerConnection* cc = new ControllerConnection(d.chosenController());
+				auto cc = new ControllerConnection(d.chosenController());
 				m->setControllerConnection( cc );
 				//cc->setTargetName( m->displayName() );
 			}

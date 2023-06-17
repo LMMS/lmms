@@ -211,7 +211,7 @@ InstrumentTrackWindow * InstrumentTrackView::topLevelInstrumentTrackWindow()
 				getGUI()->mainWindow()->workspace()->subWindowList(
 											QMdiArea::ActivationHistoryOrder ) )
 	{
-		if( sw->isVisible() && sw->widget()->inherits( "InstrumentTrackWindow" ) )
+		if( sw->isVisible() && sw->widget()->inherits( "lmms::gui::InstrumentTrackWindow" ) )
 		{
 			w = qobject_cast<InstrumentTrackWindow *>( sw->widget() );
 		}
@@ -366,7 +366,7 @@ QMenu * InstrumentTrackView::createMixerMenu(QString title, QString newMixerLabe
 		title = title.arg( channelIndex ).arg( mixerChannel->m_name );
 	}
 
-	QMenu *mixerMenu = new QMenu( title );
+	auto mixerMenu = new QMenu(title);
 
 	mixerMenu->addAction( newMixerLabel, this, SLOT(createMixerLine()));
 	mixerMenu->addSeparator();

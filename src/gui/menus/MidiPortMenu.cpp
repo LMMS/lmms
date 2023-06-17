@@ -45,7 +45,7 @@ MidiPortMenu::MidiPortMenu( MidiPort::Modes _mode ) :
 
 void MidiPortMenu::modelChanged()
 {
-	MidiPort * mp = castModel<MidiPort>();
+	auto mp = castModel<MidiPort>();
 	if( m_mode == MidiPort::Input )
 	{
 		connect( mp, SIGNAL(readablePortsChanged()),
@@ -81,7 +81,7 @@ void MidiPortMenu::activatedPort( QAction * _item )
 
 void MidiPortMenu::updateMenu()
 {
-	MidiPort * mp = castModel<MidiPort>();
+	auto mp = castModel<MidiPort>();
 	const MidiPort::Map & map = ( m_mode == MidiPort::Input ) ?
 				mp->readablePorts() : mp->writablePorts();
 	clear();
