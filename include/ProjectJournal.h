@@ -25,7 +25,7 @@
 #ifndef LMMS_PROJECT_JOURNAL_H
 #define LMMS_PROJECT_JOURNAL_H
 
-#include <QHash>
+#include <unordered_map>
 #include <QStack>
 #include <uuid.h>
 
@@ -99,7 +99,6 @@ public:
 
 
 private:
-//	using JoIdMap = QHash<jo_id_t, JournallingObject*>;
 	using JoIdMap = std::unordered_map<jo_id_t, JournallingObject*>;
 
 	struct CheckPoint
