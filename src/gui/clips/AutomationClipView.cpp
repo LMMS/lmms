@@ -40,6 +40,8 @@
 
 #include "Engine.h"
 
+#include "UuidQt.h"
+
 
 namespace lmms::gui
 {
@@ -200,7 +202,7 @@ void AutomationClipView::constructContextMenu( QMenu * _cm )
 			if (object)
 			{
 				a = new QAction(tr("Disconnect \"%1\"").arg(object->fullDisplayName()), m);
-				a->setData(object->id());
+				a->setData(QVariant::fromValue(object->id()));
 				m->addAction( a );
 			}
 		}

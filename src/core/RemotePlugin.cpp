@@ -37,7 +37,7 @@
 #include "AudioEngine.h"
 #include "Engine.h"
 #include "Song.h"
-#include "uuid.h"
+#include "UuidUtility.h"
 
 #include <QCoreApplication>
 #include <QDebug>

@@ -29,7 +29,7 @@
 #include <limits>
 
 #include "lmmsconfig.h"
-#include "uuid.h"
+#include "UuidUtility.h"
 
 #include <cstdint>
 #include <array>

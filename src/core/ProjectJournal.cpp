@@ -137,11 +137,7 @@ jo_id_t ProjectJournal::allocID( JournallingObject * _obj )
 
 void ProjectJournal::reallocID( const jo_id_t _id, JournallingObject * _obj )
 {
-	//printf("realloc %d %d\n", _id, _obj );
-//	if( m_joIDs.contains( _id ) )
-	{
-		m_joIDs[_id] = _obj;
-	}
+	m_joIDs[_id] = _obj;
 }
 
 
@@ -150,9 +146,9 @@ void ProjectJournal::clearJournal()
 	m_undoCheckPoints.clear();
 	m_redoCheckPoints.clear();
 
-	for( JoIdMap::Iterator it = m_joIDs.begin(); it != m_joIDs.end(); )
+	for( auto it = m_joIDs.begin(); it != m_joIDs.end(); )
 	{
-		if( it.value() == nullptr )
+		if( it->second == nullptr )
 		{
 			it = m_joIDs.erase( it );
 		}
@@ -165,11 +161,11 @@ void ProjectJournal::clearJournal()
 
 void ProjectJournal::stopAllJournalling()
 {
-	for( JoIdMap::Iterator it = m_joIDs.begin(); it != m_joIDs.end(); ++it)
+	for(auto& m_joID : m_joIDs)
 	{
-		if( it.value() != nullptr )
+		if( m_joID.second != nullptr )
 		{
-			it.value()->setJournalling(false);
+			m_joID.second->setJournalling(false);
 		}
 	}
 	setJournalling(false);

@@ -22,6 +22,9 @@ ENDIF(COMMAND CMAKE_POLICY)
 # Import of windows.h breaks min()/max()
 ADD_DEFINITIONS(-DNOMINMAX)
 
+# visible to all parts of the codebase
+INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/3rdparty/include")
+
 # CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES is not set correctly for MinGW until
 # CMake 3.14.1, so avoid specifying system include directories on affected
 # versions. Normal include directories are safe, since GCC ignores them if they
