@@ -66,7 +66,7 @@ Track::Track( TrackTypes type, TrackContainer * tc ) :
 	m_simpleSerializingMode( false ),
 	m_clips(),        /*!< The clips (segments) */
 	m_color( 0, 0, 0 ),
-	m_hasColor( false ),
+	m_hasColor(false),
 	m_length(0)
 {
 	m_trackContainer->addTrack( this );
@@ -549,8 +549,8 @@ void Track::removeBar( const TimePos & pos )
 /*! \brief Calculate the length of the entire track in bars
  *
  *  We step through our list of Clips and determine their end position,
- *  keeping track of the latest time found in ticks.  Then we return
- *  that in bars by dividing by the number of ticks per bar.
+ *  keeping track of the latest time found in ticks.  Then we convert
+ *  that to bars by dividing by the number of ticks per bar.
  */
 void Track::updateLength()
 {
@@ -564,15 +564,12 @@ void Track::updateLength()
 		}
 
 		const tick_t cur = clip->endPosition();
-		if (cur > last)
-		{
-			last = cur;
-		}
+		if (cur > last) { last = cur; }
 	}
 
 	m_length = last / TimePos::ticksPerBar();
 	
-	if (Engine::getSong()) { Engine::getSong()->updateLength(); };
+	Engine::getSong()->updateLength();
 }
 
 
