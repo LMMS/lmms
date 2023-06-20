@@ -556,16 +556,15 @@ void Track::updateLength()
 {
 	// find last end-position
 	tick_t last = 0;
-	for( clipVector::const_iterator it = m_clips.begin(); it != m_clips.end(); ++it )
+	for (const auto& clip : m_clips)
 	{
-		if( Engine::getSong()->isExporting() &&
-				( *it )->isMuted() )
+		if (Engine::getSong()->isExporting() && clip->isMuted())
 		{
 			continue;
 		}
 
-		const tick_t cur = ( *it )->endPosition();
-		if( cur > last )
+		const tick_t cur = clip->endPosition();
+		if (cur > last)
 		{
 			last = cur;
 		}
@@ -573,7 +572,7 @@ void Track::updateLength()
 
 	m_length = last / TimePos::ticksPerBar();
 	
-	Engine::getSong()->updateLength();
+	if (Engine::getSong()) { Engine::getSong()->updateLength(); };
 }
 
 
