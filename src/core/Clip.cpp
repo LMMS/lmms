@@ -98,7 +98,7 @@ void Clip::movePosition( const TimePos & pos )
 		Engine::audioEngine()->requestChangeInModel();
 		m_startPosition = newPos;
 		Engine::audioEngine()->doneChangeInModel();
-		Engine::getSong()->updateLength();
+		getTrack()->updateLength();
 		emit positionChanged();
 	}
 }
@@ -116,7 +116,7 @@ void Clip::movePosition( const TimePos & pos )
 void Clip::changeLength( const TimePos & length )
 {
 	m_length = length;
-	Engine::getSong()->updateLength();
+	if (getTrack()) { getTrack()->updateLength(); }
 	emit lengthChanged();
 }
 

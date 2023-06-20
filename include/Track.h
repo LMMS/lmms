@@ -143,8 +143,11 @@ public:
 	void insertBar( const TimePos & pos );
 	void removeBar( const TimePos & pos );
 
-	bar_t length() const;
-
+	void updateLength();
+	inline bar_t length()
+	{
+		return m_length;
+	}
 
 	inline TrackContainer* trackContainer() const
 	{
@@ -242,6 +245,8 @@ private:
 	
 	QColor m_color;
 	bool m_hasColor;
+	
+	bar_t m_length;
 
 	friend class gui::TrackView;
 
