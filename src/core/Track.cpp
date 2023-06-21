@@ -555,7 +555,7 @@ void Track::updateLength()
 	tick_t last = 0;
 	for (const auto& clip : m_clips)
 	{
-		if (Engine::getSong()->isExporting() && clip->isMuted())
+		if (Engine::getSong() && Engine::getSong()->isExporting() && clip->isMuted())
 		{
 			continue;
 		}
@@ -566,7 +566,7 @@ void Track::updateLength()
 
 	m_length = last / TimePos::ticksPerBar();
 	
-	Engine::getSong()->updateLength();
+	if (Engine::getSong()) { Engine::getSong()->updateLength(); };
 }
 
 
