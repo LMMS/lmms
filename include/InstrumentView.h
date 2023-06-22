@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef INSTRUMENT_VIEW_H
-#define INSTRUMENT_VIEW_H
+#ifndef LMMS_GUI_INSTRUMENT_VIEW_H
+#define LMMS_GUI_INSTRUMENT_VIEW_H
 
 #include "Instrument.h"
 #include "PluginView.h"
@@ -76,4 +75,4 @@ public:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_INSTRUMENT_VIEW_H

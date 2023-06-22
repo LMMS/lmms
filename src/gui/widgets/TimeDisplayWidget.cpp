@@ -43,7 +43,7 @@ TimeDisplayWidget::TimeDisplayWidget() :
 	m_milliSecondsLCD( 3, this )
 {
 	m_spinBoxesLayout.setSpacing( 0 );
-	m_spinBoxesLayout.setMargin( 0 );
+	m_spinBoxesLayout.setContentsMargins(0, 0, 0, 0);
 	m_spinBoxesLayout.addWidget( &m_majorLCD );
 	m_spinBoxesLayout.addWidget( &m_minorLCD );
 	m_spinBoxesLayout.addWidget( &m_milliSecondsLCD );

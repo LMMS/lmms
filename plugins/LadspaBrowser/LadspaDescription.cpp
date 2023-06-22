@@ -94,7 +94,7 @@ LadspaDescription::LadspaDescription( QWidget * _parent,
 	auto descriptionBox = new QGroupBox(tr("Description"), this);
 	auto descriptionLayout = new QVBoxLayout(descriptionBox);
 	descriptionLayout->setSpacing( 0 );
-	descriptionLayout->setMargin( 0 );
+	descriptionLayout->setContentsMargins(0, 0, 0, 0);
 
 	m_scrollArea = new QScrollArea( descriptionBox );
 	descriptionLayout->addWidget( m_scrollArea );
@@ -130,7 +130,7 @@ void LadspaDescription::update( const ladspa_key_t & _key )
 
 	auto maker = new QWidget(description);
 	auto makerLayout = new QHBoxLayout(maker);
-	makerLayout->setMargin( 0 );
+	makerLayout->setContentsMargins(0, 0, 0, 0);
 	makerLayout->setSpacing( 0 );
 	layout->addWidget( maker );
 
@@ -145,7 +145,7 @@ void LadspaDescription::update( const ladspa_key_t & _key )
 
 	auto copyright = new QWidget(description);
 	auto copyrightLayout = new QHBoxLayout(copyright);
-	copyrightLayout->setMargin( 0 );
+	copyrightLayout->setContentsMargins(0, 0, 0, 0);
 	copyrightLayout->setSpacing( 0 );
 	layout->addWidget( copyright );
 

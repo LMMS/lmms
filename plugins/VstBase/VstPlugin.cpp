@@ -751,7 +751,7 @@ void VstPlugin::createUI( QWidget * parent )
 		QHBoxLayout * l = new QHBoxLayout( helper );
 		QWidget * target = new QWidget( helper );
 		l->setSpacing( 0 );
-		l->setMargin( 0 );
+		l->setContentsMargins(0, 0, 0, 0);
 		l->addWidget( target );
 
 		// we've to call that for making sure, Qt created the windows

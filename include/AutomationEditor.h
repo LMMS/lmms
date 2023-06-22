@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef AUTOMATION_EDITOR_H
-#define AUTOMATION_EDITOR_H
+#ifndef LMMS_GUI_AUTOMATION_EDITOR_H
+#define LMMS_GUI_AUTOMATION_EDITOR_H
 
 #include <QWidget>
 
@@ -304,4 +304,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_AUTOMATION_EDITOR_H

@@ -169,6 +169,12 @@ void MidiPort::processOutEvent( const MidiEvent& event, const TimePos& time )
 			outEvent.setVelocity( fixedOutputVelocity() );
 		}
 
+		if( fixedOutputNote() >= 0 &&
+			( event.type() == MidiNoteOn || event.type() == MidiNoteOff || event.type() == MidiKeyPressure ) )
+		{
+			outEvent.setKey( fixedOutputNote() );
+		}
+
 		m_midiClient->processOutEvent( outEvent, time, this );
 	}
 }
@@ -238,6 +244,7 @@ void MidiPort::loadSettings( const QDomElement& thisElement )
 	m_outputControllerModel.loadSettings( thisElement, "outputcontroller" );
 	m_fixedInputVelocityModel.loadSettings( thisElement, "fixedinputvelocity" );
 	m_fixedOutputVelocityModel.loadSettings( thisElement, "fixedoutputvelocity" );
+	m_fixedOutputNoteModel.loadSettings( thisElement, "fixedoutputnote" );
 	m_outputProgramModel.loadSettings( thisElement, "outputprogram" );
 	m_baseVelocityModel.loadSettings( thisElement, "basevelocity" );
 	m_readableModel.loadSettings( thisElement, "readable" );

@@ -33,7 +33,6 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QShortcut>
-#include <QLibrary>
 #include <QSplitter>
 
 #include "AboutDialog.h"
@@ -78,22 +77,6 @@
 namespace lmms::gui
 {
 
-#if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_APPLE) && !defined(LMMS_BUILD_HAIKU)
-//Work around an issue on KDE5 as per https://bugs.kde.org/show_bug.cgi?id=337491#c21
-void disableAutoKeyAccelerators(QWidget* mainWindow)
-{
-	using DisablerFunc = void(*)(QWidget*);
-	QLibrary kf5WidgetsAddon("KF5WidgetsAddons", 5);
-	auto setNoAccelerators
-		= reinterpret_cast<DisablerFunc>(kf5WidgetsAddon.resolve("_ZN19KAcceleratorManager10setNoAccelEP7QWidget"));
-	if(setNoAccelerators)
-	{
-		setNoAccelerators(mainWindow);
-	}
-	kf5WidgetsAddon.unload();
-}
-#endif
-
 
 MainWindow::MainWindow() :
 	m_workspace( nullptr ),
@@ -103,20 +86,17 @@ MainWindow::MainWindow() :
 	m_metronomeToggle( 0 ),
 	m_session( Normal )
 {
-#if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_APPLE) && !defined(LMMS_BUILD_HAIKU)
-	disableAutoKeyAccelerators(this);
-#endif
 	setAttribute( Qt::WA_DeleteOnClose );
 
 	auto main_widget = new QWidget(this);
 	auto vbox = new QVBoxLayout(main_widget);
 	vbox->setSpacing( 0 );
-	vbox->setMargin( 0 );
+	vbox->setContentsMargins(0, 0, 0, 0);
 
 	auto w = new QWidget(main_widget);
 	auto hbox = new QHBoxLayout(w);
 	hbox->setSpacing( 0 );
-	hbox->setMargin( 0 );
+	hbox->setContentsMargins(0, 0, 0, 0);
 
 	auto sideBar = new SideBar(Qt::Vertical, w);
 
@@ -226,7 +206,7 @@ MainWindow::MainWindow() :
 
 	// add layout for organizing quite complex toolbar-layouting
 	m_toolBarLayout = new QGridLayout( m_toolBar/*, 2, 1*/ );
-	m_toolBarLayout->setMargin( 0 );
+	m_toolBarLayout->setContentsMargins(0, 0, 0, 0);
 	m_toolBarLayout->setSpacing( 0 );
 
 	vbox->addWidget( m_toolBar );

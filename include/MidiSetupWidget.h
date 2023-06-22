@@ -22,9 +22,8 @@
  *
  */
 
-#ifndef MIDISETUPWIDGET_H
-#define MIDISETUPWIDGET_H
-
+#ifndef LMMS_GUI_MIDI_SETUP_WIDGET_H
+#define LMMS_GUI_MIDI_SETUP_WIDGET_H
 
 #include "TabWidget.h"
 
@@ -60,4 +59,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_MIDI_SETUP_WIDGET_H

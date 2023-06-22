@@ -23,9 +23,8 @@
  *
  */
 
-
-#ifndef CONTROLLER_H
-#define CONTROLLER_H
+#ifndef LMMS_CONTROLLER_H
+#define LMMS_CONTROLLER_H
 
 #include "lmms_export.h"
 #include "Engine.h"
@@ -184,5 +183,4 @@ signals:
 
 } // namespace lmms
 
-#endif
-
+#endif // LMMS_CONTROLLER_H

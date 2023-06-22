@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef NOTE_PLAY_HANDLE_H
-#define NOTE_PLAY_HANDLE_H
+#ifndef LMMS_NOTE_PLAY_HANDLE_H
+#define LMMS_NOTE_PLAY_HANDLE_H
 
 #include <memory>
 
@@ -367,4 +367,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_NOTE_PLAY_HANDLE_H

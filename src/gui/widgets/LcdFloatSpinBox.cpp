@@ -38,6 +38,7 @@
 #include <QVBoxLayout>
 
 #include "CaptionMenu.h"
+#include "DeprecationHelper.h"
 #include "embed.h"
 #include "GuiApplication.h"
 #include "gui_templates.h"
@@ -179,7 +180,7 @@ void LcdFloatSpinBox::mouseReleaseEvent(QMouseEvent*)
 void LcdFloatSpinBox::wheelEvent(QWheelEvent *event)
 {
 	// switch between integer and fractional step based on cursor position
-	if (event->x() < m_wholeDisplay.width()) { m_intStep = true; }
+	if (position(event).x() < m_wholeDisplay.width()) { m_intStep = true; }
 	else { m_intStep = false; }
 
 	event->accept();
@@ -239,9 +240,9 @@ void LcdFloatSpinBox::paintEvent(QPaintEvent*)
 	{
 		p.setFont(pointSizeF(p.font(), 6.5));
 		p.setPen(m_wholeDisplay.textShadowColor());
-		p.drawText(width() / 2 - p.fontMetrics().width(m_label) / 2 + 1, height(), m_label);
+		p.drawText(width() / 2 - horizontalAdvance(p.fontMetrics(), m_label) / 2 + 1, height(), m_label);
 		p.setPen(m_wholeDisplay.textColor());
-		p.drawText(width() / 2 - p.fontMetrics().width(m_label) / 2, height() - 1, m_label);
+		p.drawText(width() / 2 - horizontalAdvance(p.fontMetrics(), m_label) / 2, height() - 1, m_label);
 	}
 }
 

@@ -23,9 +23,8 @@
  *
  */
 
-
-#ifndef TRACK_RENAME_LINE_EDIT_H
-#define TRACK_RENAME_LINE_EDIT_H
+#ifndef LMMS_GUI_TRACK_RENAME_LINE_EDIT_H
+#define LMMS_GUI_TRACK_RENAME_LINE_EDIT_H
 
 #include <QLineEdit>
 
@@ -48,4 +47,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_TRACK_RENAME_LINE_EDIT_H

@@ -22,12 +22,10 @@
  *
  */
 
-#ifndef SAMPLE_CLIP_VIEW_H
-#define SAMPLE_CLIP_VIEW_H
+#ifndef LMMS_GUI_SAMPLE_CLIP_VIEW_H
+#define LMMS_GUI_SAMPLE_CLIP_VIEW_H
 
 #include "ClipView.h"
-
-
 
 namespace lmms
 {
@@ -73,4 +71,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_SAMPLE_CLIP_VIEW_H

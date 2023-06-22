@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_DUMMY_H
-#define AUDIO_DUMMY_H
+#ifndef LMMS_AUDIO_DUMMY_H
+#define LMMS_AUDIO_DUMMY_H
 
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
@@ -116,4 +116,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AUDIO_DUMMY_H

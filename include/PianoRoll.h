@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef PIANO_ROLL_H
-#define PIANO_ROLL_H
+#ifndef LMMS_GUI_PIANO_ROLL_H
+#define LMMS_GUI_PIANO_ROLL_H
 
 #include <QVector>
 #include <QWidget>
@@ -60,7 +60,7 @@ namespace gui
 
 class ComboBox;
 class PositionLine;
-class TextFloat;
+class SimpleTextFloat;
 class TimeLineWidget;
 
 
@@ -149,6 +149,8 @@ public:
 	{
 		return m_midiClip != nullptr;
 	}
+	
+	int trackOctaveSize() const;
 
 	Song::PlayModes desiredPlayModeForAccompany() const;
 
@@ -345,7 +347,7 @@ private:
 
 	static std::array<PianoRollKeyTypes, 12> prKeyOrder;
 
-	static TextFloat * s_textFloat;
+	static SimpleTextFloat * s_textFloat;
 
 	ComboBoxModel m_zoomingModel;
 	ComboBoxModel m_zoomingYModel;
@@ -573,4 +575,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_PIANO_ROLL_H

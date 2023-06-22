@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MODEL_VIEW_H
-#define MODEL_VIEW_H
+#ifndef LMMS_GUI_MODEL_VIEW_H
+#define LMMS_GUI_MODEL_VIEW_H
 
 #include <QPointer>
 #include "Model.h"
@@ -85,5 +85,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
-
+#endif // LMMS_GUI_MODEL_VIEW_H
