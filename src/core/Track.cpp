@@ -551,11 +551,13 @@ void Track::removeBar( const TimePos & pos )
  */
 void Track::updateLength()
 {
+	if (!Engine::getSong()) { return; }
+
 	// find last end-position
 	tick_t last = 0;
 	for (const auto& clip : m_clips)
 	{
-		if (Engine::getSong() && Engine::getSong()->isExporting() && clip->isMuted())
+		if (Engine::getSong()->isExporting() && clip->isMuted())
 		{
 			continue;
 		}
@@ -566,7 +568,7 @@ void Track::updateLength()
 
 	m_length = last / TimePos::ticksPerBar();
 	
-	if (Engine::getSong()) { Engine::getSong()->updateLength(); };
+	Engine::getSong()->updateLength();
 }
 
 
