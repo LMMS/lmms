@@ -39,11 +39,11 @@ namespace lmms
 class LMMS_EXPORT MemoryManager
 {
 public:
-	struct ThreadGuard
-	{
-		ThreadGuard();
-		~ThreadGuard();
-	};
+	//struct ThreadGuard
+	//{
+	//	ThreadGuard();
+	//	~ThreadGuard();
+	//};
 
 	static void * alloc( size_t size );
 	static void free( void * ptr );
