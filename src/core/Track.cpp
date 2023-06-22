@@ -357,7 +357,7 @@ void Track::removeClip( Clip * clip )
 	{
 		m_clips.erase( it );
 		updateLength();
-		Engine::getSong()->setModified();
+		if (Engine::getSong()) { Engine::getSong()->setModified(); };
 	}
 }
 
