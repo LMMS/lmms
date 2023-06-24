@@ -75,18 +75,18 @@ private:
 	static constexpr int s_sampleLength = 128;
 	static constexpr int s_stringCount = 9;
 
-	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_pickKnobs;
-	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_pickupKnobs;
-	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_stiffnessKnobs;
-	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_volumeKnobs;
-	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_panKnobs;
-	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_detuneKnobs;
-	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_randomKnobs;
-	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_lengthKnobs;
-	std::array<std::unique_ptr<BoolModel>, s_stringCount> m_powerButtons;
-	std::array<std::unique_ptr<graphModel>, s_stringCount> m_graphs;
-	std::array<std::unique_ptr<BoolModel>, s_stringCount> m_impulses;
-	std::array<std::unique_ptr<NineButtonSelectorModel>, s_stringCount> m_harmonics;
+	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_pickModels;
+	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_pickupModels;
+	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_stiffnessModels;
+	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_volumeModels;
+	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_panModels;
+	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_detuneModels;
+	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_randomModels;
+	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_lengthModels;
+	std::array<std::unique_ptr<BoolModel>, s_stringCount> m_powerModels;
+	std::array<std::unique_ptr<graphModel>, s_stringCount> m_graphModels;
+	std::array<std::unique_ptr<BoolModel>, s_stringCount> m_impulseModels;
+	std::array<std::unique_ptr<NineButtonSelectorModel>, s_stringCount> m_harmonicModels;
 
 	friend class gui::VibedView;
 };

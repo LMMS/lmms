@@ -103,28 +103,28 @@ Vibed::Vibed(InstrumentTrack* instrumentTrack) :
 {
 	for (int harm = 0; harm < s_stringCount; ++harm)
 	{
-		m_volumeKnobs[harm] = std::make_unique<FloatModel>(
+		m_volumeModels[harm] = std::make_unique<FloatModel>(
 			DefaultVolume, MinVolume, MaxVolume, 1.0f, this, tr("String %1 volume").arg(harm + 1));
-		m_stiffnessKnobs[harm] = std::make_unique<FloatModel>(
+		m_stiffnessModels[harm] = std::make_unique<FloatModel>(
 			0.0f, 0.0f, 0.05f, 0.001f, this, tr("String %1 stiffness").arg(harm + 1));
-		m_pickKnobs[harm] = std::make_unique<FloatModel>(
+		m_pickModels[harm] = std::make_unique<FloatModel>(
 			0.0f, 0.0f, 0.05f, 0.005f, this, tr("Pick %1 position").arg(harm + 1));
-		m_pickupKnobs[harm] = std::make_unique<FloatModel>(
+		m_pickupModels[harm] = std::make_unique<FloatModel>(
 			0.05f, 0.0f, 0.05f, 0.005f, this, tr("Pickup %1 position").arg( harm + 1));
-		m_panKnobs[harm] = std::make_unique<FloatModel>(
+		m_panModels[harm] = std::make_unique<FloatModel>(
 			0.0f, -1.0f, 1.0f, 0.01f, this, tr("String %1 panning").arg(harm + 1));
-		m_detuneKnobs[harm] = std::make_unique<FloatModel>(
+		m_detuneModels[harm] = std::make_unique<FloatModel>(
 			0.0f, -0.1f, 0.1f, 0.001f, this, tr("String %1 detune").arg(harm + 1));
-		m_randomKnobs[harm] = std::make_unique<FloatModel>(
+		m_randomModels[harm] = std::make_unique<FloatModel>(
 			0.0f, 0.0f, 0.75f, 0.01f, this, tr("String %1 fuzziness").arg(harm + 1));
-		m_lengthKnobs[harm] = std::make_unique<FloatModel>(
+		m_lengthModels[harm] = std::make_unique<FloatModel>(
 			1, 1, 16, 1, this, tr("String %1 length").arg(harm + 1));
 
-		m_impulses[harm] = std::make_unique<BoolModel>(false, this, tr("Impulse %1").arg(harm + 1));
-		m_powerButtons[harm] = std::make_unique<BoolModel>(harm == 0, this, tr("String %1").arg(harm + 1));
-		m_harmonics[harm] = std::make_unique<NineButtonSelectorModel>(2, 0, 8, this);
-		m_graphs[harm] = std::make_unique<graphModel>(-1.0, 1.0, s_sampleLength, this);
-		m_graphs[harm]->setWaveToSine();
+		m_impulseModels[harm] = std::make_unique<BoolModel>(false, this, tr("Impulse %1").arg(harm + 1));
+		m_powerModels[harm] = std::make_unique<BoolModel>(harm == 0, this, tr("String %1").arg(harm + 1));
+		m_harmonicModels[harm] = std::make_unique<NineButtonSelectorModel>(2, 0, 8, this);
+		m_graphModels[harm] = std::make_unique<graphModel>(-1.0, 1.0, s_sampleLength, this);
+		m_graphModels[harm]->setWaveToSine();
 	}
 }
 
@@ -137,21 +137,21 @@ void Vibed::saveSettings(QDomDocument& doc, QDomElement& elem)
 	{
 		const auto is = QString::number(i);
 
-		elem.setAttribute("active" + is, QString::number(m_powerButtons[i]->value()));
+		elem.setAttribute("active" + is, QString::number(m_powerModels[i]->value()));
 
-		m_volumeKnobs[i]->saveSettings(doc, elem, "volume" + is);
-		m_stiffnessKnobs[i]->saveSettings(doc, elem, "stiffness" + is);
-		m_pickKnobs[i]->saveSettings(doc, elem, "pick" + is);
-		m_pickupKnobs[i]->saveSettings(doc, elem, "pickup" + is);
-		m_harmonics[i]->saveSettings(doc, elem, "octave" + is);
-		m_lengthKnobs[i]->saveSettings(doc, elem, "length" + is);
-		m_panKnobs[i]->saveSettings(doc, elem, "pan" + is);
-		m_detuneKnobs[i]->saveSettings(doc, elem, "detune" + is);
-		m_randomKnobs[i]->saveSettings(doc, elem, "slap" + is);
-		m_impulses[i]->saveSettings(doc, elem, "impulse" + is);
+		m_volumeModels[i]->saveSettings(doc, elem, "volume" + is);
+		m_stiffnessModels[i]->saveSettings(doc, elem, "stiffness" + is);
+		m_pickModels[i]->saveSettings(doc, elem, "pick" + is);
+		m_pickupModels[i]->saveSettings(doc, elem, "pickup" + is);
+		m_harmonicModels[i]->saveSettings(doc, elem, "octave" + is);
+		m_lengthModels[i]->saveSettings(doc, elem, "length" + is);
+		m_panModels[i]->saveSettings(doc, elem, "pan" + is);
+		m_detuneModels[i]->saveSettings(doc, elem, "detune" + is);
+		m_randomModels[i]->saveSettings(doc, elem, "slap" + is);
+		m_impulseModels[i]->saveSettings(doc, elem, "impulse" + is);
 
 		QString sampleString;
-		base64::encode((const char*)m_graphs[i]->samples(), s_sampleLength * sizeof(float), sampleString);
+		base64::encode((const char*)m_graphModels[i]->samples(), s_sampleLength * sizeof(float), sampleString);
 
 		elem.setAttribute("graph" + is, sampleString);
 	}
@@ -170,29 +170,29 @@ void Vibed::loadSettings(const QDomElement& elem)
 	{
 		const auto is = QString::number(i);
 
-		m_powerButtons[i]->setValue(elem.attribute("active" + is).toInt());
+		m_powerModels[i]->setValue(elem.attribute("active" + is).toInt());
 
 		// Version 0.2 saves/loads all instrument data unconditionally
 		const bool hasVolumeAttr = elem.hasAttribute("volume" + is) || !elem.firstChildElement("volume" + is).isNull();
-		if (newVersion || (m_powerButtons[i]->value() && hasVolumeAttr))
+		if (newVersion || (m_powerModels[i]->value() && hasVolumeAttr))
 		{
-			m_volumeKnobs[i]->loadSettings(elem, "volume" + is);
-			m_stiffnessKnobs[i]->loadSettings(elem, "stiffness" + is);
-			m_pickKnobs[i]->loadSettings(elem, "pick" + is);
-			m_pickupKnobs[i]->loadSettings(elem, "pickup" + is);
-			m_harmonics[i]->loadSettings(elem, "octave" + is);
-			m_lengthKnobs[i]->loadSettings(elem, "length" + is);
-			m_panKnobs[i]->loadSettings(elem, "pan" + is);
-			m_detuneKnobs[i]->loadSettings(elem, "detune" + is);
-			m_randomKnobs[i]->loadSettings(elem, "slap" + is);
-			m_impulses[i]->loadSettings(elem, "impulse" + is);
+			m_volumeModels[i]->loadSettings(elem, "volume" + is);
+			m_stiffnessModels[i]->loadSettings(elem, "stiffness" + is);
+			m_pickModels[i]->loadSettings(elem, "pick" + is);
+			m_pickupModels[i]->loadSettings(elem, "pickup" + is);
+			m_harmonicModels[i]->loadSettings(elem, "octave" + is);
+			m_lengthModels[i]->loadSettings(elem, "length" + is);
+			m_panModels[i]->loadSettings(elem, "pan" + is);
+			m_detuneModels[i]->loadSettings(elem, "detune" + is);
+			m_randomModels[i]->loadSettings(elem, "slap" + is);
+			m_impulseModels[i]->loadSettings(elem, "impulse" + is);
 
 			int size = 0;
 			float* shp = nullptr;
 			base64::decode(elem.attribute("graph" + is), &shp, &size);
 
 			assert(size == 128 * sizeof(float));
-			m_graphs[i]->setSamples(shp);
+			m_graphModels[i]->setSamples(shp);
 			delete[] shp;
 		}
 	}
@@ -214,18 +214,18 @@ void Vibed::playNote(NotePlayHandle* n, sampleFrame* workingBuffer)
 
 		for (int i = 0; i < s_stringCount; ++i)
 		{
-			if (m_powerButtons[i]->value())
+			if (m_powerModels[i]->value())
 			{
 				newContainer->addString(
-					m_harmonics[i]->value(),
-					m_pickKnobs[i]->value(),
-					m_pickupKnobs[i]->value(),
-					m_graphs[i]->samples(),
-					m_randomKnobs[i]->value(),
-					m_stiffnessKnobs[i]->value(),
-					m_detuneKnobs[i]->value(),
-					static_cast<int>(m_lengthKnobs[i]->value()),
-					m_impulses[i]->value(),
+					m_harmonicModels[i]->value(),
+					m_pickModels[i]->value(),
+					m_pickupModels[i]->value(),
+					m_graphModels[i]->samples(),
+					m_randomModels[i]->value(),
+					m_stiffnessModels[i]->value(),
+					m_detuneModels[i]->value(),
+					static_cast<int>(m_lengthModels[i]->value()),
+					m_impulseModels[i]->value(),
 					i);
 			}
 		}
@@ -244,8 +244,8 @@ void Vibed::playNote(NotePlayHandle* n, sampleFrame* workingBuffer)
 			if (ps->exists(str))
 			{
 				// pan: 0 -> left, 1 -> right
-				const float pan = (m_panKnobs[str]->value() + 1) / 2.0f;
-				const sample_t sample = ps->getStringSample(str) * m_volumeKnobs[str]->value() / 100.0f;
+				const float pan = (m_panModels[str]->value() + 1) / 2.0f;
+				const sample_t sample = ps->getStringSample(str) * m_volumeModels[str]->value() / 100.0f;
 				workingBuffer[i][0] += (1.0f - pan) * sample;
 				workingBuffer[i][1] += pan * sample;
 			}
@@ -450,18 +450,18 @@ void VibedView::showString(int str)
 {
 	auto v = castModel<Vibed>();
 
-	m_pickKnob.setModel(v->m_pickKnobs[str].get());
-	m_pickupKnob.setModel(v->m_pickupKnobs[str].get());
-	m_stiffnessKnob.setModel(v->m_stiffnessKnobs[str].get());
-	m_volumeKnob.setModel(v->m_volumeKnobs[str].get());
-	m_panKnob.setModel(v->m_panKnobs[str].get());
-	m_detuneKnob.setModel(v->m_detuneKnobs[str].get());
-	m_randomKnob.setModel(v->m_randomKnobs[str].get());
-	m_lengthKnob.setModel(v->m_lengthKnobs[str].get());
-	m_graph.setModel(v->m_graphs[str].get());
-	m_impulse.setModel(v->m_impulses[str].get());
-	m_harmonic->setModel(v->m_harmonics[str].get());
-	m_power.setModel(v->m_powerButtons[str].get());
+	m_pickKnob.setModel(v->m_pickModels[str].get());
+	m_pickupKnob.setModel(v->m_pickupModels[str].get());
+	m_stiffnessKnob.setModel(v->m_stiffnessModels[str].get());
+	m_volumeKnob.setModel(v->m_volumeModels[str].get());
+	m_panKnob.setModel(v->m_panModels[str].get());
+	m_detuneKnob.setModel(v->m_detuneModels[str].get());
+	m_randomKnob.setModel(v->m_randomModels[str].get());
+	m_lengthKnob.setModel(v->m_lengthModels[str].get());
+	m_graph.setModel(v->m_graphModels[str].get());
+	m_impulse.setModel(v->m_impulseModels[str].get());
+	m_harmonic->setModel(v->m_harmonicModels[str].get());
+	m_power.setModel(v->m_powerModels[str].get());
 }
 
 void VibedView::sinWaveClicked()
