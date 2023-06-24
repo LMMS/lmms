@@ -183,9 +183,10 @@ void OrganicInstrument::loadSettings(const QDomElement& elem)
 
 		m_osc[i]->m_volModel.loadSettings(elem, "vol" + is);
 
-		if (elem.hasAttribute("detune" + is))
+		if (elem.hasAttribute("detune" + is) || !elem.firstChildElement("detune" + is).isNull())
 		{
-			m_osc[i]->m_detuneModel.setValue(elem.attribute("detune").toInt() * 12);
+			m_osc[i]->m_detuneModel.loadSettings(elem, "detune" + is);
+			m_osc[i]->m_detuneModel.setValue(m_osc[i]->m_detuneModel.value() * 12); // compat
 		}
 		else
 		{
