@@ -190,11 +190,11 @@ void MixerChannel::doProcessing()
 Mixer::Mixer() :
 	Model( nullptr ),
 	JournallingObject(),
-	m_mixerChannels()
+	m_mixerChannels(),
+	m_lastSoloed(-1)
 {
 	// create master channel
 	createChannel();
-	m_lastSoloed = -1;
 }
 
 
@@ -223,6 +223,13 @@ int Mixer::createChannel()
 
 	// reset channel state
 	clearChannel( index );
+
+	// if there is a soloed channel, mute the new track
+	if (m_lastSoloed != -1 && m_mixerChannels[m_lastSoloed]->m_soloModel.value())
+	{
+		m_mixerChannels[index]->m_muteBeforeSolo = m_mixerChannels[index]->m_muteModel.value();
+		m_mixerChannels[index]->m_muteModel.setValue(true);
+	}
 
 	return index;
 }
