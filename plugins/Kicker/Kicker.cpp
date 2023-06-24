@@ -128,7 +128,7 @@ void KickerInstrument::loadSettings(const QDomElement& elem)
 	m_startNoteModel.loadSettings(elem, "startnote");
 	if (m_versionModel.value() < 1)
 	{
-		m_startNoteModel.setValue( false );
+		m_startNoteModel.setValue(false);
 	}
 	m_endNoteModel.loadSettings(elem, "endnote");
 

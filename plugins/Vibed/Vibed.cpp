@@ -70,29 +70,17 @@ class Vibed::StringContainer
 	MM_OPERATORS
 public:
 	StringContainer(float pitch, sample_rate_t sampleRate, int bufferLength) :
-		m_pitch(pitch), m_sampleRate(sampleRate), m_bufferLength(bufferLength), m_strings{}, m_exists{} {}
+		m_pitch(pitch), m_sampleRate(sampleRate), m_bufferLength(bufferLength) {}
 
 	~StringContainer() = default;
 
 	void addString(int harm, float pick, float pickup, const float* impulse, float randomize,
 		float stringLoss, float detune, int oversample, bool state, int id)
 	{
-		float harmFloat = 1.0f;
-		switch (harm)
-		{
-		case 0: harmFloat = 0.25f; break;
-		case 1: harmFloat = 0.5f; break;
-		case 2: harmFloat = 1.0f; break;
-		case 3: harmFloat = 2.0f; break;
-		case 4: harmFloat = 3.0f; break;
-		case 5: harmFloat = 4.0f; break;
-		case 6: harmFloat = 5.0f; break;
-		case 7: harmFloat = 6.0f; break;
-		case 8: harmFloat = 7.0f; break;
-		default: break;
-		}
+		constexpr auto octave = std::array{0.25f, 0.5f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f};
+		assert(harm >= 0 && harm < octave.size());
 
-		m_strings[id] = VibratingString{m_pitch * harmFloat, pick, pickup, impulse, m_bufferLength,
+		m_strings[id] = VibratingString{m_pitch * octave[harm], pick, pickup, impulse, m_bufferLength,
 			m_sampleRate, oversample, randomize, stringLoss, detune, state};
 
 		m_exists[id] = true;
@@ -106,8 +94,8 @@ private:
 	const float m_pitch;
 	const sample_rate_t m_sampleRate;
 	const int m_bufferLength;
-	std::array<VibratingString, s_stringCount> m_strings;
-	std::array<bool, s_stringCount> m_exists;
+	std::array<VibratingString, s_stringCount> m_strings{};
+	std::array<bool, s_stringCount> m_exists{};
 };
 
 Vibed::Vibed(InstrumentTrack* instrumentTrack) :
