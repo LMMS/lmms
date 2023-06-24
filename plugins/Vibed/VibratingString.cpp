@@ -68,24 +68,6 @@ VibratingString::VibratingString(float pitch, float pick, float pickup, const fl
 	m_pickupLoc = static_cast<int>(pickup * stringLength);
 }
 
-VibratingString& VibratingString::operator=(VibratingString&& other) noexcept
-{
-	if (this != &other)
-	{
-		m_fromBridge = std::exchange(other.m_fromBridge, nullptr);
-		m_toBridge = std::exchange(other.m_toBridge, nullptr);
-		m_pickupLoc = other.m_pickupLoc;
-		m_oversample = other.m_oversample;
-		m_randomize = other.m_randomize;
-		m_stringLoss = other.m_stringLoss;
-		m_impulse = std::exchange(other.m_impulse, nullptr);
-		m_choice = other.m_choice;
-		m_state = other.m_state;
-		m_outsamp = std::exchange(other.m_outsamp, nullptr);
-	}
-	return *this;
-}
-
 std::unique_ptr<VibratingString::DelayLine> VibratingString::initDelayLine(int len)
 {
 	auto dl = std::make_unique<VibratingString::DelayLine>();

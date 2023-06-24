@@ -45,7 +45,7 @@ public:
 	VibratingString(const VibratingString&) = delete;
 	VibratingString& operator=(const VibratingString&) = delete;
 	VibratingString(VibratingString&&) noexcept = delete;
-	VibratingString& operator=(VibratingString&& other) noexcept;
+	VibratingString& operator=(VibratingString&&) noexcept = default;
 
 	sample_t nextSample()
 	{
