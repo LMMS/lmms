@@ -23,25 +23,31 @@
  *
  */
 
+#ifndef LMMS_CONTROLLER_H
+#define LMMS_CONTROLLER_H
 
-#ifndef CONTROLLER_H
-#define CONTROLLER_H
-
-#include "export.h"
+#include "lmms_export.h"
 #include "Engine.h"
 #include "Model.h"
 #include "JournallingObject.h"
-#include "templates.h"
 #include "ValueBuffer.h"
 
-class ControllerDialog;
+namespace lmms
+{
+
 class Controller;
 class ControllerConnection;
 
-typedef QVector<Controller *> ControllerVector;
+namespace gui
+{
 
+class ControllerDialog;
 
-class EXPORT Controller : public Model, public JournallingObject
+} // namespace gui
+
+using ControllerVector = QVector<Controller*>;
+
+class LMMS_EXPORT Controller : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
@@ -61,7 +67,7 @@ public:
 	Controller( ControllerTypes _type, Model * _parent,
 						const QString & _display_name );
 
-	virtual ~Controller();
+	~Controller() override;
 
 	virtual float currentValue( int _offset );
 	// The per-controller get-value-in-buffers function
@@ -102,9 +108,9 @@ public:
 	}
 
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
-	virtual void loadSettings( const QDomElement & _this );
-	virtual QString nodeName() const;
+	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
+	void loadSettings( const QDomElement & _this ) override;
+	QString nodeName() const override;
 
 	static Controller * create( ControllerTypes _tt, Model * _parent );
 	static Controller * create( const QDomElement & _this,
@@ -112,7 +118,7 @@ public:
 
 	inline static float fittedValue( float _val )
 	{
-		return tLimit<float>( _val, 0.0f, 1.0f );
+		return qBound<float>( 0.0f, _val, 1.0f );
 	}
 
 	static long runningPeriods()
@@ -133,7 +139,7 @@ public:
 	bool hasModel( const Model * m ) const;
 
 public slots:
-	virtual ControllerDialog * createDialog( QWidget * _parent );
+	virtual gui::ControllerDialog * createDialog( QWidget * _parent );
 
 	virtual void setName( const QString & _new_name )
 	{
@@ -167,12 +173,14 @@ protected:
 
 
 signals:
-	// The value changed while the mixer isn't running (i.e: MIDI CC)
+	// The value changed while the audio engine isn't running (i.e: MIDI CC)
 	void valueChanged();
 
-	friend class ControllerDialog;
+	friend class gui::ControllerDialog;
 
 } ;
 
-#endif
 
+} // namespace lmms
+
+#endif // LMMS_CONTROLLER_H

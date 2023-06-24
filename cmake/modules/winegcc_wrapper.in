@@ -1,0 +1,78 @@
+#!/bin/sh
+# Wrapper script for winegcc to remove .exe file ending automatically
+# appended by winebuild.
+# See FindWine.cmake for usage
+
+set -e
+
+args="$@"
+
+# Find output name, link mode and architecture
+while [ $# -gt 0 ]; do
+	key="$1"
+
+	case $key in
+		-o)
+			output=$2
+			shift
+			;;
+		-c)
+			no_link=true
+			;;
+		-m32)
+			win32=true
+			;;
+		-m64)
+			win64=true
+			;;
+		*)
+
+			;;
+	esac
+
+	shift
+done
+
+if [ -z "$output" ]; then
+	# If -c is used without specifying an output name, GCC defaults to "a.out".
+	if [ "$no_link" != true ]; then
+		output="a.out"
+		no_move=true
+	fi
+fi
+
+# Some Wine distributions can't find their own headers. WINE_INCLUDE_DIR provided
+# by FindWine.cmake
+extra_args="-I@WINE_INCLUDE_DIR@ -I@WINE_INCLUDE_DIR@/wine/windows"
+
+# Apply manually specified flags
+extra_args="$extra_args @WINE_CXX_FLAGS@"
+
+# Apply -m32 library fix if necessary
+# Additionally, apply "-z notext" to fix an inconsistency in ld.lld vs ld.bfd and ld.gold
+if [ "$win32" = true ] && [ "$no_link" != true ]; then
+	extra_args="$extra_args @WINE_32_FLAGS@ -z notext"
+fi
+
+# Apply -m64 library fix if necessary
+if [ "$win64" = true ] && [ "$no_link" != true ]; then
+	extra_args="$extra_args @WINE_64_FLAGS@"
+fi
+
+# Work around https://bugs.winehq.org/show_bug.cgi?id=47710
+extra_args="$extra_args -D__WIDL_objidl_generated_name_0000000C="
+
+# Run winegcc
+export WINEBUILD=@WINE_BUILD@
+@WINE_CXX@ $extra_args $args
+
+if [ "$no_move" = true ] || [ "$no_link" = true ]; then
+	exit 0
+fi
+
+if [ ! -e "$output.exe" ]; then
+	echo "Fatal error in winegcc wrapper: No output file \"$output.exe\" found."
+	exit 1
+fi
+
+mv $output.exe $output

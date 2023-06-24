@@ -1,0 +1,345 @@
+#!/usr/bin/env bash
+# lmms(1) completion                                       -*- shell-script -*-
+
+_lmms_array_contains ()
+{
+    local e match="$1"
+    shift
+    for e; do [[ "$e" == "$match" ]] && return 0; done
+    return 1
+}
+
+_lmms_long_param_of()
+{
+    case "$1" in
+        -a)
+            echo "float"
+            ;;
+        -b)
+            echo "bitrate"
+            ;;
+        -c)
+            echo "config"
+            ;;
+        -f)
+            echo "format"
+            ;;
+        -i)
+            echo "interpolation"
+            ;;
+        -l)
+            echo "loop"
+            ;;
+        -m)
+            echo "mode"
+            ;;
+        -o)
+            echo "output"
+            ;;
+        -p)
+            echo "profile"
+            ;;
+        -s)
+            echo "samplerate"
+            ;;
+        -x)
+            echo "oversampling"
+            ;;
+        *)
+            echo ""
+            ;;
+    esac
+}
+
+_lmms_conv_old_action ()
+{
+    case "$1" in
+        -d|--dump)
+            echo "dump"
+            ;;
+        -r|--render)
+            echo "render"
+            ;;
+        --rendertracks)
+            echo "rendertracks"
+            ;;
+        -u|--upgrade)
+            echo "upgrade"
+            ;;
+        *)
+            echo ""
+            ;;
+    esac
+}
+
+_lmms()
+{
+    local cword=$COMP_CWORD
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+
+    # call routine provided by bash-completion
+    _init_completion || return
+    
+    local params filemode filetypes
+    local i # counter variable
+    local pars_global pars_noaction pars_render actions shortargs
+    pars_global=(--allowroot --config --help --version)
+    pars_noaction=(--geometry --import)
+    pars_render=(--float --bitrate --format --interpolation)
+    pars_render+=(--loop --mode --output --profile)
+    pars_render+=(--samplerate --oversampling)
+    actions=(dump compress render rendertracks upgrade makebundle)
+    actions_old=(-d --dump -r --render --rendertracks -u --upgrade)
+    shortargs+=(-a -b -c -f -h -i -l -m -o -p -s -v -x)
+
+    local prev prev2
+    if [ "$cword" -gt 1 ]
+    then
+        prev=${COMP_WORDS[cword-1]}
+    fi
+    if [ "$cword" -gt 2 ]
+    then
+        prev2=${COMP_WORDS[cword-2]}
+    fi
+        
+    # don't show shortargs, but complete them when entered
+    if [[ $cur =~ ^-[^-]$ ]]
+    then
+        if _lmms_array_contains "$cur" "${shortargs[@]}"
+        then
+            COMPREPLY=( "$cur" )
+        fi
+        return
+    fi
+        
+    #
+    # please keep those in order like def_pars_args above
+    #
+    case $prev in
+        --bitrate|-b)
+            params="64 96 128 160 192 256 320"
+            ;;
+        --config|-c)
+            filetypes='xml'
+            filemode='existing_files'
+            ;;
+        --format|-f)
+            params='wav ogg mp3'
+            ;;
+        --geometry)
+            # we can not name all possibilities, but this helps the user
+            # by showing them how the format is
+            params='0x0+0+0'
+            ;;
+        --interpolation|-i)
+            params='linear sincfastest sincmedium sincbest'
+            ;;
+        --import)
+            filetypes='mid|midi|MID|MIDI|rmi|RMI|h2song|H2SONG'
+            filemode='existing_files'
+            ;;
+        --mode|-m)
+            params='s j m'
+            ;;
+        --output|-o)
+            # default assumption: could be both
+            local render=1 rendertracks=1
+            for i in "${!COMP_WORDS[@]}"
+            do
+                if [[ ${COMP_WORDS[i]} =~ ^(render|-r|--render)$ ]]
+                then
+                    rendertracks=
+                elif [[ ${COMP_WORDS[i]} =~ ^(rendertracks|--rendertracks)$ ]]
+                then
+                    render=
+                fi
+            done
+            if [ "$rendertracks" ]
+            then
+                filemode='existing_directories'
+            fi
+            if [ "$render" ]
+            then
+                # filemode files is a superset of "existing directories"
+                # so it's OK to overwrite the filemode='existing_directories'
+                # from above
+                filetypes='wav|ogg|mp3'
+                filemode='files'
+            fi
+            ;;
+        --profile|-p)
+            filemode='files'
+            ;;
+        --samplerate|-s)
+            # these are the ones suggested for zyn
+            # if you think more are required,
+            # remove this comment and write a justification
+            params='44100 48000 96000 192000'
+            ;;
+        --oversampling|-x)
+            params='1 2 4 8'
+            ;;
+        *)
+            local action_found
+
+            # Is an action specified?
+            if [ "$cword" -gt 1 ]
+            then
+                local wrd
+                for wrd in "${COMP_WORDS[@]}"
+                do
+                    # action named explicitly?
+                    if _lmms_array_contains "$wrd" "${actions[@]}"
+                    then
+                        action_found=$wrd
+                        break
+                    # deprecated action name?
+                    elif _lmms_array_contains "$wrd" "${actions_old[@]}"
+                    then
+                        action_found="$(_lmms_conv_old_action "$wrd")"
+                        break
+                    # no-action params found?
+                    elif _lmms_array_contains "$wrd" "${pars_noaction[@]}"
+                    then
+                        action_found=none
+                        break
+                    fi
+                done
+            fi
+            
+            if [[ $prev =~ -e|--help|-h|-version|-v ]]
+            then
+                # the -e flag (from --import) and help/version
+                # always mark the end of arguments
+                return
+            fi
+            
+            if [[ "$action_found" =~ dump|none|^$ ]] && [[ $prev =~ \.mmpz? ]]
+            then
+                # mmp(z) mark the end of arguments for those actions
+                return
+            fi
+            
+            local savefiletypes='mmpz|mmp'
+            local params_array
+            
+            # find parameters/filetypes/dirtypes depending on actions
+            if ! [ "$action_found" ]
+            then
+                params_array=( "${actions[@]}" "${pars_global[@]}" "${pars_noaction[@]}")
+                filemode="existing_files"
+                filetypes="$savefiletypes"
+            elif [ "$action_found" == "none" ]
+            then
+                params_array=( "${pars_noaction[@]}" )
+                filemode="existing_files"
+                filetypes="$savefiletypes"
+            elif [ "$action_found" == "dump" ]
+            then
+                filemode="existing_files"
+                filetypes="mmpz"
+            elif [ "$action_found" == "upgrade" ]
+            then
+                if [ "$prev" == "upgrade" ]
+                then
+                    filemode="existing_files"
+                    filetypes="$savefiletypes"
+                elif [ "$prev2" == "upgrade" ]
+                then
+                    filemode="files"
+                    filetypes="$savefiletypes"
+                fi
+            elif [ "$action_found" == "makebundle" ]
+            then
+                if [ "$prev" == "makebundle" ]
+                then
+                    filemode="existing_files"
+                    filetypes="$savefiletypes"
+                elif [ "$prev2" == "makebundle" ]
+                then
+                    filemode="files"
+                    filetypes="$savefiletypes"
+                fi
+            elif [[ "$action_found" =~ render(tracks)? ]]
+            then
+                if [[ "$prev" =~ render(tracks)? ]]
+                then
+                    filemode="existing_files"
+                    filetypes="$savefiletypes"
+                else
+                    params_array=( "${pars_render[@]}" )
+                fi
+            fi
+            
+            # add params_array to params, but also check the history of comp words
+            local param
+            for param in "${params_array[@]}"
+            do
+                local do_append=1
+                for i in "${!COMP_WORDS[@]}"
+                do
+                    if [ "$i" -ne 0 ] && [ "$i" -ne "$cword" ]
+                    then
+                        # disallow double long parameters
+                        if [ "${COMP_WORDS[$i]}" == "$param" ]
+                        then
+                            do_append=
+                        # disallow double short parameters
+                        elif [ "--$(_lmms_long_param_of "${COMP_WORDS[$i]}")" == "$param" ]
+                        then
+                            do_append=
+                        # --help or --version must be the first parameters
+                        elif [ "$cword" -gt 1 ] && [[ $param =~ --help|--version ]]
+                        then
+                            do_append=
+                        fi
+                    fi
+                done
+                if [ "$do_append" ]
+                then
+                    params+="$param "
+                fi
+            done
+        ;;
+    esac
+    
+    case $filemode in
+        
+        # use completion routine provided by bash-completion
+        # to fill $COMPREPLY
+        
+        existing_files)
+            _filedir "@($filetypes)"
+        ;;
+
+        existing_directories)
+            _filedir -d
+        ;;
+        
+        files)
+
+            # non existing files complete like directories...
+            _filedir -d
+            
+            # ...except for non-completing files with the right file type
+            if [ ${#COMPREPLY[@]} -eq 0 ]
+            then
+                if ! [[ "$cur" =~ /$ ]] && [ "$filetypes" ] && [[ "$cur" =~ \.($filetypes)$ ]]
+                then
+                    # file ending fits, we seem to be done
+                    COMPREPLY=( "$cur" )
+                fi
+            fi
+        ;;
+        
+    esac
+
+    if [ "$params" ]
+    then
+        # none of our parameters contain spaces, so deactivate shellcheck's warning
+        # shellcheck disable=SC2207
+        COMPREPLY+=( $(compgen -W "${params}" -- "${cur}") )
+    fi
+}
+
+complete -F _lmms lmms

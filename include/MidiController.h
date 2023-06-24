@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MIDI_CONTROLLER_H
-#define MIDI_CONTROLLER_H
+#ifndef LMMS_MIDI_CONTROLLER_H
+#define LMMS_MIDI_CONTROLLER_H
 
 #include <QWidget>
 
@@ -33,7 +33,15 @@
 #include "MidiPort.h"
 
 
+namespace lmms
+{
+
 class MidiPort;
+
+namespace gui
+{
+class ControllerConnectionDialog;
+}
 
 
 class MidiController : public Controller, public MidiEventProcessor
@@ -41,33 +49,33 @@ class MidiController : public Controller, public MidiEventProcessor
 	Q_OBJECT
 public:
 	MidiController( Model * _parent );
-	virtual ~MidiController();
+	~MidiController() override = default;
 
-	virtual void processInEvent( const MidiEvent & _me,
-					const MidiTime & _time, f_cnt_t offset = 0 );
+	void processInEvent( const MidiEvent & _me,
+					const TimePos & _time, f_cnt_t offset = 0 ) override;
 
-	virtual void processOutEvent( const MidiEvent& _me,
-					const MidiTime & _time, f_cnt_t offset = 0 )
+	void processOutEvent( const MidiEvent& _me,
+					const TimePos & _time, f_cnt_t offset = 0 ) override
 	{
 		// No output yet
 	}
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
-	virtual void loadSettings( const QDomElement & _this );
-	virtual QString nodeName() const;
+	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
+	void loadSettings( const QDomElement & _this ) override;
+	QString nodeName() const override;
 
 	// Used by controllerConnectionDialog to copy
 	void subscribeReadablePorts( const MidiPort::Map & _map );
 
 
 public slots:
-	virtual ControllerDialog * createDialog( QWidget * _parent );
+	gui::ControllerDialog* createDialog( QWidget * _parent ) override;
 	void updateName();
 
 
 protected:
 	// The internal per-controller get-value function
-	virtual void updateValueBuffer();
+	void updateValueBuffer() override;
 
 
 	MidiPort m_midiPort;
@@ -76,10 +84,12 @@ protected:
 	float m_lastValue;
 	float m_previousValue;
 
-	friend class ControllerConnectionDialog;
+	friend class gui::ControllerConnectionDialog;
 	friend class AutoDetectMidiController;
 
 } ;
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_MIDI_CONTROLLER_H

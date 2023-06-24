@@ -1,0 +1,46 @@
+Description: Fix build as of 2018-10-13
+ Fix build errors, possibly introduced with GCC 8.
+Author: Javier Serrano Polo <javier@jasp.net>
+Bug-Debian: https://bugs.debian.org/897806
+
+Index: lmms-1.1.3/plugins/LadspaEffect/caps/dsp/FPTruncateMode.h
+===================================================================
+--- lmms-1.1.3.orig/plugins/LadspaEffect/caps/dsp/FPTruncateMode.h
++++ lmms-1.1.3/plugins/LadspaEffect/caps/dsp/FPTruncateMode.h
+@@ -40,9 +40,11 @@ class FPTruncateMode
+ 
+ 		FPTruncateMode()
+ 			{
++#ifdef __i386__
+ 				fstcw (cw0);
+ 				cw1 = cw0 | 0xC00;
+ 				fldcw (cw1);
++#endif
+ 			}
+ 
+ 		~FPTruncateMode()
+Index: lmms-1.1.3/plugins/ZynAddSubFx/zynaddsubfx/src/Synth/OscilGen.cpp
+===================================================================
+--- lmms-1.1.3.orig/plugins/ZynAddSubFx/zynaddsubfx/src/Synth/OscilGen.cpp
++++ lmms-1.1.3/plugins/ZynAddSubFx/zynaddsubfx/src/Synth/OscilGen.cpp
+@@ -33,7 +33,8 @@
+ //operations on FFTfreqs
+ inline void clearAll(fft_t *freqs)
+ {
+-    memset(freqs, 0, synth->oscilsize / 2 * sizeof(fft_t));
++    for(int i = 0; i < synth->oscilsize / 2; ++i)
++        freqs[i] = fft_t(0.0f, 0.0f);
+ }
+ 
+ inline void clearDC(fft_t *freqs)
+@@ -928,8 +929,8 @@ void OscilGen::getspectrum(int n, float
+     if(what == 0) {
+         for(int i = 0; i < n; ++i)
+             outoscilFFTfreqs[i] = fft_t(spc[i], spc[i]);
+-        memset(outoscilFFTfreqs + n, 0,
+-               (synth->oscilsize / 2 - n) * sizeof(fft_t));
++        for(int i = n; i < synth->oscilsize / 2; ++i)
++            outoscilFFTfreqs[i] = fft_t(0.0f, 0.0f);
+         adaptiveharmonic(outoscilFFTfreqs, 0.0f);
+         adaptiveharmonicpostprocess(outoscilFFTfreqs, n - 1);
+         for(int i = 0; i < n; ++i)

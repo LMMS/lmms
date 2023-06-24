@@ -22,30 +22,31 @@
  *
  */
 
-#ifndef MIDI_EVENT_PROCESSOR_H
-#define MIDI_EVENT_PROCESSOR_H
+#ifndef LMMS_MIDI_EVENT_PROCESSOR_H
+#define LMMS_MIDI_EVENT_PROCESSOR_H
 
 #include "MidiEvent.h"
-#include "MidiTime.h"
 #include "MemoryManager.h"
+#include "TimePos.h"
+
+namespace lmms
+{
 
 // all classes being able to process MIDI-events should inherit from this
 class MidiEventProcessor
 {
 	MM_OPERATORS
 public:
-	MidiEventProcessor()
-	{
-	}
+	MidiEventProcessor() = default;
 
-	virtual ~MidiEventProcessor()
-	{
-	}
+	virtual ~MidiEventProcessor() = default;
 
 	// to be implemented by inheriting classes
-	virtual void processInEvent( const MidiEvent& event, const MidiTime& time = MidiTime(), f_cnt_t offset = 0 ) = 0;
-	virtual void processOutEvent( const MidiEvent& event, const MidiTime& time = MidiTime(), f_cnt_t offset = 0 ) = 0;
+	virtual void processInEvent( const MidiEvent& event, const TimePos& time = TimePos(), f_cnt_t offset = 0 ) = 0;
+	virtual void processOutEvent( const MidiEvent& event, const TimePos& time = TimePos(), f_cnt_t offset = 0 ) = 0;
 
 } ;
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_MIDI_EVENT_PROCESSOR_H

@@ -22,12 +22,17 @@
  *
  */
 
-#ifndef SIDE_BAR_WIDGET_H
-#define SIDE_BAR_WIDGET_H
+#ifndef LMMS_GUI_SIDE_BAR_WIDGET_H
+#define LMMS_GUI_SIDE_BAR_WIDGET_H
 
 #include <QPixmap>
 #include <QVBoxLayout>
 #include <QWidget>
+
+class QPushButton;
+
+namespace lmms::gui
+{
 
 
 class SideBarWidget : public QWidget
@@ -36,7 +41,7 @@ class SideBarWidget : public QWidget
 public:
 	SideBarWidget( const QString & _title, const QPixmap & _icon,
 							QWidget * _parent );
-	virtual ~SideBarWidget();
+	~SideBarWidget() override = default;
 
 	inline const QPixmap & icon() const
 	{
@@ -47,11 +52,13 @@ public:
 		return m_title;
 	}
 
+signals:
+	void closeButtonClicked();
 
 protected:
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void resizeEvent( QResizeEvent * _re );
-	virtual void contextMenuEvent( QContextMenuEvent * )
+	void paintEvent( QPaintEvent * _pe ) override;
+	void resizeEvent( QResizeEvent * _re ) override;
+	void contextMenuEvent( QContextMenuEvent * ) override
 	{
 	}
 
@@ -75,7 +82,12 @@ private:
 	QVBoxLayout * m_layout;
 	QString m_title;
 	QPixmap m_icon;
+	QPushButton * m_closeBtn;
+	const QSize m_buttonSize;
 
 } ;
 
-#endif
+
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_SIDE_BAR_WIDGET_H

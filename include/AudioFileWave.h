@@ -23,14 +23,16 @@
  *
  */
 
-#ifndef AUDIO_FILE_WAVE_H
-#define AUDIO_FILE_WAVE_H
+#ifndef LMMS_AUDIO_FILE_WAVE_H
+#define LMMS_AUDIO_FILE_WAVE_H
 
 #include "lmmsconfig.h"
 #include "AudioFileDevice.h"
 
 #include <sndfile.h>
 
+namespace lmms
+{
 
 class AudioFileWave : public AudioFileDevice
 {
@@ -39,24 +41,24 @@ public:
 			const ch_cnt_t channels,
 			bool & successful,
 			const QString & file,
-			Mixer* mixer );
-	virtual ~AudioFileWave();
+			AudioEngine* audioEngine );
+	~AudioFileWave() override;
 
 	static AudioFileDevice * getInst( const QString & outputFilename,
 					  OutputSettings const & outputSettings,
 					  const ch_cnt_t channels,
-					  Mixer* mixer,
+					  AudioEngine* audioEngine,
 					  bool & successful )
 	{
 		return new AudioFileWave( outputSettings, channels, successful,
-					  outputFilename, mixer );
+					  outputFilename, audioEngine );
 	}
 
 
 private:
-	virtual void writeBuffer( const surroundSampleFrame * _ab,
+	void writeBuffer( const surroundSampleFrame * _ab,
 						const fpp_t _frames,
-						float _master_gain );
+						float _master_gain ) override;
 
 	bool startEncoding();
 	void finishEncoding();
@@ -66,4 +68,7 @@ private:
 	SNDFILE * m_sf;
 } ;
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_AUDIO_FILE_WAVE_H

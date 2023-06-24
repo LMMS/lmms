@@ -22,32 +22,35 @@
  *
  */
 
+#ifndef LMMS_SAMPLE_RECORD_HANDLE_H
+#define LMMS_SAMPLE_RECORD_HANDLE_H
 
-#ifndef SAMPLE_RECORD_HANDLE_H
-#define SAMPLE_RECORD_HANDLE_H
+#include <QList>
+#include <QPair>
 
-#include <QtCore/QList>
-#include <QtCore/QPair>
-
-#include "MidiTime.h"
 #include "PlayHandle.h"
+#include "TimePos.h"
 
-class BBTrack;
+namespace lmms
+{
+
+
+class PatternTrack;
 class SampleBuffer;
-class SampleTCO;
+class SampleClip;
 class Track;
 
 
 class SampleRecordHandle : public PlayHandle
 {
 public:
-	SampleRecordHandle( SampleTCO* tco );
-	virtual ~SampleRecordHandle();
+	SampleRecordHandle( SampleClip* clip );
+	~SampleRecordHandle() override;
 
-	virtual void play( sampleFrame * _working_buffer );
-	virtual bool isFinished() const;
+	void play( sampleFrame * _working_buffer ) override;
+	bool isFinished() const override;
 
-	virtual bool isFromTrack( const Track * _track ) const;
+	bool isFromTrack( const Track * _track ) const override;
 
 	f_cnt_t framesRecorded() const;
 	void createSampleBuffer( SampleBuffer * * _sample_buf );
@@ -57,16 +60,18 @@ private:
 	virtual void writeBuffer( const sampleFrame * _ab,
 						const f_cnt_t _frames );
 
-	typedef QList<QPair<sampleFrame *, f_cnt_t> > bufferList;
+	using bufferList = QList<QPair<sampleFrame*, f_cnt_t>>;
 	bufferList m_buffers;
 	f_cnt_t m_framesRecorded;
-	MidiTime m_minLength;
+	TimePos m_minLength;
 
 	Track * m_track;
-	BBTrack * m_bbTrack;
-	SampleTCO * m_tco;
+	PatternTrack* m_patternTrack;
+	SampleClip * m_clip;
 
 } ;
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_SAMPLE_RECORD_HANDLE_H

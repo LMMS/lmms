@@ -22,105 +22,23 @@
  *
  */
 
-#ifndef SAMPLE_TRACK_H
-#define SAMPLE_TRACK_H
-
-#include <QDialog>
+#ifndef LMMS_SAMPLE_TRACK_H
+#define LMMS_SAMPLE_TRACK_H
 
 #include "AudioPort.h"
 #include "Track.h"
 
-class EffectRackView;
-class Knob;
-class SampleBuffer;
 
-
-class SampleTCO : public TrackContentObject
+namespace lmms
 {
-	Q_OBJECT
-	mapPropertyFromModel(bool,isRecord,setRecord,m_recordModel);
-public:
-	SampleTCO( Track * _track );
-	virtual ~SampleTCO();
 
-	virtual void changeLength( const MidiTime & _length );
-	const QString & sampleFile() const;
-
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName() const
-	{
-		return "sampletco";
-	}
-
-	SampleBuffer* sampleBuffer()
-	{
-		return m_sampleBuffer;
-	}
-
-	MidiTime sampleLength() const;
-	void setSampleStartFrame( f_cnt_t startFrame );
-	void setSamplePlayLength( f_cnt_t length );
-	virtual TrackContentObjectView * createView( TrackView * _tv );
-
-
-	bool isPlaying() const;
-	void setIsPlaying(bool isPlaying);
-
-public slots:
-	void setSampleBuffer( SampleBuffer* sb );
-	void setSampleFile( const QString & _sf );
-	void updateLength();
-	void toggleRecord();
-	void playbackPositionChanged();
-	void updateTrackTcos();
-
-
-private:
-	SampleBuffer* m_sampleBuffer;
-	BoolModel m_recordModel;
-	bool m_isPlaying;
-
-
-	friend class SampleTCOView;
-
-
-signals:
-	void sampleChanged();
-
-} ;
-
-
-
-class SampleTCOView : public TrackContentObjectView
+namespace gui
 {
-	Q_OBJECT
 
-public:
-	SampleTCOView( SampleTCO * _tco, TrackView * _tv );
-	virtual ~SampleTCOView() = default;
+class SampleTrackView;
+class SampleTrackWindow;
 
-public slots:
-	void updateSample();
-
-
-
-protected:
-	virtual void contextMenuEvent( QContextMenuEvent * _cme );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
-	virtual void mouseDoubleClickEvent( QMouseEvent * );
-	virtual void paintEvent( QPaintEvent * );
-
-
-private:
-	SampleTCO * m_tco;
-	QPixmap m_paintPixmap;
-} ;
-
-
+} // namespace gui
 
 
 class SampleTrack : public Track
@@ -128,72 +46,67 @@ class SampleTrack : public Track
 	Q_OBJECT
 public:
 	SampleTrack( TrackContainer* tc );
-	virtual ~SampleTrack();
+	~SampleTrack() override;
 
-	virtual bool play( const MidiTime & _start, const fpp_t _frames,
-						const f_cnt_t _frame_base, int _tco_num = -1 );
-	virtual TrackView * createView( TrackContainerView* tcv );
-	virtual TrackContentObject * createTCO( const MidiTime & _pos );
+	bool play( const TimePos & _start, const fpp_t _frames,
+						const f_cnt_t _frame_base, int _clip_num = -1 ) override;
+	gui::TrackView * createView( gui::TrackContainerView* tcv ) override;
+	Clip* createClip(const TimePos & pos) override;
 
 
-	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
-							QDomElement & _parent );
-	virtual void loadTrackSpecificSettings( const QDomElement & _this );
+	void saveTrackSpecificSettings( QDomDocument & _doc,
+							QDomElement & _parent ) override;
+	void loadTrackSpecificSettings( const QDomElement & _this ) override;
+
+	inline IntModel * mixerChannelModel()
+	{
+		return &m_mixerChannelModel;
+	}
 
 	inline AudioPort * audioPort()
 	{
 		return &m_audioPort;
 	}
 
-	virtual QString nodeName() const
+	QString nodeName() const override
 	{
 		return "sampletrack";
 	}
 
+	bool isPlaying()
+	{
+		return m_isPlaying;
+	}
+
+	void setPlaying(bool playing)
+	{
+		if (m_isPlaying != playing) { emit playingChanged(); }
+		m_isPlaying = playing;
+	}
+
+signals:
+	void playingChanged();
+
 public slots:
-	void updateTcos();
-	void setPlayingTcos( bool isPlaying );
+	void updateClips();
+	void setPlayingClips( bool isPlaying );
+	void updateMixerChannel();
 
 private:
 	FloatModel m_volumeModel;
 	FloatModel m_panningModel;
+	IntModel m_mixerChannelModel;
 	AudioPort m_audioPort;
+	bool m_isPlaying;
 
 
 
-	friend class SampleTrackView;
-
-} ;
-
-
-
-class SampleTrackView : public TrackView
-{
-	Q_OBJECT
-public:
-	SampleTrackView( SampleTrack* Track, TrackContainerView* tcv );
-	virtual ~SampleTrackView();
-
-
-public slots:
-	void showEffects();
-
-
-protected:
-	void modelChanged();
-	virtual QString nodeName() const
-	{
-		return "SampleTrackView";
-	}
-
-
-private:
-	EffectRackView * m_effectRack;
-	QWidget * m_effWindow;
-	Knob * m_volumeKnob;
-	Knob * m_panningKnob;
+	friend class gui::SampleTrackView;
+	friend class gui::SampleTrackWindow;
 
 } ;
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_SAMPLE_TRACK_H

@@ -1,6 +1,6 @@
 /*
- * InstrumentTrack.h - declaration of class InstrumentTrack, a track + window
- *                     which holds an instrument-plugin
+ * InstrumentTrack.h - declaration of class InstrumentTrack, a track which
+ *                     holds an instrument-plugin
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -23,54 +23,48 @@
  *
  */
 
-#ifndef INSTRUMENT_TRACK_H
-#define INSTRUMENT_TRACK_H
+#ifndef LMMS_INSTRUMENT_TRACK_H
+#define LMMS_INSTRUMENT_TRACK_H
 
 #include "AudioPort.h"
-#include "GroupBox.h"
 #include "InstrumentFunctions.h"
 #include "InstrumentSoundShaping.h"
+#include "Microtuner.h"
+#include "Midi.h"
 #include "MidiEventProcessor.h"
 #include "MidiPort.h"
 #include "NotePlayHandle.h"
 #include "Piano.h"
-#include "PianoView.h"
-#include "Pitch.h"
+#include "Plugin.h"
 #include "Track.h"
 
 
+namespace lmms
+{
 
-class QLineEdit;
-template<class T> class QQueue;
-class InstrumentFunctionArpeggioView;
-class InstrumentFunctionNoteStackingView;
-class EffectRackView;
-class InstrumentSoundShapingView;
-class FadeButton;
+
 class Instrument;
-class InstrumentTrackWindow;
-class InstrumentMidiIOView;
-class InstrumentMiscView;
-class Knob;
-class LcdSpinBox;
-class LeftRightNav;
-class midiPortMenu;
 class DataFile;
-class PluginView;
-class TabWidget;
-class TrackLabelButton;
-class LedCheckBox;
-class QLabel;
+
+namespace gui
+{
+
+class InstrumentTrackView;
+class InstrumentTrackWindow;
+class InstrumentMiscView;
+class MidiCCRackView;
+
+} // namespace gui
 
 
-class EXPORT InstrumentTrack : public Track, public MidiEventProcessor
+class LMMS_EXPORT InstrumentTrack : public Track, public MidiEventProcessor
 {
 	Q_OBJECT
 	MM_OPERATORS
 	mapPropertyFromModel(int,getVolume,setVolume,m_volumeModel);
 public:
 	InstrumentTrack( TrackContainer* tc );
-	virtual ~InstrumentTrack();
+	~InstrumentTrack() override;
 
 	// used by instrument
 	void processAudioBuffer( sampleFrame * _buf, const fpp_t _frames,
@@ -78,8 +72,8 @@ public:
 
 	MidiEvent applyMasterKey( const MidiEvent& event );
 
-	virtual void processInEvent( const MidiEvent& event, const MidiTime& time = MidiTime(), f_cnt_t offset = 0 );
-	virtual void processOutEvent( const MidiEvent& event, const MidiTime& time = MidiTime(), f_cnt_t offset = 0 );
+	void processInEvent( const MidiEvent& event, const TimePos& time = TimePos(), f_cnt_t offset = 0 ) override;
+	void processOutEvent( const MidiEvent& event, const TimePos& time = TimePos(), f_cnt_t offset = 0 ) override;
 	// silence all running notes played by this track
 	void silenceAllNotes( bool removeIPH = false );
 
@@ -109,7 +103,7 @@ public:
 	void deleteNotePluginData( NotePlayHandle * _n );
 
 	// name-stuff
-	virtual void setName( const QString & _new_name );
+	void setName( const QString & _new_name ) override;
 
 	// translate given key of a note-event to absolute key (i.e.
 	// add global master-pitch and base-note of this instrument track)
@@ -128,25 +122,27 @@ public:
 	}
 
 	// play everything in given frame-range - creates note-play-handles
-	virtual bool play( const MidiTime & _start, const fpp_t _frames,
-						const f_cnt_t _frame_base, int _tco_num = -1 );
+	bool play( const TimePos & _start, const fpp_t _frames,
+						const f_cnt_t _frame_base, int _clip_num = -1 ) override;
 	// create new view for me
-	virtual TrackView * createView( TrackContainerView* tcv );
+	gui::TrackView* createView( gui::TrackContainerView* tcv ) override;
 
-	// create new track-content-object = pattern
-	virtual TrackContentObject * createTCO( const MidiTime & _pos );
+	// create new track-content-object = clip
+	Clip* createClip(const TimePos & pos) override;
 
 
 	// called by track
-	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
-							QDomElement & _parent );
-	virtual void loadTrackSpecificSettings( const QDomElement & _this );
+	void saveTrackSpecificSettings( QDomDocument & _doc,
+							QDomElement & _parent ) override;
+	void loadTrackSpecificSettings( const QDomElement & _this ) override;
 
 	using Track::setJournalling;
 
 
 	// load instrument whose name matches given one
-	Instrument * loadInstrument( const QString & _instrument_name );
+	Instrument * loadInstrument(const QString & _instrument_name,
+				const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr,
+				bool keyFromDnd = false);
 
 	AudioPort * audioPort()
 	{
@@ -168,11 +164,31 @@ public:
 		return &m_baseNoteModel;
 	}
 
+	IntModel *firstKeyModel()
+	{
+		return &m_firstKeyModel;
+	}
+
+	IntModel *lastKeyModel()
+	{
+		return &m_lastKeyModel;
+	}
+
+	bool keyRangeImport() const;
+	bool isKeyMapped(int key) const;
+	int firstKey() const;
+	int lastKey() const;
 	int baseNote() const;
+	float baseFreq() const;
 
 	Piano *pianoModel()
 	{
 		return &m_piano;
+	}
+
+	Microtuner *microtuner()
+	{
+		return &m_microtuner;
 	}
 
 	bool isArpeggioEnabled() const
@@ -203,37 +219,55 @@ public:
 		return &m_pitchRangeModel;
 	}
 
-	IntModel * effectChannelModel()
+	IntModel * mixerChannelModel()
 	{
-		return &m_effectChannelModel;
+		return &m_mixerChannelModel;
+	}
+
+	BoolModel* useMasterPitchModel()
+	{
+		return &m_useMasterPitchModel;
 	}
 
 	void setPreviewMode( const bool );
 
+	bool isPreviewMode() const
+	{
+		return m_previewMode;
+	}
+	
+	void replaceInstrument(DataFile dataFile);
+
+	void autoAssignMidiDevice( bool );
 
 signals:
 	void instrumentChanged();
-	void midiNoteOn( const Note& );
-	void midiNoteOff( const Note& );
+	void midiNoteOn( const lmms::Note& );
+	void midiNoteOff( const lmms::Note& );
 	void nameChanged();
 	void newNote();
-
+	void endNote();
 
 protected:
-	virtual QString nodeName() const
+	QString nodeName() const override
 	{
 		return "instrumenttrack";
 	}
+
+	// get the name of the instrument in the saved data
+	QString getSavedInstrumentName(const QDomElement & thisElement) const;
 
 
 protected slots:
 	void updateBaseNote();
 	void updatePitch();
 	void updatePitchRange();
-	void updateEffectChannel();
+	void updateMixerChannel();
 
 
 private:
+	void processCCEvent(int controller);
+
 	MidiPort m_midiPort;
 
 	NotePlayHandle* m_notes[NumKeys];
@@ -248,7 +282,12 @@ private:
 
 	bool m_previewMode;
 
-	IntModel m_baseNoteModel;
+	IntModel m_baseNoteModel;	//!< The "A4" or "440 Hz" key (default 69)
+	IntModel m_firstKeyModel;	//!< First key the instrument reacts to
+	IntModel m_lastKeyModel;	//!< Last key the instrument reacts to
+
+	bool m_hasAutoMidiDev;
+	static InstrumentTrack *s_autoAssignedTrack;
 
 	NotePlayHandleList m_processHandles;
 
@@ -259,9 +298,8 @@ private:
 
 	FloatModel m_pitchModel;
 	IntModel m_pitchRangeModel;
-	IntModel m_effectChannelModel;
+	IntModel m_mixerChannelModel;
 	BoolModel m_useMasterPitchModel;
-
 
 	Instrument * m_instrument;
 	InstrumentSoundShaping m_soundShaping;
@@ -270,198 +308,21 @@ private:
 
 	Piano m_piano;
 
+	Microtuner m_microtuner;
 
-	friend class InstrumentTrackView;
-	friend class InstrumentTrackWindow;
+	std::unique_ptr<BoolModel> m_midiCCEnable;
+	std::unique_ptr<FloatModel> m_midiCCModel[MidiControllerCount];
+
+	friend class gui::InstrumentTrackView;
+	friend class gui::InstrumentTrackWindow;
 	friend class NotePlayHandle;
-	friend class InstrumentMiscView;
+	friend class gui::InstrumentMiscView;
+	friend class gui::MidiCCRackView;
 
 } ;
 
 
 
+} // namespace lmms
 
-class InstrumentTrackView : public TrackView
-{
-	Q_OBJECT
-public:
-	InstrumentTrackView( InstrumentTrack * _it, TrackContainerView* tc );
-	virtual ~InstrumentTrackView();
-
-	InstrumentTrackWindow * getInstrumentTrackWindow();
-
-	InstrumentTrack * model()
-	{
-		return castModel<InstrumentTrack>();
-	}
-
-	const InstrumentTrack * model() const
-	{
-		return castModel<InstrumentTrack>();
-	}
-
-	static InstrumentTrackWindow * topLevelInstrumentTrackWindow();
-
-	QMenu * midiMenu()
-	{
-		return m_midiMenu;
-	}
-
-	void freeInstrumentTrackWindow();
-
-	static void cleanupWindowCache();
-
-	// Create a menu for assigning/creating channels for this track
-	QMenu * createFxMenu( QString title, QString newFxLabel );
-
-
-protected:
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
-
-
-private slots:
-	void toggleInstrumentWindow( bool _on );
-	void activityIndicatorPressed();
-	void activityIndicatorReleased();
-
-	void midiInSelected();
-	void midiOutSelected();
-	void midiConfigChanged();
-	void muteChanged();
-
-	void assignFxLine( int channelIndex );
-	void createFxLine();
-
-
-private:
-	InstrumentTrackWindow * m_window;
-
-	static QQueue<InstrumentTrackWindow *> s_windowCache;
-
-	// widgets in track-settings-widget
-	TrackLabelButton * m_tlb;
-	Knob * m_volumeKnob;
-	Knob * m_panningKnob;
-	FadeButton * m_activityIndicator;
-
-	QMenu * m_midiMenu;
-
-	QAction * m_midiInputAction;
-	QAction * m_midiOutputAction;
-
-	QPoint m_lastPos;
-
-
-	friend class InstrumentTrackWindow;
-
-} ;
-
-
-
-
-class InstrumentTrackWindow : public QWidget, public ModelView,
-								public SerializingObjectHook
-{
-	Q_OBJECT
-public:
-	InstrumentTrackWindow( InstrumentTrackView * _tv );
-	virtual ~InstrumentTrackWindow();
-
-	// parent for all internal tab-widgets
-	TabWidget * tabWidgetParent()
-	{
-		return m_tabWidget;
-	}
-
-	InstrumentTrack * model()
-	{
-		return castModel<InstrumentTrack>();
-	}
-
-	const InstrumentTrack * model() const
-	{
-		return castModel<InstrumentTrack>();
-	}
-
-	void setInstrumentTrackView( InstrumentTrackView * _tv );
-
-	InstrumentTrackView *instrumentTrackView()
-	{
-		return m_itv;
-	}
-
-
-	PianoView * pianoView()
-	{
-		return m_pianoView;
-	}
-
-	static void dragEnterEventGeneric( QDragEnterEvent * _dee );
-
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
-
-
-public slots:
-	void textChanged( const QString & _new_name );
-	void toggleVisibility( bool _on );
-	void updateName();
-	void updateInstrumentView();
-
-
-protected:
-	// capture close-events for toggling instrument-track-button
-	virtual void closeEvent( QCloseEvent * _ce );
-	virtual void focusInEvent( QFocusEvent * _fe );
-
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
-	virtual void loadSettings( const QDomElement & _this );
-
-
-protected slots:
-	void saveSettingsBtnClicked();
-	void viewNextInstrument();
-	void viewPrevInstrument();
-
-private:
-	virtual void modelChanged();
-	void viewInstrumentInDirection(int d);
-
-	InstrumentTrack * m_track;
-	InstrumentTrackView * m_itv;
-
-	// widgets on the top of an instrument-track-window
-	QLineEdit * m_nameLineEdit;
-	LeftRightNav * m_leftRightNav;
-	Knob * m_volumeKnob;
-	Knob * m_panningKnob;
-	Knob * m_pitchKnob;
-	QLabel * m_pitchLabel;
-	LcdSpinBox* m_pitchRangeSpinBox;
-	QLabel * m_pitchRangeLabel;
-	LcdSpinBox * m_effectChannelNumber;
-
-
-
-	// tab-widget with all children
-	TabWidget * m_tabWidget;
-	PluginView * m_instrumentView;
-	InstrumentSoundShapingView * m_ssView;
-	InstrumentFunctionNoteStackingView* m_noteStackingView;
-	InstrumentFunctionArpeggioView* m_arpeggioView;
-	InstrumentMidiIOView * m_midiView;
-	EffectRackView * m_effectView;
-	InstrumentMiscView *m_miscView;
-
-
-	// test-piano at the bottom of every instrument-settings-window
-	PianoView * m_pianoView;
-
-	friend class InstrumentView;
-
-} ;
-
-
-
-#endif
+#endif // LMMS_INSTRUMENT_TRACK_H

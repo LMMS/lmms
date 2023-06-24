@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MIDI_WINMM_H
-#define MIDI_WINMM_H
+#ifndef LMMS_MIDI_WINMM_H
+#define LMMS_MIDI_WINMM_H
 
 #include "lmmsconfig.h"
 
@@ -38,6 +38,10 @@
 class QLineEdit;
 
 
+namespace lmms
+{
+
+
 class MidiWinMM : public QObject, public MidiClient
 {
 	Q_OBJECT
@@ -47,7 +51,7 @@ public:
 
 	inline static QString probeDevice()
 	{
-		return QString::Null(); // no midi device name
+		return QString(); // no midi device name
 	}
 
 
@@ -58,13 +62,13 @@ public:
 
 	inline static QString configSection()
 	{
-		return QString::Null(); // no configuration settings
+		return QString(); // no configuration settings
 	}
 
 
 
 	virtual void processOutEvent( const MidiEvent & _me,
-						const MidiTime & _time,
+						const TimePos & _time,
 						const MidiPort * _port );
 
 	virtual void applyPortMode( MidiPort * _port );
@@ -130,7 +134,7 @@ private:
 	QMap<HMIDIOUT, QString> m_outputDevices;
 
 	// subscriptions
-	typedef QMap<QString, MidiPortList> SubMap;
+	using SubMap = QMap<QString, MidiPortList>;
 	SubMap m_inputSubs;
 	SubMap m_outputSubs;
 
@@ -141,7 +145,9 @@ signals:
 
 } ;
 
-#endif
 
-#endif
+} // namespace lmms
 
+#endif // LMMS_BUILD_WIN32
+
+#endif // LMMS_MIDI_WINMM_H

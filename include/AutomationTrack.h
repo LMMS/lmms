@@ -24,33 +24,35 @@
  *
  */
 
-#ifndef AUTOMATION_TRACK_H
-#define AUTOMATION_TRACK_H
+#ifndef LMMS_AUTOMATION_TRACK_H
+#define LMMS_AUTOMATION_TRACK_H
 
 #include "Track.h"
 
+namespace lmms
+{
 
 class AutomationTrack : public Track
 {
 	Q_OBJECT
 public:
 	AutomationTrack( TrackContainer* tc, bool _hidden = false );
-	virtual ~AutomationTrack() = default;
+	~AutomationTrack() override = default;
 
-	virtual bool play( const MidiTime & _start, const fpp_t _frames,
-						const f_cnt_t _frame_base, int _tco_num = -1 );
+	bool play( const TimePos & _start, const fpp_t _frames,
+						const f_cnt_t _frame_base, int _clip_num = -1 ) override;
 
-	virtual QString nodeName() const
+	QString nodeName() const override
 	{
 		return "automationtrack";
 	}
 
-	virtual TrackView * createView( TrackContainerView* );
-	virtual TrackContentObject * createTCO( const MidiTime & _pos );
+	gui::TrackView * createView( gui::TrackContainerView* ) override;
+	Clip* createClip(const TimePos & pos) override;
 
-	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
-							QDomElement & _parent );
-	virtual void loadTrackSpecificSettings( const QDomElement & _this );
+	void saveTrackSpecificSettings( QDomDocument & _doc,
+							QDomElement & _parent ) override;
+	void loadTrackSpecificSettings( const QDomElement & _this ) override;
 
 private:
 	friend class AutomationTrackView;
@@ -58,17 +60,6 @@ private:
 } ;
 
 
+} // namespace lmms
 
-class AutomationTrackView : public TrackView
-{
-public:
-	AutomationTrackView( AutomationTrack* at, TrackContainerView* tcv );
-	virtual ~AutomationTrackView() = default;
-
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
-
-} ;
-
-
-#endif
+#endif // LMMS_AUTOMATION_TRACK_H

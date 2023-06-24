@@ -26,18 +26,23 @@
 #define DELAYCONTROLSDIALOG_H
 
 #include "EffectControlDialog.h"
-#include "AutomatableModel.h"
+
+namespace lmms
+{
+
 
 class DelayControls;
+class FloatModel;
+
+namespace gui
+{
 
 class DelayControlsDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
 	DelayControlsDialog( DelayControls* controls );
-	virtual ~DelayControlsDialog()
-	{
-	}
+	~DelayControlsDialog() override = default;
 };
 
 class XyPad : public QWidget
@@ -45,18 +50,23 @@ class XyPad : public QWidget
 	Q_OBJECT
 public:
 	XyPad( QWidget *parent = 0, FloatModel *xModel = 0, FloatModel *yModel = 0 );
-	~XyPad() {}
+	~XyPad() override = default;
 
 protected:
-	virtual void paintEvent ( QPaintEvent * event );
-	virtual void mousePressEvent(QMouseEvent * event );
-	virtual void mouseReleaseEvent(QMouseEvent * event);
-	virtual void mouseMoveEvent(QMouseEvent * event);
+	void paintEvent ( QPaintEvent * event ) override;
+	void mousePressEvent(QMouseEvent * event ) override;
+	void mouseReleaseEvent(QMouseEvent * event) override;
+	void mouseMoveEvent(QMouseEvent * event) override;
 
 private:
 	FloatModel *m_xModel;
 	FloatModel *m_yModel;
 	bool m_acceptInput;
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif // DELAYCONTROLSDIALOG_H

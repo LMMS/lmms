@@ -1,6 +1,6 @@
 /*
  * TrackContainer.h - base-class for all track-containers like Song-Editor,
- *                    BB-Editor...
+ *                    Pattern Editor...
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -23,43 +23,45 @@
  *
  */
 
-#ifndef TRACK_CONTAINER_H
-#define TRACK_CONTAINER_H
+#ifndef LMMS_TRACK_CONTAINER_H
+#define LMMS_TRACK_CONTAINER_H
 
-#include <QtCore/QReadWriteLock>
+#include <QReadWriteLock>
 
 #include "Track.h"
 #include "JournallingObject.h"
 
+namespace lmms
+{
 
-class AutomationPattern;
+class AutomationClip;
 class InstrumentTrack;
+
+namespace gui
+{
+
 class TrackContainerView;
 
+}
 
-class EXPORT TrackContainer : public Model, public JournallingObject
+
+class LMMS_EXPORT TrackContainer : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
-	typedef QVector<Track *> TrackList;
+	using TrackList = QVector<Track*>;
 	enum TrackContainerTypes
 	{
-		BBContainer,
+		PatternContainer,
 		SongContainer
 	} ;
 
 	TrackContainer();
-	virtual ~TrackContainer();
+	~TrackContainer() override;
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 
-	virtual void loadSettings( const QDomElement & _this );
-
-
-	virtual AutomationPattern * tempoAutomationPattern()
-	{
-		return NULL;
-	}
+	void loadSettings( const QDomElement & _this ) override;
 
 	int countTracks( Track::TrackTypes _tt = Track::NumTrackTypes ) const;
 
@@ -93,13 +95,13 @@ public:
 		return m_TrackContainerType;
 	}
 
-	virtual AutomatedValueMap automatedValuesAt(MidiTime time, int tcoNum = -1) const;
+	virtual AutomatedValueMap automatedValuesAt(TimePos time, int clipNum = -1) const;
 
 signals:
-	void trackAdded( Track * _track );
+	void trackAdded( lmms::Track * _track );
 
 protected:
-	static AutomatedValueMap automatedValuesFromTracks(const TrackList &tracks, MidiTime timeStart, int tcoNum = -1);
+	static AutomatedValueMap automatedValuesFromTracks(const TrackList &tracks, TimePos timeStart, int clipNum = -1);
 
 	mutable QReadWriteLock m_tracksMutex;
 
@@ -109,36 +111,11 @@ private:
 	TrackContainerTypes m_TrackContainerType;
 
 
-	friend class TrackContainerView;
+	friend class gui::TrackContainerView;
 	friend class Track;
 
 } ;
 
+} // namespace lmms
 
-class DummyTrackContainer : public TrackContainer
-{
-public:
-	DummyTrackContainer();
-
-	virtual ~DummyTrackContainer()
-	{
-	}
-
-	virtual QString nodeName() const
-	{
-		return "DummyTrackContainer";
-	}
-
-	InstrumentTrack * dummyInstrumentTrack()
-	{
-		return m_dummyInstrumentTrack;
-	}
-
-
-private:
-	InstrumentTrack * m_dummyInstrumentTrack;
-
-} ;
-
-
-#endif
+#endif // LMMS_TRACK_CONTAINER_H

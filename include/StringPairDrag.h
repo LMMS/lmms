@@ -23,39 +23,36 @@
  *
  */
 
-#ifndef STRING_PAIR_DRAG_H
-#define STRING_PAIR_DRAG_H
+#ifndef LMMS_GUI_STRING_PAIR_DRAG_H
+#define LMMS_GUI_STRING_PAIR_DRAG_H
 
 #include <QDrag>
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QMimeData>
 
-#include "export.h"
+#include "lmms_export.h"
 
 class QPixmap;
 
+namespace lmms::gui
+{
 
-class EXPORT StringPairDrag : public QDrag
+
+class LMMS_EXPORT StringPairDrag : public QDrag
 {
 public:
 	StringPairDrag( const QString & _key, const QString & _value,
 					const QPixmap & _icon, QWidget * _w );
-	~StringPairDrag();
+	~StringPairDrag() override;
 
 	static bool processDragEnterEvent( QDragEnterEvent * _dee,
 						const QString & _allowed_keys );
-	static QString decodeMimeKey( const QMimeData * mimeData );
-	static QString decodeMimeValue( const QMimeData * mimeData );
 	static QString decodeKey( QDropEvent * _de );
 	static QString decodeValue( QDropEvent * _de );
-
-	static const char * mimeType()
-	{
-		return( "application/x-lmms-stringpair" );
-	}
-
 } ;
 
 
-#endif
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_STRING_PAIR_DRAG_H

@@ -32,6 +32,9 @@
 #include "MainWindow.h"
 #include "TextFloat.h"
 
+namespace lmms::gui
+{
+
 
 class EqFader : public Fader
 {
@@ -47,7 +50,7 @@ public:
 		resize( 23, 80 );
 		m_lPeak = lPeak;
 		m_rPeak = rPeak;
-		connect( gui->mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( updateVuMeters() ) );
+		connect( getGUI()->mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( updateVuMeters() ) );
 		m_model = model;
 		setPeak_L( 0 );
 		setPeak_R( 0 );
@@ -61,7 +64,7 @@ public:
 		resize( 23, 116 );
 		m_lPeak = lPeak;
 		m_rPeak = rPeak;
-		connect( gui->mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( updateVuMeters() ) );
+		connect( getGUI()->mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( updateVuMeters() ) );
 		m_model = model;
 		setPeak_L( 0 );
 		setPeak_R( 0 );
@@ -69,9 +72,7 @@ public:
 
 
 
-	~EqFader()
-	{
-	}
+	~EqFader() override = default;
 
 
 private slots:
@@ -80,7 +81,7 @@ private slots:
 	{
 		const float opl = getPeak_L();
 		const float opr = getPeak_R();
-		const float fall_off = 1.2;
+		const float fallOff = 1.07;
 		if( *m_lPeak > opl )
 		{
 			setPeak_L( *m_lPeak );
@@ -88,7 +89,7 @@ private slots:
 		}
 		else
 		{
-			setPeak_L( opl/fall_off );
+			setPeak_L( opl/fallOff );
 		}
 
 		if( *m_rPeak > opr )
@@ -98,7 +99,7 @@ private slots:
 		}
 		else
 		{
-			setPeak_R( opr/fall_off );
+			setPeak_R( opr/fallOff );
 		}
 		update();
 	}
@@ -112,4 +113,8 @@ private:
 	FloatModel* m_model;
 
 };
+
+
+} // namespace lmms::gui
+
 #endif // EQFADER_H

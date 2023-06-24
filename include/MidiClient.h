@@ -22,31 +22,35 @@
  *
  */
 
-#ifndef MIDI_CLIENT_H
-#define MIDI_CLIENT_H
+#ifndef LMMS_MIDI_CLIENT_H
+#define LMMS_MIDI_CLIENT_H
 
-#include <QtCore/QStringList>
-#include <QtCore/QVector>
+#include <QStringList>
+#include <QVector>
 
 
 #include "MidiEvent.h"
-#include "MidiEventProcessor.h"
-#include "TabWidget.h"
 
+class QObject;
+
+
+namespace lmms
+{
 
 class MidiPort;
+class TimePos;
 
 
 // base-class for all MIDI-clients
 class MidiClient
 {
 public:
-	MidiClient();
+	MidiClient() = default;
 	virtual ~MidiClient();
 
 	// to be implemented by sub-classes
 	virtual void processOutEvent( const MidiEvent & _me,
-						const MidiTime & _time,
+						const TimePos & _time,
 						const MidiPort * _port ) = 0;
 
 	// inheriting classes can re-implement this for being able to update
@@ -120,11 +124,11 @@ const uint32_t RAW_MIDI_PARSE_BUF_SIZE = 16;
 class MidiClientRaw : public MidiClient
 {
 public:
-	MidiClientRaw();
-	virtual ~MidiClientRaw();
+	MidiClientRaw() = default;
+	~MidiClientRaw() override = default;
 
 	// we are raw-clients for sure!
-	virtual bool isRaw() const
+	bool isRaw() const override
 	{
 		return true;
 	}
@@ -141,7 +145,7 @@ protected:
 private:
 	// this does MIDI-event-process
 	void processParsedEvent();
-	virtual void processOutEvent( const MidiEvent& event, const MidiTime& time, const MidiPort* port );
+	void processOutEvent( const MidiEvent& event, const TimePos& time, const MidiPort* port ) override;
 
 	// small helper function returning length of a certain event - this
 	// is necessary for parsing raw-MIDI-data
@@ -167,6 +171,6 @@ private:
 
 } ;
 
+} // namespace lmms
 
-#endif
-
+#endif // LMMS_MIDI_CLIENT_H

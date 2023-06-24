@@ -24,16 +24,17 @@
  *
  */
  
-#include <QLayout>
-#include <QLabel>
 
 #include "CrossoverEQControlDialog.h"
 #include "CrossoverEQControls.h"
 #include "embed.h"
-#include "ToolTip.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "Knob.h"
 #include "Fader.h"
+
+namespace lmms::gui
+{
+
 
 CrossoverEQControlDialog::CrossoverEQControlDialog( CrossoverEQControls * controls ) :
 	EffectControlDialog( controls )
@@ -45,71 +46,70 @@ CrossoverEQControlDialog::CrossoverEQControlDialog( CrossoverEQControls * contro
 	setFixedSize( 167, 178 );
 	
 	// knobs
-	Knob * xover12 = new Knob( knobBright_26, this );
+	auto xover12 = new Knob(knobBright_26, this);
 	xover12->move( 29, 11 );
 	xover12->setModel( & controls->m_xover12 );
 	xover12->setLabel( "1/2" );
-	xover12->setHintText( tr( "Band 1/2 Crossover:" ), " Hz" );
-	
-	Knob * xover23 = new Knob( knobBright_26, this );
+	xover12->setHintText( tr( "Band 1/2 crossover:" ), " Hz" );
+
+	auto xover23 = new Knob(knobBright_26, this);
 	xover23->move( 69, 11 );
 	xover23->setModel( & controls->m_xover23 );
 	xover23->setLabel( "2/3" );
-	xover23->setHintText( tr( "Band 2/3 Crossover:" ), " Hz" );
-	
-	Knob * xover34 = new Knob( knobBright_26, this );
+	xover23->setHintText( tr( "Band 2/3 crossover:" ), " Hz" );
+
+	auto xover34 = new Knob(knobBright_26, this);
 	xover34->move( 109, 11 );
 	xover34->setModel( & controls->m_xover34 );
 	xover34->setLabel( "3/4" );
-	xover34->setHintText( tr( "Band 3/4 Crossover:" ), " Hz" );
+	xover34->setHintText( tr( "Band 3/4 crossover:" ), " Hz" );
 	
 	m_fader_bg = QPixmap( PLUGIN_NAME::getIconPixmap( "fader_bg" ) );
 	m_fader_empty = QPixmap( PLUGIN_NAME::getIconPixmap( "fader_empty" ) );
 	m_fader_knob = QPixmap( PLUGIN_NAME::getIconPixmap( "fader_knob2" ) );
 	
 	// faders
-	Fader * gain1 = new Fader( &controls->m_gain1, "Band 1 Gain", this, 
-		&m_fader_bg, &m_fader_empty, &m_fader_knob );
+	auto gain1 = new Fader(&controls->m_gain1, tr("Band 1 gain"), this, &m_fader_bg, &m_fader_empty, &m_fader_knob);
 	gain1->move( 7, 56 );
 	gain1->setDisplayConversion( false );
-	gain1->setHintText( tr( "Band 1 Gain:" ), " dBFS" );
-	
-	Fader * gain2 = new Fader( &controls->m_gain2, "Band 2 Gain", this, 
-		&m_fader_bg, &m_fader_empty, &m_fader_knob );
+	gain1->setHintText( tr( "Band 1 gain:" ), " dBFS" );
+
+	auto gain2 = new Fader(&controls->m_gain2, tr("Band 2 gain"), this, &m_fader_bg, &m_fader_empty, &m_fader_knob);
 	gain2->move( 47, 56 );
 	gain2->setDisplayConversion( false );
-	gain2->setHintText( tr( "Band 2 Gain:" ), " dBFS" );
-	
-	Fader * gain3 = new Fader( &controls->m_gain3, "Band 3 Gain", this, 
-		&m_fader_bg, &m_fader_empty, &m_fader_knob );
+	gain2->setHintText( tr( "Band 2 gain:" ), " dBFS" );
+
+	auto gain3 = new Fader(&controls->m_gain3, tr("Band 3 gain"), this, &m_fader_bg, &m_fader_empty, &m_fader_knob);
 	gain3->move( 87, 56 );
 	gain3->setDisplayConversion( false );
-	gain3->setHintText( tr( "Band 3 Gain:" ), " dBFS" );
-	
-	Fader * gain4 = new Fader( &controls->m_gain4, "Band 4 Gain", this, 
-		&m_fader_bg, &m_fader_empty, &m_fader_knob );
+	gain3->setHintText( tr( "Band 3 gain:" ), " dBFS" );
+
+	auto gain4 = new Fader(&controls->m_gain4, tr("Band 4 gain"), this, &m_fader_bg, &m_fader_empty, &m_fader_knob);
 	gain4->move( 127, 56 );
 	gain4->setDisplayConversion( false );
-	gain4->setHintText( tr( "Band 4 Gain:" ), " dBFS" );
+	gain4->setHintText( tr( "Band 4 gain:" ), " dBFS" );
 	
 	// leds
-	LedCheckBox * mute1 = new LedCheckBox( "", this, tr( "Band 1 Mute" ), LedCheckBox::Green );
+	auto mute1 = new LedCheckBox("", this, tr("Band 1 mute"), LedCheckBox::Green);
 	mute1->move( 15, 154 );
 	mute1->setModel( & controls->m_mute1 );
-	ToolTip::add( mute1, tr( "Mute Band 1" ) );
-	
-	LedCheckBox * mute2 = new LedCheckBox( "", this, tr( "Band 2 Mute" ), LedCheckBox::Green );
+	mute1->setToolTip(tr("Mute band 1"));
+
+	auto mute2 = new LedCheckBox("", this, tr("Band 2 mute"), LedCheckBox::Green);
 	mute2->move( 55, 154 );
 	mute2->setModel( & controls->m_mute2 );
-	ToolTip::add( mute2, tr( "Mute Band 2" ) );
-	
-	LedCheckBox * mute3 = new LedCheckBox( "", this, tr( "Band 3 Mute" ), LedCheckBox::Green );
+	mute2->setToolTip(tr("Mute band 2"));
+
+	auto mute3 = new LedCheckBox("", this, tr("Band 3 mute"), LedCheckBox::Green);
 	mute3->move( 95, 154 );
 	mute3->setModel( & controls->m_mute3 );
-	ToolTip::add( mute3, tr( "Mute Band 3" ) );
-	
-	LedCheckBox * mute4 = new LedCheckBox( "", this, tr( "Band 4 Mute" ), LedCheckBox::Green );
+	mute3->setToolTip(tr("Mute band 3"));
+
+	auto mute4 = new LedCheckBox("", this, tr("Band 4 mute"), LedCheckBox::Green);
 	mute4->move( 135, 154 );
 	mute4->setModel( & controls->m_mute4 );
-	ToolTip::add( mute4, tr( "Mute Band 4" ) );
+	mute4->setToolTip(tr("Mute band 4"));
 }
+
+
+} // namespace lmms::gui

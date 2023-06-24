@@ -29,6 +29,8 @@
 #include "ProjectJournal.h"
 #include "Engine.h"
 
+namespace lmms
+{
 
 
 JournallingObject::JournallingObject() :
@@ -118,7 +120,7 @@ void JournallingObject::changeID( jo_id_t _id )
 	{
 		JournallingObject * jo = Engine::projectJournal()->
 											journallingObject( _id );
-		if( jo != NULL )
+		if( jo != nullptr )
 		{
 			QString used_by = jo->nodeName();
 			if( used_by == "automatablemodel" &&
@@ -140,3 +142,4 @@ void JournallingObject::changeID( jo_id_t _id )
 }
 
 
+} // namespace lmms

@@ -23,12 +23,14 @@
  *
  */
 
-
-#ifndef RUBBERBAND_H
-#define RUBBERBAND_H
+#ifndef LMMS_GUI_RUBBERBAND_H
+#define LMMS_GUI_RUBBERBAND_H
 
 #include <QRubberBand>
-#include <QtCore/QVector>
+#include <QVector>
+
+namespace lmms::gui
+{
 
 
 class selectableObject : public QWidget
@@ -41,13 +43,12 @@ public:
 	{
 	}
 
-	virtual ~selectableObject()
-	{
-	}
+	~selectableObject() override = default;
 
-	inline void setSelected( bool _selected )
+	inline void setSelected(bool selected)
 	{
-		m_selected = _selected;
+		if (m_selected == selected) { return; }
+		m_selected = selected;
 		update();
 	}
 
@@ -76,19 +77,20 @@ class RubberBand : public QRubberBand
 {
 public:
 	RubberBand( QWidget * _parent );
-	virtual ~RubberBand();
+	~RubberBand() override = default;
 
 	QVector<selectableObject *> selectedObjects() const;
 	QVector<selectableObject *> selectableObjects() const;
 
 
 protected:
-	virtual void resizeEvent( QResizeEvent * _re );
+	void resizeEvent( QResizeEvent * _re ) override;
 
 private:
 
 };
 
 
-#endif
+} // namespace lmms::gui
 
+#endif // LMMS_GUI_RUBBERBAND_H

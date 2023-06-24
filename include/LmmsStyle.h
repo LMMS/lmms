@@ -23,12 +23,14 @@
  *
  */
 
-
-#ifndef LMMS_STYLE_H
-#define LMMS_STYLE_H
+#ifndef LMMS_GUI_LMMS_STYLE_H
+#define LMMS_GUI_LMMS_STYLE_H
 
 #include <QProxyStyle>
 
+
+namespace lmms::gui
+{
 
 
 class LmmsStyle : public QProxyStyle
@@ -63,25 +65,23 @@ public:
 	};
 
 	LmmsStyle();
-	virtual ~LmmsStyle()
-	{
-	}
+	~LmmsStyle() override = default;
 
-	virtual QPalette standardPalette( void ) const;
+	QPalette standardPalette() const override;
 
-	virtual void drawComplexControl(
+	void drawComplexControl(
 				ComplexControl control,
 				const QStyleOptionComplex * option,
 					QPainter *painter,
-						const QWidget *widget ) const;
-	virtual void drawPrimitive( PrimitiveElement element,
+						const QWidget *widget ) const override;
+	void drawPrimitive( PrimitiveElement element,
 					const QStyleOption *option,
 					QPainter *painter,
-					const QWidget *widget = 0 ) const;
+					const QWidget *widget = 0 ) const override;
 
-	virtual int pixelMetric( PixelMetric metric,
+	int pixelMetric( PixelMetric metric,
 					const QStyleOption * option = 0,
-					const QWidget * widget = 0 ) const;
+					const QWidget * widget = 0 ) const override;
 
 	static QPalette * s_palette;
 
@@ -92,4 +92,7 @@ private:
 
 };
 
-#endif
+
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_LMMS_STYLE_H

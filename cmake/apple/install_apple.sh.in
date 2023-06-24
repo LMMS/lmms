@@ -6,9 +6,6 @@
 
 set -e
 
-# STK rawwaves directory
-STK_RAWWAVE=$(brew --prefix stk)/share/stk/rawwaves
-
 # Place to create ".app" bundle
 APP="@CMAKE_BINARY_DIR@/@PROJECT_NAME_UCASE@.app"
 
@@ -29,11 +26,9 @@ command cp  "@CMAKE_BINARY_DIR@/Info.plist" "@CMAKE_INSTALL_PREFIX@/"
 mkdir -p "$APP/Contents/MacOS"
 mkdir -p "$APP/Contents/Frameworks"
 mkdir -p "$APP/Contents/Resources"
-mkdir -p "$APP/Contents/share/stk/rawwaves"
 cd "@CMAKE_INSTALL_PREFIX@"
 cp -R ./* "$APP/Contents"
 cp "@CMAKE_SOURCE_DIR@/cmake/apple/"*.icns "$APP/Contents/Resources/"
-cp "$STK_RAWWAVE"/*.raw "$APP/Contents/share/stk/rawwaves" > /dev/null 2>&1
 
 # Make all libraries writable for macdeployqt
 cd "$APP"
@@ -58,6 +53,17 @@ install_name_tool -change @rpath/libZynAddSubFxCore.dylib \
 install_name_tool -change @rpath/libZynAddSubFxCore.dylib \
    @loader_path/../../$zynfmk \
   "$APP/Contents/$zynlib"
+  
+# Replace @rpath with @loader_path for Carla
+# See also plugins/CarlaBase/CMakeLists.txt
+# This MUST be done BEFORE calling macdeployqt
+install_name_tool -change @rpath/libcarlabase.dylib \
+   @loader_path/libcarlabase.dylib \
+  "$APP/Contents/lib/lmms/libcarlapatchbay.so"
+
+install_name_tool -change @rpath/libcarlabase.dylib \
+  @loader_path/libcarlabase.dylib \
+  "$APP/Contents/lib/lmms/libcarlarack.so"
 
 # Link lmms binary
 _executables="${_executables} -executable=$APP/Contents/$zynbin"
@@ -78,6 +84,28 @@ done
 # Finalize .app
 # shellcheck disable=SC2086
 macdeployqt "$APP" $_executables
+
+# Carla is a standalone plugin.  Remove library, look for it side-by-side LMMS.app
+# This MUST be done AFTER calling macdeployqt
+#
+# For example:
+#    /Applications/LMMS.app
+#    /Applications/Carla.app
+carlalibs=$(echo "@CARLA_LIBRARIES@"|tr ";" "\n")
+
+# Loop over all libcarlas, fix linking
+for file in "$APP/Contents/lib/lmms/"libcarla*; do
+   _thisfile="$APP/Contents/lib/lmms/${file##*/}"
+   for lib in $carlalibs; do
+     _oldpath="../../Frameworks/lib${lib}.dylib"
+     _newpath="Carla.app/Contents/MacOS/lib${lib}.dylib"
+     # shellcheck disable=SC2086
+     install_name_tool -change @loader_path/$_oldpath \
+       @executable_path/../../../$_newpath \
+       "$_thisfile"
+     rm -f "$APP/Contents/Frameworks/lib${lib}.dylib"
+   done
+done
 
 # Cleanup
 rm -rf "$APP/Contents/bin"

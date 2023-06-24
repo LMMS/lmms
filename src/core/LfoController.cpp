@@ -24,12 +24,15 @@
  */
 
 #include <QDomElement>
-#include <QObject>
 
 
-#include "Song.h"
-#include "Mixer.h"
 #include "LfoController.h"
+#include "AudioEngine.h"
+#include "Song.h"
+
+
+namespace lmms
+{
 
 
 LfoController::LfoController( Model * _parent ) :
@@ -48,20 +51,20 @@ LfoController::LfoController( Model * _parent ) :
 	m_userDefSampleBuffer( new SampleBuffer )
 {
 	setSampleExact( true );
-	connect( &m_waveModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateSampleFunction() ) );
+	connect( &m_waveModel, SIGNAL(dataChanged()),
+			this, SLOT(updateSampleFunction()), Qt::DirectConnection );
 
-	connect( &m_speedModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateDuration() ) );
-	connect( &m_multiplierModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateDuration() ) );
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
-			this, SLOT( updateDuration() ) );
+	connect( &m_speedModel, SIGNAL(dataChanged()),
+			this, SLOT(updateDuration()), Qt::DirectConnection );
+	connect( &m_multiplierModel, SIGNAL(dataChanged()),
+			this, SLOT(updateDuration()), Qt::DirectConnection );
+	connect( Engine::audioEngine(), SIGNAL(sampleRateChanged()),
+			this, SLOT(updateDuration()));
 
-	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ),
-			this, SLOT( updatePhase() ) );
-	connect( Engine::getSong(), SIGNAL( playbackPositionChanged() ),
-			this, SLOT( updatePhase() ) );
+	connect( Engine::getSong(), SIGNAL(playbackStateChanged()),
+			this, SLOT(updatePhase()));
+	connect( Engine::getSong(), SIGNAL(playbackPositionChanged()),
+			this, SLOT(updatePhase()));
 
 	updateDuration();
 }
@@ -91,7 +94,7 @@ void LfoController::updateValueBuffer()
 	if( m_bufferLastUpdated < s_periods )
 	{
 		int diff = s_periods - m_bufferLastUpdated;
-		phase += static_cast<float>( Engine::mixer()->framesPerPeriod() * diff ) / m_duration;
+		phase += static_cast<float>( Engine::audioEngine()->framesPerPeriod() * diff ) / m_duration;
 		m_bufferLastUpdated += diff;
 	}
 
@@ -102,7 +105,7 @@ void LfoController::updateValueBuffer()
 
 	for( float& f : m_valueBuffer )
 	{
-		const float currentSample = m_sampleFunction != NULL
+		const float currentSample = m_sampleFunction != nullptr
 			? m_sampleFunction( phase )
 			: m_userDefSampleBuffer->userWaveSample( phase );
 
@@ -125,7 +128,7 @@ void LfoController::updatePhase()
 
 void LfoController::updateDuration()
 {
-	float newDurationF = Engine::mixer()->processingSampleRate() *	m_speedModel.value();
+	float newDurationF = Engine::audioEngine()->processingSampleRate() * m_speedModel.value();
 
 	switch(m_multiplierModel.value() )
 	{
@@ -170,7 +173,7 @@ void LfoController::updateSampleFunction()
 			m_sampleFunction = &Oscillator::noiseSample;
 			break;
 		case Oscillator::UserDefinedWave:
-			m_sampleFunction = NULL;
+			m_sampleFunction = nullptr;
 			/*TODO: If C++11 is allowed, should change the type of
 			 m_sampleFunction be std::function<sample_t(const float)>
 			 and use the line below:
@@ -221,12 +224,10 @@ QString LfoController::nodeName() const
 
 
 
-ControllerDialog * LfoController::createDialog( QWidget * _parent )
+gui::ControllerDialog * LfoController::createDialog( QWidget * _parent )
 {
-	return new LfoControllerDialog( this, _parent );
+	return new gui::LfoControllerDialog( this, _parent );
 }
 
 
-
-
-
+} // namespace lmms

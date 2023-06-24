@@ -22,37 +22,39 @@
  *
  */
 
-
-#ifndef PIXMAP_BUTTON_H
-#define PIXMAP_BUTTON_H
+#ifndef LMMS_GUI_PIXMAP_BUTTON_H
+#define LMMS_GUI_PIXMAP_BUTTON_H
 
 #include <QPixmap>
 
 #include "AutomatableButton.h"
 
+namespace lmms::gui
+{
 
-class EXPORT PixmapButton : public AutomatableButton
+
+class LMMS_EXPORT PixmapButton : public AutomatableButton
 {
 	Q_OBJECT
 public:
 	PixmapButton( QWidget * _parent,
-					const QString & _name = QString::null );
-	virtual ~PixmapButton();
+					const QString & _name = QString() );
+	~PixmapButton() override = default;
 
 	void setActiveGraphic( const QPixmap & _pm );
 	void setInactiveGraphic( const QPixmap & _pm, bool _update = true );
 
-	QSize sizeHint() const;
+	QSize sizeHint() const override;
 
 signals:
 	void doubleClicked();
 
 
 protected:
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
-	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
+	void paintEvent( QPaintEvent * _pe ) override;
+	void mousePressEvent( QMouseEvent * _me ) override;
+	void mouseReleaseEvent( QMouseEvent * _me ) override;
+	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
 
 
 private:
@@ -62,4 +64,7 @@ private:
 
 } ;
 
-#endif
+
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_PIXMAP_BUTTON_H

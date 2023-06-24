@@ -25,7 +25,7 @@ if [ -z "$MSYSCON" ]; then
 		TOOLCHAIN="$DIR/toolchains/Ubuntu-MinGW-W64-$ARCH.cmake"
 	fi
 else
-	CMAKE_OPTS="$CMAKE_OPTS -DLMMS_BUILD_MSYS=1"
+	TOOLCHAIN="$DIR/toolchains/MSYS-$ARCH.cmake"
 fi
 
 export PATH=$MINGW/bin:$PATH
@@ -37,4 +37,4 @@ fi
 CMAKE_OPTS="-DCMAKE_PREFIX_PATH=$MINGW $CMAKE_OPTS"
 
 # shellcheck disable=SC2086
-cmake "$DIR/.." -DCMAKE_TOOLCHAIN_FILE="$TOOLCHAIN" -DCMAKE_MODULE_PATH="$DIR/../cmake/modules/" $CMAKE_OPTS
+cmake "$DIR/.." -DCMAKE_TOOLCHAIN_FILE="$TOOLCHAIN" $CMAKE_OPTS

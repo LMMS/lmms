@@ -22,16 +22,18 @@
  *
  */
 
-#ifndef PLUGIN_VIEW_H
-#define PLUGIN_VIEW_H
+#ifndef LMMS_GUI_PLUGIN_VIEW_H
+#define LMMS_GUI_PLUGIN_VIEW_H
 
 #include <QWidget>
 
 #include "Plugin.h"
 #include "ModelView.h"
 
+namespace lmms::gui
+{
 
-class EXPORT PluginView  : public QWidget, public ModelView
+class LMMS_EXPORT PluginView  : public QWidget, public ModelView
 {
 public:
 	PluginView( Plugin * _plugin, QWidget * _parent ) :
@@ -43,4 +45,6 @@ public:
 } ;
 
 
-#endif
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_PLUGIN_VIEW_H

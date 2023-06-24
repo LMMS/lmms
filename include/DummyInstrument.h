@@ -23,54 +23,58 @@
  *
  */
 
-#ifndef DUMMY_INSTRUMENT_H
-#define DUMMY_INSTRUMENT_H
+#ifndef LMMS_DUMMY_INSTRUMENT_H
+#define LMMS_DUMMY_INSTRUMENT_H
 
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Engine.h"
 
-#include <string.h>
+#include <cstring>
 
-#include "Mixer.h"
+#include "AudioEngine.h"
+
+
+namespace lmms
+{
 
 
 class DummyInstrument : public Instrument
 {
 public:
 	DummyInstrument( InstrumentTrack * _instrument_track ) :
-		Instrument( _instrument_track, NULL )
+		Instrument( _instrument_track, nullptr )
 	{
 	}
 
-	virtual ~DummyInstrument()
-	{
-	}
+	~DummyInstrument() override = default;
 
-	virtual void playNote( NotePlayHandle *, sampleFrame * buffer )
+	void playNote( NotePlayHandle *, sampleFrame * buffer ) override
 	{
 		memset( buffer, 0, sizeof( sampleFrame ) *
-			Engine::mixer()->framesPerPeriod() );
+			Engine::audioEngine()->framesPerPeriod() );
 	}
 
-	virtual void saveSettings( QDomDocument &, QDomElement & )
+	void saveSettings( QDomDocument &, QDomElement & ) override
 	{
 	}
 
-	virtual void loadSettings( const QDomElement & )
+	void loadSettings( const QDomElement & ) override
 	{
 	}
 
-	virtual QString nodeName() const
+	QString nodeName() const override
 	{
 		return "dummyinstrument";
 	}
 
-	virtual PluginView * instantiateView( QWidget * _parent )
+	gui::PluginView * instantiateView( QWidget * _parent ) override
 	{
-		return new InstrumentView( this, _parent );
+		return new gui::InstrumentViewFixedSize( this, _parent );
 	}
 } ;
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_DUMMY_INSTRUMENT_H

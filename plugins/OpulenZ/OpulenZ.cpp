@@ -35,17 +35,16 @@
 
 #include "OpulenZ.h"
 #include "Instrument.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
-#include "Mixer.h"
 
-#include <QDomDocument>
 #include <QFile>
 #include <QFileInfo>
 #include <QByteArray>
-#include <assert.h>
-#include <math.h>
+#include <cassert>
+#include <cmath>
 
 #include "opl.h"
 #include "temuopl.h"
@@ -55,31 +54,35 @@
 #include "debug.h"
 
 #include "Knob.h"
-#include "LcdSpinBox.h"
 #include "PixmapButton.h"
-#include "ToolTip.h"
+
+#include "plugin_export.h"
+
+namespace lmms
+{
+
 
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT opulenz_plugin_descriptor =
 {
-        STRINGIFY( PLUGIN_NAME ),
+        LMMS_STRINGIFY( PLUGIN_NAME ),
         "OpulenZ",
-        QT_TRANSLATE_NOOP( "pluginBrowser",
+        QT_TRANSLATE_NOOP( "PluginBrowser",
 			   "2-operator FM Synth" ),
         "Raine M. Ekman <raine/at/iki/fi>",
         0x0100,
         Plugin::Instrument,
         new PluginPixmapLoader( "logo" ),
         "sbi",
-        NULL
+        nullptr,
 };
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
-        return( new OpulenzInstrument( static_cast<InstrumentTrack *>( _data ) ) );
+	return( new OpulenzInstrument( static_cast<InstrumentTrack *>( m ) ) );
 }
 
 }
@@ -89,55 +92,55 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
 QMutex OpulenzInstrument::emulatorMutex;
 
 // Weird ordering of voice parameters
-const unsigned int adlib_opadd[OPL2_VOICES] = {0x00, 0x01, 0x02, 0x08, 0x09, 0x0A, 0x10, 0x11, 0x12};
+const auto adlib_opadd = std::array<unsigned int, OPL2_VOICES>{0x00, 0x01, 0x02, 0x08, 0x09, 0x0A, 0x10, 0x11, 0x12};
 
 OpulenzInstrument::OpulenzInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &opulenz_plugin_descriptor ),
 	m_patchModel( 0, 0, 127, this, tr( "Patch" ) ),
-	op1_a_mdl(14.0, 0.0, 15.0, 1.0, this, tr( "Op 1 Attack" )  ),
-	op1_d_mdl(14.0, 0.0, 15.0, 1.0, this, tr( "Op 1 Decay" )   ),
-	op1_s_mdl(3.0, 0.0, 15.0, 1.0, this, tr( "Op 1 Sustain" )   ),
-	op1_r_mdl(10.0, 0.0, 15.0, 1.0, this, tr( "Op 1 Release" )   ),
-	op1_lvl_mdl(62.0, 0.0, 63.0, 1.0, this, tr( "Op 1 Level" )   ),
-	op1_scale_mdl(0.0, 0.0, 3.0, 1.0, this, tr( "Op 1 Level Scaling" ) ),
-	op1_mul_mdl(0.0, 0.0, 15.0, 1.0, this, tr( "Op 1 Frequency Multiple" ) ),
-	feedback_mdl(0.0, 0.0, 7.0, 1.0, this, tr( "Op 1 Feedback" )    ),
-	op1_ksr_mdl(false, this, tr( "Op 1 Key Scaling Rate" ) ),
-	op1_perc_mdl(false, this, tr( "Op 1 Percussive Envelope" )   ),
-	op1_trem_mdl(true, this, tr( "Op 1 Tremolo" )   ),
-	op1_vib_mdl(false, this, tr( "Op 1 Vibrato" )   ),
+	op1_a_mdl(14.0, 0.0, 15.0, 1.0, this, tr( "Op 1 attack" )  ),
+	op1_d_mdl(14.0, 0.0, 15.0, 1.0, this, tr( "Op 1 decay" )   ),
+	op1_s_mdl(3.0, 0.0, 15.0, 1.0, this, tr( "Op 1 sustain" )   ),
+	op1_r_mdl(10.0, 0.0, 15.0, 1.0, this, tr( "Op 1 release" )   ),
+	op1_lvl_mdl(62.0, 0.0, 63.0, 1.0, this, tr( "Op 1 level" )   ),
+	op1_scale_mdl(0.0, 0.0, 3.0, 1.0, this, tr( "Op 1 level scaling" ) ),
+	op1_mul_mdl(0.0, 0.0, 15.0, 1.0, this, tr( "Op 1 frequency multiplier" ) ),
+	feedback_mdl(0.0, 0.0, 7.0, 1.0, this, tr( "Op 1 feedback" )    ),
+	op1_ksr_mdl(false, this, tr( "Op 1 key scaling rate" ) ),
+	op1_perc_mdl(false, this, tr( "Op 1 percussive envelope" )   ),
+	op1_trem_mdl(true, this, tr( "Op 1 tremolo" )   ),
+	op1_vib_mdl(false, this, tr( "Op 1 vibrato" )   ),
 	op1_w0_mdl(  ),
 	op1_w1_mdl(  ),
 	op1_w2_mdl(  ),
 	op1_w3_mdl(  ),
-	op1_waveform_mdl(0,0,3,this, tr( "Op 1 Waveform" ) ),
+	op1_waveform_mdl(0,0,3,this, tr( "Op 1 waveform" ) ),
 
 
-	op2_a_mdl(1.0, 0.0, 15.0, 1.0, this, tr( "Op 2 Attack" )   ),
-	op2_d_mdl(3.0, 0.0, 15.0, 1.0, this, tr( "Op 2 Decay" )   ),
-	op2_s_mdl(14.0, 0.0, 15.0, 1.0, this, tr( "Op 2 Sustain" ) ),
-	op2_r_mdl(12.0, 0.0, 15.0, 1.0, this, tr( "Op 2 Release" )   ),
-	op2_lvl_mdl(63.0, 0.0, 63.0, 1.0, this, tr( "Op 2 Level" )   ),
-	op2_scale_mdl(0.0, 0.0, 3.0, 1.0, this, tr( "Op 2 Level Scaling" ) ),
-	op2_mul_mdl(1.0, 0.0, 15.0, 1.0, this, tr( "Op 2 Frequency Multiple" ) ),
-	op2_ksr_mdl(false, this, tr( "Op 2 Key Scaling Rate" ) ),
-	op2_perc_mdl(false, this, tr( "Op 2 Percussive Envelope" )   ),
-	op2_trem_mdl(false, this, tr( "Op 2 Tremolo" )   ),
-	op2_vib_mdl(true, this, tr( "Op 2 Vibrato" )   ),
+	op2_a_mdl(1.0, 0.0, 15.0, 1.0, this, tr( "Op 2 attack" )   ),
+	op2_d_mdl(3.0, 0.0, 15.0, 1.0, this, tr( "Op 2 decay" )   ),
+	op2_s_mdl(14.0, 0.0, 15.0, 1.0, this, tr( "Op 2 sustain" ) ),
+	op2_r_mdl(12.0, 0.0, 15.0, 1.0, this, tr( "Op 2 release" )   ),
+	op2_lvl_mdl(63.0, 0.0, 63.0, 1.0, this, tr( "Op 2 level" )   ),
+	op2_scale_mdl(0.0, 0.0, 3.0, 1.0, this, tr( "Op 2 level scaling" ) ),
+	op2_mul_mdl(1.0, 0.0, 15.0, 1.0, this, tr( "Op 2 frequency multiplier" ) ),
+	op2_ksr_mdl(false, this, tr( "Op 2 key scaling rate" ) ),
+	op2_perc_mdl(false, this, tr( "Op 2 percussive envelope" )   ),
+	op2_trem_mdl(false, this, tr( "Op 2 tremolo" )   ),
+	op2_vib_mdl(true, this, tr( "Op 2 vibrato" )   ),
 	op2_w0_mdl(  ),
 	op2_w1_mdl(  ),
 	op2_w2_mdl(  ),
 	op2_w3_mdl(  ),
-	op2_waveform_mdl(0,0,3,this, tr( "Op 2 Waveform" ) ),
+	op2_waveform_mdl(0,0,3,this, tr( "Op 2 waveform" ) ),
 
 	fm_mdl(true, this, tr( "FM" )   ),
-	vib_depth_mdl(false, this, tr( "Vibrato Depth" )   ),
-	trem_depth_mdl(false, this, tr( "Tremolo Depth" )   )
+	vib_depth_mdl(false, this, tr( "Vibrato depth" )   ),
+	trem_depth_mdl(false, this, tr( "Tremolo depth" )   )
 {
 
 	// Create an emulator - samplerate, 16 bit, mono
 	emulatorMutex.lock();
-	theEmulator = new CTemuopl(Engine::mixer()->processingSampleRate(), true, false);
+	theEmulator = new CTemuopl(Engine::audioEngine()->processingSampleRate(), true, false);
 	theEmulator->init();
 	// Enable waveform selection
 	theEmulator->write(0x01,0x20);
@@ -156,7 +159,7 @@ OpulenzInstrument::OpulenzInstrument( InstrumentTrack * _instrument_track ) :
 	updatePatch();
 
 	// Can the buffer size change suddenly? I bet that would break lots of stuff
-	frameCount = Engine::mixer()->framesPerPeriod();
+	frameCount = Engine::audioEngine()->framesPerPeriod();
 	renderbuffer = new short[frameCount];
 
 	// Some kind of sane defaults
@@ -166,7 +169,7 @@ OpulenzInstrument::OpulenzInstrument( InstrumentTrack * _instrument_track ) :
 
 	tuneEqual(69, 440);
 
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
+	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ),
 		 this, SLOT( reloadEmulator() ) );
 	// Connect knobs
 	// This one's for testing...
@@ -211,14 +214,14 @@ OpulenzInstrument::OpulenzInstrument( InstrumentTrack * _instrument_track ) :
 	MOD_CON( vib_depth_mdl );
 	MOD_CON( trem_depth_mdl );
 
-	// Connect the plugin to the mixer...
-	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
-	Engine::mixer()->addPlayHandle( iph );
+	// Connect the plugin to the audio engine...
+	auto iph = new InstrumentPlayHandle(this, _instrument_track);
+	Engine::audioEngine()->addPlayHandle( iph );
 }
 
 OpulenzInstrument::~OpulenzInstrument() {
 	delete theEmulator;
-	Engine::mixer()->removePlayHandlesOfTypes( instrumentTrack(),
+	Engine::audioEngine()->removePlayHandlesOfTypes( instrumentTrack(),
 				PlayHandle::TypeNotePlayHandle
 				| PlayHandle::TypeInstrumentPlayHandle );
 	delete [] renderbuffer;
@@ -228,7 +231,7 @@ OpulenzInstrument::~OpulenzInstrument() {
 void OpulenzInstrument::reloadEmulator() {
 	delete theEmulator;
 	emulatorMutex.lock();
-	theEmulator = new CTemuopl(Engine::mixer()->processingSampleRate(), true, false);
+	theEmulator = new CTemuopl(Engine::audioEngine()->processingSampleRate(), true, false);
 	theEmulator->init();
 	theEmulator->write(0x01,0x20);
 	emulatorMutex.unlock();
@@ -291,15 +294,14 @@ int OpulenzInstrument::pushVoice(int v) {
 	return i;
 }
 
-bool OpulenzInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
+bool OpulenzInstrument::handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset )
 {
 	emulatorMutex.lock();
 	int key, vel, voice, tmp_pb;
 
 	switch(event.type()) {
         case MidiNoteOn:
-		// to get us in line with MIDI(?)
-		key = event.key() +12;
+		key = event.key();
 		vel = event.velocity();
 
 		voice = popVoice();
@@ -314,7 +316,7 @@ bool OpulenzInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime&
 		}
                 break;
         case MidiNoteOff:
-                key = event.key() +12;
+                key = event.key();
                 for(voice=0; voice<OPL2_VOICES; ++voice) {
                         if( voiceNote[voice] == key ) {
                                 theEmulator->write(0xA0+voice, fnums[key] & 0xff);
@@ -326,7 +328,7 @@ bool OpulenzInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime&
 		velocities[key] = 0;
                 break;
         case MidiKeyPressure:
-                key = event.key() +12;
+                key = event.key();
                 vel = event.velocity();
 		if( velocities[key] != 0) {
 			velocities[key] = vel;
@@ -369,7 +371,7 @@ bool OpulenzInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime&
 			}
 			break;
 		default:
-#ifdef LMMS_DEBUG	
+#ifdef LMMS_DEBUG
 			printf("Midi CC %02x %02x\n", event.controllerNumber(), event.controllerValue() );
 #endif
 			break;
@@ -390,9 +392,9 @@ QString OpulenzInstrument::nodeName() const
         return( opulenz_plugin_descriptor.name );
 }
 
-PluginView * OpulenzInstrument::instantiateView( QWidget * _parent )
+gui::PluginView* OpulenzInstrument::instantiateView( QWidget * _parent )
 {
-        return( new OpulenzInstrumentView( this, _parent ) );
+        return( new gui::OpulenzInstrumentView( this, _parent ) );
 }
 
 
@@ -412,7 +414,7 @@ void OpulenzInstrument::play( sampleFrame * _working_buffer )
 	emulatorMutex.unlock();
 
 	// Throw the data to the track...
-	instrumentTrack()->processAudioBuffer( _working_buffer, frameCount, NULL );
+	instrumentTrack()->processAudioBuffer( _working_buffer, frameCount, nullptr );
 
 }
 
@@ -532,7 +534,7 @@ void OpulenzInstrument::loadGMPatch() {
 
 // Update patch from the models to the chip emulation
 void OpulenzInstrument::updatePatch() {
-	unsigned char inst[14] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	auto inst = std::array<unsigned char, 14>{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	inst[0] = ( op1_trem_mdl.value() ?  128 : 0  ) +
 		( op1_vib_mdl.value() ?  64 : 0 ) +
 		( op1_perc_mdl.value() ?  0 : 32 ) + // NB. This envelope mode is "perc", not "sus"
@@ -581,7 +583,7 @@ void OpulenzInstrument::updatePatch() {
 #endif
 
 
-	loadPatch(inst);
+	loadPatch(inst.data());
 }
 
 // Load an SBI file into the knob models
@@ -675,11 +677,12 @@ void OpulenzInstrument::loadFile( const QString& file ) {
 
 
 
-
+namespace gui
+{
 
 OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
                                                         QWidget * _parent ) :
-        InstrumentView( _instrument, _parent )
+        InstrumentViewFixedSize( _instrument, _parent )
 {
 
 #define KNOB_GEN(knobname, hinttext, hintunit,xpos,ypos) \
@@ -692,18 +695,18 @@ OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
 	knobname->move(xpos,ypos);
 
 #define BUTTON_GEN(buttname, tooltip, xpos, ypos) \
-	buttname = new PixmapButton( this, NULL );\
+	buttname = new PixmapButton( this, nullptr );\
         buttname->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "led_on" ) );\
         buttname->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "led_off" ) );\
 	buttname->setCheckable( true );\
-        ToolTip::add( buttname, tr( tooltip ) );\
+        buttname->setToolTip(tr(tooltip));\
         buttname->move( xpos, ypos );
 
 #define WAVEBUTTON_GEN(buttname, tooltip, xpos, ypos, icon_on, icon_off, buttgroup) \
-	buttname = new PixmapButton( this, NULL );\
+	buttname = new PixmapButton( this, nullptr );\
         buttname->setActiveGraphic( PLUGIN_NAME::getIconPixmap( icon_on ) ); \
         buttname->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( icon_off ) ); \
-        ToolTip::add( buttname, tr( tooltip ) );\
+        buttname->setToolTip(tr(tooltip));\
         buttname->move( xpos, ypos );\
 	buttgroup->addButton(buttname);
 
@@ -760,7 +763,7 @@ OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
         setPalette( pal );
 }
 OpulenzInstrumentView::~OpulenzInstrumentView() {
-	// Knobs are QWidgets and our children, so they're 
+	// Knobs are QWidgets and our children, so they're
 	// destroyed automagically
 }
 
@@ -779,24 +782,23 @@ void OpulenzInstrumentView::updateKnobHints()
 {
 	// Envelope times in ms: t[0] = 0, t[n] = ( 1<<n ) * X, X = 0.11597 for A, 0.6311 for D/R
 	// Here some rounding has been applied.
-	const float attack_times[16] = { 
-		0.0, 0.2, 0.4, 0.9, 1.8, 3.7, 7.4, 
+	const auto attack_times = std::array<float, 16>{
+		0.0, 0.2, 0.4, 0.9, 1.8, 3.7, 7.4,
 		15.0, 30.0, 60.0, 120.0, 240.0, 480.0,
-		950.0, 1900.0, 3800.0 
+		950.0, 1900.0, 3800.0
 	};
 
-	const float dr_times[16] = { 
-		0.0, 1.2, 2.5, 5.0, 10.0, 20.0, 40.0, 
-		80.0, 160.0, 320.0, 640.0, 1300.0, 2600.0, 
-		5200.0, 10000.0, 20000.0 
-	};
-	
-	const int fmultipliers[16] = {
-		-12, 0, 12, 19, 24, 28, 31, 34, 36, 38, 40, 40, 43, 43, 47, 47  
+	const auto dr_times = std::array<float, 16>{
+		0.0, 1.2, 2.5, 5.0, 10.0, 20.0, 40.0,
+		80.0, 160.0, 320.0, 640.0, 1300.0, 2600.0,
+		5200.0, 10000.0, 20000.0
 	};
 
-	OpulenzInstrument * m = castModel<OpulenzInstrument>();
-	
+	const auto fmultipliers = std::array<int, 16>{
+		-12, 0, 12, 19, 24, 28, 31, 34, 36, 38, 40, 40, 43, 43, 47, 47
+	};
+
+	auto m = castModel<OpulenzInstrument>();
 
 	op1_a_kn->setHintText( tr( "Attack" ),
 						   " (" + knobHintHelper(attack_times[(int)m->op1_a_mdl.value()]) + ")");
@@ -818,7 +820,7 @@ void OpulenzInstrumentView::updateKnobHints()
 
 void OpulenzInstrumentView::modelChanged()
 {
-	OpulenzInstrument * m = castModel<OpulenzInstrument>();
+	auto m = castModel<OpulenzInstrument>();
 	// m_patch->setModel( &m->m_patchModel );
 
 	op1_a_kn->setModel( &m->op1_a_mdl );
@@ -861,15 +863,17 @@ void OpulenzInstrumentView::modelChanged()
 	connect( &m->op1_d_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );
 	connect( &m->op2_d_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );
 
-	connect( &m->op1_r_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );	
-	connect( &m->op2_r_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );	
+	connect( &m->op1_r_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );
+	connect( &m->op2_r_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );
 
-	connect( &m->op1_mul_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );	
-	connect( &m->op2_mul_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );	
+	connect( &m->op1_mul_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );
+	connect( &m->op2_mul_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );
 
 	updateKnobHints();
 
 }
 
 
+} // namespace gui
 
+} // namespace lmms

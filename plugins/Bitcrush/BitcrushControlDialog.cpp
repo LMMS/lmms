@@ -24,15 +24,17 @@
  */
 
 
-#include <QLayout>
 #include <QLabel>
 
+#include "embed.h"
 #include "BitcrushControlDialog.h"
 #include "BitcrushControls.h"
-#include "embed.h"
-#include "ToolTip.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "Knob.h"
+
+namespace lmms::gui
+{
+
 
 BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 	EffectControlDialog( controls )
@@ -44,70 +46,74 @@ BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 	setFixedSize( 181, 128 );
 	
 	// labels
-	QLabel * inLabel = new QLabel( tr( "IN" ), this );
+	auto inLabel = new QLabel(tr("IN"), this);
 	inLabel->move( 24, 15 );
-	
-	QLabel * outLabel = new QLabel( tr( "OUT" ), this );
+
+	auto outLabel = new QLabel(tr("OUT"), this);
 	outLabel->move( 139, 15 );
 	
 	// input knobs
-	Knob * inGain = new Knob( knobBright_26, this );
+	auto inGain = new Knob(knobBright_26, this);
 	inGain->move( 16, 32 );
 	inGain->setModel( & controls->m_inGain );
 	inGain->setLabel( tr( "GAIN" ) );
-	inGain->setHintText( tr( "Input Gain:" ) + " ", " dBFS" );
-	
-	Knob * inNoise = new Knob( knobBright_26, this );
+	inGain->setHintText( tr( "Input gain:" ) , " dBFS" );
+
+	auto inNoise = new Knob(knobBright_26, this);
 	inNoise->move( 14, 76 );
 	inNoise->setModel( & controls->m_inNoise );
 	inNoise->setLabel( tr( "NOISE" ) );
-	inNoise->setHintText( tr( "Input Noise:" ) + " ", "%" );
+	inNoise->setHintText( tr( "Input noise:" ) , "%" );
 	
 	
 	// output knobs
-	Knob * outGain = new Knob( knobBright_26, this );
+	auto outGain = new Knob(knobBright_26, this);
 	outGain->move( 138, 32 );
 	outGain->setModel( & controls->m_outGain );
 	outGain->setLabel( tr( "GAIN" ) );
-	outGain->setHintText( tr( "Output Gain:" ) + " ", " dBFS" );
-	
-	Knob * outClip = new Knob( knobBright_26, this );
+	outGain->setHintText( tr( "Output gain:" ) , " dBFS" );
+
+	auto outClip = new Knob(knobBright_26, this);
 	outClip->move( 138, 76 );
 	outClip->setModel( & controls->m_outClip );
 	outClip->setLabel( tr( "CLIP" ) );
-	outClip->setHintText( tr( "Output Clip:" ) + " ", "%" );
+    outClip->setHintText( tr( "Output clip:" ) , " dBFS");
+
 	
 	
 	// leds
-	LedCheckBox * rateEnabled = new LedCheckBox( "", this, tr( "Rate Enabled" ), LedCheckBox::Green );
+	auto rateEnabled = new LedCheckBox("", this, tr("Rate enabled"), LedCheckBox::Green);
 	rateEnabled->move( 64, 14 );
 	rateEnabled->setModel( & controls->m_rateEnabled );
-	ToolTip::add( rateEnabled, tr( "Enable samplerate-crushing" ) );
-	
-	LedCheckBox * depthEnabled = new LedCheckBox( "", this, tr( "Depth Enabled" ), LedCheckBox::Green );
+	rateEnabled->setToolTip(tr("Enable sample-rate crushing"));
+
+	auto depthEnabled = new LedCheckBox("", this, tr("Depth enabled"), LedCheckBox::Green);
 	depthEnabled->move( 101, 14 );
 	depthEnabled->setModel( & controls->m_depthEnabled );
-	ToolTip::add( depthEnabled, tr( "Enable bitdepth-crushing" ) );
+	depthEnabled->setToolTip(tr("Enable bit-depth crushing"));
 	
 	
 	// rate crushing knobs
-	Knob * rate = new Knob( knobBright_26, this );
+	auto rate = new Knob(knobBright_26, this);
 	rate->move( 59, 32 );
 	rate->setModel( & controls->m_rate );
 	rate->setLabel( tr( "FREQ" ) );
-	rate->setHintText( tr( "Sample rate:" ) + " ", " Hz" );
-	
-	Knob * stereoDiff = new Knob( knobBright_26, this );
+	rate->setHintText( tr( "Sample rate:" ) , " Hz" );
+
+	auto stereoDiff = new Knob(knobBright_26, this);
 	stereoDiff->move( 72, 76 );
 	stereoDiff->setModel( & controls->m_stereoDiff );
 	stereoDiff->setLabel( tr( "STEREO" ) );
-	stereoDiff->setHintText( tr( "Stereo difference:" ) + " ", "%" );
+	stereoDiff->setHintText( tr( "Stereo difference:" ) , "%" );
 	
 	
 	// depth crushing knob
-	Knob * levels = new Knob( knobBright_26, this );
+	auto levels = new Knob(knobBright_26, this);
 	levels->move( 92, 32 );
 	levels->setModel( & controls->m_levels );
 	levels->setLabel( tr( "QUANT" ) );
-	levels->setHintText( tr( "Levels:" ) + " ", "" );
+	levels->setHintText( tr( "Levels:" ) , "" );
 }
+
+
+} // namespace lmms::gui

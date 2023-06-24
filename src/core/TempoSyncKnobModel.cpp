@@ -31,6 +31,10 @@
 #include "Song.h"
 
 
+namespace lmms
+{
+
+
 TempoSyncKnobModel::TempoSyncKnobModel( const float _val, const float _min,
 				const float _max, const float _step,
 				const float _scale, Model * _parent,
@@ -41,15 +45,9 @@ TempoSyncKnobModel::TempoSyncKnobModel( const float _val, const float _min,
 	m_scale( _scale ),
 	m_custom( _parent )
 {
-	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
-			this, SLOT( calculateTempoSyncTime( bpm_t ) ) );
-}
-
-
-
-
-TempoSyncKnobModel::~TempoSyncKnobModel()
-{
+	connect( Engine::getSong(), SIGNAL(tempoChanged(lmms::bpm_t)),
+			this, SLOT(calculateTempoSyncTime(lmms::bpm_t)),
+			Qt::DirectConnection );
 }
 
 
@@ -153,8 +151,9 @@ void TempoSyncKnobModel::setSyncMode( TempoSyncMode _new_mode )
 		m_tempoSyncMode = _new_mode;
 		if( _new_mode == SyncCustom )
 		{
-			connect( &m_custom, SIGNAL( dataChanged() ),
-					this, SLOT( updateCustom() ) );
+			connect( &m_custom, SIGNAL(dataChanged()),
+					this, SLOT(updateCustom()),
+					Qt::DirectConnection );
 		}
 	}
 	calculateTempoSyncTime( Engine::getSong()->getTempo() );
@@ -179,8 +178,4 @@ void TempoSyncKnobModel::updateCustom()
 }
 
 
-
-
-
-
-
+} // namespace lmms

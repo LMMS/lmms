@@ -23,21 +23,31 @@
  *
  */
 
-#ifndef EFFECT_H
-#define EFFECT_H
+#ifndef LMMS_EFFECT_H
+#define LMMS_EFFECT_H
 
 #include "Plugin.h"
 #include "Engine.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "AutomatableModel.h"
 #include "TempoSyncKnobModel.h"
 #include "MemoryManager.h"
 
+namespace lmms
+{
+
 class EffectChain;
 class EffectControls;
 
+namespace gui
+{
 
-class EXPORT Effect : public Plugin
+class EffectView;
+
+} // namespace gui
+
+
+class LMMS_EXPORT Effect : public Plugin
 {
 	MM_OPERATORS
 	Q_OBJECT
@@ -45,12 +55,12 @@ public:
 	Effect( const Plugin::Descriptor * _desc,
 			Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key );
-	virtual ~Effect();
+	~Effect() override;
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	inline virtual QString nodeName() const
+	inline QString nodeName() const override
 	{
 		return "effect";
 	}
@@ -103,8 +113,8 @@ public:
 
 	inline f_cnt_t timeout() const
 	{
-		const float samples = Engine::mixer()->processingSampleRate() * m_autoQuitModel.value() / 1000.0f;
-		return 1 + ( static_cast<int>( samples ) / Engine::mixer()->framesPerPeriod() );
+		const float samples = Engine::audioEngine()->processingSampleRate() * m_autoQuitModel.value() / 1000.0f;
+		return 1 + ( static_cast<int>( samples ) / Engine::audioEngine()->framesPerPeriod() );
 	}
 
 	inline float wetLevel() const
@@ -148,11 +158,6 @@ public:
 		m_noRun = _state;
 	}
 
-	inline const Descriptor::SubPluginFeatures::Key & key() const
-	{
-		return m_key;
-	}
-
 	EffectChain * effectChain() const
 	{
 		return m_parent;
@@ -166,9 +171,16 @@ public:
 
 
 protected:
+	/**
+		Effects should call this at the end of audio processing
+
+		If the setting "Keep effects running even without input" is disabled,
+		after "decay" ms of a signal below "gate", the effect is turned off
+		and won't be processed again until it receives new audio input
+	*/
 	void checkGate( double _out_sum );
 
-	virtual PluginView * instantiateView( QWidget * );
+	gui::PluginView* instantiateView( QWidget * ) override;
 
 	// some effects might not be capable of higher sample-rates so they can
 	// sample it down before processing and back after processing
@@ -177,9 +189,9 @@ protected:
 							sample_rate_t _dst_sr )
 	{
 		resample( 0, _src_buf,
-				Engine::mixer()->processingSampleRate(),
+				Engine::audioEngine()->processingSampleRate(),
 					_dst_buf, _dst_sr,
-					Engine::mixer()->framesPerPeriod() );
+					Engine::audioEngine()->framesPerPeriod() );
 	}
 
 	inline void sampleBack( const sampleFrame * _src_buf,
@@ -187,9 +199,9 @@ protected:
 							sample_rate_t _src_sr )
 	{
 		resample( 1, _src_buf, _src_sr, _dst_buf,
-				Engine::mixer()->processingSampleRate(),
-			Engine::mixer()->framesPerPeriod() * _src_sr /
-				Engine::mixer()->processingSampleRate() );
+				Engine::audioEngine()->processingSampleRate(),
+			Engine::audioEngine()->framesPerPeriod() * _src_sr /
+				Engine::audioEngine()->processingSampleRate() );
 	}
 	void reinitSRC();
 
@@ -200,8 +212,6 @@ private:
 					sample_rate_t _src_sr,
 					sampleFrame * _dst_buf, sample_rate_t _dst_sr,
 					const f_cnt_t _frames );
-
-	Descriptor::SubPluginFeatures::Key m_key;
 
 	ch_cnt_t m_processors;
 
@@ -221,14 +231,14 @@ private:
 	SRC_STATE * m_srcState[2];
 
 
-	friend class EffectView;
+	friend class gui::EffectView;
 	friend class EffectChain;
 
 } ;
 
+using EffectKey = Effect::Descriptor::SubPluginFeatures::Key;
+using EffectKeyList = Effect::Descriptor::SubPluginFeatures::KeyList;
 
-typedef Effect::Descriptor::SubPluginFeatures::Key EffectKey;
-typedef Effect::Descriptor::SubPluginFeatures::KeyList EffectKeyList;
+} // namespace lmms
 
-
-#endif
+#endif // LMMS_EFFECT_H

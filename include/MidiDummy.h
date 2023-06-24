@@ -22,21 +22,21 @@
  *
  */
 
-#ifndef MIDI_DUMMY_H
-#define MIDI_DUMMY_H
+#ifndef LMMS_MIDI_DUMMY_H
+#define LMMS_MIDI_DUMMY_H
 
 #include "MidiClient.h"
+
+
+namespace lmms
+{
 
 
 class MidiDummy : public MidiClientRaw
 {
 public:
-	MidiDummy()
-	{
-	}
-	virtual ~MidiDummy()
-	{
-	}
+	MidiDummy() = default;
+	~MidiDummy() override = default;
 
 	inline static QString name()
 	{
@@ -46,21 +46,23 @@ public:
 
 	inline static QString probeDevice()
 	{
-		return QString::Null(); // no midi device name
+		return QString(); // no midi device name
 	}
 
 	inline static QString configSection()
 	{
-		return QString::Null(); // no configuration settings
+		return QString(); // no configuration settings
 	}
 
 
 protected:
-	virtual void sendByte( const unsigned char )
+	void sendByte( const unsigned char ) override
 	{
 	}
 
 } ;
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_MIDI_DUMMY_H
