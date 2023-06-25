@@ -130,7 +130,7 @@ void MixerChannel::unmuteSenderForSolo()
 {
 	m_muteModel.setValue(false);
 
-	// if channel is not master, unmute also every channel it sends to
+	// if channel is not master, unmute every channel it sends to
 	if (m_channelIndex != 0)
 	{
 		for (const MixerRoute* sendsRoute : m_sends)
@@ -145,7 +145,7 @@ void MixerChannel::unmuteReceiverForSolo()
 {
 	m_muteModel.setValue(false);
 
-	// if channel is not master, unmute also every channel it receives from
+	// if channel is not master, unmute every channel it receives from
 	if (m_channelIndex != 0)
 	{
 		for (const MixerRoute* receiverRoute : m_receives)
