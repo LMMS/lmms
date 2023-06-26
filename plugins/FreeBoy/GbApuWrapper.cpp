@@ -1,7 +1,7 @@
 /*
- * Gb_Apu_Buffer.cpp - Gb_Apu subclass which allows direct buffer access
+ * GbApuWrapper.cpp - Gb_Apu subclass which allows direct buffer access
  * Copyright (c) 2017 Tres Finocchiaro <tres.finocchiaro/at/gmail.com>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -20,36 +20,44 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-#include "Gb_Apu_Buffer.h"
+
+#include "GbApuWrapper.h"
 
 namespace lmms
 {
 
 
-void Gb_Apu_Buffer::end_frame(blip_time_t end_time) {
-	Gb_Apu::end_frame(end_time);
-	m_buf.end_frame(end_time);
+// Sets specified sample rate and clock rate in Stereo_Buffer
+blargg_err_t GbApuWrapper::setSampleRate(long sampleRate, long clockRate)
+{
+	Gb_Apu::output(m_buf.center(), m_buf.left(), m_buf.right());
+	m_buf.clock_rate(clockRate);
+	return m_buf.set_sample_rate(sampleRate);
 }
 
-// Sets specified sample rate and clock rate in Multi_Buffer
-blargg_err_t Gb_Apu_Buffer::set_sample_rate(long sample_rate, long clock_rate) {
-	Gb_Apu_Buffer::output(m_buf.center(), m_buf.left(), m_buf.right());
-	m_buf.clock_rate(clock_rate);
-	return m_buf.set_sample_rate(sample_rate);
-}
-
-// Wrap Multi_Buffer::samples_avail()
-long Gb_Apu_Buffer::samples_avail() const {
+// Wrap Stereo_Buffer::samples_avail()
+long GbApuWrapper::samplesAvail() const
+{
 	return m_buf.samples_avail();
 }
 
-// Wrap Multi_Buffer::read_samples(...)
-long Gb_Apu_Buffer::read_samples(sample_t* out, long count) {
+// Wrap Stereo_Buffer::read_samples(...)
+long GbApuWrapper::readSamples(blip_sample_t* out, long count)
+{
 	return m_buf.read_samples(out, count);
 }
 
-void Gb_Apu_Buffer::bass_freq(int freq) {
+// Wrap Stereo_Buffer::bass_freq(...)
+void GbApuWrapper::bassFreq(int freq)
+{
 	m_buf.bass_freq(freq);
+}
+
+void GbApuWrapper::endFrame(blip_time_t endTime)
+{
+	m_time = 0;
+	Gb_Apu::end_frame(endTime);
+	m_buf.end_frame(endTime);
 }
 
 

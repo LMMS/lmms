@@ -202,6 +202,10 @@ public:
 	// rename channels when moving etc. if they still have their original name
 	void validateChannelName( int index, int oldIndex );
 
+	// check if the index channel receives audio from any other channel
+	// or from any instrument or sample track
+	bool isChannelInUse(int index);
+
 	void toggledSolo();
 	void activateSolo();
 	void deactivateSolo();
