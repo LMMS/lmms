@@ -316,10 +316,12 @@ void SampleBuffer::update(bool keepSettings)
 				m_frames = decodeSampleOGGVorbis(file, buf, channels, samplerate);
 			}
 #endif
+#ifdef LMMS_HAVE_MP3IMPORT
 			if (m_frames == 0)
 			{
 				m_frames = decodeSampleMP3(file, fbuf, channels, samplerate);
 			}
+#endif
 			if (m_frames == 0)
 			{
 				m_frames = decodeSampleDS(file, buf, channels, samplerate);
@@ -679,7 +681,7 @@ f_cnt_t SampleBuffer::decodeSampleOGGVorbis(
 #endif // LMMS_HAVE_OGGVORBIS
 
 
-
+#ifdef LMMS_HAVE_MP3IMPORT
 f_cnt_t SampleBuffer::decodeSampleMP3(
 	QString fileName,
 	sample_t * & buf,
@@ -709,7 +711,7 @@ f_cnt_t SampleBuffer::decodeSampleMP3(
 
 	return frames;
 }
-
+#endif
 
 
 
@@ -1184,14 +1186,14 @@ QString SampleBuffer::openAudioFile() const
 
 	// set filters
 	QStringList types;
-	types << tr("All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc "
+	types << tr("All Audio-Files (*.wav *.ogg *.mp3 *.ds *.flac *.spx *.voc "
 					"*.aif *.aiff *.au *.raw)")
 		<< tr("Wave-Files (*.wav)")
 		<< tr("OGG-Files (*.ogg)")
+		<< tr("MP3-Files (*.mp3)")
 		<< tr("DrumSynth-Files (*.ds)")
 		<< tr("FLAC-Files (*.flac)")
 		<< tr("SPEEX-Files (*.spx)")
-		//<< tr("MP3-Files (*.mp3)")
 		//<< tr("MIDI-Files (*.mid)")
 		<< tr("VOC-Files (*.voc)")
 		<< tr("AIFF-Files (*.aif *.aiff)")
