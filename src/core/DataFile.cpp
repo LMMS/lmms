@@ -230,7 +230,7 @@ bool DataFile::validate( QString extension )
 			return true;
 		}
 		if( extension == "wav" || extension == "ogg" ||
-				extension == "ds" )
+				extension == "mp3" || extension == "ds" )
 		{
 			return true;
 		}

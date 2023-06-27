@@ -318,6 +318,10 @@ void SampleBuffer::update(bool keepSettings)
 #endif
 			if (m_frames == 0)
 			{
+				m_frames = decodeSampleMP3(file, fbuf, channels, samplerate);
+			}
+			if (m_frames == 0)
+			{
 				m_frames = decodeSampleDS(file, buf, channels, samplerate);
 			}
 		}
@@ -673,6 +677,38 @@ f_cnt_t SampleBuffer::decodeSampleOGGVorbis(
 	return frames;
 }
 #endif // LMMS_HAVE_OGGVORBIS
+
+
+
+f_cnt_t SampleBuffer::decodeSampleMP3(
+	QString fileName,
+	sample_t * & buf,
+	ch_cnt_t & channels,
+	sample_rate_t & samplerate
+)
+{
+	SNDFILE *sndfile;
+	SF_INFO sfinfo;
+	memset(&sfinfo, 0, sizeof(sfinfo));
+
+	sndfile = sf_open(fileName.toStdString().c_str(), SFM_READ, &sfinfo);
+	if (!sndfile)
+	{
+		printf("Error opening MP3 file.\n");
+		return 0;
+	}
+
+	f_cnt_t frames = sfinfo.frames;
+	channels = sfinfo.channels;
+	samplerate = sfinfo.samplerate;
+
+	buf = new sample_t[frames * channels];
+	frames = sf_readf_float(sndfile, buf, frames);
+
+	sf_close(sndfile);
+
+	return frames;
+}
 
 
 
