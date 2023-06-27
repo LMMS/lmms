@@ -391,17 +391,17 @@ Zixing Liu &lt;liushuyu at aosc.xyz&gt;
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="409"/>
         <source>Edit Value</source>
-        <translation type="unfinished"/>
+        <translation>编辑值</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="411"/>
         <source>New outValue</source>
-        <translation type="unfinished"/>
+        <translation>新输出值</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="412"/>
         <source>New inValue</source>
-        <translation type="unfinished"/>
+        <translation>新输入值</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="1228"/>
@@ -628,7 +628,7 @@ Zixing Liu &lt;liushuyu at aosc.xyz&gt;
     <message>
         <location filename="../../src/gui/editors/PatternEditor.cpp" line="91"/>
         <source>Clone beat/bassline clip</source>
-        <translation type="unfinished"/>
+        <translation>复制节拍/低音线片段</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PatternEditor.cpp" line="95"/>
@@ -915,32 +915,32 @@ Zixing Liu &lt;liushuyu at aosc.xyz&gt;
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="144"/>
         <source>Using KDE Oxygen icon set, designed by Oxygen Team.</source>
-        <translation type="unfinished"/>
+        <translation>采用KDE Oxygen图标，由Oxygen Team设计。</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="230"/>
         <source>Contains some knobs, backgrounds and other small artwork from Calf Studio Gear, OpenAV and OpenOctave projects.</source>
-        <translation type="unfinished"/>
+        <translation>包含一些旋钮、背景和其他来自Calf Studio Gear、OpenAV和OpenOctave项目的作品。</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="465"/>
         <source>VST is a trademark of Steinberg Media Technologies GmbH.</source>
-        <translation type="unfinished"/>
+        <translation>VST是斯坦伯格媒体技术有限公司（Steinberg Media Technologies GmbH）的商标。</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="579"/>
         <source>Special thanks to António Saraiva for a few extra icons and artwork!</source>
-        <translation type="unfinished"/>
+        <translation>特别感谢António Saraiva提供了一些额外的图标和艺术品！</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="589"/>
         <source>The LV2 logo has been designed by Thorsten Wilms, based on a concept from Peter Shorthose.</source>
-        <translation type="unfinished"/>
+        <translation>LV2的标志是由Thorsten Wilms设计的，基于Peter Shorthose的概念。</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="605"/>
         <source>MIDI Keyboard designed by Thorsten Wilms.</source>
-        <translation type="unfinished"/>
+        <translation>MIDI键盘由Thorsten Wilms设计。</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="647"/>
@@ -950,12 +950,12 @@ Zixing Liu &lt;liushuyu at aosc.xyz&gt;
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="671"/>
         <source>Features</source>
-        <translation type="unfinished"/>
+        <translation>特点</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="677"/>
         <source>AU/AudioUnit:</source>
-        <translation type="unfinished"/>
+        <translation>音频单元：</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="697"/>
@@ -972,7 +972,7 @@ Zixing Liu &lt;liushuyu at aosc.xyz&gt;
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="1015"/>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="1022"/>
         <source>TextLabel</source>
-        <translation type="unfinished"/>
+        <translation>文本标签</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="742"/>
