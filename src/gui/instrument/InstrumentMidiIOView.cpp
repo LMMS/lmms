@@ -144,24 +144,22 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 		midiOutputLayout->insertWidget( 0, m_wpBtn );
 	}
 
-	auto baseVelocityGroupBox = new GroupBox(tr("VELOCITY MAPPING"));
-	baseVelocityGroupBox->setLedButtonShown(false);
-
 	m_presetSelectGroupBox = new GroupBox(tr("ENABLE PRESET SELECTION"));
-	layout->addWidget( m_presetSelectGroupBox );
+	layout->addWidget(m_presetSelectGroupBox);
 
 	QHBoxLayout * presetSelectLayout = new QHBoxLayout(m_presetSelectGroupBox);
-	presetSelectLayout->setContentsMargins( 8, 18, 8, 8 );
-	presetSelectLayout->setSpacing( 6 );
+	presetSelectLayout->setContentsMargins(8, 18, 8, 8);
+	presetSelectLayout->setSpacing(6);
 	m_presetSelectPolicyComboBox->setFixedSize(QSize(220, 20));
 	m_presetSelectPolicyComboBox->setEnabled(false);
 
 	presetSelectLayout->addWidget(m_presetSelectPolicyComboBox);
 	presetSelectLayout->addStretch();
 
-	connect( m_presetSelectGroupBox->ledButton(), SIGNAL( toggled( bool ) ),
-			m_presetSelectPolicyComboBox, SLOT( setEnabled( bool ) ) );
-	auto baseVelocityGroupBox = new GroupBox(tr("CUSTOM BASE VELOCITY"));
+	connect(m_presetSelectGroupBox->ledButton(), &PixmapButton::toggled,
+		m_presetSelectPolicyComboBox, &ComboBox::setEnabled);
+	auto baseVelocityGroupBox = new GroupBox(tr("VELOCITY MAPPING"));
+	baseVelocityGroupBox->setLedButtonShown(false);
 	layout->addWidget( baseVelocityGroupBox );
 
 	auto baseVelocityLayout = new QVBoxLayout(baseVelocityGroupBox);
@@ -172,7 +170,6 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	m_baseVelocitySpinBox->setLabel(tr("MIDI VELOCITY"));
 	m_baseVelocitySpinBox->setToolTip(tr("MIDI notes at this velocity correspond to 100% note velocity."));
 	baseVelocityLayout->addWidget( m_baseVelocitySpinBox );
-
 	layout->addStretch();
 }
 

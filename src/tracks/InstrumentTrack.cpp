@@ -1025,7 +1025,7 @@ bool InstrumentTrack::processPresetSelectEvents(const MidiEvent& event)
 		if (policy == MidiPort::BankSelectIgnore)
 		{
 			m_programBankMSB = BANK_NONE;
-			m_programBankLSB = 0;
+			m_programBankLSB = BANK_NONE;
 		}
 		return true;
 	}
@@ -1046,8 +1046,11 @@ bool InstrumentTrack::processPresetSelectEvents(const MidiEvent& event)
 			return true;
 		case MidiPort::BankSelectBoth:
 			/* Both MSB and LSB are meaningful, so don't touch
-			 * LSB here. */
+			 * LSB here unless it is set to None (-1) - in this case reset it to 0. */
 			m_programBankMSB = event.controllerValue();
+			if (m_programBankLSB == BANK_NONE) {
+				m_programBankLSB = 0;
+			}
 			return true;
 		}
 	}
@@ -1062,6 +1065,9 @@ bool InstrumentTrack::processPresetSelectEvents(const MidiEvent& event)
 			return false;
 		case MidiPort::BankSelectBoth:
 			m_programBankLSB = event.controllerValue();
+			if (m_programBankMSB == BANK_NONE) {
+				m_programBankMSB = 0;
+			}
 			return true;
 		}
 	}
@@ -1072,19 +1078,13 @@ bool InstrumentTrack::processPresetSelectEvents(const MidiEvent& event)
 
 void InstrumentTrack::changePreset()
 {
-	if (m_instrument)
+	if (m_instrument == nullptr) { return; }
+	int bankNo = BANK_NONE;
+	if (m_programBankMSB != BANK_NONE && m_programBankLSB != BANK_NONE)
 	{
-		if (m_programBankMSB != -1)
-		{
-			m_instrument->changePreset(
-				(m_programBankMSB << 7) | m_programBankLSB,
-				m_programNumber);
-		}
-		else
-		{
-			m_instrument->changePreset(-1, m_programNumber);
-		}
+		bankNo = (m_programBankMSB << 7) | m_programBankLSB;
 	}
+	m_instrument->changePreset(bankNo, m_programNumber);
 }
 
 

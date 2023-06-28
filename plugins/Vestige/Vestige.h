@@ -71,8 +71,8 @@ public:
 	virtual void loadFile( const QString & _file );
 
 	virtual bool handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0 );
-	virtual bool presetChangeSupported();
-	virtual void changePreset(int bank, unsigned int preset) override;
+	bool presetChangeSupported() override;
+	void changePreset(int bank, unsigned int preset) override;
 
 	virtual gui::PluginView* instantiateView( QWidget * _parent );
 
