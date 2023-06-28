@@ -910,7 +910,7 @@ void GigInstrument::changePreset(int bank, unsigned int preset)
 	// banks. If we configure the preset change feature to ignore
 	// bank switching, we can set it manually and be sure
 	// that it will not reset.
-	if (bank != -1)
+	if (bank != InstrumentTrack::BANK_NONE)
 	{
 		if (m_bankNum.value() != bank)
 		{

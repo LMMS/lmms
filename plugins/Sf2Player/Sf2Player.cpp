@@ -927,7 +927,7 @@ bool Sf2Instrument::presetChangeSupported()
 void Sf2Instrument::changePreset(int bank, unsigned int preset)
 {
 	bool presetChanged = false;
-	if (bank != -1)
+	if (bank != InstrumentTrack::BANK_NONE)
 	{
 		if (m_bankNum.value() != bank)
 		{
@@ -1146,9 +1146,9 @@ void Sf2InstrumentView::modelChanged()
 	m_chorusDepthKnob->setModel( &k->m_chorusDepth );
 
 
-	connect( k, SIGNAL( fileChanged() ), this, SLOT( updateFilename() ) );
-	connect( k, SIGNAL( patchChanged() ), this, SLOT( updatePatchName() ) );
-	connect( k, SIGNAL( fileLoading() ), this, SLOT( invalidateFile() ) );
+	connect(k, &Sf2Instrument::fileChanged, this, &Sf2InstrumentView::updateFilename);
+	connect(k, &Sf2Instrument::patchChanged, this, &Sf2InstrumentView::updatePatchName);
+	connect(k, &Sf2Instrument::fileLoading, this, &Sf2InstrumentView::invalidateFile);
 
 	updateFilename();
 }

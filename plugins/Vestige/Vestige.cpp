@@ -436,26 +436,25 @@ bool VestigeInstrument::presetChangeSupported()
 
 void VestigeInstrument::changePreset(int bank, unsigned int preset)
 {
-	if (m_plugin)
+	if (m_plugin == nullptr) { return; }
+
+	int currentProgramNumber = m_plugin->currentProgram();
+	int newProgramNumber;
+	// The "empty" bank indicates that we need to handle it
+	// anyway. Since the list of VST plugins is continuous
+	// (excluding exceptions such as SQ8L), splitting it into
+	// artifically-made banks could be confusing to the user.
+	// Therefore we treat "empty" bank as 0th one, meaning
+	// that we can access only first 128 patches.
+	if (bank == InstrumentTrack::BANK_NONE)
 	{
-		int currentProgramNumber = m_plugin->currentProgram();
-		int newProgramNumber;
-		// The "empty" bank indicates that we need to handle it
-		// anyway. Since the list of VST plugins is continuous
-		// (excluding exceptions such as SQ8L), splitting it into
-		// artifically-made banks could be confusing to the user.
-		// Therefore we treat "empty" bank as 0th one, meaning
-		// that we can access only first 128 patches.
-		if (bank == -1)
-		{
-			bank = 0;
-		}
-		newProgramNumber = (bank << 7) | preset;
-		if (newProgramNumber != currentProgramNumber)
-		{
-			m_plugin->setProgram(newProgramNumber);
-			emit presetChanged();
-		}
+		bank = 0;
+	}
+	newProgramNumber = (bank << 7) | preset;
+	if (newProgramNumber != currentProgramNumber)
+	{
+		m_plugin->setProgram(newProgramNumber);
+		emit presetChanged();
 	}
 }
 
@@ -699,8 +698,8 @@ void VestigeInstrumentView::updateMenu( void )
 void VestigeInstrumentView::modelChanged()
 {
 	m_vi = castModel<VestigeInstrument>();
-	connect(m_vi, SIGNAL(presetChanged()),
-		this, SLOT(changedProgram()));
+	connect(m_vi, &VestigeInstrument::presetChanged,
+		this, &VestigeInstrumentView::changedProgram);
 }
 
 

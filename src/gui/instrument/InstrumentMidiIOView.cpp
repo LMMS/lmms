@@ -147,40 +147,40 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	}
 
 	m_presetSelectGroupBox = new GroupBox(tr("ENABLE PRESET SELECTION"));
-	layout->addWidget( m_presetSelectGroupBox );
+	layout->addWidget(m_presetSelectGroupBox);
 
 	QHBoxLayout * presetSelectLayout = new QHBoxLayout(m_presetSelectGroupBox);
-	presetSelectLayout->setContentsMargins( 8, 18, 8, 8 );
-	presetSelectLayout->setSpacing( 6 );
+	presetSelectLayout->setContentsMargins(8, 18, 8, 8);
+	presetSelectLayout->setSpacing(6);
 	m_presetSelectPolicyComboBox->setFixedSize(QSize(220, 20));
 	m_presetSelectPolicyComboBox->setEnabled(false);
 
 	presetSelectLayout->addWidget(m_presetSelectPolicyComboBox);
 	presetSelectLayout->addStretch();
 
-	connect( m_presetSelectGroupBox->ledButton(), SIGNAL( toggled( bool ) ),
-			m_presetSelectPolicyComboBox, SLOT( setEnabled( bool ) ) );
+	connect(m_presetSelectGroupBox->ledButton(), &PixmapButton::toggled,
+		m_presetSelectPolicyComboBox, &ComboBox::setEnabled);
 	auto baseVelocityGroupBox = new GroupBox(tr("CUSTOM BASE VELOCITY"));
 	layout->addWidget( baseVelocityGroupBox );
 
 	auto baseVelocityLayout = new QVBoxLayout(baseVelocityGroupBox);
-	baseVelocityLayout->setContentsMargins( 8, 18, 8, 8 );
-	baseVelocityLayout->setSpacing( 6 );
+	baseVelocityLayout->setContentsMargins(8, 18, 8, 8);
+	baseVelocityLayout->setSpacing(6);
 
 	auto baseVelocityHelp
 		= new QLabel(tr("Specify the velocity normalization base for MIDI-based instruments at 100% note velocity."));
-	baseVelocityHelp->setWordWrap( true );
+	baseVelocityHelp->setWordWrap(true);
     baseVelocityHelp->setFont( pointSize<8>( baseVelocityHelp->font() ) );
 
 	baseVelocityLayout->addWidget( baseVelocityHelp );
 
-	m_baseVelocitySpinBox = new LcdSpinBox( 3, baseVelocityGroupBox );
-	m_baseVelocitySpinBox->setLabel( tr( "BASE VELOCITY" ) );
-	m_baseVelocitySpinBox->setEnabled( false );
-	baseVelocityLayout->addWidget( m_baseVelocitySpinBox );
+	m_baseVelocitySpinBox = new LcdSpinBox(3, baseVelocityGroupBox);
+	m_baseVelocitySpinBox->setLabel(tr( "BASE VELOCITY" ));
+	m_baseVelocitySpinBox->setEnabled(false);
+	baseVelocityLayout->addWidget(m_baseVelocitySpinBox);
 
-	connect( baseVelocityGroupBox->ledButton(), SIGNAL(toggled(bool)),
-			m_baseVelocitySpinBox, SLOT(setEnabled(bool)));
+	connect(baseVelocityGroupBox->ledButton(), &PixmapButton::toggled,
+		m_baseVelocitySpinBox, &LcdSpinBox::setEnabled);
 
 	layout->addStretch();
 }

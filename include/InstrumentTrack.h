@@ -63,6 +63,9 @@ class LMMS_EXPORT InstrumentTrack : public Track, public MidiEventProcessor
 	MM_OPERATORS
 	mapPropertyFromModel(int,getVolume,setVolume,m_volumeModel);
 public:
+
+	static const int BANK_NONE = -1;
+
 	InstrumentTrack( TrackContainer* tc );
 	~InstrumentTrack() override;
 
