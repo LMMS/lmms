@@ -69,7 +69,7 @@ Plugin::Descriptor PLUGIN_EXPORT gigplayer_plugin_descriptor =
 	QT_TRANSLATE_NOOP( "PluginBrowser", "Player for GIG files" ),
 	"Garrett Wilson <g/at/floft/dot/net>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	"gig",
 	nullptr,
@@ -108,8 +108,8 @@ GigInstrument::GigInstrument( InstrumentTrack * _instrument_track ) :
 GigInstrument::~GigInstrument()
 {
 	Engine::audioEngine()->removePlayHandlesOfTypes( instrumentTrack(),
-				PlayHandle::TypeNotePlayHandle
-				| PlayHandle::TypeInstrumentPlayHandle );
+				PlayHandle::Type::NotePlayHandle
+				| PlayHandle::Type::InstrumentPlayHandle );
 	freeInstance();
 }
 
@@ -343,16 +343,16 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 	for( QList<GigNote>::iterator it = m_notes.begin(); it != m_notes.end(); ++it )
 	{
 		// Process notes in the KeyUp state, adding release samples if desired
-		if( it->state == KeyUp )
+		if( it->state == GigState::KeyUp )
 		{
 			// If there are no samples, we're done
 			if( it->samples.empty() )
 			{
-				it->state = Completed;
+				it->state = GigState::Completed;
 			}
 			else
 			{
-				it->state = PlayingKeyUp;
+				it->state = GigState::PlayingKeyUp;
 
 				// Notify each sample that the key has been released
 				for (auto& sample : it->samples)
@@ -368,9 +368,9 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			}
 		}
 		// Process notes in the KeyDown state, adding samples for the notes
-		else if( it->state == KeyDown )
+		else if( it->state == GigState::KeyDown )
 		{
-			it->state = PlayingKeyDown;
+			it->state = GigState::PlayingKeyDown;
 			addSamples( *it, false );
 		}
 
@@ -395,7 +395,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 		}
 
 		// Delete ended notes (either in the completed state or all the samples ended)
-		if( it->state == Completed || it->samples.empty() )
+		if( it->state == GigState::Completed || it->samples.empty() )
 		{
 			it = m_notes.erase( it );
 
@@ -410,7 +410,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 	for (auto& note : m_notes)
 	{
 		// Only process the notes if we're in a playing state
-		if (!(note.state == PlayingKeyDown || note.state == PlayingKeyUp ))
+		if (!(note.state == GigState::PlayingKeyDown || note.state == GigState::PlayingKeyUp ))
 		{
 			continue;
 		}
@@ -682,9 +682,9 @@ void GigInstrument::deleteNotePluginData( NotePlayHandle * _n )
 	for (auto& note : m_notes)
 	{
 		// Find the note by matching pointers to the plugin data
-		if (note.handle == pluginData && (note.state == KeyDown || note.state == PlayingKeyDown))
+		if (note.handle == pluginData && (note.state == GigState::KeyDown || note.state == GigState::PlayingKeyDown))
 		{
-			note.state = KeyUp;
+			note.state = GigState::KeyUp;
 		}
 	}
 
@@ -908,7 +908,7 @@ class gigKnob : public Knob
 {
 public:
 	gigKnob( QWidget * _parent ) :
-			Knob( knobBright_26, _parent )
+			Knob( KnobType::Bright26, _parent )
 	{
 		setFixedSize( 31, 38 );
 	}

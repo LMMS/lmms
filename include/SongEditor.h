@@ -56,11 +56,11 @@ class SongEditor : public TrackContainerView
 {
 	Q_OBJECT
 public:
-	enum EditMode
+	enum class EditMode
 	{
-		DrawMode,
-		KnifeMode,
-		SelectMode
+		Draw,
+		Knife,
+		Select
 	};
 
 	SongEditor( Song * song );

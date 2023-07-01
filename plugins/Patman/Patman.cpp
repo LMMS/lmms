@@ -61,7 +61,7 @@ Plugin::Descriptor PLUGIN_EXPORT patman_plugin_descriptor =
 				"GUS-compatible patch instrument" ),
 	"Javier Serrano Polo <jasp00/at/users.sourceforge.net>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	"pat",
 	nullptr,
@@ -154,7 +154,7 @@ void PatmanInstrument::playNote( NotePlayHandle * _n,
 						hdata->sample->frequency();
 
 	if( hdata->sample->play( _working_buffer + offset, hdata->state, frames,
-					play_freq, m_loopedModel.value() ? SampleBuffer::LoopOn : SampleBuffer::LoopOff ) )
+					play_freq, m_loopedModel.value() ? SampleBuffer::LoopMode::On : SampleBuffer::LoopMode::Off ) )
 	{
 		applyRelease( _working_buffer, _n );
 		instrumentTrack()->processAudioBuffer( _working_buffer,
@@ -201,8 +201,8 @@ void PatmanInstrument::setFile( const QString & _patch_file, bool _rename )
 	// named it self
 
 	m_patchFile = PathUtil::toShortestRelative( _patch_file );
-	LoadErrors error = loadPatch( PathUtil::toAbsolute( _patch_file ) );
-	if( error )
+	LoadError error = loadPatch( PathUtil::toAbsolute( _patch_file ) );
+	if( error != LoadError::OK )
 	{
 		printf("Load error\n");
 	}
@@ -213,7 +213,7 @@ void PatmanInstrument::setFile( const QString & _patch_file, bool _rename )
 
 
 
-PatmanInstrument::LoadErrors PatmanInstrument::loadPatch(
+PatmanInstrument::LoadError PatmanInstrument::loadPatch(
 						const QString & _filename )
 {
 	unloadCurrentPatch();
@@ -222,7 +222,7 @@ PatmanInstrument::LoadErrors PatmanInstrument::loadPatch(
 	if( !fd )
 	{
 		perror( "fopen" );
-		return( LoadOpen );
+		return( LoadError::Open );
 	}
 
 	auto header = std::array<unsigned char, 239>{};
@@ -232,19 +232,19 @@ PatmanInstrument::LoadErrors PatmanInstrument::loadPatch(
 			&& memcmp(header.data(), "GF1PATCH100\0ID#000002", 22)))
 	{
 		fclose( fd );
-		return( LoadNotGUS );
+		return( LoadError::NotGUS );
 	}
 
 	if( header[82] != 1 && header[82] != 0 )
 	{
 		fclose( fd );
-		return( LoadInstruments );
+		return( LoadError::Instruments );
 	}
 
 	if( header[151] != 1 && header[151] != 0 )
 	{
 		fclose( fd );
-		return( LoadLayers );
+		return( LoadError::Layers );
 	}
 
 	int sample_count = header[198];
@@ -256,14 +256,14 @@ PatmanInstrument::LoadErrors PatmanInstrument::loadPatch(
 		if ( fseek( fd, x, SEEK_CUR ) == -1 ) \
 		{ \
 			fclose( fd ); \
-			return( LoadIO ); \
+			return( LoadError::IO ); \
 		}
 
 #define READ_SHORT( x ) \
 		if ( fread( &tmpshort, 2, 1, fd ) != 1 ) \
 		{ \
 			fclose( fd ); \
-			return( LoadIO ); \
+			return( LoadError::IO ); \
 		} \
 		x = (unsigned short)swap16IfBE( tmpshort );
 
@@ -271,7 +271,7 @@ PatmanInstrument::LoadErrors PatmanInstrument::loadPatch(
 		if ( fread( &x, 4, 1, fd ) != 1 ) \
 		{ \
 			fclose( fd ); \
-			return( LoadIO ); \
+			return( LoadError::IO ); \
 		} \
 		x = (unsigned)swap32IfBE( x );
 
@@ -295,7 +295,7 @@ PatmanInstrument::LoadErrors PatmanInstrument::loadPatch(
 		if ( fread( &modes, 1, 1, fd ) != 1 )
 		{
 			fclose( fd );
-			return( LoadIO );
+			return( LoadError::IO );
 		}
 		// skip scale frequency, scale factor, reserved space
 		SKIP_BYTES( 2 + 2 + 36 );
@@ -313,7 +313,7 @@ PatmanInstrument::LoadErrors PatmanInstrument::loadPatch(
 				{
 					delete[] wave_samples;
 					fclose( fd );
-					return( LoadIO );
+					return( LoadError::IO );
 				}
 				sample = swap16IfBE( sample );
 				if( modes & MODES_UNSIGNED )
@@ -337,7 +337,7 @@ PatmanInstrument::LoadErrors PatmanInstrument::loadPatch(
 				{
 					delete[] wave_samples;
 					fclose( fd );
-					return( LoadIO );
+					return( LoadError::IO );
 				}
 				if( modes & MODES_UNSIGNED )
 				{
@@ -374,7 +374,7 @@ PatmanInstrument::LoadErrors PatmanInstrument::loadPatch(
 		delete[] data;
 	}
 	fclose( fd );
-	return( LoadOK );
+	return( LoadError::OK );
 }
 
 

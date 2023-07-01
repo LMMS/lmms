@@ -156,13 +156,13 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 
 
 
-int TrackContainer::countTracks( Track::TrackTypes _tt ) const
+int TrackContainer::countTracks( Track::Type _tt ) const
 {
 	int cnt = 0;
 	m_tracksMutex.lockForRead();
 	for (const auto& track : m_tracks)
 	{
-		if (track->type() == _tt || _tt == Track::NumTrackTypes)
+		if (track->type() == _tt || _tt == Track::Type::Count)
 		{
 			++cnt;
 		}
@@ -176,7 +176,7 @@ int TrackContainer::countTracks( Track::TrackTypes _tt ) const
 
 void TrackContainer::addTrack( Track * _track )
 {
-	if( _track->type() != Track::HiddenAutomationTrack )
+	if( _track->type() != Track::Type::HiddenAutomation )
 	{
 		_track->lock();
 		m_tracksMutex.lockForWrite();
@@ -268,9 +268,9 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 
 		switch(track->type())
 		{
-		case Track::AutomationTrack:
-		case Track::HiddenAutomationTrack:
-		case Track::PatternTrack:
+		case Track::Type::Automation:
+		case Track::Type::HiddenAutomation:
+		case Track::Type::Pattern:
 			if (clipNum < 0) {
 				track->getClipsInRange(clips, 0, time);
 			} else {

@@ -54,11 +54,11 @@ class LMMS_EXPORT AutomationClip : public Clip
 {
 	Q_OBJECT
 public:
-	enum ProgressionTypes
+	enum class ProgressionType
 	{
-		DiscreteProgression,
-		LinearProgression,
-		CubicHermiteProgression
+		Discrete,
+		Linear,
+		CubicHermite
 	} ;
 
 	using timeMap = QMap<int, AutomationNode>;
@@ -76,11 +76,11 @@ public:
 	const objectVector& objects() const;
 
 	// progression-type stuff
-	inline ProgressionTypes progressionType() const
+	inline ProgressionType progressionType() const
 	{
 		return m_progressionType;
 	}
-	void setProgressionType( ProgressionTypes _new_progression_type );
+	void setProgressionType( ProgressionType _new_progression_type );
 
 	inline float getTension() const
 	{
@@ -205,7 +205,7 @@ private:
 	timeMap m_oldTimeMap;	// old values for storing the values before setDragValue() is called.
 	float m_tension;
 	bool m_hasAutomation;
-	ProgressionTypes m_progressionType;
+	ProgressionType m_progressionType;
 
 	bool m_dragging;
 	bool m_dragKeepOutValue; // Should we keep the current dragged node's outValue?

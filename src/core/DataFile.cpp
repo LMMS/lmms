@@ -26,6 +26,7 @@
 
 #include "DataFile.h"
 
+#include <algorithm>
 #include <cmath>
 #include <map>
 
@@ -97,17 +98,16 @@ namespace
 		QString m_name;
 	};
 
-	const auto s_types = std::array<TypeDescStruct, DataFile::TypeCount>
-	{
-		TypeDescStruct{ DataFile::UnknownType, "unknown" },
-		TypeDescStruct{ DataFile::SongProject, "song" },
-		TypeDescStruct{ DataFile::SongProjectTemplate, "songtemplate" },
-		TypeDescStruct{ DataFile::InstrumentTrackSettings, "instrumenttracksettings" },
-		TypeDescStruct{ DataFile::DragNDropData, "dnddata" },
-		TypeDescStruct{ DataFile::ClipboardData, "clipboard-data" },
-		TypeDescStruct{ DataFile::JournalData, "journaldata" },
-		TypeDescStruct{ DataFile::EffectSettings, "effectsettings" },
-		TypeDescStruct{ DataFile::MidiClip, "midiclip" }
+	const auto s_types = std::array{
+		TypeDescStruct{ DataFile::Type::Unknown, "unknown" },
+		TypeDescStruct{ DataFile::Type::SongProject, "song" },
+		TypeDescStruct{ DataFile::Type::SongProjectTemplate, "songtemplate" },
+		TypeDescStruct{ DataFile::Type::InstrumentTrackSettings, "instrumenttracksettings" },
+		TypeDescStruct{ DataFile::Type::DragNDropData, "dnddata" },
+		TypeDescStruct{ DataFile::Type::ClipboardData, "clipboard-data" },
+		TypeDescStruct{ DataFile::Type::JournalData, "journaldata" },
+		TypeDescStruct{ DataFile::Type::EffectSettings, "effectsettings" },
+		TypeDescStruct{ DataFile::Type::MidiClip, "midiclip" }
 	};
 }
 
@@ -213,7 +213,7 @@ bool DataFile::validate( QString extension )
 			return true;
 		}
 		break;
-	case Type::UnknownType:
+	case Type::Unknown:
 		if (! ( extension == "mmp" || extension == "mpt" || extension == "mmpz" ||
 				extension == "xpf" || extension == "xml" ||
 				( extension == "xiz" && ! getPluginFactory()->pluginSupportingExtension(extension).isNull()) ||
@@ -250,7 +250,7 @@ QString DataFile::nameWithExtension( const QString & _fn ) const
 
 	switch( type() )
 	{
-		case SongProject:
+		case Type::SongProject:
 			if( extension != "mmp" &&
 					extension != "mpt" &&
 					extension != "mmpz" )
@@ -263,13 +263,13 @@ QString DataFile::nameWithExtension( const QString & _fn ) const
 				return _fn + ".mmp";
 			}
 			break;
-		case SongProjectTemplate:
+		case Type::SongProjectTemplate:
 			if( extension != "mpt" )
 			{
 				return _fn + ".mpt";
 			}
 			break;
-		case InstrumentTrackSettings:
+		case Type::InstrumentTrackSettings:
 			if( extension != "xpf" )
 			{
 				return _fn + ".xpf";
@@ -285,8 +285,8 @@ QString DataFile::nameWithExtension( const QString & _fn ) const
 
 void DataFile::write( QTextStream & _strm )
 {
-	if( type() == SongProject || type() == SongProjectTemplate
-					|| type() == InstrumentTrackSettings )
+	if( type() == Type::SongProject || type() == Type::SongProjectTemplate
+					|| type() == Type::InstrumentTrackSettings )
 	{
 		cleanMetaNodes( documentElement() );
 	}
@@ -584,21 +584,17 @@ bool DataFile::hasLocalPlugins(QDomElement parent /* = QDomElement()*/, bool fir
 
 DataFile::Type DataFile::type( const QString& typeName )
 {
-	for( int i = 0; i < TypeCount; ++i )
-	{
-		if( s_types[i].m_name == typeName )
-		{
-			return static_cast<DataFile::Type>( i );
-		}
-	}
+	const auto it = std::find_if(s_types.begin(), s_types.end(),
+		[&typeName](const TypeDescStruct& type) { return type.m_name == typeName; });
+	if (it != s_types.end()) { return it->m_type; }
 
 	// compat code
 	if( typeName == "channelsettings" )
 	{
-		return DataFile::InstrumentTrackSettings;
+		return Type::InstrumentTrackSettings;
 	}
 
-	return UnknownType;
+	return Type::Unknown;
 }
 
 
@@ -606,12 +602,7 @@ DataFile::Type DataFile::type( const QString& typeName )
 
 QString DataFile::typeName( Type type )
 {
-	if( type >= UnknownType && type < TypeCount )
-	{
-		return s_types[type].m_name;
-	}
-
-	return s_types[UnknownType].m_name;
+	return s_types[static_cast<std::size_t>(type)].m_name;
 }
 
 
@@ -1825,8 +1816,8 @@ void DataFile::upgrade_bbTcoRename()
 	for (int i = 0; !elements.item(i).isNull(); ++i)
 	{
 		auto e = elements.item(i).toElement();
-		static_assert(Track::PatternTrack == 1, "Must be type=1 for backwards compatibility");
-		if (e.attribute("type").toInt() == Track::PatternTrack)
+		static_assert(Track::Type::Pattern == static_cast<Track::Type>(1), "Must be type=1 for backwards compatibility");
+		if (static_cast<Track::Type>(e.attribute("type").toInt()) == Track::Type::Pattern)
 		{
 			e.setAttribute("name", e.attribute("name").replace("Beat/Bassline", "Pattern"));
 		}
@@ -1854,7 +1845,7 @@ void DataFile::upgrade()
 	documentElement().setAttribute( "creator", "LMMS" );
 	documentElement().setAttribute( "creatorversion", LMMS_VERSION );
 
-	if( type() == SongProject || type() == SongProjectTemplate )
+	if( type() == Type::SongProject || type() == Type::SongProjectTemplate )
 	{
 		// Time-signature
 		if ( !m_head.hasAttribute( "timesig_numerator" ) )
@@ -1932,8 +1923,8 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 		ProjectVersion createdWith = root.attribute("creatorversion");
 		ProjectVersion openedWith = LMMS_VERSION;
 
-		if (createdWith.setCompareType(ProjectVersion::Minor)
-		 !=  openedWith.setCompareType(ProjectVersion::Minor)
+		if (createdWith.setCompareType(ProjectVersion::CompareType::Minor)
+		 !=  openedWith.setCompareType(ProjectVersion::CompareType::Minor)
 		 && gui::getGUI() != nullptr && root.attribute("type") == "song"
 		){
 			auto projectType = _sourceFile.endsWith(".mpt") ?

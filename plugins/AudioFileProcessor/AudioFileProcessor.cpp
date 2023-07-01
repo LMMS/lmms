@@ -65,7 +65,7 @@ Plugin::Descriptor PLUGIN_EXPORT audiofileprocessor_plugin_descriptor =
 				"instrument-track" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	"wav,ogg,ds,spx,au,voc,aif,aiff,flac,raw",
 	nullptr,
@@ -521,7 +521,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 	m_stutterButton->setToolTip(
 		tr( "Continue sample playback across notes" ) );
 
-	m_ampKnob = new Knob( knobBright_26, this );
+	m_ampKnob = new Knob( KnobType::Bright26, this );
 	m_ampKnob->setVolumeKnob( true );
 	m_ampKnob->move( 5, 108 );
 	m_ampKnob->setHintText( tr( "Amplify:" ), "%" );
@@ -572,7 +572,7 @@ void AudioFileProcessorView::dragEnterEvent( QDragEnterEvent * _dee )
 		QString txt = _dee->mimeData()->data(
 						mimeType( MimeType::StringPair ) );
 		if( txt.section( ':', 0, 0 ) == QString( "clip_%1" ).arg(
-							Track::SampleTrack ) )
+							static_cast<int>(Track::Type::Sample) ) )
 		{
 			_dee->acceptProposedAction();
 		}
@@ -624,7 +624,7 @@ void AudioFileProcessorView::dropEvent( QDropEvent * _de )
 		newWaveView();
 		return;
 	}
-	else if( type == QString( "clip_%1" ).arg( Track::SampleTrack ) )
+	else if( type == QString( "clip_%1" ).arg( static_cast<int>(Track::Type::Sample) ) )
 	{
 		DataFile dataFile( value.toUtf8() );
 		castModel<AudioFileProcessor>()->setAudioFile( dataFile.content().firstChild().toElement().attribute( "src" ) );
@@ -794,9 +794,9 @@ void AudioFileProcessorWaveView::mousePressEvent( QMouseEvent * _me )
 	const int end_dist = 		qAbs( m_endFrameX - x );
 	const int loop_dist =		qAbs( m_loopFrameX - x );
 
-	draggingType dt = sample_loop; int md = loop_dist;
-	if( start_dist < loop_dist ) { dt = sample_start; md = start_dist; }
-	else if( end_dist < loop_dist ) { dt = sample_end; md = end_dist; }
+	DraggingType dt = DraggingType::SampleLoop; int md = loop_dist;
+	if( start_dist < loop_dist ) { dt = DraggingType::SampleStart; md = start_dist; }
+	else if( end_dist < loop_dist ) { dt = DraggingType::SampleEnd; md = end_dist; }
 
 	if( md < 4 )
 	{
@@ -804,7 +804,7 @@ void AudioFileProcessorWaveView::mousePressEvent( QMouseEvent * _me )
 	}
 	else
 	{
-		m_draggingType = wave;
+		m_draggingType = DraggingType::Wave;
 		updateCursor(_me);
 	}
 }
@@ -815,7 +815,7 @@ void AudioFileProcessorWaveView::mousePressEvent( QMouseEvent * _me )
 void AudioFileProcessorWaveView::mouseReleaseEvent( QMouseEvent * _me )
 {
 	m_isDragging = false;
-	if( m_draggingType == wave )
+	if( m_draggingType == DraggingType::Wave )
 	{
 		updateCursor(_me);
 	}
@@ -835,16 +835,16 @@ void AudioFileProcessorWaveView::mouseMoveEvent( QMouseEvent * _me )
 	const int step = _me->x() - m_draggingLastPoint.x();
 	switch( m_draggingType )
 	{
-		case sample_start:
-			slideSamplePointByPx( start, step );
+		case DraggingType::SampleStart:
+			slideSamplePointByPx( Point::Start, step );
 			break;
-		case sample_end:
-			slideSamplePointByPx( end, step );
+		case DraggingType::SampleEnd:
+			slideSamplePointByPx( Point::End, step );
 			break;
-		case sample_loop:
-			slideSamplePointByPx( loop, step );
+		case DraggingType::SampleLoop:
+			slideSamplePointByPx( Point::Loop, step );
 			break;
-		case wave:
+		case DraggingType::Wave:
 		default:
 			if( qAbs( _me->y() - m_draggingLastPoint.y() )
 				< 2 * qAbs( _me->x() - m_draggingLastPoint.x() ) )
@@ -990,7 +990,7 @@ void AudioFileProcessorWaveView::updateGraph()
 	if( m_to == 1 )
 	{
 		m_to = m_sampleBuffer.frames() * 0.7;
-		slideSamplePointToFrames( end, m_to * 0.7 );
+		slideSamplePointToFrames( Point::End, m_to * 0.7 );
 	}
 
 	if( m_from > m_sampleBuffer.startFrame() )
@@ -1117,7 +1117,7 @@ void AudioFileProcessorWaveView::setKnobs( knob * _start, knob * _end, knob * _l
 
 
 
-void AudioFileProcessorWaveView::slideSamplePointByPx( knobType _point, int _px )
+void AudioFileProcessorWaveView::slideSamplePointByPx( Point _point, int _px )
 {
 	slideSamplePointByFrames(
 		_point,
@@ -1128,18 +1128,18 @@ void AudioFileProcessorWaveView::slideSamplePointByPx( knobType _point, int _px 
 
 
 
-void AudioFileProcessorWaveView::slideSamplePointByFrames( knobType _point, f_cnt_t _frames, bool _slide_to )
+void AudioFileProcessorWaveView::slideSamplePointByFrames( Point _point, f_cnt_t _frames, bool _slide_to )
 {
 	knob * a_knob = m_startKnob;
 	switch( _point )
 	{
-		case end:
+		case Point::End:
 			a_knob = m_endKnob;
 			break;
-		case loop:
+		case Point::Loop:
 			a_knob = m_loopKnob;
 			break;
-		case start:
+		case Point::Start:
 			break;
 	}
 	if( a_knob == nullptr )
@@ -1203,7 +1203,7 @@ void AudioFileProcessorWaveView::reverse()
 
 void AudioFileProcessorWaveView::updateCursor( QMouseEvent * _me )
 {
-	bool const waveIsDragged = m_isDragging && (m_draggingType == wave);
+	bool const waveIsDragged = m_isDragging && (m_draggingType == DraggingType::Wave);
 	bool const pointerCloseToStartEndOrLoop = (_me != nullptr ) &&
 			( isCloseTo( _me->x(), m_startFrameX ) ||
 			  isCloseTo( _me->x(), m_endFrameX ) ||

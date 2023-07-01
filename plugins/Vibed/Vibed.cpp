@@ -58,7 +58,7 @@ Plugin::Descriptor PLUGIN_EXPORT vibedstrings_plugin_descriptor =
 					"Vibrating string modeler" ),
 	"Danny McRae <khjklujn/at/yahoo/com>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
@@ -357,40 +357,40 @@ VibedView::VibedView( Instrument * _instrument,
 								"artwork" ) );
 	setPalette( pal );
 	
-	m_volumeKnob = new Knob( knobBright_26, this );
+	m_volumeKnob = new Knob( KnobType::Bright26, this );
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->move( 103, 142 );
 	m_volumeKnob->setHintText( tr( "String volume:" ), "" );
 
-	m_stiffnessKnob = new Knob( knobBright_26, this );
+	m_stiffnessKnob = new Knob( KnobType::Bright26, this );
 	m_stiffnessKnob->move( 129, 142 );
 	m_stiffnessKnob->setHintText( tr( "String stiffness:" )
 							, "" );
 	
 	
-	m_pickKnob = new Knob( knobBright_26, this );
+	m_pickKnob = new Knob( KnobType::Bright26, this );
 	m_pickKnob->move( 153, 142 );
 	m_pickKnob->setHintText( tr( "Pick position:" ), "" );
 
-	m_pickupKnob = new Knob( knobBright_26, this );
+	m_pickupKnob = new Knob( KnobType::Bright26, this );
 	m_pickupKnob->move( 177, 142 );
 	m_pickupKnob->setHintText( tr( "Pickup position:" )
 						, "" );
 
-	m_panKnob = new Knob( knobBright_26, this );
+	m_panKnob = new Knob( KnobType::Bright26, this );
 	m_panKnob->move( 105, 187 );
     m_panKnob->setHintText( tr( "String panning:" ), "" );
 	
-	m_detuneKnob = new Knob( knobBright_26, this );
+	m_detuneKnob = new Knob( KnobType::Bright26, this );
 	m_detuneKnob->move( 150, 187 );
 	m_detuneKnob->setHintText( tr( "String detune:" ), "" );
 
-	m_randomKnob = new Knob( knobBright_26, this );
+	m_randomKnob = new Knob( KnobType::Bright26, this );
 	m_randomKnob->move( 194, 187 );
 	m_randomKnob->setHintText( tr( "String fuzziness:" )
 						, "" );
 
-	m_lengthKnob = new Knob( knobBright_26, this );
+	m_lengthKnob = new Knob( KnobType::Bright26, this );
 	m_lengthKnob->move( 23, 193 );
 	m_lengthKnob->setHintText( tr( "String length:" )
 						, "" );

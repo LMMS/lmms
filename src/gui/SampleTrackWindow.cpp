@@ -94,7 +94,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	Qt::Alignment widgetAlignment = Qt::AlignHCenter | Qt::AlignCenter;
 
 	// set up volume knob
-	m_volumeKnob = new Knob(knobBright_26, nullptr, tr("Sample volume"));
+	m_volumeKnob = new Knob(KnobType::Bright26, nullptr, tr("Sample volume"));
 	m_volumeKnob->setVolumeKnob(true);
 	m_volumeKnob->setHintText(tr("Volume:"), "%");
 
@@ -108,7 +108,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 
 
 	// set up panning knob
-	m_panningKnob = new Knob(knobBright_26, nullptr, tr("Panning"));
+	m_panningKnob = new Knob(KnobType::Bright26, nullptr, tr("Panning"));
 	m_panningKnob->setHintText(tr("Panning:"), "");
 
 	basicControlsLayout->addWidget(m_panningKnob, 0, 1);

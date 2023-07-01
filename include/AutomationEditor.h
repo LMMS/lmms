@@ -86,11 +86,11 @@ public:
 		return "automationeditor";
 	}
 
-	enum EditModes
+	enum class EditMode
 	{
-		DRAW,
-		ERASE,
-		DRAW_OUTVALUES
+		Draw,
+		Erase,
+		DrawOutValues
 	};
 
 public slots:
@@ -128,10 +128,10 @@ protected slots:
 	void horScrolled( int new_pos );
 	void verScrolled( int new_pos );
 
-	void setEditMode(AutomationEditor::EditModes mode);
+	void setEditMode(AutomationEditor::EditMode mode);
 	void setEditMode(int mode);
 
-	void setProgressionType(AutomationClip::ProgressionTypes type);
+	void setProgressionType(AutomationClip::ProgressionType type);
 	void setProgressionType(int type);
 	void setTension();
 
@@ -145,14 +145,14 @@ protected slots:
 
 private:
 
-	enum Actions
+	enum class Action
 	{
-		NONE,
-		MOVE_VALUE,
-		ERASE_VALUES,
-		MOVE_OUTVALUE,
-		RESET_OUTVALUES,
-		DRAW_LINE
+		None,
+		MoveValue,
+		EraseValues,
+		MoveOutValue,
+		ResetOutValues,
+		DrawLine
 	} ;
 
 	// some constants...
@@ -200,7 +200,7 @@ private:
 
 	TimePos m_currentPosition;
 
-	Actions m_action;
+	Action m_action;
 
 	int m_moveXOffset;
 
@@ -214,7 +214,7 @@ private:
 	// Time position (key) of automation node whose outValue is being dragged
 	int m_draggedOutValueKey;
 
-	EditModes m_editMode;
+	EditMode m_editMode;
 
 	bool m_mouseDownLeft;
 	bool m_mouseDownRight; //true if right click is being held down

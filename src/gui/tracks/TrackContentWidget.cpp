@@ -291,7 +291,7 @@ void TrackContentWidget::dragEnterEvent( QDragEnterEvent * dee )
 	else
 	{
 		StringPairDrag::processDragEnterEvent( dee, "clip_" +
-						QString::number( getTrack()->type() ) );
+						QString::number( static_cast<int>(getTrack()->type()) ) );
 	}
 }
 
@@ -325,7 +325,7 @@ bool TrackContentWidget::canPasteSelection( TimePos clipPos, const QMimeData* md
 	QString value = decodeValue( md );
 
 	// We can only paste into tracks of the same type
-	if( type != ( "clip_" + QString::number( t->type() ) ) ||
+	if( type != ( "clip_" + QString::number( static_cast<int>(t->type()) ) ) ||
 		m_trackView->trackContainerView()->fixedClips() == true )
 	{
 		return false;
@@ -374,7 +374,7 @@ bool TrackContentWidget::canPasteSelection( TimePos clipPos, const QMimeData* md
 		}
 
 		// Track must be of the same type
-		auto startTrackType = clipElement.attributeNode("trackType").value().toInt();
+		auto startTrackType = static_cast<Track::Type>(clipElement.attributeNode("trackType").value().toInt());
 		Track * endTrack = tracks.at( finalTrackIndex );
 		if( startTrackType != endTrack->type() )
 		{
@@ -529,7 +529,7 @@ void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 	// Enable box select if control is held when clicking an empty space
 	// (If we had clicked a Clip it would have intercepted the mouse event)
 	if( me->modifiers() & Qt::ControlModifier ){
-		getGUI()->songEditor()->m_editor->setEditMode(SongEditor::EditMode::SelectMode);
+		getGUI()->songEditor()->m_editor->setEditMode(SongEditor::EditMode::Select);
 	}
 	// Forward event to allow box select if the editor supports it and is in that mode
 	if( m_trackView->trackContainerView()->allowRubberband() == true )
@@ -646,7 +646,7 @@ void TrackContentWidget::contextMenuEvent( QContextMenuEvent * cme )
 
 	QMenu contextMenu( this );
 	QAction *pasteA = contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
-					tr( "Paste" ), [this, cme](){ contextMenuAction( cme, Paste ); } );
+					tr( "Paste" ), [this, cme](){ contextMenuAction( cme, ContextMenuAction::Paste ); } );
 	// If we can't paste in the current TCW for some reason, disable the action so the user knows
 	pasteA->setEnabled( canPasteSelection( getPosition( cme->x() ), getMimeData() ) ? true : false );
 
@@ -660,7 +660,7 @@ void TrackContentWidget::contextMenuAction( QContextMenuEvent * cme, ContextMenu
 
 	switch( action )
 	{
-		case Paste:
+		case ContextMenuAction::Paste:
 		// Paste the selection on the TimePos of the context menu event
 		TimePos clipPos = getPosition( cme->x() );
 

@@ -50,7 +50,7 @@ ControllerConnection::ControllerConnection(Controller * _controller) :
 	}
 	else
 	{
-		m_controller = Controller::create( Controller::DummyController,
+		m_controller = Controller::create( Controller::ControllerType::Dummy,
 									nullptr );
 	}
 	s_connections.append( this );
@@ -60,7 +60,7 @@ ControllerConnection::ControllerConnection(Controller * _controller) :
 
 
 ControllerConnection::ControllerConnection( int _controllerId ) :
-	m_controller( Controller::create( Controller::DummyController, nullptr ) ),
+	m_controller( Controller::create( Controller::ControllerType::Dummy, nullptr ) ),
 	m_controllerId( _controllerId ),
 	m_ownsController( false )
 {
@@ -72,7 +72,7 @@ ControllerConnection::ControllerConnection( int _controllerId ) :
 
 ControllerConnection::~ControllerConnection()
 {
-	if( m_controller && m_controller->type() != Controller::DummyController )
+	if( m_controller && m_controller->type() != Controller::ControllerType::Dummy )
 	{
 		m_controller->removeConnection( this );
 	}
@@ -101,14 +101,14 @@ void ControllerConnection::setController( Controller * _controller )
 		m_controller = nullptr;
 	}
 
-	if( m_controller && m_controller->type() != Controller::DummyController )
+	if( m_controller && m_controller->type() != Controller::ControllerType::Dummy )
 	{
 		m_controller->removeConnection( this );
 	}
 
 	if( !_controller )
 	{
-		m_controller = Controller::create( Controller::DummyController, nullptr );
+		m_controller = Controller::create( Controller::ControllerType::Dummy, nullptr );
 	}
 	else
 	{
@@ -116,7 +116,7 @@ void ControllerConnection::setController( Controller * _controller )
 	}
 	m_controllerId = -1;
 
-	if( _controller->type() != Controller::DummyController )
+	if( _controller->type() != Controller::ControllerType::Dummy )
 	{
 		_controller->addConnection( this );
 		QObject::connect( _controller, SIGNAL(valueChanged()),
@@ -124,7 +124,7 @@ void ControllerConnection::setController( Controller * _controller )
 	}
 
 	m_ownsController =
-		(_controller->type() == Controller::MidiController);
+		(_controller->type() == Controller::ControllerType::Midi);
 
 	// If we don't own the controller, allow deletion of controller
 	// to delete the connection
@@ -165,7 +165,7 @@ void ControllerConnection::finalizeConnections()
 			c->setController( Engine::getSong()->
 					controllers().at( c->m_controllerId ) );
 		}
-		else if (c->getController()->type() == Controller::DummyController)
+		else if (c->getController()->type() == Controller::ControllerType::Dummy)
 		{
 			delete c;
 			--i;
@@ -223,7 +223,7 @@ void ControllerConnection::loadSettings( const QDomElement & _this )
 		}
 		else
 		{
-			m_controller = Controller::create( Controller::DummyController, nullptr );
+			m_controller = Controller::create( Controller::ControllerType::Dummy, nullptr );
 		}
 	}
 }

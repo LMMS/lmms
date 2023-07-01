@@ -187,7 +187,7 @@ public:
 
 
 // What portion of a note are we in?
-enum GigState
+enum class GigState
 {
 	// We just pressed the key
 	KeyDown,
@@ -268,7 +268,7 @@ public:
 
 	Flags flags() const override
 	{
-		return IsSingleStreamed|IsNotBendable;
+		return Flag::IsSingleStreamed | Flag::IsNotBendable;
 	}
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;

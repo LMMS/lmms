@@ -57,7 +57,7 @@ extern "C" {
 Plugin::Descriptor PLUGIN_EXPORT xpressive_plugin_descriptor = { LMMS_STRINGIFY(
 	PLUGIN_NAME), "Xpressive", QT_TRANSLATE_NOOP("PluginBrowser",
 	"Mathematical expression parser"), "Orr Dvori", 0x0100,
-	Plugin::Instrument, new PluginPixmapLoader("logo"), nullptr, nullptr };
+	Plugin::Type::Instrument, new PluginPixmapLoader("logo"), nullptr, nullptr };
 
 }
 
@@ -291,11 +291,11 @@ public:
 		setLineWidth(3);
 	}
 	XpressiveKnob(QWidget * _parent, const QString & _name) :
-		Knob(knobStyled, _parent,_name) {
+		Knob(KnobType::Styled, _parent,_name) {
 		setStyle();
 	}
 	XpressiveKnob(QWidget * _parent) :
-		Knob(knobStyled, _parent) {
+		Knob(KnobType::Styled, _parent) {
 		setStyle();
 	}
 
@@ -325,7 +325,7 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
 	setPalette(pal);
 
-	m_graph = new Graph(this, Graph::LinearStyle, 180, 81);
+	m_graph = new Graph(this, Graph::Style::Linear, 180, 81);
 	m_graph->move(3, BASE_START + 1);
 	m_graph->setAutoFillBackground(true);
 	m_graph->setGraphColor(QColor(255, 255, 255));
@@ -447,11 +447,11 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 
 
 	m_waveInterpolate  = new LedCheckBox("Interpolate", this, tr("WaveInterpolate"),
-										 LedCheckBox::Green);
+										 LedCheckBox::LedColor::Green);
 	m_waveInterpolate->move(2, 230);
 
 	m_expressionValidToggle = new LedCheckBox("", this, tr("ExpressionValid"),
-											  LedCheckBox::Red);
+											  LedCheckBox::LedColor::Red);
 	m_expressionValidToggle->move(168, EXPR_TEXT_Y+EXPR_TEXT_H-2);
 	m_expressionValidToggle->setEnabled( false );
 
@@ -485,7 +485,7 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 
 
 
-	m_smoothKnob=new Knob(knobStyled, this, "Smoothness");
+	m_smoothKnob=new Knob(KnobType::Styled, this, "Smoothness");
 	m_smoothKnob->setFixedSize(25, 25);
 	m_smoothKnob->setCenterPointX(12.5);
 	m_smoothKnob->setCenterPointY(12.5);

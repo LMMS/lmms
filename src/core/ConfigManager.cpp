@@ -173,7 +173,7 @@ void ConfigManager::upgrade()
 	ProjectVersion createdWith = m_version;
 	
 	// Don't use old themes as they break the UI (i.e. 0.4 != 1.0, etc)
-	if (createdWith.setCompareType(ProjectVersion::Minor) != LMMS_VERSION)
+	if (createdWith.setCompareType(ProjectVersion::CompareType::Minor) != LMMS_VERSION)
 	{
 		m_themeDir = defaultThemeDir();
 	}
@@ -719,7 +719,7 @@ unsigned int ConfigManager::legacyConfigVersion()
 {
 	ProjectVersion createdWith = m_version;
 
-	createdWith.setCompareType(ProjectVersion::Build);
+	createdWith.setCompareType(ProjectVersion::CompareType::Build);
 
 	if( createdWith < "1.1.90" )
 	{

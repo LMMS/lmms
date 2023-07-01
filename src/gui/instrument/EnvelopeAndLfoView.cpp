@@ -99,43 +99,43 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 		s_lfoGraph = new QPixmap( embed::getIconPixmap( "lfo_graph" ) );
 	}
 
-	m_predelayKnob = new Knob( knobBright_26, this );
+	m_predelayKnob = new Knob( KnobType::Bright26, this );
 	m_predelayKnob->setLabel( tr( "DEL" ) );
 	m_predelayKnob->move( PREDELAY_KNOB_X, ENV_KNOBS_Y );
 	m_predelayKnob->setHintText( tr( "Pre-delay:" ), "" );
 
 
-	m_attackKnob = new Knob( knobBright_26, this );
+	m_attackKnob = new Knob( KnobType::Bright26, this );
 	m_attackKnob->setLabel( tr( "ATT" ) );
 	m_attackKnob->move( ATTACK_KNOB_X, ENV_KNOBS_Y );
 	m_attackKnob->setHintText( tr( "Attack:" ), "" );
 
 
-	m_holdKnob = new Knob( knobBright_26, this );
+	m_holdKnob = new Knob( KnobType::Bright26, this );
 	m_holdKnob->setLabel( tr( "HOLD" ) );
 	m_holdKnob->move( HOLD_KNOB_X, ENV_KNOBS_Y );
 	m_holdKnob->setHintText( tr( "Hold:" ), "" );
 
 
-	m_decayKnob = new Knob( knobBright_26, this );
+	m_decayKnob = new Knob( KnobType::Bright26, this );
 	m_decayKnob->setLabel( tr( "DEC" ) );
 	m_decayKnob->move( DECAY_KNOB_X, ENV_KNOBS_Y );
 	m_decayKnob->setHintText( tr( "Decay:" ), "" );
 
 
-	m_sustainKnob = new Knob( knobBright_26, this );
+	m_sustainKnob = new Knob( KnobType::Bright26, this );
 	m_sustainKnob->setLabel( tr( "SUST" ) );
 	m_sustainKnob->move( SUSTAIN_KNOB_X, ENV_KNOBS_Y );
 	m_sustainKnob->setHintText( tr( "Sustain:" ), "" );
 
 
-	m_releaseKnob = new Knob( knobBright_26, this );
+	m_releaseKnob = new Knob( KnobType::Bright26, this );
 	m_releaseKnob->setLabel( tr( "REL" ) );
 	m_releaseKnob->move( RELEASE_KNOB_X, ENV_KNOBS_Y );
     m_releaseKnob->setHintText( tr( "Release:" ), "" );
 
 
-	m_amountKnob = new Knob( knobBright_26, this );
+	m_amountKnob = new Knob( KnobType::Bright26, this );
 	m_amountKnob->setLabel( tr( "AMT" ) );
 	m_amountKnob->move( AMOUNT_KNOB_X, ENV_GRAPH_Y );
 	m_amountKnob->setHintText( tr( "Modulation amount:" ), "" );
@@ -143,25 +143,25 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 
 
 
-	m_lfoPredelayKnob = new Knob( knobBright_26, this );
+	m_lfoPredelayKnob = new Knob( KnobType::Bright26, this );
 	m_lfoPredelayKnob->setLabel( tr( "DEL" ) );
 	m_lfoPredelayKnob->move( LFO_PREDELAY_KNOB_X, LFO_KNOB_Y );
 	m_lfoPredelayKnob->setHintText( tr( "Pre-delay:" ), "" );
 
 
-	m_lfoAttackKnob = new Knob( knobBright_26, this );
+	m_lfoAttackKnob = new Knob( KnobType::Bright26, this );
 	m_lfoAttackKnob->setLabel( tr( "ATT" ) );
 	m_lfoAttackKnob->move( LFO_ATTACK_KNOB_X, LFO_KNOB_Y );
 	m_lfoAttackKnob->setHintText( tr( "Attack:" ), "" );
 
 
-	m_lfoSpeedKnob = new TempoSyncKnob( knobBright_26, this );
+	m_lfoSpeedKnob = new TempoSyncKnob( KnobType::Bright26, this );
 	m_lfoSpeedKnob->setLabel( tr( "SPD" ) );
 	m_lfoSpeedKnob->move( LFO_SPEED_KNOB_X, LFO_KNOB_Y );
 	m_lfoSpeedKnob->setHintText( tr( "Frequency:" ), "" );
 
 
-	m_lfoAmountKnob = new Knob( knobBright_26, this );
+	m_lfoAmountKnob = new Knob( KnobType::Bright26, this );
 	m_lfoAmountKnob->setLabel( tr( "AMT" ) );
 	m_lfoAmountKnob->move( LFO_AMOUNT_KNOB_X, LFO_KNOB_Y );
 	m_lfoAmountKnob->setHintText( tr( "Modulation amount:" ), "" );
@@ -310,7 +310,7 @@ void EnvelopeAndLfoView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	StringPairDrag::processDragEnterEvent( _dee,
 					QString( "samplefile,clip_%1" ).arg(
-							Track::SampleTrack ) );
+							static_cast<int>(Track::Type::Sample) ) );
 }
 
 
@@ -325,18 +325,18 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 		m_params->m_userWave.setAudioFile(
 					StringPairDrag::decodeValue( _de ) );
 		m_userLfoBtn->model()->setValue( true );
-		m_params->m_lfoWaveModel.setValue(EnvelopeAndLfoParameters::UserDefinedWave);
+		m_params->m_lfoWaveModel.setValue(static_cast<int>(EnvelopeAndLfoParameters::LfoShape::UserDefinedWave));
 		_de->accept();
 		update();
 	}
-	else if( type == QString( "clip_%1" ).arg( Track::SampleTrack ) )
+	else if( type == QString( "clip_%1" ).arg( static_cast<int>(Track::Type::Sample) ) )
 	{
 		DataFile dataFile( value.toUtf8() );
 		m_params->m_userWave.setAudioFile( dataFile.content().
 					firstChildElement().firstChildElement().
 					firstChildElement().attribute( "src" ) );
 		m_userLfoBtn->model()->setValue( true );
-		m_params->m_lfoWaveModel.setValue(EnvelopeAndLfoParameters::UserDefinedWave);
+		m_params->m_lfoWaveModel.setValue(static_cast<int>(EnvelopeAndLfoParameters::LfoShape::UserDefinedWave));
 		_de->accept();
 		update();
 	}
@@ -459,29 +459,29 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 			float phase = ( cur_sample -=
 					m_params->m_lfoPredelayFrames ) /
 								osc_frames;
-			switch( m_params->m_lfoWaveModel.value() )
+			switch( static_cast<EnvelopeAndLfoParameters::LfoShape>(m_params->m_lfoWaveModel.value()) )
 			{
-				case EnvelopeAndLfoParameters::SineWave:
+				case EnvelopeAndLfoParameters::LfoShape::SineWave:
 					val = Oscillator::sinSample( phase );
 					break;
-				case EnvelopeAndLfoParameters::TriangleWave:
+				case EnvelopeAndLfoParameters::LfoShape::TriangleWave:
 					val = Oscillator::triangleSample(
 								phase );
 					break;
-				case EnvelopeAndLfoParameters::SawWave:
+				case EnvelopeAndLfoParameters::LfoShape::SawWave:
 					val = Oscillator::sawSample( phase );
 					break;
-				case EnvelopeAndLfoParameters::SquareWave:
+				case EnvelopeAndLfoParameters::LfoShape::SquareWave:
 					val = Oscillator::squareSample( phase );
 					break;
-				case EnvelopeAndLfoParameters::RandomWave:
+				case EnvelopeAndLfoParameters::LfoShape::RandomWave:
 					if( x % (int)( 900 * m_lfoSpeedKnob->value<float>() + 1 ) == 0 )
 					{
 						m_randomGraph = Oscillator::noiseSample( 0.0f );
 					}
 					val = m_randomGraph;
 					break;
-				case EnvelopeAndLfoParameters::UserDefinedWave:
+				case EnvelopeAndLfoParameters::LfoShape::UserDefinedWave:
 					val = m_params->m_userWave.
 							userWaveSample( phase );
 					break;
@@ -516,8 +516,8 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 
 void EnvelopeAndLfoView::lfoUserWaveChanged()
 {
-	if( m_params->m_lfoWaveModel.value() ==
-				EnvelopeAndLfoParameters::UserDefinedWave )
+	if( static_cast<EnvelopeAndLfoParameters::LfoShape>(m_params->m_lfoWaveModel.value()) ==
+				EnvelopeAndLfoParameters::LfoShape::UserDefinedWave )
 	{
 		if( m_params->m_userWave.frames() <= 1 )
 		{

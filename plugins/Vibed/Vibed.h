@@ -60,7 +60,7 @@ public:
 
 	Flags flags() const override
 	{
-		return IsNotBendable;
+		return Flag::IsNotBendable;
 	}
 
 

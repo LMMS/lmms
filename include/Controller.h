@@ -51,20 +51,19 @@ class LMMS_EXPORT Controller : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
-	enum ControllerTypes
+	enum class ControllerType
 	{
-		DummyController,
-		LfoController,
-		MidiController,
-		PeakController,
+		Dummy,
+		Lfo,
+		Midi,
+		Peak,
 		/*
-		XYController,
-		EquationController
+		XY,
+		Equation
 		*/
-		NumControllerTypes
 	} ;
 
-	Controller( ControllerTypes _type, Model * _parent,
+	Controller( ControllerType _type, Model * _parent,
 						const QString & _display_name );
 
 	~Controller() override;
@@ -83,7 +82,7 @@ public:
 		m_sampleExact = _exact;
 	}
 
-	inline ControllerTypes type() const
+	inline ControllerType type() const
 	{
 		return( m_type );
 	}
@@ -94,8 +93,8 @@ public:
 	{
 		switch( m_type )
 		{
-			case LfoController: return( true );
-			case PeakController: return( true );
+			case ControllerType::Lfo: return( true );
+			case ControllerType::Peak: return( true );
 			default:
 				break;
 		}
@@ -112,7 +111,7 @@ public:
 	void loadSettings( const QDomElement & _this ) override;
 	QString nodeName() const override;
 
-	static Controller * create( ControllerTypes _tt, Model * _parent );
+	static Controller * create( ControllerType _tt, Model * _parent );
 	static Controller * create( const QDomElement & _this,
 							Model * _parent );
 
@@ -165,7 +164,7 @@ protected:
 	int m_connectionCount;
 
 	QString m_name;
-	ControllerTypes m_type;
+	ControllerType m_type;
 
 	static ControllerVector s_controllers;
 

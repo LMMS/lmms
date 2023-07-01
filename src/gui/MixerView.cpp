@@ -245,13 +245,13 @@ void MixerView::updateMaxChannelSelector()
 	{
 		for (const auto& track : trackList)
 		{
-			if (track->type() == Track::InstrumentTrack)
+			if (track->type() == Track::Type::Instrument)
 			{
 				auto inst = (InstrumentTrack*)track;
 				inst->mixerChannelModel()->setRange(0,
 					m_mixerChannelViews.size()-1,1);
 			}
-			else if (track->type() == Track::SampleTrack)
+			else if (track->type() == Track::Type::Sample)
 			{
 				auto strk = (SampleTrack*)track;
 				strk->mixerChannelModel()->setRange(0,

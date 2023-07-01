@@ -321,7 +321,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 		// the value of the end of the shape between the two nodes will be the inValue of
 		// the next node.
 		float nextValue;
-		if( m_clip->progressionType() == AutomationClip::DiscreteProgression )
+		if( m_clip->progressionType() == AutomationClip::ProgressionType::Discrete )
 		{
 			nextValue = OUTVAL(it);
 		}

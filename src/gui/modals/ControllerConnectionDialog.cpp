@@ -169,7 +169,7 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 	// our port-menus when being clicked
 	if( !Engine::audioEngine()->midiClient()->isRaw() )
 	{
-		m_readablePorts = new MidiPortMenu( MidiPort::Input );
+		m_readablePorts = new MidiPortMenu( MidiPort::Mode::Input );
 		connect( m_readablePorts, SIGNAL(triggered(QAction*)),
 				this, SLOT(enableAutoDetect(QAction*)));
 		auto rp_btn = new ToolButton(m_midiGroupBox);
@@ -242,9 +242,9 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 	{
 		cc = m_targetModel->controllerConnection();
 
-		if( cc && cc->getController()->type() != Controller::DummyController && Engine::getSong() )
+		if( cc && cc->getController()->type() != Controller::ControllerType::Dummy && Engine::getSong() )
 		{
-			if ( cc->getController()->type() == Controller::MidiController )
+			if ( cc->getController()->type() == Controller::ControllerType::Midi )
 			{
 				m_midiGroupBox->model()->setValue( true );
 				// ensure controller is created

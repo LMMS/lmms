@@ -80,7 +80,7 @@ class LMMS_EXPORT AutomatableModel : public Model, public JournallingObject
 public:
 	using AutoModelVector = QVector<AutomatableModel*>;
 
-	enum ScaleType
+	enum class ScaleType
 	{
 		Linear,
 		Logarithmic,
@@ -231,11 +231,11 @@ public:
 	}
 	void setScaleLogarithmic( bool setToTrue = true )
 	{
-		setScaleType( setToTrue ? Logarithmic : Linear );
+		setScaleType( setToTrue ? ScaleType::Logarithmic : ScaleType::Linear );
 	}
 	bool isScaleLogarithmic() const
 	{
-		return m_scaleType == Logarithmic;
+		return m_scaleType == ScaleType::Logarithmic;
 	}
 
 	void setStep( const float step );

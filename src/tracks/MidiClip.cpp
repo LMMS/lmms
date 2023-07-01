@@ -48,7 +48,7 @@ QPixmap * gui::MidiClipView::s_stepBtnOffLight = nullptr;
 MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
 	Clip( _instrument_track ),
 	m_instrumentTrack( _instrument_track ),
-	m_clipType( BeatClip ),
+	m_clipType( Type::BeatClip ),
 	m_steps( TimePos::stepsPerBar() )
 {
 	if (_instrument_track->trackContainer()	== Engine::patternStore())
@@ -76,11 +76,11 @@ MidiClip::MidiClip( const MidiClip& other ) :
 	init();
 	switch( getTrack()->trackContainer()->type() )
 	{
-		case TrackContainer::PatternContainer:
+		case TrackContainer::Type::Pattern:
 			setAutoResize( true );
 			break;
 
-		case TrackContainer::SongContainer:
+		case TrackContainer::Type::Song:
 			// move down
 		default:
 			setAutoResize( false );
@@ -111,7 +111,7 @@ void MidiClip::resizeToFirstTrack()
 		m_instrumentTrack->trackContainer()->tracks();
 	for (const auto& track : tracks)
 	{
-		if (track->type() == Track::InstrumentTrack)
+		if (track->type() == Track::Type::Instrument)
 		{
 			if (track != m_instrumentTrack)
 			{
@@ -144,7 +144,7 @@ void MidiClip::init()
 
 void MidiClip::updateLength()
 {
-	if( m_clipType == BeatClip )
+	if( m_clipType == Type::BeatClip )
 	{
 		changeLength( beatClipLength() );
 		updatePatternTrack();
@@ -340,10 +340,10 @@ void MidiClip::splitNotes(NoteVector notes, TimePos pos)
 
 
 
-void MidiClip::setType( MidiClipTypes _new_clip_type )
+void MidiClip::setType( Type _new_clip_type )
 {
-	if( _new_clip_type == BeatClip ||
-				_new_clip_type == MelodyClip )
+	if( _new_clip_type == Type::BeatClip ||
+				_new_clip_type == Type::MelodyClip )
 	{
 		m_clipType = _new_clip_type;
 	}
@@ -359,12 +359,12 @@ void MidiClip::checkType()
 	{
 		if( ( *it )->length() > 0 )
 		{
-			setType( MelodyClip );
+			setType( Type::MelodyClip );
 			return;
 		}
 		++it;
 	}
-	setType( BeatClip );
+	setType( Type::BeatClip );
 }
 
 
@@ -372,7 +372,7 @@ void MidiClip::checkType()
 
 void MidiClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	_this.setAttribute( "type", m_clipType );
+	_this.setAttribute( "type", static_cast<int>(m_clipType) );
 	_this.setAttribute( "name", name() );
 	
 	if( usesCustomClipColor() )
@@ -406,7 +406,7 @@ void MidiClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void MidiClip::loadSettings( const QDomElement & _this )
 {
-	m_clipType = static_cast<MidiClipTypes>( _this.attribute( "type"
+	m_clipType = static_cast<Type>( _this.attribute( "type"
 								).toInt() );
 	setName( _this.attribute( "name" ) );
 	

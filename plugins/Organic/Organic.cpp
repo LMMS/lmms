@@ -56,7 +56,7 @@ Plugin::Descriptor PLUGIN_EXPORT organic_plugin_descriptor =
 				"Additive Synthesizer for organ-like sounds" ),
 	"Andreas Brandmaier <andreas/at/brandmaier.de>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
@@ -78,7 +78,9 @@ float * OrganicInstrument::s_harmonics = nullptr;
 
 OrganicInstrument::OrganicInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &organic_plugin_descriptor ),
-	m_modulationAlgo( Oscillator::SignalMix, Oscillator::SignalMix, Oscillator::SignalMix),
+	m_modulationAlgo(static_cast<int>(Oscillator::ModulationAlgo::SignalMix),
+		static_cast<int>(Oscillator::ModulationAlgo::SignalMix),
+		static_cast<int>(Oscillator::ModulationAlgo::SignalMix)),
 	m_fx1Model( 0.0f, 0.0f, 0.99f, 0.01f , this, tr( "Distortion" ) ),
 	m_volModel( 100.0f, 0.0f, 200.0f, 1.0f, this, tr( "Volume" ) )
 {
@@ -409,7 +411,7 @@ class OrganicKnob : public Knob
 {
 public:
 	OrganicKnob( QWidget * _parent ) :
-		Knob( knobStyled, _parent )
+		Knob( KnobType::Styled, _parent )
 	{
 		setFixedSize( 21, 21 );
 	}
@@ -512,7 +514,7 @@ void OrganicInstrumentView::modelChanged()
 		oscKnob->setHintText( tr( "Osc %1 waveform:" ).arg( i + 1 ), QString() );
 
 		// setup volume-knob
-		auto volKnob = new Knob(knobStyled, this);
+		auto volKnob = new Knob(KnobType::Styled, this);
 		volKnob->setVolumeKnob( true );
 		volKnob->move( x + i * colWidth, y + rowHeight*1 );
 		volKnob->setFixedSize( 21, 21 );
@@ -566,7 +568,7 @@ void OrganicInstrumentView::updateKnobHint()
 
 OscillatorObject::OscillatorObject( Model * _parent, int _index ) :
 	Model( _parent ),
-	m_waveShape( Oscillator::SineWave, 0, Oscillator::NumWaveShapes-1, this ),
+	m_waveShape( static_cast<int>(Oscillator::WaveShape::Sine), 0, Oscillator::NumWaveShapes-1, this ),
 	m_oscModel( 0.0f, 0.0f, 5.0f, 1.0f,
 			this, tr( "Osc %1 waveform" ).arg( _index + 1 ) ),
 	m_harmModel( static_cast<float>( _index ), 0.0f, 17.0f, 1.0f,
@@ -588,15 +590,15 @@ void OscillatorObject::oscButtonChanged()
 
 	static auto shapes = std::array
 	{
-		Oscillator::SineWave,
-		Oscillator::SawWave,
-		Oscillator::SquareWave,
-		Oscillator::TriangleWave,
-		Oscillator::MoogSawWave,
-		Oscillator::ExponentialWave
+		Oscillator::WaveShape::Sine,
+		Oscillator::WaveShape::Saw,
+		Oscillator::WaveShape::Square,
+		Oscillator::WaveShape::Triangle,
+		Oscillator::WaveShape::MoogSaw,
+		Oscillator::WaveShape::Exponential
 	} ;
 
-	m_waveShape.setValue( shapes[(int)roundf( m_oscModel.value() )] );
+	m_waveShape.setValue( static_cast<float>(shapes[(int)roundf( m_oscModel.value() )]) );
 
 }
 
