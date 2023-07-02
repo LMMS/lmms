@@ -145,14 +145,14 @@ AudioSdl::~AudioSdl()
 	SDL_Quit();
 
 	delete[] m_outBuf;
-	
-	if (m_captureCbErrors) 
+
+	if (m_captureCbErrors)
 	{
-		fprintf( stderr , 
+		fprintf( stderr ,
 			"SDL inputCapture callback should not, but called [%u] !",
 			 m_captureCbErrors );
 	}
-	
+
 }
 
 
@@ -323,30 +323,30 @@ void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 
 void AudioSdl::startCapture() // New
 {
-	if (m_stopped) 
+	if (m_stopped)
 	{
-		fprintf(stderr, 
+		fprintf(stderr,
 			"AudioSdl::startCapture()  called while rendering!!!\n");
 		return;
 	}
-	
+
 	if (!m_captureOn)
-	{ 
+	{
 		SDL_PauseAudioDevice (m_inputDevice,	0);
 		m_captureOn = true;
-	} 
+	}
 }
 
 
 void AudioSdl::stopCapture() // New
 {
-	if (m_captureOn) 
+	if (m_captureOn)
 	{
 		SDL_LockAudioDevice (m_inputDevice);
 		m_captureOn = false;
 		SDL_PauseAudioDevice (m_inputDevice,	1);
 		SDL_UnlockAudioDevice (m_inputDevice);
-	} 
+	}
 }
 
 
@@ -357,14 +357,14 @@ void AudioSdl::sdlInputAudioCallback(void *_udata, Uint8 *_buf, int _len) {
 }
 
 void AudioSdl::sdlInputAudioCallback(Uint8 *_buf, int _len) {
-	if ( (!m_stopped) & (m_captureOn) ) //!< Guard for Bugs ... 
+	if ( (!m_stopped) & (m_captureOn) ) //!< Guard for Bugs ...
 	{
 		auto samples_buffer = (sampleFrame*)_buf;
 		fpp_t frames = _len / sizeof ( sampleFrame );
 
 		audioEngine()->pushInputFrames (samples_buffer, frames);
-	} 
-	else 
+	}
+	else
 	{
 		m_captureCbErrors += 1;
 	};

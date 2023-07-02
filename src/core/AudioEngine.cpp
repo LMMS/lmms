@@ -331,7 +331,7 @@ void AudioEngine::pushInputFrames(const sampleFrame * _ab, const f_cnt_t _frames
 
 	memcpy( &buf[ frames ], _ab, _frames * sizeof( sampleFrame ) );
 	m_inputBufferFrames[ m_inputBufferWrite ] += _frames;
-	
+
 	if (needCapture)
 	{
 		doneChangeInModel(); // future_hint : MUST NOT be here

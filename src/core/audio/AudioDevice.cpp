@@ -129,7 +129,7 @@ void AudioDevice::stopProcessing()
 
 
 
-void AudioDevice::startCapture() 
+void AudioDevice::startCapture()
 {
 	fprintf(stderr,
 		"BUG! AudioDevice::startCapture() called!\n");
@@ -138,7 +138,7 @@ void AudioDevice::startCapture()
 
 
 
-void AudioDevice::stopCapture() 
+void AudioDevice::stopCapture()
 {
 	fprintf(stderr,
 		"BUG! AudioDevice::stopCapture() called!\n");

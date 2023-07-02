@@ -69,12 +69,12 @@ public:
 	{
 		return m_supportsCapture;
 	}
-	
+
 	inline bool isCaptureOn() const
 	{
 		return m_captureOn;
 	}
-	
+
 	inline sample_rate_t sampleRate() const
 	{
 		return m_sampleRate;
@@ -96,9 +96,9 @@ public:
 
 	virtual void applyQualitySettings();
 
-	//! Starts capture callback if can, driver MUST override if enebales capture 
+	//! Starts capture callback if can, driver MUST override if enebales capture
 	virtual void startCapture();
-	//! Stops capture callback if can, driver MUST override if enebales capture 
+	//! Stops capture callback if can, driver MUST override if enebales capture
 	virtual void stopCapture();
 
 

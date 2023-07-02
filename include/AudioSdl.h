@@ -82,7 +82,7 @@ private:
 #ifdef LMMS_HAVE_SDL2
 	void startCapture() override;
 	void stopCapture() override;
-	
+
 	static void sdlInputAudioCallback( void * _udata, Uint8 * _buf, int _len );
 	void sdlInputAudioCallback( Uint8 * _buf, int _len );
 #endif

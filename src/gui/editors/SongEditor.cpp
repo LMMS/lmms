@@ -1097,7 +1097,7 @@ void SongEditorWindow::record()
 	{
 		ad->startCapture();
 	}
-	
+
 	m_editor->m_song->record();
 }
 
@@ -1111,7 +1111,7 @@ void SongEditorWindow::recordAccompany()
 	{
 		ad->startCapture();
 	}
-	
+
 	m_editor->m_song->playAndRecord();
 }
 
