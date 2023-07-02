@@ -386,7 +386,7 @@ void FreeBoyInstrument::playNote(NotePlayHandle* nph, sampleFrame* workingBuffer
 		data += m_ch4ShiftRegWidthModel.value();
 		data = data << 3;
 		data += div_ratio;
-		papu->write_register(0xff22, data);
+		papu->writeRegister(0xff22, data);
 
 		//channel 4 init
 		papu->writeRegister(0xff23, 128);
