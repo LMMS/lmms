@@ -99,6 +99,7 @@ void Oscillator::update(sampleFrame* ab, const fpp_t frames, const ch_cnt_t chnl
 				updateAM(ab, frames, chnl);
 				break;
 			case ModulationAlgo::SignalMix:
+			default:
 				updateMix(ab, frames, chnl);
 				break;
 			case ModulationAlgo::SynchronizedBySubOsc:

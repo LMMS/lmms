@@ -57,7 +57,7 @@ public:
 		IsNotBendable = 0x04,		/*! Instrument can't react to pitch bend changes */
 	};
 
-	using Flags = Flags<Flag>;
+	using Flags = lmms::Flags<Flag>;
 
 	Instrument(InstrumentTrack * _instrument_track,
 			const Descriptor * _descriptor,

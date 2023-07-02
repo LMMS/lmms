@@ -152,6 +152,7 @@ void LfoController::updateSampleFunction()
 	switch( static_cast<Oscillator::WaveShape>(m_waveModel.value()) )
 	{
 		case Oscillator::WaveShape::Sine:
+		default:
 			m_sampleFunction = &Oscillator::sinSample;
 			break;
 		case Oscillator::WaveShape::Triangle:

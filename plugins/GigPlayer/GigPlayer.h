@@ -224,7 +224,7 @@ public:
 
 	GigNote( int midiNote, int velocity, float frequency, GIGPluginData * handle )
 		: midiNote( midiNote ), velocity( velocity ),
-		  release( false ), isRelease( false ), state( KeyDown ),
+		  release( false ), isRelease( false ), state( GigState::KeyDown ),
 		  frequency( frequency ), handle( handle )
 	{
 	}

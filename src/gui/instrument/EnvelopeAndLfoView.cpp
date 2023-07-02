@@ -462,6 +462,7 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 			switch( static_cast<EnvelopeAndLfoParameters::LfoShape>(m_params->m_lfoWaveModel.value()) )
 			{
 				case EnvelopeAndLfoParameters::LfoShape::SineWave:
+				default:
 					val = Oscillator::sinSample( phase );
 					break;
 				case EnvelopeAndLfoParameters::LfoShape::TriangleWave:
