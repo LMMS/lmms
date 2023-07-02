@@ -369,7 +369,7 @@ void FreeBoyInstrument::playNote(NotePlayHandle* nph, sampleFrame* workingBuffer
 		// ratio and chooses the combination whose resulting frequency is closest to the note frequency
 		for (char s = 0; s < 16; ++s)
 		{
-			for (char r = 1 ; r < 8; ++r)
+			for (char r = 1; r < 8; ++r)
 			{
 				float f = 524288.0 / (r * std::pow(2.0, s + 1.0));
 				if (std::fabs(freq - closest_freq) > std::fabs(freq - f))
@@ -380,7 +380,7 @@ void FreeBoyInstrument::playNote(NotePlayHandle* nph, sampleFrame* workingBuffer
 				}
 			}
 		}
-		
+
 		data = clock_freq;
 		data = data << 1;
 		data += m_ch4ShiftRegWidthModel.value();
