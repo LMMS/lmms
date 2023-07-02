@@ -45,14 +45,14 @@
 #include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "ProjectJournal.h"
+#include "SimpleTextFloat.h"
 #include "StringPairDrag.h"
-#include "TextFloat.h"
 
 
 namespace lmms::gui
 {
 
-TextFloat * Knob::s_textFloat = nullptr;
+SimpleTextFloat * Knob::s_textFloat = nullptr;
 
 
 
@@ -86,7 +86,7 @@ void Knob::initUi( const QString & _name )
 {
 	if( s_textFloat == nullptr )
 	{
-		s_textFloat = new TextFloat;
+		s_textFloat = new SimpleTextFloat;
 	}
 
 	setWindowTitle( _name );

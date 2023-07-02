@@ -316,8 +316,7 @@ float EqHandle::getLowCutCurve( float x )
 	double c = cosf( w0 );
 	double s = sinf( w0 );
 	double resonance = getResonance();
-	double A = pow( 10, yPixelToGain( EqHandle::y(), m_heigth, m_pixelsPerUnitHeight ) / 20);
-	double alpha = s / 2 * sqrt ( ( A +1/A ) * ( 1 / resonance -1 ) +2 );
+	double alpha = s / (2 * resonance);
 	double a0, a1, a2, b0, b1, b2; // coeffs to calculate
 
 	b0 = ( 1 + c ) * 0.5;
@@ -360,8 +359,7 @@ float EqHandle::getHighCutCurve( float x )
 	double c = cosf( w0 );
 	double s = sinf( w0 );
 	double resonance = getResonance();
-	double A = pow( 10, yPixelToGain( EqHandle::y(), m_heigth, m_pixelsPerUnitHeight ) / 20 );
-	double alpha = s / 2 * sqrt ( ( A + 1 / A ) * ( 1 / resonance -1 ) +2 );
+	double alpha = s / (2 * resonance);
 	double a0, a1, a2, b0, b1, b2; // coeffs to calculate
 
 	b0 = ( 1 - c ) * 0.5;

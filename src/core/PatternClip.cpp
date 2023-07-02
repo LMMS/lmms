@@ -80,7 +80,7 @@ void PatternClip::loadSettings(const QDomElement& element)
 	}
 	changeLength( element.attribute( "len" ).toInt() );
 	setStartTimeOffset(element.attribute("off").toInt());
-	if( element.attribute( "muted" ).toInt() != isMuted() )
+	if (static_cast<bool>(element.attribute("muted").toInt()) != isMuted())
 	{
 		toggleMute();
 	}

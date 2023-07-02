@@ -1,9 +1,9 @@
 /*
  * TextFloat.h - class textFloat, a floating text-label
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
- * This file is part of LMMS - https://lmms.io
+ * Copyright (c) 2023 LMMS team
+*
+* This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -20,10 +20,11 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301 USA.
  *
- */
+*/
 
-#ifndef LMMS_GUI_TEXT_FLOAT_H
-#define LMMS_GUI_TEXT_FLOAT_H
+
+#ifndef SIMPLE_TEXT_FLOAT_H
+#define SIMPLE_TEXT_FLOAT_H
 
 #include <QWidget>
 
@@ -34,45 +35,27 @@ class QLabel;
 namespace lmms::gui
 {
 
-class LMMS_EXPORT TextFloat : public QWidget
+class LMMS_EXPORT SimpleTextFloat : public QWidget
 {
 	Q_OBJECT
 public:
-	TextFloat();
-	~TextFloat() override = default;
+	SimpleTextFloat();
+	~SimpleTextFloat() override = default;
 
-	void setTitle(const QString & title);
 	void setText(const QString & text);
-	void setPixmap(const QPixmap & pixmap);
 
 	void setVisibilityTimeOut(int msecs);
-
-	static TextFloat * displayMessage(const QString & title,
-						const QString & msg,
-						const QPixmap & pixmap = QPixmap(),
-						int timeout = 2000,
-						QWidget * parent = nullptr);
 
 	void moveGlobal(QWidget * w, const QPoint & offset)
 	{
 		move(w->mapToGlobal(QPoint(0, 0)) + offset);
 	}
 
-
-protected:
-	void mousePressEvent(QMouseEvent * me) override;
-
-
 private:
-	TextFloat(const QString & title, const QString & text, const QPixmap & pixmap);
-
-	QLabel * m_pixmapLabel;
-	QLabel * m_titleLabel;
 	QLabel * m_textLabel;
-
 };
 
 
 } // namespace lmms::gui
 
-#endif // LMMS_GUI_TEXT_FLOAT_H
+#endif

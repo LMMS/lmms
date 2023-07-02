@@ -100,7 +100,7 @@ QToolTip {
 	color: #d1d8e4;
 }
 
-lmms--gui--TextFloat {
+lmms--gui--TextFloat, lmms--gui--SimpleTextFloat {
 	background: #040506;
 	color: #d1d8e4;
 }

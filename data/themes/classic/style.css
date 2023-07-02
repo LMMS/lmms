@@ -70,7 +70,7 @@ QToolTip {
 	color: #4afd85;
 }
 
-lmms--gui--TextFloat {
+lmms--gui--TextFloat, lmms--gui--SimpleTextFloat {
 	border-radius: 4px;
 	background: qlineargradient(spread:reflect, x1:0.5, y1:0.5, x2:0.5, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(50, 50, 50, 220));
 	opacity: 175;
