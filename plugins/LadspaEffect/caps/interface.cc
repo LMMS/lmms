@@ -69,7 +69,6 @@ seed()
 
 extern "C" {
 
-__attribute__ ((constructor)) 
 void caps_so_init()
 {
 	DescriptorStub ** d = descriptors;
@@ -125,7 +124,6 @@ void caps_so_init()
 	//seed();
 }
 
-__attribute__ ((destructor)) 
 void caps_so_fini()
 {
 	for (ulong i = 0; i < N; ++i)
