@@ -29,7 +29,7 @@
 	(2541 - 2580 donated to artemio@kdemail.net)
 */
 
-#include <sys/time.h>
+// #include <sys/time.h>
 
 #include "basics.h"
 
