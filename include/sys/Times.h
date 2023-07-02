@@ -31,6 +31,9 @@
 #include <sys/types.h>
 #include <winsock2.h>
 
+namespace lmms 
+{
+
 int gettimeofday(struct timeval* t, void* timezone);
 
 // from linux's sys/times.h
@@ -58,6 +61,8 @@ struct tms
 clock_t times(struct tms* __buffer);
 
 typedef long long suseconds_t;
+
+} // namespace lmms
 
 #endif
 #endif
