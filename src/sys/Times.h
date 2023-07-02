@@ -40,8 +40,6 @@ namespace lmms
 int gettimeofday(struct timeval* t, void* timezone);
 
 
-
-
 /* Structure describing CPU time used by a process and its children.  */
 struct tms
 {
