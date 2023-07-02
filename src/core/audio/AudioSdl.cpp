@@ -370,7 +370,7 @@ void AudioSdl::sdlInputAudioCallback(Uint8 *_buf, int _len) {
 	};
 }
 
-#endif
+#endif // LMMS_HAVE_SDL2
 
 AudioSdl::setupWidget::setupWidget( QWidget * _parent ) :
 	AudioDeviceSetupWidget( AudioSdl::name(), _parent )
