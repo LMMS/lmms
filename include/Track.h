@@ -22,11 +22,10 @@
  *
  */
 
-#ifndef TRACK_H
-#define TRACK_H
+#ifndef LMMS_TRACK_H
+#define LMMS_TRACK_H
 
-
-#include <QtCore/QVector>
+#include <QVector>
 #include <QColor>
 
 #include "AutomatableModel.h"
@@ -34,11 +33,21 @@
 #include "lmms_basics.h"
 
 
+namespace lmms
+{
+
 class TimePos;
 class TrackContainer;
-class TrackContainerView;
-class TrackContentObject;
+class Clip;
+
+
+namespace gui
+{
+
 class TrackView;
+class TrackContainerView;
+
+}
 
 
 /*! The minimum track height in pixels
@@ -60,12 +69,12 @@ class LMMS_EXPORT Track : public Model, public JournallingObject
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
-	typedef QVector<TrackContentObject *> tcoVector;
+	using clipVector = QVector<Clip*>;
 
 	enum TrackTypes
 	{
 		InstrumentTrack,
-		BBTrack,
+		PatternTrack,
 		SampleTrack,
 		EventTrack,
 		VideoTrack,
@@ -75,7 +84,7 @@ public:
 	} ;
 
 	Track( TrackTypes type, TrackContainer * tc );
-	virtual ~Track();
+	~Track() override;
 
 	static Track * create( TrackTypes tt, TrackContainer * tc );
 	static Track * create( const QDomElement & element,
@@ -90,11 +99,12 @@ public:
 	}
 
 	virtual bool play( const TimePos & start, const fpp_t frames,
-						const f_cnt_t frameBase, int tcoNum = -1 ) = 0;
+						const f_cnt_t frameBase, int clipNum = -1 ) = 0;
 
 
-	virtual TrackView * createView( TrackContainerView * view ) = 0;
-	virtual TrackContentObject * createTCO( const TimePos & pos ) = 0;
+
+	virtual gui::TrackView * createView( gui::TrackContainerView * view ) = 0;
+	virtual Clip * createClip( const TimePos & pos ) = 0;
 
 	virtual void saveTrackSpecificSettings( QDomDocument & doc,
 						QDomElement & parent ) = 0;
@@ -109,25 +119,25 @@ public:
 		m_simpleSerializingMode = true;
 	}
 
-	// -- for usage by TrackContentObject only ---------------
-	TrackContentObject * addTCO( TrackContentObject * tco );
-	void removeTCO( TrackContentObject * tco );
+	// -- for usage by Clip only ---------------
+	Clip * addClip( Clip * clip );
+	void removeClip( Clip * clip );
 	// -------------------------------------------------------
-	void deleteTCOs();
+	void deleteClips();
 
-	int numOfTCOs();
-	TrackContentObject * getTCO( int tcoNum );
-	int getTCONum(const TrackContentObject* tco );
+	int numOfClips();
+	Clip * getClip( int clipNum );
+	int getClipNum(const Clip* clip );
 
-	const tcoVector & getTCOs() const
+	const clipVector & getClips() const
 	{
-		return m_trackContentObjects;
+		return m_clips;
 	}
-	void getTCOsInRange( tcoVector & tcoV, const TimePos & start,
+	void getClipsInRange( clipVector & clipV, const TimePos & start,
 							const TimePos & end );
-	void swapPositionOfTCOs( int tcoNum1, int tcoNum2 );
+	void swapPositionOfClips( int clipNum1, int clipNum2 );
 
-	void createTCOsForBB( int bb );
+	void createClipsForPattern(int pattern);
 
 
 	void insertBar( const TimePos & pos );
@@ -186,6 +196,11 @@ public:
 	{
 		return m_hasColor;
 	}
+
+	bool isMutedBeforeSolo() const
+	{
+		return m_mutedBeforeSolo;
+	}
 	
 	BoolModel* getMutedModel();
 
@@ -196,10 +211,15 @@ public slots:
 		emit nameChanged();
 	}
 
+	void setMutedBeforeSolo(const bool muted)
+	{
+		m_mutedBeforeSolo = muted;
+	}
+
 	void toggleSolo();
 
-	void trackColorChanged( QColor & c );
-	void trackColorReset();
+	void setColor(const QColor& c);
+	void resetColor();
 
 private:
 	TrackContainer* m_trackContainer;
@@ -209,29 +229,31 @@ private:
 
 protected:
 	BoolModel m_mutedModel;
+
 private:
 	BoolModel m_soloModel;
 	bool m_mutedBeforeSolo;
 
 	bool m_simpleSerializingMode;
 
-	tcoVector m_trackContentObjects;
+	clipVector m_clips;
 
 	QMutex m_processingLock;
 	
 	QColor m_color;
 	bool m_hasColor;
 
-	friend class TrackView;
+	friend class gui::TrackView;
 
 
 signals:
 	void destroyedTrack();
 	void nameChanged();
-	void trackContentObjectAdded( TrackContentObject * );
-
+	void clipAdded( lmms::Clip * );
+	void colorChanged();
 } ;
 
 
+} // namespace lmms
 
-#endif
+#endif // LMMS_TRACK_H

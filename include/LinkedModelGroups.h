@@ -22,16 +22,18 @@
  *
  */
 
-#ifndef LINKEDMODELGROUPS_H
-#define LINKEDMODELGROUPS_H
-
+#ifndef LMMS_LINKED_MODEL_GROUPS_H
+#define LMMS_LINKED_MODEL_GROUPS_H
 
 #include <cstddef>
-#include <memory>
-#include <vector>
 
 #include "Model.h"
 
+class QDomDocument;
+class QDomElement;
+
+namespace lmms
+{
 
 /**
 	@file LinkedModelGroups.h
@@ -109,8 +111,8 @@ signals:
 	// (who would kno if the client is Qt, i.e. it may not have slots at all)
 	// In this case you'd e.g. send the UI something like
 	// "/added <model meta info>"
-	void modelAdded(AutomatableModel* added);
-	void modelRemoved(AutomatableModel* removed);
+	void modelAdded(lmms::AutomatableModel* added);
+	void modelRemoved(lmms::AutomatableModel* removed);
 
 public:
 	AutomatableModel* getModel(const std::string& s)
@@ -129,6 +131,8 @@ public:
 
 private:
 	//! models for the controls
+	//! @note The AutomatableModels behind the ModelInfo are not owned,
+	//!   but referenced after `addModel` is being called.
 	std::map<std::string, ModelInfo> m_models;
 };
 
@@ -151,7 +155,7 @@ private:
 class LinkedModelGroups
 {
 public:
-	virtual ~LinkedModelGroups();
+	virtual ~LinkedModelGroups() = default;
 
 	void linkAllModels();
 
@@ -172,4 +176,6 @@ public:
 };
 
 
-#endif // LINKEDMODELGROUPS_H
+} // namespace lmms
+
+#endif // LMMS_LINKED_MODEL_GROUPS_H

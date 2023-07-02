@@ -1,5 +1,5 @@
 /*
- * AudioDevice.h - base-class for audio-devices, used by LMMS-mixer
+ * AudioDevice.h - base-class for audio-devices, used by LMMS audio engine
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,24 +22,27 @@
  *
  */
 
-#ifndef AUDIO_DEVICE_H
-#define AUDIO_DEVICE_H
+#ifndef LMMS_AUDIO_DEVICE_H
+#define LMMS_AUDIO_DEVICE_H
 
-#include <QtCore/QMutex>
+#include <QMutex>
 #include <samplerate.h>
 
 #include "lmms_basics.h"
 
-
-class AudioPort;
-class Mixer;
 class QThread;
+
+namespace lmms
+{
+
+class AudioEngine;
+class AudioPort;
 
 
 class AudioDevice
 {
 public:
-	AudioDevice( const ch_cnt_t _channels, Mixer* mixer );
+	AudioDevice( const ch_cnt_t _channels, AudioEngine* audioEngine );
 	virtual ~AudioDevice();
 
 	inline void lock()
@@ -126,9 +129,9 @@ protected:
 		m_sampleRate = _new_sr;
 	}
 
-	Mixer* mixer()
+	AudioEngine* audioEngine()
 	{
-		return m_mixer;
+		return m_audioEngine;
 	}
 
 	bool hqAudio() const;
@@ -143,7 +146,7 @@ protected:
 private:
 	sample_rate_t m_sampleRate;
 	ch_cnt_t m_channels;
-	Mixer* m_mixer;
+	AudioEngine* m_audioEngine;
 	bool m_inProcess;
 
 	QMutex m_devMutex;
@@ -153,7 +156,8 @@ private:
 
 	surroundSampleFrame * m_buffer;
 
-} ;
+};
 
+} // namespace lmms
 
-#endif
+#endif // LMMS_AUDIO_DEVICE_H

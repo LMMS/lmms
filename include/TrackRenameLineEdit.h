@@ -23,11 +23,13 @@
  *
  */
 
-
-#ifndef TRACK_RENAME_LINE_EDIT_H
-#define TRACK_RENAME_LINE_EDIT_H
+#ifndef LMMS_GUI_TRACK_RENAME_LINE_EDIT_H
+#define LMMS_GUI_TRACK_RENAME_LINE_EDIT_H
 
 #include <QLineEdit>
+
+namespace lmms::gui
+{
 
 class TrackRenameLineEdit : public QLineEdit
 {
@@ -43,4 +45,6 @@ private:
 	QString m_oldName;
 } ;
 
-#endif
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_TRACK_RENAME_LINE_EDIT_H

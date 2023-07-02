@@ -29,15 +29,19 @@
 #include "ExportProjectDialog.h"
 #include "GuiApplication.h"
 
+namespace lmms
+{
 
 AudioFileDevice::AudioFileDevice( OutputSettings const & outputSettings,
 					const ch_cnt_t _channels,
 					const QString & _file,
-					Mixer*  _mixer ) :
-	AudioDevice( _channels, _mixer ),
+					AudioEngine*  _audioEngine ) :
+	AudioDevice( _channels, _audioEngine ),
 	m_outputFile( _file ),
 	m_outputSettings(outputSettings)
 {
+	using gui::ExportProjectDialog;
+
 	setSampleRate( outputSettings.getSampleRate() );
 
 	if( m_outputFile.open( QFile::WriteOnly | QFile::Truncate ) == false )
@@ -52,9 +56,9 @@ AudioFileDevice::AudioFileDevice( OutputSettings const & outputSettings,
 						"file and try again!"
 								).arg( _file );
 
-		if( gui )
+		if (gui::getGUI() != nullptr)
 		{
-			QMessageBox::critical( NULL, title, message,
+			QMessageBox::critical( nullptr, title, message,
 						QMessageBox::Ok,
 						QMessageBox::NoButton );
 		}
@@ -87,3 +91,4 @@ int AudioFileDevice::writeData( const void* data, int len )
 	return -1;
 }
 
+} // namespace lmms

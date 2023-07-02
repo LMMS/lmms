@@ -3,7 +3,7 @@
 <lmms-project version="1.0" creator="LMMS" creatorversion="1.0.2" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings muted="0" type="0" name="Resonant Pad" solo="0">
-    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="57" vol="30">
+    <instrumenttrack pan="0" mixch="0" pitchrange="1" pitch="0" basenote="57" vol="30">
       <instrument name="tripleoscillator">
         <tripleoscillator phoffset2="0" userwavefile0="samples/empty.wav" finer0="0" userwavefile1="samples/empty.wav" finer1="13" userwavefile2="samples/empty.wav" finer2="-3" coarse0="0" coarse1="0" coarse2="0" finel0="0" finel1="-14" modalgo1="2" modalgo2="2" finel2="0" pan0="0" modalgo3="2" pan1="0" stphdetun0="0" pan2="0" stphdetun1="50" wavetype0="2" stphdetun2="0" wavetype1="2" wavetype2="2" vol0="100" vol1="100" phoffset0="0" phoffset1="0" vol2="100"/>
       </instrument>

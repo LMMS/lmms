@@ -22,13 +22,15 @@
  *
  */
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "FlangerControls.h"
 #include "FlangerEffect.h"
 #include "Engine.h"
 #include "Song.h"
 
+namespace lmms
+{
 
 
 FlangerControls::FlangerControls( FlangerEffect *effect ) :
@@ -43,7 +45,7 @@ FlangerControls::FlangerControls( FlangerEffect *effect ) :
 	m_invertFeedbackModel ( false, this, tr( "Invert" ) )
 
 {
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( changedSampleRate() ) );
+	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( changedSampleRate() ) );
 	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ), this, SLOT( changedPlaybackState() ) );
 }
 
@@ -91,3 +93,6 @@ void FlangerControls::changedPlaybackState()
 {
 	m_effect->restartLFO();
 }
+
+
+} // namespace lmms

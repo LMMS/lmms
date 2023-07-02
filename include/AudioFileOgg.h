@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef AUDIO_FILE_OGG_H
-#define AUDIO_FILE_OGG_H
+#ifndef LMMS_AUDIO_FILE_OGG_H
+#define LMMS_AUDIO_FILE_OGG_H
 
 #include "lmmsconfig.h"
 
@@ -34,6 +34,8 @@
 
 #include "AudioFileDevice.h"
 
+namespace lmms
+{
 
 class AudioFileOgg : public AudioFileDevice
 {
@@ -42,22 +44,21 @@ public:
 			const ch_cnt_t _channels,
 			bool & _success_ful,
 			const QString & _file,
-			Mixer* mixer );
-	virtual ~AudioFileOgg();
+			AudioEngine* audioEngine );
+	~AudioFileOgg() override;
 
 	static AudioFileDevice * getInst( const QString & outputFilename,
 					  OutputSettings const & outputSettings,
 					  const ch_cnt_t channels,
-					  Mixer* mixer,
+					  AudioEngine* audioEngine,
 					  bool & successful )
 	{
-		return new AudioFileOgg( outputSettings, channels, successful,
-						outputFilename, mixer );
+		return new AudioFileOgg( outputSettings, channels, successful, outputFilename, audioEngine );
 	}
 
 
 private:
-	virtual void writeBuffer( const surroundSampleFrame * _ab,
+	void writeBuffer( const surroundSampleFrame * _ab,
 						const fpp_t _frames,
 						const float _master_gain ) override;
 
@@ -108,6 +109,8 @@ private:
 } ;
 
 
-#endif
+} // namespace lmms
 
-#endif
+#endif // LMMS_HAVE_OGGVORBIS
+
+#endif // LMMS_AUDIO_FILE_OGG_H

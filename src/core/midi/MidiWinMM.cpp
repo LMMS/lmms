@@ -23,9 +23,12 @@
  */
 
 #include "MidiWinMM.h"
-#include "Note.h"
 
 #ifdef LMMS_BUILD_WIN32
+
+
+namespace lmms
+{
 
 
 MidiWinMM::MidiWinMM() :
@@ -300,4 +303,6 @@ void MidiWinMM::openDevices()
 }
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_BUILD_WIN32

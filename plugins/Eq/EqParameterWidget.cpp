@@ -25,13 +25,21 @@
 
 #include "EqParameterWidget.h"
 
+#include <cmath>
 #include <QGraphicsScene>
 #include <QGraphicsView>
-#include <QMouseEvent>
+#include <QPainter>
+#include <QPen>
 #include <QWidget>
 
-#include "EqControls.h"
-#include "lmms_math.h"
+#include "AutomatableModel.h"
+#include "EqCurve.h"
+#include "EqParameterWidget.h"
+#include "lmms_constants.h"
+
+
+namespace lmms::gui
+{
 
 
 EqParameterWidget::EqParameterWidget( QWidget *parent, EqControls * controls ) :
@@ -48,9 +56,9 @@ EqParameterWidget::EqParameterWidget( QWidget *parent, EqControls * controls ) :
 	m_pixelsPerOctave = EqHandle::freqToXPixel( 10000, m_displayWidth ) - EqHandle::freqToXPixel( 5000, m_displayWidth );
 
 	//GraphicsScene and GraphicsView stuff
-	QGraphicsScene *scene = new QGraphicsScene();
+	auto scene = new QGraphicsScene();
 	scene->setSceneRect( 0, 0, m_displayWidth, m_displayHeigth );
-	QGraphicsView *view = new QGraphicsView( this );
+	auto view = new QGraphicsView(this);
 	view->setStyleSheet( "border-style: none; background: transparent;" );
 	view->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 	view->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
@@ -240,3 +248,6 @@ EqBand::EqBand() :
 	peakR( 0 )
 {
 }
+
+
+} // namespace lmms::gui

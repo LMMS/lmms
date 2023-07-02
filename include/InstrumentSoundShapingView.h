@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef INSTRUMENT_SOUND_SHAPING_VIEW_H
-#define INSTRUMENT_SOUND_SHAPING_VIEW_H
+#ifndef LMMS_GUI_INSTRUMENT_SOUND_SHAPING_VIEW_H
+#define LMMS_GUI_INSTRUMENT_SOUND_SHAPING_VIEW_H
 
 #include <QWidget>
 
@@ -31,6 +31,9 @@
 #include "ModelView.h"
 
 class QLabel;
+
+namespace lmms::gui
+{
 
 class EnvelopeAndLfoView;
 class ComboBox;
@@ -44,7 +47,7 @@ class InstrumentSoundShapingView : public QWidget, public ModelView
 	Q_OBJECT
 public:
 	InstrumentSoundShapingView( QWidget * _parent );
-	virtual ~InstrumentSoundShapingView();
+	~InstrumentSoundShapingView() override;
 
 	void setFunctionsHidden( bool hidden );
 
@@ -67,4 +70,7 @@ private:
 
 } ;
 
-#endif
+
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_INSTRUMENT_SOUND_SHAPING_VIEW_H

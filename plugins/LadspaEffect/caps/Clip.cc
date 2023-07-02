@@ -94,7 +94,7 @@ Clip::one_cycle (int frames)
 
 	for (int i = 0; i < frames; ++i)
 	{
-		register sample_t a = gain * s[i];
+		sample_t a = gain * s[i];
 
 		a = down.process (clip (up.upsample (a)));
 
