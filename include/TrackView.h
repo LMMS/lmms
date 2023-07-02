@@ -22,10 +22,8 @@
  *
  */
 
-
-
-#ifndef TRACK_VIEW_H
-#define TRACK_VIEW_H
+#ifndef LMMS_GUI_TRACK_VIEW_H
+#define LMMS_GUI_TRACK_VIEW_H
 
 #include <QWidget>
 
@@ -33,7 +31,6 @@
 #include "ModelView.h"
 #include "TrackContentWidget.h"
 #include "TrackOperationsWidget.h"
-
 
 class QMenu;
 
@@ -179,4 +176,4 @@ private slots:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_TRACK_VIEW_H

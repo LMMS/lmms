@@ -57,7 +57,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	// init own layout + widgets
 	setFocusPolicy(Qt::StrongFocus);
 	auto vlayout = new QVBoxLayout(this);
-	vlayout->setMargin(0);
+	vlayout->setContentsMargins(0, 0, 0, 0);
 	vlayout->setSpacing(0);
 
 	auto generalSettingsWidget = new TabWidget(tr("GENERAL SETTINGS"), this);

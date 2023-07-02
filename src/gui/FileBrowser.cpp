@@ -76,7 +76,7 @@ void FileBrowser::addContentCheckBox()
 	auto filterWidget = new QWidget(contentParent());
 	filterWidget->setFixedHeight(15);
 	auto filterWidgetLayout = new QHBoxLayout(filterWidget);
-	filterWidgetLayout->setMargin(0);
+	filterWidgetLayout->setContentsMargins(0, 0, 0, 0);
 	filterWidgetLayout->setSpacing(0);
 
 	auto configCheckBox = [this, &filterWidgetLayout](QCheckBox* box)
@@ -119,7 +119,7 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	searchWidget->setFixedHeight( 24 );
 
 	auto searchWidgetLayout = new QHBoxLayout(searchWidget);
-	searchWidgetLayout->setMargin( 0 );
+	searchWidgetLayout->setContentsMargins(0, 0, 0, 0);
 	searchWidgetLayout->setSpacing( 0 );
 
 	m_filterEdit = new QLineEdit( searchWidget );
@@ -229,26 +229,22 @@ void FileBrowser::reloadTree()
 
 
 
-void FileBrowser::expandItems( QTreeWidgetItem * item, QList<QString> expandedDirs )
+void FileBrowser::expandItems(QTreeWidgetItem* item, QList<QString> expandedDirs)
 {
 	int numChildren = item ? item->childCount() : m_fileBrowserTreeWidget->topLevelItemCount();
 	for (int i = 0; i < numChildren; ++i)
 	{
-		QTreeWidgetItem * it = item ? item->child( i ) : m_fileBrowserTreeWidget->topLevelItem(i);
-		if ( m_recurse )
-		{
-			it->setExpanded( true );
-		}
+		auto it = item ? item->child(i) : m_fileBrowserTreeWidget->topLevelItem(i);
 		auto d = dynamic_cast<Directory*>(it);
 		if (d)
 		{
-			d->update();
-			bool expand = expandedDirs.contains( d->fullName() );
-			d->setExpanded( expand );
-		}
-		if (m_recurse && it->childCount())
-		{
-			expandItems(it, expandedDirs);
+			// Expanding is required when recursive to load in its contents, even if it's collapsed right afterward
+			if (m_recurse) { d->setExpanded(true); }
+			d->setExpanded(expandedDirs.contains(d->fullName()));
+			if (m_recurse && it->childCount())
+			{
+				expandItems(it, expandedDirs);
+			}
 		}
 	}
 }
@@ -1006,88 +1002,34 @@ void Directory::update()
 
 
 
-bool Directory::addItems(const QString & path )
+bool Directory::addItems(const QString& path)
 {
-	QDir thisDir( path );
-	if( !thisDir.isReadable() )
+	QDir thisDir(path);
+	if (!thisDir.isReadable()) { return false; }
+
+	treeWidget()->setUpdatesEnabled(false);
+
+	QFileInfoList entries = thisDir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::LocaleAware | QDir::DirsFirst | QDir::Name);
+	for (auto& entry : entries)
 	{
-		return false;
-	}
-
-	treeWidget()->setUpdatesEnabled( false );
-
-	bool added_something = false;
-
-	// try to add all directories from file system alphabetically into the tree
-	QStringList files = thisDir.entryList( QDir::Dirs, QDir::Name );
-	for( QStringList::const_iterator it = files.constBegin();
-						it != files.constEnd(); ++it )
-	{
-		QString cur_file = *it;
-		if( cur_file[0] != '.' )
+		QString fileName = entry.fileName();
+		if (entry.isDir())
 		{
-			bool orphan = true;
-			for( int i = 0; i < childCount(); ++i )
-			{
-				auto d = dynamic_cast<Directory*>(child(i));
-				if( d == nullptr || cur_file < d->text( 0 ) )
-				{
-					// insert before item, we're done
-					insertChild( i, new Directory( cur_file,
-							path, m_filter ) );
-					orphan = false;
-					m_dirCount++;
-					break;
-				}
-				else if( cur_file == d->text( 0 ) )
-				{
-					// imagine we have top-level subdirs named "TripleOscillator" in
-					// two directories from FileBrowser::m_directories
-					// and imagine both have a sub folder named "xyz"
-					// then only add one tree widget for both
-					// so we don't add a new Directory - we just
-					// add the path to the current directory
-					d->addDirectory( path );
-					orphan = false;
-					break;
-				}
-			}
-			if( orphan )
-			{
-				// it has not yet been added yet, so it's (lexically)
-				// larger than all other dirs => append it at the bottom
-				addChild( new Directory( cur_file, path,
-								m_filter ) );
-				m_dirCount++;
-			}
-
-			added_something = true;
+			auto dir = new Directory(fileName, path, m_filter);
+			addChild(dir);
+			m_dirCount++;
+		}
+		else if (entry.isFile() && thisDir.match(m_filter, fileName.toLower()))
+		{
+			auto fileItem = new FileItem(fileName, path);
+			addChild(fileItem);
 		}
 	}
-
-	// sorts the path alphabetically instead of just appending to the bottom (see "orphans")
-	if (added_something)
-		sortChildren(0, Qt::AscendingOrder);
-
-	QList<QTreeWidgetItem*> items;
-	files = thisDir.entryList( QDir::Files, QDir::Name );
-	files.sort(Qt::CaseInsensitive);
-	for( QStringList::const_iterator it = files.constBegin();
-						it != files.constEnd(); ++it )
-	{
-		QString cur_file = *it;
-		if( cur_file[0] != '.' &&
-				thisDir.match( m_filter, cur_file.toLower() ) )
-		{
-			items << new FileItem( cur_file, path );
-			added_something = true;
-		}
-	}
-	addChildren( items );
-
-	treeWidget()->setUpdatesEnabled( true );
-
-	return added_something;
+	
+	treeWidget()->setUpdatesEnabled(true);
+	
+	// return true if we added any child items
+	return childCount() > 0;
 }
 
 

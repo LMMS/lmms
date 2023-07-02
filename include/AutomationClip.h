@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef AUTOMATION_CLIP_H
-#define AUTOMATION_CLIP_H
+#ifndef LMMS_AUTOMATION_CLIP_H
+#define LMMS_AUTOMATION_CLIP_H
 
 #include <QMap>
 #include <QPointer>
@@ -154,7 +154,7 @@ public:
 	float valueAt( const TimePos & _time ) const;
 	float *valuesAfter( const TimePos & _time ) const;
 
-	const QString name() const;
+	QString name() const;
 
 	// settings-management
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
@@ -260,4 +260,4 @@ inline int POS(AutomationClip::TimemapIterator it)
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AUTOMATION_CLIP_H

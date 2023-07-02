@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MODELVISITOR_H
-#define MODELVISITOR_H
+#ifndef LMMS_MODEL_VISITOR_H
+#define LMMS_MODEL_VISITOR_H
 
 namespace lmms
 {
@@ -68,4 +68,4 @@ public:
 
 } // namespace lmms
 
-#endif // MODELVISITOR_H
+#endif // LMMS_MODEL_VISITOR_H

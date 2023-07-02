@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_ENGINE_WORKER_THREAD_H
-#define AUDIO_ENGINE_WORKER_THREAD_H
+#ifndef LMMS_AUDIO_ENGINE_WORKER_THREAD_H
+#define LMMS_AUDIO_ENGINE_WORKER_THREAD_H
 
 #include <QThread>
 
@@ -121,4 +121,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AUDIO_ENGINE_WORKER_THREAD_H

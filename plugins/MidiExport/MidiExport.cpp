@@ -5,7 +5,7 @@
  * Copyright (c) 2017 Hyunjin Song <tteu.ingog/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either
@@ -81,7 +81,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 
 
 	int nTracks = 0;
-	uint8_t buffer[BUFFER_SIZE];
+	auto buffer = std::array<uint8_t, BUFFER_SIZE>{};
 	uint32_t size;
 
 	for (const Track* track : tracks) if (track->type() == Track::InstrumentTrack) nTracks++;
@@ -89,8 +89,8 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 
 	// midi header
 	MidiFile::MIDIHeader header(nTracks);
-	size = header.writeToBuffer(buffer);
-	midiout.writeRawData((char *)buffer, size);
+	size = header.writeToBuffer(buffer.data());
+	midiout.writeRawData((char *)buffer.data(), size);
 
 	std::vector<std::vector<std::pair<int,int>>> plists;
 
@@ -139,8 +139,8 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 			}
 			processPatternNotes(midiClip, INT_MAX);
 			writeMidiClipToTrack(mtrack, midiClip);
-			size = mtrack.writeToBuffer(buffer);
-			midiout.writeRawData((char *)buffer, size);
+			size = mtrack.writeToBuffer(buffer.data());
+			midiout.writeRawData((char *)buffer.data(), size);
 		}
 
 		if (track->type() == Track::PatternTrack)
@@ -254,8 +254,8 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 				++itr;
 			}
 		}
-		size = mtrack.writeToBuffer(buffer);
-		midiout.writeRawData((char *)buffer, size);
+		size = mtrack.writeToBuffer(buffer.data());
+		midiout.writeRawData((char *)buffer.data(), size);
 	}
 
 	return true;

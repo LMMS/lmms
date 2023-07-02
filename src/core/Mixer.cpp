@@ -190,11 +190,11 @@ void MixerChannel::doProcessing()
 Mixer::Mixer() :
 	Model( nullptr ),
 	JournallingObject(),
-	m_mixerChannels()
+	m_mixerChannels(),
+	m_lastSoloed(-1)
 {
 	// create master channel
 	createChannel();
-	m_lastSoloed = -1;
 }
 
 
@@ -223,6 +223,13 @@ int Mixer::createChannel()
 
 	// reset channel state
 	clearChannel( index );
+
+	// if there is a soloed channel, mute the new track
+	if (m_lastSoloed != -1 && m_mixerChannels[m_lastSoloed]->m_soloModel.value())
+	{
+		m_mixerChannels[index]->m_muteBeforeSolo = m_mixerChannels[index]->m_muteModel.value();
+		m_mixerChannels[index]->m_muteModel.setValue(true);
+	}
 
 	return index;
 }
@@ -823,6 +830,42 @@ void Mixer::validateChannelName( int index, int oldIndex )
 	{
 		m_mixerChannels[index]->m_name = tr( "Channel %1" ).arg( index );
 	}
+}
+
+bool Mixer::isChannelInUse(int index)
+{
+	// check if the index mixer channel receives audio from any other channel
+	if (!m_mixerChannels[index]->m_receives.isEmpty())
+	{
+		return true;
+	}
+
+	// check if the destination mixer channel on any instrument or sample track is the index mixer channel
+	TrackContainer::TrackList tracks;
+	tracks += Engine::getSong()->tracks();
+	tracks += Engine::patternStore()->tracks();
+
+	for (const auto t : tracks)
+	{
+		if (t->type() == Track::InstrumentTrack)
+		{
+			auto inst = dynamic_cast<InstrumentTrack*>(t);
+			if (inst->mixerChannelModel()->value() == index)
+			{
+				return true;
+			}
+		}
+		else if (t->type() == Track::SampleTrack)
+		{
+			auto strack = dynamic_cast<SampleTrack*>(t);
+			if (strack->mixerChannelModel()->value() == index)
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 

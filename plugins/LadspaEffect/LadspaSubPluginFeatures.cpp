@@ -71,7 +71,7 @@ void LadspaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 
 	auto maker = new QWidget(_parent);
 	auto l = new QHBoxLayout(maker);
-	l->setMargin( 0 );
+	l->setContentsMargins(0, 0, 0, 0);
 	l->setSpacing( 0 );
 
 	auto maker_label = new QLabel(maker);
@@ -85,7 +85,7 @@ void LadspaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 
 	auto copyright = new QWidget(_parent);
 	l = new QHBoxLayout( copyright );
-	l->setMargin( 0 );
+	l->setContentsMargins(0, 0, 0, 0);
 	l->setSpacing( 0 );
 
 	copyright->setMinimumWidth( _parent->minimumWidth() );

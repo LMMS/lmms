@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef TYPES_H
-#define TYPES_H
+#ifndef LMMS_TYPES_H
+#define LMMS_TYPES_H
 
 #include <cstddef>
 #include <limits>
@@ -146,4 +145,4 @@ constexpr const char* UI_CTRL_KEY =
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_TYPES_H

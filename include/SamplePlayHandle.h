@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef SAMPLE_PLAY_HANDLE_H
-#define SAMPLE_PLAY_HANDLE_H
+#ifndef LMMS_SAMPLE_PLAY_HANDLE_H
+#define LMMS_SAMPLE_PLAY_HANDLE_H
 
 #include "SampleBuffer.h"
 #include "AutomatableModel.h"
@@ -100,4 +100,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_SAMPLE_PLAY_HANDLE_H

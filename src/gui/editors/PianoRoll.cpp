@@ -66,6 +66,7 @@
 #include "PatternStore.h"
 #include "PianoView.h"
 #include "PositionLine.h"
+#include "SimpleTextFloat.h"
 #include "SongEditor.h"
 #include "StepRecorderWidget.h"
 #include "TextFloat.h"
@@ -127,9 +128,9 @@ QPixmap * PianoRoll::s_toolMove = nullptr;
 QPixmap * PianoRoll::s_toolOpen = nullptr;
 QPixmap* PianoRoll::s_toolKnife = nullptr;
 
-TextFloat * PianoRoll::s_textFloat = nullptr;
+SimpleTextFloat * PianoRoll::s_textFloat = nullptr;
 
-static QString s_noteStrings[12] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+static std::array<QString, 12> s_noteStrings {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
 
 static QString getNoteString(int key)
 {
@@ -137,7 +138,7 @@ static QString getNoteString(int key)
 }
 
 // used for drawing of piano
-PianoRoll::PianoRollKeyTypes PianoRoll::prKeyOrder[] =
+std::array<PianoRoll::PianoRollKeyTypes, 12> PianoRoll::prKeyOrder
 {
 	PR_WHITE_KEY_SMALL, PR_BLACK_KEY, PR_WHITE_KEY_BIG, PR_BLACK_KEY,
 	PR_WHITE_KEY_SMALL, PR_WHITE_KEY_SMALL, PR_BLACK_KEY, PR_WHITE_KEY_BIG,
@@ -290,7 +291,7 @@ PianoRoll::PianoRoll() :
 	// init text-float
 	if( s_textFloat == nullptr )
 	{
-		s_textFloat = new TextFloat;
+		s_textFloat = new SimpleTextFloat;
 	}
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
@@ -369,10 +370,10 @@ PianoRoll::PianoRoll() :
 	// Set up note length model
 	m_noteLenModel.addItem( tr( "Last note" ),
 					std::make_unique<PixmapLoader>( "edit_draw" ) );
-	const QString pixmaps[] = { "whole", "half", "quarter", "eighth",
+	const auto pixmaps = std::array<QString, 11>{"whole", "half", "quarter", "eighth",
 						"sixteenth", "thirtysecond", "triplethalf",
 						"tripletquarter", "tripleteighth",
-						"tripletsixteenth", "tripletthirtysecond" } ;
+						"tripletsixteenth", "tripletthirtysecond"};
 
 	for( int i = 0; i < NUM_EVEN_LENGTHS; ++i )
 	{
@@ -600,7 +601,7 @@ void PianoRoll::markSemiTone(int i, bool fromMenu)
 
 			const int first = chord->isScale() ? 0 : key;
 			const int last = chord->isScale() ? NumKeys : key + chord->last();
-			const int cap = ( chord->isScale() || chord->last() == 0 ) ? KeysPerOctave : chord->last();
+			const int cap = (chord->isScale() || chord->last() == 0) ? trackOctaveSize() : chord->last();
 
 			for( int i = first; i <= last; i++ )
 			{
@@ -858,8 +859,7 @@ void PianoRoll::setCurrentMidiClip( MidiClip* newMidiClip )
 	}
 
 	// force the song-editor to stop playing if it played a MIDI clip before
-	if( Engine::getSong()->isPlaying() &&
-		Engine::getSong()->playMode() == Song::Mode_PlayMidiClip )
+	if (Engine::getSong()->playMode() == Song::Mode_PlayMidiClip)
 	{
 		Engine::getSong()->playMidiClip( nullptr );
 	}
@@ -937,6 +937,15 @@ void PianoRoll::hideMidiClip( MidiClip* clip )
 		setCurrentMidiClip( nullptr );
 	}
 }
+
+
+int PianoRoll::trackOctaveSize() const
+{
+	if (!m_midiClip) { return KeysPerOctave; }
+	auto ut = m_midiClip->instrumentTrack()->microtuner();
+	return ut->enabled() ? ut->octaveSize() : KeysPerOctave;
+}
+
 
 void PianoRoll::selectRegionFromPixels( int xStart, int xEnd )
 {
@@ -1310,16 +1319,25 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 				int direction = (ke->key() == Qt::Key_Up ? +1 : -1);
 				if( ( ke->modifiers() & Qt::ControlModifier ) && m_action == ActionNone )
 				{
-					// shift selection up an octave
+					// shift selection by one octave
 					// if nothing selected, shift _everything_
 					if (hasValidMidiClip())
 					{
-						shiftSemiTone( 12 * direction );
+						// An octave could potentially be greater or less than twelve semitones if the microtuner is in use.
+						const auto microtuner = m_midiClip->instrumentTrack()->microtuner();
+						if (microtuner->enabled())
+						{
+							shiftSemiTone(microtuner->octaveSize() * direction);
+						}
+						else
+						{
+							shiftSemiTone(12 * direction);
+						}
 					}
 				}
 				else if((ke->modifiers() & Qt::ShiftModifier) && m_action == ActionNone)
 				{
-					// Move selected notes up by one semitone
+					// Move selected notes by one semitone
 					if (hasValidMidiClip())
 					{
 						shiftSemiTone( 1 * direction );
@@ -3942,7 +3960,8 @@ QList<int> PianoRoll::getAllOctavesForKey( int keyToMirror ) const
 {
 	QList<int> keys;
 
-	for (int i=keyToMirror % KeysPerOctave; i < NumKeys; i += KeysPerOctave)
+	int trackKeysPerOctave = trackOctaveSize();
+	for (int i = keyToMirror % trackKeysPerOctave; i < NumKeys; i += trackKeysPerOctave)
 	{
 		keys.append(i);
 	}
@@ -5171,6 +5190,8 @@ void PianoRollWindow::saveSettings( QDomDocument & doc, QDomElement & de )
 		de.appendChild(markedSemiTonesRoot);
 	}
 
+	de.setAttribute("stopbehaviour", m_editor->m_timeLine->behaviourAtStop());
+
 	MainWindow::saveWidgetState( this, de );
 }
 
@@ -5183,6 +5204,8 @@ void PianoRollWindow::loadSettings( const QDomElement & de )
 	m_editor->loadMarkedSemiTones(de.firstChildElement("markedSemiTones"));
 
 	MainWindow::restoreWidgetState( this, de );
+
+	m_editor->m_timeLine->setBehaviourAtStop(de.attribute("stopbehaviour").toInt());
 
 	// update margins here because we're later in the startup process
 	// We can't earlier because everything is still starting with the

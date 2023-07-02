@@ -27,6 +27,7 @@
 #include <QHeaderView>
 #include <QLabel>
 #include <QLineEdit>
+#include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QStyleOption>
@@ -34,7 +35,10 @@
 
 #include "embed.h"
 #include "Engine.h"
+#include "InstrumentTrack.h"
+#include "Song.h"
 #include "StringPairDrag.h"
+#include "TrackContainerView.h"
 #include "PluginFactory.h"
 
 namespace lmms::gui
@@ -52,7 +56,7 @@ PluginBrowser::PluginBrowser( QWidget * _parent ) :
 	addContentWidget( m_view );
 
 	auto view_layout = new QVBoxLayout(m_view);
-	view_layout->setMargin( 5 );
+	view_layout->setContentsMargins(5, 5, 5, 5);
 	view_layout->setSpacing( 5 );
 
 
@@ -284,6 +288,26 @@ void PluginDescWidget::mousePressEvent( QMouseEvent * _me )
 			QString::fromUtf8(m_pluginKey.desc->name), m_logo, this);
 		leaveEvent( _me );
 	}
+}
+
+
+void PluginDescWidget::contextMenuEvent(QContextMenuEvent* e)
+{
+	QMenu contextMenu(this);
+	contextMenu.addAction(
+		tr("Send to new instrument track"),
+		[=]{ openInNewInstrumentTrack(m_pluginKey.desc->name); }
+	);
+	contextMenu.exec(e->globalPos());
+}
+
+
+void PluginDescWidget::openInNewInstrumentTrack(QString value)
+{
+	TrackContainer* tc = Engine::getSong();
+	auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::InstrumentTrack, tc));
+	auto ilt = new InstrumentLoaderThread(this, it, value);
+	ilt->start();
 }
 
 

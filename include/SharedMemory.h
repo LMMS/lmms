@@ -19,10 +19,11 @@
  * License along with this program (see COPYING); if not, write to the
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301 USA.
+ *
  */
 
-#ifndef SHARED_MEMORY_H
-#define SHARED_MEMORY_H
+#ifndef LMMS_SHARED_MEMORY_H
+#define LMMS_SHARED_MEMORY_H
 
 #include <memory>
 #include <string>
@@ -148,4 +149,4 @@ private:
 
 } // namespace lmms
 
-#endif // SHARED_MEMORY_H
+#endif // LMMS_SHARED_MEMORY_H

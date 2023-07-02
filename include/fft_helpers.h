@@ -23,9 +23,8 @@
  *
  */
 
-
-#ifndef FFT_HELPERS_H
-#define FFT_HELPERS_H
+#ifndef LMMS_FFT_HELPERS_H
+#define LMMS_FFT_HELPERS_H
 
 #include "lmms_export.h"
 
@@ -109,4 +108,4 @@ int LMMS_EXPORT compressbands(const float * _absspec_buffer, float * _compressed
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_FFT_HELPERS_H

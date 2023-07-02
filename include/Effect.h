@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef EFFECT_H
-#define EFFECT_H
+#ifndef LMMS_EFFECT_H
+#define LMMS_EFFECT_H
 
 #include "Plugin.h"
 #include "Engine.h"
@@ -241,4 +241,4 @@ using EffectKeyList = Effect::Descriptor::SubPluginFeatures::KeyList;
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_EFFECT_H

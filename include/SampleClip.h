@@ -21,9 +21,9 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
-#ifndef SAMPLE_CLIP_H
-#define SAMPLE_CLIP_H
+
+#ifndef LMMS_SAMPLE_CLIP_H
+#define LMMS_SAMPLE_CLIP_H
 
 #include "Clip.h"
 
@@ -100,4 +100,4 @@ signals:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_SAMPLE_CLIP_H

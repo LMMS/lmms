@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef PROJECT_RENDERER_H
-#define PROJECT_RENDERER_H
+#ifndef LMMS_PROJECT_RENDERER_H
+#define LMMS_PROJECT_RENDERER_H
 
 #include "AudioFileDevice.h"
 #include "lmmsconfig.h"
@@ -76,7 +76,7 @@ public:
 
 	static QString getFileExtensionFromFormat( ExportFileFormats fmt );
 
-	static const FileEncodeDevice fileEncodeDevices[];
+	static const std::array<FileEncodeDevice, 5> fileEncodeDevices;
 
 public slots:
 	void startProcessing();
@@ -103,4 +103,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_PROJECT_RENDERER_H

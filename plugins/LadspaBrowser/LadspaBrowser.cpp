@@ -98,7 +98,7 @@ LadspaBrowserView::LadspaBrowserView( ToolPlugin * _tool ) :
 {
 	auto hlayout = new QHBoxLayout(this);
 	hlayout->setSpacing( 0 );
-	hlayout->setMargin( 0 );
+	hlayout->setContentsMargins(0, 0, 0, 0);
 
 	m_tabBar = new TabBar( this, QBoxLayout::TopToBottom );
 	m_tabBar->setExclusive( true );
@@ -166,7 +166,7 @@ QWidget * LadspaBrowserView::createTab( QWidget * _parent, const QString & _txt,
 	tab->setFixedSize( 500, 400 );
 	auto layout = new QVBoxLayout(tab);
 	layout->setSpacing( 0 );
-	layout->setMargin( 0 );
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	const QString type = "<b>" + tr( "Type:" ) + "</b> ";
 	auto title = new QLabel(type + _txt, tab);
