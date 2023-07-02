@@ -35,7 +35,9 @@
 #include "Lv2Manager.h"
 #include "Lv2Evbuf.h"
 
-namespace Lv2Ports {
+
+namespace lmms::Lv2Ports
+{
 
 
 
@@ -350,16 +352,7 @@ void AtomSeq::Lv2EvbufDeleter::operator()(LV2_Evbuf *n) { lv2_evbuf_free(n); }
 
 
 
-// make the compiler happy, give each class with virtuals
-// a function (the destructor here) which is in a cpp file
-PortBase::~PortBase() {}
-ConstVisitor::~ConstVisitor() {}
-Visitor::~Visitor() {}
-
-
-
-
-} // namespace Lv2Ports
+} // namespace lmms::Lv2Ports
 
 #endif // LMMS_HAVE_LV2
 

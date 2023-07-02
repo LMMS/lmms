@@ -22,21 +22,25 @@
  *
  */
 
-
-#ifndef KNOB_H
-#define KNOB_H
+#ifndef LMMS_GUI_KNOB_H
+#define LMMS_GUI_KNOB_H
 
 #include <memory>
 #include <QPixmap>
 #include <QWidget>
-#include <QtCore/QPoint>
+#include <QPoint>
 #include <QTextDocument>
 
 #include "AutomatableModelView.h"
 
 
 class QPixmap;
-class TextFloat;
+
+namespace lmms::gui
+{
+
+
+class SimpleTextFloat;
 
 enum knobTypes
 {
@@ -79,8 +83,8 @@ class LMMS_EXPORT Knob : public QWidget, public FloatModelView
 	void onKnobNumUpdated(); //!< to be called when you updated @a m_knobNum
 
 public:
-	Knob( knobTypes _knob_num, QWidget * _parent = NULL, const QString & _name = QString() );
-	Knob( QWidget * _parent = NULL, const QString & _name = QString() ); //!< default ctor
+	Knob( knobTypes _knob_num, QWidget * _parent = nullptr, const QString & _name = QString() );
+	Knob( QWidget * _parent = nullptr, const QString & _name = QString() ); //!< default ctor
 	Knob( const Knob& other ) = delete;
 
 	// TODO: remove
@@ -170,7 +174,7 @@ private:
 	}
 
 
-	static TextFloat * s_textFloat;
+	static SimpleTextFloat * s_textFloat;
 
 	QString m_label;
 	bool m_isHtmlLabel;
@@ -206,4 +210,7 @@ private:
 
 } ;
 
-#endif
+
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_KNOB_H

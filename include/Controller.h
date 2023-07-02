@@ -23,9 +23,8 @@
  *
  */
 
-
-#ifndef CONTROLLER_H
-#define CONTROLLER_H
+#ifndef LMMS_CONTROLLER_H
+#define LMMS_CONTROLLER_H
 
 #include "lmms_export.h"
 #include "Engine.h"
@@ -33,12 +32,20 @@
 #include "JournallingObject.h"
 #include "ValueBuffer.h"
 
-class ControllerDialog;
+namespace lmms
+{
+
 class Controller;
 class ControllerConnection;
 
-typedef QVector<Controller *> ControllerVector;
+namespace gui
+{
 
+class ControllerDialog;
+
+} // namespace gui
+
+using ControllerVector = QVector<Controller*>;
 
 class LMMS_EXPORT Controller : public Model, public JournallingObject
 {
@@ -60,7 +67,7 @@ public:
 	Controller( ControllerTypes _type, Model * _parent,
 						const QString & _display_name );
 
-	virtual ~Controller();
+	~Controller() override;
 
 	virtual float currentValue( int _offset );
 	// The per-controller get-value-in-buffers function
@@ -132,7 +139,7 @@ public:
 	bool hasModel( const Model * m ) const;
 
 public slots:
-	virtual ControllerDialog * createDialog( QWidget * _parent );
+	virtual gui::ControllerDialog * createDialog( QWidget * _parent );
 
 	virtual void setName( const QString & _new_name )
 	{
@@ -166,12 +173,14 @@ protected:
 
 
 signals:
-	// The value changed while the mixer isn't running (i.e: MIDI CC)
+	// The value changed while the audio engine isn't running (i.e: MIDI CC)
 	void valueChanged();
 
-	friend class ControllerDialog;
+	friend class gui::ControllerDialog;
 
 } ;
 
-#endif
 
+} // namespace lmms
+
+#endif // LMMS_CONTROLLER_H

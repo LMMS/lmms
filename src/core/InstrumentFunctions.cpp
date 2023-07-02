@@ -25,15 +25,19 @@
 #include <QDomElement>
 
 #include "InstrumentFunctions.h"
+#include "AudioEngine.h"
 #include "embed.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
-#include "Mixer.h"
 #include "PresetPreviewPlayHandle.h"
 
-
-InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking::ChordTable::s_initTable[] =
+namespace lmms
 {
+
+std::array<InstrumentFunctionNoteStacking::ChordTable::Init, InstrumentFunctionNoteStacking::NUM_CHORD_TABLES>
+	InstrumentFunctionNoteStacking::ChordTable::s_initTable =
+	std::array<InstrumentFunctionNoteStacking::ChordTable::Init, NUM_CHORD_TABLES>
+{{
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "octave" ), { 0, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Major" ), { 0, 4, 7, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Majb5" ), { 0, 4, 6, -1 } },
@@ -136,7 +140,7 @@ InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking:
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "5" ), { 0, 7, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Phrygian dominant" ), { 0, 1, 4, 5, 7, 8, 10, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Persian" ), { 0, 1, 4, 5, 6, 8, 11, -1 } }
-} ;
+}};
 
 
 
@@ -176,11 +180,9 @@ bool InstrumentFunctionNoteStacking::Chord::hasSemiTone( int8_t semi_tone ) cons
 InstrumentFunctionNoteStacking::ChordTable::ChordTable() :
 	QVector<Chord>()
 {
-	for( int i = 0;
-		i < static_cast<int>( sizeof s_initTable / sizeof *s_initTable );
-		i++ )
+	for (const auto& chord : s_initTable)
 	{
-		push_back( Chord( s_initTable[i].m_name, s_initTable[i].m_semiTones ) );
+		push_back(Chord(chord.m_name, chord.m_semiTones));
 	}
 }
 
@@ -217,10 +219,6 @@ InstrumentFunctionNoteStacking::InstrumentFunctionNoteStacking( Model * _parent 
 
 
 
-
-InstrumentFunctionNoteStacking::~InstrumentFunctionNoteStacking()
-{
-}
 
 
 
@@ -261,7 +259,7 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 
 				// create sub-note-play-handle, only note is
 				// different
-				Engine::mixer()->addPlayHandle(
+				Engine::audioEngine()->addPlayHandle(
 						NotePlayHandleManager::acquire( _n->instrumentTrack(), _n->offset(), _n->frames(), note_copy,
 									_n, -1, NotePlayHandle::OriginNoteStacking )
 						);
@@ -331,11 +329,6 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 
 
 
-InstrumentFunctionArpeggio::~InstrumentFunctionArpeggio()
-{
-}
-
-
 
 
 void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
@@ -374,8 +367,8 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 	const int total_range = range * cnphv.size();
 
 	// number of frames that every note should be played
-	const f_cnt_t arp_frames = (f_cnt_t)( m_arpTimeModel.value() / 1000.0f * Engine::mixer()->processingSampleRate() );
-	const f_cnt_t gated_frames = (f_cnt_t)( m_arpGateModel.value() * arp_frames / 100.0f );
+	const auto arp_frames = (f_cnt_t)(m_arpTimeModel.value() / 1000.0f * Engine::audioEngine()->processingSampleRate());
+	const auto gated_frames = (f_cnt_t)(m_arpGateModel.value() * arp_frames / 100.0f);
 
 	// used for calculating remaining frames for arp-note, we have to add
 	// arp_frames-1, otherwise the first arp-note will not be setup
@@ -386,12 +379,12 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 	// used for loop
 	f_cnt_t frames_processed = ( m_arpModeModel.value() != FreeMode ) ? cnphv.first()->noteOffset() : _n->noteOffset();
 
-	while( frames_processed < Engine::mixer()->framesPerPeriod() )
+	while( frames_processed < Engine::audioEngine()->framesPerPeriod() )
 	{
 		const f_cnt_t remaining_frames_for_cur_arp = arp_frames - ( cur_frame % arp_frames );
 		// does current arp-note fill whole audio-buffer or is the remaining time just
 		// a short bit that we can discard?
-		if( remaining_frames_for_cur_arp > Engine::mixer()->framesPerPeriod() ||
+		if( remaining_frames_for_cur_arp > Engine::audioEngine()->framesPerPeriod() ||
 			_n->frames() - _n->totalFramesPlayed() < arp_frames / 5 )
 		{
 			// then we don't have to do something!
@@ -497,7 +490,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		// range-checking
 		if( sub_note_key >= NumKeys ||
 			sub_note_key < 0 ||
-			Engine::mixer()->criticalXRuns() )
+			Engine::audioEngine()->criticalXRuns() )
 		{
 			continue;
 		}
@@ -506,7 +499,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 
 		// create sub-note-play-handle, only ptr to note is different
 		// and is_arp_note=true
-		Engine::mixer()->addPlayHandle(
+		Engine::audioEngine()->addPlayHandle(
 				NotePlayHandleManager::acquire( _n->instrumentTrack(),
 							frames_processed,
 							gated_frames,
@@ -556,3 +549,6 @@ void InstrumentFunctionArpeggio::loadSettings( const QDomElement & _this )
 	m_arpDirectionModel.loadSettings( _this, "arpdir" );
 	m_arpModeModel.loadSettings( _this, "arpmode" );
 }
+
+
+} // namespace lmms

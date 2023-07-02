@@ -29,20 +29,24 @@
 #include "lmms_math.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT compressor_plugin_descriptor =
 {
-	STRINGIFY(PLUGIN_NAME),
+	LMMS_STRINGIFY(PLUGIN_NAME),
 	"Compressor",
 	QT_TRANSLATE_NOOP("PluginBrowser", "A dynamic range compressor."),
 	"Lost Robot <r94231@gmail.com>",
 	0x0100,
 	Plugin::Effect,
 	new PluginPixmapLoader("logo"),
-	NULL,
-	NULL
+	nullptr,
+	nullptr,
 } ;
 
 }
@@ -52,7 +56,7 @@ CompressorEffect::CompressorEffect(Model* parent, const Descriptor::SubPluginFea
 	Effect(&compressor_plugin_descriptor, parent, key),
 	m_compressorControls(this)
 {
-	m_sampleRate = Engine::mixer()->processingSampleRate();
+	m_sampleRate = Engine::audioEngine()->processingSampleRate();
 
 	m_yL[0] = m_yL[1] = COMP_NOISE_FLOOR;
 
@@ -86,16 +90,11 @@ CompressorEffect::CompressorEffect(Model* parent, const Descriptor::SubPluginFea
 	connect(&m_compressorControls.m_kneeModel, SIGNAL(dataChanged()), this, SLOT(calcAutoMakeup()), Qt::DirectConnection);
 	connect(&m_compressorControls.m_autoMakeupModel, SIGNAL(dataChanged()), this, SLOT(calcAutoMakeup()), Qt::DirectConnection);
 
-	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(changeSampleRate()));
+	connect(Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(changeSampleRate()));
 	changeSampleRate();
 }
 
 
-
-
-CompressorEffect::~CompressorEffect()
-{
-}
 
 
 float CompressorEffect::msToCoeff(float ms)
@@ -277,7 +276,7 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	float rOutPeak = 0.0;
 	float lInPeak = 0.0;
 	float rInPeak = 0.0;
-	
+
 	const bool midside = m_compressorControls.m_midsideModel.value();
 	const bool peakmode = m_compressorControls.m_peakmodeModel.value();
 	const float inBalance = m_compressorControls.m_inBalanceModel.value();
@@ -293,8 +292,8 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 	for(fpp_t f = 0; f < frames; ++f)
 	{
-		sample_t drySignal[2] = {buf[f][0], buf[f][1]};
-		sample_t s[2] = {drySignal[0] * m_inGainVal, drySignal[1] * m_inGainVal};
+		auto drySignal = std::array{buf[f][0], buf[f][1]};
+		auto s = std::array{drySignal[0] * m_inGainVal, drySignal[1] * m_inGainVal};
 
 		// Calculate tilt filters, to bias the sidechain to the low or high frequencies
 		if (m_tiltVal)
@@ -328,7 +327,7 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			m_rmsVal[i] = m_rmsTimeConst * m_rmsVal[i] + ((1 - m_rmsTimeConst) * (inputValue * inputValue));
 
 			// Grab the peak or RMS value
-			inputValue = qMax(COMP_NOISE_FLOOR, peakmode ? abs(inputValue) : sqrt(m_rmsVal[i]));
+			inputValue = qMax(COMP_NOISE_FLOOR, peakmode ? std::abs(inputValue) : std::sqrt(m_rmsVal[i]));
 
 			// The following code uses math magic to semi-efficiently
 			// find the largest value in the lookahead buffer.
@@ -513,7 +512,7 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 				m_inputBufLoc = 0;
 			}
 
-			const float temp[2] = {drySignal[0], drySignal[1]};
+			const auto temp = std::array{drySignal[0], drySignal[1]};
 			s[0] = m_inputBuf[0][m_inputBufLoc];
 			s[1] = m_inputBuf[1][m_inputBufLoc];
 
@@ -526,8 +525,8 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			s[1] = drySignal[1];
 		}
 
-		float delayedDrySignal[2] = {s[0], s[1]};
-		
+		auto delayedDrySignal = std::array{s[0], s[1]};
+
 		if (midside)// Convert left/right to mid/side
 		{
 			const float temp = s[0];
@@ -614,7 +613,7 @@ inline void CompressorEffect::calcTiltFilter(sample_t inputSample, sample_t &out
 
 void CompressorEffect::changeSampleRate()
 {
-	m_sampleRate = Engine::mixer()->processingSampleRate();
+	m_sampleRate = Engine::audioEngine()->processingSampleRate();
 
 	m_coeffPrecalc = COMP_LOG / (m_sampleRate * 0.001f);
 
@@ -662,3 +661,5 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main(Model* parent, void* data)
 
 }
 
+
+} // namespace lmms

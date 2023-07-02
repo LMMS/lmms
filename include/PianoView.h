@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef PIANO_VIEW_H
-#define PIANO_VIEW_H
+#ifndef LMMS_GUI_PIANO_VIEW_H
+#define LMMS_GUI_PIANO_VIEW_H
 
 #include <QPixmap>
 #include <QScrollBar>
@@ -31,15 +31,20 @@
 #include "AutomatableModel.h"
 #include "ModelView.h"
 
+namespace lmms
+{
+
 class Piano;
 
+namespace gui
+{
 
 class PianoView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
 	PianoView( QWidget * _parent );
-	virtual ~PianoView() = default;
+	~PianoView() override = default;
 
 	static int getKeyFromKeyEvent( QKeyEvent * _ke );
 
@@ -94,4 +99,8 @@ signals:
 } ;
 
 
-#endif
+} // namespace gui
+
+} // namespace lmms
+
+#endif // LMMS_GUI_PIANO_VIEW_H

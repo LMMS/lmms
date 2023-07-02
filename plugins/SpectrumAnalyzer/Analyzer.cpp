@@ -36,6 +36,9 @@
 #include "lmms_basics.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
 
 extern "C" {
 	Plugin::Descriptor PLUGIN_EXPORT analyzer_plugin_descriptor =
@@ -47,8 +50,8 @@ extern "C" {
 		0x0112,
 		Plugin::Effect,
 		new PluginPixmapLoader("logo"),
-		NULL,
-		NULL
+		nullptr,
+		nullptr,
 	};
 }
 
@@ -116,3 +119,5 @@ extern "C" {
 	}
 }
 
+
+} // namespace lmms

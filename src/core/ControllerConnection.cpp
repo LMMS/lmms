@@ -31,24 +31,27 @@
 #include "Song.h"
 #include "ControllerConnection.h"
 
+namespace lmms
+{
+
 
 ControllerConnectionVector ControllerConnection::s_connections;
 
 
 
 ControllerConnection::ControllerConnection(Controller * _controller) :
-	m_controller( NULL ),
+	m_controller( nullptr ),
 	m_controllerId( -1 ),
 	m_ownsController(false)
 {
-	if( _controller != NULL )
+	if( _controller != nullptr )
 	{
 		setController( _controller );
 	}
 	else
 	{
 		m_controller = Controller::create( Controller::DummyController,
-									NULL );
+									nullptr );
 	}
 	s_connections.append( this );
 }
@@ -57,7 +60,7 @@ ControllerConnection::ControllerConnection(Controller * _controller) :
 
 
 ControllerConnection::ControllerConnection( int _controllerId ) :
-	m_controller( Controller::create( Controller::DummyController, NULL ) ),
+	m_controller( Controller::create( Controller::DummyController, nullptr ) ),
 	m_controllerId( _controllerId ),
 	m_ownsController( false )
 {
@@ -95,7 +98,7 @@ void ControllerConnection::setController( Controller * _controller )
 	if( m_ownsController && m_controller )
 	{
 		delete m_controller;
-		m_controller = NULL;
+		m_controller = nullptr;
 	}
 
 	if( m_controller && m_controller->type() != Controller::DummyController )
@@ -105,7 +108,7 @@ void ControllerConnection::setController( Controller * _controller )
 
 	if( !_controller )
 	{
-		m_controller = Controller::create( Controller::DummyController, NULL );
+		m_controller = Controller::create( Controller::DummyController, nullptr );
 	}
 	else
 	{
@@ -116,8 +119,8 @@ void ControllerConnection::setController( Controller * _controller )
 	if( _controller->type() != Controller::DummyController )
 	{
 		_controller->addConnection( this );
-		QObject::connect( _controller, SIGNAL( valueChanged() ),
-				this, SIGNAL( valueChanged() ), Qt::DirectConnection );
+		QObject::connect( _controller, SIGNAL(valueChanged()),
+				this, SIGNAL(valueChanged()), Qt::DirectConnection );
 	}
 
 	m_ownsController =
@@ -126,8 +129,8 @@ void ControllerConnection::setController( Controller * _controller )
 	// If we don't own the controller, allow deletion of controller
 	// to delete the connection
 	if( !m_ownsController ) {
-		QObject::connect( _controller, SIGNAL( destroyed() ),
-				this, SLOT( deleteConnection() ) );
+		QObject::connect( _controller, SIGNAL(destroyed()),
+				this, SLOT(deleteConnection()));
 	}
 }
 
@@ -220,7 +223,7 @@ void ControllerConnection::loadSettings( const QDomElement & _this )
 		}
 		else
 		{
-			m_controller = Controller::create( Controller::DummyController, NULL );
+			m_controller = Controller::create( Controller::DummyController, nullptr );
 		}
 	}
 }
@@ -233,4 +236,4 @@ void ControllerConnection::deleteConnection()
 
 
 
-
+} // namespace lmms

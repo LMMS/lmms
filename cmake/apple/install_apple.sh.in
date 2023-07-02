@@ -6,9 +6,6 @@
 
 set -e
 
-# STK rawwaves directory
-STK_RAWWAVE=$(brew --prefix stk)/share/stk/rawwaves
-
 # Place to create ".app" bundle
 APP="@CMAKE_BINARY_DIR@/@PROJECT_NAME_UCASE@.app"
 
@@ -29,11 +26,9 @@ command cp  "@CMAKE_BINARY_DIR@/Info.plist" "@CMAKE_INSTALL_PREFIX@/"
 mkdir -p "$APP/Contents/MacOS"
 mkdir -p "$APP/Contents/Frameworks"
 mkdir -p "$APP/Contents/Resources"
-mkdir -p "$APP/Contents/share/stk/rawwaves"
 cd "@CMAKE_INSTALL_PREFIX@"
 cp -R ./* "$APP/Contents"
 cp "@CMAKE_SOURCE_DIR@/cmake/apple/"*.icns "$APP/Contents/Resources/"
-cp "$STK_RAWWAVE"/*.raw "$APP/Contents/share/stk/rawwaves" > /dev/null 2>&1
 
 # Make all libraries writable for macdeployqt
 cd "$APP"
@@ -60,7 +55,7 @@ install_name_tool -change @rpath/libZynAddSubFxCore.dylib \
   "$APP/Contents/$zynlib"
   
 # Replace @rpath with @loader_path for Carla
-# See also plugins/carlabase/CMakeLists.txt
+# See also plugins/CarlaBase/CMakeLists.txt
 # This MUST be done BEFORE calling macdeployqt
 install_name_tool -change @rpath/libcarlabase.dylib \
    @loader_path/libcarlabase.dylib \

@@ -1,7 +1,7 @@
 /*
  * Lv2Manager.h - Implementation of Lv2Manager class
  *
- * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LV2MANAGER_H
-#define LV2MANAGER_H
+#ifndef LMMS_LV2_MANAGER_H
+#define LMMS_LV2_MANAGER_H
 
 #include "lmmsconfig.h"
 
@@ -38,6 +38,9 @@
 #include "Lv2UridMap.h"
 #include "Plugin.h"
 
+
+namespace lmms
+{
 
 /*
 	all Lv2 classes in relation (use our "4 spaces per tab rule" to view):
@@ -158,6 +161,9 @@ private:
 	bool isSubclassOf(const LilvPluginClass *clvss, const char *uriStr);
 };
 
+
+} // namespace lmms
+
 #endif // LMMS_HAVE_LV2
 
-#endif // LV2MANAGER_H
+#endif // LMMS_LV2_MANAGER_H

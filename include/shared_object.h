@@ -23,10 +23,13 @@
  *
  */
 
-#ifndef SHARED_OBJECT_H
-#define SHARED_OBJECT_H
+#ifndef LMMS_SHARED_OBJECT_H
+#define LMMS_SHARED_OBJECT_H
 
 #include <atomic>
+
+namespace lmms
+{
 
 class sharedObject
 {
@@ -36,9 +39,7 @@ public:
 	{
 	}
 
-	virtual ~sharedObject()
-	{
-	}
+	virtual ~sharedObject() = default;
 
 	template<class T>
 	static T* ref( T* object )
@@ -82,4 +83,7 @@ private:
 	std::atomic_int m_referenceCount;
 } ;
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_SHARED_OBJECT_H

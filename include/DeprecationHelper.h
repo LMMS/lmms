@@ -24,11 +24,14 @@
  *
  */
 
-#ifndef DEPRECATIONHELPER_H
-#define DEPRECATIONHELPER_H
+#ifndef LMMS_DEPRECATIONHELPER_H
+#define LMMS_DEPRECATIONHELPER_H
 
 #include <QFontMetrics>
 #include <QWheelEvent>
+
+namespace lmms
+{
 
 /**
  * @brief horizontalAdvance is a backwards-compatible adapter for
@@ -60,4 +63,7 @@ inline QPoint position(QWheelEvent *wheelEvent)
 	return wheelEvent->pos();
 #endif
 }
-#endif // DEPRECATIONHELPER_H
+
+} // namespace lmms
+
+#endif // LMMS_DEPRECATIONHELPER_H

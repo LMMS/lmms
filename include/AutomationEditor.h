@@ -23,10 +23,9 @@
  *
  */
 
-#ifndef AUTOMATION_EDITOR_H
-#define AUTOMATION_EDITOR_H
+#ifndef LMMS_GUI_AUTOMATION_EDITOR_H
+#define LMMS_GUI_AUTOMATION_EDITOR_H
 
-#include <QVector>
 #include <QWidget>
 
 #include "Editor.h"
@@ -34,16 +33,23 @@
 #include "lmms_basics.h"
 #include "JournallingObject.h"
 #include "TimePos.h"
-#include "AutomationPattern.h"
+#include "AutomationClip.h"
 #include "ComboBoxModel.h"
-#include "Knob.h"
 
 class QPainter;
 class QPixmap;
 class QScrollBar;
 
-class ComboBox;
+namespace lmms
+{
+
 class NotePlayHandle;
+
+namespace gui
+{
+
+class Knob;
+class ComboBox;
 class TimeLineWidget;
 
 
@@ -61,16 +67,16 @@ class AutomationEditor : public QWidget, public JournallingObject
 	Q_PROPERTY(QColor crossColor MEMBER m_crossColor)
 	Q_PROPERTY(QColor backgroundShade MEMBER m_backgroundShade)
 public:
-	void setCurrentPattern(AutomationPattern * new_pattern);
+	void setCurrentClip(AutomationClip * new_clip);
 
-	inline const AutomationPattern * currentPattern() const
+	inline const AutomationClip * currentClip() const
 	{
-		return m_pattern;
+		return m_clip;
 	}
 
-	inline bool validPattern() const
+	inline bool validClip() const
 	{
-		return m_pattern != nullptr;
+		return m_clip != nullptr;
 	}
 
 	void saveSettings(QDomDocument & doc, QDomElement & parent) override;
@@ -89,11 +95,11 @@ public:
 
 public slots:
 	void update();
-	void updateAfterPatternChange();
+	void updateAfterClipChange();
 
 
 protected:
-	typedef AutomationPattern::timeMap timeMap;
+	using timeMap = AutomationClip::timeMap;
 
 	void keyPressEvent(QKeyEvent * ke) override;
 	void leaveEvent(QEvent * e) override;
@@ -125,16 +131,16 @@ protected slots:
 	void setEditMode(AutomationEditor::EditModes mode);
 	void setEditMode(int mode);
 
-	void setProgressionType(AutomationPattern::ProgressionTypes type);
+	void setProgressionType(AutomationClip::ProgressionTypes type);
 	void setProgressionType(int type);
 	void setTension();
 
-	void updatePosition( const TimePos & t );
+	void updatePosition( const lmms::TimePos & t );
 
 	void zoomingXChanged();
 	void zoomingYChanged();
 
-	/// Updates the pattern's quantization using the current user selected value.
+	/// Updates the clip's quantization using the current user selected value.
 	void setQuantization();
 
 private:
@@ -161,7 +167,7 @@ private:
 
 	AutomationEditor();
 	AutomationEditor( const AutomationEditor & );
-	virtual ~AutomationEditor();
+	~AutomationEditor() override;
 
 	static QPixmap * s_toolDraw;
 	static QPixmap * s_toolErase;
@@ -178,7 +184,7 @@ private:
 
 	FloatModel * m_tensionModel;
 
-	AutomationPattern * m_pattern;
+	AutomationClip * m_clip;
 	float m_minLevel;
 	float m_maxLevel;
 	float m_step;
@@ -218,7 +224,7 @@ private:
 
 	void drawCross(QPainter & p );
 	void drawAutomationPoint( QPainter & p, timeMap::iterator it );
-	bool inBBEditor();
+	bool inPatternEditor();
 
 	QColor m_barLineColor;
 	QColor m_beatLineColor;
@@ -234,8 +240,8 @@ private:
 
 
 signals:
-	void currentPatternChanged();
-	void positionChanged( const TimePos & );
+	void currentClipChanged();
+	void positionChanged( const lmms::TimePos & );
 } ;
 
 
@@ -249,25 +255,25 @@ class AutomationEditorWindow : public Editor
 	static const int INITIAL_HEIGHT = 480;
 public:
 	AutomationEditorWindow();
-	~AutomationEditorWindow();
+	~AutomationEditorWindow() override = default;
 
-	void setCurrentPattern(AutomationPattern* pattern);
-	const AutomationPattern* currentPattern();
+	void setCurrentClip(AutomationClip* clip);
+	const AutomationClip* currentClip();
 
 	void dropEvent( QDropEvent * _de ) override;
 	void dragEnterEvent( QDragEnterEvent * _dee ) override;
 
-	void open(AutomationPattern* pattern);
+	void open(AutomationClip* clip);
 
 	AutomationEditor* m_editor;
 
 	QSize sizeHint() const override;
 
 public slots:
-	void clearCurrentPattern();
+	void clearCurrentClip();
 
 signals:
-	void currentPatternChanged();
+	void currentClipChanged();
 
 protected:
 	void focusInEvent(QFocusEvent * event) override;
@@ -294,5 +300,8 @@ private:
 	ComboBox * m_quantizeComboBox;
 };
 
+} // namespace gui
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_GUI_AUTOMATION_EDITOR_H

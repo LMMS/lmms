@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef ENVELOPE_AND_LFO_VIEW_H
-#define ENVELOPE_AND_LFO_VIEW_H
+#ifndef LMMS_GUI_ENVELOPE_AND_LFO_VIEW_H
+#define LMMS_GUI_ENVELOPE_AND_LFO_VIEW_H
 
 #include <QWidget>
 
@@ -33,7 +33,13 @@
 class QPaintEvent;
 class QPixmap;
 
+namespace lmms
+{
+
 class EnvelopeAndLfoParameters;
+
+namespace gui
+{
 
 class automatableButtonGroup;
 class Knob;
@@ -48,7 +54,7 @@ class EnvelopeAndLfoView : public QWidget, public ModelView
 	Q_OBJECT
 public:
 	EnvelopeAndLfoView( QWidget * _parent );
-	virtual ~EnvelopeAndLfoView();
+	~EnvelopeAndLfoView() override;
 
 
 protected:
@@ -94,4 +100,8 @@ private:
 	float m_randomGraph;
 } ;
 
-#endif
+} // namespace gui
+
+} // namespace lmms
+
+#endif // LMMS_GUI_ENVELOPE_AND_LFO_VIEW_H

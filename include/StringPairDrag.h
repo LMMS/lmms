@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef STRING_PAIR_DRAG_H
-#define STRING_PAIR_DRAG_H
+#ifndef LMMS_GUI_STRING_PAIR_DRAG_H
+#define LMMS_GUI_STRING_PAIR_DRAG_H
 
 #include <QDrag>
 #include <QDragEnterEvent>
@@ -35,13 +35,16 @@
 
 class QPixmap;
 
+namespace lmms::gui
+{
+
 
 class LMMS_EXPORT StringPairDrag : public QDrag
 {
 public:
 	StringPairDrag( const QString & _key, const QString & _value,
 					const QPixmap & _icon, QWidget * _w );
-	~StringPairDrag();
+	~StringPairDrag() override;
 
 	static bool processDragEnterEvent( QDragEnterEvent * _dee,
 						const QString & _allowed_keys );
@@ -50,4 +53,6 @@ public:
 } ;
 
 
-#endif
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_STRING_PAIR_DRAG_H

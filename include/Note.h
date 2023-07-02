@@ -23,15 +23,21 @@
  *
  */
 
-#ifndef NOTE_H
-#define NOTE_H
+#ifndef LMMS_NOTE_H
+#define LMMS_NOTE_H
 
-#include <QtCore/QVector>
+#include <optional>
+#include <QVector>
 
 #include "volume.h"
 #include "panning.h"
 #include "SerializingObject.h"
 #include "TimePos.h"
+
+
+namespace lmms
+{
+
 
 class DetuningHelper;
 
@@ -91,9 +97,9 @@ public:
 		int key = DefaultKey,
 		volume_t volume = DefaultVolume,
 		panning_t panning = DefaultPanning,
-		DetuningHelper * detuning = NULL );
+		DetuningHelper * detuning = nullptr );
 	Note( const Note & note );
-	virtual ~Note();
+	~Note() override;
 
 	// used by GUI
 	inline void setSelected( const bool selected ) { m_selected = selected; }
@@ -243,8 +249,20 @@ private:
 	DetuningHelper * m_detuning;
 };
 
+using NoteVector = QVector<Note*>;
 
-typedef QVector<Note *> NoteVector;
+struct NoteBounds
+{
+	TimePos start;
+	TimePos end;
+	int lowest;
+	int highest;
+};
 
 
-#endif
+std::optional<NoteBounds> boundsForNotes(const NoteVector& notes);
+
+
+} // namespace lmms
+
+#endif // LMMS_NOTE_H

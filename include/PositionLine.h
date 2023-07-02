@@ -23,10 +23,13 @@
  *
  */
 
-#ifndef POSITION_LINE_H
-#define POSITION_LINE_H
+#ifndef LMMS_GUI_POSITION_LINE_H
+#define LMMS_GUI_POSITION_LINE_H
 
 #include <QWidget>
+
+namespace lmms::gui
+{
 
 class PositionLine : public QWidget
 {
@@ -46,4 +49,6 @@ private:
 	QColor m_lineColor;
 };
 
-#endif
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_POSITION_LINE_H

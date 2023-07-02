@@ -22,11 +22,14 @@
  *
  */
 
-#ifndef PLUGINISSUE_H
-#define PLUGINISSUE_H
+#ifndef LMMS_PLUGIN_ISSUE_H
+#define LMMS_PLUGIN_ISSUE_H
 
 #include <QDebug>
 #include <string>
+
+namespace lmms
+{
 
 //! Types of issues that can cause LMMS to not load a plugin
 //! LMMS Plugins should use this to indicate errors
@@ -79,4 +82,6 @@ public:
 
 QDebug operator<<(QDebug stream, const PluginIssue& iss);
 
-#endif // PLUGINISSUE_H
+} // namespace lmms
+
+#endif // LMMS_PLUGIN_ISSUE_H

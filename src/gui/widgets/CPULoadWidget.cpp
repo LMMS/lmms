@@ -26,10 +26,14 @@
 
 #include <QPainter>
 
+#include "AudioEngine.h"
 #include "CPULoadWidget.h"
 #include "embed.h"
 #include "Engine.h"
-#include "Mixer.h"
+
+
+namespace lmms::gui
+{
 
 
 CPULoadWidget::CPULoadWidget( QWidget * _parent ) :
@@ -47,17 +51,13 @@ CPULoadWidget::CPULoadWidget( QWidget * _parent ) :
 	m_temp = QPixmap( width(), height() );
 	
 
-	connect( &m_updateTimer, SIGNAL( timeout() ),
-					this, SLOT( updateCpuLoad() ) );
+	connect( &m_updateTimer, SIGNAL(timeout()),
+					this, SLOT(updateCpuLoad()));
 	m_updateTimer.start( 100 );	// update cpu-load at 10 fps
 }
 
 
 
-
-CPULoadWidget::~CPULoadWidget()
-{
-}
 
 
 
@@ -92,7 +92,7 @@ void CPULoadWidget::paintEvent( QPaintEvent *  )
 void CPULoadWidget::updateCpuLoad()
 {
 	// smooth load-values a bit
-	int new_load = ( m_currentLoad + Engine::mixer()->cpuLoad() ) / 2;
+	int new_load = ( m_currentLoad + Engine::audioEngine()->cpuLoad() ) / 2;
 	if( new_load != m_currentLoad )
 	{
 		m_currentLoad = new_load;
@@ -102,7 +102,4 @@ void CPULoadWidget::updateCpuLoad()
 }
 
 
-
-
-
-
+} // namespace lmms::gui
