@@ -3355,11 +3355,11 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		for(x = 0; x < m_markedSemiTones.size(); ++x)
 		{
 			const int key_num = m_markedSemiTones.at(x);
-			const int y = keyAreaBottom() + 5 - m_keyLineHeight *
+			const int y = keyAreaBottom() - 1 - m_keyLineHeight *
 				(key_num - m_startKey + 1);
 			if(y > keyAreaBottom()) { break; }
 			p.fillRect(m_whiteKeyWidth + 1,
-				y - m_keyLineHeight / 2,
+				y,
 				width() - 10,
 				m_keyLineHeight + 1,
 				m_markedSemitoneColor);
