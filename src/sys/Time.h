@@ -30,4 +30,6 @@
 
 #include "sys/Times.h"
 
+namespace lmms{}
+
 #endif

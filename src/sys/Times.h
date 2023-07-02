@@ -31,17 +31,15 @@
 #include <sys/types.h>
 #include <winsock2.h>
 
+#define __need_clock_t
+#include <Time.h>
+
 namespace lmms 
 {
 
 int gettimeofday(struct timeval* t, void* timezone);
 
-// from linux's sys/times.h
 
-//#include <features.h>
-
-#define __need_clock_t
-#include <Time.h>
 
 
 /* Structure describing CPU time used by a process and its children.  */
@@ -64,5 +62,5 @@ typedef long long suseconds_t;
 
 } // namespace lmms
 
-#endif
-#endif
+#endif // _WIN_32
+#endif // _TIMES_H_FILE

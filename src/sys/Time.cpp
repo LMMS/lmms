@@ -33,6 +33,8 @@
 #ifndef TIME
 #define TIME
 
+namespace lmms {}
+
 //int gettimeofday(struct timeval* t, void* timezone)
 //{
 //	struct _timeb timebuffer;
