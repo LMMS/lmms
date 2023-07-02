@@ -848,15 +848,18 @@ void Mixer::validateChannelName( int index, int oldIndex )
 bool Mixer::isChannelInUse(int index)
 {
 	// check if the index mixer channel receives audio from any other channel
-	if (!m_mixerChannels[index]->m_receives.isEmpty())
+	if (!m_mixerChannels[index]->m_receives.empty())
 	{
 		return true;
 	}
 
 	// check if the destination mixer channel on any instrument or sample track is the index mixer channel
 	TrackContainer::TrackList tracks;
-	tracks += Engine::getSong()->tracks();
-	tracks += Engine::patternStore()->tracks();
+
+	auto& songTracks = Engine::getSong()->tracks();
+	auto& patternStoreTracks = Engine::patternStore()->tracks();
+	tracks.insert(tracks.end(), songTracks.begin(), songTracks.end());
+	tracks.insert(patternStoreTracks.end(), patternStoreTracks.begin(), patternStoreTracks.end());
 
 	for (const auto t : tracks)
 	{

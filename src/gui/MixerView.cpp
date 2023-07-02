@@ -478,10 +478,12 @@ void MixerView::deleteUnusedChannels()
 {
 	Mixer* mix = Engine::mixer();
 
+	const auto mixer = Engine::mixer();
+
 	// Check all channels except master, delete those with no incoming sends
 	for (int i = m_mixerChannelViews.size() - 1; i > 0; --i)
 	{
-		if (!mix->isChannelInUse(i))
+		if (!mixer->isChannelInUse(i) && mixer->mixerChannel(i)->m_receives.empty())
 		{
 			deleteChannel(i);
 		}
