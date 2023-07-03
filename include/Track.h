@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef TRACK_H
-#define TRACK_H
+#ifndef LMMS_TRACK_H
+#define LMMS_TRACK_H
 
 #include <vector>
 
