@@ -59,7 +59,7 @@ static DescriptorStub * descriptors [N];
 extern "C" {
 
 #ifdef __GNUC__
-	__attribute__(constructor)
+	__attribute__((constructor))
 #endif
 void caps_so_init()
 {
@@ -117,7 +117,7 @@ void caps_so_init()
 }
 
 #ifdef __GNUC__
-	__attribute__(destructor)
+	__attribute__((destructor))
 #endif
 void caps_so_fini()
 {
