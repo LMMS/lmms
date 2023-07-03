@@ -924,6 +924,8 @@ void PianoRoll::setCurrentMidiClip( MidiClip* newMidiClip )
 	connect(m_midiClip->instrumentTrack()->microtuner()->keyRangeImportModel(), SIGNAL(dataChanged()),
 		this, SLOT(update()));
 
+	connect(m_midiClip, &MidiClip::lengthChanged, this, &PianoRoll::updateScrollbarRange);
+
 	update();
 	emit currentMidiClipChanged();
 }
@@ -3661,16 +3663,6 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	p.setBrush( Qt::NoBrush );
 	p.drawRect(x + m_whiteKeyWidth, y, w, h);
 
-	// TODO: Get this out of paint event
-	int l = ( hasValidMidiClip() )? (int) m_midiClip->length() : 0;
-
-	// reset scroll-range
-	if( m_leftRightScroll->maximum() != l )
-	{
-		m_leftRightScroll->setRange( 0, l );
-		m_leftRightScroll->setPageStep( l );
-	}
-
 	// set line colors
 	auto editAreaCol = QColor(m_lineColor);
 	auto currentKeyCol = QColor(m_beatLineColor);
@@ -3750,6 +3742,16 @@ void PianoRoll::updateScrollbars()
 		m_startKey = qMax(0, m_totalKeysToScroll);
 	}
 	m_topBottomScroll->setValue(m_totalKeysToScroll - m_startKey);
+}
+
+void PianoRoll::updateScrollbarRange()
+{
+	const int length = hasValidMidiClip() ? static_cast<int>(m_midiClip->length()) : 0;
+	if (m_leftRightScroll->maximum() != length)
+	{
+		m_leftRightScroll->setRange(0, length);
+		m_leftRightScroll->setPageStep(length);
+	}
 }
 
 // responsible for moving/resizing scrollbars after window-resizing
