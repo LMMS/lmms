@@ -58,6 +58,9 @@ static DescriptorStub * descriptors [N];
 
 extern "C" {
 
+#ifdef __GNUC__
+	__attribute__(constructor)
+#endif
 void caps_so_init()
 {
 	DescriptorStub ** d = descriptors;
@@ -113,6 +116,9 @@ void caps_so_init()
 	//seed();
 }
 
+#ifdef __GNUC__
+	__attribute__(destructor)
+#endif
 void caps_so_fini()
 {
 	for (ulong i = 0; i < N; ++i)
@@ -129,10 +135,10 @@ ladspa_descriptor (unsigned long i)
 	return 0;
 }
 
-struct CapsSoInit {
-	CapsSoInit() { caps_so_init(); } 
-	~CapsSoInit() { caps_so_fini(); } 
-}; 
-static CapsSoInit capsSoInit;
+
+#ifdef _MSC_VER
+	#pragma startup caps_so_init
+	#pragma exit caps_so_fini
+#endif
 
 }; /* extern "C" */
