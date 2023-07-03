@@ -238,6 +238,7 @@ protected slots:
 
 	void changeSnapMode();
 
+	void updateScrollbarRange();
 
 signals:
 	void currentMidiClipChanged();
