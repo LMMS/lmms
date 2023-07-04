@@ -113,7 +113,6 @@ void caps_so_init()
 	/* make sure N is correct */
 	assert (d - descriptors == N);
 
-	//seed();
 }
 
 #ifdef __GNUC__
@@ -143,10 +142,5 @@ struct CapsSoInit {
 	~CapsSoInit() { caps_so_fini(); } 
 }; 
 static CapsSoInit capsSoInit;
-
-#ifdef _MSC_VER
-	#pragma startup caps_so_init
-	#pragma exit caps_so_fini
-#endif
 
 }; /* extern "C" */
