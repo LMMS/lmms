@@ -22,16 +22,19 @@
  *
  */
 
-#ifndef SERIALIZING_OBJECT_H
-#define SERIALIZING_OBJECT_H
+#ifndef LMMS_SERIALIZING_OBJECT_H
+#define LMMS_SERIALIZING_OBJECT_H
 
-#include <QtCore/QString>
+#include <QString>
 
 #include "lmms_export.h"
 
 
 class QDomDocument;
 class QDomElement;
+
+namespace lmms
+{
 
 class SerializingObjectHook;
 
@@ -74,14 +77,14 @@ class SerializingObjectHook
 {
 public:
 	SerializingObjectHook() :
-		m_hookedIn( NULL )
+		m_hookedIn( nullptr )
 	{
 	}
 	virtual ~SerializingObjectHook()
 	{
-		if( m_hookedIn != NULL )
+		if( m_hookedIn != nullptr )
 		{
-			m_hookedIn->setHook( NULL );
+			m_hookedIn->setHook( nullptr );
 		}
 	}
 
@@ -96,5 +99,6 @@ private:
 } ;
 
 
-#endif
+} // namespace lmms
 
+#endif // LMMS_SERIALIZING_OBJECT_H

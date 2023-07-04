@@ -23,14 +23,16 @@
  *
  */
 
-
-#ifndef LCD_FLOATSPINBOX_H
-#define LCD_FLOATSPINBOX_H
+#ifndef LMMS_GUI_LCD_FLOATSPINBOX_H
+#define LMMS_GUI_LCD_FLOATSPINBOX_H
 
 #include <QString>
 
 #include "LcdWidget.h"
 #include "AutomatableModelView.h"
+
+namespace lmms::gui
+{
 
 
 class LMMS_EXPORT LcdFloatSpinBox : public QWidget, public FloatModelView
@@ -80,4 +82,6 @@ signals:
 
 using LcdFloatSpinBoxModel = FloatModel;
 
-#endif
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_LCD_FLOATSPINBOX_H

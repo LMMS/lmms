@@ -22,130 +22,141 @@
  *
  */
 
-
 #ifndef AEFFECTX_H
 #define AEFFECTX_H
 
 #include <stdint.h>
+#include <type_traits>
 
 // Calling convention
+#ifdef _WIN32
 #define VST_CALL_CONV __cdecl
+#else
+#define VST_CALL_CONV 
+#endif
 
-#define CCONST(a, b, c, d)( ( ( (int32_t) a ) << 24 ) |		\
-				( ( (int32_t) b ) << 16 ) |		\
-				( ( (int32_t) c ) << 8 ) |		\
-				( ( (int32_t) d ) << 0 ) )
 
-const int audioMasterAutomate = 0;
-const int audioMasterVersion = 1;
-const int audioMasterCurrentId = 2;
-const int audioMasterIdle = 3;
-const int audioMasterPinConnected = 4;
+template<typename T>
+constexpr int32_t CCONST(T a, T b, T c, T d)
+{
+	static_assert(std::is_convertible<T,int32_t>::value, "int32 compatibility required.");
+	return (
+		static_cast<int32_t>(a) << 24 |
+		static_cast<int32_t>(b) << 16 |
+		static_cast<int32_t>(c) << 8 |
+		static_cast<int32_t>(d) << 0);
+}
+
+constexpr int audioMasterAutomate = 0;
+constexpr int audioMasterVersion = 1;
+constexpr int audioMasterCurrentId = 2;
+constexpr int audioMasterIdle = 3;
+constexpr int audioMasterPinConnected = 4;
 // unsupported? 5
-const int audioMasterWantMidi = 6;
-const int audioMasterGetTime = 7;
-const int audioMasterProcessEvents = 8;
-const int audioMasterSetTime = 9;
-const int audioMasterTempoAt = 10;
-const int audioMasterGetNumAutomatableParameters = 11;
-const int audioMasterGetParameterQuantization = 12;
-const int audioMasterIOChanged = 13;
-const int audioMasterNeedIdle = 14;
-const int audioMasterSizeWindow = 15;
-const int audioMasterGetSampleRate = 16;
-const int audioMasterGetBlockSize = 17;
-const int audioMasterGetInputLatency = 18;
-const int audioMasterGetOutputLatency = 19;
-const int audioMasterGetPreviousPlug = 20;
-const int audioMasterGetNextPlug = 21;
-const int audioMasterWillReplaceOrAccumulate = 22;
-const int audioMasterGetCurrentProcessLevel = 23;
-const int audioMasterGetAutomationState = 24;
-const int audioMasterOfflineStart = 25;
-const int audioMasterOfflineRead = 26;
-const int audioMasterOfflineWrite = 27;
-const int audioMasterOfflineGetCurrentPass = 28;
-const int audioMasterOfflineGetCurrentMetaPass = 29;
-const int audioMasterSetOutputSampleRate = 30;
+constexpr int audioMasterWantMidi = 6;
+constexpr int audioMasterGetTime = 7;
+constexpr int audioMasterProcessEvents = 8;
+constexpr int audioMasterSetTime = 9;
+constexpr int audioMasterTempoAt = 10;
+constexpr int audioMasterGetNumAutomatableParameters = 11;
+constexpr int audioMasterGetParameterQuantization = 12;
+constexpr int audioMasterIOChanged = 13;
+constexpr int audioMasterNeedIdle = 14;
+constexpr int audioMasterSizeWindow = 15;
+constexpr int audioMasterGetSampleRate = 16;
+constexpr int audioMasterGetBlockSize = 17;
+constexpr int audioMasterGetInputLatency = 18;
+constexpr int audioMasterGetOutputLatency = 19;
+constexpr int audioMasterGetPreviousPlug = 20;
+constexpr int audioMasterGetNextPlug = 21;
+constexpr int audioMasterWillReplaceOrAccumulate = 22;
+constexpr int audioMasterGetCurrentProcessLevel = 23;
+constexpr int audioMasterGetAutomationState = 24;
+constexpr int audioMasterOfflineStart = 25;
+constexpr int audioMasterOfflineRead = 26;
+constexpr int audioMasterOfflineWrite = 27;
+constexpr int audioMasterOfflineGetCurrentPass = 28;
+constexpr int audioMasterOfflineGetCurrentMetaPass = 29;
+constexpr int audioMasterSetOutputSampleRate = 30;
 // unsupported? 31
-const int audioMasterGetSpeakerArrangement = 31; // deprecated in 2.4?
-const int audioMasterGetVendorString = 32;
-const int audioMasterGetProductString = 33;
-const int audioMasterGetVendorVersion = 34;
-const int audioMasterVendorSpecific = 35;
-const int audioMasterSetIcon = 36;
-const int audioMasterCanDo = 37;
-const int audioMasterGetLanguage = 38;
-const int audioMasterOpenWindow = 39;
-const int audioMasterCloseWindow = 40;
-const int audioMasterGetDirectory = 41;
-const int audioMasterUpdateDisplay = 42;
-const int audioMasterBeginEdit = 43;
-const int audioMasterEndEdit = 44;
-const int audioMasterOpenFileSelector = 45;
-const int audioMasterCloseFileSelector = 46; // currently unused
-const int audioMasterEditFile = 47; // currently unused
-const int audioMasterGetChunkFile = 48; // currently unused
-const int audioMasterGetInputSpeakerArrangement = 49; // currently unused
+constexpr int audioMasterGetSpeakerArrangement = 31; // deprecated in 2.4?
+constexpr int audioMasterGetVendorString = 32;
+constexpr int audioMasterGetProductString = 33;
+constexpr int audioMasterGetVendorVersion = 34;
+constexpr int audioMasterVendorSpecific = 35;
+constexpr int audioMasterSetIcon = 36;
+constexpr int audioMasterCanDo = 37;
+constexpr int audioMasterGetLanguage = 38;
+constexpr int audioMasterOpenWindow = 39;
+constexpr int audioMasterCloseWindow = 40;
+constexpr int audioMasterGetDirectory = 41;
+constexpr int audioMasterUpdateDisplay = 42;
+constexpr int audioMasterBeginEdit = 43;
+constexpr int audioMasterEndEdit = 44;
+constexpr int audioMasterOpenFileSelector = 45;
+constexpr int audioMasterCloseFileSelector = 46; // currently unused
+constexpr int audioMasterEditFile = 47; // currently unused
+constexpr int audioMasterGetChunkFile = 48; // currently unused
+constexpr int audioMasterGetInputSpeakerArrangement = 49; // currently unused
 
-const int effFlagsHasEditor = 1;
-const int effFlagsCanReplacing = 1 << 4; // very likely
-const int effFlagsIsSynth = 1 << 8; // currently unused
+constexpr int effFlagsHasEditor = 1;
+constexpr int effFlagsCanReplacing = 1 << 4; // very likely
+constexpr int effFlagsIsSynth = 1 << 8; // currently unused
 
-const int effOpen = 0;
-const int effClose = 1; // currently unused
-const int effSetProgram = 2; // currently unused
-const int effGetProgram = 3; // currently unused
-const int effGetProgramName = 5; // currently unused
-const int effGetParamLabel = 6;
-const int effGetParamDisplay = 7;
-const int effGetParamName = 8; // currently unused
-const int effSetSampleRate = 10;
-const int effSetBlockSize = 11;
-const int effMainsChanged = 12;
-const int effEditGetRect = 13;
-const int effEditOpen = 14;
-const int effEditClose = 15;
-const int effEditIdle = 19;
-const int effEditTop = 20;
-const int effSetChunk = 24;
-const int effProcessEvents = 25;
-const int effGetEffectName = 45;
-const int effGetVendorString = 47;
-const int effGetProductString = 48;
-const int effGetVendorVersion = 49;
-const int effCanDo = 51; // currently unused
-const int effGetVstVersion = 58; // currently unused
+constexpr int effOpen = 0;
+constexpr int effClose = 1; // currently unused
+constexpr int effSetProgram = 2; // currently unused
+constexpr int effGetProgram = 3; // currently unused
+constexpr int effGetProgramName = 5; // currently unused
+constexpr int effGetParamLabel = 6;
+constexpr int effGetParamDisplay = 7;
+constexpr int effGetParamName = 8; // currently unused
+constexpr int effSetSampleRate = 10;
+constexpr int effSetBlockSize = 11;
+constexpr int effMainsChanged = 12;
+constexpr int effEditGetRect = 13;
+constexpr int effEditOpen = 14;
+constexpr int effEditClose = 15;
+constexpr int effEditIdle = 19;
+constexpr int effEditTop = 20;
+constexpr int effSetChunk = 24;
+constexpr int effProcessEvents = 25;
+constexpr int effGetEffectName = 45;
+constexpr int effGetVendorString = 47;
+constexpr int effGetProductString = 48;
+constexpr int effGetVendorVersion = 49;
+constexpr int effCanDo = 51; // currently unused
+constexpr int effGetVstVersion = 58; // currently unused
 
-const int kEffectMagic = CCONST( 'V', 's', 't', 'P' );
-const int kVstLangEnglish = 1;
-const int kVstMidiType = 1;
+constexpr int kEffectMagic = CCONST( 'V', 's', 't', 'P' );
+constexpr int kVstLangEnglish = 1;
+constexpr int kVstMidiType = 1;
 
-const int kVstTransportChanged = 1;
-const int kVstTransportPlaying = 1 << 1;
-const int kVstTransportCycleActive = 1 << 2;
-const int kVstTransportRecording = 1 << 3; // currently unused
-const int kVstPpqPosValid = 1 << 9;
-const int kVstTempoValid = 1 << 10;
-const int kVstBarsValid = 1 << 11;
-const int kVstCyclePosValid = 1 << 12;
-const int kVstTimeSigValid = 1 << 13;
-const int kVstSmpteValid = 1 << 14; // currently unused
-const int kVstClockValid = 1 << 15; // currently unused
+constexpr int kVstTransportChanged = 1;
+constexpr int kVstTransportPlaying = 1 << 1;
+constexpr int kVstTransportCycleActive = 1 << 2;
+constexpr int kVstTransportRecording = 1 << 3; // currently unused
+constexpr int kVstPpqPosValid = 1 << 9;
+constexpr int kVstTempoValid = 1 << 10;
+constexpr int kVstBarsValid = 1 << 11;
+constexpr int kVstCyclePosValid = 1 << 12;
+constexpr int kVstTimeSigValid = 1 << 13;
+constexpr int kVstSmpteValid = 1 << 14; // currently unused
+constexpr int kVstClockValid = 1 << 15; // currently unused
 
 // currently unused
-const int kVstSmpte24fps = 0;
-const int kVstSmpte25fps = 1;
-const int kVstSmpte2997fps = 2;
-const int kVstSmpte30fps = 3;
-const int kVstSmpte2997dfps = 4;
-const int kVstSmpte30dfps = 5;
-const int kVstSmpteFilm16mm = 6; // very likely
-const int kVstSmpteFilm35mm = 7; // very likely
-const int kVstSmpte239fps = 10;
-const int kVstSmpte249fps = 11;
-const int kVstSmpte599fps = 12;
-const int kVstSmpte60fps = 13;
+constexpr int kVstSmpte24fps = 0;
+constexpr int kVstSmpte25fps = 1;
+constexpr int kVstSmpte2997fps = 2;
+constexpr int kVstSmpte30fps = 3;
+constexpr int kVstSmpte2997dfps = 4;
+constexpr int kVstSmpte30dfps = 5;
+constexpr int kVstSmpteFilm16mm = 6; // very likely
+constexpr int kVstSmpteFilm35mm = 7; // very likely
+constexpr int kVstSmpte239fps = 10;
+constexpr int kVstSmpte249fps = 11;
+constexpr int kVstSmpte599fps = 12;
+constexpr int kVstSmpte60fps = 13;
 
 
 
@@ -284,9 +295,6 @@ public:
 
 } ;
 
+using audioMasterCallback = intptr_t (VST_CALL_CONV*)(AEffect*, int32_t, int32_t, intptr_t, void*, float);
 
-
-typedef intptr_t (VST_CALL_CONV * audioMasterCallback)( AEffect * , int32_t, int32_t, intptr_t, void * , float );
-
-
-#endif
+#endif // AEFFECTX_H

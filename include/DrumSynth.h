@@ -23,23 +23,25 @@
  *
  */
 
-
-#ifndef _DRUMSYNTH_H__
-#define _DRUMSYNTH_H__
+#ifndef LMMS_DRUM_SYNTH_H
+#define LMMS_DRUM_SYNTH_H
 
 #include <stdint.h>
 #include "lmms_basics.h"
 
 class QString;
 
+namespace lmms
+{
+
 class DrumSynth {
     public:
-        DrumSynth() {};
+        DrumSynth() = default;
         int GetDSFileSamples(QString dsfile, int16_t *&wave, int channels, sample_rate_t Fs);
 
     private:
-        float LoudestEnv(void);
-        int   LongestEnv(void);
+        float LoudestEnv();
+        int   LongestEnv();
         void  UpdateEnv(int e, long t);
         void  GetEnv(int env, const char *sec, const char *key, QString ini);
 
@@ -51,4 +53,7 @@ class DrumSynth {
 
 };
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_DRUM_SYNTH_H

@@ -121,11 +121,11 @@ class Delay
 				sample_t x2 = (*this) [n + 2];
 
 				/* sample_t (32bit) quicker than double here */
-				register sample_t a = 
+				sample_t a = 
 						(3 * (x0 - x1) - x_1 + x2) * .5;
-				register sample_t b =
+				sample_t b =
 						2 * x1 + x_1 - (5 * x0 + x2) * .5;
-				register sample_t c = 
+				sample_t c = 
 						(x1 - x_1) * .5;
 
 				return x0 + (((a * f) + b) * f + c) * f;
@@ -154,9 +154,6 @@ class DelayTapA
 				int n;
 				fistp (f, n); /* read: n = (int) f; relies on FPTruncateMode */
 				f -= n;
-				if (0 && f < .5)
-					f += 1,
-					n -= 1;
 
 				sample_t x = d[n];
 				f = (1 - f) / (1 + f);

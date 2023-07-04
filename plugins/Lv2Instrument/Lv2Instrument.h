@@ -1,7 +1,7 @@
-﻿/*
+/*
  * Lv2Instrument.h - implementation of LV2 instrument
  *
- * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -37,12 +37,21 @@
 // currently only MIDI works
 #define LV2_INSTRUMENT_USE_MIDI
 
-class QPushButton;
+namespace lmms
+{
 
+namespace gui
+{
+
+class Lv2InsView;
+
+}
 
 class Lv2Instrument : public Instrument, public Lv2ControlBase
 {
 	Q_OBJECT
+signals:
+	void modelChanged();
 public:
 	/*
 		initialization
@@ -50,6 +59,8 @@ public:
 	Lv2Instrument(InstrumentTrack *instrumentTrackArg,
 		 Descriptor::SubPluginFeatures::Key* key);
 	~Lv2Instrument() override;
+	void reload();
+	void onSampleRateChanged();
 	//! Must be checked after ctor or reload
 	bool isValid() const;
 
@@ -83,27 +94,30 @@ public:
 		return IsSingleStreamed;
 #endif
 	}
-	PluginView *instantiateView(QWidget *parent) override;
+	gui::PluginView* instantiateView(QWidget *parent) override;
 
 private slots:
 	void updatePitchRange();
 
 private:
 	QString nodeName() const override;
-	DataFile::Types settingsType() override;
-	void setNameFromFile(const QString &name) override;
 
 #ifdef LV2_INSTRUMENT_USE_MIDI
-	int m_runningNotes[NumKeys];
+	std::array<int, NumKeys> m_runningNotes = {};
 #endif
+	void clearRunningNotes();
 
-	friend class Lv2InsView;
+	friend class gui::Lv2InsView;
 };
+
+
+namespace gui
+{
 
 
 class Lv2InsView : public InstrumentView, public Lv2ViewBase
 {
-	Q_OBJECT
+Q_OBJECT
 public:
 	Lv2InsView(Lv2Instrument *_instrument, QWidget *_parent);
 
@@ -115,5 +129,10 @@ private:
 	void modelChanged() override;
 };
 
+
+} // namespace gui
+
+
+} // namespace lmms
 
 #endif // LV2_INSTRUMENT_H

@@ -29,7 +29,7 @@ public:
 class Alg_smf_write {
 public:
     Alg_smf_write(Alg_seq_ptr seq);
-    ~Alg_smf_write();
+    ~Alg_smf_write() = default;
     long channels_per_track; // used to encode track number into chan field
     // chan is actual_channel + channels_per_track * track_number
     // default is 100, set this to 0 to merge all tracks to 16 channels
@@ -80,7 +80,7 @@ private:
 
 Alg_smf_write::Alg_smf_write(Alg_seq_ptr a_seq)
 {
-    out_file = NULL;
+    out_file = nullptr;
 
     // at 100bpm (a nominal tempo value), we would like a division
     // to represent 1ms of time. So
@@ -95,11 +95,6 @@ Alg_smf_write::Alg_smf_write(Alg_seq_ptr a_seq)
     seq = a_seq;
 
     previous_divs = 0; // used to compute deltas for midifile
-}
-
-
-Alg_smf_write::~Alg_smf_write()
-{
 }
 
 
@@ -124,19 +119,19 @@ Alg_smf_write::~Alg_smf_write()
 event_queue* push(event_queue *queue, event_queue *event)
 {
     // printf("push: %.6g, %c, %d\n", event->time, event->type, event->index);
-    if (queue == NULL) {
-        event->next = NULL;
+    if (queue == nullptr) {
+        event->next = nullptr;
         return event;
     }
    
-    event_queue *marker1 = NULL;
+    event_queue *marker1 = nullptr;
     event_queue *marker2 = queue;
-    while (marker2 != NULL && marker2->time <= event->time) {
+    while (marker2 != nullptr && marker2->time <= event->time) {
         marker1 = marker2;
         marker2 = marker2->next;
     }
     event->next = marker2;
-    if (marker1 != NULL) {
+    if (marker1 != nullptr) {
         marker1->next=event;
         return queue;
     } else return event;
@@ -415,17 +410,17 @@ void Alg_smf_write::write_track(int i)
 {
     int j = 0; // note index
     Alg_events &notes = seq->track_list[i];
-    event_queue *pending = NULL;
+    event_queue *pending = nullptr;
     if (notes.length() > 0) {
-        pending = new event_queue('n', TICK_TIME(notes[j]->time, 0), 0, NULL);
+        pending = new event_queue('n', TICK_TIME(notes[j]->time, 0), 0, nullptr);
     }
     if (i == 0) { // track 0 may have tempo and timesig info
         if (seq->get_time_map()->last_tempo_flag || seq->get_time_map()->beats.len > 0) {
-            pending = push(pending, new event_queue('c', 0.0, 0, NULL));
+            pending = push(pending, new event_queue('c', 0.0, 0, nullptr));
         }
         if (seq->time_sig.length() > 0) {
             pending = push(pending, new event_queue('s', 
-                           TICK_TIME(seq->time_sig[0].beat, 0), 0, NULL));
+                           TICK_TIME(seq->time_sig[0].beat, 0), 0, nullptr));
         }
     }
     while (pending) {
@@ -436,7 +431,7 @@ void Alg_smf_write::write_track(int i)
             if (n->is_note()) {
                 write_note(n, true);
                 pending = push(pending, new event_queue('o',
-                      TICK_TIME(n->time + n->dur, -1), current->index, NULL));
+                      TICK_TIME(n->time + n->dur, -1), current->index, nullptr));
             } else if (n->is_update()) {
                 Alg_update_ptr u = (Alg_update_ptr) n;
                 write_update(u);

@@ -27,11 +27,9 @@
 
 #include <string>
 #include <vector>
-#include <math.h>
-#include <cstdlib>
+#include <cmath>
 #include <random>
 
-#include "Xpressive.h"
 
 #include "interpolation.h"
 #include "lmms_math.h"
@@ -41,9 +39,13 @@
 #include "exprtk.hpp"
 
 #define WARN_EXPRTK qWarning("ExprTk exception")
-typedef exprtk::symbol_table<float> symbol_table_t;
-typedef exprtk::expression<float> expression_t;
-typedef exprtk::parser<float> parser_t;
+
+namespace lmms
+{
+
+using symbol_table_t = exprtk::symbol_table<float>;
+using expression_t = exprtk::expression<float>;
+using parser_t = exprtk::parser<float>;
 
 template <typename T,typename Functor,bool optimize>
 struct freefunc0 : public exprtk::ifunction<T>
@@ -53,7 +55,7 @@ struct freefunc0 : public exprtk::ifunction<T>
 	freefunc0() : exprtk::ifunction<T>(0) {
 		if (optimize) { exprtk::disable_has_side_effects(*this); }
 	}
-	inline T operator()()
+	inline T operator()() override
 	{ return Functor::process(); }
 };
 template <typename T,typename Functor,bool optimize>
@@ -64,7 +66,7 @@ struct freefunc1 : public exprtk::ifunction<T>
 	freefunc1() : exprtk::ifunction<T>(1) {
 		if (optimize) { exprtk::disable_has_side_effects(*this); }
 	}
-	inline T operator()(const T& x)
+	inline T operator()(const T& x) override
 	{ return Functor::process(x); }
 };
 
@@ -73,7 +75,7 @@ struct IntegrateFunction : public exprtk::ifunction<T>
 {
 
 	using exprtk::ifunction<T>::operator();
-	virtual ~IntegrateFunction()
+	~IntegrateFunction() override
 	{
 		delete [] m_counters;
 	}
@@ -91,7 +93,7 @@ struct IntegrateFunction : public exprtk::ifunction<T>
 		clearArray(m_counters,max_counters);
 	}
 
-	inline T operator()(const T& x)
+	inline T operator()(const T& x) override
 	{
 		if (*m_frame == 0)
 		{
@@ -128,7 +130,7 @@ struct LastSampleFunction : public exprtk::ifunction<T>
 {
 
 	using exprtk::ifunction<T>::operator();
-	virtual ~LastSampleFunction()
+	~LastSampleFunction() override
 	{
 		delete [] m_samples;
 	}
@@ -142,7 +144,7 @@ struct LastSampleFunction : public exprtk::ifunction<T>
 		clearArray(m_samples, history_size);
 	}
 
-	inline T operator()(const T& x)
+	inline T operator()(const T& x) override
 	{
 		if (!std::isnan(x) && !std::isinf(x))
 		{
@@ -184,7 +186,7 @@ struct WaveValueFunction : public exprtk::ifunction<T>
 	m_size(s)
 	{}
 
-	inline T operator()(const T& index)
+	inline T operator()(const T& index) override
 	{
 		return m_vec[(int) ( positiveFraction(index) * m_size )];
 	}
@@ -202,7 +204,7 @@ struct WaveValueFunctionInterpolate : public exprtk::ifunction<T>
 	m_size(s)
 	{}
 
-	inline T operator()(const T& index)
+	inline T operator()(const T& index) override
 	{
 		const T x = positiveFraction(index) * m_size;
 		const int ix = (int)x;
@@ -212,7 +214,7 @@ struct WaveValueFunctionInterpolate : public exprtk::ifunction<T>
 	const T *m_vec;
 	const std::size_t m_size;
 };
-static const unsigned int random_data[257]={
+static const auto random_data = std::array<unsigned int, 257>{
 0xd76a33ec, 0x4a767724, 0xb34ebd08 ,0xf4024196,
 0x17b426e2, 0x8dc6389a, 0x1b5dcb93 ,0xa771bd3f,
 0x078d502e, 0x8980988a, 0x1f64f846 ,0xb5b48ed7,
@@ -310,7 +312,7 @@ struct RandomVectorSeedFunction : public exprtk::ifunction<float>
 		{
 			return 0;
 		}
-		const unsigned int xi = (unsigned int)index;
+		const auto xi = (unsigned int)index;
 		const unsigned int si = irseed % data_size;
 		const unsigned int sa = irseed / data_size;
 		unsigned int res=rotateLeft(random_data[(xi + 23 * si + 1) % data_size] ^ random_data[(xi / data_size + sa) % data_size],sa % 31 + 1);
@@ -318,7 +320,7 @@ struct RandomVectorSeedFunction : public exprtk::ifunction<float>
 		return static_cast<int>(res) / (float)(1 << 31);
 	}
 
-	inline float operator()(const float& index,const float& seed)
+	inline float operator()(const float& index,const float& seed) override
 	{
 		int irseed;
 		if (seed < 0 || std::isnan(seed) || std::isinf(seed))
@@ -343,7 +345,7 @@ struct RandomVectorFunction : public exprtk::ifunction<float>
 	m_rseed(seed)
 	{ exprtk::disable_has_side_effects(*this); }
 
-	inline float operator()(const float& index)
+	inline float operator()(const float& index) override
 	{
 		return RandomVectorSeedFunction::randv(index,m_rseed);
 	}
@@ -361,7 +363,7 @@ namespace SimpleRandom {
 			return dist(generator);
 		}
 	};
-}
+} // namespace SimpleRandom
 
 static freefunc0<float,SimpleRandom::float_random_with_engine,false> simple_rand;
 
@@ -370,18 +372,18 @@ class ExprFrontData
 public:
 	ExprFrontData(int last_func_samples):
 	m_rand_vec(SimpleRandom::generator()),
-	m_integ_func(NULL),
+	m_integ_func(nullptr),
 	m_last_func(last_func_samples)
 	{}
 	~ExprFrontData()
 	{
-		for (int i = 0; i < m_cyclics.size() ; ++i)
+		for (const auto& cyclic : m_cyclics)
 		{
-			delete m_cyclics[i];
+			delete cyclic;
 		}
-		for (int i = 0; i < m_cyclics_interp.size() ; ++i)
+		for (const auto& cyclic : m_cyclics_interp)
 		{
-			delete m_cyclics_interp[i];
+			delete cyclic;
 		}
 		if (m_integ_func)
 		{
@@ -524,14 +526,14 @@ ExprFront::ExprFront(const char * expr, int last_func_samples)
 	try
 	{
 		m_data = new ExprFrontData(last_func_samples);
-	
+
 		m_data->m_expression_string = expr;
 		m_data->m_symbol_table.add_pi();
-	
+
 		m_data->m_symbol_table.add_constant("e", F_E);
 
 		m_data->m_symbol_table.add_constant("seed", SimpleRandom::generator() & max_float_integer_mask);
-	
+
 		m_data->m_symbol_table.add_function("sinew", sin_wave_func);
 		m_data->m_symbol_table.add_function("squarew", square_wave_func);
 		m_data->m_symbol_table.add_function("trianglew", triangle_wave_func);
@@ -575,7 +577,7 @@ bool ExprFront::compile()
 		sstore.disable_all_assignment_ops();
 		sstore.disable_all_control_structures();
 		parser_t parser(sstore);
-	
+
 		m_valid=parser.compile(m_data->m_expression_string, m_data->m_expression);
 	}
 	catch(...)
@@ -598,7 +600,7 @@ float ExprFront::evaluate()
 		WARN_EXPRTK;
 	}
 	return 0;
-	
+
 }
 bool ExprFront::add_variable(const char* name, float& ref)
 {
@@ -632,13 +634,13 @@ bool ExprFront::add_cyclic_vector(const char* name, const float* data, size_t le
 	{
 		if (interp)
 		{
-			WaveValueFunctionInterpolate<float> *wvf = new WaveValueFunctionInterpolate<float>(data, length);
+			auto wvf = new WaveValueFunctionInterpolate<float>(data, length);
 			m_data->m_cyclics_interp.push_back(wvf);
 			return m_data->m_symbol_table.add_function(name, *wvf);
 		}
 		else
 		{
-			WaveValueFunction<float> *wvf = new WaveValueFunction<float>(data, length);
+			auto wvf = new WaveValueFunction<float>(data, length);
 			m_data->m_cyclics.push_back(wvf);
 			return m_data->m_symbol_table.add_function(name, *wvf);
 		}
@@ -670,7 +672,7 @@ size_t find_occurances(const std::string& haystack, const char* const needle)
 
 void ExprFront::setIntegrate(const unsigned int* const frameCounter, const unsigned int sample_rate)
 {
-	if (m_data->m_integ_func == NULL)
+	if (m_data->m_integ_func == nullptr)
 	{
 		const unsigned int ointeg = find_occurances(m_data->m_expression_string,"integrate");
 		if ( ointeg > 0 )
@@ -755,7 +757,7 @@ void ExprSynth::renderOutput(fpp_t frames, sampleFrame *buf)
 		const float new_freq = m_nph->frequency();
 		const float freq_inc = (new_freq - m_frequency) / frames;
 		const bool is_released = m_nph->isReleased();
-	
+
 		expression_t *o1_rawExpr = &(m_exprO1->getData()->m_expression);
 		expression_t *o2_rawExpr = &(m_exprO2->getData()->m_expression);
 		LastSampleFunction<float> * last_func1 = &m_exprO1->getData()->m_last_func;
@@ -789,7 +791,7 @@ void ExprSynth::renderOutput(fpp_t frames, sampleFrame *buf)
 		}
 		else
 		{
-			
+
 			if (o2_valid)
 			{
 				o1_rawExpr = o2_rawExpr;
@@ -822,3 +824,6 @@ void ExprSynth::renderOutput(fpp_t frames, sampleFrame *buf)
 		WARN_EXPRTK;
 	}
 }
+
+
+} // namespace lmms

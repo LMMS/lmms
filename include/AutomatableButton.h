@@ -22,14 +22,15 @@
  *
  */
 
-
-#ifndef AUTOMATABLE_BUTTON_H
-#define AUTOMATABLE_BUTTON_H
+#ifndef LMMS_GUI_AUTOMATABLE_BUTTON_H
+#define LMMS_GUI_AUTOMATABLE_BUTTON_H
 
 #include <QPushButton>
 
 #include "AutomatableModelView.h"
 
+namespace lmms::gui
+{
 
 class automatableButtonGroup;
 
@@ -40,7 +41,7 @@ class LMMS_EXPORT AutomatableButton : public QPushButton, public BoolModelView
 public:
 	AutomatableButton( QWidget * _parent, const QString & _name
 			= QString() );
-	virtual ~AutomatableButton();
+	~AutomatableButton() override;
 
 	inline void setCheckable( bool _on )
 	{
@@ -85,7 +86,7 @@ class LMMS_EXPORT automatableButtonGroup : public QWidget, public IntModelView
 public:
 	automatableButtonGroup( QWidget * _parent, const QString & _name
 			= QString() );
-	virtual ~automatableButtonGroup();
+	~automatableButtonGroup() override;
 
 	void addButton( AutomatableButton * _btn );
 	void removeButton( AutomatableButton * _btn );
@@ -105,5 +106,6 @@ private:
 } ;
 
 
+} // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_AUTOMATABLE_BUTTON_H
