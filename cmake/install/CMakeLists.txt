@@ -36,6 +36,16 @@ IF(LMMS_BUILD_WIN32 OR LMMS_INSTALL_DEPENDENCIES)
 	)
 ENDIF()
 
+# Install STK rawwaves
+if(LMMS_HAVE_STK AND (LMMS_BUILD_WIN32 OR LMMS_BUILD_APPLE))
+	if(STK_RAWWAVE_ROOT)
+		file(GLOB RAWWAVES "${STK_RAWWAVE_ROOT}/*.raw")
+		install(FILES ${RAWWAVES} DESTINATION "${DATA_DIR}/stk/rawwaves")
+	else()
+		message(WARNING "Can't find STK rawwave root!")
+	endif()
+endif()
+
 IF(LMMS_BUILD_APPLE)
 	INSTALL(CODE "EXECUTE_PROCESS(COMMAND chmod u+x ${CMAKE_BINARY_DIR}/install_apple.sh)")
 	INSTALL(CODE "EXECUTE_PROCESS(COMMAND ${CMAKE_BINARY_DIR}/install_apple.sh)")

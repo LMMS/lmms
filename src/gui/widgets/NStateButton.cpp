@@ -26,8 +26,10 @@
 #include <QMouseEvent>
 
 #include "NStateButton.h"
-#include "ToolTip.h"
 
+
+namespace lmms::gui
+{
 
 
 NStateButton::NStateButton( QWidget * _parent ) :
@@ -75,7 +77,7 @@ void NStateButton::changeState( int _n )
 			( m_states[m_curState].second != "" ) ?
 				m_states[m_curState].second :
 					m_generalToolTip;
-		ToolTip::add( this, _tooltip );
+		setToolTip(_tooltip);
 
 		setIcon( m_states[m_curState].first );
 
@@ -93,3 +95,6 @@ void NStateButton::mousePressEvent( QMouseEvent * _me )
 	}
 	ToolButton::mousePressEvent( _me );
 }
+
+
+} // namespace lmms::gui

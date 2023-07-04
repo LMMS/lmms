@@ -22,17 +22,20 @@
  *
  */
 
-#ifndef LV2FEATURES_H
-#define LV2FEATURES_H
+#ifndef LMMS_LV2_FEATURES_H
+#define LMMS_LV2_FEATURES_H
 
 #include "lmmsconfig.h"
 
 #ifdef LMMS_HAVE_LV2
 
-#include <lv2.h>
 #include <map>
 #include <vector>
 #include "Lv2Manager.h"
+
+
+namespace lmms
+{
 
 /**
 	Feature container
@@ -66,6 +69,8 @@ public:
 	{
 		return m_featurePointers.data();
 	}
+	//! Clear everything
+	void clear();
 
 private:
 	//! feature storage
@@ -76,6 +81,9 @@ private:
 	std::map<const char*, void*, Lv2Manager::CmpStr> m_featureByUri;
 };
 
+
+} // namespace lmms
+
 #endif // LMMS_HAVE_LV2
 
-#endif // LV2FEATURES_H
+#endif // LMMS_LV2_FEATURES_H

@@ -23,22 +23,24 @@
  *
  */
 
-#ifndef AUDIO_FILE_DEVICE_H
-#define AUDIO_FILE_DEVICE_H
+#ifndef LMMS_AUDIO_FILE_DEVICE_H
+#define LMMS_AUDIO_FILE_DEVICE_H
 
-#include <QtCore/QFile>
+#include <QFile>
 
 #include "AudioDevice.h"
 #include "OutputSettings.h"
 
+namespace lmms
+{
 
 class AudioFileDevice : public AudioDevice
 {
 public:
 	AudioFileDevice(OutputSettings const & outputSettings,
 			const ch_cnt_t _channels, const QString & _file,
-			Mixer* mixer );
-	virtual ~AudioFileDevice();
+			AudioEngine* audioEngine );
+	~AudioFileDevice() override;
 
 	QString outputFile() const
 	{
@@ -66,13 +68,9 @@ private:
 	OutputSettings m_outputSettings;
 } ;
 
+using AudioFileDeviceInstantiaton
+	= AudioFileDevice* (*)(const QString&, const OutputSettings&, const ch_cnt_t, AudioEngine*, bool&);
 
-typedef AudioFileDevice * ( * AudioFileDeviceInstantiaton )
-					( const QString & outputFilename,
-					  OutputSettings const & outputSettings,
-					  const ch_cnt_t channels,
-					  Mixer* mixer,
-					  bool & successful );
+} // namespace lmms
 
-
-#endif
+#endif // LMMS_AUDIO_FILE_DEVICE_H

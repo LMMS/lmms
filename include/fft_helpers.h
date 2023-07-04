@@ -23,14 +23,16 @@
  *
  */
 
-
-#ifndef FFT_HELPERS_H
-#define FFT_HELPERS_H
+#ifndef LMMS_FFT_HELPERS_H
+#define LMMS_FFT_HELPERS_H
 
 #include "lmms_export.h"
 
 #include <vector>
 #include <fftw3.h>
+
+namespace lmms
+{
 
 // NOTE: FFT_BUFFER_SIZE should be considered deprecated!
 // It is used by Eq plugin and some older code here, but this should be a user
@@ -103,4 +105,7 @@ int LMMS_EXPORT absspec(const fftwf_complex *complex_buffer, float *absspec_buff
 int LMMS_EXPORT compressbands(const float * _absspec_buffer, float * _compressedband,
 			int _num_old, int _num_new, int _bottom, int _top);
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_FFT_HELPERS_H

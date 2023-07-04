@@ -23,9 +23,8 @@
  *
  */
 
-
-#ifndef GRAPH_H
-#define GRAPH_H
+#ifndef LMMS_GUI_GRAPH_H
+#define LMMS_GUI_GRAPH_H
 
 #include <QWidget>
 #include <QPixmap>
@@ -35,7 +34,14 @@
 #include "ModelView.h"
 #include "lmms_basics.h"
 
+namespace lmms
+{
+
+
 class graphModel;
+
+namespace gui
+{
 
 
 class LMMS_EXPORT Graph : public QWidget, public ModelView
@@ -60,7 +66,7 @@ public:
 		int _width = 132,
 		int _height = 104
 	);
-	virtual ~Graph() = default;
+	~Graph() override = default;
 
 	void setForeground( const QPixmap & _pixmap );
 
@@ -116,6 +122,9 @@ private:
 } ;
 
 
+} // namespace gui
+
+
 /**
 	@brief 2 dimensional function plot
 
@@ -137,11 +146,11 @@ public:
 	graphModel( float _min,
 			float _max,
 			int _size,
-			:: Model * _parent,
+			Model * _parent,
 			bool _default_constructed = false,
 			float _step = 0.0 );
 
-	virtual ~graphModel() = default;
+	~graphModel() override = default;
 
 	// TODO: saveSettings, loadSettings?
 
@@ -187,7 +196,7 @@ public slots:
 	void setWaveToSaw();
 	void setWaveToSquare();
 	void setWaveToNoise();
-	QString setWaveToUser( );
+	QString setWaveToUser();
 
 	void smooth();
 	void smoothNonCyclic();
@@ -211,8 +220,11 @@ private:
 	float m_maxValue;
 	float m_step;
 
-	friend class Graph;
+	friend class gui::Graph;
 
 };
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_GUI_GRAPH_H

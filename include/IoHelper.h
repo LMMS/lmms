@@ -22,16 +22,32 @@
  *
  */
 
+#ifndef LMMS_IO_HELPER_H
+#define LMMS_IO_HELPER_H
 
 #include "lmmsconfig.h"
 
 #include <cstdio>
 
-
 #ifdef _WIN32
 #include <windows.h>
+#endif
 
-std::wstring toWString(const std::string& s)
+#ifdef LMMS_BUILD_WIN32
+#include <io.h>
+#else
+#ifdef LMMS_HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+#endif // LMMS_BUILD_WIN32
+
+namespace lmms
+{
+
+
+#ifdef _WIN32
+
+inline std::wstring toWString(const std::string& s)
 {
 	std::wstring ret;
 	int len = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, s.data(),
@@ -44,22 +60,23 @@ std::wstring toWString(const std::string& s)
 	MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, s.data(), s.length(), &ret[0], len);
 	return ret;
 }
+
 #endif
 
+
+inline FILE* F_OPEN_UTF8(std::string const& fname, const char* mode){
 #ifdef LMMS_BUILD_WIN32
-#include <io.h>
-#define F_OPEN_UTF8(a, b) _wfopen(toWString(a).data(), L##b)
+	return _wfopen(toWString(fname).data(), toWString(mode).data());
 #else
-#ifdef LMMS_HAVE_UNISTD_H
-#include <unistd.h>
+	return fopen(fname.data(), mode);
 #endif
-#define F_OPEN_UTF8(a, b) fopen((a).data(), b)
-#endif
+}
 
-int fileToDescriptor(FILE* f, bool closeFile = true)
+
+inline int fileToDescriptor(FILE* f, bool closeFile = true)
 {
 	int fh;
-	if (f == NULL) {return -1;}
+	if (f == nullptr) {return -1;}
 
 #ifdef LMMS_BUILD_WIN32
 	fh = _dup(_fileno(f));
@@ -70,3 +87,8 @@ int fileToDescriptor(FILE* f, bool closeFile = true)
 	if (closeFile) {fclose(f);}
 	return fh;
 }
+
+
+} // namespace lmms
+
+#endif // LMMS_IO_HELPER_H

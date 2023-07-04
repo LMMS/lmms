@@ -23,27 +23,31 @@
  *
  */
 
+#ifndef LMMS_GUI_SONG_EDITOR_H
+#define LMMS_GUI_SONG_EDITOR_H
 
-#ifndef SONG_EDITOR_H
-#define SONG_EDITOR_H
-
-#include <QVector>
-#include <QLinearGradient>
-
-#include "ActionGroup.h"
 #include "Editor.h"
 #include "TrackContainerView.h"
-#include "PositionLine.h"
 
 class QLabel;
 class QScrollBar;
 
+namespace lmms
+{
+
+class Song;
+class ComboBoxModel;
+
+namespace gui
+{
+
+
+class ActionGroup;
 class AutomatableSlider;
 class ComboBox;
-class ComboBoxModel;
 class LcdSpinBox;
 class MeterDialog;
-class Song;
+class PositionLine;
 class TextFloat;
 class TimeLineWidget;
 
@@ -60,7 +64,7 @@ public:
 	};
 
 	SongEditor( Song * song );
-	~SongEditor();
+	~SongEditor() override = default;
 
 	void saveSettings( QDomDocument& doc, QDomElement& element ) override;
 	void loadSettings( const QDomElement& element ) override;
@@ -76,15 +80,15 @@ public slots:
 	void stopSelectRegion();
 	void updateRubberband();
 
-	void setEditMode( EditMode mode );
+	void setEditMode( lmms::gui::SongEditor::EditMode mode );
 	void setEditModeDraw();
 	void setEditModeKnife();
 	void setEditModeSelect();
 	void toggleProportionalSnap();
 
-	void updatePosition( const TimePos & t );
+	void updatePosition( const lmms::TimePos & t );
 	void updatePositionLine();
-	void selectAllTcos( bool select );
+	void selectAllClips( bool select );
 
 protected:
 	void closeEvent( QCloseEvent * ce ) override;
@@ -141,7 +145,7 @@ private:
 	ComboBoxModel* m_snappingModel;
 	bool m_proportionalSnap;
 
-	static const QVector<double> m_zoomLevels;
+	static const QVector<float> m_zoomLevels;
 
 	bool m_scrollBack;
 	bool m_smoothScroll;
@@ -161,7 +165,7 @@ private:
 	friend class SongEditorWindow;
 
 signals:
-	void zoomingValueChanged( double );
+	void zoomingValueChanged( float );
 } ;
 
 
@@ -198,7 +202,7 @@ signals:
 	void resized();
 
 private:
-	QAction* m_addBBTrackAction;
+	QAction* m_addPatternTrackAction;
 	QAction* m_addSampleTrackAction;
 	QAction* m_addAutomationTrackAction;
 	QAction* m_setProportionalSnapAction;
@@ -217,4 +221,9 @@ private:
 	QAction* m_removeBarAction;
 };
 
-#endif
+
+} // namespace gui
+
+} // namespace lmms
+
+#endif // LMMS_GUI_SONG_EDITOR_H

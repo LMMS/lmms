@@ -23,18 +23,22 @@
  *
  */
 
-
-#ifndef DATA_FILE_H
-#define DATA_FILE_H
+#ifndef LMMS_DATA_FILE_H
+#define LMMS_DATA_FILE_H
 
 #include <map>
 #include <QDomDocument>
 
 #include "lmms_export.h"
 #include "MemoryManager.h"
-#include "ProjectVersion.h"
 
 class QTextStream;
+
+namespace lmms
+{
+
+class ProjectVersion;
+
 
 class LMMS_EXPORT DataFile : public QDomDocument
 {
@@ -53,16 +57,16 @@ public:
 		ClipboardData,
 		JournalData,
 		EffectSettings,
-		NotePattern,
+		MidiClip,
 		TypeCount
 	} ;
-	typedef Types Type;
+	using Type = Types;
 
 	DataFile( const QString& fileName );
 	DataFile( const QByteArray& data );
 	DataFile( Type type );
 
-	virtual ~DataFile();
+	virtual ~DataFile() = default;
 
 	///
 	/// \brief validate
@@ -120,6 +124,10 @@ private:
 	void upgrade_1_3_0();
 	void upgrade_noHiddenClipNames();
 	void upgrade_automationNodes();
+	void upgrade_extendedNoteRange();
+	void upgrade_defaultTripleOscillatorHQ();
+	void upgrade_mixerRename();
+	void upgrade_bbTcoRename();
 
 	// List of all upgrade methods
 	static const std::vector<UpgradeMethod> UPGRADE_METHODS;
@@ -127,20 +135,12 @@ private:
 	static const std::vector<ProjectVersion> UPGRADE_VERSIONS;
 
 	// Map with DOM elements that access resources (for making bundles)
-	typedef std::map<QString, std::vector<QString>> ResourcesMap;
+	using ResourcesMap = std::map<QString, std::vector<QString>>;
 	static const ResourcesMap ELEMENTS_WITH_RESOURCES;
 
 	void upgrade();
 
 	void loadData( const QByteArray & _data, const QString & _sourceFile );
-
-
-	struct LMMS_EXPORT typeDescStruct
-	{
-		Type m_type;
-		QString m_name;
-	} ;
-	static typeDescStruct s_types[TypeCount];
 
 	QString m_fileName; //!< The origin file name or "" if this DataFile didn't originate from a file
 	QDomElement m_content;
@@ -151,4 +151,6 @@ private:
 } ;
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_DATA_FILE_H

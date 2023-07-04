@@ -26,7 +26,7 @@
 
 #include "DataFile.h"
 
-#include <math.h>
+#include <cmath>
 #include <map>
 
 #include <QDebug>
@@ -45,16 +45,21 @@
 #include "ProjectVersion.h"
 #include "SongEditor.h"
 #include "TextFloat.h"
+#include "Track.h"
 #include "PathUtil.h"
 
 #include "lmmsversion.h"
+
+namespace lmms
+{
+
 
 static void findIds(const QDomElement& elem, QList<jo_id_t>& idList);
 
 
 // QMap with the DOM elements that access file resources
 const DataFile::ResourcesMap DataFile::ELEMENTS_WITH_RESOURCES = {
-{ "sampletco", {"src"} },
+{ "sampleclip", {"src"} },
 { "audiofileprocessor", {"src"} },
 };
 
@@ -69,7 +74,9 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_1_0_99           ,   &DataFile::upgrade_1_1_0,
 	&DataFile::upgrade_1_1_91           ,   &DataFile::upgrade_1_2_0_rc3,
 	&DataFile::upgrade_1_3_0            ,   &DataFile::upgrade_noHiddenClipNames,
-	&DataFile::upgrade_automationNodes
+	&DataFile::upgrade_automationNodes  ,   &DataFile::upgrade_extendedNoteRange,
+	&DataFile::upgrade_defaultTripleOscillatorHQ,
+	&DataFile::upgrade_mixerRename      ,   &DataFile::upgrade_bbTcoRename,
 };
 
 // Vector of all versions that have upgrade routines.
@@ -82,19 +89,27 @@ const std::vector<ProjectVersion> DataFile::UPGRADE_VERSIONS = {
 	"1.2.0-rc3"        ,   "1.3.0"
 };
 
-DataFile::typeDescStruct
-		DataFile::s_types[DataFile::TypeCount] =
+namespace
 {
-	{ DataFile::UnknownType, "unknown" },
-	{ DataFile::SongProject, "song" },
-	{ DataFile::SongProjectTemplate, "songtemplate" },
-	{ DataFile::InstrumentTrackSettings, "instrumenttracksettings" },
-	{ DataFile::DragNDropData, "dnddata" },
-	{ DataFile::ClipboardData, "clipboard-data" },
-	{ DataFile::JournalData, "journaldata" },
-	{ DataFile::EffectSettings, "effectsettings" },
-	{ DataFile::NotePattern, "pattern" }
-} ;
+	struct TypeDescStruct
+	{
+		DataFile::Type m_type;
+		QString m_name;
+	};
+
+	const auto s_types = std::array<TypeDescStruct, DataFile::TypeCount>
+	{
+		TypeDescStruct{ DataFile::UnknownType, "unknown" },
+		TypeDescStruct{ DataFile::SongProject, "song" },
+		TypeDescStruct{ DataFile::SongProjectTemplate, "songtemplate" },
+		TypeDescStruct{ DataFile::InstrumentTrackSettings, "instrumenttracksettings" },
+		TypeDescStruct{ DataFile::DragNDropData, "dnddata" },
+		TypeDescStruct{ DataFile::ClipboardData, "clipboard-data" },
+		TypeDescStruct{ DataFile::JournalData, "journaldata" },
+		TypeDescStruct{ DataFile::EffectSettings, "effectsettings" },
+		TypeDescStruct{ DataFile::MidiClip, "midiclip" }
+	};
+}
 
 
 
@@ -136,11 +151,11 @@ DataFile::DataFile( const QString & _fileName ) :
 	QFile inFile( _fileName );
 	if( !inFile.open( QIODevice::ReadOnly ) )
 	{
-		if( gui )
+		if (gui::getGUI() != nullptr)
 		{
-			QMessageBox::critical( NULL,
-				SongEditor::tr( "Could not open file" ),
-				SongEditor::tr( "Could not open file %1. You probably "
+			QMessageBox::critical( nullptr,
+				gui::SongEditor::tr( "Could not open file" ),
+				gui::SongEditor::tr( "Could not open file %1. You probably "
 						"have no permissions to read this "
 						"file.\n Please make sure to have at "
 						"least read permissions to the file "
@@ -169,12 +184,6 @@ DataFile::DataFile( const QByteArray & _data ) :
 
 
 
-DataFile::~DataFile()
-{
-}
-
-
-
 
 bool DataFile::validate( QString extension )
 {
@@ -198,7 +207,7 @@ bool DataFile::validate( QString extension )
 			return true;
 		}
 		break;
-	case Type::NotePattern:
+	case Type::MidiClip:
 		if (extension == "xpt" || extension == "xptz")
 		{
 			return true;
@@ -207,9 +216,12 @@ bool DataFile::validate( QString extension )
 	case Type::UnknownType:
 		if (! ( extension == "mmp" || extension == "mpt" || extension == "mmpz" ||
 				extension == "xpf" || extension == "xml" ||
-				( extension == "xiz" && ! pluginFactory->pluginSupportingExtension(extension).isNull()) ||
+				( extension == "xiz" && ! getPluginFactory()->pluginSupportingExtension(extension).isNull()) ||
 				extension == "sf2" || extension == "sf3" || extension == "pat" || extension == "mid" ||
 				extension == "dll"
+#ifdef LMMS_BUILD_LINUX
+				|| extension == "so"
+#endif
 #ifdef LMMS_HAVE_LV2
 				|| extension == "lv2"
 #endif
@@ -234,12 +246,14 @@ bool DataFile::validate( QString extension )
 
 QString DataFile::nameWithExtension( const QString & _fn ) const
 {
+	const QString extension = _fn.section( '.', -1 );
+
 	switch( type() )
 	{
 		case SongProject:
-			if( _fn.section( '.', -1 ) != "mmp" &&
-					_fn.section( '.', -1 ) != "mpt" &&
-					_fn.section( '.', -1 ) != "mmpz" )
+			if( extension != "mmp" &&
+					extension != "mpt" &&
+					extension != "mmpz" )
 			{
 				if( ConfigManager::inst()->value( "app",
 						"nommpz" ).toInt() == 0 )
@@ -250,13 +264,13 @@ QString DataFile::nameWithExtension( const QString & _fn ) const
 			}
 			break;
 		case SongProjectTemplate:
-			if( _fn.section( '.',-1 ) != "mpt" )
+			if( extension != "mpt" )
 			{
 				return _fn + ".mpt";
 			}
 			break;
 		case InstrumentTrackSettings:
-			if( _fn.section( '.', -1 ) != "xpf" )
+			if( extension != "xpf" )
 			{
 				return _fn + ".xpf";
 			}
@@ -287,7 +301,7 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 {
 	// Small lambda function for displaying errors
 	auto showError = [this](QString title, QString body){
-		if (gui)
+		if (gui::getGUI() != nullptr)
 		{
 			QMessageBox mb;
 			mb.setWindowTitle(title);
@@ -316,6 +330,8 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 		: nameWithExtension(filename);
 	const QString fullNameTemp = fullName + ".new";
 	const QString fullNameBak = fullName + ".bak";
+
+	using gui::SongEditor;
 
 	// If we are saving with resources, setup the bundle folder first
 	if (withResources)
@@ -419,7 +435,7 @@ bool DataFile::copyResources(const QString& resourcesDir)
 	// repeating filenames
 	std::list<QString> namesList;
 
-	ResourcesMap::const_iterator it = ELEMENTS_WITH_RESOURCES.begin();
+	auto it = ELEMENTS_WITH_RESOURCES.begin();
 
 	// Copy resources and manipulate the DataFile to have local paths to them
 	while (it != ELEMENTS_WITH_RESOURCES.end())
@@ -431,7 +447,7 @@ bool DataFile::copyResources(const QString& resourcesDir)
 		{
 			QDomElement el = list.item(i).toElement();
 
-			std::vector<QString>::const_iterator res = it->second.begin();
+			auto res = it->second.begin();
 
 			// Search for attributes that point to resources
 			while (res != it->second.end())
@@ -525,14 +541,9 @@ bool DataFile::hasLocalPlugins(QDomElement parent /* = QDomElement()*/, bool fir
 		bool skipNode = false;
 		// Skip the nodes allowed to have "local:" attributes, but
 		// still check its children
-		for
-		(
-			ResourcesMap::const_iterator it = ELEMENTS_WITH_RESOURCES.begin();
-			it != ELEMENTS_WITH_RESOURCES.end();
-			++it
-		)
+		for (const auto& element : ELEMENTS_WITH_RESOURCES)
 		{
-			if (childElement.tagName() == it->first)
+			if (childElement.tagName() == element.first)
 			{
 				skipNode = true;
 				break;
@@ -1002,7 +1013,7 @@ void DataFile::upgrade_0_4_0_beta1()
 					m["plugin"] = sl.value( 0 );
 					m["file"] = sl.value( 1 );
 				}
-				EffectKey key( NULL, name, m );
+				EffectKey key( nullptr, name, m );
 				el.appendChild( key.saveXML( *this ) );
 			}
 		}
@@ -1311,44 +1322,32 @@ void DataFile::upgrade_1_3_0()
 					// Effect name changes
 
 					QDomElement attribute = attributes.item( k ).toElement();
-					if( attribute.attribute( "name" ) == "file" &&
-							( attribute.attribute( "value" ) == "calf" ||
-							attribute.attribute( "value" ) == "calf.so" ) )
+					const QString attrName = attribute.attribute("name");
+					const QString attrVal = attribute.attribute("value");
+					const QString plugin = attrName == "plugin" ? attrVal : "";
+
+					static const std::map<QString, QString> pluginNames = {
+						{"Sidechaincompressor", "SidechainCompressor"},
+						{"Sidechaingate", "SidechainGate"},
+						{"Multibandcompressor", "MultibandCompressor"},
+						{"Multibandgate", "MultibandGate"},
+						{"Multibandlimiter", "MultibandLimiter"},
+					};
+
+					if (attrName == "file" && (attrVal == "calf" || attrVal == "calf.so" ))
 					{
 						attribute.setAttribute( "value", "veal" );
 					}
-					else if( attribute.attribute( "name" ) == "plugin" &&
-							attribute.attribute( "value" ) == "Sidechaincompressor" )
+
+					const auto newName = pluginNames.find(plugin);
+					if (newName != pluginNames.end())
 					{
-						attribute.setAttribute( "value", "SidechainCompressor" );
-					}
-					else if( attribute.attribute( "name" ) == "plugin" &&
-							attribute.attribute( "value" ) == "Sidechaingate" )
-					{
-						attribute.setAttribute( "value", "SidechainGate" );
-					}
-					else if( attribute.attribute( "name" ) == "plugin" &&
-							attribute.attribute( "value" ) == "Multibandcompressor" )
-					{
-						attribute.setAttribute( "value", "MultibandCompressor" );
-					}
-					else if( attribute.attribute( "name" ) == "plugin" &&
-							attribute.attribute( "value" ) == "Multibandgate" )
-					{
-						attribute.setAttribute( "value", "MultibandGate" );
-					}
-					else if( attribute.attribute( "name" ) == "plugin" &&
-							attribute.attribute( "value" ) == "Multibandlimiter" )
-					{
-						attribute.setAttribute( "value", "MultibandLimiter" );
+						attribute.setAttribute("value", newName->second);
 					}
 
 					// Handle port changes
 
-					if( attribute.attribute( "name" ) == "plugin" &&
-							( attribute.attribute( "value" ) == "MultibandLimiter" ||
-							attribute.attribute( "value" ) == "MultibandCompressor" ||
-							attribute.attribute( "value" ) == "MultibandGate" ) )
+					if (plugin == "MultibandLimiter" ||	plugin == "MultibandCompressor" || plugin == "MultibandGate")
 					{
 						auto fn = [&](QDomElement& port, int num, QList<QDomElement>&, QList<QDomElement>& removeList)
 						{
@@ -1369,8 +1368,7 @@ void DataFile::upgrade_1_3_0()
 						iterate_ladspa_ports(effect, fn);
 					}
 
-					if( attribute.attribute( "name" ) == "plugin" &&
-							( attribute.attribute( "value" ) == "Pulsator" ) )
+					else if (plugin == "Pulsator")
 					{
 						auto fn = [&](QDomElement& port, int num, QList<QDomElement>& addList, QList<QDomElement>& removeList)
 						{
@@ -1413,9 +1411,7 @@ void DataFile::upgrade_1_3_0()
 						iterate_ladspa_ports(effect, fn);
 					}
 
-
-					if( attribute.attribute( "name" ) == "plugin" &&
-							( attribute.attribute( "value" ) == "VintageDelay" ) )
+					else if (plugin == "VintageDelay")
 					{
 						auto fn = [&](QDomElement& port, int num, QList<QDomElement>& addList, QList<QDomElement>& )
 						{
@@ -1452,23 +1448,20 @@ void DataFile::upgrade_1_3_0()
 						iterate_ladspa_ports(effect, fn);
 					}
 
-					if( attribute.attribute( "name" ) == "plugin" &&
-						(	   ( attribute.attribute( "value" ) == "Equalizer5Band" )
-							|| ( attribute.attribute( "value" ) == "Equalizer8Band" )
-							|| ( attribute.attribute( "value" ) == "Equalizer12Band" ) ) )
+					else if (plugin == "Equalizer5Band" || plugin == "Equalizer8Band" || plugin == "Equalizer12Band")
 					{
 						// NBand equalizers got 4 q nobs inserted. We need to shift everything else...
 						// HOWEVER: 5 band eq has only 2 q nobs inserted (no LS/HS filters)
-						bool band5 = ( attribute.attribute( "value" ) == "Equalizer5Band" );
+						bool band5 = plugin == "Equalizer5Band";
 						auto fn = [&](QDomElement& port, int num, QList<QDomElement>& addList, QList<QDomElement>& )
 						{
 							if(num == 4)
 							{
 								// don't modify port 4, but some other ones:
 								int zoom_port;
-								if(attribute.attribute( "value" ) == "Equalizer5Band")
+								if (plugin == "Equalizer5Band")
 									zoom_port = 36;
-								else if(attribute.attribute( "value" ) == "Equalizer8Band")
+								else if (plugin == "Equalizer8Band")
 									zoom_port = 48;
 								else // 12 band
 									zoom_port = 64;
@@ -1549,8 +1542,7 @@ void DataFile::upgrade_1_3_0()
 						iterate_ladspa_ports(effect, fn);
 					}
 
-					if( attribute.attribute( "name" ) == "plugin" &&
-						attribute.attribute( "value" ) == "Saturator" )
+					else if (plugin == "Saturator")
 					{
 						auto fn = [&](QDomElement& port, int num, QList<QDomElement>&, QList<QDomElement>& )
 						{
@@ -1577,8 +1569,7 @@ void DataFile::upgrade_1_3_0()
 						iterate_ladspa_ports(effect, fn);
 					}
 
-					if( attribute.attribute( "name" ) == "plugin" &&
-						attribute.attribute( "value" ) == "StereoTools" )
+					else if (plugin == "StereoTools")
 					{
 						auto fn = [&](QDomElement& port, int num, QList<QDomElement>&, QList<QDomElement>& )
 						{
@@ -1590,6 +1581,29 @@ void DataFile::upgrade_1_3_0()
 							if( num == 23 || num == 25 )
 							{
 								port.setAttribute("data", 1.0f);
+							}
+						};
+						iterate_ladspa_ports(effect, fn);
+					}
+
+					else if (plugin == "amPitchshift")
+					{
+						auto fn = [&](QDomElement& port, int num, QList<QDomElement>&, QList<QDomElement>& removeList)
+						{
+							switch (num)
+							{
+							case 0:
+								port.setTagName("port01");
+								break;
+							case 1:
+								port.setTagName("port03");
+								break;
+							case 10:
+								port.setTagName("port11");
+								break;
+							case 11:
+								port.setTagName("port13");
+								break;
 							}
 						};
 						iterate_ladspa_ports(effect, fn);
@@ -1656,10 +1670,175 @@ void DataFile::upgrade_automationNodes()
 }
 
 
+/** \brief Note range has been extended to match MIDI specification
+ *
+ * The non-standard note range previously affected all MIDI-based instruments
+ * except OpulenZ, and made them sound an octave lower than they should (#1857).
+ */
+void DataFile::upgrade_extendedNoteRange()
+{
+	auto affected = [](const QDomElement& instrument)
+	{
+		return instrument.attribute("name") == "zynaddsubfx" ||
+			instrument.attribute("name") == "vestige" ||
+			instrument.attribute("name") == "lv2instrument" ||
+			instrument.attribute("name") == "carlapatchbay" ||
+			instrument.attribute("name") == "carlarack";
+	};
+
+	if (!elementsByTagName("song").item(0).isNull())
+	{
+		// Dealing with a project file, go through all the tracks
+		QDomNodeList tracks = elementsByTagName("track");
+		for (int i = 0; !tracks.item(i).isNull(); i++)
+		{
+			// Ignore BB container tracks
+			if (tracks.item(i).toElement().attribute("type").toInt() == 1) { continue; }
+
+			QDomNodeList instruments = tracks.item(i).toElement().elementsByTagName("instrument");
+			if (instruments.isEmpty()) { continue; }
+			QDomElement instrument = instruments.item(0).toElement();
+			// Raise the base note of every instrument by 12 to compensate for the change
+			// of A4 key code from 57 to 69. This ensures that notes are labeled correctly.
+			instrument.parentNode().toElement().setAttribute(
+				"basenote",
+				instrument.parentNode().toElement().attribute("basenote").toInt() + 12);
+			// Raise the pitch of all notes in patterns assigned to instruments not affected
+			// by #1857 by an octave. This negates the base note change for normal instruments,
+			// but leaves the MIDI-based instruments sounding an octave lower, preserving their
+			// pitch in existing projects.
+			if (!affected(instrument))
+			{
+				QDomNodeList patterns = tracks.item(i).toElement().elementsByTagName("pattern");
+				for (int i = 0; !patterns.item(i).isNull(); i++)
+				{
+					QDomNodeList notes = patterns.item(i).toElement().elementsByTagName("note");
+					for (int i = 0; !notes.item(i).isNull(); i++)
+					{
+						notes.item(i).toElement().setAttribute(
+							"key",
+							notes.item(i).toElement().attribute("key").toInt() + 12
+						);
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		// Dealing with a preset, not a song
+		QDomNodeList presets = elementsByTagName("instrumenttrack");
+		if (presets.item(0).isNull()) { return; }
+		QDomElement preset = presets.item(0).toElement();
+		// Common correction for all instrument presets (make base notes match the new MIDI range).
+		// NOTE: Many older presets do not have any basenote defined, assume they were "made for 57".
+		// (Specifying a default like this also happens to fix a FileBrowser bug where previews of presets
+		// with undefined basenote always play with the basenote inherited from previously played preview.)
+		int oldBase = preset.attribute("basenote", "57").toInt();
+		preset.setAttribute("basenote", oldBase + 12);
+		// Extra correction for Zyn, VeSTige, LV2 and Carla (to preserve the original buggy behavior).
+		QDomNodeList instruments = presets.item(0).toElement().elementsByTagName("instrument");
+		if (instruments.isEmpty()) { return; }
+		QDomElement instrument = instruments.item(0).toElement();
+		if (affected(instrument))
+		{
+			preset.setAttribute("basenote", preset.attribute("basenote").toInt() + 12);
+		}
+	}
+}
+
+
+/** \brief TripleOscillator switched to using high-quality, alias-free oscillators by default
+ *
+ * Older projects were made without this feature and would sound differently if loaded
+ * with the new default setting. This upgrade routine preserves their old behavior.
+ */
+void DataFile::upgrade_defaultTripleOscillatorHQ()
+{
+	QDomNodeList tripleoscillators = elementsByTagName("tripleoscillator");
+	for (int i = 0; !tripleoscillators.item(i).isNull(); i++)
+	{
+		for (int j = 1; j <= 3; j++)
+		{
+			// Only set the attribute if it does not exist (default template has it but reports as 1.2.0)
+			if (tripleoscillators.item(i).toElement().attribute("useWaveTable" + QString::number(j)) == "")
+			{
+				tripleoscillators.item(i).toElement().setAttribute("useWaveTable" + QString::number(j), 0);
+			}
+		}
+	}
+}
+
+
+// Remove FX prefix from mixer and related nodes
+void DataFile::upgrade_mixerRename()
+{
+	// Change nodename <fxmixer> to <mixer>
+	QDomNodeList fxmixer = elementsByTagName("fxmixer");
+	for (int i = 0; !fxmixer.item(i).isNull(); ++i)
+	{
+		fxmixer.item(i).toElement().setTagName("mixer");
+	}
+
+	// Change nodename <fxchannel> to <mixerchannel>
+	QDomNodeList fxchannel = elementsByTagName("fxchannel");
+	for (int i = 0; !fxchannel.item(i).isNull(); ++i)
+	{
+		fxchannel.item(i).toElement().setTagName("mixerchannel");
+	}
+
+	// Change the attribute fxch of element <instrumenttrack> to mixch
+	QDomNodeList fxch = elementsByTagName("instrumenttrack");
+	for(int i = 0; !fxch.item(i).isNull(); ++i)
+	{
+		if(fxch.item(i).toElement().hasAttribute("fxch"))
+		{
+			fxch.item(i).toElement().setAttribute("mixch", fxch.item(i).toElement().attribute("fxch"));
+			fxch.item(i).toElement().removeAttribute("fxch");
+		}
+	}
+}
+
+
+// Rename BB to pattern and TCO to clip
+void DataFile::upgrade_bbTcoRename()
+{
+	std::vector<std::pair<const char *, const char *>> names {
+		{"automationpattern", "automationclip"},
+		{"bbtco", "patternclip"},
+		{"pattern", "midiclip"},
+		{"sampletco", "sampleclip"},
+		{"bbtrack", "patterntrack"},
+		{"bbtrackcontainer", "patternstore"},
+	};
+	// Replace names of XML tags
+	for (auto name : names)
+	{
+		QDomNodeList elements = elementsByTagName(name.first);
+		for (int i = 0; !elements.item(i).isNull(); ++i)
+		{
+			elements.item(i).toElement().setTagName(name.second);
+		}
+	}
+	// Replace "Beat/Bassline" with "Pattern" in track names
+	QDomNodeList elements = elementsByTagName("track");
+	for (int i = 0; !elements.item(i).isNull(); ++i)
+	{
+		auto e = elements.item(i).toElement();
+		static_assert(Track::PatternTrack == 1, "Must be type=1 for backwards compatibility");
+		if (e.attribute("type").toInt() == Track::PatternTrack)
+		{
+			e.setAttribute("name", e.attribute("name").replace("Beat/Bassline", "Pattern"));
+		}
+	}
+}
+
+
 void DataFile::upgrade()
 {
 	// Runs all necessary upgrade methods
-	std::for_each( UPGRADE_METHODS.begin() + m_fileVersion, UPGRADE_METHODS.end(),
+	std::size_t max = std::min(static_cast<std::size_t>(m_fileVersion), UPGRADE_METHODS.size());
+	std::for_each( UPGRADE_METHODS.begin() + max, UPGRADE_METHODS.end(),
 		[this](UpgradeMethod um)
 		{
 			(this->*um)();
@@ -1711,10 +1890,12 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 		}
 		if( line >= 0 && col >= 0 )
 		{
+			using gui::SongEditor;
+
 			qWarning() << "at line" << line << "column" << errorMsg;
-			if( gui )
+			if (gui::getGUI() != nullptr)
 			{
-				QMessageBox::critical( NULL,
+				QMessageBox::critical( nullptr,
 					SongEditor::tr( "Error in file" ),
 					SongEditor::tr( "The file %1 seems to contain "
 							"errors and therefore can't be "
@@ -1745,20 +1926,20 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 
 	if (root.hasAttribute("creatorversion"))
 	{
+		using gui::SongEditor;
+
 		// compareType defaults to All, so it doesn't have to be set here
 		ProjectVersion createdWith = root.attribute("creatorversion");
 		ProjectVersion openedWith = LMMS_VERSION;
 
-		if (createdWith < openedWith) { upgrade(); }
-
 		if (createdWith.setCompareType(ProjectVersion::Minor)
 		 !=  openedWith.setCompareType(ProjectVersion::Minor)
-		 && gui != nullptr && root.attribute("type") == "song"
+		 && gui::getGUI() != nullptr && root.attribute("type") == "song"
 		){
 			auto projectType = _sourceFile.endsWith(".mpt") ?
 				SongEditor::tr("template") : SongEditor::tr("project");
 
-			TextFloat::displayMessage(
+			gui::TextFloat::displayMessage(
 				SongEditor::tr("Version difference"),
 				SongEditor::tr("This %1 was created with LMMS %2")
 				.arg(projectType).arg(createdWith.getVersion()),
@@ -1767,6 +1948,9 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 			);
 		}
 	}
+
+	// Perform upgrade routines
+	if (m_fileVersion < UPGRADE_METHODS.size()) { upgrade(); }
 
 	m_content = root.elementsByTagName(typeName(m_type)).item(0).toElement();
 }
@@ -1799,3 +1983,6 @@ unsigned int DataFile::legacyFileVersion()
 	// Convert the iterator to an index, which is our file version (starting at 0)
 	return std::distance( UPGRADE_VERSIONS.begin(), firstRequiredUpgrade );
 }
+
+
+} // namespace lmms

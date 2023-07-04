@@ -1,11 +1,35 @@
-#ifndef PATHUTIL_H
-#define PATHUTIL_H
+/*
+ * PathUtil.h
+ *
+ * Copyright (c) 2019-2022 Spekular <Spekularr@gmail.com>
+ *
+ * This file is part of LMMS - https://lmms.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ *
+ */
+
+#ifndef LMMS_PATHUTIL_H
+#define LMMS_PATHUTIL_H
 
 #include "lmms_export.h"
 
 #include <QDir>
 
-namespace PathUtil
+namespace lmms::PathUtil
 {
 	enum class Base { Absolute, ProjectDir, FactorySample, UserSample, UserVST, Preset,
 		UserLADSPA, DefaultLADSPA, UserSoundfont, DefaultSoundfont, UserGIG, DefaultGIG,
@@ -44,6 +68,6 @@ namespace PathUtil
 	//! Defaults to an absolute path if all bases fail.
 	QString LMMS_EXPORT toShortestRelative(const QString & input, bool allowLocal = false);
 
-}
+} // namespace lmms::PathUtil
 
-#endif
+#endif // LMMS_PATHUTIL_H

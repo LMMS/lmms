@@ -26,32 +26,37 @@
  *
  */
 
+#ifndef LMMS_CONTROLLER_CONNECTION_H
+#define LMMS_CONTROLLER_CONNECTION_H
 
-#ifndef CONTROLLER_CONNECTION_H
-#define CONTROLLER_CONNECTION_H
-
-#include <QtCore/QObject>
-#include <QtCore/QVector>
+#include <QObject>
+#include <QVector>
 
 #include "Controller.h"
 #include "JournallingObject.h"
 #include "ValueBuffer.h"
 
-class AutomatableModel;
+namespace lmms
+{
+
 class ControllerConnection;
 
-typedef QVector<ControllerConnection *> ControllerConnectionVector;
+namespace gui
+{
+class ControllerConnectionDialog;
+}
 
+using ControllerConnectionVector = QVector<ControllerConnection*>;
 
 class LMMS_EXPORT ControllerConnection : public QObject, public JournallingObject
 {
 	Q_OBJECT
 public:
 
-	ControllerConnection(Controller * _controller, AutomatableModel * contmod);
+	ControllerConnection(Controller * _controller);
 	ControllerConnection( int _controllerId );
 
-	virtual ~ControllerConnection();
+	~ControllerConnection() override;
 
 	inline Controller * getController()
 	{
@@ -112,14 +117,14 @@ protected:
 
 	static ControllerConnectionVector s_connections;
 
-	AutomatableModel * m_controlledModel;
-
 signals:
-	// The value changed while the mixer isn't running (i.e: MIDI CC)
+	// The value changed while the audio engine isn't running (i.e: MIDI CC)
 	void valueChanged();
 
-	friend class ControllerConnectionDialog;
+	friend class gui::ControllerConnectionDialog;
 };
 
-#endif
 
+} // namespace lmms
+
+#endif // LMMS_CONTROLLER_CONNECTION_H

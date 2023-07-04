@@ -24,28 +24,22 @@
 
 
 #include "MeterModel.h"
-#include "AutomationPattern.h"
+#include "AutomationClip.h"
 
 
-MeterModel::MeterModel( ::Model * _parent ) :
+namespace lmms
+{
+
+MeterModel::MeterModel( Model * _parent ) :
 	Model( _parent ),
 	m_numeratorModel( 4, 1, 32, this, tr( "Numerator" ) ),
 	m_denominatorModel( 4, 1, 32, this, tr( "Denominator" ) )
 {
-	connect( &m_numeratorModel, SIGNAL( dataChanged() ), 
-			this, SIGNAL( dataChanged() ), Qt::DirectConnection );
-	connect( &m_denominatorModel, SIGNAL( dataChanged() ), 
-			this, SIGNAL( dataChanged() ), Qt::DirectConnection );
+	connect( &m_numeratorModel, SIGNAL(dataChanged()), 
+			this, SIGNAL(dataChanged()), Qt::DirectConnection );
+	connect( &m_denominatorModel, SIGNAL(dataChanged()), 
+			this, SIGNAL(dataChanged()), Qt::DirectConnection );
 }
-
-
-
-
-MeterModel::~MeterModel()
-{
-}
-
-
 
 
 void MeterModel::reset()
@@ -53,8 +47,8 @@ void MeterModel::reset()
 	m_numeratorModel.setValue( 4 );
 	m_denominatorModel.setValue( 4 );
 
-	AutomationPattern::globalAutomationPattern( &m_numeratorModel )->clear();
-	AutomationPattern::globalAutomationPattern( &m_denominatorModel )->clear();
+	AutomationClip::globalAutomationClip( &m_numeratorModel )->clear();
+	AutomationClip::globalAutomationClip( &m_denominatorModel )->clear();
 }
 
 
@@ -78,6 +72,4 @@ void MeterModel::loadSettings( const QDomElement & _this,
 }
 
 
-
-
-
+} // namespace lmms

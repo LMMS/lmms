@@ -22,22 +22,23 @@
  *
  */
 
-#ifndef INSTRUMENT_PLAY_HANDLE_H
-#define INSTRUMENT_PLAY_HANDLE_H
+#ifndef LMMS_INSTRUMENT_PLAY_HANDLE_H
+#define LMMS_INSTRUMENT_PLAY_HANDLE_H
 
 #include "PlayHandle.h"
 #include "Instrument.h"
 #include "NotePlayHandle.h"
 #include "lmms_export.h"
 
+namespace lmms
+{
+
 class LMMS_EXPORT InstrumentPlayHandle : public PlayHandle
 {
 public:
 	InstrumentPlayHandle( Instrument * instrument, InstrumentTrack* instrumentTrack );
 
-	virtual ~InstrumentPlayHandle()
-	{
-	}
+	~InstrumentPlayHandle() override = default;
 
 
 	void play( sampleFrame * _working_buffer ) override
@@ -81,4 +82,7 @@ private:
 
 } ;
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_INSTRUMENT_PLAY_HANDLE_H
