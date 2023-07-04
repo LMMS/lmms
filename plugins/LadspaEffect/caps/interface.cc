@@ -138,6 +138,11 @@ ladspa_descriptor (unsigned long i)
 	return 0;
 }
 
+struct CapsSoInit {
+	CapsSoInit() { caps_so_init(); } 
+	~CapsSoInit() { caps_so_fini(); } 
+}; 
+static CapsSoInit capsSoInit;
 
 #ifdef _MSC_VER
 	#pragma startup caps_so_init
