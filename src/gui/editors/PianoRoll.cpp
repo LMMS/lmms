@@ -1099,7 +1099,7 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 
 void PianoRoll::drawDetuningInfo(QPainter & p, const Note * n, int x, int y) const
 {
-	// Get a timeMap of the detuning pattern
+	// Get a timeMap of the detuning clip
 	AutomationClip* detuningClip = n->detuning()->automationClip();
 	timeMap & detuningMap = detuningClip->getTimeMap();
 
@@ -1107,7 +1107,7 @@ void PianoRoll::drawDetuningInfo(QPainter & p, const Note * n, int x, int y) con
 	if (detuningMap.isEmpty()) { return; }
 
 	// Reference pixel Y (that will be equivalent to
-	// zero in the automation pattern)
+	// zero in the automation clip)
 	int baseY = y + m_keyLineHeight / 2;
 
 	// Two lambda functions to calculate the X and Y position
