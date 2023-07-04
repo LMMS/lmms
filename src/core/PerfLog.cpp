@@ -35,6 +35,11 @@
 #	include <sys/times.h>
 #endif
 
+
+namespace lmms
+{
+
+
 PerfTime::PerfTime()
 	: m_real(-1)
 {
@@ -129,3 +134,6 @@ void PerfLogTimer::end()
 	// Invalidate so destructor won't call print another log entry
 	begin_time = PerfTime();
 }
+
+
+} // namespace lmms

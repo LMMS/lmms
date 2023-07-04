@@ -1,7 +1,7 @@
 /*
  * Lv2Effect.cpp - implementation of LV2 effect
  *
- * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -24,8 +24,6 @@
 
 #include "Lv2Effect.h"
 
-#include <QDebug>
-#include <lv2.h>
 
 #include "Lv2SubPluginFeatures.h"
 
@@ -33,6 +31,8 @@
 #include "plugin_export.h"
 
 
+namespace lmms
+{
 
 
 extern "C"
@@ -40,7 +40,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT lv2effect_plugin_descriptor =
 {
-	STRINGIFY(PLUGIN_NAME),
+	LMMS_STRINGIFY(PLUGIN_NAME),
 	"LV2",
 	QT_TRANSLATE_NOOP("PluginBrowser",
 		"plugin for using arbitrary LV2-effects inside LMMS."),
@@ -60,7 +60,7 @@ Plugin::Descriptor PLUGIN_EXPORT lv2effect_plugin_descriptor =
 Lv2Effect::Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key *key) :
 	Effect(&lv2effect_plugin_descriptor, parent, key),
 	m_controls(this, key->attributes["uri"]),
-	m_tmpOutputSmps(Engine::mixer()->framesPerPeriod())
+	m_tmpOutputSmps(Engine::audioEngine()->framesPerPeriod())
 {
 }
 
@@ -90,8 +90,8 @@ bool Lv2Effect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 	{
 		buf[f][0] = d * buf[f][0] + w * m_tmpOutputSmps[f][0];
 		buf[f][1] = d * buf[f][1] + w * m_tmpOutputSmps[f][1];
-		double l = static_cast<double>(buf[f][0]);
-		double r = static_cast<double>(buf[f][1]);
+		auto l = static_cast<double>(buf[f][0]);
+		auto r = static_cast<double>(buf[f][1]);
 		outSum += l*l + r*r;
 	}
 	checkGate(outSum / frames);
@@ -109,9 +109,12 @@ extern "C"
 PLUGIN_EXPORT Plugin *lmms_plugin_main(Model *_parent, void *_data)
 {
 	using KeyType = Plugin::Descriptor::SubPluginFeatures::Key;
-	Lv2Effect* eff = new Lv2Effect(_parent, static_cast<const KeyType*>(_data));
+	auto eff = new Lv2Effect(_parent, static_cast<const KeyType*>(_data));
 	if (!eff->isValid()) { delete eff; eff = nullptr; }
 	return eff;
 }
 
 }
+
+
+} // namespace lmms

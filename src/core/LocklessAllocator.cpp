@@ -25,13 +25,16 @@
 #include "LocklessAllocator.h"
 
 #include <algorithm>
-#include <stdio.h>
+#include <cstdio>
 
 #include "lmmsconfig.h"
 
 #ifndef LMMS_BUILD_WIN32
 #include <strings.h>
 #endif
+
+namespace lmms
+{
 
 static const size_t SIZEOF_SET = sizeof( int ) * 8;
 
@@ -113,7 +116,7 @@ void * LocklessAllocator::alloc()
 		if( !available )
 		{
 			fprintf( stderr, "LocklessAllocator: No free space\n" );
-			return NULL;
+			return nullptr;
 		}
 	}
 	while (!m_available.compare_exchange_weak(available, available - 1));
@@ -162,3 +165,6 @@ invalid:
 	}
 	++m_available;
 }
+
+
+} // namespace lmms

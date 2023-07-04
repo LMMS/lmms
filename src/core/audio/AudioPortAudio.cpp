@@ -27,6 +27,10 @@
 #include "AudioPortAudio.h"
 
 #ifndef LMMS_HAVE_PORTAUDIO
+namespace lmms
+{
+
+
 void AudioPortAudioSetupUtil::updateBackends()
 {
 }
@@ -38,33 +42,38 @@ void AudioPortAudioSetupUtil::updateDevices()
 void AudioPortAudioSetupUtil::updateChannels()
 {
 }
+
+
+} // namespace lmms
 #endif
 
 #ifdef LMMS_HAVE_PORTAUDIO
 
 #include <QLabel>
-#include <QLineEdit>
 
 #include "Engine.h"
 #include "ConfigManager.h"
 #include "gui_templates.h"
 #include "ComboBox.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
+
+namespace lmms
+{
 
 
-AudioPortAudio::AudioPortAudio( bool & _success_ful, Mixer * _mixer ) :
+AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine ) :
 	AudioDevice( qBound<ch_cnt_t>(
 		DEFAULT_CHANNELS,
 		ConfigManager::inst()->value( "audioportaudio", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _mixer ),
-	m_paStream( NULL ),
+		SURROUND_CHANNELS ), _audioEngine ),
+	m_paStream( nullptr ),
 	m_wasPAInitError( false ),
-	m_outBuf( new surroundSampleFrame[mixer()->framesPerPeriod()] ),
+	m_outBuf( new surroundSampleFrame[audioEngine()->framesPerPeriod()] ),
 	m_outBufPos( 0 )
 {
 	_success_ful = false;
 
-	m_outBufSize = mixer()->framesPerPeriod();
+	m_outBufSize = audioEngine()->framesPerPeriod();
 
 	PaError err = Pa_Initialize();
 	
@@ -111,31 +120,31 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, Mixer * _mixer ) :
 		return;
 	}
 
-	double inLatency = 0;//(double)mixer()->framesPerPeriod() / (double)sampleRate();
-	double outLatency = 0;//(double)mixer()->framesPerPeriod() / (double)sampleRate();
+	double inLatency = 0;//(double)audioEngine()->framesPerPeriod() / (double)sampleRate();
+	double outLatency = 0;//(double)audioEngine()->framesPerPeriod() / (double)sampleRate();
 
 	//inLatency = Pa_GetDeviceInfo( inDevIdx )->defaultLowInputLatency;
 	//outLatency = Pa_GetDeviceInfo( outDevIdx )->defaultLowOutputLatency;
-	const int samples = mixer()->framesPerPeriod();
+	const int samples = audioEngine()->framesPerPeriod();
 	
 	// Configure output parameters.
 	m_outputParameters.device = outDevIdx;
 	m_outputParameters.channelCount = channels();
 	m_outputParameters.sampleFormat = paFloat32; // 32 bit floating point output
 	m_outputParameters.suggestedLatency = outLatency;
-	m_outputParameters.hostApiSpecificStreamInfo = NULL;
+	m_outputParameters.hostApiSpecificStreamInfo = nullptr;
 	
 	// Configure input parameters.
 	m_inputParameters.device = inDevIdx;
 	m_inputParameters.channelCount = DEFAULT_CHANNELS;
 	m_inputParameters.sampleFormat = paFloat32; // 32 bit floating point input
 	m_inputParameters.suggestedLatency = inLatency;
-	m_inputParameters.hostApiSpecificStreamInfo = NULL;
+	m_inputParameters.hostApiSpecificStreamInfo = nullptr;
 	
 	// Open an audio I/O stream. 
 	err = Pa_OpenStream(
 			&m_paStream,
-			supportsCapture() ? &m_inputParameters : NULL,	// The input parameter
+			supportsCapture() ? &m_inputParameters : nullptr,	// The input parameter
 			&m_outputParameters,	// The outputparameter
 			sampleRate(),
 			samples,
@@ -151,7 +160,7 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, Mixer * _mixer ) :
 		setSampleRate( 48000 );
 		err = Pa_OpenStream(
 				&m_paStream,
-				supportsCapture() ? &m_inputParameters : NULL,	// The input parameter
+				supportsCapture() ? &m_inputParameters : nullptr,	// The input parameter
 				&m_outputParameters,	// The outputparameter
 				sampleRate(),
 				samples,
@@ -169,7 +178,7 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, Mixer * _mixer ) :
 	printf( "Input device: '%s' backend: '%s'\n", Pa_GetDeviceInfo( inDevIdx )->name, Pa_GetHostApiInfo( Pa_GetDeviceInfo( inDevIdx )->hostApi )->name );
 	printf( "Output device: '%s' backend: '%s'\n", Pa_GetDeviceInfo( outDevIdx )->name, Pa_GetHostApiInfo( Pa_GetDeviceInfo( outDevIdx )->hostApi )->name );
 
-	// TODO: debug Mixer::pushInputFrames()
+	// TODO: debug AudioEngine::pushInputFrames()
 	//m_supportsCapture = true;
 
 	_success_ful = true;
@@ -229,12 +238,12 @@ void AudioPortAudio::applyQualitySettings()
 	if( hqAudio() )
 	{
 
-		setSampleRate( Engine::mixer()->processingSampleRate() );
-		int samples = mixer()->framesPerPeriod();
+		setSampleRate( Engine::audioEngine()->processingSampleRate() );
+		int samples = audioEngine()->framesPerPeriod();
 
 		PaError err = Pa_OpenStream(
 			&m_paStream,
-			supportsCapture() ? &m_inputParameters : NULL,	// The input parameter
+			supportsCapture() ? &m_inputParameters : nullptr,	// The input parameter
 			&m_outputParameters,	// The outputparameter
 			sampleRate(),
 			samples,
@@ -261,8 +270,7 @@ int AudioPortAudio::process_callback(
 {
 	if( supportsCapture() )
 	{
-		mixer()->pushInputFrames( (sampleFrame*)_inputBuffer,
-												_framesPerBuffer );
+		audioEngine()->pushInputFrames( (sampleFrame*)_inputBuffer, _framesPerBuffer );
 	}
 
 	if( m_stopped )
@@ -290,14 +298,14 @@ int AudioPortAudio::process_callback(
 		const int min_len = qMin( (int)_framesPerBuffer,
 			m_outBufSize - m_outBufPos );
 
-		float master_gain = mixer()->masterGain();
+		float master_gain = audioEngine()->masterGain();
 
 		for( fpp_t frame = 0; frame < min_len; ++frame )
 		{
 			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 			{
 				( _outputBuffer + frame * channels() )[chnl] =
-						Mixer::clip( m_outBuf[frame][chnl] *
+						AudioEngine::clip( m_outBuf[frame][chnl] *
 						master_gain );
 			}
 		}
@@ -324,7 +332,7 @@ int AudioPortAudio::_process_callback(
 	Q_UNUSED(_timeInfo);
 	Q_UNUSED(_statusFlags);
 
-	AudioPortAudio * _this  = static_cast<AudioPortAudio *> (_arg);
+	auto _this = static_cast<AudioPortAudio*>(_arg);
 	return _this->process_callback( (const float*)_inputBuffer,
 		(float*)_outputBuffer, _framesPerBuffer );
 }
@@ -409,17 +417,19 @@ void AudioPortAudioSetupUtil::updateChannels()
 AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	AudioDeviceSetupWidget( AudioPortAudio::name(), _parent )
 {
+	using gui::ComboBox;
+
 	m_backend = new ComboBox( this, "BACKEND" );
 	m_backend->setGeometry( 64, 15, 260, ComboBox::DEFAULT_HEIGHT );
 
-	QLabel * backend_lbl = new QLabel( tr( "Backend" ), this );
+	auto backend_lbl = new QLabel(tr("Backend"), this);
 	backend_lbl->setFont( pointSize<7>( backend_lbl->font() ) );
 	backend_lbl->move( 8, 18 );
 
 	m_device = new ComboBox( this, "DEVICE" );
 	m_device->setGeometry( 64, 35, 260, ComboBox::DEFAULT_HEIGHT );
 
-	QLabel * dev_lbl = new QLabel( tr( "Device" ), this );
+	auto dev_lbl = new QLabel(tr("Device"), this);
 	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
 	dev_lbl->move( 8, 38 );
 	
@@ -434,11 +444,11 @@ AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	m_channels->setLabel( tr( "Channels" ) );
 	m_channels->move( 308, 20 );*/
 
-	connect( &m_setupUtil.m_backendModel, SIGNAL( dataChanged() ),
-			&m_setupUtil, SLOT( updateDevices() ) );
+	connect( &m_setupUtil.m_backendModel, SIGNAL(dataChanged()),
+			&m_setupUtil, SLOT(updateDevices()));
 			
-	connect( &m_setupUtil.m_deviceModel, SIGNAL( dataChanged() ),
-			&m_setupUtil, SLOT( updateChannels() ) );
+	connect( &m_setupUtil.m_deviceModel, SIGNAL(dataChanged()),
+			&m_setupUtil, SLOT(updateChannels()));
 			
 	m_backend->setModel( &m_setupUtil.m_backendModel );
 	m_device->setModel( &m_setupUtil.m_deviceModel );
@@ -449,11 +459,11 @@ AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 
 AudioPortAudio::setupWidget::~setupWidget()
 {
-	disconnect( &m_setupUtil.m_backendModel, SIGNAL( dataChanged() ),
-			&m_setupUtil, SLOT( updateDevices() ) );
+	disconnect( &m_setupUtil.m_backendModel, SIGNAL(dataChanged()),
+			&m_setupUtil, SLOT(updateDevices()));
 			
-	disconnect( &m_setupUtil.m_deviceModel, SIGNAL( dataChanged() ),
-			&m_setupUtil, SLOT( updateChannels() ) );
+	disconnect( &m_setupUtil.m_deviceModel, SIGNAL(dataChanged()),
+			&m_setupUtil, SLOT(updateChannels()));
 }
 
 
@@ -498,8 +508,10 @@ void AudioPortAudio::setupWidget::show()
 	AudioDeviceSetupWidget::show();
 }
 
+} // namespace lmms
 
-#endif
+
+#endif // LMMS_HAVE_PORTAUDIO
 
 
 

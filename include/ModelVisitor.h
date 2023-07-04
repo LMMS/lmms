@@ -22,8 +22,12 @@
  *
  */
 
-#ifndef MODELVISITOR_H
-#define MODELVISITOR_H
+#ifndef LMMS_MODEL_VISITOR_H
+#define LMMS_MODEL_VISITOR_H
+
+namespace lmms
+{
+
 
 class AutomatableModel;
 class BoolModel;
@@ -43,7 +47,7 @@ public:
 	virtual void visit(FloatModel& m);
 	virtual void visit(ComboBoxModel& m);
 	virtual void visit(TempoSyncKnobModel& m);
-	virtual ~ModelVisitor();
+	virtual ~ModelVisitor() = default;
 };
 
 class ConstModelVisitor
@@ -58,7 +62,10 @@ public:
 	virtual void visit(const FloatModel& m);
 	virtual void visit(const ComboBoxModel& m);
 	virtual void visit(const TempoSyncKnobModel& m);
-	virtual ~ConstModelVisitor();
+	virtual ~ConstModelVisitor() = default;
 };
 
-#endif // MODELVISITOR_H
+
+} // namespace lmms
+
+#endif // LMMS_MODEL_VISITOR_H

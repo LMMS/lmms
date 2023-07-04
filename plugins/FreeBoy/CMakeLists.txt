@@ -4,8 +4,8 @@ INCLUDE_DIRECTORIES(game-music-emu/gme)
 BUILD_PLUGIN(freeboy
 	FreeBoy.cpp
 	FreeBoy.h
-	Gb_Apu_Buffer.cpp
-	Gb_Apu_Buffer.h
+	GbApuWrapper.cpp
+	GbApuWrapper.h
 	game-music-emu/gme/Gb_Apu.cpp
 	game-music-emu/gme/Gb_Apu.h
 	game-music-emu/gme/Gb_Oscs.cpp

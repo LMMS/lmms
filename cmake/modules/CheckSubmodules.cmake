@@ -7,7 +7,7 @@
 #       INCLUDE(CheckSubmodules)
 #
 # Options:
-#       SET(PLUGIN_LIST "zynaddsubfx;...") # skips submodules for plugins not explicitely listed
+#       SET(PLUGIN_LIST "ZynAddSubFx;...") # skips submodules for plugins not explicitely listed
 #
 # Or via command line:       
 #       cmake -PLUGIN_LIST=foo;bar
@@ -18,7 +18,7 @@
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
 # Files which confirm a successful clone
-SET(VALID_CRUMBS "CMakeLists.txt;Makefile;Makefile.in;Makefile.am;configure.ac;configure.py;autogen.sh;.gitignore;LICENSE;Home.md")
+SET(VALID_CRUMBS "CMakeLists.txt;Makefile;Makefile.in;Makefile.am;configure.ac;configure.py;autogen.sh;.gitignore;LICENSE;Home.md;license.txt")
 
 OPTION(NO_SHALLOW_CLONE "Disable shallow cloning of submodules" OFF)
 

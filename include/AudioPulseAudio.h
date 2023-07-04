@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_PULSEAUDIO_H
-#define AUDIO_PULSEAUDIO_H
+#ifndef LMMS_AUDIO_PULSEAUDIO_H
+#define LMMS_AUDIO_PULSEAUDIO_H
 
 #include "lmmsconfig.h"
 
@@ -36,17 +36,23 @@
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
 
-
-class LcdSpinBox;
 class QLineEdit;
+
+namespace lmms
+{
+
+namespace gui
+{
+class LcdSpinBox;
+}
 
 
 class AudioPulseAudio : public QThread, public AudioDevice
 {
 	Q_OBJECT
 public:
-	AudioPulseAudio( bool & _success_ful, Mixer* mixer );
-	virtual ~AudioPulseAudio();
+	AudioPulseAudio( bool & _success_ful, AudioEngine* audioEngine );
+	~AudioPulseAudio() override;
 
 	inline static QString name()
 	{
@@ -56,17 +62,17 @@ public:
 	static QString probeDevice();
 
 
-	class setupWidget : public AudioDeviceSetupWidget
+	class setupWidget : public gui::AudioDeviceSetupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );
-		virtual ~setupWidget();
+		~setupWidget() override;
 
 		void saveSettings() override;
 
 	private:
 		QLineEdit * m_device;
-		LcdSpinBox * m_channels;
+		gui::LcdSpinBox * m_channels;
 
 	} ;
 
@@ -94,6 +100,8 @@ private:
 
 } ;
 
-#endif
+} // namespace lmms
 
-#endif
+#endif // LMMS_HAVE_PULSEAUDIO
+
+#endif // LMMS_AUDIO_PULSEAUDIO_H

@@ -28,10 +28,11 @@
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "Engine.h"
-#include "ToolTip.h"
 #include "Song.h"
 
 
+namespace lmms::gui
+{
 
 TimeDisplayWidget::TimeDisplayWidget() :
 	QWidget(),
@@ -42,20 +43,20 @@ TimeDisplayWidget::TimeDisplayWidget() :
 	m_milliSecondsLCD( 3, this )
 {
 	m_spinBoxesLayout.setSpacing( 0 );
-	m_spinBoxesLayout.setMargin( 0 );
+	m_spinBoxesLayout.setContentsMargins(0, 0, 0, 0);
 	m_spinBoxesLayout.addWidget( &m_majorLCD );
 	m_spinBoxesLayout.addWidget( &m_minorLCD );
 	m_spinBoxesLayout.addWidget( &m_milliSecondsLCD );
 
 	setMaximumHeight( 32 );
 
-	ToolTip::add( this, tr( "Time units" ) );
+	setToolTip(tr("Time units"));
 
 	// update labels of LCD spinboxes
 	setDisplayMode( m_displayMode );
 
-	connect( gui->mainWindow(), SIGNAL( periodicUpdate() ),
-					this, SLOT( updateTime() ) );
+	connect( getGUI()->mainWindow(), SIGNAL(periodicUpdate()),
+					this, SLOT(updateTime()));
 }
 
 void TimeDisplayWidget::setDisplayMode( DisplayMode displayMode )
@@ -128,3 +129,5 @@ void TimeDisplayWidget::mousePressEvent( QMouseEvent* mouseEvent )
 		}
 	}
 }
+
+} // namespace lmms::gui

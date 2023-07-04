@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_ALSA_H
-#define AUDIO_ALSA_H
+#ifndef LMMS_AUDIO_ALSA_H
+#define LMMS_AUDIO_ALSA_H
 
 #include "lmmsconfig.h"
 
@@ -37,6 +37,8 @@
 
 #include "AudioDevice.h"
 
+namespace lmms
+{
 
 class AudioAlsa : public QThread, public AudioDevice
 {
@@ -52,7 +54,7 @@ public:
 			m_deviceName(deviceName),
 			m_deviceDescription(deviceDescription)
 		{}
-		~DeviceInfo() {}
+		~DeviceInfo() = default;
 
 		QString const & getDeviceName() const { return m_deviceName; }
 		QString const & getDeviceDescription() const { return m_deviceDescription; }
@@ -63,11 +65,11 @@ public:
 
 	};
 
-	typedef std::vector<DeviceInfo> DeviceInfoCollection;
+	using DeviceInfoCollection = std::vector<DeviceInfo>;
 
 public:
-	AudioAlsa( bool & _success_ful, Mixer* mixer );
-	virtual ~AudioAlsa();
+	AudioAlsa( bool & _success_ful, AudioEngine* audioEngine );
+	~AudioAlsa() override;
 
 	inline static QString name()
 	{
@@ -102,6 +104,8 @@ private:
 
 } ;
 
-#endif
+} // namespace lmms
 
-#endif
+#endif // LMMS_HAVE_ALSA
+
+#endif // LMMS_AUDIO_ALSA_H

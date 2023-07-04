@@ -71,13 +71,7 @@ SET(CPACK_NSIS_MUI_ICON                 "${CPACK_NSIS_MUI_ICON}" PARENT_SCOPE)
 
 # Windows resource compilers
 CONFIGURE_FILE("lmms.rc.in"             "${CMAKE_BINARY_DIR}/lmms.rc")
-CONFIGURE_FILE("zynaddsubfx.rc.in"      "${CMAKE_BINARY_DIR}/plugins/zynaddsubfx/zynaddsubfx.rc")
-
-IF(LMMS_HAVE_STK)
-	FILE(GLOB RAWWAVES "${MINGW_PREFIX}/share/stk/rawwaves/*.raw")
-	LIST(SORT RAWWAVES)
-	INSTALL(FILES ${RAWWAVES} DESTINATION "${DATA_DIR}/stk/rawwaves")
-ENDIF()
+CONFIGURE_FILE("zynaddsubfx.rc.in"      "${CMAKE_BINARY_DIR}/plugins/ZynAddSubFx/zynaddsubfx.rc")
 
 INSTALL(FILES "lmms.exe.manifest" DESTINATION .)
 INSTALL(FILES "lmms.VisualElementsManifest.xml" DESTINATION .)

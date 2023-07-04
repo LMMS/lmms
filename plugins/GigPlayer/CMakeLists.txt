@@ -2,11 +2,6 @@ if(LMMS_HAVE_GIG)
 	INCLUDE(BuildPlugin)
 	INCLUDE_DIRECTORIES(${GIG_INCLUDE_DIRS})
 
-	# Disable C++11 on Clang until gig.h is patched
-	IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-		SET(CMAKE_CXX_STANDARD 98)
-	ENDIF()
-
 	# Required for not crashing loading files with libgig
 	SET(GCC_COVERAGE_COMPILE_FLAGS "-fexceptions")
 	add_definitions(${GCC_COVERAGE_COMPILE_FLAGS})

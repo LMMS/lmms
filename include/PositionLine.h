@@ -23,10 +23,13 @@
  *
  */
 
-#ifndef POSITION_LINE_H
-#define POSITION_LINE_H
+#ifndef LMMS_GUI_POSITION_LINE_H
+#define LMMS_GUI_POSITION_LINE_H
 
 #include <QWidget>
+
+namespace lmms::gui
+{
 
 class PositionLine : public QWidget
 {
@@ -37,7 +40,7 @@ public:
 	PositionLine(QWidget* parent);
 
 public slots:
-	void zoomChange(double zoom);
+	void zoomChange(float zoom);
 
 private:
 	void paintEvent(QPaintEvent* pe) override;
@@ -46,4 +49,6 @@ private:
 	QColor m_lineColor;
 };
 
-#endif
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_POSITION_LINE_H

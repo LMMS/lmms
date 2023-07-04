@@ -30,6 +30,10 @@
 #include "SaProcessor.h"
 #include "LocklessRingBuffer.h"
 
+namespace lmms
+{
+
+
 class DataprocLauncher : public QThread
 {
 public:
@@ -48,5 +52,8 @@ private:
 	SaProcessor *m_processor;
 	LocklessRingBuffer<sampleFrame> *m_inputBuffer;
 };
+
+
+} // namespace lmms
 
 #endif // DATAPROCLAUNCHER_H

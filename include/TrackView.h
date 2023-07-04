@@ -22,10 +22,8 @@
  *
  */
 
-
-
-#ifndef TRACK_VIEW_H
-#define TRACK_VIEW_H
+#ifndef LMMS_GUI_TRACK_VIEW_H
+#define LMMS_GUI_TRACK_VIEW_H
 
 #include <QWidget>
 
@@ -34,13 +32,20 @@
 #include "TrackContentWidget.h"
 #include "TrackOperationsWidget.h"
 
-
 class QMenu;
 
-class FadeButton;
+namespace lmms
+{
+
 class Track;
+class Clip;
+
+
+namespace gui
+{
+
+class FadeButton;
 class TrackContainerView;
-class TrackContentObject;
 
 
 const int DEFAULT_SETTINGS_WIDGET_WIDTH = 224;
@@ -50,15 +55,13 @@ const int TRACK_OP_WIDTH = 78;
 const int DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT = 96;
 const int TRACK_OP_WIDTH_COMPACT = 62;
 
-const int TCO_BORDER_WIDTH = 2;
-
 
 class TrackView : public QWidget, public ModelView, public JournallingObject
 {
 	Q_OBJECT
 public:
 	TrackView( Track * _track, TrackContainerView* tcv );
-	virtual ~TrackView();
+	~TrackView() override = default;
 
 	inline const Track * getTrack() const
 	{
@@ -99,7 +102,7 @@ public:
 
 	// Create a menu for assigning/creating channels for this track
 	// Currently instrument track and sample track supports it
-	virtual QMenu * createFxMenu(QString title, QString newFxLabel);
+	virtual QMenu * createMixerMenu(QString title, QString newMixerLabel);
 
 
 public slots:
@@ -163,11 +166,14 @@ private:
 
 
 private slots:
-	void createTCOView( TrackContentObject * tco );
+	void createClipView( lmms::Clip * clip );
 	void muteChanged();
 
 } ;
 
 
+} // namespace gui
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_GUI_TRACK_VIEW_H
