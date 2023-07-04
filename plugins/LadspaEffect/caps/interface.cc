@@ -127,6 +127,9 @@ void caps_so_fini()
 
 /* /////////////////////////////////////////////////////////////////////// */
 
+#ifdef _MSC_VER
+__declspec(dllexport)
+#endif
 const LADSPA_Descriptor *
 ladspa_descriptor (unsigned long i)
 {
