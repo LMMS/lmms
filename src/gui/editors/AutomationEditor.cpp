@@ -673,7 +673,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 			}
 			case EDIT_TANGENTS:
 			{
-				if (m_clip->progressionType() == AutomationClip::CubicHermiteProgression)
+				if (m_clip->canEditTangents())
 				{
 					m_clip->addJournalCheckPoint();
 
@@ -1348,8 +1348,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				// Draw circle
 				drawAutomationPoint(p, it);
 				// Draw tangents if necessary (only for manually edited tangents)
-				if (m_clip->progressionType() == AutomationClip::CubicHermiteProgression
-					&& LOCKEDTAN(it))
+				if (m_clip->canEditTangents() && LOCKEDTAN(it))
 				{
 					drawAutomationTangents(p, it);
 				}
@@ -1370,8 +1369,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			// Draw circle(the last one)
 			drawAutomationPoint(p, it);
 			// Draw tangents if necessary (only for manually edited tangents)
-			if (m_clip->progressionType() == AutomationClip::CubicHermiteProgression
-				&& LOCKEDTAN(it))
+			if (m_clip->canEditTangents() && LOCKEDTAN(it))
 			{
 				drawAutomationTangents(p, it);
 			}
@@ -2343,7 +2341,7 @@ void AutomationEditorWindow::updateWindowTitle()
  */
 void AutomationEditorWindow::setProgressionType(int progType)
 {
-	if (progType != AutomationClip::CubicHermiteProgression)
+	if (!AutomationClip::supportsTangentEditing(static_cast<AutomationClip::ProgressionTypes>(progType)))
 	{
 		if (m_editTanAction->isChecked()) { m_drawAction->trigger(); }
 		if (m_editTanAction->isEnabled()) { m_editTanAction->setEnabled(false); }

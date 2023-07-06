@@ -154,6 +154,17 @@ public:
 		return m_timeMap.isEmpty() == false;
 	}
 
+	static bool supportsTangentEditing(ProgressionTypes pType)
+	{
+		// Update function if we have new progression types that support tangent editing
+		return pType == CubicHermiteProgression;
+	}
+
+	inline bool canEditTangents() const
+	{
+		return supportsTangentEditing(m_progressionType);
+	}
+
 	float valueAt( const TimePos & _time ) const;
 	float *valuesAfter( const TimePos & _time ) const;
 
