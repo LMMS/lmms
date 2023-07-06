@@ -1,5 +1,5 @@
-#ifndef VERSION_INFO_H
-#define VERSION_INFO_H
+#ifndef LMMS_VERSION_INFO_H
+#define LMMS_VERSION_INFO_H
 
 #include "lmms_basics.h"
 
@@ -51,4 +51,4 @@ constexpr const char* LMMS_BUILDCONF_PLATFORM = "win32";
 constexpr const char* LMMS_BUILDCONF_PLATFORM = "Haiku";
 #endif
 
-#endif
+#endif // LMMS_VERSION_INFO_H

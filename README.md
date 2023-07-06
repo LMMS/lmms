@@ -6,8 +6,6 @@
 [![Join the chat at Discord](https://img.shields.io/badge/chat-on%20discord-7289DA.svg)](https://discord.gg/3sc5su7)
 [![Localise on transifex](https://img.shields.io/badge/localise-on_transifex-green.svg)](https://www.transifex.com/lmms/lmms/)
 
-**New PRs may be affected by ongoing reorganization ([#5592](https://github.com/LMMS/lmms/issues/5592)). Please be prepared to rebase your PR as necessary.**
-
 What is LMMS?
 --------------
 

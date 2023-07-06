@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef SONG_H
-#define SONG_H
+#ifndef LMMS_SONG_H
+#define LMMS_SONG_H
 
 #include <memory>
 
@@ -283,7 +283,6 @@ public:
 
 
 	bpm_t getTempo();
-	AutomationClip * tempoAutomationClip() override;
 
 	AutomationTrack * globalAutomationTrack()
 	{
@@ -350,6 +349,11 @@ public:
 	MeterModel & getTimeSigModel()
 	{
 		return m_timeSigModel;
+	}
+
+	IntModel& tempoModel()
+	{
+		return m_tempoModel;
 	}
 
 	void exportProjectMidi(QString const & exportFileName) const;
@@ -528,4 +532,4 @@ signals:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_SONG_H

@@ -60,9 +60,9 @@ TabWidget::TabWidget(const QString & caption, QWidget * parent, bool usePixmap,
 	setFont( pointSize<8>( font() ) );
 
 	setAutoFillBackground( true );
-	QColor bg_color = QApplication::palette().color( QPalette::Active, QPalette::Background ). darker( 132 );
+	QColor bg_color = QApplication::palette().color( QPalette::Active, QPalette::Window ). darker( 132 );
 	QPalette pal = palette();
-	pal.setColor( QPalette::Background, bg_color );
+	pal.setColor( QPalette::Window, bg_color );
 	setPalette( pal );
 
 }

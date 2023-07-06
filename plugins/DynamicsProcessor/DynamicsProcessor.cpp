@@ -105,17 +105,17 @@ bool DynProcEffect::processAudioBuffer( sampleFrame * _buf,
 // variables for effect
 	int i = 0;
 
-	float sm_peak[2] = { 0.0f, 0.0f };
+	auto sm_peak = std::array{0.0f, 0.0f};
 	float gain;
 
 	double out_sum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
-	
+
 	const int stereoMode = m_dpControls.m_stereomodeModel.value();
 	const float inputGain = m_dpControls.m_inputModel.value();
 	const float outputGain = m_dpControls.m_outputModel.value();
-	
+
 	const float * samples = m_dpControls.m_wavegraphModel.samples();
 
 // debug code
@@ -143,7 +143,7 @@ bool DynProcEffect::processAudioBuffer( sampleFrame * _buf,
 
 	for( fpp_t f = 0; f < _frames; ++f )
 	{
-		double s[2] = { _buf[f][0], _buf[f][1] };
+		auto s = std::array{_buf[f][0], _buf[f][1]};
 
 // apply input gain
 		s[0] *= inputGain;
@@ -211,7 +211,7 @@ bool DynProcEffect::processAudioBuffer( sampleFrame * _buf,
 					gain = samples[199];
 				};
 
-				s[i] *= gain; 
+				s[i] *= gain;
 				s[i] /= sm_peak[i];
 			}
 		}

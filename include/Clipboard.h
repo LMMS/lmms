@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef CLIPBOARD_H
-#define CLIPBOARD_H
+#ifndef LMMS_CLIPBOARD_H
+#define LMMS_CLIPBOARD_H
 
 #include <QMap>
 #include <QDomElement>
@@ -68,4 +68,4 @@ namespace lmms::Clipboard
 
 } // namespace lmms::Clipboard
 
-#endif
+#endif // LMMS_CLIPBOARD_H

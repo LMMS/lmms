@@ -1,7 +1,8 @@
 /*
- * Gb_Apu_Buffer.cpp - Gb_Apu subclass which allows direct buffer access
- * Copyright (c) 2017 Tres Finocchiaro <tres.finocchiaro/at/gmail.com>
- * 
+ * DispersionControlDialog.h
+ *
+ * Copyright (c) 2023 Lost Robot <r94231/at/gmail/dot/com>
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -20,36 +21,32 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-#ifndef GB_APU_BUFFER_H
-#define GB_APU_BUFFER_H
 
-#include "Gb_Apu.h"
-#include "Multi_Buffer.h"
-#include "MemoryManager.h"
+#ifndef LMMS_GUI_DISPERSION_CONTROL_DIALOG_H
+#define LMMS_GUI_DISPERSION_CONTROL_DIALOG_H
+
+#include "EffectControlDialog.h"
 
 namespace lmms
 {
 
+class DispersionControls;
 
-class Gb_Apu_Buffer : public Gb_Apu {
-	MM_OPERATORS
+
+namespace gui
+{
+
+class DispersionControlDialog : public EffectControlDialog
+{
+	Q_OBJECT
 public:
-	Gb_Apu_Buffer() = default;
-	~Gb_Apu_Buffer() = default;
-
-	void end_frame(blip_time_t);
-
-	blargg_err_t set_sample_rate(long sample_rate, long clock_rate);
-	long samples_avail() const;
-	using sample_t = blip_sample_t;
-	long read_samples(sample_t* out, long count);
-	void bass_freq(int freq);
-private:
-	Stereo_Buffer m_buf;
+	DispersionControlDialog(DispersionControls* controls);
+	~DispersionControlDialog() override = default;
 };
 
 
+} // namespace gui
+
 } // namespace lmms
 
-#endif
-
+#endif // LMMS_GUI_DISPERSION_CONTROL_DIALOG_H

@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MIDI_CONTROLLER_H
-#define MIDI_CONTROLLER_H
+#ifndef LMMS_MIDI_CONTROLLER_H
+#define LMMS_MIDI_CONTROLLER_H
 
 #include <QWidget>
 
@@ -92,4 +92,4 @@ protected:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_MIDI_CONTROLLER_H

@@ -47,7 +47,7 @@ InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( Instrume
 	m_chordRangeKnob( new Knob( knobBright_26 ) )
 {
 	auto topLayout = new QHBoxLayout(this);
-	topLayout->setMargin( 0 );
+	topLayout->setContentsMargins(0, 0, 0, 0);
 	topLayout->addWidget( m_chordsGroupBox );
 
 	auto mainLayout = new QGridLayout(m_chordsGroupBox);
@@ -109,7 +109,7 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	m_arpModeComboBox( new ComboBox() )
 {
 	auto topLayout = new QHBoxLayout(this);
-	topLayout->setMargin( 0 );
+	topLayout->setContentsMargins(0, 0, 0, 0);
 	topLayout->addWidget( m_arpGroupBox );
 
 	auto mainLayout = new QGridLayout(m_arpGroupBox);

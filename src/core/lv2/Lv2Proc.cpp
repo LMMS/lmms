@@ -31,6 +31,7 @@
 #include <lv2/lv2plug.in/ns/ext/atom/atom.h>
 #include <lv2/lv2plug.in/ns/ext/resize-port/resize-port.h>
 #include <QDebug>
+#include <QDomDocument>
 #include <QtGlobal>
 
 #include "AudioEngine.h"
@@ -65,8 +66,8 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
 {
 	unsigned maxPorts = lilv_plugin_get_num_ports(plugin);
 	enum { inCount, outCount, maxCount };
-	unsigned audioChannels[maxCount] = { 0, 0 }; // audio input and output count
-	unsigned midiChannels[maxCount] = { 0, 0 }; // MIDI input and output count
+	auto audioChannels = std::array<unsigned, maxCount>{}; // audio input and output count
+	auto midiChannels = std::array<unsigned, maxCount>{}; // MIDI input and output count
 
 	const char* pluginUri = lilv_node_as_uri(lilv_plugin_get_uri(plugin));
 	//qDebug() << "Checking plugin" << pluginUri << "...";
@@ -175,6 +176,26 @@ Lv2Proc::~Lv2Proc() { shutdownPlugin(); }
 
 
 
+void Lv2Proc::reload()
+{
+	// save controls, which we want to keep
+	QDomDocument doc;
+	QDomElement controls = doc.createElement("controls");
+	saveValues(doc, controls);
+	// backup construction variables
+	const LilvPlugin* plugin = m_plugin;
+	Model* parent = Model::parentModel();
+	// destroy everything using RAII ...
+	this->~Lv2Proc();
+	// ... and reuse it ("placement new")
+	new (this) Lv2Proc(plugin, parent);
+	// reload the controls
+	loadValues(controls);
+}
+
+
+
+
 void Lv2Proc::dumpPorts()
 {
 	std::size_t num = 0;
@@ -247,11 +268,11 @@ void Lv2Proc::copyModelsFromCore()
 				ev.time.frames(Engine::framesPerTick()) + ev.offset;
 			uint32_t type = Engine::getLv2Manager()->
 				uridCache()[Lv2UridCache::Id::midi_MidiEvent];
-			uint8_t buf[4];
-			std::size_t bufsize = writeToByteSeq(ev.ev, buf, sizeof(buf));
+			auto buf = std::array<uint8_t, 4>{};
+			std::size_t bufsize = writeToByteSeq(ev.ev, buf.data(), buf.size());
 			if(bufsize)
 			{
-				lv2_evbuf_write(&iter, atomStamp, type, bufsize, buf);
+				lv2_evbuf_write(&iter, atomStamp, type, bufsize, buf.data());
 			}
 		}
 	}
@@ -424,7 +445,10 @@ void Lv2Proc::shutdownPlugin()
 		lilv_instance_deactivate(m_instance);
 		lilv_instance_free(m_instance);
 		m_instance = nullptr;
+
+		m_features.clear();
 	}
+	m_valid = true;
 }
 
 

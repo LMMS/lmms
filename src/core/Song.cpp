@@ -116,7 +116,7 @@ Song::Song() :
 /*	connect( &m_masterPitchModel, SIGNAL(dataChanged()),
 			this, SLOT(masterPitchChanged()));*/
 
-	qRegisterMetaType<Note>( "Note" );
+	qRegisterMetaType<lmms::Note>( "lmms::Note" );
 	setType( SongContainer );
 
 	for (auto& scale : m_scales) {scale = std::make_shared<Scale>();}
@@ -620,6 +620,7 @@ void Song::togglePause()
 	{
 		m_playing = false;
 		m_paused = true;
+		Engine::audioEngine()->clear();
 	}
 
 	m_vstSyncController.setPlaybackState( m_playing );
@@ -837,14 +838,6 @@ bpm_t Song::getTempo()
 }
 
 
-
-
-AutomationClip * Song::tempoAutomationClip()
-{
-	return AutomationClip::globalAutomationClip( &m_tempoModel );
-}
-
-
 AutomatedValueMap Song::automatedValuesAt(TimePos time, int clipNum) const
 {
 	return TrackContainer::automatedValuesFromTracks(TrackList{m_globalAutomationTrack} << tracks(), time, clipNum);
@@ -1051,7 +1044,12 @@ void Song::loadProject( const QString & fileName )
 			else
 			{
 				QTextStream(stderr) << tr("Can't load project: "
-					"Project file contains local paths to plugins.") << endl;
+					"Project file contains local paths to plugins.")
+#if (QT_VERSION >= QT_VERSION_CHECK(5,15,0))
+					<< Qt::endl;
+#else
+					<< endl;
+#endif
 			}
 		}
 	}

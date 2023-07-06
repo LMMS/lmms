@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef REMOTE_PLUGIN_CLIENT_H
-#define REMOTE_PLUGIN_CLIENT_H
+#ifndef LMMS_REMOTE_PLUGIN_CLIENT_H
+#define LMMS_REMOTE_PLUGIN_CLIENT_H
 
 #include "RemotePluginBase.h"
 
@@ -355,4 +355,4 @@ void RemotePluginClient::doProcessing()
 
 } // namespace lmms
 
-#endif // REMOTE_PLUGIN_CLIENT_H
+#endif // LMMS_REMOTE_PLUGIN_CLIENT_H

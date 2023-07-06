@@ -89,19 +89,27 @@ const std::vector<ProjectVersion> DataFile::UPGRADE_VERSIONS = {
 	"1.2.0-rc3"        ,   "1.3.0"
 };
 
-DataFile::typeDescStruct
-		DataFile::s_types[DataFile::TypeCount] =
+namespace
 {
-	{ DataFile::UnknownType, "unknown" },
-	{ DataFile::SongProject, "song" },
-	{ DataFile::SongProjectTemplate, "songtemplate" },
-	{ DataFile::InstrumentTrackSettings, "instrumenttracksettings" },
-	{ DataFile::DragNDropData, "dnddata" },
-	{ DataFile::ClipboardData, "clipboard-data" },
-	{ DataFile::JournalData, "journaldata" },
-	{ DataFile::EffectSettings, "effectsettings" },
-	{ DataFile::MidiClip, "midiclip" }
-} ;
+	struct TypeDescStruct
+	{
+		DataFile::Type m_type;
+		QString m_name;
+	};
+
+	const auto s_types = std::array<TypeDescStruct, DataFile::TypeCount>
+	{
+		TypeDescStruct{ DataFile::UnknownType, "unknown" },
+		TypeDescStruct{ DataFile::SongProject, "song" },
+		TypeDescStruct{ DataFile::SongProjectTemplate, "songtemplate" },
+		TypeDescStruct{ DataFile::InstrumentTrackSettings, "instrumenttracksettings" },
+		TypeDescStruct{ DataFile::DragNDropData, "dnddata" },
+		TypeDescStruct{ DataFile::ClipboardData, "clipboard-data" },
+		TypeDescStruct{ DataFile::JournalData, "journaldata" },
+		TypeDescStruct{ DataFile::EffectSettings, "effectsettings" },
+		TypeDescStruct{ DataFile::MidiClip, "midiclip" }
+	};
+}
 
 
 
@@ -1314,44 +1322,32 @@ void DataFile::upgrade_1_3_0()
 					// Effect name changes
 
 					QDomElement attribute = attributes.item( k ).toElement();
-					if( attribute.attribute( "name" ) == "file" &&
-							( attribute.attribute( "value" ) == "calf" ||
-							attribute.attribute( "value" ) == "calf.so" ) )
+					const QString attrName = attribute.attribute("name");
+					const QString attrVal = attribute.attribute("value");
+					const QString plugin = attrName == "plugin" ? attrVal : "";
+
+					static const std::map<QString, QString> pluginNames = {
+						{"Sidechaincompressor", "SidechainCompressor"},
+						{"Sidechaingate", "SidechainGate"},
+						{"Multibandcompressor", "MultibandCompressor"},
+						{"Multibandgate", "MultibandGate"},
+						{"Multibandlimiter", "MultibandLimiter"},
+					};
+
+					if (attrName == "file" && (attrVal == "calf" || attrVal == "calf.so" ))
 					{
 						attribute.setAttribute( "value", "veal" );
 					}
-					else if( attribute.attribute( "name" ) == "plugin" &&
-							attribute.attribute( "value" ) == "Sidechaincompressor" )
+
+					const auto newName = pluginNames.find(plugin);
+					if (newName != pluginNames.end())
 					{
-						attribute.setAttribute( "value", "SidechainCompressor" );
-					}
-					else if( attribute.attribute( "name" ) == "plugin" &&
-							attribute.attribute( "value" ) == "Sidechaingate" )
-					{
-						attribute.setAttribute( "value", "SidechainGate" );
-					}
-					else if( attribute.attribute( "name" ) == "plugin" &&
-							attribute.attribute( "value" ) == "Multibandcompressor" )
-					{
-						attribute.setAttribute( "value", "MultibandCompressor" );
-					}
-					else if( attribute.attribute( "name" ) == "plugin" &&
-							attribute.attribute( "value" ) == "Multibandgate" )
-					{
-						attribute.setAttribute( "value", "MultibandGate" );
-					}
-					else if( attribute.attribute( "name" ) == "plugin" &&
-							attribute.attribute( "value" ) == "Multibandlimiter" )
-					{
-						attribute.setAttribute( "value", "MultibandLimiter" );
+						attribute.setAttribute("value", newName->second);
 					}
 
 					// Handle port changes
 
-					if( attribute.attribute( "name" ) == "plugin" &&
-							( attribute.attribute( "value" ) == "MultibandLimiter" ||
-							attribute.attribute( "value" ) == "MultibandCompressor" ||
-							attribute.attribute( "value" ) == "MultibandGate" ) )
+					if (plugin == "MultibandLimiter" ||	plugin == "MultibandCompressor" || plugin == "MultibandGate")
 					{
 						auto fn = [&](QDomElement& port, int num, QList<QDomElement>&, QList<QDomElement>& removeList)
 						{
@@ -1372,8 +1368,7 @@ void DataFile::upgrade_1_3_0()
 						iterate_ladspa_ports(effect, fn);
 					}
 
-					if( attribute.attribute( "name" ) == "plugin" &&
-							( attribute.attribute( "value" ) == "Pulsator" ) )
+					else if (plugin == "Pulsator")
 					{
 						auto fn = [&](QDomElement& port, int num, QList<QDomElement>& addList, QList<QDomElement>& removeList)
 						{
@@ -1416,9 +1411,7 @@ void DataFile::upgrade_1_3_0()
 						iterate_ladspa_ports(effect, fn);
 					}
 
-
-					if( attribute.attribute( "name" ) == "plugin" &&
-							( attribute.attribute( "value" ) == "VintageDelay" ) )
+					else if (plugin == "VintageDelay")
 					{
 						auto fn = [&](QDomElement& port, int num, QList<QDomElement>& addList, QList<QDomElement>& )
 						{
@@ -1455,23 +1448,20 @@ void DataFile::upgrade_1_3_0()
 						iterate_ladspa_ports(effect, fn);
 					}
 
-					if( attribute.attribute( "name" ) == "plugin" &&
-						(	   ( attribute.attribute( "value" ) == "Equalizer5Band" )
-							|| ( attribute.attribute( "value" ) == "Equalizer8Band" )
-							|| ( attribute.attribute( "value" ) == "Equalizer12Band" ) ) )
+					else if (plugin == "Equalizer5Band" || plugin == "Equalizer8Band" || plugin == "Equalizer12Band")
 					{
 						// NBand equalizers got 4 q nobs inserted. We need to shift everything else...
 						// HOWEVER: 5 band eq has only 2 q nobs inserted (no LS/HS filters)
-						bool band5 = ( attribute.attribute( "value" ) == "Equalizer5Band" );
+						bool band5 = plugin == "Equalizer5Band";
 						auto fn = [&](QDomElement& port, int num, QList<QDomElement>& addList, QList<QDomElement>& )
 						{
 							if(num == 4)
 							{
 								// don't modify port 4, but some other ones:
 								int zoom_port;
-								if(attribute.attribute( "value" ) == "Equalizer5Band")
+								if (plugin == "Equalizer5Band")
 									zoom_port = 36;
-								else if(attribute.attribute( "value" ) == "Equalizer8Band")
+								else if (plugin == "Equalizer8Band")
 									zoom_port = 48;
 								else // 12 band
 									zoom_port = 64;
@@ -1552,8 +1542,7 @@ void DataFile::upgrade_1_3_0()
 						iterate_ladspa_ports(effect, fn);
 					}
 
-					if( attribute.attribute( "name" ) == "plugin" &&
-						attribute.attribute( "value" ) == "Saturator" )
+					else if (plugin == "Saturator")
 					{
 						auto fn = [&](QDomElement& port, int num, QList<QDomElement>&, QList<QDomElement>& )
 						{
@@ -1580,8 +1569,7 @@ void DataFile::upgrade_1_3_0()
 						iterate_ladspa_ports(effect, fn);
 					}
 
-					if( attribute.attribute( "name" ) == "plugin" &&
-						attribute.attribute( "value" ) == "StereoTools" )
+					else if (plugin == "StereoTools")
 					{
 						auto fn = [&](QDomElement& port, int num, QList<QDomElement>&, QList<QDomElement>& )
 						{
@@ -1593,6 +1581,29 @@ void DataFile::upgrade_1_3_0()
 							if( num == 23 || num == 25 )
 							{
 								port.setAttribute("data", 1.0f);
+							}
+						};
+						iterate_ladspa_ports(effect, fn);
+					}
+
+					else if (plugin == "amPitchshift")
+					{
+						auto fn = [&](QDomElement& port, int num, QList<QDomElement>&, QList<QDomElement>& removeList)
+						{
+							switch (num)
+							{
+							case 0:
+								port.setTagName("port01");
+								break;
+							case 1:
+								port.setTagName("port03");
+								break;
+							case 10:
+								port.setTagName("port11");
+								break;
+							case 11:
+								port.setTagName("port13");
+								break;
 							}
 						};
 						iterate_ladspa_ports(effect, fn);

@@ -213,7 +213,7 @@ SongEditor::SongEditor( Song * song ) :
 	// create widget for oscilloscope- and cpu-load-widget
 	auto vc_w = new QWidget(tb);
 	auto vcw_layout = new QVBoxLayout(vc_w);
-	vcw_layout->setMargin( 0 );
+	vcw_layout->setContentsMargins(0, 0, 0, 0);
 	vcw_layout->setSpacing( 0 );
 
 	vcw_layout->addStretch();
