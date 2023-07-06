@@ -200,15 +200,8 @@ SET(QT_QTTEST_LIBRARY Qt5::Test)
 
 # check for libsndfile
 FIND_PACKAGE(SndFile REQUIRED)
-IF(SNDFILE_FOUND)
-  IF(SNDFILE_VERSION VERSION_GREATER_EQUAL 1.1.0)
-    SET(LMMS_SNDFILE_MP3 TRUE)
-  ELSE()
-    MESSAGE("libsndfile version is < 1.1.0; MP3 import disabled")
-    SET(LMMS_SNDFILE_MP3 FALSE)
-  ENDIF()
-ELSE()
-  MESSAGE(FATAL_ERROR "LMMS requires libsndfile1 and libsndfile1-dev >= 1.0.18 - please install, remove CMakeCache.txt and try again!")
+IF(NOT SNDFILE_FOUND)
+	MESSAGE(FATAL_ERROR "LMMS requires libsndfile1 and libsndfile1-dev >= 1.0.18 - please install, remove CMakeCache.txt and try again!")
 ENDIF()
 # check if we can use SFC_SET_COMPRESSION_LEVEL
 INCLUDE(CheckCXXSourceCompiles)

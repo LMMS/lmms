@@ -311,14 +311,6 @@ private:
 		sample_rate_t & samplerate
 	);
 #endif
-#ifdef LMMS_HAVE_MP3IMPORT
-	f_cnt_t decodeSampleMP3(
-		QString fileName,
-		sample_t * & buf,
-		ch_cnt_t & channels,
-		sample_rate_t & samplerate
-	);
-#endif
 	f_cnt_t decodeSampleDS(
 		QString fileName,
 		int_sample_t * & buf,
