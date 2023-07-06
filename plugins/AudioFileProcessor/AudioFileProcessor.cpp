@@ -67,7 +67,11 @@ Plugin::Descriptor PLUGIN_EXPORT audiofileprocessor_plugin_descriptor =
 	0x0100,
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
-	"wav,ogg,mp3,ds,spx,au,voc,aif,aiff,flac,raw",
+	"wav,ogg,ds,spx,au,voc,aif,aiff,flac,raw"
+#ifdef LMMS_SNDFILE_MP3
+	",mp3"
+#endif
+	,
 	nullptr,
 } ;
 
