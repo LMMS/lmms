@@ -225,11 +225,11 @@ PatmanInstrument::LoadErrors PatmanInstrument::loadPatch(
 		return( LoadOpen );
 	}
 
-	unsigned char header[239];
+	auto header = std::array<unsigned char, 239>{};
 
-	if( fread( header, 1, 239, fd ) != 239 ||
-			( memcmp( header, "GF1PATCH110\0ID#000002", 22 )
-			&& memcmp( header, "GF1PATCH100\0ID#000002", 22 ) ) )
+	if (fread(header.data(), 1, 239, fd ) != 239 ||
+			(memcmp(header.data(), "GF1PATCH110\0ID#000002", 22)
+			&& memcmp(header.data(), "GF1PATCH100\0ID#000002", 22)))
 	{
 		fclose( fd );
 		return( LoadNotGUS );
@@ -399,16 +399,16 @@ void PatmanInstrument::selectSample( NotePlayHandle * _n )
 	float min_dist = HUGE_VALF;
 	SampleBuffer* sample = nullptr;
 
-	for( QVector<SampleBuffer *>::iterator it = m_patchSamples.begin(); it != m_patchSamples.end(); ++it )
+	for (const auto& patchSample : m_patchSamples)
 	{
-		float patch_freq = ( *it )->frequency();
+		float patch_freq = patchSample->frequency();
 		float dist = freq >= patch_freq ? freq / patch_freq :
 							patch_freq / freq;
 
 		if( dist < min_dist )
 		{
 			min_dist = dist;
-			sample = *it;
+			sample = patchSample;
 		}
 	}
 

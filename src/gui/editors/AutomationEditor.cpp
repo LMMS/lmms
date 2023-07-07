@@ -968,8 +968,8 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	{
 		if( m_y_auto )
 		{
-			int y[] = { grid_bottom, TOP_MARGIN + font_height / 2 };
-			float level[] = { m_minLevel, m_maxLevel };
+			auto y = std::array{grid_bottom, TOP_MARGIN + font_height / 2};
+			auto level = std::array{m_minLevel, m_maxLevel};
 			for( int i = 0; i < 2; ++i )
 			{
 				const QString & label = m_clip->firstObject()

@@ -443,9 +443,9 @@ float NotePlayHandle::volumeLevel( const f_cnt_t _frame )
 void NotePlayHandle::mute()
 {
 	// mute all sub-notes
-	for( NotePlayHandleList::Iterator it = m_subNotes.begin(); it != m_subNotes.end(); ++it )
+	for (const auto& subNote : m_subNotes)
 	{
-		( *it )->mute();
+		subNote->mute();
 	}
 	m_muted = true;
 }
@@ -457,9 +457,9 @@ int NotePlayHandle::index() const
 {
 	const PlayHandleList & playHandles = Engine::audioEngine()->playHandles();
 	int idx = 0;
-	for( PlayHandleList::ConstIterator it = playHandles.begin(); it != playHandles.end(); ++it )
+	for (const auto& playHandle : playHandles)
 	{
-		const auto nph = dynamic_cast<const NotePlayHandle*>(*it);
+		const auto nph = dynamic_cast<const NotePlayHandle*>(playHandle);
 		if( nph == nullptr || nph->m_instrumentTrack != m_instrumentTrack || nph->isReleased() || nph->hasParent() )
 		{
 			continue;
@@ -481,9 +481,9 @@ ConstNotePlayHandleList NotePlayHandle::nphsOfInstrumentTrack( const InstrumentT
 	const PlayHandleList & playHandles = Engine::audioEngine()->playHandles();
 	ConstNotePlayHandleList cnphv;
 
-	for( PlayHandleList::ConstIterator it = playHandles.begin(); it != playHandles.end(); ++it )
+	for (const auto& playHandle : playHandles)
 	{
-		const auto nph = dynamic_cast<const NotePlayHandle*>(*it);
+		const auto nph = dynamic_cast<const NotePlayHandle*>(playHandle);
 		if( nph != nullptr && nph->m_instrumentTrack == _it && ( ( nph->isReleased() == false && nph->hasParent() == false ) || _all_ph == true ) )
 		{
 			cnphv.push_back( nph );
@@ -527,13 +527,13 @@ void NotePlayHandle::updateFrequency()
 	if (m_instrumentTrack->m_microtuner.enabled())
 	{
 		// custom key mapping and scale: get frequency from the microtuner
-		const float detuneMaster = detune + masterPitch;
+		const auto transposedKey = key() + masterPitch;
 
-		if (m_instrumentTrack->isKeyMapped(key()))
+		if (m_instrumentTrack->isKeyMapped(transposedKey))
 		{
-			const auto frequency = m_instrumentTrack->m_microtuner.keyToFreq(key(), baseNote);
-			m_frequency = frequency * powf(2.f, (detuneMaster + instrumentPitch / 100) / 12.f);
-			m_unpitchedFrequency = frequency * powf(2.f, detuneMaster / 12.f);
+			const auto frequency = m_instrumentTrack->m_microtuner.keyToFreq(transposedKey, baseNote);
+			m_frequency = frequency * powf(2.f, (detune + instrumentPitch / 100) / 12.f);
+			m_unpitchedFrequency = frequency * powf(2.f, detune / 12.f);
 		}
 		else
 		{
@@ -589,9 +589,9 @@ void NotePlayHandle::resize( const bpm_t _new_tempo )
 	m_frames = (f_cnt_t)new_frames;
 	m_totalFramesPlayed = (f_cnt_t)( completed * new_frames );
 
-	for( NotePlayHandleList::Iterator it = m_subNotes.begin(); it != m_subNotes.end(); ++it )
+	for (const auto& subNote : m_subNotes)
 	{
-		( *it )->resize( _new_tempo );
+		subNote->resize(_new_tempo);
 	}
 }
 

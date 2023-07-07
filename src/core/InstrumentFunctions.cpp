@@ -34,9 +34,10 @@
 namespace lmms
 {
 
-
-InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking::ChordTable::s_initTable[] =
-{
+std::array<InstrumentFunctionNoteStacking::ChordTable::Init, InstrumentFunctionNoteStacking::NUM_CHORD_TABLES>
+	InstrumentFunctionNoteStacking::ChordTable::s_initTable =
+	std::array<InstrumentFunctionNoteStacking::ChordTable::Init, NUM_CHORD_TABLES>
+{{
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "octave" ), { 0, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Major" ), { 0, 4, 7, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Majb5" ), { 0, 4, 6, -1 } },
@@ -139,7 +140,7 @@ InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking:
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "5" ), { 0, 7, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Phrygian dominant" ), { 0, 1, 4, 5, 7, 8, 10, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Persian" ), { 0, 1, 4, 5, 6, 8, 11, -1 } }
-} ;
+}};
 
 
 
@@ -179,11 +180,9 @@ bool InstrumentFunctionNoteStacking::Chord::hasSemiTone( int8_t semi_tone ) cons
 InstrumentFunctionNoteStacking::ChordTable::ChordTable() :
 	QVector<Chord>()
 {
-	for( int i = 0;
-		i < static_cast<int>( sizeof s_initTable / sizeof *s_initTable );
-		i++ )
+	for (const auto& chord : s_initTable)
 	{
-		push_back( Chord( s_initTable[i].m_name, s_initTable[i].m_semiTones ) );
+		push_back(Chord(chord.m_name, chord.m_semiTones));
 	}
 }
 

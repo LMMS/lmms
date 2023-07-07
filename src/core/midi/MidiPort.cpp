@@ -169,6 +169,12 @@ void MidiPort::processOutEvent( const MidiEvent& event, const TimePos& time )
 			outEvent.setVelocity( fixedOutputVelocity() );
 		}
 
+		if( fixedOutputNote() >= 0 &&
+			( event.type() == MidiNoteOn || event.type() == MidiNoteOff || event.type() == MidiKeyPressure ) )
+		{
+			outEvent.setKey( fixedOutputNote() );
+		}
+
 		m_midiClient->processOutEvent( outEvent, time, this );
 	}
 }
@@ -238,6 +244,7 @@ void MidiPort::loadSettings( const QDomElement& thisElement )
 	m_outputControllerModel.loadSettings( thisElement, "outputcontroller" );
 	m_fixedInputVelocityModel.loadSettings( thisElement, "fixedinputvelocity" );
 	m_fixedOutputVelocityModel.loadSettings( thisElement, "fixedoutputvelocity" );
+	m_fixedOutputNoteModel.loadSettings( thisElement, "fixedoutputnote" );
 	m_outputProgramModel.loadSettings( thisElement, "outputprogram" );
 	m_baseVelocityModel.loadSettings( thisElement, "basevelocity" );
 	m_readableModel.loadSettings( thisElement, "readable" );
@@ -378,9 +385,9 @@ void MidiPort::updateReadablePorts()
 	m_readablePorts.clear();
 	const QStringList& wp = m_midiClient->readablePorts();
 	// now insert new ports and restore selections
-	for( QStringList::ConstIterator it = wp.begin(); it != wp.end(); ++it )
+	for (const auto& port : wp)
 	{
-		m_readablePorts[*it] = ( selectedPorts.indexOf( *it ) != -1 );
+		m_readablePorts[port] = (selectedPorts.indexOf(port) != -1);
 	}
 
 	emit readablePortsChanged();
@@ -404,9 +411,9 @@ void MidiPort::updateWritablePorts()
 	m_writablePorts.clear();
 	const QStringList & wp = m_midiClient->writablePorts();
 	// now insert new ports and restore selections
-	for( QStringList::ConstIterator it = wp.begin(); it != wp.end(); ++it )
+	for (const auto& port : wp)
 	{
-		m_writablePorts[*it] = ( selectedPorts.indexOf( *it ) != -1 );
+		m_writablePorts[port] = (selectedPorts.indexOf(port) != -1);
 	}
 
 	emit writablePortsChanged();

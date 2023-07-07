@@ -214,7 +214,7 @@ struct WaveValueFunctionInterpolate : public exprtk::ifunction<T>
 	const T *m_vec;
 	const std::size_t m_size;
 };
-static const unsigned int random_data[257]={
+static const auto random_data = std::array<unsigned int, 257>{
 0xd76a33ec, 0x4a767724, 0xb34ebd08 ,0xf4024196,
 0x17b426e2, 0x8dc6389a, 0x1b5dcb93 ,0xa771bd3f,
 0x078d502e, 0x8980988a, 0x1f64f846 ,0xb5b48ed7,
@@ -377,13 +377,13 @@ public:
 	{}
 	~ExprFrontData()
 	{
-		for (int i = 0; i < m_cyclics.size() ; ++i)
+		for (const auto& cyclic : m_cyclics)
 		{
-			delete m_cyclics[i];
+			delete cyclic;
 		}
-		for (int i = 0; i < m_cyclics_interp.size() ; ++i)
+		for (const auto& cyclic : m_cyclics_interp)
 		{
-			delete m_cyclics_interp[i];
+			delete cyclic;
 		}
 		if (m_integ_func)
 		{
@@ -526,14 +526,14 @@ ExprFront::ExprFront(const char * expr, int last_func_samples)
 	try
 	{
 		m_data = new ExprFrontData(last_func_samples);
-	
+
 		m_data->m_expression_string = expr;
 		m_data->m_symbol_table.add_pi();
-	
+
 		m_data->m_symbol_table.add_constant("e", F_E);
 
 		m_data->m_symbol_table.add_constant("seed", SimpleRandom::generator() & max_float_integer_mask);
-	
+
 		m_data->m_symbol_table.add_function("sinew", sin_wave_func);
 		m_data->m_symbol_table.add_function("squarew", square_wave_func);
 		m_data->m_symbol_table.add_function("trianglew", triangle_wave_func);
@@ -577,7 +577,7 @@ bool ExprFront::compile()
 		sstore.disable_all_assignment_ops();
 		sstore.disable_all_control_structures();
 		parser_t parser(sstore);
-	
+
 		m_valid=parser.compile(m_data->m_expression_string, m_data->m_expression);
 	}
 	catch(...)
@@ -600,7 +600,7 @@ float ExprFront::evaluate()
 		WARN_EXPRTK;
 	}
 	return 0;
-	
+
 }
 bool ExprFront::add_variable(const char* name, float& ref)
 {
@@ -757,7 +757,7 @@ void ExprSynth::renderOutput(fpp_t frames, sampleFrame *buf)
 		const float new_freq = m_nph->frequency();
 		const float freq_inc = (new_freq - m_frequency) / frames;
 		const bool is_released = m_nph->isReleased();
-	
+
 		expression_t *o1_rawExpr = &(m_exprO1->getData()->m_expression);
 		expression_t *o2_rawExpr = &(m_exprO2->getData()->m_expression);
 		LastSampleFunction<float> * last_func1 = &m_exprO1->getData()->m_last_func;
@@ -791,7 +791,7 @@ void ExprSynth::renderOutput(fpp_t frames, sampleFrame *buf)
 		}
 		else
 		{
-			
+
 			if (o2_valid)
 			{
 				o1_rawExpr = o2_rawExpr;

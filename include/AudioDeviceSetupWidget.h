@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_DEVICE_SETUP_WIDGET_H
-#define AUDIO_DEVICE_SETUP_WIDGET_H
+#ifndef LMMS_GUI_AUDIO_DEVICE_SETUP_WIDGET_H
+#define LMMS_GUI_AUDIO_DEVICE_SETUP_WIDGET_H
 
 #include "TabWidget.h"
 
@@ -45,4 +45,4 @@ public:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_AUDIO_DEVICE_SETUP_WIDGET_H

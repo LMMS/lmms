@@ -190,11 +190,11 @@ void MixerChannel::doProcessing()
 Mixer::Mixer() :
 	Model( nullptr ),
 	JournallingObject(),
-	m_mixerChannels()
+	m_mixerChannels(),
+	m_lastSoloed(-1)
 {
 	// create master channel
 	createChannel();
-	m_lastSoloed = -1;
 }
 
 
@@ -223,6 +223,13 @@ int Mixer::createChannel()
 
 	// reset channel state
 	clearChannel( index );
+
+	// if there is a soloed channel, mute the new track
+	if (m_lastSoloed != -1 && m_mixerChannels[m_lastSoloed]->m_soloModel.value())
+	{
+		m_mixerChannels[index]->m_muteBeforeSolo = m_mixerChannels[index]->m_muteModel.value();
+		m_mixerChannels[index]->m_muteModel.setValue(true);
+	}
 
 	return index;
 }
@@ -387,15 +394,13 @@ void Mixer::moveChannelLeft( int index )
 	TrackContainer::TrackList songTrackList = Engine::getSong()->tracks();
 	TrackContainer::TrackList patternTrackList = Engine::patternStore()->tracks();
 
-	TrackContainer::TrackList trackLists[] = {songTrackList, patternTrackList};
-	for(int tl=0; tl<2; ++tl)
+	for (const auto& trackList : {songTrackList, patternTrackList})
 	{
-		TrackContainer::TrackList trackList = trackLists[tl];
-		for(int i=0; i<trackList.size(); ++i)
+		for (const auto& track : trackList)
 		{
-			if( trackList[i]->type() == Track::InstrumentTrack )
+			if (track->type() == Track::InstrumentTrack)
 			{
-				auto inst = (InstrumentTrack*)trackList[i];
+				auto inst = (InstrumentTrack*)track;
 				int val = inst->mixerChannelModel()->value(0);
 				if( val == a )
 				{
@@ -406,9 +411,9 @@ void Mixer::moveChannelLeft( int index )
 					inst->mixerChannelModel()->setValue(a);
 				}
 			}
-			else if( trackList[i]->type() == Track::SampleTrack )
+			else if (track->type() == Track::SampleTrack)
 			{
-				auto strk = (SampleTrack*)trackList[i];
+				auto strk = (SampleTrack*)track;
 				int val = strk->mixerChannelModel()->value(0);
 				if( val == a )
 				{
@@ -447,13 +452,13 @@ MixerRoute * Mixer::createChannelSend( mix_ch_t fromChannel, mix_ch_t toChannel,
 	MixerChannel * from = m_mixerChannels[fromChannel];
 	MixerChannel * to = m_mixerChannels[toChannel];
 
-	for( int i=0; i<from->m_sends.size(); ++i )
+	for (const auto& send : from->m_sends)
 	{
-		if( from->m_sends[i]->receiver() == to )
+		if (send->receiver() == to)
 		{
 			// simply adjust the amount
-			from->m_sends[i]->amount()->setValue( amount );
-			return from->m_sends[i];
+			send->amount()->setValue(amount);
+			return send;
 		}
 	}
 
@@ -493,11 +498,11 @@ void Mixer::deleteChannelSend( mix_ch_t fromChannel, mix_ch_t toChannel )
 	MixerChannel * to	 = m_mixerChannels[toChannel];
 
 	// find and delete the send entry
-	for( int i = 0; i < from->m_sends.size(); ++i )
+	for (const auto& send : from->m_sends)
 	{
-		if( from->m_sends[i]->receiver() == to )
+		if (send->receiver() == to)
 		{
-			deleteChannelSend( from->m_sends[i] );
+			deleteChannelSend(send);
 			break;
 		}
 	}
@@ -544,9 +549,9 @@ bool Mixer::checkInfiniteLoop( MixerChannel * from, MixerChannel * to )
 
 	// follow sendTo's outputs recursively looking for something that sends
 	// to sendFrom
-	for( int i=0; i < to->m_sends.size(); ++i )
+	for (const auto& send : to->m_sends)
 	{
-		if( checkInfiniteLoop( from, to->m_sends[i]->receiver() ) )
+		if (checkInfiniteLoop(from, send->receiver()))
 		{
 			return true;
 		}
@@ -744,13 +749,13 @@ void Mixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		if( ch->m_hasColor ) mixch.setAttribute( "color", ch->m_color.name() );
 
 		// add the channel sends
-		for( int si = 0; si < ch->m_sends.size(); ++si )
+		for (const auto& send : ch->m_sends)
 		{
 			QDomElement sendsDom = _doc.createElement( QString( "send" ) );
 			mixch.appendChild( sendsDom );
 
-			sendsDom.setAttribute( "channel", ch->m_sends[si]->receiverIndex() );
-			ch->m_sends[si]->amount()->saveSettings( _doc, sendsDom, "amount" );
+			sendsDom.setAttribute("channel", send->receiverIndex());
+			send->amount()->saveSettings(_doc, sendsDom, "amount");
 		}
 	}
 }
@@ -825,6 +830,42 @@ void Mixer::validateChannelName( int index, int oldIndex )
 	{
 		m_mixerChannels[index]->m_name = tr( "Channel %1" ).arg( index );
 	}
+}
+
+bool Mixer::isChannelInUse(int index)
+{
+	// check if the index mixer channel receives audio from any other channel
+	if (!m_mixerChannels[index]->m_receives.isEmpty())
+	{
+		return true;
+	}
+
+	// check if the destination mixer channel on any instrument or sample track is the index mixer channel
+	TrackContainer::TrackList tracks;
+	tracks += Engine::getSong()->tracks();
+	tracks += Engine::patternStore()->tracks();
+
+	for (const auto t : tracks)
+	{
+		if (t->type() == Track::InstrumentTrack)
+		{
+			auto inst = dynamic_cast<InstrumentTrack*>(t);
+			if (inst->mixerChannelModel()->value() == index)
+			{
+				return true;
+			}
+		}
+		else if (t->type() == Track::SampleTrack)
+		{
+			auto strack = dynamic_cast<SampleTrack*>(t);
+			if (strack->mixerChannelModel()->value() == index)
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 

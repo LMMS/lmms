@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef INSTRUMENT_H
-#define INSTRUMENT_H
+#ifndef LMMS_INSTRUMENT_H
+#define LMMS_INSTRUMENT_H
 
 #include <QString>
 #include "lmms_export.h"
@@ -154,4 +154,4 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(Instrument::Flags)
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_INSTRUMENT_H

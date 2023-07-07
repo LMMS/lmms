@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef PLAY_HANDLE_H
-#define PLAY_HANDLE_H
+#ifndef LMMS_PLAY_HANDLE_H
+#define LMMS_PLAY_HANDLE_H
 
 #include <QList>
 #include <QMutex>
@@ -166,4 +166,4 @@ using ConstPlayHandleList = QList<const PlayHandle*>;
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_PLAY_HANDLE_H

@@ -23,7 +23,9 @@
  */
 
 
+#include <QCheckBox>
 #include <QLayout>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QStyle>
@@ -59,7 +61,7 @@ MixerView::MixerView() :
 	m->setHook( this );
 
 	//QPalette pal = palette();
-	//pal.setColor( QPalette::Background, QColor( 72, 76, 88 ) );
+	//pal.setColor( QPalette::Window, QColor( 72, 76, 88 ) );
 	//setPalette( pal );
 
 	setAutoFillBackground( true );
@@ -79,7 +81,7 @@ MixerView::MixerView() :
 	chLayout = new QHBoxLayout( m_channelAreaWidget );
 	chLayout->setSizeConstraint( QLayout::SetMinimumSize );
 	chLayout->setSpacing( 0 );
-	chLayout->setMargin( 0 );
+	chLayout->setContentsMargins(0, 0, 0, 0);
 	m_channelAreaWidget->setLayout(chLayout);
 
 	// create rack layout before creating the first channel
@@ -168,9 +170,9 @@ MixerView::MixerView() :
 
 MixerView::~MixerView()
 {
-	for (int i=0; i<m_mixerChannelViews.size(); i++)
+	for (auto mixerChannelView : m_mixerChannelViews)
 	{
-		delete m_mixerChannelViews.at(i);
+		delete mixerChannelView;
 	}
 }
 
@@ -239,21 +241,19 @@ void MixerView::updateMaxChannelSelector()
 	TrackContainer::TrackList songTracks = Engine::getSong()->tracks();
 	TrackContainer::TrackList patternStoreTracks = Engine::patternStore()->tracks();
 
-	TrackContainer::TrackList trackLists[] = {songTracks, patternStoreTracks};
-	for(int tl=0; tl<2; ++tl)
+	for (const auto& trackList : {songTracks, patternStoreTracks})
 	{
-		TrackContainer::TrackList trackList = trackLists[tl];
-		for(int i=0; i<trackList.size(); ++i)
+		for (const auto& track : trackList)
 		{
-			if( trackList[i]->type() == Track::InstrumentTrack )
+			if (track->type() == Track::InstrumentTrack)
 			{
-				auto inst = (InstrumentTrack*)trackList[i];
+				auto inst = (InstrumentTrack*)track;
 				inst->mixerChannelModel()->setRange(0,
 					m_mixerChannelViews.size()-1,1);
 			}
-			else if( trackList[i]->type() == Track::SampleTrack )
+			else if (track->type() == Track::SampleTrack)
 			{
-				auto strk = (SampleTrack*)trackList[i];
+				auto strk = (SampleTrack*)track;
 				strk->mixerChannelModel()->setRange(0,
 					m_mixerChannelViews.size()-1,1);
 			}
@@ -387,6 +387,12 @@ void MixerView::deleteChannel(int index)
 	// can't delete master
 	if( index == 0 ) return;
 
+	// if there is no user confirmation, do nothing
+	if (!confirmRemoval(index))
+	{
+		return;
+	}
+
 	// remember selected line
 	int selLine = m_currentMixerLine->channelIndex();
 
@@ -399,7 +405,7 @@ void MixerView::deleteChannel(int index)
 
 	// delete the view
 	chLayout->removeWidget(m_mixerChannelViews[index]->m_mixerLine);
-	m_racksLayout->removeWidget( m_mixerChannelViews[index]->m_rackView );
+	m_racksLayout->removeWidget(m_mixerChannelViews[index]->m_rackView);
 	delete m_mixerChannelViews[index]->m_fader;
 	delete m_mixerChannelViews[index]->m_muteBtn;
 	delete m_mixerChannelViews[index]->m_soloBtn;
@@ -411,56 +417,74 @@ void MixerView::deleteChannel(int index)
 	m_channelAreaWidget->adjustSize();
 
 	// make sure every channel knows what index it is
-	for(int i=index + 1; i<m_mixerChannelViews.size(); ++i)
+	for (int i = index + 1; i < m_mixerChannelViews.size(); ++i)
 	{
-		m_mixerChannelViews[i]->m_mixerLine->setChannelIndex(i-1);
+		m_mixerChannelViews[i]->m_mixerLine->setChannelIndex(i - 1);
 	}
 	m_mixerChannelViews.remove(index);
 
 	// select the next channel
-	if( selLine >= m_mixerChannelViews.size() )
+	if (selLine >= m_mixerChannelViews.size())
 	{
-		selLine = m_mixerChannelViews.size()-1;
+		selLine = m_mixerChannelViews.size() - 1;
 	}
 	setCurrentMixerLine(selLine);
 
 	updateMaxChannelSelector();
 }
 
+bool MixerView::confirmRemoval(int index)
+{
+	// if config variable is set to false, there is no need for user confirmation
+	bool needConfirm = ConfigManager::inst()->value("ui", "mixerchanneldeletionwarning", "1").toInt();
+	if (!needConfirm) { return true; }
+
+	Mixer* mix = Engine::mixer();
+
+	if (!mix->isChannelInUse(index))
+	{
+		// is the channel is not in use, there is no need for user confirmation
+		return true;
+	}
+
+	QString messageRemoveTrack = tr("This Mixer Channel is being used.\n"
+									"Are you sure you want to remove this channel?\n\n"
+									"Warning: This operation can not be undone.");
+
+	QString messageTitleRemoveTrack = tr("Confirm removal");
+	QString askAgainText = tr("Don't ask again");
+	auto askAgainCheckBox = new QCheckBox(askAgainText, nullptr);
+	connect(askAgainCheckBox, &QCheckBox::stateChanged, [this](int state) {
+		// Invert button state, if it's checked we *shouldn't* ask again
+		ConfigManager::inst()->setValue("ui", "mixerchanneldeletionwarning", state ? "0" : "1");
+	});
+
+	QMessageBox mb(this);
+	mb.setText(messageRemoveTrack);
+	mb.setWindowTitle(messageTitleRemoveTrack);
+	mb.setIcon(QMessageBox::Warning);
+	mb.addButton(QMessageBox::Cancel);
+	mb.addButton(QMessageBox::Ok);
+	mb.setCheckBox(askAgainCheckBox);
+	mb.setDefaultButton(QMessageBox::Cancel);
+
+	int answer = mb.exec();
+
+	return answer == QMessageBox::Ok;
+}
 
 
 void MixerView::deleteUnusedChannels()
 {
-	TrackContainer::TrackList tracks;
-	tracks += Engine::getSong()->tracks();
-	tracks += Engine::patternStore()->tracks();
+	Mixer* mix = Engine::mixer();
 
-	std::vector<bool> inUse(m_mixerChannelViews.size(), false);
-
-	//Populate inUse by checking the destination channel for every track
-	for (Track* t: tracks)
+	// Check all channels except master, delete those with no incoming sends
+	for (int i = m_mixerChannelViews.size() - 1; i > 0; --i)
 	{
-		//The channel that this track sends to. Since master channel is always in use,
-		//setting this to 0 is a safe default (for tracks that don't sent to the mixer).
-		int channel = 0;
-		if (t->type() == Track::InstrumentTrack)
+		if (!mix->isChannelInUse(i))
 		{
-			auto inst = dynamic_cast<InstrumentTrack*>(t);
-			channel = inst->mixerChannelModel()->value();
+			deleteChannel(i);
 		}
-		else if (t->type() == Track::SampleTrack)
-		{
-			auto strack = dynamic_cast<SampleTrack*>(t);
-			channel = strack->mixerChannelModel()->value();
-		}
-		inUse[channel] = true;
-	}
-
-	//Check all channels except master, delete those with no incoming sends
-	for(int i = m_mixerChannelViews.size()-1; i > 0; --i)
-	{
-		if (!inUse[i] && Engine::mixer()->mixerChannel(i)->m_receives.isEmpty())
-		{ deleteChannel(i); }
 	}
 }
 

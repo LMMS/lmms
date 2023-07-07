@@ -108,20 +108,27 @@ bool PatternTrack::play( const TimePos & _start, const fpp_t _frames,
 	}
 
 	TimePos lastPosition;
-	TimePos lastLen;
-	for( clipVector::iterator it = clips.begin(); it != clips.end(); ++it )
+	TimePos lastLength;
+	tick_t lastOffset = 0;
+	for (const auto& clip : clips)
 	{
-		if( !( *it )->isMuted() &&
-				( *it )->startPosition() >= lastPosition )
+		if (!clip->isMuted() && clip->startPosition() >= lastPosition)
 		{
-			lastPosition = ( *it )->startPosition();
-			lastLen = ( *it )->length();
+			lastPosition = clip->startPosition();
+			lastLength = clip->length();
+			tick_t patternLength = Engine::patternStore()->lengthOfPattern(static_cast<PatternClip*>(clip)->patternIndex())
+					* TimePos::ticksPerBar();
+			lastOffset = patternLength - (clip->startTimeOffset() % patternLength);
+			if (lastOffset == patternLength)
+			{
+				lastOffset = 0;
+			}
 		}
 	}
 
-	if( _start - lastPosition < lastLen )
+	if( _start - lastPosition < lastLength )
 	{
-		return Engine::patternStore()->play(_start - lastPosition, _frames, _offset, s_infoMap[this]);
+		return Engine::patternStore()->play(_start - lastPosition + lastOffset, _frames, _offset, s_infoMap[this]);
 	}
 	return false;
 }
@@ -181,15 +188,11 @@ void PatternTrack::loadTrackSpecificSettings(const QDomElement& _this)
 	{
 		const int src = _this.attribute("sourcepattern").toInt();
 		const int dst = s_infoMap[this];
-		TrackContainer::TrackList tl =
-					Engine::patternStore()->tracks();
 		// copy clips of all tracks from source pattern (at bar "src") to destination
 		// clips (which are created if they do not exist yet)
-		for( TrackContainer::TrackList::iterator it = tl.begin();
-							it != tl.end(); ++it )
+		for (const auto& track : Engine::patternStore()->tracks())
 		{
-			Clip::copyStateTo( ( *it )->getClip( src ),
-				( *it )->getClip( dst ) );
+			Clip::copyStateTo(track->getClip(src), track->getClip(dst));
 		}
 		setName( tr( "Clone of %1" ).arg(
 					_this.parentNode().toElement().attribute( "name" ) ) );

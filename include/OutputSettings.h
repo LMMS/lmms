@@ -23,11 +23,10 @@
  *
  */
 
-#ifndef OUTPUT_SETTINGS_H
-#define OUTPUT_SETTINGS_H
+#ifndef LMMS_OUTPUT_SETTINGS_H
+#define LMMS_OUTPUT_SETTINGS_H
 
 #include "lmms_basics.h"
-
 
 namespace lmms
 {
@@ -120,4 +119,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_OUTPUT_SETTINGS_H

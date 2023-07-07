@@ -112,6 +112,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			"app", "sololegacybehavior", "0").toInt()),
 	m_trackDeletionWarning(ConfigManager::inst()->value(
 			"ui", "trackdeletionwarning", "1").toInt()),
+	m_mixerChannelDeletionWarning(ConfigManager::inst()->value(
+			"ui", "mixerchanneldeletionwarning", "1").toInt()),
 	m_MMPZ(!ConfigManager::inst()->value(
 			"app", "nommpz").toInt()),
 	m_disableBackup(!ConfigManager::inst()->value(
@@ -175,12 +177,12 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	// Vertical layout.
 	auto vlayout = new QVBoxLayout(this);
 	vlayout->setSpacing(0);
-	vlayout->setMargin(0);
+	vlayout->setContentsMargins(0, 0, 0, 0);
 
 	// Horizontal layout.
 	auto hlayout = new QHBoxLayout(main_w);
 	hlayout->setSpacing(0);
-	hlayout->setMargin(0);
+	hlayout->setContentsMargins(0, 0, 0, 0);
 
 	// Tab bar for the main tabs.
 	m_tabBar = new TabBar(main_w, QBoxLayout::TopToBottom);
@@ -195,8 +197,20 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	auto general_w = new QWidget(settings_w);
 	auto general_layout = new QVBoxLayout(general_w);
 	general_layout->setSpacing(10);
-	general_layout->setMargin(0);
+	general_layout->setContentsMargins(0, 0, 0, 0);
 	labelWidget(general_w, tr("General"));
+
+	// General scroll area.
+	auto generalScroll = new QScrollArea(general_w);
+	generalScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	generalScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+	// General controls widget.
+	auto generalControls = new QWidget(general_w);
+
+	// Path selectors layout.
+	auto generalControlsLayout = new QVBoxLayout;
+	generalControlsLayout->setSpacing(10);
 
 	auto addLedCheckBox = [&XDelta, &YDelta, this](const QString& ledText, TabWidget* tw, int& counter,
 							  bool initialState, const char* toggledSlot, bool showRestartWarning) {
@@ -214,7 +228,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	int counter = 0;
 
 	// GUI tab.
-	auto gui_tw = new TabWidget(tr("Graphical user interface (GUI)"), general_w);
+	auto gui_tw = new TabWidget(tr("Graphical user interface (GUI)"), generalControls);
 
 	addLedCheckBox(tr("Display volume as dBFS "), gui_tw, counter,
 		m_displaydBFS, SLOT(toggleDisplaydBFS(bool)), true);
@@ -236,14 +250,19 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 		m_soloLegacyBehavior, SLOT(toggleSoloLegacyBehavior(bool)), false);
 	addLedCheckBox(tr("Show warning when deleting tracks"), gui_tw, counter,
 		m_trackDeletionWarning, SLOT(toggleTrackDeletionWarning(bool)), false);
+	addLedCheckBox(tr("Show warning when deleting a mixer channel that is in use"), gui_tw, counter,
+		m_mixerChannelDeletionWarning,	SLOT(toggleMixerChannelDeletionWarning(bool)), false);
 
 	gui_tw->setFixedHeight(YDelta + YDelta * counter);
+
+	generalControlsLayout->addWidget(gui_tw);
+	generalControlsLayout->addSpacing(10);
 
 
 	counter = 0;
 
 	// Projects tab.
-	auto projects_tw = new TabWidget(tr("Projects"), general_w);
+	auto projects_tw = new TabWidget(tr("Projects"), generalControls);
 
 	addLedCheckBox(tr("Compress project files by default"), projects_tw, counter,
 		m_MMPZ, SLOT(toggleMMPZ(bool)), true);
@@ -254,8 +273,12 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	projects_tw->setFixedHeight(YDelta + YDelta * counter);
 
+	generalControlsLayout->addWidget(projects_tw);
+	generalControlsLayout->addSpacing(10);
+
+
 	// Language tab.
-	auto lang_tw = new TabWidget(tr("Language"), general_w);
+	auto lang_tw = new TabWidget(tr("Language"), generalControls);
 	lang_tw->setFixedHeight(48);
 	auto changeLang = new QComboBox(lang_tw);
 	changeLang->move(XDelta, 20);
@@ -264,11 +287,22 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	QStringList fileNames = dir.entryList(QStringList("*.qm"));
 	for(int i = 0; i < fileNames.size(); ++i)
 	{
-		// Get locale extracted by filename.
+		// Extract ISO-639 language code from filename
 		fileNames[i].truncate(fileNames[i].lastIndexOf('.'));
+		// Skip invalid language codes
+		QLocale locale(fileNames[i]);
+		if (locale.language() == QLocale::C)
+		{
+			continue;
+		}
+		// Display the native language name or fallback to the English name
+		QString langName = locale.nativeLanguageName();
+		if (langName.isEmpty())
+		{
+			langName = QLocale::languageToString(locale.language());
+		}
 		m_languages.append(fileNames[i]);
-		QString lang = QLocale(m_languages.last()).nativeLanguageName();
-		changeLang->addItem(lang);
+		changeLang->addItem(langName);
 	}
 
 	// If language unset, fallback to system language when available.
@@ -299,11 +333,15 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	connect(changeLang, SIGNAL(currentIndexChanged(int)),
 			this, SLOT(showRestartWarning()));
 
+	generalControlsLayout->addWidget(lang_tw);
+	generalControlsLayout->addSpacing(10);
 
 	// General layout ordering.
-	general_layout->addWidget(gui_tw);
-	general_layout->addWidget(projects_tw);
-	general_layout->addWidget(lang_tw);
+	generalControlsLayout->addStretch();
+	generalControls->setLayout(generalControlsLayout);
+	generalScroll->setWidget(generalControls);
+	generalScroll->setWidgetResizable(true);
+	general_layout->addWidget(generalScroll);
 	general_layout->addStretch();
 
 
@@ -313,7 +351,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	auto performance_w = new QWidget(settings_w);
 	auto performance_layout = new QVBoxLayout(performance_w);
 	performance_layout->setSpacing(10);
-	performance_layout->setMargin(0);
+	performance_layout->setContentsMargins(0, 0, 0, 0);
 	labelWidget(performance_w,
 			tr("Performance"));
 
@@ -431,7 +469,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	auto audio_w = new QWidget(settings_w);
 	auto audio_layout = new QVBoxLayout(audio_w);
 	audio_layout->setSpacing(10);
-	audio_layout->setMargin(0);
+	audio_layout->setContentsMargins(0, 0, 0, 0);
 	labelWidget(audio_w,
 			tr("Audio"));
 
@@ -449,7 +487,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	auto as_w_layout = new QHBoxLayout(as_w);
 	as_w_layout->setSpacing(0);
-	as_w_layout->setMargin(0);
+	as_w_layout->setContentsMargins(0, 0, 0, 0);
 
 #ifdef LMMS_HAVE_JACK
 	m_audioIfaceSetupWidgets[AudioJack::name()] =
@@ -581,7 +619,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	auto midi_w = new QWidget(settings_w);
 	auto midi_layout = new QVBoxLayout(midi_w);
 	midi_layout->setSpacing(10);
-	midi_layout->setMargin(0);
+	midi_layout->setContentsMargins(0, 0, 0, 0);
 	labelWidget(midi_w,
 			tr("MIDI"));
 
@@ -598,7 +636,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	auto ms_w_layout = new QHBoxLayout(ms_w);
 	ms_w_layout->setSpacing(0);
-	ms_w_layout->setMargin(0);
+	ms_w_layout->setContentsMargins(0, 0, 0, 0);
 
 #ifdef LMMS_HAVE_ALSA
 	m_midiIfaceSetupWidgets[MidiAlsaSeq::name()] =
@@ -698,7 +736,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	auto paths_layout = new QVBoxLayout(paths_w);
 	paths_layout->setSpacing(10);
-	paths_layout->setMargin(0);
+	paths_layout->setContentsMargins(0, 0, 0, 0);
 
 	labelWidget(paths_w, tr("Paths"));
 
@@ -812,7 +850,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	auto extras_w = new QWidget(this);
 	auto extras_layout = new QHBoxLayout(extras_w);
 	extras_layout->setSpacing(0);
-	extras_layout->setMargin(0);
+	extras_layout->setContentsMargins(0, 0, 0, 0);
 
 	// Restart warning label.
 	restartWarningLbl = new QLabel(
@@ -885,6 +923,8 @@ void SetupDialog::accept()
 					QString::number(m_soloLegacyBehavior));
 	ConfigManager::inst()->setValue("ui", "trackdeletionwarning",
 					QString::number(m_trackDeletionWarning));
+	ConfigManager::inst()->setValue("ui", "mixerchanneldeletionwarning",
+					QString::number(m_mixerChannelDeletionWarning));
 	ConfigManager::inst()->setValue("app", "nommpz",
 					QString::number(!m_MMPZ));
 	ConfigManager::inst()->setValue("app", "disablebackup",
@@ -1004,6 +1044,11 @@ void SetupDialog::toggleLetPreviewsFinish(bool enabled)
 void SetupDialog::toggleTrackDeletionWarning(bool enabled)
 {
 	m_trackDeletionWarning = enabled;
+}
+
+void SetupDialog::toggleMixerChannelDeletionWarning(bool enabled)
+{
+	m_mixerChannelDeletionWarning = enabled;
 }
 
 

@@ -98,6 +98,9 @@ SongEditor::SongEditor( Song * song ) :
 	connect( m_timeLine, SIGNAL(selectionFinished()),
 			 this, SLOT(stopRubberBand()));
 
+	// when tracks realign, adjust height of position line
+	connect(this, &TrackContainerView::tracksRealigned, this, &SongEditor::updatePositionLine);
+
 	m_positionLine = new PositionLine(this);
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 1, m_timeLine );
 	
@@ -181,14 +184,14 @@ SongEditor::SongEditor( Song * song ) :
 	master_pitch_lbl->setPixmap( embed::getIconPixmap( "master_pitch" ) );
 	master_pitch_lbl->setFixedHeight( 64 );
 
-	m_masterPitchSlider = new AutomatableSlider( tb, tr( "Master pitch" ) );
+	m_masterPitchSlider = new AutomatableSlider( tb, tr( "Global transposition" ) );
 	m_masterPitchSlider->setModel( &m_song->m_masterPitchModel );
 	m_masterPitchSlider->setOrientation( Qt::Vertical );
 	m_masterPitchSlider->setPageStep( 1 );
 	m_masterPitchSlider->setTickPosition( QSlider::TicksLeft );
 	m_masterPitchSlider->setFixedSize( 26, 60 );
 	m_masterPitchSlider->setTickInterval( 12 );
-	m_masterPitchSlider->setToolTip(tr("Master pitch"));
+	m_masterPitchSlider->setToolTip(tr("Global transposition"));
 	connect( m_masterPitchSlider, SIGNAL(logicValueChanged(int)), this,
 			SLOT(setMasterPitch(int)));
 	connect( m_masterPitchSlider, SIGNAL(sliderPressed()), this,
@@ -199,7 +202,7 @@ SongEditor::SongEditor( Song * song ) :
 			SLOT(hideMasterPitchFloat()));
 
 	m_mpsStatus = new TextFloat;
-	m_mpsStatus->setTitle( tr( "Master pitch" ) );
+	m_mpsStatus->setTitle( tr( "Global transposition" ) );
 	m_mpsStatus->setPixmap( embed::getIconPixmap( "master_pitch" ) );
 
 	getGUI()->mainWindow()->addWidgetToToolBar( master_pitch_lbl );
@@ -210,7 +213,7 @@ SongEditor::SongEditor( Song * song ) :
 	// create widget for oscilloscope- and cpu-load-widget
 	auto vc_w = new QWidget(tb);
 	auto vcw_layout = new QVBoxLayout(vc_w);
-	vcw_layout->setMargin( 0 );
+	vcw_layout->setContentsMargins(0, 0, 0, 0);
 	vcw_layout->setSpacing( 0 );
 
 	vcw_layout->addStretch();
@@ -507,10 +510,9 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 	else if( ke->key() == Qt::Key_Delete || ke->key() == Qt::Key_Backspace )
 	{
 		QVector<selectableObject *> so = selectedObjects();
-		for( QVector<selectableObject *>::iterator it = so.begin();
-				it != so.end(); ++it )
+		for (const auto& selectedClip : so)
 		{
-			auto clipv = dynamic_cast<ClipView*>(*it);
+			auto clipv = dynamic_cast<ClipView*>(selectedClip);
 			clipv->remove();
 		}
 	}
@@ -721,7 +723,7 @@ void SongEditor::showMasterPitchFloat( void )
 
 void SongEditor::updateMasterPitchFloat( int new_val )
 {
-	m_mpsStatus->setText( tr( "Value: %1 semitones").arg( new_val ) );
+	m_mpsStatus->setText( tr( "Value: %1 keys").arg( new_val ) );
 
 }
 
@@ -821,7 +823,7 @@ void SongEditor::updatePosition( const TimePos & t )
 		m_positionLine->hide();
 	}
 
-	m_positionLine->setFixedHeight( height() );
+	updatePositionLine();
 }
 
 
@@ -829,7 +831,7 @@ void SongEditor::updatePosition( const TimePos & t )
 
 void SongEditor::updatePositionLine()
 {
-	m_positionLine->setFixedHeight( height() );
+	m_positionLine->setFixedHeight(totalHeightOfTracks());
 }
 
 

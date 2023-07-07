@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef ENVELOPE_AND_LFO_PARAMETERS_H
-#define ENVELOPE_AND_LFO_PARAMETERS_H
+#ifndef LMMS_ENVELOPE_AND_LFO_PARAMETERS_H
+#define LMMS_ENVELOPE_AND_LFO_PARAMETERS_H
 
 #include <QVector>
 
@@ -190,4 +190,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_ENVELOPE_AND_LFO_PARAMETERS_H

@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef SETUP_DIALOG_H
-#define SETUP_DIALOG_H
+#ifndef LMMS_GUI_SETUP_DIALOG_H
+#define LMMS_GUI_SETUP_DIALOG_H
 
 #include <QDialog>
 #include <QMap>
@@ -83,6 +82,7 @@ private slots:
 	void toggleLetPreviewsFinish(bool enabled);
 	void toggleSoloLegacyBehavior(bool enabled);
 	void toggleTrackDeletionWarning(bool enabled);
+	void toggleMixerChannelDeletionWarning(bool enabled);
 	void toggleMMPZ(bool enabled);
 	void toggleDisableBackup(bool enabled);
 	void toggleOpenLastProject(bool enabled);
@@ -142,6 +142,7 @@ private:
 	bool m_letPreviewsFinish;
 	bool m_soloLegacyBehavior;
 	bool m_trackDeletionWarning;
+	bool m_mixerChannelDeletionWarning;
 	bool m_MMPZ;
 	bool m_disableBackup;
 	bool m_openLastProject;
@@ -214,4 +215,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_SETUP_DIALOG_H

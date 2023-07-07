@@ -79,14 +79,14 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 			cbIndex++;
 		}
 	}
-	
+
 	int const MAX_LEVEL=8;
 	for(int i=0; i<=MAX_LEVEL; ++i)
 	{
 		QString info="";
 		if ( i==0 ){ info = tr( "( Fastest - biggest )" ); }
 		else if ( i==MAX_LEVEL ){ info = tr( "( Slowest - smallest )" ); }
-		
+
 		compLevelCB->addItem(
 			QString::number(i)+" "+info,
 			QVariant(i/static_cast<double>(MAX_LEVEL))
@@ -159,8 +159,8 @@ void ExportProjectDialog::startExport()
 					static_cast<AudioEngine::qualitySettings::Interpolation>(interpolationCB->currentIndex()),
 					static_cast<AudioEngine::qualitySettings::Oversampling>(oversamplingCB->currentIndex()) );
 
-	const int samplerates[5] = { 44100, 48000, 88200, 96000, 192000 };
-	const bitrate_t bitrates[6] = { 64, 128, 160, 192, 256, 320 };
+	const auto samplerates = std::array{44100, 48000, 88200, 96000, 192000};
+	const auto bitrates = std::array{64, 128, 160, 192, 256, 320};
 
 	bool useVariableBitRate = checkBoxVariableBitRate->isChecked();
 

@@ -115,10 +115,6 @@ Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
 	m_chorusSpeed( FLUID_CHORUS_DEFAULT_SPEED, 0.29, 5.0, 0.01, this, tr( "Chorus speed" ) ),
 	m_chorusDepth( FLUID_CHORUS_DEFAULT_DEPTH, 0, 46.0, 0.05, this, tr( "Chorus depth" ) )
 {
-	for( int i = 0; i < 128; ++i )
-	{
-		m_notesRunning[i] = 0;
-	}
 
 
 #if QT_VERSION_CHECK(FLUIDSYNTH_VERSION_MAJOR, FLUIDSYNTH_VERSION_MINOR, FLUIDSYNTH_VERSION_MICRO) >= QT_VERSION_CHECK(1,1,9)
@@ -185,6 +181,15 @@ Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
 	connect( &m_chorusLevel, SIGNAL( dataChanged() ), this, SLOT( updateChorus() ) );
 	connect( &m_chorusSpeed, SIGNAL( dataChanged() ), this, SLOT( updateChorus() ) );
 	connect( &m_chorusDepth, SIGNAL( dataChanged() ), this, SLOT( updateChorus() ) );
+	
+	// Microtuning
+	connect(Engine::getSong(), &Song::scaleListChanged, this, &Sf2Instrument::updateTuning);
+	connect(Engine::getSong(), &Song::keymapListChanged, this, &Sf2Instrument::updateTuning);
+	connect(instrumentTrack()->microtuner()->enabledModel(), &Model::dataChanged, this, &Sf2Instrument::updateTuning, Qt::DirectConnection);
+	connect(instrumentTrack()->microtuner()->scaleModel(), &Model::dataChanged, this, &Sf2Instrument::updateTuning, Qt::DirectConnection);
+	connect(instrumentTrack()->microtuner()->keymapModel(), &Model::dataChanged, this, &Sf2Instrument::updateTuning, Qt::DirectConnection);
+	connect(instrumentTrack()->microtuner()->keyRangeImportModel(), &Model::dataChanged, this, &Sf2Instrument::updateTuning, Qt::DirectConnection);
+	connect(instrumentTrack()->baseNoteModel(), &Model::dataChanged, this, &Sf2Instrument::updateTuning, Qt::DirectConnection);
 
 	auto iph = new InstrumentPlayHandle(this, _instrument_track);
 	Engine::audioEngine()->addPlayHandle( iph );
@@ -541,6 +546,38 @@ void  Sf2Instrument::updateChorus()
 
 
 
+void Sf2Instrument::updateTuning()
+{
+	if (instrumentTrack()->microtuner()->enabledModel()->value())
+	{
+		auto centArray = std::array<double, 128>{};
+		double lowestHz = pow(2., -69. / 12.) * 440.;// Frequency of MIDI note 0, which is approximately 8.175798916 Hz
+		for (int i = 0; i < 128; ++i)
+		{
+			// Get desired Hz of note
+			double noteHz = instrumentTrack()->microtuner()->keyToFreq(i, DefaultBaseKey);
+			// Convert Hz to cents
+			centArray[i] = noteHz == 0. ? 0. : 1200. * log2(noteHz / lowestHz);
+		}
+
+		fluid_synth_activate_key_tuning(m_synth, 0, 0, "", centArray.data(), true);
+		for (int chan = 0; chan < 16; chan++)
+		{
+		    fluid_synth_activate_tuning(m_synth, chan, 0, 0, true);
+		}
+	}
+	else
+	{
+		fluid_synth_activate_key_tuning(m_synth, 0, 0, "", nullptr, true);
+		for (int chan = 0; chan < 16; chan++)
+		{
+		    fluid_synth_activate_tuning(m_synth, chan, 0, 0, true);
+		}
+	}
+}
+
+
+
 void Sf2Instrument::reloadSynth()
 {
 	double tempRate;
@@ -608,6 +645,7 @@ void Sf2Instrument::reloadSynth()
 	updateReverbOn();
 	updateChorusOn();
 	updateGain();
+	updateTuning();
 
 	// Reset last MIDI pitch properties, which will be set to the correct values
 	// upon playing the next note
@@ -626,18 +664,19 @@ void Sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 	}
 
 	const f_cnt_t tfp = _n->totalFramesPlayed();
+	
+	int masterPitch = instrumentTrack()->useMasterPitchModel()->value() ? Engine::getSong()->masterPitch() : 0;
+	int baseNote = instrumentTrack()->baseNoteModel()->value();
+	int midiNote = _n->midiKey() - baseNote + DefaultBaseKey + masterPitch;
 
-	if( tfp == 0 )
+	// out of range?
+	if (midiNote < 0 || midiNote >= 128)
 	{
-		const float LOG440 = 2.643452676f;
+		return;
+	}
 
-		int midiNote = (int)floor( 12.0 * ( log2( _n->unpitchedFrequency() ) - LOG440 ) - 4.0 );
-
-		// out of range?
-		if( midiNote <= 0 || midiNote >= 128 )
-		{
-			return;
-		}
+	if (tfp == 0)
+	{
 		const int baseVelocity = instrumentTrack()->midiPort()->baseVelocity();
 
 		auto pluginData = new Sf2PluginData;
@@ -1194,7 +1233,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
 	return new Sf2Instrument( static_cast<InstrumentTrack *>( m ) );
 }
-
 }
 
 

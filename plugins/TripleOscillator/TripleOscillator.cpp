@@ -21,7 +21,7 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 
 
 #include <QDomElement>
@@ -81,10 +81,10 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 	m_fineRightModel( 0.0f, -100.0f, 100.0f, 1.0f, this,
 			tr( "Osc %1 fine detuning right" ).arg( _idx + 1 ) ),
 	m_phaseOffsetModel( 0.0f, 0.0f, 360.0f, 1.0f, this,
-			tr( "Osc %1 phase-offset" ).arg( _idx+1 ) ), 
+			tr( "Osc %1 phase-offset" ).arg( _idx+1 ) ),
 	m_stereoPhaseDetuningModel( 0.0f, 0.0f, 360.0f, 1.0f, this,
 			tr( "Osc %1 stereo phase-detuning" ).arg( _idx+1 ) ),
-	m_waveShapeModel( Oscillator::SineWave, 0, 
+	m_waveShapeModel( Oscillator::SineWave, 0,
 			Oscillator::NumWaveShapes-1, this,
 			tr( "Osc %1 wave shape" ).arg( _idx+1 ) ),
 	m_modulationAlgoModel( Oscillator::SignalMix, 0,
@@ -220,7 +220,7 @@ void OscillatorObject::updateUseWaveTable()
 }
 
 
- 
+
 
 TripleOscillator::TripleOscillator( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &tripleoscillator_plugin_descriptor )
@@ -310,8 +310,8 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 {
 	if( _n->totalFramesPlayed() == 0 || _n->m_pluginData == nullptr )
 	{
-		Oscillator * oscs_l[NUM_OF_OSCILLATORS];
-		Oscillator * oscs_r[NUM_OF_OSCILLATORS];
+		auto oscs_l = std::array<Oscillator*, NUM_OF_OSCILLATORS>{};
+		auto oscs_r = std::array<Oscillator*, NUM_OF_OSCILLATORS>{};
 
 		for( int i = NUM_OF_OSCILLATORS - 1; i >= 0; --i )
 		{
@@ -409,10 +409,10 @@ gui::PluginView* TripleOscillator::instantiateView( QWidget * _parent )
 
 void TripleOscillator::updateAllDetuning()
 {
-	for( int i = 0; i < NUM_OF_OSCILLATORS; ++i )
+	for (const auto& osc : m_osc)
 	{
-		m_osc[i]->updateDetuningLeft();
-		m_osc[i]->updateDetuningRight();
+		osc->updateDetuningLeft();
+		osc->updateDetuningRight();
 	}
 }
 

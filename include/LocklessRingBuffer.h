@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LOCKLESSRINGBUFFER_H
-#define LOCKLESSRINGBUFFER_H
+#ifndef LMMS_LOCKLESS_RING_BUFFER_H
+#define LMMS_LOCKLESS_RING_BUFFER_H
 
 #include <QMutex>
 #include <QWaitCondition>
@@ -89,4 +89,4 @@ private:
 
 } // namespace lmms
 
-#endif //LOCKLESSRINGBUFFER_H
+#endif // LMMS_LOCKLESS_RING_BUFFER_H

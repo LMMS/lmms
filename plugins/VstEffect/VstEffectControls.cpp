@@ -83,16 +83,16 @@ void VstEffectControls::loadSettings( const QDomElement & _this )
 
 		const QMap<QString, QString> & dump = m_effect->m_plugin->parameterDump();
 		paramCount = dump.size();
-		char paramStr[35];
+		auto paramStr = std::array<char, 35>{};
 		knobFModel = new FloatModel *[ paramCount ];
 		QStringList s_dumpValues;
 		for( int i = 0; i < paramCount; i++ )
 		{
-			sprintf( paramStr, "param%d", i );
-			s_dumpValues = dump[ paramStr ].split( ":" );
+			sprintf(paramStr.data(), "param%d", i);
+			s_dumpValues = dump[paramStr.data()].split(":");
 
 			knobFModel[i] = new FloatModel( 0.0f, 0.0f, 1.0f, 0.01f, this, QString::number(i) );
-			knobFModel[i]->loadSettings( _this, paramStr );
+			knobFModel[i]->loadSettings(_this, paramStr.data());
 
 			if( !( knobFModel[ i ]->isAutomated() ||
 						knobFModel[ i ]->controllerConnection() ) )
@@ -134,12 +134,12 @@ void VstEffectControls::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		if (knobFModel != nullptr) {
 			const QMap<QString, QString> & dump = m_effect->m_plugin->parameterDump();
 			paramCount = dump.size();
-			char paramStr[35];
+			auto paramStr = std::array<char, 35>{};
 			for( int i = 0; i < paramCount; i++ )
 			{
 				if (knobFModel[i]->isAutomated() || knobFModel[i]->controllerConnection()) {
-					sprintf( paramStr, "param%d", i);
-					knobFModel[i]->saveSettings( _doc, _this, paramStr );
+					sprintf(paramStr.data(), "param%d", i);
+					knobFModel[i]->saveSettings(_doc, _this, paramStr.data());
 				}
 			}
 		}
@@ -173,7 +173,7 @@ void VstEffectControls::managePlugin()
 		auto tt = new gui::ManageVSTEffectView(m_effect, this);
 		ctrHandle = (QObject *)tt;
 	} else if (m_subWindow != nullptr) {
-		if (m_subWindow->widget()->isVisible() == false ) { 
+		if (m_subWindow->widget()->isVisible() == false ) {
 			m_scrollArea->show();
 			m_subWindow->show();
 		} else {
@@ -371,13 +371,13 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 		hasKnobModel = false;
 	}
 
-	char paramStr[35];
+	auto paramStr = std::array<char, 35>{};
 	QStringList s_dumpValues;
 
 	for( int i = 0; i < m_vi->paramCount; i++ )
 	{
-		sprintf( paramStr, "param%d", i);
-		s_dumpValues = dump[ paramStr ].split( ":" );
+		sprintf(paramStr.data(), "param%d", i);
+		s_dumpValues = dump[paramStr.data()].split(":");
 
 		vstKnobs[ i ] = new CustomTextKnob( knobBright_26, widget, s_dumpValues.at( 1 ) );
 		vstKnobs[ i ]->setDescription( s_dumpValues.at( 1 ) + ":" );
@@ -385,9 +385,9 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 
 		if( !hasKnobModel )
 		{
-			sprintf( paramStr, "%d", i);
-			m_vi->knobFModel[ i ] = new FloatModel( LocaleHelper::toFloat(s_dumpValues.at(2)),
-					0.0f, 1.0f, 0.01f, _eff, paramStr );
+			sprintf(paramStr.data(), "%d", i);
+			m_vi->knobFModel[i] = new FloatModel(LocaleHelper::toFloat(s_dumpValues.at(2)),
+					0.0f, 1.0f, 0.01f, _eff, paramStr.data());
 		}
 
 		FloatModel * model = m_vi->knobFModel[i];
@@ -439,7 +439,7 @@ void ManageVSTEffectView::closeWindow()
 
 void ManageVSTEffectView::syncPlugin()
 {
-	char paramStr[35];
+	auto paramStr = std::array<char, 35>{};
 	QStringList s_dumpValues;
 	const QMap<QString, QString> & dump = m_effect->m_plugin->parameterDump();
 	float f_value;
@@ -451,8 +451,8 @@ void ManageVSTEffectView::syncPlugin()
 		if( !( m_vi2->knobFModel[ i ]->isAutomated() ||
 					m_vi2->knobFModel[ i ]->controllerConnection() ) )
 		{
-			sprintf( paramStr, "param%d", i );
-    			s_dumpValues = dump[ paramStr ].split( ":" );
+			sprintf(paramStr.data(), "param%d", i);
+			s_dumpValues = dump[paramStr.data()].split(":");
 			f_value = LocaleHelper::toFloat(s_dumpValues.at(2));
 			m_vi2->knobFModel[ i ]->setAutomatedValue( f_value );
 			m_vi2->knobFModel[ i ]->setInitValue( f_value );
@@ -477,7 +477,7 @@ void ManageVSTEffectView::displayAutomatedOnly()
 			{
 				vstKnobs[ i ]->hide();
 				m_displayAutomatedOnly->setText( "All" );
-			} else {	
+			} else {
 				vstKnobs[ i ]->show();
 				m_displayAutomatedOnly->setText( "Automated" );
 			}
@@ -534,7 +534,7 @@ void ManageVSTEffectView::syncParameterText()
 ManageVSTEffectView::~ManageVSTEffectView()
 {
 	if( m_vi2->knobFModel != nullptr )
-	{ 
+	{
 		for( int i = 0; i < m_vi2->paramCount; i++ )
 		{
 			delete m_vi2->knobFModel[ i ];
@@ -553,18 +553,18 @@ ManageVSTEffectView::~ManageVSTEffectView()
 		delete [] m_vi2->knobFModel;
 		m_vi2->knobFModel = nullptr;
 	}
- 
+
 	if( m_vi2->m_scrollArea != nullptr )
 	{
 		delete m_vi2->m_scrollArea;
 		m_vi2->m_scrollArea = nullptr;
 	}
- 
+
 	if( m_vi2->m_subWindow != nullptr )
 	{
 		m_vi2->m_subWindow->setAttribute( Qt::WA_DeleteOnClose );
 		m_vi2->m_subWindow->close();
- 
+
 		if( m_vi2->m_subWindow != nullptr )
 		{
 			delete m_vi2->m_subWindow;

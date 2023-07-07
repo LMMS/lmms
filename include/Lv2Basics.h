@@ -1,7 +1,7 @@
 /*
  * Lv2Basics.h - basic Lv2 utils
  *
- * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,10 +22,8 @@
  *
  */
 
-
-#ifndef LV2BASICS_H
-#define LV2BASICS_H
-
+#ifndef LMMS_LV2BASICS_H
+#define LMMS_LV2BASICS_H
 
 #include "lmmsconfig.h"
 
@@ -69,4 +67,5 @@ std::string stdStringFromPortName(const LilvPlugin* plug, const LilvPort* port);
 } // namespace lmms
 
 #endif // LMMS_HAVE_LV2
-#endif // LV2BASICS_H
+
+#endif // LMMS_LV2BASICS_H

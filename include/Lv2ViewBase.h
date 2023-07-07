@@ -1,7 +1,7 @@
 /*
  * Lv2ViewBase.h - base class for Lv2 plugin views
  *
- * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,13 +22,12 @@
  *
  */
 
-#ifndef LV2VIEWBASE_H
-#define LV2VIEWBASE_H
+#ifndef LMMS_GUI_LV2_VIEW_BASE_H
+#define LMMS_GUI_LV2_VIEW_BASE_H
 
 #include "lmmsconfig.h"
 
 #ifdef LMMS_HAVE_LV2
-
 
 
 #include "LinkedModelGroupViews.h"
@@ -109,4 +108,5 @@ private:
 } // namespace lmms
 
 #endif // LMMS_HAVE_LV2
-#endif // LV2VIEWBASE_H
+
+#endif // LMMS_GUI_LV2_VIEW_BASE_H
