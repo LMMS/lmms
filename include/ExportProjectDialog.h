@@ -23,9 +23,8 @@
  *
  */
 
-
-#ifndef EXPORT_PROJECT_DIALOG_H
-#define EXPORT_PROJECT_DIALOG_H
+#ifndef LMMS_GUI_EXPORT_PROJECT_DIALOG_H
+#define LMMS_GUI_EXPORT_PROJECT_DIALOG_H
 
 #include <QDialog>
 #include <memory>
@@ -34,6 +33,10 @@
 #include "ProjectRenderer.h"
 #include "RenderManager.h"
 
+namespace lmms::gui
+{
+
+
 class ExportProjectDialog : public QDialog, public Ui::ExportProjectDialog
 {
 	Q_OBJECT
@@ -41,12 +44,12 @@ public:
 	ExportProjectDialog( const QString & _file_name, QWidget * _parent, bool multi_export );
 
 protected:
-	void reject( void ) override;
+	void reject() override;
 	void closeEvent( QCloseEvent * _ce ) override;
 
 
 private slots:
-	void startBtnClicked( void );
+	void startBtnClicked();
 	void updateTitleBar( int );
 	void accept() override;
 	void startExport();
@@ -63,4 +66,7 @@ private:
 	std::unique_ptr<RenderManager> m_renderManager;
 } ;
 
-#endif
+
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_EXPORT_PROJECT_DIALOG_H

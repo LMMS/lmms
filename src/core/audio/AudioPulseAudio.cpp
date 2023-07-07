@@ -31,10 +31,12 @@
 
 #include "ConfigManager.h"
 #include "LcdSpinBox.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "gui_templates.h"
 #include "Engine.h"
 
+namespace lmms
+{
 
 static void stream_write_callback(pa_stream *s, size_t length, void *userdata)
 {
@@ -44,12 +46,12 @@ static void stream_write_callback(pa_stream *s, size_t length, void *userdata)
 
 
 
-AudioPulseAudio::AudioPulseAudio( bool & _success_ful, Mixer*  _mixer ) :
+AudioPulseAudio::AudioPulseAudio( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	AudioDevice( qBound<ch_cnt_t>(
 		DEFAULT_CHANNELS,
 		ConfigManager::inst()->value( "audiopa", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _mixer ),
-	m_s( NULL ),
+		SURROUND_CHANNELS ), _audioEngine ),
+	m_s( nullptr ),
 	m_quit( false ),
 	m_convertEndian( false )
 {
@@ -78,7 +80,7 @@ QString AudioPulseAudio::probeDevice()
 	QString dev = ConfigManager::inst()->value( "audiopa", "device" );
 	if( dev.isEmpty() )
 	{
-		if( getenv( "AUDIODEV" ) != NULL )
+		if( getenv( "AUDIODEV" ) != nullptr )
 		{
 			return getenv( "AUDIODEV" );
 		}
@@ -114,7 +116,7 @@ void AudioPulseAudio::applyQualitySettings()
 {
 	if( hqAudio() )
 	{
-//		setSampleRate( engine::mixer()->processingSampleRate() );
+//		setSampleRate( engine::audioEngine()->processingSampleRate() );
 
 	}
 
@@ -150,7 +152,7 @@ static void stream_state_callback( pa_stream *s, void * userdata )
 /* This is called whenever the context status changes */
 static void context_state_callback(pa_context *c, void *userdata)
 {
-	AudioPulseAudio * _this = static_cast<AudioPulseAudio *>( userdata );
+	auto _this = static_cast<AudioPulseAudio*>(userdata);
 	switch( pa_context_get_state( c ) )
 	{
 		case PA_CONTEXT_CONNECTING:
@@ -161,7 +163,7 @@ static void context_state_callback(pa_context *c, void *userdata)
 		case PA_CONTEXT_READY:
 		{
 			qDebug( "Connection established.\n" );
-			_this->m_s = pa_stream_new( c, "lmms", &_this->m_sampleSpec,  NULL);
+			_this->m_s = pa_stream_new( c, "lmms", &_this->m_sampleSpec,  nullptr);
 			pa_stream_set_state_callback( _this->m_s, stream_state_callback, _this );
 			pa_stream_set_write_callback( _this->m_s, stream_write_callback, _this );
 
@@ -175,17 +177,16 @@ static void context_state_callback(pa_context *c, void *userdata)
 			buffer_attr.minreq = (uint32_t)(-1);
 			buffer_attr.fragsize = (uint32_t)(-1);
 
-			double latency = (double)( Engine::mixer()->framesPerPeriod() ) /
-													(double)_this->sampleRate();
+			double latency = (double)( Engine::audioEngine()->framesPerPeriod() ) / (double)_this->sampleRate();
 
 			// ask PulseAudio for the desired latency (which might not be approved)
 			buffer_attr.tlength = pa_usec_to_bytes( latency * PA_USEC_PER_MSEC,
 														&_this->m_sampleSpec );
 
-			pa_stream_connect_playback( _this->m_s, NULL, &buffer_attr,
+			pa_stream_connect_playback( _this->m_s, nullptr, &buffer_attr,
 										PA_STREAM_ADJUST_LATENCY,
-										NULL,	// volume
-										NULL );
+										nullptr,	// volume
+										nullptr );
 			_this->signalConnected( true );
 			break;
 		}
@@ -214,7 +215,7 @@ void AudioPulseAudio::run()
 	pa_mainloop_api * mainloop_api = pa_mainloop_get_api( mainLoop );
 
 	pa_context *context = pa_context_new( mainloop_api, "lmms" );
-	if ( context == NULL )
+	if ( context == nullptr )
 	{
 		qCritical( "pa_context_new() failed." );
 		return;
@@ -224,10 +225,10 @@ void AudioPulseAudio::run()
 
 	pa_context_set_state_callback( context, context_state_callback, this  );
 	// connect the context
-	pa_context_connect( context, NULL, (pa_context_flags) 0, NULL );
+	pa_context_connect( context, nullptr, (pa_context_flags) 0, nullptr );
 
 	while (!m_connectedSemaphore.tryAcquire()) {
-		pa_mainloop_iterate(mainLoop, 1, NULL);
+		pa_mainloop_iterate(mainLoop, 1, nullptr);
 	}
 
 	// run the main loop
@@ -245,8 +246,8 @@ void AudioPulseAudio::run()
 	}
 	else
 	{
-		const fpp_t fpp = mixer()->framesPerPeriod();
-		surroundSampleFrame * temp = new surroundSampleFrame[fpp];
+		const fpp_t fpp = audioEngine()->framesPerPeriod();
+		auto temp = new surroundSampleFrame[fpp];
 		while( getNextBuffer( temp ) )
 		{
 		}
@@ -264,9 +265,9 @@ void AudioPulseAudio::run()
 
 void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 {
-	const fpp_t fpp = mixer()->framesPerPeriod();
-	surroundSampleFrame * temp = new surroundSampleFrame[fpp];
-	int_sample_t* pcmbuf = (int_sample_t *)pa_xmalloc( fpp * channels() * sizeof(int_sample_t) );
+	const fpp_t fpp = audioEngine()->framesPerPeriod();
+	auto temp = new surroundSampleFrame[fpp];
+	auto pcmbuf = (int_sample_t*)pa_xmalloc(fpp * channels() * sizeof(int_sample_t));
 
 	size_t fd = 0;
 	while( fd < length/4 && m_quit == false )
@@ -278,12 +279,12 @@ void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 			break;
 		}
 		int bytes = convertToS16( temp, frames,
-						mixer()->masterGain(),
+						audioEngine()->masterGain(),
 						pcmbuf,
 						m_convertEndian );
 		if( bytes > 0 )
 		{
-			pa_stream_write( m_s, pcmbuf, bytes, NULL, 0,
+			pa_stream_write( m_s, pcmbuf, bytes, nullptr, 0,
 							PA_SEEK_RELATIVE );
 		}
 		fd += frames;
@@ -314,17 +315,17 @@ AudioPulseAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	m_device = new QLineEdit( AudioPulseAudio::probeDevice(), this );
 	m_device->setGeometry( 10, 20, 160, 20 );
 
-	QLabel * dev_lbl = new QLabel( tr( "Device" ), this );
+	auto dev_lbl = new QLabel(tr("Device"), this);
 	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
 	dev_lbl->setGeometry( 10, 40, 160, 10 );
 
-	LcdSpinBoxModel * m = new LcdSpinBoxModel( /* this */ );
+	auto m = new gui::LcdSpinBoxModel(/* this */);
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
 	m->setStep( 2 );
 	m->setValue( ConfigManager::inst()->value( "audiopa",
 							"channels" ).toInt() );
 
-	m_channels = new LcdSpinBox( 1, this );
+	m_channels = new gui::LcdSpinBox( 1, this );
 	m_channels->setModel( m );
 	m_channels->setLabel( tr( "Channels" ) );
 	m_channels->move( 180, 20 );
@@ -350,6 +351,7 @@ void AudioPulseAudio::setupWidget::saveSettings()
 				QString::number( m_channels->value<int>() ) );
 }
 
+} // namespace lmms
 
-#endif
+#endif // LMMS_HAVE_PULSEAUDIO
 

@@ -1,17 +1,15 @@
-#include <cstdlib>
-#include <cassert>
 #include <sys/stat.h>
-#include <ctype.h>
+#include <cctype>
 
-#include <QDir>
-#include <QApplication>
-#include <QVector>
 #include <QDomDocument>
+#include <QFile>
 #include <QLocale>
 #include <QTextCodec>
 
-#include <algorithm>
 #include "LocalFileMng.h"
+
+namespace lmms
+{
 
 
 /* New QtXml based methods */
@@ -232,3 +230,5 @@ QDomDocument LocalFileMng::openXmlDocument( const QString& filename )
 	return doc;
 }
 
+
+} // namespace lmms

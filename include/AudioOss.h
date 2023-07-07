@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_OSS_H
-#define AUDIO_OSS_H
+#ifndef LMMS_AUDIO_OSS_H
+#define LMMS_AUDIO_OSS_H
 
 #include "lmmsconfig.h"
 
@@ -34,17 +34,24 @@
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
 
-
-class LcdSpinBox;
 class QLineEdit;
+
+namespace lmms
+{
+
+namespace gui
+{
+class LcdSpinBox;
+}
+
 
 
 class AudioOss : public QThread, public AudioDevice
 {
 	Q_OBJECT
 public:
-	AudioOss( bool & _success_ful, Mixer* mixer );
-	virtual ~AudioOss();
+	AudioOss( bool & _success_ful, AudioEngine* audioEngine );
+	~AudioOss() override;
 
 	inline static QString name()
 	{
@@ -54,17 +61,17 @@ public:
 	static QString probeDevice();
 
 
-	class setupWidget : public AudioDeviceSetupWidget
+class setupWidget : public gui::AudioDeviceSetupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );
-		virtual ~setupWidget();
+		~setupWidget() override;
 
 		void saveSettings() override;
 
 	private:
 		QLineEdit * m_device;
-		LcdSpinBox * m_channels;
+		gui::LcdSpinBox * m_channels;
 
 	} ;
 
@@ -81,7 +88,8 @@ private:
 
 } ;
 
+} // namespace lmms
 
-#endif
+#endif // LMMS_HAVE_OSS
 
-#endif
+#endif // LMMS_AUDIO_OSS_H

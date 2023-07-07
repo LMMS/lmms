@@ -25,10 +25,13 @@
 
 #include <QDomElement>
 
-#include <math.h>
+#include <cmath>
 
 #include "Note.h"
 #include "DetuningHelper.h"
+
+namespace lmms
+{
 
 
 Note::Note( const TimePos & length, const TimePos & pos,
@@ -44,8 +47,8 @@ Note::Note( const TimePos & length, const TimePos & pos,
 	m_panning( qBound( PanningLeft, panning, PanningRight ) ),
 	m_length( length ),
 	m_pos( pos ),
-	m_detuning(nullptr),
-	m_type(Note::RegularNote)
+	m_detuning( nullptr ),
+	m_type( Note::RegularNote )
 {
 	if( detuning )
 	{
@@ -72,8 +75,8 @@ Note::Note( const Note & note ) :
 	m_panning( note.m_panning ),
 	m_length( note.m_length ),
 	m_pos( note.m_pos ),
-	m_detuning(nullptr),
-	m_type(note.m_type)
+	m_detuning( nullptr ),
+	m_type( note.m_type )
 {
 	if( note.m_detuning )
 	{
@@ -221,12 +224,12 @@ void Note::loadSettings( const QDomElement & _this )
 
 void Note::createDetuning()
 {
-	if( m_detuning == NULL )
+	if( m_detuning == nullptr )
 	{
 		m_detuning = new DetuningHelper;
-		(void) m_detuning->automationPattern();
+		(void) m_detuning->automationClip();
 		m_detuning->setRange( -MaxDetuning, MaxDetuning, 0.5f );
-		m_detuning->automationPattern()->setProgressionType( AutomationPattern::LinearProgression );
+		m_detuning->automationClip()->setProgressionType( AutomationClip::LinearProgression );
 	}
 }
 
@@ -245,3 +248,35 @@ bool Note::withinRange(int tickStart, int tickEnd) const
 	return pos().getTicks() >= tickStart && pos().getTicks() <= tickEnd
 		&& length().getTicks() != 0;
 }
+
+
+
+
+/*! \brief Get the start/end/bottom/top positions of notes in a vector
+ *
+ *  Returns no value if there are no notes
+ */
+std::optional<NoteBounds> boundsForNotes(const NoteVector& notes)
+{
+	if (notes.empty()) { return std::nullopt; }
+
+	TimePos start = notes.front()->pos();
+	TimePos end = start;
+	int lower = notes.front()->key();
+	int upper = lower;
+
+	for (const Note* note: notes)
+	{
+		// TODO should we assume that NoteVector is always sorted correctly,
+		// so first() always has the lowest time position?
+		start = std::min(start, note->pos());
+		end = std::max(end, note->endPos());
+		lower = std::min(lower, note->key());
+		upper = std::max(upper, note->key());
+	}
+
+	return NoteBounds{start, end, lower, upper};
+}
+
+
+} // namespace lmms

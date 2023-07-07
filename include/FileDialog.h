@@ -22,13 +22,16 @@
  *
  */
 
-
-#ifndef FILEDIALOG_H
-#define FILEDIALOG_H
+#ifndef LMMS_GUI_FILE_DIALOG_H
+#define LMMS_GUI_FILE_DIALOG_H
 
 #include <QFileDialog>
 
 #include "lmms_export.h"
+
+namespace lmms::gui
+{
+
 
 class LMMS_EXPORT FileDialog : public QFileDialog
 {
@@ -50,4 +53,7 @@ public:
 	void clearSelection();
 };
 
-#endif // FILEDIALOG_HPP
+
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_FILE_DIALOG_H

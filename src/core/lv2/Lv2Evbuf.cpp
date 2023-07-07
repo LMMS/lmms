@@ -36,6 +36,10 @@
 
 #include <lv2/lv2plug.in/ns/ext/atom/atom.h>
 
+namespace lmms
+{
+
+
 struct LV2_Evbuf_Impl {
 	uint32_t capacity;
 	uint32_t atom_Chunk;
@@ -53,8 +57,7 @@ LV2_Evbuf*
 lv2_evbuf_new(uint32_t capacity, uint32_t atom_Chunk, uint32_t atom_Sequence)
 {
 	// FIXME: memory must be 64-bit aligned
-	LV2_Evbuf* evbuf = (LV2_Evbuf*)malloc(
-		sizeof(LV2_Evbuf) + sizeof(LV2_Atom_Sequence) + capacity);
+	auto evbuf = (LV2_Evbuf*)malloc(sizeof(LV2_Evbuf) + sizeof(LV2_Atom_Sequence) + capacity);
 	evbuf->capacity = capacity;
 	evbuf->atom_Chunk = atom_Chunk;
 	evbuf->atom_Sequence = atom_Sequence;
@@ -144,15 +147,14 @@ lv2_evbuf_get(LV2_Evbuf_Iterator iter,
 	uint8_t** data)
 {
 	*frames = *type = *size = 0;
-	*data = NULL;
+	*data = nullptr;
 
 	if (!lv2_evbuf_is_valid(iter)) {
 		return false;
 	}
 
 	LV2_Atom_Sequence* aseq = &iter.evbuf->buf;
-	LV2_Atom_Event*    aev  = (LV2_Atom_Event*)(
-		(char*)LV2_ATOM_CONTENTS(LV2_Atom_Sequence, aseq) + iter.offset);
+	auto aev = (LV2_Atom_Event*)((char*)LV2_ATOM_CONTENTS(LV2_Atom_Sequence, aseq) + iter.offset);
 
 	*frames = aev->time.frames;
 	*type = aev->body.type;
@@ -175,8 +177,7 @@ lv2_evbuf_write(LV2_Evbuf_Iterator* iter,
 		return false;
 	}
 
-	LV2_Atom_Event* aev = (LV2_Atom_Event*)(
-		(char*)LV2_ATOM_CONTENTS(LV2_Atom_Sequence, aseq) + iter->offset);
+	auto aev = (LV2_Atom_Event*)((char*)LV2_ATOM_CONTENTS(LV2_Atom_Sequence, aseq) + iter->offset);
 
 	aev->time.frames = frames;
 	aev->body.type = type;
@@ -189,5 +190,8 @@ lv2_evbuf_write(LV2_Evbuf_Iterator* iter,
 
 	return true;
 }
+
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2

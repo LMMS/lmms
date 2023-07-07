@@ -34,6 +34,11 @@
 #include "MainWindow.h"
 #include "MeterDialog.h"
 #include "Song.h"
+#include "SubWindow.h"
+
+
+namespace lmms::gui
+{
 
 
 
@@ -42,7 +47,7 @@ TempoSyncKnob::TempoSyncKnob( knobTypes _knob_num, QWidget * _parent,
 	Knob( _knob_num, _parent, _name ),
 	m_tempoSyncIcon( embed::getIconPixmap( "tempo_sync" ) ),
 	m_tempoSyncDescription( tr( "Tempo Sync" ) ),
-	m_custom( NULL )
+	m_custom( nullptr )
 {
 }
 
@@ -62,18 +67,18 @@ TempoSyncKnob::~TempoSyncKnob()
 
 void TempoSyncKnob::modelChanged()
 {
-	if( model() == NULL )
+	if( model() == nullptr )
 	{
 		qWarning( "no TempoSyncKnobModel has been set!" );
 	}
-	if( m_custom != NULL )
+	if( m_custom != nullptr )
 	{
 		m_custom->setModel( &model()->m_custom );
 	}
-	connect( model(), SIGNAL( syncModeChanged( TempoSyncMode ) ),
-			this, SLOT( updateDescAndIcon() ) );
-	connect( this, SIGNAL( sliderMoved( float ) ),
-			model(), SLOT( disableSync() ) );
+	connect( model(), SIGNAL(syncModeChanged(lmms::TempoSyncKnobModel::TempoSyncMode)),
+			this, SLOT(updateDescAndIcon()));
+	connect( this, SIGNAL(sliderMoved(float)),
+			model(), SLOT(disableSync()));
 	updateDescAndIcon();
 }
 
@@ -82,7 +87,7 @@ void TempoSyncKnob::modelChanged()
 
 void TempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 {
-	mouseReleaseEvent( NULL );
+	mouseReleaseEvent( nullptr );
 
 	CaptionMenu contextMenu( model()->displayName(), this );
 	addDefaultActions( &contextMenu );
@@ -96,8 +101,8 @@ void TempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 	if( limit / 8.0f <= model()->maxValue() )
 	{
 
-	connect( syncMenu, SIGNAL( triggered( QAction * ) ),
-			model(), SLOT( setTempoSync( QAction * ) ) );
+	connect( syncMenu, SIGNAL(triggered(QAction*)),
+			model(), SLOT(setTempoSync(QAction*)));
 	syncMenu->addAction( embed::getIconPixmap( "note_none" ),
 		tr( "No Sync" ) )->setData( (int) TempoSyncKnobModel::SyncNone );
 	if( limit / 0.125f <= model()->maxValue() )
@@ -141,7 +146,7 @@ void TempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 				(int) TempoSyncKnobModel::SyncThirtysecondNote );
 	syncMenu->addAction( embed::getIconPixmap( "dont_know" ),
 				tr( "Custom..." ),
-				this, SLOT( showCustom() )
+				this, SLOT(showCustom())
 						)->setData(
 					(int) TempoSyncKnobModel::SyncCustom );
 	contextMenu.addSeparator();
@@ -204,7 +209,7 @@ void TempoSyncKnob::updateDescAndIcon()
 	{
 		m_tempoSyncDescription = tr( "Tempo Sync" );
 	}
-	if( m_custom != NULL &&
+	if( m_custom != nullptr &&
 		model()->m_tempoSyncMode != TempoSyncKnobModel::SyncCustom )
 	{
 		m_custom->parentWidget()->hide();
@@ -288,10 +293,10 @@ void TempoSyncKnob::setSyncIcon( const QPixmap & _new_icon )
 
 void TempoSyncKnob::showCustom()
 {
-	if( m_custom == NULL )
+	if( m_custom == nullptr )
 	{
-		m_custom = new MeterDialog( gui->mainWindow()->workspace() );
-		QMdiSubWindow * subWindow = gui->mainWindow()->addWindowedWidget( m_custom );
+		m_custom = new MeterDialog( getGUI()->mainWindow()->workspace() );
+		QMdiSubWindow * subWindow = getGUI()->mainWindow()->addWindowedWidget( m_custom );
 		Qt::WindowFlags flags = subWindow->windowFlags();
 		flags &= ~Qt::WindowMaximizeButtonHint;
 		subWindow->setWindowFlags( flags );
@@ -307,4 +312,4 @@ void TempoSyncKnob::showCustom()
 
 
 
-
+} // namespace lmms::gui

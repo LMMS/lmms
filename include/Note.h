@@ -23,15 +23,21 @@
  *
  */
 
-#ifndef NOTE_H
-#define NOTE_H
+#ifndef LMMS_NOTE_H
+#define LMMS_NOTE_H
 
-#include <QtCore/QVector>
+#include <optional>
+#include <QVector>
 
 #include "volume.h"
 #include "panning.h"
 #include "SerializingObject.h"
 #include "TimePos.h"
+
+
+namespace lmms
+{
+
 
 class DetuningHelper;
 
@@ -55,6 +61,7 @@ enum Keys
 
 enum Octaves
 {
+	Octave_m1,	// MIDI standard starts at C-1
 	Octave_0,
 	Octave_1,
 	Octave_2,
@@ -64,15 +71,19 @@ enum Octaves
 	Octave_6,
 	Octave_7,
 	Octave_8,
+	Octave_9,	// incomplete octave, MIDI only goes up to G9
 	NumOctaves
-} ;
+};
 
+const int FirstOctave = -1;
+const int KeysPerOctave = 12;
+const int DefaultKey = DefaultOctave * KeysPerOctave + Key_A;
+//! Number of physical keys, limited to MIDI range (valid for both MIDI 1.0 and 2.0)
+const int NumKeys = 128;
 
-const int WhiteKeysPerOctave = 7;
-const int BlackKeysPerOctave = 5;
-const int KeysPerOctave = WhiteKeysPerOctave + BlackKeysPerOctave;
-const int NumKeys = NumOctaves * KeysPerOctave;
-const int DefaultKey = DefaultOctave*KeysPerOctave + Key_A;
+const int DefaultMiddleKey = Octave_4 * KeysPerOctave + Key_C;
+const int DefaultBaseKey = Octave_4 * KeysPerOctave + Key_A;
+const float DefaultBaseFreq = 440.f;
 
 const float MaxDetuning = 4 * 12.0f;
 
@@ -86,9 +97,9 @@ public:
 		int key = DefaultKey,
 		volume_t volume = DefaultVolume,
 		panning_t panning = DefaultPanning,
-		DetuningHelper * detuning = NULL );
+		DetuningHelper * detuning = nullptr );
 	Note( const Note & note );
-	virtual ~Note();
+	~Note() override;
 
 	// Note types
 	enum Types
@@ -255,8 +266,20 @@ private:
 	Type m_type;
 };
 
+using NoteVector = QVector<Note*>;
 
-typedef QVector<Note *> NoteVector;
+struct NoteBounds
+{
+	TimePos start;
+	TimePos end;
+	int lowest;
+	int highest;
+};
 
 
-#endif
+std::optional<NoteBounds> boundsForNotes(const NoteVector& notes);
+
+
+} // namespace lmms
+
+#endif // LMMS_NOTE_H

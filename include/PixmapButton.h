@@ -22,13 +22,15 @@
  *
  */
 
-
-#ifndef PIXMAP_BUTTON_H
-#define PIXMAP_BUTTON_H
+#ifndef LMMS_GUI_PIXMAP_BUTTON_H
+#define LMMS_GUI_PIXMAP_BUTTON_H
 
 #include <QPixmap>
 
 #include "AutomatableButton.h"
+
+namespace lmms::gui
+{
 
 
 class LMMS_EXPORT PixmapButton : public AutomatableButton
@@ -37,7 +39,7 @@ class LMMS_EXPORT PixmapButton : public AutomatableButton
 public:
 	PixmapButton( QWidget * _parent,
 					const QString & _name = QString() );
-	virtual ~PixmapButton();
+	~PixmapButton() override = default;
 
 	void setActiveGraphic( const QPixmap & _pm );
 	void setInactiveGraphic( const QPixmap & _pm, bool _update = true );
@@ -62,4 +64,7 @@ private:
 
 } ;
 
-#endif
+
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_PIXMAP_BUTTON_H

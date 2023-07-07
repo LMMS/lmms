@@ -25,16 +25,17 @@
  *
  */
 
-#ifndef LOCALEHELPER_H
-#define LOCALEHELPER_H
+#ifndef LMMS_LOCALEHELPER_H
+#define LMMS_LOCALEHELPER_H
 
 #include <QLocale>
 
 #include <limits>
 #include <cmath>
 
-namespace LocaleHelper
+namespace lmms::LocaleHelper
 {
+
 inline double toDouble(QString str, bool* ok = nullptr)
 {
 	bool isOkay;
@@ -62,6 +63,8 @@ inline float toFloat(QString str, bool* ok = nullptr)
 	}
 	return static_cast<float>(d);
 }
-}
 
-#endif // LOCALEHELPER_H
+
+} // namespace lmms::LocaleHelper
+
+#endif // LMMS_LOCALEHELPER_H

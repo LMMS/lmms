@@ -3,6 +3,7 @@ IF(LMMS_BUILD_LINUX AND WANT_VST)
 	add_subdirectory(qt5-x11embed)
 ENDIF()
 
+ADD_SUBDIRECTORY(hiir)
 ADD_SUBDIRECTORY(rpmalloc)
 ADD_SUBDIRECTORY(weakjack)
 

@@ -22,12 +22,12 @@
  *
  */
 
+#ifndef LMMS_SAMPLE_BUFFER_H
+#define LMMS_SAMPLE_BUFFER_H
 
-#ifndef SAMPLE_BUFFER_H
-#define SAMPLE_BUFFER_H
-
-#include <QtCore/QReadWriteLock>
-#include <QtCore/QObject>
+#include <memory>
+#include <QReadWriteLock>
+#include <QObject>
 
 #include <samplerate.h>
 
@@ -36,11 +36,15 @@
 #include "lmms_basics.h"
 #include "lmms_math.h"
 #include "shared_object.h"
+#include "OscillatorConstants.h"
 #include "MemoryManager.h"
 
 
 class QPainter;
 class QRect;
+
+namespace lmms
+{
 
 // values for buffer margins, used for various libsamplerate interpolation modes
 // the array positions correspond to the converter_type parameter values in libsamplerate
@@ -114,7 +118,7 @@ public:
 	friend void swap(SampleBuffer & first, SampleBuffer & second) noexcept;
 	SampleBuffer& operator= (const SampleBuffer that);
 
-	virtual ~SampleBuffer();
+	~SampleBuffer() override;
 
 	bool play(
 		sampleFrame * ab,
@@ -273,17 +277,20 @@ public:
 	}
 
 
+	std::unique_ptr<OscillatorConstants::waveform_t> m_userAntiAliasWaveTable;
+
+
 public slots:
 	void setAudioFile(const QString & audioFile);
 	void loadFromBase64(const QString & data);
-	void setStartFrame(const f_cnt_t s);
-	void setEndFrame(const f_cnt_t e);
+	void setStartFrame(const lmms::f_cnt_t s);
+	void setEndFrame(const lmms::f_cnt_t e);
 	void setAmplification(float a);
 	void setReversed(bool on);
 	void sampleRateChanged();
 
 private:
-	static sample_rate_t mixerSampleRate();
+	static sample_rate_t audioEngineSampleRate();
 
 	void update(bool keepSettings = false);
 
@@ -346,5 +353,6 @@ signals:
 
 } ;
 
+} // namespace lmms
 
-#endif
+#endif // LMMS_SAMPLE_BUFFER_H
