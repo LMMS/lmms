@@ -635,15 +635,16 @@ bool MainWindow::mayChangeProject(bool stopPlayback)
 					"last saving. Do you want to save it "
 								"now?" );
 
-	QMessageBox mb( ( getSession() == Recover ?
-				messageTitleRecovered : messageTitleUnsaved ),
-			( getSession() == Recover ?
-					messageRecovered : messageUnsaved ),
-				QMessageBox::Question,
-				QMessageBox::Save,
-				QMessageBox::Discard,
-				QMessageBox::Cancel,
-				this );
+	QMessageBox mb;
+	mb.setWindowTitle( getSession() == Recover ? messageTitleRecovered : messageTitleUnsaved );
+	mb.setText( getSession() == Recover ? messageRecovered : messageUnsaved );
+	mb.setIcon( QMessageBox::Question );
+
+	mb.addButton(QMessageBox::Save);
+	QAbstractButton * discardButton = mb.addButton(QMessageBox::Discard);
+	discardButton->setShortcut(Qt::CTRL + Qt::Key_D);
+	mb.addButton(QMessageBox::Cancel);
+
 	int answer = mb.exec();
 
 	if( answer == QMessageBox::Save )
