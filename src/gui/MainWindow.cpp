@@ -316,7 +316,8 @@ void MainWindow::finalize()
 	project_menu->addAction( embed::getIconPixmap( "project_import" ),
 					tr( "Import..." ),
 					this,
-					SLOT(onImportProject()));
+					SLOT(onImportProject()),
+					Qt::CTRL + Qt::Key_I );
 	project_menu->addAction( embed::getIconPixmap( "project_export" ),
 					tr( "E&xport..." ),
 					this,
