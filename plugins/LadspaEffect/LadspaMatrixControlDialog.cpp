@@ -36,7 +36,7 @@
 #include "LadspaControl.h"
 #include "LadspaEffect.h"
 #include "LadspaMatrixControlDialog.h"
-#include "LadspaMatrixControlView.h"
+#include "LadspaWidgetFactory.h"
 #include "LadspaControlView.h"
 #include "LedCheckBox.h"
 
@@ -152,8 +152,11 @@ void LadspaMatrixControlDialog::arrangeControls(QWidget * parent, QGridLayout* g
 			}
 
 			// TODO Use a factory to directly create the widgets? Currently they are wrapped in another layout in LadspaMatrixControlView...
-			LadspaMatrixControlView *ladspaMatrixControlView = new LadspaMatrixControlView(parent, ladspaControl);
-			gridLayout->addWidget(ladspaMatrixControlView, currentRow, currentChannelColumn);
+			QWidget * controlWidget = LadspaWidgetFactory::createWidget(ladspaControl, this);
+			if (controlWidget)
+			{
+				gridLayout->addWidget(controlWidget, currentRow, currentChannelColumn);
+			}
 
 			// Record the maximum row so that we add a vertical spacer after that row
 			maxRow = std::max(maxRow, currentRow);

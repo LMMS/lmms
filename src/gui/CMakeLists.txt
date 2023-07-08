@@ -16,7 +16,7 @@ SET(LMMS_SRCS
 	gui/FileBrowser.cpp
 	gui/GuiApplication.cpp
 	gui/LadspaControlView.cpp
-	gui/LadspaMatrixControlView.cpp
+	gui/LadspaWidgetFactory.cpp
 	gui/LfoControllerDialog.cpp
 	gui/LinkedModelGroupViews.cpp
 	gui/LmmsPalette.cpp
