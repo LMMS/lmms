@@ -22,6 +22,11 @@
  *
  */
 
+#pragma once
+
+#ifndef LMMS_GUI_BAR_MODEL_EDITOR_H
+#define LMMS_GUI_BAR_MODEL_EDITOR_H
+
 #include "FloatModelEditorBase.h"
 
 
@@ -47,4 +52,6 @@ private:
 	QString const m_text;
 };
 
-}
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_BAR_MODEL_EDITOR_H

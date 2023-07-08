@@ -67,4 +67,4 @@ void BarModelEditor::paintEvent(QPaintEvent *event)
 	painter.drawText(textRect, m_text);
 }
 
-}
+} // namespace lmms::gui
