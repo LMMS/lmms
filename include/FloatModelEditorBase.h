@@ -26,11 +26,8 @@
 #ifndef LMMS_GUI_FLOAT_MODEL_EDITOR_BASE_H
 #define LMMS_GUI_FLOAT_MODEL_EDITOR_BASE_H
 
-#include <memory>
-#include <QPixmap>
 #include <QWidget>
 #include <QPoint>
-#include <QTextDocument>
 
 #include "AutomatableModelView.h"
 
@@ -106,17 +103,12 @@ private:
 
 	static SimpleTextFloat * s_textFloat;
 
-	QTextDocument* m_tdRenderer;
-
-	std::unique_ptr<QPixmap> m_knobPixmap;
 	BoolModel m_volumeKnob;
 	FloatModel m_volumeRatio;
 
 	QPoint m_lastMousePos; //!< mouse position in last mouseMoveEvent
 	float m_leftOver;
 	bool m_buttonPressed;
-
-	QImage m_cache;
 };
 
 
