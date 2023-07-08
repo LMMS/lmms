@@ -93,76 +93,9 @@ void FloatModelEditorBase::initUi( const QString & _name )
 
 	setWindowTitle( _name );
 
-	onKnobNumUpdated();
-	setTotalAngle( 270.0f );
-	setInnerRadius( 1.0f );
-	setOuterRadius( 10.0f );
 	setFocusPolicy( Qt::ClickFocus );
 
-	// This is a workaround to enable style sheets for knobs which are not styled knobs.
-	//
-	// It works as follows: the palette colors that are assigned as the line color previously
-	// had been hard coded in the drawKnob method for the different knob types. Now the
-	// drawKnob method uses the line color to draw the lines. By assigning the palette colors
-	// as the line colors here the knob lines will be drawn in this color unless the stylesheet
-	// overrides that color.
-	switch (knobNum())
-	{
-	case knobSmall_17Temp:
-	case knobBright_26Temp:
-	case knobDark_28Temp:
-		m_lineActiveColor = QApplication::palette().color(QPalette::Active, QPalette::WindowText);
-		m_arcActiveColor = QColor(QApplication::palette().color(
-									QPalette::Active, QPalette::WindowText));
-		m_arcActiveColor.setAlpha(70);
-		break;
-	case knobVintage_32Temp:
-		m_lineActiveColor = QApplication::palette().color(QPalette::Active, QPalette::Shadow);
-		m_arcActiveColor = QColor(QApplication::palette().color(
-									QPalette::Active, QPalette::Shadow));
-		m_arcActiveColor.setAlpha(70);
-		break;
-	default:
-		break;
-	}
-
 	doConnections();
-}
-
-
-
-
-void FloatModelEditorBase::onKnobNumUpdated()
-{
-	if( m_knobNum != knobStyledTemp )
-	{
-		QString knobFilename;
-		switch (m_knobNum)
-		{
-		case knobDark_28Temp:
-			knobFilename = "knob01";
-			break;
-		case knobBright_26Temp:
-			knobFilename = "knob02";
-			break;
-		case knobSmall_17Temp:
-			knobFilename = "knob03";
-			break;
-		case knobVintage_32Temp:
-			knobFilename = "knob05";
-			break;
-		case knobStyledTemp: // only here to stop the compiler from complaining
-			break;
-		}
-
-		// If knobFilename is still empty here we should get the fallback pixmap of size 1x1
-		m_knobPixmap = std::make_unique<QPixmap>(QPixmap(embed::getIconPixmap(knobFilename.toUtf8().constData())));
-		if (!this->isEnabled())
-		{
-			convertPixmapToGrayScaleTemp(*m_knobPixmap.get());
-		}
-		setFixedSize( m_knobPixmap->width(), m_knobPixmap->height() );
-	}
 }
 
 
@@ -248,26 +181,6 @@ float FloatModelEditorBase::outerRadius() const
 void FloatModelEditorBase::setOuterRadius( float r )
 {
 	m_outerRadius = r;
-}
-
-
-
-
-knobTypesTemp FloatModelEditorBase::knobNum() const
-{
-	return m_knobNum;
-}
-
-
-
-
-void FloatModelEditorBase::setknobNum( knobTypesTemp k )
-{
-	if( m_knobNum != k )
-	{
-		m_knobNum = k;
-		onKnobNumUpdated();
-	}
 }
 
 
@@ -379,112 +292,6 @@ bool FloatModelEditorBase::updateAngle()
 
 
 
-
-void FloatModelEditorBase::drawKnob( QPainter * _p )
-{
-	bool enabled = this->isEnabled();
-	QColor currentArcColor = enabled ? m_arcActiveColor : m_arcInactiveColor;
-	QColor currentLineColor = enabled ? m_lineActiveColor : m_lineInactiveColor;
-
-	if( updateAngle() == false && !m_cache.isNull() )
-	{
-		_p->drawImage( 0, 0, m_cache );
-		return;
-	}
-
-	m_cache = QImage( size(), QImage::Format_ARGB32 );
-	m_cache.fill( qRgba( 0, 0, 0, 0 ) );
-
-	QPainter p( &m_cache );
-
-	QPoint mid;
-
-	if( m_knobNum == knobStyledTemp )
-	{
-		p.setRenderHint( QPainter::Antialiasing );
-
-		// Perhaps this can move to setOuterRadius()
-		if( m_outerColor.isValid() )
-		{
-			QRadialGradient gradient( centerPoint(), outerRadius() );
-			gradient.setColorAt( 0.4, _p->pen().brush().color() );
-			gradient.setColorAt( 1, m_outerColor );
-
-			p.setPen( QPen( gradient, lineWidth(),
-						Qt::SolidLine, Qt::RoundCap ) );
-		}
-		else {
-			QPen pen = p.pen();
-			pen.setWidth( (int) lineWidth() );
-			pen.setCapStyle( Qt::RoundCap );
-
-			p.setPen( pen );
-		}
-
-		p.drawLine( calculateLine( centerPoint(), outerRadius(),
-							innerRadius() ) );
-		p.end();
-		_p->drawImage( 0, 0, m_cache );
-		return;
-	}
-
-
-	// Old-skool knobs
-	const float radius = m_knobPixmap->width() / 2.0f - 1;
-	mid = QPoint( width() / 2, m_knobPixmap->height() / 2 );
-
-	p.drawPixmap( static_cast<int>(
-				width() / 2 - m_knobPixmap->width() / 2 ), 0,
-				*m_knobPixmap );
-
-	p.setRenderHint( QPainter::Antialiasing );
-
-	const int centerAngle = angleFromValue( model()->inverseScaledValue( model()->centerValue() ), model()->minValue(), model()->maxValue(), m_totalAngle );
-
-	const int arcLineWidth = 2;
-	const int arcRectSize = m_knobPixmap->width() - arcLineWidth;
-
-	p.setPen(QPen(currentArcColor, 2));
-	p.drawArc( mid.x() - arcRectSize/2, 1, arcRectSize, arcRectSize, 315*16, 16*m_totalAngle );
-
-	p.setPen(QPen(currentLineColor, 2));
-	switch( m_knobNum )
-	{
-		case knobSmall_17Temp:
-		{
-			p.drawLine( calculateLine( mid, radius-2 ) );
-			break;
-		}
-		case knobBright_26Temp:
-		{
-			p.drawLine( calculateLine( mid, radius-5 ) );
-			break;
-		}
-		case knobDark_28Temp:
-		{
-			const float rb = qMax<float>( ( radius - 10 ) / 3.0,
-									0.0 );
-			const float re = qMax<float>( ( radius - 4 ), 0.0 );
-			QLineF ln = calculateLine( mid, re, rb );
-			ln.translate( 1, 1 );
-			p.drawLine( ln );
-			break;
-		}
-		case knobVintage_32Temp:
-		{
-			p.drawLine( calculateLine( mid, radius-2, 2 ) );
-			break;
-		}
-		case knobStyledTemp:
-			break;
-	}
-
-	p.drawArc( mid.x() - arcRectSize/2, 1, arcRectSize, arcRectSize, (90-centerAngle)*16, -16*(m_angle-centerAngle) );
-
-	p.end();
-
-	_p->drawImage( 0, 0, m_cache );
-}
 
 float FloatModelEditorBase::getValue( const QPoint & _p )
 {
@@ -663,26 +470,23 @@ void FloatModelEditorBase::mouseDoubleClickEvent( QMouseEvent * )
 
 void FloatModelEditorBase::paintEvent( QPaintEvent * _me )
 {
-	QPainter p( this );
+	QPainter p(this);
 
-	drawKnob( &p );
-	if( !m_label.isEmpty() )
-	{
-		if (!m_isHtmlLabel)
-		{
-			p.setFont(pointSizeF(p.font(), 6.5));
-			p.setPen(textColor());
-			p.drawText(width() / 2 -
-				horizontalAdvance(p.fontMetrics(), m_label) / 2,
-				height() - 2, m_label);
-		}
-		else
-		{
-			m_tdRenderer->setDefaultFont(pointSizeF(p.font(), 6.5));
-			p.translate((width() - m_tdRenderer->idealWidth()) / 2, (height() - m_tdRenderer->pageSize().height()) / 2);
-			m_tdRenderer->drawContents(&p);
-		}
-	}
+	QColor const foreground(3, 94, 97);
+
+	auto const * mod = model();
+	auto const minValue = mod->minValue();
+	auto const maxValue = mod->maxValue();
+	auto const range = maxValue - minValue;
+
+	// Compute the percentage
+	// min + x * (max - min) = v <=> x = (v - min) / (max - min)
+	auto const percentage = range == 0 ? 1. : (mod->value() - minValue) / range;
+
+	QRect r = rect();
+	p.setPen(foreground);
+	p.setBrush(foreground);
+	p.drawRect(QRect(r.topLeft(), QPoint(r.width() * percentage, r.height())));
 }
 
 
@@ -834,21 +638,6 @@ void FloatModelEditorBase::doConnections()
 
 		QObject::connect( model(), SIGNAL(propertiesChanged()),
 						this, SLOT(update()));
-	}
-}
-
-
-void FloatModelEditorBase::changeEvent(QEvent * ev)
-{
-	if (ev->type() == QEvent::EnabledChange)
-	{
-		onKnobNumUpdated();
-		if (!m_label.isEmpty())
-		{
-			setLabel(m_label);
-		}
-		m_cache = QImage();
-		update();
 	}
 }
 

@@ -76,12 +76,9 @@ class LMMS_EXPORT FloatModelEditorBase : public QWidget, public FloatModelView
 	mapPropertyFromModel(bool,isVolumeKnob,setVolumeKnob,m_volumeKnob);
 	mapPropertyFromModel(float,volumeRatio,setVolumeRatio,m_volumeRatio);
 
-	Q_PROPERTY(knobTypesTemp knobNum READ knobNum WRITE setknobNum)
-	
 	Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor)
 
 	void initUi( const QString & _name ); //!< to be called by ctors
-	void onKnobNumUpdated(); //!< to be called when you updated @a m_knobNum
 
 public:
 	FloatModelEditorBase( knobTypesTemp _knob_num, QWidget * _parent = nullptr, const QString & _name = QString() );
@@ -106,9 +103,6 @@ public:
 
 	float outerRadius() const;
 	void setOuterRadius( float r );
-
-	knobTypesTemp knobNum() const;
-	void setknobNum( knobTypesTemp k );
 
 	QPointF centerPoint() const;
 	float centerPointX() const;
@@ -143,7 +137,6 @@ protected:
 	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
 	void paintEvent( QPaintEvent * _me ) override;
 	void wheelEvent( QWheelEvent * _me ) override;
-	void changeEvent(QEvent * ev) override;
 
 	virtual float getValue( const QPoint & _p );
 
@@ -160,7 +153,6 @@ private:
 	QLineF calculateLine( const QPointF & _mid, float _radius,
 						float _innerRadius = 1) const;
 
-	void drawKnob( QPainter * _p );
 	void setPosition( const QPoint & _p );
 	bool updateAngle();
 
