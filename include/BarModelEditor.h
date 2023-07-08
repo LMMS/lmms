@@ -33,7 +33,7 @@
 namespace lmms::gui
 {
 
-class BarModelEditor : public FloatModelEditorBase
+class LMMS_EXPORT BarModelEditor : public FloatModelEditorBase
 {
 public:
 	BarModelEditor(QString text, FloatModel * floatModel, QWidget * parent = nullptr);
