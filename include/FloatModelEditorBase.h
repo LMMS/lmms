@@ -48,29 +48,9 @@ void convertPixmapToGrayScaleTemp(QPixmap &pixMap);
 class LMMS_EXPORT FloatModelEditorBase : public QWidget, public FloatModelView
 {
 	Q_OBJECT
-	Q_ENUMS( knobTypesTemp )
-
-	Q_PROPERTY(float innerRadius READ innerRadius WRITE setInnerRadius)
-	Q_PROPERTY(float outerRadius READ outerRadius WRITE setOuterRadius)
-
-	Q_PROPERTY(float centerPointX READ centerPointX WRITE setCenterPointX)
-	Q_PROPERTY(float centerPointY READ centerPointY WRITE setCenterPointY)
-
-	Q_PROPERTY(float lineWidth READ lineWidth WRITE setLineWidth)
-
-	// Unfortunately, the gradient syntax doesn't create our gradient
-	// correctly so we need to do this:
-	Q_PROPERTY(QColor outerColor READ outerColor WRITE setOuterColor)
-
-	Q_PROPERTY(QColor lineActiveColor MEMBER m_lineActiveColor)
-	Q_PROPERTY(QColor lineInactiveColor MEMBER m_lineInactiveColor)
-	Q_PROPERTY(QColor arcActiveColor MEMBER m_arcActiveColor)
-	Q_PROPERTY(QColor arcInactiveColor MEMBER m_arcInactiveColor)
 
 	mapPropertyFromModel(bool,isVolumeKnob,setVolumeKnob,m_volumeKnob);
 	mapPropertyFromModel(float,volumeRatio,setVolumeRatio,m_volumeRatio);
-
-	Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor)
 
 	void initUi( const QString & _name ); //!< to be called by ctors
 
@@ -87,29 +67,6 @@ public:
 	}
 
 	void setTotalAngle( float angle );
-
-	// Begin styled knob accessors
-	float innerRadius() const;
-	void setInnerRadius( float r );
-
-	float outerRadius() const;
-	void setOuterRadius( float r );
-
-	QPointF centerPoint() const;
-	float centerPointX() const;
-	void setCenterPointX( float c );
-	float centerPointY() const;
-	void setCenterPointY( float c );
-
-	float lineWidth() const;
-	void setLineWidth( float w );
-
-	QColor outerColor() const;
-	void setOuterColor( const QColor & c );
-	
-	QColor textColor() const;
-	void setTextColor( const QColor & c );
-
 
 signals:
 	void sliderPressed();
@@ -173,20 +130,6 @@ private:
 	float m_totalAngle;
 	int m_angle;
 	QImage m_cache;
-
-	// Styled knob stuff, could break out
-	QPointF m_centerPoint;
-	float m_innerRadius;
-	float m_outerRadius;
-	float m_lineWidth;
-	QColor m_outerColor;
-
-	QColor m_lineActiveColor;
-	QColor m_lineInactiveColor;
-	QColor m_arcActiveColor;
-	QColor m_arcInactiveColor;
-	
-	QColor m_textColor;
 };
 
 

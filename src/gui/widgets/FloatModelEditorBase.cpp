@@ -66,9 +66,7 @@ FloatModelEditorBase::FloatModelEditorBase(QWidget * _parent, const QString & _n
 	m_volumeKnob( false ),
 	m_volumeRatio( 100.0, 0.0, 1000000.0 ),
 	m_buttonPressed( false ),
-	m_angle( -10 ),
-	m_lineWidth( 0 ),
-	m_textColor( 255, 255, 255 )
+	m_angle( -10 )
 {
 	initUi( _name );
 }
@@ -104,112 +102,6 @@ void FloatModelEditorBase::setTotalAngle( float angle )
 	update();
 }
 
-
-
-
-float FloatModelEditorBase::innerRadius() const
-{
-	return m_innerRadius;
-}
-
-
-
-void FloatModelEditorBase::setInnerRadius( float r )
-{
-	m_innerRadius = r;
-}
-
-
-
-float FloatModelEditorBase::outerRadius() const
-{
-	return m_outerRadius;
-}
-
-
-
-void FloatModelEditorBase::setOuterRadius( float r )
-{
-	m_outerRadius = r;
-}
-
-
-
-
-QPointF FloatModelEditorBase::centerPoint() const
-{
-	return m_centerPoint;
-}
-
-
-
-float FloatModelEditorBase::centerPointX() const
-{
-	return m_centerPoint.x();
-}
-
-
-
-void FloatModelEditorBase::setCenterPointX( float c )
-{
-	m_centerPoint.setX( c );
-}
-
-
-
-float FloatModelEditorBase::centerPointY() const
-{
-	return m_centerPoint.y();
-}
-
-
-
-void FloatModelEditorBase::setCenterPointY( float c )
-{
-	m_centerPoint.setY( c );
-}
-
-
-
-float FloatModelEditorBase::lineWidth() const
-{
-	return m_lineWidth;
-}
-
-
-
-void FloatModelEditorBase::setLineWidth( float w )
-{
-	m_lineWidth = w;
-}
-
-
-
-QColor FloatModelEditorBase::outerColor() const
-{
-	return m_outerColor;
-}
-
-
-
-void FloatModelEditorBase::setOuterColor( const QColor & c )
-{
-	m_outerColor = c;
-}
-
-
-
-QColor FloatModelEditorBase::textColor() const
-{
-	return m_textColor;
-}
-
-
-
-void FloatModelEditorBase::setTextColor( const QColor & c )
-{
-	m_textColor = c;
-}
 
 
 
