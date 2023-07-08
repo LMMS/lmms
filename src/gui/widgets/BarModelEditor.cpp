@@ -1,20 +1,16 @@
 #include <BarModelEditor.h>
 
-#include "CaptionMenu.h"
-
 #include <QPainter>
-#include <QInputDialog>
 
 
 namespace lmms::gui
 {
 
 BarModelEditor::BarModelEditor(QString text, FloatModel * floatModel, QWidget * parent) :
-	QWidget(parent),
-	FloatModelView( floatModel, this ),
+	FloatModelEditorBase(parent),
 	m_text(text)
 {
-	connectToModelSignals();
+	setModel(floatModel);
 }
 
 QSizePolicy BarModelEditor::sizePolicy() const
@@ -69,47 +65,6 @@ void BarModelEditor::paintEvent(QPaintEvent *event)
 	QRect const textRect = valueRect.marginsRemoved(margins);
 	painter.setPen(textColor);
 	painter.drawText(textRect, m_text);
-}
-
-void BarModelEditor::contextMenuEvent(QContextMenuEvent * me)
-{
-	CaptionMenu contextMenu(model()->displayName(), this);
-
-	addDefaultActions(&contextMenu);
-
-	contextMenu.addSeparator();
-	contextMenu.exec(QCursor::pos());
-}
-
-void BarModelEditor::mouseDoubleClickEvent(QMouseEvent * me)
-{
-	bool ok;
-
-	float new_val = QInputDialog::getDouble(
-		this, tr("Set value"),
-		tr("Please enter a new value between "
-		   "%1 and %2:").
-		arg(model()->minValue()).
-		arg(model()->maxValue()),
-		model()->getRoundedValue(),
-		model()->minValue(),
-		model()->maxValue(), model()->getDigitCount(), &ok);
-
-	if (ok)
-	{
-		model()->setValue(new_val);
-	}
-}
-
-void BarModelEditor::connectToModelSignals()
-{
-	auto * m = model();
-	if(m)
-	{
-		// TODO The first connection does a "friendly" update in Knob. Do we also have to do this?
-		QObject::connect(m, SIGNAL(dataChanged()), this, SLOT(update()));
-		QObject::connect(m ,SIGNAL(propertiesChanged()), this, SLOT(update()));
-	}
 }
 
 }

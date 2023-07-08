@@ -22,14 +22,13 @@
  *
  */
 
-#include "AutomatableModelView.h"
+#include "FloatModelEditorBase.h"
 
-#include <QWidget>
 
 namespace lmms::gui
 {
 
-class BarModelEditor : public QWidget, public FloatModelView
+class BarModelEditor : public FloatModelEditorBase
 {
 public:
 	BarModelEditor(QString text, FloatModel * floatModel, QWidget * parent = nullptr);
@@ -43,12 +42,6 @@ public:
 
 protected:
 	virtual void paintEvent(QPaintEvent *event) override;
-
-	virtual void contextMenuEvent(QContextMenuEvent * me) override;
-	virtual void mouseDoubleClickEvent(QMouseEvent * me) override;
-
-private:
-	void connectToModelSignals();
 
 private:
 	QString const m_text;
