@@ -116,30 +116,6 @@ void FloatModelEditorBase::setLabel( const QString & txt )
 }
 
 
-void FloatModelEditorBase::setHtmlLabel(const QString &htmltxt)
-{
-	m_label = htmltxt;
-	m_isHtmlLabel = true;
-	// Put the rendered HTML content into cache
-	if (!m_tdRenderer)
-	{
-		m_tdRenderer = new QTextDocument(this);
-	}
-
-	m_tdRenderer->setHtml(QString("<span style=\"color:%1;\">%2</span>").arg(textColor().name(), m_label));
-
-	if (m_knobPixmap)
-	{
-		setFixedSize(m_knobPixmap->width(),
-				m_knobPixmap->height() + 15);
-	}
-
-	update();
-}
-
-
-
-
 void FloatModelEditorBase::setTotalAngle( float angle )
 {
 	if( angle < 10.0 )

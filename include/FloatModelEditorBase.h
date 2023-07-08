@@ -93,7 +93,6 @@ public:
 		setUnit( _txt_after );
 	}
 	void setLabel( const QString & txt );
-	void setHtmlLabel( const QString &htmltxt );
 
 	void setTotalAngle( float angle );
 
