@@ -1,0 +1,447 @@
+/*
+ * FloatModelEditorBase.cpp - Base editor for float models
+ *
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2023 Michael Gregorius
+ *
+ * This file is part of LMMS - https://lmms.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ *
+ */
+
+#include "FloatModelEditorBase.h"
+
+#include <QApplication>
+#include <QInputDialog>
+#include <QMouseEvent>
+#include <QPainter>
+
+#ifndef __USE_XOPEN
+#define __USE_XOPEN
+#endif
+
+#include "lmms_math.h"
+#include "CaptionMenu.h"
+#include "ConfigManager.h"
+#include "ControllerConnection.h"
+#include "GuiApplication.h"
+#include "LocaleHelper.h"
+#include "MainWindow.h"
+#include "ProjectJournal.h"
+#include "SimpleTextFloat.h"
+#include "StringPairDrag.h"
+
+
+namespace lmms::gui
+{
+
+SimpleTextFloat * FloatModelEditorBase::s_textFloat = nullptr;
+
+FloatModelEditorBase::FloatModelEditorBase(QWidget * _parent, const QString & _name ) :
+	QWidget( _parent ),
+	FloatModelView( new FloatModel( 0, 0, 0, 1, nullptr, _name, true ), this ),
+	m_volumeKnob( false ),
+	m_volumeRatio( 100.0, 0.0, 1000000.0 ),
+	m_buttonPressed( false )
+{
+	initUi( _name );
+}
+
+void FloatModelEditorBase::initUi( const QString & _name )
+{
+	if( s_textFloat == nullptr )
+	{
+		s_textFloat = new SimpleTextFloat;
+	}
+
+	setWindowTitle( _name );
+
+	setFocusPolicy( Qt::ClickFocus );
+
+	doConnections();
+}
+
+
+
+
+float FloatModelEditorBase::getValue( const QPoint & _p )
+{
+	float value;
+
+	// knob value increase is linear to mouse movement
+	value = .4f * _p.y();
+
+	// if shift pressed we want slower movement
+	if( getGUI()->mainWindow()->isShiftPressed() )
+	{
+		value /= 4.0f;
+		value = qBound( -4.0f, value, 4.0f );
+	}
+	return value * pageSize();
+}
+
+
+
+
+void FloatModelEditorBase::contextMenuEvent( QContextMenuEvent * )
+{
+	// for the case, the user clicked right while pressing left mouse-
+	// button, the context-menu appears while mouse-cursor is still hidden
+	// and it isn't shown again until user does something which causes
+	// an QApplication::restoreOverrideCursor()-call...
+	mouseReleaseEvent( nullptr );
+
+	CaptionMenu contextMenu( model()->displayName(), this );
+	addDefaultActions( &contextMenu );
+	contextMenu.addAction( QPixmap(),
+		model()->isScaleLogarithmic() ? tr( "Set linear" ) : tr( "Set logarithmic" ),
+		this, SLOT(toggleScale()));
+	contextMenu.addSeparator();
+	contextMenu.exec( QCursor::pos() );
+}
+
+
+void FloatModelEditorBase::toggleScale()
+{
+	model()->setScaleLogarithmic( ! model()->isScaleLogarithmic() );
+	update();
+}
+
+
+
+void FloatModelEditorBase::dragEnterEvent( QDragEnterEvent * _dee )
+{
+	StringPairDrag::processDragEnterEvent( _dee, "float_value,"
+							"automatable_model" );
+}
+
+
+
+
+void FloatModelEditorBase::dropEvent( QDropEvent * _de )
+{
+	QString type = StringPairDrag::decodeKey( _de );
+	QString val = StringPairDrag::decodeValue( _de );
+	if( type == "float_value" )
+	{
+		model()->setValue( LocaleHelper::toFloat(val) );
+		_de->accept();
+	}
+	else if( type == "automatable_model" )
+	{
+		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
+		if( mod != nullptr )
+		{
+			AutomatableModel::linkModels( model(), mod );
+			mod->setValue( model()->value() );
+		}
+	}
+}
+
+
+
+
+void FloatModelEditorBase::mousePressEvent( QMouseEvent * _me )
+{
+	if( _me->button() == Qt::LeftButton &&
+			! ( _me->modifiers() & Qt::ControlModifier ) &&
+			! ( _me->modifiers() & Qt::ShiftModifier ) )
+	{
+		AutomatableModel *thisModel = model();
+		if( thisModel )
+		{
+			thisModel->addJournalCheckPoint();
+			thisModel->saveJournallingState( false );
+		}
+
+		const QPoint & p = _me->pos();
+		m_lastMousePos = p;
+		m_leftOver = 0.0f;
+
+		emit sliderPressed();
+
+		s_textFloat->setText( displayValue() );
+		s_textFloat->moveGlobal( this,
+				QPoint( width() + 2, 0 ) );
+		s_textFloat->show();
+		m_buttonPressed = true;
+	}
+	else if( _me->button() == Qt::LeftButton &&
+			(_me->modifiers() & Qt::ShiftModifier) )
+	{
+		new StringPairDrag( "float_value",
+					QString::number( model()->value() ),
+							QPixmap(), this );
+	}
+	else
+	{
+		FloatModelView::mousePressEvent( _me );
+	}
+}
+
+
+
+
+void FloatModelEditorBase::mouseMoveEvent( QMouseEvent * _me )
+{
+	if( m_buttonPressed && _me->pos() != m_lastMousePos )
+	{
+		// knob position is changed depending on last mouse position
+		setPosition( _me->pos() - m_lastMousePos );
+		emit sliderMoved( model()->value() );
+		// original position for next time is current position
+		m_lastMousePos = _me->pos();
+	}
+	s_textFloat->setText( displayValue() );
+}
+
+
+
+
+void FloatModelEditorBase::mouseReleaseEvent( QMouseEvent* event )
+{
+	if( event && event->button() == Qt::LeftButton )
+	{
+		AutomatableModel *thisModel = model();
+		if( thisModel )
+		{
+			thisModel->restoreJournallingState();
+		}
+	}
+
+	m_buttonPressed = false;
+
+	emit sliderReleased();
+
+	QApplication::restoreOverrideCursor();
+
+	s_textFloat->hide();
+}
+
+
+
+
+void FloatModelEditorBase::focusOutEvent( QFocusEvent * _fe )
+{
+	// make sure we don't loose mouse release event
+	mouseReleaseEvent( nullptr );
+	QWidget::focusOutEvent( _fe );
+}
+
+
+
+
+void FloatModelEditorBase::mouseDoubleClickEvent( QMouseEvent * )
+{
+	enterValue();
+}
+
+
+
+
+void FloatModelEditorBase::paintEvent( QPaintEvent * _me )
+{
+	QPainter p(this);
+
+	QColor const foreground(3, 94, 97);
+
+	auto const * mod = model();
+	auto const minValue = mod->minValue();
+	auto const maxValue = mod->maxValue();
+	auto const range = maxValue - minValue;
+
+	// Compute the percentage
+	// min + x * (max - min) = v <=> x = (v - min) / (max - min)
+	auto const percentage = range == 0 ? 1. : (mod->value() - minValue) / range;
+
+	QRect r = rect();
+	p.setPen(foreground);
+	p.setBrush(foreground);
+	p.drawRect(QRect(r.topLeft(), QPoint(r.width() * percentage, r.height())));
+}
+
+
+
+
+void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
+{
+	we->accept();
+	const float stepMult = model()->range() / 2000 / model()->step<float>();
+	const int inc = ((we->angleDelta().y() > 0 ) ? 1 : -1) * ((stepMult < 1 ) ? 1 : stepMult);
+	model()->incValue( inc );
+
+
+	s_textFloat->setText( displayValue() );
+	s_textFloat->moveGlobal( this, QPoint( width() + 2, 0 ) );
+	s_textFloat->setVisibilityTimeOut( 1000 );
+
+	emit sliderMoved( model()->value() );
+}
+
+
+
+
+void FloatModelEditorBase::setPosition( const QPoint & _p )
+{
+	const float value = getValue( _p ) + m_leftOver;
+	const auto step = model()->step<float>();
+	const float oldValue = model()->value();
+
+
+
+	if( model()->isScaleLogarithmic() ) // logarithmic code
+	{
+		const float pos = model()->minValue() < 0
+			? oldValue / qMax( qAbs( model()->maxValue() ), qAbs( model()->minValue() ) )
+			: ( oldValue - model()->minValue() ) / model()->range();
+		const float ratio = 0.1f + qAbs( pos ) * 15.f;
+		float newValue = value * ratio;
+		if( qAbs( newValue ) >= step )
+		{
+			float roundedValue = qRound( ( oldValue - value ) / step ) * step;
+			model()->setValue( roundedValue );
+			m_leftOver = 0.0f;
+		}
+		else
+		{
+			m_leftOver = value;
+		}
+	}
+
+	else // linear code
+	{
+		if( qAbs( value ) >= step )
+		{
+			float roundedValue = qRound( ( oldValue - value ) / step ) * step;
+			model()->setValue( roundedValue );
+			m_leftOver = 0.0f;
+		}
+		else
+		{
+			m_leftOver = value;
+		}
+	}
+}
+
+
+
+
+void FloatModelEditorBase::enterValue()
+{
+	bool ok;
+	float new_val;
+
+	if( isVolumeKnob() &&
+		ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() )
+	{
+		new_val = QInputDialog::getDouble(
+			this, tr( "Set value" ),
+			tr( "Please enter a new value between "
+					"-96.0 dBFS and 6.0 dBFS:" ),
+				ampToDbfs( model()->getRoundedValue() / 100.0 ),
+							-96.0, 6.0, model()->getDigitCount(), &ok );
+		if( new_val <= -96.0 )
+		{
+			new_val = 0.0f;
+		}
+		else
+		{
+			new_val = dbfsToAmp( new_val ) * 100.0;
+		}
+	}
+	else
+	{
+		new_val = QInputDialog::getDouble(
+				this, tr( "Set value" ),
+				tr( "Please enter a new value between "
+						"%1 and %2:" ).
+						arg( model()->minValue() ).
+						arg( model()->maxValue() ),
+					model()->getRoundedValue(),
+					model()->minValue(),
+					model()->maxValue(), model()->getDigitCount(), &ok );
+	}
+
+	if( ok )
+	{
+		model()->setValue( new_val );
+	}
+}
+
+
+
+
+void FloatModelEditorBase::friendlyUpdate()
+{
+	if (model() && (model()->controllerConnection() == nullptr ||
+		model()->controllerConnection()->getController()->frequentUpdates() == false ||
+				Controller::runningFrames() % (256*4) == 0))
+	{
+		update();
+	}
+}
+
+
+
+
+QString FloatModelEditorBase::displayValue() const
+{
+	if( isVolumeKnob() &&
+		ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() )
+	{
+		return m_description.trimmed() + QString( " %1 dBFS" ).
+				arg( ampToDbfs( model()->getRoundedValue() / volumeRatio() ),
+								3, 'f', 2 );
+	}
+	return m_description.trimmed() + QString( " %1" ).
+					arg( model()->getRoundedValue() ) + m_unit;
+}
+
+
+
+
+void FloatModelEditorBase::doConnections()
+{
+	if( model() != nullptr )
+	{
+		QObject::connect( model(), SIGNAL(dataChanged()),
+					this, SLOT(friendlyUpdate()));
+
+		QObject::connect( model(), SIGNAL(propertiesChanged()),
+						this, SLOT(update()));
+	}
+}
+
+
+void convertPixmapToGrayScaleTemp(QPixmap& pixMap)
+{
+	QImage temp = pixMap.toImage().convertToFormat(QImage::Format_ARGB32);
+	for (int i = 0; i < temp.height(); ++i)
+	{
+		for (int j = 0; j < temp.width(); ++j)
+		{
+			const auto pix = temp.pixelColor(i, j);
+			const auto gscale = 0.2126 * pix.redF() + 0.7152 * pix.greenF() + 0.0722 * pix.blueF();
+			const auto pixGray = QColor::fromRgbF(gscale, gscale, gscale, pix.alphaF());
+			temp.setPixelColor(i, j, pixGray);
+		}
+	}
+	pixMap.convertFromImage(temp);
+}
+
+
+} // namespace lmms::gui
