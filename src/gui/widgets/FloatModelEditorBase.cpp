@@ -65,8 +65,7 @@ FloatModelEditorBase::FloatModelEditorBase(QWidget * _parent, const QString & _n
 	m_tdRenderer(nullptr),
 	m_volumeKnob( false ),
 	m_volumeRatio( 100.0, 0.0, 1000000.0 ),
-	m_buttonPressed( false ),
-	m_angle( -10 )
+	m_buttonPressed( false )
 {
 	initUi( _name );
 }
@@ -83,53 +82,6 @@ void FloatModelEditorBase::initUi( const QString & _name )
 	setFocusPolicy( Qt::ClickFocus );
 
 	doConnections();
-}
-
-
-
-
-void FloatModelEditorBase::setTotalAngle( float angle )
-{
-	if( angle < 10.0 )
-	{
-		m_totalAngle = 10.0;
-	}
-	else
-	{
-		m_totalAngle = angle;
-	}
-
-	update();
-}
-
-
-
-
-QLineF FloatModelEditorBase::calculateLine( const QPointF & _mid, float _radius, float _innerRadius ) const
-{
-	const float rarc = m_angle * F_PI / 180.0;
-	const float ca = cos( rarc );
-	const float sa = -sin( rarc );
-
-	return QLineF( _mid.x() - sa*_innerRadius, _mid.y() - ca*_innerRadius,
-					_mid.x() - sa*_radius, _mid.y() - ca*_radius );
-}
-
-
-
-bool FloatModelEditorBase::updateAngle()
-{
-	int angle = 0;
-	if( model() && model()->maxValue() != model()->minValue() )
-	{
-		angle = angleFromValue( model()->inverseScaledValue( model()->value() ), model()->minValue(), model()->maxValue(), m_totalAngle );
-	}
-	if( qAbs( angle - m_angle ) > 0 )
-	{
-		m_angle = angle;
-		return true;
-	}
-	return false;
 }
 
 

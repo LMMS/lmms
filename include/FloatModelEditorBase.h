@@ -66,8 +66,6 @@ public:
 		setUnit( _txt_after );
 	}
 
-	void setTotalAngle( float angle );
-
 signals:
 	void sliderPressed();
 	void sliderReleased();
@@ -98,16 +96,7 @@ private:
 
 	void doConnections() override;
 
-	QLineF calculateLine( const QPointF & _mid, float _radius,
-						float _innerRadius = 1) const;
-
 	void setPosition( const QPoint & _p );
-	bool updateAngle();
-
-	int angleFromValue( float value, float minValue, float maxValue, float totalAngle ) const
-	{
-		return static_cast<int>( ( value - 0.5 * ( minValue + maxValue ) ) / ( maxValue - minValue ) * m_totalAngle ) % 360;
-	}
 
 	inline float pageSize() const
 	{
@@ -127,8 +116,6 @@ private:
 	float m_leftOver;
 	bool m_buttonPressed;
 
-	float m_totalAngle;
-	int m_angle;
 	QImage m_cache;
 };
 
