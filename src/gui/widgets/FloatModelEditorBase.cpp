@@ -25,9 +25,7 @@
 
 #include "FloatModelEditorBase.h"
 
-#include <memory>
 #include <QApplication>
-#include <QFontMetrics>
 #include <QInputDialog>
 #include <QMouseEvent>
 #include <QPainter>
@@ -40,9 +38,6 @@
 #include "CaptionMenu.h"
 #include "ConfigManager.h"
 #include "ControllerConnection.h"
-#include "DeprecationHelper.h"
-#include "embed.h"
-#include "gui_templates.h"
 #include "GuiApplication.h"
 #include "LocaleHelper.h"
 #include "MainWindow.h"
@@ -55,9 +50,6 @@ namespace lmms::gui
 {
 
 SimpleTextFloat * FloatModelEditorBase::s_textFloat = nullptr;
-
-
-
 
 FloatModelEditorBase::FloatModelEditorBase(QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
