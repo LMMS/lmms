@@ -980,12 +980,10 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_editor->m_timeLine->addToolButtons(timeLineToolBar);
 
 	DropToolBar *insertActionsToolBar = addDropToolBarToTop(tr("Bar insert controls"));
-	m_insertBarAction = new QAction(embed::getIconPixmap("insert_bar"), tr("Insert bar (Ctrl+B)"), this);
-	m_removeBarAction = new QAction(embed::getIconPixmap("remove_bar"), tr("Remove bar (Ctrl+Shift+B)"), this);
+	m_insertBarAction = new QAction(embed::getIconPixmap("insert_bar"), tr("Insert bar (Shift+Insert)"), this);
+	m_removeBarAction = new QAction(embed::getIconPixmap("remove_bar"), tr("Remove bar (Shift+Delete)"), this);
 	insertActionsToolBar->addAction( m_insertBarAction );
 	insertActionsToolBar->addAction( m_removeBarAction );
-	m_insertBarAction->setShortcut(Qt::CTRL + Qt::Key_B);
-	m_removeBarAction->setShortcut(Qt::SHIFT + Qt::CTRL + Qt::Key_B);
 	connect(m_insertBarAction, SIGNAL(triggered()), song, SLOT(insertBar()));
 	connect(m_removeBarAction, SIGNAL(triggered()), song, SLOT(removeBar()));
 
