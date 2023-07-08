@@ -59,7 +59,7 @@ SimpleTextFloat * FloatModelEditorBase::s_textFloat = nullptr;
 
 
 
-FloatModelEditorBase::FloatModelEditorBase( knobTypesTemp _knob_num, QWidget * _parent, const QString & _name ) :
+FloatModelEditorBase::FloatModelEditorBase(QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
 	FloatModelView( new FloatModel( 0, 0, 0, 1, nullptr, _name, true ), this ),
 	m_label( "" ),
@@ -70,19 +70,10 @@ FloatModelEditorBase::FloatModelEditorBase( knobTypesTemp _knob_num, QWidget * _
 	m_buttonPressed( false ),
 	m_angle( -10 ),
 	m_lineWidth( 0 ),
-	m_textColor( 255, 255, 255 ),
-	m_knobNum( _knob_num )
+	m_textColor( 255, 255, 255 )
 {
 	initUi( _name );
 }
-
-FloatModelEditorBase::FloatModelEditorBase( QWidget * _parent, const QString & _name ) :
-	FloatModelEditorBase( knobBright_26Temp, _parent, _name )
-{
-}
-
-
-
 
 void FloatModelEditorBase::initUi( const QString & _name )
 {

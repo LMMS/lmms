@@ -68,7 +68,7 @@ QWidget * LadspaWidgetFactory::createWidget(LadspaControl * ladspaControl, QWidg
 		knob->setLabel(name);
 		break;*/
 		{
-			FloatModelEditorBase * fme = new FloatModelEditorBase(knobBright_26Temp, parent, name);
+			FloatModelEditorBase * fme = new FloatModelEditorBase(parent, name);
 			fme->setModel(ladspaControl->knobModel());
 			fme->setLabel(name);
 			fme->setHintText(QObject::tr("Value:"), "");

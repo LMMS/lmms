@@ -43,12 +43,6 @@ namespace lmms::gui
 
 class SimpleTextFloat;
 
-enum knobTypesTemp
-{
-	knobDark_28Temp, knobBright_26Temp, knobSmall_17Temp, knobVintage_32Temp, knobStyledTemp
-} ;
-
-
 void convertPixmapToGrayScaleTemp(QPixmap &pixMap);
 
 class LMMS_EXPORT FloatModelEditorBase : public QWidget, public FloatModelView
@@ -81,7 +75,6 @@ class LMMS_EXPORT FloatModelEditorBase : public QWidget, public FloatModelView
 	void initUi( const QString & _name ); //!< to be called by ctors
 
 public:
-	FloatModelEditorBase( knobTypesTemp _knob_num, QWidget * _parent = nullptr, const QString & _name = QString() );
 	FloatModelEditorBase( QWidget * _parent = nullptr, const QString & _name = QString() ); //!< default ctor
 	FloatModelEditorBase( const FloatModelEditorBase& other ) = delete;
 
@@ -197,10 +190,7 @@ private:
 	QColor m_arcInactiveColor;
 	
 	QColor m_textColor;
-
-	knobTypesTemp m_knobNum;
-
-} ;
+};
 
 
 } // namespace lmms::gui
