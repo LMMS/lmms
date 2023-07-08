@@ -70,7 +70,6 @@ QWidget * LadspaWidgetFactory::createWidget(LadspaControl * ladspaControl, QWidg
 		{
 			FloatModelEditorBase * fme = new FloatModelEditorBase(parent, name);
 			fme->setModel(ladspaControl->knobModel());
-			fme->setLabel(name);
 			fme->setHintText(QObject::tr("Value:"), "");
 			return fme;
 		}

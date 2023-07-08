@@ -85,7 +85,6 @@ public:
 		setDescription( _txt_before );
 		setUnit( _txt_after );
 	}
-	void setLabel( const QString & txt );
 
 	void setTotalAngle( float angle );
 
@@ -161,8 +160,6 @@ private:
 
 	static SimpleTextFloat * s_textFloat;
 
-	QString m_label;
-	bool m_isHtmlLabel;
 	QTextDocument* m_tdRenderer;
 
 	std::unique_ptr<QPixmap> m_knobPixmap;
