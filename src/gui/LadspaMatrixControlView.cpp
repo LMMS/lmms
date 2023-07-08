@@ -29,10 +29,12 @@
 #include "LadspaControl.h"
 
 #include "LadspaBase.h"
+#include "BarModelEditor.h"
 #include "LedCheckBox.h"
 #include "TempoSyncKnob.h"
 
 #include <QLayout>
+#include <QLabel>
 
 
 namespace lmms::gui
@@ -51,12 +53,13 @@ LadspaMatrixControlView::LadspaMatrixControlView(QWidget * parent,
 	Knob * knob = nullptr;
 
 	buffer_data_t dataType = m_ladspaControl->port()->data_type;
+	QString const name = m_ladspaControl->port()->name;
 	switch (dataType)
 	{
 		case TOGGLED:
 		{
 			LedCheckBox * toggle = new LedCheckBox(
-				"", this, QString(), LedCheckBox::Green);
+				name, this, QString(), LedCheckBox::Green);
 			toggle->setModel(m_ladspaControl->toggledModel());
 			layout->addWidget(toggle);
 			setFixedSize(toggle->width(), toggle->height());
@@ -65,16 +68,20 @@ LadspaMatrixControlView::LadspaMatrixControlView(QWidget * parent,
 
 		case INTEGER:
 		case FLOATING:
-			knob = new Knob(knobBright_26, this, m_ladspaControl->port()->name);
+			/*knob = new Knob(knobBright_26, this, name);
 			knob->setModel(m_ladspaControl->knobModel());
+			knob->setLabel(name);*/
+			layout->addWidget(new BarModelEditor(name, m_ladspaControl->knobModel(), this));
 			break;
 
 		case TIME:
-			knob = new TempoSyncKnob(knobBright_26, this, m_ladspaControl->port()->name);
+			knob = new TempoSyncKnob(knobBright_26, this, name);
 			knob->setModel(m_ladspaControl->tempoSyncKnobModel());
+			knob->setLabel(name);
 			break;
 
 		default:
+			layout->addWidget(new QLabel(tr("%1 (unsupported)").arg(name), this));
 			break;
 	}
 

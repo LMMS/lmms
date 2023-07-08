@@ -95,6 +95,7 @@ SET(LMMS_SRCS
 
 	gui/widgets/AutomatableButton.cpp
 	gui/widgets/AutomatableSlider.cpp
+	gui/widgets/BarModelEditor.cpp
 	gui/widgets/CPULoadWidget.cpp
 	gui/widgets/CaptionMenu.cpp
 	gui/widgets/ComboBox.cpp

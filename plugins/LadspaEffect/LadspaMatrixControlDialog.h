@@ -28,8 +28,11 @@
 
 #include "EffectControlDialog.h"
 
+#include "lmms_basics.h"
+
 
 class QGridLayout;
+class QScrollArea;
 
 namespace lmms
 {
@@ -53,9 +56,32 @@ public:
 private slots:
 	void updateEffectView(LadspaControls* ctl);
 
+private:
+	/**
+	 * @brief Checks if a link column is needed for the current effect controls.
+	 * @return true if a link column is needed.
+	 */
+	bool needsLinkColumn() const;
+
+	/**
+	 * @brief Arranges widgets for the current controls in a grid/matrix layout.
+	 * @param parent The parent of all created widgets
+	 * @param gridLayout The layout into which the controls are organized
+	 */
+	void arrangeControls(QWidget * parent, QGridLayout* gridLayout);
+
+	/**
+	 * @brief Creates a widget that holds the widgets of the current controls in a matrix arrangement.
+	 * @param ladspaControls
+	 * @return
+	 */
+	QWidget * createMatrixWidget();
+
+	LadspaControls * getLadspaControls() const;
+	ch_cnt_t getChannelCount() const;
 
 private:
-	QGridLayout* m_effectGridLayout;
+	QScrollArea* m_scrollArea;
 	LedCheckBox* m_stereoLink;
 
 };
