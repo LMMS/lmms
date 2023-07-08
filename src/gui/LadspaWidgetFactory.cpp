@@ -31,6 +31,8 @@
 #include "LadspaBase.h"
 
 #include "BarModelEditor.h"
+// TODO Only for testing! Remove!
+#include "FloatModelEditorBase.h"
 #include "LedCheckBox.h"
 #include "TempoSyncKnob.h"
 
@@ -65,7 +67,15 @@ QWidget * LadspaWidgetFactory::createWidget(LadspaControl * ladspaControl, QWidg
 		knob->setModel(ladspaControl->knobModel());
 		knob->setLabel(name);
 		break;*/
-		return new BarModelEditor(name, ladspaControl->knobModel(), parent);
+		{
+			FloatModelEditorBase * fme = new FloatModelEditorBase(knobBright_26Temp, parent, name);
+			fme->setModel(ladspaControl->knobModel());
+			fme->setLabel(name);
+			fme->setHintText(QObject::tr("Value:"), "");
+			return fme;
+		}
+		// FloatModelEditorBase
+		//return new BarModelEditor(name, ladspaControl->knobModel(), parent);
 
 	case TIME:
 		knob = new TempoSyncKnob(knobBright_26, parent, name);
