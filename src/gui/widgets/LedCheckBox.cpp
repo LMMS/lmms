@@ -121,21 +121,12 @@ void LedCheckBox::initUi( LedColors _color )
 
 void LedCheckBox::onTextUpdated()
 {
-	if (m_legacyMode)
-	{
-		setFixedSize(m_ledOffPixmap->width() + 5 + horizontalAdvance(QFontMetrics(font()),
-						 text()),
-			m_ledOffPixmap->height());
-	}
-	else
-	{
-		QFontMetrics fm(font());
+	QFontMetrics const fm = fontMetrics();
 
-		int const width = m_ledOffPixmap->width() + 5 + fm.horizontalAdvance(text());
-		int const height = qMax(m_ledOffPixmap->height(), fm.height());
+	int const width = m_ledOffPixmap->width() + 5 + horizontalAdvance(fm, text());
+	int const height = m_legacyMode ? m_ledOffPixmap->height() : qMax(m_ledOffPixmap->height(), fm.height());
 
-		setFixedSize(width, height);
-	}
+	setFixedSize(width, height);
 }
 
 void LedCheckBox::paintLegacy(QPaintEvent * pe)
