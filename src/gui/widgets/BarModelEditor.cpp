@@ -21,7 +21,7 @@ QSizePolicy BarModelEditor::sizePolicy() const
 QSize BarModelEditor::minimumSizeHint() const
 {
 	auto const fm = fontMetrics();
-	return QSize(200, fm.height() * 1.3);
+	return QSize(200, fm.height() + 6);
 }
 
 QSize BarModelEditor::sizeHint() const
@@ -53,16 +53,20 @@ void BarModelEditor::paintEvent(QPaintEvent *event)
 	// min + x * (max - min) = v <=> x = (v - min) / (max - min)
 	auto const percentage = range == 0 ? 1. : (mod->value() - minValue) / range;
 
-	int const margin = 2;
+	int const margin = 3;
 	QMargins const margins(margin, margin, margin, margin);
 	QRect const valueRect = r.marginsRemoved(margins);
 
 	painter.setPen(foreground);
 	painter.setBrush(foreground);
-	painter.drawRect(QRect(valueRect.topLeft(), QPoint(valueRect.width() * percentage, valueRect.height())));
+	QPoint const startPoint = valueRect.topLeft();
+	QPoint endPoint = valueRect.bottomRight();
+	endPoint.setX(startPoint.x() + percentage * (endPoint.x() - startPoint.x()));
 
-	// Draw text
-	QRect const textRect = valueRect.marginsRemoved(margins);
+	painter.drawRect(QRect(startPoint, endPoint));
+
+	// Draw the text into the value rectangle but move it slightly to the right
+	QRect const textRect = valueRect.marginsRemoved(QMargins(3, 0, 0, 0));
 	painter.setPen(textColor);
 	painter.drawText(textRect, m_text);
 }
