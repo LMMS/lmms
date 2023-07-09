@@ -67,8 +67,13 @@ void BarModelEditor::paintEvent(QPaintEvent *event)
 
 	// Draw the text into the value rectangle but move it slightly to the right
 	QRect const textRect = valueRect.marginsRemoved(QMargins(3, 0, 0, 0));
+
+	// Elide the text if needed
+	auto const fm = fontMetrics();
+	QString const elidedText = fm.elidedText(m_text, Qt::ElideRight, textRect.width());
+
 	painter.setPen(textColor);
-	painter.drawText(textRect, m_text);
+	painter.drawText(textRect, elidedText);
 }
 
 } // namespace lmms::gui
