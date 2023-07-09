@@ -714,9 +714,9 @@ void Knob::wheelEvent(QWheelEvent * we)
 		// With alt we want to be able to go through the values in 1000 steps
 		numberOfStepsForFullSweep = 2000;
 
-			   // It seems that on some systems pressing Alt with mess with the directions,
-			   // i.e. scrolling the mouse wheel is interpreted as pressing the mouse wheel
-			   // left and right. Account for this quirk.
+		// It seems that on some systems pressing Alt with mess with the directions,
+		// i.e. scrolling the mouse wheel is interpreted as pressing the mouse wheel
+		// left and right. Account for this quirk.
 		if (deltaY == 0)
 		{
 			int const deltaX = we->angleDelta().x();
@@ -727,7 +727,7 @@ void Knob::wheelEvent(QWheelEvent * we)
 		}
 	}
 
-		   // Compute the number of steps but make sure that we always do at least one step
+	// Compute the number of steps but make sure that we always do at least one step
 	const float stepMult = std::max(range / numberOfStepsForFullSweep / step, 1.f);
 	const int inc = direction * stepMult;
 	model()->incValue( inc );
