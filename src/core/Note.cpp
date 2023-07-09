@@ -47,8 +47,7 @@ Note::Note( const TimePos & length, const TimePos & pos,
 	m_panning( qBound( PanningLeft, panning, PanningRight ) ),
 	m_length( length ),
 	m_pos( pos ),
-	m_detuning( nullptr ),
-	m_type( Note::RegularNote )
+	m_detuning( nullptr )
 {
 	if( detuning )
 	{
@@ -136,14 +135,6 @@ void Note::setPanning( panning_t panning )
 {
 	const panning_t p = qBound( PanningLeft, panning, PanningRight );
 	m_panning = p;
-}
-
-
-
-
-void Note::setType(Note::Type t)
-{
-	m_type = t;
 }
 
 

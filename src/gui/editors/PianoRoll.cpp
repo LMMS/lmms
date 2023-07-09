@@ -3501,7 +3501,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			{
 				// We've done and checked all, let's draw the note with
 				// the appropriate color
-				QColor fillColor = note->type() == Note::RegularNote ? m_noteColor : m_stepNoteColor;
+				const auto fillColor = note->type() == Note::Type::RegularNote ? m_noteColor : m_stepNoteColor;
 
 				drawNoteRect(
 					p, x + m_whiteKeyWidth, noteYPos(note->key()), note_width,

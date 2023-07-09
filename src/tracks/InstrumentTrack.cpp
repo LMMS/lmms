@@ -760,7 +760,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 		{
 			// If the note is a Step Note, frames will be 0 so the NotePlayHandle
 			// plays for the whole length of the sample
-			const f_cnt_t note_frames = cur_note->type() == Note::StepNote
+			const auto note_frames = cur_note->type() == Note::Type::StepNote
 				? 0
 				: cur_note->length().frames(frames_per_tick);
 

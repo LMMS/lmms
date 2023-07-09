@@ -102,18 +102,17 @@ public:
 	~Note() override;
 
 	// Note types
-	enum Types
+	enum class Type
 	{
 		RegularNote = 0,
 		StepNote
 	};
-	typedef Types Type;
 
 	Type type() const
 	{
 		return m_type;
 	}
-	void setType(Type t);
+	inline void setType( Type t ) { m_type = t; }
 
 	// used by GUI
 	inline void setSelected( const bool selected ) { m_selected = selected; }
@@ -260,10 +259,10 @@ private:
 	panning_t m_panning;
 	TimePos m_length;
 	TimePos m_pos;
-	DetuningHelper * m_detuning;
+	DetuningHelper * m_detuning = nullptr;
 
 	// The type of this note
-	Type m_type;
+	Type m_type = Type::RegularNote;
 };
 
 using NoteVector = QVector<Note*>;

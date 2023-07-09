@@ -1674,17 +1674,17 @@ void DataFile::upgrade_automationNodes()
 // Convert the negative length notes to StepNotes
 void DataFile::upgrade_noteTypes()
 {
-	QDomNodeList notes = elementsByTagName("note");
+	const auto notes = elementsByTagName("note");
 
 	for (int i = 0; i < notes.size(); ++i)
 	{
-		QDomElement note = notes.item(i).toElement();
+		auto note = notes.item(i).toElement();
 
-		int noteSize = note.attribute("len").toInt();
+		const auto noteSize = note.attribute("len").toInt();
 		if (noteSize < 0)
 		{
 			note.setAttribute("len", DefaultTicksPerBar / 16);
-			note.setAttribute("type", static_cast<int>(Note::StepNote));
+			note.setAttribute("type", static_cast<int>(Note::Type::StepNote));
 		}
 	}
 }
