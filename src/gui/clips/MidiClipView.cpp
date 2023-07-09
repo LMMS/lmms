@@ -25,6 +25,7 @@
 
 #include "MidiClipView.h"
 
+#include <algorithm>
 #include <cmath>
 #include <QApplication>
 #include <QInputDialog>
@@ -467,65 +468,65 @@ void MidiClipView::paintEvent( QPaintEvent * )
 		QPixmap stepon200;
 		QPixmap stepoff;
 		QPixmap stepoffl;
-		const int steps = qMax( 1,
-					m_clip->m_steps );
+		const int steps = std::max(1,
+					m_clip->m_steps);
 		const int w = width() - 2 * BORDER_WIDTH;
 
 		// scale step graphics to fit the beat clip length
-		stepon0 = s_stepBtnOn0->scaled( w / steps,
+		stepon0 = s_stepBtnOn0->scaled(w / steps,
 					      s_stepBtnOn0->height(),
 					      Qt::IgnoreAspectRatio,
-					      Qt::SmoothTransformation );
-		stepon200 = s_stepBtnOn200->scaled( w / steps,
+					      Qt::SmoothTransformation);
+		stepon200 = s_stepBtnOn200->scaled(w / steps,
 					      s_stepBtnOn200->height(),
 					      Qt::IgnoreAspectRatio,
-					      Qt::SmoothTransformation );
-		stepoff = s_stepBtnOff->scaled( w / steps,
+					      Qt::SmoothTransformation);
+		stepoff = s_stepBtnOff->scaled(w / steps,
 						s_stepBtnOff->height(),
 						Qt::IgnoreAspectRatio,
-						Qt::SmoothTransformation );
-		stepoffl = s_stepBtnOffLight->scaled( w / steps,
+						Qt::SmoothTransformation);
+		stepoffl = s_stepBtnOffLight->scaled(w / steps,
 						s_stepBtnOffLight->height(),
 						Qt::IgnoreAspectRatio,
-						Qt::SmoothTransformation );
+						Qt::SmoothTransformation);
 
-		for( int it = 0; it < steps; it++ )	// go through all the steps in the beat clip
+		for (int it = 0; it < steps; it++)	// go through all the steps in the beat clip
 		{
-			Note * n = m_clip->noteAtStep( it );
+			Note * n = m_clip->noteAtStep(it);
 
 			// figure out x and y coordinates for step graphic
-			const int x = BORDER_WIDTH + static_cast<int>( it * w / steps );
+			const int x = BORDER_WIDTH + static_cast<int>(it * w / steps);
 			const int y = height() - s_stepBtnOff->height() - 1;
 
-			if( n )
+			if (n)
 			{
 				const int vol = n->getVolume();
-				p.drawPixmap( x, y, stepoffl );
-				p.drawPixmap( x, y, stepon0 );
-				p.setOpacity( sqrt( vol / 200.0 ) );
-				p.drawPixmap( x, y, stepon200 );
-				p.setOpacity( 1 );
+				p.drawPixmap(x, y, stepoffl);
+				p.drawPixmap(x, y, stepon0);
+				p.setOpacity(sqrt( vol / 200.0 ));
+				p.drawPixmap(x, y, stepon200);
+				p.setOpacity(1);
 			}
-			else if( ( it / 4 ) % 2 )
+			else if ((it / 4) % 2)
 			{
-				p.drawPixmap( x, y, stepoffl );
+				p.drawPixmap(x, y, stepoffl);
 			}
 			else
 			{
-				p.drawPixmap( x, y, stepoff );
+				p.drawPixmap(x, y, stepoff);
 			}
 		} // end for loop
 
 		// draw a transparent rectangle over muted clips
-		if ( muted )
+		if (muted)
 		{
-			p.setBrush( mutedBackgroundColor() );
-			p.setOpacity( 0.5 );
-			p.drawRect( 0, 0, width(), height() );
+			p.setBrush(mutedBackgroundColor());
+			p.setOpacity(0.5);
+			p.drawRect(0, 0, width(), height());
 		}
 	}
 	// Melody clip and Beat clip (on Song Editor) paint event
-	else if( !noteCollection.empty() )
+	else if (!noteCollection.empty())
 	{
 		// Compute the minimum and maximum key in the clip
 		// so that we know how much there is to draw.

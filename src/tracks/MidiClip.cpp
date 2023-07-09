@@ -238,7 +238,7 @@ void MidiClip::removeNote( Note * _note_to_del )
 
 
 // Returns a pointer to the note at specified step, or nullptr if note doesn't exist
-Note * MidiClip::noteAtStep( int step )
+Note * MidiClip::noteAtStep(int step)
 {
 	for (const auto& note : m_notes)
 	{

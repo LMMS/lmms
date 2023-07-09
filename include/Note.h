@@ -112,7 +112,7 @@ public:
 	{
 		return m_type;
 	}
-	inline void setType( Type t ) { m_type = t; }
+	inline void setType(Type t) { m_type = t; }
 
 	// used by GUI
 	inline void setSelected( const bool selected ) { m_selected = selected; }

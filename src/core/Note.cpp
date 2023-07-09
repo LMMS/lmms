@@ -74,8 +74,8 @@ Note::Note( const Note & note ) :
 	m_panning( note.m_panning ),
 	m_length( note.m_length ),
 	m_pos( note.m_pos ),
-	m_detuning( nullptr ),
-	m_type( note.m_type )
+	m_detuning(nullptr),
+	m_type(note.m_type)
 {
 	if( note.m_detuning )
 	{
