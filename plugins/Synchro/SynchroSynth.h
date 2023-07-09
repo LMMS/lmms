@@ -1,8 +1,7 @@
 /*
  * SynchroSynth.h - 2-oscillator PM synth
  *
- * Copyright (c) 2020 Ian Sannar <ian/dot/sannar/at/gmail/dot/com>
- * Credits to @DouglasDGI "Lost Robot" for performance optimizations
+ * Copyright (c) 2023 rubiefawn <rubiefawn/at/gmail/dot/com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -25,138 +24,156 @@
 #ifndef SYNCHROSYNTH_H
 #define SYNCHROSYNTH_H
 
-#include "Graph.h" //Required for the waveform view
-#include "Instrument.h" //Required for the synth
-#include "InstrumentView.h" //Required for instrument GUI
-#include "Knob.h" //Required to use knobs
-#include "NotePlayHandle.h" //Required for audio rendering
+#include "Graph.h"
+#include "Instrument.h"
+#include "InstrumentView.h"
+#include "Knob.h"
+#include "NotePlayHandle.h"
+#include "hiir/Downsampler2xF64Fpu.h"
 
-namespace lmms
-{
+//===============//
+// ~ constants ~ //
+//===============//
+namespace { // anonymous for hygienic constants
 
-constexpr char SYNCHRO_VERSION [] = "0.6";
-constexpr float SYNCHRO_VOLUME_CONST = 0.15f; //Prevents clipping
-constexpr int SYNCHRO_OVERSAMPLE = 4; //Anti-aliasing samples
-constexpr int SYNCHRO_PM_CONST = 20; //Strength of the phase modulation
-constexpr int SYNCHRO_GRAPH_SAMPLES = 48; //Resolution of the waveform view
-constexpr float MAGIC_HARMONICS[2][2] = {{32, 0.5}, {38, 0.025}}; //Yoioioi
+constexpr unsigned int SYNCHRO_WAVEFORM_GUI_SAMPLES = 64; // horizontal resolution for waveform preview
+constexpr unsigned int SYNCHRO_OVERSAMPLING_FACTOR = 16;
+static_assert( // no funny business
+	SYNCHRO_OVERSAMPLING_FACTOR && !(SYNCHRO_OVERSAMPLING_FACTOR & (SYNCHRO_OVERSAMPLING_FACTOR - 1)),
+	"oversampling factor must be a power of 2"
+);
+constexpr int SYNCHRO_OVERSAMPLING_FILTER_COEFFICIENT_COUNT = 12;
 
-//Used to pass the oscillator settings from the GUI to the synth itself
-struct SynchroOscillatorSettings
-{
-	float Detune; //Detune in octaves
-	float Drive; //Saturation amount
-	float Sync; //Hard-sync frequency multiplier
-	float Chop; //Per-period waveform damping
-	float Attack; //Amplitude attack time (fade-in)
-	float Decay; //Amplitude decay time (fade-out to sustain value)
-	float Sustain; //Amplitude sustain value
-	float Release; //Amplitude release time (fade out to silence)
+// these magic numbers have been selected because they make this synth sound ~roughly~ how i intended
+// that does not mean they are scientific, ideal values. these values are not gospel
+constexpr double SYNCHRO_CLIP_INHIBITOR = 0.5; // bad math -> too loud, this tames the volume to prevent clipping
+constexpr double SYNCHRO_PM_BASE = 12.0; // fine-tuned magic number to dial in good modulation sounds
+// named fields make the code that uses these way more readable, but this seven-line declaration feels sinful
+constexpr struct Harmonic {
+	unsigned int overtone;
+	double amplitude;
+} MAGIC_HARMONICS[] = { // list of {harmonic, amplitude} for phase modulation
+	{32, 0.5},
+	{38, 0.025}
 };
 
-//Renders the sound for each note or something
-class SynchroNote
-{
-	MM_OPERATORS
-public:
-	//Constructor
-	SynchroNote(NotePlayHandle * notePlayHandle);
-	//Renders a single sample of audio
-	void nextSample(sampleFrame &outputSample, const float modulationStrength, const float modulationAmount,
-		const float harmonics, const SynchroOscillatorSettings & carrier, const SynchroOscillatorSettings & modulator);
-private:
-	NotePlayHandle * m_nph;
-	float m_CarrierSampleIndex = 0; //The index (or phase) of the carrier oscillator
-	float m_ModulatorSampleIndex = 0; //The index (or phase) of the modulator oscillator
-};
+} //namespace
 
-namespace gui
-{
+namespace lmms {
 
-//Synth GUI
-class SynchroSynthView : public InstrumentViewFixedSize
-{
-	Q_OBJECT
-public:
-	SynchroSynthView(Instrument * instrument, QWidget * parent);
-	QSize sizeHint() const override { return QSize(448, 250); } //~3px wider than the artwork
-protected slots:
-private:
+//=========//
+// ~ gui ~ //
+//=========//
+namespace gui {
+
+class SynchroView : public InstrumentViewFixedSize {
+	Q_OBJECT // see https://doc.qt.io/qt-5/qobject.html#Q_OBJECT
+
+	public:
+	SynchroView(Instrument* instrument, QWidget* parent);
+	QSize sizeHint() const override { return QSize(448, 247); };
+
+	protected slots:
 	void modelChanged() override;
-	Knob * m_harmonicsKnob;
-	Knob * m_modulationStrengthKnob;
-	Knob * m_modulationKnob;
 
-	Knob * m_carrierDetuneKnob;
-	Knob * m_carrierDriveKnob;
-	Knob * m_carrierSyncKnob;
-	Knob * m_carrierChopKnob;
-	Knob * m_carrierAttackKnob;
-	Knob * m_carrierDecayKnob;
-	Knob * m_carrierSustainKnob;
-	Knob * m_carrierReleaseKnob;
+	private:
+	// general
+	Graph* m_resultingWaveform;
+	Knob* m_harmonics;
+	Knob* m_modRange;
+	Knob* m_modAmount;
 
-	Knob * m_modulatorDetuneKnob;
-	Knob * m_modulatorDriveKnob;
-	Knob * m_modulatorSyncKnob;
-	Knob * m_modulatorChopKnob;
-	Knob * m_modulatorAttackKnob;
-	Knob * m_modulatorDecayKnob;
-	Knob * m_modulatorSustainKnob;
-	Knob * m_modulatorReleaseKnob;
+	// carrier oscillator
+	Graph* m_carrierWaveform;
+	Knob* m_carrierOctave;
+	Knob* m_carrierDrive;
+	Knob* m_carrierSync;
+	Knob* m_carrierPulse;
 
-	Graph * m_carrierGraph;
-	Graph * m_modulatorGraph;
-	Graph * m_resultGraph;
-};
+	// modulator oscillator
+	Graph* m_modulatorWaveform;
+	Knob* m_modulatorOctave;
+	Knob* m_modulatorDrive;
+	Knob* m_modulatorSync;
+	Knob* m_modulatorPulse;
+}; //class SynchroView
 
 } //namespace gui
 
-class SynchroSynth : public Instrument
-{
-	Q_OBJECT
-public:
-	SynchroSynth(InstrumentTrack * instrument_track);
-	void playNote(NotePlayHandle * n, sampleFrame * working_buffer) override;
-	f_cnt_t desiredReleaseFrames() const override;
-	void saveSettings(QDomDocument & doc, QDomElement & parent) override;
-	void loadSettings(const QDomElement & thisElement) override;
+//===========//
+// ~ synth ~ //
+//===========//
+
+class SynchroSynth {
+	MM_OPERATORS // see `MemoryManager.h`
+	
+	public:
+	SynchroSynth(NotePlayHandle* notePlayHandle);
+	double nextSample( // TODO: put these in the same order as they appear in member declarations
+			const float modStrength,
+			const float modRange,
+			const float modulatorHarmonics,
+			const float carrierOctave,
+			const float modulatorOctave,
+			const float carrierDrive,
+			const float modulatorDrive,
+			const float carrierSync,
+			const float modulatorSync,
+			const float carrierPulse,
+			const float modulatorPulse
+		);
+
+	private:
+	NotePlayHandle* m_nph;
+	double m_carrierPhase = 0;
+	double m_modulatorPhase = 0;
+}; //class SynchroSynth
+
+class SynchroInstrument : public Instrument {
+	Q_OBJECT // see https://doc.qt.io/qt-5/qobject.html#Q_OBJECT
+
+	public:
+	SynchroInstrument(InstrumentTrack* instrument_track);
+	void playNote(NotePlayHandle* nph, sampleFrame* working_buffer) override;
+	f_cnt_t desiredReleaseFrames() const override { return static_cast<f_cnt_t>(128); };
+	//Flags flags() const override { return IsSingleStreamed; };
+	void saveSettings(QDomDocument& doc, QDomElement& thisElement) override;
+	void loadSettings(const QDomElement& thiselement) override;
 	QString nodeName() const override;
-	gui::PluginView * instantiateView(QWidget * parent) override { return new lmms::gui::SynchroSynthView(this, parent); };
-	void deleteNotePluginData(NotePlayHandle * n) override { delete static_cast<SynchroNote *>(n->m_pluginData); };
-protected slots:
+	gui::PluginView* instantiateView(QWidget* parent) override { return new gui::SynchroView(this, parent); };
+	void deleteNotePluginData(NotePlayHandle* nph) override { delete static_cast<SynchroSynth*>(nph->m_pluginData); };
+
+	protected slots: // protected so that gui::SynchroView can send signals to them (i assume)
+	void sampleRateChanged();
+	void generalChanged();
 	void carrierChanged();
 	void modulatorChanged();
-	void generalChanged();
-private:
-	FloatModel m_modulation;
-	FloatModel m_harmonics;
-	FloatModel m_modulationStrength;
 
-	FloatModel m_carrierDetune;
+	private:
+	hiir::Downsampler2xF64Fpu<SYNCHRO_OVERSAMPLING_FILTER_COEFFICIENT_COUNT> m_downsamplingFilter;
+	std::vector<double> m_downsamplingBuffer[2]; // these swap between downsampling iterations
+	// general
+	graphModel m_resultingWaveform; // ayo why is the class named "graphModel" and not "GraphModel"
+	FloatModel m_harmonics;
+	FloatModel m_modRange;
+	FloatModel m_modAmount;
+
+	// carrier oscillator
+	graphModel m_carrierWaveform;
+	FloatModel m_carrierOctave;
 	FloatModel m_carrierDrive;
 	FloatModel m_carrierSync;
-	FloatModel m_carrierChop;
-	FloatModel m_carrierAttack;
-	FloatModel m_carrierDecay;
-	FloatModel m_carrierSustain;
-	FloatModel m_carrierRelease;
+	FloatModel m_carrierPulse;
 
-	FloatModel m_modulatorDetune;
+	// modulator oscillator
+	graphModel m_modulatorWaveform;
+	FloatModel m_modulatorOctave;
 	FloatModel m_modulatorDrive;
 	FloatModel m_modulatorSync;
-	FloatModel m_modulatorChop;
-	FloatModel m_modulatorAttack;
-	FloatModel m_modulatorDecay;
-	FloatModel m_modulatorSustain;
-	FloatModel m_modulatorRelease;
+	FloatModel m_modulatorPulse;
 
-	graphModel m_carrierGraph;
-	graphModel m_modulatorGraph;
-	graphModel m_resultGraph;
-	friend class gui::SynchroSynthView;
-};
+	friend class gui::SynchroView;
+}; //class SynchroInstrument
 
 } //namespace lmms
-
 #endif
