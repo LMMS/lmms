@@ -44,9 +44,10 @@ static const auto names = std::array<QString, 3>
 
 
 LedCheckBox::LedCheckBox( const QString & _text, QWidget * _parent,
-				const QString & _name, LedColors _color ) :
+				const QString & _name, LedColors _color, bool legacyMode ) :
 	AutomatableButton( _parent, _name ),
-	m_text( _text )
+	m_text( _text ),
+	m_legacyMode(legacyMode)
 {
 	initUi( _color );
 }
@@ -55,8 +56,8 @@ LedCheckBox::LedCheckBox( const QString & _text, QWidget * _parent,
 
 
 LedCheckBox::LedCheckBox( QWidget * _parent,
-				const QString & _name, LedColors _color ) :
-	LedCheckBox( QString(), _parent, _name, _color )
+				const QString & _name, LedColors _color, bool legacyMode ) :
+	LedCheckBox( QString(), _parent, _name, _color, legacyMode )
 {
 }
 
@@ -80,24 +81,16 @@ void LedCheckBox::setText( const QString &s )
 
 
 
-void LedCheckBox::paintEvent( QPaintEvent * )
+void LedCheckBox::paintEvent( QPaintEvent * pe )
 {
-	QPainter p( this );
-	p.setFont( pointSize<7>( font() ) );
-
-	if( model()->value() == true )
-		{
-			p.drawPixmap( 0, 0, *m_ledOnPixmap );
+	if (!m_legacyMode)
+	{
+		paintNonLegacy(pe);
 	}
 	else
 	{
-		p.drawPixmap( 0, 0, *m_ledOffPixmap );
+		paintLegacy(pe);
 	}
-
-	p.setPen( QColor( 64, 64, 64 ) );
-	p.drawText( m_ledOffPixmap->width() + 4, 11, text() );
-	p.setPen( QColor( 255, 255, 255 ) );
-	p.drawText( m_ledOffPixmap->width() + 3, 10, text() );
 }
 
 
@@ -115,7 +108,11 @@ void LedCheckBox::initUi( LedColors _color )
 					names[_color].toUtf8().constData() ) );
 	m_ledOffPixmap = new QPixmap( embed::getIconPixmap( "led_off" ) );
 
-	setFont( pointSize<7>( font() ) );
+	if (m_legacyMode)
+	{
+		setFont( pointSize<7>( font() ) );
+	}
+
 	setText( m_text );
 }
 
@@ -124,9 +121,54 @@ void LedCheckBox::initUi( LedColors _color )
 
 void LedCheckBox::onTextUpdated()
 {
-	setFixedSize(m_ledOffPixmap->width() + 5 + horizontalAdvance(QFontMetrics(font()),
-				text()),
-				m_ledOffPixmap->height());
+	if (m_legacyMode)
+	{
+		setFixedSize(m_ledOffPixmap->width() + 5 + horizontalAdvance(QFontMetrics(font()),
+						 text()),
+			m_ledOffPixmap->height());
+	}
+	else
+	{
+		QFontMetrics fm(font());
+
+		int const width = m_ledOffPixmap->width() + 5 + fm.horizontalAdvance(text());
+		int const height = qMax(m_ledOffPixmap->height(), fm.height());
+
+		setFixedSize(width, height);
+	}
+}
+
+void LedCheckBox::paintLegacy(QPaintEvent * pe)
+{
+	QPainter p( this );
+	p.setFont( pointSize<7>( font() ) );
+
+	if( model()->value() == true )
+	{
+		p.drawPixmap( 0, 0, *m_ledOnPixmap );
+	}
+	else
+	{
+		p.drawPixmap( 0, 0, *m_ledOffPixmap );
+	}
+
+	p.setPen( QColor( 64, 64, 64 ) );
+	p.drawText( m_ledOffPixmap->width() + 4, 11, text() );
+	p.setPen( QColor( 255, 255, 255 ) );
+	p.drawText( m_ledOffPixmap->width() + 3, 10, text() );
+}
+
+void LedCheckBox::paintNonLegacy(QPaintEvent * pe)
+{
+	QPainter p(this);
+
+	QPixmap * drawnPixmap = model()->value() ? m_ledOnPixmap : m_ledOffPixmap;
+
+	p.drawPixmap( 0, rect().height() / 2 - drawnPixmap->height() / 2, *drawnPixmap);
+
+	QRect r = rect();
+	r -= QMargins(m_ledOffPixmap->width() + 5, 0, 0, 0);
+	p.drawText(r, text());
 }
 
 

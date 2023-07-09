@@ -67,7 +67,7 @@ LadspaMatrixControlDialog::LadspaMatrixControlDialog(LadspaControls * ladspaCont
 	{
 		mainLayout->addSpacing(3);
 
-		m_stereoLink = new LedCheckBox(tr("Link Channels"), this);
+		m_stereoLink = new LedCheckBox(tr("Link Channels"), this, QString(), LedCheckBox::Yellow, false);
 		m_stereoLink->setModel(&ladspaControls->m_stereoLinkModel);
 		mainLayout->addWidget(m_stereoLink, 0, Qt::AlignCenter);
 	}
