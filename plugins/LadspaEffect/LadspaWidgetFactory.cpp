@@ -63,11 +63,6 @@ QWidget * LadspaWidgetFactory::createWidget(LadspaControl * ladspaControl, QWidg
 	case INTEGER:
 	case ENUM:
 	case FLOATING:
-		// TODO Remove when not needed anymore
-		/*knob = new Knob(knobBright_26, parent, name);
-		knob->setModel(ladspaControl->knobModel());
-		knob->setLabel(name);
-		break;*/
 		return new BarModelEditor(name, ladspaControl->knobModel(), parent);
 
 	case TIME:
