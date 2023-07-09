@@ -52,7 +52,14 @@ class LMMS_EXPORT FloatModelEditorBase : public QWidget, public FloatModelView
 	void initUi( const QString & _name ); //!< to be called by ctors
 
 public:
-	FloatModelEditorBase( QWidget * _parent = nullptr, const QString & _name = QString() ); //!< default ctor
+
+	enum class DirectionOfManipulation
+	{
+		Vertical,
+		Horizontal
+	};
+
+	FloatModelEditorBase( DirectionOfManipulation directionOfManipulation = DirectionOfManipulation::Vertical, QWidget * _parent = nullptr, const QString & _name = QString() ); //!< default ctor
 	FloatModelEditorBase( const FloatModelEditorBase& other ) = delete;
 
 	// TODO: remove
@@ -109,6 +116,8 @@ private:
 	QPoint m_lastMousePos; //!< mouse position in last mouseMoveEvent
 	float m_leftOver;
 	bool m_buttonPressed;
+
+	DirectionOfManipulation m_directionOfManipulation;
 };
 
 

@@ -7,7 +7,7 @@ namespace lmms::gui
 {
 
 BarModelEditor::BarModelEditor(QString text, FloatModel * floatModel, QWidget * parent) :
-	FloatModelEditorBase(parent),
+	FloatModelEditorBase(DirectionOfManipulation::Horizontal, parent),
 	m_text(text)
 {
 	setModel(floatModel);

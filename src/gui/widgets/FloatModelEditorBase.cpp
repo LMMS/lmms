@@ -51,12 +51,13 @@ namespace lmms::gui
 
 SimpleTextFloat * FloatModelEditorBase::s_textFloat = nullptr;
 
-FloatModelEditorBase::FloatModelEditorBase(QWidget * _parent, const QString & _name ) :
+FloatModelEditorBase::FloatModelEditorBase(DirectionOfManipulation directionOfManipulation, QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
 	FloatModelView( new FloatModel( 0, 0, 0, 1, nullptr, _name, true ), this ),
 	m_volumeKnob( false ),
 	m_volumeRatio( 100.0, 0.0, 1000000.0 ),
-	m_buttonPressed( false )
+	m_buttonPressed( false ),
+	m_directionOfManipulation(directionOfManipulation)
 {
 	initUi( _name );
 }
@@ -80,10 +81,11 @@ void FloatModelEditorBase::initUi( const QString & _name )
 
 float FloatModelEditorBase::getValue( const QPoint & _p )
 {
-	float value;
+	// Find out which direction/coordinate is relevant for this control
+	int const coordinate = m_directionOfManipulation == DirectionOfManipulation::Vertical ? _p.y() : -_p.x();
 
 	// knob value increase is linear to mouse movement
-	value = .4f * _p.y();
+	float value = .4f * coordinate;
 
 	// if shift pressed we want slower movement
 	if( getGUI()->mainWindow()->isShiftPressed() )
