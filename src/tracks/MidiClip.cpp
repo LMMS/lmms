@@ -25,6 +25,7 @@
 
 #include "MidiClip.h"
 
+#include <algorithm>
 #include <QDomElement>
 
 #include "GuiApplication.h"
@@ -365,15 +366,7 @@ void MidiClip::setType( MidiClipTypes _new_clip_type )
 void MidiClip::checkType()
 {
 	// If all notes are StepNotes, we have a BeatClip
-	bool beatClip = true;
-	for (const auto it : m_notes)
-	{
-		if (it->type() != Note::Type::StepNote)
-		{
-			beatClip = false;
-			break;
-		}
-	}
+	auto beatClip = std::find_if(m_notes.begin(), m_notes.end(), [](auto note) { return note->type() != Note::Type::StepNote; }) == m_notes.end();
 
 	setType(beatClip ? BeatClip : MelodyClip);
 }
