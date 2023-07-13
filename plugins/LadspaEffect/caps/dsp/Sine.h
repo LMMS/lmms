@@ -25,12 +25,11 @@
 	02111-1307, USA or point your web browser to http://www.gnu.org.
 */
 
+#include "basics.h"
+
 #ifndef _DSP_SINE_H_
 #define _DSP_SINE_H_
 
-#ifndef M_PI
-#define M_PI 3.14159265358979323846264338327
-#endif
 
 namespace DSP {
 	
