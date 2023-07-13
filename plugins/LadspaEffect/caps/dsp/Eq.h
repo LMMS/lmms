@@ -27,7 +27,7 @@
 */
 
 
-#include "basics.h"
+#include "../basics.h"
 
 #ifndef _DSP_EQ_H_
 #define _DSP_EQ_H_
