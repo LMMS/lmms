@@ -93,7 +93,6 @@ jobs:
                        libsamplerate jack sdl libgig libsoundio lilv lv2 stk \
                        fluid-synth portaudio fltk qt@5 carla
           npm install --location=global appdmg
-          cpan List::MoreUtils
       - name: Configure
         run: |
           mkdir build
