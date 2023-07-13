@@ -31,8 +31,12 @@
 #include <QToolTip>
 #include <QWheelEvent>
 
-#include "gui_templates.h"
+#include "DeprecationHelper.h"
 #include "embed.h"
+#include "gui_templates.h"
+
+namespace lmms::gui
+{
 
 TabWidget::TabWidget(const QString & caption, QWidget * parent, bool usePixmap,
 					 bool resizable) :
@@ -56,9 +60,9 @@ TabWidget::TabWidget(const QString & caption, QWidget * parent, bool usePixmap,
 	setFont( pointSize<8>( font() ) );
 
 	setAutoFillBackground( true );
-	QColor bg_color = QApplication::palette().color( QPalette::Active, QPalette::Background ). darker( 132 );
+	QColor bg_color = QApplication::palette().color( QPalette::Active, QPalette::Window ). darker( 132 );
 	QPalette pal = palette();
-	pal.setColor( QPalette::Background, bg_color );
+	pal.setColor( QPalette::Window, bg_color );
 	setPalette( pal );
 
 }
@@ -76,7 +80,7 @@ void TabWidget::addTab( QWidget * w, const QString & name, const char *pixmap, i
 	}
 
 	// Tab's width when it is a text tab. This isn't correct for artwork tabs, but it's fixed later during the PaintEvent
-	int tab_width = fontMetrics().width( name ) + 10;
+	int tab_width = horizontalAdvance(fontMetrics(), name) + 10;
 
 	// Register new tab
 	widgetDesc d = { w, pixmap, name, tab_width };
@@ -125,7 +129,7 @@ int TabWidget::findTabAtPos( const QPoint *pos )
 
 	if( pos->y() > 1 && pos->y() < m_tabbarHeight - 1 )
 	{
-		int cx = ( ( m_caption == "" ) ? 4 : 14 ) + fontMetrics().width( m_caption );
+		int cx = ((m_caption == "") ? 4 : 14) + horizontalAdvance(fontMetrics(), m_caption);
 
 		for( widgetStack::iterator it = m_widgets.begin(); it != m_widgets.end(); ++it )
 		{
@@ -148,7 +152,7 @@ bool TabWidget::event(QEvent *event)
 
 	if ( event->type() == QEvent::ToolTip )
 	{
-		QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
+		auto helpEvent = static_cast<QHelpEvent*>(event);
 
 		int idx = findTabAtPos( & helpEvent->pos() );
 
@@ -196,10 +200,9 @@ void TabWidget::resizeEvent( QResizeEvent * )
 {
 	if (!m_resizable)
 	{
-		for ( widgetStack::iterator it = m_widgets.begin();
-							it != m_widgets.end(); ++it )
+		for (const auto& widget : m_widgets)
 		{
-			( *it ).w->setFixedSize( width() - 4, height() - m_tabbarHeight );
+			widget.w->setFixedSize(width() - 4, height() - m_tabbarHeight);
 		}
 	}
 }
@@ -232,7 +235,7 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 	}
 
 	// Calculate the tabs' x (tabs are painted next to the caption)
-	int tab_x_offset = m_caption.isEmpty() ? 4 : 14 + fontMetrics().width( m_caption );
+	int tab_x_offset = m_caption.isEmpty() ? 4 : 14 + horizontalAdvance(fontMetrics(), m_caption);
 
 	// Compute tabs' width depending on the number of tabs (only applicable for artwork tabs)
 	widgetStack::iterator first = m_widgets.begin();
@@ -288,13 +291,13 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 // Switch between tabs with mouse wheel
 void TabWidget::wheelEvent( QWheelEvent * we )
 {
-	if( we->y() > m_tabheight )
+	if(position(we).y() > m_tabheight)
 	{
 		return;
 	}
 
 	we->accept();
-	int dir = ( we->delta() < 0 ) ? 1 : -1;
+	int dir = (we->angleDelta().y() < 0) ? 1 : -1;
 	int tab = m_activeTab;
 	while( tab > -1 && static_cast<int>( tab ) < m_widgets.count() )
 	{
@@ -316,11 +319,10 @@ QSize TabWidget::minimumSizeHint() const
 	if (m_resizable)
 	{
 		int maxWidth = 0, maxHeight = 0;
-		for ( widgetStack::const_iterator it = m_widgets.begin();
-							it != m_widgets.end(); ++it )
+		for (const auto& widget : m_widgets)
 		{
-			maxWidth = std::max(maxWidth, it->w->minimumSizeHint().width());
-			maxHeight = std::max(maxHeight, it->w->minimumSizeHint().height());
+			maxWidth = std::max(maxWidth, widget.w->minimumSizeHint().width());
+			maxHeight = std::max(maxHeight, widget.w->minimumSizeHint().height());
 		}
 		// "-1" :
 		// in "addTab", under "Position tab's window", the widget is
@@ -338,11 +340,10 @@ QSize TabWidget::sizeHint() const
 	if (m_resizable)
 	{
 		int maxWidth = 0, maxHeight = 0;
-		for ( widgetStack::const_iterator it = m_widgets.begin();
-							it != m_widgets.end(); ++it )
+		for (const auto& widget : m_widgets)
 		{
-			maxWidth = std::max(maxWidth, it->w->sizeHint().width());
-			maxHeight = std::max(maxHeight, it->w->sizeHint().height());
+			maxWidth = std::max(maxWidth, widget.w->sizeHint().width());
+			maxHeight = std::max(maxHeight, widget.w->sizeHint().height());
 		}
 		// "-1" :
 		// in "addTab", under "Position tab's window", the widget is
@@ -414,3 +415,6 @@ void TabWidget::setTabBorder( const QColor & c )
 {
 	m_tabBorder = c;
 }
+
+
+} // namespace lmms::gui

@@ -7,7 +7,7 @@
 #       INCLUDE(CheckSubmodules)
 #
 # Options:
-#       SET(PLUGIN_LIST "zynaddsubfx;...") # skips submodules for plugins not explicitely listed
+#       SET(PLUGIN_LIST "ZynAddSubFx;...") # skips submodules for plugins not explicitely listed
 #
 # Or via command line:       
 #       cmake -PLUGIN_LIST=foo;bar
@@ -18,7 +18,7 @@
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
 # Files which confirm a successful clone
-SET(VALID_CRUMBS "CMakeLists.txt;Makefile;Makefile.in;Makefile.am;configure.ac;configure.py;autogen.sh;.gitignore;LICENSE;Home.md")
+SET(VALID_CRUMBS "CMakeLists.txt;Makefile;Makefile.in;Makefile.am;configure.ac;configure.py;autogen.sh;.gitignore;LICENSE;Home.md;license.txt")
 
 OPTION(NO_SHALLOW_CLONE "Disable shallow cloning of submodules" OFF)
 
@@ -100,11 +100,11 @@ ENDFOREACH()
 
 # Once called, status is stored in GIT_RESULT respectively.
 # Note: Git likes to write to stderr.  Don't assume stderr is error; Check GIT_RESULT instead.
-MACRO(GIT_SUBMODULE SUBMODULE_PATH FORCE_DEINIT FORCE_REMOTE FULL_CLONE)
+MACRO(GIT_SUBMODULE SUBMODULE_PATH FORCE_DEINIT FORCE_REMOTE NO_DEPTH)
 	FIND_PACKAGE(Git REQUIRED)
 	# Handle missing commits
 	SET(FORCE_REMOTE_FLAG "${FORCE_REMOTE}")
-	SET(FULL_CLONE_FLAG "${FULL_CLONE}")
+	SET(NO_DEPTH_FLAG "${NO_DEPTH}")
 	IF(FORCE_REMOTE_FLAG)
 		MESSAGE("--   Adding remote submodulefix to ${SUBMODULE_PATH}")
 		EXECUTE_PROCESS(
@@ -115,7 +115,7 @@ MACRO(GIT_SUBMODULE SUBMODULE_PATH FORCE_DEINIT FORCE_REMOTE FULL_CLONE)
 			OUTPUT_QUIET ERROR_QUIET
 		)
 		# Recurse
-		GIT_SUBMODULE(${SUBMODULE_PATH} false false ${FULL_CLONE_FLAG})
+		GIT_SUBMODULE(${SUBMODULE_PATH} false false ${NO_DEPTH_FLAG})
 	ELSEIF(${FORCE_DEINIT})
 		MESSAGE("--   Resetting ${SUBMODULE_PATH}")
 		EXECUTE_PROCESS(
@@ -125,21 +125,15 @@ MACRO(GIT_SUBMODULE SUBMODULE_PATH FORCE_DEINIT FORCE_REMOTE FULL_CLONE)
 		)
 		MESSAGE("--   Deleting ${CMAKE_SOURCE_DIR}/.git/${SUBMODULE_PATH}")
 		FILE(REMOVE_RECURSE "${CMAKE_SOURCE_DIR}/.git/modules/${SUBMODULE_PATH}")
-		# Recurse
+		# Recurse without depth
 		GIT_SUBMODULE(${SUBMODULE_PATH} false false true)
 	ELSE()
 		# Try to use the depth switch
-		IF(NO_SHALLOW_CLONE OR GIT_VERSION_STRING VERSION_LESS "1.8.4")
+		IF(NO_SHALLOW_CLONE OR GIT_VERSION_STRING VERSION_LESS "1.8.4" OR NO_DEPTH_FLAG)
 			# Shallow submodules were introduced in 1.8.4
 			MESSAGE("--   Fetching ${SUBMODULE_PATH}")
 			SET(DEPTH_CMD "")
 			SET(DEPTH_VAL "")
-		ELSEIF(FULL_CLONE_FLAG)
-			# Depth doesn't revert easily... It should be "--no-recommend-shallow"
-			# but it's ignored by nested submodules, use the highest value instead.
-			MESSAGE("--   Fetching ${SUBMODULE_PATH}")
-			SET(DEPTH_CMD "--depth")
-			SET(DEPTH_VAL "2147483647")
 		ELSE()
 			MESSAGE("--   Fetching ${SUBMODULE_PATH} @ --depth ${DEPTH_VALUE}")
 			SET(DEPTH_CMD "--depth")
@@ -201,13 +195,7 @@ FOREACH(_submodule ${SUBMODULE_LIST})
 					BREAK()
 				ELSEIF("${GIT_MESSAGE}" MATCHES "${_phrase}")
 					MESSAGE("--   Retrying ${_submodule} using 'deinit' (attempt ${COUNTED} of ${MAX_ATTEMPTS})...")
-					IF(COUNTED LESS 2)
-						SET(FULL_CLONE false)
-					ELSE()
-						SET(FULL_CLONE true)
-					ENDIF()
-					
-					GIT_SUBMODULE("${_submodule}" true false ${FULL_CLONE})
+					GIT_SUBMODULE("${_submodule}" true false false)
 					BREAK()
 				ENDIF()
 			ENDFOREACH()

@@ -22,10 +22,10 @@
  *
  */
 
-#ifndef ENVELOPE_AND_LFO_PARAMETERS_H
-#define ENVELOPE_AND_LFO_PARAMETERS_H
+#ifndef LMMS_ENVELOPE_AND_LFO_PARAMETERS_H
+#define LMMS_ENVELOPE_AND_LFO_PARAMETERS_H
 
-#include <QtCore/QVector>
+#include <QVector>
 
 #include "JournallingObject.h"
 #include "AutomatableModel.h"
@@ -33,6 +33,15 @@
 #include "TempoSyncKnobModel.h"
 #include "lmms_basics.h"
 
+namespace lmms
+{
+
+namespace gui
+{
+
+class EnvelopeAndLfoView;
+
+}
 
 class LMMS_EXPORT EnvelopeAndLfoParameters : public Model, public JournallingObject
 {
@@ -41,13 +50,9 @@ public:
 	class LfoInstances
 	{
 	public:
-		LfoInstances()
-		{
-		}
+		LfoInstances() = default;
 
-		~LfoInstances()
-		{
-		}
+		~LfoInstances() = default;
 
 		inline bool isEmpty() const
 		{
@@ -62,14 +67,14 @@ public:
 
 	private:
 		QMutex m_lfoListMutex;
-		typedef QList<EnvelopeAndLfoParameters *> LfoList;
+		using LfoList = QList<EnvelopeAndLfoParameters*>;
 		LfoList m_lfos;
 
 	} ;
 
 	EnvelopeAndLfoParameters( float _value_for_zero_amount,
 							Model * _parent );
-	virtual ~EnvelopeAndLfoParameters();
+	~EnvelopeAndLfoParameters() override;
 
 	static inline float expKnobVal( float _val )
 	{
@@ -91,9 +96,9 @@ public:
 	}
 
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
-	virtual QString nodeName() const
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
+	QString nodeName() const override
 	{
 		return "el";
 	}
@@ -179,8 +184,10 @@ private:
 	void updateLfoShapeData();
 
 
-	friend class EnvelopeAndLfoView;
+	friend class gui::EnvelopeAndLfoView;
 
 } ;
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_ENVELOPE_AND_LFO_PARAMETERS_H

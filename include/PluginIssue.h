@@ -22,26 +22,42 @@
  *
  */
 
-#ifndef PLUGINISSUE_H
-#define PLUGINISSUE_H
+#ifndef LMMS_PLUGIN_ISSUE_H
+#define LMMS_PLUGIN_ISSUE_H
 
 #include <QDebug>
 #include <string>
+
+namespace lmms
+{
 
 //! Types of issues that can cause LMMS to not load a plugin
 //! LMMS Plugins should use this to indicate errors
 enum PluginIssueType
 {
+	// port flow & type
 	unknownPortFlow,
 	unknownPortType,
+	// channel count
 	tooManyInputChannels,
 	tooManyOutputChannels,
+	tooManyMidiInputChannels,
+	tooManyMidiOutputChannels,
 	noOutputChannel,
+	// port metadata
 	portHasNoDef,
 	portHasNoMin,
 	portHasNoMax,
+	minGreaterMax,
+	defaultValueNotInRange,
+	logScaleMinMissing,
+	logScaleMaxMissing,
+	logScaleMinMaxDifferentSigns,
+	// features
 	featureNotSupported, //!< plugin requires functionality LMMS can't offer
+	// misc
 	badPortType, //!< port type not supported
+	blacklisted,
 	noIssue
 };
 
@@ -58,9 +74,14 @@ public:
 		: m_issueType(it), m_info(msg)
 	{
 	}
+	PluginIssueType type() const { return m_issueType; }
+	bool operator==(const PluginIssue& other) const;
+	bool operator<(const PluginIssue& other) const;
 	friend QDebug operator<<(QDebug stream, const PluginIssue& iss);
 };
 
 QDebug operator<<(QDebug stream, const PluginIssue& iss);
 
-#endif // PLUGINISSUE_H
+} // namespace lmms
+
+#endif // LMMS_PLUGIN_ISSUE_H

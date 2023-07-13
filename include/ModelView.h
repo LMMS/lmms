@@ -22,12 +22,14 @@
  *
  */
 
-#ifndef MODEL_VIEW_H
-#define MODEL_VIEW_H
+#ifndef LMMS_GUI_MODEL_VIEW_H
+#define LMMS_GUI_MODEL_VIEW_H
 
-#include <QtCore/QPointer>
+#include <QPointer>
 #include "Model.h"
 
+namespace lmms::gui
+{
 
 class LMMS_EXPORT ModelView
 {
@@ -36,6 +38,7 @@ public:
 	virtual ~ModelView();
 
 	virtual void setModel( Model* model, bool isOldModelValid = true );
+	virtual void unsetModel();
 
 	Model* model()
 	{
@@ -80,6 +83,6 @@ private:
 
 } ;
 
+} // namespace lmms::gui
 
-#endif
-
+#endif // LMMS_GUI_MODEL_VIEW_H

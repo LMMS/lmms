@@ -25,15 +25,18 @@
 #ifndef LFO_H
 #define LFO_H
 
-#include "lmms_math.h"
+#include "lmms_constants.h"
+
+
+namespace lmms
+{
+
 
 class Lfo
 {
 public:
 	Lfo( int samplerate );
-	~Lfo()
-	{
-	}
+	~Lfo() = default;
 
 
 
@@ -75,5 +78,8 @@ private:
 	double m_twoPiOverSr;
 	int m_samplerate;
 };
+
+
+} // namespace lmms
 
 #endif // LFO_H

@@ -22,33 +22,35 @@
  *
  */
 
-#ifndef PEAK_CONTROLLER_H
-#define PEAK_CONTROLLER_H
+#ifndef LMMS_PEAK_CONTROLLER_H
+#define LMMS_PEAK_CONTROLLER_H
 
-#include "Model.h"
 #include "Controller.h"
 #include "ControllerDialog.h"
 
 class QWidget;
 
+namespace lmms
+{
+
+
 class PeakControllerEffect;
 
-typedef QVector<PeakControllerEffect *> PeakControllerEffectVector;
-
+using PeakControllerEffectVector = QVector<PeakControllerEffect*>;
 
 class LMMS_EXPORT PeakController : public Controller
 {
 	Q_OBJECT
 public:
 	PeakController( Model * _parent,
-		PeakControllerEffect *_peak_effect = NULL );
+		PeakControllerEffect *_peak_effect = nullptr );
 
 
-	virtual ~PeakController();
+	~PeakController() override;
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
-	virtual void loadSettings( const QDomElement & _this );
-	virtual QString nodeName() const;
+	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
+	void loadSettings( const QDomElement & _this ) override;
+	QString nodeName() const override;
 
 	static void initGetControllerBySetting();
 	static PeakController * getControllerBySetting( const QDomElement & _this );
@@ -57,13 +59,13 @@ public:
 
 
 public slots:
-	virtual ControllerDialog * createDialog( QWidget * _parent );
-	void handleDestroyedEffect( );
+	gui::ControllerDialog * createDialog( QWidget * _parent ) override;
+	void handleDestroyedEffect();
 	void updateCoeffs();
 
 protected:
 	// The internal per-controller get-value function
-	virtual void updateValueBuffer();
+	void updateValueBuffer() override;
 
 	PeakControllerEffect * m_peakEffect;
 
@@ -81,22 +83,28 @@ private:
 	bool m_coeffNeedsUpdate;
 } ;
 
-
+namespace gui
+{
 
 class PeakControllerDialog : public ControllerDialog
 {
 	Q_OBJECT
 public:
 	PeakControllerDialog( Controller * _controller, QWidget * _parent );
-	virtual ~PeakControllerDialog();
+	~PeakControllerDialog() override = default;
 
 protected:
-	virtual void contextMenuEvent( QContextMenuEvent * _me );
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void modelChanged();
+	void contextMenuEvent( QContextMenuEvent * _me ) override;
+	void paintEvent( QPaintEvent * _pe ) override;
+	void modelChanged() override;
 
 	PeakController * m_peakController;
 
-} ;
+};
 
-#endif
+
+} // namespace gui
+
+} // namespace lmms
+
+#endif // LMMS_PEAK_CONTROLLER_H

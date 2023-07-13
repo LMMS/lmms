@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef COMBOBOX_H
-#define COMBOBOX_H
+#ifndef LMMS_GUI_COMBOBOX_H
+#define LMMS_GUI_COMBOBOX_H
 
 #include <QMenu>
 #include <QWidget>
@@ -32,14 +31,15 @@
 #include "ComboBoxModel.h"
 #include "AutomatableModelView.h"
 
-
+namespace lmms::gui
+{
 
 class LMMS_EXPORT ComboBox : public QWidget, public IntModelView
 {
 	Q_OBJECT
 public:
-	ComboBox( QWidget* parent = NULL, const QString& name = QString() );
-	virtual ~ComboBox();
+	ComboBox( QWidget* parent = nullptr, const QString& name = QString() );
+	~ComboBox() override = default;
 
 	ComboBoxModel* model()
 	{
@@ -51,16 +51,18 @@ public:
 		return castModel<ComboBoxModel>();
 	}
 
+	static constexpr int DEFAULT_HEIGHT = 22;
+
 public slots:
 	void selectNext();
 	void selectPrevious();
 
 
 protected:
-	virtual void contextMenuEvent( QContextMenuEvent* event );
-	virtual void mousePressEvent( QMouseEvent* event );
-	virtual void paintEvent( QPaintEvent* event );
-	virtual void wheelEvent( QWheelEvent* event );
+	void contextMenuEvent( QContextMenuEvent* event ) override;
+	void mousePressEvent( QMouseEvent* event ) override;
+	void paintEvent( QPaintEvent* event ) override;
+	void wheelEvent( QWheelEvent* event ) override;
 
 
 private:
@@ -78,4 +80,6 @@ private slots:
 
 } ;
 
-#endif
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_COMBOBOX_H

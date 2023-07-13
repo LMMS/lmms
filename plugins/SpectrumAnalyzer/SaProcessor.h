@@ -27,34 +27,61 @@
 #ifndef SAPROCESSOR_H
 #define SAPROCESSOR_H
 
-#include <QColor>
+#include <atomic>
+#include <fftw3.h>
 #include <QMutex>
+#include <QRgb>
 #include <vector>
 
-#include "fft_helpers.h"
-#include "SaControls.h"
+#include "lmms_basics.h"
+
+
+namespace lmms
+{
+
+template<class T>
+class LocklessRingBuffer;
+
+class SaControls;
+
 
 
 //! Receives audio data, runs FFT analysis and stores the result.
 class SaProcessor
 {
 public:
-	explicit SaProcessor(SaControls *controls);
+	explicit SaProcessor(const SaControls *controls);
 	virtual ~SaProcessor();
 
-	void analyse(sampleFrame *in_buffer, const fpp_t frame_count);
+	// analysis thread and a method to terminate it
+	void analyze(LocklessRingBuffer<sampleFrame> &ring_buffer);
+	void terminate() {m_terminate = true;}
 
 	// inform processor if any processing is actually required
 	void setSpectrumActive(bool active);
 	void setWaterfallActive(bool active);
+	void flipRequest() {m_flipRequest = true;}	// request refresh of history buffer
 
 	// configuration is taken from models in SaControls; some changes require
 	// an exlicit update request (reallocation and window rebuild)
 	void reallocateBuffers();
 	void rebuildWindow();
 	void clear();
+	void clearHistory();
+
+	const float *getSpectrumL() const {return m_normSpectrumL.data();}
+	const float *getSpectrumR() const {return m_normSpectrumR.data();}
+	const uchar *getHistory() const {return m_history.data();}
 
 	// information about results and unit conversion helpers
+	unsigned int inBlockSize() const {return m_inBlockSize;}
+	unsigned int binCount() const;			//!< size of output (frequency domain) data block
+	bool spectrumNotEmpty();				//!< check if result buffers contain any non-zero values
+
+	unsigned int waterfallWidth() const;	//!< binCount value capped at 3840 (for display)
+	unsigned int waterfallHeight() const {return m_waterfallHeight;}
+	bool waterfallNotEmpty() const {return m_waterfallNotEmpty;}
+
 	float binToFreq(unsigned int bin_index) const;
 	float binBandwidth() const;
 
@@ -72,26 +99,38 @@ public:
 	float getAmpRangeMin(bool linear = false) const;
 	float getAmpRangeMax() const;
 
-	// data access lock must be acquired by any friendly class that touches
-	// the results, mainly to prevent unexpected mid-way reallocation
+	// Reallocation lock prevents the processor from changing size of its buffers.
+	// It is used to keep consistent bin-to-frequency mapping while drawing the
+	// spectrum and to make sure reading side does not find itself out of bounds.
+	// The processor is meanwhile free to work on another block.
+	QMutex m_reallocationAccess;
+	// Data access lock prevents the processor from changing both size and content
+	// of its buffers. It is used when writing to a result buffer, or when a friendly
+	// class reads them and needs guaranteed data consistency.
+	// It causes FFT analysis to be paused, so this lock should be used sparingly.
+	// If using both locks at the same time, reallocation lock MUST be acquired first.
 	QMutex m_dataAccess;
 
+
 private:
-	SaControls *m_controls;
+	const SaControls *m_controls;
+
+	// thread communication and control
+	bool m_terminate;
 
 	// currently valid configuration
-	const unsigned int m_zeroPadFactor = 2;	//!< use n-steps bigger FFT for given block size
-	unsigned int m_inBlockSize;				//!< size of input (time domain) data block
+	unsigned int m_zeroPadFactor = 2;		//!< use n-steps bigger FFT for given block size
+	std::atomic<unsigned int> m_inBlockSize;//!< size of input (time domain) data block
 	unsigned int m_fftBlockSize;			//!< size of padded block for FFT processing
 	unsigned int m_sampleRate;
-
-	unsigned int binCount() const;			//!< size of output (frequency domain) data block
 
 	// data buffers (roughly in the order of processing, from input to output)
 	unsigned int m_framesFilledUp;
 	std::vector<float> m_bufferL;			//!< time domain samples (left)
 	std::vector<float> m_bufferR;			//!< time domain samples (right)
 	std::vector<float> m_fftWindow;			//!< precomputed window function coefficients
+	std::vector<float> m_filteredBufferL;	//!< time domain samples with window function applied (left)
+	std::vector<float> m_filteredBufferR;	//!< time domain samples with window function applied (right)
 	fftwf_plan m_fftPlanL;
 	fftwf_plan m_fftPlanR;
 	fftwf_complex *m_spectrumL;				//!< frequency domain samples (complex) (left)
@@ -102,21 +141,32 @@ private:
 	std::vector<float> m_normSpectrumR;     //!< frequency domain samples (normalized) (right)
 
 	// spectrum history for waterfall: new normSpectrum lines are added on top
-	std::vector<uchar> m_history;
-	const unsigned int m_waterfallHeight = 200;	// Number of stored lines.
-												// Note: high values may make it harder to see transients.
+	std::vector<uchar> m_history_work;		//!< local history buffer for render
+	std::vector<uchar> m_history;			//!< public buffer for reading
+	bool m_flipRequest;						//!< update public buffer only when requested
+	std::atomic<unsigned int> m_waterfallHeight;	//!< number of stored lines in history buffer
+											// Note: high values may make it harder to see transients.
+	const unsigned int m_waterfallMaxWidth = 3840;
 
 	// book keeping
 	bool m_spectrumActive;
 	bool m_waterfallActive;
-	unsigned int m_waterfallNotEmpty;
+	std::atomic<unsigned int> m_waterfallNotEmpty;	//!< number of lines remaining visible on display
 	bool m_reallocating;
 
 	// merge L and R channels and apply gamma correction to make a spectrogram pixel
-	QRgb makePixel(float left, float right, float gamma_correction = 0.30) const;
+	QRgb makePixel(float left, float right) const;
 
-	friend class SaSpectrumView;
-	friend class SaWaterfallView;
+	#ifdef SA_DEBUG
+		unsigned int m_last_dump_time;
+		unsigned int m_dump_count;
+		float m_sum_execution;
+		float m_max_execution;
+	#endif
 };
+
+
+} // namespace lmms
+
 #endif // SAPROCESSOR_H
 

@@ -22,23 +22,25 @@
  *
  */
 
-
-#ifndef CONFIG_MGR_H
-#define CONFIG_MGR_H
+#ifndef LMMS_CONFIG_MANAGER_H
+#define LMMS_CONFIG_MANAGER_H
 
 #include "lmmsconfig.h"
 
-#include <QtCore/QMap>
-#include <QtCore/QPair>
-#include <QtCore/QStringList>
-#include <QtCore/QVector>
-#include <QtCore/QObject>
+#include <QMap>
+#include <QPair>
+#include <QStringList>
+#include <QVector>
+#include <QObject>
 
 #include "lmms_export.h"
 
 
-class LmmsCore;
+namespace lmms
+{
 
+
+class Engine;
 
 const QString PROJECTS_PATH = "projects/";
 const QString TEMPLATE_PATH = "templates/";
@@ -50,15 +52,18 @@ const QString LADSPA_PATH ="plugins/ladspa/";
 const QString DEFAULT_THEME_PATH = "themes/default/";
 const QString TRACK_ICON_PATH = "track_icons/";
 const QString LOCALE_PATH = "locale/";
-
+const QString PORTABLE_MODE_FILE = "/portable_mode.txt";
 
 class LMMS_EXPORT ConfigManager : public QObject
 {
 	Q_OBJECT
+
+	using UpgradeMethod = void(ConfigManager::*)();
+
 public:
 	static inline ConfigManager * inst()
 	{
-		if(s_instanceOfMe == NULL )
+		if(s_instanceOfMe == nullptr )
 		{
 			s_instanceOfMe = new ConfigManager();
 		}
@@ -70,6 +75,12 @@ public:
 	{
 		return m_workingDir;
 	}
+
+	void initPortableWorkingDir();
+
+	void initInstalledWorkingDir();
+
+	void initDevelopmentWorkingDir();
 
 	const QString & dataDir() const
 	{
@@ -213,10 +224,14 @@ public:
 		return m_version;
 	}
 
+	// Used when the configversion attribute is not present in a configuration file.
+	// Returns the appropriate config file version based on the LMMS version.
+	unsigned int legacyConfigVersion();
+
 	QString defaultVersion() const;
 
 
-	static QStringList availabeVstEmbedMethods();
+	static QStringList availableVstEmbedMethods();
 	QString vstEmbedMethod() const;
 
 	// Returns true if the working dir (e.g. ~/lmms) exists on disk.
@@ -258,11 +273,15 @@ private:
 
 	ConfigManager();
 	ConfigManager(const ConfigManager & _c);
-	~ConfigManager();
+	~ConfigManager() override;
 
 	void upgrade_1_1_90();
 	void upgrade_1_1_91();
+	void upgrade_1_2_2();
 	void upgrade();
+
+	// List of all upgrade methods
+	static const std::vector<UpgradeMethod> UPGRADE_METHODS;
 
 	QString m_workingDir;
 	QString m_dataDir;
@@ -280,13 +299,18 @@ private:
 	QString m_backgroundPicFile;
 	QString m_lmmsRcFile;
 	QString m_version;
+	unsigned int m_configVersion;
 	QStringList m_recentlyOpenedProjects;
 
-	typedef QVector<QPair<QString, QString> > stringPairVector;
-	typedef QMap<QString, stringPairVector> settingsMap;
+	using stringPairVector = QVector<QPair<QString, QString>>;
+	using settingsMap = QMap<QString, stringPairVector>;
 	settingsMap m_settings;
 
 
-	friend class LmmsCore;
+	friend class Engine;
 };
-#endif
+
+
+} // namespace lmms
+
+#endif // LMMS_CONFIG_MANAGER_H

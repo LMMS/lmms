@@ -23,15 +23,18 @@
  *
  */
 
+#ifndef LMMS_GUI_CPU_LOAD_WIDGET_H
+#define LMMS_GUI_CPU_LOAD_WIDGET_H
 
-#ifndef CPULOAD_WIDGET_H
-#define CPULOAD_WIDGET_H
-
-#include <QtCore/QTimer>
+#include <QTimer>
 #include <QPixmap>
 #include <QWidget>
 
 #include "lmms_basics.h"
+
+
+namespace lmms::gui
+{
 
 
 class CPULoadWidget : public QWidget
@@ -39,11 +42,11 @@ class CPULoadWidget : public QWidget
 	Q_OBJECT
 public:
 	CPULoadWidget( QWidget * _parent );
-	virtual ~CPULoadWidget();
+	~CPULoadWidget() override = default;
 
 
 protected:
-	virtual void paintEvent( QPaintEvent * _ev );
+	void paintEvent( QPaintEvent * _ev ) override;
 
 
 protected slots:
@@ -64,4 +67,6 @@ private:
 } ;
 
 
-#endif
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_CPU_LOAD_WIDGET_H

@@ -22,10 +22,13 @@
  *
  */
 
-#ifndef ROW_TABLE_VIEW_H
-#define ROW_TABLE_VIEW_H
+#ifndef LMMS_GUI_ROW_TABLE_VIEW_H
+#define LMMS_GUI_ROW_TABLE_VIEW_H
 
 #include <QTableView>
+
+namespace lmms::gui
+{
 
 
 class RowDelegate;
@@ -36,13 +39,13 @@ class RowTableView : public QTableView
 	Q_OBJECT
 public:
 	RowTableView( QWidget * parent = 0 );
-	virtual ~RowTableView();
+	~RowTableView() override;
 
-	virtual void setModel( QAbstractItemModel * model );
+	void setModel( QAbstractItemModel * model ) override;
 
 
 protected:
-	virtual void keyPressEvent( QKeyEvent * event );
+	void keyPressEvent( QKeyEvent * event ) override;
 
 
 private:
@@ -51,5 +54,6 @@ private:
 } ;
 
 
+} // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_ROW_TABLE_VIEW_H

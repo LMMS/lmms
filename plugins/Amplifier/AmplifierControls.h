@@ -28,10 +28,16 @@
 
 #include "EffectControls.h"
 #include "AmplifierControlDialog.h"
-#include "Knob.h"
 
+namespace lmms
+{
 
 class AmplifierEffect;
+
+namespace gui
+{
+class AmplifierControlDialog;
+}
 
 
 class AmplifierControls : public EffectControls
@@ -39,25 +45,23 @@ class AmplifierControls : public EffectControls
 	Q_OBJECT
 public:
 	AmplifierControls( AmplifierEffect* effect );
-	virtual ~AmplifierControls()
-	{
-	}
+	~AmplifierControls() override = default;
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName() const
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
+	inline QString nodeName() const override
 	{
 		return "AmplifierControls";
 	}
 
-	virtual int controlCount()
+	int controlCount() override
 	{
 		return 4;
 	}
 
-	virtual EffectControlDialog* createView()
+	gui::EffectControlDialog* createView() override
 	{
-		return new AmplifierControlDialog( this );
+		return new gui::AmplifierControlDialog( this );
 	}
 
 
@@ -71,9 +75,12 @@ private:
 	FloatModel m_leftModel;
 	FloatModel m_rightModel;
 
-	friend class AmplifierControlDialog;
+	friend class gui::AmplifierControlDialog;
 	friend class AmplifierEffect;
 
 } ;
+
+
+} // namespace lmms
 
 #endif

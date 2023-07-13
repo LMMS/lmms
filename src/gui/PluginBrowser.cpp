@@ -27,6 +27,7 @@
 #include <QHeaderView>
 #include <QLabel>
 #include <QLineEdit>
+#include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QStyleOption>
@@ -34,9 +35,14 @@
 
 #include "embed.h"
 #include "Engine.h"
-#include "gui_templates.h"
+#include "InstrumentTrack.h"
+#include "Song.h"
 #include "StringPairDrag.h"
+#include "TrackContainerView.h"
 #include "PluginFactory.h"
+
+namespace lmms::gui
+{
 
 
 PluginBrowser::PluginBrowser( QWidget * _parent ) :
@@ -49,19 +55,19 @@ PluginBrowser::PluginBrowser( QWidget * _parent ) :
 
 	addContentWidget( m_view );
 
-	QVBoxLayout * view_layout = new QVBoxLayout( m_view );
-	view_layout->setMargin( 5 );
+	auto view_layout = new QVBoxLayout(m_view);
+	view_layout->setContentsMargins(5, 5, 5, 5);
 	view_layout->setSpacing( 5 );
 
 
 	auto hint = new QLabel( tr( "Drag an instrument "
-					"into either the Song-Editor, the "
-					"Beat+Bassline Editor or into an "
+					"into either the Song Editor, the "
+					"Pattern Editor or into an "
 					"existing instrument track." ),
 								m_view );
 	hint->setWordWrap( true );
 
-	QLineEdit * searchBar = new QLineEdit( m_view );
+	auto searchBar = new QLineEdit(m_view);
 	searchBar->setPlaceholderText( "Search" );
 	searchBar->setMaxLength( 64 );
 	searchBar->setClearButtonEnabled( true );
@@ -72,25 +78,14 @@ PluginBrowser::PluginBrowser( QWidget * _parent ) :
 	m_descTree->setIndentation( 10 );
 	m_descTree->setSelectionMode( QAbstractItemView::NoSelection );
 
-	connect( searchBar, SIGNAL( textEdited( const QString & ) ),
-			this, SLOT( onFilterChanged( const QString & ) ) );
+	connect( searchBar, SIGNAL( textEdited( const QString& ) ),
+			this, SLOT( onFilterChanged( const QString& ) ) );
 
 	view_layout->addWidget( hint );
 	view_layout->addWidget( searchBar );
 	view_layout->addWidget( m_descTree );
 
-	// Add LMMS root to the tree
-	m_lmmsRoot = new QTreeWidgetItem();
-	m_lmmsRoot->setText( 0, "LMMS" );
-	m_descTree->insertTopLevelItem( 0, m_lmmsRoot );
-	m_lmmsRoot->setExpanded( true );
-
-	// Add LV2 root to the tree
-	m_lv2Root = new QTreeWidgetItem();
-	m_lv2Root->setText( 0, "LV2" );
-	m_descTree->insertTopLevelItem( 1, m_lv2Root );
-
-	// Add plugins to the tree roots
+	// Add plugins to the tree
 	addPlugins();
 
 	// Resize
@@ -129,8 +124,7 @@ void PluginBrowser::onFilterChanged( const QString & filter )
 		for (int itemIndex = 0; itemIndex < itemCount; ++itemIndex)
 		{
 			QTreeWidgetItem * item = root->child( itemIndex );
-			PluginDescWidget * descWidget = static_cast<PluginDescWidget *>
-							(m_descTree->itemWidget( item, 0));
+			auto descWidget = static_cast<PluginDescWidget*>(m_descTree->itemWidget(item, 0));
 			if (descWidget->name().contains(filter, Qt::CaseInsensitive))
 			{
 				item->setHidden( false );
@@ -146,49 +140,62 @@ void PluginBrowser::onFilterChanged( const QString & filter )
 
 void PluginBrowser::addPlugins()
 {
-	QList<Plugin::Descriptor*> descs = pluginFactory->descriptors(Plugin::Instrument);
-	std::sort(
-			descs.begin(),
-			descs.end(),
-			[]( const Plugin::Descriptor* d1, const Plugin::Descriptor* d2 ) -> bool
-			{
-				return qstricmp( d1->displayName, d2->displayName ) < 0 ? true : false;
-			}
+	// Add a root node to the plugin tree with the specified `label` and return it
+	const auto addRoot = [this](auto label)
+	{
+		const auto root = new QTreeWidgetItem();
+		root->setText(0, label);
+		m_descTree->addTopLevelItem(root);
+		return root;
+	};
+
+	// Add the plugin identified by `key` to the tree under the root node `root`
+	const auto addPlugin = [this](const auto& key, auto root)
+	{
+		const auto item = new QTreeWidgetItem();
+		root->addChild(item);
+		m_descTree->setItemWidget(item, 0, new PluginDescWidget(key, m_descTree));
+	};
+
+	// Remove any existing plugins from the tree
+	m_descTree->clear();
+
+	// Fetch and sort all instrument plugin descriptors
+	auto descs = getPluginFactory()->descriptors(Plugin::Instrument);
+	std::sort(descs.begin(), descs.end(),
+		[](auto d1, auto d2)
+		{
+			return qstricmp(d1->displayName, d2->displayName) < 0;
+		}
 	);
 
-	typedef Plugin::Descriptor::SubPluginFeatures::KeyList PluginKeyList;
-	typedef Plugin::Descriptor::SubPluginFeatures::Key PluginKey;
-	PluginKeyList subPluginKeys, pluginKeys;
+	// Add a root node to the tree for native LMMS plugins
+	const auto lmmsRoot = addRoot("LMMS");
+	lmmsRoot->setExpanded(true);
 
-	for (const Plugin::Descriptor* desc: descs)
+	// Add all of the descriptors to the tree
+	for (const auto desc : descs)
 	{
-		if ( desc->subPluginFeatures )
+		if (desc->subPluginFeatures)
 		{
-			desc->subPluginFeatures->listSubPluginKeys(
-							desc,
-							subPluginKeys );
+			// Fetch and sort all subplugins for this plugin descriptor
+			auto subPluginKeys = Plugin::Descriptor::SubPluginFeatures::KeyList{};
+			desc->subPluginFeatures->listSubPluginKeys(desc, subPluginKeys);
+			std::sort(subPluginKeys.begin(), subPluginKeys.end(),
+				[](const auto& l, const auto& r)
+				{
+					return QString::compare(l.displayName(), r.displayName(), Qt::CaseInsensitive) < 0;
+				}
+			);
+
+			// Create a root node for this plugin and add the subplugins under it
+			const auto root = addRoot(desc->displayName);
+			for (const auto& key : subPluginKeys) { addPlugin(key, root); }
 		}
 		else
 		{
-			pluginKeys << PluginKey( desc, desc->name );
+			addPlugin(Plugin::Descriptor::SubPluginFeatures::Key(desc, desc->name), lmmsRoot);
 		}
-	}
-
-	pluginKeys += subPluginKeys;
-
-	for (const PluginKey& key : pluginKeys)
-	{
-		QTreeWidgetItem * item = new QTreeWidgetItem();
-		if ( key.desc->name == QStringLiteral("lv2instrument") )
-		{
-			m_lv2Root->addChild( item );
-		}
-		else
-		{
-			m_lmmsRoot->addChild( item );
-		}
-		PluginDescWidget* p = new PluginDescWidget( key, m_descTree );
-		m_descTree->setItemWidget( item, 0, p );
 	}
 }
 
@@ -205,7 +212,9 @@ PluginDescWidget::PluginDescWidget(const PluginKey &_pk,
 	setFixedHeight( DEFAULT_HEIGHT );
 	setMouseTracking( true );
 	setCursor( Qt::PointingHandCursor );
-	setToolTip(_pk.description());
+	setToolTip(_pk.desc->subPluginFeatures
+		? _pk.description()
+		: tr(_pk.desc->description));
 }
 
 
@@ -282,9 +291,24 @@ void PluginDescWidget::mousePressEvent( QMouseEvent * _me )
 }
 
 
+void PluginDescWidget::contextMenuEvent(QContextMenuEvent* e)
+{
+	QMenu contextMenu(this);
+	contextMenu.addAction(
+		tr("Send to new instrument track"),
+		[=]{ openInNewInstrumentTrack(m_pluginKey.desc->name); }
+	);
+	contextMenu.exec(e->globalPos());
+}
 
 
+void PluginDescWidget::openInNewInstrumentTrack(QString value)
+{
+	TrackContainer* tc = Engine::getSong();
+	auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::InstrumentTrack, tc));
+	auto ilt = new InstrumentLoaderThread(this, it, value);
+	ilt->start();
+}
 
 
-
-
+} // namespace lmms::gui

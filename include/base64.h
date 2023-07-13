@@ -23,16 +23,16 @@
  *
  */
 
-#ifndef _BASE64_H
-#define _BASE64_H
+#ifndef LMMS_BASE64_H
+#define LMMS_BASE64_H
 
-#include <QtCore/QByteArray>
-#include <QtCore/QString>
-#include <QtCore/QVariant>
+#include <QByteArray>
+#include <QString>
+#include <QVariant>
 
-
-namespace base64
+namespace lmms::base64
 {
+
 	inline void encode( const char * _data, const int _size,
 								QString & _dst )
 	{
@@ -51,6 +51,6 @@ namespace base64
 	QVariant decode( const QString & _b64,
 			QVariant::Type _force_type = QVariant::Invalid );
 
-}
+} // namespace lmms::base64
 
-#endif
+#endif // LMMS_BASE64_H

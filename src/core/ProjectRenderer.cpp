@@ -34,55 +34,56 @@
 #include "AudioFileMP3.h"
 #include "AudioFileFlac.h"
 
-#ifdef LMMS_HAVE_SCHED_H
-#include "sched.h"
-#endif
 
-const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
+namespace lmms
 {
 
-	{ ProjectRenderer::WaveFile,
+
+const std::array<ProjectRenderer::FileEncodeDevice, 5> ProjectRenderer::fileEncodeDevices
+{
+
+	FileEncodeDevice{ ProjectRenderer::WaveFile,
 		QT_TRANSLATE_NOOP( "ProjectRenderer", "WAV (*.wav)" ),
 					".wav", &AudioFileWave::getInst },
-	{ ProjectRenderer::FlacFile,
+	FileEncodeDevice{ ProjectRenderer::FlacFile,
 		QT_TRANSLATE_NOOP("ProjectRenderer", "FLAC (*.flac)"),
 		".flac",
 		&AudioFileFlac::getInst
 	},
-	{ ProjectRenderer::OggFile,
+	FileEncodeDevice{ ProjectRenderer::OggFile,
 		QT_TRANSLATE_NOOP( "ProjectRenderer", "OGG (*.ogg)" ),
 					".ogg",
 #ifdef LMMS_HAVE_OGGVORBIS
 					&AudioFileOgg::getInst
 #else
-					NULL
+					nullptr
 #endif
 									},
-	{ ProjectRenderer::MP3File,
+	FileEncodeDevice{ ProjectRenderer::MP3File,
 		QT_TRANSLATE_NOOP( "ProjectRenderer", "MP3 (*.mp3)" ),
 					".mp3",
 #ifdef LMMS_HAVE_MP3LAME
 					&AudioFileMP3::getInst
 #else
-					NULL
+					nullptr
 #endif
 									},
 	// Insert your own file-encoder infos here.
 	// Maybe one day the user can add own encoders inside the program.
 
-	{ ProjectRenderer::NumFileFormats, NULL, NULL, NULL }
+	FileEncodeDevice{ ProjectRenderer::NumFileFormats, nullptr, nullptr, nullptr }
 
 } ;
 
 
 
 
-ProjectRenderer::ProjectRenderer( const Mixer::qualitySettings & qualitySettings,
+ProjectRenderer::ProjectRenderer( const AudioEngine::qualitySettings & qualitySettings,
 					const OutputSettings & outputSettings,
 					ExportFileFormats exportFileFormat,
 					const QString & outputFilename ) :
-	QThread( Engine::mixer() ),
-	m_fileDev( NULL ),
+	QThread( Engine::audioEngine() ),
+	m_fileDev( nullptr ),
 	m_qualitySettings( qualitySettings ),
 	m_progress( 0 ),
 	m_abort( false )
@@ -95,20 +96,13 @@ ProjectRenderer::ProjectRenderer( const Mixer::qualitySettings & qualitySettings
 
 		m_fileDev = audioEncoderFactory(
 					outputFilename, outputSettings, DEFAULT_CHANNELS,
-					Engine::mixer(), successful );
+					Engine::audioEngine(), successful );
 		if( !successful )
 		{
 			delete m_fileDev;
-			m_fileDev = NULL;
+			m_fileDev = nullptr;
 		}
 	}
-}
-
-
-
-
-ProjectRenderer::~ProjectRenderer()
-{
 }
 
 
@@ -149,10 +143,9 @@ void ProjectRenderer::startProcessing()
 
 	if( isReady() )
 	{
-		// Have to do mixer stuff with GUI-thread affinity in order to
+		// Have to do audio engine stuff with GUI-thread affinity in order to
 		// make slots connected to sampleRateChanged()-signals being called immediately.
-		Engine::mixer()->setAudioDevice( m_fileDev,
-						m_qualitySettings, false, false );
+		Engine::audioEngine()->setAudioDevice( m_fileDev, m_qualitySettings, false, false );
 
 		start(
 #ifndef LMMS_BUILD_WIN32
@@ -168,7 +161,7 @@ void ProjectRenderer::run()
 {
 	MemoryManager::ThreadGuard mmThreadGuard; Q_UNUSED(mmThreadGuard);
 #if 0
-#ifdef LMMS_BUILD_LINUX
+#if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_FREEBSD)
 #ifdef LMMS_HAVE_SCHED_H
 	cpu_set_t mask;
 	CPU_ZERO( &mask );
@@ -181,14 +174,13 @@ void ProjectRenderer::run()
 	PerfLogTimer perfLog("Project Render");
 
 	Engine::getSong()->startExport();
-	Engine::getSong()->updateLength();
 	// Skip first empty buffer.
-	Engine::mixer()->nextBuffer();
+	Engine::audioEngine()->nextBuffer();
 
 	m_progress = 0;
 
 	// Now start processing
-	Engine::mixer()->startProcessing(false);
+	Engine::audioEngine()->startProcessing(false);
 
 	// Continually track and emit progress percentage to listeners.
 	while (!Engine::getSong()->isExportDone() && !m_abort)
@@ -202,8 +194,8 @@ void ProjectRenderer::run()
 		}
 	}
 
-	// Notify mixer of the end of processing.
-	Engine::mixer()->stopProcessing();
+	// Notify the audio engine of the end of processing.
+	Engine::audioEngine()->stopProcessing();
 
 	Engine::getSong()->stopExport();
 
@@ -232,8 +224,8 @@ void ProjectRenderer::updateConsoleProgress()
 {
 	const int cols = 50;
 	static int rot = 0;
-	char buf[80];
-	char prog[cols+1];
+	auto buf = std::array<char, 80>{};
+	auto prog = std::array<char, cols + 1>{};
 
 	for( int i = 0; i < cols; ++i )
 	{
@@ -241,14 +233,15 @@ void ProjectRenderer::updateConsoleProgress()
 	}
 	prog[cols] = 0;
 
-	const char * activity = (const char *) "|/-\\";
-	memset( buf, 0, sizeof( buf ) );
-	sprintf( buf, "\r|%s|    %3d%%   %c  ", prog, m_progress,
+	const auto activity = (const char*)"|/-\\";
+	std::fill(buf.begin(), buf.end(), 0);
+	sprintf(buf.data(), "\r|%s|    %3d%%   %c  ", prog.data(), m_progress,
 							activity[rot] );
 	rot = ( rot+1 ) % 4;
 
-	fprintf( stderr, "%s", buf );
+	fprintf( stderr, "%s", buf.data() );
 	fflush( stderr );
 }
 
 
+} // namespace lmms

@@ -22,25 +22,26 @@
  *
  */
 
-#ifndef INSTRUMENT_PLAY_HANDLE_H
-#define INSTRUMENT_PLAY_HANDLE_H
+#ifndef LMMS_INSTRUMENT_PLAY_HANDLE_H
+#define LMMS_INSTRUMENT_PLAY_HANDLE_H
 
 #include "PlayHandle.h"
 #include "Instrument.h"
 #include "NotePlayHandle.h"
 #include "lmms_export.h"
 
+namespace lmms
+{
+
 class LMMS_EXPORT InstrumentPlayHandle : public PlayHandle
 {
 public:
 	InstrumentPlayHandle( Instrument * instrument, InstrumentTrack* instrumentTrack );
 
-	virtual ~InstrumentPlayHandle()
-	{
-	}
+	~InstrumentPlayHandle() override = default;
 
 
-	virtual void play( sampleFrame * _working_buffer )
+	void play( sampleFrame * _working_buffer ) override
 	{
 		// ensure that all our nph's have been processed first
 		ConstNotePlayHandleList nphv = NotePlayHandle::nphsOfInstrumentTrack( m_instrument->instrumentTrack(), true );
@@ -65,12 +66,12 @@ public:
 		m_instrument->play( _working_buffer );
 	}
 
-	virtual bool isFinished() const
+	bool isFinished() const override
 	{
 		return false;
 	}
 
-	virtual bool isFromTrack( const Track* _track ) const
+	bool isFromTrack( const Track* _track ) const override
 	{
 		return m_instrument->isFromTrack( _track );
 	}
@@ -81,4 +82,7 @@ private:
 
 } ;
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_INSTRUMENT_PLAY_HANDLE_H

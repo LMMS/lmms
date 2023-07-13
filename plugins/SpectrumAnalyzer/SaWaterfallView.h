@@ -26,11 +26,21 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include <QPainter>
 #include <QWidget>
 
-#include "SaControls.h"
-#include "SaProcessor.h"
+
+class QMouseEvent;
+
+namespace lmms
+{
+class SaControls;
+class SaProcessor;
+}
+
+namespace lmms::gui
+{
+
+class EffectControlDialog;
 
 
 // Widget that displays a spectrum waterfall (spectrogram) and time labels.
@@ -39,7 +49,7 @@ class SaWaterfallView : public QWidget
 	Q_OBJECT
 public:
 	explicit SaWaterfallView(SaControls *controls, SaProcessor *processor, QWidget *_parent = 0);
-	virtual ~SaWaterfallView() {}
+	~SaWaterfallView() override = default;
 
 	QSize sizeHint() const override {return QSize(400, 350);}
 
@@ -48,6 +58,9 @@ public:
 
 protected:
 	void paintEvent(QPaintEvent *event) override;
+	void mouseMoveEvent(QMouseEvent *event) override;
+	void mousePressEvent(QMouseEvent *event) override;
+	void resizeEvent(QResizeEvent *event) override;
 
 private slots:
 	void periodicUpdate();
@@ -58,9 +71,33 @@ private:
 	const EffectControlDialog *m_controlDialog;
 
 	// Methods and data used to make time labels
-	float m_oldTimePerLine;
+	float m_oldSecondsPerLine;
+	float m_oldHeight;
+	float samplesPerLine();
+	float secondsPerLine();
 	float timeToYPixel(float time, int height);
+	float yPixelToTime(float position, int height);
 	std::vector<std::pair<float, std::string>> makeTimeTics();
 	std::vector<std::pair<float, std::string>> m_timeTics;	// 0..n (s)
+
+	// current cursor location and a method to draw it
+	QPointF m_cursor;
+	void drawCursor(QPainter &painter);
+
+	// current boundaries for drawing
+	unsigned int m_displayTop;
+	unsigned int m_displayBottom;
+	unsigned int m_displayLeft;
+	unsigned int m_displayRight;
+	unsigned int m_displayWidth;
+	unsigned int m_displayHeight;
+
+	#ifdef SA_DEBUG
+		float m_execution_avg;
+	#endif
 };
+
+
+} // namespace lmms::gui
+
 #endif // SAWATERFALLVIEW_H

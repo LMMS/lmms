@@ -27,20 +27,24 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT multitapecho_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Multitap Echo",
-	QT_TRANSLATE_NOOP( "pluginBrowser", "A multitap echo delay plugin" ),
+	QT_TRANSLATE_NOOP( "PluginBrowser", "A multitap echo delay plugin" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Effect,
 	new PluginPixmapLoader( "logo" ),
-	NULL,
-	NULL
+	nullptr,
+	nullptr,
 } ;
 
 }
@@ -51,10 +55,10 @@ MultitapEchoEffect::MultitapEchoEffect( Model* parent, const Descriptor::SubPlug
 	m_stages( 1 ),
 	m_controls( this ),
 	m_buffer( 16100.0f ),
-	m_sampleRate( Engine::mixer()->processingSampleRate() ),
+	m_sampleRate( Engine::audioEngine()->processingSampleRate() ),
 	m_sampleRatio( 1.0f / m_sampleRate )
 {
-	m_work = MM_ALLOC( sampleFrame, Engine::mixer()->framesPerPeriod() );
+	m_work = MM_ALLOC<sampleFrame>( Engine::audioEngine()->framesPerPeriod() );
 	m_buffer.reset();
 	m_stages = static_cast<int>( m_controls.m_stages.value() );
 	updateFilters( 0, 19 );
@@ -170,3 +174,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 }
 
 }
+
+
+} // namespace lmms

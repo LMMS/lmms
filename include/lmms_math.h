@@ -22,42 +22,58 @@
  *
  */
 
-
 #ifndef LMMS_MATH_H
 #define LMMS_MATH_H
 
 #include <cstdint>
 #include "lmms_constants.h"
 #include "lmmsconfig.h"
-#include <QtCore/QtGlobal>
+#include <QtGlobal>
 
 #include <cmath>
-using namespace std;
 
-#ifndef exp10
-#define exp10(x) std::pow( 10.0, x )
-#endif
+namespace lmms
+{
 
 #ifdef __INTEL_COMPILER
 
 static inline float absFraction( const float _x )
 {
-	return( _x - ( _x >= 0.0f ? floorf( _x ) : floorf( _x ) - 1 ) );
+	return( _x - floorf( _x ) );
 }
 
 static inline float fraction( const float _x )
 {
-	return( _x - floorf( _x ) );
+	return( _x - floorf( _x ) - ( _x >= 0.0f ? 0.0 : 1.0 ) );
 }
 
 #else
 
+/*!
+ * @brief Returns the wrapped fractional part of a float, a value between 0.0f and 1.0f.
+ *
+ * absFraction( 2.3) =>  0.3
+ * absFraction(-2.3) =>  0.7
+ *
+ * Note that this not the same as the absolute value of the fraction (as the function name suggests).
+ * If the result is interpreted as a phase of an oscillator, it makes that negative phases are
+ * converted to positive phases.
+ */
 static inline float absFraction( const float _x )
 {
 	return( _x - ( _x >= 0.0f ? static_cast<int>( _x ) :
 						static_cast<int>( _x ) - 1 ) );
 }
 
+/*!
+ * @brief Returns the fractional part of a float, a value between -1.0f and 1.0f.
+ *
+ * fraction( 2.3) =>  0.3
+ * fraction(-2.3) => -0.3
+ *
+ * Note that if the return value is used as a phase of an oscillator, that the oscillator must support
+ * negative phases.
+ */
 static inline float fraction( const float _x )
 {
 	return( _x - static_cast<int>( _x ) );
@@ -101,11 +117,11 @@ static inline float absFraction( float _x )
 }
 #endif
 
-#endif
+#endif // __INTEL_COMPILER
 
 
 
-#define FAST_RAND_MAX 32767
+constexpr int FAST_RAND_MAX = 32767;
 static inline int fast_rand()
 {
 	static unsigned long next = 1;
@@ -136,7 +152,7 @@ static inline long double fastFmal( long double a, long double b, long double c 
 	#endif
 #else
 	return a * b + c;
-#endif
+#endif // FP_FAST_FMAL
 }
 
 //! @brief Takes advantage of fmaf() function if present in hardware
@@ -150,7 +166,7 @@ static inline float fastFmaf( float a, float b, float c )
 	#endif
 #else
 	return a * b + c;
-#endif
+#endif // FP_FAST_FMAF
 }
 
 //! @brief Takes advantage of fma() function if present in hardware
@@ -201,10 +217,10 @@ static inline float logToLinearScale( float min, float max, float value )
 		const float mmax = qMax( qAbs( min ), qAbs( max ) );
 		const float val = value * ( max - min ) + min;
 		float result = signedPowf( val / mmax, F_E ) * mmax;
-		return isnan( result ) ? 0 : result;
+		return std::isnan( result ) ? 0 : result;
 	}
 	float result = powf( value, F_E ) * ( max - min ) + min;
-	return isnan( result ) ? 0 : result;
+	return std::isnan( result ) ? 0 : result;
 }
 
 
@@ -218,10 +234,10 @@ static inline float linearToLogScale( float min, float max, float value )
 	{
 		const float mmax = qMax( qAbs( min ), qAbs( max ) );
 		float result = signedPowf( valueLimited / mmax, EXP ) * mmax;
-		return isnan( result ) ? 0 : result;
+		return std::isnan( result ) ? 0 : result;
 	}
 	float result = powf( val, EXP ) * ( max - min ) + min;
-	return isnan( result ) ? 0 : result;
+	return std::isnan( result ) ? 0 : result;
 }
 
 
@@ -243,9 +259,9 @@ static inline float safeAmpToDbfs( float amp )
 //! @return Linear amplitude
 static inline float safeDbfsToAmp( float dbfs )
 {
-	return isinf( dbfs )
+	return std::isinf( dbfs )
 		? 0.0f
-		: exp10( dbfs * 0.05f );
+		: std::pow(10.f, dbfs * 0.05f );
 }
 
 
@@ -263,7 +279,7 @@ static inline float ampToDbfs( float amp )
 //! @return Linear amplitude
 static inline float dbfsToAmp( float dbfs )
 {
-	return exp10( dbfs * 0.05f );
+	return std::pow(10.f, dbfs * 0.05f );
 }
 
 
@@ -309,4 +325,7 @@ static inline T absMin( T a, T b )
 	return qAbs<T>(a) < qAbs<T>(b) ? a : b;
 }
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_MATH_H

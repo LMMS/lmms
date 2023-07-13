@@ -23,9 +23,8 @@
  *
  */
 
-
-#ifndef GRAPH_H
-#define GRAPH_H
+#ifndef LMMS_GUI_GRAPH_H
+#define LMMS_GUI_GRAPH_H
 
 #include <QWidget>
 #include <QPixmap>
@@ -35,7 +34,14 @@
 #include "ModelView.h"
 #include "lmms_basics.h"
 
+namespace lmms
+{
+
+
 class graphModel;
+
+namespace gui
+{
 
 
 class LMMS_EXPORT Graph : public QWidget, public ModelView
@@ -60,7 +66,7 @@ public:
 		int _width = 132,
 		int _height = 104
 	);
-	virtual ~Graph() = default;
+	~Graph() override = default;
 
 	void setForeground( const QPixmap & _pixmap );
 
@@ -87,19 +93,19 @@ public:
 signals:
 	void drawn();
 protected:
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void dropEvent( QDropEvent * _de );
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseMoveEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
+	void paintEvent( QPaintEvent * _pe ) override;
+	void dropEvent( QDropEvent * _de ) override;
+	void dragEnterEvent( QDragEnterEvent * _dee ) override;
+	void mousePressEvent( QMouseEvent * _me ) override;
+	void mouseMoveEvent( QMouseEvent * _me ) override;
+	void mouseReleaseEvent( QMouseEvent * _me ) override;
 
 protected slots:
 	void updateGraph( int _startPos, int _endPos );
 	void updateGraph();
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	void changeSampleAt( int _x, int _y );
 	void drawLineAt( int _x, int _y, int _lastx );
@@ -114,6 +120,9 @@ private:
 	int m_lastCursorX;
 
 } ;
+
+
+} // namespace gui
 
 
 /**
@@ -137,11 +146,11 @@ public:
 	graphModel( float _min,
 			float _max,
 			int _size,
-			:: Model * _parent,
+			Model * _parent,
 			bool _default_constructed = false,
 			float _step = 0.0 );
 
-	virtual ~graphModel() = default;
+	~graphModel() override = default;
 
 	// TODO: saveSettings, loadSettings?
 
@@ -187,7 +196,7 @@ public slots:
 	void setWaveToSaw();
 	void setWaveToSquare();
 	void setWaveToNoise();
-	QString setWaveToUser( );
+	QString setWaveToUser();
 
 	void smooth();
 	void smoothNonCyclic();
@@ -211,8 +220,11 @@ private:
 	float m_maxValue;
 	float m_step;
 
-	friend class Graph;
+	friend class gui::Graph;
 
 };
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_GUI_GRAPH_H

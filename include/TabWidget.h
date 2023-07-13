@@ -22,12 +22,14 @@
  *
  */
 
-
-#ifndef TAB_WIDGET_H
-#define TAB_WIDGET_H
+#ifndef LMMS_GUI_TAB_WIDGET_H
+#define LMMS_GUI_TAB_WIDGET_H
 
 #include <QWidget>
-#include <QtCore/QMap>
+#include <QMap>
+
+namespace lmms::gui
+{
 
 const int TEXT_TAB_HEIGHT = 14;
 const int GRAPHIC_TAB_HEIGHT = 17;
@@ -40,9 +42,9 @@ public:
 	//!   If false, all child widget will be cut down to the TabWidget's size
 	TabWidget( const QString & _caption, QWidget * _parent,
 				bool usePixmap = false, bool resizable = false );
-	virtual ~TabWidget() = default;
+	~TabWidget() override = default;
 
-	void addTab( QWidget * w, const QString & name, const char *pixmap = NULL, int idx = -1 );
+	void addTab( QWidget * w, const QString & name, const char *pixmap = nullptr, int idx = -1 );
 
 	void setActiveTab( int idx );
 
@@ -72,13 +74,13 @@ public:
 	void setTabBorder( const QColor & c );
 
 protected:
-	virtual bool event( QEvent * event );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void resizeEvent( QResizeEvent * _re );
-	virtual void wheelEvent( QWheelEvent * _we );
-	virtual QSize minimumSizeHint() const;
-	virtual QSize sizeHint() const;
+	bool event( QEvent * event ) override;
+	void mousePressEvent( QMouseEvent * _me ) override;
+	void paintEvent( QPaintEvent * _pe ) override;
+	void resizeEvent( QResizeEvent * _re ) override;
+	void wheelEvent( QWheelEvent * _we ) override;
+	QSize minimumSizeHint() const override;
+	QSize sizeHint() const override;
 
 private:
 	struct widgetDesc
@@ -88,7 +90,7 @@ private:
 		QString name;        // name for widget
 		int nwidth;          // width of name when painting (only valid for text tab)
 	} ;
-	typedef QMap<int, widgetDesc> widgetStack;
+	using widgetStack = QMap<int, widgetDesc>;
 
 	widgetStack m_widgets;
 
@@ -106,4 +108,7 @@ private:
 	QColor m_tabBorder;     // The TabWidget's borders color.
 } ;
 
-#endif
+
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_TAB_WIDGET_H

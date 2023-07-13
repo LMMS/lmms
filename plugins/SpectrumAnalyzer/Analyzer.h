@@ -27,9 +27,15 @@
 #ifndef ANALYZER_H
 #define ANALYZER_H
 
+
+#include "DataprocLauncher.h"
 #include "Effect.h"
+#include "LocklessRingBuffer.h"
 #include "SaControls.h"
 #include "SaProcessor.h"
+
+namespace lmms
+{
 
 
 //! Top level class; handles LMMS interface and feeds data to the data processor.
@@ -37,7 +43,7 @@ class Analyzer : public Effect
 {
 public:
 	Analyzer(Model *parent, const Descriptor::SubPluginFeatures::Key *key);
-	virtual ~Analyzer() {};
+	~Analyzer() override;
 
 	bool processAudioBuffer(sampleFrame *buffer, const fpp_t frame_count) override;
 	EffectControls *controls() override {return &m_controls;}
@@ -47,7 +53,28 @@ public:
 private:
 	SaProcessor m_processor;
 	SaControls m_controls;
+
+	// Maximum LMMS buffer size (hard coded, the actual constant is hard to get)
+	const unsigned int m_maxBufferSize = 4096;
+
+	// QThread::create() workaround
+	// Replace DataprocLauncher by QThread and replace initializer in constructor
+	// with the following commented line when LMMS CI starts using Qt > 5.9
+	//m_processorThread = QThread::create([=]{m_processor.analyze(m_inputBuffer);});
+	DataprocLauncher m_processorThread;
+
+	LocklessRingBuffer<sampleFrame> m_inputBuffer;
+
+	#ifdef SA_DEBUG
+		int m_last_dump_time;
+		int m_dump_count;
+		float m_sum_execution;
+		float m_max_execution;
+	#endif
 };
+
+
+} // namespace lmms
 
 #endif // ANALYZER_H
 

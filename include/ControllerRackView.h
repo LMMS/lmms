@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef CONTROLLER_RACK_VIEW_H
-#define CONTROLLER_RACK_VIEW_H
+#ifndef LMMS_GUI_CONTROLLER_RACK_VIEW_H
+#define LMMS_GUI_CONTROLLER_RACK_VIEW_H
 
 #include <QWidget>
 #include <QCloseEvent>
@@ -36,8 +36,16 @@ class QPushButton;
 class QScrollArea;
 class QVBoxLayout;
 
-class ControllerView;
+
+namespace lmms
+{
+
 class Controller;
+
+namespace gui
+{
+
+class ControllerView;
 
 
 class ControllerRackView : public QWidget, public SerializingObject
@@ -45,24 +53,24 @@ class ControllerRackView : public QWidget, public SerializingObject
 	Q_OBJECT
 public:
 	ControllerRackView();
-	virtual ~ControllerRackView();
+	~ControllerRackView() override = default;
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	inline virtual QString nodeName() const
+	inline QString nodeName() const override
 	{
 		return "ControllerRackView";
 	}
 
 
 public slots:
-	void deleteController( ControllerView * _view );
-	void onControllerAdded( Controller * );
-	void onControllerRemoved( Controller * );
+	void deleteController( lmms::gui::ControllerView * _view );
+	void onControllerAdded( lmms::Controller * );
+	void onControllerRemoved( lmms::Controller * );
 
 protected:
-	virtual void closeEvent( QCloseEvent * _ce );
+	void closeEvent( QCloseEvent * _ce ) override;
 
 private slots:
 	void addController();
@@ -80,4 +88,8 @@ private:
 	int m_nextIndex;
 } ;
 
-#endif
+} // namespace gui
+
+} // namespace lmms
+
+#endif // LMMS_GUI_CONTROLLER_RACK_VIEW_H
