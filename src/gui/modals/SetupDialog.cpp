@@ -801,7 +801,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	pathsScroll->setWidget(pathSelectors);
 	pathsScroll->setWidgetResizable(true);
 
-	paths_layout->addWidget(pathsScroll);
+	paths_layout->addWidget(pathsScroll, 1);
 	paths_layout->addStretch();
 
 	// Add all main widgets to the layout of the settings widget
