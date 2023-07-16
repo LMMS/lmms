@@ -47,9 +47,9 @@ public:
 	// Define how the widget will behave in a layout
 	QSizePolicy sizePolicy() const;
 
-	virtual QSize minimumSizeHint() const override;
+	QSize minimumSizeHint() const override;
 
-	virtual QSize sizeHint() const override;
+	QSize sizeHint() const override;
 
 	QBrush const & getBackgroundBrush() const;
 	void setBackgroundBrush(QBrush const & backgroundBrush);
@@ -61,7 +61,7 @@ public:
 	void setTextColor(QColor const & textColor);
 
 protected:
-	virtual void paintEvent(QPaintEvent *event) override;
+	void paintEvent(QPaintEvent *event) override;
 
 private:
 	QString const m_text;

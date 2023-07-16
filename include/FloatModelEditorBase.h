@@ -52,7 +52,6 @@ class LMMS_EXPORT FloatModelEditorBase : public QWidget, public FloatModelView
 	void initUi( const QString & _name ); //!< to be called by ctors
 
 public:
-
 	enum class DirectionOfManipulation
 	{
 		Vertical,

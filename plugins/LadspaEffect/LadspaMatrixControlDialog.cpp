@@ -79,6 +79,11 @@ LadspaMatrixControlDialog::LadspaMatrixControlDialog(LadspaControls * ladspaCont
 	}
 }
 
+bool LadspaMatrixControlDialog::isResizable() const
+{
+	return true;
+}
+
 bool LadspaMatrixControlDialog::needsLinkColumn() const
 {
 	LadspaControls * ladspaControls = getLadspaControls();
