@@ -1002,7 +1002,7 @@ Zixing Liu &lt;liushuyu at aosc.xyz&gt;
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="962"/>
         <source>Host URLs:</source>
-        <translation type="unfinished"/>
+        <translation>主页链接</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="982"/>
@@ -1317,7 +1317,7 @@ POSSIBILITY OF SUCH DAMAGES.
     <message>
         <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="69"/>
         <source>Plugin Version</source>
-        <translation type="unfinished"/>
+        <translation>插件版本</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="71"/>
@@ -1328,7 +1328,7 @@ POSSIBILITY OF SUCH DAMAGES.
         <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="100"/>
         <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="101"/>
         <source>(Engine not running)</source>
-        <translation type="unfinished"/>
+        <translation>引擎未运行</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="123"/>
@@ -1363,7 +1363,7 @@ POSSIBILITY OF SUCH DAMAGES.
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="14"/>
         <source>MainWindow</source>
-        <translation type="unfinished"/>
+        <translation>主窗口</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="40"/>
@@ -1378,12 +1378,12 @@ POSSIBILITY OF SUCH DAMAGES.
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="179"/>
         <source>Logs</source>
-        <translation type="unfinished"/>
+        <translation>日志</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="214"/>
         <source>Loading...</source>
-        <translation type="unfinished"/>
+        <translation>加载中</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="249"/>
@@ -1453,7 +1453,7 @@ POSSIBILITY OF SUCH DAMAGES.
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="540"/>
         <source>Disk</source>
-        <translation type="unfinished"/>
+        <translation>磁盘</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="564"/>
@@ -1545,7 +1545,7 @@ POSSIBILITY OF SUCH DAMAGES.
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="970"/>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="973"/>
         <source>Open...</source>
-        <translation type="unfinished"/>
+        <translation>正在打开</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="976"/>
@@ -1571,7 +1571,7 @@ POSSIBILITY OF SUCH DAMAGES.
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1000"/>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1003"/>
         <source>Save As...</source>
-        <translation type="unfinished"/>
+        <translation>另存为</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1006"/>
@@ -1626,12 +1626,12 @@ POSSIBILITY OF SUCH DAMAGES.
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1068"/>
         <source>Enable</source>
-        <translation type="unfinished"/>
+        <translation>启用</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1073"/>
         <source>Disable</source>
-        <translation type="unfinished"/>
+        <translation>禁用</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1078"/>
@@ -1893,12 +1893,12 @@ POSSIBILITY OF SUCH DAMAGES.
     <message>
         <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_host.cpp" line="704"/>
         <source>Failed to load project</source>
-        <translation type="unfinished"/>
+        <translation>项目加载失败</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_host.cpp" line="721"/>
         <source>Failed to save project</source>
-        <translation type="unfinished"/>
+        <translation>项目保存失败</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_host.cpp" line="1335"/>
@@ -1961,7 +1961,7 @@ Do you want to do this now?</source>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="81"/>
         <source>engine</source>
-        <translation type="unfinished"/>
+        <translation>引擎</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="86"/>
@@ -1971,12 +1971,12 @@ Do you want to do this now?</source>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="91"/>
         <source>file-paths</source>
-        <translation type="unfinished"/>
+        <translation>文件路径</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="96"/>
         <source>plugin-paths</source>
-        <translation type="unfinished"/>
+        <translation>插件路径</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="101"/>
@@ -2009,17 +2009,17 @@ Do you want to do this now?</source>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="152"/>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2762"/>
         <source>Engine</source>
-        <translation type="unfinished"/>
+        <translation>引擎</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="194"/>
         <source>File Paths</source>
-        <translation type="unfinished"/>
+        <translation>文件路径</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="212"/>
         <source>Plugin Paths</source>
-        <translation type="unfinished"/>
+        <translation>插件路径</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="230"/>
@@ -2045,7 +2045,7 @@ Do you want to do this now?</source>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="339"/>
         <source>Default project folder:</source>
-        <translation type="unfinished"/>
+        <translation>默认项目文件夹</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="377"/>
@@ -2097,7 +2097,7 @@ Do you want to do this now?</source>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="477"/>
         <source>System</source>
-        <translation type="unfinished"/>
+        <translation>系统</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="510"/>
@@ -2117,12 +2117,12 @@ Do you want to do this now?</source>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="622"/>
         <source>Theme:</source>
-        <translation type="unfinished"/>
+        <translation>主题</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="658"/>
         <source>Size:</source>
-        <translation type="unfinished"/>
+        <translation>大小</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="669"/>
@@ -2152,7 +2152,7 @@ Do you want to do this now?</source>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="713"/>
         <source>Options</source>
-        <translation type="unfinished"/>
+        <translation>选项</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="719"/>
@@ -2253,7 +2253,7 @@ Do you want to do this now?</source>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1001"/>
         <source>Plugin UIs</source>
-        <translation type="unfinished"/>
+        <translation>插件UI</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1007"/>
@@ -2295,7 +2295,7 @@ Do you want to do this now?</source>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1133"/>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1582"/>
         <source>Restart the engine to load the new settings</source>
-        <translation type="unfinished"/>
+        <translation>重启引擎以读取新设置</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1177"/>
@@ -2305,12 +2305,12 @@ Do you want to do this now?</source>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1230"/>
         <source>Enable OSC</source>
-        <translation type="unfinished"/>
+        <translation>启用OSC</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1266"/>
         <source>Enable TCP port</source>
-        <translation type="unfinished"/>
+        <translation>启用TCP端口</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1275"/>
@@ -2332,7 +2332,7 @@ Do you want to do this now?</source>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1399"/>
         <source>Enable UDP port</source>
-        <translation type="unfinished"/>
+        <translation>启用UDP端口</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1504"/>
@@ -2357,7 +2357,7 @@ Do you want to do this now?</source>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1754"/>
         <source>MIDI</source>
-        <translation>MIDI</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1781"/>
@@ -2385,7 +2385,7 @@ Do you want to do this now?</source>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1899"/>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2223"/>
         <source>Change...</source>
-        <translation type="unfinished"/>
+        <translation>更改...</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1936"/>
@@ -2440,7 +2440,7 @@ Do you want to do this now?</source>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2307"/>
         <source>Executable</source>
-        <translation type="unfinished"/>
+        <translation>可执行的</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2313"/>
@@ -2574,7 +2574,7 @@ This mode is not available for VST plugins.</source>
         <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_settings.cpp" line="1626"/>
         <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_settings.cpp" line="1671"/>
         <source>Add Path</source>
-        <translation type="unfinished"/>
+        <translation>添加路径</translation>
     </message>
 </context>
 <context>
@@ -2662,7 +2662,7 @@ This mode is not available for VST plugins.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="133"/>
         <source>RMS Size:</source>
-        <translation type="unfinished"/>
+        <translation>RMS大小：</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="135"/>
@@ -2808,7 +2808,7 @@ This mode is not available for VST plugins.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="209"/>
         <source>Left/Right</source>
-        <translation type="unfinished"/>
+        <translation>左/右</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="212"/>
@@ -2972,7 +2972,7 @@ This mode is not available for VST plugins.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControls.cpp" line="45"/>
         <source>RMS Size</source>
-        <translation type="unfinished"/>
+        <translation>RMS大小</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControls.cpp" line="46"/>
@@ -3149,7 +3149,7 @@ This mode is not available for VST plugins.</source>
     <message>
         <location filename="../../src/gui/modals/ControllerConnectionDialog.cpp" line="334"/>
         <source>LMMS</source>
-        <translation>LMMS</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/modals/ControllerConnectionDialog.cpp" line="334"/>
@@ -3200,7 +3200,7 @@ This mode is not available for VST plugins.</source>
     <message>
         <location filename="../../src/gui/ControllerView.cpp" line="154"/>
         <source>LFO</source>
-        <translation>LFO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/ControllerView.cpp" line="178"/>
@@ -3412,12 +3412,12 @@ This mode is not available for VST plugins.</source>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="49"/>
         <source>Name:</source>
-        <translation type="unfinished"/>
+        <translation>名称：</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="85"/>
         <source>Application:</source>
-        <translation type="unfinished"/>
+        <translation>应用：</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="104"/>
@@ -3432,7 +3432,7 @@ This mode is not available for VST plugins.</source>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="137"/>
         <source>Template:</source>
-        <translation type="unfinished"/>
+        <translation>模板：</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="167"/>
@@ -3522,7 +3522,7 @@ This mode is not available for VST plugins.</source>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_osc_connect.ui" line="26"/>
         <source>UDP Port:</source>
-        <translation type="unfinished"/>
+        <translation>UDP端口：</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_osc_connect.ui" line="36"/>
@@ -3532,7 +3532,7 @@ This mode is not available for VST plugins.</source>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_osc_connect.ui" line="66"/>
         <source>TCP Port:</source>
-        <translation type="unfinished"/>
+        <translation>TCP端口：</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_osc_connect.ui" line="114"/>
@@ -3581,7 +3581,7 @@ If you are unsure, leave it as &apos;Automatic&apos;.</source>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings_driver.ui" line="79"/>
         <source>Device:</source>
-        <translation type="unfinished"/>
+        <translation>设备：</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings_driver.ui" line="95"/>
@@ -3606,7 +3606,7 @@ If you are unsure, leave it as &apos;Automatic&apos;.</source>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings_driver.ui" line="249"/>
         <source>Restart the engine to load the new settings</source>
-        <translation type="unfinished"/>
+        <translation>重启以读取新设置</translation>
     </message>
 </context>
 <context>
