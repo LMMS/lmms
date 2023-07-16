@@ -5234,6 +5234,16 @@ bool PianoRollWindow::hasFocus() const
 }
 
 
+void PianoRollWindow::setScrollbarPos(double posX)
+{
+	auto sbX = m_editor->m_leftRightScroll;
+	const auto halfEditorWidth = (sbX->width() - m_editor->m_topBottomScroll->width()) / 2.0;
+
+	auto absolutePosX = static_cast<int>(posX * (sbX->maximum() - sbX->minimum()) - halfEditorWidth);
+
+	sbX->setValue(std::max(absolutePosX, 0));
+}
+
 
 void PianoRollWindow::updateAfterMidiClipChange()
 {

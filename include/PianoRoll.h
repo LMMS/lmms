@@ -540,6 +540,8 @@ public:
 	QSize sizeHint() const override;
 	bool hasFocus() const;
 
+	void setScrollbarPos(double posX); //!< posX is in range [0, 1)
+
 signals:
 	void currentMidiClipChanged();
 

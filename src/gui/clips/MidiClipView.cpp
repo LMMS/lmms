@@ -107,9 +107,13 @@ void MidiClipView::update()
 
 
 
-void MidiClipView::openInPianoRoll()
+void MidiClipView::openInPianoRoll(double scrollX)
 {
-	getGUI()->pianoRoll()->setCurrentMidiClip( m_clip );
+	getGUI()->pianoRoll()->setCurrentMidiClip(m_clip);
+	if (scrollX >= 0.0)
+	{
+		getGUI()->pianoRoll()->setScrollbarPos(scrollX);
+	}
 	getGUI()->pianoRoll()->parentWidget()->show();
 	getGUI()->pianoRoll()->show();
 	getGUI()->pianoRoll()->setFocus();
@@ -313,7 +317,9 @@ void MidiClipView::mouseDoubleClickEvent(QMouseEvent *_me)
 	}
 	if( m_clip->m_clipType == MidiClip::MelodyClip || !fixedClips() )
 	{
-		openInPianoRoll();
+		// Local X position of mouse over clip, normalized to range of [0, 1)
+		auto scrollX = _me->localPos().x() / width();
+		openInPianoRoll(scrollX);
 	}
 }
 
