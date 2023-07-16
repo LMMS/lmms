@@ -605,15 +605,14 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	auto midi_layout = new QVBoxLayout(midi_w);
 	midi_layout->setSpacing(10);
 	midi_layout->setContentsMargins(0, 0, 0, 0);
-	labelWidget(midi_w,
-			tr("MIDI"));
+	labelWidget(midi_w, tr("MIDI"));
 
-	// MIDI interface tab.
-	auto midiiface_tw = new TabWidget(tr("MIDI interface"), midi_w);
-	midiiface_tw->setFixedHeight(56);
+	// MIDI interface group
+	QGroupBox * midiInterfaceBox = new QGroupBox(tr("MIDI interface"), midi_w);
+	QVBoxLayout * midiInterfaceLayout = new QVBoxLayout(midiInterfaceBox);
 
-	m_midiInterfaces = new QComboBox(midiiface_tw);
-	m_midiInterfaces->setGeometry(10, 20, 240, 28);
+	m_midiInterfaces = new QComboBox(midiInterfaceBox);
+	midiInterfaceLayout->addWidget(m_midiInterfaces);
 
 	// Ifaces-settings-widget.
 	auto ms_w = new QWidget(midi_w);
@@ -687,12 +686,12 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			this, SLOT(midiInterfaceChanged(const QString&)));
 
 
-	// MIDI autoassign tab.
-	auto midiAutoAssign_tw = new TabWidget(tr("Automatically assign MIDI controller to selected track"), midi_w);
-	midiAutoAssign_tw->setFixedHeight(56);
+	// MIDI autoassign group
+	QGroupBox * midiAutoAssignBox = new QGroupBox(tr("Automatically assign MIDI controller to selected track"), midi_w);
+	QVBoxLayout * midiAutoAssignLayout = new QVBoxLayout(midiAutoAssignBox);
 
-	m_assignableMidiDevices = new QComboBox(midiAutoAssign_tw);
-	m_assignableMidiDevices->setGeometry(10, 20, 240, 28);
+	m_assignableMidiDevices = new QComboBox(midiAutoAssignBox);
+	midiAutoAssignLayout->addWidget(m_assignableMidiDevices);
 	m_assignableMidiDevices->addItem("none");
 	if ( !Engine::audioEngine()->midiClient()->isRaw() )
 	{
@@ -709,9 +708,9 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	}
 
 	// MIDI layout ordering.
-	midi_layout->addWidget(midiiface_tw);
+	midi_layout->addWidget(midiInterfaceBox);
 	midi_layout->addWidget(ms_w);
-	midi_layout->addWidget(midiAutoAssign_tw);
+	midi_layout->addWidget(midiAutoAssignBox);
 	midi_layout->addStretch();
 
 
