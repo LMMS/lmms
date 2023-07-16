@@ -40,6 +40,7 @@ class QComboBox;
 class QLabel;
 class QLineEdit;
 class QSlider;
+class QCheckBox;
 
 
 namespace lmms::gui
@@ -155,8 +156,8 @@ private:
 	bool m_enableRunningAutoSave;
 	QSlider * m_saveIntervalSlider;
 	QLabel * m_saveIntervalLbl;
-	LedCheckBox * m_autoSave;
-	LedCheckBox * m_runningAutoSave;
+	QCheckBox * m_autoSave;
+	QCheckBox * m_runningAutoSave;
 	bool m_smoothScroll;
 	bool m_animateAFP;
 	QLabel * m_vstEmbedLbl;

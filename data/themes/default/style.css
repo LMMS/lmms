@@ -3,7 +3,7 @@
  ********************/
 
 /* most foreground text items */
-QLabel, QTreeWidget, QListWidget, QGroupBox, QMenuBar {
+QLabel, QTreeWidget, QListWidget, QGroupBox, QMenuBar, QCheckBox {
 	color: #d1d8e4;
 }
 
