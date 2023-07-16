@@ -55,7 +55,7 @@ QWidget * LadspaWidgetFactory::createWidget(LadspaControl * ladspaControl, QWidg
 	case TOGGLED:
 	{
 		LedCheckBox * toggle = new LedCheckBox(
-			name, parent, QString(), LedCheckBox::Yellow, false);
+			name, parent, QString(), LedCheckBox::Green, false);
 		toggle->setModel(ladspaControl->toggledModel());
 		return toggle;
 	}

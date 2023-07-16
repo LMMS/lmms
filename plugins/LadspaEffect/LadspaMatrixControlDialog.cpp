@@ -73,7 +73,7 @@ LadspaMatrixControlDialog::LadspaMatrixControlDialog(LadspaControls * ladspaCont
 	{
 		mainLayout->addSpacing(3);
 
-		m_stereoLink = new LedCheckBox(tr("Link Channels"), this, QString(), LedCheckBox::Yellow, false);
+		m_stereoLink = new LedCheckBox(tr("Link Channels"), this, QString(), LedCheckBox::Green, false);
 		m_stereoLink->setModel(&ladspaControls->m_stereoLinkModel);
 		mainLayout->addWidget(m_stereoLink, 0, Qt::AlignCenter);
 	}
@@ -151,7 +151,7 @@ void LadspaMatrixControlDialog::arrangeControls(QWidget * parent, QGridLayout* g
 			if (i == 0 && ladspaControl->m_link)
 			{
 				// TODO Assumes that all processors are equal! Change to more general approach, e.g. map from name to row
-				LedCheckBox * linkCheckBox = new LedCheckBox("", parent);
+				LedCheckBox * linkCheckBox = new LedCheckBox("", parent, "", LedCheckBox::Green);
 				linkCheckBox->setModel(&ladspaControl->m_linkEnabledModel);
 				linkCheckBox->setToolTip(tr("Link channels"));
 				gridLayout->addWidget(linkCheckBox, currentRow, linkColumn, Qt::AlignHCenter);
