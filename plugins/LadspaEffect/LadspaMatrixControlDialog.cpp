@@ -55,6 +55,9 @@ LadspaMatrixControlDialog::LadspaMatrixControlDialog(LadspaControls * ladspaCont
 	m_scrollArea = new QScrollArea(this);
 	m_scrollArea->setWidgetResizable(true);
 	m_scrollArea->setFrameShape(QFrame::NoFrame);
+	// Set to always on so that the elements do not move around when the
+	// scroll bar is hidden or shown.
+	m_scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
 	// Add a scroll area that grows
 	mainLayout->addWidget(m_scrollArea, 1);
@@ -174,6 +177,7 @@ QWidget * LadspaMatrixControlDialog::createMatrixWidget()
 {
 	QWidget *widget = new QWidget(this);
 	QGridLayout *gridLayout = new QGridLayout(widget);
+	gridLayout->setMargin(0);
 	widget->setLayout(gridLayout);
 
 	arrangeControls(widget, gridLayout);
