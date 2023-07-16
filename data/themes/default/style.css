@@ -1002,6 +1002,12 @@ lmms--gui--CompressorControlDialog lmms--gui--Knob {
 	qproperty-lineWidth: 2;
 }
 
+lmms--gui--BarModelEditor {
+	qproperty-backgroundBrush: rgba(30, 40, 51, 255);
+	qproperty-barBrush: rgba(3, 94, 97, 255);
+	qproperty-textColor: rgba(14, 192, 198, 255);
+}
+
 /* palette information  */
 
 lmms--gui--LmmsPalette {

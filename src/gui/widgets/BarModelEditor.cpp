@@ -1,6 +1,7 @@
 #include <BarModelEditor.h>
 
 #include <QPainter>
+#include <QStyle>
 
 
 namespace lmms::gui
@@ -8,7 +9,10 @@ namespace lmms::gui
 
 BarModelEditor::BarModelEditor(QString text, FloatModel * floatModel, QWidget * parent) :
 	FloatModelEditorBase(DirectionOfManipulation::Horizontal, parent),
-	m_text(text)
+	m_text(text),
+	m_backgroundBrush(palette().base()),
+	m_barBrush(palette().button()),
+	m_textColor(palette().text().color())
 {
 	setModel(floatModel);
 }
@@ -29,13 +33,39 @@ QSize BarModelEditor::sizeHint() const
 	return minimumSizeHint();
 }
 
+QBrush const & BarModelEditor::getBackgroundBrush() const
+{
+	return m_backgroundBrush;
+}
+
+void BarModelEditor::setBackgroundBrush(QBrush const & backgroundBrush)
+{
+	m_backgroundBrush = backgroundBrush;
+}
+
+QBrush const & BarModelEditor::getBarBrush() const
+{
+	return m_barBrush;
+}
+
+void BarModelEditor::setBarBrush(QBrush const & barBrush)
+{
+	m_barBrush = barBrush;
+}
+
+QColor const & BarModelEditor::getTextColor() const
+{
+	return m_textColor;
+}
+
+void BarModelEditor::setTextColor(QColor const & textColor)
+{
+	m_textColor = textColor;
+}
+
 void BarModelEditor::paintEvent(QPaintEvent *event)
 {
 	QWidget::paintEvent(event);
-
-	QColor const background(30, 40, 51);
-	QColor const foreground(3, 94, 97);
-	QColor const textColor(14, 192, 198);
 
 	auto const * mod = model();
 	auto const minValue = mod->minValue();
@@ -45,11 +75,16 @@ void BarModelEditor::paintEvent(QPaintEvent *event)
 	QRect const r = rect();
 
 	QPainter painter(this);
-	painter.setPen(background);
-	painter.setBrush(background);
+
+	// Paint the base rectangle into which the bar and the text go
+	QBrush const & backgroundBrush = getBackgroundBrush();
+	painter.setPen(backgroundBrush.color());
+	painter.setBrush(backgroundBrush);
 	painter.drawRect(r);
 
-	// Compute the percentage
+
+	// Paint the bar
+	// Compute the percentage as:
 	// min + x * (max - min) = v <=> x = (v - min) / (max - min)
 	auto const percentage = range == 0 ? 1. : (mod->value() - minValue) / range;
 
@@ -57,13 +92,15 @@ void BarModelEditor::paintEvent(QPaintEvent *event)
 	QMargins const margins(margin, margin, margin, margin);
 	QRect const valueRect = r.marginsRemoved(margins);
 
-	painter.setPen(foreground);
-	painter.setBrush(foreground);
+	QBrush const & barBrush = getBarBrush();
+	painter.setPen(barBrush.color());
+	painter.setBrush(barBrush);
 	QPoint const startPoint = valueRect.topLeft();
 	QPoint endPoint = valueRect.bottomRight();
 	endPoint.setX(startPoint.x() + percentage * (endPoint.x() - startPoint.x()));
 
 	painter.drawRect(QRect(startPoint, endPoint));
+
 
 	// Draw the text into the value rectangle but move it slightly to the right
 	QRect const textRect = valueRect.marginsRemoved(QMargins(3, 0, 0, 0));
@@ -72,7 +109,8 @@ void BarModelEditor::paintEvent(QPaintEvent *event)
 	auto const fm = fontMetrics();
 	QString const elidedText = fm.elidedText(m_text, Qt::ElideRight, textRect.width());
 
-	painter.setPen(textColor);
+	// Now draw the text
+	painter.setPen(getTextColor());
 	painter.drawText(textRect, elidedText);
 }
 
