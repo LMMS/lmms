@@ -30,7 +30,6 @@
 
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
-#include "LedCheckBox.h"
 #include "lmmsconfig.h"
 #include "MidiClient.h"
 #include "MidiSetupWidget.h"
@@ -163,7 +162,7 @@ private:
 	QLabel * m_vstEmbedLbl;
 	QComboBox* m_vstEmbedComboBox;
 	QString m_vstEmbedMethod;
-	LedCheckBox * m_vstAlwaysOnTopCheckBox;
+	QCheckBox * m_vstAlwaysOnTopCheckBox;
 	bool m_vstAlwaysOnTop;
 	bool m_disableAutoQuit;
 

@@ -39,6 +39,7 @@
 #include "Engine.h"
 #include "FileDialog.h"
 #include "gui_templates.h"
+#include "LedCheckBox.h"
 #include "MainWindow.h"
 #include "MidiSetupWidget.h"
 #include "ProjectJournal.h"
@@ -167,10 +168,6 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	Engine::projectJournal()->setJournalling(false);
 
 
-	// Constants for positioning LED check boxes.
-	const int XDelta = 10;
-	const int YDelta = 18;
-
 	// Main widget.
 	auto main_w = new QWidget(this);
 
@@ -212,20 +209,6 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	// Path selectors layout.
 	auto generalControlsLayout = new QVBoxLayout;
 	generalControlsLayout->setSpacing(10);
-
-	// TODO Remove once it is not used anymore
-	auto addLedCheckBox = [&XDelta, &YDelta, this](const QString& ledText, TabWidget* tw, int& counter,
-							  bool initialState, const char* toggledSlot, bool showRestartWarning) {
-		auto checkBox = new LedCheckBox(ledText, tw);
-		counter++;
-		checkBox->move(XDelta, YDelta * counter);
-		checkBox->setChecked(initialState);
-		connect(checkBox, SIGNAL(toggled(bool)), this, toggledSlot);
-		if (showRestartWarning)
-		{
-			connect(checkBox, SIGNAL(toggled(bool)), this, SLOT(showRestartWarning()));
-		}
-	};
 
 	auto addCheckBox = [this](const QString& ledText, QWidget* parent, QBoxLayout * layout,
 									  bool initialState, const char* toggledSlot, bool showRestartWarning) -> QCheckBox * {
@@ -422,17 +405,15 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 		m_animateAFP, SLOT(toggleAnimateAFP(bool)), false);
 
 
-	int counter = 0;
+	// Plugins group
+	QGroupBox * pluginsBox = new QGroupBox(tr("Plugins"), performance_w);
+	QVBoxLayout * pluginsLayout = new QVBoxLayout(pluginsBox);
 
-	// Plugins tab.
-	auto plugins_tw = new TabWidget(tr("Plugins"), performance_w);
-
-	m_vstEmbedLbl = new QLabel(plugins_tw);
-	m_vstEmbedLbl->move(XDelta, YDelta * ++counter);
+	m_vstEmbedLbl = new QLabel(pluginsBox);
 	m_vstEmbedLbl->setText(tr("VST plugins embedding:"));
+	pluginsLayout->addWidget(m_vstEmbedLbl);
 
-	m_vstEmbedComboBox = new QComboBox(plugins_tw);
-	m_vstEmbedComboBox->move(XDelta, YDelta * ++counter);
+	m_vstEmbedComboBox = new QComboBox(pluginsBox);
 
 	QStringList embedMethods = ConfigManager::availableVstEmbedMethods();
 	m_vstEmbedComboBox->addItem(tr("No embedding"), "none");
@@ -451,27 +432,19 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	m_vstEmbedComboBox->setCurrentIndex(m_vstEmbedComboBox->findData(m_vstEmbedMethod));
 	connect(m_vstEmbedComboBox, SIGNAL(currentIndexChanged(int)),
 			this, SLOT(vstEmbedMethodChanged()));
+	pluginsLayout->addWidget(m_vstEmbedComboBox);
 
-	counter += 2;
+	m_vstAlwaysOnTopCheckBox = addCheckBox(tr("Keep plugin windows on top when not embedded"), pluginsBox, pluginsLayout,
+		m_vstAlwaysOnTop, SLOT(toggleVSTAlwaysOnTop(bool)), false);
 
-	m_vstAlwaysOnTopCheckBox = new LedCheckBox(
-			tr("Keep plugin windows on top when not embedded"), plugins_tw);
-	m_vstAlwaysOnTopCheckBox->move(20, 66);
-	m_vstAlwaysOnTopCheckBox->setChecked(m_vstAlwaysOnTop);
-	m_vstAlwaysOnTopCheckBox->setVisible(m_vstEmbedMethod == "none");
-	connect(m_vstAlwaysOnTopCheckBox, SIGNAL(toggled(bool)),
-			this, SLOT(toggleVSTAlwaysOnTop(bool)));
-
-	addLedCheckBox(tr("Keep effects running even without input"), plugins_tw, counter,
+	addCheckBox(tr("Keep effects running even without input"), pluginsBox, pluginsLayout,
 		m_disableAutoQuit, SLOT(toggleDisableAutoQuit(bool)), false);
-
-	plugins_tw->setFixedHeight(YDelta + YDelta * counter);
 
 
 	// Performance layout ordering.
 	performance_layout->addWidget(autoSaveBox);
 	performance_layout->addWidget(uiFxBox);
-	performance_layout->addWidget(plugins_tw);
+	performance_layout->addWidget(pluginsBox);
 	performance_layout->addStretch();
 
 
@@ -575,6 +548,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	// Advanced setting, hidden for now
 	if(false)
 	{
+		// TODO Handle or remove.
 		auto useNaNHandler = new LedCheckBox(tr("Use built-in NaN handler"), audio_w);
 		useNaNHandler->setChecked(m_NaNHandler);
 	}
@@ -895,9 +869,9 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	extras_layout->addSpacing(10);
 
 	// Vertical layout ordering.
-	vlayout->addWidget(main_w, 0);
+	vlayout->addWidget(main_w, 1);
 	vlayout->addSpacing(10);
-	vlayout->addWidget(extras_w), 1;
+	vlayout->addWidget(extras_w);
 	vlayout->addSpacing(10);
 
 	show();
