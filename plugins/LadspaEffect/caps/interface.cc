@@ -58,9 +58,6 @@ static DescriptorStub * descriptors [N];
 
 extern "C" {
 
-#ifdef __GNUC__
-	__attribute__((constructor))
-#endif
 void caps_so_init()
 {
 	DescriptorStub ** d = descriptors;
@@ -114,9 +111,6 @@ void caps_so_init()
 	assert (d - descriptors == N);
 }
 
-#ifdef __GNUC__
-	__attribute__((destructor))
-#endif
 void caps_so_fini()
 {
 	for (ulong i = 0; i < N; ++i)
