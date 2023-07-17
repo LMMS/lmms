@@ -161,10 +161,6 @@ tick_t TimePos::getTickWithinBeat( const TimeSig &sig ) const
 
 f_cnt_t TimePos::frames( const float framesPerTick ) const
 {
-	//TODO: Remove next line, it's just a warning to see
-	// if any leftover code is still creating notes with
-	// negative lengths
-	if (m_ticks < 0) { qWarning("TimePos with negative length"); }
 	return static_cast<f_cnt_t>(m_ticks * framesPerTick);
 }
 

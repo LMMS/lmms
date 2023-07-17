@@ -259,9 +259,8 @@ private:
 	panning_t m_panning;
 	TimePos m_length;
 	TimePos m_pos;
-	DetuningHelper * m_detuning = nullptr;
+	DetuningHelper * m_detuning;
 
-	// The type of this note
 	Type m_type = Type::RegularNote;
 };
 
