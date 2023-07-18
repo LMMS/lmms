@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef DETUNING_HELPER_H
-#define DETUNING_HELPER_H
+#ifndef LMMS_DETUNING_HELPER_H
+#define LMMS_DETUNING_HELPER_H
 
 #include "InlineAutomation.h"
 #include "MemoryManager.h"
@@ -64,4 +64,4 @@ public:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_DETUNING_HELPER_H

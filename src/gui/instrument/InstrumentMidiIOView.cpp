@@ -48,7 +48,7 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	m_wpBtn( nullptr )
 {
 	auto layout = new QVBoxLayout(this);
-	layout->setMargin( 5 );
+	layout->setContentsMargins(5, 5, 5, 5);
 	m_midiInputGroupBox = new GroupBox( tr( "ENABLE MIDI INPUT" ) );
 	layout->addWidget( m_midiInputGroupBox );
 

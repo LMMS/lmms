@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef TRACK_CONTENT_OBJECT_H
-#define TRACK_CONTENT_OBJECT_H
+#ifndef LMMS_CLIP_H
+#define LMMS_CLIP_H
 
 #include <QColor>
 
@@ -194,4 +194,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_CLIP_H

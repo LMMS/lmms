@@ -609,8 +609,6 @@ void InstrumentTrack::setName( const QString & _new_name )
 	Track::setName( _new_name );
 	m_midiPort.setName( name() );
 	m_audioPort.setName( name() );
-
-	emit nameChanged();
 }
 
 

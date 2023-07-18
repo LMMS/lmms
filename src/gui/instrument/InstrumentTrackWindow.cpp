@@ -90,7 +90,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	// init own layout + widgets
 	setFocusPolicy( Qt::StrongFocus );
 	auto vlayout = new QVBoxLayout(this);
-	vlayout->setMargin( 0 );
+	vlayout->setContentsMargins(0, 0, 0, 0);
 	vlayout->setSpacing( 0 );
 
 	auto generalSettingsWidget = new TabWidget(tr("GENERAL SETTINGS"), this);
@@ -246,7 +246,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	// FUNC tab
 	auto instrumentFunctions = new QWidget(m_tabWidget);
 	auto instrumentFunctionsLayout = new QVBoxLayout(instrumentFunctions);
-	instrumentFunctionsLayout->setMargin( 5 );
+	instrumentFunctionsLayout->setContentsMargins(5, 5, 5, 5);
 	m_noteStackingView = new InstrumentFunctionNoteStackingView( &m_track->m_noteStacking );
 	m_arpeggioView = new InstrumentFunctionArpeggioView( &m_track->m_arpeggio );
 

@@ -241,7 +241,7 @@ void MidiAlsaSeq::applyPortMode( MidiPort * _port )
 	m_seqMutex.lock();
 
 	// determine port-capabilities
-	unsigned int caps[2] = { 0, 0 };
+	auto caps = std::array<unsigned int, 2>{};
 
 	switch( _port->mode() )
 	{

@@ -48,7 +48,7 @@ InstrumentTuningView::InstrumentTuningView(InstrumentTrack *it, QWidget *parent)
 	QWidget(parent)
 {
 	auto layout = new QVBoxLayout(this);
-	layout->setMargin(5);
+	layout->setContentsMargins(5, 5, 5, 5);
 
 	// Master pitch toggle
 	m_pitchGroupBox = new GroupBox(tr("GLOBAL TRANSPOSITION"));

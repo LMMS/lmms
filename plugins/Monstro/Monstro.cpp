@@ -653,8 +653,8 @@ inline void MonstroSynth::updateModulators( float * env1, float * env2, float * 
 	// frames played before
 	const f_cnt_t tfp = m_nph->totalFramesPlayed();
 
-	float * lfo [2];
-	float * env [2];
+	auto lfo = std::array<float*, 2>{};
+	auto env = std::array<float*, 2>{};
 	lfo[0] = lfo1;
 	lfo[1] = lfo2;
 	env[0] = env1;
@@ -1694,8 +1694,8 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	m_lfo2WaveBox -> setGeometry( 127, LFOROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
 	m_lfo2WaveBox->setFont( pointSize<8>( m_lfo2WaveBox->font() ) );
 
-	maketsknob(m_lfo2AttKnob, LFOCOL4, LFOROW, tr("Attack"), " ms", "lfoKnob") 
-	maketsknob(m_lfo2RateKnob, LFOCOL5, LFOROW, tr("Rate"), " ms", "lfoKnob") 
+	maketsknob(m_lfo2AttKnob, LFOCOL4, LFOROW, tr("Attack"), " ms", "lfoKnob")
+	maketsknob(m_lfo2RateKnob, LFOCOL5, LFOROW, tr("Rate"), " ms", "lfoKnob")
 	makeknob(m_lfo2PhsKnob, LFOCOL6, LFOROW, tr("Phase"), tr(" deg"), "lfoKnob")
 
 	maketsknob(m_env1PreKnob, KNOBCOL1, E1ROW, tr("Pre-delay"), " ms", "envKnob")

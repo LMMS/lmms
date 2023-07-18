@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_JACK_H
-#define AUDIO_JACK_H
+#ifndef LMMS_AUDIO_JACK_H
+#define LMMS_AUDIO_JACK_H
 
 #include "lmmsconfig.h"
 
@@ -144,4 +144,4 @@ signals:
 
 #endif // LMMS_HAVE_JACK
 
-#endif
+#endif // LMMS_AUDIO_JACK_H

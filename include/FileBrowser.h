@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef FILE_BROWSER_H
-#define FILE_BROWSER_H
+#ifndef LMMS_GUI_FILE_BROWSER_H
+#define LMMS_GUI_FILE_BROWSER_H
 
 #include <QCheckBox>
 #include <QDir>
@@ -298,4 +297,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_FILE_BROWSER_H

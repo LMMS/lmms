@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef CONFIG_MGR_H
-#define CONFIG_MGR_H
+#ifndef LMMS_CONFIG_MANAGER_H
+#define LMMS_CONFIG_MANAGER_H
 
 #include "lmmsconfig.h"
 
@@ -314,4 +313,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_CONFIG_MANAGER_H

@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef TRACK_CONTAINER_VIEW_H
-#define TRACK_CONTAINER_VIEW_H
+#ifndef LMMS_GUI_TRACK_CONTAINER_VIEW_H
+#define LMMS_GUI_TRACK_CONTAINER_VIEW_H
 
 #include <QVector>
 #include <QScrollArea>
@@ -219,4 +218,4 @@ signals:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_TRACK_CONTAINER_VIEW_H

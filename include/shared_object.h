@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef SHARED_OBJECT_H
-#define SHARED_OBJECT_H
+#ifndef LMMS_SHARED_OBJECT_H
+#define LMMS_SHARED_OBJECT_H
 
 #include <atomic>
 
@@ -86,4 +86,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_SHARED_OBJECT_H

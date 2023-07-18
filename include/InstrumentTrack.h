@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef INSTRUMENT_TRACK_H
-#define INSTRUMENT_TRACK_H
+#ifndef LMMS_INSTRUMENT_TRACK_H
+#define LMMS_INSTRUMENT_TRACK_H
 
 #include "AudioPort.h"
 #include "InstrumentFunctions.h"
@@ -224,6 +224,11 @@ public:
 		return &m_mixerChannelModel;
 	}
 
+	BoolModel* useMasterPitchModel()
+	{
+		return &m_useMasterPitchModel;
+	}
+
 	void setPreviewMode( const bool );
 
 	bool isPreviewMode() const
@@ -239,7 +244,6 @@ signals:
 	void instrumentChanged();
 	void midiNoteOn( const lmms::Note& );
 	void midiNoteOff( const lmms::Note& );
-	void nameChanged();
 	void newNote();
 	void endNote();
 
@@ -320,4 +324,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_INSTRUMENT_TRACK_H
