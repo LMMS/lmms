@@ -62,7 +62,7 @@ const QVector<float> SongEditor::m_zoomLevels =
 		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f, 16.0f };
 
 const QVector<float> SongEditor::m_zoomYLevels =
-		{ 1.0f, 1.5f, 2.0f, 3.0f, 4.0f, 8.0f, 16.0f };
+		{ 1.0f, 2.0f, 3.0f, 4.0f, 8.0f, 16.0f };
 
 SongEditor::SongEditor( Song * song ) :
 	TrackContainerView( song ),
@@ -868,7 +868,7 @@ void SongEditor::zoomingChanged()
 
 void SongEditor::zoomingYChanged()
 {
-	setVerticalHeight( m_zoomYLevels[m_zoomingYModel->value()] * DEFAULT_TRACK_HEIGHT );
+	setVerticalScale( m_zoomYLevels[m_zoomingYModel->value()] );
 	updatePositionLine();
 }
 

@@ -86,6 +86,7 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	m_ppb( DEFAULT_PIXELS_PER_BAR ),
 	m_rubberBand( new RubberBand( m_scrollArea ) )
 {
+	m_trackHeightScale = 1;
 	m_tc->setHook( this );
 	//keeps the direction of the widget, undepended on the locale
 	setLayoutDirection( Qt::LeftToRight );
@@ -349,13 +350,21 @@ void TrackContainerView::setPixelsPerBar( int ppb )
 	}
 }
 
-void TrackContainerView::setVerticalHeight(int h)
+void TrackContainerView::setVerticalScale(double h)
 {
 	for (const auto& trackView : m_trackViews)
 	{
-		trackView->setFixedHeight(h);
-		trackView->getTrack()->setHeight(h);
+		int new_height = h * DEFAULT_TRACK_HEIGHT;
+		int cur_height = trackView->getTrack()->getHeight();
+
+		if(cur_height != m_trackHeightScale)
+			new_height = cur_height * (h / m_trackHeightScale);
+
+		trackView->setFixedHeight(new_height);
+		trackView->getTrack()->setHeight(new_height);
 	}
+
+	m_trackHeightScale = h;
 }
 
 

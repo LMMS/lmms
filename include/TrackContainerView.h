@@ -98,7 +98,7 @@ public:
 	}
 
 	void setPixelsPerBar( int ppb );
-	void setVerticalHeight( int h );
+	void setVerticalScale( double h );
 
 	const TrackView * trackViewAt( const int _y ) const;
 
@@ -205,6 +205,7 @@ private:
 	QVBoxLayout * m_scrollLayout;
 
 	float m_ppb;
+	int m_trackHeightScale;
 
 	RubberBand * m_rubberBand;
 
