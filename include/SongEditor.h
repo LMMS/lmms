@@ -70,6 +70,7 @@ public:
 	void loadSettings( const QDomElement& element ) override;
 
 	ComboBoxModel *zoomingModel() const;
+	ComboBoxModel *zoomingYModel() const;
 	ComboBoxModel *snappingModel() const;
 	float getSnapSize() const;
 	QString getSnapSizeString() const;
@@ -112,6 +113,7 @@ private slots:
 	void updateScrollBar(int len);
 
 	void zoomingChanged();
+	void zoomingYChanged();
 
 private:
 	void keyPressEvent( QKeyEvent * ke ) override;
@@ -142,10 +144,12 @@ private:
 	PositionLine * m_positionLine;
 
 	ComboBoxModel* m_zoomingModel;
+	ComboBoxModel* m_zoomingYModel;
 	ComboBoxModel* m_snappingModel;
 	bool m_proportionalSnap;
 
 	static const QVector<float> m_zoomLevels;
+	static const QVector<float> m_zoomYLevels;
 
 	bool m_scrollBack;
 	bool m_smoothScroll;
@@ -214,6 +218,7 @@ private:
 	QAction* m_crtlAction;
 
 	ComboBox * m_zoomingComboBox;
+	ComboBox * m_zoomingYComboBox;
 	ComboBox * m_snappingComboBox;
 	QLabel* m_snapSizeLabel;
 

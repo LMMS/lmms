@@ -349,6 +349,15 @@ void TrackContainerView::setPixelsPerBar( int ppb )
 	}
 }
 
+void TrackContainerView::setVerticalHeight(int h)
+{
+	for (const auto& trackView : m_trackViews)
+	{
+		trackView->setFixedHeight(h);
+		trackView->getTrack()->setHeight(h);
+	}
+}
+
 
 
 

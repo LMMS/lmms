@@ -61,10 +61,14 @@ namespace lmms::gui
 const QVector<float> SongEditor::m_zoomLevels =
 		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f, 16.0f };
 
+const QVector<float> SongEditor::m_zoomYLevels =
+		{ 1.0f, 1.5f, 2.0f, 3.0f, 4.0f, 8.0f, 16.0f };
+
 SongEditor::SongEditor( Song * song ) :
 	TrackContainerView( song ),
 	m_song( song ),
 	m_zoomingModel(new ComboBoxModel()),
+	m_zoomingYModel(new ComboBoxModel()),
 	m_snappingModel(new ComboBoxModel()),
 	m_proportionalSnap( false ),
 	m_scrollBack( false ),
@@ -82,6 +86,7 @@ SongEditor::SongEditor( Song * song ) :
 	m_selectRegion(false)
 {
 	m_zoomingModel->setParent(this);
+	m_zoomingYModel->setParent(this);
 	m_snappingModel->setParent(this);
 	m_timeLine = new TimeLineWidget( m_trackHeadWidth, 32,
 					pixelsPerBar(),
@@ -252,6 +257,17 @@ SongEditor::SongEditor( Song * song ) :
 					this, SLOT(zoomingChanged()));
 	connect( m_zoomingModel, SIGNAL(dataChanged()),
 					m_positionLine, SLOT(update()));
+
+	// Set up Y-axis zooming model
+	for( float const & zoomLevel : m_zoomYLevels )
+	{
+		m_zoomingYModel->addItem( QString( "%1\%" ).arg( zoomLevel * 100 ) );
+	}
+	m_zoomingYModel->setInitValue(
+			m_zoomingYModel->findText( "100%" ) );
+	connect( m_zoomingYModel, SIGNAL(dataChanged()),
+					this, SLOT(zoomingYChanged()));
+
 
 	//Set up snapping model, 2^i
 	for ( int i = 3; i >= -4; i-- )
@@ -840,7 +856,7 @@ void SongEditor::updatePositionLine()
 void SongEditor::zoomingChanged()
 {
 	setPixelsPerBar( m_zoomLevels[m_zoomingModel->value()] * DEFAULT_PIXELS_PER_BAR );
-
+	
 	m_song->m_playPos[Song::Mode_PlaySong].m_timeLine->
 					setPixelsPerBar( pixelsPerBar() );
 	realignTracks();
@@ -850,6 +866,11 @@ void SongEditor::zoomingChanged()
 	emit zoomingValueChanged( m_zoomLevels[m_zoomingModel->value()] );
 }
 
+void SongEditor::zoomingYChanged()
+{
+	setVerticalHeight( m_zoomYLevels[m_zoomingYModel->value()] * DEFAULT_TRACK_HEIGHT );
+	updatePositionLine();
+}
 
 void SongEditor::selectAllClips( bool select )
 {
@@ -904,7 +925,10 @@ ComboBoxModel *SongEditor::zoomingModel() const
 	return m_zoomingModel;
 }
 
-
+ComboBoxModel *SongEditor::zoomingYModel() const
+{
+	return m_zoomingYModel;
+}
 
 
 ComboBoxModel *SongEditor::snappingModel() const
@@ -988,8 +1012,10 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	DropToolBar *zoomToolBar = addDropToolBarToTop(tr("Zoom controls"));
 
-	auto zoom_lbl = new QLabel(m_toolBar);
-	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
+	auto zoomx_lbl = new QLabel(m_toolBar);
+	zoomx_lbl->setPixmap( embed::getIconPixmap( "zoom_x" ) );
+	auto zoomy_lbl = new QLabel(m_toolBar);
+	zoomy_lbl->setPixmap( embed::getIconPixmap( "zoom_y" ) );
 
 	//Set up zooming-stuff
 	m_zoomingComboBox = new ComboBox( m_toolBar );
@@ -999,8 +1025,16 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_zoomingComboBox->setToolTip(tr("Horizontal zooming"));
 	connect(m_editor->zoomingModel(), SIGNAL(dataChanged()), this, SLOT(updateSnapLabel()));
 
-	zoomToolBar->addWidget( zoom_lbl );
+	m_zoomingYComboBox = new ComboBox( m_toolBar );
+	m_zoomingYComboBox->setFixedSize( 80, ComboBox::DEFAULT_HEIGHT );
+	m_zoomingYComboBox->move( 580, 4 );
+	m_zoomingYComboBox->setModel(m_editor->m_zoomingYModel);
+	m_zoomingYComboBox->setToolTip(tr("Vertical zooming"));
+
+	zoomToolBar->addWidget( zoomx_lbl );
 	zoomToolBar->addWidget( m_zoomingComboBox );
+	zoomToolBar->addWidget( zoomy_lbl );
+	zoomToolBar->addWidget( m_zoomingYComboBox );
 
 	DropToolBar *snapToolBar = addDropToolBarToTop(tr("Snap controls"));
 	auto snap_lbl = new QLabel(m_toolBar);
