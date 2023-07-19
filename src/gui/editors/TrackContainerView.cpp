@@ -281,7 +281,13 @@ TrackView * TrackContainerView::createTrackView( Track * _t )
 		if (trackView->getTrack() == _t) { return trackView; }
 	}
 
-	return _t->createView( this );
+	auto trackView = _t->createView( this );
+
+	int height = lround(m_trackHeightScale * DEFAULT_TRACK_HEIGHT);
+	trackView->setFixedHeight(height);
+	trackView->getTrack()->setHeight(height);
+
+	return trackView;
 }
 
 
