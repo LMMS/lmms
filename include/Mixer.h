@@ -100,9 +100,9 @@ class MixerChannel : public ThreadableJob
 class MixerRoute : public QObject
 {
 	Q_OBJECT
-	public:
-		MixerRoute( MixerChannel * from, MixerChannel * to, float amount );
-		~MixerRoute() override = default;
+public:
+	MixerRoute( MixerChannel * from, MixerChannel * to, float amount );
+	~MixerRoute() override = default;
 
 	mix_ch_t senderIndex() const
 	{
