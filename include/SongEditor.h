@@ -143,12 +143,12 @@ private:
 
 	PositionLine * m_positionLine;
 
-	ComboBoxModel* m_zoomingModel;
+	ComboBoxModel* m_zoomingXModel;
 	ComboBoxModel* m_zoomingYModel;
 	ComboBoxModel* m_snappingModel;
 	bool m_proportionalSnap;
 
-	static const QVector<float> m_zoomLevels;
+	static const QVector<float> m_zoomXLevels;
 	static const QVector<float> m_zoomYLevels;
 
 	bool m_scrollBack;
@@ -217,7 +217,7 @@ private:
 	QAction* m_selectModeAction;
 	QAction* m_crtlAction;
 
-	ComboBox * m_zoomingComboBox;
+	ComboBox * m_zoomingXComboBox;
 	ComboBox * m_zoomingYComboBox;
 	ComboBox * m_snappingComboBox;
 	QLabel* m_snapSizeLabel;

@@ -354,11 +354,16 @@ void TrackContainerView::setVerticalScale(double h)
 {
 	for (const auto& trackView : m_trackViews)
 	{
-		int new_height = h * DEFAULT_TRACK_HEIGHT;
+		int new_height = lround(h * DEFAULT_TRACK_HEIGHT);
 		int cur_height = trackView->getTrack()->getHeight();
 
-		if(cur_height != m_trackHeightScale)
-			new_height = cur_height * (h / m_trackHeightScale);
+		// If a track has been manually resized, calculate the new height by scaling the old height rather than just setting it.
+		if(cur_height != lround((m_trackHeightScale * DEFAULT_TRACK_HEIGHT)))
+			new_height = lround(cur_height * (h / m_trackHeightScale));
+
+		// clamp the value to prevent it from becoming smaller than the zoom level.
+		if(new_height < lround(h * DEFAULT_TRACK_HEIGHT))
+			new_height = lround(h * DEFAULT_TRACK_HEIGHT);
 
 		trackView->setFixedHeight(new_height);
 		trackView->getTrack()->setHeight(new_height);

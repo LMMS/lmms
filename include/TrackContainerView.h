@@ -205,7 +205,7 @@ private:
 	QVBoxLayout * m_scrollLayout;
 
 	float m_ppb;
-	int m_trackHeightScale;
+	double m_trackHeightScale;
 
 	RubberBand * m_rubberBand;
 
