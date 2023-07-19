@@ -481,7 +481,8 @@ MidiClip * MidiClip::adjacentMidiClipByOffset(int offset) const
 {
 	std::vector<Clip *> clips = m_instrumentTrack->getClips();
 	int clipNum = m_instrumentTrack->getClipNum(this);
-	return (clipNum < 0 || clipNum > clips.size() - 1) ? nullptr : dynamic_cast<MidiClip*>(clips[clipNum + offset]);
+	if (clipNum < 0 || clipNum > clips.size() - 1) { return nullptr; }
+	return dynamic_cast<MidiClip*>(clips[clipNum + offset]);
 }
 
 
