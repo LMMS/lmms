@@ -559,13 +559,13 @@ DataFile ClipView::createClipDataFiles(
 	// Add extra metadata needed for calculations later
 
 	const auto initialTrackIt = std::find(tc->tracks().begin(), tc->tracks().end(), t);
-	const int initialTrackIndex = initialTrackIt != tc->tracks().end() ? std::distance(tc->tracks().begin(), initialTrackIt) : -1;
-
-	if (initialTrackIndex < 0)
+	if (initialTrackIt != tc->tracks().end())
 	{
 		printf("Failed to find selected track in the TrackContainer.\n");
 		return dataFile;
 	}
+
+	const int initialTrackIndex = std::distance(tc->tracks().begin(), initialTrackIt);
 	QDomElement metadata = dataFile.createElement( "copyMetadata" );
 	// initialTrackIndex is the index of the track that was touched
 	metadata.setAttribute( "initialTrackIndex", initialTrackIndex );
