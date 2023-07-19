@@ -80,7 +80,7 @@ void MidiController::processInEvent( const MidiEvent& event, const TimePos& time
 		case MidiControlChange:
 			controllerNum = event.controllerNumber();
 
-			if( m_midiPort.inputController() == controllerNum + 1 &&
+			if( m_midiPort.inputController() == controllerNum &&
 					( m_midiPort.inputChannel() == event.channel() + 1 ||
 					  m_midiPort.inputChannel() == 0 ) )
 			{
