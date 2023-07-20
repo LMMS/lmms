@@ -383,7 +383,7 @@ void SongEditor::selectRegionFromPixels(int xStart, int xEnd)
 		//we save the position of scrollbars, mouse position and zooming level
 		m_origin = QPoint(xStart, 0);
 		m_scrollPos = QPoint(m_leftRightScroll->value(), contentWidget()->verticalScrollBar()->value());
-		m_currentZoomingValue = zoomingModel()->value();
+		m_currentZoomingValue = zoomingXModel()->value();
 
 		//calculate the song position where the mouse was clicked
 		m_rubberbandStartTimePos = TimePos((xStart - m_trackHeadWidth)
@@ -628,7 +628,7 @@ void SongEditor::mousePressEvent(QMouseEvent *me)
 		//we save the position of scrollbars, mouse position and zooming level
 		m_scrollPos = QPoint(m_leftRightScroll->value(), contentWidget()->verticalScrollBar()->value());
 		m_origin = contentWidget()->mapFromParent(QPoint(me->pos().x(), me->pos().y()));
-		m_currentZoomingValue = zoomingModel()->value();
+		m_currentZoomingValue = zoomingXModel()->value();
 
 		//paint the rubberband
 		rubberBand()->setEnabled(true);
@@ -920,7 +920,7 @@ int SongEditor::indexOfTrackView(const TrackView *tv)
 
 
 
-ComboBoxModel *SongEditor::zoomingModel() const
+ComboBoxModel *SongEditor::zoomingXModel() const
 {
 	return m_zoomingXModel;
 }
@@ -1023,7 +1023,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_zoomingXComboBox->move( 580, 4 );
 	m_zoomingXComboBox->setModel(m_editor->m_zoomingXModel);
 	m_zoomingXComboBox->setToolTip(tr("Horizontal zooming"));
-	connect(m_editor->zoomingModel(), SIGNAL(dataChanged()), this, SLOT(updateSnapLabel()));
+	connect(m_editor->zoomingXModel(), SIGNAL(dataChanged()), this, SLOT(updateSnapLabel()));
 
 	m_zoomingYComboBox = new ComboBox( m_toolBar );
 	m_zoomingYComboBox->setFixedSize( 80, ComboBox::DEFAULT_HEIGHT );

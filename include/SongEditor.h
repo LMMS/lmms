@@ -69,7 +69,7 @@ public:
 	void saveSettings( QDomDocument& doc, QDomElement& element ) override;
 	void loadSettings( const QDomElement& element ) override;
 
-	ComboBoxModel *zoomingModel() const;
+	ComboBoxModel *zoomingXModel() const;
 	ComboBoxModel *zoomingYModel() const;
 	ComboBoxModel *snappingModel() const;
 	float getSnapSize() const;
