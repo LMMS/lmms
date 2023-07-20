@@ -98,7 +98,7 @@ public:
 	}
 
 	void setPixelsPerBar( int ppb );
-	void setVerticalScale( double h );
+	void setVerticalScale(double h);
 
 	const TrackView * trackViewAt( const int _y ) const;
 

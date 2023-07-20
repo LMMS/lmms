@@ -84,9 +84,9 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	m_trackViews(),
 	m_scrollArea( new scrollArea( this ) ),
 	m_ppb( DEFAULT_PIXELS_PER_BAR ),
+	m_trackHeightScale(1),
 	m_rubberBand( new RubberBand( m_scrollArea ) )
 {
-	m_trackHeightScale = 1;
 	m_tc->setHook( this );
 	//keeps the direction of the widget, undepended on the locale
 	setLayoutDirection( Qt::LeftToRight );
@@ -281,7 +281,7 @@ TrackView * TrackContainerView::createTrackView( Track * _t )
 		if (trackView->getTrack() == _t) { return trackView; }
 	}
 
-	auto trackView = _t->createView( this );
+	auto trackView = _t->createView(this);
 
 	int height = lround(m_trackHeightScale * DEFAULT_TRACK_HEIGHT);
 	trackView->setFixedHeight(height);
@@ -365,11 +365,15 @@ void TrackContainerView::setVerticalScale(double h)
 
 		// If a track has been manually resized, calculate the new height by scaling the old height rather than just setting it.
 		if(cur_height != lround((m_trackHeightScale * DEFAULT_TRACK_HEIGHT)))
+		{
 			new_height = lround(cur_height * (h / m_trackHeightScale));
+		}
 
 		// clamp the value to prevent it from becoming smaller than the zoom level.
 		if(new_height < lround(h * DEFAULT_TRACK_HEIGHT))
+		{
 			new_height = lround(h * DEFAULT_TRACK_HEIGHT);
+		}
 
 		trackView->setFixedHeight(new_height);
 		trackView->getTrack()->setHeight(new_height);

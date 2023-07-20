@@ -69,8 +69,8 @@ public:
 	void saveSettings( QDomDocument& doc, QDomElement& element ) override;
 	void loadSettings( const QDomElement& element ) override;
 
-	ComboBoxModel *zoomingXModel() const;
-	ComboBoxModel *zoomingYModel() const;
+	ComboBoxModel* zoomingXModel() const;
+	ComboBoxModel* zoomingYModel() const;
 	ComboBoxModel *snappingModel() const;
 	float getSnapSize() const;
 	QString getSnapSizeString() const;
@@ -217,8 +217,8 @@ private:
 	QAction* m_selectModeAction;
 	QAction* m_crtlAction;
 
-	ComboBox * m_zoomingXComboBox;
-	ComboBox * m_zoomingYComboBox;
+	ComboBox* m_zoomingXComboBox;
+	ComboBox* m_zoomingYComboBox;
 	ComboBox * m_snappingComboBox;
 	QLabel* m_snapSizeLabel;
 
