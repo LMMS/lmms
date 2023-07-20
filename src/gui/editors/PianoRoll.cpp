@@ -156,7 +156,6 @@ const std::vector<float> PianoRoll::m_zoomYLevels =
 
 
 PianoRoll::PianoRoll() :
-	m_nemStr(),
 	m_noteEditMenu( nullptr ),
 	m_semiToneMarkerMenu( nullptr ),
 	m_zoomingModel(),

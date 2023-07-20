@@ -87,11 +87,11 @@ class MixerChannel : public ThreadableJob
 		QColor m_color;
 		bool m_hasColor;
 
-
+	
 		std::atomic_int m_dependenciesMet;
 		void incrementDeps();
 		void processed();
-
+		
 	private:
 		void doProcessing() override;
 };

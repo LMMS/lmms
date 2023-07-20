@@ -117,7 +117,7 @@ private:
 	std::atomic<bool> m_stopped;
 
 	std::atomic<MidiJack *> m_midiClient;
-	std::vector<jack_port_t*> m_outputPorts;
+	std::vector<jack_port_t *> m_outputPorts;
 	jack_default_audio_sample_t * * m_tempOutBufs;
 	surroundSampleFrame * m_outBuf;
 

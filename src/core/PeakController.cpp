@@ -196,7 +196,7 @@ PeakController * PeakController::getControllerBySetting(const QDomElement & _thi
 	{
 		for (const auto& effect : s_effects)
 		{
-			if (effect->m_effectId == effectId )
+			if (effect->m_effectId == effectId)
 			{
 				foundCount++;
 			}

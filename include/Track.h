@@ -188,7 +188,7 @@ public:
 	{
 		return m_processingLock.tryLock();
 	}
-
+	
 	QColor color()
 	{
 		return m_color;
@@ -202,7 +202,7 @@ public:
 	{
 		return m_mutedBeforeSolo;
 	}
-
+	
 	BoolModel* getMutedModel();
 
 public slots:
@@ -240,7 +240,7 @@ private:
 	clipVector m_clips;
 
 	QMutex m_processingLock;
-
+	
 	QColor m_color;
 	bool m_hasColor;
 

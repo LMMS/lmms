@@ -230,7 +230,7 @@ void EffectChain::clear()
 
 	while (m_effects.size())
 	{
-		Effect * e = m_effects[m_effects.size() - 1];
+		auto e = m_effects[m_effects.size() - 1];
 		m_effects.pop_back();
 		delete e;
 	}

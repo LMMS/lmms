@@ -105,7 +105,7 @@ float Controller::currentValue( int _offset )
 	{
 		m_currentValue = fittedValue( value( _offset ) );
 	}
-
+	
 	return m_currentValue;
 }
 
@@ -119,7 +119,7 @@ float Controller::value( int offset )
 	}
 	return m_valueBuffer.values()[ offset ];
 }
-
+	
 
 ValueBuffer * Controller::valueBuffer()
 {
@@ -209,7 +209,7 @@ Controller * Controller::create( ControllerTypes _ct, Model * _parent )
 			c = new class MidiController( _parent );
 			break;
 
-		default:
+		default: 
 			break;
 	}
 

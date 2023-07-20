@@ -770,7 +770,7 @@ void AutomationClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "prog", QString::number( progressionType() ) );
 	_this.setAttribute( "tens", QString::number( getTension() ) );
 	_this.setAttribute( "mute", QString::number( isMuted() ) );
-
+	
 	if( usesCustomClipColor() )
 	{
 		_this.setAttribute( "color", color().name() );
@@ -831,10 +831,10 @@ void AutomationClip::loadSettings( const QDomElement & _this )
 		}
 		else if( element.tagName() == "object" )
 		{
-			m_idsToResolve.push_back(element.attribute( "id" ).toInt());
+			m_idsToResolve.push_back(element.attribute("id").toInt());
 		}
 	}
-
+	
 	if( _this.hasAttribute( "color" ) )
 	{
 		useCustomClipColor( true );
@@ -1055,11 +1055,11 @@ void AutomationClip::objectDestroyed( jo_id_t _id )
 
 	for (auto objIt = m_objects.begin(); objIt != m_objects.end(); objIt++)
 	{
-		Q_ASSERT(!(*objIt).isNull());
-		if((*objIt)->id() == _id)
+		Q_ASSERT( !(*objIt).isNull() );
+		if( (*objIt)->id() == _id )
 		{
 			//Assign to objIt so that this loop work even break; is removed.
-			objIt = m_objects.erase(objIt);
+			objIt = m_objects.erase( objIt );
 			break;
 		}
 	}

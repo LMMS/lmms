@@ -473,7 +473,7 @@ float AutomatableModel::fittedValue( float value ) const
 
 void AutomatableModel::linkModel( AutomatableModel* model )
 {
-	bool containsModel = std::find(m_linkedModels.begin(), m_linkedModels.end(), model) != m_linkedModels.end();
+	auto containsModel = std::find(m_linkedModels.begin(), m_linkedModels.end(), model) != m_linkedModels.end();
 	if (!containsModel && model != this)
 	{
 		m_linkedModels.push_back( model );
@@ -505,8 +505,8 @@ void AutomatableModel::unlinkModel( AutomatableModel* model )
 
 void AutomatableModel::linkModels( AutomatableModel* model1, AutomatableModel* model2 )
 {
-	bool containsModel2 = std::find(model1->m_linkedModels.begin(), model1->m_linkedModels.end(), model2) != model1->m_linkedModels.end();
-	if (!containsModel2 && model1 != model2)
+	auto model1ContainsModel2 = std::find(model1->m_linkedModels.begin(), model1->m_linkedModels.end(), model2) != model1->m_linkedModels.end();
+	if (!model1ContainsModel2 && model1 != model2)
 	{
 		// copy data
 		model1->m_value = model2->m_value;
@@ -723,7 +723,7 @@ void AutomatableModel::reset()
 float AutomatableModel::globalAutomationValueAt( const TimePos& time )
 {
 	// get clips that connect to this model
-	auto clips = AutomationClip::clipsForModel( this );
+	auto clips = AutomationClip::clipsForModel(this);
 	if (clips.empty())
 	{
 		// if no such clips exist, return current value
@@ -734,12 +734,11 @@ float AutomatableModel::globalAutomationValueAt( const TimePos& time )
 		// of those clips:
 		// find the clips which overlap with the time position
 		std::vector<AutomationClip*> clipsInRange;
-
-		for (const auto clip : clipsInRange)
+		for (const auto& clip : clips)
 		{
-			int start = clip->startPosition();
-			int end = clip->endPosition();
-			if (start <= time && end >= time) { clipsInRange.push_back(clip); }
+			int s = clip->startPosition();
+			int e = clip->endPosition();
+			if (s <= time && e >= time) { clipsInRange.push_back(clip); }
 		}
 
 		AutomationClip * latestClip = nullptr;
@@ -754,18 +753,19 @@ float AutomatableModel::globalAutomationValueAt( const TimePos& time )
 		// if we find no clips at the exact time, we need to search for the last clip before time and use that
 		{
 			int latestPosition = 0;
-			for (const auto clip : clips)
+
+			for (const auto& clip : clips)
 			{
-				int end = clip->endPosition();
-				if (end <= time && end > latestPosition)
+				int e = clip->endPosition();
+				if (e <= time && e > latestPosition)
 				{
-					latestPosition = end;
+					latestPosition = e;
 					latestClip = clip;
 				}
 			}
 		}
 
-		if (latestClip)
+		if( latestClip )
 		{
 			// scale/fit the value appropriately and return it
 			const float value = latestClip->valueAt( time - latestClip->startPosition() );

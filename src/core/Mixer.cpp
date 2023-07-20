@@ -340,11 +340,11 @@ void Mixer::deleteChannel( int index )
 	// delete all of this channel's sends and receives
 	while (!ch->m_sends.empty())
 	{
-		deleteChannelSend( ch->m_sends.front() );
+		deleteChannelSend(ch->m_sends.front());
 	}
 	while (!ch->m_receives.empty())
 	{
-		deleteChannelSend( ch->m_receives.front() );
+		deleteChannelSend(ch->m_receives.front());
 	}
 
 	// if m_lastSoloed was our index, reset it

@@ -100,7 +100,7 @@ public:
 							JobQueue::OperationMode _opMode = JobQueue::Static )
 	{
 		resetJobQueue( _opMode );
-		for (const auto job : _vec)
+		for (const auto& job : _vec)
 		{
 			addJob(job);
 		}

@@ -125,7 +125,7 @@ private:
 namespace gui
 {
 
-ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
+ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent, 
 		const AutomatableModel * _target_model ) :
 	QDialog( _parent ),
 	m_readablePorts( nullptr ),
@@ -143,7 +143,7 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 	m_midiGroupBox->setGeometry( 8, 10, 240, 80 );
 	connect( m_midiGroupBox->model(), SIGNAL(dataChanged()),
 			this, SLOT(midiToggled()));
-
+	
 	m_midiChannelSpinBox = new LcdSpinBox( 2, m_midiGroupBox,
 			tr( "Input channel" ) );
 	m_midiChannelSpinBox->addTextForValue( 0, "--" );
@@ -155,7 +155,7 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 	m_midiControllerSpinBox->addTextForValue( 0, "---" );
 	m_midiControllerSpinBox->setLabel( tr( "CONTROLLER" ) );
 	m_midiControllerSpinBox->move( 68, 24 );
-
+	
 
 	m_midiAutoDetectCheckBox =
 			new LedCheckBox( tr("Auto Detect"),
@@ -218,7 +218,7 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 	btn_layout->setContentsMargins(0, 0, 0, 0);
 
 	auto select_btn = new QPushButton(embed::getIconPixmap("add"), tr("OK"), buttons);
-	connect( select_btn, SIGNAL(clicked()),
+	connect( select_btn, SIGNAL(clicked()), 
 				this, SLOT(selectController()));
 
 	auto cancel_btn = new QPushButton(embed::getIconPixmap("cancel"), tr("Cancel"), buttons);
@@ -235,7 +235,7 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 	setFixedSize( 256, 280 );
 
 	// Crazy MIDI View stuff
-
+	
 	// TODO, handle by making this a model for the Dialog "view"
 	ControllerConnection * cc = nullptr;
 	if( m_targetModel )
@@ -301,9 +301,9 @@ void ControllerConnectionDialog::selectController()
 		{
 			MidiController * mc;
 			mc = m_midiController->copyToMidiController( Engine::getSong() );
-
+	
 			/*
-			if( m_targetModel->getTrack() &&
+			if( m_targetModel->getTrack() && 
 					!m_targetModel->getTrack()->displayName().isEmpty() )
 			{
 				mc->m_midiPort.setName( QString( "%1 (%2)" ).
@@ -320,12 +320,12 @@ void ControllerConnectionDialog::selectController()
 		}
 	}
 	// User
-	else
+	else 
 	{
-		if( m_userGroupBox->model()->value() > 0 &&
+		if( m_userGroupBox->model()->value() > 0 && 
 				Engine::getSong()->controllers().size() )
 		{
-			m_controller = Engine::getSong()->controllers().at(
+			m_controller = Engine::getSong()->controllers().at( 
 					m_userController->model()->value() );
 		}
 
@@ -334,7 +334,7 @@ void ControllerConnectionDialog::selectController()
 			QMessageBox::warning(this, tr("LMMS"), tr("Cycle Detected."));
 			return;
 		}
-
+	
 	}
 
 	accept();

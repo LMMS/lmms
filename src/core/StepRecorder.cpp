@@ -292,7 +292,7 @@ void StepRecorder::removeNotesReleasedForTooLong()
 	{
 		if (stepNote->isReleased())
 		{
-			const int timeSinceReleased = stepNote->timeSinceReleased();
+			const int timeSinceReleased = stepNote->timeSinceReleased(); // capture value to avoid wraparound when calculting nextTimout
 			if (timeSinceReleased >= REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS)
 			{
 				notesRemoved = true;
