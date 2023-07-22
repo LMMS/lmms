@@ -9,8 +9,3 @@
 /plugins/ZynAddSubFx/zynaddsubfx/doc/Makefile
 /plugins/ZynAddSubFx/zynaddsubfx/doc/gen/Makefile
 /data/locale/*.qm
-*.vsidx
-*.sqlite
-*.lock
-*.sqlite-journal
-.vs/VSWorkspaceState.json
