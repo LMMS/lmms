@@ -617,7 +617,6 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	// Ifaces-settings-widget.
 	auto ms_w = new QWidget(midi_w);
-	ms_w->setFixedHeight(60);
 
 	auto ms_w_layout = new QHBoxLayout(ms_w);
 	ms_w_layout->setSpacing(0);

@@ -25,7 +25,7 @@
 #ifndef LMMS_GUI_MIDI_SETUP_WIDGET_H
 #define LMMS_GUI_MIDI_SETUP_WIDGET_H
 
-#include "TabWidget.h"
+#include <QGroupBox>
 
 class QLineEdit;
 
@@ -33,7 +33,7 @@ namespace lmms::gui
 {
 
 
-class MidiSetupWidget : public TabWidget
+class MidiSetupWidget : public QGroupBox
 {
 	Q_OBJECT
 	MidiSetupWidget( const QString & caption, const QString & configSection,
