@@ -1,7 +1,8 @@
 /*
- * AudioAlsaSetupWidget.h - Implements a setup widget for ALSA-PCM-output
+ * AudioDeviceSetupGroupWidget.cpp - Base class for audio device setup widgets using group box
  *
  * Copyright (c) 2004-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2015 Michael Gregorius
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,48 +23,20 @@
  *
  */
 
-#ifndef LMMS_GUI_AUDIO_ALSA_SETUP_WIDGET_H
-#define LMMS_GUI_AUDIO_ALSA_SETUP_WIDGET_H
-
-#include "lmmsconfig.h"
-
-#ifdef LMMS_HAVE_ALSA
-
 #include "AudioDeviceSetupGroupWidget.h"
-
-#include "AudioAlsa.h"
-
-
-class QComboBox;
 
 namespace lmms::gui
 {
 
-class LcdSpinBox;
-
-class AudioAlsaSetupWidget : public AudioDeviceSetupGroupWidget
+AudioDeviceSetupGroupWidget::AudioDeviceSetupGroupWidget(const QString & caption, QWidget * parent) :
+	QGroupBox(QGroupBox::tr("Settings for %1").arg(tr(caption.toUtf8())), parent)
 {
-	Q_OBJECT
+}
 
-public:
-	AudioAlsaSetupWidget( QWidget * _parent );
-	~AudioAlsaSetupWidget() override;
-
-	void saveSettings() override;
-
-public slots:
-	void onCurrentIndexChanged(int index);
-
-private:
-	QComboBox * m_deviceComboBox;
-	LcdSpinBox * m_channels;
-
-	int m_selectedDevice;
-	AudioAlsa::DeviceInfoCollection m_deviceInfos;
-};
+void AudioDeviceSetupGroupWidget::show()
+{
+	parentWidget()->show();
+	QWidget::show();
+}
 
 } // namespace lmms::gui
-
-#endif // LMMS_HAVE_ALSA
-
-#endif // LMMS_GUI_AUDIO_ALSA_SETUP_WIDGET_H

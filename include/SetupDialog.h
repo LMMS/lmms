@@ -29,7 +29,7 @@
 #include <QMap>
 
 #include "AudioDevice.h"
-#include "AudioDeviceSetupWidget.h"
+#include "AudioDeviceSetupGroupWidget.h"
 #include "lmmsconfig.h"
 #include "MidiClient.h"
 #include "MidiSetupWidget.h"
@@ -166,7 +166,7 @@ private:
 	bool m_vstAlwaysOnTop;
 	bool m_disableAutoQuit;
 
-	using AswMap = QMap<QString, AudioDeviceSetupWidget*>;
+	using AswMap = QMap<QString, AudioDeviceSetupGroupWidget*>;
 	using MswMap = QMap<QString, MidiSetupWidget*>;
 	using trMap = QMap<QString, QString>;
 

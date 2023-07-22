@@ -35,7 +35,7 @@
 #   include <portaudio.h>
 
 #   include "AudioDevice.h"
-#   include "AudioDeviceSetupWidget.h"
+#   include "AudioDeviceSetupGroupWidget.h"
 
 #   if defined paNeverDropInput || defined paNonInterleaved
 #	    define PORTAUDIO_V19
@@ -90,7 +90,7 @@ public:
 		unsigned long _framesPerBuffer );
 
 
-	class setupWidget : public gui::AudioDeviceSetupWidget
+	class setupWidget : public gui::AudioDeviceSetupGroupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );

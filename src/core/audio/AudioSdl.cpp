@@ -26,7 +26,7 @@
 
 #ifdef LMMS_HAVE_SDL
 
-#include <QLabel>
+#include <QFormLayout>>
 #include <QLineEdit>
 #include <SDL.h>
 
@@ -325,16 +325,14 @@ void AudioSdl::sdlInputAudioCallback(Uint8 *_buf, int _len) {
 #endif
 
 AudioSdl::setupWidget::setupWidget( QWidget * _parent ) :
-	AudioDeviceSetupWidget( AudioSdl::name(), _parent )
+	AudioDeviceSetupGroupWidget( AudioSdl::name(), _parent )
 {
+	QFormLayout * form = new QFormLayout(this);
+
 	QString dev = ConfigManager::inst()->value( "audiosdl", "device" );
 	m_device = new QLineEdit( dev, this );
-	m_device->setGeometry( 10, 20, 160, 20 );
 
-	auto dev_lbl = new QLabel(tr("Device"), this);
-	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
-	dev_lbl->setGeometry( 10, 40, 160, 10 );
-
+	form->addRow(tr("Device"), m_device);
 }
 
 

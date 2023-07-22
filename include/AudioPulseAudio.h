@@ -34,7 +34,7 @@
 #include <QThread>
 
 #include "AudioDevice.h"
-#include "AudioDeviceSetupWidget.h"
+#include "AudioDeviceSetupGroupWidget.h"
 
 class QLineEdit;
 
@@ -62,7 +62,7 @@ public:
 	static QString probeDevice();
 
 
-	class setupWidget : public gui::AudioDeviceSetupWidget
+	class setupWidget : public gui::AudioDeviceSetupGroupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );

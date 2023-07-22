@@ -466,7 +466,6 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	// Ifaces-settings-widget.
 	auto as_w = new QWidget(audio_w);
-	as_w->setFixedHeight(60);
 
 	auto as_w_layout = new QHBoxLayout(as_w);
 	as_w_layout->setSpacing(0);
@@ -492,6 +491,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			new AudioPortAudio::setupWidget(as_w);
 #endif
 
+// TODO !!!
 #ifdef LMMS_HAVE_SOUNDIO
 	m_audioIfaceSetupWidgets[AudioSoundIo::name()] =
 			new AudioSoundIo::setupWidget(as_w);
@@ -507,6 +507,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			new AudioOss::setupWidget(as_w);
 #endif
 
+// TODO !!!
 #ifdef LMMS_HAVE_SNDIO
 	m_audioIfaceSetupWidgets[AudioSndio::name()] =
 			new AudioSndio::setupWidget(as_w);
@@ -520,7 +521,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 		it != m_audioIfaceSetupWidgets.end(); ++it)
 	{
 		m_audioIfaceNames[
-			AudioDeviceSetupWidget::tr(it.key().toUtf8())] = it.key();
+			AudioDeviceSetupGroupWidget::tr(it.key().toUtf8())] = it.key();
 	}
 	for(trMap::iterator it = m_audioIfaceNames.begin();
 		it != m_audioIfaceNames.end(); ++it)

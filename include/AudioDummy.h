@@ -26,7 +26,7 @@
 #define LMMS_AUDIO_DUMMY_H
 
 #include "AudioDevice.h"
-#include "AudioDeviceSetupWidget.h"
+#include "AudioDeviceSetupGroupWidget.h"
 #include "AudioEngine.h"
 #include "MicroTimer.h"
 
@@ -54,11 +54,11 @@ public:
 	}
 
 
-	class setupWidget : public gui::AudioDeviceSetupWidget
+	class setupWidget : public gui::AudioDeviceSetupGroupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent ) :
-			gui::AudioDeviceSetupWidget( AudioDummy::name(), _parent )
+			gui::AudioDeviceSetupGroupWidget( AudioDummy::name(), _parent )
 		{
 		}
 

@@ -27,8 +27,8 @@
 #ifdef LMMS_HAVE_JACK
 
 #include <QLineEdit>
-#include <QLabel>
 #include <QMessageBox>
+#include <QFormLayout>
 
 #include "Engine.h"
 #include "GuiApplication.h"
@@ -452,19 +452,18 @@ void AudioJack::shutdownCallback( void * _udata )
 
 
 AudioJack::setupWidget::setupWidget( QWidget * _parent ) :
-	AudioDeviceSetupWidget( AudioJack::name(), _parent )
+	AudioDeviceSetupGroupWidget( AudioJack::name(), _parent )
 {
+	QFormLayout * form = new QFormLayout(this);
+
 	QString cn = ConfigManager::inst()->value( "audiojack", "clientname" );
 	if( cn.isEmpty() )
 	{
 		cn = "lmms";
 	}
 	m_clientName = new QLineEdit( cn, this );
-	m_clientName->setGeometry( 10, 20, 160, 20 );
 
-	auto cn_lbl = new QLabel(tr("Client name"), this);
-	cn_lbl->setFont( pointSize<7>( cn_lbl->font() ) );
-	cn_lbl->setGeometry( 10, 40, 160, 10 );
+	form->addRow(tr("Client name"), m_clientName);
 
 	auto m = new gui::LcdSpinBoxModel(/* this */);
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
@@ -474,8 +473,8 @@ AudioJack::setupWidget::setupWidget( QWidget * _parent ) :
 
 	m_channels = new gui::LcdSpinBox( 1, this );
 	m_channels->setModel( m );
-	m_channels->setLabel( tr( "Channels" ) );
-	m_channels->move( 180, 20 );
+
+	form->addRow(tr("Channels"), m_channels);
 
 }
 
