@@ -297,7 +297,7 @@ void Mixer::deleteChannel( int index )
 	auto& songTracks = Engine::getSong()->tracks();
 	auto& patternStoreTracks = Engine::patternStore()->tracks();
 	tracks.insert(tracks.end(), songTracks.begin(), songTracks.end());
-	tracks.insert(patternStoreTracks.end(), patternStoreTracks.begin(), patternStoreTracks.end());
+	tracks.insert(tracks.end(), patternStoreTracks.begin(), patternStoreTracks.end());
 
 	for( Track* t : tracks )
 	{
