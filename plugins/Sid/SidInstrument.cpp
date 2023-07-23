@@ -126,7 +126,7 @@ SidInstrument::SidInstrument( InstrumentTrack * _instrument_track ) :
 	// misc
 	m_voice3OffModel( false, this, tr( "Voice 3 off" ) ),
 	m_volumeModel( 15.0f, 0.0f, 15.0f, 1.0f, this, tr( "Volume" ) ),
-	m_chipModel( static_cast<int>(ChipModel::sidMOS8580), 0, NumChipModels-1, this, tr( "Chip model" ) )
+	m_chipModel( static_cast<int>(ChipModel::MOS8580), 0, NumChipModels-1, this, tr( "Chip model" ) )
 {
 	for( int i = 0; i < 3; ++i )
 	{
@@ -325,7 +325,7 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 		reg = 0x00;
 	}
 
-	if( (ChipModel)m_chipModel.value() == ChipModel::sidMOS6581 )
+	if( (ChipModel)m_chipModel.value() == ChipModel::MOS6581 )
 	{
 		sid->set_chip_model( MOS6581 );
 	}

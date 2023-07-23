@@ -93,8 +93,8 @@ public:
 	constexpr static auto NumFilterTypes = static_cast<std::size_t>(FilterType::Count);
 	
 	enum class ChipModel {
-		sidMOS6581 = 0,
-		sidMOS8580,
+		MOS6581 = 0,
+		MOS8580,
 		Count
 	};
 	constexpr static auto NumChipModels = static_cast<std::size_t>(ChipModel::Count);
