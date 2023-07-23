@@ -1684,7 +1684,7 @@ void DataFile::upgrade_noteTypes()
 		if (noteSize < 0)
 		{
 			note.setAttribute("len", DefaultTicksPerBar / 16);
-			note.setAttribute("type", static_cast<int>(Note::Type::StepNote));
+			note.setAttribute("type", static_cast<int>(Note::Type::Step));
 		}
 	}
 }

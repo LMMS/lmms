@@ -175,7 +175,7 @@ TimePos MidiClip::beatClipLength() const
 
 	for (const auto& note : m_notes)
 	{
-		if (note->type() == Note::Type::StepNote)
+		if (note->type() == Note::Type::Step)
 		{
 			max_length = qMax<tick_t>(max_length, note->pos() + 1);
 		}
@@ -244,7 +244,7 @@ Note * MidiClip::noteAtStep(int step)
 	for (const auto& note : m_notes)
 	{
 		if (note->pos() == TimePos::stepPosition(step)
-			&& note->type() == Note::Type::StepNote)
+			&& note->type() == Note::Type::Step)
 		{
 			return note;
 		}
@@ -281,19 +281,10 @@ void MidiClip::clearNotes()
 
 Note * MidiClip::addStepNote( int step )
 {
-	const auto prevPatternType = m_clipType;
-	Note * n =
-		addNote(
-			Note(TimePos(DefaultTicksPerBar / 16),
-			TimePos::stepPosition(step)), false
-		);
-	n->setType(Note::Type::StepNote);
-	// addNote will change a BeatClip to a MelodyClip
-	// because it calls checkType after adding a regular note.
-	// We need to revert it back to a BeatClip if it was one
-	// before we added the note.
-	if (prevPatternType == BeatClip) { setType(BeatClip); }
-	return n;
+	Note stepNote = Note(TimePos(DefaultTicksPerBar / 16), TimePos::stepPosition(step));
+	stepNote.setType(Note::Type::Step);
+
+	return addNote(stepNote, false);
 }
 
 
@@ -366,7 +357,7 @@ void MidiClip::setType( MidiClipTypes _new_clip_type )
 void MidiClip::checkType()
 {
 	// If all notes are StepNotes, we have a BeatClip
-	auto beatClip = std::find_if(m_notes.begin(), m_notes.end(), [](auto note) { return note->type() != Note::Type::StepNote; }) == m_notes.end();
+	const auto beatClip = std::all_of(m_notes.begin(), m_notes.end(), [](auto note) { return note->type() == Note::Type::Step; });
 
 	setType(beatClip ? BeatClip : MelodyClip);
 }

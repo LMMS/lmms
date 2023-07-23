@@ -104,8 +104,8 @@ public:
 	// Note types
 	enum class Type
 	{
-		RegularNote = 0,
-		StepNote
+		Regular = 0,
+		Step
 	};
 
 	Type type() const
@@ -261,7 +261,7 @@ private:
 	TimePos m_pos;
 	DetuningHelper * m_detuning;
 
-	Type m_type = Type::RegularNote;
+	Type m_type = Type::Regular;
 };
 
 using NoteVector = QVector<Note*>;
