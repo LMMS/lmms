@@ -506,7 +506,6 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			new AudioOss::setupWidget(as_w);
 #endif
 
-// TODO !!!
 #ifdef LMMS_HAVE_SNDIO
 	m_audioIfaceSetupWidgets[AudioSndio::name()] =
 			new AudioSndio::setupWidget(as_w);
