@@ -27,7 +27,7 @@
 #ifdef LMMS_HAVE_OSS
 
 #include <QFileInfo>
-#include <QFormLayout>>
+#include <QFormLayout>
 #include <QLineEdit>
 
 #include "endian_handling.h"

@@ -24,7 +24,7 @@
 
 #include "MidiSetupWidget.h"
 
-#include <QFormLayout>>
+#include <QFormLayout>
 #include <QLineEdit>
 
 #include "ConfigManager.h"
