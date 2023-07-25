@@ -32,7 +32,6 @@
 #include <QGroupBox>
 #include <QCheckBox>
 
-#include "AudioDeviceSetupWidget.h"
 #include "AudioEngine.h"
 #include "debug.h"
 #include "embed.h"
