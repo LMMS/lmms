@@ -38,7 +38,7 @@
 #include <QVector>
 
 #include "AudioDevice.h"
-#include "AudioDeviceSetupGroupWidget.h"
+#include "AudioDeviceSetupWidget.h"
 
 class QLineEdit;
 
@@ -74,7 +74,7 @@ public:
 	}
 
 
-class setupWidget : public gui::AudioDeviceSetupGroupWidget
+class setupWidget : public gui::AudioDeviceSetupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );

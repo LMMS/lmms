@@ -37,7 +37,7 @@ namespace lmms::gui
 {
 
 AudioAlsaSetupWidget::AudioAlsaSetupWidget( QWidget * _parent ) :
-	AudioDeviceSetupGroupWidget( AudioAlsa::name(), _parent ),
+	AudioDeviceSetupWidget( AudioAlsa::name(), _parent ),
 	m_selectedDevice(-1)
 {
 	QFormLayout * form = new QFormLayout(this);

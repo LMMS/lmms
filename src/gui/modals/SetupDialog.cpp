@@ -520,7 +520,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 		it != m_audioIfaceSetupWidgets.end(); ++it)
 	{
 		m_audioIfaceNames[
-			AudioDeviceSetupGroupWidget::tr(it.key().toUtf8())] = it.key();
+			AudioDeviceSetupWidget::tr(it.key().toUtf8())] = it.key();
 	}
 	for(trMap::iterator it = m_audioIfaceNames.begin();
 		it != m_audioIfaceNames.end(); ++it)

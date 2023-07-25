@@ -415,7 +415,7 @@ void AudioPortAudioSetupUtil::updateChannels()
 
 
 AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
-	AudioDeviceSetupGroupWidget( AudioPortAudio::name(), _parent )
+	AudioDeviceSetupWidget( AudioPortAudio::name(), _parent )
 {
 	using gui::ComboBox;
 
@@ -499,7 +499,7 @@ void AudioPortAudio::setupWidget::show()
 		m_setupUtil.m_deviceModel.setValue( i );
 	}
 
-	AudioDeviceSetupGroupWidget::show();
+	AudioDeviceSetupWidget::show();
 }
 
 } // namespace lmms

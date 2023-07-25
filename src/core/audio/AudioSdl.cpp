@@ -325,7 +325,7 @@ void AudioSdl::sdlInputAudioCallback(Uint8 *_buf, int _len) {
 #endif
 
 AudioSdl::setupWidget::setupWidget( QWidget * _parent ) :
-	AudioDeviceSetupGroupWidget( AudioSdl::name(), _parent )
+	AudioDeviceSetupWidget( AudioSdl::name(), _parent )
 {
 	QFormLayout * form = new QFormLayout(this);
 

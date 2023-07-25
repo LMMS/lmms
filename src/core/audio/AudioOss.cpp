@@ -318,7 +318,7 @@ void AudioOss::run()
 
 
 AudioOss::setupWidget::setupWidget( QWidget * _parent ) :
-	AudioDeviceSetupGroupWidget( AudioOss::name(), _parent )
+	AudioDeviceSetupWidget( AudioOss::name(), _parent )
 {
 	QFormLayout * form = new QFormLayout(this);
 

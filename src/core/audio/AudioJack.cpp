@@ -452,7 +452,7 @@ void AudioJack::shutdownCallback( void * _udata )
 
 
 AudioJack::setupWidget::setupWidget( QWidget * _parent ) :
-	AudioDeviceSetupGroupWidget( AudioJack::name(), _parent )
+	AudioDeviceSetupWidget( AudioJack::name(), _parent )
 {
 	QFormLayout * form = new QFormLayout(this);
 

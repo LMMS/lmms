@@ -29,7 +29,7 @@
 
 #ifdef LMMS_HAVE_ALSA
 
-#include "AudioDeviceSetupGroupWidget.h"
+#include "AudioDeviceSetupWidget.h"
 
 #include "AudioAlsa.h"
 
@@ -41,7 +41,7 @@ namespace lmms::gui
 
 class LcdSpinBox;
 
-class AudioAlsaSetupWidget : public AudioDeviceSetupGroupWidget
+class AudioAlsaSetupWidget : public AudioDeviceSetupWidget
 {
 	Q_OBJECT
 

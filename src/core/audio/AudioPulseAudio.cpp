@@ -310,7 +310,7 @@ void AudioPulseAudio::signalConnected( bool connected )
 
 
 AudioPulseAudio::setupWidget::setupWidget( QWidget * _parent ) :
-	AudioDeviceSetupGroupWidget( AudioPulseAudio::name(), _parent )
+	AudioDeviceSetupWidget( AudioPulseAudio::name(), _parent )
 {
 	QFormLayout * form = new QFormLayout(this);
 
