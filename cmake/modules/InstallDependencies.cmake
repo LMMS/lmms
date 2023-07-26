@@ -1,7 +1,8 @@
 include(GetPrerequisites)
 include(CMakeParseArguments)
 
-cmake_minimum_required(${CMAKE_MINIMUM_REQUIRED_VERSION})
+# Project's cmake_minimum_required doesn't always propagate
+cmake_policy(SET CMP0057 NEW)
 
 function(make_absolute var)
 	get_filename_component(abs "${${var}}" ABSOLUTE BASE_DIR "${CMAKE_INSTALL_PREFIX}")
