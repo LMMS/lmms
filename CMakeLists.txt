@@ -7,7 +7,6 @@ SET(LMMS_BINARY_DIR ${CMAKE_BINARY_DIR})
 SET(LMMS_SOURCE_DIR ${CMAKE_SOURCE_DIR})
 
 # CMAKE_POLICY Section
-CMAKE_POLICY(SET CMP0057 NEW) # Support new if() IN_LIST operator.
 
 # Import of windows.h breaks min()/max()
 ADD_DEFINITIONS(-DNOMINMAX)
