@@ -3,7 +3,7 @@
 # is updated to relink libcarlabase.dylib.  MacOS 10.8 uses
 # cmake 3.9.6, so this can be done at any time.
 IF(NOT CMAKE_VERSION VERSION_LESS 3.9)
-  CMAKE_POLICY(SET CMP0068 OLD)
+  CMAKE_POLICY(SET CMP0068 OLD) # RPATH settings on macOS do not affect install_name.
 ENDIF()
 
 # If Carla was not provided by the system, make a dummy library instead

@@ -6,14 +6,7 @@ SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
 SET(LMMS_BINARY_DIR ${CMAKE_BINARY_DIR})
 SET(LMMS_SOURCE_DIR ${CMAKE_SOURCE_DIR})
 
-CMAKE_POLICY(SET CMP0005 NEW)	# Preprocessor definition values are now escaped automatically
-CMAKE_POLICY(SET CMP0003 NEW)   # Libraries linked via full path no longer produce linker search paths.
-CMAKE_POLICY(SET CMP0026 NEW)	# Disallow use of the LOCATION property for build targets.
-CMAKE_POLICY(SET CMP0045 NEW)   # Error on non-existent target in get_target_property.
-CMAKE_POLICY(SET CMP0050 OLD)   # Disallow add_custom_command SOURCE signatures.
-CMAKE_POLICY(SET CMP0020 NEW)	# Automatically link Qt executables to qtmain target on Windows.
-CMAKE_POLICY(SET CMP0057 NEW)	# Support new if() IN_LIST operator.
-
+# CMAKE_POLICY Section
 
 # Import of windows.h breaks min()/max()
 ADD_DEFINITIONS(-DNOMINMAX)
