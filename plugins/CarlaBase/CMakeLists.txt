@@ -1,11 +1,3 @@
-# For MacOS, use "OLD" RPATH install_name behavior
-# This can be changed to "NEW" safely if install_apple.sh.in
-# is updated to relink libcarlabase.dylib.  MacOS 10.8 uses
-# cmake 3.9.6, so this can be done at any time.
-IF(NOT CMAKE_VERSION VERSION_LESS 3.9)
-  CMAKE_POLICY(SET CMP0068 OLD) # RPATH settings on macOS do not affect install_name.
-ENDIF()
-
 # If Carla was not provided by the system, make a dummy library instead
 if(LMMS_HAVE_WEAKCARLA)
   SET(CARLA_INCLUDE_DIRS
