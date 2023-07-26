@@ -1,7 +1,7 @@
 include(GetPrerequisites)
 include(CMakeParseArguments)
 
-CMAKE_POLICY(SET CMP0057 NEW) # Support new if() IN_LIST operator.
+cmake_minimum_required(${CMAKE_MINIMUM_REQUIRED_VERSION})
 
 function(make_absolute var)
 	get_filename_component(abs "${${var}}" ABSOLUTE BASE_DIR "${CMAKE_INSTALL_PREFIX}")
