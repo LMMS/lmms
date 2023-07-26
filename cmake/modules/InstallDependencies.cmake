@@ -1,9 +1,6 @@
 include(GetPrerequisites)
 include(CMakeParseArguments)
 
-CMAKE_POLICY(SET CMP0011 NEW)
-CMAKE_POLICY(SET CMP0057 NEW)
-
 function(make_absolute var)
 	get_filename_component(abs "${${var}}" ABSOLUTE BASE_DIR "${CMAKE_INSTALL_PREFIX}")
 	set(${var} ${abs} PARENT_SCOPE)
