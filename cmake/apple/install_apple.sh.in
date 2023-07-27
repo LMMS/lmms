@@ -36,7 +36,6 @@ find . -type f -print0 | xargs -0 chmod u+w
 
 lmmsbin="MacOS/@CMAKE_PROJECT_NAME@"
 zynlib="lib/lmms/libzynaddsubfx.so"
-zynfmk="Frameworks/libZynAddSubFxCore.dylib"
 zynbin="MacOS/RemoteZynAddSubFx"
 
 # Move lmms binary
@@ -44,15 +43,6 @@ mv "$APP/Contents/bin/@CMAKE_PROJECT_NAME@" "$APP/Contents/$lmmsbin"
 
 # Fix zyn linking
 mv "$APP/Contents/lib/lmms/RemoteZynAddSubFx" "$APP/Contents/$zynbin"
-mv "$APP/Contents/lib/lmms/libZynAddSubFxCore.dylib" "$APP/Contents/$zynfmk"
-
-install_name_tool -change @rpath/libZynAddSubFxCore.dylib \
-   @loader_path/../$zynfmk \
-  "$APP/Contents/$zynbin"
-
-install_name_tool -change @rpath/libZynAddSubFxCore.dylib \
-   @loader_path/../../$zynfmk \
-  "$APP/Contents/$zynlib"
   
 # Replace @rpath with @loader_path for Carla
 # See also plugins/CarlaBase/CMakeLists.txt
@@ -67,7 +57,6 @@ install_name_tool -change @rpath/libcarlabase.dylib \
 
 # Link lmms binary
 _executables="${_executables} -executable=$APP/Contents/$zynbin"
-_executables="${_executables} -executable=$APP/Contents/$zynfmk"
 
 # Build a list of shared objects in target/lib/lmms
 for file in "$APP/Contents/lib/lmms/"*.so; do
