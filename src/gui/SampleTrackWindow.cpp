@@ -74,7 +74,6 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 
 	// setup line edit for changing sample track name
 	m_nameLineEdit = new QLineEdit;
-	m_nameLineEdit->setFont(pointSize<9>(m_nameLineEdit->font()));
 	connect(m_nameLineEdit, SIGNAL(textChanged(const QString&)),
 				this, SLOT(textChanged(const QString&)));
 
