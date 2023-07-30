@@ -616,6 +616,8 @@ else()
 	set(NOOP_COMMAND "${CMAKE_COMMAND}" "-E" "echo")
 endif()
 if(STRIP)
+	# TODO CMake 3.19: Now that CONFIG generator expressions support testing for
+	# multiple configurations, combine the OR into a single CONFIG expression.
 	set(STRIP_COMMAND "$<IF:$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>,${NOOP_COMMAND},${STRIP}>")
 else()
 	set(STRIP_COMMAND "${NOOP_COMMAND}")
