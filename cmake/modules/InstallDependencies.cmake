@@ -2,7 +2,7 @@ include(GetPrerequisites)
 include(CMakeParseArguments)
 
 # Project's cmake_minimum_required doesn't always propagate
-cmake_policy(SET CMP0057 NEW)
+cmake_policy(SET CMP0057 NEW) # Support new if() IN_LIST operator.
 
 function(make_absolute var)
 	get_filename_component(abs "${${var}}" ABSOLUTE BASE_DIR "${CMAKE_INSTALL_PREFIX}")
