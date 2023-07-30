@@ -97,4 +97,8 @@ done
 
 # Cleanup
 rm -rf "$APP/Contents/bin"
+
+# Codesign
+codesign --force --deep --sign - "$APP"
+
 echo -e "\nFinished.\n\n"
