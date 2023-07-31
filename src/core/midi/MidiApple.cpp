@@ -403,7 +403,7 @@ void MidiApple::midiInClose( MIDIEndpointRef reference )
 
 
 
-char *getName( MIDIObjectRef &object )
+char *getName( const MIDIObjectRef &object )
 {
 	// Returns the name of a given MIDIObjectRef as char *
 	CFStringRef name = nullptr;
