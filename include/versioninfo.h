@@ -1,5 +1,7 @@
-#ifdef __GNUC__
+#if defined(__GNUC__)
 #define GCC_VERSION "GCC " __VERSION__
+#elif defined(__clang__)
+#define GCC_VERSION "Clang " __clang_version__
 #else
 #define GCC_VERSION "unknown compiler"
 #endif
@@ -10,6 +12,22 @@
 
 #ifdef LMMS_HOST_X86_64
 #define MACHINE "x86_64"
+#endif
+
+#ifdef LMMS_HOST_ARM32
+#define MACHINE "arm"
+#endif
+
+#ifdef LMMS_HOST_ARM64
+#define MACHINE "arm64"
+#endif
+
+#ifdef LMMS_HOST_PPC32
+#define MACHINE "ppc"
+#endif
+
+#ifdef LMMS_HOST_PPC64
+#define MACHINE "ppc64"
 #endif
 
 #ifndef MACHINE
@@ -38,4 +56,8 @@
 
 #ifdef LMMS_BUILD_HAIKU
 #define PLATFORM "Haiku"
+#endif
+
+#ifndef PLATFORM
+#define PLATFORM "unknown platform"
 #endif
