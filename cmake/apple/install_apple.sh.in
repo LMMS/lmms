@@ -6,9 +6,6 @@
 
 set -e
 
-# Test failure
-exit 1
-
 # Place to create ".app" bundle
 APP="@CMAKE_BINARY_DIR@/@PROJECT_NAME_UCASE@.app"
 
