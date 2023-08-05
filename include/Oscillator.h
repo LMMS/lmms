@@ -240,7 +240,7 @@ private:
 	const float & m_freq;
 	const float & m_detuning_div_samplerate;
 	const float & m_volume;
-	const float & m_ext_phaseOffset;
+	float m_ext_phaseOffset;
 	Oscillator * m_subOsc;
 	float m_phaseOffset;
 	float m_phase;

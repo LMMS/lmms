@@ -37,6 +37,7 @@
 #include "Oscillator.h"
 #include "PixmapButton.h"
 #include "SampleBuffer.h"
+#include "lmms_math.h"
 
 #include "embed.h"
 #include "plugin_export.h"
@@ -75,15 +76,17 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 			tr( "Osc %1 panning" ).arg( _idx+1 ) ),
 	m_coarseModel( -_idx*KeysPerOctave,
 			-2 * KeysPerOctave, 2 * KeysPerOctave, 1.0f, this,
-			tr( "Osc %1 coarse detuning" ).arg( _idx+1 ) ),
+			tr( "Osc %1 coarse detuning" ).arg( _idx + 1 ) ),
 	m_fineLeftModel( 0.0f, -100.0f, 100.0f, 1.0f, this,
-			tr( "Osc %1 fine detuning left" ).arg( _idx+1 ) ),
+			tr( "Osc %1 fine detuning left" ).arg( _idx + 1 ) ),
 	m_fineRightModel( 0.0f, -100.0f, 100.0f, 1.0f, this,
 			tr( "Osc %1 fine detuning right" ).arg( _idx + 1 ) ),
 	m_phaseOffsetModel( 0.0f, 0.0f, 360.0f, 1.0f, this,
-			tr( "Osc %1 phase-offset" ).arg( _idx+1 ) ),
+			tr( "Osc %1 phase-offset" ).arg( _idx + 1 ) ),
 	m_stereoPhaseDetuningModel( 0.0f, 0.0f, 360.0f, 1.0f, this,
-			tr( "Osc %1 stereo phase-detuning" ).arg( _idx+1 ) ),
+			tr( "Osc %1 stereo phase-detuning" ).arg( _idx + 1 ) ),
+	m_phaseRandModel( 0.0f, 0.0f, 100.0f, 1.0f, this,
+			tr( "Osc %1 phase randomization" ).arg( _idx + 1 ) ),
 	m_waveShapeModel( Oscillator::SineWave, 0,
 			Oscillator::NumWaveShapes-1, this,
 			tr( "Osc %1 wave shape" ).arg( _idx+1 ) ),
@@ -125,6 +128,8 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 			this, SLOT( updatePhaseOffsetRight() ), Qt::DirectConnection );
 	connect( &m_stereoPhaseDetuningModel, SIGNAL( dataChanged() ),
 			this, SLOT( updatePhaseOffsetLeft() ), Qt::DirectConnection );
+	connect( &m_phaseRandModel, SIGNAL( dataChanged() ),
+			this, SLOT( updatePhaseRand() ), Qt::DirectConnection );
 	connect ( &m_useWaveTableModel, SIGNAL(dataChanged()),
 			this, SLOT( updateUseWaveTable()));
 
@@ -222,6 +227,15 @@ void OscillatorObject::updateUseWaveTable()
 
 
 
+
+void OscillatorObject::updatePhaseRand()
+{
+	m_phaseRand = m_phaseRandModel.value() / 100;
+}
+
+
+
+
 TripleOscillator::TripleOscillator( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &tripleoscillator_plugin_descriptor )
 {
@@ -255,6 +269,8 @@ void TripleOscillator::saveSettings( QDomDocument & _doc, QDomElement & _this )
 							"phoffset" + is );
 		m_osc[i]->m_stereoPhaseDetuningModel.saveSettings( _doc, _this,
 							"stphdetun" + is );
+		m_osc[i]->m_phaseRandModel.saveSettings( _doc, _this,
+							"phrand" + is );
 		m_osc[i]->m_waveShapeModel.saveSettings( _doc, _this,
 							"wavetype" + is );
 		m_osc[i]->m_modulationAlgoModel.saveSettings( _doc, _this,
@@ -283,6 +299,8 @@ void TripleOscillator::loadSettings( const QDomElement & _this )
 							"phoffset" + is );
 		m_osc[i]->m_stereoPhaseDetuningModel.loadSettings( _this,
 							"stphdetun" + is );
+		m_osc[i]->m_phaseRandModel.loadSettings( _this,
+							"phrand" + is );
 		m_osc[i]->m_waveShapeModel.loadSettings( _this, "wavetype" +
 									is );
 		m_osc[i]->m_modulationAlgoModel.loadSettings( _this,
@@ -316,6 +334,9 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 		for( int i = NUM_OF_OSCILLATORS - 1; i >= 0; --i )
 		{
 
+			float phaseRandL = fastRandf( 1 ) * m_osc[i]->m_phaseRand;
+			float phaseRandR = fastRandf( 1 ) * m_osc[i]->m_phaseRand;
+
 			// the last oscs needs no sub-oscs...
 			if( i == NUM_OF_OSCILLATORS - 1 )
 			{
@@ -324,7 +345,7 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 						&m_osc[i]->m_modulationAlgoModel,
 						_n->frequency(),
 						m_osc[i]->m_detuningLeft,
-						m_osc[i]->m_phaseOffsetLeft,
+						m_osc[i]->m_phaseOffsetLeft	+ phaseRandL,
 						m_osc[i]->m_volumeLeft );
 				oscs_l[i]->setUseWaveTable(m_osc[i]->m_useWaveTable);
 				oscs_r[i] = new Oscillator(
@@ -332,7 +353,7 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 						&m_osc[i]->m_modulationAlgoModel,
 						_n->frequency(),
 						m_osc[i]->m_detuningRight,
-						m_osc[i]->m_phaseOffsetRight,
+						m_osc[i]->m_phaseOffsetRight + phaseRandR,
 						m_osc[i]->m_volumeRight );
 				oscs_r[i]->setUseWaveTable(m_osc[i]->m_useWaveTable);
 			}
@@ -343,7 +364,7 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 						&m_osc[i]->m_modulationAlgoModel,
 						_n->frequency(),
 						m_osc[i]->m_detuningLeft,
-						m_osc[i]->m_phaseOffsetLeft,
+						m_osc[i]->m_phaseOffsetLeft	+ phaseRandL,
 						m_osc[i]->m_volumeLeft,
 						oscs_l[i + 1] );
 				oscs_l[i]->setUseWaveTable(m_osc[i]->m_useWaveTable);
@@ -352,7 +373,7 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 						&m_osc[i]->m_modulationAlgoModel,
 						_n->frequency(),
 						m_osc[i]->m_detuningRight,
-						m_osc[i]->m_phaseOffsetRight,
+						m_osc[i]->m_phaseOffsetRight + phaseRandR,
 						m_osc[i]->m_volumeRight,
 						oscs_r[i + 1] );
 				oscs_r[i]->setUseWaveTable(m_osc[i]->m_useWaveTable);
@@ -360,7 +381,6 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 
 			oscs_l[i]->setUserWave( m_osc[i]->m_sampleBuffer );
 			oscs_r[i]->setUserWave( m_osc[i]->m_sampleBuffer );
-
 		}
 
 		_n->m_pluginData = new oscPtr;
@@ -586,6 +606,13 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 						  arg( i + 1 ),
 							" " + tr( "cents" ) );
 
+		// setup phase randomization knob
+		Knob * phrk = new TripleOscKnob( this );
+		phrk->move( 165, knob_y );
+		phrk->setHintText( tr( "Osc %1 phase randomization:" ).
+						  arg( i + 1 ),
+							" " + tr( "%" ) );
+
 		// setup phase-offset-knob
 		Knob * pok = new TripleOscKnob( this );
 		pok->move( 188, knob_y );
@@ -599,6 +626,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 		spdk->setHintText( tr("Osc %1 stereo phase-detuning:" ).
 						arg( i + 1 ),
 							" " + tr( "degrees" ) );
+
 
 		int btn_y = 96 + i * osc_h;
 
@@ -695,7 +723,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 
 
 		m_oscKnobs[i] = OscillatorKnobs( vk, pk, ck, flk, frk, pok,
-							spdk, uwb, wsbg, uwt );
+							spdk, phrk, uwb, wsbg, uwt );
 	}
 }
 
@@ -724,6 +752,8 @@ void TripleOscillatorView::modelChanged()
 					&t->m_osc[i]->m_phaseOffsetModel );
 		m_oscKnobs[i].m_stereoPhaseDetuningKnob->setModel(
 				&t->m_osc[i]->m_stereoPhaseDetuningModel );
+		m_oscKnobs[i].m_phaseRandKnob->setModel(
+					&t->m_osc[i]->m_phaseRandModel );
 		m_oscKnobs[i].m_waveShapeBtnGrp->setModel(
 					&t->m_osc[i]->m_waveShapeModel );
 		m_oscKnobs[i].m_multiBandWaveTableButton->setModel(
