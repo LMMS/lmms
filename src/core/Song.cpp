@@ -40,6 +40,8 @@
 #include "EnvelopeAndLfoParameters.h"
 #include "Mixer.h"
 #include "MixerView.h"
+#include "GrooveFactory.h"
+#include "GrooveView.h"
 #include "GuiApplication.h"
 #include "ExportFilter.h"
 #include "InstrumentTrack.h"
@@ -70,6 +72,7 @@ Song::Song() :
 	m_globalAutomationTrack( dynamic_cast<AutomationTrack *>(
 				Track::create( Track::HiddenAutomationTrack,
 								this ) ) ),
+	m_globalGroove(GrooveFactory::create("none")),
 	m_tempoModel( DefaultTempo, MinTempo, MaxTempo, this, tr( "Tempo" ) ),
 	m_timeSigModel( this ),
 	m_oldTicksPerBar( DefaultTicksPerBar ),
@@ -130,6 +133,7 @@ Song::~Song()
 {
 	m_playing = false;
 	delete m_globalAutomationTrack;
+	delete m_globalGroove;
 }
 
 
@@ -605,8 +609,6 @@ void Song::setPlayPos( tick_t ticks, PlayModes playMode )
 		emit updateSampleTracks();
 	}
 }
-
-
 
 
 void Song::togglePause()
@@ -1105,6 +1107,18 @@ void Song::loadProject( const QString & fileName )
 		}
 	}
 
+	node = dataFile.content().firstChildElement( "groove" );
+	if( !node.isNull() )
+	{
+		QDomElement ge = dataFile.content().firstChildElement( "groove" );
+		m_globalGroove = GrooveFactory::create(ge.attribute("type"));
+		m_globalGroove->restoreState( ge.firstChildElement(ge.attribute("type")) );
+	}
+	else
+	{
+		m_globalGroove = GrooveFactory::create("none");
+	}
+
 	node = dataFile.content().firstChild();
 
 	QDomNodeList tclist=dataFile.content().elementsByTagName("trackcontainer");
@@ -1244,6 +1258,12 @@ bool Song::saveProjectFile(const QString & filename, bool withResources)
 	saveState( dataFile, dataFile.content() );
 
 	m_globalAutomationTrack->saveState( dataFile, dataFile.content() );
+
+	QDomElement ge = dataFile.createElement( "groove" );
+	ge.setAttribute("type", m_globalGroove->nodeName());
+	dataFile.content().appendChild( ge );
+	m_globalGroove->saveState( dataFile, ge );
+
 	Engine::mixer()->saveState( dataFile, dataFile.content() );
 	if( getGUI() != nullptr )
 	{
@@ -1264,6 +1284,10 @@ bool Song::saveProjectFile(const QString & filename, bool withResources)
 	return dataFile.writeFile(filename, withResources);
 }
 
+void Song::setGlobalGroove(Groove * groove)
+{
+	m_globalGroove = groove;
+}
 
 
 // Save the current song

@@ -36,11 +36,13 @@
 #include "lmms_constants.h"
 #include "MeterModel.h"
 #include "VstSyncController.h"
+#include "Groove.h"
 
 namespace lmms
 {
 
 class AutomationTrack;
+class Groove;
 class Keymap;
 class MidiClip;
 class Scale;
@@ -289,6 +291,11 @@ public:
 		return m_globalAutomationTrack;
 	}
 
+	Groove* globalGroove()
+	{
+		return m_globalGroove;
+	}
+
 	//TODO: Add Q_DECL_OVERRIDE when Qt4 is dropped
 	AutomatedValueMap automatedValuesAt(TimePos time, int clipNum = -1) const override;
 
@@ -299,6 +306,7 @@ public:
 	bool guiSaveProject();
 	bool guiSaveProjectAs(const QString & filename);
 	bool saveProjectFile(const QString & filename, bool withResources = false);
+	void setGlobalGroove(Groove* groove);
 
 	const QString & projectFileName() const
 	{
@@ -380,6 +388,7 @@ public slots:
 	void playMidiClip( const lmms::MidiClip * midiClipToPlay, bool loop = true );
 	void togglePause();
 	void stop();
+	void setPlayPos( tick_t ticks, PlayModes playMode );
 
 	void startExport();
 	void stopExport();
@@ -431,8 +440,6 @@ private:
 			m_playPos[m_playMode].currentFrame();
 	}
 
-	void setPlayPos( tick_t ticks, PlayModes playMode );
-
 	void saveControllerStates( QDomDocument & doc, QDomElement & element );
 	void restoreControllerStates( const QDomElement & element );
 
@@ -451,6 +458,7 @@ private:
 	void setProjectFileName(QString const & projectFileName);
 
 	AutomationTrack * m_globalAutomationTrack;
+	Groove* m_globalGroove;
 
 	IntModel m_tempoModel;
 	MeterModel m_timeSigModel;

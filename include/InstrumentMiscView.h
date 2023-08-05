@@ -51,10 +51,13 @@ public:
 	GroupBox *pitchGroupBox() {return m_pitchGroupBox;}
 	GroupBox *microtunerGroupBox() {return m_microtunerGroupBox;}
 
+
 	ComboBox *scaleCombo() {return m_scaleCombo;}
 	ComboBox *keymapCombo() {return m_keymapCombo;}
 
 	LedCheckBox *rangeImportCheckbox() {return m_rangeImportCheckbox;}
+
+	GroupBox *grooveGroupBox() {return m_grooveGroupBox;}
 
 private:
 	GroupBox *m_pitchGroupBox;
@@ -64,6 +67,8 @@ private:
 	ComboBox *m_keymapCombo;
 
 	LedCheckBox *m_rangeImportCheckbox;
+
+	GroupBox * m_grooveGroupBox;
 };
 
 

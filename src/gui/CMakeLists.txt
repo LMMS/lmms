@@ -100,6 +100,7 @@ SET(LMMS_SRCS
 	gui/widgets/CustomTextKnob.cpp
 	gui/widgets/Fader.cpp
 	gui/widgets/Graph.cpp
+	gui/widgets/GrooveView.cpp
 	gui/widgets/GroupBox.cpp
 	gui/widgets/Knob.cpp
 	gui/widgets/LcdFloatSpinBox.cpp
