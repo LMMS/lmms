@@ -310,6 +310,14 @@ void Lv2InsView::modelChanged()
 }
 
 
+
+
+QSize Lv2InsView::sizeHint() const
+{
+	return Lv2ViewBase::uiWidgetSize();
+}
+
+
 } // namespace gui
 
 extern "C"

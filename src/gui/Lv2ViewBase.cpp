@@ -1,7 +1,7 @@
 /*
  * Lv2ViewBase.cpp - base class for Lv2 plugin views
  *
- * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2024 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -29,9 +29,15 @@
 #include <QGridLayout>
 #include <QPushButton>
 #include <QHBoxLayout>
+#include <QTimer>
 #include <QLabel>
 #include <lilv/lilv.h>
+#include <lv2/atom/atom.h>
+#include <lv2/atom/forge.h>
+#include <lv2/data-access/data-access.h>
+#include <lv2/instance-access/instance-access.h>
 #include <lv2/port-props/port-props.h>
+#include <lv2/ui/ui.h>
 
 #include "AudioEngine.h"
 #include "Controls.h"
@@ -52,79 +58,405 @@ namespace lmms::gui
 {
 
 
-Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* proc, int colNum) :
-	LinkedModelGroupView (parent, proc, colNum)
+class Timer : public QTimer
 {
-	class SetupTheWidget : public Lv2Ports::ConstVisitor
+public:
+	explicit Timer(Lv2ViewProc* viewProc)
+	: QTimer(viewProc)
+	, m_viewProc(viewProc)
+	{}
+	
+	void timerEvent(QTimerEvent*) override
 	{
-	public:
-		QWidget* m_parent; // input
-		const LilvNode* m_commentUri; // input
-		Control* m_control = nullptr; // output
-		void visit(const Lv2Ports::Control& port) override
+		if(m_viewProc) { m_viewProc->update(); }
+	}
+
+private:
+	Lv2ViewProc* m_viewProc = nullptr;
+};
+
+
+
+
+void Lv2ViewProc::uiPortEvent(
+	uint32_t port_index,
+	uint32_t buffer_size,
+	uint32_t protocol,
+	const void* buffer)
+{
+	if (m_uiInstance)
+	{
+#ifdef LMMS_HAVE_SUIL
+		suil_instance_port_event(m_uiInstance, port_index, buffer_size, protocol, buffer);
+#endif
+	}
+	else
+	{
+		// LMMS UI is updated automatically
+	}
+}
+
+
+
+
+// TODO: call me
+// TODO: not RT-safe!
+#if 0
+void Lv2ViewProc::initUi()
+{
+	// Set initial control port values
+	int i = 0;
+	(proc())->foreach_port([&i,this](Lv2Ports::PortBase* port){
+		auto ctrl = Lv2Ports::dcast<Lv2Ports::Control>(port);
+		if(ctrl)
 		{
-			if (port.m_flow == Lv2Ports::Flow::Input)
+			uiPortEvent(i, sizeof(float), 0, &ctrl->m_val);
+		}
+	});
+}
+#endif
+
+
+
+
+// write UI event to ui_events (to be read by plugin)
+void Lv2ViewProc::writeToPlugin(uint32_t port_index,
+	uint32_t buffer_size,
+	uint32_t protocol,
+	const void* buffer)
+{
+	Lv2Manager* mgr = Engine::getLv2Manager();
+	
+	if (protocol != 0 && protocol != m_atomEventTransfer)
+	{
+		qWarning(
+			"UI write with unsupported protocol %u (%s), should be %u (%s) or 0",
+			protocol,
+			mgr->uridMap().unmap(protocol),
+			m_atomEventTransfer,
+			mgr->uridMap().unmap(m_atomEventTransfer)
+			);
+		return;
+	}
+
+	if (port_index >= proc()->portNum())
+	{
+		qWarning() << "UI write to out of range port index" << port_index;
+		return;
+	}
+	
+	if (lv2Dump && protocol == m_atomEventTransfer)
+	{
+		const LV2_Atom* atom = (const LV2_Atom*)buffer;
+		mgr->uridMap().dump();
+		char* str  = sratom_to_turtle(mgr->sratom,
+			mgr->uridMap().unmapFeature(),
+			"lmms:",
+			nullptr, nullptr,
+			atom->type, atom->size, LV2_ATOM_BODY_CONST(atom));
+		qDebug("\n## UI => Plugin (%u bytes) ##\n%s\n", atom->size, str);
+		free(str);
+	}
+	
+	char buf[Lv2Proc::uiEventsBufsize()];
+	Lv2UiControlChange* ev = (Lv2UiControlChange*)buf;
+	ev->index = port_index;
+	ev->protocol = protocol;
+	ev->size = buffer_size;
+	memcpy(ev + 1, buffer, buffer_size);
+	m_uiEvents.write(buf, sizeof(Lv2UiControlChange) + buffer_size);
+}
+
+
+
+
+bool Lv2ViewProc::calculateIsResizable() const
+{
+	if (!m_ui) { return false; }
+	
+	Lv2Manager* mgr = Engine::getLv2Manager();
+	
+	const LilvNode* s = lilv_ui_get_uri(m_ui);
+	AutoLilvNode p = mgr->uri(LV2_CORE__optionalFeature);
+	AutoLilvNode fs = mgr->uri(LV2_UI__fixedSize);
+	AutoLilvNode nrs = mgr->uri(LV2_UI__noUserResize);
+	
+	AutoLilvNodes fs_matches  = mgr->findNodes(s, p.get(), fs.get());
+	AutoLilvNodes nrs_matches = mgr->findNodes(s, p.get(), nrs.get());
+	
+	return !fs_matches && !nrs_matches;
+}
+
+
+
+
+std::tuple<const LilvUI*, const LilvNode*> Lv2ViewProc::selectPluginUi(LilvUIs *uis) const
+{
+#ifdef LMMS_HAVE_SUIL
+	{
+		// Try to find an embeddable UI
+		AutoLilvNode hostUi = uri(hostUiTypeUri());
+		LILV_FOREACH (uis, u, uis)
+		{
+			const LilvUI* pluginUi = lilv_uis_get(uis, u);
+			const LilvNode* pluginUiType = nullptr;
+			const bool supported = lilv_ui_is_supported(pluginUi, suil_ui_supported, hostUi.get(), &pluginUiType);
+			if (supported)
 			{
-				using PortVis = Lv2Ports::Vis;
-
-				switch (port.m_vis)
+				if (pluginUiType)
 				{
-					case PortVis::Generic:
-						m_control = new KnobControl(m_parent);
-						break;
-					case PortVis::Integer:
-					{
-						sample_rate_t sr = Engine::audioEngine()->outputSampleRate();
-						auto pMin = port.min(sr);
-						auto pMax = port.max(sr);
-						int numDigits = std::max(numDigitsAsInt(pMin), numDigitsAsInt(pMax));
-						m_control = new LcdControl(numDigits, m_parent);
-						break;
-					}
-					case PortVis::Enumeration:
-						m_control = new ComboControl(m_parent);
-						break;
-					case PortVis::Toggled:
-						m_control = new CheckControl(m_parent);
-						break;
+					qDebug() << "Found supported UI" << lilv_node_as_uri(pluginUiType);
 				}
-				m_control->setText(port.name());
-
-				AutoLilvNodes props(lilv_port_get_value(
-					port.m_plugin, port.m_port, m_commentUri));
-				LILV_FOREACH(nodes, itr, props.get())
-				{
-					const LilvNode* nod = lilv_nodes_get(props.get(), itr);
-					m_control->topWidget()->setToolTip(lilv_node_as_string(nod));
-					break;
-				}
+				return std::make_tuple(pluginUi, pluginUiType);
 			}
 		}
-	};
+	}
+#endif
+	return std::make_tuple(nullptr, nullptr);;
+}
 
-	AutoLilvNode commentUri = uri(LILV_NS_RDFS "comment");
-	proc->foreach_port(
-		[this, &commentUri](const Lv2Ports::PortBase* port)
-		{
-			if(!lilv_port_has_property(port->m_plugin, port->m_port,
-										uri(LV2_PORT_PROPS__notOnGUI).get()))
+
+
+
+Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* proc, int colNum) :
+	LinkedModelGroupView (parent, proc, colNum),
+	m_uiEvents(Lv2Proc::uiMidiBufsize() * Lv2Proc::uiNBufferCycles())
+{
+#ifdef LMMS_HAVE_SUIL
+	if(proc->wantUi())
+	{
+		std::tie(m_ui, m_uiType) = selectPluginUi(proc->getUis());
+	}
+#endif
+
+#ifdef LMMS_HAVE_SUIL
+	if(m_ui)
+	{
+		LinkedModelGroupView::hide();
+
+		Lv2Manager* mgr = Engine::getLv2Manager();
+		m_atomEventTransfer = mgr->uridMap().map(LV2_ATOM__eventTransfer);
+		m_uiHost = suil_host_new(
+			[](void* const h, uint32_t port, uint32_t bs, uint32_t pro, const void* buf)
 			{
-				SetupTheWidget setup;
-				setup.m_parent = this;
-				setup.m_commentUri = commentUri.get();
-				port->accept(setup);
+				static_cast<Lv2ViewProc*>(h)->writeToPlugin(port, bs, pro, buf);
+			},
+			[](void* const c, const char* symbol) -> uint32_t
+			{
+				std::size_t portId = static_cast<Lv2ViewProc*>(c)->proc()->getIdOfPort(symbol);
+				return (portId == (std::size_t)-1 ? LV2UI_INVALID_PORT_INDEX : portId);
+			},
+			nullptr, nullptr);
+		
+		Q_ASSERT(m_uiHost);
 
-				if (setup.m_control)
+		const LV2_Feature parentFeature = {LV2_UI__parent, parent};
+		const LV2_Feature instanceFeature = {
+			LV2_INSTANCE_ACCESS_URI,
+			lilv_instance_get_handle(proc->getInstanceForInstanceFeatureOnly())};
+		const LV2_Feature  dataFeature = {LV2_DATA_ACCESS_URI,
+											proc->extdataFeature()};
+
+		const LV2_Feature* uiFeatures[] = {
+			proc->mapFeature(),
+			proc->unmapFeature(),
+			&instanceFeature,
+			&dataFeature,
+			&parentFeature,
+			proc->optionsFeature(),
+			/*(LV2_Feature*)features[LV2_UI__requestValue],*/ // TODO
+			nullptr};
+		
+		const char* bundleUri  = lilv_node_as_uri(lilv_ui_get_bundle_uri(m_ui));
+		const char* binaryUri  = lilv_node_as_uri(lilv_ui_get_binary_uri(m_ui));
+		char* bundlePath = lilv_file_uri_parse(bundleUri, NULL);
+		char* binaryPath = lilv_file_uri_parse(binaryUri, NULL);
+		
+		m_uiInstance =
+			suil_instance_new(m_uiHost,
+				this,
+				"http://lv2plug.in/ns/extensions/ui#Qt5UI",
+				proc->pluginUri(),
+				lilv_node_as_uri(lilv_ui_get_uri(m_ui)),
+				lilv_node_as_uri(m_uiType),
+				bundlePath,
+				binaryPath,
+				uiFeatures);
+		if (!m_uiInstance)
+		{
+			qWarning() << "Failed to load UI";
+		}
+		else
+		{
+			qDebug() << "Created new UI" << lilv_node_as_uri(lilv_ui_get_uri(m_ui)) << lilv_node_as_uri(m_uiType);
+		}
+	
+		lilv_free(binaryPath);
+		lilv_free(bundlePath);
+
+		// connect UI ringbuffers
+		// about the order: Lv2Proc can reject sending plugin events as long as
+		//                  its UI reader is not connected
+		proc->connectToPluginEvents(m_pluginEventsReader);
+		proc->connectUiEventsReaderTo(m_uiEvents);
+
+		m_uiInstanceWidget = static_cast<QWidget*>(suil_instance_get_widget(m_uiInstance));
+		m_uiInstanceWidget->setParent(parent);
+		
+		m_isResizable = calculateIsResizable();
+		qDebug() << "RESIZABLE? " << m_isResizable;
+
+		m_timer = new Timer(this);
+		m_timer->start(1000 / lv2UiRefreshRate());
+	}
+	else
+#endif
+	{
+		class SetupTheWidget : public Lv2Ports::ConstVisitor
+		{
+		public:
+			QWidget* m_parent; // input
+			const LilvNode* m_commentUri; // input
+			Control* m_control = nullptr; // output
+			void visit(const Lv2Ports::Control& port) override
+			{
+				if (port.m_flow == Lv2Ports::Flow::Input)
 				{
-					addControl(setup.m_control,
-						lilv_node_as_string(lilv_port_get_symbol(
-							port->m_plugin, port->m_port)),
-						port->name().toUtf8().data(),
-						false);
+					using PortVis = Lv2Ports::Vis;
+	
+					switch (port.m_vis)
+					{
+						case PortVis::Generic:
+							m_control = new KnobControl(m_parent);
+							break;
+						case PortVis::Integer:
+						{
+							sample_rate_t sr = Engine::audioEngine()->outputSampleRate();
+							auto pMin = port.min(sr);
+							auto pMax = port.max(sr);
+							int numDigits = std::max(numDigitsAsInt(pMin), numDigitsAsInt(pMax));
+							m_control = new LcdControl(numDigits, m_parent);
+							break;
+						}
+						case PortVis::Enumeration:
+							m_control = new ComboControl(m_parent);
+							break;
+						case PortVis::Toggled:
+							m_control = new CheckControl(m_parent);
+							break;
+					}
+					m_control->setText(port.name());
+	
+					AutoLilvNodes props(lilv_port_get_value(
+						port.m_plugin, port.m_port, m_commentUri));
+					LILV_FOREACH(nodes, itr, props.get())
+					{
+						const LilvNode* nod = lilv_nodes_get(props.get(), itr);
+						m_control->topWidget()->setToolTip(lilv_node_as_string(nod));
+						break;
+					}
 				}
 			}
-		});
+		};
+	
+		AutoLilvNode commentUri = uri(LILV_NS_RDFS "comment");
+		proc->foreach_port(
+			[this, &commentUri](const Lv2Ports::PortBase* port)
+			{
+				if(!lilv_port_has_property(port->m_plugin, port->m_port,
+											uri(LV2_PORT_PROPS__notOnGUI).get()))
+				{
+					SetupTheWidget setup;
+					setup.m_parent = this;
+					setup.m_commentUri = commentUri.get();
+					port->accept(setup);
+	
+					if (setup.m_control)
+					{
+						addControl(setup.m_control,
+							lilv_node_as_string(lilv_port_get_symbol(
+								port->m_plugin, port->m_port)),
+							port->name().toUtf8().data(),
+							false);
+					}
+				}
+			}); // proc->foreach_port
+	} // ! m_ui
 }
+
+
+
+
+Lv2ViewProc::~Lv2ViewProc()
+{
+	if(m_timer) { m_timer->stop(); }
+}
+
+
+
+
+QSize Lv2ViewProc::uiWidgetSize() const
+{
+#ifdef LMMS_HAVE_SUIL
+	return m_uiInstanceWidget ? m_uiInstanceWidget->size() : QSize();
+#else
+	return QSize();
+#endif
+}
+
+
+
+
+void Lv2ViewProc::update()
+{
+	if (!m_pluginEventsReader) { return; }
+
+	// Emit UI events
+	Lv2UiControlChange ev;
+	const size_t space = m_pluginEventsReader->read_space();
+	
+	for (size_t i = 0; i + sizeof(ev) < space; i += sizeof(ev) + ev.size)
+	{
+		// Read event header to get the size
+		if(space - i < sizeof(ev)) { break; }
+		m_pluginEventsReader->read(sizeof(ev)).copy((char*)&ev, sizeof(ev));
+		
+		// Resize read buffer if necessary
+		m_uiEventBuf.resize(ev.size);
+		void* const buf = m_uiEventBuf.data();
+		
+		// Read event body
+		if(space - i < ev.size)
+		{
+			qWarning() << "error: Error reading from UI ring buffer";
+			break;
+		}
+		m_pluginEventsReader->read(ev.size).copy((char*)buf, ev.size);
+		
+		if (lv2Dump && ev.protocol == m_atomEventTransfer)
+		{
+			Lv2Manager* mgr = Engine::getLv2Manager();
+			// Dump event in Turtle to the console
+			LV2_Atom* atom = (LV2_Atom*)buf;
+			char* str = sratom_to_turtle(mgr->ui_sratom,
+									mgr->uridMap().unmapFeature(),
+									"lmms:",
+									nullptr, nullptr,
+									atom->type, atom->size, LV2_ATOM_BODY(atom));
+			qDebug("\n## Plugin => UI (%u bytes) ##\n%s\n", atom->size, str);
+			free(str);
+		}
+		
+		uiPortEvent(ev.index, ev.size, ev.protocol, buf);
+
+		if (lv2Dump && ev.protocol == 0)
+		{
+			qDebug() << proc()->portname(ev.index).toLocal8Bit().data() << " = " << *(float*)buf;
+		}
+
+	}
+}
+
 
 
 
@@ -276,7 +608,8 @@ HelpWindowEventFilter::HelpWindowEventFilter(Lv2ViewBase* viewBase) :
 
 bool HelpWindowEventFilter::eventFilter(QObject* , QEvent* event)
 {
-	if (event->type() == QEvent::Close) {
+	if (event->type() == QEvent::Close)
+	{
 		m_viewBase->m_helpButton->setChecked(false);
 		return true;
 	}

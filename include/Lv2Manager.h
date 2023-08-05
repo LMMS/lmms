@@ -1,7 +1,7 @@
 /*
  * Lv2Manager.h - Implementation of Lv2Manager class
  *
- * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2024 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -33,6 +33,8 @@
 #include <set>
 #include <string_view>
 #include <lilv/lilv.h>
+#include "serd/serd.h"
+#include "sratom/sratom.h"
 
 #include "Lv2Basics.h"
 #include "Lv2UridCache.h"
@@ -139,6 +141,10 @@ public:
 	{
 		return pluginBlacklistBuffersizeLessThan32;
 	}
+
+	SerdEnv* env;
+	Sratom* sratom; //!< Atom serialiser
+	Sratom* ui_sratom; //!< Atom serialiser for UI thread
 
 private:
 	// general data

@@ -81,4 +81,12 @@ void Lv2FxControlDialog::hideEvent(QHideEvent *event)
 }
 
 
+
+
+QSize Lv2FxControlDialog::sizeHint() const
+{
+	return Lv2ViewBase::uiWidgetSize();
+}
+
+
 } // namespace lmms::gui

@@ -1,7 +1,7 @@
 /*
  * Lv2Basics.h - basic Lv2 utils
  *
- * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2024 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -69,6 +69,20 @@ QString qStringFromPortName(const LilvPlugin* plug, const LilvPort* port);
 
 //! Return port name as std::string, everything will be freed automatically
 std::string stdStringFromPortName(const LilvPlugin* plug, const LilvPort* port);
+
+//! Control change event, sent through ring buffers for UI updates
+struct Lv2UiControlChange
+{
+	uint32_t index;
+	uint32_t protocol;
+	uint32_t size;
+	// Followed immediately by size bytes of data
+};
+
+float lv2UiRefreshRate();
+float lv2UiScaleFactor();
+
+const bool lv2Dump = true;
 
 } // namespace lmms
 

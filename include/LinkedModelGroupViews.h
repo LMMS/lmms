@@ -1,7 +1,7 @@
 /*
  * LinkedModelGroupViews.h - view for groups of linkable models
  *
- * Copyright (c) 2019-2019 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
+ * Copyright (c) 2019-2024 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -82,6 +82,8 @@ protected:
 	void removeControl(const QString &key);
 
 	void removeFocusFromSearchBar();
+
+	const LinkedModelGroup* model() const { return m_model; }
 
 private:
 	class LinkedModelGroup* m_model;

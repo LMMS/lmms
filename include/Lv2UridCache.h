@@ -1,7 +1,7 @@
 /*
  * Lv2UridCache.h - Lv2UridCache definition
  *
- * Copyright (c) 2020-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2020-2024 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -51,6 +51,8 @@ public:
 		bufsz_sequenceSize,
 		midi_MidiEvent,
 		param_sampleRate,
+		ui_updateRate,
+		ui_scaleFactor,
 		// exception to alphabetic ordering - keep at the end:
 		size
 	};

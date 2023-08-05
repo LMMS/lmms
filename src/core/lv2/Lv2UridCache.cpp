@@ -1,7 +1,7 @@
 /*
  * Lv2UridCache.cpp - Lv2UridCache implementation
  *
- * Copyright (c) 2020-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2020-2024 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -30,6 +30,7 @@
 #include <lv2/buf-size/buf-size.h>
 #include <lv2/midi/midi.h>
 #include <lv2/parameters/parameters.h>
+#include <lv2/lv2plug.in/ns/extensions/ui/ui.h>
 #include <QtGlobal>
 
 #include "Lv2UridMap.h"
@@ -67,6 +68,8 @@ Lv2UridCache::Lv2UridCache(UridMap &mapper)
 	init(Id::bufsz_sequenceSize, LV2_BUF_SIZE__sequenceSize);
 	init(Id::midi_MidiEvent, LV2_MIDI__MidiEvent);
 	init(Id::param_sampleRate, LV2_PARAMETERS__sampleRate);
+	init(Id::ui_updateRate, LV2_UI__updateRate);
+	init(Id::ui_scaleFactor, LV2_UI__scaleFactor);
 
 	for(uint32_t urid : m_cache) { Q_ASSERT(urid != noIdYet); }
 }

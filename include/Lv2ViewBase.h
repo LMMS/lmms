@@ -29,11 +29,16 @@
 
 #ifdef LMMS_HAVE_LV2
 
+#include <optional>
+#ifdef LMMS_HAVE_SUIL
+	#include <suil/suil.h>
+#endif
 
 #include "LinkedModelGroupViews.h"
+#include "LocklessRingBuffer.h"
 #include "lmms_export.h"
 #include "Lv2Basics.h"
-
+#include "Lv2Features.h"
 
 class QPushButton;
 class QMdiSubWindow;
@@ -45,11 +50,13 @@ namespace lmms
 class Lv2Proc;
 class Lv2ControlBase;
 
+namespace Lv2Ports {
+	struct PortBase;
+}
+
 
 namespace gui
 {
-
-class LedCheckBox;
 
 //! View for one processor, Lv2ViewBase contains 2 of those for mono plugins
 class Lv2ViewProc : public LinkedModelGroupView
@@ -57,10 +64,44 @@ class Lv2ViewProc : public LinkedModelGroupView
 public:
 	//! @param colNum numbers of columns for the controls
 	Lv2ViewProc(QWidget *parent, Lv2Proc *proc, int colNum);
-	~Lv2ViewProc() override = default;
+	~Lv2ViewProc() override;
+
+	QSize uiWidgetSize() const;
+	bool isResizable() const { return true; /*m_isResizable;*/ /* TODO: temporary fix, see Discord, asked H-S */ }
+	void update();
 
 private:
+	Lv2Proc* proc() { return (Lv2Proc*)model(); }
+	const Lv2Proc* proc() const { return (const Lv2Proc*)model(); }
+
+	static const char* hostUiTypeUri() { return "http://lv2plug.in/ns/extensions/ui#Qt5UI"; }
+	bool calculateIsResizable() const;
+	
+	void initUi();
+	void writeToPlugin(uint32_t port_index,
+		uint32_t buffer_size, uint32_t protocol, const void* buffer);
+	void uiPortEvent(uint32_t port_index, uint32_t buffer_size, uint32_t protocol,
+		const void* buffer);
+	std::tuple<const LilvUI*, const LilvNode*> selectPluginUi(LilvUIs* uis) const;
+
+	Lv2Features m_uiFeatures;
+	
+	LV2_URID m_atomEventTransfer;
 	static AutoLilvNode uri(const char *uriStr);
+	
+	LocklessRingBuffer<char> m_uiEvents;
+	std::optional<LocklessRingBufferReader<char>> m_pluginEventsReader;
+	std::vector<char> m_uiEventBuf;
+	class Timer* m_timer = nullptr;
+	
+	const LilvUI* m_ui = nullptr;
+	const LilvNode* m_uiType;
+	bool m_isResizable = false;
+#ifdef LMMS_HAVE_SUIL
+	SuilHost*     m_uiHost;     ///< Plugin UI host support
+	SuilInstance* m_uiInstance; ///< Plugin UI instance (shared library)
+	QWidget*      m_uiInstanceWidget = nullptr;
+#endif
 };
 
 
@@ -100,6 +141,9 @@ protected:
 	// to be called by child virtuals
 	//! Reconnect models if model changed
 	void modelChanged(Lv2ControlBase* ctrlBase);
+	
+	QSize uiWidgetSize() const { return m_procView->uiWidgetSize(); }
+	bool isResizable() const { return m_procView->isResizable(); }
 
 private:
 	enum Rows

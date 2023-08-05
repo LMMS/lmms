@@ -418,7 +418,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	QVBoxLayout * pluginsLayout = new QVBoxLayout(pluginsBox);
 
 	m_vstEmbedLbl = new QLabel(pluginsBox);
-	m_vstEmbedLbl->setText(tr("VST plugins embedding:"));
+	m_vstEmbedLbl->setText(tr("External plugin embedding:"));
 	pluginsLayout->addWidget(m_vstEmbedLbl);
 
 	m_vstEmbedComboBox = new QComboBox(pluginsBox);

@@ -1,7 +1,7 @@
 /*
  * Lv2Proc.h - Lv2 processor class
  *
- * Copyright (c) 2019-2022 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2019-2024 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -96,14 +96,6 @@ public:
 	StereoPortRef& outPorts() { return m_outPorts; }
 	const StereoPortRef& outPorts() const { return m_outPorts; }
 	template<class Functor>
-	void foreach_port(const Functor& ftor)
-	{
-		for (std::unique_ptr<Lv2Ports::PortBase>& port : m_ports)
-		{
-			ftor(port.get());
-		}
-	}
-	template<class Functor>
 	void foreach_port(const Functor& ftor) const
 	{
 		for (const std::unique_ptr<Lv2Ports::PortBase>& port : m_ports)
@@ -156,11 +148,59 @@ public:
 		const TimePos &time, f_cnt_t offset);
 
 	/*
-		misc
+		ui
 	 */
-	class AutomatableModel *modelAtPort(const QString &uri); // unused currently
+	bool wantUi() const { return m_wantUi; }  // true if the user wants a UI (and we support it)
+	void connectUiEventsReaderTo(LocklessRingBuffer<char>& uiEvents)
+	{
+		m_uiEventsReader.emplace(uiEvents);
+	}
+	void connectToPluginEvents(std::optional<LocklessRingBufferReader<char>>& pluginEventsReader)
+	{
+		pluginEventsReader.emplace(m_pluginEvents);
+	}
+	//! This can enable RealTime safety violations, only use this to instantiate the instance feature
+	const LilvInstance* getInstanceForInstanceFeatureOnly() const { return m_instance; }
+	LocklessRingBuffer<char>& getPluginEventsForInitializationOnly() { return m_pluginEvents; }
+	static constexpr std::size_t uiEventsBufsize()
+	{
+		// source: Jalv (MSG_BUFFER_SIZE)
+		//         Ardour: Uses dynamic stack allocation (g_alloca)
+		//         => TODO: switch to alloca/STACKALLOC
+		return 1024;
+	}
+	static constexpr std::size_t uiNBufferCycles()
+	{
+		// source: jalv (N_BUFFER_CYCLES=16)
+		//         Ardour is similar (at least 8, LV2Plugin::write_from_ui). */
+		return 16;
+	}
+	static constexpr std::size_t uiMidiBufsize()
+	{
+		// source: Ardour uses the capacity of the event buffers (LV2Plugin::write_from_ui)
+		//         Jalv is lower (jalv->midi_buf_size = 4096 default for jack,
+		//                        but it can be changed by jack: jack_port_type_get_buffer_size)
+		return defaultEvbufSize();
+	}
+
+	/*
+		features save for non-realtime access
+	 */
+	const LV2_Feature* mapFeature() { return &m_features[LV2_URID__map]; }
+	const LV2_Feature* unmapFeature() { return &m_features[LV2_URID__unmap]; }
+	const LV2_Feature* optionsFeature() { return &m_features[LV2_OPTIONS__options]; }
+	LV2_Extension_Data_Feature* extdataFeature() { return &m_features.m_extData; }
+
+	/*
+		metadata
+	 */
 	std::size_t controlCount() const { return LinkedModelGroup::modelNum(); }
 	bool hasNoteInput() const;
+	LilvUIs* getUis() const { return lilv_plugin_get_uis(m_plugin); }
+	const char* pluginUri() const { return lilv_node_as_uri(lilv_plugin_get_uri(m_plugin)); }
+	std::size_t getIdOfPort(const char* symbol) const;
+	QString portname(std::size_t idx) const;
+	uint32_t portNum() const;
 
 protected:
 	/*
@@ -200,8 +240,17 @@ private:
 	//! MIDI ringbuffer reader
 	ringbuffer_reader_t<struct MidiInputEvent> m_midiInputReader;
 
+	// ui
+	LocklessRingBuffer<char> m_pluginEvents;
+	std::optional<LocklessRingBufferReader<char>> m_uiEventsReader;
+	bool m_wantUi;
+	static bool initWantUi();
+	void applyUiEvents(uint32_t nframes);
+	bool sendToUi(uint32_t port_index, uint32_t type, uint32_t size, const void* body);
+	uint32_t m_eventDeltaT;
+
 	// other
-	static int32_t defaultEvbufSize() { return 1 << 15; /* ardour uses this*/ }
+	static constexpr int32_t defaultEvbufSize() { return 1 << 15; /* ardour uses this*/ }
 
 	//! models for the controls, sorted by port symbols
 	//! @note These are not owned, but rather link to the models in

@@ -1,7 +1,7 @@
 /*
  * Lv2Features.h - Lv2Features class
  *
- * Copyright (c) 2020-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2020-2024 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -33,6 +33,7 @@
 #include <string_view>
 #include <vector>
 #include "Lv2Manager.h"
+#include <lv2/lv2plug.in/ns/ext/data-access/data-access.h>
 
 
 namespace lmms
@@ -62,7 +63,7 @@ public:
 	//! Register only plugin-common features
 	void initCommon();
 	//! Return reference to feature data with given URI featName
-	void*& operator[](const char* featName);
+	LV2_Feature& operator[](const char* featName);
 	//! Fill m_features and m_featurePointers with all features
 	void createFeatureVectors();
 	//! Return LV2_Feature pointer vector, suited for lilv_plugin_instantiate
@@ -73,13 +74,16 @@ public:
 	//! Clear everything
 	void clear();
 
+	//! data features is a UI feature, it is not in the map
+	LV2_Extension_Data_Feature m_extData;
+
 private:
 	//! feature storage
 	std::vector<LV2_Feature> m_features;
 	//! pointers to m_features, required for lilv_plugin_instantiate
 	std::vector<const LV2_Feature*> m_featurePointers;
 	//! features + data, ordered by URI
-	std::map<std::string_view, void*> m_featureByUri;
+	std::map<std::string_view, LV2_Feature> m_featureByUri;
 };
 
 

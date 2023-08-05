@@ -118,6 +118,9 @@ protected:
 
 private:
 	void modelChanged() override;
+	bool isResizable() const final { return Lv2ViewBase::isResizable(); }
+	QSize sizeHint() const override;
+	QSize minimumSizeHint() const override { return sizeHint(); }
 };
 
 
