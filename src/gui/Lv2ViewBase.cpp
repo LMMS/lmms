@@ -59,7 +59,7 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum) :
 	public:
 		QWidget* m_par; // input
 		const LilvNode* m_commentUri; // input
-		Control* m_control = nullptr; // output
+		std::unique_ptr<Control> m_control; // output
 		void visit(const Lv2Ports::Control& port) override
 		{
 			if (port.m_flow == Lv2Ports::Flow::Input)
@@ -69,20 +69,20 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum) :
 				switch (port.m_vis)
 				{
 					case PortVis::Generic:
-						m_control = new KnobControl(m_par);
+						m_control = std::make_unique<KnobControl>(m_par);
 						break;
 					case PortVis::Integer:
 					{
 						sample_rate_t sr = Engine::audioEngine()->processingSampleRate();
-						m_control = new LcdControl((port.max(sr) <= 9.0f) ? 1 : 2,
+						m_control = std::make_unique<LcdControl>((port.max(sr) <= 9.0f) ? 1 : 2,
 													m_par);
 						break;
 					}
 					case PortVis::Enumeration:
-						m_control = new ComboControl(m_par);
+						m_control = std::make_unique<ComboControl>(m_par);
 						break;
 					case PortVis::Toggled:
-						m_control = new CheckControl(m_par);
+						m_control = std::make_unique<CheckControl>(m_par);
 						break;
 				}
 				m_control->setText(port.name());
@@ -113,7 +113,7 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum) :
 
 				if (setup.m_control)
 				{
-					addControl(setup.m_control,
+					addControl(std::move(setup.m_control),
 						lilv_node_as_string(lilv_port_get_symbol(
 							port->m_plugin, port->m_port)),
 						port->name().toUtf8().data(),
