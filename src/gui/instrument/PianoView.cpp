@@ -155,6 +155,21 @@ PianoView::PianoView(QWidget *parent) :
 	connect(Engine::getSong(), SIGNAL(keymapListChanged(int)), this, SLOT(update()));
 }
 
+
+/*! \brief list of note strings
+ */
+std::array<QString, 12> PianoView::s_noteStrings {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+
+
+/*! \brief return a note string (e.g. "C4") based on the key number
+ *  \param key The midi key number
+ */
+QString PianoView::getNoteStringByKey(int key)
+{
+	return s_noteStrings[key % 12] + QString::number(static_cast<int>(FirstOctave + key / KeysPerOctave));
+}
+
+
 /*! \brief Map a keyboard key being pressed to a note in our keyboard view
  *
  *  \param _k The keyboard scan code of the key being pressed.
@@ -405,33 +420,60 @@ void PianoView::pianoScrolled(int new_pos)
 }
 
 
-
-
-/*! \brief Handle a context menu selection on the piano display view
+/*! \brief Handle a context menu selection on the piano view
  *
  *  \param me the ContextMenuEvent to handle.
  *  \todo Is this right, or does this create the context menu?
  */
 void PianoView::contextMenuEvent(QContextMenuEvent *me)
 {
-	if (me->pos().y() > PIANO_BASE || m_piano == nullptr ||
+	if (m_piano == nullptr ||
 		m_piano->instrumentTrack()->keyRangeImport())
 	{
 		QWidget::contextMenuEvent(me);
 		return;
 	}
 
-	// check which control element is closest to the mouse and open the appropriate menu
 	QString title;
-	IntModel *noteModel = getNearestMarker(getKeyFromMouse(me->pos()), &title);
+	int key_num = getKeyFromMouse(me->pos());
 
-	CaptionMenu contextMenu(title);
-	AutomatableModelView amv(noteModel, &contextMenu);
-	amv.addDefaultActions(&contextMenu);
-	contextMenu.exec(QCursor::pos());
+	if (me->pos().y() > PIANO_BASE)
+	{
+		title = QString("Key %1 [%2]").arg(getNoteStringByKey(key_num)).arg(key_num);
+
+		CaptionMenu contextMenu(title);
+		QAction *actionBase = contextMenu.addAction(tr("Set &base note"), this,
+			[this, key_num]() { setMarkerKeyValue(m_piano->instrumentTrack()->baseNoteModel(), key_num); });
+
+		contextMenu.addSeparator();
+
+		QAction *actionFirst = contextMenu.addAction(tr("Set &first key"), this,
+			[this, key_num]() { setMarkerKeyValue(m_piano->instrumentTrack()->firstKeyModel(), key_num); });
+		QAction *actionLast = contextMenu.addAction(tr("Set &last key"), this,
+			[this, key_num]() { setMarkerKeyValue(m_piano->instrumentTrack()->lastKeyModel(), key_num); });
+		contextMenu.addAction(tr("Set &single key" ), this,
+			[this, key_num]() {
+				setMarkerKeyValue(m_piano->instrumentTrack()->firstKeyModel(), key_num);
+				setMarkerKeyValue(m_piano->instrumentTrack()->lastKeyModel(), key_num);
+			});
+
+		actionFirst->setEnabled(key_num != m_piano->instrumentTrack()->firstKeyModel()->value() && firstMarkerAllowed(key_num));
+		actionLast->setEnabled(key_num != m_piano->instrumentTrack()->lastKeyModel()->value() && lastMarkerAllowed(key_num));
+		actionBase->setEnabled(key_num != m_piano->instrumentTrack()->baseNoteModel()->value());
+
+		contextMenu.exec(QCursor::pos());
+	}
+	else
+	{
+		// context menu for the black stripe above the keys containing the first/last/base markers
+		IntModel *noteModel = getNearestMarker(key_num);
+		CaptionMenu contextMenu(noteModel->displayName());
+		AutomatableModelView amv(noteModel, &contextMenu);
+		amv.addDefaultActions(&contextMenu);
+
+		contextMenu.exec(QCursor::pos());
+	}
 }
-
-
 
 
 // handler for mouse-click-event
@@ -491,8 +533,7 @@ void PianoView::mousePressEvent(QMouseEvent *me)
 			}
 			else
 			{
-				m_movedNoteModel->setInitValue(static_cast<float>(key_num));
-				if (m_movedNoteModel == m_piano->instrumentTrack()->baseNoteModel()) { emit baseNoteChanged(); }	// TODO: not actually used by anything?
+				setMarkerKeyValue(m_movedNoteModel,key_num);
 			}
 		}
 		else
@@ -503,6 +544,33 @@ void PianoView::mousePressEvent(QMouseEvent *me)
 		// and let the user see that he pressed a key... :)
 		update();
 	}
+}
+
+void PianoView::setMarkerKeyValue(IntModel *noteModel, int key_num)
+{
+	auto firstModel = m_piano->instrumentTrack()->firstKeyModel();
+	auto lastModel = m_piano->instrumentTrack()->lastKeyModel();
+
+	if (noteModel == firstModel && lastModel->value() < key_num)
+	{
+		lastModel->setValue(key_num);
+	}
+	else if (noteModel == lastModel && firstModel->value() > key_num)
+	{
+		firstModel->setValue(key_num);
+	}
+
+	noteModel->setValue(static_cast<float>(key_num));
+}
+
+bool PianoView::firstMarkerAllowed(int key_num)
+{
+	return key_num <=  m_piano->instrumentTrack()->lastKeyModel()->value();
+}
+
+bool PianoView::lastMarkerAllowed(int key_num)
+{
+	return key_num >=  m_piano->instrumentTrack()->firstKeyModel()->value();
 }
 
 
@@ -599,7 +667,7 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
 			else if (m_movedNoteModel != nullptr)
 			{
 				// upper section, move the base / first / last note marker
-				m_movedNoteModel->setInitValue(static_cast<float>(key_num));
+				setMarkerKeyValue(m_movedNoteModel,key_num);
 			}
 		}
 		// and let the user see that he pressed a key... :)
@@ -810,25 +878,22 @@ int PianoView::getKeyHeight(int key_num) const
 
 /*! \brief Return model and title of the marker closest to the given key
  */
-IntModel* PianoView::getNearestMarker(int key, QString* title)
+IntModel* PianoView::getNearestMarker(int key)
 {
 	const int base = m_piano->instrumentTrack()->baseNote();
 	const int first = m_piano->instrumentTrack()->firstKey();
 	const int last = m_piano->instrumentTrack()->lastKey();
 
 	if (abs(key - base) < abs(key - first) && abs(key - base) < abs(key - last))
-	{
-		if (title) {*title = tr("Base note");}
+	{		
 		return m_piano->instrumentTrack()->baseNoteModel();
 	}
 	else if (abs(key - first) < abs(key - last))
-	{
-		if (title) {*title = tr("First note");}
+	{		
 		return m_piano->instrumentTrack()->firstKeyModel();
 	}
 	else
-	{
-		if (title) {*title = tr("Last note");}
+	{		
 		return m_piano->instrumentTrack()->lastKeyModel();
 	}
 }
@@ -851,41 +916,72 @@ void PianoView::paintEvent( QPaintEvent * )
 
 	// draw bar above the keyboard (there will be the labels
 	// for all C's)
-	p.fillRect( QRect( 0, 1, width(), PIANO_BASE-2 ), p.background() );
-
-	// draw the line above the keyboard
-	p.setPen( Qt::black );
-	p.drawLine( 0, 0, width(), 0 );
-	p.drawLine( 0, PIANO_BASE-1, width(), PIANO_BASE-1 );
-
-	p.setPen( Qt::white );
+	p.fillRect( QRect( 0, 1, width(), PIANO_BASE-2 ), p.background() );	
 
 	// Controls for first / last / base key models are shown only if microtuner or its key range import are disabled
 	if (m_piano != nullptr && !m_piano->instrumentTrack()->keyRangeImport())
 	{
-		// Draw the base note marker and first / last note boundary markers
+		QColor slider_foreColor = QApplication::palette().color(QPalette::Active, QPalette::Text).darker(200);
+		QColor marker_fillColor = QApplication::palette().color(QPalette::Active, QPalette::WindowText);
+		QColor marker_borderColor = marker_fillColor.darker(200);
+
+		// get the marker model instances
 		const int base_key = m_piano->instrumentTrack()->baseNoteModel()->value();
 		const int first_key = m_piano->instrumentTrack()->firstKeyModel()->value();
 		const int last_key = m_piano->instrumentTrack()->lastKeyModel()->value();
-		QColor marker_color = QApplication::palette().color(QPalette::Active, QPalette::BrightText);
 
-		// - prepare triangle shapes for start / end markers
+		// prepare arrow pointing right
 		QPainterPath first_marker(QPoint(getKeyX(first_key) + 1, 1));
 		first_marker.lineTo(getKeyX(first_key) + 1, PIANO_BASE);
 		first_marker.lineTo(getKeyX(first_key) + PIANO_BASE / 2 + 1, PIANO_BASE / 2);
 
+		// prepare arrow pointing left
 		QPainterPath last_marker(QPoint(getKeyX(last_key) + getKeyWidth(last_key), 1));
 		last_marker.lineTo(getKeyX(last_key) + getKeyWidth(last_key), PIANO_BASE);
 		last_marker.lineTo(getKeyX(last_key) + getKeyWidth(last_key) - PIANO_BASE / 2, PIANO_BASE / 2);
 
-		// - fill all markers
-		p.fillRect(QRect(getKeyX(base_key), 1, getKeyWidth(base_key) - 1, PIANO_BASE - 2), marker_color);
-		p.fillPath(first_marker, marker_color);
-		p.fillPath(last_marker, marker_color);
+		// prepare slider stlye "arrow" pointing down
+		int posDelta = getKeyWidth(base_key) - PW_BLACK_KEY_WIDTH; // make sure the width is constant
+		posDelta = posDelta > 0 ? posDelta /2 : 0;
+
+		QPainterPath base_marker(QPoint(getKeyX(base_key) + posDelta + 2, 1));
+		base_marker.lineTo(getKeyX(base_key) + getKeyWidth(base_key) - posDelta, 1);
+		base_marker.lineTo(getKeyX(base_key) + getKeyWidth(base_key) - posDelta, PIANO_BASE / 2);
+		base_marker.lineTo(getKeyX(base_key) + getKeyWidth(base_key) / 2 + 1, PIANO_BASE);
+		base_marker.lineTo(getKeyX(base_key) + posDelta + 2, PIANO_BASE / 2);
+
+		// draw the "slider" line inside the bar
+		p.setPen(slider_foreColor);
+		p.drawLine(2, PIANO_BASE/2, width() - 4, PIANO_BASE/2 );
+
+		// we do some slight corrections on C and H because we have more space
+		if ((Keys)(base_key % KeysPerOctave) == Key_H) base_marker.translate(1,0);
+		if ((Keys)(base_key % KeysPerOctave) == Key_C) base_marker.translate(-1,0);
+
+		// draw the markers with a simple left/right "border"
+		// drawpath and strokepath give no satisfying results and
+		// changing the compositionmode may be overkill
+		p.fillPath(base_marker.translated(-1,0), marker_borderColor);
+		p.fillPath(base_marker.translated(1,0), marker_borderColor);
+		p.fillPath(base_marker, marker_fillColor);
+
+		p.fillPath(first_marker.translated(-1,0), marker_borderColor);
+		p.fillPath(first_marker.translated(1,0), marker_borderColor);
+		p.fillPath(first_marker, marker_fillColor);
+
+		p.fillPath(last_marker.translated(-1,0), marker_borderColor);
+		p.fillPath(last_marker.translated(1,0), marker_borderColor);
+		p.fillPath(last_marker, marker_fillColor);
 	}
 
-	int cur_key = m_startKey;
+	// draw the dark border lines of the bar above the keyboard
+	p.setPen( Qt::black );
+	p.drawLine( 0, 0, width(), 0 );
+	p.drawLine( 0, PIANO_BASE-1, width(), PIANO_BASE-1 );
 
+	int cur_key = m_startKey;
+	//p.setPen(Qt::white);
+	p.setPen(Qt::black);
 	// draw all white keys...
 	for (int x = 0; x < width();)
 	{
@@ -911,14 +1007,13 @@ void PianoView::paintEvent( QPaintEvent * )
 			p.drawPixmap(x, PIANO_BASE, *s_whiteKeyDisabledPm);
 		}
 
-		x += PW_WHITE_KEY_WIDTH;
-
 		if ((Keys)(cur_key % KeysPerOctave) == Key_C)
 		{
-			// label key of note C with "C" and number of current octave
-			p.drawText(x - PW_WHITE_KEY_WIDTH, LABEL_TEXT_SIZE + 2,
-					   QString("C") + QString::number(FirstOctave + cur_key / KeysPerOctave));
+			p.rotate(-90);
+			p.drawText(-PIANO_BASE-PW_WHITE_KEY_HEIGHT+4, x+PW_WHITE_KEY_WIDTH-1, getNoteStringByKey(cur_key));
+			p.rotate(90);
 		}
+		x += PW_WHITE_KEY_WIDTH;
 		++cur_key;
 	}
 

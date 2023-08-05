@@ -47,7 +47,8 @@ public:
 	~PianoView() override = default;
 
 	static int getKeyFromKeyEvent( QKeyEvent * _ke );
-
+	static QString getNoteStringByKey(int key);	
+	static std::array<QString, 12> s_noteStrings;
 
 public:
 	void keyPressEvent( QKeyEvent * ke ) override;
@@ -71,7 +72,10 @@ private:
 	int getKeyX( int _key_num ) const;
 	int getKeyWidth(int key_num) const;
 	int getKeyHeight(int key_num) const;
-	IntModel *getNearestMarker(int key, QString* title = nullptr);
+	IntModel *getNearestMarker(int key);
+	void setMarkerKeyValue(IntModel *noteModel, int key_num);
+	bool firstMarkerAllowed(int key_num);
+	bool lastMarkerAllowed(int key_num);
 
 	static QPixmap * s_whiteKeyPm;
 	static QPixmap * s_blackKeyPm;
@@ -86,8 +90,6 @@ private:
 	int m_startKey;					//!< first key when drawing
 	int m_lastKey;					//!< previously pressed key
 	IntModel *m_movedNoteModel;		//!< note marker which is being moved
-
-
 
 private slots:
 	void pianoScrolled( int _new_pos );

@@ -130,13 +130,6 @@ QPixmap* PianoRoll::s_toolKnife = nullptr;
 
 SimpleTextFloat * PianoRoll::s_textFloat = nullptr;
 
-static std::array<QString, 12> s_noteStrings {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
-
-static QString getNoteString(int key)
-{
-	return s_noteStrings[key % 12] + QString::number(static_cast<int>(FirstOctave + key / KeysPerOctave));
-}
-
 // used for drawing of piano
 std::array<PianoRoll::PianoRollKeyTypes, 12> PianoRoll::prKeyOrder
 {
@@ -394,7 +387,7 @@ PianoRoll::PianoRoll() :
 	// Set up key selection dropdown
 	m_keyModel.addItem(tr("No key"));
 	// Use piano roll note strings for key dropdown
-	for (const auto& noteString : s_noteStrings)
+	for (const auto& noteString : PianoView::s_noteStrings)
 	{
 		m_keyModel.addItem(noteString);
 	}
@@ -1056,7 +1049,7 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 		int const noteTextHeight = static_cast<int>(noteHeight * 0.8);
 		if (noteTextHeight > 6)
 		{
-			QString noteKeyString = getNoteString(n->key());
+			QString noteKeyString = PianoView::getNoteStringByKey(n->key());
 
 			QFont noteFont(p.font());
 			noteFont.setPixelSize(noteTextHeight);
@@ -3243,7 +3236,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			{
 				// small font sizes have 1 pixel offset instead of 2
 				auto zoomOffset = m_zoomYLevels[m_zoomingYModel.value()] > 1.0f ? 2 : 1;
-				QString noteString = getNoteString(key);
+				QString noteString = PianoView::getNoteStringByKey(key);
 				QRect textRect(
 					m_whiteKeyWidth - boundingRect.width() - 2,
 					yb - m_keyLineHeight + zoomOffset,
