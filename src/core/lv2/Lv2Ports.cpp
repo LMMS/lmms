@@ -114,12 +114,12 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 
 	m_optional = hasProperty(LV2_CORE__connectionOptional);
 
-	m_vis = hasProperty(LV2_CORE__integer)
-		? Vis::Integer // WARNING: this may still be changed below
+	m_vis = hasProperty(LV2_CORE__toggled)
+		? Vis::Toggled
 		: hasProperty(LV2_CORE__enumeration)
 		? Vis::Enumeration
-		: hasProperty(LV2_CORE__toggled)
-		? Vis::Toggled
+		: hasProperty(LV2_CORE__integer)
+		? Vis::Integer // WARNING: this may still be changed below
 		: Vis::Generic;
 
 	if (isA(LV2_CORE__InputPort)) { m_flow = Flow::Input; }
