@@ -12,6 +12,11 @@
 					"name": "Qt5_DIR",
 					"value": "C:/Qt/5.15.2/msvc2019_64/lib/cmake",
 					"type": "PATH"
+				},
+				{
+					"name": "Qt5Test_DIR",
+					"value": "C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5Test",
+					"type": "PATH"
 				}
 			],
 			"cmakeToolchain": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
