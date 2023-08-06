@@ -53,72 +53,72 @@
 				},
 				{
 					"name": "FFTW_INCLUDE_DIR",
-					"value": "C:\\vcpkg\\packages\\fftw3_x64-windows\\include",
+					"value": "C:/vcpkg/packages/fftw3_x64-windows/include",
 					"type": "PATH"
 				},
 				{
 					"name": "FFTW3F_LIBRARY",
-					"value": "C:\\vcpkg\\packages\\fftw3_x64-windows\\lib/fftw3f.lib",
+					"value": "C:/vcpkg/packages/fftw3_x64-windows/lib/fftw3f.lib",
 					"type": "FILEPATH"
 				},
 				{
 					"name": "LibSndFile_DIR",
-					"value": "C:\\vcpkg\\packages\\libsndfile_x64-windows",
+					"value": "C:/vcpkg/packages/libsndfile_x64-windows",
 					"type": "PATH"
 				},
 				{
 					"name": "LILV_DIR",
-					"value": "C:\\vcpkg\\packages\\lilv_x64-windows",
+					"value": "C:/vcpkg/packages/lilv_x64-windows",
 					"type": "PATH"
 				},
 				{
 					"name": "LV2_DIR",
-					"value": "C:\\vcpkg\\packages\\lv2_x64-windows",
+					"value": "C:/vcpkg/packages/lv2_x64-windows",
 					"type": "PATH"
 				},
 				{
 					"name": "OGG_INCLUDE_DIR",
-					"value": "C:\\vcpkg\\packages\\libogg_x64-windows\\include",
+					"value": "C:/vcpkg/packages/libogg_x64-windows/include",
 					"type": "PATH"
 				},
 				{
 					"name": "OGG_LIBRARY",
-					"value": "C:\\vcpkg\\packages\\libogg_x64-windows\\lib/ogg.lib",
+					"value": "C:/vcpkg/packages/libogg_x64-windows/lib/ogg.lib",
 					"type": "FILEPATH"
 				},
 				{
 					"name": "SDL2_DIR",
-					"value": "C:\\vcpkg\\packages\\sdl2_x64-windows",
+					"value": "C:/vcpkg/packages/sdl2_x64-windows",
 					"type": "PATH"
 				},
 				{
 					"name": "VORBISENC_LIBRARY",
-					"value": "C:\\vcpkg\\packages\\libvorbis_x64-windows\\lib/vorbisenc.lib",
+					"value": "C:/vcpkg/packages/libvorbis_x64-windows/lib/vorbisenc.lib",
 					"type": "FILEPATH"
 				},
 				{
 					"name": "VORBISFILE_LIBRARY",
-					"value": "C:\\vcpkg\\packages\\libvorbis_x64-windows\\lib/vorbisfile.lib",
+					"value": "C:/vcpkg/packages/libvorbis_x64-windows/lib/vorbisfile.lib",
 					"type": "FILEPATH"
 				},
 				{
 					"name": "FLTK_DIR",
-					"value": "C:\\vcpkg\\packages\\fltk_x64-windows",
+					"value": "C:/vcpkg/packages/fltk_x64-windows",
 					"type": "PATH"
 				},
 				{
 					"name": "FLTK_INCLUDE_DIR",
-					"value": "C:\\vcpkg\\packages\\fltk_x64-windows\\include",
+					"value": "C:/vcpkg/packages/fltk_x64-windows/include",
 					"type": "PATH"
 				},
 				{
 					"name": "FluidSynth_INCLUDE_DIR",
-					"value": "C:\\vcpkg\\packages\\fluidsynth_x64-windows\\include",
+					"value": "C:/vcpkg/packages/fluidsynth_x64-windows/include",
 					"type": "PATH"
 				},
 				{
 					"name": "FluidSynth_LIBRARY",
-					"value": "C:\\vcpkg\\packages\\fluidsynth_x64-windows\\lib/fluidsynth.lib",
+					"value": "C:/vcpkg/packages/fluidsynth_x64-windows/lib/fluidsynth.lib",
 					"type": "FILEPATH"
 				}
 			]
