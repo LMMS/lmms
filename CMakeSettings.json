@@ -22,10 +22,18 @@
 					"name": "PERL_EXECUTABLE",
 					"value": "C:/Strawberry/perl/bin/perl.exe",
 					"type": "FILEPATH"
+				},
+				{
+					"name": "VCPKG_TRACE_FIND_PACKAGE",
+					"value": "ON"
+				},
+				{
+					"name": "CMAKE_PREFIX_PATH",
+					"value": "C:/Qt/5.15.2/msvc2019_64",
+					"type": "PATH"
 				}
 			],
-			"cmakeToolchain": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
-			"cmakeCommandArgs": "-DVCPKG_TRACE_FIND_PACKAGE=ON"
+			"cmakeToolchain": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
 		}
 	]
 }
