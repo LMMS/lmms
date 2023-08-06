@@ -17,6 +17,11 @@
 					"name": "Qt5Test_DIR",
 					"value": "C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5Test",
 					"type": "PATH"
+				},
+				{
+					"name": "PERL_EXECUTABLE",
+					"value": "C:/Strawberry/perl/bin/perl.exe",
+					"type": "FILEPATH"
 				}
 			],
 			"cmakeToolchain": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
