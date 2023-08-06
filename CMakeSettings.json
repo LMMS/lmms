@@ -25,12 +25,8 @@
 				},
 				{
 					"name": "VCPKG_TRACE_FIND_PACKAGE",
-					"value": "ON"
-				},
-				{
-					"name": "CMAKE_PREFIX_PATH",
-					"value": "C:/Qt/5.15.2/msvc2019_64",
-					"type": "PATH"
+					"value": "ON",
+					"type": "STRING"
 				}
 			],
 			"cmakeToolchain": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
