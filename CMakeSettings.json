@@ -120,6 +120,11 @@
 					"name": "FluidSynth_LIBRARY",
 					"value": "C:/vcpkg/packages/fluidsynth_x64-windows/lib/fluidsynth.lib",
 					"type": "FILEPATH"
+				},
+				{
+					"name": "Qt5Test_DIR",
+					"value": "C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5Test",
+					"type": "PATH"
 				}
 			]
 		}
