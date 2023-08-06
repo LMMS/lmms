@@ -1,0 +1,197 @@
+﻿{
+	"configurations": [
+		{
+			"name": "x64-Debug",
+			"generator": "Ninja",
+			"configurationType": "Debug",
+			"inheritEnvironments": [ "msvc_x64_x64" ],
+			"buildRoot": "${projectDir}\\out\\build\\${name}",
+			"installRoot": "${projectDir}\\out\\install\\${name}",
+			"cmakeCommandArgs": "",
+			"buildCommandArgs": "",
+			"ctestCommandArgs": "",
+			"variables": [
+				{
+					"name": "Qt5_DIR",
+					"value": "C:/Qt/5.15.2/msvc2019_64/lib/cmake",
+					"type": "PATH"
+				},
+				{
+					"name": "SNDFILE_INCLUDE_DIR",
+					"value": "C:/vcpkg/packages/libsndfile_x64-windows/include",
+					"type": "PATH"
+				},
+				{
+					"name": "SNDFILE_LIBRARY",
+					"value": "C:/vcpkg/packages/libsndfile_x64-windows/lib",
+					"type": "FILEPATH"
+				},
+				{
+					"name": "SDL2_LIBRARY",
+					"value": "C:/vcpkg/packages/sdl2_x64-windows/lib/SDL2.lib",
+					"type": "FILEPATH"
+				},
+				{
+					"name": "SDL2_INCLUDE_DIR",
+					"value": "C:/vcpkg/packages/sdl2_x64-windows/include",
+					"type": "PATH"
+				},
+				{
+					"name": "VORBIS_INCLUDE_DIR",
+					"value": "C:/vcpkg/packages/libvorbis_x64-windows/include",
+					"type": "PATH"
+				},
+				{
+					"name": "VORBIS_LIBRARY",
+					"value": "C:/vcpkg/packages/libvorbis_x64-windows/lib/vorbis.lib",
+					"type": "FILEPATH"
+				},
+				{
+					"name": "SDL_INCLUDE_DIR",
+					"value": "C:/vcpkg/packages/sdl2_x64-windows/include",
+					"type": "PATH"
+				},
+				{
+					"name": "FFTW_INCLUDE_DIR",
+					"value": "C:/vcpkg/packages/fftw3_x64-windows/include",
+					"type": "PATH"
+				},
+				{
+					"name": "FFTW3F_LIBRARY",
+					"value": "C:/vcpkg/packages/fftw3_x64-windows/lib/fftw3f.lib",
+					"type": "FILEPATH"
+				},
+				{
+					"name": "LibSndFile_DIR",
+					"value": "C:/vcpkg/packages/libsndfile_x64-windows",
+					"type": "PATH"
+				},
+				{
+					"name": "LILV_DIR",
+					"value": "C:/vcpkg/packages/lilv_x64-windows",
+					"type": "PATH"
+				},
+				{
+					"name": "LV2_DIR",
+					"value": "C:/vcpkg/packages/lv2_x64-windows",
+					"type": "PATH"
+				},
+				{
+					"name": "OGG_INCLUDE_DIR",
+					"value": "C:/vcpkg/packages/libogg_x64-windows/include",
+					"type": "PATH"
+				},
+				{
+					"name": "OGG_LIBRARY",
+					"value": "C:/vcpkg/packages/libogg_x64-windows/lib/ogg.lib",
+					"type": "FILEPATH"
+				},
+				{
+					"name": "SDL2_DIR",
+					"value": "C:/vcpkg/packages/sdl2_x64-windows",
+					"type": "PATH"
+				},
+				{
+					"name": "VORBISENC_LIBRARY",
+					"value": "C:/vcpkg/packages/libvorbis_x64-windows/lib/vorbisenc.lib",
+					"type": "FILEPATH"
+				},
+				{
+					"name": "VORBISFILE_LIBRARY",
+					"value": "C:/vcpkg/packages/libvorbis_x64-windows/lib/vorbisfile.lib",
+					"type": "FILEPATH"
+				},
+				{
+					"name": "FLTK_DIR",
+					"value": "C:/vcpkg/packages/fltk_x64-windows",
+					"type": "PATH"
+				},
+				{
+					"name": "FLTK_INCLUDE_DIR",
+					"value": "C:/vcpkg/packages/fltk_x64-windows/include",
+					"type": "PATH"
+				},
+				{
+					"name": "FluidSynth_INCLUDE_DIR",
+					"value": "C:/vcpkg/packages/fluidsynth_x64-windows/include",
+					"type": "PATH"
+				},
+				{
+					"name": "FluidSynth_LIBRARY",
+					"value": "C:/vcpkg/packages/fluidsynth_x64-windows/lib/fluidsynth.lib",
+					"type": "FILEPATH"
+				},
+				{
+					"name": "Qt5Test_DIR",
+					"value": "C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5Test",
+					"type": "PATH"
+				},
+				{
+					"name": "FLTK_FLUID_EXECUTABLE",
+					"value": "C:/vcpkg/packages/fltk_x64-windows/tools/fltk/fluid.exe",
+					"type": "FILEPATH"
+				},
+				{
+					"name": "Portaudio_LIBRARY",
+					"value": "C:/vcpkg/packages/portaudio_x64-windows/lib/portaudio.lib",
+					"type": "FILEPATH"
+				},
+				{
+					"name": "Portaudio_INCLUDE_DIR",
+					"value": "C:/vcpkg/packages/portaudio_x64-windows/include",
+					"type": "PATH"
+				},
+				{
+					"name": "STK_RAWWAVE_ROOT",
+					"value": "C:/vcpkg/packages/libstk_x64-windows/share/libstk/rawwaves",
+					"type": "PATH"
+				},
+				{
+					"name": "STK_LIBRARY",
+					"value": "C:/vcpkg/packages/libstk_x64-windows/lib/libstk.lib",
+					"type": "FILEPATH"
+				},
+				{
+					"name": "mp3lame_DIR",
+					"value": "C:/vcpkg/packages/mp3lame_x64-windows",
+					"type": "PATH"
+				},
+				{
+					"name": "portaudio_DIR",
+					"value": "C:/vcpkg/packages/portaudio_x64-windows",
+					"type": "PATH"
+				},
+				{
+					"name": "serd_DIR",
+					"value": "C:/vcpkg/packages/serd_x64-windows",
+					"type": "PATH"
+				},
+				{
+					"name": "STK_INCLUDE_DIR",
+					"value": "C:/vcpkg/packages/libstk_x64-windows/include",
+					"type": "PATH"
+				},
+				{
+					"name": "sord_DIR",
+					"value": "C:/vcpkg/packages/sord_x64-windows",
+					"type": "PATH"
+				},
+				{
+					"name": "sratom_DIR",
+					"value": "C:/vcpkg/packages/sratom_x64-windows",
+					"type": "PATH"
+				},
+				{
+					"name": "SAMPLERATE_LIBRARY",
+					"value": "C:/vcpkg/packages/libsamplerate_x64-windows/lib/samplerate.lib",
+					"type": "FILEPATH"
+				},
+				{
+					"name": "SAMPLERATE_INCLUDE_DIR",
+					"value": "C:/vcpkg/packages/libsamplerate_x64-windows/include",
+					"type": "PATH"
+				}
+			]
+		}
+	]
+}
