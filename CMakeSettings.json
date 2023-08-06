@@ -125,6 +125,61 @@
 					"name": "Qt5Test_DIR",
 					"value": "C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5Test",
 					"type": "PATH"
+				},
+				{
+					"name": "FLTK_FLUID_EXECUTABLE",
+					"value": "C:/vcpkg/packages/fltk_x64-windows/tools/fltk/fluid.exe",
+					"type": "FILEPATH"
+				},
+				{
+					"name": "Portaudio_LIBRARY",
+					"value": "C:/vcpkg/packages/portaudio_x64-windows/lib/portaudio.lib",
+					"type": "FILEPATH"
+				},
+				{
+					"name": "Portaudio_INCLUDE_DIR",
+					"value": "C:/vcpkg/packages/portaudio_x64-windows/include",
+					"type": "PATH"
+				},
+				{
+					"name": "STK_RAWWAVE_ROOT",
+					"value": "C:/vcpkg/packages/libstk_x64-windows/share/libstk/rawwaves",
+					"type": "PATH"
+				},
+				{
+					"name": "STK_LIBRARY",
+					"value": "C:/vcpkg/packages/libstk_x64-windows/lib/libstk.lib",
+					"type": "FILEPATH"
+				},
+				{
+					"name": "mp3lame_DIR",
+					"value": "C:/vcpkg/packages/mp3lame_x64-windows",
+					"type": "PATH"
+				},
+				{
+					"name": "portaudio_DIR",
+					"value": "C:/vcpkg/packages/portaudio_x64-windows",
+					"type": "PATH"
+				},
+				{
+					"name": "serd_DIR",
+					"value": "C:/vcpkg/packages/serd_x64-windows",
+					"type": "PATH"
+				},
+				{
+					"name": "STK_INCLUDE_DIR",
+					"value": "C:/vcpkg/packages/libstk_x64-windows/include",
+					"type": "PATH"
+				},
+				{
+					"name": "sord_DIR",
+					"value": "C:/vcpkg/packages/sord_x64-windows",
+					"type": "PATH"
+				},
+				{
+					"name": "sratom_DIR",
+					"value": "C:/vcpkg/packages/sratom_x64-windows",
+					"type": "PATH"
 				}
 			]
 		}
