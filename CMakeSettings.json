@@ -180,6 +180,11 @@
 					"name": "sratom_DIR",
 					"value": "C:/vcpkg/packages/sratom_x64-windows",
 					"type": "PATH"
+				},
+				{
+					"name": "SAMPLERATE_LIBRARY",
+					"value": "C:/vcpkg/packages/libsamplerate_x64-windows/lib/samplerate.lib",
+					"type": "FILEPATH"
 				}
 			]
 		}
