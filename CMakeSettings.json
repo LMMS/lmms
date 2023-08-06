@@ -14,7 +14,8 @@
 					"type": "PATH"
 				}
 			],
-			"cmakeToolchain": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
+			"cmakeToolchain": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
+			"cmakeCommandArgs": "-DVCPKG_TRACE_FIND_PACKAGE=ON"
 		}
 	]
 }
