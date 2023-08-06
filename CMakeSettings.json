@@ -185,6 +185,11 @@
 					"name": "SAMPLERATE_LIBRARY",
 					"value": "C:/vcpkg/packages/libsamplerate_x64-windows/lib/samplerate.lib",
 					"type": "FILEPATH"
+				},
+				{
+					"name": "SAMPLERATE_INCLUDE_DIR",
+					"value": "C:/vcpkg/packages/libsamplerate_x64-windows/include",
+					"type": "PATH"
 				}
 			]
 		}
