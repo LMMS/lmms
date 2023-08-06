@@ -7,7 +7,6 @@
 			"inheritEnvironments": [ "msvc_x64_x64" ],
 			"buildRoot": "${projectDir}\\out\\build\\${name}",
 			"installRoot": "${projectDir}\\out\\install\\${name}",
-			"cmakeCommandArgs": "",
 			"buildCommandArgs": "",
 			"ctestCommandArgs": "",
 			"variables": [
@@ -191,7 +190,8 @@
 					"value": "C:/vcpkg/packages/libsamplerate_x64-windows/include",
 					"type": "PATH"
 				}
-			]
+			],
+			"cmakeToolchain": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
 		}
 	]
 }
