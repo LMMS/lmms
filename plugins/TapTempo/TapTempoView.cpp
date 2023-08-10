@@ -103,9 +103,7 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 		}
 	});
 
-	connect(resetButton, &QPushButton::pressed, this, [this]() {
-		closeEvent(nullptr);
-	});
+	connect(resetButton, &QPushButton::pressed, this, [this]() { closeEvent(nullptr); });
 
 	connect(precisionCheckBox, &QCheckBox::toggled, [this](bool checked) {
 		m_plugin->m_showDecimal = checked;
