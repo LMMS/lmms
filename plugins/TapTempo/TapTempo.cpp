@@ -67,33 +67,14 @@ void TapTempo::onBpmClick()
 	if (m_numTaps == 0)
 	{
 		m_startTime = currentTime;
-		m_prevTime = currentTime;
 	}
 	else
 	{
-		const std::chrono::duration<double> fullInterval = currentTime - m_startTime;
-		m_bpm = m_numTaps / std::max(DBL_MIN, fullInterval.count()) * 60;
+		using namespace std::chrono_literals;
+		const auto secondsElapsed = (currentTime - m_startTime) / 1.0s;
+		if (m_numTaps >= m_tapsNeededToDisplay) { m_bpm = m_numTaps / secondsElapsed * 60; }
 	}
 
-	if (m_numTaps > 0 && m_numTaps % s_numRecentTaps == 0)
-	{
-		if (m_prevTime != m_startTime)
-		{
-			const std::chrono::duration<double> recentInveral = currentTime - m_prevTime;
-			const auto recentBpm = s_numRecentTaps / std::max(DBL_MIN, recentInveral.count()) * 60;
-
-			if (std::abs(m_bpm - recentBpm) > s_bpmDifferenceThreshold)
-			{
-				m_numTaps = 0;
-				m_bpm = 0;
-				m_startTime = currentTime;
-				m_prevTime = currentTime;
-				return;
-			}
-		}
-
-		m_prevTime = currentTime;
-	}
 	++m_numTaps;
 }
 

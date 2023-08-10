@@ -49,10 +49,8 @@ public:
 
 private:
 	std::chrono::time_point<clock> m_startTime;
-	std::chrono::time_point<clock> m_prevTime;
 	int m_numTaps = 0;
-	static constexpr int s_numRecentTaps = 3;
-	static constexpr int s_bpmDifferenceThreshold = 30;
+	int m_tapsNeededToDisplay = 2;
 	double m_bpm = 0.0;
 	bool m_showDecimal = false;
 
