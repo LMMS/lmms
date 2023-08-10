@@ -27,6 +27,7 @@
 
 #include <QString>
 #include <QObject>
+#include <memory>
 
 #include "lmmsconfig.h"
 #include "lmms_export.h"
@@ -58,27 +59,27 @@ public:
 	// core
 	static AudioEngine *audioEngine()
 	{
-		return s_audioEngine;
+		return s_audioEngine.get();
 	}
 
 	static Mixer * mixer()
 	{
-		return s_mixer;
+		return s_mixer.get();
 	}
 
 	static Song * getSong()
 	{
-		return s_song;
+		return s_song.get();
 	}
 
 	static PatternStore * patternStore()
 	{
-		return s_patternStore;
+		return s_patternStore.get();
 	}
 
 	static ProjectJournal * projectJournal()
 	{
-		return s_projectJournal;
+		return s_projectJournal.get();
 	}
 
 	static bool ignorePluginBlacklist();
@@ -86,13 +87,13 @@ public:
 #ifdef LMMS_HAVE_LV2
 	static class Lv2Manager * getLv2Manager()
 	{
-		return s_lv2Manager;
+		return s_lv2Manager.get();
 	}
 #endif
 
 	static Ladspa2LMMS * getLADSPAManager()
 	{
-		return s_ladspaManager;
+		return s_ladspaManager.get();
 	}
 
 	static float framesPerTick()
@@ -108,9 +109,9 @@ public:
 	{
 		if( s_instanceOfMe == nullptr )
 		{
-			s_instanceOfMe = new Engine();
+			s_instanceOfMe = std::make_unique<Engine>();
 		}
-		return s_instanceOfMe;
+		return s_instanceOfMe.get();
 	}
 
 	static void setDndPluginKey(void* newKey);
@@ -134,20 +135,20 @@ private:
 	static float s_framesPerTick;
 
 	// core
-	static AudioEngine *s_audioEngine;
-	static Mixer * s_mixer;
-	static Song * s_song;
-	static PatternStore * s_patternStore;
-	static ProjectJournal * s_projectJournal;
+	static std::unique_ptr<AudioEngine> s_audioEngine;
+	static std::unique_ptr<Mixer> s_mixer;
+	static std::unique_ptr<Song> s_song;
+	static std::unique_ptr<PatternStore> s_patternStore;
+	static std::unique_ptr<ProjectJournal> s_projectJournal;
 
 #ifdef LMMS_HAVE_LV2
-	static class Lv2Manager* s_lv2Manager;
+	static std::unique_ptr<class Lv2Manager> s_lv2Manager;
 #endif
-	static Ladspa2LMMS* s_ladspaManager;
+	static std::unique_ptr<Ladspa2LMMS> s_ladspaManager;
 	static void* s_dndPluginKey;
 
 	// even though most methods are static, an instance is needed for Qt slots/signals
-	static Engine* s_instanceOfMe;
+	static std::unique_ptr<Engine> s_instanceOfMe;
 
 	friend class gui::GuiApplication;
 };
