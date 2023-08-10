@@ -69,7 +69,11 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 	m_hzLabel->setToolTip(tr("Frequency of BPM"));
 	m_hzLabel->setText(tr("0.0 hz"));
 
+	auto resetButton = new QPushButton(tr("Reset"));
+	resetButton->setToolTip(tr("Reset counter and sidebar information"));
+
 	m_verticalLayout = new QVBoxLayout();
+	m_verticalLayout->addWidget(resetButton);
 	m_verticalLayout->addWidget(m_precisionCheckBox);
 	m_verticalLayout->addWidget(m_muteCheckBox);
 
@@ -101,6 +105,10 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 				? Engine::audioEngine()->addPlayHandle(new SamplePlayHandle("misc/metronome02.ogg"))
 				: Engine::audioEngine()->addPlayHandle(new SamplePlayHandle("misc/metronome01.ogg"));
 		}
+	});
+
+	connect(resetButton, &QPushButton::pressed, this, [this]() {
+		closeEvent(nullptr);
 	});
 
 	connect(m_precisionCheckBox, &QCheckBox::toggled, [this](bool checked) {
