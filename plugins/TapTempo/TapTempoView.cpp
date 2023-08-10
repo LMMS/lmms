@@ -55,22 +55,27 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 	m_tapButton->setText(tr("0"));
 
 	auto precisionCheckBox = new QCheckBox(tr("Precision"));
+	precisionCheckBox->setFocusPolicy(Qt::NoFocus);
 	precisionCheckBox->setToolTip(tr("Display in high precision"));
 	precisionCheckBox->setText(tr("Precision"));
 
 	auto muteCheckBox = new QCheckBox(tr("0.0 ms"));
+	muteCheckBox->setFocusPolicy(Qt::NoFocus);	
 	muteCheckBox->setToolTip(tr("Mute metronome"));
 	muteCheckBox->setText(tr("Mute"));
 
 	m_msLabel = new QLabel();
+	m_msLabel->setFocusPolicy(Qt::NoFocus);
 	m_msLabel->setToolTip(tr("BPM in milliseconds"));
 	m_msLabel->setText(tr("0 ms"));
 
 	m_hzLabel = new QLabel();
+	m_hzLabel->setFocusPolicy(Qt::NoFocus);
 	m_hzLabel->setToolTip(tr("Frequency of BPM"));
 	m_hzLabel->setText(tr("0.0000 hz"));
 
 	auto resetButton = new QPushButton(tr("Reset"));
+	resetButton->setFocusPolicy(Qt::NoFocus);
 	resetButton->setToolTip(tr("Reset counter and sidebar information"));
 
 	auto optionLayout = new QVBoxLayout();
