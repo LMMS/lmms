@@ -44,61 +44,57 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 	: ToolPluginView(plugin)
 	, m_plugin(plugin)
 {
-	setFixedSize(250, 288);
+	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
 	auto font = QFont();
 	font.setPointSize(24);
+
 	m_tapButton = new QPushButton();
 	m_tapButton->setFixedSize(200, 200);
 	m_tapButton->setFont(font);
 	m_tapButton->setText(tr("0"));
 
-	m_precisionCheckBox = new QCheckBox(tr("Precision"));
-	m_precisionCheckBox->setToolTip(tr("Display in high precision"));
-	m_precisionCheckBox->setText(tr("Precision"));
+	auto precisionCheckBox = new QCheckBox(tr("Precision"));
+	precisionCheckBox->setToolTip(tr("Display in high precision"));
+	precisionCheckBox->setText(tr("Precision"));
 
-	m_muteCheckBox = new QCheckBox(tr("0.0 ms"));
-	m_muteCheckBox->setToolTip(tr("Mute metronome"));
-	m_muteCheckBox->setText(tr("Mute"));
+	auto muteCheckBox = new QCheckBox(tr("0.0 ms"));
+	muteCheckBox->setToolTip(tr("Mute metronome"));
+	muteCheckBox->setText(tr("Mute"));
 
 	m_msLabel = new QLabel();
 	m_msLabel->setToolTip(tr("BPM in milliseconds"));
-	m_msLabel->setText(tr("0.0 ms"));
+	m_msLabel->setText(tr("0 ms"));
 
 	m_hzLabel = new QLabel();
 	m_hzLabel->setToolTip(tr("Frequency of BPM"));
-	m_hzLabel->setText(tr("0.0 hz"));
+	m_hzLabel->setText(tr("0.0000 hz"));
 
 	auto resetButton = new QPushButton(tr("Reset"));
 	resetButton->setToolTip(tr("Reset counter and sidebar information"));
 
-	m_verticalLayout = new QVBoxLayout();
-	m_verticalLayout->addWidget(resetButton);
-	m_verticalLayout->addWidget(m_precisionCheckBox);
-	m_verticalLayout->addWidget(m_muteCheckBox);
+	auto optionLayout = new QVBoxLayout();
+	optionLayout->addWidget(precisionCheckBox);
+	optionLayout->addWidget(muteCheckBox);
 
-	m_sidebarLayout = new QHBoxLayout();
-	m_sidebarLayout->setSpacing(5);
-	m_sidebarLayout->addWidget(m_msLabel, 0, Qt::AlignHCenter);
-	m_sidebarLayout->addWidget(m_hzLabel, 0, Qt::AlignHCenter);
-	m_sidebarLayout->addLayout(m_verticalLayout);
+	auto bpmInfoLayout = new QVBoxLayout();
+	bpmInfoLayout->addWidget(m_msLabel, 0, Qt::AlignHCenter);
+	bpmInfoLayout->addWidget(m_hzLabel, 0, Qt::AlignHCenter);
 
-	m_mainLayout = new QVBoxLayout();
-	m_mainLayout->setSpacing(5);
-	m_mainLayout->setContentsMargins(2, 2, 2, 2);
-	m_mainLayout->addWidget(m_tapButton, 0, Qt::AlignHCenter | Qt::AlignVCenter);
-	m_mainLayout->addLayout(m_sidebarLayout);
+	auto sidebarLayout = new QHBoxLayout();
+	sidebarLayout->addLayout(optionLayout);
+	sidebarLayout->addLayout(bpmInfoLayout);
 
-	m_windowLayout = new QVBoxLayout(this);
-	m_windowLayout->setSpacing(0);
-	m_windowLayout->setContentsMargins(0, 0, 0, 0);
-	m_windowLayout->addLayout(m_mainLayout);
+	auto mainLayout = new QVBoxLayout(this);
+	mainLayout->addWidget(m_tapButton, 0, Qt::AlignCenter);
+	mainLayout->addWidget(resetButton, 0, Qt::AlignCenter);
+	mainLayout->addLayout(sidebarLayout);
 
-	connect(m_tapButton, &QPushButton::pressed, this, [this]() {
+	connect(m_tapButton, &QPushButton::pressed, this, [this, muteCheckBox]() {
 		m_plugin->onBpmClick();
 		updateLabels();
 
-		if (!m_muteCheckBox->isChecked())
+		if (!muteCheckBox->isChecked())
 		{
 			const auto timeSigNumerator = Engine::getSong()->getTimeSigModel().getNumerator();
 			m_plugin->m_numTaps % timeSigNumerator == 0
@@ -111,7 +107,7 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 		closeEvent(nullptr);
 	});
 
-	connect(m_precisionCheckBox, &QCheckBox::toggled, [this](bool checked) {
+	connect(precisionCheckBox, &QCheckBox::toggled, [this](bool checked) {
 		m_plugin->m_showDecimal = checked;
 		updateLabels();
 	});
@@ -137,7 +133,7 @@ void TapTempoView::updateLabels()
 
 	m_tapButton->setText(QString::number(bpm, 'f', m_plugin->m_showDecimal ? 1 : 0));
 	m_msLabel->setText(tr("%1 ms").arg(ms, 0, 'f', m_plugin->m_showDecimal ? 1 : 0));
-	m_hzLabel->setText(tr("%1 Hz").arg(hz, 0, 'f', 4));
+	m_hzLabel->setText(tr("%1 hz").arg(hz, 0, 'f', 4));
 }
 
 void TapTempoView::keyPressEvent(QKeyEvent* event)

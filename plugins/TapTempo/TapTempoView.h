@@ -53,15 +53,9 @@ public:
 	void closeEvent(QCloseEvent*) override;
 
 private:
-	QVBoxLayout* m_windowLayout;
-	QVBoxLayout* m_mainLayout;
 	QPushButton* m_tapButton;
-	QHBoxLayout* m_sidebarLayout;
 	QLabel* m_msLabel;
 	QLabel* m_hzLabel;
-	QVBoxLayout* m_verticalLayout;
-	QCheckBox* m_precisionCheckBox;
-	QCheckBox* m_muteCheckBox;
 	TapTempo* m_plugin;
 	friend class TapTempo;
 };
