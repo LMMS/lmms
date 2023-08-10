@@ -142,6 +142,7 @@ void TapTempoView::closeEvent(QCloseEvent*)
 {
 	m_plugin->m_numTaps = 0;
 	m_plugin->m_bpm = 0;
+	updateLabels();
 }
 
 } // namespace lmms::gui
