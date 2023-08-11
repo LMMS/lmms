@@ -419,7 +419,7 @@ const surroundSampleFrame * AudioEngine::renderNextBuffer()
 	}
 
 	// STAGE 2: process effects of all instrument- and sampletracks
-	AudioEngineWorkerThread::fillJobQueue<std::vector<AudioPort*>>(m_audioPorts);
+	AudioEngineWorkerThread::fillJobQueue(m_audioPorts);
 	AudioEngineWorkerThread::startAndWaitForJobs();
 
 
