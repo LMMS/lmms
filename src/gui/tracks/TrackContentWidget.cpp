@@ -325,7 +325,7 @@ bool TrackContentWidget::canPasteSelection( TimePos clipPos, const QMimeData* md
 	QString value = decodeValue( md );
 
 	// We can only paste into tracks of the same type
-	if( type != ( "clip_" + QString::number( t->type() ) ) )
+	if (type != ("clip_" + QString::number(t->type())))
 	{
 		return false;
 	}
@@ -361,8 +361,8 @@ bool TrackContentWidget::canPasteSelection( TimePos clipPos, const QMimeData* md
 
 	// If we are pasting into the PatternEditor, only a single Clip is allowed to be pasted
 	// so we don't have the unexpected behavior of pasting on different PatternTracks
-	if( m_trackView->trackContainerView()->fixedClips() == true &&
-			clipNodes.length() > 1 )
+	if (m_trackView->trackContainerView()->fixedClips() == true &&
+			clipNodes.length() > 1)
 	{
 		return false;
 	}
