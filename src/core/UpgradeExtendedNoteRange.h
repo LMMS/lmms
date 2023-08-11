@@ -42,6 +42,6 @@ private:
 	QDomElement & m_domElement;
 };
 
-}
+} // namespace lmms
 
 #endif // LMMS_UPGRADEEXTENDEDNOTERANGE_H

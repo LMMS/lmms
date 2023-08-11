@@ -27,6 +27,8 @@
 #include <QDomElement>
 
 #include <set>
+#include <cassert>
+
 
 namespace lmms
 {
@@ -428,4 +430,4 @@ void UpgradeExtendedNoteRange::upgrade()
 	}
 }
 
-}
+} // namespace lmms
