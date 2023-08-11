@@ -1699,7 +1699,7 @@ static PatternAnalysisResult analyzeAutomationPattern(QDomElement const & automa
 
 	// Iterate the objects. These contain the ids of the automated objects.
 	QDomElement object = automationPattern.firstChildElement("object");
-	while(!object.isNull())
+	while (!object.isNull())
 	{
 		unsigned int const id = object.attribute("id").toUInt();
 
@@ -1788,7 +1788,7 @@ static void fixInstrumentBaseNoteAndCollectIds(QDomElement & instrument, std::se
 static void fixAutomationPattern(QDomElement & automationPattern)
 {
 	QDomElement time = automationPattern.firstChildElement("time");
-	while(!time.isNull())
+	while (!time.isNull())
 	{
 		// Automation patterns can automate base notes as floats
 		// so we read and correct them as floats here.
@@ -1823,7 +1823,7 @@ static void fixTrack(QDomElement & track, std::set<unsigned int> & automatedBase
 
 	Track::TrackTypes const trackType = static_cast<Track::TrackTypes>(track.attribute("type").toInt());
 
-	// BB tracks need special handling because they container a track container of their own
+	// BB tracks need special handling because they contain a track container of their own
 	if (trackType == Track::PatternTrack)
 	{
 		// Assuming that a BB track cannot contain another BB track here...
@@ -1948,7 +1948,7 @@ static void fixAutomationTracks(QDomElement & song, std::set<unsigned int> const
 			{
 				// The pattern itself is mixed. Remove the base note objects.
 				QDomElement object = automationPattern.firstChildElement("object");
-				while(!object.isNull())
+				while (!object.isNull())
 				{
 					unsigned int const id = object.attribute("id").toUInt();
 
@@ -1978,7 +1978,7 @@ static void fixAutomationTracks(QDomElement & song, std::set<unsigned int> const
 			{
 				// This pattern has base note automations. Remove all other ones and fix the pattern.
 				QDomElement object = automationPattern.firstChildElement("object");
-				while(!object.isNull())
+				while (!object.isNull())
 				{
 					unsigned int const id = object.attribute("id").toUInt();
 
