@@ -924,6 +924,9 @@ int main( int argc, char * * argv )
 			// set icons
 			recover->setIcon( embed::getIconPixmap( "recover" ) );
 			discard->setIcon( embed::getIconPixmap( "discard" ) );
+			
+			// add shortcut to discard
+			discard->setShortcut(Qt::CTRL + Qt::Key_D);
 
 			mb.setDefaultButton( recover );
 			mb.setEscapeButton( exit );
