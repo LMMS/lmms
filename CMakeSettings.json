@@ -30,6 +30,37 @@
 				}
 			],
 			"cmakeToolchain": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
+		},
+		{
+			"name": "x64-Release",
+			"generator": "Ninja",
+			"configurationType": "Release",
+			"buildRoot": "${projectDir}\\out\\build\\${name}",
+			"installRoot": "${projectDir}\\out\\install\\${name}",
+			"cmakeToolchain": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
+			"inheritEnvironments": [ "msvc_x64" ],
+			"variables": [
+				{
+					"name": "Qt5_DIR",
+					"value": "C:/Qt/5.15.2/msvc2019_64/lib/cmake",
+					"type": "PATH"
+				},
+				{
+					"name": "Qt5Test_DIR",
+					"value": "C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5Test",
+					"type": "PATH"
+				},
+				{
+					"name": "PERL_EXECUTABLE",
+					"value": "C:/Strawberry/perl/bin/perl.exe",
+					"type": "FILEPATH"
+				},
+				{
+					"name": "VCPKG_TRACE_FIND_PACKAGE",
+					"value": "ON",
+					"type": "STRING"
+				}
+			]
 		}
 	]
 }
