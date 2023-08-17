@@ -42,6 +42,10 @@ ReverbSCControls::ReverbSCControls( ReverbSCEffect* effect ) :
 	m_outputGainModel( 0.0f, -60.0f, 15, 0.1f, this, tr( "Output gain" ) )
 {
 	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( changeSampleRate() ));
+	m_inPeakL = 0.0;
+	m_inPeakR = 0.0;
+	m_outPeakL = 0.0;
+	m_outPeakR = 0.0;
 }
 
 void ReverbSCControls::changeControl()

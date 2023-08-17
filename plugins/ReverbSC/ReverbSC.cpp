@@ -35,6 +35,7 @@ namespace lmms
 extern "C"
 {
 
+
 Plugin::Descriptor PLUGIN_EXPORT reverbsc_plugin_descriptor =
 {
 	LMMS_STRINGIFY( PLUGIN_NAME ),
@@ -47,7 +48,6 @@ Plugin::Descriptor PLUGIN_EXPORT reverbsc_plugin_descriptor =
 	nullptr,
 	nullptr,
 } ;
-
 }
 
 ReverbSCEffect::ReverbSCEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key ) :
@@ -85,6 +85,10 @@ bool ReverbSCEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	double outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
+	float inLPeak = 0.0;
+	float inRPeak = 0.0;
+	float lPeak = 0.0;
+	float rPeak = 0.0;
 
 	SPFLOAT tmpL, tmpR;
 	SPFLOAT dcblkL, dcblkR;
@@ -97,6 +101,11 @@ bool ReverbSCEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	for( fpp_t f = 0; f < frames; ++f )
 	{
 		auto s = std::array{buf[f][0], buf[f][1]};
+
+		inLPeak = buf[f][0] > inLPeak ? buf[f][0] : inLPeak;
+		inRPeak = buf[f][1] > inRPeak ? buf[f][1] : inRPeak;
+
+
 
 		const auto inGain
 			= (SPFLOAT)DB2LIN((inGainBuf ? inGainBuf->values()[f] : m_reverbSCControls.m_inputGainModel.value()));
@@ -120,11 +129,18 @@ bool ReverbSCEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 		buf[f][0] = d * buf[f][0] + w * dcblkL * outGain;
 		buf[f][1] = d * buf[f][1] + w * dcblkR * outGain;
 
+		lPeak = buf[f][0] > lPeak ? buf[f][0] : lPeak;
+		rPeak = buf[f][1] > rPeak ? buf[f][1] : rPeak;
+
 		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
 	}
 
-
 	checkGate( outSum / frames );
+
+	m_reverbSCControls.m_inPeakL = inLPeak;
+	m_reverbSCControls.m_inPeakR = inRPeak;
+	m_reverbSCControls.m_outPeakL = lPeak;
+	m_reverbSCControls.m_outPeakR = rPeak;
 
 	return isRunning();
 }
@@ -152,7 +168,6 @@ void ReverbSCEffect::changeSampleRate()
 
 extern "C"
 {
-
 // necessary for getting instance out of shared lib
 PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 {
@@ -161,7 +176,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data)
 	);
 }
-
 }
 
 

@@ -59,6 +59,11 @@ public:
 		return new gui::ReverbSCControlDialog( this );
 	}
 
+	float m_inPeakL;
+	float m_inPeakR;
+	float m_outPeakL;
+	float m_outPeakR;
+
 
 private slots:
 	void changeControl();

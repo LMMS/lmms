@@ -15,5 +15,6 @@ BUILD_PLUGIN(
 	MOCFILES
 	ReverbSCControls.h
 	ReverbSCControlDialog.h
+	../Eq/EqFader.h
 	EMBEDDED_RESOURCES artwork.png logo.png
 )

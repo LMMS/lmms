@@ -28,6 +28,7 @@
 #include "embed.h"
 #include "Knob.h"
 #include "ReverbSCControls.h"
+#include "../Eq/EqFader.h"
 
 namespace lmms::gui
 {
@@ -40,31 +41,33 @@ ReverbSCControlDialog::ReverbSCControlDialog( ReverbSCControls* controls ) :
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-	setFixedSize( 185, 55 );
+	setFixedSize( 144, 144 );
 
-	auto inputGainKnob = new Knob(knobBright_26, this);
-	inputGainKnob -> move( 16, 10 );
-	inputGainKnob->setModel( &controls->m_inputGainModel );
-	inputGainKnob->setLabel( tr( "Input" ) );
-	inputGainKnob->setHintText( tr( "Input gain:" ) , "dB" );
+	auto inFader
+		= new EqFader(&controls->m_inputGainModel, tr("Input gain"), this, &controls->m_inPeakL, &controls->m_inPeakR);
+	inFader->setMaximumHeight( 32 );
+	inFader->move( 15, 16 );
+	inFader->setDisplayConversion( false );
+	inFader->setHintText( tr( "Gain" ), "dBFS" );
 
 	auto sizeKnob = new Knob(knobBright_26, this);
-	sizeKnob -> move( 57, 10 );
+	sizeKnob -> move( 58, 30 );
 	sizeKnob->setModel( &controls->m_sizeModel );
 	sizeKnob->setLabel( tr( "Size" ) );
 	sizeKnob->setHintText( tr( "Size:" ) , "" );
 
 	auto colorKnob = new Knob(knobBright_26, this);
-	colorKnob -> move( 98, 10 );
+	colorKnob -> move( 58, 76 );
 	colorKnob->setModel( &controls->m_colorModel );
 	colorKnob->setLabel( tr( "Color" ) );
 	colorKnob->setHintText( tr( "Color:" ) , "" );
 
-	auto outputGainKnob = new Knob(knobBright_26, this);
-	outputGainKnob -> move( 139, 10 );
-	outputGainKnob->setModel( &controls->m_outputGainModel );
-	outputGainKnob->setLabel( tr( "Output" ) );
-	outputGainKnob->setHintText( tr( "Output gain:" ) , "dB" );
+	auto outFader
+		= new EqFader(&controls->m_outputGainModel, tr("Out gain"), this, &controls->m_outPeakL, &controls->m_outPeakR);
+	outFader->setMaximumHeight( 196 );
+	outFader->move( 106, 16 );
+	outFader->setDisplayConversion( false );
+	outFader->setHintText( tr( "Gain" ), "dBFS" );
 }
 
 
