@@ -406,7 +406,7 @@ void ControllerConnectionDialog::userSelected()
 
 void ControllerConnectionDialog::autoDetectToggled()
 {
-	if( m_midiAutoDetect.value() )
+	if (m_midiAutoDetect.value() && m_midiController)
 	{
 		m_midiController->reset();
 	}
