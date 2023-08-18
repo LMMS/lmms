@@ -107,6 +107,7 @@ SET(LMMS_SRCS
 	gui/widgets/LcdWidget.cpp
 	gui/widgets/LedCheckBox.cpp
 	gui/widgets/LeftRightNav.cpp
+	gui/widgets/Menu.cpp
 	gui/widgets/MeterDialog.cpp
 	gui/widgets/MixerLineLcdSpinBox.cpp
 	gui/widgets/NStateButton.cpp

@@ -45,6 +45,7 @@
 #include "FileDialog.h"
 #include "MixerView.h"
 #include "GuiApplication.h"
+#include "Menu.h"
 #include "ImportFilter.h"
 #include "InstrumentTrackView.h"
 #include "InstrumentTrackWindow.h"
@@ -278,7 +279,7 @@ void MainWindow::finalize()
 
 
 	// project-popup-menu
-	auto project_menu = new QMenu(this);
+	auto project_menu = new Menu(this);
 	menuBar()->addMenu( project_menu )->setText( tr( "&File" ) );
 	project_menu->addAction( embed::getIconPixmap( "project_new" ),
 					tr( "&New" ),
@@ -342,7 +343,7 @@ void MainWindow::finalize()
 					qApp, SLOT(closeAllWindows()),
 					Qt::CTRL + Qt::Key_Q );
 
-	auto edit_menu = new QMenu(this);
+	auto edit_menu = new Menu(this);
 	menuBar()->addMenu( edit_menu )->setText( tr( "&Edit" ) );
 	m_undoAction = edit_menu->addAction( embed::getIconPixmap( "edit_undo" ),
 					tr( "Undo" ),
@@ -368,7 +369,7 @@ void MainWindow::finalize()
 					this, SLOT(showSettingsDialog()));
 	connect( edit_menu, SIGNAL(aboutToShow()), this, SLOT(updateUndoRedoButtons()));
 
-	m_viewMenu = new QMenu( this );
+	m_viewMenu = new Menu( this );
 	menuBar()->addMenu( m_viewMenu )->setText( tr( "&View" ) );
 	connect( m_viewMenu, SIGNAL(aboutToShow()),
 		 this, SLOT(updateViewMenu()));
@@ -376,7 +377,7 @@ void MainWindow::finalize()
 		SLOT(updateConfig(QAction*)));
 
 
-	m_toolsMenu = new QMenu( this );
+	m_toolsMenu = new Menu( this );
 	for( const Plugin::Descriptor* desc : getPluginFactory()->descriptors(Plugin::Tool) )
 	{
 		m_toolsMenu->addAction( desc->logo->pixmap(), desc->displayName );
@@ -392,7 +393,7 @@ void MainWindow::finalize()
 
 
 	// help-popup-menu
-	auto help_menu = new QMenu(this);
+	auto help_menu = new Menu(this);
 	menuBar()->addMenu( help_menu )->setText( tr( "&Help" ) );
 	// May use offline help
 	if( true )
