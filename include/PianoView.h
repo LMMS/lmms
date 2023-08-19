@@ -64,6 +64,7 @@ protected:
 	void focusOutEvent( QFocusEvent * _fe ) override;
 	void focusInEvent( QFocusEvent * fe ) override;
 	void resizeEvent( QResizeEvent * _event ) override;
+	void wheelEvent(QWheelEvent* we) override;
 
 
 private:

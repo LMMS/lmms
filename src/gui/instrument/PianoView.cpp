@@ -738,6 +738,12 @@ void PianoView::resizeEvent(QResizeEvent* event)
 
 
 
+void PianoView::wheelEvent(QWheelEvent* we)
+{
+	QApplication::sendEvent(m_pianoScroll, we);
+}
+
+
 
 /*! \brief Convert a key number to an X coordinate in the piano display view
  *
