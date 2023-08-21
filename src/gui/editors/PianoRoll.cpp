@@ -5243,7 +5243,7 @@ void PianoRollWindow::setScrollbarPos(double posX)
 	const auto zoomFactor = m_editor->m_zoomLevels[m_editor->m_zoomingModel.value()];
 	const auto zoomOffset = halfEditorWidth * (-1.0 / zoomFactor);
 
-	const auto scrollPosX = static_cast<int>(posX * (sbX->maximum() - sbX->minimum()) + zoomOffset);
+	const auto scrollPosX = static_cast<int>(posX * (sbX->maximum() - sbX->minimum()) + zoomOffset + (sbY->width() / 2));
 
 	sbX->setValue(std::max(scrollPosX, 0));
 }
