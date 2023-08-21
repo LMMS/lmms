@@ -30,6 +30,7 @@
 
 #include "ExportFilter.h"
 #include "MidiFile.hpp"
+#include "Note.h"
 
 class QDomNode;
 
@@ -46,6 +47,7 @@ struct MidiNote
 	uint8_t pitch;
 	int duration;
 	uint8_t volume;
+	Note::Type type;
 
 	inline bool operator<(const MidiNote &b) const
 	{
@@ -78,7 +80,7 @@ private:
 	void writeMidiClipToTrack(MTrack &mtrack, MidiNoteVector &nv);
 	void writePatternClip(MidiNoteVector &src, MidiNoteVector &dst,
 				int len, int base, int start, int end);
-	void processPatternNotes(MidiNoteVector &nv, int cutPos);
+	void processPatternNotes(MidiNoteVector &nv, int beatLen, int cutPos);
 
 	void error();
 

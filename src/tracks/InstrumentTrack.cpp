@@ -831,6 +831,7 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 	{
 		QDomElement i = doc.createElement( "instrument" );
 		i.setAttribute( "name", m_instrument->descriptor()->name );
+		i.setAttribute("beatlen", static_cast<int>(beatLen(nullptr)));
 		QDomElement ins = m_instrument->saveState( doc, i );
 		if(m_instrument->key().isValid()) {
 			ins.appendChild( m_instrument->key().saveXML( doc ) );
