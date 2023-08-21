@@ -5236,12 +5236,16 @@ bool PianoRollWindow::hasFocus() const
 
 void PianoRollWindow::setScrollbarPos(double posX)
 {
-	auto sbX = m_editor->m_leftRightScroll;
-	const auto halfEditorWidth = (sbX->width() - m_editor->m_topBottomScroll->width()) / 2.0;
+	const auto sbX = m_editor->m_leftRightScroll;
+	const auto sbY = m_editor->m_topBottomScroll;
 
-	auto absolutePosX = static_cast<int>(posX * (sbX->maximum() - sbX->minimum()) - halfEditorWidth);
+	const auto halfEditorWidth = (sbX->width() - sbY->width()) / 2.0;
+	const auto zoomFactor = m_editor->m_zoomLevels[m_editor->m_zoomingModel.value()];
+	const auto zoomOffset = halfEditorWidth * (-1.0 / zoomFactor);
 
-	sbX->setValue(std::max(absolutePosX, 0));
+	const auto scrollPosX = static_cast<int>(posX * (sbX->maximum() - sbX->minimum()) + zoomOffset);
+
+	sbX->setValue(std::max(scrollPosX, 0));
 }
 
 
