@@ -881,6 +881,7 @@ void PianoRoll::setCurrentMidiClip( MidiClip* newMidiClip )
 	{
 		//resizeEvent( NULL );
 
+		updateXScroll();
 		update();
 		emit currentMidiClipChanged();
 		return;
@@ -924,8 +925,9 @@ void PianoRoll::setCurrentMidiClip( MidiClip* newMidiClip )
 	connect(m_midiClip->instrumentTrack()->microtuner()->keyRangeImportModel(), SIGNAL(dataChanged()),
 		this, SLOT(update()));
 
-	connect(m_midiClip, &MidiClip::lengthChanged, this, &PianoRoll::updateScrollbarRange);
+	connect(m_midiClip, &MidiClip::lengthChanged, this, &PianoRoll::updateXScroll);
 
+	updateXScroll();
 	update();
 	emit currentMidiClipChanged();
 }
@@ -3721,38 +3723,10 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 void PianoRoll::updateScrollbars()
 {
-	m_leftRightScroll->setGeometry(
-		m_whiteKeyWidth,
-		height() - SCROLLBAR_SIZE,
-		width() - m_whiteKeyWidth,
-		SCROLLBAR_SIZE
-	);
-	m_topBottomScroll->setGeometry(
-		width() - SCROLLBAR_SIZE,
-		PR_TOP_MARGIN,
-		SCROLLBAR_SIZE,
-		height() - PR_TOP_MARGIN - SCROLLBAR_SIZE
-	);
-	int pianoAreaHeight = keyAreaBottom() - PR_TOP_MARGIN;
-	int numKeysVisible = pianoAreaHeight / m_keyLineHeight;
-	m_totalKeysToScroll = qMax(0, NumKeys - numKeysVisible);
-	m_topBottomScroll->setRange(0, m_totalKeysToScroll);
-	if (m_startKey > m_totalKeysToScroll)
-	{
-		m_startKey = qMax(0, m_totalKeysToScroll);
-	}
-	m_topBottomScroll->setValue(m_totalKeysToScroll - m_startKey);
+	updateXScroll();
+	updateYScroll();
 }
 
-void PianoRoll::updateScrollbarRange()
-{
-	const int length = hasValidMidiClip() ? static_cast<int>(m_midiClip->length()) : 0;
-	if (m_leftRightScroll->maximum() != length)
-	{
-		m_leftRightScroll->setRange(0, length);
-		m_leftRightScroll->setPageStep(length);
-	}
-}
 
 // responsible for moving/resizing scrollbars after window-resizing
 void PianoRoll::resizeEvent(QResizeEvent* re)
@@ -4315,20 +4289,39 @@ void PianoRoll::enterValue( NoteVector* nv )
 	}
 }
 
+void PianoRoll::updateXScroll()
+{
+	m_leftRightScroll->setGeometry(
+		m_whiteKeyWidth,
+		height() - SCROLLBAR_SIZE,
+		width() - m_whiteKeyWidth,
+		SCROLLBAR_SIZE
+	);
+
+	const int length = hasValidMidiClip() ? static_cast<int>(m_midiClip->length()) : 0;
+	if (m_leftRightScroll->maximum() != length)
+	{
+		m_leftRightScroll->setRange(0, length);
+		m_leftRightScroll->setPageStep(length);
+	}
+}
 
 void PianoRoll::updateYScroll()
 {
-	m_topBottomScroll->setGeometry(width() - SCROLLBAR_SIZE, PR_TOP_MARGIN,
-						SCROLLBAR_SIZE,
-						height() - PR_TOP_MARGIN -
-						SCROLLBAR_SIZE);
+	m_topBottomScroll->setGeometry(
+		width() - SCROLLBAR_SIZE,
+		PR_TOP_MARGIN,
+		SCROLLBAR_SIZE,
+		height() - PR_TOP_MARGIN - SCROLLBAR_SIZE
+	);
 
-	const int visible_space = keyAreaBottom() - keyAreaTop();
-	m_totalKeysToScroll = qMax(0, NumKeys - 1 - visible_space / m_keyLineHeight);
+	int pianoAreaHeight = keyAreaBottom() - keyAreaTop();
+	int numKeysVisible = pianoAreaHeight / m_keyLineHeight;
 
+	m_totalKeysToScroll = std::max(0, NumKeys - numKeysVisible);
 	m_topBottomScroll->setRange(0, m_totalKeysToScroll);
 
-	if(m_startKey > m_totalKeysToScroll)
+	if (m_startKey > m_totalKeysToScroll)
 	{
 		m_startKey = m_totalKeysToScroll;
 	}

@@ -189,6 +189,7 @@ protected:
 	// for entering values with dblclick in the vol/pan bars
 	void enterValue( NoteVector* nv );
 
+	void updateXScroll();
 	void updateYScroll();
 
 protected slots:
@@ -237,8 +238,6 @@ protected slots:
 	void constrainNoteLengths(bool constrainMax);
 
 	void changeSnapMode();
-
-	void updateScrollbarRange();
 
 signals:
 	void currentMidiClipChanged();
