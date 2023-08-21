@@ -130,7 +130,7 @@ void AudioFileProcessor::playNote( NotePlayHandle * _n,
 		return;
 	}
 
-	if (!_n->m_pluginData)
+	if( !_n->m_pluginData )
 	{
 		if( m_stutterModel.value() == true && m_nextPlayStartPoint >= m_sampleBuffer.endFrame() )
 		{
@@ -682,12 +682,11 @@ void AudioFileProcessorView::sampleUpdated()
 void AudioFileProcessorView::openAudioFile()
 {
 	QString af = castModel<AudioFileProcessor>()->m_sampleBuffer.openAudioFile();
-	if (!af.isEmpty())
-	{
-		castModel<AudioFileProcessor>()->setAudioFile(af);
-		Engine::getSong()->setModified();
-		m_waveView->updateSampleRange();
-	}
+	if (af.isEmpty()) { return; }
+
+	castModel<AudioFileProcessor>()->setAudioFile(af);
+	Engine::getSong()->setModified();
+	m_waveView->updateSampleRange();
 }
 
 

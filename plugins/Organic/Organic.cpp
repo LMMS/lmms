@@ -163,7 +163,7 @@ void OrganicInstrument::saveSettings(QDomDocument& doc, QDomElement& elem)
 
 	for (int i = 0; i < m_numOscillators; ++i)
 	{
-		QString is = QString::number(i);
+		const auto is = QString::number(i);
 		m_osc[i]->m_volModel.saveSettings(doc, elem, "vol" + is);
 		m_osc[i]->m_panModel.saveSettings(doc, elem, "pan" + is);
 		m_osc[i]->m_harmModel.saveSettings(doc, elem, "newharmonic" + is);

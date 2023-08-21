@@ -113,7 +113,7 @@ private:
 			for (int i = 0; i < pick; ++i)
 			{
 				r = static_cast<float>(std::rand()) / RAND_MAX;
-				offset =  (m_randomize / 2.0f - m_randomize) * r;
+				offset = (m_randomize / 2.0f - m_randomize) * r;
 				dl->data[i] = scale * values[dl->length - i - 1] + offset;
 			}
 			for (int i = pick; i < dl->length; ++i)
