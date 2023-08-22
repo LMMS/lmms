@@ -95,7 +95,7 @@ int ProjectVersion::compare(const ProjectVersion & a, const ProjectVersion & b, 
 	if(aPat != bPat){ return aPat - bPat; }
 
 	// Decide how many optional identifiers we care about
-	const int maxLabels = qMax(0, limit - 3);
+	const int maxLabels = std::max(0, limit - 3);
 	const auto aLabels = a.getLabels().mid(0, maxLabels);
 	const auto bLabels = b.getLabels().mid(0, maxLabels);
 

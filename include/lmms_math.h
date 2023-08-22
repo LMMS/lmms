@@ -214,7 +214,7 @@ static inline float logToLinearScale( float min, float max, float value )
 {
 	if( min < 0 )
 	{
-		const float mmax = qMax(std::abs(min), std::abs(max));
+		const float mmax = std::max(std::abs(min), std::abs(max));
 		const float val = value * ( max - min ) + min;
 		float result = signedPowf( val / mmax, F_E ) * mmax;
 		return std::isnan( result ) ? 0 : result;
@@ -232,7 +232,7 @@ static inline float linearToLogScale( float min, float max, float value )
 	const float val = ( valueLimited - min ) / ( max - min );
 	if( min < 0 )
 	{
-		const float mmax = qMax(std::abs(min), std::abs(max));
+		const float mmax = std::max(std::abs(min), std::abs(max));
 		float result = signedPowf( valueLimited / mmax, EXP ) * mmax;
 		return std::isnan( result ) ? 0 : result;
 	}

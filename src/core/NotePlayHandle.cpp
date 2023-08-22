@@ -384,7 +384,7 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 
 	// then set some variables indicating release-state
 	m_framesBeforeRelease = _s;
-	m_releaseFramesToDo = qMax<f_cnt_t>( 0, actualReleaseFramesToDo() );
+	m_releaseFramesToDo = std::max<f_cnt_t>(0, actualReleaseFramesToDo());
 
 	if( m_hasMidiNote )
 	{

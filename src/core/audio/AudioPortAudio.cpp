@@ -496,12 +496,12 @@ void AudioPortAudio::setupWidget::show()
 		const QString& device = ConfigManager::inst()->value(
 			"audioportaudio", "device" );
 		
-		int i = qMax( 0, m_setupUtil.m_backendModel.findText( backend ) );
+		int i = std::max(0, m_setupUtil.m_backendModel.findText(backend));
 		m_setupUtil.m_backendModel.setValue( i );
 		
 		m_setupUtil.updateDevices();
 		
-		i = qMax( 0, m_setupUtil.m_deviceModel.findText( device ) );
+		i = std::max(0, m_setupUtil.m_deviceModel.findText(device));
 		m_setupUtil.m_deviceModel.setValue( i );
 	}
 

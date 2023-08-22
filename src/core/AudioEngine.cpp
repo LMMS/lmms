@@ -314,7 +314,7 @@ void AudioEngine::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
 
 	if( frames + _frames > size )
 	{
-		size = qMax( size * 2, frames + _frames );
+		size = std::max(size * 2, frames + _frames);
 		auto ab = new sampleFrame[size];
 		memcpy( ab, buf, frames * sizeof( sampleFrame ) );
 		delete [] buf;

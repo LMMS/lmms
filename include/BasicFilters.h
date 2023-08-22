@@ -702,7 +702,7 @@ public:
 	inline void calcFilterCoeffs( float _freq, float _q )
 	{
 		// temp coef vars
-		_q = qMax( _q, minQ() );
+		_q = std::max(_q, minQ());
 
 		if( m_type == Lowpass_RC12  ||
 			m_type == Bandpass_RC12 ||
@@ -796,10 +796,10 @@ public:
 			m_type == Highpass_SV ||
 			m_type == Notch_SV )
 		{
-			const float f = sinf( qMax( minFreq(), _freq ) * m_sampleRatio * F_PI );
+			const float f = sinf(std::max(minFreq(), _freq) * m_sampleRatio * F_PI);
 			m_svf1 = qMin( f, 0.825f );
 			m_svf2 = qMin( f * 2.0f, 0.825f );
-			m_svq = qMax( 0.0001f, 2.0f - ( _q * 0.1995f ) );
+			m_svq = std::max(0.0001f, 2.0f - (_q * 0.1995f));
 			return;
 		}
 

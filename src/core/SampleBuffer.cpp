@@ -736,7 +736,7 @@ bool SampleBuffer::play(
 
 
 	// this holds the index of the first frame to play
-	f_cnt_t playFrame = qMax(state->m_frameIndex, startFrame);
+	f_cnt_t playFrame = std::max(state->m_frameIndex, startFrame);
 
 	if (loopMode == LoopOff)
 	{

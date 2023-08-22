@@ -187,7 +187,7 @@ namespace lmms::DspEffectLibrary
 	template<typename sample_t>
 	inline sample_t saturate( sample_t x )
 	{
-		return qMin<sample_t>( qMax<sample_t>( -1.0f, x ), 1.0f );
+		return qMin<sample_t>(std::max<sample_t>(-1.0f, x), 1.0f);
 	}
 
 
@@ -198,7 +198,7 @@ namespace lmms::DspEffectLibrary
 				const sample_t _gain,
 				const sample_t _ratio,
 				const FastBassBoost & _orig = FastBassBoost() ) :
-			m_frequency( qMax<sample_t>( _frequency, 10.0 ) ),
+			m_frequency(std::max<sample_t>(_frequency, 10.0)),
 			m_gain1( 1.0 / ( m_frequency + 1.0 ) ),
 			m_gain2( _gain ),
 			m_ratio( _ratio ),

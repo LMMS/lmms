@@ -225,7 +225,7 @@ TimePos AutomationClip::timeMapLength() const
 void AutomationClip::updateLength()
 {
 	// Do not resize down in case user manually extended up
-	changeLength(qMax(length(), timeMapLength()));
+	changeLength(std::max(length(), timeMapLength()));
 }
 
 
@@ -375,7 +375,7 @@ void AutomationClip::removeNodes(const int tick0, const int tick1)
 	}
 
 	auto start = TimePos(qMin(tick0, tick1));
-	auto end = TimePos(qMax(tick0, tick1));
+	auto end = TimePos(std::max(tick0, tick1));
 
 	// Make a list of TimePos with nodes to be removed
 	// because we can't simply remove the nodes from
@@ -411,7 +411,7 @@ void AutomationClip::resetNodes(const int tick0, const int tick1)
 	}
 
 	auto start = TimePos(qMin(tick0, tick1));
-	auto end = TimePos(qMax(tick0, tick1));
+	auto end = TimePos(std::max(tick0, tick1));
 
 	for (auto it = m_timeMap.lowerBound(start), endIt = m_timeMap.upperBound(end); it != endIt; ++it)
 	{

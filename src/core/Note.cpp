@@ -192,7 +192,7 @@ void Note::saveSettings( QDomDocument & doc, QDomElement & parent )
 void Note::loadSettings( const QDomElement & _this )
 {
 	const int oldKey = _this.attribute( "tone" ).toInt() + _this.attribute( "oct" ).toInt() * KeysPerOctave;
-	m_key = qMax( oldKey, _this.attribute( "key" ).toInt() );
+	m_key = std::max(oldKey, _this.attribute("key").toInt());
 	m_volume = _this.attribute( "vol" ).toInt();
 	m_panning = _this.attribute( "pan" ).toInt();
 	m_length = _this.attribute( "len" ).toInt();

@@ -87,7 +87,7 @@ AudioAlsa::AudioAlsa( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	int count = snd_pcm_poll_descriptors_count( m_handle );
 	ufds = new pollfd[count];
 	snd_pcm_poll_descriptors( m_handle, ufds, count );
-	for( int i = 0; i < qMax( 3, count ); ++i )
+	for (int i = 0; i < std::max(3, count); ++i)
 	{
 		const int fd = ( i >= count ) ? ufds[0].fd+i : ufds[i].fd;
 		int oldflags = fcntl( fd, F_GETFD, 0 );
