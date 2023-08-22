@@ -1,5 +1,5 @@
 /*
- * AudioFileProcessor.cpp - instrument for using audio-files
+ * AudioFileProcessor.cpp - instrument for using audio files
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -46,7 +46,6 @@
 
 #include "embed.h"
 #include "plugin_export.h"
-
 
 namespace lmms
 {
@@ -205,74 +204,70 @@ void AudioFileProcessor::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-void AudioFileProcessor::saveSettings( QDomDocument & _doc,
-							QDomElement & _this )
+void AudioFileProcessor::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
-	_this.setAttribute( "src", m_sampleBuffer.audioFile() );
-	if( m_sampleBuffer.audioFile() == "" )
+	elem.setAttribute("src", m_sampleBuffer.audioFile());
+	if (m_sampleBuffer.audioFile().isEmpty())
 	{
 		QString s;
-		_this.setAttribute( "sampledata",
-						m_sampleBuffer.toBase64( s ) );
+		elem.setAttribute("sampledata", m_sampleBuffer.toBase64(s));
 	}
-	m_reverseModel.saveSettings( _doc, _this, "reversed" );
-	m_loopModel.saveSettings( _doc, _this, "looped" );
-	m_ampModel.saveSettings( _doc, _this, "amp" );
-	m_startPointModel.saveSettings( _doc, _this, "sframe" );
-	m_endPointModel.saveSettings( _doc, _this, "eframe" );
-	m_loopPointModel.saveSettings( _doc, _this, "lframe" );
-	m_stutterModel.saveSettings( _doc, _this, "stutter" );
-	m_interpolationModel.saveSettings( _doc, _this, "interp" );
-
+	m_reverseModel.saveSettings(doc, elem, "reversed");
+	m_loopModel.saveSettings(doc, elem, "looped");
+	m_ampModel.saveSettings(doc, elem, "amp");
+	m_startPointModel.saveSettings(doc, elem, "sframe");
+	m_endPointModel.saveSettings(doc, elem, "eframe");
+	m_loopPointModel.saveSettings(doc, elem, "lframe");
+	m_stutterModel.saveSettings(doc, elem, "stutter");
+	m_interpolationModel.saveSettings(doc, elem, "interp");
 }
 
 
 
 
-void AudioFileProcessor::loadSettings( const QDomElement & _this )
+void AudioFileProcessor::loadSettings(const QDomElement& elem)
 {
-	if( _this.attribute( "src" ) != "" )
+	if (!elem.attribute("src").isEmpty())
 	{
-		setAudioFile( _this.attribute( "src" ), false );
+		setAudioFile(elem.attribute("src"), false);
 
-		QString absolutePath = PathUtil::toAbsolute( m_sampleBuffer.audioFile() );
-		if ( !QFileInfo( absolutePath ).exists() )
+		QString absolutePath = PathUtil::toAbsolute(m_sampleBuffer.audioFile());
+		if (!QFileInfo(absolutePath).exists())
 		{
-			QString message = tr( "Sample not found: %1" ).arg( m_sampleBuffer.audioFile() );
-
-			Engine::getSong()->collectError( message );
+			QString message = tr("Sample not found: %1").arg(m_sampleBuffer.audioFile());
+			Engine::getSong()->collectError(message);
 		}
 	}
-	else if( _this.attribute( "sampledata" ) != "" )
+	else if (!elem.attribute("sampledata").isEmpty())
 	{
-		m_sampleBuffer.loadFromBase64( _this.attribute( "srcdata" ) );
+		m_sampleBuffer.loadFromBase64(elem.attribute("srcdata"));
 	}
 
-	m_loopModel.loadSettings( _this, "looped" );
-	m_ampModel.loadSettings( _this, "amp" );
-	m_endPointModel.loadSettings( _this, "eframe" );
-	m_startPointModel.loadSettings( _this, "sframe" );
+	m_loopModel.loadSettings(elem, "looped");
+	m_ampModel.loadSettings(elem, "amp");
+	m_endPointModel.loadSettings(elem, "eframe");
+	m_startPointModel.loadSettings(elem, "sframe");
 
 	// compat code for not having a separate loopback point
-	if (_this.hasAttribute("lframe") || !(_this.firstChildElement("lframe").isNull()))
+	if (elem.hasAttribute("lframe") || !elem.firstChildElement("lframe").isNull())
 	{
-		m_loopPointModel.loadSettings( _this, "lframe" );
+		m_loopPointModel.loadSettings(elem, "lframe");
 	}
 	else
 	{
-		m_loopPointModel.loadSettings( _this, "sframe" );
+		m_loopPointModel.loadSettings(elem, "sframe");
 	}
 
-	m_reverseModel.loadSettings( _this, "reversed" );
+	m_reverseModel.loadSettings(elem, "reversed");
 
-	m_stutterModel.loadSettings( _this, "stutter" );
-	if( _this.hasAttribute( "interp" ) )
+	m_stutterModel.loadSettings(elem, "stutter");
+	if (elem.hasAttribute("interp") || !elem.firstChildElement("interp").isNull())
 	{
-		m_interpolationModel.loadSettings( _this, "interp" );
+		m_interpolationModel.loadSettings(elem, "interp");
 	}
 	else
 	{
-		m_interpolationModel.setValue( 1 ); //linear by default
+		m_interpolationModel.setValue(1.0f); // linear by default
 	}
 
 	pointChanged();
@@ -686,14 +681,12 @@ void AudioFileProcessorView::sampleUpdated()
 
 void AudioFileProcessorView::openAudioFile()
 {
-	QString af = castModel<AudioFileProcessor>()->m_sampleBuffer.
-							openAudioFile();
-	if( af != "" )
-	{
-		castModel<AudioFileProcessor>()->setAudioFile( af );
-		Engine::getSong()->setModified();
-		m_waveView->updateSampleRange();
-	}
+	QString af = castModel<AudioFileProcessor>()->m_sampleBuffer.openAudioFile();
+	if (af.isEmpty()) { return; }
+
+	castModel<AudioFileProcessor>()->setAudioFile(af);
+	Engine::getSong()->setModified();
+	m_waveView->updateSampleRange();
 }
 
 

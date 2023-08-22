@@ -274,9 +274,8 @@ QString BitInvader::nodeName() const
 void BitInvader::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
-	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == nullptr )
+	if (!_n->m_pluginData)
 	{
-	
 		float factor;
 		if( !m_normalize.value() )
 		{

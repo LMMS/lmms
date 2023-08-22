@@ -22,12 +22,9 @@
  *
  */
 
-
 #include "Organic.h"
 
-
 #include <QDomElement>
-
 
 #include "Engine.h"
 #include "AudioEngine.h"
@@ -38,7 +35,6 @@
 #include "PixmapButton.h"
 
 #include "embed.h"
-
 #include "plugin_export.h"
 
 namespace lmms
@@ -159,61 +155,59 @@ OrganicInstrument::~OrganicInstrument()
 
 
 
-void OrganicInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void OrganicInstrument::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
-	_this.setAttribute( "num_osc", QString::number( m_numOscillators ) );
-	m_fx1Model.saveSettings( _doc, _this, "foldback" );
-	m_volModel.saveSettings( _doc, _this, "vol" );
+	elem.setAttribute("num_osc", QString::number(m_numOscillators));
+	m_fx1Model.saveSettings(doc, elem, "foldback");
+	m_volModel.saveSettings(doc, elem, "vol");
 
-	for( int i = 0; i < m_numOscillators; ++i )
+	for (int i = 0; i < m_numOscillators; ++i)
 	{
-		QString is = QString::number( i );
-		m_osc[i]->m_volModel.saveSettings( _doc, _this, "vol" + is );
-		m_osc[i]->m_panModel.saveSettings( _doc, _this, "pan" + is );
-		m_osc[i]->m_harmModel.saveSettings( _doc, _this, "newharmonic" + is );
-
-		m_osc[i]->m_detuneModel.saveSettings( _doc, _this, "newdetune"
-									+ is );
-		m_osc[i]->m_oscModel.saveSettings( _doc, _this, "wavetype"
-									+ is );
+		const auto is = QString::number(i);
+		m_osc[i]->m_volModel.saveSettings(doc, elem, "vol" + is);
+		m_osc[i]->m_panModel.saveSettings(doc, elem, "pan" + is);
+		m_osc[i]->m_harmModel.saveSettings(doc, elem, "newharmonic" + is);
+		m_osc[i]->m_detuneModel.saveSettings(doc, elem, "newdetune" + is);
+		m_osc[i]->m_oscModel.saveSettings(doc, elem, "wavetype" + is);
 	}
 }
 
 
 
 
-void OrganicInstrument::loadSettings( const QDomElement & _this )
+void OrganicInstrument::loadSettings(const QDomElement& elem)
 {
-//	m_numOscillators =  _this.attribute( "num_osc" ).
-	//							toInt();
-
-	for( int i = 0; i < m_numOscillators; ++i )
+	for (int i = 0; i < m_numOscillators; ++i)
 	{
-		QString is = QString::number( i );
-		m_osc[i]->m_volModel.loadSettings( _this, "vol" + is );
-		if( _this.hasAttribute( "detune" + is ) )
-		{
-			m_osc[i]->m_detuneModel.setValue( _this.attribute( "detune" ).toInt() * 12 );
-		}
-		else
-		{
-			m_osc[i]->m_detuneModel.loadSettings( _this, "newdetune" + is );
-		}
-		m_osc[i]->m_panModel.loadSettings( _this, "pan" + is );
-		m_osc[i]->m_oscModel.loadSettings( _this, "wavetype" + is );
+		const auto is = QString::number(i);
 
-		if( _this.hasAttribute( "newharmonic" + is ) )
+		m_osc[i]->m_volModel.loadSettings(elem, "vol" + is);
+
+		if (elem.hasAttribute("detune" + is) || !elem.firstChildElement("detune" + is).isNull())
 		{
-			m_osc[i]->m_harmModel.loadSettings( _this, "newharmonic" + is );
+			m_osc[i]->m_detuneModel.loadSettings(elem, "detune" + is);
+			m_osc[i]->m_detuneModel.setValue(m_osc[i]->m_detuneModel.value() * 12); // compat
 		}
 		else
 		{
-			m_osc[i]->m_harmModel.setValue( static_cast<float>( i ) );
+			m_osc[i]->m_detuneModel.loadSettings(elem, "newdetune" + is);
+		}
+
+		m_osc[i]->m_panModel.loadSettings(elem, "pan" + is);
+		m_osc[i]->m_oscModel.loadSettings(elem, "wavetype" + is);
+
+		if (elem.hasAttribute("newharmonic" + is) || !elem.firstChildElement("newharmonic" + is).isNull())
+		{
+			m_osc[i]->m_harmModel.loadSettings(elem, "newharmonic" + is);
+		}
+		else
+		{
+			m_osc[i]->m_harmModel.setValue(static_cast<float>(i));
 		}
 	}
 
-	m_volModel.loadSettings( _this, "vol" );
-	m_fx1Model.loadSettings( _this, "foldback" );
+	m_volModel.loadSettings(elem, "vol");
+	m_fx1Model.loadSettings(elem, "foldback");
 }
 
 
@@ -231,7 +225,7 @@ void OrganicInstrument::playNote( NotePlayHandle * _n,
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 
-	if( _n->totalFramesPlayed() == 0 || _n->m_pluginData == nullptr )
+	if (!_n->m_pluginData)
 	{
 		auto oscs_l = std::array<Oscillator*, NUM_OSCILLATORS>{};
 		auto oscs_r = std::array<Oscillator*, NUM_OSCILLATORS>{};

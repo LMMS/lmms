@@ -23,11 +23,10 @@
  *
  */
 
-
+#include "Kicker.h"
 
 #include <QDomElement>
 
-#include "Kicker.h"
 #include "AudioEngine.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
@@ -85,65 +84,64 @@ KickerInstrument::KickerInstrument( InstrumentTrack * _instrument_track ) :
 
 
 
-void KickerInstrument::saveSettings( QDomDocument & _doc,
-							QDomElement & _this )
+void KickerInstrument::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
-	m_startFreqModel.saveSettings( _doc, _this, "startfreq" );
-	m_endFreqModel.saveSettings( _doc, _this, "endfreq" );
-	m_decayModel.saveSettings( _doc, _this, "decay" );
-	m_distModel.saveSettings( _doc, _this, "dist" );
-	m_distEndModel.saveSettings( _doc, _this, "distend" );
-	m_gainModel.saveSettings( _doc, _this, "gain" );
-	m_envModel.saveSettings( _doc, _this, "env" );
-	m_noiseModel.saveSettings( _doc, _this, "noise" );
-	m_clickModel.saveSettings( _doc, _this, "click" );
-	m_slopeModel.saveSettings( _doc, _this, "slope" );
-	m_startNoteModel.saveSettings( _doc, _this, "startnote" );
-	m_endNoteModel.saveSettings( _doc, _this, "endnote" );
-	m_versionModel.saveSettings( _doc, _this, "version" );
+	m_startFreqModel.saveSettings(doc, elem, "startfreq");
+	m_endFreqModel.saveSettings(doc, elem, "endfreq");
+	m_decayModel.saveSettings(doc, elem, "decay");
+	m_distModel.saveSettings(doc, elem, "dist");
+	m_distEndModel.saveSettings(doc, elem, "distend");
+	m_gainModel.saveSettings(doc, elem, "gain");
+	m_envModel.saveSettings(doc, elem, "env");
+	m_noiseModel.saveSettings(doc, elem, "noise");
+	m_clickModel.saveSettings(doc, elem, "click");
+	m_slopeModel.saveSettings(doc, elem, "slope");
+	m_startNoteModel.saveSettings(doc, elem, "startnote");
+	m_endNoteModel.saveSettings(doc, elem, "endnote");
+	m_versionModel.saveSettings(doc, elem, "version");
 }
 
 
 
 
-void KickerInstrument::loadSettings( const QDomElement & _this )
+void KickerInstrument::loadSettings(const QDomElement& elem)
 {
-	m_versionModel.loadSettings( _this, "version" );
+	m_versionModel.loadSettings(elem, "version");
 
-	m_startFreqModel.loadSettings( _this, "startfreq" );
-	m_endFreqModel.loadSettings( _this, "endfreq" );
-	m_decayModel.loadSettings( _this, "decay" );
-	m_distModel.loadSettings( _this, "dist" );
-	if( _this.hasAttribute( "distend" ) )
+	m_startFreqModel.loadSettings(elem, "startfreq");
+	m_endFreqModel.loadSettings(elem, "endfreq");
+	m_decayModel.loadSettings(elem, "decay");
+	m_distModel.loadSettings(elem, "dist");
+	if (elem.hasAttribute("distend") || !elem.firstChildElement("distend").isNull())
 	{
-		m_distEndModel.loadSettings( _this, "distend" );
+		m_distEndModel.loadSettings(elem, "distend");
 	}
 	else
 	{
-		m_distEndModel.setValue( m_distModel.value() );
+		m_distEndModel.setValue(m_distModel.value());
 	}
-	m_gainModel.loadSettings( _this, "gain" );
-	m_envModel.loadSettings( _this, "env" );
-	m_noiseModel.loadSettings( _this, "noise" );
-	m_clickModel.loadSettings( _this, "click" );
-	m_slopeModel.loadSettings( _this, "slope" );
-	m_startNoteModel.loadSettings( _this, "startnote" );
-	if( m_versionModel.value() < 1 )
+	m_gainModel.loadSettings(elem, "gain");
+	m_envModel.loadSettings(elem, "env");
+	m_noiseModel.loadSettings(elem, "noise");
+	m_clickModel.loadSettings(elem, "click");
+	m_slopeModel.loadSettings(elem, "slope");
+	m_startNoteModel.loadSettings(elem, "startnote");
+	if (m_versionModel.value() < 1)
 	{
-		m_startNoteModel.setValue( false );
+		m_startNoteModel.setValue(false);
 	}
-	m_endNoteModel.loadSettings( _this, "endnote" );
+	m_endNoteModel.loadSettings(elem, "endnote");
 
 	// Try to maintain backwards compatibility
-	if( !_this.hasAttribute( "version" ) )
+	if (!elem.hasAttribute("version"))
 	{
-		m_startNoteModel.setValue( false );
-		m_decayModel.setValue( m_decayModel.value() * 1.33f );
-		m_envModel.setValue( 1.0f );
-		m_slopeModel.setValue( 1.0f );
-		m_clickModel.setValue( 0.0f );
+		m_startNoteModel.setValue(false);
+		m_decayModel.setValue(m_decayModel.value() * 1.33f);
+		m_envModel.setValue(1.0f);
+		m_slopeModel.setValue(1.0f);
+		m_clickModel.setValue(0.0f);
 	}
-	m_versionModel.setValue( KICKER_PRESET_VERSION );
+	m_versionModel.setValue(KICKER_PRESET_VERSION);
 }
 
 
@@ -165,7 +163,7 @@ void KickerInstrument::playNote( NotePlayHandle * _n,
 	const float decfr = m_decayModel.value() * Engine::audioEngine()->processingSampleRate() / 1000.0f;
 	const f_cnt_t tfp = _n->totalFramesPlayed();
 
-	if ( tfp == 0 )
+	if (!_n->m_pluginData)
 	{
 		_n->m_pluginData = new SweepOsc(
 					DistFX( m_distModel.value(),

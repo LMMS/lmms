@@ -446,9 +446,9 @@ void SfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffe
 {
 	float currentSampleRate = Engine::audioEngine()->processingSampleRate();
 
-    fpp_t frameNum = _n->framesLeftForCurrentPeriod();
-    const f_cnt_t offset = _n->noteOffset();
-	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == nullptr )
+	fpp_t frameNum = _n->framesLeftForCurrentPeriod();
+	const f_cnt_t offset = _n->noteOffset();
+	if (!_n->m_pluginData)
 	{
 		_n->m_pluginData = new SfxrSynth( this );
 	}

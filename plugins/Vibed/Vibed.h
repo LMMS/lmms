@@ -2,7 +2,7 @@
  * Vibed.h - combination of PluckedStringSynth and BitInvader
  *
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/yahoo/com>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -21,12 +21,20 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-#ifndef _VIBED_H
-#define _VIBED_H
+
+#ifndef LMMS_VIBED_H
+#define LMMS_VIBED_H
 
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "NineButtonSelector.h"
+#include "Knob.h"
+#include "LedCheckBox.h"
+#include "Graph.h"
+#include "PixmapButton.h"
+
+#include <array>
+#include <memory>
 
 namespace lmms
 {
@@ -46,45 +54,42 @@ class Vibed : public Instrument
 {
 	Q_OBJECT
 public:
-	Vibed( InstrumentTrack * _instrument_track );
+	Vibed(InstrumentTrack* instrumentTrack);
+	~Vibed() override = default;
 
-	void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer ) override;
-	void deleteNotePluginData( NotePlayHandle * _n ) override;
+	void playNote(NotePlayHandle* n, sampleFrame* workingBuffer) override;
+	void deleteNotePluginData(NotePlayHandle* n) override;
 
-
-	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
-	void loadSettings( const QDomElement & _this ) override;
+	void saveSettings(QDomDocument& doc, QDomElement& elem) override;
+	void loadSettings(const QDomElement& elem) override;
 
 	QString nodeName() const override;
 
-	Flags flags() const override
-	{
-		return IsNotBendable;
-	}
+	Flags flags() const override { return IsNotBendable; }
 
-
-	gui::PluginView* instantiateView( QWidget * _parent ) override;
-
+	gui::PluginView* instantiateView(QWidget* parent) override;
 
 private:
-	QList<FloatModel*> m_pickKnobs;
-	QList<FloatModel*> m_pickupKnobs;
-	QList<FloatModel*> m_stiffnessKnobs;
-	QList<FloatModel*> m_volumeKnobs;
-	QList<FloatModel*> m_panKnobs;
-	QList<FloatModel*> m_detuneKnobs;
-	QList<FloatModel*> m_randomKnobs;
-	QList<FloatModel*> m_lengthKnobs;
-	QList<BoolModel*> m_powerButtons;
-	QList<graphModel*> m_graphs;
-	QList<BoolModel*> m_impulses;
-	QList<gui::NineButtonSelectorModel*> m_harmonics;
+	class StringContainer;
 
-	static const int __sampleLength = 128;
+	static constexpr int s_sampleLength = 128;
+	static constexpr int s_stringCount = 9;
+
+	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_pickModels;
+	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_pickupModels;
+	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_stiffnessModels;
+	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_volumeModels;
+	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_panModels;
+	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_detuneModels;
+	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_randomModels;
+	std::array<std::unique_ptr<FloatModel>, s_stringCount> m_lengthModels;
+	std::array<std::unique_ptr<BoolModel>, s_stringCount> m_powerModels;
+	std::array<std::unique_ptr<graphModel>, s_stringCount> m_graphModels;
+	std::array<std::unique_ptr<BoolModel>, s_stringCount> m_impulseModels;
+	std::array<std::unique_ptr<NineButtonSelectorModel>, s_stringCount> m_harmonicModels;
 
 	friend class gui::VibedView;
-} ;
+};
 
 
 namespace gui
@@ -95,13 +100,12 @@ class VibedView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
-	VibedView( Instrument * _instrument,
-					QWidget * _parent );
+	VibedView(Instrument* instrument, QWidget* parent);
 	~VibedView() override = default;
 
 public slots:
-	void showString( int _string );
-	void contextMenuEvent( QContextMenuEvent * ) override;
+	void showString(int str);
+	void contextMenuEvent(QContextMenuEvent*) override;
 
 protected slots:
 	void sinWaveClicked();
@@ -116,35 +120,32 @@ protected slots:
 private:
 	void modelChanged() override;
 
-
 	// String-related
-	Knob * m_pickKnob;
-	Knob * m_pickupKnob;
-	Knob * m_stiffnessKnob;
-	Knob * m_volumeKnob;
-	Knob * m_panKnob;
-	Knob * m_detuneKnob;
-	Knob * m_randomKnob;
-	Knob * m_lengthKnob;
-	Graph * m_graph;
-	NineButtonSelector * m_harmonic;
-	LedCheckBox * m_impulse;
-	LedCheckBox * m_power;
+	Knob m_volumeKnob;
+	Knob m_stiffnessKnob;
+	Knob m_pickKnob;
+	Knob m_pickupKnob;
+	Knob m_panKnob;
+	Knob m_detuneKnob;
+	Knob m_randomKnob;
+	Knob m_lengthKnob;
+	Graph m_graph;
+	LedCheckBox m_impulse;
+	LedCheckBox m_power;
+	std::unique_ptr<NineButtonSelector> m_harmonic;
 
 	// Not in model
-	NineButtonSelector * m_stringSelector;
-	PixmapButton * m_smoothBtn;
-	PixmapButton * m_normalizeBtn;
+	std::unique_ptr<NineButtonSelector> m_stringSelector;
+	PixmapButton m_smoothBtn;
+	PixmapButton m_normalizeBtn;
 
 	// From impulse editor
-	PixmapButton * m_sinWaveBtn;
-	PixmapButton * m_triangleWaveBtn;
-	PixmapButton * m_sqrWaveBtn;
-	PixmapButton * m_sawWaveBtn;
-	PixmapButton * m_whiteNoiseWaveBtn;
-	PixmapButton * m_usrWaveBtn;
-
-
+	PixmapButton m_sinWaveBtn;
+	PixmapButton m_triangleWaveBtn;
+	PixmapButton m_sawWaveBtn;
+	PixmapButton m_sqrWaveBtn;
+	PixmapButton m_whiteNoiseWaveBtn;
+	PixmapButton m_usrWaveBtn;
 };
 
 
@@ -152,4 +153,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_VIBED_H

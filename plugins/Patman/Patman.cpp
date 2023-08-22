@@ -144,7 +144,7 @@ void PatmanInstrument::playNote( NotePlayHandle * _n,
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 
-	if( !_n->m_pluginData )
+	if (!_n->m_pluginData)
 	{
 		selectSample( _n );
 	}

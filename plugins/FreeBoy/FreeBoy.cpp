@@ -250,7 +250,7 @@ void FreeBoyInstrument::playNote(NotePlayHandle* nph, sampleFrame* workingBuffer
 	int data = 0;
 	int freq = nph->frequency();
 
-	if ( tfp == 0 )
+	if (!nph->m_pluginData)
 	{
 		auto papu = new GbApuWrapper{};
 		papu->setSampleRate(samplerate, CLOCK_RATE);
