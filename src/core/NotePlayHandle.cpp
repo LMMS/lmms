@@ -350,9 +350,9 @@ fpp_t NotePlayHandle::framesLeftForCurrentPeriod() const
 {
 	if( m_totalFramesPlayed == 0 )
 	{
-		return (fpp_t) qMin<f_cnt_t>( framesLeft(), Engine::audioEngine()->framesPerPeriod() - offset() );
+		return static_cast<fpp_t>(std::min<f_cnt_t>(framesLeft(), Engine::audioEngine()->framesPerPeriod() - offset()));
 	}
-	return (fpp_t) qMin<f_cnt_t>( framesLeft(), Engine::audioEngine()->framesPerPeriod() );
+	return static_cast<fpp_t>(std::min<f_cnt_t>(framesLeft(), Engine::audioEngine()->framesPerPeriod()));
 }
 
 

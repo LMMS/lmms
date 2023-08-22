@@ -257,9 +257,9 @@ void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 			m_currentBufferFramesCount = frames;
 
 		}
-		const uint min_frames_count = qMin( _len/sizeof(sampleFrame),
+		const uint min_frames_count = std::min(_len/sizeof(sampleFrame),
 										  m_currentBufferFramesCount
-										- m_currentBufferFramePos );
+										- m_currentBufferFramePos);
 
 		const float gain = audioEngine()->masterGain();
 		for (uint f = 0; f < min_frames_count; f++)
@@ -296,8 +296,8 @@ void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 						(int_sample_t *)m_convertedBuf,
 						m_outConvertEndian );
 		}
-		const int min_len = qMin( _len, m_convertedBufSize
-							- m_convertedBufPos );
+		const int min_len = std::min(_len, m_convertedBufSize
+							- m_convertedBufPos);
 		memcpy( _buf, m_convertedBuf + m_convertedBufPos, min_len );
 		_buf += min_len;
 		_len -= min_len;

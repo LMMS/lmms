@@ -187,7 +187,7 @@ namespace lmms::DspEffectLibrary
 	template<typename sample_t>
 	inline sample_t saturate( sample_t x )
 	{
-		return qMin<sample_t>(std::max<sample_t>(-1.0f, x), 1.0f);
+		return std::min<sample_t>(std::max<sample_t>(-1.0f, x), 1.0f);
 	}
 
 

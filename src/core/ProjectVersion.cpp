@@ -100,7 +100,7 @@ int ProjectVersion::compare(const ProjectVersion & a, const ProjectVersion & b, 
 	const auto bLabels = b.getLabels().mid(0, maxLabels);
 
 	// We can only compare identifiers if both versions have them
-	const int commonLabels = qMin(aLabels.size(), bLabels.size());
+	const int commonLabels = std::min(aLabels.size(), bLabels.size());
 	// If one version has optional labels and the other doesn't,
 	// the one without them is bigger
 	if (commonLabels == 0){ return bLabels.size() - aLabels.size(); }

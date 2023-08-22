@@ -797,8 +797,8 @@ public:
 			m_type == Notch_SV )
 		{
 			const float f = sinf(std::max(minFreq(), _freq) * m_sampleRatio * F_PI);
-			m_svf1 = qMin( f, 0.825f );
-			m_svf2 = qMin( f * 2.0f, 0.825f );
+			m_svf1 = std::min(f, 0.825f);
+			m_svf2 = std::min(f * 2.0f, 0.825f);
 			m_svq = std::max(0.0001f, 2.0f - (_q * 0.1995f));
 			return;
 		}

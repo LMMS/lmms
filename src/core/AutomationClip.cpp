@@ -374,7 +374,7 @@ void AutomationClip::removeNodes(const int tick0, const int tick1)
 		return;
 	}
 
-	auto start = TimePos(qMin(tick0, tick1));
+	auto start = TimePos(std::min(tick0, tick1));
 	auto end = TimePos(std::max(tick0, tick1));
 
 	// Make a list of TimePos with nodes to be removed
@@ -410,7 +410,7 @@ void AutomationClip::resetNodes(const int tick0, const int tick1)
 		return;
 	}
 
-	auto start = TimePos(qMin(tick0, tick1));
+	auto start = TimePos(std::min(tick0, tick1));
 	auto end = TimePos(std::max(tick0, tick1));
 
 	for (auto it = m_timeMap.lowerBound(start), endIt = m_timeMap.upperBound(end); it != endIt; ++it)

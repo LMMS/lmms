@@ -295,8 +295,8 @@ int AudioPortAudio::process_callback(
 			}
 			m_outBufSize = frames;
 		}
-		const int min_len = qMin( (int)_framesPerBuffer,
-			m_outBufSize - m_outBufPos );
+		const int min_len = std::min(static_cast<int>(_framesPerBuffer),
+			m_outBufSize - m_outBufPos);
 
 		float master_gain = audioEngine()->masterGain();
 

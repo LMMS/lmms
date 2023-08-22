@@ -915,12 +915,12 @@ sampleFrame * SampleBuffer::getSampleFragment(
 	}
 	else if (loopMode == LoopOn)
 	{
-		f_cnt_t copied = qMin(frames, loopEnd - index);
+		f_cnt_t copied = std::min(frames, loopEnd - index);
 		memcpy(*tmp, m_data + index, copied * BYTES_PER_FRAME);
 		f_cnt_t loopFrames = loopEnd - loopStart;
 		while (copied < frames)
 		{
-			f_cnt_t todo = qMin(frames - copied, loopFrames);
+			f_cnt_t todo = std::min(frames - copied, loopFrames);
 			memcpy(*tmp + copied, m_data + loopStart, todo * BYTES_PER_FRAME);
 			copied += todo;
 		}
@@ -936,7 +936,7 @@ sampleFrame * SampleBuffer::getSampleFragment(
 
 		if (currentBackwards)
 		{
-			copied = qMin(frames, pos - loopStart);
+			copied = std::min(frames, pos - loopStart);
 			for (int i = 0; i < copied; i++)
 			{
 				(*tmp)[i][0] = m_data[pos - i][0];
@@ -947,7 +947,7 @@ sampleFrame * SampleBuffer::getSampleFragment(
 		}
 		else
 		{
-			copied = qMin(frames, loopEnd - pos);
+			copied = std::min(frames, loopEnd - pos);
 			memcpy(*tmp, m_data + pos, copied * BYTES_PER_FRAME);
 			pos += copied;
 			if (pos == loopEnd) { currentBackwards = true; }
@@ -957,7 +957,7 @@ sampleFrame * SampleBuffer::getSampleFragment(
 		{
 			if (currentBackwards)
 			{
-				f_cnt_t todo = qMin(frames - copied, pos - loopStart);
+				f_cnt_t todo = std::min(frames - copied, pos - loopStart);
 				for (int i = 0; i < todo; i++)
 				{
 					(*tmp)[copied + i][0] = m_data[pos - i][0];
@@ -969,7 +969,7 @@ sampleFrame * SampleBuffer::getSampleFragment(
 			}
 			else
 			{
-				f_cnt_t todo = qMin(frames - copied, loopEnd - pos);
+				f_cnt_t todo = std::min(frames - copied, loopEnd - pos);
 				memcpy(*tmp + copied, m_data + pos, todo * BYTES_PER_FRAME);
 				pos += todo;
 				copied += todo;
@@ -1291,7 +1291,7 @@ QString & SampleBuffer::toBase64(QString & dst) const
 
 	while (frameCnt < m_frames)
 	{
-		f_cnt_t remaining = qMin<f_cnt_t>(FRAMES_PER_BUF, m_frames - frameCnt);
+		f_cnt_t remaining = std::min<f_cnt_t>(FRAMES_PER_BUF, m_frames - frameCnt);
 		FLAC__int32 buf[FRAMES_PER_BUF * DEFAULT_CHANNELS];
 		for (f_cnt_t f = 0; f < remaining; ++f)
 		{
