@@ -585,7 +585,7 @@ float AutomatableModel::controllerValue( int frameOffset ) const
 		}
 		if( typeInfo<float>::isEqual( m_step, 1 ) && m_hasStrictStepSize )
 		{
-			return qRound( v );
+			return std::round(v);
 		}
 		return v;
 	}
@@ -794,7 +794,7 @@ void AutomatableModel::setUseControllerValue(bool b)
 
 float FloatModel::getRoundedValue() const
 {
-	return qRound( value() / step<float>() ) * step<float>();
+	return std::round(value() / step<float>()) * step<float>();
 }
 
 
