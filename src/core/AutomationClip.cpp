@@ -58,22 +58,6 @@ AutomationClip::AutomationClip( AutomationTrack * _auto_track ) :
 	m_isRecording( false ),
 	m_lastRecordedValue( 0 )
 {
-	changeLength( TimePos( 1, 0 ) );
-	if( getTrack() )
-	{
-		switch( getTrack()->trackContainer()->type() )
-		{
-			case TrackContainer::PatternContainer:
-				setAutoResize( true );
-				break;
-
-			case TrackContainer::SongContainer:
-				// move down
-			default:
-				setAutoResize( false );
-				break;
-		}
-	}
 }
 
 
@@ -100,19 +84,6 @@ AutomationClip::AutomationClip( const AutomationClip & _clip_to_copy ) :
 		m_timeMap[POS(it)] = it.value();
 		// Sets the node's clip to this one
 		m_timeMap[POS(it)].setClip(this);
-	}
-	if (!getTrack()){ return; }
-	switch( getTrack()->trackContainer()->type() )
-	{
-		case TrackContainer::PatternContainer:
-			setAutoResize( true );
-			break;
-
-		case TrackContainer::SongContainer:
-			// move down
-		default:
-			setAutoResize( false );
-			break;
 	}
 }
 

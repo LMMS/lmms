@@ -58,6 +58,7 @@ public:
 
 	void init();
 
+	bool allowUserResize() const override { return false; }
 	void updateLength();
 
 	// note management
@@ -77,6 +78,10 @@ public:
 
 	Note * addStepNote( int step );
 	void setStep( int step, bool enabled );
+
+	bool canSplit() const override { return true; }
+	bool supportsStartTimeOffset() const override { return false; }
+	bool truncate(const TimePos& cutPos, bool removeLeft = false) override;
 
 	// Split the list of notes on the given position
 	void splitNotes(NoteVector notes, TimePos pos);

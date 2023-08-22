@@ -680,6 +680,13 @@ void MidiClipView::paintEvent( QPaintEvent * )
 			embed::getIconPixmap( "muted", size, size ) );
 	}
 
+	// draw knife marker
+	if (m_marker)
+	{
+		p.setPen(c.darker(200));
+		p.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
+	}
+
 	painter.drawPixmap( 0, 0, m_paintPixmap );
 }
 

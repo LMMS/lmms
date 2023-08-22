@@ -174,6 +174,8 @@ public:
 	bool isRecording() const { return m_isRecording; }
 	void setRecording( const bool b ) { m_isRecording = b; }
 
+	bool supportsStartTimeOffset() const override { return false; }
+
 	static int quantization() { return s_quantization; }
 	static void setQuantization(int q) { s_quantization = q; }
 

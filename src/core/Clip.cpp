@@ -58,7 +58,7 @@ Clip::Clip( Track * track ) :
 	}
 	setJournalling( false );
 	movePosition( 0 );
-	changeLength( 0 );
+	changeLength(TimePos::ticksPerBar());
 	setJournalling( true );
 }
 
@@ -118,6 +118,18 @@ void Clip::changeLength( const TimePos & length )
 	m_length = length;
 	Engine::getSong()->updateLength();
 	emit lengthChanged();
+}
+
+
+
+/*! \brief Whether the clip length can be manually set
+ *
+ *  Return true if the user should be able to resize the clip by dragging its edge.
+ *  This is false for clips in the the Pattern Editor.
+ */
+bool Clip::allowUserResize() const
+{
+	return m_track != nullptr && m_track->trackContainer()->type() != TrackContainer::PatternContainer;
 }
 
 
@@ -184,6 +196,78 @@ void Clip::setStartTimeOffset( const TimePos &startTimeOffset )
 {
 	m_startTimeOffset = startTimeOffset;
 }
+
+
+
+
+/*! \brief Split the clip
+ *
+ *  Cut the current clip at the given position and create a new clip to the right.
+ *
+ * \param splitPos the position of the split, relative to the start of the clip
+ * \return pointer to the right side clip
+ */
+Clip* Clip::split(const TimePos& splitPos)
+{
+	// Don't create zero length clips
+	if (splitPos >= length() || splitPos <= 0) { return nullptr; }
+
+	auto track = getTrack();
+	if (!track) { return nullptr; }
+
+	track->addJournalCheckPoint();
+	track->saveJournallingState(false);
+
+	// Clone this clip
+	Clip* rightClip = track->createClip(0);
+	copyStateTo(this, rightClip);
+
+	rightClip->movePosition(startPosition() + splitPos);
+
+	// Empty clips will be deleted
+	if (!truncate(splitPos))
+	{
+		deleteLater();
+	}
+	if (!rightClip->truncate(splitPos, /* removeStart */ true))
+	{
+		delete rightClip;
+		rightClip = nullptr;
+	}
+
+	restoreJournallingState();
+
+	return rightClip;
+}
+
+
+
+/*! \brief Remove start or end of the clip
+ *
+ *  The default implementation simply sets offset and length,
+ *  but other implementations may cut and remove clip data.
+ *
+ *  \param cutPos - position (relative to clip) where it will be cut
+ *  \param removeStart - remove everything to the left of cutPos
+ *  \return true if the clip is non-empty after the operation
+ */
+bool Clip::truncate(const TimePos& cutPos, bool removeStart)
+{
+	if (cutPos >= length()) { return true; }
+
+	if (removeStart)
+	{
+		setStartTimeOffset(startTimeOffset() - cutPos);
+		changeLength(length() - cutPos);
+	}
+	else
+	{
+		changeLength(cutPos);
+	}
+
+	return length() - startTimeOffset() > 0;
+}
+
 
 
 

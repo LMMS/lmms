@@ -298,7 +298,7 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 				continue;
 			}
 			TimePos relTime = time - p->startPosition();
-			if (! p->getAutoResize()) {
+			if (p->allowUserResize()) {
 				relTime = qMin(relTime, p->length());
 			}
 			float value = p->valueAt(relTime);
