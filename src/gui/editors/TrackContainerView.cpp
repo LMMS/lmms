@@ -199,8 +199,8 @@ void TrackContainerView::moveTrackView( TrackView * trackView, int indexTo )
 
 	Track * track = m_tc->m_tracks[indexFrom];
 
-	m_tc->m_tracks.remove( indexFrom );
-	m_tc->m_tracks.insert( indexTo, track );
+	m_tc->m_tracks.erase(m_tc->m_tracks.begin() + indexFrom);
+	m_tc->m_tracks.insert(m_tc->m_tracks.begin() + indexTo, track);
 	m_trackViews.move( indexFrom, indexTo );
 
 	realignTracks();

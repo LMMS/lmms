@@ -72,7 +72,7 @@ QPixmap * AutomationEditor::s_toolMove = nullptr;
 QPixmap * AutomationEditor::s_toolYFlip = nullptr;
 QPixmap * AutomationEditor::s_toolXFlip = nullptr;
 
-const QVector<float> AutomationEditor::m_zoomXLevels =
+const std::array<float, 7> AutomationEditor::m_zoomXLevels =
 		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f };
 
 

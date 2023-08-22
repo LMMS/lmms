@@ -69,7 +69,7 @@ void RenderManager::renderNextTrack()
 {
 	m_activeRenderer.reset();
 
-	if( m_tracksToRender.isEmpty() )
+	if (m_tracksToRender.empty())
 	{
 		// nothing left to render
 		restoreMutedState();
@@ -169,7 +169,7 @@ void RenderManager::render(QString outputPath)
 // Unmute all tracks that were muted while rendering tracks
 void RenderManager::restoreMutedState()
 {
-	while( !m_unmuted.isEmpty() )
+	while (!m_unmuted.empty())
 	{
 		Track* restoreTrack = m_unmuted.back();
 		m_unmuted.pop_back();

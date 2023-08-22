@@ -31,6 +31,8 @@
 #include "Midi.h"
 #include "volume.h"
 
+#include <cmath>
+
 namespace lmms
 {
 
@@ -40,7 +42,7 @@ inline StereoVolumeVector panningToVolumeVector( panning_t _p,
 {
 	StereoVolumeVector v = { { _scale, _scale } };
 	const float pf = _p / 100.0f;
-	v.vol[_p >= PanningCenter ? 0 : 1] *= 1.0f - qAbs<float>( pf );
+	v.vol[_p >= PanningCenter ? 0 : 1] *= 1.0f - std::abs(pf);
 	return v;
 }
 

@@ -545,7 +545,7 @@ DataFile ClipView::createClipDataFiles(
 	{
 		// Insert into the dom under the "clips" element
 		Track* clipTrack = clipView->m_trackView->getTrack();
-		int trackIndex = tc->tracks().indexOf( clipTrack );
+		int trackIndex = std::distance(tc->tracks().begin(), std::find(tc->tracks().begin(), tc->tracks().end(), clipTrack));
 		QDomElement clipElement = dataFile.createElement("clip");
 		clipElement.setAttribute( "trackIndex", trackIndex );
 		clipElement.setAttribute( "trackType", clipTrack->type() );
@@ -557,12 +557,15 @@ DataFile ClipView::createClipDataFiles(
 	dataFile.content().appendChild( clipParent );
 
 	// Add extra metadata needed for calculations later
-	int initialTrackIndex = tc->tracks().indexOf( t );
-	if( initialTrackIndex < 0 )
+
+	const auto initialTrackIt = std::find(tc->tracks().begin(), tc->tracks().end(), t);
+	if (initialTrackIt != tc->tracks().end())
 	{
 		printf("Failed to find selected track in the TrackContainer.\n");
 		return dataFile;
 	}
+
+	const int initialTrackIndex = std::distance(tc->tracks().begin(), initialTrackIt);
 	QDomElement metadata = dataFile.createElement( "copyMetadata" );
 	// initialTrackIndex is the index of the track that was touched
 	metadata.setAttribute( "initialTrackIndex", initialTrackIndex );

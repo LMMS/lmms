@@ -345,7 +345,8 @@ bool TrackContentWidget::canPasteSelection( TimePos clipPos, const QMimeData* md
 
 	// Get the current track's index
 	const TrackContainer::TrackList tracks = t->trackContainer()->tracks();
-	const int currentTrackIndex = tracks.indexOf( t );
+	const auto currentTrackIt = std::find(tracks.begin(), tracks.end(), t);
+	const int currentTrackIndex = currentTrackIt != tracks.end() ? std::distance(tracks.begin(), currentTrackIt) : -1;
 
 	// Don't paste if we're on the same bar and allowSameBar is false
 	auto sourceTrackContainerId = metadata.attributeNode( "trackContainerId" ).value().toUInt();
@@ -443,7 +444,8 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, 
 
 	// Snap the mouse position to the beginning of the dropped bar, in ticks
 	const TrackContainer::TrackList tracks = getTrack()->trackContainer()->tracks();
-	const int currentTrackIndex = tracks.indexOf( getTrack() );
+	const auto currentTrackIt = std::find(tracks.begin(), tracks.end(), getTrack());
+	const int currentTrackIndex = currentTrackIt != tracks.end() ? std::distance(tracks.begin(), currentTrackIt) : -1;
 
 	bool wasSelection = m_trackView->trackContainerView()->rubberBand()->selectedObjects().count();
 

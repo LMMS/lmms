@@ -71,7 +71,7 @@ AutomatableModel::~AutomatableModel()
 {
 	while( m_linkedModels.empty() == false )
 	{
-		m_linkedModels.last()->unlinkModel( this );
+		m_linkedModels.back()->unlinkModel(this);
 		m_linkedModels.erase( m_linkedModels.end() - 1 );
 	}
 
@@ -473,7 +473,8 @@ float AutomatableModel::fittedValue( float value ) const
 
 void AutomatableModel::linkModel( AutomatableModel* model )
 {
-	if( !m_linkedModels.contains( model ) && model != this )
+	auto containsModel = std::find(m_linkedModels.begin(), m_linkedModels.end(), model) != m_linkedModels.end();
+	if (!containsModel && model != this)
 	{
 		m_linkedModels.push_back( model );
 
@@ -490,7 +491,7 @@ void AutomatableModel::linkModel( AutomatableModel* model )
 
 void AutomatableModel::unlinkModel( AutomatableModel* model )
 {
-	AutoModelVector::Iterator it = std::find( m_linkedModels.begin(), m_linkedModels.end(), model );
+	auto it = std::find(m_linkedModels.begin(), m_linkedModels.end(), model);
 	if( it != m_linkedModels.end() )
 	{
 		m_linkedModels.erase( it );
@@ -504,7 +505,8 @@ void AutomatableModel::unlinkModel( AutomatableModel* model )
 
 void AutomatableModel::linkModels( AutomatableModel* model1, AutomatableModel* model2 )
 {
-	if (!model1->m_linkedModels.contains( model2 ) && model1 != model2)
+	auto model1ContainsModel2 = std::find(model1->m_linkedModels.begin(), model1->m_linkedModels.end(), model2) != model1->m_linkedModels.end();
+	if (!model1ContainsModel2 && model1 != model2)
 	{
 		// copy data
 		model1->m_value = model2->m_value;
@@ -588,7 +590,7 @@ float AutomatableModel::controllerValue( int frameOffset ) const
 		return v;
 	}
 
-	AutomatableModel* lm = m_linkedModels.first();
+	AutomatableModel* lm = m_linkedModels.front();
 	if (lm->controllerConnection() && lm->useControllerValue())
 	{
 		return fittedValue( lm->controllerValue( frameOffset ) );
@@ -649,7 +651,7 @@ ValueBuffer * AutomatableModel::valueBuffer()
 		AutomatableModel* lm = nullptr;
 		if (hasLinkedModels())
 		{
-			lm = m_linkedModels.first();
+			lm = m_linkedModels.front();
 		}
 		if (lm && lm->controllerConnection() && lm->useControllerValue() &&
 				lm->controllerConnection()->getController()->isSampleExact())
@@ -721,8 +723,8 @@ void AutomatableModel::reset()
 float AutomatableModel::globalAutomationValueAt( const TimePos& time )
 {
 	// get clips that connect to this model
-	QVector<AutomationClip *> clips = AutomationClip::clipsForModel( this );
-	if( clips.isEmpty() )
+	auto clips = AutomationClip::clipsForModel(this);
+	if (clips.empty())
 	{
 		// if no such clips exist, return current value
 		return m_value;
@@ -731,17 +733,17 @@ float AutomatableModel::globalAutomationValueAt( const TimePos& time )
 	{
 		// of those clips:
 		// find the clips which overlap with the time position
-		QVector<AutomationClip *> clipsInRange;
+		std::vector<AutomationClip*> clipsInRange;
 		for (const auto& clip : clips)
 		{
 			int s = clip->startPosition();
 			int e = clip->endPosition();
-			if (s <= time && e >= time) { clipsInRange += clip; }
+			if (s <= time && e >= time) { clipsInRange.push_back(clip); }
 		}
 
 		AutomationClip * latestClip = nullptr;
 
-		if( ! clipsInRange.isEmpty() )
+		if (!clipsInRange.empty())
 		{
 			// if there are more than one overlapping clips, just use the first one because
 			// multiple clip behaviour is undefined anyway

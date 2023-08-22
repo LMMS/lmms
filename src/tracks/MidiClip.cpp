@@ -115,11 +115,11 @@ void MidiClip::resizeToFirstTrack()
 		{
 			if (track != m_instrumentTrack)
 			{
-				unsigned int currentClip = m_instrumentTrack->
-					getClips().indexOf(this);
-				m_steps = static_cast<MidiClip *>
-					(track->getClip(currentClip))
-					->m_steps;
+				const auto& instrumentTrackClips = m_instrumentTrack->getClips();
+				const auto currentClipIt = std::find(instrumentTrackClips.begin(), instrumentTrackClips.end(), this);
+				unsigned int currentClip = currentClipIt != instrumentTrackClips.end() ?
+					std::distance(instrumentTrackClips.begin(), currentClipIt) : -1;
+				m_steps = static_cast<MidiClip*>(track->getClip(currentClip))->m_steps;
 			}
 			break;
 		}
@@ -218,17 +218,14 @@ Note * MidiClip::addNote( const Note & _new_note, const bool _quant_pos )
 void MidiClip::removeNote( Note * _note_to_del )
 {
 	instrumentTrack()->lock();
-	NoteVector::Iterator it = m_notes.begin();
-	while( it != m_notes.end() )
+
+	m_notes.erase(std::remove_if(m_notes.begin(), m_notes.end(), [&](Note* note)
 	{
-		if( *it == _note_to_del )
-		{
-			delete *it;
-			m_notes.erase( it );
-			break;
-		}
-		++it;
-	}
+		auto shouldRemove = note == _note_to_del;
+		if (shouldRemove) { delete note; }
+		return shouldRemove;
+	}), m_notes.end());
+
 	instrumentTrack()->unlock();
 
 	checkType();
@@ -354,15 +351,13 @@ void MidiClip::setType( MidiClipTypes _new_clip_type )
 
 void MidiClip::checkType()
 {
-	NoteVector::Iterator it = m_notes.begin();
-	while( it != m_notes.end() )
+	for (auto& note : m_notes)
 	{
-		if( ( *it )->length() > 0 )
+		if (note->length() > 0)
 		{
-			setType( MelodyClip );
+			setType(MelodyClip);
 			return;
 		}
-		++it;
 	}
 	setType( BeatClip );
 }
@@ -395,9 +390,9 @@ void MidiClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "steps", m_steps );
 
 	// now save settings of all notes
-	for (const auto& note : m_notes)
+	for (auto& note : m_notes)
 	{
-		note->saveState( _doc, _this );
+		note->saveState(_doc, _this);
 	}
 }
 
@@ -477,9 +472,10 @@ MidiClip *  MidiClip::nextMidiClip() const
 
 MidiClip * MidiClip::adjacentMidiClipByOffset(int offset) const
 {
-	QVector<Clip *> clips = m_instrumentTrack->getClips();
+	std::vector<Clip *> clips = m_instrumentTrack->getClips();
 	int clipNum = m_instrumentTrack->getClipNum(this);
-	return dynamic_cast<MidiClip*>(clips.value(clipNum + offset, nullptr));
+	if (clipNum < 0 || clipNum > clips.size() - 1) { return nullptr; }
+	return dynamic_cast<MidiClip*>(clips[clipNum + offset]);
 }
 
 

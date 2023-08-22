@@ -739,7 +739,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 		// get all notes from the given clip...
 		const NoteVector & notes = c->notes();
 		// ...and set our index to zero
-		NoteVector::ConstIterator nit = notes.begin();
+		auto nit = notes.begin();
 
 		// very effective algorithm for playing notes that are
 		// posated within the current sample-frame

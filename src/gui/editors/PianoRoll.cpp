@@ -148,15 +148,14 @@ std::array<PianoRoll::PianoRollKeyTypes, 12> PianoRoll::prKeyOrder
 
 const int DEFAULT_PR_PPB = DEFAULT_CELL_WIDTH * DefaultStepsPerBar;
 
-const QVector<float> PianoRoll::m_zoomLevels =
+const std::vector<float> PianoRoll::m_zoomLevels =
 		{0.125f, 0.25f, 0.5f, 1.0f, 1.5f, 2.0f, 4.0f, 8.0f};
 
-const QVector<float> PianoRoll::m_zoomYLevels =
+const std::vector<float> PianoRoll::m_zoomYLevels =
 		{0.25f, 0.5f, 1.0f, 1.5f, 2.0f, 2.5f, 3.0f, 4.0f};
 
 
 PianoRoll::PianoRoll() :
-	m_nemStr( QVector<QString>() ),
 	m_noteEditMenu( nullptr ),
 	m_semiToneMarkerMenu( nullptr ),
 	m_zoomingModel(),
@@ -406,7 +405,7 @@ PianoRoll::PianoRoll() :
 			InstrumentFunctionNoteStacking::ChordTable::getInstance();
 
 	m_scaleModel.addItem( tr("No scale") );
-	for( const InstrumentFunctionNoteStacking::Chord& chord : chord_table )
+	for (const InstrumentFunctionNoteStacking::Chord& chord : chord_table.chords())
 	{
 		if( chord.isScale() )
 		{
@@ -423,7 +422,7 @@ PianoRoll::PianoRoll() :
 
 	// Set up chord model
 	m_chordModel.addItem( tr("No chord") );
-	for( const InstrumentFunctionNoteStacking::Chord& chord : chord_table )
+	for (const InstrumentFunctionNoteStacking::Chord& chord : chord_table.chords())
 	{
 		if( ! chord.isScale() )
 		{
@@ -775,7 +774,7 @@ void PianoRoll::fitNoteLengths(bool fill)
 		{
 			if (!fill) { break; }
 			// Last notes stretch to end of last bar
-			length = notes.last()->endPos().nextFullBar() * TimePos::ticksPerBar() - note->pos();
+			length = notes.back()->endPos().nextFullBar() * TimePos::ticksPerBar() - note->pos();
 		}
 		else
 		{
@@ -1241,11 +1240,11 @@ void PianoRoll::shiftPos(NoteVector notes, int amount)
 {
 	m_midiClip->addJournalCheckPoint();
 
-	if (notes.isEmpty()) {
+	if (notes.empty()) {
 		return;
 	}
 
-	auto leftMostPos = notes.first()->pos();
+	auto leftMostPos = notes.front()->pos();
 	//Limit leftwards shifts to prevent moving left of clip start
 	auto shiftAmount = (leftMostPos > -amount) ? amount : -leftMostPos;
 	if (shiftAmount == 0) { return; }
@@ -1645,7 +1644,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 		if (note)
 		{
-			n.append(note);
+			n.push_back(note);
 
 			updateKnifePos(me);
 
@@ -1723,7 +1722,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 			const NoteVector & notes = m_midiClip->notes();
 
 			// will be our iterator in the following loop
-			NoteVector::ConstIterator it = notes.begin()+notes.size()-1;
+			auto it = notes.begin() + notes.size() - 1;
 
 			// loop through whole note-vector...
 			for( int i = 0; i < notes.size(); ++i )
@@ -1846,9 +1845,9 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 				auto selectedNotes = getSelectedNotes();
 
-				m_moveBoundaryLeft = selectedNotes.first()->pos().getTicks();
-				m_moveBoundaryRight = selectedNotes.first()->endPos();
-				m_moveBoundaryBottom = selectedNotes.first()->key();
+				m_moveBoundaryLeft = selectedNotes.front()->pos().getTicks();
+				m_moveBoundaryRight = selectedNotes.front()->endPos();
+				m_moveBoundaryBottom = selectedNotes.front()->key();
 				m_moveBoundaryTop = m_moveBoundaryBottom;
 
 				//Figure out the bounding box of all the selected notes
@@ -2036,7 +2035,7 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent * me )
 		{
 			if( i->withinRange( ticks_start, ticks_end ) || ( i->selected() && !altPressed ) )
 			{
-				nv += i;
+				nv.push_back(i);
 			}
 		}
 		// make sure we're on a note
@@ -2054,8 +2053,8 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent * me )
 					if( dist < closest_dist ) { closest = i; closest_dist = dist; }
 				}
 				// ... then remove all notes from the vector that aren't on the same exact time
-				NoteVector::Iterator it = nv.begin();
-				while( it != nv.end() )
+				auto it = nv.begin();
+				while (it != nv.end())
 				{
 					const Note *note = *it;
 					if( note->pos().getTicks() != closest->pos().getTicks() )
@@ -2517,7 +2516,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			bool altPressed = me->modifiers() & Qt::AltModifier;
 			// We iterate from last note in MIDI clip to the first,
 			// chronologically
-			NoteVector::ConstIterator it = notes.begin()+notes.size()-1;
+			auto it = notes.begin() + notes.size() - 1;
 			for( int i = 0; i < notes.size(); ++i )
 			{
 				Note* n = *it;
@@ -2579,7 +2578,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			const NoteVector & notes = m_midiClip->notes();
 
 			// will be our iterator in the following loop
-			NoteVector::ConstIterator it = notes.begin()+notes.size()-1;
+			auto it = notes.begin() + notes.size() - 1;
 
 			// loop through whole note-vector...
 			for( int i = 0; i < notes.size(); ++i )
@@ -2656,7 +2655,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			const NoteVector & notes = m_midiClip->notes();
 
 			// will be our iterator in the following loop
-			NoteVector::ConstIterator it = notes.begin();
+			auto it = notes.begin();
 
 			// loop through whole note-vector...
 			while( it != notes.end() )
@@ -3789,7 +3788,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		{
 			if( i->withinRange( ticks_start, ticks_end ) || ( i->selected() && !altPressed ) )
 			{
-				nv += i;
+				nv.push_back(i);
 			}
 		}
 		if( nv.size() > 0 )
