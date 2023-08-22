@@ -209,7 +209,7 @@ public:
 	
 	inline float update( float s, ch_cnt_t ch )
 	{
-		if( qAbs( s ) < 1.0e-10f && qAbs( m_z1[ch] ) < 1.0e-10f ) return 0.0f;
+		if (std::abs(s) < 1.0e-10f && std::abs(m_z1[ch]) < 1.0e-10f) return 0.0f;
 		return m_z1[ch] = s * m_a0 + m_z1[ch] * m_b1;
 	}
 	
@@ -597,7 +597,7 @@ public:
 			case Formantfilter:
 			case FastFormant:
 			{
-				if( qAbs( _in0 ) < 1.0e-10f && qAbs( m_vflast[0][_chnl] ) < 1.0e-10f ) { return 0.0f; } // performance hack - skip processing when the numbers get too small
+				if (std::abs(_in0) < 1.0e-10f && std::abs(m_vflast[0][_chnl]) < 1.0e-10f) { return 0.0f; } // performance hack - skip processing when the numbers get too small
 				sample_t hp, bp, in;
 
 				out = 0;

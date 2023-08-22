@@ -354,8 +354,8 @@ float AutomatableModel::inverseScaledValue( float value ) const
 template<class T>
 void roundAt( T& value, const T& where, const T& step_size )
 {
-	if( qAbs<float>( value - where )
-		< typeInfo<float>::minEps() * qAbs<float>( step_size ) )
+	if (std::abs(value - where)
+		< typeInfo<float>::minEps() * std::abs(step_size))
 	{
 		value = where;
 	}

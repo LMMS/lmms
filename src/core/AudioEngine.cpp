@@ -551,8 +551,8 @@ AudioEngine::StereoSample AudioEngine::getPeakValues(sampleFrame * ab, const f_c
 
 	for (f_cnt_t f = 0; f < frames; ++f)
 	{
-		float const absLeft = qAbs(ab[f][0]);
-		float const absRight = qAbs(ab[f][1]);
+		float const absLeft = std::abs(ab[f][0]);
+		float const absRight = std::abs(ab[f][1]);
 		if (absLeft > peakLeft)
 		{
 			peakLeft = absLeft;

@@ -214,7 +214,7 @@ static inline float logToLinearScale( float min, float max, float value )
 {
 	if( min < 0 )
 	{
-		const float mmax = qMax( qAbs( min ), qAbs( max ) );
+		const float mmax = qMax(std::abs(min), std::abs(max));
 		const float val = value * ( max - min ) + min;
 		float result = signedPowf( val / mmax, F_E ) * mmax;
 		return std::isnan( result ) ? 0 : result;
@@ -232,7 +232,7 @@ static inline float linearToLogScale( float min, float max, float value )
 	const float val = ( valueLimited - min ) / ( max - min );
 	if( min < 0 )
 	{
-		const float mmax = qMax( qAbs( min ), qAbs( max ) );
+		const float mmax = qMax(std::abs(min), std::abs(max));
 		float result = signedPowf( valueLimited / mmax, EXP ) * mmax;
 		return std::isnan( result ) ? 0 : result;
 	}
@@ -315,14 +315,14 @@ static inline float fastSqrt( float n )
 template<class T>
 static inline T absMax( T a, T b )
 {
-	return qAbs<T>(a) > qAbs<T>(b) ? a : b;
+	return std::abs(a) > std::abs(b) ? a : b;
 }
 
 //! returns value nearest to zero
 template<class T>
 static inline T absMin( T a, T b )
 {
-	return qAbs<T>(a) < qAbs<T>(b) ? a : b;
+	return std::abs(a) < std::abs(b) ? a : b;
 }
 
 
