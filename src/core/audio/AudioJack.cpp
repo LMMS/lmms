@@ -44,10 +44,10 @@ namespace lmms
 {
 
 AudioJack::AudioJack( bool & _success_ful, AudioEngine*  _audioEngine ) :
-	AudioDevice( qBound<int>(
+	AudioDevice(std::clamp<int>(
+		ConfigManager::inst()->value("audiojack", "channels").toInt(),
 		DEFAULT_CHANNELS,
-		ConfigManager::inst()->value( "audiojack", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _audioEngine ),
+		SURROUND_CHANNELS), _audioEngine),
 	m_client( nullptr ),
 	m_active( false ),
 	m_midiClient( nullptr ),

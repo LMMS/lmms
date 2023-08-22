@@ -62,10 +62,10 @@ namespace lmms
 
 
 AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine ) :
-	AudioDevice( qBound<ch_cnt_t>(
+	AudioDevice(std::clamp<ch_cnt_t>(
+		ConfigManager::inst()->value("audioportaudio", "channels").toInt(),
 		DEFAULT_CHANNELS,
-		ConfigManager::inst()->value( "audioportaudio", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _audioEngine ),
+		SURROUND_CHANNELS), _audioEngine),
 	m_paStream( nullptr ),
 	m_wasPAInitError( false ),
 	m_outBuf( new surroundSampleFrame[audioEngine()->framesPerPeriod()] ),

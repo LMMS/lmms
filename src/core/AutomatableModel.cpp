@@ -444,7 +444,7 @@ void AutomatableModel::setStep( const float step )
 
 float AutomatableModel::fittedValue( float value ) const
 {
-	value = qBound<float>( m_minValue, value, m_maxValue );
+	value = std::clamp(value, m_minValue, m_maxValue);
 
 	if( m_step != 0 && m_hasStrictStepSize )
 	{

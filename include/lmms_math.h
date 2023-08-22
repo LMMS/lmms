@@ -228,7 +228,7 @@ static inline float logToLinearScale( float min, float max, float value )
 static inline float linearToLogScale( float min, float max, float value )
 {
 	static const float EXP = 1.0f / F_E;
-	const float valueLimited = qBound( min, value, max);
+	const float valueLimited = std::clamp(value, min, max);
 	const float val = ( valueLimited - min ) / ( max - min );
 	if( min < 0 )
 	{

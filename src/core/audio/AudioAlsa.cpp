@@ -36,10 +36,10 @@ namespace lmms
 {
 
 AudioAlsa::AudioAlsa( bool & _success_ful, AudioEngine*  _audioEngine ) :
-	AudioDevice( qBound<ch_cnt_t>(
+	AudioDevice(std::clamp<ch_cnt_t>(
+		ConfigManager::inst()->value("audioalsa", "channels").toInt(),
 		DEFAULT_CHANNELS,
-		ConfigManager::inst()->value( "audioalsa", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _audioEngine ),
+		SURROUND_CHANNELS), _audioEngine),
 	m_handle( nullptr ),
 	m_hwParams( nullptr ),
 	m_swParams( nullptr ),

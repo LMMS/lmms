@@ -456,10 +456,10 @@ void SampleBuffer::normalizeSampleRate(const sample_rate_t srcSR, bool keepSetti
 	{
 		auto oldRateToNewRateRatio = static_cast<float>(audioEngineSampleRate()) / oldRate;
 
-		m_startFrame = qBound(0, f_cnt_t(m_startFrame * oldRateToNewRateRatio), m_frames);
-		m_endFrame = qBound(m_startFrame, f_cnt_t(m_endFrame * oldRateToNewRateRatio), m_frames);
-		m_loopStartFrame = qBound(0, f_cnt_t(m_loopStartFrame * oldRateToNewRateRatio), m_frames);
-		m_loopEndFrame = qBound(m_loopStartFrame, f_cnt_t(m_loopEndFrame * oldRateToNewRateRatio), m_frames);
+		m_startFrame = std::clamp(f_cnt_t(m_startFrame * oldRateToNewRateRatio), 0, m_frames);
+		m_endFrame = std::clamp(f_cnt_t(m_endFrame * oldRateToNewRateRatio), m_startFrame, m_frames);
+		m_loopStartFrame = std::clamp(f_cnt_t(m_loopStartFrame * oldRateToNewRateRatio), 0, m_frames);
+		m_loopEndFrame = std::clamp(f_cnt_t(m_loopEndFrame * oldRateToNewRateRatio), m_loopStartFrame, m_frames);
 		m_sampleRate = audioEngineSampleRate();
 	}
 }
@@ -1085,8 +1085,8 @@ void SampleBuffer::visualize(
 
 		const float trueRmsData = (rmsData[0] + rmsData[1]) / 2 / fpp;
 		const float sqrtRmsData = sqrt(trueRmsData);
-		const float maxRmsData = qBound(minData, sqrtRmsData, maxData);
-		const float minRmsData = qBound(minData, -sqrtRmsData, maxData);
+		const float maxRmsData = std::clamp(sqrtRmsData, minData, maxData);
+		const float minRmsData = std::clamp(-sqrtRmsData, minData, maxData);
 
 		// If nbFrames >= w, we can use curPixel to calculate X
 		// but if nbFrames < w, we need to calculate it proportionally
