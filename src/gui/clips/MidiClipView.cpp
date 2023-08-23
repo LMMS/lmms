@@ -110,10 +110,7 @@ void MidiClipView::update()
 void MidiClipView::openInPianoRoll(double scrollX)
 {
 	getGUI()->pianoRoll()->setCurrentMidiClip(m_clip);
-	if (scrollX >= 0.0)
-	{
-		getGUI()->pianoRoll()->setScrollbarPos(scrollX);
-	}
+	getGUI()->pianoRoll()->setScrollbarPos(scrollX);
 	getGUI()->pianoRoll()->parentWidget()->show();
 	getGUI()->pianoRoll()->show();
 	getGUI()->pianoRoll()->setFocus();
