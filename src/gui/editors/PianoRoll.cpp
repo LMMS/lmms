@@ -844,6 +844,19 @@ void PianoRoll::loadMarkedSemiTones(const QDomElement & de)
 	m_markedSemiTones.erase(new_end, m_markedSemiTones.end());
 }
 
+void PianoRoll::setScrollbarPos(double posX)
+{
+	assert(posX >= 0.0 && posX < 1.0);
+
+	// Convert posX to position on scrollbar
+	auto scrollPosX = posX * (m_leftRightScroll->maximum() - m_leftRightScroll->minimum()) + m_leftRightScroll->minimum();
+
+	// Center the position within the editor
+	const auto tpp = 1.0 * TimePos::ticksPerBar() / m_ppb; // ticks per pixel
+	scrollPosX -= tpp * (0.5 * m_leftRightScroll->width() - m_topBottomScroll->width());
+
+	m_leftRightScroll->setValue(std::max(static_cast<int>(scrollPosX), 0));
+}
 
 void PianoRoll::setCurrentMidiClip( MidiClip* newMidiClip )
 {
@@ -5229,16 +5242,7 @@ bool PianoRollWindow::hasFocus() const
 
 void PianoRollWindow::setScrollbarPos(double posX)
 {
-	const auto sbX = m_editor->m_leftRightScroll;
-	const auto sbY = m_editor->m_topBottomScroll;
-
-	const auto halfEditorWidth = (sbX->width() - sbY->width()) / 2.0;
-	const auto zoomFactor = m_editor->m_zoomLevels[m_editor->m_zoomingModel.value()];
-	const auto zoomOffset = halfEditorWidth * (-1.0 / zoomFactor);
-
-	const auto scrollPosX = static_cast<int>(posX * (sbX->maximum() - sbX->minimum()) + zoomOffset + (sbY->width() / 2));
-
-	sbX->setValue(std::max(scrollPosX, 0));
+	m_editor->setScrollbarPos(posX);
 }
 
 

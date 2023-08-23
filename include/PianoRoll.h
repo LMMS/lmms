@@ -124,6 +124,7 @@ public:
 	void setGhostMidiClip( MidiClip* newMidiClip );
 	void loadGhostNotes( const QDomElement & de );
 	void loadMarkedSemiTones(const QDomElement & de);
+	void setScrollbarPos(double posX); //!< posX is in range [0, 1)
 
 	inline void stopRecording()
 	{
