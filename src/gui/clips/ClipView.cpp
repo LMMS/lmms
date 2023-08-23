@@ -559,7 +559,7 @@ DataFile ClipView::createClipDataFiles(
 	// Add extra metadata needed for calculations later
 
 	const auto initialTrackIt = std::find(tc->tracks().begin(), tc->tracks().end(), t);
-	if (initialTrackIt != tc->tracks().end())
+	if (initialTrackIt == tc->tracks().end())
 	{
 		printf("Failed to find selected track in the TrackContainer.\n");
 		return dataFile;
