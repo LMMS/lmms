@@ -263,7 +263,7 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 
 				if (it != controllers.end())
 				{
-					int idx = std::distance(it, controllers.begin());
+					int idx = std::distance(controllers.begin(), it);
 					m_userGroupBox->model()->setValue( true );
 					m_userController->model()->setValue( idx );
 				}
