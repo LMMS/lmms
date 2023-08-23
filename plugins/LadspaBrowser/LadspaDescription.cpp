@@ -205,7 +205,7 @@ void LadspaDescription::rowChanged( int _pluginIndex )
 
 void LadspaDescription::onDoubleClicked( QListWidgetItem * _item )
 {
-	emit( doubleClicked( m_currentSelection ) );
+	emit doubleClicked( m_currentSelection );
 }
 
 
