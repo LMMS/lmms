@@ -125,7 +125,7 @@ ClipView::ClipView( Clip * clip,
 
 	connect( m_clip, SIGNAL(lengthChanged()),
 			this, SLOT(updateLength()));
-	connect( getGUI()->songEditor()->m_editor->zoomingModel(), SIGNAL(dataChanged()), this, SLOT(updateLength()));
+	connect(getGUI()->songEditor()->m_editor->zoomingXModel(), SIGNAL(dataChanged()), this, SLOT(updateLength()));
 	connect( m_clip, SIGNAL(positionChanged()),
 			this, SLOT(updatePosition()));
 	connect( m_clip, SIGNAL(destroyedClip()), this, SLOT(close()));

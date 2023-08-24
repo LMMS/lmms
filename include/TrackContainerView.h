@@ -98,6 +98,7 @@ public:
 	}
 
 	void setPixelsPerBar( int ppb );
+	void setVerticalScale(double h);
 
 	const TrackView * trackViewAt( const int _y ) const;
 
@@ -167,6 +168,7 @@ public slots:
 
 protected:
 	static const int DEFAULT_PIXELS_PER_BAR = 16;
+	static const int DEFAULT_TRACK_HEIGHT = 32;
 
 	void resizeEvent( QResizeEvent * ) override;
 
@@ -203,6 +205,7 @@ private:
 	QVBoxLayout * m_scrollLayout;
 
 	float m_ppb;
+	double m_trackHeightScale;
 
 	RubberBand * m_rubberBand;
 
