@@ -85,6 +85,8 @@ protected:
 
 
 private:
+	float baseWidth() const;
+
 	static QPixmap * s_stepBtnOn0;
 	static QPixmap * s_stepBtnOn200;
 	static QPixmap * s_stepBtnOff;

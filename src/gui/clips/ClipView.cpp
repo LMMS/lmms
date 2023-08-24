@@ -196,7 +196,7 @@ void ClipView::update()
  *
  * \todo In what circumstance are they fixed?
  */
-bool ClipView::fixedClips()
+bool ClipView::fixedClips() const
 {
 	return m_trackView->trackContainerView()->fixedClips();
 }

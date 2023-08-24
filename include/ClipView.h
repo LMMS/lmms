@@ -73,7 +73,7 @@ public:
 	ClipView( Clip * clip, TrackView * tv );
 	~ClipView() override;
 
-	bool fixedClips();
+	bool fixedClips() const;
 
 	inline Clip * getClip()
 	{

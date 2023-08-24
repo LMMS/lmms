@@ -853,7 +853,7 @@ void PianoRoll::setScrollbarPos(double posX)
 
 	// Center the position within the editor
 	const auto tpp = 1.0 * TimePos::ticksPerBar() / m_ppb; // ticks per pixel
-	scrollPosX -= tpp * (0.5 * m_leftRightScroll->width() - m_topBottomScroll->width());
+	scrollPosX -= tpp * 0.5 * (m_leftRightScroll->width() - m_topBottomScroll->width());
 
 	m_leftRightScroll->setValue(std::max(static_cast<int>(scrollPosX), 0));
 }
