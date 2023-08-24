@@ -314,8 +314,8 @@ void MidiClipView::mouseDoubleClickEvent(QMouseEvent *_me)
 	}
 	if( m_clip->m_clipType == MidiClip::MelodyClip || !fixedClips() )
 	{
-		// Local X position of mouse over clip, normalized to range of [0, 1)
-		auto scrollX = (_me->localPos().x() + BORDER_WIDTH) / baseWidth();
+		// Local X position of mouse over clip's note drawing area, normalized to range of [0, 1]
+		const auto scrollX = std::min((_me->localPos().x() + BORDER_WIDTH) / noteAreaWidth(), 1.0);
 		openInPianoRoll(scrollX);
 	}
 }
@@ -376,7 +376,7 @@ void MidiClipView::wheelEvent(QWheelEvent * we)
 }
 
 
-float MidiClipView::baseWidth() const
+float MidiClipView::noteAreaWidth() const
 {
 	return fixedClips() ? parentWidget()->width() - 2 * BORDER_WIDTH : width() - BORDER_WIDTH;
 }
@@ -455,7 +455,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	}
 
 	// Compute pixels per bar
-	const float pixelsPerBar = baseWidth() / static_cast<float>(m_clip->length().getBar());
+	const float pixelsPerBar = noteAreaWidth() / static_cast<float>(m_clip->length().getBar());
 
 	// Length of one bar/beat in the [0,1] x [0,1] coordinate system
 	const float barLength = 1. / m_clip->length().getBar();

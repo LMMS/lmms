@@ -85,7 +85,8 @@ protected:
 
 
 private:
-	float baseWidth() const;
+	//! Width in pixels of the area where notes are drawn over the clip
+	float noteAreaWidth() const;
 
 	static QPixmap * s_stepBtnOn0;
 	static QPixmap * s_stepBtnOn200;

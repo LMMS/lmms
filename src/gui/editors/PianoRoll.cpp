@@ -846,7 +846,7 @@ void PianoRoll::loadMarkedSemiTones(const QDomElement & de)
 
 void PianoRoll::setScrollbarPos(double posX)
 {
-	assert(posX >= 0.0 && posX < 1.0);
+	assert(posX >= 0.0 && posX <= 1.0);
 
 	// Convert posX to position on scrollbar
 	auto scrollPosX = posX * (m_leftRightScroll->maximum() - m_leftRightScroll->minimum()) + m_leftRightScroll->minimum();

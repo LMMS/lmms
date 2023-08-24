@@ -124,7 +124,7 @@ public:
 	void setGhostMidiClip( MidiClip* newMidiClip );
 	void loadGhostNotes( const QDomElement & de );
 	void loadMarkedSemiTones(const QDomElement & de);
-	void setScrollbarPos(double posX); //!< posX is in range [0, 1)
+	void setScrollbarPos(double posX); //!< posX is in range [0, 1]
 
 	inline void stopRecording()
 	{
@@ -540,7 +540,7 @@ public:
 	QSize sizeHint() const override;
 	bool hasFocus() const;
 
-	void setScrollbarPos(double posX); //!< posX is in range [0, 1)
+	void setScrollbarPos(double posX); //!< posX is in range [0, 1]
 
 signals:
 	void currentMidiClipChanged();
