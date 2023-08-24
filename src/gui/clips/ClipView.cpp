@@ -125,7 +125,7 @@ ClipView::ClipView( Clip * clip,
 
 	connect( m_clip, SIGNAL(lengthChanged()),
 			this, SLOT(updateLength()));
-	connect( getGUI()->songEditor()->m_editor->zoomingModel(), SIGNAL(dataChanged()), this, SLOT(updateLength()));
+	connect(getGUI()->songEditor()->m_editor, &SongEditor::pixelsPerBarChanged, this, &ClipView::updateLength);
 	connect( m_clip, SIGNAL(positionChanged()),
 			this, SLOT(updatePosition()));
 	connect( m_clip, SIGNAL(destroyedClip()), this, SLOT(close()));
@@ -314,10 +314,9 @@ void ClipView::updateLength()
 	}
 	else
 	{
-		setFixedWidth(
-		static_cast<int>( m_clip->length() * pixelsPerBar() /
-					TimePos::ticksPerBar() ) + 1 /*+
-						BORDER_WIDTH * 2-1*/ );
+		// this std::max function is needed for clips that do not start or end on the beat, otherwise, they "disappear" when zooming to min 
+		// 3 is the minimun width needed to make a clip visible
+		setFixedWidth(std::max(static_cast<int>(m_clip->length() * pixelsPerBar() / TimePos::ticksPerBar() + 1), 3));
 	}
 	m_trackView->trackContainerView()->update();
 }

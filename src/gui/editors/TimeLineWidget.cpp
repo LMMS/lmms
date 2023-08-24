@@ -22,22 +22,28 @@
  *
  */
 
+#include "TimeLineWidget.h"
+
+#include <cmath>
 
 #include <QDomElement>
-#include <QTimer>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QTimer>
 #include <QToolBar>
 
-
-#include "TimeLineWidget.h"
 #include "embed.h"
-#include "NStateButton.h"
 #include "GuiApplication.h"
+#include "NStateButton.h"
 #include "TextFloat.h"
 
 namespace lmms::gui
 {
+
+namespace
+{
+	constexpr int MIN_BAR_LABEL_DISTANCE = 35;
+}
 
 
 QPixmap * TimeLineWidget::s_posMarkerPixmap = nullptr;
@@ -270,12 +276,14 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	int const x = m_xOffset + s_posMarkerPixmap->width() / 2 -
 			( ( static_cast<int>( m_begin * m_ppb ) / TimePos::ticksPerBar() ) % static_cast<int>( m_ppb ) );
 
+	// Double the interval between bar numbers until they are far enough appart
+	int barLabelInterval = 1;
+	while (barLabelInterval * m_ppb < MIN_BAR_LABEL_DISTANCE) { barLabelInterval *= 2; }
+
 	for( int i = 0; x + i * m_ppb < width(); ++i )
 	{
 		++barNumber;
-		if( ( barNumber - 1 ) %
-			qMax( 1, qRound( 1.0f / 3.0f *
-				TimePos::ticksPerBar() / m_ppb ) ) == 0 )
+		if ((barNumber - 1) % barLabelInterval == 0)
 		{
 			const int cx = x + qRound( i * m_ppb );
 			p.setPen( barLineColor );
