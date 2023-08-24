@@ -60,7 +60,7 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 	precisionCheckBox->setText(tr("Precision"));
 
 	auto muteCheckBox = new QCheckBox(tr("0.0 ms"));
-	muteCheckBox->setFocusPolicy(Qt::NoFocus);	
+	muteCheckBox->setFocusPolicy(Qt::NoFocus);
 	muteCheckBox->setToolTip(tr("Mute metronome"));
 	muteCheckBox->setText(tr("Mute"));
 
@@ -78,6 +78,10 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 	resetButton->setFocusPolicy(Qt::NoFocus);
 	resetButton->setToolTip(tr("Reset counter and sidebar information"));
 
+	auto syncButton = new QPushButton(tr("Sync"));
+	syncButton->setFocusPolicy(Qt::NoFocus);
+	syncButton->setToolTip(tr("Sync with project tempo"));
+
 	auto optionLayout = new QVBoxLayout();
 	optionLayout->addWidget(precisionCheckBox);
 	optionLayout->addWidget(muteCheckBox);
@@ -90,9 +94,13 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 	sidebarLayout->addLayout(optionLayout);
 	sidebarLayout->addLayout(bpmInfoLayout);
 
+	auto buttonsLayout = new QHBoxLayout();
+	buttonsLayout->addWidget(resetButton, 0, Qt::AlignCenter);
+	buttonsLayout->addWidget(syncButton, 0, Qt::AlignCenter);
+
 	auto mainLayout = new QVBoxLayout(this);
 	mainLayout->addWidget(m_tapButton, 0, Qt::AlignCenter);
-	mainLayout->addWidget(resetButton, 0, Qt::AlignCenter);
+	mainLayout->addLayout(buttonsLayout);
 	mainLayout->addLayout(sidebarLayout);
 
 	connect(m_tapButton, &QPushButton::pressed, this, [this, muteCheckBox]() {
@@ -113,6 +121,12 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 	connect(precisionCheckBox, &QCheckBox::toggled, [this](bool checked) {
 		m_plugin->m_showDecimal = checked;
 		updateLabels();
+	});
+
+	connect(syncButton, &QPushButton::clicked, this, [this]() {
+		const auto& tempoModel = Engine::getSong()->tempoModel();
+		if (m_plugin->m_bpm < tempoModel.minValue() || m_plugin->m_bpm > tempoModel.maxValue()) { return; }
+		Engine::getSong()->setTempo(m_plugin->m_bpm);
 	});
 
 	hide();
