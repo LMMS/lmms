@@ -72,12 +72,12 @@ public:
 
 	const QString & itemText( int i ) const
 	{
-		return m_items[qBound<int>( minValue(), i,  maxValue() )].first;
+		return m_items[std::clamp(i, minValue(), maxValue())].first;
 	}
 
 	const PixmapLoader* itemPixmap( int i ) const
 	{
-		return m_items[qBound<int>( minValue(), i, maxValue() )].second.get();
+		return m_items[std::clamp(i, minValue(), maxValue())].second.get();
 	}
 
 	int size() const

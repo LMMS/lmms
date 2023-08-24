@@ -118,7 +118,7 @@ public:
 
 	inline static float fittedValue( float _val )
 	{
-		return qBound<float>( 0.0f, _val, 1.0f );
+		return std::clamp(_val, 0.0f, 1.0f);
 	}
 
 	static long runningPeriods()

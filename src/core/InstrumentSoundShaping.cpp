@@ -317,7 +317,7 @@ f_cnt_t InstrumentSoundShaping::releaseFrames() const
 	{
 		if( m_envLfoParameters[i]->isUsed() )
 		{
-			ret_val = qMax( ret_val, m_envLfoParameters[i]->releaseFrames() );
+			ret_val = std::max(ret_val, m_envLfoParameters[i]->releaseFrames());
 		}
 	}
 	return ret_val;

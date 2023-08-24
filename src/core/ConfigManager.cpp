@@ -77,9 +77,9 @@ ConfigManager::ConfigManager() :
 	m_sf2Dir = m_workingDir + SF2_PATH;
 	m_gigDir = m_workingDir + GIG_PATH;
 	m_themeDir = defaultThemeDir();
-	if (!qgetenv("LMMS_DATA_DIR").isEmpty())
+	if (std::getenv("LMMS_DATA_DIR"))
 	{
-		QDir::addSearchPath("data", QString::fromLocal8Bit(qgetenv("LMMS_DATA_DIR")));
+		QDir::addSearchPath("data", QString::fromLocal8Bit(std::getenv("LMMS_DATA_DIR")));
 	}
 	initDevelopmentWorkingDir();
 
@@ -557,8 +557,8 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 	upgrade();
 
 	QStringList searchPaths;
-	if(! qgetenv("LMMS_THEME_PATH").isNull())
-		searchPaths << qgetenv("LMMS_THEME_PATH");
+	if (std::getenv("LMMS_THEME_PATH"))
+		searchPaths << std::getenv("LMMS_THEME_PATH");
 	searchPaths << themeDir() << defaultThemeDir();
 	QDir::setSearchPaths("resources", searchPaths);
 

@@ -27,6 +27,7 @@
 
 #include <QMap>
 #include <QMutex>
+#include <cmath>
 
 #include "JournallingObject.h"
 #include "Model.h"
@@ -144,7 +145,7 @@ public:
 	template<bool>
 	static bool castValue( const float v )
 	{
-		return ( qRound( v ) != 0 );
+		return (std::round(v) != 0);
 	}
 
 

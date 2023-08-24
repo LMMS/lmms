@@ -354,8 +354,8 @@ float AutomatableModel::inverseScaledValue( float value ) const
 template<class T>
 void roundAt( T& value, const T& where, const T& step_size )
 {
-	if( qAbs<float>( value - where )
-		< typeInfo<float>::minEps() * qAbs<float>( step_size ) )
+	if (std::abs(value - where)
+		< typeInfo<float>::minEps() * std::abs(step_size))
 	{
 		value = where;
 	}
@@ -444,7 +444,7 @@ void AutomatableModel::setStep( const float step )
 
 float AutomatableModel::fittedValue( float value ) const
 {
-	value = qBound<float>( m_minValue, value, m_maxValue );
+	value = std::clamp(value, m_minValue, m_maxValue);
 
 	if( m_step != 0 && m_hasStrictStepSize )
 	{
@@ -585,7 +585,7 @@ float AutomatableModel::controllerValue( int frameOffset ) const
 		}
 		if( typeInfo<float>::isEqual( m_step, 1 ) && m_hasStrictStepSize )
 		{
-			return qRound( v );
+			return std::round(v);
 		}
 		return v;
 	}
@@ -794,7 +794,7 @@ void AutomatableModel::setUseControllerValue(bool b)
 
 float FloatModel::getRoundedValue() const
 {
-	return qRound( value() / step<float>() ) * step<float>();
+	return std::round(value() / step<float>()) * step<float>();
 }
 
 

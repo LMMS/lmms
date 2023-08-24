@@ -314,7 +314,7 @@ void AudioEngine::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
 
 	if( frames + _frames > size )
 	{
-		size = qMax( size * 2, frames + _frames );
+		size = std::max(size * 2, frames + _frames);
 		auto ab = new sampleFrame[size];
 		memcpy( ab, buf, frames * sizeof( sampleFrame ) );
 		delete [] buf;
@@ -551,8 +551,8 @@ AudioEngine::StereoSample AudioEngine::getPeakValues(sampleFrame * ab, const f_c
 
 	for (f_cnt_t f = 0; f < frames; ++f)
 	{
-		float const absLeft = qAbs(ab[f][0]);
-		float const absRight = qAbs(ab[f][1]);
+		float const absLeft = std::abs(ab[f][0]);
+		float const absRight = std::abs(ab[f][1]);
 		if (absLeft > peakLeft)
 		{
 			peakLeft = absLeft;

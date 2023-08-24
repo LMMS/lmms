@@ -157,7 +157,7 @@ void MidiClip::updateLength()
 	{
 		if (note->length() > 0)
 		{
-			max_length = qMax<tick_t>(max_length, note->endPos());
+			max_length = std::max<tick_t>(max_length, note->endPos());
 		}
 	}
 	changeLength( TimePos( max_length ).nextFullBar() *
@@ -176,7 +176,7 @@ TimePos MidiClip::beatClipLength() const
 	{
 		if (note->length() < 0)
 		{
-			max_length = qMax<tick_t>(max_length, note->pos() + 1);
+			max_length = std::max<tick_t>(max_length, note->pos() + 1);
 		}
 	}
 
@@ -591,8 +591,8 @@ void MidiClip::changeTimeSignature()
 		}
 	}
 	last_pos = last_pos.nextFullBar() * TimePos::ticksPerBar();
-	m_steps = qMax<tick_t>( TimePos::stepsPerBar(),
-				last_pos.getBar() * TimePos::stepsPerBar() );
+	m_steps = std::max<tick_t>(TimePos::stepsPerBar(),
+				last_pos.getBar() * TimePos::stepsPerBar());
 	updateLength();
 }
 

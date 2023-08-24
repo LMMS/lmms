@@ -265,7 +265,7 @@ void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, 
 		const f_cnt_t offset = n->noteOffset();
 		m_soundShaping.processAudioBuffer( buf + offset, frames - offset, n );
 		const float vol = ( (float) n->getVolume() * DefaultVolumeRatio );
-		const panning_t pan = qBound( PanningLeft, n->getPanning(), PanningRight );
+		const panning_t pan = std::clamp(n->getPanning(), PanningLeft, PanningRight);
 		StereoVolumeVector vv = panningToVolumeVector( pan, vol );
 		for( f_cnt_t f = offset; f < frames; ++f )
 		{
@@ -666,7 +666,7 @@ int InstrumentTrack::masterKey( int _midi_key ) const
 {
 
 	int key = baseNote();
-	return qBound<int>( 0, _midi_key - ( key - DefaultKey ), NumKeys );
+	return std::clamp(_midi_key - (key - DefaultKey), 0, NumKeys);
 }
 
 

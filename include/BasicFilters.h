@@ -209,7 +209,7 @@ public:
 	
 	inline float update( float s, ch_cnt_t ch )
 	{
-		if( qAbs( s ) < 1.0e-10f && qAbs( m_z1[ch] ) < 1.0e-10f ) return 0.0f;
+		if (std::abs(s) < 1.0e-10f && std::abs(m_z1[ch]) < 1.0e-10f) return 0.0f;
 		return m_z1[ch] = s * m_a0 + m_z1[ch] * m_b1;
 	}
 	
@@ -340,22 +340,18 @@ public:
 
 				// four cascaded onepole filters
 				// (bilinear transform)
-				m_y1[_chnl] = qBound( -10.0f,
-						( x + m_oldx[_chnl] ) * m_p
-							- m_k * m_y1[_chnl],
+				m_y1[_chnl] = std::clamp((x + m_oldx[_chnl]) * m_p
+							- m_k * m_y1[_chnl], -10.0f,
+								10.0f);
+				m_y2[_chnl] = std::clamp((m_y1[_chnl] + m_oldy1[_chnl]) * m_p
+							- m_k * m_y2[_chnl], -10.0f,
+								10.0f);
+				m_y3[_chnl] = std::clamp((m_y2[_chnl] + m_oldy2[_chnl]) * m_p
+							- m_k * m_y3[_chnl], -10.0f,
 								10.0f );
-				m_y2[_chnl] = qBound( -10.0f,
-					( m_y1[_chnl] + m_oldy1[_chnl] ) * m_p
-							- m_k * m_y2[_chnl],
-								10.0f );
-				m_y3[_chnl] = qBound( -10.0f,
-					( m_y2[_chnl] + m_oldy2[_chnl] ) * m_p
-							- m_k * m_y3[_chnl],
-								10.0f );
-				m_y4[_chnl] = qBound( -10.0f,
-					( m_y3[_chnl] + m_oldy3[_chnl] ) * m_p
-							- m_k * m_y4[_chnl],
-								10.0f );
+				m_y4[_chnl] = std::clamp((m_y3[_chnl] + m_oldy3[_chnl]) * m_p
+							- m_k * m_y4[_chnl], -10.0f,
+								10.0f);
 
 				m_oldx[_chnl] = x;
 				m_oldy1[_chnl] = m_y1[_chnl];
@@ -377,18 +373,15 @@ public:
 					ip += 0.25f;
 					sample_t x = linearInterpolate( m_last[_chnl], _in0, ip ) - m_r * m_y3[_chnl];
 					
-					m_y1[_chnl] = qBound( -10.0f,
-						( x + m_oldx[_chnl] ) * m_p
-							- m_k * m_y1[_chnl],
-								10.0f );
-					m_y2[_chnl] = qBound( -10.0f,
-						( m_y1[_chnl] + m_oldy1[_chnl] ) * m_p
-								- m_k * m_y2[_chnl],
-									10.0f );
-					m_y3[_chnl] = qBound( -10.0f,
-						( m_y2[_chnl] + m_oldy2[_chnl] ) * m_p
-								- m_k * m_y3[_chnl],
-									10.0f );
+					m_y1[_chnl] = std::clamp((x + m_oldx[_chnl]) * m_p
+							- m_k * m_y1[_chnl], -10.0f,
+								10.0f);
+					m_y2[_chnl] = std::clamp((m_y1[_chnl] + m_oldy1[_chnl]) * m_p
+								- m_k * m_y2[_chnl], -10.0f,
+									10.0f);
+					m_y3[_chnl] = std::clamp((m_y2[_chnl] + m_oldy2[_chnl]) * m_p
+								- m_k * m_y3[_chnl], -10.0f,
+									10.0f);
 					m_oldx[_chnl] = x;
 					m_oldy1[_chnl] = m_y1[_chnl];
 					m_oldy2[_chnl] = m_y2[_chnl];
@@ -471,16 +464,16 @@ public:
 				for( int n = 4; n != 0; --n )
 				{
 					in = _in0 + m_rcbp0[_chnl] * m_rcq;
-					in = qBound( -1.0f, in, 1.0f );
+					in = std::clamp(in, -1.0f, 1.0f);
 
 					lp = in * m_rcb + m_rclp0[_chnl] * m_rca;
-					lp = qBound( -1.0f, lp, 1.0f );
+					lp = std::clamp(lp, -1.0f, 1.0f);
 
 					hp = m_rcc * ( m_rchp0[_chnl] + in - m_rclast0[_chnl] );
-					hp = qBound( -1.0f, hp, 1.0f );
+					hp = std::clamp(hp, -1.0f, 1.0f);
 
 					bp = hp * m_rcb + m_rcbp0[_chnl] * m_rca;
-					bp = qBound( -1.0f, bp, 1.0f );
+					bp = std::clamp(bp, -1.0f, 1.0f);
 
 					m_rclast0[_chnl] = in;
 					m_rclp0[_chnl] = lp;
@@ -496,13 +489,13 @@ public:
 				for( int n = 4; n != 0; --n )
 				{
 					in = _in0 + m_rcbp0[_chnl] * m_rcq;
-					in = qBound( -1.0f, in, 1.0f );
+					in = std::clamp(in, -1.0f, 1.0f);
 
 					hp = m_rcc * ( m_rchp0[_chnl] + in - m_rclast0[_chnl] );
-					hp = qBound( -1.0f, hp, 1.0f );
+					hp = std::clamp(hp, -1.0f, 1.0f);
 
 					bp = hp * m_rcb + m_rcbp0[_chnl] * m_rca;
-					bp = qBound( -1.0f, bp, 1.0f );
+					bp = std::clamp(bp, -1.0f, 1.0f);
 
 					m_rclast0[_chnl] = in;
 					m_rchp0[_chnl] = hp;
@@ -518,16 +511,16 @@ public:
 				{
 					// first stage is as for the 12dB case...
 					in = _in0 + m_rcbp0[_chnl] * m_rcq;
-					in = qBound( -1.0f, in, 1.0f );
+					in = std::clamp(in, -1.0f, 1.0f);
 
 					lp = in * m_rcb + m_rclp0[_chnl] * m_rca;
-					lp = qBound( -1.0f, lp, 1.0f );
+					lp = std::clamp(lp, -1.0f, 1.0f);
 
 					hp = m_rcc * ( m_rchp0[_chnl] + in - m_rclast0[_chnl] );
-					hp = qBound( -1.0f, hp, 1.0f );
+					hp = std::clamp(hp, -1.0f, 1.0f);
 
 					bp = hp * m_rcb + m_rcbp0[_chnl] * m_rca;
-					bp = qBound( -1.0f, bp, 1.0f );
+					bp = std::clamp(bp, -1.0f, 1.0f);
 
 					m_rclast0[_chnl] = in;
 					m_rclp0[_chnl] = lp;
@@ -536,16 +529,16 @@ public:
 
 					// second stage gets the output of the first stage as input...
 					in = lp + m_rcbp1[_chnl] * m_rcq;
-					in = qBound( -1.0f, in, 1.0f );
+					in = std::clamp(in, -1.0f, 1.0f );
 
 					lp = in * m_rcb + m_rclp1[_chnl] * m_rca;
-					lp = qBound( -1.0f, lp, 1.0f );
+					lp = std::clamp(lp, -1.0f, 1.0f);
 
 					hp = m_rcc * ( m_rchp1[_chnl] + in - m_rclast1[_chnl] );
-					hp = qBound( -1.0f, hp, 1.0f );
+					hp = std::clamp(hp, -1.0f, 1.0f);
 
 					bp = hp * m_rcb + m_rcbp1[_chnl] * m_rca;
-					bp = qBound( -1.0f, bp, 1.0f );
+					bp = std::clamp(bp, -1.0f, 1.0f);
 
 					m_rclast1[_chnl] = in;
 					m_rclp1[_chnl] = lp;
@@ -562,13 +555,13 @@ public:
 				{
 					// first stage is as for the 12dB case...
 					in = _in0 + m_rcbp0[_chnl] * m_rcq;
-					in = qBound( -1.0f, in, 1.0f );
+					in = std::clamp(in, -1.0f, 1.0f);
 
 					hp = m_rcc * ( m_rchp0[_chnl] + in - m_rclast0[_chnl] );
-					hp = qBound( -1.0f, hp, 1.0f );
+					hp = std::clamp(hp, -1.0f, 1.0f);
 
 					bp = hp * m_rcb + m_rcbp0[_chnl] * m_rca;
-					bp = qBound( -1.0f, bp, 1.0f );
+					bp = std::clamp(bp, -1.0f, 1.0f);
 
 					m_rclast0[_chnl] = in;
 					m_rchp0[_chnl] = hp;
@@ -579,13 +572,13 @@ public:
 						? hp + m_rcbp1[_chnl] * m_rcq
 						: bp + m_rcbp1[_chnl] * m_rcq;
 
-					in = qBound( -1.0f, in, 1.0f );
+					in = std::clamp(in, -1.0f, 1.0f);
 
 					hp = m_rcc * ( m_rchp1[_chnl] + in - m_rclast1[_chnl] );
-					hp = qBound( -1.0f, hp, 1.0f );
+					hp = std::clamp(hp, -1.0f, 1.0f);
 
 					bp = hp * m_rcb + m_rcbp1[_chnl] * m_rca;
-					bp = qBound( -1.0f, bp, 1.0f );
+					bp = std::clamp(bp, -1.0f, 1.0f);
 
 					m_rclast1[_chnl] = in;
 					m_rchp1[_chnl] = hp;
@@ -597,7 +590,7 @@ public:
 			case Formantfilter:
 			case FastFormant:
 			{
-				if( qAbs( _in0 ) < 1.0e-10f && qAbs( m_vflast[0][_chnl] ) < 1.0e-10f ) { return 0.0f; } // performance hack - skip processing when the numbers get too small
+				if (std::abs(_in0) < 1.0e-10f && std::abs(m_vflast[0][_chnl]) < 1.0e-10f) { return 0.0f; } // performance hack - skip processing when the numbers get too small
 				sample_t hp, bp, in;
 
 				out = 0;
@@ -606,39 +599,39 @@ public:
 				{
 					// first formant
 					in = _in0 + m_vfbp[0][_chnl] * m_vfq;
-					in = qBound( -1.0f, in, 1.0f );
+					in = std::clamp(in, -1.0f, 1.0f);
 
 					hp = m_vfc[0] * ( m_vfhp[0][_chnl] + in - m_vflast[0][_chnl] );
-					hp = qBound( -1.0f, hp, 1.0f );
+					hp = std::clamp(hp, -1.0f, 1.0f);
 
 					bp = hp * m_vfb[0] + m_vfbp[0][_chnl] * m_vfa[0];
-					bp = qBound( -1.0f, bp, 1.0f );
+					bp = std::clamp(bp, -1.0f, 1.0f);
 
 					m_vflast[0][_chnl] = in;
 					m_vfhp[0][_chnl] = hp;
 					m_vfbp[0][_chnl] = bp;
 
 					in = bp + m_vfbp[2][_chnl] * m_vfq;
-					in = qBound( -1.0f, in, 1.0f );
+					in = std::clamp(in, -1.0f, 1.0f);
 
 					hp = m_vfc[0] * ( m_vfhp[2][_chnl] + in - m_vflast[2][_chnl] );
-					hp = qBound( -1.0f, hp, 1.0f );
+					hp = std::clamp(hp, -1.0f, 1.0f);
 
 					bp = hp * m_vfb[0] + m_vfbp[2][_chnl] * m_vfa[0];
-					bp = qBound( -1.0f, bp, 1.0f );
+					bp = std::clamp(bp, -1.0f, 1.0f);
 
 					m_vflast[2][_chnl] = in;
 					m_vfhp[2][_chnl] = hp;
 					m_vfbp[2][_chnl] = bp;
 
 					in = bp + m_vfbp[4][_chnl] * m_vfq;
-					in = qBound( -1.0f, in, 1.0f );
+					in = std::clamp(in, -1.0f, 1.0f);
 
 					hp = m_vfc[0] * ( m_vfhp[4][_chnl] + in - m_vflast[4][_chnl] );
-					hp = qBound( -1.0f, hp, 1.0f );
+					hp = std::clamp(hp, -1.0f, 1.0f);
 
 					bp = hp * m_vfb[0] + m_vfbp[4][_chnl] * m_vfa[0];
-					bp = qBound( -1.0f, bp, 1.0f );
+					bp = std::clamp(bp, -1.0f, 1.0f);
 
 					m_vflast[4][_chnl] = in;
 					m_vfhp[4][_chnl] = hp;
@@ -648,39 +641,39 @@ public:
 
 					// second formant
 					in = _in0 + m_vfbp[0][_chnl] * m_vfq;
-					in = qBound( -1.0f, in, 1.0f );
+					in = std::clamp(in, -1.0f, 1.0f);
 
 					hp = m_vfc[1] * ( m_vfhp[1][_chnl] + in - m_vflast[1][_chnl] );
-					hp = qBound( -1.0f, hp, 1.0f );
+					hp = std::clamp(hp, -1.0f, 1.0f);
 
 					bp = hp * m_vfb[1] + m_vfbp[1][_chnl] * m_vfa[1];
-					bp = qBound( -1.0f, bp, 1.0f );
+					bp = std::clamp(bp, -1.0f, 1.0f);
 
 					m_vflast[1][_chnl] = in;
 					m_vfhp[1][_chnl] = hp;
 					m_vfbp[1][_chnl] = bp;
 
 					in = bp + m_vfbp[3][_chnl] * m_vfq;
-					in = qBound( -1.0f, in, 1.0f );
+					in = std::clamp(in, -1.0f, 1.0f);
 
 					hp = m_vfc[1] * ( m_vfhp[3][_chnl] + in - m_vflast[3][_chnl] );
-					hp = qBound( -1.0f, hp, 1.0f );
+					hp = std::clamp(hp, -1.0f, 1.0f);
 
 					bp = hp * m_vfb[1] + m_vfbp[3][_chnl] * m_vfa[1];
-					bp = qBound( -1.0f, bp, 1.0f );
+					bp = std::clamp(bp, -1.0f, 1.0f);
 
 					m_vflast[3][_chnl] = in;
 					m_vfhp[3][_chnl] = hp;
 					m_vfbp[3][_chnl] = bp;
 
 					in = bp + m_vfbp[5][_chnl] * m_vfq;
-					in = qBound( -1.0f, in, 1.0f );
+					in = std::clamp(in, -1.0f, 1.0f);
 
 					hp = m_vfc[1] * ( m_vfhp[5][_chnl] + in - m_vflast[5][_chnl] );
-					hp = qBound( -1.0f, hp, 1.0f );
+					hp = std::clamp(hp, -1.0f, 1.0f);
 
 					bp = hp * m_vfb[1] + m_vfbp[5][_chnl] * m_vfa[1];
-					bp = qBound( -1.0f, bp, 1.0f );
+					bp = std::clamp(bp, -1.0f, 1.0f);
 
 					m_vflast[5][_chnl] = in;
 					m_vfhp[5][_chnl] = hp;
@@ -709,7 +702,7 @@ public:
 	inline void calcFilterCoeffs( float _freq, float _q )
 	{
 		// temp coef vars
-		_q = qMax( _q, minQ() );
+		_q = std::max(_q, minQ());
 
 		if( m_type == Lowpass_RC12  ||
 			m_type == Bandpass_RC12 ||
@@ -718,7 +711,7 @@ public:
 			m_type == Bandpass_RC24 ||
 			m_type == Highpass_RC24 )
 		{
-			_freq = qBound( 50.0f, _freq, 20000.0f );
+			_freq = std::clamp(_freq, 50.0f, 20000.0f);
 			const float sr = m_sampleRatio * 0.25f;
 			const float f = 1.0f / ( _freq * F_2PI );
 			
@@ -734,7 +727,7 @@ public:
 		if( m_type == Formantfilter ||
 			m_type == FastFormant )
 		{
-			_freq = qBound( minFreq(), _freq, 20000.0f ); // limit freq and q for not getting bad noise out of the filter...
+			_freq = std::clamp(_freq, minFreq(), 20000.0f); // limit freq and q for not getting bad noise out of the filter...
 
 			// formats for a, e, i, o, u, a
 			static const float _f[6][2] = { { 1000, 1400 }, { 500, 2300 },
@@ -772,7 +765,7 @@ public:
 			m_type == DoubleMoog )
 		{
 			// [ 0 - 0.5 ]
-			const float f = qBound( minFreq(), _freq, 20000.0f ) * m_sampleRatio;
+			const float f = std::clamp(_freq, minFreq(), 20000.0f) * m_sampleRatio;
 			// (Empirical tunning)
 			m_p = ( 3.6f - 3.2f * f ) * f;
 			m_k = 2.0f * m_p - 1;
@@ -789,7 +782,7 @@ public:
 		
 		if( m_type == Tripole )
 		{
-			const float f = qBound( 20.0f, _freq, 20000.0f ) * m_sampleRatio * 0.25f;
+			const float f = std::clamp(_freq, 20.0f, 20000.0f) * m_sampleRatio * 0.25f;
 			
 			m_p = ( 3.6f - 3.2f * f ) * f;
 			m_k = 2.0f * m_p - 1.0f;
@@ -803,15 +796,15 @@ public:
 			m_type == Highpass_SV ||
 			m_type == Notch_SV )
 		{
-			const float f = sinf( qMax( minFreq(), _freq ) * m_sampleRatio * F_PI );
-			m_svf1 = qMin( f, 0.825f );
-			m_svf2 = qMin( f * 2.0f, 0.825f );
-			m_svq = qMax( 0.0001f, 2.0f - ( _q * 0.1995f ) );
+			const float f = sinf(std::max(minFreq(), _freq) * m_sampleRatio * F_PI);
+			m_svf1 = std::min(f, 0.825f);
+			m_svf2 = std::min(f * 2.0f, 0.825f);
+			m_svq = std::max(0.0001f, 2.0f - (_q * 0.1995f));
 			return;
 		}
 
 		// other filters
-		_freq = qBound( minFreq(), _freq, 20000.0f );
+		_freq = std::clamp(_freq, minFreq(), 20000.0f);
 		const float omega = F_2PI * _freq * m_sampleRatio;
 		const float tsin = sinf( omega ) * 0.5f;
 		const float tcos = cosf( omega );
