@@ -738,7 +738,7 @@ bool SampleBuffer::play(
 	// this holds the index of the first frame to play
 	f_cnt_t playFrame = std::max(state->m_frameIndex, startFrame);
 
-	if (loopMode == LoopOff)
+	if (loopMode == LoopMode::Off)
 	{
 		if (playFrame >= endFrame || (endFrame - playFrame) / freqFactor == 0)
 		{
@@ -746,7 +746,7 @@ bool SampleBuffer::play(
 			return false;
 		}
 	}
-	else if (loopMode == LoopOn)
+	else if (loopMode == LoopMode::On)
 	{
 		playFrame = getLoopedIndex(playFrame, loopStartFrame, loopEndFrame);
 	}
@@ -786,14 +786,14 @@ bool SampleBuffer::play(
 		// Advance
 		switch (loopMode)
 		{
-			case LoopOff:
+			case LoopMode::Off:
 				playFrame += srcData.input_frames_used;
 				break;
-			case LoopOn:
+			case LoopMode::On:
 				playFrame += srcData.input_frames_used;
 				playFrame = getLoopedIndex(playFrame, loopStartFrame, loopEndFrame);
 				break;
-			case LoopPingPong:
+			case LoopMode::PingPong:
 			{
 				f_cnt_t left = srcData.input_frames_used;
 				if (state->isBackwards())
@@ -825,14 +825,14 @@ bool SampleBuffer::play(
 		// Advance
 		switch (loopMode)
 		{
-			case LoopOff:
+			case LoopMode::Off:
 				playFrame += frames;
 				break;
-			case LoopOn:
+			case LoopMode::On:
 				playFrame += frames;
 				playFrame = getLoopedIndex(playFrame, loopStartFrame, loopEndFrame);
 				break;
-			case LoopPingPong:
+			case LoopMode::PingPong:
 			{
 				f_cnt_t left = frames;
 				if (state->isBackwards())
@@ -883,14 +883,14 @@ sampleFrame * SampleBuffer::getSampleFragment(
 	f_cnt_t end
 ) const
 {
-	if (loopMode == LoopOff)
+	if (loopMode == LoopMode::Off)
 	{
 		if (index + frames <= end)
 		{
 			return m_data + index;
 		}
 	}
-	else if (loopMode == LoopOn)
+	else if (loopMode == LoopMode::On)
 	{
 		if (index + frames <= loopEnd)
 		{
@@ -907,13 +907,13 @@ sampleFrame * SampleBuffer::getSampleFragment(
 
 	*tmp = MM_ALLOC<sampleFrame>( frames);
 
-	if (loopMode == LoopOff)
+	if (loopMode == LoopMode::Off)
 	{
 		f_cnt_t available = end - index;
 		memcpy(*tmp, m_data + index, available * BYTES_PER_FRAME);
 		memset(*tmp + available, 0, (frames - available) * BYTES_PER_FRAME);
 	}
-	else if (loopMode == LoopOn)
+	else if (loopMode == LoopMode::On)
 	{
 		f_cnt_t copied = std::min(frames, loopEnd - index);
 		memcpy(*tmp, m_data + index, copied * BYTES_PER_FRAME);

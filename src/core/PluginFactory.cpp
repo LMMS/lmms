@@ -109,7 +109,7 @@ Plugin::DescriptorList PluginFactory::descriptors() const
 	return m_descriptors.values();
 }
 
-Plugin::DescriptorList PluginFactory::descriptors(Plugin::PluginTypes type) const
+Plugin::DescriptorList PluginFactory::descriptors(Plugin::Type type) const
 {
 	return m_descriptors.values(type);
 }

@@ -55,10 +55,10 @@ Plugin::Descriptor PLUGIN_EXPORT lv2instrument_plugin_descriptor =
 		"plugin for using arbitrary LV2 instruments inside LMMS."),
 	"Johannes Lorenz <jlsf2013$$$users.sourceforge.net, $$$=@>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader("logo"),
 	nullptr,
-	new Lv2SubPluginFeatures(Plugin::Instrument)
+	new Lv2SubPluginFeatures(Plugin::Type::Instrument)
 };
 
 }
@@ -97,7 +97,7 @@ Lv2Instrument::Lv2Instrument(InstrumentTrack *instrumentTrackArg,
 Lv2Instrument::~Lv2Instrument()
 {
 	Engine::audioEngine()->removePlayHandlesOfTypes(instrumentTrack(),
-		PlayHandle::TypeNotePlayHandle | PlayHandle::TypeInstrumentPlayHandle);
+		PlayHandle::Type::NotePlayHandle | PlayHandle::Type::InstrumentPlayHandle);
 }
 
 

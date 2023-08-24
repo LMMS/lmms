@@ -43,7 +43,7 @@ Plugin::Descriptor PLUGIN_EXPORT compressor_plugin_descriptor =
 	QT_TRANSLATE_NOOP("PluginBrowser", "A dynamic range compressor."),
 	"Lost Robot <r94231@gmail.com>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,
@@ -442,28 +442,28 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			m_gainResult[i] = qMax(m_rangeVal, m_gainResult[i]);
 		}
 
-		switch (stereoLink)
+		switch (static_cast<StereoLinkMode>(stereoLink))
 		{
-			case Unlinked:
+			case StereoLinkMode::Unlinked:
 			{
 				break;
 			}
-			case Maximum:
+			case StereoLinkMode::Maximum:
 			{
 				m_gainResult[0] = m_gainResult[1] = qMin(m_gainResult[0], m_gainResult[1]);
 				break;
 			}
-			case Average:
+			case StereoLinkMode::Average:
 			{
 				m_gainResult[0] = m_gainResult[1] = (m_gainResult[0] + m_gainResult[1]) * 0.5f;
 				break;
 			}
-			case Minimum:
+			case StereoLinkMode::Minimum:
 			{
 				m_gainResult[0] = m_gainResult[1] = qMax(m_gainResult[0], m_gainResult[1]);
 				break;
 			}
-			case Blend:
+			case StereoLinkMode::Blend:
 			{
 				if (blend > 0)// 0 is unlinked
 				{

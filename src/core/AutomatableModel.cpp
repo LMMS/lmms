@@ -44,7 +44,7 @@ AutomatableModel::AutomatableModel(
 						const float val, const float min, const float max, const float step,
 						Model* parent, const QString & displayName, bool defaultConstructed ) :
 	Model( parent, displayName, defaultConstructed ),
-	m_scaleType( Linear ),
+	m_scaleType( ScaleType::Linear ),
 	m_minValue( min ),
 	m_maxValue( max ),
 	m_step( step ),
@@ -105,7 +105,7 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 {
 	bool mustQuote = mustQuoteName(name);
 
-	if( isAutomated() || m_scaleType != Linear )
+	if( isAutomated() || m_scaleType != ScaleType::Linear )
 	{
 		// automation needs tuple of data (name, id, value)
 		// scale type also needs an extra value
@@ -114,7 +114,7 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 		QDomElement me = doc.createElement( mustQuote ? QString("automatablemodel") : name );
 		me.setAttribute( "id", ProjectJournal::idToSave( id() ) );
 		me.setAttribute( "value", m_value );
-		me.setAttribute( "scale_type", m_scaleType == Logarithmic ? "log" : "linear" );
+		me.setAttribute( "scale_type", m_scaleType == ScaleType::Logarithmic ? "log" : "linear" );
 		if(mustQuote) {
 			me.setAttribute( "nodename", name );
 		}
@@ -140,11 +140,11 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 	// the discardMIDIConnections option is true.
 	auto controllerType = m_controllerConnection
 			? m_controllerConnection->getController()->type()
-			: Controller::DummyController;
+			: Controller::ControllerType::Dummy;
 	bool skipMidiController = Engine::getSong()->isSavingProject()
 							  && Engine::getSong()->getSaveOptions().discardMIDIConnections.value();
-	if (m_controllerConnection && controllerType != Controller::DummyController
-		&& !(skipMidiController && controllerType == Controller::MidiController))
+	if (m_controllerConnection && controllerType != Controller::ControllerType::Dummy
+		&& !(skipMidiController && controllerType == Controller::ControllerType::Midi))
 	{
 		QDomElement controllerElement;
 
@@ -264,18 +264,18 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 		{
 			if( nodeElement.attribute( "scale_type" ) == "linear" )
 			{
-				setScaleType( Linear );
+				setScaleType( ScaleType::Linear );
 			}
 			else if( nodeElement.attribute( "scale_type" ) == "log" )
 			{
-				setScaleType( Logarithmic );
+				setScaleType( ScaleType::Logarithmic );
 			}
 		}
 	}
 	else
 	{
 
-		setScaleType( Linear );
+		setScaleType( ScaleType::Linear );
 
 		if( element.hasAttribute( name ) )
 			// attribute => read the element's value from the attribute list
@@ -335,7 +335,7 @@ template<class T> T AutomatableModel::logToLinearScale( T value ) const
 
 float AutomatableModel::scaledValue( float value ) const
 {
-	return m_scaleType == Linear
+	return m_scaleType == ScaleType::Linear
 		? value
 		: logToLinearScale<float>( ( value - minValue<float>() ) / m_range );
 }
@@ -343,7 +343,7 @@ float AutomatableModel::scaledValue( float value ) const
 
 float AutomatableModel::inverseScaledValue( float value ) const
 {
-	return m_scaleType == Linear
+	return m_scaleType == ScaleType::Linear
 		? value
 		: lmms::linearToLogScale( minValue<float>(), maxValue<float>(), value );
 }
@@ -571,10 +571,10 @@ float AutomatableModel::controllerValue( int frameOffset ) const
 		float v = 0;
 		switch(m_scaleType)
 		{
-		case Linear:
+		case ScaleType::Linear:
 			v = minValue<float>() + ( range() * controllerConnection()->currentValue( frameOffset ) );
 			break;
-		case Logarithmic:
+		case ScaleType::Logarithmic:
 			v = logToLinearScale(
 				controllerConnection()->currentValue( frameOffset ));
 			break;
@@ -623,13 +623,13 @@ ValueBuffer * AutomatableModel::valueBuffer()
 			float * nvalues = m_valueBuffer.values();
 			switch( m_scaleType )
 			{
-			case Linear:
+			case ScaleType::Linear:
 				for( int i = 0; i < m_valueBuffer.length(); i++ )
 				{
 					nvalues[i] = minValue<float>() + ( range() * values[i] );
 				}
 				break;
-			case Logarithmic:
+			case ScaleType::Logarithmic:
 				for( int i = 0; i < m_valueBuffer.length(); i++ )
 				{
 					nvalues[i] = logToLinearScale( values[i] );

@@ -216,7 +216,7 @@ void Note::createDetuning()
 		m_detuning = new DetuningHelper;
 		(void) m_detuning->automationClip();
 		m_detuning->setRange( -MaxDetuning, MaxDetuning, 0.5f );
-		m_detuning->automationClip()->setProgressionType( AutomationClip::LinearProgression );
+		m_detuning->automationClip()->setProgressionType( AutomationClip::ProgressionType::Linear );
 	}
 }
 

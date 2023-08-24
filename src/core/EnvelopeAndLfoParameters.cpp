@@ -113,7 +113,7 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 				SECS_PER_LFO_OSCILLATION * 1000.0, this,
 							tr( "LFO frequency" ) ),
 	m_lfoAmountModel( 0.0, -1.0, 1.0, 0.005, this, tr( "LFO mod amount" ) ),
-	m_lfoWaveModel( SineWave, 0, NumLfoShapes, this, tr( "LFO wave shape" ) ),
+	m_lfoWaveModel( static_cast<int>(LfoShape::SineWave), 0, NumLfoShapes, this, tr( "LFO wave shape" ) ),
 	m_x100Model( false, this, tr( "LFO frequency x 100" ) ),
 	m_controlEnvAmountModel( false, this, tr( "Modulate env amount" ) ),
 	m_lfoFrame( 0 ),
@@ -209,28 +209,28 @@ inline sample_t EnvelopeAndLfoParameters::lfoShapeSample( fpp_t _frame_offset )
 	const float phase = frame / static_cast<float>(
 						m_lfoOscillationFrames );
 	sample_t shape_sample;
-	switch( m_lfoWaveModel.value()  )
+	switch( static_cast<LfoShape>(m_lfoWaveModel.value())  )
 	{
-		case TriangleWave:
+		case LfoShape::TriangleWave:
 			shape_sample = Oscillator::triangleSample( phase );
 			break;
-		case SquareWave:
+		case LfoShape::SquareWave:
 			shape_sample = Oscillator::squareSample( phase );
 			break;
-		case SawWave:
+		case LfoShape::SawWave:
 			shape_sample = Oscillator::sawSample( phase );
 			break;
-		case UserDefinedWave:
+		case LfoShape::UserDefinedWave:
 			shape_sample = m_userWave.userWaveSample( phase );
 			break;
-		case RandomWave:
+		case LfoShape::RandomWave:
 			if( frame == 0 )
 			{
 				m_random = Oscillator::noiseSample( 0.0f );
 			}
 			shape_sample = m_random;
 			break;
-		case SineWave:
+		case LfoShape::SineWave:
 		default:
 			shape_sample = Oscillator::sinSample( phase );
 			break;

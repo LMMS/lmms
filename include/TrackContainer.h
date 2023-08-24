@@ -50,10 +50,10 @@ class LMMS_EXPORT TrackContainer : public Model, public JournallingObject
 	Q_OBJECT
 public:
 	using TrackList = std::vector<Track*>;
-	enum TrackContainerTypes
+	enum class Type
 	{
-		PatternContainer,
-		SongContainer
+		Pattern,
+		Song
 	} ;
 
 	TrackContainer();
@@ -63,7 +63,7 @@ public:
 
 	void loadSettings( const QDomElement & _this ) override;
 
-	int countTracks( Track::TrackTypes _tt = Track::NumTrackTypes ) const;
+	int countTracks( Track::Type _tt = Track::Type::Count ) const;
 
 
 	void addTrack( Track * _track );
@@ -85,12 +85,12 @@ public:
 		return "trackcontainer";
 	}
 
-	inline void setType( TrackContainerTypes newType )
+	inline void setType( Type newType )
 	{
 		m_TrackContainerType = newType;
 	}
 
-	inline TrackContainerTypes type() const
+	inline Type type() const
 	{
 		return m_TrackContainerType;
 	}
@@ -108,7 +108,7 @@ protected:
 private:
 	TrackList m_tracks;
 
-	TrackContainerTypes m_TrackContainerType;
+	Type m_TrackContainerType;
 
 
 	friend class gui::TrackContainerView;

@@ -58,8 +58,8 @@ bool AudioFileFlac::startEncoding()
 
 	switch (getOutputSettings().getBitDepth())
 	{
-		case OutputSettings::Depth_24Bit:
-		case OutputSettings::Depth_32Bit:
+		case OutputSettings::BitDepth::Depth24Bit:
+		case OutputSettings::BitDepth::Depth32Bit:
 			// FLAC does not support 32bit sampling, so take it as 24.
 			m_sfinfo.format |= SF_FORMAT_PCM_24;
 			break;
@@ -94,7 +94,7 @@ void AudioFileFlac::writeBuffer(surroundSampleFrame const* _ab, fpp_t const fram
 	OutputSettings::BitDepth depth = getOutputSettings().getBitDepth();
 	float clipvalue = std::nextafterf( -1.0f, 0.0f );
 
-	if (depth == OutputSettings::Depth_24Bit || depth == OutputSettings::Depth_32Bit) // Float encoding
+	if (depth == OutputSettings::BitDepth::Depth24Bit || depth == OutputSettings::BitDepth::Depth32Bit) // Float encoding
 	{
 		auto buf = std::vector<sample_t>(frames * channels());
 		for(fpp_t frame = 0; frame < frames; ++frame)

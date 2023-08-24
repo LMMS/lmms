@@ -65,7 +65,7 @@ public:
 
 	QString nodeName() const override;
 
-	Flags flags() const override { return IsNotBendable; }
+	Flags flags() const override { return Flag::IsNotBendable; }
 
 	gui::PluginView* instantiateView(QWidget* parent) override;
 

@@ -82,7 +82,7 @@ SongEditor::SongEditor( Song * song ) :
 	m_proportionalSnap( false ),
 	m_scrollBack( false ),
 	m_smoothScroll( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
-	m_mode(DrawMode),
+	m_mode(EditMode::Draw),
 	m_origin(),
 	m_scrollPos(),
 	m_mousePos(),
@@ -99,11 +99,11 @@ SongEditor::SongEditor( Song * song ) :
 
 	m_timeLine = new TimeLineWidget( m_trackHeadWidth, 32,
 					pixelsPerBar(),
-					m_song->m_playPos[Song::Mode_PlaySong],
+					m_song->getPlayPos(Song::PlayMode::Song),
 					m_currentPosition,
-					Song::Mode_PlaySong, this );
+					Song::PlayMode::Song, this );
 	connect( this, SIGNAL( positionChanged( const lmms::TimePos& ) ),
-				m_song->m_playPos[Song::Mode_PlaySong].m_timeLine,
+				m_song->getPlayPos(Song::PlayMode::Song).m_timeLine,
 			SLOT( updatePosition( const lmms::TimePos& ) ) );
 	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos& ) ),
 			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
@@ -341,8 +341,8 @@ QString SongEditor::getSnapSizeString() const
 void SongEditor::setHighQuality( bool hq )
 {
 	Engine::audioEngine()->changeQuality( AudioEngine::qualitySettings(
-			hq ? AudioEngine::qualitySettings::Mode_HighQuality :
-				AudioEngine::qualitySettings::Mode_Draft ) );
+			hq ? AudioEngine::qualitySettings::Mode::HighQuality :
+				AudioEngine::qualitySettings::Mode::Draft ) );
 }
 
 
@@ -456,17 +456,17 @@ void SongEditor::setEditMode( EditMode mode )
 
 void SongEditor::setEditModeDraw()
 {
-	setEditMode(DrawMode);
+	setEditMode(EditMode::Draw);
 }
 
 void SongEditor::setEditModeKnife()
 {
-	setEditMode(KnifeMode);
+	setEditMode(EditMode::Knife);
 }
 
 void SongEditor::setEditModeSelect()
 {
-	setEditMode(SelectMode);
+	setEditMode(EditMode::Select);
 }
 
 void SongEditor::toggleProportionalSnap()
@@ -496,7 +496,7 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 		tick_t t = m_song->currentTick() - TimePos::ticksPerBar();
 		if( t >= 0 )
 		{
-			m_song->setPlayPos( t, Song::Mode_PlaySong );
+			m_song->setPlayPos( t, Song::PlayMode::Song );
 		}
 	}
 	else if( ke->key() == Qt::Key_Right )
@@ -504,12 +504,12 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 		tick_t t = m_song->currentTick() + TimePos::ticksPerBar();
 		if( t < MaxSongLength )
 		{
-			m_song->setPlayPos( t, Song::Mode_PlaySong );
+			m_song->setPlayPos( t, Song::PlayMode::Song );
 		}
 	}
 	else if( ke->key() == Qt::Key_Home )
 	{
-		m_song->setPlayPos( 0, Song::Mode_PlaySong );
+		m_song->setPlayPos( 0, Song::PlayMode::Song );
 	}
 	else if( ke->key() == Qt::Key_Delete || ke->key() == Qt::Key_Backspace )
 	{
@@ -560,7 +560,7 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		m_leftRightScroll->setValue(m_leftRightScroll->value() + bar - newBar);
 
 		// update timeline
-		m_song->m_playPos[Song::Mode_PlaySong].m_timeLine->setPixelsPerBar(pixelsPerBar());
+		m_song->getPlayPos(Song::PlayMode::Song).m_timeLine->setPixelsPerBar(pixelsPerBar());
 		// and make sure, all Clip's are resized and relocated
 		realignTracks();
 	}
@@ -788,8 +788,8 @@ void SongEditor::updatePosition( const TimePos & t )
 		trackOpWidth = TRACK_OP_WIDTH;
 	}
 
-	if( ( m_song->isPlaying() && m_song->m_playMode == Song::Mode_PlaySong
-		  && m_timeLine->autoScroll() == TimeLineWidget::AutoScrollEnabled) ||
+	if( ( m_song->isPlaying() && m_song->m_playMode == Song::PlayMode::Song
+		  && m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Enabled) ||
 							m_scrollBack == true )
 	{
 		m_smoothScroll = ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt();
@@ -808,7 +808,7 @@ void SongEditor::updatePosition( const TimePos & t )
 		m_scrollBack = false;
 	}
 
-	const int x = m_song->m_playPos[Song::Mode_PlaySong].m_timeLine->
+	const int x = m_song->getPlayPos(Song::PlayMode::Song).m_timeLine->
 							markerX( t ) + 8;
 	if( x >= trackOpWidth + widgetWidth -1 )
 	{
@@ -872,7 +872,7 @@ void SongEditor::zoomingChanged()
 	int ppb = calculatePixelsPerBar();
 	setPixelsPerBar(ppb);
 
-	m_song->m_playPos[Song::Mode_PlaySong].m_timeLine->setPixelsPerBar(ppb);
+	m_song->getPlayPos(Song::PlayMode::Song).m_timeLine->setPixelsPerBar(ppb);
 	realignTracks();
 	updateRubberband();
 	m_timeLine->setSnapSize(getSnapSize());
@@ -895,7 +895,7 @@ void SongEditor::selectAllClips( bool select )
 
 bool SongEditor::allowRubberband() const
 {
-	return m_mode == SelectMode;
+	return m_mode == EditMode::Select;
 }
 
 
@@ -903,7 +903,7 @@ bool SongEditor::allowRubberband() const
 
 bool SongEditor::knifeMode() const
 {
-	return m_mode == KnifeMode;
+	return m_mode == EditMode::Knife;
 }
 
 
@@ -1104,7 +1104,7 @@ void SongEditorWindow::changeEvent(QEvent *event)
 void SongEditorWindow::play()
 {
 	emit playTriggered();
-	if( Engine::getSong()->playMode() != Song::Mode_PlaySong )
+	if( Engine::getSong()->playMode() != Song::PlayMode::Song )
 	{
 		Engine::getSong()->playSong();
 	}

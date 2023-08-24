@@ -52,7 +52,7 @@ Plugin::Descriptor PLUGIN_EXPORT watsyn_plugin_descriptor =
 				"4-oscillator modulatable wavetable synth" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
@@ -816,7 +816,7 @@ WatsynView::WatsynView( Instrument * _instrument,
 	pal = QPalette();
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap("wavegraph") );
 // a1 graph
-	a1_graph = new Graph( this, Graph::LinearStyle, 224, 105 );
+	a1_graph = new Graph( this, Graph::Style::Linear, 224, 105 );
 	a1_graph->move( 4, 141 );
 	a1_graph->setAutoFillBackground( true );
 	a1_graph->setGraphColor( QColor( 0x43, 0xb2, 0xff ) );
@@ -824,7 +824,7 @@ WatsynView::WatsynView( Instrument * _instrument,
 	a1_graph->setPalette( pal );
 
 // a2 graph
-	a2_graph = new Graph( this, Graph::LinearStyle, 224, 105 );
+	a2_graph = new Graph( this, Graph::Style::Linear, 224, 105 );
 	a2_graph->move( 4, 141 );
 	a2_graph->setAutoFillBackground( true );
 	a2_graph->setGraphColor( QColor( 0x43, 0xb2, 0xff ) );
@@ -832,7 +832,7 @@ WatsynView::WatsynView( Instrument * _instrument,
 	a2_graph->setPalette( pal );
 
 // b1 graph
-	b1_graph = new Graph( this, Graph::LinearStyle, 224, 105 );
+	b1_graph = new Graph( this, Graph::Style::Linear, 224, 105 );
 	b1_graph->move( 4, 141 );
 	b1_graph->setAutoFillBackground( true );
 	b1_graph->setGraphColor( QColor( 0xfc, 0x54, 0x31 ) );
@@ -840,7 +840,7 @@ WatsynView::WatsynView( Instrument * _instrument,
 	b1_graph->setPalette( pal );
 
 // b2 graph
-	b2_graph = new Graph( this, Graph::LinearStyle, 224, 105 );
+	b2_graph = new Graph( this, Graph::Style::Linear, 224, 105 );
 	b2_graph->move( 4, 141 );
 	b2_graph->setAutoFillBackground( true );
 	b2_graph->setGraphColor( QColor( 0xfc, 0x54, 0x31 ) );

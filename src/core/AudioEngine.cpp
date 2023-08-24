@@ -81,7 +81,7 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	m_workers(),
 	m_numWorkers( QThread::idealThreadCount()-1 ),
 	m_newPlayHandles( PlayHandle::MaxNumber ),
-	m_qualitySettings( qualitySettings::Mode_Draft ),
+	m_qualitySettings( qualitySettings::Mode::Draft ),
 	m_masterGain( 1.0f ),
 	m_isProcessing( false ),
 	m_audioDev( nullptr ),
@@ -357,7 +357,7 @@ const surroundSampleFrame * AudioEngine::renderNextBuffer()
 		if( it != m_playHandles.end() )
 		{
 			( *it )->audioPort()->removePlayHandle( ( *it ) );
-			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
+			if( ( *it )->type() == PlayHandle::Type::NotePlayHandle )
 			{
 				NotePlayHandleManager::release( (NotePlayHandle*) *it );
 			}
@@ -405,7 +405,7 @@ const surroundSampleFrame * AudioEngine::renderNextBuffer()
 		if( ( *it )->isFinished() )
 		{
 			( *it )->audioPort()->removePlayHandle( ( *it ) );
-			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
+			if( ( *it )->type() == PlayHandle::Type::NotePlayHandle )
 			{
 				NotePlayHandleManager::release( (NotePlayHandle*) *it );
 			}
@@ -464,12 +464,12 @@ void AudioEngine::handleMetronome()
 	static tick_t lastMetroTicks = -1;
 
 	Song * song = Engine::getSong();
-	Song::PlayModes currentPlayMode = song->playMode();
+	Song::PlayMode currentPlayMode = song->playMode();
 
 	bool metronomeSupported =
-		currentPlayMode == Song::Mode_PlayMidiClip
-		|| currentPlayMode == Song::Mode_PlaySong
-		|| currentPlayMode == Song::Mode_PlayPattern;
+		currentPlayMode == Song::PlayMode::MidiClip
+		|| currentPlayMode == Song::PlayMode::Song
+		|| currentPlayMode == Song::PlayMode::Pattern;
 
 	if (!metronomeSupported || !m_metronomeActive || song->isExporting())
 	{
@@ -534,7 +534,7 @@ void AudioEngine::clearInternal()
 	// TODO: m_midiClient->noteOffAll();
 	for (auto ph : m_playHandles)
 	{
-		if (ph->type() != PlayHandle::TypeInstrumentPlayHandle)
+		if (ph->type() != PlayHandle::Type::InstrumentPlayHandle)
 		{
 			m_playHandlesToRemove.push_back(ph);
 		}
@@ -681,7 +681,7 @@ bool AudioEngine::addPlayHandle( PlayHandle* handle )
 		return true;
 	}
 
-	if( handle->type() == PlayHandle::TypeNotePlayHandle )
+	if( handle->type() == PlayHandle::Type::NotePlayHandle )
 	{
 		NotePlayHandleManager::release( (NotePlayHandle*)handle );
 	}
@@ -732,7 +732,7 @@ void AudioEngine::removePlayHandle(PlayHandle * ph)
 		// (See tobydox's 2008 commit 4583e48)
 		if ( removedFromList )
 		{
-			if (ph->type() == PlayHandle::TypeNotePlayHandle)
+			if (ph->type() == PlayHandle::Type::NotePlayHandle)
 			{
 				NotePlayHandleManager::release(dynamic_cast<NotePlayHandle*>(ph));
 			}
@@ -749,7 +749,7 @@ void AudioEngine::removePlayHandle(PlayHandle * ph)
 
 
 
-void AudioEngine::removePlayHandlesOfTypes(Track * track, const quint8 types)
+void AudioEngine::removePlayHandlesOfTypes(Track * track, PlayHandle::Types types)
 {
 	requestChangeInModel();
 	PlayHandleList::Iterator it = m_playHandles.begin();
@@ -758,7 +758,7 @@ void AudioEngine::removePlayHandlesOfTypes(Track * track, const quint8 types)
 		if ((*it)->isFromTrack(track) && ((*it)->type() & types))
 		{
 			( *it )->audioPort()->removePlayHandle( ( *it ) );
-			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
+			if( ( *it )->type() == PlayHandle::Type::NotePlayHandle )
 			{
 				NotePlayHandleManager::release( (NotePlayHandle*) *it );
 			}

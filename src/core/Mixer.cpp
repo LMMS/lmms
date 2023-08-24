@@ -301,7 +301,7 @@ void Mixer::deleteChannel( int index )
 
 	for( Track* t : tracks )
 	{
-		if( t->type() == Track::InstrumentTrack )
+		if( t->type() == Track::Type::Instrument )
 		{
 			auto inst = dynamic_cast<InstrumentTrack*>(t);
 			int val = inst->mixerChannelModel()->value(0);
@@ -317,7 +317,7 @@ void Mixer::deleteChannel( int index )
 				inst->mixerChannelModel()->setValue(val-1);
 			}
 		}
-		else if( t->type() == Track::SampleTrack )
+		else if( t->type() == Track::Type::Sample )
 		{
 			auto strk = dynamic_cast<SampleTrack*>(t);
 			int val = strk->mixerChannelModel()->value(0);
@@ -401,7 +401,7 @@ void Mixer::moveChannelLeft( int index )
 	{
 		for (const auto& track : trackList)
 		{
-			if (track->type() == Track::InstrumentTrack)
+			if (track->type() == Track::Type::Instrument)
 			{
 				auto inst = (InstrumentTrack*)track;
 				int val = inst->mixerChannelModel()->value(0);
@@ -414,7 +414,7 @@ void Mixer::moveChannelLeft( int index )
 					inst->mixerChannelModel()->setValue(a);
 				}
 			}
-			else if (track->type() == Track::SampleTrack)
+			else if (track->type() == Track::Type::Sample)
 			{
 				auto strk = (SampleTrack*)track;
 				int val = strk->mixerChannelModel()->value(0);
@@ -630,7 +630,7 @@ void Mixer::masterMix( sampleFrame * _buf )
 	// also instantly add all muted channels as they don't need to care
 	// about their senders, and can just increment the deps of their
 	// recipients right away.
-	AudioEngineWorkerThread::resetJobQueue( AudioEngineWorkerThread::JobQueue::Dynamic );
+	AudioEngineWorkerThread::resetJobQueue( AudioEngineWorkerThread::JobQueue::OperationMode::Dynamic );
 	for( MixerChannel * ch : m_mixerChannels )
 	{
 		ch->m_muted = ch->m_muteModel.value();
@@ -863,7 +863,7 @@ bool Mixer::isChannelInUse(int index)
 
 	for (const auto t : tracks)
 	{
-		if (t->type() == Track::InstrumentTrack)
+		if (t->type() == Track::Type::Instrument)
 		{
 			auto inst = dynamic_cast<InstrumentTrack*>(t);
 			if (inst->mixerChannelModel()->value() == index)
@@ -871,7 +871,7 @@ bool Mixer::isChannelInUse(int index)
 				return true;
 			}
 		}
-		else if (t->type() == Track::SampleTrack)
+		else if (t->type() == Track::Type::Sample)
 		{
 			auto strack = dynamic_cast<SampleTrack*>(t);
 			if (strack->mixerChannelModel()->value() == index)

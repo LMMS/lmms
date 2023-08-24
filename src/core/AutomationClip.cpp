@@ -53,7 +53,7 @@ AutomationClip::AutomationClip( AutomationTrack * _auto_track ) :
 	m_autoTrack( _auto_track ),
 	m_objects(),
 	m_tension( 1.0 ),
-	m_progressionType( DiscreteProgression ),
+	m_progressionType( ProgressionType::Discrete ),
 	m_dragging( false ),
 	m_isRecording( false ),
 	m_lastRecordedValue( 0 )
@@ -63,11 +63,11 @@ AutomationClip::AutomationClip( AutomationTrack * _auto_track ) :
 	{
 		switch( getTrack()->trackContainer()->type() )
 		{
-			case TrackContainer::PatternContainer:
+			case TrackContainer::Type::Pattern:
 				setAutoResize( true );
 				break;
 
-			case TrackContainer::SongContainer:
+			case TrackContainer::Type::Song:
 				// move down
 			default:
 				setAutoResize( false );
@@ -104,11 +104,11 @@ AutomationClip::AutomationClip( const AutomationClip & _clip_to_copy ) :
 	if (!getTrack()){ return; }
 	switch( getTrack()->trackContainer()->type() )
 	{
-		case TrackContainer::PatternContainer:
+		case TrackContainer::Type::Pattern:
 			setAutoResize( true );
 			break;
 
-		case TrackContainer::SongContainer:
+		case TrackContainer::Type::Song:
 			// move down
 		default:
 			setAutoResize( false );
@@ -147,13 +147,13 @@ bool AutomationClip::addObject( AutomatableModel * _obj, bool _search_dup )
 
 
 void AutomationClip::setProgressionType(
-					ProgressionTypes _new_progression_type )
+					ProgressionType _new_progression_type )
 {
 	QMutexLocker m(&m_clipMutex);
 
-	if ( _new_progression_type == DiscreteProgression ||
-		_new_progression_type == LinearProgression ||
-		_new_progression_type == CubicHermiteProgression )
+	if ( _new_progression_type == ProgressionType::Discrete ||
+		_new_progression_type == ProgressionType::Linear ||
+		_new_progression_type == ProgressionType::CubicHermite )
 	{
 		m_progressionType = _new_progression_type;
 		emit dataChanged();
@@ -560,11 +560,11 @@ float AutomationClip::valueAt( timeMap::const_iterator v, int offset ) const
 	// value if we do
 	if (offset == 0) { return INVAL(v); }
 
-	if (m_progressionType == DiscreteProgression)
+	if (m_progressionType == ProgressionType::Discrete)
 	{
 		return OUTVAL(v);
 	}
-	else if( m_progressionType == LinearProgression )
+	else if( m_progressionType == ProgressionType::Linear )
 	{
 		float slope =
 			(INVAL(v + 1) - OUTVAL(v))
@@ -572,7 +572,7 @@ float AutomationClip::valueAt( timeMap::const_iterator v, int offset ) const
 
 		return OUTVAL(v) + offset * slope;
 	}
-	else /* CubicHermiteProgression */
+	else /* ProgressionType::CubicHermite */
 	{
 		// Implements a Cubic Hermite spline as explained at:
 		// http://en.wikipedia.org/wiki/Cubic_Hermite_spline#Unit_interval_.280.2C_1.29
@@ -767,7 +767,7 @@ void AutomationClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "pos", startPosition() );
 	_this.setAttribute( "len", length() );
 	_this.setAttribute( "name", name() );
-	_this.setAttribute( "prog", QString::number( progressionType() ) );
+	_this.setAttribute( "prog", QString::number( static_cast<int>(progressionType()) ) );
 	_this.setAttribute( "tens", QString::number( getTension() ) );
 	_this.setAttribute( "mute", QString::number( isMuted() ) );
 	
@@ -808,7 +808,7 @@ void AutomationClip::loadSettings( const QDomElement & _this )
 
 	movePosition( _this.attribute( "pos" ).toInt() );
 	setName( _this.attribute( "name" ) );
-	setProgressionType( static_cast<ProgressionTypes>( _this.attribute(
+	setProgressionType( static_cast<ProgressionType>( _this.attribute(
 							"prog" ).toInt() ) );
 	setTension( _this.attribute( "tens" ) );
 	setMuted(_this.attribute( "mute", QString::number( false ) ).toInt() );
@@ -891,7 +891,7 @@ bool AutomationClip::isAutomated( const AutomatableModel * _m )
 	auto l = combineAllTracks();
 	for (const auto track : l)
 	{
-		if (track->type() == Track::AutomationTrack || track->type() == Track::HiddenAutomationTrack)
+		if (track->type() == Track::Type::Automation || track->type() == Track::Type::HiddenAutomation)
 		{
 			for (const auto& clip : track->getClips())
 			{
@@ -926,7 +926,7 @@ std::vector<AutomationClip *> AutomationClip::clipsForModel(const AutomatableMod
 	for (const auto track : l)
 	{
 		// we want only automation tracks...
-		if (track->type() == Track::AutomationTrack || track->type() == Track::HiddenAutomationTrack )
+		if (track->type() == Track::Type::Automation || track->type() == Track::Type::HiddenAutomation )
 		{
 			// go through all the clips...
 			for (const auto& trackClip : track->getClips())
@@ -985,7 +985,7 @@ void AutomationClip::resolveAllIDs()
 	auto l = combineAllTracks();
 	for (const auto& track : l)
 	{
-		if (track->type() == Track::AutomationTrack || track->type() == Track::HiddenAutomationTrack)
+		if (track->type() == Track::Type::Automation || track->type() == Track::Type::HiddenAutomation)
 		{
 			for (const auto& clip : track->getClips())
 			{

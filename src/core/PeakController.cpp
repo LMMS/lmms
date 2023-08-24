@@ -46,7 +46,7 @@ bool PeakController::m_buggedFile;
 
 PeakController::PeakController( Model * _parent,
 		PeakControllerEffect * _peak_effect ) :
-	Controller( Controller::PeakController, _parent, tr( "Peak Controller" ) ),
+	Controller( ControllerType::Peak, _parent, tr( "Peak Controller" ) ),
 	m_peakEffect( _peak_effect ),
 	m_currentSample( 0.0f )
 {

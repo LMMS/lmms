@@ -54,7 +54,7 @@ Plugin::Descriptor PLUGIN_EXPORT kicker_plugin_descriptor =
 				"Versatile drum synthesizer" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
@@ -226,7 +226,7 @@ class KickerKnob : public Knob
 {
 public:
 	KickerKnob( QWidget * _parent ) :
-			Knob( knobStyled, _parent )
+			Knob( KnobType::Styled, _parent )
 	{
 		setFixedSize( 29, 29 );
 		setObjectName( "smallKnob" );
@@ -238,7 +238,7 @@ class KickerEnvKnob : public TempoSyncKnob
 {
 public:
 	KickerEnvKnob( QWidget * _parent ) :
-			TempoSyncKnob( knobStyled, _parent )
+			TempoSyncKnob( KnobType::Styled, _parent )
 	{
 		setFixedSize( 29, 29 );
 		setObjectName( "smallKnob" );
@@ -250,7 +250,7 @@ class KickerLargeKnob : public Knob
 {
 public:
 	KickerLargeKnob( QWidget * _parent ) :
-			Knob( knobStyled, _parent )
+			Knob( KnobType::Styled, _parent )
 	{
 		setFixedSize( 34, 34 );
 		setObjectName( "largeKnob" );
@@ -315,10 +315,10 @@ KickerInstrumentView::KickerInstrumentView( Instrument * _instrument,
 	m_distEndKnob->setHintText( tr( "End distortion:" ), "" );
 	m_distEndKnob->move( COL5, ROW2 );
 
-	m_startNoteToggle = new LedCheckBox( "", this, "", LedCheckBox::Green );
+	m_startNoteToggle = new LedCheckBox( "", this, "", LedCheckBox::LedColor::Green );
 	m_startNoteToggle->move( COL1 + 8, LED_ROW );
 
-	m_endNoteToggle = new LedCheckBox( "", this, "", LedCheckBox::Green );
+	m_endNoteToggle = new LedCheckBox( "", this, "", LedCheckBox::LedColor::Green );
 	m_endNoteToggle->move( END_COL + 8, LED_ROW );
 
 	setAutoFillBackground( true );

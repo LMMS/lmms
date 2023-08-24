@@ -83,7 +83,7 @@ Plugin::Descriptor PLUGIN_EXPORT sid_plugin_descriptor =
 	"Csaba Hruska <csaba.hruska/at/gmail.com>"
 	"Attila Herman <attila589/at/gmail.com>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
@@ -105,7 +105,7 @@ VoiceObject::VoiceObject( Model * _parent, int _idx ) :
 					tr( "Voice %1 release" ).arg( _idx+1 ) ),
 	m_coarseModel( 0.0f, -24.0, 24.0, 1.0f, this,
 					tr( "Voice %1 coarse detuning" ).arg( _idx+1 ) ),
-	m_waveFormModel( TriangleWave, 0, NumWaveShapes-1, this,
+	m_waveFormModel( static_cast<int>(WaveForm::Triangle), 0, NumWaveShapes-1, this,
 					tr( "Voice %1 wave shape" ).arg( _idx+1 ) ),
 
 	m_syncModel( false, this, tr( "Voice %1 sync" ).arg( _idx+1 ) ),
@@ -121,12 +121,12 @@ SidInstrument::SidInstrument( InstrumentTrack * _instrument_track ) :
 	// filter
 	m_filterFCModel( 1024.0f, 0.0f, 2047.0f, 1.0f, this, tr( "Cutoff frequency" ) ),
 	m_filterResonanceModel( 8.0f, 0.0f, 15.0f, 1.0f, this, tr( "Resonance" ) ),
-	m_filterModeModel( LowPass, 0, NumFilterTypes-1, this, tr( "Filter type" )),
+	m_filterModeModel( static_cast<int>(FilterType::LowPass), 0, NumFilterTypes-1, this, tr( "Filter type" )),
 
 	// misc
 	m_voice3OffModel( false, this, tr( "Voice 3 off" ) ),
 	m_volumeModel( 15.0f, 0.0f, 15.0f, 1.0f, this, tr( "Volume" ) ),
-	m_chipModel( sidMOS8580, 0, NumChipModels-1, this, tr( "Chip model" ) )
+	m_chipModel( static_cast<int>(ChipModel::MOS8580), 0, NumChipModels-1, this, tr( "Chip model" ) )
 {
 	for( int i = 0; i < 3; ++i )
 	{
@@ -323,7 +323,7 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 		reg = 0x00;
 	}
 
-	if( (ChipModel)m_chipModel.value() == sidMOS6581 )
+	if( (ChipModel)m_chipModel.value() == ChipModel::MOS6581 )
 	{
 		sid->set_chip_model( MOS6581 );
 	}
@@ -360,13 +360,13 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 		data8 += m_voice[i]->m_syncModel.value()?2:0;
 		data8 += m_voice[i]->m_ringModModel.value()?4:0;
 		data8 += m_voice[i]->m_testModel.value()?8:0;
-		switch( m_voice[i]->m_waveFormModel.value() )
+		switch( static_cast<VoiceObject::WaveForm>(m_voice[i]->m_waveFormModel.value()) )
 		{
 			default: break;
-			case VoiceObject::NoiseWave:	data8 += 128; break;
-			case VoiceObject::SquareWave:	data8 += 64; break;
-			case VoiceObject::SawWave:		data8 += 32; break;
-			case VoiceObject::TriangleWave:	data8 += 16; break;
+			case VoiceObject::WaveForm::Noise:	data8 += 128; break;
+			case VoiceObject::WaveForm::Square:	data8 += 64; break;
+			case VoiceObject::WaveForm::Saw:		data8 += 32; break;
+			case VoiceObject::WaveForm::Triangle:	data8 += 16; break;
 		}
 		sidreg[base+4] = data8&0x00FF;
 		// ad
@@ -406,12 +406,12 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 	data8 = data16&0x000F;
 	data8 += m_voice3OffModel.value()?128:0;
 
-	switch( m_filterModeModel.value() )
+	switch( static_cast<FilterType>(m_filterModeModel.value()) )
 	{
 		default: break;
-		case LowPass:	data8 += 16; break;
-		case BandPass:	data8 += 32; break;
-		case HighPass:	data8 += 64; break;
+		case FilterType::LowPass:	data8 += 16; break;
+		case FilterType::BandPass:	data8 += 32; break;
+		case FilterType::HighPass:	data8 += 64; break;
 	}
 
 	sidreg[24] = data8&0x00FF;
@@ -459,7 +459,7 @@ class sidKnob : public Knob
 {
 public:
 	sidKnob( QWidget * _parent ) :
-			Knob( knobStyled, _parent )
+			Knob( KnobType::Styled, _parent )
 	{
 		setFixedSize( 16, 16 );
 		setCenterPointX( 7.5 );

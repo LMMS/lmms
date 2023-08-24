@@ -63,7 +63,7 @@ Plugin::Descriptor PLUGIN_EXPORT sf2player_plugin_descriptor =
 	QT_TRANSLATE_NOOP( "PluginBrowser", "Player for SoundFont files" ),
 	"Paul Giblock <drfaygo/at/gmail/dot/com>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	"sf2,sf3",
 	nullptr,
@@ -200,8 +200,8 @@ Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
 Sf2Instrument::~Sf2Instrument()
 {
 	Engine::audioEngine()->removePlayHandlesOfTypes( instrumentTrack(),
-				PlayHandle::TypeNotePlayHandle
-				| PlayHandle::TypeInstrumentPlayHandle );
+				PlayHandle::Type::NotePlayHandle
+				| PlayHandle::Type::InstrumentPlayHandle );
 	freeFont();
 	delete_fluid_synth( m_synth );
 	delete_fluid_settings( m_settings );
@@ -616,7 +616,7 @@ void Sf2Instrument::reloadSynth()
 
 	m_synthMutex.lock();
 	if( Engine::audioEngine()->currentQualitySettings().interpolation >=
-			AudioEngine::qualitySettings::Interpolation_SincFastest )
+			AudioEngine::qualitySettings::Interpolation::SincFastest )
 	{
 		fluid_synth_set_interp_method( m_synth, -1, FLUID_INTERP_7THORDER );
 	}
@@ -936,7 +936,7 @@ class Sf2Knob : public Knob
 {
 public:
 	Sf2Knob( QWidget * _parent ) :
-			Knob( knobStyled, _parent )
+			Knob( KnobType::Styled, _parent )
 	{
 		setFixedSize( 31, 38 );
 	}

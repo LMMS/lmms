@@ -55,7 +55,7 @@ public:
 		bool isNull() const {return ! library;}
 	};
 	using PluginInfoList = QList<PluginInfo>;
-	using DescriptorMap = QMultiMap<Plugin::PluginTypes, Plugin::Descriptor*>;
+	using DescriptorMap = QMultiMap<Plugin::Type, Plugin::Descriptor*>;
 
 	PluginFactory();
 	~PluginFactory() = default;
@@ -68,7 +68,7 @@ public:
 
 	/// Returns a list of all found plugins' descriptors.
 	Plugin::DescriptorList descriptors() const;
-	Plugin::DescriptorList descriptors(Plugin::PluginTypes type) const;
+	Plugin::DescriptorList descriptors(Plugin::Type type) const;
 
 	struct PluginInfoAndKey
 	{

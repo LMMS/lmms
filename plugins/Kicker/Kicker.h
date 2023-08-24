@@ -66,7 +66,7 @@ public:
 
 	Flags flags() const override
 	{
-		return IsNotBendable;
+		return Flag::IsNotBendable;
 	}
 
 	f_cnt_t desiredReleaseFrames() const override

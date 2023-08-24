@@ -57,7 +57,7 @@ SimpleTextFloat * Knob::s_textFloat = nullptr;
 
 
 
-Knob::Knob( knobTypes _knob_num, QWidget * _parent, const QString & _name ) :
+Knob::Knob( KnobType _knob_num, QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
 	FloatModelView( new FloatModel( 0, 0, 0, 1, nullptr, _name, true ), this ),
 	m_label( "" ),
@@ -75,7 +75,7 @@ Knob::Knob( knobTypes _knob_num, QWidget * _parent, const QString & _name ) :
 }
 
 Knob::Knob( QWidget * _parent, const QString & _name ) :
-	Knob( knobBright_26, _parent, _name )
+	Knob( KnobType::Bright26, _parent, _name )
 {
 }
 
@@ -106,15 +106,15 @@ void Knob::initUi( const QString & _name )
 	// overrides that color.
 	switch (knobNum())
 	{
-	case knobSmall_17:
-	case knobBright_26:
-	case knobDark_28:
+	case KnobType::Small17:
+	case KnobType::Bright26:
+	case KnobType::Dark28:
 		m_lineActiveColor = QApplication::palette().color(QPalette::Active, QPalette::WindowText);
 		m_arcActiveColor = QColor(QApplication::palette().color(
 									QPalette::Active, QPalette::WindowText));
 		m_arcActiveColor.setAlpha(70);
 		break;
-	case knobVintage_32:
+	case KnobType::Vintage32:
 		m_lineActiveColor = QApplication::palette().color(QPalette::Active, QPalette::Shadow);
 		m_arcActiveColor = QColor(QApplication::palette().color(
 									QPalette::Active, QPalette::Shadow));
@@ -132,24 +132,24 @@ void Knob::initUi( const QString & _name )
 
 void Knob::onKnobNumUpdated()
 {
-	if( m_knobNum != knobStyled )
+	if( m_knobNum != KnobType::Styled )
 	{
 		QString knobFilename;
 		switch (m_knobNum)
 		{
-		case knobDark_28:
+		case KnobType::Dark28:
 			knobFilename = "knob01";
 			break;
-		case knobBright_26:
+		case KnobType::Bright26:
 			knobFilename = "knob02";
 			break;
-		case knobSmall_17:
+		case KnobType::Small17:
 			knobFilename = "knob03";
 			break;
-		case knobVintage_32:
+		case KnobType::Vintage32:
 			knobFilename = "knob05";
 			break;
-		case knobStyled: // only here to stop the compiler from complaining
+		case KnobType::Styled: // only here to stop the compiler from complaining
 			break;
 		}
 
@@ -251,7 +251,7 @@ void Knob::setOuterRadius( float r )
 
 
 
-knobTypes Knob::knobNum() const
+KnobType Knob::knobNum() const
 {
 	return m_knobNum;
 }
@@ -259,7 +259,7 @@ knobTypes Knob::knobNum() const
 
 
 
-void Knob::setknobNum( knobTypes k )
+void Knob::setknobNum( KnobType k )
 {
 	if( m_knobNum != k )
 	{
@@ -397,7 +397,7 @@ void Knob::drawKnob( QPainter * _p )
 
 	QPoint mid;
 
-	if( m_knobNum == knobStyled )
+	if( m_knobNum == KnobType::Styled )
 	{
 		p.setRenderHint( QPainter::Antialiasing );
 
@@ -448,17 +448,17 @@ void Knob::drawKnob( QPainter * _p )
 	p.setPen(QPen(currentLineColor, 2));
 	switch( m_knobNum )
 	{
-		case knobSmall_17:
+		case KnobType::Small17:
 		{
 			p.drawLine( calculateLine( mid, radius-2 ) );
 			break;
 		}
-		case knobBright_26:
+		case KnobType::Bright26:
 		{
 			p.drawLine( calculateLine( mid, radius-5 ) );
 			break;
 		}
-		case knobDark_28:
+		case KnobType::Dark28:
 		{
 			const float rb = qMax<float>( ( radius - 10 ) / 3.0,
 									0.0 );
@@ -468,12 +468,12 @@ void Knob::drawKnob( QPainter * _p )
 			p.drawLine( ln );
 			break;
 		}
-		case knobVintage_32:
+		case KnobType::Vintage32:
 		{
 			p.drawLine( calculateLine( mid, radius-2, 2 ) );
 			break;
 		}
-		case knobStyled:
+		case KnobType::Styled:
 			break;
 	}
 

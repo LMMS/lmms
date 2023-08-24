@@ -43,7 +43,7 @@ public:
 	RenderManager(
 		const AudioEngine::qualitySettings & qualitySettings,
 		const OutputSettings & outputSettings,
-		ProjectRenderer::ExportFileFormats fmt,
+		ProjectRenderer::ExportFileFormat fmt,
 		QString outputPath);
 
 	~RenderManager() override;
@@ -73,7 +73,7 @@ private:
 	const AudioEngine::qualitySettings m_qualitySettings;
 	const AudioEngine::qualitySettings m_oldQualitySettings;
 	const OutputSettings m_outputSettings;
-	ProjectRenderer::ExportFileFormats m_format;
+	ProjectRenderer::ExportFileFormat m_format;
 	QString m_outputPath;
 
 	std::unique_ptr<ProjectRenderer> m_activeRenderer;

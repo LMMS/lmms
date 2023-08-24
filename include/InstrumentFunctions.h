@@ -176,14 +176,13 @@ class InstrumentFunctionArpeggio : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
-	enum ArpDirections
+	enum class ArpDirection
 	{
-		ArpDirUp,
-		ArpDirDown,
-		ArpDirUpAndDown,
-		ArpDirDownAndUp,
-		ArpDirRandom,
-		NumArpDirections
+		Up,
+		Down,
+		UpAndDown,
+		DownAndUp,
+		Random
 	} ;
 
 	InstrumentFunctionArpeggio( Model * _parent );
@@ -202,11 +201,11 @@ public:
 
 
 private:
-	enum ArpModes
+	enum class ArpMode
 	{
-		FreeMode,
-		SortMode,
-		SyncMode
+		Free,
+		Sort,
+		Sync
 	} ;
 
 	BoolModel m_arpEnabledModel;

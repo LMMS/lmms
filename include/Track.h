@@ -72,29 +72,29 @@ class LMMS_EXPORT Track : public Model, public JournallingObject
 public:
 	using clipVector = std::vector<Clip*>;
 
-	enum TrackTypes
+	enum class Type
 	{
-		InstrumentTrack,
-		PatternTrack,
-		SampleTrack,
-		EventTrack,
-		VideoTrack,
-		AutomationTrack,
-		HiddenAutomationTrack,
-		NumTrackTypes
+		Instrument,
+		Pattern,
+		Sample,
+		Event,
+		Video,
+		Automation,
+		HiddenAutomation,
+		Count
 	} ;
 
-	Track( TrackTypes type, TrackContainer * tc );
+	Track( Type type, TrackContainer * tc );
 	~Track() override;
 
-	static Track * create( TrackTypes tt, TrackContainer * tc );
+	static Track * create( Type tt, TrackContainer * tc );
 	static Track * create( const QDomElement & element,
 							TrackContainer * tc );
 	Track * clone();
 
 
 	// pure virtual functions
-	TrackTypes type() const
+	Type type() const
 	{
 		return m_type;
 	}
@@ -224,7 +224,7 @@ public slots:
 
 private:
 	TrackContainer* m_trackContainer;
-	TrackTypes m_type;
+	Type m_type;
 	QString m_name;
 	int m_height;
 

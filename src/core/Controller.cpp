@@ -44,7 +44,7 @@ std::vector<Controller*> Controller::s_controllers;
 
 
 
-Controller::Controller( ControllerTypes _type, Model * _parent,
+Controller::Controller( ControllerType _type, Model * _parent,
 					const QString & _display_name ) :
 	Model( _parent, _display_name ),
 	JournallingObject(),
@@ -53,7 +53,7 @@ Controller::Controller( ControllerTypes _type, Model * _parent,
 	m_connectionCount( 0 ),
 	m_type( _type )
 {
-	if( _type != DummyController && _type != MidiController )
+	if( _type != ControllerType::Dummy && _type != ControllerType::Midi )
 	{
 		s_controllers.push_back(this);
 		// Determine which name to use
@@ -182,30 +182,30 @@ void Controller::resetFrameCounter()
 
 
 
-Controller * Controller::create( ControllerTypes _ct, Model * _parent )
+Controller * Controller::create( ControllerType _ct, Model * _parent )
 {
 	static Controller * dummy = nullptr;
 	Controller * c = nullptr;
 
 	switch( _ct )
 	{
-		case Controller::DummyController:
+		case ControllerType::Dummy:
 			if (!dummy)
-				dummy = new Controller( DummyController, nullptr,
+				dummy = new Controller( ControllerType::Dummy, nullptr,
 								QString() );
 			c = dummy;
 			break;
 
-		case Controller::LfoController:
+		case ControllerType::Lfo:
 			c = new class LfoController( _parent );
 			break;
 
-		case Controller::PeakController:
+		case ControllerType::Peak:
 			//Already instantiated in EffectChain::loadSettings()
 			Q_ASSERT( false );
 			break;
 
-		case Controller::MidiController:
+		case ControllerType::Midi:
 			c = new class MidiController( _parent );
 			break;
 
@@ -221,14 +221,14 @@ Controller * Controller::create( ControllerTypes _ct, Model * _parent )
 Controller * Controller::create( const QDomElement & _this, Model * _parent )
 {
 	Controller * c;
-	if( _this.attribute( "type" ).toInt() == Controller::PeakController )
+	if( static_cast<ControllerType>(_this.attribute( "type" ).toInt()) == ControllerType::Peak )
 	{
 		c = PeakController::getControllerBySetting( _this );
 	}
 	else
 	{
 		c = create(
-			static_cast<ControllerTypes>( _this.attribute( "type" ).toInt() ),
+			static_cast<ControllerType>( _this.attribute( "type" ).toInt() ),
 										_parent );
 	}
 
@@ -269,7 +269,7 @@ bool Controller::hasModel( const Model * m ) const
 
 void Controller::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	_this.setAttribute( "type", type() );
+	_this.setAttribute( "type", static_cast<int>(type()) );
 	_this.setAttribute( "name", name() );
 }
 
@@ -277,7 +277,7 @@ void Controller::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void Controller::loadSettings( const QDomElement & _this )
 {
-	if( _this.attribute( "type" ).toInt() != type() )
+	if( static_cast<ControllerType>(_this.attribute( "type" ).toInt()) != type() )
 	{
 		qWarning( "controller-type does not match controller-type of "
 							"settings-node!\n" );
