@@ -177,12 +177,11 @@ bool InstrumentFunctionNoteStacking::Chord::hasSemiTone( int8_t semi_tone ) cons
 
 
 
-InstrumentFunctionNoteStacking::ChordTable::ChordTable() :
-	QVector<Chord>()
+InstrumentFunctionNoteStacking::ChordTable::ChordTable()
 {
 	for (const auto& chord : s_initTable)
 	{
-		push_back(Chord(chord.m_name, chord.m_semiTones));
+		m_chords.emplace_back(chord.m_name, chord.m_semiTones);
 	}
 }
 
@@ -191,10 +190,12 @@ InstrumentFunctionNoteStacking::ChordTable::ChordTable() :
 
 const InstrumentFunctionNoteStacking::Chord & InstrumentFunctionNoteStacking::ChordTable::getByName( const QString & name, bool is_scale ) const
 {
-	for( int i = 0; i < size(); i++ )
+	for (const auto& chord : m_chords)
 	{
-		if( at( i ).getName() == name && is_scale == at( i ).isScale() )
-			return at( i );
+		if (chord.getName() == name && is_scale == chord.isScale())
+		{
+			return chord;
+		}
 	}
 
 	static Chord empty;
@@ -211,9 +212,10 @@ InstrumentFunctionNoteStacking::InstrumentFunctionNoteStacking( Model * _parent 
 	m_chordRangeModel( 1.0f, 1.0f, 9.0f, 1.0f, this, tr( "Chord range" ) )
 {
 	const ChordTable & chord_table = ChordTable::getInstance();
-	for( int i = 0; i < chord_table.size(); ++i )
+
+	for (const auto& chord : chord_table.chords())
 	{
-		m_chordsModel.addItem( chord_table[i].getName() );
+		m_chordsModel.addItem(chord.getName());
 	}
 }
 
@@ -244,10 +246,10 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 			const int sub_note_key_base = base_note_key + octave_cnt * KeysPerOctave;
 
 			// process all notes in the chord
-			for( int i = 0; i < chord_table[selected_chord].size(); ++i )
+			for( int i = 0; i < chord_table.chords()[selected_chord].size(); ++i )
 			{
 				// add interval to sub-note-key
-				const int sub_note_key = sub_note_key_base + (int) chord_table[selected_chord][i];
+				const int sub_note_key = sub_note_key_base + (int) chord_table.chords()[selected_chord][i];
 				// maybe we're out of range -> let's get outta
 				// here!
 				if( sub_note_key > NumKeys )
@@ -309,9 +311,9 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 	m_arpModeModel( this, tr( "Arpeggio mode" ) )
 {
 	const InstrumentFunctionNoteStacking::ChordTable & chord_table = InstrumentFunctionNoteStacking::ChordTable::getInstance();
-	for( int i = 0; i < chord_table.size(); ++i )
+	for (auto& chord : chord_table.chords())
 	{
-		m_arpModel.addItem( chord_table[i].getName() );
+		m_arpModel.addItem(chord.getName());
 	}
 
 	m_arpDirectionModel.addItem( tr( "Up" ), std::make_unique<PixmapLoader>( "arp_up" ) );
@@ -362,7 +364,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 	}
 
 	const InstrumentFunctionNoteStacking::ChordTable & chord_table = InstrumentFunctionNoteStacking::ChordTable::getInstance();
-	const int cur_chord_size = chord_table[selected_arp].size();
+	const int cur_chord_size = chord_table.chords()[selected_arp].size();
 	const int range = static_cast<int>(cur_chord_size * m_arpRangeModel.value() * m_arpRepeatsModel.value());
 	const int total_range = range * cnphv.size();
 
@@ -485,7 +487,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 
 		// now calculate final key for our arp-note
 		const int sub_note_key = base_note_key + (cur_arp_idx / cur_chord_size ) *
-							KeysPerOctave + chord_table[selected_arp][cur_arp_idx % cur_chord_size];
+							KeysPerOctave + chord_table.chords()[selected_arp][cur_arp_idx % cur_chord_size];
 
 		// range-checking
 		if( sub_note_key >= NumKeys ||

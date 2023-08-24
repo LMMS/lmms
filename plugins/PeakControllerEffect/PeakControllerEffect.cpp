@@ -76,7 +76,7 @@ PeakControllerEffect::PeakControllerEffect(
 	{
 		Engine::getSong()->addController( m_autoController );
 	}
-	PeakController::s_effects.append( this );
+	PeakController::s_effects.push_back(this);
 }
 
 
@@ -84,11 +84,11 @@ PeakControllerEffect::PeakControllerEffect(
 
 PeakControllerEffect::~PeakControllerEffect()
 {
-	int idx = PeakController::s_effects.indexOf( this );
-	if( idx >= 0 )
+	auto it = std::find(PeakController::s_effects.begin(), PeakController::s_effects.end(), this);
+	if (it != PeakController::s_effects.end())
 	{
-		PeakController::s_effects.remove( idx );
-		Engine::getSong()->removeController( m_autoController );
+		PeakController::s_effects.erase(it);
+		Engine::getSong()->removeController(m_autoController);
 	}
 }
 

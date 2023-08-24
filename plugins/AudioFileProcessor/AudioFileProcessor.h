@@ -23,9 +23,8 @@
  *
  */
 
-
-#ifndef AUDIO_FILE_PROCESSOR_H
-#define AUDIO_FILE_PROCESSOR_H
+#ifndef LMMS_AUDIO_FILE_PROCESSOR_H
+#define LMMS_AUDIO_FILE_PROCESSOR_H
 
 #include <QPixmap>
 
@@ -61,9 +60,8 @@ public:
 						sampleFrame * _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
-	void saveSettings( QDomDocument & _doc,
-						QDomElement & _parent ) override;
-	void loadSettings( const QDomElement & _this ) override;
+	void saveSettings(QDomDocument& doc, QDomElement& elem) override;
+	void loadSettings(const QDomElement& elem) override;
 
 	void loadFile( const QString & _file ) override;
 
@@ -303,4 +301,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AUDIO_FILE_PROCESSOR_H

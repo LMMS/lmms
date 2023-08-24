@@ -97,7 +97,7 @@ bar_t PatternStore::lengthOfPattern(int pattern) const
 		// Don't create Clips here if they don't exist
 		if (pattern < t->numOfClips())
 		{
-			maxLength = qMax(maxLength, t->getClip(pattern)->length());
+			maxLength = std::max(maxLength, t->getClip(pattern)->length());
 		}
 	}
 
@@ -125,7 +125,7 @@ void PatternStore::removePattern(int pattern)
 	}
 	if (pattern <= currentPattern())
 	{
-		setCurrentPattern(qMax(currentPattern() - 1, 0));
+		setCurrentPattern(std::max(currentPattern() - 1, 0));
 	}
 }
 

@@ -286,7 +286,7 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 	int p = m_presetsModel.value();
 	
 	const float freq = _n->frequency();
-	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == nullptr )
+	if (!_n->m_pluginData)
 	{
 		// If newer projects, adjust velocity to within stk's limits
 		float velocityAdjust =

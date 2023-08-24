@@ -85,8 +85,7 @@ void PluginFactory::setupSearchPaths()
 	addRelativeIfExists(PLUGIN_DIR);
 #endif
 	// Or via an environment variable:
-	QString env_path;
-	if (!(env_path = qgetenv("LMMS_PLUGIN_DIR")).isEmpty())
+	if (const char* env_path = std::getenv("LMMS_PLUGIN_DIR"))
 		QDir::addSearchPath("plugins", env_path);
 
 	QDir::addSearchPath("plugins", ConfigManager::inst()->workingDir() + "plugins");

@@ -62,7 +62,7 @@ public:
 	} ;
 
 	using timeMap = QMap<int, AutomationNode>;
-	using objectVector = QVector<QPointer<AutomatableModel>>;
+	using objectVector = std::vector<QPointer<AutomatableModel>>;
 
 	using TimemapIterator = timeMap::const_iterator;
 
@@ -167,7 +167,7 @@ public:
 
 
 	static bool isAutomated( const AutomatableModel * _m );
-	static QVector<AutomationClip *> clipsForModel( const AutomatableModel * _m );
+	static std::vector<AutomationClip*> clipsForModel(const AutomatableModel* _m);
 	static AutomationClip * globalAutomationClip( AutomatableModel * _m );
 	static void resolveAllIDs();
 
@@ -190,6 +190,15 @@ private:
 	void generateTangents(timeMap::iterator it, int numToGenerate);
 	float valueAt( timeMap::const_iterator v, int offset ) const;
 
+	/**
+	 * @brief
+	 * This function combines the song tracks, pattern store tracks,
+	 * and the global automation track all in one vector.
+	 *
+	 * @return std::vector<Track*>
+	 */
+	static std::vector<Track*> combineAllTracks();
+
 	// Mutex to make methods involving automation clips thread safe
 	// Mutable so we can lock it from const objects
 #if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
@@ -199,7 +208,7 @@ private:
 #endif
 
 	AutomationTrack * m_autoTrack;
-	QVector<jo_id_t> m_idsToResolve;
+	std::vector<jo_id_t> m_idsToResolve;
 	objectVector m_objects;
 	timeMap m_timeMap;	// actual values
 	timeMap m_oldTimeMap;	// old values for storing the values before setDragValue() is called.

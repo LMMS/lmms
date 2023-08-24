@@ -27,12 +27,12 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <QFileInfo>
 #include <QHash>
 #include <QList>
 #include <QString>
-#include <QVector>
 
 #include "lmms_export.h"
 #include "Plugin.h"
@@ -99,7 +99,7 @@ private:
 	PluginInfoList m_pluginInfos;
 
 	QMap<QString, PluginInfoAndKey> m_pluginByExt;
-	QVector<std::string> m_garbage; //!< cleaned up at destruction
+	std::vector<std::string> m_garbage; //!< cleaned up at destruction
 
 	QHash<QString, QString> m_errors;
 

@@ -325,8 +325,7 @@ bool TrackContentWidget::canPasteSelection( TimePos clipPos, const QMimeData* md
 	QString value = decodeValue( md );
 
 	// We can only paste into tracks of the same type
-	if( type != ( "clip_" + QString::number( static_cast<int>(t->type()) ) ) ||
-		m_trackView->trackContainerView()->fixedClips() == true )
+	if (type != ("clip_" + QString::number(static_cast<int>(t->type()))))
 	{
 		return false;
 	}
@@ -346,7 +345,8 @@ bool TrackContentWidget::canPasteSelection( TimePos clipPos, const QMimeData* md
 
 	// Get the current track's index
 	const TrackContainer::TrackList tracks = t->trackContainer()->tracks();
-	const int currentTrackIndex = tracks.indexOf( t );
+	const auto currentTrackIt = std::find(tracks.begin(), tracks.end(), t);
+	const int currentTrackIndex = currentTrackIt != tracks.end() ? std::distance(tracks.begin(), currentTrackIt) : -1;
 
 	// Don't paste if we're on the same bar and allowSameBar is false
 	auto sourceTrackContainerId = metadata.attributeNode( "trackContainerId" ).value().toUInt();
@@ -359,6 +359,14 @@ bool TrackContentWidget::canPasteSelection( TimePos clipPos, const QMimeData* md
 	// Extract the clip data
 	QDomElement clipParent = dataFile.content().firstChildElement("clips");
 	QDomNodeList clipNodes = clipParent.childNodes();
+
+	// If we are pasting into the PatternEditor, only a single Clip is allowed to be pasted
+	// so we don't have the unexpected behavior of pasting on different PatternTracks
+	if (m_trackView->trackContainerView()->fixedClips() == true &&
+			clipNodes.length() > 1)
+	{
+		return false;
+	}
 
 	// Determine if all the Clips will land on a valid track
 	for( int i = 0; i < clipNodes.length(); i++ )
@@ -436,7 +444,8 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, 
 
 	// Snap the mouse position to the beginning of the dropped bar, in ticks
 	const TrackContainer::TrackList tracks = getTrack()->trackContainer()->tracks();
-	const int currentTrackIndex = tracks.indexOf( getTrack() );
+	const auto currentTrackIt = std::find(tracks.begin(), tracks.end(), getTrack());
+	const int currentTrackIndex = currentTrackIt != tracks.end() ? std::distance(tracks.begin(), currentTrackIt) : -1;
 
 	bool wasSelection = m_trackView->trackContainerView()->rubberBand()->selectedObjects().count();
 

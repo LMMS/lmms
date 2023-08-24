@@ -250,7 +250,7 @@ void FreeBoyInstrument::playNote(NotePlayHandle* nph, sampleFrame* workingBuffer
 	int data = 0;
 	int freq = nph->frequency();
 
-	if ( tfp == 0 )
+	if (!nph->m_pluginData)
 	{
 		auto papu = new GbApuWrapper{};
 		papu->setSampleRate(samplerate, CLOCK_RATE);
@@ -358,30 +358,34 @@ void FreeBoyInstrument::playNote(NotePlayHandle* nph, sampleFrame* workingBuffer
 
 	if (tfp == 0)
 	{
-		//PRNG Frequency = (1048576 Hz / (ratio + 1)) / 2 ^ (shiftclockfreq + 1)
-		char sopt = 0;
-		char ropt = 1;
-		float fopt = 524288.0 / (ropt * std::pow(2.0, sopt + 1.0));
-		float f;
+		// Initialize noise channel...
+		// PRNG Frequency = (1048576 Hz / (ratio + 1)) / 2 ^ (shiftclockfreq + 1)
+		// When div_ratio = 0 the ratio should be 0.5. Since s = 0 is the only case where r = 0 gives
+		// a unique frequency, we can start by guessing s = r = 0 here and then skip r = 0 in the loop.
+		char clock_freq = 0;
+		char div_ratio = 0;
+		float closest_freq = 524288.0 / (0.5 * std::pow(2.0, clock_freq + 1.0));
+		// This nested for loop iterates over all possible combinations of clock frequency and dividing
+		// ratio and chooses the combination whose resulting frequency is closest to the note frequency
 		for (char s = 0; s < 16; ++s)
 		{
-			for (char r = 0; r < 8; ++r)
+			for (char r = 1; r < 8; ++r)
 			{
-				f = 524288.0 / (r * std::pow(2.0, s + 1.0));
-				if (std::fabs(freq - fopt) > std::fabs(freq - f))
+				float f = 524288.0 / (r * std::pow(2.0, s + 1.0));
+				if (std::fabs(freq - closest_freq) > std::fabs(freq - f))
 				{
-					fopt = f;
-					ropt = r;
-					sopt = s;
+					closest_freq = f;
+					div_ratio = r;
+					clock_freq = s;
 				}
 			}
 		}
 
-		data = sopt;
+		data = clock_freq;
 		data = data << 1;
 		data += m_ch4ShiftRegWidthModel.value();
 		data = data << 3;
-		data += ropt;
+		data += div_ratio;
 		papu->writeRegister(0xff22, data);
 
 		//channel 4 init

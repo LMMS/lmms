@@ -27,6 +27,7 @@
 #define LMMS_GUI_AUTOMATION_EDITOR_H
 
 #include <QWidget>
+#include <array>
 
 #include "Editor.h"
 
@@ -180,7 +181,7 @@ private:
 	ComboBoxModel m_zoomingYModel;
 	ComboBoxModel m_quantizeModel;
 
-	static const QVector<float> m_zoomXLevels;
+	static const std::array<float, 7> m_zoomXLevels;
 
 	FloatModel * m_tensionModel;
 

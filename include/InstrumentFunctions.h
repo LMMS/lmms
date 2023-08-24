@@ -119,7 +119,7 @@ public:
 	};
 
 
-	struct ChordTable : public QVector<Chord>
+	struct ChordTable
 	{
 	private:
 		ChordTable();
@@ -131,6 +131,7 @@ public:
 		};
 
 		static std::array<Init, NUM_CHORD_TABLES> s_initTable;
+		std::vector<Chord> m_chords;
 
 	public:
 		static const ChordTable & getInstance()
@@ -149,6 +150,11 @@ public:
 		const Chord & getChordByName( const QString & name ) const
 		{
 			return getByName( name, false );
+		}
+
+		const std::vector<Chord>& chords() const
+		{
+			return m_chords;
 		}
 	};
 

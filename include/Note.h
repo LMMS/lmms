@@ -27,7 +27,7 @@
 #define LMMS_NOTE_H
 
 #include <optional>
-#include <QVector>
+#include <vector>
 
 #include "volume.h"
 #include "panning.h"
@@ -204,7 +204,7 @@ public:
 
 	int midiVelocity( int midiBaseVelocity ) const
 	{
-		return qMin( MidiMaxVelocity, getVolume() * midiBaseVelocity / DefaultVolume );
+		return std::min(MidiMaxVelocity, getVolume() * midiBaseVelocity / DefaultVolume);
 	}
 
 	inline panning_t getPanning() const
@@ -255,7 +255,7 @@ private:
 	DetuningHelper * m_detuning;
 };
 
-using NoteVector = QVector<Note*>;
+using NoteVector = std::vector<Note*>;
 
 struct NoteBounds
 {

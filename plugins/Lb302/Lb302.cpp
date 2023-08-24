@@ -746,7 +746,7 @@ void Lb302Synth::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 void Lb302Synth::processNote( NotePlayHandle * _n )
 {
 		/// Start a new note.
-		if( _n->m_pluginData != this ) 
+		if (_n->m_pluginData != this)
 		{
 			m_playingNote = _n;
 			new_freq = true;

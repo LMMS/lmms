@@ -550,7 +550,7 @@ void NesInstrument::playNote( NotePlayHandle * n, sampleFrame * workingBuffer )
 	const fpp_t frames = n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = n->noteOffset();
 	
-	if ( n->totalFramesPlayed() == 0 || n->m_pluginData == nullptr )
+	if (!n->m_pluginData)
 	{
 		auto nes = new NesObject(this, Engine::audioEngine()->processingSampleRate(), n);
 		n->m_pluginData = nes;

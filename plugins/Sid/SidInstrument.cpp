@@ -297,12 +297,10 @@ static int sid_fillbuffer(unsigned char* sidreg, SID *sid, int tdelta, short *pt
 void SidInstrument::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
-	const f_cnt_t tfp = _n->totalFramesPlayed();
-
 	const int clockrate = C64_PAL_CYCLES_PER_SEC;
 	const int samplerate = Engine::audioEngine()->processingSampleRate();
 
-	if ( tfp == 0 )
+	if (!_n->m_pluginData)
 	{
 		SID *sid = new SID();
 		sid->set_sampling_parameters( clockrate, SAMPLE_FAST, samplerate );

@@ -308,7 +308,7 @@ QString TripleOscillator::nodeName() const
 void TripleOscillator::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
-	if( _n->totalFramesPlayed() == 0 || _n->m_pluginData == nullptr )
+	if (!_n->m_pluginData)
 	{
 		auto oscs_l = std::array<Oscillator*, NUM_OF_OSCILLATORS>{};
 		auto oscs_r = std::array<Oscillator*, NUM_OF_OSCILLATORS>{};

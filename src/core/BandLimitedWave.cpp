@@ -109,7 +109,7 @@ void BandLimitedWave::generateWaves()
 					harm++;
 				} while( hlen > 2.0 );
 				s_waveforms[static_cast<std::size_t>(BandLimitedWave::Waveform::BLSaw)].setSampleAt( i, ph, s );
-				max = qMax( max, qAbs( s ) );
+				max = std::max(max, std::abs(s));
 			}
 			// normalize
 			for( int ph = 0; ph < len; ph++ )
@@ -151,7 +151,7 @@ void BandLimitedWave::generateWaves()
 					harm += 2;
 				} while( hlen > 2.0 );
 				s_waveforms[static_cast<std::size_t>(BandLimitedWave::Waveform::BLSquare)].setSampleAt( i, ph, s );
-				max = qMax( max, qAbs( s ) );
+				max = std::max(max, std::abs(s));
 			}
 			// normalize
 			for( int ph = 0; ph < len; ph++ )
@@ -193,7 +193,7 @@ void BandLimitedWave::generateWaves()
 					harm += 2;
 				} while( hlen > 2.0 );
 				s_waveforms[static_cast<std::size_t>(BandLimitedWave::Waveform::BLTriangle)].setSampleAt( i, ph, s );
-				max = qMax( max, qAbs( s ) );
+				max = std::max(max, std::abs(s));
 			}
 			// normalize
 			for( int ph = 0; ph < len; ph++ )

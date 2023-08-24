@@ -258,10 +258,12 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 			}
 			else
 			{
-				int idx = Engine::getSong()->controllers().indexOf( cc->getController() );
+				auto& controllers = Engine::getSong()->controllers();
+				auto it = std::find(controllers.begin(), controllers.end(), cc->getController());
 
-				if( idx >= 0 )
+				if (it != controllers.end())
 				{
+					int idx = std::distance(controllers.begin(), it);
 					m_userGroupBox->model()->setValue( true );
 					m_userController->model()->setValue( idx );
 				}
@@ -406,7 +408,7 @@ void ControllerConnectionDialog::userSelected()
 
 void ControllerConnectionDialog::autoDetectToggled()
 {
-	if( m_midiAutoDetect.value() )
+	if (m_midiAutoDetect.value() && m_midiController)
 	{
 		m_midiController->reset();
 	}

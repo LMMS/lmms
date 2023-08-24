@@ -27,6 +27,7 @@
 
 #include <QMap>
 #include <QMutex>
+#include <cmath>
 
 #include "JournallingObject.h"
 #include "Model.h"
@@ -78,7 +79,7 @@ class LMMS_EXPORT AutomatableModel : public Model, public JournallingObject
 	Q_OBJECT
 	MM_OPERATORS
 public:
-	using AutoModelVector = QVector<AutomatableModel*>;
+	using AutoModelVector = std::vector<AutomatableModel*>;
 
 	enum class ScaleType
 	{
@@ -144,7 +145,7 @@ public:
 	template<bool>
 	static bool castValue( const float v )
 	{
-		return ( qRound( v ) != 0 );
+		return (std::round(v) != 0);
 	}
 
 

@@ -125,7 +125,7 @@ ClipView::ClipView( Clip * clip,
 
 	connect( m_clip, SIGNAL(lengthChanged()),
 			this, SLOT(updateLength()));
-	connect( getGUI()->songEditor()->m_editor->zoomingModel(), SIGNAL(dataChanged()), this, SLOT(updateLength()));
+	connect(getGUI()->songEditor()->m_editor, &SongEditor::pixelsPerBarChanged, this, &ClipView::updateLength);
 	connect( m_clip, SIGNAL(positionChanged()),
 			this, SLOT(updatePosition()));
 	connect( m_clip, SIGNAL(destroyedClip()), this, SLOT(close()));
@@ -314,10 +314,9 @@ void ClipView::updateLength()
 	}
 	else
 	{
-		setFixedWidth(
-		static_cast<int>( m_clip->length() * pixelsPerBar() /
-					TimePos::ticksPerBar() ) + 1 /*+
-						BORDER_WIDTH * 2-1*/ );
+		// this std::max function is needed for clips that do not start or end on the beat, otherwise, they "disappear" when zooming to min 
+		// 3 is the minimun width needed to make a clip visible
+		setFixedWidth(std::max(static_cast<int>(m_clip->length() * pixelsPerBar() / TimePos::ticksPerBar() + 1), 3));
 	}
 	m_trackView->trackContainerView()->update();
 }
@@ -545,7 +544,7 @@ DataFile ClipView::createClipDataFiles(
 	{
 		// Insert into the dom under the "clips" element
 		Track* clipTrack = clipView->m_trackView->getTrack();
-		int trackIndex = tc->tracks().indexOf( clipTrack );
+		int trackIndex = std::distance(tc->tracks().begin(), std::find(tc->tracks().begin(), tc->tracks().end(), clipTrack));
 		QDomElement clipElement = dataFile.createElement("clip");
 		clipElement.setAttribute( "trackIndex", trackIndex );
 		clipElement.setAttribute( "trackType", static_cast<int>(clipTrack->type()) );
@@ -557,12 +556,15 @@ DataFile ClipView::createClipDataFiles(
 	dataFile.content().appendChild( clipParent );
 
 	// Add extra metadata needed for calculations later
-	int initialTrackIndex = tc->tracks().indexOf( t );
-	if( initialTrackIndex < 0 )
+
+	const auto initialTrackIt = std::find(tc->tracks().begin(), tc->tracks().end(), t);
+	if (initialTrackIt == tc->tracks().end())
 	{
 		printf("Failed to find selected track in the TrackContainer.\n");
 		return dataFile;
 	}
+
+	const int initialTrackIndex = std::distance(tc->tracks().begin(), initialTrackIt);
 	QDomElement metadata = dataFile.createElement( "copyMetadata" );
 	// initialTrackIndex is the index of the track that was touched
 	metadata.setAttribute( "initialTrackIndex", initialTrackIndex );

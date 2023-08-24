@@ -1,8 +1,5 @@
 /*
- * panning.h - declaration of some types, concerning the
- *             panning of a note
- *
- * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * UpgradeExtendedNoteRange.h - Upgrades the extended note range
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -23,39 +20,28 @@
  *
  */
 
-#ifndef LMMS_PANNING_H
-#define LMMS_PANNING_H
+#pragma once
 
-#include "lmms_basics.h"
-#include "panning_constants.h"
-#include "Midi.h"
-#include "volume.h"
+#ifndef LMMS_UPGRADEEXTENDEDNOTERANGE_H
+#define LMMS_UPGRADEEXTENDEDNOTERANGE_H
 
-#include <cmath>
+
+class QDomElement;
 
 namespace lmms
 {
 
-
-inline StereoVolumeVector panningToVolumeVector( panning_t _p,
-							float _scale = 1.0f )
+class UpgradeExtendedNoteRange
 {
-	StereoVolumeVector v = { { _scale, _scale } };
-	const float pf = _p / 100.0f;
-	v.vol[_p >= PanningCenter ? 0 : 1] *= 1.0f - std::abs(pf);
-	return v;
-}
+public:
+	UpgradeExtendedNoteRange(QDomElement & domElement);
 
+	void upgrade();
 
-inline int panningToMidi( panning_t _p )
-{
-	return MidiMinPanning + (int) (
-			  ( (float)( _p - PanningLeft ) ) /
-			  ( (float)( PanningRight - PanningLeft ) ) *
-			  ( (float)( MidiMaxPanning - MidiMinPanning ) ) );
-}
-
+private:
+	QDomElement & m_domElement;
+};
 
 } // namespace lmms
 
-#endif // LMMS_PANNING_H
+#endif // LMMS_UPGRADEEXTENDEDNOTERANGE_H

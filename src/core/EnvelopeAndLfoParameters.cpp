@@ -274,7 +274,7 @@ inline void EnvelopeAndLfoParameters::fillLfoLevel( float * _buf,
 	}
 
 	fpp_t offset = 0;
-	const float lafI = 1.0f / qMax( minimumFrames, m_lfoAttackFrames );
+	const float lafI = 1.0f / std::max(minimumFrames, m_lfoAttackFrames);
 	for( ; offset < _frames && _frame < m_lfoAttackFrames; ++offset,
 								++_frame )
 	{
@@ -404,16 +404,16 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 	// TODO: Remove the expKnobVals, time should be linear
 	const auto predelay_frames = static_cast<f_cnt_t>(frames_per_env_seg * expKnobVal(m_predelayModel.value()));
 
-	const f_cnt_t attack_frames = qMax( minimumFrames,
-					static_cast<f_cnt_t>( frames_per_env_seg *
-					expKnobVal( m_attackModel.value() ) ) );
+	const f_cnt_t attack_frames = std::max(minimumFrames,
+					static_cast<f_cnt_t>(frames_per_env_seg *
+					expKnobVal(m_attackModel.value())));
 
 	const auto hold_frames = static_cast<f_cnt_t>(frames_per_env_seg * expKnobVal(m_holdModel.value()));
 
-	const f_cnt_t decay_frames = qMax( minimumFrames,
-					static_cast<f_cnt_t>( frames_per_env_seg *
-					expKnobVal( m_decayModel.value() *
-					( 1 - m_sustainModel.value() ) ) ) );
+	const f_cnt_t decay_frames = std::max(minimumFrames,
+					static_cast<f_cnt_t>(frames_per_env_seg *
+					expKnobVal(m_decayModel.value() *
+					(1 - m_sustainModel.value()))));
 
 	m_sustainLevel = m_sustainModel.value();
 	m_amount = m_amountModel.value();
@@ -430,7 +430,7 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 								decay_frames;
 	m_rFrames = static_cast<f_cnt_t>( frames_per_env_seg *
 					expKnobVal( m_releaseModel.value() ) );
-	m_rFrames = qMax( minimumFrames, m_rFrames );
+	m_rFrames = std::max(minimumFrames, m_rFrames);
 
 	if( static_cast<int>( floorf( m_amount * 1000.0f ) ) == 0 )
 	{
