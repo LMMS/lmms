@@ -197,11 +197,6 @@ void MidiPort::saveSettings( QDomDocument& doc, QDomElement& thisElement )
 	m_readableModel.saveSettings( doc, thisElement, "readable" );
 	m_writableModel.saveSettings( doc, thisElement, "writable" );
 
-	/* New versions of LMMS count the controllers from 0, older ones count from 1. We need to mark that the new
-	 * indexing convention is used. When loading the project LMMS will know if the values should be translated or not */
-	BoolModel controllerZeroBaseModel(true, this);
-	controllerZeroBaseModel.saveSettings(doc, thisElement, "controller0base");
-
 	if( isInputEnabled() )
 	{
 		QString rp;
@@ -241,6 +236,7 @@ void MidiPort::saveSettings( QDomDocument& doc, QDomElement& thisElement )
 
 
 
+
 void MidiPort::loadSettings( const QDomElement& thisElement )
 {
 	m_inputChannelModel.loadSettings( thisElement, "inputchannel" );
@@ -254,16 +250,6 @@ void MidiPort::loadSettings( const QDomElement& thisElement )
 	m_baseVelocityModel.loadSettings( thisElement, "basevelocity" );
 	m_readableModel.loadSettings( thisElement, "readable" );
 	m_writableModel.loadSettings( thisElement, "writable" );
-
-	BoolModel controllerZeroBaseModel;
-	controllerZeroBaseModel.loadSettings(thisElement, "controller0base");
-
-	if (controllerZeroBaseModel.value() == false) {
-		/* We have a project created with older version of LMMS. We need to translate the controller indexes
-		 * to the new convention */
-		m_inputControllerModel.setValue(m_inputControllerModel.value() - 1);
-		m_outputControllerModel.setValue(m_outputControllerModel.value() - 1);
-	}
 
 	// restore connections
 
