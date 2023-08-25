@@ -35,6 +35,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QMessageBox>
+#include <string>
 
 #include "base64.h"
 #include "ConfigManager.h"
@@ -79,7 +80,7 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_automationNodes  ,   &DataFile::upgrade_extendedNoteRange,
 	&DataFile::upgrade_defaultTripleOscillatorHQ,
 	&DataFile::upgrade_mixerRename      ,   &DataFile::upgrade_bbTcoRename,
-	&DataFile::upgrade_sampleAndHold    ,
+	&DataFile::upgrade_sampleAndHold    ,   &DataFile::upgrade_midiCCIndexing
 };
 
 // Vector of all versions that have upgrade routines.
@@ -1809,6 +1810,26 @@ void DataFile::upgrade_sampleAndHold()
 	}
 }
 
+//! Update MIDI CC indexes, so that they are counted from 0. Older releases of LMMS
+//! count the CCs from 1.
+void DataFile::upgrade_midiCCIndexing()
+{
+	std::vector<const char*> attributesToUpdate = {"inputcontroller", "outputcontroller"};
+
+	QDomNodeList elements = elementsByTagName("Midicontroller");
+	for(int i = 0; !elements.item(i).isNull(); ++i)
+	{
+		auto element = elements.item(i).toElement();
+		for (const char* attrName : attributesToUpdate)
+		{
+			if(element.hasAttribute(attrName))
+			{
+				int cc = std::stoi(element.attribute(attrName).toStdString());
+				element.setAttribute(attrName, cc - 1);
+			}
+		}
+	}
+}
 
 void DataFile::upgrade()
 {
