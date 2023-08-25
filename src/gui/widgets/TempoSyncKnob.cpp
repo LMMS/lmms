@@ -76,7 +76,7 @@ void TempoSyncKnob::modelChanged()
 		m_custom->setModel( &model()->m_custom );
 	}
 	connect(model(), &TempoSyncKnobModel::syncModeChanged, this, &TempoSyncKnob::updateDescAndIcon);
-	connect(this, &TempoSyncKnob::sliderMoved(), model(), &TempoSyncKnobModel::disableSync());
+	connect(this, &TempoSyncKnob::sliderMoved, model(), &TempoSyncKnobModel::disableSync);
 	updateDescAndIcon();
 }
 
