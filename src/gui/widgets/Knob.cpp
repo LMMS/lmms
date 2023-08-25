@@ -696,22 +696,26 @@ void Knob::wheelEvent(QWheelEvent * we)
 	float const step = m->step<float>();
 	float const range = m->range();
 
+	// This is the default number of steps or mouse wheel events that it takes to sweep
+	// from the lowest value to the highest value.
+	// It might be modified if the user presses modifier keys. See below.
 	float numberOfStepsForFullSweep = 100.;
 
 	auto const modKeys = we->modifiers();
 	if (modKeys == Qt::ShiftModifier)
 	{
-		// With shift we want to be able to go through the values in 10 steps
+		// The shift is intended to go through the values in very coarse steps as in:
+		// "Shift into overdrive"
 		numberOfStepsForFullSweep = 10;
 	}
 	else if (modKeys == Qt::ControlModifier)
 	{
-		// With control we want to be able to go through the values in 100 steps
+		// The control key gives more control, i.e. it enables more fine-grained adjustments
 		numberOfStepsForFullSweep = 1000;
 	}
 	else if (modKeys == Qt::AltModifier)
 	{
-		// With alt we want to be able to go through the values in 1000 steps
+		// The alt key enables even finer adjustments
 		numberOfStepsForFullSweep = 2000;
 
 		// It seems that on some systems pressing Alt with mess with the directions,
