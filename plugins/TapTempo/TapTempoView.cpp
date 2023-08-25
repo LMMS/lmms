@@ -125,7 +125,7 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 	connect(syncButton, &QPushButton::clicked, this, [this]() {
 		const auto& tempoModel = Engine::getSong()->tempoModel();
 		if (m_plugin->m_bpm < tempoModel.minValue() || m_plugin->m_bpm > tempoModel.maxValue()) { return; }
-		Engine::getSong()->setTempo(m_plugin->m_bpm);
+		Engine::getSong()->setTempo(std::round(m_plugin->m_bpm));
 	});
 
 	hide();
