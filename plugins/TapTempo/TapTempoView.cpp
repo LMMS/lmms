@@ -104,16 +104,15 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 	mainLayout->addLayout(sidebarLayout);
 
 	connect(m_tapButton, &QPushButton::pressed, this, [this, muteCheckBox]() {
-		m_plugin->onBpmClick();
-		updateLabels();
-
 		if (!muteCheckBox->isChecked())
 		{
 			const auto timeSigNumerator = Engine::getSong()->getTimeSigModel().getNumerator();
-			m_plugin->m_numTaps % timeSigNumerator == 0
-				? Engine::audioEngine()->addPlayHandle(new SamplePlayHandle("misc/metronome02.ogg"))
-				: Engine::audioEngine()->addPlayHandle(new SamplePlayHandle("misc/metronome01.ogg"));
+			Engine::audioEngine()->addPlayHandle(new SamplePlayHandle(
+				m_plugin->m_numTaps % timeSigNumerator == 0 ? "misc/metronome02.ogg" : "misc/metronome01.ogg"));
 		}
+
+		m_plugin->onBpmClick();
+		updateLabels();
 	});
 
 	connect(resetButton, &QPushButton::pressed, this, [this]() { closeEvent(nullptr); });
