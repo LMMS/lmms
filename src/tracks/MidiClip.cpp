@@ -146,7 +146,7 @@ void MidiClip::updateLength()
 {
 	tick_t maxLength = TimePos::ticksPerBar();
 
-	if (m_clipType == BeatClip)
+	if (m_clipType == Type::BeatClip)
 	{
 		for (const auto& note : m_notes)
 		{
