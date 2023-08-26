@@ -49,12 +49,12 @@ namespace lmms
  */
 static const auto KEY_ORDER = std::array
 {
-//	C                CIS              D                DIS
-	Piano::WhiteKey, Piano::BlackKey, Piano::WhiteKey, Piano::BlackKey,
-//	E                F                FIS              G
-	Piano::WhiteKey, Piano::WhiteKey, Piano::BlackKey, Piano::WhiteKey,
-//	GIS              A                AIS              B
-	Piano::BlackKey, Piano::WhiteKey, Piano::BlackKey, Piano::WhiteKey
+//	C                      CIS                    D                      DIS
+	Piano::KeyType::White, Piano::KeyType::Black, Piano::KeyType::White, Piano::KeyType::Black,
+//	E                      F                      FIS                    G
+	Piano::KeyType::White, Piano::KeyType::White, Piano::KeyType::Black, Piano::KeyType::White,
+//	GIS                    A                      AIS                    B
+	Piano::KeyType::Black, Piano::KeyType::White, Piano::KeyType::Black, Piano::KeyType::White
 } ;
 
 
@@ -127,7 +127,7 @@ bool Piano::isBlackKey(int key)
 {
 	int keyCode = key % KeysPerOctave;
 
-	return KEY_ORDER[keyCode] == Piano::BlackKey;
+	return KEY_ORDER[keyCode] == Piano::KeyType::Black;
 }
 
 

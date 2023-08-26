@@ -38,13 +38,13 @@ Note::Note( const TimePos & length, const TimePos & pos,
 		int key, volume_t volume, panning_t panning,
 						DetuningHelper * detuning ) :
 	m_selected( false ),
-	m_oldKey( qBound( 0, key, NumKeys ) ),
+	m_oldKey(std::clamp(key, 0, NumKeys)),
 	m_oldPos( pos ),
 	m_oldLength( length ),
 	m_isPlaying( false ),
-	m_key( qBound( 0, key, NumKeys ) ),
-	m_volume( qBound( MinVolume, volume, MaxVolume ) ),
-	m_panning( qBound( PanningLeft, panning, PanningRight ) ),
+	m_key(std::clamp(key, 0, NumKeys)),
+	m_volume(std::clamp(volume, MinVolume, MaxVolume)),
+	m_panning(std::clamp(panning, PanningLeft, PanningRight)),
 	m_length( length ),
 	m_pos( pos ),
 	m_detuning( nullptr )
@@ -114,7 +114,7 @@ void Note::setPos( const TimePos & pos )
 
 void Note::setKey( const int key )
 {
-	const int k = qBound( 0, key, NumKeys - 1 );
+	const int k = std::clamp(key, 0, NumKeys - 1);
 	m_key = k;
 }
 
@@ -123,7 +123,7 @@ void Note::setKey( const int key )
 
 void Note::setVolume( volume_t volume )
 {
-	const volume_t v = qBound( MinVolume, volume, MaxVolume );
+	const volume_t v = std::clamp(volume, MinVolume, MaxVolume);
 	m_volume = v;
 }
 
@@ -132,7 +132,7 @@ void Note::setVolume( volume_t volume )
 
 void Note::setPanning( panning_t panning )
 {
-	const panning_t p = qBound( PanningLeft, panning, PanningRight );
+	const panning_t p = std::clamp(panning, PanningLeft, PanningRight);
 	m_panning = p;
 }
 
@@ -192,7 +192,7 @@ void Note::saveSettings( QDomDocument & doc, QDomElement & parent )
 void Note::loadSettings( const QDomElement & _this )
 {
 	const int oldKey = _this.attribute( "tone" ).toInt() + _this.attribute( "oct" ).toInt() * KeysPerOctave;
-	m_key = qMax( oldKey, _this.attribute( "key" ).toInt() );
+	m_key = std::max(oldKey, _this.attribute("key").toInt());
 	m_volume = _this.attribute( "vol" ).toInt();
 	m_panning = _this.attribute( "pan" ).toInt();
 	m_length = _this.attribute( "len" ).toInt();
@@ -216,7 +216,7 @@ void Note::createDetuning()
 		m_detuning = new DetuningHelper;
 		(void) m_detuning->automationClip();
 		m_detuning->setRange( -MaxDetuning, MaxDetuning, 0.5f );
-		m_detuning->automationClip()->setProgressionType( AutomationClip::LinearProgression );
+		m_detuning->automationClip()->setProgressionType( AutomationClip::ProgressionType::Linear );
 	}
 }
 

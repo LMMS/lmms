@@ -183,10 +183,10 @@ static void fixTrack(QDomElement & track, std::set<unsigned int> & automatedBase
 		return;
 	}
 
-	Track::TrackTypes const trackType = static_cast<Track::TrackTypes>(track.attribute("type").toInt());
+	Track::Type const trackType = static_cast<Track::Type>(track.attribute("type").toInt());
 
 		   // BB tracks need special handling because they contain a track container of their own
-	if (trackType == Track::PatternTrack)
+	if (trackType == Track::Type::Pattern)
 	{
 		// Assuming that a BB track cannot contain another BB track here...
 		QDomNodeList subTracks = track.elementsByTagName("track");
@@ -233,7 +233,7 @@ static void fixAutomationTracks(QDomElement & song, std::set<unsigned int> const
 	for (int i = 0; i < tracks.size(); ++i)
 	{
 		QDomElement currentTrack = tracks.item(i).toElement();
-		if (currentTrack.attribute("type").toInt() != Track::AutomationTrack)
+		if (static_cast<Track::Type>(currentTrack.attribute("type").toInt()) != Track::Type::Automation)
 		{
 			continue;
 		}

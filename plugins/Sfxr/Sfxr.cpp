@@ -67,7 +67,7 @@ Plugin::Descriptor PLUGIN_EXPORT sfxr_plugin_descriptor =
 				"LMMS port of sfxr" ),
 	"Wong Cho Ching",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
@@ -350,7 +350,7 @@ SfxrInstrument::SfxrInstrument( InstrumentTrack * _instrument_track ) :
 	m_lpFilResoModel(0.0f, this, "LP Filter Resonance"),
 	m_hpFilCutModel(0.0f, this, "HP Filter Cutoff"),
 	m_hpFilCutSweepModel(0.0f, this, "HP Filter Cutoff Sweep"),
-	m_waveFormModel( SQR_WAVE, 0, WAVES_NUM-1, this, tr( "Wave" ) )
+	m_waveFormModel( static_cast<int>(SfxrWave::Square), 0, NumSfxrWaves-1, this, tr( "Wave" ) )
 {
 }
 
@@ -446,9 +446,9 @@ void SfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffe
 {
 	float currentSampleRate = Engine::audioEngine()->processingSampleRate();
 
-    fpp_t frameNum = _n->framesLeftForCurrentPeriod();
-    const f_cnt_t offset = _n->noteOffset();
-	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == nullptr )
+	fpp_t frameNum = _n->framesLeftForCurrentPeriod();
+	const f_cnt_t offset = _n->noteOffset();
+	if (!_n->m_pluginData)
 	{
 		_n->m_pluginData = new SfxrSynth( this );
 	}
@@ -549,7 +549,7 @@ class SfxrKnob : public Knob
 {
 public:
 	SfxrKnob( QWidget * _parent ) :
-			Knob( knobStyled, _parent )
+			Knob( KnobType::Styled, _parent )
 	{
 		setFixedSize( 20, 20 );
 		setCenterPointX( 10.0 );

@@ -53,7 +53,7 @@ SampleClip::SampleClip( Track * _track ) :
 					this, SLOT(updateLength()));
 
 	//care about positionmarker
-	gui::TimeLineWidget* timeLine = Engine::getSong()->getPlayPos( Engine::getSong()->Mode_PlaySong ).m_timeLine;
+	gui::TimeLineWidget* timeLine = Engine::getSong()->getPlayPos( Song::PlayMode::Song ).m_timeLine;
 	if( timeLine )
 	{
 		connect( timeLine, SIGNAL(positionMarkerMoved()), this, SLOT(playbackPositionChanged()));
@@ -74,11 +74,11 @@ SampleClip::SampleClip( Track * _track ) :
 
 	switch( getTrack()->trackContainer()->type() )
 	{
-		case TrackContainer::PatternContainer:
+		case TrackContainer::Type::Pattern:
 			setAutoResize( true );
 			break;
 
-		case TrackContainer::SongContainer:
+		case TrackContainer::Type::Song:
 			// move down
 		default:
 			setAutoResize( false );
@@ -117,7 +117,7 @@ SampleClip::~SampleClip()
 
 void SampleClip::changeLength( const TimePos & _length )
 {
-	Clip::changeLength( qMax( static_cast<int>( _length ), 1 ) );
+	Clip::changeLength(std::max(static_cast<int>(_length), 1));
 }
 
 
@@ -179,7 +179,7 @@ void SampleClip::toggleRecord()
 
 void SampleClip::playbackPositionChanged()
 {
-	Engine::audioEngine()->removePlayHandlesOfTypes( getTrack(), PlayHandle::TypeSamplePlayHandle );
+	Engine::audioEngine()->removePlayHandlesOfTypes( getTrack(), PlayHandle::Type::SamplePlayHandle );
 	auto st = dynamic_cast<SampleTrack*>(getTrack());
 	st->setPlayingClips( false );
 }
