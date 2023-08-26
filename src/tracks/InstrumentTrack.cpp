@@ -28,6 +28,7 @@
 #include "ConfigManager.h"
 #include "ControllerConnection.h"
 #include "DataFile.h"
+#include "Midi.h"
 #include "Mixer.h"
 #include "InstrumentTrackView.h"
 #include "Instrument.h"
@@ -42,7 +43,6 @@
 
 namespace lmms
 {
-
 
 InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	Track( Track::Type::Instrument, tc ),
@@ -69,7 +69,10 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_arpeggio( this ),
 	m_noteStacking( this ),
 	m_piano(this),
-	m_microtuner()
+	m_microtuner(),
+	m_programNumber(0),
+	m_programBankMSB(BANK_NONE),
+	m_programBankLSB(BANK_NONE)
 {
 	m_pitchModel.setCenterValue( 0 );
 	m_panningModel.setCenterValue( DefaultPanning );
@@ -425,6 +428,20 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const TimePos& tim
 				event.controllerNumber() == MidiControllerPolyOn )
 			{
 				silenceAllNotes();
+			}
+			if( event.controllerNumber() == MidiControllerBankSelectMSB ||
+				event.controllerNumber() == MidiControllerBankSelectLSB )
+			{
+				if (processPresetSelectEvents(event))
+				{
+					changePreset();
+				}
+			}
+			break;
+
+		case MidiProgramChange:
+			if (processPresetSelectEvents(event)) {
+				changePreset();
 			}
 			break;
 
@@ -966,6 +983,85 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 
 	updatePitchRange();
 	unlock();
+}
+
+bool InstrumentTrack::processPresetSelectEvents(const MidiEvent& event)
+{
+	if (m_midiPort.m_captureProgramChangeModel.value() == 0)
+	{
+		return false;
+	}
+
+	auto policy = static_cast<MidiPort::PresetSelectPolicy>(
+			m_midiPort.m_presetSelectPolicyModel.value());
+
+	if (event.type() == MidiProgramChange)
+	{
+		m_programNumber = event.key();
+
+		if (policy == MidiPort::BankSelectIgnore)
+		{
+			m_programBankMSB = BANK_NONE;
+			m_programBankLSB = BANK_NONE;
+		}
+		return true;
+	}
+
+	else if (event.type() == MidiControlChange &&
+			event.controllerNumber() == MidiControllerBankSelectMSB)
+	{
+		switch (policy)
+		{
+		case MidiPort::BankSelectIgnore:
+			return false;
+		case MidiPort::BankSelectMSB:
+			/* Only MSB is meaningful and is the only bank select
+			 * message, so it should be actually treated as LSB.
+			 * MSB should be set to zero. */
+			m_programBankMSB = 0;
+			m_programBankLSB = event.controllerValue();
+			return true;
+		case MidiPort::BankSelectBoth:
+			/* Both MSB and LSB are meaningful, so don't touch
+			 * LSB here unless it is set to None (-1) - in this case reset it to 0. */
+			m_programBankMSB = event.controllerValue();
+			if (m_programBankLSB == BANK_NONE) {
+				m_programBankLSB = 0;
+			}
+			return true;
+		}
+	}
+
+	else if (event.type() == MidiControlChange &&
+			event.controllerNumber() == MidiControllerBankSelectLSB)
+	{
+		switch (policy)
+		{
+		case MidiPort::BankSelectIgnore:
+		case MidiPort::BankSelectMSB:
+			return false;
+		case MidiPort::BankSelectBoth:
+			m_programBankLSB = event.controllerValue();
+			if (m_programBankMSB == BANK_NONE) {
+				m_programBankMSB = 0;
+			}
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+void InstrumentTrack::changePreset()
+{
+	if (m_instrument == nullptr) { return; }
+	int bankNo = BANK_NONE;
+	if (m_programBankMSB != BANK_NONE && m_programBankLSB != BANK_NONE)
+	{
+		bankNo = (m_programBankMSB << 7) | m_programBankLSB;
+	}
+	m_instrument->changePreset(bankNo, m_programNumber);
 }
 
 
