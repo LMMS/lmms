@@ -59,6 +59,9 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	m_tlb->move(3, 1);
 	m_tlb->show();
 
+	m_mixerChannelNumber = new MixerLineLcdSpinBox(2, getTrackSettingsWidget(), tr("Mixer channel"), this);
+	m_mixerChannelNumber->show();
+
 	m_volumeKnob = new Knob( KnobType::Small17, getTrackSettingsWidget(),
 						    tr( "Track volume" ) );
 	m_volumeKnob->setVolumeKnob( true );
@@ -170,6 +173,7 @@ void SampleTrackView::modelChanged()
 {
 	auto st = castModel<SampleTrack>();
 	m_volumeKnob->setModel(&st->m_volumeModel);
+	m_mixerChannelNumber->setModel(&st->m_mixerChannelModel);
 
 	TrackView::modelChanged();
 }
