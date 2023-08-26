@@ -168,6 +168,7 @@ PianoRoll::PianoRoll() :
 	m_midiClip( nullptr ),
 	m_currentPosition(),
 	m_recording( false ),
+	m_doAutoQuantization(ConfigManager::inst()->value("midi", "autoquantize").toInt() != 0),
 	m_currentNote( nullptr ),
 	m_action( ActionNone ),
 	m_noteEditMode( NoteEditVolume ),
@@ -248,6 +249,15 @@ PianoRoll::PianoRoll() :
 	connect( markChordAction, &QAction::triggered, [this](){ markSemiTone(stmaMarkCurrentChord); });
 	connect( unmarkAllAction, &QAction::triggered, [this](){ markSemiTone(stmaUnmarkAll); });
 	connect( copyAllNotesAction, &QAction::triggered, [this](){ markSemiTone(stmaCopyAllNotesOnKey); });
+	connect( ConfigManager::inst(), &ConfigManager::valueChanged,
+		[this](QString const& cls, QString const& attribute, QString const& value)
+		{
+			if (cls != "midi" && attribute != "autoquantize")
+			{
+				return;
+			}
+			this->m_doAutoQuantization = (value.toInt() != 0);
+		});
 
 	markScaleAction->setEnabled( false );
 	markChordAction->setEnabled( false );
@@ -4138,10 +4148,7 @@ void PianoRoll::finishRecordNote(const Note & n )
 							it->key(), it->getVolume(),
 							it->getPanning() );
 
-					// TODO this value is probably better off cached somewhere;
-					//  currently doing a string parse everytime a note is released.
-					bool doQuantize = (ConfigManager::inst()->value("midi", "autoquantize").toInt() != 0);
-					if (doQuantize)
+					if (m_doAutoQuantization)
 					{
 						n1.quantizeLength(quantization());
 						n1.quantizePos(quantization());
