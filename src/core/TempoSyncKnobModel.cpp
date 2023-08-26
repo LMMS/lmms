@@ -117,6 +117,10 @@ void TempoSyncKnobModel::calculateTempoSyncTime( bpm_t _bpm )
 		emit syncModeChanged( m_tempoSyncMode );
 		m_tempoLastSyncMode = m_tempoSyncMode;
 	}
+	else if (m_tempoSyncMode == SyncMode::Custom)
+	{
+		emit syncModeChanged(m_tempoSyncMode);
+	}
 }
 
 

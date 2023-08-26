@@ -75,8 +75,7 @@ void TempoSyncKnob::modelChanged()
 	{
 		m_custom->setModel( &model()->m_custom );
 	}
-	connect( model(), SIGNAL(syncModeChanged(lmms::TempoSyncKnobModel::TempoSyncMode)),
-			this, SLOT(updateDescAndIcon()));
+	connect(model(), &TempoSyncKnobModel::syncModeChanged, this, &TempoSyncKnob::updateDescAndIcon);
 	connect( this, SIGNAL(sliderMoved(float)),
 			model(), SLOT(disableSync()));
 	updateDescAndIcon();
