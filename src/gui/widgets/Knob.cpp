@@ -689,10 +689,52 @@ void Knob::paintEvent( QPaintEvent * _me )
 void Knob::wheelEvent(QWheelEvent * we)
 {
 	we->accept();
-	const float stepMult = model()->range() / 2000 / model()->step<float>();
-	const int inc = ((we->angleDelta().y() > 0 ) ? 1 : -1) * ((stepMult < 1 ) ? 1 : stepMult);
-	model()->incValue( inc );
+	const int deltaY = we->angleDelta().y();
+	float direction = deltaY > 0 ? 1 : -1;
 
+	auto * m = model();
+	float const step = m->step<float>();
+	float const range = m->range();
+
+	// This is the default number of steps or mouse wheel events that it takes to sweep
+	// from the lowest value to the highest value.
+	// It might be modified if the user presses modifier keys. See below.
+	float numberOfStepsForFullSweep = 100.;
+
+	auto const modKeys = we->modifiers();
+	if (modKeys == Qt::ShiftModifier)
+	{
+		// The shift is intended to go through the values in very coarse steps as in:
+		// "Shift into overdrive"
+		numberOfStepsForFullSweep = 10;
+	}
+	else if (modKeys == Qt::ControlModifier)
+	{
+		// The control key gives more control, i.e. it enables more fine-grained adjustments
+		numberOfStepsForFullSweep = 1000;
+	}
+	else if (modKeys == Qt::AltModifier)
+	{
+		// The alt key enables even finer adjustments
+		numberOfStepsForFullSweep = 2000;
+
+		// It seems that on some systems pressing Alt with mess with the directions,
+		// i.e. scrolling the mouse wheel is interpreted as pressing the mouse wheel
+		// left and right. Account for this quirk.
+		if (deltaY == 0)
+		{
+			int const deltaX = we->angleDelta().x();
+			if (deltaX != 0)
+			{
+				direction = deltaX > 0 ? 1 : -1;
+			}
+		}
+	}
+
+	// Compute the number of steps but make sure that we always do at least one step
+	const float stepMult = std::max(range / numberOfStepsForFullSweep / step, 1.f);
+	const int inc = direction * stepMult;
+	model()->incValue(inc);
 
 	s_textFloat->setText( displayValue() );
 	s_textFloat->moveGlobal( this, QPoint( width() + 2, 0 ) );
