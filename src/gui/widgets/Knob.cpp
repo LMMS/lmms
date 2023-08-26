@@ -734,7 +734,7 @@ void Knob::wheelEvent(QWheelEvent * we)
 	// Compute the number of steps but make sure that we always do at least one step
 	const float stepMult = std::max(range / numberOfStepsForFullSweep / step, 1.f);
 	const int inc = direction * stepMult;
-	model()->incValue( inc );
+	model()->incValue(inc);
 
 	s_textFloat->setText( displayValue() );
 	s_textFloat->moveGlobal( this, QPoint( width() + 2, 0 ) );
