@@ -848,12 +848,23 @@ void PianoRoll::setScrollbarPos(double posX)
 {
 	assert(posX >= 0.0 && posX <= 1.0);
 
+	if (!hasValidMidiClip()) { return; }
+
+	const auto tpp = 1.0 * TimePos::ticksPerBar() / m_ppb; // ticks per pixel
+	const auto editorWidthTicks = tpp * (m_leftRightScroll->width() - m_topBottomScroll->width());
+
+	// Set scrollbar to far left if entire clip can fit on screen
+	if (m_midiClip->exactLength().getTicks() <= editorWidthTicks)
+	{
+		m_leftRightScroll->setValue(m_leftRightScroll->minimum());
+		return;
+	}
+
 	// Convert posX to position on scrollbar
 	auto scrollPosX = posX * (m_leftRightScroll->maximum() - m_leftRightScroll->minimum()) + m_leftRightScroll->minimum();
 
 	// Center the position within the editor
-	const auto tpp = 1.0 * TimePos::ticksPerBar() / m_ppb; // ticks per pixel
-	scrollPosX -= tpp * 0.5 * (m_leftRightScroll->width() - m_topBottomScroll->width());
+	scrollPosX -= 0.5 * editorWidthTicks;
 
 	m_leftRightScroll->setValue(std::max(static_cast<int>(scrollPosX), 0));
 }

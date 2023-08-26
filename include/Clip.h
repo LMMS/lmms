@@ -88,7 +88,7 @@ public:
 		return sp + m_length;
 	}
 
-	inline const TimePos & length() const
+	inline TimePos length() const
 	{
 		return m_length;
 	}
@@ -129,7 +129,7 @@ public:
 	}
 
 	virtual void movePosition( const TimePos & pos );
-	virtual void changeLength( const TimePos & length );
+	virtual void changeLength(TimePos length);
 
 	virtual gui::ClipView * createView( gui::TrackView * tv ) = 0;
 

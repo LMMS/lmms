@@ -115,9 +115,9 @@ SampleClip::~SampleClip()
 
 
 
-void SampleClip::changeLength( const TimePos & _length )
+void SampleClip::changeLength(TimePos length)
 {
-	Clip::changeLength( qMax( static_cast<int>( _length ), 1 ) );
+	Clip::changeLength(std::max(static_cast<int>(length), 1));
 }
 
 

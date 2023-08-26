@@ -59,6 +59,7 @@ public:
 	void init();
 
 	void updateLength();
+	void changeLength(TimePos length, TimePos exactLength);
 
 	// note management
 	Note * addNote( const Note & _new_note, const bool _quant_pos = true );
@@ -73,6 +74,12 @@ public:
 	inline const NoteVector & notes() const
 	{
 		return m_notes;
+	}
+
+	//! Returns exact length (in ticks) instead of length rounded to next bar
+	inline TimePos exactLength() const
+	{
+		return m_exactLength;
 	}
 
 	Note * addStepNote( int step );
@@ -127,8 +134,6 @@ protected slots:
 
 
 private:
-	TimePos beatClipLength() const;
-
 	void setType( MidiClipTypes _new_clip_type );
 	void checkType();
 
@@ -141,6 +146,7 @@ private:
 	// data-stuff
 	NoteVector m_notes;
 	int m_steps;
+	TimePos m_exactLength = 0;
 
 	MidiClip * adjacentMidiClipByOffset(int offset) const;
 
