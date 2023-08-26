@@ -172,17 +172,9 @@ void MidiClip::updateLength()
 		}
 	}
 
-	changeLength(TimePos{maxLength}.nextFullBar() * TimePos::ticksPerBar(), maxLength);
+	m_exactLength = maxLength;
+	changeLength(TimePos{maxLength}.nextFullBar() * TimePos::ticksPerBar());
 	updatePatternTrack();
-}
-
-
-
-
-void MidiClip::changeLength(TimePos length, TimePos exactLength)
-{
-	m_exactLength = exactLength;
-	Clip::changeLength(length);
 }
 
 
