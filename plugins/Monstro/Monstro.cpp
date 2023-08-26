@@ -53,7 +53,7 @@ Plugin::Descriptor PLUGIN_EXPORT monstro_plugin_descriptor =
 				"Monstrous 3-oscillator synth with modulation matrix" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
@@ -1030,7 +1030,7 @@ void MonstroInstrument::playNote( NotePlayHandle * _n,
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 
-	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == nullptr )
+	if (!_n->m_pluginData)
 	{
 		_n->m_pluginData = new MonstroSynth( this, _n );
 	}

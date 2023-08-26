@@ -38,7 +38,7 @@ namespace lmms
 class LadspaSubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures
 {
 public:
-	LadspaSubPluginFeatures( Plugin::PluginTypes _type );
+	LadspaSubPluginFeatures( Plugin::Type _type );
 
 	QString displayName(const Key& k) const override;
 	void fillDescriptionWidget( QWidget * _parent,

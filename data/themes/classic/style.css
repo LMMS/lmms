@@ -418,6 +418,25 @@ lmms--gui--AutomatableSlider::handle:vertical {
 	margin: -4px -12px -2px;
 }
 
+/* main horizontal sliders (zoom) */
+
+lmms--gui--AutomatableSlider::groove:horizontal {
+	background: rgba(0,0,0, 128);
+	border: 1px inset rgba(100,100,100, 64);
+	border-radius: 2px;
+	height: 2px;
+	margin: 2px;
+}
+
+lmms--gui--AutomatableSlider::handle:horizontal {
+	background: none;
+	border-image: url(resources:horizontal_slider.png);
+	width: 10px;
+	height: 26px;
+	border-radius: 2px;
+	margin: -12px -2px;
+}
+
 /* about dialog */
 QTabWidget, QTabWidget QWidget {
 	background: #5b6571;

@@ -92,7 +92,7 @@ Clip::~Clip()
  */
 void Clip::movePosition( const TimePos & pos )
 {
-	TimePos newPos = qMax(0, pos.getTicks());
+	TimePos newPos = std::max(0, pos.getTicks());
 	if (m_startPosition != newPos)
 	{
 		Engine::audioEngine()->requestChangeInModel();

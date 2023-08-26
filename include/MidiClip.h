@@ -46,7 +46,7 @@ class LMMS_EXPORT MidiClip : public Clip
 {
 	Q_OBJECT
 public:
-	enum MidiClipTypes
+	enum class Type
 	{
 		BeatClip,
 		MelodyClip
@@ -89,7 +89,7 @@ public:
 	void splitNotes(NoteVector notes, TimePos pos);
 
 	// clip-type stuff
-	inline MidiClipTypes type() const
+	inline Type type() const
 	{
 		return m_clipType;
 	}
@@ -134,14 +134,15 @@ protected slots:
 
 
 private:
-	void setType( MidiClipTypes _new_clip_type );
+	void setType( Type _new_clip_type );
+
 	void checkType();
 
 	void resizeToFirstTrack();
 
 	InstrumentTrack * m_instrumentTrack;
 
-	MidiClipTypes m_clipType;
+	Type m_clipType;
 
 	// data-stuff
 	NoteVector m_notes;

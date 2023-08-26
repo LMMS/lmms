@@ -244,7 +244,6 @@ signals:
 	void instrumentChanged();
 	void midiNoteOn( const lmms::Note& );
 	void midiNoteOff( const lmms::Note& );
-	void nameChanged();
 	void newNote();
 	void endNote();
 

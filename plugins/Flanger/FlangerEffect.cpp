@@ -45,7 +45,7 @@ Plugin::Descriptor PLUGIN_EXPORT flanger_plugin_descriptor =
 	QT_TRANSLATE_NOOP( "PluginBrowser", "A native flanger plugin" ),
 	"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,

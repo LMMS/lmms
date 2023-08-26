@@ -51,7 +51,7 @@ Plugin::Descriptor PLUGIN_EXPORT midiexport_plugin_descriptor =
 	"Mohamed Abdel Maksoud <mohamed at amaksoud.com> and "
 	"Hyunjin Song <tteu.ingog/at/gmail.com>",
 	0x0100,
-	Plugin::ExportFilter,
+	Plugin::Type::ExportFilter,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -84,8 +84,8 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 	auto buffer = std::array<uint8_t, BUFFER_SIZE>{};
 	uint32_t size;
 
-	for (const Track* track : tracks) if (track->type() == Track::InstrumentTrack) nTracks++;
-	for (const Track* track : patternStoreTracks) if (track->type() == Track::InstrumentTrack) nTracks++;
+	for (const Track* track : tracks) if (track->type() == Track::Type::Instrument) nTracks++;
+	for (const Track* track : patternStoreTracks) if (track->type() == Track::Type::Instrument) nTracks++;
 
 	// midi header
 	MidiFile::MIDIHeader header(nTracks);
@@ -97,10 +97,10 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 	// midi tracks
 	for (Track* track : tracks)
 	{
-		DataFile dataFile(DataFile::SongProject);
+		DataFile dataFile(DataFile::Type::SongProject);
 		MTrack mtrack;
 
-		if (track->type() == Track::InstrumentTrack)
+		if (track->type() == Track::Type::Instrument)
 		{
 
 			mtrack.addName(track->name().toStdString(), 0);
@@ -143,7 +143,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 			midiout.writeRawData((char *)buffer.data(), size);
 		}
 
-		if (track->type() == Track::PatternTrack)
+		if (track->type() == Track::Type::Pattern)
 		{
 			patternTrack = dynamic_cast<PatternTrack*>(track);
 			element = patternTrack->saveState(dataFile, dataFile.content());
@@ -169,7 +169,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 	// for each instrument in the pattern editor
 	for (Track* track : patternStoreTracks)
 	{
-		DataFile dataFile(DataFile::SongProject);
+		DataFile dataFile(DataFile::Type::SongProject);
 		MTrack mtrack;
 
 		// begin at the first pattern track (first pattern)
@@ -177,7 +177,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 
 		std::vector<std::pair<int,int>> st;
 
-		if (track->type() != Track::InstrumentTrack) continue;
+		if (track->type() != Track::Type::Instrument) continue;
 
 		mtrack.addName(track->name().toStdString(), 0);
 		//mtrack.addProgramChange(0, 0);

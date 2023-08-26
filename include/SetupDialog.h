@@ -53,7 +53,7 @@ class SetupDialog : public QDialog
 	Q_OBJECT
 
 public:
-	enum ConfigTabs
+	enum class ConfigTab
 	{
 		GeneralSettings,
 		PerformanceSettings,
@@ -62,7 +62,7 @@ public:
 		PathsSettings
 	};
 
-	SetupDialog(ConfigTabs tab_to_open = GeneralSettings);
+	SetupDialog(ConfigTab tab_to_open = ConfigTab::GeneralSettings);
 	~SetupDialog() override;
 
 

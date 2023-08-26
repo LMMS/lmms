@@ -1,5 +1,5 @@
 /*
- * AudioFileProcessor.cpp - instrument for using audio-files
+ * AudioFileProcessor.cpp - instrument for using audio files
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -47,7 +47,6 @@
 #include "embed.h"
 #include "plugin_export.h"
 
-
 namespace lmms
 {
 
@@ -65,7 +64,7 @@ Plugin::Descriptor PLUGIN_EXPORT audiofileprocessor_plugin_descriptor =
 				"instrument-track" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	"wav,ogg,ds,spx,au,voc,aif,aiff,flac,raw",
 	nullptr,
@@ -205,74 +204,70 @@ void AudioFileProcessor::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-void AudioFileProcessor::saveSettings( QDomDocument & _doc,
-							QDomElement & _this )
+void AudioFileProcessor::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
-	_this.setAttribute( "src", m_sampleBuffer.audioFile() );
-	if( m_sampleBuffer.audioFile() == "" )
+	elem.setAttribute("src", m_sampleBuffer.audioFile());
+	if (m_sampleBuffer.audioFile().isEmpty())
 	{
 		QString s;
-		_this.setAttribute( "sampledata",
-						m_sampleBuffer.toBase64( s ) );
+		elem.setAttribute("sampledata", m_sampleBuffer.toBase64(s));
 	}
-	m_reverseModel.saveSettings( _doc, _this, "reversed" );
-	m_loopModel.saveSettings( _doc, _this, "looped" );
-	m_ampModel.saveSettings( _doc, _this, "amp" );
-	m_startPointModel.saveSettings( _doc, _this, "sframe" );
-	m_endPointModel.saveSettings( _doc, _this, "eframe" );
-	m_loopPointModel.saveSettings( _doc, _this, "lframe" );
-	m_stutterModel.saveSettings( _doc, _this, "stutter" );
-	m_interpolationModel.saveSettings( _doc, _this, "interp" );
-
+	m_reverseModel.saveSettings(doc, elem, "reversed");
+	m_loopModel.saveSettings(doc, elem, "looped");
+	m_ampModel.saveSettings(doc, elem, "amp");
+	m_startPointModel.saveSettings(doc, elem, "sframe");
+	m_endPointModel.saveSettings(doc, elem, "eframe");
+	m_loopPointModel.saveSettings(doc, elem, "lframe");
+	m_stutterModel.saveSettings(doc, elem, "stutter");
+	m_interpolationModel.saveSettings(doc, elem, "interp");
 }
 
 
 
 
-void AudioFileProcessor::loadSettings( const QDomElement & _this )
+void AudioFileProcessor::loadSettings(const QDomElement& elem)
 {
-	if( _this.attribute( "src" ) != "" )
+	if (!elem.attribute("src").isEmpty())
 	{
-		setAudioFile( _this.attribute( "src" ), false );
+		setAudioFile(elem.attribute("src"), false);
 
-		QString absolutePath = PathUtil::toAbsolute( m_sampleBuffer.audioFile() );
-		if ( !QFileInfo( absolutePath ).exists() )
+		QString absolutePath = PathUtil::toAbsolute(m_sampleBuffer.audioFile());
+		if (!QFileInfo(absolutePath).exists())
 		{
-			QString message = tr( "Sample not found: %1" ).arg( m_sampleBuffer.audioFile() );
-
-			Engine::getSong()->collectError( message );
+			QString message = tr("Sample not found: %1").arg(m_sampleBuffer.audioFile());
+			Engine::getSong()->collectError(message);
 		}
 	}
-	else if( _this.attribute( "sampledata" ) != "" )
+	else if (!elem.attribute("sampledata").isEmpty())
 	{
-		m_sampleBuffer.loadFromBase64( _this.attribute( "srcdata" ) );
+		m_sampleBuffer.loadFromBase64(elem.attribute("srcdata"));
 	}
 
-	m_loopModel.loadSettings( _this, "looped" );
-	m_ampModel.loadSettings( _this, "amp" );
-	m_endPointModel.loadSettings( _this, "eframe" );
-	m_startPointModel.loadSettings( _this, "sframe" );
+	m_loopModel.loadSettings(elem, "looped");
+	m_ampModel.loadSettings(elem, "amp");
+	m_endPointModel.loadSettings(elem, "eframe");
+	m_startPointModel.loadSettings(elem, "sframe");
 
 	// compat code for not having a separate loopback point
-	if (_this.hasAttribute("lframe") || !(_this.firstChildElement("lframe").isNull()))
+	if (elem.hasAttribute("lframe") || !elem.firstChildElement("lframe").isNull())
 	{
-		m_loopPointModel.loadSettings( _this, "lframe" );
+		m_loopPointModel.loadSettings(elem, "lframe");
 	}
 	else
 	{
-		m_loopPointModel.loadSettings( _this, "sframe" );
+		m_loopPointModel.loadSettings(elem, "sframe");
 	}
 
-	m_reverseModel.loadSettings( _this, "reversed" );
+	m_reverseModel.loadSettings(elem, "reversed");
 
-	m_stutterModel.loadSettings( _this, "stutter" );
-	if( _this.hasAttribute( "interp" ) )
+	m_stutterModel.loadSettings(elem, "stutter");
+	if (elem.hasAttribute("interp") || !elem.firstChildElement("interp").isNull())
 	{
-		m_interpolationModel.loadSettings( _this, "interp" );
+		m_interpolationModel.loadSettings(elem, "interp");
 	}
 	else
 	{
-		m_interpolationModel.setValue( 1 ); //linear by default
+		m_interpolationModel.setValue(1.0f); // linear by default
 	}
 
 	pointChanged();
@@ -521,7 +516,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 	m_stutterButton->setToolTip(
 		tr( "Continue sample playback across notes" ) );
 
-	m_ampKnob = new Knob( knobBright_26, this );
+	m_ampKnob = new Knob( KnobType::Bright26, this );
 	m_ampKnob->setVolumeKnob( true );
 	m_ampKnob->move( 5, 108 );
 	m_ampKnob->setHintText( tr( "Amplify:" ), "%" );
@@ -572,7 +567,7 @@ void AudioFileProcessorView::dragEnterEvent( QDragEnterEvent * _dee )
 		QString txt = _dee->mimeData()->data(
 						mimeType( MimeType::StringPair ) );
 		if( txt.section( ':', 0, 0 ) == QString( "clip_%1" ).arg(
-							Track::SampleTrack ) )
+							static_cast<int>(Track::Type::Sample) ) )
 		{
 			_dee->acceptProposedAction();
 		}
@@ -624,7 +619,7 @@ void AudioFileProcessorView::dropEvent( QDropEvent * _de )
 		newWaveView();
 		return;
 	}
-	else if( type == QString( "clip_%1" ).arg( Track::SampleTrack ) )
+	else if( type == QString( "clip_%1" ).arg( static_cast<int>(Track::Type::Sample) ) )
 	{
 		DataFile dataFile( value.toUtf8() );
 		castModel<AudioFileProcessor>()->setAudioFile( dataFile.content().firstChild().toElement().attribute( "src" ) );
@@ -686,14 +681,12 @@ void AudioFileProcessorView::sampleUpdated()
 
 void AudioFileProcessorView::openAudioFile()
 {
-	QString af = castModel<AudioFileProcessor>()->m_sampleBuffer.
-							openAudioFile();
-	if( af != "" )
-	{
-		castModel<AudioFileProcessor>()->setAudioFile( af );
-		Engine::getSong()->setModified();
-		m_waveView->updateSampleRange();
-	}
+	QString af = castModel<AudioFileProcessor>()->m_sampleBuffer.openAudioFile();
+	if (af.isEmpty()) { return; }
+
+	castModel<AudioFileProcessor>()->setAudioFile(af);
+	Engine::getSong()->setModified();
+	m_waveView->updateSampleRange();
 }
 
 
@@ -794,9 +787,9 @@ void AudioFileProcessorWaveView::mousePressEvent( QMouseEvent * _me )
 	const int end_dist = 		qAbs( m_endFrameX - x );
 	const int loop_dist =		qAbs( m_loopFrameX - x );
 
-	draggingType dt = sample_loop; int md = loop_dist;
-	if( start_dist < loop_dist ) { dt = sample_start; md = start_dist; }
-	else if( end_dist < loop_dist ) { dt = sample_end; md = end_dist; }
+	DraggingType dt = DraggingType::SampleLoop; int md = loop_dist;
+	if( start_dist < loop_dist ) { dt = DraggingType::SampleStart; md = start_dist; }
+	else if( end_dist < loop_dist ) { dt = DraggingType::SampleEnd; md = end_dist; }
 
 	if( md < 4 )
 	{
@@ -804,7 +797,7 @@ void AudioFileProcessorWaveView::mousePressEvent( QMouseEvent * _me )
 	}
 	else
 	{
-		m_draggingType = wave;
+		m_draggingType = DraggingType::Wave;
 		updateCursor(_me);
 	}
 }
@@ -815,7 +808,7 @@ void AudioFileProcessorWaveView::mousePressEvent( QMouseEvent * _me )
 void AudioFileProcessorWaveView::mouseReleaseEvent( QMouseEvent * _me )
 {
 	m_isDragging = false;
-	if( m_draggingType == wave )
+	if( m_draggingType == DraggingType::Wave )
 	{
 		updateCursor(_me);
 	}
@@ -835,16 +828,16 @@ void AudioFileProcessorWaveView::mouseMoveEvent( QMouseEvent * _me )
 	const int step = _me->x() - m_draggingLastPoint.x();
 	switch( m_draggingType )
 	{
-		case sample_start:
-			slideSamplePointByPx( start, step );
+		case DraggingType::SampleStart:
+			slideSamplePointByPx( Point::Start, step );
 			break;
-		case sample_end:
-			slideSamplePointByPx( end, step );
+		case DraggingType::SampleEnd:
+			slideSamplePointByPx( Point::End, step );
 			break;
-		case sample_loop:
-			slideSamplePointByPx( loop, step );
+		case DraggingType::SampleLoop:
+			slideSamplePointByPx( Point::Loop, step );
 			break;
-		case wave:
+		case DraggingType::Wave:
 		default:
 			if( qAbs( _me->y() - m_draggingLastPoint.y() )
 				< 2 * qAbs( _me->x() - m_draggingLastPoint.x() ) )
@@ -990,7 +983,7 @@ void AudioFileProcessorWaveView::updateGraph()
 	if( m_to == 1 )
 	{
 		m_to = m_sampleBuffer.frames() * 0.7;
-		slideSamplePointToFrames( end, m_to * 0.7 );
+		slideSamplePointToFrames( Point::End, m_to * 0.7 );
 	}
 
 	if( m_from > m_sampleBuffer.startFrame() )
@@ -1117,7 +1110,7 @@ void AudioFileProcessorWaveView::setKnobs( knob * _start, knob * _end, knob * _l
 
 
 
-void AudioFileProcessorWaveView::slideSamplePointByPx( knobType _point, int _px )
+void AudioFileProcessorWaveView::slideSamplePointByPx( Point _point, int _px )
 {
 	slideSamplePointByFrames(
 		_point,
@@ -1128,18 +1121,18 @@ void AudioFileProcessorWaveView::slideSamplePointByPx( knobType _point, int _px 
 
 
 
-void AudioFileProcessorWaveView::slideSamplePointByFrames( knobType _point, f_cnt_t _frames, bool _slide_to )
+void AudioFileProcessorWaveView::slideSamplePointByFrames( Point _point, f_cnt_t _frames, bool _slide_to )
 {
 	knob * a_knob = m_startKnob;
 	switch( _point )
 	{
-		case end:
+		case Point::End:
 			a_knob = m_endKnob;
 			break;
-		case loop:
+		case Point::Loop:
 			a_knob = m_loopKnob;
 			break;
-		case start:
+		case Point::Start:
 			break;
 	}
 	if( a_knob == nullptr )
@@ -1203,7 +1196,7 @@ void AudioFileProcessorWaveView::reverse()
 
 void AudioFileProcessorWaveView::updateCursor( QMouseEvent * _me )
 {
-	bool const waveIsDragged = m_isDragging && (m_draggingType == wave);
+	bool const waveIsDragged = m_isDragging && (m_draggingType == DraggingType::Wave);
 	bool const pointerCloseToStartEndOrLoop = (_me != nullptr ) &&
 			( isCloseTo( _me->x(), m_startFrameX ) ||
 			  isCloseTo( _me->x(), m_endFrameX ) ||

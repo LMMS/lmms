@@ -88,7 +88,7 @@ public:
 
 	Flags flags() const override
 	{
-		return IsSingleStreamed;
+		return Flag::IsSingleStreamed;
 	}
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;

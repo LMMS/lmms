@@ -61,7 +61,7 @@ struct MidiInputEvent
 
 
 
-Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
+Plugin::Type Lv2Proc::check(const LilvPlugin *plugin,
 	std::vector<PluginIssue>& issues)
 {
 	unsigned maxPorts = lilv_plugin_get_num_ports(plugin);
@@ -79,7 +79,7 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
 	if (!Engine::ignorePluginBlacklist() &&
 		pluginBlacklist.find(pluginUri) != pluginBlacklist.end())
 	{
-		issues.emplace_back(blacklisted);
+		issues.emplace_back(PluginIssueType::Blacklisted);
 	}
 
 	for (unsigned portNum = 0; portNum < maxPorts; ++portNum)
@@ -106,19 +106,19 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
 	}
 
 	if (audioChannels[inCount] > 2)
-		issues.emplace_back(tooManyInputChannels,
+		issues.emplace_back(PluginIssueType::TooManyInputChannels,
 			std::to_string(audioChannels[inCount]));
 	if (audioChannels[outCount] == 0)
-		issues.emplace_back(noOutputChannel);
+		issues.emplace_back(PluginIssueType::NoOutputChannel);
 	else if (audioChannels[outCount] > 2)
-		issues.emplace_back(tooManyOutputChannels,
+		issues.emplace_back(PluginIssueType::TooManyOutputChannels,
 			std::to_string(audioChannels[outCount]));
 
 	if (midiChannels[inCount] > 1)
-		issues.emplace_back(tooManyMidiInputChannels,
+		issues.emplace_back(PluginIssueType::TooManyMidiInputChannels,
 			std::to_string(midiChannels[inCount]));
 	if (midiChannels[outCount] > 1)
-		issues.emplace_back(tooManyMidiOutputChannels,
+		issues.emplace_back(PluginIssueType::TooManyMidiOutputChannels,
 			std::to_string(midiChannels[outCount]));
 
 	AutoLilvNodes reqFeats(lilv_plugin_get_required_features(plugin));
@@ -128,7 +128,7 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
 								lilv_nodes_get(reqFeats.get(), itr));
 		if(!Lv2Features::isFeatureSupported(reqFeatName))
 		{
-			issues.emplace_back(featureNotSupported, reqFeatName);
+			issues.emplace_back(PluginIssueType::FeatureNotSupported, reqFeatName);
 		}
 	}
 
@@ -144,16 +144,16 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
 			{
 				// yes, this is not a Lv2 feature,
 				// but it's a feature in abstract sense
-				issues.emplace_back(featureNotSupported, ro);
+				issues.emplace_back(PluginIssueType::FeatureNotSupported, ro);
 			}
 		}
 	}
 
 	return (audioChannels[inCount] > 2 || audioChannels[outCount] > 2)
-		? Plugin::Undefined
+		? Plugin::Type::Undefined
 		: (audioChannels[inCount] > 0)
-			? Plugin::Effect
-			: Plugin::Instrument;
+			? Plugin::Type::Effect
+			: Plugin::Type::Instrument;
 }
 
 

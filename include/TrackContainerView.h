@@ -174,12 +174,6 @@ protected:
 
 
 private:
-	enum Actions
-	{
-		AddTrack,
-		RemoveTrack
-	} ;
-
 	class scrollArea : public QScrollArea
 	{
 	public:
