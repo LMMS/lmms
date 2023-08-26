@@ -4141,11 +4141,12 @@ void PianoRoll::finishRecordNote(const Note & n )
 					// TODO this value is probably better off cached somewhere;
 					//  currently doing a string parse everytime a note is released.
 					bool doQuantize = (ConfigManager::inst()->value("midi", "autoquantize").toInt() != 0);
-					if (doQuantize) {
+					if (doQuantize)
+					{
 						n1.quantizeLength(quantization());
 						n1.quantizePos(quantization());
 					}
-					m_midiClip->addNote(n1,false);
+					m_midiClip->addNote(n1, false);
 					update();
 					m_recordingNotes.erase( it );
 					break;
