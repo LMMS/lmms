@@ -251,7 +251,7 @@ PianoRoll::PianoRoll() :
 	connect(ConfigManager::inst(), &ConfigManager::valueChanged,
 		[this](QString const& cls, QString const& attribute, QString const& value)
 		{
-			if (cls != "midi" && attribute != "autoquantize")
+			if (not (cls == "midi" && attribute == "autoquantize"))
 			{
 				return;
 			}
