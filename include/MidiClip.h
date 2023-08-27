@@ -134,7 +134,6 @@ protected slots:
 
 private:
 	void setType( Type _new_clip_type );
-
 	void checkType();
 
 	void resizeToFirstTrack();

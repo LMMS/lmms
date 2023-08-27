@@ -846,6 +846,7 @@ void PianoRoll::loadMarkedSemiTones(const QDomElement & de)
 void PianoRoll::setScrollbarPos(double posX)
 {
 	assert(posX >= 0.0 && posX <= 1.0);
+	assert(m_leftRightScroll->minimum() == 0);
 
 	if (!hasValidMidiClip()) { return; }
 
@@ -855,12 +856,12 @@ void PianoRoll::setScrollbarPos(double posX)
 	// Set scrollbar to far left if entire clip can fit on screen
 	if (m_midiClip->exactLength().getTicks() <= editorWidthTicks)
 	{
-		m_leftRightScroll->setValue(m_leftRightScroll->minimum());
+		m_leftRightScroll->setValue(0);
 		return;
 	}
 
 	// Convert posX to position on scrollbar
-	auto scrollPosX = posX * (m_leftRightScroll->maximum() - m_leftRightScroll->minimum()) + m_leftRightScroll->minimum();
+	auto scrollPosX = posX * m_leftRightScroll->maximum(); // Simplified from: posX * (max - min) + min
 
 	// Center the position within the editor
 	scrollPosX -= 0.5 * editorWidthTicks;
