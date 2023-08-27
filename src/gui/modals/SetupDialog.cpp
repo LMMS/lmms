@@ -730,7 +730,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	auto* midiRecordingTab = new TabWidget(tr("Behavior when recording"), midi_w);
 	addLedCheckBox(tr("Auto-quantize notes in Piano Roll"), midiRecordingTab, counter,
 		m_midiAutoQuantize, SLOT(toggleMidiAutoQuantization(bool)), false);
-	midiRecordingTab->setFixedHeight(YDelta + YDelta * mwCounter);
+	midiRecordingTab->setFixedHeight(YDelta + YDelta * counter);
 
 	// MIDI layout ordering.
 	midi_layout->addWidget(midiiface_tw);
