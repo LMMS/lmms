@@ -62,16 +62,16 @@ void SideBarWidget::paintEvent( QPaintEvent * )
 
 	QFont f = p.font();
 	f.setBold( true );
-	f.setUnderline( true );
+	f.setUnderline( false );
 	f.setPointSize( f.pointSize() + 2 );
 	p.setFont( f );
 
 	p.setPen( palette().highlightedText().color() );
 
-	const int tx = m_icon.width()+4;
+	const int tx = m_icon.width() + 8;
 
 	QFontMetrics metrics( f );
-	const int ty = metrics.ascent();
+	const int ty = (metrics.ascent() + m_icon.height()) / 2;
 	p.drawText( tx, ty, m_title );
 
 	p.drawPixmap( 2, 2, m_icon.transformed( QTransform().rotate( -90 ) ) );
