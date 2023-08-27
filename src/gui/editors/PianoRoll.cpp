@@ -249,7 +249,7 @@ PianoRoll::PianoRoll() :
 	connect( markChordAction, &QAction::triggered, [this](){ markSemiTone(stmaMarkCurrentChord); });
 	connect( unmarkAllAction, &QAction::triggered, [this](){ markSemiTone(stmaUnmarkAll); });
 	connect( copyAllNotesAction, &QAction::triggered, [this](){ markSemiTone(stmaCopyAllNotesOnKey); });
-	connect( ConfigManager::inst(), &ConfigManager::valueChanged,
+	connect(ConfigManager::inst(), &ConfigManager::valueChanged,
 		[this](QString const& cls, QString const& attribute, QString const& value)
 		{
 			if (cls != "midi" && attribute != "autoquantize")
