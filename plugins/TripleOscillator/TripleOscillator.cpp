@@ -26,6 +26,7 @@
 
 #include <QDomElement>
 
+#include "SampleLoader.h"
 #include "TripleOscillator.h"
 #include "AudioEngine.h"
 #include "AutomatableButton.h"
@@ -92,7 +93,7 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 				tr( "Modulation type %1" ).arg( _idx+1 ) ),
 	m_useWaveTableModel(true),
 
-	m_sampleBuffer( new SampleBuffer ),
+	m_sampleBuffer( new SampleBuffer2 ),
 	m_volumeLeft( 0.0f ),
 	m_volumeRight( 0.0f ),
 	m_detuningLeft( 0.0f ),
@@ -136,17 +137,17 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 
 
 
-OscillatorObject::~OscillatorObject()
-{
-	sharedObject::unref( m_sampleBuffer );
-}
 
 
 
 
 void OscillatorObject::oscUserDefWaveDblClick()
 {
-	QString af = m_sampleBuffer->openAndSetWaveformFile();
+	QString af = gui::SampleLoader::openWaveformFile();
+	auto buffer = gui::SampleLoader::createBufferFromFile(af);
+	// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
+	std::atomic_store(&m_sampleBuffer, std::shared_ptr<const SampleBuffer2>(std::move(buffer)));
+
 	if( af != "" )
 	{
 		// TODO:
@@ -289,8 +290,10 @@ void TripleOscillator::loadSettings( const QDomElement & _this )
 					"modalgo" + QString::number( i+1 ) );
 		m_osc[i]->m_useWaveTableModel.loadSettings( _this,
 							"useWaveTable" + QString::number (i+1 ) );
-		m_osc[i]->m_sampleBuffer->setAudioFile( _this.attribute(
-							"userwavefile" + is ) );
+
+		auto buffer = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile" + is));
+		// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
+		std::atomic_store(&m_osc[i]->m_sampleBuffer, std::shared_ptr<const SampleBuffer2>(std::move(buffer)));
 	}
 }
 

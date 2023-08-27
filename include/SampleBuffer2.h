@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_SAMPLE_BUFFER_H
-#define LMMS_SAMPLE_BUFFER_H
+#ifndef LMMS_SAMPLE_BUFFER2_H
+#define LMMS_SAMPLE_BUFFER2_H
 
 #include <QByteArray>
 #include <QString>
@@ -80,4 +80,4 @@ private:
 
 } // namespace lmms
 
-#endif // LMMS_SAMPLE_BUFFER_H
+#endif // LMMS_SAMPLE_BUFFER2_H

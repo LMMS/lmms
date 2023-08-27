@@ -361,7 +361,6 @@ void SampleBuffer::update(bool keepSettings)
 	{
 		m_userAntiAliasWaveTable = std::make_unique<OscillatorConstants::waveform_t>();
 	}
-	Oscillator::generateAntiAliasUserWaveTable(this);
 
 	if (fileLoadError)
 	{

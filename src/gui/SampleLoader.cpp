@@ -86,11 +86,11 @@ QString SampleLoader::openWaveformFile(const QString& previousFile)
 		previousFile.isEmpty() ? ConfigManager::inst()->factorySamplesDir() + "waveforms/10saw.flac" : previousFile);
 }
 
-std::unique_ptr<SampleBuffer> SampleLoader::createBufferFromFile(const QString& filePath)
+std::unique_ptr<SampleBuffer2> SampleLoader::createBufferFromFile(const QString& filePath)
 {
 	try
 	{
-		return std::make_unique<SampleBuffer>(filePath);
+		return std::make_unique<SampleBuffer2>(filePath);
 	}
 	catch (const std::runtime_error& error)
 	{
@@ -99,11 +99,11 @@ std::unique_ptr<SampleBuffer> SampleLoader::createBufferFromFile(const QString& 
 	}
 }
 
-std::unique_ptr<SampleBuffer> SampleLoader::createBufferFromBase64(const QString& base64, int sampleRate)
+std::unique_ptr<SampleBuffer2> SampleLoader::createBufferFromBase64(const QString& base64, int sampleRate)
 {
 	try
 	{
-		return std::make_unique<SampleBuffer>(base64.toUtf8().toBase64(), sampleRate);
+		return std::make_unique<SampleBuffer2>(base64.toUtf8().toBase64(), sampleRate);
 	}
 	catch (const std::runtime_error& error)
 	{

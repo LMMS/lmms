@@ -31,6 +31,7 @@
 #include "Knob.h"
 #include "TempoSyncKnob.h"
 #include "PixmapButton.h"
+#include "SampleLoader.h"
 
 namespace lmms::gui
 {
@@ -210,9 +211,13 @@ LfoControllerDialog::~LfoControllerDialog()
 
 void LfoControllerDialog::askUserDefWave()
 {
-	SampleBuffer * sampleBuffer = dynamic_cast<LfoController*>(this->model())->
-									m_userDefSampleBuffer;
-	QString fileName = sampleBuffer->openAndSetWaveformFile();
+	auto sampleBuffer = dynamic_cast<LfoController*>(this->model())->m_userDefSampleBuffer;
+	QString fileName = SampleLoader::openWaveformFile();
+	
+	auto buffer = SampleLoader::createBufferFromFile(fileName);
+	// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
+	std::atomic_store(&sampleBuffer, std::shared_ptr<const SampleBuffer2>(std::move(buffer)));
+	
 	if( fileName.isEmpty() == false )
 	{
 		// TODO:

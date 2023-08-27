@@ -29,6 +29,7 @@
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "AutomatableModel.h"
+#include "SampleBuffer2.h"
 
 namespace lmms
 {
@@ -57,9 +58,6 @@ class OscillatorObject : public Model
 	Q_OBJECT
 public:
 	OscillatorObject( Model * _parent, int _idx );
-	~OscillatorObject() override;
-
-
 private:
 	FloatModel m_volumeModel;
 	FloatModel m_panModel;
@@ -71,7 +69,7 @@ private:
 	IntModel m_waveShapeModel;
 	IntModel m_modulationAlgoModel;
 	BoolModel m_useWaveTableModel;
-	SampleBuffer* m_sampleBuffer;
+	std::shared_ptr<const SampleBuffer2> m_sampleBuffer;
 
 	float m_volumeLeft;
 	float m_volumeRight;

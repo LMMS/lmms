@@ -28,6 +28,7 @@
 
 #include "LfoController.h"
 #include "AudioEngine.h"
+#include "SampleLoader.h"
 #include "Song.h"
 
 
@@ -48,7 +49,7 @@ LfoController::LfoController( Model * _parent ) :
 	m_phaseOffset( 0 ),
 	m_currentPhase( 0 ),
 	m_sampleFunction( &Oscillator::sinSample ),
-	m_userDefSampleBuffer( new SampleBuffer )
+	m_userDefSampleBuffer(std::make_shared<SampleBuffer2>())
 {
 	setSampleExact( true );
 	connect( &m_waveModel, SIGNAL(dataChanged()),
@@ -74,7 +75,6 @@ LfoController::LfoController( Model * _parent ) :
 
 LfoController::~LfoController()
 {
-	sharedObject::unref( m_userDefSampleBuffer );
 	m_baseModel.disconnect( this );
 	m_speedModel.disconnect( this );
 	m_amountModel.disconnect( this );
@@ -107,7 +107,7 @@ void LfoController::updateValueBuffer()
 	{
 		const float currentSample = m_sampleFunction != nullptr
 			? m_sampleFunction( phase )
-			: m_userDefSampleBuffer->userWaveSample( phase );
+			: Oscillator::userWaveSample(m_userDefSampleBuffer.get(), phase);
 
 		f = std::clamp(m_baseModel.value() + (*amountPtr * currentSample / 2.0f), 0.0f, 1.0f);
 
@@ -211,7 +211,10 @@ void LfoController::loadSettings( const QDomElement & _this )
 	m_phaseModel.loadSettings( _this, "phase" );
 	m_waveModel.loadSettings( _this, "wave" );
 	m_multiplierModel.loadSettings( _this, "multiplier" );
-	m_userDefSampleBuffer->setAudioFile( _this.attribute("userwavefile" ) );
+
+	auto buffer = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile"));
+	// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
+	std::atomic_store(&m_userDefSampleBuffer, std::shared_ptr<const SampleBuffer2>(std::move(buffer)));
 
 	updateSampleFunction();
 }
