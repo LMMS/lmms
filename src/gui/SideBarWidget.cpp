@@ -62,7 +62,7 @@ void SideBarWidget::paintEvent( QPaintEvent * )
 
 	QFont f = p.font();
 	f.setBold( true );
-	f.setUnderline( false );
+	f.setUnderline(false);
 	f.setPointSize( f.pointSize() + 2 );
 	p.setFont( f );
 
