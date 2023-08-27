@@ -213,7 +213,7 @@ Controller * Controller::create( ControllerType _ct, Model * _parent )
 			break;
 	}
 
-	return( c );
+	return c;
 }
 
 
@@ -237,7 +237,7 @@ Controller * Controller::create( const QDomElement & _this, Model * _parent )
 		c->restoreState( _this );
 	}
 
-	return( c );
+	return c;
 }
 
 
@@ -289,7 +289,7 @@ void Controller::loadSettings( const QDomElement & _this )
 
 QString Controller::nodeName() const
 {
-	return( "Controller" );
+	return "Controller";
 }
 
 

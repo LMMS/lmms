@@ -59,7 +59,7 @@ void Instrument::deleteNotePluginData( NotePlayHandle * )
 
 f_cnt_t Instrument::beatLen( NotePlayHandle * ) const
 {
-	return( 0 );
+	return 0;
 }
 
 
@@ -75,7 +75,7 @@ Instrument *Instrument::instantiate(const QString &_plugin_name,
 	if(dynamic_cast<Instrument *>(p))
 		return dynamic_cast<Instrument *>(p);
 	delete p;
-	return( new DummyInstrument( _instrument_track ) );
+	return new DummyInstrument( _instrument_track );
 }
 
 
@@ -122,7 +122,7 @@ fpp_t getFadeInLength(float maxLength, fpp_t frames, int zeroCrossings)
 	// Length is inversely proportional to the max of zeroCrossings,
 	// because for low frequencies, we need a longer fade in to
 	// prevent clicking.
-	return (fpp_t) (maxLength  / ((float) zeroCrossings / ((float) frames / 128.0f) + 1.0f));
+	return (fpp_t) (maxLength / ((float) zeroCrossings / ((float) frames / 128.0f) + 1.0f));
 }
 
 
