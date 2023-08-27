@@ -1671,6 +1671,8 @@ void DataFile::upgrade_extendedNoteRange()
 {
 	auto root = documentElement();
 	UpgradeExtendedNoteRange upgradeExtendedNoteRange(root);
+
+	upgradeExtendedNoteRange.upgrade();
 }
 
 
