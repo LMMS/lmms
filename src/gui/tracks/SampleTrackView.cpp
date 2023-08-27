@@ -89,9 +89,8 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	auto layout = new QHBoxLayout(getTrackSettingsWidget());
 	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(0);
-
-	layout->addWidget(m_mixerChannelNumber);
 	layout->addWidget(m_tlb);
+	layout->addWidget(m_mixerChannelNumber);
 	layout->addWidget(m_activityIndicator);
 	layout->addWidget(m_volumeKnob);
 	layout->addWidget(m_panningKnob);
