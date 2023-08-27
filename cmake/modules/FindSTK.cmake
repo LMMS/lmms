@@ -26,6 +26,13 @@ else()
 	endif()
 endif()
 
+# find STK rawwave path
+find_path(STK_RAWWAVE_ROOT
+	NAMES silence.raw sinewave.raw
+	HINTS "${STK_INCLUDE_DIR}/.."
+	PATH_SUFFIXES share/stk/rawwaves share/libstk/rawwaves
+)
+
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(STK
 	REQUIRED_VARS STK_LIBRARY STK_INCLUDE_DIR

@@ -57,7 +57,7 @@ SimpleTextFloat * Knob::s_textFloat = nullptr;
 
 
 
-Knob::Knob( knobTypes _knob_num, QWidget * _parent, const QString & _name ) :
+Knob::Knob( KnobType _knob_num, QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
 	FloatModelView( new FloatModel( 0, 0, 0, 1, nullptr, _name, true ), this ),
 	m_label( "" ),
@@ -75,7 +75,7 @@ Knob::Knob( knobTypes _knob_num, QWidget * _parent, const QString & _name ) :
 }
 
 Knob::Knob( QWidget * _parent, const QString & _name ) :
-	Knob( knobBright_26, _parent, _name )
+	Knob( KnobType::Bright26, _parent, _name )
 {
 }
 
@@ -106,15 +106,15 @@ void Knob::initUi( const QString & _name )
 	// overrides that color.
 	switch (knobNum())
 	{
-	case knobSmall_17:
-	case knobBright_26:
-	case knobDark_28:
+	case KnobType::Small17:
+	case KnobType::Bright26:
+	case KnobType::Dark28:
 		m_lineActiveColor = QApplication::palette().color(QPalette::Active, QPalette::WindowText);
 		m_arcActiveColor = QColor(QApplication::palette().color(
 									QPalette::Active, QPalette::WindowText));
 		m_arcActiveColor.setAlpha(70);
 		break;
-	case knobVintage_32:
+	case KnobType::Vintage32:
 		m_lineActiveColor = QApplication::palette().color(QPalette::Active, QPalette::Shadow);
 		m_arcActiveColor = QColor(QApplication::palette().color(
 									QPalette::Active, QPalette::Shadow));
@@ -132,24 +132,24 @@ void Knob::initUi( const QString & _name )
 
 void Knob::onKnobNumUpdated()
 {
-	if( m_knobNum != knobStyled )
+	if( m_knobNum != KnobType::Styled )
 	{
 		QString knobFilename;
 		switch (m_knobNum)
 		{
-		case knobDark_28:
+		case KnobType::Dark28:
 			knobFilename = "knob01";
 			break;
-		case knobBright_26:
+		case KnobType::Bright26:
 			knobFilename = "knob02";
 			break;
-		case knobSmall_17:
+		case KnobType::Small17:
 			knobFilename = "knob03";
 			break;
-		case knobVintage_32:
+		case KnobType::Vintage32:
 			knobFilename = "knob05";
 			break;
-		case knobStyled: // only here to stop the compiler from complaining
+		case KnobType::Styled: // only here to stop the compiler from complaining
 			break;
 		}
 
@@ -251,7 +251,7 @@ void Knob::setOuterRadius( float r )
 
 
 
-knobTypes Knob::knobNum() const
+KnobType Knob::knobNum() const
 {
 	return m_knobNum;
 }
@@ -259,7 +259,7 @@ knobTypes Knob::knobNum() const
 
 
 
-void Knob::setknobNum( knobTypes k )
+void Knob::setknobNum( KnobType k )
 {
 	if( m_knobNum != k )
 	{
@@ -397,7 +397,7 @@ void Knob::drawKnob( QPainter * _p )
 
 	QPoint mid;
 
-	if( m_knobNum == knobStyled )
+	if( m_knobNum == KnobType::Styled )
 	{
 		p.setRenderHint( QPainter::Antialiasing );
 
@@ -448,17 +448,17 @@ void Knob::drawKnob( QPainter * _p )
 	p.setPen(QPen(currentLineColor, 2));
 	switch( m_knobNum )
 	{
-		case knobSmall_17:
+		case KnobType::Small17:
 		{
 			p.drawLine( calculateLine( mid, radius-2 ) );
 			break;
 		}
-		case knobBright_26:
+		case KnobType::Bright26:
 		{
 			p.drawLine( calculateLine( mid, radius-5 ) );
 			break;
 		}
-		case knobDark_28:
+		case KnobType::Dark28:
 		{
 			const float rb = qMax<float>( ( radius - 10 ) / 3.0,
 									0.0 );
@@ -468,12 +468,12 @@ void Knob::drawKnob( QPainter * _p )
 			p.drawLine( ln );
 			break;
 		}
-		case knobVintage_32:
+		case KnobType::Vintage32:
 		{
 			p.drawLine( calculateLine( mid, radius-2, 2 ) );
 			break;
 		}
-		case knobStyled:
+		case KnobType::Styled:
 			break;
 	}
 
@@ -689,10 +689,52 @@ void Knob::paintEvent( QPaintEvent * _me )
 void Knob::wheelEvent(QWheelEvent * we)
 {
 	we->accept();
-	const float stepMult = model()->range() / 2000 / model()->step<float>();
-	const int inc = ((we->angleDelta().y() > 0 ) ? 1 : -1) * ((stepMult < 1 ) ? 1 : stepMult);
-	model()->incValue( inc );
+	const int deltaY = we->angleDelta().y();
+	float direction = deltaY > 0 ? 1 : -1;
 
+	auto * m = model();
+	float const step = m->step<float>();
+	float const range = m->range();
+
+	// This is the default number of steps or mouse wheel events that it takes to sweep
+	// from the lowest value to the highest value.
+	// It might be modified if the user presses modifier keys. See below.
+	float numberOfStepsForFullSweep = 100.;
+
+	auto const modKeys = we->modifiers();
+	if (modKeys == Qt::ShiftModifier)
+	{
+		// The shift is intended to go through the values in very coarse steps as in:
+		// "Shift into overdrive"
+		numberOfStepsForFullSweep = 10;
+	}
+	else if (modKeys == Qt::ControlModifier)
+	{
+		// The control key gives more control, i.e. it enables more fine-grained adjustments
+		numberOfStepsForFullSweep = 1000;
+	}
+	else if (modKeys == Qt::AltModifier)
+	{
+		// The alt key enables even finer adjustments
+		numberOfStepsForFullSweep = 2000;
+
+		// It seems that on some systems pressing Alt with mess with the directions,
+		// i.e. scrolling the mouse wheel is interpreted as pressing the mouse wheel
+		// left and right. Account for this quirk.
+		if (deltaY == 0)
+		{
+			int const deltaX = we->angleDelta().x();
+			if (deltaX != 0)
+			{
+				direction = deltaX > 0 ? 1 : -1;
+			}
+		}
+	}
+
+	// Compute the number of steps but make sure that we always do at least one step
+	const float stepMult = std::max(range / numberOfStepsForFullSweep / step, 1.f);
+	const int inc = direction * stepMult;
+	model()->incValue(inc);
 
 	s_textFloat->setText( displayValue() );
 	s_textFloat->moveGlobal( this, QPoint( width() + 2, 0 ) );

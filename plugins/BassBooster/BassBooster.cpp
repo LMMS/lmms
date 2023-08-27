@@ -41,7 +41,7 @@ Plugin::Descriptor PLUGIN_EXPORT bassbooster_plugin_descriptor =
 	QT_TRANSLATE_NOOP( "PluginBrowser", "Boost your bass the fast and simple way" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,

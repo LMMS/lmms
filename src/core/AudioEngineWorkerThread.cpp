@@ -91,7 +91,7 @@ void AudioEngineWorkerThread::JobQueue::run()
 			}
 		}
 		// always exit loop if we're not in dynamic mode
-		processedJob = processedJob && ( m_opMode == Dynamic );
+		processedJob = processedJob && ( m_opMode == OperationMode::Dynamic );
 	}
 }
 

@@ -1,11 +1,3 @@
-# For MacOS, use "OLD" RPATH install_name behavior
-# This can be changed to "NEW" safely if install_apple.sh.in
-# is updated to relink libcarlabase.dylib.  MacOS 10.8 uses
-# cmake 3.9.6, so this can be done at any time.
-IF(NOT CMAKE_VERSION VERSION_LESS 3.9)
-  CMAKE_POLICY(SET CMP0068 OLD)
-ENDIF()
-
 # If Carla was not provided by the system, make a dummy library instead
 if(LMMS_HAVE_WEAKCARLA)
   SET(CARLA_INCLUDE_DIRS
@@ -15,14 +7,13 @@ if(LMMS_HAVE_WEAKCARLA)
     ${CMAKE_CURRENT_SOURCE_DIR}/carla/source/backend
   )
 
+  # force "lib" prefix
   IF(LMMS_BUILD_WIN32)
-      # use carla.dll
-      SET(CMAKE_SHARED_LIBRARY_PREFIX "")
-      SET(CARLA_NATIVE_LIB carla)
-  ELSE()
-      # use libcarla_native-plugin
-      SET(CARLA_NATIVE_LIB carla_native-plugin)
+      SET(CMAKE_SHARED_LIBRARY_PREFIX "lib")
   ENDIF()
+
+  SET(CARLA_NATIVE_LIB carla_native-plugin)
+
   ADD_LIBRARY(${CARLA_NATIVE_LIB} SHARED DummyCarla.cpp)
   TARGET_INCLUDE_DIRECTORIES(${CARLA_NATIVE_LIB} PUBLIC ${CARLA_INCLUDE_DIRS})
   INSTALL(TARGETS ${CARLA_NATIVE_LIB}

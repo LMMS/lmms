@@ -88,7 +88,7 @@ public:
 
 	Flags flags() const override
 	{
-		return IsSingleStreamed | IsMidiBased;
+		return Flag::IsSingleStreamed | Flag::IsMidiBased;
 	}
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;

@@ -220,7 +220,7 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
 
 CarlaInstrument::~CarlaInstrument()
 {
-    Engine::audioEngine()->removePlayHandlesOfTypes(instrumentTrack(), PlayHandle::TypeNotePlayHandle | PlayHandle::TypeInstrumentPlayHandle);
+    Engine::audioEngine()->removePlayHandlesOfTypes(instrumentTrack(), PlayHandle::Type::NotePlayHandle | PlayHandle::Type::InstrumentPlayHandle);
 
     if (fHost.resourceDir != nullptr)
     {
@@ -345,7 +345,7 @@ intptr_t CarlaInstrument::handleDispatcher(const NativeHostDispatcherOpcode opco
 
 Instrument::Flags CarlaInstrument::flags() const
 {
-    return IsSingleStreamed|IsMidiBased|IsNotBendable;
+    return Flag::IsSingleStreamed | Flag::IsMidiBased | Flag::IsNotBendable;
 }
 
 QString CarlaInstrument::nodeName() const
@@ -1015,7 +1015,7 @@ void CarlaParamsView::refreshKnobs()
 	for (uint32_t i=0; i < m_carlaInstrument->m_paramModels.count(); ++i)
 	{
 		bool enabled = m_carlaInstrument->m_paramModels[i]->enabled();
-		m_knobs.push_back(new Knob(knobDark_28, m_inputScrollAreaWidgetContent));
+		m_knobs.push_back(new Knob(KnobType::Dark28, m_inputScrollAreaWidgetContent));
 		QString name = (*m_carlaInstrument->m_paramModels[i]).displayName();
 		m_knobs[i]->setHintText(name, "");
 		m_knobs[i]->setLabel(name);
