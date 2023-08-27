@@ -26,6 +26,8 @@
 #include <QUrl>
 #include <QListView>
 #include <QStandardPaths>
+#include <QStorageInfo>
+#include <QStringList>
 
 #include "ConfigManager.h"
 #include "FileDialog.h"
@@ -45,25 +47,65 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 
 	setOption( QFileDialog::DontUseNativeDialog );
 
-	// Add additional locations to the sidebar
+#ifdef LMMS_BUILD_LINUX
+	QList<QUrl> urls;
+#endif
+
+#ifndef LMMS_BUILD_LINUX
 	QList<QUrl> urls = sidebarUrls();
-	urls << QUrl::fromLocalFile( QStandardPaths::writableLocation( QStandardPaths::DesktopLocation ) );
-	// Find downloads directory
-	QDir downloadDir( QDir::homePath() + "/Downloads" );
-	if ( ! downloadDir.exists() )
-		downloadDir.setPath(QStandardPaths::writableLocation( QStandardPaths::DownloadLocation ));
-	if ( downloadDir.exists() )
-		urls << QUrl::fromLocalFile( downloadDir.absolutePath() );
+#endif
 
-	urls << QUrl::fromLocalFile( QStandardPaths::writableLocation( QStandardPaths::MusicLocation ) );
-	urls << QUrl::fromLocalFile( ConfigManager::inst()->workingDir() );
+	QDir desktopDir;
+	desktopDir.setPath(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation));
+	if (desktopDir.exists())
+	{
+		urls << QUrl::fromLocalFile(desktopDir.absolutePath());
+	}
+	
+	QDir downloadDir(QDir::homePath() + "/Downloads");
+	if (!downloadDir.exists())
+	{
+		downloadDir.setPath(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation));
+	}
+	if (downloadDir.exists())
+	{
+		urls << QUrl::fromLocalFile(downloadDir.absolutePath());
+	}
 
+	QDir musicDir;
+	musicDir.setPath(QStandardPaths::writableLocation(QStandardPaths::MusicLocation));
+	if (musicDir.exists())
+	{
+		urls << QUrl::fromLocalFile(musicDir.absolutePath());
+	}
+
+	urls << QUrl::fromLocalFile(ConfigManager::inst()->workingDir());
+	
 	// Add `/Volumes` directory on OS X systems, this allows the user to browse
 	// external disk drives.
 #ifdef LMMS_BUILD_APPLE
 	QDir volumesDir( QDir("/Volumes") );
 	if ( volumesDir.exists() )
 		urls << QUrl::fromLocalFile( volumesDir.absolutePath() );
+#endif
+
+#ifdef LMMS_BUILD_LINUX
+
+	// FileSystem types : https://www.javatpoint.com/linux-file-system
+	QStringList usableFileSystems = {"ext", "ext2", "ext3", "ext4", "jfs", "reiserfs"};
+
+	foreach (QStorageInfo storage, QStorageInfo::mountedVolumes())
+	{
+		storage.refresh();
+
+		if (usableFileSystems.contains(QString(storage.fileSystemType()), Qt::CaseInsensitive))
+		{
+			if (storage.isValid() && storage.isReady())
+			{
+				urls << QUrl::fromLocalFile(storage.displayName());	
+			}
+		}
+	}
 #endif
 
 	setSidebarUrls(urls);
