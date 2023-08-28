@@ -62,8 +62,6 @@ private:
 	QTimer * m_hideTimer;
 
 };
-
-
 } // namespace lmms::gui
 
 #endif
