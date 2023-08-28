@@ -108,7 +108,7 @@ void SamplePlayHandle::play( sampleFrame * buffer )
 	if( !( m_track && m_track->isMuted() )
 				&& !(m_patternTrack && m_patternTrack->isMuted()))
 	{
-/*		StereoVolumeVector v 
+/*		StereoVolumeVector v =
 			{ { m_volumeModel->value() / DefaultVolume,
 				m_volumeModel->value() / DefaultVolume } };*/
 		// SamplePlayHandle always plays the sample at its original pitch;
