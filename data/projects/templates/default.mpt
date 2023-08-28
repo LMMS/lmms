@@ -70,8 +70,8 @@
         <object id="5865711"/>
       </automationpattern>
     </track>
-    <mixer width="543" x="5" y="310" maximized="0" height="335" visible="1" minimized="0">
-      <mixerchannel num="0" muted="0" volume="1" name="Master" soloed="0">
+    <fxmixer width="543" x="5" y="310" maximized="0" height="335" visible="1" minimized="0">
+      <fxchannel num="0" muted="0" volume="1" name="Master" soloed="0">
         <fxchain numofeffects="0" enabled="0"/>
       </mixerchannel>
     </mixer>
