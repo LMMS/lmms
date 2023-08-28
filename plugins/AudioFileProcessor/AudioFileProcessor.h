@@ -31,6 +31,7 @@
 #include "ComboBoxModel.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
+#include "Sample.h"
 #include "SampleBuffer.h"
 #include "Knob.h"
 
@@ -93,12 +94,12 @@ private slots:
 
 signals:
 	void isPlaying( lmms::f_cnt_t _current_frame );
-
+	void sampleUpdated();
 
 private:
 	using handleState = SampleBuffer::handleState;
 
-	SampleBuffer m_sampleBuffer;
+	std::shared_ptr<Sample> m_sample;
 
 	FloatModel m_ampModel;
 	FloatModel m_startPointModel;
@@ -247,7 +248,7 @@ private:
 		SampleLoop
 	} ;
 
-	SampleBuffer& m_sampleBuffer;
+	Sample* m_sample;
 	QPixmap m_graph;
 	f_cnt_t m_from;
 	f_cnt_t m_to;
@@ -267,8 +268,10 @@ private:
 	f_cnt_t m_framesPlayed;
 	bool m_animation;
 
+	friend class AudioFileProcessorView;
+
 public:
-	AudioFileProcessorWaveView( QWidget * _parent, int _w, int _h, SampleBuffer& buf );
+	AudioFileProcessorWaveView(QWidget * _parent, int _w, int _h, Sample* buf);
 	void setKnobs(knob *_start, knob *_end, knob *_loop );
 
 
