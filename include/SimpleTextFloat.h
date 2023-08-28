@@ -60,8 +60,8 @@ private:
 	QLabel * m_textLabel;
 	QTimer * m_showTimer;
 	QTimer * m_hideTimer;
-
 };
+
 } // namespace lmms::gui
 
 #endif
