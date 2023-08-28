@@ -95,7 +95,7 @@ std::unique_ptr<SampleBuffer2> SampleLoader::createBufferFromFile(const QString&
 	catch (const std::runtime_error& error)
 	{
 		displayError(QString::fromStdString(error.what()));
-		return nullptr;
+		return std::make_unique<SampleBuffer2>();
 	}
 }
 
@@ -108,7 +108,7 @@ std::unique_ptr<SampleBuffer2> SampleLoader::createBufferFromBase64(const QStrin
 	catch (const std::runtime_error& error)
 	{
 		displayError(QString::fromStdString(error.what()));
-		return nullptr;
+		return std::make_unique<SampleBuffer2>();
 	}
 }
 

@@ -29,6 +29,7 @@
 #include <QPair>
 
 #include "PlayHandle.h"
+#include "SampleBuffer2.h"
 #include "TimePos.h"
 
 namespace lmms
@@ -53,7 +54,7 @@ public:
 	bool isFromTrack( const Track * _track ) const override;
 
 	f_cnt_t framesRecorded() const;
-	void createSampleBuffer( SampleBuffer * * _sample_buf );
+	void createSampleBuffer(SampleBuffer2** _sample_buf);
 
 
 private:

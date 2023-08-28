@@ -28,6 +28,7 @@
 #include <QMenu>
 #include <QPainter>
 
+#include "SampleLoader.h"
 #include "embed.h"
 #include "PathUtil.h"
 #include "SampleBuffer.h"
@@ -60,8 +61,8 @@ void SampleClipView::updateSample()
 	update();
 	// set tooltip to filename so that user can see what sample this
 	// sample-clip contains
-	setToolTip(m_clip->m_sampleBuffer->audioFile() != "" ?
-					PathUtil::toAbsolute(m_clip->m_sampleBuffer->audioFile()) :
+	setToolTip(m_clip->m_sample->buffer()->audioFile() != "" ?
+					PathUtil::toAbsolute(m_clip->m_sample->buffer()->audioFile()) :
 					tr( "Double-click to open sample" ) );
 }
 
@@ -112,8 +113,7 @@ void SampleClipView::dropEvent( QDropEvent * _de )
 	}
 	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )
 	{
-		m_clip->m_sampleBuffer->loadFromBase64(
-					StringPairDrag::decodeValue( _de ) );
+		auto buffer = SampleLoader::createBufferFromBase64(StringPairDrag::decodeValue(_de));
 		m_clip->updateLength();
 		update();
 		_de->accept();
@@ -171,12 +171,12 @@ void SampleClipView::mouseReleaseEvent(QMouseEvent *_me)
 
 void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 {
-	QString af = m_clip->m_sampleBuffer->openAudioFile();
+	QString af = gui::SampleLoader::openAudioFile();
 
 	if ( af.isEmpty() ) {} //Don't do anything if no file is loaded
-	else if ( af == m_clip->m_sampleBuffer->audioFile() )
+	else if (af == m_clip->m_sample->buffer()->audioFile())
 	{	//Instead of reloading the existing file, just reset the size
-		int length = (int) ( m_clip->m_sampleBuffer->frames() / Engine::framesPerTick() );
+		int length = static_cast<int>(m_clip->m_sample->buffer()->size() / Engine::framesPerTick());
 		m_clip->changeLength(length);
 	}
 	else
@@ -263,9 +263,9 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	float offset =  m_clip->startTimeOffset() / ticksPerBar * pixelsPerBar();
 	QRect r = QRect( offset, spacing,
 			qMax( static_cast<int>( m_clip->sampleLength() * ppb / ticksPerBar ), 1 ), rect().bottom() - 2 * spacing );
-	m_clip->m_sampleBuffer->visualize( p, r, pe->rect() );
+	m_clip->m_sample->visualize(p, r);
 
-	QString name = PathUtil::cleanName(m_clip->m_sampleBuffer->audioFile());
+	QString name = PathUtil::cleanName(m_clip->m_sample->buffer()->audioFile());
 	paintTextLabel(name, p);
 
 	// disable antialiasing for borders, since its not needed
@@ -318,7 +318,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 void SampleClipView::reverseSample()
 {
-	m_clip->sampleBuffer()->setReversed(!m_clip->sampleBuffer()->reversed());
+	m_clip->sample()->setReversed(!m_clip->sample()->reversed());
 	Engine::getSong()->setModified();
 	update();
 }
