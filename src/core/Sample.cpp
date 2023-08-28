@@ -113,7 +113,7 @@ auto swap(Sample& first, Sample& second) -> void
 
 bool Sample::play(sampleFrame* dst, PlaybackState* state, int numFrames, float desiredFrequency, Loop loopMode) const
 {
-	if (m_buffer->sampleRate() <= 0) { return false; }
+	assert(m_buffer != nullptr && m_buffer->sampleRate() > 0);
 
 	const auto lock = std::shared_lock{m_mutex};
 	const auto resampleRatio
@@ -232,37 +232,40 @@ void Sample::visualize(QPainter& p, const QRect& dr, int fromFrame, int toFrame)
 
 auto Sample::sampleDuration() const -> int
 {
+	assert(m_buffer != nullptr && m_buffer->sampleRate() > 0);
 	const auto lock = std::shared_lock{m_mutex};
-	return m_buffer->sampleRate() > 0 ? static_cast<double>(m_endFrame - m_startFrame) / m_buffer->sampleRate() * 1000
-									  : 0;
+	return static_cast<double>(m_endFrame - m_startFrame) / m_buffer->sampleRate() * 1000;
 }
 
 auto Sample::sampleFile() const -> QString
 {
+	assert(m_buffer != nullptr);
 	return m_buffer->audioFile();
 }
 
 auto Sample::sampleRate() const -> int
 {
+	assert(m_buffer != nullptr);
 	return m_buffer->sampleRate();
 }
 
 auto Sample::sampleSize() const -> int
 {
+	assert(m_buffer != nullptr);
 	return m_buffer->size();
 }
 
 auto Sample::toBase64() const -> QString
 {
+	assert(m_buffer != nullptr);
 	return m_buffer->toBase64();
 }
 
 auto Sample::playbackSize() const -> int
 {
+	assert(m_buffer != nullptr && m_buffer->sampleRate() > 0);
 	const auto lock = std::shared_lock{m_mutex};
-	return m_buffer->sampleRate() > 0
-		? m_buffer->size() * Engine::audioEngine()->processingSampleRate() / m_buffer->sampleRate()
-		: 0;
+	return m_buffer->size() * Engine::audioEngine()->processingSampleRate() / m_buffer->sampleRate();
 }
 
 auto Sample::buffer() const -> std::shared_ptr<const SampleBuffer>
