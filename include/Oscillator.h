@@ -28,6 +28,7 @@
 
 #include <cassert>
 #include <fftw3.h>
+#include <memory>
 #include <cstdlib>
 #include "interpolation.h"
 
