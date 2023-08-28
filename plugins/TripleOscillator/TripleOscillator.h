@@ -26,6 +26,8 @@
 #ifndef _TRIPLE_OSCILLATOR_H
 #define _TRIPLE_OSCILLATOR_H
 
+#include <memory>
+
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "AutomatableModel.h"
