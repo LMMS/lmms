@@ -40,7 +40,7 @@ class MidiPortMenu : public QMenu, public ModelView
 {
 	Q_OBJECT
 public:
-	MidiPortMenu( MidiPort::Modes _mode );
+	MidiPortMenu( MidiPort::Mode _mode );
 	~MidiPortMenu() override = default;
 
 
@@ -55,7 +55,7 @@ protected slots:
 private:
 	void modelChanged() override;
 
-	MidiPort::Modes m_mode;
+	MidiPort::Mode m_mode;
 
 } ;
 

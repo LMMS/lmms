@@ -137,12 +137,12 @@ void TrackOperationsWidget::mousePressEvent( QMouseEvent * me )
 {
 	if( me->button() == Qt::LeftButton &&
 		me->modifiers() & Qt::ControlModifier &&
-			m_trackView->getTrack()->type() != Track::PatternTrack)
+			m_trackView->getTrack()->type() != Track::Type::Pattern)
 	{
-		DataFile dataFile( DataFile::DragNDropData );
+		DataFile dataFile( DataFile::Type::DragNDropData );
 		m_trackView->getTrack()->saveState( dataFile, dataFile.content() );
 		new StringPairDrag( QString( "track_%1" ).arg(
-					m_trackView->getTrack()->type() ),
+					static_cast<int>(m_trackView->getTrack()->type()) ),
 			dataFile.toString(), m_trackView->getTrackSettingsWidget()->grab(),
 									this );
 	}

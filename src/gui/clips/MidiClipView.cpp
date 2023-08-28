@@ -205,7 +205,7 @@ void MidiClipView::transposeSelection()
 
 void MidiClipView::constructContextMenu( QMenu * _cm )
 {
-	bool isBeat = m_clip->type() == MidiClip::BeatClip;
+	bool isBeat = m_clip->type() == MidiClip::Type::BeatClip;
 
 	auto a = new QAction(embed::getIconPixmap("piano"), tr("Open in piano-roll"), _cm);
 	_cm->insertAction( _cm->actions()[0], a );
@@ -254,7 +254,7 @@ void MidiClipView::mousePressEvent( QMouseEvent * _me )
 {
 	bool displayPattern = fixedClips() || (pixelsPerBar() >= 96 && m_legacySEPattern);
 	if( _me->button() == Qt::LeftButton &&
-		m_clip->m_clipType == MidiClip::BeatClip &&
+		m_clip->m_clipType == MidiClip::Type::BeatClip &&
 		displayPattern && _me->y() > height() - s_stepBtnOff->height() )
 
 	// when mouse button is pressed in pattern mode
@@ -312,7 +312,7 @@ void MidiClipView::mouseDoubleClickEvent(QMouseEvent *_me)
 		_me->ignore();
 		return;
 	}
-	if( m_clip->m_clipType == MidiClip::MelodyClip || !fixedClips() )
+	if( m_clip->m_clipType == MidiClip::Type::MelodyClip || !fixedClips() )
 	{
 		openInPianoRoll();
 	}
@@ -323,7 +323,7 @@ void MidiClipView::mouseDoubleClickEvent(QMouseEvent *_me)
 
 void MidiClipView::wheelEvent(QWheelEvent * we)
 {
-	if(m_clip->m_clipType == MidiClip::BeatClip &&
+	if(m_clip->m_clipType == MidiClip::Type::BeatClip &&
 				(fixedClips() || pixelsPerBar() >= 96) &&
 				position(we).y() > height() - s_stepBtnOff->height())
 	{
@@ -401,7 +401,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	QColor c;
 	bool const muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();
 	bool current = getGUI()->pianoRoll()->currentMidiClip() == m_clip;
-	bool beatClip = m_clip->m_clipType == MidiClip::BeatClip;
+	bool beatClip = m_clip->m_clipType == MidiClip::Type::BeatClip;
 
 	if( beatClip )
 	{
@@ -526,7 +526,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 		}
 	}
 	// Melody clip and Beat clip (on Song Editor) paint event
-	else if (!noteCollection.empty())
+	else if (m_clip->m_clipType == MidiClip::Type::MelodyClip && !noteCollection.empty())
 	{
 		// Compute the minimum and maximum key in the clip
 		// so that we know how much there is to draw.

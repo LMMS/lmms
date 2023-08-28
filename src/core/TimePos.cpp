@@ -190,7 +190,7 @@ tick_t TimePos::ticksPerBar( const TimeSig &sig )
 int TimePos::stepsPerBar()
 {
 	int steps = ticksPerBar() / DefaultBeatsPerBar;
-	return qMax( 1, steps );
+	return std::max(1, steps);
 }
 
 

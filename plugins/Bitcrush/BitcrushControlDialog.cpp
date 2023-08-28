@@ -53,13 +53,13 @@ BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 	outLabel->move( 139, 15 );
 	
 	// input knobs
-	auto inGain = new Knob(knobBright_26, this);
+	auto inGain = new Knob(KnobType::Bright26, this);
 	inGain->move( 16, 32 );
 	inGain->setModel( & controls->m_inGain );
 	inGain->setLabel( tr( "GAIN" ) );
 	inGain->setHintText( tr( "Input gain:" ) , " dBFS" );
 
-	auto inNoise = new Knob(knobBright_26, this);
+	auto inNoise = new Knob(KnobType::Bright26, this);
 	inNoise->move( 14, 76 );
 	inNoise->setModel( & controls->m_inNoise );
 	inNoise->setLabel( tr( "NOISE" ) );
@@ -67,13 +67,13 @@ BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 	
 	
 	// output knobs
-	auto outGain = new Knob(knobBright_26, this);
+	auto outGain = new Knob(KnobType::Bright26, this);
 	outGain->move( 138, 32 );
 	outGain->setModel( & controls->m_outGain );
 	outGain->setLabel( tr( "GAIN" ) );
 	outGain->setHintText( tr( "Output gain:" ) , " dBFS" );
 
-	auto outClip = new Knob(knobBright_26, this);
+	auto outClip = new Knob(KnobType::Bright26, this);
 	outClip->move( 138, 76 );
 	outClip->setModel( & controls->m_outClip );
 	outClip->setLabel( tr( "CLIP" ) );
@@ -82,25 +82,25 @@ BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 	
 	
 	// leds
-	auto rateEnabled = new LedCheckBox("", this, tr("Rate enabled"), LedCheckBox::Green);
+	auto rateEnabled = new LedCheckBox("", this, tr("Rate enabled"), LedCheckBox::LedColor::Green);
 	rateEnabled->move( 64, 14 );
 	rateEnabled->setModel( & controls->m_rateEnabled );
 	rateEnabled->setToolTip(tr("Enable sample-rate crushing"));
 
-	auto depthEnabled = new LedCheckBox("", this, tr("Depth enabled"), LedCheckBox::Green);
+	auto depthEnabled = new LedCheckBox("", this, tr("Depth enabled"), LedCheckBox::LedColor::Green);
 	depthEnabled->move( 101, 14 );
 	depthEnabled->setModel( & controls->m_depthEnabled );
 	depthEnabled->setToolTip(tr("Enable bit-depth crushing"));
 	
 	
 	// rate crushing knobs
-	auto rate = new Knob(knobBright_26, this);
+	auto rate = new Knob(KnobType::Bright26, this);
 	rate->move( 59, 32 );
 	rate->setModel( & controls->m_rate );
 	rate->setLabel( tr( "FREQ" ) );
 	rate->setHintText( tr( "Sample rate:" ) , " Hz" );
 
-	auto stereoDiff = new Knob(knobBright_26, this);
+	auto stereoDiff = new Knob(KnobType::Bright26, this);
 	stereoDiff->move( 72, 76 );
 	stereoDiff->setModel( & controls->m_stereoDiff );
 	stereoDiff->setLabel( tr( "STEREO" ) );
@@ -108,7 +108,7 @@ BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 	
 	
 	// depth crushing knob
-	auto levels = new Knob(knobBright_26, this);
+	auto levels = new Knob(KnobType::Bright26, this);
 	levels->move( 92, 32 );
 	levels->setModel( & controls->m_levels );
 	levels->setLabel( tr( "QUANT" ) );
