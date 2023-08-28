@@ -237,6 +237,26 @@ auto Sample::sampleDuration() const -> int
 									  : 0;
 }
 
+auto Sample::sampleFile() const -> QString
+{
+	return m_buffer->audioFile();
+}
+
+auto Sample::sampleRate() const -> int
+{
+	return m_buffer->sampleRate();
+}
+
+auto Sample::sampleSize() const -> int
+{
+	return m_buffer->size();
+}
+
+auto Sample::toBase64() const -> QString
+{
+	return m_buffer->toBase64();
+}
+
 auto Sample::playbackSize() const -> int
 {
 	const auto lock = std::shared_lock{m_mutex};

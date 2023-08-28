@@ -120,7 +120,7 @@ void SampleClip::changeLength( const TimePos & _length )
 
 QString SampleClip::sampleFile() const
 {
-	return m_sample->buffer()->audioFile();
+	return m_sample->sampleFile();
 }
 
 
@@ -260,10 +260,10 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	if( sampleFile() == "" )
 	{
 		QString s;
-		_this.setAttribute("data", m_sample->buffer()->toBase64());
+		_this.setAttribute("data", m_sample->toBase64());
 	}
 
-	_this.setAttribute("sample_rate", m_sample->buffer()->sampleRate());
+	_this.setAttribute("sample_rate", m_sample->sampleRate());
 	if( usesCustomClipColor() )
 	{
 		_this.setAttribute( "color", color().name() );

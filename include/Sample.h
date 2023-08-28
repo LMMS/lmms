@@ -97,9 +97,15 @@ public:
 
 	auto play(sampleFrame* dst, PlaybackState* state, int numFrames, float desiredFrequency = DefaultBaseFreq,
 		Loop loopMode = Loop::Off) const -> bool;
-	auto visualize(QPainter& p, const QRect& dr, int fromFrame = 0, int toFrame = 0) const -> void;
-	auto sampleDuration() const -> int;
 	auto playbackSize() const -> int;
+	auto visualize(QPainter& p, const QRect& dr, int fromFrame = 0, int toFrame = 0) const -> void;
+
+	auto sampleDuration() const -> int;
+	auto sampleFile() const -> QString;
+	auto sampleRate() const -> int;
+	auto sampleSize() const -> int;
+
+	auto toBase64() const -> QString;
 
 	auto buffer() const -> std::shared_ptr<const SampleBuffer2>;
 	auto startFrame() const -> int;
