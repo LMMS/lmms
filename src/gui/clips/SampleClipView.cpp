@@ -31,7 +31,6 @@
 #include "SampleLoader.h"
 #include "embed.h"
 #include "PathUtil.h"
-#include "SampleBuffer.h"
 #include "SampleClip.h"
 #include "Song.h"
 #include "StringPairDrag.h"
