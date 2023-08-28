@@ -34,7 +34,7 @@
 namespace lmms
 {
 
-class SampleBuffer2;
+class SampleBuffer;
 
 
 class AudioSampleRecorder : public AudioDevice
@@ -44,7 +44,7 @@ public:
 	~AudioSampleRecorder() override;
 
 	f_cnt_t framesRecorded() const;
-	void createSampleBuffer(SampleBuffer2** sampleBuffer);
+	void createSampleBuffer(SampleBuffer** sampleBuffer);
 
 
 private:

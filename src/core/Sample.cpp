@@ -1,5 +1,5 @@
 /*
- * Sample.cpp - State for container-class SampleBuffer2
+ * Sample.cpp - State for container-class SampleBuffer
  *
  * Copyright (c) 2023 saker <sakertooth@gmail.com>
  *
@@ -30,7 +30,7 @@
 namespace lmms {
 
 Sample::Sample(const QString& audioFile)
-	: m_buffer(std::make_shared<SampleBuffer2>(audioFile))
+	: m_buffer(std::make_shared<SampleBuffer>(audioFile))
 	, m_startFrame(0)
 	, m_endFrame(m_buffer->size())
 	, m_loopStartFrame(0)
@@ -39,7 +39,7 @@ Sample::Sample(const QString& audioFile)
 }
 
 Sample::Sample(const QByteArray& base64, int sampleRate)
-	: m_buffer(std::make_shared<SampleBuffer2>(base64, sampleRate))
+	: m_buffer(std::make_shared<SampleBuffer>(base64, sampleRate))
 	, m_startFrame(0)
 	, m_endFrame(m_buffer->size())
 	, m_loopStartFrame(0)
@@ -48,7 +48,7 @@ Sample::Sample(const QByteArray& base64, int sampleRate)
 }
 
 Sample::Sample(const sampleFrame* data, int numFrames, int sampleRate)
-	: m_buffer(std::make_shared<SampleBuffer2>(data, numFrames, sampleRate))
+	: m_buffer(std::make_shared<SampleBuffer>(data, numFrames, sampleRate))
 	, m_startFrame(0)
 	, m_endFrame(m_buffer->size())
 	, m_loopStartFrame(0)
@@ -56,7 +56,7 @@ Sample::Sample(const sampleFrame* data, int numFrames, int sampleRate)
 {
 }
 
-Sample::Sample(std::shared_ptr<const SampleBuffer2> buffer)
+Sample::Sample(std::shared_ptr<const SampleBuffer> buffer)
 	: m_buffer(buffer)
 	, m_startFrame(0)
 	, m_endFrame(m_buffer->size())
@@ -265,7 +265,7 @@ auto Sample::playbackSize() const -> int
 		: 0;
 }
 
-auto Sample::buffer() const -> std::shared_ptr<const SampleBuffer2>
+auto Sample::buffer() const -> std::shared_ptr<const SampleBuffer>
 {
 	const auto lock = std::shared_lock{m_mutex};
 	return m_buffer;

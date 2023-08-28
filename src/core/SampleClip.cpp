@@ -125,10 +125,10 @@ QString SampleClip::sampleFile() const
 
 
 
-void SampleClip::setSampleBuffer( SampleBuffer2* sb )
+void SampleClip::setSampleBuffer( SampleBuffer* sb )
 {
 	// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-	auto buffer = std::shared_ptr<const SampleBuffer2>(sb);
+	auto buffer = std::shared_ptr<const SampleBuffer>(sb);
 	std::atomic_store(&m_sample, std::make_shared<Sample>(buffer));
 	updateLength();
 

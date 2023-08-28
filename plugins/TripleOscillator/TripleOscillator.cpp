@@ -93,7 +93,7 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 				tr( "Modulation type %1" ).arg( _idx+1 ) ),
 	m_useWaveTableModel(true),
 
-	m_sampleBuffer( new SampleBuffer2 ),
+	m_sampleBuffer( new SampleBuffer ),
 	m_volumeLeft( 0.0f ),
 	m_volumeRight( 0.0f ),
 	m_detuningLeft( 0.0f ),
@@ -146,7 +146,7 @@ void OscillatorObject::oscUserDefWaveDblClick()
 	QString af = gui::SampleLoader::openWaveformFile();
 	auto buffer = gui::SampleLoader::createBufferFromFile(af);
 	// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-	std::atomic_store(&m_sampleBuffer, std::shared_ptr<const SampleBuffer2>(std::move(buffer)));
+	std::atomic_store(&m_sampleBuffer, std::shared_ptr<const SampleBuffer>(std::move(buffer)));
 
 	if( af != "" )
 	{
@@ -293,7 +293,7 @@ void TripleOscillator::loadSettings( const QDomElement & _this )
 
 		auto buffer = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile" + is));
 		// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-		std::atomic_store(&m_osc[i]->m_sampleBuffer, std::shared_ptr<const SampleBuffer2>(std::move(buffer)));
+		std::atomic_store(&m_osc[i]->m_sampleBuffer, std::shared_ptr<const SampleBuffer>(std::move(buffer)));
 	}
 }
 

@@ -29,7 +29,7 @@
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Sample.h"
-#include "SampleBuffer2.h"
+#include "SampleBuffer.h"
 #include "AutomatableModel.h"
 #include "MemoryManager.h"
 

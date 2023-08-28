@@ -29,7 +29,7 @@
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "AutomatableModel.h"
-#include "SampleBuffer2.h"
+#include "SampleBuffer.h"
 
 namespace lmms
 {
@@ -69,7 +69,7 @@ private:
 	IntModel m_waveShapeModel;
 	IntModel m_modulationAlgoModel;
 	BoolModel m_useWaveTableModel;
-	std::shared_ptr<const SampleBuffer2> m_sampleBuffer;
+	std::shared_ptr<const SampleBuffer> m_sampleBuffer;
 
 	float m_volumeLeft;
 	float m_volumeRight;

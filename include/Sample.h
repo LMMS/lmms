@@ -1,5 +1,5 @@
 /*
- * Sample.h - State for container-class SampleBuffer2
+ * Sample.h - State for container-class SampleBuffer
  *
  * Copyright (c) 2023 saker <sakertooth@gmail.com>
  *
@@ -29,7 +29,7 @@
 #include <memory>
 
 #include "Note.h"
-#include "SampleBuffer2.h"
+#include "SampleBuffer.h"
 #include "lmms_export.h"
 
 #ifdef __MINGW32__
@@ -88,7 +88,7 @@ public:
 	Sample(const QString& audioFile);
 	Sample(const QByteArray& base64, int sampleRate = Engine::audioEngine()->processingSampleRate());
 	Sample(const sampleFrame* data, int numFrames, int sampleRate = Engine::audioEngine()->processingSampleRate());
-	Sample(std::shared_ptr<const SampleBuffer2> buffer);
+	Sample(std::shared_ptr<const SampleBuffer> buffer);
 	Sample(const Sample& other);
 	Sample(Sample&& other) noexcept;
 
@@ -107,7 +107,7 @@ public:
 
 	auto toBase64() const -> QString;
 
-	auto buffer() const -> std::shared_ptr<const SampleBuffer2>;
+	auto buffer() const -> std::shared_ptr<const SampleBuffer>;
 	auto startFrame() const -> int;
 	auto endFrame() const -> int;
 	auto loopStartFrame() const -> int;
@@ -144,7 +144,7 @@ private:
 	auto amplifySampleRange(sampleFrame* src, int numFrames) const -> void;
 
 private:
-	std::shared_ptr<const SampleBuffer2> m_buffer = std::make_shared<SampleBuffer2>();
+	std::shared_ptr<const SampleBuffer> m_buffer = std::make_shared<SampleBuffer>();
 	int m_startFrame = 0;
 	int m_endFrame = 0;
 	int m_loopStartFrame = 0;

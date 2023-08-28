@@ -36,7 +36,7 @@
 #include "lmmsconfig.h"
 #include "AudioEngine.h"
 #include "OscillatorConstants.h"
-#include "SampleBuffer2.h"
+#include "SampleBuffer.h"
 
 namespace lmms
 {
@@ -91,14 +91,14 @@ public:
 
 	static void waveTableInit();
 	static void destroyFFTPlans();
-	static std::unique_ptr<OscillatorConstants::waveform_t> generateAntiAliasUserWaveTable(const SampleBuffer2 *sampleBuffer);
+	static std::unique_ptr<OscillatorConstants::waveform_t> generateAntiAliasUserWaveTable(const SampleBuffer *sampleBuffer);
 
 	inline void setUseWaveTable(bool n)
 	{
 		m_useWaveTable = n;
 	}
 
-	inline void setUserWave(std::shared_ptr<const SampleBuffer2> _wave)
+	inline void setUserWave(std::shared_ptr<const SampleBuffer> _wave)
 	{
 		m_userWave = _wave;
 	}
@@ -164,7 +164,7 @@ public:
 		return 1.0f - fast_rand() * 2.0f / FAST_RAND_MAX;
 	}
 
-	static inline sample_t userWaveSample(const SampleBuffer2* buffer, const float sample)
+	static inline sample_t userWaveSample(const SampleBuffer* buffer, const float sample)
 	{
 		if (buffer == nullptr || buffer->size() == 0) { return 0; }
 		const auto frames = buffer->size();
@@ -256,7 +256,7 @@ private:
 	Oscillator * m_subOsc;
 	float m_phaseOffset;
 	float m_phase;
-	std::shared_ptr<const SampleBuffer2> m_userWave;
+	std::shared_ptr<const SampleBuffer> m_userWave;
 	std::shared_ptr<const OscillatorConstants::waveform_t> m_userAntiAliasWaveTable;
 	bool m_useWaveTable;
 	// There are many update*() variants; the modulator flag is stored as a member variable to avoid

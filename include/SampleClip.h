@@ -78,7 +78,7 @@ public:
 	void setIsPlaying(bool isPlaying);
 
 public slots:
-	void setSampleBuffer(SampleBuffer2* sb);
+	void setSampleBuffer(SampleBuffer* sb);
 	void setSampleFile( const QString & _sf );
 	void updateLength();
 	void toggleRecord();

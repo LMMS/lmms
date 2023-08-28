@@ -28,7 +28,7 @@
 #include "Graph.h"
 #include "SampleLoader.h"
 #include "StringPairDrag.h"
-#include "SampleBuffer2.h"
+#include "SampleBuffer.h"
 #include "Oscillator.h"
 
 namespace lmms

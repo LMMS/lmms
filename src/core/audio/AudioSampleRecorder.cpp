@@ -25,7 +25,7 @@
 
 
 #include "AudioSampleRecorder.h"
-#include "SampleBuffer2.h"
+#include "SampleBuffer.h"
 #include "debug.h"
 
 
@@ -70,7 +70,7 @@ f_cnt_t AudioSampleRecorder::framesRecorded() const
 
 
 
-void AudioSampleRecorder::createSampleBuffer(SampleBuffer2** sampleBuf)
+void AudioSampleRecorder::createSampleBuffer(SampleBuffer** sampleBuf)
 {
 	const f_cnt_t frames = framesRecorded();
 	// create buffer to store all recorded buffers in
@@ -90,7 +90,7 @@ void AudioSampleRecorder::createSampleBuffer(SampleBuffer2** sampleBuf)
 		data_ptr += ( *it ).second;
 	}
 	// create according sample-buffer out of big buffer
-	*sampleBuf = new SampleBuffer2(data, frames, sampleRate());
+	*sampleBuf = new SampleBuffer(data, frames, sampleRate());
 	delete[] data;
 }
 

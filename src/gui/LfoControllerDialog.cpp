@@ -216,7 +216,7 @@ void LfoControllerDialog::askUserDefWave()
 	
 	auto buffer = SampleLoader::createBufferFromFile(fileName);
 	// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-	std::atomic_store(&sampleBuffer, std::shared_ptr<const SampleBuffer2>(std::move(buffer)));
+	std::atomic_store(&sampleBuffer, std::shared_ptr<const SampleBuffer>(std::move(buffer)));
 	
 	if( fileName.isEmpty() == false )
 	{

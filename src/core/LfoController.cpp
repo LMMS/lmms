@@ -49,7 +49,7 @@ LfoController::LfoController( Model * _parent ) :
 	m_phaseOffset( 0 ),
 	m_currentPhase( 0 ),
 	m_sampleFunction( &Oscillator::sinSample ),
-	m_userDefSampleBuffer(std::make_shared<SampleBuffer2>())
+	m_userDefSampleBuffer(std::make_shared<SampleBuffer>())
 {
 	setSampleExact( true );
 	connect( &m_waveModel, SIGNAL(dataChanged()),
@@ -214,7 +214,7 @@ void LfoController::loadSettings( const QDomElement & _this )
 
 	auto buffer = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile"));
 	// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-	std::atomic_store(&m_userDefSampleBuffer, std::shared_ptr<const SampleBuffer2>(std::move(buffer)));
+	std::atomic_store(&m_userDefSampleBuffer, std::shared_ptr<const SampleBuffer>(std::move(buffer)));
 
 	updateSampleFunction();
 }
