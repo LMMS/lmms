@@ -182,6 +182,14 @@ ClapPluginInfo::ClapPluginInfo(const clap_plugin_factory* factory, uint32_t inde
 		return;
 	}
 
+	if (ClapManager::kDebug)
+	{
+		qDebug().nospace() << "CLAP version: "
+			<< m_descriptor->clap_version.major << "."
+			<< m_descriptor->clap_version.minor << "."
+			<< m_descriptor->clap_version.revision;
+	}
+
 	if (!clap_version_is_compatible(m_descriptor->clap_version))
 	{
 		qWarning() << "Incompatible CLAP version: Plugin is: " << m_descriptor->clap_version.major << "."

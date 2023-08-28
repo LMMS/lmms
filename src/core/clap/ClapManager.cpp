@@ -71,7 +71,7 @@ bool ClapManager::kDebug = false;
 
 ClapManager::ClapManager()
 {
-	const char* dbgStr = getenv("LMMS_CLAP_DEBUG");
+	const char* dbgStr = std::getenv("LMMS_CLAP_DEBUG");
 	kDebug = (dbgStr && *dbgStr);
 	if (kDebug)
 		qDebug() << "CLAP host debugging enabled";
@@ -137,7 +137,7 @@ void ClapManager::findSearchPaths()
 	m_searchPaths.clear();
 
 	// Get CLAP_PATH paths
-	if (const char* clapPathTemp = getenv("CLAP_PATH"))
+	if (const char* clapPathTemp = std::getenv("CLAP_PATH"))
 	{
 		std::error_code ec;
 		std::string_view clapPath{clapPathTemp};
@@ -169,14 +169,14 @@ void ClapManager::findSearchPaths()
 		m_searchPaths.emplace_back(std::move(path.make_preferred()));
 #elif defined(LMMS_BUILD_WIN32) || defined(LMMS_BUILD_WIN64)
 	std::error_code ec;
-	if (auto commonProgFiles = getenv("COMMONPROGRAMFILES"))
+	if (auto commonProgFiles = std::getenv("COMMONPROGRAMFILES"))
 	{
 		std::filesystem::path path{commonProgFiles};
 		path /= "CLAP";
 		if (std::filesystem::is_directory(path, ec))
 			m_searchPaths.emplace_back(std::move(path.make_preferred()));
 	}
-	if (auto localAppData = getenv("LOCALAPPDATA"))
+	if (auto localAppData = std::getenv("LOCALAPPDATA"))
 	{
 		std::filesystem::path path{localAppData};
 		path /= std::filesystem::path{"Programs/Common/CLAP"};
