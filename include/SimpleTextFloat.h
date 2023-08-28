@@ -27,11 +27,11 @@
 #define SIMPLE_TEXT_FLOAT_H
 
 #include <QWidget>
-#include <QTimer>
 
 #include "lmms_export.h"
 
 class QLabel;
+class Qtimer;
 
 namespace lmms::gui
 {

@@ -49,8 +49,6 @@
 #include "SimpleTextFloat.h"
 #include "StringPairDrag.h"
 
-#include <QDebug>
-
 namespace lmms::gui
 {
 
@@ -98,7 +96,7 @@ void Knob::initUi( const QString & _name )
 	setInnerRadius( 1.0f );
 	setOuterRadius( 10.0f );
 	setFocusPolicy( Qt::ClickFocus );
-	
+
 	// This is a workaround to enable style sheets for knobs which are not styled knobs.
 	//
 	// It works as follows: the palette colors that are assigned as the line color previously

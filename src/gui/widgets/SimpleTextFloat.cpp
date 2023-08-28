@@ -28,6 +28,7 @@
 #include <QStyleOption>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QTimer>
 
 #include "GuiApplication.h"
 #include "MainWindow.h"
