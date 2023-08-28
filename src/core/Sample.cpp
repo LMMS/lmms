@@ -26,6 +26,7 @@
 
 #include <QPainter>
 #include <QRect>
+#include <cassert>
 
 namespace lmms {
 
@@ -113,7 +114,9 @@ auto swap(Sample& first, Sample& second) -> void
 
 bool Sample::play(sampleFrame* dst, PlaybackState* state, int numFrames, float desiredFrequency, Loop loopMode) const
 {
-	assert(m_buffer != nullptr && m_buffer->sampleRate() > 0);
+	assert(m_buffer != nullptr);
+	if (numFrames <= 0 || desiredFrequency <= 0 ||
+		m_buffer->size() <= 0 || m_buffer->sampleRate() <= 0) { return false; }
 
 	const auto lock = std::shared_lock{m_mutex};
 	const auto resampleRatio
@@ -385,7 +388,8 @@ auto Sample::playSampleRange(PlaybackState* state, sampleFrame* dst, int numFram
 	return true;
 }
 
-auto Sample::playSampleRangeLoop(PlaybackState* state, sampleFrame* dst, int numFrames, float resampleRatio) const -> bool
+auto Sample::playSampleRangeLoop(PlaybackState* state, sampleFrame* dst, int numFrames, float resampleRatio) const
+	-> bool
 {
 	if (numFrames <= 0) { return false; }
 	if (state->m_frameIndex >= m_loopEndFrame) { state->m_frameIndex = m_loopStartFrame; }
@@ -414,7 +418,8 @@ auto Sample::playSampleRangeLoop(PlaybackState* state, sampleFrame* dst, int num
 	return true;
 }
 
-auto Sample::playSampleRangePingPong(PlaybackState* state, sampleFrame* dst, int numFrames, float resampleRatio) const -> bool
+auto Sample::playSampleRangePingPong(PlaybackState* state, sampleFrame* dst, int numFrames, float resampleRatio) const
+	-> bool
 {
 	if (numFrames <= 0) { return false; }
 	if (state->m_frameIndex >= m_loopEndFrame)
@@ -474,8 +479,10 @@ auto Sample::copyBufferForward(sampleFrame* dst, int initialPosition, int advanc
 
 auto Sample::copyBufferBackward(sampleFrame* dst, int initialPosition, int advanceAmount) const -> void
 {
-	m_reversed ? std::reverse_copy(m_buffer->rbegin() + initialPosition - advanceAmount, m_buffer->rbegin() + initialPosition, dst)
-			   : std::reverse_copy(m_buffer->begin() + initialPosition - advanceAmount, m_buffer->begin() + initialPosition, dst);
+	m_reversed ? std::reverse_copy(
+		m_buffer->rbegin() + initialPosition - advanceAmount, m_buffer->rbegin() + initialPosition, dst)
+			   : std::reverse_copy(
+				   m_buffer->begin() + initialPosition - advanceAmount, m_buffer->begin() + initialPosition, dst);
 }
 
 auto Sample::getLoopedIndex(int index, int startFrame, int endFrame) const -> int
