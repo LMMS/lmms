@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef PIXMAP_BUTTON_H
-#define PIXMAP_BUTTON_H
+#ifndef LMMS_GUI_PIXMAP_BUTTON_H
+#define LMMS_GUI_PIXMAP_BUTTON_H
 
 #include <QPixmap>
 
@@ -68,4 +67,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_PIXMAP_BUTTON_H

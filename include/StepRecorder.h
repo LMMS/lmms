@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef STEP_RECORDER_H
-#define STEP_RECORDER_H
+#ifndef LMMS_STEP_RECORDER_H
+#define LMMS_STEP_RECORDER_H
 
 #include <QColor>
 #include <QElapsedTimer>
@@ -59,7 +59,7 @@ class StepRecorder : public QObject
 	void setCurrentMidiClip(MidiClip* newMidiClip);
 	void setStepsLength(const TimePos& newLength);
 
-	QVector<Note*> getCurStepNotes();
+	std::vector<Note*> getCurStepNotes();
 
 	bool isRecording() const
 	{
@@ -142,7 +142,7 @@ class StepRecorder : public QObject
 		QElapsedTimer releasedTimer;
 	} ;
 
-	QVector<StepNote*> m_curStepNotes; // contains the current recorded step notes (i.e. while user still press the notes; before they are applied to the clip)
+	std::vector<StepNote*> m_curStepNotes; // contains the current recorded step notes (i.e. while user still press the notes; before they are applied to the clip)
 
 	StepNote* findCurStepNote(const int key);
 
@@ -152,4 +152,4 @@ class StepRecorder : public QObject
 
 } // namespace lmms
 
-#endif //STEP_RECORDER_H
+#endif // LMMS_STEP_RECORDER_H

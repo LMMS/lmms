@@ -115,14 +115,18 @@ void PatternClipView::paintEvent(QPaintEvent*)
 	
 	// bar lines
 	const int lineSize = 3;
+	int pixelsPerPattern = Engine::patternStore()->lengthOfPattern(m_patternClip->patternIndex()) * pixelsPerBar();
+	int offset = static_cast<int>(m_patternClip->startTimeOffset() * (pixelsPerBar() / TimePos::ticksPerBar()))
+			% pixelsPerPattern;
+	if (offset < 2) {
+		offset += pixelsPerPattern;
+	}
+
 	p.setPen( c.darker( 200 ) );
 
-	bar_t t = Engine::patternStore()->lengthOfPattern(m_patternClip->patternIndex());
-	if (m_patternClip->length() > TimePos::ticksPerBar() && t > 0)
+	if (pixelsPerPattern > 0)
 	{
-		for( int x = static_cast<int>( t * pixelsPerBar() );
-								x < width() - 2;
-			x += static_cast<int>( t * pixelsPerBar() ) )
+		for (int x = offset; x < width() - 2; x += pixelsPerPattern)
 		{
 			p.drawLine( x, BORDER_WIDTH, x, BORDER_WIDTH + lineSize );
 			p.drawLine( x, rect().bottom() - ( BORDER_WIDTH + lineSize ),

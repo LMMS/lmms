@@ -33,7 +33,6 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QShortcut>
-#include <QLibrary>
 #include <QSplitter>
 
 #include "AboutDialog.h"
@@ -78,22 +77,6 @@
 namespace lmms::gui
 {
 
-#if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_APPLE) && !defined(LMMS_BUILD_HAIKU)
-//Work around an issue on KDE5 as per https://bugs.kde.org/show_bug.cgi?id=337491#c21
-void disableAutoKeyAccelerators(QWidget* mainWindow)
-{
-	using DisablerFunc = void(*)(QWidget*);
-	QLibrary kf5WidgetsAddon("KF5WidgetsAddons", 5);
-	auto setNoAccelerators
-		= reinterpret_cast<DisablerFunc>(kf5WidgetsAddon.resolve("_ZN19KAcceleratorManager10setNoAccelEP7QWidget"));
-	if(setNoAccelerators)
-	{
-		setNoAccelerators(mainWindow);
-	}
-	kf5WidgetsAddon.unload();
-}
-#endif
-
 
 MainWindow::MainWindow() :
 	m_workspace( nullptr ),
@@ -101,22 +84,19 @@ MainWindow::MainWindow() :
 	m_autoSaveTimer( this ),
 	m_viewMenu( nullptr ),
 	m_metronomeToggle( 0 ),
-	m_session( Normal )
+	m_session( SessionState::Normal )
 {
-#if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_APPLE) && !defined(LMMS_BUILD_HAIKU)
-	disableAutoKeyAccelerators(this);
-#endif
 	setAttribute( Qt::WA_DeleteOnClose );
 
 	auto main_widget = new QWidget(this);
 	auto vbox = new QVBoxLayout(main_widget);
 	vbox->setSpacing( 0 );
-	vbox->setMargin( 0 );
+	vbox->setContentsMargins(0, 0, 0, 0);
 
 	auto w = new QWidget(main_widget);
 	auto hbox = new QHBoxLayout(w);
 	hbox->setSpacing( 0 );
-	hbox->setMargin( 0 );
+	hbox->setContentsMargins(0, 0, 0, 0);
 
 	auto sideBar = new SideBar(Qt::Vertical, w);
 
@@ -226,7 +206,7 @@ MainWindow::MainWindow() :
 
 	// add layout for organizing quite complex toolbar-layouting
 	m_toolBarLayout = new QGridLayout( m_toolBar/*, 2, 1*/ );
-	m_toolBarLayout->setMargin( 0 );
+	m_toolBarLayout->setContentsMargins(0, 0, 0, 0);
 	m_toolBarLayout->setSpacing( 0 );
 
 	vbox->addWidget( m_toolBar );
@@ -397,7 +377,7 @@ void MainWindow::finalize()
 
 
 	m_toolsMenu = new QMenu( this );
-	for( const Plugin::Descriptor* desc : getPluginFactory()->descriptors(Plugin::Tool) )
+	for( const Plugin::Descriptor* desc : getPluginFactory()->descriptors(Plugin::Type::Tool) )
 	{
 		m_toolsMenu->addAction( desc->logo->pixmap(), desc->displayName );
 		m_tools.push_back( ToolPlugin::instantiate( desc->name, /*this*/nullptr )
@@ -534,7 +514,7 @@ void MainWindow::finalize()
 		ConfigManager::inst()->value( "audioengine", "audiodev" ) ) )
 	{
 		// if so, offer the audio settings section of the setup dialog
-		SetupDialog sd( SetupDialog::AudioSettings );
+		SetupDialog sd( SetupDialog::ConfigTab::AudioSettings );
 		sd.exec();
 	}
 
@@ -620,7 +600,7 @@ void MainWindow::resetWindowTitle()
 		title += '*';
 	}
 
-	if( getSession() == Recover )
+	if( getSession() == SessionState::Recover )
 	{
 		title += " - " + tr( "Recover session. Please save your work!" );
 	}
@@ -638,7 +618,7 @@ bool MainWindow::mayChangeProject(bool stopPlayback)
 		Engine::getSong()->stop();
 	}
 
-	if( !Engine::getSong()->isModified() && getSession() != Recover )
+	if( !Engine::getSong()->isModified() && getSession() != SessionState::Recover )
 	{
 		return( true );
 	}
@@ -655,9 +635,9 @@ bool MainWindow::mayChangeProject(bool stopPlayback)
 					"last saving. Do you want to save it "
 								"now?" );
 
-	QMessageBox mb( ( getSession() == Recover ?
+	QMessageBox mb( ( getSession() == SessionState::Recover ?
 				messageTitleRecovered : messageTitleUnsaved ),
-			( getSession() == Recover ?
+			( getSession() == SessionState::Recover ?
 					messageRecovered : messageUnsaved ),
 				QMessageBox::Question,
 				QMessageBox::Save,
@@ -672,7 +652,7 @@ bool MainWindow::mayChangeProject(bool stopPlayback)
 	}
 	else if( answer == QMessageBox::Discard )
 	{
-		if( getSession() == Recover )
+		if( getSession() == SessionState::Recover )
 		{
 			sessionCleanup();
 		}
@@ -815,7 +795,7 @@ bool MainWindow::saveProject()
 	}
 	else if( this->guiSaveProject() )
 	{
-		if( getSession() == Recover )
+		if( getSession() == SessionState::Recover )
 		{
 			sessionCleanup();
 		}
@@ -870,7 +850,7 @@ bool MainWindow::saveProjectAs()
 		}
 		if( this->guiSaveProjectAs( fname ) )
 		{
-			if( getSession() == Recover )
+			if( getSession() == SessionState::Recover )
 			{
 				sessionCleanup();
 			}
@@ -1234,19 +1214,19 @@ void MainWindow::updatePlayPauseIcons()
 	{
 		switch( Engine::getSong()->playMode() )
 		{
-			case Song::Mode_PlaySong:
+			case Song::PlayMode::Song:
 				getGUI()->songEditor()->setPauseIcon( true );
 				break;
 
-			case Song::Mode_PlayAutomationClip:
+			case Song::PlayMode::AutomationClip:
 				getGUI()->automationEditor()->setPauseIcon( true );
 				break;
 
-			case Song::Mode_PlayPattern:
+			case Song::PlayMode::Pattern:
 				getGUI()->patternEditor()->setPauseIcon( true );
 				break;
 
-			case Song::Mode_PlayMidiClip:
+			case Song::PlayMode::MidiClip:
 				getGUI()->pianoRoll()->setPauseIcon( true );
 				break;
 
@@ -1308,7 +1288,7 @@ void MainWindow::sessionCleanup()
 {
 	// delete recover session files
 	QFile::remove( ConfigManager::inst()->recoveryFile() );
-	setSession( Normal );
+	setSession( SessionState::Normal );
 }
 
 
@@ -1500,7 +1480,7 @@ void MainWindow::exportProject(bool multiExport)
 		efd.setFileMode( FileDialog::AnyFile );
 		int idx = 0;
 		QStringList types;
-		while( ProjectRenderer::fileEncodeDevices[idx].m_fileFormat != ProjectRenderer::NumFileFormats)
+		while( ProjectRenderer::fileEncodeDevices[idx].m_fileFormat != ProjectRenderer::ExportFileFormat::Count)
 		{
 			if(ProjectRenderer::fileEncodeDevices[idx].isAvailable()) {
 				types << tr(ProjectRenderer::fileEncodeDevices[idx].m_description);
@@ -1645,17 +1625,17 @@ void MainWindow::onSongStopped()
 		SongEditorWindow* songEditor = getGUI()->songEditor();
 		switch( tl->behaviourAtStop() )
 		{
-			case TimeLineWidget::BackToZero:
-				if( songEditor && ( tl->autoScroll() == TimeLineWidget::AutoScrollEnabled ) )
+			case TimeLineWidget::BehaviourAtStopState::BackToZero:
+				if( songEditor && ( tl->autoScroll() == TimeLineWidget::AutoScrollState::Enabled ) )
 				{
 					songEditor->m_editor->updatePosition(0);
 				}
 				break;
 
-			case TimeLineWidget::BackToStart:
+			case TimeLineWidget::BehaviourAtStopState::BackToStart:
 				if( tl->savedPos() >= 0 )
 				{
-					if(songEditor && ( tl->autoScroll() == TimeLineWidget::AutoScrollEnabled ) )
+					if(songEditor && ( tl->autoScroll() == TimeLineWidget::AutoScrollState::Enabled ) )
 					{
 						songEditor->m_editor->updatePosition( TimePos(tl->savedPos().getTicks() ) );
 					}
@@ -1663,7 +1643,7 @@ void MainWindow::onSongStopped()
 				}
 				break;
 
-			case TimeLineWidget::KeepStopPosition:
+			case TimeLineWidget::BehaviourAtStopState::KeepStopPosition:
 				break;
 		}
 	}

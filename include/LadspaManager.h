@@ -24,9 +24,8 @@
  *
  */
 
-
-#ifndef LADSPA_MANAGER_H
-#define LADSPA_MANAGER_H
+#ifndef LMMS_LADSPA_MANAGER_H
+#define LMMS_LADSPA_MANAGER_H
 
 #include <ladspa.h>
 
@@ -63,14 +62,14 @@ calls using:
 
 as the plug-in key. */
 
-enum LadspaPluginType
+enum class LadspaPluginType
 {
-	SOURCE,
-	TRANSFER,
-	VALID,
-	INVALID,
-	SINK,
-	OTHER
+	Source,
+	Transfer,
+	Valid,
+	Invalid,
+	Sink,
+	Other
 };
 
 struct LadspaManagerDescription
@@ -350,4 +349,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_LADSPA_MANAGER_H

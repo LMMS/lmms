@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_JACK_H
-#define AUDIO_JACK_H
+#ifndef LMMS_AUDIO_JACK_H
+#define LMMS_AUDIO_JACK_H
 
 #include "lmmsconfig.h"
 
@@ -35,7 +35,7 @@
 #endif
 
 #include <atomic>
-#include <QVector>
+#include <vector>
 
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
@@ -117,7 +117,7 @@ private:
 	std::atomic<bool> m_stopped;
 
 	std::atomic<MidiJack *> m_midiClient;
-	QVector<jack_port_t *> m_outputPorts;
+	std::vector<jack_port_t *> m_outputPorts;
 	jack_default_audio_sample_t * * m_tempOutBufs;
 	surroundSampleFrame * m_outBuf;
 
@@ -144,4 +144,4 @@ signals:
 
 #endif // LMMS_HAVE_JACK
 
-#endif
+#endif // LMMS_AUDIO_JACK_H

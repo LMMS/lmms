@@ -1,7 +1,7 @@
 /*
  * Lv2Manager.h - Implementation of Lv2Manager class
  *
- * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LV2MANAGER_H
-#define LV2MANAGER_H
+#ifndef LMMS_LV2_MANAGER_H
+#define LMMS_LV2_MANAGER_H
 
 #include "lmmsconfig.h"
 
@@ -95,18 +95,18 @@ public:
 		//! use only for std::map internals
 		Lv2Info() : m_plugin(nullptr) {}
 		//! ctor used inside Lv2Manager
-		Lv2Info(const LilvPlugin* plug, Plugin::PluginTypes type, bool valid) :
+		Lv2Info(const LilvPlugin* plug, Plugin::Type type, bool valid) :
 			m_plugin(plug), m_type(type), m_valid(valid) {}
 		Lv2Info(Lv2Info&& other) = default;
 		Lv2Info& operator=(Lv2Info&& other) = default;
 
 		const LilvPlugin* plugin() const { return m_plugin; }
-		Plugin::PluginTypes type() const { return m_type; }
+		Plugin::Type type() const { return m_type; }
 		bool isValid() const { return m_valid; }
 
 	private:
 		const LilvPlugin* m_plugin;
-		Plugin::PluginTypes m_type;
+		Plugin::Type m_type;
 		bool m_valid = false;
 	};
 
@@ -166,4 +166,4 @@ private:
 
 #endif // LMMS_HAVE_LV2
 
-#endif // LV2MANAGER_H
+#endif // LMMS_LV2_MANAGER_H

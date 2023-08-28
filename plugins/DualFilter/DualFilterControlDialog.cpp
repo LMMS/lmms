@@ -36,7 +36,7 @@ namespace lmms::gui
 
 
 #define makeknob( name, x, y, model, label, hint, unit ) 	\
-	Knob * name = new Knob( knobBright_26, this); 			\
+	Knob * name = new Knob( KnobType::Bright26, this); 			\
 	(name) -> move( x, y );									\
 	(name) ->setModel( &controls-> model );					\
 	(name) ->setLabel( label );							\
@@ -64,8 +64,8 @@ DualFilterControlDialog::DualFilterControlDialog( DualFilterControls* controls )
 	gain1Knob-> setVolumeKnob( true );
 	gain2Knob-> setVolumeKnob( true );
 
-	auto enabled1Toggle = new LedCheckBox("", this, tr("Filter 1 enabled"), LedCheckBox::Green);
-	auto enabled2Toggle = new LedCheckBox("", this, tr("Filter 2 enabled"), LedCheckBox::Green);
+	auto enabled1Toggle = new LedCheckBox("", this, tr("Filter 1 enabled"), LedCheckBox::LedColor::Green);
+	auto enabled2Toggle = new LedCheckBox("", this, tr("Filter 2 enabled"), LedCheckBox::LedColor::Green);
 
 	enabled1Toggle -> move( 12, 11 );
 	enabled1Toggle -> setModel( &controls -> m_enabled1Model );

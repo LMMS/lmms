@@ -71,8 +71,7 @@ void MidiClient::removePort( MidiPort* port )
 		return;
 	}
 
-	QVector<MidiPort *>::Iterator it =
-		std::find( m_midiPorts.begin(), m_midiPorts.end(), port );
+	auto it = std::find(m_midiPorts.begin(), m_midiPorts.end(), port);
 	if( it != m_midiPorts.end() )
 	{
 		m_midiPorts.erase( it );
@@ -105,10 +104,10 @@ void MidiClientRaw::parseData( const unsigned char c )
 	/* 'Process' system real-time messages                               */
 	/*********************************************************************/
 	/* There are not too many real-time messages that are of interest here.
-	 * They can occur anywhere, even in the middle of a noteon message! 
+	 * They can occur anywhere, even in the middle of a noteon message!
 	 * Real-time range: 0xF8 .. 0xFF
 	 * Note: Real-time does not affect (running) status.
-	 */  
+	 */
 	if( c >= 0xF8 )
 	{
 		if( c == MidiSystemReset )
@@ -124,13 +123,13 @@ void MidiClientRaw::parseData( const unsigned char c )
 	/* 'Process' system common messages (again, just skip them)          */
 	/*********************************************************************/
 	/* There are no system common messages that are of interest here.
-	 * System common range: 0xF0 .. 0xF7 
+	 * System common range: 0xF0 .. 0xF7
 	 */
 	if( c > 0xF0 )
 	{
 	/* MIDI spec say: To ignore a non-real-time message, just discard all
 	 * data up to the next status byte.  And our parser will ignore data
-	 * that is received without a valid status.  
+	 * that is received without a valid status.
 	 * Note: system common cancels running status. */
 		m_midiParseData.m_status = 0;
 		return;
@@ -186,14 +185,14 @@ void MidiClientRaw::parseData( const unsigned char c )
 	/*********************************************************************/
 	/* Send the event                                                    */
 	/*********************************************************************/
-	/* The event is ready-to-go.  About 'running status': 
-	 * 
+	/* The event is ready-to-go.  About 'running status':
+	 *
 	 * The MIDI protocol has a built-in compression mechanism. If several
 	 * similar events are sent in-a-row, for example note-ons, then the
 	 * event type is only sent once. For this case, the last event type
 	 * (status) is remembered.
 	 * We simply keep the status as it is, just reset the parameter counter.
-	 * If another status byte comes in, it will overwrite the status. 
+	 * If another status byte comes in, it will overwrite the status.
 	 */
 	m_midiParseData.m_midiEvent.setType(static_cast<MidiEventTypes>(m_midiParseData.m_status));
 	m_midiParseData.m_midiEvent.setChannel(m_midiParseData.m_channel);
@@ -224,7 +223,7 @@ void MidiClientRaw::parseData( const unsigned char c )
 			m_midiParseData.m_midiEvent.setPitchBend((m_midiParseData.m_buffer[1] * 128) | m_midiParseData.m_buffer[0]);
 			break;
 
-		default: 
+		default:
 			// Unlikely
 			return;
 	}
@@ -271,7 +270,7 @@ void MidiClientRaw::processOutEvent(const MidiEvent& event, const TimePos&, cons
 
 
 // Taken from Nagano Daisuke's USB-MIDI driver
-static const unsigned char REMAINS_F0F6[] =
+static const auto REMAINS_F0F6 = std::array<unsigned char, 7>
 {
 	0,	/* 0xF0 */
 	2,	/* 0XF1 */
@@ -282,7 +281,7 @@ static const unsigned char REMAINS_F0F6[] =
 	1	/* 0XF6 */
 } ;
 
-static const unsigned char REMAINS_80E0[] =
+static const auto REMAINS_80E0 = std::array<unsigned char, 7>
 {
 	3,	/* 0x8X Note Off */
 	3,	/* 0x9X Note On */

@@ -41,7 +41,7 @@ Plugin::Descriptor PLUGIN_EXPORT bassbooster_plugin_descriptor =
 	QT_TRANSLATE_NOOP( "PluginBrowser", "Boost your bass the fast and simple way" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,
@@ -102,7 +102,7 @@ bool BassBoosterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 		m_bbFX.leftFX().setGain( gain );
 		m_bbFX.rightFX().setGain( gain);
 
-		sample_t s[2] = { buf[f][0], buf[f][1] };
+		auto s = std::array{buf[f][0], buf[f][1]};
 		m_bbFX.nextSample( s[0], s[1] );
 
 		buf[f][0] = d * buf[f][0] + w * s[0];

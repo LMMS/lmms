@@ -37,7 +37,7 @@ namespace lmms
 RenderManager::RenderManager(
 		const AudioEngine::qualitySettings & qualitySettings,
 		const OutputSettings & outputSettings,
-		ProjectRenderer::ExportFileFormats fmt,
+		ProjectRenderer::ExportFileFormat fmt,
 		QString outputPath) :
 	m_qualitySettings(qualitySettings),
 	m_oldQualitySettings( Engine::audioEngine()->currentQualitySettings() ),
@@ -69,7 +69,7 @@ void RenderManager::renderNextTrack()
 {
 	m_activeRenderer.reset();
 
-	if( m_tracksToRender.isEmpty() )
+	if (m_tracksToRender.empty())
 	{
 		// nothing left to render
 		restoreMutedState();
@@ -102,11 +102,11 @@ void RenderManager::renderTracks()
 	// find all currently unnmuted tracks -- we want to render these.
 	for (const auto& tk : tl)
 	{
-		Track::TrackTypes type = tk->type();
+		Track::Type type = tk->type();
 
 		// Don't render automation tracks
 		if ( tk->isMuted() == false &&
-				( type == Track::InstrumentTrack || type == Track::SampleTrack ) )
+				( type == Track::Type::Instrument || type == Track::Type::Sample ) )
 		{
 			m_unmuted.push_back(tk);
 		}
@@ -115,11 +115,11 @@ void RenderManager::renderTracks()
 	const TrackContainer::TrackList t2 = Engine::patternStore()->tracks();
 	for (const auto& tk : t2)
 	{
-		Track::TrackTypes type = tk->type();
+		Track::Type type = tk->type();
 
 		// Don't render automation tracks
 		if ( tk->isMuted() == false &&
-				( type == Track::InstrumentTrack || type == Track::SampleTrack ) )
+				( type == Track::Type::Instrument || type == Track::Type::Sample ) )
 		{
 			m_unmuted.push_back(tk);
 		}
@@ -169,7 +169,7 @@ void RenderManager::render(QString outputPath)
 // Unmute all tracks that were muted while rendering tracks
 void RenderManager::restoreMutedState()
 {
-	while( !m_unmuted.isEmpty() )
+	while (!m_unmuted.empty())
 	{
 		Track* restoreTrack = m_unmuted.back();
 		m_unmuted.pop_back();

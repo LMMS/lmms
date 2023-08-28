@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef KNOB_H
-#define KNOB_H
+#ifndef LMMS_GUI_KNOB_H
+#define LMMS_GUI_KNOB_H
 
 #include <memory>
 #include <QPixmap>
@@ -41,11 +40,11 @@ namespace lmms::gui
 {
 
 
-class TextFloat;
+class SimpleTextFloat;
 
-enum knobTypes
+enum class KnobType
 {
-	knobDark_28, knobBright_26, knobSmall_17, knobVintage_32, knobStyled
+	Dark28, Bright26, Small17, Vintage32, Styled
 } ;
 
 
@@ -54,7 +53,7 @@ void convertPixmapToGrayScale(QPixmap &pixMap);
 class LMMS_EXPORT Knob : public QWidget, public FloatModelView
 {
 	Q_OBJECT
-	Q_ENUMS( knobTypes )
+	Q_ENUMS( KnobType )
 
 	Q_PROPERTY(float innerRadius READ innerRadius WRITE setInnerRadius)
 	Q_PROPERTY(float outerRadius READ outerRadius WRITE setOuterRadius)
@@ -76,7 +75,7 @@ class LMMS_EXPORT Knob : public QWidget, public FloatModelView
 	mapPropertyFromModel(bool,isVolumeKnob,setVolumeKnob,m_volumeKnob);
 	mapPropertyFromModel(float,volumeRatio,setVolumeRatio,m_volumeRatio);
 
-	Q_PROPERTY(knobTypes knobNum READ knobNum WRITE setknobNum)
+	Q_PROPERTY(KnobType knobNum READ knobNum WRITE setknobNum)
 	
 	Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor)
 
@@ -84,7 +83,7 @@ class LMMS_EXPORT Knob : public QWidget, public FloatModelView
 	void onKnobNumUpdated(); //!< to be called when you updated @a m_knobNum
 
 public:
-	Knob( knobTypes _knob_num, QWidget * _parent = nullptr, const QString & _name = QString() );
+	Knob( KnobType _knob_num, QWidget * _parent = nullptr, const QString & _name = QString() );
 	Knob( QWidget * _parent = nullptr, const QString & _name = QString() ); //!< default ctor
 	Knob( const Knob& other ) = delete;
 
@@ -107,8 +106,8 @@ public:
 	float outerRadius() const;
 	void setOuterRadius( float r );
 
-	knobTypes knobNum() const;
-	void setknobNum( knobTypes k );
+	KnobType knobNum() const;
+	void setknobNum( KnobType k );
 
 	QPointF centerPoint() const;
 	float centerPointX() const;
@@ -175,7 +174,7 @@ private:
 	}
 
 
-	static TextFloat * s_textFloat;
+	static SimpleTextFloat * s_textFloat;
 
 	QString m_label;
 	bool m_isHtmlLabel;
@@ -207,11 +206,11 @@ private:
 	
 	QColor m_textColor;
 
-	knobTypes m_knobNum;
+	KnobType m_knobNum;
 
 } ;
 
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_KNOB_H

@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_DEVICE_H
-#define AUDIO_DEVICE_H
+#ifndef LMMS_AUDIO_DEVICE_H
+#define LMMS_AUDIO_DEVICE_H
 
 #include <QMutex>
 #include <samplerate.h>
@@ -160,4 +160,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AUDIO_DEVICE_H

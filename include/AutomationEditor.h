@@ -23,10 +23,11 @@
  *
  */
 
-#ifndef AUTOMATION_EDITOR_H
-#define AUTOMATION_EDITOR_H
+#ifndef LMMS_GUI_AUTOMATION_EDITOR_H
+#define LMMS_GUI_AUTOMATION_EDITOR_H
 
 #include <QWidget>
+#include <array>
 
 #include "Editor.h"
 
@@ -87,12 +88,12 @@ public:
 		return "automationeditor";
 	}
 
-	enum EditModes
+	enum class EditMode
 	{
-		DRAW,
-		ERASE,
-		DRAW_OUTVALUES,
-		EDIT_TANGENTS
+		Draw,
+		Erase,
+		DrawOutValues,
+		EditTangents
 	};
 
 public slots:
@@ -132,10 +133,10 @@ protected slots:
 	void horScrolled( int new_pos );
 	void verScrolled( int new_pos );
 
-	void setEditMode(AutomationEditor::EditModes mode);
+	void setEditMode(AutomationEditor::EditMode mode);
 	void setEditMode(int mode);
 
-	void setProgressionType(AutomationClip::ProgressionTypes type);
+	void setProgressionType(AutomationClip::ProgressionType type);
 	void setProgressionType(int type);
 	void setTension();
 
@@ -149,16 +150,16 @@ protected slots:
 
 private:
 
-	enum Actions
+	enum class Action
 	{
-		NONE,
-		MOVE_VALUE,
-		ERASE_VALUES,
-		MOVE_OUTVALUE,
-		RESET_OUTVALUES,
-		DRAW_LINE,
-		MOVE_TANGENT,
-		RESET_TANGENTS
+		None,
+		MoveValue,
+		EraseValues,
+		MoveOutValue,
+		ResetOutValues,
+		DrawLine,
+		MoveTangent,
+		ResetTangents
 	} ;
 
 	// some constants...
@@ -187,7 +188,7 @@ private:
 	ComboBoxModel m_zoomingYModel;
 	ComboBoxModel m_quantizeModel;
 
-	static const QVector<float> m_zoomXLevels;
+	static const std::array<float, 7> m_zoomXLevels;
 
 	FloatModel * m_tensionModel;
 
@@ -207,7 +208,7 @@ private:
 
 	TimePos m_currentPosition;
 
-	Actions m_action;
+	Action m_action;
 
 	int m_moveXOffset;
 
@@ -226,7 +227,7 @@ private:
 	// Whether the tangent being dragged is the InTangent or OutTangent
 	bool m_draggedOutTangent;
 
-	EditModes m_editMode;
+	EditMode m_editMode;
 
 	bool m_mouseDownLeft;
 	bool m_mouseDownRight; //true if right click is being held down
@@ -324,4 +325,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_AUTOMATION_EDITOR_H

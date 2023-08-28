@@ -71,7 +71,7 @@ QToolTip {
 	color: #4afd85;
 }
 
-lmms--gui--TextFloat {
+lmms--gui--TextFloat, lmms--gui--SimpleTextFloat {
 	border-radius: 4px;
 	background: qlineargradient(spread:reflect, x1:0.5, y1:0.5, x2:0.5, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(50, 50, 50, 220));
 	opacity: 175;
@@ -417,6 +417,25 @@ lmms--gui--AutomatableSlider::handle:vertical {
 	height: 10px;
 	border-radius: 2px;
 	margin: -4px -12px -2px;
+}
+
+/* main horizontal sliders (zoom) */
+
+lmms--gui--AutomatableSlider::groove:horizontal {
+	background: rgba(0,0,0, 128);
+	border: 1px inset rgba(100,100,100, 64);
+	border-radius: 2px;
+	height: 2px;
+	margin: 2px;
+}
+
+lmms--gui--AutomatableSlider::handle:horizontal {
+	background: none;
+	border-image: url(resources:horizontal_slider.png);
+	width: 10px;
+	height: 26px;
+	border-radius: 2px;
+	margin: -12px -2px;
 }
 
 /* about dialog */

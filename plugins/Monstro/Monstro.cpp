@@ -53,7 +53,7 @@ Plugin::Descriptor PLUGIN_EXPORT monstro_plugin_descriptor =
 				"Monstrous 3-oscillator synth with modulation matrix" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
@@ -653,8 +653,8 @@ inline void MonstroSynth::updateModulators( float * env1, float * env2, float * 
 	// frames played before
 	const f_cnt_t tfp = m_nph->totalFramesPlayed();
 
-	float * lfo [2];
-	float * env [2];
+	auto lfo = std::array<float*, 2>{};
+	auto env = std::array<float*, 2>{};
 	lfo[0] = lfo1;
 	lfo[1] = lfo2;
 	env[0] = env1;
@@ -1030,7 +1030,7 @@ void MonstroInstrument::playNote( NotePlayHandle * _n,
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 
-	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == nullptr )
+	if (!_n->m_pluginData)
 	{
 		_n->m_pluginData = new MonstroSynth( this, _n );
 	}
@@ -1694,8 +1694,8 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	m_lfo2WaveBox -> setGeometry( 127, LFOROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
 	m_lfo2WaveBox->setFont( pointSize<8>( m_lfo2WaveBox->font() ) );
 
-	maketsknob(m_lfo2AttKnob, LFOCOL4, LFOROW, tr("Attack"), " ms", "lfoKnob") 
-	maketsknob(m_lfo2RateKnob, LFOCOL5, LFOROW, tr("Rate"), " ms", "lfoKnob") 
+	maketsknob(m_lfo2AttKnob, LFOCOL4, LFOROW, tr("Attack"), " ms", "lfoKnob")
+	maketsknob(m_lfo2RateKnob, LFOCOL5, LFOROW, tr("Rate"), " ms", "lfoKnob")
 	makeknob(m_lfo2PhsKnob, LFOCOL6, LFOROW, tr("Phase"), tr(" deg"), "lfoKnob")
 
 	maketsknob(m_env1PreKnob, KNOBCOL1, E1ROW, tr("Pre-delay"), " ms", "envKnob")

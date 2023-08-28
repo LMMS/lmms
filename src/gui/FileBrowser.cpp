@@ -76,7 +76,7 @@ void FileBrowser::addContentCheckBox()
 	auto filterWidget = new QWidget(contentParent());
 	filterWidget->setFixedHeight(15);
 	auto filterWidgetLayout = new QHBoxLayout(filterWidget);
-	filterWidgetLayout->setMargin(0);
+	filterWidgetLayout->setContentsMargins(0, 0, 0, 0);
 	filterWidgetLayout->setSpacing(0);
 
 	auto configCheckBox = [this, &filterWidgetLayout](QCheckBox* box)
@@ -119,7 +119,7 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	searchWidget->setFixedHeight( 24 );
 
 	auto searchWidgetLayout = new QHBoxLayout(searchWidget);
-	searchWidgetLayout->setMargin( 0 );
+	searchWidgetLayout->setContentsMargins(0, 0, 0, 0);
 	searchWidgetLayout->setSpacing( 0 );
 
 	m_filterEdit = new QLineEdit( searchWidget );
@@ -229,26 +229,22 @@ void FileBrowser::reloadTree()
 
 
 
-void FileBrowser::expandItems( QTreeWidgetItem * item, QList<QString> expandedDirs )
+void FileBrowser::expandItems(QTreeWidgetItem* item, QList<QString> expandedDirs)
 {
 	int numChildren = item ? item->childCount() : m_fileBrowserTreeWidget->topLevelItemCount();
 	for (int i = 0; i < numChildren; ++i)
 	{
-		QTreeWidgetItem * it = item ? item->child( i ) : m_fileBrowserTreeWidget->topLevelItem(i);
-		if ( m_recurse )
-		{
-			it->setExpanded( true );
-		}
+		auto it = item ? item->child(i) : m_fileBrowserTreeWidget->topLevelItem(i);
 		auto d = dynamic_cast<Directory*>(it);
 		if (d)
 		{
-			d->update();
-			bool expand = expandedDirs.contains( d->fullName() );
-			d->setExpanded( expand );
-		}
-		if (m_recurse && it->childCount())
-		{
-			expandItems(it, expandedDirs);
+			// Expanding is required when recursive to load in its contents, even if it's collapsed right afterward
+			if (m_recurse) { d->setExpanded(true); }
+			d->setExpanded(expandedDirs.contains(d->fullName()));
+			if (m_recurse && it->childCount())
+			{
+				expandItems(it, expandedDirs);
+			}
 		}
 	}
 }
@@ -444,7 +440,7 @@ void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 	if (file == nullptr) { return; }
 
 	// When moving to a new sound, preview it. Skip presets, they can play forever
-	if (vertical && file->type() == FileItem::SampleFile)
+	if (vertical && file->type() == FileItem::FileType::Sample)
 	{
 		previewFileItem(file);
 	}
@@ -539,7 +535,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool songEditor)
 {
 	QList<QAction*> result = QList<QAction*>();
-	const bool fileIsSample = file->type() == FileItem::SampleFile;
+	const bool fileIsSample = file->type() == FileItem::FileType::Sample;
 
 	QString instrumentAction = fileIsSample ?
 		tr("Send to new AudioFileProcessor instance") :
@@ -607,7 +603,7 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 
 	// In special case of sample-files we do not care about
 	// handling() rather than directly creating a SamplePlayHandle
-	if (file->type() == FileItem::SampleFile)
+	if (file->type() == FileItem::FileType::Sample)
 	{
 		TextFloat * tf = TextFloat::displayMessage(
 			tr("Loading sample"),
@@ -625,15 +621,15 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 		 ext == "gig" || ext == "pat")
 		&& !getPluginFactory()->pluginSupportingExtension(ext).isNull())
 	{
-		const bool isPlugin = file->handling() == FileItem::LoadByPlugin;
+		const bool isPlugin = file->handling() == FileItem::FileHandling::LoadByPlugin;
 		newPPH = new PresetPreviewPlayHandle(fileName, isPlugin);
 	}
-	else if (file->type() != FileItem::VstPluginFile && file->isTrack())
+	else if (file->type() != FileItem::FileType::VstPlugin && file->isTrack())
 	{
 		DataFile dataFile(fileName);
 		if (dataFile.validate(ext))
 		{
-			const bool isPlugin = file->handling() == FileItem::LoadByPlugin;
+			const bool isPlugin = file->handling() == FileItem::FileHandling::LoadByPlugin;
 			newPPH = new PresetPreviewPlayHandle(fileName, isPlugin, &dataFile);
 		}
 		else
@@ -685,34 +681,34 @@ void FileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
 		{
 			switch( f->type() )
 			{
-				case FileItem::PresetFile:
-					new StringPairDrag( f->handling() == FileItem::LoadAsPreset ?
+				case FileItem::FileType::Preset:
+					new StringPairDrag( f->handling() == FileItem::FileHandling::LoadAsPreset ?
 							"presetfile" : "pluginpresetfile",
 							f->fullName(),
 							embed::getIconPixmap( "preset_file" ), this );
 					break;
 
-				case FileItem::SampleFile:
+				case FileItem::FileType::Sample:
 					new StringPairDrag( "samplefile", f->fullName(),
 							embed::getIconPixmap( "sample_file" ), this );
 					break;
-				case FileItem::SoundFontFile:
+				case FileItem::FileType::SoundFont:
 					new StringPairDrag( "soundfontfile", f->fullName(),
 							embed::getIconPixmap( "soundfont_file" ), this );
 					break;
-				case FileItem::PatchFile:
+				case FileItem::FileType::Patch:
 					new StringPairDrag( "patchfile", f->fullName(),
 							embed::getIconPixmap( "sample_file" ), this );
 					break;
-				case FileItem::VstPluginFile:
+				case FileItem::FileType::VstPlugin:
 					new StringPairDrag( "vstpluginfile", f->fullName(),
 							embed::getIconPixmap( "vst_plugin_file" ), this );
 					break;
-				case FileItem::MidiFile:
+				case FileItem::FileType::Midi:
 					new StringPairDrag( "importedproject", f->fullName(),
 							embed::getIconPixmap( "midi_file" ), this );
 					break;
-				case FileItem::ProjectFile:
+				case FileItem::FileType::Project:
 					new StringPairDrag( "projectfile", f->fullName(),
 							embed::getIconPixmap( "project_file" ), this );
 					break;
@@ -736,7 +732,7 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 	if (m_previewPlayHandle == nullptr) { return; }
 
 	// Only sample previews may continue after mouse up. Is this a sample preview?
-	bool isSample = m_previewPlayHandle->type() == PlayHandle::TypeSamplePlayHandle;
+	bool isSample = m_previewPlayHandle->type() == PlayHandle::Type::SamplePlayHandle;
 	// Even sample previews should only continue if the user wants them to. Do they?
 	bool shouldContinue = ConfigManager::inst()->value("ui", "letpreviewsfinish").toInt();
 	// If both are true the preview may continue, otherwise we stop it
@@ -751,14 +747,14 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 	Engine::audioEngine()->requestChangeInModel();
 	switch( f->handling() )
 	{
-		case FileItem::LoadAsProject:
+		case FileItem::FileHandling::LoadAsProject:
 			if( getGUI()->mainWindow()->mayChangeProject(true) )
 			{
 				Engine::getSong()->loadProject( f->fullName() );
 			}
 			break;
 
-		case FileItem::LoadByPlugin:
+		case FileItem::FileHandling::LoadByPlugin:
 		{
 			const QString e = f->extension();
 			Instrument * i = it->instrument();
@@ -773,17 +769,17 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 			break;
 		}
 
-		case FileItem::LoadAsPreset: {
+		case FileItem::FileHandling::LoadAsPreset: {
 			DataFile dataFile(f->fullName());
 			it->replaceInstrument(dataFile);
 			break;
 		}
-		case FileItem::ImportAsProject:
+		case FileItem::FileHandling::ImportAsProject:
 			ImportFilter::import( f->fullName(),
 							Engine::getSong() );
 			break;
 
-		case FileItem::NotSupported:
+		case FileItem::FileHandling::NotSupported:
 		default:
 			break;
 
@@ -803,14 +799,14 @@ void FileBrowserTreeWidget::activateListItem(QTreeWidgetItem * item,
 		return;
 	}
 
-	if( f->handling() == FileItem::LoadAsProject ||
-		f->handling() == FileItem::ImportAsProject )
+	if( f->handling() == FileItem::FileHandling::LoadAsProject ||
+		f->handling() == FileItem::FileHandling::ImportAsProject )
 	{
 		handleFile( f, nullptr );
 	}
-	else if( f->handling() != FileItem::NotSupported )
+	else if( f->handling() != FileItem::FileHandling::NotSupported )
 	{
-		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::InstrumentTrack, Engine::patternStore()));
+		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, Engine::patternStore()));
 		handleFile( f, it );
 	}
 }
@@ -822,7 +818,7 @@ void FileBrowserTreeWidget::openInNewInstrumentTrack(TrackContainer* tc, FileIte
 {
 	if(item->isTrack())
 	{
-		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::InstrumentTrack, tc));
+		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, tc));
 		handleFile(item, it);
 	}
 }
@@ -844,10 +840,10 @@ void FileBrowserTreeWidget::openInNewInstrumentTrack(FileItem* item, bool songEd
 bool FileBrowserTreeWidget::openInNewSampleTrack(FileItem* item)
 {
 	// Can't add non-samples to a sample track
-	if (item->type() != FileItem::SampleFile) { return false; }
+	if (item->type() != FileItem::FileType::Sample) { return false; }
 
 	// Create a new sample track for this sample
-	auto sampleTrack = static_cast<SampleTrack*>(Track::create(Track::SampleTrack, Engine::getSong()));
+	auto sampleTrack = static_cast<SampleTrack*>(Track::create(Track::Type::Sample, Engine::getSong()));
 
 	// Add the sample clip to the track
 	Engine::audioEngine()->requestChangeInModel();
@@ -1006,88 +1002,34 @@ void Directory::update()
 
 
 
-bool Directory::addItems(const QString & path )
+bool Directory::addItems(const QString& path)
 {
-	QDir thisDir( path );
-	if( !thisDir.isReadable() )
+	QDir thisDir(path);
+	if (!thisDir.isReadable()) { return false; }
+
+	treeWidget()->setUpdatesEnabled(false);
+
+	QFileInfoList entries = thisDir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::LocaleAware | QDir::DirsFirst | QDir::Name);
+	for (auto& entry : entries)
 	{
-		return false;
-	}
-
-	treeWidget()->setUpdatesEnabled( false );
-
-	bool added_something = false;
-
-	// try to add all directories from file system alphabetically into the tree
-	QStringList files = thisDir.entryList( QDir::Dirs, QDir::Name );
-	for( QStringList::const_iterator it = files.constBegin();
-						it != files.constEnd(); ++it )
-	{
-		QString cur_file = *it;
-		if( cur_file[0] != '.' )
+		QString fileName = entry.fileName();
+		if (entry.isDir())
 		{
-			bool orphan = true;
-			for( int i = 0; i < childCount(); ++i )
-			{
-				auto d = dynamic_cast<Directory*>(child(i));
-				if( d == nullptr || cur_file < d->text( 0 ) )
-				{
-					// insert before item, we're done
-					insertChild( i, new Directory( cur_file,
-							path, m_filter ) );
-					orphan = false;
-					m_dirCount++;
-					break;
-				}
-				else if( cur_file == d->text( 0 ) )
-				{
-					// imagine we have top-level subdirs named "TripleOscillator" in
-					// two directories from FileBrowser::m_directories
-					// and imagine both have a sub folder named "xyz"
-					// then only add one tree widget for both
-					// so we don't add a new Directory - we just
-					// add the path to the current directory
-					d->addDirectory( path );
-					orphan = false;
-					break;
-				}
-			}
-			if( orphan )
-			{
-				// it has not yet been added yet, so it's (lexically)
-				// larger than all other dirs => append it at the bottom
-				addChild( new Directory( cur_file, path,
-								m_filter ) );
-				m_dirCount++;
-			}
-
-			added_something = true;
+			auto dir = new Directory(fileName, path, m_filter);
+			addChild(dir);
+			m_dirCount++;
+		}
+		else if (entry.isFile() && thisDir.match(m_filter, fileName.toLower()))
+		{
+			auto fileItem = new FileItem(fileName, path);
+			addChild(fileItem);
 		}
 	}
-
-	// sorts the path alphabetically instead of just appending to the bottom (see "orphans")
-	if (added_something)
-		sortChildren(0, Qt::AscendingOrder);
-
-	QList<QTreeWidgetItem*> items;
-	files = thisDir.entryList( QDir::Files, QDir::Name );
-	files.sort(Qt::CaseInsensitive);
-	for( QStringList::const_iterator it = files.constBegin();
-						it != files.constEnd(); ++it )
-	{
-		QString cur_file = *it;
-		if( cur_file[0] != '.' &&
-				thisDir.match( m_filter, cur_file.toLower() ) )
-		{
-			items << new FileItem( cur_file, path );
-			added_something = true;
-		}
-	}
-	addChildren( items );
-
-	treeWidget()->setUpdatesEnabled( true );
-
-	return added_something;
+	
+	treeWidget()->setUpdatesEnabled(true);
+	
+	// return true if we added any child items
+	return childCount() > 0;
 }
 
 
@@ -1171,26 +1113,26 @@ void FileItem::initPixmaps()
 
 	switch( m_type )
 	{
-		case ProjectFile:
+		case FileType::Project:
 			setIcon( 0, *s_projectFilePixmap );
 			break;
-		case PresetFile:
+		case FileType::Preset:
 			setIcon( 0, *s_presetFilePixmap );
 			break;
-		case SoundFontFile:
+		case FileType::SoundFont:
 			setIcon( 0, *s_soundfontFilePixmap );
 			break;
-		case VstPluginFile:
+		case FileType::VstPlugin:
 			setIcon( 0, *s_vstPluginFilePixmap );
 			break;
-		case SampleFile:
-		case PatchFile:			// TODO
+		case FileType::Sample:
+		case FileType::Patch:			// TODO
 			setIcon( 0, *s_sampleFilePixmap );
 			break;
-		case MidiFile:
+		case FileType::Midi:
 			setIcon( 0, *s_midiFilePixmap );
 			break;
-		case UnknownFile:
+		case FileType::Unknown:
 		default:
 			setIcon( 0, *s_unknownFilePixmap );
 			break;
@@ -1202,36 +1144,36 @@ void FileItem::initPixmaps()
 
 void FileItem::determineFileType()
 {
-	m_handling = NotSupported;
+	m_handling = FileHandling::NotSupported;
 
 	const QString ext = extension();
 	if( ext == "mmp" || ext == "mpt" || ext == "mmpz" )
 	{
-		m_type = ProjectFile;
-		m_handling = LoadAsProject;
+		m_type = FileType::Project;
+		m_handling = FileHandling::LoadAsProject;
 	}
 	else if( ext == "xpf" || ext == "xml" )
 	{
-		m_type = PresetFile;
-		m_handling = LoadAsPreset;
+		m_type = FileType::Preset;
+		m_handling = FileHandling::LoadAsPreset;
 	}
 	else if( ext == "xiz" && ! getPluginFactory()->pluginSupportingExtension(ext).isNull() )
 	{
-		m_type = PresetFile;
-		m_handling = LoadByPlugin;
+		m_type = FileType::Preset;
+		m_handling = FileHandling::LoadByPlugin;
 	}
 	else if( ext == "sf2" || ext == "sf3" )
 	{
-		m_type = SoundFontFile;
+		m_type = FileType::SoundFont;
 	}
 	else if( ext == "pat" )
 	{
-		m_type = PatchFile;
+		m_type = FileType::Patch;
 	}
 	else if( ext == "mid" || ext == "midi" || ext == "rmi" )
 	{
-		m_type = MidiFile;
-		m_handling = ImportAsProject;
+		m_type = FileType::Midi;
+		m_handling = FileHandling::ImportAsProject;
 	}
 	else if( ext == "dll"
 #ifdef LMMS_BUILD_LINUX
@@ -1239,28 +1181,28 @@ void FileItem::determineFileType()
 #endif
 	)
 	{
-		m_type = VstPluginFile;
-		m_handling = LoadByPlugin;
+		m_type = FileType::VstPlugin;
+		m_handling = FileHandling::LoadByPlugin;
 	}
 	else if ( ext == "lv2" )
 	{
-		m_type = PresetFile;
-		m_handling = LoadByPlugin;
+		m_type = FileType::Preset;
+		m_handling = FileHandling::LoadByPlugin;
 	}
 	else
 	{
-		m_type = UnknownFile;
+		m_type = FileType::Unknown;
 	}
 
-	if( m_handling == NotSupported &&
+	if( m_handling == FileHandling::NotSupported &&
 		!ext.isEmpty() && ! getPluginFactory()->pluginSupportingExtension(ext).isNull() )
 	{
-		m_handling = LoadByPlugin;
+		m_handling = FileHandling::LoadByPlugin;
 		// classify as sample if not classified by anything yet but can
 		// be handled by a certain plugin
-		if( m_type == UnknownFile )
+		if( m_type == FileType::Unknown )
 		{
-			m_type = SampleFile;
+			m_type = FileType::Sample;
 		}
 	}
 }

@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef INSTRUMENT_TRACK_WINDOW_H
-#define INSTRUMENT_TRACK_WINDOW_H
+#ifndef LMMS_GUI_INSTRUMENT_TRACK_WINDOW_H
+#define LMMS_GUI_INSTRUMENT_TRACK_WINDOW_H
 
 #include <QWidget>
 
@@ -169,4 +169,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_INSTRUMENT_TRACK_WINDOW_H

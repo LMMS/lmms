@@ -22,10 +22,8 @@
  *
  */
 
-
-
-#ifndef TRACK_VIEW_H
-#define TRACK_VIEW_H
+#ifndef LMMS_GUI_TRACK_VIEW_H
+#define LMMS_GUI_TRACK_VIEW_H
 
 #include <QWidget>
 
@@ -33,7 +31,6 @@
 #include "ModelView.h"
 #include "TrackContentWidget.h"
 #include "TrackOperationsWidget.h"
-
 
 class QMenu;
 
@@ -98,7 +95,7 @@ public:
 
 	bool isMovingTrack() const
 	{
-		return m_action == MoveTrack;
+		return m_action == Action::Move;
 	}
 
 	virtual void update();
@@ -142,11 +139,11 @@ protected:
 
 
 private:
-	enum Actions
+	enum class Action
 	{
-		NoAction,
-		MoveTrack,
-		ResizeTrack
+		None,
+		Move,
+		Resize
 	} ;
 
 	Track * m_track;
@@ -156,7 +153,7 @@ private:
 	QWidget m_trackSettingsWidget;
 	TrackContentWidget m_trackContentWidget;
 
-	Actions m_action;
+	Action m_action;
 
 	virtual FadeButton * getActivityIndicator()
 	{
@@ -179,4 +176,4 @@ private slots:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_TRACK_VIEW_H

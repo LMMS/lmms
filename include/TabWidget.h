@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef TAB_WIDGET_H
-#define TAB_WIDGET_H
+#ifndef LMMS_GUI_TAB_WIDGET_H
+#define LMMS_GUI_TAB_WIDGET_H
 
 #include <QWidget>
 #include <QMap>
@@ -112,4 +111,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_TAB_WIDGET_H

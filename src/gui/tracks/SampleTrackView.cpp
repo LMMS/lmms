@@ -59,7 +59,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	m_tlb->move(3, 1);
 	m_tlb->show();
 
-	m_volumeKnob = new Knob( knobSmall_17, getTrackSettingsWidget(),
+	m_volumeKnob = new Knob( KnobType::Small17, getTrackSettingsWidget(),
 						    tr( "Track volume" ) );
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setModel( &_t->m_volumeModel );
@@ -73,7 +73,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	m_volumeKnob->setLabel( tr( "VOL" ) );
 	m_volumeKnob->show();
 
-	m_panningKnob = new Knob( knobSmall_17, getTrackSettingsWidget(),
+	m_panningKnob = new Knob( KnobType::Small17, getTrackSettingsWidget(),
 							tr( "Panning" ) );
 	m_panningKnob->setModel( &_t->m_panningModel );
 	m_panningKnob->setHintText( tr( "Panning:" ), "%" );
@@ -82,7 +82,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	m_panningKnob->show();
 
 	m_activityIndicator = new FadeButton(
-		QApplication::palette().color(QPalette::Active, QPalette::Background),
+		QApplication::palette().color(QPalette::Active, QPalette::Window),
 		QApplication::palette().color(QPalette::Active, QPalette::BrightText),
 		QApplication::palette().color(QPalette::Active, QPalette::BrightText).darker(),
 		getTrackSettingsWidget()
