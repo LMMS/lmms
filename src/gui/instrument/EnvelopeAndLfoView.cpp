@@ -486,7 +486,8 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 					val = m_randomGraph;
 					break;
 				case EnvelopeAndLfoParameters::LfoShape::UserDefinedWave:
-					val = Oscillator::userWaveSample(m_params->m_userWave.get(), phase);
+					// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
+					val = Oscillator::userWaveSample(std::atomic_load(&m_params->m_userWave).get(), phase);
 					break;
 			}
 			if( static_cast<f_cnt_t>( cur_sample ) <=

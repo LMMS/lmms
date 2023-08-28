@@ -814,7 +814,8 @@ inline sample_t Oscillator::getSample<Oscillator::WaveShape::UserDefined>(
 	}
 	else
 	{
-		return userWaveSample(m_userWave.get(), _sample);
+		// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
+		return userWaveSample(std::atomic_load(&m_userWave).get(), _sample);
 	}
 }
 

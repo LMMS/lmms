@@ -107,7 +107,8 @@ void LfoController::updateValueBuffer()
 	{
 		const float currentSample = m_sampleFunction != nullptr
 			? m_sampleFunction( phase )
-			: Oscillator::userWaveSample(m_userDefSampleBuffer.get(), phase);
+			// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
+			: Oscillator::userWaveSample(std::atomic_load(&m_userDefSampleBuffer).get(), phase);
 
 		f = std::clamp(m_baseModel.value() + (*amountPtr * currentSample / 2.0f), 0.0f, 1.0f);
 
