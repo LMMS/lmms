@@ -323,9 +323,13 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 	QString value = StringPairDrag::decodeValue( _de );
 	if( type == "samplefile" )
 	{
-		auto buffer = SampleLoader::createBufferFromFile(StringPairDrag::decodeValue(_de));
-		// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-		std::atomic_store(&m_params->m_userWave, std::shared_ptr<const SampleBuffer>(std::move(buffer)));
+		if (!value.isEmpty())
+		{
+			auto buffer = SampleLoader::createBufferFromFile(value);
+			// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
+			std::atomic_store(&m_params->m_userWave, std::shared_ptr<const SampleBuffer>(std::move(buffer)));
+		}
+
 		m_userLfoBtn->model()->setValue( true );
 		m_params->m_lfoWaveModel.setValue(static_cast<int>(EnvelopeAndLfoParameters::LfoShape::UserDefinedWave));
 		_de->accept();
@@ -337,9 +341,14 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 		auto file = dataFile.content().
 					firstChildElement().firstChildElement().
 					firstChildElement().attribute("src");
-		auto buffer = SampleLoader::createBufferFromFile(file);
-		// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-		std::atomic_store(&m_params->m_userWave, std::shared_ptr<const SampleBuffer>(std::move(buffer)));
+
+		if (!file.isEmpty())
+		{
+			auto buffer = SampleLoader::createBufferFromFile(file);
+			// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
+			std::atomic_store(&m_params->m_userWave, std::shared_ptr<const SampleBuffer>(std::move(buffer)));
+		}
+
 		m_userLfoBtn->model()->setValue( true );
 		m_params->m_lfoWaveModel.setValue(static_cast<int>(EnvelopeAndLfoParameters::LfoShape::UserDefinedWave));
 		_de->accept();

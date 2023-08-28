@@ -213,13 +213,13 @@ void LfoControllerDialog::askUserDefWave()
 {
 	auto sampleBuffer = dynamic_cast<LfoController*>(this->model())->m_userDefSampleBuffer;
 	QString fileName = SampleLoader::openWaveformFile();
-	
-	auto buffer = SampleLoader::createBufferFromFile(fileName);
-	// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-	std::atomic_store(&sampleBuffer, std::shared_ptr<const SampleBuffer>(std::move(buffer)));
-	
-	if( fileName.isEmpty() == false )
+
+	if (!fileName.isEmpty())
 	{
+		auto buffer = SampleLoader::createBufferFromFile(fileName);
+		// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
+		std::atomic_store(&sampleBuffer, std::shared_ptr<const SampleBuffer>(std::move(buffer)));
+
 		// TODO:
 		m_userWaveBtn->setToolTip(sampleBuffer->audioFile());
 	}

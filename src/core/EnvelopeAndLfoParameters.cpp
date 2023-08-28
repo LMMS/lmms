@@ -389,9 +389,13 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 		m_sustainModel.setValue( 1.0 - m_sustainModel.value() );
 	}
 
-	auto buffer = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile"));
-	// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-	std::atomic_store(&m_userWave, std::shared_ptr<const SampleBuffer>(std::move(buffer)));
+	if (!_this.attribute("userwavefile").isEmpty())
+	{
+		auto buffer = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile"));
+		// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
+		std::atomic_store(&m_userWave, std::shared_ptr<const SampleBuffer>(std::move(buffer)));
+	}
+
 	updateSampleVars();
 }
 

@@ -144,12 +144,12 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 void OscillatorObject::oscUserDefWaveDblClick()
 {
 	QString af = gui::SampleLoader::openWaveformFile();
-	auto buffer = gui::SampleLoader::createBufferFromFile(af);
-	// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-	std::atomic_store(&m_sampleBuffer, std::shared_ptr<const SampleBuffer>(std::move(buffer)));
-
-	if( af != "" )
+	if (af != "")
 	{
+		auto buffer = gui::SampleLoader::createBufferFromFile(af);
+		// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
+		std::atomic_store(&m_sampleBuffer, std::shared_ptr<const SampleBuffer>(std::move(buffer)));
+
 		// TODO:
 		//m_usrWaveBtn->setToolTip(m_sampleBuffer->audioFile());
 	}
@@ -291,9 +291,12 @@ void TripleOscillator::loadSettings( const QDomElement & _this )
 		m_osc[i]->m_useWaveTableModel.loadSettings( _this,
 							"useWaveTable" + QString::number (i+1 ) );
 
-		auto buffer = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile" + is));
-		// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-		std::atomic_store(&m_osc[i]->m_sampleBuffer, std::shared_ptr<const SampleBuffer>(std::move(buffer)));
+		if (!_this.attribute("userwavefile" + is).isEmpty())
+		{
+			auto buffer = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile" + is));
+			// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
+			std::atomic_store(&m_osc[i]->m_sampleBuffer, std::shared_ptr<const SampleBuffer>(std::move(buffer)));
+		}
 	}
 }
 
