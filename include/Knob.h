@@ -144,6 +144,9 @@ protected:
 	void wheelEvent( QWheelEvent * _me ) override;
 	void changeEvent(QEvent * ev) override;
 
+	void enterEvent(QEvent *event) override;
+	void leaveEvent(QEvent *event) override;
+
 	virtual float getValue( const QPoint & _p );
 
 private slots:
@@ -160,6 +163,7 @@ private:
 						float _innerRadius = 1) const;
 
 	void drawKnob( QPainter * _p );
+	void showTextFloat(int msecBeforeDisplay, int msecDisplayTime);
 	void setPosition( const QPoint & _p );
 	bool updateAngle();
 
