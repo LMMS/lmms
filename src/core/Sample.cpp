@@ -64,6 +64,7 @@ Sample::Sample(std::shared_ptr<const SampleBuffer> buffer)
 	, m_loopStartFrame(0)
 	, m_loopEndFrame(m_buffer->size())
 {
+	assert(buffer != nullptr);
 }
 
 Sample::Sample(const Sample& other)
@@ -145,6 +146,8 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, int numFrames, float d
 
 void Sample::visualize(QPainter& p, const QRect& dr, int fromFrame, int toFrame) const
 {
+	assert(m_buffer != nullptr);
+
 	const auto lock = std::shared_lock{m_mutex};
 	const auto numFrames = static_cast<int>(m_buffer->size());
 	if (numFrames == 0) { return; }
@@ -235,8 +238,9 @@ void Sample::visualize(QPainter& p, const QRect& dr, int fromFrame, int toFrame)
 
 auto Sample::sampleDuration() const -> int
 {
-	assert(m_buffer != nullptr && m_buffer->sampleRate() > 0);
+	assert(m_buffer != nullptr);
 	const auto lock = std::shared_lock{m_mutex};
+	if (m_buffer->sampleRate() <= 0) { return 0; }
 	return static_cast<double>(m_endFrame - m_startFrame) / m_buffer->sampleRate() * 1000;
 }
 
@@ -266,8 +270,9 @@ auto Sample::toBase64() const -> QString
 
 auto Sample::playbackSize() const -> int
 {
-	assert(m_buffer != nullptr && m_buffer->sampleRate() > 0);
+	assert(m_buffer != nullptr);
 	const auto lock = std::shared_lock{m_mutex};
+	if (m_buffer->sampleRate() <= 0) { return 0; }
 	return m_buffer->size() * Engine::audioEngine()->processingSampleRate() / m_buffer->sampleRate();
 }
 
