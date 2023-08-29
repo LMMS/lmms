@@ -561,7 +561,7 @@ void NotePlayHandle::processTimePos(const TimePos& time, float pitchValue, bool 
 {
 	if (!detuning() || time < songGlobalParentOffset() + pos()) { return; }
 
-	if (isRecording && m_origin == Origin::OriginMidiInput)
+	if (isRecording && m_origin == Origin::MidiInput)
 	{
 		detuning()->automationClip()->recordValue(time - songGlobalParentOffset() - pos(), pitchValue / 100);
 	}
