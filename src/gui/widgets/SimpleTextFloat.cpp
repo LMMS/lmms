@@ -48,7 +48,7 @@ SimpleTextFloat::SimpleTextFloat() :
 
 	m_showTimer = new QTimer();
 	m_showTimer->setSingleShot(true);
-	QObject::connect(m_showTimer, &QTimer::timeout, this, &SimpleTextFloat::show, Qt::AutoConnection);
+	QObject::connect(m_showTimer, &QTimer::timeout, this, &SimpleTextFloat::show);
 
 	m_hideTimer = new QTimer();
 	m_hideTimer->setSingleShot(true);
