@@ -92,18 +92,15 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 #ifdef LMMS_BUILD_LINUX
 
 	// FileSystem types : https://www.javatpoint.com/linux-file-system
-	QStringList usableFileSystems = {"ext", "ext2", "ext3", "ext4", "jfs", "reiserfs"};
+	QStringList usableFileSystems = {"ext", "ext2", "ext3", "ext4", "jfs", "reiserfs", "ntfs3", "fuse.sshfs", "fuseblk"};
 
 	foreach (QStorageInfo storage, QStorageInfo::mountedVolumes())
 	{
 		storage.refresh();
 
-		if (usableFileSystems.contains(QString(storage.fileSystemType()), Qt::CaseInsensitive))
+		if (usableFileSystems.contains(QString(storage.fileSystemType()), Qt::CaseInsensitive) && storage.isValid() && storage.isReady())
 		{
-			if (storage.isValid() && storage.isReady())
-			{
-				urls << QUrl::fromLocalFile(storage.displayName());	
-			}
+			urls << QUrl::fromLocalFile(storage.rootPath());	
 		}
 	}
 #endif
