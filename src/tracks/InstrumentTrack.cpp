@@ -714,7 +714,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 	// Handle automation: detuning
 	for (const auto& processHandle : m_processHandles)
 	{
-		processHandle->processTimePos(_start, m_pitchModel.value(), GuiApplication::instance()->pianoRoll()->isRecording());
+		processHandle->processTimePos(_start, m_pitchModel.value(), gui::GuiApplication::instance()->pianoRoll()->isRecording());
 	}
 
 	if ( clips.size() == 0 )
