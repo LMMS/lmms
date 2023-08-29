@@ -22,12 +22,15 @@
  *
  */
 
-#ifndef TRACK_OPERATIONS_WIDGET_H
-#define TRACK_OPERATIONS_WIDGET_H
+#ifndef LMMS_GUI_TRACK_OPERATIONS_WIDGET_H
+#define LMMS_GUI_TRACK_OPERATIONS_WIDGET_H
 
 #include <QWidget>
 
 class QPushButton;
+
+namespace lmms::gui
+{
 
 class PixmapButton;
 class TrackView;
@@ -37,7 +40,7 @@ class TrackOperationsWidget : public QWidget
 	Q_OBJECT
 public:
 	TrackOperationsWidget( TrackView * parent );
-	~TrackOperationsWidget();
+	~TrackOperationsWidget() override = default;
 
 
 protected:
@@ -70,8 +73,11 @@ private:
 	friend class TrackView;
 
 signals:
-	void trackRemovalScheduled( TrackView * t );
+	void trackRemovalScheduled( lmms::gui::TrackView * t );
 
 } ;
 
-#endif
+
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_TRACK_OPERATIONS_WIDGET_H

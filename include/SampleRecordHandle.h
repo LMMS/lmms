@@ -22,17 +22,20 @@
  *
  */
 
+#ifndef LMMS_SAMPLE_RECORD_HANDLE_H
+#define LMMS_SAMPLE_RECORD_HANDLE_H
 
-#ifndef SAMPLE_RECORD_HANDLE_H
-#define SAMPLE_RECORD_HANDLE_H
-
-#include <QtCore/QList>
-#include <QtCore/QPair>
+#include <QList>
+#include <QPair>
 
 #include "PlayHandle.h"
 #include "TimePos.h"
 
-class BBTrack;
+namespace lmms
+{
+
+
+class PatternTrack;
 class SampleBuffer;
 class SampleClip;
 class Track;
@@ -42,7 +45,7 @@ class SampleRecordHandle : public PlayHandle
 {
 public:
 	SampleRecordHandle( SampleClip* clip );
-	virtual ~SampleRecordHandle();
+	~SampleRecordHandle() override;
 
 	void play( sampleFrame * _working_buffer ) override;
 	bool isFinished() const override;
@@ -57,16 +60,18 @@ private:
 	virtual void writeBuffer( const sampleFrame * _ab,
 						const f_cnt_t _frames );
 
-	typedef QList<QPair<sampleFrame *, f_cnt_t> > bufferList;
+	using bufferList = QList<QPair<sampleFrame*, f_cnt_t>>;
 	bufferList m_buffers;
 	f_cnt_t m_framesRecorded;
 	TimePos m_minLength;
 
 	Track * m_track;
-	BBTrack * m_bbTrack;
+	PatternTrack* m_patternTrack;
 	SampleClip * m_clip;
 
 } ;
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_SAMPLE_RECORD_HANDLE_H

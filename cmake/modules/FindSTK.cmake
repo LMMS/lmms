@@ -1,20 +1,39 @@
-FIND_PATH(STK_INCLUDE_DIR Stk.h /usr/include/stk /usr/local/include/stk ${CMAKE_INSTALL_PREFIX}/include/stk ${CMAKE_FIND_ROOT_PATH}/include/stk)
+# Try config mode first
+find_package(unofficial-libstk CONFIG QUIET)
 
-FIND_LIBRARY(STK_LIBRARY NAMES stk PATH /usr/lib /usr/local/lib ${CMAKE_INSTALL_PREFIX}/lib ${CMAKE_FIND_ROOT_PATH}/lib) 
+if(TARGET unofficial::libstk::libstk)
+	# Extract details for find_package_handle_standard_args
+	get_target_property(STK_LIBRARY unofficial::libstk::libstk LOCATION)
+	get_target_property(STK_INCLUDE_DIR unofficial::libstk::libstk INTERFACE_INCLUDE_DIRECTORIES)
+else()
+	find_path(STK_INCLUDE_DIR
+		NAMES stk/Stk.h
+		PATH /usr/include /usr/local/include "${CMAKE_INSTALL_PREFIX}/include" "${CMAKE_FIND_ROOT_PATH}/include"
+	)
 
-IF (STK_INCLUDE_DIR AND STK_LIBRARY)
-   SET(STK_FOUND TRUE)
-ENDIF (STK_INCLUDE_DIR AND STK_LIBRARY)
+	find_library(STK_LIBRARY
+		NAMES stk
+		PATH /usr/lib /usr/local/lib "${CMAKE_INSTALL_PREFIX}/lib" "${CMAKE_FIND_ROOT_PATH}/lib"
+	)
 
+	if(STK_INCLUDE_DIR AND STK_LIBRARY)
+		# Yes, this target name is hideous, but it matches that provided by vcpkg
+		add_library(unofficial::libstk::libstk UNKNOWN IMPORTED)
+		set_target_properties(unofficial::libstk::libstk PROPERTIES
+			INTERFACE_INCLUDE_DIRECTORIES "${STK_INCLUDE_DIR}"
+			IMPORTED_LOCATION "${STK_LIBRARY}"
+		)
+	endif()
+endif()
 
-IF (STK_FOUND)
-   IF (NOT STK_FIND_QUIETLY)
-      MESSAGE(STATUS "Found STK: ${STK_LIBRARY}")
-	SET(HAVE_STK TRUE)
-   ENDIF (NOT STK_FIND_QUIETLY)
-ELSE (STK_FOUND)
-   IF (STK_FIND_REQUIRED)
-      MESSAGE(FATAL_ERROR "Could not find STK")
-   ENDIF (STK_FIND_REQUIRED)
-ENDIF (STK_FOUND)
+# find STK rawwave path
+find_path(STK_RAWWAVE_ROOT
+	NAMES silence.raw sinewave.raw
+	HINTS "${STK_INCLUDE_DIR}/.."
+	PATH_SUFFIXES share/stk/rawwaves share/libstk/rawwaves
+)
 
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(STK
+	REQUIRED_VARS STK_LIBRARY STK_INCLUDE_DIR
+)

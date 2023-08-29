@@ -25,16 +25,18 @@
 #include "SamplePlayHandle.h"
 #include "AudioEngine.h"
 #include "AudioPort.h"
-#include "BBTrack.h"
 #include "Engine.h"
-#include "InstrumentTrack.h"
-#include "lmms_constants.h"
+#include "Note.h"
+#include "PatternTrack.h"
 #include "SampleClip.h"
+#include "SampleTrack.h"
 
+namespace lmms
+{
 
 
 SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer , bool ownAudioPort ) :
-	PlayHandle( TypeSamplePlayHandle ),
+	PlayHandle( Type::SamplePlayHandle ),
 	m_sampleBuffer( sharedObject::ref( sampleBuffer ) ),
 	m_doneMayReturnTrue( true ),
 	m_frame( 0 ),
@@ -42,7 +44,7 @@ SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer , bool ownAudioPo
 	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
 	m_track( nullptr ),
-	m_bbTrack( nullptr )
+	m_patternTrack( nullptr )
 {
 	if (ownAudioPort)
 	{
@@ -106,9 +108,9 @@ void SamplePlayHandle::play( sampleFrame * buffer )
 	}
 
 	if( !( m_track && m_track->isMuted() )
-				&& !( m_bbTrack && m_bbTrack->isMuted() ) )
+				&& !(m_patternTrack && m_patternTrack->isMuted()))
 	{
-/*		stereoVolumeVector v =
+/*		StereoVolumeVector v =
 			{ { m_volumeModel->value() / DefaultVolume,
 				m_volumeModel->value() / DefaultVolume } };*/
 		// SamplePlayHandle always plays the sample at its original pitch;
@@ -135,7 +137,7 @@ bool SamplePlayHandle::isFinished() const
 
 bool SamplePlayHandle::isFromTrack( const Track * _track ) const
 {
-	return m_track == _track || m_bbTrack == _track;
+	return m_track == _track || m_patternTrack == _track;
 }
 
 
@@ -148,5 +150,4 @@ f_cnt_t SamplePlayHandle::totalFrames() const
 }
 
 
-
-
+} // namespace lmms

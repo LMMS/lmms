@@ -22,19 +22,22 @@
  *
  */
 
-#ifndef AUDIO_ENGINE_PROFILER_H
-#define AUDIO_ENGINE_PROFILER_H
+#ifndef LMMS_AUDIO_ENGINE_PROFILER_H
+#define LMMS_AUDIO_ENGINE_PROFILER_H
 
 #include <QFile>
 
 #include "lmms_basics.h"
 #include "MicroTimer.h"
 
+namespace lmms
+{
+
 class AudioEngineProfiler
 {
 public:
 	AudioEngineProfiler();
-	~AudioEngineProfiler();
+	~AudioEngineProfiler() = default;
 
 	void startPeriod()
 	{
@@ -57,4 +60,6 @@ private:
 	QFile m_outputFile;
 };
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_AUDIO_ENGINE_PROFILER_H

@@ -29,17 +29,21 @@
 #include "lmms_math.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT compressor_plugin_descriptor =
 {
-	STRINGIFY(PLUGIN_NAME),
+	LMMS_STRINGIFY(PLUGIN_NAME),
 	"Compressor",
 	QT_TRANSLATE_NOOP("PluginBrowser", "A dynamic range compressor."),
 	"Lost Robot <r94231@gmail.com>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,
@@ -91,11 +95,6 @@ CompressorEffect::CompressorEffect(Model* parent, const Descriptor::SubPluginFea
 }
 
 
-
-
-CompressorEffect::~CompressorEffect()
-{
-}
 
 
 float CompressorEffect::msToCoeff(float ms)
@@ -277,7 +276,7 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	float rOutPeak = 0.0;
 	float lInPeak = 0.0;
 	float rInPeak = 0.0;
-	
+
 	const bool midside = m_compressorControls.m_midsideModel.value();
 	const bool peakmode = m_compressorControls.m_peakmodeModel.value();
 	const float inBalance = m_compressorControls.m_inBalanceModel.value();
@@ -293,8 +292,8 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 	for(fpp_t f = 0; f < frames; ++f)
 	{
-		sample_t drySignal[2] = {buf[f][0], buf[f][1]};
-		sample_t s[2] = {drySignal[0] * m_inGainVal, drySignal[1] * m_inGainVal};
+		auto drySignal = std::array{buf[f][0], buf[f][1]};
+		auto s = std::array{drySignal[0] * m_inGainVal, drySignal[1] * m_inGainVal};
 
 		// Calculate tilt filters, to bias the sidechain to the low or high frequencies
 		if (m_tiltVal)
@@ -443,28 +442,28 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			m_gainResult[i] = qMax(m_rangeVal, m_gainResult[i]);
 		}
 
-		switch (stereoLink)
+		switch (static_cast<StereoLinkMode>(stereoLink))
 		{
-			case Unlinked:
+			case StereoLinkMode::Unlinked:
 			{
 				break;
 			}
-			case Maximum:
+			case StereoLinkMode::Maximum:
 			{
 				m_gainResult[0] = m_gainResult[1] = qMin(m_gainResult[0], m_gainResult[1]);
 				break;
 			}
-			case Average:
+			case StereoLinkMode::Average:
 			{
 				m_gainResult[0] = m_gainResult[1] = (m_gainResult[0] + m_gainResult[1]) * 0.5f;
 				break;
 			}
-			case Minimum:
+			case StereoLinkMode::Minimum:
 			{
 				m_gainResult[0] = m_gainResult[1] = qMax(m_gainResult[0], m_gainResult[1]);
 				break;
 			}
-			case Blend:
+			case StereoLinkMode::Blend:
 			{
 				if (blend > 0)// 0 is unlinked
 				{
@@ -513,7 +512,7 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 				m_inputBufLoc = 0;
 			}
 
-			const float temp[2] = {drySignal[0], drySignal[1]};
+			const auto temp = std::array{drySignal[0], drySignal[1]};
 			s[0] = m_inputBuf[0][m_inputBufLoc];
 			s[1] = m_inputBuf[1][m_inputBufLoc];
 
@@ -526,8 +525,8 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			s[1] = drySignal[1];
 		}
 
-		float delayedDrySignal[2] = {s[0], s[1]};
-		
+		auto delayedDrySignal = std::array{s[0], s[1]};
+
 		if (midside)// Convert left/right to mid/side
 		{
 			const float temp = s[0];
@@ -662,3 +661,5 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main(Model* parent, void* data)
 
 }
 
+
+} // namespace lmms

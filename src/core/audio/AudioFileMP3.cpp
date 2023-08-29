@@ -27,10 +27,11 @@
 
 #ifdef LMMS_HAVE_MP3LAME
 
-#include "AudioEngine.h"
 
 #include <cassert>
 
+namespace lmms
+{
 
 AudioFileMP3::AudioFileMP3(	OutputSettings const & outputSettings,
 				const ch_cnt_t channels,
@@ -93,11 +94,11 @@ MPEG_mode mapToMPEG_mode(OutputSettings::StereoMode stereoMode)
 {
 	switch (stereoMode)
 	{
-	case OutputSettings::StereoMode_Stereo:
+	case OutputSettings::StereoMode::Stereo:
 		return STEREO;
-	case OutputSettings::StereoMode_JointStereo:
+	case OutputSettings::StereoMode::JointStereo:
 		return JOINT_STEREO;
-	case OutputSettings::StereoMode_Mono:
+	case OutputSettings::StereoMode::Mono:
 		return MONO;
 	default:
 		return NOT_SET;
@@ -131,4 +132,6 @@ void AudioFileMP3::tearDownEncoder()
 	lame_close(m_lame);
 }
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_HAVE_MP3LAME

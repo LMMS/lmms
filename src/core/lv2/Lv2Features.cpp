@@ -32,6 +32,10 @@
 #include "Lv2Manager.h"
 
 
+namespace lmms
+{
+
+
 bool Lv2Features::isFeatureSupported(const char* featName)
 {
 	return Engine::getLv2Manager()->isFeatureSupported(featName);
@@ -83,9 +87,9 @@ void Lv2Features::createFeatureVectors()
 
 	// create pointer vector (for lilv_plugin_instantiate)
 	m_featurePointers.reserve(m_features.size() + 1);
-	for(std::size_t i = 0; i < m_features.size(); ++i)
+	for (const auto& feature : m_features)
 	{
-		m_featurePointers.push_back(&m_features[i]);
+		m_featurePointers.push_back(&feature);
 	}
 	m_featurePointers.push_back(nullptr);
 }
@@ -100,6 +104,16 @@ void *&Lv2Features::operator[](const char *featName)
 	return itr->second;
 }
 
+
+
+
+void Lv2Features::clear()
+{
+	m_featureByUri.clear();
+}
+
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2
 

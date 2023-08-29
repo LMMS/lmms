@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MIXER_VIEW_H
-#define MIXER_VIEW_H
+#ifndef LMMS_GUI_MIXER_VIEW_H
+#define LMMS_GUI_MIXER_VIEW_H
 
 #include <QWidget>
 #include <QHBoxLayout>
@@ -34,11 +34,15 @@
 #include "Engine.h"
 #include "Fader.h"
 #include "PixmapButton.h"
-#include "ToolTip.h"
 #include "embed.h"
 #include "EffectRackView.h"
 
 class QButtonGroup;
+
+
+namespace lmms::gui
+{
+
 class MixerLine;
 
 class LMMS_EXPORT MixerView : public QWidget, public ModelView,
@@ -62,7 +66,7 @@ public:
 
 
 	MixerView();
-	virtual ~MixerView();
+	~MixerView() override;
 
 	void keyPressEvent(QKeyEvent * e) override;
 
@@ -91,6 +95,7 @@ public:
 
 	// notify the view that a mixer channel was deleted
 	void deleteChannel(int index);
+	bool confirmRemoval(int index);
 
 	// delete all unused channels
 	void deleteUnusedChannels();
@@ -128,8 +133,11 @@ private:
 	QWidget * m_racksWidget;
 
 	void updateMaxChannelSelector();
-	
+
 	friend class MixerChannelView;
 } ;
 
-#endif
+
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_MIXER_VIEW_H

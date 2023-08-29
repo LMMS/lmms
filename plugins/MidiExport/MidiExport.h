@@ -31,9 +31,14 @@
 #include "ExportFilter.h"
 #include "MidiFile.hpp"
 
+class QDomNode;
+
+namespace lmms
+{
+
 
 const int BUFFER_SIZE = 50*1024;
-typedef MidiFile::MIDITrack<BUFFER_SIZE> MTrack;
+using MTrack = MidiFile::MIDITrack<BUFFER_SIZE>;
 
 struct MidiNote
 {
@@ -48,39 +53,39 @@ struct MidiNote
 	}
 } ;
 
-typedef std::vector<MidiNote> MidiNoteVector;
-typedef std::vector<MidiNote>::iterator MidiNoteIterator;
-
-
+using MidiNoteVector = std::vector<MidiNote>;
+using MidiNoteIterator = std::vector<MidiNote>::iterator;
 
 class MidiExport: public ExportFilter
 {
 // 	Q_OBJECT
 public:
 	MidiExport();
-	~MidiExport();
+	~MidiExport() override = default;
 
-	virtual PluginView *instantiateView(QWidget *)
+	gui::PluginView* instantiateView(QWidget *) override
 	{
 		return nullptr;
 	}
 
-	virtual bool tryExport(const TrackContainer::TrackList &tracks,
-				const TrackContainer::TrackList &tracks_BB,
-				int tempo, int masterPitch, const QString &filename);
+	bool tryExport(const TrackContainer::TrackList &tracks,
+				const TrackContainer::TrackList &patternTracks,
+				int tempo, int masterPitch, const QString &filename) override;
 	
 private:
-	void writeMidiClip(MidiNoteVector &midiClip, QDomNode n,
+	void writeMidiClip(MidiNoteVector &midiClip, const QDomNode& n,
 				int base_pitch, double base_volume, int base_time);
 	void writeMidiClipToTrack(MTrack &mtrack, MidiNoteVector &nv);
-	void writeBBClip(MidiNoteVector &src, MidiNoteVector &dst,
+	void writePatternClip(MidiNoteVector &src, MidiNoteVector &dst,
 				int len, int base, int start, int end);
-	void ProcessBBNotes(MidiNoteVector &nv, int cutPos);
+	void processPatternNotes(MidiNoteVector &nv, int cutPos);
 
 	void error();
 
 
 } ;
 
+
+} // namespace lmms
 
 #endif

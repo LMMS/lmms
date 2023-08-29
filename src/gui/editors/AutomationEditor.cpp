@@ -30,10 +30,9 @@
 #include <cmath>
 
 #include <QApplication>
+#include <QInputDialog>
 #include <QKeyEvent>
 #include <QLabel>
-#include <QLayout>
-#include <QMdiArea>
 #include <QPainter>
 #include <QPainterPath>
 #include <QScrollBar>
@@ -46,7 +45,6 @@
 
 #include "ActionGroup.h"
 #include "AutomationNode.h"
-#include "BBTrackContainer.h"
 #include "ComboBox.h"
 #include "debug.h"
 #include "DeprecationHelper.h"
@@ -54,15 +52,18 @@
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "gui_templates.h"
+#include "Knob.h"
 #include "MainWindow.h"
+#include "PatternStore.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
-#include "SongEditor.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
-#include "ToolTip.h"
 
+
+namespace lmms::gui
+{
 
 QPixmap * AutomationEditor::s_toolDraw = nullptr;
 QPixmap * AutomationEditor::s_toolErase = nullptr;
@@ -71,7 +72,7 @@ QPixmap * AutomationEditor::s_toolMove = nullptr;
 QPixmap * AutomationEditor::s_toolYFlip = nullptr;
 QPixmap * AutomationEditor::s_toolXFlip = nullptr;
 
-const QVector<float> AutomationEditor::m_zoomXLevels =
+const std::array<float, 7> AutomationEditor::m_zoomXLevels =
 		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f };
 
 
@@ -89,13 +90,13 @@ AutomationEditor::AutomationEditor() :
 	m_bottomLevel( 0 ),
 	m_topLevel( 0 ),
 	m_currentPosition(),
-	m_action( NONE ),
+	m_action( Action::None ),
 	m_drawLastLevel( 0.0f ),
 	m_drawLastTick( 0 ),
 	m_ppb( DEFAULT_PPB ),
 	m_y_delta( DEFAULT_Y_DELTA ),
 	m_y_auto( true ),
-	m_editMode( DRAW ),
+	m_editMode( EditMode::Draw ),
 	m_mouseDownLeft(false),
 	m_mouseDownRight( false ),
 	m_scrollBack( false ),
@@ -109,11 +110,11 @@ AutomationEditor::AutomationEditor() :
 	m_crossColor(0, 0, 0),
 	m_backgroundShade(0, 0, 0)
 {
-	connect( this, SIGNAL( currentClipChanged() ),
-				this, SLOT( updateAfterClipChange() ),
+	connect( this, SIGNAL(currentClipChanged()),
+				this, SLOT(updateAfterClipChange()),
 				Qt::QueuedConnection );
-	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
-						this, SLOT( update() ) );
+	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
+						this, SLOT(update()));
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
@@ -121,15 +122,15 @@ AutomationEditor::AutomationEditor() :
 	setLayoutDirection( Qt::LeftToRight );
 
 	m_tensionModel = new FloatModel(1.0, 0.0, 1.0, 0.01);
-	connect( m_tensionModel, SIGNAL( dataChanged() ),
-				this, SLOT( setTension() ) );
+	connect( m_tensionModel, SIGNAL(dataChanged()),
+				this, SLOT(setTension()));
 
 	for (auto q : Quantizations) {
 		m_quantizeModel.addItem(QString("1/%1").arg(q));
 	}
 
-	connect( &m_quantizeModel, SIGNAL(dataChanged() ),
-					this, SLOT( setQuantization() ) );
+	connect( &m_quantizeModel, SIGNAL(dataChanged()),
+					this, SLOT(setQuantization()));
 	m_quantizeModel.setValue( m_quantizeModel.findText( "1/8" ) );
 
 	if (s_toolYFlip == nullptr)
@@ -146,25 +147,25 @@ AutomationEditor::AutomationEditor() :
 	// add time-line
 	m_timeLine = new TimeLineWidget( VALUES_WIDTH, 0, m_ppb,
 				Engine::getSong()->getPlayPos(
-					Song::Mode_PlayAutomationClip ),
+					Song::PlayMode::AutomationClip ),
 					m_currentPosition,
-					Song::Mode_PlayAutomationClip, this );
-	connect( this, SIGNAL( positionChanged( const TimePos & ) ),
-		m_timeLine, SLOT( updatePosition( const TimePos & ) ) );
-	connect( m_timeLine, SIGNAL( positionChanged( const TimePos & ) ),
-			this, SLOT( updatePosition( const TimePos & ) ) );
+					Song::PlayMode::AutomationClip, this );
+	connect( this, SIGNAL( positionChanged( const lmms::TimePos& ) ),
+		m_timeLine, SLOT( updatePosition( const lmms::TimePos& ) ) );
+	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos& ) ),
+			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
 
 	// init scrollbars
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
 	m_leftRightScroll->setSingleStep( 1 );
-	connect( m_leftRightScroll, SIGNAL( valueChanged( int ) ), this,
-						SLOT( horScrolled( int ) ) );
+	connect( m_leftRightScroll, SIGNAL(valueChanged(int)), this,
+						SLOT(horScrolled(int)));
 
 	m_topBottomScroll = new QScrollBar( Qt::Vertical, this );
 	m_topBottomScroll->setSingleStep( 1 );
 	m_topBottomScroll->setPageStep( 20 );
-	connect( m_topBottomScroll, SIGNAL( valueChanged( int ) ), this,
-						SLOT( verScrolled( int ) ) );
+	connect( m_topBottomScroll, SIGNAL(valueChanged(int)), this,
+						SLOT(verScrolled(int)));
 
 	// init pixmaps
 	if (s_toolDraw == nullptr)
@@ -347,7 +348,7 @@ void AutomationEditor::drawLine( int x0In, float y0, int x1In, float y1 )
 	int x0 = Note::quantized( x0In, AutomationClip::quantization() );
 	int x1 = Note::quantized( x1In, AutomationClip::quantization() );
 	int deltax = qAbs( x1 - x0 );
-	float deltay = qAbs<float>( y1 - y0 );
+	auto deltay = qAbs<float>(y1 - y0);
 	int x = x0;
 	float y = y0;
 	int xstep;
@@ -491,15 +492,15 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 		// a node, while others require that we know if we clicked the outValue
 		// of a node.
 		bool editingOutValue = (
-			m_editMode == DRAW_OUTVALUES
-			|| (m_editMode == ERASE && m_mouseDownRight)
+			m_editMode == EditMode::DrawOutValues
+			|| (m_editMode == EditMode::Erase && m_mouseDownRight)
 		);
 
 		timeMap::iterator clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y(), editingOutValue);
 
 		switch (m_editMode)
 		{
-			case DRAW:
+			case EditMode::Draw:
 			{
 				m_clip->addJournalCheckPoint();
 
@@ -517,7 +518,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 						m_drawLastLevel = level;
 
 						// Changes the action to drawing a line of nodes
-						m_action = DRAW_LINE;
+						m_action = Action::DrawLine;
 					}
 					else // No shift, we are just creating/moving nodes
 					{
@@ -539,8 +540,8 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 						// is being dragged, so if we don't update it we have a bogus iterator
 						clickedNode = tm.find(newTime);
 
-						// Set the action to MOVE_VALUE so moveMouseEvent() knows we are moving a node
-						m_action = MOVE_VALUE;
+						// Set the action to Action::MoveValue so moveMouseEvent() knows we are moving a node
+						m_action = Action::MoveValue;
 
 						// Calculate the offset from the place the mouse click happened in comparison
 						// to the center of the node
@@ -558,7 +559,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 
 					Engine::getSong()->setModified();
 				}
-				else if (m_mouseDownRight) // Right click on DRAW mode erases values
+				else if (m_mouseDownRight) // Right click on EditMode::Draw mode erases values
 				{
 					// Update the last clicked position so we remove all nodes from
 					// that point up to the point we release the mouse button
@@ -567,11 +568,11 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 					// If we right-clicked a node, remove it
 					eraseNode(clickedNode);
 
-					m_action = ERASE_VALUES;
+					m_action = Action::EraseValues;
 				}
 			break;
 			}
-			case ERASE:
+			case EditMode::Erase:
 			{
 				m_clip->addJournalCheckPoint();
 
@@ -585,7 +586,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 					// If we right-clicked a node, remove it
 					eraseNode(clickedNode);
 
-					m_action = ERASE_VALUES;
+					m_action = Action::EraseValues;
 				}
 				else if (m_mouseDownRight) // And right click resets outValues
 				{
@@ -596,11 +597,11 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 					// that point up to the point we release the mouse button
 					m_drawLastTick = posTicks;
 
-					m_action = RESET_OUTVALUES;
+					m_action = Action::ResetOutValues;
 				}
 			break;
 			}
-			case DRAW_OUTVALUES:
+			case EditMode::DrawOutValues:
 			{
 				m_clip->addJournalCheckPoint();
 
@@ -614,7 +615,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 
 						clickedNode.value().setOutValue(level);
 
-						m_action = MOVE_OUTVALUE;
+						m_action = Action::MoveOutValue;
 
 						Engine::getSong()->setModified();
 					}
@@ -634,7 +635,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 							m_draggedOutValueKey = POS(clickedNode);
 							clickedNode.value().setOutValue(level);
 
-							m_action = MOVE_OUTVALUE;
+							m_action = Action::MoveOutValue;
 
 							Engine::getSong()->setModified();
 						}
@@ -649,7 +650,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 					// that point up to the point we release the mouse button
 					m_drawLastTick = posTicks;
 
-					m_action = RESET_OUTVALUES;
+					m_action = Action::ResetOutValues;
 				}
 			break;
 			}
@@ -670,13 +671,13 @@ void AutomationEditor::mouseDoubleClickEvent(QMouseEvent * mouseEvent)
 	if (mouseEvent->y() <= TOP_MARGIN || mouseEvent->x() < VALUES_WIDTH) { return; }
 
 	// Are we fine tuning the inValue or outValue?
-	const bool isOutVal = (m_editMode == DRAW_OUTVALUES);
+	const bool isOutVal = (m_editMode == EditMode::DrawOutValues);
 	timeMap::iterator clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y(), isOutVal);
 
 	switch (m_editMode)
 	{
-		case DRAW:
-		case DRAW_OUTVALUES:
+		case EditMode::Draw:
+		case EditMode::DrawOutValues:
 			if (fineTuneValue(clickedNode, isOutVal)) { update(); }
 			break;
 		default:
@@ -702,9 +703,9 @@ void AutomationEditor::mouseReleaseEvent(QMouseEvent * mouseEvent )
 		mustRepaint = true;
 	}
 
-	if (m_editMode == DRAW)
+	if (m_editMode == EditMode::Draw)
 	{
-		if (m_action == MOVE_VALUE)
+		if (m_action == Action::MoveValue)
 		{
 			// Actually apply the value of the node being dragged
 			m_clip->applyDragValue();
@@ -713,7 +714,7 @@ void AutomationEditor::mouseReleaseEvent(QMouseEvent * mouseEvent )
 		QApplication::restoreOverrideCursor();
 	}
 
-	m_action = NONE;
+	m_action = Action::None;
 
 	if (mustRepaint) { repaint(); }
 }
@@ -741,12 +742,12 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 
 		switch (m_editMode)
 		{
-			case DRAW:
+			case EditMode::Draw:
 			{
 				// We are dragging a node
 				if (m_mouseDownLeft)
 				{
-					if (m_action == MOVE_VALUE)
+					if (m_action == Action::MoveValue)
 					{
 						// When we clicked the node, we might have clicked slightly off
 						// so we account for that offset for a smooth drag
@@ -769,7 +770,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 
 						Engine::getSong()->setModified();
 					}
-					/* else if (m_action == DRAW_LINE)
+					/* else if (m_action == Action::DrawLine)
 					{
 						// We are drawing a line. For now do nothing (as before), but later logic
 						// could be added here so the line is updated according to the new mouse position
@@ -778,7 +779,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 				}
 				else if (m_mouseDownRight) // We are removing nodes
 				{
-					if (m_action == ERASE_VALUES)
+					if (m_action == Action::EraseValues)
 					{
 						// If we moved the mouse past the beginning correct the position in ticks
 						posTicks = qMax(posTicks, 0);
@@ -793,7 +794,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 				}
 			break;
 			}
-			case ERASE:
+			case EditMode::Erase:
 			{
 				// If we moved the mouse past the beginning correct the position in ticks
 				posTicks = qMax(posTicks, 0);
@@ -801,7 +802,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 				// Left button removes nodes
 				if (m_mouseDownLeft)
 				{
-					if (m_action == ERASE_VALUES)
+					if (m_action == Action::EraseValues)
 					{
 						// Removing automation nodes
 
@@ -813,7 +814,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 				}
 				else if (m_mouseDownRight) // Right button resets outValues
 				{
-					if (m_action == RESET_OUTVALUES)
+					if (m_action == Action::ResetOutValues)
 					{
 						// Reseting outValues
 
@@ -825,7 +826,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 				}
 			break;
 			}
-			case DRAW_OUTVALUES:
+			case EditMode::DrawOutValues:
 			{
 				// If we moved the mouse past the beginning correct the position in ticks
 				posTicks = qMax(posTicks, 0);
@@ -833,7 +834,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 				// Left button moves outValues
 				if (m_mouseDownLeft)
 				{
-					if (m_action == MOVE_OUTVALUE)
+					if (m_action == Action::MoveOutValue)
 					{
 						// We are moving the outValue of the node
 						timeMap & tm = m_clip->getTimeMap();
@@ -849,7 +850,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 				}
 				else if (m_mouseDownRight) // Right button resets them
 				{
-					if (m_action == RESET_OUTVALUES)
+					if (m_action == Action::ResetOutValues)
 					{
 						// Reseting outValues
 
@@ -961,15 +962,14 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 	// print value numbers
 	int font_height = p.fontMetrics().height();
-	Qt::Alignment text_flags =
-		(Qt::Alignment)( Qt::AlignRight | Qt::AlignVCenter );
+	auto text_flags = (Qt::Alignment)(Qt::AlignRight | Qt::AlignVCenter);
 
 	if( validClip() )
 	{
 		if( m_y_auto )
 		{
-			int y[] = { grid_bottom, TOP_MARGIN + font_height / 2 };
-			float level[] = { m_minLevel, m_maxLevel };
+			auto y = std::array{grid_bottom, TOP_MARGIN + font_height / 2};
+			auto level = std::array{m_minLevel, m_maxLevel};
 			for( int i = 0; i < 2; ++i )
 			{
 				const QString & label = m_clip->firstObject()
@@ -1172,7 +1172,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				// the value of the end of the shape between the two nodes will be the inValue of
 				// the next node.
 				float nextValue;
-				if( m_clip->progressionType() == AutomationClip::DiscreteProgression )
+				if( m_clip->progressionType() == AutomationClip::ProgressionType::Discrete )
 				{
 					nextValue = OUTVAL(it);
 				}
@@ -1248,22 +1248,22 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	// draw current edit-mode-icon below the cursor
 	switch( m_editMode )
 	{
-		case DRAW:
+		case EditMode::Draw:
 		{
-			if (m_action == ERASE_VALUES) { cursor = s_toolErase; }
-			else if (m_action == MOVE_VALUE) { cursor = s_toolMove; }
+			if (m_action == Action::EraseValues) { cursor = s_toolErase; }
+			else if (m_action == Action::MoveValue) { cursor = s_toolMove; }
 			else { cursor = s_toolDraw; }
 			break;
 		}
-		case ERASE:
+		case EditMode::Erase:
 		{
 			cursor = s_toolErase;
 			break;
 		}
-		case DRAW_OUTVALUES:
+		case EditMode::DrawOutValues:
 		{
-			if (m_action == RESET_OUTVALUES) { cursor = s_toolErase; }
-			else if (m_action == MOVE_OUTVALUE) { cursor = s_toolMove; }
+			if (m_action == Action::ResetOutValues) { cursor = s_toolErase; }
+			else if (m_action == Action::MoveOutValue) { cursor = s_toolMove; }
 			else { cursor = s_toolDrawOut; }
 			break;
 		}
@@ -1400,7 +1400,7 @@ void AutomationEditor::resizeEvent(QResizeEvent * re)
 
 	if( Engine::getSong() )
 	{
-		Engine::getSong()->getPlayPos( Song::Mode_PlayAutomationClip
+		Engine::getSong()->getPlayPos( Song::PlayMode::AutomationClip
 					).m_timeLine->setFixedWidth( width() );
 	}
 
@@ -1508,10 +1508,9 @@ float AutomationEditor::getLevel(int y )
 
 
 
-inline bool AutomationEditor::inBBEditor()
+inline bool AutomationEditor::inPatternEditor()
 {
-	return( validClip() &&
-				m_clip->getTrack()->trackContainer() == Engine::getBBTrackContainer() );
+	return (validClip() && m_clip->getTrack()->trackContainer() == Engine::patternStore());
 }
 
 
@@ -1526,7 +1525,7 @@ void AutomationEditor::play()
 
 	if( !m_clip->getTrack() )
 	{
-		if( Engine::getSong()->playMode() != Song::Mode_PlayMidiClip )
+		if( Engine::getSong()->playMode() != Song::PlayMode::MidiClip )
 		{
 			Engine::getSong()->stop();
 			Engine::getSong()->playMidiClip( getGUI()->pianoRoll()->currentMidiClip() );
@@ -1540,9 +1539,9 @@ void AutomationEditor::play()
 			Engine::getSong()->playMidiClip( getGUI()->pianoRoll()->currentMidiClip() );
 		}
 	}
-	else if( inBBEditor() )
+	else if (inPatternEditor())
 	{
-		Engine::getBBTrackContainer()->play();
+		Engine::patternStore()->play();
 	}
 	else
 	{
@@ -1566,9 +1565,9 @@ void AutomationEditor::stop()
 	{
 		return;
 	}
-	if( m_clip->getTrack() && inBBEditor() )
+	if (m_clip->getTrack() && inPatternEditor())
 	{
-		Engine::getBBTrackContainer()->stop();
+		Engine::patternStore()->stop();
 	}
 	else
 	{
@@ -1600,7 +1599,7 @@ void AutomationEditor::verScrolled(int new_pos )
 
 
 
-void AutomationEditor::setEditMode(AutomationEditor::EditModes mode)
+void AutomationEditor::setEditMode(AutomationEditor::EditMode mode)
 {
 	if (m_editMode == mode)
 		return;
@@ -1615,13 +1614,13 @@ void AutomationEditor::setEditMode(AutomationEditor::EditModes mode)
 
 void AutomationEditor::setEditMode(int mode)
 {
-	setEditMode((AutomationEditor::EditModes) mode);
+	setEditMode((AutomationEditor::EditMode) mode);
 }
 
 
 
 
-void AutomationEditor::setProgressionType(AutomationClip::ProgressionTypes type)
+void AutomationEditor::setProgressionType(AutomationClip::ProgressionType type)
 {
 	if (validClip())
 	{
@@ -1634,7 +1633,7 @@ void AutomationEditor::setProgressionType(AutomationClip::ProgressionTypes type)
 
 void AutomationEditor::setProgressionType(int type)
 {
-	setProgressionType((AutomationClip::ProgressionTypes) type);
+	setProgressionType((AutomationClip::ProgressionType) type);
 }
 
 
@@ -1656,7 +1655,7 @@ void AutomationEditor::updatePosition(const TimePos & t )
 {
 	if( ( Engine::getSong()->isPlaying() &&
 			Engine::getSong()->playMode() ==
-					Song::Mode_PlayAutomationClip ) ||
+					Song::PlayMode::AutomationClip ) ||
 							m_scrollBack == true )
 	{
 		const int w = width() - VALUES_WIDTH;
@@ -1839,7 +1838,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	// Edit mode buttons
 	DropToolBar *editActionsToolBar = addDropToolBarToTop(tr("Edit actions"));
 
-	ActionGroup* editModeGroup = new ActionGroup(this);
+	auto editModeGroup = new ActionGroup(this);
 	QAction* drawAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode (Shift+D)"));
 	drawAction->setShortcut(Qt::SHIFT | Qt::Key_D);
 	drawAction->setChecked(true);
@@ -1864,7 +1863,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	// Interpolation actions
 	DropToolBar *interpolationActionsToolBar = addDropToolBarToTop(tr("Interpolation controls"));
 
-	ActionGroup* progression_type_group = new ActionGroup(this);
+	auto progression_type_group = new ActionGroup(this);
 
 	m_discreteAction = progression_type_group->addAction(
 				embed::getIconPixmap("progression_discrete"), tr("Discrete progression"));
@@ -1878,9 +1877,9 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	connect(progression_type_group, SIGNAL(triggered(int)), m_editor, SLOT(setProgressionType(int)));
 
 	// setup tension-stuff
-	m_tensionKnob = new Knob( knobSmall_17, this, "Tension" );
+	m_tensionKnob = new Knob( KnobType::Small17, this, "Tension" );
 	m_tensionKnob->setModel(m_editor->m_tensionModel);
-	ToolTip::add(m_tensionKnob, tr("Tension value for spline"));
+	m_tensionKnob->setToolTip(tr("Tension value for spline"));
 
 	connect(m_cubicHermiteAction, SIGNAL(toggled(bool)), m_tensionKnob, SLOT(setEnabled(bool)));
 
@@ -1899,7 +1898,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	// Zoom controls
 	DropToolBar *zoomToolBar = addDropToolBarToTop(tr("Zoom controls"));
 
-	QLabel * zoom_x_label = new QLabel( zoomToolBar );
+	auto zoom_x_label = new QLabel(zoomToolBar);
 	zoom_x_label->setPixmap( embed::getIconPixmap( "zoom_x" ) );
 
 	m_zoomingXComboBox = new ComboBox( zoomToolBar );
@@ -1914,11 +1913,10 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	m_zoomingXComboBox->setModel( &m_editor->m_zoomingXModel );
 
-	connect( &m_editor->m_zoomingXModel, SIGNAL( dataChanged() ),
-			m_editor, SLOT( zoomingXChanged() ) );
+	connect( &m_editor->m_zoomingXModel, SIGNAL(dataChanged()),
+			m_editor, SLOT(zoomingXChanged()));
 
-
-	QLabel * zoom_y_label = new QLabel( zoomToolBar );
+	auto zoom_y_label = new QLabel(zoomToolBar);
 	zoom_y_label->setPixmap( embed::getIconPixmap( "zoom_y" ) );
 
 	m_zoomingYComboBox = new ComboBox( zoomToolBar );
@@ -1934,8 +1932,8 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	m_zoomingYComboBox->setModel( &m_editor->m_zoomingYModel );
 
-	connect( &m_editor->m_zoomingYModel, SIGNAL( dataChanged() ),
-			m_editor, SLOT( zoomingYChanged() ) );
+	connect( &m_editor->m_zoomingYModel, SIGNAL(dataChanged()),
+			m_editor, SLOT(zoomingYChanged()));
 
 	zoomToolBar->addWidget( zoom_x_label );
 	zoomToolBar->addWidget( m_zoomingXComboBox );
@@ -1946,7 +1944,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	// Quantization controls
 	DropToolBar *quantizationActionsToolBar = addDropToolBarToTop(tr("Quantization controls"));
 
-	QLabel * quantize_lbl = new QLabel( m_toolBar );
+	auto quantize_lbl = new QLabel(m_toolBar);
 	quantize_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
 
 	m_quantizeComboBox = new ComboBox( m_toolBar );
@@ -1964,11 +1962,6 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	setWindowIcon( embed::getIconPixmap( "automation" ) );
 	setAcceptDrops( true );
 	m_toolBar->setAcceptDrops( true );
-}
-
-
-AutomationEditorWindow::~AutomationEditorWindow()
-{
 }
 
 
@@ -1996,15 +1989,15 @@ void AutomationEditorWindow::setCurrentClip(AutomationClip* clip)
 
 	switch(m_editor->m_clip->progressionType())
 	{
-	case AutomationClip::DiscreteProgression:
+	case AutomationClip::ProgressionType::Discrete:
 		m_discreteAction->setChecked(true);
 		m_tensionKnob->setEnabled(false);
 		break;
-	case AutomationClip::LinearProgression:
+	case AutomationClip::ProgressionType::Linear:
 		m_linearAction->setChecked(true);
 		m_tensionKnob->setEnabled(false);
 		break;
-	case AutomationClip::CubicHermiteProgression:
+	case AutomationClip::ProgressionType::CubicHermite:
 		m_cubicHermiteAction->setChecked(true);
 		m_tensionKnob->setEnabled(true);
 		break;
@@ -2014,7 +2007,7 @@ void AutomationEditorWindow::setCurrentClip(AutomationClip* clip)
 	if (clip)
 	{
 		connect(clip, SIGNAL(dataChanged()), this, SLOT(update()));
-		connect( clip, SIGNAL( dataChanged() ), this, SLOT( updateWindowTitle() ) );
+		connect( clip, SIGNAL(dataChanged()), this, SLOT(updateWindowTitle()));
 		connect(clip, SIGNAL(destroyed()), this, SLOT(clearCurrentClip()));
 
 		connect(m_flipXAction, SIGNAL(triggered()), clip, SLOT(flipX()));
@@ -2036,9 +2029,7 @@ void AutomationEditorWindow::dropEvent( QDropEvent *_de )
 	QString val = StringPairDrag::decodeValue( _de );
 	if( type == "automatable_model" )
 	{
-		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
-				Engine::projectJournal()->
-					journallingObject( val.toInt() ) );
+		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
 		if (mod != nullptr)
 		{
 			bool added = m_editor->m_clip->addObject( mod );
@@ -2110,3 +2101,6 @@ void AutomationEditorWindow::updateWindowTitle()
 
 	setWindowTitle( tr( "Automation Editor - %1" ).arg( m_editor->m_clip->name() ) );
 }
+
+
+} // namespace lmms::gui

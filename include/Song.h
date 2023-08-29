@@ -22,30 +22,37 @@
  *
  */
 
-#ifndef SONG_H
-#define SONG_H
+#ifndef LMMS_SONG_H
+#define LMMS_SONG_H
 
 #include <memory>
-#include <utility>
 
-#include <QtCore/QSharedMemory>
-#include <QtCore/QVector>
 #include <QHash>
 #include <QString>
 
 #include "TrackContainer.h"
 #include "AudioEngine.h"
 #include "Controller.h"
-#include "Keymap.h"
 #include "lmms_constants.h"
 #include "MeterModel.h"
-#include "Scale.h"
 #include "VstSyncController.h"
 
+namespace lmms
+{
 
 class AutomationTrack;
+class Keymap;
 class MidiClip;
+class Scale;
+
+namespace gui
+{
+
 class TimeLineWidget;
+class SongEditor;
+class ControllerRackView;
+
+}
 
 
 const bpm_t MinTempo = 10;
@@ -61,15 +68,16 @@ class LMMS_EXPORT Song : public TrackContainer
 	mapPropertyFromModel( int,masterPitch,setMasterPitch,m_masterPitchModel );
 	mapPropertyFromModel( int,masterVolume,setMasterVolume, m_masterVolumeModel );
 public:
-	enum PlayModes
+	enum class PlayMode
 	{
-		Mode_None,
-		Mode_PlaySong,
-		Mode_PlayBB,
-		Mode_PlayMidiClip,
-		Mode_PlayAutomationClip,
-		Mode_Count
+		None,
+		Song,
+		Pattern,
+		MidiClip,
+		AutomationClip,
+		Count
 	} ;
+	constexpr static auto PlayModeCount = static_cast<std::size_t>(PlayMode::Count);
 
 	struct SaveOptions {
 		/**
@@ -117,7 +125,7 @@ public:
 		{
 			return m_jumped;
 		}
-		TimeLineWidget * m_timeLine;
+		gui::TimeLineWidget * m_timeLine;
 
 	private:
 		float m_currentFrame;
@@ -134,36 +142,34 @@ public:
 
 	inline int getMilliseconds() const
 	{
-		return m_elapsedMilliSeconds[m_playMode];
+		return getMilliseconds(m_playMode);
 	}
 
-	inline int getMilliseconds(PlayModes playMode) const
+	inline int getMilliseconds(PlayMode playMode) const
 	{
-		return m_elapsedMilliSeconds[playMode];
+		return m_elapsedMilliSeconds[static_cast<std::size_t>(playMode)];
 	}
 
 	inline void setToTime(TimePos const & pos)
 	{
-		m_elapsedMilliSeconds[m_playMode] = pos.getTimeInMilliseconds(getTempo());
-		m_playPos[m_playMode].setTicks(pos.getTicks());
+		setToTime(pos, m_playMode);
 	}
 
-	inline void setToTime(TimePos const & pos, PlayModes playMode)
+	inline void setToTime(TimePos const & pos, PlayMode playMode)
 	{
-		m_elapsedMilliSeconds[playMode] = pos.getTimeInMilliseconds(getTempo());
-		m_playPos[playMode].setTicks(pos.getTicks());
+		m_elapsedMilliSeconds[static_cast<std::size_t>(playMode)] = pos.getTimeInMilliseconds(getTempo());
+		getPlayPos(playMode).setTicks(pos.getTicks());
 	}
 
 	inline void setToTimeByTicks(tick_t ticks)
 	{
-		m_elapsedMilliSeconds[m_playMode] = TimePos::ticksToMilliseconds(ticks, getTempo());
-		m_playPos[m_playMode].setTicks(ticks);
+		setToTimeByTicks(ticks, m_playMode);
 	}
 
-	inline void setToTimeByTicks(tick_t ticks, PlayModes playMode)
+	inline void setToTimeByTicks(tick_t ticks, PlayMode playMode)
 	{
-		m_elapsedMilliSeconds[playMode] = TimePos::ticksToMilliseconds(ticks, getTempo());
-		m_playPos[playMode].setTicks(ticks);
+		m_elapsedMilliSeconds[static_cast<std::size_t>(playMode)] = TimePos::ticksToMilliseconds(ticks, getTempo());
+		getPlayPos(playMode).setTicks(ticks);
 	}
 
 	inline int getBars() const
@@ -246,18 +252,18 @@ public:
 		m_renderBetweenMarkers = renderBetweenMarkers;
 	}
 
-	inline PlayModes playMode() const
+	inline PlayMode playMode() const
 	{
 		return m_playMode;
 	}
 
-	inline PlayPos & getPlayPos( PlayModes pm )
+	inline PlayPos & getPlayPos( PlayMode pm )
 	{
-		return m_playPos[pm];
+		return m_playPos[static_cast<std::size_t>(pm)];
 	}
-	inline const PlayPos & getPlayPos( PlayModes pm ) const
+	inline const PlayPos & getPlayPos( PlayMode pm ) const
 	{
-		return m_playPos[pm];
+		return m_playPos[static_cast<std::size_t>(pm)];
 	}
 	inline PlayPos & getPlayPos()
 	{
@@ -276,7 +282,6 @@ public:
 
 
 	bpm_t getTempo();
-	AutomationClip * tempoAutomationClip() override;
 
 	AutomationTrack * globalAutomationTrack()
 	{
@@ -345,6 +350,11 @@ public:
 		return m_timeSigModel;
 	}
 
+	IntModel& tempoModel()
+	{
+		return m_tempoModel;
+	}
+
 	void exportProjectMidi(QString const & exportFileName) const;
 
 	inline void setLoadOnLaunch(bool value) { m_loadOnLaunch = value; }
@@ -359,12 +369,14 @@ public:
 	void setScale(unsigned int index, std::shared_ptr<Scale> newScale);
 	void setKeymap(unsigned int index, std::shared_ptr<Keymap> newMap);
 
+	const std::string& syncKey() const noexcept { return m_vstSyncController.sharedMemoryKey(); }
+
 public slots:
 	void playSong();
 	void record();
 	void playAndRecord();
-	void playBB();
-	void playMidiClip( const MidiClip * midiClipToPlay, bool loop = true );
+	void playPattern();
+	void playMidiClip( const lmms::MidiClip * midiClipToPlay, bool loop = true );
 	void togglePause();
 	void stop();
 
@@ -376,7 +388,7 @@ public slots:
 
 	void clearProject();
 
-	void addBBTrack();
+	void addPatternTrack();
 
 
 private slots:
@@ -399,26 +411,26 @@ private slots:
 private:
 	Song();
 	Song( const Song & );
-	virtual ~Song();
+	~Song() override;
 
 
 	inline bar_t currentBar() const
 	{
-		return m_playPos[m_playMode].getBar();
+		return getPlayPos(m_playMode).getBar();
 	}
 
 	inline tick_t currentTick() const
 	{
-		return m_playPos[m_playMode].getTicks();
+		return getPlayPos(m_playMode).getTicks();
 	}
 
 	inline f_cnt_t currentFrame() const
 	{
-		return m_playPos[m_playMode].getTicks() * Engine::framesPerTick() +
-			m_playPos[m_playMode].currentFrame();
+		return getPlayPos(m_playMode).getTicks() * Engine::framesPerTick() +
+			getPlayPos(m_playMode).currentFrame();
 	}
 
-	void setPlayPos( tick_t ticks, PlayModes playMode );
+	void setPlayPos( tick_t ticks, PlayMode playMode );
 
 	void saveControllerStates( QDomDocument & doc, QDomElement & element );
 	void restoreControllerStates( const QDomElement & element );
@@ -469,14 +481,14 @@ private:
 
 	QHash<QString, int> m_errors;
 
-	PlayModes m_playMode;
-	PlayPos m_playPos[Mode_Count];
+	PlayMode m_playMode;
+	PlayPos m_playPos[PlayModeCount];
 	bar_t m_length;
 
 	const MidiClip* m_midiClipToPlay;
 	bool m_loopMidiClip;
 
-	double m_elapsedMilliSeconds[Mode_Count];
+	double m_elapsedMilliSeconds[PlayModeCount];
 	tick_t m_elapsedTicks;
 	bar_t m_elapsedBars;
 
@@ -495,20 +507,19 @@ private:
 
 	AutomatedValueMap m_oldAutomatedValues;
 
-	friend class LmmsCore;
-	friend class SongEditor;
-	friend class mainWindow;
-	friend class ControllerRackView;
+	friend class Engine;
+	friend class gui::SongEditor;
+	friend class gui::ControllerRackView;
 
 signals:
 	void projectLoaded();
 	void playbackStateChanged();
 	void playbackPositionChanged();
 	void lengthChanged( int bars );
-	void tempoChanged( bpm_t newBPM );
+	void tempoChanged( lmms::bpm_t newBPM );
 	void timeSignatureChanged( int oldTicksPerBar, int ticksPerBar );
-	void controllerAdded( Controller * );
-	void controllerRemoved( Controller * );
+	void controllerAdded( lmms::Controller * );
+	void controllerRemoved( lmms::Controller * );
 	void updateSampleTracks();
 	void stopped();
 	void modified();
@@ -518,4 +529,6 @@ signals:
 } ;
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_SONG_H

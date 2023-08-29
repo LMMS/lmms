@@ -25,13 +25,21 @@
 
 #include "EqParameterWidget.h"
 
+#include <cmath>
 #include <QGraphicsScene>
 #include <QGraphicsView>
-#include <QMouseEvent>
+#include <QPainter>
+#include <QPen>
 #include <QWidget>
 
-#include "EqControls.h"
-#include "lmms_math.h"
+#include "AutomatableModel.h"
+#include "EqCurve.h"
+#include "EqParameterWidget.h"
+#include "lmms_constants.h"
+
+
+namespace lmms::gui
+{
 
 
 EqParameterWidget::EqParameterWidget( QWidget *parent, EqControls * controls ) :
@@ -48,9 +56,9 @@ EqParameterWidget::EqParameterWidget( QWidget *parent, EqControls * controls ) :
 	m_pixelsPerOctave = EqHandle::freqToXPixel( 10000, m_displayWidth ) - EqHandle::freqToXPixel( 5000, m_displayWidth );
 
 	//GraphicsScene and GraphicsView stuff
-	QGraphicsScene *scene = new QGraphicsScene();
+	auto scene = new QGraphicsScene();
 	scene->setSceneRect( 0, 0, m_displayWidth, m_displayHeigth );
-	QGraphicsView *view = new QGraphicsView( this );
+	auto view = new QGraphicsView(this);
 	view->setStyleSheet( "border-style: none; background: transparent;" );
 	view->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 	view->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
@@ -156,35 +164,35 @@ void EqParameterWidget::changeHandle( int i )
 	switch ( i )
 	{
 	case 0 :
-		m_handleList->at( i )->setType( highpass );
+		m_handleList->at( i )->setType( EqHandleType::HighPass );
 		m_handleList->at( i )->setPos( x, m_displayHeigth / 2 );
 		break;
 	case 1:
-		m_handleList->at( i )->setType( lowshelf );
+		m_handleList->at( i )->setType( EqHandleType::LowShelf );
 		m_handleList->at( i )->setPos( x, y );
 		break;
 	case 2:
-		m_handleList->at( i )->setType( para );
+		m_handleList->at( i )->setType( EqHandleType::Para );
 		m_handleList->at( i )->setPos( x, y );
 		break;
 	case 3:
-		m_handleList->at( i )->setType( para );
+		m_handleList->at( i )->setType( EqHandleType::Para );
 		m_handleList->at( i )->setPos( x, y );
 		break;
 	case 4:
-		m_handleList->at( i )->setType( para );
+		m_handleList->at( i )->setType( EqHandleType::Para );
 		m_handleList->at( i )->setPos( x, y );
 		break;
 	case 5:
-		m_handleList->at( i )->setType( para );
+		m_handleList->at( i )->setType( EqHandleType::Para );
 		m_handleList->at( i )->setPos( x, y );
 		break;
 	case 6:
-		m_handleList->at( i )->setType( highshelf );
+		m_handleList->at( i )->setType( EqHandleType::HighShelf );
 		m_handleList->at( i )->setPos( x, y );
 		break;
 	case 7:
-		m_handleList->at( i )->setType( lowpass );
+		m_handleList->at( i )->setType( EqHandleType::LowPass );
 		m_handleList->at( i )->setPos( QPointF( x, m_displayHeigth / 2 ) );
 		break;
 	}
@@ -240,3 +248,6 @@ EqBand::EqBand() :
 	peakR( 0 )
 {
 }
+
+
+} // namespace lmms::gui

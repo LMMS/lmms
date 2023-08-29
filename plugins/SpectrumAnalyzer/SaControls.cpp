@@ -24,10 +24,13 @@
 
 #include "SaControls.h"
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "Analyzer.h"
 #include "SaControlsDialog.h"
+
+namespace lmms
+{
 
 
 SaControls::SaControls(Analyzer *effect) :
@@ -63,7 +66,7 @@ SaControls::SaControls(Analyzer *effect) :
 	m_zeroPaddingModel(2.0f, 0.0f, 4.0f, 1.0f, this, tr("FFT zero padding"))
 {
 	// Frequency and amplitude ranges; order must match
-	// FREQUENCY_RANGES and AMPLITUDE_RANGES defined in SaControls.h
+	// FrequencyRange and AmplitudeRange defined in SaControls.h
 	m_freqRangeModel.addItem(tr("Full (auto)"));
 	m_freqRangeModel.addItem(tr("Audible"));
 	m_freqRangeModel.addItem(tr("Bass"));
@@ -96,7 +99,7 @@ SaControls::SaControls(Analyzer *effect) :
 	}
 	m_blockSizeModel.setValue(m_blockSizeModel.findText("2048"));
 
-	// Window type order must match FFT_WINDOWS defined in fft_helpers.h
+	// Window type order must match FFTWindow defined in fft_helpers.h
 	m_windowModel.addItem(tr("Rectangular (Off)"));
 	m_windowModel.addItem(tr("Blackman-Harris (Default)"));
 	m_windowModel.addItem(tr("Hamming"));
@@ -121,9 +124,9 @@ SaControls::SaControls(Analyzer *effect) :
 
 
 // Create the SaControlDialog widget which handles display of GUI elements.
-EffectControlDialog* SaControls::createView()
+gui::EffectControlDialog* SaControls::createView()
 {
-	return new SaControlsDialog(this, m_effect->getProcessor());
+	return new gui::SaControlsDialog(this, m_effect->getProcessor());
 }
 
 
@@ -174,3 +177,6 @@ void SaControls::saveSettings(QDomDocument &doc, QDomElement &parent)
 	m_zeroPaddingModel.saveSettings(doc, parent, "ZeroPadding");
 
 }
+
+
+} // namespace lmms

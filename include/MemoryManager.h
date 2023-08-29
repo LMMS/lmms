@@ -24,13 +24,17 @@
  *
  */
 
-#ifndef MEMORY_MANAGER_H
-#define MEMORY_MANAGER_H
+#ifndef LMMS_MEMORY_MANAGER_H
+#define LMMS_MEMORY_MANAGER_H
 
 #include <cstddef>
 #include <vector>
 
 #include "lmms_export.h"
+
+namespace lmms
+{
+
 
 class LMMS_EXPORT MemoryManager
 {
@@ -48,8 +52,10 @@ public:
 template<typename T>
 struct MmAllocator
 {
-	typedef T value_type;
-	template<class U>  struct rebind { typedef MmAllocator<U> other; };
+	using value_type = T;
+	template<class U>  struct rebind {
+		using other = MmAllocator<U>;
+	};
 
 	T* allocate( std::size_t n )
 	{
@@ -61,7 +67,7 @@ struct MmAllocator
 		MemoryManager::free( p );
 	}
 
-	typedef std::vector<T, MmAllocator<T> > vector;
+	using vector = std::vector<T, MmAllocator<T>>;
 };
 
 
@@ -99,4 +105,7 @@ void MM_FREE(T* ptr)
 	MemoryManager::free(ptr);
 }
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_MEMORY_MANAGER_H

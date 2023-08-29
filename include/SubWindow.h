@@ -23,21 +23,25 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-#ifndef SUBWINDOW_H
-#define SUBWINDOW_H
 
-#include <QEvent>
-#include <QGraphicsDropShadowEffect>
+#ifndef LMMS_GUI_SUBWINDOW_H
+#define LMMS_GUI_SUBWINDOW_H
+
 #include <QMdiSubWindow>
-#include <QLabel>
-#include <QPushButton>
 #include <QString>
 
 #include "lmms_export.h"
 
+class QGraphicsDropShadowEffect;
+class QLabel;
 class QMoveEvent;
+class QPushButton;
 class QResizeEvent;
 class QWidget;
+
+namespace lmms::gui
+{
+
 
 /**
  * @brief The SubWindow class
@@ -97,4 +101,8 @@ private slots:
 	void focusChanged( QMdiSubWindow * subWindow );
 };
 
-#endif
+
+
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_SUBWINDOW_H

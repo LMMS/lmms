@@ -22,6 +22,7 @@
  *
  */
 
+#include "AutomatableModel.h"
 #include "DelayControlsDialog.h"
 #include "DelayControls.h"
 #include "embed.h"
@@ -30,7 +31,8 @@
 #include <QMouseEvent>
 #include <QPainter>
 
-
+namespace lmms::gui
+{
 
 
 DelayControlsDialog::DelayControlsDialog( DelayControls *controls ) :
@@ -42,42 +44,42 @@ DelayControlsDialog::DelayControlsDialog( DelayControls *controls ) :
 	setPalette( pal );
 	setFixedSize( 300, 208 );
 
-	TempoSyncKnob* sampleDelayKnob = new TempoSyncKnob( knobBright_26, this );
+	auto sampleDelayKnob = new TempoSyncKnob(KnobType::Bright26, this);
 	sampleDelayKnob->move( 10,14 );
 	sampleDelayKnob->setVolumeKnob( false );
 	sampleDelayKnob->setModel( &controls->m_delayTimeModel );
 	sampleDelayKnob->setLabel( tr( "DELAY" ) );
 	sampleDelayKnob->setHintText( tr( "Delay time" ) + " ", " s" );
 
-	Knob * feedbackKnob = new Knob( knobBright_26, this );
+	auto feedbackKnob = new Knob(KnobType::Bright26, this);
 	feedbackKnob->move( 11, 58 );
 	feedbackKnob->setVolumeKnob( true) ;
 	feedbackKnob->setModel( &controls->m_feedbackModel);
 	feedbackKnob->setLabel( tr( "FDBK" ) );
 	feedbackKnob->setHintText( tr ( "Feedback amount" ) + " " , "" );
 
-	TempoSyncKnob * lfoFreqKnob = new TempoSyncKnob( knobBright_26, this );
+	auto lfoFreqKnob = new TempoSyncKnob(KnobType::Bright26, this);
 	lfoFreqKnob->move( 11, 119 );
 	lfoFreqKnob->setVolumeKnob( false );
 	lfoFreqKnob->setModel( &controls->m_lfoTimeModel );
 	lfoFreqKnob->setLabel( tr( "RATE" ) );
 	lfoFreqKnob->setHintText( tr ( "LFO frequency") + " ", " s" );
 
-	TempoSyncKnob * lfoAmtKnob = new TempoSyncKnob( knobBright_26, this );
+	auto lfoAmtKnob = new TempoSyncKnob(KnobType::Bright26, this);
 	lfoAmtKnob->move( 11, 159 );
 	lfoAmtKnob->setVolumeKnob( false );
 	lfoAmtKnob->setModel( &controls->m_lfoAmountModel );
 	lfoAmtKnob->setLabel( tr( "AMNT" ) );
 	lfoAmtKnob->setHintText( tr ( "LFO amount" ) + " " , " s" );
 
-	EqFader * outFader = new EqFader( &controls->m_outGainModel,tr( "Out gain" ),
-									  this, &controls->m_outPeakL, &controls->m_outPeakR );
+	auto outFader
+		= new EqFader(&controls->m_outGainModel, tr("Out gain"), this, &controls->m_outPeakL, &controls->m_outPeakR);
 	outFader->setMaximumHeight( 196 );
 	outFader->move( 263, 45 );
 	outFader->setDisplayConversion( false );
 	outFader->setHintText( tr( "Gain" ), "dBFS" );
 
-	XyPad * pad = new XyPad( this, &controls->m_feedbackModel, &controls->m_delayTimeModel );
+	auto pad = new XyPad(this, &controls->m_feedbackModel, &controls->m_delayTimeModel);
 	pad->resize( 200, 200 );
 	pad->move( 50, 5 );
 }
@@ -151,3 +153,6 @@ void XyPad::mouseMoveEvent(QMouseEvent *event)
 		m_yModel->setValue( m_yModel->minValue() + ( event->y() * yInc ) );
 	}
 }
+
+
+} // namespace lmms::gui

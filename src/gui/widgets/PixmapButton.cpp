@@ -28,9 +28,10 @@
 #include <QPainter>
 
 #include "PixmapButton.h"
-#include "MainWindow.h"
 #include "embed.h"
 
+namespace lmms::gui
+{
 
 
 PixmapButton::PixmapButton( QWidget * _parent, const QString & _name ) :
@@ -45,10 +46,6 @@ PixmapButton::PixmapButton( QWidget * _parent, const QString & _name ) :
 
 
 
-
-PixmapButton::~PixmapButton()
-{
-}
 
 
 
@@ -143,6 +140,4 @@ QSize PixmapButton::sizeHint() const
 }
 
 
-
-
-
+} // namespace lmms::gui

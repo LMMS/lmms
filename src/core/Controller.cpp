@@ -25,11 +25,9 @@
  */
 
 #include <QDomElement>
-#include <QObject>
-#include <QVector>
 
+#include <vector>
 
-#include "Song.h"
 #include "AudioEngine.h"
 #include "ControllerConnection.h"
 #include "ControllerDialog.h"
@@ -37,13 +35,16 @@
 #include "MidiController.h"
 #include "PeakController.h"
 
+namespace lmms
+{
+
 
 long Controller::s_periods = 0;
-QVector<Controller *> Controller::s_controllers;
+std::vector<Controller*> Controller::s_controllers;
 
 
 
-Controller::Controller( ControllerTypes _type, Model * _parent,
+Controller::Controller( ControllerType _type, Model * _parent,
 					const QString & _display_name ) :
 	Model( _parent, _display_name ),
 	JournallingObject(),
@@ -52,9 +53,9 @@ Controller::Controller( ControllerTypes _type, Model * _parent,
 	m_connectionCount( 0 ),
 	m_type( _type )
 {
-	if( _type != DummyController && _type != MidiController )
+	if( _type != ControllerType::Dummy && _type != ControllerType::Midi )
 	{
-		s_controllers.append( this );
+		s_controllers.push_back(this);
 		// Determine which name to use
 		for ( uint i=s_controllers.size(); ; i++ )
 		{
@@ -85,10 +86,10 @@ Controller::Controller( ControllerTypes _type, Model * _parent,
 
 Controller::~Controller()
 {
-	int idx = s_controllers.indexOf( this );
-	if( idx >= 0 )
+	auto it = std::find(s_controllers.begin(), s_controllers.end(), this);
+	if (it != s_controllers.end())
 	{
-		s_controllers.remove( idx );
+		s_controllers.erase(it);
 	}
 
 	m_valueBuffer.clear();
@@ -181,31 +182,31 @@ void Controller::resetFrameCounter()
 
 
 
-Controller * Controller::create( ControllerTypes _ct, Model * _parent )
+Controller * Controller::create( ControllerType _ct, Model * _parent )
 {
 	static Controller * dummy = nullptr;
 	Controller * c = nullptr;
 
 	switch( _ct )
 	{
-		case Controller::DummyController:
+		case ControllerType::Dummy:
 			if (!dummy)
-				dummy = new Controller( DummyController, nullptr,
+				dummy = new Controller( ControllerType::Dummy, nullptr,
 								QString() );
 			c = dummy;
 			break;
 
-		case Controller::LfoController:
-			c = new ::LfoController( _parent );
+		case ControllerType::Lfo:
+			c = new class LfoController( _parent );
 			break;
 
-		case Controller::PeakController:
+		case ControllerType::Peak:
 			//Already instantiated in EffectChain::loadSettings()
 			Q_ASSERT( false );
 			break;
 
-		case Controller::MidiController:
-			c = new ::MidiController( _parent );
+		case ControllerType::Midi:
+			c = new class MidiController( _parent );
 			break;
 
 		default: 
@@ -220,14 +221,14 @@ Controller * Controller::create( ControllerTypes _ct, Model * _parent )
 Controller * Controller::create( const QDomElement & _this, Model * _parent )
 {
 	Controller * c;
-	if( _this.attribute( "type" ).toInt() == Controller::PeakController )
+	if( static_cast<ControllerType>(_this.attribute( "type" ).toInt()) == ControllerType::Peak )
 	{
 		c = PeakController::getControllerBySetting( _this );
 	}
 	else
 	{
 		c = create(
-			static_cast<ControllerTypes>( _this.attribute( "type" ).toInt() ),
+			static_cast<ControllerType>( _this.attribute( "type" ).toInt() ),
 										_parent );
 	}
 
@@ -245,7 +246,7 @@ bool Controller::hasModel( const Model * m ) const
 {
 	for (QObject * c : children())
 	{
-		AutomatableModel * am = qobject_cast<AutomatableModel*>(c);
+		auto am = qobject_cast<AutomatableModel*>(c);
 		if( am != nullptr )
 		{
 			if( am == m )
@@ -268,7 +269,7 @@ bool Controller::hasModel( const Model * m ) const
 
 void Controller::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	_this.setAttribute( "type", type() );
+	_this.setAttribute( "type", static_cast<int>(type()) );
 	_this.setAttribute( "name", name() );
 }
 
@@ -276,7 +277,7 @@ void Controller::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void Controller::loadSettings( const QDomElement & _this )
 {
-	if( _this.attribute( "type" ).toInt() != type() )
+	if( static_cast<ControllerType>(_this.attribute( "type" ).toInt()) != type() )
 	{
 		qWarning( "controller-type does not match controller-type of "
 							"settings-node!\n" );
@@ -293,9 +294,9 @@ QString Controller::nodeName() const
 
 
 
-ControllerDialog * Controller::createDialog( QWidget * _parent )
+gui::ControllerDialog * Controller::createDialog( QWidget * _parent )
 {
-	ControllerDialog * d = new ControllerDialog( this, _parent );
+	auto d = new gui::ControllerDialog(this, _parent);
 
 	return d;
 }
@@ -325,7 +326,7 @@ int Controller::connectionCount() const{
 }
 
 
-
+} // namespace lmms
 
 
 

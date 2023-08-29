@@ -22,20 +22,22 @@
  *
  */
 
-#ifndef PLAY_HANDLE_H
-#define PLAY_HANDLE_H
+#ifndef LMMS_PLAY_HANDLE_H
+#define LMMS_PLAY_HANDLE_H
 
-#include <QtCore/QList>
-#include <QtCore/QMutex>
+#include <QList>
+#include <QMutex>
 
 #include "lmms_export.h"
 
-#include "MemoryManager.h"
-
+#include "Flags.h"
 #include "ThreadableJob.h"
 #include "lmms_basics.h"
 
 class QThread;
+
+namespace lmms
+{
 
 class Track;
 class AudioPort;
@@ -43,19 +45,16 @@ class AudioPort;
 class LMMS_EXPORT PlayHandle : public ThreadableJob
 {
 public:
-	enum Types
+	enum class Type
 	{
-		TypeNotePlayHandle = 0x01,
-		TypeInstrumentPlayHandle = 0x02,
-		TypeSamplePlayHandle = 0x04,
-		TypePresetPreviewHandle = 0x08
+		NotePlayHandle = 0x01,
+		InstrumentPlayHandle = 0x02,
+		SamplePlayHandle = 0x04,
+		PresetPreviewHandle = 0x08
 	} ;
-	typedef Types Type;
+	using Types = Flags<Type>;
 
-	enum
-	{
-		MaxNumber = 1024
-	} ;
+	constexpr static std::size_t MaxNumber = 1024;
 
 	PlayHandle( const Type type, f_cnt_t offset = 0 );
 
@@ -159,9 +158,11 @@ private:
 	AudioPort * m_audioPort;
 } ;
 
+using PlayHandleList = QList<PlayHandle*>;
+using ConstPlayHandleList = QList<const PlayHandle*>;
 
-typedef QList<PlayHandle *> PlayHandleList;
-typedef QList<const PlayHandle *> ConstPlayHandleList;
+LMMS_DECLARE_OPERATORS_FOR_FLAGS(PlayHandle::Type)
 
+} // namespace lmms
 
-#endif
+#endif // LMMS_PLAY_HANDLE_H

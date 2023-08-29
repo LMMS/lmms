@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef NOTE_PLAY_HANDLE_H
-#define NOTE_PLAY_HANDLE_H
+#ifndef LMMS_NOTE_PLAY_HANDLE_H
+#define LMMS_NOTE_PLAY_HANDLE_H
 
 #include <memory>
 
@@ -35,12 +35,15 @@
 #include "MemoryManager.h"
 
 class QReadWriteLock;
+
+namespace lmms
+{
+
 class InstrumentTrack;
 class NotePlayHandle;
 
-typedef QList<NotePlayHandle *> NotePlayHandleList;
-typedef QList<const NotePlayHandle *> ConstNotePlayHandleList;
-
+using NotePlayHandleList = QList<NotePlayHandle*>;
+using ConstNotePlayHandleList = QList<const NotePlayHandle*>;
 
 class LMMS_EXPORT NotePlayHandle : public PlayHandle, public Note
 {
@@ -53,15 +56,13 @@ public:
 	fpp_t m_fadeInLength;
 
 	// specifies origin of NotePlayHandle
-	enum Origins
+	enum class Origin
 	{
-		OriginMidiClip,		/*! playback of a note from a MIDI clip */
-		OriginMidiInput,	/*! playback of a MIDI note input event */
-		OriginNoteStacking,	/*! created by note stacking instrument function */
-		OriginArpeggio,		/*! created by arpeggio instrument function */
-		OriginCount
+		MidiClip,		/*! playback of a note from a MIDI clip */
+		MidiInput,	/*! playback of a MIDI note input event */
+		NoteStacking,	/*! created by note stacking instrument function */
+		Arpeggio,		/*! created by arpeggio instrument function */
 	};
-	typedef Origins Origin;
 
 	NotePlayHandle( InstrumentTrack* instrumentTrack,
 					const f_cnt_t offset,
@@ -69,8 +70,8 @@ public:
 					const Note& noteToPlay,
 					NotePlayHandle* parent = nullptr,
 					int midiEventChannel = -1,
-					Origin origin = OriginMidiClip );
-	virtual ~NotePlayHandle();
+					Origin origin = Origin::MidiClip );
+	~NotePlayHandle() override;
 
 	void * operator new ( size_t size, void * p )
 	{
@@ -231,16 +232,16 @@ public:
 	/*! Returns whether given NotePlayHandle instance is equal to *this */
 	bool operator==( const NotePlayHandle & _nph ) const;
 
-	/*! Returns whether NotePlayHandle belongs to BB track and BB track is muted */
-	bool isBbTrackMuted()
+	/*! Returns whether NotePlayHandle belongs to pattern track and pattern track is muted */
+	bool isPatternTrackMuted()
 	{
-		return m_bbTrack && m_bbTrack->isMuted();
+		return m_patternTrack && m_patternTrack->isMuted();
 	}
 
-	/*! Sets attached BB track */
-	void setBBTrack( Track* t )
+	/*! Sets attached pattern track */
+	void setPatternTrack(Track* t)
 	{
-		m_bbTrack = t;
+		m_patternTrack = t;
 	}
 
 	/*! Process note detuning automation */
@@ -311,7 +312,7 @@ private:
 	NotePlayHandle * m_parent;			// parent note
 	bool m_hadChildren;
 	bool m_muted;							// indicates whether note is muted
-	Track* m_bbTrack;						// related BB track
+	Track* m_patternTrack;						// related pattern track
 
 	// tempo reaction
 	bpm_t m_origTempo;						// original tempo
@@ -346,7 +347,7 @@ public:
 					const Note& noteToPlay,
 					NotePlayHandle* parent = nullptr,
 					int midiEventChannel = -1,
-					NotePlayHandle::Origin origin = NotePlayHandle::OriginMidiClip );
+					NotePlayHandle::Origin origin = NotePlayHandle::Origin::MidiClip );
 	static void release( NotePlayHandle * nph );
 	static void extend( int i );
 	static void free();
@@ -359,4 +360,6 @@ private:
 };
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_NOTE_PLAY_HANDLE_H

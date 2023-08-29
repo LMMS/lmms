@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef AEFFECTX_H
 #define AEFFECTX_H
 
@@ -30,7 +29,12 @@
 #include <type_traits>
 
 // Calling convention
+#ifdef _WIN32
 #define VST_CALL_CONV __cdecl
+#else
+#define VST_CALL_CONV 
+#endif
+
 
 template<typename T>
 constexpr int32_t CCONST(T a, T b, T c, T d)
@@ -291,9 +295,6 @@ public:
 
 } ;
 
+using audioMasterCallback = intptr_t (VST_CALL_CONV*)(AEffect*, int32_t, int32_t, intptr_t, void*, float);
 
-
-typedef intptr_t (VST_CALL_CONV * audioMasterCallback)( AEffect * , int32_t, int32_t, intptr_t, void * , float );
-
-
-#endif
+#endif // AEFFECTX_H

@@ -33,13 +33,18 @@
 #include <QPainter>
 #include <QString>
 
+#include "fft_helpers.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "SaControls.h"
 #include "SaProcessor.h"
 
 #ifdef SA_DEBUG
 	#include <chrono>
 #endif
+
+namespace lmms::gui
+{
 
 
 SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWidget *_parent) :
@@ -643,8 +648,8 @@ std::vector<std::pair<int, std::string>> SaSpectrumView::makeLogFreqTics(int low
 {
 	std::vector<std::pair<int, std::string>> result;
 	int i, j;
-	int a[] = {10, 20, 50};		// sparse series multipliers
-	int b[] = {14, 30, 70};		// additional (denser) series
+	auto a = std::array{10, 20, 50};		// sparse series multipliers
+	auto b = std::array{14, 30, 70};		// additional (denser) series
 
 	// generate main steps (powers of 10); use the series to specify smaller steps
 	for (i = 1; i <= high; i *= 10)
@@ -841,3 +846,5 @@ void SaSpectrumView::resizeEvent(QResizeEvent *event)
 	m_linearAmpTics = makeLinearAmpTics(m_processor->getAmpRangeMin(), m_processor->getAmpRangeMax());
 }
 
+
+} // namespace lmms::gui

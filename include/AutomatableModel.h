@@ -22,11 +22,12 @@
  *
  */
 
-#ifndef AUTOMATABLE_MODEL_H
-#define AUTOMATABLE_MODEL_H
+#ifndef LMMS_AUTOMATABLE_MODEL_H
+#define LMMS_AUTOMATABLE_MODEL_H
 
-#include <QtCore/QMap>
-#include <QtCore/QMutex>
+#include <QMap>
+#include <QMutex>
+#include <cmath>
 
 #include "JournallingObject.h"
 #include "Model.h"
@@ -34,6 +35,10 @@
 #include "ValueBuffer.h"
 #include "MemoryManager.h"
 #include "ModelVisitor.h"
+
+
+namespace lmms
+{
 
 // simple way to map a property of a view to a model
 #define mapPropertyFromModelPtr(type,getfunc,setfunc,modelname)	\
@@ -74,10 +79,9 @@ class LMMS_EXPORT AutomatableModel : public Model, public JournallingObject
 	Q_OBJECT
 	MM_OPERATORS
 public:
+	using AutoModelVector = std::vector<AutomatableModel*>;
 
-	typedef QVector<AutomatableModel *> AutoModelVector;
-
-	enum ScaleType
+	enum class ScaleType
 	{
 		Linear,
 		Logarithmic,
@@ -85,7 +89,7 @@ public:
 	};
 
 
-	virtual ~AutomatableModel();
+	~AutomatableModel() override;
 
 	// Implement those by using the MODEL_IS_VISITABLE macro
 	virtual void accept(ModelVisitor& v) = 0;
@@ -141,7 +145,7 @@ public:
 	template<bool>
 	static bool castValue( const float v )
 	{
-		return ( qRound( v ) != 0 );
+		return (std::round(v) != 0);
 	}
 
 
@@ -228,11 +232,11 @@ public:
 	}
 	void setScaleLogarithmic( bool setToTrue = true )
 	{
-		setScaleType( setToTrue ? Logarithmic : Linear );
+		setScaleType( setToTrue ? ScaleType::Logarithmic : ScaleType::Linear );
 	}
 	bool isScaleLogarithmic() const
 	{
-		return m_scaleType == Logarithmic;
+		return m_scaleType == ScaleType::Logarithmic;
 	}
 
 	void setStep( const float step );
@@ -416,7 +420,7 @@ private:
 
 signals:
 	void initValueChanged( float val );
-	void destroyed( jo_id_t id );
+	void destroyed( lmms::jo_id_t id );
 
 } ;
 
@@ -500,7 +504,8 @@ public:
 	QString displayValue( const float val ) const override;
 } ;
 
-typedef QMap<AutomatableModel*, float> AutomatedValueMap;
+using AutomatedValueMap = QMap<AutomatableModel*, float>;
 
-#endif
+} // namespace lmms
 
+#endif // LMMS_AUTOMATABLE_MODEL_H

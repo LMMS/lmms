@@ -22,13 +22,12 @@
  *
  */
 
-
-#ifndef SAMPLE_BUFFER_H
-#define SAMPLE_BUFFER_H
+#ifndef LMMS_SAMPLE_BUFFER_H
+#define LMMS_SAMPLE_BUFFER_H
 
 #include <memory>
-#include <QtCore/QReadWriteLock>
-#include <QtCore/QObject>
+#include <QReadWriteLock>
+#include <QObject>
 
 #include <samplerate.h>
 
@@ -44,6 +43,9 @@
 class QPainter;
 class QRect;
 
+namespace lmms
+{
+
 // values for buffer margins, used for various libsamplerate interpolation modes
 // the array positions correspond to the converter_type parameter values in libsamplerate
 // if there appears problems with playback on some interpolation mode, then the value for that mode
@@ -55,10 +57,10 @@ class LMMS_EXPORT SampleBuffer : public QObject, public sharedObject
 	Q_OBJECT
 	MM_OPERATORS
 public:
-	enum LoopMode {
-		LoopOff = 0,
-		LoopOn,
-		LoopPingPong
+	enum class LoopMode {
+		Off = 0,
+		On,
+		PingPong
 	};
 	class LMMS_EXPORT handleState
 	{
@@ -116,14 +118,14 @@ public:
 	friend void swap(SampleBuffer & first, SampleBuffer & second) noexcept;
 	SampleBuffer& operator= (const SampleBuffer that);
 
-	virtual ~SampleBuffer();
+	~SampleBuffer() override;
 
 	bool play(
 		sampleFrame * ab,
 		handleState * state,
 		const fpp_t frames,
 		const float freq,
-		const LoopMode loopMode = LoopOff
+		const LoopMode loopMode = LoopMode::Off
 	);
 
 	void visualize(
@@ -281,8 +283,8 @@ public:
 public slots:
 	void setAudioFile(const QString & audioFile);
 	void loadFromBase64(const QString & data);
-	void setStartFrame(const f_cnt_t s);
-	void setEndFrame(const f_cnt_t e);
+	void setStartFrame(const lmms::f_cnt_t s);
+	void setEndFrame(const lmms::f_cnt_t e);
 	void setAmplification(float a);
 	void setReversed(bool on);
 	void sampleRateChanged();
@@ -351,5 +353,6 @@ signals:
 
 } ;
 
+} // namespace lmms
 
-#endif
+#endif // LMMS_SAMPLE_BUFFER_H

@@ -24,6 +24,8 @@
 
 #include "AudioEngineProfiler.h"
 
+namespace lmms
+{
 
 AudioEngineProfiler::AudioEngineProfiler() :
 	m_periodTimer(),
@@ -34,17 +36,12 @@ AudioEngineProfiler::AudioEngineProfiler() :
 
 
 
-AudioEngineProfiler::~AudioEngineProfiler()
-{
-}
-
-
 void AudioEngineProfiler::finishPeriod( sample_rate_t sampleRate, fpp_t framesPerPeriod )
 {
 	int periodElapsed = m_periodTimer.elapsed();
 
 	const float newCpuLoad = periodElapsed / 10000.0f * sampleRate / framesPerPeriod;
-    m_cpuLoad = qBound<int>( 0, ( newCpuLoad * 0.1f + m_cpuLoad * 0.9f ), 100 );
+    m_cpuLoad = std::clamp<int>((newCpuLoad * 0.1f + m_cpuLoad * 0.9f), 0, 100);
 
 	if( m_outputFile.isOpen() )
 	{
@@ -61,3 +58,4 @@ void AudioEngineProfiler::setOutputFile( const QString& outputFile )
 	m_outputFile.open( QFile::WriteOnly | QFile::Truncate );
 }
 
+} // namespace lmms

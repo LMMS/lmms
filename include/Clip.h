@@ -22,19 +22,27 @@
  *
  */
 
-#ifndef TRACK_CONTENT_OBJECT_H
-#define TRACK_CONTENT_OBJECT_H
+#ifndef LMMS_CLIP_H
+#define LMMS_CLIP_H
 
 #include <QColor>
 
 #include "AutomatableModel.h"
-#include "lmms_basics.h"
 
+
+namespace lmms
+{
 
 class Track;
-class ClipView;
 class TrackContainer;
+
+namespace gui
+{
+
+class ClipView;
 class TrackView;
+
+} // namespace gui
 
 
 class LMMS_EXPORT Clip : public Model, public JournallingObject
@@ -45,7 +53,7 @@ class LMMS_EXPORT Clip : public Model, public JournallingObject
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
 	Clip( Track * track );
-	virtual ~Clip();
+	~Clip() override;
 
 	inline Track * getTrack() const
 	{
@@ -85,6 +93,12 @@ public:
 		return m_length;
 	}
 
+	/*! \brief Specify whether or not a TCO automatically resizes.
+	 *
+	 *  If a TCO does automatically resize, it cannot be manually
+	 *  resized by clicking and dragging its edge.
+	 *
+	 */
 	inline void setAutoResize( const bool r )
 	{
 		m_autoResize = r;
@@ -117,7 +131,7 @@ public:
 	virtual void movePosition( const TimePos & pos );
 	virtual void changeLength( const TimePos & length );
 
-	virtual ClipView * createView( TrackView * tv ) = 0;
+	virtual gui::ClipView * createView( gui::TrackView * tv ) = 0;
 
 	inline void selectViewOnCreate( bool select )
 	{
@@ -150,13 +164,6 @@ signals:
 
 
 private:
-	enum Actions
-	{
-		NoAction,
-		Move,
-		Resize
-	} ;
-
 	Track * m_track;
 	QString m_name;
 
@@ -178,4 +185,6 @@ private:
 } ;
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_CLIP_H

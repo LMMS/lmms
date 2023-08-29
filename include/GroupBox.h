@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef GROUP_BOX_H
-#define GROUP_BOX_H
+#ifndef LMMS_GUI_GROUP_BOX_H
+#define LMMS_GUI_GROUP_BOX_H
 
 #include <QWidget>
 
@@ -34,13 +33,15 @@
 
 class QPixmap;
 
+namespace lmms::gui
+{
 
 class GroupBox : public QWidget, public BoolModelView
 {
 	Q_OBJECT
 public:
 	GroupBox( const QString & _caption, QWidget * _parent = nullptr );
-	virtual ~GroupBox();
+	~GroupBox() override;
 
 	void modelChanged() override;
 
@@ -70,6 +71,6 @@ private:
 } ;
 
 
+} // namespace lmms::gui
 
-
-#endif
+#endif // LMMS_GUI_GROUP_BOX_H

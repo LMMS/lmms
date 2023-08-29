@@ -24,18 +24,29 @@
  *
  */
 
-#ifndef AUTOMATION_CLIP_H
-#define AUTOMATION_CLIP_H
+#ifndef LMMS_AUTOMATION_CLIP_H
+#define LMMS_AUTOMATION_CLIP_H
 
-#include <QtCore/QMap>
-#include <QtCore/QPointer>
+#include <QMap>
+#include <QPointer>
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	#include <QRecursiveMutex>
+#endif
 
 #include "AutomationNode.h"
 #include "Clip.h"
 
 
+namespace lmms
+{
+
 class AutomationTrack;
 class TimePos;
+
+namespace gui
+{
+class AutomationClipView;
+} // namespace gui
 
 
 
@@ -43,21 +54,21 @@ class LMMS_EXPORT AutomationClip : public Clip
 {
 	Q_OBJECT
 public:
-	enum ProgressionTypes
+	enum class ProgressionType
 	{
-		DiscreteProgression,
-		LinearProgression,
-		CubicHermiteProgression
+		Discrete,
+		Linear,
+		CubicHermite
 	} ;
 
-	typedef QMap<int, AutomationNode> timeMap;
-	typedef QVector<QPointer<AutomatableModel>> objectVector;
+	using timeMap = QMap<int, AutomationNode>;
+	using objectVector = std::vector<QPointer<AutomatableModel>>;
 
 	using TimemapIterator = timeMap::const_iterator;
 
 	AutomationClip( AutomationTrack * _auto_track );
 	AutomationClip( const AutomationClip & _clip_to_copy );
-	virtual ~AutomationClip() = default;
+	~AutomationClip() override = default;
 
 	bool addObject( AutomatableModel * _obj, bool _search_dup = true );
 
@@ -65,11 +76,11 @@ public:
 	const objectVector& objects() const;
 
 	// progression-type stuff
-	inline ProgressionTypes progressionType() const
+	inline ProgressionType progressionType() const
 	{
 		return m_progressionType;
 	}
-	void setProgressionType( ProgressionTypes _new_progression_type );
+	void setProgressionType( ProgressionType _new_progression_type );
 
 	inline float getTension() const
 	{
@@ -143,20 +154,20 @@ public:
 	float valueAt( const TimePos & _time ) const;
 	float *valuesAfter( const TimePos & _time ) const;
 
-	const QString name() const;
+	QString name() const;
 
 	// settings-management
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
 
-	static const QString classNodeName() { return "automationpattern"; }
+	static const QString classNodeName() { return "automationclip"; }
 	QString nodeName() const override { return classNodeName(); }
 
-	ClipView * createView( TrackView * _tv ) override;
+	gui::ClipView * createView( gui::TrackView * _tv ) override;
 
 
 	static bool isAutomated( const AutomatableModel * _m );
-	static QVector<AutomationClip *> clipsForModel( const AutomatableModel * _m );
+	static std::vector<AutomationClip*> clipsForModel(const AutomatableModel* _m);
 	static AutomationClip * globalAutomationClip( AutomatableModel * _m );
 	static void resolveAllIDs();
 
@@ -168,7 +179,7 @@ public:
 
 public slots:
 	void clear();
-	void objectDestroyed( jo_id_t );
+	void objectDestroyed( lmms::jo_id_t );
 	void flipY( int min, int max );
 	void flipY();
 	void flipX( int length = -1 );
@@ -179,18 +190,31 @@ private:
 	void generateTangents(timeMap::iterator it, int numToGenerate);
 	float valueAt( timeMap::const_iterator v, int offset ) const;
 
+	/**
+	 * @brief
+	 * This function combines the song tracks, pattern store tracks,
+	 * and the global automation track all in one vector.
+	 *
+	 * @return std::vector<Track*>
+	 */
+	static std::vector<Track*> combineAllTracks();
+
 	// Mutex to make methods involving automation clips thread safe
 	// Mutable so we can lock it from const objects
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	mutable QRecursiveMutex m_clipMutex;
+#else
 	mutable QMutex m_clipMutex;
+#endif
 
 	AutomationTrack * m_autoTrack;
-	QVector<jo_id_t> m_idsToResolve;
+	std::vector<jo_id_t> m_idsToResolve;
 	objectVector m_objects;
 	timeMap m_timeMap;	// actual values
 	timeMap m_oldTimeMap;	// old values for storing the values before setDragValue() is called.
 	float m_tension;
 	bool m_hasAutomation;
-	ProgressionTypes m_progressionType;
+	ProgressionType m_progressionType;
 
 	bool m_dragging;
 	bool m_dragKeepOutValue; // Should we keep the current dragged node's outValue?
@@ -204,7 +228,7 @@ private:
 	static const float DEFAULT_MIN_VALUE;
 	static const float DEFAULT_MAX_VALUE;
 
-	friend class AutomationClipView;
+	friend class gui::AutomationClipView;
 	friend class AutomationNode;
 
 } ;
@@ -242,4 +266,7 @@ inline int POS(AutomationClip::TimemapIterator it)
 	return it.key();
 }
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_AUTOMATION_CLIP_H

@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LV2PORTS_H
-#define LV2PORTS_H
+#ifndef LMMS_LV2PORTS_H
+#define LMMS_LV2PORTS_H
 
 #include "lmmsconfig.h"
 
@@ -33,11 +33,17 @@
 #include <memory>
 #include <vector>
 
+#include "Flags.h"
 #include "lmms_basics.h"
 #include "PluginIssue.h"
 
+
+namespace lmms
+{
+
+
 struct ConnectPortVisitor;
-typedef struct LV2_Evbuf_Impl LV2_Evbuf;
+using LV2_Evbuf = struct LV2_Evbuf_Impl;
 
 namespace Lv2Ports {
 
@@ -87,7 +93,7 @@ struct ConstVisitor
 	virtual void visit(const Lv2Ports::AtomSeq& ) {}
 	virtual void visit(const Lv2Ports::Unknown& ) {}
 
-	virtual ~ConstVisitor();
+	virtual ~ConstVisitor() = default;
 };
 
 struct Visitor
@@ -99,7 +105,7 @@ struct Visitor
 	virtual void visit(Lv2Ports::AtomSeq& ) {}
 	virtual void visit(Lv2Ports::Unknown& ) {}
 
-	virtual ~Visitor();
+	virtual ~Visitor() = default;
 };
 
 struct Meta
@@ -134,7 +140,7 @@ struct PortBase : public Meta
 	QString name() const;
 	QString uri() const;
 
-	virtual ~PortBase();
+	virtual ~PortBase() = default;
 };
 
 template<typename Derived, typename Base>
@@ -200,17 +206,17 @@ private:
 	bool m_sidechain;
 
 	// the only case when data of m_buffer may be referenced:
-	friend struct ::ConnectPortVisitor;
+	friend struct lmms::ConnectPortVisitor;
 };
 
 struct AtomSeq : public VisitablePort<AtomSeq, PortBase>
 {
-	enum FlagType
+	enum class FlagType
 	{
 		None = 0,
 		Midi = 1
 	};
-	unsigned flags = FlagType::None;
+	Flags<FlagType> flags = FlagType::None;
 
 	struct Lv2EvbufDeleter
 	{
@@ -261,5 +267,9 @@ const Target* dcast(const PortBase* base)
 
 } // namespace Lv2Ports
 
+
+} // namespace lmms
+
 #endif // LMMS_HAVE_LV2
-#endif // LV2PORTS_H
+
+#endif // LMMS_LV2PORTS_H

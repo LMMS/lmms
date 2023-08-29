@@ -22,11 +22,11 @@
  *
  */
 
-#ifndef TRACK_H
-#define TRACK_H
+#ifndef LMMS_TRACK_H
+#define LMMS_TRACK_H
 
+#include <vector>
 
-#include <QtCore/QVector>
 #include <QColor>
 
 #include "AutomatableModel.h"
@@ -34,11 +34,21 @@
 #include "lmms_basics.h"
 
 
+namespace lmms
+{
+
 class TimePos;
 class TrackContainer;
-class TrackContainerView;
 class Clip;
+
+
+namespace gui
+{
+
 class TrackView;
+class TrackContainerView;
+
+}
 
 
 /*! The minimum track height in pixels
@@ -60,31 +70,31 @@ class LMMS_EXPORT Track : public Model, public JournallingObject
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
-	typedef QVector<Clip *> clipVector;
+	using clipVector = std::vector<Clip*>;
 
-	enum TrackTypes
+	enum class Type
 	{
-		InstrumentTrack,
-		BBTrack,
-		SampleTrack,
-		EventTrack,
-		VideoTrack,
-		AutomationTrack,
-		HiddenAutomationTrack,
-		NumTrackTypes
+		Instrument,
+		Pattern,
+		Sample,
+		Event,
+		Video,
+		Automation,
+		HiddenAutomation,
+		Count
 	} ;
 
-	Track( TrackTypes type, TrackContainer * tc );
-	virtual ~Track();
+	Track( Type type, TrackContainer * tc );
+	~Track() override;
 
-	static Track * create( TrackTypes tt, TrackContainer * tc );
+	static Track * create( Type tt, TrackContainer * tc );
 	static Track * create( const QDomElement & element,
 							TrackContainer * tc );
 	Track * clone();
 
 
 	// pure virtual functions
-	TrackTypes type() const
+	Type type() const
 	{
 		return m_type;
 	}
@@ -93,7 +103,8 @@ public:
 						const f_cnt_t frameBase, int clipNum = -1 ) = 0;
 
 
-	virtual TrackView * createView( TrackContainerView * view ) = 0;
+
+	virtual gui::TrackView * createView( gui::TrackContainerView * view ) = 0;
 	virtual Clip * createClip( const TimePos & pos ) = 0;
 
 	virtual void saveTrackSpecificSettings( QDomDocument & doc,
@@ -127,7 +138,7 @@ public:
 							const TimePos & end );
 	void swapPositionOfClips( int clipNum1, int clipNum2 );
 
-	void createClipsForBB( int bb );
+	void createClipsForPattern(int pattern);
 
 
 	void insertBar( const TimePos & pos );
@@ -213,7 +224,7 @@ public slots:
 
 private:
 	TrackContainer* m_trackContainer;
-	TrackTypes m_type;
+	Type m_type;
 	QString m_name;
 	int m_height;
 
@@ -233,16 +244,17 @@ private:
 	QColor m_color;
 	bool m_hasColor;
 
-	friend class TrackView;
+	friend class gui::TrackView;
 
 
 signals:
 	void destroyedTrack();
 	void nameChanged();
-	void clipAdded( Clip * );
+	void clipAdded( lmms::Clip * );
 	void colorChanged();
 } ;
 
 
+} // namespace lmms
 
-#endif
+#endif // LMMS_TRACK_H

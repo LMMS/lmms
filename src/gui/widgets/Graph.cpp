@@ -23,8 +23,6 @@
  *
  */
 
-#include <QPaintEvent>
-#include <QFontMetrics>
 #include <QPainter>
 
 #include "Graph.h"
@@ -32,8 +30,13 @@
 #include "SampleBuffer.h"
 #include "Oscillator.h"
 
+namespace lmms
+{
 
-Graph::Graph( QWidget * _parent, graphStyle _style, int _width,
+namespace gui
+{
+
+Graph::Graph( QWidget * _parent, Style _style, int _width,
 		int _height ) :
 	QWidget( _parent ),
 	/* TODO: size, background? */
@@ -47,13 +50,13 @@ Graph::Graph( QWidget * _parent, graphStyle _style, int _width,
 	setAcceptDrops( true );
 	setCursor( Qt::CrossCursor );
 
-	graphModel * gModel = castModel<graphModel>();
+	auto gModel = castModel<graphModel>();
 
-	QObject::connect( gModel, SIGNAL( samplesChanged( int, int ) ),
-			this, SLOT( updateGraph( int, int ) ) );
+	QObject::connect( gModel, SIGNAL(samplesChanged(int,int)),
+			this, SLOT(updateGraph(int,int)));
 
-	QObject::connect( gModel, SIGNAL( lengthChanged( ) ),
-			this, SLOT( updateGraph( ) ) );
+	QObject::connect( gModel, SIGNAL(lengthChanged()),
+			this, SLOT(updateGraph()));
 }
 
 void Graph::setForeground( const QPixmap &_pixmap )
@@ -302,7 +305,7 @@ void Graph::paintEvent( QPaintEvent * )
 
 	switch( m_graphStyle )
 	{
-		case Graph::LinearStyle:
+		case Style::Linear:
 			p.setRenderHints( QPainter::Antialiasing, true );
 
 			for( int i=0; i < length; i++ )
@@ -326,7 +329,7 @@ void Graph::paintEvent( QPaintEvent * )
 			break;
 
 
-		case Graph::NearestStyle:
+		case Style::Nearest:
 			for( int i=0; i < length; i++ )
 			{
 				p.drawLine(2+static_cast<int>(i*xscale),
@@ -347,7 +350,7 @@ void Graph::paintEvent( QPaintEvent * )
 				2+static_cast<int>( ( (*samps)[length] - maxVal ) * yscale ) );
 			break;
 
-		case Graph::LinearNonCyclicStyle:
+		case Style::LinearNonCyclic:
 			p.setRenderHints( QPainter::Antialiasing, true );
 
 			for( int i=0; i < length; i++ )
@@ -366,7 +369,7 @@ void Graph::paintEvent( QPaintEvent * )
 			p.setRenderHints( QPainter::Antialiasing, false );
 			break;
 
-		case Graph::BarStyle:
+		case Style::Bar:
 			for( int i=0; i <= length; i++ )
 			{
 				p.fillRect( 2+static_cast<int>( i*xscale ),
@@ -430,13 +433,13 @@ void Graph::dragEnterEvent( QDragEnterEvent * _dee )
 
 void Graph::modelChanged()
 {
-	graphModel * gModel = castModel<graphModel>();
+	auto gModel = castModel<graphModel>();
 
-	QObject::connect( gModel, SIGNAL( samplesChanged( int, int ) ),
-			this, SLOT( updateGraph( int, int ) ) );
+	QObject::connect( gModel, SIGNAL(samplesChanged(int,int)),
+			this, SLOT(updateGraph(int,int)));
 
-	QObject::connect( gModel, SIGNAL( lengthChanged( ) ),
-			this, SLOT( updateGraph( ) ) );
+	QObject::connect( gModel, SIGNAL(lengthChanged()),
+			this, SLOT(updateGraph()));
 }
 
 
@@ -453,8 +456,10 @@ void Graph::updateGraph()
 }
 
 
+} // namespace gui
+
 graphModel::graphModel( float _min, float _max, int _length,
-			::Model * _parent, bool _default_constructed,  float _step ) :
+			Model* _parent, bool _default_constructed,  float _step ) :
 	Model( _parent, tr( "Graph" ), _default_constructed ),
 	m_samples( _length ),
 	m_length( _length ),
@@ -583,7 +588,7 @@ void graphModel::setWaveToNoise()
 
 QString graphModel::setWaveToUser()
 {
-	SampleBuffer * sampleBuffer = new SampleBuffer;
+	auto sampleBuffer = new SampleBuffer;
 	QString fileName = sampleBuffer->openAndSetWaveformFile();
 	if( fileName.isEmpty() == false )
 	{
@@ -746,6 +751,4 @@ void graphModel::drawSampleAt( int x, float val )
 }
 
 
-
-
-
+} // namespace lmms

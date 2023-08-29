@@ -40,12 +40,11 @@
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 
-#include <QDomDocument>
 #include <QFile>
 #include <QFileInfo>
 #include <QByteArray>
-#include <assert.h>
-#include <math.h>
+#include <cassert>
+#include <cmath>
 
 #include "opl.h"
 #include "temuopl.h"
@@ -55,24 +54,26 @@
 #include "debug.h"
 
 #include "Knob.h"
-#include "LcdSpinBox.h"
 #include "PixmapButton.h"
-#include "ToolTip.h"
 
 #include "plugin_export.h"
+
+namespace lmms
+{
+
 
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT opulenz_plugin_descriptor =
 {
-        STRINGIFY( PLUGIN_NAME ),
+        LMMS_STRINGIFY( PLUGIN_NAME ),
         "OpulenZ",
         QT_TRANSLATE_NOOP( "PluginBrowser",
 			   "2-operator FM Synth" ),
         "Raine M. Ekman <raine/at/iki/fi>",
         0x0100,
-        Plugin::Instrument,
+        Plugin::Type::Instrument,
         new PluginPixmapLoader( "logo" ),
         "sbi",
         nullptr,
@@ -91,7 +92,7 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 QMutex OpulenzInstrument::emulatorMutex;
 
 // Weird ordering of voice parameters
-const unsigned int adlib_opadd[OPL2_VOICES] = {0x00, 0x01, 0x02, 0x08, 0x09, 0x0A, 0x10, 0x11, 0x12};
+const auto adlib_opadd = std::array<unsigned int, OPL2_VOICES>{0x00, 0x01, 0x02, 0x08, 0x09, 0x0A, 0x10, 0x11, 0x12};
 
 OpulenzInstrument::OpulenzInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &opulenz_plugin_descriptor ),
@@ -214,15 +215,15 @@ OpulenzInstrument::OpulenzInstrument( InstrumentTrack * _instrument_track ) :
 	MOD_CON( trem_depth_mdl );
 
 	// Connect the plugin to the audio engine...
-	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
+	auto iph = new InstrumentPlayHandle(this, _instrument_track);
 	Engine::audioEngine()->addPlayHandle( iph );
 }
 
 OpulenzInstrument::~OpulenzInstrument() {
 	delete theEmulator;
 	Engine::audioEngine()->removePlayHandlesOfTypes( instrumentTrack(),
-				PlayHandle::TypeNotePlayHandle
-				| PlayHandle::TypeInstrumentPlayHandle );
+				PlayHandle::Type::NotePlayHandle
+				| PlayHandle::Type::InstrumentPlayHandle );
 	delete [] renderbuffer;
 }
 
@@ -370,7 +371,7 @@ bool OpulenzInstrument::handleMidiEvent( const MidiEvent& event, const TimePos& 
 			}
 			break;
 		default:
-#ifdef LMMS_DEBUG	
+#ifdef LMMS_DEBUG
 			printf("Midi CC %02x %02x\n", event.controllerNumber(), event.controllerValue() );
 #endif
 			break;
@@ -391,9 +392,9 @@ QString OpulenzInstrument::nodeName() const
         return( opulenz_plugin_descriptor.name );
 }
 
-PluginView * OpulenzInstrument::instantiateView( QWidget * _parent )
+gui::PluginView* OpulenzInstrument::instantiateView( QWidget * _parent )
 {
-        return( new OpulenzInstrumentView( this, _parent ) );
+        return( new gui::OpulenzInstrumentView( this, _parent ) );
 }
 
 
@@ -533,7 +534,7 @@ void OpulenzInstrument::loadGMPatch() {
 
 // Update patch from the models to the chip emulation
 void OpulenzInstrument::updatePatch() {
-	unsigned char inst[14] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	auto inst = std::array<unsigned char, 14>{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	inst[0] = ( op1_trem_mdl.value() ?  128 : 0  ) +
 		( op1_vib_mdl.value() ?  64 : 0 ) +
 		( op1_perc_mdl.value() ?  0 : 32 ) + // NB. This envelope mode is "perc", not "sus"
@@ -582,7 +583,7 @@ void OpulenzInstrument::updatePatch() {
 #endif
 
 
-	loadPatch(inst);
+	loadPatch(inst.data());
 }
 
 // Load an SBI file into the knob models
@@ -676,7 +677,8 @@ void OpulenzInstrument::loadFile( const QString& file ) {
 
 
 
-
+namespace gui
+{
 
 OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
                                                         QWidget * _parent ) :
@@ -684,7 +686,7 @@ OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
 {
 
 #define KNOB_GEN(knobname, hinttext, hintunit,xpos,ypos) \
-	knobname = new Knob( knobStyled, this );\
+	knobname = new Knob( KnobType::Styled, this );\
 	knobname->setHintText( tr(hinttext), hintunit );\
 	knobname->setFixedSize(22,22);\
 	knobname->setCenterPointX(11.0);\
@@ -697,14 +699,14 @@ OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
         buttname->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "led_on" ) );\
         buttname->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "led_off" ) );\
 	buttname->setCheckable( true );\
-        ToolTip::add( buttname, tr( tooltip ) );\
+        buttname->setToolTip(tr(tooltip));\
         buttname->move( xpos, ypos );
 
 #define WAVEBUTTON_GEN(buttname, tooltip, xpos, ypos, icon_on, icon_off, buttgroup) \
 	buttname = new PixmapButton( this, nullptr );\
         buttname->setActiveGraphic( PLUGIN_NAME::getIconPixmap( icon_on ) ); \
         buttname->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( icon_off ) ); \
-        ToolTip::add( buttname, tr( tooltip ) );\
+        buttname->setToolTip(tr(tooltip));\
         buttname->move( xpos, ypos );\
 	buttgroup->addButton(buttname);
 
@@ -761,7 +763,7 @@ OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
         setPalette( pal );
 }
 OpulenzInstrumentView::~OpulenzInstrumentView() {
-	// Knobs are QWidgets and our children, so they're 
+	// Knobs are QWidgets and our children, so they're
 	// destroyed automagically
 }
 
@@ -780,24 +782,23 @@ void OpulenzInstrumentView::updateKnobHints()
 {
 	// Envelope times in ms: t[0] = 0, t[n] = ( 1<<n ) * X, X = 0.11597 for A, 0.6311 for D/R
 	// Here some rounding has been applied.
-	const float attack_times[16] = { 
-		0.0, 0.2, 0.4, 0.9, 1.8, 3.7, 7.4, 
+	const auto attack_times = std::array<float, 16>{
+		0.0, 0.2, 0.4, 0.9, 1.8, 3.7, 7.4,
 		15.0, 30.0, 60.0, 120.0, 240.0, 480.0,
-		950.0, 1900.0, 3800.0 
+		950.0, 1900.0, 3800.0
 	};
 
-	const float dr_times[16] = { 
-		0.0, 1.2, 2.5, 5.0, 10.0, 20.0, 40.0, 
-		80.0, 160.0, 320.0, 640.0, 1300.0, 2600.0, 
-		5200.0, 10000.0, 20000.0 
-	};
-	
-	const int fmultipliers[16] = {
-		-12, 0, 12, 19, 24, 28, 31, 34, 36, 38, 40, 40, 43, 43, 47, 47  
+	const auto dr_times = std::array<float, 16>{
+		0.0, 1.2, 2.5, 5.0, 10.0, 20.0, 40.0,
+		80.0, 160.0, 320.0, 640.0, 1300.0, 2600.0,
+		5200.0, 10000.0, 20000.0
 	};
 
-	OpulenzInstrument * m = castModel<OpulenzInstrument>();
-	
+	const auto fmultipliers = std::array<int, 16>{
+		-12, 0, 12, 19, 24, 28, 31, 34, 36, 38, 40, 40, 43, 43, 47, 47
+	};
+
+	auto m = castModel<OpulenzInstrument>();
 
 	op1_a_kn->setHintText( tr( "Attack" ),
 						   " (" + knobHintHelper(attack_times[(int)m->op1_a_mdl.value()]) + ")");
@@ -819,7 +820,7 @@ void OpulenzInstrumentView::updateKnobHints()
 
 void OpulenzInstrumentView::modelChanged()
 {
-	OpulenzInstrument * m = castModel<OpulenzInstrument>();
+	auto m = castModel<OpulenzInstrument>();
 	// m_patch->setModel( &m->m_patchModel );
 
 	op1_a_kn->setModel( &m->op1_a_mdl );
@@ -862,15 +863,17 @@ void OpulenzInstrumentView::modelChanged()
 	connect( &m->op1_d_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );
 	connect( &m->op2_d_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );
 
-	connect( &m->op1_r_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );	
-	connect( &m->op2_r_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );	
+	connect( &m->op1_r_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );
+	connect( &m->op2_r_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );
 
-	connect( &m->op1_mul_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );	
-	connect( &m->op2_mul_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );	
+	connect( &m->op1_mul_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );
+	connect( &m->op2_mul_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );
 
 	updateKnobHints();
 
 }
 
 
+} // namespace gui
 
+} // namespace lmms

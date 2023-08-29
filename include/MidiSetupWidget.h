@@ -22,14 +22,16 @@
  *
  */
 
-#ifndef MIDISETUPWIDGET_H
-#define MIDISETUPWIDGET_H
-
-#include <QLabel>
+#ifndef LMMS_GUI_MIDI_SETUP_WIDGET_H
+#define LMMS_GUI_MIDI_SETUP_WIDGET_H
 
 #include "TabWidget.h"
 
 class QLineEdit;
+
+namespace lmms::gui
+{
+
 
 class MidiSetupWidget : public TabWidget
 {
@@ -54,4 +56,7 @@ private:
 
 };
 
-#endif
+
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_MIDI_SETUP_WIDGET_H

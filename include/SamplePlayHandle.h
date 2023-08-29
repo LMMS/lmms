@@ -23,26 +23,30 @@
  *
  */
 
-#ifndef SAMPLE_PLAY_HANDLE_H
-#define SAMPLE_PLAY_HANDLE_H
+#ifndef LMMS_SAMPLE_PLAY_HANDLE_H
+#define LMMS_SAMPLE_PLAY_HANDLE_H
 
 #include "SampleBuffer.h"
 #include "AutomatableModel.h"
 #include "PlayHandle.h"
 
-class BBTrack;
+namespace lmms
+{
+
+
+class PatternTrack;
 class SampleClip;
 class Track;
 class AudioPort;
 
 
-class SamplePlayHandle : public PlayHandle
+class LMMS_EXPORT SamplePlayHandle : public PlayHandle
 {
 public:
 	SamplePlayHandle( SampleBuffer* sampleBuffer , bool ownAudioPort = true );
 	SamplePlayHandle( const QString& sampleFile );
 	SamplePlayHandle( SampleClip* clip );
-	virtual ~SamplePlayHandle();
+	~SamplePlayHandle() override;
 
 	inline bool affinityMatters() const override
 	{
@@ -65,9 +69,9 @@ public:
 		m_doneMayReturnTrue = _enable;
 	}
 
-	void setBBTrack( BBTrack * _bb_track )
+	void setPatternTrack(PatternTrack* pt)
 	{
-		m_bbTrack = _bb_track;
+		m_patternTrack = pt;
 	}
 
 	void setVolumeModel( FloatModel * _model )
@@ -89,9 +93,11 @@ private:
 	FloatModel * m_volumeModel;
 	Track * m_track;
 
-	BBTrack * m_bbTrack;
+	PatternTrack* m_patternTrack;
 
 } ;
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_SAMPLE_PLAY_HANDLE_H

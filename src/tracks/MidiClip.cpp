@@ -25,29 +25,33 @@
 
 #include "MidiClip.h"
 
-#include "BBTrackContainer.h"
+#include <QDomElement>
+
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
+#include "MidiClipView.h"
+#include "PatternStore.h"
 #include "PianoRoll.h"
 
-#include <limits>
 
 
-QPixmap * MidiClipView::s_stepBtnOn0 = nullptr;
-QPixmap * MidiClipView::s_stepBtnOn200 = nullptr;
-QPixmap * MidiClipView::s_stepBtnOff = nullptr;
-QPixmap * MidiClipView::s_stepBtnOffLight = nullptr;
+namespace lmms
+{
+
+QPixmap * gui::MidiClipView::s_stepBtnOn0 = nullptr;
+QPixmap * gui::MidiClipView::s_stepBtnOn200 = nullptr;
+QPixmap * gui::MidiClipView::s_stepBtnOff = nullptr;
+QPixmap * gui::MidiClipView::s_stepBtnOffLight = nullptr;
 
 
 
 MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
 	Clip( _instrument_track ),
 	m_instrumentTrack( _instrument_track ),
-	m_clipType( BeatClip ),
+	m_clipType( Type::BeatClip ),
 	m_steps( TimePos::stepsPerBar() )
 {
-	if( _instrument_track->trackContainer()
-					== Engine::getBBTrackContainer() )
+	if (_instrument_track->trackContainer()	== Engine::patternStore())
 	{
 		resizeToFirstTrack();
 	}
@@ -64,19 +68,19 @@ MidiClip::MidiClip( const MidiClip& other ) :
 	m_clipType( other.m_clipType ),
 	m_steps( other.m_steps )
 {
-	for( NoteVector::ConstIterator it = other.m_notes.begin(); it != other.m_notes.end(); ++it )
+	for (const auto& note : other.m_notes)
 	{
-		m_notes.push_back( new Note( **it ) );
+		m_notes.push_back(new Note(*note));
 	}
 
 	init();
 	switch( getTrack()->trackContainer()->type() )
 	{
-		case TrackContainer::BBContainer:
+		case TrackContainer::Type::Pattern:
 			setAutoResize( true );
 			break;
 
-		case TrackContainer::SongContainer:
+		case TrackContainer::Type::Song:
 			// move down
 		default:
 			setAutoResize( false );
@@ -89,10 +93,9 @@ MidiClip::~MidiClip()
 {
 	emit destroyedMidiClip( this );
 
-	for( NoteVector::Iterator it = m_notes.begin();
-						it != m_notes.end(); ++it )
+	for (const auto& note : m_notes)
 	{
-		delete *it;
+		delete note;
 	}
 
 	m_notes.clear();
@@ -103,20 +106,20 @@ MidiClip::~MidiClip()
 
 void MidiClip::resizeToFirstTrack()
 {
-	// Resize this track to be the same as existing tracks in the BB
+	// Resize this track to be the same as existing tracks in the pattern
 	const TrackContainer::TrackList & tracks =
 		m_instrumentTrack->trackContainer()->tracks();
-	for(unsigned int trackID = 0; trackID < tracks.size(); ++trackID)
+	for (const auto& track : tracks)
 	{
-		if(tracks.at(trackID)->type() == Track::InstrumentTrack)
+		if (track->type() == Track::Type::Instrument)
 		{
-			if(tracks.at(trackID) != m_instrumentTrack)
+			if (track != m_instrumentTrack)
 			{
-				unsigned int currentClip = m_instrumentTrack->
-					getClips().indexOf(this);
-				m_steps = static_cast<MidiClip *>
-					(tracks.at(trackID)->getClip(currentClip))
-					->m_steps;
+				const auto& instrumentTrackClips = m_instrumentTrack->getClips();
+				const auto currentClipIt = std::find(instrumentTrackClips.begin(), instrumentTrackClips.end(), this);
+				unsigned int currentClip = currentClipIt != instrumentTrackClips.end() ?
+					std::distance(instrumentTrackClips.begin(), currentClipIt) : -1;
+				m_steps = static_cast<MidiClip*>(track->getClip(currentClip))->m_steps;
 			}
 			break;
 		}
@@ -128,8 +131,8 @@ void MidiClip::resizeToFirstTrack()
 
 void MidiClip::init()
 {
-	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
-				this, SLOT( changeTimeSignature() ) );
+	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
+				this, SLOT(changeTimeSignature()));
 	saveJournallingState( false );
 
 	updateLength();
@@ -141,27 +144,25 @@ void MidiClip::init()
 
 void MidiClip::updateLength()
 {
-	if( m_clipType == BeatClip )
+	if( m_clipType == Type::BeatClip )
 	{
 		changeLength( beatClipLength() );
-		updateBBTrack();
+		updatePatternTrack();
 		return;
 	}
 
 	tick_t max_length = TimePos::ticksPerBar();
 
-	for( NoteVector::ConstIterator it = m_notes.begin();
-						it != m_notes.end(); ++it )
+	for (const auto& note : m_notes)
 	{
-		if( ( *it )->length() > 0 )
+		if (note->length() > 0)
 		{
-			max_length = qMax<tick_t>( max_length,
-							( *it )->endPos() );
+			max_length = std::max<tick_t>(max_length, note->endPos());
 		}
 	}
 	changeLength( TimePos( max_length ).nextFullBar() *
 						TimePos::ticksPerBar() );
-	updateBBTrack();
+	updatePatternTrack();
 }
 
 
@@ -171,13 +172,11 @@ TimePos MidiClip::beatClipLength() const
 {
 	tick_t max_length = TimePos::ticksPerBar();
 
-	for( NoteVector::ConstIterator it = m_notes.begin();
-						it != m_notes.end(); ++it )
+	for (const auto& note : m_notes)
 	{
-		if( ( *it )->length() < 0 )
+		if (note->length() < 0)
 		{
-			max_length = qMax<tick_t>( max_length,
-				( *it )->pos() + 1 );
+			max_length = std::max<tick_t>(max_length, note->pos() + 1);
 		}
 	}
 
@@ -195,10 +194,10 @@ TimePos MidiClip::beatClipLength() const
 
 Note * MidiClip::addNote( const Note & _new_note, const bool _quant_pos )
 {
-	Note * new_note = new Note( _new_note );
-	if( _quant_pos && getGUI()->pianoRoll() )
+	auto new_note = new Note(_new_note);
+	if (_quant_pos && gui::getGUI()->pianoRoll())
 	{
-		new_note->quantizePos( getGUI()->pianoRoll()->quantization() );
+		new_note->quantizePos(gui::getGUI()->pianoRoll()->quantization());
 	}
 
 	instrumentTrack()->lock();
@@ -219,17 +218,14 @@ Note * MidiClip::addNote( const Note & _new_note, const bool _quant_pos )
 void MidiClip::removeNote( Note * _note_to_del )
 {
 	instrumentTrack()->lock();
-	NoteVector::Iterator it = m_notes.begin();
-	while( it != m_notes.end() )
+
+	m_notes.erase(std::remove_if(m_notes.begin(), m_notes.end(), [&](Note* note)
 	{
-		if( *it == _note_to_del )
-		{
-			delete *it;
-			m_notes.erase( it );
-			break;
-		}
-		++it;
-	}
+		auto shouldRemove = note == _note_to_del;
+		if (shouldRemove) { delete note; }
+		return shouldRemove;
+	}), m_notes.end());
+
 	instrumentTrack()->unlock();
 
 	checkType();
@@ -243,13 +239,11 @@ void MidiClip::removeNote( Note * _note_to_del )
 
 Note * MidiClip::noteAtStep( int _step )
 {
-	for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end();
-									++it )
+	for (const auto& note : m_notes)
 	{
-		if( ( *it )->pos() == TimePos::stepPosition( _step )
-						&& ( *it )->length() < 0 )
+		if (note->pos() == TimePos::stepPosition(_step) && note->length() < 0)
 		{
-			return *it;
+			return note;
 		}
 	}
 	return nullptr;
@@ -268,10 +262,9 @@ void MidiClip::rearrangeAllNotes()
 void MidiClip::clearNotes()
 {
 	instrumentTrack()->lock();
-	for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end();
-									++it )
+	for (const auto& note : m_notes)
 	{
-		delete *it;
+		delete note;
 	}
 	m_notes.clear();
 	instrumentTrack()->unlock();
@@ -318,10 +311,8 @@ void MidiClip::splitNotes(NoteVector notes, TimePos pos)
 
 	addJournalCheckPoint();
 
-	for (int i = 0; i < notes.size(); ++i)
+	for (const auto& note : notes)
 	{
-		Note* note = notes.at(i);
-
 		int leftLength = pos.getTicks() - note->pos();
 		int rightLength = note->length() - leftLength;
 
@@ -346,10 +337,10 @@ void MidiClip::splitNotes(NoteVector notes, TimePos pos)
 
 
 
-void MidiClip::setType( MidiClipTypes _new_clip_type )
+void MidiClip::setType( Type _new_clip_type )
 {
-	if( _new_clip_type == BeatClip ||
-				_new_clip_type == MelodyClip )
+	if( _new_clip_type == Type::BeatClip ||
+				_new_clip_type == Type::MelodyClip )
 	{
 		m_clipType = _new_clip_type;
 	}
@@ -360,17 +351,15 @@ void MidiClip::setType( MidiClipTypes _new_clip_type )
 
 void MidiClip::checkType()
 {
-	NoteVector::Iterator it = m_notes.begin();
-	while( it != m_notes.end() )
+	for (auto& note : m_notes)
 	{
-		if( ( *it )->length() > 0 )
+		if (note->length() > 0)
 		{
-			setType( MelodyClip );
+			setType(Type::MelodyClip);
 			return;
 		}
-		++it;
 	}
-	setType( BeatClip );
+	setType( Type::BeatClip );
 }
 
 
@@ -378,7 +367,7 @@ void MidiClip::checkType()
 
 void MidiClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	_this.setAttribute( "type", m_clipType );
+	_this.setAttribute( "type", static_cast<int>(m_clipType) );
 	_this.setAttribute( "name", name() );
 	
 	if( usesCustomClipColor() )
@@ -401,10 +390,9 @@ void MidiClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "steps", m_steps );
 
 	// now save settings of all notes
-	for( NoteVector::Iterator it = m_notes.begin();
-						it != m_notes.end(); ++it )
+	for (auto& note : m_notes)
 	{
-		( *it )->saveState( _doc, _this );
+		note->saveState(_doc, _this);
 	}
 }
 
@@ -413,7 +401,7 @@ void MidiClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void MidiClip::loadSettings( const QDomElement & _this )
 {
-	m_clipType = static_cast<MidiClipTypes>( _this.attribute( "type"
+	m_clipType = static_cast<Type>( _this.attribute( "type"
 								).toInt() );
 	setName( _this.attribute( "name" ) );
 	
@@ -431,7 +419,7 @@ void MidiClip::loadSettings( const QDomElement & _this )
 	{
 		movePosition( _this.attribute( "pos" ).toInt() );
 	}
-	if( _this.attribute( "muted" ).toInt() != isMuted() )
+	if (static_cast<bool>(_this.attribute("muted").toInt()) != isMuted())
 	{
 		toggleMute();
 	}
@@ -444,7 +432,7 @@ void MidiClip::loadSettings( const QDomElement & _this )
 		if( node.isElement() &&
 			!node.toElement().attribute( "metadata" ).toInt() )
 		{
-			Note * n = new Note;
+			auto n = new Note;
 			n->restoreState( node.toElement() );
 			m_notes.push_back( n );
 		}
@@ -484,9 +472,10 @@ MidiClip *  MidiClip::nextMidiClip() const
 
 MidiClip * MidiClip::adjacentMidiClipByOffset(int offset) const
 {
-	QVector<Clip *> clips = m_instrumentTrack->getClips();
+	std::vector<Clip *> clips = m_instrumentTrack->getClips();
 	int clipNum = m_instrumentTrack->getClipNum(this);
-	return dynamic_cast<MidiClip*>(clips.value(clipNum + offset, nullptr));
+	if (clipNum < 0 || clipNum > clips.size() - 1) { return nullptr; }
+	return dynamic_cast<MidiClip*>(clips[clipNum + offset]);
 }
 
 
@@ -550,26 +539,26 @@ void MidiClip::removeSteps()
 
 
 
-ClipView * MidiClip::createView( TrackView * _tv )
+gui::ClipView * MidiClip::createView( gui::TrackView * _tv )
 {
-	return new MidiClipView( this, _tv );
+	return new gui::MidiClipView( this, _tv );
 }
 
 
 
 
-void MidiClip::updateBBTrack()
+void MidiClip::updatePatternTrack()
 {
-	if( getTrack()->trackContainer() == Engine::getBBTrackContainer() )
+	if (getTrack()->trackContainer() == Engine::patternStore())
 	{
-		Engine::getBBTrackContainer()->updateBBTrack( this );
+		Engine::patternStore()->updatePatternTrack(this);
 	}
 
-	if( getGUI() != nullptr
-		&& getGUI()->pianoRoll()
-		&& getGUI()->pianoRoll()->currentMidiClip() == this )
+	if (gui::getGUI() != nullptr
+		&& gui::getGUI()->pianoRoll()
+		&& gui::getGUI()->pianoRoll()->currentMidiClip() == this)
 	{
-		getGUI()->pianoRoll()->update();
+		gui::getGUI()->pianoRoll()->update();
 	}
 }
 
@@ -578,10 +567,9 @@ void MidiClip::updateBBTrack()
 
 bool MidiClip::empty()
 {
-	for( NoteVector::ConstIterator it = m_notes.begin();
-						it != m_notes.end(); ++it )
+	for (const auto& note : m_notes)
 	{
-		if( ( *it )->length() != 0 )
+		if (note->length() != 0)
 		{
 			return false;
 		}
@@ -595,17 +583,18 @@ bool MidiClip::empty()
 void MidiClip::changeTimeSignature()
 {
 	TimePos last_pos = TimePos::ticksPerBar() - 1;
-	for( NoteVector::ConstIterator cit = m_notes.begin();
-						cit != m_notes.end(); ++cit )
+	for (const auto& note : m_notes)
 	{
-		if( ( *cit )->length() < 0 && ( *cit )->pos() > last_pos )
+		if (note->length() < 0 && note->pos() > last_pos)
 		{
-			last_pos = ( *cit )->pos()+TimePos::ticksPerBar() /
-						TimePos::stepsPerBar();
+			last_pos = note->pos() + TimePos::ticksPerBar() / TimePos::stepsPerBar();
 		}
 	}
 	last_pos = last_pos.nextFullBar() * TimePos::ticksPerBar();
-	m_steps = qMax<tick_t>( TimePos::stepsPerBar(),
-				last_pos.getBar() * TimePos::stepsPerBar() );
+	m_steps = std::max<tick_t>(TimePos::stepsPerBar(),
+				last_pos.getBar() * TimePos::stepsPerBar());
 	updateLength();
 }
+
+
+} // namespace lmms

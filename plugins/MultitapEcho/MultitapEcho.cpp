@@ -27,17 +27,21 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT multitapecho_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Multitap Echo",
 	QT_TRANSLATE_NOOP( "PluginBrowser", "A multitap echo delay plugin" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
@@ -170,3 +174,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 }
 
 }
+
+
+} // namespace lmms

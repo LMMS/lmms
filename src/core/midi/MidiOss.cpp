@@ -28,8 +28,10 @@
 #ifdef LMMS_HAVE_OSS
 
 #include "ConfigManager.h"
-#include "gui_templates.h"
 
+
+namespace lmms
+{
 
 
 MidiOss::MidiOss() :
@@ -107,6 +109,6 @@ void MidiOss::run()
 }
 
 
-#endif
+} // namespace lmms
 
-
+#endif // LMMS_HAVE_OSS

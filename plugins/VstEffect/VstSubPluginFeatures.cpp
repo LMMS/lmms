@@ -30,9 +30,11 @@
 #include "VstSubPluginFeatures.h"
 #include "ConfigManager.h"
 
+namespace lmms
+{
 
 
-VstSubPluginFeatures::VstSubPluginFeatures( Plugin::PluginTypes _type ) :
+VstSubPluginFeatures::VstSubPluginFeatures( Plugin::Type _type ) :
 	SubPluginFeatures( _type )
 {
 }
@@ -53,7 +55,7 @@ void VstSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 void VstSubPluginFeatures::listSubPluginKeys( const Plugin::Descriptor * _desc,
 														KeyList & _kl ) const
 {
-	QStringList *dlls = new QStringList();
+	auto dlls = new QStringList();
 	const QString path = QString("");
 	addPluginsFromDir(dlls, path );
 	// TODO: eval m_type
@@ -90,3 +92,5 @@ void VstSubPluginFeatures::addPluginsFromDir( QStringList* filenames, QString pa
 	}
 }
 
+
+} // namespace lmms

@@ -22,15 +22,17 @@
  *
  */
 
-#ifndef KEYMAP_H
-#define KEYMAP_H
+#ifndef LMMS_KEYMAP_H
+#define LMMS_KEYMAP_H
 
 #include <vector>
 #include <QObject>
 #include <QString>
 
-#include "Note.h"
 #include "SerializingObject.h"
+
+namespace lmms
+{
 
 class Keymap : public QObject, public SerializingObject
 {
@@ -76,4 +78,6 @@ private:
 	float m_baseFreq;               //!< frequency of the base note (usually A4 @440 Hz)
 };
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_KEYMAP_H

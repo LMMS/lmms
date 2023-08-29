@@ -35,18 +35,19 @@
 #include "gui_templates.h"
 #include "ConfigManager.h"
 #include "LcdSpinBox.h"
-#include "AudioPort.h"
 #include "MainWindow.h"
 #include "AudioEngine.h"
 #include "MidiJack.h"
 
 
+namespace lmms
+{
 
 AudioJack::AudioJack( bool & _success_ful, AudioEngine*  _audioEngine ) :
-	AudioDevice( qBound<int>(
+	AudioDevice(std::clamp<int>(
+		ConfigManager::inst()->value("audiojack", "channels").toInt(),
 		DEFAULT_CHANNELS,
-		ConfigManager::inst()->value( "audiojack", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _audioEngine ),
+		SURROUND_CHANNELS), _audioEngine),
 	m_client( nullptr ),
 	m_active( false ),
 	m_midiClient( nullptr ),
@@ -60,8 +61,8 @@ AudioJack::AudioJack( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	_success_ful = initJackClient();
 	if( _success_ful )
 	{
-		connect( this, SIGNAL( zombified() ),
-				this, SLOT( restartAfterZombified() ),
+		connect( this, SIGNAL(zombified()),
+				this, SLOT(restartAfterZombified()),
 				Qt::QueuedConnection );
 	}
 
@@ -103,7 +104,7 @@ void AudioJack::restartAfterZombified()
 	{
 		m_active = false;
 		startProcessing();
-		QMessageBox::information( getGUI()->mainWindow(),
+		QMessageBox::information(gui::getGUI()->mainWindow(),
 			tr( "JACK client restarted" ),
 			tr( "LMMS was kicked by JACK for some reason. "
 				"Therefore the JACK backend of LMMS has been "
@@ -112,7 +113,7 @@ void AudioJack::restartAfterZombified()
 	}
 	else
 	{
-		QMessageBox::information( getGUI()->mainWindow(),
+		QMessageBox::information(gui::getGUI()->mainWindow(),
 			tr( "JACK server down" ),
 			tr( "The JACK server seems to have been shutdown "
 				"and starting a new instance failed. "
@@ -338,7 +339,7 @@ void AudioJack::renamePort( AudioPort * _port )
 #endif
 		}
 	}
-#endif
+#endif // AUDIO_PORT_SUPPORT
 }
 
 
@@ -363,7 +364,7 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 	}
 
 #ifdef AUDIO_PORT_SUPPORT
-	const int frames = qMin<int>( _nframes, audioEngine()->framesPerPeriod() );
+	const int frames = std::min<int>(_nframes, audioEngine()->framesPerPeriod());
 	for( JackPortMap::iterator it = m_portMap.begin();
 						it != m_portMap.end(); ++it )
 	{
@@ -388,10 +389,10 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 	jack_nframes_t done = 0;
 	while( done < _nframes && m_stopped == false )
 	{
-		jack_nframes_t todo = qMin<jack_nframes_t>(
+		jack_nframes_t todo = std::min<jack_nframes_t>(
 						_nframes,
 						m_framesToDoInCurBuf -
-							m_framesDoneInCurBuf );
+							m_framesDoneInCurBuf);
 		const float gain = audioEngine()->masterGain();
 		for( int c = 0; c < channels(); ++c )
 		{
@@ -441,7 +442,7 @@ int AudioJack::staticProcessCallback( jack_nframes_t _nframes, void * _udata )
 
 void AudioJack::shutdownCallback( void * _udata )
 {
-	AudioJack * _this = static_cast<AudioJack *>( _udata );
+	auto _this = static_cast<AudioJack*>(_udata);
 	_this->m_client = nullptr;
 	_this->zombified();
 }
@@ -461,17 +462,17 @@ AudioJack::setupWidget::setupWidget( QWidget * _parent ) :
 	m_clientName = new QLineEdit( cn, this );
 	m_clientName->setGeometry( 10, 20, 160, 20 );
 
-	QLabel * cn_lbl = new QLabel( tr( "Client name" ), this );
+	auto cn_lbl = new QLabel(tr("Client name"), this);
 	cn_lbl->setFont( pointSize<7>( cn_lbl->font() ) );
 	cn_lbl->setGeometry( 10, 40, 160, 10 );
 
-	LcdSpinBoxModel * m = new LcdSpinBoxModel( /* this */ );
+	auto m = new gui::LcdSpinBoxModel(/* this */);
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
 	m->setStep( 2 );
 	m->setValue( ConfigManager::inst()->value( "audiojack",
 							"channels" ).toInt() );
 
-	m_channels = new LcdSpinBox( 1, this );
+	m_channels = new gui::LcdSpinBox( 1, this );
 	m_channels->setModel( m );
 	m_channels->setLabel( tr( "Channels" ) );
 	m_channels->move( 180, 20 );
@@ -499,6 +500,6 @@ void AudioJack::setupWidget::saveSettings()
 
 
 
+} // namespace lmms
 
-
-#endif
+#endif // LMMS_HAVE_JACK

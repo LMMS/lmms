@@ -23,12 +23,19 @@
  *
  */
 
-#ifndef PANNING_CONSTANTS_H
-#define PANNING_CONSTANTS_H
+#ifndef LMMS_PANNING_CONSTANTS_H
+#define LMMS_PANNING_CONSTANTS_H
+
+namespace lmms
+{
+
 
 constexpr panning_t PanningRight = ( 0 + 100 );
 constexpr panning_t PanningLeft = - PanningRight;
 constexpr panning_t PanningCenter = 0;
 constexpr panning_t DefaultPanning = PanningCenter;
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_PANNING_CONSTANTS_H

@@ -22,22 +22,25 @@
  *
  */
 
-
-#ifndef CONFIG_MGR_H
-#define CONFIG_MGR_H
+#ifndef LMMS_CONFIG_MANAGER_H
+#define LMMS_CONFIG_MANAGER_H
 
 #include "lmmsconfig.h"
 
-#include <QtCore/QMap>
-#include <QtCore/QPair>
-#include <QtCore/QStringList>
-#include <QtCore/QVector>
-#include <QtCore/QObject>
+#include <QMap>
+#include <QPair>
+#include <QStringList>
+#include <QObject>
 
+#include <vector>
 #include "lmms_export.h"
 
 
-class LmmsCore;
+namespace lmms
+{
+
+
+class Engine;
 
 const QString PROJECTS_PATH = "projects/";
 const QString TEMPLATE_PATH = "templates/";
@@ -236,11 +239,8 @@ public:
 
 	void addRecentlyOpenedProject(const QString & _file);
 
-	const QString & value(const QString & cls,
-					const QString & attribute) const;
-	const QString & value(const QString & cls,
-					const QString & attribute,
-					const QString & defaultVal) const;
+	QString value(const QString& cls, const QString& attribute, const QString& defaultVal = "") const;
+
 	void setValue(const QString & cls, const QString & attribute,
 						const QString & value);
 	void deleteValue(const QString & cls, const QString & attribute);
@@ -270,7 +270,7 @@ private:
 
 	ConfigManager();
 	ConfigManager(const ConfigManager & _c);
-	~ConfigManager();
+	~ConfigManager() override;
 
 	void upgrade_1_1_90();
 	void upgrade_1_1_91();
@@ -299,11 +299,15 @@ private:
 	unsigned int m_configVersion;
 	QStringList m_recentlyOpenedProjects;
 
-	typedef QVector<QPair<QString, QString> > stringPairVector;
-	typedef QMap<QString, stringPairVector> settingsMap;
+	using stringPairVector = std::vector<QPair<QString, QString>>;
+	using settingsMap = QMap<QString, stringPairVector>;
 	settingsMap m_settings;
 
 
-	friend class LmmsCore;
+	friend class Engine;
 };
-#endif
+
+
+} // namespace lmms
+
+#endif // LMMS_CONFIG_MANAGER_H

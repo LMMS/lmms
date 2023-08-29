@@ -35,6 +35,9 @@
 #include "embed.h"
 #include "gui_templates.h"
 
+namespace lmms::gui
+{
+
 TabWidget::TabWidget(const QString & caption, QWidget * parent, bool usePixmap,
 					 bool resizable) :
 	QWidget( parent ),
@@ -57,9 +60,9 @@ TabWidget::TabWidget(const QString & caption, QWidget * parent, bool usePixmap,
 	setFont( pointSize<8>( font() ) );
 
 	setAutoFillBackground( true );
-	QColor bg_color = QApplication::palette().color( QPalette::Active, QPalette::Background ). darker( 132 );
+	QColor bg_color = QApplication::palette().color( QPalette::Active, QPalette::Window ). darker( 132 );
 	QPalette pal = palette();
-	pal.setColor( QPalette::Background, bg_color );
+	pal.setColor( QPalette::Window, bg_color );
 	setPalette( pal );
 
 }
@@ -149,7 +152,7 @@ bool TabWidget::event(QEvent *event)
 
 	if ( event->type() == QEvent::ToolTip )
 	{
-		QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
+		auto helpEvent = static_cast<QHelpEvent*>(event);
 
 		int idx = findTabAtPos( & helpEvent->pos() );
 
@@ -197,10 +200,9 @@ void TabWidget::resizeEvent( QResizeEvent * )
 {
 	if (!m_resizable)
 	{
-		for ( widgetStack::iterator it = m_widgets.begin();
-							it != m_widgets.end(); ++it )
+		for (const auto& widget : m_widgets)
 		{
-			( *it ).w->setFixedSize( width() - 4, height() - m_tabbarHeight );
+			widget.w->setFixedSize(width() - 4, height() - m_tabbarHeight);
 		}
 	}
 }
@@ -317,11 +319,10 @@ QSize TabWidget::minimumSizeHint() const
 	if (m_resizable)
 	{
 		int maxWidth = 0, maxHeight = 0;
-		for ( widgetStack::const_iterator it = m_widgets.begin();
-							it != m_widgets.end(); ++it )
+		for (const auto& widget : m_widgets)
 		{
-			maxWidth = std::max(maxWidth, it->w->minimumSizeHint().width());
-			maxHeight = std::max(maxHeight, it->w->minimumSizeHint().height());
+			maxWidth = std::max(maxWidth, widget.w->minimumSizeHint().width());
+			maxHeight = std::max(maxHeight, widget.w->minimumSizeHint().height());
 		}
 		// "-1" :
 		// in "addTab", under "Position tab's window", the widget is
@@ -339,11 +340,10 @@ QSize TabWidget::sizeHint() const
 	if (m_resizable)
 	{
 		int maxWidth = 0, maxHeight = 0;
-		for ( widgetStack::const_iterator it = m_widgets.begin();
-							it != m_widgets.end(); ++it )
+		for (const auto& widget : m_widgets)
 		{
-			maxWidth = std::max(maxWidth, it->w->sizeHint().width());
-			maxHeight = std::max(maxHeight, it->w->sizeHint().height());
+			maxWidth = std::max(maxWidth, widget.w->sizeHint().width());
+			maxHeight = std::max(maxHeight, widget.w->sizeHint().height());
 		}
 		// "-1" :
 		// in "addTab", under "Position tab's window", the widget is
@@ -415,3 +415,6 @@ void TabWidget::setTabBorder( const QColor & c )
 {
 	m_tabBorder = c;
 }
+
+
+} // namespace lmms::gui

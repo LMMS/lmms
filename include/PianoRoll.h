@@ -24,12 +24,12 @@
  *
  */
 
-#ifndef PIANO_ROLL_H
-#define PIANO_ROLL_H
+#ifndef LMMS_GUI_PIANO_ROLL_H
+#define LMMS_GUI_PIANO_ROLL_H
 
-#include <QVector>
 #include <QWidget>
-#include <QInputDialog>
+
+#include <vector>
 
 #include "Editor.h"
 #include "ComboBoxModel.h"
@@ -37,22 +37,33 @@
 #include "Note.h"
 #include "lmms_basics.h"
 #include "Song.h"
-#include "ToolTip.h"
 #include "StepRecorder.h"
 #include "StepRecorderWidget.h"
-#include "PositionLine.h"
 
 class QPainter;
 class QPixmap;
+class QPushButton;
 class QScrollBar;
 class QString;
 class QMenu;
 class QToolButton;
 
-class ComboBox;
+namespace lmms
+{
+
+
 class NotePlayHandle;
 class MidiClip;
+
+
+namespace gui
+{
+
+class ComboBox;
+class PositionLine;
+class SimpleTextFloat;
 class TimeLineWidget;
+
 
 class PianoRoll : public QWidget
 {
@@ -93,13 +104,13 @@ class PianoRoll : public QWidget
 	Q_PROPERTY(QBrush blackKeyActiveBackground MEMBER m_blackKeyActiveBackground)
 	Q_PROPERTY(QBrush blackKeyDisabledBackground MEMBER m_blackKeyDisabledBackground)
 public:
-	enum EditModes
+	enum class EditMode
 	{
-		ModeDraw,
-		ModeErase,
-		ModeSelect,
-		ModeEditDetuning,
-		ModeEditKnife
+		Draw,
+		Erase,
+		Select,
+		Detuning,
+		Knife
 	};
 
 	/*! \brief Resets settings to default when e.g. creating a new project */
@@ -139,17 +150,29 @@ public:
 	{
 		return m_midiClip != nullptr;
 	}
+	
+	int trackOctaveSize() const;
 
-	Song::PlayModes desiredPlayModeForAccompany() const;
+	Song::PlayMode desiredPlayModeForAccompany() const;
 
 	int quantization() const;
 
 protected:
-	enum QuantizeActions
+	enum class QuantizeAction
 	{
-		QuantizeBoth,
-		QuantizePos,
-		QuantizeLength
+		Both,
+		Pos,
+		Length
+	};
+
+	enum class SemiToneMarkerAction
+	{
+		UnmarkAll,
+		MarkCurrentSemiTone,
+		MarkAllOctaveSemiTones,
+		MarkCurrentScale,
+		MarkCurrentChord,
+		CopyAllNotesOnKey
 	};
 
 	void keyPressEvent( QKeyEvent * ke ) override;
@@ -186,8 +209,8 @@ protected slots:
 	bool toggleStepRecording();
 	void stop();
 
-	void startRecordNote( const Note & n );
-	void finishRecordNote( const Note & n );
+	void startRecordNote( const lmms::Note & n );
+	void finishRecordNote( const lmms::Note & n );
 
 	void horScrolled( int new_pos );
 	void verScrolled( int new_pos );
@@ -199,23 +222,23 @@ protected slots:
 	void pasteNotes();
 	bool deleteSelectedNotes();
 
-	void updatePosition(const TimePos & t );
-	void updatePositionAccompany(const TimePos & t );
-	void updatePositionStepRecording(const TimePos & t );
+	void updatePosition(const lmms::TimePos & t );
+	void updatePositionAccompany(const lmms::TimePos & t );
+	void updatePositionStepRecording(const lmms::TimePos & t );
 
 	void zoomingChanged();
 	void zoomingYChanged();
 	void quantizeChanged();
 	void noteLengthChanged();
 	void keyChanged();
-	void quantizeNotes(QuantizeActions mode = QuantizeBoth);
+	void quantizeNotes(QuantizeAction mode = QuantizeAction::Both);
 
 	void updateSemiToneMarkerMenu();
 
 	void changeNoteEditMode( int i );
-	void markSemiTone(int i, bool fromMenu = true);
+	void markSemiTone(SemiToneMarkerAction i, bool fromMenu = true);
 
-	void hideMidiClip( MidiClip* clip );
+	void hideMidiClip( lmms::MidiClip* clip );
 
 	void selectRegionFromPixels( int xStart, int xEnd );
 
@@ -235,51 +258,41 @@ signals:
 
 
 private:
-	enum Actions
+	enum class Action
 	{
-		ActionNone,
-		ActionMoveNote,
-		ActionResizeNote,
-		ActionSelectNotes,
-		ActionChangeNoteProperty,
-		ActionResizeNoteEditArea,
-		ActionKnife
+		None,
+		MoveNote,
+		ResizeNote,
+		SelectNotes,
+		ChangeNoteProperty,
+		ResizeNoteEditArea,
+		Knife
 	};
 
-	enum NoteEditMode
+	enum class NoteEditMode
 	{
-		NoteEditVolume,
-		NoteEditPanning,
-		NoteEditCount // make sure this one is always last
+		Volume,
+		Panning,
+		Count // make sure this one is always last
 	};
 
-	enum SemiToneMarkerAction
+	enum class KeyType
 	{
-		stmaUnmarkAll,
-		stmaMarkCurrentSemiTone,
-		stmaMarkAllOctaveSemiTones,
-		stmaMarkCurrentScale,
-		stmaMarkCurrentChord,
-		stmaCopyAllNotesOnKey
+		WhiteSmall,
+		WhiteBig,
+		Black
 	};
 
-	enum PianoRollKeyTypes
+	enum class GridMode
 	{
-		PR_WHITE_KEY_SMALL,
-		PR_WHITE_KEY_BIG,
-		PR_BLACK_KEY
-	};
-
-	enum GridMode
-	{
-		gridNudge,
-		gridSnap
-	//	gridFree
+		Nudge,
+		Snap
+	//	Free
 	};
 
 	PositionLine * m_positionLine;
 
-	QVector<QString> m_nemStr; // gui names of each edit mode
+	std::vector<QString> m_nemStr; // gui names of each edit mode
 	QMenu * m_noteEditMenu; // when you right click below the key area
 
 	QList<int> m_markedSemiTones;
@@ -288,7 +301,7 @@ private:
 
 	PianoRoll();
 	PianoRoll( const PianoRoll & );
-	virtual ~PianoRoll();
+	~PianoRoll() override = default;
 
 	void autoScroll(const TimePos & t );
 
@@ -333,9 +346,9 @@ private:
 	static QPixmap * s_toolOpen;
 	static QPixmap* s_toolKnife;
 
-	static PianoRollKeyTypes prKeyOrder[];
+	static std::array<KeyType, 12> prKeyOrder;
 
-	static TextFloat * s_textFloat;
+	static SimpleTextFloat * s_textFloat;
 
 	ComboBoxModel m_zoomingModel;
 	ComboBoxModel m_zoomingYModel;
@@ -346,8 +359,8 @@ private:
 	ComboBoxModel m_chordModel;
 	ComboBoxModel m_snapModel;
 
-	static const QVector<float> m_zoomLevels;
-	static const QVector<float> m_zoomYLevels;
+	static const std::vector<float> m_zoomLevels;
+	static const std::vector<float> m_zoomYLevels;
 
 	MidiClip* m_midiClip;
 	NoteVector m_ghostNotes;
@@ -365,7 +378,7 @@ private:
 	QList<Note> m_recordingNotes;
 
 	Note * m_currentNote;
-	Actions m_action;
+	Action m_action;
 	NoteEditMode m_noteEditMode;
 	GridMode m_gridMode;
 
@@ -416,9 +429,9 @@ private:
 	int m_startKey; // first key when drawing
 	int m_lastKey;
 
-	EditModes m_editMode;
-	EditModes m_ctrlMode; // mode they were in before they hit ctrl
-	EditModes m_knifeMode; // mode they where in before entering knife mode
+	EditMode m_editMode;
+	EditMode m_ctrlMode; // mode they were in before they hit ctrl
+	EditMode m_knifeMode; // mode they where in before entering knife mode
 
 	bool m_mouseDownRight; //true if right click is being held down
 
@@ -484,7 +497,7 @@ private:
 	QBrush m_blackKeyDisabledBackground;
 
 signals:
-	void positionChanged( const TimePos & );
+	void positionChanged( const lmms::TimePos & );
 } ;
 
 
@@ -559,4 +572,8 @@ private:
 };
 
 
-#endif
+} // namespace gui
+
+} // namespace lmms
+
+#endif // LMMS_GUI_PIANO_ROLL_H

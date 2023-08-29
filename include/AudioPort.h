@@ -22,16 +22,18 @@
  *
  */
 
-#ifndef AUDIO_PORT_H
-#define AUDIO_PORT_H
+#ifndef LMMS_AUDIO_PORT_H
+#define LMMS_AUDIO_PORT_H
 
 #include <memory>
-#include <QtCore/QString>
-#include <QtCore/QMutex>
-#include <QtCore/QMutexLocker>
+#include <QString>
+#include <QMutex>
 
 #include "MemoryManager.h"
 #include "PlayHandle.h"
+
+namespace lmms
+{
 
 class EffectChain;
 class FloatModel;
@@ -134,5 +136,6 @@ private:
 
 } ;
 
+} // namespace lmms
 
-#endif
+#endif // LMMS_AUDIO_PORT_H

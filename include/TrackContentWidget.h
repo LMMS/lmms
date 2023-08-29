@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef TRACK_CONTENT_WIDGET_H
-#define TRACK_CONTENT_WIDGET_H
+#ifndef LMMS_GUI_TRACK_CONTENT_WIDGET_H
+#define LMMS_GUI_TRACK_CONTENT_WIDGET_H
 
 #include <QWidget>
 
@@ -33,10 +33,16 @@
 
 class QMimeData;
 
-class Track;
-class ClipView;
-class TrackView;
+namespace lmms
+{
 
+class Track;
+
+namespace gui
+{
+
+class TrackView;
+class ClipView;
 
 class TrackContentWidget : public QWidget, public JournallingObject
 {
@@ -50,7 +56,7 @@ class TrackContentWidget : public QWidget, public JournallingObject
 
 public:
 	TrackContentWidget( TrackView * parent );
-	virtual ~TrackContentWidget();
+	~TrackContentWidget() override = default;
 
 	/*! \brief Updates the background tile pixmap. */
 	void updateBackground();
@@ -86,10 +92,10 @@ public:
 
 public slots:
 	void update();
-	void changePosition( const TimePos & newPos = TimePos( -1 ) );
+	void changePosition( const lmms::TimePos & newPos = TimePos( -1 ) );
 
 protected:
-	enum ContextMenuAction
+	enum class ContextMenuAction
 	{
 		Paste
 	};
@@ -126,7 +132,7 @@ private:
 
 	TrackView * m_trackView;
 
-	typedef QVector<ClipView *> clipViewVector;
+	using clipViewVector = QVector<ClipView*>;
 	clipViewVector m_clipViews;
 
 	QPixmap m_background;
@@ -139,5 +145,8 @@ private:
 } ;
 
 
+} // namespace gui
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_GUI_TRACK_CONTENT_WIDGET_H

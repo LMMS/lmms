@@ -23,11 +23,11 @@
  *
  */
 
-#ifndef AUTOMATION_EDITOR_H
-#define AUTOMATION_EDITOR_H
+#ifndef LMMS_GUI_AUTOMATION_EDITOR_H
+#define LMMS_GUI_AUTOMATION_EDITOR_H
 
-#include <QVector>
 #include <QWidget>
+#include <array>
 
 #include "Editor.h"
 
@@ -36,14 +36,21 @@
 #include "TimePos.h"
 #include "AutomationClip.h"
 #include "ComboBoxModel.h"
-#include "Knob.h"
 
 class QPainter;
 class QPixmap;
 class QScrollBar;
 
-class ComboBox;
+namespace lmms
+{
+
 class NotePlayHandle;
+
+namespace gui
+{
+
+class Knob;
+class ComboBox;
 class TimeLineWidget;
 
 
@@ -80,11 +87,11 @@ public:
 		return "automationeditor";
 	}
 
-	enum EditModes
+	enum class EditMode
 	{
-		DRAW,
-		ERASE,
-		DRAW_OUTVALUES
+		Draw,
+		Erase,
+		DrawOutValues
 	};
 
 public slots:
@@ -93,7 +100,7 @@ public slots:
 
 
 protected:
-	typedef AutomationClip::timeMap timeMap;
+	using timeMap = AutomationClip::timeMap;
 
 	void keyPressEvent(QKeyEvent * ke) override;
 	void leaveEvent(QEvent * e) override;
@@ -122,14 +129,14 @@ protected slots:
 	void horScrolled( int new_pos );
 	void verScrolled( int new_pos );
 
-	void setEditMode(AutomationEditor::EditModes mode);
+	void setEditMode(AutomationEditor::EditMode mode);
 	void setEditMode(int mode);
 
-	void setProgressionType(AutomationClip::ProgressionTypes type);
+	void setProgressionType(AutomationClip::ProgressionType type);
 	void setProgressionType(int type);
 	void setTension();
 
-	void updatePosition( const TimePos & t );
+	void updatePosition( const lmms::TimePos & t );
 
 	void zoomingXChanged();
 	void zoomingYChanged();
@@ -139,14 +146,14 @@ protected slots:
 
 private:
 
-	enum Actions
+	enum class Action
 	{
-		NONE,
-		MOVE_VALUE,
-		ERASE_VALUES,
-		MOVE_OUTVALUE,
-		RESET_OUTVALUES,
-		DRAW_LINE
+		None,
+		MoveValue,
+		EraseValues,
+		MoveOutValue,
+		ResetOutValues,
+		DrawLine
 	} ;
 
 	// some constants...
@@ -161,7 +168,7 @@ private:
 
 	AutomationEditor();
 	AutomationEditor( const AutomationEditor & );
-	virtual ~AutomationEditor();
+	~AutomationEditor() override;
 
 	static QPixmap * s_toolDraw;
 	static QPixmap * s_toolErase;
@@ -174,7 +181,7 @@ private:
 	ComboBoxModel m_zoomingYModel;
 	ComboBoxModel m_quantizeModel;
 
-	static const QVector<float> m_zoomXLevels;
+	static const std::array<float, 7> m_zoomXLevels;
 
 	FloatModel * m_tensionModel;
 
@@ -194,7 +201,7 @@ private:
 
 	TimePos m_currentPosition;
 
-	Actions m_action;
+	Action m_action;
 
 	int m_moveXOffset;
 
@@ -208,7 +215,7 @@ private:
 	// Time position (key) of automation node whose outValue is being dragged
 	int m_draggedOutValueKey;
 
-	EditModes m_editMode;
+	EditMode m_editMode;
 
 	bool m_mouseDownLeft;
 	bool m_mouseDownRight; //true if right click is being held down
@@ -218,7 +225,7 @@ private:
 
 	void drawCross(QPainter & p );
 	void drawAutomationPoint( QPainter & p, timeMap::iterator it );
-	bool inBBEditor();
+	bool inPatternEditor();
 
 	QColor m_barLineColor;
 	QColor m_beatLineColor;
@@ -235,7 +242,7 @@ private:
 
 signals:
 	void currentClipChanged();
-	void positionChanged( const TimePos & );
+	void positionChanged( const lmms::TimePos & );
 } ;
 
 
@@ -249,7 +256,7 @@ class AutomationEditorWindow : public Editor
 	static const int INITIAL_HEIGHT = 480;
 public:
 	AutomationEditorWindow();
-	~AutomationEditorWindow();
+	~AutomationEditorWindow() override = default;
 
 	void setCurrentClip(AutomationClip* clip);
 	const AutomationClip* currentClip();
@@ -294,5 +301,8 @@ private:
 	ComboBox * m_quantizeComboBox;
 };
 
+} // namespace gui
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_GUI_AUTOMATION_EDITOR_H

@@ -54,11 +54,13 @@
 #include "embed.h"
 #include "CaptionMenu.h"
 #include "ConfigManager.h"
-#include "TextFloat.h"
-#include "MainWindow.h"
+#include "SimpleTextFloat.h"
+
+namespace lmms::gui
+{
 
 
-TextFloat * Fader::s_textFloat = nullptr;
+SimpleTextFloat * Fader::s_textFloat = nullptr;
 QPixmap * Fader::s_back = nullptr;
 QPixmap * Fader::s_leds = nullptr;
 QPixmap * Fader::s_knob = nullptr;
@@ -81,7 +83,7 @@ Fader::Fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 {
 	if( s_textFloat == nullptr )
 	{
-		s_textFloat = new TextFloat;
+		s_textFloat = new SimpleTextFloat;
 	}
 	if( ! s_back )
 	{
@@ -123,7 +125,7 @@ Fader::Fader( FloatModel * model, const QString & name, QWidget * parent, QPixma
 {
 	if( s_textFloat == nullptr )
 	{
-		s_textFloat = new TextFloat;
+		s_textFloat = new SimpleTextFloat;
 	}
 
 	m_back = back;
@@ -166,7 +168,7 @@ void Fader::mouseMoveEvent( QMouseEvent *mouseEvent )
 
 		float delta = dy * ( model()->maxValue() - model()->minValue() ) / (float) ( height() - ( *m_knob ).height() );
 
-		const float step = model()->step<float>();
+		const auto step = model()->step<float>();
 		float newValue = static_cast<float>( static_cast<int>( ( m_startValue + delta ) / step + 0.5 ) ) * step;
 		model()->setValue( newValue );
 
@@ -326,7 +328,8 @@ void Fader::updateTextFloat()
 	{
 		s_textFloat->setText( m_description + " " + QString("%1 ").arg( model()->value() * m_conversionFactor ) + " " + m_unit );
 	}
-	s_textFloat->moveGlobal( this, QPoint( width() - ( *m_knob ).width() - 5, knobPosY() - 46 ) );
+
+	s_textFloat->moveGlobal(this, QPoint(width() + 2, knobPosY() - s_textFloat->height() / 2));
 }
 
 
@@ -479,3 +482,6 @@ void Fader::setPeakYellow( const QColor & c )
 {
 	m_peakYellow = c;
 }
+
+
+} // namespace lmms::gui

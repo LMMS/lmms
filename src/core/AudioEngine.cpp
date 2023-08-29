@@ -61,8 +61,10 @@
 
 #include "BufferManager.h"
 
-typedef LocklessList<PlayHandle *>::Element LocklessListElement;
+namespace lmms
+{
 
+using LocklessListElement = LocklessList<PlayHandle*>::Element;
 
 static thread_local bool s_renderingThread;
 
@@ -79,7 +81,7 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	m_workers(),
 	m_numWorkers( QThread::idealThreadCount()-1 ),
 	m_newPlayHandles( PlayHandle::MaxNumber ),
-	m_qualitySettings( qualitySettings::Mode_Draft ),
+	m_qualitySettings( qualitySettings::Mode::Draft ),
 	m_masterGain( 1.0f ),
 	m_isProcessing( false ),
 	m_audioDev( nullptr ),
@@ -90,7 +92,9 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	m_clearSignal( false ),
 	m_changesSignal( false ),
 	m_changes( 0 ),
+#if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
 	m_doChangesMutex( QMutex::Recursive ),
+#endif
 	m_waitingForWrite( false )
 {
 	for( int i = 0; i < 2; ++i )
@@ -144,7 +148,7 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 
 	for( int i = 0; i < m_numWorkers+1; ++i )
 	{
-		AudioEngineWorkerThread * wt = new AudioEngineWorkerThread( this );
+		auto wt = new AudioEngineWorkerThread(this);
 		if( i < m_numWorkers )
 		{
 			wt->start( QThread::TimeCriticalPriority );
@@ -184,9 +188,9 @@ AudioEngine::~AudioEngine()
 	MemoryHelper::alignedFree(m_outputBufferRead);
 	MemoryHelper::alignedFree(m_outputBufferWrite);
 
-	for( int i = 0; i < 2; ++i )
+	for (const auto& input : m_inputBuffer)
 	{
-		delete[] m_inputBuffer[i];
+		delete[] input;
 	}
 }
 
@@ -310,8 +314,8 @@ void AudioEngine::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
 
 	if( frames + _frames > size )
 	{
-		size = qMax( size * 2, frames + _frames );
-		sampleFrame * ab = new sampleFrame[ size ];
+		size = std::max(size * 2, frames + _frames);
+		auto ab = new sampleFrame[size];
 		memcpy( ab, buf, frames * sizeof( sampleFrame ) );
 		delete [] buf;
 
@@ -353,7 +357,7 @@ const surroundSampleFrame * AudioEngine::renderNextBuffer()
 		if( it != m_playHandles.end() )
 		{
 			( *it )->audioPort()->removePlayHandle( ( *it ) );
-			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
+			if( ( *it )->type() == PlayHandle::Type::NotePlayHandle )
 			{
 				NotePlayHandleManager::release( (NotePlayHandle*) *it );
 			}
@@ -401,7 +405,7 @@ const surroundSampleFrame * AudioEngine::renderNextBuffer()
 		if( ( *it )->isFinished() )
 		{
 			( *it )->audioPort()->removePlayHandle( ( *it ) );
-			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
+			if( ( *it )->type() == PlayHandle::Type::NotePlayHandle )
 			{
 				NotePlayHandleManager::release( (NotePlayHandle*) *it );
 			}
@@ -415,7 +419,7 @@ const surroundSampleFrame * AudioEngine::renderNextBuffer()
 	}
 
 	// STAGE 2: process effects of all instrument- and sampletracks
-	AudioEngineWorkerThread::fillJobQueue<QVector<AudioPort *> >( m_audioPorts );
+	AudioEngineWorkerThread::fillJobQueue(m_audioPorts);
 	AudioEngineWorkerThread::startAndWaitForJobs();
 
 
@@ -460,12 +464,12 @@ void AudioEngine::handleMetronome()
 	static tick_t lastMetroTicks = -1;
 
 	Song * song = Engine::getSong();
-	Song::PlayModes currentPlayMode = song->playMode();
+	Song::PlayMode currentPlayMode = song->playMode();
 
 	bool metronomeSupported =
-		currentPlayMode == Song::Mode_PlayMidiClip
-		|| currentPlayMode == Song::Mode_PlaySong
-		|| currentPlayMode == Song::Mode_PlayBB;
+		currentPlayMode == Song::PlayMode::MidiClip
+		|| currentPlayMode == Song::PlayMode::Song
+		|| currentPlayMode == Song::PlayMode::Pattern;
 
 	if (!metronomeSupported || !m_metronomeActive || song->isExporting())
 	{
@@ -530,7 +534,7 @@ void AudioEngine::clearInternal()
 	// TODO: m_midiClient->noteOffAll();
 	for (auto ph : m_playHandles)
 	{
-		if (ph->type() != PlayHandle::TypeInstrumentPlayHandle)
+		if (ph->type() != PlayHandle::Type::InstrumentPlayHandle)
 		{
 			m_playHandlesToRemove.push_back(ph);
 		}
@@ -547,8 +551,8 @@ AudioEngine::StereoSample AudioEngine::getPeakValues(sampleFrame * ab, const f_c
 
 	for (f_cnt_t f = 0; f < frames; ++f)
 	{
-		float const absLeft = qAbs(ab[f][0]);
-		float const absRight = qAbs(ab[f][1]);
+		float const absLeft = std::abs(ab[f][0]);
+		float const absRight = std::abs(ab[f][1]);
 		if (absLeft > peakLeft)
 		{
 			peakLeft = absLeft;
@@ -659,7 +663,7 @@ void AudioEngine::removeAudioPort(AudioPort * port)
 {
 	requestChangeInModel();
 
-	QVector<AudioPort *>::Iterator it = std::find(m_audioPorts.begin(), m_audioPorts.end(), port);
+	auto it = std::find(m_audioPorts.begin(), m_audioPorts.end(), port);
 	if (it != m_audioPorts.end())
 	{
 		m_audioPorts.erase(it);
@@ -677,7 +681,7 @@ bool AudioEngine::addPlayHandle( PlayHandle* handle )
 		return true;
 	}
 
-	if( handle->type() == PlayHandle::TypeNotePlayHandle )
+	if( handle->type() == PlayHandle::Type::NotePlayHandle )
 	{
 		NotePlayHandleManager::release( (NotePlayHandle*)handle );
 	}
@@ -728,7 +732,7 @@ void AudioEngine::removePlayHandle(PlayHandle * ph)
 		// (See tobydox's 2008 commit 4583e48)
 		if ( removedFromList )
 		{
-			if (ph->type() == PlayHandle::TypeNotePlayHandle)
+			if (ph->type() == PlayHandle::Type::NotePlayHandle)
 			{
 				NotePlayHandleManager::release(dynamic_cast<NotePlayHandle*>(ph));
 			}
@@ -745,7 +749,7 @@ void AudioEngine::removePlayHandle(PlayHandle * ph)
 
 
 
-void AudioEngine::removePlayHandlesOfTypes(Track * track, const quint8 types)
+void AudioEngine::removePlayHandlesOfTypes(Track * track, PlayHandle::Types types)
 {
 	requestChangeInModel();
 	PlayHandleList::Iterator it = m_playHandles.begin();
@@ -754,7 +758,7 @@ void AudioEngine::removePlayHandlesOfTypes(Track * track, const quint8 types)
 		if ((*it)->isFromTrack(track) && ((*it)->type() & types))
 		{
 			( *it )->audioPort()->removePlayHandle( ( *it ) );
-			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
+			if( ( *it )->type() == PlayHandle::Type::NotePlayHandle )
 			{
 				NotePlayHandleManager::release( (NotePlayHandle*) *it );
 			}
@@ -1109,7 +1113,7 @@ MidiClient * AudioEngine::tryMidiClients()
 #ifdef LMMS_HAVE_ALSA
 	if( client_name == MidiAlsaSeq::name() || client_name == "" )
 	{
-		MidiAlsaSeq * malsas = new MidiAlsaSeq;
+		auto malsas = new MidiAlsaSeq;
 		if( malsas->isRunning() )
 		{
 			m_midiClientName = MidiAlsaSeq::name();
@@ -1120,7 +1124,7 @@ MidiClient * AudioEngine::tryMidiClients()
 
 	if( client_name == MidiAlsaRaw::name() || client_name == "" )
 	{
-		MidiAlsaRaw * malsar = new MidiAlsaRaw;
+		auto malsar = new MidiAlsaRaw;
 		if( malsar->isRunning() )
 		{
 			m_midiClientName = MidiAlsaRaw::name();
@@ -1133,7 +1137,7 @@ MidiClient * AudioEngine::tryMidiClients()
 #ifdef LMMS_HAVE_JACK
 	if( client_name == MidiJack::name() || client_name == "" )
 	{
-		MidiJack * mjack = new MidiJack;
+		auto mjack = new MidiJack;
 		if( mjack->isRunning() )
 		{
 			m_midiClientName = MidiJack::name();
@@ -1146,7 +1150,7 @@ MidiClient * AudioEngine::tryMidiClients()
 #ifdef LMMS_HAVE_OSS
 	if( client_name == MidiOss::name() || client_name == "" )
 	{
-		MidiOss * moss = new MidiOss;
+		auto moss = new MidiOss;
 		if( moss->isRunning() )
 		{
 			m_midiClientName = MidiOss::name();
@@ -1257,7 +1261,7 @@ void AudioEngine::fifoWriter::run()
 	const fpp_t frames = m_audioEngine->framesPerPeriod();
 	while( m_writing )
 	{
-		surroundSampleFrame * buffer = new surroundSampleFrame[frames];
+		auto buffer = new surroundSampleFrame[frames];
 		const surroundSampleFrame * b = m_audioEngine->renderNextBuffer();
 		memcpy( buffer, b, frames * sizeof( surroundSampleFrame ) );
 		write( buffer );
@@ -1284,3 +1288,5 @@ void AudioEngine::fifoWriter::write( surroundSampleFrame * buffer )
 	m_audioEngine->m_waitingForWrite = false;
 	m_audioEngine->m_doChangesMutex.unlock();
 }
+
+} // namespace lmms

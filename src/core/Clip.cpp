@@ -33,6 +33,9 @@
 #include "Song.h"
 
 
+namespace lmms
+{
+
 /*! \brief Create a new Clip
  *
  *  Creates a new clip for the given track.
@@ -89,7 +92,7 @@ Clip::~Clip()
  */
 void Clip::movePosition( const TimePos & pos )
 {
-	TimePos newPos = qMax(0, pos.getTicks());
+	TimePos newPos = std::max(0, pos.getTicks());
 	if (m_startPosition != newPos)
 	{
 		Engine::audioEngine()->requestChangeInModel();
@@ -145,7 +148,7 @@ void Clip::copyStateTo( Clip *src, Clip *dst )
 		dst->movePosition( pos );
 
 		AutomationClip::resolveAllIDs();
-		GuiApplication::instance()->automationEditor()->m_editor->updateAfterClipChange();
+		gui::getGUI()->automationEditor()->m_editor->updateAfterClipChange();
 	}
 }
 
@@ -197,3 +200,4 @@ bool Clip::hasColor()
 	return usesCustomClipColor() || getTrack()->useColor();
 }
 
+} // namespace lmms

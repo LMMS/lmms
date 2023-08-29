@@ -22,16 +22,18 @@
  *
  */
 
-
 #ifndef LMMS_MATH_H
 #define LMMS_MATH_H
 
 #include <cstdint>
 #include "lmms_constants.h"
 #include "lmmsconfig.h"
-#include <QtCore/QtGlobal>
+#include <QtGlobal>
 
 #include <cmath>
+
+namespace lmms
+{
 
 #ifdef __INTEL_COMPILER
 
@@ -115,7 +117,7 @@ static inline float absFraction( float _x )
 }
 #endif
 
-#endif
+#endif // __INTEL_COMPILER
 
 
 
@@ -150,7 +152,7 @@ static inline long double fastFmal( long double a, long double b, long double c 
 	#endif
 #else
 	return a * b + c;
-#endif
+#endif // FP_FAST_FMAL
 }
 
 //! @brief Takes advantage of fmaf() function if present in hardware
@@ -164,7 +166,7 @@ static inline float fastFmaf( float a, float b, float c )
 	#endif
 #else
 	return a * b + c;
-#endif
+#endif // FP_FAST_FMAF
 }
 
 //! @brief Takes advantage of fma() function if present in hardware
@@ -212,7 +214,7 @@ static inline float logToLinearScale( float min, float max, float value )
 {
 	if( min < 0 )
 	{
-		const float mmax = qMax( qAbs( min ), qAbs( max ) );
+		const float mmax = std::max(std::abs(min), std::abs(max));
 		const float val = value * ( max - min ) + min;
 		float result = signedPowf( val / mmax, F_E ) * mmax;
 		return std::isnan( result ) ? 0 : result;
@@ -226,11 +228,11 @@ static inline float logToLinearScale( float min, float max, float value )
 static inline float linearToLogScale( float min, float max, float value )
 {
 	static const float EXP = 1.0f / F_E;
-	const float valueLimited = qBound( min, value, max);
+	const float valueLimited = std::clamp(value, min, max);
 	const float val = ( valueLimited - min ) / ( max - min );
 	if( min < 0 )
 	{
-		const float mmax = qMax( qAbs( min ), qAbs( max ) );
+		const float mmax = std::max(std::abs(min), std::abs(max));
 		float result = signedPowf( valueLimited / mmax, EXP ) * mmax;
 		return std::isnan( result ) ? 0 : result;
 	}
@@ -313,14 +315,17 @@ static inline float fastSqrt( float n )
 template<class T>
 static inline T absMax( T a, T b )
 {
-	return qAbs<T>(a) > qAbs<T>(b) ? a : b;
+	return std::abs(a) > std::abs(b) ? a : b;
 }
 
 //! returns value nearest to zero
 template<class T>
 static inline T absMin( T a, T b )
 {
-	return qAbs<T>(a) < qAbs<T>(b) ? a : b;
+	return std::abs(a) < std::abs(b) ? a : b;
 }
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_MATH_H

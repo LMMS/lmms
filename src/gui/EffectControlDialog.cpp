@@ -23,11 +23,13 @@
  *
  */
 
-#include <QMessageBox>
 #include <QCloseEvent>
 
 #include "EffectControlDialog.h"
 #include "EffectControls.h"
+
+namespace lmms::gui
+{
 
 
 EffectControlDialog::EffectControlDialog( EffectControls * _controls ) :
@@ -42,13 +44,6 @@ EffectControlDialog::EffectControlDialog( EffectControls * _controls ) :
 
 
 
-EffectControlDialog::~EffectControlDialog()
-{
-}
-
-
-
-
 void EffectControlDialog::closeEvent( QCloseEvent * _ce )
 {
 	_ce->ignore();
@@ -56,6 +51,4 @@ void EffectControlDialog::closeEvent( QCloseEvent * _ce )
 }
 
 
-
-
-
+} // namespace lmms::gui

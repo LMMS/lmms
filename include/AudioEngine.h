@@ -22,27 +22,35 @@
  *
  */
 
-#ifndef AUDIO_ENGINE_H
-#define AUDIO_ENGINE_H
+#ifndef LMMS_AUDIO_ENGINE_H
+#define LMMS_AUDIO_ENGINE_H
 
-#include <QtCore/QMutex>
-#include <QtCore/QThread>
-#include <QtCore/QVector>
-#include <QtCore/QWaitCondition>
+#include <QMutex>
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	#include <QRecursiveMutex>
+#endif
+
+#include <QThread>
+#include <QWaitCondition>
 #include <samplerate.h>
 
+#include <vector>
 
 #include "lmms_basics.h"
 #include "LocklessList.h"
-#include "Note.h"
 #include "FifoBuffer.h"
 #include "AudioEngineProfiler.h"
 #include "PlayHandle.h"
 
 
+namespace lmms
+{
+
 class AudioDevice;
 class MidiClient;
 class AudioPort;
+class AudioEngineWorkerThread;
 
 
 const fpp_t MINIMUM_BUFFER_SIZE = 32;
@@ -55,37 +63,73 @@ const int BYTES_PER_SURROUND_FRAME = sizeof( surroundSampleFrame );
 
 const float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
 
-
-class AudioEngineWorkerThread;
-
-
 class LMMS_EXPORT AudioEngine : public QObject
 {
 	Q_OBJECT
 public:
+	/**
+	 * @brief RAII helper for requestChangesInModel.
+	 * Used by AudioEngine::requestChangesGuard.
+	 */
+	class RequestChangesGuard {
+		friend class AudioEngine;
+
+	private:
+		RequestChangesGuard(AudioEngine* audioEngine)
+			: m_audioEngine{audioEngine}
+		{
+			m_audioEngine->requestChangeInModel();
+		}
+	public:
+
+		RequestChangesGuard()
+			: m_audioEngine{nullptr}
+		{
+		}
+
+		RequestChangesGuard(RequestChangesGuard&& other)
+			: RequestChangesGuard()
+		{
+			std::swap(other.m_audioEngine, m_audioEngine);
+		}
+
+		// Disallow copy.
+		RequestChangesGuard(const RequestChangesGuard&) = delete;
+		RequestChangesGuard& operator=(const RequestChangesGuard&) = delete;
+
+		~RequestChangesGuard() {
+			if (m_audioEngine) {
+				m_audioEngine->doneChangeInModel();
+			}
+		}
+
+	private:
+		AudioEngine* m_audioEngine;
+	};
+
 	struct qualitySettings
 	{
-		enum Mode
+		enum class Mode
 		{
-			Mode_Draft,
-			Mode_HighQuality,
-			Mode_FinalMix
+			Draft,
+			HighQuality,
+			FinalMix
 		} ;
 
-		enum Interpolation
+		enum class Interpolation
 		{
-			Interpolation_Linear,
-			Interpolation_SincFastest,
-			Interpolation_SincMedium,
-			Interpolation_SincBest
+			Linear,
+			SincFastest,
+			SincMedium,
+			SincBest
 		} ;
 
-		enum Oversampling
+		enum class Oversampling
 		{
-			Oversampling_None,
-			Oversampling_2x,
-			Oversampling_4x,
-			Oversampling_8x
+			None,
+			X2,
+			X4,
+			X8
 		} ;
 
 		Interpolation interpolation;
@@ -95,18 +139,18 @@ public:
 		{
 			switch (m)
 			{
-				case Mode_Draft:
-					interpolation = Interpolation_Linear;
-					oversampling = Oversampling_None;
+				case Mode::Draft:
+					interpolation = Interpolation::Linear;
+					oversampling = Oversampling::None;
 					break;
-				case Mode_HighQuality:
+				case Mode::HighQuality:
 					interpolation =
-						Interpolation_SincFastest;
-					oversampling = Oversampling_2x;
+						Interpolation::SincFastest;
+					oversampling = Oversampling::X2;
 					break;
-				case Mode_FinalMix:
-					interpolation = Interpolation_SincBest;
-					oversampling = Oversampling_8x;
+				case Mode::FinalMix:
+					interpolation = Interpolation::SincBest;
+					oversampling = Oversampling::X8;
 					break;
 			}
 		}
@@ -121,10 +165,10 @@ public:
 		{
 			switch( oversampling )
 			{
-				case Oversampling_None: return 1;
-				case Oversampling_2x: return 2;
-				case Oversampling_4x: return 4;
-				case Oversampling_8x: return 8;
+				case Oversampling::None: return 1;
+				case Oversampling::X2: return 2;
+				case Oversampling::X4: return 4;
+				case Oversampling::X8: return 8;
 			}
 			return 1;
 		}
@@ -133,13 +177,13 @@ public:
 		{
 			switch( interpolation )
 			{
-				case Interpolation_Linear:
+				case Interpolation::Linear:
 					return SRC_ZERO_ORDER_HOLD;
-				case Interpolation_SincFastest:
+				case Interpolation::SincFastest:
 					return SRC_SINC_FASTEST;
-				case Interpolation_SincMedium:
+				case Interpolation::SincMedium:
 					return SRC_SINC_MEDIUM_QUALITY;
-				case Interpolation_SincBest:
+				case Interpolation::SincBest:
 					return SRC_SINC_BEST_QUALITY;
 			}
 			return SRC_LINEAR;
@@ -211,7 +255,7 @@ public:
 		return m_playHandles;
 	}
 
-	void removePlayHandlesOfTypes(Track * track, const quint8 types);
+	void removePlayHandlesOfTypes(Track * track, PlayHandle::Types types);
 
 
 	// methods providing information for other classes
@@ -310,6 +354,11 @@ public:
 	void requestChangeInModel();
 	void doneChangeInModel();
 
+	RequestChangesGuard requestChangesGuard()
+	{
+		return RequestChangesGuard{this};
+	}
+
 	static bool isAudioDevNameValid(QString name);
 	static bool isMidiDevNameValid(QString name);
 
@@ -317,11 +366,11 @@ public:
 signals:
 	void qualitySettingsChanged();
 	void sampleRateChanged();
-	void nextAudioBuffer( const surroundSampleFrame * buffer );
+	void nextAudioBuffer( const lmms::surroundSampleFrame * buffer );
 
 
 private:
-	typedef FifoBuffer<surroundSampleFrame *> Fifo;
+	using Fifo = FifoBuffer<surroundSampleFrame*>;
 
 	class fifoWriter : public QThread
 	{
@@ -343,7 +392,7 @@ private:
 
 
 	AudioEngine( bool renderOnly );
-	virtual ~AudioEngine();
+	~AudioEngine() override;
 
 	void startProcessing(bool needsFifo = true);
 	void stopProcessing();
@@ -367,7 +416,7 @@ private:
 
 	bool m_renderOnly;
 
-	QVector<AudioPort *> m_audioPorts;
+	std::vector<AudioPort *> m_audioPorts;
 
 	fpp_t m_framesPerPeriod;
 
@@ -381,7 +430,7 @@ private:
 	surroundSampleFrame * m_outputBufferWrite;
 
 	// worker thread stuff
-	QVector<AudioEngineWorkerThread *> m_workers;
+	std::vector<AudioEngineWorkerThread *> m_workers;
 	int m_numWorkers;
 
 	// playhandle stuff
@@ -420,16 +469,22 @@ private:
 	bool m_changesSignal;
 	unsigned int m_changes;
 	QMutex m_changesMutex;
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	QRecursiveMutex m_doChangesMutex;
+#else
 	QMutex m_doChangesMutex;
+#endif
 	QMutex m_waitChangesMutex;
 	QWaitCondition m_changesAudioEngineCondition;
 	QWaitCondition m_changesRequestCondition;
 
 	bool m_waitingForWrite;
 
-	friend class LmmsCore;
+	friend class Engine;
 	friend class AudioEngineWorkerThread;
 	friend class ProjectRenderer;
 } ;
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_AUDIO_ENGINE_H

@@ -29,12 +29,16 @@
 #include "AutomationNode.h"
 #include "AutomationClipView.h"
 #include "AutomationTrack.h"
-#include "BBTrackContainer.h"
 #include "LocaleHelper.h"
+#include "Note.h"
+#include "PatternStore.h"
 #include "ProjectJournal.h"
 #include "Song.h"
 
 #include <cmath>
+
+namespace lmms
+{
 
 int AutomationClip::s_quantization = 1;
 const float AutomationClip::DEFAULT_MIN_VALUE = 0;
@@ -43,11 +47,13 @@ const float AutomationClip::DEFAULT_MAX_VALUE = 1;
 
 AutomationClip::AutomationClip( AutomationTrack * _auto_track ) :
 	Clip( _auto_track ),
+#if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
 	m_clipMutex(QMutex::Recursive),
+#endif
 	m_autoTrack( _auto_track ),
 	m_objects(),
 	m_tension( 1.0 ),
-	m_progressionType( DiscreteProgression ),
+	m_progressionType( ProgressionType::Discrete ),
 	m_dragging( false ),
 	m_isRecording( false ),
 	m_lastRecordedValue( 0 )
@@ -57,11 +63,11 @@ AutomationClip::AutomationClip( AutomationTrack * _auto_track ) :
 	{
 		switch( getTrack()->trackContainer()->type() )
 		{
-			case TrackContainer::BBContainer:
+			case TrackContainer::Type::Pattern:
 				setAutoResize( true );
 				break;
 
-			case TrackContainer::SongContainer:
+			case TrackContainer::Type::Song:
 				// move down
 			default:
 				setAutoResize( false );
@@ -75,7 +81,9 @@ AutomationClip::AutomationClip( AutomationTrack * _auto_track ) :
 
 AutomationClip::AutomationClip( const AutomationClip & _clip_to_copy ) :
 	Clip( _clip_to_copy.m_autoTrack ),
+#if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
 	m_clipMutex(QMutex::Recursive),
+#endif
 	m_autoTrack( _clip_to_copy.m_autoTrack ),
 	m_objects( _clip_to_copy.m_objects ),
 	m_tension( _clip_to_copy.m_tension ),
@@ -96,11 +104,11 @@ AutomationClip::AutomationClip( const AutomationClip & _clip_to_copy ) :
 	if (!getTrack()){ return; }
 	switch( getTrack()->trackContainer()->type() )
 	{
-		case TrackContainer::BBContainer:
+		case TrackContainer::Type::Pattern:
 			setAutoResize( true );
 			break;
 
-		case TrackContainer::SongContainer:
+		case TrackContainer::Type::Song:
 			// move down
 		default:
 			setAutoResize( false );
@@ -112,22 +120,22 @@ bool AutomationClip::addObject( AutomatableModel * _obj, bool _search_dup )
 {
 	QMutexLocker m(&m_clipMutex);
 
-	if( _search_dup && m_objects.contains(_obj) )
+	if (_search_dup && std::find(m_objects.begin(), m_objects.end(), _obj) != m_objects.end())
 	{
 		return false;
 	}
 
 	// the automation track is unconnected and there is nothing in the track
-	if( m_objects.isEmpty() && hasAutomation() == false )
+	if (m_objects.empty() && hasAutomation() == false)
 	{
 		// then initialize first value
 		putValue( TimePos(0), _obj->inverseScaledValue( _obj->value<float>() ), false );
 	}
 
-	m_objects += _obj;
+	m_objects.push_back(_obj);
 
-	connect( _obj, SIGNAL( destroyed( jo_id_t ) ),
-			this, SLOT( objectDestroyed( jo_id_t ) ),
+	connect( _obj, SIGNAL(destroyed(lmms::jo_id_t)),
+			this, SLOT(objectDestroyed(lmms::jo_id_t)),
 						Qt::DirectConnection );
 
 	emit dataChanged();
@@ -139,13 +147,13 @@ bool AutomationClip::addObject( AutomatableModel * _obj, bool _search_dup )
 
 
 void AutomationClip::setProgressionType(
-					ProgressionTypes _new_progression_type )
+					ProgressionType _new_progression_type )
 {
 	QMutexLocker m(&m_clipMutex);
 
-	if ( _new_progression_type == DiscreteProgression ||
-		_new_progression_type == LinearProgression ||
-		_new_progression_type == CubicHermiteProgression )
+	if ( _new_progression_type == ProgressionType::Discrete ||
+		_new_progression_type == ProgressionType::Linear ||
+		_new_progression_type == ProgressionType::CubicHermite )
 	{
 		m_progressionType = _new_progression_type;
 		emit dataChanged();
@@ -176,7 +184,7 @@ const AutomatableModel * AutomationClip::firstObject() const
 	QMutexLocker m(&m_clipMutex);
 
 	AutomatableModel* model;
-	if (!m_objects.isEmpty() && (model = m_objects.first()) != nullptr)
+	if (!m_objects.empty() && (model = m_objects.front()) != nullptr)
 	{
 		return model;
 	}
@@ -203,7 +211,7 @@ TimePos AutomationClip::timeMapLength() const
 	if (m_timeMap.isEmpty()) { return one_bar; }
 
 	timeMap::const_iterator it = m_timeMap.end();
-	tick_t last_tick = static_cast<tick_t>(POS(it - 1));
+	auto last_tick = static_cast<tick_t>(POS(it - 1));
 	// if last_tick is 0 (single item at tick 0)
 	// return length as a whole bar to prevent disappearing Clip
 	if (last_tick == 0) { return one_bar; }
@@ -217,7 +225,7 @@ TimePos AutomationClip::timeMapLength() const
 void AutomationClip::updateLength()
 {
 	// Do not resize down in case user manually extended up
-	changeLength(qMax(length(), timeMapLength()));
+	changeLength(std::max(length(), timeMapLength()));
 }
 
 
@@ -366,17 +374,17 @@ void AutomationClip::removeNodes(const int tick0, const int tick1)
 		return;
 	}
 
-	TimePos start = TimePos(qMin(tick0, tick1));
-	TimePos end = TimePos(qMax(tick0, tick1));
+	auto start = TimePos(std::min(tick0, tick1));
+	auto end = TimePos(std::max(tick0, tick1));
 
 	// Make a list of TimePos with nodes to be removed
 	// because we can't simply remove the nodes from
 	// the timeMap while we are iterating it.
-	QVector<TimePos> nodesToRemove;
+	std::vector<TimePos> nodesToRemove;
 
 	for (auto it = m_timeMap.lowerBound(start), endIt = m_timeMap.upperBound(end); it != endIt; ++it)
 	{
-		nodesToRemove.append(POS(it));
+		nodesToRemove.push_back(POS(it));
 	}
 
 	for (auto node: nodesToRemove)
@@ -402,8 +410,8 @@ void AutomationClip::resetNodes(const int tick0, const int tick1)
 		return;
 	}
 
-	TimePos start = TimePos(qMin(tick0, tick1));
-	TimePos end = TimePos(qMax(tick0, tick1));
+	auto start = TimePos(std::min(tick0, tick1));
+	auto end = TimePos(std::max(tick0, tick1));
 
 	for (auto it = m_timeMap.lowerBound(start), endIt = m_timeMap.upperBound(end); it != endIt; ++it)
 	{
@@ -552,11 +560,11 @@ float AutomationClip::valueAt( timeMap::const_iterator v, int offset ) const
 	// value if we do
 	if (offset == 0) { return INVAL(v); }
 
-	if (m_progressionType == DiscreteProgression)
+	if (m_progressionType == ProgressionType::Discrete)
 	{
 		return OUTVAL(v);
 	}
-	else if( m_progressionType == LinearProgression )
+	else if( m_progressionType == ProgressionType::Linear )
 	{
 		float slope =
 			(INVAL(v + 1) - OUTVAL(v))
@@ -564,7 +572,7 @@ float AutomationClip::valueAt( timeMap::const_iterator v, int offset ) const
 
 		return OUTVAL(v) + offset * slope;
 	}
-	else /* CubicHermiteProgression */
+	else /* ProgressionType::CubicHermite */
 	{
 		// Implements a Cubic Hermite spline as explained at:
 		// http://en.wikipedia.org/wiki/Cubic_Hermite_spline#Unit_interval_.280.2C_1.29
@@ -602,7 +610,7 @@ float *AutomationClip::valuesAfter( const TimePos & _time ) const
 	}
 
 	int numValues = POS(v + 1) - POS(v);
-	float *ret = new float[numValues];
+	auto ret = new float[numValues];
 
 	for( int i = 0; i < numValues; i++ )
 	{
@@ -690,7 +698,7 @@ void AutomationClip::flipX(int length)
 				// We swap the inValue and outValue when flipping horizontally
 				tempValue = OUTVAL(it);
 				tempOutValue = INVAL(it);
-				TimePos newTime = TimePos(length - POS(it));
+				auto newTime = TimePos(length - POS(it));
 
 				tempMap[newTime] = AutomationNode(this, tempValue, tempOutValue, newTime);
 
@@ -732,7 +740,7 @@ void AutomationClip::flipX(int length)
 			tempValue = OUTVAL(it);
 			tempOutValue = INVAL(it);
 
-			TimePos newTime = TimePos(realLength - POS(it));
+			auto newTime = TimePos(realLength - POS(it));
 			tempMap[newTime] = AutomationNode(this, tempValue, tempOutValue, newTime);
 
 			++it;
@@ -759,7 +767,7 @@ void AutomationClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "pos", startPosition() );
 	_this.setAttribute( "len", length() );
 	_this.setAttribute( "name", name() );
-	_this.setAttribute( "prog", QString::number( progressionType() ) );
+	_this.setAttribute( "prog", QString::number( static_cast<int>(progressionType()) ) );
 	_this.setAttribute( "tens", QString::number( getTension() ) );
 	_this.setAttribute( "mute", QString::number( isMuted() ) );
 	
@@ -778,15 +786,13 @@ void AutomationClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		_this.appendChild( element );
 	}
 
-	for( objectVector::const_iterator it = m_objects.begin();
-						it != m_objects.end(); ++it )
+	for (const auto& object : m_objects)
 	{
-		if( *it )
+		if (object)
 		{
 			QDomElement element = _doc.createElement( "object" );
-			element.setAttribute( "id",
-				ProjectJournal::idToSave( ( *it )->id() ) );
-			_this.appendChild( element );
+			element.setAttribute("id", ProjectJournal::idToSave(object->id()));
+			_this.appendChild(element);
 		}
 	}
 }
@@ -802,7 +808,7 @@ void AutomationClip::loadSettings( const QDomElement & _this )
 
 	movePosition( _this.attribute( "pos" ).toInt() );
 	setName( _this.attribute( "name" ) );
-	setProgressionType( static_cast<ProgressionTypes>( _this.attribute(
+	setProgressionType( static_cast<ProgressionType>( _this.attribute(
 							"prog" ).toInt() ) );
 	setTension( _this.attribute( "tens" ) );
 	setMuted(_this.attribute( "mute", QString::number( false ) ).toInt() );
@@ -825,7 +831,7 @@ void AutomationClip::loadSettings( const QDomElement & _this )
 		}
 		else if( element.tagName() == "object" )
 		{
-			m_idsToResolve << element.attribute( "id" ).toInt();
+			m_idsToResolve.push_back(element.attribute("id").toInt());
 		}
 	}
 	
@@ -851,7 +857,7 @@ void AutomationClip::loadSettings( const QDomElement & _this )
 
 
 
-const QString AutomationClip::name() const
+QString AutomationClip::name() const
 {
 	QMutexLocker m(&m_clipMutex);
 
@@ -859,9 +865,9 @@ const QString AutomationClip::name() const
 	{
 		return Clip::name();
 	}
-	if( !m_objects.isEmpty() && m_objects.first() != nullptr )
+	if (!m_objects.empty() && m_objects.front() != nullptr)
 	{
-		return m_objects.first()->fullDisplayName();
+		return m_objects.front()->fullDisplayName();
 	}
 	return tr( "Drag a control while pressing <%1>" ).arg(UI_CTRL_KEY);
 }
@@ -869,11 +875,11 @@ const QString AutomationClip::name() const
 
 
 
-ClipView * AutomationClip::createView( TrackView * _tv )
+gui::ClipView * AutomationClip::createView( gui::TrackView * _tv )
 {
 	QMutexLocker m(&m_clipMutex);
 
-	return new AutomationClipView( this, _tv );
+	return new gui::AutomationClipView( this, _tv );
 }
 
 
@@ -882,25 +888,19 @@ ClipView * AutomationClip::createView( TrackView * _tv )
 
 bool AutomationClip::isAutomated( const AutomatableModel * _m )
 {
-	TrackContainer::TrackList l;
-	l += Engine::getSong()->tracks();
-	l += Engine::getBBTrackContainer()->tracks();
-	l += Engine::getSong()->globalAutomationTrack();
-
-	for( TrackContainer::TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
+	auto l = combineAllTracks();
+	for (const auto track : l)
 	{
-		if( ( *it )->type() == Track::AutomationTrack ||
-			( *it )->type() == Track::HiddenAutomationTrack )
+		if (track->type() == Track::Type::Automation || track->type() == Track::Type::HiddenAutomation)
 		{
-			const Track::clipVector & v = ( *it )->getClips();
-			for( Track::clipVector::ConstIterator j = v.begin(); j != v.end(); ++j )
+			for (const auto& clip : track->getClips())
 			{
-				const AutomationClip * a = dynamic_cast<const AutomationClip *>( *j );
+				const auto a = dynamic_cast<const AutomationClip*>(clip);
 				if( a && a->hasAutomation() )
 				{
-					for( objectVector::const_iterator k = a->m_objects.begin(); k != a->m_objects.end(); ++k )
+					for (const auto& object : a->m_objects)
 					{
-						if( *k == _m )
+						if (object == _m)
 						{
 							return true;
 						}
@@ -917,42 +917,36 @@ bool AutomationClip::isAutomated( const AutomatableModel * _m )
  * @brief returns a list of all the automation clips that are connected to a specific model
  * @param _m the model we want to look for
  */
-QVector<AutomationClip *> AutomationClip::clipsForModel( const AutomatableModel * _m )
+std::vector<AutomationClip *> AutomationClip::clipsForModel(const AutomatableModel* _m)
 {
-	QVector<AutomationClip *> clips;
-	TrackContainer::TrackList l;
-	l += Engine::getSong()->tracks();
-	l += Engine::getBBTrackContainer()->tracks();
-	l += Engine::getSong()->globalAutomationTrack();
+	std::vector<AutomationClip *> clips;
+	auto l = combineAllTracks();
 
 	// go through all tracks...
-	for( TrackContainer::TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
+	for (const auto track : l)
 	{
 		// we want only automation tracks...
-		if( ( *it )->type() == Track::AutomationTrack ||
-			( *it )->type() == Track::HiddenAutomationTrack )
+		if (track->type() == Track::Type::Automation || track->type() == Track::Type::HiddenAutomation )
 		{
-			// get clips in those tracks....
-			const Track::clipVector & v = ( *it )->getClips();
 			// go through all the clips...
-			for( Track::clipVector::ConstIterator j = v.begin(); j != v.end(); ++j )
+			for (const auto& trackClip : track->getClips())
 			{
-				AutomationClip * a = dynamic_cast<AutomationClip *>( *j );
+				auto a = dynamic_cast<AutomationClip*>(trackClip);
 				// check that the clip has automation
 				if( a && a->hasAutomation() )
 				{
 					// now check is the clip is connected to the model we want by going through all the connections
 					// of the clip
 					bool has_object = false;
-					for( objectVector::const_iterator k = a->m_objects.begin(); k != a->m_objects.end(); ++k )
+					for (const auto& object : a->m_objects)
 					{
-						if( *k == _m )
+						if (object == _m)
 						{
 							has_object = true;
 						}
 					}
 					// if the clips is connected to the model, add it to the list
-					if( has_object ) { clips += a; }
+					if (has_object) { clips.push_back(a); }
 				}
 			}
 		}
@@ -966,24 +960,19 @@ AutomationClip * AutomationClip::globalAutomationClip(
 							AutomatableModel * _m )
 {
 	AutomationTrack * t = Engine::getSong()->globalAutomationTrack();
-	Track::clipVector v = t->getClips();
-	for( Track::clipVector::const_iterator j = v.begin(); j != v.end(); ++j )
+	for (const auto& clip : t->getClips())
 	{
-		AutomationClip * a = dynamic_cast<AutomationClip *>( *j );
+		auto a = dynamic_cast<AutomationClip*>(clip);
 		if( a )
 		{
-			for( objectVector::const_iterator k = a->m_objects.begin();
-												k != a->m_objects.end(); ++k )
+			for (const auto& object : a->m_objects)
 			{
-				if( *k == _m )
-				{
-					return a;
-				}
+				if (object == _m) { return a; }
 			}
 		}
 	}
 
-	AutomationClip * a = new AutomationClip( t );
+	auto a = new AutomationClip(t);
 	a->addObject( _m, false );
 	return a;
 }
@@ -993,27 +982,19 @@ AutomationClip * AutomationClip::globalAutomationClip(
 
 void AutomationClip::resolveAllIDs()
 {
-	TrackContainer::TrackList l = Engine::getSong()->tracks() +
-				Engine::getBBTrackContainer()->tracks();
-	l += Engine::getSong()->globalAutomationTrack();
-	for( TrackContainer::TrackList::iterator it = l.begin();
-							it != l.end(); ++it )
+	auto l = combineAllTracks();
+	for (const auto& track : l)
 	{
-		if( ( *it )->type() == Track::AutomationTrack ||
-			 ( *it )->type() == Track::HiddenAutomationTrack )
+		if (track->type() == Track::Type::Automation || track->type() == Track::Type::HiddenAutomation)
 		{
-			Track::clipVector v = ( *it )->getClips();
-			for( Track::clipVector::iterator j = v.begin();
-							j != v.end(); ++j )
+			for (const auto& clip : track->getClips())
 			{
-				AutomationClip * a = dynamic_cast<AutomationClip *>( *j );
+				auto a = dynamic_cast<AutomationClip*>(clip);
 				if( a )
 				{
-					for( QVector<jo_id_t>::Iterator k = a->m_idsToResolve.begin();
-									k != a->m_idsToResolve.end(); ++k )
+					for (const auto& id : a->m_idsToResolve)
 					{
-						JournallingObject * o = Engine::projectJournal()->
-														journallingObject( *k );
+						JournallingObject* o = Engine::projectJournal()->journallingObject(id);
 						if( o && dynamic_cast<AutomatableModel *>( o ) )
 						{
 							a->addObject( dynamic_cast<AutomatableModel *>( o ), false );
@@ -1022,7 +1003,7 @@ void AutomationClip::resolveAllIDs()
 						{
 							// FIXME: Remove this block once the automation system gets fixed
 							// This is a temporary fix for https://github.com/LMMS/lmms/issues/3781
-							o = Engine::projectJournal()->journallingObject(ProjectJournal::idFromSave(*k));
+							o = Engine::projectJournal()->journallingObject(ProjectJournal::idFromSave(id));
 							if( o && dynamic_cast<AutomatableModel *>( o ) )
 							{
 								a->addObject( dynamic_cast<AutomatableModel *>( o ), false );
@@ -1031,7 +1012,7 @@ void AutomationClip::resolveAllIDs()
 							{
 								// FIXME: Remove this block once the automation system gets fixed
 								// This is a temporary fix for https://github.com/LMMS/lmms/issues/4781
-								o = Engine::projectJournal()->journallingObject(ProjectJournal::idToSave(*k));
+								o = Engine::projectJournal()->journallingObject(ProjectJournal::idToSave(id));
 								if( o && dynamic_cast<AutomatableModel *>( o ) )
 								{
 									a->addObject( dynamic_cast<AutomatableModel *>( o ), false );
@@ -1070,10 +1051,9 @@ void AutomationClip::objectDestroyed( jo_id_t _id )
 	// when switching samplerate) and real deletions because in the latter
 	// case we had to remove ourselves if we're the global automation
 	// clip of the destroyed object
-	m_idsToResolve += _id;
+	m_idsToResolve.push_back(_id);
 
-	for( objectVector::Iterator objIt = m_objects.begin();
-		objIt != m_objects.end(); objIt++ )
+	for (auto objIt = m_objects.begin(); objIt != m_objects.end(); objIt++)
 	{
 		Q_ASSERT( !(*objIt).isNull() );
 		if( (*objIt)->id() == _id )
@@ -1182,3 +1162,19 @@ void AutomationClip::generateTangents(timeMap::iterator it, int numToGenerate)
 		it++;
 	}
 }
+
+std::vector<Track*> AutomationClip::combineAllTracks()
+{
+	std::vector<Track*> combinedTrackList;
+
+	auto& songTracks = Engine::getSong()->tracks();
+	auto& patternStoreTracks = Engine::patternStore()->tracks();
+
+	combinedTrackList.insert(combinedTrackList.end(), songTracks.begin(), songTracks.end());
+	combinedTrackList.insert(combinedTrackList.end(), patternStoreTracks.begin(), patternStoreTracks.end());
+	combinedTrackList.push_back(Engine::getSong()->globalAutomationTrack());
+
+	return combinedTrackList;
+}
+
+} // namespace lmms

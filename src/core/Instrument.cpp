@@ -31,6 +31,10 @@
 #include "lmms_constants.h"
 
 
+namespace lmms
+{
+
+
 Instrument::Instrument(InstrumentTrack * _instrument_track,
 			const Descriptor * _descriptor,
 			const Descriptor::SubPluginFeatures::Key *key) :
@@ -86,7 +90,7 @@ bool Instrument::isFromTrack( const Track * _track ) const
 static int countZeroCrossings(sampleFrame *buf, fpp_t start, fpp_t frames)
 {
 	// zero point crossing counts of all channels
-	int zeroCrossings[DEFAULT_CHANNELS] = {0};
+	auto zeroCrossings = std::array<int, DEFAULT_CHANNELS>{};
 	// maximum zero point crossing of all channels
 	int maxZeroCrossings = 0;
 
@@ -181,8 +185,8 @@ void Instrument::applyRelease( sampleFrame * buf, const NotePlayHandle * _n )
 	if( fl <= desiredReleaseFrames()+fpp )
 	{
 		for( fpp_t f = (fpp_t)( ( fl > desiredReleaseFrames() ) ?
-				( qMax( fpp - desiredReleaseFrames(), 0 ) +
-					fl % fpp ) : 0 ); f < frames; ++f )
+				(std::max(fpp - desiredReleaseFrames(), 0) +
+					fl % fpp) : 0); f < frames; ++f)
 		{
 			const float fac = (float)( fl-f-1 ) /
 							desiredReleaseFrames();
@@ -201,3 +205,6 @@ QString Instrument::fullDisplayName() const
 {
 	return instrumentTrack()->displayName();
 }
+
+
+} // namespace lmms

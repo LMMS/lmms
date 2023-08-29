@@ -23,27 +23,32 @@
  *
  */
 
+#ifndef LMMS_GUI_SONG_EDITOR_H
+#define LMMS_GUI_SONG_EDITOR_H
 
-#ifndef SONG_EDITOR_H
-#define SONG_EDITOR_H
-
-#include <QVector>
-#include <QLinearGradient>
-
-#include "ActionGroup.h"
+#include "AutomatableModel.h"
 #include "Editor.h"
 #include "TrackContainerView.h"
-#include "PositionLine.h"
 
 class QLabel;
 class QScrollBar;
 
+namespace lmms
+{
+
+class Song;
+class ComboBoxModel;
+
+namespace gui
+{
+
+
+class ActionGroup;
 class AutomatableSlider;
 class ComboBox;
-class ComboBoxModel;
 class LcdSpinBox;
 class MeterDialog;
-class Song;
+class PositionLine;
 class TextFloat;
 class TimeLineWidget;
 
@@ -52,20 +57,19 @@ class SongEditor : public TrackContainerView
 {
 	Q_OBJECT
 public:
-	enum EditMode
+	enum class EditMode
 	{
-		DrawMode,
-		KnifeMode,
-		SelectMode
+		Draw,
+		Knife,
+		Select
 	};
 
 	SongEditor( Song * song );
-	~SongEditor();
+	~SongEditor() override = default;
 
 	void saveSettings( QDomDocument& doc, QDomElement& element ) override;
 	void loadSettings( const QDomElement& element ) override;
 
-	ComboBoxModel *zoomingModel() const;
 	ComboBoxModel *snappingModel() const;
 	float getSnapSize() const;
 	QString getSnapSizeString() const;
@@ -76,13 +80,13 @@ public slots:
 	void stopSelectRegion();
 	void updateRubberband();
 
-	void setEditMode( EditMode mode );
+	void setEditMode( lmms::gui::SongEditor::EditMode mode );
 	void setEditModeDraw();
 	void setEditModeKnife();
 	void setEditModeSelect();
 	void toggleProportionalSnap();
 
-	void updatePosition( const TimePos & t );
+	void updatePosition( const lmms::TimePos & t );
 	void updatePositionLine();
 	void selectAllClips( bool select );
 
@@ -116,9 +120,11 @@ private:
 	bool allowRubberband() const override;
 	bool knifeMode() const override;
 
+	int calculatePixelsPerBar() const;
+	int calculateZoomSliderValue(int pixelsPerBar) const;
+
 	int trackIndexFromSelectionPoint(int yPos);
 	int indexOfTrackView(const TrackView* tv);
-
 
 	Song * m_song;
 
@@ -137,11 +143,9 @@ private:
 
 	PositionLine * m_positionLine;
 
-	ComboBoxModel* m_zoomingModel;
+	IntModel* m_zoomingModel;
 	ComboBoxModel* m_snappingModel;
 	bool m_proportionalSnap;
-
-	static const QVector<float> m_zoomLevels;
 
 	bool m_scrollBack;
 	bool m_smoothScroll;
@@ -154,14 +158,14 @@ private:
 	QPoint m_mousePos;
 	int m_rubberBandStartTrackview;
 	TimePos m_rubberbandStartTimePos;
-	int m_currentZoomingValue;
+	int m_rubberbandPixelsPerBar; //!< pixels per bar when selection starts
 	int m_trackHeadWidth;
 	bool m_selectRegion;
 
 	friend class SongEditorWindow;
 
 signals:
-	void zoomingValueChanged( float );
+	void pixelsPerBarChanged(float);
 } ;
 
 
@@ -198,7 +202,7 @@ signals:
 	void resized();
 
 private:
-	QAction* m_addBBTrackAction;
+	QAction* m_addPatternTrackAction;
 	QAction* m_addSampleTrackAction;
 	QAction* m_addAutomationTrackAction;
 	QAction* m_setProportionalSnapAction;
@@ -209,7 +213,7 @@ private:
 	QAction* m_selectModeAction;
 	QAction* m_crtlAction;
 
-	ComboBox * m_zoomingComboBox;
+	AutomatableSlider * m_zoomingSlider;
 	ComboBox * m_snappingComboBox;
 	QLabel* m_snapSizeLabel;
 
@@ -217,4 +221,8 @@ private:
 	QAction* m_removeBarAction;
 };
 
-#endif
+} // namespace gui
+
+} // namespace lmms
+
+#endif // LMMS_GUI_SONG_EDITOR_H

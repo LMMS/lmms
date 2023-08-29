@@ -31,6 +31,10 @@
 #include "ColorChooser.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "VecControls.h"
+
+namespace lmms::gui
+{
 
 
 VectorView::VectorView(VecControls *controls, LocklessRingBuffer<sampleFrame> *inputBuffer, unsigned short displaySize, QWidget *parent) :
@@ -303,7 +307,7 @@ void VectorView::periodicUpdate()
 // More of an Easter egg, to avoid cluttering the interface with non-essential functionality.
 void VectorView::mouseDoubleClickEvent(QMouseEvent *event)
 {
-	ColorChooser *colorDialog = new ColorChooser(m_controls->m_colorFG, this);
+	auto colorDialog = new ColorChooser(m_controls->m_colorFG, this);
 	if (colorDialog->exec())
 	{
 		m_controls->m_colorFG = colorDialog->currentColor();
@@ -326,3 +330,6 @@ void VectorView::wheelEvent(QWheelEvent *event)
 	).count();
 
 }
+
+
+} // namespace lmms::gui

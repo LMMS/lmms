@@ -24,15 +24,21 @@
  *
  */
 
-#ifndef INSTRUMENT_MISC_VIEW_H
-#define INSTRUMENT_MISC_VIEW_H
+#ifndef LMMS_GUI_INSTRUMENT_MISC_VIEW_H
+#define LMMS_GUI_INSTRUMENT_MISC_VIEW_H
 
 #include <QWidget>
 
+namespace lmms
+{
+
+class InstrumentTrack;
+
+namespace gui
+{
 
 class ComboBox;
 class GroupBox;
-class InstrumentTrack;
 class LedCheckBox;
 
 
@@ -60,4 +66,9 @@ private:
 	LedCheckBox *m_rangeImportCheckbox;
 };
 
-#endif
+
+} // namespace gui
+
+} // namespace lmms
+
+#endif // LMMS_GUI_INSTRUMENT_MISC_VIEW_H

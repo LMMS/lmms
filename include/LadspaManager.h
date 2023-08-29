@@ -1,5 +1,5 @@
 /*
- * LadspaManager.h - declaration of class ladspaManager
+ * LadspaManager.h - declaration of class LadspaManager
  *                    a class to manage loading and instantiation
  *                    of ladspa plugins
  *
@@ -24,30 +24,32 @@
  *
  */
 
-
-#ifndef LADSPA_MANAGER_H
-#define LADSPA_MANAGER_H
+#ifndef LMMS_LADSPA_MANAGER_H
+#define LMMS_LADSPA_MANAGER_H
 
 #include <ladspa.h>
 
-#include <QtCore/QMap>
-#include <QtCore/QPair>
-#include <QtCore/QString>
-#include <QtCore/QStringList>
+#include <QMap>
+#include <QPair>
+#include <QString>
+#include <QStringList>
 
 
 #include "lmms_export.h"
 #include "lmms_basics.h"
 
 
+namespace lmms
+{
+
 const float NOHINT = -99342.2243f;
 
-typedef QPair<QString, QString> ladspa_key_t;
-typedef QPair<QString, ladspa_key_t> sortable_plugin_t;
-typedef QList<sortable_plugin_t> l_sortable_plugin_t;
-typedef QList<ladspa_key_t> l_ladspa_key_t;
+using ladspa_key_t = QPair<QString, QString>;
+using sortable_plugin_t = QPair<QString, ladspa_key_t>;
+using l_sortable_plugin_t = QList<sortable_plugin_t>;
+using l_ladspa_key_t = QList<ladspa_key_t>;
 
-/* ladspaManager provides a database of LADSPA plug-ins.  Upon instantiation,
+/* LadspaManager provides a database of LADSPA plug-ins.  Upon instantiation,
 it loads all of the plug-ins found in the LADSPA_PATH environmental variable
 and stores their access descriptors according in a dictionary keyed on
 the filename the plug-in was loaded from and the label of the plug-in.
@@ -60,25 +62,24 @@ calls using:
 
 as the plug-in key. */
 
-enum ladspaPluginType
+enum class LadspaPluginType
 {
-	SOURCE,
-	TRANSFER,
-	VALID,
-	INVALID,
-	SINK,
-	OTHER
+	Source,
+	Transfer,
+	Valid,
+	Invalid,
+	Sink,
+	Other
 };
 
-typedef struct ladspaManagerStorage
+struct LadspaManagerDescription
 {
 	LADSPA_Descriptor_Function descriptorFunction;
 	uint32_t index;
-	ladspaPluginType type;
+	LadspaPluginType type;
 	uint16_t inputChannels;
 	uint16_t outputChannels;
-} ladspaManagerDescription;
-
+};
 
 class LMMS_EXPORT LadspaManager
 {
@@ -88,7 +89,7 @@ public:
 	virtual ~LadspaManager();
 
 	l_sortable_plugin_t getSortedPlugins();
-	ladspaManagerDescription * getDescription( const ladspa_key_t &
+	LadspaManagerDescription * getDescription( const ladspa_key_t &
 								_plugin );
 
 	/* This identifier can be used as a unique, case-sensitive
@@ -339,11 +340,13 @@ private:
 	const LADSPA_PortRangeHint* getPortRangeHint( const ladspa_key_t& _plugin,
 													uint32_t _port );
 
-	typedef QMap<ladspa_key_t, ladspaManagerDescription *>
-						ladspaManagerMapType;
-	ladspaManagerMapType m_ladspaManagerMap;
+	using LadspaManagerMapType = QMap<ladspa_key_t, LadspaManagerDescription*>;
+	LadspaManagerMapType m_ladspaManagerMap;
 	l_sortable_plugin_t m_sortedPlugins;
 
 } ;
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_LADSPA_MANAGER_H

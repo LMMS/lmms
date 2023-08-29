@@ -22,10 +22,10 @@
  *
  */
 
-#ifndef ENVELOPE_AND_LFO_PARAMETERS_H
-#define ENVELOPE_AND_LFO_PARAMETERS_H
+#ifndef LMMS_ENVELOPE_AND_LFO_PARAMETERS_H
+#define LMMS_ENVELOPE_AND_LFO_PARAMETERS_H
 
-#include <QtCore/QVector>
+#include <vector>
 
 #include "JournallingObject.h"
 #include "AutomatableModel.h"
@@ -33,6 +33,15 @@
 #include "TempoSyncKnobModel.h"
 #include "lmms_basics.h"
 
+namespace lmms
+{
+
+namespace gui
+{
+
+class EnvelopeAndLfoView;
+
+}
 
 class LMMS_EXPORT EnvelopeAndLfoParameters : public Model, public JournallingObject
 {
@@ -41,13 +50,9 @@ public:
 	class LfoInstances
 	{
 	public:
-		LfoInstances()
-		{
-		}
+		LfoInstances() = default;
 
-		~LfoInstances()
-		{
-		}
+		~LfoInstances() = default;
 
 		inline bool isEmpty() const
 		{
@@ -62,14 +67,14 @@ public:
 
 	private:
 		QMutex m_lfoListMutex;
-		typedef QList<EnvelopeAndLfoParameters *> LfoList;
+		using LfoList = QList<EnvelopeAndLfoParameters*>;
 		LfoList m_lfos;
 
 	} ;
 
 	EnvelopeAndLfoParameters( float _value_for_zero_amount,
 							Model * _parent );
-	virtual ~EnvelopeAndLfoParameters();
+	~EnvelopeAndLfoParameters() override;
 
 	static inline float expKnobVal( float _val )
 	{
@@ -164,7 +169,7 @@ private:
 	bool m_bad_lfoShapeData;
 	SampleBuffer m_userWave;
 
-	enum LfoShapes
+	enum class LfoShape
 	{
 		SineWave,
 		TriangleWave,
@@ -172,15 +177,18 @@ private:
 		SquareWave,
 		UserDefinedWave,
 		RandomWave,
-		NumLfoShapes
+		Count
 	} ;
+	constexpr static auto NumLfoShapes = static_cast<std::size_t>(LfoShape::Count);
 
 	sample_t lfoShapeSample( fpp_t _frame_offset );
 	void updateLfoShapeData();
 
 
-	friend class EnvelopeAndLfoView;
+	friend class gui::EnvelopeAndLfoView;
 
 } ;
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_ENVELOPE_AND_LFO_PARAMETERS_H

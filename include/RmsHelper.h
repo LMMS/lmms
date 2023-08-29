@@ -23,10 +23,15 @@
  *
  */
 
-#ifndef RMS_HELPER_H
-#define RMS_HELPER_H
+#ifndef LMMS_RMS_HELPER_H
+#define LMMS_RMS_HELPER_H
 
 #include "lmms_math.h"
+
+
+namespace lmms
+{
+
 
 class RmsHelper
 {
@@ -91,4 +96,6 @@ private:
 };
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_RMS_HELPER_H

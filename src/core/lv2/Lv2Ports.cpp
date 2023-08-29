@@ -35,7 +35,9 @@
 #include "Lv2Manager.h"
 #include "Lv2Evbuf.h"
 
-namespace Lv2Ports {
+
+namespace lmms::Lv2Ports
+{
 
 
 
@@ -112,19 +114,19 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 
 	m_optional = hasProperty(LV2_CORE__connectionOptional);
 
-	m_vis = hasProperty(LV2_CORE__integer)
-		? Vis::Integer // WARNING: this may still be changed below
+	m_vis = hasProperty(LV2_CORE__toggled)
+		? Vis::Toggled
 		: hasProperty(LV2_CORE__enumeration)
 		? Vis::Enumeration
-		: hasProperty(LV2_CORE__toggled)
-		? Vis::Toggled
+		: hasProperty(LV2_CORE__integer)
+		? Vis::Integer // WARNING: this may still be changed below
 		: Vis::Generic;
 
 	if (isA(LV2_CORE__InputPort)) { m_flow = Flow::Input; }
 	else if (isA(LV2_CORE__OutputPort)) { m_flow = Flow::Output; }
 	else {
 		m_flow = Flow::Unknown;
-		issue(unknownPortFlow, portName);
+		issue(PluginIssueType::UnknownPortFlow, portName);
 	}
 
 	m_def = .0f;
@@ -143,7 +145,7 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 		if (isA(LV2_CORE__CVPort))
 		{
 			// currently not supported, but we can still check the metadata
-			issue(badPortType, "cvPort");
+			issue(PluginIssueType::BadPortType, "cvPort");
 		}
 
 		m_type = isA(LV2_CORE__CVPort) ? Type::Cv : Type::Control;
@@ -170,21 +172,21 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 			}
 		};
 
-		takeRangeValue(def.get(), m_def, portHasNoDef);
+		takeRangeValue(def.get(), m_def, PluginIssueType::PortHasNoDef);
 		if (isToggle)
 		{
 			m_min = .0f;
 			m_max = 1.f;
 			if(def.get() && m_def != m_min && m_def != m_max)
 			{
-				issue(defaultValueNotInRange, portName);
+				issue(PluginIssueType::DefaultValueNotInRange, portName);
 			}
 		}
 		else
 		{
 			// take min/max
-			takeRangeValue(min.get(), m_min, portHasNoMin);
-			takeRangeValue(max.get(), m_max, portHasNoMax);
+			takeRangeValue(min.get(), m_min, PluginIssueType::PortHasNoMin);
+			takeRangeValue(max.get(), m_max, PluginIssueType::PortHasNoMax);
 			if(m_type == Type::Cv)
 			{
 				// no range is allowed and bashed to [-1,+1],
@@ -194,10 +196,10 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 					m_min = -1.f;
 					m_max = +1.f;
 				}
-				else if(!m_min_set()) { issue(portHasNoMin, portName); }
-				else if(!m_max_set()) { issue(portHasNoMax, portName); }
+				else if(!m_min_set()) { issue(PluginIssueType::PortHasNoMin, portName); }
+				else if(!m_max_set()) { issue(PluginIssueType::PortHasNoMax, portName); }
 			}
-			if(m_min > m_max) { issue(minGreaterMax, portName); }
+			if(m_min > m_max) { issue(PluginIssueType::MinGreaterMax, portName); }
 
 			// sampleRate
 			if (hasProperty(LV2_CORE__sampleRate)) { m_sampleRate = true; }
@@ -205,7 +207,7 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 			// default value
 			if (def.get())
 			{
-				if (m_def < m_min) { issue(defaultValueNotInRange, portName); }
+				if (m_def < m_min) { issue(PluginIssueType::DefaultValueNotInRange, portName); }
 				else if (m_def > m_max)
 				{
 					if(m_sampleRate)
@@ -213,7 +215,7 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 						// multiplying with sample rate will hopefully lead us
 						// to a good default value
 					}
-					else { issue(defaultValueNotInRange, portName); }
+					else { issue(PluginIssueType::DefaultValueNotInRange, portName); }
 				}
 			}
 
@@ -252,7 +254,7 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 	{
 		if (m_optional) { m_used = false; }
 		else {
-			issue(PluginIssueType::unknownPortType, portName);
+			issue(PluginIssueType::UnknownPortType, portName);
 		}
 	}
 
@@ -263,16 +265,16 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 		// be non-Lv2-conforming
 		if(m_min == std::numeric_limits<decltype(m_min)>::lowest())
 		{
-			issue(PluginIssueType::logScaleMinMissing, portName);
+			issue(PluginIssueType::LogScaleMinMissing, portName);
 		}
 		if(m_max == std::numeric_limits<decltype(m_max)>::max())
 		{
-			issue(PluginIssueType::logScaleMaxMissing, portName);
+			issue(PluginIssueType::LogScaleMaxMissing, portName);
 		}
 		// forbid min < 0 < max
 		if(m_min < 0.f && m_max > 0.f)
 		{
-			issue(PluginIssueType::logScaleMinMaxDifferentSigns, portName);
+			issue(PluginIssueType::LogScaleMinMaxDifferentSigns, portName);
 		}
 		m_logarithmic = true;
 	}
@@ -350,16 +352,7 @@ void AtomSeq::Lv2EvbufDeleter::operator()(LV2_Evbuf *n) { lv2_evbuf_free(n); }
 
 
 
-// make the compiler happy, give each class with virtuals
-// a function (the destructor here) which is in a cpp file
-PortBase::~PortBase() {}
-ConstVisitor::~ConstVisitor() {}
-Visitor::~Visitor() {}
-
-
-
-
-} // namespace Lv2Ports
+} // namespace lmms::Lv2Ports
 
 #endif // LMMS_HAVE_LV2
 
