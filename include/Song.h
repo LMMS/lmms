@@ -488,7 +488,7 @@ private:
 	const MidiClip* m_midiClipToPlay;
 	bool m_loopMidiClip;
 
-	double m_elapsedMilliSeconds[PlayModeCount];
+	std::array<std::atomic<double>, PlayModeCount> m_elapsedMilliSeconds;
 	tick_t m_elapsedTicks;
 	bar_t m_elapsedBars;
 

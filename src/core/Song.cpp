@@ -99,7 +99,7 @@ Song::Song() :
 	m_loopRenderRemaining(1),
 	m_oldAutomatedValues()
 {
-	for (double& millisecondsElapsed : m_elapsedMilliSeconds) { millisecondsElapsed = 0; }
+	for (auto& millisecondsElapsed : m_elapsedMilliSeconds) { millisecondsElapsed.store(0); }
 	connect( &m_tempoModel, SIGNAL(dataChanged()),
 			this, SLOT(setTempo()), Qt::DirectConnection );
 	connect( &m_tempoModel, SIGNAL(dataUnchanged()),
@@ -349,7 +349,8 @@ void Song::processNextBuffer()
 		frameOffsetInPeriod += framesToPlay;
 		frameOffsetInTick += framesToPlay;
 		getPlayPos().setCurrentFrame(frameOffsetInTick);
-		m_elapsedMilliSeconds[static_cast<std::size_t>(m_playMode)] += TimePos::ticksToMilliseconds(framesToPlay / framesPerTick, getTempo());
+		auto& elapsedMilliSeconds = m_elapsedMilliSeconds[static_cast<std::size_t>(m_playMode)];
+		elapsedMilliSeconds.store(elapsedMilliSeconds + TimePos::ticksToMilliseconds(framesToPlay / framesPerTick, getTempo()));
 		m_elapsedBars = getPlayPos(PlayMode::Song).getBar();
 		m_elapsedTicks = (getPlayPos(PlayMode::Song).getTicks() % ticksPerBar()) / 48;
 	}
@@ -593,7 +594,8 @@ void Song::setPlayPos( tick_t ticks, PlayMode playMode )
 {
 	tick_t ticksFromPlayMode = getPlayPos(playMode).getTicks();
 	m_elapsedTicks += ticksFromPlayMode - ticks;
-	m_elapsedMilliSeconds[static_cast<std::size_t>(playMode)] += TimePos::ticksToMilliseconds( ticks - ticksFromPlayMode, getTempo() );
+	auto& elapsedMilliSeconds = m_elapsedMilliSeconds[static_cast<std::size_t>(playMode)];
+	elapsedMilliSeconds.store(elapsedMilliSeconds + TimePos::ticksToMilliseconds(ticks - ticksFromPlayMode, getTempo()));
 	getPlayPos(playMode).setTicks( ticks );
 	getPlayPos(playMode).setCurrentFrame( 0.0f );
 	getPlayPos(playMode).setJumped( true );
@@ -678,7 +680,7 @@ void Song::stop()
 	}
 	m_playing = false;
 
-	m_elapsedMilliSeconds[static_cast<std::size_t>(PlayMode::None)] = m_elapsedMilliSeconds[static_cast<std::size_t>(m_playMode)];
+	m_elapsedMilliSeconds[static_cast<std::size_t>(PlayMode::None)].store(m_elapsedMilliSeconds[static_cast<std::size_t>(m_playMode)]);
 	getPlayPos(PlayMode::None).setTicks(getPlayPos().getTicks());
 
 	getPlayPos().setCurrentFrame( 0 );
