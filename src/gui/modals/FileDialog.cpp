@@ -48,9 +48,7 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 
 #ifdef LMMS_BUILD_LINUX
 	QList<QUrl> urls;
-#endif
-
-#ifndef LMMS_BUILD_LINUX
+#else
 	QList<QUrl> urls = sidebarUrls();
 #endif
 
