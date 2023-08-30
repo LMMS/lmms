@@ -625,8 +625,11 @@ void MixerView::updateFaders()
 	Mixer * m = Engine::mixer();
 
 	// apply master gain
-	m->mixerChannel(0)->m_peakLeft *= Engine::audioEngine()->masterGain();
-	m->mixerChannel(0)->m_peakRight *= Engine::audioEngine()->masterGain();
+	const auto masterGain = Engine::audioEngine()->masterGain();
+	auto& peakLeft = m->mixerChannel(0)->m_peakLeft;
+	auto& peakRight = m->mixerChannel(0)->m_peakRight;
+	peakLeft.store(peakLeft * masterGain);
+	peakRight.store(peakLeft * masterGain);
 
 	for( int i = 0; i < m_mixerChannelViews.size(); ++i )
 	{

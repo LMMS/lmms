@@ -54,8 +54,8 @@ class MixerChannel : public ThreadableJob
 		// set to true if any effect in the channel is enabled and running
 		bool m_stillRunning;
 
-		float m_peakLeft;
-		float m_peakRight;
+		std::atomic<float> m_peakLeft;
+		std::atomic<float> m_peakRight;
 		sampleFrame * m_buffer;
 		bool m_muteBeforeSolo;
 		BoolModel m_muteModel;
