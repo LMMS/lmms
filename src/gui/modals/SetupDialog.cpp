@@ -147,7 +147,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_bufferSize(ConfigManager::inst()->value(
 			"audioengine", "framesperaudiobuffer").toInt()),
 	m_midiAutoQuantize(ConfigManager::inst()->value(
-			"midi", "autoquantize").toInt()),
+			"midi", "autoquantize", "0").toInt() != 0),
 	m_workingDir(QDir::toNativeSeparators(ConfigManager::inst()->workingDir())),
 	m_vstDir(QDir::toNativeSeparators(ConfigManager::inst()->vstDir())),
 	m_ladspaDir(QDir::toNativeSeparators(ConfigManager::inst()->ladspaDir())),
