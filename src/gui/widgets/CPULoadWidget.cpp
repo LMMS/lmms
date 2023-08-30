@@ -35,6 +35,7 @@
 namespace lmms::gui
 {
 
+
 CPULoadWidget::CPULoadWidget( QWidget * _parent ) :
 	QWidget( _parent ),
 	m_currentLoad( 0 ),

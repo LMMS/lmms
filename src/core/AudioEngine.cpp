@@ -394,14 +394,14 @@ void AudioEngine::renderStageInstruments()
 {
 	m_profiler.startDetail(AudioEngineProfiler::DetailType::Instruments);
 
-	AudioEngineWorkerThread::fillJobQueue<>(m_playHandles);
+	AudioEngineWorkerThread::fillJobQueue(m_playHandles);
 	AudioEngineWorkerThread::startAndWaitForJobs();
 
 	// removed all play handles which are done
 	for( PlayHandleList::Iterator it = m_playHandles.begin();
-		it != m_playHandles.end(); )
+						it != m_playHandles.end(); )
 	{
-		if ( ( *it )->affinityMatters() &&
+		if( ( *it )->affinityMatters() &&
 			( *it )->affinity() != QThread::currentThread() )
 		{
 			++it;
@@ -410,7 +410,7 @@ void AudioEngine::renderStageInstruments()
 		if( ( *it )->isFinished() )
 		{
 			( *it )->audioPort()->removePlayHandle( ( *it ) );
-			if ((*it)->type() == PlayHandle::Type::NotePlayHandle)
+			if( ( *it )->type() == PlayHandle::Type::NotePlayHandle )
 			{
 				NotePlayHandleManager::release( (NotePlayHandle*) *it );
 			}
