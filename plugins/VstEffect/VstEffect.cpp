@@ -49,10 +49,10 @@ Plugin::Descriptor PLUGIN_EXPORT vsteffect_plugin_descriptor =
 				"plugin for using arbitrary VST effects inside LMMS." ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0200,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
-	new VstSubPluginFeatures( Plugin::Effect )
+	new VstSubPluginFeatures( Plugin::Type::Effect )
 } ;
 
 }

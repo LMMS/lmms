@@ -56,28 +56,28 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 	// Disable effects that are of type "DummyEffect"
 	bool isEnabled = !dynamic_cast<DummyEffect *>( effect() );
-	m_bypass = new LedCheckBox( this, "", isEnabled ? LedCheckBox::Green : LedCheckBox::Red );
+	m_bypass = new LedCheckBox( this, "", isEnabled ? LedCheckBox::LedColor::Green : LedCheckBox::LedColor::Red );
 	m_bypass->move( 3, 3 );
 	m_bypass->setEnabled( isEnabled );
 
 	m_bypass->setToolTip(tr("On/Off"));
 
 
-	m_wetDry = new Knob( knobBright_26, this );
+	m_wetDry = new Knob( KnobType::Bright26, this );
 	m_wetDry->setLabel( tr( "W/D" ) );
 	m_wetDry->move( 40 - m_wetDry->width() / 2, 5 );
 	m_wetDry->setEnabled( isEnabled );
 	m_wetDry->setHintText( tr( "Wet Level:" ), "" );
 
 
-	m_autoQuit = new TempoSyncKnob( knobBright_26, this );
+	m_autoQuit = new TempoSyncKnob( KnobType::Bright26, this );
 	m_autoQuit->setLabel( tr( "DECAY" ) );
 	m_autoQuit->move( 78 - m_autoQuit->width() / 2, 5 );
 	m_autoQuit->setEnabled( isEnabled && !effect()->m_autoQuitDisabled );
 	m_autoQuit->setHintText( tr( "Time:" ), "ms" );
 
 
-	m_gate = new Knob( knobBright_26, this );
+	m_gate = new Knob( KnobType::Bright26, this );
 	m_gate->setLabel( tr( "GATE" ) );
 	m_gate->move( 116 - m_gate->width() / 2, 5 );
 	m_gate->setEnabled( isEnabled && !effect()->m_autoQuitDisabled );

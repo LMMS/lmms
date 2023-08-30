@@ -51,19 +51,19 @@ DispersionControlDialog::DispersionControlDialog(DispersionControls* controls) :
 	m_amountBox->setLabel(tr("AMOUNT"));
 	m_amountBox->setToolTip(tr("Number of all-pass filters"));
 	
-	Knob * freqKnob = new Knob(knobBright_26, this);
+	Knob * freqKnob = new Knob(KnobType::Bright26, this);
 	freqKnob->move(59, 8);
 	freqKnob->setModel(&controls->m_freqModel);
 	freqKnob->setLabel(tr("FREQ"));
 	freqKnob->setHintText(tr("Frequency:") , " Hz");
 	
-	Knob * resoKnob = new Knob(knobBright_26, this);
+	Knob * resoKnob = new Knob(KnobType::Bright26, this);
 	resoKnob->move(99, 8);
 	resoKnob->setModel(&controls->m_resoModel);
 	resoKnob->setLabel(tr("RESO"));
 	resoKnob->setHintText(tr("Resonance:") , " octaves");
 	
-	Knob * feedbackKnob = new Knob(knobBright_26, this);
+	Knob * feedbackKnob = new Knob(KnobType::Bright26, this);
 	feedbackKnob->move(139, 8);
 	feedbackKnob->setModel(&controls->m_feedbackModel);
 	feedbackKnob->setLabel(tr("FEED"));

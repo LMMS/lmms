@@ -44,7 +44,7 @@ InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( Instrume
 	m_cc( cc ),
 	m_chordsGroupBox( new GroupBox( tr( "STACKING" ) ) ),
 	m_chordsComboBox( new ComboBox() ),
-	m_chordRangeKnob( new Knob( knobBright_26 ) )
+	m_chordRangeKnob( new Knob( KnobType::Bright26 ) )
 {
 	auto topLayout = new QHBoxLayout(this);
 	topLayout->setContentsMargins(0, 0, 0, 0);
@@ -98,13 +98,13 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	m_a( arp ),
 	m_arpGroupBox( new GroupBox( tr( "ARPEGGIO" ) ) ),
 	m_arpComboBox( new ComboBox() ),
-	m_arpRangeKnob( new Knob( knobBright_26 ) ),
-	m_arpRepeatsKnob( new Knob( knobBright_26 ) ),
-	m_arpCycleKnob( new Knob( knobBright_26 ) ),
-	m_arpSkipKnob( new Knob( knobBright_26 ) ),
-	m_arpMissKnob( new Knob( knobBright_26 ) ),
-	m_arpTimeKnob( new TempoSyncKnob( knobBright_26 ) ),
-	m_arpGateKnob( new Knob( knobBright_26 ) ),
+	m_arpRangeKnob( new Knob( KnobType::Bright26 ) ),
+	m_arpRepeatsKnob( new Knob( KnobType::Bright26 ) ),
+	m_arpCycleKnob( new Knob( KnobType::Bright26 ) ),
+	m_arpSkipKnob( new Knob( KnobType::Bright26 ) ),
+	m_arpMissKnob( new Knob( KnobType::Bright26 ) ),
+	m_arpTimeKnob( new TempoSyncKnob( KnobType::Bright26 ) ),
+	m_arpGateKnob( new Knob( KnobType::Bright26 ) ),
 	m_arpDirectionComboBox( new ComboBox() ),
 	m_arpModeComboBox( new ComboBox() )
 {

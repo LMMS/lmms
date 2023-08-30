@@ -25,6 +25,7 @@
 #ifndef LMMS_GUI_INSTRUMENT_TRACK_VIEW_H
 #define LMMS_GUI_INSTRUMENT_TRACK_VIEW_H
 
+#include "MixerLineLcdSpinBox.h"
 #include "TrackView.h"
 
 #include "InstrumentTrack.h"
@@ -72,6 +73,7 @@ public:
 
 
 protected:
+	void modelChanged() override;
 	void dragEnterEvent( QDragEnterEvent * _dee ) override;
 	void dropEvent( QDropEvent * _de ) override;
 
@@ -97,6 +99,7 @@ private:
 
 	// widgets in track-settings-widget
 	TrackLabelButton * m_tlb;
+	MixerLineLcdSpinBox* m_mixerChannelNumber;
 	Knob * m_volumeKnob;
 	Knob * m_panningKnob;
 	FadeButton * m_activityIndicator;

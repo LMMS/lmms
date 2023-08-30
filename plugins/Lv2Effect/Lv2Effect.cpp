@@ -46,10 +46,10 @@ Plugin::Descriptor PLUGIN_EXPORT lv2effect_plugin_descriptor =
 		"plugin for using arbitrary LV2-effects inside LMMS."),
 	"Johannes Lorenz <jlsf2013$$$users.sourceforge.net, $$$=@>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
-	new Lv2SubPluginFeatures(Plugin::Effect)
+	new Lv2SubPluginFeatures(Plugin::Type::Effect)
 };
 
 }
