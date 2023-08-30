@@ -48,11 +48,11 @@ class FadeButton;
 class TrackContainerView;
 
 
-const int DEFAULT_SETTINGS_WIDGET_WIDTH = 224;
+const int DEFAULT_SETTINGS_WIDGET_WIDTH = 256;
 const int TRACK_OP_WIDTH = 78;
 // This shaves 150-ish pixels off track buttons,
 // ruled from config: ui.compacttrackbuttons
-const int DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT = 96;
+const int DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT = 128;
 const int TRACK_OP_WIDTH_COMPACT = 62;
 
 

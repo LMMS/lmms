@@ -56,8 +56,10 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	connect(m_tlb, SIGNAL(clicked(bool)),
 			this, SLOT(showEffects()));
 	m_tlb->setIcon(embed::getIconPixmap("sample_track"));
-	m_tlb->move(3, 1);
 	m_tlb->show();
+
+	m_mixerChannelNumber = new MixerLineLcdSpinBox(2, getTrackSettingsWidget(), tr("Mixer channel"), this);
+	m_mixerChannelNumber->show();
 
 	m_volumeKnob = new Knob( KnobType::Small17, getTrackSettingsWidget(),
 						    tr( "Track volume" ) );
@@ -65,11 +67,6 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	m_volumeKnob->setModel( &_t->m_volumeModel );
 	m_volumeKnob->setHintText( tr( "Channel volume:" ), "%" );
 
-	int settingsWidgetWidth = ConfigManager::inst()->
-					value( "ui", "compacttrackbuttons" ).toInt()
-				? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT
-				: DEFAULT_SETTINGS_WIDGET_WIDTH;
-	m_volumeKnob->move( settingsWidgetWidth - 2 * 24, 2 );
 	m_volumeKnob->setLabel( tr( "VOL" ) );
 	m_volumeKnob->show();
 
@@ -77,7 +74,6 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 							tr( "Panning" ) );
 	m_panningKnob->setModel( &_t->m_panningModel );
 	m_panningKnob->setHintText( tr( "Panning:" ), "%" );
-	m_panningKnob->move( settingsWidgetWidth - 24, 2 );
 	m_panningKnob->setLabel( tr( "PAN" ) );
 	m_panningKnob->show();
 
@@ -87,8 +83,18 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 		QApplication::palette().color(QPalette::Active, QPalette::BrightText).darker(),
 		getTrackSettingsWidget()
 	);
-	m_activityIndicator->setGeometry(settingsWidgetWidth - 2 * 24 - 11, 2, 8, 28);
+	m_activityIndicator->setFixedSize(8, 28);
 	m_activityIndicator->show();
+
+	auto layout = new QHBoxLayout(getTrackSettingsWidget());
+	layout->setContentsMargins(0, 0, 0, 0);
+	layout->setSpacing(0);
+	layout->addWidget(m_tlb);
+	layout->addWidget(m_mixerChannelNumber);
+	layout->addWidget(m_activityIndicator);
+	layout->addWidget(m_volumeKnob);
+	layout->addWidget(m_panningKnob);
+
 	connect(_t, SIGNAL(playingChanged()), this, SLOT(updateIndicator()));
 
 	setModel( _t );
@@ -170,6 +176,7 @@ void SampleTrackView::modelChanged()
 {
 	auto st = castModel<SampleTrack>();
 	m_volumeKnob->setModel(&st->m_volumeModel);
+	m_mixerChannelNumber->setModel(&st->m_mixerChannelModel);
 
 	TrackView::modelChanged();
 }

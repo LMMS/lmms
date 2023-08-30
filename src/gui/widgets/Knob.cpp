@@ -22,6 +22,8 @@
  *
  */
 
+#include "Knob.h"
+
 #include <memory>
 #include <QApplication>
 #include <QFontMetrics>
@@ -34,7 +36,6 @@
 #endif
 
 #include "lmms_math.h"
-#include "Knob.h"
 #include "CaptionMenu.h"
 #include "ConfigManager.h"
 #include "ControllerConnection.h"
@@ -47,7 +48,6 @@
 #include "ProjectJournal.h"
 #include "SimpleTextFloat.h"
 #include "StringPairDrag.h"
-
 
 namespace lmms::gui
 {
@@ -484,6 +484,13 @@ void Knob::drawKnob( QPainter * _p )
 	_p->drawImage( 0, 0, m_cache );
 }
 
+void Knob::showTextFloat(int msecBeforeDisplay, int msecDisplayTime)
+{
+	s_textFloat->setText(displayValue());
+	s_textFloat->moveGlobal(this, QPoint(width() + 2, 0));
+	s_textFloat->showWithDelay(msecBeforeDisplay, msecDisplayTime);
+}
+
 float Knob::getValue( const QPoint & _p )
 {
 	float value;
@@ -580,10 +587,8 @@ void Knob::mousePressEvent( QMouseEvent * _me )
 
 		emit sliderPressed();
 
-		s_textFloat->setText( displayValue() );
-		s_textFloat->moveGlobal( this,
-				QPoint( width() + 2, 0 ) );
-		s_textFloat->show();
+		showTextFloat(0, 0);
+
 		m_buttonPressed = true;
 	}
 	else if( _me->button() == Qt::LeftButton &&
@@ -613,6 +618,7 @@ void Knob::mouseMoveEvent( QMouseEvent * _me )
 		m_lastMousePos = _me->pos();
 	}
 	s_textFloat->setText( displayValue() );
+	s_textFloat->show();
 }
 
 
@@ -638,7 +644,15 @@ void Knob::mouseReleaseEvent( QMouseEvent* event )
 	s_textFloat->hide();
 }
 
+void Knob::enterEvent(QEvent *event)
+{
+	showTextFloat(700, 2000);
+}
 
+void Knob::leaveEvent(QEvent *event)
+{
+	s_textFloat->hide();
+}
 
 
 void Knob::focusOutEvent( QFocusEvent * _fe )
