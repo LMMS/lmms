@@ -715,7 +715,7 @@ void Sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 		pluginData->isNew = true;
 		pluginData->offset = _n->offset();
 		pluginData->noteOffSent = false;
-		pluginData->panning = std::clamp(PanningLeft, _n->getPanning(), PanningRight);
+		pluginData->panning = _n->getPanning();
 
 		_n->m_pluginData = pluginData;
 
