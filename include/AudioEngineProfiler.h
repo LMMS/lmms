@@ -54,7 +54,7 @@ public:
 
 	void setOutputFile( const QString& outputFile );
 
-	enum DetailType {
+	enum class DetailType {
 		NoteSetup,
 		Instruments,
 		Effects,
@@ -62,10 +62,13 @@ public:
 		DetailCount
 	};
 
-	void startDetail(const DetailType type) { m_detailTimer[type].reset(); }
-	void finishDetail(const DetailType type) { m_detailTime[type] = m_detailTimer[type].elapsed(); }
+	void startDetail(const DetailType type) { m_detailTimer[static_cast<int>(type)].reset(); }
+	void finishDetail(const DetailType type)
+	{
+		m_detailTime[static_cast<int>(type)] = m_detailTimer[static_cast<int>(type)].elapsed();
+	}
 
-	int detailLoad(const DetailType type) const { return m_detailLoad[type]; }
+	int detailLoad(const DetailType type) const { return m_detailLoad[static_cast<int>(type)]; }
 
 private:
 	MicroTimer m_periodTimer;
@@ -73,9 +76,9 @@ private:
 	QFile m_outputFile;
 
 	// Use arrays to avoid dynamic allocations in realtime code
-	std::array<MicroTimer, DetailCount> m_detailTimer;
-	std::array<int, DetailCount> m_detailTime{0};
-	std::array<float, DetailCount> m_detailLoad{0};
+	std::array<MicroTimer, static_cast<int>(DetailType::DetailCount)> m_detailTimer;
+	std::array<int, static_cast<int>(DetailType::DetailCount)> m_detailTime{0};
+	std::array<float, static_cast<int>(DetailType::DetailCount)> m_detailLoad{0};
 };
 
 } // namespace lmms

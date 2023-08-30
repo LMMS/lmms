@@ -53,7 +53,7 @@ void AudioEngineProfiler::finishPeriod( sample_rate_t sampleRate, fpp_t framesPe
 	m_cpuLoad = std::min(newCpuLoad * 0.1f + m_cpuLoad * 0.9f, 100.f);
 
 	// Compute detailed load analysis. Can use stronger averaging to get more stable readout.
-	for (int i = 0; i < DetailCount; i++)
+	for (int i = 0; i < static_cast<int>(DetailType::DetailCount); i++)
 	{
 		const int newLoad = 100 * m_detailTime[i] / timeLimit;
 		m_detailLoad[i] = std::min(newLoad * 0.05f + m_detailLoad[i] * 0.95f, 100.f);
