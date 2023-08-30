@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef FILE_BROWSER_H
-#define FILE_BROWSER_H
+#ifndef LMMS_GUI_FILE_BROWSER_H
+#define LMMS_GUI_FILE_BROWSER_H
 
 #include <QCheckBox>
 #include <QDir>
@@ -224,20 +223,19 @@ private:
 class FileItem : public QTreeWidgetItem
 {
 public:
-	enum FileTypes
+	enum class FileType
 	{
-		ProjectFile,
-		PresetFile,
-		SampleFile,
-		SoundFontFile,
-		PatchFile,
-		MidiFile,
-		VstPluginFile,
-		UnknownFile,
-		NumFileTypes
+		Project,
+		Preset,
+		Sample,
+		SoundFont,
+		Patch,
+		Midi,
+		VstPlugin,
+		Unknown
 	} ;
 
-	enum FileHandling
+	enum class FileHandling
 	{
 		NotSupported,
 		LoadAsProject,
@@ -256,7 +254,7 @@ public:
 		return QFileInfo(m_path, text(0)).absoluteFilePath();
 	}
 
-	inline FileTypes type() const
+	inline FileType type() const
 	{
 		return( m_type );
 	}
@@ -268,7 +266,7 @@ public:
 
 	inline bool isTrack() const
 	{
-		return m_handling == LoadAsPreset || m_handling == LoadByPlugin;
+		return m_handling == FileHandling::LoadAsPreset || m_handling == FileHandling::LoadByPlugin;
 	}
 
 	QString extension();
@@ -288,7 +286,7 @@ private:
 	static QPixmap * s_unknownFilePixmap;
 
 	QString m_path;
-	FileTypes m_type;
+	FileType m_type;
 	FileHandling m_handling;
 
 } ;
@@ -298,4 +296,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_FILE_BROWSER_H

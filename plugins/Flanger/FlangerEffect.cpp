@@ -24,6 +24,9 @@
 
 #include "FlangerEffect.h"
 #include "Engine.h"
+#include "MonoDelay.h"
+#include "Noise.h"
+#include "QuadratureLfo.h"
 
 #include "embed.h"
 #include "plugin_export.h"
@@ -42,7 +45,7 @@ Plugin::Descriptor PLUGIN_EXPORT flanger_plugin_descriptor =
 	QT_TRANSLATE_NOOP( "PluginBrowser", "A native flanger plugin" ),
 	"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,
@@ -104,7 +107,7 @@ bool FlangerEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 	m_lfo->setOffset( m_flangerControls.m_lfoPhaseModel.value() / 180 * D_PI );
 	m_lDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
 	m_rDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
-	sample_t dryS[2];
+	auto dryS = std::array<sample_t, 2>{};
 	float leftLfo;
 	float rightLfo;
 	for( fpp_t f = 0; f < frames; ++f )

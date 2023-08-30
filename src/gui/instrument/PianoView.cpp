@@ -62,9 +62,9 @@ namespace lmms::gui
 
 /*! The scale of C Major - white keys only.
  */
-Keys WhiteKeys[] =
+auto WhiteKeys = std::array
 {
-	Key_C, Key_D, Key_E, Key_F, Key_G, Key_A, Key_H
+	Key::C, Key::D, Key::E, Key::F, Key::G, Key::A, Key::H
 } ;
 
 
@@ -95,7 +95,7 @@ PianoView::PianoView(QWidget *parent) :
 	QWidget(parent),                 /*!< Our parent */
 	ModelView(nullptr, this),        /*!< Our view Model */
 	m_piano(nullptr),                /*!< Our piano Model */
-	m_startKey(Key_C + Octave_3*KeysPerOctave), /*!< The first key displayed? */
+	m_startKey(Octave::Octave_3 + Key::C), /*!< The first key displayed? */
 	m_lastKey(-1),                   /*!< The last key displayed? */
 	m_movedNoteModel(nullptr)        /*!< Key marker which is being moved */
 {
@@ -138,7 +138,7 @@ PianoView::PianoView(QWidget *parent) :
 	m_pianoScroll = new QScrollBar( Qt::Horizontal, this );
 	m_pianoScroll->setSingleStep( 1 );
 	m_pianoScroll->setPageStep( 20 );
-	m_pianoScroll->setValue(Octave_3 * Piano::WhiteKeysPerOctave);
+	m_pianoScroll->setValue(static_cast<int>(Octave::Octave_3) * Piano::WhiteKeysPerOctave);
 
 	// and connect it to this widget
 	connect( m_pianoScroll, SIGNAL(valueChanged(int)),
@@ -147,7 +147,7 @@ PianoView::PianoView(QWidget *parent) :
 	// create a layout for ourselves
 	auto layout = new QVBoxLayout(this);
 	layout->setSpacing( 0 );
-	layout->setMargin( 0 );
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->addSpacing( PIANO_BASE+PW_WHITE_KEY_HEIGHT );
 	layout->addWidget( m_pianoScroll );
 
@@ -155,14 +155,10 @@ PianoView::PianoView(QWidget *parent) :
 	connect(Engine::getSong(), SIGNAL(keymapListChanged(int)), this, SLOT(update()));
 }
 
-/*! \brief Map a keyboard key being pressed to a note in our keyboard view
- *
- *  \param _k The keyboard scan code of the key being pressed.
- *  \todo check the scan codes for ',' = c, 'L' = c#, '.' = d, ':' = d#,
- *     '/' = d, '[' = f', '=' = f'#, ']' = g' - Paul's additions
- */
-int PianoView::getKeyFromKeyEvent( QKeyEvent * _ke )
+static int getKeyOffsetFromKeyEvent( QKeyEvent * _ke )
 {
+	// TODO: check the scan codes for ',' = c, 'L' = c#, '.' = d, ':' = d#,
+	// '/' = d, '[' = f', '=' = f'#, ']' = g' - Paul's additions
 #ifdef LMMS_BUILD_APPLE
 	const int k = _ke->nativeVirtualKey();
 #else
@@ -297,8 +293,14 @@ int PianoView::getKeyFromKeyEvent( QKeyEvent * _ke )
 	return -100;
 }
 
-
-
+/*! \brief Map a keyboard key being pressed to a note in our keyboard view
+ *
+ */
+int PianoView::getKeyFromKeyEvent( QKeyEvent * ke )
+{
+	const auto key = static_cast<Key>(getKeyOffsetFromKeyEvent(ke));
+	return DefaultOctave + key - KeysPerOctave;
+}
 
 /*! \brief Register a change to this piano display view
  *
@@ -398,8 +400,8 @@ int PianoView::getKeyFromMouse( const QPoint & _p ) const
  */
 void PianoView::pianoScrolled(int new_pos)
 {
-	m_startKey = WhiteKeys[new_pos % Piano::WhiteKeysPerOctave] +
-		(new_pos / Piano::WhiteKeysPerOctave) * KeysPerOctave;
+	m_startKey = static_cast<Octave>(new_pos / Piano::WhiteKeysPerOctave)
+		+ WhiteKeys[new_pos % Piano::WhiteKeysPerOctave];
 
 	update();
 }
@@ -625,8 +627,7 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
  */
 void PianoView::keyPressEvent( QKeyEvent * _ke )
 {
-	const int key_num = getKeyFromKeyEvent( _ke ) +
-				( DefaultOctave - 1 ) * KeysPerOctave;
+	const int key_num = getKeyFromKeyEvent( _ke );
 
 	if( _ke->isAutoRepeat() == false && key_num > -1 )
 	{
@@ -654,8 +655,7 @@ void PianoView::keyPressEvent( QKeyEvent * _ke )
  */
 void PianoView::keyReleaseEvent( QKeyEvent * _ke )
 {
-	const int key_num = getKeyFromKeyEvent( _ke ) +
-				( DefaultOctave - 1 ) * KeysPerOctave;
+	const int key_num = getKeyFromKeyEvent( _ke );
 	if( _ke->isAutoRepeat() == false && key_num > -1 )
 	{
 		if( m_piano != nullptr )
@@ -913,7 +913,7 @@ void PianoView::paintEvent( QPaintEvent * )
 
 		x += PW_WHITE_KEY_WIDTH;
 
-		if ((Keys)(cur_key % KeysPerOctave) == Key_C)
+		if ((Key)(cur_key % KeysPerOctave) == Key::C)
 		{
 			// label key of note C with "C" and number of current octave
 			p.drawText(x - PW_WHITE_KEY_WIDTH, LABEL_TEXT_SIZE + 2,
@@ -927,7 +927,7 @@ void PianoView::paintEvent( QPaintEvent * )
 	int white_cnt = 0;
 
 	int startKey = m_startKey;
-	if (startKey > 0 && Piano::isBlackKey(static_cast<Keys>(--startKey)))
+	if (startKey > 0 && Piano::isBlackKey(--startKey))
 	{
 		if (m_piano && m_piano->instrumentTrack()->isKeyMapped(startKey))
 		{

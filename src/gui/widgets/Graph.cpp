@@ -36,7 +36,7 @@ namespace lmms
 namespace gui
 {
 
-Graph::Graph( QWidget * _parent, graphStyle _style, int _width,
+Graph::Graph( QWidget * _parent, Style _style, int _width,
 		int _height ) :
 	QWidget( _parent ),
 	/* TODO: size, background? */
@@ -305,7 +305,7 @@ void Graph::paintEvent( QPaintEvent * )
 
 	switch( m_graphStyle )
 	{
-		case Graph::LinearStyle:
+		case Style::Linear:
 			p.setRenderHints( QPainter::Antialiasing, true );
 
 			for( int i=0; i < length; i++ )
@@ -329,7 +329,7 @@ void Graph::paintEvent( QPaintEvent * )
 			break;
 
 
-		case Graph::NearestStyle:
+		case Style::Nearest:
 			for( int i=0; i < length; i++ )
 			{
 				p.drawLine(2+static_cast<int>(i*xscale),
@@ -350,7 +350,7 @@ void Graph::paintEvent( QPaintEvent * )
 				2+static_cast<int>( ( (*samps)[length] - maxVal ) * yscale ) );
 			break;
 
-		case Graph::LinearNonCyclicStyle:
+		case Style::LinearNonCyclic:
 			p.setRenderHints( QPainter::Antialiasing, true );
 
 			for( int i=0; i < length; i++ )
@@ -369,7 +369,7 @@ void Graph::paintEvent( QPaintEvent * )
 			p.setRenderHints( QPainter::Antialiasing, false );
 			break;
 
-		case Graph::BarStyle:
+		case Style::Bar:
 			for( int i=0; i <= length; i++ )
 			{
 				p.fillRect( 2+static_cast<int>( i*xscale ),

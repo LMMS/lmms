@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_ENGINE_PROFILER_H
-#define AUDIO_ENGINE_PROFILER_H
+#ifndef LMMS_AUDIO_ENGINE_PROFILER_H
+#define LMMS_AUDIO_ENGINE_PROFILER_H
 
 #include <array>
 #include <QFile>
@@ -80,4 +80,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AUDIO_ENGINE_PROFILER_H

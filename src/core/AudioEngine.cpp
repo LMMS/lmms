@@ -81,7 +81,7 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	m_workers(),
 	m_numWorkers( QThread::idealThreadCount()-1 ),
 	m_newPlayHandles( PlayHandle::MaxNumber ),
-	m_qualitySettings( qualitySettings::Mode_Draft ),
+	m_qualitySettings( qualitySettings::Mode::Draft ),
 	m_masterGain( 1.0f ),
 	m_isProcessing( false ),
 	m_audioDev( nullptr ),
@@ -314,7 +314,7 @@ void AudioEngine::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
 
 	if( frames + _frames > size )
 	{
-		size = qMax( size * 2, frames + _frames );
+		size = std::max(size * 2, frames + _frames);
 		auto ab = new sampleFrame[size];
 		memcpy( ab, buf, frames * sizeof( sampleFrame ) );
 		delete [] buf;
@@ -354,7 +354,7 @@ void AudioEngine::renderStageNoteSetup()
 		if (it != m_playHandles.end())
 		{
 			(*it)->audioPort()->removePlayHandle((*it));
-			if ((*it)->type() == PlayHandle::TypeNotePlayHandle)
+			if ((*it)->type() == PlayHandle::Type::NotePlayHandle)
 			{
 				NotePlayHandleManager::release((NotePlayHandle*)*it);
 			}
@@ -411,7 +411,7 @@ void AudioEngine::renderStageInstruments()
 		if ((*it)->isFinished())
 		{
 			(*it)->audioPort()->removePlayHandle((*it));
-			if ((*it)->type() == PlayHandle::TypeNotePlayHandle)
+			if ((*it)->type() == PlayHandle::Type::NotePlayHandle)
 			{
 				NotePlayHandleManager::release((NotePlayHandle*)*it);
 			}
@@ -432,7 +432,8 @@ void AudioEngine::renderStageEffects()
 {
 	m_profiler.startDetail(AudioEngineProfiler::DetailType::Effects);
 
-	AudioEngineWorkerThread::fillJobQueue<QVector<AudioPort*>>(m_audioPorts);
+	// STAGE 2: process effects of all instrument- and sampletracks
+	AudioEngineWorkerThread::fillJobQueue(m_audioPorts);
 	AudioEngineWorkerThread::startAndWaitForJobs();
 
 	m_profiler.finishDetail(AudioEngineProfiler::DetailType::Effects);
@@ -498,12 +499,12 @@ void AudioEngine::handleMetronome()
 	static tick_t lastMetroTicks = -1;
 
 	Song * song = Engine::getSong();
-	Song::PlayModes currentPlayMode = song->playMode();
+	Song::PlayMode currentPlayMode = song->playMode();
 
 	bool metronomeSupported =
-		currentPlayMode == Song::Mode_PlayMidiClip
-		|| currentPlayMode == Song::Mode_PlaySong
-		|| currentPlayMode == Song::Mode_PlayPattern;
+		currentPlayMode == Song::PlayMode::MidiClip
+		|| currentPlayMode == Song::PlayMode::Song
+		|| currentPlayMode == Song::PlayMode::Pattern;
 
 	if (!metronomeSupported || !m_metronomeActive || song->isExporting())
 	{
@@ -568,7 +569,7 @@ void AudioEngine::clearInternal()
 	// TODO: m_midiClient->noteOffAll();
 	for (auto ph : m_playHandles)
 	{
-		if (ph->type() != PlayHandle::TypeInstrumentPlayHandle)
+		if (ph->type() != PlayHandle::Type::InstrumentPlayHandle)
 		{
 			m_playHandlesToRemove.push_back(ph);
 		}
@@ -585,8 +586,8 @@ AudioEngine::StereoSample AudioEngine::getPeakValues(sampleFrame * ab, const f_c
 
 	for (f_cnt_t f = 0; f < frames; ++f)
 	{
-		float const absLeft = qAbs(ab[f][0]);
-		float const absRight = qAbs(ab[f][1]);
+		float const absLeft = std::abs(ab[f][0]);
+		float const absRight = std::abs(ab[f][1]);
 		if (absLeft > peakLeft)
 		{
 			peakLeft = absLeft;
@@ -697,7 +698,7 @@ void AudioEngine::removeAudioPort(AudioPort * port)
 {
 	requestChangeInModel();
 
-	QVector<AudioPort *>::Iterator it = std::find(m_audioPorts.begin(), m_audioPorts.end(), port);
+	auto it = std::find(m_audioPorts.begin(), m_audioPorts.end(), port);
 	if (it != m_audioPorts.end())
 	{
 		m_audioPorts.erase(it);
@@ -715,7 +716,7 @@ bool AudioEngine::addPlayHandle( PlayHandle* handle )
 		return true;
 	}
 
-	if( handle->type() == PlayHandle::TypeNotePlayHandle )
+	if( handle->type() == PlayHandle::Type::NotePlayHandle )
 	{
 		NotePlayHandleManager::release( (NotePlayHandle*)handle );
 	}
@@ -766,7 +767,7 @@ void AudioEngine::removePlayHandle(PlayHandle * ph)
 		// (See tobydox's 2008 commit 4583e48)
 		if ( removedFromList )
 		{
-			if (ph->type() == PlayHandle::TypeNotePlayHandle)
+			if (ph->type() == PlayHandle::Type::NotePlayHandle)
 			{
 				NotePlayHandleManager::release(dynamic_cast<NotePlayHandle*>(ph));
 			}
@@ -783,7 +784,7 @@ void AudioEngine::removePlayHandle(PlayHandle * ph)
 
 
 
-void AudioEngine::removePlayHandlesOfTypes(Track * track, const quint8 types)
+void AudioEngine::removePlayHandlesOfTypes(Track * track, PlayHandle::Types types)
 {
 	requestChangeInModel();
 	PlayHandleList::Iterator it = m_playHandles.begin();
@@ -792,7 +793,7 @@ void AudioEngine::removePlayHandlesOfTypes(Track * track, const quint8 types)
 		if ((*it)->isFromTrack(track) && ((*it)->type() & types))
 		{
 			( *it )->audioPort()->removePlayHandle( ( *it ) );
-			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
+			if( ( *it )->type() == PlayHandle::Type::NotePlayHandle )
 			{
 				NotePlayHandleManager::release( (NotePlayHandle*) *it );
 			}

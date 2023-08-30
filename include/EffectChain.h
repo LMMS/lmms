@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef EFFECT_CHAIN_H
-#define EFFECT_CHAIN_H
+#ifndef LMMS_EFFECT_CHAIN_H
+#define LMMS_EFFECT_CHAIN_H
 
 #include "Model.h"
 #include "SerializingObject.h"
@@ -69,7 +69,7 @@ public:
 
 
 private:
-	using EffectList = QVector<Effect*>;
+	using EffectList = std::vector<Effect*>;
 	EffectList m_effects;
 
 	BoolModel m_enabledModel;
@@ -85,5 +85,4 @@ signals:
 
 } // namespace lmms
 
-#endif
-
+#endif // LMMS_EFFECT_CHAIN_H

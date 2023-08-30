@@ -44,7 +44,7 @@ SideBarWidget::SideBarWidget( const QString & _title, const QPixmap & _icon,
 	m_contents = new QWidget( this );
 	m_layout = new QVBoxLayout( m_contents );
 	m_layout->setSpacing( 5 );
-	m_layout->setMargin( 0 );
+	m_layout->setContentsMargins(0, 0, 0, 0);
 	m_closeBtn = new QPushButton(embed::getIconPixmap("close"), QString(), this);
 	m_closeBtn->resize(m_buttonSize);
 	m_closeBtn->setToolTip(tr("Close"));
@@ -62,16 +62,16 @@ void SideBarWidget::paintEvent( QPaintEvent * )
 
 	QFont f = p.font();
 	f.setBold( true );
-	f.setUnderline( true );
+	f.setUnderline(false);
 	f.setPointSize( f.pointSize() + 2 );
 	p.setFont( f );
 
 	p.setPen( palette().highlightedText().color() );
 
-	const int tx = m_icon.width()+4;
+	const int tx = m_icon.width() + 8;
 
 	QFontMetrics metrics( f );
-	const int ty = metrics.ascent();
+	const int ty = (metrics.ascent() + m_icon.height()) / 2;
 	p.drawText( tx, ty, m_title );
 
 	p.drawPixmap( 2, 2, m_icon.transformed( QTransform().rotate( -90 ) ) );

@@ -44,7 +44,7 @@ PatternStore::PatternStore() :
 	// not change upon setCurrentPattern()-call
 	connect(&m_patternComboBoxModel, SIGNAL(dataUnchanged()),
 			this, SLOT(currentPatternChanged()));
-	setType(PatternContainer);
+	setType(Type::Pattern);
 }
 
 
@@ -97,7 +97,7 @@ bar_t PatternStore::lengthOfPattern(int pattern) const
 		// Don't create Clips here if they don't exist
 		if (pattern < t->numOfClips())
 		{
-			maxLength = qMax(maxLength, t->getClip(pattern)->length());
+			maxLength = std::max(maxLength, t->getClip(pattern)->length());
 		}
 	}
 
@@ -109,7 +109,7 @@ bar_t PatternStore::lengthOfPattern(int pattern) const
 
 int PatternStore::numOfPatterns() const
 {
-	return Engine::getSong()->countTracks(Track::PatternTrack);
+	return Engine::getSong()->countTracks(Track::Type::Pattern);
 }
 
 
@@ -125,7 +125,7 @@ void PatternStore::removePattern(int pattern)
 	}
 	if (pattern <= currentPattern())
 	{
-		setCurrentPattern(qMax(currentPattern() - 1, 0));
+		setCurrentPattern(std::max(currentPattern() - 1, 0));
 	}
 }
 
@@ -174,7 +174,7 @@ void PatternStore::fixIncorrectPositions()
 
 void PatternStore::play()
 {
-	if (Engine::getSong()->playMode() != Song::Mode_PlayPattern)
+	if (Engine::getSong()->playMode() != Song::PlayMode::Pattern)
 	{
 		Engine::getSong()->playPattern();
 	}
@@ -218,7 +218,7 @@ void PatternStore::currentPatternChanged()
 	TrackList tl = Engine::getSong()->tracks();
 	for (Track * t : tl)
 	{
-		if (t->type() == Track::PatternTrack)
+		if (t->type() == Track::Type::Pattern)
 		{
 			t->dataChanged();
 		}

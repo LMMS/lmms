@@ -2,7 +2,7 @@
  * VibratingString.h - model of a vibrating string lifted from pluckedSynth
  *
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/yahoo/com>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -21,10 +21,12 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-#ifndef _VIBRATING_STRING_H
-#define _VIBRATING_STRING_H
 
-#include <stdlib.h>
+#ifndef LMMS_VIBRATING_STRING_H
+#define LMMS_VIBRATING_STRING_H
+
+#include <memory>
+#include <cstdlib>
 
 #include "lmms_basics.h"
 
@@ -34,244 +36,219 @@ namespace lmms
 
 class VibratingString
 {
-
 public:
-	VibratingString(	float _pitch, 
-				float _pick, 
-				float _pickup,
-				float * impluse,
-				int _len,
-				sample_rate_t _sample_rate,
-				int _oversample,
-				float _randomize,
-				float _string_loss,
-				float _detune,
-				bool _state );
-	
-	inline ~VibratingString()
-	{
-		delete[] m_outsamp;
-		delete[] m_impulse;
-		VibratingString::freeDelayLine( m_fromBridge );
-		VibratingString::freeDelayLine( m_toBridge );
-	}
+	VibratingString() = default;
+	VibratingString(float pitch, float pick, float pickup, const float* impulse, int len,
+		sample_rate_t sampleRate, int oversample, float randomize, float stringLoss, float detune, bool state);
+	~VibratingString() = default;
 
-	inline sample_t nextSample()
-	{	
+	VibratingString(const VibratingString&) = delete;
+	VibratingString& operator=(const VibratingString&) = delete;
+	VibratingString(VibratingString&&) noexcept = delete;
+	VibratingString& operator=(VibratingString&&) noexcept = default;
+
+	sample_t nextSample()
+	{
 		sample_t ym0;
 		sample_t ypM;
-		for( int i = 0; i < m_oversample; i++)
+		for (int i = 0; i < m_oversample; ++i)
 		{
 			// Output at pickup position
-			m_outsamp[i] = fromBridgeAccess( m_fromBridge, 
-								m_pickupLoc );
-			m_outsamp[i] += toBridgeAccess( m_toBridge, 
-								m_pickupLoc );
-		
+			m_outsamp[i] = fromBridgeAccess(m_fromBridge.get(), m_pickupLoc);
+			m_outsamp[i] += toBridgeAccess(m_toBridge.get(), m_pickupLoc);
+
 			// Sample traveling into "bridge"
-			ym0 = toBridgeAccess( m_toBridge, 1 );
+			ym0 = toBridgeAccess(m_toBridge.get(), 1);
 			// Sample to "nut"
-			ypM = fromBridgeAccess( m_fromBridge,
-						m_fromBridge->length - 2 );
+			ypM = fromBridgeAccess(m_fromBridge.get(), m_fromBridge->length - 2);
 
 			// String state update
 
 			// Decrement pointer and then update
-			fromBridgeUpdate( m_fromBridge, 
-						-bridgeReflection( ym0 ) );
+			fromBridgeUpdate(m_fromBridge.get(), -bridgeReflection(ym0));
 			// Update and then increment pointer
-			toBridgeUpdate( m_toBridge, -ypM );
+			toBridgeUpdate(m_toBridge.get(), -ypM);
 		}
-		return( m_outsamp[m_choice] );
+
+		return m_outsamp[m_choice];
 	}
 
 private:
-	struct delayLine
+	struct DelayLine
 	{
-		sample_t * data;
+		std::unique_ptr<sample_t[]> data;
 		int length;
-		sample_t * pointer;
-		sample_t * end;
-	} ;
+		sample_t* pointer;
+		sample_t* end;
+	};
 
-	delayLine * m_fromBridge;
-	delayLine * m_toBridge;
+	std::unique_ptr<DelayLine> m_fromBridge;
+	std::unique_ptr<DelayLine> m_toBridge;
 	int m_pickupLoc;
 	int m_oversample;
 	float m_randomize;
 	float m_stringLoss;
-	
-	float * m_impulse;
+
+	std::unique_ptr<float[]> m_impulse;
 	int m_choice;
 	float m_state;
-	
-	sample_t * m_outsamp;
 
-	delayLine * initDelayLine( int _len, int _pick );
-	static void freeDelayLine( delayLine * _dl );
-	void resample( float *_src, f_cnt_t _src_frames, f_cnt_t _dst_frames );
-	
-	/* setDelayLine initializes the string with an impulse at the pick
+	std::unique_ptr<sample_t[]> m_outsamp;
+
+	std::unique_ptr<DelayLine> initDelayLine(int len);
+	void resample(const float* src, f_cnt_t srcFrames, f_cnt_t dstFrames);
+
+	/**
+	 * setDelayLine initializes the string with an impulse at the pick
 	 * position unless the impulse is longer than the string, in which
-	 * case the impulse gets truncated. */
-	inline void setDelayLine( delayLine * _dl, 
-					int _pick,
-					const float * _values, 
-					int _len,
-					float _scale,
-					bool _state )
+	 * case the impulse gets truncated.
+	 */
+	void setDelayLine(DelayLine* dl, int pick, const float* values, int len, float scale, bool state)
 	{
 		float r;
 		float offset;
-		
-		if( ! _state )
+
+		if (!state)
 		{
-			for( int i = 0; i < _pick; i++ )
+			for (int i = 0; i < pick; ++i)
 			{
-				r = static_cast<float>( rand() ) /
-						RAND_MAX;
-				offset =  ( m_randomize / 2.0f -
-						m_randomize ) * r;
-				_dl->data[i] = _scale *
-						_values[_dl->length - i - 1] +
-						offset;
+				r = static_cast<float>(std::rand()) / RAND_MAX;
+				offset = (m_randomize / 2.0f - m_randomize) * r;
+				dl->data[i] = scale * values[dl->length - i - 1] + offset;
 			}
-			for( int i = _pick; i < _dl->length; i++ )
+			for (int i = pick; i < dl->length; ++i)
 			{
-				r = static_cast<float>( rand() ) /
-						RAND_MAX;
-				offset =  ( m_randomize / 2.0f -
-						m_randomize ) * r;
-				_dl->data[i] = _scale * 
-						_values[i - _pick]  + offset ;
+				r = static_cast<float>(std::rand()) / RAND_MAX;
+				offset = (m_randomize / 2.0f - m_randomize) * r;
+				dl->data[i] = scale * values[i - pick]  + offset;
 			}
 		}
 		else
 		{
-			if( _len + _pick > _dl->length )
+			if (len + pick > dl->length)
 			{
-				for( int i = _pick; i < _dl->length; i++ )
+				for (int i = pick; i < dl->length; ++i)
 				{
-					r = static_cast<float>( rand() ) /
-							RAND_MAX;
-					offset =  ( m_randomize / 2.0f -
-							m_randomize ) * r;
-					_dl->data[i] = _scale *
-							_values[i-_pick] +
-							offset;
+					r = static_cast<float>(std::rand()) / RAND_MAX;
+					offset = (m_randomize / 2.0f - m_randomize) * r;
+					dl->data[i] = scale * values[i - pick] + offset;
 				}
 			}
 			else
 			{
-				for( int i = 0; i < _len; i++ )
+				for (int i = 0; i < len; ++i)
 				{
-					r = static_cast<float>( rand() ) /
-							RAND_MAX;
-					offset =  ( m_randomize / 2.0f -
-							m_randomize ) * r;
-					_dl->data[i+_pick] = _scale *
-								_values[i] +
-								offset;
+					r = static_cast<float>(std::rand()) / RAND_MAX;
+					offset = (m_randomize / 2.0f - m_randomize) * r;
+					dl->data[i+pick] = scale * values[i] + offset;
 				}
 			}
 		}
 	}
 
-	/* toBridgeUpdate(dl, insamp);
-	* Places "nut-reflected" sample from upper delay-line into
-	* current lower delay-line pointer position (which represents
-	* x = 0 position).  The pointer is then incremented (i.e. the
-	* wave travels one sample to the left), turning the previous
-	* position into an "effective" x = L position for the next
-	* iteration. */
-	inline void toBridgeUpdate( delayLine * _dl, sample_t _insamp )
+	/**
+	 * toBridgeUpdate(dl, insamp);
+	 * Places "nut-reflected" sample from upper delay-line into
+	 * current lower delay-line pointer position (which represents
+	 * x = 0 position). The pointer is then incremented (i.e. the
+	 * wave travels one sample to the left), turning the previous
+	 * position into an "effective" x = L position for the next
+	 * iteration.
+	 */
+	void toBridgeUpdate(DelayLine* dl, sample_t insamp)
 	{
-		sample_t * ptr = _dl->pointer;
-		*ptr = _insamp * m_stringLoss;
+		sample_t* ptr = dl->pointer;
+		*ptr = insamp * m_stringLoss;
 		++ptr;
-		if( ptr > _dl->end )
+		if (ptr > dl->end)
 		{
-			ptr = _dl->data;
+			ptr = dl->data.get();
 		}
-		_dl->pointer = ptr;
+		dl->pointer = ptr;
 	}
 
-	/* fromBridgeUpdate(dl, insamp);
-	* Decrements current upper delay-line pointer position (i.e.
-	* the wave travels one sample to the right), moving it to the
-	* "effective" x = 0 position for the next iteration.  The
-	* "bridge-reflected" sample from lower delay-line is then placed
-	* into this position. */
-	inline void fromBridgeUpdate( delayLine * _dl, 
-							sample_t _insamp )
+	/**
+	 * fromBridgeUpdate(dl, insamp);
+	 * Decrements current upper delay-line pointer position (i.e.
+	 * the wave travels one sample to the right), moving it to the
+	 * "effective" x = 0 position for the next iteration. The
+	 * "bridge-reflected" sample from lower delay-line is then placed
+	 * into this position.
+	 */
+	void fromBridgeUpdate(DelayLine* dl, sample_t insamp)
 	{
-		sample_t * ptr = _dl->pointer;
+		sample_t* ptr = dl->pointer;
 		--ptr;
-		if( ptr < _dl->data )
+		if (ptr < dl->data.get())
 		{
-			ptr = _dl->end;
+			ptr = dl->end;
 		}
-		*ptr = _insamp * m_stringLoss;
-		_dl->pointer = ptr;
+		*ptr = insamp * m_stringLoss;
+		dl->pointer = ptr;
 	}
 
-	/* dlAccess(dl, position);
-	* Returns sample "position" samples into delay-line's past.
-	* Position "0" points to the most recently inserted sample. */
-	static inline sample_t dlAccess( delayLine * _dl, int _position )
+	/**
+	 * dlAccess(dl, position);
+	 * Returns sample "position" samples into delay-line's past.
+	 * Position "0" points to the most recently inserted sample.
+	 */
+	static sample_t dlAccess(DelayLine* dl, int position)
 	{
-		sample_t * outpos = _dl->pointer + _position;
-		while( outpos < _dl->data )
+		sample_t* outpos = dl->pointer + position;
+		while (outpos < dl->data.get())
 		{
-			outpos += _dl->length;
+			outpos += dl->length;
 		}
-		while( outpos > _dl->end )
+		while (outpos > dl->end)
 		{
-			outpos -= _dl->length;
+			outpos -= dl->length;
 		}
-		return( *outpos );
+		return *outpos;
 	}
 
 	/*
-	*  Right-going delay line:
-	*  -->---->---->--- 
-	*  x=0
-	*  (pointer)
-	*  Left-going delay line:
-	*  --<----<----<--- 
-	*  x=0
-	*  (pointer)
-	*/
+	 * Right-going delay line:
+	 * -->---->---->---
+	 * x=0
+	 * (pointer)
+	 * Left-going delay line:
+	 * --<----<----<---
+	 * x=0
+	 * (pointer)
+	 */
 
-	/* fromBridgeAccess(dl, position);
-	* Returns spatial sample at position "position", where position zero
-	* is equal to the current upper delay-line pointer position (x = 0).
-	* In a right-going delay-line, position increases to the right, and
-	* delay increases to the right => left = past and right = future. */
-	static inline sample_t fromBridgeAccess( delayLine * _dl, 
-								int _position )
+	/**
+	 * fromBridgeAccess(dl, position);
+	 * Returns spatial sample at position "position", where position zero
+	 * is equal to the current upper delay-line pointer position (x = 0).
+	 * In a right-going delay-line, position increases to the right, and
+	 * delay increases to the right => left = past and right = future.
+	 */
+	static sample_t fromBridgeAccess(DelayLine* dl, int position)
 	{
-		return( dlAccess( _dl, _position ) );
+		return dlAccess(dl, position);
 	}
 
-	/* toBridgeAccess(dl, position);
-	* Returns spatial sample at position "position", where position zero
-	* is equal to the current lower delay-line pointer position (x = 0).
-	* In a left-going delay-line, position increases to the right, and
-	* delay DEcreases to the right => left = future and right = past. */
-	static inline sample_t toBridgeAccess( delayLine * _dl, int _position )
+	/**
+	 * toBridgeAccess(dl, position);
+	 * Returns spatial sample at position "position", where position zero
+	 * is equal to the current lower delay-line pointer position (x = 0).
+	 * In a left-going delay-line, position increases to the right, and
+	 * delay DEcreases to the right => left = future and right = past.
+	 */
+	static sample_t toBridgeAccess(DelayLine* dl, int position)
 	{
-		return( dlAccess( _dl, _position ) );
+		return dlAccess(dl, position);
 	}
 
-	inline sample_t bridgeReflection( sample_t _insamp )
+	sample_t bridgeReflection(sample_t insamp)
 	{
-		return( m_state = ( m_state + _insamp ) * 0.5 );
+		m_state = (m_state + insamp) * 0.5;
+		return m_state;
 	}
-
-} ;
+};
 
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_VIBRATING_STRING_H

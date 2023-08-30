@@ -22,18 +22,17 @@
  *
  */
 
-
-#ifndef CONFIG_MGR_H
-#define CONFIG_MGR_H
+#ifndef LMMS_CONFIG_MANAGER_H
+#define LMMS_CONFIG_MANAGER_H
 
 #include "lmmsconfig.h"
 
 #include <QMap>
 #include <QPair>
 #include <QStringList>
-#include <QVector>
 #include <QObject>
 
+#include <vector>
 #include "lmms_export.h"
 
 
@@ -240,11 +239,8 @@ public:
 
 	void addRecentlyOpenedProject(const QString & _file);
 
-	const QString & value(const QString & cls,
-					const QString & attribute) const;
-	const QString & value(const QString & cls,
-					const QString & attribute,
-					const QString & defaultVal) const;
+	QString value(const QString& cls, const QString& attribute, const QString& defaultVal = "") const;
+
 	void setValue(const QString & cls, const QString & attribute,
 						const QString & value);
 	void deleteValue(const QString & cls, const QString & attribute);
@@ -303,7 +299,7 @@ private:
 	unsigned int m_configVersion;
 	QStringList m_recentlyOpenedProjects;
 
-	using stringPairVector = QVector<QPair<QString, QString>>;
+	using stringPairVector = std::vector<QPair<QString, QString>>;
 	using settingsMap = QMap<QString, stringPairVector>;
 	settingsMap m_settings;
 
@@ -314,4 +310,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_CONFIG_MANAGER_H

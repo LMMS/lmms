@@ -33,6 +33,7 @@ SET(LMMS_PLUGIN_LIST
 	Compressor
 	CrossoverEQ
 	Delay
+	Dispersion
 	DualFilter
 	DynamicsProcessor
 	Eq
@@ -62,6 +63,7 @@ SET(LMMS_PLUGIN_LIST
 	StereoEnhancer
 	StereoMatrix
 	Stk
+	TapTempo
 	VstBase
 	Vestige
 	VstEffect
@@ -100,7 +102,6 @@ ENDIF()
 IF(MSVC)
 	SET(MSVC_INCOMPATIBLE_PLUGINS
 		LadspaEffect
-		ZynAddSubFx
 	)
 	message(WARNING "Compiling with MSVC. The following plugins are not available: ${MSVC_INCOMPATIBLE_PLUGINS}")
 	LIST(REMOVE_ITEM PLUGIN_LIST ${MSVC_INCOMPATIBLE_PLUGINS})
