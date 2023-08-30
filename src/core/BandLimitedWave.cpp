@@ -26,7 +26,6 @@
 #include "BandLimitedWave.h"
 
 #include <QDataStream>
-#include <QFile>
 
 namespace lmms
 {
