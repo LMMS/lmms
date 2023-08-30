@@ -394,7 +394,7 @@ void AudioEngine::renderStageInstruments()
 {
 	m_profiler.startDetail(AudioEngineProfiler::DetailType::Instruments);
 
-	AudioEngineWorkerThread::fillJobQueue<PlayHandleList>(m_playHandles);
+	AudioEngineWorkerThread::fillJobQueue<>(m_playHandles);
 	AudioEngineWorkerThread::startAndWaitForJobs();
 
 	// removed all play handles which are done
