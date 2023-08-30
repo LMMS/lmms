@@ -841,7 +841,7 @@ int main( int argc, char * * argv )
 
 		if( profilerOutputFile.isEmpty() == false )
 		{
-			Engine::audioEngine()->profiler().setOutputFile(profilerOutputFile);
+			Engine::audioEngine()->profiler().setOutputFile( profilerOutputFile );
 		}
 
 		// start now!

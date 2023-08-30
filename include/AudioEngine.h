@@ -411,7 +411,8 @@ private:
 	void renderStageInstruments();
 	void renderStageEffects();
 	void renderStageMix();
-	const surroundSampleFrame *renderNextBuffer();
+
+	const surroundSampleFrame * renderNextBuffer();
 
 	void swapBuffers();
 

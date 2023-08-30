@@ -337,7 +337,7 @@ void AudioEngine::renderStageNoteSetup()
 {
 	m_profiler.startDetail(AudioEngineProfiler::DetailType::NoteSetup);
 
-	if (m_clearSignal)
+	if( m_clearSignal )
 	{
 		m_clearSignal = false;
 		clearInternal();
@@ -347,31 +347,28 @@ void AudioEngine::renderStageNoteSetup()
 	// them if they still exist...
 	// maybe this algorithm could be optimized...
 	ConstPlayHandleList::Iterator it_rem = m_playHandlesToRemove.begin();
-	while (it_rem != m_playHandlesToRemove.end())
+	while( it_rem != m_playHandlesToRemove.end() )
 	{
-		PlayHandleList::Iterator it = std::find(m_playHandles.begin(), m_playHandles.end(), *it_rem);
+		PlayHandleList::Iterator it = std::find( m_playHandles.begin(), m_playHandles.end(), *it_rem );
 
-		if (it != m_playHandles.end())
+		if( it != m_playHandles.end() )
 		{
-			(*it)->audioPort()->removePlayHandle((*it));
-			if ((*it)->type() == PlayHandle::Type::NotePlayHandle)
+			( *it )->audioPort()->removePlayHandle( ( *it ) );
+			if( ( *it )->type() == PlayHandle::Type::NotePlayHandle )
 			{
-				NotePlayHandleManager::release((NotePlayHandle*)*it);
+				NotePlayHandleManager::release( (NotePlayHandle*) *it );
 			}
-			else
-			{
-				delete *it;
-			}
-			m_playHandles.erase(it);
+			else delete *it;
+			m_playHandles.erase( it );
 		}
 
-		it_rem = m_playHandlesToRemove.erase(it_rem);
+		it_rem = m_playHandlesToRemove.erase( it_rem );
 	}
 
 	swapBuffers();
 
 	// prepare master mix (clear internal buffers etc.)
-	Mixer *mixer = Engine::mixer();
+	Mixer * mixer = Engine::mixer();
 	mixer->prepareMasterMix();
 
 	handleMetronome();
@@ -380,11 +377,11 @@ void AudioEngine::renderStageNoteSetup()
 	Engine::getSong()->processNextBuffer();
 
 	// add all play-handles that have to be added
-	for (LocklessListElement *e = m_newPlayHandles.popList(); e; )
+	for( LocklessListElement * e = m_newPlayHandles.popList(); e; )
 	{
 		m_playHandles += e->value;
-		LocklessListElement *next = e->next;
-		m_newPlayHandles.free(e);
+		LocklessListElement * next = e->next;
+		m_newPlayHandles.free( e );
 		e = next;
 	}
 
@@ -401,22 +398,24 @@ void AudioEngine::renderStageInstruments()
 	AudioEngineWorkerThread::startAndWaitForJobs();
 
 	// removed all play handles which are done
-	for (PlayHandleList::Iterator it = m_playHandles.begin(); it != m_playHandles.end(); )
+	for( PlayHandleList::Iterator it = m_playHandles.begin();
+		it != m_playHandles.end(); )
 	{
-		if ((*it)->affinityMatters() && (*it)->affinity() != QThread::currentThread())
+		if ( ( *it )->affinityMatters() &&
+			( *it )->affinity() != QThread::currentThread() )
 		{
 			++it;
 			continue;
 		}
-		if ((*it)->isFinished())
+		if( ( *it )->isFinished() )
 		{
-			(*it)->audioPort()->removePlayHandle((*it));
+			( *it )->audioPort()->removePlayHandle( ( *it ) );
 			if ((*it)->type() == PlayHandle::Type::NotePlayHandle)
 			{
-				NotePlayHandleManager::release((NotePlayHandle*)*it);
+				NotePlayHandleManager::release( (NotePlayHandle*) *it );
 			}
 			else delete *it;
-			it = m_playHandles.erase(it);
+			it = m_playHandles.erase( it );
 		}
 		else
 		{

@@ -32,14 +32,14 @@ namespace lmms
 
 AudioEngineProfiler::AudioEngineProfiler() :
 	m_periodTimer(),
-	m_cpuLoad(0),
+	m_cpuLoad( 0 ),
 	m_outputFile()
 {
 }
 
 
 
-void AudioEngineProfiler::finishPeriod(sample_rate_t sampleRate, fpp_t framesPerPeriod)
+void AudioEngineProfiler::finishPeriod( sample_rate_t sampleRate, fpp_t framesPerPeriod )
 {
 	// Time taken to process all data and fill the audio buffer.
 	const unsigned int periodElapsed = m_periodTimer.elapsed();
@@ -59,19 +59,19 @@ void AudioEngineProfiler::finishPeriod(sample_rate_t sampleRate, fpp_t framesPer
 		m_detailLoad[i] = std::min(newLoad * 0.05f + m_detailLoad[i] * 0.95f, 100.f);
 	}
 
-	if (m_outputFile.isOpen())
+	if( m_outputFile.isOpen() )
 	{
-		m_outputFile.write(QString("%1\n").arg(periodElapsed).toLatin1());
+		m_outputFile.write( QString( "%1\n" ).arg( periodElapsed ).toLatin1() );
 	}
 }
 
 
 
-void AudioEngineProfiler::setOutputFile(const QString &outputFile)
+void AudioEngineProfiler::setOutputFile( const QString& outputFile )
 {
 	m_outputFile.close();
-	m_outputFile.setFileName(outputFile);
-	m_outputFile.open(QFile::WriteOnly | QFile::Truncate);
+	m_outputFile.setFileName( outputFile );
+	m_outputFile.open( QFile::WriteOnly | QFile::Truncate );
 }
 
 } // namespace lmms

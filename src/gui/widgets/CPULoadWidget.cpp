@@ -37,7 +37,7 @@ namespace lmms::gui
 
 CPULoadWidget::CPULoadWidget( QWidget * _parent ) :
 	QWidget( _parent ),
-	m_currentLoad(0),
+	m_currentLoad( 0 ),
 	m_temp(),
 	m_background( embed::getIconPixmap( "cpuload_bg" ) ),
 	m_leds( embed::getIconPixmap( "cpuload_leds" ) ),

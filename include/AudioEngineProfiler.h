@@ -45,14 +45,14 @@ public:
 		m_periodTimer.reset();
 	}
 
-	void finishPeriod(sample_rate_t sampleRate, fpp_t framesPerPeriod);
+	void finishPeriod( sample_rate_t sampleRate, fpp_t framesPerPeriod );
 
 	int cpuLoad() const
 	{
 		return m_cpuLoad;
 	}
 
-	void setOutputFile(const QString& outputFile);
+	void setOutputFile( const QString& outputFile );
 
 	enum DetailType {
 		NoteSetup,
