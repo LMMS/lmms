@@ -383,7 +383,7 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 	}
 
 	values = container->automatedValuesAt(timeStart, clipNum);
-	TrackList tracks = container->tracks();
+	const TrackList& tracks = container->tracks();
 
 	Track::clipVector clips;
 	for (Track* track : tracks)

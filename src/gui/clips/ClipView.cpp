@@ -1308,7 +1308,7 @@ void ClipView::mergeClips(QVector<ClipView*> clipvs)
 			continue;
 		}
 
-		NoteVector currentClipNotes = mcView->getMidiClip()->notes();
+		const NoteVector& currentClipNotes = mcView->getMidiClip()->notes();
 		TimePos mcViewPos = mcView->getMidiClip()->startPosition();
 
 		for (Note* note: currentClipNotes)

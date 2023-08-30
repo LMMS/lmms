@@ -61,7 +61,7 @@ bool PatternStore::play(TimePos start, fpp_t frames, f_cnt_t offset, int clipNum
 
 	start = start % (lengthOfPattern(clipNum) * TimePos::ticksPerBar());
 
-	TrackList tl = tracks();
+	const TrackList& tl = tracks();
 	for (Track * t : tl)
 	{
 		if (t->play(start, frames, offset, clipNum))
@@ -117,7 +117,7 @@ int PatternStore::numOfPatterns() const
 
 void PatternStore::removePattern(int pattern)
 {
-	TrackList tl = tracks();
+	const TrackList& tl = tracks();
 	for (Track * t : tl)
 	{
 		delete t->getClip(pattern);
@@ -134,7 +134,7 @@ void PatternStore::removePattern(int pattern)
 
 void PatternStore::swapPattern(int pattern1, int pattern2)
 {
-	TrackList tl = tracks();
+	const TrackList& tl = tracks();
 	for (Track * t : tl)
 	{
 		t->swapPositionOfClips(pattern1, pattern2);
@@ -159,7 +159,7 @@ void PatternStore::updatePatternTrack(Clip* clip)
 
 void PatternStore::fixIncorrectPositions()
 {
-	TrackList tl = tracks();
+	const TrackList& tl = tracks();
 	for (Track * t : tl)
 	{
 		for (int i = 0; i < numOfPatterns(); ++i)
@@ -215,7 +215,7 @@ void PatternStore::updateComboBox()
 void PatternStore::currentPatternChanged()
 {
 	// now update all track-labels (the current one has to become white, the others gray)
-	TrackList tl = Engine::getSong()->tracks();
+	const TrackList& tl = Engine::getSong()->tracks();
 	for (Track * t : tl)
 	{
 		if (t->type() == Track::Type::Pattern)
@@ -230,7 +230,7 @@ void PatternStore::currentPatternChanged()
 
 void PatternStore::createClipsForPattern(int pattern)
 {
-	TrackList tl = tracks();
+	const TrackList& tl = tracks();
 	for (Track * t : tl)
 	{
 		t->createClipsForPattern(pattern);

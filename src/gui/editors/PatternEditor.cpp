@@ -69,7 +69,7 @@ void PatternEditor::cloneSteps()
 
 void PatternEditor::removeSteps()
 {
-	TrackContainer::TrackList tl = model()->tracks();
+	const TrackContainer::TrackList& tl = model()->tracks();
 
 	for (const auto& track : tl)
 	{
@@ -176,7 +176,7 @@ void PatternEditor::updatePosition()
 
 void PatternEditor::makeSteps( bool clone )
 {
-	TrackContainer::TrackList tl = model()->tracks();
+	const TrackContainer::TrackList& tl = model()->tracks();
 
 	for (const auto& track : tl)
 	{
