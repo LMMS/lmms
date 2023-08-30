@@ -26,6 +26,7 @@
 #ifndef LMMS_TIME_POS_H
 #define LMMS_TIME_POS_H
 
+#include <atomic>
 #include "lmms_export.h"
 #include "lmms_basics.h"
 
@@ -67,10 +68,12 @@ class LMMS_EXPORT TimePos
 public:
 	TimePos( const bar_t bar, const tick_t ticks );
 	TimePos( const tick_t ticks = 0 );
+	TimePos(const TimePos& time);
 
 	TimePos quantize(float) const;
 	TimePos toAbsoluteBar() const;
 
+	TimePos& operator=(const TimePos& time);
 	TimePos& operator+=( const TimePos& time );
 	TimePos& operator-=( const TimePos& time );
 
@@ -107,7 +110,7 @@ public:
 	static double ticksToMilliseconds( double ticks, bpm_t beatsPerMinute );
 
 private:
-	tick_t m_ticks;
+	std::atomic<tick_t> m_ticks;
 
 	static tick_t s_ticksPerBar;
 
