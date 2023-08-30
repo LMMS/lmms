@@ -32,7 +32,6 @@
 #include "ConfigManager.h"
 #include "FileDialog.h"
 
-
 namespace lmms::gui
 {
 
@@ -94,12 +93,12 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 	// FileSystem types : https://www.javatpoint.com/linux-file-system
 	QStringList usableFileSystems = {"ext", "ext2", "ext3", "ext4", "jfs", "reiserfs", "ntfs3", "fuse.sshfs", "fuseblk"};
 
-	foreach (QStorageInfo storage, QStorageInfo::mountedVolumes())
+	for(QStorageInfo storage : QStorageInfo::mountedVolumes())
 	{
 		storage.refresh();
 
 		if (usableFileSystems.contains(QString(storage.fileSystemType()), Qt::CaseInsensitive) && storage.isValid() && storage.isReady())
-		{
+		{			
 			urls << QUrl::fromLocalFile(storage.rootPath());	
 		}
 	}
