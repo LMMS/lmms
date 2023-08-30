@@ -315,7 +315,7 @@ void MidiClipView::mouseDoubleClickEvent(QMouseEvent *_me)
 	if( m_clip->m_clipType == MidiClip::Type::MelodyClip || !fixedClips() )
 	{
 		// Local X position of mouse over clip's note drawing area, normalized to range of [0, 1]
-		const auto scrollX = std::min((_me->localPos().x() + BORDER_WIDTH) / noteAreaWidth(), 1.0);
+		const auto scrollX = std::min(_me->localPos().x() / noteAreaWidth(), 1.0);
 		openInPianoRoll(scrollX);
 	}
 }
