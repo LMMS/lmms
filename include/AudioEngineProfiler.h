@@ -56,7 +56,7 @@ public:
 
 private:
 	MicroTimer m_periodTimer;
-	int m_cpuLoad;
+	std::atomic<int> m_cpuLoad;
 	QFile m_outputFile;
 };
 
