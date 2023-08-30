@@ -382,7 +382,7 @@ private:
 
 
 	ScaleType m_scaleType; //!< scale type, linear by default
-	float m_value;
+	std::atomic<float> m_value;
 	float m_initValue;
 	float m_minValue;
 	float m_maxValue;
@@ -393,7 +393,7 @@ private:
 	bool m_valueChanged;
 
 	// currently unused?
-	float m_oldValue;
+	std::atomic<float> m_oldValue;
 	int m_setValueDepth;
 
 	// used to determine if step size should be applied strictly (ie. always)

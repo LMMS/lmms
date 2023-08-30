@@ -294,7 +294,7 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 
 void AutomatableModel::setValue( const float value )
 {
-	m_oldValue = m_value;
+	m_oldValue.store(m_value);
 	++m_setValueDepth;
 	const float old_val = m_value;
 
@@ -377,7 +377,7 @@ void AutomatableModel::setAutomatedValue( const float value )
 {
 	setUseControllerValue(false);
 
-	m_oldValue = m_value;
+	m_oldValue.store(m_value);
 	++m_setValueDepth;
 	const float oldValue = m_value;
 
@@ -509,7 +509,7 @@ void AutomatableModel::linkModels( AutomatableModel* model1, AutomatableModel* m
 	if (!model1ContainsModel2 && model1 != model2)
 	{
 		// copy data
-		model1->m_value = model2->m_value;
+		model1->m_value.store(model2->m_value);
 		if (model1->valueBuffer() && model2->valueBuffer())
 		{
 			std::copy_n(model2->valueBuffer()->data(),
@@ -704,7 +704,7 @@ void AutomatableModel::setInitValue( const float value )
 	m_initValue = fittedValue( value );
 	bool journalling = testAndSetJournalling( false );
 	setValue( value );
-	m_oldValue = m_value;
+	m_oldValue.store(m_value);
 	setJournalling( journalling );
 	emit initValueChanged( value );
 }
