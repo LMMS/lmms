@@ -349,7 +349,7 @@ void Song::processNextBuffer()
 		frameOffsetInPeriod += framesToPlay;
 		frameOffsetInTick += framesToPlay;
 		getPlayPos().setCurrentFrame(frameOffsetInTick);
-		auto& elapsedMilliSeconds = m_elapsedMilliSeconds[static_cast<std::size_t>(m_playMode)];
+		auto& elapsedMilliSeconds = m_elapsedMilliSeconds[static_cast<std::size_t>(playMode())];
 		elapsedMilliSeconds.store(elapsedMilliSeconds + TimePos::ticksToMilliseconds(framesToPlay / framesPerTick, getTempo()));
 		m_elapsedBars = getPlayPos(PlayMode::Song).getBar();
 		m_elapsedTicks = (getPlayPos(PlayMode::Song).getTicks() % ticksPerBar()) / 48;
@@ -656,7 +656,7 @@ void Song::stop()
 		{
 			case TimeLineWidget::BehaviourAtStopState::BackToZero:
 				getPlayPos().setTicks(0);
-				m_elapsedMilliSeconds[static_cast<std::size_t>(m_playMode)] = 0;
+				m_elapsedMilliSeconds[static_cast<std::size_t>(playMode())] = 0;
 				break;
 
 			case TimeLineWidget::BehaviourAtStopState::BackToStart:
@@ -676,11 +676,11 @@ void Song::stop()
 	else
 	{
 		getPlayPos().setTicks( 0 );
-		m_elapsedMilliSeconds[static_cast<std::size_t>(m_playMode)] = 0;
+		m_elapsedMilliSeconds[static_cast<std::size_t>(playMode())] = 0;
 	}
 	m_playing = false;
 
-	m_elapsedMilliSeconds[static_cast<std::size_t>(PlayMode::None)].store(m_elapsedMilliSeconds[static_cast<std::size_t>(m_playMode)]);
+	m_elapsedMilliSeconds[static_cast<std::size_t>(PlayMode::None)].store(m_elapsedMilliSeconds[static_cast<std::size_t>(playMode())]);
 	getPlayPos(PlayMode::None).setTicks(getPlayPos().getTicks());
 
 	getPlayPos().setCurrentFrame( 0 );

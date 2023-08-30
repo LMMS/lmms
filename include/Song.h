@@ -481,7 +481,7 @@ private:
 
 	QHash<QString, int> m_errors;
 
-	PlayMode m_playMode;
+	std::atomic<PlayMode> m_playMode;
 	PlayPos m_playPos[PlayModeCount];
 	bar_t m_length;
 
