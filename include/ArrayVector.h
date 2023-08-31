@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef ARRAY_VECTOR_H
-#define ARRAY_VECTOR_H
+#ifndef LMMS_ARRAY_VECTOR_H
+#define LMMS_ARRAY_VECTOR_H
 
 #include <algorithm>
 #include <cassert>
@@ -385,4 +385,4 @@ private:
 
 } // namespace lmms
 
-#endif // ARRAY_VECTOR_H
+#endif // LMMS_ARRAY_VECTOR_H
