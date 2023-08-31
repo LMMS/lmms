@@ -69,7 +69,7 @@ public:
 
 
 private:
-	using EffectList = QVector<Effect*>;
+	using EffectList = std::vector<Effect*>;
 	EffectList m_effects;
 
 	BoolModel m_enabledModel;

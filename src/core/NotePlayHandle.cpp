@@ -53,7 +53,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 								NotePlayHandle *parent,
 								int midiEventChannel,
 								Origin origin ) :
-	PlayHandle( TypeNotePlayHandle, _offset ),
+	PlayHandle( Type::NotePlayHandle, _offset ),
 	Note( n.length(), n.pos(), n.key(), n.getVolume(), n.getPanning(), n.detuning() ),
 	m_pluginData( nullptr ),
 	m_instrumentTrack( instrumentTrack ),
@@ -104,12 +104,12 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	setFrames( _frames );
 
 	// inform attached components about new MIDI note (used for recording in Piano Roll)
-	if( m_origin == OriginMidiInput )
+	if( m_origin == Origin::MidiInput )
 	{
 		m_instrumentTrack->midiNoteOn( *this );
 	}
 
-	if(m_instrumentTrack->instrument() && m_instrumentTrack->instrument()->flags() & Instrument::IsSingleStreamed )
+	if(m_instrumentTrack->instrument() && m_instrumentTrack->instrument()->flags() & Instrument::Flag::IsSingleStreamed )
 	{
 		setUsesBuffer( false );
 	}
@@ -350,9 +350,9 @@ fpp_t NotePlayHandle::framesLeftForCurrentPeriod() const
 {
 	if( m_totalFramesPlayed == 0 )
 	{
-		return (fpp_t) qMin<f_cnt_t>( framesLeft(), Engine::audioEngine()->framesPerPeriod() - offset() );
+		return static_cast<fpp_t>(std::min<f_cnt_t>(framesLeft(), Engine::audioEngine()->framesPerPeriod() - offset()));
 	}
-	return (fpp_t) qMin<f_cnt_t>( framesLeft(), Engine::audioEngine()->framesPerPeriod() );
+	return static_cast<fpp_t>(std::min<f_cnt_t>(framesLeft(), Engine::audioEngine()->framesPerPeriod()));
 }
 
 
@@ -384,7 +384,7 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 
 	// then set some variables indicating release-state
 	m_framesBeforeRelease = _s;
-	m_releaseFramesToDo = qMax<f_cnt_t>( 0, actualReleaseFramesToDo() );
+	m_releaseFramesToDo = std::max<f_cnt_t>(0, actualReleaseFramesToDo());
 
 	if( m_hasMidiNote )
 	{
@@ -400,7 +400,7 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 	// inform attached components about MIDI finished (used for recording in Piano Roll)
 	if (!instrumentTrack()->isSustainPedalPressed())
 	{
-		if( m_origin == OriginMidiInput )
+		if( m_origin == Origin::MidiInput )
 		{
 			setLength( TimePos( static_cast<f_cnt_t>( totalFramesPlayed() / Engine::framesPerTick() ) ) );
 			m_instrumentTrack->midiNoteOff( *this );
@@ -557,14 +557,20 @@ void NotePlayHandle::updateFrequency()
 
 
 
-void NotePlayHandle::processTimePos( const TimePos& time )
+void NotePlayHandle::processTimePos(const TimePos& time, float pitchValue, bool isRecording)
 {
-	if( detuning() && time >= songGlobalParentOffset()+pos() )
+	if (!detuning() || time < songGlobalParentOffset() + pos()) { return; }
+
+	if (isRecording && m_origin == Origin::MidiInput)
 	{
-		const float v = detuning()->automationClip()->valueAt( time - songGlobalParentOffset() - pos() );
-		if( !typeInfo<float>::isEqual( v, m_baseDetuning->value() ) )
+		detuning()->automationClip()->recordValue(time - songGlobalParentOffset() - pos(), pitchValue / 100);
+	}
+	else
+	{
+		const float v = detuning()->automationClip()->valueAt(time - songGlobalParentOffset() - pos());
+		if (!typeInfo<float>::isEqual(v, m_baseDetuning->value()))
 		{
-			m_baseDetuning->setValue( v );
+			m_baseDetuning->setValue(v);
 			updateFrequency();
 		}
 	}
@@ -575,8 +581,8 @@ void NotePlayHandle::processTimePos( const TimePos& time )
 
 void NotePlayHandle::resize( const bpm_t _new_tempo )
 {
-	if (origin() == OriginMidiInput ||
-		(origin() == OriginNoteStacking && m_parent->origin() == OriginMidiInput))
+	if (origin() == Origin::MidiInput ||
+		(origin() == Origin::NoteStacking && m_parent->origin() == Origin::MidiInput))
 	{
 		// Don't resize notes from MIDI input - they should continue to play
 		// until the key is released, and their large duration can cause

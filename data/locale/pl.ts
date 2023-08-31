@@ -6646,7 +6646,7 @@ Upewnij się, że masz uprawnienia do zapisu do pliku i katalogu zawierającego 
     </message>
 </context>
 <context>
-    <name>InstrumentMiscView</name>
+    <name>InstrumentTuningView</name>
     <message>
         <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="221"/>
         <source>MASTER PITCH</source>

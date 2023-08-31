@@ -161,7 +161,7 @@ void PluginBrowser::addPlugins()
 	m_descTree->clear();
 
 	// Fetch and sort all instrument plugin descriptors
-	auto descs = getPluginFactory()->descriptors(Plugin::Instrument);
+	auto descs = getPluginFactory()->descriptors(Plugin::Type::Instrument);
 	std::sort(descs.begin(), descs.end(),
 		[](auto d1, auto d2)
 		{
@@ -305,7 +305,7 @@ void PluginDescWidget::contextMenuEvent(QContextMenuEvent* e)
 void PluginDescWidget::openInNewInstrumentTrack(QString value)
 {
 	TrackContainer* tc = Engine::getSong();
-	auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::InstrumentTrack, tc));
+	auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, tc));
 	auto ilt = new InstrumentLoaderThread(this, it, value);
 	ilt->start();
 }
