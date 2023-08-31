@@ -27,6 +27,7 @@
 #include <QPainter>
 #include <QRect>
 #include <cassert>
+#include "ArrayVector.h"
 
 namespace lmms {
 
@@ -384,7 +385,8 @@ auto Sample::playSampleRange(PlaybackState* state, sampleFrame* dst, int numFram
 		numFrames / resampleRatio + (resampleRatio != 1.0f ? s_interpolationMargins[state->m_interpolationMode] : 0),
 		m_endFrame - state->m_frameIndex);
 
-	auto buffer = std::vector<sampleFrame>(numFramesToCopy);
+	if (numFramesToCopy > 4096) { return false; }
+	auto buffer = ArrayVector<sampleFrame, 4096>(numFramesToCopy);
 	copyBufferForward(buffer.data(), state->m_frameIndex, numFramesToCopy);
 
 	auto resample
@@ -402,7 +404,8 @@ auto Sample::playSampleRangeLoop(PlaybackState* state, sampleFrame* dst, int num
 
 	const auto totalFramesToCopy = static_cast<int>(
 		numFrames / resampleRatio + (resampleRatio != 1.0f ? s_interpolationMargins[state->m_interpolationMode] : 0));
-	auto buffer = std::vector<sampleFrame>(totalFramesToCopy);
+	if (totalFramesToCopy > 4096) { return false; }
+	auto buffer = ArrayVector<sampleFrame, 4096>(totalFramesToCopy);
 
 	auto numFramesCopied = 0;
 	while (numFramesCopied != totalFramesToCopy)
@@ -437,7 +440,8 @@ auto Sample::playSampleRangePingPong(PlaybackState* state, sampleFrame* dst, int
 
 	const auto totalFramesToCopy = static_cast<int>(
 		numFrames / resampleRatio + (resampleRatio != 1.0f ? s_interpolationMargins[state->m_interpolationMode] : 0));
-	auto buffer = std::vector<sampleFrame>(totalFramesToCopy);
+	if (totalFramesToCopy > 4096) { return false; }
+	auto buffer = ArrayVector<sampleFrame, 4096>(totalFramesToCopy);
 
 	auto numFramesCopied = 0;
 	while (numFramesCopied != totalFramesToCopy)
