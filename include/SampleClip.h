@@ -63,10 +63,9 @@ public:
 		return "sampleclip";
 	}
 
-	std::shared_ptr<Sample> sample()
+	const Sample& sample()
 	{
-		// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-		return std::atomic_load(&m_sample);
+		return m_sample;
 	}
 
 	TimePos sampleLength() const;
@@ -88,7 +87,7 @@ public slots:
 
 
 private:
-	std::shared_ptr<Sample> m_sample = std::make_shared<Sample>();
+	Sample m_sample;
 	BoolModel m_recordModel;
 	bool m_isPlaying;
 

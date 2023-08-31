@@ -44,7 +44,7 @@ class AudioPort;
 class LMMS_EXPORT SamplePlayHandle : public PlayHandle
 {
 public:
-	SamplePlayHandle(std::shared_ptr<const Sample> sampleBuffer , bool ownAudioPort = true);
+	SamplePlayHandle(const Sample& sample, bool ownAudioPort = true);
 	SamplePlayHandle( const QString& sampleFile );
 	SamplePlayHandle( SampleClip* clip );
 	~SamplePlayHandle() override;
@@ -82,7 +82,7 @@ public:
 
 
 private:
-	std::shared_ptr<const Sample> m_sample;
+	Sample m_sample;
 	bool m_doneMayReturnTrue;
 
 	f_cnt_t m_frame;

@@ -90,8 +90,7 @@ SampleClip::SampleClip( Track * _track ) :
 SampleClip::SampleClip(const SampleClip& orig) :
 	SampleClip(orig.getTrack())
 {
-	// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-	std::atomic_store(&m_sample, orig.m_sample);
+	m_sample = orig.m_sample;
 	m_isPlaying = orig.m_isPlaying;
 }
 
@@ -120,7 +119,7 @@ void SampleClip::changeLength( const TimePos & _length )
 
 QString SampleClip::sampleFile() const
 {
-	return m_sample->sampleFile();
+	return m_sample.sampleFile();
 }
 
 
@@ -129,7 +128,7 @@ void SampleClip::setSampleBuffer( SampleBuffer* sb )
 {
 	// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
 	auto buffer = std::shared_ptr<const SampleBuffer>(sb);
-	std::atomic_store(&m_sample, std::make_shared<Sample>(buffer));
+	m_sample = Sample(buffer);
 	updateLength();
 
 	emit sampleChanged();
@@ -149,8 +148,7 @@ void SampleClip::setSampleFile( const QString & _sf )
 	else
 	{	//Otherwise set it to the sample's length
 		auto buffer = gui::SampleLoader::createBufferFromFile(_sf);
-		// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-		std::atomic_store(&m_sample, std::make_shared<Sample>(std::move(buffer)));
+		m_sample = Sample(std::move(buffer));
 		length = sampleLength();
 	}
 	changeLength(length);
@@ -221,7 +219,7 @@ void SampleClip::updateLength()
 
 TimePos SampleClip::sampleLength() const
 {
-	return static_cast<int>(m_sample->playbackSize() / Engine::framesPerTick());
+	return static_cast<int>(m_sample.playbackSize() / Engine::framesPerTick());
 }
 
 
@@ -229,7 +227,7 @@ TimePos SampleClip::sampleLength() const
 
 void SampleClip::setSampleStartFrame(f_cnt_t startFrame)
 {
-	m_sample->setStartFrame(startFrame);
+	m_sample.setStartFrame(startFrame);
 }
 
 
@@ -237,7 +235,7 @@ void SampleClip::setSampleStartFrame(f_cnt_t startFrame)
 
 void SampleClip::setSamplePlayLength(f_cnt_t length)
 {
-	m_sample->setEndFrame(length);
+	m_sample.setEndFrame(length);
 }
 
 
@@ -260,15 +258,15 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	if( sampleFile() == "" )
 	{
 		QString s;
-		_this.setAttribute("data", m_sample->toBase64());
+		_this.setAttribute("data", m_sample.toBase64());
 	}
 
-	_this.setAttribute("sample_rate", m_sample->sampleRate());
+	_this.setAttribute("sample_rate", m_sample.sampleRate());
 	if( usesCustomClipColor() )
 	{
 		_this.setAttribute( "color", color().name() );
 	}
-	if (m_sample->reversed())
+	if (m_sample.reversed())
 	{
 		_this.setAttribute("reversed", "true");
 	}
@@ -291,8 +289,7 @@ void SampleClip::loadSettings( const QDomElement & _this )
 			Engine::audioEngine()->processingSampleRate();
 
 		auto buffer = gui::SampleLoader::createBufferFromBase64(_this.attribute("data"), sampleRate);
-		// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-		std::atomic_store(&m_sample, std::make_shared<Sample>(std::move(buffer)));
+		m_sample = Sample(std::move(buffer));
 	}
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );
@@ -310,7 +307,7 @@ void SampleClip::loadSettings( const QDomElement & _this )
 
 	if(_this.hasAttribute("reversed"))
 	{
-		m_sample->setReversed(true);
+		m_sample.setReversed(true);
 		emit wasReversed(); // tell SampleClipView to update the view
 	}
 }

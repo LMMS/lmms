@@ -35,7 +35,7 @@ namespace lmms
 {
 
 
-SamplePlayHandle::SamplePlayHandle(std::shared_ptr<const Sample> sample, bool ownAudioPort) :
+SamplePlayHandle::SamplePlayHandle(const Sample& sample, bool ownAudioPort) :
 	PlayHandle( Type::SamplePlayHandle ),
 	m_sample(sample),
 	m_doneMayReturnTrue( true ),
@@ -56,7 +56,7 @@ SamplePlayHandle::SamplePlayHandle(std::shared_ptr<const Sample> sample, bool ow
 
 
 SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
-	SamplePlayHandle(std::make_shared<const Sample>(sampleFile), true)
+	SamplePlayHandle(Sample(sampleFile), true)
 {
 }
 
@@ -113,7 +113,7 @@ void SamplePlayHandle::play( sampleFrame * buffer )
 				m_volumeModel->value() / DefaultVolume } };*/
 		// SamplePlayHandle always plays the sample at its original pitch;
 		// it is used only for previews, SampleTracks and the metronome.
-		if (!m_sample->play(workingBuffer, &m_state, frames, DefaultBaseFreq))
+		if (!m_sample.play(workingBuffer, &m_state, frames, DefaultBaseFreq))
 		{
 			memset(workingBuffer, 0, frames * sizeof(sampleFrame));
 		}
@@ -143,8 +143,8 @@ bool SamplePlayHandle::isFromTrack( const Track * _track ) const
 
 f_cnt_t SamplePlayHandle::totalFrames() const
 {
-	return (m_sample->endFrame() - m_sample->startFrame()) *
-			(static_cast<float>(Engine::audioEngine()->processingSampleRate()) / m_sample->sampleRate());
+	return (m_sample.endFrame() - m_sample.startFrame()) *
+			(static_cast<float>(Engine::audioEngine()->processingSampleRate()) / m_sample.sampleRate());
 }
 
 
