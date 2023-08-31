@@ -25,6 +25,7 @@
 #include "ClipView.h"
 
 #include <set>
+#include <cassert>
 
 #include <QMenu>
 #include <QMouseEvent>
@@ -545,6 +546,7 @@ DataFile ClipView::createClipDataFiles(
 		// Insert into the dom under the "clips" element
 		Track* clipTrack = clipView->m_trackView->getTrack();
 		int trackIndex = std::distance(tc->tracks().begin(), std::find(tc->tracks().begin(), tc->tracks().end(), clipTrack));
+		assert(trackIndex != tc->tracks().size());
 		QDomElement clipElement = dataFile.createElement("clip");
 		clipElement.setAttribute( "trackIndex", trackIndex );
 		clipElement.setAttribute( "trackType", static_cast<int>(clipTrack->type()) );
@@ -1308,7 +1310,7 @@ void ClipView::mergeClips(QVector<ClipView*> clipvs)
 			continue;
 		}
 
-		NoteVector currentClipNotes = mcView->getMidiClip()->notes();
+		const NoteVector& currentClipNotes = mcView->getMidiClip()->notes();
 		TimePos mcViewPos = mcView->getMidiClip()->startPosition();
 
 		for (Note* note: currentClipNotes)

@@ -97,7 +97,7 @@ void RenderManager::renderNextTrack()
 // Render the song into individual tracks
 void RenderManager::renderTracks()
 {
-	const TrackContainer::TrackList & tl = Engine::getSong()->tracks();
+	const TrackContainer::TrackList& tl = Engine::getSong()->tracks();
 
 	// find all currently unnmuted tracks -- we want to render these.
 	for (const auto& tk : tl)
@@ -112,7 +112,7 @@ void RenderManager::renderTracks()
 		}
 	}
 
-	const TrackContainer::TrackList t2 = Engine::patternStore()->tracks();
+	const TrackContainer::TrackList& t2 = Engine::patternStore()->tracks();
 	for (const auto& tk : t2)
 	{
 		Track::Type type = tk->type();
