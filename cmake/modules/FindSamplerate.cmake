@@ -6,7 +6,7 @@
 include(ImportedTargetHelpers)
 
 _find_package_config_mode_with_fallback(SampleRate SampleRate::samplerate
-	LIBRARY_NAMES "libsamplerate" "libsamplerate-0"
+	LIBRARY_NAMES "samplerate" "libsamplerate" "libsamplerate-0"
 	INCLUDE_NAMES "samplerate.h"
 	PKG_CONFIG samplerate
 	PREFIX Samplerate

@@ -121,7 +121,7 @@ function(_find_package_config_mode_with_fallback _fpcmwf_PACKAGE_NAME _fpcmwf_TA
 		if(DEFINED _fpcmwf_PKG_CONFIG)
 			find_package(PkgConfig QUIET)
 			if(PKG_CONFIG_FOUND)
-				pkg_check_modules("${_pkg_config_prefix}" "${_fpcmwf_PKG_CONFIG}")
+				pkg_check_modules("${_pkg_config_prefix}" QUIET "${_fpcmwf_PKG_CONFIG}")
 				if("${${_pkg_config_prefix}_FOUND}")
 					set("${_version_var}" "${${_pkg_config_prefix}_VERSION}")
 				endif()
@@ -140,12 +140,12 @@ function(_find_package_config_mode_with_fallback _fpcmwf_PACKAGE_NAME _fpcmwf_TA
 		)
 
 		# Create an imported target if we succeeded in finding the package
-		if("${${_library_var}}" AND "${${_include_var}}")
+		if(${_library_var} AND ${_include_var})
 			add_library("${_fpcmwf_TARGET_NAME}" UNKNOWN IMPORTED)
 			set_target_properties("${_fpcmwf_TARGET_NAME}" PROPERTIES
 				IMPORTED_LOCATION "${${_library_var}}"
 				INTERFACE_INCLUDE_DIRECTORIES "${${_include_var}}"
-				INTERFACE_LINK_LIBRARIES ${_fpcmwf_DEPENDS}
+				INTERFACE_LINK_LIBRARIES "${_fpcmwf_DEPENDS}"
 			)
 		endif()
 
