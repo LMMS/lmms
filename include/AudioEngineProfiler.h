@@ -59,16 +59,18 @@ public:
 		Instruments,
 		Effects,
 		Mixing,
-		DetailCount
+		Count
 	};
 
-	void startDetail(const DetailType type) { m_detailTimer[static_cast<int>(type)].reset(); }
+	constexpr static auto DetailCount = static_cast<std::size_t>(DetailType::Count);
+
+	void startDetail(const DetailType type) { m_detailTimer[static_cast<std::size_t>(type)].reset(); }
 	void finishDetail(const DetailType type)
 	{
-		m_detailTime[static_cast<int>(type)] = m_detailTimer[static_cast<int>(type)].elapsed();
+		m_detailTime[static_cast<int>(type)] = m_detailTimer[static_cast<std::size_t>(type)].elapsed();
 	}
 
-	int detailLoad(const DetailType type) const { return m_detailLoad[static_cast<int>(type)]; }
+	int detailLoad(const DetailType type) const { return m_detailLoad[static_cast<std::size_t>(type)]; }
 
 private:
 	MicroTimer m_periodTimer;
@@ -76,9 +78,9 @@ private:
 	QFile m_outputFile;
 
 	// Use arrays to avoid dynamic allocations in realtime code
-	std::array<MicroTimer, static_cast<int>(DetailType::DetailCount)> m_detailTimer;
-	std::array<int, static_cast<int>(DetailType::DetailCount)> m_detailTime{0};
-	std::array<float, static_cast<int>(DetailType::DetailCount)> m_detailLoad{0};
+	std::array<MicroTimer, DetailCount> m_detailTimer;
+	std::array<int, DetailCount> m_detailTime{0};
+	std::array<float, DetailCount> m_detailLoad{0};
 };
 
 } // namespace lmms
