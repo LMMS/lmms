@@ -56,8 +56,8 @@ namespace lmms::gui
 
 MicrotunerConfig::MicrotunerConfig() :
 	QWidget(),
-	m_scaleComboModel(nullptr, tr("Selected scale")),
-	m_keymapComboModel(nullptr, tr("Selected keymap")),
+	m_scaleComboModel(nullptr, tr("Selected scale slot")),
+	m_keymapComboModel(nullptr, tr("Selected keymap slot")),
 	m_firstKeyModel(0, 0, NumKeys - 1, nullptr, tr("First key")),
 	m_lastKeyModel(NumKeys - 1, 0, NumKeys - 1, nullptr, tr("Last key")),
 	m_middleKeyModel(DefaultMiddleKey, 0, NumKeys - 1, nullptr, tr("Middle key")),
@@ -75,7 +75,7 @@ MicrotunerConfig::MicrotunerConfig() :
 #endif
 
 	setWindowIcon(embed::getIconPixmap("microtuner"));
-	setWindowTitle(tr("Microtuner"));
+	setWindowTitle(tr("Microtuner Configuration"));
 
 	// Organize into 2 main columns: scales and keymaps
 	auto microtunerLayout = new QGridLayout();
@@ -84,7 +84,7 @@ MicrotunerConfig::MicrotunerConfig() :
 	// ----------------------------------
 	// Scale sub-column
 	//
-	auto scaleLabel = new QLabel(tr("Scale:"));
+	auto scaleLabel = new QLabel(tr("Scale slot to edit:"));
 	microtunerLayout->addWidget(scaleLabel, 0, 0, 1, 2, Qt::AlignBottom);
 
 	for (unsigned int i = 0; i < MaxScaleCount; i++)
@@ -102,6 +102,8 @@ MicrotunerConfig::MicrotunerConfig() :
 
 	auto loadScaleButton = new QPushButton(tr("Load"));
 	auto saveScaleButton = new QPushButton(tr("Save"));
+	loadScaleButton->setToolTip(tr("Load scale definition from a file."));
+	saveScaleButton->setToolTip(tr("Save scale definition to a file."));
 	microtunerLayout->addWidget(loadScaleButton, 3, 0, 1, 1);
 	microtunerLayout->addWidget(saveScaleButton, 3, 1, 1, 1);
 	connect(loadScaleButton, &QPushButton::clicked, [=] {loadScaleFromFile();});
@@ -112,14 +114,15 @@ MicrotunerConfig::MicrotunerConfig() :
 	m_scaleTextEdit->setToolTip(tr("Enter intervals on separate lines. Numbers containing a decimal point are treated as cents.\nOther inputs are treated as integer ratios and must be in the form of \'a/b\' or \'a\'.\nUnity (0.0 cents or ratio 1/1) is always present as a hidden first value; do not enter it manually."));
 	microtunerLayout->addWidget(m_scaleTextEdit, 4, 0, 2, 2);
 
-	auto applyScaleButton = new QPushButton(tr("Apply scale"));
+	auto applyScaleButton = new QPushButton(tr("Apply scale changes"));
+	applyScaleButton->setToolTip(tr("Verify and apply changes made to the selected scale. To use the scale, select it in the settings of a supported instrument."));
 	microtunerLayout->addWidget(applyScaleButton, 6, 0, 1, 2);
 	connect(applyScaleButton, &QPushButton::clicked, [=] {applyScale();});
 
 	// ----------------------------------
 	// Mapping sub-column
 	//
-	auto keymapLabel = new QLabel(tr("Keymap:"));
+	auto keymapLabel = new QLabel(tr("Keymap slot to edit:"));
 	microtunerLayout->addWidget(keymapLabel, 0, 2, 1, 2, Qt::AlignBottom);
 
 	for (unsigned int i = 0; i < MaxKeymapCount; i++)
@@ -137,6 +140,8 @@ MicrotunerConfig::MicrotunerConfig() :
 
 	auto loadKeymapButton = new QPushButton(tr("Load"));
 	auto saveKeymapButton = new QPushButton(tr("Save"));
+	loadKeymapButton->setToolTip(tr("Load key mapping definition from a file."));
+	saveKeymapButton->setToolTip(tr("Save key mapping definition to a file."));
 	microtunerLayout->addWidget(loadKeymapButton, 3, 2, 1, 1);
 	microtunerLayout->addWidget(saveKeymapButton, 3, 3, 1, 1);
 	connect(loadKeymapButton, &QPushButton::clicked, [=] {loadKeymapFromFile();});
@@ -181,7 +186,8 @@ MicrotunerConfig::MicrotunerConfig() :
 	baseFreqSpin->setToolTip(tr("Base note frequency"));
 	keymapRangeLayout->addWidget(baseFreqSpin, 1, 1, 1, 2);
 
-	auto applyKeymapButton = new QPushButton(tr("Apply keymap"));
+	auto applyKeymapButton = new QPushButton(tr("Apply keymap changes"));
+	applyKeymapButton->setToolTip(tr("Verify and apply changes made to the selected key mapping. To use the mapping, select it in the settings of a supported instrument."));
 	microtunerLayout->addWidget(applyKeymapButton, 6, 2, 1, 2);
 	connect(applyKeymapButton, &QPushButton::clicked, [=] {applyKeymap();});
 

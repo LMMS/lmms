@@ -6645,7 +6645,7 @@ Veuillez vous assurez que vous avez les droits d&apos;écriture sur le fichier e
     </message>
 </context>
 <context>
-    <name>InstrumentMiscView</name>
+    <name>InstrumentTuningView</name>
     <message>
         <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="221"/>
         <source>MASTER PITCH</source>
