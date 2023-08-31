@@ -283,8 +283,7 @@ bool ClipView::close()
 /*! \brief Removes a ClipView from its track view.
  *
  *  Like the close() method, this asks the track view to remove this
- *  ClipView.  However, the clip is
- *  scheduled for later deletion rather than closed immediately.
+ *  ClipView.
  *
  */
 void ClipView::remove()
