@@ -293,7 +293,8 @@ void ClipView::remove()
 
 	// delete ourself
 	close();
-	m_clip->deleteLater();
+	auto guard = Engine::audioEngine()->requestChangesGuard();
+	delete m_clip;
 }
 
 
