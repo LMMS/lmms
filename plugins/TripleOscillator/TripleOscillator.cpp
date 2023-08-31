@@ -262,8 +262,8 @@ void TripleOscillator::saveSettings( QDomDocument & _doc, QDomElement & _this )
 					"modalgo" + QString::number( i+1 ) );
 		m_osc[i]->m_useWaveTableModel.saveSettings( _doc, _this,
 					"useWaveTable" + QString::number (i+1 ) );
-		_this.setAttribute( "userwavefile" + is,
-					m_osc[i]->m_sampleBuffer->audioFile() );
+		// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
+		_this.setAttribute("userwavefile" + is, std::atomic_load(&m_osc[i]->m_sampleBuffer)->audioFile());
 	}
 }
 
@@ -364,8 +364,9 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 				oscs_r[i]->setUseWaveTable(m_osc[i]->m_useWaveTable);
 			}
 
-			oscs_l[i]->setUserWave( m_osc[i]->m_sampleBuffer );
-			oscs_r[i]->setUserWave( m_osc[i]->m_sampleBuffer );
+			// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
+			oscs_l[i]->setUserWave(std::atomic_load(&m_osc[i]->m_sampleBuffer));
+			oscs_r[i]->setUserWave(std::atomic_load(&m_osc[i]->m_sampleBuffer));
 
 		}
 

@@ -197,7 +197,8 @@ void LfoController::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	m_phaseModel.saveSettings( _doc, _this, "phase" );
 	m_waveModel.saveSettings( _doc, _this, "wave" );
 	m_multiplierModel.saveSettings( _doc, _this, "multiplier" );
-	_this.setAttribute( "userwavefile" , m_userDefSampleBuffer->audioFile() );
+	// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
+	_this.setAttribute("userwavefile", std::atomic_load(&m_userDefSampleBuffer)->audioFile());
 }
 
 
