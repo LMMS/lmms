@@ -44,7 +44,7 @@ public:
 	~AudioSampleRecorder() override;
 
 	f_cnt_t framesRecorded() const;
-	void createSampleBuffer(SampleBuffer** sampleBuffer);
+	void createSampleBuffer( SampleBuffer** sampleBuffer );
 
 
 private:

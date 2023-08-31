@@ -70,7 +70,7 @@ f_cnt_t AudioSampleRecorder::framesRecorded() const
 
 
 
-void AudioSampleRecorder::createSampleBuffer(SampleBuffer** sampleBuf)
+void AudioSampleRecorder::createSampleBuffer( SampleBuffer** sampleBuf )
 {
 	const f_cnt_t frames = framesRecorded();
 	// create buffer to store all recorded buffers in
