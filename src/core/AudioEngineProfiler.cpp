@@ -56,7 +56,7 @@ void AudioEngineProfiler::finishPeriod( sample_rate_t sampleRate, fpp_t framesPe
 	for (int i = 0; i < DetailCount; i++)
 	{
 		const int newLoad = 100 * m_detailTime[i] / timeLimit;
-		m_detailLoad[i] = std::min(newLoad * 0.05f + m_detailLoad[i] * 0.95f, 100.f);
+		m_detailLoad[i].store(std::min(newLoad * 0.05f + m_detailLoad[i] * 0.95f, 100.f), std::memory_order_relaxed);
 	}
 
 	if( m_outputFile.isOpen() )

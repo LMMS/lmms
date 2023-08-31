@@ -26,6 +26,7 @@
 #define LMMS_AUDIO_ENGINE_PROFILER_H
 
 #include <array>
+#include <atomic>
 #include <QFile>
 
 #include "lmms_basics.h"
@@ -70,7 +71,10 @@ public:
 		m_detailTime[static_cast<int>(type)] = m_detailTimer[static_cast<std::size_t>(type)].elapsed();
 	}
 
-	int detailLoad(const DetailType type) const { return m_detailLoad[static_cast<std::size_t>(type)]; }
+	int detailLoad(const DetailType type) const
+	{
+		return m_detailLoad[static_cast<std::size_t>(type)].load(std::memory_order_relaxed);
+	}
 
 private:
 	MicroTimer m_periodTimer;
@@ -80,7 +84,7 @@ private:
 	// Use arrays to avoid dynamic allocations in realtime code
 	std::array<MicroTimer, DetailCount> m_detailTimer;
 	std::array<int, DetailCount> m_detailTime{0};
-	std::array<float, DetailCount> m_detailLoad{0};
+	std::array<std::atomic<float>, DetailCount> m_detailLoad{0};
 };
 
 } // namespace lmms
