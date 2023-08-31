@@ -28,6 +28,7 @@
 #include "ConfigManager.h"
 #include "ControllerConnection.h"
 #include "DataFile.h"
+#include "GuiApplication.h"
 #include "Mixer.h"
 #include "InstrumentTrackView.h"
 #include "Instrument.h"
@@ -37,6 +38,7 @@
 #include "MixHelpers.h"
 #include "PatternStore.h"
 #include "PatternTrack.h"
+#include "PianoRoll.h"
 #include "Pitch.h"
 #include "Song.h"
 
@@ -72,6 +74,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_microtuner()
 {
 	m_pitchModel.setCenterValue( 0 );
+	m_pitchModel.setStrictStepSize(true);
 	m_panningModel.setCenterValue( DefaultPanning );
 	m_baseNoteModel.setInitValue( DefaultKey );
 	m_firstKeyModel.setInitValue(0);
@@ -341,9 +344,10 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const TimePos& tim
 						NotePlayHandleManager::acquire(
 								this, offset,
 								typeInfo<f_cnt_t>::max() / 2,
-								Note( TimePos(), TimePos(), event.key(), event.volume( midiPort()->baseVelocity() ) ),
+								Note(TimePos(), Engine::getSong()->getPlayPos(Engine::getSong()->playMode()),
+										event.key(), event.volume(midiPort()->baseVelocity())),
 								nullptr, event.channel(),
-								NotePlayHandle::Origin::MidiInput );
+								NotePlayHandle::Origin::MidiInput);
 					m_notes[event.key()] = nph;
 					if( ! Engine::audioEngine()->addPlayHandle( nph ) )
 					{
@@ -710,7 +714,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 	// Handle automation: detuning
 	for (const auto& processHandle : m_processHandles)
 	{
-		processHandle->processTimePos(_start);
+		processHandle->processTimePos(_start, m_pitchModel.value(), gui::GuiApplication::instance()->pianoRoll()->isRecording());
 	}
 
 	if ( clips.size() == 0 )

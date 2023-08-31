@@ -4134,9 +4134,9 @@ void PianoRoll::finishRecordNote(const Note & n )
 			{
 				if( it->key() == n.key() )
 				{
-					Note n1( n.length(), it->pos(),
+					Note n1(n.length(), it->pos(),
 							it->key(), it->getVolume(),
-							it->getPanning() );
+							it->getPanning(), n.detuning());
 					n1.quantizeLength( quantization() );
 					m_midiClip->addNote( n1 );
 					update();
