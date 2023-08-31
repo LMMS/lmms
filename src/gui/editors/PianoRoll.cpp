@@ -798,16 +798,10 @@ void PianoRoll::constrainNoteLengths(bool constrainMax)
 	m_midiClip->addJournalCheckPoint();
 
 	const NoteVector selectedNotes = getSelectedNotes();
+	const auto& notes = selectedNotes.empty() ? m_midiClip->notes() : selectedNotes;
 
-	// TODO C++20: std::span
-	const NoteVector* notes = &selectedNotes;
-	if (selectedNotes.empty())
-	{
-		notes = &m_midiClip->notes();
-	}
-
-	TimePos bound = m_lenOfNewNotes;  // will be length of last note
-	for (auto note : *notes)
+	TimePos bound = m_lenOfNewNotes; // will be length of last note
+	for (auto note : notes)
 	{
 		if (constrainMax ? note->length() > bound : note->length() < bound)
 		{
