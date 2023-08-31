@@ -25,7 +25,7 @@ function(_determine_version_from_source _version_out _target _source)
 	# Return with a notice if cross-compiling, since we are unlikely to be able
 	# to run the compiled source
 	if(CMAKE_CROSSCOMPILING)
-		message(NOTICE
+		message(
 			"${_target} was found but the version could not be determined automatically.\n"
 			"Set the cache variable `${_version_out}` to the version you have installed."
 		)
@@ -59,7 +59,7 @@ function(_determine_version_from_source _version_out _target _source)
 		set("${_version_out}" "${_run_output}" CACHE INTERNAL "Version of ${_target}")
 	else()
 		message(DEBUG "${_compile_output}")
-		message(NOTICE
+		message(
 			"${_target} was found but the version could not be determined automatically.\n"
 			"Set the cache variable `${_version_out}` to the version you have installed."
 		)
