@@ -78,6 +78,9 @@ OPTION(WANT_VST_32	"Include 32-bit VST support" ON)
 OPTION(WANT_VST_64	"Include 64-bit VST support" ON)
 OPTION(WANT_WINMM	"Include WinMM MIDI support" OFF)
 OPTION(WANT_DEBUG_FPE	"Debug floating point exceptions" OFF)
+option(WANT_ASAN	"Enable AddressSanitizer" OFF)
+option(WANT_TSAN	"Enable ThreadSanitizer" OFF)
+option(WANT_MSAN	"Enable MemorySanitizer" OFF)
 OPTION(BUNDLE_QT_TRANSLATIONS	"Install Qt translation files for LMMS" OFF)
 
 
