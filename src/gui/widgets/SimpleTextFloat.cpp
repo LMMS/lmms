@@ -45,6 +45,14 @@ SimpleTextFloat::SimpleTextFloat() :
 
 	m_textLabel = new QLabel(this);
 	layout->addWidget(m_textLabel);
+
+	m_showTimer = new QTimer();
+	m_showTimer->setSingleShot(true);
+	QObject::connect(m_showTimer, &QTimer::timeout, this, &SimpleTextFloat::show);
+
+	m_hideTimer = new QTimer();
+	m_hideTimer->setSingleShot(true);
+	QObject::connect(m_hideTimer, &QTimer::timeout, this, &SimpleTextFloat::hide);
 }
 
 void SimpleTextFloat::setText(const QString & text)
@@ -52,6 +60,29 @@ void SimpleTextFloat::setText(const QString & text)
 	m_textLabel->setText(text);
 }
 
+void SimpleTextFloat::showWithDelay(int msecBeforeDisplay, int msecDisplayTime)
+{
+	if (msecBeforeDisplay != 0)
+	{
+		m_showTimer->start(msecBeforeDisplay);
+	}
+	else
+	{
+		show();
+	}
+
+	if (msecDisplayTime != 0)
+	{
+		m_hideTimer->start(msecBeforeDisplay + msecDisplayTime);
+	}
+}
+
+void SimpleTextFloat::hide()
+{
+	m_showTimer->stop();
+	m_hideTimer->stop();
+	QWidget::hide();
+}
 
 void SimpleTextFloat::setVisibilityTimeOut(int msecs)
 {

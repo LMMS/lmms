@@ -108,6 +108,9 @@ public:
 		return m_unpitchedFrequency;
 	}
 
+	//! Get the current per-note detuning for this note
+	float currentDetuning() const { return m_baseDetuning->value(); }
+
 	/*! Renders one chunk using the attached instrument into the buffer */
 	void play( sampleFrame* buffer ) override;
 
