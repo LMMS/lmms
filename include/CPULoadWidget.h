@@ -40,6 +40,7 @@ namespace lmms::gui
 class CPULoadWidget : public QWidget
 {
 	Q_OBJECT
+	Q_PROPERTY(int stepSize MEMBER m_stepSize)
 public:
 	CPULoadWidget( QWidget * _parent );
 	~CPULoadWidget() override = default;
@@ -63,6 +64,9 @@ private:
 	bool m_changed;
 
 	QTimer m_updateTimer;
+
+	int m_stepSize;
+	int stepSize() const { return m_stepSize > 0 ? m_stepSize : 1; }
 
 } ;
 

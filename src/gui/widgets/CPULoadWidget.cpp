@@ -72,7 +72,9 @@ void CPULoadWidget::paintEvent( QPaintEvent *  )
 		QPainter p( &m_temp );
 		p.drawPixmap( 0, 0, m_background );
 
-		int w = m_leds.width() * m_currentLoad / 100;
+		// Normally the CPU load indicator moves smoothly, with 1 pixel resolution. However, some themes may want to
+		// draw discrete elements (like LEDs), so the stepSize property can be used to specify a larger step size.
+		int w = (m_leds.width() * m_currentLoad / (stepSize() * 100)) * stepSize();
 		if( w > 0 )
 		{
 			p.drawPixmap( 23, 3, m_leds, 0, 0, w,
