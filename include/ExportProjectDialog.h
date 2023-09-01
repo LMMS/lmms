@@ -67,7 +67,6 @@ private:
 	QString m_originalTargetFileExt;
 	QString m_dirName;
 	QString m_fileExtension;
-	
 	bool m_multiExport;
 
 	ProjectRenderer::ExportFileFormat m_ft;

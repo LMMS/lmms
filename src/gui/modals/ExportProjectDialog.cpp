@@ -54,9 +54,9 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 	updateWindowTitle();
 	
 	int cbIndex = 0;
-	for( int i = 0; i < ProjectRenderer::NumFileFormats; ++i )
+	for(int i = 0; i < ProjectRenderer::NumFileFormats; ++i)
 	{
-		if( ProjectRenderer::fileEncodeDevices[i].isAvailable() )
+		if (ProjectRenderer::fileEncodeDevices[i].isAvailable())
 		{
 			// Get the extension of this format.
 			QString renderExt = ProjectRenderer::fileEncodeDevices[i].m_extension;
@@ -68,10 +68,9 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 			);
 
 			// If this is our extension, select it.
-			if( QString::compare( renderExt, m_originalTargetFileExt,
-									Qt::CaseInsensitive ) == 0 )
+			if (QString::compare(renderExt, m_originalTargetFileExt, Qt::CaseInsensitive) == 0)
 			{
-				fileFormatCB->setCurrentIndex( cbIndex );
+				fileFormatCB->setCurrentIndex(cbIndex);
 			}
 
 			cbIndex++;
@@ -82,8 +81,8 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 	for(int i=0; i<=MAX_LEVEL; ++i)
 	{
 		QString info="";
-		if ( i==0 ){ info = tr( "( Fastest - biggest )" ); }
-		else if ( i==MAX_LEVEL ){ info = tr( "( Slowest - smallest )" ); }
+		if (i==0) { info = tr( "( Fastest - biggest )" ); }
+		else if (i==MAX_LEVEL) { info = tr( "( Slowest - smallest )" ); }
 
 		compLevelCB->addItem(
 			QString::number(i)+" "+info,
