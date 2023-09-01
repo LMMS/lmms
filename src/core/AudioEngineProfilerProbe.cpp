@@ -41,4 +41,4 @@ AudioEngineProfilerProbe::~AudioEngineProfilerProbe()
 	m_profiler.finishDetail(m_type);
 }
 
-}
+} // namespace lmms

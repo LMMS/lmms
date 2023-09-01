@@ -41,6 +41,6 @@ private:
 	const AudioEngineProfiler::DetailType m_type;
 };
 
-}
+} // namespace lmms
 
 #endif // LMMS_AUDIO_ENGINE_PROFILER_PROBE_H
