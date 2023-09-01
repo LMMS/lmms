@@ -47,15 +47,15 @@ void AudioEngineProfiler::finishPeriod( sample_rate_t sampleRate, fpp_t framesPe
 	const uint64_t timeLimit = static_cast<uint64_t>(1000000) * framesPerPeriod / sampleRate;
 
 	// Compute new overall CPU load and apply exponential averaging.
-	// The result is used for overload detection in AudioEngine::CriticalXRuns()
+	// The result is used for overload detection in AudioEngine::criticalXRuns()
 	// → the weight of a new sample must be high enough to allow relatively fast changes!
-	const int newCpuLoad = 100 * periodElapsed / timeLimit;
+	const auto newCpuLoad = 100.f * periodElapsed / timeLimit;
 	m_cpuLoad = std::min(newCpuLoad * 0.1f + m_cpuLoad * 0.9f, 100.f);
 
 	// Compute detailed load analysis. Can use stronger averaging to get more stable readout.
 	for (std::size_t i = 0; i < DetailCount; i++)
 	{
-		const int newLoad = 100 * m_detailTime[i] / timeLimit;
+		const auto newLoad = 100.f * m_detailTime[i] / timeLimit;
 		const auto oldLoad = m_detailLoad[i].load(std::memory_order_relaxed);
 		m_detailLoad[i].store(std::min(newLoad * 0.05f + oldLoad * 0.95f, 100.f), std::memory_order_relaxed);
 	}

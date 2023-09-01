@@ -72,10 +72,7 @@ void CPULoadWidget::paintEvent( QPaintEvent *  )
 		QPainter p( &m_temp );
 		p.drawPixmap( 0, 0, m_background );
 
-		// as load-indicator consists of small 2-pixel wide leds with
-		// 1 pixel spacing, we have to make sure, only whole leds are
-		// shown which we achieve by the following formula
-		int w = ( m_leds.width() * m_currentLoad / 300 ) * 3;
+		int w = m_leds.width() * m_currentLoad / 100;
 		if( w > 0 )
 		{
 			p.drawPixmap( 23, 3, m_leds, 0, 0, w,
