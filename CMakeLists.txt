@@ -568,6 +568,21 @@ ELSE()
 	SET (STATUS_DEBUG_FPE "Disabled")
 ENDIF(WANT_DEBUG_FPE)
 
+if(WANT_DEBUG_ASAN)
+	add_compile_options(-fsanitize=address)
+	add_link_options(-fsanitize=address)
+endif()
+
+if(WANT_DEBUG_TSAN)
+	add_compile_options(-fsanitize=thread)
+	add_link_options(-fsanitize=thread)
+endif()
+
+if(WANT_DEBUG_MSAN)
+	add_compile_options(-fsanitize=memory -fno-omit-frame-pointer)
+	add_link_options(-fsanitize=memory -fno-omit-frame-pointer)
+endif()
+
 # check for libsamplerate
 FIND_PACKAGE(Samplerate 0.1.8 MODULE REQUIRED)
 

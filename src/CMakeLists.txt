@@ -16,21 +16,6 @@ IF(LMMS_BUILD_APPLE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 ENDIF()
 
-if(WANT_DEBUG_ASAN)
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
-endif()
-
-if(WANT_DEBUG_TSAN)
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=thread")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=thread")
-endif()
-
-if(WANT_DEBUG_MSAN)
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=memory -fno-omit-frame-pointer")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=memory -fno-omit-frame-pointer")
-endif()
-
 ADD_SUBDIRECTORY(common)
 ADD_SUBDIRECTORY(core)
 ADD_SUBDIRECTORY(gui)
