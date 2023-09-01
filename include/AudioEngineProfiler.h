@@ -68,7 +68,7 @@ public:
 	void startDetail(const DetailType type) { m_detailTimer[static_cast<std::size_t>(type)].reset(); }
 	void finishDetail(const DetailType type)
 	{
-		m_detailTime[static_cast<int>(type)] = m_detailTimer[static_cast<std::size_t>(type)].elapsed();
+		m_detailTime[static_cast<std::size_t>(type)] = m_detailTimer[static_cast<std::size_t>(type)].elapsed();
 	}
 
 	int detailLoad(const DetailType type) const

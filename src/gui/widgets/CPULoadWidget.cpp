@@ -100,11 +100,11 @@ void CPULoadWidget::updateCpuLoad()
 	{
 		auto engine = Engine::audioEngine();
 		setToolTip(
-			tr("DSP total: %1").arg(new_load) + " %\n"
-			+ tr(" - Notes and setup: %1").arg(engine->detailLoad(AudioEngineProfiler::DetailType::NoteSetup)) + " %\n"
-			+ tr(" - Instruments: %1").arg(engine->detailLoad(AudioEngineProfiler::DetailType::Instruments)) + " %\n"
-			+ tr(" - Effects: %1").arg(engine->detailLoad(AudioEngineProfiler::DetailType::Effects)) + " %\n"
-			+ tr(" - Mixing: %1").arg(engine->detailLoad(AudioEngineProfiler::DetailType::Mixing)) + " %"
+			tr("DSP total: %1%").arg(new_load) + "\n"
+			+ tr(" - Notes and setup: %1%").arg(engine->detailLoad(AudioEngineProfiler::DetailType::NoteSetup)) + "\n"
+			+ tr(" - Instruments: %1%").arg(engine->detailLoad(AudioEngineProfiler::DetailType::Instruments)) + "\n"
+			+ tr(" - Effects: %1%").arg(engine->detailLoad(AudioEngineProfiler::DetailType::Effects)) + "\n"
+			+ tr(" - Mixing: %1%").arg(engine->detailLoad(AudioEngineProfiler::DetailType::Mixing))
 		);
 		m_currentLoad = new_load;
 		m_changed = true;
