@@ -97,7 +97,7 @@ signals:
 	void sampleUpdated();
 
 private:
-	Sample m_sample;
+	std::shared_ptr<Sample> m_sample;
 
 	FloatModel m_ampModel;
 	FloatModel m_startPointModel;

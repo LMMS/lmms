@@ -90,11 +90,11 @@ private:
 		MM_OPERATORS
 		Sample::PlaybackState* state;
 		bool tuned;
-		Sample sample;
+		std::shared_ptr<Sample> sample;
 	};
 
 	QString m_patchFile;
-	QVector<Sample> m_patchSamples;
+	QVector<std::shared_ptr<Sample>> m_patchSamples;
 	BoolModel m_loopedModel;
 	BoolModel m_tunedModel;
 
