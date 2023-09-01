@@ -27,6 +27,8 @@
 #define LMMS_GUI_EXPORT_PROJECT_DIALOG_H
 
 #include <QDialog>
+#include <QFileInfo>
+
 #include <memory>
 #include "ui_export_project.h"
 
@@ -47,6 +49,8 @@ protected:
 	void reject() override;
 	void closeEvent( QCloseEvent * _ce ) override;
 
+	void updateWindowTitle();
+	QString removeKnownExtension(QString fileName);
 
 private slots:
 	void startBtnClicked();
@@ -58,8 +62,12 @@ private slots:
 
 private:
 	QString m_fileName;
+	QFileInfo m_targetFileInfo;
+	bool m_needCheckIfTargetFileExists;
+	QString m_originalTargetFileExt;
 	QString m_dirName;
 	QString m_fileExtension;
+	
 	bool m_multiExport;
 
 	ProjectRenderer::ExportFileFormat m_ft;

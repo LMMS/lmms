@@ -22,10 +22,11 @@
  *
  */
 
-#include <QFileInfo>
-#include <QMessageBox>
-
 #include "ExportProjectDialog.h"
+
+#include <QMessageBox>
+#include <QDir>
+
 #include "Song.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
@@ -44,17 +45,14 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 	m_renderManager( nullptr )
 {
 	setupUi( this );
-	setWindowTitle( tr( "Export project to %1" ).arg(
-					QFileInfo( _file_name ).fileName() ) );
 
-	// Get the extension of the chosen file.
-	QStringList parts = _file_name.split( '.' );
-	QString fileExt;
-	if( parts.size() > 0 )
-	{
-		fileExt = "." + parts[parts.size()-1];
-	}
-
+	m_targetFileInfo = QFileInfo(m_fileName);
+	m_needCheckIfTargetFileExists = false;
+	QString fileExt = m_targetFileInfo.suffix();
+	m_originalTargetFileExt = "." + fileExt;
+	
+	updateWindowTitle();
+	
 	int cbIndex = 0;
 	for( int i = 0; i < ProjectRenderer::NumFileFormats; ++i )
 	{
@@ -70,7 +68,7 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 			);
 
 			// If this is our extension, select it.
-			if( QString::compare( renderExt, fileExt,
+			if( QString::compare( renderExt, m_originalTargetFileExt,
 									Qt::CaseInsensitive ) == 0 )
 			{
 				fileFormatCB->setCurrentIndex( cbIndex );
@@ -102,6 +100,33 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 			this, SLOT(startBtnClicked()));
 }
 
+void ExportProjectDialog::updateWindowTitle()
+{
+	setWindowTitle( tr( "Export project to %1" ).arg(
+					m_targetFileInfo.fileName() ) );
+}
+
+QString ExportProjectDialog::removeKnownExtension(QString filePath)
+{
+	QFileInfo info(filePath);
+
+	QString fileExt = info.suffix();
+	
+	if (fileExt.compare("") == 0) return filePath;
+	
+	fileExt = "." + fileExt;
+
+	for(int i = 0; i < ProjectRenderer::NumFileFormats; i++)
+	{
+		if( ProjectRenderer::fileEncodeDevices[i].isAvailable() )
+		{
+			if (fileExt.compare(ProjectRenderer::fileEncodeDevices[i].m_extension, Qt::CaseInsensitive ) == 0) 
+				return QDir(info.absolutePath()).filePath(info.completeBaseName());
+		} 
+	}
+
+	return info.absoluteFilePath();
+}
 
 void ExportProjectDialog::reject()
 {
@@ -247,10 +272,31 @@ void ExportProjectDialog::onFileFormatChanged(int index)
 	checkBoxVariableBitRate->setVisible(variableBitrateVisible);
 
 	depthWidget->setVisible(bitDepthControlEnabled);
+		
+	// Updating target file extention and checking status
+
+	m_targetFileInfo.setFile(removeKnownExtension(m_targetFileInfo.absoluteFilePath()) 
+							+ ProjectRenderer::fileEncodeDevices[index].m_extension);
+	
+	m_needCheckIfTargetFileExists = m_originalTargetFileExt.compare(ProjectRenderer::fileEncodeDevices[index].m_extension, 
+																	Qt::CaseInsensitive ) != 0;
+
+	updateWindowTitle();
 }
 
 void ExportProjectDialog::startBtnClicked()
 {
+	if (m_needCheckIfTargetFileExists && m_targetFileInfo.exists())
+	{
+		QMessageBox mb;
+		mb.setWindowTitle(windowTitle());
+		mb.setText(m_targetFileInfo.fileName() + tr(" already exists. Do you want to replace it?"));
+		mb.setIcon(QMessageBox::Warning);
+		mb.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+
+		if(mb.exec() == QMessageBox::No) return;
+	}
+
 	m_ft = ProjectRenderer::ExportFileFormat::Count;
 
 	// Get file format from current menu selection.
