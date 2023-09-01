@@ -3,6 +3,7 @@ set(LMMS_SRCS
 
 	core/AudioEngine.cpp
 	core/AudioEngineProfiler.cpp
+	core/AudioEngineProfilerProbe.cpp
 	core/AudioEngineWorkerThread.cpp
 	core/AutomatableModel.cpp
 	core/AutomationClip.cpp

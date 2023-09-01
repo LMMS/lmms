@@ -28,6 +28,7 @@
 
 #include "lmmsconfig.h"
 
+#include "AudioEngineProfilerProbe.h"
 #include "AudioEngineWorkerThread.h"
 #include "AudioPort.h"
 #include "Mixer.h"
@@ -335,7 +336,7 @@ void AudioEngine::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
 
 void AudioEngine::renderStageNoteSetup()
 {
-	m_profiler.startDetail(AudioEngineProfiler::DetailType::NoteSetup);
+	AudioEngineProfilerProbe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::NoteSetup);
 
 	if( m_clearSignal )
 	{
@@ -384,15 +385,13 @@ void AudioEngine::renderStageNoteSetup()
 		m_newPlayHandles.free( e );
 		e = next;
 	}
-
-	m_profiler.finishDetail(AudioEngineProfiler::DetailType::NoteSetup);
 }
 
 
 
 void AudioEngine::renderStageInstruments()
 {
-	m_profiler.startDetail(AudioEngineProfiler::DetailType::Instruments);
+	AudioEngineProfilerProbe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::Instruments);
 
 	AudioEngineWorkerThread::fillJobQueue(m_playHandles);
 	AudioEngineWorkerThread::startAndWaitForJobs();
@@ -422,27 +421,24 @@ void AudioEngine::renderStageInstruments()
 			++it;
 		}
 	}
-	m_profiler.finishDetail(AudioEngineProfiler::DetailType::Instruments);
 }
 
 
 
 void AudioEngine::renderStageEffects()
 {
-	m_profiler.startDetail(AudioEngineProfiler::DetailType::Effects);
+	AudioEngineProfilerProbe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::Effects);
 
 	// STAGE 2: process effects of all instrument- and sampletracks
 	AudioEngineWorkerThread::fillJobQueue(m_audioPorts);
 	AudioEngineWorkerThread::startAndWaitForJobs();
-
-	m_profiler.finishDetail(AudioEngineProfiler::DetailType::Effects);
 }
 
 
 
 void AudioEngine::renderStageMix()
 {
-	m_profiler.startDetail(AudioEngineProfiler::DetailType::Mixing);
+	AudioEngineProfilerProbe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::Mixing);
 
 	Mixer *mixer = Engine::mixer();
 	mixer->masterMix(m_outputBufferWrite);
@@ -455,8 +451,6 @@ void AudioEngine::renderStageMix()
 	EnvelopeAndLfoParameters::instances()->trigger();
 	Controller::triggerFrameCounter();
 	AutomatableModel::incrementPeriodCounter();
-
-	m_profiler.finishDetail(AudioEngineProfiler::DetailType::Mixing);
 }
 
 
