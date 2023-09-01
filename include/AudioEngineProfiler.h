@@ -78,7 +78,7 @@ public:
 
 private:
 	MicroTimer m_periodTimer;
-	float m_cpuLoad;
+	std::atomic<float> m_cpuLoad;
 	QFile m_outputFile;
 
 	// Use arrays to avoid dynamic allocations in realtime code
