@@ -26,6 +26,7 @@
 #ifndef LMMS_GUI_CPU_LOAD_WIDGET_H
 #define LMMS_GUI_CPU_LOAD_WIDGET_H
 
+#include <algorithm>
 #include <QTimer>
 #include <QPixmap>
 #include <QWidget>
@@ -55,6 +56,8 @@ protected slots:
 
 
 private:
+	int stepSize() const { return std::max(1, m_stepSize); }
+
 	int m_currentLoad;
 
 	QPixmap m_temp;
@@ -66,7 +69,6 @@ private:
 	QTimer m_updateTimer;
 
 	int m_stepSize;
-	int stepSize() const { return m_stepSize > 0 ? m_stepSize : 1; }
 
 } ;
 

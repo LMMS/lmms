@@ -28,7 +28,6 @@
 
 #include "lmmsconfig.h"
 
-#include "AudioEngineProfilerProbe.h"
 #include "AudioEngineWorkerThread.h"
 #include "AudioPort.h"
 #include "Mixer.h"
@@ -336,7 +335,7 @@ void AudioEngine::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
 
 void AudioEngine::renderStageNoteSetup()
 {
-	AudioEngineProfilerProbe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::NoteSetup);
+	AudioEngineProfiler::Probe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::NoteSetup);
 
 	if( m_clearSignal )
 	{
@@ -391,7 +390,7 @@ void AudioEngine::renderStageNoteSetup()
 
 void AudioEngine::renderStageInstruments()
 {
-	AudioEngineProfilerProbe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::Instruments);
+	AudioEngineProfiler::Probe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::Instruments);
 
 	AudioEngineWorkerThread::fillJobQueue(m_playHandles);
 	AudioEngineWorkerThread::startAndWaitForJobs();
@@ -427,7 +426,7 @@ void AudioEngine::renderStageInstruments()
 
 void AudioEngine::renderStageEffects()
 {
-	AudioEngineProfilerProbe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::Effects);
+	AudioEngineProfiler::Probe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::Effects);
 
 	// STAGE 2: process effects of all instrument- and sampletracks
 	AudioEngineWorkerThread::fillJobQueue(m_audioPorts);
@@ -438,7 +437,7 @@ void AudioEngine::renderStageEffects()
 
 void AudioEngine::renderStageMix()
 {
-	AudioEngineProfilerProbe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::Mixing);
+	AudioEngineProfiler::Probe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::Mixing);
 
 	Mixer *mixer = Engine::mixer();
 	mixer->masterMix(m_outputBufferWrite);

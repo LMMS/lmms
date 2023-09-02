@@ -65,18 +65,37 @@ public:
 
 	constexpr static auto DetailCount = static_cast<std::size_t>(DetailType::Count);
 
+	int detailLoad(const DetailType type) const
+	{
+		return m_detailLoad[static_cast<std::size_t>(type)].load(std::memory_order_relaxed);
+	}
+
+	class Probe
+	{
+	public:
+		Probe(AudioEngineProfiler& profiler, AudioEngineProfiler::DetailType type)
+			: m_profiler(profiler)
+			, m_type(type)
+		{
+			profiler.startDetail(type);
+		}
+		~Probe() { m_profiler.finishDetail(m_type); }
+		Probe& operator=(const Probe&) = delete;
+		Probe(const Probe&) = delete;
+		Probe(Probe&&) = delete;
+
+	private:
+		AudioEngineProfiler &m_profiler;
+		const AudioEngineProfiler::DetailType m_type;
+	};
+
+private:
 	void startDetail(const DetailType type) { m_detailTimer[static_cast<std::size_t>(type)].reset(); }
 	void finishDetail(const DetailType type)
 	{
 		m_detailTime[static_cast<std::size_t>(type)] = m_detailTimer[static_cast<std::size_t>(type)].elapsed();
 	}
 
-	int detailLoad(const DetailType type) const
-	{
-		return m_detailLoad[static_cast<std::size_t>(type)].load(std::memory_order_relaxed);
-	}
-
-private:
 	MicroTimer m_periodTimer;
 	std::atomic<float> m_cpuLoad;
 	QFile m_outputFile;
