@@ -54,7 +54,7 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 	updateWindowTitle();
 	
 	int cbIndex = 0;
-	for(int i = 0; i < ProjectRenderer::NumFileFormats; ++i)
+	for (int i = 0; i < ProjectRenderer::NumFileFormats; ++i)
 	{
 		if (ProjectRenderer::fileEncodeDevices[i].isAvailable())
 		{
@@ -78,7 +78,7 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 	}
 
 	int const MAX_LEVEL=8;
-	for(int i=0; i<=MAX_LEVEL; ++i)
+	for (int i=0; i<=MAX_LEVEL; ++i)
 	{
 		QString info="";
 		if (i==0) { info = tr( "( Fastest - biggest )" ); }
@@ -101,8 +101,7 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 
 void ExportProjectDialog::updateWindowTitle()
 {
-	setWindowTitle( tr( "Export project to %1" ).arg(
-					m_targetFileInfo.fileName() ) );
+	setWindowTitle(tr("Export project to %1").arg(m_targetFileInfo.fileName()));
 }
 
 QString ExportProjectDialog::removeKnownExtension(QString filePath)
@@ -111,13 +110,13 @@ QString ExportProjectDialog::removeKnownExtension(QString filePath)
 
 	QString fileExt = info.suffix();
 	
-	if (fileExt.compare("") == 0) return filePath;
+	if (fileExt.isEmpty()) { return filePath; }
 	
 	fileExt = "." + fileExt;
 
-	for(int i = 0; i < ProjectRenderer::NumFileFormats; i++)
+	for (int i = 0; i < ProjectRenderer::NumFileFormats; i++)
 	{
-		if( ProjectRenderer::fileEncodeDevices[i].isAvailable() )
+		if (ProjectRenderer::fileEncodeDevices[i].isAvailable())
 		{
 			if (fileExt.compare(ProjectRenderer::fileEncodeDevices[i].m_extension, Qt::CaseInsensitive ) == 0) 
 				return QDir(info.absolutePath()).filePath(info.completeBaseName());
@@ -278,7 +277,7 @@ void ExportProjectDialog::onFileFormatChanged(int index)
 							+ ProjectRenderer::fileEncodeDevices[index].m_extension);
 	
 	m_needCheckIfTargetFileExists = m_originalTargetFileExt.compare(ProjectRenderer::fileEncodeDevices[index].m_extension, 
-																	Qt::CaseInsensitive ) != 0;
+																	Qt::CaseInsensitive) != 0;
 
 	updateWindowTitle();
 }
@@ -293,7 +292,7 @@ void ExportProjectDialog::startBtnClicked()
 		mb.setIcon(QMessageBox::Warning);
 		mb.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 
-		if(mb.exec() == QMessageBox::No) return;
+		if (mb.exec() == QMessageBox::No) { return; }
 	}
 
 	m_ft = ProjectRenderer::ExportFileFormat::Count;
