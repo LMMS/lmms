@@ -34,7 +34,7 @@ namespace gui
         for (int i = 0;i<slicePoints.size();i++) {
             // printf("%i\n", slicePoints[i]);
             float xPos = (float)slicePoints[i] / (float)currentSample.frames() * (float)width;
-            printf("%i / %i * %i = %f\n", slicePoints[i] , currentSample.frames() , width, xPos);
+            // printf("%i / %i * %i = %f\n", slicePoints[i] , currentSample.frames() , width, xPos);
             brush.drawLine(xPos, 0, xPos, height);
         }
 

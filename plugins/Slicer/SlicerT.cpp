@@ -76,7 +76,7 @@ Plugin::Descriptor PLUGIN_EXPORT slicert_plugin_descriptor =
 SlicerT::SlicerT(InstrumentTrack * _instrument_track) : 
 	Instrument( _instrument_track, &slicert_plugin_descriptor ),
 	m_sampleBuffer(),
-	noteThreshold( 0.2f, 0.0f, 1.0f, 0.01f, this, tr( "Note Threshold" ) )
+	noteThreshold( 0.6f, 0.0f, 2.0f, 0.01f, this, tr( "Note Threshold" ) )
 {
 	// connect( &noteThreshold, SIGNAL( dataChanged() ), this, SLOT( updateParams() ) );
 	printf("Correctly loaded SlicerT!\n");
@@ -85,29 +85,33 @@ SlicerT::SlicerT(InstrumentTrack * _instrument_track) :
 
 void SlicerT::findSlices() {
 	int c = 0;
-	float lastAvg = 0;
-	float currentAvg = 0;
-	slicePoints = {};
+	const int window = 1024;
+	int peakIndex = 0;
+	float lastPeak = 0;
+	float currentPeak = 0;
+	slicePoints = {0};
 	for (int i = 0; i<m_sampleBuffer.endFrame();i+=1) {
 		// combine left and right and absolute it
 		float sampleValue = abs(m_sampleBuffer.data()[i][0]) + abs(m_sampleBuffer.data()[i][1]) / 2;
-		currentAvg += sampleValue;
-
-		if (i%128==0) {
-			currentAvg /= 128.0f;
+		if (sampleValue > currentPeak) {
+			currentPeak = sampleValue;
+			peakIndex = i;
+		}
+		
+		if (i%window==0) {
 			//printf("%i -> %f : %f\n", i, currentAvg, lastAvg);
-			if (abs(currentAvg- lastAvg) > noteThreshold.value()) {
+			if (abs(currentPeak / lastPeak) > 1+noteThreshold.value()) {
 				c++;
-				slicePoints.push_back(i);
+				slicePoints.push_back(peakIndex);
 			}
-			lastAvg = currentAvg;
-			currentAvg = 0;
+			lastPeak = currentPeak;
+			currentPeak = 0;
 		}
 
 	}
-	// for (int i : slicePoints) {
-	// 	//printf("%i\n", i);
-	// }
+	for (int i : slicePoints) {
+		printf("%i\n", i);
+	}
 	
 	printf("Found %i notes\n", c);
 	emit dataChanged();
