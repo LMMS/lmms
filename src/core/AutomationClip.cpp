@@ -347,9 +347,9 @@ void AutomationClip::removeNode(const TimePos & time)
 
 	m_timeMap.remove(time);
 
-	if (!m_timeMap.isEmpty())
+	auto it = m_timeMap.lowerBound(time);
+	if (it != m_timeMap.end())
 	{
-		auto it = m_timeMap.lowerBound(time);
 		if (it != m_timeMap.begin())
 		{
 			--it;
@@ -483,8 +483,7 @@ TimePos AutomationClip::setDragValue(
 			}
 		}
 
-		removeNode(newTime);
-
+		this->removeNode(newTime);
 		m_oldTimeMap = m_timeMap;
 		m_dragging = true;
 	}
