@@ -5,7 +5,7 @@ ADD_LIBRARY(cmt MODULE ${SOURCES})
 INSTALL(TARGETS cmt LIBRARY DESTINATION "${PLUGIN_DIR}/ladspa")
 
 SET_TARGET_PROPERTIES(cmt PROPERTIES PREFIX "")
-SET_TARGET_PROPERTIES(cmt PROPERTIES COMPILE_FLAGS "-Wall -O3 -fno-strict-aliasing")
+target_compile_options(cmt PRIVATE -Wall -O3 -fno-strict-aliasing)
 
 if(LMMS_BUILD_WIN32)
 	add_custom_command(
@@ -22,6 +22,6 @@ if(NOT LMMS_BUILD_WIN32)
 endif()
 
 IF(NOT LMMS_BUILD_APPLE AND NOT LMMS_BUILD_OPENBSD)
-	SET_TARGET_PROPERTIES(cmt PROPERTIES LINK_FLAGS "${LINK_FLAGS} -shared -Wl,-no-undefined")
+	target_link_options(cmt PRIVATE -shared -Wl,$<IF:$<PLATFORM_ID:GNU>,-no-undefined,-undefined>)
 ENDIF()
 
