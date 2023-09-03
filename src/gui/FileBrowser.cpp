@@ -190,7 +190,7 @@ bool FileBrowser::filterAndExpandItems(const QString & filter, QTreeWidgetItem *
 	bool anyMatched = false;
 
 	int numChildren = item ? item->childCount() : m_fileBrowserTreeWidget->topLevelItemCount();
-	for (int i = 0; i < numChildren; i++)
+	for (int i = 0; i < numChildren; ++i)
 	{
 		QTreeWidgetItem * it = item ? item->child( i ) : m_fileBrowserTreeWidget->topLevelItem(i);
 
@@ -278,17 +278,14 @@ void FileBrowser::expandItems(QTreeWidgetItem* item, QList<QString> expandedDirs
 			// Expanding is required when recursive to load in its contents, even if it's collapsed right afterward
 			if (m_recurse) { d->setExpanded(true); }
 			d->setExpanded(expandedDirs.contains(d->fullName()));
-			d->setHidden(false);
 
 			if (m_recurse && it->childCount())
 			{
 				expandItems(it, expandedDirs);
 			}
 		}
-		else
-		{
-			it->setHidden(false);
-		}
+		
+		it->setHidden(false);		
 	}
 }
 
