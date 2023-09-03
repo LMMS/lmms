@@ -653,11 +653,7 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	ENDIF(WIN32)
 ENDIF()
 
-#
 # add enabled sanitizers
-# todo: use target_link_options(lmmsobjs INTERFACE -fsanitize=<check>) instead 
-# once support is added to link object libraries to other targets (CMake 3.12)
-#
 function(add_sanitizer sanitizer supported_compilers want_flag status_flag)
 	if(${want_flag})
 		if(CMAKE_CXX_COMPILER_ID MATCHES ${supported_compilers})
