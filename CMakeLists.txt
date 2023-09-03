@@ -81,6 +81,7 @@ OPTION(WANT_DEBUG_FPE	"Debug floating point exceptions" OFF)
 option(WANT_DEBUG_ASAN	"Enable AddressSanitizer" OFF)
 option(WANT_DEBUG_TSAN	"Enable ThreadSanitizer" OFF)
 option(WANT_DEBUG_MSAN	"Enable MemorySanitizer" OFF)
+option(WANT_DEBUG_UBSAN	"Enable UndefinedBehaviorSanitizer" OFF)
 OPTION(BUNDLE_QT_TRANSLATIONS	"Install Qt translation files for LMMS" OFF)
 
 
@@ -743,6 +744,11 @@ if(WANT_DEBUG_MSAN)
 	target_link_options(tests PRIVATE -fsanitize=memory -fno-omit-frame-pointer)
 endif()
 
+if(WANT_DEBUG_UBSAN)
+	target_compile_options(lmmsobjs PUBLIC -fsanitize=undefined)
+	target_link_options(lmms PRIVATE -fsanitize=undefined)
+	target_link_options(tests PRIVATE -fsanitize=undefined)
+endif()
 
 #
 # display configuration information
