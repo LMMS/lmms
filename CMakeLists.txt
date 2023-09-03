@@ -726,29 +726,26 @@ ADD_CUSTOM_TARGET(uninstall
 # todo: use target_link_options(lmmsobjs INTERFACE -fsanitize=<check>) instead 
 # once support is added to link object libraries to other targets (CMake 3.12)
 #
-if(WANT_DEBUG_ASAN)
-	target_compile_options(lmmsobjs PUBLIC -fsanitize=address)
-	target_link_options(lmms PRIVATE -fsanitize=address)
-	target_link_options(tests PRIVATE -fsanitize=address)
-endif()
 
-if(WANT_DEBUG_TSAN)
-	target_compile_options(lmmsobjs PUBLIC -fsanitize=thread)
-	target_link_options(lmms PRIVATE -fsanitize=thread)
-	target_link_options(tests PRIVATE -fsanitize=thread)
-endif()
+function(add_sanitizer sanitizer supported_compilers want_flag status_flag)
+	if(${want_flag})
+		if(CMAKE_CXX_COMPILER_ID MATCHES ${supported_compilers})
+			set(${status_flag} "Enabled" PARENT_SCOPE)
+			target_compile_options(lmmsobjs PUBLIC -fsanitize=${sanitizer})
+			target_link_options(lmms PRIVATE -fsanitize=${sanitizer})
+			target_link_options(tests PRIVATE -fsanitize=${sanitizer})
+		else()
+			set(${status_flag} "Wanted but disabled due to unsupported compiler" PARENT_SCOPE)
+		endif()
+	else()
+		set(${status_flag} "Disabled" PARENT_SCOPE)
+	endif()
+endfunction()
 
-if(WANT_DEBUG_MSAN)
-	target_compile_options(lmmsobjs PUBLIC -fsanitize=memory -fno-omit-frame-pointer)
-	target_link_options(lmms PRIVATE -fsanitize=memory -fno-omit-frame-pointer)
-	target_link_options(tests PRIVATE -fsanitize=memory -fno-omit-frame-pointer)
-endif()
-
-if(WANT_DEBUG_UBSAN)
-	target_compile_options(lmmsobjs PUBLIC -fsanitize=undefined)
-	target_link_options(lmms PRIVATE -fsanitize=undefined)
-	target_link_options(tests PRIVATE -fsanitize=undefined)
-endif()
+add_sanitizer(address "GNU|Clang|MSVC" WANT_DEBUG_ASAN STATUS_DEBUG_ASAN)
+add_sanitizer(thread "GNU|Clang" WANT_DEBUG_TSAN STATUS_DEBUG_TSAN)
+add_sanitizer(memory "GNU|Clang" WANT_DEBUG_MSAN STATUS_DEBUG_MSAN)
+add_sanitizer(undefined "GNU|Clang" WANT_DEBUG_UBSAN STATUS_DEBUG_UBSAN)
 
 #
 # display configuration information
@@ -816,6 +813,10 @@ MESSAGE(
 "Developer options\n"
 "-----------------------------------------\n"
 "* Debug FP exceptions         : ${STATUS_DEBUG_FPE}\n"
+"* Debug AddressSanitizer      : ${STATUS_DEBUG_ASAN}\n"
+"* Debug ThreadSanitizer       : ${STATUS_DEBUG_TSAN}\n"
+"* Debug MemorySanitizer       : ${STATUS_DEBUG_MSAN}\n"
+"* Debug UBSanitizer           : ${STATUS_DEBUG_UBSAN}\n"
 )
 
 MESSAGE(
