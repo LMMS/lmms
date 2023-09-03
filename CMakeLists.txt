@@ -568,21 +568,6 @@ ELSE()
 	SET (STATUS_DEBUG_FPE "Disabled")
 ENDIF(WANT_DEBUG_FPE)
 
-if(WANT_DEBUG_ASAN)
-	add_compile_options(-fsanitize=address)
-	add_link_options(-fsanitize=address)
-endif()
-
-if(WANT_DEBUG_TSAN)
-	add_compile_options(-fsanitize=thread)
-	add_link_options(-fsanitize=thread)
-endif()
-
-if(WANT_DEBUG_MSAN)
-	add_compile_options(-fsanitize=memory -fno-omit-frame-pointer)
-	add_link_options(-fsanitize=memory -fno-omit-frame-pointer)
-endif()
-
 # check for libsamplerate
 FIND_PACKAGE(Samplerate 0.1.8 MODULE REQUIRED)
 
@@ -734,6 +719,29 @@ ADD_CUSTOM_TARGET(dist
 ADD_CUSTOM_TARGET(uninstall
 	COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}" -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/uninstall.cmake"
 )
+
+#
+# add enabled sanitizers
+# todo: use target_link_options(lmmsobjs INTERFACE -fsanitize=<check>) instead 
+# once support is added to link object libraries to other targets (CMake 3.12)
+#
+if(WANT_DEBUG_ASAN)
+	target_compile_options(lmmsobjs PUBLIC -fsanitize=address)
+	target_link_options(lmms PRIVATE -fsanitize=address)
+	target_link_options(tests PRIVATE -fsanitize=address)
+endif()
+
+if(WANT_DEBUG_TSAN)
+	target_compile_options(lmmsobjs PUBLIC -fsanitize=thread)
+	target_link_options(lmms PRIVATE -fsanitize=thread)
+	target_link_options(tests PRIVATE -fsanitize=thread)
+endif()
+
+if(WANT_DEBUG_MSAN)
+	target_compile_options(lmmsobjs PUBLIC -fsanitize=memory -fno-omit-frame-pointer)
+	target_link_options(lmms PRIVATE -fsanitize=memory -fno-omit-frame-pointer)
+	target_link_options(tests PRIVATE -fsanitize=memory -fno-omit-frame-pointer)
+endif()
 
 
 #
