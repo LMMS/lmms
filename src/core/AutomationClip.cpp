@@ -345,17 +345,13 @@ void AutomationClip::removeNode(const TimePos & time)
 
 	cleanObjects();
 
-	m_timeMap.remove(time);
-
-	auto it = m_timeMap.lowerBound(time);
-	if (it != m_timeMap.end())
+	m_timeMap.remove( time );
+	timeMap::iterator it = m_timeMap.lowerBound(time);
+	if( it != m_timeMap.begin() )
 	{
-		if (it != m_timeMap.begin())
-		{
-			--it;
-		}
-		generateTangents(it, 3);
+		--it;
 	}
+	generateTangents(it, 3);
 
 	updateLength();
 
@@ -1110,30 +1106,22 @@ void AutomationClip::generateTangents(timeMap::iterator it, int numToGenerate)
 {
 	QMutexLocker m(&m_clipMutex);
 
-	if( m_timeMap.size() < 2 && numToGenerate > 0 )
+	for (int i = 0; i < numToGenerate && it != m_timeMap.end(); ++i, ++it)
 	{
-		it.value().setInTangent(0);
-		it.value().setOutTangent(0);
-		return;
-	}
-
-	for( int i = 0; i < numToGenerate; i++ )
-	{
-		if( it == m_timeMap.begin() )
+		if (it + 1 == m_timeMap.end())
+		{
+			// Previously, the last value's tangent was always set to 0. That logic was kept for both tangents
+			// of the last node
+			it.value().setInTangent(0);
+			it.value().setOutTangent(0);
+		}
+		else if (it == m_timeMap.begin())
 		{
 			// On the first node there's no curve behind it, so we will only calculate the outTangent
 			// and inTangent will be set to 0.
 			float tangent = (INVAL(it + 1) - OUTVAL(it)) / (POS(it + 1) - POS(it));
 			it.value().setInTangent(0);
 			it.value().setOutTangent(tangent);
-		}
-		else if( it+1 == m_timeMap.end() )
-		{
-			// Previously, the last value's tangent was always set to 0. That logic was kept for both tangents
-			// of the last node
-			it.value().setInTangent(0);
-			it.value().setOutTangent(0);
-			return;
 		}
 		else
 		{
@@ -1163,7 +1151,6 @@ void AutomationClip::generateTangents(timeMap::iterator it, int numToGenerate)
 				it.value().setOutTangent(outTangent);
 			}
 		}
-		it++;
 	}
 }
 
