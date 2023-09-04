@@ -333,12 +333,9 @@ void AudioEngine::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
 
 
 
-
-const surroundSampleFrame * AudioEngine::renderNextBuffer()
+void AudioEngine::renderStageNoteSetup()
 {
-	m_profiler.startPeriod();
-
-	s_renderingThread = true;
+	AudioEngineProfiler::Probe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::NoteSetup);
 
 	if( m_clearSignal )
 	{
@@ -387,9 +384,15 @@ const surroundSampleFrame * AudioEngine::renderNextBuffer()
 		m_newPlayHandles.free( e );
 		e = next;
 	}
+}
 
-	// STAGE 1: run and render all play handles
-	AudioEngineWorkerThread::fillJobQueue<PlayHandleList>( m_playHandles );
+
+
+void AudioEngine::renderStageInstruments()
+{
+	AudioEngineProfiler::Probe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::Instruments);
+
+	AudioEngineWorkerThread::fillJobQueue(m_playHandles);
 	AudioEngineWorkerThread::startAndWaitForJobs();
 
 	// removed all play handles which are done
@@ -417,15 +420,27 @@ const surroundSampleFrame * AudioEngine::renderNextBuffer()
 			++it;
 		}
 	}
+}
+
+
+
+void AudioEngine::renderStageEffects()
+{
+	AudioEngineProfiler::Probe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::Effects);
 
 	// STAGE 2: process effects of all instrument- and sampletracks
 	AudioEngineWorkerThread::fillJobQueue(m_audioPorts);
 	AudioEngineWorkerThread::startAndWaitForJobs();
+}
 
 
-	// STAGE 3: do master mix in mixer
+
+void AudioEngine::renderStageMix()
+{
+	AudioEngineProfiler::Probe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::Mixing);
+
+	Mixer *mixer = Engine::mixer();
 	mixer->masterMix(m_outputBufferWrite);
-
 
 	emit nextAudioBuffer(m_outputBufferRead);
 
@@ -435,10 +450,22 @@ const surroundSampleFrame * AudioEngine::renderNextBuffer()
 	EnvelopeAndLfoParameters::instances()->trigger();
 	Controller::triggerFrameCounter();
 	AutomatableModel::incrementPeriodCounter();
+}
+
+
+
+const surroundSampleFrame *AudioEngine::renderNextBuffer()
+{
+	m_profiler.startPeriod();
+	s_renderingThread = true;
+
+	renderStageNoteSetup();     // STAGE 0: clear old play handles and buffers, setup new play handles
+	renderStageInstruments();   // STAGE 1: run and render all play handles
+	renderStageEffects();       // STAGE 2: process effects of all instrument- and sampletracks
+	renderStageMix();           // STAGE 3: do master mix in mixer
 
 	s_renderingThread = false;
-
-	m_profiler.finishPeriod( processingSampleRate(), m_framesPerPeriod );
+	m_profiler.finishPeriod(processingSampleRate(), m_framesPerPeriod);
 
 	return m_outputBufferRead;
 }
