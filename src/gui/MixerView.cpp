@@ -248,8 +248,8 @@ void MixerView::refreshDisplay()
 // update the and max. channel number for every instrument
 void MixerView::updateMaxChannelSelector()
 {
-	TrackContainer::TrackList songTracks = Engine::getSong()->tracks();
-	TrackContainer::TrackList patternStoreTracks = Engine::patternStore()->tracks();
+	const TrackContainer::TrackList& songTracks = Engine::getSong()->tracks();
+	const TrackContainer::TrackList& patternStoreTracks = Engine::patternStore()->tracks();
 
 	for (const auto& trackList : {songTracks, patternStoreTracks})
 	{

@@ -322,70 +322,65 @@ void PianoView::modelChanged()
 
 
 
-// gets the key from the given mouse-position
+// Gets the key from the given mouse position
 /*! \brief Get the key from the mouse position in the piano display
  *
- *  First we determine it roughly by the position of the point given in
- *  white key widths from our start.  We then add in any black keys that
- *  might have been skipped over (they take a key number, but no 'white
- *  key' space).  We then add in our starting key number.
- *
- *  We then determine whether it was a black key that was pressed by
- *  checking whether it was within the vertical range of black keys.
- *  Black keys sit exactly between white keys on this keyboard, so
- *  we then shift the note down or up if we were in the left or right
- *  half of the white note.  We only do this, of course, if the white
- *  note has a black key on that side, so to speak.
- *
- *  This function returns const because there is a linear mapping from
- *  the point given to the key returned that never changes.
- *
- *  \param _p The point that the mouse was pressed.
+ *  \param p The point that the mouse was pressed.
  */
-int PianoView::getKeyFromMouse( const QPoint & _p ) const
+int PianoView::getKeyFromMouse(const QPoint& p) const
 {
-	int offset = _p.x() % PW_WHITE_KEY_WIDTH;
-	if( offset < 0 ) offset += PW_WHITE_KEY_WIDTH;
-	int key_num = ( _p.x() - offset) / PW_WHITE_KEY_WIDTH;
+	// The left-most key visible in the piano display is always white
+	const int startingWhiteKey = m_pianoScroll->value();
 
-	for( int i = 0; i <= key_num; ++i )
+	// Adjust the mouse x position as if x == 0 was the left side of the lowest key
+	const int adjX = p.x() + (startingWhiteKey * PW_WHITE_KEY_WIDTH);
+
+	// Can early return for notes too low
+	if (adjX <= 0) { return 0; }
+
+	// Now we can calculate the key number (in only white keys) and the octave
+	const int whiteKey = adjX / PW_WHITE_KEY_WIDTH;
+	const int octave = whiteKey / Piano::WhiteKeysPerOctave;
+
+	// Calculate for full octaves
+	int key = octave * KeysPerOctave;
+
+	// Adjust for white notes in the current octave
+	// (WhiteKeys maps each white key to the number of notes to their left in the octave)
+	key += static_cast<int>(WhiteKeys[whiteKey % Piano::WhiteKeysPerOctave]);
+
+	// Might be a black key, which would require further adjustment
+	if (p.y() < PIANO_BASE + PW_BLACK_KEY_HEIGHT)
 	{
-		if ( Piano::isBlackKey( m_startKey+i ) )
-		{
-			++key_num;
-		}
-	}
-	for( int i = 0; i >= key_num; --i )
-	{
-		if ( Piano::isBlackKey( m_startKey+i ) )
-		{
-			--key_num;
-		}
-	}
+		// Maps white keys to neighboring black keys
+		static constexpr std::array neighboringKeyMap {
+			std::pair{ 0, 1 }, // C --> no B#; C#
+			std::pair{ 1, 1 }, // D --> C#; D#
+			std::pair{ 1, 0 }, // E --> D#; no E#
+			std::pair{ 0, 1 }, // F --> no E#; F#
+			std::pair{ 1, 1 }, // G --> F#; G#
+			std::pair{ 1, 1 }, // A --> G#; A#
+			std::pair{ 1, 0 }, // B --> A#; no B#
+		};
 
-	key_num += m_startKey;
+		const auto neighboringBlackKeys = neighboringKeyMap[whiteKey % Piano::WhiteKeysPerOctave];
+		const int offset = adjX - (whiteKey * PW_WHITE_KEY_WIDTH); // mouse X offset from white key
 
-	// is it a black key?
-	if( _p.y() < PIANO_BASE + PW_BLACK_KEY_HEIGHT )
-	{
-		// then do extra checking whether the mouse-cursor is over
-		// a black key
-		if( key_num > 0 && Piano::isBlackKey( key_num-1 ) &&
-			offset <= ( PW_WHITE_KEY_WIDTH / 2 ) -
-					( PW_BLACK_KEY_WIDTH / 2 ) )
+		if (offset < PW_BLACK_KEY_WIDTH / 2)
 		{
-			--key_num;
+			// At the location of a (possibly non-existent) black key on the left side
+			key -= neighboringBlackKeys.first;
 		}
-		if( key_num < NumKeys - 1 && Piano::isBlackKey( key_num+1 ) &&
-			offset >= ( PW_WHITE_KEY_WIDTH -
-					PW_BLACK_KEY_WIDTH / 2 ) )
+		else if (offset > PW_WHITE_KEY_WIDTH - (PW_BLACK_KEY_WIDTH / 2))
 		{
-			++key_num;
+			// At the location of a (possibly non-existent) black key on the right side
+			key += neighboringBlackKeys.second;
 		}
+
+		// For white keys in between black keys, no further adjustment is needed
 	}
 
-	// some range-checking-stuff
-	return qBound( 0, key_num, NumKeys - 1 );
+	return std::clamp(key, 0, NumKeys - 1);
 }
 
 
@@ -396,12 +391,12 @@ int PianoView::getKeyFromMouse( const QPoint & _p ) const
  *
  *  We need to update our start key position based on the new position.
  *
- *  \param _new_pos the new key position.
+ *  \param newPos the new key position, counting only white keys.
  */
-void PianoView::pianoScrolled(int new_pos)
+void PianoView::pianoScrolled(int newPos)
 {
-	m_startKey = static_cast<Octave>(new_pos / Piano::WhiteKeysPerOctave)
-		+ WhiteKeys[new_pos % Piano::WhiteKeysPerOctave];
+	m_startKey = static_cast<Octave>(newPos / Piano::WhiteKeysPerOctave)
+		+ WhiteKeys[newPos % Piano::WhiteKeysPerOctave];
 
 	update();
 }
