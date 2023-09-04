@@ -36,7 +36,7 @@ TARGET_COMPILE_DEFINITIONS(veal PRIVATE DISABLE_OSC=1)
 
 SET(INLINE_FLAGS "")
 IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-	SET(INLINE_FLAGS "-finline-functions-called-once -finline-limit=80")
+	SET(INLINE_FLAGS -finline-functions-called-once -finline-limit=80)
 ENDIF()
 target_compile_options(veal PRIVATE -fexceptions -O2 -finline-functions ${INLINE_FLAGS})
 
