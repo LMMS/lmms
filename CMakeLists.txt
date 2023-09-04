@@ -658,9 +658,10 @@ function(add_sanitizer sanitizer supported_compilers want_flag status_flag)
 	if(${want_flag})
 		if(CMAKE_CXX_COMPILER_ID MATCHES ${supported_compilers})
 			set(${status_flag} "Enabled" PARENT_SCOPE)
-			# todo CMake 3.13: use add_compile_options/add_link_options instead 
-			set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fsanitize=${sanitizer}" PARENT_SCOPE)
-			set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=${sanitizer}" PARENT_SCOPE)
+			set(additional_flags ${ARGN})
+			# todo CMake 3.13: use add_compile_options/add_link_options instead
+			set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fsanitize=${sanitizer} ${additional_flags}" PARENT_SCOPE)
+			set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=${sanitizer} ${additional_flags}" PARENT_SCOPE)
 		else()
 			set(${status_flag} "Wanted but disabled due to unsupported compiler" PARENT_SCOPE)
 		endif()
@@ -671,7 +672,7 @@ endfunction()
 
 add_sanitizer(address "GNU|Clang|MSVC" WANT_DEBUG_ASAN STATUS_DEBUG_ASAN)
 add_sanitizer(thread "GNU|Clang" WANT_DEBUG_TSAN STATUS_DEBUG_TSAN)
-add_sanitizer(memory "Clang" WANT_DEBUG_MSAN STATUS_DEBUG_MSAN)
+add_sanitizer(memory "Clang" WANT_DEBUG_MSAN STATUS_DEBUG_MSAN -fno-omit-frame-pointer)
 add_sanitizer(undefined "GNU|Clang" WANT_DEBUG_UBSAN STATUS_DEBUG_UBSAN)
 
 
