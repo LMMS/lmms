@@ -185,8 +185,8 @@ void Instrument::applyRelease( sampleFrame * buf, const NotePlayHandle * _n )
 	if( fl <= desiredReleaseFrames()+fpp )
 	{
 		for( fpp_t f = (fpp_t)( ( fl > desiredReleaseFrames() ) ?
-				( qMax( fpp - desiredReleaseFrames(), 0 ) +
-					fl % fpp ) : 0 ); f < frames; ++f )
+				(std::max(fpp - desiredReleaseFrames(), 0) +
+					fl % fpp) : 0); f < frames; ++f)
 		{
 			const float fac = (float)( fl-f-1 ) /
 							desiredReleaseFrames();

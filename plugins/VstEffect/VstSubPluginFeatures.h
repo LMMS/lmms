@@ -38,7 +38,7 @@ namespace lmms
 class VstSubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures
 {
 public:
-	VstSubPluginFeatures( Plugin::PluginTypes _type );
+	VstSubPluginFeatures( Plugin::Type _type );
 
 	void fillDescriptionWidget( QWidget * _parent,
 											const Key * _key ) const override;

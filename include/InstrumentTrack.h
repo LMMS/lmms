@@ -51,7 +51,7 @@ namespace gui
 
 class InstrumentTrackView;
 class InstrumentTrackWindow;
-class InstrumentMiscView;
+class InstrumentTuningView;
 class MidiCCRackView;
 
 } // namespace gui
@@ -244,7 +244,6 @@ signals:
 	void instrumentChanged();
 	void midiNoteOn( const lmms::Note& );
 	void midiNoteOff( const lmms::Note& );
-	void nameChanged();
 	void newNote();
 	void endNote();
 
@@ -316,7 +315,7 @@ private:
 	friend class gui::InstrumentTrackView;
 	friend class gui::InstrumentTrackWindow;
 	friend class NotePlayHandle;
-	friend class gui::InstrumentMiscView;
+	friend class gui::InstrumentTuningView;
 	friend class gui::MidiCCRackView;
 
 } ;

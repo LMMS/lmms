@@ -103,7 +103,7 @@ private:
 
 	struct CheckPoint
 	{
-		explicit CheckPoint(jo_id_t initID = Uuid::NullUuid(), const DataFile& initData = DataFile(DataFile::JournalData)) :
+		explicit CheckPoint(jo_id_t initID = Uuid::NullUuid(), const DataFile& initData = DataFile(DataFile::Type::JournalData)) :
 			joID( initID ),
 			data( initData )
 		{}

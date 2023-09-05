@@ -54,7 +54,7 @@ void ProjectJournal::undo()
 
 		if( jo )
 		{
-			DataFile curState( DataFile::JournalData );
+			DataFile curState( DataFile::Type::JournalData );
 			jo->saveState( curState, curState.content() );
 			m_redoCheckPoints.push( CheckPoint( c.joID, curState ) );
 
@@ -79,7 +79,7 @@ void ProjectJournal::redo()
 
 		if( jo )
 		{
-			DataFile curState( DataFile::JournalData );
+			DataFile curState( DataFile::Type::JournalData );
 			jo->saveState( curState, curState.content() );
 			m_undoCheckPoints.push( CheckPoint( c.joID, curState ) );
 
@@ -111,7 +111,7 @@ void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
 	{
 		m_redoCheckPoints.clear();
 
-		DataFile dataFile( DataFile::JournalData );
+		DataFile dataFile( DataFile::Type::JournalData );
 		jo->saveState( dataFile, dataFile.content() );
 
 		m_undoCheckPoints.push( CheckPoint( jo->id(), dataFile ) );

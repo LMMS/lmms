@@ -31,7 +31,7 @@ namespace lmms
 
 
 InstrumentPlayHandle::InstrumentPlayHandle( Instrument * instrument, InstrumentTrack* instrumentTrack ) :
-		PlayHandle( TypeInstrumentPlayHandle ),
+		PlayHandle( Type::InstrumentPlayHandle ),
 		m_instrument( instrument )
 {
 	setAudioPort( instrumentTrack->audioPort() );

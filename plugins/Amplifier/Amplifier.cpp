@@ -41,7 +41,7 @@ Plugin::Descriptor PLUGIN_EXPORT amplifier_plugin_descriptor =
 	QT_TRANSLATE_NOOP( "PluginBrowser", "A native amplifier plugin" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,

@@ -34,7 +34,7 @@ namespace lmms
 {
 
 
-VstSubPluginFeatures::VstSubPluginFeatures( Plugin::PluginTypes _type ) :
+VstSubPluginFeatures::VstSubPluginFeatures( Plugin::Type _type ) :
 	SubPluginFeatures( _type )
 {
 }

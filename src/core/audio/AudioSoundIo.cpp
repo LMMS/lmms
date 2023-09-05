@@ -40,10 +40,10 @@ namespace lmms
 {
 
 AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
-	AudioDevice( qBound<ch_cnt_t>(
+	AudioDevice(std::clamp<ch_cnt_t>(
+		ConfigManager::inst()->value("audiosoundio", "channels").toInt(),
 		DEFAULT_CHANNELS,
-		ConfigManager::inst()->value( "audiosoundio", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _audioEngine )
+		SURROUND_CHANNELS), _audioEngine)
 {
 	outSuccessful = false;
 	m_soundio = nullptr;

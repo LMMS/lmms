@@ -121,7 +121,7 @@ bool sanitize( sampleFrame * src, int frames )
 			}
 			else
 			{
-				src[f][c] = qBound( -1000.0f, src[f][c], 1000.0f );
+				src[f][c] = std::clamp(src[f][c], -1000.0f, 1000.0f);
 			}
 		}
 	}
