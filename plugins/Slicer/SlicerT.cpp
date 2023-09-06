@@ -98,7 +98,7 @@ SlicerT::SlicerT(InstrumentTrack * _instrument_track) :
 {
 	// connect( &noteThreshold, SIGNAL( dataChanged() ), this, SLOT( updateParams() ) );
 	printf("Correctly loaded SlicerT!\n");
-	warmupFFT();
+	// warmupFFT(); // maybe
 }
 
 
@@ -222,8 +222,8 @@ void SlicerT::timeShiftSample() {
 
 
 	vector<float> rawData(originalFrames, 0);
-	vector<float> outData(originalFrames, 0);
-	vector<sampleFrame> bufferData(originalFrames, sampleFrame());
+	vector<float> outData(originalFrames*2, 0);
+	vector<sampleFrame> bufferData(originalFrames*2, sampleFrame());
 
 	for (int i = 0;i<originalFrames;i++) {
 		rawData[i] = (float)originalSample.data()[i][0];
@@ -247,39 +247,60 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 	using std::vector;
 	// processing parameters, lower is faster
 	const int windowSize = 2048;
-	const int overSampling = 4;
+	const int overSampling = 16;
 	
-	// values used
-	const int stepSize = windowSize / overSampling; 
-	const int windowLatency = windowSize - stepSize;
-	const float freqPerBin = sampleRate/windowSize; 
-	const float expectedPhase = 2.*M_PI*(float)stepSize/(float)windowSize;
-	
-
 	// audio data
 	int inFrames = dataIn.size();
-	int outFrames = dataOut.size();
+	int outFrames = dataIn.size();
+
+	float lengthRatio = 1;// inFrames / outFrames;
+
+	// values used
+	const int stepSize = windowSize / overSampling; 
+	const int numWindows = inFrames / stepSize;
+	const int outStepSize = lengthRatio * stepSize;
+	const int windowLatency = (overSampling-1)*outStepSize;
+	const float freqPerBin = sampleRate/windowSize; 
+	const float expectedPhase = 2.*M_PI*(float)stepSize/(float)windowSize;
+
+
+	printf("frames: %i ,step size: %i , out step size: %i , ratio: %f\n", inFrames, stepSize, outStepSize, lengthRatio);
+	printf("frames: %i , maxFrames: %i \n", inFrames, (numWindows-overSampling) * stepSize + windowSize);
+	printf("will drop %i\n", inFrames%(inFrames/numWindows));
+	printf("pitch shift: %f", noteThreshold.value());
 
 	// initialize buffers
+
 	fftwf_complex FFTSpectrum[windowSize];
+	vector<float> FFTInput(windowSize, 0);
 	vector<float> IFFTReconstruction(windowSize, 0);
 	vector<float> allMagnitudes(windowSize, 0);
 	vector<float> allFrequencies(windowSize, 0);
+	vector<float> processedFreq(windowSize, 0);
+	vector<float> processedMagn(windowSize, 0);
 	vector<float> lastPhase(windowSize, 0);
 	vector<float> sumPhase(windowSize, 0);
 
 	// declare vars
-	float real, imag, phase, prevPhase, magnitude, freq, deltaPhase = 0;
+	float real, imag, phase, magnitude, freq, deltaPhase = 0;
+	int inWindowIndex = 0;
+	int outWindowIndex = 0;
 
 	// fft plans
 	fftwf_plan fftPlan;
+	fftPlan = fftwf_plan_dft_r2c_1d(windowSize, FFTInput.data(), FFTSpectrum, FFTW_MEASURE);
 	fftwf_plan ifftPlan;
+	ifftPlan = fftwf_plan_dft_c2r_1d(windowSize, FFTSpectrum, IFFTReconstruction.data(), FFTW_MEASURE);
 
 
+	// remove oversampling, because the actual window is overSampling* bigger than stepsize
+	for (int i = 0;i < numWindows-overSampling;i++) {
+		inWindowIndex = i * stepSize;
+		outWindowIndex = i * outStepSize;
 
-	for (int i = 0;i < inFrames - windowSize;i+=stepSize) {
 		// FFT
-		fftPlan = fftwf_plan_dft_r2c_1d(windowSize, dataIn.data() + i, FFTSpectrum, FFTW_MEASURE);
+		memcpy(FFTInput.data(), dataIn.data() + inWindowIndex, windowSize*sizeof(float));
+
 		fftwf_execute(fftPlan);
 
 		// analysis step
@@ -312,8 +333,17 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 			allFrequencies[j] = freq;
 
 		}
-		// effects go here
+		// pitch shifting
+		// memset(processedFreq.data(), 0, processedFreq.size()*sizeof(float));
+		// memset(processedMagn.data(), 0, processedFreq.size()*sizeof(float));
+		// for (int j = 0; j < windowSize/2; j++) {
+		// 	int index = j*noteThreshold.value();
+		// 	if (index <= windowSize/2) {
+		// 		processedMagn[index] += allMagnitudes[j];
+		// 		processedFreq[index] = allFrequencies[j] * noteThreshold.value();
+		// 	}
 
+		// }
 
 		// synthesis, all the operations are the reverse of the analysis
 		for (int j = 0; j < windowSize; j++) {
@@ -336,26 +366,25 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 		}
 
 		// inverse fft
-		ifftPlan = fftwf_plan_dft_c2r_1d(windowSize, FFTSpectrum, IFFTReconstruction.data(), FFTW_MEASURE);
 		fftwf_execute(ifftPlan);
 
 		// windowing
 		for (int j = 0; j < windowSize; j++) {
 			
-			if (i+j < windowLatency) {
+			float windowIndex = outWindowIndex + j;
+			if (windowIndex < windowLatency) {
 				// calculate amount of windows overlapping
-				float windowIndex =  i + j;
+				
 				int windowsOverlapping = windowIndex / windowSize * overSampling + 1;
 
 				
 				// since not all windows overlap, just take the average of the ones that do overlap
-				// this should be improved
-				// idk why the 4 is there but it works
-				dataOut[j+i] += 4/windowsOverlapping*IFFTReconstruction[j]/(windowSize/2.0f*overSampling);
+				// this should be improved, at least simplyfiy the expression
+				dataOut[windowIndex] += overSampling/windowsOverlapping*IFFTReconstruction[j]/(windowSize/2.0f*overSampling);
 			} else {
 				// this computes the weight of the window on the final output
 				float window = -0.5f*cos(2.*M_PI*(float)j/(float)windowSize)+0.5f;
-				dataOut[j+i] += 2.0f*window*IFFTReconstruction[j]/(windowSize/2.0f*overSampling);
+				dataOut[windowIndex] += 2.0f*window*IFFTReconstruction[j]/(windowSize/2.0f*overSampling);
 			}
 
 
@@ -366,7 +395,7 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 
 	// normalize 	
 	float max = -1;
-	for (int i = 0;i<inFrames;i++) {
+	for (int i = 0;i<outFrames;i++) {
 		max = std::max(max, abs(dataOut[i]));
 		dataOut[i] = dataOut[i];
 	}
@@ -400,7 +429,7 @@ void SlicerT::normalizeSample(sampleFrame * data) {
 }
 
 void SlicerT::warmupFFT() {
-	const int dataPoints = 512;
+	const int dataPoints = 1024;
 
 	std::vector<float> warmupData(dataPoints, sqrt(2));
 	fftwf_complex fftOut[dataPoints];
