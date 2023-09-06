@@ -32,7 +32,7 @@
 #include "InstrumentView.h"
 #include "SampleBuffer.h"
 #include "SlicerTUI.h"
-
+#include <fftw3.h>
 // #include "Graph.h"
 // #include "MemoryManager.h"
 
@@ -63,15 +63,24 @@ class SlicerT : public Instrument{
 		void updateParams();
 
 	private:
-		int frameCounter = 0;
-		SampleBuffer m_sampleBuffer;
+	
+
 		FloatModel noteThreshold;
 
+		SampleBuffer originalSample;
+		SampleBuffer timeShiftedSample;
 		std::vector<int> slicePoints;
-
-		friend class gui::SlicerTUI;
+		std::vector<int> timeShiftedSlices;
+		
+		int originalBPM = 140;
 
 		void findSlices();
+		void timeShiftSample();
+		void phaseVocoder(std::vector<float> &in, std::vector<float> &out, float sampleRate, float pitchScale);
+		void normalizeSample(sampleFrame * data);
+		void warmupFFT(); // runs one fft cycle to generate wisdom
+
+		friend class gui::SlicerTUI;
 		
 };
 

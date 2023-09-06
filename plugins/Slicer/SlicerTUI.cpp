@@ -34,17 +34,21 @@ SlicerTUI::SlicerTUI( SlicerT * _instrument,
 					QWidget * _parent ) :
 	InstrumentViewFixedSize( _instrument, _parent ),
 	noteThresholdKnob(KnobType::Bright26, this),
+	slicerTParent(_instrument),
 	wf(200, 100, (_instrument->slicePoints), _parent)
 	
 {
 	setAcceptDrops( true );
 	wf.move(30, 30); 
 	noteThresholdKnob.move(30, 200);
-	noteThresholdKnob.setModel(&_instrument->noteThreshold);
+	noteThresholdKnob.setModel(&slicerTParent->noteThreshold);
 
 }
 
 void SlicerTUI::mousePressEvent( QMouseEvent * _me ) {
+	slicerTParent->findSlices();
+	slicerTParent->timeShiftSample();
+
 	update();
 }
 
@@ -85,7 +89,7 @@ void SlicerTUI::dropEvent( QDropEvent * _de ) {
 	if( type == "samplefile" )
 	{
 		printf("type: samplefile\n");
-		castModel<SlicerT>()->updateFile( value );
+		slicerTParent->updateFile( value );
 		wf.updateFile( value );
 		// castModel<AudioFileProcessor>()->setAudioFile( value );
 		// _de->accept();
@@ -96,7 +100,7 @@ void SlicerTUI::dropEvent( QDropEvent * _de ) {
 	{
 		printf("type: clip file\n");
 		DataFile dataFile( value.toUtf8() );
-		castModel<SlicerT>()->updateFile( dataFile.content().firstChild().toElement().attribute( "src" ) );
+		slicerTParent->updateFile( dataFile.content().firstChild().toElement().attribute( "src" ) );
 		_de->accept();
 		return;
 	}

@@ -44,6 +44,8 @@ protected:
 
 
 private:
+	SlicerT * slicerTParent;
+
 	Knob noteThresholdKnob;
 
 	WaveForm wf;
