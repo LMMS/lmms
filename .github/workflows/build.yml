@@ -196,13 +196,13 @@ jobs:
           fetch-depth: 0
           submodules: recursive
       - name: Cache vcpkg dependencies
+        id: cache-deps
         uses: actions/cache@v3
         with:
-          key: vcpkg-${{ matrix.arch }}-${{ github.ref }}-${{ github.run_id }}
+          key: vcpkg-${{ matrix.arch }}-${{ hashFiles('vcpkg.json') }}
           restore-keys: |
-            vcpkg-${{ matrix.arch }}-${{ github.ref }}-
             vcpkg-${{ matrix.arch }}-
-          path: C:\vcpkg\installed
+          path: build\vcpkg_installed
       - name: Install 64-bit Qt
         if: matrix.arch == 'x64'
         uses: jurplel/install-qt-action@b3ea5275e37b734d027040e2c7fe7a10ea2ef946
@@ -219,26 +219,24 @@ jobs:
           archives: qtbase qtsvg qttools
           cache: true
           set-env: ${{ matrix.arch == 'x86' }}
-      - name: Install dependencies
-        run: |
-          vcpkg install `
-            --triplet=${{ matrix.arch }}-windows `
-            --host-triplet=${{ matrix.arch }}-windows `
-            --recurse `
-            fftw3 fltk fluidsynth[sndfile] libsamplerate libsndfile libstk `
-            lilv lv2 portaudio sdl2
       - name: Set up build environment
         uses: ilammy/msvc-dev-cmd@cec98b9d092141f74527d0afa6feb2af698cfe89
         with:
           arch: ${{ matrix.arch }}
       - name: Configure
         run: |
-          mkdir build
+          mkdir build -Force
           cmake -S . `
             -B build `
             -G Ninja `
             --toolchain C:/vcpkg/scripts/buildsystems/vcpkg.cmake `
-            -DCMAKE_BUILD_TYPE=RelWithDebInfo
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo `
+            -DVCPKG_TARGET_TRIPLET="${{ matrix.arch }}-windows" `
+            -DVCPKG_HOST_TRIPLET="${{ matrix.arch }}-windows" `
+            -DVCPKG_MANIFEST_INSTALL="${{ env.should_install_manifest }}"
+        env:
+          should_install_manifest:
+            ${{ steps.cache-deps.outputs.cache-hit == 'true' && 'NO' || 'YES' }}
       - name: Build
         run: cmake --build build
       - name: Build tests
