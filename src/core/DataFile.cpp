@@ -35,7 +35,6 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QMessageBox>
-#include <string>
 
 #include "base64.h"
 #include "ConfigManager.h"
@@ -1814,17 +1813,18 @@ void DataFile::upgrade_sampleAndHold()
 //! count the CCs from 1.
 void DataFile::upgrade_midiCCIndexing()
 {
-	std::vector<const char*> attributesToUpdate = {"inputcontroller", "outputcontroller"};
+	static constexpr std::array attributesToUpdate{"inputcontroller", "outputcontroller"};
 
 	QDomNodeList elements = elementsByTagName("Midicontroller");
-	for(int i = 0; !elements.item(i).isNull(); ++i)
+	for(int i = 0; i < elements.length(); i++)
 	{
+		if (elements.item(i).isNull()) { continue; }
 		auto element = elements.item(i).toElement();
 		for (const char* attrName : attributesToUpdate)
 		{
-			if(element.hasAttribute(attrName))
+			if (element.hasAttribute(attrName))
 			{
-				int cc = std::stoi(element.attribute(attrName).toStdString());
+				int cc = element.attribute(attrName).toInt();
 				element.setAttribute(attrName, cc - 1);
 			}
 		}

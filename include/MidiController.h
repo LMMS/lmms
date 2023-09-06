@@ -48,7 +48,7 @@ class MidiController : public Controller, public MidiEventProcessor
 {
 	Q_OBJECT
 public:
-	static const int NONE = -1;
+	static constexpr int NONE = -1;
 	MidiController( Model * _parent );
 	~MidiController() override = default;
 
