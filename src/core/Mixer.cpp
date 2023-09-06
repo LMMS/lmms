@@ -173,8 +173,8 @@ void MixerChannel::doProcessing()
 		m_stillRunning = m_fxChain.processAudioBuffer( m_buffer, fpp, m_hasInput );
 
 		AudioEngine::StereoSample peakSamples = Engine::audioEngine()->getPeakValues(m_buffer, fpp);
-		m_peakLeft = std::max<float>(m_peakLeft, peakSamples.left * v);
-		m_peakRight = std::max<float>(m_peakRight, peakSamples.right * v);
+		m_peakLeft = std::max(m_peakLeft.load(std::memory_order_relaxed), peakSamples.left * v);
+		m_peakRight = std::max(m_peakRight.load(std::memory_order_relaxed), peakSamples.right * v);
 	}
 	else
 	{
