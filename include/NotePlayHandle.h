@@ -108,6 +108,9 @@ public:
 		return m_unpitchedFrequency;
 	}
 
+	//! Get the current per-note detuning for this note
+	float currentDetuning() const { return m_baseDetuning->value(); }
+
 	/*! Renders one chunk using the attached instrument into the buffer */
 	void play( sampleFrame* buffer ) override;
 
@@ -245,7 +248,7 @@ public:
 	}
 
 	/*! Process note detuning automation */
-	void processTimePos( const TimePos& time );
+	void processTimePos(const TimePos& time, float pitchValue, bool isRecording);
 
 	/*! Updates total length (m_frames) depending on a new tempo */
 	void resize( const bpm_t newTempo );

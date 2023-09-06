@@ -741,10 +741,10 @@ void PianoRoll::fitNoteLengths(bool fill)
 {
 	if (!hasValidMidiClip()) { return; }
 	m_midiClip->addJournalCheckPoint();
+	m_midiClip->rearrangeAllNotes();
 
 	// Reference notes
-	NoteVector refNotes = m_midiClip->notes();
-	std::sort(refNotes.begin(), refNotes.end(), Note::lessThan);
+	const NoteVector& refNotes = m_midiClip->notes();
 
 	// Notes to edit
 	NoteVector notes = getSelectedNotes();
@@ -762,7 +762,7 @@ void PianoRoll::fitNoteLengths(bool fill)
 	}
 
 	int length;
-	NoteVector::iterator ref = refNotes.begin();
+	auto ref = refNotes.begin();
 	for (Note* note : notes)
 	{
 		// Fast forward to next reference note
@@ -797,14 +797,11 @@ void PianoRoll::constrainNoteLengths(bool constrainMax)
 	if (!hasValidMidiClip()) { return; }
 	m_midiClip->addJournalCheckPoint();
 
-	NoteVector notes = getSelectedNotes();
-	if (notes.empty())
-	{
-		notes = m_midiClip->notes();
-	}
+	const NoteVector selectedNotes = getSelectedNotes();
+	const auto& notes = selectedNotes.empty() ? m_midiClip->notes() : selectedNotes;
 
-	TimePos bound = m_lenOfNewNotes;  // will be length of last note
-	for (Note* note : notes)
+	TimePos bound = m_lenOfNewNotes; // will be length of last note
+	for (auto note : notes)
 	{
 		if (constrainMax ? note->length() > bound : note->length() < bound)
 		{
@@ -1207,11 +1204,11 @@ void PianoRoll::shiftSemiTone(int amount) //Shift notes by amount semitones
 
 	auto selectedNotes = getSelectedNotes();
 	//If no notes are selected, shift all of them, otherwise shift selection
-	if (selectedNotes.empty()) { return shiftSemiTone(m_midiClip->notes(), amount); }
-	else { return shiftSemiTone(selectedNotes, amount); }
+	if (selectedNotes.empty()) { shiftSemiTone(m_midiClip->notes(), amount); }
+	else { shiftSemiTone(selectedNotes, amount); }
 }
 
-void PianoRoll::shiftSemiTone(NoteVector notes, int amount)
+void PianoRoll::shiftSemiTone(const NoteVector& notes, int amount)
 {
 	m_midiClip->addJournalCheckPoint();
 	for (Note *note : notes) { note->setKey( note->key() + amount ); }
@@ -1232,11 +1229,11 @@ void PianoRoll::shiftPos(int amount) //Shift notes pos by amount
 
 	auto selectedNotes = getSelectedNotes();
 	//If no notes are selected, shift all of them, otherwise shift selection
-	if (selectedNotes.empty()) { return shiftPos(m_midiClip->notes(), amount); }
-	else { return shiftPos(selectedNotes, amount); }
+	if (selectedNotes.empty()) { shiftPos(m_midiClip->notes(), amount); }
+	else { shiftPos(selectedNotes, amount); }
 }
 
-void PianoRoll::shiftPos(NoteVector notes, int amount)
+void PianoRoll::shiftPos(const NoteVector& notes, int amount)
 {
 	m_midiClip->addJournalCheckPoint();
 
@@ -4134,9 +4131,9 @@ void PianoRoll::finishRecordNote(const Note & n )
 			{
 				if( it->key() == n.key() )
 				{
-					Note n1( n.length(), it->pos(),
+					Note n1(n.length(), it->pos(),
 							it->key(), it->getVolume(),
-							it->getPanning() );
+							it->getPanning(), n.detuning());
 					n1.quantizeLength( quantization() );
 					m_midiClip->addNote( n1 );
 					update();

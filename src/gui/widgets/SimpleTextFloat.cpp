@@ -46,11 +46,11 @@ SimpleTextFloat::SimpleTextFloat() :
 	m_textLabel = new QLabel(this);
 	layout->addWidget(m_textLabel);
 
-	m_showTimer = new QTimer();
+	m_showTimer = new QTimer(this);
 	m_showTimer->setSingleShot(true);
 	QObject::connect(m_showTimer, &QTimer::timeout, this, &SimpleTextFloat::show);
 
-	m_hideTimer = new QTimer();
+	m_hideTimer = new QTimer(this);
 	m_hideTimer->setSingleShot(true);
 	QObject::connect(m_hideTimer, &QTimer::timeout, this, &SimpleTextFloat::hide);
 }

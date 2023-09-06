@@ -363,10 +363,12 @@ void MainWindow::finalize()
 	}
 
 	edit_menu->addSeparator();
-	edit_menu->addAction( embed::getIconPixmap( "setup_general" ),
-					tr( "Settings" ),
-					this, SLOT(showSettingsDialog()));
-	connect( edit_menu, SIGNAL(aboutToShow()), this, SLOT(updateUndoRedoButtons()));
+	edit_menu->addAction(embed::getIconPixmap("microtuner"), tr("Scales and keymaps"),
+		this, SLOT(toggleMicrotunerWin()));
+	edit_menu->addAction(embed::getIconPixmap("setup_general"), tr("Settings"),
+		this, SLOT(showSettingsDialog()));
+
+	connect(edit_menu, SIGNAL(aboutToShow()), this, SLOT(updateUndoRedoButtons()));
 
 	m_viewMenu = new QMenu( this );
 	menuBar()->addMenu( m_viewMenu )->setText( tr( "&View" ) );
@@ -485,10 +487,6 @@ void MainWindow::finalize()
 		tr("Show/hide project notes") + " (Ctrl+7)", this, SLOT(toggleProjectNotesWin()), m_toolBar);
 	project_notes_window->setShortcut( Qt::CTRL + Qt::Key_7 );
 
-	auto microtuner_window = new ToolButton(embed::getIconPixmap("microtuner"),
-		tr("Microtuner configuration") + " (Ctrl+8)", this, SLOT(toggleMicrotunerWin()), m_toolBar);
-	microtuner_window->setShortcut( Qt::CTRL + Qt::Key_8 );
-
 	m_toolBarLayout->addWidget( song_editor_window, 1, 1 );
 	m_toolBarLayout->addWidget( pattern_editor_window, 1, 2 );
 	m_toolBarLayout->addWidget( piano_roll_window, 1, 3 );
@@ -496,7 +494,6 @@ void MainWindow::finalize()
 	m_toolBarLayout->addWidget( mixer_window, 1, 5 );
 	m_toolBarLayout->addWidget( controllers_window, 1, 6 );
 	m_toolBarLayout->addWidget( project_notes_window, 1, 7 );
-	m_toolBarLayout->addWidget( microtuner_window, 1, 8 );
 	m_toolBarLayout->setColumnStretch( 100, 1 );
 
 	// setup-dialog opened before?
@@ -1099,10 +1096,6 @@ void MainWindow::updateViewMenu()
 	m_viewMenu->addAction(embed::getIconPixmap( "project_notes" ),
 			      tr( "Project Notes" ) + "\tCtrl+7",
 			      this, SLOT(toggleProjectNotesWin())
-		);
-	m_viewMenu->addAction(embed::getIconPixmap( "microtuner" ),
-			      tr( "Microtuner" ) + "\tCtrl+8",
-			      this, SLOT(toggleMicrotunerWin())
 		);
 
 	m_viewMenu->addSeparator();
