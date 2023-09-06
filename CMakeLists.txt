@@ -658,7 +658,7 @@ function(add_sanitizer sanitizer supported_compilers want_flag status_flag)
 	if(${want_flag})
 		if(CMAKE_CXX_COMPILER_ID MATCHES "${supported_compilers}")
 			set("${status_flag}" "Enabled" PARENT_SCOPE)
-			set(additional_flags ${ARGN})
+			string(REPLACE ";" " " additional_flags "${ARGN}")
 			# todo CMake 3.13: use add_compile_options/add_link_options instead
 			set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fsanitize=${sanitizer} ${additional_flags}" PARENT_SCOPE)
 			set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=${sanitizer} ${additional_flags}" PARENT_SCOPE)
