@@ -205,14 +205,14 @@ jobs:
           path: C:\vcpkg\installed
       - name: Install 64-bit Qt
         if: matrix.arch == 'x64'
-        uses: jurplel/install-qt-action@64bdb64f2c14311d23733a8463e5fcbc65e8775e
+        uses: jurplel/install-qt-action@b3ea5275e37b734d027040e2c7fe7a10ea2ef946
         with:
           version: ${{ env.qt-version }}
           arch: win64_msvc2019_64
           archives: qtbase qtsvg qttools
           cache: true
       - name: Install 32-bit Qt
-        uses: jurplel/install-qt-action@64bdb64f2c14311d23733a8463e5fcbc65e8775e
+        uses: jurplel/install-qt-action@b3ea5275e37b734d027040e2c7fe7a10ea2ef946
         with:
           version: ${{ env.qt-version }}
           arch: win32_msvc2019
@@ -228,7 +228,7 @@ jobs:
             fftw3 fltk fluidsynth[sndfile] libsamplerate libsndfile libstk `
             lilv lv2 portaudio sdl2
       - name: Set up build environment
-        uses: ilammy/msvc-dev-cmd@d8610e2b41c6d0f0c3b4c46dad8df0fd826c68e1
+        uses: ilammy/msvc-dev-cmd@cec98b9d092141f74527d0afa6feb2af698cfe89
         with:
           arch: ${{ matrix.arch }}
       - name: Configure
