@@ -811,11 +811,11 @@ MESSAGE(
 MESSAGE(
 "Developer options\n"
 "-----------------------------------------\n"
-"* Debug FP exceptions         : ${STATUS_DEBUG_FPE}\n"
-"* Debug AddressSanitizer      : ${STATUS_DEBUG_ASAN}\n"
-"* Debug ThreadSanitizer       : ${STATUS_DEBUG_TSAN}\n"
-"* Debug MemorySanitizer       : ${STATUS_DEBUG_MSAN}\n"
-"* Debug UBSanitizer           : ${STATUS_DEBUG_UBSAN}\n"
+"* Debug using FP exceptions         : ${STATUS_DEBUG_FPE}\n"
+"* Debug using AddressSanitizer      : ${STATUS_DEBUG_ASAN}\n"
+"* Debug using ThreadSanitizer       : ${STATUS_DEBUG_TSAN}\n"
+"* Debug using MemorySanitizer       : ${STATUS_DEBUG_MSAN}\n"
+"* Debug using UBSanitizer           : ${STATUS_DEBUG_UBSAN}\n"
 )
 
 MESSAGE(
