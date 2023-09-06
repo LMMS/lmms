@@ -236,7 +236,7 @@ void SlicerT::timeShiftSample() {
 		bufferData.data()[i][1] = outData[i];
 	}
 
-	timeShiftedSample = SampleBuffer(bufferData.data(), originalFrames);
+	timeShiftedSample = *(SampleBuffer(bufferData.data(), originalFrames).resample(sampleRate , sampleRate * 1.1f));
 
 	printf("finished sample timeshifting\n");
 
@@ -247,7 +247,7 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 	using std::vector;
 	// processing parameters, lower is faster
 	const int windowSize = 2048;
-	const int overSampling = 16;
+	const int overSampling = 32;
 	
 	// audio data
 	int inFrames = dataIn.size();
@@ -334,21 +334,22 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 
 		}
 		// pitch shifting
-		// memset(processedFreq.data(), 0, processedFreq.size()*sizeof(float));
-		// memset(processedMagn.data(), 0, processedFreq.size()*sizeof(float));
-		// for (int j = 0; j < windowSize/2; j++) {
-		// 	int index = j*noteThreshold.value();
-		// 	if (index <= windowSize/2) {
-		// 		processedMagn[index] += allMagnitudes[j];
-		// 		processedFreq[index] = allFrequencies[j] * noteThreshold.value();
-		// 	}
+		memset(processedFreq.data(), 0, processedFreq.size()*sizeof(float));
+		memset(processedMagn.data(), 0, processedFreq.size()*sizeof(float));
+		for (int j = 0; j < windowSize/2; j++) {
+			int index = j*noteThreshold.value();
+			if (index <= windowSize/2) {
+				processedMagn[index] += allMagnitudes[j];
+				processedFreq[index] = allFrequencies[j]* noteThreshold.value();
+			}
+		}
 
-		// }
+
 
 		// synthesis, all the operations are the reverse of the analysis
 		for (int j = 0; j < windowSize; j++) {
-			magnitude = allMagnitudes[j];
-			freq = allFrequencies[j];
+			magnitude = processedMagn[j];
+			freq = processedFreq[j];
 
 			deltaPhase = freq - (float)j*freqPerBin;
 
