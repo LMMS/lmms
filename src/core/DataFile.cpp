@@ -1725,6 +1725,16 @@ void DataFile::upgrade_mixerRename()
 			fxch.item(i).toElement().removeAttribute("fxch");
 		}
 	}
+	// Change the attribute fxch of element <sampletrack> to mixch
+	fxch = elementsByTagName("sampletrack");
+	for(int i = 0; !fxch.item(i).isNull(); ++i)
+	{
+		if(fxch.item(i).toElement().hasAttribute("fxch"))
+		{
+			fxch.item(i).toElement().setAttribute("mixch", fxch.item(i).toElement().attribute("fxch"));
+			fxch.item(i).toElement().removeAttribute("fxch");
+		}
+	}
 }
 
 
