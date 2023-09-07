@@ -50,9 +50,7 @@ class LadspaMatrixControlDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	LadspaMatrixControlDialog(LadspaControls* ctl);
-
 	bool isResizable() const override;
-
 private slots:
 	void updateEffectView(LadspaControls* ctl);
 
