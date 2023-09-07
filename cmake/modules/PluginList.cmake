@@ -63,6 +63,7 @@ SET(LMMS_PLUGIN_LIST
 	StereoEnhancer
 	StereoMatrix
 	Stk
+	TapTempo
 	VstBase
 	Vestige
 	VstEffect

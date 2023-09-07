@@ -73,7 +73,7 @@ Plugin::Descriptor PLUGIN_EXPORT opulenz_plugin_descriptor =
 			   "2-operator FM Synth" ),
         "Raine M. Ekman <raine/at/iki/fi>",
         0x0100,
-        Plugin::Instrument,
+        Plugin::Type::Instrument,
         new PluginPixmapLoader( "logo" ),
         "sbi",
         nullptr,
@@ -222,8 +222,8 @@ OpulenzInstrument::OpulenzInstrument( InstrumentTrack * _instrument_track ) :
 OpulenzInstrument::~OpulenzInstrument() {
 	delete theEmulator;
 	Engine::audioEngine()->removePlayHandlesOfTypes( instrumentTrack(),
-				PlayHandle::TypeNotePlayHandle
-				| PlayHandle::TypeInstrumentPlayHandle );
+				PlayHandle::Type::NotePlayHandle
+				| PlayHandle::Type::InstrumentPlayHandle );
 	delete [] renderbuffer;
 }
 
@@ -686,7 +686,7 @@ OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
 {
 
 #define KNOB_GEN(knobname, hinttext, hintunit,xpos,ypos) \
-	knobname = new Knob( knobStyled, this );\
+	knobname = new Knob( KnobType::Styled, this );\
 	knobname->setHintText( tr(hinttext), hintunit );\
 	knobname->setFixedSize(22,22);\
 	knobname->setCenterPointX(11.0);\

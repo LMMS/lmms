@@ -6,6 +6,7 @@ SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
 SET(LMMS_BINARY_DIR ${CMAKE_BINARY_DIR})
 SET(LMMS_SOURCE_DIR ${CMAKE_SOURCE_DIR})
 
+# CMAKE_POLICY Section
 IF(COMMAND CMAKE_POLICY)
 	CMAKE_POLICY(SET CMP0005 NEW)
 	CMAKE_POLICY(SET CMP0003 NEW)
@@ -21,7 +22,6 @@ IF(COMMAND CMAKE_POLICY)
 		CMAKE_POLICY(SET CMP0074 NEW) # find_package() uses <PackageName>_ROOT variables
 	ENDIF()
 ENDIF(COMMAND CMAKE_POLICY)
-
 
 # Import of windows.h breaks min()/max()
 ADD_DEFINITIONS(-DNOMINMAX)
@@ -518,7 +518,11 @@ IF(WANT_SF2)
 	find_package(FluidSynth 1.1.0)
 	if(FluidSynth_FOUND)
 		SET(LMMS_HAVE_FLUIDSYNTH TRUE)
-		SET(STATUS_FLUIDSYNTH "OK")
+		if(FluidSynth_VERSION_STRING VERSION_GREATER_EQUAL 2)
+			set(STATUS_FLUIDSYNTH "OK")
+		else()
+			set(STATUS_FLUIDSYNTH "OK (FluidSynth version < 2: per-note panning unsupported)")
+		endif()
 	else()
 		SET(STATUS_FLUIDSYNTH "not found, libfluidsynth-dev (or similar)"
 			"is highly recommended")
@@ -629,7 +633,9 @@ else()
 	set(NOOP_COMMAND "${CMAKE_COMMAND}" "-E" "echo")
 endif()
 if(STRIP)
-	set(STRIP_COMMAND "$<IF:$<TARGET:Debug,RelWithDebInfo>,${NOOP_COMMAND},${STRIP}>")
+	# TODO CMake 3.19: Now that CONFIG generator expressions support testing for
+	# multiple configurations, combine the OR into a single CONFIG expression.
+	set(STRIP_COMMAND "$<IF:$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>,${NOOP_COMMAND},${STRIP}>")
 else()
 	set(STRIP_COMMAND "${NOOP_COMMAND}")
 endif()

@@ -59,7 +59,7 @@ QString Lv2SubPluginFeatures::pluginName(const LilvPlugin *plug)
 
 
 
-Lv2SubPluginFeatures::Lv2SubPluginFeatures(Plugin::PluginTypes type) :
+Lv2SubPluginFeatures::Lv2SubPluginFeatures(Plugin::Type type) :
 	SubPluginFeatures(type)
 {
 }

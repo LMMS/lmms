@@ -94,11 +94,11 @@ MPEG_mode mapToMPEG_mode(OutputSettings::StereoMode stereoMode)
 {
 	switch (stereoMode)
 	{
-	case OutputSettings::StereoMode_Stereo:
+	case OutputSettings::StereoMode::Stereo:
 		return STEREO;
-	case OutputSettings::StereoMode_JointStereo:
+	case OutputSettings::StereoMode::JointStereo:
 		return JOINT_STEREO;
-	case OutputSettings::StereoMode_Mono:
+	case OutputSettings::StereoMode::Mono:
 		return MONO;
 	default:
 		return NOT_SET;

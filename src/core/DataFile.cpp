@@ -26,6 +26,7 @@
 
 #include "DataFile.h"
 
+#include <algorithm>
 #include <cmath>
 #include <map>
 
@@ -47,6 +48,7 @@
 #include "TextFloat.h"
 #include "Track.h"
 #include "PathUtil.h"
+#include "UpgradeExtendedNoteRange.h"
 
 #include "lmmsversion.h"
 
@@ -97,17 +99,16 @@ namespace
 		QString m_name;
 	};
 
-	const auto s_types = std::array<TypeDescStruct, DataFile::TypeCount>
-	{
-		TypeDescStruct{ DataFile::UnknownType, "unknown" },
-		TypeDescStruct{ DataFile::SongProject, "song" },
-		TypeDescStruct{ DataFile::SongProjectTemplate, "songtemplate" },
-		TypeDescStruct{ DataFile::InstrumentTrackSettings, "instrumenttracksettings" },
-		TypeDescStruct{ DataFile::DragNDropData, "dnddata" },
-		TypeDescStruct{ DataFile::ClipboardData, "clipboard-data" },
-		TypeDescStruct{ DataFile::JournalData, "journaldata" },
-		TypeDescStruct{ DataFile::EffectSettings, "effectsettings" },
-		TypeDescStruct{ DataFile::MidiClip, "midiclip" }
+	const auto s_types = std::array{
+		TypeDescStruct{ DataFile::Type::Unknown, "unknown" },
+		TypeDescStruct{ DataFile::Type::SongProject, "song" },
+		TypeDescStruct{ DataFile::Type::SongProjectTemplate, "songtemplate" },
+		TypeDescStruct{ DataFile::Type::InstrumentTrackSettings, "instrumenttracksettings" },
+		TypeDescStruct{ DataFile::Type::DragNDropData, "dnddata" },
+		TypeDescStruct{ DataFile::Type::ClipboardData, "clipboard-data" },
+		TypeDescStruct{ DataFile::Type::JournalData, "journaldata" },
+		TypeDescStruct{ DataFile::Type::EffectSettings, "effectsettings" },
+		TypeDescStruct{ DataFile::Type::MidiClip, "midiclip" }
 	};
 }
 
@@ -213,7 +214,7 @@ bool DataFile::validate( QString extension )
 			return true;
 		}
 		break;
-	case Type::UnknownType:
+	case Type::Unknown:
 		if (! ( extension == "mmp" || extension == "mpt" || extension == "mmpz" ||
 				extension == "xpf" || extension == "xml" ||
 				( extension == "xiz" && ! getPluginFactory()->pluginSupportingExtension(extension).isNull()) ||
@@ -250,7 +251,7 @@ QString DataFile::nameWithExtension( const QString & _fn ) const
 
 	switch( type() )
 	{
-		case SongProject:
+		case Type::SongProject:
 			if( extension != "mmp" &&
 					extension != "mpt" &&
 					extension != "mmpz" )
@@ -263,13 +264,13 @@ QString DataFile::nameWithExtension( const QString & _fn ) const
 				return _fn + ".mmp";
 			}
 			break;
-		case SongProjectTemplate:
+		case Type::SongProjectTemplate:
 			if( extension != "mpt" )
 			{
 				return _fn + ".mpt";
 			}
 			break;
-		case InstrumentTrackSettings:
+		case Type::InstrumentTrackSettings:
 			if( extension != "xpf" )
 			{
 				return _fn + ".xpf";
@@ -285,8 +286,8 @@ QString DataFile::nameWithExtension( const QString & _fn ) const
 
 void DataFile::write( QTextStream & _strm )
 {
-	if( type() == SongProject || type() == SongProjectTemplate
-					|| type() == InstrumentTrackSettings )
+	if( type() == Type::SongProject || type() == Type::SongProjectTemplate
+					|| type() == Type::InstrumentTrackSettings )
 	{
 		cleanMetaNodes( documentElement() );
 	}
@@ -584,21 +585,17 @@ bool DataFile::hasLocalPlugins(QDomElement parent /* = QDomElement()*/, bool fir
 
 DataFile::Type DataFile::type( const QString& typeName )
 {
-	for( int i = 0; i < TypeCount; ++i )
-	{
-		if( s_types[i].m_name == typeName )
-		{
-			return static_cast<DataFile::Type>( i );
-		}
-	}
+	const auto it = std::find_if(s_types.begin(), s_types.end(),
+		[&typeName](const TypeDescStruct& type) { return type.m_name == typeName; });
+	if (it != s_types.end()) { return it->m_type; }
 
 	// compat code
 	if( typeName == "channelsettings" )
 	{
-		return DataFile::InstrumentTrackSettings;
+		return Type::InstrumentTrackSettings;
 	}
 
-	return UnknownType;
+	return Type::Unknown;
 }
 
 
@@ -606,12 +603,7 @@ DataFile::Type DataFile::type( const QString& typeName )
 
 QString DataFile::typeName( Type type )
 {
-	if( type >= UnknownType && type < TypeCount )
-	{
-		return s_types[type].m_name;
-	}
-
-	return s_types[UnknownType].m_name;
+	return s_types[static_cast<std::size_t>(type)].m_name;
 }
 
 
@@ -1677,74 +1669,10 @@ void DataFile::upgrade_automationNodes()
  */
 void DataFile::upgrade_extendedNoteRange()
 {
-	auto affected = [](const QDomElement& instrument)
-	{
-		return instrument.attribute("name") == "zynaddsubfx" ||
-			instrument.attribute("name") == "vestige" ||
-			instrument.attribute("name") == "lv2instrument" ||
-			instrument.attribute("name") == "carlapatchbay" ||
-			instrument.attribute("name") == "carlarack";
-	};
+	auto root = documentElement();
+	UpgradeExtendedNoteRange upgradeExtendedNoteRange(root);
 
-	if (!elementsByTagName("song").item(0).isNull())
-	{
-		// Dealing with a project file, go through all the tracks
-		QDomNodeList tracks = elementsByTagName("track");
-		for (int i = 0; !tracks.item(i).isNull(); i++)
-		{
-			// Ignore BB container tracks
-			if (tracks.item(i).toElement().attribute("type").toInt() == 1) { continue; }
-
-			QDomNodeList instruments = tracks.item(i).toElement().elementsByTagName("instrument");
-			if (instruments.isEmpty()) { continue; }
-			QDomElement instrument = instruments.item(0).toElement();
-			// Raise the base note of every instrument by 12 to compensate for the change
-			// of A4 key code from 57 to 69. This ensures that notes are labeled correctly.
-			instrument.parentNode().toElement().setAttribute(
-				"basenote",
-				instrument.parentNode().toElement().attribute("basenote").toInt() + 12);
-			// Raise the pitch of all notes in patterns assigned to instruments not affected
-			// by #1857 by an octave. This negates the base note change for normal instruments,
-			// but leaves the MIDI-based instruments sounding an octave lower, preserving their
-			// pitch in existing projects.
-			if (!affected(instrument))
-			{
-				QDomNodeList patterns = tracks.item(i).toElement().elementsByTagName("pattern");
-				for (int i = 0; !patterns.item(i).isNull(); i++)
-				{
-					QDomNodeList notes = patterns.item(i).toElement().elementsByTagName("note");
-					for (int i = 0; !notes.item(i).isNull(); i++)
-					{
-						notes.item(i).toElement().setAttribute(
-							"key",
-							notes.item(i).toElement().attribute("key").toInt() + 12
-						);
-					}
-				}
-			}
-		}
-	}
-	else
-	{
-		// Dealing with a preset, not a song
-		QDomNodeList presets = elementsByTagName("instrumenttrack");
-		if (presets.item(0).isNull()) { return; }
-		QDomElement preset = presets.item(0).toElement();
-		// Common correction for all instrument presets (make base notes match the new MIDI range).
-		// NOTE: Many older presets do not have any basenote defined, assume they were "made for 57".
-		// (Specifying a default like this also happens to fix a FileBrowser bug where previews of presets
-		// with undefined basenote always play with the basenote inherited from previously played preview.)
-		int oldBase = preset.attribute("basenote", "57").toInt();
-		preset.setAttribute("basenote", oldBase + 12);
-		// Extra correction for Zyn, VeSTige, LV2 and Carla (to preserve the original buggy behavior).
-		QDomNodeList instruments = presets.item(0).toElement().elementsByTagName("instrument");
-		if (instruments.isEmpty()) { return; }
-		QDomElement instrument = instruments.item(0).toElement();
-		if (affected(instrument))
-		{
-			preset.setAttribute("basenote", preset.attribute("basenote").toInt() + 12);
-		}
-	}
+	upgradeExtendedNoteRange.upgrade();
 }
 
 
@@ -1825,8 +1753,8 @@ void DataFile::upgrade_bbTcoRename()
 	for (int i = 0; !elements.item(i).isNull(); ++i)
 	{
 		auto e = elements.item(i).toElement();
-		static_assert(Track::PatternTrack == 1, "Must be type=1 for backwards compatibility");
-		if (e.attribute("type").toInt() == Track::PatternTrack)
+		static_assert(Track::Type::Pattern == static_cast<Track::Type>(1), "Must be type=1 for backwards compatibility");
+		if (static_cast<Track::Type>(e.attribute("type").toInt()) == Track::Type::Pattern)
 		{
 			e.setAttribute("name", e.attribute("name").replace("Beat/Bassline", "Pattern"));
 		}
@@ -1854,7 +1782,7 @@ void DataFile::upgrade()
 	documentElement().setAttribute( "creator", "LMMS" );
 	documentElement().setAttribute( "creatorversion", LMMS_VERSION );
 
-	if( type() == SongProject || type() == SongProjectTemplate )
+	if( type() == Type::SongProject || type() == Type::SongProjectTemplate )
 	{
 		// Time-signature
 		if ( !m_head.hasAttribute( "timesig_numerator" ) )
@@ -1932,8 +1860,8 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 		ProjectVersion createdWith = root.attribute("creatorversion");
 		ProjectVersion openedWith = LMMS_VERSION;
 
-		if (createdWith.setCompareType(ProjectVersion::Minor)
-		 !=  openedWith.setCompareType(ProjectVersion::Minor)
+		if (createdWith.setCompareType(ProjectVersion::CompareType::Minor)
+		 !=  openedWith.setCompareType(ProjectVersion::CompareType::Minor)
 		 && gui::getGUI() != nullptr && root.attribute("type") == "song"
 		){
 			auto projectType = _sourceFile.endsWith(".mpt") ?

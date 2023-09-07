@@ -22,12 +22,9 @@
  *
  */
 
-
 #include "Organic.h"
 
-
 #include <QDomElement>
-
 
 #include "Engine.h"
 #include "AudioEngine.h"
@@ -38,7 +35,6 @@
 #include "PixmapButton.h"
 
 #include "embed.h"
-
 #include "plugin_export.h"
 
 namespace lmms
@@ -56,7 +52,7 @@ Plugin::Descriptor PLUGIN_EXPORT organic_plugin_descriptor =
 				"Additive Synthesizer for organ-like sounds" ),
 	"Andreas Brandmaier <andreas/at/brandmaier.de>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
@@ -78,7 +74,9 @@ float * OrganicInstrument::s_harmonics = nullptr;
 
 OrganicInstrument::OrganicInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &organic_plugin_descriptor ),
-	m_modulationAlgo( Oscillator::SignalMix, Oscillator::SignalMix, Oscillator::SignalMix),
+	m_modulationAlgo(static_cast<int>(Oscillator::ModulationAlgo::SignalMix),
+		static_cast<int>(Oscillator::ModulationAlgo::SignalMix),
+		static_cast<int>(Oscillator::ModulationAlgo::SignalMix)),
 	m_fx1Model( 0.0f, 0.0f, 0.99f, 0.01f , this, tr( "Distortion" ) ),
 	m_volModel( 100.0f, 0.0f, 200.0f, 1.0f, this, tr( "Volume" ) )
 {
@@ -159,61 +157,59 @@ OrganicInstrument::~OrganicInstrument()
 
 
 
-void OrganicInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void OrganicInstrument::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
-	_this.setAttribute( "num_osc", QString::number( m_numOscillators ) );
-	m_fx1Model.saveSettings( _doc, _this, "foldback" );
-	m_volModel.saveSettings( _doc, _this, "vol" );
+	elem.setAttribute("num_osc", QString::number(m_numOscillators));
+	m_fx1Model.saveSettings(doc, elem, "foldback");
+	m_volModel.saveSettings(doc, elem, "vol");
 
-	for( int i = 0; i < m_numOscillators; ++i )
+	for (int i = 0; i < m_numOscillators; ++i)
 	{
-		QString is = QString::number( i );
-		m_osc[i]->m_volModel.saveSettings( _doc, _this, "vol" + is );
-		m_osc[i]->m_panModel.saveSettings( _doc, _this, "pan" + is );
-		m_osc[i]->m_harmModel.saveSettings( _doc, _this, "newharmonic" + is );
-
-		m_osc[i]->m_detuneModel.saveSettings( _doc, _this, "newdetune"
-									+ is );
-		m_osc[i]->m_oscModel.saveSettings( _doc, _this, "wavetype"
-									+ is );
+		const auto is = QString::number(i);
+		m_osc[i]->m_volModel.saveSettings(doc, elem, "vol" + is);
+		m_osc[i]->m_panModel.saveSettings(doc, elem, "pan" + is);
+		m_osc[i]->m_harmModel.saveSettings(doc, elem, "newharmonic" + is);
+		m_osc[i]->m_detuneModel.saveSettings(doc, elem, "newdetune" + is);
+		m_osc[i]->m_oscModel.saveSettings(doc, elem, "wavetype" + is);
 	}
 }
 
 
 
 
-void OrganicInstrument::loadSettings( const QDomElement & _this )
+void OrganicInstrument::loadSettings(const QDomElement& elem)
 {
-//	m_numOscillators =  _this.attribute( "num_osc" ).
-	//							toInt();
-
-	for( int i = 0; i < m_numOscillators; ++i )
+	for (int i = 0; i < m_numOscillators; ++i)
 	{
-		QString is = QString::number( i );
-		m_osc[i]->m_volModel.loadSettings( _this, "vol" + is );
-		if( _this.hasAttribute( "detune" + is ) )
-		{
-			m_osc[i]->m_detuneModel.setValue( _this.attribute( "detune" ).toInt() * 12 );
-		}
-		else
-		{
-			m_osc[i]->m_detuneModel.loadSettings( _this, "newdetune" + is );
-		}
-		m_osc[i]->m_panModel.loadSettings( _this, "pan" + is );
-		m_osc[i]->m_oscModel.loadSettings( _this, "wavetype" + is );
+		const auto is = QString::number(i);
 
-		if( _this.hasAttribute( "newharmonic" + is ) )
+		m_osc[i]->m_volModel.loadSettings(elem, "vol" + is);
+
+		if (elem.hasAttribute("detune" + is) || !elem.firstChildElement("detune" + is).isNull())
 		{
-			m_osc[i]->m_harmModel.loadSettings( _this, "newharmonic" + is );
+			m_osc[i]->m_detuneModel.loadSettings(elem, "detune" + is);
+			m_osc[i]->m_detuneModel.setValue(m_osc[i]->m_detuneModel.value() * 12); // compat
 		}
 		else
 		{
-			m_osc[i]->m_harmModel.setValue( static_cast<float>( i ) );
+			m_osc[i]->m_detuneModel.loadSettings(elem, "newdetune" + is);
+		}
+
+		m_osc[i]->m_panModel.loadSettings(elem, "pan" + is);
+		m_osc[i]->m_oscModel.loadSettings(elem, "wavetype" + is);
+
+		if (elem.hasAttribute("newharmonic" + is) || !elem.firstChildElement("newharmonic" + is).isNull())
+		{
+			m_osc[i]->m_harmModel.loadSettings(elem, "newharmonic" + is);
+		}
+		else
+		{
+			m_osc[i]->m_harmModel.setValue(static_cast<float>(i));
 		}
 	}
 
-	m_volModel.loadSettings( _this, "vol" );
-	m_fx1Model.loadSettings( _this, "foldback" );
+	m_volModel.loadSettings(elem, "vol");
+	m_fx1Model.loadSettings(elem, "foldback");
 }
 
 
@@ -231,7 +227,7 @@ void OrganicInstrument::playNote( NotePlayHandle * _n,
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 
-	if( _n->totalFramesPlayed() == 0 || _n->m_pluginData == nullptr )
+	if (!_n->m_pluginData)
 	{
 		auto oscs_l = std::array<Oscillator*, NUM_OSCILLATORS>{};
 		auto oscs_r = std::array<Oscillator*, NUM_OSCILLATORS>{};
@@ -409,7 +405,7 @@ class OrganicKnob : public Knob
 {
 public:
 	OrganicKnob( QWidget * _parent ) :
-		Knob( knobStyled, _parent )
+		Knob( KnobType::Styled, _parent )
 	{
 		setFixedSize( 21, 21 );
 	}
@@ -512,7 +508,7 @@ void OrganicInstrumentView::modelChanged()
 		oscKnob->setHintText( tr( "Osc %1 waveform:" ).arg( i + 1 ), QString() );
 
 		// setup volume-knob
-		auto volKnob = new Knob(knobStyled, this);
+		auto volKnob = new Knob(KnobType::Styled, this);
 		volKnob->setVolumeKnob( true );
 		volKnob->move( x + i * colWidth, y + rowHeight*1 );
 		volKnob->setFixedSize( 21, 21 );
@@ -566,7 +562,7 @@ void OrganicInstrumentView::updateKnobHint()
 
 OscillatorObject::OscillatorObject( Model * _parent, int _index ) :
 	Model( _parent ),
-	m_waveShape( Oscillator::SineWave, 0, Oscillator::NumWaveShapes-1, this ),
+	m_waveShape( static_cast<int>(Oscillator::WaveShape::Sine), 0, Oscillator::NumWaveShapes-1, this ),
 	m_oscModel( 0.0f, 0.0f, 5.0f, 1.0f,
 			this, tr( "Osc %1 waveform" ).arg( _index + 1 ) ),
 	m_harmModel( static_cast<float>( _index ), 0.0f, 17.0f, 1.0f,
@@ -588,15 +584,15 @@ void OscillatorObject::oscButtonChanged()
 
 	static auto shapes = std::array
 	{
-		Oscillator::SineWave,
-		Oscillator::SawWave,
-		Oscillator::SquareWave,
-		Oscillator::TriangleWave,
-		Oscillator::MoogSawWave,
-		Oscillator::ExponentialWave
+		Oscillator::WaveShape::Sine,
+		Oscillator::WaveShape::Saw,
+		Oscillator::WaveShape::Square,
+		Oscillator::WaveShape::Triangle,
+		Oscillator::WaveShape::MoogSaw,
+		Oscillator::WaveShape::Exponential
 	} ;
 
-	m_waveShape.setValue( shapes[(int)roundf( m_oscModel.value() )] );
+	m_waveShape.setValue( static_cast<float>(shapes[(int)roundf( m_oscModel.value() )]) );
 
 }
 

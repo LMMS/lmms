@@ -57,6 +57,16 @@ MixerView::MixerView() :
 	ModelView( nullptr, this ),
 	SerializingObjectHook()
 {
+#if QT_VERSION < 0x50C00
+	// Workaround for a bug in Qt versions below 5.12,
+	// where argument-dependent-lookup fails for QFlags operators
+	// declared inside a namepsace.
+	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
+	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
+
+	using ::operator|;
+#endif
+
 	Mixer * m = Engine::mixer();
 	m->setHook( this );
 
@@ -238,20 +248,20 @@ void MixerView::refreshDisplay()
 // update the and max. channel number for every instrument
 void MixerView::updateMaxChannelSelector()
 {
-	TrackContainer::TrackList songTracks = Engine::getSong()->tracks();
-	TrackContainer::TrackList patternStoreTracks = Engine::patternStore()->tracks();
+	const TrackContainer::TrackList& songTracks = Engine::getSong()->tracks();
+	const TrackContainer::TrackList& patternStoreTracks = Engine::patternStore()->tracks();
 
 	for (const auto& trackList : {songTracks, patternStoreTracks})
 	{
 		for (const auto& track : trackList)
 		{
-			if (track->type() == Track::InstrumentTrack)
+			if (track->type() == Track::Type::Instrument)
 			{
 				auto inst = (InstrumentTrack*)track;
 				inst->mixerChannelModel()->setRange(0,
 					m_mixerChannelViews.size()-1,1);
 			}
-			else if (track->type() == Track::SampleTrack)
+			else if (track->type() == Track::Type::Sample)
 			{
 				auto strk = (SampleTrack*)track;
 				strk->mixerChannelModel()->setRange(0,

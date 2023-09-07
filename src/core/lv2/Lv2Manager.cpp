@@ -217,7 +217,7 @@ void Lv2Manager::initPlugins()
 		const LilvPlugin* curPlug = lilv_plugins_get(plugins, itr);
 
 		std::vector<PluginIssue> issues;
-		Plugin::PluginTypes type = Lv2ControlBase::check(curPlug, issues);
+		Plugin::Type type = Lv2ControlBase::check(curPlug, issues);
 		std::sort(issues.begin(), issues.end());
 		auto last = std::unique(issues.begin(), issues.end());
 		issues.erase(last, issues.end());
@@ -240,7 +240,7 @@ void Lv2Manager::initPlugins()
 		{
 			if(std::any_of(issues.begin(), issues.end(),
 				[](const PluginIssue& iss) {
-				return iss.type() == PluginIssueType::blacklisted; }))
+				return iss.type() == PluginIssueType::Blacklisted; }))
 			{
 				++blacklisted;
 			}

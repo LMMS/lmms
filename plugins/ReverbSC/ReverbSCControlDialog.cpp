@@ -42,25 +42,25 @@ ReverbSCControlDialog::ReverbSCControlDialog( ReverbSCControls* controls ) :
 	setPalette( pal );
 	setFixedSize( 185, 55 );
 
-	auto inputGainKnob = new Knob(knobBright_26, this);
+	auto inputGainKnob = new Knob(KnobType::Bright26, this);
 	inputGainKnob -> move( 16, 10 );
 	inputGainKnob->setModel( &controls->m_inputGainModel );
 	inputGainKnob->setLabel( tr( "Input" ) );
 	inputGainKnob->setHintText( tr( "Input gain:" ) , "dB" );
 
-	auto sizeKnob = new Knob(knobBright_26, this);
+	auto sizeKnob = new Knob(KnobType::Bright26, this);
 	sizeKnob -> move( 57, 10 );
 	sizeKnob->setModel( &controls->m_sizeModel );
 	sizeKnob->setLabel( tr( "Size" ) );
 	sizeKnob->setHintText( tr( "Size:" ) , "" );
 
-	auto colorKnob = new Knob(knobBright_26, this);
+	auto colorKnob = new Knob(KnobType::Bright26, this);
 	colorKnob -> move( 98, 10 );
 	colorKnob->setModel( &controls->m_colorModel );
 	colorKnob->setLabel( tr( "Color" ) );
 	colorKnob->setHintText( tr( "Color:" ) , "" );
 
-	auto outputGainKnob = new Knob(knobBright_26, this);
+	auto outputGainKnob = new Knob(KnobType::Bright26, this);
 	outputGainKnob -> move( 139, 10 );
 	outputGainKnob->setModel( &controls->m_outputGainModel );
 	outputGainKnob->setLabel( tr( "Output" ) );
