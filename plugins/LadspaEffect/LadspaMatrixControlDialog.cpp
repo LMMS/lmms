@@ -73,7 +73,7 @@ LadspaMatrixControlDialog::LadspaMatrixControlDialog(LadspaControls * ladspaCont
 	{
 		mainLayout->addSpacing(3);
 
-		m_stereoLink = new LedCheckBox(tr("Link Channels"), this, QString(), LedCheckBox::Green, false);
+		m_stereoLink = new LedCheckBox(tr("Link Channels"), this, QString(), LedCheckBox::LedColor::Green, false);
 		m_stereoLink->setModel(&ladspaControls->m_stereoLinkModel);
 		mainLayout->addWidget(m_stereoLink, 0, Qt::AlignCenter);
 	}
@@ -156,7 +156,7 @@ void LadspaMatrixControlDialog::arrangeControls(QWidget * parent, QGridLayout* g
 			if (i == 0 && ladspaControl->m_link)
 			{
 				// TODO Assumes that all processors are equal! Change to more general approach, e.g. map from name to row
-				LedCheckBox * linkCheckBox = new LedCheckBox("", parent, "", LedCheckBox::Green);
+				LedCheckBox * linkCheckBox = new LedCheckBox("", parent, "", LedCheckBox::LedColor::Green);
 				linkCheckBox->setModel(&ladspaControl->m_linkEnabledModel);
 				linkCheckBox->setToolTip(tr("Link channels"));
 				gridLayout->addWidget(linkCheckBox, currentRow, linkColumn, Qt::AlignHCenter);
@@ -168,7 +168,7 @@ void LadspaMatrixControlDialog::arrangeControls(QWidget * parent, QGridLayout* g
 			{
 				// Align time based controls, i.e. knobs, in the center.
 				// This defeats the purpose of the widget factory a bit but it makes the design look nicer.
-				auto alignment = ladspaControl->port()->data_type == TIME ? Qt::AlignCenter : Qt::Alignment();
+				auto alignment = ladspaControl->port()->data_type == BufferDataType::Time ? Qt::AlignCenter : Qt::Alignment();
 
 				gridLayout->addWidget(controlWidget, currentRow, currentChannelColumn, alignment);
 			}

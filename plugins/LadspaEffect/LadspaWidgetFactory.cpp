@@ -52,21 +52,21 @@ QWidget * LadspaWidgetFactory::createWidget(LadspaControl * ladspaControl, QWidg
 
 	switch (port->data_type)
 	{
-	case TOGGLED:
+	case BufferDataType::Toggled:
 	{
 		LedCheckBox * toggle = new LedCheckBox(
-			name, parent, QString(), LedCheckBox::Green, false);
+			name, parent, QString(), LedCheckBox::LedColor::Green, false);
 		toggle->setModel(ladspaControl->toggledModel());
 		return toggle;
 	}
 
-	case INTEGER:
-	case ENUM:
-	case FLOATING:
+	case BufferDataType::Integer:
+	case BufferDataType::Enum:
+	case BufferDataType::Floating:
 		return new BarModelEditor(name, ladspaControl->knobModel(), parent);
 
-	case TIME:
-		knob = new TempoSyncKnob(knobBright_26, parent, name);
+	case BufferDataType::Time:
+		knob = new TempoSyncKnob(KnobType::Bright26, parent, name);
 		knob->setModel(ladspaControl->tempoSyncKnobModel());
 		knob->setLabel(name);
 		break;
