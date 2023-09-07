@@ -166,11 +166,7 @@ void LadspaMatrixControlDialog::arrangeControls(QWidget * parent, QGridLayout* g
 			QWidget * controlWidget = LadspaWidgetFactory::createWidget(ladspaControl, this);
 			if (controlWidget)
 			{
-				// Align time based controls, i.e. knobs, in the center.
-				// This defeats the purpose of the widget factory a bit but it makes the design look nicer.
-				auto alignment = ladspaControl->port()->data_type == BufferDataType::Time ? Qt::AlignCenter : Qt::Alignment();
-
-				gridLayout->addWidget(controlWidget, currentRow, currentChannelColumn, alignment);
+				gridLayout->addWidget(controlWidget, currentRow, currentChannelColumn);
 			}
 
 			// Record the maximum row so that we add a vertical spacer after that row

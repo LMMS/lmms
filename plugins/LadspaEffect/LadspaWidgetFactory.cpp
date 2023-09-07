@@ -34,7 +34,7 @@
 // TODO Only for testing! Remove!
 #include "FloatModelEditorBase.h"
 #include "LedCheckBox.h"
-#include "TempoSyncKnob.h"
+#include "TempoSyncBarModelEditor.h"
 
 #include <QLabel>
 
@@ -44,8 +44,6 @@ namespace lmms::gui
 
 QWidget * LadspaWidgetFactory::createWidget(LadspaControl * ladspaControl, QWidget * parent)
 {
-	Knob * knob = nullptr;
-
 	auto const * port = ladspaControl->port();
 
 	QString const name = port->name;
@@ -66,19 +64,10 @@ QWidget * LadspaWidgetFactory::createWidget(LadspaControl * ladspaControl, QWidg
 		return new BarModelEditor(name, ladspaControl->knobModel(), parent);
 
 	case BufferDataType::Time:
-		knob = new TempoSyncKnob(KnobType::Bright26, parent, name);
-		knob->setModel(ladspaControl->tempoSyncKnobModel());
-		knob->setLabel(name);
-		break;
+		return new TempoSyncBarModelEditor(name, ladspaControl->tempoSyncKnobModel(), parent);
 
 	default:
 		return new QLabel(QObject::tr("%1 (unsupported)").arg(name), parent);
-	}
-
-	if (knob != nullptr)
-	{
-		knob->setHintText(QObject::tr("Value:"), "");
-		return knob;
 	}
 
 	return nullptr;
