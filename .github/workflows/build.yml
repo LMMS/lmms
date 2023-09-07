@@ -14,7 +14,8 @@ jobs:
         -DUSE_WERROR=ON
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
         -DUSE_COMPILE_CACHE=ON
-      CCACHE_MAXSIZE: 500M
+      CCACHE_MAXSIZE: 0
+      CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
     steps:
       - name: Update and configure Git
@@ -56,12 +57,15 @@ jobs:
         with:
           name: linux
           path: build/lmms-*.AppImage
-      - name: Print ccache statistics
+      - name: Trim ccache and print statistics
         run: |
+          ccache --cleanup
           echo "[ccache config]"
-          ccache -p
+          ccache --show-config
           echo "[ccache stats]"
-          ccache -s
+          ccache --show-stats
+        env:
+          CCACHE_MAXSIZE: 500M
   macos:
     name: macos
     runs-on: macos-11
@@ -70,7 +74,8 @@ jobs:
         -DUSE_WERROR=ON
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
         -DUSE_COMPILE_CACHE=ON
-      CCACHE_MAXSIZE: 500M
+      CCACHE_MAXSIZE: 0
+      CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j3
       DEVELOPER_DIR: /Applications/Xcode_11.7.app/Contents/Developer
     steps:
@@ -117,12 +122,15 @@ jobs:
         with:
           name: macos
           path: build/lmms-*.dmg
-      - name: Print ccache statistics
+      - name: Trim ccache and print statistics
         run: |
+          ccache --cleanup
           echo "[ccache config]"
-          ccache -p
+          ccache --show-config
           echo "[ccache stats]"
-          ccache -s
+          ccache --show-stats --verbose
+        env:
+          CCACHE_MAXSIZE: 500MB
   mingw:
     strategy:
       fail-fast: false
@@ -136,7 +144,8 @@ jobs:
         -DUSE_WERROR=ON
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
         -DUSE_COMPILE_CACHE=ON
-      CCACHE_MAXSIZE: 500M
+      CCACHE_MAXSIZE: 0
+      CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
     steps:
       - name: Update and configure Git
@@ -174,12 +183,15 @@ jobs:
         with:
           name: mingw${{ matrix.arch }}
           path: build/lmms-*.exe
-      - name: Print ccache statistics
+      - name: Trim ccache and print statistics
         run: |
+          ccache --cleanup
           echo "[ccache config]"
-          ccache -p
+          ccache --show-config
           echo "[ccache stats]"
-          ccache -s
+          ccache --show-stats
+        env:
+          CCACHE_MAXSIZE: 500M
   msvc:
     strategy:
       fail-fast: false
