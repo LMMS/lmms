@@ -79,6 +79,7 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_automationNodes  ,   &DataFile::upgrade_extendedNoteRange,
 	&DataFile::upgrade_defaultTripleOscillatorHQ,
 	&DataFile::upgrade_mixerRename      ,   &DataFile::upgrade_bbTcoRename,
+	&DataFile::upgrade_sampleAndHold    ,
 };
 
 // Vector of all versions that have upgrade routines.
@@ -1757,6 +1758,22 @@ void DataFile::upgrade_bbTcoRename()
 		if (static_cast<Track::Type>(e.attribute("type").toInt()) == Track::Type::Pattern)
 		{
 			e.setAttribute("name", e.attribute("name").replace("Beat/Bassline", "Pattern"));
+		}
+	}
+}
+
+
+// Set LFO speed to 0.01 on projects made before sample-and-hold PR
+void DataFile::upgrade_sampleAndHold()
+{
+	QDomNodeList elements = elementsByTagName("lfocontroller");
+	for (int i = 0; !elements.item(i).isNull(); ++i)
+	{
+		auto e = elements.item(i).toElement();
+		// Correct old random wave LFO speeds
+		if (e.attribute("wave").toInt() == 6)
+		{
+			e.setAttribute("speed",0.01f);
 		}
 	}
 }
