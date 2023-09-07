@@ -60,7 +60,7 @@ Plugin::Descriptor PLUGIN_EXPORT bitinvader_plugin_descriptor =
 				"Customizable wavetable synthesizer" ),
 	"Andreas Brandmaier <andreas/at/brandmaier/dot/de>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
@@ -274,9 +274,8 @@ QString BitInvader::nodeName() const
 void BitInvader::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
-	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == nullptr )
+	if (!_n->m_pluginData)
 	{
-	
 		float factor;
 		if( !m_normalize.value() )
 		{
@@ -346,11 +345,11 @@ BitInvaderView::BitInvaderView( Instrument * _instrument,
 								"artwork" ) );
 	setPalette( pal );
 	
-	m_sampleLengthKnob = new Knob( knobDark_28, this );
+	m_sampleLengthKnob = new Knob( KnobType::Dark28, this );
 	m_sampleLengthKnob->move( 6, 201 );
 	m_sampleLengthKnob->setHintText( tr( "Sample length" ), "" );
 
-	m_graph = new Graph( this, Graph::NearestStyle, 204, 134 );
+	m_graph = new Graph( this, Graph::Style::Nearest, 204, 134 );
 	m_graph->move(23,59);	// 55,120 - 2px border
 	m_graph->setAutoFillBackground( true );
 	m_graph->setGraphColor( QColor( 255, 255, 255 ) );
@@ -432,12 +431,12 @@ BitInvaderView::BitInvaderView( Instrument * _instrument,
 
 
 	m_interpolationToggle = new LedCheckBox( "Interpolation", this,
-							tr( "Interpolation" ), LedCheckBox::Yellow );
+							tr( "Interpolation" ), LedCheckBox::LedColor::Yellow );
 	m_interpolationToggle->move( 131, 221 );
 
 
 	m_normalizeToggle = new LedCheckBox( "Normalize", this,
-							tr( "Normalize" ), LedCheckBox::Green );
+							tr( "Normalize" ), LedCheckBox::LedColor::Green );
 	m_normalizeToggle->move( 131, 236 );
 	
 	
@@ -557,7 +556,7 @@ void BitInvaderView::smoothClicked()
 
 void BitInvaderView::interpolationToggled( bool value )
 {
-	m_graph->setGraphStyle( value ? Graph::LinearStyle : Graph::NearestStyle);
+	m_graph->setGraphStyle( value ? Graph::Style::Linear : Graph::Style::Nearest);
 	Engine::getSong()->setModified();
 }
 

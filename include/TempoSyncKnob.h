@@ -41,7 +41,7 @@ class LMMS_EXPORT TempoSyncKnob : public Knob
 {
 	Q_OBJECT
 public:
-	TempoSyncKnob( knobTypes knobNum, QWidget* parent = nullptr, const QString& name = QString() );
+	TempoSyncKnob( KnobType knobNum, QWidget* parent = nullptr, const QString& name = QString() );
 	~TempoSyncKnob() override;
 
 	const QString & syncDescription();
