@@ -240,25 +240,35 @@ void SlicerT::timeShiftSample() {
 
 }
 
-
+// basic phase vocoder implementation that time shifts without pitch change
+// a lot of stuff needs improvement, mostly the windowing and
+// the pitch shifting implemention
 void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataOut, float sampleRate, float pitchScale) {
 	using std::vector;
 	// processing parameters, lower is faster
-	const int windowSize = 2048;
-	const int overSampling = 32;
+	// lower windows size seems to work better for time scaling,
+	// this is because the step site is scaled, but not the window size
+	// this causes slight timing differences between windows
+	// oversampling is better if higher always (probably)
+	const int windowSize = 512;
+	const int overSampling = 64;
 	
 	// audio data
 	int inFrames = dataIn.size();
 	int outFrames = dataOut.size();
 
-	float lengthRatio = noteThreshold.value();// inFrames / outFrames;
+	float lengthRatio = noteThreshold.value() + 0.001f;// inFrames / outFrames;
 
 	// values used
 	const int stepSize = windowSize / overSampling; 
+	const int outStepSize = stepSize * lengthRatio;
 	const int numWindows = inFrames / stepSize;
 	const int windowLatency = (overSampling-1)*stepSize;
 	const float freqPerBin = sampleRate/windowSize; 
-	const float expectedPhase = 2.*M_PI*(float)stepSize/(float)windowSize;
+	// very important
+	const float expectedPhaseIn = 2.*M_PI*(float)stepSize/(float)windowSize;
+	const float expectedPhaseOut = 2.*M_PI*(float)outStepSize/(float)windowSize;
+
 
 
 	printf("frames: %i , out frames: %i , ratio: %f\n", inFrames, outFrames, (float)outFrames / inFrames);
@@ -267,7 +277,6 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 	printf("pitch shift: %f\n", noteThreshold.value());
 
 	// initialize buffers
-
 	fftwf_complex FFTSpectrum[windowSize];
 	vector<float> FFTInput(windowSize, 0);
 	vector<float> IFFTReconstruction(windowSize, 0);
@@ -278,7 +287,7 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 	vector<float> lastPhase(windowSize, 0);
 	vector<float> sumPhase(windowSize, 0);
 
-	vector<float> outBuffer(inFrames, 0);
+	vector<float> outBuffer(outFrames, 0);
 
 	// declare vars
 	float real, imag, phase, magnitude, freq, deltaPhase = 0;
@@ -314,7 +323,7 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 			freq = phase - lastPhase[j]; // subtract prev pahse to get phase diference
 			lastPhase[j] = phase;
 
-			freq -= (float)j*expectedPhase; // subtract expected phase
+			freq -= (float)j*expectedPhaseIn; // subtract expected phase
 
 			// some black magic to get into +/- PI interval, revise later pls
 			long qpd = freq/M_PI;
@@ -337,22 +346,22 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 		// nyquist frequency = samplerate / 2
 		// and moves them to a different bin
 		// improve for larger pitch shift
-		memset(processedFreq.data(), 0, processedFreq.size()*sizeof(float));
-		memset(processedMagn.data(), 0, processedFreq.size()*sizeof(float));
-		for (int j = 0; j < windowSize/2; j++) {
-			int index = (float)j * noteThreshold.value();
-			if (index <= windowSize/2) {
-				processedMagn[index] += allMagnitudes[j];
-				processedFreq[index] = allFrequencies[j] * noteThreshold.value();
-			}
-		}
+		// memset(processedFreq.data(), 0, processedFreq.size()*sizeof(float));
+		// memset(processedMagn.data(), 0, processedFreq.size()*sizeof(float));
+		// for (int j = 0; j < windowSize/2; j++) {
+		// 	int index = (float)j;// * noteThreshold.value();
+		// 	if (index <= windowSize/2) {
+		// 		processedMagn[index] += allMagnitudes[j];
+		// 		processedFreq[index] = allFrequencies[j];// * noteThreshold.value();
+		// 	}
+		// }
 
 
 
 		// synthesis, all the operations are the reverse of the analysis
 		for (int j = 0; j < windowSize; j++) {
-			magnitude = processedMagn[j];
-			freq = processedFreq[j];
+			magnitude = allMagnitudes[j];
+			freq = allFrequencies[j];
 
 			deltaPhase = freq - (float)j*freqPerBin;
 
@@ -360,7 +369,7 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 
 			deltaPhase = 2.*M_PI*deltaPhase/overSampling;;
 
-			deltaPhase += (float)j*expectedPhase;
+			deltaPhase += (float)j*expectedPhaseOut;
 
 			sumPhase[j] += deltaPhase;
 			deltaPhase = sumPhase[j]; // this is the bin phase
@@ -379,7 +388,7 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 		// pls improve
 		for (int j = 0; j < windowSize; j++) {
 			
-			float outIndex = windowIndex + j;
+			float outIndex = i * outStepSize + j;
 			if (outIndex < 0) {
 				// calculate amount of windows overlapping
 				float windowsOverlapping =  outIndex / windowSize * overSampling + 1;
@@ -406,46 +415,18 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 
 	// normalize 	
 	float max = -1;
-	for (int i = 0;i<inFrames;i++) {
+	for (int i = 0;i<outFrames;i++) {
 		max = std::max(max, abs(outBuffer[i]));
 	}
 
-	for (int i = 0;i<inFrames;i++) {
+	for (int i = 0;i<outFrames;i++) {
 		outBuffer[i] = outBuffer[i] / max;
 	}
 
-	// memcpy(dataOut.data(), outBuffer.data(), inFrames*sizeof(float));
+	memcpy(dataOut.data(), outBuffer.data(), outFrames*sizeof(float));
 
 	printf("finished pitch scaling sample\n");
 
-
-	// copied code from samplebuffer.resample()
-	int error;
-	SRC_STATE * state;
-	if ((state = src_new(SRC_SINC_BEST_QUALITY, 1, &error)) != nullptr)
-	{
-		SRC_DATA srcData;
-		// srcData.end_of_input = 1;
-		srcData.data_in = outBuffer.data();
-		srcData.data_out = dataOut.data();
-		srcData.input_frames = inFrames;
-		srcData.output_frames = outFrames;
-		srcData.src_ratio = noteThreshold.value();
-		if ((error = src_process(state, &srcData)))
-		{
-			printf("SlicerT: error while resampling: %s\n", src_strerror(error));
-		}
-		src_delete(state);
-	}
-	else
-	{
-		printf("Error: src_new() failed in SlicerT.cpp!\n");
-	}
-
-
-
-
-	// fftwf_cleanup();
 
 }
 
