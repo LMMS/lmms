@@ -811,7 +811,7 @@ MESSAGE(
 MESSAGE(
 "Developer options\n"
 "-----------------------------------------\n"
-"* Debug using FP exceptions         : ${STATUS_DEBUG_FPE}\n"
+"* Debug FP exceptions				 : ${STATUS_DEBUG_FPE}\n"
 "* Debug using AddressSanitizer      : ${STATUS_DEBUG_ASAN}\n"
 "* Debug using ThreadSanitizer       : ${STATUS_DEBUG_TSAN}\n"
 "* Debug using MemorySanitizer       : ${STATUS_DEBUG_MSAN}\n"
