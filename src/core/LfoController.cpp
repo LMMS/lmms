@@ -103,8 +103,7 @@ void LfoController::updateValueBuffer()
 	ValueBuffer *amountBuffer = m_amountModel.valueBuffer();
 	int amountInc = amountBuffer ? 1 : 0;
 	float *amountPtr = amountBuffer ? &(amountBuffer->values()[ 0 ] ) : &amount;
-	Oscillator::WaveShape waveshape = 
-			static_cast<Oscillator::WaveShape>(m_waveModel.value());
+	Oscillator::WaveShape waveshape = static_cast<Oscillator::WaveShape>(m_waveModel.value());
 
 	for( float& f : m_valueBuffer )
 	{
@@ -115,17 +114,17 @@ void LfoController::updateValueBuffer()
 				if (absFraction(phase) < absFraction(phasePrev))
 				{
 					// Resample when phase period has completed
-					m_heldSample = m_sampleFunction( phase );
+					m_heldSample = m_sampleFunction(phase);
 				}
 				currentSample = m_heldSample;
 				break;
 			case Oscillator::WaveShape::UserDefined:
-				currentSample = m_userDefSampleBuffer->userWaveSample( phase );
+				currentSample = m_userDefSampleBuffer->userWaveSample(phase);
 				break;
 			default:
 				if (m_sampleFunction != nullptr)
 				{
-					currentSample = m_sampleFunction( phase );
+					currentSample = m_sampleFunction(phase);
 				}
 		}
 
@@ -136,7 +135,7 @@ void LfoController::updateValueBuffer()
 		amountPtr += amountInc;
 	}
 
-	m_currentPhase = absFraction( phase - m_phaseOffset );
+	m_currentPhase = absFraction(phase - m_phaseOffset);
 	m_bufferLastUpdated = s_periods;
 }
 
