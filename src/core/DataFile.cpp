@@ -1727,12 +1727,13 @@ void DataFile::upgrade_mixerRename()
 	}
 	// Change the attribute fxch of element <sampletrack> to mixch
 	fxch = elementsByTagName("sampletrack");
-	for(int i = 0; !fxch.item(i).isNull(); ++i)
+	for (int i = 0; fxch.length(); ++i)
 	{
-		if(fxch.item(i).toElement().hasAttribute("fxch"))
+		auto item = fxch.item(i).toElement();
+		if (item.hasAttribute("fxch"))
 		{
-			fxch.item(i).toElement().setAttribute("mixch", fxch.item(i).toElement().attribute("fxch"));
-			fxch.item(i).toElement().removeAttribute("fxch");
+			item.setAttribute("mixch", item.attribute("fxch"));
+			item.removeAttribute("fxch");
 		}
 	}
 }
