@@ -201,6 +201,8 @@ jobs:
     runs-on: windows-2019
     env:
       qt-version: '5.15.2'
+      CCACHE_MAXSIZE: 0
+      CCACHE_NOCOMPRESS: 1
     steps:
       - name: Check out
         uses: actions/checkout@v3
@@ -215,6 +217,17 @@ jobs:
           restore-keys: |
             vcpkg-${{ matrix.arch }}-
           path: build\vcpkg_installed
+      - name: Cache ccache data
+        uses: actions/cache@v3
+        with:
+          key: "ccache-${{ github.job }}-${{ matrix.arch }}-${{ github.ref }}\
+            -${{ github.run_id }}"
+          restore-keys: |
+            ccache-${{ github.job }}-${{ matrix.arch }}-${{ github.ref }}-
+            ccache-${{ github.job }}-${{ matrix.arch }}-
+          path: ~\AppData\Local\ccache
+      - name: Install tools
+        run: choco install ccache
       - name: Install 64-bit Qt
         if: matrix.arch == 'x64'
         uses: jurplel/install-qt-action@b3ea5275e37b734d027040e2c7fe7a10ea2ef946
@@ -243,6 +256,7 @@ jobs:
             -G Ninja `
             --toolchain C:/vcpkg/scripts/buildsystems/vcpkg.cmake `
             -DCMAKE_BUILD_TYPE=RelWithDebInfo `
+            -DUSE_COMPILE_CACHE=ON `
             -DVCPKG_TARGET_TRIPLET="${{ matrix.arch }}-windows" `
             -DVCPKG_HOST_TRIPLET="${{ matrix.arch }}-windows" `
             -DVCPKG_MANIFEST_INSTALL="${{ env.should_install_manifest }}"
@@ -260,3 +274,12 @@ jobs:
         with:
           name: msvc-${{ matrix.arch }}
           path: build\lmms-*.exe
+      - name: Trim ccache and print statistics
+        run: |
+          ccache --cleanup
+          echo "[ccache config]"
+          ccache --show-config
+          echo "[ccache stats]"
+          ccache --show-stats --verbose
+        env:
+          CCACHE_MAXSIZE: 500MB
