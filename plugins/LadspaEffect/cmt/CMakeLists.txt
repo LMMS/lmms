@@ -22,6 +22,6 @@ if(NOT LMMS_BUILD_WIN32)
 endif()
 
 IF(NOT LMMS_BUILD_APPLE AND NOT LMMS_BUILD_OPENBSD)
-	target_link_libraries(cmt -shared -Wl,-no-undefined)
+	target_link_libraries(cmt PRIVATE -shared)
 ENDIF()
 
