@@ -24,17 +24,19 @@
 
 
 // TODO: fadeIn
-// TODO: saving, loading
+// TODO: fix lag multiple notes
 // TODO: timeshift samples on notePlay and cache them
 
 #include "SlicerT.h"
 #include <stdio.h>
 #include <fftw3.h>
+#include <QDomElement>
 
 #include "Engine.h"
 #include "Song.h"
 #include "InstrumentTrack.h"
 
+#include "PathUtil.h"
 #include "embed.h"
 #include "plugin_export.h"
 
@@ -74,14 +76,7 @@ SlicerT::SlicerT(InstrumentTrack * _instrument_track) :
 
 	originalSample(),
 	timeShiftedSample()
-	
-	
-	
 {
-	// connect( &noteThreshold, SIGNAL( dataChanged() ), this, SLOT( updateSlices() ) );
-	// TODO: either button to timeshift, threading or generating samples on the fly
-	// connect( &originalBPM, SIGNAL( dataChanged() ), this, SLOT( updateTimeShift() ) );
-
 	printf("Correctly loaded SlicerT!\n");
 }
 
@@ -133,12 +128,7 @@ void SlicerT::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer ) {
 					frames, 440,
 					static_cast<SampleBuffer::LoopMode>( 0 ) ) )
 		{
-
-			applyRelease( _working_buffer, _n );
-			instrumentTrack()->processAudioBuffer( _working_buffer,
-									frames + offset, _n );
-
-			// exponential fade out
+			// exponential fade out, applyRelease kinda sucks
 			if (noteFramesLeft < fadeOutFrames.value()) {
 				// printf("fade out started. frames: %i, framesLeft: %i\n", frames, noteFramesLeft);
 				for (int i = 0;i<frames;i++) {
@@ -152,16 +142,20 @@ void SlicerT::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer ) {
 				}
 			}
 
+			instrumentTrack()->processAudioBuffer( _working_buffer,
+									frames + offset, _n );
+
+
 			float absoluteCurrentNote = (float)(sliceStart + playedFrames) / totalFrames;
 			float absoluteStartNote = (float)sliceStart / totalFrames;
 			float abslouteEndNote = (float)sliceEnd / totalFrames;
-			// emit isPlaying(absoluteCurrentNote, absoluteStartNote, abslouteEndNote);
+			emit isPlaying(absoluteCurrentNote, absoluteStartNote, abslouteEndNote);
 
 		} else {
-			// emit isPlaying(0, 0, 0);			
+			emit isPlaying(0, 0, 0);			
 		}
 	} else {
-		// emit isPlaying(0, 0, 0);
+		emit isPlaying(0, 0, 0);
 	}
 
 	
@@ -243,6 +237,7 @@ void SlicerT::findBPM() {
 	bpm -= bpm % bpmSnap;
 
 	originalBPM.setValue(bpm);
+	originalBPM.setInitValue(bpm);
 }
 
 // create thimeshifted samplebuffer and timeshifted slicePoints
@@ -511,6 +506,9 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 }
 
 void SlicerT::writeToMidi(std::vector<Note> * outClip) {
+	if (originalSample.frames() < 2048) {
+		return;
+	}
 	int ticksPerBar = DefaultTicksPerBar;
 	float sampleRate = timeShiftedSample.sampleRate();
 
@@ -545,6 +543,7 @@ void SlicerT::updateFile(QString file) {
 	findBPM(); 
 	timeShiftSample();
 	
+	emit dataChanged();
 }
 
 void SlicerT::updateSlices() {
@@ -556,8 +555,60 @@ void SlicerT::updateTimeShift() {
 }
 
 
-void SlicerT::saveSettings(QDomDocument & _doc, QDomElement & _parent) {}
-void SlicerT::loadSettings( const QDomElement & _this ) {}
+void SlicerT::saveSettings(QDomDocument & doc, QDomElement & elem) {
+	elem.setAttribute("src", originalSample.audioFile());
+	if (originalSample.audioFile().isEmpty())
+	{
+		QString s;
+		elem.setAttribute("sampledata", originalSample.toBase64(s));
+	}
+
+	elem.setAttribute("totalSlices", (int)slicePoints.size());
+
+	for (int i = 0;i<slicePoints.size();i++) {
+		elem.setAttribute(tr("slice_%1").arg(i), slicePoints[i]);
+	}
+
+	fadeOutFrames.saveSettings(doc, elem, "fadeOut");
+	noteThreshold.saveSettings(doc, elem, "threshold");
+	originalBPM.saveSettings(doc, elem, "origBPM");
+
+}
+void SlicerT::loadSettings( const QDomElement & elem ) {
+	if (!elem.attribute("src").isEmpty())
+	{
+		originalSample.setAudioFile(elem.attribute("src"));
+
+		QString absolutePath = PathUtil::toAbsolute(originalSample.audioFile());
+		if (!QFileInfo(absolutePath).exists())
+		{
+			QString message = tr("Sample not found: %1").arg(originalSample.audioFile());
+			Engine::getSong()->collectError(message);
+		}
+	}
+	else if (!elem.attribute("sampledata").isEmpty())
+	{
+		originalSample.loadFromBase64(elem.attribute("srcdata"));
+	}
+
+	if (!elem.attribute("totalSlices").isEmpty()) {
+		int totalSlices = elem.attribute("totalSlices").toInt();
+		slicePoints = {};
+		for (int i = 0;i<totalSlices;i++) {
+			
+			slicePoints.push_back(elem.attribute(tr("slice_%1").arg(i)).toInt());
+		}
+	}
+
+	fadeOutFrames.loadSettings(elem, "fadeOut");
+	noteThreshold.loadSettings(elem, "threshold");
+	originalBPM.loadSettings(elem, "origBPM");
+
+	timeShiftSample();
+
+	emit dataChanged();
+
+}
 
 QString SlicerT::nodeName() const
 {

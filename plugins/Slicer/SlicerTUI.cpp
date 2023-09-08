@@ -64,7 +64,6 @@ SlicerTUI::SlicerTUI( SlicerT * _instrument,
 	resetButton.move(70, 200);
 	resetButton.setToolTip(tr("Reset Slices"));
 	connect(&resetButton, SIGNAL( clicked() ), slicerTParent, SLOT( updateSlices() ));
-	connect(&resetButton, SIGNAL( clicked() ), &wf, SLOT( updateUI() ));
 
 
 
@@ -80,7 +79,9 @@ void SlicerTUI::exportMidi() {
 
 	std::vector<Note> notes;
 	slicerTParent->writeToMidi(&notes);
-
+	if (notes.size() == 0) {
+		return;
+	}
 
 	TimePos start_pos( notes.front().pos().getBar(), 0 );
 	for( Note note : notes )
@@ -140,7 +141,6 @@ void SlicerTUI::dropEvent( QDropEvent * _de ) {
 	{
 		printf("type: samplefile\n");
 		slicerTParent->updateFile( value );
-		wf.updateFile( value );
 		// castModel<AudioFileProcessor>()->setAudioFile( value );
 		// _de->accept();
 		// set wf wave file

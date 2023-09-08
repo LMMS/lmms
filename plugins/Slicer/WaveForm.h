@@ -70,15 +70,14 @@ class WaveForm : public QWidget {
 
         void drawEditor();
         void drawSeeker();
-        
+        void updateUI();
 
     public slots:
-        void updateUI();
+        void updateData();
         void isPlaying(float current, float start, float end);
 
     public:
         WaveForm(int _w, int _h, SlicerT * _instrument, QWidget * _parent);
-        void updateFile(QString file);
 
     private:
         SlicerT * slicerTParent;

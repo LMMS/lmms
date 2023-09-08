@@ -13,9 +13,11 @@ namespace gui
         QWidget(_parent),
         seeker(QPixmap(_w, _h*seekerRatio)),
         sliceEditor(QPixmap(_w, _h*(1 - seekerRatio) - margin)),
-        currentSample(),
+        currentSample(_instrument->originalSample.data(), _instrument->originalSample.frames()),
         slicePoints(_instrument->slicePoints)
         {
+            
+
             width = _w;
             height = _h;
             slicerTParent = _instrument;
@@ -30,6 +32,10 @@ namespace gui
                     SIGNAL(isPlaying(float, float, float)), 
                     this, 
                     SLOT(isPlaying(float, float, float)));
+
+            connect(slicerTParent, SIGNAL(dataChanged()), this, SLOT(updateData()));
+
+            updateUI();
         }
 
     void WaveForm::drawEditor() {
@@ -100,16 +106,19 @@ namespace gui
         update();
     }
 
-    void WaveForm::updateFile(QString file) {
-        currentSample.setAudioFile(file);
+    void WaveForm::updateData() {
+        printf("main data changed, updating sample and UI\n");
+        currentSample = SampleBuffer(slicerTParent->originalSample.data(), slicerTParent->originalSample.frames());
         updateUI();
     }
+
 
     void WaveForm::isPlaying(float current, float start, float end) {
         noteCurrent = current;
         noteStart = start;
         noteEnd = end;
-        updateUI();
+        drawSeeker();
+        update();
     }
 
     void WaveForm::mousePressEvent( QMouseEvent * _me ) {
@@ -247,8 +256,5 @@ namespace gui
         p.drawPixmap(0, height*0.3f + margin, sliceEditor);
         p.drawPixmap(0, 0, seeker);
     }
-
-
-
 }
 }
