@@ -46,10 +46,10 @@ public:
 	~TempoSyncBarModelEditor() override;
 
 	const QString & syncDescription();
-	void setSyncDescription( const QString & _new_description );
+	void setSyncDescription(const QString & new_description);
 
 	const QPixmap & syncIcon();
-	void setSyncIcon( const QPixmap & _new_pix );
+	void setSyncIcon(const QPixmap & new_pix);
 
 	TempoSyncKnobModel * model()
 	{
@@ -60,12 +60,12 @@ public:
 
 
 signals:
-	void syncDescriptionChanged( const QString & _new_description );
+	void syncDescriptionChanged(const QString & new_description);
 	void syncIconChanged();
 
 
 protected:
-	void contextMenuEvent( QContextMenuEvent * _me ) override;
+	void contextMenuEvent(QContextMenuEvent * me) override;
 
 
 protected slots:
@@ -78,10 +78,7 @@ private:
 	QString m_tempoSyncDescription;
 
 	QPointer<MeterDialog> m_custom;
-
-} ;
-
-
+};
 
 } // namespace lmms::gui
 
