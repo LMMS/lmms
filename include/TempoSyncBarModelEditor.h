@@ -74,6 +74,11 @@ protected slots:
 
 
 private:
+	void updateTextDescription();
+	void updateIcon();
+
+
+private:
 	QPixmap m_tempoSyncIcon;
 	QString m_tempoSyncDescription;
 
