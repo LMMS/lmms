@@ -20,14 +20,14 @@ namespace gui
 class WaveForm : public QWidget {
     	Q_OBJECT
     protected:
-        virtual void enterEvent( QEvent * _e );
-        virtual void leaveEvent( QEvent * _e );
         virtual void mousePressEvent( QMouseEvent * _me );
         virtual void mouseReleaseEvent( QMouseEvent * _me );
         virtual void mouseMoveEvent( QMouseEvent * _me );
-        virtual void wheelEvent( QWheelEvent * _we );
-        virtual void paintEvent( QPaintEvent * _pe );
+        virtual void mouseDoubleClickEvent(QMouseEvent * _me);
 
+        virtual void keyPressEvent(QKeyEvent * ke);
+
+        virtual void paintEvent( QPaintEvent * _pe);
 
     private:
         int width;

@@ -38,7 +38,7 @@ the matchingSpeed buffer will always get initialzed freshly using a buffer, this
 give it the raw data
 */
 
-// TODO: add, remove slices; add gui values (fade out, window sizes?); fix timeshift lag (bpm change)
+// TODO: add gui values (fade out, window sizes?); fix timeshift lag (bpm change)
 // TODO: midi dragging, open file button
 // TODO: fix empty sample, small sample edge cases, general stability stuff
 
@@ -137,8 +137,8 @@ void SlicerT::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer ) {
 
 		timeShiftedSample.setAllPointFrames( sliceStart, sliceEnd, sliceStart, sliceEnd );
 
-		printf("%i : %i -> %i\n", noteIndex, sliceStart, sliceEnd);
-		printf("%i\n", _n->oldKey());
+		// printf("%i : %i -> %i\n", noteIndex, sliceStart, sliceEnd);
+		// printf("%i\n", _n->oldKey());
 
 	
 	}
@@ -173,13 +173,13 @@ void SlicerT::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer ) {
 			float absoluteCurrentNote = (float)(sliceStart + playedFrames) / totalFrames;
 			float absoluteStartNote = (float)sliceStart / totalFrames;
 			float abslouteEndNote = (float)sliceEnd / totalFrames;
-			emit isPlaying(absoluteCurrentNote, absoluteStartNote, abslouteEndNote);
+			// emit isPlaying(absoluteCurrentNote, absoluteStartNote, abslouteEndNote);
 
 		} else {
-			emit isPlaying(0, 0, 0);			
+			// emit isPlaying(0, 0, 0);			
 		}
 	} else {
-		emit isPlaying(0, 0, 0);
+		// emit isPlaying(0, 0, 0);
 	}
 
 	

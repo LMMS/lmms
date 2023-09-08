@@ -42,6 +42,7 @@ SlicerTUI::SlicerTUI( SlicerT * _instrument,
 	
 {
 	setAcceptDrops( true );
+	setFocusProxy(&wf);
 
 	wf.move(2, 5); 
 
@@ -64,7 +65,6 @@ void SlicerTUI::mousePressEvent( QMouseEvent * _me ) {
 	// slicerTParent->findSlices();
 	// slicerTParent->findBPM();
 	// slicerTParent->timeShiftSample();
-
 	update();
 }
 
