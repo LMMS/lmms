@@ -27,12 +27,17 @@
 #ifndef SLICERT_H
 #define SLICERT_H
 
-#include "AutomatableModel.h"
+#include "SlicerTUI.h"
+
+#include <fftw3.h>
+
+#include "Note.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
+#include "AutomatableModel.h"
 #include "SampleBuffer.h"
-#include "SlicerTUI.h"
-#include <fftw3.h>
+
+
 // #include "Graph.h"
 // #include "MemoryManager.h"
 
@@ -58,6 +63,8 @@ class SlicerT : public Instrument{
 
 		gui::PluginView * instantiateView( QWidget * _parent ) override;
 
+		void writeToMidi(std::vector<Note> * outClip);
+
 	public slots:
 		void updateFile(QString file);
 		void updateTimeShift();
@@ -70,7 +77,8 @@ class SlicerT : public Instrument{
 	
 
 		FloatModel noteThreshold;
-		IntModel originalBPM = 140;
+		FloatModel fadeOutFrames;
+		IntModel originalBPM;
 
 		SampleBuffer originalSample;
 		SampleBuffer timeShiftedSample;

@@ -3,6 +3,7 @@
 #include <QInputDialog>
 #include <QMouseEvent>
 #include <QPainter>
+
 #include "SampleBuffer.h"
 
 #ifndef WAVEFORM_H

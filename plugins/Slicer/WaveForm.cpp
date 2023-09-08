@@ -1,8 +1,7 @@
-#include <stdio.h>
-
 #include "WaveForm.h"
 #include "SlicerT.h"
 
+#include <stdio.h>
 
 namespace lmms
 {
@@ -23,7 +22,6 @@ namespace gui
             setFixedSize(width, height);
             setMouseTracking( true );
             setAcceptDrops( true );
-            setFocusPolicy(Qt::StrongFocus);
 
             sliceEditor.fill(waveformBgColor);
             seeker.fill(waveformBgColor);
@@ -117,6 +115,12 @@ namespace gui
     void WaveForm::mousePressEvent( QMouseEvent * _me ) {
         float normalizedClick = (float)_me->x() / width;
         
+        if (_me->button() == Qt::MouseButton::MiddleButton) {
+            seekerStart = 0;
+            seekerEnd = 1;
+            return;
+        }
+
         if (_me->y() < height*seekerRatio) {
             if (abs(normalizedClick - seekerStart) < 0.03) {
                 currentlyDragging = draggingTypes::seekerStart;
@@ -154,7 +158,7 @@ namespace gui
                 slicePoints.erase(slicePoints.begin() + sliceSelected);
                 sliceSelected = -1;
             }
-        }
+        }  
 
     }
 

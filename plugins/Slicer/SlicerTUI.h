@@ -1,14 +1,12 @@
-#include <stdio.h>
 #include "WaveForm.h"
-// #include "AutomatableModel.h"
+
+#include <stdio.h>
+#include <QPushButton>
+
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Knob.h"
 #include "LcdSpinBox.h"
-#include <QPushButton>
-// #include "Graph.h"
-// #include "MemoryManager.h"
-
 
 
 #ifndef SLICERT_UI_H
@@ -36,7 +34,8 @@ public:
 					QWidget * _parent );
 	~SlicerTUI() override = default;
 
-// protected slots:
+protected slots:
+	void exportMidi();
 	//void sampleSizeChanged( float _new_sample_length );
 
 protected:
@@ -49,9 +48,12 @@ private:
 	SlicerT * slicerTParent;
 
 	Knob noteThresholdKnob;
+	Knob fadeOutKnob;
 	LcdSpinBox bpmBox;
 
 	QPushButton resetButton;
+	QPushButton timeShiftButton;
+	QPushButton midiExportButton;
 
 	WaveForm wf;
 

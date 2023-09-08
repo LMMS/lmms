@@ -1,28 +1,19 @@
 #include "SlicerTUI.h"
 #include "SlicerT.h"
-// #include <QDomElement>
-#include <stdio.h>
 
+#include <stdio.h>
+#include <QFileInfo>
+#include <QDropEvent>
 
 #include "StringPairDrag.h"
 #include "Clipboard.h"
 #include "Track.h"
 #include "DataFile.h"
-// #include "AudioEngine.h"
-// #include "base64.h"
-// #include "Engine.h"
-// #include "Graph.h"
-// #include "InstrumentTrack.h"
-// #include "Knob.h"
-// #include "LedCheckBox.h"
-// #include "NotePlayHandle.h"
-// #include "PixmapButton.h"
-// #include "Song.h"
-// #include "interpolation.h"
 
-// #include <QPainter>
-#include <QFileInfo>
-#include <QDropEvent>
+#include "Engine.h"
+#include "Song.h"
+#include "InstrumentTrack.h"
+
 #include "embed.h"
 
 namespace lmms
@@ -34,29 +25,72 @@ namespace gui
 SlicerTUI::SlicerTUI( SlicerT * _instrument,
 					QWidget * _parent ) :
 	InstrumentViewFixedSize( _instrument, _parent ),
-	noteThresholdKnob(KnobType::Bright26, this),
 	slicerTParent(_instrument),
-	wf(245, 125, _instrument, this),
+	noteThresholdKnob(KnobType::Dark28, this),
+	fadeOutKnob(KnobType::Dark28, this),
 	bpmBox(3, "21pink", this),
-	resetButton(embed::getIconPixmap("reload"), QString(), this)
-	
+	resetButton(embed::getIconPixmap("reload"), QString(), this),
+	timeShiftButton(embed::getIconPixmap("max_length"), QString(), this),
+	midiExportButton(embed::getIconPixmap("midi_tab"), QString(), this),
+	wf(245, 125, _instrument, this)
 {
 	setAcceptDrops( true );
-	setFocusProxy(&wf);
 
 	wf.move(2, 5); 
 
-	resetButton.move(100, 150);
-	connect(&resetButton, SIGNAL( clicked() ), slicerTParent, SLOT( updateSlices() ));
-	connect(&resetButton, SIGNAL( clicked() ), &wf, SLOT( updateUI() ));
-
-	bpmBox.move(30, 150);
-	bpmBox.setToolTip(tr("original sample BPM"));
+	bpmBox.move(2, 150);
+	bpmBox.setToolTip(tr("Original sample BPM"));
 	bpmBox.setLabel(tr("BPM"));
 	bpmBox.setModel(&slicerTParent->originalBPM);
 
-	noteThresholdKnob.move(30, 200);
+	timeShiftButton.move(70, 150);
+	timeShiftButton.setToolTip(tr("Timeshift sample"));
+	connect(&timeShiftButton, SIGNAL( clicked() ), slicerTParent, SLOT( updateTimeShift() ));
+
+	fadeOutKnob.move(200, 150);
+	fadeOutKnob.setToolTip(tr("FadeOut for notes"));
+	fadeOutKnob.setLabel(tr("FadeOut"));
+	fadeOutKnob.setModel(&slicerTParent->fadeOutFrames);
+
+	midiExportButton.move(150, 150);
+	midiExportButton.setToolTip(tr("Copy midi pattern to clipboard"));
+	connect(&midiExportButton, SIGNAL( clicked() ), this, SLOT( exportMidi() ));
+
+	noteThresholdKnob.move(7, 200);
+	noteThresholdKnob.setToolTip(tr("Threshold used for slicing"));
+	noteThresholdKnob.setLabel(tr("Threshold"));
 	noteThresholdKnob.setModel(&slicerTParent->noteThreshold);
+
+	resetButton.move(70, 200);
+	resetButton.setToolTip(tr("Reset Slices"));
+	connect(&resetButton, SIGNAL( clicked() ), slicerTParent, SLOT( updateSlices() ));
+	connect(&resetButton, SIGNAL( clicked() ), &wf, SLOT( updateUI() ));
+
+
+
+}
+
+// copied from piano roll
+void SlicerTUI::exportMidi() {
+	using namespace Clipboard;
+
+	DataFile dataFile( DataFile::Type::ClipboardData );
+	QDomElement note_list = dataFile.createElement( "note-list" );
+	dataFile.content().appendChild( note_list );
+
+	std::vector<Note> notes;
+	slicerTParent->writeToMidi(&notes);
+
+
+	TimePos start_pos( notes.front().pos().getBar(), 0 );
+	for( Note note : notes )
+	{
+		Note clip_note( note );
+		clip_note.setPos( clip_note.pos( start_pos ) );
+		clip_note.saveState( dataFile, note_list );
+	}
+
+	copyString( dataFile.toString(), MimeType::Default );
 
 }
 
