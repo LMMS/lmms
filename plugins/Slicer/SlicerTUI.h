@@ -4,13 +4,15 @@
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Knob.h"
+#include "LcdSpinBox.h"
+#include <QPushButton>
 // #include "Graph.h"
 // #include "MemoryManager.h"
 
 
 
-#ifndef SLICER_UI_H
-#define SLICER_UI_H
+#ifndef SLICERT_UI_H
+#define SLICERT_UI_H
 
 namespace lmms
 {
@@ -47,6 +49,9 @@ private:
 	SlicerT * slicerTParent;
 
 	Knob noteThresholdKnob;
+	LcdSpinBox bpmBox;
+
+	QPushButton resetButton;
 
 	WaveForm wf;
 

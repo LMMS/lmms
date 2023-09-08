@@ -1,6 +1,8 @@
 #include <stdio.h>
 
 #include "WaveForm.h"
+#include "SlicerT.h"
+
 
 namespace lmms
 {
@@ -8,50 +10,202 @@ namespace lmms
 
 namespace gui
 {
-    WaveForm::WaveForm(int _w, int _h, std::vector<int> & _slicePoints, QWidget * _parent) :
+    WaveForm::WaveForm(int _w, int _h, SlicerT  * _instrument, QWidget * _parent) :
         QWidget(_parent),
-        m_graph( QPixmap(_w, _h)),
+        seeker(QPixmap(_w, _h*seekerRatio)),
+        sliceEditor(QPixmap(_w, _h*(1 - seekerRatio) - margin)),
         currentSample(),
-        slicePoints(_slicePoints)
+        slicePoints(_instrument->slicePoints)
         {
             width = _w;
             height = _h;
-            setFixedSize( width, height );
+            slicerTParent = _instrument;
+            setFixedSize(width, height);
+            setMouseTracking( true );
+            setAcceptDrops( true );
 
-            m_graph.fill(QColor(11, 11, 11));
+            sliceEditor.fill(waveformBgColor);
+            seeker.fill(waveformBgColor);
+
+            connect(slicerTParent, 
+                    SIGNAL(isPlaying(float, float, float)), 
+                    this, 
+                    SLOT(isPlaying(float, float, float)));
         }
 
-    void WaveForm::drawWaveForm() {
-        m_graph.fill(QColor(11, 11, 11));
-        QPainter brush(&m_graph);
-        brush.setPen(QColor(255, 0, 0));
+    void WaveForm::drawEditor() {
+        sliceEditor.fill(waveformBgColor);
+        QPainter brush(&sliceEditor);
+        brush.setPen(waveformColor);
+
+        float startFrame = seekerStart * currentSample.frames();
+        float endFrame = seekerEnd * currentSample.frames();
+
         currentSample.visualize(
 		brush,
-		QRect( 0, 0, m_graph.width(), m_graph.height() ),
-		0, currentSample.frames());
-        brush.setPen(QColor(0, 255, 0));
+		QRect( 0, 0, sliceEditor.width(), sliceEditor.height() ),
+		startFrame, endFrame);
+
 
         for (int i = 0;i<slicePoints.size();i++) {
-            // printf("%i\n", slicePoints[i]);
-            float xPos = (float)slicePoints[i] / (float)currentSample.frames() * (float)width;
-            // printf("%i / %i * %i = %f\n", slicePoints[i] , currentSample.frames() , width, xPos);
-            brush.drawLine(xPos, 0, xPos, height);
+            int sliceIndex = slicePoints[i];
+            brush.setPen(QPen(sliceColor, 2));
+
+            if (sliceIndex >= startFrame && sliceIndex <= endFrame) {
+                float xPos = (float)(sliceIndex - startFrame) / (float)(endFrame - startFrame) * (float)width;
+                if (i == sliceSelected) {
+                    brush.setPen(QPen(selectedSliceColor, 2));
+                }
+
+                brush.drawLine(xPos, 0, xPos, height);
+            }
+
         }
 
     }
 
+    void WaveForm::drawSeeker() {
+        seeker.fill(waveformBgColor);
+        QPainter brush(&seeker);
+        brush.setPen(waveformColor);
 
-    void WaveForm::paintEvent( QPaintEvent * _pe) {
-        QPainter p( this );
-        drawWaveForm();
-        p.drawPixmap(0, 0, m_graph);
+        currentSample.visualize(
+		brush,
+		QRect( 0, 0, seeker.width(), seeker.height() ),
+		0, currentSample.frames());
+
+        // draw slice points
+        brush.setPen(sliceColor);
+        for (int i = 0;i<slicePoints.size();i++) {
+            float xPos = (float)slicePoints[i] / (float)currentSample.frames() * (float)width;
+            brush.drawLine(xPos, 0, xPos, height);
+        }
+
+        // draw current playBack
+        brush.setPen(playColor);
+        // printf("noteplay index: %i\n", noteCurrent);
+        brush.drawLine(noteCurrent*width, 0, noteCurrent*width, height);
+        brush.fillRect(noteStart*width, 0, (noteEnd-noteStart)*width, height, playHighlighColor);
+
+        // draw seeker points
+        brush.setPen(QPen(seekerColor, 3));
+        brush.drawLine(seekerStart*width, 0, seekerStart*width, height);
+        brush.drawLine(seekerEnd*width, 0, seekerEnd*width, height);
+
+        // shadow on not selected area
+        brush.fillRect(0, 0, seekerStart*width, height, seekerShadowColor);
+        brush.fillRect(seekerEnd*width, 0, width, height, seekerShadowColor);
+    }
+
+    void WaveForm::updateUI() {
+        drawSeeker();
+        drawEditor();
+        update();
     }
 
     void WaveForm::updateFile(QString file) {
         currentSample.setAudioFile(file);
-        drawWaveForm();
-        update();
+        updateUI();
     }
+
+    void WaveForm::isPlaying(float current, float start, float end) {
+        noteCurrent = current;
+        noteStart = start;
+        noteEnd = end;
+        updateUI();
+    }
+
+    void WaveForm::mousePressEvent( QMouseEvent * _me ) {
+        isDragging = true;
+        float normalizedClick = (float)_me->x() / width;
+
+        if (_me->y() < height*seekerRatio) {
+            if (abs(normalizedClick - seekerStart) < 0.03) {
+                currentlyDragging = draggingTypes::seekerStart;
+            } else if (abs(normalizedClick - seekerEnd) < 0.03) {
+                currentlyDragging = draggingTypes::seekerEnd;
+            } else if (normalizedClick > seekerStart && normalizedClick < seekerEnd) {
+                currentlyDragging = draggingTypes::seekerMiddle;
+                seekerMiddle = normalizedClick;
+            }
+
+        } else {
+            float startFrame = seekerStart * currentSample.frames();
+            float endFrame = seekerEnd * currentSample.frames();
+            for (int i = 0;i<slicePoints.size();i++) {
+                int sliceIndex = slicePoints[i];
+                // if (sliceIndex >= startFrame && sliceIndex <= endFrame) {
+                    float xPos = (float)(sliceIndex - startFrame) / (float)(endFrame - startFrame);
+                    if (abs(xPos - normalizedClick) < 0.03) {
+                        currentlyDragging = draggingTypes::slicePoint;
+                        sliceSelected = i;
+                    // }
+                }
+            }
+        }
+
+    }
+
+    void WaveForm::enterEvent( QEvent * _e ) {}
+    void WaveForm::leaveEvent( QEvent * _e ) {}
+    void WaveForm::mouseReleaseEvent( QMouseEvent * _me ) {
+        isDragging = false;
+        currentlyDragging = draggingTypes::nothing;
+        sliceSelected = 0;
+        updateUI();
+    }
+    void WaveForm::mouseMoveEvent( QMouseEvent * _me ) {
+        float normalizedClick = (float)_me->x() / width;
+        
+        // handle dragging events
+        if (isDragging) { 
+            // printf("drag type:%i , seekerStart: %f , seekerEnd: %f \n", currentlyDragging, seekerStart, seekerEnd);
+            if (currentlyDragging == draggingTypes::seekerStart) {
+                seekerStart = std::clamp(normalizedClick, 0.0f, seekerEnd - 0.13f);
+
+            } else if (currentlyDragging == draggingTypes::seekerEnd) {
+                seekerEnd = std::clamp(normalizedClick, seekerStart + 0.13f, 1.0f);;
+
+            } else if (currentlyDragging == draggingTypes::seekerMiddle) {
+                float distStart = seekerStart - seekerMiddle;
+                float distEnd = seekerEnd - seekerMiddle;
+
+                seekerMiddle = normalizedClick;
+
+                if (seekerMiddle + distStart > 0 && seekerMiddle + distEnd < 1) {
+                    seekerStart = seekerMiddle + distStart;
+                    seekerEnd = seekerMiddle + distEnd;
+                }
+
+            } else if (currentlyDragging == draggingTypes::slicePoint) {
+                float startFrame = seekerStart * currentSample.frames();
+                float endFrame = seekerEnd * currentSample.frames();
+
+                slicePoints[sliceSelected] = startFrame + normalizedClick * (endFrame - startFrame);
+
+                slicePoints[sliceSelected] = std::clamp(slicePoints[sliceSelected], 0, currentSample.frames());
+
+                std::sort(slicePoints.begin(), slicePoints.end());
+
+            }
+            updateUI();
+        } else {
+            
+        }
+
+        
+
+    }
+    void WaveForm::wheelEvent( QWheelEvent * _we ) {}
+
+
+    void WaveForm::paintEvent( QPaintEvent * _pe) {
+        QPainter p( this );
+        p.drawPixmap(0, height*0.3f + margin, sliceEditor);
+        p.drawPixmap(0, 0, seeker);
+    }
+
+
 
 }
 }

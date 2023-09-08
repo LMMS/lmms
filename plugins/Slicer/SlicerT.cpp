@@ -38,25 +38,23 @@ the matchingSpeed buffer will always get initialzed freshly using a buffer, this
 give it the raw data
 */
 
+// TODO: add, remove slices; add gui values (fade out, window sizes?); fix timeshift lag (bpm change)
+// TODO: midi dragging, open file button
+// TODO: fix empty sample, small sample edge cases, general stability stuff
+
 // #include <QDomElement>
-#include <stdio.h>
 #include "SlicerT.h"
+#include <stdio.h>
+
 #include "fft_helpers.h"
 #include <atomic>
 
 // #include "AudioEngine.h"
 // #include "base64.h"
 #include "Engine.h"
-// #include "Graph.h"
 #include "InstrumentTrack.h"
-// #include "Knob.h"
-// #include "LedCheckBox.h"
-// #include "NotePlayHandle.h"
-// #include "PixmapButton.h"
 #include "Song.h"
-// #include "interpolation.h"
 #include <fftw3.h>
-
 
 #include "embed.h"
 #include "plugin_export.h"
@@ -66,7 +64,6 @@ give it the raw data
 
 namespace lmms
 {
-
 
 
 extern "C"
@@ -94,11 +91,99 @@ SlicerT::SlicerT(InstrumentTrack * _instrument_track) :
 	Instrument( _instrument_track, &slicert_plugin_descriptor ),
 	originalSample(),
 	timeShiftedSample(),
-	noteThreshold( 0.6f, 0.0f, 2.0f, 0.01f, this, tr( "Note Threshold" ) )
+	noteThreshold( 0.6f, 0.0f, 2.0f, 0.01f, this, tr( "Note Threshold" ) ),
+	originalBPM(1, 1, 999, this, tr("original sample bpm"))
 {
-	// connect( &noteThreshold, SIGNAL( dataChanged() ), this, SLOT( updateParams() ) );
+	// connect( &noteThreshold, SIGNAL( dataChanged() ), this, SLOT( updateSlices() ) );
+	// TODO: either button to timeshift, threading or generating samples on the fly
+	connect( &originalBPM, SIGNAL( dataChanged() ), this, SLOT( updateTimeShift() ) );
+
 	printf("Correctly loaded SlicerT!\n");
-	// warmupFFT(); // maybe
+}
+
+void SlicerT::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer ) {
+	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	const int playedFrames = _n->totalFramesPlayed();
+	const f_cnt_t offset = _n->noteOffset();
+	
+
+
+	int totalFrames = timeShiftedSample.frames();
+	int sliceStart = timeShiftedSample.startFrame();
+	int sliceEnd = timeShiftedSample.endFrame();
+	int sliceFrames = timeShiftedSample.endFrame() - timeShiftedSample.startFrame();
+	int noteFramesLeft = sliceFrames - playedFrames;
+
+	int fadeOutFrames = (float)sliceFrames/4;
+
+	// init NotePlayHandle data
+	if( !_n->m_pluginData )
+	{
+		_n->m_pluginData = new SampleBuffer::handleState( false, SRC_LINEAR );
+
+		float speedRatio = (float)originalBPM.value() / Engine::getSong()->getTempo() ;
+		int noteIndex = _n->key() - 69;
+		int sliceStart, sliceEnd;
+		
+		// 0th element is no sound, so play full sample
+		if (noteIndex > slicePoints.size()-2 || noteIndex < 0) {
+			sliceStart = 0;
+			sliceEnd = timeShiftedSample.frames();
+		} else {
+			sliceStart = slicePoints[noteIndex] * speedRatio;
+			sliceEnd = slicePoints[noteIndex+1] * speedRatio;
+		}
+
+
+		timeShiftedSample.setAllPointFrames( sliceStart, sliceEnd, sliceStart, sliceEnd );
+
+		printf("%i : %i -> %i\n", noteIndex, sliceStart, sliceEnd);
+		printf("%i\n", _n->oldKey());
+
+	
+	}
+
+
+	// if play returns true (success I guess)
+	if( ! _n->isFinished() ) {
+		if( timeShiftedSample.play( _working_buffer + offset,
+					(SampleBuffer::handleState *)_n->m_pluginData,
+					frames, 440,
+					static_cast<SampleBuffer::LoopMode>( 0 ) ) )
+		{
+
+			applyRelease( _working_buffer, _n );
+			instrumentTrack()->processAudioBuffer( _working_buffer,
+									frames + offset, _n );
+
+			// exponential fade out
+			if (noteFramesLeft < fadeOutFrames) {
+				// printf("fade out started. frames: %i, framesLeft: %i\n", frames, noteFramesLeft);
+				for (int i = 0;i<frames;i++) {
+					float fadeValue = (float)(noteFramesLeft-i) / fadeOutFrames;
+					// if the workingbuffer extends the sample
+					fadeValue = std::clamp(fadeValue, 0.0f, 1.0f);
+					fadeValue = pow(fadeValue, 2);
+
+					_working_buffer[i][0] *= fadeValue;
+					_working_buffer[i][1] *= fadeValue;
+				}
+			}
+
+			float absoluteCurrentNote = (float)(sliceStart + playedFrames) / totalFrames;
+			float absoluteStartNote = (float)sliceStart / totalFrames;
+			float abslouteEndNote = (float)sliceEnd / totalFrames;
+			emit isPlaying(absoluteCurrentNote, absoluteStartNote, abslouteEndNote);
+
+		} else {
+			emit isPlaying(0, 0, 0);			
+		}
+	} else {
+		emit isPlaying(0, 0, 0);
+	}
+
+	
+
 }
 
 
@@ -109,7 +194,7 @@ void SlicerT::findSlices() {
 	float lastPeak = 0;
 	float currentPeak = 0;
 	int minWindowsPassed = 0;
-	slicePoints = {0};
+	slicePoints = {};
 	for (int i = 0; i<originalSample.frames();i+=1) {
 		// combine left and right and absolute it
 		float sampleValue = abs(originalSample.data()[i][0]) + abs(originalSample.data()[i][1]) / 2;
@@ -122,7 +207,7 @@ void SlicerT::findSlices() {
 								//printf("%i -> %f : %f\n", i, currentAvg, lastAvg);
 			if (abs(currentPeak / lastPeak) > 1+noteThreshold.value() && minWindowsPassed <= 0) {
 				c++;
-				slicePoints.push_back(peakIndex);
+				slicePoints.push_back(std::max(0, peakIndex-window/2)); // slight offset
 				minWindowsPassed = 2; // wait at least one window for a new note
 			}
 			lastPeak = currentPeak;
@@ -135,11 +220,7 @@ void SlicerT::findSlices() {
 
 	}
 	slicePoints.push_back(originalSample.frames());
-	// for (int i : slicePoints) {
-	// 	printf("%i\n", i);
-	// }
-	
-	// printf("Found %i notes\n", c);
+
 	emit dataChanged();
 }
 
@@ -147,100 +228,100 @@ void SlicerT::findSlices() {
 
 // }
 
-void SlicerT::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer ) {
-	
-	const fpp_t frames = _n->framesLeftForCurrentPeriod();
-	const f_cnt_t offset = _n->noteOffset();
+// find the bpm of the sample by assuming its in 4/4 time signature ,
+// and lies in the 100 - 200 bpm range
+void SlicerT::findBPM() {
+	int bpmSnap = 1;
 
-	// 0 at 440hz, or where the square thing is on the keyboard
-	
+	float sampleRate = originalSample.sampleRate();
+	float totalFrames = originalSample.frames();
+	float sampleLength = totalFrames / sampleRate;
 
-	// init NotePlayHandle data
-	if( !_n->m_pluginData )
-	{
-		_n->m_pluginData = new SampleBuffer::handleState( false, SRC_LINEAR );
+	// this assumes the sample has a time signature of x/4
+	float bpmEstimate = 240.0f / sampleLength;
 
-		// 0th element is no sound, so play no sound when out of bounds
-		// int noteIndex = _n->key() - 68;
-		// if (noteIndex > slicePoints.size()-2 || noteIndex < 0) {
-		// 	noteIndex = 0;
-		// }
-
-		// int sliceStart = slicePoints[noteIndex];
-		// int sliceEnd = slicePoints[noteIndex+1];
-
-		// m_sampleBuffer.setAllPointFrames( sliceStart, sliceEnd, sliceStart, sliceEnd );
-
-		// printf("%i : %i -> %i\n", noteIndex, sliceStart, sliceEnd);
-		// printf("%i\n", _n->oldKey());
-
-	
+	// deal with samlpes that are not 1 bar long
+	while (bpmEstimate < 100) {
+		bpmEstimate *= 2;
 	}
 
-	// if play returns true (success I guess)
-	if( timeShiftedSample.play( _working_buffer + offset,
-				(SampleBuffer::handleState *)_n->m_pluginData,
-				frames, 440,
-				static_cast<SampleBuffer::LoopMode>( 0 ) ) )
-	{
-
-		applyRelease( _working_buffer, _n );
-		instrumentTrack()->processAudioBuffer( _working_buffer,
-								frames + offset, _n );
-
+	while (bpmEstimate > 200) {
+		bpmEstimate /= 2;
 	}
 
+	// snap bpm
+	int bpm = bpmEstimate;
+	bpm += (float)bpmSnap / 2;
+	bpm -= bpm % bpmSnap;
 
-}
+	originalBPM.setValue(bpm);
+ }
 
 // create thimeshifted samplebuffer and timeshifted slicePoints
-// http://blogs.zynaptiq.com/bernsee/pitch-shifting-using-the-ft/
 void SlicerT::timeShiftSample() {
-
+	using std::vector;
 	printf("starting sample timeshifting\n");
 
-	using std::vector;
+	// original sample data
+	float sampleRate = originalSample.sampleRate();
+	int originalFrames = originalSample.frames();
 
+	// target data TODO: fix this mess
+	bpm_t targetBPM = Engine::getSong()->getTempo();
+	float speedRatio = (float)originalBPM.value() / targetBPM ;
+	int samplesPerBeat = 60.0f / targetBPM * sampleRate;
+	int outFrames = speedRatio * originalFrames;
 
+	// snap to a beat, this should be in the UI
+	outFrames += (float)samplesPerBeat;
+	outFrames -= outFrames%samplesPerBeat;
 
-
-	bpm_t targetBPM = Engine::getSong()->getTempo();;
 	// nothing to do here
-	if (targetBPM == originalBPM) {
+	if (targetBPM == originalBPM.value()) {
 		timeShiftedSample = SampleBuffer(originalSample.data(), originalSample.frames());
 		printf("BPM match for sample, finished timeshift\n");
 		return;
 	}
 
-
-
-	float sampleRate = originalSample.sampleRate();
-	float speedRatio = (double)targetBPM / originalBPM;
-	int originalFrames = originalSample.frames();
-	
+	// buffers
 	vector<float> rawData(originalFrames, 0);
-	vector<float> outData(originalFrames*2, 0);
-	vector<sampleFrame> bufferData(originalFrames*2, sampleFrame());
+	vector<float> outData(outFrames, 0);
 
+	vector<sampleFrame> bufferData(outFrames, sampleFrame());
+
+	// copy channels for processing
 	for (int i = 0;i<originalFrames;i++) {
 		rawData[i] = (float)originalSample.data()[i][0];
 	}
-
+	printf("startign PV\n");
+	// process channels
 	phaseVocoder(rawData, outData, sampleRate, 1);
 
-	for (int i = 0;i<bufferData.size();i++) {
+	printf("starting buffer copy\n");
+	// write processed channels 
+	for (int i = 0;i<outFrames;i++) {
 		bufferData.data()[i][0] = outData[i];
 		bufferData.data()[i][1] = outData[i];
 	}
 
-	// timeShiftedSample = *(SampleBuffer(bufferData.data(), originalFrames).resample(sampleRate , sampleRate));
+	printf("creating timeshifted sample\n");
+	// new sample
 	timeShiftedSample = SampleBuffer(bufferData.data(), bufferData.size());
+
 
 	printf("finished sample timeshifting\n");
 
+
 }
 
+
 // basic phase vocoder implementation that time shifts without pitch change
+// resources:
+// http://blogs.zynaptiq.com/bernsee/pitch-shifting-using-the-ft/
+// https://sethares.engr.wisc.edu/vocoders/phasevocoder.html
+// https://dsp.stackexchange.com/questions/40101/audio-time-stretching-without-pitch-shifting/40367#40367
+// https://www.guitarpitchshifter.com/
+
 // a lot of stuff needs improvement, mostly the windowing and
 // the pitch shifting implemention
 void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataOut, float sampleRate, float pitchScale) {
@@ -249,15 +330,17 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 	// lower windows size seems to work better for time scaling,
 	// this is because the step site is scaled, but not the window size
 	// this causes slight timing differences between windows
+	// sadly, lower windowsize also reduces audio quality in general
+	// TODO: find solution
 	// oversampling is better if higher always (probably)
 	const int windowSize = 512;
-	const int overSampling = 64;
+	const int overSampling = 32;
 	
 	// audio data
 	int inFrames = dataIn.size();
 	int outFrames = dataOut.size();
 
-	float lengthRatio = noteThreshold.value() + 0.001f;// inFrames / outFrames;
+	float lengthRatio = (float)outFrames / inFrames;
 
 	// values used
 	const int stepSize = windowSize / overSampling; 
@@ -270,11 +353,8 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 	const float expectedPhaseOut = 2.*M_PI*(float)outStepSize/(float)windowSize;
 
 
-
 	printf("frames: %i , out frames: %i , ratio: %f\n", inFrames, outFrames, (float)outFrames / inFrames);
-	printf("frames: %i , maxFrames: %i \n", inFrames, (numWindows-overSampling) * stepSize + windowSize);
 	printf("will drop %i\n", inFrames%(inFrames/numWindows));
-	printf("pitch shift: %f\n", noteThreshold.value());
 
 	// initialize buffers
 	fftwf_complex FFTSpectrum[windowSize];
@@ -299,14 +379,12 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 	fftwf_plan ifftPlan;
 	ifftPlan = fftwf_plan_dft_c2r_1d(windowSize, FFTSpectrum, IFFTReconstruction.data(), FFTW_MEASURE);
 
-
 	// remove oversampling, because the actual window is overSampling* bigger than stepsize
 	for (int i = 0;i < numWindows-overSampling;i++) {
 		windowIndex = i * stepSize;
 
 		// FFT
 		memcpy(FFTInput.data(), dataIn.data() + windowIndex, windowSize*sizeof(float));
-
 		fftwf_execute(fftPlan);
 
 		// analysis step
@@ -314,8 +392,6 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 			
 			real = FFTSpectrum[j][0];
 			imag = FFTSpectrum[j][1];
-
-			// printf("freq: %3d %+9.5f %+9.5f I  original: %+9.5f \n", j, real, imag, dataIn.at(i+j));
 
 			magnitude = 2.*sqrt(real*real + imag*imag);
 			phase = atan2(imag,real); 
@@ -340,8 +416,7 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 
 		}
 		
-		
-		// pitch shifting
+		// TODO: pitch shifting
 		// takes all the values that are below the nyquist frequency (representable with our samplerate)
 		// nyquist frequency = samplerate / 2
 		// and moves them to a different bin
@@ -355,8 +430,6 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 		// 		processedFreq[index] = allFrequencies[j];// * noteThreshold.value();
 		// 	}
 		// }
-
-
 
 		// synthesis, all the operations are the reverse of the analysis
 		for (int j = 0; j < windowSize; j++) {
@@ -385,11 +458,15 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 		// this is very bad, audible click at the beginning if we take the average,
 		// but else there is a windowSized delay...
 		// solution would be to take the average but blend it together better
-		// pls improve
+		// TODO: make better
 		for (int j = 0; j < windowSize; j++) {
-			
+
 			float outIndex = i * outStepSize + j;
-			if (outIndex < 0) {
+			if (outIndex > outFrames) {
+				printf("too long window size, breaking\n");
+				break;
+			}
+			if (outIndex < windowLatency) {
 				// calculate amount of windows overlapping
 				float windowsOverlapping =  outIndex / windowSize * overSampling + 1;
 
@@ -430,44 +507,22 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 
 }
 
-void SlicerT::normalizeSample(sampleFrame * data) {
-	float max = -1;
-	for (int i = 0;i<data->size();i++) {
-		max = std::max(max, abs(data[i][0]));
-		max = std::max(max, abs(data[i][1]));
-	}
 
-	printf("max: %f\n", max);
-
-	for (int i = 0;i<data->size();i++) {
-		data[i][0] = 0;
-		data[i][1] = 0;
-	}
-
-}
-
-void SlicerT::warmupFFT() {
-	const int dataPoints = 1024;
-
-	std::vector<float> warmupData(dataPoints, sqrt(2));
-	fftwf_complex fftOut[dataPoints];
-	fftwf_plan p = fftwf_plan_dft_r2c_1d(dataPoints, warmupData.data(), fftOut, FFTW_MEASURE);
-	fftwf_execute(p);
-
-	fftwf_plan d = fftwf_plan_dft_c2r_1d(dataPoints, fftOut, warmupData.data(), FFTW_MEASURE);
-	fftwf_execute(d);
-
-	fftwf_destroy_plan(p);
-	fftwf_destroy_plan(d);
-}
 
 void SlicerT::updateFile(QString file) {
 	printf("updated audio file\n");
 	originalSample.setAudioFile(file);
 	findSlices();
-	// updateBPM()
-	timeShiftSample();
+	findBPM(); // this also updates timeshift because bpm change
 	
+}
+
+void SlicerT::updateSlices() {
+	findSlices();
+}
+
+void SlicerT::updateTimeShift() {
+	timeShiftSample();
 }
 
 
@@ -502,80 +557,3 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 
 } // namespace lmms
 
-
-
-/* Implementation of Robust peak detection algorithm
-Doesnt work that great, it is too sensitive 
-https://stackoverflow.com/questions/22583391/peak-signal-detection-in-realtime-timeseries-data/46998001#46998001
-void SlicerT::findSlices() {
-	int c = 0;
-	const int lag = 64;
-	const float influence = 1;
-	
-	float peak = 0;
-	float lastMean = 0;
-	float lastStd = 0;
-	int noteDuration = 0;
-	// init vector with the start of the sample
-	std::vector<float> lastValues = {};
-
-
-	slicePoints = {};
-	for (int i = 0; i<m_sampleBuffer.frames();i++) {
-		// combine left and right and absolute it
-		float sampleValue = abs(m_sampleBuffer.data()[i][0]) + abs(m_sampleBuffer.data()[i][1]) / 2;
-		peak = std::max(sampleValue, peak);
-
-		if (i%64==0) {
-
-			if (lastValues.size() < lag) {
-				lastValues.push_back(peak);
-				continue;
-			} 
-
-			if (abs(peak - lastMean) > noteThreshold.value()) {
-				if (noteDuration <= 0) {
-					printf("%f : %f : %f\n", peak, lastMean, lastStd);
-					// lastValues.push_back(influence*peak + (1-influence)* lastValues.back());
-					lastValues.push_back(peak);
-					lastValues.erase(lastValues.begin());
-					c++;
-					slicePoints.push_back(i);
-					noteDuration = 20;
-				}
-
-			} else {
-
-				lastValues.push_back(peak);
-				lastValues.erase(lastValues.begin());
-				
-			}
-			noteDuration--;
-
-			lastMean = 0;
-			for (float v : lastValues) {
-				lastMean += v;
-			}
-			lastMean /= lag;
-
-			lastStd = 0;
-			for (float v : lastValues) {
-				lastStd += pow(v - lastMean, 2);
-			}
-
-			lastStd = sqrt(lastStd / lag);
-			peak = 0;
-		}
-
-
-
-
-	}
-	// for (int i : slicePoints) {
-	// 	printf("%i\n", i);
-	// }
-	
-	printf("Found %i notes\n", c);
-	emit dataChanged();
-}
-*/

@@ -23,6 +23,7 @@
 // #include <QPainter>
 #include <QFileInfo>
 #include <QDropEvent>
+#include "embed.h"
 
 namespace lmms
 {
@@ -35,19 +36,34 @@ SlicerTUI::SlicerTUI( SlicerT * _instrument,
 	InstrumentViewFixedSize( _instrument, _parent ),
 	noteThresholdKnob(KnobType::Bright26, this),
 	slicerTParent(_instrument),
-	wf(200, 100, (_instrument->slicePoints), _parent)
+	wf(245, 125, _instrument, this),
+	bpmBox(3, "21pink", this),
+	resetButton(embed::getIconPixmap("reload"), QString(), this)
 	
 {
 	setAcceptDrops( true );
-	wf.move(30, 30); 
+
+	wf.move(2, 5); 
+
+	resetButton.move(100, 150);
+	connect(&resetButton, SIGNAL( clicked() ), slicerTParent, SLOT( updateSlices() ));
+	connect(&resetButton, SIGNAL( clicked() ), &wf, SLOT( updateUI() ));
+
+	bpmBox.move(30, 150);
+	bpmBox.setToolTip(tr("original sample BPM"));
+	bpmBox.setLabel(tr("BPM"));
+	bpmBox.setModel(&slicerTParent->originalBPM);
+
 	noteThresholdKnob.move(30, 200);
 	noteThresholdKnob.setModel(&slicerTParent->noteThreshold);
 
 }
 
 void SlicerTUI::mousePressEvent( QMouseEvent * _me ) {
-	slicerTParent->findSlices();
-	slicerTParent->timeShiftSample();
+	printf("clicked on TUI\n");
+	// slicerTParent->findSlices();
+	// slicerTParent->findBPM();
+	// slicerTParent->timeShiftSample();
 
 	update();
 }

@@ -24,8 +24,8 @@
  */
 
 
-#ifndef TEST_H
-#define TEST_H
+#ifndef SLICERT_H
+#define SLICERT_H
 
 #include "AutomatableModel.h"
 #include "Instrument.h"
@@ -60,27 +60,30 @@ class SlicerT : public Instrument{
 
 	public slots:
 		void updateFile(QString file);
-		void updateParams();
+		void updateTimeShift();
+		void updateSlices();
+
+	signals:
+		void isPlaying( float current, float start, float end );
 
 	private:
 	
 
 		FloatModel noteThreshold;
+		IntModel originalBPM = 140;
 
 		SampleBuffer originalSample;
 		SampleBuffer timeShiftedSample;
 		std::vector<int> slicePoints;
-		std::vector<int> timeShiftedSlices;
 		
-		int originalBPM = 140;
-
+	
 		void findSlices();
+		void findBPM();
 		void timeShiftSample();
 		void phaseVocoder(std::vector<float> &in, std::vector<float> &out, float sampleRate, float pitchScale);
-		void normalizeSample(sampleFrame * data);
-		void warmupFFT(); // runs one fft cycle to generate wisdom
 
 		friend class gui::SlicerTUI;
+		friend class gui::WaveForm;
 		
 };
 
