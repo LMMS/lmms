@@ -36,9 +36,9 @@ TARGET_COMPILE_DEFINITIONS(veal PRIVATE DISABLE_OSC=1)
 
 SET(INLINE_FLAGS "")
 IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-	SET(INLINE_FLAGS "-finline-functions-called-once -finline-limit=80")
+	SET(INLINE_FLAGS -finline-functions-called-once -finline-limit=80)
 ENDIF()
-SET_TARGET_PROPERTIES(veal PROPERTIES COMPILE_FLAGS "-fexceptions -O2 -finline-functions ${INLINE_FLAGS}")
+target_compile_options(veal PRIVATE -fexceptions -O2 -finline-functions ${INLINE_FLAGS})
 
 if(LMMS_BUILD_WIN32)
 	add_custom_command(
@@ -50,5 +50,5 @@ if(LMMS_BUILD_WIN32)
 	)
 endif()
 IF(NOT LMMS_BUILD_APPLE AND NOT LMMS_BUILD_OPENBSD)
-	SET_TARGET_PROPERTIES(veal PROPERTIES LINK_FLAGS "${LINK_FLAGS} -shared -Wl,-no-undefined")
+	target_link_libraries(veal PRIVATE -shared)
 ENDIF()
