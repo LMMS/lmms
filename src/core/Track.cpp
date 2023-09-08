@@ -290,11 +290,7 @@ void Track::loadSettings( const QDomElement & element )
 		return;
 	}
 
-	while( !m_clips.empty() )
-	{
-		delete m_clips.front();
-//		m_clips.erase( m_clips.begin() );
-	}
+	deleteClips();
 
 	QDomNode node = element.firstChild();
 	while( !node.isNull() )
@@ -365,6 +361,7 @@ void Track::removeClip( Clip * clip )
 /*! \brief Remove all Clips from this track */
 void Track::deleteClips()
 {
+	auto guard = Engine::audioEngine()->requestChangesGuard();
 	while (!m_clips.empty())
 	{
 		delete m_clips.front();
