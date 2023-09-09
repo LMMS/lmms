@@ -39,8 +39,6 @@ namespace gui
         m_currentSample(instrument->m_originalSample.data(), instrument->m_originalSample.frames()),
         m_slicePoints(instrument->m_slicePoints)
         {
-            
-
             m_width = w;
             m_height = h;
             m_slicerTParent = instrument;
@@ -178,7 +176,6 @@ namespace gui
                 }
             }
         } 
-
         if (me->button() == Qt::MouseButton::LeftButton) {
             m_isDragging = true;
 

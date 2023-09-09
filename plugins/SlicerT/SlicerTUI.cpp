@@ -88,9 +88,6 @@ SlicerTUI::SlicerTUI( SlicerT * instrument,
 	m_resetButton.move(70, 200);
 	m_resetButton.setToolTip(tr("Reset Slices"));
 	connect(&m_resetButton, SIGNAL( clicked() ), m_slicerTParent, SLOT( updateSlices() ));
-
-
-
 }
 
 // copied from piano roll

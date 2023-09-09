@@ -41,6 +41,7 @@ namespace lmms
 
 class SlicerT : public Instrument{
 	Q_OBJECT
+	
 	public:
 		SlicerT(InstrumentTrack * instrumentTrack);
 		~SlicerT() override = default;
