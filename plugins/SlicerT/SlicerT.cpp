@@ -47,7 +47,7 @@ Plugin::Descriptor PLUGIN_EXPORT slicert_plugin_descriptor =
 	"SlicerT",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Basic Slicer" ),
-	"Daniel Kauss Serna",
+	"Daniel Kauss Serna <daniel.kauss.serna/at/gmail.com>",
 	0x0100,
 	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
@@ -71,36 +71,35 @@ void SlicerT::playNote( NotePlayHandle * handle, sampleFrame * workingBuffer ) {
 	if (m_originalSample.frames() < 2048) {
 		return;
 	}
-
 	const fpp_t frames = handle->framesLeftForCurrentPeriod();
 	const int playedFrames = handle->totalFramesPlayed();
 	const f_cnt_t offset = handle->noteOffset();
+	const int totalFrames = m_timeShiftedSample.frames();
 	
-	int totalFrames = m_timeShiftedSample.frames();
-	int sliceStart = m_timeShiftedSample.startFrame();
-	int sliceEnd = m_timeShiftedSample.endFrame();
-	int sliceFrames = m_timeShiftedSample.endFrame() - m_timeShiftedSample.startFrame();
+	int sliceStart, sliceEnd;
+	float speedRatio = (float)m_originalBPM.value() / Engine::getSong()->getTempo() ;
+	int noteIndex = handle->key() - 69;
+	
+	// 0th element is no sound, so play full sample
+	if (noteIndex > m_slicePoints.size()-2 || noteIndex < 0) {
+		sliceStart = 0;
+		sliceEnd = totalFrames;
+	} else {
+		sliceStart = m_slicePoints[noteIndex] * speedRatio;
+		sliceEnd = m_slicePoints[noteIndex+1] * speedRatio;
+	}
+	
+	int sliceFrames = sliceEnd - sliceStart;
 	int noteFramesLeft = sliceFrames - playedFrames;
+
+	// pretty sure this causes issues when playing multipple slices at once
+	m_timeShiftedSample.setAllPointFrames( sliceStart, sliceEnd, sliceStart, sliceEnd );
 
 	// init NotePlayHandle data
 	if( !handle->m_pluginData )
 	{
 		handle->m_pluginData = new SampleBuffer::handleState( false, SRC_LINEAR );
-
-		float speedRatio = (float)m_originalBPM.value() / Engine::getSong()->getTempo() ;
-		int noteIndex = handle->key() - 69;
-		int sliceStart, sliceEnd;
-		
-		// 0th element is no sound, so play full sample
-		if (noteIndex > m_slicePoints.size()-2 || noteIndex < 0) {
-			sliceStart = 0;
-			sliceEnd = m_timeShiftedSample.frames();
-		} else {
-			sliceStart = m_slicePoints[noteIndex] * speedRatio;
-			sliceEnd = m_slicePoints[noteIndex+1] * speedRatio;
-		}
-
-		m_timeShiftedSample.setAllPointFrames( sliceStart, sliceEnd, sliceStart, sliceEnd );
+		((SampleBuffer::handleState *)handle->m_pluginData)->setFrameIndex( sliceStart );
 	}
 
 	if( ! handle->isFinished() ) {
