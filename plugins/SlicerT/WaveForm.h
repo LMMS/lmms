@@ -44,6 +44,7 @@ namespace gui
 
 class WaveForm : public QWidget {
     	Q_OBJECT
+
     protected:
         virtual void mousePressEvent(QMouseEvent * me);
         virtual void mouseReleaseEvent(QMouseEvent * me);
@@ -104,7 +105,6 @@ class WaveForm : public QWidget {
     private:
         SlicerT * m_slicerTParent;
         std::vector<int> & m_slicePoints;
-
 };
 }}
 

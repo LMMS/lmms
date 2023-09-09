@@ -323,7 +323,6 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 
 		// analysis step
 		for (int j = 0; j < windowSize; j++) {
-			
 			real = FFTSpectrum[j][0];
 			imag = FFTSpectrum[j][1];
 
@@ -347,9 +346,7 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 
 			allMagnitudes[j] = magnitude;
 			allFrequencies[j] = freq;
-
 		}
-		
 		// pitch shifting
 		// takes all the values that are below the nyquist frequency (representable with our samplerate)
 		// nyquist frequency = samplerate / 2
@@ -390,7 +387,6 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 
 		// windowing
 		for (int j = 0; j < windowSize; j++) {
-
 			float outIndex = i * outStepSize + j;
 			if (outIndex > outFrames) {
 				break;
@@ -492,8 +488,8 @@ void SlicerT::saveSettings(QDomDocument & document, QDomElement & element) {
 	m_fadeOutFrames.saveSettings(document, element, "fadeOut");
 	m_noteThreshold.saveSettings(document, element, "threshold");
 	m_originalBPM.saveSettings(document, element, "origBPM");
-
 }
+
 void SlicerT::loadSettings( const QDomElement & element ) {
 	if (!element.attribute("src").isEmpty())
 	{
@@ -515,7 +511,6 @@ void SlicerT::loadSettings( const QDomElement & element ) {
 		int totalSlices = element.attribute("totalSlices").toInt();
 		m_slicePoints = {};
 		for (int i = 0;i<totalSlices;i++) {
-			
 			m_slicePoints.push_back(element.attribute(tr("slice_%1").arg(i)).toInt());
 		}
 	}
@@ -543,7 +538,6 @@ gui::PluginView * SlicerT::instantiateView( QWidget * parent )
 
 extern "C"
 {
-
 // necessary for getting instance out of shared lib
 PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {

@@ -47,6 +47,7 @@ namespace gui
 class SlicerTUI : public InstrumentViewFixedSize
 {
 	Q_OBJECT
+	
 public:
 	SlicerTUI( SlicerT * instrument,
 					QWidget * parent );
@@ -72,9 +73,7 @@ private:
 	QPushButton m_midiExportButton;
 
 	WaveForm m_wf;
-
-
-} ;
+};
 
 
 } // namespace gui

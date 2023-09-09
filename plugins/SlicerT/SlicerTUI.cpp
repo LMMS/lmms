@@ -116,7 +116,6 @@ void SlicerTUI::exportMidi() {
 	}
 
 	copyString( dataFile.toString(), MimeType::Default );
-
 }
 
 // all the drag stuff is copied from AudioFileProcessor
@@ -147,7 +146,6 @@ void SlicerTUI::dragEnterEvent( QDragEnterEvent * dee )
 	{
 		dee->ignore();
 	}
-
 }
 
 void SlicerTUI::dropEvent( QDropEvent * de ) {

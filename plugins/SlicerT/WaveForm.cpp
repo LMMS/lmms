@@ -175,7 +175,6 @@ namespace gui
                 if (abs(xPos - normalizedClick) < 0.03) {
                     m_currentlyDragging = m_draggingTypes::slicePoint;
                     m_sliceSelected = i;
-
                 }
             }
         } 
@@ -229,15 +228,9 @@ namespace gui
                 m_slicePoints[m_sliceSelected] = std::clamp(m_slicePoints[m_sliceSelected], 0, m_currentSample.frames());
 
                 std::sort(m_slicePoints.begin(), m_slicePoints.end());
-
             }
             updateUI();
-        } else {
-
         }
-
-        
-
     }
 
     void WaveForm::mouseDoubleClickEvent(QMouseEvent * me) {
@@ -255,7 +248,6 @@ namespace gui
         }
 
         std::sort(m_slicePoints.begin(), m_slicePoints.end());
-        
     }
 
     void WaveForm::paintEvent( QPaintEvent * pe) {
