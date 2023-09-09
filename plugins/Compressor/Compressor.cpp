@@ -320,8 +320,8 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			float inputValue = feedback ? m_prevOut[i] : s[i];
 
 			// Calculate the crest factor of the audio by diving the peak by the RMS
-			m_crestPeakVal[i] = qMax(inputValue * inputValue, m_crestTimeConst * m_crestPeakVal[i] + (1 - m_crestTimeConst) * (inputValue * inputValue));
-			m_crestRmsVal[i] = m_crestTimeConst * m_crestRmsVal[i] + ((1 - m_crestTimeConst) * (inputValue * inputValue));
+			m_crestPeakVal[i] = qMax(qMax(COMP_NOISE_FLOOR, inputValue * inputValue), m_crestTimeConst * m_crestPeakVal[i] + (1 - m_crestTimeConst) * (inputValue * inputValue));
+			m_crestRmsVal[i] = qMax(COMP_NOISE_FLOOR, m_crestTimeConst * m_crestRmsVal[i] + ((1 - m_crestTimeConst) * (inputValue * inputValue)));
 			m_crestFactorVal[i] = m_crestPeakVal[i] / m_crestRmsVal[i];
 
 			m_rmsVal[i] = m_rmsTimeConst * m_rmsVal[i] + ((1 - m_rmsTimeConst) * (inputValue * inputValue));
