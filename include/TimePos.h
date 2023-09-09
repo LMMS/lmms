@@ -110,7 +110,7 @@ public:
 	static double ticksToMilliseconds( double ticks, bpm_t beatsPerMinute );
 
 private:
-	std::atomic<tick_t> m_ticks;
+	tick_t m_ticks;
 
 	static tick_t s_ticksPerBar;
 

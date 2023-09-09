@@ -66,11 +66,6 @@ TimePos::TimePos( const tick_t ticks ) :
 {
 }
 
-TimePos::TimePos(const TimePos& time) :
-	m_ticks(time.m_ticks.load())
-{
-}
-
 TimePos TimePos::quantize(float bars) const
 {
 	//The intervals we should snap to, our new position should be a factor of this
@@ -96,11 +91,6 @@ TimePos TimePos::toAbsoluteBar() const
 	return getBar() * s_ticksPerBar;
 }
 
-TimePos& TimePos::operator=(const TimePos& time)
-{
-	m_ticks.store(time.m_ticks);
-	return *this;
-}
 
 TimePos& TimePos::operator+=( const TimePos& time )
 {
