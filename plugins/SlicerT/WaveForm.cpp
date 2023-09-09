@@ -1,7 +1,30 @@
+/*
+ * WaveForm.cpp - slice editor for SlicerT
+ *
+ * Copyright (c) 2006-2008 Andreas Brandmaier <andy/at/brandmaier/dot/de>
+ * 
+ * This file is part of LMMS - https://lmms.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ *
+ */
+
 #include "WaveForm.h"
 #include "SlicerT.h"
 
-#include <stdio.h>
 
 namespace lmms
 {
@@ -86,7 +109,6 @@ namespace gui
 
         // draw current playBack
         brush.setPen(m_playColor);
-        // printf("noteplay index: %i\n", m_noteCurrent);
         brush.drawLine(m_noteCurrent*m_width, 0, m_noteCurrent*m_width, m_height);
         brush.fillRect(m_noteStart*m_width, 0, (m_noteEnd-m_noteStart)*m_width, m_height, m_playHighlighColor);
 
@@ -107,7 +129,6 @@ namespace gui
     }
 
     void WaveForm::updateData() {
-        printf("main data changed, updating sample and UI\n");
         m_currentSample = SampleBuffer(m_slicerTParent->m_originalSample.data(), m_slicerTParent->m_originalSample.frames());
         updateUI();
     }
@@ -182,7 +203,6 @@ namespace gui
         
         // handle dragging events
         if (m_isDragging) { 
-            // printf("drag type:%i , m_seekerStart: %f , m_seekerEnd: %f \n", m_currentlyDragging, m_seekerStart, m_seekerEnd);
             if (m_currentlyDragging == m_draggingTypes::m_seekerStart) {
                 m_seekerStart = std::clamp(normalizedClick, 0.0f, m_seekerEnd - 0.13f);
 
