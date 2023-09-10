@@ -2,7 +2,7 @@
  * SlicerTUI.cpp - controls the UI for slicerT
  *
  * Copyright (c) 2006-2008 Andreas Brandmaier <andy/at/brandmaier/dot/de>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -54,30 +54,24 @@ SlicerTUI::SlicerTUI( SlicerT * instrument,
 	m_fadeOutKnob(KnobType::Dark28, this),
 	m_bpmBox(3, "21pink", this),
 	m_resetButton(embed::getIconPixmap("reload"), QString(), this),
-	m_timeShiftButton(embed::getIconPixmap("max_length"), QString(), this),
 	m_midiExportButton(embed::getIconPixmap("midi_tab"), QString(), this),
 	m_wf(245, 125, instrument, this)
 {
 	setAcceptDrops( true );
 
-	m_wf.move(2, 5); 
+	m_wf.move(2, 5);
 
 	m_bpmBox.move(2, 150);
 	m_bpmBox.setToolTip(tr("Original sample BPM"));
 	m_bpmBox.setLabel(tr("BPM"));
 	m_bpmBox.setModel(&m_slicerTParent->m_originalBPM);
-	// connect(&m_bpmBox, SIGNAL( manualChange() ), m_slicerTParent, SLOT( updateTimeShift() ), Qt::QueuedConnection);
-
-	m_timeShiftButton.move(70, 150);
-	m_timeShiftButton.setToolTip(tr("Timeshift sample"));
-	// connect(&m_timeShiftButton, SIGNAL( clicked() ), m_slicerTParent, SLOT( updateTimeShift() ), Qt::QueuedConnection);
 
 	m_fadeOutKnob.move(200, 150);
 	m_fadeOutKnob.setToolTip(tr("FadeOut for notes"));
 	m_fadeOutKnob.setLabel(tr("FadeOut"));
 	m_fadeOutKnob.setModel(&m_slicerTParent->m_fadeOutFrames);
 
-	m_midiExportButton.move(150, 150);
+	m_midiExportButton.move(150, 200);
 	m_midiExportButton.setToolTip(tr("Copy midi pattern to clipboard"));
 	connect(&m_midiExportButton, SIGNAL( clicked() ), this, SLOT( exportMidi() ));
 
@@ -101,7 +95,8 @@ void SlicerTUI::exportMidi() {
 
 	std::vector<Note> notes;
 	m_slicerTParent->writeToMidi(&notes);
-	if (notes.size() == 0) {
+	if (notes.size() == 0)
+	{
 		return;
 	}
 

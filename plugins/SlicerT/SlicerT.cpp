@@ -2,7 +2,7 @@
  * SlicerT.cpp - simple slicer plugin
  *
  * Copyright (c) 2006-2008 Andreas Brandmaier <andy/at/brandmaier/dot/de>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -22,8 +22,9 @@
  *
  */
 
+// TODO: fade in mode
+// TODO: general UI improvements, maybe open folders button
 // TODO: add fft cache, maybe this is overkill but whatever
-// TODO: optimize waveform a LOT, mostly during playback
 
 #include "SlicerT.h"
 
@@ -60,7 +61,7 @@ Plugin::Descriptor PLUGIN_EXPORT slicert_plugin_descriptor =
 } // end extern
 
 
-SlicerT::SlicerT(InstrumentTrack * instrumentTrack) : 
+SlicerT::SlicerT(InstrumentTrack * instrumentTrack) :
 	Instrument( instrumentTrack, &slicert_plugin_descriptor ),
 	m_noteThreshold(0.6f, 0.0f, 2.0f, 0.01f, this, tr( "Note threshold" ) ),
 	m_fadeOutFrames(0.0f, 0.0f, 8192.0f, 4.0f, this, tr("FadeOut")),
@@ -70,35 +71,37 @@ SlicerT::SlicerT(InstrumentTrack * instrumentTrack) :
 
 
 void SlicerT::playNote( NotePlayHandle * handle, sampleFrame * workingBuffer ) {
-	if (m_originalSample.frames() < 2048) {
-		return;
-	}
+	if (m_originalSample.frames() < 2048) { return; }
+
 	const float speedRatio = (float)m_originalBPM.value() / Engine::getSong()->getTempo() ;
 	const int noteIndex = handle->key() - 69;
 	const fpp_t frames = handle->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = handle->noteOffset();
 	const int playedFrames = handle->totalFramesPlayed();
 
-	if (m_currentSpeedRatio != speedRatio) {
+	if (m_currentSpeedRatio != speedRatio)
+	{
 		timeShiftSample();
 	}
 	const int totalFrames = m_timeShiftedSample.frames();
 
 	int sliceStart, sliceEnd;
-	if (noteIndex > m_slicePoints.size()-2 || noteIndex < 0) {
+	if (noteIndex > m_slicePoints.size()-2 || noteIndex < 0)
+	{
 		sliceStart = 0;
 		sliceEnd = totalFrames;
 	} else {
 		sliceStart = m_slicePoints[noteIndex] * speedRatio;
 		sliceEnd = m_slicePoints[noteIndex+1] * speedRatio;
 	}
-	
+
 	int sliceFrames = sliceEnd - sliceStart;
 	int currentNoteFrame = sliceStart + playedFrames;
 	int noteFramesLeft = sliceFrames - playedFrames;
 
 
-	if( noteFramesLeft > 0) {
+	if( noteFramesLeft > 0)
+	{
 		int bufferSize = frames * BYTES_PER_FRAME;
 		memcpy(workingBuffer + offset, m_timeShiftedSample.data() + currentNoteFrame, bufferSize);
 
@@ -119,20 +122,18 @@ void SlicerT::playNote( NotePlayHandle * handle, sampleFrame * workingBuffer ) {
 
 		// !! disabled until it is optimized, because it lags the whole ui
 		// calculate absolute for the waveform
-		// float absoluteCurrentNote = (float)currentNoteFrame / totalFrames;
-		// float absoluteStartNote = (float)sliceStart / totalFrames;
-		// float abslouteEndNote = (float)sliceEnd / totalFrames;
-		// emit isPlaying(absoluteCurrentNote, absoluteStartNote, abslouteEndNote);
+		float absoluteCurrentNote = (float)currentNoteFrame / totalFrames;
+		float absoluteStartNote = (float)sliceStart / totalFrames;
+		float abslouteEndNote = (float)sliceEnd / totalFrames;
+		emit isPlaying(absoluteCurrentNote, absoluteStartNote, abslouteEndNote);
 	} else {
-		// emit isPlaying(0, 0, 0);
+		emit isPlaying(0, 0, 0);
 	}
 }
 
 
 void SlicerT::findSlices() {
-	if (m_originalSample.frames() < 2048) {
-		return;
-	}
+	if (m_originalSample.frames() < 2048) { return; }
 	m_slicePoints = {};
 
 	const int window = 1024;
@@ -141,17 +142,20 @@ void SlicerT::findSlices() {
 
 	float lastPeak = 0;
 	float currentPeak = 0;
-	
+
 	for (int i = 0; i<m_originalSample.frames();i+=1) {
 		float sampleValue = abs(m_originalSample.data()[i][0]) + abs(m_originalSample.data()[i][1]) / 2;
 
-		if (sampleValue > currentPeak) {
+		if (sampleValue > currentPeak)
+		{
 			currentPeak = sampleValue;
 			peakIndex = i;
 		}
-		
-		if (i%window==0) {
-			if (abs(currentPeak / lastPeak) > 1+m_noteThreshold.value() && minWindowsPassed <= 0) {
+
+		if (i%window==0)
+		{
+			if (abs(currentPeak / lastPeak) > 1+m_noteThreshold.value() && minWindowsPassed <= 0)
+			{
 				m_slicePoints.push_back(std::max(0, peakIndex-window/2)); // slight offset
 				minWindowsPassed = 2; // wait at least one window for a new note
 			}
@@ -168,9 +172,7 @@ void SlicerT::findSlices() {
 // find the bpm of the sample by assuming its in 4/4 time signature ,
 // and lies in the 100 - 200 bpm range
 void SlicerT::findBPM() {
-	if (m_originalSample.frames() < 2048) {
-		return;
-	}
+	if (m_originalSample.frames() < 2048) { return; }
 	int bpmSnap = 1; // 1 = disabled
 
 	float sampleRate = m_originalSample.sampleRate();
@@ -181,11 +183,13 @@ void SlicerT::findBPM() {
 	float bpmEstimate = 240.0f / sampleLength;
 
 	// deal with samlpes that are not 1 bar long
-	while (bpmEstimate < 100) {
+	while (bpmEstimate < 100)
+	{
 		bpmEstimate *= 2;
 	}
 
-	while (bpmEstimate > 200) {
+	while (bpmEstimate > 200)
+	{
 		bpmEstimate /= 2;
 	}
 
@@ -202,14 +206,11 @@ void SlicerT::findBPM() {
 void SlicerT::timeShiftSample() {
 	using std::vector;
 	// initial checks
-	if (m_originalSample.frames() < 2048) {
-		return;
-	}
-	if (m_timeshiftLock) { // needed
-		return;
-	}
+	if (m_originalSample.frames() < 2048) { return; }
+
+	if (m_timeshiftLock) { return; }
 	m_timeshiftLock = true;
-	
+
 
 	// original sample data
 	float sampleRate = m_originalSample.sampleRate();
@@ -220,7 +221,8 @@ void SlicerT::timeShiftSample() {
 	int outFrames = m_currentSpeedRatio * originalFrames;
 
 	// nothing to do here
-	if (targetBPM == m_originalBPM.value()) {
+	if (targetBPM == m_originalBPM.value())
+	{
 		m_timeShiftedSample.setData(m_originalSample.data(), m_originalSample.frames());
 		m_timeshiftLock = false;
 		return;
@@ -235,7 +237,8 @@ void SlicerT::timeShiftSample() {
 	vector<sampleFrame> bufferData(outFrames, sampleFrame());
 
 	// copy channels for processing
-	for (int i = 0;i<originalFrames;i++) {
+	for (int i = 0;i<originalFrames;i++)
+	{
 		rawDataL[i] = (float)m_originalSample.data()[i][0];
 		rawDataR[i] = (float)m_originalSample.data()[i][1];
 	}
@@ -244,7 +247,7 @@ void SlicerT::timeShiftSample() {
 	phaseVocoder(rawDataL, outDataL, sampleRate, 1);
 	phaseVocoder(rawDataR, outDataR, sampleRate, 1);
 
-	// write processed channels 
+	// write processed channels
 	m_timeShiftedSample.setData(outDataL, outDataR);
 
 	m_timeshiftLock = false;
@@ -267,7 +270,7 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 	// oversampling is better if higher always (probably)
 	const int windowSize = 512;
 	const int overSampling = 32;
-	
+
 	// audio data
 	int inFrames = dataIn.size();
 	int outFrames = dataOut.size();
@@ -275,10 +278,10 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 	float lengthRatio = (float)outFrames / inFrames;
 
 	// values used
-	const int stepSize = (float)windowSize / overSampling; 
+	const int stepSize = (float)windowSize / overSampling;
 	const int numWindows = (float)inFrames / stepSize;
 	const float outStepSize = lengthRatio * (float)stepSize; // float, else inaccurate
-	const float freqPerBin = sampleRate/windowSize; 
+	const float freqPerBin = sampleRate/windowSize;
 	// very important
 	const float expectedPhaseIn = 2.*M_PI*(float)stepSize/(float)windowSize;
 	const float expectedPhaseOut = 2.*M_PI*(float)outStepSize/(float)windowSize;
@@ -307,7 +310,8 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 	ifftPlan = fftwf_plan_dft_c2r_1d(windowSize, FFTSpectrum, IFFTReconstruction.data(), FFTW_MEASURE);
 
 	// remove oversampling, because the actual window is overSampling* bigger than stepsize
-	for (int i = 0;i < numWindows-overSampling;i++) {
+	for (int i = 0;i < numWindows-overSampling;i++)
+	{
 		windowIndex = i * stepSize;
 
 		memcpy(FFTInput.data(), dataIn.data() + windowIndex, windowSize*sizeof(float));
@@ -324,7 +328,7 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 			imag = FFTSpectrum[j][1];
 
 			magnitude = 2.*sqrt(real*real + imag*imag);
-			phase = atan2(imag,real); 
+			phase = atan2(imag,real);
 
 			freq = phase - lastPhase[j]; // subtract prev pahse to get phase diference
 			lastPhase[j] = phase;
@@ -336,7 +340,7 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 			if (qpd >= 0) qpd += qpd&1;
 			else qpd -= qpd&1;
 			freq -= M_PI*(float)qpd;
-			
+
 			freq = (float)overSampling*freq/(2.*M_PI); // idk
 
 			freq = (float)j*freqPerBin + freq*freqPerBin; // "compute the k-th partials' true frequency" ok i guess
@@ -385,15 +389,13 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 		// windowing
 		for (int j = 0; j < windowSize; j++) {
 			float outIndex = i * outStepSize + j;
-			if (outIndex > outFrames) {
-				break;
-			}
+			if (outIndex > outFrames) { break; }
 
 			// calculate windows overlapping at index
 			float startWindowOverlap = ceil(outIndex / outStepSize + 0.00000001f);
 			float endWindowOverlap = ceil((float)(-outIndex + outFrames) / outStepSize + 0.00000001f);
 			float totalWindowOverlap = std::min(
-										std::min(startWindowOverlap, endWindowOverlap), 
+										std::min(startWindowOverlap, endWindowOverlap),
 										(float)overSampling);
 
 			// discrete windowing
@@ -408,13 +410,15 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 	fftwf_destroy_plan(fftPlan);
 	fftwf_destroy_plan(ifftPlan);
 
-	// normalize 	
+	// normalize
 	float max = -1;
-	for (int i = 0;i<outFrames;i++) {
+	for (int i = 0;i<outFrames;i++)
+	{
 		max = std::max(max, abs(outBuffer[i]));
 	}
 
-	for (int i = 0;i<outFrames;i++) {
+	for (int i = 0;i<outFrames;i++)
+	{
 		outBuffer[i] = outBuffer[i] / max;
 	}
 
@@ -423,16 +427,16 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 
 int SlicerT::hashFttWindow(std::vector<float> & in) {
 	int hash = 0;
-	for (float value : in) {
+	for (float value : in)
+	{
 		hash += (324723947 + (int)(value * 10689354)) ^ 93485734985;;
 	}
 	return hash;
 }
 
 void SlicerT::writeToMidi(std::vector<Note> * outClip) {
-	if (m_originalSample.frames() < 2048) {
-		return;
-	}
+	if (m_originalSample.frames() < 2048) { return; }
+
 	int ticksPerBar = DefaultTicksPerBar;
 	float sampleRate = m_originalSample.sampleRate();
 
@@ -457,13 +461,12 @@ void SlicerT::writeToMidi(std::vector<Note> * outClip) {
 
 void SlicerT::updateFile(QString file) {
 	m_originalSample.setAudioFile(file);
-	if (m_originalSample.frames() < 2048) {
-		return;
-	}
+	if (m_originalSample.frames() < 2048) { return; }
+
 	findSlices();
-	findBPM(); 
+	findBPM();
 	timeShiftSample();
-	
+
 	emit dataChanged();
 }
 
@@ -507,7 +510,8 @@ void SlicerT::loadSettings( const QDomElement & element ) {
 		m_originalSample.loadFromBase64(element.attribute("srcdata"));
 	}
 
-	if (!element.attribute("totalSlices").isEmpty()) {
+	if (!element.attribute("totalSlices").isEmpty())
+	{
 		int totalSlices = element.attribute("totalSlices").toInt();
 		m_slicePoints = {};
 		for (int i = 0;i<totalSlices;i++) {

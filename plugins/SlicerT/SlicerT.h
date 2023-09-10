@@ -1,8 +1,8 @@
 /*
- * SlicerT.h - declaration of class SlicerT 
+ * SlicerT.h - declaration of class SlicerT
  *
  * Copyright (c) 2006-2008 Andreas Brandmaier <andy/at/brandmaier/dot/de>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -47,18 +47,20 @@ class PlaybackBuffer {
 		int frames() { return mainBuffer.size(); };
 		sampleFrame * data() { return mainBuffer.data(); };
 
-		void setData(const sampleFrame * data, int newFrames) 
+		void setData(const sampleFrame * data, int newFrames)
 		{
 			mainBuffer = {};
-			mainBuffer.resize(newFrames); 
+			mainBuffer.resize(newFrames);
 			memcpy(mainBuffer.data(), data, newFrames * sizeof(sampleFrame));
 		};
-		void setData(std::vector<float> & leftData, std::vector<float> & rightData) {
+		void setData(std::vector<float> & leftData, std::vector<float> & rightData)
+		{
 			int newFrames = std::min(leftData.size(), rightData.size());
 			mainBuffer = {};
 			mainBuffer.resize(newFrames);
 
-			for (int i = 0;i < newFrames;i++) {
+			for (int i = 0;i < newFrames;i++)
+			{
 				mainBuffer[i][0] = leftData[i];
 				mainBuffer[i][1] = rightData[i];
 			}
@@ -67,7 +69,7 @@ class PlaybackBuffer {
 
 class SlicerT : public Instrument{
 	Q_OBJECT
-	
+
 	public:
 		SlicerT(InstrumentTrack * instrumentTrack);
 		~SlicerT() override = default;
@@ -98,7 +100,7 @@ class SlicerT : public Instrument{
 		SampleBuffer m_originalSample;
 		PlaybackBuffer m_timeShiftedSample;
 		std::vector<int> m_slicePoints;
-		
+
 		float m_currentSpeedRatio = 0;
 		bool m_timeshiftLock; // dont run timeshifting at the same time, instant crash
 		// std::unordered_map<int, std::vector<float> > m_fftWindowCache;

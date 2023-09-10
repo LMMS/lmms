@@ -2,7 +2,7 @@
  * SlicerTUI.h - declaration of class SlicerTUI
  *
  * Copyright (c) 2006-2008 Andreas Brandmaier <andy/at/brandmaier/dot/de>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -47,7 +47,7 @@ namespace gui
 class SlicerTUI : public InstrumentViewFixedSize
 {
 	Q_OBJECT
-	
+
 public:
 	SlicerTUI( SlicerT * instrument,
 					QWidget * parent );
@@ -69,7 +69,6 @@ private:
 	LcdSpinBox m_bpmBox;
 
 	QPushButton m_resetButton;
-	QPushButton m_timeShiftButton;
 	QPushButton m_midiExportButton;
 
 	WaveForm m_wf;

@@ -2,7 +2,7 @@
  * WaveForm.h - declaration of class WaveForm
  *
  * Copyright (c) 2006-2008 Andreas Brandmaier <andy/at/brandmaier/dot/de>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -68,13 +68,15 @@ class WaveForm : public QWidget {
         QColor m_seekerColor = QColor(214, 124, 49);
         QColor m_seekerShadowColor = QColor(0, 0, 0, 175);
 
-        enum class m_draggingTypes {
+        enum class m_draggingTypes
+        {
             nothing,
             m_seekerStart,
             m_seekerEnd,
             m_seekerMiddle,
             slicePoint,
         };
+
         m_draggingTypes m_currentlyDragging;
         bool m_isDragging = false;
 
@@ -89,10 +91,12 @@ class WaveForm : public QWidget {
 
         QPixmap m_sliceEditor;
         QPixmap m_seeker;
+        QPixmap m_seekerWaveform;
 
         SampleBuffer m_currentSample;
 
         void drawEditor();
+        void drawSeekerWaveform();
         void drawSeeker();
         void updateUI();
 
