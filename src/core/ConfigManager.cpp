@@ -676,11 +676,10 @@ void ConfigManager::checkDevelopment()
 			}
 			if (line.startsWith("lmms_BINARY_DIR:")) {
 				m_lmmsRcFile = line.section('=', -1).trimmed() +  QDir::separator() + ".lmmsrc.xml";
+				m_isDevelopment = true;
 				done++;
 			}
-			if (done == 2)
-			{
-				m_isDevelopment = true;
+			if (done == 2) {
 				break;
 			}
 		}
