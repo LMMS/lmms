@@ -39,6 +39,32 @@
 namespace lmms
 {
 
+// small helper class, since SampleBuffer is inadequate (not thread safe, no dinamic startpoint)
+class PlaybackBuffer {
+	public:
+		std::vector<sampleFrame> mainBuffer;
+
+		int frames() { return mainBuffer.size(); };
+		sampleFrame * data() { return mainBuffer.data(); };
+
+		void setData(const sampleFrame * data, int newFrames) 
+		{
+			mainBuffer = {};
+			mainBuffer.resize(newFrames); 
+			memcpy(mainBuffer.data(), data, newFrames * sizeof(sampleFrame));
+		};
+		void setData(std::vector<float> & leftData, std::vector<float> & rightData) {
+			int newFrames = std::min(leftData.size(), rightData.size());
+			mainBuffer = {};
+			mainBuffer.resize(newFrames);
+
+			for (int i = 0;i < newFrames;i++) {
+				mainBuffer[i][0] = leftData[i];
+				mainBuffer[i][1] = rightData[i];
+			}
+		}
+};
+
 class SlicerT : public Instrument{
 	Q_OBJECT
 	
@@ -70,17 +96,21 @@ class SlicerT : public Instrument{
 		IntModel m_originalBPM;
 
 		SampleBuffer m_originalSample;
-		SampleBuffer m_timeShiftedSample;
+		PlaybackBuffer m_timeShiftedSample;
 		std::vector<int> m_slicePoints;
 		
+		float m_currentSpeedRatio = 0;
+		bool m_timeshiftLock; // dont run timeshifting at the same time, instant crash
+		// std::unordered_map<int, std::vector<float> > m_fftWindowCache;
+
 		void findSlices();
 		void findBPM();
 		void timeShiftSample();
 		void phaseVocoder(std::vector<float> &in, std::vector<float> &out, float sampleRate, float pitchScale);
+		int hashFttWindow(std::vector<float> & in);
 
 		friend class gui::SlicerTUI;
 		friend class gui::WaveForm;
 };
-}
-
-#endif
+} // namespace lmms
+#endif // SLICERT_H

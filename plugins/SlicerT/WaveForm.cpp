@@ -252,5 +252,5 @@ namespace gui
         p.drawPixmap(0, m_height*0.3f + m_margin, m_sliceEditor);
         p.drawPixmap(0, 0, m_seeker);
     }
-}
-}
+} // namespace gui
+} // namespace lmms

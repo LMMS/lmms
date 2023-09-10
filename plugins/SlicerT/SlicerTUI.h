@@ -22,6 +22,9 @@
  *
  */
 
+#ifndef SLICERT_UI_H
+#define SLICERT_UI_H
+
 #include "WaveForm.h"
 
 #include <QPushButton>
@@ -31,9 +34,6 @@
 #include "Knob.h"
 #include "LcdSpinBox.h"
 
-
-#ifndef SLICERT_UI_H
-#define SLICERT_UI_H
 
 namespace lmms
 {
@@ -74,10 +74,6 @@ private:
 
 	WaveForm m_wf;
 };
-
-
 } // namespace gui
-
 } // namespace lmms
-
-#endif
+#endif // SLICERT_UI_H

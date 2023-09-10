@@ -22,6 +22,9 @@
  *
  */
 
+// TODO: add fft cache, maybe this is overkill but whatever
+// TODO: optimize waveform a LOT, mostly during playback
+
 #include "SlicerT.h"
 
 #include <fftw3.h>
@@ -56,14 +59,13 @@ Plugin::Descriptor PLUGIN_EXPORT slicert_plugin_descriptor =
 } ;
 } // end extern
 
+
 SlicerT::SlicerT(InstrumentTrack * instrumentTrack) : 
 	Instrument( instrumentTrack, &slicert_plugin_descriptor ),
 	m_noteThreshold(0.6f, 0.0f, 2.0f, 0.01f, this, tr( "Note threshold" ) ),
 	m_fadeOutFrames(0.0f, 0.0f, 8192.0f, 4.0f, this, tr("FadeOut")),
 	m_originalBPM(1, 1, 999, this, tr("Original bpm")),
-
-	m_originalSample(),
-	m_timeShiftedSample()
+	m_originalSample()
 {}
 
 
@@ -71,16 +73,18 @@ void SlicerT::playNote( NotePlayHandle * handle, sampleFrame * workingBuffer ) {
 	if (m_originalSample.frames() < 2048) {
 		return;
 	}
+	const float speedRatio = (float)m_originalBPM.value() / Engine::getSong()->getTempo() ;
+	const int noteIndex = handle->key() - 69;
 	const fpp_t frames = handle->framesLeftForCurrentPeriod();
-	const int playedFrames = handle->totalFramesPlayed();
 	const f_cnt_t offset = handle->noteOffset();
+	const int playedFrames = handle->totalFramesPlayed();
+
+	if (m_currentSpeedRatio != speedRatio) {
+		timeShiftSample();
+	}
 	const int totalFrames = m_timeShiftedSample.frames();
-	
+
 	int sliceStart, sliceEnd;
-	float speedRatio = (float)m_originalBPM.value() / Engine::getSong()->getTempo() ;
-	int noteIndex = handle->key() - 69;
-	
-	// 0th element is no sound, so play full sample
 	if (noteIndex > m_slicePoints.size()-2 || noteIndex < 0) {
 		sliceStart = 0;
 		sliceEnd = totalFrames;
@@ -90,51 +94,37 @@ void SlicerT::playNote( NotePlayHandle * handle, sampleFrame * workingBuffer ) {
 	}
 	
 	int sliceFrames = sliceEnd - sliceStart;
+	int currentNoteFrame = sliceStart + playedFrames;
 	int noteFramesLeft = sliceFrames - playedFrames;
 
-	// pretty sure this causes issues when playing multipple slices at once
-	m_timeShiftedSample.setAllPointFrames( sliceStart, sliceEnd, sliceStart, sliceEnd );
 
-	// init NotePlayHandle data
-	if( !handle->m_pluginData )
-	{
-		handle->m_pluginData = new SampleBuffer::handleState( false, SRC_LINEAR );
-		((SampleBuffer::handleState *)handle->m_pluginData)->setFrameIndex( sliceStart );
-	}
+	if( noteFramesLeft > 0) {
+		int bufferSize = frames * BYTES_PER_FRAME;
+		memcpy(workingBuffer + offset, m_timeShiftedSample.data() + currentNoteFrame, bufferSize);
 
-	if( ! handle->isFinished() ) {
-		if( m_timeShiftedSample.play( workingBuffer + offset,
-					(SampleBuffer::handleState *)handle->m_pluginData,
-					frames, 440,
-					static_cast<SampleBuffer::LoopMode>( 0 ) ) )
-		{
-			// exponential fade out, applyRelease kinda sucks
-			if (noteFramesLeft < m_fadeOutFrames.value()) {
-				for (int i = 0;i<frames;i++) {
-					float fadeValue = (float)(noteFramesLeft-i) / m_fadeOutFrames.value();
-					// if the workingbuffer extends the sample
-					fadeValue = std::clamp(fadeValue, 0.0f, 1.0f);
-					fadeValue = pow(fadeValue, 2);
+		// exponential fade out, applyRelease kinda sucks
+		if (noteFramesLeft < m_fadeOutFrames.value()) {
+			for (int i = 0;i<frames;i++) {
+				float fadeValue = (float)(noteFramesLeft-i) / m_fadeOutFrames.value();
+				// if the workingbuffer extends the sample
+				fadeValue = std::clamp(fadeValue, 0.0f, 1.0f);
+				fadeValue = pow(fadeValue, 2);
 
-					workingBuffer[i][0] *= fadeValue;
-					workingBuffer[i][1] *= fadeValue;
-				}
+				workingBuffer[i][0] *= fadeValue;
+				workingBuffer[i][1] *= fadeValue;
 			}
-
-			instrumentTrack()->processAudioBuffer( workingBuffer,
-									frames + offset, handle );
-
-
-			float absoluteCurrentNote = (float)(sliceStart + playedFrames) / totalFrames;
-			float absoluteStartNote = (float)sliceStart / totalFrames;
-			float abslouteEndNote = (float)sliceEnd / totalFrames;
-			emit isPlaying(absoluteCurrentNote, absoluteStartNote, abslouteEndNote);
-
-		} else {
-			emit isPlaying(0, 0, 0);			
 		}
+
+		instrumentTrack()->processAudioBuffer( workingBuffer, frames + offset, handle );
+
+		// !! disabled until it is optimized, because it lags the whole ui
+		// calculate absolute for the waveform
+		// float absoluteCurrentNote = (float)currentNoteFrame / totalFrames;
+		// float absoluteStartNote = (float)sliceStart / totalFrames;
+		// float abslouteEndNote = (float)sliceEnd / totalFrames;
+		// emit isPlaying(absoluteCurrentNote, absoluteStartNote, abslouteEndNote);
 	} else {
-		emit isPlaying(0, 0, 0);
+		// emit isPlaying(0, 0, 0);
 	}
 }
 
@@ -146,7 +136,7 @@ void SlicerT::findSlices() {
 	m_slicePoints = {};
 
 	const int window = 1024;
-	int minWindowsPassed = 0;
+	int minWindowsPassed = 1;
 	int peakIndex = 0;
 
 	float lastPeak = 0;
@@ -181,7 +171,7 @@ void SlicerT::findBPM() {
 	if (m_originalSample.frames() < 2048) {
 		return;
 	}
-	int bpmSnap = 1;
+	int bpmSnap = 1; // 1 = disabled
 
 	float sampleRate = m_originalSample.sampleRate();
 	float totalFrames = m_originalSample.frames();
@@ -210,23 +200,29 @@ void SlicerT::findBPM() {
 
 // create timeshifted samplebuffer and timeshifted m_slicePoints
 void SlicerT::timeShiftSample() {
+	using std::vector;
+	// initial checks
 	if (m_originalSample.frames() < 2048) {
 		return;
 	}
-	using std::vector;
+	if (m_timeshiftLock) { // needed
+		return;
+	}
+	m_timeshiftLock = true;
+	
 
 	// original sample data
 	float sampleRate = m_originalSample.sampleRate();
 	int originalFrames = m_originalSample.frames();
 
-	// target data TODO: fix this mess
 	bpm_t targetBPM = Engine::getSong()->getTempo();
-	float speedRatio = (float)m_originalBPM.value() / targetBPM ;
-	int outFrames = speedRatio * originalFrames;
+	m_currentSpeedRatio = (float)m_originalBPM.value() / targetBPM ;
+	int outFrames = m_currentSpeedRatio * originalFrames;
 
 	// nothing to do here
 	if (targetBPM == m_originalBPM.value()) {
-		m_timeShiftedSample = SampleBuffer(m_originalSample.data(), m_originalSample.frames());
+		m_timeShiftedSample.setData(m_originalSample.data(), m_originalSample.frames());
+		m_timeshiftLock = false;
 		return;
 	}
 
@@ -243,18 +239,15 @@ void SlicerT::timeShiftSample() {
 		rawDataL[i] = (float)m_originalSample.data()[i][0];
 		rawDataR[i] = (float)m_originalSample.data()[i][1];
 	}
+
 	// process channels
 	phaseVocoder(rawDataL, outDataL, sampleRate, 1);
 	phaseVocoder(rawDataR, outDataR, sampleRate, 1);
 
 	// write processed channels 
-	for (int i = 0;i<outFrames;i++) {
-		bufferData.data()[i][0] = outDataL[i];
-		bufferData.data()[i][1] = outDataR[i];
-	}
+	m_timeShiftedSample.setData(outDataL, outDataR);
 
-	// new sample
-	m_timeShiftedSample = SampleBuffer(bufferData.data(), bufferData.size());
+	m_timeshiftLock = false;
 }
 
 // basic phase vocoder implementation that time shifts without pitch change
@@ -317,8 +310,12 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 	for (int i = 0;i < numWindows-overSampling;i++) {
 		windowIndex = i * stepSize;
 
-		// FFT
 		memcpy(FFTInput.data(), dataIn.data() + windowIndex, windowSize*sizeof(float));
+
+		// int hash = hashFttWindow(FFTInput);
+		// printf("%i\n", hash);
+
+		// FFT
 		fftwf_execute(fftPlan);
 
 		// analysis step
@@ -424,12 +421,20 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 	memcpy(dataOut.data(), outBuffer.data(), outFrames*sizeof(float));
 }
 
+int SlicerT::hashFttWindow(std::vector<float> & in) {
+	int hash = 0;
+	for (float value : in) {
+		hash += (324723947 + (int)(value * 10689354)) ^ 93485734985;;
+	}
+	return hash;
+}
+
 void SlicerT::writeToMidi(std::vector<Note> * outClip) {
 	if (m_originalSample.frames() < 2048) {
 		return;
 	}
 	int ticksPerBar = DefaultTicksPerBar;
-	float sampleRate = m_timeShiftedSample.sampleRate();
+	float sampleRate = m_originalSample.sampleRate();
 
 	float bpm = Engine::getSong()->getTempo();
 	float samplesPerBeat = 60.0f / bpm * sampleRate;
@@ -465,11 +470,6 @@ void SlicerT::updateFile(QString file) {
 void SlicerT::updateSlices() {
 	findSlices();
 }
-
-void SlicerT::updateTimeShift() {
-	timeShiftSample();
-}
-
 
 void SlicerT::saveSettings(QDomDocument & document, QDomElement & element) {
 	element.setAttribute("src", m_originalSample.audioFile());

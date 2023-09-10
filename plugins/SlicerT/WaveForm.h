@@ -22,6 +22,9 @@
  *
  */
 
+#ifndef WAVEFORM_H
+#define WAVEFORM_H
+
 #include <QApplication>
 #include <QFontMetrics>
 #include <QInputDialog>
@@ -30,8 +33,6 @@
 
 #include "SampleBuffer.h"
 
-#ifndef WAVEFORM_H
-#define WAVEFORM_H
 
 namespace lmms
 {
@@ -106,7 +107,6 @@ class WaveForm : public QWidget {
         SlicerT * m_slicerTParent;
         std::vector<int> & m_slicePoints;
 };
-}}
-
-
-#endif
+} // namespace gui
+} // namespace lmms
+#endif // WAVEFORM_H

@@ -66,10 +66,11 @@ SlicerTUI::SlicerTUI( SlicerT * instrument,
 	m_bpmBox.setToolTip(tr("Original sample BPM"));
 	m_bpmBox.setLabel(tr("BPM"));
 	m_bpmBox.setModel(&m_slicerTParent->m_originalBPM);
+	// connect(&m_bpmBox, SIGNAL( manualChange() ), m_slicerTParent, SLOT( updateTimeShift() ), Qt::QueuedConnection);
 
 	m_timeShiftButton.move(70, 150);
 	m_timeShiftButton.setToolTip(tr("Timeshift sample"));
-	connect(&m_timeShiftButton, SIGNAL( clicked() ), m_slicerTParent, SLOT( updateTimeShift() ));
+	// connect(&m_timeShiftButton, SIGNAL( clicked() ), m_slicerTParent, SLOT( updateTimeShift() ), Qt::QueuedConnection);
 
 	m_fadeOutKnob.move(200, 150);
 	m_fadeOutKnob.setToolTip(tr("FadeOut for notes"));
@@ -166,7 +167,5 @@ void SlicerTUI::dropEvent( QDropEvent * de ) {
 
 	de->ignore();
 }
-}
-}
-
-
+} // namespace gui
+} // namespace lmms
