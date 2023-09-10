@@ -47,7 +47,7 @@ extern "C"
 {
 Plugin::Descriptor PLUGIN_EXPORT slicert_plugin_descriptor =
 {
-	LMMS_STRINGIFY( PLUGINhandleAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"SlicerT",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Basic Slicer" ),
@@ -70,7 +70,8 @@ SlicerT::SlicerT(InstrumentTrack * instrumentTrack) :
 {}
 
 
-void SlicerT::playNote( NotePlayHandle * handle, sampleFrame * workingBuffer ) {
+void SlicerT::playNote( NotePlayHandle * handle, sampleFrame * workingBuffer )
+{
 	if (m_originalSample.frames() < 2048) { return; }
 
 	const float speedRatio = (float)m_originalBPM.value() / Engine::getSong()->getTempo() ;
@@ -106,8 +107,10 @@ void SlicerT::playNote( NotePlayHandle * handle, sampleFrame * workingBuffer ) {
 		memcpy(workingBuffer + offset, m_timeShiftedSample.data() + currentNoteFrame, bufferSize);
 
 		// exponential fade out, applyRelease kinda sucks
-		if (noteFramesLeft < m_fadeOutFrames.value()) {
-			for (int i = 0;i<frames;i++) {
+		if (noteFramesLeft < m_fadeOutFrames.value())
+		{
+			for (int i = 0;i<frames;i++)
+			{
 				float fadeValue = (float)(noteFramesLeft-i) / m_fadeOutFrames.value();
 				// if the workingbuffer extends the sample
 				fadeValue = std::clamp(fadeValue, 0.0f, 1.0f);
@@ -120,7 +123,6 @@ void SlicerT::playNote( NotePlayHandle * handle, sampleFrame * workingBuffer ) {
 
 		instrumentTrack()->processAudioBuffer( workingBuffer, frames + offset, handle );
 
-		// !! disabled until it is optimized, because it lags the whole ui
 		// calculate absolute for the waveform
 		float absoluteCurrentNote = (float)currentNoteFrame / totalFrames;
 		float absoluteStartNote = (float)sliceStart / totalFrames;
@@ -132,7 +134,8 @@ void SlicerT::playNote( NotePlayHandle * handle, sampleFrame * workingBuffer ) {
 }
 
 
-void SlicerT::findSlices() {
+void SlicerT::findSlices()
+{
 	if (m_originalSample.frames() < 2048) { return; }
 	m_slicePoints = {};
 
@@ -143,7 +146,8 @@ void SlicerT::findSlices() {
 	float lastPeak = 0;
 	float currentPeak = 0;
 
-	for (int i = 0; i<m_originalSample.frames();i+=1) {
+	for (int i = 0; i<m_originalSample.frames();i+=1)
+	{
 		float sampleValue = abs(m_originalSample.data()[i][0]) + abs(m_originalSample.data()[i][1]) / 2;
 
 		if (sampleValue > currentPeak)
@@ -171,7 +175,8 @@ void SlicerT::findSlices() {
 
 // find the bpm of the sample by assuming its in 4/4 time signature ,
 // and lies in the 100 - 200 bpm range
-void SlicerT::findBPM() {
+void SlicerT::findBPM()
+{
 	if (m_originalSample.frames() < 2048) { return; }
 	int bpmSnap = 1; // 1 = disabled
 
@@ -203,7 +208,8 @@ void SlicerT::findBPM() {
 }
 
 // create timeshifted samplebuffer and timeshifted m_slicePoints
-void SlicerT::timeShiftSample() {
+void SlicerT::timeShiftSample()
+{
 	using std::vector;
 	// initial checks
 	if (m_originalSample.frames() < 2048) { return; }
@@ -259,7 +265,8 @@ void SlicerT::timeShiftSample() {
 // https://sethares.engr.wisc.edu/vocoders/phasevocoder.html
 // https://dsp.stackexchange.com/questions/40101/audio-time-stretching-without-pitch-shifting/40367#40367
 // https://www.guitarpitchshifter.com/
-void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataOut, float sampleRate, float pitchScale) {
+void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataOut, float sampleRate, float pitchScale)
+{
 	using std::vector;
 	// processing parameters, lower is faster
 	// lower windows size seems to work better for time scaling,
@@ -323,7 +330,8 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 		fftwf_execute(fftPlan);
 
 		// analysis step
-		for (int j = 0; j < windowSize; j++) {
+		for (int j = 0; j < windowSize; j++)
+		{
 			real = FFTSpectrum[j][0];
 			imag = FFTSpectrum[j][1];
 
@@ -364,7 +372,8 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 		// }
 
 		// synthesis, all the operations are the reverse of the analysis
-		for (int j = 0; j < windowSize; j++) {
+		for (int j = 0; j < windowSize; j++)
+		{
 			magnitude = allMagnitudes[j];
 			freq = allFrequencies[j];
 
@@ -387,7 +396,8 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 		fftwf_execute(ifftPlan);
 
 		// windowing
-		for (int j = 0; j < windowSize; j++) {
+		for (int j = 0; j < windowSize; j++)
+		{
 			float outIndex = i * outStepSize + j;
 			if (outIndex > outFrames) { break; }
 
@@ -425,7 +435,8 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 	memcpy(dataOut.data(), outBuffer.data(), outFrames*sizeof(float));
 }
 
-int SlicerT::hashFttWindow(std::vector<float> & in) {
+int SlicerT::hashFttWindow(std::vector<float> & in)
+{
 	int hash = 0;
 	for (float value : in)
 	{
@@ -434,7 +445,8 @@ int SlicerT::hashFttWindow(std::vector<float> & in) {
 	return hash;
 }
 
-void SlicerT::writeToMidi(std::vector<Note> * outClip) {
+void SlicerT::writeToMidi(std::vector<Note> * outClip)
+{
 	if (m_originalSample.frames() < 2048) { return; }
 
 	int ticksPerBar = DefaultTicksPerBar;
@@ -447,7 +459,8 @@ void SlicerT::writeToMidi(std::vector<Note> * outClip) {
 	float barsInSample = beats / Engine::getSong()->getTimeSigModel().getDenominator();
 	float totalTicks = ticksPerBar * barsInSample;
 
-	for (int i = 0;i<m_slicePoints.size()-1;i++) {
+	for (int i = 0;i<m_slicePoints.size()-1;i++)
+	{
 		float sliceStart = (float)m_slicePoints[i] / m_originalSample.frames() * totalTicks;
 		float sliceEnd = (float)m_slicePoints[i + 1] / m_originalSample.frames() * totalTicks;
 
@@ -459,7 +472,8 @@ void SlicerT::writeToMidi(std::vector<Note> * outClip) {
 	}
 }
 
-void SlicerT::updateFile(QString file) {
+void SlicerT::updateFile(QString file)
+{
 	m_originalSample.setAudioFile(file);
 	if (m_originalSample.frames() < 2048) { return; }
 
@@ -470,11 +484,13 @@ void SlicerT::updateFile(QString file) {
 	emit dataChanged();
 }
 
-void SlicerT::updateSlices() {
+void SlicerT::updateSlices()
+{
 	findSlices();
 }
 
-void SlicerT::saveSettings(QDomDocument & document, QDomElement & element) {
+void SlicerT::saveSettings(QDomDocument & document, QDomElement & element)
+{
 	element.setAttribute("src", m_originalSample.audioFile());
 	if (m_originalSample.audioFile().isEmpty())
 	{
@@ -484,7 +500,8 @@ void SlicerT::saveSettings(QDomDocument & document, QDomElement & element) {
 
 	element.setAttribute("totalSlices", (int)m_slicePoints.size());
 
-	for (int i = 0;i<m_slicePoints.size();i++) {
+	for (int i = 0;i<m_slicePoints.size();i++)
+	{
 		element.setAttribute(tr("slice_%1").arg(i), m_slicePoints[i]);
 	}
 
@@ -493,7 +510,8 @@ void SlicerT::saveSettings(QDomDocument & document, QDomElement & element) {
 	m_originalBPM.saveSettings(document, element, "origBPM");
 }
 
-void SlicerT::loadSettings( const QDomElement & element ) {
+void SlicerT::loadSettings( const QDomElement & element )
+{
 	if (!element.attribute("src").isEmpty())
 	{
 		m_originalSample.setAudioFile(element.attribute("src"));
@@ -514,7 +532,8 @@ void SlicerT::loadSettings( const QDomElement & element ) {
 	{
 		int totalSlices = element.attribute("totalSlices").toInt();
 		m_slicePoints = {};
-		for (int i = 0;i<totalSlices;i++) {
+		for (int i = 0;i<totalSlices;i++)
+		{
 			m_slicePoints.push_back(element.attribute(tr("slice_%1").arg(i)).toInt());
 		}
 	}

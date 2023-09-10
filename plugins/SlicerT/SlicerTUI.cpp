@@ -50,16 +50,18 @@ SlicerTUI::SlicerTUI( SlicerT * instrument,
 					QWidget * parent ) :
 	InstrumentViewFixedSize( instrument, parent ),
 	m_slicerTParent(instrument),
+	m_backgroundImage(PLUGIN_NAME::getIconPixmap(
+								"artwork" )),
 	m_noteThresholdKnob(KnobType::Dark28, this),
 	m_fadeOutKnob(KnobType::Dark28, this),
-	m_bpmBox(3, "21pink", this),
+	m_bpmBox(3, "19green", this),
 	m_resetButton(embed::getIconPixmap("reload"), QString(), this),
 	m_midiExportButton(embed::getIconPixmap("midi_tab"), QString(), this),
-	m_wf(245, 125, instrument, this)
+	m_wf(244, 125, instrument, this)
 {
 	setAcceptDrops( true );
 
-	m_wf.move(2, 5);
+	m_wf.move(3, 5);
 
 	m_bpmBox.move(2, 150);
 	m_bpmBox.setToolTip(tr("Original sample BPM"));
@@ -86,7 +88,8 @@ SlicerTUI::SlicerTUI( SlicerT * instrument,
 }
 
 // copied from piano roll
-void SlicerTUI::exportMidi() {
+void SlicerTUI::exportMidi()
+{
 	using namespace Clipboard;
 
 	DataFile dataFile( DataFile::Type::ClipboardData );
@@ -141,7 +144,8 @@ void SlicerTUI::dragEnterEvent( QDragEnterEvent * dee )
 	}
 }
 
-void SlicerTUI::dropEvent( QDropEvent * de ) {
+void SlicerTUI::dropEvent( QDropEvent * de )
+{
 	QString type = StringPairDrag::decodeKey( de );
 	QString value = StringPairDrag::decodeValue( de );
 	if( type == "samplefile" )
@@ -162,5 +166,12 @@ void SlicerTUI::dropEvent( QDropEvent * de ) {
 
 	de->ignore();
 }
+
+void SlicerTUI::paintEvent(QPaintEvent * pe)
+{
+	QPainter p( this );
+	p.drawPixmap(0, 0, m_backgroundImage);
+}
+
 } // namespace gui
 } // namespace lmms

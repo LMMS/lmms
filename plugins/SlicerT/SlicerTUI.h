@@ -61,8 +61,11 @@ protected:
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );
 
+	virtual void paintEvent(QPaintEvent * pe);
+
 private:
 	SlicerT * m_slicerTParent;
+	QPixmap m_backgroundImage;
 
 	Knob m_noteThresholdKnob;
 	Knob m_fadeOutKnob;
