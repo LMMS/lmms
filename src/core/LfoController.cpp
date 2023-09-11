@@ -110,22 +110,28 @@ void LfoController::updateValueBuffer()
 		float currentSample = 0;
 		switch (waveshape)
 		{
-			case Oscillator::WaveShape::WhiteNoise:
-				if (absFraction(phase) < absFraction(phasePrev))
-				{
-					// Resample when phase period has completed
-					m_heldSample = m_sampleFunction(phase);
-				}
-				currentSample = m_heldSample;
-				break;
-			case Oscillator::WaveShape::UserDefined:
-				currentSample = m_userDefSampleBuffer->userWaveSample(phase);
-				break;
-			default:
-				if (m_sampleFunction != nullptr)
-				{
-					currentSample = m_sampleFunction(phase);
-				}
+		case Oscillator::WaveShape::WhiteNoise:
+		{
+			if (absFraction(phase) < absFraction(phasePrev))
+			{
+				// Resample when phase period has completed
+				m_heldSample = m_sampleFunction(phase);
+			}
+			currentSample = m_heldSample;
+			break;
+		}
+		case Oscillator::WaveShape::UserDefined:
+		{
+			currentSample = m_userDefSampleBuffer->userWaveSample(phase);
+			break;
+		}
+		default:
+		{
+			if (m_sampleFunction != nullptr)
+			{
+				currentSample = m_sampleFunction(phase);
+			}
+		}
 		}
 
 		f = std::clamp(m_baseModel.value() + (*amountPtr * currentSample / 2.0f), 0.0f, 1.0f);
