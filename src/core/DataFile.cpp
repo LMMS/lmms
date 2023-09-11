@@ -1727,7 +1727,7 @@ void DataFile::upgrade_mixerRename()
 
 	// Change the attribute fxch of element <instrumenttrack> to mixch
 	QDomNodeList fxch = elementsByTagName("instrumenttrack");
-	for(int i = 0; i < fxch.length(); ++i)
+	for (int i = 0; i < fxch.length(); ++i)
 	{
 		auto item = fxch.item(i).toElement();
 		if (item.isNull())
