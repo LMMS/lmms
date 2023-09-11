@@ -701,39 +701,65 @@ void ConfigManager::initPortablePaths()
 
 void ConfigManager::initInstalledPaths()
 {
+	QString home = QDir::home().absolutePath();
+
 	m_workingDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/lmms/";
 
 	// Detect < 1.2.0 working directory as a courtesy
-	if (QFileInfo(QDir::home().absolutePath() + "/lmms/projects/").exists())
+	if (QFileInfo(home + "/lmms/projects/").exists())
 	{
-		m_workingDir = QDir::home().absolutePath() + "/lmms/";
+		m_workingDir = home + "/lmms/";
 	}
 
 	// Determine RC file location to use if not in development
 	if (!m_isDevelopment)
 	{
-		QString cfgDir = QStandardPaths::standardLocations(QStandardPaths::AppConfigLocation).at(0);
-		QString newRcLocation = cfgDir + "/lmmsrc.xml";
-		QString legacyRcLocation = QDir::home().absolutePath() + "/.lmmsrc.xml";
+		QStringList standardLocations = QStandardPaths::standardLocations(QStandardPaths::AppConfigLocation);
+		QString newCfgDir = "";
 
-		if (QFileInfo(newRcLocation).exists())
+		bool useNewLocation;
+		QString newRcLocation = "";
+		QString legacyRcLocation = home + "/.lmmsrc.xml";
+
+		if (standardLocations.length() > 0)
 		{
-			// Use the new RC file location if the file is found there
-			m_lmmsRcFile = newRcLocation;
+			newCfgDir = standardLocations.at(0);
+			newRcLocation = newCfgDir + "/lmms.xml";
+		}
+
+		if (!newRcLocation.isEmpty() && QFileInfo(newRcLocation).exists() && QFileInfo(newRcLocation).isWritable())
+		{
+			useNewLocation = true;
 		}
 		else if (QFileInfo(legacyRcLocation).exists())
 		{
-			// Use the legacy RC file location if the file is found there
-			m_lmmsRcFile = legacyRcLocation;
+			useNewLocation = false;
 		}
 		else
 		{
-			// Otherwise, create the file at the new location
 			QDir dir;
 
-			dir.mkpath(cfgDir);
-			m_lmmsRcFile = newRcLocation;
+			// Create the RC file if it has not been found
+			if (!newCfgDir.isEmpty() && dir.mkpath(newCfgDir))
+			{
+				QFileInfo fileInfo(newCfgDir);
+
+				if (fileInfo.isWritable())
+				{
+					useNewLocation = true;
+				}
+				else
+				{
+					useNewLocation = false;
+				}
+			}
+			else
+			{
+				useNewLocation = false;
+			}
 		}
+
+		m_lmmsRcFile = (useNewLocation) ? newRcLocation : legacyRcLocation;
 	}
 }
 
