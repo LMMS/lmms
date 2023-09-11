@@ -1767,7 +1767,7 @@ void DataFile::upgrade_bbTcoRename()
 void DataFile::upgrade_sampleAndHold()
 {
 	QDomNodeList elements = elementsByTagName("lfocontroller");
-	for (int i = 0; i < elements.size(); ++i)
+	for (int i = 0; i < elements.length(); ++i)
 	{
 		if (elements.item(i).isNull()) { continue; }
 		auto e = elements.item(i).toElement();
