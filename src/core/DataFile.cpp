@@ -1767,8 +1767,9 @@ void DataFile::upgrade_bbTcoRename()
 void DataFile::upgrade_sampleAndHold()
 {
 	QDomNodeList elements = elementsByTagName("lfocontroller");
-	for (int i = 0; !elements.item(i).isNull(); ++i)
+	for (int i = 0; i < elements.size(); ++i)
 	{
+		if (elements.item(i).isNull()) { continue; }
 		auto e = elements.item(i).toElement();
 		// Correct old random wave LFO speeds
 		if (e.attribute("wave").toInt() == 6)
