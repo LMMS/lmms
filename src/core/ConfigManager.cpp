@@ -653,12 +653,16 @@ void ConfigManager::checkDevelopment()
 	// If we're in development (lmms is not installed) let's get the source and
 	// binary directories by reading the CMake Cache
 	QDir appPath = qApp->applicationDirPath();
+
 	// If in tests, get parent directory
-	if (appPath.dirName() == "tests") {
+	if (appPath.dirName() == "tests")
+	{
 		appPath.cdUp();
 	}
+
 	QFile cmakeCache(appPath.absoluteFilePath("CMakeCache.txt"));
-	if (cmakeCache.exists()) {
+	if (cmakeCache.exists())
+	{
 		cmakeCache.open(QFile::ReadOnly);
 		QTextStream stream(&cmakeCache);
 
@@ -669,17 +673,22 @@ void ConfigManager::checkDevelopment()
 		{
 			QString line = stream.readLine();
 
-			if (line.startsWith("lmms_SOURCE_DIR:")) {
+			if (line.startsWith("lmms_SOURCE_DIR:"))
+			{
 				QString srcDir = line.section('=', -1).trimmed();
 				QDir::addSearchPath("data", srcDir + "/data/");
 				done++;
 			}
-			if (line.startsWith("lmms_BINARY_DIR:")) {
+
+			if (line.startsWith("lmms_BINARY_DIR:"))
+			{
 				m_lmmsRcFile = line.section('=', -1).trimmed() +  QDir::separator() + ".lmmsrc.xml";
 				m_isDevelopment = true;
 				done++;
 			}
-			if (done == 2) {
+
+			if (done == 2)
+			{
 				break;
 			}
 		}
