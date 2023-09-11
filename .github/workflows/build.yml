@@ -61,7 +61,7 @@ jobs:
         run: |
           ccache --cleanup
           echo "[ccache config]"
-          ccache --show-config
+          ccache --print-config
           echo "[ccache stats]"
           ccache --show-stats
         env:
@@ -203,7 +203,7 @@ jobs:
         run: |
           ccache --cleanup
           echo "[ccache config]"
-          ccache --show-config
+          ccache --print-config
           echo "[ccache stats]"
           ccache --show-stats
         env:
