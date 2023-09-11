@@ -9,3 +9,4 @@
 /plugins/ZynAddSubFx/zynaddsubfx/doc/Makefile
 /plugins/ZynAddSubFx/zynaddsubfx/doc/gen/Makefile
 /data/locale/*.qm
+Brewfile.lock.json

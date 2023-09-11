@@ -84,6 +84,15 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+      - name: Clean up Homebrew download cache
+        run: rm -rf ~/Library/Caches/Homebrew/downloads
+      - name: Restore Homebrew download cache
+        uses: actions/cache/restore@v3
+        with:
+          key: n/a - only restore from restore-keys
+          restore-keys: |
+            homebrew-
+          path: ~/Library/Caches/Homebrew/downloads
       - name: Cache ccache data
         uses: actions/cache@v3
         with:
@@ -94,10 +103,12 @@ jobs:
           path: ~/Library/Caches/ccache
       - name: Install dependencies
         run: |
-          brew install ccache fftw pkg-config libogg libvorbis lame libsndfile \
-                       libsamplerate jack sdl libgig libsoundio lilv lv2 stk \
-                       fluid-synth portaudio fltk qt@5 carla
+          brew bundle install --verbose
           npm install --location=global appdmg
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: 1
+          HOMEBREW_NO_INSTALL_UPGRADE: 1
+          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
       - name: Configure
         run: |
           mkdir build
@@ -131,6 +142,11 @@ jobs:
           ccache --show-stats --verbose
         env:
           CCACHE_MAXSIZE: 500MB
+      - name: Save Homebrew download cache
+        uses: actions/cache/save@v3
+        with:
+          key: homebrew-${{ hashFiles('Brewfile.lock.json') }}
+          path: ~/Library/Caches/Homebrew/downloads
   mingw:
     strategy:
       fail-fast: false
