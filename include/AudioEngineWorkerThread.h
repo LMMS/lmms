@@ -41,6 +41,14 @@ class AudioEngineWorkerThread : public QThread
 {
 	Q_OBJECT
 public:
+	enum class Status
+	{
+		Init,
+		Ready,
+		Processing,
+		Quitting
+	};
+
 	// internal representation of the job queue - all functions are thread-safe
 	class JobQueue
 	{
@@ -67,24 +75,27 @@ public:
 		void addJob( ThreadableJob * _job );
 
 		void run();
-		void wait();
+		void waitForJobs();
+		void waitForWorkers();
 
 	private:
 		std::atomic<ThreadableJob*> m_items[JOB_QUEUE_SIZE];
 		std::atomic_int m_writeIndex;
 		std::atomic_int m_itemsDone;
-		std::atomic<OperationMode> m_opMode;
+		OperationMode m_opMode;
 	} ;
 
 
 	AudioEngineWorkerThread( AudioEngine* audioEngine );
 	~AudioEngineWorkerThread() override;
 
+	Status status();
 	virtual void quit();
 
 	static void resetJobQueue( JobQueue::OperationMode _opMode =
 													JobQueue::OperationMode::Static )
 	{
+		globalJobQueue.waitForWorkers();
 		globalJobQueue.reset( _opMode );
 	}
 
@@ -111,9 +122,10 @@ public:
 
 private:
 	void run() override;
+	std::atomic<Status> m_status = Status::Init;
 
 	static JobQueue globalJobQueue;
-	static QWaitCondition * queueReadyWaitCond;
+	static std::condition_variable queueReadyWaitCond;
 	static QList<AudioEngineWorkerThread *> workerThreads;
 
 	volatile bool m_quit;

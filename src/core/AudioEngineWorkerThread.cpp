@@ -27,6 +27,8 @@
 #include <QDebug>
 #include <QMutex>
 #include <QWaitCondition>
+#include <atomic>
+#include <condition_variable>
 
 #include "denormals.h"
 #include "AudioEngine.h"
@@ -41,7 +43,7 @@ namespace lmms
 {
 
 AudioEngineWorkerThread::JobQueue AudioEngineWorkerThread::globalJobQueue;
-QWaitCondition * AudioEngineWorkerThread::queueReadyWaitCond = nullptr;
+std::condition_variable AudioEngineWorkerThread::queueReadyWaitCond;
 QList<AudioEngineWorkerThread *> AudioEngineWorkerThread::workerThreads;
 
 // implementation of internal JobQueue
@@ -98,7 +100,7 @@ void AudioEngineWorkerThread::JobQueue::run()
 
 
 
-void AudioEngineWorkerThread::JobQueue::wait()
+void AudioEngineWorkerThread::JobQueue::waitForJobs()
 {
 	while (m_itemsDone < m_writeIndex)
 	{
@@ -108,7 +110,11 @@ void AudioEngineWorkerThread::JobQueue::wait()
 	}
 }
 
-
+void AudioEngineWorkerThread::JobQueue::waitForWorkers()
+{
+	auto workerProcessing = [](auto worker) { return worker->m_status.load(std::memory_order_acquire) == Status::Processing; };
+	while (std::any_of(workerThreads.begin(), workerThreads.end(), workerProcessing)) {}
+}
 
 
 
@@ -118,15 +124,7 @@ AudioEngineWorkerThread::AudioEngineWorkerThread( AudioEngine* audioEngine ) :
 	QThread( audioEngine ),
 	m_quit( false )
 {
-	// initialize global static data
-	if( queueReadyWaitCond == nullptr )
-	{
-		queueReadyWaitCond = new QWaitCondition;
-	}
 
-	// keep track of all instantiated worker threads - this is used for
-	// processing the last worker thread "inline", see comments in
-	// AudioEngineWorkerThread::startAndWaitForJobs() for details
 	workerThreads << this;
 
 	resetJobQueue();
@@ -149,17 +147,17 @@ void AudioEngineWorkerThread::quit()
 	resetJobQueue();
 }
 
+AudioEngineWorkerThread::Status AudioEngineWorkerThread::status()
+{
+	return m_status.load(std::memory_order_acquire);
+}
 
 
 
 void AudioEngineWorkerThread::startAndWaitForJobs()
 {
-	queueReadyWaitCond->wakeAll();
-	// The last worker-thread is never started. Instead it's processed "inline"
-	// i.e. within the global AudioEngine thread. This way we can reduce latencies
-	// that otherwise would be caused by synchronizing with another thread.
-	globalJobQueue.run();
-	globalJobQueue.wait();
+	queueReadyWaitCond.notify_all();
+	globalJobQueue.waitForJobs();
 }
 
 
@@ -170,14 +168,16 @@ void AudioEngineWorkerThread::run()
 	MemoryManager::ThreadGuard mmThreadGuard; Q_UNUSED(mmThreadGuard);
 	disable_denormals();
 
-	QMutex m;
-	while( m_quit == false )
+	auto mutex = std::mutex{};
+	while (!m_quit)
 	{
-		m.lock();
-		queueReadyWaitCond->wait( &m );
+		auto guard = std::unique_lock{mutex};
+		m_status.store(Status::Ready, std::memory_order_release);
+		queueReadyWaitCond.wait(guard);
+		m_status.store(Status::Processing, std::memory_order_release);
 		globalJobQueue.run();
-		m.unlock();
 	}
+	m_status.store(Status::Quitting, std::memory_order_release);
 }
 
 } // namespace lmms
