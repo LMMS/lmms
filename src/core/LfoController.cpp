@@ -132,7 +132,7 @@ void LfoController::updateValueBuffer()
 				currentSample = m_sampleFunction(phase);
 			}
 		}
-		}
+	}
 
 		f = std::clamp(m_baseModel.value() + (*amountPtr * currentSample / 2.0f), 0.0f, 1.0f);
 
