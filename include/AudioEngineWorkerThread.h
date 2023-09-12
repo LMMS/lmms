@@ -47,7 +47,7 @@ class AudioEngineWorkerThread : public QThread
 {
 	Q_OBJECT
 public:
-	enum class Status
+	enum class State
 	{
 		Init,
 		Ready,
@@ -95,7 +95,7 @@ public:
 	AudioEngineWorkerThread( AudioEngine* audioEngine );
 	~AudioEngineWorkerThread() override;
 
-	Status status();
+	State state();
 	virtual void quit();
 
 	static void resetJobQueue( JobQueue::OperationMode _opMode =
@@ -128,7 +128,7 @@ public:
 
 private:
 	void run() override;
-	std::atomic<Status> m_status = Status::Init;
+	std::atomic<State> m_state = State::Init;
 
 	static JobQueue globalJobQueue;
 	static std::condition_variable queueReadyWaitCond;

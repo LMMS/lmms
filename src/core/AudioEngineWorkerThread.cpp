@@ -112,7 +112,7 @@ void AudioEngineWorkerThread::JobQueue::waitForJobs()
 
 void AudioEngineWorkerThread::JobQueue::waitForWorkers()
 {
-	auto workerProcessing = [](auto worker) { return worker->m_status.load(std::memory_order_acquire) == Status::Processing; };
+	auto workerProcessing = [](auto worker) { return worker->m_state.load(std::memory_order_acquire) == State::Processing; };
 	while (std::any_of(workerThreads.begin(), workerThreads.end(), workerProcessing)) {}
 }
 
@@ -147,9 +147,9 @@ void AudioEngineWorkerThread::quit()
 	resetJobQueue();
 }
 
-AudioEngineWorkerThread::Status AudioEngineWorkerThread::status()
+AudioEngineWorkerThread::State AudioEngineWorkerThread::state()
 {
-	return m_status.load(std::memory_order_acquire);
+	return m_state.load(std::memory_order_acquire);
 }
 
 
@@ -172,12 +172,12 @@ void AudioEngineWorkerThread::run()
 	while (!m_quit)
 	{
 		auto guard = std::unique_lock{mutex};
-		m_status.store(Status::Ready, std::memory_order_release);
+		m_state.store(State::Ready, std::memory_order_release);
 		queueReadyWaitCond.wait(guard);
-		m_status.store(Status::Processing, std::memory_order_release);
+		m_state.store(State::Processing, std::memory_order_release);
 		globalJobQueue.run();
 	}
-	m_status.store(Status::Quitting, std::memory_order_release);
+	m_state.store(State::Quitting, std::memory_order_release);
 }
 
 } // namespace lmms
