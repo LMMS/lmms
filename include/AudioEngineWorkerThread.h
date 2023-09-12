@@ -28,6 +28,7 @@
 #include <QThread>
 
 #include <atomic>
+#include <condition_variable>
 
 class QWaitCondition;
 
