@@ -1,12 +1,27 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.9)
 
+# Set the given policy to NEW. If it does not exist, it will not be set. If it
+# is already set to NEW (most likely due to predating the minimum required CMake
+# version), a developer warning is emitted indicating that the policy need no
+# longer be explicitly set.
+function(enable_policy_if_exists id)
+	if(POLICY "${id}")
+		cmake_policy(GET "${id}" current_value)
+		if(current_value STREQUAL "NEW")
+			message(AUTHOR_WARNING "${id} is now set to NEW by default, and no longer needs to be explicitly set.")
+		else()
+			cmake_policy(SET "${id}" NEW)
+		endif()
+	endif()
+endfunction()
+
+enable_policy_if_exists(CMP0141) # MSVC debug information format flags are selected by an abstraction.
+
 PROJECT(lmms)
 
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
 SET(LMMS_BINARY_DIR ${CMAKE_BINARY_DIR})
 SET(LMMS_SOURCE_DIR ${CMAKE_SOURCE_DIR})
-
-# CMAKE_POLICY Section
 
 # Import of windows.h breaks min()/max()
 ADD_DEFINITIONS(-DNOMINMAX)
