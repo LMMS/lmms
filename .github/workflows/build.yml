@@ -39,6 +39,7 @@ jobs:
           path: ~/.ccache
       - name: Configure
         run: |
+          ccache --zero-stats
           source /opt/qt5*/bin/qt5*-env.sh || true
           mkdir build && cd build
           cmake .. $CMAKE_OPTS -DCMAKE_INSTALL_PREFIX=./install
@@ -111,6 +112,7 @@ jobs:
           HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
       - name: Configure
         run: |
+          ccache --zero-stats
           mkdir build
           cmake -S . \
                 -B build \
@@ -186,6 +188,7 @@ jobs:
           path: ~/.ccache
       - name: Configure
         run: |
+          ccache --zero-stats
           mkdir build && cd build
           ../cmake/build_win${{ matrix.arch }}.sh
       - name: Build
@@ -266,6 +269,7 @@ jobs:
           arch: ${{ matrix.arch }}
       - name: Configure
         run: |
+          ccache --zero-stats
           mkdir build -Force
           cmake -S . `
             -B build `
