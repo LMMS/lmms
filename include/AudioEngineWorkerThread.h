@@ -53,7 +53,7 @@ public:
 	{
 		Init,
 		Idle,
-		Processing,
+		Processing
 	};
 
 	// internal representation of the job queue - all functions are thread-safe
