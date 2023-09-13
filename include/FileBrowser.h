@@ -75,14 +75,16 @@ public:
 private slots:
 	void reloadTree();
 	void expandItems( QTreeWidgetItem * item=nullptr, QList<QString> expandedDirs = QList<QString>() );
-	// call with item=NULL to filter the entire tree
-	bool filterItems( const QString & filter, QTreeWidgetItem * item=nullptr );
+	bool filterAndExpandItems(const QString & filter, QTreeWidgetItem * item = nullptr);
 	void giveFocusToFilter();
 
 private:
 	void keyPressEvent( QKeyEvent * ke ) override;
 
 	void addItems( const QString & path );
+
+	void saveDirectoriesStates();
+	void restoreDirectoriesStates();
 
 	FileBrowserTreeWidget * m_fileBrowserTreeWidget;
 
@@ -99,6 +101,8 @@ private:
 	QCheckBox* m_showFactoryContent = nullptr;
 	QString m_userDir;
 	QString m_factoryDir;
+	QList<QString> m_savedExpandedDirs;
+	QString m_previousFilterValue;
 } ;
 
 
@@ -114,7 +118,6 @@ public:
 	//! This method returns a QList with paths (QString's) of all directories
 	//! that are expanded in the tree.
 	QList<QString> expandedDirs( QTreeWidgetItem * item = nullptr ) const;
-
 
 protected:
 	void contextMenuEvent( QContextMenuEvent * e ) override;
