@@ -95,7 +95,6 @@ public:
 	AudioEngineWorkerThread( AudioEngine* audioEngine );
 	~AudioEngineWorkerThread() override;
 
-	State state();
 	virtual void quit();
 
 	static void resetJobQueue( JobQueue::OperationMode _opMode =
