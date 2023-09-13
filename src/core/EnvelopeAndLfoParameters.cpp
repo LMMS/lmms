@@ -90,16 +90,17 @@ void EnvelopeAndLfoParameters::LfoInstances::remove( EnvelopeAndLfoParameters * 
 
 EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 					float _value_for_zero_amount,
-							Model * _parent ) :
+					float defaultAmount,
+					Model * _parent ) :
 	Model( _parent ),
 	m_used( false ),
 	m_predelayModel( 0.0, 0.0, 2.0, 0.001, this, tr( "Env pre-delay" ) ),
 	m_attackModel( 0.0, 0.0, 2.0, 0.001, this, tr( "Env attack" ) ),
-	m_holdModel( 0.5, 0.0, 2.0, 0.001, this, tr( "Env hold" ) ),
+	m_holdModel( 0.0, 0.0, 2.0, 0.001, this, tr( "Env hold" ) ),
 	m_decayModel( 0.5, 0.0, 2.0, 0.001, this, tr( "Env decay" ) ),
-	m_sustainModel( 0.5, 0.0, 1.0, 0.001, this, tr( "Env sustain" ) ),
+	m_sustainModel( 1.0, 0.0, 1.0, 0.001, this, tr( "Env sustain" ) ),
 	m_releaseModel( 0.1, 0.0, 2.0, 0.001, this, tr( "Env release" ) ),
-	m_amountModel( 0.0, -1.0, 1.0, 0.005, this, tr( "Env mod amount" ) ),
+	m_amountModel( defaultAmount, -1.0, 1.0, 0.005, this, tr( "Env mod amount" ) ),
 	m_valueForZeroAmount( _value_for_zero_amount ),
 	m_pahdFrames( 0 ),
 	m_rFrames( 0 ),

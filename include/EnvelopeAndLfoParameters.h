@@ -72,8 +72,8 @@ public:
 
 	} ;
 
-	EnvelopeAndLfoParameters( float _value_for_zero_amount,
-							Model * _parent );
+	EnvelopeAndLfoParameters(float _value_for_zero_amount,
+		float defaultAmount, Model * _parent );
 	~EnvelopeAndLfoParameters() override;
 
 	static inline float expKnobVal( float _val )

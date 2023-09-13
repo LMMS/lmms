@@ -66,18 +66,16 @@ InstrumentSoundShaping::InstrumentSoundShaping(
 	m_filterCutModel( 14000.0, 1.0, 14000.0, 1.0, this, tr( "Cutoff frequency" ) ),
 	m_filterResModel( 0.5, BasicFilters<>::minQ(), 10.0, 0.01, this, tr( "Q/Resonance" ) )
 {
-	for( int i = 0; i < NumTargets; ++i )
+	for(int i = 0; i < NumTargets; ++i)
 	{
-		float value_for_zero_amount = 0.0;
-		if( static_cast<Target>(i) == Target::Volume )
-		{
-			value_for_zero_amount = 1.0;
-		}
+		bool const isVolumeTarget = static_cast<Target>(i) == Target::Volume;
+		
 		m_envLfoParameters[i] = new EnvelopeAndLfoParameters(
-										value_for_zero_amount, 
-										this );
-		m_envLfoParameters[i]->setDisplayName(
-			tr( targetNames[i][2] ) );
+			isVolumeTarget ? 1.0 : 0.0, // Value for zero amount
+			isVolumeTarget ? 1.0 : 0.0, // Default amount
+			this);
+
+		m_envLfoParameters[i]->setDisplayName(tr(targetNames[i][2]));
 	}
 
 	m_filterModel.addItem( tr( "Low-pass" ), std::make_unique<PixmapLoader>( "filter_lp" ) );
