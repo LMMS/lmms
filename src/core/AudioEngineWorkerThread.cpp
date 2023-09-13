@@ -100,7 +100,7 @@ void AudioEngineWorkerThread::JobQueue::run()
 
 
 
-void AudioEngineWorkerThread::JobQueue::waitForJobs()
+void AudioEngineWorkerThread::JobQueue::wait()
 {
 	auto workerProcessing = [](auto worker) { return worker->m_state == State::Processing; };
 	auto noWorkersProcessing = [&] { return std::none_of(workerThreads.begin(), workerThreads.end(), workerProcessing); };
@@ -156,7 +156,7 @@ void AudioEngineWorkerThread::startAndWaitForJobs()
 	}
 
 	startCond.notify_all();
-	globalJobQueue.waitForJobs();
+	globalJobQueue.wait();
 }
 
 

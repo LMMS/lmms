@@ -82,7 +82,7 @@ public:
 		void addJob( ThreadableJob * _job );
 
 		void run();
-		void waitForJobs();
+		void wait();
 
 	private:
 		std::atomic<ThreadableJob*> m_items[JOB_QUEUE_SIZE];
