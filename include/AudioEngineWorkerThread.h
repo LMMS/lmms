@@ -31,8 +31,10 @@
 
 #ifdef __MINGW32__
 	#include <mingw.condition_variable.h>
+	#include <mingw.shared_mutex.h>
 #else
 	#include <condition_variable>
+	#include <shared_mutex>
 #endif
 
 class QWaitCondition;
@@ -50,9 +52,8 @@ public:
 	enum class State
 	{
 		Init,
-		Ready,
+		Idle,
 		Processing,
-		Quitting
 	};
 
 	// internal representation of the job queue - all functions are thread-safe
@@ -82,7 +83,6 @@ public:
 
 		void run();
 		void waitForJobs();
-		void waitForWorkers();
 
 	private:
 		std::atomic<ThreadableJob*> m_items[JOB_QUEUE_SIZE];
@@ -101,7 +101,6 @@ public:
 	static void resetJobQueue( JobQueue::OperationMode _opMode =
 													JobQueue::OperationMode::Static )
 	{
-		globalJobQueue.waitForWorkers();
 		globalJobQueue.reset( _opMode );
 	}
 
@@ -128,10 +127,11 @@ public:
 
 private:
 	void run() override;
-	std::atomic<State> m_state = State::Init;
+	State m_state = State::Init;
 
 	static JobQueue globalJobQueue;
-	static std::condition_variable queueReadyWaitCond;
+	static std::condition_variable_any startCond, endCond;
+	static std::shared_mutex startMutex, endMutex;
 	static QList<AudioEngineWorkerThread *> workerThreads;
 
 	volatile bool m_quit;

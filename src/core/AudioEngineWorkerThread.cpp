@@ -25,10 +25,9 @@
 #include "AudioEngineWorkerThread.h"
 
 #include <QDebug>
-#include <QMutex>
 #include <QWaitCondition>
-#include <atomic>
-#include <condition_variable>
+#include <algorithm>
+#include <cassert>
 
 #include "denormals.h"
 #include "AudioEngine.h"
@@ -43,7 +42,8 @@ namespace lmms
 {
 
 AudioEngineWorkerThread::JobQueue AudioEngineWorkerThread::globalJobQueue;
-std::condition_variable AudioEngineWorkerThread::queueReadyWaitCond;
+std::condition_variable_any AudioEngineWorkerThread::startCond, AudioEngineWorkerThread::endCond;
+std::shared_mutex AudioEngineWorkerThread::startMutex, AudioEngineWorkerThread::endMutex;
 QList<AudioEngineWorkerThread *> AudioEngineWorkerThread::workerThreads;
 
 // implementation of internal JobQueue
@@ -102,18 +102,11 @@ void AudioEngineWorkerThread::JobQueue::run()
 
 void AudioEngineWorkerThread::JobQueue::waitForJobs()
 {
-	while (m_itemsDone < m_writeIndex)
-	{
-#ifdef __SSE__
-		_mm_pause();
-#endif
-	}
-}
-
-void AudioEngineWorkerThread::JobQueue::waitForWorkers()
-{
-	auto workerProcessing = [](auto worker) { return worker->m_state.load(std::memory_order_acquire) == State::Processing; };
-	while (std::any_of(workerThreads.begin(), workerThreads.end(), workerProcessing)) {}
+	auto workerProcessing = [](auto worker) { return worker->m_state == State::Processing; };
+	auto noWorkersProcessing = [&] { return std::none_of(workerThreads.begin(), workerThreads.end(), workerProcessing); };
+	auto lock = std::unique_lock{endMutex};
+	endCond.wait(lock, noWorkersProcessing);
+	assert(m_itemsDone >= m_writeIndex);
 }
 
 
@@ -147,16 +140,22 @@ void AudioEngineWorkerThread::quit()
 	resetJobQueue();
 }
 
-AudioEngineWorkerThread::State AudioEngineWorkerThread::state()
-{
-	return m_state.load(std::memory_order_acquire);
-}
-
 
 
 void AudioEngineWorkerThread::startAndWaitForJobs()
 {
-	queueReadyWaitCond.notify_all();
+	{
+		auto lock = std::unique_lock{startMutex};
+		for (auto& worker : workerThreads)
+		{
+			if (worker->m_state == State::Idle)
+			{
+				worker->m_state = State::Processing;
+			}
+		}
+	}
+
+	startCond.notify_all();
 	globalJobQueue.waitForJobs();
 }
 
@@ -168,16 +167,21 @@ void AudioEngineWorkerThread::run()
 	MemoryManager::ThreadGuard mmThreadGuard; Q_UNUSED(mmThreadGuard);
 	disable_denormals();
 
-	auto mutex = std::mutex{};
+	m_state = State::Idle;
 	while (!m_quit)
 	{
-		auto guard = std::unique_lock{mutex};
-		m_state.store(State::Ready, std::memory_order_release);
-		queueReadyWaitCond.wait(guard);
-		m_state.store(State::Processing, std::memory_order_release);
+		{
+			auto lock = std::shared_lock{startMutex};
+			startCond.wait(lock, [this] { return m_state == State::Processing; });
+		}
 		globalJobQueue.run();
+
+		{
+			auto lock = std::shared_lock{endMutex};
+			m_state = State::Idle;
+		}
+		endCond.notify_one();
 	}
-	m_state.store(State::Quitting, std::memory_order_release);
 }
 
 } // namespace lmms
