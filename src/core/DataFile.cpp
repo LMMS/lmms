@@ -670,6 +670,11 @@ void DataFile::renameAttribute( const QDomNodeList& elements, const QString& old
  *        iteration process so numerous devs with disperate experience and
  *        styles have a unified way to handle upgrade routines without all of
  *        the iteration mess seen previously.
+ * @param elements The list of nodes to process.
+ * @param callback A lambda that implements the specifics of the upgrade.
+ *        Usually just [](QDomElement& item){...} but "this" can be captured
+ *        to use other member functions such as renameAttributes within the
+ *        lambda like so: [this](QDomElement& item){ renameAttributes(...); }
  */
 void DataFile::processElements( const QDomNodeList& elements, std::function<void(QDomElement&)> callback )
 {
@@ -1736,6 +1741,8 @@ void DataFile::upgrade_defaultTripleOscillatorHQ()
 	processElements( triposcs, [](QDomElement& item) {
 		for (int j = 0; j < 3; ++j)
 		{
+			// Only set the attribute if it does not exist
+			// (default template has it but reports as 1.2.0)
 			QString wavtnum = "useWaveTable" + QString::number(j+1);
 			if (item.attribute(wavtnum) == "")
 			{
