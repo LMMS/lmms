@@ -29,7 +29,6 @@
 #include <algorithm>
 #include <cmath>
 #include <map>
-#include <functional>
 
 #include <QDebug>
 #include <QFile>
@@ -655,34 +654,6 @@ void DataFile::renameAttribute( const QDomNodeList& elements, const QString& old
 		// make before break
 		item.setAttribute(newName, item.attribute(oldName));
 		item.removeAttribute(oldName);
-	}
-}
-
-
-/**
- * @brief A generic functional iterator wrapper that allows each upgrade
- *        process, which is fairly unique, to operate on a single element
- *        without error prone copy pasta.
- *        Qt6 does not provide .begin() or .end() for use with standard iterator
- *        classes or a foreach loops.
- *        Additionally, it's not clear whether Null nodes can show up anywhere
- *        other than the end of a list, so this function encapsulates the
- *        iteration process so numerous devs with disperate experience and
- *        styles have a unified way to handle upgrade routines without all of
- *        the iteration mess seen previously.
- * @param elements The list of nodes to process.
- * @param callback A lambda that implements the specifics of the upgrade.
- *        Usually just [](QDomElement& item){...} but "this" can be captured
- *        to use other member functions such as renameAttributes within the
- *        lambda like so: [this](QDomElement& item){ renameAttributes(...); }
- */
-void DataFile::processElements( const QDomNodeList& elements, std::function<void(QDomElement&)> callback )
-{
-	for (int i = 0; i < elements.length(); ++i)
-	{
-		QDomElement item = elements.item(i).toElement();
-		if (item.isNull()) { continue; }
-		callback(item);
 	}
 }
 
@@ -1737,19 +1708,18 @@ void DataFile::upgrade_extendedNoteRange()
  */
 void DataFile::upgrade_defaultTripleOscillatorHQ()
 {
-	QDomNodeList triposcs = elementsByTagName("tripleoscillator");
-	processElements( triposcs, [](QDomElement& item) {
-		for (int j = 0; j < 3; ++j)
+	QDomNodeList tripleoscillators = elementsByTagName("tripleoscillator");
+	for (int i = 0; !tripleoscillators.item(i).isNull(); i++)
+	{
+		for (int j = 1; j <= 3; j++)
 		{
-			// Only set the attribute if it does not exist
-			// (default template has it but reports as 1.2.0)
-			QString wavtnum = "useWaveTable" + QString::number(j+1);
-			if (item.attribute(wavtnum) == "")
+			// Only set the attribute if it does not exist (default template has it but reports as 1.2.0)
+			if (tripleoscillators.item(i).toElement().attribute("useWaveTable" + QString::number(j)) == "")
 			{
-				item.setAttribute(wavtnum, 0);
+				tripleoscillators.item(i).toElement().setAttribute("useWaveTable" + QString::number(j), 0);
 			}
 		}
-	});
+	}
 }
 
 
@@ -1758,19 +1728,58 @@ void DataFile::upgrade_mixerRename()
 {
 	// Change nodename <fxmixer> to <mixer>
 	QDomNodeList fxmixer = elementsByTagName("fxmixer");
-	renameElements( fxmixer, "mixer" );
+	for (int i = 0; i < fxmixer.length(); ++i)
+	{
+		auto item = fxmixer.item(i).toElement();
+		if (item.isNull())
+		{
+			continue;
+		}
+		item.setTagName("mixer");
+	}
 
 	// Change nodename <fxchannel> to <mixerchannel>
 	QDomNodeList fxchannel = elementsByTagName("fxchannel");
-	renameElements( fxchannel, "mixerchannel" );
+	for (int i = 0; i < fxchannel.length(); ++i)
+	{
+		auto item = fxchannel.item(i).toElement();
+		if (item.isNull())
+		{
+			continue;
+		}
+		item.setTagName("mixerchannel");
+	}
 
 	// Change the attribute fxch of element <instrumenttrack> to mixch
 	QDomNodeList fxch = elementsByTagName("instrumenttrack");
-	renameAttribute( fxch, "fxch", "mixch" );
-
+	for (int i = 0; i < fxch.length(); ++i)
+	{
+		auto item = fxch.item(i).toElement();
+		if (item.isNull())
+		{
+			continue;
+		}
+		if (item.hasAttribute("fxch"))
+		{
+			item.setAttribute("mixch", item.attribute("fxch"));
+			item.removeAttribute("fxch");
+		}
+	}
 	// Change the attribute fxch of element <sampletrack> to mixch
 	fxch = elementsByTagName("sampletrack");
-	renameAttribute( fxch, "fxch", "mixch" );
+	for (int i = 0; i < fxch.length(); ++i)
+	{
+		auto item = fxch.item(i).toElement();
+		if (item.isNull())
+		{
+			continue;
+		}
+		if (item.hasAttribute("fxch"))
+		{
+			item.setAttribute("mixch", item.attribute("fxch"));
+			item.removeAttribute("fxch");
+		}
+	}
 }
 
 

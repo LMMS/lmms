@@ -106,8 +106,6 @@ private:
 	void renameElements( const QDomNodeList& elements, const QString& newTagName);
 	void renameAttribute( const QDomNodeList& elements, const QString& oldName, const QString& newName);
 
-	void processElements( const QDomNodeList& elements, std::function<void(QDomElement&)> callback );
-
 	// helper upgrade routines
 	void upgrade_0_2_1_20070501();
 	void upgrade_0_2_1_20070508();
