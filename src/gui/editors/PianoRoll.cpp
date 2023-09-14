@@ -130,7 +130,7 @@ QPixmap* PianoRoll::s_toolKnife = nullptr;
 
 SimpleTextFloat * PianoRoll::s_textFloat = nullptr;
 
-static std::array<QString, 12> s_noteStrings {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+static std::array<QString, 12> s_noteStrings {"C", "C# / D\u266D", "D", "D# / E\u266D", "E", "F", "F# / G\u266D", "G", "G# / A\u266D", "A", "A# / B\u266D", "B"};
 
 static QString getNoteString(int key)
 {
