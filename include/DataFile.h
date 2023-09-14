@@ -27,6 +27,7 @@
 #define LMMS_DATA_FILE_H
 
 #include <map>
+#include <functional>
 #include <QDomDocument>
 
 #include "lmms_export.h"
@@ -101,6 +102,11 @@ private:
 	static QString typeName( Type type );
 
 	void cleanMetaNodes( QDomElement de );
+
+	void renameElements( const QDomNodeList& elements, const QString& newTagName);
+	void renameAttribute( const QDomNodeList& elements, const QString& oldName, const QString& newName);
+
+	void processElements( const QDomNodeList& elements, std::function<void(QDomElement&)> callback );
 
 	// helper upgrade routines
 	void upgrade_0_2_1_20070501();
