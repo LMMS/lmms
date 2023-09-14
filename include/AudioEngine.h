@@ -473,7 +473,7 @@ private:
 
 	bool m_metronomeActive;
 
-	std::atomic<bool> m_clearSignal;
+	bool m_clearSignal;
 
 	bool m_changesSignal;
 	unsigned int m_changes;

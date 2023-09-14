@@ -78,8 +78,8 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	m_inputBufferWrite( 1 ),
 	m_outputBufferRead(nullptr),
 	m_outputBufferWrite(nullptr),
-	m_workers(QThread::idealThreadCount()),
-	m_numWorkers(QThread::idealThreadCount()),
+	m_workers(),
+	m_numWorkers( QThread::idealThreadCount()-1 ),
 	m_newPlayHandles( PlayHandle::MaxNumber ),
 	m_qualitySettings( qualitySettings::Mode::Draft ),
 	m_masterGain( 1.0f ),
@@ -146,10 +146,14 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	BufferManager::clear(m_outputBufferRead, m_framesPerPeriod);
 	BufferManager::clear(m_outputBufferWrite, m_framesPerPeriod);
 
-	for (auto& worker : m_workers)
+	for( int i = 0; i < m_numWorkers+1; ++i )
 	{
-		worker = new AudioEngineWorkerThread{this};
-		worker->start(QThread::TimeCriticalPriority);
+		auto wt = new AudioEngineWorkerThread(this);
+		if( i < m_numWorkers )
+		{
+			wt->start( QThread::TimeCriticalPriority );
+		}
+		m_workers.push_back( wt );
 	}
 }
 

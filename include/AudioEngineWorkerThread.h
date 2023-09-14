@@ -29,14 +29,6 @@
 
 #include <atomic>
 
-#ifdef __MINGW32__
-	#include <mingw.condition_variable.h>
-	#include <mingw.shared_mutex.h>
-#else
-	#include <condition_variable>
-	#include <shared_mutex>
-#endif
-
 class QWaitCondition;
 
 namespace lmms
@@ -49,13 +41,6 @@ class AudioEngineWorkerThread : public QThread
 {
 	Q_OBJECT
 public:
-	enum class State
-	{
-		Init,
-		Idle,
-		Processing
-	};
-
 	// internal representation of the job queue - all functions are thread-safe
 	class JobQueue
 	{
@@ -126,11 +111,9 @@ public:
 
 private:
 	void run() override;
-	State m_state = State::Init;
 
 	static JobQueue globalJobQueue;
-	static std::condition_variable_any startCond, endCond;
-	static std::shared_mutex startMutex, endMutex;
+	static QWaitCondition * queueReadyWaitCond;
 	static QList<AudioEngineWorkerThread *> workerThreads;
 
 	volatile bool m_quit;
