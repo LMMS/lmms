@@ -429,8 +429,6 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 			_working_buffer[frame+offset][ch] = s;
 		}
 	}
-
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
 }
 
 

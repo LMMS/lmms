@@ -233,8 +233,6 @@ void Xpressive::playNote(NotePlayHandle* nph, sampleFrame* working_buffer) {
 	const f_cnt_t offset = nph->noteOffset();
 
 	ps->renderOutput(frames, working_buffer + offset);
-
-	instrumentTrack()->processAudioBuffer(working_buffer, frames + offset, nph);
 }
 
 void Xpressive::deleteNotePluginData(NotePlayHandle* nph) {

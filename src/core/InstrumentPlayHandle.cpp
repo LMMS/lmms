@@ -24,7 +24,10 @@
 
 
 #include "InstrumentPlayHandle.h"
+#include "Instrument.h"
 #include "InstrumentTrack.h"
+#include "Engine.h"
+#include "AudioEngine.h"
 
 namespace lmms
 {
@@ -35,6 +38,42 @@ InstrumentPlayHandle::InstrumentPlayHandle( Instrument * instrument, InstrumentT
 		m_instrument( instrument )
 {
 	setAudioPort( instrumentTrack->audioPort() );
+}
+
+void InstrumentPlayHandle::play( sampleFrame * _working_buffer )
+{
+	InstrumentTrack * instrumentTrack = m_instrument->instrumentTrack();
+
+	// ensure that all our nph's have been processed first
+	ConstNotePlayHandleList nphv = NotePlayHandle::nphsOfInstrumentTrack(instrumentTrack, true );
+	
+	bool nphsLeft;
+	do
+	{
+		nphsLeft = false;
+		for( const NotePlayHandle * constNotePlayHandle : nphv )
+		{
+			NotePlayHandle * notePlayHandle = const_cast<NotePlayHandle *>( constNotePlayHandle );
+			if( notePlayHandle->state() != ThreadableJob::ProcessingState::Done &&
+				!notePlayHandle->isFinished())
+			{
+				nphsLeft = true;
+				notePlayHandle->process();
+			}
+		}
+	}
+	while( nphsLeft );
+	
+	m_instrument->play( _working_buffer );
+
+	// Process the audio buffer that the instrument has just worked on...
+	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
+	instrumentTrack->processAudioBuffer(_working_buffer, frames, nullptr);
+}
+
+bool InstrumentPlayHandle::isFromTrack( const Track* _track ) const
+{
+	return m_instrument->isFromTrack( _track );
 }
 
 

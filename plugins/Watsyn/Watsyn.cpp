@@ -445,8 +445,6 @@ void WatsynInstrument::playNote( NotePlayHandle * _n,
 	}
 
 	applyRelease( _working_buffer, _n );
-
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
 }
 
 

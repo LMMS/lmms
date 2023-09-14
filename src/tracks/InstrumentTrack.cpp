@@ -579,6 +579,13 @@ void InstrumentTrack::playNote( NotePlayHandle* n, sampleFrame* workingBuffer )
 	{
 		// all is done, so now lets play the note!
 		m_instrument->playNote( n, workingBuffer );
+
+		if (workingBuffer != nullptr)
+		{
+			const fpp_t frames = n->framesLeftForCurrentPeriod();
+			const f_cnt_t offset = n->noteOffset();
+			this->processAudioBuffer(workingBuffer, frames + offset, n);
+		}
 	}
 }
 

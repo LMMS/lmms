@@ -480,9 +480,6 @@ void SfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffe
 	delete[] pitchedBuffer;
 
 	applyRelease( _working_buffer, _n );
-
-	instrumentTrack()->processAudioBuffer( _working_buffer, frameNum + offset, _n );
-
 }
 
 

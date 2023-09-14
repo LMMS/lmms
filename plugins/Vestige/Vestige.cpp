@@ -409,8 +409,6 @@ void VestigeInstrument::play( sampleFrame * _buf )
 
 	m_plugin->process( nullptr, _buf );
 
-	instrumentTrack()->processAudioBuffer( _buf, frames, nullptr );
-
 	m_pluginMutex.unlock();
 }
 

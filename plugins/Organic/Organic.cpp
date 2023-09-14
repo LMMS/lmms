@@ -312,8 +312,6 @@ void OrganicInstrument::playNote( NotePlayHandle * _n,
 	}
 
 	// -- --
-
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
 }
 
 
