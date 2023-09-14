@@ -634,7 +634,7 @@ void DataFile::cleanMetaNodes( QDomElement _de )
 }
 
 
-void DataFile::renameElements( const QDomNodeList& elements, const QString& newTagName)
+void DataFile::renameElements( QDomNodeList& elements, const QString newTagName)
 {
 	for (int i = 0; i < elements.length(); ++i)
 	{
@@ -645,7 +645,7 @@ void DataFile::renameElements( const QDomNodeList& elements, const QString& newT
 }
 
 
-void DataFile::renameAttribute( const QDomNodeList& elements, const QString& oldName, const QString& newName)
+void DataFile::renameAttribute( QDomNodeList& elements, const QString oldName, const QString newName)
 {
 	for (int i = 0; i < elements.length(); ++i)
 	{
