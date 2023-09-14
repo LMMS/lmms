@@ -1728,58 +1728,19 @@ void DataFile::upgrade_mixerRename()
 {
 	// Change nodename <fxmixer> to <mixer>
 	QDomNodeList fxmixer = elementsByTagName("fxmixer");
-	for (int i = 0; i < fxmixer.length(); ++i)
-	{
-		auto item = fxmixer.item(i).toElement();
-		if (item.isNull())
-		{
-			continue;
-		}
-		item.setTagName("mixer");
-	}
+	renameElements(fxmixer, "mixer");
 
 	// Change nodename <fxchannel> to <mixerchannel>
 	QDomNodeList fxchannel = elementsByTagName("fxchannel");
-	for (int i = 0; i < fxchannel.length(); ++i)
-	{
-		auto item = fxchannel.item(i).toElement();
-		if (item.isNull())
-		{
-			continue;
-		}
-		item.setTagName("mixerchannel");
-	}
+	renameElements(fxchannel, "mixerchannel");
 
 	// Change the attribute fxch of element <instrumenttrack> to mixch
 	QDomNodeList fxch = elementsByTagName("instrumenttrack");
-	for (int i = 0; i < fxch.length(); ++i)
-	{
-		auto item = fxch.item(i).toElement();
-		if (item.isNull())
-		{
-			continue;
-		}
-		if (item.hasAttribute("fxch"))
-		{
-			item.setAttribute("mixch", item.attribute("fxch"));
-			item.removeAttribute("fxch");
-		}
-	}
+	renameAttribute(fxch, "fxch", "mixch");
+
 	// Change the attribute fxch of element <sampletrack> to mixch
 	fxch = elementsByTagName("sampletrack");
-	for (int i = 0; i < fxch.length(); ++i)
-	{
-		auto item = fxch.item(i).toElement();
-		if (item.isNull())
-		{
-			continue;
-		}
-		if (item.hasAttribute("fxch"))
-		{
-			item.setAttribute("mixch", item.attribute("fxch"));
-			item.removeAttribute("fxch");
-		}
-	}
+	renameAttribute(fxch, "fxch", "mixch");
 }
 
 

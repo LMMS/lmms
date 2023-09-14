@@ -27,7 +27,6 @@
 #define LMMS_DATA_FILE_H
 
 #include <map>
-#include <functional>
 #include <QDomDocument>
 
 #include "lmms_export.h"
