@@ -1297,36 +1297,30 @@ QDebug operator<<(QDebug dbg, const QDomNode& node)
 
 void DataFile::upgrade_1_3_0()
 {
-	QDomNodeList list = elementsByTagName( "instrument" );
-	for( int i = 0; !list.item( i ).isNull(); ++i )
+	QDomNodeList elements = elementsByTagName( "instrument" );
+	for (int i = 0; i < elements.length(); ++i)
 	{
-		QDomElement el = list.item( i ).toElement();
-		if( el.attribute( "name" ) == "papu" )
+		QDomElement el = elements.item(i).toElement();
+		if (el.isNull()) { continue; }
+		if (el.attribute("name") == "papu")
 		{
-			el.setAttribute( "name", "freeboy" );
-			QDomNodeList children = el.elementsByTagName( "papu" );
-			for( int j = 0; !children.item( j ).isNull(); ++j )
-			{
-				QDomElement child = children.item( j ).toElement();
-				child.setTagName( "freeboy" );
-			}
+			el.setAttribute("name", "freeboy");
+			QDomNodeList children = el.elementsByTagName("papu");
+			renameElements(children, "freeboy");
 		}
-		else if( el.attribute( "name" ) == "OPL2" )
+		else if (el.attribute( "name" ) == "OPL2")
 		{
-			el.setAttribute( "name", "opulenz" );
-			QDomNodeList children = el.elementsByTagName( "OPL2" );
-			for( int j = 0; !children.item( j ).isNull(); ++j )
-			{
-				QDomElement child = children.item( j ).toElement();
-				child.setTagName( "opulenz" );
-			}
+			el.setAttribute("name", "opulenz");
+			QDomNodeList children = el.elementsByTagName("OPL2");
+			renameElements(children, "opulenz");
 		}
 	}
 
-	list = elementsByTagName( "effect" );
-	for( int i = 0; !list.item( i ).isNull(); ++i )
+	elements = elementsByTagName( "effect" );
+	for (int i = 0; i < elements.length(); ++i)
 	{
-		QDomElement effect = list.item( i ).toElement();
+		QDomElement effect = elements.item(i).toElement();
+		if (effect.isNull()) { continue; }
 		if( effect.attribute( "name" ) == "ladspaeffect" )
 		{
 			QDomNodeList keys = effect.elementsByTagName( "key" );
@@ -1759,16 +1753,14 @@ void DataFile::upgrade_bbTcoRename()
 	for (auto name : names)
 	{
 		QDomNodeList elements = elementsByTagName(name.first);
-		for (int i = 0; !elements.item(i).isNull(); ++i)
-		{
-			elements.item(i).toElement().setTagName(name.second);
-		}
+		renameElements(elements, name.second);
 	}
 	// Replace "Beat/Bassline" with "Pattern" in track names
 	QDomNodeList elements = elementsByTagName("track");
-	for (int i = 0; !elements.item(i).isNull(); ++i)
+	for (int i = 0; i < elements.length(); ++i)
 	{
 		auto e = elements.item(i).toElement();
+		if (e.isNull()) { continue; }
 		static_assert(Track::Type::Pattern == static_cast<Track::Type>(1), "Must be type=1 for backwards compatibility");
 		if (static_cast<Track::Type>(e.attribute("type").toInt()) == Track::Type::Pattern)
 		{
