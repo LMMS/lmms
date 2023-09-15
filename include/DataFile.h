@@ -103,7 +103,7 @@ private:
 	void cleanMetaNodes( QDomElement de );
 
 	void renameElements(QDomNodeList& elements, const QString newTagName);
-	void renameAttribute( QDomNodeList& elements, const QString oldName, const QString newName);
+	void renameAttribute(QDomNodeList& elements, const QString oldName, const QString newName);
 
 	// helper upgrade routines
 	void upgrade_0_2_1_20070501();
