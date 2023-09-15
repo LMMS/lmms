@@ -1720,7 +1720,6 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 			// will be our iterator in the following loop
 			auto it = notes.end();
-			if (!notes.empty()){ auto it = notes.begin() + notes.size() - 1; }
 
 			// loop through whole note-vector...
 			for( int i = 0; i < notes.size(); ++i )
