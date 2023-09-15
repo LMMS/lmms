@@ -294,7 +294,6 @@ void WaveForm::paintEvent( QPaintEvent * pe)
     p.drawPixmap(0, 0 ,m_seekerWaveform);
     p.drawPixmap(0, 0, m_seeker);
     p.drawPixmap(0, m_height*0.3f + m_margin, m_sliceEditor);
-
 }
 } // namespace gui
 } // namespace lmms

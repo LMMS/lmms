@@ -42,19 +42,27 @@ namespace lmms
 // small helper class, since SampleBuffer is inadequate (not thread safe, no dinamic startpoint)
 class PlaybackBuffer {
 	public:
+		QMutex dataLock;
 		std::vector<sampleFrame> mainBuffer;
 
-		int frames() { return mainBuffer.size(); };
-		sampleFrame * data() { return mainBuffer.data(); };
-
+		int frames() { return mainBuffer.size(); }; // not thread safe yet, but shouldnt be a big issue
+		sampleFrame * data() {  return mainBuffer.data(); };
+		void copyFrames(sampleFrame * outData, int start, int framesToCopy) {
+			dataLock.lock();
+			memcpy(outData, mainBuffer.data() + start, framesToCopy * sizeof(sampleFrame));
+			dataLock.unlock();
+		}
 		void setData(const sampleFrame * data, int newFrames)
 		{
+			dataLock.lock();
 			mainBuffer = {};
 			mainBuffer.resize(newFrames);
 			memcpy(mainBuffer.data(), data, newFrames * sizeof(sampleFrame));
+			dataLock.unlock();
 		};
 		void setData(std::vector<float> & leftData, std::vector<float> & rightData)
 		{
+			dataLock.lock();
 			int newFrames = std::min(leftData.size(), rightData.size());
 			mainBuffer = {};
 			mainBuffer.resize(newFrames);
@@ -64,6 +72,7 @@ class PlaybackBuffer {
 				mainBuffer[i][0] = leftData[i];
 				mainBuffer[i][1] = rightData[i];
 			}
+			dataLock.unlock();
 		}
 };
 
@@ -86,7 +95,6 @@ class SlicerT : public Instrument{
 
 	public slots:
 		void updateFile(QString file);
-		void updateTimeShift();
 		void updateSlices();
 
 	signals:
@@ -102,7 +110,7 @@ class SlicerT : public Instrument{
 		std::vector<int> m_slicePoints;
 
 		float m_currentSpeedRatio = 0;
-		bool m_timeshiftLock; // dont run timeshifting at the same time, instant crash
+		QMutex m_timeshiftLock; // should be unecesaty since playbackBuffer is safe
 		// std::unordered_map<int, std::vector<float> > m_fftWindowCache;
 
 		void findSlices();

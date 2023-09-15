@@ -46,43 +46,59 @@ namespace lmms
 namespace gui
 {
 
+
 SlicerTUI::SlicerTUI( SlicerT * instrument,
 					QWidget * parent ) :
 	InstrumentViewFixedSize( instrument, parent ),
 	m_slicerTParent(instrument),
-	m_backgroundImage(PLUGIN_NAME::getIconPixmap(
-								"artwork" )),
-	m_noteThresholdKnob(KnobType::Dark28, this),
-	m_fadeOutKnob(KnobType::Dark28, this),
+	m_noteThresholdKnob(this),
+	m_fadeOutKnob(this),
 	m_bpmBox(3, "19green", this),
-	m_resetButton(embed::getIconPixmap("reload"), QString(), this),
-	m_midiExportButton(embed::getIconPixmap("midi_tab"), QString(), this),
+	m_resetButton(this, nullptr),
+	m_midiExportButton(this, nullptr),
 	m_wf(244, 125, instrument, this)
 {
 	setAcceptDrops( true );
+	setAutoFillBackground( true );
+
+	QPalette pal;
+	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
+	pal.setColor(QPalette::All, QPalette::ColorRole::Foreground, Qt::red);
+	pal.setColor(QPalette::All, QPalette::ColorRole::Button, Qt::red);
+	pal.setColor(QPalette::All, QPalette::ColorRole::Base, Qt::red);
+	pal.setColor(QPalette::All, QPalette::ColorRole::Highlight, Qt::red);
+	setPalette( pal );
 
 	m_wf.move(3, 5);
 
-	m_bpmBox.move(2, 150);
+	m_bpmBox.move(7, 153);
 	m_bpmBox.setToolTip(tr("Original sample BPM"));
 	m_bpmBox.setLabel(tr("BPM"));
 	m_bpmBox.setModel(&m_slicerTParent->m_originalBPM);
 
-	m_fadeOutKnob.move(200, 150);
+	m_noteThresholdKnob.move(7, 200);
+	m_noteThresholdKnob.setToolTip(tr("Threshold used for slicing"));
+	// m_noteThresholdKnob.setLabel(tr("Threshold"));
+	m_noteThresholdKnob.setModel(&m_slicerTParent->m_noteThreshold);
+
+	m_fadeOutKnob.move(200, 200);
 	m_fadeOutKnob.setToolTip(tr("FadeOut for notes"));
-	m_fadeOutKnob.setLabel(tr("FadeOut"));
+	// m_fadeOutKnob.setLabel(tr("FadeOut"));
 	m_fadeOutKnob.setModel(&m_slicerTParent->m_fadeOutFrames);
 
-	m_midiExportButton.move(150, 200);
+	m_midiExportButton.move(145, 198);
+	m_midiExportButton.setActiveGraphic(
+						PLUGIN_NAME::getIconPixmap( "CopyMidiBtn" ) );
+	m_midiExportButton.setInactiveGraphic(
+						PLUGIN_NAME::getIconPixmap( "CopyMidiBtn" ) );
 	m_midiExportButton.setToolTip(tr("Copy midi pattern to clipboard"));
 	connect(&m_midiExportButton, SIGNAL( clicked() ), this, SLOT( exportMidi() ));
 
-	m_noteThresholdKnob.move(7, 200);
-	m_noteThresholdKnob.setToolTip(tr("Threshold used for slicing"));
-	m_noteThresholdKnob.setLabel(tr("Threshold"));
-	m_noteThresholdKnob.setModel(&m_slicerTParent->m_noteThreshold);
-
-	m_resetButton.move(70, 200);
+	m_resetButton.move(80, 198);
+	m_resetButton.setActiveGraphic(
+						PLUGIN_NAME::getIconPixmap( "ResetBtn" ) );
+	m_resetButton.setInactiveGraphic(
+						PLUGIN_NAME::getIconPixmap( "ResetBtn" ) );
 	m_resetButton.setToolTip(tr("Reset Slices"));
 	connect(&m_resetButton, SIGNAL( clicked() ), m_slicerTParent, SLOT( updateSlices() ));
 }
@@ -97,6 +113,7 @@ void SlicerTUI::exportMidi()
 	dataFile.content().appendChild( note_list );
 
 	std::vector<Note> notes;
+	m_slicerTParent->timeShiftSample();
 	m_slicerTParent->writeToMidi(&notes);
 	if (notes.size() == 0)
 	{
@@ -169,8 +186,6 @@ void SlicerTUI::dropEvent( QDropEvent * de )
 
 void SlicerTUI::paintEvent(QPaintEvent * pe)
 {
-	QPainter p( this );
-	p.drawPixmap(0, 0, m_backgroundImage);
 }
 
 } // namespace gui

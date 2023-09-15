@@ -103,8 +103,9 @@ void SlicerT::playNote( NotePlayHandle * handle, sampleFrame * workingBuffer )
 
 	if( noteFramesLeft > 0)
 	{
-		int bufferSize = frames * BYTES_PER_FRAME;
-		memcpy(workingBuffer + offset, m_timeShiftedSample.data() + currentNoteFrame, bufferSize);
+		// int bufferSize = frames * BYTES_PER_FRAME;
+		int framesToCopy = std::min((int)frames, noteFramesLeft);
+		m_timeShiftedSample.copyFrames(workingBuffer + offset, currentNoteFrame, framesToCopy);
 
 		// exponential fade out, applyRelease kinda sucks
 		if (noteFramesLeft < m_fadeOutFrames.value())
@@ -129,7 +130,7 @@ void SlicerT::playNote( NotePlayHandle * handle, sampleFrame * workingBuffer )
 		float abslouteEndNote = (float)sliceEnd / totalFrames;
 		emit isPlaying(absoluteCurrentNote, absoluteStartNote, abslouteEndNote);
 	} else {
-		emit isPlaying(0, 0, 0);
+		emit isPlaying(-1, 0, 0);
 	}
 }
 
@@ -213,10 +214,7 @@ void SlicerT::timeShiftSample()
 	using std::vector;
 	// initial checks
 	if (m_originalSample.frames() < 2048) { return; }
-
-	if (m_timeshiftLock) { return; }
-	m_timeshiftLock = true;
-
+	m_timeshiftLock.lock();
 
 	// original sample data
 	float sampleRate = m_originalSample.sampleRate();
@@ -230,7 +228,7 @@ void SlicerT::timeShiftSample()
 	if (targetBPM == m_originalBPM.value())
 	{
 		m_timeShiftedSample.setData(m_originalSample.data(), m_originalSample.frames());
-		m_timeshiftLock = false;
+		m_timeshiftLock.unlock();
 		return;
 	}
 
@@ -256,7 +254,7 @@ void SlicerT::timeShiftSample()
 	// write processed channels
 	m_timeShiftedSample.setData(outDataL, outDataR);
 
-	m_timeshiftLock = false;
+	m_timeshiftLock.unlock();
 }
 
 // basic phase vocoder implementation that time shifts without pitch change
@@ -399,7 +397,7 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 		for (int j = 0; j < windowSize; j++)
 		{
 			float outIndex = i * outStepSize + j;
-			if (outIndex > outFrames) { break; }
+			if (outIndex >= outFrames) { break; }
 
 			// calculate windows overlapping at index
 			float startWindowOverlap = ceil(outIndex / outStepSize + 0.00000001f);

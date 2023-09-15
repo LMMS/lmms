@@ -59,7 +59,7 @@ class WaveForm : public QWidget {
         int m_height;
         float m_m_seekerRatio = 0.3f;
         int m_margin = 5;
-        QColor m_waveformBgColor = QColor(11, 11, 11);
+        QColor m_waveformBgColor = QColor(11, 11, 11, 200);
         QColor m_waveformColor = QColor(113, 0, 177);
         // QColor m_waveformColor = QColor(255, 161, 247); // logo color
         QColor m_playColor = QColor(255, 255, 255, 200);

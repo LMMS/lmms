@@ -32,6 +32,7 @@
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Knob.h"
+#include "PixmapButton.h"
 #include "LcdSpinBox.h"
 
 
@@ -43,6 +44,21 @@ class SlicerT;
 namespace gui
 {
 
+class SlicerTKnob : public Knob {
+	public:
+		SlicerTKnob( QWidget * _parent ) :
+				Knob( KnobType::Styled, _parent )
+		{
+		setFixedSize( 46, 40 );
+		setCenterPointX( 23.0 );
+		setCenterPointY( 15.0 );
+		setInnerRadius( 8 );
+		setOuterRadius( 11 );
+		// setTotalAngle( 270.0 );
+		setLineWidth( 3 );
+		setOuterColor( QColor(255, 161, 247) );
+		}
+};
 
 class SlicerTUI : public InstrumentViewFixedSize
 {
@@ -65,14 +81,13 @@ protected:
 
 private:
 	SlicerT * m_slicerTParent;
-	QPixmap m_backgroundImage;
 
-	Knob m_noteThresholdKnob;
-	Knob m_fadeOutKnob;
+	SlicerTKnob m_noteThresholdKnob;
+	SlicerTKnob m_fadeOutKnob;
 	LcdSpinBox m_bpmBox;
 
-	QPushButton m_resetButton;
-	QPushButton m_midiExportButton;
+	PixmapButton m_resetButton;
+	PixmapButton m_midiExportButton;
 
 	WaveForm m_wf;
 };
