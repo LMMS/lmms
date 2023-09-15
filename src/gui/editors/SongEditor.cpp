@@ -1164,6 +1164,12 @@ void SongEditorWindow::adjustUiAfterProjectLoad()
 }
 
 
+void SongEditorWindow::setLoop( const TimePos& from, const TimePos& to )
+{
+	m_editor->m_timeLine->setLoop( from, to );
+	m_editor->m_timeLine->repaint();
+}
+
 } // namespace lmms::gui
 
 

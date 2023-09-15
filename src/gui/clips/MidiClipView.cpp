@@ -37,6 +37,7 @@
 #include "MidiClip.h"
 #include "PianoRoll.h"
 #include "RenameDialog.h"
+#include "SongEditor.h"
 #include "TrackView.h"
 
 namespace lmms::gui
@@ -130,6 +131,14 @@ void MidiClipView::setGhostInPianoRoll()
 
 
 
+void MidiClipView::setLoop()
+{
+	getGUI()->songEditor()->setLoop( m_clip->startPosition(), m_clip->startPosition()+m_clip->length() );
+}
+
+
+
+
 void MidiClipView::resetName() { m_clip->setName(""); }
 
 
@@ -218,6 +227,9 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 					this, SLOT(setGhostInPianoRoll()));
 	_cm->insertSeparator( _cm->actions()[2] );
 	_cm->addSeparator();
+
+	_cm->addAction( embed::getIconPixmap( "piano" ), // TODO: Get a loop icon for this?
+			tr( "Set loop" ), this, SLOT( setLoop() ) );
 
 	_cm->addAction( embed::getIconPixmap( "edit_erase" ),
 			tr( "Clear all notes" ), m_clip, SLOT(clear()));

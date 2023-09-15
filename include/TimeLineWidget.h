@@ -143,6 +143,13 @@ public:
 						m_loopPos[0] : m_loopPos[1];
 	}
 
+	inline void setLoop( const TimePos & from, const TimePos & to ) {
+		m_loopPos[0] = from;
+		m_loopPos[1] = to;
+		toggleLoopPoints( LoopPointsEnabled );
+		loopPointStateLoaded( LoopPointsEnabled );
+	}
+
 	inline void savePos( const TimePos & pos )
 	{
 		m_savedPos = pos;

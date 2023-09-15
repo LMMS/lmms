@@ -182,6 +182,8 @@ public:
 	SongEditor* m_editor;
 	void syncEditMode();
 
+	void setLoop(const TimePos& from, const TimePos& to);
+
 protected:
 	void resizeEvent( QResizeEvent * event ) override;
 	void changeEvent( QEvent * ) override;
