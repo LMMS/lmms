@@ -446,7 +446,7 @@ namespace gui
 
 PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 	InstrumentViewFixedSize( _instrument, _parent ),
-	m_pi( nullptr )
+	m_pi(dynamic_cast<PatmanInstrument*>(_instrument))
 {
 	setAutoFillBackground( true );
 	QPalette pal;
@@ -490,6 +490,8 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 	m_displayFilename = tr( "No file selected" );
 
 	setAcceptDrops( true );
+	updateFilename();
+	connect(m_pi, &PatmanInstrument::fileChanged, this, &PatmanView::updateFilename);
 }
 
 
@@ -636,8 +638,6 @@ void PatmanView::modelChanged()
 	m_pi = castModel<PatmanInstrument>();
 	m_loopButton->setModel( &m_pi->m_loopedModel );
 	m_tuneButton->setModel( &m_pi->m_tunedModel );
-	connect( m_pi, SIGNAL( fileChanged() ),
-			this, SLOT( updateFilename() ) );
 }
 
 
