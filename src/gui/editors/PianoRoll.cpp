@@ -2600,7 +2600,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 
 			// did it reach end of vector because there's
 			// no note??
-			if( it != notes.begin()-1 )
+			if (it != notes.begin())
 			{
 				Note *note = *it;
 				// x coordinate of the right edge of the note
