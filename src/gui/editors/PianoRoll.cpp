@@ -1769,7 +1769,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				Note * created_new_note = nullptr;
 				// did it reach end of vector because
 				// there's no note??
-				if(it == notes.end())
+				if (it == notes.end())
 				{
 					is_new_note = true;
 					m_midiClip->addJournalCheckPoint();
@@ -1933,7 +1933,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 			{
 				// erase single note
 				m_mouseDownRight = true;
-				if(it != notes.end())
+				if (it != notes.end())
 				{
 					m_midiClip->addJournalCheckPoint();
 					m_midiClip->removeNote( *it );
