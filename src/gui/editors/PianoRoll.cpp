@@ -2575,13 +2575,11 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			const NoteVector & notes = m_midiClip->notes();
 
 			// will be our iterator in the following loop
+			auto it = notes.end();
 			if (!notes.empty()) {
+				
 				auto it = notes.begin() + notes.size() - 1;
 			} 
-			else {
-				// on MSVC, trying to access empty notes leads to error
-				auto it = notes.end();
-			}
 
 			// loop through whole note-vector...
 			for( int i = 0; i < notes.size(); ++i )
