@@ -2578,7 +2578,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			auto it = notes.rbegin();
 
 			// loop through whole note-vector...
-			for( int i = 0; i < notes.size(); ++i )
+			while (it != notes.rend())
 			{
 				Note *note = *it;
 				// and check whether the cursor is over an
@@ -2591,7 +2591,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				{
 					break;
 				}
-				--it;
+				++it;
 			}
 
 			// did it reach end of vector because there's
