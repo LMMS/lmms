@@ -22,9 +22,8 @@
  *
  */
 
-// TODO: fade in mode
-// TODO: general UI improvements, maybe open folders button
-// TODO: add fft cache, maybe this is overkill but whatever
+// write in frames to outputBuffer
+// store the stuff that has to be reused in a fullsized buffer
 
 #include "SlicerT.h"
 
@@ -66,15 +65,39 @@ SlicerT::SlicerT(InstrumentTrack * instrumentTrack) :
 	m_noteThreshold(0.6f, 0.0f, 2.0f, 0.01f, this, tr( "Note threshold" ) ),
 	m_fadeOutFrames(0.0f, 0.0f, 8192.0f, 4.0f, this, tr("FadeOut")),
 	m_originalBPM(1, 1, 999, this, tr("Original bpm")),
-	m_originalSample()
+	m_originalSample(),
+
+	FFTInput(windowSize, 0),
+	IFFTReconstruction(windowSize, 0),
+	allMagnitudes(windowSize, 0),
+	allFrequencies(windowSize, 0),
+	processedFreq(windowSize, 0),
+	processedMagn(windowSize, 0)
 {}
 
+void SlicerT::updateParams(float newRatio) {
+	stepSize = (float)windowSize / overSampling;
+	numWindows = (float)m_originalSample.frames() / stepSize;
+	outStepSize = newRatio * (float)stepSize; // float, else inaccurate
+	freqPerBin = m_originalSample.sampleRate()/windowSize;
+	expectedPhaseIn = 2.*M_PI*(float)stepSize/(float)windowSize;
+	expectedPhaseOut = 2.*M_PI*(float)outStepSize/(float)windowSize;
+
+	// resize all the buffers that rely on the final size
+	m_timeshiftedBufferL = {};
+	m_timeshiftedBufferL.resize(newRatio*m_originalSample.frames());
+	lastPhase = {};
+	lastPhase.resize(numWindows*windowSize);
+	sumPhase = {};
+	sumPhase.resize(numWindows*windowSize);
+}
 
 void SlicerT::playNote( NotePlayHandle * handle, sampleFrame * workingBuffer )
 {
 	if (m_originalSample.frames() < 2048) { return; }
 
 	const float speedRatio = (float)m_originalBPM.value() / Engine::getSong()->getTempo() ;
+	// const float lengthRatio = 1.0f / speedRatio; // inverse, because longer is slower
 	const int noteIndex = handle->key() - 69;
 	const fpp_t frames = handle->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = handle->noteOffset();
@@ -82,6 +105,7 @@ void SlicerT::playNote( NotePlayHandle * handle, sampleFrame * workingBuffer )
 
 	if (m_currentSpeedRatio != speedRatio)
 	{
+		updateParams(speedRatio);
 		timeShiftSample();
 	}
 	const int totalFrames = m_timeShiftedSample.frames();
@@ -248,8 +272,8 @@ void SlicerT::timeShiftSample()
 	}
 
 	// process channels
-	phaseVocoder(rawDataL, outDataL, sampleRate, 1);
-	phaseVocoder(rawDataR, outDataR, sampleRate, 1);
+	phaseVocoder(rawDataL, outDataL);
+	phaseVocoder(rawDataR, outDataR);
 
 	// write processed channels
 	m_timeShiftedSample.setData(outDataL, outDataR);
@@ -263,50 +287,18 @@ void SlicerT::timeShiftSample()
 // https://sethares.engr.wisc.edu/vocoders/phasevocoder.html
 // https://dsp.stackexchange.com/questions/40101/audio-time-stretching-without-pitch-shifting/40367#40367
 // https://www.guitarpitchshifter.com/
-void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataOut, float sampleRate, float pitchScale)
+void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataOut)
 {
-	using std::vector;
-	// processing parameters, lower is faster
-	// lower windows size seems to work better for time scaling,
-	// this is because the step site is scaled, but not the window size
-	// this causes slight timing differences between windows
-	// sadly, lower windowsize also reduces audio quality in general
-	// TODO: find solution
-	// oversampling is better if higher always (probably)
-	const int windowSize = 512;
-	const int overSampling = 32;
+	memset(lastPhase.data(), 0, numWindows*windowSize*sizeof(float));
+	memset(sumPhase.data(), 0, numWindows*windowSize*sizeof(float));
 
-	// audio data
-	int inFrames = dataIn.size();
 	int outFrames = dataOut.size();
 
-	float lengthRatio = (float)outFrames / inFrames;
-
-	// values used
-	const int stepSize = (float)windowSize / overSampling;
-	const int numWindows = (float)inFrames / stepSize;
-	const float outStepSize = lengthRatio * (float)stepSize; // float, else inaccurate
-	const float freqPerBin = sampleRate/windowSize;
-	// very important
-	const float expectedPhaseIn = 2.*M_PI*(float)stepSize/(float)windowSize;
-	const float expectedPhaseOut = 2.*M_PI*(float)outStepSize/(float)windowSize;
-
-	// initialize buffers
-	fftwf_complex FFTSpectrum[windowSize];
-	vector<float> FFTInput(windowSize, 0);
-	vector<float> IFFTReconstruction(windowSize, 0);
-	vector<float> allMagnitudes(windowSize, 0);
-	vector<float> allFrequencies(windowSize, 0);
-	vector<float> processedFreq(windowSize, 0);
-	vector<float> processedMagn(windowSize, 0);
-	vector<float> lastPhase(windowSize, 0);
-	vector<float> sumPhase(windowSize, 0);
-
-	vector<float> outBuffer(outFrames, 0);
+	std::vector<float> outBuffer(outFrames, 0);
 
 	// declare vars
 	float real, imag, phase, magnitude, freq, deltaPhase = 0;
-	int windowIndex = 0;
+		int windowIndex = 0;
 
 	// fft plans
 	fftwf_plan fftPlan;
@@ -322,7 +314,7 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 		memcpy(FFTInput.data(), dataIn.data() + windowIndex, windowSize*sizeof(float));
 
 		// int hash = hashFttWindow(FFTInput);
-		// printf("%i\n", hash);
+			// printf("%i\n", hash);
 
 		// FFT
 		fftwf_execute(fftPlan);
@@ -330,14 +322,16 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 		// analysis step
 		for (int j = 0; j < windowSize; j++)
 		{
+			int windowIndex = (float)i*windowSize;
+
 			real = FFTSpectrum[j][0];
 			imag = FFTSpectrum[j][1];
 
 			magnitude = 2.*sqrt(real*real + imag*imag);
 			phase = atan2(imag,real);
 
-			freq = phase - lastPhase[j]; // subtract prev pahse to get phase diference
-			lastPhase[j] = phase;
+			freq = phase - lastPhase[std::max(0, windowIndex + j - windowSize)]; // subtract prev pahse to get phase diference
+			lastPhase[windowIndex + j] = phase;
 
 			freq -= (float)j*expectedPhaseIn; // subtract expected phase
 
@@ -372,6 +366,8 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 		// synthesis, all the operations are the reverse of the analysis
 		for (int j = 0; j < windowSize; j++)
 		{
+			int windowIndex = (float)i*windowSize;
+
 			magnitude = allMagnitudes[j];
 			freq = allFrequencies[j];
 
@@ -383,8 +379,9 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 
 			deltaPhase += (float)j*expectedPhaseOut;
 
-			sumPhase[j] += deltaPhase;
-			deltaPhase = sumPhase[j]; // this is the bin phase
+			sumPhase[windowIndex + j] += deltaPhase;
+			deltaPhase = sumPhase[windowIndex + j]; // this is the bin phase
+			sumPhase[windowIndex + j + windowSize] = deltaPhase; // copy into the next window for accurate sum
 
 			FFTSpectrum[j][0] = magnitude*cos(deltaPhase);
 			FFTSpectrum[j][1] = magnitude*sin(deltaPhase);
@@ -430,7 +427,7 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 		outBuffer[i] = outBuffer[i] / max;
 	}
 
-	memcpy(dataOut.data(), outBuffer.data(), outFrames*sizeof(float));
+memcpy(dataOut.data(), outBuffer.data(), outFrames*sizeof(float));
 }
 
 int SlicerT::hashFttWindow(std::vector<float> & in)

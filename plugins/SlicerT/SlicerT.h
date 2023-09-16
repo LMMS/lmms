@@ -106,18 +106,46 @@ class SlicerT : public Instrument{
 		IntModel m_originalBPM;
 
 		SampleBuffer m_originalSample;
+
 		PlaybackBuffer m_timeShiftedSample;
+		std::vector<float> m_timeshiftedBufferL;
+		std::vector<float> m_timeshiftedBufferR;
+
+
 		std::vector<int> m_slicePoints;
 
-		float m_currentSpeedRatio = 0;
+		float m_currentSpeedRatio = -1;
 		QMutex m_timeshiftLock; // should be unecesaty since playbackBuffer is safe
 		// std::unordered_map<int, std::vector<float> > m_fftWindowCache;
 
+		void updateParams(float newRatio);
 		void findSlices();
 		void findBPM();
 		void timeShiftSample();
-		void phaseVocoder(std::vector<float> &in, std::vector<float> &out, float sampleRate, float pitchScale);
+		void phaseVocoder(std::vector<float> &in, std::vector<float> &out);
 		int hashFttWindow(std::vector<float> & in);
+
+		// timeshift stuff
+		static const int windowSize = 512;
+		static const int overSampling = 32;
+
+		int stepSize = 0;
+		int numWindows = 0;
+		float outStepSize = 0;
+		float freqPerBin = 0;
+		// very important
+		float expectedPhaseIn = 0;
+		float expectedPhaseOut = 0;
+
+		fftwf_complex FFTSpectrum[windowSize];
+		std::vector<float> FFTInput;
+		std::vector<float> IFFTReconstruction;
+		std::vector<float> allMagnitudes;
+		std::vector<float> allFrequencies;
+		std::vector<float> processedFreq;
+		std::vector<float> processedMagn;
+		std::vector<float> lastPhase;
+		std::vector<float> sumPhase;
 
 		friend class gui::SlicerTUI;
 		friend class gui::WaveForm;
