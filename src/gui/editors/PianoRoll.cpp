@@ -1719,7 +1719,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 			const NoteVector & notes = m_midiClip->notes();
 
 			// will be our iterator in the following loop
-			auto it = notes.begin();
+			auto it = notes.rend();
 
 			// loop through whole note-vector...
 			for( int i = 0; i < notes.size(); ++i )
@@ -1747,7 +1747,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				{
 					break;
 				}
-				it++;
+				--it;
 			}
 
 			// first check whether the user clicked in note-edit-
@@ -1769,7 +1769,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				Note * created_new_note = nullptr;
 				// did it reach end of vector because
 				// there's no note??
-				if (it == notes.end())
+				if (it == notes.rbegin())
 				{
 					is_new_note = true;
 					m_midiClip->addJournalCheckPoint();
@@ -1816,8 +1816,8 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					// reset it so that it can be used for
 					// ops (move, resize) after this
 					// code-block
-					it = notes.begin();
-					while( it != notes.end() && *it != created_new_note )
+					it = notes.rbegin();
+					while( it != notes.rend() && *it != created_new_note )
 					{
 						++it;
 					}
@@ -1933,7 +1933,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 			{
 				// erase single note
 				m_mouseDownRight = true;
-				if (it != notes.end())
+				if (it != notes.rbegin())
 				{
 					m_midiClip->addJournalCheckPoint();
 					m_midiClip->removeNote( *it );
@@ -2513,7 +2513,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			bool altPressed = me->modifiers() & Qt::AltModifier;
 			// We iterate from last note in MIDI clip to the first,
 			// chronologically
-			auto it = notes.begin();
+			auto it = notes.rend();
 			for( int i = 0; i < notes.size(); ++i )
 			{
 				Note* n = *it;
@@ -2556,7 +2556,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				}
 
 
-				it++;
+				--it;
 			}
 
 			// Emit MIDI clip has changed
@@ -2575,7 +2575,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			const NoteVector & notes = m_midiClip->notes();
 
 			// will be our iterator in the following loop
-			auto it = notes.begin();
+			auto it = notes.rend();
 
 			// loop through whole note-vector...
 			for( int i = 0; i < notes.size(); ++i )
@@ -2591,12 +2591,12 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				{
 					break;
 				}
-				it++;
+				--it;
 			}
 
 			// did it reach end of vector because there's
 			// no note??
-			if (it != notes.end())
+			if (it != notes.rbegin())
 			{
 				Note *note = *it;
 				// x coordinate of the right edge of the note
@@ -2686,7 +2686,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				}
 				else
 				{
-					it++;
+					++it;
 				}
 			}
 		}
