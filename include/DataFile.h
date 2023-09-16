@@ -126,6 +126,7 @@ private:
 	void upgrade_defaultTripleOscillatorHQ();
 	void upgrade_mixerRename();
 	void upgrade_bbTcoRename();
+	void upgrade_sampleAndHold();
 
 	// List of all upgrade methods
 	static const std::vector<UpgradeMethod> UPGRADE_METHODS;
