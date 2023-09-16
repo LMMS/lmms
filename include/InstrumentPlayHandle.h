@@ -37,23 +37,22 @@ class InstrumentTrack;
 class LMMS_EXPORT InstrumentPlayHandle : public PlayHandle
 {
 public:
-	InstrumentPlayHandle( Instrument * instrument, InstrumentTrack* instrumentTrack );
+	InstrumentPlayHandle(Instrument * instrument, InstrumentTrack* instrumentTrack);
 
 	~InstrumentPlayHandle() override = default;
 
-	void play( sampleFrame * _working_buffer ) override;
+	void play(sampleFrame * working_buffer) override;
 
 	bool isFinished() const override
 	{
 		return false;
 	}
 
-	bool isFromTrack( const Track* _track ) const override;
+	bool isFromTrack(const Track* track) const override;
 
 private:
 	Instrument* m_instrument;
-} ;
-
+};
 
 } // namespace lmms
 

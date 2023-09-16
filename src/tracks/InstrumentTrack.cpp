@@ -584,7 +584,7 @@ void InstrumentTrack::playNote( NotePlayHandle* n, sampleFrame* workingBuffer )
 		{
 			const fpp_t frames = n->framesLeftForCurrentPeriod();
 			const f_cnt_t offset = n->noteOffset();
-			this->processAudioBuffer(workingBuffer, frames + offset, n);
+			processAudioBuffer(workingBuffer, frames + offset, n);
 		}
 	}
 }
