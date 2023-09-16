@@ -1816,8 +1816,8 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					// reset it so that it can be used for
 					// ops (move, resize) after this
 					// code-block
-					it = notes.rend();
-					while (it != notes.rbegin() && *it != created_new_note)
+					it = notes.rend()+1;
+					while (it != notes.rbegin()+1 && *it != created_new_note)
 					{
 						++it;
 					}
