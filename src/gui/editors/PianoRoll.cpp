@@ -1719,7 +1719,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 			const NoteVector & notes = m_midiClip->notes();
 
 			// will be our iterator in the following loop
-			auto it = notes.rend();
+			auto it = notes.rbegin();
 
 			// loop through whole note-vector...
 			for( int i = 0; i < notes.size(); ++i )
@@ -1769,7 +1769,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				Note * created_new_note = nullptr;
 				// did it reach end of vector because
 				// there's no note??
-				if (it == notes.rbegin())
+				if (it == notes.rend())
 				{
 					is_new_note = true;
 					m_midiClip->addJournalCheckPoint();
@@ -1816,8 +1816,8 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					// reset it so that it can be used for
 					// ops (move, resize) after this
 					// code-block
-					it = notes.rbegin();
-					while( it != notes.rend() && *it != created_new_note )
+					it = notes.rend();
+					while (it != notes.rbegin() && *it != created_new_note)
 					{
 						++it;
 					}
@@ -1933,7 +1933,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 			{
 				// erase single note
 				m_mouseDownRight = true;
-				if (it != notes.rbegin())
+				if (it != notes.rend())
 				{
 					m_midiClip->addJournalCheckPoint();
 					m_midiClip->removeNote( *it );
@@ -2575,7 +2575,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			const NoteVector & notes = m_midiClip->notes();
 
 			// will be our iterator in the following loop
-			auto it = notes.rend();
+			auto it = notes.rbegin();
 
 			// loop through whole note-vector...
 			for( int i = 0; i < notes.size(); ++i )
@@ -2596,7 +2596,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 
 			// did it reach end of vector because there's
 			// no note??
-			if (it != notes.rbegin())
+			if (it != notes.rend())
 			{
 				Note *note = *it;
 				// x coordinate of the right edge of the note
