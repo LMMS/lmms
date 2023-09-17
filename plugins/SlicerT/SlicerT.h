@@ -39,57 +39,59 @@
 namespace lmms
 {
 
-// small helper class, since SampleBuffer is inadequate (not thread safe, no dinamic startpoint)
-class PlaybackBuffer {
+// main class that handles everything audio related
+class PhaseVocoder {
 	public:
+		PhaseVocoder();
+		~PhaseVocoder();
+		void loadSample(const sampleFrame* originalData, int frames, int sampleRate, float newRatio);
+		void setScaleRatio(float newRatio) { updateParams(newRatio); }
+		void getFrames(sampleFrame * outData, int start, int frames);
+		int frames() { return leftBuffer.size(); }
+	private:
 		QMutex dataLock;
-		std::vector<sampleFrame> mainBuffer;
+		// original data
+		std::vector<float> originalBufferL;
+		std::vector<float> originalBufferR;
+		int originalSampleRate = 0;
+
+		float scaleRatio = -1; // to force on fisrt load
+
+		// output data
 		std::vector<float> leftBuffer;
 		std::vector<float> rightBuffer;
-		float sampleMax = -1;
+		std::vector<bool> m_processedWindows; // marks a window processed
 
-		int frames() { return mainBuffer.size(); }; // not thread safe yet, but shouldnt be a big issue
-		sampleFrame * data() {  return mainBuffer.data(); };
-		void copyFrames(sampleFrame * outData, int start, int framesToCopy) {
-			dataLock.lock();
-			memcpy(outData, mainBuffer.data() + start, framesToCopy * sizeof(sampleFrame));
-			dataLock.unlock();
-		}
-		void resetAndResize(int newFrames) {
-			mainBuffer = {};
-			mainBuffer.resize(newFrames);
-			leftBuffer = {};
-			leftBuffer.resize(newFrames);
-			rightBuffer = {};
-			rightBuffer.resize(newFrames);
-		}
-		void loadSample(const sampleFrame * data, int newFrames)
-		{
-			dataLock.lock();
-			resetAndResize(newFrames);
-			memcpy(mainBuffer.data(), data, newFrames * sizeof(sampleFrame));
-			for (int i = 0;i<newFrames;i++) {
-				leftBuffer[i] = mainBuffer[i][0];
-				sampleMax = std::max(sampleMax, leftBuffer[i]);
-				rightBuffer[i] = mainBuffer[i][1];
-				sampleMax = std::max(sampleMax, rightBuffer[i]);
-			}
-			dataLock.unlock();
-		};
-		void setFrames(std::vector<float> & leftData, std::vector<float> & rightData)
-		{
-			dataLock.lock();
-			int newFrames = std::min(leftData.size(), rightData.size());
-			mainBuffer = {};
-			mainBuffer.resize(newFrames);
+		// timeshift stuff
+		static const int windowSize = 512;
+		static const int overSampling = 32;
 
-			for (int i = 0;i < newFrames;i++)
-			{
-				mainBuffer[i][0] = leftData[i];
-				mainBuffer[i][1] = rightData[i];
-			}
-			dataLock.unlock();
-		}
+		// depending on scaleRatio
+		int stepSize = 0;
+		int numWindows = 0;
+		float outStepSize = 0;
+		float freqPerBin = 0;
+		float expectedPhaseIn = 0;
+		float expectedPhaseOut = 0;
+
+		// buffers
+		fftwf_complex FFTSpectrum[windowSize];
+		std::vector<float> FFTInput;
+		std::vector<float> IFFTReconstruction;
+		std::vector<float> allMagnitudes;
+		std::vector<float> allFrequencies;
+		std::vector<float> processedFreq;
+		std::vector<float> processedMagn;
+		std::vector<float> lastPhase;
+		std::vector<float> sumPhase;
+
+		// fftw plans
+		fftwf_plan fftPlan;
+		fftwf_plan ifftPlan;
+
+		void updateParams(float newRatio);
+		void generateWindow(std::vector<float> &in, std::vector<float> &out, int start);
+		int hashFttWindow(std::vector<float> & in);
 };
 
 class SlicerT : public Instrument{
@@ -122,54 +124,12 @@ class SlicerT : public Instrument{
 		IntModel m_originalBPM;
 
 		SampleBuffer m_originalSample;
-		std::vector<float> m_originalBufferL;
-		std::vector<float> m_originalBufferR;
-		int originalMax; // for later rescaling
-
-		PlaybackBuffer m_timeShiftedSample;
-		std::vector<float> m_timeshiftedBufferL;
-		std::vector<float> m_timeshiftedBufferR;
-		std::vector<bool> m_processedFrames; // check if a frame is processed
-
+		PhaseVocoder m_phaseVocoder;
 
 		std::vector<int> m_slicePoints;
 
-		float m_currentSpeedRatio = -1;
-		QMutex m_timeshiftLock; // should be unecesaty since playbackBuffer is safe
-		// std::unordered_map<int, std::vector<float> > m_fftWindowCache;
-
-		void updateParams();
-		void extractOriginalData();
 		void findSlices();
 		void findBPM();
-		void timeShiftSample(int windowsToProcess);
-		void phaseVocoder(std::vector<float> &in, std::vector<float> &out, int start, int steps);
-		int hashFttWindow(std::vector<float> & in);
-
-		// timeshift stuff
-		static const int windowSize = 512;
-		static const int overSampling = 32;
-
-		int stepSize = 0;
-		int numWindows = 0;
-		float outStepSize = 0;
-		float freqPerBin = 0;
-		// very important
-		float expectedPhaseIn = 0;
-		float expectedPhaseOut = 0;
-
-		fftwf_complex FFTSpectrum[windowSize];
-		std::vector<float> FFTInput;
-		std::vector<float> IFFTReconstruction;
-		std::vector<float> allMagnitudes;
-		std::vector<float> allFrequencies;
-		std::vector<float> processedFreq;
-		std::vector<float> processedMagn;
-		std::vector<float> lastPhase;
-		std::vector<float> sumPhase;
-
-		fftwf_plan fftPlan;
-		fftwf_plan ifftPlan;
 
 		friend class gui::SlicerTUI;
 		friend class gui::WaveForm;

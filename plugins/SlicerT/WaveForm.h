@@ -94,7 +94,7 @@ class WaveForm : public QWidget {
         QPixmap m_seeker;
         QPixmap m_seekerWaveform;
 
-        SampleBuffer m_currentSample;
+        SampleBuffer & m_currentSample;
 
         void drawEditor();
         void drawSeekerWaveform();

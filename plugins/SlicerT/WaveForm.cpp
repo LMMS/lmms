@@ -37,7 +37,7 @@ WaveForm::WaveForm(int w, int h, SlicerT  * instrument, QWidget * parent) :
     m_sliceEditor(QPixmap(w, h*(1 - m_m_seekerRatio) - m_margin)),
     m_seeker(QPixmap(w, h*m_m_seekerRatio)),
     m_seekerWaveform(QPixmap(w, h*m_m_seekerRatio)),
-    m_currentSample(instrument->m_originalSample.data(), instrument->m_originalSample.frames()),
+    m_currentSample(instrument->m_originalSample),
     m_slicePoints(instrument->m_slicePoints)
     {
         m_width = w;
@@ -146,7 +146,8 @@ void WaveForm::updateUI()
 
 void WaveForm::updateData()
 {
-    m_currentSample = SampleBuffer(m_slicerTParent->m_originalSample.data(), m_slicerTParent->m_originalSample.frames());
+    // I hate SampleBuffer, fot whatever reason this crashes sometimes
+    // m_currentSample = SampleBuffer(m_slicerTParent->m_originalSample.data(), m_slicerTParent->m_originalSample.frames());
     updateUI();
 }
 

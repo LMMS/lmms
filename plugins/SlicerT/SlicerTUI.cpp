@@ -113,7 +113,6 @@ void SlicerTUI::exportMidi()
 	dataFile.content().appendChild( note_list );
 
 	std::vector<Note> notes;
-	m_slicerTParent->timeShiftSample(-1);
 	m_slicerTParent->writeToMidi(&notes);
 	if (notes.size() == 0)
 	{
