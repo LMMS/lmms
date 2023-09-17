@@ -79,7 +79,7 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_automationNodes  ,   &DataFile::upgrade_extendedNoteRange,
 	&DataFile::upgrade_defaultTripleOscillatorHQ,
 	&DataFile::upgrade_mixerRename      ,   &DataFile::upgrade_bbTcoRename,
-	&DataFile::upgrade_sampleAndHold    ,
+	&DataFile::upgrade_sampleAndHold    ,   &DataFile::upgrade_loopsRename,
 };
 
 // Vector of all versions that have upgrade routines.

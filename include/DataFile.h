@@ -125,6 +125,7 @@ private:
 	void upgrade_extendedNoteRange();
 	void upgrade_defaultTripleOscillatorHQ();
 	void upgrade_mixerRename();
+	void upgrade_loopsRename();
 	void upgrade_bbTcoRename();
 	void upgrade_sampleAndHold();
 
