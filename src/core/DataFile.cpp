@@ -1810,6 +1810,67 @@ void DataFile::upgrade_sampleAndHold()
 }
 
 
+// Change loops' filenames in <sampleclip>s
+void DataFile::upgrade_loopsRename()
+{
+	std::vector<std::pair<string, string>> loopBPMs{
+		{"briff01", "140"},
+		{"rave_bass01", "180"},
+		{"rave_bass02", "180"},
+		{"tb303_01", "123"},
+		{"techno_bass01", "140"},
+		{"techno_bass02", "140"},
+		{"techno_synth01", "140"},
+		{"techno_synth02", "140"},
+		{"techno_synth03", "130"},
+		{"techno_synth04", "140"},
+		{"909beat01", "122"},
+		{"break01", "168"},
+		{"break02", "141"},
+		{"break03", "168"},
+		{"electro_beat01", "120"},
+		{"electro_beat02", "119"},
+		{"house_loop01", "142"},
+		{"jungle01", "168"},
+		{"rave_hihat01", "180"},
+		{"rave_hihat02", "180"},
+		{"rave_kick01", "180"},
+		{"rave_kick02", "180"},
+		{"rave_snare01", "180"},
+		{"latin_brass01", "140"},
+		{"latin_guitar01", "126"},
+		{"latin_guitar02", "140"},
+		{"latin_guitar03", "120"},
+	};
+
+	const string SRCATTR = "src", SAMPLECLIPELEM = "sampleclip", BPMPREF = " - ", BPMSUFF = " BPM";
+
+	// Replace names of loop samples
+	QDomNodeList elements = elementsByTagName(SAMPLECLIPELEM);
+	for (int i = 0; i < elements.length(); ++i)
+	{
+		auto item = elements.item(i).toElement();
+
+		if (item.isNull()) { continue; }
+		if (item.hasAttribute(SRCATTR))
+		{
+			for (int i = 0; i < loopBPMs.length(); ++i)
+			{
+				auto currentPair = loopBPMs.at(i);
+				auto toReplace = currentPair.first;
+				auto srcVal = item.attribute(SRCATTR);
+
+				if (srcVal.contains(toReplace, Qt::CaseInsensitive))
+				{
+					srcVal.replace(QString::fromStdString(toReplace),
+						QString::fromStdString(toReplace + BPMPREF + currentPair.second + BPMSUFF));
+				}
+			}
+		}
+	}
+}
+
+
 void DataFile::upgrade()
 {
 	// Runs all necessary upgrade methods
@@ -1958,66 +2019,6 @@ unsigned int DataFile::legacyFileVersion()
 
 	// Convert the iterator to an index, which is our file version (starting at 0)
 	return std::distance( UPGRADE_VERSIONS.begin(), firstRequiredUpgrade );
-}
-
-// Change loops' filenames in <sampleclip>s
-void DataFile::upgrade_loopsRename()
-{
-	std::vector<std::pair<string, string>> loopBPMs{
-		{"briff01", "140"},
-		{"rave_bass01", "180"},
-		{"rave_bass02", "180"},
-		{"tb303_01", "123"},
-		{"techno_bass01", "140"},
-		{"techno_bass02", "140"},
-		{"techno_synth01", "140"},
-		{"techno_synth02", "140"},
-		{"techno_synth03", "130"},
-		{"techno_synth04", "140"},
-		{"909beat01", "122"},
-		{"break01", "168"},
-		{"break02", "141"},
-		{"break03", "168"},
-		{"electro_beat01", "120"},
-		{"electro_beat02", "119"},
-		{"house_loop01", "142"},
-		{"jungle01", "168"},
-		{"rave_hihat01", "180"},
-		{"rave_hihat02", "180"},
-		{"rave_kick01", "180"},
-		{"rave_kick02", "180"},
-		{"rave_snare01", "180"},
-		{"latin_brass01", "140"},
-		{"latin_guitar01", "126"},
-		{"latin_guitar02", "140"},
-		{"latin_guitar03", "120"},
-	};
-
-	const string SRCATTR = "src", SAMPLECLIPELEM = "sampleclip", BPMPREF = " - ", BPMSUFF = " BPM";
-
-	// Replace names of loop samples
-	QDomNodeList elements = elementsByTagName(SAMPLECLIPELEM);
-	for (int i = 0; i < elements.length(); ++i)
-	{
-		auto item = elements.item(i).toElement();
-
-		if (item.isNull()) { continue; }
-		if (item.hasAttribute(SRCATTR))
-		{
-			for (int i = 0; i < loopBPMs.length(); ++i)
-			{
-				auto currentPair = loopBPMs.at(i);
-				auto toReplace = currentPair.first;
-				auto srcVal = item.attribute(SRCATTR);
-
-				if (srcVal.contains(toReplace, Qt::CaseInsensitive))
-				{
-					srcVal.replace(QString::fromStdString(toReplace),
-						QString::fromStdString(toReplace + BPMPREF + currentPair.second + BPMSUFF));
-				}
-			}
-		}
-	}
 }
 
 } // namespace lmms
