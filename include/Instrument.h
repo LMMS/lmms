@@ -134,6 +134,7 @@ public:
 		return m_instrumentTrack;
 	}
 
+	void resetToLegacyVolumeEnvelope();
 
 protected:
 	// fade in to prevent clicks

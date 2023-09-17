@@ -50,7 +50,7 @@ class InstrumentLoaderThread : public QThread
 Q_OBJECT
 public:
 	InstrumentLoaderThread( QObject *parent = 0, InstrumentTrack *it = 0,
-		QString name = "" );
+		QString name = "", bool resetToLegacyVolumeEnvelope = false );
 
 	void run() override;
 
@@ -58,6 +58,7 @@ private:
 	InstrumentTrack *m_it;
 	QString m_name;
 	QThread *m_containerThread;
+	bool m_resetToLegacyVolumeEnvelope;
 };
 
 namespace gui
@@ -169,6 +170,8 @@ protected:
 	static const int DEFAULT_PIXELS_PER_BAR = 16;
 
 	void resizeEvent( QResizeEvent * ) override;
+
+	void handleDropEvent(QDropEvent * de, bool resetToLegacyVolumeEnvelope);
 
 	TimePos m_currentPosition;
 

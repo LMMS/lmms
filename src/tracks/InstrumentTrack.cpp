@@ -1076,5 +1076,10 @@ void InstrumentTrack::autoAssignMidiDevice(bool assign)
 	}
 }
 
+void InstrumentTrack::resetToLegacyVolumeEnvelope()
+{
+	m_soundShaping.resetToLegacyVolumeEnvelope();
+}
+
 
 } // namespace lmms

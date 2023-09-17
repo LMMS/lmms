@@ -50,10 +50,11 @@ namespace lmms
 using namespace std;
 
 
-InstrumentLoaderThread::InstrumentLoaderThread( QObject *parent, InstrumentTrack *it, QString name ) :
+InstrumentLoaderThread::InstrumentLoaderThread(QObject *parent, InstrumentTrack *it, QString name, bool resetToLegacyVolumeEnvelope) :
 	QThread( parent ),
 	m_it( it ),
-	m_name( name )
+	m_name( name ),
+	m_resetToLegacyVolumeEnvelope(resetToLegacyVolumeEnvelope)
 {
 	m_containerThread = thread();
 }
@@ -65,6 +66,11 @@ void InstrumentLoaderThread::run()
 {
 	Instrument *i = m_it->loadInstrument(m_name, nullptr,
 										 true /*always DnD*/);
+	if (m_resetToLegacyVolumeEnvelope)
+	{
+		i->resetToLegacyVolumeEnvelope();
+	}
+
 	QObject *parent = i->parent();
 	i->setParent( 0 );
 	i->moveToThread( m_containerThread );
@@ -388,60 +394,9 @@ void TrackContainerView::stopRubberBand()
 
 
 
-void TrackContainerView::dropEvent( QDropEvent * _de )
+void TrackContainerView::dropEvent(QDropEvent * de)
 {
-	QString type = StringPairDrag::decodeKey( _de );
-	QString value = StringPairDrag::decodeValue( _de );
-	if( type == "instrument" )
-	{
-		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, m_tc));
-		auto ilt = new InstrumentLoaderThread(this, it, value);
-		ilt->start();
-		//it->toggledInstrumentTrackButton( true );
-		_de->accept();
-	}
-	else if( type == "samplefile" || type == "pluginpresetfile"
-		|| type == "soundfontfile" || type == "vstpluginfile"
-		|| type == "patchfile" )
-	{
-		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, m_tc));
-		PluginFactory::PluginInfoAndKey piakn =
-			getPluginFactory()->pluginSupportingExtension(FileItem::extension(value));
-		Instrument * i = it->loadInstrument(piakn.info.name(), &piakn.key);
-		i->loadFile( value );
-		//it->toggledInstrumentTrackButton( true );
-		_de->accept();
-	}
-	else if( type == "presetfile" )
-	{
-		DataFile dataFile( value );
-		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, m_tc));
-		it->setSimpleSerializing();
-		it->loadSettings( dataFile.content().toElement() );
-		//it->toggledInstrumentTrackButton( true );
-		_de->accept();
-	}
-	else if( type == "importedproject" )
-	{
-		ImportFilter::import( value, m_tc );
-		_de->accept();
-	}
-
-	else if( type == "projectfile")
-	{
-		if( getGUI()->mainWindow()->mayChangeProject(true) )
-		{
-			Engine::getSong()->loadProject( value );
-		}
-		_de->accept();
-	}
-
-	else if( type.left( 6 ) == "track_" )
-	{
-		DataFile dataFile( value.toUtf8() );
-		Track::create( dataFile.content().firstChild().toElement(), m_tc );
-		_de->accept();
-	}
+	handleDropEvent(de, false);
 }
 
 
@@ -453,6 +408,66 @@ void TrackContainerView::resizeEvent( QResizeEvent * _re )
 	QWidget::resizeEvent( _re );
 }
 
+
+void TrackContainerView::handleDropEvent(QDropEvent * de, bool resetToLegacyVolumeEnvelope)
+{
+	QString type = StringPairDrag::decodeKey(de);
+	QString value = StringPairDrag::decodeValue(de);
+	if( type == "instrument" )
+	{
+		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, m_tc));
+		auto ilt = new InstrumentLoaderThread(this, it, value, resetToLegacyVolumeEnvelope);
+		ilt->start();
+		//it->toggledInstrumentTrackButton( true );
+		de->accept();
+	}
+	else if( type == "samplefile" || type == "pluginpresetfile"
+		|| type == "soundfontfile" || type == "vstpluginfile"
+		|| type == "patchfile" )
+	{
+		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, m_tc));
+		PluginFactory::PluginInfoAndKey piakn =
+			getPluginFactory()->pluginSupportingExtension(FileItem::extension(value));
+		Instrument * i = it->loadInstrument(piakn.info.name(), &piakn.key);
+		if (resetToLegacyVolumeEnvelope)
+		{
+			i->resetToLegacyVolumeEnvelope();
+		}
+		i->loadFile( value );
+		//it->toggledInstrumentTrackButton( true );
+		de->accept();
+	}
+	else if( type == "presetfile" )
+	{
+		DataFile dataFile( value );
+		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, m_tc));
+		it->setSimpleSerializing();
+		it->loadSettings( dataFile.content().toElement() );
+		//it->toggledInstrumentTrackButton( true );
+		de->accept();
+	}
+	else if( type == "importedproject" )
+	{
+		ImportFilter::import( value, m_tc );
+		de->accept();
+	}
+
+	else if( type == "projectfile")
+	{
+		if( getGUI()->mainWindow()->mayChangeProject(true) )
+		{
+			Engine::getSong()->loadProject( value );
+		}
+		de->accept();
+	}
+
+	else if( type.left( 6 ) == "track_" )
+	{
+		DataFile dataFile( value.toUtf8() );
+		Track::create( dataFile.content().firstChild().toElement(), m_tc );
+		de->accept();
+	}
+}
 
 
 

@@ -158,7 +158,7 @@ void PatternEditor::dropEvent(QDropEvent* de)
 	}
 	else
 	{
-		TrackContainerView::dropEvent( de );
+		handleDropEvent(de, true);
 	}
 }
 

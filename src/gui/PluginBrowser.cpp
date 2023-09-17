@@ -306,7 +306,11 @@ void PluginDescWidget::openInNewInstrumentTrack(QString value)
 {
 	TrackContainer* tc = Engine::getSong();
 	auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, tc));
-	auto ilt = new InstrumentLoaderThread(this, it, value);
+
+	// This is the case where an instrument is pulled into the song editor.
+	// Hence we don't want to disable the volume envelope.
+	auto ilt = new InstrumentLoaderThread(this, it, value, false);
+
 	ilt->start();
 }
 

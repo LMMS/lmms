@@ -113,6 +113,9 @@ public:
 		return m_rFrames;
 	}
 
+	void setPAHDSR(float predelay, float attack, float hold, float decay, float sustain, float release);
+	void setAmount(float amount);
+
 
 public slots:
 	void updateSampleVars();

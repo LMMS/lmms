@@ -240,6 +240,8 @@ public:
 
 	void autoAssignMidiDevice( bool );
 
+	void resetToLegacyVolumeEnvelope();
+
 signals:
 	void instrumentChanged();
 	void midiNoteOn( const lmms::Note& );

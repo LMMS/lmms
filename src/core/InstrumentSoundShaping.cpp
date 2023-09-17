@@ -370,6 +370,13 @@ void InstrumentSoundShaping::loadSettings( const QDomElement & _this )
 }
 
 
+void InstrumentSoundShaping::resetToLegacyVolumeEnvelope()
+{
+	EnvelopeAndLfoParameters * volumeParameters = m_envLfoParameters[static_cast<std::size_t>(Target::Volume)];
+
+	volumeParameters->setPAHDSR(0., 0., 0.5, 0.5, 0.5, 0.1);
+	volumeParameters->setAmount(0);
+}
 
 
 

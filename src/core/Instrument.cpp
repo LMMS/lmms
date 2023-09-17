@@ -86,6 +86,14 @@ bool Instrument::isFromTrack( const Track * _track ) const
 	return( m_instrumentTrack == _track );
 }
 
+
+void Instrument::resetToLegacyVolumeEnvelope()
+{
+	// For some funny reasons the track has the envelopes
+	instrumentTrack()->resetToLegacyVolumeEnvelope();
+}
+
+
 // helper function for Instrument::applyFadeIn
 static int countZeroCrossings(sampleFrame *buf, fpp_t start, fpp_t frames)
 {

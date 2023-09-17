@@ -393,6 +393,21 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 }
 
 
+void EnvelopeAndLfoParameters::setPAHDSR(float predelay, float attack, float hold, float decay, float sustain, float release)
+{
+	m_predelayModel.setValue(predelay);
+	m_attackModel.setValue(attack);
+	m_holdModel.setValue(hold);
+	m_decayModel.setValue(decay);
+	m_sustainModel.setValue(sustain);
+	m_releaseModel.setValue(release);
+}
+
+void EnvelopeAndLfoParameters::setAmount(float amount)
+{
+	m_amountModel.setValue(amount);
+}
+
 
 
 void EnvelopeAndLfoParameters::updateSampleVars()
@@ -532,11 +547,5 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 	emit dataChanged();
 
 }
-
-
-
-
-
-
 
 } // namespace lmms

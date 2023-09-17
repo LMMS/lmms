@@ -73,6 +73,8 @@ public:
 		return "eldata";
 	}
 
+	void resetToLegacyVolumeEnvelope();
+
 
 private:
 	EnvelopeAndLfoParameters * m_envLfoParameters[NumTargets];
