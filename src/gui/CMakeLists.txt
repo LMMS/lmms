@@ -61,7 +61,7 @@ SET(LMMS_SRCS
 	gui/instrument/EnvelopeAndLfoView.cpp
 	gui/instrument/InstrumentFunctionViews.cpp
 	gui/instrument/InstrumentMidiIOView.cpp
-	gui/instrument/InstrumentMiscView.cpp
+	gui/instrument/InstrumentTuningView.cpp
 	gui/instrument/InstrumentSoundShapingView.cpp
 	gui/instrument/InstrumentTrackWindow.cpp
 	gui/instrument/InstrumentView.cpp
@@ -112,6 +112,7 @@ SET(LMMS_SRCS
 	gui/widgets/NStateButton.cpp
 	gui/widgets/Oscilloscope.cpp
 	gui/widgets/PixmapButton.cpp
+	gui/widgets/SimpleTextFloat.cpp
 	gui/widgets/TabBar.cpp
 	gui/widgets/TabWidget.cpp
 	gui/widgets/TempoSyncKnob.cpp

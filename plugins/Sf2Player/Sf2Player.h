@@ -88,7 +88,7 @@ public:
 
 	Flags flags() const override
 	{
-		return IsSingleStreamed;
+		return Flag::IsSingleStreamed;
 	}
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
@@ -111,7 +111,7 @@ public slots:
 	void updateChorusOn();
 	void updateChorus();
 	void updateGain();
-
+	void updateTuning();
 
 private:
 	static QMutex s_fontsMutex;

@@ -64,13 +64,13 @@ bool AudioFileWave::startEncoding()
 
 	switch( getOutputSettings().getBitDepth() )
 	{
-	case OutputSettings::Depth_32Bit:
+	case OutputSettings::BitDepth::Depth32Bit:
 		m_si.format |= SF_FORMAT_FLOAT;
 		break;
-	case OutputSettings::Depth_24Bit:
+	case OutputSettings::BitDepth::Depth24Bit:
 		m_si.format |= SF_FORMAT_PCM_24;
 		break;
-	case OutputSettings::Depth_16Bit:
+	case OutputSettings::BitDepth::Depth16Bit:
 	default:
 		m_si.format |= SF_FORMAT_PCM_16;
 		break;
@@ -102,7 +102,7 @@ void AudioFileWave::writeBuffer( const surroundSampleFrame * _ab,
 {
 	OutputSettings::BitDepth bitDepth = getOutputSettings().getBitDepth();
 
-	if( bitDepth == OutputSettings::Depth_32Bit || bitDepth == OutputSettings::Depth_24Bit )
+	if( bitDepth == OutputSettings::BitDepth::Depth32Bit || bitDepth == OutputSettings::BitDepth::Depth24Bit )
 	{
 		auto buf = new float[_frames * channels()];
 		for( fpp_t frame = 0; frame < _frames; ++frame )

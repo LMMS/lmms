@@ -1,7 +1,7 @@
 /*
  * Lv2Instrument.cpp - implementation of LV2 instrument
  *
- * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -55,10 +55,10 @@ Plugin::Descriptor PLUGIN_EXPORT lv2instrument_plugin_descriptor =
 		"plugin for using arbitrary LV2 instruments inside LMMS."),
 	"Johannes Lorenz <jlsf2013$$$users.sourceforge.net, $$$=@>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader("logo"),
 	nullptr,
-	new Lv2SubPluginFeatures(Plugin::Instrument)
+	new Lv2SubPluginFeatures(Plugin::Type::Instrument)
 };
 
 }
@@ -78,10 +78,12 @@ Lv2Instrument::Lv2Instrument(InstrumentTrack *instrumentTrackArg,
 {
 	if (Lv2ControlBase::isValid())
 	{
+		clearRunningNotes();
+
 		connect(instrumentTrack()->pitchRangeModel(), SIGNAL(dataChanged()),
 			this, SLOT(updatePitchRange()), Qt::DirectConnection);
 		connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged,
-			this, [this](){Lv2ControlBase::reloadPlugin();});
+			this, [this](){onSampleRateChanged();});
 
 		// now we need a play-handle which cares for calling play()
 		auto iph = new InstrumentPlayHandle(this, instrumentTrackArg);
@@ -95,7 +97,38 @@ Lv2Instrument::Lv2Instrument(InstrumentTrack *instrumentTrackArg,
 Lv2Instrument::~Lv2Instrument()
 {
 	Engine::audioEngine()->removePlayHandlesOfTypes(instrumentTrack(),
-		PlayHandle::TypeNotePlayHandle | PlayHandle::TypeInstrumentPlayHandle);
+		PlayHandle::Type::NotePlayHandle | PlayHandle::Type::InstrumentPlayHandle);
+}
+
+
+
+
+void Lv2Instrument::reload()
+{
+	Lv2ControlBase::reload();
+	clearRunningNotes();
+	emit modelChanged();
+}
+
+
+
+
+void Lv2Instrument::clearRunningNotes()
+{
+#ifdef LV2_INSTRUMENT_USE_MIDI
+	for (int i = 0; i < NumKeys; ++i) { m_runningNotes[i] = 0; }
+#endif
+}
+
+
+
+
+void Lv2Instrument::onSampleRateChanged()
+{
+	// TODO: once lv2 options are implemented,
+	//       plugins that support it might allow changing their samplerate
+	//       through it instead of reloading
+	reload();
 }
 
 
@@ -196,24 +229,8 @@ QString Lv2Instrument::nodeName() const
 
 
 
-DataFile::Types Lv2Instrument::settingsType()
-{
-	return DataFile::InstrumentTrackSettings;
-}
-
-
-
-
-void Lv2Instrument::setNameFromFile(const QString &name)
-{
-	instrumentTrack()->setName(name);
-}
-
-
-
 namespace gui
 {
-
 
 /*
 	Lv2InsView
@@ -227,7 +244,7 @@ Lv2InsView::Lv2InsView(Lv2Instrument *_instrument, QWidget *_parent) :
 	setAutoFillBackground(true);
 	if (m_reloadPluginButton) {
 		connect(m_reloadPluginButton, &QPushButton::clicked,
-			this, [this](){ this->castModel<Lv2Instrument>()->reloadPlugin();} );
+			this, [this](){ this->castModel<Lv2Instrument>()->reload();} );
 	}
 	if (m_toggleUIButton) {
 		connect(m_toggleUIButton, &QPushButton::toggled,
@@ -283,6 +300,8 @@ void Lv2InsView::dropEvent(QDropEvent *_de)
 void Lv2InsView::modelChanged()
 {
 	Lv2ViewBase::modelChanged(castModel<Lv2Instrument>());
+	connect(castModel<Lv2Instrument>(), &Lv2Instrument::modelChanged,
+		this, [this](){ this->modelChanged();} );
 }
 
 

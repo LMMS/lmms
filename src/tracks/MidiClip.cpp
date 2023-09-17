@@ -48,7 +48,7 @@ QPixmap * gui::MidiClipView::s_stepBtnOffLight = nullptr;
 MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
 	Clip( _instrument_track ),
 	m_instrumentTrack( _instrument_track ),
-	m_clipType( BeatClip ),
+	m_clipType( Type::BeatClip ),
 	m_steps( TimePos::stepsPerBar() )
 {
 	if (_instrument_track->trackContainer()	== Engine::patternStore())
@@ -76,11 +76,11 @@ MidiClip::MidiClip( const MidiClip& other ) :
 	init();
 	switch( getTrack()->trackContainer()->type() )
 	{
-		case TrackContainer::PatternContainer:
+		case TrackContainer::Type::Pattern:
 			setAutoResize( true );
 			break;
 
-		case TrackContainer::SongContainer:
+		case TrackContainer::Type::Song:
 			// move down
 		default:
 			setAutoResize( false );
@@ -111,15 +111,15 @@ void MidiClip::resizeToFirstTrack()
 		m_instrumentTrack->trackContainer()->tracks();
 	for (const auto& track : tracks)
 	{
-		if (track->type() == Track::InstrumentTrack)
+		if (track->type() == Track::Type::Instrument)
 		{
 			if (track != m_instrumentTrack)
 			{
-				unsigned int currentClip = m_instrumentTrack->
-					getClips().indexOf(this);
-				m_steps = static_cast<MidiClip *>
-					(track->getClip(currentClip))
-					->m_steps;
+				const auto& instrumentTrackClips = m_instrumentTrack->getClips();
+				const auto currentClipIt = std::find(instrumentTrackClips.begin(), instrumentTrackClips.end(), this);
+				unsigned int currentClip = currentClipIt != instrumentTrackClips.end() ?
+					std::distance(instrumentTrackClips.begin(), currentClipIt) : -1;
+				m_steps = static_cast<MidiClip*>(track->getClip(currentClip))->m_steps;
 			}
 			break;
 		}
@@ -144,7 +144,7 @@ void MidiClip::init()
 
 void MidiClip::updateLength()
 {
-	if( m_clipType == BeatClip )
+	if( m_clipType == Type::BeatClip )
 	{
 		changeLength( beatClipLength() );
 		updatePatternTrack();
@@ -157,7 +157,7 @@ void MidiClip::updateLength()
 	{
 		if (note->length() > 0)
 		{
-			max_length = qMax<tick_t>(max_length, note->endPos());
+			max_length = std::max<tick_t>(max_length, note->endPos());
 		}
 	}
 	changeLength( TimePos( max_length ).nextFullBar() *
@@ -176,7 +176,7 @@ TimePos MidiClip::beatClipLength() const
 	{
 		if (note->length() < 0)
 		{
-			max_length = qMax<tick_t>(max_length, note->pos() + 1);
+			max_length = std::max<tick_t>(max_length, note->pos() + 1);
 		}
 	}
 
@@ -218,17 +218,14 @@ Note * MidiClip::addNote( const Note & _new_note, const bool _quant_pos )
 void MidiClip::removeNote( Note * _note_to_del )
 {
 	instrumentTrack()->lock();
-	NoteVector::Iterator it = m_notes.begin();
-	while( it != m_notes.end() )
+
+	m_notes.erase(std::remove_if(m_notes.begin(), m_notes.end(), [&](Note* note)
 	{
-		if( *it == _note_to_del )
-		{
-			delete *it;
-			m_notes.erase( it );
-			break;
-		}
-		++it;
-	}
+		auto shouldRemove = note == _note_to_del;
+		if (shouldRemove) { delete note; }
+		return shouldRemove;
+	}), m_notes.end());
+
 	instrumentTrack()->unlock();
 
 	checkType();
@@ -308,7 +305,7 @@ void MidiClip::setStep( int step, bool enabled )
 
 
 
-void MidiClip::splitNotes(NoteVector notes, TimePos pos)
+void MidiClip::splitNotes(const NoteVector& notes, TimePos pos)
 {
 	if (notes.empty()) { return; }
 
@@ -340,10 +337,10 @@ void MidiClip::splitNotes(NoteVector notes, TimePos pos)
 
 
 
-void MidiClip::setType( MidiClipTypes _new_clip_type )
+void MidiClip::setType( Type _new_clip_type )
 {
-	if( _new_clip_type == BeatClip ||
-				_new_clip_type == MelodyClip )
+	if( _new_clip_type == Type::BeatClip ||
+				_new_clip_type == Type::MelodyClip )
 	{
 		m_clipType = _new_clip_type;
 	}
@@ -354,17 +351,15 @@ void MidiClip::setType( MidiClipTypes _new_clip_type )
 
 void MidiClip::checkType()
 {
-	NoteVector::Iterator it = m_notes.begin();
-	while( it != m_notes.end() )
+	for (auto& note : m_notes)
 	{
-		if( ( *it )->length() > 0 )
+		if (note->length() > 0)
 		{
-			setType( MelodyClip );
+			setType(Type::MelodyClip);
 			return;
 		}
-		++it;
 	}
-	setType( BeatClip );
+	setType( Type::BeatClip );
 }
 
 
@@ -372,7 +367,7 @@ void MidiClip::checkType()
 
 void MidiClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	_this.setAttribute( "type", m_clipType );
+	_this.setAttribute( "type", static_cast<int>(m_clipType) );
 	_this.setAttribute( "name", name() );
 	
 	if( usesCustomClipColor() )
@@ -395,9 +390,9 @@ void MidiClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "steps", m_steps );
 
 	// now save settings of all notes
-	for (const auto& note : m_notes)
+	for (auto& note : m_notes)
 	{
-		note->saveState( _doc, _this );
+		note->saveState(_doc, _this);
 	}
 }
 
@@ -406,7 +401,7 @@ void MidiClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void MidiClip::loadSettings( const QDomElement & _this )
 {
-	m_clipType = static_cast<MidiClipTypes>( _this.attribute( "type"
+	m_clipType = static_cast<Type>( _this.attribute( "type"
 								).toInt() );
 	setName( _this.attribute( "name" ) );
 	
@@ -424,7 +419,7 @@ void MidiClip::loadSettings( const QDomElement & _this )
 	{
 		movePosition( _this.attribute( "pos" ).toInt() );
 	}
-	if( _this.attribute( "muted" ).toInt() != isMuted() )
+	if (static_cast<bool>(_this.attribute("muted").toInt()) != isMuted())
 	{
 		toggleMute();
 	}
@@ -477,9 +472,10 @@ MidiClip *  MidiClip::nextMidiClip() const
 
 MidiClip * MidiClip::adjacentMidiClipByOffset(int offset) const
 {
-	QVector<Clip *> clips = m_instrumentTrack->getClips();
+	auto& clips = m_instrumentTrack->getClips();
 	int clipNum = m_instrumentTrack->getClipNum(this);
-	return dynamic_cast<MidiClip*>(clips.value(clipNum + offset, nullptr));
+	if (clipNum < 0 || clipNum > clips.size() - 1) { return nullptr; }
+	return dynamic_cast<MidiClip*>(clips[clipNum + offset]);
 }
 
 
@@ -595,8 +591,8 @@ void MidiClip::changeTimeSignature()
 		}
 	}
 	last_pos = last_pos.nextFullBar() * TimePos::ticksPerBar();
-	m_steps = qMax<tick_t>( TimePos::stepsPerBar(),
-				last_pos.getBar() * TimePos::stepsPerBar() );
+	m_steps = std::max<tick_t>(TimePos::stepsPerBar(),
+				last_pos.getBar() * TimePos::stepsPerBar());
 	updateLength();
 }
 

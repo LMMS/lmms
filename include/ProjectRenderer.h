@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef PROJECT_RENDERER_H
-#define PROJECT_RENDERER_H
+#ifndef LMMS_PROJECT_RENDERER_H
+#define LMMS_PROJECT_RENDERER_H
 
 #include "AudioFileDevice.h"
 #include "lmmsconfig.h"
@@ -40,20 +40,21 @@ class LMMS_EXPORT ProjectRenderer : public QThread
 {
 	Q_OBJECT
 public:
-	enum ExportFileFormats: int
+	enum class ExportFileFormat : int
 	{
-		WaveFile,
-		FlacFile,
-		OggFile,
-		MP3File,
-		NumFileFormats
+		Wave,
+		Flac,
+		Ogg,
+		MP3,
+		Count
 	} ;
+	constexpr static auto NumFileFormats = static_cast<std::size_t>(ExportFileFormat::Count);
 
 	struct FileEncodeDevice
 	{
 		bool isAvailable() const { return m_getDevInst != nullptr; }
 
-		ExportFileFormats m_fileFormat;
+		ExportFileFormat m_fileFormat;
 		const char * m_description;
 		const char * m_extension;
 		AudioFileDeviceInstantiaton m_getDevInst;
@@ -62,7 +63,7 @@ public:
 
 	ProjectRenderer( const AudioEngine::qualitySettings & _qs,
 				const OutputSettings & _os,
-				ExportFileFormats _file_format,
+				ExportFileFormat _file_format,
 				const QString & _out_file );
 	~ProjectRenderer() override = default;
 
@@ -71,12 +72,12 @@ public:
 		return m_fileDev != nullptr;
 	}
 
-	static ExportFileFormats getFileFormatFromExtension(
+	static ExportFileFormat getFileFormatFromExtension(
 							const QString & _ext );
 
-	static QString getFileExtensionFromFormat( ExportFileFormats fmt );
+	static QString getFileExtensionFromFormat( ExportFileFormat fmt );
 
-	static const FileEncodeDevice fileEncodeDevices[];
+	static const std::array<FileEncodeDevice, 5> fileEncodeDevices;
 
 public slots:
 	void startProcessing();
@@ -103,4 +104,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_PROJECT_RENDERER_H

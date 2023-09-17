@@ -41,7 +41,7 @@ PatternTrack::infoMap PatternTrack::s_infoMap;
 
 
 PatternTrack::PatternTrack(TrackContainer* tc) :
-	Track(Track::PatternTrack, tc)
+	Track(Track::Type::Pattern, tc)
 {
 	int patternNum = s_infoMap.size();
 	s_infoMap[this] = patternNum;
@@ -61,9 +61,9 @@ PatternTrack::PatternTrack(TrackContainer* tc) :
 PatternTrack::~PatternTrack()
 {
 	Engine::audioEngine()->removePlayHandlesOfTypes( this,
-					PlayHandle::TypeNotePlayHandle
-					| PlayHandle::TypeInstrumentPlayHandle
-					| PlayHandle::TypeSamplePlayHandle );
+					PlayHandle::Type::NotePlayHandle
+					| PlayHandle::Type::InstrumentPlayHandle
+					| PlayHandle::Type::SamplePlayHandle );
 
 	const int pattern = s_infoMap[this];
 	Engine::patternStore()->removePattern(pattern);
@@ -108,19 +108,27 @@ bool PatternTrack::play( const TimePos & _start, const fpp_t _frames,
 	}
 
 	TimePos lastPosition;
-	TimePos lastLen;
+	TimePos lastLength;
+	tick_t lastOffset = 0;
 	for (const auto& clip : clips)
 	{
 		if (!clip->isMuted() && clip->startPosition() >= lastPosition)
 		{
 			lastPosition = clip->startPosition();
-			lastLen = clip->length();
+			lastLength = clip->length();
+			tick_t patternLength = Engine::patternStore()->lengthOfPattern(static_cast<PatternClip*>(clip)->patternIndex())
+					* TimePos::ticksPerBar();
+			lastOffset = patternLength - (clip->startTimeOffset() % patternLength);
+			if (lastOffset == patternLength)
+			{
+				lastOffset = 0;
+			}
 		}
 	}
 
-	if( _start - lastPosition < lastLen )
+	if( _start - lastPosition < lastLength )
 	{
-		return Engine::patternStore()->play(_start - lastPosition, _frames, _offset, s_infoMap[this]);
+		return Engine::patternStore()->play(_start - lastPosition + lastOffset, _frames, _offset, s_infoMap[this]);
 	}
 	return false;
 }

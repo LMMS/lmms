@@ -22,19 +22,25 @@
  *
  */
 
-#include <lmmsconfig.h>
+#include "LocalZynAddSubFx.h"
 
-#include "zynaddsubfx/src/Misc/Util.h"
-#include <unistd.h>
 #include <ctime>
 
-#include "LocalZynAddSubFx.h"
+#include "lmmsconfig.h"
+
+#ifdef LMMS_BUILD_WIN32
+#	include <wchar.h>
+#	include "IoHelper.h"
+#else
+#	include <unistd.h>
+#endif
 
 #include "MidiEvent.h"
 
 #include "zynaddsubfx/src/Nio/NulEngine.h"
 #include "zynaddsubfx/src/Misc/Master.h"
 #include "zynaddsubfx/src/Misc/Part.h"
+#include "zynaddsubfx/src/Misc/Util.h"
 
 // Global variable in zynaddsubfx/src/globals.h
 SYNTH_T* synth = nullptr;
@@ -53,14 +59,6 @@ LocalZynAddSubFx::LocalZynAddSubFx() :
 {
 	if( s_instanceCount == 0 )
 	{
-#ifdef LMMS_BUILD_WIN32
-#ifndef __WINPTHREADS_VERSION
-		// (non-portable) initialization of statically linked pthread library
-		pthread_win32_process_attach_np();
-		pthread_win32_thread_attach_np();
-#endif
-#endif // LMMS_BUILD_WIN32
-
 		initConfig();
 
 		synth = new SYNTH_T;
@@ -143,14 +141,20 @@ void LocalZynAddSubFx::loadXML( const std::string & _filename )
 {
 	char * f = strdup( _filename.c_str() );
 
-	pthread_mutex_lock( &m_master->mutex );
-	m_master->defaults();
-	m_master->loadXML( f );
-	pthread_mutex_unlock( &m_master->mutex );
+	{
+		const auto lock = std::lock_guard{m_master->mutex};
+		m_master->defaults();
+		m_master->loadXML( f );
+	}
 
 	m_master->applyparameters();
 
+#ifdef LMMS_BUILD_WIN32
+	_wunlink(toWString(_filename).c_str());
+#else
 	unlink( f );
+#endif
+
 	free( f );
 }
 
@@ -161,10 +165,11 @@ void LocalZynAddSubFx::loadPreset( const std::string & _filename, int _part )
 {
 	char * f = strdup( _filename.c_str() );
 
-	pthread_mutex_lock( &m_master->mutex );
-	m_master->part[_part]->defaultsinstrument();
-	m_master->part[_part]->loadXMLinstrument( f );
-	pthread_mutex_unlock( &m_master->mutex );
+	{
+		const auto lock = std::lock_guard{m_master->mutex};
+		m_master->part[_part]->defaultsinstrument();
+		m_master->part[_part]->loadXMLinstrument( f );
+	}
 
 	m_master->applyparameters();
 
@@ -262,8 +267,13 @@ void LocalZynAddSubFx::processMidiEvent( const MidiEvent& event )
 
 void LocalZynAddSubFx::processAudio( sampleFrame * _out )
 {
+#ifdef _MSC_VER
+	const auto outputl = static_cast<float*>(_alloca(synth->buffersize * sizeof(float)));
+	const auto outputr = static_cast<float*>(_alloca(synth->buffersize * sizeof(float)));
+#else
 	float outputl[synth->buffersize];
 	float outputr[synth->buffersize];
+#endif
 
 	m_master->GetAudioOutSamples( synth->buffersize, synth->samplerate, outputl, outputr );
 

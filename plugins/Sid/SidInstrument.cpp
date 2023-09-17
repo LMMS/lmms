@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008 Csaba Hruska <csaba.hruska/at/gmail.com>
  *                    Attila Herman <attila589/at/gmail.com>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -52,22 +52,22 @@ namespace lmms
 #define SIDWRITEDELAY 9 // lda $xxxx,x 4 cycles, sta $d400,x 5 cycles
 #define SIDWAVEDELAY 4 // and $xxxx,x 4 cycles extra
 
-unsigned char sidorder[] =
+auto sidorder = std::array<unsigned char, 25>
   {0x15,0x16,0x18,0x17,
    0x05,0x06,0x02,0x03,0x00,0x01,0x04,
    0x0c,0x0d,0x09,0x0a,0x07,0x08,0x0b,
    0x13,0x14,0x10,0x11,0x0e,0x0f,0x12};
 
-static const char *attackTime[16] = { "2 ms", "8 ms", "16 ms", "24 ms",
+static auto attackTime = std::array<const char*, 16>{ "2 ms", "8 ms", "16 ms", "24 ms",
 									"38 ms", "56 ms", "68 ms", "80 ms",
 									"100 ms", "250 ms", "500 ms", "800 ms",
 									"1 s", "3 s", "5 s", "8 s" };
-static const char *decRelTime[16] = { "6 ms", "24 ms", "48 ms", "72 ms",
+static auto decRelTime = std::array<const char*, 16>{ "6 ms", "24 ms", "48 ms", "72 ms",
 									"114 ms", "168 ms", "204 ms", "240 ms",
 									"300 ms", "750 ms", "1.5 s", "2.4 s",
 									"3 s", "9 s", "15 s", "24 s" };
 // release time time in ms
-static const int relTime[16] = { 6, 24, 48, 72, 114, 168, 204, 240, 300, 750,
+static const auto relTime = std::array{ 6, 24, 48, 72, 114, 168, 204, 240, 300, 750,
 								1500, 2400, 3000, 9000, 15000, 24000 };
 
 
@@ -83,7 +83,7 @@ Plugin::Descriptor PLUGIN_EXPORT sid_plugin_descriptor =
 	"Csaba Hruska <csaba.hruska/at/gmail.com>"
 	"Attila Herman <attila589/at/gmail.com>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
@@ -105,7 +105,7 @@ VoiceObject::VoiceObject( Model * _parent, int _idx ) :
 					tr( "Voice %1 release" ).arg( _idx+1 ) ),
 	m_coarseModel( 0.0f, -24.0, 24.0, 1.0f, this,
 					tr( "Voice %1 coarse detuning" ).arg( _idx+1 ) ),
-	m_waveFormModel( TriangleWave, 0, NumWaveShapes-1, this,
+	m_waveFormModel( static_cast<int>(WaveForm::Triangle), 0, NumWaveShapes-1, this,
 					tr( "Voice %1 wave shape" ).arg( _idx+1 ) ),
 
 	m_syncModel( false, this, tr( "Voice %1 sync" ).arg( _idx+1 ) ),
@@ -118,15 +118,15 @@ VoiceObject::VoiceObject( Model * _parent, int _idx ) :
 
 SidInstrument::SidInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &sid_plugin_descriptor ),
-	// filter	
+	// filter
 	m_filterFCModel( 1024.0f, 0.0f, 2047.0f, 1.0f, this, tr( "Cutoff frequency" ) ),
 	m_filterResonanceModel( 8.0f, 0.0f, 15.0f, 1.0f, this, tr( "Resonance" ) ),
-	m_filterModeModel( LowPass, 0, NumFilterTypes-1, this, tr( "Filter type" )),
-	
+	m_filterModeModel( static_cast<int>(FilterType::LowPass), 0, NumFilterTypes-1, this, tr( "Filter type" )),
+
 	// misc
 	m_voice3OffModel( false, this, tr( "Voice 3 off" ) ),
 	m_volumeModel( 15.0f, 0.0f, 15.0f, 1.0f, this, tr( "Volume" ) ),
-	m_chipModel( sidMOS8580, 0, NumChipModels-1, this, tr( "Chip model" ) )
+	m_chipModel( static_cast<int>(ChipModel::MOS8580), 0, NumChipModels-1, this, tr( "Chip model" ) )
 {
 	for( int i = 0; i < 3; ++i )
 	{
@@ -167,11 +167,11 @@ void SidInstrument::saveSettings( QDomDocument & _doc,
 										_doc, _this, "test" + is );
 	}
 
-	// filter	
+	// filter
 	m_filterFCModel.saveSettings( _doc, _this, "filterFC" );
 	m_filterResonanceModel.saveSettings( _doc, _this, "filterResonance" );
 	m_filterModeModel.saveSettings( _doc, _this, "filterMode" );
-	
+
 	// misc
 	m_voice3OffModel.saveSettings( _doc, _this, "voice3Off" );
 	m_volumeModel.saveSettings( _doc, _this, "volume" );
@@ -200,12 +200,12 @@ void SidInstrument::loadSettings( const QDomElement & _this )
 		m_voice[i]->m_filteredModel.loadSettings( _this, "filtered" + is );
 		m_voice[i]->m_testModel.loadSettings( _this, "test" + is );
 	}
-	
-	// filter	
+
+	// filter
 	m_filterFCModel.loadSettings( _this, "filterFC" );
 	m_filterResonanceModel.loadSettings( _this, "filterResonance" );
 	m_filterModeModel.loadSettings( _this, "filterMode" );
-	
+
 	// misc
 	m_voice3OffModel.loadSettings( _this, "voice3Off" );
 	m_volumeModel.loadSettings( _this, "volume" );
@@ -297,12 +297,10 @@ static int sid_fillbuffer(unsigned char* sidreg, SID *sid, int tdelta, short *pt
 void SidInstrument::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
-	const f_cnt_t tfp = _n->totalFramesPlayed();
-
 	const int clockrate = C64_PAL_CYCLES_PER_SEC;
 	const int samplerate = Engine::audioEngine()->processingSampleRate();
 
-	if ( tfp == 0 )
+	if (!_n->m_pluginData)
 	{
 		SID *sid = new SID();
 		sid->set_sampling_parameters( clockrate, SAMPLE_FAST, samplerate );
@@ -318,14 +316,14 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 	int delta_t = clockrate * frames / samplerate + 4;
 	// avoid variable length array for msvc compat
 	auto buf = reinterpret_cast<short*>(_working_buffer + offset);
-	unsigned char sidreg[NUMSIDREGS];
+	auto sidreg = std::array<unsigned char, NUMSIDREGS>{};
 
 	for (auto& reg : sidreg)
 	{
 		reg = 0x00;
 	}
 
-	if( (ChipModel)m_chipModel.value() == sidMOS6581 )
+	if( (ChipModel)m_chipModel.value() == ChipModel::MOS6581 )
 	{
 		sid->set_chip_model( MOS6581 );
 	}
@@ -354,7 +352,7 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 		sidreg[base+1] = (data16>>8)&0x00FF;
 		// pw
 		data16 = (int)m_voice[i]->m_pulseWidthModel.value();
-		
+
 		sidreg[base+2] = data16&0x00FF;
 		sidreg[base+3] = (data16>>8)&0x000F;
 		// control: wave form, (test), ringmod, sync, gate
@@ -362,13 +360,13 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 		data8 += m_voice[i]->m_syncModel.value()?2:0;
 		data8 += m_voice[i]->m_ringModModel.value()?4:0;
 		data8 += m_voice[i]->m_testModel.value()?8:0;
-		switch( m_voice[i]->m_waveFormModel.value() )
-		{	
+		switch( static_cast<VoiceObject::WaveForm>(m_voice[i]->m_waveFormModel.value()) )
+		{
 			default: break;
-			case VoiceObject::NoiseWave:	data8 += 128; break;
-			case VoiceObject::SquareWave:	data8 += 64; break;
-			case VoiceObject::SawWave:		data8 += 32; break;
-			case VoiceObject::TriangleWave:	data8 += 16; break;
+			case VoiceObject::WaveForm::Noise:	data8 += 128; break;
+			case VoiceObject::WaveForm::Square:	data8 += 64; break;
+			case VoiceObject::WaveForm::Saw:		data8 += 32; break;
+			case VoiceObject::WaveForm::Triangle:	data8 += 16; break;
 		}
 		sidreg[base+4] = data8&0x00FF;
 		// ad
@@ -394,7 +392,7 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 	data16 = (int)m_filterFCModel.value();
 	sidreg[21] = data16&0x0007;
 	sidreg[22] = (data16>>3)&0x00FF;
-	
+
 	// res, filt ex,3,2,1
 	data16 = (int)m_filterResonanceModel.value();
 	data8 = (data16&0x000F)<<4;
@@ -408,17 +406,17 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 	data8 = data16&0x000F;
 	data8 += m_voice3OffModel.value()?128:0;
 
-	switch( m_filterModeModel.value() )
-	{	
+	switch( static_cast<FilterType>(m_filterModeModel.value()) )
+	{
 		default: break;
-		case LowPass:	data8 += 16; break;
-		case BandPass:	data8 += 32; break;
-		case HighPass:	data8 += 64; break;
+		case FilterType::LowPass:	data8 += 16; break;
+		case FilterType::BandPass:	data8 += 32; break;
+		case FilterType::HighPass:	data8 += 64; break;
 	}
 
 	sidreg[24] = data8&0x00FF;
-		
-	int num = sid_fillbuffer(sidreg, sid,delta_t,buf, frames);
+
+	int num = sid_fillbuffer(sidreg.data(), sid, delta_t, buf, frames);
 	if(num!=frames)
 		printf("!!!Not enough samples\n");
 
@@ -461,7 +459,7 @@ class sidKnob : public Knob
 {
 public:
 	sidKnob( QWidget * _parent ) :
-			Knob( knobStyled, _parent )
+			Knob( KnobType::Styled, _parent )
 	{
 		setFixedSize( 16, 16 );
 		setCenterPointX( 7.5 );
@@ -544,7 +542,7 @@ SidInstrumentView::SidInstrumentView( Instrument * _instrument,
 	m_sidTypeBtnGrp->addButton( mos6581_btn );
 	m_sidTypeBtnGrp->addButton( mos8580_btn );
 
-	for( int i = 0; i < 3; i++ ) 
+	for( int i = 0; i < 3; i++ )
 	{
 		Knob *ak = new sidKnob( this );
 		ak->setHintText( tr("Attack:"), "" );
@@ -674,7 +672,7 @@ void SidInstrumentView::updateKnobHint()
 				m_releaseModel.value()] )  + ")" );
 		m_voiceKnobs[i].m_relKnob->setToolTip(
 						decRelTime[(int)k->m_voice[i]->m_releaseModel.value()]);
-	
+
 		m_voiceKnobs[i].m_pwKnob->setHintText( tr( "Pulse width:" )+ " ", " (" +
 				QString::number(  (double)k->m_voice[i]->
 				m_pulseWidthModel.value() / 40.95 ) + "%)" );
@@ -758,7 +756,7 @@ void SidInstrumentView::modelChanged()
 		connect(&voice->m_sustainModel, SIGNAL(dataChanged()), this, SLOT(updateKnobToolTip()));
 		connect(&voice->m_coarseModel, SIGNAL(dataChanged()), this, SLOT(updateKnobToolTip()));
 	}
-	
+
 	connect( &k->m_volumeModel, SIGNAL( dataChanged() ),
 		this, SLOT( updateKnobToolTip() ) );
 	connect( &k->m_filterResonanceModel, SIGNAL( dataChanged() ),

@@ -21,7 +21,7 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 
 
 #include <QDomElement>
@@ -57,7 +57,7 @@ Plugin::Descriptor PLUGIN_EXPORT tripleoscillator_plugin_descriptor =
 				"in several ways" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0110,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
@@ -81,13 +81,13 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 	m_fineRightModel( 0.0f, -100.0f, 100.0f, 1.0f, this,
 			tr( "Osc %1 fine detuning right" ).arg( _idx + 1 ) ),
 	m_phaseOffsetModel( 0.0f, 0.0f, 360.0f, 1.0f, this,
-			tr( "Osc %1 phase-offset" ).arg( _idx+1 ) ), 
+			tr( "Osc %1 phase-offset" ).arg( _idx+1 ) ),
 	m_stereoPhaseDetuningModel( 0.0f, 0.0f, 360.0f, 1.0f, this,
 			tr( "Osc %1 stereo phase-detuning" ).arg( _idx+1 ) ),
-	m_waveShapeModel( Oscillator::SineWave, 0, 
+	m_waveShapeModel( static_cast<int>(Oscillator::WaveShape::Sine), 0,
 			Oscillator::NumWaveShapes-1, this,
 			tr( "Osc %1 wave shape" ).arg( _idx+1 ) ),
-	m_modulationAlgoModel( Oscillator::SignalMix, 0,
+	m_modulationAlgoModel( static_cast<int>(Oscillator::ModulationAlgo::SignalMix), 0,
 				Oscillator::NumModulationAlgos-1, this,
 				tr( "Modulation type %1" ).arg( _idx+1 ) ),
 	m_useWaveTableModel(true),
@@ -220,7 +220,7 @@ void OscillatorObject::updateUseWaveTable()
 }
 
 
- 
+
 
 TripleOscillator::TripleOscillator( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &tripleoscillator_plugin_descriptor )
@@ -308,10 +308,10 @@ QString TripleOscillator::nodeName() const
 void TripleOscillator::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
-	if( _n->totalFramesPlayed() == 0 || _n->m_pluginData == nullptr )
+	if (!_n->m_pluginData)
 	{
-		Oscillator * oscs_l[NUM_OF_OSCILLATORS];
-		Oscillator * oscs_r[NUM_OF_OSCILLATORS];
+		auto oscs_l = std::array<Oscillator*, NUM_OF_OSCILLATORS>{};
+		auto oscs_r = std::array<Oscillator*, NUM_OF_OSCILLATORS>{};
 
 		for( int i = NUM_OF_OSCILLATORS - 1; i >= 0; --i )
 		{
@@ -426,7 +426,7 @@ class TripleOscKnob : public Knob
 {
 public:
 	TripleOscKnob( QWidget * _parent ) :
-			Knob( knobStyled, _parent )
+			Knob( KnobType::Styled, _parent )
 	{
 		setFixedSize( 28, 35 );
 	}
@@ -554,7 +554,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 		int knob_y = osc_y + i * osc_h;
 
 		// setup volume-knob
-		auto vk = new Knob(knobStyled, this);
+		auto vk = new Knob(KnobType::Styled, this);
 		vk->setVolumeKnob( true );
 		vk->setFixedSize( 28, 35 );
 		vk->move( 6, knob_y );

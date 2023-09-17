@@ -22,10 +22,10 @@
  *
  */
 
-#ifndef ENVELOPE_AND_LFO_PARAMETERS_H
-#define ENVELOPE_AND_LFO_PARAMETERS_H
+#ifndef LMMS_ENVELOPE_AND_LFO_PARAMETERS_H
+#define LMMS_ENVELOPE_AND_LFO_PARAMETERS_H
 
-#include <QVector>
+#include <vector>
 
 #include "JournallingObject.h"
 #include "AutomatableModel.h"
@@ -169,7 +169,7 @@ private:
 	bool m_bad_lfoShapeData;
 	SampleBuffer m_userWave;
 
-	enum LfoShapes
+	enum class LfoShape
 	{
 		SineWave,
 		TriangleWave,
@@ -177,8 +177,9 @@ private:
 		SquareWave,
 		UserDefinedWave,
 		RandomWave,
-		NumLfoShapes
+		Count
 	} ;
+	constexpr static auto NumLfoShapes = static_cast<std::size_t>(LfoShape::Count);
 
 	sample_t lfoShapeSample( fpp_t _frame_offset );
 	void updateLfoShapeData();
@@ -190,4 +191,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_ENVELOPE_AND_LFO_PARAMETERS_H

@@ -1,8 +1,8 @@
 /*
- * InstrumentMiscView.cpp - Miscellaneous instrument settings
+ * InstrumentTuningView.cpp - Instrument settings for tuning and transpositions
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * Copyright (c) 2020 Martin Pavelek <he29.HS/at/gmail.com>
+ * Copyright (c) 2020-2022 Martin Pavelek <he29.HS/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -23,42 +23,52 @@
  *
  */
 
-#include "InstrumentMiscView.h"
+#include "InstrumentTuningView.h"
 
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QPixmap>
 #include <QVBoxLayout>
 
 #include "ComboBox.h"
 #include "GroupBox.h"
+#include "GuiApplication.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "LedCheckBox.h"
+#include "MainWindow.h"
+#include "PixmapButton.h"
 
 
 namespace lmms::gui
 {
 
 
-InstrumentMiscView::InstrumentMiscView(InstrumentTrack *it, QWidget *parent) :
+InstrumentTuningView::InstrumentTuningView(InstrumentTrack *it, QWidget *parent) :
 	QWidget(parent)
 {
 	auto layout = new QVBoxLayout(this);
-	layout->setMargin(5);
+	layout->setContentsMargins(5, 5, 5, 5);
 
 	// Master pitch toggle
-	m_pitchGroupBox = new GroupBox(tr("MASTER PITCH"));
+	m_pitchGroupBox = new GroupBox(tr("GLOBAL TRANSPOSITION"));
 	m_pitchGroupBox->setModel(&it->m_useMasterPitchModel);
 	layout->addWidget(m_pitchGroupBox);
 
 	auto masterPitchLayout = new QHBoxLayout(m_pitchGroupBox);
 	masterPitchLayout->setContentsMargins(8, 18, 8, 8);
 
-	auto tlabel = new QLabel(tr("Enables the use of master pitch"));
+	auto tlabel = new QLabel(tr("Enables the use of global transposition"));
+	tlabel->setWordWrap(true);
 	tlabel->setFont(pointSize<8>(tlabel->font()));
 	masterPitchLayout->addWidget(tlabel);
 
 	// Microtuner settings
+	m_microtunerNotSupportedLabel = new QLabel(tr("Microtuner is not available for MIDI-based instruments."));
+	m_microtunerNotSupportedLabel->setWordWrap(true);
+	m_microtunerNotSupportedLabel->hide();
+	layout->addWidget(m_microtunerNotSupportedLabel);
+
 	m_microtunerGroupBox = new GroupBox(tr("MICROTUNER"));
 	m_microtunerGroupBox->setModel(it->m_microtuner.enabledModel());
 	layout->addWidget(m_microtunerGroupBox);
@@ -66,8 +76,22 @@ InstrumentMiscView::InstrumentMiscView(InstrumentTrack *it, QWidget *parent) :
 	auto microtunerLayout = new QVBoxLayout(m_microtunerGroupBox);
 	microtunerLayout->setContentsMargins(8, 18, 8, 8);
 
+	auto scaleEditLayout = new QHBoxLayout();
+	scaleEditLayout->setContentsMargins(0, 0, 4, 0);
+	microtunerLayout->addLayout(scaleEditLayout);
+
 	auto scaleLabel = new QLabel(tr("Active scale:"));
-	microtunerLayout->addWidget(scaleLabel);
+	scaleEditLayout->addWidget(scaleLabel);
+
+	QPixmap editPixmap(embed::getIconPixmap("edit_draw_small"));
+	auto editPixButton = new PixmapButton(this, tr("Edit scales and keymaps"));
+	editPixButton->setToolTip(tr("Edit scales and keymaps"));
+	editPixButton->setInactiveGraphic(editPixmap);
+	editPixButton->setActiveGraphic(editPixmap);
+	editPixButton->setFixedSize(16, 16);
+	connect(editPixButton, SIGNAL(clicked()), getGUI()->mainWindow(), SLOT(toggleMicrotunerWin()));
+
+	scaleEditLayout->addWidget(editPixButton);
 
 	m_scaleCombo = new ComboBox();
 	m_scaleCombo->setModel(it->m_microtuner.scaleModel());

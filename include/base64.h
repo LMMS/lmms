@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _BASE64_H
-#define _BASE64_H
+#ifndef LMMS_BASE64_H
+#define LMMS_BASE64_H
 
 #include <QByteArray>
 #include <QString>
@@ -53,4 +53,4 @@ namespace lmms::base64
 
 } // namespace lmms::base64
 
-#endif
+#endif // LMMS_BASE64_H

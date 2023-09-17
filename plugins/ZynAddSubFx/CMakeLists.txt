@@ -1,4 +1,11 @@
+if(NOT FLTK_FOUND)
+	return()
+endif()
+
 INCLUDE(BuildPlugin)
+
+find_package(Threads REQUIRED)
+find_package(ZLIB REQUIRED)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
@@ -11,38 +18,18 @@ ELSE()
 	ADD_DEFINITIONS(-DOS_WINDOWS)
 ENDIF()
 
-# do not conflict with LMMS' Controller class
-ADD_DEFINITIONS(-DController=ZynController)
-
 # use asm optimizations when on x86 or x86_64
-IF(LMMS_HOST_X86 OR LMMS_HOST_X86_64)
+if(NOT MSVC AND (LMMS_HOST_X86 OR LMMS_HOST_X86_64))
 	ADD_DEFINITIONS(-DASM_F2I_YES)
-ENDIF(LMMS_HOST_X86 OR LMMS_HOST_X86_64)
+endif()
 
 # build ZynAddSubFX with full optimizations
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wno-write-strings -Wno-deprecated-declarations -fpermissive")
+if(NOT MSVC)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wno-write-strings -Wno-deprecated-declarations -fpermissive")
+endif()
 
 IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND NOT "${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS "6.0.0")
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-misleading-indentation")
-ENDIF()
-
-IF(LMMS_BUILD_WIN32)
-	# link system-libraries
-	ADD_DEFINITIONS(-DPTW32_STATIC_LIB)
-	# fix X11 headers errors caused by bug with mingw + c++11 (enable -std=gnu++0x)
-	SET(CMAKE_CXX_EXTENSIONS ON)
-ENDIF(LMMS_BUILD_WIN32)
-
-SET(FLTK_SKIP_OPENGL TRUE)
-SET(FLTK_SKIP_FORMS TRUE)
-SET(FLTK_SKIP_IMAGES TRUE)
-SET(FLTK_SKIP_MATH TRUE)
-IF(MINGW_PREFIX)
-	SET(FLTK_SKIP_FLUID TRUE)
-ENDIF()
-
-IF(NOT FLTK_FOUND)
-	RETURN()
 ENDIF()
 
 IF(MINGW_PREFIX)
@@ -57,13 +44,15 @@ IF(NOT EXISTS ${FLTK_FLUID_EXECUTABLE})
     ENDIF()
 ENDIF()
 
-INCLUDE_DIRECTORIES("${FLTK_INCLUDE_DIR}"
-                    "${CMAKE_CURRENT_SOURCE_DIR}"
-                    ${FFTW3F_INCLUDE_DIRS}
-                    "${CMAKE_CURRENT_BINARY_DIR}"
-                    "${CMAKE_BINARY_DIR}")
-
-include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/zynaddsubfx/src/UI)
+include_directories(
+	"${FLTK_INCLUDE_DIR}"
+	"${CMAKE_CURRENT_SOURCE_DIR}"
+	${FFTW3F_INCLUDE_DIRS}
+	"${CMAKE_CURRENT_BINARY_DIR}"
+	"${CMAKE_BINARY_DIR}"
+	"${CMAKE_SOURCE_DIR}/src/3rdparty/mingw-std-threads"
+	"${CMAKE_CURRENT_SOURCE_DIR}/zynaddsubfx/src/UI"
+)
 
 ADD_DEFINITIONS(-DPLUGINVERSION)	# removes exit confirmation dialogs etc. in MasterUI.fl
 add_subdirectory(zynaddsubfx/src/Nio)
@@ -116,24 +105,23 @@ SET(zynaddsubfx_core_SRCS
 	zynaddsubfx/src/Synth/PADnote.cpp
 	zynaddsubfx/src/Synth/Resonance.cpp
 	zynaddsubfx/src/Synth/SUBnote.cpp
-    )
+)
 
+add_library(ZynAddSubFxCoreObjs OBJECT LocalZynAddSubFx.cpp ${zynaddsubfx_core_SRCS})
+add_library(ZynAddSubFxCore INTERFACE)
+target_sources(ZynAddSubFxCore INTERFACE
+	$<TARGET_OBJECTS:ZynAddSubFxCoreObjs>
+	$<TARGET_OBJECTS:zynaddsubfx_nio>
+)
 
-IF(LMMS_BUILD_LINUX)
-	ADD_LIBRARY(ZynAddSubFxCore MODULE LocalZynAddSubFx.cpp ${zynaddsubfx_core_SRCS})
-ELSE()
-	ADD_LIBRARY(ZynAddSubFxCore SHARED LocalZynAddSubFx.cpp ${zynaddsubfx_core_SRCS})
-ENDIF()
-TARGET_LINK_LIBRARIES(ZynAddSubFxCore zynaddsubfx_nio ${FFTW3F_LIBRARIES} ${QT_LIBRARIES} -lz -lpthread)
-
-TARGET_LINK_LIBRARIES(ZynAddSubFxCore Qt5::Widgets Qt5::Xml)
-
-IF(LMMS_BUILD_WIN32)
-	TARGET_LINK_LIBRARIES(ZynAddSubFxCore -lws2_32)
-	INSTALL(TARGETS ZynAddSubFxCore RUNTIME DESTINATION "${PLUGIN_DIR}")
-ELSE(LMMS_BUILD_WIN32)
-	INSTALL(TARGETS ZynAddSubFxCore LIBRARY DESTINATION "${PLUGIN_DIR}")
-ENDIF(LMMS_BUILD_WIN32)
+target_link_libraries(ZynAddSubFxCore INTERFACE
+	${FFTW3F_LIBRARIES}
+	${QT_LIBRARIES}
+	Qt5::Widgets
+	Qt5::Xml
+	Threads::Threads
+	ZLIB::ZLIB
+)
 
 LINK_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}/..")
 IF(LMMS_BUILD_LINUX)
@@ -144,10 +132,11 @@ ELSE()
 	SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${PLUGIN_DIR}")
 ENDIF()
 BUILD_PLUGIN(zynaddsubfx ZynAddSubFx.cpp ZynAddSubFx.h MOCFILES ZynAddSubFx.h EMBEDDED_RESOURCES artwork.png logo.png)
-TARGET_LINK_LIBRARIES(zynaddsubfx -lZynAddSubFxCore)
-ADD_DEPENDENCIES(zynaddsubfx ZynAddSubFxCore)
+target_link_libraries(zynaddsubfx ZynAddSubFxCore)
 
-IF(WIN32)
+if(MSVC)
+	set(WINRC "${CMAKE_CURRENT_BINARY_DIR}/zynaddsubfx.rc")
+elseif(WIN32)
 	SET(WINRC "${CMAKE_CURRENT_BINARY_DIR}/zynaddsubfxrc.obj")
 	ADD_CUSTOM_COMMAND(OUTPUT "${WINRC}"
 				COMMAND "${CMAKE_RC_COMPILER}"
@@ -155,14 +144,19 @@ IF(WIN32)
 					"-o\"${CMAKE_CURRENT_BINARY_DIR}/zynaddsubfxrc.obj\""
 					"-i\"${CMAKE_CURRENT_BINARY_DIR}/zynaddsubfx.rc\""
 				DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/zynaddsubfx.rc")
-ENDIF(WIN32)
+endif()
 
 # Use libraries in non-standard directories (e.g., another version of Qt)
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 ADD_SUBDIRECTORY("${LMMS_SOURCE_DIR}/src/common" common)
 
-ADD_EXECUTABLE(RemoteZynAddSubFx RemoteZynAddSubFx.cpp ${LMMS_COMMON_SRCS} "${WINRC}")
+add_executable(RemoteZynAddSubFx
+	RemoteZynAddSubFx.cpp
+	${LMMS_COMMON_SRCS}
+	"${WINRC}"
+	$<TARGET_OBJECTS:zynaddsubfx_gui>
+)
 INSTALL(TARGETS RemoteZynAddSubFx RUNTIME DESTINATION "${PLUGIN_DIR}")
 # Needed to deploy dependencies of RemoteZynAddSubFx
 SET_PROPERTY(GLOBAL APPEND PROPERTY PLUGINS_BUILT "RemoteZynAddSubFx")
@@ -182,8 +176,7 @@ IF(FLTK_CONFIG AND NOT (LMMS_BUILD_APPLE OR LMMS_BUILD_WIN32))
 	STRING(REPLACE " " ";" FLTK_FILTERED_LDFLAGS ${FLTK_FILTERED_LDFLAGS})
 	LIST(REMOVE_ITEM FLTK_FILTERED_LDFLAGS -lX11)
 ENDIF()
-TARGET_LINK_LIBRARIES(RemoteZynAddSubFx zynaddsubfx_gui -lZynAddSubFxCore ${FLTK_FILTERED_LDFLAGS} -lpthread )
-ADD_DEPENDENCIES(RemoteZynAddSubFx ZynAddSubFxCore)
+target_link_libraries(RemoteZynAddSubFx ZynAddSubFxCore ${FLTK_FILTERED_LDFLAGS})
 
 if(LMMS_HAVE_LIBRT)
 	target_link_libraries(RemoteZynAddSubFx rt)
@@ -199,13 +192,6 @@ ENDIF(LMMS_BUILD_WIN32)
 
 
 IF(LMMS_BUILD_WIN32)
-	add_custom_command(
-		TARGET ZynAddSubFxCore
-		POST_BUILD
-		COMMAND "${STRIP_COMMAND}" "$<TARGET_FILE:ZynAddSubFxCore>"
-		VERBATIM
-		COMMAND_EXPAND_LISTS
-	)
 	add_custom_command(
 		TARGET RemoteZynAddSubFx
 		POST_BUILD

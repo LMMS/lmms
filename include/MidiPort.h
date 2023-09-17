@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef MIDI_PORT_H
-#define MIDI_PORT_H
+#ifndef LMMS_MIDI_PORT_H
+#define LMMS_MIDI_PORT_H
 
 #include <QString>
 #include <QList>
@@ -69,20 +69,19 @@ class MidiPort : public Model, public SerializingObject
 public:
 	using Map = QMap<QString, bool>;
 
-	enum Modes
+	enum class Mode
 	{
 		Disabled,	// don't route any MIDI-events (default)
 		Input,		// from MIDI-client to MIDI-event-processor
 		Output,		// from MIDI-event-processor to MIDI-client
 		Duplex		// both directions
 	} ;
-	using Mode = Modes;
 
 	MidiPort( const QString& name,
 			MidiClient* client,
 			MidiEventProcessor* eventProcessor,
 			Model* parent = nullptr,
-			Mode mode = Disabled );
+			Mode mode = Mode::Disabled );
 	~MidiPort() override;
 
 	void setName( const QString& name );
@@ -96,12 +95,12 @@ public:
 
 	bool isInputEnabled() const
 	{
-		return mode() == Input || mode() == Duplex;
+		return mode() == Mode::Input || mode() == Mode::Duplex;
 	}
 
 	bool isOutputEnabled() const
 	{
-		return mode() == Output || mode() == Duplex;
+		return mode() == Mode::Output || mode() == Mode::Duplex;
 	}
 
 	int realOutputChannel() const
@@ -190,4 +189,4 @@ using MidiPortList = QList<MidiPort*>;
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_MIDI_PORT_H

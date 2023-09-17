@@ -24,11 +24,12 @@
  *
  */
 
-#ifndef PIANO_ROLL_H
-#define PIANO_ROLL_H
+#ifndef LMMS_GUI_PIANO_ROLL_H
+#define LMMS_GUI_PIANO_ROLL_H
 
-#include <QVector>
 #include <QWidget>
+
+#include <vector>
 
 #include "Editor.h"
 #include "ComboBoxModel.h"
@@ -60,7 +61,7 @@ namespace gui
 
 class ComboBox;
 class PositionLine;
-class TextFloat;
+class SimpleTextFloat;
 class TimeLineWidget;
 
 
@@ -103,13 +104,13 @@ class PianoRoll : public QWidget
 	Q_PROPERTY(QBrush blackKeyActiveBackground MEMBER m_blackKeyActiveBackground)
 	Q_PROPERTY(QBrush blackKeyDisabledBackground MEMBER m_blackKeyDisabledBackground)
 public:
-	enum EditModes
+	enum class EditMode
 	{
-		ModeDraw,
-		ModeErase,
-		ModeSelect,
-		ModeEditDetuning,
-		ModeEditKnife
+		Draw,
+		Erase,
+		Select,
+		Detuning,
+		Knife
 	};
 
 	/*! \brief Resets settings to default when e.g. creating a new project */
@@ -149,17 +150,29 @@ public:
 	{
 		return m_midiClip != nullptr;
 	}
+	
+	int trackOctaveSize() const;
 
-	Song::PlayModes desiredPlayModeForAccompany() const;
+	Song::PlayMode desiredPlayModeForAccompany() const;
 
 	int quantization() const;
 
 protected:
-	enum QuantizeActions
+	enum class QuantizeAction
 	{
-		QuantizeBoth,
-		QuantizePos,
-		QuantizeLength
+		Both,
+		Pos,
+		Length
+	};
+
+	enum class SemiToneMarkerAction
+	{
+		UnmarkAll,
+		MarkCurrentSemiTone,
+		MarkAllOctaveSemiTones,
+		MarkCurrentScale,
+		MarkCurrentChord,
+		CopyAllNotesOnKey
 	};
 
 	void keyPressEvent( QKeyEvent * ke ) override;
@@ -218,12 +231,12 @@ protected slots:
 	void quantizeChanged();
 	void noteLengthChanged();
 	void keyChanged();
-	void quantizeNotes(lmms::gui::PianoRoll::QuantizeActions mode = QuantizeBoth);
+	void quantizeNotes(QuantizeAction mode = QuantizeAction::Both);
 
 	void updateSemiToneMarkerMenu();
 
 	void changeNoteEditMode( int i );
-	void markSemiTone(int i, bool fromMenu = true);
+	void markSemiTone(SemiToneMarkerAction i, bool fromMenu = true);
 
 	void hideMidiClip( lmms::MidiClip* clip );
 
@@ -245,51 +258,41 @@ signals:
 
 
 private:
-	enum Actions
+	enum class Action
 	{
-		ActionNone,
-		ActionMoveNote,
-		ActionResizeNote,
-		ActionSelectNotes,
-		ActionChangeNoteProperty,
-		ActionResizeNoteEditArea,
-		ActionKnife
+		None,
+		MoveNote,
+		ResizeNote,
+		SelectNotes,
+		ChangeNoteProperty,
+		ResizeNoteEditArea,
+		Knife
 	};
 
-	enum NoteEditMode
+	enum class NoteEditMode
 	{
-		NoteEditVolume,
-		NoteEditPanning,
-		NoteEditCount // make sure this one is always last
+		Volume,
+		Panning,
+		Count // make sure this one is always last
 	};
 
-	enum SemiToneMarkerAction
+	enum class KeyType
 	{
-		stmaUnmarkAll,
-		stmaMarkCurrentSemiTone,
-		stmaMarkAllOctaveSemiTones,
-		stmaMarkCurrentScale,
-		stmaMarkCurrentChord,
-		stmaCopyAllNotesOnKey
+		WhiteSmall,
+		WhiteBig,
+		Black
 	};
 
-	enum PianoRollKeyTypes
+	enum class GridMode
 	{
-		PR_WHITE_KEY_SMALL,
-		PR_WHITE_KEY_BIG,
-		PR_BLACK_KEY
-	};
-
-	enum GridMode
-	{
-		gridNudge,
-		gridSnap
-	//	gridFree
+		Nudge,
+		Snap
+	//	Free
 	};
 
 	PositionLine * m_positionLine;
 
-	QVector<QString> m_nemStr; // gui names of each edit mode
+	std::vector<QString> m_nemStr; // gui names of each edit mode
 	QMenu * m_noteEditMenu; // when you right click below the key area
 
 	QList<int> m_markedSemiTones;
@@ -305,9 +308,9 @@ private:
 	TimePos newNoteLen() const;
 
 	void shiftPos(int amount);
-	void shiftPos(NoteVector notes, int amount);
+	void shiftPos(const NoteVector& notes, int amount);
 	void shiftSemiTone(int amount);
-	void shiftSemiTone(NoteVector notes, int amount);
+	void shiftSemiTone(const NoteVector& notes, int amount);
 	bool isSelection() const;
 	int selectionCount() const;
 	void testPlayNote( Note * n );
@@ -343,9 +346,9 @@ private:
 	static QPixmap * s_toolOpen;
 	static QPixmap* s_toolKnife;
 
-	static PianoRollKeyTypes prKeyOrder[];
+	static std::array<KeyType, 12> prKeyOrder;
 
-	static TextFloat * s_textFloat;
+	static SimpleTextFloat * s_textFloat;
 
 	ComboBoxModel m_zoomingModel;
 	ComboBoxModel m_zoomingYModel;
@@ -356,8 +359,8 @@ private:
 	ComboBoxModel m_chordModel;
 	ComboBoxModel m_snapModel;
 
-	static const QVector<float> m_zoomLevels;
-	static const QVector<float> m_zoomYLevels;
+	static const std::vector<float> m_zoomLevels;
+	static const std::vector<float> m_zoomYLevels;
 
 	MidiClip* m_midiClip;
 	NoteVector m_ghostNotes;
@@ -375,7 +378,7 @@ private:
 	QList<Note> m_recordingNotes;
 
 	Note * m_currentNote;
-	Actions m_action;
+	Action m_action;
 	NoteEditMode m_noteEditMode;
 	GridMode m_gridMode;
 
@@ -426,9 +429,9 @@ private:
 	int m_startKey; // first key when drawing
 	int m_lastKey;
 
-	EditModes m_editMode;
-	EditModes m_ctrlMode; // mode they were in before they hit ctrl
-	EditModes m_knifeMode; // mode they where in before entering knife mode
+	EditMode m_editMode;
+	EditMode m_ctrlMode; // mode they were in before they hit ctrl
+	EditMode m_knifeMode; // mode they where in before entering knife mode
 
 	bool m_mouseDownRight; //true if right click is being held down
 
@@ -573,4 +576,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_PIANO_ROLL_H

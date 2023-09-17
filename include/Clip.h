@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef TRACK_CONTENT_OBJECT_H
-#define TRACK_CONTENT_OBJECT_H
+#ifndef LMMS_CLIP_H
+#define LMMS_CLIP_H
 
 #include <QColor>
 
@@ -164,13 +164,6 @@ signals:
 
 
 private:
-	enum Actions
-	{
-		NoAction,
-		Move,
-		Resize
-	} ;
-
 	Track * m_track;
 	QString m_name;
 
@@ -194,4 +187,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_CLIP_H

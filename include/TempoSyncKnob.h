@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef TEMPO_SYNC_KNOB_H
-#define TEMPO_SYNC_KNOB_H
+#ifndef LMMS_GUI_TEMPO_SYNC_KNOB_H
+#define LMMS_GUI_TEMPO_SYNC_KNOB_H
 
 #include <QPixmap>
 #include <QPointer>
@@ -41,7 +41,7 @@ class LMMS_EXPORT TempoSyncKnob : public Knob
 {
 	Q_OBJECT
 public:
-	TempoSyncKnob( knobTypes knobNum, QWidget* parent = nullptr, const QString& name = QString() );
+	TempoSyncKnob( KnobType knobNum, QWidget* parent = nullptr, const QString& name = QString() );
 	~TempoSyncKnob() override;
 
 	const QString & syncDescription();
@@ -84,4 +84,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_TEMPO_SYNC_KNOB_H

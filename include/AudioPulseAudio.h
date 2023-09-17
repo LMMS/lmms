@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_PULSEAUDIO_H
-#define AUDIO_PULSEAUDIO_H
+#ifndef LMMS_AUDIO_PULSEAUDIO_H
+#define LMMS_AUDIO_PULSEAUDIO_H
 
 #include "lmmsconfig.h"
 
@@ -104,4 +104,4 @@ private:
 
 #endif // LMMS_HAVE_PULSEAUDIO
 
-#endif
+#endif // LMMS_AUDIO_PULSEAUDIO_H
