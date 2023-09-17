@@ -22,8 +22,15 @@
  *
  */
 
-// TODO: rewrite PhaseVocoder for only one channel, interlace in playNote
-// maybe cleaner, maybe not
+// TODO: fix changing sample while playing broken
+// TODO: add cache to PhaseVocoder
+// TODO: cleaup loading, saving
+// TODO: maybe add grace period while changing velocity, there are artifacts when changing bpm repetedly
+// TODO: general performance, set frames from getFrames to fixed, reduce vector creation as much as posible
+// TODO: switch to arrayVector
+// TODO: volume normalizazion, atm just reduce by x amount
+// TODO: cleaunp UI classes
+// TODO: implment roxas new UI
 
 #include "SlicerT.h"
 
@@ -78,30 +85,22 @@ PhaseVocoder::~PhaseVocoder() {
 	fftwf_destroy_plan(ifftPlan);
 }
 
-void PhaseVocoder::loadSample(const sampleFrame * originalData, int frames, int sampleRate, float newRatio) {
-	originalBufferL.resize(frames);
-	originalBufferR.resize(frames);
-
-	for (int i = 0;i<frames;i++) {
-		originalBufferL[i] = originalData[i][0];
-		originalBufferR[i] = originalData[i][1];
-	}
-
+void PhaseVocoder::loadData(std::vector<float> originalData, int sampleRate, float newRatio) {
+	originalBuffer = originalData;
 	originalSampleRate = sampleRate;
 	scaleRatio = -1; // force update, kinda hacky
-
 	updateParams(newRatio);
 
 	for (int i = 0;i<numWindows;i++) {
 		if (!m_processedWindows[i]) {
-			generateWindow(originalBufferL, leftBuffer, i);
+			generateWindow(originalBuffer, processedBuffer, i);
 			m_processedWindows[i] = true;
 		}
 	}
 }
 
-void PhaseVocoder::getFrames(sampleFrame * outData, int start, int frames) {
-	if (originalBufferL.size() < 2048) { return; }
+void PhaseVocoder::getFrames(std::vector<float> & outData, int start, int frames) {
+	if (originalBuffer.size() < 2048) { return; }
 	dataLock.lock();
 
 	int windowMargin = overSampling / 2; // numbers of windows before full quality
@@ -111,42 +110,41 @@ void PhaseVocoder::getFrames(sampleFrame * outData, int start, int frames) {
 	// which must be computed
 	for (int i = startWindow;i<endWindow;i++) {
 		if (!m_processedWindows[i]) {
-			generateWindow(originalBufferL, leftBuffer, i);
+			generateWindow(originalBuffer, processedBuffer, i);
 			m_processedWindows[i] = true;
 		}
 	}
 
 	for (int i = 0;i<frames;i++) {
-		outData[i][0] = leftBuffer[start + i];
-		outData[i][1] = leftBuffer[start + i];
+		outData[i] = processedBuffer[start + i];
 	}
 
 	dataLock.unlock();
 }
 
 void PhaseVocoder::updateParams(float newRatio) {
-	if (originalBufferL.size() < 2048) { return; }
+	if (originalBuffer.size() < 2048) { return; }
 	if (newRatio == scaleRatio) { return; }
 	dataLock.lock();
 
+	printf("ratio: %f\n", newRatio);
+
 	scaleRatio = newRatio;
 	stepSize = (float)windowSize / overSampling;
-	numWindows = (float)originalBufferL.size() / stepSize - overSampling - 1;
+	numWindows = (float)originalBuffer.size() / stepSize - overSampling - 1;
 	outStepSize = scaleRatio * (float)stepSize; // float, else inaccurate
 	freqPerBin = originalSampleRate/windowSize;
 	expectedPhaseIn = 2.*M_PI*(float)stepSize/(float)windowSize;
 	expectedPhaseOut = 2.*M_PI*(float)outStepSize/(float)windowSize;
 
 	// clear all buffers
-	leftBuffer = {};
-	rightBuffer = {};
+	processedBuffer = {};
 	m_processedWindows = {};
 	lastPhase = {};
 	sumPhase = {};
 
 	// resize all buffers
-	leftBuffer.resize(scaleRatio*originalBufferL.size(), 0);
-	rightBuffer.resize(scaleRatio*originalBufferL.size(), 0);
+	processedBuffer.resize(scaleRatio*originalBuffer.size(), 0);
 	lastPhase.resize(numWindows*windowSize, 0);
 	sumPhase.resize(numWindows*windowSize, 0);
 	m_processedWindows.resize(numWindows, false);

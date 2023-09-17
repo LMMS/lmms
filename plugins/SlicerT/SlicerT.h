@@ -39,27 +39,25 @@
 namespace lmms
 {
 
-// main class that handles everything audio related
+// takes one audio-channel and timeshifts it
 class PhaseVocoder {
 	public:
 		PhaseVocoder();
 		~PhaseVocoder();
-		void loadSample(const sampleFrame* originalData, int frames, int sampleRate, float newRatio);
+		void loadData(std::vector<float> originalData, int sampleRate, float newRatio);
 		void setScaleRatio(float newRatio) { updateParams(newRatio); }
-		void getFrames(sampleFrame * outData, int start, int frames);
-		int frames() { return leftBuffer.size(); }
+		void getFrames(std::vector<float> & outData, int start, int frames);
+		int frames() { return processedBuffer.size(); }
 	private:
 		QMutex dataLock;
 		// original data
-		std::vector<float> originalBufferL;
-		std::vector<float> originalBufferR;
+		std::vector<float> originalBuffer;
 		int originalSampleRate = 0;
 
 		float scaleRatio = -1; // to force on fisrt load
 
 		// output data
-		std::vector<float> leftBuffer;
-		std::vector<float> rightBuffer;
+		std::vector<float> processedBuffer;
 		std::vector<bool> m_processedWindows; // marks a window processed
 
 		// timeshift stuff
@@ -94,6 +92,46 @@ class PhaseVocoder {
 		int hashFttWindow(std::vector<float> & in);
 };
 
+// simple helper class that handles the different audio channels
+class dinamicPlaybackBuffer {
+	public:
+		dinamicPlaybackBuffer() :
+			leftChannel(),
+			rightChannel()
+		{}
+		void loadSample(const sampleFrame * outData, int frames, int sampleRate, float newRatio) {
+			std::vector<float> leftData(frames, 0);
+			std::vector<float> rightData(frames, 0);
+			for (int i = 0;i<frames;i++) {
+				leftData[i] = outData[i][0];
+				rightData[i] = outData[i][1];
+			}
+			leftChannel.loadData(leftData, sampleRate, newRatio);
+			rightChannel.loadData(rightData, sampleRate, newRatio);
+		}
+		void getFrames(sampleFrame * outData, int startFrame, int frames) {
+			std::vector<float> leftOut(frames, 0);
+			std::vector<float> rightOut(frames, 0);
+
+			leftChannel.getFrames(leftOut, startFrame, frames);
+			rightChannel.getFrames(rightOut, startFrame, frames);
+
+			for (int i = 0;i<frames;i++) {
+				outData[i][0] = leftOut[i];
+				outData[i][1] = rightOut[i];
+			}
+		}
+		int frames() { return leftChannel.frames(); }
+		void setScaleRatio(float newRatio) {
+			leftChannel.setScaleRatio(newRatio);
+			rightChannel.setScaleRatio(newRatio);
+		}
+	private:
+		float scaleRatio;
+		PhaseVocoder leftChannel;
+		PhaseVocoder rightChannel;
+};
+
 class SlicerT : public Instrument{
 	Q_OBJECT
 
@@ -124,7 +162,7 @@ class SlicerT : public Instrument{
 		IntModel m_originalBPM;
 
 		SampleBuffer m_originalSample;
-		PhaseVocoder m_phaseVocoder;
+		dinamicPlaybackBuffer m_phaseVocoder;
 
 		std::vector<int> m_slicePoints;
 
