@@ -119,7 +119,7 @@ public:
 	};
 
 
-	struct ChordTable : public QVector<Chord>
+	struct ChordTable
 	{
 	private:
 		ChordTable();
@@ -131,6 +131,7 @@ public:
 		};
 
 		static std::array<Init, NUM_CHORD_TABLES> s_initTable;
+		std::vector<Chord> m_chords;
 
 	public:
 		static const ChordTable & getInstance()
@@ -149,6 +150,11 @@ public:
 		const Chord & getChordByName( const QString & name ) const
 		{
 			return getByName( name, false );
+		}
+
+		const std::vector<Chord>& chords() const
+		{
+			return m_chords;
 		}
 	};
 
@@ -170,14 +176,13 @@ class InstrumentFunctionArpeggio : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
-	enum ArpDirections
+	enum class ArpDirection
 	{
-		ArpDirUp,
-		ArpDirDown,
-		ArpDirUpAndDown,
-		ArpDirDownAndUp,
-		ArpDirRandom,
-		NumArpDirections
+		Up,
+		Down,
+		UpAndDown,
+		DownAndUp,
+		Random
 	} ;
 
 	InstrumentFunctionArpeggio( Model * _parent );
@@ -196,11 +201,11 @@ public:
 
 
 private:
-	enum ArpModes
+	enum class ArpMode
 	{
-		FreeMode,
-		SortMode,
-		SyncMode
+		Free,
+		Sort,
+		Sync
 	} ;
 
 	BoolModel m_arpEnabledModel;

@@ -36,10 +36,10 @@ namespace lmms
 {
 
 AudioAlsa::AudioAlsa( bool & _success_ful, AudioEngine*  _audioEngine ) :
-	AudioDevice( qBound<ch_cnt_t>(
+	AudioDevice(std::clamp<ch_cnt_t>(
+		ConfigManager::inst()->value("audioalsa", "channels").toInt(),
 		DEFAULT_CHANNELS,
-		ConfigManager::inst()->value( "audioalsa", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _audioEngine ),
+		SURROUND_CHANNELS), _audioEngine),
 	m_handle( nullptr ),
 	m_hwParams( nullptr ),
 	m_swParams( nullptr ),
@@ -87,7 +87,7 @@ AudioAlsa::AudioAlsa( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	int count = snd_pcm_poll_descriptors_count( m_handle );
 	ufds = new pollfd[count];
 	snd_pcm_poll_descriptors( m_handle, ufds, count );
-	for( int i = 0; i < qMax( 3, count ); ++i )
+	for (int i = 0; i < std::max(3, count); ++i)
 	{
 		const int fd = ( i >= count ) ? ufds[0].fd+i : ufds[i].fd;
 		int oldflags = fcntl( fd, F_GETFD, 0 );
@@ -328,7 +328,7 @@ void AudioAlsa::run()
 						outbuf,
 						m_convertEndian );
 			}
-			int min_len = qMin( len, outbuf_size - outbuf_pos );
+			int min_len = std::min(len, outbuf_size - outbuf_pos);
 			memcpy( ptr, outbuf + outbuf_pos,
 					min_len * sizeof( int_sample_t ) );
 			ptr += min_len;

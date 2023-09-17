@@ -47,9 +47,9 @@ class LMMS_EXPORT DataFile : public QDomDocument
 	using UpgradeMethod = void(DataFile::*)();
 
 public:
-	enum Types
+	enum class Type
 	{
-		UnknownType,
+		Unknown,
 		SongProject,
 		SongProjectTemplate,
 		InstrumentTrackSettings,
@@ -57,10 +57,8 @@ public:
 		ClipboardData,
 		JournalData,
 		EffectSettings,
-		MidiClip,
-		TypeCount
+		MidiClip
 	} ;
-	using Type = Types;
 
 	DataFile( const QString& fileName );
 	DataFile( const QByteArray& data );
@@ -128,6 +126,7 @@ private:
 	void upgrade_defaultTripleOscillatorHQ();
 	void upgrade_mixerRename();
 	void upgrade_bbTcoRename();
+	void upgrade_sampleAndHold();
 
 	// List of all upgrade methods
 	static const std::vector<UpgradeMethod> UPGRADE_METHODS;

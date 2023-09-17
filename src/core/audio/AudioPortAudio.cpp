@@ -62,10 +62,10 @@ namespace lmms
 
 
 AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine ) :
-	AudioDevice( qBound<ch_cnt_t>(
+	AudioDevice(std::clamp<ch_cnt_t>(
+		ConfigManager::inst()->value("audioportaudio", "channels").toInt(),
 		DEFAULT_CHANNELS,
-		ConfigManager::inst()->value( "audioportaudio", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _audioEngine ),
+		SURROUND_CHANNELS), _audioEngine),
 	m_paStream( nullptr ),
 	m_wasPAInitError( false ),
 	m_outBuf( new surroundSampleFrame[audioEngine()->framesPerPeriod()] ),
@@ -295,8 +295,8 @@ int AudioPortAudio::process_callback(
 			}
 			m_outBufSize = frames;
 		}
-		const int min_len = qMin( (int)_framesPerBuffer,
-			m_outBufSize - m_outBufPos );
+		const int min_len = std::min(static_cast<int>(_framesPerBuffer),
+			m_outBufSize - m_outBufPos);
 
 		float master_gain = audioEngine()->masterGain();
 
@@ -496,12 +496,12 @@ void AudioPortAudio::setupWidget::show()
 		const QString& device = ConfigManager::inst()->value(
 			"audioportaudio", "device" );
 		
-		int i = qMax( 0, m_setupUtil.m_backendModel.findText( backend ) );
+		int i = std::max(0, m_setupUtil.m_backendModel.findText(backend));
 		m_setupUtil.m_backendModel.setValue( i );
 		
 		m_setupUtil.updateDevices();
 		
-		i = qMax( 0, m_setupUtil.m_deviceModel.findText( device ) );
+		i = std::max(0, m_setupUtil.m_deviceModel.findText(device));
 		m_setupUtil.m_deviceModel.setValue( i );
 	}
 

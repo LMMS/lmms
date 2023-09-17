@@ -2956,7 +2956,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>InstrumentMiscView</name>
+    <name>InstrumentTuningView</name>
     <message>
         <source>MASTER PITCH</source>
         <translation type="unfinished"/>

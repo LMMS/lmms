@@ -91,7 +91,7 @@ inline void labelWidget(QWidget * w, const QString & txt)
 
 
 
-SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
+SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_displaydBFS(ConfigManager::inst()->value(
 			"app", "displaydbfs").toInt()),
 	m_tooltips(!ConfigManager::inst()->value(
@@ -837,7 +837,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			tr("Paths"), 4, true, true)->setIcon(
 					embed::getIconPixmap("setup_directories"));
 
-	m_tabBar->setActiveTab(tab_to_open);
+	m_tabBar->setActiveTab(static_cast<int>(tab_to_open));
 
 	// Horizontal layout ordering.
 	hlayout->addSpacing(2);

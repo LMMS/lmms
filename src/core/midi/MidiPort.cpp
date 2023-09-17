@@ -66,8 +66,8 @@ MidiPort::MidiPort( const QString& name,
 {
 	m_midiClient->addPort( this );
 
-	m_readableModel.setValue( m_mode == Input || m_mode == Duplex );
-	m_writableModel.setValue( m_mode == Output || m_mode == Duplex );
+	m_readableModel.setValue( m_mode == Mode::Input || m_mode == Mode::Duplex );
+	m_writableModel.setValue( m_mode == Mode::Output || m_mode == Mode::Duplex );
 
 	connect( &m_readableModel, SIGNAL(dataChanged()),
 			this, SLOT(updateMidiPortMode()), Qt::DirectConnection );
@@ -325,10 +325,10 @@ void MidiPort::subscribeWritablePort( const QString& port, bool subscribe )
 void MidiPort::updateMidiPortMode()
 {
 	// this small lookup-table makes everything easier
-	static const Modes modeTable[2][2] =
+	static const Mode modeTable[2][2] =
 	{
-		{ Disabled, Output },
-		{ Input, Duplex }
+		{ Mode::Disabled, Mode::Output },
+		{ Mode::Input, Mode::Duplex }
 	} ;
 	setMode( modeTable[m_readableModel.value()][m_writableModel.value()] );
 

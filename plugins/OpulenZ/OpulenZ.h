@@ -66,7 +66,7 @@ public:
 
 	Flags flags() const override
 	{
-		return IsSingleStreamed | IsMidiBased;
+		return Flag::IsSingleStreamed | Flag::IsMidiBased;
 	}
 
 	bool handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0 ) override;

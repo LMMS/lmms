@@ -43,7 +43,7 @@ Plugin::Descriptor PLUGIN_EXPORT compressor_plugin_descriptor =
 	QT_TRANSLATE_NOOP("PluginBrowser", "A dynamic range compressor."),
 	"Lost Robot <r94231@gmail.com>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,
@@ -320,8 +320,8 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			float inputValue = feedback ? m_prevOut[i] : s[i];
 
 			// Calculate the crest factor of the audio by diving the peak by the RMS
-			m_crestPeakVal[i] = qMax(inputValue * inputValue, m_crestTimeConst * m_crestPeakVal[i] + (1 - m_crestTimeConst) * (inputValue * inputValue));
-			m_crestRmsVal[i] = m_crestTimeConst * m_crestRmsVal[i] + ((1 - m_crestTimeConst) * (inputValue * inputValue));
+			m_crestPeakVal[i] = qMax(qMax(COMP_NOISE_FLOOR, inputValue * inputValue), m_crestTimeConst * m_crestPeakVal[i] + (1 - m_crestTimeConst) * (inputValue * inputValue));
+			m_crestRmsVal[i] = qMax(COMP_NOISE_FLOOR, m_crestTimeConst * m_crestRmsVal[i] + ((1 - m_crestTimeConst) * (inputValue * inputValue)));
 			m_crestFactorVal[i] = m_crestPeakVal[i] / m_crestRmsVal[i];
 
 			m_rmsVal[i] = m_rmsTimeConst * m_rmsVal[i] + ((1 - m_rmsTimeConst) * (inputValue * inputValue));
@@ -442,28 +442,28 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			m_gainResult[i] = qMax(m_rangeVal, m_gainResult[i]);
 		}
 
-		switch (stereoLink)
+		switch (static_cast<StereoLinkMode>(stereoLink))
 		{
-			case Unlinked:
+			case StereoLinkMode::Unlinked:
 			{
 				break;
 			}
-			case Maximum:
+			case StereoLinkMode::Maximum:
 			{
 				m_gainResult[0] = m_gainResult[1] = qMin(m_gainResult[0], m_gainResult[1]);
 				break;
 			}
-			case Average:
+			case StereoLinkMode::Average:
 			{
 				m_gainResult[0] = m_gainResult[1] = (m_gainResult[0] + m_gainResult[1]) * 0.5f;
 				break;
 			}
-			case Minimum:
+			case StereoLinkMode::Minimum:
 			{
 				m_gainResult[0] = m_gainResult[1] = qMax(m_gainResult[0], m_gainResult[1]);
 				break;
 			}
-			case Blend:
+			case StereoLinkMode::Blend:
 			{
 				if (blend > 0)// 0 is unlinked
 				{

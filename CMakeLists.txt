@@ -6,18 +6,7 @@ SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
 SET(LMMS_BINARY_DIR ${CMAKE_BINARY_DIR})
 SET(LMMS_SOURCE_DIR ${CMAKE_SOURCE_DIR})
 
-IF(COMMAND CMAKE_POLICY)
-	CMAKE_POLICY(SET CMP0005 NEW)
-	CMAKE_POLICY(SET CMP0003 NEW)
-	IF (CMAKE_MAJOR_VERSION GREATER 2)
-		CMAKE_POLICY(SET CMP0026 NEW)
-		CMAKE_POLICY(SET CMP0045 NEW)
-		CMAKE_POLICY(SET CMP0050 OLD)
-	ENDIF()
-	CMAKE_POLICY(SET CMP0020 NEW)
-	CMAKE_POLICY(SET CMP0057 NEW)
-ENDIF(COMMAND CMAKE_POLICY)
-
+# CMAKE_POLICY Section
 
 # Import of windows.h breaks min()/max()
 ADD_DEFINITIONS(-DNOMINMAX)
@@ -89,6 +78,10 @@ OPTION(WANT_VST_32	"Include 32-bit VST support" ON)
 OPTION(WANT_VST_64	"Include 64-bit VST support" ON)
 OPTION(WANT_WINMM	"Include WinMM MIDI support" OFF)
 OPTION(WANT_DEBUG_FPE	"Debug floating point exceptions" OFF)
+option(WANT_DEBUG_ASAN	"Enable AddressSanitizer" OFF)
+option(WANT_DEBUG_TSAN	"Enable ThreadSanitizer" OFF)
+option(WANT_DEBUG_MSAN	"Enable MemorySanitizer" OFF)
+option(WANT_DEBUG_UBSAN	"Enable UndefinedBehaviorSanitizer" OFF)
 OPTION(BUNDLE_QT_TRANSLATIONS	"Install Qt translation files for LMMS" OFF)
 
 
@@ -505,7 +498,11 @@ IF(WANT_SF2)
 	find_package(FluidSynth 1.1.0)
 	if(FluidSynth_FOUND)
 		SET(LMMS_HAVE_FLUIDSYNTH TRUE)
-		SET(STATUS_FLUIDSYNTH "OK")
+		if(FluidSynth_VERSION_STRING VERSION_GREATER_EQUAL 2)
+			set(STATUS_FLUIDSYNTH "OK")
+		else()
+			set(STATUS_FLUIDSYNTH "OK (FluidSynth version < 2: per-note panning unsupported)")
+		endif()
 	else()
 		SET(STATUS_FLUIDSYNTH "not found, libfluidsynth-dev (or similar)"
 			"is highly recommended")
@@ -616,7 +613,9 @@ else()
 	set(NOOP_COMMAND "${CMAKE_COMMAND}" "-E" "echo")
 endif()
 if(STRIP)
-	set(STRIP_COMMAND "$<IF:$<TARGET:Debug,RelWithDebInfo>,${NOOP_COMMAND},${STRIP}>")
+	# TODO CMake 3.19: Now that CONFIG generator expressions support testing for
+	# multiple configurations, combine the OR into a single CONFIG expression.
+	set(STRIP_COMMAND "$<IF:$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>,${NOOP_COMMAND},${STRIP}>")
 else()
 	set(STRIP_COMMAND "${NOOP_COMMAND}")
 endif()
@@ -653,6 +652,31 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -DPIC")
 	ENDIF(WIN32)
 ENDIF()
+
+# add enabled sanitizers
+function(add_sanitizer sanitizer supported_compilers want_flag status_flag)
+	if(${want_flag})
+		if(CMAKE_CXX_COMPILER_ID MATCHES "${supported_compilers}")
+			set("${status_flag}" "Enabled" PARENT_SCOPE)
+			string(REPLACE ";" " " additional_flags "${ARGN}")
+			# todo CMake 3.13: use add_compile_options/add_link_options instead
+			set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fsanitize=${sanitizer} ${additional_flags}" PARENT_SCOPE)
+			set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=${sanitizer} ${additional_flags}" PARENT_SCOPE)
+		else()
+			set("${status_flag}" "Wanted but disabled due to unsupported compiler" PARENT_SCOPE)
+		endif()
+	else()
+		set("${status_flag}" "Disabled" PARENT_SCOPE)
+	endif()
+endfunction()
+
+add_sanitizer(address "GNU|Clang|MSVC" WANT_DEBUG_ASAN STATUS_DEBUG_ASAN)
+add_sanitizer(thread "GNU|Clang" WANT_DEBUG_TSAN STATUS_DEBUG_TSAN)
+add_sanitizer(memory "Clang" WANT_DEBUG_MSAN STATUS_DEBUG_MSAN -fno-omit-frame-pointer)
+# UBSan does not link with vptr enabled due to a problem with references from PeakControllerEffect
+# not being found by PeakController
+add_sanitizer(undefined "GNU|Clang" WANT_DEBUG_UBSAN STATUS_DEBUG_UBSAN -fno-sanitize=vptr)
+
 
 # use ccache
 include(CompileCache)
@@ -722,7 +746,6 @@ ADD_CUSTOM_TARGET(uninstall
 	COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}" -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/uninstall.cmake"
 )
 
-
 #
 # display configuration information
 #
@@ -788,7 +811,11 @@ MESSAGE(
 MESSAGE(
 "Developer options\n"
 "-----------------------------------------\n"
-"* Debug FP exceptions         : ${STATUS_DEBUG_FPE}\n"
+"* Debug FP exceptions               : ${STATUS_DEBUG_FPE}\n"
+"* Debug using AddressSanitizer      : ${STATUS_DEBUG_ASAN}\n"
+"* Debug using ThreadSanitizer       : ${STATUS_DEBUG_TSAN}\n"
+"* Debug using MemorySanitizer       : ${STATUS_DEBUG_MSAN}\n"
+"* Debug using UBSanitizer           : ${STATUS_DEBUG_UBSAN}\n"
 )
 
 MESSAGE(
