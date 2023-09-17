@@ -44,6 +44,9 @@ class PlaybackBuffer {
 	public:
 		QMutex dataLock;
 		std::vector<sampleFrame> mainBuffer;
+		std::vector<float> leftBuffer;
+		std::vector<float> rightBuffer;
+		float sampleMax = -1;
 
 		int frames() { return mainBuffer.size(); }; // not thread safe yet, but shouldnt be a big issue
 		sampleFrame * data() {  return mainBuffer.data(); };
@@ -52,15 +55,28 @@ class PlaybackBuffer {
 			memcpy(outData, mainBuffer.data() + start, framesToCopy * sizeof(sampleFrame));
 			dataLock.unlock();
 		}
-		void setData(const sampleFrame * data, int newFrames)
-		{
-			dataLock.lock();
+		void resetAndResize(int newFrames) {
 			mainBuffer = {};
 			mainBuffer.resize(newFrames);
+			leftBuffer = {};
+			leftBuffer.resize(newFrames);
+			rightBuffer = {};
+			rightBuffer.resize(newFrames);
+		}
+		void loadSample(const sampleFrame * data, int newFrames)
+		{
+			dataLock.lock();
+			resetAndResize(newFrames);
 			memcpy(mainBuffer.data(), data, newFrames * sizeof(sampleFrame));
+			for (int i = 0;i<newFrames;i++) {
+				leftBuffer[i] = mainBuffer[i][0];
+				sampleMax = std::max(sampleMax, leftBuffer[i]);
+				rightBuffer[i] = mainBuffer[i][1];
+				sampleMax = std::max(sampleMax, rightBuffer[i]);
+			}
 			dataLock.unlock();
 		};
-		void setData(std::vector<float> & leftData, std::vector<float> & rightData)
+		void setFrames(std::vector<float> & leftData, std::vector<float> & rightData)
 		{
 			dataLock.lock();
 			int newFrames = std::min(leftData.size(), rightData.size());
@@ -106,10 +122,14 @@ class SlicerT : public Instrument{
 		IntModel m_originalBPM;
 
 		SampleBuffer m_originalSample;
+		std::vector<float> m_originalBufferL;
+		std::vector<float> m_originalBufferR;
+		int originalMax; // for later rescaling
 
 		PlaybackBuffer m_timeShiftedSample;
 		std::vector<float> m_timeshiftedBufferL;
 		std::vector<float> m_timeshiftedBufferR;
+		std::vector<bool> m_processedFrames; // check if a frame is processed
 
 
 		std::vector<int> m_slicePoints;
@@ -118,11 +138,12 @@ class SlicerT : public Instrument{
 		QMutex m_timeshiftLock; // should be unecesaty since playbackBuffer is safe
 		// std::unordered_map<int, std::vector<float> > m_fftWindowCache;
 
-		void updateParams(float newRatio);
+		void updateParams();
+		void extractOriginalData();
 		void findSlices();
 		void findBPM();
-		void timeShiftSample();
-		void phaseVocoder(std::vector<float> &in, std::vector<float> &out);
+		void timeShiftSample(int windowsToProcess);
+		void phaseVocoder(std::vector<float> &in, std::vector<float> &out, int start, int steps);
 		int hashFttWindow(std::vector<float> & in);
 
 		// timeshift stuff
@@ -146,6 +167,9 @@ class SlicerT : public Instrument{
 		std::vector<float> processedMagn;
 		std::vector<float> lastPhase;
 		std::vector<float> sumPhase;
+
+		fftwf_plan fftPlan;
+		fftwf_plan ifftPlan;
 
 		friend class gui::SlicerTUI;
 		friend class gui::WaveForm;

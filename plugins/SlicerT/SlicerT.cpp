@@ -22,8 +22,9 @@
  *
  */
 
-// write in frames to outputBuffer
-// store the stuff that has to be reused in a fullsized buffer
+// TODO: deinterlace only once, always work with seperated buffers
+// TODO: start working from the start of the note
+// TODO: create a seperate class for phaseVocoder, that handles all the sampleData
 
 #include "SlicerT.h"
 
@@ -73,19 +74,31 @@ SlicerT::SlicerT(InstrumentTrack * instrumentTrack) :
 	allFrequencies(windowSize, 0),
 	processedFreq(windowSize, 0),
 	processedMagn(windowSize, 0)
-{}
+{
+	fftPlan = fftwf_plan_dft_r2c_1d(windowSize, FFTInput.data(), FFTSpectrum, FFTW_MEASURE);
+	ifftPlan = fftwf_plan_dft_c2r_1d(windowSize, FFTSpectrum, IFFTReconstruction.data(), FFTW_MEASURE);
 
-void SlicerT::updateParams(float newRatio) {
+}
+
+void SlicerT::updateParams() {
+	float speedRatio = (float)m_originalBPM.value() / Engine::getSong()->getTempo() ;
+
 	stepSize = (float)windowSize / overSampling;
 	numWindows = (float)m_originalSample.frames() / stepSize;
-	outStepSize = newRatio * (float)stepSize; // float, else inaccurate
+	outStepSize = speedRatio * (float)stepSize; // float, else inaccurate
 	freqPerBin = m_originalSample.sampleRate()/windowSize;
 	expectedPhaseIn = 2.*M_PI*(float)stepSize/(float)windowSize;
 	expectedPhaseOut = 2.*M_PI*(float)outStepSize/(float)windowSize;
 
 	// resize all the buffers that rely on the final size
+	// is there a better way for this? probably
 	m_timeshiftedBufferL = {};
-	m_timeshiftedBufferL.resize(newRatio*m_originalSample.frames());
+	m_timeshiftedBufferL.resize(speedRatio*m_originalSample.frames());
+	m_processedFrames = {};
+	m_processedFrames.resize(numWindows);
+	for (bool b : m_processedFrames) {
+		b = false;
+	}
 	lastPhase = {};
 	lastPhase.resize(numWindows*windowSize);
 	sumPhase = {};
@@ -105,10 +118,11 @@ void SlicerT::playNote( NotePlayHandle * handle, sampleFrame * workingBuffer )
 
 	if (m_currentSpeedRatio != speedRatio)
 	{
-		updateParams(speedRatio);
-		timeShiftSample();
+		updateParams();
+		// timeShiftSample(16);
+		m_currentSpeedRatio = speedRatio;
 	}
-	const int totalFrames = m_timeShiftedSample.frames();
+	const int totalFrames = m_timeshiftedBufferL.size();
 
 	int sliceStart, sliceEnd;
 	if (noteIndex > m_slicePoints.size()-2 || noteIndex < 0)
@@ -127,9 +141,23 @@ void SlicerT::playNote( NotePlayHandle * handle, sampleFrame * workingBuffer )
 
 	if( noteFramesLeft > 0)
 	{
+		std::vector<float> originalBuffer(m_originalSample.frames());
+		for (int i = 0;i<m_originalSample.frames();i++) {
+			originalBuffer[i] = m_originalSample.data()[i][0];
+		}
 		// int bufferSize = frames * BYTES_PER_FRAME;
 		int framesToCopy = std::min((int)frames, noteFramesLeft);
-		m_timeShiftedSample.copyFrames(workingBuffer + offset, currentNoteFrame, framesToCopy);
+
+		// phaseVocoder(originalBuffer, m_timeshiftedBufferL, (float)currentNoteFrame/stepSize, 17);
+		timeShiftSample(overSampling/2);
+
+		for (int i = 0;i<frames;i++) {
+			// printf("output: %f, original: %f\n", m_timeshiftedBufferL[currentNoteFrame + i], originalBuffer[(currentNoteFrame + i) / speedRatio]);
+			workingBuffer[i][0] = m_timeshiftedBufferL[currentNoteFrame + i];
+			workingBuffer[i][1] = m_timeshiftedBufferL[currentNoteFrame + i];
+		}
+
+		// m_timeShiftedSample.copyFrames(workingBuffer + offset, currentNoteFrame, framesToCopy);
 
 		// exponential fade out, applyRelease kinda sucks
 		if (noteFramesLeft < m_fadeOutFrames.value())
@@ -233,36 +261,18 @@ void SlicerT::findBPM()
 }
 
 // create timeshifted samplebuffer and timeshifted m_slicePoints
-void SlicerT::timeShiftSample()
+void SlicerT::timeShiftSample(int windowsToProcess)
 {
-	using std::vector;
 	// initial checks
 	if (m_originalSample.frames() < 2048) { return; }
 	m_timeshiftLock.lock();
 
 	// original sample data
-	float sampleRate = m_originalSample.sampleRate();
 	int originalFrames = m_originalSample.frames();
 
-	bpm_t targetBPM = Engine::getSong()->getTempo();
-	m_currentSpeedRatio = (float)m_originalBPM.value() / targetBPM ;
-	int outFrames = m_currentSpeedRatio * originalFrames;
-
-	// nothing to do here
-	if (targetBPM == m_originalBPM.value())
-	{
-		m_timeShiftedSample.setData(m_originalSample.data(), m_originalSample.frames());
-		m_timeshiftLock.unlock();
-		return;
-	}
-
 	// buffers
-	vector<float> rawDataL(originalFrames, 0);
-	vector<float> rawDataR(originalFrames, 0);
-	vector<float> outDataL(outFrames, 0);
-	vector<float> outDataR(outFrames, 0);
-
-	vector<sampleFrame> bufferData(outFrames, sampleFrame());
+	std::vector<float> rawDataL(originalFrames, 0);
+	std::vector<float> rawDataR(originalFrames, 0);
 
 	// copy channels for processing
 	for (int i = 0;i<originalFrames;i++)
@@ -271,12 +281,18 @@ void SlicerT::timeShiftSample()
 		rawDataR[i] = (float)m_originalSample.data()[i][1];
 	}
 
-	// process channels
-	phaseVocoder(rawDataL, outDataL);
-	phaseVocoder(rawDataR, outDataR);
+	int windowsProcessed = 0;
 
-	// write processed channels
-	m_timeShiftedSample.setData(outDataL, outDataR);
+	for (int i = 0;i<numWindows;i++) {
+		if (!m_processedFrames[i]) {
+			// process channels
+			phaseVocoder(rawDataL, m_timeshiftedBufferL, i, 1);
+			// phaseVocoder(rawDataR, m_timeshiftedBufferR, i, 1);
+			windowsProcessed++;
+		}
+		m_processedFrames[i] = true;
+		if (windowsProcessed >= windowsToProcess) { break; }
+	}
 
 	m_timeshiftLock.unlock();
 }
@@ -287,31 +303,28 @@ void SlicerT::timeShiftSample()
 // https://sethares.engr.wisc.edu/vocoders/phasevocoder.html
 // https://dsp.stackexchange.com/questions/40101/audio-time-stretching-without-pitch-shifting/40367#40367
 // https://www.guitarpitchshifter.com/
-void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataOut)
+void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataOut, int start, int steps)
 {
-	memset(lastPhase.data(), 0, numWindows*windowSize*sizeof(float));
-	memset(sumPhase.data(), 0, numWindows*windowSize*sizeof(float));
+	// memset(lastPhase.data(), 0, numWindows*windowSize*sizeof(float));
+	// memset(sumPhase.data(), 0, numWindows*windowSize*sizeof(float));
 
-	int outFrames = dataOut.size();
-
-	std::vector<float> outBuffer(outFrames, 0);
 
 	// declare vars
 	float real, imag, phase, magnitude, freq, deltaPhase = 0;
-		int windowIndex = 0;
+	int windowStart = 0;
 
 	// fft plans
-	fftwf_plan fftPlan;
-	fftPlan = fftwf_plan_dft_r2c_1d(windowSize, FFTInput.data(), FFTSpectrum, FFTW_MEASURE);
-	fftwf_plan ifftPlan;
-	ifftPlan = fftwf_plan_dft_c2r_1d(windowSize, FFTSpectrum, IFFTReconstruction.data(), FFTW_MEASURE);
+	// fftwf_plan fftPlan;
+	// fftPlan = fftwf_plan_dft_r2c_1d(windowSize, FFTInput.data(), FFTSpectrum, FFTW_MEASURE);
+	// fftwf_plan ifftPlan;
+	// ifftPlan = fftwf_plan_dft_c2r_1d(windowSize, FFTSpectrum, IFFTReconstruction.data(), FFTW_MEASURE);
 
 	// remove oversampling, because the actual window is overSampling* bigger than stepsize
-	for (int i = 0;i < numWindows-overSampling;i++)
+	for (int i = start;i < start + steps;i++)
 	{
-		windowIndex = i * stepSize;
-
-		memcpy(FFTInput.data(), dataIn.data() + windowIndex, windowSize*sizeof(float));
+		printf("%i\n", i);
+		windowStart = i * stepSize;
+		memcpy(FFTInput.data(), dataIn.data() + windowStart, windowSize*sizeof(float));
 
 		// int hash = hashFttWindow(FFTInput);
 			// printf("%i\n", hash);
@@ -394,40 +407,37 @@ void SlicerT::phaseVocoder(std::vector<float> &dataIn, std::vector<float> &dataO
 		for (int j = 0; j < windowSize; j++)
 		{
 			float outIndex = i * outStepSize + j;
-			if (outIndex >= outFrames) { break; }
+			if (outIndex >= dataOut.size()) { break; }
 
 			// calculate windows overlapping at index
 			float startWindowOverlap = ceil(outIndex / outStepSize + 0.00000001f);
-			float endWindowOverlap = ceil((float)(-outIndex + outFrames) / outStepSize + 0.00000001f);
+			float endWindowOverlap = ceil((float)(-outIndex + dataOut.size()) / outStepSize + 0.00000001f);
 			float totalWindowOverlap = std::min(
 										std::min(startWindowOverlap, endWindowOverlap),
 										(float)overSampling);
 
 			// discrete windowing
-			outBuffer[outIndex] += (float)overSampling/totalWindowOverlap*IFFTReconstruction[j]/(windowSize/2.0f*overSampling);
-
+			dataOut[outIndex] += (float)overSampling/totalWindowOverlap*IFFTReconstruction[j]/(windowSize/2.0f*overSampling);
+			// printf("timeshifted in phase: %f\n", m_timeshiftedBufferL[outIndex]);
 			// continuos windowing
 			// float window = -0.5f*cos(2.*M_PI*(float)j/(float)windowSize)+0.5f;
 			// outBuffer[outIndex] += 2.0f*window*IFFTReconstruction[j]/(windowSize/2.0f*overSampling);
 		}
 	}
 
-	fftwf_destroy_plan(fftPlan);
-	fftwf_destroy_plan(ifftPlan);
-
 	// normalize
-	float max = -1;
-	for (int i = 0;i<outFrames;i++)
-	{
-		max = std::max(max, abs(outBuffer[i]));
-	}
+	// float max = -1;
+	// for (int i = 0;i<outFrames;i++)
+	// {
+	// 	max = std::max(max, abs(dataOut[i]));
+	// }
 
-	for (int i = 0;i<outFrames;i++)
-	{
-		outBuffer[i] = outBuffer[i] / max;
-	}
+	// for (int i = 0;i<outFrames;i++)
+	// {
+	// 	dataOut[i] = dataOut[i] / max;
+	// }
 
-memcpy(dataOut.data(), outBuffer.data(), outFrames*sizeof(float));
+// memcpy(dataOut.data(), outBuffer.data(), outFrames*sizeof(float));
 }
 
 int SlicerT::hashFttWindow(std::vector<float> & in)
@@ -467,6 +477,10 @@ void SlicerT::writeToMidi(std::vector<Note> * outClip)
 	}
 }
 
+void SlicerT::extractOriginalData() {
+
+}
+
 void SlicerT::updateFile(QString file)
 {
 	m_originalSample.setAudioFile(file);
@@ -474,7 +488,7 @@ void SlicerT::updateFile(QString file)
 
 	findSlices();
 	findBPM();
-	timeShiftSample();
+	updateParams();
 
 	emit dataChanged();
 }
@@ -537,7 +551,7 @@ void SlicerT::loadSettings( const QDomElement & element )
 	m_noteThreshold.loadSettings(element, "threshold");
 	m_originalBPM.loadSettings(element, "origBPM");
 
-	timeShiftSample();
+	updateParams();
 
 	emit dataChanged();
 
