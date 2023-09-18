@@ -2513,7 +2513,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			bool altPressed = me->modifiers() & Qt::AltModifier;
 			// We iterate from last note in MIDI clip to the first,
 			// chronologically
-			auto it = notes.rend();
+			auto it = notes.rbegin();
 			for( int i = 0; i < notes.size(); ++i )
 			{
 				Note* n = *it;
@@ -2556,7 +2556,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				}
 
 
-				--it;
+				++it;
 			}
 
 			// Emit MIDI clip has changed
