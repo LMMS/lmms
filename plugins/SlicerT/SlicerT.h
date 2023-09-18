@@ -62,7 +62,7 @@ class PhaseVocoder {
 
 		// timeshift stuff
 		static const int windowSize = 512;
-		static const int overSampling = 32;
+		static const int overSampling = 64;
 
 		// depending on scaleRatio
 		int stepSize = 0;
@@ -83,13 +83,16 @@ class PhaseVocoder {
 		std::vector<float> lastPhase;
 		std::vector<float> sumPhase;
 
+		// cache
+		std::vector<float> freqCache;
+		std::vector<float> magCache;
+
 		// fftw plans
 		fftwf_plan fftPlan;
 		fftwf_plan ifftPlan;
 
 		void updateParams(float newRatio);
-		void generateWindow(std::vector<float> &in, std::vector<float> &out, int start);
-		int hashFttWindow(std::vector<float> & in);
+		void generateWindow(int windowNum, bool useCache);
 };
 
 // simple helper class that handles the different audio channels
@@ -110,7 +113,7 @@ class dinamicPlaybackBuffer {
 			rightChannel.loadData(rightData, sampleRate, newRatio);
 		}
 		void getFrames(sampleFrame * outData, int startFrame, int frames) {
-			std::vector<float> leftOut(frames, 0);
+			std::vector<float> leftOut(frames, 0); // not a huge performance issue
 			std::vector<float> rightOut(frames, 0);
 
 			leftChannel.getFrames(leftOut, startFrame, frames);

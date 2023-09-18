@@ -22,15 +22,11 @@
  *
  */
 
-// TODO: fix changing sample while playing broken
-// TODO: add cache to PhaseVocoder
-// TODO: cleaup loading, saving
-// TODO: maybe add grace period while changing velocity, there are artifacts when changing bpm repetedly
-// TODO: general performance, set frames from getFrames to fixed, reduce vector creation as much as posible
-// TODO: switch to arrayVector
-// TODO: volume normalizazion, atm just reduce by x amount
+// better ounset detection + bpm cleanup
+// TODO: switch to arrayVector (maybe)
 // TODO: cleaunp UI classes
 // TODO: implment roxas new UI
+// TODO: code cleaunp, style and test
 
 #include "SlicerT.h"
 
@@ -77,7 +73,6 @@ PhaseVocoder::PhaseVocoder() :
 {
 	fftPlan = fftwf_plan_dft_r2c_1d(windowSize, FFTInput.data(), FFTSpectrum, FFTW_MEASURE);
 	ifftPlan = fftwf_plan_dft_c2r_1d(windowSize, FFTSpectrum, IFFTReconstruction.data(), FFTW_MEASURE);
-	// loadSample(originalData, frames, sampleRate);
 }
 
 PhaseVocoder::~PhaseVocoder() {
@@ -89,14 +84,26 @@ void PhaseVocoder::loadData(std::vector<float> originalData, int sampleRate, flo
 	originalBuffer = originalData;
 	originalSampleRate = sampleRate;
 	scaleRatio = -1; // force update, kinda hacky
+
 	updateParams(newRatio);
+
+	dataLock.lock();
+
+	// set buffer size
+	m_processedWindows.resize(numWindows, false);
+	lastPhase.resize(numWindows*windowSize, 0);
+	sumPhase.resize(numWindows*windowSize, 0);
+	freqCache.resize(numWindows*windowSize, 0);
+	magCache.resize(numWindows*windowSize, 0);
 
 	for (int i = 0;i<numWindows;i++) {
 		if (!m_processedWindows[i]) {
-			generateWindow(originalBuffer, processedBuffer, i);
+			generateWindow(i, false);
 			m_processedWindows[i] = true;
 		}
 	}
+
+	dataLock.unlock();
 }
 
 void PhaseVocoder::getFrames(std::vector<float> & outData, int start, int frames) {
@@ -110,7 +117,7 @@ void PhaseVocoder::getFrames(std::vector<float> & outData, int start, int frames
 	// which must be computed
 	for (int i = startWindow;i<endWindow;i++) {
 		if (!m_processedWindows[i]) {
-			generateWindow(originalBuffer, processedBuffer, i);
+			generateWindow(i, true);
 			m_processedWindows[i] = true;
 		}
 	}
@@ -122,13 +129,13 @@ void PhaseVocoder::getFrames(std::vector<float> & outData, int start, int frames
 	dataLock.unlock();
 }
 
+// adjust pv params and reset buffers
 void PhaseVocoder::updateParams(float newRatio) {
 	if (originalBuffer.size() < 2048) { return; }
 	if (newRatio == scaleRatio) { return; }
 	dataLock.lock();
 
-	printf("ratio: %f\n", newRatio);
-
+	// TODO: remove static stuff from here, like stepsize
 	scaleRatio = newRatio;
 	stepSize = (float)windowSize / overSampling;
 	numWindows = (float)originalBuffer.size() / stepSize - overSampling - 1;
@@ -137,83 +144,74 @@ void PhaseVocoder::updateParams(float newRatio) {
 	expectedPhaseIn = 2.*M_PI*(float)stepSize/(float)windowSize;
 	expectedPhaseOut = 2.*M_PI*(float)outStepSize/(float)windowSize;
 
-	// clear all buffers
-	processedBuffer = {};
-	m_processedWindows = {};
-	lastPhase = {};
-	sumPhase = {};
-
-	// resize all buffers
 	processedBuffer.resize(scaleRatio*originalBuffer.size(), 0);
-	lastPhase.resize(numWindows*windowSize, 0);
-	sumPhase.resize(numWindows*windowSize, 0);
-	m_processedWindows.resize(numWindows, false);
+
+	// very slow :(
+	std::fill(m_processedWindows.begin(), m_processedWindows.end(), false);
+	std::fill(processedBuffer.begin(), processedBuffer.end(), 0);
+	// somehow this works if this is commented, idk why but its faster
+	// std::fill(lastPhase.begin(), lastPhase.end(), 0);
+	// std::fill(sumPhase.begin(), sumPhase.end(), 0);
 
 	dataLock.unlock();
 }
 
-// basic phase vocoder implementation that time shifts without pitch change
+// time shifts one window from originalBuffer and writes to processedBuffer
 // resources:
 // http://blogs.zynaptiq.com/bernsee/pitch-shifting-using-the-ft/
 // https://sethares.engr.wisc.edu/vocoders/phasevocoder.html
 // https://dsp.stackexchange.com/questions/40101/audio-time-stretching-without-pitch-shifting/40367#40367
 // https://www.guitarpitchshifter.com/
-void PhaseVocoder::generateWindow(std::vector<float> &dataIn, std::vector<float> &dataOut, int start)
+void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 {
 	// declare vars
 	float real, imag, phase, magnitude, freq, deltaPhase = 0;
-	int windowStart = (float)start*stepSize;
-	int windowIndex = (float)start*windowSize;
+	int windowStart = (float)windowNum*stepSize;
+	int windowIndex = (float)windowNum*windowSize;
 
-	memcpy(FFTInput.data(), dataIn.data() + windowStart, windowSize*sizeof(float));
+	if (!useCache) { // normal stuff
+		memcpy(FFTInput.data(), originalBuffer.data() + windowStart, windowSize*sizeof(float));
 
-	// FFT
-	fftwf_execute(fftPlan);
+		// FFT
+		fftwf_execute(fftPlan);
 
-	// analysis step
-	for (int j = 0; j < windowSize; j++)
-	{
-		real = FFTSpectrum[j][0];
-		imag = FFTSpectrum[j][1];
+		// analysis step
+		for (int j = 0; j < windowSize; j++)
+		{
+			real = FFTSpectrum[j][0];
+			imag = FFTSpectrum[j][1];
 
-		magnitude = 2.*sqrt(real*real + imag*imag);
-		phase = atan2(imag,real);
+			magnitude = 2.*sqrt(real*real + imag*imag);
+			phase = atan2(imag,real);
 
-		freq = phase;
-		freq = phase - lastPhase[std::max(0, windowIndex + j - windowSize)]; // subtract prev pahse to get phase diference
-		lastPhase[windowIndex + j] = phase;
+			freq = phase;
+			freq = phase - lastPhase[std::max(0, windowIndex + j - windowSize)]; // subtract prev pahse to get phase diference
+			lastPhase[windowIndex + j] = phase;
 
-		freq -= (float)j*expectedPhaseIn; // subtract expected phase
+			freq -= (float)j*expectedPhaseIn; // subtract expected phase
 
-		// some black magic to get into +/- PI interval, revise later pls
-		long qpd = freq/M_PI;
-		if (qpd >= 0) qpd += qpd&1;
-		else qpd -= qpd&1;
-		freq -= M_PI*(float)qpd;
+			// some black magic to get into +/- PI interval, revise later pls
+			long qpd = freq/M_PI;
+			if (qpd >= 0) qpd += qpd&1;
+			else qpd -= qpd&1;
+			freq -= M_PI*(float)qpd;
 
-		freq = (float)overSampling*freq/(2.*M_PI); // idk
+			freq = (float)overSampling*freq/(2.*M_PI); // idk
 
-		freq = (float)j*freqPerBin + freq*freqPerBin; // "compute the k-th partials' true frequency" ok i guess
+			freq = (float)j*freqPerBin + freq*freqPerBin; // "compute the k-th partials' true frequency" ok i guess
 
-		allMagnitudes[j] = magnitude;
-		allFrequencies[j] = freq;
+			allMagnitudes[j] = magnitude;
+			allFrequencies[j] = freq;
+		}
+		// write cache
+		memcpy(freqCache.data() + windowIndex, allFrequencies.data(), windowSize*sizeof(float));
+		memcpy(magCache.data() + windowIndex, allMagnitudes.data(),  windowSize*sizeof(float));
+	} else {
+		// read cache
+		memcpy(allFrequencies.data(), freqCache.data() + windowIndex, windowSize*sizeof(float));
+		memcpy(allMagnitudes.data(), magCache.data() + windowIndex, windowSize*sizeof(float));
 	}
 
-
-	// pitch shifting
-	// takes all the values that are below the nyquist frequency (representable with our samplerate)
-	// nyquist frequency = samplerate / 2
-	// and moves them to a different bin
-	// improve for larger pitch shift
-	// memset(processedFreq.data(), 0, processedFreq.size()*sizeof(float));
-	// memset(processedMagn.data(), 0, processedFreq.size()*sizeof(float));
-	// for (int j = 0; j < windowSize/2; j++) {
-	// 	int index = (float)j;// * m_noteThreshold.value();
-	// 	if (index <= windowSize/2) {
-	// 		processedMagn[index] += allMagnitudes[j];
-	// 		processedFreq[index] = allFrequencies[j];// * m_noteThreshold.value();
-	// 	}
-	// }
 
 	// synthesis, all the operations are the reverse of the analysis
 	for (int j = 0; j < windowSize; j++)
@@ -245,8 +243,8 @@ void PhaseVocoder::generateWindow(std::vector<float> &dataIn, std::vector<float>
 	// windowing
 	for (int j = 0; j < windowSize; j++)
 	{
-		float outIndex = start * outStepSize + j;
-		if (outIndex >= dataOut.size()) { break; }
+		float outIndex = windowNum * outStepSize + j;
+		if (outIndex >= frames()) { break; }
 
 		// calculate windows overlapping at index
 		// float startWindowOverlap = ceil(outIndex / outStepSize + 0.00000001f);
@@ -260,20 +258,11 @@ void PhaseVocoder::generateWindow(std::vector<float> &dataIn, std::vector<float>
 		// printf("timeshifted in phase: %f\n", m_timeshiftedBufferL[outIndex]);
 		// continuos windowing
 		float window = -0.5f*cos(2.*M_PI*(float)j/(float)windowSize)+0.5f;
-		dataOut[outIndex] += 2.0f*window*IFFTReconstruction[j]/(windowSize/2.0f*overSampling);
+		processedBuffer[outIndex] += window*IFFTReconstruction[j]/(windowSize/2.0f*overSampling);
 	}
 
 }
 
-int PhaseVocoder::hashFttWindow(std::vector<float> & in)
-{
-	int hash = 0;
-	for (float value : in)
-	{
-		hash += (324723947 + (int)(value * 10689354)) ^ 93485734985;;
-	}
-	return hash;
-}
 
 // ################################# SlicerT ####################################
 
