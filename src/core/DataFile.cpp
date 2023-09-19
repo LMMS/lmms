@@ -1804,7 +1804,7 @@ void DataFile::upgrade_sampleAndHold()
 		// Correct old random wave LFO speeds
 		if (e.attribute("wave").toInt() == 6)
 		{
-			e.setAttribute("speed",0.01f);
+			e.setAttribute("speed", 0.01f);
 		}
 	}
 }
@@ -1813,7 +1813,7 @@ void DataFile::upgrade_sampleAndHold()
 // Change loops' filenames in <sampleclip>s
 void DataFile::upgrade_loopsRename()
 {
-	std::vector<std::pair<string, string>> loopBPMs{
+	std::vector<std::pair<QString, QString>> loopBPMs{
 		{"briff01", "140"},
 		{"rave_bass01", "180"},
 		{"rave_bass02", "180"},
@@ -1843,7 +1843,7 @@ void DataFile::upgrade_loopsRename()
 		{"latin_guitar03", "120"},
 	};
 
-	const string SRCATTR = "src", SAMPLECLIPELEM = "sampleclip", BPMPREF = " - ", BPMSUFF = " BPM";
+	const QString SRCATTR = "src", SAMPLECLIPELEM = "sampleclip", BPMPREF = " - ", BPMSUFF = " BPM";
 
 	// Replace names of loop samples
 	QDomNodeList elements = elementsByTagName(SAMPLECLIPELEM);
@@ -1854,7 +1854,7 @@ void DataFile::upgrade_loopsRename()
 		if (item.isNull()) { continue; }
 		if (item.hasAttribute(SRCATTR))
 		{
-			for (int i = 0; i < loopBPMs.length(); ++i)
+			for (int i = 0; i < loopBPMs.size(); ++i)
 			{
 				auto currentPair = loopBPMs.at(i);
 				auto toReplace = currentPair.first;
@@ -1862,8 +1862,11 @@ void DataFile::upgrade_loopsRename()
 
 				if (srcVal.contains(toReplace, Qt::CaseInsensitive))
 				{
-					srcVal.replace(QString::fromStdString(toReplace),
-						QString::fromStdString(toReplace + BPMPREF + currentPair.second + BPMSUFF));
+					// Add " - X BPM" to filename
+					srcVal.replace(toReplace,
+						toReplace + BPMPREF + currentPair.second + BPMSUFF);
+
+					item.setAttribute(SRCATTR, srcVal);
 				}
 			}
 		}
