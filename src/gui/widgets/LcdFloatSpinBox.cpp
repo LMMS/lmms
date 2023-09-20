@@ -49,6 +49,7 @@ namespace lmms::gui
 
 
 LcdFloatSpinBox::LcdFloatSpinBox(int numWhole, int numFrac, const QString& name, QWidget* parent) :
+	QWidget(parent),
 	FloatModelView(new FloatModel(0, 0, 0, 0, nullptr, name, true), this),
 	m_wholeDisplay(numWhole, parent, name, false),
 	m_fractionDisplay(numFrac, parent, name, true),
@@ -62,6 +63,7 @@ LcdFloatSpinBox::LcdFloatSpinBox(int numWhole, int numFrac, const QString& name,
 
 
 LcdFloatSpinBox::LcdFloatSpinBox(int numWhole, int numFrac, const QString& style, const QString& name, QWidget* parent) :
+	QWidget(parent),
 	FloatModelView(new FloatModel(0, 0, 0, 0, nullptr, name, true), this),
 	m_wholeDisplay(numWhole, style, parent, name, false),
 	m_fractionDisplay(numFrac, style, parent, name, true),
@@ -101,6 +103,7 @@ void LcdFloatSpinBox::layoutSetup(const QString &style)
 	outerLayout->setContentsMargins(0, 0, 0, 0);
 	outerLayout->setSizeConstraint(QLayout::SetFixedSize);
 	this->setLayout(outerLayout);
+	this->setFixedHeight(32);
 }
 
 
@@ -240,9 +243,9 @@ void LcdFloatSpinBox::paintEvent(QPaintEvent*)
 	{
 		p.setFont(pointSizeF(p.font(), 6.5));
 		p.setPen(m_wholeDisplay.textShadowColor());
-		p.drawText(width() / 2 - horizontalAdvance(p.fontMetrics(), m_label) / 2 + 1, height(), m_label);
+		p.drawText(width() / 2 - p.fontMetrics().boundingRect(m_label).width() / 2 + 1, height(), m_label);
 		p.setPen(m_wholeDisplay.textColor());
-		p.drawText(width() / 2 - horizontalAdvance(p.fontMetrics(), m_label) / 2, height() - 1, m_label);
+		p.drawText(width() / 2 - p.fontMetrics().boundingRect(m_label).width() / 2, height() - 1, m_label);
 	}
 }
 

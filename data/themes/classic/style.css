@@ -209,6 +209,7 @@ lmms--gui--Oscilloscope {
 lmms--gui--CPULoadWidget {
 	border: none;
 	background: url(resources:cpuload_bg.png);
+	qproperty-stepSize: 4;
 }
 
 /* scrollbar: trough */

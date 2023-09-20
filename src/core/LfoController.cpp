@@ -88,6 +88,7 @@ void LfoController::updateValueBuffer()
 {
 	m_phaseOffset = m_phaseModel.value() / 360.0;
 	float phase = m_currentPhase + m_phaseOffset;
+	float phasePrev = 0.0f;
 
 	// roll phase up until we're in sync with period counter
 	m_bufferLastUpdated++;
@@ -102,20 +103,45 @@ void LfoController::updateValueBuffer()
 	ValueBuffer *amountBuffer = m_amountModel.valueBuffer();
 	int amountInc = amountBuffer ? 1 : 0;
 	float *amountPtr = amountBuffer ? &(amountBuffer->values()[ 0 ] ) : &amount;
+	Oscillator::WaveShape waveshape = static_cast<Oscillator::WaveShape>(m_waveModel.value());
 
 	for( float& f : m_valueBuffer )
 	{
-		const float currentSample = m_sampleFunction != nullptr
-			? m_sampleFunction( phase )
-			: m_userDefSampleBuffer->userWaveSample( phase );
+		float currentSample = 0;
+		switch (waveshape)
+		{
+		case Oscillator::WaveShape::WhiteNoise:
+		{
+			if (absFraction(phase) < absFraction(phasePrev))
+			{
+				// Resample when phase period has completed
+				m_heldSample = m_sampleFunction(phase);
+			}
+			currentSample = m_heldSample;
+			break;
+		}
+		case Oscillator::WaveShape::UserDefined:
+		{
+			currentSample = m_userDefSampleBuffer->userWaveSample(phase);
+			break;
+		}
+		default:
+		{
+			if (m_sampleFunction != nullptr)
+			{
+				currentSample = m_sampleFunction(phase);
+			}
+		}
+	}
 
 		f = std::clamp(m_baseModel.value() + (*amountPtr * currentSample / 2.0f), 0.0f, 1.0f);
 
+		phasePrev = phase;
 		phase += 1.0 / m_duration;
 		amountPtr += amountInc;
 	}
 
-	m_currentPhase = absFraction( phase - m_phaseOffset );
+	m_currentPhase = absFraction(phase - m_phaseOffset);
 	m_bufferLastUpdated = s_periods;
 }
 
