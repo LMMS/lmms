@@ -7,6 +7,13 @@ SET(LMMS_BINARY_DIR ${CMAKE_BINARY_DIR})
 SET(LMMS_SOURCE_DIR ${CMAKE_SOURCE_DIR})
 
 # CMAKE_POLICY Section
+IF(COMMAND CMAKE_POLICY)
+	# TODO: Keep CMP0074 but remove this condition when cmake 3.12+ is guaranteed
+	IF(${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.12)
+		# Needed for the SWH Ladspa plugins. See below.
+		CMAKE_POLICY(SET CMP0074 NEW) # find_package() uses <PackageName>_ROOT variables
+	ENDIF()
+ENDIF(COMMAND CMAKE_POLICY)
 
 # Import of windows.h breaks min()/max()
 ADD_DEFINITIONS(-DNOMINMAX)
@@ -266,8 +273,17 @@ ELSE(WANT_CMT)
 ENDIF(WANT_CMT)
 
 IF(WANT_SWH)
-	SET(LMMS_HAVE_SWH TRUE)
-	SET(STATUS_SWH "OK")
+	IF(LMMS_BUILD_APPLE)
+		# Prefer system perl over Homebrew, MacPorts, etc
+		SET(Perl_ROOT "/usr/bin")
+	ENDIF()
+	FIND_PACKAGE(Perl)
+	IF(PERL_FOUND)
+		SET(LMMS_HAVE_SWH TRUE)
+		SET(STATUS_SWH "OK")
+	ELSE()
+		SET(STATUS_SWH "Skipping, perl is missing")
+	ENDIF()
 ELSE(WANT_SWH)
 	SET(STATUS_SWH "not built as requested")
 ENDIF(WANT_SWH)
