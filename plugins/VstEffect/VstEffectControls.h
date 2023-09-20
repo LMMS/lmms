@@ -89,7 +89,7 @@ private:
 
 	QMdiSubWindow * m_subWindow;
 	QScrollArea * m_scrollArea;
-	FloatModel ** knobFModel;
+	std::vector<FloatModel*> knobFModel;
 	int paramCount;
 
 	QObject * ctrHandle;
