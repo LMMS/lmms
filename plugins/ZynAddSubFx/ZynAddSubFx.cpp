@@ -341,7 +341,6 @@ void ZynAddSubFxInstrument::play( sampleFrame * _buf )
 		m_plugin->processAudio( _buf );
 	}
 	m_pluginMutex.unlock();
-	instrumentTrack()->processAudioBuffer( _buf, Engine::audioEngine()->framesPerPeriod(), nullptr );
 }
 
 

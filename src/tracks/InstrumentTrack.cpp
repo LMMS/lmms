@@ -570,6 +570,10 @@ f_cnt_t InstrumentTrack::beatLen( NotePlayHandle * _n ) const
 
 void InstrumentTrack::playNote( NotePlayHandle* n, sampleFrame* workingBuffer )
 {
+	// Note: under certain circumstances the working buffer is a nullptr.
+	// These cases are triggered in PlayHandle::doProcessing when the play method is called with a nullptr.
+	// TODO: Find out if we can skip processing at a higher level if the buffer is nullptr.
+
 	// arpeggio- and chord-widget has to do its work -> adding sub-notes
 	// for chords/arpeggios
 	m_noteStacking.processNote( n );
@@ -579,6 +583,15 @@ void InstrumentTrack::playNote( NotePlayHandle* n, sampleFrame* workingBuffer )
 	{
 		// all is done, so now lets play the note!
 		m_instrument->playNote( n, workingBuffer );
+
+		// This is effectively the same as checking if workingBuffer is not a nullptr.
+		// Calling processAudioBuffer with a nullptr leads to crashes. Hence the check.
+		if (n->usesBuffer())
+		{
+			const fpp_t frames = n->framesLeftForCurrentPeriod();
+			const f_cnt_t offset = n->noteOffset();
+			processAudioBuffer(workingBuffer, frames + offset, n);
+		}
 	}
 }
 
