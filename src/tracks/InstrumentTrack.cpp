@@ -584,9 +584,9 @@ void InstrumentTrack::playNote( NotePlayHandle* n, sampleFrame* workingBuffer )
 		// all is done, so now lets play the note!
 		m_instrument->playNote( n, workingBuffer );
 
-		// Calling processAudioBuffer with a nullptr leads to crashes when checking if the buffer represents silence.
-		// Therefore we must guard against a nullptr here.
-		if (workingBuffer != nullptr)
+		// This is effectively the same as checking if workingBuffer is not a nullptr.
+		// Calling processAudioBuffer with a nullptr leads to crashes. Hence the check.
+		if (n->usesBuffer())
 		{
 			const fpp_t frames = n->framesLeftForCurrentPeriod();
 			const f_cnt_t offset = n->noteOffset();
