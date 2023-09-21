@@ -60,6 +60,9 @@ private:
 	EqBand *setBand( int index, BoolModel *active, FloatModel *freq, FloatModel *res, FloatModel *gain, QColor color, QString name, float *peakL, float *peakR, BoolModel *hp12, BoolModel *hp24, BoolModel *hp48, BoolModel *lp12, BoolModel *lp24, BoolModel *lp48 );
 
 	int m_originalHeight;
+	static QPixmap s_faderBg;
+	static QPixmap s_faderLeds;
+	static QPixmap s_faderKnob;
 };
 
 
