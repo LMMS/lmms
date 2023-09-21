@@ -56,7 +56,7 @@ EqParameterWidget::EqParameterWidget( QWidget *parent, EqControls * controls ) :
 	m_pixelsPerOctave = EqHandle::freqToXPixel( 10000, m_displayWidth ) - EqHandle::freqToXPixel( 5000, m_displayWidth );
 
 	//GraphicsScene and GraphicsView stuff
-	auto scene = new QGraphicsScene();
+	auto scene = new QGraphicsScene(this);
 	scene->setSceneRect( 0, 0, m_displayWidth, m_displayHeigth );
 	auto view = new QGraphicsView(this);
 	view->setStyleSheet( "border-style: none; background: transparent;" );
