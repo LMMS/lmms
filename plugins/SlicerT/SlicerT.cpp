@@ -22,7 +22,7 @@
  *
  */
 
-// better ounset detection + bpm cleanup
+// TODO: better onset detection + bpm cleanup
 // TODO: switch to arrayVector (maybe)
 // TODO: cleaunp UI classes
 // TODO: implment roxas new UI
@@ -56,7 +56,7 @@ Plugin::Descriptor PLUGIN_EXPORT slicert_plugin_descriptor =
 	"Daniel Kauss Serna <daniel.kauss.serna/at/gmail.com>",
 	0x0100,
 	Plugin::Type::Instrument,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader( "icon" ),
 	nullptr,
 	nullptr,
 } ;

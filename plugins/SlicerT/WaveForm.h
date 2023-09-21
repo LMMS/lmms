@@ -57,16 +57,18 @@ class WaveForm : public QWidget {
     private:
         int m_width;
         int m_height;
-        float m_m_seekerRatio = 0.3f;
+        int m_seekerHeight = 46;
+        int m_editorHeight;
         int m_margin = 5;
-        QColor m_waveformBgColor = QColor(11, 11, 11, 200);
-        QColor m_waveformColor = QColor(113, 0, 177);
+        QColor m_waveformBgColor = QColor(255, 255, 255, 0);
+        QColor m_waveformColor = QColor(123, 49, 212);
         // QColor m_waveformColor = QColor(255, 161, 247); // logo color
         QColor m_playColor = QColor(255, 255, 255, 200);
         QColor m_playHighlighColor = QColor(255, 255, 255, 70);
-        QColor m_sliceColor = QColor(49, 214, 124);
+        QColor m_sliceColor = QColor(218, 193, 255);
         QColor m_selectedSliceColor = QColor(172, 236, 190);
-        QColor m_seekerColor = QColor(214, 124, 49);
+        QColor m_seekerColor = QColor(178, 115, 255);
+        QColor m_seekerHighlightColor = QColor(178, 115, 255, 100);
         QColor m_seekerShadowColor = QColor(0, 0, 0, 175);
 
         enum class m_draggingTypes

@@ -56,20 +56,16 @@ SlicerTUI::SlicerTUI( SlicerT * instrument,
 	m_bpmBox(3, "19green", this),
 	m_resetButton(this, nullptr),
 	m_midiExportButton(this, nullptr),
-	m_wf(244, 125, instrument, this)
+	m_wf(248, 132, instrument, this)
 {
 	setAcceptDrops( true );
 	setAutoFillBackground( true );
 
 	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
-	pal.setColor(QPalette::All, QPalette::ColorRole::Foreground, Qt::red);
-	pal.setColor(QPalette::All, QPalette::ColorRole::Button, Qt::red);
-	pal.setColor(QPalette::All, QPalette::ColorRole::Base, Qt::red);
-	pal.setColor(QPalette::All, QPalette::ColorRole::Highlight, Qt::red);
+	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "bg" ) );
 	setPalette( pal );
 
-	m_wf.move(3, 5);
+	m_wf.move(2, 2);
 
 	m_bpmBox.move(7, 153);
 	m_bpmBox.setToolTip(tr("Original sample BPM"));
@@ -88,17 +84,17 @@ SlicerTUI::SlicerTUI( SlicerT * instrument,
 
 	m_midiExportButton.move(145, 198);
 	m_midiExportButton.setActiveGraphic(
-						PLUGIN_NAME::getIconPixmap( "CopyMidiBtn" ) );
+						embed::getIconPixmap("midi_tab") );
 	m_midiExportButton.setInactiveGraphic(
-						PLUGIN_NAME::getIconPixmap( "CopyMidiBtn" ) );
+						embed::getIconPixmap("midi_tab"));
 	m_midiExportButton.setToolTip(tr("Copy midi pattern to clipboard"));
 	connect(&m_midiExportButton, SIGNAL( clicked() ), this, SLOT( exportMidi() ));
 
 	m_resetButton.move(80, 198);
 	m_resetButton.setActiveGraphic(
-						PLUGIN_NAME::getIconPixmap( "ResetBtn" ) );
+						embed::getIconPixmap("reload") );
 	m_resetButton.setInactiveGraphic(
-						PLUGIN_NAME::getIconPixmap( "ResetBtn" ) );
+						embed::getIconPixmap("reload") );
 	m_resetButton.setToolTip(tr("Reset Slices"));
 	connect(&m_resetButton, SIGNAL( clicked() ), m_slicerTParent, SLOT( updateSlices() ));
 }

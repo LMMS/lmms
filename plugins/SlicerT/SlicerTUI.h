@@ -52,11 +52,11 @@ class SlicerTKnob : public Knob {
 		setFixedSize( 46, 40 );
 		setCenterPointX( 23.0 );
 		setCenterPointY( 15.0 );
-		setInnerRadius( 8 );
+		setInnerRadius( 3 );
 		setOuterRadius( 11 );
 		// setTotalAngle( 270.0 );
 		setLineWidth( 3 );
-		setOuterColor( QColor(255, 161, 247) );
+		setOuterColor( QColor(178, 115, 255) );
 		}
 };
 

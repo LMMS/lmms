@@ -34,14 +34,16 @@ namespace gui
 {
 WaveForm::WaveForm(int w, int h, SlicerT  * instrument, QWidget * parent) :
     QWidget(parent),
-    m_sliceEditor(QPixmap(w, h*(1 - m_m_seekerRatio) - m_margin)),
-    m_seeker(QPixmap(w, h*m_m_seekerRatio)),
-    m_seekerWaveform(QPixmap(w, h*m_m_seekerRatio)),
+    m_sliceEditor(QPixmap(w, h - m_seekerHeight - m_margin)),
+    m_seeker(QPixmap(w, m_seekerHeight)),
+    m_seekerWaveform(QPixmap(w, m_seekerHeight)),
     m_currentSample(instrument->m_originalSample),
     m_slicePoints(instrument->m_slicePoints)
     {
         m_width = w;
         m_height = h;
+        m_editorHeight = h - m_seekerHeight - m_margin;
+
         m_slicerTParent = instrument;
         setFixedSize(m_width, m_height);
         setMouseTracking( true );
@@ -68,12 +70,12 @@ void WaveForm::drawEditor()
     float endFrame = m_seekerEnd * m_currentSample.frames();
 
     brush.setPen(m_playHighlighColor);
-    brush.drawLine(0, m_sliceEditor.height()/2, m_sliceEditor.width(), m_sliceEditor.height()/2);
+    brush.drawLine(0, m_editorHeight/2, m_width, m_editorHeight/2);
 
     brush.setPen(m_waveformColor);
     m_currentSample.visualize(
     brush,
-    QRect( 0, 0, m_sliceEditor.width(), m_sliceEditor.height() ),
+    QRect( 0, 0, m_width, m_editorHeight ),
     startFrame, endFrame);
 
 
@@ -90,7 +92,7 @@ void WaveForm::drawEditor()
                 brush.setPen(QPen(m_selectedSliceColor, 2));
             }
 
-            brush.drawLine(xPos, 0, xPos, m_height);
+            brush.drawLine(xPos, 0, xPos, m_editorHeight);
         }
     }
 }
@@ -118,22 +120,30 @@ void WaveForm::drawSeeker()
     for (int i = 0;i<m_slicePoints.size();i++)
     {
         float xPos = (float)m_slicePoints[i] / (float)m_currentSample.frames() * (float)m_width;
-        brush.drawLine(xPos, 0, xPos, m_height);
+        brush.drawLine(xPos, 0, xPos, m_seekerHeight);
     }
 
     // draw current playBack
     brush.setPen(m_playColor);
-    brush.drawLine(m_noteCurrent*m_width, 0, m_noteCurrent*m_width, m_height);
-    brush.fillRect(m_noteStart*m_width, 0, (m_noteEnd-m_noteStart)*m_width, m_height, m_playHighlighColor);
+    brush.drawLine(m_noteCurrent*m_width, 0, m_noteCurrent*m_width, m_seekerHeight);
+    brush.fillRect(m_noteStart*m_width, 0, (m_noteEnd-m_noteStart)*m_width, m_seekerHeight, m_playHighlighColor);
 
     // draw m_seeker points
-    brush.setPen(QPen(m_seekerColor, 3));
-    brush.drawLine(m_seekerStart*m_width, 0, m_seekerStart*m_width, m_height);
-    brush.drawLine(m_seekerEnd*m_width, 0, m_seekerEnd*m_width, m_height);
+    // brush.setPen(QPen(m_seekerColor, 3));
+    // brush.drawLine(m_seekerStart*m_width, 0, m_seekerStart*m_width, m_seekerHeight);
+    // brush.drawLine(m_seekerEnd*m_width, 0, m_seekerEnd*m_width, m_seekerHeight);
+
+
+    // highlight on selecte area
+    brush.fillRect(m_seekerStart*m_width, 0, (m_seekerEnd-m_seekerStart)*m_width, m_seekerHeight, m_seekerHighlightColor);
 
     // shadow on not selected area
-    brush.fillRect(0, 0, m_seekerStart*m_width, m_height, m_seekerShadowColor);
-    brush.fillRect(m_seekerEnd*m_width, 0, m_width, m_height, m_seekerShadowColor);
+    brush.fillRect(0, 0, m_seekerStart*m_width, m_seekerHeight, m_seekerShadowColor);
+    brush.fillRect(m_seekerEnd*m_width+1, 0, m_width+1, m_seekerHeight, m_seekerShadowColor);
+
+    brush.setPen(QPen(m_seekerColor, 1));
+    brush.drawRoundedRect(m_seekerStart*m_width, 0, (m_seekerEnd-m_seekerStart)*m_width-1, m_seekerHeight-1, 4, 4); // -1 needed
+
 }
 
 void WaveForm::updateUI()
@@ -171,7 +181,7 @@ void WaveForm::mousePressEvent( QMouseEvent * me )
         return;
     }
 
-    if (me->y() < m_height*m_m_seekerRatio)
+    if (me->y() < m_seekerHeight)
     {
         if (abs(normalizedClick - m_seekerStart) < 0.03)
         {
@@ -248,7 +258,7 @@ void WaveForm::mouseMoveEvent( QMouseEvent * me )
 
             m_seekerMiddle = normalizedClick;
 
-            if (m_seekerMiddle + distStart > 0 && m_seekerMiddle + distEnd < 1)
+            if (m_seekerMiddle + distStart >= 0 && m_seekerMiddle + distEnd <= 1)
             {
                 m_seekerStart = m_seekerMiddle + distStart;
                 m_seekerEnd = m_seekerMiddle + distEnd;
@@ -294,7 +304,7 @@ void WaveForm::paintEvent( QPaintEvent * pe)
     QPainter p( this );
     p.drawPixmap(0, 0 ,m_seekerWaveform);
     p.drawPixmap(0, 0, m_seeker);
-    p.drawPixmap(0, m_height*0.3f + m_margin, m_sliceEditor);
+    p.drawPixmap(0, m_seekerHeight + m_margin, m_sliceEditor);
 }
 } // namespace gui
 } // namespace lmms
