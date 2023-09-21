@@ -19,6 +19,7 @@ IF(COMMAND CMAKE_POLICY)
 	CMAKE_POLICY(SET CMP0057 NEW)
 	# TODO: Keep CMP0074 but remove this condition when cmake 3.12+ is guaranteed
 	IF(${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.12)
+		# Needed for the SWH Ladspa plugins. See below.
 		CMAKE_POLICY(SET CMP0074 NEW) # find_package() uses <PackageName>_ROOT variables
 	ENDIF()
 ENDIF(COMMAND CMAKE_POLICY)
@@ -675,6 +676,9 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	ELSE(WIN32)
 		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -DPIC")
 	ENDIF(WIN32)
+elseif(MSVC)
+	# Use UTF-8 as the source and execution character set
+	add_compile_options("/utf-8")
 ENDIF()
 
 # add enabled sanitizers
