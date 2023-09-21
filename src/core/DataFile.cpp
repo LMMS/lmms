@@ -1813,7 +1813,7 @@ void DataFile::upgrade_sampleAndHold()
 // Change loops' filenames in <sampleclip>s
 void DataFile::upgrade_loopsRename()
 {
-	std::vector<std::pair<QString, QString>> loopBPMs{
+	const std::vector<std::pair<QString, QString>> LOOPBPMS{
 		{"briff01", "140"},
 		{"rave_bass01", "180"},
 		{"rave_bass02", "180"},
@@ -1843,30 +1843,39 @@ void DataFile::upgrade_loopsRename()
 		{"latin_guitar03", "120"},
 	};
 
-	const QString SRCATTR = "src", SAMPLECLIPELEM = "sampleclip", BPMPREF = " - ", BPMSUFF = " BPM";
+	const QString BPMPREF = " - ", BPMSUFF = " BPM";
 
-	// Replace names of loop samples
-	QDomNodeList elements = elementsByTagName(SAMPLECLIPELEM);
-	for (int i = 0; i < elements.length(); ++i)
+	// Replace loop sample names
+	for (auto& [elem, srcAttrs] : ELEMENTS_WITH_RESOURCES)
 	{
-		auto item = elements.item(i).toElement();
+		auto elements = elementsByTagName(elem);
 
-		if (item.isNull()) { continue; }
-		if (item.hasAttribute(SRCATTR))
+		for (int i = 0; i < srcAttrs.size(); ++i)
 		{
-			for (int i = 0; i < loopBPMs.size(); ++i)
+			auto srcAttr = srcAttrs.at(i);
+
+			for (int j = 0; j < elements.length(); ++j)
 			{
-				auto currentPair = loopBPMs.at(i);
-				auto toReplace = currentPair.first;
-				auto srcVal = item.attribute(SRCATTR);
+				auto item = elements.item(j).toElement();
 
-				if (srcVal.contains(toReplace, Qt::CaseInsensitive))
+				if (item.isNull()) { continue; }
+				if (item.hasAttribute(srcAttr))
 				{
-					// Add " - X BPM" to filename
-					srcVal.replace(toReplace,
-						toReplace + BPMPREF + currentPair.second + BPMSUFF);
+					for (int k = 0; k < LOOPBPMS.size(); ++k)
+					{
+						auto currentPair = LOOPBPMS.at(k);
+						auto toReplace = currentPair.first;
+						auto srcVal = item.attribute(srcAttr);
 
-					item.setAttribute(SRCATTR, srcVal);
+						if (srcVal.contains(toReplace, Qt::CaseInsensitive))
+						{
+							// Add " - X BPM" to filename
+							srcVal.replace(toReplace,
+									toReplace + BPMPREF + currentPair.second + BPMSUFF);
+
+							item.setAttribute(srcAttr, srcVal);
+						}
+					}
 				}
 			}
 		}
