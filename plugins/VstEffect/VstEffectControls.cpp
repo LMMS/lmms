@@ -558,6 +558,7 @@ ManageVSTEffectView::~ManageVSTEffectView()
 		vstKnobs = nullptr;
 	}
 
+	m_vi2->knobFModel.clear();
 
 	if( m_vi2->m_scrollArea != nullptr )
 	{
