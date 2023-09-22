@@ -35,6 +35,7 @@
 #include <QDebug>
 #include <QElapsedTimer>
 
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "Plugin.h"
 #include "Lv2ControlBase.h"
@@ -156,6 +157,10 @@ Lv2Manager::Lv2Manager() :
 	m_supportedFeatureURIs.insert(LV2_BUF_SIZE__boundedBlockLength);
 	// block length is only changed initially in AudioEngine CTOR
 	m_supportedFeatureURIs.insert(LV2_BUF_SIZE__fixedBlockLength);
+	if (const auto fpp = Engine::audioEngine()->framesPerPeriod(); (fpp & (fpp - 1)) == 0)  // <=> ffp is power of 2 (for ffp > 0)
+	{
+		m_supportedFeatureURIs.insert(LV2_BUF_SIZE__powerOf2BlockLength);
+	}
 
 	auto supportOpt = [this](Lv2UridCache::Id id)
 	{
