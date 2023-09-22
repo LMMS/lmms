@@ -119,15 +119,6 @@ const int INITIAL_START_KEY = Octave::Octave_4 + Key::C;
 const int NUM_EVEN_LENGTHS = 6;
 const int NUM_TRIPLET_LENGTHS = 5;
 
-
-
-QPixmap * PianoRoll::s_toolDraw = nullptr;
-QPixmap * PianoRoll::s_toolErase = nullptr;
-QPixmap * PianoRoll::s_toolSelect = nullptr;
-QPixmap * PianoRoll::s_toolMove = nullptr;
-QPixmap * PianoRoll::s_toolOpen = nullptr;
-QPixmap* PianoRoll::s_toolKnife = nullptr;
-
 SimpleTextFloat * PianoRoll::s_textFloat = nullptr;
 
 static std::array<QString, 12> s_noteStrings {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
@@ -262,30 +253,19 @@ PianoRoll::PianoRoll() :
 	m_semiToneMarkerMenu->addAction( copyAllNotesAction );
 
 	// init pixmaps
-	if( s_toolDraw == nullptr )
-	{
-		s_toolDraw = new QPixmap( embed::getIconPixmap( "edit_draw" ) );
-	}
-	if( s_toolErase == nullptr )
-	{
-		s_toolErase= new QPixmap( embed::getIconPixmap( "edit_erase" ) );
-	}
-	if( s_toolSelect == nullptr )
-	{
-		s_toolSelect = new QPixmap( embed::getIconPixmap( "edit_select" ) );
-	}
-	if( s_toolMove == nullptr )
-	{
-		s_toolMove = new QPixmap( embed::getIconPixmap( "edit_move" ) );
-	}
-	if( s_toolOpen == nullptr )
-	{
-		s_toolOpen = new QPixmap( embed::getIconPixmap( "automation" ) );
-	}
-	if (s_toolKnife == nullptr)
-	{
-		s_toolKnife = new QPixmap(embed::getIconPixmap("edit_knife"));
-	}
+	static auto s_toolDraw = QPixmap{embed::getIconPixmap("edit_draw")};
+	static auto s_toolErase = QPixmap{embed::getIconPixmap("edit_erase")};
+	static auto s_toolSelect = QPixmap{embed::getIconPixmap("edit_select")};
+	static auto s_toolMove = QPixmap{embed::getIconPixmap("edit_move")};
+	static auto s_toolOpen = QPixmap{embed::getIconPixmap("automation")};
+	static auto s_toolKnife = QPixmap{embed::getIconPixmap("edit_knife")};
+
+	toolDraw = &s_toolDraw;
+	toolErase = &s_toolErase;
+	toolSelect = &s_toolSelect;
+	toolMove = &s_toolMove;
+	toolOpen = &s_toolOpen;
+	toolOpen = &s_toolKnife;
 
 	// init text-float
 	if( s_textFloat == nullptr )
@@ -3696,21 +3676,29 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			case EditMode::Draw:
 				if( m_mouseDownRight )
 				{
-					cursor = s_toolErase;
+					cursor = toolErase;
 				}
 				else if( m_action == Action::MoveNote )
 				{
-					cursor = s_toolMove;
+					cursor = toolMove;
 				}
 				else
 				{
-					cursor = s_toolDraw;
+					cursor = toolDraw;
 				}
 				break;
-			case EditMode::Erase: cursor = s_toolErase; break;
-			case EditMode::Select: cursor = s_toolSelect; break;
-			case EditMode::Detuning: cursor = s_toolOpen; break;
-			case EditMode::Knife: cursor = s_toolKnife; break;
+			case EditMode::Erase:
+				cursor = toolErase;
+				break;
+			case EditMode::Select:
+				cursor = toolSelect;
+				break;
+			case EditMode::Detuning:
+				cursor = toolOpen;
+				break;
+			case EditMode::Knife:
+				cursor = toolKnife;
+				break;
 		}
 		QPoint mousePosition = mapFromGlobal( QCursor::pos() );
 		if( cursor != nullptr && mousePosition.y() > keyAreaTop() && mousePosition.x() > noteEditLeft())
