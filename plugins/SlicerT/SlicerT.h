@@ -62,7 +62,7 @@ class PhaseVocoder {
 
 		// timeshift stuff
 		static const int windowSize = 512;
-		static const int overSampling = 64;
+		static const int overSampling = 32;
 
 		// depending on scaleRatio
 		int stepSize = 0;

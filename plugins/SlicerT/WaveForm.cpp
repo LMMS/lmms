@@ -25,6 +25,7 @@
 #include "WaveForm.h"
 #include "SlicerT.h"
 
+#include "embed.h"
 
 namespace lmms
 {
@@ -34,17 +35,24 @@ namespace gui
 {
 WaveForm::WaveForm(int w, int h, SlicerT  * instrument, QWidget * parent) :
     QWidget(parent),
-    m_sliceEditor(QPixmap(w, h - m_seekerHeight - m_margin)),
-    m_seeker(QPixmap(w, m_seekerHeight)),
-    m_seekerWaveform(QPixmap(w, m_seekerHeight)),
+    // calculate sizes
+    m_width(w),
+    m_height(h),
+    m_seekerWidth(w - m_seekerHorMargin * 2),
+    m_editorHeight(h - m_seekerHeight - m_middleMargin),
+    m_editorWidth(w),
+
+    // create pixmaps
+    m_sliceArrow(PLUGIN_NAME::getIconPixmap( "slide_indicator_arrow" )),
+    m_seeker(QPixmap(m_seekerWidth, m_seekerHeight)),
+    m_seekerWaveform(QPixmap(m_seekerWidth, m_seekerHeight)),
+    m_sliceEditor(QPixmap(w, m_editorHeight)),
+
+    // references to instrument vars
+    m_slicerTParent(instrument),
     m_currentSample(instrument->m_originalSample),
     m_slicePoints(instrument->m_slicePoints)
     {
-        m_width = w;
-        m_height = h;
-        m_editorHeight = h - m_seekerHeight - m_margin;
-
-        m_slicerTParent = instrument;
         setFixedSize(m_width, m_height);
         setMouseTracking( true );
 
@@ -55,54 +63,18 @@ WaveForm::WaveForm(int w, int h, SlicerT  * instrument, QWidget * parent) :
                 SIGNAL(isPlaying(float, float, float)),
                 this,
                 SLOT(isPlaying(float, float, float)));
-
-        connect(m_slicerTParent, SIGNAL(dataChanged()), this, SLOT(updateData()));
+        connect(m_slicerTParent, SIGNAL(dataChanged()), this, SLOT(updateUI()));
 
         updateUI();
     }
 
-void WaveForm::drawEditor()
-{
-    m_sliceEditor.fill(m_waveformBgColor);
-    QPainter brush(&m_sliceEditor);
-
-    float startFrame = m_seekerStart * m_currentSample.frames();
-    float endFrame = m_seekerEnd * m_currentSample.frames();
-
-    brush.setPen(m_playHighlighColor);
-    brush.drawLine(0, m_editorHeight/2, m_width, m_editorHeight/2);
-
-    brush.setPen(m_waveformColor);
-    m_currentSample.visualize(
-    brush,
-    QRect( 0, 0, m_width, m_editorHeight ),
-    startFrame, endFrame);
-
-
-    for (int i = 0;i<m_slicePoints.size();i++)
-    {
-        int sliceIndex = m_slicePoints[i];
-        brush.setPen(QPen(m_sliceColor, 2));
-
-        if (sliceIndex >= startFrame && sliceIndex <= endFrame)
-        {
-            float xPos = (float)(sliceIndex - startFrame) / (float)(endFrame - startFrame) * (float)m_width;
-            if (i == m_sliceSelected)
-            {
-                brush.setPen(QPen(m_selectedSliceColor, 2));
-            }
-
-            brush.drawLine(xPos, 0, xPos, m_editorHeight);
-        }
-    }
-}
-
+// graphics
 void WaveForm::drawSeekerWaveform()
 {
+    m_seekerWaveform.fill(m_waveformBgColor);
     QPainter brush(&m_seekerWaveform);
     brush.setPen(m_waveformColor);
 
-    m_seekerWaveform.fill(m_waveformBgColor);
     m_currentSample.visualize(
     brush,
     QRect( 0, 0, m_seekerWaveform.width(), m_seekerWaveform.height() ),
@@ -111,54 +83,80 @@ void WaveForm::drawSeekerWaveform()
 
 void WaveForm::drawSeeker()
 {
-    m_seeker.fill(QColor(0, 0, 0, 0));
+    m_seeker.fill(m_waveformBgColor);
     QPainter brush(&m_seeker);
-    brush.setPen(m_waveformColor);
-
     // draw slice points
     brush.setPen(m_sliceColor);
     for (int i = 0;i<m_slicePoints.size();i++)
     {
-        float xPos = (float)m_slicePoints[i] / (float)m_currentSample.frames() * (float)m_width;
+        float xPos = (float)m_slicePoints[i] / m_currentSample.frames() * m_seekerWidth;
         brush.drawLine(xPos, 0, xPos, m_seekerHeight);
     }
 
+    // this is a complete mess
     // draw current playBack
     brush.setPen(m_playColor);
-    brush.drawLine(m_noteCurrent*m_width, 0, m_noteCurrent*m_width, m_seekerHeight);
-    brush.fillRect(m_noteStart*m_width, 0, (m_noteEnd-m_noteStart)*m_width, m_seekerHeight, m_playHighlighColor);
+    brush.drawLine(m_noteCurrent*m_seekerWidth, 0, m_noteCurrent*m_seekerWidth, m_seekerHeight);
+    brush.fillRect(m_noteStart*m_seekerWidth, 0, (m_noteEnd-m_noteStart)*m_seekerWidth, m_seekerHeight, m_playHighlighColor);
 
-    // draw m_seeker points
-    // brush.setPen(QPen(m_seekerColor, 3));
-    // brush.drawLine(m_seekerStart*m_width, 0, m_seekerStart*m_width, m_seekerHeight);
-    // brush.drawLine(m_seekerEnd*m_width, 0, m_seekerEnd*m_width, m_seekerHeight);
-
-
-    // highlight on selecte area
-    brush.fillRect(m_seekerStart*m_width, 0, (m_seekerEnd-m_seekerStart)*m_width, m_seekerHeight, m_seekerHighlightColor);
+    // highlight on selected area
+    brush.fillRect(m_seekerStart*m_seekerWidth, 0, (m_seekerEnd-m_seekerStart)*m_seekerWidth, m_seekerHeight, m_seekerHighlightColor);
 
     // shadow on not selected area
-    brush.fillRect(0, 0, m_seekerStart*m_width, m_seekerHeight, m_seekerShadowColor);
-    brush.fillRect(m_seekerEnd*m_width+1, 0, m_width+1, m_seekerHeight, m_seekerShadowColor);
+    brush.fillRect(0, 0, m_seekerStart*m_seekerWidth, m_seekerHeight, m_seekerShadowColor);
+    brush.fillRect(m_seekerEnd*m_seekerWidth+1, 0, m_seekerWidth+1, m_seekerHeight, m_seekerShadowColor);
 
+    // draw border around selection
     brush.setPen(QPen(m_seekerColor, 1));
-    brush.drawRoundedRect(m_seekerStart*m_width, 0, (m_seekerEnd-m_seekerStart)*m_width-1, m_seekerHeight-1, 4, 4); // -1 needed
-
+    brush.drawRoundedRect(m_seekerStart*m_seekerWidth, 0, (m_seekerEnd-m_seekerStart)*m_seekerWidth-1, m_seekerHeight-1, 4, 4); // -1 needed
 }
 
+void WaveForm::drawEditor()
+{
+    m_sliceEditor.fill(m_waveformBgColor);
+    QPainter brush(&m_sliceEditor);
+
+    float startFrame = m_seekerStart * m_currentSample.frames();
+    float endFrame = m_seekerEnd * m_currentSample.frames();
+    float numFramesToDraw = endFrame - startFrame;
+
+    // 0 centered line
+    brush.setPen(m_playHighlighColor);
+    brush.drawLine(0, m_editorHeight/2, m_editorWidth, m_editorHeight/2);
+
+    // draw waveform
+    brush.setPen(m_waveformColor);
+    m_currentSample.visualize(
+    brush,
+    QRect( 0, 0, m_editorWidth, m_editorHeight ),
+    startFrame, endFrame);
+
+    // draw slicepoints
+    brush.setPen(QPen(m_sliceColor, 2));
+    for (int i = 0;i<m_slicePoints.size();i++)
+    {
+        float xPos = (float)(m_slicePoints[i] - startFrame) / numFramesToDraw * m_editorWidth;
+
+        if (i == m_sliceSelected)
+        {
+            brush.setPen(QPen(m_selectedSliceColor, 2));
+        } else
+        {
+            brush.setPen(QPen(m_sliceColor, 2));
+        }
+
+        brush.drawLine(xPos, 0, xPos, m_editorHeight);
+        brush.drawPixmap(xPos - (float)m_sliceArrow.width()/2, 0, m_sliceArrow);
+    }
+}
+
+// slots
 void WaveForm::updateUI()
 {
     drawSeekerWaveform();
     drawSeeker();
     drawEditor();
     update();
-}
-
-void WaveForm::updateData()
-{
-    // I hate SampleBuffer, fot whatever reason this crashes sometimes
-    // m_currentSample = SampleBuffer(m_slicerTParent->m_originalSample.data(), m_slicerTParent->m_originalSample.frames());
-    updateUI();
 }
 
 void WaveForm::isPlaying(float current, float start, float end)
@@ -170,10 +168,12 @@ void WaveForm::isPlaying(float current, float start, float end)
     update();
 }
 
+// events
 void WaveForm::mousePressEvent( QMouseEvent * me )
 {
-    float normalizedClick = (float)me->x() / m_width;
-
+    float normalizedClickSeeker = (float)(me->x() - m_seekerHorMargin) / m_seekerWidth;
+    float normalizedClickEditor = (float)(me->x()) / m_editorWidth;
+    // reset seeker on middle click
     if (me->button() == Qt::MouseButton::MiddleButton)
     {
         m_seekerStart = 0;
@@ -181,44 +181,39 @@ void WaveForm::mousePressEvent( QMouseEvent * me )
         return;
     }
 
-    if (me->y() < m_seekerHeight)
+    if (me->y() < m_seekerHeight) // seeker click
     {
-        if (abs(normalizedClick - m_seekerStart) < 0.03)
+        if (abs(normalizedClickSeeker - m_seekerStart) < distanceForClick) // dragging start
         {
             m_currentlyDragging = m_draggingTypes::m_seekerStart;
-
-        } else if (abs(normalizedClick - m_seekerEnd) < 0.03)
+        } else if (abs(normalizedClickSeeker - m_seekerEnd) < distanceForClick) // dragging end
         {
             m_currentlyDragging = m_draggingTypes::m_seekerEnd;
 
-        } else if (normalizedClick > m_seekerStart && normalizedClick < m_seekerEnd)
+        } else if (normalizedClickSeeker > m_seekerStart && normalizedClickSeeker < m_seekerEnd) // dragging middle
         {
             m_currentlyDragging = m_draggingTypes::m_seekerMiddle;
-            m_seekerMiddle = normalizedClick;
+            m_seekerMiddle = normalizedClickSeeker;
         }
-
-    } else {
+    } else { // editor click
         m_sliceSelected = -1;
         float startFrame = m_seekerStart * m_currentSample.frames();
         float endFrame = m_seekerEnd * m_currentSample.frames();
-
+        // select slice
         for (int i = 0;i<m_slicePoints.size();i++)
         {
             int sliceIndex = m_slicePoints[i];
             float xPos = (float)(sliceIndex - startFrame) / (float)(endFrame - startFrame);
 
-            if (abs(xPos - normalizedClick) < 0.03)
+            if (abs(xPos - normalizedClickEditor) < distanceForClick)
             {
-                m_currentlyDragging = m_draggingTypes::slicePoint;
+                m_currentlyDragging = m_draggingTypes::m_slicePoint;
                 m_sliceSelected = i;
             }
         }
     }
-    if (me->button() == Qt::MouseButton::LeftButton)
-    {
-        m_isDragging = true;
 
-    } else if (me->button() == Qt::MouseButton::RightButton)
+    if (me->button() == Qt::MouseButton::RightButton) // erase selected slice
     {
         if (m_sliceSelected != -1 && m_slicePoints.size() > 2)
         {
@@ -226,66 +221,66 @@ void WaveForm::mousePressEvent( QMouseEvent * me )
             m_sliceSelected = -1;
         }
     }
-
+    updateUI();
 }
 
 void WaveForm::mouseReleaseEvent( QMouseEvent * me )
 {
-    m_isDragging = false;
     m_currentlyDragging = m_draggingTypes::nothing;
     updateUI();
 }
 
 void WaveForm::mouseMoveEvent( QMouseEvent * me )
 {
-    float normalizedClick = (float)me->x() / m_width;
+    float normalizedClickSeeker = (float)(me->x() - m_seekerHorMargin) / m_seekerWidth;
+    float normalizedClickEditor = (float)(me->x()) / m_editorWidth;
+
+    float distStart = m_seekerStart - m_seekerMiddle;
+    float distEnd = m_seekerEnd - m_seekerMiddle;
+    float startFrame = m_seekerStart * m_currentSample.frames();
+    float endFrame = m_seekerEnd * m_currentSample.frames();
 
     // handle dragging events
-    if (m_isDragging)
+    switch (m_currentlyDragging)
     {
-        if (m_currentlyDragging == m_draggingTypes::m_seekerStart)
+    case m_draggingTypes::m_seekerStart:
+        m_seekerStart = std::clamp(normalizedClickSeeker, 0.0f, m_seekerEnd - minSeekerDistance);
+        break;
+
+    case m_draggingTypes::m_seekerEnd:
+        m_seekerEnd = std::clamp(normalizedClickSeeker, m_seekerStart + minSeekerDistance, 1.0f);
+        break;
+
+    case m_draggingTypes::m_seekerMiddle:
+        m_seekerMiddle = normalizedClickSeeker;
+
+        if (m_seekerMiddle + distStart >= 0 && m_seekerMiddle + distEnd <= 1)
         {
-            m_seekerStart = std::clamp(normalizedClick, 0.0f, m_seekerEnd - 0.13f);
-
-        } else if (m_currentlyDragging == m_draggingTypes::m_seekerEnd)
-        {
-            m_seekerEnd = std::clamp(normalizedClick, m_seekerStart + 0.13f, 1.0f);;
-
-        } else if (m_currentlyDragging == m_draggingTypes::m_seekerMiddle)
-        {
-            float distStart = m_seekerStart - m_seekerMiddle;
-            float distEnd = m_seekerEnd - m_seekerMiddle;
-
-            m_seekerMiddle = normalizedClick;
-
-            if (m_seekerMiddle + distStart >= 0 && m_seekerMiddle + distEnd <= 1)
-            {
-                m_seekerStart = m_seekerMiddle + distStart;
-                m_seekerEnd = m_seekerMiddle + distEnd;
-            }
-
-        } else if (m_currentlyDragging == m_draggingTypes::slicePoint)
-        {
-            float startFrame = m_seekerStart * m_currentSample.frames();
-            float endFrame = m_seekerEnd * m_currentSample.frames();
-
-            m_slicePoints[m_sliceSelected] = startFrame + normalizedClick * (endFrame - startFrame);
-
-            m_slicePoints[m_sliceSelected] = std::clamp(m_slicePoints[m_sliceSelected], 0, m_currentSample.frames());
-
-            std::sort(m_slicePoints.begin(), m_slicePoints.end());
+            m_seekerStart = m_seekerMiddle + distStart;
+            m_seekerEnd = m_seekerMiddle + distEnd;
         }
-        updateUI();
+        break;
+
+    case m_draggingTypes::m_slicePoint: // TODO: fix this
+        m_slicePoints[m_sliceSelected] = startFrame + normalizedClickEditor * (endFrame - startFrame);
+
+        m_slicePoints[m_sliceSelected] = std::clamp(m_slicePoints[m_sliceSelected], 0, m_currentSample.frames());
+
+        std::sort(m_slicePoints.begin(), m_slicePoints.end());
+        break;
+    case m_draggingTypes::nothing:
+        break;
     }
+    updateUI();
 }
 
 void WaveForm::mouseDoubleClickEvent(QMouseEvent * me)
 {
-    float normalizedClick = (float)me->x() / m_width;
+    float normalizedClickEditor = (float)(me->x()) / m_editorWidth;
     float startFrame = m_seekerStart * m_currentSample.frames();
     float endFrame = m_seekerEnd * m_currentSample.frames();
 
-    float slicePosition = startFrame + normalizedClick * (endFrame - startFrame);
+    float slicePosition = startFrame + normalizedClickEditor * (endFrame - startFrame);
 
     for (int i = 0;i<m_slicePoints.size();i++)
     {
@@ -302,9 +297,9 @@ void WaveForm::mouseDoubleClickEvent(QMouseEvent * me)
 void WaveForm::paintEvent( QPaintEvent * pe)
 {
     QPainter p( this );
-    p.drawPixmap(0, 0 ,m_seekerWaveform);
-    p.drawPixmap(0, 0, m_seeker);
-    p.drawPixmap(0, m_seekerHeight + m_margin, m_sliceEditor);
+    p.drawPixmap(m_seekerHorMargin, 0 ,m_seekerWaveform);
+    p.drawPixmap(m_seekerHorMargin, 0, m_seeker);
+    p.drawPixmap(0, m_seekerHeight + m_middleMargin, m_sliceEditor);
 }
 } // namespace gui
 } // namespace lmms

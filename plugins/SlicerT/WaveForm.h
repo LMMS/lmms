@@ -55,56 +55,71 @@ class WaveForm : public QWidget {
         virtual void paintEvent(QPaintEvent * pe);
 
     private:
+        // vars used to control structure and colors
         int m_width;
         int m_height;
-        int m_seekerHeight = 46;
+
+        int m_seekerHorMargin = 5;
+        int m_seekerHeight = 38; // used to calcualte all hor sizes
+        int m_seekerWidth;
+
+        int m_middleMargin = 6;
         int m_editorHeight;
-        int m_margin = 5;
+        int m_editorWidth;
+
+
         QColor m_waveformBgColor = QColor(255, 255, 255, 0);
         QColor m_waveformColor = QColor(123, 49, 212);
+        // QColor m_waveformColorDark = QColor(39, 15, 67);
+
         // QColor m_waveformColor = QColor(255, 161, 247); // logo color
         QColor m_playColor = QColor(255, 255, 255, 200);
         QColor m_playHighlighColor = QColor(255, 255, 255, 70);
         QColor m_sliceColor = QColor(218, 193, 255);
-        QColor m_selectedSliceColor = QColor(172, 236, 190);
+        QColor m_selectedSliceColor = QColor(178, 153, 215);
         QColor m_seekerColor = QColor(178, 115, 255);
         QColor m_seekerHighlightColor = QColor(178, 115, 255, 100);
-        QColor m_seekerShadowColor = QColor(0, 0, 0, 175);
+        QColor m_seekerShadowColor = QColor(0, 0, 0, 120);
 
+        // interaction vars
+        float distanceForClick = 0.03f;
+        float minSeekerDistance = 0.13f;
+
+        // dragging vars
         enum class m_draggingTypes
         {
             nothing,
             m_seekerStart,
             m_seekerEnd,
             m_seekerMiddle,
-            slicePoint,
+            m_slicePoint,
         };
-
         m_draggingTypes m_currentlyDragging;
-        bool m_isDragging = false;
 
+        // seeker vars
         float m_seekerStart = 0;
         float m_seekerEnd = 1;
         float m_seekerMiddle = 0.5f;
         int m_sliceSelected = 0;
 
+        // playback highlight vars
         float m_noteCurrent;
         float m_noteStart;
         float m_noteEnd;
 
-        QPixmap m_sliceEditor;
+        // pixmaps
+        QPixmap m_sliceArrow;
         QPixmap m_seeker;
-        QPixmap m_seekerWaveform;
+        QPixmap m_seekerWaveform; // only stores waveform graphic
+        QPixmap m_sliceEditor;
 
         SampleBuffer & m_currentSample;
 
         void drawEditor();
         void drawSeekerWaveform();
         void drawSeeker();
-        void updateUI();
-
     public slots:
-        void updateData();
+        void updateUI();
         void isPlaying(float current, float start, float end);
 
     public:
