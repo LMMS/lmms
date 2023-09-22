@@ -39,6 +39,7 @@
 #include "GuiApplication.h"
 #include "embed.h"
 #include "gui_templates.h"
+#include "lmms_math.h"
 #include "Lv2ControlBase.h"
 #include "Lv2Manager.h"
 #include "Lv2Proc.h"
@@ -74,8 +75,10 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* proc, int colNum) :
 					case PortVis::Integer:
 					{
 						sample_rate_t sr = Engine::audioEngine()->processingSampleRate();
-						m_control = new LcdControl((port.max(sr) <= 9.0f) ? 1 : 2,
-													m_parent);
+						auto pMin = port.min(sr);
+						auto pMax = port.max(sr);
+						int numDigits = std::max(numDigitsAsInt(pMin), numDigitsAsInt(pMax));
+						m_control = new LcdControl(numDigits, m_parent);
 						break;
 					}
 					case PortVis::Enumeration:
