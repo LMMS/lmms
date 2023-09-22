@@ -439,19 +439,12 @@ namespace gui
 {
 
 
-QPixmap * AudioFileProcessorView::s_artwork = nullptr;
 
 
 AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 							QWidget * _parent ) :
 	InstrumentViewFixedSize( _instrument, _parent )
 {
-	if( s_artwork == nullptr )
-	{
-		s_artwork = new QPixmap( PLUGIN_NAME::getIconPixmap(
-								"artwork" ) );
-	}
-
 	m_openAudioFileButton = new PixmapButton( this );
 	m_openAudioFileButton->setCursor( QCursor( Qt::PointingHandCursor ) );
 	m_openAudioFileButton->move( 227, 72 );
@@ -637,7 +630,8 @@ void AudioFileProcessorView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
-	p.drawPixmap( 0, 0, *s_artwork );
+	static auto s_artwork = QPixmap{PLUGIN_NAME::getIconPixmap("artwork")};
+	p.drawPixmap(0, 0, s_artwork);
 
 	auto a = castModel<AudioFileProcessor>();
 
