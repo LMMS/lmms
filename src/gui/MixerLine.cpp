@@ -68,8 +68,6 @@ bool MixerLine::eventFilter( QObject *dist, QEvent *event )
 }
 
 const int MixerLine::MixerLineHeight = 287;
-QPixmap * MixerLine::s_sendBgArrow = nullptr;
-QPixmap * MixerLine::s_receiveBgArrow = nullptr;
 
 MixerLine::MixerLine( QWidget * _parent, MixerView * _mv, int _channelIndex ) :
 	QWidget( _parent ),
@@ -82,15 +80,6 @@ MixerLine::MixerLine( QWidget * _parent, MixerView * _mv, int _channelIndex ) :
 	m_strokeInnerInactive( 0, 0, 0 ),
 	m_inRename( false )
 {
-	if( !s_sendBgArrow )
-	{
-		s_sendBgArrow = new QPixmap( embed::getIconPixmap( "send_bg_arrow", 29, 56 ) );
-	}
-	if( !s_receiveBgArrow )
-	{
-		s_receiveBgArrow = new QPixmap( embed::getIconPixmap( "receive_bg_arrow", 29, 56 ) );
-	}
-
 	setFixedSize( 33, MixerLineHeight );
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
@@ -193,14 +182,10 @@ void MixerLine::drawMixerLine( QPainter* p, const MixerLine *mixerLine, bool isA
 	p->drawRect( 0, 0, width-1, height-1 );
 
 	// draw the mixer send background
-	if( sendToThis )
-	{
-		p->drawPixmap( 2, 0, 29, 56, *s_sendBgArrow );
-	}
-	else if( receiveFromThis )
-	{
-		p->drawPixmap( 2, 0, 29, 56, *s_receiveBgArrow );
-	}
+
+	static auto s_sendBgArrow = QPixmap{embed::getIconPixmap("send_bg_arrow", 29, 56)};
+	static auto s_receiveBgArrow = QPixmap{embed::getIconPixmap("receive_bg_arrow", 29, 56)};
+	p->drawPixmap(2, 0, 29, 56, sendToThis ? s_sendBgArrow : s_receiveBgArrow);
 }
 
 
