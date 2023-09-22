@@ -560,8 +560,8 @@ void MidiClipView::paintEvent( QPaintEvent * )
 		const int w = width() - 2 * BORDER_WIDTH;
 
 		static auto s_stepBtnOn0 = QPixmap{embed::getIconPixmap("step_btn_on_0")};
-		static auto s_stepBtnOn200 = QPixmap(embed::getIconPixmap("step_btn_on_200"));
-		static auto s_stepBtnOff = QPixmap(embed::getIconPixmap("step_btn_off"));
+		static auto s_stepBtnOn200 = QPixmap{embed::getIconPixmap("step_btn_on_200")};
+		static auto s_stepBtnOff = QPixmap{embed::getIconPixmap("step_btn_off")};
 		static auto s_stepBtnOffLight = QPixmap{embed::getIconPixmap("step_btn_off_light")}; 
 
 		// scale step graphics to fit the beat clip length
