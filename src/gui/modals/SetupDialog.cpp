@@ -579,31 +579,38 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	// Buffer size tab.
 	auto bufferSize_tw = new TabWidget(tr("Buffer size"), audio_w);
-	bufferSize_tw->setFixedHeight(76);
+	auto bufferSize_layout = new QVBoxLayout(bufferSize_tw);
+	bufferSize_layout->setSpacing(10);
+	bufferSize_layout->setContentsMargins(10, 18, 10, 10);
 
 	m_bufferSizeSlider = new QSlider(Qt::Horizontal, bufferSize_tw);
 	m_bufferSizeSlider->setRange(1, 128);
 	m_bufferSizeSlider->setTickInterval(8);
 	m_bufferSizeSlider->setPageStep(8);
 	m_bufferSizeSlider->setValue(m_bufferSize / BUFFERSIZE_RESOLUTION);
-	m_bufferSizeSlider->setGeometry(10, 18, 340, 18);
 	m_bufferSizeSlider->setTickPosition(QSlider::TicksBelow);
+
+	m_bufferSizeLbl = new QLabel(bufferSize_tw);
+
+	m_bufferSizeWarnLbl = new QLabel(bufferSize_tw);
+	m_bufferSizeWarnLbl->setWordWrap(true);
 
 	connect(m_bufferSizeSlider, SIGNAL(valueChanged(int)),
 			this, SLOT(setBufferSize(int)));
 	connect(m_bufferSizeSlider, SIGNAL(valueChanged(int)),
 			this, SLOT(showRestartWarning()));
-
-	m_bufferSizeLbl = new QLabel(bufferSize_tw);
-	m_bufferSizeLbl->setGeometry(10, 40, 200, 24);
 	setBufferSize(m_bufferSizeSlider->value());
 
 	auto bufferSize_reset_btn = new QPushButton(embed::getIconPixmap("reload"), "", bufferSize_tw);
-	bufferSize_reset_btn->setGeometry(320, 40, 28, 28);
 	connect(bufferSize_reset_btn, SIGNAL(clicked()),
 			this, SLOT(resetBufferSize()));
 	bufferSize_reset_btn->setToolTip(
 			tr("Reset to default value"));
+
+	bufferSize_layout->addWidget(m_bufferSizeSlider);
+	bufferSize_layout->addWidget(m_bufferSizeLbl);
+	bufferSize_layout->addWidget(m_bufferSizeWarnLbl);
+	bufferSize_layout->addWidget(bufferSize_reset_btn);
 
 
 	// Audio layout ordering.
@@ -1172,6 +1179,24 @@ void SetupDialog::audioInterfaceChanged(const QString & iface)
 }
 
 
+void SetupDialog::updateBufferSizeWarning(int value)
+{
+	QString text = "<ul>";
+	if((value & (value - 1)) != 0)  // <=> value is not a power of 2 (for value > 0)
+	{
+		text += "<li>" + tr("The currently selected value is not a power of 2 "
+					"(32, 64, 128, 256, 512, 1024, ...). Some plugins may not be available.") + "</li>";
+	}
+	if(value <= 32)
+	{
+		text += "<li>" + tr("The currently selected value is less than or equal to 32. "
+					"Some plugins may not be available.") + "</li>";
+	}
+	text += "</ul>";
+	m_bufferSizeWarnLbl->setText(text);
+}
+
+
 void SetupDialog::setBufferSize(int value)
 {
 	const int step = DEFAULT_BUFFER_SIZE / BUFFERSIZE_RESOLUTION;
@@ -1197,6 +1222,7 @@ void SetupDialog::setBufferSize(int value)
 	m_bufferSize = value * BUFFERSIZE_RESOLUTION;
 	m_bufferSizeLbl->setText(tr("Frames: %1\nLatency: %2 ms").arg(m_bufferSize).arg(
 		1000.0f * m_bufferSize / Engine::audioEngine()->processingSampleRate(), 0, 'f', 1));
+	updateBufferSizeWarning(m_bufferSize);
 }
 
 
