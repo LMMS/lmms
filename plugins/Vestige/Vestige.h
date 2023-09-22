@@ -131,8 +131,6 @@ protected:
 
 
 private:
-	static QPixmap * s_artwork;
-
 	VestigeInstrument * m_vi;
 
 	QWidget *widget;
@@ -175,7 +173,6 @@ protected:
 private:
 	virtual void modelChanged();
 
-	static QPixmap * s_artwork;
 
 	VestigeInstrument * m_vi;
 
