@@ -64,14 +64,6 @@
 
 namespace lmms::gui
 {
-
-QPixmap * AutomationEditor::s_toolDraw = nullptr;
-QPixmap * AutomationEditor::s_toolErase = nullptr;
-QPixmap * AutomationEditor::s_toolDrawOut = nullptr;
-QPixmap * AutomationEditor::s_toolMove = nullptr;
-QPixmap * AutomationEditor::s_toolYFlip = nullptr;
-QPixmap * AutomationEditor::s_toolXFlip = nullptr;
-
 const std::array<float, 7> AutomationEditor::m_zoomXLevels =
 		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f };
 
@@ -133,16 +125,10 @@ AutomationEditor::AutomationEditor() :
 					this, SLOT(setQuantization()));
 	m_quantizeModel.setValue( m_quantizeModel.findText( "1/8" ) );
 
-	if (s_toolYFlip == nullptr)
-	{
-		s_toolYFlip = new QPixmap( embed::getIconPixmap(
-							"flip_y" ) );
-	}
-	if (s_toolXFlip == nullptr)
-	{
-		s_toolXFlip = new QPixmap( embed::getIconPixmap(
-							"flip_x" ) );
-	}
+	static auto s_toolYFlip = QPixmap{embed::getIconPixmap("flip_y")};
+	static auto s_toolXFlip = QPixmap{embed::getIconPixmap("flip_x")};
+	toolYFlip = &s_toolYFlip;
+	toolXFlip = &s_toolXFlip;
 
 	// add time-line
 	m_timeLine = new TimeLineWidget( VALUES_WIDTH, 0, m_ppb,
@@ -168,22 +154,15 @@ AutomationEditor::AutomationEditor() :
 						SLOT(verScrolled(int)));
 
 	// init pixmaps
-	if (s_toolDraw == nullptr)
-	{
-		s_toolDraw = new QPixmap(embed::getIconPixmap("edit_draw"));
-	}
-	if (s_toolErase == nullptr)
-	{
-		s_toolErase= new QPixmap(embed::getIconPixmap("edit_erase"));
-	}
-	if (s_toolDrawOut == nullptr)
-	{
-		s_toolDrawOut = new QPixmap(embed::getIconPixmap("edit_draw_outvalue"));
-	}
-	if (s_toolMove == nullptr)
-	{
-		s_toolMove = new QPixmap(embed::getIconPixmap("edit_move"));
-	}
+	static auto s_toolDraw = QPixmap{embed::getIconPixmap("edit_draw")};
+	static auto s_toolErase = QPixmap{embed::getIconPixmap("edit_erase")};
+	static auto s_toolDrawOut = QPixmap{embed::getIconPixmap("edit_draw_outvalue")};
+	static auto s_toolMove = QPixmap{embed::getIconPixmap("edit_move")};
+
+	toolDraw = &s_toolDraw;
+	toolErase = &s_toolErase;
+	toolDrawOut = &s_toolDrawOut;
+	toolMove = &s_toolMove;
 
 	setCurrentClip(nullptr);
 
@@ -1250,21 +1229,21 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	{
 		case EditMode::Draw:
 		{
-			if (m_action == Action::EraseValues) { cursor = s_toolErase; }
-			else if (m_action == Action::MoveValue) { cursor = s_toolMove; }
-			else { cursor = s_toolDraw; }
+			if (m_action == Action::EraseValues) { cursor = toolErase; }
+			else if (m_action == Action::MoveValue) { cursor = toolMove; }
+			else { cursor = toolDraw; }
 			break;
 		}
 		case EditMode::Erase:
 		{
-			cursor = s_toolErase;
+			cursor = toolErase;
 			break;
 		}
 		case EditMode::DrawOutValues:
 		{
-			if (m_action == Action::ResetOutValues) { cursor = s_toolErase; }
-			else if (m_action == Action::MoveOutValue) { cursor = s_toolMove; }
-			else { cursor = s_toolDrawOut; }
+			if (m_action == Action::ResetOutValues) { cursor = toolErase; }
+			else if (m_action == Action::MoveOutValue) { cursor = toolMove; }
+			else { cursor = toolDrawOut; }
 			break;
 		}
 	}
