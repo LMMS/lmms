@@ -40,9 +40,6 @@
 
 namespace lmms::gui
 {
-QPixmap EqControlsDialog::s_faderBg;
-QPixmap EqControlsDialog::s_faderLeds;
-QPixmap EqControlsDialog::s_faderKnob;
 
 
 EqControlsDialog::EqControlsDialog( EqControls *controls ) :
@@ -75,12 +72,12 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	setBand( 6, &controls->m_highShelfActiveModel, &controls->m_highShelfFreqModel, &controls->m_highShelfResModel, &controls->m_highShelfGainModel, QColor(255 ,255, 255), tr( "High-shelf" ), &controls->m_highShelfPeakL, &controls->m_highShelfPeakR,0,0,0,0,0,0 );
 	setBand( 7, &controls->m_lpActiveModel, &controls->m_lpFreqModel, &controls->m_lpResModel, 0, QColor(255 ,255, 255), tr( "LP" ) ,0,0,0,0,0, &controls->m_lp12Model, &controls->m_lp24Model, &controls->m_lp48Model);
 
-	if (s_faderBg.isNull()) { s_faderBg = QPixmap(PLUGIN_NAME::getIconPixmap("faderback")); }
-	if (s_faderLeds.isNull()) { s_faderLeds = QPixmap(PLUGIN_NAME::getIconPixmap("faderleds")); }
-	if (s_faderKnob.isNull()) { s_faderKnob = QPixmap(PLUGIN_NAME::getIconPixmap("faderknob")); }
+	static auto s_faderBg = QPixmap(PLUGIN_NAME::getIconPixmap("faderback"));
+	static auto s_faderLeds = QPixmap(PLUGIN_NAME::getIconPixmap("faderleds"));
+	static auto s_faderKnob = QPixmap(PLUGIN_NAME::getIconPixmap("faderknob"));
 
-	auto GainFaderIn = new EqFader(&controls->m_inGainModel, tr("Input gain"), this, &s_faderBg, &s_faderLeds,
-		&s_faderKnob, &controls->m_inPeakL, &controls->m_inPeakR);
+	auto GainFaderIn = new EqFader(&controls->m_inGainModel, tr("Input gain"), this, &s_faderBg, &s_faderLeds, &s_faderKnob,
+		&controls->m_inPeakL, &controls->m_inPeakR);
 	GainFaderIn->move( 23, 295 );
 	GainFaderIn->setDisplayConversion( false );
 	GainFaderIn->setHintText( tr( "Gain" ), "dBv");
