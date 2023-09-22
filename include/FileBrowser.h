@@ -197,14 +197,12 @@ public:
 
 
 private:
-	void initPixmaps();
-
 	bool addItems( const QString & path );
 
 
-	static QPixmap * s_folderPixmap;
-	static QPixmap * s_folderOpenedPixmap;
-	static QPixmap * s_folderLockedPixmap;
+	QPixmap* folderPixmap;
+	QPixmap* folderOpenedPixmap;
+	QPixmap* folderLockedPixmap;
 
 	//! Directories that lead here
 	//! Initially, this is just set to the current path of a directory

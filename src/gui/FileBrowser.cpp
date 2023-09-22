@@ -958,16 +958,6 @@ void FileBrowserTreeWidget::updateDirectory(QTreeWidgetItem * item )
 	}
 }
 
-
-
-
-
-
-QPixmap * Directory::s_folderPixmap = nullptr;
-QPixmap * Directory::s_folderOpenedPixmap = nullptr;
-QPixmap * Directory::s_folderLockedPixmap = nullptr;
-
-
 Directory::Directory(const QString & filename, const QString & path,
 						const QString & filter ) :
 	QTreeWidgetItem( QStringList( filename ), TypeDirectoryItem ),
@@ -975,56 +965,27 @@ Directory::Directory(const QString & filename, const QString & path,
 	m_filter( filter ),
 	m_dirCount( 0 )
 {
-	initPixmaps();
+	static auto s_folderPixmap = QPixmap{embed::getIconPixmap("folder")};
+	static auto s_folderOpenedPixmap = QPixmap{embed::getIconPixmap("folder_opened")};
+	static auto s_folderLockedPixmap = QPixmap{embed::getIconPixmap("folder_locked")};
 
+	folderPixmap = &s_folderPixmap;
+	folderOpenedPixmap = &s_folderOpenedPixmap;
+	folderLockedPixmap = &s_folderLockedPixmap;
+
+	setIcon(0, !QDir{fullName()}.isReadable() ? s_folderLockedPixmap : s_folderPixmap);
 	setChildIndicatorPolicy( QTreeWidgetItem::ShowIndicator );
-
-	if( !QDir( fullName() ).isReadable() )
-	{
-		setIcon( 0, *s_folderLockedPixmap );
-	}
-	else
-	{
-		setIcon( 0, *s_folderPixmap );
-	}
 }
-
-
-
-
-void Directory::initPixmaps()
-{
-	if( s_folderPixmap == nullptr )
-	{
-		s_folderPixmap = new QPixmap(
-					embed::getIconPixmap( "folder" ) );
-	}
-
-	if( s_folderOpenedPixmap == nullptr )
-	{
-		s_folderOpenedPixmap = new QPixmap(
-				embed::getIconPixmap( "folder_opened" ) );
-	}
-
-	if( s_folderLockedPixmap == nullptr )
-	{
-		s_folderLockedPixmap = new QPixmap(
-				embed::getIconPixmap( "folder_locked" ) );
-	}
-}
-
-
-
 
 void Directory::update()
 {
 	if( !isExpanded() )
 	{
-		setIcon( 0, *s_folderPixmap );
+		setIcon(0, *folderPixmap);
 		return;
 	}
 
-	setIcon( 0, *s_folderOpenedPixmap );
+	setIcon(0, *folderOpenedPixmap);
 	if( !childCount() )
 	{
 		m_dirCount = 0;
@@ -1123,72 +1084,38 @@ FileItem::FileItem(const QString & name, const QString & path ) :
 
 void FileItem::initPixmaps()
 {
-	if( s_projectFilePixmap == nullptr )
-	{
-		s_projectFilePixmap = new QPixmap( embed::getIconPixmap(
-						"project_file", 16, 16 ) );
-	}
-
-	if( s_presetFilePixmap == nullptr )
-	{
-		s_presetFilePixmap = new QPixmap( embed::getIconPixmap(
-						"preset_file", 16, 16 ) );
-	}
-
-	if( s_sampleFilePixmap == nullptr )
-	{
-		s_sampleFilePixmap = new QPixmap( embed::getIconPixmap(
-						"sample_file", 16, 16 ) );
-	}
-
-	if ( s_soundfontFilePixmap == nullptr )
-	{
-		s_soundfontFilePixmap = new QPixmap( embed::getIconPixmap(
-						"soundfont_file", 16, 16 ) );
-	}
-
-	if ( s_vstPluginFilePixmap == nullptr )
-	{
-		s_vstPluginFilePixmap = new QPixmap( embed::getIconPixmap(
-						"vst_plugin_file", 16, 16 ) );
-	}
-
-	if( s_midiFilePixmap == nullptr )
-	{
-		s_midiFilePixmap = new QPixmap( embed::getIconPixmap(
-							"midi_file", 16, 16 ) );
-	}
-
-	if( s_unknownFilePixmap == nullptr )
-	{
-		s_unknownFilePixmap = new QPixmap( embed::getIconPixmap(
-							"unknown_file" ) );
-	}
+	static auto s_projectFilePixmap = QPixmap{embed::getIconPixmap("project_file", 16, 16)};
+	static auto s_presetFilePixmap = QPixmap{embed::getIconPixmap("preset_file", 16, 16)};
+	static auto s_sampleFilePixmap = QPixmap{embed::getIconPixmap("sample_file", 16, 16)};
+	static auto s_soundfontFilePixmap = QPixmap{embed::getIconPixmap("soundfont_file", 16, 16)};
+	static auto s_vstPluginFilePixmap = QPixmap{embed::getIconPixmap("vst_plugin_file", 16, 16)};
+	static auto s_midiFilePixmap = QPixmap{embed::getIconPixmap("midi_file", 16, 16)};
+	static auto s_unknownFilePixmap = QPixmap{embed::getIconPixmap("unknown_file")};
 
 	switch( m_type )
 	{
 		case FileType::Project:
-			setIcon( 0, *s_projectFilePixmap );
+			setIcon(0, s_projectFilePixmap);
 			break;
 		case FileType::Preset:
-			setIcon( 0, *s_presetFilePixmap );
+			setIcon(0, s_presetFilePixmap);
 			break;
 		case FileType::SoundFont:
-			setIcon( 0, *s_soundfontFilePixmap );
+			setIcon(0, s_soundfontFilePixmap);
 			break;
 		case FileType::VstPlugin:
-			setIcon( 0, *s_vstPluginFilePixmap );
+			setIcon(0, s_vstPluginFilePixmap);
 			break;
 		case FileType::Sample:
 		case FileType::Patch:			// TODO
-			setIcon( 0, *s_sampleFilePixmap );
+			setIcon(0, s_sampleFilePixmap);
 			break;
 		case FileType::Midi:
-			setIcon( 0, *s_midiFilePixmap );
+			setIcon(0, s_midiFilePixmap);
 			break;
 		case FileType::Unknown:
 		default:
-			setIcon( 0, *s_unknownFilePixmap );
+			setIcon(0, s_unknownFilePixmap);
 			break;
 	}
 }
