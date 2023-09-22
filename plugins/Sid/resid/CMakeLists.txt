@@ -4,9 +4,9 @@ set(RESID_INLINE inline)
 set(RESID_BRANCH_HINTS 1)
 set(NEW_8580_FILTER 1)
 
-check_cxx_source_compiles("int main() { bool flag; return 0; }" HAVE_BOOL)
-check_cxx_source_compiles("int main() { __builtin_expect(0, 0); return 0; }" HAVE_BUILTIN_EXPECT)
-check_cxx_source_compiles("#include <math.h> int main() { log1p(1); return 0; }" HAVE_LOG1P)
+set(HAVE_BOOL 1)
+set(HAVE_LOG1P 1)
+set(HAVE_BUILTIN_EXPECT $<PLATFORM_ID:GCC,Clang>)
 
 configure_file(resid/siddefs.h.in resid/siddefs.h @ONLY)
 configure_file(resid/siddefs.h.in ${CMAKE_CURRENT_SOURCE_DIR}/resid/siddefs.h @ONLY)
