@@ -278,9 +278,11 @@ void LcdWidget::initUi(const QString& name , const QString& style)
 	setWindowTitle( name );
 
 	// We should make a factory for these or something.
-	//m_lcdPixmap = new QPixmap( embed::getIconPixmap( QString( "lcd_" + style ).toUtf8().constData() ) );
-	//m_lcdPixmap = new QPixmap( embed::getIconPixmap( "lcd_19green" ) ); // TODO!!
-	m_lcdPixmap = new QPixmap( embed::getIconPixmap( QString( "lcd_" + style ).toUtf8().constData() ) );
+	//m_lcdPixmap = QPixmap{embed::getIconPixmap(QString("lcd_" + style).toUtf8().constData())};
+	//m_lcdPixmap = QPixmap{embed::getIconPixmap("lcd_19green")}; // TODO!!
+
+	static auto s_lcdPixmap = QPixmap{embed::getIconPixmap(QString("lcd_" + style).toUtf8().constData())};
+	m_lcdPixmap = &s_lcdPixmap;
 
 	m_cellWidth = m_lcdPixmap->size().width() / LcdWidget::charsPerPixmap;
 	m_cellHeight = m_lcdPixmap->size().height() / 2;
