@@ -21,6 +21,7 @@ ADD_EXECUTABLE(tests
 
 	src/core/ArrayVectorTest.cpp
 	src/core/AutomatableModelTest.cpp
+	src/core/MathTest.cpp
 	src/core/ProjectVersionTest.cpp
 	src/core/RelativePathsTest.cpp
 
