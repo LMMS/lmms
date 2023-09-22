@@ -308,7 +308,7 @@ auto AudioFileProcessor::beatLen(NotePlayHandle* note) const -> int
 		: m_nextPlayStartPoint;
 	const auto duration = m_sampleBuffer.endFrame() - startFrame;
 
-	return static_cast<int>(floorf(duration * freqFactor));
+	return static_cast<int>(std::floorf(duration * freqFactor));
 }
 
 
