@@ -1843,8 +1843,6 @@ void DataFile::upgrade_loopsRename()
 		{"latin_guitar03", "120"},
 	};
 
-	const QString BPMPREF = " - ", BPMSUFF = " BPM";
-
 	// Replace loop sample names
 	for (const auto& [elem, srcAttrs] : ELEMENTS_WITH_RESOURCES)
 	{
@@ -1871,7 +1869,7 @@ void DataFile::upgrade_loopsRename()
 						{
 							// Add " - X BPM" to filename
 							srcVal.replace(toReplace,
-									toReplace + BPMPREF + currentPair.second + BPMSUFF);
+									toReplace + " - " + currentPair.second + " BPM");
 
 							item.setAttribute(srcAttr, srcVal);
 						}
