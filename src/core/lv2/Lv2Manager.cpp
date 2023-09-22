@@ -28,7 +28,6 @@
 
 #include <algorithm>
 #include <cstdlib>
-#include <cstring>
 #include <lilv/lilv.h>
 #include <lv2/lv2plug.in/ns/ext/buf-size/buf-size.h>
 #include <lv2/lv2plug.in/ns/ext/options/options.h>
@@ -47,7 +46,7 @@ namespace lmms
 {
 
 
-const std::set<const char*, Lv2Manager::CmpStr> Lv2Manager::pluginBlacklist =
+const std::set<std::string_view> Lv2Manager::pluginBlacklist =
 {
 	// github.com/calf-studio-gear/calf, #278
 	"http://calf.sourceforge.net/plugins/Analyzer",
@@ -136,6 +135,26 @@ const std::set<const char*, Lv2Manager::CmpStr> Lv2Manager::pluginBlacklist =
 
 	// unstable
 	"urn:juced:DrumSynth"
+};
+
+const std::set<std::string_view> Lv2Manager::pluginBlacklistBuffersizeLessThan32 =
+{
+	"http://moddevices.com/plugins/mod-devel/2Voices",
+	"http://moddevices.com/plugins/mod-devel/Capo",
+	"http://moddevices.com/plugins/mod-devel/Drop",
+	"http://moddevices.com/plugins/mod-devel/Harmonizer",
+	"http://moddevices.com/plugins/mod-devel/Harmonizer2",
+	"http://moddevices.com/plugins/mod-devel/HarmonizerCS",
+	"http://moddevices.com/plugins/mod-devel/SuperCapo",
+	"http://moddevices.com/plugins/mod-devel/SuperWhammy",
+	"http://moddevices.com/plugins/mod-devel/Gx2Voices",
+	"http://moddevices.com/plugins/mod-devel/GxCapo",
+	"http://moddevices.com/plugins/mod-devel/GxDrop",
+	"http://moddevices.com/plugins/mod-devel/GxHarmonizer",
+	"http://moddevices.com/plugins/mod-devel/GxHarmonizer2",
+	"http://moddevices.com/plugins/mod-devel/GxHarmonizerCS",
+	"http://moddevices.com/plugins/mod-devel/GxSuperCapo",
+	"http://moddevices.com/plugins/mod-devel/GxSuperWhammy"
 };
 
 
@@ -288,14 +307,6 @@ void Lv2Manager::initPlugins()
 			"  If you want to ignore the blacklist (dangerous!), please set\n"
 			"  environment variable \"LMMS_IGNORE_BLACKLIST\" to nonempty.";
 	}
-}
-
-
-
-
-bool Lv2Manager::CmpStr::operator()(const char *a, const char *b) const
-{
-	return std::strcmp(a, b) < 0;
 }
 
 
