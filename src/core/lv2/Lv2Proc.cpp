@@ -593,8 +593,16 @@ void Lv2Proc::createPort(std::size_t portNum)
 								comboModel->addItem(s);
 							}
 						}
+						for(std::size_t i = 0; i < ctrl->m_scalePointMap.size(); ++i)
+						{
+							if(meta.def() == ctrl->m_scalePointMap[i])
+							{
+								comboModel->setValue(i);
+								comboModel->setInitValue(i);
+								break;
+							}
+						}
 						ctrl->m_connectedModel.reset(comboModel);
-						// TODO: use default value on comboModel, too?
 						break;
 					}
 					case Lv2Ports::Vis::Toggled:
