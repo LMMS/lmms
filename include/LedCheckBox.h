@@ -69,8 +69,8 @@ protected:
 
 
 private:
-	QPixmap * m_ledOnPixmap;
-	QPixmap * m_ledOffPixmap;
+	QPixmap* m_ledOnPixmap;
+	QPixmap* m_ledOffPixmap;
 
 	QString m_text;
 
