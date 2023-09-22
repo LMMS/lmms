@@ -30,6 +30,7 @@
 #include <QDomElement>
 #include <QLabel>
 
+#include "ArrayVector.h"
 #include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "FileDialog.h"
@@ -71,17 +72,47 @@ Plugin::Descriptor PLUGIN_EXPORT sf2player_plugin_descriptor =
 
 }
 
+/**
+ * A non-owning reference to a single FluidSynth voice, for tracking whether the
+ * referenced voice is still the same voice that was passed to the constructor.
+ */
+class FluidVoice
+{
+public:
+	//! Create a reference to the voice currently pointed at by `voice`.
+	explicit FluidVoice(fluid_voice_t* voice) :
+		m_voice{voice},
+		m_id{fluid_voice_get_id(voice)}
+	{ }
+
+	//! Get a pointer to the referenced voice.
+	fluid_voice_t* get() const noexcept { return m_voice; }
+
+	//! Test whether this object still refers to the original voice.
+	bool isValid() const
+	{
+		return fluid_voice_get_id(m_voice) == m_id && fluid_voice_is_playing(m_voice);
+	}
+
+private:
+	fluid_voice_t* m_voice;
+	unsigned int m_id;
+};
 
 struct Sf2PluginData
 {
 	int midiNote;
 	int lastPanning;
 	float lastVelocity;
-	fluid_voice_t * fluidVoice;
+	// The soundfonts I checked used at most two voices per note, so space for
+	// four should be safe. This may need to be increased if a soundfont with
+	// more voices per note is found.
+	ArrayVector<FluidVoice, 4> fluidVoices;
 	bool isNew;
 	f_cnt_t offset;
 	bool noteOffSent;
-} ;
+	panning_t panning;
+};
 
 
 
@@ -681,10 +712,10 @@ void Sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 		pluginData->midiNote = midiNote;
 		pluginData->lastPanning = 0;
 		pluginData->lastVelocity = _n->midiVelocity( baseVelocity );
-		pluginData->fluidVoice = nullptr;
 		pluginData->isNew = true;
 		pluginData->offset = _n->offset();
 		pluginData->noteOffSent = false;
+		pluginData->panning = _n->getPanning();
 
 		_n->m_pluginData = pluginData;
 
@@ -703,6 +734,17 @@ void Sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 		m_playingNotes.append( _n );
 		m_playingNotesMutex.unlock();
 	}
+
+	// Update the pitch of all the voices
+	if (const auto data = static_cast<Sf2PluginData*>(_n->m_pluginData)) {
+		const auto detuning = _n->currentDetuning();
+		for (const auto& voice : data->fluidVoices) {
+			if (voice.isValid()) {
+				fluid_voice_gen_set(voice.get(), GEN_COARSETUNE, detuning);
+				fluid_voice_update_param(voice.get(), GEN_COARSETUNE);
+			}
+		}
+	}
 }
 
 
@@ -715,34 +757,46 @@ void Sf2Instrument::noteOn( Sf2PluginData * n )
 	const int poly = fluid_synth_get_polyphony( m_synth );
 #ifndef _MSC_VER
 	fluid_voice_t* voices[poly];
-	unsigned int id[poly];
 #else
 	const auto voices = static_cast<fluid_voice_t**>(_alloca(poly * sizeof(fluid_voice_t*)));
-	const auto id = static_cast<unsigned int*>(_alloca(poly * sizeof(unsigned int)));
 #endif
-	fluid_synth_get_voicelist( m_synth, voices, poly, -1 );
-	for( int i = 0; i < poly; ++i )
-	{
-		id[i] = 0;
-	}
-	for( int i = 0; i < poly && voices[i]; ++i )
-	{
-		id[i] = fluid_voice_get_id( voices[i] );
-	}
 
 	fluid_synth_noteon( m_synth, m_channel, n->midiNote, n->lastVelocity );
 
-	// get new voice and save it
-	fluid_synth_get_voicelist( m_synth, voices, poly, -1 );
-	for( int i = 0; i < poly && voices[i]; ++i )
+	// Get any new voices and store them in the plugin data
+	fluid_synth_get_voicelist(m_synth, voices, poly, -1);
+	for (int i = 0; i < poly && voices[i] && !n->fluidVoices.full(); ++i)
 	{
-		const unsigned int newID = fluid_voice_get_id( voices[i] );
-		if( id[i] != newID || newID == 0 )
-		{
-			n->fluidVoice = voices[i];
-			break;
+		const auto voice = voices[i];
+		// FluidSynth stops voices with the same channel and pitch upon note-on,
+		// so voices with the current channel and pitch are playing this note.
+		if (fluid_voice_get_channel(voice) == m_channel
+			&& fluid_voice_get_key(voice) == n->midiNote
+			&& fluid_voice_is_on(voice)
+		) {
+			n->fluidVoices.emplace_back(voices[i]);
 		}
 	}
+
+#if FLUIDSYNTH_VERSION_MAJOR >= 2
+	// Smallest balance value that results in full attenuation of one channel.
+	// Corresponds to internal FluidSynth macro `FLUID_CB_AMP_SIZE`.
+	constexpr static auto maxBalance = 1441.f;
+	// Convert panning from linear to exponential for FluidSynth
+	const auto panning = n->panning;
+	const auto factor = 1.f - std::abs(panning) / static_cast<float>(PanningRight);
+	const auto balance = std::copysign(
+		factor <= 0 ? maxBalance : std::min(-200.f * std::log10(factor), maxBalance),
+		panning
+	);
+	// Set note panning on all the voices
+	for (const auto& voice : n->fluidVoices) {
+		if (voice.isValid()) {
+			fluid_voice_gen_set(voice.get(), GEN_CUSTOM_BALANCE, balance);
+			fluid_voice_update_param(voice.get(), GEN_CUSTOM_BALANCE);
+		}
+	}
+#endif
 
 	m_synthMutex.unlock();
 
@@ -859,6 +913,7 @@ void Sf2Instrument::play( sampleFrame * _working_buffer )
 void Sf2Instrument::renderFrames( f_cnt_t frames, sampleFrame * buf )
 {
 	m_synthMutex.lock();
+	fluid_synth_get_gain(m_synth); // This flushes voice updates as a side effect
 	if( m_internalSampleRate < Engine::audioEngine()->processingSampleRate() &&
 							m_srcState != nullptr )
 	{

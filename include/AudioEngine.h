@@ -275,6 +275,11 @@ public:
 		return m_profiler.cpuLoad();
 	}
 
+	int detailLoad(const AudioEngineProfiler::DetailType type) const
+	{
+		return m_profiler.detailLoad(type);
+	}
+
 	const qualitySettings & currentQualitySettings() const
 	{
 		return m_qualitySettings;
@@ -401,6 +406,10 @@ private:
 	AudioDevice * tryAudioDevices();
 	MidiClient * tryMidiClients();
 
+	void renderStageNoteSetup();
+	void renderStageInstruments();
+	void renderStageEffects();
+	void renderStageMix();
 
 	const surroundSampleFrame * renderNextBuffer();
 

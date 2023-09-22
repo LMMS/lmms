@@ -1196,42 +1196,28 @@ void AutomationClip::generateTangents(timeMap::iterator it, int numToGenerate)
 {
 	QMutexLocker m(&m_clipMutex);
 
-	if( m_timeMap.size() < 2 && numToGenerate > 0 )
-	{
-		// Set the value of the single node's tangents if they are not
-		// locked (were manually edited)
-		if (!LOCKEDTAN(it))
-		{
-			it.value().setInTangent(0);
-			it.value().setOutTangent(0);
-		}
-		return;
-	}
-
-	for( int i = 0; i < numToGenerate && it != m_timeMap.end(); i++ )
+	for (int i = 0; i < numToGenerate && it != m_timeMap.end(); ++i, ++it)
 	{
 		// Skip the node if it has locked tangents (were manually edited)
 		if (LOCKEDTAN(it))
 		{
-			++it;
 			continue;
 		}
 
-		if( it == m_timeMap.begin() )
+		if (it + 1 == m_timeMap.end())
+		{
+			// Previously, the last value's tangent was always set to 0. That logic was kept for both tangents
+			// of the last node
+			it.value().setInTangent(0);
+			it.value().setOutTangent(0);
+		}
+		else if (it == m_timeMap.begin())
 		{
 			// On the first node there's no curve behind it, so we will only calculate the outTangent
 			// and inTangent will be set to 0.
 			float tangent = (INVAL(it + 1) - OUTVAL(it)) / (POS(it + 1) - POS(it));
 			it.value().setInTangent(0);
 			it.value().setOutTangent(tangent);
-		}
-		else if( it+1 == m_timeMap.end() )
-		{
-			// Previously, the last value's tangent was always set to 0. That logic was kept for both tangents
-			// of the last node
-			it.value().setInTangent(0);
-			it.value().setOutTangent(0);
-			return;
 		}
 		else
 		{
@@ -1261,7 +1247,6 @@ void AutomationClip::generateTangents(timeMap::iterator it, int numToGenerate)
 				it.value().setOutTangent(outTangent);
 			}
 		}
-		it++;
 	}
 }
 

@@ -305,7 +305,7 @@ void MidiClip::setStep( int step, bool enabled )
 
 
 
-void MidiClip::splitNotes(NoteVector notes, TimePos pos)
+void MidiClip::splitNotes(const NoteVector& notes, TimePos pos)
 {
 	if (notes.empty()) { return; }
 
@@ -472,7 +472,7 @@ MidiClip *  MidiClip::nextMidiClip() const
 
 MidiClip * MidiClip::adjacentMidiClipByOffset(int offset) const
 {
-	std::vector<Clip *> clips = m_instrumentTrack->getClips();
+	auto& clips = m_instrumentTrack->getClips();
 	int clipNum = m_instrumentTrack->getClipNum(this);
 	if (clipNum < 0 || clipNum > clips.size() - 1) { return nullptr; }
 	return dynamic_cast<MidiClip*>(clips[clipNum + offset]);

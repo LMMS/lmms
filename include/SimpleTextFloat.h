@@ -31,6 +31,7 @@
 #include "lmms_export.h"
 
 class QLabel;
+class QTimer;
 
 namespace lmms::gui
 {
@@ -44,6 +45,8 @@ public:
 
 	void setText(const QString & text);
 
+	void showWithDelay(int msecBeforeDisplay, int msecDisplayTime);
+
 	void setVisibilityTimeOut(int msecs);
 
 	void moveGlobal(QWidget * w, const QPoint & offset)
@@ -51,10 +54,13 @@ public:
 		move(w->mapToGlobal(QPoint(0, 0)) + offset);
 	}
 
+	void hide();
+
 private:
 	QLabel * m_textLabel;
+	QTimer * m_showTimer;
+	QTimer * m_hideTimer;
 };
-
 
 } // namespace lmms::gui
 

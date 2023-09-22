@@ -79,6 +79,7 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_automationNodes  ,   &DataFile::upgrade_extendedNoteRange,
 	&DataFile::upgrade_defaultTripleOscillatorHQ,
 	&DataFile::upgrade_mixerRename      ,   &DataFile::upgrade_bbTcoRename,
+	&DataFile::upgrade_sampleAndHold    ,
 };
 
 // Vector of all versions that have upgrade routines.
@@ -1703,26 +1704,56 @@ void DataFile::upgrade_mixerRename()
 {
 	// Change nodename <fxmixer> to <mixer>
 	QDomNodeList fxmixer = elementsByTagName("fxmixer");
-	for (int i = 0; !fxmixer.item(i).isNull(); ++i)
+	for (int i = 0; i < fxmixer.length(); ++i)
 	{
-		fxmixer.item(i).toElement().setTagName("mixer");
+		auto item = fxmixer.item(i).toElement();
+		if (item.isNull())
+		{
+			continue;
+		}
+		item.setTagName("mixer");
 	}
 
 	// Change nodename <fxchannel> to <mixerchannel>
 	QDomNodeList fxchannel = elementsByTagName("fxchannel");
-	for (int i = 0; !fxchannel.item(i).isNull(); ++i)
+	for (int i = 0; i < fxchannel.length(); ++i)
 	{
-		fxchannel.item(i).toElement().setTagName("mixerchannel");
+		auto item = fxchannel.item(i).toElement();
+		if (item.isNull())
+		{
+			continue;
+		}
+		item.setTagName("mixerchannel");
 	}
 
 	// Change the attribute fxch of element <instrumenttrack> to mixch
 	QDomNodeList fxch = elementsByTagName("instrumenttrack");
-	for(int i = 0; !fxch.item(i).isNull(); ++i)
+	for (int i = 0; i < fxch.length(); ++i)
 	{
-		if(fxch.item(i).toElement().hasAttribute("fxch"))
+		auto item = fxch.item(i).toElement();
+		if (item.isNull())
 		{
-			fxch.item(i).toElement().setAttribute("mixch", fxch.item(i).toElement().attribute("fxch"));
-			fxch.item(i).toElement().removeAttribute("fxch");
+			continue;
+		}
+		if (item.hasAttribute("fxch"))
+		{
+			item.setAttribute("mixch", item.attribute("fxch"));
+			item.removeAttribute("fxch");
+		}
+	}
+	// Change the attribute fxch of element <sampletrack> to mixch
+	fxch = elementsByTagName("sampletrack");
+	for (int i = 0; i < fxch.length(); ++i)
+	{
+		auto item = fxch.item(i).toElement();
+		if (item.isNull())
+		{
+			continue;
+		}
+		if (item.hasAttribute("fxch"))
+		{
+			item.setAttribute("mixch", item.attribute("fxch"));
+			item.removeAttribute("fxch");
 		}
 	}
 }
@@ -1757,6 +1788,23 @@ void DataFile::upgrade_bbTcoRename()
 		if (static_cast<Track::Type>(e.attribute("type").toInt()) == Track::Type::Pattern)
 		{
 			e.setAttribute("name", e.attribute("name").replace("Beat/Bassline", "Pattern"));
+		}
+	}
+}
+
+
+// Set LFO speed to 0.01 on projects made before sample-and-hold PR
+void DataFile::upgrade_sampleAndHold()
+{
+	QDomNodeList elements = elementsByTagName("lfocontroller");
+	for (int i = 0; i < elements.length(); ++i)
+	{
+		if (elements.item(i).isNull()) { continue; }
+		auto e = elements.item(i).toElement();
+		// Correct old random wave LFO speeds
+		if (e.attribute("wave").toInt() == 6)
+		{
+			e.setAttribute("speed",0.01f);
 		}
 	}
 }
