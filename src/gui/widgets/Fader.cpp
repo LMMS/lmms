@@ -59,11 +59,7 @@
 namespace lmms::gui
 {
 
-
 SimpleTextFloat * Fader::s_textFloat = nullptr;
-QPixmap * Fader::s_back = nullptr;
-QPixmap * Fader::s_leds = nullptr;
-QPixmap * Fader::s_knob = nullptr;
 
 Fader::Fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 	QWidget( _parent ),
@@ -85,22 +81,14 @@ Fader::Fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 	{
 		s_textFloat = new SimpleTextFloat;
 	}
-	if( ! s_back )
-	{
-		s_back = new QPixmap( embed::getIconPixmap( "fader_background" ) );
-	}
-	if( ! s_leds )
-	{
-		s_leds = new QPixmap( embed::getIconPixmap( "fader_leds" ) );
-	}
-	if( ! s_knob )
-	{
-		s_knob = new QPixmap( embed::getIconPixmap( "fader_knob" ) );
-	}
 
-	m_back = s_back;
-	m_leds = s_leds;
-	m_knob = s_knob;
+	static auto s_back = QPixmap{embed::getIconPixmap("fader_background")};
+	static auto s_leds = QPixmap{embed::getIconPixmap("fader_leds")};
+	static auto s_knob = QPixmap{embed::getIconPixmap("fader_knob")};
+
+	m_back = &s_back;
+	m_leds = &s_leds;
+	m_knob = &s_knob;
 
 	init(_model, _name);
 

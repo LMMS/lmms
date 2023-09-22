@@ -151,10 +151,6 @@ private:
 	QElapsedTimer m_lastPeakTimer_L;
 	QElapsedTimer m_lastPeakTimer_R;
 
-	static QPixmap * s_back;
-	static QPixmap * s_leds;
-	static QPixmap * s_knob;
-	
 	QPixmap * m_back;
 	QPixmap * m_leds;
 	QPixmap * m_knob;
