@@ -53,8 +53,8 @@ private:
 
 	MixerLine * m_parent;
 	MixerView * m_mv;
-	static QPixmap * s_qpmOn;
-	static QPixmap * s_qpmOff;
+	QPixmap* qpmOn;
+	QPixmap* qpmOff;
 
 	FloatModel * getSendModel();
 };
