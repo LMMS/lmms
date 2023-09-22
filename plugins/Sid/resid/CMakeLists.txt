@@ -1,3 +1,16 @@
+# These are the defaults
+set(RESID_INLINING 1)
+set(RESID_INLINE inline)
+set(RESID_BRANCH_HINTS 1)
+set(NEW_8580_FILTER 1)
+
+check_cxx_source_compiles("int main() { bool flag; return 0; }" HAVE_BOOL)
+check_cxx_source_compiles("int main() { __builtin_expect(0, 0); return 0; }" HAVE_BUILTIN_EXPECT)
+check_cxx_source_compiles("#include <math.h> int main() { log1p(1); return 0; }" HAVE_LOG1P)
+
+configure_file(resid/siddefs.h.in resid/siddefs.h @ONLY)
+configure_file(resid/siddefs.h.in ${CMAKE_CURRENT_SOURCE_DIR}/resid/siddefs.h @ONLY)
+
 add_library(resid OBJECT
     resid/sid.cc
     resid/voice.cc
@@ -9,8 +22,6 @@ add_library(resid OBJECT
     resid/pot.cc
     resid/version.cc
 )
-
-target_include_directories(resid PUBLIC resid)
 
 set(RESID_WAVE_DATA
     wave6581_PST
@@ -45,23 +56,10 @@ else()
     message(SEND_ERROR "Cannot build resid - Perl not found")
 endif()
 
-# These are the defaults
-set(RESID_INLINING 1)
-set(RESID_INLINE inline)
-set(RESID_BRANCH_HINTS 1)
-set(NEW_8580_FILTER 1)
-
-check_cxx_source_compiles("int main() { bool flag; return 0; }" HAVE_BOOL)
-check_cxx_source_compiles("int main() { __builtin_expect(0, 0); return 0; }" HAVE_BUILTIN_EXPECT)
-check_cxx_source_compiles("#include <math.h> int main() { log1p(1); return 0; }" HAVE_LOG1P)
-
-configure_file(resid/siddefs.h.in resid/siddefs.h @ONLY)
-configure_file(resid/siddefs.h.in ${CMAKE_CURRENT_SOURCE_DIR}/resid/siddefs.h @ONLY)
-
-# used the version from the previous submodule, this might not be accurate
+# Used the version from the previous submodule, this might not be accurate
 set(SRC_VER 0.16)
 set(MAJOR_VER 5)
 set(MINOR_VER 0)
 set(PATCH_VER 0)
-
 target_compile_definitions(resid PUBLIC VERSION="${MAJOR_VER}.${MINOR_VER}.${PATCH_VER}")
+target_include_directories(resid PUBLIC resid)
