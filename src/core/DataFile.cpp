@@ -1846,7 +1846,7 @@ void DataFile::upgrade_loopsRename()
 	const QString BPMPREF = " - ", BPMSUFF = " BPM";
 
 	// Replace loop sample names
-	for (auto& [elem, srcAttrs] : ELEMENTS_WITH_RESOURCES)
+	for (const auto& [elem, srcAttrs] : ELEMENTS_WITH_RESOURCES)
 	{
 		auto elements = elementsByTagName(elem);
 
