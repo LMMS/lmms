@@ -6,7 +6,12 @@ set(NEW_8580_FILTER 1)
 
 set(HAVE_BOOL 1)
 set(HAVE_LOG1P 1)
-set(HAVE_BUILTIN_EXPECT $<PLATFORM_ID:GCC,Clang>)
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "GCC,Clang")
+    set(HAVE_BUILTIN_EXPECT 1)
+else()
+    set(HAVE_BUILTIN_EXPECT 0)
+endif()
 
 configure_file(resid/siddefs.h.in resid/siddefs.h @ONLY)
 configure_file(resid/siddefs.h.in ${CMAKE_CURRENT_SOURCE_DIR}/resid/siddefs.h @ONLY)
