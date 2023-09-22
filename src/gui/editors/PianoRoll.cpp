@@ -260,12 +260,12 @@ PianoRoll::PianoRoll() :
 	static auto s_toolOpen = QPixmap{embed::getIconPixmap("automation")};
 	static auto s_toolKnife = QPixmap{embed::getIconPixmap("edit_knife")};
 
-	toolDraw = &s_toolDraw;
-	toolErase = &s_toolErase;
-	toolSelect = &s_toolSelect;
-	toolMove = &s_toolMove;
-	toolOpen = &s_toolOpen;
-	toolOpen = &s_toolKnife;
+	m_toolDraw = &s_toolDraw;
+	m_toolErase = &s_toolErase;
+	m_toolSelect = &s_toolSelect;
+	m_toolMove = &s_toolMove;
+	m_toolOpen = &s_toolOpen;
+	m_toolOpen = &s_toolKnife;
 
 	// init text-float
 	if( s_textFloat == nullptr )
@@ -3676,28 +3676,28 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			case EditMode::Draw:
 				if( m_mouseDownRight )
 				{
-					cursor = toolErase;
+					cursor = m_toolErase;
 				}
 				else if( m_action == Action::MoveNote )
 				{
-					cursor = toolMove;
+					cursor = m_toolMove;
 				}
 				else
 				{
-					cursor = toolDraw;
+					cursor = m_toolDraw;
 				}
 				break;
 			case EditMode::Erase:
-				cursor = toolErase;
+				cursor = m_toolErase;
 				break;
 			case EditMode::Select:
-				cursor = toolSelect;
+				cursor = m_toolSelect;
 				break;
 			case EditMode::Detuning:
-				cursor = toolOpen;
+				cursor = m_toolOpen;
 				break;
 			case EditMode::Knife:
-				cursor = toolKnife;
+				cursor = m_toolKnife;
 				break;
 		}
 		QPoint mousePosition = mapFromGlobal( QCursor::pos() );

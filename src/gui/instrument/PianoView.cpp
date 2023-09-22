@@ -98,12 +98,12 @@ PianoView::PianoView(QWidget *parent) :
 	static auto s_whiteKeyDisabledPm = QPixmap{embed::getIconPixmap("white_key_disabled")};
 	static auto s_blackKeyDisabledPm = QPixmap{embed::getIconPixmap("black_key_disabled")};
 
-	whiteKeyPm = &s_whiteKeyPm;
-	blackKeyPm = &s_blackKeyPm;
-	whiteKeyPressedPm = &s_whiteKeyPressedPm;
-	blackKeyPressedPm = &s_blackKeyPressedPm;
-	whiteKeyDisabledPm = &s_whiteKeyDisabledPm;
-	blackKeyDisabledPm = &s_blackKeyDisabledPm;
+	m_whiteKeyPm = &s_whiteKeyPm;
+	m_blackKeyPm = &s_blackKeyPm;
+	m_whiteKeyPressedPm = &s_whiteKeyPressedPm;
+	m_blackKeyPressedPm = &s_blackKeyPressedPm;
+	m_whiteKeyDisabledPm = &s_whiteKeyDisabledPm;
+	m_whiteKeyDisabledPm = &s_blackKeyDisabledPm;
 
 	setAttribute(Qt::WA_OpaquePaintEvent, true);
 	setFocusPolicy(Qt::StrongFocus);
@@ -875,16 +875,16 @@ void PianoView::paintEvent( QPaintEvent * )
 		{
 			if (m_piano && m_piano->isKeyPressed(cur_key))
 			{
-				p.drawPixmap(x, PIANO_BASE, *whiteKeyPressedPm);
+				p.drawPixmap(x, PIANO_BASE, *m_whiteKeyPressedPm);
 			}
 			else
 			{
-				p.drawPixmap(x, PIANO_BASE, *whiteKeyPm);
+				p.drawPixmap(x, PIANO_BASE, *m_whiteKeyPm);
 			}
 		}
 		else
 		{
-			p.drawPixmap(x, PIANO_BASE, *whiteKeyDisabledPm);
+			p.drawPixmap(x, PIANO_BASE, *m_whiteKeyDisabledPm);
 		}
 
 		x += PW_WHITE_KEY_WIDTH;
@@ -909,16 +909,16 @@ void PianoView::paintEvent( QPaintEvent * )
 		{
 			if (m_piano && m_piano->isKeyPressed(startKey))
 			{
-				p.drawPixmap(0 - PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *blackKeyPressedPm);
+				p.drawPixmap(0 - PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *m_blackKeyPressedPm);
 			}
 			else
 			{
-				p.drawPixmap(0 - PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *blackKeyPm);
+				p.drawPixmap(0 - PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *m_blackKeyPm);
 			}
 		}
 		else
 		{
-			p.drawPixmap(0 - PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *blackKeyDisabledPm);
+			p.drawPixmap(0 - PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *m_whiteKeyDisabledPm);
 		}
 	}
 
@@ -932,16 +932,16 @@ void PianoView::paintEvent( QPaintEvent * )
 			{
 				if (m_piano && m_piano->isKeyPressed(cur_key))
 				{
-					p.drawPixmap(x + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *blackKeyPressedPm);
+					p.drawPixmap(x + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *m_blackKeyPressedPm);
 				}
 				else
 				{
-					p.drawPixmap(x + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *blackKeyPm);
+					p.drawPixmap(x + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *m_blackKeyPm);
 				}
 			}
 			else
 			{
-				p.drawPixmap(x + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *blackKeyDisabledPm);
+				p.drawPixmap(x + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *m_whiteKeyDisabledPm);
 			}
 			x += PW_WHITE_KEY_WIDTH;
 			white_cnt = 0;

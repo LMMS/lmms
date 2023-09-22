@@ -205,7 +205,7 @@ protected:
 
 
 private:
-	QPixmap* posMarkerPixmap;
+	QPixmap* m_posMarkerPixmap;
 
 	QColor m_inactiveLoopColor;
 	QBrush m_inactiveLoopBrush;

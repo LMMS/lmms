@@ -73,12 +73,12 @@ private:
 	int getKeyHeight(int key_num) const;
 	IntModel *getNearestMarker(int key, QString* title = nullptr);
 
-	QPixmap* whiteKeyPm;
-	QPixmap* blackKeyPm;
-	QPixmap* whiteKeyPressedPm;
-	QPixmap* blackKeyPressedPm;
-	QPixmap* whiteKeyDisabledPm;
-	QPixmap* blackKeyDisabledPm;
+	QPixmap* m_whiteKeyPm;
+	QPixmap* m_blackKeyPm;
+	QPixmap* m_whiteKeyPressedPm;
+	QPixmap* m_blackKeyPressedPm;
+	QPixmap* m_whiteKeyDisabledPm;
+	QPixmap* m_blackKeyDisabledPm;
 
 	Piano * m_piano;
 

@@ -127,8 +127,8 @@ AutomationEditor::AutomationEditor() :
 
 	static auto s_toolYFlip = QPixmap{embed::getIconPixmap("flip_y")};
 	static auto s_toolXFlip = QPixmap{embed::getIconPixmap("flip_x")};
-	toolYFlip = &s_toolYFlip;
-	toolXFlip = &s_toolXFlip;
+	m_toolYFlip = &s_toolYFlip;
+	m_toolXFlip = &s_toolXFlip;
 
 	// add time-line
 	m_timeLine = new TimeLineWidget( VALUES_WIDTH, 0, m_ppb,
@@ -159,10 +159,10 @@ AutomationEditor::AutomationEditor() :
 	static auto s_toolDrawOut = QPixmap{embed::getIconPixmap("edit_draw_outvalue")};
 	static auto s_toolMove = QPixmap{embed::getIconPixmap("edit_move")};
 
-	toolDraw = &s_toolDraw;
-	toolErase = &s_toolErase;
-	toolDrawOut = &s_toolDrawOut;
-	toolMove = &s_toolMove;
+	m_toolDraw = &s_toolDraw;
+	m_toolErase = &s_toolErase;
+	m_toolDrawOut = &s_toolDrawOut;
+	m_toolMove = &s_toolMove;
 
 	setCurrentClip(nullptr);
 
@@ -1229,21 +1229,21 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	{
 		case EditMode::Draw:
 		{
-			if (m_action == Action::EraseValues) { cursor = toolErase; }
-			else if (m_action == Action::MoveValue) { cursor = toolMove; }
-			else { cursor = toolDraw; }
+			if (m_action == Action::EraseValues) { cursor = m_toolErase; }
+			else if (m_action == Action::MoveValue) { cursor = m_toolMove; }
+			else { cursor = m_toolDraw; }
 			break;
 		}
 		case EditMode::Erase:
 		{
-			cursor = toolErase;
+			cursor = m_toolErase;
 			break;
 		}
 		case EditMode::DrawOutValues:
 		{
-			if (m_action == Action::ResetOutValues) { cursor = toolErase; }
-			else if (m_action == Action::MoveOutValue) { cursor = toolMove; }
-			else { cursor = toolDrawOut; }
+			if (m_action == Action::ResetOutValues) { cursor = m_toolErase; }
+			else if (m_action == Action::MoveOutValue) { cursor = m_toolMove; }
+			else { cursor = m_toolDrawOut; }
 			break;
 		}
 	}

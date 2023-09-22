@@ -86,8 +86,8 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 {
 	static auto s_envGraph = QPixmap{embed::getIconPixmap("envelope_graph")};
 	static auto s_lfoGraph = QPixmap{embed::getIconPixmap("lfo_graph")};
-	envGraph = &s_envGraph;
-	lfoGraph = &s_lfoGraph;
+	m_envGraph = &s_envGraph;
+	m_lfoGraph = &s_lfoGraph;
 
 	m_predelayKnob = new Knob( KnobType::Bright26, this );
 	m_predelayKnob->setLabel( tr( "DEL" ) );
@@ -267,7 +267,7 @@ void EnvelopeAndLfoView::mousePressEvent( QMouseEvent * _me )
 		return;
 	}
 
-	if (QRect(ENV_GRAPH_X, ENV_GRAPH_Y, envGraph->width(), envGraph->height()).contains(_me->pos()))
+	if (QRect(ENV_GRAPH_X, ENV_GRAPH_Y, m_envGraph->width(), m_envGraph->height()).contains(_me->pos()))
 	{
 		if( m_params->m_amountModel.value() < 1.0f )
 		{
@@ -278,7 +278,7 @@ void EnvelopeAndLfoView::mousePressEvent( QMouseEvent * _me )
 			m_params->m_amountModel.setValue( 0.0f );
 		}
 	}
-	else if (QRect(LFO_GRAPH_X, LFO_GRAPH_Y, lfoGraph->width(), lfoGraph->height()).contains(_me->pos()))
+	else if (QRect(LFO_GRAPH_X, LFO_GRAPH_Y, m_lfoGraph->width(), m_lfoGraph->height()).contains(_me->pos()))
 	{
 		if( m_params->m_lfoAmountModel.value() < 1.0f )
 		{
@@ -339,9 +339,9 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 	p.setRenderHint( QPainter::Antialiasing );
 
 	// draw envelope-graph
-	p.drawPixmap(ENV_GRAPH_X, ENV_GRAPH_Y, *envGraph);
+	p.drawPixmap(ENV_GRAPH_X, ENV_GRAPH_Y, *m_envGraph);
 	// draw LFO-graph
-	p.drawPixmap(LFO_GRAPH_X, LFO_GRAPH_Y, *lfoGraph);
+	p.drawPixmap(LFO_GRAPH_X, LFO_GRAPH_Y, *m_lfoGraph);
 
 	p.setFont( pointSize<8>( p.font() ) );
 
@@ -355,8 +355,8 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 	const QColor end_points_color( 0x99, 0xAF, 0xFF );
 	const QColor end_points_bg_color( 0, 0, 2 );
 
-	const int y_base = ENV_GRAPH_Y + envGraph->height() - 3;
-	const int avail_height = envGraph->height() - 6;
+	const int y_base = ENV_GRAPH_Y + m_envGraph->height() - 3;
+	const int avail_height = m_envGraph->height() - 6;
 	
 	int x1 = static_cast<int>( m_predelayKnob->value<float>() * TIME_UNIT_WIDTH );
 	int x2 = x1 + static_cast<int>( m_attackKnob->value<float>() * TIME_UNIT_WIDTH );
@@ -409,8 +409,8 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 	p.fillRect( x5 - 1, y_base - 2, 4, 4, end_points_bg_color );
 	p.fillRect( x5, y_base - 1, 2, 2, end_points_color );
 
-	int LFO_GRAPH_W = lfoGraph->width() - 3;	// subtract border
-	int LFO_GRAPH_H = lfoGraph->height() - 6;	// subtract border
+	int LFO_GRAPH_W = m_lfoGraph->width() - 3;	// subtract border
+	int LFO_GRAPH_H = m_lfoGraph->height() - 6;	// subtract border
 	int graph_x_base = LFO_GRAPH_X + 2;
 	int graph_y_base = LFO_GRAPH_Y + 3 + LFO_GRAPH_H / 2;
 
@@ -491,8 +491,8 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 	int ms_per_osc = static_cast<int>( SECS_PER_LFO_OSCILLATION *
 						m_lfoSpeedKnob->value<float>() *
 								1000.0f );
-	p.drawText(LFO_GRAPH_X + 4, LFO_GRAPH_Y + lfoGraph->height() - 6, tr("ms/LFO:"));
-	p.drawText(LFO_GRAPH_X + 52, LFO_GRAPH_Y + lfoGraph->height() - 6, QString::number(ms_per_osc));
+	p.drawText(LFO_GRAPH_X + 4, LFO_GRAPH_Y + m_lfoGraph->height() - 6, tr("ms/LFO:"));
+	p.drawText(LFO_GRAPH_X + 52, LFO_GRAPH_Y + m_lfoGraph->height() - 6, QString::number(ms_per_osc));
 }
 
 

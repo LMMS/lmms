@@ -339,12 +339,12 @@ private:
 	static const int cm_scrollAmtHoriz = 10;
 	static const int cm_scrollAmtVert = 1;
 
-	QPixmap* toolDraw;
-	QPixmap* toolErase;
-	QPixmap* toolSelect;
-	QPixmap* toolMove;
-	QPixmap* toolOpen;
-	QPixmap* toolKnife;
+	QPixmap* m_toolDraw;
+	QPixmap* m_toolErase;
+	QPixmap* m_toolSelect;
+	QPixmap* m_toolMove;
+	QPixmap* m_toolOpen;
+	QPixmap* m_toolKnife;
 
 	static std::array<KeyType, 12> prKeyOrder;
 

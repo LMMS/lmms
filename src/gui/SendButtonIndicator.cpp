@@ -16,8 +16,8 @@ SendButtonIndicator:: SendButtonIndicator( QWidget * _parent, MixerLine * _owner
 {
 	static auto s_qpmOff = QPixmap{embed::getIconPixmap("mixer_send_off", 29, 20)};
 	static auto s_qpmOn = QPixmap{embed::getIconPixmap("mixer_send_on", 29, 20)};
-	qpmOff = &s_qpmOff;
-	qpmOn = &s_qpmOn;
+	m_qpmOff = &s_qpmOff;
+	m_qpmOn = &s_qpmOn;
 
 	// don't do any initializing yet, because the MixerView and MixerLine
 	// that were passed to this constructor are not done with their constructors
@@ -55,7 +55,7 @@ FloatModel * SendButtonIndicator::getSendModel()
 
 void SendButtonIndicator::updateLightStatus()
 {
-	setPixmap(!getSendModel() ? *qpmOff : *qpmOn);
+	setPixmap(!getSendModel() ? *m_qpmOff : *m_qpmOn);
 }
 
 

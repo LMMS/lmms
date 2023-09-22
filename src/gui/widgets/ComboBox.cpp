@@ -52,9 +52,9 @@ ComboBox::ComboBox( QWidget * _parent, const QString & _name ) :
 	static auto s_background = QPixmap{embed::getIconPixmap("combobox_bg")};
 	static auto s_arrow = QPixmap{embed::getIconPixmap("combobox_arrow")};
 	static auto s_arrowSelected = QPixmap{embed::getIconPixmap("combobox_arrow_selected")};
-	background = &s_background;
-	arrow = &s_arrow;
-	arrowSelected = &s_arrowSelected;
+	m_background = &s_background;
+	m_arrow = &s_arrow;
+	m_arrowSelected = &s_arrowSelected;
 
 	setFont( pointSize<9>( font() ) );
 	m_menu.setFont( pointSize<8>( m_menu.font() ) );
@@ -160,7 +160,7 @@ void ComboBox::paintEvent( QPaintEvent * _pe )
 {
 	QPainter p( this );
 
-	p.fillRect(2, 2, width() - 2, height() - 4, *background);
+	p.fillRect(2, 2, width() - 2, height() - 4, *m_background);
 
 	QColor shadow = palette().shadow().color();
 	QColor highlight = palette().highlight().color();
@@ -182,9 +182,9 @@ void ComboBox::paintEvent( QPaintEvent * _pe )
 
 	style()->drawPrimitive( QStyle::PE_Frame, &opt, &p, this );
 
-	auto arrowPixmap = m_pressed ? arrowSelected : arrow;
+	auto arrow = m_pressed ? m_arrowSelected : m_arrow;
 
-	p.drawPixmap(width() - CB_ARROW_BTN_WIDTH + 3, 4, *arrowPixmap);
+	p.drawPixmap(width() - CB_ARROW_BTN_WIDTH + 3, 4, *arrow);
 
 	if( model() && model()->size() > 0 )
 	{

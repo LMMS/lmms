@@ -200,9 +200,9 @@ private:
 	bool addItems( const QString & path );
 
 
-	QPixmap* folderPixmap;
-	QPixmap* folderOpenedPixmap;
-	QPixmap* folderLockedPixmap;
+	QPixmap* m_folderPixmap;
+	QPixmap* m_folderOpenedPixmap;
+	QPixmap* m_folderLockedPixmap;
 
 	//! Directories that lead here
 	//! Initially, this is just set to the current path of a directory

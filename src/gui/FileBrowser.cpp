@@ -969,9 +969,9 @@ Directory::Directory(const QString & filename, const QString & path,
 	static auto s_folderOpenedPixmap = QPixmap{embed::getIconPixmap("folder_opened")};
 	static auto s_folderLockedPixmap = QPixmap{embed::getIconPixmap("folder_locked")};
 
-	folderPixmap = &s_folderPixmap;
-	folderOpenedPixmap = &s_folderOpenedPixmap;
-	folderLockedPixmap = &s_folderLockedPixmap;
+	m_folderPixmap = &s_folderPixmap;
+	m_folderOpenedPixmap = &s_folderOpenedPixmap;
+	m_folderLockedPixmap = &s_folderLockedPixmap;
 
 	setIcon(0, !QDir{fullName()}.isReadable() ? s_folderLockedPixmap : s_folderPixmap);
 	setChildIndicatorPolicy( QTreeWidgetItem::ShowIndicator );
@@ -981,11 +981,11 @@ void Directory::update()
 {
 	if( !isExpanded() )
 	{
-		setIcon(0, *folderPixmap);
+		setIcon(0, *m_folderPixmap);
 		return;
 	}
 
-	setIcon(0, *folderOpenedPixmap);
+	setIcon(0, *m_folderOpenedPixmap);
 	if( !childCount() )
 	{
 		m_dirCount = 0;
