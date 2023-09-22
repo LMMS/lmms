@@ -75,11 +75,19 @@ Plugin::Type Lv2Proc::check(const LilvPlugin *plugin,
 	// TODO: manage a global blacklist outside of the code
 	//       for now, this will help
 	//       this is only a fix for the meantime
-	const auto& pluginBlacklist = Lv2Manager::getPluginBlacklist();
-	if (!Engine::ignorePluginBlacklist() &&
-		pluginBlacklist.find(pluginUri) != pluginBlacklist.end())
+	if (!Engine::ignorePluginBlacklist())
 	{
-		issues.emplace_back(PluginIssueType::Blacklisted);
+		const auto& pluginBlacklist = Lv2Manager::getPluginBlacklist();
+		const auto& pluginBlacklist32 = Lv2Manager::getPluginBlacklistBuffersizeLessThan32();
+		if(pluginBlacklist.find(pluginUri) != pluginBlacklist.end())
+		{
+			issues.emplace_back(PluginIssueType::Blacklisted);
+		}
+		else if(Engine::audioEngine()->framesPerPeriod() <= 32 &&
+			pluginBlacklist32.find(pluginUri) != pluginBlacklist32.end())
+		{
+			issues.emplace_back(PluginIssueType::Blacklisted);  // currently no special blacklist category
+		}
 	}
 
 	for (unsigned portNum = 0; portNum < maxPorts; ++portNum)
