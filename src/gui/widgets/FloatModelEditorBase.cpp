@@ -77,6 +77,12 @@ void FloatModelEditorBase::initUi( const QString & _name )
 }
 
 
+void FloatModelEditorBase::showTextFloat(int msecBeforeDisplay, int msecDisplayTime)
+{
+	s_textFloat->setText(displayValue());
+	s_textFloat->moveGlobal(this, QPoint(width() + 2, 0));
+	s_textFloat->showWithDelay(msecBeforeDisplay, msecDisplayTime);
+}
 
 
 float FloatModelEditorBase::getValue( const QPoint & _p )
@@ -176,6 +182,8 @@ void FloatModelEditorBase::mousePressEvent( QMouseEvent * _me )
 
 		emit sliderPressed();
 
+		showTextFloat(0, 0);
+
 		s_textFloat->setText( displayValue() );
 		s_textFloat->moveGlobal( this,
 				QPoint( width() + 2, 0 ) );
@@ -209,6 +217,7 @@ void FloatModelEditorBase::mouseMoveEvent( QMouseEvent * _me )
 		m_lastMousePos = _me->pos();
 	}
 	s_textFloat->setText( displayValue() );
+	s_textFloat->show();
 }
 
 
@@ -234,6 +243,16 @@ void FloatModelEditorBase::mouseReleaseEvent( QMouseEvent* event )
 	s_textFloat->hide();
 }
 
+
+void FloatModelEditorBase::enterEvent(QEvent *event)
+{
+	showTextFloat(700, 2000);
+}
+
+void FloatModelEditorBase::leaveEvent(QEvent *event)
+{
+	s_textFloat->hide();
+}
 
 
 

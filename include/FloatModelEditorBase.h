@@ -87,6 +87,9 @@ protected:
 	void paintEvent( QPaintEvent * _me ) override;
 	void wheelEvent( QWheelEvent * _me ) override;
 
+	void enterEvent(QEvent *event) override;
+	void leaveEvent(QEvent *event) override;
+
 	virtual float getValue( const QPoint & _p );
 
 private slots:
@@ -99,6 +102,7 @@ private:
 
 	void doConnections() override;
 
+	void showTextFloat(int msecBeforeDisplay, int msecDisplayTime);
 	void setPosition( const QPoint & _p );
 
 	inline float pageSize() const
