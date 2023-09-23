@@ -27,7 +27,6 @@
 
 #include <QApplication>
 #include <QInputDialog>
-#include <QMouseEvent>
 #include <QPainter>
 
 #ifndef __USE_XOPEN
@@ -36,7 +35,6 @@
 
 #include "lmms_math.h"
 #include "CaptionMenu.h"
-#include "ConfigManager.h"
 #include "ControllerConnection.h"
 #include "GuiApplication.h"
 #include "LocaleHelper.h"
