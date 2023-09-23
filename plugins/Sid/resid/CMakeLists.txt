@@ -2,7 +2,7 @@
 set(RESID_INLINING 1)
 set(RESID_INLINE inline)
 set(RESID_BRANCH_HINTS 1)
-set(NEW_8580_FILTER 1)
+set(NEW_8580_FILTER 0)
 
 set(HAVE_BOOL 1)
 set(HAVE_LOG1P 1)
@@ -20,7 +20,7 @@ add_library(resid_objects OBJECT
 	resid/voice.cc
 	resid/wave.cc
 	resid/envelope.cc
-	resid/filter8580new.cc
+	resid/filter.cc
 	resid/dac.cc
 	resid/extfilt.cc
 	resid/pot.cc
