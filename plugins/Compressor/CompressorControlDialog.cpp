@@ -501,7 +501,7 @@ void CompressorControlDialog::redrawKnee()
 	const float kneeVal = m_controls->m_effect->m_kneeVal;
 	float kneePoint1 = thresholdVal - kneeVal;
 	float kneePoint2X = thresholdVal + kneeVal;
-	float kneePoint2Y = (thresholdVal != 0.f) ? (thresholdVal + (-thresholdVal * (actualRatio * (kneeVal / -thresholdVal)))) : 0.f;
+	float kneePoint2Y = thresholdVal + kneeVal * actualRatio;
 	float ratioPoint = thresholdVal + (-thresholdVal * actualRatio);
 
 	// Draw two straight lines
