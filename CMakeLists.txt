@@ -211,6 +211,10 @@ CHECK_CXX_SOURCE_COMPILES(
 	LMMS_HAVE_SF_COMPLEVEL
 )
 
+# check for perl
+find_package(Perl)
+set(LMMS_HAVE_PERL ${PERL_FOUND})
+
 IF(WANT_LV2)
 	IF(PKG_CONFIG_FOUND)
 		PKG_CHECK_MODULES(LV2 lv2)
@@ -277,8 +281,7 @@ IF(WANT_SWH)
 		# Prefer system perl over Homebrew, MacPorts, etc
 		SET(Perl_ROOT "/usr/bin")
 	ENDIF()
-	FIND_PACKAGE(Perl)
-	IF(PERL_FOUND)
+	IF(LMMS_HAVE_PERL)
 		SET(LMMS_HAVE_SWH TRUE)
 		SET(STATUS_SWH "OK")
 	ELSE()

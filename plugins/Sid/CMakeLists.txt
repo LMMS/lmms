@@ -1,5 +1,10 @@
 INCLUDE(BuildPlugin)
 
+if(NOT ${LMMS_HAVE_PERL})
+	message(STATUS "Cannot build Sid plugin, Perl not found")
+	return()
+endif()
+
 BUILD_PLUGIN(sid
 	SidInstrument.cpp
 	SidInstrument.h

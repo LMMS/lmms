@@ -44,25 +44,20 @@ set(RESID_WAVES
 	wave8580__ST
 )
 
-find_package(Perl)
-if(${PERL_FOUND})
-	set(RESID_SAMP2SRC_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/resid/samp2src.pl)
-	foreach(WAVE_DATA IN LISTS RESID_WAVES)
-		set(WAVE_DATA_IN ${CMAKE_CURRENT_SOURCE_DIR}/resid/${WAVE_DATA}.dat)
-		set(WAVE_SRC_OUT ${CMAKE_CURRENT_BINARY_DIR}/resid/${WAVE_DATA}.h)
-		set(WAVE_COMMAND
-			"${PERL_EXECUTABLE}"
-			"${RESID_SAMP2SRC_SCRIPT}"
-			"${WAVE_DATA}"
-			"${WAVE_DATA_IN}"
-			"${WAVE_SRC_OUT}"
-		)
-		add_custom_command(OUTPUT ${WAVE_SRC_OUT} COMMAND ${WAVE_COMMAND} VERBATIM)
-		target_sources(resid_objects PUBLIC ${WAVE_SRC_OUT})
-	endforeach()
-else()
-	message(SEND_ERROR "Cannot build resid - Perl not found")
-endif()
+set(RESID_SAMP2SRC_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/resid/samp2src.pl)
+foreach(WAVE_DATA IN LISTS RESID_WAVES)
+	set(WAVE_DATA_IN ${CMAKE_CURRENT_SOURCE_DIR}/resid/${WAVE_DATA}.dat)
+	set(WAVE_SRC_OUT ${CMAKE_CURRENT_BINARY_DIR}/resid/${WAVE_DATA}.h)
+	set(WAVE_COMMAND
+		"${PERL_EXECUTABLE}"
+		"${RESID_SAMP2SRC_SCRIPT}"
+		"${WAVE_DATA}"
+		"${WAVE_DATA_IN}"
+		"${WAVE_SRC_OUT}"
+	)
+	add_custom_command(OUTPUT ${WAVE_SRC_OUT} COMMAND ${WAVE_COMMAND} VERBATIM)
+	target_sources(resid_objects PUBLIC ${WAVE_SRC_OUT})
+endforeach()
 
 # TODO CMake 3.12: Use target_link_libraries() to propagate usage requirements directly to sid plugin
 add_library(resid INTERFACE)
