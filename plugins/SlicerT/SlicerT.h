@@ -48,13 +48,14 @@ class PhaseVocoder {
 		void setScaleRatio(float newRatio) { updateParams(newRatio); }
 		void getFrames(std::vector<float> & outData, int start, int frames);
 		int frames() { return processedBuffer.size(); }
+		float scaleRatio() { return m_scaleRatio; }
 	private:
 		QMutex dataLock;
 		// original data
 		std::vector<float> originalBuffer;
 		int originalSampleRate = 0;
 
-		float scaleRatio = -1; // to force on fisrt load
+		float m_scaleRatio = -1; // to force on fisrt load
 
 		// output data
 		std::vector<float> processedBuffer;
@@ -125,12 +126,12 @@ class dinamicPlaybackBuffer {
 			}
 		}
 		int frames() { return leftChannel.frames(); }
+		float scaleRatio() { return leftChannel.scaleRatio(); }
 		void setScaleRatio(float newRatio) {
 			leftChannel.setScaleRatio(newRatio);
 			rightChannel.setScaleRatio(newRatio);
 		}
 	private:
-		float scaleRatio;
 		PhaseVocoder leftChannel;
 		PhaseVocoder rightChannel;
 };

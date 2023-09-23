@@ -53,7 +53,7 @@ SlicerTUI::SlicerTUI( SlicerT * instrument,
 	m_slicerTParent(instrument),
 	m_noteThresholdKnob(this),
 	m_fadeOutKnob(this),
-	m_bpmBox(3, "19green", this),
+	m_bpmBox(3, "21pink", this),
 	m_resetButton(this, nullptr),
 	m_midiExportButton(this, nullptr),
 	m_wf(248, 128, instrument, this)
@@ -67,22 +67,22 @@ SlicerTUI::SlicerTUI( SlicerT * instrument,
 
 	m_wf.move(2, 6);
 
-	m_bpmBox.move(115, 200);
+	m_bpmBox.move(135, 200);
 	m_bpmBox.setToolTip(tr("Original sample BPM"));
 	m_bpmBox.setLabel(tr("BPM"));
 	m_bpmBox.setModel(&m_slicerTParent->m_originalBPM);
 
-	m_noteThresholdKnob.move(15, 200);
+	m_noteThresholdKnob.move(14, 195);
 	m_noteThresholdKnob.setToolTip(tr("Threshold used for slicing"));
 	m_noteThresholdKnob.setLabel(tr("Threshold"));
 	m_noteThresholdKnob.setModel(&m_slicerTParent->m_noteThreshold);
 
-	m_fadeOutKnob.move(65, 200);
+	m_fadeOutKnob.move(80, 195);
 	m_fadeOutKnob.setToolTip(tr("FadeOut for notes"));
 	m_fadeOutKnob.setLabel(tr("FadeOut"));
 	m_fadeOutKnob.setModel(&m_slicerTParent->m_fadeOutFrames);
 
-	m_midiExportButton.move(185, 200);
+	m_midiExportButton.move(190, 200);
 	m_midiExportButton.setActiveGraphic(
 						embed::getIconPixmap("midi_tab") );
 	m_midiExportButton.setInactiveGraphic(
@@ -90,7 +90,7 @@ SlicerTUI::SlicerTUI( SlicerT * instrument,
 	m_midiExportButton.setToolTip(tr("Copy midi pattern to clipboard"));
 	connect(&m_midiExportButton, SIGNAL( clicked() ), this, SLOT( exportMidi() ));
 
-	m_resetButton.move(225, 200);
+	m_resetButton.move(215, 200);
 	m_resetButton.setActiveGraphic(
 						embed::getIconPixmap("reload") );
 	m_resetButton.setInactiveGraphic(

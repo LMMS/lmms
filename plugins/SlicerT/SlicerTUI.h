@@ -47,16 +47,15 @@ namespace gui
 class SlicerTKnob : public Knob {
 	public:
 		SlicerTKnob( QWidget * _parent ) :
-				Knob( KnobType::Bright26, _parent )
+				Knob( KnobType::Styled, _parent )
 		{
-		// setFixedSize( 46, 40 );
-		// setCenterPointX( 23.0 );
-		// setCenterPointY( 15.0 );
-		// setInnerRadius( 3 );
-		// setOuterRadius( 11 );
-		// // setTotalAngle( 270.0 );
-		// setLineWidth( 3 );
-		// setOuterColor( QColor(178, 115, 255) );
+		setFixedSize( 46, 40 );
+		setCenterPointX( 23.0 );
+		setCenterPointY( 15.0 );
+		setInnerRadius( 3 );
+		setOuterRadius( 11 );
+		setLineWidth( 3 );
+		setOuterColor( QColor(178, 115, 255) );
 		}
 };
 

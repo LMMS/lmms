@@ -25,7 +25,8 @@
 // TODO: better onset detection + bpm cleanup
 // TODO: switch to arrayVector (maybe)
 // TODO: cleaunp UI classes
-// TODO: implment roxas new UI
+// TODO: add text when no sample loaded
+// TODO: better buttons
 // TODO: code cleaunp, style and test
 
 #include "SlicerT.h"
@@ -83,13 +84,13 @@ PhaseVocoder::~PhaseVocoder() {
 void PhaseVocoder::loadData(std::vector<float> originalData, int sampleRate, float newRatio) {
 	originalBuffer = originalData;
 	originalSampleRate = sampleRate;
-	scaleRatio = -1; // force update, kinda hacky
+	m_scaleRatio = -1; // force update, kinda hacky
 
 	updateParams(newRatio);
 
 	dataLock.lock();
 
-	// set buffer size
+	// set buffer sizes
 	m_processedWindows.resize(numWindows, false);
 	lastPhase.resize(numWindows*windowSize, 0);
 	sumPhase.resize(numWindows*windowSize, 0);
@@ -132,19 +133,19 @@ void PhaseVocoder::getFrames(std::vector<float> & outData, int start, int frames
 // adjust pv params and reset buffers
 void PhaseVocoder::updateParams(float newRatio) {
 	if (originalBuffer.size() < 2048) { return; }
-	if (newRatio == scaleRatio) { return; }
+	if (newRatio == m_scaleRatio) { return; }
 	dataLock.lock();
 
 	// TODO: remove static stuff from here, like stepsize
-	scaleRatio = newRatio;
+	m_scaleRatio = newRatio;
 	stepSize = (float)windowSize / overSampling;
 	numWindows = (float)originalBuffer.size() / stepSize - overSampling - 1;
-	outStepSize = scaleRatio * (float)stepSize; // float, else inaccurate
+	outStepSize = m_scaleRatio * (float)stepSize; // float, else inaccurate
 	freqPerBin = originalSampleRate/windowSize;
 	expectedPhaseIn = 2.*M_PI*(float)stepSize/(float)windowSize;
 	expectedPhaseOut = 2.*M_PI*(float)outStepSize/(float)windowSize;
 
-	processedBuffer.resize(scaleRatio*originalBuffer.size(), 0);
+	processedBuffer.resize(m_scaleRatio*originalBuffer.size(), 0);
 
 	// very slow :(
 	std::fill(m_processedWindows.begin(), m_processedWindows.end(), false);
@@ -269,7 +270,7 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 SlicerT::SlicerT(InstrumentTrack * instrumentTrack) :
 	Instrument( instrumentTrack, &slicert_plugin_descriptor ),
 	m_noteThreshold(0.6f, 0.0f, 2.0f, 0.01f, this, tr( "Note threshold" ) ),
-	m_fadeOutFrames(0.0f, 0.0f, 8192.0f, 4.0f, this, tr("FadeOut")),
+	m_fadeOutFrames(400.0f, 0.0f, 8192.0f, 1.0f, this, tr("FadeOut")),
 	m_originalBPM(1, 1, 999, this, tr("Original bpm")),
 	m_originalSample(),
 	m_phaseVocoder()
@@ -386,6 +387,7 @@ void SlicerT::findBPM()
 	if (m_originalSample.frames() < 2048) { return; }
 	int bpmSnap = 1; // 1 = disabled
 
+	// caclulate length of sample
 	float sampleRate = m_originalSample.sampleRate();
 	float totalFrames = m_originalSample.frames();
 	float sampleLength = totalFrames / sampleRate;
@@ -417,13 +419,18 @@ void SlicerT::writeToMidi(std::vector<Note> * outClip)
 {
 	if (m_originalSample.frames() < 2048) { return; }
 
-	int ticksPerBar = DefaultTicksPerBar;
-	float sampleRate = m_originalSample.sampleRate();
+	// update incase bpm changed
+	const float speedRatio = (float)m_originalBPM.value() / Engine::getSong()->getTempo();
+	m_phaseVocoder.setScaleRatio(speedRatio);
 
+	// calculate how many "beats" are in the sample
+	float ticksPerBar = DefaultTicksPerBar;
+	float sampleRate = m_originalSample.sampleRate();
 	float bpm = Engine::getSong()->getTempo();
 	float samplesPerBeat = 60.0f / bpm * sampleRate;
 	float beats = (float)m_phaseVocoder.frames() / samplesPerBeat;
 
+	// calculate how many ticks in sample
 	float barsInSample = beats / Engine::getSong()->getTimeSigModel().getDenominator();
 	float totalTicks = ticksPerBar * barsInSample;
 
