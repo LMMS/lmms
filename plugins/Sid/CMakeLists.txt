@@ -1,7 +1,6 @@
 INCLUDE(BuildPlugin)
 
-if(NOT ${LMMS_HAVE_PERL})
-	message(STATUS "Cannot build Sid plugin, Perl not found")
+if(NOT ${LMMS_HAVE_SID})
 	return()
 endif()
 
