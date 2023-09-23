@@ -334,11 +334,11 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 
 	// voices
 	reSID::reg8 data8 = 0;
-	reSID::reg8 data16 = 0;
-	reSID::reg8 base = 0;
+	reSID::reg16 data16 = 0;
+	size_t base = 0;
 	float freq = 0.0;
 	float note = 0.0;
-	for (reSID::reg8 i = 0; i < 3; ++i)
+	for (size_t i = 0; i < 3; ++i)
 	{
 		base = i*7;
 		// freq ( Fn = Fout / Fclk * 16777216 ) + coarse detuning
