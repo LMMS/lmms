@@ -24,6 +24,8 @@
 
 #include "AudioFileProcessor.h"
 
+#include <cmath>
+
 #include <QPainter>
 #include <QFileInfo>
 #include <QDropEvent>
@@ -308,7 +310,7 @@ auto AudioFileProcessor::beatLen(NotePlayHandle* note) const -> int
 		: m_nextPlayStartPoint;
 	const auto duration = m_sampleBuffer.endFrame() - startFrame;
 
-	return static_cast<int>(std::floorf(duration * freqFactor));
+	return static_cast<int>(std::floor(duration * freqFactor));
 }
 
 
