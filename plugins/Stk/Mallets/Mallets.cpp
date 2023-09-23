@@ -359,8 +359,6 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 		_working_buffer[frame][1] = ps->nextSampleRight() *
 				( m_scalers[p] + add_scale );
 	}
-
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
 }
 
 

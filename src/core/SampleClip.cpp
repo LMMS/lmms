@@ -143,23 +143,26 @@ void SampleClip::setSampleBuffer( SampleBuffer* sb )
 
 
 
-void SampleClip::setSampleFile( const QString & _sf )
+void SampleClip::setSampleFile(const QString & sf)
 {
-	int length;
-	if ( _sf.isEmpty() )
-	{	//When creating an empty sample clip make it a bar long
-		float nom = Engine::getSong()->getTimeSigModel().getNumerator();
-		float den = Engine::getSong()->getTimeSigModel().getDenominator();
-		length = DefaultTicksPerBar * ( nom / den );
-	}
-	else
-	{	//Otherwise set it to the sample's length
-		m_sampleBuffer->setAudioFile( _sf );
+	int length = 0;
+
+	if (!sf.isEmpty())
+	{
+		m_sampleBuffer->setAudioFile(sf);
 		length = sampleLength();
 	}
-	changeLength(length);
 
-	setStartTimeOffset( 0 );
+	if (length == 0)
+	{
+		//If there is no sample, make the clip a bar long
+		float nom = Engine::getSong()->getTimeSigModel().getNumerator();
+		float den = Engine::getSong()->getTimeSigModel().getDenominator();
+		length = DefaultTicksPerBar * (nom / den);
+	}
+
+	changeLength(length);
+	setStartTimeOffset(0);
 
 	emit sampleChanged();
 	emit playbackPositionChanged();

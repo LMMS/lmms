@@ -523,7 +523,8 @@ void MidiClipView::paintEvent( QPaintEvent * )
 		p.scale(width(), height() - distanceToTop - 2 * notesBorder);
 
 		// set colour based on mute status
-		QColor noteFillColor = muted ? getMutedNoteFillColor() : getNoteFillColor();
+		QColor noteFillColor = muted ? getMutedNoteFillColor().lighter(200)
+									 : (c.lightness() > 175 ? getNoteFillColor().darker(400) : getNoteFillColor());
 		QColor noteBorderColor = muted ? getMutedNoteBorderColor()
 									   : ( m_clip->hasColor() ? c.lighter( 200 ) : getNoteBorderColor() );
 

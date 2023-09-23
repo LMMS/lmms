@@ -82,7 +82,6 @@ lmms--gui--TextFloat, lmms--gui--SimpleTextFloat {
 QMenu {
 	border:1px solid #747474;
 	background-color: #c9c9c9;
-	font-size:11px;
 }
 
 QMenu::separator {
@@ -98,15 +97,12 @@ QMenu::item {
 
 QMenu::item:selected {
 	color: white;
-	font-weight:bold;
 	background-color: #747474;
 }
 
 QMenu::item:disabled {
 	color: #747474;
 	background-color: #c9c9c9;
-	font-size:12px;
-	font-weight: normal;
 	padding: 4px 32px 4px 20px;
 }
 
@@ -132,7 +128,7 @@ QMenu::indicator:selected {
 
 lmms--gui--FileBrowser QCheckBox
 {
-	font-size: 10px;
+	font-size: 8pt;
 	color: white;
 }
 
