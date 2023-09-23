@@ -31,8 +31,6 @@
 #include "LadspaBase.h"
 
 #include "BarModelEditor.h"
-// TODO Only for testing! Remove!
-#include "FloatModelEditorBase.h"
 #include "LedCheckBox.h"
 #include "TempoSyncBarModelEditor.h"
 

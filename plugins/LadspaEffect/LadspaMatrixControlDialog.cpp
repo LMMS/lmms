@@ -130,6 +130,8 @@ void LadspaMatrixControlDialog::arrangeControls(QWidget * parent, QGridLayout* g
 	int maxRow = 0;
 
 	// Iterate the channels and add widgets for each control
+	// Note: the code assumes that all channels have the same structure, i.e. that all channels
+	//       have the same number of parameters which are in the same order.
 	ch_cnt_t const numberOfChannels = getChannelCount();
 	for (ch_cnt_t i = 0; i < numberOfChannels; ++i)
 	{
@@ -155,14 +157,12 @@ void LadspaMatrixControlDialog::arrangeControls(QWidget * parent, QGridLayout* g
 			// Only use the first channel to determine if we need to add link controls
 			if (i == 0 && ladspaControl->m_link)
 			{
-				// TODO Assumes that all processors are equal! Change to more general approach, e.g. map from name to row
 				LedCheckBox * linkCheckBox = new LedCheckBox("", parent, "", LedCheckBox::LedColor::Green);
 				linkCheckBox->setModel(&ladspaControl->m_linkEnabledModel);
 				linkCheckBox->setToolTip(tr("Link channels"));
 				gridLayout->addWidget(linkCheckBox, currentRow, linkColumn, Qt::AlignHCenter);
 			}
 
-			// TODO Use a factory to directly create the widgets? Currently they are wrapped in another layout in LadspaMatrixControlView...
 			QWidget * controlWidget = LadspaWidgetFactory::createWidget(ladspaControl, this);
 			if (controlWidget)
 			{
