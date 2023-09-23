@@ -24,11 +24,6 @@
 
 #include "Knob.h"
 
-#include <memory>
-#include <QApplication>
-#include <QFontMetrics>
-#include <QInputDialog>
-#include <QMouseEvent>
 #include <QPainter>
 
 #ifndef __USE_XOPEN
@@ -36,18 +31,10 @@
 #endif
 
 #include "lmms_math.h"
-#include "CaptionMenu.h"
-#include "ConfigManager.h"
-#include "ControllerConnection.h"
 #include "DeprecationHelper.h"
 #include "embed.h"
 #include "gui_templates.h"
-#include "GuiApplication.h"
-#include "LocaleHelper.h"
-#include "MainWindow.h"
-#include "ProjectJournal.h"
-#include "SimpleTextFloat.h"
-#include "StringPairDrag.h"
+
 
 namespace lmms::gui
 {

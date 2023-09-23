@@ -26,9 +26,6 @@
 #define LMMS_GUI_KNOB_H
 
 #include <memory>
-#include <QPixmap>
-#include <QWidget>
-#include <QPoint>
 #include <QTextDocument>
 
 #include "FloatModelEditorBase.h"
