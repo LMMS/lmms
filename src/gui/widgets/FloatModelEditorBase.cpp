@@ -51,27 +51,28 @@ namespace lmms::gui
 
 SimpleTextFloat * FloatModelEditorBase::s_textFloat = nullptr;
 
-FloatModelEditorBase::FloatModelEditorBase(DirectionOfManipulation directionOfManipulation, QWidget * _parent, const QString & _name ) :
-	QWidget( _parent ),
-	FloatModelView( new FloatModel( 0, 0, 0, 1, nullptr, _name, true ), this ),
-	m_volumeKnob( false ),
-	m_volumeRatio( 100.0, 0.0, 1000000.0 ),
-	m_buttonPressed( false ),
+FloatModelEditorBase::FloatModelEditorBase(DirectionOfManipulation directionOfManipulation, QWidget * parent, const QString & name) :
+	QWidget(parent),
+	FloatModelView(new FloatModel(0, 0, 0, 1, nullptr, name, true), this),
+	m_volumeKnob(false),
+	m_volumeRatio(100.0, 0.0, 1000000.0),
+	m_buttonPressed(false),
 	m_directionOfManipulation(directionOfManipulation)
 {
-	initUi( _name );
+	initUi(name);
 }
 
-void FloatModelEditorBase::initUi( const QString & _name )
+
+void FloatModelEditorBase::initUi(const QString & name)
 {
-	if( s_textFloat == nullptr )
+	if (s_textFloat == nullptr)
 	{
 		s_textFloat = new SimpleTextFloat;
 	}
 
-	setWindowTitle( _name );
+	setWindowTitle(name);
 
-	setFocusPolicy( Qt::ClickFocus );
+	setFocusPolicy(Qt::ClickFocus);
 
 	doConnections();
 }
@@ -85,98 +86,92 @@ void FloatModelEditorBase::showTextFloat(int msecBeforeDisplay, int msecDisplayT
 }
 
 
-float FloatModelEditorBase::getValue( const QPoint & _p )
+float FloatModelEditorBase::getValue(const QPoint & p)
 {
 	// Find out which direction/coordinate is relevant for this control
-	int const coordinate = m_directionOfManipulation == DirectionOfManipulation::Vertical ? _p.y() : -_p.x();
+	int const coordinate = m_directionOfManipulation == DirectionOfManipulation::Vertical ? p.y() : -p.x();
 
 	// knob value increase is linear to mouse movement
 	float value = .4f * coordinate;
 
 	// if shift pressed we want slower movement
-	if( getGUI()->mainWindow()->isShiftPressed() )
+	if (getGUI()->mainWindow()->isShiftPressed())
 	{
 		value /= 4.0f;
-		value = qBound( -4.0f, value, 4.0f );
+		value = qBound(-4.0f, value, 4.0f);
 	}
+
 	return value * pageSize();
 }
 
 
-
-
-void FloatModelEditorBase::contextMenuEvent( QContextMenuEvent * )
+void FloatModelEditorBase::contextMenuEvent(QContextMenuEvent *)
 {
 	// for the case, the user clicked right while pressing left mouse-
 	// button, the context-menu appears while mouse-cursor is still hidden
 	// and it isn't shown again until user does something which causes
 	// an QApplication::restoreOverrideCursor()-call...
-	mouseReleaseEvent( nullptr );
+	mouseReleaseEvent(nullptr);
 
-	CaptionMenu contextMenu( model()->displayName(), this );
-	addDefaultActions( &contextMenu );
-	contextMenu.addAction( QPixmap(),
-		model()->isScaleLogarithmic() ? tr( "Set linear" ) : tr( "Set logarithmic" ),
+	CaptionMenu contextMenu(model()->displayName(), this);
+	addDefaultActions(&contextMenu);
+	contextMenu.addAction(QPixmap(),
+		model()->isScaleLogarithmic() ? tr("Set linear") : tr("Set logarithmic"),
 		this, SLOT(toggleScale()));
 	contextMenu.addSeparator();
-	contextMenu.exec( QCursor::pos() );
+	contextMenu.exec(QCursor::pos());
 }
 
 
 void FloatModelEditorBase::toggleScale()
 {
-	model()->setScaleLogarithmic( ! model()->isScaleLogarithmic() );
+	model()->setScaleLogarithmic(! model()->isScaleLogarithmic());
 	update();
 }
 
 
-
-void FloatModelEditorBase::dragEnterEvent( QDragEnterEvent * _dee )
+void FloatModelEditorBase::dragEnterEvent(QDragEnterEvent * dee)
 {
-	StringPairDrag::processDragEnterEvent( _dee, "float_value,"
-							"automatable_model" );
+	StringPairDrag::processDragEnterEvent(dee, "float_value,"
+							"automatable_model");
 }
 
 
-
-
-void FloatModelEditorBase::dropEvent( QDropEvent * _de )
+void FloatModelEditorBase::dropEvent(QDropEvent * de)
 {
-	QString type = StringPairDrag::decodeKey( _de );
-	QString val = StringPairDrag::decodeValue( _de );
-	if( type == "float_value" )
+	QString type = StringPairDrag::decodeKey(de);
+	QString val = StringPairDrag::decodeValue(de);
+	if (type == "float_value")
 	{
-		model()->setValue( LocaleHelper::toFloat(val) );
-		_de->accept();
+		model()->setValue(LocaleHelper::toFloat(val));
+		de->accept();
 	}
-	else if( type == "automatable_model" )
+	else if (type == "automatable_model")
 	{
 		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
-		if( mod != nullptr )
+		if (mod != nullptr)
 		{
-			AutomatableModel::linkModels( model(), mod );
-			mod->setValue( model()->value() );
+			AutomatableModel::linkModels(model(), mod);
+			mod->setValue(model()->value());
 		}
 	}
 }
 
 
-
-
-void FloatModelEditorBase::mousePressEvent( QMouseEvent * _me )
+void FloatModelEditorBase::mousePressEvent(QMouseEvent * me)
 {
-	if( _me->button() == Qt::LeftButton &&
-			! ( _me->modifiers() & Qt::ControlModifier ) &&
-			! ( _me->modifiers() & Qt::ShiftModifier ) )
+	if (me->button() == Qt::LeftButton &&
+			! (me->modifiers() & Qt::ControlModifier) &&
+			! (me->modifiers() & Qt::ShiftModifier))
 	{
 		AutomatableModel *thisModel = model();
-		if( thisModel )
+		if (thisModel)
 		{
 			thisModel->addJournalCheckPoint();
-			thisModel->saveJournallingState( false );
+			thisModel->saveJournallingState(false);
 		}
 
-		const QPoint & p = _me->pos();
+		const QPoint & p = me->pos();
 		m_lastMousePos = p;
 		m_leftOver = 0.0f;
 
@@ -184,51 +179,47 @@ void FloatModelEditorBase::mousePressEvent( QMouseEvent * _me )
 
 		showTextFloat(0, 0);
 
-		s_textFloat->setText( displayValue() );
-		s_textFloat->moveGlobal( this,
-				QPoint( width() + 2, 0 ) );
+		s_textFloat->setText(displayValue());
+		s_textFloat->moveGlobal(this,
+				QPoint(width() + 2, 0));
 		s_textFloat->show();
 		m_buttonPressed = true;
 	}
-	else if( _me->button() == Qt::LeftButton &&
-			(_me->modifiers() & Qt::ShiftModifier) )
+	else if (me->button() == Qt::LeftButton &&
+			(me->modifiers() & Qt::ShiftModifier))
 	{
-		new StringPairDrag( "float_value",
-					QString::number( model()->value() ),
-							QPixmap(), this );
+		new StringPairDrag("float_value",
+					QString::number(model()->value()),
+							QPixmap(), this);
 	}
 	else
 	{
-		FloatModelView::mousePressEvent( _me );
+		FloatModelView::mousePressEvent(me);
 	}
 }
 
 
-
-
-void FloatModelEditorBase::mouseMoveEvent( QMouseEvent * _me )
+void FloatModelEditorBase::mouseMoveEvent(QMouseEvent * me)
 {
-	if( m_buttonPressed && _me->pos() != m_lastMousePos )
+	if (m_buttonPressed && me->pos() != m_lastMousePos)
 	{
 		// knob position is changed depending on last mouse position
-		setPosition( _me->pos() - m_lastMousePos );
-		emit sliderMoved( model()->value() );
+		setPosition(me->pos() - m_lastMousePos);
+		emit sliderMoved(model()->value());
 		// original position for next time is current position
-		m_lastMousePos = _me->pos();
+		m_lastMousePos = me->pos();
 	}
-	s_textFloat->setText( displayValue() );
+	s_textFloat->setText(displayValue());
 	s_textFloat->show();
 }
 
 
-
-
-void FloatModelEditorBase::mouseReleaseEvent( QMouseEvent* event )
+void FloatModelEditorBase::mouseReleaseEvent(QMouseEvent* event)
 {
-	if( event && event->button() == Qt::LeftButton )
+	if (event && event->button() == Qt::LeftButton)
 	{
 		AutomatableModel *thisModel = model();
-		if( thisModel )
+		if (thisModel)
 		{
 			thisModel->restoreJournallingState();
 		}
@@ -249,32 +240,28 @@ void FloatModelEditorBase::enterEvent(QEvent *event)
 	showTextFloat(700, 2000);
 }
 
+
 void FloatModelEditorBase::leaveEvent(QEvent *event)
 {
 	s_textFloat->hide();
 }
 
 
-
-void FloatModelEditorBase::focusOutEvent( QFocusEvent * _fe )
+void FloatModelEditorBase::focusOutEvent(QFocusEvent * fe)
 {
 	// make sure we don't loose mouse release event
-	mouseReleaseEvent( nullptr );
-	QWidget::focusOutEvent( _fe );
+	mouseReleaseEvent(nullptr);
+	QWidget::focusOutEvent(fe);
 }
 
 
-
-
-void FloatModelEditorBase::mouseDoubleClickEvent( QMouseEvent * )
+void FloatModelEditorBase::mouseDoubleClickEvent(QMouseEvent *)
 {
 	enterValue();
 }
 
 
-
-
-void FloatModelEditorBase::paintEvent( QPaintEvent * _me )
+void FloatModelEditorBase::paintEvent(QPaintEvent *)
 {
 	QPainter p(this);
 
@@ -294,8 +281,6 @@ void FloatModelEditorBase::paintEvent( QPaintEvent * _me )
 	p.setBrush(foreground);
 	p.drawRect(QRect(r.topLeft(), QPoint(r.width() * percentage, r.height())));
 }
-
-
 
 
 void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
@@ -348,35 +333,31 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 	const int inc = direction * stepMult;
 	model()->incValue(inc);
 
-	s_textFloat->setText( displayValue() );
-	s_textFloat->moveGlobal( this, QPoint( width() + 2, 0 ) );
-	s_textFloat->setVisibilityTimeOut( 1000 );
+	s_textFloat->setText(displayValue());
+	s_textFloat->moveGlobal(this, QPoint(width() + 2, 0));
+	s_textFloat->setVisibilityTimeOut(1000);
 
-	emit sliderMoved( model()->value() );
+	emit sliderMoved(model()->value());
 }
 
 
-
-
-void FloatModelEditorBase::setPosition( const QPoint & _p )
+void FloatModelEditorBase::setPosition(const QPoint & p)
 {
-	const float value = getValue( _p ) + m_leftOver;
+	const float value = getValue(p) + m_leftOver;
 	const auto step = model()->step<float>();
 	const float oldValue = model()->value();
 
-
-
-	if( model()->isScaleLogarithmic() ) // logarithmic code
+	if (model()->isScaleLogarithmic()) // logarithmic code
 	{
 		const float pos = model()->minValue() < 0
-			? oldValue / qMax( qAbs( model()->maxValue() ), qAbs( model()->minValue() ) )
-			: ( oldValue - model()->minValue() ) / model()->range();
-		const float ratio = 0.1f + qAbs( pos ) * 15.f;
+			? oldValue / qMax(qAbs(model()->maxValue()), qAbs(model()->minValue()))
+			: (oldValue - model()->minValue()) / model()->range();
+		const float ratio = 0.1f + qAbs(pos) * 15.f;
 		float newValue = value * ratio;
-		if( qAbs( newValue ) >= step )
+		if (qAbs(newValue) >= step)
 		{
-			float roundedValue = qRound( ( oldValue - value ) / step ) * step;
-			model()->setValue( roundedValue );
+			float roundedValue = qRound((oldValue - value) / step) * step;
+			model()->setValue(roundedValue);
 			m_leftOver = 0.0f;
 		}
 		else
@@ -387,10 +368,10 @@ void FloatModelEditorBase::setPosition( const QPoint & _p )
 
 	else // linear code
 	{
-		if( qAbs( value ) >= step )
+		if (qAbs(value) >= step)
 		{
-			float roundedValue = qRound( ( oldValue - value ) / step ) * step;
-			model()->setValue( roundedValue );
+			float roundedValue = qRound((oldValue - value) / step) * step;
+			model()->setValue(roundedValue);
 			m_leftOver = 0.0f;
 		}
 		else
@@ -401,51 +382,47 @@ void FloatModelEditorBase::setPosition( const QPoint & _p )
 }
 
 
-
-
 void FloatModelEditorBase::enterValue()
 {
 	bool ok;
 	float new_val;
 
-	if( isVolumeKnob() &&
-		ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() )
+	if (isVolumeKnob() &&
+		ConfigManager::inst()->value("app", "displaydbfs").toInt())
 	{
 		new_val = QInputDialog::getDouble(
-			this, tr( "Set value" ),
-			tr( "Please enter a new value between "
-					"-96.0 dBFS and 6.0 dBFS:" ),
-				ampToDbfs( model()->getRoundedValue() / 100.0 ),
-							-96.0, 6.0, model()->getDigitCount(), &ok );
-		if( new_val <= -96.0 )
+			this, tr("Set value"),
+			tr("Please enter a new value between "
+					"-96.0 dBFS and 6.0 dBFS:"),
+				ampToDbfs(model()->getRoundedValue() / 100.0),
+							-96.0, 6.0, model()->getDigitCount(), &ok);
+		if (new_val <= -96.0)
 		{
 			new_val = 0.0f;
 		}
 		else
 		{
-			new_val = dbfsToAmp( new_val ) * 100.0;
+			new_val = dbfsToAmp(new_val) * 100.0;
 		}
 	}
 	else
 	{
 		new_val = QInputDialog::getDouble(
-				this, tr( "Set value" ),
-				tr( "Please enter a new value between "
-						"%1 and %2:" ).
-						arg( model()->minValue() ).
-						arg( model()->maxValue() ),
+				this, tr("Set value"),
+				tr("Please enter a new value between "
+						"%1 and %2:").
+						arg(model()->minValue()).
+						arg(model()->maxValue()),
 					model()->getRoundedValue(),
 					model()->minValue(),
-					model()->maxValue(), model()->getDigitCount(), &ok );
+					model()->maxValue(), model()->getDigitCount(), &ok);
 	}
 
-	if( ok )
+	if (ok)
 	{
-		model()->setValue( new_val );
+		model()->setValue(new_val);
 	}
 }
-
-
 
 
 void FloatModelEditorBase::friendlyUpdate()
@@ -459,35 +436,31 @@ void FloatModelEditorBase::friendlyUpdate()
 }
 
 
-
-
 QString FloatModelEditorBase::displayValue() const
 {
-	if( isVolumeKnob() &&
-		ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() )
+	if (isVolumeKnob() &&
+		ConfigManager::inst()->value("app", "displaydbfs").toInt())
 	{
-		return m_description.trimmed() + QString( " %1 dBFS" ).
-				arg( ampToDbfs( model()->getRoundedValue() / volumeRatio() ),
-								3, 'f', 2 );
+		return m_description.trimmed() + QString(" %1 dBFS").
+				arg(ampToDbfs(model()->getRoundedValue() / volumeRatio()),
+								3, 'f', 2);
 	}
-	return m_description.trimmed() + QString( " %1" ).
-					arg( model()->getRoundedValue() ) + m_unit;
+
+	return m_description.trimmed() + QString(" %1").
+					arg(model()->getRoundedValue()) + m_unit;
 }
-
-
 
 
 void FloatModelEditorBase::doConnections()
 {
-	if( model() != nullptr )
+	if (model() != nullptr)
 	{
-		QObject::connect( model(), SIGNAL(dataChanged()),
+		QObject::connect(model(), SIGNAL(dataChanged()),
 					this, SLOT(friendlyUpdate()));
 
-		QObject::connect( model(), SIGNAL(propertiesChanged()),
+		QObject::connect(model(), SIGNAL(propertiesChanged()),
 						this, SLOT(update()));
 	}
 }
-
 
 } // namespace lmms::gui

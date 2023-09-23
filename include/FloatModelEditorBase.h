@@ -41,10 +41,10 @@ class LMMS_EXPORT FloatModelEditorBase : public QWidget, public FloatModelView
 {
 	Q_OBJECT
 
-	mapPropertyFromModel(bool,isVolumeKnob,setVolumeKnob,m_volumeKnob);
-	mapPropertyFromModel(float,volumeRatio,setVolumeRatio,m_volumeRatio);
+	mapPropertyFromModel(bool, isVolumeKnob, setVolumeKnob, m_volumeKnob);
+	mapPropertyFromModel(float, volumeRatio, setVolumeRatio, m_volumeRatio);
 
-	void initUi( const QString & _name ); //!< to be called by ctors
+	void initUi(const QString & name); //!< to be called by ctors
 
 public:
 	enum class DirectionOfManipulation
@@ -53,39 +53,38 @@ public:
 		Horizontal
 	};
 
-	FloatModelEditorBase( DirectionOfManipulation directionOfManipulation = DirectionOfManipulation::Vertical, QWidget * _parent = nullptr, const QString & _name = QString() ); //!< default ctor
-	FloatModelEditorBase( const FloatModelEditorBase& other ) = delete;
+	FloatModelEditorBase(DirectionOfManipulation directionOfManipulation = DirectionOfManipulation::Vertical, QWidget * _parent = nullptr, const QString & _name = QString()); //!< default ctor
+	FloatModelEditorBase(const FloatModelEditorBase& other) = delete;
 
 	// TODO: remove
-	inline void setHintText( const QString & _txt_before,
-						const QString & _txt_after )
+	inline void setHintText(const QString & txt_before, const QString & txt_after)
 	{
-		setDescription( _txt_before );
-		setUnit( _txt_after );
+		setDescription(txt_before);
+		setUnit(txt_after);
 	}
 
 signals:
 	void sliderPressed();
 	void sliderReleased();
-	void sliderMoved( float value );
+	void sliderMoved(float value);
 
 
 protected:
-	void contextMenuEvent( QContextMenuEvent * _me ) override;
-	void dragEnterEvent( QDragEnterEvent * _dee ) override;
-	void dropEvent( QDropEvent * _de ) override;
-	void focusOutEvent( QFocusEvent * _fe ) override;
-	void mousePressEvent( QMouseEvent * _me ) override;
-	void mouseReleaseEvent( QMouseEvent * _me ) override;
-	void mouseMoveEvent( QMouseEvent * _me ) override;
-	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
-	void paintEvent( QPaintEvent * _me ) override;
-	void wheelEvent( QWheelEvent * _me ) override;
+	void contextMenuEvent(QContextMenuEvent * me) override;
+	void dragEnterEvent(QDragEnterEvent * dee) override;
+	void dropEvent(QDropEvent * de) override;
+	void focusOutEvent(QFocusEvent * fe) override;
+	void mousePressEvent(QMouseEvent * me) override;
+	void mouseReleaseEvent(QMouseEvent * me) override;
+	void mouseMoveEvent(QMouseEvent * me) override;
+	void mouseDoubleClickEvent(QMouseEvent * me) override;
+	void paintEvent(QPaintEvent * me) override;
+	void wheelEvent(QWheelEvent * me) override;
 
 	void enterEvent(QEvent *event) override;
 	void leaveEvent(QEvent *event) override;
 
-	virtual float getValue( const QPoint & _p );
+	virtual float getValue(const QPoint & p);
 
 private slots:
 	virtual void enterValue();
@@ -98,13 +97,12 @@ private:
 	void doConnections() override;
 
 	void showTextFloat(int msecBeforeDisplay, int msecDisplayTime);
-	void setPosition( const QPoint & _p );
+	void setPosition(const QPoint & p);
 
 	inline float pageSize() const
 	{
-		return ( model()->maxValue() - model()->minValue() ) / 100.0f;
+		return (model()->maxValue() - model()->minValue()) / 100.0f;
 	}
-
 
 	static SimpleTextFloat * s_textFloat;
 
@@ -117,7 +115,6 @@ private:
 
 	DirectionOfManipulation m_directionOfManipulation;
 };
-
 
 } // namespace lmms::gui
 
