@@ -32,15 +32,10 @@
 #include "AutomatableModelView.h"
 
 
-class QPixmap;
-
 namespace lmms::gui
 {
 
-
 class SimpleTextFloat;
-
-void convertPixmapToGrayScaleTemp(QPixmap &pixMap);
 
 class LMMS_EXPORT FloatModelEditorBase : public QWidget, public FloatModelView
 {

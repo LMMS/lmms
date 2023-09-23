@@ -31,7 +31,7 @@
 #include <QPoint>
 #include <QTextDocument>
 
-#include "AutomatableModelView.h"
+#include "FloatModelEditorBase.h"
 
 
 class QPixmap;
@@ -50,7 +50,7 @@ enum class KnobType
 
 void convertPixmapToGrayScale(QPixmap &pixMap);
 
-class LMMS_EXPORT Knob : public QWidget, public FloatModelView
+class LMMS_EXPORT Knob : public FloatModelEditorBase
 {
 	Q_OBJECT
 	Q_ENUMS( KnobType )
@@ -72,9 +72,6 @@ class LMMS_EXPORT Knob : public QWidget, public FloatModelView
 	Q_PROPERTY(QColor arcActiveColor MEMBER m_arcActiveColor)
 	Q_PROPERTY(QColor arcInactiveColor MEMBER m_arcInactiveColor)
 
-	mapPropertyFromModel(bool,isVolumeKnob,setVolumeKnob,m_volumeKnob);
-	mapPropertyFromModel(float,volumeRatio,setVolumeRatio,m_volumeRatio);
-
 	Q_PROPERTY(KnobType knobNum READ knobNum WRITE setknobNum)
 	
 	Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor)
@@ -87,13 +84,6 @@ public:
 	Knob( QWidget * _parent = nullptr, const QString & _name = QString() ); //!< default ctor
 	Knob( const Knob& other ) = delete;
 
-	// TODO: remove
-	inline void setHintText( const QString & _txt_before,
-						const QString & _txt_after )
-	{
-		setDescription( _txt_before );
-		setUnit( _txt_after );
-	}
 	void setLabel( const QString & txt );
 	void setHtmlLabel( const QString &htmltxt );
 
@@ -125,46 +115,16 @@ public:
 	void setTextColor( const QColor & c );
 
 
-signals:
-	void sliderPressed();
-	void sliderReleased();
-	void sliderMoved( float value );
-
-
 protected:
-	void contextMenuEvent( QContextMenuEvent * _me ) override;
-	void dragEnterEvent( QDragEnterEvent * _dee ) override;
-	void dropEvent( QDropEvent * _de ) override;
-	void focusOutEvent( QFocusEvent * _fe ) override;
-	void mousePressEvent( QMouseEvent * _me ) override;
-	void mouseReleaseEvent( QMouseEvent * _me ) override;
-	void mouseMoveEvent( QMouseEvent * _me ) override;
-	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
 	void paintEvent( QPaintEvent * _me ) override;
-	void wheelEvent( QWheelEvent * _me ) override;
+
 	void changeEvent(QEvent * ev) override;
 
-	void enterEvent(QEvent *event) override;
-	void leaveEvent(QEvent *event) override;
-
-	virtual float getValue( const QPoint & _p );
-
-private slots:
-	virtual void enterValue();
-	void friendlyUpdate();
-	void toggleScale();
-
 private:
-	virtual QString displayValue() const;
-
-	void doConnections() override;
-
 	QLineF calculateLine( const QPointF & _mid, float _radius,
 						float _innerRadius = 1) const;
 
 	void drawKnob( QPainter * _p );
-	void showTextFloat(int msecBeforeDisplay, int msecDisplayTime);
-	void setPosition( const QPoint & _p );
 	bool updateAngle();
 
 	int angleFromValue( float value, float minValue, float maxValue, float totalAngle ) const
@@ -172,25 +132,11 @@ private:
 		return static_cast<int>( ( value - 0.5 * ( minValue + maxValue ) ) / ( maxValue - minValue ) * m_totalAngle ) % 360;
 	}
 
-	inline float pageSize() const
-	{
-		return ( model()->maxValue() - model()->minValue() ) / 100.0f;
-	}
-
-
-	static SimpleTextFloat * s_textFloat;
-
 	QString m_label;
 	bool m_isHtmlLabel;
 	QTextDocument* m_tdRenderer;
 
 	std::unique_ptr<QPixmap> m_knobPixmap;
-	BoolModel m_volumeKnob;
-	FloatModel m_volumeRatio;
-
-	QPoint m_lastMousePos; //!< mouse position in last mouseMoveEvent
-	float m_leftOver;
-	bool m_buttonPressed;
 
 	float m_totalAngle;
 	int m_angle;
@@ -211,9 +157,7 @@ private:
 	QColor m_textColor;
 
 	KnobType m_knobNum;
-
-} ;
-
+};
 
 } // namespace lmms::gui
 

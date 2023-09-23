@@ -490,21 +490,4 @@ void FloatModelEditorBase::doConnections()
 }
 
 
-void convertPixmapToGrayScaleTemp(QPixmap& pixMap)
-{
-	QImage temp = pixMap.toImage().convertToFormat(QImage::Format_ARGB32);
-	for (int i = 0; i < temp.height(); ++i)
-	{
-		for (int j = 0; j < temp.width(); ++j)
-		{
-			const auto pix = temp.pixelColor(i, j);
-			const auto gscale = 0.2126 * pix.redF() + 0.7152 * pix.greenF() + 0.0722 * pix.blueF();
-			const auto pixGray = QColor::fromRgbF(gscale, gscale, gscale, pix.alphaF());
-			temp.setPixelColor(i, j, pixGray);
-		}
-	}
-	pixMap.convertFromImage(temp);
-}
-
-
 } // namespace lmms::gui
