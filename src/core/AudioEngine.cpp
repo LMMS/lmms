@@ -701,7 +701,10 @@ void AudioEngine::removeAudioPort(AudioPort * port)
 
 bool AudioEngine::addPlayHandle( PlayHandle* handle )
 {
-	if( criticalXRuns() == false )
+	// Only add play handles if we have the CPU capacity to process them.
+	// Instrument play handles are not added during playback, but when the
+	// associated instrument is created, so add those unconditionally.
+	if (handle->type() == PlayHandle::Type::InstrumentPlayHandle || !criticalXRuns())
 	{
 		m_newPlayHandles.push( handle );
 		handle->audioPort()->addPlayHandle( handle );
