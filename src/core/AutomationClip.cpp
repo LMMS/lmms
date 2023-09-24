@@ -440,8 +440,8 @@ void AutomationClip::resetTangents(const int tick0, const int tick1)
 		return;
 	}
 
-	TimePos start = TimePos(qMin(tick0, tick1));
-	TimePos end = TimePos(qMax(tick0, tick1));
+	TimePos start = TimePos(std::min(tick0, tick1));
+	TimePos end = TimePos(std::max(tick0, tick1));
 
 	for (auto it = m_timeMap.lowerBound(start), endIt = m_timeMap.upperBound(end); it != endIt; ++it)
 	{
