@@ -1933,10 +1933,10 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 				Engine::getSong()->setModified();
 			}
-			else if ((me->buttons() == Qt::RightButton &&
-							m_editMode == EditMode::Draw &&
-							(!isSelection() || it != notes.begin()-1)) ||
-					m_editMode == EditMode::Erase )
+			else if ((me->buttons() == Qt::RightButton
+							&& m_editMode == EditMode::Draw
+							&& (!isSelection() || it != notes.rend()))
+							|| m_editMode == EditMode::Erase)
 			{
 				// erase single note
 				m_mouseDownRight = true;
