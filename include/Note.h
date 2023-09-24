@@ -91,7 +91,7 @@ const int DefaultMiddleKey = Octave::Octave_4 + Key::C;
 const int DefaultBaseKey = Octave::Octave_4 + Key::A;
 const float DefaultBaseFreq = 440.f;
 
-const float MaxDetuning = 4 * 12.0f;
+const float MaxDetuning = 5 * 12.0f;
 
 
 

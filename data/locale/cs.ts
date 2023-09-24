@@ -6361,7 +6361,7 @@ Ověřte si prosím, zda máte povolen zápis do souboru a do složky, ve které
     </message>
 </context>
 <context>
-    <name>InstrumentMiscView</name>
+    <name>InstrumentTuningView</name>
     <message>
         <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="221"/>
         <source>MASTER PITCH</source>
