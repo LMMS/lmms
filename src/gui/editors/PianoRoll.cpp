@@ -1947,10 +1947,10 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					Engine::getSong()->setModified();
 				}
 			}
-			else if ((me->button() == Qt::RightButton &&
-							m_editMode == EditMode::Draw) ||
-							(me->button() == Qt::LeftButton &&
-							m_editMode == EditMode::Draw))
+			else if ((me->button() == Qt::RightButton
+							&& m_editMode == EditMode::Draw)
+							|| (me->button() == Qt::LeftButton
+							&& m_editMode == EditMode::Draw))
 			{
 				//unselect when clicing off selection	
 				clearSelectedNotes();
