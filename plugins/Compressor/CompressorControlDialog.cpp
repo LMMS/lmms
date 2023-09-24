@@ -497,10 +497,12 @@ void CompressorControlDialog::redrawKnee()
 	float actualRatio = m_controls->m_limiterModel.value() ? 0 : m_controls->m_effect->m_ratioVal;
 
 	// Calculate endpoints for the two straight lines
-	float kneePoint1 = m_controls->m_effect->m_thresholdVal - m_controls->m_effect->m_kneeVal;
-	float kneePoint2X = m_controls->m_effect->m_thresholdVal + m_controls->m_effect->m_kneeVal;
-	float kneePoint2Y = (m_controls->m_effect->m_thresholdVal + (-m_controls->m_effect->m_thresholdVal * (actualRatio * (m_controls->m_effect->m_kneeVal / -m_controls->m_effect->m_thresholdVal))));
-	float ratioPoint = m_controls->m_effect->m_thresholdVal + (-m_controls->m_effect->m_thresholdVal * actualRatio);
+	const float thresholdVal = m_controls->m_effect->m_thresholdVal;
+	const float kneeVal = m_controls->m_effect->m_kneeVal;
+	float kneePoint1 = thresholdVal - kneeVal;
+	float kneePoint2X = thresholdVal + kneeVal;
+	float kneePoint2Y = thresholdVal + kneeVal * actualRatio;
+	float ratioPoint = thresholdVal + (-thresholdVal * actualRatio);
 
 	// Draw two straight lines
 	m_p.drawLine(0, m_kneeWindowSizeY, dbfsToXPoint(kneePoint1), dbfsToYPoint(kneePoint1));
@@ -510,7 +512,7 @@ void CompressorControlDialog::redrawKnee()
 	}
 
 	// Draw knee section
-	if (m_controls->m_effect->m_kneeVal)
+	if (kneeVal)
 	{
 		m_p.setPen(QPen(m_kneeColor2, 3));
 
@@ -522,8 +524,8 @@ void CompressorControlDialog::redrawKnee()
 		{
 			newPoint[0] = linearInterpolate(kneePoint1, kneePoint2X, (i + 1) / (float)COMP_KNEE_LINES);
 
-			const float temp = newPoint[0] - m_controls->m_effect->m_thresholdVal + m_controls->m_effect->m_kneeVal;
-			newPoint[1] = (newPoint[0] + (actualRatio - 1) * temp * temp / (4 * m_controls->m_effect->m_kneeVal));
+			const float temp = newPoint[0] - thresholdVal + kneeVal;
+			newPoint[1] = (newPoint[0] + (actualRatio - 1) * temp * temp / (4 * kneeVal));
 
 			m_p.drawLine(dbfsToXPoint(prevPoint[0]), dbfsToYPoint(prevPoint[1]), dbfsToXPoint(newPoint[0]), dbfsToYPoint(newPoint[1]));
 
