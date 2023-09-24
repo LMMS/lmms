@@ -67,14 +67,13 @@ namespace
 	}
 }
 
-bool ClapManager::kDebug = false;
+bool ClapManager::s_debug = false;
 
 ClapManager::ClapManager()
 {
 	const char* dbgStr = std::getenv("LMMS_CLAP_DEBUG");
-	kDebug = (dbgStr && *dbgStr);
-	if (kDebug)
-		qDebug() << "CLAP host debugging enabled";
+	s_debug = (dbgStr && *dbgStr);
+	if (s_debug) { qDebug() << "CLAP host debugging enabled"; }
 }
 
 ClapManager::~ClapManager()
@@ -91,8 +90,7 @@ ClapManager::~ClapManager()
 void ClapManager::initPlugins()
 {
 	findSearchPaths();
-	if (kDebug)
-		qDebug() << "Found .clap files:";
+	if (s_debug) { qDebug() << "Found .clap files:"; }
 	loadClapFiles(getSearchPaths());
 
 	// TEMPORARY: Testing purposes
@@ -140,60 +138,76 @@ void ClapManager::findSearchPaths()
 	if (const char* clapPathTemp = std::getenv("CLAP_PATH"))
 	{
 		std::error_code ec;
-		std::string_view clapPath{clapPathTemp};
+		auto clapPath = std::string_view{clapPathTemp};
 		auto pos = clapPath.find(LADSPA_PATH_SEPERATOR);
 		while (pos != std::string_view::npos)
 		{
-			std::filesystem::path path{expandHomeDir(clapPath.substr(0, pos))};
+			auto path = std::filesystem::path{expandHomeDir(clapPath.substr(0, pos))};
 			if (std::filesystem::is_directory(path, ec))
+			{
 				m_searchPaths.emplace_back(std::move(path.make_preferred()));
+			}
 			clapPath = clapPath.substr(pos + 1);
 			pos = clapPath.find(LADSPA_PATH_SEPERATOR);
 		}
 		if (!clapPath.empty())
 		{
-			std::filesystem::path path{expandHomeDir(clapPath)};
+			auto path = std::filesystem::path{expandHomeDir(clapPath)};
 			if (std::filesystem::is_directory(path, ec))
+			{
 				m_searchPaths.emplace_back(std::move(path.make_preferred()));
+			}
 		}
 	}
 
 	// Add OS-dependent search paths
 #ifdef LMMS_BUILD_LINUX
-	std::filesystem::path path{expandHomeDir("~/.clap")};
+	auto path = std::filesystem::path{expandHomeDir("~/.clap")};
 	std::error_code ec;
 	if (std::filesystem::is_directory(path, ec))
+	{
 		m_searchPaths.emplace_back(std::move(path.make_preferred()));
+	}
 	path = "/usr/lib/clap";
 	if (std::filesystem::is_directory(path, ec))
+	{
 		m_searchPaths.emplace_back(std::move(path.make_preferred()));
+	}
 #elif defined(LMMS_BUILD_WIN32) || defined(LMMS_BUILD_WIN64)
 	std::error_code ec;
 	if (auto commonProgFiles = std::getenv("COMMONPROGRAMFILES"))
 	{
-		std::filesystem::path path{commonProgFiles};
+		auto path = std::filesystem::path{commonProgFiles};
 		path /= "CLAP";
 		if (std::filesystem::is_directory(path, ec))
+		{
 			m_searchPaths.emplace_back(std::move(path.make_preferred()));
+		}
 	}
 	if (auto localAppData = std::getenv("LOCALAPPDATA"))
 	{
-		std::filesystem::path path{localAppData};
+		auto path = std::filesystem::path{localAppData};
 		path /= std::filesystem::path{"Programs/Common/CLAP"};
 		if (std::filesystem::is_directory(path, ec))
+		{
 			m_searchPaths.emplace_back(std::move(path.make_preferred()));
+		}
 	}
 #elif defined(LMMS_BUILD_APPLE)
 	std::error_code ec;
-	std::filesystem::path path{"/Library/Audio/Plug-Ins/CLAP"};
+	auto path = std::filesystem::path{"/Library/Audio/Plug-Ins/CLAP"};
 	if (std::filesystem::is_directory(path, ec))
+	{
 		m_searchPaths.emplace_back(std::move(path.make_preferred()));
+	}
 	path = expandHomeDir("~/Library/Audio/Plug-Ins/CLAP");
 	if (std::filesystem::is_directory(path, ec))
+	{
 		m_searchPaths.emplace_back(std::move(path.make_preferred()));
+	}
 #endif
 
-	if (kDebug)
+	if (s_debug)
 	{
 		qDebug() << "CLAP search paths:";
 		for (const auto& path : m_searchPaths)
@@ -205,8 +219,7 @@ void ClapManager::findSearchPaths()
 
 void ClapManager::loadClapFiles(const std::vector<std::filesystem::path>& searchPaths)
 {
-	if (!m_files.empty())
-		return; // Cannot unload CLAP plugins yet
+	if (!m_files.empty()) { return; } // Cannot unload CLAP plugins yet
 
 	m_instances.clear();
 	m_files.clear();
@@ -217,20 +230,22 @@ void ClapManager::loadClapFiles(const std::vector<std::filesystem::path>& search
 	timer.start();
 
 	// Search searchPaths for files with ".clap" extension
-	int totalClapFiles = 0, totalClapPlugins = 0;
+	int totalClapFiles = 0;
+	int totalClapPlugins = 0;
 	for (const auto& path : searchPaths)
 	{
-		for (const auto& entry : std::filesystem::recursive_directory_iterator(path))
+		for (const auto& entry : std::filesystem::recursive_directory_iterator{path})
 		{
 			auto entryPath = entry.path();
 			std::error_code ec;
 			if (!entry.is_regular_file(ec) || entryPath.extension() != ".clap")
+			{
 				continue;
+			}
 
 			++totalClapFiles;
 
-			if (kDebug)
-				qDebug() << "-" << entryPath.c_str();
+			if (s_debug) { qDebug() << "-" << entryPath.c_str(); }
 
 			auto& clapFile = m_files.emplace_back(this, std::move(entryPath));
 			clapFile.load();
@@ -258,8 +273,7 @@ void ClapManager::loadClapFiles(const std::vector<std::filesystem::path>& search
 				m_pluginInfo.push_back(plugin);
 			}
 
-			if (purgeNeeded)
-				clapFile.purgeInvalidPlugins();
+			if (purgeNeeded) { clapFile.purgeInvalidPlugins(); }
 		}
 	}
 
@@ -269,7 +283,7 @@ void ClapManager::loadClapFiles(const std::vector<std::filesystem::path>& search
 		<< "CLAP plugins loaded in" << timer.elapsed() << "msecs.";
 	if (m_files.size() != totalClapFiles || m_pluginInfo.size() != totalClapPlugins)
 	{
-		if (kDebug)
+		if (s_debug)
 		{
 			qDebug() <<
 				"If you don't want to see all this debug output, please set\n"
@@ -289,7 +303,7 @@ auto ClapManager::getClapGuiApi() -> const char*
 {
 #if defined(LMMS_BUILD_LINUX)
 	return CLAP_WINDOW_API_X11;
-#elif defined(LMMS_BUILD_WIN32)
+#elif defined(LMMS_BUILD_WIN32) || defined(LMMS_BUILD_WIN64)
 	return CLAP_WINDOW_API_WIN32;
 #elif defined(LMMS_BUILD_APPLE)
 	return CLAP_WINDOW_API_COCOA;

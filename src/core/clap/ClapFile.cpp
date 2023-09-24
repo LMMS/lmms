@@ -38,38 +38,10 @@ namespace lmms
 // ClapFile
 ////////////////////////////////
 
-ClapFile::ClapFile(const ClapManager* manager, std::filesystem::path&& filename)
-	: m_parent(manager), m_filename(std::move(filename))
+ClapFile::ClapFile(const ClapManager* manager, std::filesystem::path filename)
+	: m_parent{manager}, m_filename{std::move(filename)}
 {
 	m_filename.make_preferred();
-}
-
-ClapFile::ClapFile(ClapFile&& other) noexcept
-{
-	m_parent = std::exchange(other.m_parent, nullptr);
-	m_filename = std::move(other.m_filename);
-	m_library = std::exchange(other.m_library, nullptr);
-	m_entry = std::exchange(other.m_entry, nullptr);
-	m_factory = std::exchange(other.m_factory, nullptr);
-	m_pluginCount = other.m_pluginCount;
-	m_valid = std::exchange(other.m_valid, false);
-	m_pluginInfo = std::move(other.m_pluginInfo);
-}
-
-ClapFile& ClapFile::operator=(ClapFile&& rhs) noexcept
-{
-	if (this != &rhs)
-	{
-		m_parent = std::exchange(rhs.m_parent, nullptr);
-		m_filename = std::move(rhs.m_filename);
-		m_library = std::exchange(rhs.m_library, nullptr);
-		m_entry = std::exchange(rhs.m_entry, nullptr);
-		m_factory = std::exchange(rhs.m_factory, nullptr);
-		m_pluginCount = rhs.m_pluginCount;
-		m_valid = std::exchange(rhs.m_valid, false);
-		m_pluginInfo = std::move(rhs.m_pluginInfo);
-	}
-	return *this;
 }
 
 ClapFile::~ClapFile()
@@ -82,15 +54,13 @@ auto ClapFile::load() -> bool
 	m_valid = false;
 
 	m_library = std::make_unique<QLibrary>();
-	if (!m_library)
-		return false;
+	if (!m_library) { return false; }
 
 	m_library->setFileName(QString::fromUtf8(m_filename.c_str()));
 	m_library->setLoadHints(QLibrary::ResolveAllSymbolsHint | QLibrary::DeepBindHint);
 
 	// Do not allow reloading yet
-	if (m_library->isLoaded())
-		return false;
+	if (m_library->isLoaded()) { return false; }
 
 	if (!m_library->load())
 	{
@@ -110,10 +80,8 @@ auto ClapFile::load() -> bool
 	m_factory = static_cast<const clap_plugin_factory*>(pluginEntry->get_factory(CLAP_PLUGIN_FACTORY_ID));
 
 	m_pluginCount = m_factory->get_plugin_count(m_factory);
-	if (ClapManager::kDebug)
-		qDebug() << "plugin count:" << m_pluginCount;
-	if (m_pluginCount <= 0)
-		return false;
+	if (ClapManager::s_debug) { qDebug() << "plugin count:" << m_pluginCount; }
+	if (m_pluginCount <= 0) { return false; }
 
 	m_pluginInfo.clear();
 	for (uint32_t i = 0; i < m_pluginCount; ++i)
@@ -152,8 +120,7 @@ void ClapFile::unload()
 void ClapFile::purgeInvalidPlugins()
 {
 	m_pluginInfo.erase(std::remove_if(
-		m_pluginInfo.begin(), m_pluginInfo.end(),
-		[](auto& pi){
+		m_pluginInfo.begin(), m_pluginInfo.end(), [](const auto& pi) {
 			return !pi || !pi->isValid();
 		})
 	);
@@ -182,7 +149,7 @@ ClapPluginInfo::ClapPluginInfo(const clap_plugin_factory* factory, uint32_t inde
 		return;
 	}
 
-	if (ClapManager::kDebug)
+	if (ClapManager::s_debug)
 	{
 		qDebug().nospace() << "CLAP version: "
 			<< m_descriptor->clap_version.major << "."
@@ -193,12 +160,12 @@ ClapPluginInfo::ClapPluginInfo(const clap_plugin_factory* factory, uint32_t inde
 	if (!clap_version_is_compatible(m_descriptor->clap_version))
 	{
 		qWarning() << "Incompatible CLAP version: Plugin is: " << m_descriptor->clap_version.major << "."
-					<< m_descriptor->clap_version.minor << "." << m_descriptor->clap_version.revision << " Host is "
-					<< CLAP_VERSION.major << "." << CLAP_VERSION.minor << "." << CLAP_VERSION.revision;
+			<< m_descriptor->clap_version.minor << "." << m_descriptor->clap_version.revision << " Host is "
+			<< CLAP_VERSION.major << "." << CLAP_VERSION.minor << "." << CLAP_VERSION.revision;
 		return;
 	}
 
-	if (ClapManager::kDebug)
+	if (ClapManager::s_debug)
 	{
 		qDebug() << "name:" << m_descriptor->name;
 		qDebug() << "description:" << m_descriptor->description;
@@ -208,22 +175,27 @@ ClapPluginInfo::ClapPluginInfo(const clap_plugin_factory* factory, uint32_t inde
 	auto features = m_descriptor->features;
 	while (features && *features)
 	{
-		std::string_view feature = *features;
-		if (ClapManager::kDebug)
-			qDebug() << "feature:" << feature.data();
+		auto feature = std::string_view{*features};
+		if (ClapManager::s_debug) { qDebug() << "feature:" << feature.data(); }
 		if (feature == CLAP_PLUGIN_FEATURE_INSTRUMENT)
+		{
 			m_type = Plugin::Type::Instrument;
+		}
 		else if (feature == CLAP_PLUGIN_FEATURE_AUDIO_EFFECT
-				|| feature == "effect" /* non-standard, but used by Surge XT Effects */)
+			|| feature == "effect" /* non-standard, but used by Surge XT Effects */)
+		{
 			m_type = Plugin::Type::Effect;
-		else if (feature == CLAP_PLUGIN_FEATURE_ANALYZER)
+		}
+		/*else if (feature == CLAP_PLUGIN_FEATURE_ANALYZER)
+		{
 			m_type = Plugin::Type::Tool;
+		}*/
 		++features;
 	}
 
 	if (m_type == Plugin::Type::Undefined)
 	{
-		qWarning() << "CLAP plugin is not recognized as an instrument, effect, or tool";
+		qWarning() << "CLAP plugin is not recognized as an instrument or audio effect";
 		return;
 	}
 

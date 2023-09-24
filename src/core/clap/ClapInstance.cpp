@@ -108,7 +108,7 @@ namespace
 ////////////////////////////////
 
 ClapInstance::ClapInstance(const ClapPluginInfo* pluginInfo, Model* parent)
-	: LinkedModelGroup(parent), m_pluginInfo(pluginInfo)
+	: LinkedModelGroup{parent}, m_pluginInfo{pluginInfo}
 {
 	m_pluginState = PluginState::None;
 	setHost();
@@ -277,6 +277,8 @@ auto ClapInstance::pluginLoad() -> bool
 auto ClapInstance::pluginUnload() -> bool
 {
 	qDebug() << "Unloading plugin instance:" << m_pluginInfo->getDescriptor()->name;
+	assert(isMainThread());
+
 	pluginDeactivate();
 
 	if (m_plugin)
@@ -297,6 +299,8 @@ auto ClapInstance::pluginUnload() -> bool
 auto ClapInstance::pluginInit() -> bool
 {
 	qDebug() << "ClapInstance::pluginInit()";
+	assert(isMainThread());
+
 	if (isPluginErrorState()) { return false; }
 	checkPluginStateCurrent(PluginState::Loaded);
 	checkPluginStateNext(PluginState::Inactive); // success
@@ -362,11 +366,14 @@ auto ClapInstance::pluginInit() -> bool
 			qDebug() << "Output ports:" << portCount;
 		}
 
-		clap_id monoPort = CLAP_INVALID_ID, stereoPort = CLAP_INVALID_ID;
+		clap_id monoPort = CLAP_INVALID_ID;
+		clap_id stereoPort = CLAP_INVALID_ID;
 		//clap_id mainPort = CLAP_INVALID_ID;
 		for (uint32_t idx = 0; idx < portCount; ++idx)
 		{
 			clap_audio_port_info info{};
+			info.id = CLAP_INVALID_ID;
+			info.in_place_pair = CLAP_INVALID_ID;
 			if (!m_pluginExtAudioPorts->get(m_plugin, idx, is_input, &info))
 			{
 				qWarning() << "Unknown error calling m_pluginExtAudioPorts->get(...)";
@@ -374,16 +381,9 @@ auto ClapInstance::pluginInit() -> bool
 				return nullptr;
 			}
 
-			std::string_view portType;
-			if (info.port_type)
-				portType = info.port_type;
-
 			qDebug() << "- port id:" << info.id;
 			qDebug() << "- port name:" << info.name;
 			qDebug() << "- port flags:" << info.flags;
-			qDebug() << "- port channel_count:" << info.channel_count;
-			qDebug() << "- port type:" << portType.data();
-			qDebug() << "- port in place pair:" << info.in_place_pair;
 
 			if (idx == 0 && !(info.flags & CLAP_AUDIO_PORT_IS_MAIN))
 			{
@@ -393,10 +393,13 @@ auto ClapInstance::pluginInit() -> bool
 			//if (info.flags & CLAP_AUDIO_PORT_IS_MAIN)
 			//	mainPort = idx;
 
-			AudioPortType type = AudioPortType::Unsupported;
+			qDebug() << "- port channel_count:" << info.channel_count;
 
+			auto type = AudioPortType::Unsupported;
 			if (info.port_type)
 			{
+				auto portType = std::string_view{info.port_type};
+				qDebug() << "- port type:" << portType.data();
 				if (portType == CLAP_PORT_MONO)
 				{
 					assert(info.channel_count == 1);
@@ -413,6 +416,7 @@ auto ClapInstance::pluginInit() -> bool
 			}
 			else
 			{
+				qDebug() << "- port type: (nullptr)";
 				if (info.channel_count == 1)
 				{
 					type = AudioPortType::Mono;
@@ -424,6 +428,8 @@ auto ClapInstance::pluginInit() -> bool
 					if (stereoPort == CLAP_INVALID_ID) { stereoPort = idx; }
 				}
 			}
+
+			qDebug() << "- port in place pair:" << info.in_place_pair;
 
 			audioPorts.emplace_back(AudioPort{info, idx, is_input, type, false});
 		}
@@ -564,8 +570,6 @@ auto ClapInstance::pluginInit() -> bool
 auto ClapInstance::pluginActivate() -> bool
 {
 	qDebug() << "ClapInstance::pluginActivate()";
-
-	// Must be on main thread
 	assert(isMainThread());
 
 	if (isPluginErrorState()) { return false; }
@@ -594,17 +598,7 @@ auto ClapInstance::pluginDeactivate() -> bool
 	assert(isMainThread());
 	if (!isPluginActive()) { return false; }
 
-	// TODO: May cause hang
-	/*
-	while (isPluginProcessing() || isPluginSleeping())
-	{
-		m_scheduleDeactivate = true;
-		QThread::msleep(10);
-	}
-	m_scheduleDeactivate = false;
-	*/
-
-	m_plugin->deactivate(m_plugin); // TODO: Not audio thread!!!
+	m_plugin->deactivate(m_plugin);
 	setPluginState(PluginState::Inactive);
 	qDebug() << "ClapInstance::pluginDeactivate end";
 	return true;
@@ -643,7 +637,7 @@ auto ClapInstance::pluginProcess(uint32_t frames) -> bool
 	// We can't process a plugin which failed to start processing
 	if (m_pluginState == PluginState::ActiveWithError) { return false; }
 
-	m_process.transport = nullptr;
+	m_process.transport = nullptr; // TODO
 
 	m_process.in_events = m_evIn.clapInputEvents();
 	m_process.out_events = m_evOut.clapOutputEvents();
@@ -1016,10 +1010,11 @@ auto ClapInstance::fromHost(const clap_host* host) -> ClapInstance*
 auto ClapInstance::hostGetExtension(const clap_host* host, const char* extensionId) -> const void*
 {
 	[[maybe_unused]] auto h = fromHost(host);
+	if (!extensionId) { return nullptr; }
 
-	if (ClapManager::kDebug) { qDebug() << "--Plugin requested host extension:" << extensionId; }
+	if (ClapManager::s_debug) { qDebug() << "--Plugin requested host extension:" << extensionId; }
 
-	const std::string_view extensionIdView = extensionId;
+	const auto extensionIdView = std::string_view{extensionId};
 	if (extensionIdView == CLAP_EXT_LOG) { return &m_hostExtLog; }
 	if (extensionIdView == CLAP_EXT_THREAD_CHECK) { return &m_hostExtThreadCheck; }
 	if (extensionIdView == CLAP_EXT_PARAMS) { return &m_hostExtParams; }
@@ -1070,10 +1065,10 @@ void ClapInstance::hostExtLogLog(const clap_host_t* host, clap_log_severity seve
 	switch (severity)
 	{
 	case CLAP_LOG_DEBUG:
-		if (!ClapManager::kDebug) { return; }
+		if (!ClapManager::s_debug) { return; }
 		severityStr = "DEBUG"; break;
 	case CLAP_LOG_INFO:
-		if (!ClapManager::kDebug) { return; }
+		if (!ClapManager::s_debug) { return; }
 		severityStr = "INFO"; break;
 	case CLAP_LOG_WARNING:
 		severityStr = "WARNING"; break;
@@ -1124,19 +1119,19 @@ void ClapInstance::hostExtParamsRescan(const clap_host* host, uint32_t flags)
 
 	for (int32_t i = 0; i < count; ++i)
 	{
-		clap_param_info info;
+		clap_param_info info{};
+		info.id = CLAP_INVALID_ID;
+
 		if (!h->m_pluginExtParams->get_info(h->m_plugin, i, &info))
 		{
-			throw std::logic_error{"clap_plugin_params.get_info did return false!"};
+			throw std::logic_error{"clap_plugin_params.get_info returned false!"};
 		}
 
 		if (info.id == CLAP_INVALID_ID)
 		{
-			std::ostringstream msg;
-			msg << "clap_plugin_params.get_info() reported a parameter with id = CLAP_INVALID_ID"
-				<< std::endl
-				<< " 2. name: " << info.name << ", module: " << info.module << std::endl;
-			throw std::logic_error{msg.str()};
+			std::string msg = "clap_plugin_params.get_info() reported a parameter with id = CLAP_INVALID_ID\n"
+				" 2. name: " + std::string{info.name} + ", module: " + std::string{info.module};
+			throw std::logic_error{msg};
 		}
 
 		auto it = h->m_paramMap.find(info.id);
@@ -1145,13 +1140,10 @@ void ClapInstance::hostExtParamsRescan(const clap_host* host, uint32_t flags)
 		if (paramIds.count(info.id) > 0)
 		{
 			assert(it != h->m_paramMap.end());
-
-			std::ostringstream msg;
-			msg << "the parameter with id: " << info.id << " was declared twice." << std::endl
-				<< " 1. name: " << it->second->info().name << ", module: " << it->second->info().module
-				<< std::endl
-				<< " 2. name: " << info.name << ", module: " << info.module << std::endl;
-			throw std::logic_error{msg.str()};
+			std::string msg = "the parameter with id: " + std::to_string(info.id) + " was declared twice.\n"
+				" 1. name: " + std::string{it->second->info().name} + ", module: " + std::string{it->second->info().module} + "\n"
+				" 2. name: " + std::string{info.name} + ", module: " + std::string{info.module};
+			throw std::logic_error{msg};
 		}
 		paramIds.insert(info.id);
 
@@ -1159,11 +1151,9 @@ void ClapInstance::hostExtParamsRescan(const clap_host* host, uint32_t flags)
 		{
 			if (!(flags & CLAP_PARAM_RESCAN_ALL))
 			{
-				std::ostringstream msg;
-				msg << "a new parameter was declared, but the flag CLAP_PARAM_RESCAN_ALL was not "
-					"specified; id: "
-					<< info.id << ", name: " << info.name << ", module: " << info.module << std::endl;
-				throw std::logic_error{msg.str()};
+				std::string msg = "a new parameter was declared, but the flag CLAP_PARAM_RESCAN_ALL was not specified; "
+					"id: " + std::to_string(info.id) + ", name: " + std::string{info.name} + ", module: " + std::string{info.module};
+				throw std::logic_error{msg};
 			}
 
 			double value = h->getParamValue(info);
@@ -1179,22 +1169,16 @@ void ClapInstance::hostExtParamsRescan(const clap_host* host, uint32_t flags)
 			{
 				if (!clapParamsRescanMayInfoChange(flags))
 				{
-					std::ostringstream msg;
-					msg << "a parameter's info did change, but the flag CLAP_PARAM_RESCAN_INFO "
-						"was not specified; id: "
-						<< info.id << ", name: " << info.name << ", module: " << info.module
-						<< std::endl;
-					throw std::logic_error{msg.str()};
+					std::string msg = "a parameter's info did change, but the flag CLAP_PARAM_RESCAN_INFO was not specified; "
+						"id: " + std::to_string(info.id) + ", name: " + std::string{info.name} + ", module: " + std::string{info.module};
+					throw std::logic_error{msg};
 				}
 
 				if (!(flags & CLAP_PARAM_RESCAN_ALL) && !it->second->isInfoCriticallyDifferentTo(info))
 				{
-					std::ostringstream msg;
-					msg << "a parameter's info has critical changes, but the flag CLAP_PARAM_RESCAN_ALL "
-							"was not specified; id: "
-						<< info.id << ", name: " << info.name << ", module: " << info.module
-						<< std::endl;
-					throw std::logic_error{msg.str()};
+					std::string msg = "a parameter's info has critical changes, but the flag CLAP_PARAM_RESCAN_ALL was not specified; "
+						"id: " + std::to_string(info.id) + ", name: " + std::string{info.name} + ", module: " + std::string{info.module};
+					throw std::logic_error{msg};
 				}
 
 				it->second->setInfo(info);
@@ -1205,12 +1189,9 @@ void ClapInstance::hostExtParamsRescan(const clap_host* host, uint32_t flags)
 			{
 				if (!clapParamsRescanMayValueChange(flags))
 				{
-					std::ostringstream msg;
-					msg << "a parameter's value did change but, but the flag CLAP_PARAM_RESCAN_VALUES "
-						"was not specified; id: "
-						<< info.id << ", name: " << info.name << ", module: " << info.module
-						<< std::endl;
-					throw std::logic_error{msg.str()};
+					std::string msg = "a parameter's value did change but, but the flag CLAP_PARAM_RESCAN_VALUES was not specified; "
+						"id: " + std::to_string(info.id) + ", name: " + std::string{info.name} + ", module: " + std::string{info.module};
+					throw std::logic_error{msg};
 				}
 
 				// Update param value
@@ -1228,12 +1209,9 @@ void ClapInstance::hostExtParamsRescan(const clap_host* host, uint32_t flags)
 		{
 			if (!(flags & CLAP_PARAM_RESCAN_ALL))
 			{
-				std::ostringstream msg;
-				auto& info = it->second->info();
-				msg << "a parameter was removed, but the flag CLAP_PARAM_RESCAN_ALL was not "
-					"specified; id: "
-					<< info.id << ", name: " << info.name << ", module: " << info.module << std::endl;
-				throw std::logic_error{msg.str()};
+				std::string msg = "a parameter was removed, but the flag CLAP_PARAM_RESCAN_ALL was not specified; "
+					"id: " + std::to_string(info.id) + ", name: " + std::string{info.name} + ", module: " + std::string{info.module};
+				throw std::logic_error{msg};
 			}
 			it = h->m_paramMap.erase(it);
 			needToUpdateParamsCache = true;
@@ -1336,17 +1314,17 @@ auto ClapInstance::getParamValue(const clap_param_info& info) const -> double
 
 	if (!canUsePluginParams()) { return 0.0; }
 
-	double value;
+	double value = 0.0;
 	if (m_pluginExtParams->get_value(m_plugin, info.id, &value)) { return value; }
 
-	std::ostringstream msg;
-	msg << "failed to get the param value, id: " << info.id << ", name: " << info.name
-		<< ", module: " << info.module;
-	throw std::logic_error{msg.str()};
+	std::string msg = "failed to get the param value, id: " + std::to_string(info.id)
+		+ ", name: " + std::string{info.name} + ", module: " + std::string{info.module};
+	throw std::logic_error{msg};
 }
 
 auto ClapInstance::getParamValueText(const ClapParam* param) const -> std::string
 {
+	assert(param != nullptr);
 	return param->getValueText(m_plugin, m_pluginExtParams);
 }
 

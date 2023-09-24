@@ -82,7 +82,7 @@ public:
 
 	static auto getClapGuiApi() -> const char*;
 
-	static bool kDebug; //!< If LMMS_CLAP_DEBUG is set, debug output will be printed
+	static bool s_debug; //!< If LMMS_CLAP_DEBUG is set, debug output will be printed
 
 private:
 

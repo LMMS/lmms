@@ -51,11 +51,11 @@ class ClapFile
 {
 public:
 	//! Loads .clap file and plugin info
-	ClapFile(const ClapManager* manager, std::filesystem::path&& filename);
+	ClapFile(const ClapManager* manager, std::filesystem::path filename);
 	ClapFile(const ClapFile&) = delete;
-	ClapFile(ClapFile&& other) noexcept;
+	ClapFile(ClapFile&& other) noexcept = default;
 	ClapFile& operator=(const ClapFile&) = delete;
-	ClapFile& operator=(ClapFile&& rhs) noexcept;
+	ClapFile& operator=(ClapFile&& rhs) noexcept = default;
 	~ClapFile();
 
 	//! Represents a CLAP plugin within a .clap file

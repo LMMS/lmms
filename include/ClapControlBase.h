@@ -47,36 +47,14 @@ class ClapProc;
 class PluginIssue;
 
 /**
-	Common base class for Lv2 plugins
-
-	This class contains a vector of Lv2Proc, usually 1 (for stereo plugins) or
-	2 (for mono plugins). Most of the logic is done there, this class primarily
-	forwards work to the Lv2Proc and collects the results.
-
-	This class provides everything Lv2 plugins have in common. It's not
-	named Lv2Plugin, because
-	* it does not inherit Instrument
-	* the Plugin subclass Effect does not inherit this class
-
-	This class would usually be a Model subclass. However, Qt doesn't allow
-	this:
-	* inheriting only from Model will cause diamond inheritance for QObject,
-	  which will cause errors with Q_OBJECT
-	* making this a direct subclass of Instrument resp. EffectControls would
-	  require CRTP, which would make this class a template class, which would
-	  conflict with Q_OBJECT
-
-	The consequence is that this class can neither inherit QObject or Model, nor
-	Instrument or EffectControls, which means in fact:
-	* this class contains no signals or slots, but it offers stubs for slots
-	  that shall be called by child classes
-	* this class can not override virtuals of Instrument or EffectControls, so
-	  it will offer functions that must be called by virtuals in its child class
-*/
+ * Common base class for CLAP plugins.
+ * The design of this class is based on Lv2ControlBase by Johannes Lorenz.
+ * See Lv2ControlBase for more information.
+ */
 class LMMS_EXPORT ClapControlBase : public LinkedModelGroups
 {
 public:
-	const ClapPluginInfo* getPluginInfo() const { return m_info; }
+	const ClapPluginInfo* pluginInfo() const { return m_info; }
 
 	ClapInstance* control(std::size_t idx) { return m_instances[idx].get(); }
 	const ClapInstance* control(std::size_t idx) const { return m_instances[idx].get(); }
@@ -104,14 +82,14 @@ protected:
 	void reload();
 
 	/*
-		overrides
-	*/
+	 * overrides
+	 */
 	auto getGroup(std::size_t idx) -> LinkedModelGroup* override;
 	auto getGroup(std::size_t idx) const -> const LinkedModelGroup* override;
 
 	/*
-		utils for the run thread
-	*/
+	 * utils for the run thread
+	 */
 	//! Copy values from the LMMS core (connected models, MIDI events, ...) into
 	//! the respective ports
 	void copyModelsFromLmms();
@@ -126,15 +104,15 @@ protected:
 	void run(fpp_t frames);
 
 	/*
-		load/save, must be called from virtuals
-	*/
+	 * load/save, must be called from virtuals
+	 */
 	void saveSettings(QDomDocument& doc, QDomElement& that);
 	void loadSettings(const QDomElement& that);
 	void loadFile(const QString& file);
 
 	/*
-		more functions that must be called from virtuals
-	*/
+	 * more functions that must be called from virtuals
+	 */
 	auto controlCount() const -> std::size_t;
 	auto nodeName() const -> QString { return "clapcontrols"; }
 	auto hasNoteInput() const -> bool;
