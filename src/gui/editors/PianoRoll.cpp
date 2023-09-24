@@ -1933,14 +1933,9 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 				Engine::getSong()->setModified();
 			}
-			else if(me->button() == Qt::LeftButton &&
-							m_editMode == EditMode::Draw)
-			{
-				//unselect when clicing off selection	
-				clearSelectedNotes();
-			}
-			else if( ( me->buttons() == Qt::RightButton &&
-							m_editMode == EditMode::Draw ) ||
+			else if ((me->buttons() == Qt::RightButton &&
+							m_editMode == EditMode::Draw &&
+							(!isSelection() || it != notes.begin()-1)) ||
 					m_editMode == EditMode::Erase )
 			{
 				// erase single note
@@ -1951,6 +1946,14 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					m_midiClip->removeNote( *it );
 					Engine::getSong()->setModified();
 				}
+			}
+			else if ((me->button() == Qt::RightButton &&
+							m_editMode == EditMode::Draw) ||
+					(me->button() == Qt::LeftButton &&
+							m_editMode == EditMode::Draw))
+			{
+				//unselect when clicing off selection	
+				clearSelectedNotes();
 			}
 			else if( me->button() == Qt::LeftButton &&
 							m_editMode == EditMode::Select )
