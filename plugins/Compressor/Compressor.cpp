@@ -177,7 +177,8 @@ void CompressorEffect::calcRange()
 
 void CompressorEffect::resizeRMS()
 {
-	m_rmsTimeConst = exp(-1.f / (m_compressorControls.m_rmsModel.value() * 0.001f * m_sampleRate));
+	const float rmsValue = m_compressorControls.m_rmsModel.value();
+	m_rmsTimeConst = (rmsValue > 0) ? exp(-1.f / (rmsValue * 0.001f * m_sampleRate)) : 0;
 }
 
 void CompressorEffect::calcLookaheadLength()
