@@ -25,7 +25,6 @@
 	02111-1307, USA or point your web browser to http://www.gnu.org.
 */
 
-#include "../basics.h"
 
 #ifndef _DSP_SINE_H_
 #define _DSP_SINE_H_
