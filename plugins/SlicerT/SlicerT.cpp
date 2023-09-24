@@ -22,7 +22,8 @@
  *
  */
 
-// TODO: better onset detection + bpm cleanup
+// TODO: fix some PV bugs
+// TODO: onset detection find valleys
 // TODO: switch to arrayVector (maybe)
 // TODO: cleaunp UI classes
 // TODO: add text when no sample loaded
@@ -269,7 +270,7 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 
 SlicerT::SlicerT(InstrumentTrack * instrumentTrack) :
 	Instrument( instrumentTrack, &slicert_plugin_descriptor ),
-	m_noteThreshold(0.6f, 0.0f, 2.0f, 0.01f, this, tr( "Note threshold" ) ),
+	m_noteThreshold(0.3f, 0.0f, 2.0f, 0.01f, this, tr( "Note threshold" ) ),
 	m_fadeOutFrames(400.0f, 0.0f, 8192.0f, 1.0f, this, tr("FadeOut")),
 	m_originalBPM(1, 1, 999, this, tr("Original bpm")),
 	m_originalSample(),
@@ -340,41 +341,58 @@ void SlicerT::playNote( NotePlayHandle * handle, sampleFrame * workingBuffer )
 	}
 }
 
-
+// uses the spectral flux to determine the change in magnitude
+// resources:
+// http://www.iro.umontreal.ca/~pift6080/H09/documents/papers/bello_onset_tutorial.pdf
 void SlicerT::findSlices()
 {
 	if (m_originalSample.frames() < 2048) { return; }
 	m_slicePoints = {};
+	const int windowSize = 1024;
+	const int minDist = 2048;
 
-	const int window = 1024;
-	int minWindowsPassed = 1;
-	int peakIndex = 0;
+	std::vector<float> leftChannel(m_originalSample.frames(), 0);
 
-	float lastPeak = 0;
-	float currentPeak = 0;
-
-	for (int i = 0; i<m_originalSample.frames();i+=1)
-	{
-		float sampleValue = abs(m_originalSample.data()[i][0]) + abs(m_originalSample.data()[i][1]) / 2;
-
-		if (sampleValue > currentPeak)
-		{
-			currentPeak = sampleValue;
-			peakIndex = i;
-		}
-
-		if (i%window==0)
-		{
-			if (abs(currentPeak / lastPeak) > 1+m_noteThreshold.value() && minWindowsPassed <= 0)
-			{
-				m_slicePoints.push_back(std::max(0, peakIndex-window/2)); // slight offset
-				minWindowsPassed = 2; // wait at least one window for a new note
-			}
-			lastPeak = currentPeak;
-			currentPeak = 0;
-			minWindowsPassed--;
-		}
+	for (int i = 0;i<m_originalSample.frames();i++) {
+		leftChannel[i] = m_originalSample.data()[i][0];
 	}
+
+	std::vector<float> prevMags(windowSize, 0);
+	std::vector<float> fftIn(windowSize, 0);
+	fftwf_complex fftOut[windowSize];
+
+	fftwf_plan fftPlan = fftwf_plan_dft_r2c_1d(windowSize, fftIn.data(), fftOut, FFTW_MEASURE);
+
+	int lastPoint = -minDist - 1;
+	float spectralFlux = 0;
+	float prevFlux = 0;
+	float real, imag, magnitude, diff;
+
+	for (int i = 0;i<leftChannel.size()-windowSize;i+=windowSize) {
+		memcpy(fftIn.data(), leftChannel.data() + i, windowSize*sizeof(float));
+		fftwf_execute(fftPlan);
+
+		for (int j = 0;j<windowSize/2;j++) { // only use niquistic frequencies
+			real = fftOut[j][0];
+			imag = fftOut[j][1];
+			magnitude = sqrt(real*real + imag*imag);
+
+			diff = sqrt(pow(magnitude - prevMags[j], 2));
+			spectralFlux += diff;
+
+			prevMags[j] = magnitude;
+		}
+
+		if (spectralFlux / prevFlux > 1.0f+m_noteThreshold.value() && i - lastPoint > minDist) {
+			m_slicePoints.push_back(i);
+			lastPoint = i;
+		}
+
+		prevFlux = spectralFlux;
+		spectralFlux = 0;
+
+	}
+
 	m_slicePoints.push_back(m_originalSample.frames());
 
 	emit dataChanged();
@@ -434,9 +452,11 @@ void SlicerT::writeToMidi(std::vector<Note> * outClip)
 	float barsInSample = beats / Engine::getSong()->getTimeSigModel().getDenominator();
 	float totalTicks = ticksPerBar * barsInSample;
 
+	float lastEnd = 0;
+
 	for (int i = 0;i<m_slicePoints.size()-1;i++)
 	{
-		float sliceStart = (float)m_slicePoints[i] / m_originalSample.frames() * totalTicks;
+		float sliceStart = lastEnd;
 		float sliceEnd = (float)m_slicePoints[i + 1] / m_originalSample.frames() * totalTicks;
 
 		Note sliceNote = Note();
@@ -444,6 +464,8 @@ void SlicerT::writeToMidi(std::vector<Note> * outClip)
 		sliceNote.setPos(sliceStart);
 		sliceNote.setLength(sliceEnd - sliceStart);
 		outClip->push_back(sliceNote);
+
+		lastEnd = sliceEnd;
 	}
 }
 
