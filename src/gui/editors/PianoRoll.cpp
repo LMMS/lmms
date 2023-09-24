@@ -1631,7 +1631,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 {
 	m_startedWithShift = me->modifiers() & Qt::ShiftModifier;
 
-	if( ! hasValidMidiClip() )
+	if (! hasValidMidiClip())
 	{
 		return;
 	}
@@ -1656,7 +1656,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 		return;
 	}
 
-	if( m_editMode == EditMode::Detuning && noteUnderMouse() )
+	if (m_editMode == EditMode::Detuning && noteUnderMouse())
 	{
 		static QPointer<AutomationClip> detuningClip = nullptr;
 		if (detuningClip.data() != nullptr)
@@ -1675,16 +1675,16 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 	}
 
 	// if holding control, go to selection mode unless shift is also pressed
-	if( me->modifiers() & Qt::ControlModifier && m_editMode != EditMode::Select )
+	if (me->modifiers() & Qt::ControlModifier && m_editMode != EditMode::Select)
 	{
 		m_ctrlMode = m_editMode;
 		m_editMode = EditMode::Select;
-		setCursor( Qt::ArrowCursor );
+		setCursor(Qt::ArrowCursor);
 		update();
 	}
 
 	// keep track of the point where the user clicked down
-	if( me->button() == Qt::LeftButton )
+	if (me->button() == Qt::LeftButton)
 	{
 		m_moveStartX = me->x();
 		m_moveStartY = me->y();
@@ -1763,8 +1763,11 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				return;
 			}
 			// left button??
-			else if( me->button() == Qt::LeftButton &&
-							m_editMode == EditMode::Draw )
+			// create or play note when not clicking off current
+			// selection
+			else if(me->button() == Qt::LeftButton &&
+							m_editMode == EditMode::Draw &&
+							(!isSelection() || it != notes.begin()-1))
 			{
 				// whether this action creates new note(s) or not
 				bool is_new_note = false;
@@ -1929,6 +1932,12 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				}
 
 				Engine::getSong()->setModified();
+			}
+			else if(me->button() == Qt::LeftButton &&
+							m_editMode == EditMode::Draw)
+			{
+				//unselect when clicing off selection	
+				clearSelectedNotes();
 			}
 			else if( ( me->buttons() == Qt::RightButton &&
 							m_editMode == EditMode::Draw ) ||
