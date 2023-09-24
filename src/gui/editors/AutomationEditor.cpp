@@ -928,14 +928,14 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 			case EditMode::EditTangents:
 			{
 				// If we moved the mouse past the beginning correct the position in ticks
-				posTicks = qMax(posTicks, 0);
+				posTicks = std::max(posTicks, 0);
 
 				if (m_mouseDownLeft)
 				{
 					if (m_action == Action::MoveTangent)
 					{
-						timeMap & tm = m_clip->getTimeMap();
-						timeMap::iterator it = tm.find(m_draggedTangentTick);
+						timeMap& tm = m_clip->getTimeMap();
+						auto it = tm.find(m_draggedTangentTick);
 
 						// Safety check
 						if (it != tm.end())
@@ -1050,7 +1050,7 @@ inline void AutomationEditor::drawAutomationPoint(QPainter & p, timeMap::iterato
 
 
 
-inline void AutomationEditor::drawAutomationTangents(QPainter & p, timeMap::iterator it)
+inline void AutomationEditor::drawAutomationTangents(QPainter& p, timeMap::iterator it)
 {
 	int x = xCoordOfTick(POS(it));
 	int y, tx, ty;
@@ -2002,12 +2002,12 @@ AutomationEditor::timeMap::iterator AutomationEditor::getClosestNode(int x)
 	int posTicks = (x * TimePos::ticksPerBar() / m_ppb) + m_currentPosition;
 
 	// Get our pattern timeMap and create a iterator so we can check the nodes
-	timeMap & tm = m_clip->getTimeMap();
+	timeMap& tm = m_clip->getTimeMap();
 
 	if (tm.isEmpty()) { return tm.end(); }
 
 	// Get the node with an equal or higher position
-	timeMap::iterator it = tm.lowerBound(posTicks);
+	auto it = tm.lowerBound(posTicks);
 
 	// If there are no nodes equal or higher than the position return
 	// the one before it
@@ -2242,6 +2242,7 @@ void AutomationEditorWindow::setCurrentClip(AutomationClip* clip)
 		connect(m_flipYAction, SIGNAL(triggered()), clip, SLOT(flipY()));
 	}
 
+	updateEditTanButton();
 	emit currentClipChanged();
 }
 
@@ -2332,16 +2333,27 @@ void AutomationEditorWindow::updateWindowTitle()
 
 /**
  * @brief This method handles the AutomationEditorWindow event of changing
- * progression types. The Edit Tangent edit mode should only be available for
- * Cubic Hermite progressions, so this method is responsable for disabling it
- * for other edit modes and reenabling it when it changes back to the Edit Tangent
- * mode. After that, it calls the AutomationEditor::setProgressionType method so
- * it can handle the rest.
+ * progression types. After that, it calls updateEditTanButton so the edit
+ * tangents button is updated accordingly
  * @param Int New progression type
  */
 void AutomationEditorWindow::setProgressionType(int progType)
 {
-	if (!AutomationClip::supportsTangentEditing(static_cast<AutomationClip::ProgressionType>(progType)))
+	m_editor->setProgressionType(progType);
+	updateEditTanButton();
+}
+
+/**
+ * @brief The Edit Tangent edit mode should only be available for
+ * Cubic Hermite progressions, so this method is responsable for disabling it
+ * for other edit modes and reenabling it when it changes back to the Edit Tangent
+ * mode.
+ */
+void AutomationEditorWindow::updateEditTanButton()
+{
+	auto progType = currentClip()->progressionType();
+
+	if (!AutomationClip::supportsTangentEditing(progType))
 	{
 		if (m_editTanAction->isChecked()) { m_drawAction->trigger(); }
 		if (m_editTanAction->isEnabled()) { m_editTanAction->setEnabled(false); }
@@ -2350,7 +2362,6 @@ void AutomationEditorWindow::setProgressionType(int progType)
 	{
 		if (m_editTanAction->isEnabled() == false) { m_editTanAction->setEnabled(true); }
 	}
-	m_editor->setProgressionType(progType);
 }
 
 } // namespace lmms::gui

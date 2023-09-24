@@ -300,6 +300,7 @@ protected slots:
 private slots:
 	void updateWindowTitle();
 	void setProgressionType(int progType);
+	void updateEditTanButton();
 
 private:
 	QAction* m_drawAction;
