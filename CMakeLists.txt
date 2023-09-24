@@ -281,6 +281,11 @@ ELSE(WANT_CMT)
 ENDIF(WANT_CMT)
 
 IF(WANT_SWH)
+	IF(LMMS_BUILD_APPLE)
+		# Prefer system perl over Homebrew, MacPorts, etc
+		SET(Perl_ROOT "/usr/bin")
+	ENDIF()
+	FIND_PACKAGE(Perl)
 	IF(PERL_FOUND)
 		SET(LMMS_HAVE_SWH TRUE)
 		SET(STATUS_SWH "OK")

@@ -38,7 +38,10 @@ SET(INLINE_FLAGS "")
 IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	SET(INLINE_FLAGS -finline-functions-called-once -finline-limit=80)
 ENDIF()
-target_compile_options(veal PRIVATE -fexceptions -O2 -finline-functions ${INLINE_FLAGS})
+
+IF(NOT MSVC)
+	target_compile_options(veal PRIVATE -fexceptions -O2 -finline-functions ${INLINE_FLAGS})
+endif()
 
 if(LMMS_BUILD_WIN32)
 	add_custom_command(
