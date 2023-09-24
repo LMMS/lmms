@@ -1949,7 +1949,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 			}
 			else if ((me->button() == Qt::RightButton &&
 							m_editMode == EditMode::Draw) ||
-					(me->button() == Qt::LeftButton &&
+							(me->button() == Qt::LeftButton &&
 							m_editMode == EditMode::Draw))
 			{
 				//unselect when clicing off selection	
