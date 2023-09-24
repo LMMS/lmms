@@ -52,35 +52,46 @@ ClapParam::ClapParam(ClapInstance* pluginHost, const clap_param_info& info, doub
 		|| flags & CLAP_PARAM_IS_READONLY
 		|| flags & CLAP_PARAM_IS_BYPASS /* TODO */) { return; }
 
+	if (m_info.min_value > m_info.max_value)
+	{
+		throw std::logic_error{"PARAMS: Error: min value > max value"};
+	}
+
+	if (m_info.default_value > m_info.max_value || m_info.default_value < m_info.min_value)
+	{
+		throw std::logic_error{"PARAMS: Error: default value is out of range"};
+	}
+
+	if (value > m_info.max_value || value < m_info.min_value)
+	{
+		throw std::logic_error{"PARAMS: Error: value is out of range"};
+	}
+
 	auto displayName = QString::fromUtf8(getDisplayName().data());
 
 	// TODO: CLAP_PARAM_IS_BYPASS
 	if (flags & CLAP_PARAM_IS_STEPPED)
 	{
 		const auto minVal = static_cast<int>(m_info.min_value);
+		const auto valueInt = static_cast<int>(value);
 		const auto maxVal = static_cast<int>(m_info.max_value);
 
 		if (minVal == 0 && maxVal == 1)
 		{
 			qDebug() << "PARAMS: Creating BoolModel";
+			m_connectedModel = std::make_unique<BoolModel>(valueInt, pluginHost, displayName);
 			m_valueType = ParamType::Bool;
-			m_connectedModel = std::make_unique<BoolModel>(
-				static_cast<int>(m_info.default_value),
-				pluginHost, displayName);
 		}
 		else
 		{
 			qDebug() << "PARAMS: Creating IntModel";
+			m_connectedModel = std::make_unique<IntModel>(valueInt, minVal, maxVal, pluginHost, displayName);
 			m_valueType = ParamType::Integer;
-			m_connectedModel = std::make_unique<IntModel>(
-				static_cast<int>(m_info.default_value),
-				minVal, maxVal, pluginHost, displayName);
 		}
 	}
 	else
 	{
 		qDebug() << "PARAMS: Creating FloatModel";
-		m_valueType = ParamType::Float;
 
 		// Allow ~1000 steps
 		double stepSize = (m_info.max_value - m_info.min_value) / 1000.0f;
@@ -91,11 +102,13 @@ ClapParam::ClapParam(ClapInstance* pluginHost, const clap_param_info& info, doub
 		stepSize = std::max(stepSize, minStep);
 
 		m_connectedModel = std::make_unique<FloatModel>(
-			static_cast<float>(m_info.default_value),
+			static_cast<float>(value),
 			static_cast<float>(m_info.min_value),
 			static_cast<float>(m_info.max_value),
 			static_cast<float>(stepSize),
 			pluginHost, displayName);
+
+		m_valueType = ParamType::Float;
 	}
 }
 
