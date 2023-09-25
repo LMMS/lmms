@@ -41,6 +41,7 @@ ClapParam::ClapParam(ClapInstance* pluginHost, const clap_param_info& info, doub
 {
 	qDebug() << "ClapParam::ClapParam";
 	const auto flags = m_info.flags;
+	// Assume ClapParam::check() has already been called at this point
 
 	m_id = "p" + std::to_string(m_info.id);
 	m_displayName = m_info.name;
@@ -52,19 +53,10 @@ ClapParam::ClapParam(ClapInstance* pluginHost, const clap_param_info& info, doub
 		|| flags & CLAP_PARAM_IS_READONLY
 		|| flags & CLAP_PARAM_IS_BYPASS /* TODO */) { return; }
 
-	if (m_info.min_value > m_info.max_value)
-	{
-		throw std::logic_error{"PARAMS: Error: min value > max value"};
-	}
-
-	if (m_info.default_value > m_info.max_value || m_info.default_value < m_info.min_value)
-	{
-		throw std::logic_error{"PARAMS: Error: default value is out of range"};
-	}
-
 	if (value > m_info.max_value || value < m_info.min_value)
 	{
-		throw std::logic_error{"PARAMS: Error: value is out of range"};
+		throw std::logic_error{"CLAP param: Error: value is out of range"};
+		//value = std::clamp(value, m_info.min_value, m_info.max_value);
 	}
 
 	auto name = QString::fromUtf8(displayName().data());
@@ -78,20 +70,20 @@ ClapParam::ClapParam(ClapInstance* pluginHost, const clap_param_info& info, doub
 
 		if (minVal == 0 && maxVal == 1)
 		{
-			qDebug() << "PARAMS: Creating BoolModel";
+			qDebug() << "CLAP param: Creating BoolModel";
 			m_connectedModel = std::make_unique<BoolModel>(valueInt, pluginHost, name);
 			m_valueType = ParamType::Bool;
 		}
 		else
 		{
-			qDebug() << "PARAMS: Creating IntModel";
+			qDebug() << "CLAP param: Creating IntModel";
 			m_connectedModel = std::make_unique<IntModel>(valueInt, minVal, maxVal, pluginHost, name);
 			m_valueType = ParamType::Integer;
 		}
 	}
 	else
 	{
-		qDebug() << "PARAMS: Creating FloatModel";
+		qDebug() << "CLAP param: Creating FloatModel";
 
 		// Allow ~1000 steps
 		double stepSize = (m_info.max_value - m_info.min_value) / 1000.0f;
@@ -181,6 +173,24 @@ auto ClapParam::isInfoCriticallyDifferentTo(const clap_param_info& info) const -
 		CLAP_PARAM_IS_READONLY | CLAP_PARAM_REQUIRES_PROCESS;
 	return (m_info.flags & criticalFlags) == (info.flags & criticalFlags)
 		|| m_info.min_value != m_info.min_value || m_info.max_value != m_info.max_value;
+}
+
+void ClapParam::check(clap_param_info& info)
+{
+	if (info.min_value > info.max_value)
+	{
+		throw std::logic_error{"CLAP param: Error: min value > max value"};
+		//qWarning() << "CLAP param: Error: min value > max value";
+	}
+
+	if (info.default_value > info.max_value || info.default_value < info.min_value)
+	{
+		throw std::logic_error{"CLAP param: Error: default value is out of range"};
+		//qDebug() << "CLAP param: Warning: default value is out of range; clamping to valid range";
+		//info.default_value = std::clamp(info.default_value, info.min_value, info.max_value);
+		//return false;
+	}
+	//return true;
 }
 
 } // namespace lmms

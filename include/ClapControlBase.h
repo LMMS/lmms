@@ -42,10 +42,6 @@
 namespace lmms
 {
 
-class ClapInstance;
-class ClapProc;
-class PluginIssue;
-
 /**
  * Common base class for CLAP plugins.
  * The design of this class is based on Lv2ControlBase by Johannes Lorenz.

@@ -533,8 +533,17 @@ auto ClapInstance::pluginInit() -> bool
 
 	if (pluginExtensionInit(m_pluginExtParams, CLAP_EXT_PARAMS))
 	{
-		hostExtParamsRescan(&m_host, CLAP_PARAM_RESCAN_ALL);
-		qDebug() << "PARAMS: m_params.size():" << m_params.size();
+		try
+		{
+			hostExtParamsRescan(&m_host, CLAP_PARAM_RESCAN_ALL);
+		}
+		catch (const std::exception& e)
+		{
+			qWarning() << e.what() << '\n';
+			return false;
+		}
+
+		qDebug() << "CLAP PARAMS: m_params.size():" << m_params.size();
 		for (auto param : m_params)
 		{
 			if (param && param->model())
@@ -1115,7 +1124,7 @@ void ClapInstance::hostExtParamsRescan(const clap_host* host, std::uint32_t flag
 
 	// 2. Scan the params
 	auto count = h->m_pluginExtParams->count(h->m_plugin);
-	qDebug() << "PARAMS: count:" << count;
+	qDebug() << "CLAP PARAMS: count:" << count;
 	std::unordered_set<clap_id> paramIds(count * 2);
 	bool needToUpdateParamsCache = false;
 
@@ -1126,8 +1135,10 @@ void ClapInstance::hostExtParamsRescan(const clap_host* host, std::uint32_t flag
 
 		if (!h->m_pluginExtParams->get_info(h->m_plugin, i, &info))
 		{
-			throw std::logic_error{"clap_plugin_params.get_info returned false!"};
+			throw std::logic_error{"clap_plugin_params.get_info() returned false!"};
 		}
+
+		ClapParam::check(info);
 
 		if (info.id == CLAP_INVALID_ID)
 		{

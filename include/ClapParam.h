@@ -109,6 +109,9 @@ public:
 		emit isBeingAdjustedChanged();
 	}
 
+	//! Checks that the parameter info is valid, throwing exception if not
+	static void check(clap_param_info& info);
+
 signals:
 	void isBeingAdjustedChanged();
 	void infoChanged();
