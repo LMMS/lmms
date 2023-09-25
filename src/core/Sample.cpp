@@ -26,7 +26,6 @@
 
 #include <QPainter>
 #include <QRect>
-#include <cassert>
 #include "ArrayVector.h"
 
 namespace lmms {
@@ -65,7 +64,6 @@ Sample::Sample(std::shared_ptr<const SampleBuffer> buffer)
 	, m_loopStartFrame(0)
 	, m_loopEndFrame(m_buffer->size())
 {
-	assert(buffer != nullptr);
 }
 
 Sample::Sample(const Sample& other)
@@ -116,7 +114,6 @@ auto swap(Sample& first, Sample& second) -> void
 
 bool Sample::play(sampleFrame* dst, PlaybackState* state, int numFrames, float desiredFrequency, Loop loopMode) const
 {
-	assert(m_buffer != nullptr);
 	if (numFrames <= 0 || desiredFrequency <= 0 ||
 		m_buffer->size() <= 0 || m_buffer->sampleRate() <= 0) { return false; }
 
@@ -147,8 +144,6 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, int numFrames, float d
 
 void Sample::visualize(QPainter& p, const QRect& dr, int fromFrame, int toFrame) const
 {
-	assert(m_buffer != nullptr);
-
 	const auto lock = std::shared_lock{m_mutex};
 	const auto numFrames = static_cast<int>(m_buffer->size());
 	if (numFrames == 0) { return; }
@@ -239,7 +234,6 @@ void Sample::visualize(QPainter& p, const QRect& dr, int fromFrame, int toFrame)
 
 auto Sample::sampleDuration() const -> int
 {
-	assert(m_buffer != nullptr);
 	const auto lock = std::shared_lock{m_mutex};
 	if (m_buffer->sampleRate() <= 0) { return 0; }
 	return static_cast<double>(m_endFrame - m_startFrame) / m_buffer->sampleRate() * 1000;
@@ -247,31 +241,26 @@ auto Sample::sampleDuration() const -> int
 
 auto Sample::sampleFile() const -> QString
 {
-	assert(m_buffer != nullptr);
 	return m_buffer->audioFile();
 }
 
 auto Sample::sampleRate() const -> int
 {
-	assert(m_buffer != nullptr);
 	return m_buffer->sampleRate();
 }
 
 auto Sample::sampleSize() const -> int
 {
-	assert(m_buffer != nullptr);
 	return m_buffer->size();
 }
 
 auto Sample::toBase64() const -> QString
 {
-	assert(m_buffer != nullptr);
 	return m_buffer->toBase64();
 }
 
 auto Sample::playbackSize() const -> int
 {
-	assert(m_buffer != nullptr);
 	const auto lock = std::shared_lock{m_mutex};
 	if (m_buffer->sampleRate() <= 0) { return 0; }
 	return m_buffer->size() * Engine::audioEngine()->processingSampleRate() / m_buffer->sampleRate();
