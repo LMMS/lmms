@@ -55,8 +55,6 @@ class UridMap
 	LV2_URID_Map m_mapFeature;
 	LV2_URID_Unmap m_unmapFeature;
 
-	[[maybe_unused]] LV2_URID m_lastUrid = 0;
-
 public:
 	//! constructor; will set up the features
 	UridMap();
