@@ -125,7 +125,7 @@ ClapViewInstance::ClapViewInstance(QWidget* parent, ClapInstance* instance, int 
 
 	*/
 
-	for (auto param : instance->getParams())
+	for (auto param : instance->params())
 	{
 		if (!param || !param->model()) { continue; }
 
@@ -160,14 +160,14 @@ ClapViewInstance::ClapViewInstance(QWidget* parent, ClapInstance* instance, int 
 		if (!control) { continue; }
 
 		// This is the param name seen in the GUI
-		control->setText(QString::fromUtf8(param->getDisplayName().data()));
+		control->setText(QString::fromUtf8(param->displayName().data()));
 
 		if (param->info().module[0] != '\0')
 		{
 			control->topWidget()->setToolTip(QString::fromUtf8(param->info().module));
 		}
 
-		addControl(control, param->getId().data(), param->getDisplayName().data(), false);
+		addControl(control, param->id().data(), param->displayName().data(), false);
 	}
 
 }

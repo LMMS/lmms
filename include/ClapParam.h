@@ -64,8 +64,8 @@ public:
 
 	auto model() const -> AutomatableModel* { return m_connectedModel.get(); }
 	auto valueType() const -> ParamType { return m_valueType; }
-	auto getId() const -> std::string_view { return m_id; }
-	auto getDisplayName() const -> std::string_view { return m_displayName; }
+	auto id() const -> std::string_view { return m_id; }
+	auto displayName() const -> std::string_view { return m_displayName; }
 	auto getValueText(const clap_plugin* plugin, const clap_plugin_params* params) const -> std::string;
 
 	auto value() const -> double { return m_value; }

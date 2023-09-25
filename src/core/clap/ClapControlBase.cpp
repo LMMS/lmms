@@ -42,7 +42,7 @@ ClapControlBase::ClapControlBase(Model* that, const QString& uri)
 {
 	qDebug() << "ClapControlBase::ClapControlBase";
 	auto manager = Engine::getClapManager();
-	m_info = manager->getPluginInfo(uri).lock().get();
+	m_info = manager->pluginInfo(uri).lock().get();
 	if (!m_info)
 	{
 		qCritical() << "No CLAP plugin found for URI" << uri;

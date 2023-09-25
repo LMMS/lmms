@@ -255,14 +255,14 @@ auto ClapInstance::pluginRestart() -> bool
 
 auto ClapInstance::pluginLoad() -> bool
 {
-	qDebug() << "Loading plugin instance:" << m_pluginInfo->getDescriptor()->name;
+	qDebug() << "Loading plugin instance:" << m_pluginInfo->descriptor()->name;
 	checkPluginStateCurrent(PluginState::None);
 	checkPluginStateNext(PluginState::Loaded); // success
 	checkPluginStateNext(PluginState::None); // failure (stay None)
 
 	// Create plugin instance, destroying any previous plugin instance first
-	const auto factory = m_pluginInfo->getFactory();
-	m_plugin = factory->create_plugin(factory, getHost(), m_pluginInfo->getDescriptor()->id);
+	const auto factory = m_pluginInfo->factory();
+	m_plugin = factory->create_plugin(factory, host(), m_pluginInfo->descriptor()->id);
 	if (!m_plugin)
 	{
 		qWarning() << "Failed to create instance of CLAP plugin";
@@ -276,7 +276,7 @@ auto ClapInstance::pluginLoad() -> bool
 
 auto ClapInstance::pluginUnload() -> bool
 {
-	qDebug() << "Unloading plugin instance:" << m_pluginInfo->getDescriptor()->name;
+	qDebug() << "Unloading plugin instance:" << m_pluginInfo->descriptor()->name;
 	assert(isMainThread());
 
 	pluginDeactivate();
@@ -306,11 +306,11 @@ auto ClapInstance::pluginInit() -> bool
 	checkPluginStateNext(PluginState::Inactive); // success
 	checkPluginStateNext(PluginState::LoadedWithError); // failure (init fail)
 
-	if (getPluginState() != PluginState::Loaded) { return false; }
+	if (pluginState() != PluginState::Loaded) { return false; }
 
 	if (!m_plugin->init(m_plugin))
 	{
-		qWarning() << "Could not init the plugin with id:" << getInfo().getDescriptor()->id;
+		qWarning() << "Could not init the plugin with id:" << info().descriptor()->id;
 		setPluginState(PluginState::LoadedWithError);
 		m_plugin->destroy(m_plugin);
 		return false;
@@ -336,8 +336,8 @@ auto ClapInstance::pluginInit() -> bool
 	}
 
 	// Effect, Instrument, and Tool are the only options
-	const bool needInputPort = m_pluginInfo->getType() != Plugin::Type::Instrument;
-	const bool needOutputPort = m_pluginInfo->getType() != Plugin::Type::Tool;
+	const bool needInputPort = m_pluginInfo->type() != Plugin::Type::Instrument;
+	const bool needOutputPort = m_pluginInfo->type() != Plugin::Type::Tool;
 
 	auto readPorts = [this, needInputPort, needOutputPort](
 		std::vector<AudioPort>& audioPorts,
@@ -369,7 +369,7 @@ auto ClapInstance::pluginInit() -> bool
 		clap_id monoPort = CLAP_INVALID_ID;
 		clap_id stereoPort = CLAP_INVALID_ID;
 		//clap_id mainPort = CLAP_INVALID_ID;
-		for (uint32_t idx = 0; idx < portCount; ++idx)
+		for (std::uint32_t idx = 0; idx < portCount; ++idx)
 		{
 			clap_audio_port_info info{};
 			info.id = CLAP_INVALID_ID;
@@ -439,7 +439,7 @@ auto ClapInstance::pluginInit() -> bool
 
 		assert(portCount == audioPorts.size());
 		audioBuffers = std::make_unique<clap_audio_buffer[]>(audioPorts.size());
-		for (uint32_t port = 0; port < audioPorts.size(); ++port)
+		for (std::uint32_t port = 0; port < audioPorts.size(); ++port)
 		{
 			const auto channelCount = audioPorts[port].info.channel_count;
 			if (channelCount <= 0) { return nullptr; }
@@ -450,8 +450,8 @@ auto ClapInstance::pluginInit() -> bool
 			{
 				// This input port will not be used by LMMS
 				// TODO: Will a mono port ever need to be used if a stereo port is available?
-				constexpr uint32_t maxChannels = sizeof(clap_audio_buffer::constant_mask) * 8;
-				audioBuffers[port].constant_mask = channelCount < maxChannels ? (1u << channelCount) - 1 : static_cast<uint64_t>(-1);
+				constexpr std::uint32_t maxChannels = sizeof(clap_audio_buffer::constant_mask) * 8;
+				audioBuffers[port].constant_mask = channelCount < maxChannels ? (1u << channelCount) - 1 : static_cast<std::uint64_t>(-1);
 			}
 			else
 			{
@@ -539,7 +539,7 @@ auto ClapInstance::pluginInit() -> bool
 		{
 			if (param && param->model())
 			{
-				const auto uri = QString::fromUtf8(param->getId().data());
+				const auto uri = QString::fromUtf8(param->id().data());
 				addModel(param->model(), uri);
 
 				// Tell plugin when param value changes in host
@@ -604,14 +604,14 @@ auto ClapInstance::pluginDeactivate() -> bool
 	return true;
 }
 
-auto ClapInstance::pluginProcessBegin(uint32_t frames) -> bool
+auto ClapInstance::pluginProcessBegin(std::uint32_t frames) -> bool
 {
 	m_process.frames_count = frames;
 	//m_process.steady_time = m_steadyTime;
 	return false;
 }
 
-auto ClapInstance::pluginProcess(uint32_t frames) -> bool
+auto ClapInstance::pluginProcess(std::uint32_t frames) -> bool
 {
 	//m_steadyTime += frames;
 
@@ -683,7 +683,7 @@ auto ClapInstance::pluginProcess(uint32_t frames) -> bool
 	return true;
 }
 
-auto ClapInstance::pluginProcessEnd(uint32_t frames) -> bool
+auto ClapInstance::pluginProcessEnd(std::uint32_t frames) -> bool
 {
 	m_process.frames_count = frames;
 	//m_process.steady_time = m_steadyTime;
@@ -730,7 +730,7 @@ void ClapInstance::generatePluginInputEvents()
 
 void ClapInstance::handlePluginOutputEvents()
 {
-	for (uint32_t i = 0; i < m_evOut.size(); ++i)
+	for (std::uint32_t i = 0; i < m_evOut.size(); ++i)
 	{
 		auto h = m_evOut.get(i);
 		switch (h->type)
@@ -1000,9 +1000,11 @@ auto ClapInstance::fromHost(const clap_host* host) -> ClapInstance*
 	auto h = static_cast<ClapInstance*>(host->host_data);
 	if (!h) { throw std::invalid_argument{"Passed an invalid host pointer because the host_data is null"}; }
 
-	if (!h->getPlugin()) { throw std::logic_error{
-		"The plugin can't query for extensions during the create method. Wait "
-		"for clap_plugin.init() call."}; }
+	if (!h->plugin())
+	{
+		throw std::logic_error{"The plugin can't query for extensions during the create method. Wait "
+			"for clap_plugin.init() call."};
+	}
 
 	return h;
 }
@@ -1097,7 +1099,7 @@ auto ClapInstance::hostExtThreadCheckIsAudioThread(const clap_host_t* host) -> b
 	return isAudioThread();
 }
 
-void ClapInstance::hostExtParamsRescan(const clap_host* host, uint32_t flags)
+void ClapInstance::hostExtParamsRescan(const clap_host* host, std::uint32_t flags)
 {
 	qDebug() << "ClapInstance::hostExtParamsRescan";
 	assert(isMainThread());

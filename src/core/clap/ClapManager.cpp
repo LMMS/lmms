@@ -54,7 +54,7 @@ namespace lmms
 
 namespace
 {
-	inline std::string expandHomeDir(std::string_view dir)
+	auto expandHomeDir(std::string_view dir) -> std::filesystem::path
 	{
 #if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_APPLE)
 		if (!dir.empty() && dir[0] == '~')
@@ -63,7 +63,7 @@ namespace
 			return QDir::home().absolutePath().toStdString() + std::string{dir};
 		}
 #endif
-		return std::string{dir};
+		return std::filesystem::path{dir};
 	}
 }
 
@@ -80,7 +80,7 @@ ClapManager::~ClapManager()
 {
 	qDebug() << "ClapManager::~ClapManager";
 	// Deactivate and destroy plugin instances first
-	m_instances.clear();
+	//m_instances.clear();
 
 	// Then deinit the .clap files and unload the shared libraries
 	m_files.clear();
@@ -132,6 +132,7 @@ void ClapManager::findSearchPaths()
 	// Each directory should be recursively searched for files and/or bundles as appropriate in your OS
 	// ending with the extension `.clap`.
 
+	namespace fs = std::filesystem;
 	m_searchPaths.clear();
 
 	// Get CLAP_PATH paths
@@ -142,8 +143,8 @@ void ClapManager::findSearchPaths()
 		auto pos = clapPath.find(LADSPA_PATH_SEPERATOR);
 		while (pos != std::string_view::npos)
 		{
-			auto path = std::filesystem::path{expandHomeDir(clapPath.substr(0, pos))};
-			if (std::filesystem::is_directory(path, ec))
+			auto path = expandHomeDir(clapPath.substr(0, pos));
+			if (fs::is_directory(path, ec))
 			{
 				m_searchPaths.emplace_back(std::move(path.make_preferred()));
 			}
@@ -152,8 +153,8 @@ void ClapManager::findSearchPaths()
 		}
 		if (!clapPath.empty())
 		{
-			auto path = std::filesystem::path{expandHomeDir(clapPath)};
-			if (std::filesystem::is_directory(path, ec))
+			auto path = expandHomeDir(clapPath);
+			if (fs::is_directory(path, ec))
 			{
 				m_searchPaths.emplace_back(std::move(path.make_preferred()));
 			}
@@ -162,14 +163,14 @@ void ClapManager::findSearchPaths()
 
 	// Add OS-dependent search paths
 #ifdef LMMS_BUILD_LINUX
-	auto path = std::filesystem::path{expandHomeDir("~/.clap")};
+	auto path = expandHomeDir("~/.clap");
 	std::error_code ec;
-	if (std::filesystem::is_directory(path, ec))
+	if (fs::is_directory(path, ec))
 	{
 		m_searchPaths.emplace_back(std::move(path.make_preferred()));
 	}
 	path = "/usr/lib/clap";
-	if (std::filesystem::is_directory(path, ec))
+	if (fs::is_directory(path, ec))
 	{
 		m_searchPaths.emplace_back(std::move(path.make_preferred()));
 	}
@@ -177,31 +178,31 @@ void ClapManager::findSearchPaths()
 	std::error_code ec;
 	if (auto commonProgFiles = std::getenv("COMMONPROGRAMFILES"))
 	{
-		auto path = std::filesystem::path{commonProgFiles};
+		auto path = fs::path{commonProgFiles};
 		path /= "CLAP";
-		if (std::filesystem::is_directory(path, ec))
+		if (fs::is_directory(path, ec))
 		{
 			m_searchPaths.emplace_back(std::move(path.make_preferred()));
 		}
 	}
 	if (auto localAppData = std::getenv("LOCALAPPDATA"))
 	{
-		auto path = std::filesystem::path{localAppData};
-		path /= std::filesystem::path{"Programs/Common/CLAP"};
-		if (std::filesystem::is_directory(path, ec))
+		auto path = fs::path{localAppData};
+		path /= fs::path{"Programs/Common/CLAP"};
+		if (fs::is_directory(path, ec))
 		{
 			m_searchPaths.emplace_back(std::move(path.make_preferred()));
 		}
 	}
 #elif defined(LMMS_BUILD_APPLE)
 	std::error_code ec;
-	auto path = std::filesystem::path{"/Library/Audio/Plug-Ins/CLAP"};
-	if (std::filesystem::is_directory(path, ec))
+	auto path = fs::path{"/Library/Audio/Plug-Ins/CLAP"};
+	if (fs::is_directory(path, ec))
 	{
 		m_searchPaths.emplace_back(std::move(path.make_preferred()));
 	}
 	path = expandHomeDir("~/Library/Audio/Plug-Ins/CLAP");
-	if (std::filesystem::is_directory(path, ec))
+	if (fs::is_directory(path, ec))
 	{
 		m_searchPaths.emplace_back(std::move(path.make_preferred()));
 	}
@@ -221,7 +222,7 @@ void ClapManager::loadClapFiles(const std::vector<std::filesystem::path>& search
 {
 	if (!m_files.empty()) { return; } // Cannot unload CLAP plugins yet
 
-	m_instances.clear();
+	//m_instances.clear();
 	m_files.clear();
 	m_uriToPluginInfo.clear();
 	m_pluginInfo.clear();
@@ -257,13 +258,13 @@ void ClapManager::loadClapFiles(const std::vector<std::filesystem::path>& search
 			}
 
 			bool purgeNeeded = false;
-			totalClapPlugins += clapFile.getPluginCount();
+			totalClapPlugins += clapFile.pluginCount();
 			for (const auto& plugin : clapFile.pluginInfo())
 			{
-				auto [ignore, added] = m_uriToPluginInfo.emplace(std::string{plugin->getDescriptor()->id}, std::weak_ptr{plugin});
+				auto [ignore, added] = m_uriToPluginInfo.emplace(std::string{plugin->descriptor()->id}, std::weak_ptr{plugin});
 				if (!added)
 				{
-					qWarning().nospace() << "The CLAP plugin ID '" << plugin->getDescriptor()->id
+					qWarning().nospace() << "The CLAP plugin ID '" << plugin->descriptor()->id
 						<< "' in the plugin file '" << entry.path().c_str() << "' is identical to an ID"
 						<< " in a previously loaded plugin file. Skipping the duplicate CLAP plugin.";
 					plugin->invalidate();
@@ -299,7 +300,7 @@ void ClapManager::loadClapFiles(const std::vector<std::filesystem::path>& search
 	}
 }
 
-auto ClapManager::getClapGuiApi() -> const char*
+auto ClapManager::clapGuiApi() -> const char*
 {
 #if defined(LMMS_BUILD_LINUX)
 	return CLAP_WINDOW_API_X11;
@@ -313,15 +314,15 @@ auto ClapManager::getClapGuiApi() -> const char*
 #endif
 }
 
-auto ClapManager::getPluginInfo(const std::string& uri) -> std::weak_ptr<const ClapPluginInfo>
+auto ClapManager::pluginInfo(const std::string& uri) -> std::weak_ptr<const ClapPluginInfo>
 {
 	const auto iter = m_uriToPluginInfo.find(uri);
 	return iter != m_uriToPluginInfo.end() ? iter->second : std::weak_ptr<const ClapPluginInfo>{};
 }
 
-auto ClapManager::getPluginInfo(const QString& uri) -> std::weak_ptr<const ClapPluginInfo>
+auto ClapManager::pluginInfo(const QString& uri) -> std::weak_ptr<const ClapPluginInfo>
 {
-	return getPluginInfo(uri.toStdString());
+	return pluginInfo(uri.toStdString());
 }
 
 } // namespace lmms

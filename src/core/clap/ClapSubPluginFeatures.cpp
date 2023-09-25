@@ -46,7 +46,7 @@ ClapSubPluginFeatures::ClapSubPluginFeatures(Plugin::Type type)
 
 void ClapSubPluginFeatures::fillDescriptionWidget(QWidget* parent, const Key* key) const
 {
-	const auto descriptor = getPluginInfo(*key)->getDescriptor();
+	const auto descriptor = pluginInfo(*key)->descriptor();
 
 	auto label = new QLabel(parent);
 	label->setText(QWidget::tr("Name: ") + QString::fromUtf8(descriptor->name));
@@ -111,9 +111,9 @@ void ClapSubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor* desc, Ke
 	{
 		for (const auto& pluginInfo : file.pluginInfo())
 		{
-			if (pluginInfo->getType() == m_type && pluginInfo->isValid())
+			if (pluginInfo->type() == m_type && pluginInfo->isValid())
 			{
-				const auto clapDesc = pluginInfo->getDescriptor();
+				const auto clapDesc = pluginInfo->descriptor();
 				Key::AttributeMap atm;
 				atm["uri"] = QString::fromUtf8(clapDesc->id);
 
@@ -135,12 +135,12 @@ auto ClapSubPluginFeatures::additionalFileExtensions([[maybe_unused]] const Key&
 
 auto ClapSubPluginFeatures::displayName(const Key& key) const -> QString
 {
-	return QString::fromUtf8(getPluginInfo(key)->getDescriptor()->name);
+	return QString::fromUtf8(pluginInfo(key)->descriptor()->name);
 }
 
 auto ClapSubPluginFeatures::description(const Key& key) const -> QString
 {
-	return QString::fromUtf8(getPluginInfo(key)->getDescriptor()->description);
+	return QString::fromUtf8(pluginInfo(key)->descriptor()->description);
 }
 
 auto ClapSubPluginFeatures::logo([[maybe_unused]] const Key& key) const -> const PixmapLoader*
@@ -148,9 +148,9 @@ auto ClapSubPluginFeatures::logo([[maybe_unused]] const Key& key) const -> const
 	return nullptr;
 }
 
-auto ClapSubPluginFeatures::getPluginInfo(const Key& key) -> std::shared_ptr<const ClapPluginInfo>
+auto ClapSubPluginFeatures::pluginInfo(const Key& key) -> std::shared_ptr<const ClapPluginInfo>
 {
-	const auto result = Engine::getClapManager()->getPluginInfo(key.attributes["uri"]);
+	const auto result = Engine::getClapManager()->pluginInfo(key.attributes["uri"]);
 	Q_ASSERT(!result.expired());
 	return result.lock();
 }

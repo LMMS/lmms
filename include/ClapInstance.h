@@ -160,10 +160,10 @@ public:
 	auto isMonoInput() const -> bool { return m_monoInput; } //!< Can call after pluginInit()
 	auto isMonoOutput() const -> bool { return m_monoOutput; } //!< Can call after pluginInit()
 
-	auto getHost() const -> const clap_host* { return &m_host; }
-	auto getPlugin() const -> const clap_plugin* { return m_plugin; }
-	auto getInfo() const -> const ClapPluginInfo& { return *m_pluginInfo; }
-	auto getParams() const -> const std::vector<ClapParam*>& { return m_params; }
+	auto host() const -> const clap_host* { return &m_host; }
+	auto plugin() const -> const clap_plugin* { return m_plugin; }
+	auto info() const -> const ClapPluginInfo& { return *m_pluginInfo; }
+	auto params() const -> const std::vector<ClapParam*>& { return m_params; }
 
 	/////////////////////////////////////////
 	// Host
@@ -178,7 +178,7 @@ public:
 	// Plugin
 	/////////////////////////////////////////
 
-	auto getPluginState() const -> PluginState { return m_pluginState; };
+	auto pluginState() const -> PluginState { return m_pluginState; };
 
 	auto pluginStart() -> bool; //!< Loads, inits, and activates in that order
 	auto pluginRestart() -> bool;
@@ -189,9 +189,9 @@ public:
 	auto pluginActivate() -> bool;
 	auto pluginDeactivate() -> bool;
 
-	auto pluginProcessBegin(uint32_t frames) -> bool;
-	auto pluginProcess(uint32_t frames) -> bool;
-	auto pluginProcessEnd(uint32_t frames) -> bool;
+	auto pluginProcessBegin(std::uint32_t frames) -> bool;
+	auto pluginProcess(std::uint32_t frames) -> bool;
+	auto pluginProcessEnd(std::uint32_t frames) -> bool;
 
 	void paramFlushOnMainThread();
 	void handlePluginOutputEvents();
@@ -227,20 +227,20 @@ private:
 	static void hostExtLogLog([[maybe_unused]] const clap_host_t* host, clap_log_severity severity, const char* msg);
 	static auto hostExtThreadCheckIsMainThread(const clap_host_t* host) -> bool;
 	static auto hostExtThreadCheckIsAudioThread(const clap_host_t* host) -> bool;
-	static void hostExtParamsRescan(const clap_host* host, uint32_t flags);
+	static void hostExtParamsRescan(const clap_host* host, std::uint32_t flags);
 	static void hostExtParamsClear(const clap_host* host, clap_id param_id, clap_param_clear_flags flags);
 	static void hostExtParamsRequestFlush(const clap_host* host);
 
 	auto canUsePluginParams() const noexcept -> bool;
 	//bool canUsePluginGui() const noexcept;
-	//static const char* getCurrentClapGuiApi();
+	//static const char* currentClapGuiApi();
 
 	void setParamValueByHost(ClapParam& param, double value);
 	void setParamModulationByHost(ClapParam& param, double value);
 	void checkValidParamValue(const ClapParam& param, double value);
 	auto getParamValue(const clap_param_info& info) const -> double;
-	static auto clapParamsRescanMayValueChange(uint32_t flags) -> bool { return flags & (CLAP_PARAM_RESCAN_ALL | CLAP_PARAM_RESCAN_VALUES); }
-	static auto clapParamsRescanMayInfoChange(uint32_t flags) -> bool { return flags & (CLAP_PARAM_RESCAN_ALL | CLAP_PARAM_RESCAN_INFO); }
+	static auto clapParamsRescanMayValueChange(std::uint32_t flags) -> bool { return flags & (CLAP_PARAM_RESCAN_ALL | CLAP_PARAM_RESCAN_VALUES); }
+	static auto clapParamsRescanMayInfoChange(std::uint32_t flags) -> bool { return flags & (CLAP_PARAM_RESCAN_ALL | CLAP_PARAM_RESCAN_INFO); }
 
 	clap_host m_host;
 	std::queue<std::function<bool()>> m_idleQueue;
@@ -289,11 +289,11 @@ private:
 	class AudioBuffer
 	{
 	public:
-		AudioBuffer(uint32_t channels, uint32_t frames)
+		AudioBuffer(std::uint32_t channels, std::uint32_t frames)
 			: m_channels(channels), m_frames(frames)
 		{
 			m_data = new float*[m_channels]();
-			for (uint32_t channel = 0; channel < m_channels; ++channel)
+			for (std::uint32_t channel = 0; channel < m_channels; ++channel)
 			{
 				m_data[channel] = new float[m_frames]();
 			}
@@ -334,15 +334,15 @@ private:
 		void free() noexcept
 		{
 			if (!m_data) { return; }
-			for (uint32_t channel = 0; channel < m_channels; ++channel)
+			for (std::uint32_t channel = 0; channel < m_channels; ++channel)
 			{
 				if (m_data[channel]) { delete[] m_data[channel]; }
 			}
 			delete[] m_data;
 		}
 
-		uint32_t m_channels;
-		uint32_t m_frames;
+		std::uint32_t m_channels;
+		std::uint32_t m_frames;
 		float** m_data = nullptr;
 	};
 
@@ -418,7 +418,7 @@ private:
 	struct AudioPort
 	{
 		clap_audio_port_info info{};
-		uint32_t index = 0; //!< Index on plugin side, not m_audioPorts***
+		std::uint32_t index = 0; //!< Index on plugin side, not m_audioPorts***
 		bool is_input = false;
 		AudioPortType type = AudioPortType::Unsupported;
 		bool used = false; //!< In use by LMMS
@@ -458,7 +458,6 @@ private:
 	 * Plugin/Host extension data
 	*/
 	bool m_hostExtStateIsDirty = false;
-
 };
 
 }

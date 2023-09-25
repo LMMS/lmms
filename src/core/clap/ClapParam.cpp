@@ -67,7 +67,7 @@ ClapParam::ClapParam(ClapInstance* pluginHost, const clap_param_info& info, doub
 		throw std::logic_error{"PARAMS: Error: value is out of range"};
 	}
 
-	auto displayName = QString::fromUtf8(getDisplayName().data());
+	auto name = QString::fromUtf8(displayName().data());
 
 	// TODO: CLAP_PARAM_IS_BYPASS
 	if (flags & CLAP_PARAM_IS_STEPPED)
@@ -79,13 +79,13 @@ ClapParam::ClapParam(ClapInstance* pluginHost, const clap_param_info& info, doub
 		if (minVal == 0 && maxVal == 1)
 		{
 			qDebug() << "PARAMS: Creating BoolModel";
-			m_connectedModel = std::make_unique<BoolModel>(valueInt, pluginHost, displayName);
+			m_connectedModel = std::make_unique<BoolModel>(valueInt, pluginHost, name);
 			m_valueType = ParamType::Bool;
 		}
 		else
 		{
 			qDebug() << "PARAMS: Creating IntModel";
-			m_connectedModel = std::make_unique<IntModel>(valueInt, minVal, maxVal, pluginHost, displayName);
+			m_connectedModel = std::make_unique<IntModel>(valueInt, minVal, maxVal, pluginHost, name);
 			m_valueType = ParamType::Integer;
 		}
 	}
@@ -106,7 +106,7 @@ ClapParam::ClapParam(ClapInstance* pluginHost, const clap_param_info& info, doub
 			static_cast<float>(m_info.min_value),
 			static_cast<float>(m_info.max_value),
 			static_cast<float>(stepSize),
-			pluginHost, displayName);
+			pluginHost, name);
 
 		m_valueType = ParamType::Float;
 	}
@@ -114,7 +114,7 @@ ClapParam::ClapParam(ClapInstance* pluginHost, const clap_param_info& info, doub
 
 auto ClapParam::getValueText(const clap_plugin* plugin, const clap_plugin_params* params) const -> std::string
 {
-	constexpr uint32_t bufferSize = 50;
+	constexpr std::uint32_t bufferSize = 50;
 	std::string buffer(bufferSize, '\0');
 	if (!params->value_to_text(plugin, m_info.id, m_value, &buffer[0], bufferSize))
 	{
@@ -172,7 +172,7 @@ auto ClapParam::isInfoEqualTo(const clap_param_info& info) const -> bool
 auto ClapParam::isInfoCriticallyDifferentTo(const clap_param_info& info) const -> bool
 {
 	assert(m_info.id == info.id);
-	const uint32_t criticalFlags =
+	const std::uint32_t criticalFlags =
 		CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_AUTOMATABLE_PER_NOTE_ID |
 		CLAP_PARAM_IS_AUTOMATABLE_PER_KEY | CLAP_PARAM_IS_AUTOMATABLE_PER_CHANNEL |
 		CLAP_PARAM_IS_AUTOMATABLE_PER_PORT | CLAP_PARAM_IS_MODULATABLE |

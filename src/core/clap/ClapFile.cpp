@@ -51,17 +51,12 @@ ClapFile::~ClapFile()
 
 auto ClapFile::load() -> bool
 {
+	// Do not allow reloading yet
+	if (m_library && m_library->isLoaded()) { return false; }
+
 	m_valid = false;
 
-	m_library = std::make_unique<QLibrary>();
-	if (!m_library) { return false; }
-
-	m_library->setFileName(QString::fromUtf8(m_filename.c_str()));
-	m_library->setLoadHints(QLibrary::ResolveAllSymbolsHint | QLibrary::DeepBindHint);
-
-	// Do not allow reloading yet
-	if (m_library->isLoaded()) { return false; }
-
+	m_library = std::make_unique<QLibrary>(QString::fromUtf8(m_filename.c_str()));
 	if (!m_library->load())
 	{
 		qWarning() << m_library->errorString();
@@ -71,12 +66,12 @@ auto ClapFile::load() -> bool
 	const auto pluginEntry = reinterpret_cast<const clap_plugin_entry*>(m_library->resolve("clap_entry"));
 	if (!pluginEntry)
 	{
-		qWarning() << "Unable to resolve entry point 'clap_entry' in '" << getFilename().c_str() << "'";
+		qWarning() << "Unable to resolve entry point 'clap_entry' in '" << filename().c_str() << "'";
 		m_library->unload();
 		return false;
 	}
 
-	pluginEntry->init(getFilename().c_str());
+	pluginEntry->init(filename().c_str());
 	m_factory = static_cast<const clap_plugin_factory*>(pluginEntry->get_factory(CLAP_PLUGIN_FACTORY_ID));
 
 	m_pluginCount = m_factory->get_plugin_count(m_factory);
@@ -84,7 +79,7 @@ auto ClapFile::load() -> bool
 	if (m_pluginCount <= 0) { return false; }
 
 	m_pluginInfo.clear();
-	for (uint32_t i = 0; i < m_pluginCount; ++i)
+	for (std::uint32_t i = 0; i < m_pluginCount; ++i)
 	{
 		auto& plugin = m_pluginInfo.emplace_back(std::make_shared<ClapPluginInfo>(m_factory, i));
 		if (!plugin || !plugin->isValid())
@@ -100,8 +95,9 @@ auto ClapFile::load() -> bool
 
 void ClapFile::unload()
 {
-	// Need to destroy any plugin instances from this .clap file before
-	// calling this method. See ClapManager::unload().
+	// NOTE: Need to destroy any plugin instances from this .clap file before
+	// calling this method. This should be okay as long as the ClapManager
+	// singleton is destroyed after any ClapControlBase objects.
 
 	if (m_entry)
 	{
@@ -115,6 +111,8 @@ void ClapFile::unload()
 		m_library->unload();
 		m_library = nullptr;
 	}
+
+	m_valid = false;
 }
 
 void ClapFile::purgeInvalidPlugins()
@@ -130,12 +128,9 @@ void ClapFile::purgeInvalidPlugins()
 // ClapPluginInfo
 ////////////////////////////////
 
-ClapPluginInfo::ClapPluginInfo(const clap_plugin_factory* factory, uint32_t index)
+ClapPluginInfo::ClapPluginInfo(const clap_plugin_factory* factory, std::uint32_t index)
+	: m_factory{factory}, m_index{index}
 {
-	m_valid = false;
-	m_factory = factory;
-	m_index = index;
-
 	m_descriptor = m_factory->get_plugin_descriptor(m_factory, m_index);
 	if (!m_descriptor)
 	{
