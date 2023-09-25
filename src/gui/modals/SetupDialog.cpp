@@ -93,7 +93,9 @@ inline void labelWidget(QWidget * w, const QString & txt)
 
 SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_displaydBFS(ConfigManager::inst()->value(
-			"app", "displaydbfs").toInt()),
+			"app", "displaydbfs").toInt()), 
+	m_expandSidebar(ConfigManager::inst()->value(
+			"ui", "expandSidebar").toInt()),
 	m_tooltips(!ConfigManager::inst()->value(
 			"tooltips", "disabled").toInt()),
 	m_displayWaveform(ConfigManager::inst()->value(
@@ -232,6 +234,8 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	addLedCheckBox(tr("Display volume as dBFS "), gui_tw, counter,
 		m_displaydBFS, SLOT(toggleDisplaydBFS(bool)), true);
+	addLedCheckBox(tr("Expand Sidebar Icons with Names"), gui_tw, counter,
+		m_expandSidebar, SLOT(toggleExpandSidebar(bool)), true);
 	addLedCheckBox(tr("Enable tooltips"), gui_tw, counter,
 		m_tooltips, SLOT(toggleTooltips(bool)), true);
 	addLedCheckBox(tr("Enable master oscilloscope by default"), gui_tw, counter,
@@ -912,6 +916,8 @@ void SetupDialog::accept()
 
 	ConfigManager::inst()->setValue("app", "displaydbfs",
 					QString::number(m_displaydBFS));
+	ConfigManager::inst()->setValue("ui", "expandSidebar",
+					QString::number(m_expandSidebar));
 	ConfigManager::inst()->setValue("tooltips", "disabled",
 					QString::number(!m_tooltips));
 	ConfigManager::inst()->setValue("ui", "displaywaveform",
@@ -1005,6 +1011,10 @@ void SetupDialog::toggleDisplaydBFS(bool enabled)
 	m_displaydBFS = enabled;
 }
 
+void SetupDialog::toggleExpandSidebar(bool enabled)
+{
+	m_expandSidebar = enabled;
+}
 
 void SetupDialog::toggleTooltips(bool enabled)
 {
