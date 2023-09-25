@@ -409,7 +409,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		// Skip notes randomly
 		if( m_arpSkipModel.value() )
 		{
-			if( 100 * ( (float) rand() / (float)( RAND_MAX + 1.0f ) ) < m_arpSkipModel.value() )
+			if( 100 * ( (float) rand() / (static_cast<float>(RAND_MAX) + 1.0f)) < m_arpSkipModel.value() )
 			{
 				// update counters
 				frames_processed += arp_frames;
@@ -425,7 +425,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 
 		if( m_arpMissModel.value() )
 		{
-			if( 100 * ( (float) rand() / (float)( RAND_MAX + 1.0f ) ) < m_arpMissModel.value() )
+			if( 100 * ( (float) rand() / (static_cast<float>(RAND_MAX) + 1.0f)) < m_arpMissModel.value() )
 			{
 				dir = ArpDirection::Random;
 			}
