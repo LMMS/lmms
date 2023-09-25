@@ -1209,6 +1209,7 @@ void ClapInstance::hostExtParamsRescan(const clap_host* host, uint32_t flags)
 		{
 			if (!(flags & CLAP_PARAM_RESCAN_ALL))
 			{
+				const auto& info = it->second->info();
 				std::string msg = "a parameter was removed, but the flag CLAP_PARAM_RESCAN_ALL was not specified; "
 					"id: " + std::to_string(info.id) + ", name: " + std::string{info.name} + ", module: " + std::string{info.module};
 				throw std::logic_error{msg};
