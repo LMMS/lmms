@@ -391,11 +391,18 @@ auto Sample::setReversed(bool reversed) -> void
 
 auto Sample::playSampleRange(PlaybackState* state, sampleFrame* dst, size_t numFrames) const -> void
 {
-	const auto framesToCopy = state->m_backwards
-		? std::min<int>(state->m_frameIndex - m_startFrame, numFrames)
-		: std::min<int>(m_endFrame - state->m_frameIndex, numFrames);
-	state->m_backwards ? copyBufferBackward(dst, state->m_frameIndex, framesToCopy)
-					   : copyBufferForward(dst, state->m_frameIndex, framesToCopy);
+	auto framesToCopy = 0;
+	if (state->m_backwards)
+	{
+		framesToCopy = std::min<int>(state->m_frameIndex - m_startFrame, numFrames);
+		copyBufferBackward(dst, state->m_frameIndex, framesToCopy);
+	}
+	else
+	{
+		framesToCopy = std::min<int>(m_endFrame - state->m_frameIndex, numFrames);
+		copyBufferForward(dst, state->m_frameIndex, framesToCopy);
+	}
+
 	if (framesToCopy < numFrames) { std::fill_n(dst + framesToCopy, numFrames - framesToCopy, sampleFrame{0, 0}); }
 }
 
