@@ -123,7 +123,7 @@ const QString& SampleClip::sampleFile() const
 	return m_sample->sampleFile();
 }
 
-void SampleClip::setSampleBuffer(std::unique_ptr<SampleBuffer>&& sb)
+void SampleClip::setSampleBuffer(std::unique_ptr<SampleBuffer> sb)
 {
 	// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
 	auto buffer = std::shared_ptr<const SampleBuffer>(std::move(sb));
