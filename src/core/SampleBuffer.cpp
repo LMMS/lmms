@@ -115,7 +115,7 @@ void SampleBuffer::decodeSampleSF(const QString& audioFile)
 		}
 	}
 
-	m_data = result;
+	m_data = std::move(result);
 	m_audioFile = audioFile;
 	m_sampleRate = sfInfo.samplerate;
 }
@@ -137,7 +137,7 @@ void SampleBuffer::decodeSampleDS(const QString& audioFile)
 	}
 	else { throw std::runtime_error{"Decoding failure: failed to decode DrumSynth file."}; }
 
-	m_data = result;
+	m_data = std::move(result);
 	m_audioFile = audioFile;
 	m_sampleRate = engineRate;
 }
