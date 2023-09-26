@@ -29,7 +29,6 @@
 #include <QPair>
 
 #include "PlayHandle.h"
-#include "SampleBuffer.h"
 #include "TimePos.h"
 
 namespace lmms
