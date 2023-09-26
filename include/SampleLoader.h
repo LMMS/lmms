@@ -44,4 +44,4 @@ private:
 };
 } // namespace lmms::gui
 
-#endif // LMMS_SAMPLE_BUFFER_LOADER_H
+#endif // LMMS_GUI_SAMPLE_LOADER_H
