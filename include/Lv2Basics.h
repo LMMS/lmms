@@ -47,8 +47,14 @@ struct LilvNodesDeleter
 	void operator()(LilvNodes* n) { lilv_nodes_free(n); }
 };
 
+struct LilvScalePointsDeleter
+{
+	void operator()(LilvScalePoints* s) { lilv_scale_points_free(s); }
+};
+
 using AutoLilvNode = std::unique_ptr<LilvNode, LilvNodeDeleter>;
 using AutoLilvNodes = std::unique_ptr<LilvNodes, LilvNodesDeleter>;
+using AutoLilvScalePoints = std::unique_ptr<LilvScalePoints, LilvScalePointsDeleter>;
 
 /**
 	Return QString from a plugin's node, everything will be freed automatically
