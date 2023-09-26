@@ -185,7 +185,7 @@ void Sample::visualize(QPainter& p, const QRect& dr, int fromFrame, int toFrame)
 	// the width, so we will have width points, or nbFrames is
 	// smaller than the width (fpp = 1) and we will have nbFrames
 	// points
-	const int totalPoints = nbFrames > w ? w : nbFrames;
+	const int totalPoints = std::min(nbFrames, w);
 	std::vector<QPointF> fEdgeMax(totalPoints);
 	std::vector<QPointF> fEdgeMin(totalPoints);
 	std::vector<QPointF> fRmsMax(totalPoints);
