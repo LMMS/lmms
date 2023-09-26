@@ -122,7 +122,6 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, int numFrames, float d
 	auto resampleRatio = static_cast<float>(Engine::audioEngine()->processingSampleRate()) / m_buffer->sampleRate();
 	resampleRatio *= m_frequency / desiredFrequency;
 
-	// If there happens to be an upper limit on the frames per period, we could use ArrayVector here instead
 	auto playBuffer = std::vector<sampleFrame>(numFrames / resampleRatio);
 	if (!typeInfo<float>::isEqual(resampleRatio, 1.0f))
 	{
