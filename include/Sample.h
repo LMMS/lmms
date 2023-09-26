@@ -101,7 +101,7 @@ public:
 	auto visualize(QPainter& p, const QRect& dr, int fromFrame = 0, int toFrame = 0) const -> void;
 
 	auto sampleDuration() const -> int;
-	auto sampleFile() const -> QString;
+	auto sampleFile() const -> const QString&;
 	auto sampleRate() const -> int;
 	auto sampleSize() const -> int;
 

@@ -263,7 +263,7 @@ auto Sample::sampleDuration() const -> int
 	return static_cast<double>(m_endFrame - m_startFrame) / m_buffer->sampleRate() * 1000;
 }
 
-auto Sample::sampleFile() const -> QString
+auto Sample::sampleFile() const -> const QString&
 {
 	return m_buffer->audioFile();
 }

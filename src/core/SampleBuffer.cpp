@@ -151,9 +151,9 @@ QString SampleBuffer::toBase64() const
 	return byteArray.toBase64();
 }
 
-auto SampleBuffer::audioFile() const -> QString
+auto SampleBuffer::audioFile() const -> const QString&
 {
-	return m_audioFile.value_or("");
+	return m_audioFile;
 }
 
 auto SampleBuffer::sampleRate() const -> sample_rate_t

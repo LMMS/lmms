@@ -118,7 +118,7 @@ void SampleClip::changeLength( const TimePos & _length )
 
 
 
-QString SampleClip::sampleFile() const
+const QString& SampleClip::sampleFile() const
 {
 	return m_sample->sampleFile();
 }

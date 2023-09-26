@@ -56,7 +56,7 @@ public:
 	friend void swap(SampleBuffer& first, SampleBuffer& second) noexcept;
 	auto toBase64() const -> QString;
 
-	auto audioFile() const -> QString;
+	auto audioFile() const -> const QString&;
 	auto sampleRate() const -> sample_rate_t;
 
 	auto begin() const -> const_iterator;
@@ -74,7 +74,7 @@ private:
 
 private:
 	std::vector<sampleFrame> m_data;
-	std::optional<QString> m_audioFile;
+	QString m_audioFile;
 	int m_sampleRate = 0;
 };
 
