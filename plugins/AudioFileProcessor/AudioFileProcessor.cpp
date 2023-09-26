@@ -172,9 +172,6 @@ void AudioFileProcessor::playNote( NotePlayHandle * _n,
 						static_cast<Sample::Loop>(m_loopModel.value())))
 		{
 			applyRelease( _working_buffer, _n );
-			instrumentTrack()->processAudioBuffer( _working_buffer,
-									frames + offset, _n );
-
 			emit isPlaying((static_cast<Sample::PlaybackState*>(_n->m_pluginData)->frameIndex()));
 		}
 		else

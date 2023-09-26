@@ -494,8 +494,6 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 		_working_buffer[i][0] *= m_gain.value();
 		_working_buffer[i][1] *= m_gain.value();
 	}
-
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames, nullptr );
 }
 
 

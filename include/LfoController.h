@@ -86,6 +86,7 @@ protected:
 	sample_t (*m_sampleFunction)( const float );
 
 private:
+	float m_heldSample;
 	std::shared_ptr<const SampleBuffer> m_userDefSampleBuffer;
 
 protected slots:
