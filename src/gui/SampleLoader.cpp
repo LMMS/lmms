@@ -1,7 +1,7 @@
 /*
  * SampleLoader.cpp - Static functions that open audio files
  *
- * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2023 saker <sakertooth@gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
