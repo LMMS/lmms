@@ -325,9 +325,7 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 	{
 		if (!value.isEmpty())
 		{
-			auto buffer = SampleLoader::createBufferFromFile(value);
-			// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-			std::atomic_store(&m_params->m_userWave, std::shared_ptr<const SampleBuffer>(std::move(buffer)));
+			m_params->m_userWave = SampleLoader::createBufferFromFile(value);
 		}
 
 		m_userLfoBtn->model()->setValue( true );
@@ -345,8 +343,7 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 		if (!file.isEmpty())
 		{
 			auto buffer = SampleLoader::createBufferFromFile(file);
-			// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-			std::atomic_store(&m_params->m_userWave, std::shared_ptr<const SampleBuffer>(std::move(buffer)));
+			m_params->m_userWave = std::shared_ptr<const SampleBuffer>(std::move(buffer));
 		}
 
 		m_userLfoBtn->model()->setValue( true );
@@ -495,8 +492,7 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 					val = m_randomGraph;
 					break;
 				case EnvelopeAndLfoParameters::LfoShape::UserDefinedWave:
-					// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-					val = Oscillator::userWaveSample(std::atomic_load(&m_params->m_userWave).get(), phase);
+					val = Oscillator::userWaveSample(m_params->m_userWave.get(), phase);
 					break;
 			}
 			if( static_cast<f_cnt_t>( cur_sample ) <=

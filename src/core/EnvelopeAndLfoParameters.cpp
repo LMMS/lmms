@@ -222,7 +222,7 @@ inline sample_t EnvelopeAndLfoParameters::lfoShapeSample( fpp_t _frame_offset )
 			shape_sample = Oscillator::sawSample( phase );
 			break;
 		case LfoShape::UserDefinedWave:
-			shape_sample = Oscillator::userWaveSample(std::atomic_load(&m_userWave).get(), phase);
+			shape_sample = Oscillator::userWaveSample(m_userWave.get(), phase);
 			break;
 		case LfoShape::RandomWave:
 			if( frame == 0 )
@@ -355,9 +355,7 @@ void EnvelopeAndLfoParameters::saveSettings( QDomDocument & _doc,
 	m_lfoAmountModel.saveSettings( _doc, _parent, "lamt" );
 	m_x100Model.saveSettings( _doc, _parent, "x100" );
 	m_controlEnvAmountModel.saveSettings( _doc, _parent, "ctlenvamt" );
-
-	// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-	_parent.setAttribute("userwavefile", std::atomic_load(&m_userWave)->audioFile());
+	_parent.setAttribute("userwavefile", m_userWave->audioFile());
 }
 
 
@@ -391,9 +389,7 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 
 	if (!_this.attribute("userwavefile").isEmpty())
 	{
-		auto buffer = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile"));
-		// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-		std::atomic_store(&m_userWave, std::shared_ptr<const SampleBuffer>(std::move(buffer)));
+		m_userWave = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile"));
 	}
 
 	updateSampleVars();

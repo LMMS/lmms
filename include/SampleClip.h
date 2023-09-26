@@ -65,8 +65,7 @@ public:
 
 	std::shared_ptr<Sample> sample()
 	{
-		// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-		return std::atomic_load(&m_sample);
+		return m_sample;
 	}
 
 	TimePos sampleLength() const;

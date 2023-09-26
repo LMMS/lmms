@@ -146,9 +146,7 @@ void OscillatorObject::oscUserDefWaveDblClick()
 	QString af = gui::SampleLoader::openWaveformFile();
 	if (af != "")
 	{
-		auto buffer = gui::SampleLoader::createBufferFromFile(af);
-		// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-		std::atomic_store(&m_sampleBuffer, std::shared_ptr<const SampleBuffer>(std::move(buffer)));
+		m_sampleBuffer = gui::SampleLoader::createBufferFromFile(af);
 
 		// TODO:
 		//m_usrWaveBtn->setToolTip(m_sampleBuffer->audioFile());
@@ -262,8 +260,7 @@ void TripleOscillator::saveSettings( QDomDocument & _doc, QDomElement & _this )
 					"modalgo" + QString::number( i+1 ) );
 		m_osc[i]->m_useWaveTableModel.saveSettings( _doc, _this,
 					"useWaveTable" + QString::number (i+1 ) );
-		// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-		_this.setAttribute("userwavefile" + is, std::atomic_load(&m_osc[i]->m_sampleBuffer)->audioFile());
+		_this.setAttribute("userwavefile" + is, m_osc[i]->m_sampleBuffer->audioFile());
 	}
 }
 
@@ -293,9 +290,7 @@ void TripleOscillator::loadSettings( const QDomElement & _this )
 
 		if (!_this.attribute("userwavefile" + is).isEmpty())
 		{
-			auto buffer = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile" + is));
-			// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-			std::atomic_store(&m_osc[i]->m_sampleBuffer, std::shared_ptr<const SampleBuffer>(std::move(buffer)));
+			m_osc[i]->m_sampleBuffer = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile" + is));
 		}
 	}
 }
@@ -363,10 +358,8 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 						oscs_r[i + 1] );
 				oscs_r[i]->setUseWaveTable(m_osc[i]->m_useWaveTable);
 			}
-
-			// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-			oscs_l[i]->setUserWave(std::atomic_load(&m_osc[i]->m_sampleBuffer));
-			oscs_r[i]->setUserWave(std::atomic_load(&m_osc[i]->m_sampleBuffer));
+			oscs_l[i]->setUserWave(m_osc[i]->m_sampleBuffer);
+			oscs_r[i]->setUserWave(m_osc[i]->m_sampleBuffer);
 
 		}
 

@@ -90,8 +90,7 @@ SampleClip::SampleClip( Track * _track ) :
 SampleClip::SampleClip(const SampleClip& orig) :
 	SampleClip(orig.getTrack())
 {
-	// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-	std::atomic_store(&m_sample, orig.m_sample);
+	m_sample = orig.m_sample;
 	m_isPlaying = orig.m_isPlaying;
 }
 
@@ -125,9 +124,7 @@ const QString& SampleClip::sampleFile() const
 
 void SampleClip::setSampleBuffer(std::unique_ptr<SampleBuffer> sb)
 {
-	// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-	auto buffer = std::shared_ptr<const SampleBuffer>(std::move(sb));
-	std::atomic_store(&m_sample, std::make_shared<Sample>(buffer));
+	m_sample = std::make_shared<Sample>(std::shared_ptr<const SampleBuffer>(std::move(sb)));
 	updateLength();
 
 	emit sampleChanged();
@@ -142,9 +139,7 @@ void SampleClip::setSampleFile(const QString & sf)
 	if (!sf.isEmpty())
 	{
 		//Otherwise set it to the sample's length
-		auto buffer = gui::SampleLoader::createBufferFromFile(sf);
-		// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-		std::atomic_store(&m_sample, std::make_shared<Sample>(std::move(buffer)));
+		m_sample = std::make_shared<Sample>(gui::SampleLoader::createBufferFromFile(sf));
 		length = sampleLength();
 	}
 
@@ -293,8 +288,7 @@ void SampleClip::loadSettings( const QDomElement & _this )
 			Engine::audioEngine()->processingSampleRate();
 
 		auto buffer = gui::SampleLoader::createBufferFromBase64(_this.attribute("data"), sampleRate);
-		// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-		std::atomic_store(&m_sample, std::make_shared<Sample>(std::move(buffer)));
+		m_sample = std::make_shared<Sample>(std::move(buffer));
 	}
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );

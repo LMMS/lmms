@@ -122,7 +122,7 @@ void LfoController::updateValueBuffer()
 		}
 		case Oscillator::WaveShape::UserDefined:
 		{
-			currentSample = Oscillator::userWaveSample(std::atomic_load(&m_userDefSampleBuffer).get(), phase);
+			currentSample = Oscillator::userWaveSample(m_userDefSampleBuffer.get(), phase);
 			break;
 		}
 		default:
@@ -222,8 +222,7 @@ void LfoController::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	m_phaseModel.saveSettings( _doc, _this, "phase" );
 	m_waveModel.saveSettings( _doc, _this, "wave" );
 	m_multiplierModel.saveSettings( _doc, _this, "multiplier" );
-	// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-	_this.setAttribute("userwavefile", std::atomic_load(&m_userDefSampleBuffer)->audioFile());
+	_this.setAttribute("userwavefile", m_userDefSampleBuffer->audioFile());
 }
 
 
@@ -241,9 +240,7 @@ void LfoController::loadSettings( const QDomElement & _this )
 
 	if (!_this.attribute("userwavefile").isEmpty())
 	{
-		auto buffer = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile"));
-		// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-		std::atomic_store(&m_userDefSampleBuffer, std::shared_ptr<const SampleBuffer>(std::move(buffer)));
+		m_userDefSampleBuffer = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile"));
 	}
 
 	updateSampleFunction();

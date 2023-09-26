@@ -165,8 +165,7 @@ void AudioFileProcessor::playNote( NotePlayHandle * _n,
 
 	if( ! _n->isFinished() )
 	{
-		// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-		if (std::atomic_load(&m_sample)->play(_working_buffer + offset,
+		if (m_sample->play(_working_buffer + offset,
 						static_cast<Sample::PlaybackState*>(_n->m_pluginData),
 						frames, _n->frequency(),
 						static_cast<Sample::Loop>(m_loopModel.value())))
@@ -237,9 +236,7 @@ void AudioFileProcessor::loadSettings(const QDomElement& elem)
 	}
 	else if (!elem.attribute("sampledata").isEmpty())
 	{
-		auto buffer = gui::SampleLoader::createBufferFromBase64(elem.attribute("srcdata"));
-		// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-		std::atomic_store(&m_sample, std::make_shared<Sample>(std::move(buffer)));
+		m_sample = std::make_shared<Sample>(gui::SampleLoader::createBufferFromBase64(elem.attribute("srcdata")));
 	}
 
 	m_loopModel.loadSettings(elem, "looped");
@@ -327,10 +324,7 @@ void AudioFileProcessor::setAudioFile( const QString & _audio_file,
 	}
 	// else we don't touch the track-name, because the user named it self
 
-	auto buffer = gui::SampleLoader::createBufferFromFile(_audio_file);
-	// TODO C++20: Deprecated, use std::atomic<std::shared_ptr> instead
-	std::atomic_store(&m_sample, std::make_shared<Sample>(std::move(buffer)));
-	
+	m_sample = std::make_shared<Sample>(gui::SampleLoader::createBufferFromFile(_audio_file));
 	loopPointChanged();
 	emit sampleUpdated();
 }
