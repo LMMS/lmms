@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_SAMPLE_BUFFER_LOADER_H
-#define LMMS_SAMPLE_BUFFER_LOADER_H
+#ifndef LMMS_GUI_SAMPLE_LOADER_H
+#define LMMS_GUI_SAMPLE_LOADER_H
 
 #include <QString>
 #include <memory>
