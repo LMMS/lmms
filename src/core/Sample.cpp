@@ -124,7 +124,7 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, int numFrames, float d
 
 	// If there happens to be an upper limit on the frames per period, we could use ArrayVector here instead
 	auto playBuffer = std::vector<sampleFrame>(numFrames / resampleRatio);
-	if (resampleRatio != 1.0f)
+	if (!typeInfo<float>::isEqual(resampleRatio, 1.0f))
 	{
 		playBuffer.resize(playBuffer.size() + s_interpolationMargins[state->m_interpolationMode]);
 	}
