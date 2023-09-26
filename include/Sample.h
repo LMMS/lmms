@@ -33,11 +33,11 @@
 #include "lmms_export.h"
 
 #ifdef __MINGW32__
-#include <mingw.shared_mutex.h>
 #include <mingw.mutex.h>
+#include <mingw.shared_mutex.h>
 #else
-#include <shared_mutex>
 #include <mutex>
+#include <shared_mutex>
 #endif
 
 class QPainter;
@@ -126,22 +126,12 @@ public:
 	auto setReversed(bool reversed) -> void;
 
 private:
-	auto playSampleRange(PlaybackState* state, sampleFrame* dst, int numFrames, float resampleRatio = 1.0f) const
-		-> bool;
-	auto playSampleRangeLoop(PlaybackState* state, sampleFrame* dst, int numFrames, float resampleRatio = 1.0f) const
-		-> bool;
-	auto playSampleRangePingPong(
-		PlaybackState* state, sampleFrame* dst, int numFrames, float resampleRatio = 1.0f) const -> bool;
-
+	auto playSampleRange(PlaybackState* state, sampleFrame* dst, size_t numFrames) const -> void;
+	auto resampleSampleRange(SRC_STATE* state, sampleFrame* src, sampleFrame* dst, size_t numInputFrames,
+		size_t numOutputFrames, double ratio) const -> SRC_DATA;
+	auto amplifySampleRange(sampleFrame* src, int numFrames) const -> void;
 	auto copyBufferForward(sampleFrame* dst, int initialPosition, int advanceAmount) const -> void;
 	auto copyBufferBackward(sampleFrame* dst, int initialPosition, int advanceAmount) const -> void;
-
-	auto getPingPongIndex(int index, int startFrame, int endFrame) const -> int;
-	auto getLoopedIndex(int index, int startFrame, int endFrame) const -> int;
-
-	auto resampleSampleRange(SRC_STATE* state, sampleFrame* src, sampleFrame* dst, int numInputFrames,
-		int numOutputFrames, double ratio) const -> SRC_DATA;
-	auto amplifySampleRange(sampleFrame* src, int numFrames) const -> void;
 
 private:
 	std::shared_ptr<const SampleBuffer> m_buffer = std::make_shared<SampleBuffer>();
