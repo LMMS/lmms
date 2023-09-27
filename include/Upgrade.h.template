@@ -1,0 +1,60 @@
+/*
+ * Delete these instructions when finished:
+ *  + Replace CLASS_NAME with the CamelCase name of the class.
+ *  + Replace CLASS_NAME_GUARD with the ALLUPPERCASE name of the class.
+ *  + Replace BLURB with a blurb about what this upgrade routine does.
+ *
+ * CLASS_NAME.h
+ *   Functor for upgrading data files for BLURB
+ *
+ * This file is part of LMMS - https://lmms.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ *
+ */
+
+#pragma once
+
+#ifndef LMMS_CLASS_NAME_GUARD_H
+#define LMMS_CLASS_NAME_GUARD_H
+
+#include "DataFileUpgrade.h"
+
+
+namespace lmms
+{
+
+// upgrade functor for 
+class CLASS_NAME : public DataFileUpgrade
+{
+public:
+	CLASS_NAME(QDomDocument& document) : DataFileUpgrade(document);
+
+	virtual void upgrade() override;
+
+	// Helper methods
+	void upgrade_helper(); //delete if you don't need it
+
+// Functor state
+private:
+	QDomNodeList m_elements;
+};
+
+
+}
+
+#endif // LMMS_CLASS_NAME_GUARD_H
+

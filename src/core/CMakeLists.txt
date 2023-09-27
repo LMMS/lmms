@@ -16,6 +16,7 @@ set(LMMS_SRCS
 	core/Controller.cpp
 	core/ControllerConnection.cpp
 	core/DataFile.cpp
+	core/DataFileUpgrade.cpp
 	core/DrumSynth.cpp
 	core/Effect.cpp
 	core/EffectChain.cpp
@@ -77,7 +78,10 @@ set(LMMS_SRCS
 	core/ToolPlugin.cpp
 	core/Track.cpp
 	core/TrackContainer.cpp
-	core/UpgradeExtendedNoteRange.h
+	core/UpgradeTo1_3_0.cpp
+	core/UpgradeMixerRename.cpp
+	core/UpgradeRenameBBTCO.cpp
+	core/UpgradeSampleAndHold.cpp
 	core/UpgradeExtendedNoteRange.cpp
 	core/Clip.cpp
 	core/ValueBuffer.cpp
