@@ -623,7 +623,7 @@ endif()
 # people simply updating git will still have this and mess up build with it
 FILE(REMOVE include/lmmsconfig.h)
 
-FILE(GLOB LMMS_INCLUDES "${CMAKE_SOURCE_DIR}/include/*.h")
+FILE(GLOB_RECURSE LMMS_INCLUDES "${CMAKE_SOURCE_DIR}/include/*.h")
 LIST(SORT LMMS_INCLUDES)
 
 # Get list of all committers from git history, ordered by number of commits.

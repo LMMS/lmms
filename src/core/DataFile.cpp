@@ -52,11 +52,11 @@
 #include "lmmsversion.h"
 
 // upgrade functors
-#include "UpgradeExtendedNoteRange.h"
-#include "UpgradeMixerRename.h"
-#include "UpgradeRenameBBTCO.h"
-#include "UpgradeSampleAndHold.h"
-#include "UpgradeTo1_3_0.h"
+#include "datafile/UpgradeExtendedNoteRange.h"
+#include "datafile/UpgradeMixerRename.h"
+#include "datafile/UpgradeRenameBBTCO.h"
+#include "datafile/UpgradeSampleAndHold.h"
+#include "datafile/UpgradeTo1_3_0.h"
 
 namespace lmms
 {

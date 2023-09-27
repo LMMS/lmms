@@ -22,7 +22,7 @@
  *
  */
 
-#include "UpgradeSampleAndHold.h"
+#include "datafile/UpgradeSampleAndHold.h"
 
 
 namespace lmms

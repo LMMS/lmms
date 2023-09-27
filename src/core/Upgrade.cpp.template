@@ -27,7 +27,7 @@
  *
  */
 
-#include "CLASS_NAME.h"
+#include "datafile/CLASS_NAME.h"
 
 
 namespace lmms

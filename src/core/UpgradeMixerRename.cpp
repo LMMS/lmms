@@ -22,7 +22,7 @@
  *
  */
 
-#include "UpgradeMixerRename.h"
+#include "datafile/UpgradeMixerRename.h"
 
 namespace lmms
 {
