@@ -28,6 +28,9 @@
 
 #include "DataFileUpgrade.h"
 
+#include <map>
+
+using StringMap = std::map<QString, QString>;
 
 namespace lmms
 {
@@ -41,10 +44,34 @@ public:
 	virtual void upgrade() override;
 
 	void upgrade_effects();
+	void upgrade_calf();
+	void rename_plugins();
+	void upgrade_ports();
+	void upgrade_multiband_ports();
+	void upgrade_pulsator_ports();
+	void upgrade_vintagedelay_ports();
+	void upgrade_equalizer_ports();
+	void upgrade_saturator_ports();
+	void upgrade_stereotools_ports();
+	void upgrade_ampitchshift_ports();
 
-// functor state
+// Functor state
 private:
 	QDomNodeList m_elements;
+
+	QDomElement attribute;
+	QDomElement effect;
+	QString attrName;
+	QString attrVal;
+	QString plugin;
+
+	const StringMap pluginNames = {
+		{"Sidechaincompressor", "SidechainCompressor"},
+		{"Sidechaingate", "SidechainGate"},
+		{"Multibandcompressor", "MultibandCompressor"},
+		{"Multibandgate", "MultibandGate"},
+		{"Multibandlimiter", "MultibandLimiter"},
+	};
 };
 
 
