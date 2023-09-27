@@ -122,20 +122,21 @@ void SampleBuffer::decodeSampleSF(const QString& audioFile)
 
 void SampleBuffer::decodeSampleDS(const QString& audioFile)
 {
-	auto data = std::unique_ptr<int_sample_t>{};
+	// Populated by DrumSynth::GetDSFileSamples
 	int_sample_t* dataPtr = nullptr;
 
 	auto ds = DrumSynth{};
 	const auto engineRate = Engine::audioEngine()->processingSampleRate();
 	const auto frames = ds.GetDSFileSamples(audioFile, dataPtr, DEFAULT_CHANNELS, engineRate);
-	data.reset(dataPtr);
+	const auto data = std::unique_ptr<int_sample_t[]>{dataPtr}; // NOLINT, we have to use a C-style array here
+
+	if (frames <= 0 || !data)
+	{
+		throw std::runtime_error{"Decoding failure: failed to decode DrumSynth file."};
+	}
 
 	auto result = std::vector<sampleFrame>(frames);
-	if (frames > 0 && data != nullptr)
-	{
-		src_short_to_float_array(data.get(), &result[0][0], frames * DEFAULT_CHANNELS);
-	}
-	else { throw std::runtime_error{"Decoding failure: failed to decode DrumSynth file."}; }
+	src_short_to_float_array(data.get(), &result[0][0], frames * DEFAULT_CHANNELS);
 
 	m_data = std::move(result);
 	m_audioFile = audioFile;
