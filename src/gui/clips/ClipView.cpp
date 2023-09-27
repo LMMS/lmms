@@ -295,11 +295,9 @@ void ClipView::remove()
 	// delete ourself
 	close();
 
-	// Since the Track would own the clip, we don't delete it
 	if (m_clip->getTrack())
 	{
 		m_clip->getTrack()->removeClip(m_clip);
-		return;
 	}
 
 	m_clip->deleteLater();
