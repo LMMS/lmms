@@ -330,11 +330,11 @@ void FileBrowser::addItems(const QString & path )
 	// try to add all directories from file system alphabetically into the tree
 	QDir cdir(path);
 	if (!cdir.isReadable()) { return; }
-	cdir.setNameFilters(m_filter.split(' '));
 	QFileInfoList entries = cdir.entryInfoList(
+			m_filter.split(' '),
 			QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot,
 			QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase);
-	for (auto& entry : entries)
+	for (const auto& entry : entries)
 	{
 		QString fileName = entry.fileName();
 		if (entry.isDir())
@@ -1057,11 +1057,11 @@ bool Directory::addItems(const QString& path)
 
 	treeWidget()->setUpdatesEnabled(false);
 
-	thisDir.setNameFilters(m_filter.split(' '));
 	QFileInfoList entries = thisDir.entryInfoList(
+			m_filter.split(' '),
 			QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot,
 			QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase);
-	for (auto& entry : entries)
+	for (const auto& entry : entries)
 	{
 		QString fileName = entry.fileName();
 		if (entry.isDir())
