@@ -63,7 +63,7 @@ public:
 		return "sampleclip";
 	}
 
-	std::shared_ptr<Sample> sample()
+	const Sample& sample()
 	{
 		return m_sample;
 	}
@@ -87,7 +87,7 @@ public slots:
 
 
 private:
-	std::shared_ptr<Sample> m_sample = std::make_shared<Sample>();
+	Sample m_sample;
 	BoolModel m_recordModel;
 	bool m_isPlaying;
 
