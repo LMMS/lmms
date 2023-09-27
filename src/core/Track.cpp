@@ -345,6 +345,7 @@ Clip * Track::addClip( Clip * clip )
  */
 void Track::removeClip( Clip * clip )
 {
+	auto guard = Engine::audioEngine()->requestChangesGuard();
 	clipVector::iterator it = std::find( m_clips.begin(), m_clips.end(), clip );
 	if( it != m_clips.end() )
 	{

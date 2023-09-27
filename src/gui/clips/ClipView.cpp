@@ -284,7 +284,8 @@ bool ClipView::close()
 /*! \brief Removes a ClipView from its track view.
  *
  *  Like the close() method, this asks the track view to remove this
- *  ClipView.
+ *  ClipView.  However, the clip is
+ *  scheduled for later deletion rather than closed immediately.
  *
  */
 void ClipView::remove()
@@ -293,8 +294,15 @@ void ClipView::remove()
 
 	// delete ourself
 	close();
-	auto guard = Engine::audioEngine()->requestChangesGuard();
-	delete m_clip;
+
+	// Since the Track would own the clip, we don't delete it
+	if (m_clip->getTrack())
+	{
+		m_clip->getTrack()->removeClip(m_clip);
+		return;
+	}
+
+	m_clip->deleteLater();
 }
 
 
