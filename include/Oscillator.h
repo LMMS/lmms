@@ -104,6 +104,11 @@ public:
 		m_userWave = _wave;
 	}
 
+	inline void setUserAntiAliasWaveTable(std::shared_ptr<const OscillatorConstants::waveform_t> waveform)
+	{
+		m_userAntiAliasWaveTable = waveform;
+	}
+
 	void update(sampleFrame* ab, const fpp_t frames, const ch_cnt_t chnl, bool modulator = false);
 
 	// now follow the wave-shape-routines...

@@ -31,6 +31,7 @@
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "AutomatableModel.h"
+#include "OscillatorConstants.h"
 #include "SampleBuffer.h"
 
 namespace lmms
@@ -72,6 +73,7 @@ private:
 	IntModel m_modulationAlgoModel;
 	BoolModel m_useWaveTableModel;
 	std::shared_ptr<const SampleBuffer> m_sampleBuffer;
+	std::shared_ptr<const OscillatorConstants::waveform_t> m_userAntiAliasWaveTable;
 
 	float m_volumeLeft;
 	float m_volumeRight;

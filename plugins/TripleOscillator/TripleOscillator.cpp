@@ -26,7 +26,6 @@
 
 #include <QDomElement>
 
-#include "SampleLoader.h"
 #include "TripleOscillator.h"
 #include "AudioEngine.h"
 #include "AutomatableButton.h"
@@ -38,6 +37,7 @@
 #include "Oscillator.h"
 #include "PixmapButton.h"
 #include "SampleBuffer.h"
+#include "SampleLoader.h"
 
 #include "embed.h"
 #include "plugin_export.h"
@@ -134,20 +134,13 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 
 }
 
-
-
-
-
-
-
-
 void OscillatorObject::oscUserDefWaveDblClick()
 {
-	QString af = gui::SampleLoader::openWaveformFile();
-	if (af != "")
+	auto af = gui::SampleLoader::openWaveformFile();
+	if( af != "" )
 	{
 		m_sampleBuffer = gui::SampleLoader::createBufferFromFile(af);
-
+		m_userAntiAliasWaveTable = Oscillator::generateAntiAliasUserWaveTable(m_sampleBuffer.get());
 		// TODO:
 		//m_usrWaveBtn->setToolTip(m_sampleBuffer->audioFile());
 	}
@@ -260,7 +253,8 @@ void TripleOscillator::saveSettings( QDomDocument & _doc, QDomElement & _this )
 					"modalgo" + QString::number( i+1 ) );
 		m_osc[i]->m_useWaveTableModel.saveSettings( _doc, _this,
 					"useWaveTable" + QString::number (i+1 ) );
-		_this.setAttribute("userwavefile" + is, m_osc[i]->m_sampleBuffer->audioFile());
+		_this.setAttribute( "userwavefile" + is,
+					m_osc[i]->m_sampleBuffer->audioFile() );
 	}
 }
 
@@ -291,6 +285,7 @@ void TripleOscillator::loadSettings( const QDomElement & _this )
 		if (!_this.attribute("userwavefile" + is).isEmpty())
 		{
 			m_osc[i]->m_sampleBuffer = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile" + is));
+			m_osc[i]->m_userAntiAliasWaveTable = Oscillator::generateAntiAliasUserWaveTable(m_osc[i]->m_sampleBuffer.get());
 		}
 	}
 }
@@ -358,9 +353,11 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 						oscs_r[i + 1] );
 				oscs_r[i]->setUseWaveTable(m_osc[i]->m_useWaveTable);
 			}
-			oscs_l[i]->setUserWave(m_osc[i]->m_sampleBuffer);
-			oscs_r[i]->setUserWave(m_osc[i]->m_sampleBuffer);
 
+			oscs_l[i]->setUserWave( m_osc[i]->m_sampleBuffer );
+			oscs_r[i]->setUserWave( m_osc[i]->m_sampleBuffer );
+			oscs_l[i]->setUserAntiAliasWaveTable(m_osc[i]->m_userAntiAliasWaveTable);
+			oscs_r[i]->setUserAntiAliasWaveTable(m_osc[i]->m_userAntiAliasWaveTable);
 		}
 
 		_n->m_pluginData = new oscPtr;
