@@ -45,4 +45,4 @@ void UpgradeSampleAndHold::upgrade()
 }
 
 
-}
+} // namespace lmms

@@ -1,5 +1,6 @@
 /*
- * UpgradeExtendedNoteRange.cpp - Upgrades the extended note range
+ * UpgradeExtendedNoteRange.cpp
+ *   Upgrades the extended note range
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -374,14 +375,9 @@ static void fixAutomationTracks(QDomElement & song, std::set<unsigned int> const
 }
 
 
-UpgradeExtendedNoteRange::UpgradeExtendedNoteRange(QDomElement & domElement) :
-	m_domElement(domElement)
-{
-}
-
 void UpgradeExtendedNoteRange::upgrade()
 {
-	QDomElement song = m_domElement.firstChildElement("song");
+	QDomElement song = m_document.firstChildElement("song");
 	while (!song.isNull())
 	{
 		// This set will later contain all ids of automated base notes. They are
@@ -408,10 +404,10 @@ void UpgradeExtendedNoteRange::upgrade()
 		song = song.nextSiblingElement("song");
 	};
 
-	if (m_domElement.elementsByTagName("song").item(0).isNull())
+	if (m_document.elementsByTagName("song").item(0).isNull())
 	{
 		// Dealing with a preset, not a song
-		QDomNodeList presets = m_domElement.elementsByTagName("instrumenttrack");
+		QDomNodeList presets = m_document.elementsByTagName("instrumenttrack");
 		if (presets.item(0).isNull()) { return; }
 		QDomElement preset = presets.item(0).toElement();
 		// Common correction for all instrument presets (make base notes match the new MIDI range).

@@ -42,7 +42,6 @@ public:
 };
 
 
-}
+} // namespace lmms
 
 #endif // LMMS_UPGRADESAMPLEANDHOLD_H
-

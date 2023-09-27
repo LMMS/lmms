@@ -53,4 +53,4 @@ void CLASS_NAME::upgrade()
 }
 
 
-}
+} // namespace lmms

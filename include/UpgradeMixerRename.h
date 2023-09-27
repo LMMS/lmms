@@ -41,7 +41,7 @@ public:
 };
 
 
-}
+} // namespace lmms
 
 #endif // LMMS_UPGRADEMIXERRENAME_H
 

@@ -48,4 +48,4 @@ void UpgradeMixerRename::upgrade()
 }
 
 
-}
+} // namespace lmms

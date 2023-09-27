@@ -48,7 +48,6 @@ private:
 };
 
 
-}
+} // namespace lmms
 
 #endif // LMMS_UPGRADETO1_3_0_H
-

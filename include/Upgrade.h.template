@@ -41,7 +41,7 @@ namespace lmms
 class CLASS_NAME : public DataFileUpgrade
 {
 public:
-	CLASS_NAME(QDomDocument& document) : DataFileUpgrade(document);
+	CLASS_NAME(QDomDocument& document) : DataFileUpgrade(document) {}
 
 	virtual void upgrade() override;
 
@@ -54,7 +54,7 @@ private:
 };
 
 
-}
+} // namespace lmms
 
 #endif // LMMS_CLASS_NAME_GUARD_H
 

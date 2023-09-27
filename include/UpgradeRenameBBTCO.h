@@ -41,7 +41,6 @@ public:
 };
 
 
-}
+} // namespace lmms
 
 #endif // LMMS_UPGRADERENAMEBBTCO_H
-

@@ -1,5 +1,6 @@
 /*
- * UpgradeExtendedNoteRange.h - Upgrades the extended note range
+ * UpgradeExtendedNoteRange.h
+ *   Upgrades the extended note range
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -25,21 +26,18 @@
 #ifndef LMMS_UPGRADEEXTENDEDNOTERANGE_H
 #define LMMS_UPGRADEEXTENDEDNOTERANGE_H
 
+#include "DataFileUpgrade.h"
 
-class QDomElement;
 
 namespace lmms
 {
 
-class UpgradeExtendedNoteRange
+class UpgradeExtendedNoteRange : public DataFileUpgrade
 {
 public:
-	UpgradeExtendedNoteRange(QDomElement & domElement);
+	UpgradeExtendedNoteRange(QDomDocument& document) : DataFileUpgrade(document) {}
 
-	void upgrade();
-
-private:
-	QDomElement & m_domElement;
+	virtual void upgrade() override;
 };
 
 } // namespace lmms

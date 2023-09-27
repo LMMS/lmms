@@ -1286,10 +1286,9 @@ void DataFile::upgrade_automationNodes()
  */
 void DataFile::upgrade_extendedNoteRange()
 {
-	auto root = documentElement();
-	UpgradeExtendedNoteRange upgradeExtendedNoteRange(root);
+	UpgradeExtendedNoteRange upgrader(*this);
 
-	upgradeExtendedNoteRange.upgrade();
+	upgrader.upgrade();
 }
 
 

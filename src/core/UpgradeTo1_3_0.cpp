@@ -435,4 +435,4 @@ void UpgradeTo1_3_0::upgrade()
 }
 
 
-}
+} // namespace lmms

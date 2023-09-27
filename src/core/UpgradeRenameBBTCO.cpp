@@ -63,4 +63,4 @@ void UpgradeRenameBBTCO::upgrade()
 }
 
 
-}
+} // namespace lmms
