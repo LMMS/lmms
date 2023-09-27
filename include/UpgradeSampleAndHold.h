@@ -38,7 +38,7 @@ class UpgradeSampleAndHold : public DataFileUpgrade
 public:
 	UpgradeSampleAndHold(QDomDocument& document) : DataFileUpgrade(document) {}
 
-	virtual void upgrade() override;
+	void upgrade() override;
 };
 
 

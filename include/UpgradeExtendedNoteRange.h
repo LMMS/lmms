@@ -37,7 +37,7 @@ class UpgradeExtendedNoteRange : public DataFileUpgrade
 public:
 	UpgradeExtendedNoteRange(QDomDocument& document) : DataFileUpgrade(document) {}
 
-	virtual void upgrade() override;
+	void upgrade() override;
 };
 
 } // namespace lmms

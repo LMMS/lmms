@@ -41,7 +41,7 @@ class UpgradeTo1_3_0 : public DataFileUpgrade
 public:
 	UpgradeTo1_3_0(QDomDocument& document) : DataFileUpgrade(document) {}
 
-	virtual void upgrade() override;
+	void upgrade() override;
 
 	void upgrade_effects();
 	void upgrade_calf();

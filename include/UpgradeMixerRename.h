@@ -37,7 +37,7 @@ class UpgradeMixerRename : public DataFileUpgrade
 public:
 	UpgradeMixerRename(QDomDocument& document) : DataFileUpgrade(document) {}
 
-	virtual void upgrade() override;
+	void upgrade() override;
 };
 
 

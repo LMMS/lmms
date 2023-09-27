@@ -37,7 +37,7 @@ class UpgradeRenameBBTCO : public DataFileUpgrade
 public:
 	UpgradeRenameBBTCO(QDomDocument& document) : DataFileUpgrade(document) {}
 
-	virtual void upgrade() override;
+	void upgrade() override;
 };
 
 

@@ -43,7 +43,7 @@ class CLASS_NAME : public DataFileUpgrade
 public:
 	CLASS_NAME(QDomDocument& document) : DataFileUpgrade(document) {}
 
-	virtual void upgrade() override;
+	void upgrade() override;
 
 	// Helper methods
 	void upgrade_helper(); //delete if you don't need it
