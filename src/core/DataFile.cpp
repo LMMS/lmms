@@ -79,7 +79,7 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_automationNodes  ,   &DataFile::upgrade_extendedNoteRange,
 	&DataFile::upgrade_defaultTripleOscillatorHQ,
 	&DataFile::upgrade_mixerRename      ,   &DataFile::upgrade_bbTcoRename,
-	&DataFile::upgrade_sampleAndHold    ,
+	&DataFile::upgrade_sampleAndHold    ,   &DataFile::upgrade_midiCCIndexing
 };
 
 // Vector of all versions that have upgrade routines.
@@ -1809,6 +1809,27 @@ void DataFile::upgrade_sampleAndHold()
 	}
 }
 
+//! Update MIDI CC indexes, so that they are counted from 0. Older releases of LMMS
+//! count the CCs from 1.
+void DataFile::upgrade_midiCCIndexing()
+{
+	static constexpr std::array attributesToUpdate{"inputcontroller", "outputcontroller"};
+
+	QDomNodeList elements = elementsByTagName("Midicontroller");
+	for(int i = 0; i < elements.length(); i++)
+	{
+		if (elements.item(i).isNull()) { continue; }
+		auto element = elements.item(i).toElement();
+		for (const char* attrName : attributesToUpdate)
+		{
+			if (element.hasAttribute(attrName))
+			{
+				int cc = element.attribute(attrName).toInt();
+				element.setAttribute(attrName, cc - 1);
+			}
+		}
+	}
+}
 
 void DataFile::upgrade()
 {

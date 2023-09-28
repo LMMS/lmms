@@ -848,7 +848,6 @@ void Sf2Instrument::play( sampleFrame * _working_buffer )
 	if( m_playingNotes.isEmpty() )
 	{
 		renderFrames( frames, _working_buffer );
-		instrumentTrack()->processAudioBuffer( _working_buffer, frames, nullptr );
 		return;
 	}
 
@@ -906,7 +905,6 @@ void Sf2Instrument::play( sampleFrame * _working_buffer )
 	{
 		renderFrames( frames - currentFrame, _working_buffer + currentFrame );
 	}
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames, nullptr );
 }
 
 

@@ -1040,8 +1040,6 @@ void MonstroInstrument::playNote( NotePlayHandle * _n,
 	ms->renderOutput( frames, _working_buffer + offset );
 
 	//applyRelease( _working_buffer, _n ); // we have our own release
-
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
 }
 
 void MonstroInstrument::deleteNotePluginData( NotePlayHandle * _n )

@@ -247,7 +247,15 @@ void SampleBuffer::update(bool keepSettings)
 	const int fileSizeMax = 300; // MB
 	const int sampleLengthMax = 90; // Minutes
 
-	bool fileLoadError = false;
+	enum class FileLoadError
+	{
+		None,
+		ReadPermissionDenied,
+		TooLarge,
+		Invalid
+	};
+	FileLoadError fileLoadError = FileLoadError::None;
+
 	if (m_audioFile.isEmpty() && m_origData != nullptr && m_origFrames > 0)
 	{
 		// TODO: reverse- and amplification-property is not covered
@@ -271,31 +279,40 @@ void SampleBuffer::update(bool keepSettings)
 		m_frames = 0;
 
 		const QFileInfo fileInfo(file);
-		if (fileInfo.size() > fileSizeMax * 1024 * 1024)
+		if (!fileInfo.isReadable())
 		{
-			fileLoadError = true;
+			fileLoadError = FileLoadError::ReadPermissionDenied;
+		}
+		else if (fileInfo.size() > fileSizeMax * 1024 * 1024)
+		{
+			fileLoadError = FileLoadError::TooLarge;
 		}
 		else
 		{
 			// Use QFile to handle unicode file names on Windows
 			QFile f(file);
-			SNDFILE * sndFile;
+			SNDFILE * sndFile = nullptr;
 			SF_INFO sfInfo;
 			sfInfo.format = 0;
+
 			if (f.open(QIODevice::ReadOnly) && (sndFile = sf_open_fd(f.handle(), SFM_READ, &sfInfo, false)))
 			{
 				f_cnt_t frames = sfInfo.frames;
 				int rate = sfInfo.samplerate;
 				if (frames / rate > sampleLengthMax * 60)
 				{
-					fileLoadError = true;
+					fileLoadError = FileLoadError::TooLarge;
 				}
 				sf_close(sndFile);
+			}
+			else
+			{
+				fileLoadError = FileLoadError::Invalid;
 			}
 			f.close();
 		}
 
-		if (!fileLoadError)
+		if (fileLoadError == FileLoadError::None)
 		{
 #ifdef LMMS_HAVE_OGGVORBIS
 			// workaround for a bug in libsndfile or our libsndfile decoder
@@ -322,7 +339,7 @@ void SampleBuffer::update(bool keepSettings)
 			}
 		}
 
-		if (m_frames == 0 || fileLoadError)  // if still no frames, bail
+		if (m_frames == 0 || fileLoadError != FileLoadError::None)  // if still no frames, bail
 		{
 			// sample couldn't be decoded, create buffer containing
 			// one sample-frame
@@ -363,16 +380,35 @@ void SampleBuffer::update(bool keepSettings)
 	}
 	Oscillator::generateAntiAliasUserWaveTable(this);
 
-	if (fileLoadError)
+	if (fileLoadError != FileLoadError::None)
 	{
 		QString title = tr("Fail to open file");
-		QString message = tr("Audio files are limited to %1 MB "
-				"in size and %2 minutes of playing time"
-				).arg(fileSizeMax).arg(sampleLengthMax);
+		QString message;
+
+		switch (fileLoadError)
+		{
+			case FileLoadError::None:
+				// present just to avoid a compiler warning
+				break;
+
+			case FileLoadError::ReadPermissionDenied:
+				message = tr("Read permission denied");
+				break;
+
+			case FileLoadError::TooLarge:
+				message = tr("Audio files are limited to %1 MB "
+					"in size and %2 minutes of playing time"
+					).arg(fileSizeMax).arg(sampleLengthMax);
+				break;
+
+			case FileLoadError::Invalid:
+				message = tr("Invalid audio file");
+				break;
+		}
+
 		if (gui::getGUI() != nullptr)
 		{
-			QMessageBox::information(nullptr,
-				title, message,	QMessageBox::Ok);
+			QMessageBox::information(nullptr, title, message, QMessageBox::Ok);
 		}
 		else
 		{
@@ -1353,7 +1389,7 @@ SampleBuffer * SampleBuffer::resample(const sample_rate_t srcSR, const sample_ra
 	}
 	else
 	{
-		printf("Error: src_new() failed in sample_buffer.cpp!\n");
+		printf("Error: src_new() failed in SampleBuffer.cpp!\n");
 	}
 	dstSB->update();
 	return dstSB;
@@ -1576,7 +1612,7 @@ SampleBuffer::handleState::handleState(bool varyingPitch, int interpolationMode)
 
 	if ((m_resamplingData = src_new(interpolationMode, DEFAULT_CHANNELS, &error)) == nullptr)
 	{
-		qDebug("Error: src_new() failed in sample_buffer.cpp!\n");
+		qDebug("Error: src_new() failed in SampleBuffer.cpp!\n");
 	}
 }
 

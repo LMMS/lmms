@@ -419,7 +419,6 @@ void FreeBoyInstrument::playNote(NotePlayHandle* nph, sampleFrame* workingBuffer
 		}
 		framesLeft -= count;
 	}
-	instrumentTrack()->processAudioBuffer(workingBuffer, frames + offset, nph);
 }
 
 

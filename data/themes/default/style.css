@@ -9,7 +9,6 @@ QLabel, QTreeWidget, QListWidget, QGroupBox, QMenuBar {
 
 QTreeView {
 	outline: none;
-	font-size: 12px;
 }
 
 QTreeWidget::item {
@@ -42,7 +41,7 @@ QMdiArea {
 
 lmms--gui--FileBrowser QCheckBox
 {
-	font-size: 10px;
+	font-size: 8pt;
 	color: white;
 }
 
@@ -115,7 +114,6 @@ QSplashScreen QLabel {
 QMenu {
 	border-top: 2px solid #08993E;
 	background-color: #15191c;
-	font-size: 11px;
 }
 
 QMenu::separator {
@@ -133,15 +131,12 @@ QMenu::item {
 
 QMenu::item:selected {
 	color: #d1d8e4;
-	font-weight: normal;
 	background-color: #21272b;
 }
 
 QMenu::item:disabled {
 	color: #515459;
 	background-color: #262b30;
-	font-size: 12px;
-	font-weight: normal;
 	padding: 4px 32px 4px 20px;
 }
 

@@ -64,7 +64,6 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 				"to begin a new drag'n'drop action." ).arg(UI_CTRL_KEY) );
 
 	auto toMenu = new QMenu(this);
-	toMenu->setFont( pointSize<9>( toMenu->font() ) );
 	connect( toMenu, SIGNAL(aboutToShow()), this, SLOT(updateMenu()));
 
 
