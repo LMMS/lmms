@@ -120,7 +120,7 @@ void caps_so_init()
 
 	/* make sure N is correct */
 	assert (d - descriptors == N);
-	
+
 	//seed();
 }
 
