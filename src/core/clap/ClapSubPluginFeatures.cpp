@@ -106,11 +106,12 @@ void ClapSubPluginFeatures::fillDescriptionWidget(QWidget* parent, const Key* ke
 
 void ClapSubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor* desc, KeyList& kl) const
 {
-	const auto& manager = *Engine::getClapManager();
-	for (const auto& file : manager.files())
+	for (const auto& file : Engine::getClapManager()->files())
 	{
+		assert(file.isValid());
 		for (const auto& pluginInfo : file.pluginInfo())
 		{
+			assert(pluginInfo != nullptr);
 			if (pluginInfo->type() == m_type && pluginInfo->isValid())
 			{
 				const auto clapDesc = pluginInfo->descriptor();

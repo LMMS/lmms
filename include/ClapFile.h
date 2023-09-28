@@ -53,9 +53,9 @@ public:
 	//! Loads .clap file and plugin info
 	ClapFile(const ClapManager* manager, std::filesystem::path filename);
 	ClapFile(const ClapFile&) = delete;
-	ClapFile(ClapFile&& other) noexcept = default;
+	ClapFile(ClapFile&& other) noexcept;
 	ClapFile& operator=(const ClapFile&) = delete;
-	ClapFile& operator=(ClapFile&& rhs) noexcept = default;
+	ClapFile& operator=(ClapFile&& rhs) noexcept;
 	~ClapFile();
 
 	//! Represents a CLAP plugin within a .clap file
@@ -92,7 +92,6 @@ public:
 	//! Call after creating ClapFile to load the .clap file
 	auto load() -> bool;
 
-	auto parent() const -> const ClapManager* { return m_parent; }
 	auto filename() const -> const std::filesystem::path& { return m_filename; }
 	auto factory() const -> const clap_plugin_factory* { return m_factory; }
 
@@ -111,7 +110,6 @@ private:
 	void unload();
 
 	// Are set when the .clap file is loaded:
-	const ClapManager* m_parent = nullptr; //!< Always valid, so storing it is okay
 	std::filesystem::path m_filename;
 	std::unique_ptr<QLibrary> m_library;
 	const clap_plugin_entry* m_entry = nullptr;

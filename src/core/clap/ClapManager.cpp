@@ -94,7 +94,7 @@ ClapManager::~ClapManager()
 void ClapManager::initPlugins()
 {
 	findSearchPaths();
-	if (s_debug) { qDebug() << "Found .clap files:"; }
+	if (debugging()) { qDebug() << "Found .clap files:"; }
 	loadClapFiles(getSearchPaths());
 
 	// TEMPORARY: Testing purposes
@@ -212,7 +212,7 @@ void ClapManager::findSearchPaths()
 	}
 #endif
 
-	if (s_debug)
+	if (debugging())
 	{
 		qDebug() << "CLAP search paths:";
 		for (const auto& path : m_searchPaths)
@@ -231,7 +231,7 @@ void ClapManager::loadClapFiles(const std::vector<std::filesystem::path>& search
 	m_uriToPluginInfo.clear();
 	m_pluginInfo.clear();
 
-	QElapsedTimer timer;
+	QElapsedTimer timer; // TODO: Use <chrono> library
 	timer.start();
 
 	// Search searchPaths for files with ".clap" extension
@@ -250,7 +250,7 @@ void ClapManager::loadClapFiles(const std::vector<std::filesystem::path>& search
 
 			++totalClapFiles;
 
-			if (s_debug) { qDebug() << "-" << entryPath.c_str(); }
+			if (debugging()) { qDebug() << "\n\n~~~CLAP FILE~~~\nfilename:" << entryPath.c_str(); }
 
 			auto& clapFile = m_files.emplace_back(this, std::move(entryPath));
 			clapFile.load();
@@ -288,7 +288,7 @@ void ClapManager::loadClapFiles(const std::vector<std::filesystem::path>& search
 		<< "CLAP plugins loaded in" << timer.elapsed() << "msecs.";
 	if (m_files.size() != totalClapFiles || m_pluginInfo.size() != totalClapPlugins)
 	{
-		if (s_debug)
+		if (debugging())
 		{
 			qDebug() <<
 				"If you don't want to see all this debug output, please set\n"

@@ -39,9 +39,35 @@ namespace lmms
 ////////////////////////////////
 
 ClapFile::ClapFile(const ClapManager* manager, std::filesystem::path filename)
-	: m_parent{manager}, m_filename{std::move(filename)}
+	: m_filename{std::move(filename)}
 {
 	m_filename.make_preferred();
+}
+
+ClapFile::ClapFile(ClapFile&& other) noexcept
+{
+	m_filename = std::move(other.m_filename);
+	m_library = std::exchange(other.m_library, nullptr);
+	m_entry = std::exchange(other.m_entry, nullptr);
+	m_factory = std::exchange(other.m_factory, nullptr);
+	m_pluginCount = other.m_pluginCount;
+	m_valid = std::exchange(other.m_valid, false);
+	m_pluginInfo = std::move(other.m_pluginInfo);
+}
+
+ClapFile& ClapFile::operator=(ClapFile&& rhs) noexcept
+{
+	if (this != &rhs)
+	{
+		m_filename = std::move(rhs.m_filename);
+		m_library = std::exchange(rhs.m_library, nullptr);
+		m_entry = std::exchange(rhs.m_entry, nullptr);
+		m_factory = std::exchange(rhs.m_factory, nullptr);
+		m_pluginCount = rhs.m_pluginCount;
+		m_valid = std::exchange(rhs.m_valid, false);
+		m_pluginInfo = std::move(rhs.m_pluginInfo);
+	}
+	return *this;
 }
 
 ClapFile::~ClapFile()
@@ -63,20 +89,35 @@ auto ClapFile::load() -> bool
 		return false;
 	}
 
-	const auto pluginEntry = reinterpret_cast<const clap_plugin_entry*>(m_library->resolve("clap_entry"));
-	if (!pluginEntry)
+	m_entry = reinterpret_cast<const clap_plugin_entry*>(m_library->resolve("clap_entry"));
+	if (!m_entry)
 	{
-		qWarning() << "Unable to resolve entry point 'clap_entry' in '" << filename().c_str() << "'";
+		qWarning().nospace() << "Unable to resolve entry point 'clap_entry' in CLAP file '" << filename().c_str() << "'";
 		m_library->unload();
 		return false;
 	}
 
-	pluginEntry->init(filename().c_str());
-	m_factory = static_cast<const clap_plugin_factory*>(pluginEntry->get_factory(CLAP_PLUGIN_FACTORY_ID));
+	if (!m_entry->init(filename().c_str()))
+	{
+		qWarning().nospace() << "CLAP file '" << filename().c_str() << "' failed to initialize";
+		m_entry = nullptr; // Prevent deinit() from being called
+		return false;
+	}
+
+	m_factory = static_cast<const clap_plugin_factory*>(m_entry->get_factory(CLAP_PLUGIN_FACTORY_ID));
+	if (!m_factory)
+	{
+		qWarning().nospace() << "Failed to get the plugin factory in CLAP file '" << filename().c_str() << "'";
+		return false;
+	}
 
 	m_pluginCount = m_factory->get_plugin_count(m_factory);
 	if (ClapManager::debugging()) { qDebug() << "plugin count:" << m_pluginCount; }
-	if (m_pluginCount <= 0) { return false; }
+	if (m_pluginCount <= 0)
+	{
+		qWarning().nospace() << "CLAP file '" << filename().c_str() << "' contains no plugins";
+		return false;
+	}
 
 	m_pluginInfo.clear();
 	for (std::uint32_t i = 0; i < m_pluginCount; ++i)
@@ -131,6 +172,9 @@ void ClapFile::purgeInvalidPlugins()
 ClapPluginInfo::ClapPluginInfo(const clap_plugin_factory* factory, std::uint32_t index)
 	: m_factory{factory}, m_index{index}
 {
+	assert(m_factory != nullptr);
+	if (ClapManager::debugging()) { qDebug() << ""; }
+
 	m_descriptor = m_factory->get_plugin_descriptor(m_factory, m_index);
 	if (!m_descriptor)
 	{
@@ -144,14 +188,6 @@ ClapPluginInfo::ClapPluginInfo(const clap_plugin_factory* factory, std::uint32_t
 		return;
 	}
 
-	if (ClapManager::debugging())
-	{
-		qDebug().nospace() << "CLAP version: "
-			<< m_descriptor->clap_version.major << "."
-			<< m_descriptor->clap_version.minor << "."
-			<< m_descriptor->clap_version.revision;
-	}
-
 	if (!clap_version_is_compatible(m_descriptor->clap_version))
 	{
 		qWarning() << "Incompatible CLAP version: Plugin is: " << m_descriptor->clap_version.major << "."
@@ -163,6 +199,10 @@ ClapPluginInfo::ClapPluginInfo(const clap_plugin_factory* factory, std::uint32_t
 	if (ClapManager::debugging())
 	{
 		qDebug() << "name:" << m_descriptor->name;
+		qDebug().nospace() << "CLAP version: "
+			<< m_descriptor->clap_version.major << "."
+			<< m_descriptor->clap_version.minor << "."
+			<< m_descriptor->clap_version.revision;
 		qDebug() << "description:" << m_descriptor->description;
 	}
 

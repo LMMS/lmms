@@ -229,7 +229,7 @@ auto ClapInstance::hasNoteInput() const -> bool
 
 void ClapInstance::destroy()
 {
-	hostIdle(); // ???
+	//hostIdle(); // TODO: ??? May throw an exception, which should not happen in ClapInstance dtor
 
 	pluginUnload();
 
@@ -238,7 +238,6 @@ void ClapInstance::destroy()
 
 auto ClapInstance::isValid() const -> bool
 {
-	// TODO: Check if state is not None?
 	return m_plugin != nullptr && !isPluginErrorState() && m_pluginIssues.empty();
 }
 
@@ -267,6 +266,7 @@ auto ClapInstance::pluginLoad() -> bool
 	{
 		qWarning() << "Failed to create instance of CLAP plugin";
 		hostDestroy();
+		// TODO: Set state to NoneWithError?
 		return false;
 	}
 
@@ -311,6 +311,7 @@ auto ClapInstance::pluginInit() -> bool
 		qWarning() << "Could not init the plugin with id:" << info().descriptor()->id;
 		setPluginState(PluginState::LoadedWithError);
 		m_plugin->destroy(m_plugin);
+		m_plugin = nullptr;
 		return false;
 	}
 
@@ -805,7 +806,6 @@ void ClapInstance::paramFlushOnMainThread()
 
 	if (canUsePluginParams())
 	{
-		// ZaMaximX2 crashes here:
 		m_pluginExtParams->flush(m_plugin, m_evIn.clapInputEvents(), m_evOut.clapOutputEvents());
 	}
 
@@ -856,7 +856,7 @@ auto ClapInstance::isPluginNextStateValid(PluginState next) -> bool
 			|| m_pluginState == PluginState::InactiveWithError
 			|| m_pluginState == PluginState::Loaded
 			|| m_pluginState == PluginState::LoadedWithError
-			|| m_pluginState == PluginState::None; // TODO
+			|| m_pluginState == PluginState::None; // TODO: NoneWithError?
 	case PluginState::Loaded:
 		return m_pluginState == PluginState::None;
 	case PluginState::LoadedWithError:
@@ -942,25 +942,25 @@ void ClapInstance::hostDestroy()
 void ClapInstance::hostIdle()
 {
 	assert(isMainThread());
+	if (isPluginErrorState()) { return; }
 
 	// Try to send events to the audio engine
 	m_appToEngineValueQueue.producerDone();
 	m_appToEngineModQueue.producerDone();
 
 	m_engineToAppValueQueue.consume(
-		[this](clap_id param_id, const EngineToAppParamQueueValue &value) {
-			const auto it = m_paramMap.find(param_id);
+		[this](clap_id paramId, const EngineToAppParamQueueValue& value) {
+			const auto it = m_paramMap.find(paramId);
 			if (it == m_paramMap.end())
 			{
-				std::ostringstream msg;
-				msg << "Plugin produced a CLAP_EVENT_PARAM_SET with an unknown param_id: " << param_id;
-				throw std::invalid_argument(msg.str());
+				std::string msg = "Plugin produced a CLAP_EVENT_PARAM_SET with an unknown param_id: " + std::to_string(paramId);
+				throw std::invalid_argument{msg};
 			}
 
 			if (value.has_value) { it->second->setValue(value.value); }
 			if (value.has_gesture) { it->second->setIsAdjusting(value.is_begin); }
 
-			emit paramAdjusted(param_id);
+			emit paramAdjusted(paramId);
 		}
 	);
 
