@@ -305,18 +305,18 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 		if(p < 9)
 		{
 			hardness += random * static_cast<float>(fast_rand() % 128) - 64.0;
-			hardness = std::clamp(0.0f, hardness, 128.0f);
+			hardness = std::clamp(hardness, 0.0f, 128.0f);
 
 			position += random * static_cast<float>(fast_rand() % 64) - 32.0;
-			position = std::clamp(0.0f, position, 64.0f);
+			position = std::clamp(position, 0.0f, 64.0f);
 		}
 		else if(p == 9)
 		{
 			modulator += random * static_cast<float>(fast_rand() % 128) - 64.0;
-			modulator = std::clamp(0.0f, modulator, 128.0f);
+			modulator = std::clamp(modulator, 0.0f, 128.0f);
 
 			crossfade += random * static_cast<float>(fast_rand() % 128) - 64.0;
-			crossfade = std::clamp(0.0f, crossfade, 128.0f);
+			crossfade = std::clamp(crossfade, 0.0f, 128.0f);
 		}
 
 		// critical section as STK is not thread-safe
