@@ -104,6 +104,7 @@ void Engine::destroy()
 	deleteHelper( &s_patternStore );
 
 	deleteHelper( &s_mixer );
+	deleteHelper(&s_song);
 	deleteHelper( &s_audioEngine );
 
 #ifdef LMMS_HAVE_LV2
@@ -114,7 +115,6 @@ void Engine::destroy()
 	//delete ConfigManager::inst();
 	deleteHelper( &s_projectJournal );
 
-	deleteHelper( &s_song );
 
 	delete ConfigManager::inst();
 
