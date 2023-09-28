@@ -29,6 +29,8 @@
 	(2541 - 2580 donated to artemio@kdemail.net)
 */
 
+// #include <sys/time.h>
+
 #include "basics.h"
 
 #include "Cabinet.h"
@@ -55,6 +57,15 @@
 
 #define N 39 
 static DescriptorStub * descriptors [N];
+
+/*static inline void
+seed()
+{
+	static struct timeval tv;
+  gettimeofday (&tv, 0);
+
+	srand (tv.tv_sec ^ tv.tv_usec);
+}*/
 
 extern "C" {
 
@@ -129,11 +140,5 @@ ladspa_descriptor (unsigned long i)
 		return descriptors[i];
 	return 0;
 }
-
-struct CapsSoInit {
-	CapsSoInit() { caps_so_init(); } 
-	~CapsSoInit() { caps_so_fini(); } 
-}; 
-static CapsSoInit capsSoInit;
 
 }; /* extern "C" */
