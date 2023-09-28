@@ -122,6 +122,7 @@ void caps_so_init()
 	assert (d - descriptors == N);
 }
 
+	//seed();
 void caps_so_fini()
 {
 	for (ulong i = 0; i < N; ++i)
