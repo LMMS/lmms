@@ -438,7 +438,7 @@ MalletsInstrumentView::MalletsInstrumentView( MalletsInstrument * _instrument,
 	m_spreadKnob->move( 190, 140 );
 	m_spreadKnob->setHintText( tr( "Spread:" ), "" );
 
-	m_randomKnob = new Knob(knobVintage_32, this);
+	m_randomKnob = new Knob( KnobType::Vintage32, this );
 	m_randomKnob->setLabel(tr("Random"));
 	m_randomKnob->move(190, 190);
 	m_randomKnob->setHintText(tr("Random:"),"");
