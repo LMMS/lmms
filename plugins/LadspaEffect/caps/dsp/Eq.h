@@ -27,10 +27,8 @@
 */
 
 
-
 #ifndef _DSP_EQ_H_
 #define _DSP_EQ_H_
-
 namespace DSP {
 
 /* A single bandpass as used by the Eq, expressed as a biquad. Like all

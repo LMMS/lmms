@@ -1,7 +1,7 @@
 INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/include")
 FILE(GLOB PLUGIN_SOURCES tap-plugins/*.c)
 LIST(SORT PLUGIN_SOURCES)
-IF (NOT MSVC)
+IF(NOT MSVC)
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -Wno-write-strings -fomit-frame-pointer -fno-strict-aliasing -funroll-loops -ffast-math")
 ENDIF()
 FOREACH(_item ${PLUGIN_SOURCES})
