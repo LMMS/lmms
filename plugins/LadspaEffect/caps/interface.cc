@@ -120,9 +120,10 @@ void caps_so_init()
 
 	/* make sure N is correct */
 	assert (d - descriptors == N);
+	
+	//seed();
 }
 
-	//seed();
 void caps_so_fini()
 {
 	for (ulong i = 0; i < N; ++i)
