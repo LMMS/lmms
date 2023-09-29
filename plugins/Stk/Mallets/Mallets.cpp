@@ -302,7 +302,7 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 		float modulator = m_modulatorModel.value();
 		float crossfade = m_crossfadeModel.value();
 
-		if(p < 9)
+		if (p < 9)
 		{
 			hardness += random * static_cast<float>(fast_rand() % 128) - 64.0;
 			hardness = std::clamp(hardness, 0.0f, 128.0f);
