@@ -49,9 +49,10 @@ WaveForm::WaveForm(int w, int h, SlicerT  * instrument, QWidget * parent) :
     m_sliceEditor(QPixmap(w, m_editorHeight)),
 
     // references to instrument vars
-    m_slicerTParent(instrument),
     m_currentSample(instrument->m_originalSample),
+    m_slicerTParent(instrument),
     m_slicePoints(instrument->m_slicePoints)
+
     {
         setFixedSize(m_width, m_height);
         setMouseTracking( true );

@@ -23,6 +23,8 @@
  */
 
 // TODO: fix some PV bugs
+// make fft size and windowsize seperate, pad window to fit into fft with 0
+// this should produce better quality hopefully
 // TODO: onset detection find valleys
 // TODO: switch to arrayVector (maybe)
 // TODO: cleaunp UI classes
@@ -178,7 +180,7 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 		fftwf_execute(fftPlan);
 
 		// analysis step
-		for (int j = 0; j < windowSize; j++)
+		for (int j = 0; j < windowSize/2; j++) // only process nyquistic frequency
 		{
 			real = FFTSpectrum[j][0];
 			imag = FFTSpectrum[j][1];
@@ -192,11 +194,8 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 
 			freq -= (float)j*expectedPhaseIn; // subtract expected phase
 
-			// some black magic to get into +/- PI interval, revise later pls
-			long qpd = freq/M_PI;
-			if (qpd >= 0) qpd += qpd&1;
-			else qpd -= qpd&1;
-			freq -= M_PI*(float)qpd;
+			// this puts freq in 0-2pi
+			freq = fmod(freq + M_PI, -2.0f * M_PI) + M_PI;
 
 			freq = (float)overSampling*freq/(2.*M_PI); // idk
 
@@ -216,7 +215,7 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 
 
 	// synthesis, all the operations are the reverse of the analysis
-	for (int j = 0; j < windowSize; j++)
+	for (int j = 0; j < windowSize/2; j++)
 	{
 		magnitude = allMagnitudes[j];
 		freq = allFrequencies[j];
@@ -225,7 +224,7 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 
 		deltaPhase /= freqPerBin;
 
-		deltaPhase = 2.*M_PI*deltaPhase/overSampling;;
+		deltaPhase = 2.*M_PI*deltaPhase/overSampling;
 
 		deltaPhase += (float)j*expectedPhaseOut;
 

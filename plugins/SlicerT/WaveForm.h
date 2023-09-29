@@ -115,6 +115,9 @@ class WaveForm : public QWidget {
 
         SampleBuffer & m_currentSample;
 
+        SlicerT * m_slicerTParent;
+        std::vector<int> & m_slicePoints;
+
         void drawEditor();
         void drawSeekerWaveform();
         void drawSeeker();
@@ -124,10 +127,6 @@ class WaveForm : public QWidget {
 
     public:
         WaveForm(int w, int h, SlicerT * instrument, QWidget * parent);
-
-    private:
-        SlicerT * m_slicerTParent;
-        std::vector<int> & m_slicePoints;
 };
 } // namespace gui
 } // namespace lmms
