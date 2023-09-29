@@ -310,7 +310,7 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 			position += random * static_cast<float>(fast_rand() % 64) - 32.0;
 			position = std::clamp(position, 0.0f, 64.0f);
 		}
-		else if(p == 9)
+		else if (p == 9)
 		{
 			modulator += random * static_cast<float>(fast_rand() % 128) - 64.0;
 			modulator = std::clamp(modulator, 0.0f, 128.0f);
