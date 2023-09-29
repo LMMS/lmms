@@ -441,7 +441,7 @@ MalletsInstrumentView::MalletsInstrumentView( MalletsInstrument * _instrument,
 	m_randomKnob = new Knob(KnobType::Vintage32, this);
 	m_randomKnob->setLabel(tr("Random"));
 	m_randomKnob->move(190, 190);
-	m_randomKnob->setHintText(tr("Random:"),"");
+	m_randomKnob->setHintText(tr("Random:"), "");
 
 	// try to inform user about missing Stk-installation
 	if( _instrument->m_filesMissing && getGUI() != nullptr )
