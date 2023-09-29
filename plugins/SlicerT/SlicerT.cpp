@@ -30,61 +30,55 @@
 // TODO: cleaunp UI classes
 // TODO: add text when no sample loaded
 // TODO: better buttons
-// TODO: code cleaunp, style and test
 
 #include "SlicerT.h"
 
-#include <fftw3.h>
 #include <QDomElement>
+#include <fftw3.h>
 
 #include "Engine.h"
-#include "Song.h"
 #include "InstrumentTrack.h"
-
 #include "PathUtil.h"
+#include "Song.h"
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms {
 
-namespace lmms
-{
-
-extern "C"
-{
-Plugin::Descriptor PLUGIN_EXPORT slicert_plugin_descriptor =
-{
-	LMMS_STRINGIFY( PLUGIN_NAME ),
+extern "C" {
+Plugin::Descriptor PLUGIN_EXPORT slicert_plugin_descriptor = {
+	LMMS_STRINGIFY(PLUGIN_NAME),
 	"SlicerT",
-	QT_TRANSLATE_NOOP( "PluginBrowser",
-				"Basic Slicer" ),
+	QT_TRANSLATE_NOOP("PluginBrowser", "Basic Slicer"),
 	"Daniel Kauss Serna <daniel.kauss.serna/at/gmail.com>",
 	0x0100,
 	Plugin::Type::Instrument,
-	new PluginPixmapLoader( "icon" ),
+	new PluginPixmapLoader("icon"),
 	nullptr,
 	nullptr,
-} ;
+};
 } // end extern
 
-
-PhaseVocoder::PhaseVocoder() :
-	FFTInput(windowSize, 0),
-	IFFTReconstruction(windowSize, 0),
-	allMagnitudes(windowSize, 0),
-	allFrequencies(windowSize, 0),
-	processedFreq(windowSize, 0),
-	processedMagn(windowSize, 0)
+PhaseVocoder::PhaseVocoder()
+	: FFTInput(windowSize, 0)
+	, IFFTReconstruction(windowSize, 0)
+	, allMagnitudes(windowSize, 0)
+	, allFrequencies(windowSize, 0)
+	, processedFreq(windowSize, 0)
+	, processedMagn(windowSize, 0)
 {
 	fftPlan = fftwf_plan_dft_r2c_1d(windowSize, FFTInput.data(), FFTSpectrum, FFTW_MEASURE);
 	ifftPlan = fftwf_plan_dft_c2r_1d(windowSize, FFTSpectrum, IFFTReconstruction.data(), FFTW_MEASURE);
 }
 
-PhaseVocoder::~PhaseVocoder() {
+PhaseVocoder::~PhaseVocoder()
+{
 	fftwf_destroy_plan(fftPlan);
 	fftwf_destroy_plan(ifftPlan);
 }
 
-void PhaseVocoder::loadData(std::vector<float> originalData, int sampleRate, float newRatio) {
+void PhaseVocoder::loadData(std::vector<float> originalData, int sampleRate, float newRatio)
+{
 	originalBuffer = originalData;
 	originalSampleRate = sampleRate;
 	m_scaleRatio = -1; // force update, kinda hacky
@@ -95,13 +89,15 @@ void PhaseVocoder::loadData(std::vector<float> originalData, int sampleRate, flo
 
 	// set buffer sizes
 	m_processedWindows.resize(numWindows, false);
-	lastPhase.resize(numWindows*windowSize, 0);
-	sumPhase.resize(numWindows*windowSize, 0);
-	freqCache.resize(numWindows*windowSize, 0);
-	magCache.resize(numWindows*windowSize, 0);
+	lastPhase.resize(numWindows * windowSize, 0);
+	sumPhase.resize(numWindows * windowSize, 0);
+	freqCache.resize(numWindows * windowSize, 0);
+	magCache.resize(numWindows * windowSize, 0);
 
-	for (int i = 0;i<numWindows;i++) {
-		if (!m_processedWindows[i]) {
+	for (int i = 0; i < numWindows; i++)
+	{
+		if (!m_processedWindows[i])
+		{
 			generateWindow(i, false);
 			m_processedWindows[i] = true;
 		}
@@ -110,7 +106,8 @@ void PhaseVocoder::loadData(std::vector<float> originalData, int sampleRate, flo
 	dataLock.unlock();
 }
 
-void PhaseVocoder::getFrames(std::vector<float> & outData, int start, int frames) {
+void PhaseVocoder::getFrames(std::vector<float>& outData, int start, int frames)
+{
 	if (originalBuffer.size() < 2048) { return; }
 	dataLock.lock();
 
@@ -119,14 +116,17 @@ void PhaseVocoder::getFrames(std::vector<float> & outData, int start, int frames
 	int endWindow = std::min((float)numWindows, (float)(start + frames) / outStepSize + windowMargin);
 	// this encompases the minimum windows needed to get full quality,
 	// which must be computed
-	for (int i = startWindow;i<endWindow;i++) {
-		if (!m_processedWindows[i]) {
+	for (int i = startWindow; i < endWindow; i++)
+	{
+		if (!m_processedWindows[i])
+		{
 			generateWindow(i, true);
 			m_processedWindows[i] = true;
 		}
 	}
 
-	for (int i = 0;i<frames;i++) {
+	for (int i = 0; i < frames; i++)
+	{
 		outData[i] = processedBuffer[start + i];
 	}
 
@@ -134,7 +134,8 @@ void PhaseVocoder::getFrames(std::vector<float> & outData, int start, int frames
 }
 
 // adjust pv params and reset buffers
-void PhaseVocoder::updateParams(float newRatio) {
+void PhaseVocoder::updateParams(float newRatio)
+{
 	if (originalBuffer.size() < 2048) { return; }
 	if (newRatio == m_scaleRatio) { return; }
 	dataLock.lock();
@@ -144,11 +145,11 @@ void PhaseVocoder::updateParams(float newRatio) {
 	stepSize = (float)windowSize / overSampling;
 	numWindows = (float)originalBuffer.size() / stepSize - overSampling - 1;
 	outStepSize = m_scaleRatio * (float)stepSize; // float, else inaccurate
-	freqPerBin = originalSampleRate/windowSize;
-	expectedPhaseIn = 2.*M_PI*(float)stepSize/(float)windowSize;
-	expectedPhaseOut = 2.*M_PI*(float)outStepSize/(float)windowSize;
+	freqPerBin = originalSampleRate / windowSize;
+	expectedPhaseIn = 2. * M_PI * (float)stepSize / (float)windowSize;
+	expectedPhaseOut = 2. * M_PI * (float)outStepSize / (float)windowSize;
 
-	processedBuffer.resize(m_scaleRatio*originalBuffer.size(), 0);
+	processedBuffer.resize(m_scaleRatio * originalBuffer.size(), 0);
 
 	// very slow :(
 	std::fill(m_processedWindows.begin(), m_processedWindows.end(), false);
@@ -170,72 +171,76 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 {
 	// declare vars
 	float real, imag, phase, magnitude, freq, deltaPhase = 0;
-	int windowStart = (float)windowNum*stepSize;
-	int windowIndex = (float)windowNum*windowSize;
+	int windowStart = (float)windowNum * stepSize;
+	int windowIndex = (float)windowNum * windowSize;
 
-	if (!useCache) { // normal stuff
-		memcpy(FFTInput.data(), originalBuffer.data() + windowStart, windowSize*sizeof(float));
+	if (!useCache)
+	{ // normal stuff
+		memcpy(FFTInput.data(), originalBuffer.data() + windowStart, windowSize * sizeof(float));
 
 		// FFT
 		fftwf_execute(fftPlan);
 
 		// analysis step
-		for (int j = 0; j < windowSize/2; j++) // only process nyquistic frequency
+		for (int j = 0; j < windowSize / 2; j++) // only process nyquistic frequency
 		{
 			real = FFTSpectrum[j][0];
 			imag = FFTSpectrum[j][1];
 
-			magnitude = 2.*sqrt(real*real + imag*imag);
-			phase = atan2(imag,real);
+			magnitude = 2. * sqrt(real * real + imag * imag);
+			phase = atan2(imag, real);
 
 			freq = phase;
-			freq = phase - lastPhase[std::max(0, windowIndex + j - windowSize)]; // subtract prev pahse to get phase diference
+			freq = phase
+				- lastPhase[std::max(0, windowIndex + j - windowSize)]; // subtract prev pahse to get phase diference
 			lastPhase[windowIndex + j] = phase;
 
-			freq -= (float)j*expectedPhaseIn; // subtract expected phase
+			freq -= (float)j * expectedPhaseIn; // subtract expected phase
 
 			// this puts freq in 0-2pi
 			freq = fmod(freq + M_PI, -2.0f * M_PI) + M_PI;
 
-			freq = (float)overSampling*freq/(2.*M_PI); // idk
+			freq = (float)overSampling * freq / (2. * M_PI); // idk
 
-			freq = (float)j*freqPerBin + freq*freqPerBin; // "compute the k-th partials' true frequency" ok i guess
+			freq = (float)j * freqPerBin + freq * freqPerBin; // "compute the k-th partials' true frequency" ok i guess
 
 			allMagnitudes[j] = magnitude;
 			allFrequencies[j] = freq;
 		}
 		// write cache
-		memcpy(freqCache.data() + windowIndex, allFrequencies.data(), windowSize*sizeof(float));
-		memcpy(magCache.data() + windowIndex, allMagnitudes.data(),  windowSize*sizeof(float));
-	} else {
+		memcpy(freqCache.data() + windowIndex, allFrequencies.data(), windowSize * sizeof(float));
+		memcpy(magCache.data() + windowIndex, allMagnitudes.data(), windowSize * sizeof(float));
+	}
+	else
+	{
 		// read cache
-		memcpy(allFrequencies.data(), freqCache.data() + windowIndex, windowSize*sizeof(float));
-		memcpy(allMagnitudes.data(), magCache.data() + windowIndex, windowSize*sizeof(float));
+		memcpy(allFrequencies.data(), freqCache.data() + windowIndex, windowSize * sizeof(float));
+		memcpy(allMagnitudes.data(), magCache.data() + windowIndex, windowSize * sizeof(float));
 	}
 
-
 	// synthesis, all the operations are the reverse of the analysis
-	for (int j = 0; j < windowSize/2; j++)
+	for (int j = 0; j < windowSize / 2; j++)
 	{
 		magnitude = allMagnitudes[j];
 		freq = allFrequencies[j];
 
-		deltaPhase = freq - (float)j*freqPerBin;
+		deltaPhase = freq - (float)j * freqPerBin;
 
 		deltaPhase /= freqPerBin;
 
-		deltaPhase = 2.*M_PI*deltaPhase/overSampling;
+		deltaPhase = 2. * M_PI * deltaPhase / overSampling;
 
-		deltaPhase += (float)j*expectedPhaseOut;
+		deltaPhase += (float)j * expectedPhaseOut;
 
 		sumPhase[windowIndex + j] += deltaPhase;
 		deltaPhase = sumPhase[windowIndex + j]; // this is the bin phase
-		if (windowIndex + j + windowSize < sumPhase.size()) { // only if not last window
+		if (windowIndex + j + windowSize < sumPhase.size())
+		{														 // only if not last window
 			sumPhase[windowIndex + j + windowSize] = deltaPhase; // copy to the next
 		}
 
-		FFTSpectrum[j][0] = magnitude*cos(deltaPhase);
-		FFTSpectrum[j][1] = magnitude*sin(deltaPhase);
+		FFTSpectrum[j][0] = magnitude * cos(deltaPhase);
+		FFTSpectrum[j][1] = magnitude * sin(deltaPhase);
 	}
 
 	// inverse fft
@@ -255,35 +260,32 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 		// 							(float)overSampling);
 
 		// discrete windowing
-		// dataOut[outIndex] += (float)overSampling/totalWindowOverlap*IFFTReconstruction[j]/(windowSize/2.0f*overSampling);
+		// dataOut[outIndex] +=
+		// (float)overSampling/totalWindowOverlap*IFFTReconstruction[j]/(windowSize/2.0f*overSampling);
 		// printf("timeshifted in phase: %f\n", m_timeshiftedBufferL[outIndex]);
 		// continuos windowing
-		float window = -0.5f*cos(2.*M_PI*(float)j/(float)windowSize)+0.5f;
-		processedBuffer[outIndex] += window*IFFTReconstruction[j]/(windowSize/2.0f*overSampling);
+		float window = -0.5f * cos(2. * M_PI * (float)j / (float)windowSize) + 0.5f;
+		processedBuffer[outIndex] += window * IFFTReconstruction[j] / (windowSize / 2.0f * overSampling);
 	}
-
 }
-
 
 // ################################# SlicerT ####################################
 
-SlicerT::SlicerT(InstrumentTrack * instrumentTrack) :
-	Instrument( instrumentTrack, &slicert_plugin_descriptor ),
-	m_noteThreshold(0.3f, 0.0f, 2.0f, 0.01f, this, tr( "Note threshold" ) ),
-	m_fadeOutFrames(400.0f, 0.0f, 8192.0f, 1.0f, this, tr("FadeOut")),
-	m_originalBPM(1, 1, 999, this, tr("Original bpm")),
-	m_originalSample(),
-	m_phaseVocoder()
+SlicerT::SlicerT(InstrumentTrack* instrumentTrack)
+	: Instrument(instrumentTrack, &slicert_plugin_descriptor)
+	, m_noteThreshold(0.3f, 0.0f, 2.0f, 0.01f, this, tr("Note threshold"))
+	, m_fadeOutFrames(400.0f, 0.0f, 8192.0f, 1.0f, this, tr("FadeOut"))
+	, m_originalBPM(1, 1, 999, this, tr("Original bpm"))
+	, m_originalSample()
+	, m_phaseVocoder()
 {
 }
 
-
-
-void SlicerT::playNote( NotePlayHandle * handle, sampleFrame * workingBuffer )
+void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 {
 	if (m_originalSample.frames() < 2048) { return; }
 
-	const float speedRatio = (float)m_originalBPM.value() / Engine::getSong()->getTempo() ;
+	const float speedRatio = (float)m_originalBPM.value() / Engine::getSong()->getTempo();
 
 	const int noteIndex = handle->key() - 69;
 	const fpp_t frames = handle->framesLeftForCurrentPeriod();
@@ -294,21 +296,22 @@ void SlicerT::playNote( NotePlayHandle * handle, sampleFrame * workingBuffer )
 	const int totalFrames = m_phaseVocoder.frames();
 
 	int sliceStart, sliceEnd;
-	if (noteIndex > m_slicePoints.size()-2 || noteIndex < 0)
+	if (noteIndex > m_slicePoints.size() - 2 || noteIndex < 0)
 	{
 		sliceStart = 0;
 		sliceEnd = totalFrames;
-	} else {
+	}
+	else
+	{
 		sliceStart = m_slicePoints[noteIndex] * speedRatio;
-		sliceEnd = m_slicePoints[noteIndex+1] * speedRatio;
+		sliceEnd = m_slicePoints[noteIndex + 1] * speedRatio;
 	}
 
 	int sliceFrames = sliceEnd - sliceStart;
 	int currentNoteFrame = sliceStart + playedFrames;
 	int noteFramesLeft = sliceFrames - playedFrames;
 
-
-	if( noteFramesLeft > 0)
+	if (noteFramesLeft > 0)
 	{
 		int framesToCopy = std::min((int)frames, noteFramesLeft);
 		m_phaseVocoder.getFrames(workingBuffer + offset, currentNoteFrame, framesToCopy);
@@ -316,9 +319,9 @@ void SlicerT::playNote( NotePlayHandle * handle, sampleFrame * workingBuffer )
 		// exponential fade out, applyRelease kinda sucks
 		if (noteFramesLeft < m_fadeOutFrames.value())
 		{
-			for (int i = 0;i<frames;i++)
+			for (int i = 0; i < frames; i++)
 			{
-				float fadeValue = (float)(noteFramesLeft-i) / m_fadeOutFrames.value();
+				float fadeValue = (float)(noteFramesLeft - i) / m_fadeOutFrames.value();
 				// if the workingbuffer extends the sample
 				fadeValue = std::clamp(fadeValue, 0.0f, 1.0f);
 				fadeValue = pow(fadeValue, 2);
@@ -328,16 +331,15 @@ void SlicerT::playNote( NotePlayHandle * handle, sampleFrame * workingBuffer )
 			}
 		}
 
-		instrumentTrack()->processAudioBuffer( workingBuffer, frames + offset, handle );
+		instrumentTrack()->processAudioBuffer(workingBuffer, frames + offset, handle);
 
 		// calculate absolute for the waveform
 		float absoluteCurrentNote = (float)currentNoteFrame / totalFrames;
 		float absoluteStartNote = (float)sliceStart / totalFrames;
 		float abslouteEndNote = (float)sliceEnd / totalFrames;
 		emit isPlaying(absoluteCurrentNote, absoluteStartNote, abslouteEndNote);
-	} else {
-		emit isPlaying(-1, 0, 0);
 	}
+	else { emit isPlaying(-1, 0, 0); }
 }
 
 // uses the spectral flux to determine the change in magnitude
@@ -352,7 +354,8 @@ void SlicerT::findSlices()
 
 	std::vector<float> leftChannel(m_originalSample.frames(), 0);
 
-	for (int i = 0;i<m_originalSample.frames();i++) {
+	for (int i = 0; i < m_originalSample.frames(); i++)
+	{
 		leftChannel[i] = m_originalSample.data()[i][0];
 	}
 
@@ -367,14 +370,16 @@ void SlicerT::findSlices()
 	float prevFlux = 0;
 	float real, imag, magnitude, diff;
 
-	for (int i = 0;i<leftChannel.size()-windowSize;i+=windowSize) {
-		memcpy(fftIn.data(), leftChannel.data() + i, windowSize*sizeof(float));
+	for (int i = 0; i < leftChannel.size() - windowSize; i += windowSize)
+	{
+		memcpy(fftIn.data(), leftChannel.data() + i, windowSize * sizeof(float));
 		fftwf_execute(fftPlan);
 
-		for (int j = 0;j<windowSize/2;j++) { // only use niquistic frequencies
+		for (int j = 0; j < windowSize / 2; j++)
+		{ // only use niquistic frequencies
 			real = fftOut[j][0];
 			imag = fftOut[j][1];
-			magnitude = sqrt(real*real + imag*imag);
+			magnitude = sqrt(real * real + imag * imag);
 
 			diff = sqrt(pow(magnitude - prevMags[j], 2));
 			spectralFlux += diff;
@@ -382,14 +387,14 @@ void SlicerT::findSlices()
 			prevMags[j] = magnitude;
 		}
 
-		if (spectralFlux / prevFlux > 1.0f+m_noteThreshold.value() && i - lastPoint > minDist) {
+		if (spectralFlux / prevFlux > 1.0f + m_noteThreshold.value() && i - lastPoint > minDist)
+		{
 			m_slicePoints.push_back(i);
 			lastPoint = i;
 		}
 
 		prevFlux = spectralFlux;
 		spectralFlux = 0;
-
 	}
 
 	m_slicePoints.push_back(m_originalSample.frames());
@@ -432,7 +437,7 @@ void SlicerT::findBPM()
 	m_originalBPM.setInitValue(bpm);
 }
 
-void SlicerT::writeToMidi(std::vector<Note> * outClip)
+void SlicerT::writeToMidi(std::vector<Note>* outClip)
 {
 	if (m_originalSample.frames() < 2048) { return; }
 
@@ -453,7 +458,7 @@ void SlicerT::writeToMidi(std::vector<Note> * outClip)
 
 	float lastEnd = 0;
 
-	for (int i = 0;i<m_slicePoints.size()-1;i++)
+	for (int i = 0; i < m_slicePoints.size() - 1; i++)
 	{
 		float sliceStart = lastEnd;
 		float sliceEnd = (float)m_slicePoints[i + 1] / m_originalSample.frames() * totalTicks;
@@ -476,11 +481,9 @@ void SlicerT::updateFile(QString file)
 	findSlices();
 	findBPM();
 
-	float speedRatio = (float)m_originalBPM.value() / Engine::getSong()->getTempo() ;
-	m_phaseVocoder.loadSample(m_originalSample.data(),
-							m_originalSample.frames(),
-							m_originalSample.sampleRate(),
-							speedRatio);
+	float speedRatio = (float)m_originalBPM.value() / Engine::getSong()->getTempo();
+	m_phaseVocoder.loadSample(
+		m_originalSample.data(), m_originalSample.frames(), m_originalSample.sampleRate(), speedRatio);
 
 	emit dataChanged();
 }
@@ -490,7 +493,7 @@ void SlicerT::updateSlices()
 	findSlices();
 }
 
-void SlicerT::saveSettings(QDomDocument & document, QDomElement & element)
+void SlicerT::saveSettings(QDomDocument& document, QDomElement& element)
 {
 	element.setAttribute("src", m_originalSample.audioFile());
 	if (m_originalSample.audioFile().isEmpty())
@@ -501,7 +504,7 @@ void SlicerT::saveSettings(QDomDocument & document, QDomElement & element)
 
 	element.setAttribute("totalSlices", (int)m_slicePoints.size());
 
-	for (int i = 0;i<m_slicePoints.size();i++)
+	for (int i = 0; i < m_slicePoints.size(); i++)
 	{
 		element.setAttribute(tr("slice_%1").arg(i), m_slicePoints[i]);
 	}
@@ -511,7 +514,7 @@ void SlicerT::saveSettings(QDomDocument & document, QDomElement & element)
 	m_originalBPM.saveSettings(document, element, "origBPM");
 }
 
-void SlicerT::loadSettings( const QDomElement & element )
+void SlicerT::loadSettings(const QDomElement& element)
 {
 	if (!element.attribute("src").isEmpty())
 	{
@@ -533,7 +536,7 @@ void SlicerT::loadSettings( const QDomElement & element )
 	{
 		int totalSlices = element.attribute("totalSlices").toInt();
 		m_slicePoints = {};
-		for (int i = 0;i<totalSlices;i++)
+		for (int i = 0; i < totalSlices; i++)
 		{
 			m_slicePoints.push_back(element.attribute(tr("slice_%1").arg(i)).toInt());
 		}
@@ -543,34 +546,28 @@ void SlicerT::loadSettings( const QDomElement & element )
 	m_noteThreshold.loadSettings(element, "threshold");
 	m_originalBPM.loadSettings(element, "origBPM");
 
-	float speedRatio = (float)m_originalBPM.value() / Engine::getSong()->getTempo() ;
-	m_phaseVocoder.loadSample(m_originalSample.data(),
-							m_originalSample.frames(),
-							m_originalSample.sampleRate(),
-							speedRatio);
+	float speedRatio = (float)m_originalBPM.value() / Engine::getSong()->getTempo();
+	m_phaseVocoder.loadSample(
+		m_originalSample.data(), m_originalSample.frames(), m_originalSample.sampleRate(), speedRatio);
 
 	emit dataChanged();
-
 }
 
 QString SlicerT::nodeName() const
 {
-	return( slicert_plugin_descriptor.name );
+	return (slicert_plugin_descriptor.name);
 }
 
-gui::PluginView * SlicerT::instantiateView( QWidget * parent )
+gui::PluginView* SlicerT::instantiateView(QWidget* parent)
 {
-	return( new gui::SlicerTUI( this, parent ) );
+	return (new gui::SlicerTUI(this, parent));
 }
 
-
-extern "C"
-{
+extern "C" {
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
 {
-	return( new SlicerT( static_cast<InstrumentTrack *>( m ) ) );
+	return (new SlicerT(static_cast<InstrumentTrack*>(m)));
 }
 } // extern
 } // namespace lmms
-

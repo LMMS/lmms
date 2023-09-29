@@ -25,156 +25,164 @@
 #ifndef SLICERT_H
 #define SLICERT_H
 
-#include "SlicerTUI.h"
-
 #include <fftw3.h>
 
-#include "Note.h"
+#include "AutomatableModel.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "AutomatableModel.h"
+#include "Note.h"
 #include "SampleBuffer.h"
+#include "SlicerTUI.h"
 
-
-namespace lmms
-{
+namespace lmms {
 
 // takes one audio-channel and timeshifts it
-class PhaseVocoder {
-	public:
-		PhaseVocoder();
-		~PhaseVocoder();
-		void loadData(std::vector<float> originalData, int sampleRate, float newRatio);
-		void setScaleRatio(float newRatio) { updateParams(newRatio); }
-		void getFrames(std::vector<float> & outData, int start, int frames);
-		int frames() { return processedBuffer.size(); }
-		float scaleRatio() { return m_scaleRatio; }
-	private:
-		QMutex dataLock;
-		// original data
-		std::vector<float> originalBuffer;
-		int originalSampleRate = 0;
+class PhaseVocoder
+{
+public:
+	PhaseVocoder();
+	~PhaseVocoder();
+	void loadData(std::vector<float> originalData, int sampleRate, float newRatio);
+	void setScaleRatio(float newRatio) { updateParams(newRatio); }
+	void getFrames(std::vector<float>& outData, int start, int frames);
+	int frames() { return processedBuffer.size(); }
+	float scaleRatio() { return m_scaleRatio; }
 
-		float m_scaleRatio = -1; // to force on fisrt load
+private:
+	QMutex dataLock;
+	// original data
+	std::vector<float> originalBuffer;
+	int originalSampleRate = 0;
 
-		// output data
-		std::vector<float> processedBuffer;
-		std::vector<bool> m_processedWindows; // marks a window processed
+	float m_scaleRatio = -1; // to force on fisrt load
 
-		// timeshift stuff
-		static const int windowSize = 512;
-		static const int overSampling = 32;
+	// output data
+	std::vector<float> processedBuffer;
+	std::vector<bool> m_processedWindows; // marks a window processed
 
-		// depending on scaleRatio
-		int stepSize = 0;
-		int numWindows = 0;
-		float outStepSize = 0;
-		float freqPerBin = 0;
-		float expectedPhaseIn = 0;
-		float expectedPhaseOut = 0;
+	// timeshift stuff
+	static const int windowSize = 512;
+	static const int overSampling = 32;
 
-		// buffers
-		fftwf_complex FFTSpectrum[windowSize];
-		std::vector<float> FFTInput;
-		std::vector<float> IFFTReconstruction;
-		std::vector<float> allMagnitudes;
-		std::vector<float> allFrequencies;
-		std::vector<float> processedFreq;
-		std::vector<float> processedMagn;
-		std::vector<float> lastPhase;
-		std::vector<float> sumPhase;
+	// depending on scaleRatio
+	int stepSize = 0;
+	int numWindows = 0;
+	float outStepSize = 0;
+	float freqPerBin = 0;
+	float expectedPhaseIn = 0;
+	float expectedPhaseOut = 0;
 
-		// cache
-		std::vector<float> freqCache;
-		std::vector<float> magCache;
+	// buffers
+	fftwf_complex FFTSpectrum[windowSize];
+	std::vector<float> FFTInput;
+	std::vector<float> IFFTReconstruction;
+	std::vector<float> allMagnitudes;
+	std::vector<float> allFrequencies;
+	std::vector<float> processedFreq;
+	std::vector<float> processedMagn;
+	std::vector<float> lastPhase;
+	std::vector<float> sumPhase;
 
-		// fftw plans
-		fftwf_plan fftPlan;
-		fftwf_plan ifftPlan;
+	// cache
+	std::vector<float> freqCache;
+	std::vector<float> magCache;
 
-		void updateParams(float newRatio);
-		void generateWindow(int windowNum, bool useCache);
+	// fftw plans
+	fftwf_plan fftPlan;
+	fftwf_plan ifftPlan;
+
+	void updateParams(float newRatio);
+	void generateWindow(int windowNum, bool useCache);
 };
 
 // simple helper class that handles the different audio channels
-class dinamicPlaybackBuffer {
-	public:
-		dinamicPlaybackBuffer() :
-			leftChannel(),
-			rightChannel()
-		{}
-		void loadSample(const sampleFrame * outData, int frames, int sampleRate, float newRatio) {
-			std::vector<float> leftData(frames, 0);
-			std::vector<float> rightData(frames, 0);
-			for (int i = 0;i<frames;i++) {
-				leftData[i] = outData[i][0];
-				rightData[i] = outData[i][1];
-			}
-			leftChannel.loadData(leftData, sampleRate, newRatio);
-			rightChannel.loadData(rightData, sampleRate, newRatio);
+class dinamicPlaybackBuffer
+{
+public:
+	dinamicPlaybackBuffer()
+		: leftChannel()
+		, rightChannel()
+	{
+	}
+	void loadSample(const sampleFrame* outData, int frames, int sampleRate, float newRatio)
+	{
+		std::vector<float> leftData(frames, 0);
+		std::vector<float> rightData(frames, 0);
+		for (int i = 0; i < frames; i++)
+		{
+			leftData[i] = outData[i][0];
+			rightData[i] = outData[i][1];
 		}
-		void getFrames(sampleFrame * outData, int startFrame, int frames) {
-			std::vector<float> leftOut(frames, 0); // not a huge performance issue
-			std::vector<float> rightOut(frames, 0);
+		leftChannel.loadData(leftData, sampleRate, newRatio);
+		rightChannel.loadData(rightData, sampleRate, newRatio);
+	}
+	void getFrames(sampleFrame* outData, int startFrame, int frames)
+	{
+		std::vector<float> leftOut(frames, 0); // not a huge performance issue
+		std::vector<float> rightOut(frames, 0);
 
-			leftChannel.getFrames(leftOut, startFrame, frames);
-			rightChannel.getFrames(rightOut, startFrame, frames);
+		leftChannel.getFrames(leftOut, startFrame, frames);
+		rightChannel.getFrames(rightOut, startFrame, frames);
 
-			for (int i = 0;i<frames;i++) {
-				outData[i][0] = leftOut[i];
-				outData[i][1] = rightOut[i];
-			}
+		for (int i = 0; i < frames; i++)
+		{
+			outData[i][0] = leftOut[i];
+			outData[i][1] = rightOut[i];
 		}
-		int frames() { return leftChannel.frames(); }
-		float scaleRatio() { return leftChannel.scaleRatio(); }
-		void setScaleRatio(float newRatio) {
-			leftChannel.setScaleRatio(newRatio);
-			rightChannel.setScaleRatio(newRatio);
-		}
-	private:
-		PhaseVocoder leftChannel;
-		PhaseVocoder rightChannel;
+	}
+	int frames() { return leftChannel.frames(); }
+	float scaleRatio() { return leftChannel.scaleRatio(); }
+	void setScaleRatio(float newRatio)
+	{
+		leftChannel.setScaleRatio(newRatio);
+		rightChannel.setScaleRatio(newRatio);
+	}
+
+private:
+	PhaseVocoder leftChannel;
+	PhaseVocoder rightChannel;
 };
 
-class SlicerT : public Instrument{
+class SlicerT : public Instrument
+{
 	Q_OBJECT
 
-	public:
-		SlicerT(InstrumentTrack * instrumentTrack);
-		~SlicerT() override = default;
+public:
+	SlicerT(InstrumentTrack* instrumentTrack);
+	~SlicerT() override = default;
 
-		void playNote( NotePlayHandle * handle, sampleFrame * workingBuffer ) override;
+	void playNote(NotePlayHandle* handle, sampleFrame* workingBuffer) override;
 
-		void saveSettings( QDomDocument & document, QDomElement & element ) override;
-		void loadSettings( const QDomElement & element ) override;
+	void saveSettings(QDomDocument& document, QDomElement& element) override;
+	void loadSettings(const QDomElement& element) override;
 
-		QString nodeName() const override;
-		gui::PluginView * instantiateView( QWidget * parent ) override;
+	QString nodeName() const override;
+	gui::PluginView* instantiateView(QWidget* parent) override;
 
-		void writeToMidi(std::vector<Note> * outClip);
+	void writeToMidi(std::vector<Note>* outClip);
 
-	public slots:
-		void updateFile(QString file);
-		void updateSlices();
+public slots:
+	void updateFile(QString file);
+	void updateSlices();
 
-	signals:
-		void isPlaying(float current, float start, float end);
+signals:
+	void isPlaying(float current, float start, float end);
 
-	private:
-		FloatModel m_noteThreshold;
-		FloatModel m_fadeOutFrames;
-		IntModel m_originalBPM;
+private:
+	FloatModel m_noteThreshold;
+	FloatModel m_fadeOutFrames;
+	IntModel m_originalBPM;
 
-		SampleBuffer m_originalSample;
-		dinamicPlaybackBuffer m_phaseVocoder;
+	SampleBuffer m_originalSample;
+	dinamicPlaybackBuffer m_phaseVocoder;
 
-		std::vector<int> m_slicePoints;
+	std::vector<int> m_slicePoints;
 
-		void findSlices();
-		void findBPM();
+	void findSlices();
+	void findBPM();
 
-		friend class gui::SlicerTUI;
-		friend class gui::WaveForm;
+	friend class gui::SlicerTUI;
+	friend class gui::WaveForm;
 };
 } // namespace lmms
 #endif // SLICERT_H

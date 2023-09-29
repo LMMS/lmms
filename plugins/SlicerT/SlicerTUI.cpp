@@ -23,47 +23,40 @@
  */
 
 #include "SlicerTUI.h"
-#include "SlicerT.h"
 
-#include <QFileInfo>
 #include <QDropEvent>
+#include <QFileInfo>
 
-#include "StringPairDrag.h"
 #include "Clipboard.h"
-#include "Track.h"
 #include "DataFile.h"
-
 #include "Engine.h"
-#include "Song.h"
 #include "InstrumentTrack.h"
-
+#include "SlicerT.h"
+#include "Song.h"
+#include "StringPairDrag.h"
+#include "Track.h"
 #include "embed.h"
 
-namespace lmms
+namespace lmms {
+
+namespace gui {
+
+SlicerTUI::SlicerTUI(SlicerT* instrument, QWidget* parent)
+	: InstrumentViewFixedSize(instrument, parent)
+	, m_slicerTParent(instrument)
+	, m_noteThresholdKnob(this)
+	, m_fadeOutKnob(this)
+	, m_bpmBox(3, "21pink", this)
+	, m_resetButton(this, nullptr)
+	, m_midiExportButton(this, nullptr)
+	, m_wf(248, 128, instrument, this)
 {
-
-
-namespace gui
-{
-
-
-SlicerTUI::SlicerTUI( SlicerT * instrument,
-					QWidget * parent ) :
-	InstrumentViewFixedSize( instrument, parent ),
-	m_slicerTParent(instrument),
-	m_noteThresholdKnob(this),
-	m_fadeOutKnob(this),
-	m_bpmBox(3, "21pink", this),
-	m_resetButton(this, nullptr),
-	m_midiExportButton(this, nullptr),
-	m_wf(248, 128, instrument, this)
-{
-	setAcceptDrops( true );
-	setAutoFillBackground( true );
+	setAcceptDrops(true);
+	setAutoFillBackground(true);
 
 	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "bg" ) );
-	setPalette( pal );
+	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("bg"));
+	setPalette(pal);
 
 	m_wf.move(2, 6);
 
@@ -83,20 +76,16 @@ SlicerTUI::SlicerTUI( SlicerT * instrument,
 	m_fadeOutKnob.setModel(&m_slicerTParent->m_fadeOutFrames);
 
 	m_midiExportButton.move(190, 200);
-	m_midiExportButton.setActiveGraphic(
-						embed::getIconPixmap("midi_tab") );
-	m_midiExportButton.setInactiveGraphic(
-						embed::getIconPixmap("midi_tab"));
+	m_midiExportButton.setActiveGraphic(embed::getIconPixmap("midi_tab"));
+	m_midiExportButton.setInactiveGraphic(embed::getIconPixmap("midi_tab"));
 	m_midiExportButton.setToolTip(tr("Copy midi pattern to clipboard"));
-	connect(&m_midiExportButton, SIGNAL( clicked() ), this, SLOT( exportMidi() ));
+	connect(&m_midiExportButton, SIGNAL(clicked()), this, SLOT(exportMidi()));
 
 	m_resetButton.move(215, 200);
-	m_resetButton.setActiveGraphic(
-						embed::getIconPixmap("reload") );
-	m_resetButton.setInactiveGraphic(
-						embed::getIconPixmap("reload") );
+	m_resetButton.setActiveGraphic(embed::getIconPixmap("reload"));
+	m_resetButton.setInactiveGraphic(embed::getIconPixmap("reload"));
 	m_resetButton.setToolTip(tr("Reset Slices"));
-	connect(&m_resetButton, SIGNAL( clicked() ), m_slicerTParent, SLOT( updateSlices() ));
+	connect(&m_resetButton, SIGNAL(clicked()), m_slicerTParent, SLOT(updateSlices()));
 }
 
 // copied from piano roll
@@ -104,74 +93,60 @@ void SlicerTUI::exportMidi()
 {
 	using namespace Clipboard;
 
-	DataFile dataFile( DataFile::Type::ClipboardData );
-	QDomElement note_list = dataFile.createElement( "note-list" );
-	dataFile.content().appendChild( note_list );
+	DataFile dataFile(DataFile::Type::ClipboardData);
+	QDomElement note_list = dataFile.createElement("note-list");
+	dataFile.content().appendChild(note_list);
 
 	std::vector<Note> notes;
 	m_slicerTParent->writeToMidi(&notes);
-	if (notes.size() == 0)
+	if (notes.size() == 0) { return; }
+
+	TimePos start_pos(notes.front().pos().getBar(), 0);
+	for (Note note : notes)
 	{
-		return;
+		Note clip_note(note);
+		clip_note.setPos(clip_note.pos(start_pos));
+		clip_note.saveState(dataFile, note_list);
 	}
 
-	TimePos start_pos( notes.front().pos().getBar(), 0 );
-	for( Note note : notes )
-	{
-		Note clip_note( note );
-		clip_note.setPos( clip_note.pos( start_pos ) );
-		clip_note.saveState( dataFile, note_list );
-	}
-
-	copyString( dataFile.toString(), MimeType::Default );
+	copyString(dataFile.toString(), MimeType::Default);
 }
 
 // all the drag stuff is copied from AudioFileProcessor
-void SlicerTUI::dragEnterEvent( QDragEnterEvent * dee )
+void SlicerTUI::dragEnterEvent(QDragEnterEvent* dee)
 {
-		// For mimeType() and MimeType enum class
+	// For mimeType() and MimeType enum class
 	using namespace Clipboard;
 
-	if( dee->mimeData()->hasFormat( mimeType( MimeType::StringPair ) ) )
+	if (dee->mimeData()->hasFormat(mimeType(MimeType::StringPair)))
 	{
-		QString txt = dee->mimeData()->data(
-						mimeType( MimeType::StringPair ) );
-		if( txt.section( ':', 0, 0 ) == QString( "clip_%1" ).arg(
-							static_cast<int>(Track::Type::Sample) ) )
+		QString txt = dee->mimeData()->data(mimeType(MimeType::StringPair));
+		if (txt.section(':', 0, 0) == QString("clip_%1").arg(static_cast<int>(Track::Type::Sample)))
 		{
 			dee->acceptProposedAction();
 		}
-		else if( txt.section( ':', 0, 0 ) == "samplefile" )
-		{
-			dee->acceptProposedAction();
-		}
-		else
-		{
-			dee->ignore();
-		}
+		else if (txt.section(':', 0, 0) == "samplefile") { dee->acceptProposedAction(); }
+		else { dee->ignore(); }
 	}
-	else
-	{
-		dee->ignore();
-	}
+	else { dee->ignore(); }
 }
 
-void SlicerTUI::dropEvent( QDropEvent * de )
+void SlicerTUI::dropEvent(QDropEvent* de)
 {
-	QString type = StringPairDrag::decodeKey( de );
-	QString value = StringPairDrag::decodeValue( de );
-	if( type == "samplefile" )
+	QString type = StringPairDrag::decodeKey(de);
+	QString value = StringPairDrag::decodeValue(de);
+	if (type == "samplefile")
 	{
-		m_slicerTParent->updateFile( value );
+		m_slicerTParent->updateFile(value);
 		// castModel<AudioFileProcessor>()->setAudioFile( value );
 		// de->accept();
 		// set m_wf wave file
 		return;
 	}
-	else if( type == QString( "clip_%1" ).arg( static_cast<int>(Track::Type::Sample) ) )
+	else if (type == QString("clip_%1").arg(static_cast<int>(Track::Type::Sample)))
 	{
-		DataFile dataFile( value.toUtf8() );
-		m_slicerTParent->updateFile( dataFile.content().firstChild().toElement().attribute( "src" ) );
+		DataFile dataFile(value.toUtf8());
+		m_slicerTParent->updateFile(dataFile.content().firstChild().toElement().attribute("src"));
 		de->accept();
 		return;
 	}
@@ -179,7 +154,7 @@ void SlicerTUI::dropEvent( QDropEvent * de )
 	de->ignore();
 }
 
-void SlicerTUI::paintEvent(QPaintEvent * pe)
+void SlicerTUI::paintEvent(QPaintEvent* pe)
 {
 }
 

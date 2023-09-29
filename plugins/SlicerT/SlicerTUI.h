@@ -25,38 +25,35 @@
 #ifndef SLICERT_UI_H
 #define SLICERT_UI_H
 
-#include "WaveForm.h"
-
 #include <QPushButton>
 
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Knob.h"
-#include "PixmapButton.h"
 #include "LcdSpinBox.h"
+#include "PixmapButton.h"
+#include "WaveForm.h"
 
-
-namespace lmms
-{
+namespace lmms {
 
 class SlicerT;
 
-namespace gui
-{
+namespace gui {
 
-class SlicerTKnob : public Knob {
-	public:
-		SlicerTKnob( QWidget * _parent ) :
-				Knob( KnobType::Styled, _parent )
-		{
-		setFixedSize( 46, 40 );
-		setCenterPointX( 23.0 );
-		setCenterPointY( 15.0 );
-		setInnerRadius( 3 );
-		setOuterRadius( 11 );
-		setLineWidth( 3 );
-		setOuterColor( QColor(178, 115, 255) );
-		}
+class SlicerTKnob : public Knob
+{
+public:
+	SlicerTKnob(QWidget* _parent)
+		: Knob(KnobType::Styled, _parent)
+	{
+		setFixedSize(46, 40);
+		setCenterPointX(23.0);
+		setCenterPointY(15.0);
+		setInnerRadius(3);
+		setOuterRadius(11);
+		setLineWidth(3);
+		setOuterColor(QColor(178, 115, 255));
+	}
 };
 
 class SlicerTUI : public InstrumentViewFixedSize
@@ -64,22 +61,21 @@ class SlicerTUI : public InstrumentViewFixedSize
 	Q_OBJECT
 
 public:
-	SlicerTUI( SlicerT * instrument,
-					QWidget * parent );
+	SlicerTUI(SlicerT* instrument, QWidget* parent);
 	~SlicerTUI() override = default;
 
 protected slots:
 	void exportMidi();
-	//void sampleSizeChanged( float _new_sample_length );
+	// void sampleSizeChanged( float _new_sample_length );
 
 protected:
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
+	virtual void dragEnterEvent(QDragEnterEvent* _dee);
+	virtual void dropEvent(QDropEvent* _de);
 
-	virtual void paintEvent(QPaintEvent * pe);
+	virtual void paintEvent(QPaintEvent* pe);
 
 private:
-	SlicerT * m_slicerTParent;
+	SlicerT* m_slicerTParent;
 
 	SlicerTKnob m_noteThresholdKnob;
 	SlicerTKnob m_fadeOutKnob;
