@@ -870,6 +870,9 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	vlayout->addWidget(extras_w);
 	vlayout->addSpacing(10);
 
+	// Ensure that we cannot make the dialog smaller than it wants to be
+	setMinimumWidth(width());
+
 	show();
 }
 
