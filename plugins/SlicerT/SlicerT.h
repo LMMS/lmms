@@ -172,6 +172,7 @@ private:
 	FloatModel m_noteThreshold;
 	FloatModel m_fadeOutFrames;
 	IntModel m_originalBPM;
+	ComboBoxModel m_sliceSnap;
 
 	SampleBuffer m_originalSample;
 	dinamicPlaybackBuffer m_phaseVocoder;

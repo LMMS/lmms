@@ -25,10 +25,8 @@
 // TODO: fix some PV bugs
 // make fft size and windowsize seperate, pad window to fit into fft with 0
 // this should produce better quality hopefully
-// TODO: onset detection find valleys
 // TODO: switch to arrayVector (maybe)
 // TODO: cleaunp UI classes
-// TODO: add text when no sample loaded
 // TODO: better buttons
 
 #include "SlicerT.h"
@@ -273,12 +271,21 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 
 SlicerT::SlicerT(InstrumentTrack* instrumentTrack)
 	: Instrument(instrumentTrack, &slicert_plugin_descriptor)
-	, m_noteThreshold(0.3f, 0.0f, 2.0f, 0.01f, this, tr("Note threshold"))
+	, m_noteThreshold(0.6f, 0.0f, 2.0f, 0.01f, this, tr("Note threshold"))
 	, m_fadeOutFrames(400.0f, 0.0f, 8192.0f, 1.0f, this, tr("FadeOut"))
 	, m_originalBPM(1, 1, 999, this, tr("Original bpm"))
+	, m_sliceSnap(this, tr("Slice snap"))
 	, m_originalSample()
 	, m_phaseVocoder()
 {
+	m_sliceSnap.addItem("None");
+	m_sliceSnap.addItem("1/1");
+	m_sliceSnap.addItem("1/2");
+	m_sliceSnap.addItem("1/4");
+	m_sliceSnap.addItem("1/8");
+	m_sliceSnap.addItem("1/16");
+	m_sliceSnap.addItem("1/32");
+	m_sliceSnap.setValue(0);
 }
 
 void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
@@ -291,8 +298,8 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 	const fpp_t frames = handle->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = handle->noteOffset();
 	const int playedFrames = handle->totalFramesPlayed();
-	m_phaseVocoder.setScaleRatio(speedRatio);
 
+	m_phaseVocoder.setScaleRatio(speedRatio); // check if bpm changed
 	const int totalFrames = m_phaseVocoder.frames();
 
 	int sliceStart, sliceEnd;
@@ -349,34 +356,35 @@ void SlicerT::findSlices()
 {
 	if (m_originalSample.frames() < 2048) { return; }
 	m_slicePoints = {};
-	const int windowSize = 1024;
-	const int minDist = 2048;
 
-	std::vector<float> leftChannel(m_originalSample.frames(), 0);
+	const int windowSize = 512;
+	const int minDist = 2048; // this value should probably be calculated through samplerate or something
+
+	std::vector<float> singleChannel(m_originalSample.frames(), 0);
 
 	for (int i = 0; i < m_originalSample.frames(); i++)
 	{
-		leftChannel[i] = m_originalSample.data()[i][0];
+		singleChannel[i] = (m_originalSample.data()[i][0] + m_originalSample.data()[i][1]) / 2;
 	}
 
-	std::vector<float> prevMags(windowSize, 0);
+	std::vector<float> prevMags(windowSize / 2, 0);
 	std::vector<float> fftIn(windowSize, 0);
 	fftwf_complex fftOut[windowSize];
 
 	fftwf_plan fftPlan = fftwf_plan_dft_r2c_1d(windowSize, fftIn.data(), fftOut, FFTW_MEASURE);
 
-	int lastPoint = -minDist - 1;
+	int lastPoint = -minDist - 1; // to always store 0 first
 	float spectralFlux = 0;
 	float prevFlux = 0;
 	float real, imag, magnitude, diff;
 
-	for (int i = 0; i < leftChannel.size() - windowSize; i += windowSize)
+	for (int i = 0; i < singleChannel.size() - windowSize; i += windowSize)
 	{
-		memcpy(fftIn.data(), leftChannel.data() + i, windowSize * sizeof(float));
+		memcpy(fftIn.data(), singleChannel.data() + i, windowSize * sizeof(float));
 		fftwf_execute(fftPlan);
 
-		for (int j = 0; j < windowSize / 2; j++)
-		{ // only use niquistic frequencies
+		for (int j = 0; j < windowSize / 2; j++) // only use niquistic frequencies
+		{
 			real = fftOut[j][0];
 			imag = fftOut[j][1];
 			magnitude = sqrt(real * real + imag * imag);
@@ -398,6 +406,25 @@ void SlicerT::findSlices()
 	}
 
 	m_slicePoints.push_back(m_originalSample.frames());
+
+	int noteLock = m_sliceSnap.value(); // 1 / notelock; is to which note is locked
+	int timeSignature = Engine::getSong()->getTimeSigModel().getNumerator();
+	int samplesPerBar = 60.0f * timeSignature / m_originalBPM.value() * m_originalSample.sampleRate();
+	int sliceLock = samplesPerBar / pow(2, noteLock + 1);
+	if (noteLock == 0) { sliceLock = 1; } // disable notelock
+
+	for (int i = 0; i < m_slicePoints.size(); i++)
+	{
+		m_slicePoints[i] += sliceLock / 2;
+		m_slicePoints[i] -= m_slicePoints[i] % sliceLock;
+	}
+
+	// set to fit
+	m_slicePoints[0] = 0;
+	m_slicePoints[m_slicePoints.size()] = m_originalSample.frames();
+
+	// remove duplicates
+	m_slicePoints.erase(std::unique(m_slicePoints.begin(), m_slicePoints.end()), m_slicePoints.end());
 
 	emit dataChanged();
 }
@@ -466,7 +493,7 @@ void SlicerT::writeToMidi(std::vector<Note>* outClip)
 		Note sliceNote = Note();
 		sliceNote.setKey(i + 69);
 		sliceNote.setPos(sliceStart);
-		sliceNote.setLength(sliceEnd - sliceStart);
+		sliceNote.setLength(sliceEnd - sliceStart + 1); // + 1 needed for whatever reason
 		outClip->push_back(sliceNote);
 
 		lastEnd = sliceEnd;
@@ -478,8 +505,8 @@ void SlicerT::updateFile(QString file)
 	m_originalSample.setAudioFile(file);
 	if (m_originalSample.frames() < 2048) { return; }
 
-	findSlices();
 	findBPM();
+	findSlices();
 
 	float speedRatio = (float)m_originalBPM.value() / Engine::getSong()->getTempo();
 	m_phaseVocoder.loadSample(

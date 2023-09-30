@@ -47,6 +47,7 @@ SlicerTUI::SlicerTUI(SlicerT* instrument, QWidget* parent)
 	, m_noteThresholdKnob(this)
 	, m_fadeOutKnob(this)
 	, m_bpmBox(3, "21pink", this)
+	, m_snapSetting(this, "Slice snap")
 	, m_resetButton(this, nullptr)
 	, m_midiExportButton(this, nullptr)
 	, m_wf(248, 128, instrument, this)
@@ -59,6 +60,10 @@ SlicerTUI::SlicerTUI(SlicerT* instrument, QWidget* parent)
 	setPalette(pal);
 
 	m_wf.move(2, 6);
+
+	m_snapSetting.setGeometry(14, 150, 55, ComboBox::DEFAULT_HEIGHT);
+	m_snapSetting.setToolTip(tr("Set slice snapping for detection"));
+	m_snapSetting.setModel(&m_slicerTParent->m_sliceSnap);
 
 	m_bpmBox.move(135, 200);
 	m_bpmBox.setToolTip(tr("Original sample BPM"));

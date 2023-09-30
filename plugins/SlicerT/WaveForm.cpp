@@ -81,6 +81,8 @@ void WaveForm::drawSeeker()
 {
 	m_seeker.fill(m_waveformBgColor);
 	QPainter brush(&m_seeker);
+
+	// if (m_currentSample.frames() < 2048) { return; }
 	// draw slice points
 	brush.setPen(m_sliceColor);
 	for (int i = 0; i < m_slicePoints.size(); i++)
@@ -114,6 +116,14 @@ void WaveForm::drawEditor()
 {
 	m_sliceEditor.fill(m_waveformBgColor);
 	QPainter brush(&m_sliceEditor);
+
+	if (m_currentSample.frames() < 2048)
+	{
+		brush.setPen(m_playHighlighColor);
+		brush.drawText(
+			m_editorWidth / 2 - 100, m_editorHeight / 2 - 100, 200, 200, Qt::AlignCenter, tr("Drag sample to load"));
+		return;
+	}
 
 	float startFrame = m_seekerStart * m_currentSample.frames();
 	float endFrame = m_seekerEnd * m_currentSample.frames();

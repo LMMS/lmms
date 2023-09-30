@@ -27,6 +27,7 @@
 
 #include <QPushButton>
 
+#include "ComboBox.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Knob.h"
@@ -80,6 +81,7 @@ private:
 	SlicerTKnob m_noteThresholdKnob;
 	SlicerTKnob m_fadeOutKnob;
 	LcdSpinBox m_bpmBox;
+	ComboBox m_snapSetting;
 
 	PixmapButton m_resetButton;
 	PixmapButton m_midiExportButton;
