@@ -372,6 +372,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			this, SLOT(setAutoSaveInterval(int)));
 
 	auto autoSaveResetBtn = new QPushButton(embed::getIconPixmap("reload"), "", autoSaveBox);
+	autoSaveResetBtn->setFixedSize(32, 32);
 	connect(autoSaveResetBtn, SIGNAL(clicked()),
 		this, SLOT(resetAutoSave()));
 
@@ -575,6 +576,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	bufferSizeSubLayout->addWidget(m_bufferSizeSlider, 1);
 
 	auto bufferSize_reset_btn = new QPushButton(embed::getIconPixmap("reload"), "", bufferSizeBox);
+	bufferSize_reset_btn->setFixedSize(32, 32);
 	connect(bufferSize_reset_btn, SIGNAL(clicked()),
 		this, SLOT(resetBufferSize()));
 	bufferSize_reset_btn->setToolTip(
