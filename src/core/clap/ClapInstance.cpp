@@ -287,6 +287,9 @@ auto ClapInstance::pluginUnload() -> bool
 		m_plugin = nullptr;
 	}
 
+	m_paramMap.clear();
+	m_params.clear();
+
 	// Clear all plugin extensions
 	m_pluginExtAudioPorts = nullptr;
 	m_pluginExtState = nullptr;
@@ -326,7 +329,8 @@ auto ClapInstance::pluginInit() -> bool
 	m_audioInBuffers.clear();
 	m_audioOutBuffers.clear();
 
-	// TODO: Need to init extensions before activating the plugin
+	// Initialize Audio Ports extension
+
 	if (!pluginExtensionInit(m_pluginExtAudioPorts, CLAP_EXT_AUDIO_PORTS))
 	{
 		qWarning() << "The required CLAP audio port extension is not supported by the plugin";
@@ -336,17 +340,17 @@ auto ClapInstance::pluginInit() -> bool
 
 	// Effect, Instrument, and Tool are the only options
 	const bool needInputPort = m_pluginInfo->type() != Plugin::Type::Instrument;
-	const bool needOutputPort = m_pluginInfo->type() != Plugin::Type::Tool;
+	constexpr bool needOutputPort = true;
 
 	auto readPorts = [this, needInputPort, needOutputPort](
 		std::vector<AudioPort>& audioPorts,
 		std::unique_ptr<clap_audio_buffer[]>& audioBuffers,
 		std::vector<AudioBuffer>& rawAudioBuffers,
-		bool is_input) -> AudioPort*
+		bool isInput) -> AudioPort*
 	{
-		const auto portCount = m_pluginExtAudioPorts->count(m_plugin, is_input);
+		const auto portCount = m_pluginExtAudioPorts->count(m_plugin, isInput);
 
-		if (is_input)
+		if (isInput)
 		{
 			//if (portCount == 0 && m_pluginInfo->getType() == Plugin::PluginTypes::Effect)
 			//	m_pluginIssues.emplace_back( ... );
@@ -370,10 +374,10 @@ auto ClapInstance::pluginInit() -> bool
 		//clap_id mainPort = CLAP_INVALID_ID;
 		for (std::uint32_t idx = 0; idx < portCount; ++idx)
 		{
-			clap_audio_port_info info{};
+			auto info = clap_audio_port_info{};
 			info.id = CLAP_INVALID_ID;
 			info.in_place_pair = CLAP_INVALID_ID;
-			if (!m_pluginExtAudioPorts->get(m_plugin, idx, is_input, &info))
+			if (!m_pluginExtAudioPorts->get(m_plugin, idx, isInput, &info))
 			{
 				qWarning() << "Unknown error calling m_pluginExtAudioPorts->get(...)";
 				m_pluginIssues.emplace_back(PluginIssueType::PortHasNoDef);
@@ -430,11 +434,11 @@ auto ClapInstance::pluginInit() -> bool
 
 			qDebug() << "- port in place pair:" << info.in_place_pair;
 
-			audioPorts.emplace_back(AudioPort{info, idx, is_input, type, false});
+			audioPorts.emplace_back(AudioPort{info, idx, isInput, type, false});
 		}
 
-		if (is_input && !needInputPort) { return nullptr; }
-		if (!is_input && !needOutputPort) { return nullptr; }
+		if (isInput && !needInputPort) { return nullptr; }
+		if (!isInput && !needOutputPort) { return nullptr; }
 
 		assert(portCount == audioPorts.size());
 		audioBuffers = std::make_unique<clap_audio_buffer[]>(audioPorts.size());
@@ -445,7 +449,7 @@ auto ClapInstance::pluginInit() -> bool
 
 			audioBuffers[port].channel_count = channelCount;
 
-			if (is_input && ((port != stereoPort && stereoPort != CLAP_INVALID_ID) || (port != monoPort && stereoPort == CLAP_INVALID_ID)))
+			if (isInput && ((port != stereoPort && stereoPort != CLAP_INVALID_ID) || (port != monoPort && stereoPort == CLAP_INVALID_ID)))
 			{
 				// This input port will not be used by LMMS
 				// TODO: Will a mono port ever need to be used if a stereo port is available?
@@ -465,7 +469,7 @@ auto ClapInstance::pluginInit() -> bool
 
 		if (stereoPort != CLAP_INVALID_ID)
 		{
-			if (is_input) { m_monoInput = false; } else { m_monoOutput = false; }
+			if (isInput) { m_monoInput = false; } else { m_monoOutput = false; }
 			auto port = &audioPorts[stereoPort];
 			port->used = true;
 			return port;
@@ -473,14 +477,14 @@ auto ClapInstance::pluginInit() -> bool
 
 		if (monoPort != CLAP_INVALID_ID)
 		{
-			if (is_input) { m_monoInput = true; } else { m_monoOutput = true; }
+			if (isInput) { m_monoInput = true; } else { m_monoOutput = true; }
 			auto port = &audioPorts[monoPort];
 			port->used = true;
 			return port;
 		}
 
 		// Missing a required port type that LMMS supports - i.e. an effect where the only input is surround sound
-		qWarning() << "An" << (is_input ? "input" : "output") << "port is required, but CLAP plugin has none that are usable";
+		qWarning() << "An" << (isInput ? "input" : "output") << "port is required, but CLAP plugin has none that are usable";
 		m_pluginIssues.emplace_back(PluginIssueType::UnknownPortType);
 		return nullptr;
 	};
@@ -583,7 +587,7 @@ auto ClapInstance::pluginActivate() -> bool
 	if (isPluginErrorState()) { return false; }
 	checkPluginStateCurrent(PluginState::Inactive);
 
-	const auto sampleRate = Engine::audioEngine()->processingSampleRate();
+	const auto sampleRate = static_cast<double>(Engine::audioEngine()->processingSampleRate());
 	static_assert(DEFAULT_BUFFER_SIZE > MINIMUM_BUFFER_SIZE);
 
 	assert(!isPluginActive());
@@ -706,7 +710,7 @@ auto ClapInstance::pluginProcessEnd(std::uint32_t frames) -> bool
 void ClapInstance::generatePluginInputEvents()
 {
 	m_appToEngineValueQueue.consume(
-		[this](clap_id param_id, const AppToEngineParamQueueValue& value) {
+		[this](clap_id param_id, const HostToPluginParamQueueValue& value) {
 			clap_event_param_value ev;
 			ev.header.time = 0;
 			ev.header.type = CLAP_EVENT_PARAM_VALUE;
@@ -723,7 +727,7 @@ void ClapInstance::generatePluginInputEvents()
 			m_evIn.push(&ev.header);
 		});
 
-	m_appToEngineModQueue.consume([this](clap_id param_id, const AppToEngineParamQueueValue& value) {
+	m_appToEngineModQueue.consume([this](clap_id param_id, const HostToPluginParamQueueValue& value) {
 		clap_event_param_mod ev;
 		ev.header.time = 0;
 		ev.header.type = CLAP_EVENT_PARAM_MOD;
@@ -757,7 +761,7 @@ void ClapInstance::handlePluginOutputEvents()
 					throw std::logic_error("The plugin sent BEGIN_ADJUST twice");
 				isAdj = true;
 
-				EngineToAppParamQueueValue v;
+				PluginToHostParamQueueValue v;
 				v.has_gesture = true;
 				v.is_begin = true;
 				m_engineToAppValueQueue.setOrUpdate(ev->param_id, v);
@@ -772,7 +776,7 @@ void ClapInstance::handlePluginOutputEvents()
 				if (!isAdj)
 				throw std::logic_error("The plugin sent END_ADJUST without a preceding BEGIN_ADJUST");
 				isAdj = false;
-				EngineToAppParamQueueValue v;
+				PluginToHostParamQueueValue v;
 				v.has_gesture = true;
 				v.is_begin = false;
 				m_engineToAppValueQueue.setOrUpdate(ev->param_id, v);
@@ -782,7 +786,7 @@ void ClapInstance::handlePluginOutputEvents()
 			case CLAP_EVENT_PARAM_VALUE:
 			{
 				auto ev = reinterpret_cast<const clap_event_param_value*>(h);
-				EngineToAppParamQueueValue v;
+				PluginToHostParamQueueValue v;
 				v.has_value = true;
 				v.value = ev->value;
 				m_engineToAppValueQueue.setOrUpdate(ev->param_id, v);
@@ -949,7 +953,7 @@ void ClapInstance::hostIdle()
 	m_appToEngineModQueue.producerDone();
 
 	m_engineToAppValueQueue.consume(
-		[this](clap_id paramId, const EngineToAppParamQueueValue& value) {
+		[this](clap_id paramId, const PluginToHostParamQueueValue& value) {
 			const auto it = m_paramMap.find(paramId);
 			if (it == m_paramMap.end())
 			{

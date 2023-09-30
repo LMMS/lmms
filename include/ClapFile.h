@@ -67,7 +67,7 @@ public:
 		ClapPluginInfo(const ClapPluginInfo&) = delete;
 		ClapPluginInfo(ClapPluginInfo&& other) noexcept;
 		ClapPluginInfo& operator=(const ClapPluginInfo&) = delete;
-		ClapPluginInfo& operator=(ClapPluginInfo&& rhs) noexcept = delete;
+		ClapPluginInfo& operator=(ClapPluginInfo&&) noexcept = delete;
 		~ClapPluginInfo() = default;
 
 		auto isValid() const -> bool { return m_valid; }

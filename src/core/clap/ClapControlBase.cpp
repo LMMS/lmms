@@ -84,12 +84,12 @@ ClapControlBase::~ClapControlBase() = default;
 
 auto ClapControlBase::getGroup(std::size_t idx) -> LinkedModelGroup*
 {
-	return (m_instances.size() > idx) ? m_instances[idx].get() : nullptr;
+	return (idx < m_instances.size()) ? m_instances[idx].get() : nullptr;
 }
 
 auto ClapControlBase::getGroup(std::size_t idx) const -> const LinkedModelGroup*
 {
-	return (m_instances.size() > idx) ? m_instances[idx].get() : nullptr;
+	return (idx < m_instances.size()) ? m_instances[idx].get() : nullptr;
 }
 
 void ClapControlBase::copyModelsFromLmms()

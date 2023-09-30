@@ -142,15 +142,14 @@ ClapViewInstance::ClapViewInstance(QWidget* parent, ClapInstance* instance, int 
 			break;
 		case ClapParam::ParamType::Float:
 		{
-			auto derived = new CustomTextKnobControl{this};
+			control = new CustomTextKnobControl{this};
 
 			// CustomTextKnob calls this lambda to update value text
-			auto customTextKnob = dynamic_cast<CustomTextKnob*>(derived->modelView());
-			customTextKnob->setValueText([instance, param](){
-					return QString::fromUtf8(instance->getParamValueText(param).c_str());
+			auto customTextKnob = dynamic_cast<CustomTextKnob*>(control->modelView());
+			customTextKnob->setValueText([=]() {
+				return QString::fromUtf8(instance->getParamValueText(param).c_str());
 			});
 
-			control = derived;
 			break;
 		}
 		default:
@@ -162,6 +161,7 @@ ClapViewInstance::ClapViewInstance(QWidget* parent, ClapInstance* instance, int 
 		// This is the param name seen in the GUI
 		control->setText(QString::fromUtf8(param->displayName().data()));
 
+		// TODO: Group parameters according to module path?
 		if (param->info().module[0] != '\0')
 		{
 			control->topWidget()->setToolTip(QString::fromUtf8(param->info().module));

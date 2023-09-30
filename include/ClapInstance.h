@@ -321,13 +321,10 @@ private:
 			return *this;
 		}
 
-		~AudioBuffer()
-		{
-			free();
-		}
+		~AudioBuffer() { free(); }
 
 		//! [channel][frame]
-		auto data() -> float** { return m_data; }
+		auto data() const -> float** { return m_data; }
 
 	private:
 
@@ -358,15 +355,15 @@ private:
 	std::unordered_map<clap_id, std::unique_ptr<ClapParam>> m_paramMap;
 	std::vector<ClapParam*> m_params; //!< Cache for faster iteration
 
-	struct AppToEngineParamQueueValue
+	struct HostToPluginParamQueueValue
 	{
 		void* cookie;
 		double value;
 	};
 
-	struct EngineToAppParamQueueValue
+	struct PluginToHostParamQueueValue
 	{
-		void update(const EngineToAppParamQueueValue& v) noexcept
+		void update(const PluginToHostParamQueueValue& v) noexcept
 		{
 			if (v.has_value)
 			{
@@ -388,9 +385,9 @@ private:
 	};
 
 	//! Engine = CLAP plugin; App = LMMS
-	clap::helpers::ReducingParamQueue<clap_id, AppToEngineParamQueueValue> m_appToEngineValueQueue;
-	clap::helpers::ReducingParamQueue<clap_id, AppToEngineParamQueueValue> m_appToEngineModQueue;
-	clap::helpers::ReducingParamQueue<clap_id, EngineToAppParamQueueValue> m_engineToAppValueQueue;
+	clap::helpers::ReducingParamQueue<clap_id, HostToPluginParamQueueValue> m_appToEngineValueQueue;
+	clap::helpers::ReducingParamQueue<clap_id, HostToPluginParamQueueValue> m_appToEngineModQueue;
+	clap::helpers::ReducingParamQueue<clap_id, PluginToHostParamQueueValue> m_engineToAppValueQueue;
 
 	std::unordered_map<clap_id, bool> m_isAdjustingParameter;
 
@@ -419,7 +416,7 @@ private:
 	{
 		clap_audio_port_info info{};
 		std::uint32_t index = 0; //!< Index on plugin side, not m_audioPorts***
-		bool is_input = false;
+		bool isInput = false;
 		AudioPortType type = AudioPortType::Unsupported;
 		bool used = false; //!< In use by LMMS
 	};

@@ -44,15 +44,15 @@ ClapFile::ClapFile(const ClapManager* manager, std::filesystem::path filename)
 	m_filename.make_preferred();
 }
 
-ClapFile::ClapFile(ClapFile&& other) noexcept
+ClapFile::ClapFile(ClapFile&& other) noexcept :
+	m_filename{std::move(other.m_filename)},
+	m_library{std::exchange(other.m_library, nullptr)},
+	m_entry{std::exchange(other.m_entry, nullptr)},
+	m_factory{std::exchange(other.m_factory, nullptr)},
+	m_pluginInfo{std::move(other.m_pluginInfo)},
+	m_pluginCount{other.m_pluginCount},
+	m_valid{std::exchange(other.m_valid, false)}
 {
-	m_filename = std::move(other.m_filename);
-	m_library = std::exchange(other.m_library, nullptr);
-	m_entry = std::exchange(other.m_entry, nullptr);
-	m_factory = std::exchange(other.m_factory, nullptr);
-	m_pluginCount = other.m_pluginCount;
-	m_valid = std::exchange(other.m_valid, false);
-	m_pluginInfo = std::move(other.m_pluginInfo);
 }
 
 ClapFile& ClapFile::operator=(ClapFile&& rhs) noexcept
@@ -63,9 +63,9 @@ ClapFile& ClapFile::operator=(ClapFile&& rhs) noexcept
 		m_library = std::exchange(rhs.m_library, nullptr);
 		m_entry = std::exchange(rhs.m_entry, nullptr);
 		m_factory = std::exchange(rhs.m_factory, nullptr);
+		m_pluginInfo = std::move(rhs.m_pluginInfo);
 		m_pluginCount = rhs.m_pluginCount;
 		m_valid = std::exchange(rhs.m_valid, false);
-		m_pluginInfo = std::move(rhs.m_pluginInfo);
 	}
 	return *this;
 }
@@ -212,6 +212,7 @@ ClapPluginInfo::ClapPluginInfo(const clap_plugin_factory* factory, std::uint32_t
 	{
 		auto feature = std::string_view{*features};
 		if (ClapManager::debugging()) { qDebug() << "feature:" << feature.data(); }
+
 		if (feature == CLAP_PLUGIN_FEATURE_INSTRUMENT)
 		{
 			m_type = Plugin::Type::Instrument;
@@ -234,18 +235,18 @@ ClapPluginInfo::ClapPluginInfo(const clap_plugin_factory* factory, std::uint32_t
 		return;
 	}
 
-	// So far the plugin is valid, but it may be invalidated later
+	// So far the plugin is valid, but it may be invalidated later TODO: ???
 	m_valid = true;
 }
 
-ClapPluginInfo::ClapPluginInfo(ClapPluginInfo&& other) noexcept
+ClapPluginInfo::ClapPluginInfo(ClapPluginInfo&& other) noexcept :
+	m_factory{std::exchange(other.m_factory, nullptr)},
+	m_index{other.m_index},
+	m_descriptor{std::exchange(other.m_descriptor, nullptr)},
+	m_type{std::exchange(other.m_type, Plugin::Type::Undefined)},
+	m_valid{std::exchange(other.m_valid, false)},
+	m_issues{std::move(other.m_issues)}
 {
-	m_factory = std::exchange(other.m_factory, nullptr);
-	m_index = other.m_index;
-	m_descriptor = std::exchange(other.m_descriptor, nullptr);
-	m_type = std::exchange(other.m_type, Plugin::Type::Undefined);
-	m_valid = std::exchange(other.m_valid, false);
-	m_issues = std::move(other.m_issues);
 }
 
 

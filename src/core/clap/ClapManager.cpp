@@ -265,12 +265,15 @@ void ClapManager::loadClapFiles(const std::vector<std::filesystem::path>& search
 			totalClapPlugins += clapFile.pluginCount();
 			for (const auto& plugin : clapFile.pluginInfo())
 			{
-				auto [ignore, added] = m_uriToPluginInfo.emplace(std::string{plugin->descriptor()->id}, std::weak_ptr{plugin});
+				auto [_, added] = m_uriToPluginInfo.emplace(std::string{plugin->descriptor()->id}, std::weak_ptr{plugin});
 				if (!added)
 				{
-					qWarning().nospace() << "The CLAP plugin ID '" << plugin->descriptor()->id
-						<< "' in the plugin file '" << entry.path().c_str() << "' is identical to an ID"
-						<< " in a previously loaded plugin file. Skipping the duplicate CLAP plugin.";
+					if (debugging())
+					{
+						qDebug().nospace() << "The CLAP plugin ID '" << plugin->descriptor()->id
+							<< "' in the plugin file '" << entry.path().c_str() << "' is identical to an ID"
+							<< " in a previously loaded plugin file. Skipping the duplicate CLAP plugin.";
+					}
 					plugin->invalidate();
 					purgeNeeded = true;
 					continue;
@@ -283,9 +286,9 @@ void ClapManager::loadClapFiles(const std::vector<std::filesystem::path>& search
 	}
 
 	qDebug() << "CLAP plugin SUMMARY:"
-		<< m_files.size() << "of" << totalClapFiles << ".clap files containing"
+		<< m_files.size() << "of" << totalClapFiles << "files and"
 		<< m_pluginInfo.size() << "of" << totalClapPlugins
-		<< "CLAP plugins loaded in" << timer.elapsed() << "msecs.";
+		<< "plugins loaded in" << timer.elapsed() << "msecs.";
 	if (m_files.size() != totalClapFiles || m_pluginInfo.size() != totalClapPlugins)
 	{
 		if (debugging())

@@ -43,7 +43,7 @@ Plugin::Descriptor PLUGIN_EXPORT clapeffect_plugin_descriptor =
 	LMMS_STRINGIFY(PLUGIN_NAME),
 	"CLAP",
 	QT_TRANSLATE_NOOP("PluginBrowser",
-		"plugin for using CLAP effects inside LMMS."),
+	"plugin for using CLAP effects inside LMMS."),
 	"Dalton Messmer <messmer.dalton/at/gmail.com>",
 	0x0100,
 	Plugin::Type::Effect,
@@ -81,16 +81,16 @@ bool ClapEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	m_controls.copyBuffersToLmms(m_tempOutputSamples.data(), frames);
 
 	double outSum = 0.0;
-	bool corrupt = wetLevel() < 0.f; // #3261 - if w < 0, bash w := 0, d := 1
-	const float d = corrupt ? 1.f : dryLevel();
-	const float w = corrupt ? 0.f : wetLevel();
+	bool corrupt = wetLevel() < 0.f; // #3261 - if wet < 0, bash wet := 0, dry := 1
+	const float dry = corrupt ? 1.f : dryLevel();
+	const float wet = corrupt ? 0.f : wetLevel();
 	for (fpp_t f = 0; f < frames; ++f)
 	{
-		buf[f][0] = d * buf[f][0] + w * m_tempOutputSamples[f][0];
-		buf[f][1] = d * buf[f][1] + w * m_tempOutputSamples[f][1];
-		auto l = static_cast<double>(buf[f][0]);
-		auto r = static_cast<double>(buf[f][1]);
-		outSum += l*l + r*r;
+		buf[f][0] = dry * buf[f][0] + wet * m_tempOutputSamples[f][0];
+		buf[f][1] = dry * buf[f][1] + wet * m_tempOutputSamples[f][1];
+		auto left = static_cast<double>(buf[f][0]);
+		auto right = static_cast<double>(buf[f][1]);
+		outSum += left * left + right * right;
 	}
 	checkGate(outSum / frames);
 
