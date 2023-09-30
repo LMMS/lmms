@@ -2315,16 +2315,8 @@ void AutomationEditorWindow::setProgressionType(int progType)
 void AutomationEditorWindow::updateEditTanButton()
 {
 	auto progType = currentClip()->progressionType();
-
-	if (!AutomationClip::supportsTangentEditing(progType))
-	{
-		if (m_editTanAction->isChecked()) { m_drawAction->trigger(); }
-		if (m_editTanAction->isEnabled()) { m_editTanAction->setEnabled(false); }
-	}
-	else
-	{
-		if (!m_editTanAction->isEnabled()) { m_editTanAction->setEnabled(true); }
-	}
+	m_editTanAction->setEnabled(AutomationClip::supportsTangentEditing(progType));
+	if (!m_editTanAction->isEnabled() && m_editTanAction->isChecked()) { m_drawAction->trigger(); }
 }
 
 } // namespace lmms::gui
