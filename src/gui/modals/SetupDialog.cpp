@@ -168,8 +168,8 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 
 	// Constants for positioning LED check boxes.
-	const int XDelta = 10;
-	const int YDelta = 18;
+	constexpr int XDelta = 10;
+	constexpr int YDelta = 18;
 
 	// Main widget.
 	auto main_w = new QWidget(this);
@@ -212,7 +212,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	auto generalControlsLayout = new QVBoxLayout;
 	generalControlsLayout->setSpacing(10);
 
-	auto addLedCheckBox = [&XDelta, &YDelta, this](const QString& ledText, TabWidget* tw, int& counter,
+	auto addLedCheckBox = [&](const QString& ledText, TabWidget* tw, int& counter,
 							  bool initialState, const char* toggledSlot, bool showRestartWarning) {
 		auto checkBox = new LedCheckBox(ledText, tw);
 		counter++;
