@@ -25,46 +25,47 @@
 #ifndef LMMS_CLIPBOARD_H
 #define LMMS_CLIPBOARD_H
 
-#include <QMap>
 #include <QDomElement>
+#include <QMap>
+
+#include "lmms_export.h"
 
 class QMimeData;
 
-namespace lmms::Clipboard
+namespace lmms::Clipboard {
+
+enum class MimeType
 {
+	StringPair,
+	Default
+};
 
-	enum class MimeType
+// Convenience Methods
+const QMimeData* getMimeData();
+bool hasFormat(MimeType mT);
+
+// Helper methods for String data
+void copyString(const QString& str, MimeType mT);
+QString getString(MimeType mT);
+
+// Helper methods for String Pair data
+void copyStringPair(const QString& key, const QString& value);
+QString decodeKey(const QMimeData* mimeData);
+QString decodeValue(const QMimeData* mimeData);
+
+inline const char* mimeType(MimeType type)
+{
+	switch (type)
 	{
-		StringPair,
-		Default
-	};
-
-	// Convenience Methods
-	const QMimeData * getMimeData();
-	bool hasFormat( MimeType mT );
-
-	// Helper methods for String data
-	void copyString( const QString & str, MimeType mT );
-	QString getString( MimeType mT );
-
-	// Helper methods for String Pair data
-	void copyStringPair( const QString & key, const QString & value );
-	QString decodeKey( const QMimeData * mimeData );
-	QString decodeValue( const QMimeData * mimeData );
-
-	inline const char * mimeType( MimeType type )
-	{
-		switch( type )
-		{
-			case MimeType::StringPair:
-				return "application/x-lmms-stringpair";
-			break;
-			case MimeType::Default:
-			default:
-				return "application/x-lmms-clipboard";
-				break;
-		}
+	case MimeType::StringPair:
+		return "application/x-lmms-stringpair";
+		break;
+	case MimeType::Default:
+	default:
+		return "application/x-lmms-clipboard";
+		break;
 	}
+}
 
 } // namespace lmms::Clipboard
 

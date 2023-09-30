@@ -33,12 +33,14 @@
 
 #include <QDomElement>
 #include <fftw3.h>
+#include <math.h>
 
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "PathUtil.h"
 #include "Song.h"
 #include "embed.h"
+#include "lmms_constants.h"
 #include "plugin_export.h"
 
 namespace lmms {
@@ -144,8 +146,8 @@ void PhaseVocoder::updateParams(float newRatio)
 	numWindows = (float)originalBuffer.size() / stepSize - overSampling - 1;
 	outStepSize = m_scaleRatio * (float)stepSize; // float, else inaccurate
 	freqPerBin = originalSampleRate / windowSize;
-	expectedPhaseIn = 2. * M_PI * (float)stepSize / (float)windowSize;
-	expectedPhaseOut = 2. * M_PI * (float)outStepSize / (float)windowSize;
+	expectedPhaseIn = 2. * F_PI * (float)stepSize / (float)windowSize;
+	expectedPhaseOut = 2. * F_PI * (float)outStepSize / (float)windowSize;
 
 	processedBuffer.resize(m_scaleRatio * originalBuffer.size(), 0);
 
@@ -196,9 +198,9 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 			freq -= (float)j * expectedPhaseIn; // subtract expected phase
 
 			// this puts freq in 0-2pi
-			freq = fmod(freq + M_PI, -2.0f * M_PI) + M_PI;
+			freq = fmod(freq + F_PI, -2.0f * F_PI) + F_PI;
 
-			freq = (float)overSampling * freq / (2. * M_PI); // idk
+			freq = (float)overSampling * freq / (2. * F_PI); // idk
 
 			freq = (float)j * freqPerBin + freq * freqPerBin; // "compute the k-th partials' true frequency" ok i guess
 
@@ -226,7 +228,7 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 
 		deltaPhase /= freqPerBin;
 
-		deltaPhase = 2. * M_PI * deltaPhase / overSampling;
+		deltaPhase = 2. * F_PI * deltaPhase / overSampling;
 
 		deltaPhase += (float)j * expectedPhaseOut;
 
@@ -262,7 +264,7 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 		// (float)overSampling/totalWindowOverlap*IFFTReconstruction[j]/(windowSize/2.0f*overSampling);
 		// printf("timeshifted in phase: %f\n", m_timeshiftedBufferL[outIndex]);
 		// continuos windowing
-		float window = -0.5f * cos(2. * M_PI * (float)j / (float)windowSize) + 0.5f;
+		float window = -0.5f * cos(2. * F_PI * (float)j / (float)windowSize) + 0.5f;
 		processedBuffer[outIndex] += window * IFFTReconstruction[j] / (windowSize / 2.0f * overSampling);
 	}
 }
