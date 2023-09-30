@@ -690,14 +690,9 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 							node.value().setLockedTangents(true);
 
 							m_draggedTangentTick = POS(node);
-							if (posTicks >= m_draggedTangentTick)
-							{
-								m_draggedOutTangent = true;
-							}
-							else
-							{
-								m_draggedOutTangent = false;
-							}
+
+							// Are we dragging the out or in tangent?
+							m_draggedOutTangent = posTicks >= m_draggedTangentTick;
 
 							m_action = Action::MoveTangent;
 						}
@@ -930,48 +925,42 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 				// If we moved the mouse past the beginning correct the position in ticks
 				posTicks = std::max(posTicks, 0);
 
-				if (m_mouseDownLeft)
+				if (m_mouseDownLeft && m_action == Action::MoveTangent)
 				{
-					if (m_action == Action::MoveTangent)
+					timeMap& tm = m_clip->getTimeMap();
+					auto it = tm.find(m_draggedTangentTick);
+
+					// Safety check
+					if (it != tm.end())
 					{
-						timeMap& tm = m_clip->getTimeMap();
-						auto it = tm.find(m_draggedTangentTick);
+						// Calculate new tangent
+						float y = m_draggedOutTangent
+							? yCoordOfLevel(OUTVAL(it))
+							: yCoordOfLevel(INVAL(it));
+						float dy = m_draggedOutTangent
+							? y - mouseEvent->y()
+							: mouseEvent->y() - y;
+						float dx = std::abs(posTicks - POS(it));
+						float newTangent = dy / std::max(dx, 1.0f);
 
-						// Safety check
-						if (it != tm.end())
+						if (m_draggedOutTangent)
 						{
-							// Calculate new tangent
-							float y = m_draggedOutTangent
-								? yCoordOfLevel(OUTVAL(it))
-								: yCoordOfLevel(INVAL(it));
-							float dy = m_draggedOutTangent
-								? y - mouseEvent->y()
-								: mouseEvent->y() - y;
-							float dx = std::abs(posTicks - POS(it));
-							float newTangent = dy / std::max(dx, 1.0f);
-
-							if (m_draggedOutTangent)
-							{
-								it.value().setOutTangent(newTangent);
-							}
-							else
-							{
-								it.value().setInTangent(newTangent);
-							}
+							it.value().setOutTangent(newTangent);
+						}
+						else
+						{
+							it.value().setInTangent(newTangent);
 						}
 					}
 				}
-				else if (m_mouseDownRight)
+				else if (m_mouseDownRight && m_action == Action::ResetTangents)
 				{
-					if (m_action == Action::ResetTangents)
-					{
-						// Reseting tangents
+					// Reseting tangents
 
-						// Resets all tangents from the last clicked tick up to the current position tick
-						m_clip->resetTangents(m_drawLastTick, posTicks);
+					// Resets all tangents from the last clicked tick up to the current position tick
+					m_clip->resetTangents(m_drawLastTick, posTicks);
 
-						Engine::getSong()->setModified();
-					}
+					Engine::getSong()->setModified();
 				}
 			break;
 			}
@@ -1429,8 +1418,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		}
 		case EditMode::EditTangents:
 		{
-			if (m_action == Action::MoveTangent) { cursor = s_toolMove; }
-			else { cursor = s_toolEditTangents; }
+			cursor = m_action == Action::MoveTangent ? s_toolMove : s_toolEditTangents;
 			break;
 		}
 	}
@@ -2026,19 +2014,14 @@ AutomationEditor::timeMap::iterator AutomationEditor::getClosestNode(int x)
 	{
 		// Distance from node to the right
 		int distanceRight = std::abs(POS(it) - posTicks);
-		--it;
 		// Distance from node to the left
-		int distanceLeft = std::abs(POS(it) - posTicks);
+		int distanceLeft = std::abs(POS(--it) - posTicks);
 
-		if (distanceLeft < distanceRight)
-		{
-			return it;
-		}
-		else
+		if (distanceLeft >= distanceRight)
 		{
 			++it;
-			return it;
 		}
+		return it;
 	}
 }
 
@@ -2360,7 +2343,7 @@ void AutomationEditorWindow::updateEditTanButton()
 	}
 	else
 	{
-		if (m_editTanAction->isEnabled() == false) { m_editTanAction->setEnabled(true); }
+		if (!m_editTanAction->isEnabled()) { m_editTanAction->setEnabled(true); }
 	}
 }
 
