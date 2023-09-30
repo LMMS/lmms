@@ -120,7 +120,12 @@ protected:
 	inline void drawLevelTick(QPainter & p, int tick, float value);
 
 	timeMap::iterator getNodeAt(int x, int y, bool outValue = false, int r = 5);
-	// Get the closest node to the x position (for the drag tangent)
+	/**
+	 * @brief Given a mouse X coordinate, returns a timeMap::iterator that points to
+	 *        the closest node.
+	 * @param Int X coordinate
+	 * @return timeMap::iterator with the closest node or timeMap.end() if there are no nodes.
+	 */
 	timeMap::iterator getClosestNode(int x);
 
 	void drawLine( int x0, float y0, int x1, float y1 );
@@ -137,6 +142,12 @@ protected slots:
 	void setEditMode(int mode);
 
 	void setProgressionType(AutomationClip::ProgressionType type);
+	/**
+	 * @brief This method handles the AutomationEditorWindow event of changing
+	 * progression types. After that, it calls updateEditTanButton so the edit
+	 * tangents button is updated accordingly
+	 * @param Int New progression type
+	 */
 	void setProgressionType(int type);
 	void setTension();
 
@@ -300,6 +311,12 @@ protected slots:
 private slots:
 	void updateWindowTitle();
 	void setProgressionType(int progType);
+	/**
+	 * @brief The Edit Tangent edit mode should only be available for
+	 * Cubic Hermite progressions, so this method is responsable for disabling it
+	 * for other edit modes and reenabling it when it changes back to the Edit Tangent
+	 * mode.
+	 */
 	void updateEditTanButton();
 
 private:

@@ -673,42 +673,42 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 			}
 			case EditMode::EditTangents:
 			{
-				if (m_clip->canEditTangents())
+				if (!m_clip->canEditTangents())
 				{
-					m_clip->addJournalCheckPoint();
+					update();
+					return;
+				}
 
-					// Gets the closest node to the mouse click
-					timeMap::iterator node = getClosestNode(mouseEvent->x());
+				m_clip->addJournalCheckPoint();
 
-					// Starts dragging a tangent
-					if (m_mouseDownLeft)
-					{
-						if (node != tm.end())
-						{
-							// Lock the tangents from that node, so it can only be
-							// manually edited
-							node.value().setLockedTangents(true);
+				// Gets the closest node to the mouse click
+				timeMap::iterator node = getClosestNode(mouseEvent->x());
 
-							m_draggedTangentTick = POS(node);
+				// Starts dragging a tangent
+				if (m_mouseDownLeft && node != tm.end())
+				{
+					// Lock the tangents from that node, so it can only be
+					// manually edited
+					node.value().setLockedTangents(true);
 
-							// Are we dragging the out or in tangent?
-							m_draggedOutTangent = posTicks >= m_draggedTangentTick;
+					m_draggedTangentTick = POS(node);
 
-							m_action = Action::MoveTangent;
-						}
-					}
-					// Resets node's tangent
-					else if (m_mouseDownRight)
-					{
-						// Resets tangent from node
-						resetTangent(node);
+					// Are we dragging the out or in tangent?
+					m_draggedOutTangent = posTicks >= m_draggedTangentTick;
 
-						// Update the last clicked position so we reset all tangents from
-						// that point up to the point we release the mouse button
-						m_drawLastTick = posTicks;
+					m_action = Action::MoveTangent;
+				}
+				// Resets node's tangent
+				else if (m_mouseDownRight)
+				{
+					// Resets tangent from node
+					resetTangent(node);
 
-						m_action = Action::ResetTangents;
-					}
+					// Update the last clicked position so we reset all tangents from
+					// that point up to the point we release the mouse button
+					m_drawLastTick = posTicks;
+
+					m_action = Action::ResetTangents;
 				}
 			break;
 			}
@@ -931,32 +931,33 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 					auto it = tm.find(m_draggedTangentTick);
 
 					// Safety check
-					if (it != tm.end())
+					if (it == tm.end())
 					{
-						// Calculate new tangent
-						float y = m_draggedOutTangent
-							? yCoordOfLevel(OUTVAL(it))
-							: yCoordOfLevel(INVAL(it));
-						float dy = m_draggedOutTangent
-							? y - mouseEvent->y()
-							: mouseEvent->y() - y;
-						float dx = std::abs(posTicks - POS(it));
-						float newTangent = dy / std::max(dx, 1.0f);
+						update();
+						return;
+					}
 
-						if (m_draggedOutTangent)
-						{
-							it.value().setOutTangent(newTangent);
-						}
-						else
-						{
-							it.value().setInTangent(newTangent);
-						}
+					// Calculate new tangent
+					float y = m_draggedOutTangent
+						? yCoordOfLevel(OUTVAL(it))
+						: yCoordOfLevel(INVAL(it));
+					float dy = m_draggedOutTangent
+						? y - mouseEvent->y()
+						: mouseEvent->y() - y;
+					float dx = std::abs(posTicks - POS(it));
+					float newTangent = dy / std::max(dx, 1.0f);
+
+					if (m_draggedOutTangent)
+					{
+						it.value().setOutTangent(newTangent);
+					}
+					else
+					{
+						it.value().setInTangent(newTangent);
 					}
 				}
 				else if (m_mouseDownRight && m_action == Action::ResetTangents)
 				{
-					// Reseting tangents
-
 					// Resets all tangents from the last clicked tick up to the current position tick
 					m_clip->resetTangents(m_drawLastTick, posTicks);
 
@@ -1973,15 +1974,6 @@ AutomationEditor::timeMap::iterator AutomationEditor::getNodeAt(int x, int y, bo
 	return tm.end();
 }
 
-
-
-
-/**
- * @brief Given a mouse X coordinate, returns a timeMap::iterator that points to
- *        the closest node.
- * @param Int X coordinate
- * @return timeMap::iterator with the closest node or timeMap.end() if there are no nodes.
- */
 AutomationEditor::timeMap::iterator AutomationEditor::getClosestNode(int x)
 {
 	// Remove the VALUES_WIDTH from the x position, so we have the actual viewport x
@@ -2314,24 +2306,12 @@ void AutomationEditorWindow::updateWindowTitle()
 	setWindowTitle( tr( "Automation Editor - %1" ).arg( m_editor->m_clip->name() ) );
 }
 
-/**
- * @brief This method handles the AutomationEditorWindow event of changing
- * progression types. After that, it calls updateEditTanButton so the edit
- * tangents button is updated accordingly
- * @param Int New progression type
- */
 void AutomationEditorWindow::setProgressionType(int progType)
 {
 	m_editor->setProgressionType(progType);
 	updateEditTanButton();
 }
 
-/**
- * @brief The Edit Tangent edit mode should only be available for
- * Cubic Hermite progressions, so this method is responsable for disabling it
- * for other edit modes and reenabling it when it changes back to the Edit Tangent
- * mode.
- */
 void AutomationEditorWindow::updateEditTanButton()
 {
 	auto progType = currentClip()->progressionType();

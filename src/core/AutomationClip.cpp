@@ -422,11 +422,6 @@ void AutomationClip::resetNodes(const int tick0, const int tick1)
 
 
 
-/**
- * @brief Resets the tangents from the nodes between the given ticks
- * @param Int first tick of the range
- * @param Int second tick of the range
- */
 void AutomationClip::resetTangents(const int tick0, const int tick1)
 {
 	if (tick0 == tick1)

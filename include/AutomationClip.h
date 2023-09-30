@@ -112,6 +112,11 @@ public:
 
 	void resetNodes(const int tick0, const int tick1);
 
+	/**
+	 * @brief Resets the tangents from the nodes between the given ticks
+	 * @param Int first tick of the range
+	 * @param Int second tick of the range
+	 */
 	void resetTangents(const int tick0, const int tick1);
 
 	void recordValue(TimePos time, float value);
