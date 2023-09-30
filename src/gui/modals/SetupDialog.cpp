@@ -1189,7 +1189,7 @@ void SetupDialog::updateBufferSizeWarning(int value)
 	if(((value & (value - 1)) != 0) && value < 256)
 	{
 		text += "<li>" + tr("The currently selected value is not a power of 2 "
-					"(32, 64, 128, 256, 512, 1024, ...). Some plugins may not be available.") + "</li>";
+					"(32, 64, 128, 256). Some plugins may not be available.") + "</li>";
 	}
 	if(value <= 32)
 	{
