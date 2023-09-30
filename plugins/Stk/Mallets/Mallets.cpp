@@ -301,6 +301,8 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 		float position = m_positionModel.value();
 		float modulator = m_modulatorModel.value();
 		float crossfade = m_crossfadeModel.value();
+		float pressure = m_pressureModel.value();
+		float speed = m_velocityModel.value();
 
 		if (p < 9)
 		{
@@ -317,6 +319,14 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 
 			crossfade += random * (static_cast<float>(fast_rand() % 128) - 64.0);
 			crossfade = std::clamp(crossfade, 0.0f, 128.0f);
+		}
+		else
+		{
+			pressure += random * (static_cast<float>(fast_rand() % 128) - 64.0);
+			pressure = std::clamp(pressure, 0.0f, 128.0f);
+
+			speed += random * (static_cast<float>(fast_rand() % 128) - 64.0);
+			speed = std::clamp(speed, 0.0f, 128.0f);
 		}
 
 		// critical section as STK is not thread-safe
@@ -352,12 +362,12 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 		{
 			_n->m_pluginData = new MalletsSynth( freq,
 						vel,
-						m_pressureModel.value(),
+						pressure,
 						m_motionModel.value(),
 						m_vibratoModel.value(),
 						p - 10,
 						m_strikeModel.value() * 128.0,
-						m_velocityModel.value(),
+						speed,
 						(uint8_t) m_spreadModel.value(),
 				Engine::audioEngine()->processingSampleRate() );
 		}
