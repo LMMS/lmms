@@ -29,7 +29,7 @@
 	(2541 - 2580 donated to artemio@kdemail.net)
 */
 
-// #include <sys/time.h> this header is unnecessary and breaks msvc
+// #include <sys/time.h> needed if using the commented seed function
 
 #include "basics.h"
 
