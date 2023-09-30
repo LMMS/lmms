@@ -33,8 +33,9 @@
 #include "ClapInstance.h"
 #include "DataFile.h"
 #include "LinkedModelGroups.h"
-#include "lmms_export.h"
 #include "Plugin.h"
+#include "ArrayVector.h"
+#include "lmms_export.h"
 
 #include <memory>
 #include <clap/clap.h>
@@ -67,14 +68,12 @@ protected:
 	//! @param uri the CLAP URI telling this class what plugin to construct
 	ClapControlBase(class Model* that, const QString& uri);
 	ClapControlBase(const ClapControlBase&) = delete;
-	~ClapControlBase() override;
-
 	ClapControlBase& operator=(const ClapControlBase&) = delete;
+	~ClapControlBase() override;
 
 	//! Must be checked after ctor or reload
 	auto isValid() const -> bool { return m_valid; }
 
-	//! TODO: not implemented
 	void reload();
 
 	/*
@@ -89,13 +88,16 @@ protected:
 	//! Copy values from the LMMS core (connected models, MIDI events, ...) into
 	//! the respective ports
 	void copyModelsFromLmms();
+
 	//! Bring values from all ports to the LMMS core
 	void copyModelsToLmms() const;
 
-	//! Copy buffer passed by LMMS into our ports
+	//! Copy LMMS core audio buffer into CLAP audio input buffer
 	void copyBuffersFromLmms(const sampleFrame* buf, fpp_t frames);
-	//! Copy our ports into buffers passed by LMMS
+
+	//! Copy CLAP audio output buffers into buffer passed by LMMS core
 	void copyBuffersToLmms(sampleFrame* buf, fpp_t frames) const;
+
 	//! Run the CLAP plugin instance(s) for @param frames frames
 	void run(fpp_t frames);
 
@@ -116,23 +118,23 @@ protected:
 		const class TimePos& time, f_cnt_t offset);
 
 private:
+
 	//! Return the DataFile settings type
 	virtual auto settingsType() -> DataFile::Type = 0;
+
 	//! Inform the plugin about a file name change
 	virtual void setNameFromFile(const QString& fname) = 0;
 
 	//! Independent processors
 	//! If this is a mono effect, the vector will have size 2 in order to
 	//! fulfill LMMS' requirement of having stereo input and output
-	std::vector<std::unique_ptr<ClapInstance>> m_instances;
+	ArrayVector<std::unique_ptr<ClapInstance>, DEFAULT_CHANNELS> m_instances;
+
+	const ClapPluginInfo* m_info = nullptr;
 
 	bool m_valid = true;
 	bool m_hasGUI = false;
-	unsigned m_channelsPerInstance;
-
-	const ClapPluginInfo* m_info;
-	//const ClapPluginInstance* m_plugin;
-	//std::unique_ptr<ClapInstance> m_instance;
+	unsigned m_channelsPerInstance = 0;
 };
 
 
