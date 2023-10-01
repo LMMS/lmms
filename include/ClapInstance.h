@@ -224,12 +224,13 @@ private:
 	static void hostRequestProcess(const clap_host* host);
 	static void hostRequestRestart(const clap_host* host);
 	static void hostExtStateMarkDirty(const clap_host* host);
-	static void hostExtLogLog([[maybe_unused]] const clap_host_t* host, clap_log_severity severity, const char* msg);
-	static auto hostExtThreadCheckIsMainThread(const clap_host_t* host) -> bool;
-	static auto hostExtThreadCheckIsAudioThread(const clap_host_t* host) -> bool;
+	static void hostExtLogLog([[maybe_unused]] const clap_host* host, clap_log_severity severity, const char* msg);
+	static auto hostExtThreadCheckIsMainThread(const clap_host* host) -> bool;
+	static auto hostExtThreadCheckIsAudioThread(const clap_host* host) -> bool;
 	static void hostExtParamsRescan(const clap_host* host, std::uint32_t flags);
 	static void hostExtParamsClear(const clap_host* host, clap_id param_id, clap_param_clear_flags flags);
 	static void hostExtParamsRequestFlush(const clap_host* host);
+	static void hostExtLatencyChanged([[maybe_unused]] const clap_host* host);
 
 	auto canUsePluginParams() const noexcept -> bool;
 	//bool canUsePluginGui() const noexcept;
@@ -449,6 +450,10 @@ private:
 		&ClapInstance::hostExtParamsRescan,
 		&ClapInstance::hostExtParamsClear,
 		&ClapInstance::hostExtParamsRequestFlush,
+	};
+
+	static const constexpr clap_host_latency m_hostExtLatency {
+		&ClapInstance::hostExtLatencyChanged
 	};
 
 	/**

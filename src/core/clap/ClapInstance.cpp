@@ -261,6 +261,7 @@ auto ClapInstance::pluginLoad() -> bool
 
 	// Create plugin instance, destroying any previous plugin instance first
 	const auto factory = m_pluginInfo->factory();
+	assert(factory != nullptr);
 	m_plugin = factory->create_plugin(factory, host(), m_pluginInfo->descriptor()->id);
 	if (!m_plugin)
 	{
@@ -538,7 +539,7 @@ auto ClapInstance::pluginInit() -> bool
 	{
 		try
 		{
-			hostExtParamsRescan(&m_host, CLAP_PARAM_RESCAN_ALL);
+			hostExtParamsRescan(host(), CLAP_PARAM_RESCAN_ALL);
 		}
 		catch (const std::exception& e)
 		{
@@ -609,7 +610,7 @@ auto ClapInstance::pluginDeactivate() -> bool
 	if (!isPluginActive()) { return false; }
 
 	/*
-	TODO: Need to fix this
+	//TODO: Need to fix this
 	while (isPluginProcessing() || isPluginSleeping())
 	{
 		m_scheduleDeactivate = true;
@@ -1033,6 +1034,7 @@ auto ClapInstance::hostGetExtension(const clap_host* host, const char* extension
 	if (extensionIdView == CLAP_EXT_LOG) { return &m_hostExtLog; }
 	if (extensionIdView == CLAP_EXT_THREAD_CHECK) { return &m_hostExtThreadCheck; }
 	if (extensionIdView == CLAP_EXT_PARAMS) { return &m_hostExtParams; }
+	if (extensionIdView == CLAP_EXT_LATENCY) { return &m_hostExtLatency; }
 
 	return nullptr;
 }
@@ -1073,7 +1075,7 @@ void ClapInstance::hostExtStateMarkDirty(const clap_host* host)
 	h->m_hostExtStateIsDirty = true;
 }
 
-void ClapInstance::hostExtLogLog(const clap_host_t* host, clap_log_severity severity, const char* msg)
+void ClapInstance::hostExtLogLog(const clap_host* host, clap_log_severity severity, const char* msg)
 {
 	// Thread-safe
 	std::string_view severityStr;
@@ -1102,12 +1104,12 @@ void ClapInstance::hostExtLogLog(const clap_host_t* host, clap_log_severity seve
 	qDebug().nospace() << "CLAP LOG: severity=" << severityStr.data() << "; msg='" << msg << "'";
 }
 
-auto ClapInstance::hostExtThreadCheckIsMainThread(const clap_host_t* host) -> bool
+auto ClapInstance::hostExtThreadCheckIsMainThread(const clap_host* host) -> bool
 {
 	return isMainThread();
 }
 
-auto ClapInstance::hostExtThreadCheckIsAudioThread(const clap_host_t* host) -> bool
+auto ClapInstance::hostExtThreadCheckIsAudioThread(const clap_host* host) -> bool
 {
 	return isAudioThread();
 }
@@ -1260,7 +1262,7 @@ void ClapInstance::hostExtParamsClear(const clap_host* host, clap_id param_id, c
 
 void ClapInstance::hostExtParamsRequestFlush(const clap_host* host)
 {
-	//qDebug() << "ClapInstance::hostExtParamsRequestFlush";
+	qDebug() << "ClapInstance::hostExtParamsRequestFlush";
 	auto h = fromHost(host);
 
 	if (!h->isPluginActive() && hostExtThreadCheckIsMainThread(host))
@@ -1271,6 +1273,17 @@ void ClapInstance::hostExtParamsRequestFlush(const clap_host* host)
 	}
 
 	h->m_scheduleParamFlush = true;
+}
+
+void ClapInstance::hostExtLatencyChanged(const clap_host* host)
+{
+	/*
+	 * LMMS currently does not use latency data, but implementing this extension
+	 * fixes a crash that would occur in plugins built using the DISTRHO plugin
+	 * framework prior to this commit:
+	 * https://github.com/DISTRHO/DPF/commit/4f11f8cc49b24ede1735a16606e7bad5a52ab41d
+	 */
+	//qDebug() << "ClapInstance::hostExtLatencyChanged";
 }
 
 auto ClapInstance::canUsePluginParams() const noexcept -> bool
@@ -1298,7 +1311,7 @@ void ClapInstance::setParamValueByHost(ClapParam& param, double value)
 
 	m_appToEngineValueQueue.set(param.info().id, {param.info().cookie, value});
 	m_appToEngineValueQueue.producerDone();
-	hostExtParamsRequestFlush(&m_host);
+	hostExtParamsRequestFlush(host());
 }
 
 void ClapInstance::setParamModulationByHost(ClapParam& param, double value)
@@ -1309,7 +1322,7 @@ void ClapInstance::setParamModulationByHost(ClapParam& param, double value)
 
 	m_appToEngineModQueue.set(param.info().id, {param.info().cookie, value});
 	m_appToEngineModQueue.producerDone();
-	hostExtParamsRequestFlush(&m_host);
+	hostExtParamsRequestFlush(host());
 }
 
 void ClapInstance::checkValidParamValue(const ClapParam& param, double value)

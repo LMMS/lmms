@@ -63,8 +63,8 @@ ClapControlBase::ClapControlBase(Model* that, const QString& uri)
 
 	if (first->isMonoOutput())
 	{
-		qDebug() << "Creating CLAP instance (#2)";
 		// A second instance is needed for stereo input/output
+		qDebug() << "Creating CLAP instance (#2)";
 		auto& second = m_instances.emplace_back(std::make_unique<ClapInstance>(m_info, that));
 		if (!second || !second->isValid())
 		{
