@@ -273,7 +273,7 @@ SlicerT::SlicerT(InstrumentTrack* instrumentTrack)
 	, m_originalSample()
 	, m_phaseVocoder()
 {
-	m_sliceSnap.addItem("None");
+	m_sliceSnap.addItem("Off");
 	m_sliceSnap.addItem("1/1");
 	m_sliceSnap.addItem("1/2");
 	m_sliceSnap.addItem("1/4");
