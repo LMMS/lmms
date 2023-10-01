@@ -39,13 +39,13 @@ class TunerControls : public EffectControls
 public:
 	TunerControls(Tuner* tuner);
 
-	void saveSettings(QDomDocument&, QDomElement&) override;
-	void loadSettings(const QDomElement&) override;
+	auto saveSettings(QDomDocument&, QDomElement&) -> void override;
+	auto loadSettings(const QDomElement&) -> void override;
 
-	QString nodeName() const override;
-	int controlCount() override;
+	auto nodeName() const -> QString override;
+	auto controlCount() -> int override;
 
-	gui::EffectControlDialog* createView() override;
+	auto createView() -> gui::EffectControlDialog* override;
 
 private:
 	Tuner* m_tuner = nullptr;

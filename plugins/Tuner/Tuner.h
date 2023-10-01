@@ -41,11 +41,11 @@ public:
 	Tuner(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~Tuner() override;
 
-	bool processAudioBuffer(sampleFrame* buf, const fpp_t frames) override;
-	EffectControls* controls() override;
+	auto processAudioBuffer(sampleFrame* buf, const fpp_t frames) -> bool override;
+	auto controls() -> EffectControls* override;
 
 signals:
-	void frequencyCalculated(float frequency);
+	auto frequencyCalculated(float frequency) -> void;
 
 private:
 	TunerControls m_tunerControls;

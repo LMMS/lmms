@@ -40,27 +40,27 @@ TunerControls::TunerControls(Tuner* tuner)
 		[this, tuner] { tuner->m_referenceFrequency = m_referenceFreqModel.value(); });
 }
 
-void TunerControls::saveSettings(QDomDocument& domDocument, QDomElement& domElement)
+auto TunerControls::saveSettings(QDomDocument& domDocument, QDomElement& domElement) -> void
 {
 	m_referenceFreqModel.saveSettings(domDocument, domElement, "reference");
 }
 
-void TunerControls::loadSettings(const QDomElement& domElement)
+auto TunerControls::loadSettings(const QDomElement& domElement) -> void
 {
 	m_referenceFreqModel.loadSettings(domElement, "reference");
 }
 
-QString TunerControls::nodeName() const
+auto TunerControls::nodeName() const -> QString
 {
 	return "TunerControls";
 }
 
-int TunerControls::controlCount()
+auto TunerControls::controlCount() -> int
 {
 	return 1;
 }
 
-gui::EffectControlDialog* TunerControls::createView()
+auto TunerControls::createView() -> gui::EffectControlDialog*
 {
 	return new gui::TunerControlDialog(this);
 }

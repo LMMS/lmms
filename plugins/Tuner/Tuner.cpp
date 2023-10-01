@@ -63,7 +63,7 @@ Tuner::~Tuner()
 	del_aubio_pitch(m_aubioPitch);
 }
 
-bool Tuner::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
+auto Tuner::processAudioBuffer(sampleFrame* buf, const fpp_t frames) -> bool
 {
 	if (!isEnabled() || !isRunning()) { return false; }
 
@@ -108,7 +108,7 @@ bool Tuner::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	return isRunning();
 }
 
-EffectControls* Tuner::controls()
+auto Tuner::controls() -> EffectControls*
 {
 	return &m_tunerControls;
 }

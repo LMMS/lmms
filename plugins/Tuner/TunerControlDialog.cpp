@@ -77,7 +77,7 @@ TunerControlDialog::TunerControlDialog(TunerControls* controls)
 		[this](float frequency) { frequencyCalculated(frequency); });
 }
 
-void TunerControlDialog::frequencyCalculated(float frequency)
+auto TunerControlDialog::frequencyCalculated(float frequency) -> void
 {
 	// A4 = referenceFrequency
 	const float referenceFrequency = static_cast<TunerControls*>(m_effectControls)->m_referenceFreqModel.value();
@@ -104,7 +104,7 @@ void TunerControlDialog::frequencyCalculated(float frequency)
 	else if (centDistance > 30) { m_centsLabel->setStyleSheet("QLabel { color : red; }"); }
 }
 
-std::string TunerControlDialog::noteToString(NoteName note)
+auto TunerControlDialog::noteToString(NoteName note) -> std::string
 {
 	switch (note)
 	{
