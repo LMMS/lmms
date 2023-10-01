@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef TUNER_H
-#define TUNER_H
+#ifndef LMMS_TUNER_H
+#define LMMS_TUNER_H
 
 #include <array>
 #include <aubio/aubio.h>
@@ -31,6 +31,8 @@
 
 #include "Effect.h"
 #include "TunerControls.h"
+
+namespace lmms {
 
 class Tuner : public Effect
 {
@@ -62,5 +64,6 @@ private:
 	fvec_t* m_outputBuffer;
 	friend class TunerControls;
 };
+} // namespace lmms
 
-#endif
+#endif // LMMS_TUNER_H

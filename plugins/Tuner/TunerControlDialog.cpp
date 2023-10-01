@@ -26,16 +26,17 @@
 
 #include <QLabel>
 #include <QPainter>
-#include <QVBoxLayout>
 #include <QSizePolicy>
+#include <QVBoxLayout>
+#include <cmath>
+#include <iostream>
 
 #include "LcdFloatSpinBox.h"
 #include "LcdSpinBox.h"
 #include "Tuner.h"
 #include "TunerControls.h"
 
-#include <cmath>
-#include <iostream>
+namespace lmms::gui {
 
 TunerControlDialog::TunerControlDialog(TunerControls* controls)
 	: EffectControlDialog(controls)
@@ -65,25 +66,26 @@ TunerControlDialog::TunerControlDialog(TunerControls* controls)
 	auto referenceFreqSpinBox = new LcdSpinBox(3, this, tr("Reference"));
 	referenceFreqSpinBox->setModel(&controls->m_referenceFreqModel);
 	referenceFreqSpinBox->setLabel(tr("Reference"));
-	
+
 	auto layout = new QVBoxLayout(this);
 	layout->setSpacing(1);
 	layout->setContentsMargins(0, 0, 0, 0);
 	layout->addLayout(noteLayout);
 	layout->addWidget(referenceFreqSpinBox, 0, Qt::AlignRight);
 
-	QObject::connect(controls->m_tuner, &Tuner::frequencyCalculated, this, [this](float frequency){ frequencyCalculated(frequency); });
+	QObject::connect(controls->m_tuner, &Tuner::frequencyCalculated, this,
+		[this](float frequency) { frequencyCalculated(frequency); });
 }
 
 void TunerControlDialog::frequencyCalculated(float frequency)
-{	
+{
 	// A4 = referenceFrequency
 	const float referenceFrequency = static_cast<TunerControls*>(m_effectControls)->m_referenceFreqModel.value();
 	const int centsFromReference = std::round(1200.0f * std::log2f(frequency / referenceFrequency));
-	
+
 	const int octavesFromReference = std::round(centsFromReference / 1200.0f);
 	const int octaveOfNote = 4 + octavesFromReference;
-	
+
 	int centsRemaining = centsFromReference - (octavesFromReference * 1200);
 	int semitonesFromReference = std::round(centsRemaining / 100);
 	int centsOfNote = centsRemaining - (semitonesFromReference * 100);
@@ -92,26 +94,17 @@ void TunerControlDialog::frequencyCalculated(float frequency)
 	auto note = noteToString(static_cast<NoteName>(semitonesFromReference));
 	m_noteLabel->setText(QString::fromStdString(note));
 
-	//Only give back the octave if it is in a useful range
+	// Only give back the octave if it is in a useful range
 	if (octaveOfNote >= -1 && octaveOfNote <= 8) { m_octaveLabel->setText(QString::number(octaveOfNote)); };
-	
+
 	m_centsLabel->setText((centsOfNote >= 0 ? "+" : "") + QString::number(centsOfNote) + "ct");
 	auto centDistance = std::abs(centsOfNote);
-	if (centDistance >= 0 && centDistance <= 10) 
-	{
-		m_centsLabel->setStyleSheet("QLabel { color : green; }");
-	}
-	else if (centDistance > 10 && centDistance <= 30) 
-	{
-		m_centsLabel->setStyleSheet("QLabel { color : yellow; }");
-	}
-	else if (centDistance > 30) 
-	{
-		m_centsLabel->setStyleSheet("QLabel { color : red; }");
-	}
+	if (centDistance >= 0 && centDistance <= 10) { m_centsLabel->setStyleSheet("QLabel { color : green; }"); }
+	else if (centDistance > 10 && centDistance <= 30) { m_centsLabel->setStyleSheet("QLabel { color : yellow; }"); }
+	else if (centDistance > 30) { m_centsLabel->setStyleSheet("QLabel { color : red; }"); }
 }
 
-std::string TunerControlDialog::noteToString(NoteName note) 
+std::string TunerControlDialog::noteToString(NoteName note)
 {
 	switch (note)
 	{
@@ -142,4 +135,5 @@ std::string TunerControlDialog::noteToString(NoteName note)
 	default:
 		return "";
 	};
-} 
+}
+} // namespace lmms

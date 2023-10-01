@@ -22,20 +22,21 @@
  *
  */
 
-#include "Tuner.h"
 #include "TunerControls.h"
 
 #include <QDomElement>
+
+#include "Tuner.h"
+
+namespace lmms {
 
 TunerControls::TunerControls(Tuner* tuner)
 	: EffectControls(tuner)
 	, m_tuner(tuner)
 	, m_referenceFreqModel(440, 0, 999)
 {
-	QObject::connect(&m_referenceFreqModel, &LcdSpinBoxModel::dataChanged, tuner, [this, tuner]
-	{
-		tuner->m_referenceFrequency = m_referenceFreqModel.value();
-	});
+	QObject::connect(&m_referenceFreqModel, &gui::LcdSpinBoxModel::dataChanged, tuner,
+		[this, tuner] { tuner->m_referenceFrequency = m_referenceFreqModel.value(); });
 }
 
 void TunerControls::saveSettings(QDomDocument& domDocument, QDomElement& domElement)
@@ -58,7 +59,8 @@ int TunerControls::controlCount()
 	return 1;
 }
 
-EffectControlDialog* TunerControls::createView()
+gui::EffectControlDialog* TunerControls::createView()
 {
-	return new TunerControlDialog(this);
+	return new gui::TunerControlDialog(this);
 }
+} // namespace lmms

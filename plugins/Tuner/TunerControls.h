@@ -22,12 +22,14 @@
  *
  */
 
-#ifndef TUNER_CONTROLS_H
-#define TUNER_CONTROLS_H
+#ifndef LMMS_TUNER_CONTROLS_H
+#define LMMS_TUNER_CONTROLS_H
 
 #include "EffectControls.h"
 #include "LcdSpinBox.h"
 #include "TunerControlDialog.h"
+
+namespace lmms {
 
 class Tuner;
 class TunerControls : public EffectControls
@@ -41,15 +43,16 @@ public:
 	QString nodeName() const override;
 	int controlCount() override;
 
-	EffectControlDialog* createView() override;
+	gui::EffectControlDialog* createView() override;
 
 private:
 	Tuner* m_tuner = nullptr;
-	TunerControlDialog* m_tunerDialog = nullptr;
-	LcdSpinBoxModel m_referenceFreqModel;
+	gui::TunerControlDialog* m_tunerDialog = nullptr;
+	gui::LcdSpinBoxModel m_referenceFreqModel;
 
-	friend class TunerControlDialog;
+	friend class gui::TunerControlDialog;
 	friend class Tuner;
 };
+} // namespace lmms
 
-#endif
+#endif // LMMS_TUNER_CONTROLS_H

@@ -30,11 +30,13 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms {
+
 extern "C" {
 
 Plugin::Descriptor PLUGIN_EXPORT tuner_plugin_descriptor
-	= {STRINGIFY(PLUGIN_NAME), "Tuner", QT_TRANSLATE_NOOP("pluginBrowser", "Estimate the pitch of audio signals"),
-		"saker <sakertooth@gmail.com>", 0x0100, Plugin::Effect, new PluginPixmapLoader("logo"), NULL, NULL};
+	= {LMMS_STRINGIFY(PLUGIN_NAME), "Tuner", QT_TRANSLATE_NOOP("pluginBrowser", "Estimate the pitch of audio signals"),
+		"saker <sakertooth@gmail.com>", 0x0100, Plugin::Type::Effect, new PluginPixmapLoader("logo"), NULL, NULL};
 };
 
 extern "C" {
@@ -71,16 +73,16 @@ bool Tuner::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 	}
 
-	if (outSum > 0.0f) 
+	if (outSum > 0.0f)
 	{
 		for (int i = 0; i < frames; ++i)
 		{
-			if (m_samplesCounter % m_hopSize == 0 && m_samplesCounter > 0) 
+			if (m_samplesCounter % m_hopSize == 0 && m_samplesCounter > 0)
 			{
 				aubio_pitch_do(m_aubioPitch, m_inputBuffer, m_outputBuffer);
 				m_samplesCounter = 0;
 
-				const float frequency = fvec_get_sample(m_outputBuffer, 0);  
+				const float frequency = fvec_get_sample(m_outputBuffer, 0);
 				m_finalFrequency += (frequency - m_finalFrequency) / ++m_numOutputsCounter;
 
 				if (m_numOutputsCounter % m_numOutputsPerUpdate == 0)
@@ -94,10 +96,7 @@ bool Tuner::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			fvec_set_sample(m_inputBuffer, (buf[i][0] + buf[i][1]) * 0.5f, m_samplesCounter++);
 		}
 
-		if (!m_clearInputBuffer)
-		{
-			m_clearInputBuffer = true;
-		}
+		if (!m_clearInputBuffer) { m_clearInputBuffer = true; }
 	}
 	else if (m_clearInputBuffer)
 	{
@@ -113,3 +112,4 @@ EffectControls* Tuner::controls()
 {
 	return &m_tunerControls;
 }
+} // namespace lmms

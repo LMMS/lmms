@@ -22,19 +22,23 @@
  *
  */
 
-#ifndef TUNER_CONTROL_DIALOG_H
-#define TUNER_CONTROL_DIALOG_H
+#ifndef LMMS_TUNER_CONTROL_DIALOG_H
+#define LMMS_TUNER_CONTROL_DIALOG_H
 
 #include <QLabel>
 
 #include "EffectControlDialog.h"
 #include "LcdWidget.h"
 
+namespace lmms {
 class TunerControls;
+}
+
+namespace lmms::gui {
 class TunerControlDialog : public EffectControlDialog
 {
 public:
-	enum class NoteName 
+	enum class NoteName
 	{
 		A,
 		ASharp,
@@ -53,6 +57,7 @@ public:
 	TunerControlDialog(TunerControls* controls);
 	void frequencyCalculated(float frequency);
 	std::string noteToString(NoteName name);
+
 private:
 	LcdWidget* m_centsWidget;
 	LcdWidget* m_freqWidget;
@@ -62,5 +67,6 @@ private:
 	QLabel* m_frequencyLabel;
 	friend class TunerControls;
 };
+} // namespace lmms::gui
 
-#endif
+#endif // LMMS_TUNER_CONTROL_DIALOG_H
