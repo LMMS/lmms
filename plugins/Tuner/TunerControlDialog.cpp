@@ -92,7 +92,7 @@ auto TunerControlDialog::frequencyCalculated(float frequency) -> void
 
 	if (semitonesFromReference < 0) { semitonesFromReference += 12; }
 	auto note = noteToString(static_cast<NoteName>(semitonesFromReference));
-	m_noteLabel->setText(QString::fromStdString(note));
+	m_noteLabel->setText(note);
 
 	// Only give back the octave if it is in a useful range
 	if (octaveOfNote >= -1 && octaveOfNote <= 8) { m_octaveLabel->setText(QString::number(octaveOfNote)); };
@@ -104,7 +104,7 @@ auto TunerControlDialog::frequencyCalculated(float frequency) -> void
 	else if (centDistance > 30) { m_centsLabel->setStyleSheet("QLabel { color : red; }"); }
 }
 
-auto TunerControlDialog::noteToString(NoteName note) -> std::string
+auto TunerControlDialog::noteToString(NoteName note) const -> const char*
 {
 	switch (note)
 	{

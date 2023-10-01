@@ -56,7 +56,7 @@ public:
 
 	TunerControlDialog(TunerControls* controls);
 	auto frequencyCalculated(float frequency) -> void;
-	auto noteToString(NoteName name) -> std::string;
+	auto noteToString(NoteName name) const -> const char*;
 
 private:
 	LcdWidget* m_centsWidget;
