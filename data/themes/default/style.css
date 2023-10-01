@@ -464,6 +464,10 @@ lmms--gui--EffectSelectDialog QScrollArea {
 	background: #262b30;
 }
 
+lmms--gui--SetupDialog QScrollArea {
+	border: 0px;
+}
+
 /* the inner boxes in LADSPA effect windows */
 
 lmms--gui--EffectControlDialog QGroupBox {
