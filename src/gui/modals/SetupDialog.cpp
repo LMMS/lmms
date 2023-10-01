@@ -38,7 +38,6 @@
 #include "Engine.h"
 #include "FileDialog.h"
 #include "gui_templates.h"
-#include "LedCheckBox.h"
 #include "MainWindow.h"
 #include "MidiSetupWidget.h"
 #include "ProjectJournal.h"
@@ -542,12 +541,10 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			this, SLOT(audioInterfaceChanged(const QString&)));
 
 	// Advanced setting, hidden for now
-	if(false)
-	{
-		// TODO Handle or remove.
-		auto useNaNHandler = new LedCheckBox(tr("Use built-in NaN handler"), audio_w);
-		useNaNHandler->setChecked(m_NaNHandler);
-	}
+	// // TODO Handle or remove.
+	// auto useNaNHandler = new LedCheckBox(tr("Use built-in NaN handler"), audio_w);
+	// audio_layout->addWidget(useNaNHandler);
+	// useNaNHandler->setChecked(m_NaNHandler);
 
 	// HQ mode checkbox
 	auto hqaudio = addCheckBox(tr("HQ mode for output audio device"), audioInterfaceBox, nullptr,
