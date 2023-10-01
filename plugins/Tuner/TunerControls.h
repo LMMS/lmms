@@ -27,10 +27,12 @@
 
 #include "EffectControls.h"
 #include "LcdSpinBox.h"
-#include "TunerControlDialog.h"
+
+namespace lmms::gui {
+class TunerControlDialog;
+}
 
 namespace lmms {
-
 class Tuner;
 class TunerControls : public EffectControls
 {

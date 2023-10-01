@@ -27,6 +27,7 @@
 #include <QDomElement>
 
 #include "Tuner.h"
+#include "TunerControlDialog.h"
 
 namespace lmms {
 
