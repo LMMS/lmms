@@ -390,7 +390,7 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 	while( done < _nframes && m_stopped == false )
 	{
 		jack_nframes_t todo = std::min<jack_nframes_t>(
-						_nframes,
+						_nframes-done,
 						m_framesToDoInCurBuf -
 							m_framesDoneInCurBuf);
 		const float gain = audioEngine()->masterGain();
