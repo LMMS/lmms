@@ -208,6 +208,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	// Path selectors layout.
 	auto generalControlsLayout = new QVBoxLayout;
 	generalControlsLayout->setSpacing(10);
+	generalControlsLayout->setContentsMargins(0, 0, 0, 0);
 
 	auto addCheckBox = [&](const QString& ledText, QWidget* parent, QBoxLayout * layout,
 									  bool initialState, const char* toggledSlot, bool showRestartWarning) -> QCheckBox * {
@@ -734,6 +735,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	// Path selectors layout.
 	auto pathSelectorsLayout = new QVBoxLayout;
 	pathSelectorsLayout->setSpacing(10);
+	pathSelectorsLayout->setContentsMargins(0, 0, 0, 0);
 
 	auto addPathEntry = [&](const QString& caption, const QString& content, const char* setSlot, const char* openSlot,
 							QLineEdit*& lineEdit, const char* pixmap = "project_open") {
