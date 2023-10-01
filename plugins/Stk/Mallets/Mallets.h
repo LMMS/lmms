@@ -126,22 +126,22 @@ public:
 
 	inline void setFrequency(const StkFloat _pitch)
 	{
-		if ( m_voice ) { m_voice->setFrequency( _pitch ); }
+		if (m_voice) { m_voice->setFrequency(_pitch); }
 	}
 
-	inline void setADSR( const StkFloat _control128 )
+	inline void setADSR(const StkFloat _control128)
 	{
-		if ( m_voice ) { m_voice->controlChange( 128, _control128 ); }
+		if (m_voice) { m_voice->controlChange(128, _control128); }
 	}
 
-	inline void setLFODepth( const StkFloat _control1 )
+	inline void setLFODepth(const StkFloat _control1)
 	{
-		if ( m_voice ) { m_voice->controlChange( 1, _control1 ); }
+		if (m_voice) { m_voice->controlChange(1, _control1); }
 	}
 
-	inline void setLFOSpeed( const StkFloat _control11 )
+	inline void setLFOSpeed(const StkFloat _control11)
 	{
-		if ( m_voice ) { m_voice->controlChange( 11, _control11 ); }
+		if (m_voice) { m_voice->controlChange(11, _control11); }
 	}
 
 	inline int presetIndex()

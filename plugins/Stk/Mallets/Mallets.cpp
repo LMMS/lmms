@@ -379,12 +379,12 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 	const f_cnt_t offset = _n->noteOffset();
 
 	auto ps = static_cast<MalletsSynth*>(_n->m_pluginData);
-	ps->setFrequency( freq );
+	ps->setFrequency(freq);
 	if (p==9) // Tubular Bells
 	{
-		ps->setADSR( m_adsrModel.value() );
-		ps->setLFODepth( m_lfoDepthModel.value() );
-		ps->setLFOSpeed( m_lfoSpeedModel.value() );
+		ps->setADSR(m_adsrModel.value());
+		ps->setLFODepth(m_lfoDepthModel.value());
+		ps->setLFOSpeed(m_lfoSpeedModel.value());
 	}
 	p = ps->presetIndex();
 
