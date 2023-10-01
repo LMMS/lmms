@@ -124,12 +124,14 @@ public:
 		return( s );
 	}
 
-	inline void setFrequency( const StkFloat _pitch )
+	inline void setFrequency(const StkFloat _pitch)
 	{
-		if( m_voice )
-		{
-			m_voice->setFrequency( _pitch );
-		}
+		if ( m_voice ) { m_voice->setFrequency( _pitch ); }
+	}
+
+	inline void setADSR( const StkFloat _control128 )
+	{
+		if( m_voice ) { m_voice->controlChange( 128, _control128 ); }
 	}
 
 	inline int presetIndex()

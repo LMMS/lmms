@@ -380,6 +380,7 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 
 	auto ps = static_cast<MalletsSynth*>(_n->m_pluginData);
 	ps->setFrequency( freq );
+	if (p==9) { ps->setADSR( m_adsrModel.value() ); }
 	p = ps->presetIndex();
 
 	sample_t add_scale = 0.0f;
