@@ -31,6 +31,7 @@
 #include "MidiEventProcessor.h"
 #include "Note.h"
 #include "Song.h"
+#include "MidiController.h"
 
 
 namespace lmms
@@ -54,8 +55,8 @@ MidiPort::MidiPort( const QString& name,
 	m_mode( mode ),
 	m_inputChannelModel( 0, 0, MidiChannelCount, this, tr( "Input channel" ) ),
 	m_outputChannelModel( 1, 0, MidiChannelCount, this, tr( "Output channel" ) ),
-	m_inputControllerModel( 0, 0, MidiControllerCount, this, tr( "Input controller" ) ),
-	m_outputControllerModel( 0, 0, MidiControllerCount, this, tr( "Output controller" ) ),
+	m_inputControllerModel(MidiController::NONE, MidiController::NONE, MidiControllerCount - 1, this, tr( "Input controller" )),
+	m_outputControllerModel(MidiController::NONE, MidiController::NONE, MidiControllerCount - 1, this, tr( "Output controller" )),
 	m_fixedInputVelocityModel( -1, -1, MidiMaxVelocity, this, tr( "Fixed input velocity" ) ),
 	m_fixedOutputVelocityModel( -1, -1, MidiMaxVelocity, this, tr( "Fixed output velocity" ) ),
 	m_fixedOutputNoteModel( -1, -1, MidiMaxKey, this, tr( "Fixed output note" ) ),

@@ -412,10 +412,6 @@ void OpulenzInstrument::play( sampleFrame * _working_buffer )
                 }
 	}
 	emulatorMutex.unlock();
-
-	// Throw the data to the track...
-	instrumentTrack()->processAudioBuffer( _working_buffer, frameCount, nullptr );
-
 }
 
 

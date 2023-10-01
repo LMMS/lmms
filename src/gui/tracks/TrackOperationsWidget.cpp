@@ -64,7 +64,6 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 				"to begin a new drag'n'drop action." ).arg(UI_CTRL_KEY) );
 
 	auto toMenu = new QMenu(this);
-	toMenu->setFont( pointSize<9>( toMenu->font() ) );
 	connect( toMenu, SIGNAL(aboutToShow()), this, SLOT(updateMenu()));
 
 
@@ -196,7 +195,7 @@ bool TrackOperationsWidget::confirmRemoval()
 	QString messageTitleRemoveTrack = tr("Confirm removal");
 	QString askAgainText = tr("Don't ask again");
 	auto askAgainCheckBox = new QCheckBox(askAgainText, nullptr);
-	connect(askAgainCheckBox, &QCheckBox::stateChanged, [this](int state){
+	connect(askAgainCheckBox, &QCheckBox::stateChanged, [](int state){
 		// Invert button state, if it's checked we *shouldn't* ask again
 		ConfigManager::inst()->setValue("ui", "trackdeletionwarning", state ? "0" : "1");
 	});

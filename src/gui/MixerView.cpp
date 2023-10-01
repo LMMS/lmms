@@ -248,8 +248,8 @@ void MixerView::refreshDisplay()
 // update the and max. channel number for every instrument
 void MixerView::updateMaxChannelSelector()
 {
-	TrackContainer::TrackList songTracks = Engine::getSong()->tracks();
-	TrackContainer::TrackList patternStoreTracks = Engine::patternStore()->tracks();
+	const TrackContainer::TrackList& songTracks = Engine::getSong()->tracks();
+	const TrackContainer::TrackList& patternStoreTracks = Engine::patternStore()->tracks();
 
 	for (const auto& trackList : {songTracks, patternStoreTracks})
 	{
@@ -464,7 +464,7 @@ bool MixerView::confirmRemoval(int index)
 	QString messageTitleRemoveTrack = tr("Confirm removal");
 	QString askAgainText = tr("Don't ask again");
 	auto askAgainCheckBox = new QCheckBox(askAgainText, nullptr);
-	connect(askAgainCheckBox, &QCheckBox::stateChanged, [this](int state) {
+	connect(askAgainCheckBox, &QCheckBox::stateChanged, [](int state) {
 		// Invert button state, if it's checked we *shouldn't* ask again
 		ConfigManager::inst()->setValue("ui", "mixerchanneldeletionwarning", state ? "0" : "1");
 	});

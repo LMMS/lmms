@@ -308,9 +308,9 @@ private:
 	TimePos newNoteLen() const;
 
 	void shiftPos(int amount);
-	void shiftPos(NoteVector notes, int amount);
+	void shiftPos(const NoteVector& notes, int amount);
 	void shiftSemiTone(int amount);
-	void shiftSemiTone(NoteVector notes, int amount);
+	void shiftSemiTone(const NoteVector& notes, int amount);
 	bool isSelection() const;
 	int selectionCount() const;
 	void testPlayNote( Note * n );
