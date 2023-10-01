@@ -22,11 +22,6 @@
  *
  */
 
-// TODO: fix some PV bugs
-// make fft size and windowsize seperate, pad window to fit into fft with 0
-// this should produce better quality hopefully
-// TODO: switch to arrayVector (maybe)
-// TODO: cleaunp UI classes
 // TODO: better buttons
 
 #include "SlicerT.h"
@@ -421,12 +416,19 @@ void SlicerT::findSlices()
 		m_slicePoints[i] -= m_slicePoints[i] % sliceLock;
 	}
 
-	// set to fit
-	m_slicePoints[0] = 0;
-	m_slicePoints[m_slicePoints.size()] = m_originalSample.frames();
-
 	// remove duplicates
 	m_slicePoints.erase(std::unique(m_slicePoints.begin(), m_slicePoints.end()), m_slicePoints.end());
+
+	// fit to sample size
+	m_slicePoints[0] = 0;
+	m_slicePoints[m_slicePoints.size()-1] = m_originalSample.frames();
+
+	for (int i = 0; i < m_slicePoints.size(); i++) {
+		printf("%i \n", m_slicePoints[i]);
+	}
+
+
+	printf("total frames: %i\n", m_originalSample.frames());
 
 	emit dataChanged();
 }

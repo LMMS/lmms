@@ -91,25 +91,31 @@ void WaveForm::drawSeeker()
 		brush.drawLine(xPos, 0, xPos, m_seekerHeight);
 	}
 
-	// this is a complete mess, TODO: cleanup
+	// seeker vars
+	float seekerStartPosX = m_seekerStart * m_seekerWidth;
+	float seekerEndPosX = m_seekerEnd * m_seekerWidth;
+	float seekerMiddleWidth = (m_seekerEnd - m_seekerStart) * m_seekerWidth;
+
+	// note playback vars
+	float noteCurrentPosX = m_noteCurrent * m_seekerWidth;
+	float noteStartPosX = m_noteStart * m_seekerWidth;
+	float noteEndPosX = (m_noteEnd - m_noteStart) * m_seekerWidth;
+
 	// draw current playBack
 	brush.setPen(m_playColor);
-	brush.drawLine(m_noteCurrent * m_seekerWidth, 0, m_noteCurrent * m_seekerWidth, m_seekerHeight);
-	brush.fillRect(
-		m_noteStart * m_seekerWidth, 0, (m_noteEnd - m_noteStart) * m_seekerWidth, m_seekerHeight, m_playHighlighColor);
+	brush.drawLine(noteCurrentPosX, 0, noteCurrentPosX, m_seekerHeight);
+	brush.fillRect(noteStartPosX, 0, noteEndPosX, m_seekerHeight, m_playHighlighColor);
 
 	// highlight on selected area
-	brush.fillRect(m_seekerStart * m_seekerWidth, 0, (m_seekerEnd - m_seekerStart) * m_seekerWidth, m_seekerHeight,
-		m_seekerHighlightColor);
+	brush.fillRect(seekerStartPosX, 0, seekerMiddleWidth, m_seekerHeight, m_seekerHighlightColor);
 
 	// shadow on not selected area
-	brush.fillRect(0, 0, m_seekerStart * m_seekerWidth, m_seekerHeight, m_seekerShadowColor);
-	brush.fillRect(m_seekerEnd * m_seekerWidth + 1, 0, m_seekerWidth + 1, m_seekerHeight, m_seekerShadowColor);
+	brush.fillRect(0, 0, seekerStartPosX, m_seekerHeight, m_seekerShadowColor);
+	brush.fillRect(seekerEndPosX + 1, 0, m_seekerWidth + 1, m_seekerHeight, m_seekerShadowColor);
 
 	// draw border around selection
 	brush.setPen(QPen(m_seekerColor, 1));
-	brush.drawRoundedRect(m_seekerStart * m_seekerWidth, 0, (m_seekerEnd - m_seekerStart) * m_seekerWidth - 1,
-		m_seekerHeight - 1, 4, 4); // -1 needed
+	brush.drawRoundedRect(seekerStartPosX, 0, seekerMiddleWidth - 1, m_seekerHeight - 1, 4, 4); // -1 needed
 }
 
 void WaveForm::drawEditor()
@@ -231,6 +237,7 @@ void WaveForm::mousePressEvent(QMouseEvent* me)
 void WaveForm::mouseReleaseEvent(QMouseEvent* me)
 {
 	m_currentlyDragging = m_draggingTypes::nothing;
+	std::sort(m_slicePoints.begin(), m_slicePoints.end());
 	updateUI();
 }
 
@@ -269,8 +276,6 @@ void WaveForm::mouseMoveEvent(QMouseEvent* me)
 		m_slicePoints[m_sliceSelected] = startFrame + normalizedClickEditor * (endFrame - startFrame);
 
 		m_slicePoints[m_sliceSelected] = std::clamp(m_slicePoints[m_sliceSelected], 0, m_currentSample.frames());
-
-		std::sort(m_slicePoints.begin(), m_slicePoints.end());
 		break;
 	case m_draggingTypes::nothing:
 		break;
