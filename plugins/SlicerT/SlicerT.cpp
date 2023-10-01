@@ -22,8 +22,6 @@
  *
  */
 
-// TODO: better buttons
-
 #include "SlicerT.h"
 
 #include <QDomElement>

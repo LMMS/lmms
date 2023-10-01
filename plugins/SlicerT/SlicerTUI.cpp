@@ -61,11 +61,11 @@ SlicerTUI::SlicerTUI(SlicerT* instrument, QWidget* parent)
 
 	m_wf.move(2, 6);
 
-	m_snapSetting.setGeometry(14, 150, 55, ComboBox::DEFAULT_HEIGHT);
+	m_snapSetting.setGeometry(190, 200, 55, ComboBox::DEFAULT_HEIGHT);
 	m_snapSetting.setToolTip(tr("Set slice snapping for detection"));
 	m_snapSetting.setModel(&m_slicerTParent->m_sliceSnap);
 
-	m_bpmBox.move(135, 200);
+	m_bpmBox.move(135, 203);
 	m_bpmBox.setToolTip(tr("Original sample BPM"));
 	m_bpmBox.setLabel(tr("BPM"));
 	m_bpmBox.setModel(&m_slicerTParent->m_originalBPM);
@@ -80,15 +80,15 @@ SlicerTUI::SlicerTUI(SlicerT* instrument, QWidget* parent)
 	m_fadeOutKnob.setLabel(tr("FadeOut"));
 	m_fadeOutKnob.setModel(&m_slicerTParent->m_fadeOutFrames);
 
-	m_midiExportButton.move(190, 200);
-	m_midiExportButton.setActiveGraphic(embed::getIconPixmap("midi_tab"));
-	m_midiExportButton.setInactiveGraphic(embed::getIconPixmap("midi_tab"));
+	m_midiExportButton.move(205, 155);
+	m_midiExportButton.setActiveGraphic(PLUGIN_NAME::getIconPixmap("copyMidi"));
+	m_midiExportButton.setInactiveGraphic(PLUGIN_NAME::getIconPixmap("copyMidi"));
 	m_midiExportButton.setToolTip(tr("Copy midi pattern to clipboard"));
 	connect(&m_midiExportButton, SIGNAL(clicked()), this, SLOT(exportMidi()));
 
-	m_resetButton.move(215, 200);
-	m_resetButton.setActiveGraphic(embed::getIconPixmap("reload"));
-	m_resetButton.setInactiveGraphic(embed::getIconPixmap("reload"));
+	m_resetButton.move(25, 155);
+	m_resetButton.setActiveGraphic(PLUGIN_NAME::getIconPixmap("resetSlices"));
+	m_resetButton.setInactiveGraphic(PLUGIN_NAME::getIconPixmap("resetSlices"));
 	m_resetButton.setToolTip(tr("Reset Slices"));
 	connect(&m_resetButton, SIGNAL(clicked()), m_slicerTParent, SLOT(updateSlices()));
 }
@@ -161,6 +161,12 @@ void SlicerTUI::dropEvent(QDropEvent* de)
 
 void SlicerTUI::paintEvent(QPaintEvent* pe)
 {
+	QPainter brush(this);
+	brush.setPen(QColor(255, 255, 255));
+	brush.setFont(QFont(brush.font().family(), 7.5f, -1, false));
+	brush.drawText(205, 170, 20, 20, Qt::AlignCenter, tr("Midi"));
+	brush.drawText(22, 170, 25, 20, Qt::AlignCenter, tr("Reset"));
+	brush.drawText(190, 217, 55, 20, Qt::AlignCenter, tr("Snap"));
 }
 
 } // namespace gui

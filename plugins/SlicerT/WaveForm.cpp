@@ -126,6 +126,7 @@ void WaveForm::drawEditor()
 	if (m_currentSample.frames() < 2048)
 	{
 		brush.setPen(m_playHighlighColor);
+		brush.setFont(QFont(brush.font().family(), 9.0f, -1, false));
 		brush.drawText(
 			m_editorWidth / 2 - 100, m_editorHeight / 2 - 100, 200, 200, Qt::AlignCenter, tr("Drag sample to load"));
 		return;
