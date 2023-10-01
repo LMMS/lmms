@@ -92,7 +92,7 @@ inline void labelWidget(QWidget * w, const QString & txt)
 
 
 
-SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
+SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_displaydBFS(ConfigManager::inst()->value(
 			"app", "displaydbfs").toInt()),
 	m_tooltips(!ConfigManager::inst()->value(
@@ -209,7 +209,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	auto generalControlsLayout = new QVBoxLayout;
 	generalControlsLayout->setSpacing(10);
 
-	auto addCheckBox = [this](const QString& ledText, QWidget* parent, QBoxLayout * layout,
+	auto addCheckBox = [&](const QString& ledText, QWidget* parent, QBoxLayout * layout,
 									  bool initialState, const char* toggledSlot, bool showRestartWarning) -> QCheckBox * {
 		auto checkBox = new QCheckBox(ledText, parent);
 		checkBox->setChecked(initialState);
@@ -572,7 +572,6 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			this, SLOT(setBufferSize(int)));
 	connect(m_bufferSizeSlider, SIGNAL(valueChanged(int)),
 			this, SLOT(showRestartWarning()));
-
 	bufferSizeSubLayout->addWidget(m_bufferSizeSlider, 1);
 
 	auto bufferSize_reset_btn = new QPushButton(embed::getIconPixmap("reload"), "", bufferSizeBox);
@@ -586,9 +585,13 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	bufferSizeLayout->addLayout(bufferSizeSubLayout);
 
 	m_bufferSizeLbl = new QLabel(bufferSizeBox);
-	setBufferSize(m_bufferSizeSlider->value());
-
 	bufferSizeLayout->addWidget(m_bufferSizeLbl);
+
+	m_bufferSizeWarnLbl = new QLabel(bufferSizeBox);
+	m_bufferSizeWarnLbl->setWordWrap(true);
+	bufferSizeLayout->addWidget(m_bufferSizeWarnLbl);
+
+	setBufferSize(m_bufferSizeSlider->value());
 
 
 	// Audio layout ordering.
@@ -827,7 +830,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			tr("Paths"), 4, true, true, false)->setIcon(
 					embed::getIconPixmap("setup_directories"));
 
-	m_tabBar->setActiveTab(tab_to_open);
+	m_tabBar->setActiveTab(static_cast<int>(tab_to_open));
 
 	// Horizontal layout ordering.
 	hlayout->addSpacing(2);
@@ -1165,6 +1168,24 @@ void SetupDialog::audioInterfaceChanged(const QString & iface)
 }
 
 
+void SetupDialog::updateBufferSizeWarning(int value)
+{
+	QString text = "<ul>";
+	if((value & (value - 1)) != 0)  // <=> value is not a power of 2 (for value > 0)
+	{
+		text += "<li>" + tr("The currently selected value is not a power of 2 "
+					"(32, 64, 128, 256, 512, 1024, ...). Some plugins may not be available.") + "</li>";
+	}
+	if(value <= 32)
+	{
+		text += "<li>" + tr("The currently selected value is less than or equal to 32. "
+					"Some plugins may not be available.") + "</li>";
+	}
+	text += "</ul>";
+	m_bufferSizeWarnLbl->setText(text);
+}
+
+
 void SetupDialog::setBufferSize(int value)
 {
 	const int step = DEFAULT_BUFFER_SIZE / BUFFERSIZE_RESOLUTION;
@@ -1190,6 +1211,7 @@ void SetupDialog::setBufferSize(int value)
 	m_bufferSize = value * BUFFERSIZE_RESOLUTION;
 	m_bufferSizeLbl->setText(tr("Frames: %1\nLatency: %2 ms").arg(m_bufferSize).arg(
 		1000.0f * m_bufferSize / Engine::audioEngine()->processingSampleRate(), 0, 'f', 1));
+	updateBufferSizeWarning(m_bufferSize);
 }
 
 

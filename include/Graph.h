@@ -48,13 +48,12 @@ class LMMS_EXPORT Graph : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
-	enum graphStyle
+	enum class Style
 	{
-		NearestStyle, //!< draw as stairs
-		LinearStyle, //!< connect each 2 samples with a line, with wrapping
-		LinearNonCyclicStyle, //!< LinearStyle without wrapping
-		BarStyle, //!< draw thick bars
-		NumGraphStyles
+		Nearest, //!< draw as stairs
+		Linear, //!< connect each 2 samples with a line, with wrapping
+		LinearNonCyclic, //!< Linear without wrapping
+		Bar, //!< draw thick bars
 	};
 
 	/**
@@ -62,7 +61,7 @@ public:
 	 * @param _width Pixel width of widget
 	 * @param _height Pixel height of widget
 	 */
-	Graph( QWidget * _parent, graphStyle _style = Graph::LinearStyle,
+	Graph( QWidget * _parent, Style _style = Style::Linear,
 		int _width = 132,
 		int _height = 104
 	);
@@ -78,13 +77,13 @@ public:
 		return castModel<graphModel>();
 	}
 
-	inline graphStyle getGraphStyle()
+	inline Style getGraphStyle()
 	{
 		return m_graphStyle;
 	}
 
 
-	inline void setGraphStyle( graphStyle _s )
+	inline void setGraphStyle( Style _s )
 	{
 		m_graphStyle = _s;
 		update();
@@ -114,7 +113,7 @@ private:
 	QPixmap m_foreground;
 	QColor m_graphColor;
 
-	graphStyle m_graphStyle;
+	Style m_graphStyle;
 
 	bool m_mouseDown;
 	int m_lastCursorX;

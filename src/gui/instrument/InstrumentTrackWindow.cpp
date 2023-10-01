@@ -49,7 +49,7 @@
 #include "InstrumentFunctions.h"
 #include "InstrumentFunctionViews.h"
 #include "InstrumentMidiIOView.h"
-#include "InstrumentMiscView.h"
+#include "InstrumentTuningView.h"
 #include "InstrumentSoundShapingView.h"
 #include "InstrumentTrack.h"
 #include "InstrumentTrackView.h"
@@ -148,7 +148,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	Qt::Alignment widgetAlignment = Qt::AlignHCenter | Qt::AlignCenter;
 
 	// set up volume knob
-	m_volumeKnob = new Knob( knobBright_26, nullptr, tr( "Volume" ) );
+	m_volumeKnob = new Knob( KnobType::Bright26, nullptr, tr( "Volume" ) );
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setHintText( tr( "Volume:" ), "%" );
 
@@ -162,7 +162,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 
 	// set up panning knob
-	m_panningKnob = new Knob( knobBright_26, nullptr, tr( "Panning" ) );
+	m_panningKnob = new Knob( KnobType::Bright26, nullptr, tr( "Panning" ) );
 	m_panningKnob->setHintText( tr( "Panning:" ), "" );
 
 	basicControlsLayout->addWidget( m_panningKnob, 0, 1 );
@@ -178,7 +178,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 
 	// set up pitch knob
-	m_pitchKnob = new Knob( knobBright_26, nullptr, tr( "Pitch" ) );
+	m_pitchKnob = new Knob( KnobType::Bright26, nullptr, tr( "Pitch" ) );
 	m_pitchKnob->setHintText( tr( "Pitch:" ), " " + tr( "cents" ) );
 
 	basicControlsLayout->addWidget( m_pitchKnob, 0, 3 );
@@ -255,25 +255,25 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	instrumentFunctionsLayout->addStretch();
 
 	// MIDI tab
-	m_midiView = new InstrumentMidiIOView( m_tabWidget );
+	m_midiView = new InstrumentMidiIOView(m_tabWidget);
 
 	// FX tab
-	m_effectView = new EffectRackView( m_track->m_audioPort.effects(), m_tabWidget );
+	m_effectView = new EffectRackView(m_track->m_audioPort.effects(), m_tabWidget);
 
-	// MISC tab
-	m_miscView = new InstrumentMiscView( m_track, m_tabWidget );
+	// Tuning tab
+	m_tuningView = new InstrumentTuningView(m_track, m_tabWidget);
 
 
-	m_tabWidget->addTab( m_ssView, tr( "Envelope, filter & LFO" ), "env_lfo_tab", 1 );
-	m_tabWidget->addTab( instrumentFunctions, tr( "Chord stacking & arpeggio" ), "func_tab", 2 );
-	m_tabWidget->addTab( m_effectView, tr( "Effects" ), "fx_tab", 3 );
-	m_tabWidget->addTab( m_midiView, tr( "MIDI" ), "midi_tab", 4 );
-	m_tabWidget->addTab( m_miscView, tr( "Miscellaneous" ), "misc_tab", 5 );
+	m_tabWidget->addTab(m_ssView, tr("Envelope, filter & LFO"), "env_lfo_tab", 1);
+	m_tabWidget->addTab(instrumentFunctions, tr("Chord stacking & arpeggio"), "func_tab", 2);
+	m_tabWidget->addTab(m_effectView, tr("Effects"), "fx_tab", 3);
+	m_tabWidget->addTab(m_midiView, tr("MIDI"), "midi_tab", 4);
+	m_tabWidget->addTab(m_tuningView, tr("Tuning and transposition"), "tuning_tab", 5);
 	adjustTabSize(m_ssView);
 	adjustTabSize(instrumentFunctions);
 	m_effectView->resize(EffectRackView::DEFAULT_WIDTH, INSTRUMENT_HEIGHT - 4 - 1);
 	adjustTabSize(m_midiView);
-	adjustTabSize(m_miscView);
+	adjustTabSize(m_tuningView);
 
 	// setup piano-widget
 	m_pianoView = new PianoView( this );
@@ -356,7 +356,7 @@ void InstrumentTrackWindow::modelChanged()
 	m_mixerChannelNumber->setModel( &m_track->m_mixerChannelModel );
 	m_pianoView->setModel( &m_track->m_piano );
 
-	if( m_track->instrument() && m_track->instrument()->flags().testFlag( Instrument::IsNotBendable ) == false )
+	if( m_track->instrument() && m_track->instrument()->flags().testFlag( Instrument::Flag::IsNotBendable ) == false )
 	{
 		m_pitchKnob->setModel( &m_track->m_pitchModel );
 		m_pitchRangeSpinBox->setModel( &m_track->m_pitchRangeModel );
@@ -374,14 +374,16 @@ void InstrumentTrackWindow::modelChanged()
 		m_pitchRangeLabel->hide();
 	}
 
-	if (m_track->instrument() && m_track->instrument()->flags().testFlag(Instrument::IsMidiBased))
+	if (m_track->instrument() && m_track->instrument()->flags().testFlag(Instrument::Flag::IsMidiBased))
 	{
-		m_miscView->microtunerGroupBox()->hide();
+		m_tuningView->microtunerNotSupportedLabel()->show();
+		m_tuningView->microtunerGroupBox()->hide();
 		m_track->m_microtuner.enabledModel()->setValue(false);
 	}
 	else
 	{
-		m_miscView->microtunerGroupBox()->show();
+		m_tuningView->microtunerNotSupportedLabel()->hide();
+		m_tuningView->microtunerGroupBox()->show();
 	}
 
 	m_ssView->setModel( &m_track->m_soundShaping );
@@ -389,11 +391,11 @@ void InstrumentTrackWindow::modelChanged()
 	m_arpeggioView->setModel( &m_track->m_arpeggio );
 	m_midiView->setModel( &m_track->m_midiPort );
 	m_effectView->setModel( m_track->m_audioPort.effects() );
-	m_miscView->pitchGroupBox()->setModel(&m_track->m_useMasterPitchModel);
-	m_miscView->microtunerGroupBox()->setModel(m_track->m_microtuner.enabledModel());
-	m_miscView->scaleCombo()->setModel(m_track->m_microtuner.scaleModel());
-	m_miscView->keymapCombo()->setModel(m_track->m_microtuner.keymapModel());
-	m_miscView->rangeImportCheckbox()->setModel(m_track->m_microtuner.keyRangeImportModel());
+	m_tuningView->pitchGroupBox()->setModel(&m_track->m_useMasterPitchModel);
+	m_tuningView->microtunerGroupBox()->setModel(m_track->m_microtuner.enabledModel());
+	m_tuningView->scaleCombo()->setModel(m_track->m_microtuner.scaleModel());
+	m_tuningView->keymapCombo()->setModel(m_track->m_microtuner.keymapModel());
+	m_tuningView->rangeImportCheckbox()->setModel(m_track->m_microtuner.keyRangeImportModel());
 	updateName();
 }
 
@@ -425,7 +427,7 @@ void InstrumentTrackWindow::saveSettingsBtnClicked()
 		!sfd.selectedFiles().isEmpty() &&
 		!sfd.selectedFiles().first().isEmpty() )
 	{
-		DataFile dataFile(DataFile::InstrumentTrackSettings);
+		DataFile dataFile(DataFile::Type::InstrumentTrackSettings);
 		QDomElement& content(dataFile.content());
 
 		m_track->setSimpleSerializing();
@@ -466,7 +468,7 @@ void InstrumentTrackWindow::updateInstrumentView()
 		m_tabWidget->addTab( m_instrumentView, tr( "Plugin" ), "plugin_tab", 0 );
 		m_tabWidget->setActiveTab( 0 );
 
-		m_ssView->setFunctionsHidden( m_track->m_instrument->flags().testFlag( Instrument::IsSingleStreamed ) );
+		m_ssView->setFunctionsHidden( m_track->m_instrument->flags().testFlag( Instrument::Flag::IsSingleStreamed ) );
 
 		modelChanged(); 		// Get the instrument window to refresh
 		m_track->dataChanged(); // Get the text on the trackButton to change

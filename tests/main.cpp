@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
 	int failed = 0;
 	for (QTestSuite*& suite : QTestSuite::suites())
 	{
-		failed += QTest::qExec(suite, argc, argv);
+		if (QTest::qExec(suite, argc, argv) != 0) { ++failed; }
 	}
 	qDebug() << "<<" << failed << "out of"<<numsuites<<"test suites failed.";
 	return failed;

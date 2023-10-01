@@ -62,14 +62,14 @@ calls using:
 
 as the plug-in key. */
 
-enum LadspaPluginType
+enum class LadspaPluginType
 {
-	SOURCE,
-	TRANSFER,
-	VALID,
-	INVALID,
-	SINK,
-	OTHER
+	Source,
+	Transfer,
+	Valid,
+	Invalid,
+	Sink,
+	Other
 };
 
 struct LadspaManagerDescription

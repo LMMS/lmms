@@ -63,7 +63,6 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_tlb = new TrackLabelButton( this, getTrackSettingsWidget() );
 	m_tlb->setCheckable( true );
 	m_tlb->setIcon( embed::getIconPixmap( "instrument_track" ) );
-	m_tlb->move( 3, 1 );
 	m_tlb->show();
 
 	connect( m_tlb, SIGNAL(toggled(bool)),
@@ -75,32 +74,21 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	connect(ConfigManager::inst(), SIGNAL(valueChanged(QString,QString,QString)),
 			this, SLOT(handleConfigChange(QString,QString,QString)));
 
-	// creation of widgets for track-settings-widget
-	int widgetWidth;
-	if( ConfigManager::inst()->value( "ui",
-					  "compacttrackbuttons" ).toInt() )
-	{
-		widgetWidth = DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT;
-	}
-	else
-	{
-		widgetWidth = DEFAULT_SETTINGS_WIDGET_WIDTH;
-	}
+	m_mixerChannelNumber = new MixerLineLcdSpinBox(2, getTrackSettingsWidget(), tr("Mixer channel"), this);
+	m_mixerChannelNumber->show();
 
-	m_volumeKnob = new Knob( knobSmall_17, getTrackSettingsWidget(),
+	m_volumeKnob = new Knob( KnobType::Small17, getTrackSettingsWidget(),
 							tr( "Volume" ) );
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setModel( &_it->m_volumeModel );
 	m_volumeKnob->setHintText( tr( "Volume:" ), "%" );
-	m_volumeKnob->move( widgetWidth-2*24, 2 );
 	m_volumeKnob->setLabel( tr( "VOL" ) );
 	m_volumeKnob->show();
 
-	m_panningKnob = new Knob( knobSmall_17, getTrackSettingsWidget(),
+	m_panningKnob = new Knob( KnobType::Small17, getTrackSettingsWidget(),
 							tr( "Panning" ) );
 	m_panningKnob->setModel( &_it->m_panningModel );
 	m_panningKnob->setHintText(tr("Panning:"), "%");
-	m_panningKnob->move( widgetWidth-24, 2 );
 	m_panningKnob->setLabel( tr( "PAN" ) );
 	m_panningKnob->show();
 
@@ -110,9 +98,9 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	if( !Engine::audioEngine()->midiClient()->isRaw() )
 	{
 		_it->m_midiPort.m_readablePortsMenu = new MidiPortMenu(
-							MidiPort::Input );
+							MidiPort::Mode::Input );
 		_it->m_midiPort.m_writablePortsMenu = new MidiPortMenu(
-							MidiPort::Output );
+							MidiPort::Mode::Output );
 		_it->m_midiPort.m_readablePortsMenu->setModel(
 							&_it->m_midiPort );
 		_it->m_midiPort.m_writablePortsMenu->setModel(
@@ -151,9 +139,18 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 						QApplication::palette().color( QPalette::Active,
 							QPalette::BrightText).darker(),
 						getTrackSettingsWidget() );
-	m_activityIndicator->setGeometry(
-					 widgetWidth-2*24-11, 2, 8, 28 );
+	m_activityIndicator->setFixedSize(8, 28);
 	m_activityIndicator->show();
+
+	auto layout = new QHBoxLayout(getTrackSettingsWidget());
+	layout->setContentsMargins(0, 0, 0, 0);
+	layout->setSpacing(0);
+	layout->addWidget(m_tlb);
+	layout->addWidget(m_mixerChannelNumber);
+	layout->addWidget(m_activityIndicator);
+	layout->addWidget(m_volumeKnob);
+	layout->addWidget(m_panningKnob);
+
 	connect( m_activityIndicator, SIGNAL(pressed()),
 				this, SLOT(activityIndicatorPressed()));
 	connect( m_activityIndicator, SIGNAL(released()),
@@ -266,6 +263,13 @@ void InstrumentTrackView::handleConfigChange(QString cls, QString attr, QString 
 	{
 		m_tlb->setChecked(m_window && m_window == topLevelInstrumentTrackWindow());
 	}
+}
+
+void InstrumentTrackView::modelChanged()
+{
+	TrackView::modelChanged();
+	auto st = castModel<InstrumentTrack>();
+	m_mixerChannelNumber->setModel(&st->m_mixerChannelModel);
 }
 
 void InstrumentTrackView::dragEnterEvent( QDragEnterEvent * _dee )

@@ -6362,7 +6362,7 @@ Pastikan Anda memiliki izin menulis ke file dan direktori yang berisi berkas ter
     </message>
 </context>
 <context>
-    <name>InstrumentMiscView</name>
+    <name>InstrumentTuningView</name>
     <message>
         <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="221"/>
         <source>MASTER PITCH</source>

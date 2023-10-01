@@ -56,7 +56,7 @@ class Lv2ViewProc : public LinkedModelGroupView
 {
 public:
 	//! @param colNum numbers of columns for the controls
-	Lv2ViewProc(QWidget *parent, Lv2Proc *ctrlBase, int colNum);
+	Lv2ViewProc(QWidget *parent, Lv2Proc *proc, int colNum);
 	~Lv2ViewProc() override = default;
 
 private:

@@ -23,9 +23,8 @@
  *
  */
 
-
-#ifndef AUDIO_FILE_PROCESSOR_H
-#define AUDIO_FILE_PROCESSOR_H
+#ifndef LMMS_AUDIO_FILE_PROCESSOR_H
+#define LMMS_AUDIO_FILE_PROCESSOR_H
 
 #include <QPixmap>
 
@@ -61,9 +60,8 @@ public:
 						sampleFrame * _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
-	void saveSettings( QDomDocument & _doc,
-						QDomElement & _parent ) override;
-	void loadSettings( const QDomElement & _this ) override;
+	void saveSettings(QDomDocument& doc, QDomElement& elem) override;
+	void loadSettings(const QDomElement& elem) override;
 
 	void loadFile( const QString & _file ) override;
 
@@ -179,11 +177,11 @@ protected:
 
 
 public:
-	enum knobType
+	enum class Point
 	{
-		start,
-		end,
-		loop
+		Start,
+		End,
+		Loop
 	} ;
 
 	class knob : public Knob
@@ -194,7 +192,7 @@ public:
 
 	public:
 		knob( QWidget * _parent ) :
-			Knob( knobBright_26, _parent ),
+			Knob( KnobType::Bright26, _parent ),
 			m_waveView( 0 ),
 			m_relatedKnob( 0 )
 		{
@@ -241,12 +239,12 @@ public slots:
 private:
 	static const int s_padding = 2;
 
-	enum draggingType
+	enum class DraggingType
 	{
-		wave,
-		sample_start,
-		sample_end,
-		sample_loop
+		Wave,
+		SampleStart,
+		SampleEnd,
+		SampleLoop
 	} ;
 
 	SampleBuffer& m_sampleBuffer;
@@ -264,7 +262,7 @@ private:
 	f_cnt_t m_loopFrameX;
 	bool m_isDragging;
 	QPoint m_draggingLastPoint;
-	draggingType m_draggingType;
+	DraggingType m_draggingType;
 	bool m_reversed;
 	f_cnt_t m_framesPlayed;
 	bool m_animation;
@@ -278,11 +276,11 @@ public:
 private:
 	void zoom( const bool _out = false );
 	void slide( int _px );
-	void slideSamplePointByPx( knobType _point, int _px );
-	void slideSamplePointByFrames( knobType _point, f_cnt_t _frames, bool _slide_to = false );
+	void slideSamplePointByPx( Point _point, int _px );
+	void slideSamplePointByFrames( Point _point, f_cnt_t _frames, bool _slide_to = false );
 	void slideSampleByFrames( f_cnt_t _frames );
 
-	void slideSamplePointToFrames( knobType _point, f_cnt_t _frames )
+	void slideSamplePointToFrames( Point _point, f_cnt_t _frames )
 	{
 		slideSamplePointByFrames( _point, _frames, true );
 	}
@@ -303,4 +301,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AUDIO_FILE_PROCESSOR_H

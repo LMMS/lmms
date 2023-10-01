@@ -89,14 +89,15 @@ QDataStream& operator>> ( QDataStream &in, WaveMipMap &waveMipMap );
 class LMMS_EXPORT BandLimitedWave
 {
 public:
-	enum Waveforms
+	enum class Waveform
 	{
 		BLSaw,
 		BLSquare,
 		BLTriangle,
 		BLMoog,
-		NumBLWaveforms
+		Count
 	};
+	constexpr static auto NumWaveforms = static_cast<std::size_t>(Waveform::Count);
 
 	BandLimitedWave() = default;
 	virtual ~BandLimitedWave() = default;
@@ -127,7 +128,7 @@ public:
 	 *  \param _wavelen The wavelength (length of one cycle, ie. the inverse of frequency) of the wanted oscillation, measured in sample frames
 	 *  \param _wave The wanted waveform. Options currently are saw, triangle, square and moog saw.
 	 */
-	static inline sample_t oscillate( float _ph, float _wavelen, Waveforms _wave )
+	static inline sample_t oscillate( float _ph, float _wavelen, Waveform _wave )
 	{
 		// get the next higher tlen
 		int t = 0;
@@ -139,12 +140,12 @@ public:
 		int lookup = static_cast<int>( lookupf );
 		const float ip = fraction( lookupf );
 
-		const sample_t s1 = s_waveforms[ _wave ].sampleAt( t, lookup );
-		const sample_t s2 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 1 ) % tlen );
+		const sample_t s1 = s_waveforms[ static_cast<std::size_t>(_wave) ].sampleAt( t, lookup );
+		const sample_t s2 = s_waveforms[ static_cast<std::size_t>(_wave) ].sampleAt( t, ( lookup + 1 ) % tlen );
 
 		const int lm = lookup == 0 ? tlen - 1 : lookup - 1;
-		const sample_t s0 = s_waveforms[ _wave ].sampleAt( t, lm );
-		const sample_t s3 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 2 ) % tlen );
+		const sample_t s0 = s_waveforms[ static_cast<std::size_t>(_wave) ].sampleAt( t, lm );
+		const sample_t s3 = s_waveforms[ static_cast<std::size_t>(_wave) ].sampleAt( t, ( lookup + 2 ) % tlen );
 		const sample_t sr = optimal4pInterpolate( s0, s1, s2, s3, ip );
 
 		return sr;
@@ -153,8 +154,8 @@ public:
 		lookup = lookup << 1;
 		tlen = tlen << 1;
 		t += 1;
-		const sample_t s3 = s_waveforms[ _wave ].sampleAt( t, lookup );
-		const sample_t s4 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 1 ) % tlen );
+		const sample_t s3 = s_waveforms[ static_cast<std::size_t>(_wave) ].sampleAt( t, lookup );
+		const sample_t s4 = s_waveforms[ static_cast<std::size_t>(_wave) ].sampleAt( t, ( lookup + 1 ) % tlen );
 		const sample_t s34 = linearInterpolate( s3, s4, ip );
 
 		const float ip2 = ( ( tlen - _wavelen ) / tlen - 0.5 ) * 2.0;
@@ -168,7 +169,7 @@ public:
 
 	static bool s_wavesGenerated;
 
-	static std::array<WaveMipMap, NumBLWaveforms> s_waveforms;
+	static std::array<WaveMipMap, NumWaveforms> s_waveforms;
 
 	static QString s_wavetableDir;
 };

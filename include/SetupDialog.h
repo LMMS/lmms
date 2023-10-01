@@ -53,7 +53,7 @@ class SetupDialog : public QDialog
 	Q_OBJECT
 
 public:
-	enum ConfigTabs
+	enum class ConfigTab
 	{
 		GeneralSettings,
 		PerformanceSettings,
@@ -62,7 +62,7 @@ public:
 		PathsSettings
 	};
 
-	SetupDialog(ConfigTabs tab_to_open = GeneralSettings);
+	SetupDialog(ConfigTab tab_to_open = ConfigTab::GeneralSettings);
 	~SetupDialog() override;
 
 
@@ -102,6 +102,7 @@ private slots:
 	// Audio settings widget.
 	void audioInterfaceChanged(const QString & driver);
 	void toggleHQAudioDev(bool enabled);
+	void updateBufferSizeWarning(int value);
 	void setBufferSize(int value);
 	void resetBufferSize();
 
@@ -179,6 +180,7 @@ private:
 	int m_bufferSize;
 	QSlider * m_bufferSizeSlider;
 	QLabel * m_bufferSizeLbl;
+	QLabel * m_bufferSizeWarnLbl;
 
 	// MIDI settings widgets.
 	QComboBox * m_midiInterfaces;

@@ -140,7 +140,7 @@ public slots:
 	void resetColor();
 
 protected:
-	enum ContextMenuAction
+	enum class ContextMenuAction
 	{
 		Remove,
 		Cut,
@@ -191,9 +191,9 @@ protected slots:
 
 
 private:
-	enum Actions
+	enum class Action
 	{
-		NoAction,
+		None,
 		Move,
 		MoveSelection,
 		Resize,
@@ -206,7 +206,7 @@ private:
 	static TextFloat * s_textFloat;
 
 	Clip * m_clip;
-	Actions m_action;
+	Action m_action;
 	QPoint m_initialMousePos;
 	QPoint m_initialMouseGlobalPos;
 	QVector<TimePos> m_initialOffsets;

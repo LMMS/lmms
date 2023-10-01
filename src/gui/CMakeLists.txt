@@ -61,7 +61,7 @@ SET(LMMS_SRCS
 	gui/instrument/EnvelopeAndLfoView.cpp
 	gui/instrument/InstrumentFunctionViews.cpp
 	gui/instrument/InstrumentMidiIOView.cpp
-	gui/instrument/InstrumentMiscView.cpp
+	gui/instrument/InstrumentTuningView.cpp
 	gui/instrument/InstrumentSoundShapingView.cpp
 	gui/instrument/InstrumentTrackWindow.cpp
 	gui/instrument/InstrumentView.cpp

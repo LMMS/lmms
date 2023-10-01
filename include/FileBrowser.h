@@ -75,14 +75,16 @@ public:
 private slots:
 	void reloadTree();
 	void expandItems( QTreeWidgetItem * item=nullptr, QList<QString> expandedDirs = QList<QString>() );
-	// call with item=NULL to filter the entire tree
-	bool filterItems( const QString & filter, QTreeWidgetItem * item=nullptr );
+	bool filterAndExpandItems(const QString & filter, QTreeWidgetItem * item = nullptr);
 	void giveFocusToFilter();
 
 private:
 	void keyPressEvent( QKeyEvent * ke ) override;
 
 	void addItems( const QString & path );
+
+	void saveDirectoriesStates();
+	void restoreDirectoriesStates();
 
 	FileBrowserTreeWidget * m_fileBrowserTreeWidget;
 
@@ -99,6 +101,8 @@ private:
 	QCheckBox* m_showFactoryContent = nullptr;
 	QString m_userDir;
 	QString m_factoryDir;
+	QList<QString> m_savedExpandedDirs;
+	QString m_previousFilterValue;
 } ;
 
 
@@ -114,7 +118,6 @@ public:
 	//! This method returns a QList with paths (QString's) of all directories
 	//! that are expanded in the tree.
 	QList<QString> expandedDirs( QTreeWidgetItem * item = nullptr ) const;
-
 
 protected:
 	void contextMenuEvent( QContextMenuEvent * e ) override;
@@ -223,20 +226,19 @@ private:
 class FileItem : public QTreeWidgetItem
 {
 public:
-	enum FileTypes
+	enum class FileType
 	{
-		ProjectFile,
-		PresetFile,
-		SampleFile,
-		SoundFontFile,
-		PatchFile,
-		MidiFile,
-		VstPluginFile,
-		UnknownFile,
-		NumFileTypes
+		Project,
+		Preset,
+		Sample,
+		SoundFont,
+		Patch,
+		Midi,
+		VstPlugin,
+		Unknown
 	} ;
 
-	enum FileHandling
+	enum class FileHandling
 	{
 		NotSupported,
 		LoadAsProject,
@@ -255,7 +257,7 @@ public:
 		return QFileInfo(m_path, text(0)).absoluteFilePath();
 	}
 
-	inline FileTypes type() const
+	inline FileType type() const
 	{
 		return( m_type );
 	}
@@ -267,7 +269,7 @@ public:
 
 	inline bool isTrack() const
 	{
-		return m_handling == LoadAsPreset || m_handling == LoadByPlugin;
+		return m_handling == FileHandling::LoadAsPreset || m_handling == FileHandling::LoadByPlugin;
 	}
 
 	QString extension();
@@ -287,7 +289,7 @@ private:
 	static QPixmap * s_unknownFilePixmap;
 
 	QString m_path;
-	FileTypes m_type;
+	FileType m_type;
 	FileHandling m_handling;
 
 } ;
