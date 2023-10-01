@@ -341,10 +341,6 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	generalScroll->setWidgetResizable(true);
 	general_layout->addWidget(generalScroll, 1);
 
-	// TODO Does not really seem to be needed
-	general_layout->addStretch();
-
-
 
 
 	// Performance widget.
