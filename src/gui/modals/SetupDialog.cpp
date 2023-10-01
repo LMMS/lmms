@@ -23,14 +23,14 @@
  */
 
 
+#include <QCheckBox>
 #include <QComboBox>
+#include <QGroupBox>
 #include <QImageReader>
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
 #include <QScrollArea>
-#include <QGroupBox>
-#include <QCheckBox>
 
 #include "AudioEngine.h"
 #include "debug.h"

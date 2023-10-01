@@ -22,8 +22,8 @@
  *
  */
 
-#include <QLineEdit>
 #include <QFormLayout>
+#include <QLineEdit>
 
 #include "AudioPulseAudio.h"
 

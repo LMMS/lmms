@@ -26,9 +26,9 @@
 
 #ifdef LMMS_HAVE_JACK
 
+#include <QFormLayout>
 #include <QLineEdit>
 #include <QMessageBox>
-#include <QFormLayout>
 
 #include "Engine.h"
 #include "GuiApplication.h"

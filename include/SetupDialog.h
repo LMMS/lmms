@@ -35,11 +35,11 @@
 #include "MidiSetupWidget.h"
 
 
+class QCheckBox;
 class QComboBox;
 class QLabel;
 class QLineEdit;
 class QSlider;
-class QCheckBox;
 
 
 namespace lmms::gui
