@@ -51,8 +51,6 @@ Tuner::Tuner(Model* parent, const Descriptor::SubPluginFeatures::Key* key)
 	, m_tunerControls(this)
 	, m_aubioPitch(new_aubio_pitch("default", WINDOW_SIZE, HOP_SIZE, Engine::audioEngine()->processingSampleRate()))
 	, m_numAubioInputFrames(0)
-	, m_numUpdatesPerDetection(10)
-	, m_numUpdates(0)
 {
 }
 
@@ -111,13 +109,7 @@ auto Tuner::detectPitch(float* data, size_t size) -> float
 	auto out = fvec_t{1, &pitchOut};
 
 	aubio_pitch_do(m_aubioPitch, &in, &out);
-
-	// Only update the display periodically to allow stabilization on a value first
-	if (++m_numUpdates % m_numUpdatesPerDetection == 0)
-	{
-		emit frequencyCalculated(pitchOut);
-		m_numUpdates = 0;
-	}
+	emit frequencyCalculated(pitchOut);
 
 	return pitchOut;
 }

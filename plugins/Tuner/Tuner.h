@@ -57,7 +57,6 @@ private:
 	aubio_pitch_t* m_aubioPitch;
 	std::array<float, HOP_SIZE> m_aubioInput;
 	int m_numAubioInputFrames;
-	int m_numUpdatesPerDetection, m_numUpdates;
 	friend class TunerControls;
 };
 } // namespace lmms
