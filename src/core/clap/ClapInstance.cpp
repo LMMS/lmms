@@ -523,22 +523,22 @@ auto ClapInstance::init() -> bool
 	m_process.audio_outputs_count = m_audioPortsOut.size();
 	m_audioOutActive = m_audioPortOutActive ? &m_audioOut[m_audioPortOutActive->index] : nullptr;
 
-	if (isMonoInput() && m_audioPortInActive->type != AudioPortType::Mono)
+	if (needInputPort && isMonoInput() && m_audioPortInActive->type != AudioPortType::Mono)
 	{
 		setPluginState(PluginState::LoadedWithError);
 		return false;
 	}
-	if (!isMonoInput() && m_audioPortInActive->type != AudioPortType::Stereo)
+	if (needInputPort && !isMonoInput() && m_audioPortInActive->type != AudioPortType::Stereo)
 	{
 		setPluginState(PluginState::LoadedWithError);
 		return false;
 	}
-	if (isMonoOutput() && m_audioPortOutActive->type != AudioPortType::Mono)
+	if (needOutputPort && isMonoOutput() && m_audioPortOutActive->type != AudioPortType::Mono)
 	{
 		setPluginState(PluginState::LoadedWithError);
 		return false;
 	}
-	if (!isMonoOutput() && m_audioPortOutActive->type != AudioPortType::Stereo)
+	if (needOutputPort && !isMonoOutput() && m_audioPortOutActive->type != AudioPortType::Stereo)
 	{
 		setPluginState(PluginState::LoadedWithError);
 		return false;
