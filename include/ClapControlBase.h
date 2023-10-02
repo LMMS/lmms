@@ -71,6 +71,8 @@ protected:
 	ClapControlBase& operator=(const ClapControlBase&) = delete;
 	~ClapControlBase() override;
 
+	void init(Model* that, const QString& uri);
+
 	//! Must be checked after ctor or reload
 	auto isValid() const -> bool { return m_valid; }
 

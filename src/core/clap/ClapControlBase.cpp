@@ -29,6 +29,8 @@
 #include <algorithm>
 #include <QDebug>
 #include <QtGlobal>
+#include <QThread>
+#include <QCoreApplication>
 
 #include "Engine.h"
 #include "ClapManager.h"
@@ -42,6 +44,21 @@ ClapControlBase::ClapControlBase(Model* that, const QString& uri)
 {
 	qDebug() << "ClapControlBase::ClapControlBase";
 
+	if (QThread::currentThread() == QCoreApplication::instance()->thread())
+	{
+		// On main thread - can start ClapInstance normally
+		init(that, uri);
+	}
+	else
+	{
+		// Not on main thread - need to invoke on main thread
+		static_assert(QT_VERSION >= QT_VERSION_CHECK(5, 10, 0), "");
+		QMetaObject::invokeMethod(QCoreApplication::instance(), [&]{ init(that, uri); }, Qt::BlockingQueuedConnection);
+	}
+}
+
+void ClapControlBase::init(Model* that, const QString& uri)
+{
 	auto manager = Engine::getClapManager();
 	m_info = manager->pluginInfo(uri).lock().get();
 	if (!m_info)
