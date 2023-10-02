@@ -79,8 +79,8 @@ private:
 	QColor m_seekerShadowColor = QColor(0, 0, 0, 120);
 
 	// interaction vars
-	float distanceForClick = 0.03f;
-	float minSeekerDistance = 0.13f;
+	float m_distanceForClick = 0.03f;
+	float m_minSeekerDistance = 0.13f;
 
 	// dragging vars
 	enum class m_draggingTypes

@@ -48,51 +48,51 @@ public:
 
 	void getFrames(std::vector<float>& outData, int start, int frames);
 
-	int frames() { return processedBuffer.size(); }
+	int frames() { return m_processedBuffer.size(); }
 	float scaleRatio() { return m_scaleRatio; }
 
 private:
-	QMutex dataLock;
+	QMutex m_dataLock;
 	// original data
-	std::vector<float> originalBuffer;
-	int originalSampleRate = 0;
+	std::vector<float> m_originalBuffer;
+	int m_originalSampleRate = 0;
 
 	float m_scaleRatio = -1; // to force on first load
 
 	// output data
-	std::vector<float> processedBuffer; // final output
+	std::vector<float> m_processedBuffer; // final output
 	std::vector<bool> m_processedWindows; // marks a window processed
 
 	// timeshift stuff
-	static const int windowSize = 512;
-	static const int overSampling = 32;
+	static const int s_windowSize = 512;
+	static const int s_overSampling = 32;
 
 	// depending on scaleRatio
-	int stepSize = 0;
-	int numWindows = 0;
-	float outStepSize = 0;
-	float freqPerBin = 0;
-	float expectedPhaseIn = 0;
-	float expectedPhaseOut = 0;
+	int m_stepSize = 0;
+	int m_numWindows = 0;
+	float m_outStepSize = 0;
+	float m_freqPerBin = 0;
+	float m_expectedPhaseIn = 0;
+	float m_expectedPhaseOut = 0;
 
 	// buffers
-	fftwf_complex FFTSpectrum[windowSize];
-	std::vector<float> FFTInput;
-	std::vector<float> IFFTReconstruction;
-	std::vector<float> allMagnitudes;
-	std::vector<float> allFrequencies;
-	std::vector<float> processedFreq;
-	std::vector<float> processedMagn;
-	std::vector<float> lastPhase;
-	std::vector<float> sumPhase;
+	fftwf_complex m_FFTSpectrum[s_windowSize];
+	std::vector<float> m_FFTInput;
+	std::vector<float> m_IFFTReconstruction;
+	std::vector<float> m_allMagnitudes;
+	std::vector<float> m_allFrequencies;
+	std::vector<float> m_processedFreq;
+	std::vector<float> m_processedMagn;
+	std::vector<float> m_lastPhase;
+	std::vector<float> m_sumPhase;
 
 	// cache
-	std::vector<float> freqCache;
-	std::vector<float> magCache;
+	std::vector<float> m_freqCache;
+	std::vector<float> m_magCache;
 
 	// fftw plans
-	fftwf_plan fftPlan;
-	fftwf_plan ifftPlan;
+	fftwf_plan m_fftPlan;
+	fftwf_plan m_ifftPlan;
 
 	void updateParams(float newRatio);
 	void generateWindow(int windowNum, bool useCache);
@@ -103,8 +103,8 @@ class dinamicPlaybackBuffer
 {
 public:
 	dinamicPlaybackBuffer()
-		: leftChannel()
-		, rightChannel()
+		: m_leftChannel()
+		, m_rightChannel()
 	{
 	}
 	void loadSample(const sampleFrame* outData, int frames, int sampleRate, float newRatio)
@@ -116,16 +116,16 @@ public:
 			leftData[i] = outData[i][0];
 			rightData[i] = outData[i][1];
 		}
-		leftChannel.loadData(leftData, sampleRate, newRatio);
-		rightChannel.loadData(rightData, sampleRate, newRatio);
+		m_leftChannel.loadData(leftData, sampleRate, newRatio);
+		m_rightChannel.loadData(rightData, sampleRate, newRatio);
 	}
 	void getFrames(sampleFrame* outData, int startFrame, int frames)
 	{
 		std::vector<float> leftOut(frames, 0); // not a huge performance issue
 		std::vector<float> rightOut(frames, 0);
 
-		leftChannel.getFrames(leftOut, startFrame, frames);
-		rightChannel.getFrames(rightOut, startFrame, frames);
+		m_leftChannel.getFrames(leftOut, startFrame, frames);
+		m_rightChannel.getFrames(rightOut, startFrame, frames);
 
 		for (int i = 0; i < frames; i++)
 		{
@@ -133,17 +133,17 @@ public:
 			outData[i][1] = rightOut[i];
 		}
 	}
-	int frames() { return leftChannel.frames(); }
-	float scaleRatio() { return leftChannel.scaleRatio(); }
+	int frames() { return m_leftChannel.frames(); }
+	float scaleRatio() { return m_leftChannel.scaleRatio(); }
 	void setScaleRatio(float newRatio)
 	{
-		leftChannel.setScaleRatio(newRatio);
-		rightChannel.setScaleRatio(newRatio);
+		m_leftChannel.setScaleRatio(newRatio);
+		m_rightChannel.setScaleRatio(newRatio);
 	}
 
 private:
-	PhaseVocoder leftChannel;
-	PhaseVocoder rightChannel;
+	PhaseVocoder m_leftChannel;
+	PhaseVocoder m_rightChannel;
 };
 
 class SlicerT : public Instrument

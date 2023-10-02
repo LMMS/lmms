@@ -193,11 +193,11 @@ void WaveForm::mousePressEvent(QMouseEvent* me)
 
 	if (me->y() < m_seekerHeight) // seeker click
 	{
-		if (abs(normalizedClickSeeker - m_seekerStart) < distanceForClick) // dragging start
+		if (abs(normalizedClickSeeker - m_seekerStart) < m_distanceForClick) // dragging start
 		{
 			m_currentlyDragging = m_draggingTypes::m_seekerStart;
 		}
-		else if (abs(normalizedClickSeeker - m_seekerEnd) < distanceForClick) // dragging end
+		else if (abs(normalizedClickSeeker - m_seekerEnd) < m_distanceForClick) // dragging end
 		{
 			m_currentlyDragging = m_draggingTypes::m_seekerEnd;
 		}
@@ -218,7 +218,7 @@ void WaveForm::mousePressEvent(QMouseEvent* me)
 			int sliceIndex = m_slicePoints[i];
 			float xPos = (float)(sliceIndex - startFrame) / (float)(endFrame - startFrame);
 
-			if (abs(xPos - normalizedClickEditor) < distanceForClick)
+			if (abs(xPos - normalizedClickEditor) < m_distanceForClick)
 			{
 				m_currentlyDragging = m_draggingTypes::m_slicePoint;
 				m_sliceSelected = i;
@@ -259,11 +259,11 @@ void WaveForm::mouseMoveEvent(QMouseEvent* me)
 	switch (m_currentlyDragging)
 	{
 	case m_draggingTypes::m_seekerStart:
-		m_seekerStart = std::clamp(normalizedClickSeeker, 0.0f, m_seekerEnd - minSeekerDistance);
+		m_seekerStart = std::clamp(normalizedClickSeeker, 0.0f, m_seekerEnd - m_minSeekerDistance);
 		break;
 
 	case m_draggingTypes::m_seekerEnd:
-		m_seekerEnd = std::clamp(normalizedClickSeeker, m_seekerStart + minSeekerDistance, 1.0f);
+		m_seekerEnd = std::clamp(normalizedClickSeeker, m_seekerStart + m_minSeekerDistance, 1.0f);
 		break;
 
 	case m_draggingTypes::m_seekerMiddle:
