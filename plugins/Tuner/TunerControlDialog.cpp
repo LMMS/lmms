@@ -75,6 +75,7 @@ TunerControlDialog::TunerControlDialog(TunerControls* controls)
 
 auto TunerControlDialog::frequencyCalculated(float frequency) -> void
 {
+	if (frequency <= 0) { return; }
 	const auto referenceFrequency = static_cast<TunerControls*>(m_effectControls)->m_referenceFreqModel.value();
 
 	auto closestMidiNote = static_cast<int>(69 + 12 * std::log2(frequency / referenceFrequency));
