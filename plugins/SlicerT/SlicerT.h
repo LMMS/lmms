@@ -42,9 +42,12 @@ class PhaseVocoder
 public:
 	PhaseVocoder();
 	~PhaseVocoder();
+
 	void loadData(std::vector<float> originalData, int sampleRate, float newRatio);
 	void setScaleRatio(float newRatio) { updateParams(newRatio); }
+
 	void getFrames(std::vector<float>& outData, int start, int frames);
+
 	int frames() { return processedBuffer.size(); }
 	float scaleRatio() { return m_scaleRatio; }
 
@@ -54,10 +57,10 @@ private:
 	std::vector<float> originalBuffer;
 	int originalSampleRate = 0;
 
-	float m_scaleRatio = -1; // to force on fisrt load
+	float m_scaleRatio = -1; // to force on first load
 
 	// output data
-	std::vector<float> processedBuffer;
+	std::vector<float> processedBuffer; // final output
 	std::vector<bool> m_processedWindows; // marks a window processed
 
 	// timeshift stuff
@@ -169,11 +172,13 @@ signals:
 	void isPlaying(float current, float start, float end);
 
 private:
+	// models
 	FloatModel m_noteThreshold;
 	FloatModel m_fadeOutFrames;
 	IntModel m_originalBPM;
 	ComboBoxModel m_sliceSnap;
 
+	// sample buffers
 	SampleBuffer m_originalSample;
 	dinamicPlaybackBuffer m_phaseVocoder;
 

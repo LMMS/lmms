@@ -52,27 +52,28 @@ protected:
 	virtual void paintEvent(QPaintEvent* pe);
 
 private:
-	// vars used to control structure and colors
+	// sizes
 	int m_width;
 	int m_height;
 
 	int m_seekerHorMargin = 5;
-	int m_seekerHeight = 38; // used to calcualte all hor sizes
+	int m_seekerHeight = 38; // used to calcualte all vertical sizes
 	int m_seekerWidth;
 
 	int m_middleMargin = 6;
 	int m_editorHeight;
 	int m_editorWidth;
 
+	// colors
 	QColor m_waveformBgColor = QColor(255, 255, 255, 0);
 	QColor m_waveformColor = QColor(123, 49, 212);
-	// QColor m_waveformColorDark = QColor(39, 15, 67);
 
-	// QColor m_waveformColor = QColor(255, 161, 247); // logo color
 	QColor m_playColor = QColor(255, 255, 255, 200);
 	QColor m_playHighlighColor = QColor(255, 255, 255, 70);
+
 	QColor m_sliceColor = QColor(218, 193, 255);
 	QColor m_selectedSliceColor = QColor(178, 153, 215);
+
 	QColor m_seekerColor = QColor(178, 115, 255);
 	QColor m_seekerHighlightColor = QColor(178, 115, 255, 100);
 	QColor m_seekerShadowColor = QColor(0, 0, 0, 120);
@@ -117,6 +118,7 @@ private:
 	void drawEditor();
 	void drawSeekerWaveform();
 	void drawSeeker();
+
 public slots:
 	void updateUI();
 	void isPlaying(float current, float start, float end);

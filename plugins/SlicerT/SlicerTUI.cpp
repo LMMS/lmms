@@ -52,40 +52,49 @@ SlicerTUI::SlicerTUI(SlicerT* instrument, QWidget* parent)
 	, m_midiExportButton(this, nullptr)
 	, m_wf(248, 128, instrument, this)
 {
+	// window settings
 	setAcceptDrops(true);
 	setAutoFillBackground(true);
 
+	// render background
 	QPalette pal;
 	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("bg"));
 	setPalette(pal);
 
+	// move editor and seeker
 	m_wf.move(2, 6);
 
+	// snap combo box
 	m_snapSetting.setGeometry(190, 200, 55, ComboBox::DEFAULT_HEIGHT);
 	m_snapSetting.setToolTip(tr("Set slice snapping for detection"));
 	m_snapSetting.setModel(&m_slicerTParent->m_sliceSnap);
 
+	// bpm spin box
 	m_bpmBox.move(135, 203);
 	m_bpmBox.setToolTip(tr("Original sample BPM"));
 	m_bpmBox.setLabel(tr("BPM"));
 	m_bpmBox.setModel(&m_slicerTParent->m_originalBPM);
 
+	// threshold knob
 	m_noteThresholdKnob.move(14, 195);
 	m_noteThresholdKnob.setToolTip(tr("Threshold used for slicing"));
 	m_noteThresholdKnob.setLabel(tr("Threshold"));
 	m_noteThresholdKnob.setModel(&m_slicerTParent->m_noteThreshold);
 
+	// fadeout knob
 	m_fadeOutKnob.move(80, 195);
 	m_fadeOutKnob.setToolTip(tr("FadeOut for notes"));
 	m_fadeOutKnob.setLabel(tr("FadeOut"));
 	m_fadeOutKnob.setModel(&m_slicerTParent->m_fadeOutFrames);
 
+	// midi copy button
 	m_midiExportButton.move(205, 155);
 	m_midiExportButton.setActiveGraphic(PLUGIN_NAME::getIconPixmap("copyMidi"));
 	m_midiExportButton.setInactiveGraphic(PLUGIN_NAME::getIconPixmap("copyMidi"));
 	m_midiExportButton.setToolTip(tr("Copy midi pattern to clipboard"));
 	connect(&m_midiExportButton, SIGNAL(clicked()), this, SLOT(exportMidi()));
 
+	// slcie reset button
 	m_resetButton.move(25, 155);
 	m_resetButton.setActiveGraphic(PLUGIN_NAME::getIconPixmap("resetSlices"));
 	m_resetButton.setInactiveGraphic(PLUGIN_NAME::getIconPixmap("resetSlices"));
@@ -159,6 +168,7 @@ void SlicerTUI::dropEvent(QDropEvent* de)
 	de->ignore();
 }
 
+// display button text
 void SlicerTUI::paintEvent(QPaintEvent* pe)
 {
 	QPainter brush(this);

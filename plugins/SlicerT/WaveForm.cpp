@@ -54,19 +54,21 @@ WaveForm::WaveForm(int w, int h, SlicerT* instrument, QWidget* parent)
 	, m_slicePoints(instrument->m_slicePoints)
 
 {
+	// window config
 	setFixedSize(m_width, m_height);
 	setMouseTracking(true);
 
+	// draw backgrounds
 	m_sliceEditor.fill(m_waveformBgColor);
 	m_seekerWaveform.fill(m_waveformBgColor);
 
+	// connect to playback
 	connect(m_slicerTParent, SIGNAL(isPlaying(float, float, float)), this, SLOT(isPlaying(float, float, float)));
 	connect(m_slicerTParent, SIGNAL(dataChanged()), this, SLOT(updateUI()));
 
 	updateUI();
 }
 
-// graphics
 void WaveForm::drawSeekerWaveform()
 {
 	m_seekerWaveform.fill(m_waveformBgColor);
@@ -82,7 +84,6 @@ void WaveForm::drawSeeker()
 	m_seeker.fill(m_waveformBgColor);
 	QPainter brush(&m_seeker);
 
-	// if (m_currentSample.frames() < 2048) { return; }
 	// draw slice points
 	brush.setPen(m_sliceColor);
 	for (int i = 0; i < m_slicePoints.size(); i++)
@@ -123,6 +124,7 @@ void WaveForm::drawEditor()
 	m_sliceEditor.fill(m_waveformBgColor);
 	QPainter brush(&m_sliceEditor);
 
+	// draw text if no sample loaded
 	if (m_currentSample.frames() < 2048)
 	{
 		brush.setPen(m_playHighlighColor);
@@ -132,6 +134,7 @@ void WaveForm::drawEditor()
 		return;
 	}
 
+	// editor boundaries
 	float startFrame = m_seekerStart * m_currentSample.frames();
 	float endFrame = m_seekerEnd * m_currentSample.frames();
 	float numFramesToDraw = endFrame - startFrame;
@@ -158,7 +161,6 @@ void WaveForm::drawEditor()
 	}
 }
 
-// slots
 void WaveForm::updateUI()
 {
 	drawSeekerWaveform();
@@ -172,7 +174,7 @@ void WaveForm::isPlaying(float current, float start, float end)
 	m_noteCurrent = current;
 	m_noteStart = start;
 	m_noteEnd = end;
-	drawSeeker(); // only update seeker, else horrible performance
+	drawSeeker(); // only update seeker, else horrible performance because of waveform redraw
 	update();
 }
 
@@ -205,8 +207,8 @@ void WaveForm::mousePressEvent(QMouseEvent* me)
 			m_seekerMiddle = normalizedClickSeeker;
 		}
 	}
-	else
-	{ // editor click
+	else // editor click
+	{
 		m_sliceSelected = -1;
 		float startFrame = m_seekerStart * m_currentSample.frames();
 		float endFrame = m_seekerEnd * m_currentSample.frames();
@@ -239,6 +241,7 @@ void WaveForm::mouseReleaseEvent(QMouseEvent* me)
 {
 	m_currentlyDragging = m_draggingTypes::nothing;
 	std::sort(m_slicePoints.begin(), m_slicePoints.end());
+
 	updateUI();
 }
 
@@ -273,9 +276,8 @@ void WaveForm::mouseMoveEvent(QMouseEvent* me)
 		}
 		break;
 
-	case m_draggingTypes::m_slicePoint: // TODO: fix this
+	case m_draggingTypes::m_slicePoint:
 		m_slicePoints[m_sliceSelected] = startFrame + normalizedClickEditor * (endFrame - startFrame);
-
 		m_slicePoints[m_sliceSelected] = std::clamp(m_slicePoints[m_sliceSelected], 0, m_currentSample.frames());
 		break;
 	case m_draggingTypes::nothing:

@@ -41,6 +41,7 @@ class SlicerT;
 
 namespace gui {
 
+// style knob, defined in data/themes/default/style.css#L949
 class SlicerTKnob : public Knob
 {
 public:
@@ -59,11 +60,9 @@ class SlicerTUI : public InstrumentViewFixedSize
 
 public:
 	SlicerTUI(SlicerT* instrument, QWidget* parent);
-	~SlicerTUI() override = default;
 
 protected slots:
 	void exportMidi();
-	// void sampleSizeChanged( float _new_sample_length );
 
 protected:
 	virtual void dragEnterEvent(QDragEnterEvent* _dee);
@@ -74,11 +73,13 @@ protected:
 private:
 	SlicerT* m_slicerTParent;
 
+	// lmms UI
 	SlicerTKnob m_noteThresholdKnob;
 	SlicerTKnob m_fadeOutKnob;
 	LcdSpinBox m_bpmBox;
 	ComboBox m_snapSetting;
 
+	// buttons
 	PixmapButton m_resetButton;
 	PixmapButton m_midiExportButton;
 
