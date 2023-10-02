@@ -114,19 +114,18 @@ protected:
 	auto controlCount() const -> std::size_t;
 	auto nodeName() const -> QString { return "clapcontrols"; }
 	auto hasNoteInput() const -> bool;
-	void handleMidiInputEvent(const class MidiEvent& event,
-		const class TimePos& time, f_cnt_t offset);
+	void handleMidiInputEvent(const class MidiEvent& event, const class TimePos& time, f_cnt_t offset);
 
 private:
 
 	//! Return the DataFile settings type
-	virtual auto settingsType() -> DataFile::Type = 0;
+	//virtual auto settingsType() -> DataFile::Type = 0;
 
 	//! Inform the plugin about a file name change
-	virtual void setNameFromFile(const QString& fname) = 0;
+	//virtual void setNameFromFile(const QString& fname) = 0;
 
 	//! Independent processors
-	//! If this is a mono effect, the vector will have size 2 in order to
+	//! If this is a mono effect, the ArrayVector will have size 2 in order to
 	//! fulfill LMMS' requirement of having stereo input and output
 	ArrayVector<std::unique_ptr<ClapInstance>, DEFAULT_CHANNELS> m_instances;
 

@@ -157,8 +157,8 @@ public:
 	void destroy();
 
 	auto isValid() const -> bool;
-	auto isMonoInput() const -> bool { return m_monoInput; } //!< Can call after pluginInit()
-	auto isMonoOutput() const -> bool { return m_monoOutput; } //!< Can call after pluginInit()
+	auto isMonoInput() const -> bool { return m_monoInput; } //!< Can call after init()
+	auto isMonoOutput() const -> bool { return m_monoOutput; } //!< Can call after init()
 
 	auto host() const -> const clap_host* { return &m_host; }
 	auto plugin() const -> const clap_plugin* { return m_plugin; }
@@ -178,30 +178,32 @@ public:
 	// Plugin
 	/////////////////////////////////////////
 
-	auto pluginState() const -> PluginState { return m_pluginState; };
+	auto state() const -> PluginState { return m_pluginState; };
 
-	auto pluginStart() -> bool; //!< Loads, inits, and activates in that order
-	auto pluginRestart() -> bool;
+	auto start() -> bool; //!< Loads, inits, and activates in that order
+	auto restart() -> bool;
 
-	auto pluginLoad() -> bool;
-	auto pluginUnload() -> bool;
-	auto pluginInit() -> bool;
-	auto pluginActivate() -> bool;
-	auto pluginDeactivate() -> bool;
+	auto load() -> bool;
+	auto unload() -> bool;
+	auto init() -> bool;
+	auto activate() -> bool;
+	auto deactivate() -> bool;
 
-	auto pluginProcessBegin(std::uint32_t frames) -> bool;
-	auto pluginProcess(std::uint32_t frames) -> bool;
-	auto pluginProcessEnd(std::uint32_t frames) -> bool;
+	auto processBegin(std::uint32_t frames) -> bool;
+	void processNoteOff(int sampleOffset, int channel, int key, int velocity);
+	void processNoteOn(int sampleOffset, int channel, int key, int velocity);
+	auto process(std::uint32_t frames) -> bool;
+	auto processEnd(std::uint32_t frames) -> bool;
 
 	void paramFlushOnMainThread();
 	void handlePluginOutputEvents();
 	void generatePluginInputEvents();
 	auto getParamValueText(const ClapParam* param) const -> std::string;
 
-	auto isPluginActive() const -> bool;
-	auto isPluginProcessing() const -> bool;
-	auto isPluginSleeping() const -> bool;
-	auto isPluginErrorState() const -> bool;
+	auto isActive() const -> bool;
+	auto isProcessing() const -> bool;
+	auto isSleeping() const -> bool;
+	auto isErrorState() const -> bool;
 
 signals:
 
@@ -366,29 +368,28 @@ private:
 	{
 		void update(const PluginToHostParamQueueValue& v) noexcept
 		{
-			if (v.has_value)
+			if (v.hasValue)
 			{
-				has_value = true;
+				hasValue = true;
 				value = v.value;
 			}
 
-			if (v.has_gesture)
+			if (v.hasGesture)
 			{
-				has_gesture = true;
-				is_begin = v.is_begin;
+				hasGesture = true;
+				isBegin = v.isBegin;
 			}
 		}
 
-		bool has_value = false;
-		bool has_gesture = false;
-		bool is_begin = false;
+		bool hasValue = false;
+		bool hasGesture = false;
+		bool isBegin = false;
 		double value = 0;
 	};
 
-	//! Engine = CLAP plugin; App = LMMS
-	clap::helpers::ReducingParamQueue<clap_id, HostToPluginParamQueueValue> m_appToEngineValueQueue;
-	clap::helpers::ReducingParamQueue<clap_id, HostToPluginParamQueueValue> m_appToEngineModQueue;
-	clap::helpers::ReducingParamQueue<clap_id, PluginToHostParamQueueValue> m_engineToAppValueQueue;
+	clap::helpers::ReducingParamQueue<clap_id, HostToPluginParamQueueValue> m_hostToPluginValueQueue;
+	clap::helpers::ReducingParamQueue<clap_id, HostToPluginParamQueueValue> m_hostToPluginModQueue;
+	clap::helpers::ReducingParamQueue<clap_id, PluginToHostParamQueueValue> m_pluginToHostValueQueue;
 
 	std::unordered_map<clap_id, bool> m_isAdjustingParameter;
 

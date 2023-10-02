@@ -35,7 +35,7 @@ namespace lmms
 
 
 ClapFxControls::ClapFxControls(ClapEffect* effect, const QString& uri)
-	: EffectControls(effect), ClapControlBase(this, uri)
+	: EffectControls{effect}, ClapControlBase{this, uri}
 {
 	if (isValid())
 	{
@@ -76,6 +76,7 @@ void ClapFxControls::changeControl()
 	//	engine::getSong()->setModified();
 }
 
+/*
 auto ClapFxControls::settingsType() -> DataFile::Type
 {
 	return DataFile::Type::EffectSettings;
@@ -85,6 +86,7 @@ void ClapFxControls::setNameFromFile(const QString& name)
 {
 	effect()->setDisplayName(name);
 }
+*/
 
 
 } // namespace lmms

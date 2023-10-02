@@ -33,7 +33,7 @@ namespace lmms::gui
 
 
 ClapFxControlDialog::ClapFxControlDialog(ClapFxControls* controls)
-	: EffectControlDialog(controls), ClapViewBase(this, controls)
+	: EffectControlDialog{controls}, ClapViewBase{this, controls}
 {
 	if (m_reloadPluginButton)
 	{
@@ -66,8 +66,7 @@ auto ClapFxControlDialog::clapControls() -> ClapFxControls*
 void ClapFxControlDialog::modelChanged()
 {
 	ClapViewBase::modelChanged(clapControls());
-	connect(clapControls(), &ClapFxControls::modelChanged,
-		this, [this](){ this->modelChanged();} );
+	connect(clapControls(), &ClapFxControls::modelChanged, this, [this](){ this->modelChanged();} );
 }
 
 

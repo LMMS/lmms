@@ -55,13 +55,13 @@ Plugin::Descriptor PLUGIN_EXPORT clapeffect_plugin_descriptor =
 }
 
 
-ClapEffect::ClapEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key)
-	: Effect(&clapeffect_plugin_descriptor, parent, key),
-	m_controls(this, key->attributes["uri"]),
+ClapEffect::ClapEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
+	Effect{&clapeffect_plugin_descriptor, parent, key},
+	m_controls{this, key->attributes["uri"]},
 	m_tempOutputSamples(Engine::audioEngine()->framesPerPeriod()),
-	m_idleTimer(this)
+	m_idleTimer{this}
 {
-	connect(&m_idleTimer, &QTimer::timeout, this, QOverload<>::of(&ClapEffect::callHostIdle));
+	connect(&m_idleTimer, &QTimer::timeout, this, [this](){ m_controls.callHostIdle(); });
 	m_idleTimer.start(1000 / 30);
 }
 
@@ -106,8 +106,7 @@ PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data)
 {
 	using KeyType = Plugin::Descriptor::SubPluginFeatures::Key;
 	auto effect = std::make_unique<ClapEffect>(parent, static_cast<const KeyType*>(data));
-	if (!effect || !effect->isValid())
-		return nullptr;
+	if (!effect || !effect->isValid()) { return nullptr; }
 	return effect.release();
 }
 

@@ -116,7 +116,7 @@ ClapInstance::ClapInstance(const ClapPluginInfo* pluginInfo, Model* parent)
 	m_process.steady_time = -1; // Not supported yet
 	m_process.transport = ClapManager::transport();
 
-	pluginStart();
+	start();
 }
 
 ClapInstance::ClapInstance(ClapInstance&& other) noexcept
@@ -211,14 +211,25 @@ void ClapInstance::copyBuffersToCore(sampleFrame* buf, unsigned firstChan, unsig
 
 void ClapInstance::run(fpp_t frames)
 {
-	pluginProcessBegin(frames);
-	pluginProcess(frames);
-	pluginProcessEnd(frames);
+	processBegin(frames);
+	process(frames);
+	processEnd(frames);
 }
 
 void ClapInstance::handleMidiInputEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset)
 {
-	//
+	switch (event.type())
+	{
+		case MidiEventTypes::MidiNoteOff:
+			processNoteOff(offset, event.channel(), event.key(), event.velocity());
+			break;
+		case MidiEventTypes::MidiNoteOn:
+			processNoteOn(offset, event.channel(), event.key(), event.velocity());
+			break;
+		// TODO: Implement other midi events
+		default:
+			break;
+	}
 }
 
 auto ClapInstance::hasNoteInput() const -> bool
@@ -231,30 +242,30 @@ void ClapInstance::destroy()
 {
 	//hostIdle(); // TODO: ??? May throw an exception, which should not happen in ClapInstance dtor
 
-	pluginUnload();
+	unload();
 
 	hostDestroy();
 }
 
 auto ClapInstance::isValid() const -> bool
 {
-	return m_plugin != nullptr && !isPluginErrorState() && m_pluginIssues.empty();
+	return m_plugin != nullptr && !isErrorState() && m_pluginIssues.empty();
 }
 
-auto ClapInstance::pluginStart() -> bool
+auto ClapInstance::start() -> bool
 {
-	if (!pluginLoad()) { return false; }
-	if (!pluginInit()) { return false; }
-	return pluginActivate();
+	if (!load()) { return false; }
+	if (!init()) { return false; }
+	return activate();
 }
 
-auto ClapInstance::pluginRestart() -> bool
+auto ClapInstance::restart() -> bool
 {
-	if (!pluginUnload()) { return false; }
-	return pluginStart();
+	if (!unload()) { return false; }
+	return start();
 }
 
-auto ClapInstance::pluginLoad() -> bool
+auto ClapInstance::load() -> bool
 {
 	qDebug() << "Loading plugin instance:" << m_pluginInfo->descriptor()->name;
 	checkPluginStateCurrent(PluginState::None);
@@ -275,12 +286,12 @@ auto ClapInstance::pluginLoad() -> bool
 	return true;
 }
 
-auto ClapInstance::pluginUnload() -> bool
+auto ClapInstance::unload() -> bool
 {
 	qDebug() << "Unloading plugin instance:" << m_pluginInfo->descriptor()->name;
 	assert(isMainThread());
 
-	pluginDeactivate();
+	deactivate();
 
 	if (m_plugin)
 	{
@@ -300,15 +311,15 @@ auto ClapInstance::pluginUnload() -> bool
 	return true;
 }
 
-auto ClapInstance::pluginInit() -> bool
+auto ClapInstance::init() -> bool
 {
-	qDebug() << "ClapInstance::pluginInit()";
+	qDebug() << "ClapInstance::init()";
 	assert(isMainThread());
 
-	if (isPluginErrorState()) { return false; }
+	if (isErrorState()) { return false; }
 	checkPluginStateCurrent(PluginState::Loaded);
 
-	if (pluginState() != PluginState::Loaded) { return false; }
+	if (state() != PluginState::Loaded) { return false; }
 
 	if (!m_plugin->init(m_plugin))
 	{
@@ -580,18 +591,18 @@ auto ClapInstance::pluginInit() -> bool
 	return true;
 }
 
-auto ClapInstance::pluginActivate() -> bool
+auto ClapInstance::activate() -> bool
 {
-	qDebug() << "ClapInstance::pluginActivate()";
+	qDebug() << "ClapInstance::activate()";
 	assert(isMainThread());
 
-	if (isPluginErrorState()) { return false; }
+	if (isErrorState()) { return false; }
 	checkPluginStateCurrent(PluginState::Inactive);
 
 	const auto sampleRate = static_cast<double>(Engine::audioEngine()->processingSampleRate());
 	static_assert(DEFAULT_BUFFER_SIZE > MINIMUM_BUFFER_SIZE);
 
-	assert(!isPluginActive());
+	assert(!isActive());
 	if (!m_plugin->activate(m_plugin, sampleRate, MINIMUM_BUFFER_SIZE, DEFAULT_BUFFER_SIZE))
 	{
 		setPluginState(PluginState::InactiveWithError);
@@ -603,15 +614,15 @@ auto ClapInstance::pluginActivate() -> bool
 	return true;
 }
 
-auto ClapInstance::pluginDeactivate() -> bool
+auto ClapInstance::deactivate() -> bool
 {
-	qDebug() << "ClapInstance::pluginDeactivate";
+	qDebug() << "ClapInstance::deactivate";
 	assert(isMainThread());
-	if (!isPluginActive()) { return false; }
+	if (!isActive()) { return false; }
 
 	/*
 	//TODO: Need to fix this
-	while (isPluginProcessing() || isPluginSleeping())
+	while (isProcessing() || isSleeping())
 	{
 		m_scheduleDeactivate = true;
 		QThread::msleep(10);
@@ -621,18 +632,56 @@ auto ClapInstance::pluginDeactivate() -> bool
 
 	m_plugin->deactivate(m_plugin);
 	setPluginState(PluginState::Inactive);
-	qDebug() << "ClapInstance::pluginDeactivate end";
+	qDebug() << "ClapInstance::deactivate end";
 	return true;
 }
 
-auto ClapInstance::pluginProcessBegin(std::uint32_t frames) -> bool
+auto ClapInstance::processBegin(std::uint32_t frames) -> bool
 {
 	m_process.frames_count = frames;
 	//m_process.steady_time = m_steadyTime;
 	return false;
 }
 
-auto ClapInstance::pluginProcess(std::uint32_t frames) -> bool
+void ClapInstance::processNoteOff(int sampleOffset, int channel, int key, int velocity)
+{
+	assert(isAudioThread());
+
+	clap_event_note ev;
+	ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+	ev.header.type = CLAP_EVENT_NOTE_OFF;
+	ev.header.time = sampleOffset;
+	ev.header.flags = 0;
+	ev.header.size = sizeof(ev);
+	ev.port_index = 0;
+	ev.key = key;
+	ev.channel = channel;
+	ev.note_id = -1;
+	ev.velocity = velocity / 127.0;
+
+	m_evIn.push(&ev.header);
+}
+
+void ClapInstance::processNoteOn(int sampleOffset, int channel, int key, int velocity)
+{
+	assert(isAudioThread());
+
+	clap_event_note ev;
+	ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+	ev.header.type = CLAP_EVENT_NOTE_ON;
+	ev.header.time = sampleOffset;
+	ev.header.flags = 0;
+	ev.header.size = sizeof(ev);
+	ev.port_index = 0;
+	ev.key = key;
+	ev.channel = channel;
+	ev.note_id = -1;
+	ev.velocity = velocity / 127.0;
+
+	m_evIn.push(&ev.header);
+}
+
+auto ClapInstance::process(std::uint32_t frames) -> bool
 {
 	//m_steadyTime += frames;
 
@@ -640,7 +689,7 @@ auto ClapInstance::pluginProcess(std::uint32_t frames) -> bool
 	if (!m_plugin) { return false; }
 
 	// Can't process a plugin that is not active
-	if (!isPluginActive()) { return false; }
+	if (!isActive()) { return false; }
 
 	// Do we want to deactivate the plugin?
 	if (m_scheduleDeactivate)
@@ -663,7 +712,7 @@ auto ClapInstance::pluginProcess(std::uint32_t frames) -> bool
 	m_evOut.clear();
 	generatePluginInputEvents();
 
-	if (isPluginSleeping())
+	if (isSleeping())
 	{
 		if (!m_scheduleProcess && m_evIn.empty())
 		{
@@ -684,7 +733,7 @@ auto ClapInstance::pluginProcess(std::uint32_t frames) -> bool
 	}
 
 	[[maybe_unused]] int32_t status = CLAP_PROCESS_SLEEP;
-	if (isPluginProcessing())
+	if (isProcessing())
 	{
 		status = m_plugin->process(m_plugin, &m_process);
 	}
@@ -694,14 +743,14 @@ auto ClapInstance::pluginProcess(std::uint32_t frames) -> bool
 	m_evOut.clear();
 	m_evIn.clear();
 
-	m_engineToAppValueQueue.producerDone();
+	m_pluginToHostValueQueue.producerDone();
 
 	// TODO: send plugin to sleep if possible
 
 	return true;
 }
 
-auto ClapInstance::pluginProcessEnd(std::uint32_t frames) -> bool
+auto ClapInstance::processEnd(std::uint32_t frames) -> bool
 {
 	m_process.frames_count = frames;
 	//m_process.steady_time = m_steadyTime;
@@ -710,7 +759,7 @@ auto ClapInstance::pluginProcessEnd(std::uint32_t frames) -> bool
 
 void ClapInstance::generatePluginInputEvents()
 {
-	m_appToEngineValueQueue.consume(
+	m_hostToPluginValueQueue.consume(
 		[this](clap_id param_id, const HostToPluginParamQueueValue& value) {
 			clap_event_param_value ev;
 			ev.header.time = 0;
@@ -728,7 +777,7 @@ void ClapInstance::generatePluginInputEvents()
 			m_evIn.push(&ev.header);
 		});
 
-	m_appToEngineModQueue.consume([this](clap_id param_id, const HostToPluginParamQueueValue& value) {
+	m_hostToPluginModQueue.consume([this](clap_id param_id, const HostToPluginParamQueueValue& value) {
 		clap_event_param_mod ev;
 		ev.header.time = 0;
 		ev.header.type = CLAP_EVENT_PARAM_MOD;
@@ -756,31 +805,35 @@ void ClapInstance::handlePluginOutputEvents()
 			case CLAP_EVENT_PARAM_GESTURE_BEGIN:
 			{
 				auto ev = reinterpret_cast<const clap_event_param_gesture*>(h);
-				bool &isAdj = m_isAdjustingParameter[ev->param_id];
+				bool& isAdj = m_isAdjustingParameter[ev->param_id];
 
 				if (isAdj)
+				{
 					throw std::logic_error("The plugin sent BEGIN_ADJUST twice");
+				}
 				isAdj = true;
 
 				PluginToHostParamQueueValue v;
-				v.has_gesture = true;
-				v.is_begin = true;
-				m_engineToAppValueQueue.setOrUpdate(ev->param_id, v);
+				v.hasGesture = true;
+				v.isBegin = true;
+				m_pluginToHostValueQueue.setOrUpdate(ev->param_id, v);
 				break;
 			}
 
 			case CLAP_EVENT_PARAM_GESTURE_END:
 			{
 				auto ev = reinterpret_cast<const clap_event_param_gesture*>(h);
-				bool &isAdj = m_isAdjustingParameter[ev->param_id];
+				bool& isAdj = m_isAdjustingParameter[ev->param_id];
 
 				if (!isAdj)
-				throw std::logic_error("The plugin sent END_ADJUST without a preceding BEGIN_ADJUST");
+				{
+					throw std::logic_error("The plugin sent END_ADJUST without a preceding BEGIN_ADJUST");
+				}
 				isAdj = false;
 				PluginToHostParamQueueValue v;
-				v.has_gesture = true;
-				v.is_begin = false;
-				m_engineToAppValueQueue.setOrUpdate(ev->param_id, v);
+				v.hasGesture = true;
+				v.isBegin = false;
+				m_pluginToHostValueQueue.setOrUpdate(ev->param_id, v);
 				break;
 			}
 
@@ -788,9 +841,9 @@ void ClapInstance::handlePluginOutputEvents()
 			{
 				auto ev = reinterpret_cast<const clap_event_param_value*>(h);
 				PluginToHostParamQueueValue v;
-				v.has_value = true;
+				v.hasValue = true;
 				v.value = ev->value;
-				m_engineToAppValueQueue.setOrUpdate(ev->param_id, v);
+				m_pluginToHostValueQueue.setOrUpdate(ev->param_id, v);
 				break;
 			}
 		}
@@ -800,7 +853,7 @@ void ClapInstance::handlePluginOutputEvents()
 void ClapInstance::paramFlushOnMainThread()
 {
 	assert(isMainThread());
-	assert(!isPluginActive());
+	assert(!isActive());
 
 	m_scheduleParamFlush = false;
 
@@ -817,10 +870,10 @@ void ClapInstance::paramFlushOnMainThread()
 	handlePluginOutputEvents();
 
 	m_evOut.clear();
-	m_engineToAppValueQueue.producerDone();
+	m_pluginToHostValueQueue.producerDone();
 }
 
-auto ClapInstance::isPluginActive() const -> bool
+auto ClapInstance::isActive() const -> bool
 {
 	switch (m_pluginState)
 	{
@@ -834,17 +887,17 @@ auto ClapInstance::isPluginActive() const -> bool
 	}
 }
 
-auto ClapInstance::isPluginProcessing() const -> bool
+auto ClapInstance::isProcessing() const -> bool
 {
 	return m_pluginState == PluginState::ActiveAndProcessing;
 }
 
-auto ClapInstance::isPluginSleeping() const -> bool
+auto ClapInstance::isSleeping() const -> bool
 {
 	return m_pluginState == PluginState::ActiveAndSleeping;
 }
 
-auto ClapInstance::isPluginErrorState() const -> bool
+auto ClapInstance::isErrorState() const -> bool
 {
 	return m_pluginState == PluginState::None
 		|| m_pluginState == PluginState::LoadedWithError
@@ -867,7 +920,7 @@ auto ClapInstance::isPluginNextStateValid(PluginState next) -> bool
 	case PluginState::LoadedWithError:
 		return m_pluginState == PluginState::Loaded;
 	case PluginState::Inactive:
-		return true; // TODO: Remove once ClapInstance::pluginDeactivate() is fixed
+		return true; // TODO: Remove once ClapInstance::deactivate() is fixed
 		return m_pluginState == PluginState::Loaded
 			|| m_pluginState == PluginState::ActiveAndReadyToDeactivate;
 	case PluginState::InactiveWithError:
@@ -947,13 +1000,13 @@ void ClapInstance::hostDestroy()
 void ClapInstance::hostIdle()
 {
 	assert(isMainThread());
-	if (isPluginErrorState()) { return; }
+	if (isErrorState()) { return; }
 
 	// Try to send events to the audio engine
-	m_appToEngineValueQueue.producerDone();
-	m_appToEngineModQueue.producerDone();
+	m_hostToPluginValueQueue.producerDone();
+	m_hostToPluginModQueue.producerDone();
 
-	m_engineToAppValueQueue.consume(
+	m_pluginToHostValueQueue.consume(
 		[this](clap_id paramId, const PluginToHostParamQueueValue& value) {
 			const auto it = m_paramMap.find(paramId);
 			if (it == m_paramMap.end())
@@ -962,14 +1015,14 @@ void ClapInstance::hostIdle()
 				throw std::invalid_argument{msg};
 			}
 
-			if (value.has_value) { it->second->setValue(value.value); }
-			if (value.has_gesture) { it->second->setIsAdjusting(value.is_begin); }
+			if (value.hasValue) { it->second->setValue(value.value); }
+			if (value.hasGesture) { it->second->setIsAdjusting(value.isBegin); }
 
 			emit paramAdjusted(paramId);
 		}
 	);
 
-	if (m_scheduleParamFlush && !isPluginActive())
+	if (m_scheduleParamFlush && !isActive())
 	{
 		paramFlushOnMainThread();
 	}
@@ -982,9 +1035,9 @@ void ClapInstance::hostIdle()
 
 	if (m_scheduleRestart)
 	{
-		pluginDeactivate();
+		deactivate();
 		m_scheduleRestart = false;
-		pluginActivate();
+		activate();
 	}
 }
 
@@ -1123,7 +1176,7 @@ void ClapInstance::hostExtParamsRescan(const clap_host* host, std::uint32_t flag
 	if (!h->canUsePluginParams()) { return; }
 
 	// 1. It is forbidden to use CLAP_PARAM_RESCAN_ALL if the plugin is active
-	if (h->isPluginActive() && (flags & CLAP_PARAM_RESCAN_ALL))
+	if (h->isActive() && (flags & CLAP_PARAM_RESCAN_ALL))
 	{
 		throw std::logic_error{"clap_host_params.recan(CLAP_PARAM_RESCAN_ALL) was called while the plugin is active!"};
 	}
@@ -1265,7 +1318,7 @@ void ClapInstance::hostExtParamsRequestFlush(const clap_host* host)
 	qDebug() << "ClapInstance::hostExtParamsRequestFlush";
 	auto h = fromHost(host);
 
-	if (!h->isPluginActive() && hostExtThreadCheckIsMainThread(host))
+	if (!h->isActive() && hostExtThreadCheckIsMainThread(host))
 	{
 		// Perform the flush immediately
 		h->paramFlushOnMainThread();
@@ -1309,8 +1362,8 @@ void ClapInstance::setParamValueByHost(ClapParam& param, double value)
 
 	param.setValue(value);
 
-	m_appToEngineValueQueue.set(param.info().id, {param.info().cookie, value});
-	m_appToEngineValueQueue.producerDone();
+	m_hostToPluginValueQueue.set(param.info().id, {param.info().cookie, value});
+	m_hostToPluginValueQueue.producerDone();
 	hostExtParamsRequestFlush(host());
 }
 
@@ -1320,8 +1373,8 @@ void ClapInstance::setParamModulationByHost(ClapParam& param, double value)
 
 	param.setModulation(value);
 
-	m_appToEngineModQueue.set(param.info().id, {param.info().cookie, value});
-	m_appToEngineModQueue.producerDone();
+	m_hostToPluginModQueue.set(param.info().id, {param.info().cookie, value});
+	m_hostToPluginModQueue.producerDone();
 	hostExtParamsRequestFlush(host());
 }
 

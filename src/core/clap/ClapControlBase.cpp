@@ -41,6 +41,7 @@ namespace lmms
 ClapControlBase::ClapControlBase(Model* that, const QString& uri)
 {
 	qDebug() << "ClapControlBase::ClapControlBase";
+
 	auto manager = Engine::getClapManager();
 	m_info = manager->pluginInfo(uri).lock().get();
 	if (!m_info)
@@ -153,13 +154,14 @@ void ClapControlBase::loadSettings(const QDomElement& elem)
 void ClapControlBase::loadFile([[maybe_unused]] const QString& file)
 {
 	// TODO: load preset using clap_plugin_preset_load if supported by plugin
+	qDebug() << "ClapControlBase::loadFile called, but it is unimplemented.";
 }
 
 void ClapControlBase::reload()
 {
 	for (const auto& instance : m_instances)
 	{
-		instance->pluginRestart();
+		instance->restart();
 	}
 }
 

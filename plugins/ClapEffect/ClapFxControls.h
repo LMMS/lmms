@@ -63,8 +63,8 @@ private slots:
 	void changeControl();
 
 private:
-	auto settingsType() -> DataFile::Type override;
-	void setNameFromFile(const QString& name) override;
+	//auto settingsType() -> DataFile::Type override;
+	//void setNameFromFile(const QString& name) override;
 
 	friend class gui::ClapFxControlDialog;
 	friend class ClapEffect;

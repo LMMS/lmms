@@ -39,7 +39,7 @@ class ClapEffect : public Effect
 	Q_OBJECT
 
 public:
-	ClapEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* _key);
+	ClapEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 
 	//! Must be checked after ctor or reload
 	auto isValid() const -> bool { return m_controls.isValid(); }
@@ -51,8 +51,6 @@ public:
 	auto clapControls() const -> const ClapFxControls* { return &m_controls; }
 
 private:
-
-	void callHostIdle() { m_controls.callHostIdle(); }
 
 	ClapFxControls m_controls;
 	std::vector<sampleFrame> m_tempOutputSamples;

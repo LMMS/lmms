@@ -105,7 +105,7 @@ void ClapManager::initPlugins()
 		{
 			qDebug() << plugin->getDescriptor()->name;
 			auto& test = m_instances.emplace_back(std::make_shared<ClapInstance>(plugin.get()));
-			test->pluginLoad();
+			test->load();
 		}
 	}
 	*/
