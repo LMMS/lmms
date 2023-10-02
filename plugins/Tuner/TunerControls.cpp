@@ -36,8 +36,6 @@ TunerControls::TunerControls(Tuner* tuner)
 	, m_tuner(tuner)
 	, m_referenceFreqModel(440, 0, 999)
 {
-	QObject::connect(&m_referenceFreqModel, &gui::LcdSpinBoxModel::dataChanged, tuner,
-		[this, tuner] { tuner->m_referenceFrequency = m_referenceFreqModel.value(); });
 }
 
 auto TunerControls::saveSettings(QDomDocument& domDocument, QDomElement& domElement) -> void

@@ -38,30 +38,26 @@ class Tuner : public Effect
 {
 	Q_OBJECT
 public:
+	static constexpr auto WINDOW_SIZE = 8192;
+	static constexpr auto HOP_SIZE = WINDOW_SIZE / 4;
+
 	Tuner(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~Tuner() override;
 
 	auto processAudioBuffer(sampleFrame* buf, const fpp_t frames) -> bool override;
 	auto controls() -> EffectControls* override;
 
+	auto detectPitch(float* data, size_t size) -> float;
+
 signals:
 	auto frequencyCalculated(float frequency) -> void;
 
 private:
 	TunerControls m_tunerControls;
-	float m_referenceFrequency = 0;
-
-	const int m_windowSize = 8192;
-	const int m_hopSize = 128;
-	int m_numOutputsPerUpdate = 32;
-	int m_numOutputsCounter = 0;
-	int m_samplesCounter = 0;
-	float m_finalFrequency = 0.0f;
-	bool m_clearInputBuffer = false;
-
 	aubio_pitch_t* m_aubioPitch;
-	fvec_t* m_inputBuffer;
-	fvec_t* m_outputBuffer;
+	std::array<float, HOP_SIZE> m_aubioInput;
+	int m_numAubioInputFrames;
+	int m_numUpdatesPerDetection, m_numUpdates;
 	friend class TunerControls;
 };
 } // namespace lmms

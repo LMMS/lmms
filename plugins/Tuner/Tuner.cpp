@@ -25,8 +25,8 @@
 #include "Tuner.h"
 
 #include <cmath>
-#include <iostream>
 
+#include "ArrayVector.h"
 #include "embed.h"
 #include "plugin_export.h"
 
@@ -49,17 +49,15 @@ Plugin* PLUGIN_EXPORT lmms_plugin_main(Model* parent, void* _data)
 Tuner::Tuner(Model* parent, const Descriptor::SubPluginFeatures::Key* key)
 	: Effect(&tuner_plugin_descriptor, parent, key)
 	, m_tunerControls(this)
-	, m_referenceFrequency(440.0f)
-	, m_aubioPitch(new_aubio_pitch("default", m_windowSize, m_hopSize, Engine::audioEngine()->processingSampleRate()))
-	, m_inputBuffer(new_fvec(m_hopSize))
-	, m_outputBuffer(new_fvec(1))
+	, m_aubioPitch(new_aubio_pitch("default", WINDOW_SIZE, HOP_SIZE, Engine::audioEngine()->processingSampleRate()))
+	, m_numAubioInputFrames(0)
+	, m_numUpdatesPerDetection(5)
+	, m_numUpdates(0)
 {
 }
 
 Tuner::~Tuner()
 {
-	del_fvec(m_inputBuffer);
-	del_fvec(m_outputBuffer);
 	del_aubio_pitch(m_aubioPitch);
 }
 
@@ -67,45 +65,61 @@ auto Tuner::processAudioBuffer(sampleFrame* buf, const fpp_t frames) -> bool
 {
 	if (!isEnabled() || !isRunning()) { return false; }
 
-	float outSum = 0.0f;
-	for (fpp_t f = 0; f < frames; ++f)
+	auto outSum = 0.0f;
+	auto monoSignal = ArrayVector<float, DEFAULT_BUFFER_SIZE>(frames);
+	for (size_t frame = 0; frame < frames; ++frame)
 	{
-		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
+		monoSignal[frame] = std::accumulate(buf[frame].begin(), buf[frame].end(), 0.0f) / DEFAULT_CHANNELS;
+		outSum += buf[frame][0] * buf[frame][0] + buf[frame][1] * buf[frame][1];
 	}
 
-	if (outSum > 0.0f)
+	if (typeInfo<float>::isEqual(outSum, 0.0f))
 	{
-		for (int i = 0; i < frames; ++i)
+		checkGate(outSum / frames);
+		return false;
+	}
+
+	if (monoSignal.size() > HOP_SIZE)
+	{
+		for (int hop = 0; hop < monoSignal.size() / HOP_SIZE; ++hop)
 		{
-			if (m_samplesCounter % m_hopSize == 0 && m_samplesCounter > 0)
-			{
-				aubio_pitch_do(m_aubioPitch, m_inputBuffer, m_outputBuffer);
-				m_samplesCounter = 0;
-
-				const float frequency = fvec_get_sample(m_outputBuffer, 0);
-				m_finalFrequency += (frequency - m_finalFrequency) / ++m_numOutputsCounter;
-
-				if (m_numOutputsCounter % m_numOutputsPerUpdate == 0)
-				{
-					emit frequencyCalculated(m_finalFrequency);
-					m_finalFrequency = 0.0f;
-					m_numOutputsCounter = 0;
-				}
-			}
-
-			fvec_set_sample(m_inputBuffer, (buf[i][0] + buf[i][1]) * 0.5f, m_samplesCounter++);
+			detectPitch(monoSignal.begin() + hop * HOP_SIZE, HOP_SIZE);
 		}
-
-		if (!m_clearInputBuffer) { m_clearInputBuffer = true; }
 	}
-	else if (m_clearInputBuffer)
+	else if (m_numAubioInputFrames + monoSignal.size() <= HOP_SIZE)
 	{
-		fvec_zeros(m_inputBuffer);
-		m_clearInputBuffer = false;
+		std::copy(monoSignal.begin(), monoSignal.end(), m_aubioInput.begin() + m_numAubioInputFrames);
+		m_numAubioInputFrames += monoSignal.size();
+
+		if (m_numAubioInputFrames == HOP_SIZE)
+		{
+			detectPitch(m_aubioInput.data(), m_aubioInput.size());
+			m_numAubioInputFrames = 0;
+		}
 	}
+	else if (monoSignal.size() == HOP_SIZE) { detectPitch(monoSignal.data(), monoSignal.size()); }
 
 	checkGate(outSum / frames);
 	return isRunning();
+}
+
+auto Tuner::detectPitch(float* data, size_t size) -> float
+{
+	float pitchOut = 0.0f;
+
+	auto in = fvec_t{static_cast<uint_t>(size), data};
+	auto out = fvec_t{1, &pitchOut};
+
+	aubio_pitch_do(m_aubioPitch, &in, &out);
+
+	// Only update the display periodically to allow stabilization on a value first
+	if (++m_numUpdates % m_numUpdatesPerDetection == 0)
+	{
+		emit frequencyCalculated(pitchOut);
+		m_numUpdates = 0;
+	}
+
+	return pitchOut;
 }
 
 auto Tuner::controls() -> EffectControls*
