@@ -40,9 +40,6 @@ class TunerControlDialog : public EffectControlDialog
 public:
 	enum class NoteName
 	{
-		A,
-		ASharp,
-		B,
 		C,
 		CSharp,
 		D,
@@ -51,7 +48,10 @@ public:
 		F,
 		FSharp,
 		G,
-		GSharp
+		GSharp,
+		A,
+		ASharp,
+		B
 	};
 
 	TunerControlDialog(TunerControls* controls);
@@ -62,7 +62,6 @@ private:
 	LcdWidget* m_centsWidget;
 	LcdWidget* m_freqWidget;
 	QLabel* m_noteLabel;
-	QLabel* m_octaveLabel;
 	QLabel* m_centsLabel;
 	QLabel* m_frequencyLabel;
 	friend class TunerControls;

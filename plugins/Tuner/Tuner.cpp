@@ -51,7 +51,7 @@ Tuner::Tuner(Model* parent, const Descriptor::SubPluginFeatures::Key* key)
 	, m_tunerControls(this)
 	, m_aubioPitch(new_aubio_pitch("default", WINDOW_SIZE, HOP_SIZE, Engine::audioEngine()->processingSampleRate()))
 	, m_numAubioInputFrames(0)
-	, m_numUpdatesPerDetection(5)
+	, m_numUpdatesPerDetection(10)
 	, m_numUpdates(0)
 {
 }

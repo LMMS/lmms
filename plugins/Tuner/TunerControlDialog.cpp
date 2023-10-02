@@ -51,16 +51,12 @@ TunerControlDialog::TunerControlDialog(TunerControls* controls)
 	m_noteLabel = new QLabel();
 	m_noteLabel->setFont(QFont{"Arial", 32, QFont::Bold});
 
-	m_octaveLabel = new QLabel();
-	m_octaveLabel->setFont(QFont{"Arial", 8, QFont::Bold});
-
 	m_centsLabel = new QLabel();
 	m_centsLabel->setFont(QFont{"Arial", 16, QFont::Bold});
 
 	auto noteLayout = new QHBoxLayout();
 	noteLayout->addStretch(1);
 	noteLayout->addWidget(m_noteLabel, 0, Qt::AlignRight);
-	noteLayout->addWidget(m_octaveLabel);
 	noteLayout->addWidget(m_centsLabel, 1);
 
 	auto referenceFreqSpinBox = new LcdSpinBox(3, this, tr("Reference"));
@@ -79,26 +75,26 @@ TunerControlDialog::TunerControlDialog(TunerControls* controls)
 
 auto TunerControlDialog::frequencyCalculated(float frequency) -> void
 {
-	// A4 = referenceFrequency
-	const float referenceFrequency = static_cast<TunerControls*>(m_effectControls)->m_referenceFreqModel.value();
-	const int centsFromReference = std::round(1200.0f * std::log2f(frequency / referenceFrequency));
+	const auto referenceFrequency = static_cast<TunerControls*>(m_effectControls)->m_referenceFreqModel.value();
 
-	const int octavesFromReference = std::round(centsFromReference / 1200.0f);
-	const int octaveOfNote = 4 + octavesFromReference;
+	auto closestMidiNote = static_cast<int>(69 + 12 * std::log2(frequency / referenceFrequency));
+	auto estimatedNote = static_cast<NoteName>(closestMidiNote % 12);
 
-	int centsRemaining = centsFromReference - (octavesFromReference * 1200);
-	int semitonesFromReference = std::round(centsRemaining / 100);
-	int centsOfNote = centsRemaining - (semitonesFromReference * 100);
+	auto closestMidiNoteFrequency = referenceFrequency * std::exp2((closestMidiNote - 69) / 12.0f);
+	auto estimatedCentDifference = static_cast<int>(std::round(1200 * std::log2(frequency / closestMidiNoteFrequency)));
 
-	if (semitonesFromReference < 0) { semitonesFromReference += 12; }
-	auto note = noteToString(static_cast<NoteName>(semitonesFromReference));
-	m_noteLabel->setText(note);
+	// Roll over cents to get smaller cent values
+	if (100 - std::abs(estimatedCentDifference) < std::abs(estimatedCentDifference))
+	{
+		auto increaseNote = estimatedCentDifference > 0;
+		estimatedNote = static_cast<NoteName>((static_cast<int>(estimatedNote) + (increaseNote ? 1 : -1)) % 12);
+		estimatedCentDifference = increaseNote ? estimatedCentDifference - 100 : 100 - estimatedCentDifference;
+	}
 
-	// Only give back the octave if it is in a useful range
-	if (octaveOfNote >= -1 && octaveOfNote <= 8) { m_octaveLabel->setText(QString::number(octaveOfNote)); };
+	m_noteLabel->setText(noteToString(estimatedNote));
+	m_centsLabel->setText(QString::number(estimatedCentDifference) + "ct");
 
-	m_centsLabel->setText((centsOfNote >= 0 ? "+" : "") + QString::number(centsOfNote) + "ct");
-	auto centDistance = std::abs(centsOfNote);
+	auto centDistance = std::abs(estimatedCentDifference);
 	if (centDistance >= 0 && centDistance <= 10) { m_centsLabel->setStyleSheet("QLabel { color : green; }"); }
 	else if (centDistance > 10 && centDistance <= 30) { m_centsLabel->setStyleSheet("QLabel { color : yellow; }"); }
 	else if (centDistance > 30) { m_centsLabel->setStyleSheet("QLabel { color : red; }"); }
@@ -136,4 +132,4 @@ auto TunerControlDialog::noteToString(NoteName note) const -> const char*
 		return "";
 	};
 }
-} // namespace lmms
+} // namespace lmms::gui
