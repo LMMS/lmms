@@ -1389,7 +1389,7 @@ SampleBuffer * SampleBuffer::resample(const sample_rate_t srcSR, const sample_ra
 	}
 	else
 	{
-		printf("Error: src_new() failed in sample_buffer.cpp!\n");
+		printf("Error: src_new() failed in SampleBuffer.cpp!\n");
 	}
 	dstSB->update();
 	return dstSB;
@@ -1612,7 +1612,7 @@ SampleBuffer::handleState::handleState(bool varyingPitch, int interpolationMode)
 
 	if ((m_resamplingData = src_new(interpolationMode, DEFAULT_CHANNELS, &error)) == nullptr)
 	{
-		qDebug("Error: src_new() failed in sample_buffer.cpp!\n");
+		qDebug("Error: src_new() failed in SampleBuffer.cpp!\n");
 	}
 }
 
