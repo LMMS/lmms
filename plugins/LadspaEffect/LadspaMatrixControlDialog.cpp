@@ -55,6 +55,10 @@ LadspaMatrixControlDialog::LadspaMatrixControlDialog(LadspaControls * ladspaCont
 {
 	QVBoxLayout * mainLayout = new QVBoxLayout(this);
 
+	QLabel * label = new QLabel(ladspaControls->effect()->displayName(), this);
+	label->setObjectName("ladspaheader");
+	mainLayout->addWidget(label);
+
 	m_scrollArea = new QScrollArea(this);
 	m_scrollArea->setWidgetResizable(true);
 	m_scrollArea->setFrameShape(QFrame::NoFrame);
