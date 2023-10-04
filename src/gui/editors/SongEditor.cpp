@@ -963,9 +963,9 @@ void SongEditor::zoomToAction(ZoomAction zAction)
 			if (so.isEmpty())
 			{
 				m_zoomInfo = TextFloat::displayMessage(tr("Info"),
-													  tr("There is no selection active. \n"
+													   tr("There is no selection active. \n"
 														  "Please, select some clips to apply zoom to selection."),
-													  embed::getIconPixmap("whatsthis"), 4000);
+													   embed::getIconPixmap("whatsthis"), 4000);
 				return;
 			}
 			else
