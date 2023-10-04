@@ -33,8 +33,6 @@
 
 #include <QApplication>
 #include <QThread>
-#include <QDomDocument>
-#include <QDomElement>
 #include <QDebug>
 
 #include <algorithm>
@@ -126,7 +124,6 @@ ClapInstance::ClapInstance(const ClapPluginInfo* pluginInfo, Model* parent)
 	m_pluginState = PluginState::None;
 	setHost();
 
-	m_process.steady_time = -1; // Not supported yet
 	m_process.transport = ClapManager::transport();
 
 	start();
@@ -664,7 +661,7 @@ auto ClapInstance::deactivate() -> bool
 auto ClapInstance::processBegin(std::uint32_t frames) -> bool
 {
 	m_process.frames_count = frames;
-	//m_process.steady_time = m_steadyTime;
+	m_process.steady_time = m_steadyTime;
 	return false;
 }
 
@@ -775,8 +772,9 @@ auto ClapInstance::process(std::uint32_t frames) -> bool
 
 auto ClapInstance::processEnd(std::uint32_t frames) -> bool
 {
+	m_steadyTime += frames;
 	m_process.frames_count = frames;
-	//m_process.steady_time = m_steadyTime;
+	m_process.steady_time = m_steadyTime;
 	return false;
 }
 

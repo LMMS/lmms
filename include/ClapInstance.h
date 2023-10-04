@@ -250,7 +250,7 @@ private:
 	clap_host m_host;
 	std::queue<std::function<bool()>> m_idleQueue;
 
-	//int64_t m_steadyTime = 0;
+	std::int64_t m_steadyTime = 0;
 
 	/////////////////////////////////////////
 	// Plugin
