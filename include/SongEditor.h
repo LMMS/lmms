@@ -64,6 +64,13 @@ public:
 		Select
 	};
 
+	enum class ZoomAction
+	{
+		Loop,
+		Selection,
+		FullSong
+	};
+
 	SongEditor( Song * song );
 	~SongEditor() override = default;
 
@@ -125,6 +132,9 @@ private:
 
 	int trackIndexFromSelectionPoint(int yPos);
 	int indexOfTrackView(const TrackView* tv);
+
+	void zoomToAction(enum ZoomAction);
+	TextFloat* m_zoomInfo;
 
 	Song * m_song;
 
