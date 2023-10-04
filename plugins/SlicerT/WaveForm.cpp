@@ -145,7 +145,9 @@ void WaveForm::drawEditor()
 
 	// draw waveform
 	brush.setPen(m_waveformColor);
-	m_currentSample.visualize(brush, QRect(0, 0, m_editorWidth, m_editorHeight), startFrame, endFrame);
+	float zoomOffset = ((float)m_editorHeight - m_zoomLevel * m_editorHeight) / 2;
+	m_currentSample.visualize(
+		brush, QRect(0, zoomOffset, m_editorWidth, m_zoomLevel * m_editorHeight), startFrame, endFrame);
 
 	// draw slicepoints
 	brush.setPen(QPen(m_sliceColor, 2));
@@ -188,6 +190,7 @@ void WaveForm::mousePressEvent(QMouseEvent* me)
 	{
 		m_seekerStart = 0;
 		m_seekerEnd = 1;
+		m_zoomLevel = 1;
 		return;
 	}
 
@@ -304,6 +307,16 @@ void WaveForm::mouseDoubleClickEvent(QMouseEvent* me)
 	}
 
 	std::sort(m_slicePoints.begin(), m_slicePoints.end());
+}
+
+void WaveForm::wheelEvent(QWheelEvent* _we)
+{
+	// m_zoomLevel = _we-> / 360.0f * 2.0f;
+	m_zoomLevel += _we->angleDelta().y() / 360.0f * m_zoomSensitivity;
+	m_zoomLevel = std::max(0.0f, m_zoomLevel);
+
+	drawEditor();
+	update();
 }
 
 void WaveForm::paintEvent(QPaintEvent* pe)

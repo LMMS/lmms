@@ -48,6 +48,7 @@ protected:
 	virtual void mouseReleaseEvent(QMouseEvent* me);
 	virtual void mouseMoveEvent(QMouseEvent* me);
 	virtual void mouseDoubleClickEvent(QMouseEvent* me);
+	virtual void wheelEvent(QWheelEvent* _we);
 
 	virtual void paintEvent(QPaintEvent* pe);
 
@@ -81,6 +82,7 @@ private:
 	// interaction vars
 	float m_distanceForClick = 0.03f;
 	float m_minSeekerDistance = 0.13f;
+	float m_zoomSensitivity = 0.5f;
 
 	// dragging vars
 	enum class m_draggingTypes
@@ -103,6 +105,9 @@ private:
 	float m_noteCurrent;
 	float m_noteStart;
 	float m_noteEnd;
+
+	// editor vars
+	float m_zoomLevel = 1.0f;
 
 	// pixmaps
 	QPixmap m_sliceArrow;
