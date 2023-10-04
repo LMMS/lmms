@@ -129,6 +129,20 @@ public:
 		if (m_voice) { m_voice->setFrequency(_pitch); }
 	}
 
+	// ModalBar updates
+	inline void setVibratoGain(const StkFloat _control8)
+	{
+		// bug in stk, Control Number 8 and 1 swapped in ModalBar
+		// we send the control number for stick direct mix instead
+		if (m_voice) { m_voice->controlChange(8, _control8); }
+	}
+
+	inline void setVibratoFreq(const StkFloat _control11)
+	{
+		if (m_voice) { m_voice->controlChange(11, _control11); }
+	}
+
+	// Tubular Bells updates
 	inline void setADSR(const StkFloat _control128)
 	{
 		if (m_voice) { m_voice->controlChange(128, _control128); }
