@@ -161,6 +161,7 @@ void PhaseVocoder::updateParams(float newRatio)
 // https://sethares.engr.wisc.edu/vocoders/phasevocoder.html
 // https://dsp.stackexchange.com/questions/40101/audio-time-stretching-without-pitch-shifting/40367#40367
 // https://www.guitarpitchshifter.com/
+// https://en.wikipedia.org/wiki/Window_function
 void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 {
 	// declare vars
@@ -257,9 +258,17 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 		float outIndex = windowNum * m_outStepSize + j;
 		if (outIndex >= frames()) { break; }
 
-		// hann windowing
-		float window = -0.5f * cos(2. * F_PI * (float)j / (float)s_windowSize) + 0.5f;
-		m_processedBuffer[outIndex] += window * m_IFFTReconstruction[j] / (s_windowSize / 2.0f * s_overSampling);
+		// blackman-harris window
+		float a0 = 0.35875f;
+		float a1 = 0.48829f;
+		float a2 = 0.14128f;
+		float a3 = 0.01168f;
+
+		float piN2 = 2.0f * F_PI * j;
+		float window = a0 - (a1 * cos(piN2 / s_windowSize)) + (a2 * cos(2.0f * piN2 / s_windowSize)) - (a3 * cos(3.0f * piN2));
+
+		// inverse fft magnitudes are windowsSize times bigger
+		m_processedBuffer[outIndex] += window * (m_IFFTReconstruction[j] / s_windowSize / s_overSampling);
 	}
 }
 
