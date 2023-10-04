@@ -33,6 +33,8 @@
 
 #include <QApplication>
 #include <QThread>
+#include <QDomDocument>
+#include <QDomElement>
 #include <QDebug>
 
 #include <algorithm>
@@ -102,13 +104,24 @@ namespace
 	}
 }
 
+//! Container for everything required to store MIDI events going to the plugin
+struct MidiInputEvent
+{
+	MidiEvent ev;
+	TimePos time;
+	f_cnt_t offset;
+};
+
 
 ////////////////////////////////
 // ClapInstance
 ////////////////////////////////
 
 ClapInstance::ClapInstance(const ClapPluginInfo* pluginInfo, Model* parent)
-	: LinkedModelGroup{parent}, m_pluginInfo{pluginInfo}
+	: LinkedModelGroup{parent}
+	, m_pluginInfo{pluginInfo}
+	, m_midiInputBuf{m_maxMidiInputEvents}
+	, m_midiInputReader{m_midiInputBuf}
 {
 	m_pluginState = PluginState::None;
 	setHost();
@@ -117,20 +130,6 @@ ClapInstance::ClapInstance(const ClapPluginInfo* pluginInfo, Model* parent)
 	m_process.transport = ClapManager::transport();
 
 	start();
-}
-
-ClapInstance::ClapInstance(ClapInstance&& other) noexcept
-	: LinkedModelGroup(other.parentModel()),
-	m_pluginInfo(std::move(other.m_pluginInfo)),
-	m_pluginIssues(std::move(other.m_pluginIssues))
-{
-	assert(false && "Shouldn't see this");
-	qDebug() << "TODO: Move constructor not fully implemented yet";
-	m_idleQueue = std::move(other.m_idleQueue);
-	m_plugin = std::exchange(other.m_plugin, nullptr);
-
-	// Update the host's host_data pointer
-	setHost();
 }
 
 ClapInstance::~ClapInstance()
@@ -150,6 +149,26 @@ void ClapInstance::copyModelsFromCore()
 		setParamValueByHost(*param, param->model()->value<float>());
 	}
 	*/
+
+	// TODO: Handle parameter events similar to midi input? (with ringbuffer)
+
+	if (!hasNoteInput()) { return; } // TODO: Check for MIDI event / note event support instead?
+
+	while (m_midiInputReader.read_space() > 0)
+	{
+		const auto [event, _, offset] = m_midiInputReader.read(1)[0];
+		switch (event.type())
+		{
+			case MidiNoteOff:
+				processNoteOff(offset, event.channel(), event.key(), event.velocity());
+				break;
+			case MidiNoteOn:
+				processNoteOn(offset, event.channel(), event.key(), event.velocity());
+				break;
+			default:
+				break;
+		}
+	}
 }
 
 void ClapInstance::copyModelsToCore()
@@ -218,24 +237,30 @@ void ClapInstance::run(fpp_t frames)
 
 void ClapInstance::handleMidiInputEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset)
 {
-	switch (event.type())
+	// TODO: Use MidiInputEvent from LV2 code, moved to common location?
+
+	// TODO: Early return if plugin does not support midi input or note events
+	if (!hasNoteInput()) { return; }
+
+	const auto ev = MidiInputEvent{event, time, offset};
+
+	// Acquire lock and spin
+	while (m_ringLock.test_and_set(std::memory_order_acquire)) {}
+
+	const auto written = m_midiInputBuf.write(&ev, 1);
+
+	m_ringLock.clear(std::memory_order_release);
+
+	if (written != 1)
 	{
-		case MidiEventTypes::MidiNoteOff:
-			processNoteOff(offset, event.channel(), event.key(), event.velocity());
-			break;
-		case MidiEventTypes::MidiNoteOn:
-			processNoteOn(offset, event.channel(), event.key(), event.velocity());
-			break;
-		// TODO: Implement other midi events
-		default:
-			break;
+		qWarning("MIDI ringbuffer is too small! Discarding MIDI event.");
 	}
 }
 
 auto ClapInstance::hasNoteInput() const -> bool
 {
-	//
-	return false;
+	// TODO: Check for midi in support?
+	return info().type() == Plugin::Type::Instrument;
 }
 
 void ClapInstance::destroy()
@@ -650,7 +675,7 @@ void ClapInstance::processNoteOff(int sampleOffset, int channel, int key, int ve
 	clap_event_note ev;
 	ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
 	ev.header.type = CLAP_EVENT_NOTE_OFF;
-	ev.header.time = sampleOffset;
+	ev.header.time = static_cast<std::uint32_t>(sampleOffset);
 	ev.header.flags = 0;
 	ev.header.size = sizeof(ev);
 	ev.port_index = 0;
@@ -669,7 +694,7 @@ void ClapInstance::processNoteOn(int sampleOffset, int channel, int key, int vel
 	clap_event_note ev;
 	ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
 	ev.header.type = CLAP_EVENT_NOTE_ON;
-	ev.header.time = sampleOffset;
+	ev.header.time = static_cast<std::uint32_t>(sampleOffset);
 	ev.header.flags = 0;
 	ev.header.size = sizeof(ev);
 	ev.port_index = 0;
@@ -683,8 +708,6 @@ void ClapInstance::processNoteOn(int sampleOffset, int channel, int key, int vel
 
 auto ClapInstance::process(std::uint32_t frames) -> bool
 {
-	//m_steadyTime += frames;
-
 	assert(isAudioThread());
 	if (!m_plugin) { return false; }
 

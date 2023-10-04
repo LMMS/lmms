@@ -36,10 +36,12 @@
 #include "Plugin.h"
 #include "MidiEvent.h"
 #include "TimePos.h"
+#include "../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
 
 #include <memory>
 #include <queue>
 #include <functional>
+#include <atomic>
 #include <cassert>
 #include <cstddef>
 
@@ -76,7 +78,7 @@ public:
 	ClapInstance(const ClapPluginInfo* pluginInfo, Model* parent);
 	ClapInstance(const ClapInstance&) = delete;
 	ClapInstance& operator=(const ClapInstance&) = delete;
-	ClapInstance(ClapInstance&& other) noexcept;
+	ClapInstance(ClapInstance&& other) noexcept = delete;
 	ClapInstance& operator=(ClapInstance&& rhs) noexcept = delete;
 	~ClapInstance() override;
 
@@ -351,6 +353,19 @@ private:
 	clap::helpers::EventList m_evIn;
 	clap::helpers::EventList m_evOut;
 	clap_process m_process{};
+
+	/**
+	 * MIDI
+	 */
+	// many things here may be moved into the `Instrument` class
+	constexpr const static std::size_t m_maxMidiInputEvents = 1024;
+	//! Spinlock for the MIDI ringbuffer (for MIDI events going to the plugin)
+	std::atomic_flag m_ringLock = ATOMIC_FLAG_INIT;
+
+	//! MIDI ringbuffer (for MIDI events going to the plugin)
+	ringbuffer_t<struct MidiInputEvent> m_midiInputBuf;
+	//! MIDI ringbuffer reader
+	ringbuffer_reader_t<struct MidiInputEvent> m_midiInputReader;
 
 	/**
 	 * Parameter update queues
