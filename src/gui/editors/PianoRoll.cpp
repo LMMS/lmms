@@ -1763,11 +1763,8 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				return;
 			}
 			// left button??
-			// create or play note when not clicking off current
-			// selection
 			else if (me->button() == Qt::LeftButton &&
-							m_editMode == EditMode::Draw &&
-							(!isSelection() || it != notes.rend()))
+							m_editMode == EditMode::Draw)
 			{
 				// whether this action creates new note(s) or not
 				bool is_new_note = false;
@@ -1938,7 +1935,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 							(!isSelection() || it != notes.rend())) ||
 							m_editMode == EditMode::Erase)
 			{
-				// erase single note
+				// erase single note when not clicking off selection
 				m_mouseDownRight = true;
 				if (it != notes.rend())
 				{
@@ -1947,10 +1944,8 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					Engine::getSong()->setModified();
 				}
 			}
-			else if ((me->button() == Qt::LeftButton &&
-							m_editMode == EditMode::Draw) ||
-							(me->buttons() == Qt::RightButton &&
-							m_editMode == EditMode::Draw))
+			else if (me->buttons() == Qt::RightButton && 
+							m_editMode == EditMode::Draw)
 			{
 				// unselect when clicking off selection
 				clearSelectedNotes();
