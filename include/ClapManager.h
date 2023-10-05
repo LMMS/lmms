@@ -85,6 +85,7 @@ public:
 	static void setPlaying(bool isPlaying);
 	static void setRecording(bool isRecording);
 	static void setLooping(bool isLooping);
+	static void setBeatPosition();
 	static void setTimePosition(int elapsedMilliseconds);
 	static void setTempo(bpm_t tempo);
 	static void setTimeSignature(int num, int denom);

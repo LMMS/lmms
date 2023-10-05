@@ -519,7 +519,7 @@ auto ClapInstance::init() -> bool
 
 		// Missing a required port type that LMMS supports - i.e. an effect where the only input is surround sound
 		qWarning() << "An" << (isInput ? "input" : "output") << "port is required, but CLAP plugin has none that are usable";
-		m_pluginIssues.emplace_back(PluginIssueType::UnknownPortType);
+		m_pluginIssues.emplace_back(PluginIssueType::UnknownPortType); // TODO: Add better entry to PluginIssueType
 		return nullptr;
 	};
 
@@ -545,25 +545,32 @@ auto ClapInstance::init() -> bool
 	m_process.audio_outputs_count = m_audioPortsOut.size();
 	m_audioOutActive = m_audioPortOutActive ? &m_audioOut[m_audioPortOutActive->index] : nullptr;
 
-	if (needInputPort && isMonoInput() && m_audioPortInActive->type != AudioPortType::Mono)
+	if (needInputPort)
 	{
-		setPluginState(PluginState::LoadedWithError);
-		return false;
+		if (isMonoInput() && m_audioPortInActive->type != AudioPortType::Mono)
+		{
+			setPluginState(PluginState::LoadedWithError);
+			return false;
+		}
+		if (!isMonoInput() && m_audioPortInActive->type != AudioPortType::Stereo)
+		{
+			setPluginState(PluginState::LoadedWithError);
+			return false;
+		}
 	}
-	if (needInputPort && !isMonoInput() && m_audioPortInActive->type != AudioPortType::Stereo)
+
+	if (needOutputPort)
 	{
-		setPluginState(PluginState::LoadedWithError);
-		return false;
-	}
-	if (needOutputPort && isMonoOutput() && m_audioPortOutActive->type != AudioPortType::Mono)
-	{
-		setPluginState(PluginState::LoadedWithError);
-		return false;
-	}
-	if (needOutputPort && !isMonoOutput() && m_audioPortOutActive->type != AudioPortType::Stereo)
-	{
-		setPluginState(PluginState::LoadedWithError);
-		return false;
+		if (isMonoOutput() && m_audioPortOutActive->type != AudioPortType::Mono)
+		{
+			setPluginState(PluginState::LoadedWithError);
+			return false;
+		}
+		if (!isMonoOutput() && m_audioPortOutActive->type != AudioPortType::Stereo)
+		{
+			setPluginState(PluginState::LoadedWithError);
+			return false;
+		}
 	}
 
 	// Now initialize params and add param models
@@ -781,15 +788,15 @@ auto ClapInstance::processEnd(std::uint32_t frames) -> bool
 void ClapInstance::generatePluginInputEvents()
 {
 	m_hostToPluginValueQueue.consume(
-		[this](clap_id param_id, const HostToPluginParamQueueValue& value) {
+		[this](clap_id paramId, const HostToPluginParamQueueValue& value) {
 			clap_event_param_value ev;
 			ev.header.time = 0;
 			ev.header.type = CLAP_EVENT_PARAM_VALUE;
 			ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
 			ev.header.flags = 0;
 			ev.header.size = sizeof(ev);
-			ev.param_id = param_id;
-			ev.cookie = m_hostShouldProvideParamCookie ? value.cookie : nullptr;
+			ev.param_id = paramId;
+			ev.cookie = s_hostShouldProvideParamCookie ? value.cookie : nullptr;
 			ev.port_index = 0;
 			ev.key = -1;
 			ev.channel = -1;
@@ -798,15 +805,15 @@ void ClapInstance::generatePluginInputEvents()
 			m_evIn.push(&ev.header);
 		});
 
-	m_hostToPluginModQueue.consume([this](clap_id param_id, const HostToPluginParamQueueValue& value) {
+	m_hostToPluginModQueue.consume([this](clap_id paramId, const HostToPluginParamQueueValue& value) {
 		clap_event_param_mod ev;
 		ev.header.time = 0;
 		ev.header.type = CLAP_EVENT_PARAM_MOD;
 		ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
 		ev.header.flags = 0;
 		ev.header.size = sizeof(ev);
-		ev.param_id = param_id;
-		ev.cookie = m_hostShouldProvideParamCookie ? value.cookie : nullptr;
+		ev.param_id = paramId;
+		ev.cookie = s_hostShouldProvideParamCookie ? value.cookie : nullptr;
 		ev.port_index = 0;
 		ev.key = -1;
 		ev.channel = -1;
@@ -818,6 +825,7 @@ void ClapInstance::generatePluginInputEvents()
 
 void ClapInstance::handlePluginOutputEvents()
 {
+	// TODO: Are LMMS models being updated with values here?
 	for (std::uint32_t i = 0; i < m_evOut.size(); ++i)
 	{
 		auto h = m_evOut.get(i);
@@ -851,6 +859,7 @@ void ClapInstance::handlePluginOutputEvents()
 					throw std::logic_error("The plugin sent END_ADJUST without a preceding BEGIN_ADJUST");
 				}
 				isAdj = false;
+
 				PluginToHostParamQueueValue v;
 				v.hasGesture = true;
 				v.isBegin = false;
@@ -1078,6 +1087,7 @@ void ClapInstance::setHost()
 
 void ClapInstance::hostPushToIdleQueue(std::function<bool()>&& functor)
 {
+	// TODO: Remove this method and m_idleQueue?
 	m_idleQueue.push(std::move(functor));
 }
 
@@ -1327,7 +1337,7 @@ void ClapInstance::hostExtParamsRescan(const clap_host* host, std::uint32_t flag
 	if (flags & CLAP_PARAM_RESCAN_ALL) { h->paramsChanged(); }
 }
 
-void ClapInstance::hostExtParamsClear(const clap_host* host, clap_id param_id, clap_param_clear_flags flags)
+void ClapInstance::hostExtParamsClear(const clap_host* host, clap_id paramId, clap_param_clear_flags flags)
 {
 	assert(isMainThread());
 	qDebug() << "ClapInstance::hostExtParamsClear";

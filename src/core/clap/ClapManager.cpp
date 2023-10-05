@@ -29,6 +29,7 @@
 #include <algorithm>
 #include <filesystem>
 #include <string_view>
+#include <type_traits>
 
 #include <cstdlib>
 #include <cstring>
@@ -65,6 +66,28 @@ namespace
 		}
 #endif
 		return std::filesystem::path{dir};
+	}
+
+	template<std::size_t mask, typename T>
+	inline void SetBit(T& number, bool value) noexcept
+	{
+		if constexpr (std::is_signed_v<T>)
+		{
+			assert(number >= 0 && "left-shifting negative number is UB");
+		}
+		constexpr auto bitPos = [=]() {
+			// constexpr log2
+			static_assert(mask && !(mask & (mask - 1)), "mask must have single bit set");
+			unsigned pos = 0;
+			auto x = mask;
+			while (x != 0) {
+				x >>= 1;
+				++pos;
+			}
+			return pos - 1;
+		}();
+		static_assert(bitPos < sizeof(T) * 8, "mask is too big for T");
+		number = (number & ~mask) | (static_cast<T>(value) << bitPos);
 	}
 }
 
@@ -320,12 +343,12 @@ void ClapManager::updateTransport()
 
 	setPlaying(song->isPlaying());
 	setRecording(song->isRecording());
-	//setLooping(song->isLooping()); // TODO
+	//setLooping(song->isLooping());
 
+	// TODO: Pre-roll, isLooping, tempo_inc
+
+	setBeatPosition();
 	setTimePosition(song->getMilliseconds());
-
-	// TODO: Find a way to get the absolute beat within the song in order to support beats timeline
-	s_transport.flags &= ~static_cast<std::uint32_t>(CLAP_TRANSPORT_HAS_BEATS_TIMELINE);
 
 	setTempo(song->getTempo());
 	setTimeSignature(song->getTimeSigModel().getNumerator(), song->getTimeSigModel().getDenominator());
@@ -333,17 +356,44 @@ void ClapManager::updateTransport()
 
 void ClapManager::setPlaying(bool isPlaying)
 {
-	s_transport.flags |= isPlaying ? CLAP_TRANSPORT_IS_PLAYING : 0;
+	SetBit<CLAP_TRANSPORT_IS_PLAYING>(s_transport.flags, isPlaying);
 }
 
 void ClapManager::setRecording(bool isRecording)
 {
-	s_transport.flags |= isRecording ? CLAP_TRANSPORT_IS_RECORDING : 0;
+	SetBit<CLAP_TRANSPORT_IS_RECORDING>(s_transport.flags, isRecording);
 }
 
 void ClapManager::setLooping(bool isLooping)
 {
-	s_transport.flags |= isLooping ? CLAP_TRANSPORT_IS_LOOP_ACTIVE : 0;
+	SetBit<CLAP_TRANSPORT_IS_LOOP_ACTIVE>(s_transport.flags, isLooping);
+	// TODO: loop_start_* and loop_end_*
+}
+
+void ClapManager::setBeatPosition()
+{
+	const Song* song = Engine::getSong();
+	if (!song) { return; }
+
+	s_transport.flags |= static_cast<std::uint32_t>(CLAP_TRANSPORT_HAS_BEATS_TIMELINE);
+
+	// Logic taken from TimeDisplayWidget.cpp
+	// NOTE: If the time signature changes during the song, this info may be misleading
+	const auto tick = song->getPlayPos().getTicks();
+	const auto ticksPerBar = song->ticksPerBar();
+	const auto timeSigNum = song->getTimeSigModel().getNumerator();
+	const auto barsElapsed = static_cast<int>(tick / ticksPerBar); // zero-based
+
+	s_transport.bar_number = barsElapsed;
+
+	const auto barsElapsedInBeats = (barsElapsed * timeSigNum) + 1; // one-based
+
+	s_transport.bar_start = barsElapsedInBeats << 31; // same as multiplication by CLAP_BEATTIME_FACTOR
+
+	const auto beatWithinBar = 1.0 * (tick % ticksPerBar) / (ticksPerBar / timeSigNum); // zero-based
+	const auto beatsElapsed = barsElapsedInBeats + beatWithinBar; // one-based
+
+	s_transport.song_pos_beats = std::lround(CLAP_BEATTIME_FACTOR * beatsElapsed);
 }
 
 void ClapManager::setTimePosition(int elapsedMilliseconds)
@@ -356,6 +406,7 @@ void ClapManager::setTempo(bpm_t tempo)
 {
 	s_transport.flags |= static_cast<std::uint32_t>(CLAP_TRANSPORT_HAS_TEMPO);
 	s_transport.tempo  = static_cast<double>(tempo);
+	// TODO: tempo_inc
 }
 
 void ClapManager::setTimeSignature(int num, int denom)

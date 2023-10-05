@@ -232,7 +232,7 @@ private:
 	static auto hostExtThreadCheckIsMainThread(const clap_host* host) -> bool;
 	static auto hostExtThreadCheckIsAudioThread(const clap_host* host) -> bool;
 	static void hostExtParamsRescan(const clap_host* host, std::uint32_t flags);
-	static void hostExtParamsClear(const clap_host* host, clap_id param_id, clap_param_clear_flags flags);
+	static void hostExtParamsClear(const clap_host* host, clap_id paramId, clap_param_clear_flags flags);
 	static void hostExtParamsRequestFlush(const clap_host* host);
 	static void hostExtLatencyChanged([[maybe_unused]] const clap_host* host);
 
@@ -408,7 +408,7 @@ private:
 
 	std::unordered_map<clap_id, bool> m_isAdjustingParameter;
 
-	static constexpr bool m_hostShouldProvideParamCookie = true;
+	static constexpr bool s_hostShouldProvideParamCookie = true;
 
 	/**
 	 * Scheduling

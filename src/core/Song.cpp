@@ -350,6 +350,7 @@ void Song::processNextBuffer()
 			m_vstSyncController.update();
 
 #ifdef LMMS_HAVE_CLAP
+			ClapManager::setBeatPosition();
 			ClapManager::setTimePosition(getMilliseconds());
 #endif
 		}
@@ -714,6 +715,7 @@ void Song::stop()
 
 #ifdef LMMS_HAVE_CLAP
 	ClapManager::setPlaying(m_exporting);
+	ClapManager::setBeatPosition();
 	ClapManager::setTimePosition(getMilliseconds());
 #endif
 
