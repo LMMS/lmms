@@ -94,7 +94,7 @@ SlicerTUI::SlicerTUI(SlicerT* instrument, QWidget* parent)
 	m_midiExportButton.setToolTip(tr("Copy midi pattern to clipboard"));
 	connect(&m_midiExportButton, SIGNAL(clicked()), this, SLOT(exportMidi()));
 
-	// slcie reset button
+	// slice reset button
 	m_resetButton.move(25, 155);
 	m_resetButton.setActiveGraphic(PLUGIN_NAME::getIconPixmap("resetSlices"));
 	m_resetButton.setInactiveGraphic(PLUGIN_NAME::getIconPixmap("resetSlices"));
@@ -139,8 +139,14 @@ void SlicerTUI::dragEnterEvent(QDragEnterEvent* dee)
 		{
 			dee->acceptProposedAction();
 		}
-		else if (txt.section(':', 0, 0) == "samplefile") { dee->acceptProposedAction(); }
-		else { dee->ignore(); }
+		else if (txt.section(':', 0, 0) == "samplefile")
+		{
+			dee->acceptProposedAction();
+		}
+		else
+		{
+			dee->ignore();
+		}
 	}
 	else { dee->ignore(); }
 }
@@ -151,10 +157,8 @@ void SlicerTUI::dropEvent(QDropEvent* de)
 	QString value = StringPairDrag::decodeValue(de);
 	if (type == "samplefile")
 	{
-		m_slicerTParent->updateFile(value);
-		// castModel<AudioFileProcessor>()->setAudioFile( value );
-		// de->accept();
 		// set m_wf wave file
+		m_slicerTParent->updateFile(value);
 		return;
 	}
 	else if (type == QString("clip_%1").arg(static_cast<int>(Track::Type::Sample)))

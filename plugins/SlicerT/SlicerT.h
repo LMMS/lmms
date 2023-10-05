@@ -99,14 +99,14 @@ private:
 };
 
 // simple helper class that handles the different audio channels
-class dinamicPlaybackBuffer
+class DynamicPlaybackBuffer
 {
 public:
-	dinamicPlaybackBuffer()
+	DynamicPlaybackBuffer()
 		: m_leftChannel()
 		, m_rightChannel()
-	{
-	}
+	{}
+	
 	void loadSample(const sampleFrame* outData, int frames, int sampleRate, float newRatio)
 	{
 		std::vector<float> leftData(frames, 0);
@@ -119,6 +119,7 @@ public:
 		m_leftChannel.loadData(leftData, sampleRate, newRatio);
 		m_rightChannel.loadData(rightData, sampleRate, newRatio);
 	}
+
 	void getFrames(sampleFrame* outData, int startFrame, int frames)
 	{
 		std::vector<float> leftOut(frames, 0); // not a huge performance issue
@@ -133,8 +134,10 @@ public:
 			outData[i][1] = rightOut[i];
 		}
 	}
+
 	int frames() { return m_leftChannel.frames(); }
 	float scaleRatio() { return m_leftChannel.scaleRatio(); }
+
 	void setScaleRatio(float newRatio)
 	{
 		m_leftChannel.setScaleRatio(newRatio);
@@ -180,7 +183,7 @@ private:
 
 	// sample buffers
 	SampleBuffer m_originalSample;
-	dinamicPlaybackBuffer m_phaseVocoder;
+	DynamicPlaybackBuffer m_phaseVocoder;
 
 	std::vector<int> m_slicePoints;
 

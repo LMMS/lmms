@@ -588,7 +588,7 @@ void SlicerT::loadSettings(const QDomElement& element)
 	m_noteThreshold.loadSettings(element, "threshold");
 	m_originalBPM.loadSettings(element, "origBPM");
 
-	// create dinamic buffer
+	// create dynamic buffer
 	float speedRatio = (float)m_originalBPM.value() / Engine::getSong()->getTempo();
 	m_phaseVocoder.loadSample(
 		m_originalSample.data(), m_originalSample.frames(), m_originalSample.sampleRate(), speedRatio);
