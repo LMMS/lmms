@@ -287,6 +287,7 @@ SlicerT::SlicerT(InstrumentTrack* instrumentTrack)
 	, m_sliceSnap(this, tr("Slice snap"))
 	, m_originalSample()
 	, m_phaseVocoder()
+	, m_parentTrack(instrumentTrack)
 {
 	m_sliceSnap.addItem("Off");
 	m_sliceSnap.addItem("1/1");
@@ -308,7 +309,7 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 
 	// current playback status
 	const int totalFrames = m_phaseVocoder.frames();
-	const int noteIndex = handle->key() - 69;
+	const int noteIndex = handle->key() - m_parentTrack->baseNote();
 	const fpp_t frames = handle->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = handle->noteOffset();
 	const int playedFrames = handle->totalFramesPlayed();
@@ -506,7 +507,7 @@ void SlicerT::writeToMidi(std::vector<Note>* outClip)
 		float sliceEnd = (float)m_slicePoints[i + 1] / m_originalSample.frames() * totalTicks;
 
 		Note sliceNote = Note();
-		sliceNote.setKey(i + 69);
+		sliceNote.setKey(i + m_parentTrack->baseNote());
 		sliceNote.setPos(sliceStart);
 		sliceNote.setLength(sliceEnd - sliceStart + 1); // + 1 needed for whatever reason
 		outClip->push_back(sliceNote);

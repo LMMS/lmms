@@ -184,6 +184,8 @@ private:
 
 	std::vector<int> m_slicePoints;
 
+	InstrumentTrack* m_parentTrack;
+
 	void findSlices();
 	void findBPM();
 
