@@ -197,6 +197,7 @@ private:
 
 	ComboBoxModel m_presetsModel;
 	FloatModel m_spreadModel;
+	FloatModel m_randomModel;
 	IntModel m_versionModel;
 	BoolModel m_isOldVersionModel;
 
@@ -255,6 +256,7 @@ private:
 
 	ComboBox * m_presetsCombo;
 	Knob * m_spreadKnob;
+	Knob * m_randomKnob;
 };
 
 
