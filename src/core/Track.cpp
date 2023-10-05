@@ -290,7 +290,10 @@ void Track::loadSettings( const QDomElement & element )
 		return;
 	}
 
-	deleteClips();
+	{
+		auto guard = Engine::audioEngine()->requestChangesGuard();
+		deleteClips();
+	}
 
 	QDomNode node = element.firstChild();
 	while( !node.isNull() )
@@ -345,7 +348,6 @@ Clip * Track::addClip( Clip * clip )
  */
 void Track::removeClip( Clip * clip )
 {
-	auto guard = Engine::audioEngine()->requestChangesGuard();
 	clipVector::iterator it = std::find( m_clips.begin(), m_clips.end(), clip );
 	if( it != m_clips.end() )
 	{
@@ -362,7 +364,6 @@ void Track::removeClip( Clip * clip )
 /*! \brief Remove all Clips from this track */
 void Track::deleteClips()
 {
-	auto guard = Engine::audioEngine()->requestChangesGuard();
 	while (!m_clips.empty())
 	{
 		delete m_clips.front();

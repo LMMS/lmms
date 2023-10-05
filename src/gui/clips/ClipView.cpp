@@ -297,6 +297,7 @@ void ClipView::remove()
 
 	if (m_clip->getTrack())
 	{
+		auto guard = Engine::audioEngine()->requestChangesGuard();
 		m_clip->getTrack()->removeClip(m_clip);
 	}
 
