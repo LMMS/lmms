@@ -83,9 +83,13 @@ void PhaseVocoder::loadData(std::vector<float> originalData, int sampleRate, flo
 	// set buffer sizes
 	m_processedWindows.resize(m_numWindows, false);
 	m_lastPhase.resize(m_numWindows * s_windowSize, 0);
-	m_sumPhase.resize(m_numWindows * s_windowSize, 0);
+	m_sumPhase.resize((m_numWindows + 1) * s_windowSize, 0);
 	m_freqCache.resize(m_numWindows * s_windowSize, 0);
 	m_magCache.resize(m_numWindows * s_windowSize, 0);
+
+	// clear phase buffers
+	std::fill(m_lastPhase.begin(), m_lastPhase.end(), 0);
+	std::fill(m_sumPhase.begin(), m_sumPhase.end(), 0);
 
 	// maybe limit this to a set amount of windows to reduce initial lag spikes
 	for (int i = 0; i < m_numWindows; i++)
@@ -108,6 +112,13 @@ void PhaseVocoder::getFrames(std::vector<float>& outData, int start, int frames)
 	int windowMargin = s_overSampling / 2; // numbers of windows before full quality
 	int startWindow = std::max(0.0f, (float)start / m_outStepSize - windowMargin);
 	int endWindow = std::min((float)m_numWindows, (float)(start + frames) / m_outStepSize + windowMargin);
+
+	// discard previous phaseSum if not processed
+	if (!m_processedWindows[startWindow])
+	{
+		std::fill_n(m_sumPhase.data() + startWindow * s_windowSize, s_windowSize, 0);
+	}
+
 	// this encompases the minimum windows needed to get full quality,
 	// which must be computed
 	for (int i = startWindow; i < endWindow; i++)
@@ -147,10 +158,6 @@ void PhaseVocoder::updateParams(float newRatio)
 	// very slow :(
 	std::fill(m_processedWindows.begin(), m_processedWindows.end(), false);
 	std::fill(m_processedBuffer.begin(), m_processedBuffer.end(), 0);
-	// this can be commented, since the start phase is not importante to the PV
-	// and the sum phase will grow linearly anyway
-	// std::fill(lastPhase.begin(), lastPhase.end(), 0);
-	// std::fill(sumPhase.begin(), sumPhase.end(), 0);
 
 	m_dataLock.unlock();
 }
@@ -225,10 +232,10 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 		magnitude = m_allMagnitudes[j];
 		freq = m_allFrequencies[j];
 
-		// difference in freq
+		// difference to bin freq mulitplier
 		deltaPhase = freq - (float)j * m_freqPerBin;
 
-		// scaled to 1
+		// convert to phase difference
 		deltaPhase /= m_freqPerBin;
 
 		// difference in phase
@@ -239,11 +246,10 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 
 		// sum this phase to the total, to keep track of the out phase along the sample
 		m_sumPhase[windowIndex + j] += deltaPhase;
-		deltaPhase = m_sumPhase[windowIndex + j]; // this is the bin phase
-		if (windowIndex + j + s_windowSize < m_sumPhase.size())
-		{														 // only if not last window
-			m_sumPhase[windowIndex + j + s_windowSize] = deltaPhase; // copy to the next
-		}
+		deltaPhase = m_sumPhase[windowIndex + j]; // final bin phase
+
+		m_sumPhase[windowIndex + j + s_windowSize] = deltaPhase; // copy to the next
+
 
 		m_FFTSpectrum[j][0] = magnitude * cos(deltaPhase);
 		m_FFTSpectrum[j][1] = magnitude * sin(deltaPhase);
@@ -256,7 +262,6 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 	for (int j = 0; j < s_windowSize; j++)
 	{
 		float outIndex = windowNum * m_outStepSize + j;
-		if (outIndex >= frames()) { break; }
 
 		// blackman-harris window
 		float a0 = 0.35875f;
