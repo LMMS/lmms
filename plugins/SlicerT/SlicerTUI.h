@@ -48,8 +48,8 @@ public:
 	SlicerTKnob(QWidget* _parent)
 		: Knob(KnobType::Styled, _parent)
 	{
-		setFixedSize(46, 40);
-		setCenterPointX(23.0);
+		setFixedSize(50, 40);
+		setCenterPointX(24.0);
 		setCenterPointY(15.0);
 	}
 };
