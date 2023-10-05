@@ -133,11 +133,9 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, int numFrames, float d
 	{
 	case Loop::Off:
 		if (state->m_frameIndex >= m_endFrame) { return false; }
-		playSampleRange(state, playBuffer.data(), playBuffer.size());
 		break;
 	case Loop::On:
 		if (state->m_frameIndex >= m_endFrame) { state->m_frameIndex = m_startFrame; }
-		playSampleRange(state, playBuffer.data(), playBuffer.size());
 		break;
 	case Loop::PingPong:
 		if (state->m_backwards && state->m_frameIndex <= m_startFrame)
@@ -150,11 +148,12 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, int numFrames, float d
 			state->m_backwards = true;
 			state->m_frameIndex = m_endFrame - 1;
 		}
-		playSampleRange(state, playBuffer.data(), playBuffer.size());
 		break;
 	default:
 		break;
 	}
+
+	playSampleRange(state, playBuffer.data(), playBuffer.size());
 
 	auto resample = resampleSampleRange(
 		state->m_resampleState, playBuffer.data(), dst, playBuffer.size(), numFrames, resampleRatio);
