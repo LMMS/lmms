@@ -56,7 +56,7 @@ SamplePlayHandle::SamplePlayHandle(const Sample* sample, bool ownAudioPort) :
 
 
 SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
-	SamplePlayHandle(new const Sample(sampleFile), true)
+	SamplePlayHandle(new Sample(sampleFile), true)
 {
 }
 
