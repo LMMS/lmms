@@ -58,7 +58,7 @@ SlicerTUI::SlicerTUI(SlicerT* instrument, QWidget* parent)
 
 	// render background
 	QPalette pal;
-	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("bg"));
+	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
 	setPalette(pal);
 
 	// move editor and seeker
