@@ -109,12 +109,16 @@ void LcdFloatSpinBox::layoutSetup(const QString &style)
 
 void LcdFloatSpinBox::update()
 {
-	const int whole = static_cast<int>(model()->value());
-	float fraction = std::abs(model()->value() - whole);
-	fraction += model()->step<float>() * 0.9f;// Fix roundoff errors
-	const int intFraction = fraction * std::pow(10.f, m_fractionDisplay.numDigits());
-	m_wholeDisplay.setValue(model()->value());
-	m_fractionDisplay.setValue(intFraction);
+	const int digitValue = std::pow(10.f, m_fractionDisplay.numDigits());
+	float value = model()->value();
+	int fraction = std::abs(std::round((value - static_cast<int>(value)) * digitValue));
+	if (fraction == digitValue)
+	{
+		value += copysign(1, value);
+		fraction = 0;
+	}
+	m_wholeDisplay.setValue(value);
+	m_fractionDisplay.setValue(fraction);
 
 	QWidget::update();
 }
