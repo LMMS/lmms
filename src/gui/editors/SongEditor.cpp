@@ -985,9 +985,20 @@ void SongEditor::zoomToAction(ZoomAction zAction)
 			break;
 		}
 		case ZoomAction::FullSong: {
-			sAction = "Full song";
-			beatZoomBegin = 0;
-			beatZoomEnd = m_song->length();
+			if (m_song->length() == 0)
+			{
+				m_zoomInfo = TextFloat::displayMessage(tr("Info"),
+													   tr("The song is empty. \n"
+					                                      "No zoom change is applied."),
+					                                   embed::getIconPixmap("whatsthis"), 4000);
+				return;
+			}
+			else
+			{
+				sAction = "Full song";
+				beatZoomBegin = 0;
+				beatZoomEnd = m_song->length();
+			}
 			break;
 		}
 		default:
