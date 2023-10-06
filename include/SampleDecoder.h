@@ -27,6 +27,7 @@
 
 #include <QString>
 #include <functional>
+#include <unordered_map>
 
 #include "lmms_basics.h"
 
