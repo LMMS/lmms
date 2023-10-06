@@ -39,8 +39,7 @@ auto SampleDecoder::decode(const QString& audioFile) -> Result
 {
 	const auto fileExtension = QFileInfo{audioFile}.suffix();
 	auto it = std::find_if(s_extensionMap.begin(), s_extensionMap.end(), [&](auto entry) {
-		auto [key, _] = entry;
-		return fileExtension == key;
+		return fileExtension == entry.first;
 	});
 
 	if (it != s_extensionMap.end())
