@@ -178,5 +178,5 @@ auto SampleDecoder::decodeSampleOggVorbis(const QString& audioFile) -> Result
 
 	return {std::move(result), static_cast<int>(sampleRate)};
 }
-#endif
+#endif // LMMS_HAVE_OGGVORBIS
 } // namespace lmms
