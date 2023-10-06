@@ -134,7 +134,6 @@ private:
 	int indexOfTrackView(const TrackView* tv);
 
 	void zoomToAction(enum ZoomAction);
-	TextFloat* m_zoomInfo;
 
 	Song * m_song;
 
@@ -171,6 +170,8 @@ private:
 	int m_rubberbandPixelsPerBar; //!< pixels per bar when selection starts
 	int m_trackHeadWidth;
 	bool m_selectRegion;
+
+	TextFloat* m_zoomInfo;
 
 	friend class SongEditorWindow;
 
