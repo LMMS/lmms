@@ -69,10 +69,6 @@ public:
 	bool empty() const;
 
 private:
-	void decodeSampleSF(const QString& fileName);
-	void decodeSampleDS(const QString& fileName);
-
-private:
 	std::vector<sampleFrame> m_data;
 	QString m_audioFile;
 	int m_sampleRate = 0;
