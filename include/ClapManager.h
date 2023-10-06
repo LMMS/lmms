@@ -77,21 +77,6 @@ public:
 	//! Creates a plugin instance given plugin info; Plugin instance is owned by ClapManager
 	//auto createInstance(const ClapPluginInfo* info) -> std::weak_ptr<ClapPluginInstance>;
 
-	/**
-	 * Transport update methods
-	 * TODO: Add pre-roll and beat position
-	 */
-	static void updateTransport();
-	static void setPlaying(bool isPlaying);
-	static void setRecording(bool isRecording);
-	static void setLooping(bool isLooping);
-	static void setBeatPosition();
-	static void setTimePosition(int elapsedMilliseconds);
-	static void setTempo(bpm_t tempo);
-	static void setTimeSignature(int num, int denom);
-
-	static auto transport() -> const clap_event_transport* { return &s_transport; }
-
 	static auto clapGuiApi() -> const char*;
 
 	static auto debugging() -> bool { return s_debug; }
@@ -115,7 +100,6 @@ private:
 	std::unordered_map<std::string, std::weak_ptr<const ClapPluginInfo>> m_uriToPluginInfo; //!< Non-owning map of plugin URIs (IDs) to ClapPluginInfo
 	//std::vector<std::weak_ptr<ClapInstance>> m_instances; //!< Vector of all CLAP plugin instances (for guaranteeing correct clean-up order)
 
-	static clap_event_transport s_transport;
 	static bool s_debug; //!< If LMMS_CLAP_DEBUG is set, debug output will be printed
 };
 

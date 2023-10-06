@@ -29,7 +29,6 @@
 #include <algorithm>
 #include <filesystem>
 #include <string_view>
-#include <type_traits>
 
 #include <cstdlib>
 #include <cstring>
@@ -45,6 +44,7 @@
 #include <clap/clap.h>
 
 #include "ClapFile.h"
+#include "ClapTransport.h"
 #include "Engine.h"
 #include "Song.h"
 #include "Plugin.h"
@@ -67,36 +67,13 @@ namespace
 #endif
 		return std::filesystem::path{dir};
 	}
-
-	template<std::size_t mask, typename T>
-	inline void SetBit(T& number, bool value) noexcept
-	{
-		if constexpr (std::is_signed_v<T>)
-		{
-			assert(number >= 0 && "left-shifting negative number is UB");
-		}
-		constexpr auto bitPos = [=]() {
-			// constexpr log2
-			static_assert(mask && !(mask & (mask - 1)), "mask must have single bit set");
-			unsigned pos = 0;
-			auto x = mask;
-			while (x != 0) {
-				x >>= 1;
-				++pos;
-			}
-			return pos - 1;
-		}();
-		static_assert(bitPos < sizeof(T) * 8, "mask is too big for T");
-		number = (number & ~mask) | (static_cast<T>(value) << bitPos);
-	}
 }
 
-clap_event_transport ClapManager::s_transport = {};
 bool ClapManager::s_debug = false;
 
 ClapManager::ClapManager()
 {
-	updateTransport(); // TODO: Is Song available at this point?
+	ClapTransport::update(); // TODO: Is Song available at this point?
 
 	const char* dbgStr = std::getenv("LMMS_CLAP_DEBUG");
 	s_debug = (dbgStr && *dbgStr);
@@ -119,46 +96,10 @@ void ClapManager::initPlugins()
 	findSearchPaths();
 	if (debugging()) { qDebug() << "Found .clap files:"; }
 	loadClapFiles(getSearchPaths());
-
-	// TEMPORARY: Testing purposes
-	/*
-	for (const auto& file : files())
-	{
-		for (auto& plugin : file.pluginInfo())
-		{
-			qDebug() << plugin->getDescriptor()->name;
-			auto& test = m_instances.emplace_back(std::make_shared<ClapInstance>(plugin.get()));
-			test->load();
-		}
-	}
-	*/
 }
 
 void ClapManager::findSearchPaths()
 {
-	// FROM CLAP DOCUMENTATION:
-	// CLAP plugins standard search path:
-	//
-	// Linux
-	//   - ~/.clap
-	//   - /usr/lib/clap
-	//
-	// Windows
-	//   - %COMMONPROGRAMFILES%\CLAP
-	//   - %LOCALAPPDATA%\Programs\Common\CLAP
-	//
-	// MacOS
-	//   - /Library/Audio/Plug-Ins/CLAP
-	//   - ~/Library/Audio/Plug-Ins/CLAP
-	//
-	// In addition to the OS-specific default locations above, a CLAP host must query the environment
-	// for a CLAP_PATH variable, which is a list of directories formatted in the same manner as the host
-	// OS binary search path (PATH on Unix, separated by `:` and Path on Windows, separated by ';', as
-	// of this writing).
-	//
-	// Each directory should be recursively searched for files and/or bundles as appropriate in your OS
-	// ending with the extension `.clap`.
-
 	namespace fs = std::filesystem;
 	m_searchPaths.clear();
 
@@ -190,8 +131,10 @@ void ClapManager::findSearchPaths()
 
 	// Add OS-dependent search paths
 #ifdef LMMS_BUILD_LINUX
-	auto path = expandHomeDir("~/.clap");
+	// ~/.clap
+	// /usr/lib/clap
 	std::error_code ec;
+	auto path = expandHomeDir("~/.clap");
 	if (fs::is_directory(path, ec))
 	{
 		m_searchPaths.emplace_back(std::move(path.make_preferred()));
@@ -202,11 +145,12 @@ void ClapManager::findSearchPaths()
 		m_searchPaths.emplace_back(std::move(path.make_preferred()));
 	}
 #elif defined(LMMS_BUILD_WIN32) || defined(LMMS_BUILD_WIN64)
+	// %COMMONPROGRAMFILES%\CLAP
+	// %LOCALAPPDATA%\Programs\Common\CLAP
 	std::error_code ec;
 	if (auto commonProgFiles = std::getenv("COMMONPROGRAMFILES"))
 	{
-		auto path = fs::path{commonProgFiles};
-		path /= "CLAP";
+		auto path = fs::path{commonProgFiles} / "CLAP";
 		if (fs::is_directory(path, ec))
 		{
 			m_searchPaths.emplace_back(std::move(path.make_preferred()));
@@ -214,14 +158,15 @@ void ClapManager::findSearchPaths()
 	}
 	if (auto localAppData = std::getenv("LOCALAPPDATA"))
 	{
-		auto path = fs::path{localAppData};
-		path /= fs::path{"Programs/Common/CLAP"};
+		auto path = fs::path{localAppData} / "Programs/Common/CLAP";
 		if (fs::is_directory(path, ec))
 		{
 			m_searchPaths.emplace_back(std::move(path.make_preferred()));
 		}
 	}
 #elif defined(LMMS_BUILD_APPLE)
+	// /Library/Audio/Plug-Ins/CLAP
+	// ~/Library/Audio/Plug-Ins/CLAP
 	std::error_code ec;
 	auto path = fs::path{"/Library/Audio/Plug-Ins/CLAP"};
 	if (fs::is_directory(path, ec))
@@ -238,9 +183,9 @@ void ClapManager::findSearchPaths()
 	if (debugging())
 	{
 		qDebug() << "CLAP search paths:";
-		for (const auto& path : m_searchPaths)
+		for (const auto& searchPath : m_searchPaths)
 		{
-			qDebug() << "-" << path.c_str();
+			qDebug() << "-" << searchPath.c_str();
 		}
 	}
 }
@@ -328,92 +273,6 @@ void ClapManager::loadClapFiles(const std::vector<std::filesystem::path>& search
 				"  environment variable \"LMMS_CLAP_DEBUG\" to nonempty.";
 		}
 	}
-}
-
-void ClapManager::updateTransport()
-{
-	s_transport = {};
-	s_transport.header.size = sizeof(clap_event_transport);
-	s_transport.header.type = CLAP_EVENT_TRANSPORT;
-
-	const Song* song = Engine::getSong();
-	if (!song) { return; }
-
-	s_transport.flags = 0;
-
-	setPlaying(song->isPlaying());
-	setRecording(song->isRecording());
-	//setLooping(song->isLooping());
-
-	// TODO: Pre-roll, isLooping, tempo_inc
-
-	setBeatPosition();
-	setTimePosition(song->getMilliseconds());
-
-	setTempo(song->getTempo());
-	setTimeSignature(song->getTimeSigModel().getNumerator(), song->getTimeSigModel().getDenominator());
-}
-
-void ClapManager::setPlaying(bool isPlaying)
-{
-	SetBit<CLAP_TRANSPORT_IS_PLAYING>(s_transport.flags, isPlaying);
-}
-
-void ClapManager::setRecording(bool isRecording)
-{
-	SetBit<CLAP_TRANSPORT_IS_RECORDING>(s_transport.flags, isRecording);
-}
-
-void ClapManager::setLooping(bool isLooping)
-{
-	SetBit<CLAP_TRANSPORT_IS_LOOP_ACTIVE>(s_transport.flags, isLooping);
-	// TODO: loop_start_* and loop_end_*
-}
-
-void ClapManager::setBeatPosition()
-{
-	const Song* song = Engine::getSong();
-	if (!song) { return; }
-
-	s_transport.flags |= static_cast<std::uint32_t>(CLAP_TRANSPORT_HAS_BEATS_TIMELINE);
-
-	// Logic taken from TimeDisplayWidget.cpp
-	// NOTE: If the time signature changes during the song, this info may be misleading
-	const auto tick = song->getPlayPos().getTicks();
-	const auto ticksPerBar = song->ticksPerBar();
-	const auto timeSigNum = song->getTimeSigModel().getNumerator();
-	const auto barsElapsed = static_cast<int>(tick / ticksPerBar); // zero-based
-
-	s_transport.bar_number = barsElapsed;
-
-	const auto barsElapsedInBeats = (barsElapsed * timeSigNum) + 1; // one-based
-
-	s_transport.bar_start = barsElapsedInBeats << 31; // same as multiplication by CLAP_BEATTIME_FACTOR
-
-	const auto beatWithinBar = 1.0 * (tick % ticksPerBar) / (ticksPerBar / timeSigNum); // zero-based
-	const auto beatsElapsed = barsElapsedInBeats + beatWithinBar; // one-based
-
-	s_transport.song_pos_beats = std::lround(CLAP_BEATTIME_FACTOR * beatsElapsed);
-}
-
-void ClapManager::setTimePosition(int elapsedMilliseconds)
-{
-	s_transport.flags |= static_cast<std::uint32_t>(CLAP_TRANSPORT_HAS_SECONDS_TIMELINE);
-	s_transport.song_pos_seconds = std::lround(CLAP_SECTIME_FACTOR * (elapsedMilliseconds / 1000.0));
-}
-
-void ClapManager::setTempo(bpm_t tempo)
-{
-	s_transport.flags |= static_cast<std::uint32_t>(CLAP_TRANSPORT_HAS_TEMPO);
-	s_transport.tempo  = static_cast<double>(tempo);
-	// TODO: tempo_inc
-}
-
-void ClapManager::setTimeSignature(int num, int denom)
-{
-	s_transport.flags |= static_cast<std::uint32_t>(CLAP_TRANSPORT_HAS_TIME_SIGNATURE);
-	s_transport.tsig_num = static_cast<std::uint16_t>(num);
-	s_transport.tsig_denom = static_cast<std::uint16_t>(denom);
 }
 
 auto ClapManager::clapGuiApi() -> const char*

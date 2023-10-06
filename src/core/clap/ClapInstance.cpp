@@ -27,6 +27,7 @@
 #ifdef LMMS_HAVE_CLAP
 
 #include "ClapManager.h"
+#include "ClapTransport.h"
 #include "Engine.h"
 #include "AudioEngine.h"
 #include "MidiEvent.h"
@@ -124,7 +125,7 @@ ClapInstance::ClapInstance(const ClapPluginInfo* pluginInfo, Model* parent)
 	m_pluginState = PluginState::None;
 	setHost();
 
-	m_process.transport = ClapManager::transport();
+	m_process.transport = ClapTransport::get();
 
 	start();
 }
@@ -150,6 +151,9 @@ void ClapInstance::copyModelsFromCore()
 	// TODO: Handle parameter events similar to midi input? (with ringbuffer)
 
 	if (!hasNoteInput()) { return; } // TODO: Check for MIDI event / note event support instead?
+
+	// TODO: Midi events and parameter events may not be ordered according to increasing sample offset
+	//       The event.header.time values need to be sorted in increasing order.
 
 	while (m_midiInputReader.read_space() > 0)
 	{
@@ -672,7 +676,7 @@ auto ClapInstance::processBegin(std::uint32_t frames) -> bool
 	return false;
 }
 
-void ClapInstance::processNoteOff(int sampleOffset, int channel, int key, int velocity)
+void ClapInstance::processNoteOff(f_cnt_t sampleOffset, std::int8_t channel, std::int16_t key, std::uint8_t velocity)
 {
 	assert(isAudioThread());
 
@@ -691,7 +695,7 @@ void ClapInstance::processNoteOff(int sampleOffset, int channel, int key, int ve
 	m_evIn.push(&ev.header);
 }
 
-void ClapInstance::processNoteOn(int sampleOffset, int channel, int key, int velocity)
+void ClapInstance::processNoteOn(f_cnt_t sampleOffset, std::int8_t channel, std::int16_t key, std::uint8_t velocity)
 {
 	assert(isAudioThread());
 

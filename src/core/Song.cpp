@@ -34,6 +34,7 @@
 
 #include "AutomationTrack.h"
 #include "AutomationEditor.h"
+#include "ClapTransport.h"
 #include "ConfigManager.h"
 #include "ControllerRackView.h"
 #include "ControllerConnection.h"
@@ -56,7 +57,6 @@
 #include "SongEditor.h"
 #include "TimeLineWidget.h"
 #include "PeakController.h"
-#include "ClapManager.h"
 
 
 namespace lmms
@@ -166,7 +166,7 @@ void Song::setTempo()
 	m_vstSyncController.setTempo( tempo );
 
 #ifdef LMMS_HAVE_CLAP
-	ClapManager::setTempo(tempo);
+	ClapTransport::setTempo(tempo);
 #endif
 
 	emit tempoChanged( tempo );
@@ -186,7 +186,7 @@ void Song::setTimeSignature()
 		getTimeSigModel().getNumerator(), getTimeSigModel().getDenominator() );
 
 #ifdef LMMS_HAVE_CLAP
-	ClapManager::setTimeSignature(getTimeSigModel().getNumerator(), getTimeSigModel().getDenominator());
+	ClapTransport::setTimeSignature(getTimeSigModel().getNumerator(), getTimeSigModel().getDenominator());
 #endif
 }
 
@@ -272,7 +272,7 @@ void Song::processNextBuffer()
 #ifdef LMMS_HAVE_CLAP
 	// If looping is enabled, or we're playing a pattern track or a MIDI clip
 	// TODO: Looping might not be handled correctly
-	ClapManager::setLooping(loopEnabled
+	ClapTransport::setLooping(loopEnabled
 		|| (m_playMode == PlayMode::Pattern)
 		|| (m_playMode == PlayMode::MidiClip && m_loopMidiClip)
 		);
@@ -350,8 +350,8 @@ void Song::processNextBuffer()
 			m_vstSyncController.update();
 
 #ifdef LMMS_HAVE_CLAP
-			ClapManager::setBeatPosition();
-			ClapManager::setTimePosition(getMilliseconds());
+			ClapTransport::setBeatPosition();
+			ClapTransport::setTimePosition(getMilliseconds());
 #endif
 		}
 
@@ -513,7 +513,7 @@ void Song::playSong()
 	m_vstSyncController.setPlaybackState( true );
 
 #ifdef LMMS_HAVE_CLAP
-	ClapManager::setPlaying(true);
+	ClapTransport::setPlaying(true);
 #endif
 
 	savePlayStartPosition();
@@ -556,7 +556,7 @@ void Song::playPattern()
 	m_vstSyncController.setPlaybackState( true );
 
 #ifdef LMMS_HAVE_CLAP
-	ClapManager::setPlaying(true);
+	ClapTransport::setPlaying(true);
 #endif
 
 	savePlayStartPosition();
@@ -654,7 +654,7 @@ void Song::togglePause()
 	m_vstSyncController.setPlaybackState( m_playing );
 
 #ifdef LMMS_HAVE_CLAP
-	ClapManager::setPlaying(m_playing);
+	ClapTransport::setPlaying(m_playing);
 #endif
 
 	emit playbackStateChanged();
@@ -714,9 +714,9 @@ void Song::stop()
 		/ (double) Engine::framesPerTick() );
 
 #ifdef LMMS_HAVE_CLAP
-	ClapManager::setPlaying(m_exporting);
-	ClapManager::setBeatPosition();
-	ClapManager::setTimePosition(getMilliseconds());
+	ClapTransport::setPlaying(m_exporting);
+	ClapTransport::setBeatPosition();
+	ClapTransport::setTimePosition(getMilliseconds());
 #endif
 
 	// remove all note-play-handles that are active
@@ -802,7 +802,7 @@ void Song::stopExport()
 	m_vstSyncController.setPlaybackState( m_playing );
 
 #ifdef LMMS_HAVE_CLAP
-	ClapManager::setPlaying(m_playing);
+	ClapTransport::setPlaying(m_playing);
 #endif
 }
 

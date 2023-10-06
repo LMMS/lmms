@@ -192,8 +192,8 @@ public:
 	auto deactivate() -> bool;
 
 	auto processBegin(std::uint32_t frames) -> bool;
-	void processNoteOff(int sampleOffset, int channel, int key, int velocity);
-	void processNoteOn(int sampleOffset, int channel, int key, int velocity);
+	void processNoteOff(f_cnt_t sampleOffset, std::int8_t channel, std::int16_t key, std::uint8_t velocity);
+	void processNoteOn(f_cnt_t sampleOffset, std::int8_t channel, std::int16_t key, std::uint8_t velocity);
 	auto process(std::uint32_t frames) -> bool;
 	auto processEnd(std::uint32_t frames) -> bool;
 
