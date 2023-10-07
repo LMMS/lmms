@@ -72,12 +72,14 @@ PhaseVocoder::~PhaseVocoder()
 
 void PhaseVocoder::loadData(std::vector<float> originalData, int sampleRate, float newRatio)
 {
+	m_dataLock.lock();
+
 	m_originalBuffer = originalData;
 	m_originalSampleRate = sampleRate;
 	m_scaleRatio = -1; // force update, kinda hacky
 
+	m_dataLock.unlock(); // stupid, but QRecursiveMutex is too expensive to have in updateParas and getFrames
 	updateParams(newRatio);
-
 	m_dataLock.lock();
 
 	// set buffer sizes
@@ -372,13 +374,24 @@ void SlicerT::findSlices()
 
 	// computacion params
 	const int windowSize = 512;
-	const int minDist = 2048;
+	const float minBeatLength = 0.05f; // in seconds, ~ 1/4 length at 220 bpm
+
+	int sampleRate = m_originalSample.sampleRate();
+	int minDist = sampleRate * minBeatLength;
 
 	// copy vector into one vector, averaging channels
+	float maxMag = -1;
 	std::vector<float> singleChannel(m_originalSample.frames(), 0);
 	for (int i = 0; i < m_originalSample.frames(); i++)
 	{
 		singleChannel[i] = (m_originalSample.data()[i][0] + m_originalSample.data()[i][1]) / 2;
+		maxMag = std::max(maxMag, singleChannel[i]);
+	}
+
+	// normalize
+	for (int i = 0; i < singleChannel.size(); i++)
+	{
+		singleChannel[i] /= maxMag;
 	}
 
 	// buffers
