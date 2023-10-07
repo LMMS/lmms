@@ -281,13 +281,6 @@ auto Sample::toBase64() const -> QString
 	return m_buffer->toBase64();
 }
 
-auto Sample::playbackSize() const -> int
-{
-	const auto lock = std::shared_lock{m_mutex};
-	if (m_buffer->sampleRate() <= 0) { return 0; }
-	return m_buffer->size() * Engine::audioEngine()->processingSampleRate() / m_buffer->sampleRate();
-}
-
 auto Sample::buffer() const -> std::shared_ptr<const SampleBuffer>
 {
 	const auto lock = std::shared_lock{m_mutex};
