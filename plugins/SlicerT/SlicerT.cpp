@@ -111,6 +111,12 @@ void PhaseVocoder::getFrames(std::vector<float>& outData, int start, int frames)
 	if (m_originalBuffer.size() < 2048) { return; }
 	m_dataLock.lock();
 
+	if (m_scaleRatio == 1) { // directly copy original data
+		memcpy(outData.data(), m_originalBuffer.data() + start, frames*sizeof(float));
+		m_dataLock.unlock();
+		return;
+	}
+
 	int windowMargin = s_overSampling / 2; // numbers of windows before full quality
 	int startWindow = std::max(0.0f, (float)start / m_outStepSize - windowMargin);
 	int endWindow = std::min((float)m_numWindows, (float)(start + frames) / m_outStepSize + windowMargin);
@@ -287,6 +293,7 @@ SlicerT::SlicerT(InstrumentTrack* instrumentTrack)
 	, m_fadeOutFrames(400.0f, 0.0f, 8192.0f, 1.0f, this, tr("FadeOut"))
 	, m_originalBPM(1, 1, 999, this, tr("Original bpm"))
 	, m_sliceSnap(this, tr("Slice snap"))
+	, m_enableSync(true, this, tr("BPM sync"))
 	, m_originalSample()
 	, m_phaseVocoder()
 	, m_parentTrack(instrumentTrack)
@@ -306,7 +313,8 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 	if (m_originalSample.frames() < 2048) { return; }
 
 	// update current speed ratio, in case bpm changed
-	const float speedRatio = (float)m_originalBPM.value() / Engine::getSong()->getTempo();
+	float speedRatio = (float)m_originalBPM.value() / Engine::getSong()->getTempo();
+	if (!m_enableSync.value()) { speedRatio = 1; } // disable timeshift
 	m_phaseVocoder.setScaleRatio(speedRatio);
 
 	// current playback status
@@ -497,7 +505,7 @@ void SlicerT::writeToMidi(std::vector<Note>* outClip)
 	if (m_originalSample.frames() < 2048) { return; }
 
 	// update incase bpm changed
-	const float speedRatio = (float)m_originalBPM.value() / Engine::getSong()->getTempo();
+	float speedRatio = (float)m_originalBPM.value() / Engine::getSong()->getTempo();
 	m_phaseVocoder.setScaleRatio(speedRatio);
 
 	// calculate how many "beats" are in the sample

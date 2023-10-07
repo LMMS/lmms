@@ -177,6 +177,7 @@ private:
 	FloatModel m_fadeOutFrames;
 	IntModel m_originalBPM;
 	ComboBoxModel m_sliceSnap;
+	BoolModel m_enableSync;
 
 	// sample buffers
 	SampleBuffer m_originalSample;

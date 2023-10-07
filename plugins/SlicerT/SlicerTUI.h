@@ -32,6 +32,7 @@
 #include "InstrumentView.h"
 #include "Knob.h"
 #include "LcdSpinBox.h"
+#include "LedCheckBox.h"
 #include "PixmapButton.h"
 #include "WaveForm.h"
 
@@ -78,6 +79,7 @@ private:
 	SlicerTKnob m_fadeOutKnob;
 	LcdSpinBox m_bpmBox;
 	ComboBox m_snapSetting;
+	LedCheckBox m_syncToggle;
 
 	// buttons
 	PixmapButton m_resetButton;

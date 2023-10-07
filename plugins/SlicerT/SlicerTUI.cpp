@@ -48,6 +48,7 @@ SlicerTUI::SlicerTUI(SlicerT* instrument, QWidget* parent)
 	, m_fadeOutKnob(this)
 	, m_bpmBox(3, "21pink", this)
 	, m_snapSetting(this, "Slice snap")
+	, m_syncToggle("Sync", this, "SyncToggle", LedCheckBox::LedColor::Green)
 	, m_resetButton(this, nullptr)
 	, m_midiExportButton(this, nullptr)
 	, m_wf(248, 128, instrument, this)
@@ -68,6 +69,11 @@ SlicerTUI::SlicerTUI(SlicerT* instrument, QWidget* parent)
 	m_snapSetting.setGeometry(190, 200, 55, ComboBox::DEFAULT_HEIGHT);
 	m_snapSetting.setToolTip(tr("Set slice snapping for detection"));
 	m_snapSetting.setModel(&m_slicerTParent->m_sliceSnap);
+
+	// sync toggle
+	m_syncToggle.move(135, 187);
+	m_syncToggle.setToolTip(tr("Enable BPM sync"));
+	m_syncToggle.setModel(&m_slicerTParent->m_enableSync);
 
 	// bpm spin box
 	m_bpmBox.move(135, 203);
