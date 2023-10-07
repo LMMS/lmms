@@ -40,10 +40,17 @@ SampleBuffer::SampleBuffer(const QString& audioFile)
 	if (audioFile.isEmpty()) { throw std::runtime_error{"Failure loading audio file: Audio file path is empty."}; }
 	auto resolvedFileName = PathUtil::toAbsolute(PathUtil::toShortestRelative(audioFile));
 
-	auto [data, sampleRate] = SampleDecoder::decode(resolvedFileName);
-	m_data = std::move(data);
-	m_sampleRate = sampleRate;
-	m_audioFile = audioFile;
+	if (auto decodedResult = SampleDecoder::decode(resolvedFileName); decodedResult)
+	{
+		auto [data, sampleRate] = *decodedResult;
+		m_data = std::move(data);
+		m_sampleRate = sampleRate;
+		m_audioFile = audioFile;
+		return;
+	}
+
+	throw std::runtime_error{
+			"Failed to decode audio file: Either the audio codec is unsupported, or the file is corrupted."};
 }
 
 SampleBuffer::SampleBuffer(const QByteArray& base64Data, int sampleRate)

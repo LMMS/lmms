@@ -27,7 +27,7 @@
 
 #include <QString>
 #include <functional>
-#include <unordered_map>
+#include <optional>
 
 #include "lmms_basics.h"
 
@@ -41,17 +41,16 @@ public:
 		int sampleRate;
 	};
 
-	using Decoder = std::function<Result(const QString&)>;
+	using Decoder = std::function<std::optional<Result>(const QString&)>;
 
-	static auto decode(const QString& audioFile) -> Result;
+	static auto decode(const QString& audioFile) -> std::optional<Result>;
 
 private:
-	static auto decodeSampleSF(const QString& audioFile) -> Result;
-	static auto decodeSampleDS(const QString& audioFile) -> Result;
+	static auto decodeSampleSF(const QString& audioFile) -> std::optional<Result>;
+	static auto decodeSampleDS(const QString& audioFile) -> std::optional<Result>;
 #ifdef LMMS_HAVE_OGGVORBIS
-	static auto decodeSampleOggVorbis(const QString& audioFile) -> Result;
+	static auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<Result>;
 #endif
-	static std::unordered_map<const char*, Decoder> s_extensionMap;
 	static std::vector<Decoder> s_decoders;
 };
 } // namespace lmms
