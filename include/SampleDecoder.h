@@ -28,6 +28,7 @@
 #include <QString>
 #include <functional>
 #include <optional>
+#include <vector>
 
 #include "lmms_basics.h"
 
