@@ -37,7 +37,6 @@ class SampleDecoder
 public:
 	struct Result
 	{
-		Result(const std::vector<sampleFrame>& data, int sampleRate);
 		std::vector<sampleFrame> data;
 		int sampleRate;
 	};

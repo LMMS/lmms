@@ -25,12 +25,6 @@ std::vector<SampleDecoder::Decoder> SampleDecoder::s_decoders = {&SampleDecoder:
 	,
 	&SampleDecoder::decodeSampleDS};
 
-SampleDecoder::Result::Result(const std::vector<sampleFrame>& data, int sampleRate)
-	: data(data)
-	, sampleRate(sampleRate)
-{
-}
-
 auto SampleDecoder::decode(const QString& audioFile) -> std::optional<Result>
 {
 	auto result = std::optional<Result>{};
@@ -78,7 +72,7 @@ auto SampleDecoder::decodeSampleSF(const QString& audioFile) -> std::optional<Re
 		}
 	}
 
-	return std::make_optional<Result>(std::move(result), sfInfo.samplerate);
+	return Result{std::move(result), static_cast<int>(sfInfo.samplerate)};
 }
 
 auto SampleDecoder::decodeSampleDS(const QString& audioFile) -> std::optional<Result>
@@ -96,7 +90,7 @@ auto SampleDecoder::decodeSampleDS(const QString& audioFile) -> std::optional<Re
 	auto result = std::vector<sampleFrame>(frames);
 	src_short_to_float_array(data.get(), &result[0][0], frames * DEFAULT_CHANNELS);
 
-	return std::make_optional<Result>(std::move(result), engineRate);
+	return Result{std::move(result), static_cast<int>(engineRate)};
 }
 
 #ifdef LMMS_HAVE_OGGVORBIS
@@ -135,7 +129,7 @@ auto SampleDecoder::decodeSampleOggVorbis(const QString& audioFile) -> std::opti
 		else if (numChannels > 1) { result[i] = {buffer[i * numChannels], buffer[i * numChannels + 1]}; }
 	}
 
-	return std::make_optional<Result>(std::move(result), sampleRate);
+	return Result{std::move(result), static_cast<int>(sampleRate)};
 }
 #endif // LMMS_HAVE_OGGVORBIS
 } // namespace lmms
