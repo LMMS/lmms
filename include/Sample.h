@@ -99,7 +99,7 @@ public:
 		Loop loopMode = Loop::Off) const -> bool;
 	auto visualize(QPainter& p, const QRect& dr, int fromFrame = 0, int toFrame = 0) const -> void;
 
-	auto sampleDuration() const -> int;
+	auto sampleDuration() const -> std::chrono::milliseconds;
 	auto sampleFile() const -> const QString&;
 	auto sampleRate() const -> int;
 	auto sampleSize() const -> int;
