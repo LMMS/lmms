@@ -114,7 +114,7 @@ void LcdFloatSpinBox::update()
 	int fraction = std::abs(std::round((value - static_cast<int>(value)) * digitValue));
 	if (fraction == digitValue)
 	{
-		value += copysign(1, value);
+		value += std::copysign(1, value);
 		fraction = 0;
 	}
 	m_wholeDisplay.setValue(value);
