@@ -24,6 +24,8 @@
 
 #include "AudioFileProcessor.h"
 
+#include <cmath>
+
 #include <QPainter>
 #include <QFileInfo>
 #include <QDropEvent>
@@ -288,15 +290,24 @@ QString AudioFileProcessor::nodeName() const
 
 
 
-int AudioFileProcessor::getBeatLen( NotePlayHandle * _n ) const
+auto AudioFileProcessor::beatLen(NotePlayHandle* note) const -> int
 {
+	// If we can play indefinitely, use the default beat note duration
+	if (static_cast<Sample::Loop>(m_loopModel.value()) != Sample::Loop::Off) { return 0; }
+
+	// Otherwise, use the remaining sample duration
 	const auto baseFreq = instrumentTrack()->baseFreq();
-	const float freq_factor = baseFreq / _n->frequency() *
-			Engine::audioEngine()->processingSampleRate() / Engine::audioEngine()->baseSampleRate();
+	const auto freqFactor = baseFreq / note->frequency()
+		* Engine::audioEngine()->processingSampleRate()
+		/ Engine::audioEngine()->baseSampleRate();
 
-	return static_cast<int>(floorf((m_sample.endFrame() - m_sample.startFrame()) * freq_factor));
+	const auto startFrame = m_nextPlayStartPoint >= m_sample.endFrame()
+		? m_sample.startFrame()
+		: m_nextPlayStartPoint;
+	const auto duration = m_sample.endFrame() - startFrame;
+
+	return static_cast<int>(std::floor(duration * freqFactor));
 }
-
 
 
 

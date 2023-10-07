@@ -68,7 +68,7 @@ public:
 
 	QString nodeName() const override;
 
-	virtual int getBeatLen( NotePlayHandle * _n ) const;
+	auto beatLen(NotePlayHandle* note) const -> int override;
 
 	f_cnt_t desiredReleaseFrames() const override
 	{
