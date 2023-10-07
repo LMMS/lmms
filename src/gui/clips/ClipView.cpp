@@ -295,6 +295,9 @@ void ClipView::remove()
 	// delete ourself
 	close();
 
+	// TODO: Shared ownership should be used between the ClipView
+	// and the corresponding Track for the clip, removing the need for such synchronization
+	// when deleting clips that the Track may still be using.
 	if (m_clip->getTrack())
 	{
 		auto guard = Engine::audioEngine()->requestChangesGuard();
