@@ -423,44 +423,44 @@ int LOMMControlDialog::dbfsToX(float dbfs)
 
 float LOMMControlDialog::xToDbfs(int x)
 {
-    float xNorm = float(x - LOMM_DISPLAY_X) / LOMM_DISPLAY_WIDTH;
-    float dbfs = xNorm * (LOMM_DISPLAY_MAX - LOMM_DISPLAY_MIN) + LOMM_DISPLAY_MIN;
-    return dbfs;
+	float xNorm = float(x - LOMM_DISPLAY_X) / LOMM_DISPLAY_WIDTH;
+	float dbfs = xNorm * (LOMM_DISPLAY_MAX - LOMM_DISPLAY_MIN) + LOMM_DISPLAY_MIN;
+	return dbfs;
 }
 
 void LOMMControlDialog::mousePressEvent(QMouseEvent* event)
 {
-    if ((event->button() == Qt::LeftButton || event->button() == Qt::MiddleButton) && !(event->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier)))
-    {
-        const QPoint& p = event->pos();
+	if ((event->button() == Qt::LeftButton || event->button() == Qt::MiddleButton) && !(event->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier)))
+	{
+		const QPoint& p = event->pos();
 
-        if (LOMM_DISPLAY_X - 10 <= p.x() && p.x() <= LOMM_DISPLAY_X + LOMM_DISPLAY_WIDTH + 10)
-        {
-            FloatModel* aThresh[] = {&m_controls->m_aThreshHModel, &m_controls->m_aThreshMModel, &m_controls->m_aThreshLModel};
-            FloatModel* bThresh[] = {&m_controls->m_bThreshHModel, &m_controls->m_bThreshMModel, &m_controls->m_bThreshLModel};
+		if (LOMM_DISPLAY_X - 10 <= p.x() && p.x() <= LOMM_DISPLAY_X + LOMM_DISPLAY_WIDTH + 10)
+		{
+			FloatModel* aThresh[] = {&m_controls->m_aThreshHModel, &m_controls->m_aThreshMModel, &m_controls->m_aThreshLModel};
+			FloatModel* bThresh[] = {&m_controls->m_bThreshHModel, &m_controls->m_bThreshMModel, &m_controls->m_bThreshLModel};
 
-            for (int i = 0; i < 3; ++i)
-            {
-                if (LOMM_DISPLAY_Y[i * 2] <= p.y() && p.y() <= LOMM_DISPLAY_Y[i * 2 + 1] + LOMM_DISPLAY_HEIGHT)
-                {
-                	int behavior = (p.x() < dbfsToX(bThresh[i]->value())) ? 0 : (p.x() > dbfsToX(aThresh[i]->value())) ? 1 : 2;
-                	if (event->button() == Qt::MiddleButton)
-                	{
-                		if (behavior == 0 || behavior == 2) {bThresh[i]->reset();}
-                		if (behavior == 1 || behavior == 2) {aThresh[i]->reset();}
-                		return;
-                	}
+			for (int i = 0; i < 3; ++i)
+			{
+				if (LOMM_DISPLAY_Y[i * 2] <= p.y() && p.y() <= LOMM_DISPLAY_Y[i * 2 + 1] + LOMM_DISPLAY_HEIGHT)
+				{
+					int behavior = (p.x() < dbfsToX(bThresh[i]->value())) ? 0 : (p.x() > dbfsToX(aThresh[i]->value())) ? 1 : 2;
+					if (event->button() == Qt::MiddleButton)
+					{
+						if (behavior == 0 || behavior == 2) {bThresh[i]->reset();}
+						if (behavior == 1 || behavior == 2) {aThresh[i]->reset();}
+						return;
+					}
 
-                    m_bandDrag = i;
-                    m_lastMousePos = p;
-                    m_buttonPressed = true;
+					m_bandDrag = i;
+					m_lastMousePos = p;
+					m_buttonPressed = true;
 
-                    m_dragType = behavior;
-                    return;
-                }
-            }
-        }
-    }
+					m_dragType = behavior;
+					return;
+				}
+			}
+		}
+	}
 }
 
 void LOMMControlDialog::mouseMoveEvent(QMouseEvent * event)
@@ -472,7 +472,7 @@ void LOMMControlDialog::mouseMoveEvent(QMouseEvent * event)
 		m_lastMousePos = event->pos();
 		
 		FloatModel* aModel[] = {&m_controls->m_aThreshHModel, &m_controls->m_aThreshMModel, &m_controls->m_aThreshLModel};
-        FloatModel* bModel[] = {&m_controls->m_bThreshHModel, &m_controls->m_bThreshMModel, &m_controls->m_bThreshLModel};
+		FloatModel* bModel[] = {&m_controls->m_bThreshHModel, &m_controls->m_bThreshMModel, &m_controls->m_bThreshLModel};
 		
 		float bVal = bModel[m_bandDrag]->value();
 		float aVal = aModel[m_bandDrag]->value();
