@@ -30,7 +30,6 @@
 #include "InstrumentSoundShaping.h"
 #include "ModelView.h"
 
-class QLabel;
 
 namespace lmms::gui
 {
@@ -49,8 +48,6 @@ public:
 	InstrumentSoundShapingView( QWidget * _parent );
 	~InstrumentSoundShapingView() override;
 
-	void setFunctionsHidden( bool hidden );
-
 
 private:
 	void modelChanged() override;
@@ -65,10 +62,7 @@ private:
 	ComboBox * m_filterComboBox;
 	Knob * m_filterCutKnob;
 	Knob * m_filterResKnob;
-
-	QLabel* m_singleStreamInfoLabel;
-
-} ;
+};
 
 
 } // namespace lmms::gui

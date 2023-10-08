@@ -83,7 +83,8 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	ModelView( nullptr, this ),
 	m_track( _itv->model() ),
 	m_itv( _itv ),
-	m_instrumentView( nullptr )
+	m_instrumentView(nullptr),
+	m_ssView(nullptr)
 {
 	setAcceptDrops( true );
 
@@ -241,7 +242,11 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 
 	// create tab-widgets
-	m_ssView = new InstrumentSoundShapingView( m_tabWidget );
+	bool const showInstrumentSoundShapingView = !m_track->m_instrument->flags().testFlag(Instrument::Flag::IsSingleStreamed);
+	if (showInstrumentSoundShapingView)
+	{
+		m_ssView = new InstrumentSoundShapingView(m_tabWidget);
+	}
 
 	// FUNC tab
 	auto instrumentFunctions = new QWidget(m_tabWidget);
@@ -263,13 +268,17 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	// Tuning tab
 	m_tuningView = new InstrumentTuningView(m_track, m_tabWidget);
 
-
-	m_tabWidget->addTab(m_ssView, tr("Envelope, filter & LFO"), "env_lfo_tab", 1);
-	m_tabWidget->addTab(instrumentFunctions, tr("Chord stacking & arpeggio"), "func_tab", 2);
-	m_tabWidget->addTab(m_effectView, tr("Effects"), "fx_tab", 3);
-	m_tabWidget->addTab(m_midiView, tr("MIDI"), "midi_tab", 4);
-	m_tabWidget->addTab(m_tuningView, tr("Tuning and transposition"), "tuning_tab", 5);
-	adjustTabSize(m_ssView);
+	int index = 1;
+	// Shound shaping view stays nullptr for single streamed instruments
+	if (m_ssView)
+	{
+		m_tabWidget->addTab(m_ssView, tr("Envelope, filter & LFO"), "env_lfo_tab", index++);
+		adjustTabSize(m_ssView);
+	}
+	m_tabWidget->addTab(instrumentFunctions, tr("Chord stacking & arpeggio"), "func_tab", index++);
+	m_tabWidget->addTab(m_effectView, tr("Effects"), "fx_tab", index++);
+	m_tabWidget->addTab(m_midiView, tr("MIDI"), "midi_tab", index++);
+	m_tabWidget->addTab(m_tuningView, tr("Tuning and transposition"), "tuning_tab", index++);
 	adjustTabSize(instrumentFunctions);
 	m_effectView->resize(EffectRackView::DEFAULT_WIDTH, INSTRUMENT_HEIGHT - 4 - 1);
 	adjustTabSize(m_midiView);
@@ -386,7 +395,11 @@ void InstrumentTrackWindow::modelChanged()
 		m_tuningView->microtunerGroupBox()->show();
 	}
 
-	m_ssView->setModel( &m_track->m_soundShaping );
+	// Shound shaping view stays nullptr for single streamed instruments
+	if (m_ssView)
+	{
+		m_ssView->setModel(&m_track->m_soundShaping);
+	}
 	m_noteStackingView->setModel( &m_track->m_noteStacking );
 	m_arpeggioView->setModel( &m_track->m_arpeggio );
 	m_midiView->setModel( &m_track->m_midiPort );
@@ -467,8 +480,6 @@ void InstrumentTrackWindow::updateInstrumentView()
 		m_instrumentView = m_track->m_instrument->createView( m_tabWidget );
 		m_tabWidget->addTab( m_instrumentView, tr( "Plugin" ), "plugin_tab", 0 );
 		m_tabWidget->setActiveTab( 0 );
-
-		m_ssView->setFunctionsHidden( m_track->m_instrument->flags().testFlag( Instrument::Flag::IsSingleStreamed ) );
 
 		modelChanged(); 		// Get the instrument window to refresh
 		m_track->dataChanged(); // Get the text on the trackButton to change
