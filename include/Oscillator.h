@@ -92,7 +92,7 @@ public:
 
 	static void waveTableInit();
 	static void destroyFFTPlans();
-	static std::unique_ptr<OscillatorConstants::waveform_t> generateAntiAliasUserWaveTable(const SampleBuffer *sampleBuffer);
+	static std::unique_ptr<OscillatorConstants::waveform_t> generateAntiAliasUserWaveTable(const SampleBuffer* sampleBuffer);
 
 	inline void setUseWaveTable(bool n)
 	{
