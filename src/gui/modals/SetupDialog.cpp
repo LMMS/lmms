@@ -958,7 +958,7 @@ void SetupDialog::accept()
 	ConfigManager::inst()->setValue("ui", "animateafp",
 					QString::number(m_animateAFP));
 	ConfigManager::inst()->setValue("ui", "vstembedmethod",
-					WindowEmbed::toString(WindowEmbed::Method{m_vstEmbedComboBox->currentData().toInt()}).data());
+					WindowEmbed::toString(m_vstEmbedMethod).data());
 	ConfigManager::inst()->setValue("ui", "vstalwaysontop",
 					QString::number(m_vstAlwaysOnTop));
 	ConfigManager::inst()->setValue("ui", "disableautoquit",

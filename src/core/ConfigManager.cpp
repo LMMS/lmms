@@ -195,6 +195,11 @@ WindowEmbed::Method ConfigManager::vstEmbedMethod() const
 	const auto defaultMethodStr = QString{WindowEmbed::toString(defaultMethod).data()};
 	const auto currentMethodStr = value("ui", "vstembedmethod", defaultMethodStr);
 	const auto currentMethod = WindowEmbed::toEnum(currentMethodStr.toStdString());
+
+	// If no embedding, use that
+	if (currentMethod == WindowEmbed::Method::None) { return currentMethod; }
+
+	// If embedding, use method from configuration if available, else default method
 	return std::find(methods.begin(), methods.end(), currentMethod) != methods.end()
 		? currentMethod
 		: defaultMethod;
