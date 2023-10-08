@@ -49,8 +49,9 @@ public:
 
 	~LcdWidget() override;
 
-	void setValue( int value );
-	void setLabel( const QString& label );
+	void setValue(int value);
+	void setValue(float value);
+	void setLabel(const QString& label);
 
 	void addTextForValue( int value, const QString& text )
 	{
