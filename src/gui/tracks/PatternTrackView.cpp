@@ -124,21 +124,16 @@ void PatternTrackView::assignMixerLine(int channelIndex)
 	// Assign all tracks to channel:
 	TrackContainer::TrackList tl = Engine::patternStore()->tracks();
 
-	for
-	(
-		TrackContainer::TrackList::iterator it = tl.begin();
-		it != tl.end();
-		++it
-	)
+	for (Track* track : tl)
 	{
-		if((*it)->type() == Track::TrackTypes::InstrumentTrack)
+		if(track->type() == Track::TrackTypes::InstrumentTrack)
 		{
-			InstrumentTrack* t = dynamic_cast<InstrumentTrack*>(*it);
+			InstrumentTrack* t = dynamic_cast<InstrumentTrack*>(track);
 			if (t) { t->mixerChannelModel()->setValue(channelIndex); }
 		}
-		else if ((*it)->type() == Track::TrackTypes::SampleTrack)
+		else if (track->type() == Track::TrackTypes::SampleTrack)
 		{
-			SampleTrack* t = dynamic_cast<SampleTrack*>(*it);
+			SampleTrack* t = dynamic_cast<SampleTrack*>(track);
 			if (t) { t->mixerChannelModel()->setValue(channelIndex); }
 		}
 	}

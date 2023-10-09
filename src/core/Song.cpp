@@ -823,32 +823,27 @@ void Song::convertPatterntoSE(bool singlePattern /* = false*/, int pattern /* = 
 {
 	// Get all tracks from the Pattern editor
 	PatternStore* patternStore = Engine::patternStore();
-	TrackList tl = patternStore->tracks();
+	const TrackList& tl = patternStore->tracks();
 
 	// For each track, go through all clips and copy them in every place
 	// the corresponding PatternTrack has PatternClips in.
-	for
-	(
-		TrackList::iterator it = tl.begin();
-		it != tl.end();
-		++it
-	)
+	for (Track* track : tl)
 	{
 		// Create a clone of the track and add it to the song editor
 		Track* clonedTrack = nullptr;
-		if ((*it)->type() == Track::InstrumentTrack || (*it)->type() == Track::SampleTrack)
+		if (track->type() == Track::TrackTypes::InstrumentTrack || track->type() == Track::TrackTypes::SampleTrack)
 		{
 			// Create XML data of the track for the clone
 			QDomDocument doc;
 			QDomElement parent = doc.createElement("clone");
-			(*it)->saveState(doc, parent);
+			track->saveState(doc, parent);
 			clonedTrack = Track::create(parent.firstChild().toElement(), this);
 			clonedTrack->deleteClips();
 		}
 		else { continue; }
 
 		// Convert either a single PatternTrack or all of them
-		auto numClips = (*it)->numOfClips();
+		auto numClips = track->numOfClips();
 		int firstPattern = singlePattern ? pattern : 0;
 		int lastPattern = singlePattern ? pattern : numClips - 1;
 
@@ -861,14 +856,14 @@ void Song::convertPatterntoSE(bool singlePattern /* = false*/, int pattern /* = 
 			if (!pt) { continue; }
 
 			// Get the Clip from the track inside the PatternTrack
-			Clip* src = (*it)->getClip(i);
+			Clip* src = track->getClip(i);
 
 			// If Clip is a MidiClip and it's empty, skip it
 			MidiClip* mc = dynamic_cast<MidiClip *>(src);
 			if (mc && mc->empty()) { continue; }
 
 			// Go through the PatternTrack's Clips
-			Track::clipVector patternclips = pt->getClips();
+			const auto& patternclips = pt->getClips();
 			for (Clip* patternclip : patternclips)
 			{
 				auto pos = patternclip->startPosition();
