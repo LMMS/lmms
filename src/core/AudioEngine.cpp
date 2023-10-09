@@ -126,6 +126,9 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 
 			m_framesPerPeriod = DEFAULT_BUFFER_SIZE;
 		}
+		// lmms works with chunks of size DEFAULT_BUFFER_SIZE (256) and only the final mix will use the actual
+		// buffer size. Plugins don't see a larger buffer size than 256. If m_framesPerPeriod is larger than
+		// DEFAULT_BUFFER_SIZE, it's set to DEFAULT_BUFFER_SIZE and the rest is handled by an increased fifoSize.
 		else if( m_framesPerPeriod > DEFAULT_BUFFER_SIZE )
 		{
 			fifoSize = m_framesPerPeriod / DEFAULT_BUFFER_SIZE;
