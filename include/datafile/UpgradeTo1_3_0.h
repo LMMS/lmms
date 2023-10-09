@@ -26,7 +26,7 @@
 #ifndef LMMS_UPGRADETO1_3_0_H
 #define LMMS_UPGRADETO1_3_0_H
 
-#include "DataFileUpgrade.h"
+#include "datafile/DataFileUpgrade.h"
 
 #include <map>
 
@@ -39,7 +39,7 @@ namespace lmms
 class UpgradeTo1_3_0 : public DataFileUpgrade
 {
 public:
-	UpgradeTo1_3_0(QDomDocument& document) : DataFileUpgrade(document) {}
+	UpgradeTo1_3_0(DataFile& document) : DataFileUpgrade(document) {}
 
 	void upgrade() override;
 

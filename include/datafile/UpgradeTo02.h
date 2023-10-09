@@ -1,12 +1,5 @@
 /*
- * Delete these instructions when finished:
- *  + Replace CLASS_NAME with the CamelCase name of the class.
- *  + Replace CLASS_NAME_GUARD with the ALLUPPERCASE name of the class.
- *  + Replace BLURB with a blurb about what this upgrade routine does.
- *  + Replace __TAG__ with the tag name you want to operate on.
- *
- * CLASS_NAME.cpp
- *   Functor for upgrading data files BLURB
+ * UpgradeTo02.h - upgrades pre lmms 0.2.0 files
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -27,30 +20,46 @@
  *
  */
 
-#include "datafile/CLASS_NAME.h"
+#pragma once
+
+#ifndef LMMS_UPGRADEOLD_H
+#define LMMS_UPGRADEOLD_H
+
+#include "datafile/DataFileUpgrade.h"
 
 
 namespace lmms
 {
 
-
-void CLASS_NAME::upgrade_helper()
+/*
+ * Upgrade to 0.2.1-20070501
+ *
+ * Upgrade to version 0.2.1-20070501
+ */
+class UpgradeTo0_2_1_20070501 : public DataFileUpgrade
 {
-}
+public:
+	UpgradeTo0_2_1_20070501(DataFile& document) : DataFileUpgrade(document) {}
 
+	void upgrade() override;
+};
 
-void CLASS_NAME::upgrade()
+/*
+ * Upgrade to 0.2.1-20070508
+ *
+ * Upgrade to version 0.2.1-20070508 from some version greater than
+ * or equal to 0.2.1-20070501
+ */
+class UpgradeTo0_2_1_20070508 : public DataFileUpgrade
 {
-	m_elements = m_docment.elementsByTagName( "__TAG__" );
-	for (int i = 0; i < m_elements.length(); ++i)
-	{
-		QDomElement el = m_elements.item(i).toElement();
-		if (el.isNull()) { continue; }
-		// do something to each element "el"
-	}
+public:
+	UpgradeTo0_2_1_20070508(DataFile& document) : DataFileUpgrade(document) {}
 
-	upgrade_helper();
-}
+	void upgrade() override;
+};
 
 
 } // namespace lmms
+
+#endif // LMMS_UPGRADEOLD_H
+

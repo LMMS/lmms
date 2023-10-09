@@ -26,7 +26,7 @@
 #ifndef LMMS_UPGRADEEXTENDEDNOTERANGE_H
 #define LMMS_UPGRADEEXTENDEDNOTERANGE_H
 
-#include "DataFileUpgrade.h"
+#include "datafile/DataFileUpgrade.h"
 
 
 namespace lmms
@@ -35,7 +35,7 @@ namespace lmms
 class UpgradeExtendedNoteRange : public DataFileUpgrade
 {
 public:
-	UpgradeExtendedNoteRange(QDomDocument& document) : DataFileUpgrade(document) {}
+	UpgradeExtendedNoteRange(DataFile& document) : DataFileUpgrade(document) {}
 
 	void upgrade() override;
 };

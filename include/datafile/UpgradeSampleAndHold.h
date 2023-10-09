@@ -26,7 +26,7 @@
 #ifndef LMMS_UPGRADESAMPLEANDHOLD_H
 #define LMMS_UPGRADESAMPLEANDHOLD_H
 
-#include "DataFileUpgrade.h"
+#include "datafile/DataFileUpgrade.h"
 
 
 namespace lmms
@@ -36,7 +36,7 @@ namespace lmms
 class UpgradeSampleAndHold : public DataFileUpgrade
 {
 public:
-	UpgradeSampleAndHold(QDomDocument& document) : DataFileUpgrade(document) {}
+	UpgradeSampleAndHold(DataFile& document) : DataFileUpgrade(document) {}
 
 	void upgrade() override;
 };

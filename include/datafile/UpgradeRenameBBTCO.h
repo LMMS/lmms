@@ -25,7 +25,7 @@
 #ifndef LMMS_UPGRADERENAMEBBTCO_H
 #define LMMS_UPGRADERENAMEBBTCO_H
 
-#include "DataFileUpgrade.h"
+#include "datafile/DataFileUpgrade.h"
 
 
 namespace lmms
@@ -35,7 +35,7 @@ namespace lmms
 class UpgradeRenameBBTCO : public DataFileUpgrade
 {
 public:
-	UpgradeRenameBBTCO(QDomDocument& document) : DataFileUpgrade(document) {}
+	UpgradeRenameBBTCO(DataFile& document) : DataFileUpgrade(document) {}
 
 	void upgrade() override;
 };

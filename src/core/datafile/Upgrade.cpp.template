@@ -1,5 +1,12 @@
 /*
- * DataFileUpgrade.h - base functor for DataFile upgrade routines
+ * Delete these instructions when finished:
+ *  + Replace CLASS_NAME_GUARD with the ALLUPPERCASE name of the class.
+ *  + Replace CLASS_NAME with the CamelCase name of the class.
+ *  + Replace BLURB with a blurb about what this upgrade routine does.
+ *  + Replace __TAG__ with the tag name you want to operate on.
+ *
+ * CLASS_NAME.cpp
+ *   Functor for upgrading data files BLURB
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -20,42 +27,30 @@
  *
  */
 
-#pragma once
+#include "datafile/CLASS_NAME.h"
 
-#ifndef LMMS_DATAFILEUPGRADE_H
-#define LMMS_DATAFILEUPGRADE_H
-
-#include <QDomDocument>
 
 namespace lmms
 {
 
 
-// Base functor with some helper methods
-class DataFileUpgrade
+void CLASS_NAME::upgrade_helper()
 {
-public:
-	DataFileUpgrade(QDomDocument& document) : m_document(document) {}
+}
 
-	virtual void upgrade() {};
 
-	// wrappers
-	QDomNodeList elementsByTagName( const QString& tagName ) {
-		return m_document.elementsByTagName(tagName);
+void CLASS_NAME::upgrade()
+{
+	m_elements = m_docment.elementsByTagName( "__TAG__" );
+	for (int i = 0; i < m_elements.length(); ++i)
+	{
+		QDomElement el = m_elements.item(i).toElement();
+		if (el.isNull()) { continue; }
+		// do something to each element "el"
 	}
-	QDomElement createElement(const QString& tagName) {
-		return m_document.createElement(tagName);
-	}
 
-	// helper functions
-	void renameElements(QDomNodeList& elements, const QString& newTagName);
-	void renameAttribute(QDomNodeList& elements, const QString& oldName, const QString& newName);
-
-protected:
-	QDomDocument & m_document;
-};
+	upgrade_helper();
+}
 
 
 } // namespace lmms
-
-#endif // LMMS_DATAFILEUPGRADE_H

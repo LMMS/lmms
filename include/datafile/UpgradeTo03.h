@@ -1,5 +1,6 @@
 /*
- * UpgradeMixerRename.h - functor for upgrading data files _
+ * UpgradeTo03.h
+ *   Functor for upgrading data files from pre lmms 0.3.0
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,8 +23,8 @@
 
 #pragma once
 
-#ifndef LMMS_UPGRADEMIXERRENAME_H
-#define LMMS_UPGRADEMIXERRENAME_H
+#ifndef LMMS_UPGRADE03_H
+#define LMMS_UPGRADE03_H
 
 #include "datafile/DataFileUpgrade.h"
 
@@ -31,11 +32,30 @@
 namespace lmms
 {
 
-// upgrade functor for 
-class UpgradeMixerRename : public DataFileUpgrade
+/*
+ * Upgrade to 0.3.0-rc2
+ *
+ * Upgrade to version 0.3.0-rc2 from some version greater than
+ * or equal to 0.2.1-20070508
+ */
+class UpgradeTo0_3_0_RC2 : public DataFileUpgrade
 {
 public:
-	UpgradeMixerRename(DataFile& document) : DataFileUpgrade(document) {}
+	UpgradeTo0_3_0_RC2(DataFile& document) : DataFileUpgrade(document) {}
+
+	void upgrade() override;
+};
+
+/*
+ * Upgrade to 0.3.0
+ *
+ * Upgrade to version 0.3.0 (final) from some version greater than
+ * or equal to 0.3.0-rc2
+ */
+class UpgradeTo0_3_0 : public DataFileUpgrade
+{
+public:
+	UpgradeTo0_3_0(DataFile& document) : DataFileUpgrade(document) {}
 
 	void upgrade() override;
 };
@@ -43,5 +63,5 @@ public:
 
 } // namespace lmms
 
-#endif // LMMS_UPGRADEMIXERRENAME_H
+#endif // LMMS_UPGRADE03_H
 

@@ -1,7 +1,7 @@
 /*
  * Delete these instructions when finished:
- *  + Replace CLASS_NAME with the CamelCase name of the class.
  *  + Replace CLASS_NAME_GUARD with the ALLUPPERCASE name of the class.
+ *  + Replace CLASS_NAME with the CamelCase name of the class.
  *  + Replace BLURB with a blurb about what this upgrade routine does.
  *
  * CLASS_NAME.h
@@ -31,7 +31,7 @@
 #ifndef LMMS_CLASS_NAME_GUARD_H
 #define LMMS_CLASS_NAME_GUARD_H
 
-#include "DataFileUpgrade.h"
+#include "datafile/DataFileUpgrade.h"
 
 
 namespace lmms
@@ -41,7 +41,7 @@ namespace lmms
 class CLASS_NAME : public DataFileUpgrade
 {
 public:
-	CLASS_NAME(QDomDocument& document) : DataFileUpgrade(document) {}
+	CLASS_NAME(DataFile& document) : DataFileUpgrade(document) {}
 
 	void upgrade() override;
 

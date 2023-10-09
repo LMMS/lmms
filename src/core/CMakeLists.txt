@@ -16,7 +16,6 @@ set(LMMS_SRCS
 	core/Controller.cpp
 	core/ControllerConnection.cpp
 	core/DataFile.cpp
-	core/DataFileUpgrade.cpp
 	core/DrumSynth.cpp
 	core/Effect.cpp
 	core/EffectChain.cpp
@@ -78,11 +77,6 @@ set(LMMS_SRCS
 	core/ToolPlugin.cpp
 	core/Track.cpp
 	core/TrackContainer.cpp
-	core/UpgradeTo1_3_0.cpp
-	core/UpgradeMixerRename.cpp
-	core/UpgradeRenameBBTCO.cpp
-	core/UpgradeSampleAndHold.cpp
-	core/UpgradeExtendedNoteRange.cpp
 	core/Clip.cpp
 	core/ValueBuffer.cpp
 	core/VstSyncController.cpp
@@ -104,6 +98,17 @@ set(LMMS_SRCS
 	core/audio/AudioPulseAudio.cpp
 	core/audio/AudioSampleRecorder.cpp
 	core/audio/AudioSdl.cpp
+
+	core/datafile/DataFileUpgrade.cpp
+	core/datafile/UpgradeTo02.cpp
+	core/datafile/UpgradeTo03.cpp
+	core/datafile/UpgradeTo04.cpp
+	core/datafile/UpgradeTo1Pre3.cpp
+	core/datafile/UpgradeTo1_3_0.cpp
+	core/datafile/UpgradeMixerRename.cpp
+	core/datafile/UpgradeRenameBBTCO.cpp
+	core/datafile/UpgradeSampleAndHold.cpp
+	core/datafile/UpgradeExtendedNoteRange.cpp
 
 	core/lv2/Lv2Basics.cpp
 	core/lv2/Lv2ControlBase.cpp
