@@ -122,7 +122,7 @@ void PatternTrackView::createMixerLine()
 void PatternTrackView::assignMixerLine(int channelIndex)
 {
 	// Assign all tracks to channel:
-	TrackContainer::TrackList tl = Engine::patternStore()->tracks();
+	const auto& tl = Engine::patternStore()->tracks();
 
 	for (Track* track : tl)
 	{
