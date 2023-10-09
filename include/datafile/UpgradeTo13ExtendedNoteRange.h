@@ -1,5 +1,5 @@
 /*
- * UpgradeExtendedNoteRange.h
+ * UpgradeTo13ExtendedNoteRange.h
  *   Upgrades the extended note range
  *
  * This file is part of LMMS - https://lmms.io
@@ -32,10 +32,15 @@
 namespace lmms
 {
 
-class UpgradeExtendedNoteRange : public DataFileUpgrade
+/** \brief Note range has been extended to match MIDI specification
+ *
+ * The non-standard note range previously affected all MIDI-based instruments
+ * except OpulenZ, and made them sound an octave lower than they should (#1857).
+ */
+class UpgradeTo13ExtendedNoteRange : public DataFileUpgrade
 {
 public:
-	UpgradeExtendedNoteRange(DataFile& document) : DataFileUpgrade(document) {}
+	UpgradeTo13ExtendedNoteRange(DataFile& document) : DataFileUpgrade(document) {}
 
 	void upgrade() override;
 };

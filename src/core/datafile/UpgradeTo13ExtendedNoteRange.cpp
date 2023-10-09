@@ -1,5 +1,5 @@
 /*
- * UpgradeExtendedNoteRange.cpp
+ * UpgradeTo13ExtendedNoteRange.cpp
  *   Upgrades the extended note range
  *
  * This file is part of LMMS - https://lmms.io
@@ -21,7 +21,7 @@
  *
  */
 
-#include "datafile/UpgradeExtendedNoteRange.h"
+#include "datafile/UpgradeTo13ExtendedNoteRange.h"
 
 #include "Track.h"
 
@@ -375,7 +375,7 @@ static void fixAutomationTracks(QDomElement & song, std::set<unsigned int> const
 }
 
 
-void UpgradeExtendedNoteRange::upgrade()
+void UpgradeTo13ExtendedNoteRange::upgrade()
 {
 	QDomElement song = m_document.firstChildElement("song");
 	while (!song.isNull())

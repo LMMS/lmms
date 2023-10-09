@@ -104,11 +104,11 @@ set(LMMS_SRCS
 	core/datafile/UpgradeTo03.cpp
 	core/datafile/UpgradeTo04.cpp
 	core/datafile/UpgradeTo1Pre3.cpp
-	core/datafile/UpgradeTo1_3_0.cpp
+	core/datafile/UpgradeTo13.cpp
+	core/datafile/UpgradeTo13Misc.cpp
+	core/datafile/UpgradeTo13ExtendedNoteRange.cpp
 	core/datafile/UpgradeMixerRename.cpp
 	core/datafile/UpgradeRenameBBTCO.cpp
-	core/datafile/UpgradeSampleAndHold.cpp
-	core/datafile/UpgradeExtendedNoteRange.cpp
 
 	core/lv2/Lv2Basics.cpp
 	core/lv2/Lv2ControlBase.cpp

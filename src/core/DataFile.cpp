@@ -56,11 +56,11 @@
 #include "datafile/UpgradeTo03.h"
 #include "datafile/UpgradeTo04.h"
 #include "datafile/UpgradeTo1Pre3.h"
-#include "datafile/UpgradeTo1_3_0.h"
-#include "datafile/UpgradeExtendedNoteRange.h"
+#include "datafile/UpgradeTo13.h"
+#include "datafile/UpgradeTo13Misc.h"
+#include "datafile/UpgradeTo13ExtendedNoteRange.h"
 #include "datafile/UpgradeMixerRename.h"
 #include "datafile/UpgradeRenameBBTCO.h"
-#include "datafile/UpgradeSampleAndHold.h"
 
 namespace lmms
 {
@@ -87,9 +87,9 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_1_1_91           ,   &DataFile::upgrade_1_2_0_rc3,
 	*/
 	//&DataFile::upgrade_1_3_0            ,
-	&DataFile::upgrade_noHiddenClipNames,
-	&DataFile::upgrade_automationNodes  ,//   &DataFile::upgrade_extendedNoteRange,
-	&DataFile::upgrade_defaultTripleOscillatorHQ,
+//	&DataFile::upgrade_noHiddenClipNames,
+//	&DataFile::upgrade_automationNodes  ,//   &DataFile::upgrade_extendedNoteRange,
+//	&DataFile::upgrade_defaultTripleOscillatorHQ,
 	//&DataFile::upgrade_mixerRename      ,   &DataFile::upgrade_bbTcoRename,
 	//&DataFile::upgrade_sampleAndHold    ,
 };
@@ -642,97 +642,6 @@ void DataFile::cleanMetaNodes( QDomElement _de )
 }
 
 
-void DataFile::upgrade_noHiddenClipNames()
-{
-	QDomNodeList tracks = elementsByTagName("track");
-
-	auto clearDefaultNames = [](QDomNodeList clips, QString trackName)
-	{
-		for (int j = 0; j < clips.size(); ++j)
-		{
-			QDomElement clip = clips.item(j).toElement();
-			QString clipName = clip.attribute("name", "");
-			if (clipName == trackName) { clip.setAttribute("name", ""); }
-		}
-	};
-
-	for (int i = 0; i < tracks.size(); ++i)
-	{
-		QDomElement track = tracks.item(i).toElement();
-		QString trackName = track.attribute("name", "");
-
-		QDomNodeList instClips = track.elementsByTagName("pattern");
-		QDomNodeList autoClips = track.elementsByTagName("automationpattern");
-		QDomNodeList bbClips = track.elementsByTagName("bbtco");
-
-		clearDefaultNames(instClips, trackName);
-		clearDefaultNames(autoClips, trackName);
-		clearDefaultNames(bbClips, trackName);
-	}
-}
-
-void DataFile::upgrade_automationNodes()
-{
-	QDomNodeList autoPatterns = elementsByTagName("automationpattern");
-
-	// Go through all automation patterns
-	for (int i = 0; i < autoPatterns.size(); ++i)
-	{
-		QDomElement autoPattern = autoPatterns.item(i).toElement();
-
-		// On each automation pattern, get all <time> elements
-		QDomNodeList times = autoPattern.elementsByTagName("time");
-
-		// Loop through all <time> elements and change what we need
-		for (int j=0; j < times.size(); ++j)
-		{
-			QDomElement el = times.item(j).toElement();
-
-			float value = LocaleHelper::toFloat(el.attribute("value"));
-
-			// inValue will be equal to "value" and outValue will
-			// be set to the same
-			el.setAttribute("outValue", value);
-		}
-	}
-}
-
-
-/** \brief Note range has been extended to match MIDI specification
- *
- * The non-standard note range previously affected all MIDI-based instruments
- * except OpulenZ, and made them sound an octave lower than they should (#1857).
- */
-void DataFile::upgrade_extendedNoteRange()
-{
-	UpgradeExtendedNoteRange upgrader(*this);
-
-	upgrader.upgrade();
-}
-
-
-/** \brief TripleOscillator switched to using high-quality, alias-free oscillators by default
- *
- * Older projects were made without this feature and would sound differently if loaded
- * with the new default setting. This upgrade routine preserves their old behavior.
- */
-void DataFile::upgrade_defaultTripleOscillatorHQ()
-{
-	QDomNodeList tripleoscillators = elementsByTagName("tripleoscillator");
-	for (int i = 0; !tripleoscillators.item(i).isNull(); i++)
-	{
-		for (int j = 1; j <= 3; j++)
-		{
-			// Only set the attribute if it does not exist (default template has it but reports as 1.2.0)
-			if (tripleoscillators.item(i).toElement().attribute("useWaveTable" + QString::number(j)) == "")
-			{
-				tripleoscillators.item(i).toElement().setAttribute("useWaveTable" + QString::number(j), 0);
-			}
-		}
-	}
-}
-
-
 // Remove FX prefix from mixer and related nodes
 //void DataFile::upgrade_mixerRename()
 
@@ -772,27 +681,30 @@ void DataFile::upgrade()
 	// Runs all necessary upgrade methods
 	unsigned int start = m_fileVersion;
 	
-	upgrade<UpgradeTo0_2_1_20070501>(0,start);
-	upgrade<UpgradeTo0_2_1_20070508>(1,start);
-	upgrade<UpgradeTo0_3_0_RC2>(2,start);
-	upgrade<UpgradeTo0_3_0>(3,start);
-	upgrade<UpgradeTo0_4_0_20080104>(4,start);
-	upgrade<UpgradeTo0_4_0_20080118>(5,start);
-	upgrade<UpgradeTo0_4_0_20080129>(6,start);
-	upgrade<UpgradeTo0_4_0_20080409>(7,start);
-	upgrade<UpgradeTo0_4_0_20080607>(8,start);
-	upgrade<UpgradeTo0_4_0_20080622>(9,start);
-	upgrade<UpgradeTo0_4_0_beta1>(10,start);
-	upgrade<UpgradeTo0_4_0_rc2>(11,start);
-	upgrade<UpgradeTo1_0_99>(12,start);
-	upgrade<UpgradeTo1_1_0>(13,start);
-	upgrade<UpgradeTo1_1_91>(14,start);
-	upgrade<UpgradeTo1_2_0_RC3>(15,start);
-	upgrade<UpgradeTo1_3_0>(16,start);
-	upgrade<UpgradeExtendedNoteRange>(19,start);
-	upgrade<UpgradeMixerRename>(21,start);
-	upgrade<UpgradeRenameBBTCO>(22,start);
-	upgrade<UpgradeSampleAndHold>(23,start);
+	upgrade<UpgradeTo0_2_1_20070501> (0,start);
+	upgrade<UpgradeTo0_2_1_20070508> (1,start);
+	upgrade<UpgradeTo0_3_0_RC2> (2,start);
+	upgrade<UpgradeTo0_3_0> (3,start);
+	upgrade<UpgradeTo0_4_0_20080104> (4,start);
+	upgrade<UpgradeTo0_4_0_20080118> (5,start);
+	upgrade<UpgradeTo0_4_0_20080129> (6,start);
+	upgrade<UpgradeTo0_4_0_20080409> (7,start);
+	upgrade<UpgradeTo0_4_0_20080607> (8,start);
+	upgrade<UpgradeTo0_4_0_20080622> (9,start);
+	upgrade<UpgradeTo0_4_0_beta1> (10,start);
+	upgrade<UpgradeTo0_4_0_rc2> (11,start);
+	upgrade<UpgradeTo1_0_99> (12,start);
+	upgrade<UpgradeTo1_1_0> (13,start);
+	upgrade<UpgradeTo1_1_91> (14,start);
+	upgrade<UpgradeTo1_2_0_RC3> (15,start);
+	upgrade<UpgradeTo1_3_0> (16,start);
+	upgrade<UpgradeTo13NoHiddenClipNames> (17,start);
+	upgrade<UpgradeTo13AutomationNodes> (18,start);
+	upgrade<UpgradeTo13ExtendedNoteRange> (19,start);
+	upgrade<UpgradeTo13DefaultTripleOscillatorHQ> (20,start);
+	upgrade<UpgradeMixerRename> (21,start);
+	upgrade<UpgradeRenameBBTCO> (22,start);
+	upgrade<UpgradeTo13SampleAndHold> (23,start);
 	// Add your upgrader functor here...
 	// and increment DATAFILE_VERSION in DataFile.h
 

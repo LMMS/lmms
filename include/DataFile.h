@@ -131,10 +131,10 @@ private:
 	void upgrade_1_2_0_rc3();
 	*/
 	//void upgrade_1_3_0();
-	void upgrade_noHiddenClipNames();
-	void upgrade_automationNodes();
-	void upgrade_extendedNoteRange();
-	void upgrade_defaultTripleOscillatorHQ();
+	//void upgrade_noHiddenClipNames();
+	//void upgrade_automationNodes();
+	//void upgrade_extendedNoteRange();
+	//void upgrade_defaultTripleOscillatorHQ();
 
 	// List of all upgrade methods
 	static const std::vector<UpgradeMethod> UPGRADE_METHODS;

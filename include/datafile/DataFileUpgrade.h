@@ -58,7 +58,7 @@ protected:
 	DataFile& m_document;
 };
 
-
+// common free functions
 void findIds(const QDomElement& elem, QList<jo_id_t>& idList);
 
 

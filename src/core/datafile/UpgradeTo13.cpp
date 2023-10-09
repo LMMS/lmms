@@ -21,7 +21,7 @@
  *
  */
 
-#include "datafile/UpgradeTo1_3_0.h"
+#include "datafile/UpgradeTo13.h"
 
 #include <algorithm>
 #include <cmath>
@@ -32,7 +32,6 @@
 
 namespace lmms
 {
-
 
 /**
  *  Helper function to call a functor for all effect ports' DomElements,
@@ -94,6 +93,31 @@ QDebug operator<<(QDebug dbg, const QDomNode& node)
 	node.save(str, 2);
 	dbg << qPrintable(s);
 	return dbg;
+}
+
+
+void UpgradeTo1_3_0::upgrade()
+{
+	m_elements = m_document.elementsByTagName( "instrument" );
+	for (int i = 0; i < m_elements.length(); ++i)
+	{
+		QDomElement el = m_elements.item(i).toElement();
+		if (el.isNull()) { continue; }
+		if (el.attribute("name") == "papu")
+		{
+			el.setAttribute("name", "freeboy");
+			QDomNodeList children = el.elementsByTagName("papu");
+			renameElements(children, "freeboy");
+		}
+		else if (el.attribute( "name" ) == "OPL2")
+		{
+			el.setAttribute("name", "opulenz");
+			QDomNodeList children = el.elementsByTagName("OPL2");
+			renameElements(children, "opulenz");
+		}
+	}
+
+	upgrade_effects();
 }
 
 
@@ -449,31 +473,6 @@ void UpgradeTo1_3_0::upgrade_effects()
 			}
 		}
 	}
-}
-
-
-void UpgradeTo1_3_0::upgrade()
-{
-	m_elements = m_document.elementsByTagName( "instrument" );
-	for (int i = 0; i < m_elements.length(); ++i)
-	{
-		QDomElement el = m_elements.item(i).toElement();
-		if (el.isNull()) { continue; }
-		if (el.attribute("name") == "papu")
-		{
-			el.setAttribute("name", "freeboy");
-			QDomNodeList children = el.elementsByTagName("papu");
-			renameElements(children, "freeboy");
-		}
-		else if (el.attribute( "name" ) == "OPL2")
-		{
-			el.setAttribute("name", "opulenz");
-			QDomNodeList children = el.elementsByTagName("OPL2");
-			renameElements(children, "opulenz");
-		}
-	}
-
-	upgrade_effects();
 }
 
 
