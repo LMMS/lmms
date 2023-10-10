@@ -183,8 +183,8 @@ bool LOMMEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	const float range = m_lommControls.m_rangeModel.value();
 	const float rangeAmp = dbfsToAmp(range);
 	const float balance = m_lommControls.m_balanceModel.value();
-	const float balanceAmpL = dbfsToAmp(balance);
-	const float balanceAmpR = 1.f / balanceAmpL;
+	const float balanceAmpTemp = dbfsToAmp(balance);
+	const float balanceAmp[2] = {1.f / balanceAmpTemp, balanceAmpTemp};
 	const bool depthScaling = m_lommControls.m_depthScalingModel.value();
 	const bool stereoLink = m_lommControls.m_stereoLinkModel.value();
 	const float autoTime = m_lommControls.m_autoTimeModel.value() * m_lommControls.m_autoTimeModel.value();
@@ -207,8 +207,6 @@ bool LOMMEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			s[0] = (s[0] + s[1]) * 0.5f;
 			s[1] = tempS0 - s[1];
 		}
-		s[0] *= balanceAmpL;
-		s[1] *= balanceAmpR;
 		
 		float bands[3][2] = {{}};
 		float bandsDry[3][2] = {{}};
@@ -246,14 +244,14 @@ bool LOMMEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			float detect[3] = {0, 0, 0};
 			for (int j = 0; j < 3; ++j)
 			{
-				bandsDry[j][i] = bands[j][i] * inVol;
+				bandsDry[j][i] = bands[j][i];
 				
 				if (feedback && !lookaheadEnable)
 				{
 					bands[j][i] = m_prevOut[j][i];
 				}
 				
-				bands[j][i] *= inBandVol[j] * inVol;
+				bands[j][i] *= inBandVol[j] * inVol * balanceAmp[i];
 				
 				if (rmsTime > 0)// RMS
 				{
@@ -388,7 +386,7 @@ bool LOMMEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 				}
 				else if (feedback)
 				{
-					bands[j][i] = bandsDry[j][i];
+					bands[j][i] = bandsDry[j][i] * inBandVol[j] * inVol * balanceAmp[i];
 				}
 			
 				// Apply gain reduction
