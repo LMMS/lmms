@@ -59,14 +59,14 @@ SlicerTUI::SlicerTUI(SlicerT* instrument, QWidget* parent)
 
 	// render background
 	QPalette pal;
-	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("bg"));
+	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
 	setPalette(pal);
 
 	// move editor and seeker
 	m_wf.move(2, 6);
 
 	// snap combo box
-	m_snapSetting.setGeometry(190, 200, 55, ComboBox::DEFAULT_HEIGHT);
+	m_snapSetting.setGeometry(185, 200, 55, ComboBox::DEFAULT_HEIGHT);
 	m_snapSetting.setToolTip(tr("Set slice snapping for detection"));
 	m_snapSetting.setModel(&m_slicerTParent->m_sliceSnap);
 
@@ -76,32 +76,32 @@ SlicerTUI::SlicerTUI(SlicerT* instrument, QWidget* parent)
 	m_syncToggle.setModel(&m_slicerTParent->m_enableSync);
 
 	// bpm spin box
-	m_bpmBox.move(135, 203);
+	m_bpmBox.move(130, 203);
 	m_bpmBox.setToolTip(tr("Original sample BPM"));
 	m_bpmBox.setLabel(tr("BPM"));
 	m_bpmBox.setModel(&m_slicerTParent->m_originalBPM);
 
 	// threshold knob
-	m_noteThresholdKnob.move(14, 195);
+	m_noteThresholdKnob.move(9, 195);
 	m_noteThresholdKnob.setToolTip(tr("Threshold used for slicing"));
 	m_noteThresholdKnob.setLabel(tr("Threshold"));
 	m_noteThresholdKnob.setModel(&m_slicerTParent->m_noteThreshold);
 
 	// fadeout knob
-	m_fadeOutKnob.move(80, 195);
-	m_fadeOutKnob.setToolTip(tr("FadeOut for notes"));
-	m_fadeOutKnob.setLabel(tr("FadeOut"));
+	m_fadeOutKnob.move(75, 195);
+	m_fadeOutKnob.setToolTip(tr("Fade Out for notes"));
+	m_fadeOutKnob.setLabel(tr("Fade Out"));
 	m_fadeOutKnob.setModel(&m_slicerTParent->m_fadeOutFrames);
 
 	// midi copy button
-	m_midiExportButton.move(205, 155);
+	m_midiExportButton.move(215, 150);
 	m_midiExportButton.setActiveGraphic(PLUGIN_NAME::getIconPixmap("copyMidi"));
 	m_midiExportButton.setInactiveGraphic(PLUGIN_NAME::getIconPixmap("copyMidi"));
 	m_midiExportButton.setToolTip(tr("Copy midi pattern to clipboard"));
 	connect(&m_midiExportButton, SIGNAL(clicked()), this, SLOT(exportMidi()));
 
-	// slcie reset button
-	m_resetButton.move(25, 155);
+	// slice reset button
+	m_resetButton.move(19, 150);
 	m_resetButton.setActiveGraphic(PLUGIN_NAME::getIconPixmap("resetSlices"));
 	m_resetButton.setInactiveGraphic(PLUGIN_NAME::getIconPixmap("resetSlices"));
 	m_resetButton.setToolTip(tr("Reset Slices"));
@@ -145,8 +145,14 @@ void SlicerTUI::dragEnterEvent(QDragEnterEvent* dee)
 		{
 			dee->acceptProposedAction();
 		}
-		else if (txt.section(':', 0, 0) == "samplefile") { dee->acceptProposedAction(); }
-		else { dee->ignore(); }
+		else if (txt.section(':', 0, 0) == "samplefile")
+		{
+			dee->acceptProposedAction();
+		}
+		else
+		{
+			dee->ignore();
+		}
 	}
 	else { dee->ignore(); }
 }
@@ -157,10 +163,8 @@ void SlicerTUI::dropEvent(QDropEvent* de)
 	QString value = StringPairDrag::decodeValue(de);
 	if (type == "samplefile")
 	{
-		m_slicerTParent->updateFile(value);
-		// castModel<AudioFileProcessor>()->setAudioFile( value );
-		// de->accept();
 		// set m_wf wave file
+		m_slicerTParent->updateFile(value);
 		return;
 	}
 	else if (type == QString("clip_%1").arg(static_cast<int>(Track::Type::Sample)))
@@ -180,9 +184,9 @@ void SlicerTUI::paintEvent(QPaintEvent* pe)
 	QPainter brush(this);
 	brush.setPen(QColor(255, 255, 255));
 	brush.setFont(QFont(brush.font().family(), 7.5f, -1, false));
-	brush.drawText(205, 170, 20, 20, Qt::AlignCenter, tr("Midi"));
-	brush.drawText(22, 170, 25, 20, Qt::AlignCenter, tr("Reset"));
-	brush.drawText(190, 217, 55, 20, Qt::AlignCenter, tr("Snap"));
+	brush.drawText(212, 165, 25, 20, Qt::AlignCenter, tr("Midi"));
+	brush.drawText(14, 165, 30, 20, Qt::AlignCenter, tr("Reset"));
+	brush.drawText(185, 217, 55, 20, Qt::AlignCenter, tr("Snap"));
 }
 
 } // namespace gui
