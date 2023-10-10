@@ -31,6 +31,7 @@
 
 #include "ClapFile.h"
 #include "ClapParam.h"
+#include "ClapGui.h"
 
 #include "LinkedModelGroups.h"
 #include "Plugin.h"
@@ -51,7 +52,6 @@
 
 namespace lmms
 {
-
 
 /**
  * @brief ClapInstance stores a CLAP host/plugin instance pair.
@@ -166,6 +166,7 @@ public:
 	auto plugin() const -> const clap_plugin* { return m_plugin; }
 	auto info() const -> const ClapPluginInfo& { return *m_pluginInfo; }
 	auto params() const -> const std::vector<ClapParam*>& { return m_params; }
+	auto gui() const { return m_pluginGui.get(); }
 
 	/////////////////////////////////////////
 	// Host
@@ -235,6 +236,11 @@ private:
 	static void hostExtParamsClear(const clap_host* host, clap_id paramId, clap_param_clear_flags flags);
 	static void hostExtParamsRequestFlush(const clap_host* host);
 	static void hostExtLatencyChanged([[maybe_unused]] const clap_host* host);
+	static void hostExtGuiResizeHintsChanged(const clap_host* host);
+	static auto hostExtGuiRequestResize(const clap_host* host, std::uint32_t width, std::uint32_t height) -> bool;
+	static auto hostExtGuiRequestShow(const clap_host* host) -> bool;
+	static auto hostExtGuiRequestHide(const clap_host* host) -> bool;
+	static void hostExtGuiRequestClosed(const clap_host* host, bool wasDestroyed);
 
 	auto canUsePluginParams() const noexcept -> bool;
 	//bool canUsePluginGui() const noexcept;
@@ -448,28 +454,38 @@ private:
 	const clap_plugin_audio_ports* m_pluginExtAudioPorts = nullptr;
 
 	const clap_plugin_state* m_pluginExtState = nullptr;
-	static const constexpr clap_host_state m_hostExtState {
+	static const constexpr clap_host_state s_hostExtState {
 		&ClapInstance::hostExtStateMarkDirty
 	};
 
-	static const constexpr clap_host_log m_hostExtLog {
+	static const constexpr clap_host_log s_hostExtLog {
 		&ClapInstance::hostExtLogLog
 	};
 
-	static const constexpr clap_host_thread_check m_hostExtThreadCheck {
+	static const constexpr clap_host_thread_check s_hostExtThreadCheck {
 		&ClapInstance::hostExtThreadCheckIsMainThread,
 		&ClapInstance::hostExtThreadCheckIsAudioThread
 	};
 
 	const clap_plugin_params* m_pluginExtParams = nullptr;
-	static const constexpr clap_host_params m_hostExtParams {
+	static const constexpr clap_host_params s_hostExtParams {
 		&ClapInstance::hostExtParamsRescan,
 		&ClapInstance::hostExtParamsClear,
 		&ClapInstance::hostExtParamsRequestFlush,
 	};
 
-	static const constexpr clap_host_latency m_hostExtLatency {
+	static const constexpr clap_host_latency s_hostExtLatency {
 		&ClapInstance::hostExtLatencyChanged
+	};
+
+	std::unique_ptr<ClapGui> m_pluginGui;
+	const clap_plugin_gui* m_pluginExtGui = nullptr;
+	static const constexpr clap_host_gui s_hostExtGui {
+		&hostExtGuiResizeHintsChanged,
+		&hostExtGuiRequestResize,
+		&hostExtGuiRequestShow,
+		&hostExtGuiRequestHide,
+		&hostExtGuiRequestClosed
 	};
 
 	/**

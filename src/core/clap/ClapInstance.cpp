@@ -486,18 +486,7 @@ auto ClapInstance::init() -> bool
 			if (channelCount <= 0) { return nullptr; }
 
 			audioBuffers[port].channel_count = channelCount;
-
-			if (isInput && ((port != stereoPort && stereoPort != CLAP_INVALID_ID) || (port != monoPort && stereoPort == CLAP_INVALID_ID)))
-			{
-				// This input port will not be used by LMMS
-				// TODO: Will a mono port ever need to be used if a stereo port is available?
-				constexpr std::uint32_t maxChannels = sizeof(clap_audio_buffer::constant_mask) * 8;
-				audioBuffers[port].constant_mask = channelCount < maxChannels ? (1u << channelCount) - 1 : static_cast<std::uint64_t>(-1);
-			}
-			else
-			{
-				audioBuffers[port].constant_mask = 0;
-			}
+			audioBuffers[port].constant_mask = 0; // TODO: Implement later?
 
 			auto& rawBuffer = rawAudioBuffers.emplace_back(channelCount, DEFAULT_BUFFER_SIZE);
 			audioBuffers[port].data32 = rawBuffer.data();
@@ -616,6 +605,13 @@ auto ClapInstance::init() -> bool
 	{
 		qWarning() << "The params extension is not supported by the CLAP plugin";
 	}
+
+	// Initialize GUI
+	if (pluginExtensionInit(m_pluginExtGui, CLAP_EXT_GUI) && ClapGui::extensionSupported(m_pluginExtGui))
+	{
+		m_pluginGui = std::make_unique<ClapGui>(&info(), plugin(), m_pluginExtGui);
+	}
+
 
 	//scanQuickControls();
 
@@ -1119,10 +1115,11 @@ auto ClapInstance::hostGetExtension(const clap_host* host, const char* extension
 	if (ClapManager::debugging()) { qDebug() << "--Plugin requested host extension:" << extensionId; }
 
 	const auto extensionIdView = std::string_view{extensionId};
-	if (extensionIdView == CLAP_EXT_LOG) { return &m_hostExtLog; }
-	if (extensionIdView == CLAP_EXT_THREAD_CHECK) { return &m_hostExtThreadCheck; }
-	if (extensionIdView == CLAP_EXT_PARAMS) { return &m_hostExtParams; }
-	if (extensionIdView == CLAP_EXT_LATENCY) { return &m_hostExtLatency; }
+	if (extensionIdView == CLAP_EXT_LOG) { return &s_hostExtLog; }
+	if (extensionIdView == CLAP_EXT_THREAD_CHECK) { return &s_hostExtThreadCheck; }
+	if (extensionIdView == CLAP_EXT_PARAMS) { return &s_hostExtParams; }
+	if (extensionIdView == CLAP_EXT_LATENCY) { return &s_hostExtLatency; }
+	if (extensionIdView == CLAP_EXT_GUI) { return &s_hostExtGui; }
 
 	return nullptr;
 }
@@ -1372,6 +1369,36 @@ void ClapInstance::hostExtLatencyChanged(const clap_host* host)
 	 * https://github.com/DISTRHO/DPF/commit/4f11f8cc49b24ede1735a16606e7bad5a52ab41d
 	 */
 	//qDebug() << "ClapInstance::hostExtLatencyChanged";
+}
+
+void ClapInstance::hostExtGuiResizeHintsChanged(const clap_host* host)
+{
+	auto gui = fromHost(host)->gui();
+	gui->clapResizeHintsChanged();
+}
+
+auto ClapInstance::hostExtGuiRequestResize(const clap_host* host, std::uint32_t width, std::uint32_t height) -> bool
+{
+	auto gui = fromHost(host)->gui();
+	return gui->clapRequestResize(width, height);
+}
+
+auto ClapInstance::hostExtGuiRequestShow(const clap_host* host) -> bool
+{
+	auto gui = fromHost(host)->gui();
+	return gui->clapRequestShow();
+}
+
+auto ClapInstance::hostExtGuiRequestHide(const clap_host* host) -> bool
+{
+	auto gui = fromHost(host)->gui();
+	return gui->clapRequestHide();
+}
+
+void ClapInstance::hostExtGuiRequestClosed(const clap_host* host, bool wasDestroyed)
+{
+	auto gui = fromHost(host)->gui();
+	gui->clapRequestClosed(wasDestroyed);
 }
 
 auto ClapInstance::canUsePluginParams() const noexcept -> bool

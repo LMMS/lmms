@@ -43,6 +43,8 @@
 namespace lmms
 {
 
+class Model;
+
 /**
  * Common base class for CLAP plugins.
  * The design of this class is based on Lv2ControlBase by Johannes Lorenz.
@@ -51,12 +53,12 @@ namespace lmms
 class LMMS_EXPORT ClapControlBase : public LinkedModelGroups
 {
 public:
-	const ClapPluginInfo* pluginInfo() const { return m_info; }
+	auto pluginInfo() const -> const ClapPluginInfo* { return m_info; }
 
-	ClapInstance* control(std::size_t idx) { return m_instances[idx].get(); }
-	const ClapInstance* control(std::size_t idx) const { return m_instances[idx].get(); }
+	auto control(std::size_t idx) -> ClapInstance* { return m_instances[idx].get(); }
+	auto control(std::size_t idx) const -> const ClapInstance* { return m_instances[idx].get(); }
 
-	bool hasGui() const { return m_hasGUI; }
+	auto hasGui() const -> bool { return m_hasGUI; }
 	void setHasGui(bool val) { m_hasGUI = val; }
 
 	void callHostIdle();
@@ -66,9 +68,9 @@ protected:
 	//! @param that the class inheriting this class and inheriting Model;
 	//!   this is the same pointer as this, but a different type
 	//! @param uri the CLAP URI telling this class what plugin to construct
-	ClapControlBase(class Model* that, const QString& uri);
+	ClapControlBase(Model* that, const QString& uri);
 	ClapControlBase(const ClapControlBase&) = delete;
-	ClapControlBase& operator=(const ClapControlBase&) = delete;
+	auto operator=(const ClapControlBase&) -> ClapControlBase& = delete;
 	~ClapControlBase() override;
 
 	void init(Model* that, const QString& uri);
