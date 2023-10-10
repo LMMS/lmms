@@ -166,6 +166,26 @@ void ClapInstance::copyModelsFromCore()
 			case MidiNoteOn:
 				processNoteOn(offset, event.channel(), event.key(), event.velocity());
 				break;
+			case MidiKeyPressure:
+			{
+				assert(isAudioThread());
+				clap_event_note_expression ev;
+				ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+				ev.header.type = CLAP_EVENT_NOTE_EXPRESSION;
+				ev.header.time = static_cast<std::uint32_t>(offset);
+				ev.header.flags = 0;
+				ev.header.size = sizeof(ev);
+				ev.port_index = 0;
+				ev.expression_id = CLAP_NOTE_EXPRESSION_VOLUME;
+				ev.note_id = 0;
+				ev.port_index = 0;
+				ev.channel = event.channel();
+				ev.key = event.key();
+				ev.value = event.velocity() / 32.0; // 0..127 --> 0..4
+
+				m_evIn.push(&ev.header);
+				break;
+			}
 			default:
 				break;
 		}
