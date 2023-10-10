@@ -467,12 +467,6 @@ lmms--gui--EffectControlDialog QGroupBox::title {
 	padding: 2px 1px;
 }
 
-lmms--gui--LadspaMatrixControlDialog QLabel#ladspaheader {
-	font-size: 14pt;
-	font-weight: bold;
-	qproperty-alignment: AlignCenter;
-}
-
 /* main toolbar */
 
 QWidget#mainToolbar {
