@@ -312,18 +312,23 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 {
 	if (m_originalSample.frames() < 2048) { return; }
 
-	// update current speed ratio, in case bpm changed
-	float speedRatio = (float)m_originalBPM.value() / Engine::getSong()->getTempo();
-	if (!m_enableSync.value()) { speedRatio = 1; } // disable timeshift
-	m_phaseVocoder.setScaleRatio(speedRatio);
-
-	// current playback status
-	const int totalFrames = m_phaseVocoder.frames();
+	// playback parameters
+	// const float freq = handle->frequency();
+	const float pitchRatio = pow(2, m_parentTrack->pitchModel()->value() / 1200);
+	const float inversePitchRatio = 1.0f / pitchRatio;
 	const int noteIndex = handle->key() - m_parentTrack->baseNote();
+	const int playedFrames = handle->totalFramesPlayed();
 	const fpp_t frames = handle->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = handle->noteOffset();
-	const int playedFrames = handle->totalFramesPlayed();
+	const int bpm = Engine::getSong()->getTempo();
 
+	// update scaling parameters
+	float speedRatio = (float)m_originalBPM.value() / bpm;
+	if (!m_enableSync.value()) { speedRatio = 1; } // disable timeshift
+	m_phaseVocoder.setScaleRatio(speedRatio);
+	speedRatio *= inversePitchRatio; // adjust for pitch bend
+
+	int totalFrames = inversePitchRatio * m_phaseVocoder.frames(); // adjust frames played with regards to pitch
 	int sliceStart, sliceEnd;
 	if (noteIndex > m_slicePoints.size() - 2 || noteIndex < 0) // full sample if ouside range
 	{
@@ -343,8 +348,23 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 
 	if (noteFramesLeft > 0)
 	{
-		int framesToCopy = std::min((int)frames, noteFramesLeft);
-		m_phaseVocoder.getFrames(workingBuffer + offset, currentNoteFrame, framesToCopy);
+		// load sample segmengt, with regards to pitch settings
+		// TODO: THIS CRASHES OFTEN
+		std::vector<sampleFrame> prePitchBuffer(pitchRatio * frames + 1, {0.0f, 0.0f}); // round the frames up
+		int framesToCopy = std::min((int)(pitchRatio * frames) + 1, noteFramesLeft);	// same here
+		int framesIndex = std::min((int)(pitchRatio * currentNoteFrame), m_phaseVocoder.frames() - framesToCopy);
+		m_phaseVocoder.getFrames(prePitchBuffer.data(), framesIndex, framesToCopy);
+
+		// resample for pitch bend
+		SRC_DATA resamplerData;
+
+		resamplerData.data_in = (float*)prePitchBuffer.data();	 // wtf
+		resamplerData.data_out = (float*)workingBuffer + offset; // wtf is this
+		resamplerData.input_frames = prePitchBuffer.size();
+		resamplerData.output_frames = frames;
+		resamplerData.src_ratio = inversePitchRatio;
+
+		src_simple(&resamplerData, SRC_SINC_MEDIUM_QUALITY, 2); // only 2 channels
 
 		// exponential fade out, applyRelease kinda sucks
 		if (noteFramesLeft < m_fadeOutFrames.value())
@@ -367,6 +387,7 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 		float absoluteCurrentNote = (float)currentNoteFrame / totalFrames;
 		float absoluteStartNote = (float)sliceStart / totalFrames;
 		float abslouteEndNote = (float)sliceEnd / totalFrames;
+		printf("curr: %f, start: %f, end: %f\n", absoluteCurrentNote, absoluteStartNote, abslouteEndNote);
 		emit isPlaying(absoluteCurrentNote, absoluteStartNote, abslouteEndNote);
 	}
 	else { emit isPlaying(-1, 0, 0); }

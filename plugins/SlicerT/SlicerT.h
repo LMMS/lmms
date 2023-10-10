@@ -106,7 +106,7 @@ public:
 		: m_leftChannel()
 		, m_rightChannel()
 	{}
-	
+
 	void loadSample(const sampleFrame* outData, int frames, int sampleRate, float newRatio)
 	{
 		std::vector<float> leftData(frames, 0);
