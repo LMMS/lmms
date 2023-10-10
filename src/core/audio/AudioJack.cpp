@@ -26,8 +26,8 @@
 
 #ifdef LMMS_HAVE_JACK
 
+#include <QFormLayout>
 #include <QLineEdit>
-#include <QLabel>
 #include <QMessageBox>
 
 #include "Engine.h"
@@ -44,10 +44,10 @@ namespace lmms
 {
 
 AudioJack::AudioJack( bool & _success_ful, AudioEngine*  _audioEngine ) :
-	AudioDevice( qBound<int>(
+	AudioDevice(std::clamp<int>(
+		ConfigManager::inst()->value("audiojack", "channels").toInt(),
 		DEFAULT_CHANNELS,
-		ConfigManager::inst()->value( "audiojack", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _audioEngine ),
+		SURROUND_CHANNELS), _audioEngine),
 	m_client( nullptr ),
 	m_active( false ),
 	m_midiClient( nullptr ),
@@ -364,7 +364,7 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 	}
 
 #ifdef AUDIO_PORT_SUPPORT
-	const int frames = qMin<int>( _nframes, audioEngine()->framesPerPeriod() );
+	const int frames = std::min<int>(_nframes, audioEngine()->framesPerPeriod());
 	for( JackPortMap::iterator it = m_portMap.begin();
 						it != m_portMap.end(); ++it )
 	{
@@ -389,10 +389,10 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 	jack_nframes_t done = 0;
 	while( done < _nframes && m_stopped == false )
 	{
-		jack_nframes_t todo = qMin<jack_nframes_t>(
+		jack_nframes_t todo = std::min<jack_nframes_t>(
 						_nframes,
 						m_framesToDoInCurBuf -
-							m_framesDoneInCurBuf );
+							m_framesDoneInCurBuf);
 		const float gain = audioEngine()->masterGain();
 		for( int c = 0; c < channels(); ++c )
 		{
@@ -454,17 +454,16 @@ void AudioJack::shutdownCallback( void * _udata )
 AudioJack::setupWidget::setupWidget( QWidget * _parent ) :
 	AudioDeviceSetupWidget( AudioJack::name(), _parent )
 {
+	QFormLayout * form = new QFormLayout(this);
+
 	QString cn = ConfigManager::inst()->value( "audiojack", "clientname" );
 	if( cn.isEmpty() )
 	{
 		cn = "lmms";
 	}
 	m_clientName = new QLineEdit( cn, this );
-	m_clientName->setGeometry( 10, 20, 160, 20 );
 
-	auto cn_lbl = new QLabel(tr("Client name"), this);
-	cn_lbl->setFont( pointSize<7>( cn_lbl->font() ) );
-	cn_lbl->setGeometry( 10, 40, 160, 10 );
+	form->addRow(tr("Client name"), m_clientName);
 
 	auto m = new gui::LcdSpinBoxModel(/* this */);
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
@@ -474,8 +473,8 @@ AudioJack::setupWidget::setupWidget( QWidget * _parent ) :
 
 	m_channels = new gui::LcdSpinBox( 1, this );
 	m_channels->setModel( m );
-	m_channels->setLabel( tr( "Channels" ) );
-	m_channels->move( 180, 20 );
+
+	form->addRow(tr("Channels"), m_channels);
 
 }
 

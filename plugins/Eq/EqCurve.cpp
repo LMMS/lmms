@@ -65,6 +65,7 @@ QRectF EqHandle::boundingRect() const
 
 float EqHandle::freqToXPixel( float freq , int w )
 {
+	if (typeInfo<float>::isEqual(freq, 0.0f)) { return 0.0f; }
 	float min = log10f( 20 );
 	float max = log10f( 20000 );
 	float range = max - min;
@@ -137,7 +138,7 @@ void EqHandle::paint( QPainter *painter, const QStyleOptionGraphicsItem *option,
 		QRectF textRect2 = QRectF ( rectX+1, rectY+1, 80, 30 );
 		QString freq = QString::number( xPixelToFreq( EqHandle::x(), m_width ) );
 		QString res;
-		if ( getType() != para )
+		if ( getType() != EqHandleType::Para )
 		{
 			res = tr( "Reso: ") + QString::number( getResonance() );
 		}
@@ -171,11 +172,11 @@ QPainterPath EqHandle::getCurvePath()
 	float y = m_heigth * 0.5;
 	for ( float x = 0 ; x < m_width; x++ )
 	{
-		if ( m_type == highpass ) y = getLowCutCurve( x );
-		if ( m_type == lowshelf ) y = getLowShelfCurve( x );
-		if ( m_type == para ) y = getPeakCurve( x );
-		if ( m_type == highshelf ) y = getHighShelfCurve( x );
-		if ( m_type == lowpass ) y = getHighCutCurve( x );
+		if ( m_type == EqHandleType::HighPass ) y = getLowCutCurve( x );
+		if ( m_type == EqHandleType::LowShelf ) y = getLowShelfCurve( x );
+		if ( m_type == EqHandleType::Para ) y = getPeakCurve( x );
+		if ( m_type == EqHandleType::HighShelf ) y = getHighShelfCurve( x );
+		if ( m_type == EqHandleType::LowPass ) y = getHighCutCurve( x );
 		if ( x == 0 ) path.moveTo( x, y ); // sets the begin of Path
 		path.lineTo( x, y );
 	}
@@ -410,7 +411,7 @@ int EqHandle::getNum()
 
 
 
-void EqHandle::setType( int t )
+void EqHandle::setType( EqHandleType t )
 {
 	EqHandle::m_type = t;
 }
@@ -442,7 +443,7 @@ void EqHandle::setMouseHover( bool d )
 
 
 
-int EqHandle::getType()
+EqHandleType EqHandle::getType()
 {
 	return m_type;
 }
@@ -569,7 +570,7 @@ void EqHandle::mouseReleaseEvent( QGraphicsSceneMouseEvent *event )
 void EqHandle::wheelEvent( QGraphicsSceneWheelEvent *wevent )
 {
 	float highestBandwich;
-	if( m_type != para )
+	if( m_type != EqHandleType::Para )
 	{
 		highestBandwich = 10;
 	}
@@ -631,7 +632,7 @@ QVariant EqHandle::itemChange( QGraphicsItem::GraphicsItemChange change, const Q
 	if( change == ItemPositionChange )
 	{
 		// pass filter don't move in y direction
-		if ( m_type == highpass || m_type == lowpass )
+		if ( m_type == EqHandleType::HighPass || m_type == EqHandleType::LowPass )
 		{
 			float newX = value.toPointF().x();
 			if( newX < 0 )
@@ -714,23 +715,23 @@ void EqCurve::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, 
 			{
 				for ( int x = 0; x < m_width ; x=x+1 )
 				{
-					if ( m_handle->at( thatHandle )->getType() == highpass )
+					if ( m_handle->at( thatHandle )->getType() == EqHandleType::HighPass )
 					{
 						mainCurve[x]= ( mainCurve[x] + ( m_handle->at( thatHandle )->getLowCutCurve( x ) * ( activeHandles ) ) - ( ( activeHandles * ( m_heigth/2 ) ) - m_heigth ) );
 					}
-					if ( m_handle->at(thatHandle)->getType() == lowshelf )
+					if ( m_handle->at(thatHandle)->getType() == EqHandleType::LowShelf )
 					{
 						mainCurve[x]= ( mainCurve[x] + ( m_handle->at( thatHandle )->getLowShelfCurve( x ) * ( activeHandles ) ) - ( ( activeHandles * ( m_heigth/2 ) ) - m_heigth ) );
 					}
-					if ( m_handle->at( thatHandle )->getType() == para )
+					if ( m_handle->at( thatHandle )->getType() == EqHandleType::Para )
 					{
 						mainCurve[x]= ( mainCurve[x] + ( m_handle->at( thatHandle )->getPeakCurve( x ) * ( activeHandles ) ) - ( ( activeHandles * ( m_heigth/2 ) ) - m_heigth ) );
 					}
-					if ( m_handle->at( thatHandle )->getType() == highshelf )
+					if ( m_handle->at( thatHandle )->getType() == EqHandleType::HighShelf )
 					{
 						mainCurve[x]= ( mainCurve[x] + ( m_handle->at( thatHandle )->getHighShelfCurve( x ) * ( activeHandles ) ) - ( ( activeHandles * ( m_heigth/2 ) ) - m_heigth ) );
 					}
-					if ( m_handle->at(thatHandle)->getType() == lowpass )
+					if ( m_handle->at(thatHandle)->getType() == EqHandleType::LowPass )
 					{
 						mainCurve[x]= ( mainCurve[x] + ( m_handle->at( thatHandle )->getHighCutCurve( x ) * ( activeHandles ) ) - ( ( activeHandles * ( m_heigth/2 ) ) - m_heigth ) );
 					}
@@ -739,14 +740,18 @@ void EqCurve::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, 
 		}
 		//compute a QPainterPath
 		m_curve = QPainterPath();
-		for ( int x = 0; x < m_width ; x++ )
+		//only draw the EQ curve if there are any activeHandles
+		if (activeHandles != 0)
 		{
-			mainCurve[x] = ( ( mainCurve[x] / activeHandles ) ) - ( m_heigth/2 );
-			if ( x==0 )
+			for (int x = 0; x < m_width; x++)
 			{
-				m_curve.moveTo( x, mainCurve[x] );
+				mainCurve[x] = ((mainCurve[x] / activeHandles)) - (m_heigth / 2);
+				if (x == 0)
+				{
+					m_curve.moveTo(x, mainCurve[x]);
+				}
+				m_curve.lineTo(x, mainCurve[x]);
 			}
-			m_curve.lineTo( x, mainCurve[x] );
 		}
 		//we cache the curve painting in a pixmap for saving cpu
 		QPixmap cacheMap( boundingRect().size().toSize() );

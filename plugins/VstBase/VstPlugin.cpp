@@ -216,18 +216,18 @@ void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 
 	lock();
 
-	VstHostLanguages hlang = LanguageEnglish;
+	VstHostLanguage hlang = VstHostLanguage::English;
 	switch( QLocale::system().language() )
 	{
-		case QLocale::French: hlang = LanguageFrench; break;
-		case QLocale::German: hlang = LanguageGerman; break;
-		case QLocale::Italian: hlang = LanguageItalian; break;
-		case QLocale::Japanese: hlang = LanguageJapanese; break;
-		case QLocale::Korean: hlang = LanguageKorean; break;
-		case QLocale::Spanish: hlang = LanguageSpanish; break;
+		case QLocale::French: hlang = VstHostLanguage::French; break;
+		case QLocale::German: hlang = VstHostLanguage::German; break;
+		case QLocale::Italian: hlang = VstHostLanguage::Italian; break;
+		case QLocale::Japanese: hlang = VstHostLanguage::Japanese; break;
+		case QLocale::Korean: hlang = VstHostLanguage::Korean; break;
+		case QLocale::Spanish: hlang = VstHostLanguage::Spanish; break;
 		default: break;
 	}
-	sendMessage( message( IdVstSetLanguage ).addInt( hlang ) );
+	sendMessage( message( IdVstSetLanguage ).addInt( static_cast<int>(hlang) ) );
 	sendMessage( message( IdVstLoadPlugin ).addString( QSTR_TO_STDSTR( m_plugin ) ) );
 
 	waitForInitDone();

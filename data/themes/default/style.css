@@ -3,13 +3,12 @@
  ********************/
 
 /* most foreground text items */
-QLabel, QTreeWidget, QListWidget, QGroupBox, QMenuBar {
+QLabel, QTreeWidget, QListWidget, QGroupBox, QMenuBar, QCheckBox {
 	color: #d1d8e4;
 }
 
 QTreeView {
 	outline: none;
-	font-size: 12px;
 }
 
 QTreeWidget::item {
@@ -42,7 +41,7 @@ QMdiArea {
 
 lmms--gui--FileBrowser QCheckBox
 {
-	font-size: 10px;
+	font-size: 8pt;
 	color: white;
 }
 
@@ -57,6 +56,7 @@ lmms--gui--AutomationEditor {
 	qproperty-backgroundShade: rgba(255, 255, 255, 15);
 	qproperty-nodeInValueColor: rgba(103, 73, 194, 150);
 	qproperty-nodeOutValueColor: rgba(125, 40, 40, 150);
+	qproperty-nodeTangentLineColor: rgba(200, 200, 200, 255);
 	qproperty-crossColor: rgba(215, 210, 254, 150);
 	/* Grid colors */
 	qproperty-lineColor: #292929;
@@ -115,7 +115,6 @@ QSplashScreen QLabel {
 QMenu {
 	border-top: 2px solid #08993E;
 	background-color: #15191c;
-	font-size: 11px;
 }
 
 QMenu::separator {
@@ -133,15 +132,12 @@ QMenu::item {
 
 QMenu::item:selected {
 	color: #d1d8e4;
-	font-weight: normal;
 	background-color: #21272b;
 }
 
 QMenu::item:disabled {
 	color: #515459;
 	background-color: #262b30;
-	font-size: 12px;
-	font-weight: normal;
 	padding: 4px 32px 4px 20px;
 }
 
@@ -241,6 +237,7 @@ lmms--gui--Oscilloscope {
 lmms--gui--CPULoadWidget {
 	border: none;
 	background: url(resources:cpuload_bg.png);
+	qproperty-stepSize: 1;
 }
 
 /* scrollbar: trough */
@@ -443,10 +440,33 @@ lmms--gui--AutomatableSlider::handle:vertical {
 	margin: -4px -12px -2px;
 }
 
+/* main horizontal sliders (zoom) */
+
+lmms--gui--AutomatableSlider::groove:horizontal {
+	background: #040506;
+	border: none;
+	border-radius: 2px;
+	height: 2px;
+	margin: 2px;
+}
+
+lmms--gui--AutomatableSlider::handle:horizontal {
+	background: none;
+	border-image: url(resources:horizontal_slider.png);
+	width: 10px;
+	height: 26px;
+	border-radius: 2px;
+	margin: -12px -2px;
+}
+
 /* window that shows up when you add effects */
 
 lmms--gui--EffectSelectDialog QScrollArea {
 	background: #262b30;
+}
+
+lmms--gui--SetupDialog QScrollArea {
+	border: 0px;
 }
 
 /* the inner boxes in LADSPA effect windows */

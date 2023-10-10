@@ -74,7 +74,7 @@ class PluginIssue;
 class LMMS_EXPORT Lv2ControlBase : public LinkedModelGroups
 {
 public:
-	static Plugin::PluginTypes check(const LilvPlugin* m_plugin,
+	static Plugin::Type check(const LilvPlugin* m_plugin,
 		std::vector<PluginIssue> &issues);
 
 	void shutdown();

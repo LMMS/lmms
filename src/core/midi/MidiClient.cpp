@@ -71,8 +71,7 @@ void MidiClient::removePort( MidiPort* port )
 		return;
 	}
 
-	QVector<MidiPort *>::Iterator it =
-		std::find( m_midiPorts.begin(), m_midiPorts.end(), port );
+	auto it = std::find(m_midiPorts.begin(), m_midiPorts.end(), port);
 	if( it != m_midiPorts.end() )
 	{
 		m_midiPorts.erase( it );

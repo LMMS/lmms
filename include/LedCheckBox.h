@@ -38,20 +38,19 @@ class LMMS_EXPORT LedCheckBox : public AutomatableButton
 {
 	Q_OBJECT
 public:
-	enum LedColors
+	enum class LedColor
 	{
 		Yellow,
 		Green,
-		Red,
-		NumColors
+		Red
 	} ;
 
 	LedCheckBox( const QString & _txt, QWidget * _parent,
 				const QString & _name = QString(),
-						LedColors _color = Yellow );
+						LedColor _color = LedColor::Yellow );
 	LedCheckBox( QWidget * _parent,
 				const QString & _name = QString(),
-						LedColors _color = Yellow );
+						LedColor _color = LedColor::Yellow );
 
 	~LedCheckBox() override;
 
@@ -75,7 +74,7 @@ private:
 
 	QString m_text;
 
-	void initUi( LedColors _color ); //!< to be called by ctors
+	void initUi( LedColor _color ); //!< to be called by ctors
 	void onTextUpdated(); //!< to be called when you updated @a m_text
 
 } ;

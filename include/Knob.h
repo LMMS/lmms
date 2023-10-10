@@ -42,9 +42,9 @@ namespace lmms::gui
 
 class SimpleTextFloat;
 
-enum knobTypes
+enum class KnobType
 {
-	knobDark_28, knobBright_26, knobSmall_17, knobVintage_32, knobStyled
+	Dark28, Bright26, Small17, Vintage32, Styled
 } ;
 
 
@@ -53,7 +53,7 @@ void convertPixmapToGrayScale(QPixmap &pixMap);
 class LMMS_EXPORT Knob : public QWidget, public FloatModelView
 {
 	Q_OBJECT
-	Q_ENUMS( knobTypes )
+	Q_ENUMS( KnobType )
 
 	Q_PROPERTY(float innerRadius READ innerRadius WRITE setInnerRadius)
 	Q_PROPERTY(float outerRadius READ outerRadius WRITE setOuterRadius)
@@ -75,7 +75,7 @@ class LMMS_EXPORT Knob : public QWidget, public FloatModelView
 	mapPropertyFromModel(bool,isVolumeKnob,setVolumeKnob,m_volumeKnob);
 	mapPropertyFromModel(float,volumeRatio,setVolumeRatio,m_volumeRatio);
 
-	Q_PROPERTY(knobTypes knobNum READ knobNum WRITE setknobNum)
+	Q_PROPERTY(KnobType knobNum READ knobNum WRITE setknobNum)
 	
 	Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor)
 
@@ -83,7 +83,7 @@ class LMMS_EXPORT Knob : public QWidget, public FloatModelView
 	void onKnobNumUpdated(); //!< to be called when you updated @a m_knobNum
 
 public:
-	Knob( knobTypes _knob_num, QWidget * _parent = nullptr, const QString & _name = QString() );
+	Knob( KnobType _knob_num, QWidget * _parent = nullptr, const QString & _name = QString() );
 	Knob( QWidget * _parent = nullptr, const QString & _name = QString() ); //!< default ctor
 	Knob( const Knob& other ) = delete;
 
@@ -106,8 +106,8 @@ public:
 	float outerRadius() const;
 	void setOuterRadius( float r );
 
-	knobTypes knobNum() const;
-	void setknobNum( knobTypes k );
+	KnobType knobNum() const;
+	void setknobNum( KnobType k );
 
 	QPointF centerPoint() const;
 	float centerPointX() const;
@@ -144,6 +144,9 @@ protected:
 	void wheelEvent( QWheelEvent * _me ) override;
 	void changeEvent(QEvent * ev) override;
 
+	void enterEvent(QEvent *event) override;
+	void leaveEvent(QEvent *event) override;
+
 	virtual float getValue( const QPoint & _p );
 
 private slots:
@@ -160,6 +163,7 @@ private:
 						float _innerRadius = 1) const;
 
 	void drawKnob( QPainter * _p );
+	void showTextFloat(int msecBeforeDisplay, int msecDisplayTime);
 	void setPosition( const QPoint & _p );
 	bool updateAngle();
 
@@ -206,7 +210,7 @@ private:
 	
 	QColor m_textColor;
 
-	knobTypes m_knobNum;
+	KnobType m_knobNum;
 
 } ;
 

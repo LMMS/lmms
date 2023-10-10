@@ -39,7 +39,7 @@ namespace lmms
 {
 
 
-LadspaSubPluginFeatures::LadspaSubPluginFeatures( Plugin::PluginTypes _type ) :
+LadspaSubPluginFeatures::LadspaSubPluginFeatures( Plugin::Type _type ) :
 	SubPluginFeatures( _type )
 {
 }
@@ -137,17 +137,17 @@ void LadspaSubPluginFeatures::listSubPluginKeys(
 	l_sortable_plugin_t plugins;
 	switch( m_type )
 	{
-		case Plugin::Instrument:
+		case Plugin::Type::Instrument:
 			plugins = lm->getInstruments();
 			break;
-		case Plugin::Effect:
+		case Plugin::Type::Effect:
 			plugins = lm->getValidEffects();
 			//plugins += lm->getInvalidEffects();
 			break;
-		case Plugin::Tool:
+		case Plugin::Type::Tool:
 			plugins = lm->getAnalysisTools();
 			break;
-		case Plugin::Other:
+		case Plugin::Type::Other:
 			plugins = lm->getOthers();
 			break;
 		default:

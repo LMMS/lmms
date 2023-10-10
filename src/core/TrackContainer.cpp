@@ -156,13 +156,13 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 
 
 
-int TrackContainer::countTracks( Track::TrackTypes _tt ) const
+int TrackContainer::countTracks( Track::Type _tt ) const
 {
 	int cnt = 0;
 	m_tracksMutex.lockForRead();
 	for (const auto& track : m_tracks)
 	{
-		if (track->type() == _tt || _tt == Track::NumTrackTypes)
+		if (track->type() == _tt || _tt == Track::Type::Count)
 		{
 			++cnt;
 		}
@@ -176,7 +176,7 @@ int TrackContainer::countTracks( Track::TrackTypes _tt ) const
 
 void TrackContainer::addTrack( Track * _track )
 {
-	if( _track->type() != Track::HiddenAutomationTrack )
+	if( _track->type() != Track::Type::HiddenAutomation )
 	{
 		_track->lock();
 		m_tracksMutex.lockForWrite();
@@ -196,14 +196,14 @@ void TrackContainer::removeTrack( Track * _track )
 	//   After checking that index != -1, we need to upgrade the lock to a write locker before changing m_tracks.
 	//   But since Qt offers no function to promote a read lock to a write lock, we must start with the write locker.
 	QWriteLocker lockTracksAccess(&m_tracksMutex);
-	int index = m_tracks.indexOf( _track );
-	if( index != -1 )
+	auto it = std::find(m_tracks.begin(), m_tracks.end(), _track);
+	if (it != m_tracks.end())
 	{
 		// If the track is solo, all other tracks are muted. Change this before removing the solo track:
 		if (_track->isSolo()) {
 			_track->setSolo(false);
 		}
-		m_tracks.remove( index );
+		m_tracks.erase(it);
 		lockTracksAccess.unlock();
 
 		if( Engine::getSong() )
@@ -226,9 +226,9 @@ void TrackContainer::updateAfterTrackAdd()
 void TrackContainer::clearAllTracks()
 {
 	//m_tracksMutex.lockForWrite();
-	while( !m_tracks.isEmpty() )
+	while (!m_tracks.empty())
 	{
-		delete m_tracks.first();
+		delete m_tracks.front();
 	}
 	//m_tracksMutex.unlock();
 }
@@ -240,7 +240,7 @@ bool TrackContainer::isEmpty() const
 {
 	for (const auto& track : m_tracks)
 	{
-		if (!track->getClips().isEmpty())
+		if (!track->getClips().empty())
 		{
 			return false;
 		}
@@ -268,14 +268,14 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 
 		switch(track->type())
 		{
-		case Track::AutomationTrack:
-		case Track::HiddenAutomationTrack:
-		case Track::PatternTrack:
+		case Track::Type::Automation:
+		case Track::Type::HiddenAutomation:
+		case Track::Type::Pattern:
 			if (clipNum < 0) {
 				track->getClipsInRange(clips, 0, time);
 			} else {
 				Q_ASSERT(track->numOfClips() > clipNum);
-				clips << track->getClip(clipNum);
+				clips.push_back(track->getClip(clipNum));
 			}
 		default:
 			break;
@@ -299,7 +299,7 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 			}
 			TimePos relTime = time - p->startPosition();
 			if (! p->getAutoResize()) {
-				relTime = qMin(relTime, p->length());
+				relTime = std::min(relTime, p->length());
 			}
 			float value = p->valueAt(relTime);
 

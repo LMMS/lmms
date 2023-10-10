@@ -37,7 +37,7 @@ namespace lmms
 
 
 SampleRecordHandle::SampleRecordHandle(SampleClip* clip, TimePos startRecordTimeOffset) :
-	PlayHandle( TypeSamplePlayHandle ),
+	PlayHandle(Type::SamplePlayHandle),
 	m_framesRecorded( 0 ),
 	m_minLength( clip->length() ),
 	m_track( clip->getTrack() ),

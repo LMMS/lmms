@@ -47,7 +47,7 @@ Plugin::Descriptor PLUGIN_EXPORT dynamicsprocessor_plugin_descriptor =
 				"plugin for processing dynamics in a flexible way" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,
@@ -167,19 +167,19 @@ bool DynProcEffect::processAudioBuffer( sampleFrame * _buf,
 		}
 
 // account for stereo mode
-		switch( stereoMode )
+		switch( static_cast<DynProcControls::StereoMode>(stereoMode) )
 		{
-			case DynProcControls::SM_Maximum:
+			case DynProcControls::StereoMode::Maximum:
 			{
 				sm_peak[0] = sm_peak[1] = qMax( m_currentPeak[0], m_currentPeak[1] );
 				break;
 			}
-			case DynProcControls::SM_Average:
+			case DynProcControls::StereoMode::Average:
 			{
 				sm_peak[0] = sm_peak[1] = ( m_currentPeak[0] + m_currentPeak[1] ) * 0.5;
 				break;
 			}
-			case DynProcControls::SM_Unlinked:
+			case DynProcControls::StereoMode::Unlinked:
 			{
 				sm_peak[0] = m_currentPeak[0];
 				sm_peak[1] = m_currentPeak[1];

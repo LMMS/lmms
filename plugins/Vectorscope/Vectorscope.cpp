@@ -39,7 +39,7 @@ extern "C" {
 		QT_TRANSLATE_NOOP("PluginBrowser", "A stereo field visualizer."),
 		"Martin Pavelek <he29/dot/HS/at/gmail/dot/com>",
 		0x0100,
-		Plugin::Effect,
+		Plugin::Type::Effect,
 		new PluginPixmapLoader("logo"),
 		nullptr,
 		nullptr,

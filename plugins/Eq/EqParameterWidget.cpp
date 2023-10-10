@@ -164,35 +164,35 @@ void EqParameterWidget::changeHandle( int i )
 	switch ( i )
 	{
 	case 0 :
-		m_handleList->at( i )->setType( highpass );
+		m_handleList->at( i )->setType( EqHandleType::HighPass );
 		m_handleList->at( i )->setPos( x, m_displayHeigth / 2 );
 		break;
 	case 1:
-		m_handleList->at( i )->setType( lowshelf );
+		m_handleList->at( i )->setType( EqHandleType::LowShelf );
 		m_handleList->at( i )->setPos( x, y );
 		break;
 	case 2:
-		m_handleList->at( i )->setType( para );
+		m_handleList->at( i )->setType( EqHandleType::Para );
 		m_handleList->at( i )->setPos( x, y );
 		break;
 	case 3:
-		m_handleList->at( i )->setType( para );
+		m_handleList->at( i )->setType( EqHandleType::Para );
 		m_handleList->at( i )->setPos( x, y );
 		break;
 	case 4:
-		m_handleList->at( i )->setType( para );
+		m_handleList->at( i )->setType( EqHandleType::Para );
 		m_handleList->at( i )->setPos( x, y );
 		break;
 	case 5:
-		m_handleList->at( i )->setType( para );
+		m_handleList->at( i )->setType( EqHandleType::Para );
 		m_handleList->at( i )->setPos( x, y );
 		break;
 	case 6:
-		m_handleList->at( i )->setType( highshelf );
+		m_handleList->at( i )->setType( EqHandleType::HighShelf );
 		m_handleList->at( i )->setPos( x, y );
 		break;
 	case 7:
-		m_handleList->at( i )->setType( lowpass );
+		m_handleList->at( i )->setType( EqHandleType::LowPass );
 		m_handleList->at( i )->setPos( QPointF( x, m_displayHeigth / 2 ) );
 		break;
 	}
