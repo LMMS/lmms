@@ -392,6 +392,7 @@ public slots:
 	void addPatternTrack();
 	// Convert all Pattern tracks or a single one to the Song Editor
 	void convertPatterntoSE(bool singlePattern = false, int pattern = 0);
+	void muteAllPatternTracks();
 
 
 private slots:

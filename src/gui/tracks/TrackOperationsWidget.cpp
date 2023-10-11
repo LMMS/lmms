@@ -353,10 +353,13 @@ void TrackOperationsWidget::updateMenu()
 	PatternTrackView* patternTrackView = dynamic_cast<PatternTrackView *>(m_trackView);
 	if (patternTrackView)
 	{
-		int patternIndex = patternTrackView->getPatternTrack()->patternIndex();
+		PatternTrack* pT = patternTrackView->getPatternTrack();
+		int patternIndex = pT->patternIndex();
 		toMenu->addSeparator();
-		toMenu->addAction(tr("Convert PatternTrack to Song Editor"), [patternIndex](){
+		toMenu->addAction(tr("Convert PatternTrack to Song Editor"), [patternIndex, pT](){
 			Engine::getSong()->convertPatterntoSE(true, patternIndex);
+			pT->getMutedModel()->setValue(true);
+			pT->dataChanged();
 		});
 	}
 

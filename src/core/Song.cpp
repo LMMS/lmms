@@ -881,10 +881,28 @@ void Song::convertPatterntoSE(bool singlePattern /* = false*/, int pattern /* = 
 		}
 	}
 
+	// If we are converting all pattern tracks, mute them all
+	// (if we convert a single one it will mute itself)
+	if (!singlePattern) { muteAllPatternTracks(); }
+
 	// Resolve all automation IDs
 	AutomationClip::resolveAllIDs();
 }
 
+void Song::muteAllPatternTracks()
+{
+	// Get a list of all tracks
+	const TrackList& tracks = this->tracks();
+	// Go through them and mute the pattern tracks only
+	for (Track* t : tracks)
+	{
+		if (t->type() == Track::TrackTypes::PatternTrack)
+		{
+			t->getMutedModel()->setValue(true);
+			t->dataChanged();
+		}
+	}
+}
 
 
 
