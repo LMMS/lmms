@@ -347,9 +347,7 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 
 	if (noteFramesLeft > 0)
 	{
-		// round the frames up, the more there are the less artyfacts are on each window end
-		// but its also more expensive, so just deal with it if you pitch shift
-		int framesToCopy = pitchRatio * frames + 128;
+		int framesToCopy = pitchRatio * frames + 1; // just in case
 		int framesIndex = std::min((int)(pitchRatio * currentNoteFrame), m_phaseVocoder.frames() - framesToCopy);
 
 		// load sample segmengt, with regards to pitch settings
@@ -358,15 +356,16 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 
 		// if pitch is changed, resample, else just copy
 		if (pitchRatio != 1.0f)
-		{ // resample for pitch bend
+		{
 			SRC_DATA resamplerData;
 
-			resamplerData.data_in = (float*)prePitchBuffer.data();	 // wtf
-			resamplerData.data_out = (float*)workingBuffer + offset; // wtf is this
+			resamplerData.data_in = (float*)prePitchBuffer.data();	   // wtf
+			resamplerData.data_out = (float*)(workingBuffer + offset); // wtf is this
 			resamplerData.input_frames = prePitchBuffer.size();
 			resamplerData.output_frames = frames;
 			resamplerData.src_ratio = inversePitchRatio;
-			src_simple(&resamplerData, SRC_SINC_MEDIUM_QUALITY, 2);
+
+			src_simple(&resamplerData, SRC_LINEAR, 2);
 		}
 		else { memcpy(workingBuffer + offset, prePitchBuffer.data(), frames * sizeof(sampleFrame)); }
 
