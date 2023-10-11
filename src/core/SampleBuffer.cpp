@@ -50,12 +50,18 @@ SampleBuffer::SampleBuffer(const QString& audioFile)
 	}
 
 	throw std::runtime_error{
-			"Failed to decode audio file: Either the audio codec is unsupported, or the file is corrupted."};
+		"Failed to decode audio file: Either the audio codec is unsupported, or the file is corrupted."};
 }
 
 SampleBuffer::SampleBuffer(const QByteArray& base64Data, int sampleRate)
 	: m_data(reinterpret_cast<const sampleFrame*>(base64Data.data()),
 		reinterpret_cast<const sampleFrame*>(base64Data.data()) + base64Data.size() / sizeof(sampleFrame))
+	, m_sampleRate(sampleRate)
+{
+}
+
+SampleBuffer::SampleBuffer(const std::vector<sampleFrame>& data, int sampleRate)
+	: m_data(data)
 	, m_sampleRate(sampleRate)
 {
 }

@@ -67,31 +67,22 @@ f_cnt_t AudioSampleRecorder::framesRecorded() const
 	return frames;
 }
 
-
-
-
-void AudioSampleRecorder::createSampleBuffer( SampleBuffer** sampleBuf )
+std::unique_ptr<SampleBuffer> AudioSampleRecorder::createSampleBuffer()
 {
 	const f_cnt_t frames = framesRecorded();
 	// create buffer to store all recorded buffers in
-	auto data = new sampleFrame[frames];
-	// make sure buffer is cleaned up properly at the end...
-	sampleFrame * data_ptr = data;
-
-
-	assert( data != nullptr );
+	auto bigBuffer = std::vector<sampleFrame>(frames);
 
 	// now copy all buffers into big buffer
-	for( BufferList::ConstIterator it = m_buffers.begin();
-						it != m_buffers.end(); ++it )
+	auto framesCopied = 0;
+	for (auto& buffer : m_buffers)
 	{
-		memcpy( data_ptr, ( *it ).first, ( *it ).second *
-							sizeof( sampleFrame ) );
-		data_ptr += ( *it ).second;
+		std::copy_n(buffer.first, buffer.second, bigBuffer.begin() + framesCopied);
+		framesCopied += buffer.second;
 	}
+
 	// create according sample-buffer out of big buffer
-	*sampleBuf = new SampleBuffer(data, frames, sampleRate());
-	delete[] data;
+	return std::make_unique<SampleBuffer>(std::move(bigBuffer), sampleRate());
 }
 
 
