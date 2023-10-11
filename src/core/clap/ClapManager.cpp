@@ -62,7 +62,7 @@ namespace
 		if (!dir.empty() && dir[0] == '~')
 		{
 			dir.remove_prefix(1);
-			return QDir::home().absolutePath().toStdString() + std::string{dir};
+			return QDir::home().absolutePath().toStdString().append(dir.data(), dir.size());
 		}
 #endif
 		return std::filesystem::path{dir};
@@ -94,7 +94,15 @@ ClapManager::~ClapManager()
 void ClapManager::initPlugins()
 {
 	findSearchPaths();
-	if (debugging()) { qDebug() << "Found .clap files:"; }
+	if (debugging())
+	{
+		qDebug() << "CLAP search paths:";
+		for (const auto& searchPath : m_searchPaths)
+		{
+			qDebug() << "-" << searchPath.c_str();
+		}
+		qDebug() << "Found .clap files:";
+	}
 	loadClapFiles(getSearchPaths());
 }
 
@@ -103,31 +111,41 @@ void ClapManager::findSearchPaths()
 	namespace fs = std::filesystem;
 	m_searchPaths.clear();
 
-	// Get CLAP_PATH paths
-	if (const char* clapPathTemp = std::getenv("CLAP_PATH"))
-	{
+	// Parses a string of paths, adding results to m_searchPaths
+	auto parsePaths = [this](const char* pathString) {
+		if (!pathString) { return; }
 		std::error_code ec;
-		auto clapPath = std::string_view{clapPathTemp};
-		auto pos = clapPath.find(LADSPA_PATH_SEPERATOR);
+		auto paths = std::string_view{pathString};
+		auto pos = paths.find(LADSPA_PATH_SEPERATOR);
 		while (pos != std::string_view::npos)
 		{
-			auto path = expandHomeDir(clapPath.substr(0, pos));
+			auto path = expandHomeDir(paths.substr(0, pos));
 			if (fs::is_directory(path, ec))
 			{
 				m_searchPaths.emplace_back(std::move(path.make_preferred()));
 			}
-			clapPath = clapPath.substr(pos + 1);
-			pos = clapPath.find(LADSPA_PATH_SEPERATOR);
+			paths = paths.substr(pos + 1);
+			pos = paths.find(LADSPA_PATH_SEPERATOR);
 		}
-		if (!clapPath.empty())
+		if (!paths.empty())
 		{
-			auto path = expandHomeDir(clapPath);
+			auto path = expandHomeDir(paths);
 			if (fs::is_directory(path, ec))
 			{
 				m_searchPaths.emplace_back(std::move(path.make_preferred()));
 			}
 		}
+	};
+
+	// Use LMMS_CLAP_PATH to override all of CLAP's default search paths
+	if (auto paths = std::getenv("LMMS_CLAP_PATH"))
+	{
+		parsePaths(paths);
+		return;
 	}
+
+	// Get CLAP_PATH paths
+	parsePaths(std::getenv("CLAP_PATH"));
 
 	// Add OS-dependent search paths
 #ifdef LMMS_BUILD_LINUX
@@ -179,15 +197,6 @@ void ClapManager::findSearchPaths()
 		m_searchPaths.emplace_back(std::move(path.make_preferred()));
 	}
 #endif
-
-	if (debugging())
-	{
-		qDebug() << "CLAP search paths:";
-		for (const auto& searchPath : m_searchPaths)
-		{
-			qDebug() << "-" << searchPath.c_str();
-		}
-	}
 }
 
 void ClapManager::loadClapFiles(const std::vector<std::filesystem::path>& searchPaths)
