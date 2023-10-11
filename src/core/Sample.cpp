@@ -114,10 +114,7 @@ auto swap(Sample& first, Sample& second) -> void
 bool Sample::play(sampleFrame* dst, PlaybackState* state, int numFrames, float desiredFrequency, Loop loopMode) const
 {
 	auto lock = std::shared_lock{m_mutex};
-	if (numFrames <= 0 || desiredFrequency <= 0 || m_buffer->size() <= 0 || m_buffer->sampleRate() <= 0)
-	{
-		return false;
-	}
+	if (numFrames <= 0 || desiredFrequency <= 0) { return false; }
 
 	auto resampleRatio = static_cast<float>(Engine::audioEngine()->processingSampleRate()) / m_buffer->sampleRate();
 	resampleRatio *= m_frequency / desiredFrequency;
@@ -168,7 +165,6 @@ void Sample::visualize(QPainter& p, const QRect& dr, int fromFrame, int toFrame)
 {
 	const auto lock = std::shared_lock{m_mutex};
 	const auto numFrames = static_cast<int>(m_buffer->size());
-	if (numFrames == 0) { return; }
 
 	const bool focusOnRange = toFrame <= numFrames && 0 <= fromFrame && fromFrame < toFrame;
 	const int w = dr.width();
@@ -257,7 +253,7 @@ void Sample::visualize(QPainter& p, const QRect& dr, int fromFrame, int toFrame)
 auto Sample::sampleDuration() const -> std::chrono::milliseconds
 {
 	const auto lock = std::shared_lock{m_mutex};
-	const auto duration = m_buffer->size() / static_cast<float>(sampleRate()) * 1000;
+	const auto duration = m_buffer->size() / static_cast<float>(m_buffer->sampleRate()) * 1000;
 	return std::chrono::milliseconds{static_cast<int>(duration)};
 }
 
