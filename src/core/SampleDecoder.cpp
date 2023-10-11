@@ -17,13 +17,13 @@
 
 namespace lmms {
 
-std::vector<SampleDecoder::Decoder> SampleDecoder::s_decoders = {&SampleDecoder::decodeSampleSF
+std::vector<SampleDecoder::Decoder> SampleDecoder::s_decoders = {
+	&SampleDecoder::decodeSampleSF,
 #ifdef LMMS_HAVE_OGGVORBIS
-	,
-	&SampleDecoder::decodeSampleOggVorbis
+	&SampleDecoder::decodeSampleOggVorbis,
 #endif
-	,
-	&SampleDecoder::decodeSampleDS};
+	&SampleDecoder::decodeSampleDS
+};
 
 auto SampleDecoder::decode(const QString& audioFile) -> std::optional<Result>
 {
