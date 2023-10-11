@@ -91,7 +91,7 @@ public:
 	*/
 	Flags flags() const override
 	{
-#ifdef LV2_INSTRUMENT_USE_MIDI
+#ifdef CLAP_INSTRUMENT_USE_MIDI
 		return Flag::IsSingleStreamed | Flag::IsMidiBased;
 #else
 		return Flag::IsSingleStreamed;

@@ -33,6 +33,8 @@
 #include "MidiEvent.h"
 
 #include <QApplication>
+#include <QDomDocument>
+#include <QDomElement>
 #include <QThread>
 #include <QDebug>
 
@@ -307,8 +309,22 @@ auto ClapInstance::start() -> bool
 
 auto ClapInstance::restart() -> bool
 {
+	qDebug() << "ClapInstance::restart()";
+	// Save controls, which we want to keep
+	QDomDocument doc;
+	QDomElement controls = doc.createElement("controls");
+	saveValues(doc, controls);
+
 	if (!unload()) { return false; }
-	return start();
+	if (!load()) { return false; }
+	if (!init()) { return false; }
+
+	// Reload the controls
+	loadValues(controls);
+
+	bool success = activate();
+	qDebug() << "ClapInstance::restart() end";
+	return success;
 }
 
 auto ClapInstance::load() -> bool
@@ -352,6 +368,7 @@ auto ClapInstance::unload() -> bool
 	m_pluginExtAudioPorts = nullptr;
 	m_pluginExtState = nullptr;
 	m_pluginExtParams = nullptr;
+	m_pluginExtGui = nullptr;
 
 	setPluginState(PluginState::None);
 	return true;
@@ -506,11 +523,20 @@ auto ClapInstance::init() -> bool
 			if (channelCount <= 0) { return nullptr; }
 
 			audioBuffers[port].channel_count = channelCount;
-			audioBuffers[port].constant_mask = 0; // TODO: Implement later?
+			if (isInput && port != monoPort && (port != stereoPort || stereoPort == CLAP_INVALID_ID))
+			{
+				// This input port will not be used by LMMS
+				// TODO: Will a mono port ever need to be used if a stereo port is available?
+				audioBuffers[port].constant_mask = static_cast<std::uint64_t>(-1);
+			}
+			else
+			{
+				audioBuffers[port].constant_mask = 0;
+			}
 
 			auto& rawBuffer = rawAudioBuffers.emplace_back(channelCount, DEFAULT_BUFFER_SIZE);
 			audioBuffers[port].data32 = rawBuffer.data();
-			audioBuffers[port].data64 = nullptr;
+			audioBuffers[port].data64 = nullptr; // Not supported by LMMS
 			audioBuffers[port].latency = 0; // TODO
 		}
 
@@ -601,12 +627,13 @@ auto ClapInstance::init() -> bool
 		}
 
 		qDebug() << "CLAP PARAMS: m_params.size():" << m_params.size();
+		LinkedModelGroup::clearModels();
 		for (auto param : m_params)
 		{
 			if (param && param->model())
 			{
 				const auto uri = QString::fromUtf8(param->id().data());
-				addModel(param->model(), uri);
+				LinkedModelGroup::addModel(param->model(), uri);
 
 				// Tell plugin when param value changes in host
 				auto updateParam = [this, param]() {
