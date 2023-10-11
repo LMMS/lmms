@@ -48,7 +48,7 @@ public:
 	using size_type = std::vector<sampleFrame>::size_type;
 
 	SampleBuffer() = default;
-	SampleBuffer(const QString& audioFile);
+	explicit SampleBuffer(const QString& audioFile);
 	SampleBuffer(const QByteArray& base64Data, int sampleRate);
 	SampleBuffer(
 		const sampleFrame* data, int numFrames, int sampleRate = Engine::audioEngine()->processingSampleRate());
