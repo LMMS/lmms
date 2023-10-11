@@ -121,7 +121,7 @@ void AudioPort::doProcessing()
 		if( ph->buffer() )
 		{
 			if( ph->usesBuffer()
-				&& ( ph->type() == PlayHandle::TypeNotePlayHandle
+				&& ( ph->type() == PlayHandle::Type::NotePlayHandle
 					|| !MixHelpers::isSilent( ph->buffer(), fpp ) ) )
 			{
 				m_bufferUsage = true;

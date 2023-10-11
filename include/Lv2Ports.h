@@ -33,6 +33,7 @@
 #include <memory>
 #include <vector>
 
+#include "Flags.h"
 #include "lmms_basics.h"
 #include "PluginIssue.h"
 
@@ -210,12 +211,12 @@ private:
 
 struct AtomSeq : public VisitablePort<AtomSeq, PortBase>
 {
-	enum FlagType
+	enum class FlagType
 	{
 		None = 0,
 		Midi = 1
 	};
-	unsigned flags = FlagType::None;
+	Flags<FlagType> flags = FlagType::None;
 
 	struct Lv2EvbufDeleter
 	{

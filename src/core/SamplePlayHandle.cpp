@@ -36,7 +36,7 @@ namespace lmms
 
 
 SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer , bool ownAudioPort ) :
-	PlayHandle( TypeSamplePlayHandle ),
+	PlayHandle( Type::SamplePlayHandle ),
 	m_sampleBuffer( sharedObject::ref( sampleBuffer ) ),
 	m_doneMayReturnTrue( true ),
 	m_frame( 0 ),

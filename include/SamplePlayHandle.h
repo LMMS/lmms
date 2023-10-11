@@ -40,7 +40,7 @@ class Track;
 class AudioPort;
 
 
-class SamplePlayHandle : public PlayHandle
+class LMMS_EXPORT SamplePlayHandle : public PlayHandle
 {
 public:
 	SamplePlayHandle( SampleBuffer* sampleBuffer , bool ownAudioPort = true );

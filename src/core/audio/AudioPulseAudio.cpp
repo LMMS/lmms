@@ -22,8 +22,8 @@
  *
  */
 
+#include <QFormLayout>
 #include <QLineEdit>
-#include <QLabel>
 
 #include "AudioPulseAudio.h"
 
@@ -47,10 +47,10 @@ static void stream_write_callback(pa_stream *s, size_t length, void *userdata)
 
 
 AudioPulseAudio::AudioPulseAudio( bool & _success_ful, AudioEngine*  _audioEngine ) :
-	AudioDevice( qBound<ch_cnt_t>(
+	AudioDevice(std::clamp<ch_cnt_t>(
+		ConfigManager::inst()->value("audiopa", "channels").toInt(),
 		DEFAULT_CHANNELS,
-		ConfigManager::inst()->value( "audiopa", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _audioEngine ),
+		SURROUND_CHANNELS), _audioEngine),
 	m_s( nullptr ),
 	m_quit( false ),
 	m_convertEndian( false )
@@ -312,24 +312,21 @@ void AudioPulseAudio::signalConnected( bool connected )
 AudioPulseAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	AudioDeviceSetupWidget( AudioPulseAudio::name(), _parent )
 {
+	QFormLayout * form = new QFormLayout(this);
+
 	m_device = new QLineEdit( AudioPulseAudio::probeDevice(), this );
-	m_device->setGeometry( 10, 20, 160, 20 );
+	form->addRow(tr("Device"), m_device);
 
-	auto dev_lbl = new QLabel(tr("Device"), this);
-	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
-	dev_lbl->setGeometry( 10, 40, 160, 10 );
-
-	auto m = new gui::LcdSpinBoxModel(/* this */);
+	auto m = new gui::LcdSpinBoxModel();
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
 	m->setStep( 2 );
 	m->setValue( ConfigManager::inst()->value( "audiopa",
-							"channels" ).toInt() );
+										 "channels" ).toInt() );
 
 	m_channels = new gui::LcdSpinBox( 1, this );
 	m_channels->setModel( m );
-	m_channels->setLabel( tr( "Channels" ) );
-	m_channels->move( 180, 20 );
 
+	form->addRow(tr("Channels"), m_channels);
 }
 
 

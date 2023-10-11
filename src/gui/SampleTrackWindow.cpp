@@ -54,6 +54,16 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	m_track(tv->model()),
 	m_stv(tv)
 {
+#if QT_VERSION < 0x50C00
+	// Workaround for a bug in Qt versions below 5.12,
+	// where argument-dependent-lookup fails for QFlags operators
+	// declared inside a namepsace.
+	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
+	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
+
+	using ::operator|;
+#endif
+
 	// init own layout + widgets
 	setFocusPolicy(Qt::StrongFocus);
 	auto vlayout = new QVBoxLayout(this);
@@ -74,7 +84,6 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 
 	// setup line edit for changing sample track name
 	m_nameLineEdit = new QLineEdit;
-	m_nameLineEdit->setFont(pointSize<9>(m_nameLineEdit->font()));
 	connect(m_nameLineEdit, SIGNAL(textChanged(const QString&)),
 				this, SLOT(textChanged(const QString&)));
 
@@ -94,7 +103,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	Qt::Alignment widgetAlignment = Qt::AlignHCenter | Qt::AlignCenter;
 
 	// set up volume knob
-	m_volumeKnob = new Knob(knobBright_26, nullptr, tr("Sample volume"));
+	m_volumeKnob = new Knob(KnobType::Bright26, nullptr, tr("Sample volume"));
 	m_volumeKnob->setVolumeKnob(true);
 	m_volumeKnob->setHintText(tr("Volume:"), "%");
 
@@ -108,7 +117,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 
 
 	// set up panning knob
-	m_panningKnob = new Knob(knobBright_26, nullptr, tr("Panning"));
+	m_panningKnob = new Knob(KnobType::Bright26, nullptr, tr("Panning"));
 	m_panningKnob->setHintText(tr("Panning:"), "");
 
 	basicControlsLayout->addWidget(m_panningKnob, 0, 1);

@@ -49,22 +49,22 @@ LadspaDescription::LadspaDescription( QWidget * _parent,
 	l_sortable_plugin_t plugins;
 	switch( _type )
 	{
-		case SOURCE:
+		case LadspaPluginType::Source:
 			plugins = manager->getInstruments();
 			break;
-		case TRANSFER:
+		case LadspaPluginType::Transfer:
 			plugins = manager->getValidEffects();
 			break;
-		case VALID:
+		case LadspaPluginType::Valid:
 			plugins = manager->getValidEffects();
 			break;
-		case INVALID:
+		case LadspaPluginType::Invalid:
 			plugins = manager->getInvalidEffects();
 			break;
-		case SINK:
+		case LadspaPluginType::Sink:
 			plugins = manager->getAnalysisTools();
 			break;
-		case OTHER:
+		case LadspaPluginType::Other:
 			plugins = manager->getOthers();
 			break;
 		default:
@@ -75,7 +75,7 @@ LadspaDescription::LadspaDescription( QWidget * _parent,
 	for (const auto& plugin : plugins)
 	{
 		ch_cnt_t audioDeviceChannels = Engine::audioEngine()->audioDev()->channels();
-		if (_type != VALID || manager->getDescription(plugin.second)->inputChannels <= audioDeviceChannels)
+		if (_type != LadspaPluginType::Valid || manager->getDescription(plugin.second)->inputChannels <= audioDeviceChannels)
 		{
 			pluginNames.push_back(plugin.first);
 			m_pluginKeys.push_back(plugin.second);

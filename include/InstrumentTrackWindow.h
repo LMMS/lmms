@@ -47,7 +47,7 @@ class MixerLineLcdSpinBox;
 class InstrumentFunctionArpeggioView;
 class InstrumentFunctionNoteStackingView;
 class InstrumentMidiIOView;
-class InstrumentMiscView;
+class InstrumentTuningView;
 class InstrumentSoundShapingView;
 class InstrumentTrackShapingView;
 class InstrumentTrackView;
@@ -154,7 +154,7 @@ private:
 	InstrumentFunctionArpeggioView* m_arpeggioView;
 	InstrumentMidiIOView * m_midiView;
 	EffectRackView * m_effectView;
-	InstrumentMiscView *m_miscView;
+	InstrumentTuningView *m_tuningView;
 
 
 	// test-piano at the bottom of every instrument-settings-window

@@ -44,7 +44,7 @@ static const auto names = std::array<QString, 3>
 
 
 LedCheckBox::LedCheckBox( const QString & _text, QWidget * _parent,
-				const QString & _name, LedColors _color ) :
+				const QString & _name, LedColor _color ) :
 	AutomatableButton( _parent, _name ),
 	m_text( _text )
 {
@@ -55,7 +55,7 @@ LedCheckBox::LedCheckBox( const QString & _text, QWidget * _parent,
 
 
 LedCheckBox::LedCheckBox( QWidget * _parent,
-				const QString & _name, LedColors _color ) :
+				const QString & _name, LedColor _color ) :
 	LedCheckBox( QString(), _parent, _name, _color )
 {
 }
@@ -103,16 +103,12 @@ void LedCheckBox::paintEvent( QPaintEvent * )
 
 
 
-void LedCheckBox::initUi( LedColors _color )
+void LedCheckBox::initUi( LedColor _color )
 {
 	setCheckable( true );
 
-	if( _color >= NumColors || _color < Yellow )
-	{
-		_color = Yellow;
-	}
 	m_ledOnPixmap = new QPixmap( embed::getIconPixmap(
-					names[_color].toUtf8().constData() ) );
+					names[static_cast<std::size_t>(_color)].toUtf8().constData() ) );
 	m_ledOffPixmap = new QPixmap( embed::getIconPixmap( "led_off" ) );
 
 	setFont( pointSize<7>( font() ) );

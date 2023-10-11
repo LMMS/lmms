@@ -89,7 +89,7 @@ MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
 	// Adds the controller knobs
 	for (int i = 0; i < MidiControllerCount; ++i)
 	{
-		m_controllerKnob[i] = new Knob(knobBright_26);
+		m_controllerKnob[i] = new Knob(KnobType::Bright26);
 		m_controllerKnob[i]->setLabel(tr("CC %1").arg(i));
 		knobsAreaLayout->addWidget(m_controllerKnob[i], i/4, i%4);
 	}

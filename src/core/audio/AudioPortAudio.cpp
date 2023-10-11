@@ -49,7 +49,7 @@ void AudioPortAudioSetupUtil::updateChannels()
 
 #ifdef LMMS_HAVE_PORTAUDIO
 
-#include <QLabel>
+#include <QFormLayout>
 
 #include "Engine.h"
 #include "ConfigManager.h"
@@ -62,10 +62,10 @@ namespace lmms
 
 
 AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine ) :
-	AudioDevice( qBound<ch_cnt_t>(
+	AudioDevice(std::clamp<ch_cnt_t>(
+		ConfigManager::inst()->value("audioportaudio", "channels").toInt(),
 		DEFAULT_CHANNELS,
-		ConfigManager::inst()->value( "audioportaudio", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _audioEngine ),
+		SURROUND_CHANNELS), _audioEngine),
 	m_paStream( nullptr ),
 	m_wasPAInitError( false ),
 	m_outBuf( new surroundSampleFrame[audioEngine()->framesPerPeriod()] ),
@@ -295,8 +295,8 @@ int AudioPortAudio::process_callback(
 			}
 			m_outBufSize = frames;
 		}
-		const int min_len = qMin( (int)_framesPerBuffer,
-			m_outBufSize - m_outBufPos );
+		const int min_len = std::min(static_cast<int>(_framesPerBuffer),
+			m_outBufSize - m_outBufPos);
 
 		float master_gain = audioEngine()->masterGain();
 
@@ -419,19 +419,13 @@ AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 {
 	using gui::ComboBox;
 
-	m_backend = new ComboBox( this, "BACKEND" );
-	m_backend->setGeometry( 64, 15, 260, ComboBox::DEFAULT_HEIGHT );
+	QFormLayout * form = new QFormLayout(this);
 
-	auto backend_lbl = new QLabel(tr("Backend"), this);
-	backend_lbl->setFont( pointSize<7>( backend_lbl->font() ) );
-	backend_lbl->move( 8, 18 );
+	m_backend = new ComboBox( this, "BACKEND" );
+	form->addRow(tr("Backend"), m_backend);
 
 	m_device = new ComboBox( this, "DEVICE" );
-	m_device->setGeometry( 64, 35, 260, ComboBox::DEFAULT_HEIGHT );
-
-	auto dev_lbl = new QLabel(tr("Device"), this);
-	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
-	dev_lbl->move( 8, 38 );
+	form->addRow(tr("Device"), m_device);
 	
 /*	LcdSpinBoxModel * m = new LcdSpinBoxModel(  );
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
@@ -496,12 +490,12 @@ void AudioPortAudio::setupWidget::show()
 		const QString& device = ConfigManager::inst()->value(
 			"audioportaudio", "device" );
 		
-		int i = qMax( 0, m_setupUtil.m_backendModel.findText( backend ) );
+		int i = std::max(0, m_setupUtil.m_backendModel.findText(backend));
 		m_setupUtil.m_backendModel.setValue( i );
 		
 		m_setupUtil.updateDevices();
 		
-		i = qMax( 0, m_setupUtil.m_deviceModel.findText( device ) );
+		i = std::max(0, m_setupUtil.m_deviceModel.findText(device));
 		m_setupUtil.m_deviceModel.setValue( i );
 	}
 

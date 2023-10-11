@@ -22,6 +22,7 @@ lmms--gui--AutomationEditor {
 	qproperty-backgroundShade: rgba(255, 255, 255, 15);
 	qproperty-nodeInValueColor: rgba(255, 119, 175, 150);
 	qproperty-nodeOutValueColor: rgba(129, 231, 181, 150);
+	qproperty-nodeTangentLineColor: rgba(200, 200, 200, 255);
 	qproperty-crossColor: rgb( 255, 51, 51 );
 	/* Grid colors */
 	qproperty-lineColor: rgba(128, 128, 128, 80);
@@ -82,7 +83,6 @@ lmms--gui--TextFloat, lmms--gui--SimpleTextFloat {
 QMenu {
 	border:1px solid #747474;
 	background-color: #c9c9c9;
-	font-size:11px;
 }
 
 QMenu::separator {
@@ -98,15 +98,12 @@ QMenu::item {
 
 QMenu::item:selected {
 	color: white;
-	font-weight:bold;
 	background-color: #747474;
 }
 
 QMenu::item:disabled {
 	color: #747474;
 	background-color: #c9c9c9;
-	font-size:12px;
-	font-weight: normal;
 	padding: 4px 32px 4px 20px;
 }
 
@@ -132,7 +129,7 @@ QMenu::indicator:selected {
 
 lmms--gui--FileBrowser QCheckBox
 {
-	font-size: 10px;
+	font-size: 8pt;
 	color: white;
 }
 
@@ -209,6 +206,7 @@ lmms--gui--Oscilloscope {
 lmms--gui--CPULoadWidget {
 	border: none;
 	background: url(resources:cpuload_bg.png);
+	qproperty-stepSize: 4;
 }
 
 /* scrollbar: trough */
@@ -416,6 +414,25 @@ lmms--gui--AutomatableSlider::handle:vertical {
 	height: 10px;
 	border-radius: 2px;
 	margin: -4px -12px -2px;
+}
+
+/* main horizontal sliders (zoom) */
+
+lmms--gui--AutomatableSlider::groove:horizontal {
+	background: rgba(0,0,0, 128);
+	border: 1px inset rgba(100,100,100, 64);
+	border-radius: 2px;
+	height: 2px;
+	margin: 2px;
+}
+
+lmms--gui--AutomatableSlider::handle:horizontal {
+	background: none;
+	border-image: url(resources:horizontal_slider.png);
+	width: 10px;
+	height: 26px;
+	border-radius: 2px;
+	margin: -12px -2px;
 }
 
 /* about dialog */
