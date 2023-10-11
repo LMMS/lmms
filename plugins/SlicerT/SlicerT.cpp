@@ -313,14 +313,13 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 	if (m_originalSample.frames() < 2048) { return; }
 
 	// playback parameters
-	// const float freq = handle->frequency();
-	const float pitchRatio = pow(2, m_parentTrack->pitchModel()->value() / 1200);
-	const float inversePitchRatio = 1.0f / pitchRatio;
 	const int noteIndex = handle->key() - m_parentTrack->baseNote();
 	const int playedFrames = handle->totalFramesPlayed();
 	const fpp_t frames = handle->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = handle->noteOffset();
 	const int bpm = Engine::getSong()->getTempo();
+	const float pitchRatio = pow(2, m_parentTrack->pitchModel()->value() / 1200);
+	const float inversePitchRatio = 1.0f / pitchRatio;
 
 	// update scaling parameters
 	float speedRatio = (float)m_originalBPM.value() / bpm;
@@ -348,11 +347,13 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 
 	if (noteFramesLeft > 0)
 	{
-		// load sample segmengt, with regards to pitch settings
-		// TODO: THIS CRASHES OFTEN
-		std::vector<sampleFrame> prePitchBuffer(pitchRatio * frames + 1, {0.0f, 0.0f}); // round the frames up
-		int framesToCopy = std::min((int)(pitchRatio * frames) + 1, noteFramesLeft);	// same here
+		// round the frames up, the more there are the less artyfacts are on each window end
+		// but its also more expensive, so just deal with it if you pitch shift
+		int framesToCopy = pitchRatio * frames + 1;
 		int framesIndex = std::min((int)(pitchRatio * currentNoteFrame), m_phaseVocoder.frames() - framesToCopy);
+
+		// load sample segmengt, with regards to pitch settings
+		std::vector<sampleFrame> prePitchBuffer(framesToCopy, {0.0f, 0.0f});
 		m_phaseVocoder.getFrames(prePitchBuffer.data(), framesIndex, framesToCopy);
 
 		// resample for pitch bend
@@ -364,7 +365,9 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 		resamplerData.output_frames = frames;
 		resamplerData.src_ratio = inversePitchRatio;
 
-		src_simple(&resamplerData, SRC_SINC_MEDIUM_QUALITY, 2); // only 2 channels
+		// if pitch is changed, interpolate, else just copy
+		if (pitchRatio != 1.0f) { src_simple(&resamplerData, SRC_SINC_MEDIUM_QUALITY, 2); }
+		else { memcpy(workingBuffer + offset, prePitchBuffer.data(), frames * sizeof(sampleFrame)); }
 
 		// exponential fade out, applyRelease kinda sucks
 		if (noteFramesLeft < m_fadeOutFrames.value())
