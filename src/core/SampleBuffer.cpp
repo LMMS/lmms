@@ -42,7 +42,7 @@ SampleBuffer::SampleBuffer(const QString& audioFile)
 
 	if (auto decodedResult = SampleDecoder::decode(resolvedFileName))
 	{
-		auto [data, sampleRate] = *decodedResult;
+		auto& [data, sampleRate] = *decodedResult;
 		m_data = std::move(data);
 		m_sampleRate = sampleRate;
 		m_audioFile = audioFile;
