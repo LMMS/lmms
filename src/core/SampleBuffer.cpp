@@ -60,8 +60,8 @@ SampleBuffer::SampleBuffer(const QByteArray& base64Data, int sampleRate)
 {
 }
 
-SampleBuffer::SampleBuffer(const std::vector<sampleFrame>& data, int sampleRate)
-	: m_data(data)
+SampleBuffer::SampleBuffer(std::vector<sampleFrame> data, int sampleRate)
+	: m_data(std::move(data))
 	, m_sampleRate(sampleRate)
 {
 }
