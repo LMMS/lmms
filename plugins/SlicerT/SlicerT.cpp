@@ -349,24 +349,25 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 	{
 		// round the frames up, the more there are the less artyfacts are on each window end
 		// but its also more expensive, so just deal with it if you pitch shift
-		int framesToCopy = pitchRatio * frames + 1;
+		int framesToCopy = pitchRatio * frames + 128;
 		int framesIndex = std::min((int)(pitchRatio * currentNoteFrame), m_phaseVocoder.frames() - framesToCopy);
 
 		// load sample segmengt, with regards to pitch settings
 		std::vector<sampleFrame> prePitchBuffer(framesToCopy, {0.0f, 0.0f});
 		m_phaseVocoder.getFrames(prePitchBuffer.data(), framesIndex, framesToCopy);
 
-		// resample for pitch bend
-		SRC_DATA resamplerData;
+		// if pitch is changed, resample, else just copy
+		if (pitchRatio != 1.0f)
+		{ // resample for pitch bend
+			SRC_DATA resamplerData;
 
-		resamplerData.data_in = (float*)prePitchBuffer.data();	 // wtf
-		resamplerData.data_out = (float*)workingBuffer + offset; // wtf is this
-		resamplerData.input_frames = prePitchBuffer.size();
-		resamplerData.output_frames = frames;
-		resamplerData.src_ratio = inversePitchRatio;
-
-		// if pitch is changed, interpolate, else just copy
-		if (pitchRatio != 1.0f) { src_simple(&resamplerData, SRC_SINC_MEDIUM_QUALITY, 2); }
+			resamplerData.data_in = (float*)prePitchBuffer.data();	 // wtf
+			resamplerData.data_out = (float*)workingBuffer + offset; // wtf is this
+			resamplerData.input_frames = prePitchBuffer.size();
+			resamplerData.output_frames = frames;
+			resamplerData.src_ratio = inversePitchRatio;
+			src_simple(&resamplerData, SRC_SINC_MEDIUM_QUALITY, 2);
+		}
 		else { memcpy(workingBuffer + offset, prePitchBuffer.data(), frames * sizeof(sampleFrame)); }
 
 		// exponential fade out, applyRelease kinda sucks
@@ -390,7 +391,6 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 		float absoluteCurrentNote = (float)currentNoteFrame / totalFrames;
 		float absoluteStartNote = (float)sliceStart / totalFrames;
 		float abslouteEndNote = (float)sliceEnd / totalFrames;
-		printf("curr: %f, start: %f, end: %f\n", absoluteCurrentNote, absoluteStartNote, abslouteEndNote);
 		emit isPlaying(absoluteCurrentNote, absoluteStartNote, abslouteEndNote);
 	}
 	else { emit isPlaying(-1, 0, 0); }
