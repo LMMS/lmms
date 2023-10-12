@@ -34,6 +34,7 @@
 #include "LedCheckBox.h"
 #include "TempoSyncBarModelEditor.h"
 
+#include <QHBoxLayout>
 #include <QLabel>
 
 
@@ -50,10 +51,18 @@ QWidget * LadspaWidgetFactory::createWidget(LadspaControl * ladspaControl, QWidg
 	{
 	case BufferDataType::Toggled:
 	{
+		// The actual check box is put into a widget because LedCheckBox does not play nice with layouts.
+		// Putting it directly into a grid layout disables the resizing behavior of all columns where it
+		// appears. Hence we put it into the layout of a widget that knows how to play nice with layouts.
+		QWidget * widgetWithLayout = new QWidget(parent);
+		QHBoxLayout * layout = new QHBoxLayout(widgetWithLayout);
+		layout->setContentsMargins(0, 0, 0, 0);
 		LedCheckBox * toggle = new LedCheckBox(
 			name, parent, QString(), LedCheckBox::LedColor::Green, false);
 		toggle->setModel(ladspaControl->toggledModel());
-		return toggle;
+		layout->addWidget(toggle, 0, Qt::AlignLeft);
+
+		return widgetWithLayout;
 	}
 
 	case BufferDataType::Integer:
