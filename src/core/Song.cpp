@@ -872,9 +872,16 @@ void Song::convertPatterntoSE(bool singlePattern /* = false*/, int pattern /* = 
 			for (Clip* patternclip : patternclips)
 			{
 				auto pos = patternclip->startPosition();
-				auto patternTcoLen = patternclip->length().getTicks();
+				auto clipLen = src->length().getTicks();
+				auto patternClipLen = patternclip->length().getTicks();
 				auto patternTrackLen = patternStore->lengthOfPattern(i) * TimePos::ticksPerBar();
-				auto numOfCopies = patternTcoLen / patternTrackLen;
+				auto numOfCopies = patternClipLen / patternTrackLen;
+				// If we have an pattern clip that isn't a perfect multiple of the pattern size
+				// we check if the clip that will be copied would fit the remainder of the pattern clip
+				if (patternClipLen % patternTrackLen >= clipLen)
+				{
+					++numOfCopies;
+				}
 
 				for (int j = 0; j < numOfCopies; ++j)
 				{
