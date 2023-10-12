@@ -831,7 +831,12 @@ void Song::convertPatterntoSE(bool singlePattern /* = false*/, int pattern /* = 
 	{
 		// Create a clone of the track and add it to the song editor
 		Track* clonedTrack = nullptr;
-		if (track->type() == Track::Type::Instrument || track->type() == Track::Type::Sample)
+		if
+		(
+			track->type() == Track::Type::Instrument
+			|| track->type() == Track::Type::Sample
+			|| track->type() == Track::Type::Automation
+		)
 		{
 			// Create XML data of the track for the clone
 			QDomDocument doc;
