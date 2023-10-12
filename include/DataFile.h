@@ -105,32 +105,6 @@ private:
 
 	void cleanMetaNodes( QDomElement de );
 
-	// helper upgrade routines
-	/*
-	void upgrade_0_4_0_20080104();
-	void upgrade_0_4_0_20080118();
-	void upgrade_0_4_0_20080129();
-	void upgrade_0_4_0_20080409();
-	void upgrade_0_4_0_20080607();
-	void upgrade_0_4_0_20080622();
-	void upgrade_0_4_0_beta1();
-	void upgrade_0_4_0_rc2();
-	*/
-
-	/*
-	void upgrade_1_0_99();
-	void upgrade_1_1_0();
-	void upgrade_1_1_91();
-	void upgrade_1_2_0_rc3();
-	*/
-	//void upgrade_1_3_0();
-	//void upgrade_noHiddenClipNames();
-	//void upgrade_automationNodes();
-	//void upgrade_extendedNoteRange();
-	//void upgrade_defaultTripleOscillatorHQ();
-
-	// List of all upgrade methods
-	static const std::vector<UpgradeMethod> UPGRADE_METHODS;
 	// List of ProjectVersions for the legacyFileVersion method
 	static const std::vector<ProjectVersion> UPGRADE_VERSIONS;
 

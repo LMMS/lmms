@@ -72,28 +72,6 @@ const DataFile::ResourcesMap DataFile::ELEMENTS_WITH_RESOURCES = {
 { "audiofileprocessor", {"src"} },
 };
 
-// Vector with all the upgrade methods
-const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
-	//&DataFile::upgrade_0_2_1_20070501   ,   &DataFile::upgrade_0_2_1_20070508,
-	//&DataFile::upgrade_0_3_0_rc2        ,   &DataFile::upgrade_0_3_0,
-	/*
-	&DataFile::upgrade_0_4_0_20080104   ,   &DataFile::upgrade_0_4_0_20080118,
-	&DataFile::upgrade_0_4_0_20080129   ,   &DataFile::upgrade_0_4_0_20080409,
-	&DataFile::upgrade_0_4_0_20080607   ,   &DataFile::upgrade_0_4_0_20080622,
-	&DataFile::upgrade_0_4_0_beta1      ,   &DataFile::upgrade_0_4_0_rc2,
-	*/
-	/*
-	&DataFile::upgrade_1_0_99           ,   &DataFile::upgrade_1_1_0,
-	&DataFile::upgrade_1_1_91           ,   &DataFile::upgrade_1_2_0_rc3,
-	*/
-	//&DataFile::upgrade_1_3_0            ,
-//	&DataFile::upgrade_noHiddenClipNames,
-//	&DataFile::upgrade_automationNodes  ,//   &DataFile::upgrade_extendedNoteRange,
-//	&DataFile::upgrade_defaultTripleOscillatorHQ,
-	//&DataFile::upgrade_mixerRename      ,   &DataFile::upgrade_bbTcoRename,
-	//&DataFile::upgrade_sampleAndHold    ,
-};
-
 // Vector of all versions that have upgrade routines.
 const std::vector<ProjectVersion> DataFile::UPGRADE_VERSIONS = {
 	"0.2.1-20070501"   ,   "0.2.1-20070508"   ,   "0.3.0-rc2",
@@ -160,7 +138,7 @@ DataFile::DataFile( const QString & _fileName ) :
 	m_fileName(_fileName),
 	m_content(),
 	m_head(),
-	m_fileVersion( UPGRADE_METHODS.size() )
+	m_fileVersion(DATAFILE_VERSION)
 {
 	QFile inFile( _fileName );
 	if( !inFile.open( QIODevice::ReadOnly ) )
@@ -190,7 +168,7 @@ DataFile::DataFile( const QByteArray & _data ) :
 	m_fileName(""),
 	m_content(),
 	m_head(),
-	m_fileVersion( UPGRADE_METHODS.size() )
+	m_fileVersion(DATAFILE_VERSION)
 {
 	loadData( _data, "<internal data>" );
 }
@@ -642,40 +620,6 @@ void DataFile::cleanMetaNodes( QDomElement _de )
 }
 
 
-// Remove FX prefix from mixer and related nodes
-//void DataFile::upgrade_mixerRename()
-
-
-// Rename BB to pattern and TCO to clip
-//void DataFile::upgrade_bbTcoRename()
-
-
-// Set LFO speed to 0.01 on projects made before sample-and-hold PR
-//void DataFile::upgrade_sampleAndHold()
-
-/*
-template<class Up>
-void update(QDomDocument& document, const int start, int& i)
-{
-    if (i >= start)
-	{
-        Up{document}();
-    } 
-    ++i;
-}
-
-
-template<class... Ups>
-void updaters (QDomDocument& document, const unsigned int start)
-{
-	int i = 0;
-	// This fold expression instances and calls each update functor in order
-    // begining with index "start"
-    ( update<Ups>(document, start, i), ... );
-}
-*/
-
-
 void DataFile::upgradeAll()
 {
 	// Runs all necessary upgrade methods
@@ -704,9 +648,9 @@ void DataFile::upgradeAll()
 	upgrade<22, UpgradeTo13RenameBBTCO>();
 	upgrade<23, UpgradeTo13SampleAndHold>();
 	// Add your upgrader functor here...
-	// and increment DATAFILE_VERSION in DataFile.h
+	// and increment DATAFILE_VERSION in DataFile.h to
+	// 1 greater than you upgrader index.
 
-	// Bump the file version (which should be the size of the upgrade methods vector)
 	m_fileVersion = DATAFILE_VERSION;
 
 	// update document meta data
