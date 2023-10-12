@@ -508,7 +508,6 @@ void CarlaInstrument::play(sampleFrame* workingBuffer)
 
     if (fHandle == nullptr)
     {
-        instrumentTrack()->processAudioBuffer(workingBuffer, bufsize, nullptr);
         return;
     }
 
@@ -556,8 +555,6 @@ void CarlaInstrument::play(sampleFrame* workingBuffer)
         workingBuffer[i][0] = buf1[i];
         workingBuffer[i][1] = buf2[i];
     }
-
-    instrumentTrack()->processAudioBuffer(workingBuffer, bufsize, nullptr);
 }
 
 bool CarlaInstrument::handleMidiEvent(const MidiEvent& event, const TimePos&, f_cnt_t offset)

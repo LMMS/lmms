@@ -77,7 +77,7 @@ public:
 
 public slots:
 	void setSampleBuffer( lmms::SampleBuffer* sb );
-	void setSampleFile( const QString & _sf );
+	void setSampleFile( const QString & sf );
 	void updateLength();
 	void toggleRecord();
 	void playbackPositionChanged();

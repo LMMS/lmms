@@ -292,7 +292,7 @@ void DataFile::write( QTextStream & _strm )
 bool DataFile::writeFile(const QString& filename, bool withResources)
 {
 	// Small lambda function for displaying errors
-	auto showError = [this](QString title, QString body){
+	auto showError = [](QString title, QString body){
 		if (gui::getGUI() != nullptr)
 		{
 			QMessageBox mb;

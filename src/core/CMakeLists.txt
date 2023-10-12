@@ -70,6 +70,7 @@ set(LMMS_SRCS
 	core/SamplePlayHandle.cpp
 	core/SampleRecordHandle.cpp
 	core/Scale.cpp
+	core/LmmsSemaphore.cpp
 	core/SerializingObject.cpp
 	core/Song.cpp
 	core/TempoSyncKnobModel.cpp
@@ -121,6 +122,7 @@ set(LMMS_SRCS
 	core/lv2/Lv2SubPluginFeatures.cpp
 	core/lv2/Lv2UridCache.cpp
 	core/lv2/Lv2UridMap.cpp
+	core/lv2/Lv2Worker.cpp
 
 	core/midi/MidiAlsaRaw.cpp
 	core/midi/MidiAlsaSeq.cpp
