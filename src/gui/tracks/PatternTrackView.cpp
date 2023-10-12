@@ -126,12 +126,12 @@ void PatternTrackView::assignMixerLine(int channelIndex)
 
 	for (Track* track : tl)
 	{
-		if(track->type() == Track::TrackTypes::InstrumentTrack)
+		if(track->type() == Track::Type::Instrument)
 		{
 			InstrumentTrack* t = dynamic_cast<InstrumentTrack*>(track);
 			if (t) { t->mixerChannelModel()->setValue(channelIndex); }
 		}
-		else if (track->type() == Track::TrackTypes::SampleTrack)
+		else if (track->type() == Track::Type::Sample)
 		{
 			SampleTrack* t = dynamic_cast<SampleTrack*>(track);
 			if (t) { t->mixerChannelModel()->setValue(channelIndex); }

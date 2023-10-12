@@ -831,7 +831,7 @@ void Song::convertPatterntoSE(bool singlePattern /* = false*/, int pattern /* = 
 	{
 		// Create a clone of the track and add it to the song editor
 		Track* clonedTrack = nullptr;
-		if (track->type() == Track::TrackTypes::InstrumentTrack || track->type() == Track::TrackTypes::SampleTrack)
+		if (track->type() == Track::Type::Instrument || track->type() == Track::Type::Sample)
 		{
 			// Create XML data of the track for the clone
 			QDomDocument doc;
@@ -896,7 +896,7 @@ void Song::muteAllPatternTracks()
 	// Go through them and mute the pattern tracks only
 	for (Track* t : tracks)
 	{
-		if (t->type() == Track::TrackTypes::PatternTrack)
+		if (t->type() == Track::Type::Pattern)
 		{
 			t->getMutedModel()->setValue(true);
 			t->dataChanged();
