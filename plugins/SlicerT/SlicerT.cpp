@@ -1,7 +1,7 @@
 /*
  * SlicerT.cpp - simple slicer plugin
  *
- * Copyright (c) 2006-2008 Andreas Brandmaier <andy/at/brandmaier/dot/de>
+ * Copyright (c) 2006-2008 Daniel Kauss Serna <daniel.kauss.serna@gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -43,7 +43,7 @@ Plugin::Descriptor PLUGIN_EXPORT slicert_plugin_descriptor = {
 	LMMS_STRINGIFY(PLUGIN_NAME),
 	"SlicerT",
 	QT_TRANSLATE_NOOP("PluginBrowser", "Basic Slicer"),
-	"Daniel Kauss Serna <daniel.kauss.serna/at/gmail.com>",
+	"Daniel Kauss Serna <daniel.kauss.serna@gmail.com>",
 	0x0100,
 	Plugin::Type::Instrument,
 	new PluginPixmapLoader("icon"),
@@ -434,7 +434,7 @@ void SlicerT::findSlices()
 
 	int lastPoint = -minDist - 1; // to always store 0 first
 	float spectralFlux = 0;
-	float prevFlux = 0;
+	float prevFlux = 1E-10; // small value, no divison by zero
 	float real, imag, magnitude, diff;
 
 	for (int i = 0; i < singleChannel.size() - windowSize; i += windowSize)
@@ -465,7 +465,7 @@ void SlicerT::findSlices()
 		}
 
 		prevFlux = spectralFlux;
-		spectralFlux = 0;
+		spectralFlux = 1E-10; // again for no divison by zero
 	}
 
 	m_slicePoints.push_back(m_originalSample.frames());

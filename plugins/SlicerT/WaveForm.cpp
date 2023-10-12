@@ -1,7 +1,7 @@
 /*
  * WaveForm.cpp - slice editor for SlicerT
  *
- * Copyright (c) 2006-2008 Andreas Brandmaier <andy/at/brandmaier/dot/de>
+ * Copyright (c) 2006-2008 Daniel Kauss Serna <daniel.kauss.serna@gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -73,6 +73,7 @@ WaveForm::WaveForm(int w, int h, SlicerT* instrument, QWidget* parent)
 void WaveForm::drawSeekerWaveform()
 {
 	m_seekerWaveform.fill(m_waveformBgColor);
+	if (m_currentSample.frames() < 2048) { return; }
 	QPainter brush(&m_seekerWaveform);
 	brush.setPen(m_waveformColor);
 
@@ -83,6 +84,7 @@ void WaveForm::drawSeekerWaveform()
 void WaveForm::drawSeeker()
 {
 	m_seeker.fill(m_waveformBgColor);
+	if (m_currentSample.frames() < 2048) { return; }
 	QPainter brush(&m_seeker);
 
 	// draw slice points
