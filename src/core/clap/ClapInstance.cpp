@@ -121,7 +121,7 @@ struct MidiInputEvent
 ClapInstance::ClapInstance(const ClapPluginInfo* pluginInfo, Model* parent)
 	: LinkedModelGroup{parent}
 	, m_pluginInfo{pluginInfo}
-	, m_midiInputBuf{m_maxMidiInputEvents}
+	, m_midiInputBuf{s_maxMidiInputEvents}
 	, m_midiInputReader{m_midiInputBuf}
 {
 	m_pluginState = PluginState::None;
@@ -199,55 +199,55 @@ void ClapInstance::copyModelsToCore()
 	//
 }
 
-void ClapInstance::copyBuffersFromCore(const sampleFrame* buf, unsigned firstChan, unsigned num, fpp_t frames)
+void ClapInstance::copyBuffersFromCore(const sampleFrame* buf, unsigned firstChannel, unsigned numChannels, fpp_t frames)
 {
 	// LMMS to CLAP
-	if (num > 1)
+	if (numChannels > 1)
 	{
-		if (!isMonoInput())
+		if (hasStereoInput())
 		{
 			// Stereo LMMS to Stereo CLAP
 			//qDebug() << "***stereo lmms to stereo clap";
-			copyBuffersHostToPlugin<true>(buf, m_audioInActive->data32, firstChan, frames);
+			copyBuffersHostToPlugin<true>(buf, m_audioInActive->data32, firstChannel, frames);
 		}
 		else
 		{
 			// Stereo LMMS to Mono CLAP
 			//qDebug() << "***stereo lmms to mono clap";
-			copyBuffersStereoHostToMonoPlugin(buf, m_audioInActive->data32, firstChan, frames);
+			copyBuffersStereoHostToMonoPlugin(buf, m_audioInActive->data32, firstChannel, frames);
 		}
 	}
 	else
 	{
 		// Mono LMMS to Mono CLAP
 		//qDebug() << "***mono lmms to mono clap";
-		copyBuffersHostToPlugin<false>(buf, m_audioInActive->data32, firstChan, frames);
+		copyBuffersHostToPlugin<false>(buf, m_audioInActive->data32, firstChannel, frames);
 	}
 }
 
-void ClapInstance::copyBuffersToCore(sampleFrame* buf, unsigned firstChan, unsigned num, fpp_t frames) const
+void ClapInstance::copyBuffersToCore(sampleFrame* buf, unsigned firstChannel, unsigned numChannels, fpp_t frames) const
 {
 	// CLAP to LMMS
-	if (num > 1)
+	if (numChannels > 1)
 	{
-		if (!isMonoOutput())
+		if (hasStereoOutput())
 		{
 			// Stereo CLAP to Stereo LMMS
 			//qDebug() << "***stereo clap to stereo lmms";
-			copyBuffersPluginToHost<true>(m_audioOutActive->data32, buf, m_audioOutActive->constant_mask, firstChan, frames);
+			copyBuffersPluginToHost<true>(m_audioOutActive->data32, buf, m_audioOutActive->constant_mask, firstChannel, frames);
 		}
 		else
 		{
 			// Mono CLAP to Stereo LMMS
 			//qDebug() << "***mono clap to stereo lmms";
-			copyBuffersMonoPluginToStereoHost(m_audioOutActive->data32, buf, m_audioOutActive->constant_mask, firstChan, frames);
+			copyBuffersMonoPluginToStereoHost(m_audioOutActive->data32, buf, m_audioOutActive->constant_mask, firstChannel, frames);
 		}
 	}
 	else
 	{
 		// Mono CLAP to Mono LMMS
 		//qDebug() << "***mono clap to mono lmms";
-		copyBuffersPluginToHost<false>(m_audioOutActive->data32, buf, m_audioOutActive->constant_mask, firstChan, frames);
+		copyBuffersPluginToHost<false>(m_audioOutActive->data32, buf, m_audioOutActive->constant_mask, firstChannel, frames);
 	}
 }
 
@@ -309,22 +309,10 @@ auto ClapInstance::start() -> bool
 
 auto ClapInstance::restart() -> bool
 {
-	qDebug() << "ClapInstance::restart()";
-	// Save controls, which we want to keep
-	QDomDocument doc;
-	QDomElement controls = doc.createElement("controls");
-	saveValues(doc, controls);
+	qDebug() << "ClapInstance::restart";
 
-	if (!unload()) { return false; }
-	if (!load()) { return false; }
-	if (!init()) { return false; }
-
-	// Reload the controls
-	loadValues(controls);
-
-	bool success = activate();
-	qDebug() << "ClapInstance::restart() end";
-	return success;
+	if (!deactivate()) { return false; }
+	return activate();
 }
 
 auto ClapInstance::load() -> bool
@@ -376,7 +364,7 @@ auto ClapInstance::unload() -> bool
 
 auto ClapInstance::init() -> bool
 {
-	qDebug() << "ClapInstance::init()";
+	qDebug() << "ClapInstance::init";
 	assert(isMainThread());
 
 	if (isErrorState()) { return false; }
@@ -427,6 +415,8 @@ auto ClapInstance::init() -> bool
 
 		if (isInput)
 		{
+			m_hasStereoInput = false; // initialize
+
 			//if (portCount == 0 && m_pluginInfo->getType() == Plugin::PluginTypes::Effect)
 			//	m_pluginIssues.emplace_back( ... );
 
@@ -434,6 +424,8 @@ auto ClapInstance::init() -> bool
 		}
 		else
 		{
+			m_hasStereoOutput = false; // initialize
+
 			if (portCount == 0 && needOutputPort)
 			{
 				m_pluginIssues.emplace_back(PluginIssueType::NoOutputChannel);
@@ -542,7 +534,7 @@ auto ClapInstance::init() -> bool
 
 		if (stereoPort != CLAP_INVALID_ID)
 		{
-			if (isInput) { m_monoInput = false; } else { m_monoOutput = false; }
+			if (isInput) { m_hasStereoInput = true; } else { m_hasStereoOutput = true; }
 			auto port = &audioPorts[stereoPort];
 			port->used = true;
 			return port;
@@ -550,7 +542,6 @@ auto ClapInstance::init() -> bool
 
 		if (monoPort != CLAP_INVALID_ID)
 		{
-			if (isInput) { m_monoInput = true; } else { m_monoOutput = true; }
 			auto port = &audioPorts[monoPort];
 			port->used = true;
 			return port;
@@ -586,12 +577,12 @@ auto ClapInstance::init() -> bool
 
 	if (needInputPort)
 	{
-		if (isMonoInput() && m_audioPortInActive->type != AudioPortType::Mono)
+		if (!hasStereoInput() && m_audioPortInActive->type != AudioPortType::Mono)
 		{
 			setPluginState(PluginState::LoadedWithError);
 			return false;
 		}
-		if (!isMonoInput() && m_audioPortInActive->type != AudioPortType::Stereo)
+		if (hasStereoInput() && m_audioPortInActive->type != AudioPortType::Stereo)
 		{
 			setPluginState(PluginState::LoadedWithError);
 			return false;
@@ -600,12 +591,12 @@ auto ClapInstance::init() -> bool
 
 	if (needOutputPort)
 	{
-		if (isMonoOutput() && m_audioPortOutActive->type != AudioPortType::Mono)
+		if (!hasStereoOutput() && m_audioPortOutActive->type != AudioPortType::Mono)
 		{
 			setPluginState(PluginState::LoadedWithError);
 			return false;
 		}
-		if (!isMonoOutput() && m_audioPortOutActive->type != AudioPortType::Stereo)
+		if (hasStereoOutput() && m_audioPortOutActive->type != AudioPortType::Stereo)
 		{
 			setPluginState(PluginState::LoadedWithError);
 			return false;
@@ -656,9 +647,8 @@ auto ClapInstance::init() -> bool
 	// Initialize GUI
 	if (pluginExtensionInit(m_pluginExtGui, CLAP_EXT_GUI) && ClapGui::extensionSupported(m_pluginExtGui))
 	{
-		m_pluginGui = std::make_unique<ClapGui>(&info(), plugin(), m_pluginExtGui);
+		m_pluginGui = std::make_unique<ClapGui>(m_pluginInfo, m_plugin, m_pluginExtGui);
 	}
-
 
 	//scanQuickControls();
 
@@ -669,7 +659,7 @@ auto ClapInstance::init() -> bool
 
 auto ClapInstance::activate() -> bool
 {
-	qDebug() << "ClapInstance::activate()";
+	qDebug() << "ClapInstance::activate";
 	assert(isMainThread());
 
 	if (isErrorState()) { return false; }
@@ -692,23 +682,42 @@ auto ClapInstance::activate() -> bool
 
 auto ClapInstance::deactivate() -> bool
 {
+	// NOTE: This method assumes that process() cannot be called concurrently
 	qDebug() << "ClapInstance::deactivate";
 	assert(isMainThread());
 	if (!isActive()) { return false; }
 
-	/*
-	//TODO: Need to fix this
-	while (isProcessing() || isSleeping())
+	class StopProcessingThread : public QThread
 	{
-		m_scheduleDeactivate = true;
-		QThread::msleep(10);
-	}
-	m_scheduleDeactivate = false;
-	*/
+	public:
+		explicit StopProcessingThread(ClapInstance* instance)
+			: m_instance{instance}
+		{
+		}
+	private:
+		void run() override
+		{
+			if (m_instance->m_pluginState == PluginState::ActiveAndProcessing)
+			{
+				m_instance->m_plugin->stop_processing(m_instance->m_plugin);
+			}
+			m_instance->setPluginState(PluginState::ActiveAndReadyToDeactivate);
+		}
+		ClapInstance* m_instance;
+	};
+
+	// stop_processing() needs to be called on the audio thread,
+	// but the main thread will hang if I try to use m_scheduleDeactivate
+	// and poll until the process() event is called - it never seems to be called
+	// TODO: Could try spoofing the thread check extension instead of
+	//       creating a thread here, but maybe that wouldn't be safe
+	auto thread = StopProcessingThread{this};
+	thread.start();
+	thread.wait();
 
 	m_plugin->deactivate(m_plugin);
 	setPluginState(PluginState::Inactive);
-	qDebug() << "ClapInstance::deactivate end";
+
 	return true;
 }
 
@@ -768,9 +777,11 @@ auto ClapInstance::process(std::uint32_t frames) -> bool
 	// Do we want to deactivate the plugin?
 	if (m_scheduleDeactivate)
 	{
+		qDebug() << "ClapInstance::process - Schedule deactivate";
 		m_scheduleDeactivate = false;
 		if (m_pluginState == PluginState::ActiveAndProcessing)
 		{
+			qDebug() << "ClapInstance::process - stop_processing()";
 			m_plugin->stop_processing(m_plugin);
 		}
 		setPluginState(PluginState::ActiveAndReadyToDeactivate);
@@ -929,6 +940,7 @@ void ClapInstance::handlePluginOutputEvents()
 
 void ClapInstance::paramFlushOnMainThread()
 {
+	qDebug() << "ClapInstance::paramFlushOnMainThread";
 	assert(isMainThread());
 	assert(!isActive());
 
@@ -997,7 +1009,6 @@ auto ClapInstance::isPluginNextStateValid(PluginState next) -> bool
 	case PluginState::LoadedWithError:
 		return m_pluginState == PluginState::Loaded;
 	case PluginState::Inactive:
-		return true; // TODO: Remove once ClapInstance::deactivate() is fixed
 		return m_pluginState == PluginState::Loaded
 			|| m_pluginState == PluginState::ActiveAndReadyToDeactivate;
 	case PluginState::InactiveWithError:
@@ -1394,7 +1405,7 @@ void ClapInstance::hostExtParamsClear(const clap_host* host, clap_id paramId, cl
 
 void ClapInstance::hostExtParamsRequestFlush(const clap_host* host)
 {
-	qDebug() << "ClapInstance::hostExtParamsRequestFlush";
+	//qDebug() << "ClapInstance::hostExtParamsRequestFlush";
 	auto h = fromHost(host);
 
 	if (!h->isActive() && hostExtThreadCheckIsMainThread(host))

@@ -77,9 +77,9 @@ public:
 	ClapInstance() = delete;
 	ClapInstance(const ClapPluginInfo* pluginInfo, Model* parent);
 	ClapInstance(const ClapInstance&) = delete;
-	ClapInstance& operator=(const ClapInstance&) = delete;
-	ClapInstance(ClapInstance&& other) noexcept = delete;
-	ClapInstance& operator=(ClapInstance&& rhs) noexcept = delete;
+	ClapInstance(ClapInstance&&) noexcept = delete;
+	auto operator=(const ClapInstance&) -> ClapInstance& = delete;
+	auto operator=(ClapInstance&&) noexcept -> ClapInstance& = delete;
 	~ClapInstance() override;
 
 	enum class PluginState
@@ -121,27 +121,27 @@ public:
 	 * Copy buffer passed by the core into our ports
 	 * @param buf buffer of sample frames, each sample frame is something like
 	 *   a `float[<number-of-procs> * <channels per proc>]` array.
-	 * @param firstChan The offset for @p buf where we have to read our
+	 * @param firstChannel The offset for @p buf where we have to read our
 	 *   first channel.
 	 *   This marks the first sample in each sample frame where we read from.
 	 *   If we are the 2nd of 2 mono procs, this can be greater than 0.
-	 * @param num Number of channels we must read from @param buf (starting at
+	 * @param numChannels Number of channels we must read from @param buf (starting at
 	 *   @p offset)
 	 */
-	void copyBuffersFromCore(const sampleFrame* buf, unsigned firstChan, unsigned num, fpp_t frames);
+	void copyBuffersFromCore(const sampleFrame* buf, unsigned firstChannel, unsigned numChannels, fpp_t frames);
 
 	/**
 	 * Copy our ports into buffers passed by the core
 	 * @param buf buffer of sample frames, each sample frame is something like
 	 *   a `float[<number-of-procs> * <channels per proc>]` array.
-	 * @param firstChan The offset for @p buf where we have to write our
+	 * @param firstChannel The offset for @p buf where we have to write our
 	 *   first channel.
 	 *   This marks the first sample in each sample frame where we write to.
 	 *   If we are the 2nd of 2 mono procs, this can be greater than 0.
-	 * @param num Number of channels we must write to @param buf (starting at
+	 * @param numChannels Number of channels we must write to @param buf (starting at
 	 *   @p offset)
 	 */
-	void copyBuffersToCore(sampleFrame* buf, unsigned firstChan, unsigned num, fpp_t frames) const;
+	void copyBuffersToCore(sampleFrame* buf, unsigned firstChannel, unsigned numChannels, fpp_t frames) const;
 
 	//! Run the CLAP plugin instance for @param frames frames
 	void run(fpp_t frames);
@@ -159,8 +159,8 @@ public:
 	void destroy();
 
 	auto isValid() const -> bool;
-	auto isMonoInput() const -> bool { return m_monoInput; } //!< Can call after init()
-	auto isMonoOutput() const -> bool { return m_monoOutput; } //!< Can call after init()
+	auto hasStereoInput() const { return m_hasStereoInput; } //!< Can call after init()
+	auto hasStereoOutput() const { return m_hasStereoOutput; } //!< Can call after init()
 
 	auto host() const -> const clap_host* { return &m_host; }
 	auto plugin() const -> const clap_plugin* { return m_plugin; }
@@ -243,8 +243,6 @@ private:
 	static void hostExtGuiRequestClosed(const clap_host* host, bool wasDestroyed);
 
 	auto canUsePluginParams() const noexcept -> bool;
-	//bool canUsePluginGui() const noexcept;
-	//static const char* currentClapGuiApi();
 
 	void setParamValueByHost(ClapParam& param, double value);
 	void setParamModulationByHost(ClapParam& param, double value);
@@ -284,8 +282,8 @@ private:
 	const ClapPluginInfo* m_pluginInfo; // TODO: Use weak_ptr instead?
 
 	PluginState m_pluginState = PluginState::Inactive;
-	bool m_monoInput = false;
-	bool m_monoOutput = false;
+	bool m_hasStereoInput = false;
+	bool m_hasStereoOutput = false;
 
 	std::vector<PluginIssue> m_pluginIssues;
 
@@ -364,7 +362,7 @@ private:
 	 * MIDI
 	 */
 	// many things here may be moved into the `Instrument` class
-	constexpr const static std::size_t m_maxMidiInputEvents = 1024;
+	constexpr const static std::size_t s_maxMidiInputEvents = 1024;
 	//! Spinlock for the MIDI ringbuffer (for MIDI events going to the plugin)
 	std::atomic_flag m_ringLock = ATOMIC_FLAG_INIT;
 

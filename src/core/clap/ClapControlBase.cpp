@@ -79,7 +79,7 @@ void ClapControlBase::init(Model* that, const QString& uri)
 		return;
 	}
 
-	if (first->isMonoOutput())
+	if (!first->hasStereoOutput())
 	{
 		// A second instance is needed for stereo input/output
 		qDebug() << "Creating CLAP instance (#2)";
