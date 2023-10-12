@@ -59,8 +59,8 @@
 #include "datafile/UpgradeTo13.h"
 #include "datafile/UpgradeTo13Misc.h"
 #include "datafile/UpgradeTo13ExtendedNoteRange.h"
-#include "datafile/UpgradeMixerRename.h"
-#include "datafile/UpgradeRenameBBTCO.h"
+#include "datafile/UpgradeTo13MixerRename.h"
+#include "datafile/UpgradeTo13RenameBBTCO.h"
 
 namespace lmms
 {
@@ -676,35 +676,33 @@ void updaters (QDomDocument& document, const unsigned int start)
 */
 
 
-void DataFile::upgrade()
+void DataFile::upgradeAll()
 {
 	// Runs all necessary upgrade methods
-	unsigned int start = m_fileVersion;
-	
-	upgrade<UpgradeTo0_2_1_20070501> (0,start);
-	upgrade<UpgradeTo0_2_1_20070508> (1,start);
-	upgrade<UpgradeTo0_3_0_RC2> (2,start);
-	upgrade<UpgradeTo0_3_0> (3,start);
-	upgrade<UpgradeTo0_4_0_20080104> (4,start);
-	upgrade<UpgradeTo0_4_0_20080118> (5,start);
-	upgrade<UpgradeTo0_4_0_20080129> (6,start);
-	upgrade<UpgradeTo0_4_0_20080409> (7,start);
-	upgrade<UpgradeTo0_4_0_20080607> (8,start);
-	upgrade<UpgradeTo0_4_0_20080622> (9,start);
-	upgrade<UpgradeTo0_4_0_beta1> (10,start);
-	upgrade<UpgradeTo0_4_0_rc2> (11,start);
-	upgrade<UpgradeTo1_0_99> (12,start);
-	upgrade<UpgradeTo1_1_0> (13,start);
-	upgrade<UpgradeTo1_1_91> (14,start);
-	upgrade<UpgradeTo1_2_0_RC3> (15,start);
-	upgrade<UpgradeTo1_3_0> (16,start);
-	upgrade<UpgradeTo13NoHiddenClipNames> (17,start);
-	upgrade<UpgradeTo13AutomationNodes> (18,start);
-	upgrade<UpgradeTo13ExtendedNoteRange> (19,start);
-	upgrade<UpgradeTo13DefaultTripleOscillatorHQ> (20,start);
-	upgrade<UpgradeMixerRename> (21,start);
-	upgrade<UpgradeRenameBBTCO> (22,start);
-	upgrade<UpgradeTo13SampleAndHold> (23,start);
+	upgrade< 0, UpgradeTo0_2_1_20070501>();
+	upgrade< 1, UpgradeTo0_2_1_20070508>();
+	upgrade< 2, UpgradeTo0_3_0_RC2>();
+	upgrade< 3, UpgradeTo0_3_0>();
+	upgrade< 4, UpgradeTo0_4_0_20080104>();
+	upgrade< 5, UpgradeTo0_4_0_20080118>();
+	upgrade< 6, UpgradeTo0_4_0_20080129>();
+	upgrade< 7, UpgradeTo0_4_0_20080409>();
+	upgrade< 8, UpgradeTo0_4_0_20080607>();
+	upgrade< 9, UpgradeTo0_4_0_20080622>();
+	upgrade<10, UpgradeTo0_4_0_beta1>();
+	upgrade<11, UpgradeTo0_4_0_rc2>();
+	upgrade<12, UpgradeTo1_0_99>();
+	upgrade<13, UpgradeTo1_1_0>();
+	upgrade<14, UpgradeTo1_1_91>();
+	upgrade<15, UpgradeTo1_2_0_RC3>();
+	upgrade<16, UpgradeTo1_3_0>();
+	upgrade<17, UpgradeTo13NoHiddenClipNames>();
+	upgrade<18, UpgradeTo13AutomationNodes>();
+	upgrade<19, UpgradeTo13ExtendedNoteRange>();
+	upgrade<20, UpgradeTo13DefaultTripleOscillatorHQ>();
+	upgrade<21, UpgradeTo13MixerRename>();
+	upgrade<22, UpgradeTo13RenameBBTCO>();
+	upgrade<23, UpgradeTo13SampleAndHold>();
 	// Add your upgrader functor here...
 	// and increment DATAFILE_VERSION in DataFile.h
 
@@ -811,7 +809,7 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 	}
 
 	// Perform upgrade routines
-	if (m_fileVersion < UPGRADE_METHODS.size()) { upgrade(); }
+	if (m_fileVersion < DATAFILE_VERSION) { upgradeAll(); }
 
 	m_content = root.elementsByTagName(typeName(m_type)).item(0).toElement();
 }

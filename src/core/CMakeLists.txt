@@ -107,8 +107,8 @@ set(LMMS_SRCS
 	core/datafile/UpgradeTo13.cpp
 	core/datafile/UpgradeTo13Misc.cpp
 	core/datafile/UpgradeTo13ExtendedNoteRange.cpp
-	core/datafile/UpgradeMixerRename.cpp
-	core/datafile/UpgradeRenameBBTCO.cpp
+	core/datafile/UpgradeTo13MixerRename.cpp
+	core/datafile/UpgradeTo13RenameBBTCO.cpp
 
 	core/lv2/Lv2Basics.cpp
 	core/lv2/Lv2ControlBase.cpp

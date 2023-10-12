@@ -22,14 +22,15 @@
  *
  */
 
-#include "datafile/UpgradeMixerRename.h"
+#include "datafile/UpgradeTo13MixerRename.h"
 
 namespace lmms
 {
 
 
-void UpgradeMixerRename::upgrade()
+void UpgradeTo13MixerRename::upgrade()
 {
+	printf("Running Upgrade To 1.3: Mixer Rename\n");
 	// Change nodename <fxmixer> to <mixer>
 	QDomNodeList fxmixer = m_document.elementsByTagName("fxmixer");
 	renameElements(fxmixer, "mixer");

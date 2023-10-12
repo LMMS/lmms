@@ -1,5 +1,5 @@
 /*
- * UpgradeRenameBBTCO.cpp
+ * UpgradeTo13RenameBBTCO.cpp
  *   Functor for upgrading data files after various tags were renamed
  *   to normalize on the "clip" suffix
  *
@@ -22,7 +22,7 @@
  *
  */
 
-#include "datafile/UpgradeRenameBBTCO.h"
+#include "datafile/UpgradeTo13RenameBBTCO.h"
 
 #include <vector>
 
@@ -32,7 +32,7 @@ namespace lmms
 {
 
 
-void UpgradeRenameBBTCO::upgrade()
+void UpgradeTo13RenameBBTCO::upgrade()
 {
 	std::vector<std::pair<const char *, const char *>> names {
 		{"automationpattern", "automationclip"},

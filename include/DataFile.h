@@ -105,13 +105,6 @@ private:
 
 	void cleanMetaNodes( QDomElement de );
 
-	template<class Up>
-	void upgrade(const unsigned int i, const unsigned int start) {
-		if (i >= start) {
-			Up{*this}();
-		}
-	}
-
 	// helper upgrade routines
 	/*
 	void upgrade_0_4_0_20080104();
@@ -145,7 +138,7 @@ private:
 	using ResourcesMap = std::map<QString, std::vector<QString>>;
 	static const ResourcesMap ELEMENTS_WITH_RESOURCES;
 
-	void upgrade();
+	void upgradeAll();
 
 	void loadData( const QByteArray & _data, const QString & _sourceFile );
 
@@ -154,6 +147,13 @@ private:
 	QDomElement m_head;
 	Type m_type;
 	unsigned int m_fileVersion;
+
+	template<unsigned int i, class Up>
+	void upgrade() {
+		if (i >= m_fileVersion) {
+			Up{*this}();
+		}
+	}
 
 } ;
 

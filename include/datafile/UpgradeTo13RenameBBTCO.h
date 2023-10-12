@@ -1,5 +1,5 @@
 /*
- * UpgradeRenameBBTCO.h - functor for upgrading data files _
+ * UpgradeTo13RenameBBTCO.h - functor for upgrading data files _
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,8 +22,8 @@
 
 #pragma once
 
-#ifndef LMMS_UPGRADERENAMEBBTCO_H
-#define LMMS_UPGRADERENAMEBBTCO_H
+#ifndef LMMS_UPGRADETO13RENAMEBBTCO_H
+#define LMMS_UPGRADETO13RENAMEBBTCO_H
 
 #include "datafile/DataFileUpgrade.h"
 
@@ -32,10 +32,10 @@ namespace lmms
 {
 
 // upgrade functor for 
-class UpgradeRenameBBTCO : public DataFileUpgrade
+class UpgradeTo13RenameBBTCO : public DataFileUpgrade
 {
 public:
-	UpgradeRenameBBTCO(DataFile& document) : DataFileUpgrade(document) {}
+	UpgradeTo13RenameBBTCO(DataFile& document) : DataFileUpgrade(document) {}
 
 	void upgrade() override;
 };
@@ -43,4 +43,4 @@ public:
 
 } // namespace lmms
 
-#endif // LMMS_UPGRADERENAMEBBTCO_H
+#endif // LMMS_UPGRADETO13RENAMEBBTCO_H

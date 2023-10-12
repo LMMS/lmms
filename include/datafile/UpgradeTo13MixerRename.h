@@ -22,8 +22,8 @@
 
 #pragma once
 
-#ifndef LMMS_UPGRADEMIXERRENAME_H
-#define LMMS_UPGRADEMIXERRENAME_H
+#ifndef LMMS_UPGRADETO13MIXERRENAME_H
+#define LMMS_UPGRADETO13MIXERRENAME_H
 
 #include "datafile/DataFileUpgrade.h"
 
@@ -32,10 +32,10 @@ namespace lmms
 {
 
 // upgrade functor for 
-class UpgradeMixerRename : public DataFileUpgrade
+class UpgradeTo13MixerRename : public DataFileUpgrade
 {
 public:
-	UpgradeMixerRename(DataFile& document) : DataFileUpgrade(document) {}
+	UpgradeTo13MixerRename(DataFile& document) : DataFileUpgrade(document) {}
 
 	void upgrade() override;
 };
@@ -43,5 +43,5 @@ public:
 
 } // namespace lmms
 
-#endif // LMMS_UPGRADEMIXERRENAME_H
+#endif // LMMS_UPGRADETO13MIXERRENAME_H
 
