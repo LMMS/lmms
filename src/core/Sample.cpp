@@ -221,12 +221,18 @@ void Sample::visualize(QPainter& p, const QRect& dr, int fromFrame, int toFrame)
 		const float maxRmsData = std::clamp(sqrtRmsData, minData, maxData);
 		const float minRmsData = std::clamp(-sqrtRmsData, minData, maxData);
 
-		// If nbFrames >= w, we can use curPixel to calculate X
-		// but if nbFrames < w, we need to calculate it proportionally
-		// to the total number of points
-		auto x = nbFrames >= w ? xb + curPixel : xb + ((static_cast<double>(curPixel) / nbFrames) * w);
-
-		if (m_reversed) { x = w - 1 - x; }
+		double x = 0;
+		if (m_reversed)
+		{
+			x = nbFrames >= w ? xb + w - curPixel : xb + ((1 - static_cast<double>(curPixel) / nbFrames) * w);
+		}
+		else
+		{
+			// If nbFrames >= w, we can use curPixel to calculate X
+			// but if nbFrames < w, we need to calculate it proportionally
+			// to the total number of points
+			x = nbFrames >= w ? xb + curPixel : xb + ((static_cast<double>(curPixel) / nbFrames) * w);
+		}
 
 		// Partial Y calculation
 		auto py = ySpace * m_amplification;
