@@ -25,7 +25,7 @@ QSizePolicy BarModelEditor::sizePolicy() const
 QSize BarModelEditor::minimumSizeHint() const
 {
 	auto const fm = fontMetrics();
-	return QSize(200, fm.height() + 6);
+	return QSize(50, fm.height() + 6);
 }
 
 QSize BarModelEditor::sizeHint() const
