@@ -49,32 +49,38 @@ LOMMControlDialog::LOMMControlDialog(LOMMControls* controls) :
 	Knob * depthKnob = new Knob(KnobType::Bright26, this);
 	depthKnob->move(10, 4);
 	depthKnob->setModel(&controls->m_depthModel);
-	depthKnob->setHintText(tr("Depth:") , "");
+	depthKnob->setHintText(tr("Depth:"), "");
+	depthKnob->setToolTip(tr("Compression amount for all bands"));
 	
 	Knob * timeKnob = new Knob(KnobType::Bright26, this);
 	timeKnob->move(10, 41);
 	timeKnob->setModel(&controls->m_timeModel);
-	timeKnob->setHintText(tr("Time:") , "");
+	timeKnob->setHintText(tr("Time:"), "");
+	timeKnob->setToolTip(tr("Attack/release scaling for all bands"));
 	
 	Knob * inVolKnob = new Knob(KnobType::Bright26, this);
 	inVolKnob->move(10, 220);
 	inVolKnob->setModel(&controls->m_inVolModel);
-	inVolKnob->setHintText(tr("Input Volume:") , " dB");
+	inVolKnob->setHintText(tr("Input Volume:"), " dB");
+	inVolKnob->setToolTip(tr("Input volume"));
 	
 	Knob * outVolKnob = new Knob(KnobType::Bright26, this);
 	outVolKnob->move(363, 220);
 	outVolKnob->setModel(&controls->m_outVolModel);
-	outVolKnob->setHintText(tr("Output Volume:") , " dB");
+	outVolKnob->setHintText(tr("Output Volume:"), " dB");
+	outVolKnob->setToolTip(tr("Output volume"));
 	
 	Knob * upwardKnob = new Knob(KnobType::Bright26, this);
 	upwardKnob->move(10, 179);
 	upwardKnob->setModel(&controls->m_upwardModel);
-	upwardKnob->setHintText(tr("Upward Depth:") , "");
+	upwardKnob->setHintText(tr("Upward Depth:"), "");
+	upwardKnob->setToolTip(tr("Upward compression amount for all bands"));
 	
 	Knob * downwardKnob = new Knob(KnobType::Bright26, this);
 	downwardKnob->move(363, 179);
 	downwardKnob->setModel(&controls->m_downwardModel);
-	downwardKnob->setHintText(tr("Downward Depth:") , "");
+	downwardKnob->setHintText(tr("Downward Depth:"), "");
+	downwardKnob->setToolTip(tr("Downward compression amount for all bands"));
 	
 	LcdFloatSpinBox * split1Spin = new LcdFloatSpinBox(5, 2, "11green", tr("High/Mid Crossover"), this);
 	split1Spin->move(352, 76);
@@ -131,144 +137,170 @@ LOMMControlDialog::LOMMControlDialog(LOMMControls* controls) :
 	Knob * inHighKnob = new Knob(KnobType::Bright26, this);
 	inHighKnob->move(53, 43);
 	inHighKnob->setModel(&controls->m_inHighModel);
-	inHighKnob->setHintText(tr("High Input Volume:") , " dB");
+	inHighKnob->setHintText(tr("High Input Volume:"), " dB");
+	inHighKnob->setToolTip(tr("Input volume for high band"));
 	
 	Knob * inMidKnob = new Knob(KnobType::Bright26, this);
 	inMidKnob->move(53, 123);
 	inMidKnob->setModel(&controls->m_inMidModel);
-	inMidKnob->setHintText(tr("Mid Input Volume:") , " dB");
+	inMidKnob->setHintText(tr("Mid Input Volume:"), " dB");
+	inMidKnob->setToolTip(tr("Input volume for mid band"));
 	
 	Knob * inLowKnob = new Knob(KnobType::Bright26, this);
 	inLowKnob->move(53, 203);
 	inLowKnob->setModel(&controls->m_inLowModel);
-	inLowKnob->setHintText(tr("Low Input Volume:") , " dB");
+	inLowKnob->setHintText(tr("Low Input Volume:"), " dB");
+	inLowKnob->setToolTip(tr("Input volume for low band"));
 	
 	Knob * outHighKnob = new Knob(KnobType::Bright26, this);
 	outHighKnob->move(320, 43);
 	outHighKnob->setModel(&controls->m_outHighModel);
-	outHighKnob->setHintText(tr("High Output Volume:") , " dB");
+	outHighKnob->setHintText(tr("High Output Volume:"), " dB");
+	outHighKnob->setToolTip(tr("Output volume for high band"));
 	
 	Knob * outMidKnob = new Knob(KnobType::Bright26, this);
 	outMidKnob->move(320, 123);
 	outMidKnob->setModel(&controls->m_outMidModel);
-	outMidKnob->setHintText(tr("Mid Output Volume:") , " dB");
+	outMidKnob->setHintText(tr("Mid Output Volume:"), " dB");
+	outMidKnob->setToolTip(tr("Output volume for mid band"));
 	
 	Knob * outLowKnob = new Knob(KnobType::Bright26, this);
 	outLowKnob->move(320, 203);
 	outLowKnob->setModel(&controls->m_outLowModel);
-	outLowKnob->setHintText(tr("Low Output Volume:") , " dB");
+	outLowKnob->setHintText(tr("Low Output Volume:"), " dB");
+	outLowKnob->setToolTip(tr("Output volume for low band"));
 	
 	LcdFloatSpinBox * aThreshHSpin = new LcdFloatSpinBox(3, 3, "11green", tr("Above Threshold High"), this);
 	aThreshHSpin->move(300, 13);
 	aThreshHSpin->setModel(&controls->m_aThreshHModel);
-	aThreshHSpin->setToolTip(tr("Above Threshold High"));
 	aThreshHSpin->setSeamless(true, true);
+	aThreshHSpin->setToolTip(tr("Downward compression threshold for high band"));
 	
 	LcdFloatSpinBox * aThreshMSpin = new LcdFloatSpinBox(3, 3, "11green", tr("Above Threshold Mid"), this);
 	aThreshMSpin->move(300, 93);
 	aThreshMSpin->setModel(&controls->m_aThreshMModel);
 	aThreshMSpin->setSeamless(true, true);
+	aThreshMSpin->setToolTip(tr("Downward compression threshold for mid band"));
 	
 	LcdFloatSpinBox * aThreshLSpin = new LcdFloatSpinBox(3, 3, "11green", tr("Above Threshold Low"), this);
 	aThreshLSpin->move(300, 173);
 	aThreshLSpin->setModel(&controls->m_aThreshLModel);
 	aThreshLSpin->setSeamless(true, true);
+	aThreshLSpin->setToolTip(tr("Downward compression threshold for low band"));
 	
 	LcdFloatSpinBox * aRatioHSpin = new LcdFloatSpinBox(2, 2, "11green", tr("Above Ratio High"), this);
 	aRatioHSpin->move(284, 44);
 	aRatioHSpin->setModel(&controls->m_aRatioHModel);
 	aRatioHSpin->setSeamless(true, true);
+	aRatioHSpin->setToolTip(tr("Downward compression ratio for high band"));
 	
 	LcdFloatSpinBox * aRatioMSpin = new LcdFloatSpinBox(2, 2, "11green", tr("Above Ratio Mid"), this);
 	aRatioMSpin->move(284, 124);
 	aRatioMSpin->setModel(&controls->m_aRatioMModel);
 	aRatioMSpin->setSeamless(true, true);
+	aRatioMSpin->setToolTip(tr("Downward compression ratio for mid band"));
 	
 	LcdFloatSpinBox * aRatioLSpin = new LcdFloatSpinBox(2, 2, "11green", tr("Above Ratio Low"), this);
 	aRatioLSpin->move(284, 204);
 	aRatioLSpin->setModel(&controls->m_aRatioLModel);
 	aRatioLSpin->setSeamless(true, true);
+	aRatioLSpin->setToolTip(tr("Downward compression ratio for low band"));
 	
 	LcdFloatSpinBox * bThreshHSpin = new LcdFloatSpinBox(3, 3, "11green", tr("Below Threshold High"), this);
 	bThreshHSpin->move(59, 13);
 	bThreshHSpin->setModel(&controls->m_bThreshHModel);
-	bThreshHSpin->setToolTip(tr("Above Threshold High"));
 	bThreshHSpin->setSeamless(true, true);
+	bThreshHSpin->setToolTip(tr("Upward compression threshold for high band"));
 	
 	LcdFloatSpinBox * bThreshMSpin = new LcdFloatSpinBox(3, 3, "11green", tr("Below Threshold Mid"), this);
 	bThreshMSpin->move(59, 93);
 	bThreshMSpin->setModel(&controls->m_bThreshMModel);
 	bThreshMSpin->setSeamless(true, true);
+	bThreshMSpin->setToolTip(tr("Upward compression threshold for mid band"));
 	
 	LcdFloatSpinBox * bThreshLSpin = new LcdFloatSpinBox(3, 3, "11green", tr("Below Threshold Low"), this);
 	bThreshLSpin->move(59, 173);
 	bThreshLSpin->setModel(&controls->m_bThreshLModel);
 	bThreshLSpin->setSeamless(true, true);
+	bThreshLSpin->setToolTip(tr("Upward compression threshold for low band"));
 	
 	LcdFloatSpinBox * bRatioHSpin = new LcdFloatSpinBox(2, 2, "11green", tr("Below Ratio High"), this);
 	bRatioHSpin->move(87, 44);
 	bRatioHSpin->setModel(&controls->m_bRatioHModel);
 	bRatioHSpin->setSeamless(true, true);
+	bRatioHSpin->setToolTip(tr("Upward compression ratio for high band"));
 	
 	LcdFloatSpinBox * bRatioMSpin = new LcdFloatSpinBox(2, 2, "11green", tr("Below Ratio Mid"), this);
 	bRatioMSpin->move(87, 124);
 	bRatioMSpin->setModel(&controls->m_bRatioMModel);
 	bRatioMSpin->setSeamless(true, true);
+	bRatioMSpin->setToolTip(tr("Upward compression ratio for mid band"));
 	
 	LcdFloatSpinBox * bRatioLSpin = new LcdFloatSpinBox(2, 2, "11green", tr("Below Ratio Low"), this);
 	bRatioLSpin->move(87, 204);
 	bRatioLSpin->setModel(&controls->m_bRatioLModel);
 	bRatioLSpin->setSeamless(true, true);
+	bRatioLSpin->setToolTip(tr("Upward compression ratio for low band"));
 	
 	Knob * atkHKnob = new Knob(KnobType::Small17, this);
 	atkHKnob->move(120, 61);
 	atkHKnob->setModel(&controls->m_atkHModel);
-	atkHKnob->setHintText(tr("Attack High:") , " ms");
+	atkHKnob->setHintText(tr("Attack High:"), " ms");
+	atkHKnob->setToolTip(tr("Attack time for high band"));
 	
 	Knob * atkMKnob = new Knob(KnobType::Small17, this);
 	atkMKnob->move(120, 141);
 	atkMKnob->setModel(&controls->m_atkMModel);
-	atkMKnob->setHintText(tr("Attack Mid:") , " ms");
+	atkMKnob->setHintText(tr("Attack Mid:"), " ms");
+	atkMKnob->setToolTip(tr("Attack time for mid band"));
 	
 	Knob * atkLKnob = new Knob(KnobType::Small17, this);
 	atkLKnob->move(120, 221);
 	atkLKnob->setModel(&controls->m_atkLModel);
-	atkLKnob->setHintText(tr("Attack Low:") , " ms");
+	atkLKnob->setHintText(tr("Attack Low:"), " ms");
+	atkLKnob->setToolTip(tr("Attack time for low band"));
 	
 	Knob * relHKnob = new Knob(KnobType::Small17, this);
 	relHKnob->move(261, 61);
 	relHKnob->setModel(&controls->m_relHModel);
-	relHKnob->setHintText(tr("Release High:") , " ms");
+	relHKnob->setHintText(tr("Release High:"), " ms");
+	relHKnob->setToolTip(tr("Release time for high band"));
 	
 	Knob * relMKnob = new Knob(KnobType::Small17, this);
 	relMKnob->move(261, 141);
 	relMKnob->setModel(&controls->m_relMModel);
-	relMKnob->setHintText(tr("Release Mid:") , " ms");
+	relMKnob->setHintText(tr("Release Mid:"), " ms");
+	relMKnob->setToolTip(tr("Release time for mid band"));
 	
 	Knob * relLKnob = new Knob(KnobType::Small17, this);
 	relLKnob->move(261, 221);
 	relLKnob->setModel(&controls->m_relLModel);
-	relLKnob->setHintText(tr("Release Low:") , " ms");
+	relLKnob->setHintText(tr("Release Low:"), " ms");
+	relLKnob->setToolTip(tr("Release time for low band"));
 	
 	Knob * rmsTimeKnob = new Knob(KnobType::Small17, this);
 	rmsTimeKnob->move(380, 42);
 	rmsTimeKnob->setModel(&controls->m_rmsTimeModel);
-	rmsTimeKnob->setHintText(tr("RMS Time:") , " ms");
+	rmsTimeKnob->setHintText(tr("RMS Time:"), " ms");
+	rmsTimeKnob->setToolTip(tr("RMS size for sidechain signal (set to 0 for Peak mode)"));
 	
 	Knob * kneeKnob = new Knob(KnobType::Small17, this);
 	kneeKnob->move(356, 42);
 	kneeKnob->setModel(&controls->m_kneeModel);
-	kneeKnob->setHintText(tr("Knee:") , " dB");
+	kneeKnob->setHintText(tr("Knee:"), " dB");
+	kneeKnob->setToolTip(tr("Knee size for all compressors"));
 	
 	Knob * rangeKnob = new Knob(KnobType::Small17, this);
 	rangeKnob->move(24, 146);
 	rangeKnob->setModel(&controls->m_rangeModel);
-	rangeKnob->setHintText(tr("Range:") , " dB");
+	rangeKnob->setHintText(tr("Range:"), " dB");
+	rangeKnob->setToolTip(tr("Maximum gain increase for all bands"));
 	
 	Knob * balanceKnob = new Knob(KnobType::Small17, this);
 	balanceKnob->move(13, 114);
 	balanceKnob->setModel(&controls->m_balanceModel);
-	balanceKnob->setHintText(tr("Balance:") , " dB");
+	balanceKnob->setHintText(tr("Balance:"), " dB");
+	balanceKnob->setToolTip(tr("Bias input volume towards one channel"));
 	
 	PixmapButton * depthScalingButton = new PixmapButton(this, tr("Scale output volume with Depth"));
 	depthScalingButton->move(51, 0);
@@ -276,7 +308,7 @@ LOMMControlDialog::LOMMControlDialog(LOMMControls* controls) :
 	depthScalingButton->setModel(&controls->m_depthScalingModel);
 	depthScalingButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("depthScaling_active"));
 	depthScalingButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("depthScaling_inactive"));
-	depthScalingButton->setToolTip(tr("Scale output volume with Depth"));
+	depthScalingButton->setToolTip(tr("Scale output volume with Depth parameter"));
 	
 	PixmapButton * stereoLinkButton = new PixmapButton(this, tr("Stereo Link"));
 	stereoLinkButton->move(52, 237);
@@ -284,17 +316,19 @@ LOMMControlDialog::LOMMControlDialog(LOMMControls* controls) :
 	stereoLinkButton->setModel(&controls->m_stereoLinkModel);
 	stereoLinkButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("stereoLink_active"));
 	stereoLinkButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("stereoLink_inactive"));
-	stereoLinkButton->setToolTip(tr("Stereo Link"));
+	stereoLinkButton->setToolTip(tr("Apply same gain change to both channels"));
 	
 	Knob * autoTimeKnob = new Knob(KnobType::Small17, this);
 	autoTimeKnob->move(24, 80);
 	autoTimeKnob->setModel(&controls->m_autoTimeModel);
-	autoTimeKnob->setHintText(tr("Auto Time:") , "");
+	autoTimeKnob->setHintText(tr("Auto Time:"), "");
+	autoTimeKnob->setToolTip(tr("Speed up attack and release times when transients occur"));
 	
 	Knob * mixKnob = new Knob(KnobType::Bright26, this);
 	mixKnob->move(363, 4);
 	mixKnob->setModel(&controls->m_mixModel);
-	mixKnob->setHintText(tr("Mix:") , "");
+	mixKnob->setHintText(tr("Mix:"), "");
+	mixKnob->setToolTip(tr("Wet/Dry of all bands"));
 	
 	m_feedbackButton = new PixmapButton(this, tr("Feedback"));
 	m_feedbackButton->move(317, 238);
@@ -302,7 +336,7 @@ LOMMControlDialog::LOMMControlDialog(LOMMControls* controls) :
 	m_feedbackButton->setModel(&controls->m_feedbackModel);
 	m_feedbackButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("feedback_active"));
 	m_feedbackButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("feedback_inactive"));
-	m_feedbackButton->setToolTip(tr("Feedback"));
+	m_feedbackButton->setToolTip(tr("Use output as sidechain signal instead of input"));
 	
 	PixmapButton * midsideButton = new PixmapButton(this, tr("Mid/Side"));
 	midsideButton->move(285, 238);
@@ -310,7 +344,7 @@ LOMMControlDialog::LOMMControlDialog(LOMMControls* controls) :
 	midsideButton->setModel(&controls->m_midsideModel);
 	midsideButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("midside_active"));
 	midsideButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("midside_inactive"));
-	midsideButton->setToolTip(tr("Mid/Side"));
+	midsideButton->setToolTip(tr("Compress mid/side channels instead of left/right"));
 	
 	PixmapButton * lookaheadEnableButton = new PixmapButton(this, tr("Lookahead"));
 	lookaheadEnableButton->move(147, 0);
@@ -318,18 +352,19 @@ LOMMControlDialog::LOMMControlDialog(LOMMControls* controls) :
 	lookaheadEnableButton->setModel(&controls->m_lookaheadEnableModel);
 	lookaheadEnableButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("lookahead_active"));
 	lookaheadEnableButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("lookahead_inactive"));
-	lookaheadEnableButton->setToolTip(tr("Lookahead"));
+	lookaheadEnableButton->setToolTip(tr(("Enable lookahead with fixed " + std::to_string(int(LOMM_MAX_LOOKAHEAD)) + " ms latency").c_str()));
 	
 	LcdFloatSpinBox * lookaheadSpin = new LcdFloatSpinBox(2, 2, "11green", tr("Lookahead"), this);
 	lookaheadSpin->move(214, 2);
 	lookaheadSpin->setModel(&controls->m_lookaheadModel);
 	lookaheadSpin->setSeamless(true, true);
+	lookaheadSpin->setToolTip(tr("Lookahead length"));
 	
-	PixmapButton * initButton = new PixmapButton(this, tr("Reset all parameters"));
+	PixmapButton * initButton = new PixmapButton(this, tr("Clear all parameters"));
 	initButton->move(84, 237);
 	initButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("init_active"));
 	initButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("init_inactive"));
-	initButton->setToolTip(tr("Reset all parameters"));
+	initButton->setToolTip(tr("Clear all parameters"));
 	
 	connect(initButton, SIGNAL(clicked()), m_controls, SLOT(resetAllParameters()));
 	connect(&controls->m_lookaheadEnableModel, SIGNAL(dataChanged()), this, SLOT(updateFeedbackVisibility()));

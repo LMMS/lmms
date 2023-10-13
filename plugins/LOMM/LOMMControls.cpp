@@ -113,7 +113,7 @@ LOMMControls::LOMMControls(LOMMEffect* effect) :
 
 void LOMMControls::resetAllParameters()
 {
-	int choice = QMessageBox::question(m_view, "Initialize Plugin", "Are you sure you want to reset all parameters?", QMessageBox::Yes | QMessageBox::No);
+	int choice = QMessageBox::question(m_view, "Clear Plugin Settings", "Are you sure you want to clear all parameters?\n(This wipes LOMM to a clean slate, not the default preset.)", QMessageBox::Yes | QMessageBox::No);
 	if (choice != QMessageBox::Yes) { return; }
 	
 	// give the user a chance to beg LMMS for forgiveness
