@@ -53,8 +53,7 @@ Plugin::Descriptor PLUGIN_EXPORT slicert_plugin_descriptor = {
 } // end extern
 
 PhaseVocoder::PhaseVocoder()
-	: m_FFTSpectrum(s_windowSize)
-	, m_FFTInput(s_windowSize, 0)
+	: m_FFTInput(s_windowSize, 0)
 	, m_IFFTReconstruction(s_windowSize, 0)
 	, m_allMagnitudes(s_windowSize, 0)
 	, m_allFrequencies(s_windowSize, 0)
@@ -432,7 +431,7 @@ void SlicerT::findSlices()
 	// buffers
 	std::vector<float> prevMags(windowSize / 2, 0);
 	std::vector<float> fftIn(windowSize, 0);
-	std::vector<fftwf_complex> fftOut(windowSize);
+	std::array<fftwf_complex, windowSize> fftOut;
 
 	fftwf_plan fftPlan = fftwf_plan_dft_r2c_1d(windowSize, fftIn.data(), fftOut.data(), FFTW_MEASURE);
 

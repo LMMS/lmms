@@ -52,8 +52,8 @@ public:
 	float scaleRatio() { return m_scaleRatio; }
 
 	// timeshift config
-	const int s_windowSize = 512;
-	const int s_overSampling = 32;
+	static const int s_windowSize = 512;
+	static const int s_overSampling = 32;
 
 private:
 	QMutex m_dataLock;
@@ -76,7 +76,7 @@ private:
 	float m_expectedPhaseOut = 0;
 
 	// buffers
-	std::vector<fftwf_complex> m_FFTSpectrum;
+	std::array<fftwf_complex, s_windowSize> m_FFTSpectrum;
 	std::vector<float> m_FFTInput;
 	std::vector<float> m_IFFTReconstruction;
 	std::vector<float> m_allMagnitudes;
