@@ -902,6 +902,14 @@ lmms--gui--SidInstrumentView lmms--gui--Knob {
 	qproperty-lineWidth: 2;
 }
 
+lmms--gui--SlicerTUI lmms--gui--Knob {
+	color: rgb(162, 128, 226);
+	qproperty-outerColor: rgb( 162, 128, 226 );
+	qproperty-innerRadius: 1;
+	qproperty-outerRadius: 11;
+	qproperty-lineWidth: 3;
+}
+
 lmms--gui--WatsynView lmms--gui--Knob {
 	qproperty-innerRadius: 1;
 	qproperty-outerRadius: 7;

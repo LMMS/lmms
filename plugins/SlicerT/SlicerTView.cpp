@@ -1,7 +1,7 @@
 /*
- * SlicerTUI.cpp - controls the UI for slicerT
+ * SlicerTView.cpp - controls the UI for slicerT
  *
- * Copyright (c) 2006-2008 Daniel Kauss Serna <daniel.kauss.serna@gmail.com>
+ * Copyright (c) 2023 Daniel Kauss Serna <daniel.kauss.serna@gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,7 +22,7 @@
  *
  */
 
-#include "SlicerTUI.h"
+#include "SlicerTView.h"
 
 #include <QDropEvent>
 #include <QFileInfo>
@@ -41,7 +41,7 @@ namespace lmms {
 
 namespace gui {
 
-SlicerTUI::SlicerTUI(SlicerT* instrument, QWidget* parent)
+SlicerTView::SlicerTView(SlicerT* instrument, QWidget* parent)
 	: InstrumentViewFixedSize(instrument, parent)
 	, m_slicerTParent(instrument)
 	, m_noteThresholdKnob(this)
@@ -109,7 +109,7 @@ SlicerTUI::SlicerTUI(SlicerT* instrument, QWidget* parent)
 }
 
 // copied from piano roll
-void SlicerTUI::exportMidi()
+void SlicerTView::exportMidi()
 {
 	using namespace Clipboard;
 
@@ -133,7 +133,7 @@ void SlicerTUI::exportMidi()
 }
 
 // all the drag stuff is copied from AudioFileProcessor
-void SlicerTUI::dragEnterEvent(QDragEnterEvent* dee)
+void SlicerTView::dragEnterEvent(QDragEnterEvent* dee)
 {
 	// For mimeType() and MimeType enum class
 	using namespace Clipboard;
@@ -145,19 +145,13 @@ void SlicerTUI::dragEnterEvent(QDragEnterEvent* dee)
 		{
 			dee->acceptProposedAction();
 		}
-		else if (txt.section(':', 0, 0) == "samplefile")
-		{
-			dee->acceptProposedAction();
-		}
-		else
-		{
-			dee->ignore();
-		}
+		else if (txt.section(':', 0, 0) == "samplefile") { dee->acceptProposedAction(); }
+		else { dee->ignore(); }
 	}
 	else { dee->ignore(); }
 }
 
-void SlicerTUI::dropEvent(QDropEvent* de)
+void SlicerTView::dropEvent(QDropEvent* de)
 {
 	QString type = StringPairDrag::decodeKey(de);
 	QString value = StringPairDrag::decodeValue(de);
@@ -179,7 +173,7 @@ void SlicerTUI::dropEvent(QDropEvent* de)
 }
 
 // display button text
-void SlicerTUI::paintEvent(QPaintEvent* pe)
+void SlicerTView::paintEvent(QPaintEvent* pe)
 {
 	QPainter brush(this);
 	brush.setPen(QColor(255, 255, 255));

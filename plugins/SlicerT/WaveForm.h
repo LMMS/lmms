@@ -1,7 +1,7 @@
 /*
  * WaveForm.h - declaration of class WaveForm
  *
- * Copyright (c) 2006-2008 Daniel Kauss Serna <daniel.kauss.serna@gmail.com>
+ * Copyright (c) 2023 Daniel Kauss Serna <daniel.kauss.serna@gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -66,18 +66,18 @@ private:
 	int m_editorWidth;
 
 	// colors
-	QColor m_waveformBgColor = QColor(255, 255, 255, 0);
-	QColor m_waveformColor = QColor(123, 49, 212);
+	static constexpr QColor s_waveformBgColor = QColor(255, 255, 255, 0);
+	static constexpr QColor s_waveformColor = QColor(123, 49, 212);
 
-	QColor m_playColor = QColor(255, 255, 255, 200);
-	QColor m_playHighlighColor = QColor(255, 255, 255, 70);
+	static constexpr QColor s_playColor = QColor(255, 255, 255, 200);
+	static constexpr QColor s_playHighlighColor = QColor(255, 255, 255, 70);
 
-	QColor m_sliceColor = QColor(218, 193, 255);
-	QColor m_selectedSliceColor = QColor(178, 153, 215);
+	static constexpr QColor s_sliceColor = QColor(218, 193, 255);
+	static constexpr QColor s_selectedSliceColor = QColor(178, 153, 215);
 
-	QColor m_seekerColor = QColor(178, 115, 255);
-	QColor m_seekerHighlightColor = QColor(178, 115, 255, 100);
-	QColor m_seekerShadowColor = QColor(0, 0, 0, 120);
+	static constexpr QColor s_seekerColor = QColor(178, 115, 255);
+	static constexpr QColor s_seekerHighlightColor = QColor(178, 115, 255, 100);
+	static constexpr QColor s_seekerShadowColor = QColor(0, 0, 0, 120);
 
 	// interaction vars
 	float m_distanceForClick = 0.03f;

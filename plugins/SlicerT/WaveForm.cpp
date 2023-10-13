@@ -1,7 +1,7 @@
 /*
  * WaveForm.cpp - slice editor for SlicerT
  *
- * Copyright (c) 2006-2008 Daniel Kauss Serna <daniel.kauss.serna@gmail.com>
+ * Copyright (c) 2023 Daniel Kauss Serna <daniel.kauss.serna@gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -60,8 +60,8 @@ WaveForm::WaveForm(int w, int h, SlicerT* instrument, QWidget* parent)
 	setMouseTracking(true);
 
 	// draw backgrounds
-	m_sliceEditor.fill(m_waveformBgColor);
-	m_seekerWaveform.fill(m_waveformBgColor);
+	m_sliceEditor.fill(s_waveformBgColor);
+	m_seekerWaveform.fill(s_waveformBgColor);
 
 	// connect to playback
 	connect(m_slicerTParent, SIGNAL(isPlaying(float, float, float)), this, SLOT(isPlaying(float, float, float)));
@@ -72,10 +72,10 @@ WaveForm::WaveForm(int w, int h, SlicerT* instrument, QWidget* parent)
 
 void WaveForm::drawSeekerWaveform()
 {
-	m_seekerWaveform.fill(m_waveformBgColor);
+	m_seekerWaveform.fill(s_waveformBgColor);
 	if (m_currentSample.frames() < 2048) { return; }
 	QPainter brush(&m_seekerWaveform);
-	brush.setPen(m_waveformColor);
+	brush.setPen(s_waveformColor);
 
 	m_currentSample.visualize(
 		brush, QRect(0, 0, m_seekerWaveform.width(), m_seekerWaveform.height()), 0, m_currentSample.frames());
@@ -83,12 +83,12 @@ void WaveForm::drawSeekerWaveform()
 
 void WaveForm::drawSeeker()
 {
-	m_seeker.fill(m_waveformBgColor);
+	m_seeker.fill(s_waveformBgColor);
 	if (m_currentSample.frames() < 2048) { return; }
 	QPainter brush(&m_seeker);
 
 	// draw slice points
-	brush.setPen(m_sliceColor);
+	brush.setPen(s_sliceColor);
 	for (int i = 0; i < m_slicePoints.size(); i++)
 	{
 		float xPos = (float)m_slicePoints[i] / m_currentSample.frames() * m_seekerWidth;
@@ -106,31 +106,31 @@ void WaveForm::drawSeeker()
 	float noteEndPosX = (m_noteEnd - m_noteStart) * m_seekerWidth;
 
 	// draw current playBack
-	brush.setPen(m_playColor);
+	brush.setPen(s_playColor);
 	brush.drawLine(noteCurrentPosX, 0, noteCurrentPosX, m_seekerHeight);
-	brush.fillRect(noteStartPosX, 0, noteEndPosX, m_seekerHeight, m_playHighlighColor);
+	brush.fillRect(noteStartPosX, 0, noteEndPosX, m_seekerHeight, s_playHighlighColor);
 
 	// highlight on selected area
-	brush.fillRect(seekerStartPosX, 0, seekerMiddleWidth, m_seekerHeight, m_seekerHighlightColor);
+	brush.fillRect(seekerStartPosX, 0, seekerMiddleWidth, m_seekerHeight, s_seekerHighlightColor);
 
 	// shadow on not selected area
-	brush.fillRect(0, 0, seekerStartPosX, m_seekerHeight, m_seekerShadowColor);
-	brush.fillRect(seekerEndPosX + 1, 0, m_seekerWidth + 1, m_seekerHeight, m_seekerShadowColor);
+	brush.fillRect(0, 0, seekerStartPosX, m_seekerHeight, s_seekerShadowColor);
+	brush.fillRect(seekerEndPosX + 1, 0, m_seekerWidth + 1, m_seekerHeight, s_seekerShadowColor);
 
 	// draw border around selection
-	brush.setPen(QPen(m_seekerColor, 1));
+	brush.setPen(QPen(s_seekerColor, 1));
 	brush.drawRoundedRect(seekerStartPosX, 0, seekerMiddleWidth - 1, m_seekerHeight - 1, 4, 4); // -1 needed
 }
 
 void WaveForm::drawEditor()
 {
-	m_sliceEditor.fill(m_waveformBgColor);
+	m_sliceEditor.fill(s_waveformBgColor);
 	QPainter brush(&m_sliceEditor);
 
 	// draw text if no sample loaded
 	if (m_currentSample.frames() < 2048)
 	{
-		brush.setPen(m_playHighlighColor);
+		brush.setPen(s_playHighlighColor);
 		brush.setFont(QFont(brush.font().family(), 9.0f, -1, false));
 		brush.drawText(
 			m_editorWidth / 2 - 100, m_editorHeight / 2 - 100, 200, 200, Qt::AlignCenter, tr("Drag sample to load"));
@@ -143,23 +143,23 @@ void WaveForm::drawEditor()
 	float numFramesToDraw = endFrame - startFrame;
 
 	// 0 centered line
-	brush.setPen(m_playHighlighColor);
+	brush.setPen(s_playHighlighColor);
 	brush.drawLine(0, m_editorHeight / 2, m_editorWidth, m_editorHeight / 2);
 
 	// draw waveform
-	brush.setPen(m_waveformColor);
+	brush.setPen(s_waveformColor);
 	float zoomOffset = ((float)m_editorHeight - m_zoomLevel * m_editorHeight) / 2;
 	m_currentSample.visualize(
 		brush, QRect(0, zoomOffset, m_editorWidth, m_zoomLevel * m_editorHeight), startFrame, endFrame);
 
 	// draw slicepoints
-	brush.setPen(QPen(m_sliceColor, 2));
+	brush.setPen(QPen(s_sliceColor, 2));
 	for (int i = 0; i < m_slicePoints.size(); i++)
 	{
 		float xPos = (float)(m_slicePoints[i] - startFrame) / numFramesToDraw * m_editorWidth;
 
-		if (i == m_sliceSelected) { brush.setPen(QPen(m_selectedSliceColor, 2)); }
-		else { brush.setPen(QPen(m_sliceColor, 2)); }
+		if (i == m_sliceSelected) { brush.setPen(QPen(s_selectedSliceColor, 2)); }
+		else { brush.setPen(QPen(s_sliceColor, 2)); }
 
 		brush.drawLine(xPos, 0, xPos, m_editorHeight);
 		brush.drawPixmap(xPos - (float)m_sliceArrow.width() / 2, 0, m_sliceArrow);

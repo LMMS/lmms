@@ -1,7 +1,7 @@
 /*
  * SlicerT.h - declaration of class SlicerT
  *
- * Copyright (c) 2006-2008 Daniel Kauss Serna <daniel.kauss.serna@gmail.com>
+ * Copyright (c) 2023 Daniel Kauss Serna <daniel.kauss.serna@gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -32,7 +32,7 @@
 #include "InstrumentView.h"
 #include "Note.h"
 #include "SampleBuffer.h"
-#include "SlicerTUI.h"
+#include "SlicerTView.h"
 
 namespace lmms {
 
@@ -193,7 +193,7 @@ private:
 	void findSlices();
 	void findBPM();
 
-	friend class gui::SlicerTUI;
+	friend class gui::SlicerTView;
 	friend class gui::WaveForm;
 };
 } // namespace lmms

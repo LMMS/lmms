@@ -1,7 +1,7 @@
 /*
- * SlicerTUI.h - declaration of class SlicerTUI
+ * SlicerTView.h - declaration of class SlicerTView
  *
- * Copyright (c) 2006-2008 Daniel Kauss Serna <daniel.kauss.serna@gmail.com>
+ * Copyright (c) 2023 Daniel Kauss Serna <daniel.kauss.serna@gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -55,12 +55,12 @@ public:
 	}
 };
 
-class SlicerTUI : public InstrumentViewFixedSize
+class SlicerTView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 
 public:
-	SlicerTUI(SlicerT* instrument, QWidget* parent);
+	SlicerTView(SlicerT* instrument, QWidget* parent);
 
 protected slots:
 	void exportMidi();

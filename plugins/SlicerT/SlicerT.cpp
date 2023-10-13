@@ -1,7 +1,7 @@
 /*
  * SlicerT.cpp - simple slicer plugin
  *
- * Copyright (c) 2006-2008 Daniel Kauss Serna <daniel.kauss.serna@gmail.com>
+ * Copyright (c) 2023 Daniel Kauss Serna <daniel.kauss.serna@gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -118,8 +118,11 @@ void PhaseVocoder::getFrames(std::vector<float>& outData, int start, int frames)
 	}
 
 	int windowMargin = s_overSampling / 2; // numbers of windows before full quality
-	int startWindow = std::max(0.0f, (float)start / m_outStepSize - windowMargin);
-	int endWindow = std::min((float)m_numWindows, (float)(start + frames) / m_outStepSize + windowMargin);
+	int startWindow = (float)start / m_outStepSize - windowMargin;
+	int endWindow = (float)(start + frames) / m_outStepSize + windowMargin;
+
+	startWindow = std::clamp(startWindow, 0, m_numWindows - 1);
+	endWindow = std::clamp(endWindow, 0, m_numWindows - 1);
 
 	// discard previous phaseSum if not processed
 	if (!m_processedWindows[startWindow])
@@ -379,8 +382,8 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 				fadeValue = std::clamp(fadeValue, 0.0f, 1.0f);
 				fadeValue = pow(fadeValue, 2);
 
-				workingBuffer[i][0] *= fadeValue;
-				workingBuffer[i][1] *= fadeValue;
+				workingBuffer[i + offset][0] *= fadeValue;
+				workingBuffer[i + offset][1] *= fadeValue;
 			}
 		}
 
@@ -653,7 +656,7 @@ QString SlicerT::nodeName() const
 
 gui::PluginView* SlicerT::instantiateView(QWidget* parent)
 {
-	return (new gui::SlicerTUI(this, parent));
+	return (new gui::SlicerTView(this, parent));
 }
 
 extern "C" {
