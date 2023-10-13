@@ -1,5 +1,5 @@
 /*
- * WaveForm.cpp - slice editor for SlicerT
+ * SlicerTWaveform.cpp - slice editor for SlicerT
  *
  * Copyright (c) 2023 Daniel Kauss Serna <daniel.kauss.serna@gmail.com>
  *
@@ -22,16 +22,15 @@
  *
  */
 
-#include "WaveForm.h"
-
 #include "SlicerT.h"
+#include "SlicerTWaveform.h"
 #include "embed.h"
 
 namespace lmms {
 
 namespace gui {
 
-WaveForm::WaveForm(int w, int h, SlicerT* instrument, QWidget* parent)
+SlicerTWaveform::SlicerTWaveform(int w, int h, SlicerT* instrument, QWidget* parent)
 	: QWidget(parent)
 	,
 	// calculate sizes
@@ -45,7 +44,7 @@ WaveForm::WaveForm(int w, int h, SlicerT* instrument, QWidget* parent)
 	// create pixmaps
 	m_sliceArrow(PLUGIN_NAME::getIconPixmap("slide_indicator_arrow"))
 	, m_seeker(QPixmap(m_seekerWidth, m_seekerHeight))
-	, m_seekerWaveform(QPixmap(m_seekerWidth, m_seekerHeight))
+	, m_seekerSlicerTWaveform(QPixmap(m_seekerWidth, m_seekerHeight))
 	, m_sliceEditor(QPixmap(w, m_editorHeight))
 	,
 
@@ -60,8 +59,8 @@ WaveForm::WaveForm(int w, int h, SlicerT* instrument, QWidget* parent)
 	setMouseTracking(true);
 
 	// draw backgrounds
-	m_sliceEditor.fill(s_waveformBgColor);
-	m_seekerWaveform.fill(s_waveformBgColor);
+	m_sliceEditor.fill(s_SlicerTWaveformBgColor);
+	m_seekerSlicerTWaveform.fill(s_SlicerTWaveformBgColor);
 
 	// connect to playback
 	connect(m_slicerTParent, SIGNAL(isPlaying(float, float, float)), this, SLOT(isPlaying(float, float, float)));
@@ -70,20 +69,20 @@ WaveForm::WaveForm(int w, int h, SlicerT* instrument, QWidget* parent)
 	updateUI();
 }
 
-void WaveForm::drawSeekerWaveform()
+void SlicerTWaveform::drawSeekerSlicerTWaveform()
 {
-	m_seekerWaveform.fill(s_waveformBgColor);
+	m_seekerSlicerTWaveform.fill(s_SlicerTWaveformBgColor);
 	if (m_currentSample.frames() < 2048) { return; }
-	QPainter brush(&m_seekerWaveform);
-	brush.setPen(s_waveformColor);
+	QPainter brush(&m_seekerSlicerTWaveform);
+	brush.setPen(s_SlicerTWaveformColor);
 
-	m_currentSample.visualize(
-		brush, QRect(0, 0, m_seekerWaveform.width(), m_seekerWaveform.height()), 0, m_currentSample.frames());
+	m_currentSample.visualize(brush, QRect(0, 0, m_seekerSlicerTWaveform.width(), m_seekerSlicerTWaveform.height()), 0,
+		m_currentSample.frames());
 }
 
-void WaveForm::drawSeeker()
+void SlicerTWaveform::drawSeeker()
 {
-	m_seeker.fill(s_waveformBgColor);
+	m_seeker.fill(s_SlicerTWaveformBgColor);
 	if (m_currentSample.frames() < 2048) { return; }
 	QPainter brush(&m_seeker);
 
@@ -122,9 +121,9 @@ void WaveForm::drawSeeker()
 	brush.drawRoundedRect(seekerStartPosX, 0, seekerMiddleWidth - 1, m_seekerHeight - 1, 4, 4); // -1 needed
 }
 
-void WaveForm::drawEditor()
+void SlicerTWaveform::drawEditor()
 {
-	m_sliceEditor.fill(s_waveformBgColor);
+	m_sliceEditor.fill(s_SlicerTWaveformBgColor);
 	QPainter brush(&m_sliceEditor);
 
 	// draw text if no sample loaded
@@ -146,8 +145,8 @@ void WaveForm::drawEditor()
 	brush.setPen(s_playHighlighColor);
 	brush.drawLine(0, m_editorHeight / 2, m_editorWidth, m_editorHeight / 2);
 
-	// draw waveform
-	brush.setPen(s_waveformColor);
+	// draw SlicerTWaveform
+	brush.setPen(s_SlicerTWaveformColor);
 	float zoomOffset = ((float)m_editorHeight - m_zoomLevel * m_editorHeight) / 2;
 	m_currentSample.visualize(
 		brush, QRect(0, zoomOffset, m_editorWidth, m_zoomLevel * m_editorHeight), startFrame, endFrame);
@@ -166,25 +165,25 @@ void WaveForm::drawEditor()
 	}
 }
 
-void WaveForm::updateUI()
+void SlicerTWaveform::updateUI()
 {
-	drawSeekerWaveform();
+	drawSeekerSlicerTWaveform();
 	drawSeeker();
 	drawEditor();
 	update();
 }
 
-void WaveForm::isPlaying(float current, float start, float end)
+void SlicerTWaveform::isPlaying(float current, float start, float end)
 {
 	m_noteCurrent = current;
 	m_noteStart = start;
 	m_noteEnd = end;
-	drawSeeker(); // only update seeker, else horrible performance because of waveform redraw
+	drawSeeker(); // only update seeker, else horrible performance because of SlicerTWaveform redraw
 	update();
 }
 
 // events
-void WaveForm::mousePressEvent(QMouseEvent* me)
+void SlicerTWaveform::mousePressEvent(QMouseEvent* me)
 {
 	float normalizedClickSeeker = (float)(me->x() - m_seekerHorMargin) / m_seekerWidth;
 	float normalizedClickEditor = (float)(me->x()) / m_editorWidth;
@@ -201,15 +200,15 @@ void WaveForm::mousePressEvent(QMouseEvent* me)
 	{
 		if (abs(normalizedClickSeeker - m_seekerStart) < m_distanceForClick) // dragging start
 		{
-			m_currentlyDragging = m_draggingTypes::m_seekerStart;
+			m_currentlyDragging = DraggingTypes::SeekerStart;
 		}
 		else if (abs(normalizedClickSeeker - m_seekerEnd) < m_distanceForClick) // dragging end
 		{
-			m_currentlyDragging = m_draggingTypes::m_seekerEnd;
+			m_currentlyDragging = DraggingTypes::SeekerEnd;
 		}
 		else if (normalizedClickSeeker > m_seekerStart && normalizedClickSeeker < m_seekerEnd) // dragging middle
 		{
-			m_currentlyDragging = m_draggingTypes::m_seekerMiddle;
+			m_currentlyDragging = DraggingTypes::SeekerMiddle;
 			m_seekerMiddle = normalizedClickSeeker;
 		}
 	}
@@ -226,7 +225,7 @@ void WaveForm::mousePressEvent(QMouseEvent* me)
 
 			if (abs(xPos - normalizedClickEditor) < m_distanceForClick)
 			{
-				m_currentlyDragging = m_draggingTypes::m_slicePoint;
+				m_currentlyDragging = DraggingTypes::SlicePoint;
 				m_sliceSelected = i;
 			}
 		}
@@ -243,15 +242,15 @@ void WaveForm::mousePressEvent(QMouseEvent* me)
 	updateUI();
 }
 
-void WaveForm::mouseReleaseEvent(QMouseEvent* me)
+void SlicerTWaveform::mouseReleaseEvent(QMouseEvent* me)
 {
-	m_currentlyDragging = m_draggingTypes::nothing;
+	m_currentlyDragging = DraggingTypes::Nothing;
 	std::sort(m_slicePoints.begin(), m_slicePoints.end());
 
 	updateUI();
 }
 
-void WaveForm::mouseMoveEvent(QMouseEvent* me)
+void SlicerTWaveform::mouseMoveEvent(QMouseEvent* me)
 {
 	float normalizedClickSeeker = (float)(me->x() - m_seekerHorMargin) / m_seekerWidth;
 	float normalizedClickEditor = (float)(me->x()) / m_editorWidth;
@@ -264,15 +263,15 @@ void WaveForm::mouseMoveEvent(QMouseEvent* me)
 	// handle dragging events
 	switch (m_currentlyDragging)
 	{
-	case m_draggingTypes::m_seekerStart:
+	case DraggingTypes::SeekerStart:
 		m_seekerStart = std::clamp(normalizedClickSeeker, 0.0f, m_seekerEnd - m_minSeekerDistance);
 		break;
 
-	case m_draggingTypes::m_seekerEnd:
+	case DraggingTypes::SeekerEnd:
 		m_seekerEnd = std::clamp(normalizedClickSeeker, m_seekerStart + m_minSeekerDistance, 1.0f);
 		break;
 
-	case m_draggingTypes::m_seekerMiddle:
+	case DraggingTypes::SeekerMiddle:
 		m_seekerMiddle = normalizedClickSeeker;
 
 		if (m_seekerMiddle + distStart >= 0 && m_seekerMiddle + distEnd <= 1)
@@ -282,17 +281,17 @@ void WaveForm::mouseMoveEvent(QMouseEvent* me)
 		}
 		break;
 
-	case m_draggingTypes::m_slicePoint:
+	case DraggingTypes::SlicePoint:
 		m_slicePoints[m_sliceSelected] = startFrame + normalizedClickEditor * (endFrame - startFrame);
 		m_slicePoints[m_sliceSelected] = std::clamp(m_slicePoints[m_sliceSelected], 0, m_currentSample.frames());
 		break;
-	case m_draggingTypes::nothing:
+	case DraggingTypes::Nothing:
 		break;
 	}
 	updateUI();
 }
 
-void WaveForm::mouseDoubleClickEvent(QMouseEvent* me)
+void SlicerTWaveform::mouseDoubleClickEvent(QMouseEvent* me)
 {
 	float normalizedClickEditor = (float)(me->x()) / m_editorWidth;
 	float startFrame = m_seekerStart * m_currentSample.frames();
@@ -312,7 +311,7 @@ void WaveForm::mouseDoubleClickEvent(QMouseEvent* me)
 	std::sort(m_slicePoints.begin(), m_slicePoints.end());
 }
 
-void WaveForm::wheelEvent(QWheelEvent* _we)
+void SlicerTWaveform::wheelEvent(QWheelEvent* _we)
 {
 	// m_zoomLevel = _we-> / 360.0f * 2.0f;
 	m_zoomLevel += _we->angleDelta().y() / 360.0f * m_zoomSensitivity;
@@ -322,10 +321,10 @@ void WaveForm::wheelEvent(QWheelEvent* _we)
 	update();
 }
 
-void WaveForm::paintEvent(QPaintEvent* pe)
+void SlicerTWaveform::paintEvent(QPaintEvent* pe)
 {
 	QPainter p(this);
-	p.drawPixmap(m_seekerHorMargin, 0, m_seekerWaveform);
+	p.drawPixmap(m_seekerHorMargin, 0, m_seekerSlicerTWaveform);
 	p.drawPixmap(m_seekerHorMargin, 0, m_seeker);
 	p.drawPixmap(0, m_seekerHeight + m_middleMargin, m_sliceEditor);
 }

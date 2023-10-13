@@ -76,7 +76,7 @@ private:
 	float m_expectedPhaseOut = 0;
 
 	// buffers
-	fftwf_complex m_FFTSpectrum[s_windowSize];
+	std::vector<fftwf_complex> m_FFTSpectrum;
 	std::vector<float> m_FFTInput;
 	std::vector<float> m_IFFTReconstruction;
 	std::vector<float> m_allMagnitudes;
@@ -153,6 +153,13 @@ class SlicerT : public Instrument
 {
 	Q_OBJECT
 
+public slots:
+	void updateFile(QString file);
+	void updateSlices();
+
+signals:
+	void isPlaying(float current, float start, float end);
+
 public:
 	SlicerT(InstrumentTrack* instrumentTrack);
 	~SlicerT() override = default;
@@ -162,17 +169,13 @@ public:
 	void saveSettings(QDomDocument& document, QDomElement& element) override;
 	void loadSettings(const QDomElement& element) override;
 
+	void findSlices();
+	void findBPM();
+
 	QString nodeName() const override;
 	gui::PluginView* instantiateView(QWidget* parent) override;
 
 	void writeToMidi(std::vector<Note>* outClip);
-
-public slots:
-	void updateFile(QString file);
-	void updateSlices();
-
-signals:
-	void isPlaying(float current, float start, float end);
 
 private:
 	// models
@@ -190,11 +193,8 @@ private:
 
 	InstrumentTrack* m_parentTrack;
 
-	void findSlices();
-	void findBPM();
-
 	friend class gui::SlicerTView;
-	friend class gui::WaveForm;
+	friend class gui::SlicerTWaveform;
 };
 } // namespace lmms
-#endif // SLICERT_H
+#endif // LMMS_SLICERT_H

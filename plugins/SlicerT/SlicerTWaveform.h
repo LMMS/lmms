@@ -1,5 +1,5 @@
 /*
- * WaveForm.h - declaration of class WaveForm
+ * SlicerTWaveform.h - declaration of class SlicerTWaveform
  *
  * Copyright (c) 2023 Daniel Kauss Serna <daniel.kauss.serna@gmail.com>
  *
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef WAVEFORM_H
-#define WAVEFORM_H
+#ifndef LMMS_SlicerT_Waveform_H
+#define LMMS_SlicerT_Waveform_H
 
 #include <QApplication>
 #include <QFontMetrics>
@@ -39,9 +39,25 @@ class SlicerT;
 
 namespace gui {
 
-class WaveForm : public QWidget
+class SlicerTWaveform : public QWidget
 {
 	Q_OBJECT
+
+public slots:
+	void updateUI();
+	void isPlaying(float current, float start, float end);
+
+public:
+	SlicerTWaveform(int w, int h, SlicerT* instrument, QWidget* parent);
+
+	enum class DraggingTypes
+	{
+		Nothing,
+		SeekerStart,
+		SeekerEnd,
+		SeekerMiddle,
+		SlicePoint,
+	};
 
 protected:
 	virtual void mousePressEvent(QMouseEvent* me);
@@ -66,8 +82,8 @@ private:
 	int m_editorWidth;
 
 	// colors
-	static constexpr QColor s_waveformBgColor = QColor(255, 255, 255, 0);
-	static constexpr QColor s_waveformColor = QColor(123, 49, 212);
+	static constexpr QColor s_SlicerTWaveformBgColor = QColor(255, 255, 255, 0);
+	static constexpr QColor s_SlicerTWaveformColor = QColor(123, 49, 212);
 
 	static constexpr QColor s_playColor = QColor(255, 255, 255, 200);
 	static constexpr QColor s_playHighlighColor = QColor(255, 255, 255, 70);
@@ -85,15 +101,7 @@ private:
 	float m_zoomSensitivity = 0.5f;
 
 	// dragging vars
-	enum class m_draggingTypes
-	{
-		nothing,
-		m_seekerStart,
-		m_seekerEnd,
-		m_seekerMiddle,
-		m_slicePoint,
-	};
-	m_draggingTypes m_currentlyDragging;
+	DraggingTypes m_currentlyDragging;
 
 	// seeker vars
 	float m_seekerStart = 0;
@@ -112,7 +120,7 @@ private:
 	// pixmaps
 	QPixmap m_sliceArrow;
 	QPixmap m_seeker;
-	QPixmap m_seekerWaveform; // only stores waveform graphic
+	QPixmap m_seekerSlicerTWaveform; // only stores SlicerTWaveform graphic
 	QPixmap m_sliceEditor;
 
 	SampleBuffer& m_currentSample;
@@ -121,16 +129,9 @@ private:
 	std::vector<int>& m_slicePoints;
 
 	void drawEditor();
-	void drawSeekerWaveform();
+	void drawSeekerSlicerTWaveform();
 	void drawSeeker();
-
-public slots:
-	void updateUI();
-	void isPlaying(float current, float start, float end);
-
-public:
-	WaveForm(int w, int h, SlicerT* instrument, QWidget* parent);
 };
 } // namespace gui
 } // namespace lmms
-#endif // WAVEFORM_H
+#endif // LMMS_SlicerT_Waveform_H

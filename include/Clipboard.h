@@ -46,7 +46,7 @@ namespace lmms::Clipboard
 	bool hasFormat( MimeType mT );
 
 	// Helper methods for String data
-	void LMMS_EXPORT copyString( const QString & str, MimeType mT );
+	void LMMS_EXPORT copyString(const QString& str, MimeType mT);
 	QString getString( MimeType mT );
 
 	// Helper methods for String Pair data

@@ -53,15 +53,16 @@ Plugin::Descriptor PLUGIN_EXPORT slicert_plugin_descriptor = {
 } // end extern
 
 PhaseVocoder::PhaseVocoder()
-	: m_FFTInput(s_windowSize, 0)
+	: m_FFTSpectrum(s_windowSize)
+	, m_FFTInput(s_windowSize, 0)
 	, m_IFFTReconstruction(s_windowSize, 0)
 	, m_allMagnitudes(s_windowSize, 0)
 	, m_allFrequencies(s_windowSize, 0)
 	, m_processedFreq(s_windowSize, 0)
 	, m_processedMagn(s_windowSize, 0)
 {
-	m_fftPlan = fftwf_plan_dft_r2c_1d(s_windowSize, m_FFTInput.data(), m_FFTSpectrum, FFTW_MEASURE);
-	m_ifftPlan = fftwf_plan_dft_c2r_1d(s_windowSize, m_FFTSpectrum, m_IFFTReconstruction.data(), FFTW_MEASURE);
+	m_fftPlan = fftwf_plan_dft_r2c_1d(s_windowSize, m_FFTInput.data(), m_FFTSpectrum.data(), FFTW_MEASURE);
+	m_ifftPlan = fftwf_plan_dft_c2r_1d(s_windowSize, m_FFTSpectrum.data(), m_IFFTReconstruction.data(), FFTW_MEASURE);
 }
 
 PhaseVocoder::~PhaseVocoder()
@@ -112,7 +113,7 @@ void PhaseVocoder::getFrames(std::vector<float>& outData, int start, int frames)
 	m_dataLock.lock();
 
 	if (m_scaleRatio == 1) { // directly copy original data
-		memcpy(outData.data(), m_originalBuffer.data() + start, frames*sizeof(float));
+		std::copy_n(m_originalBuffer.data() + start, frames, outData.data());
 		m_dataLock.unlock();
 		return;
 	}
@@ -189,7 +190,7 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 
 	if (!useCache)
 	{ // normal stuff
-		memcpy(m_FFTInput.data(), m_originalBuffer.data() + windowStart, s_windowSize * sizeof(float));
+		std::copy_n(m_originalBuffer.data() + windowStart, s_windowSize, m_FFTInput.data());
 
 		// FFT
 		fftwf_execute(m_fftPlan);
@@ -227,14 +228,14 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 			m_allFrequencies[j] = freq;
 		}
 		// write cache
-		memcpy(m_freqCache.data() + windowIndex, m_allFrequencies.data(), s_windowSize * sizeof(float));
-		memcpy(m_magCache.data() + windowIndex, m_allMagnitudes.data(), s_windowSize * sizeof(float));
+		std::copy_n(m_allFrequencies.data(), s_windowSize, m_freqCache.data() + windowIndex);
+		std::copy_n(m_allMagnitudes.data(), s_windowSize, m_magCache.data() + windowIndex);
 	}
 	else
 	{
 		// read cache
-		memcpy(m_allFrequencies.data(), m_freqCache.data() + windowIndex, s_windowSize * sizeof(float));
-		memcpy(m_allMagnitudes.data(), m_magCache.data() + windowIndex, s_windowSize * sizeof(float));
+		std::copy_n(m_freqCache.data() + windowIndex, s_windowSize, m_allFrequencies.data());
+		std::copy_n(m_magCache.data() + windowIndex, s_windowSize, m_allMagnitudes.data());
 	}
 
 	// synthesis, all the operations are the reverse of the analysis
@@ -389,7 +390,7 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 
 		instrumentTrack()->processAudioBuffer(workingBuffer, frames + offset, handle);
 
-		// calculate absolute for the waveform
+		// calculate absolute for the SlicerTWaveform
 		float absoluteCurrentNote = (float)currentNoteFrame / totalFrames;
 		float absoluteStartNote = (float)sliceStart / totalFrames;
 		float abslouteEndNote = (float)sliceEnd / totalFrames;
@@ -431,9 +432,9 @@ void SlicerT::findSlices()
 	// buffers
 	std::vector<float> prevMags(windowSize / 2, 0);
 	std::vector<float> fftIn(windowSize, 0);
-	fftwf_complex fftOut[windowSize];
+	std::vector<fftwf_complex> fftOut(windowSize);
 
-	fftwf_plan fftPlan = fftwf_plan_dft_r2c_1d(windowSize, fftIn.data(), fftOut, FFTW_MEASURE);
+	fftwf_plan fftPlan = fftwf_plan_dft_r2c_1d(windowSize, fftIn.data(), fftOut.data(), FFTW_MEASURE);
 
 	int lastPoint = -minDist - 1; // to always store 0 first
 	float spectralFlux = 0;
@@ -443,7 +444,7 @@ void SlicerT::findSlices()
 	for (int i = 0; i < singleChannel.size() - windowSize; i += windowSize)
 	{
 		// fft
-		memcpy(fftIn.data(), singleChannel.data() + i, windowSize * sizeof(float));
+		std::copy_n(singleChannel.data() + i, windowSize, fftIn.data());
 		fftwf_execute(fftPlan);
 
 		// calculate spectral flux in regard to last window

@@ -7,4 +7,4 @@ INCLUDE_DIRECTORIES(${SAMPLERATE_INCLUDE_DIRS})
 LINK_DIRECTORIES(${SAMPLERATE_LIBRARY_DIRS})
 LINK_LIBRARIES(${SAMPLERATE_LIBRARIES})
 
-BUILD_PLUGIN(slicert SlicerT.cpp SlicerT.h SlicerTView.cpp SlicerTView.h WaveForm.cpp WaveForm.h MOCFILES SlicerT.h SlicerTView.h WaveForm.h EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.png")
+BUILD_PLUGIN(slicert SlicerT.cpp SlicerT.h SlicerTView.cpp SlicerTView.h SlicerTWaveform.cpp SlicerTWaveform.h MOCFILES SlicerT.h SlicerTView.h SlicerTWaveform.h EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.png")

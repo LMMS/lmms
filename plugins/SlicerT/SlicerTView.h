@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef SLICERT_UI_H
-#define SLICERT_UI_H
+#ifndef LMMS_SLICERT_VIEW_H
+#define LMMS_SLICERT_VIEW_H
 
 #include <QPushButton>
 
@@ -34,7 +34,7 @@
 #include "LcdSpinBox.h"
 #include "LedCheckBox.h"
 #include "PixmapButton.h"
-#include "WaveForm.h"
+#include "SlicerTWaveform.h"
 
 namespace lmms {
 
@@ -59,11 +59,11 @@ class SlicerTView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 
-public:
-	SlicerTView(SlicerT* instrument, QWidget* parent);
-
 protected slots:
 	void exportMidi();
+
+public:
+	SlicerTView(SlicerT* instrument, QWidget* parent);
 
 protected:
 	virtual void dragEnterEvent(QDragEnterEvent* _dee);
@@ -85,8 +85,8 @@ private:
 	PixmapButton m_resetButton;
 	PixmapButton m_midiExportButton;
 
-	WaveForm m_wf;
+	SlicerTWaveform m_wf;
 };
 } // namespace gui
 } // namespace lmms
-#endif // SLICERT_UI_H
+#endif // LMMS_SLICERT_VIEW_H
