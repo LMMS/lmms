@@ -22,8 +22,10 @@
  *
  */
 
-#include "SlicerT.h"
 #include "SlicerTWaveform.h"
+
+#include "SlicerT.h"
+#include "SlicerTView.h"
 #include "embed.h"
 
 namespace lmms {
@@ -46,13 +48,11 @@ SlicerTWaveform::SlicerTWaveform(int w, int h, SlicerT* instrument, QWidget* par
 	, m_seeker(QPixmap(m_seekerWidth, m_seekerHeight))
 	, m_seekerSlicerTWaveform(QPixmap(m_seekerWidth, m_seekerHeight))
 	, m_sliceEditor(QPixmap(w, m_editorHeight))
-	,
 
 	// references to instrument vars
-	m_currentSample(instrument->m_originalSample)
 	, m_slicerTParent(instrument)
-	, m_slicePoints(instrument->m_slicePoints)
-
+	, m_currentSample(&instrument->m_originalSample)
+	, m_slicePoints(&instrument->m_slicePoints)
 {
 	// window config
 	setFixedSize(m_width, m_height);
@@ -72,25 +72,25 @@ SlicerTWaveform::SlicerTWaveform(int w, int h, SlicerT* instrument, QWidget* par
 void SlicerTWaveform::drawSeekerSlicerTWaveform()
 {
 	m_seekerSlicerTWaveform.fill(s_SlicerTWaveformBgColor);
-	if (m_currentSample.frames() < 2048) { return; }
+	if (m_currentSample->frames() < 2048) { return; }
 	QPainter brush(&m_seekerSlicerTWaveform);
 	brush.setPen(s_SlicerTWaveformColor);
 
-	m_currentSample.visualize(brush, QRect(0, 0, m_seekerSlicerTWaveform.width(), m_seekerSlicerTWaveform.height()), 0,
-		m_currentSample.frames());
+	m_currentSample->visualize(brush, QRect(0, 0, m_seekerSlicerTWaveform.width(), m_seekerSlicerTWaveform.height()), 0,
+		m_currentSample->frames());
 }
 
 void SlicerTWaveform::drawSeeker()
 {
 	m_seeker.fill(s_SlicerTWaveformBgColor);
-	if (m_currentSample.frames() < 2048) { return; }
+	if (m_currentSample->frames() < 2048) { return; }
 	QPainter brush(&m_seeker);
 
 	// draw slice points
 	brush.setPen(s_sliceColor);
-	for (int i = 0; i < m_slicePoints.size(); i++)
+	for (int i = 0; i < m_slicePoints->size(); i++)
 	{
-		float xPos = (float)m_slicePoints[i] / m_currentSample.frames() * m_seekerWidth;
+		float xPos = (float)m_slicePoints->at(i) / m_currentSample->frames() * m_seekerWidth;
 		brush.drawLine(xPos, 0, xPos, m_seekerHeight);
 	}
 
@@ -127,7 +127,7 @@ void SlicerTWaveform::drawEditor()
 	QPainter brush(&m_sliceEditor);
 
 	// draw text if no sample loaded
-	if (m_currentSample.frames() < 2048)
+	if (m_currentSample->frames() < 2048)
 	{
 		brush.setPen(s_playHighlighColor);
 		brush.setFont(QFont(brush.font().family(), 9.0f, -1, false));
@@ -137,8 +137,8 @@ void SlicerTWaveform::drawEditor()
 	}
 
 	// editor boundaries
-	float startFrame = m_seekerStart * m_currentSample.frames();
-	float endFrame = m_seekerEnd * m_currentSample.frames();
+	float startFrame = m_seekerStart * m_currentSample->frames();
+	float endFrame = m_seekerEnd * m_currentSample->frames();
 	float numFramesToDraw = endFrame - startFrame;
 
 	// 0 centered line
@@ -148,14 +148,14 @@ void SlicerTWaveform::drawEditor()
 	// draw SlicerTWaveform
 	brush.setPen(s_SlicerTWaveformColor);
 	float zoomOffset = ((float)m_editorHeight - m_zoomLevel * m_editorHeight) / 2;
-	m_currentSample.visualize(
+	m_currentSample->visualize(
 		brush, QRect(0, zoomOffset, m_editorWidth, m_zoomLevel * m_editorHeight), startFrame, endFrame);
 
 	// draw slicepoints
 	brush.setPen(QPen(s_sliceColor, 2));
-	for (int i = 0; i < m_slicePoints.size(); i++)
+	for (int i = 0; i < m_slicePoints->size(); i++)
 	{
-		float xPos = (float)(m_slicePoints[i] - startFrame) / numFramesToDraw * m_editorWidth;
+		float xPos = (float)(m_slicePoints->at(i) - startFrame) / numFramesToDraw * m_editorWidth;
 
 		if (i == m_sliceSelected) { brush.setPen(QPen(s_selectedSliceColor, 2)); }
 		else { brush.setPen(QPen(s_sliceColor, 2)); }
@@ -215,12 +215,12 @@ void SlicerTWaveform::mousePressEvent(QMouseEvent* me)
 	else // editor click
 	{
 		m_sliceSelected = -1;
-		float startFrame = m_seekerStart * m_currentSample.frames();
-		float endFrame = m_seekerEnd * m_currentSample.frames();
+		float startFrame = m_seekerStart * m_currentSample->frames();
+		float endFrame = m_seekerEnd * m_currentSample->frames();
 		// select slice
-		for (int i = 0; i < m_slicePoints.size(); i++)
+		for (int i = 0; i < m_slicePoints->size(); i++)
 		{
-			int sliceIndex = m_slicePoints[i];
+			int sliceIndex = m_slicePoints->at(i);
 			float xPos = (float)(sliceIndex - startFrame) / (float)(endFrame - startFrame);
 
 			if (abs(xPos - normalizedClickEditor) < m_distanceForClick)
@@ -233,9 +233,9 @@ void SlicerTWaveform::mousePressEvent(QMouseEvent* me)
 
 	if (me->button() == Qt::MouseButton::RightButton) // erase selected slice
 	{
-		if (m_sliceSelected != -1 && m_slicePoints.size() > 2)
+		if (m_sliceSelected != -1 && m_slicePoints->size() > 2)
 		{
-			m_slicePoints.erase(m_slicePoints.begin() + m_sliceSelected);
+			m_slicePoints->erase(m_slicePoints->begin() + m_sliceSelected);
 			m_sliceSelected = -1;
 		}
 	}
@@ -245,7 +245,7 @@ void SlicerTWaveform::mousePressEvent(QMouseEvent* me)
 void SlicerTWaveform::mouseReleaseEvent(QMouseEvent* me)
 {
 	m_currentlyDragging = DraggingTypes::Nothing;
-	std::sort(m_slicePoints.begin(), m_slicePoints.end());
+	std::sort(m_slicePoints->begin(), m_slicePoints->end());
 
 	updateUI();
 }
@@ -257,8 +257,8 @@ void SlicerTWaveform::mouseMoveEvent(QMouseEvent* me)
 
 	float distStart = m_seekerStart - m_seekerMiddle;
 	float distEnd = m_seekerEnd - m_seekerMiddle;
-	float startFrame = m_seekerStart * m_currentSample.frames();
-	float endFrame = m_seekerEnd * m_currentSample.frames();
+	float startFrame = m_seekerStart * m_currentSample->frames();
+	float endFrame = m_seekerEnd * m_currentSample->frames();
 
 	// handle dragging events
 	switch (m_currentlyDragging)
@@ -282,8 +282,9 @@ void SlicerTWaveform::mouseMoveEvent(QMouseEvent* me)
 		break;
 
 	case DraggingTypes::SlicePoint:
-		m_slicePoints[m_sliceSelected] = startFrame + normalizedClickEditor * (endFrame - startFrame);
-		m_slicePoints[m_sliceSelected] = std::clamp(m_slicePoints[m_sliceSelected], 0, m_currentSample.frames());
+		m_slicePoints->at(m_sliceSelected) = startFrame + normalizedClickEditor * (endFrame - startFrame);
+		m_slicePoints->at(m_sliceSelected)
+			= std::clamp(m_slicePoints->at(m_sliceSelected), 0, m_currentSample->frames());
 		break;
 	case DraggingTypes::Nothing:
 		break;
@@ -294,21 +295,21 @@ void SlicerTWaveform::mouseMoveEvent(QMouseEvent* me)
 void SlicerTWaveform::mouseDoubleClickEvent(QMouseEvent* me)
 {
 	float normalizedClickEditor = (float)(me->x()) / m_editorWidth;
-	float startFrame = m_seekerStart * m_currentSample.frames();
-	float endFrame = m_seekerEnd * m_currentSample.frames();
+	float startFrame = m_seekerStart * m_currentSample->frames();
+	float endFrame = m_seekerEnd * m_currentSample->frames();
 
 	float slicePosition = startFrame + normalizedClickEditor * (endFrame - startFrame);
 
-	for (int i = 0; i < m_slicePoints.size(); i++)
+	for (int i = 0; i < m_slicePoints->size(); i++)
 	{
-		if (m_slicePoints[i] < slicePosition)
+		if (m_slicePoints->at(i) < slicePosition)
 		{
-			m_slicePoints.insert(m_slicePoints.begin() + i, slicePosition);
+			m_slicePoints->insert(m_slicePoints->begin() + i, slicePosition);
 			break;
 		}
 	}
 
-	std::sort(m_slicePoints.begin(), m_slicePoints.end());
+	std::sort(m_slicePoints->begin(), m_slicePoints->end());
 }
 
 void SlicerTWaveform::wheelEvent(QWheelEvent* _we)

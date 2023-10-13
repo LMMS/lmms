@@ -125,10 +125,9 @@ private:
 	QPixmap m_seekerSlicerTWaveform; // only stores SlicerTWaveform graphic
 	QPixmap m_sliceEditor;
 
-	SampleBuffer& m_currentSample;
-
 	SlicerT* m_slicerTParent;
-	std::vector<int>& m_slicePoints;
+	SampleBuffer* m_currentSample;
+	std::vector<int>* m_slicePoints;
 
 	void drawEditor();
 	void drawSeekerSlicerTWaveform();
