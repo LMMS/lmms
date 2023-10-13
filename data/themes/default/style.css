@@ -946,7 +946,7 @@ lmms--gui--SidInstrumentView lmms--gui--Knob {
 	qproperty-lineWidth: 2;
 }
 
-lmms--gui--SlicerTUI lmms--gui--Knob {
+lmms--gui--SlicerTView lmms--gui--Knob {
 	color: rgb(162, 128, 226);
 	qproperty-outerColor: rgb( 162, 128, 226 );
 	qproperty-innerRadius: 1;
