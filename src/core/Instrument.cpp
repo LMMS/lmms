@@ -182,7 +182,7 @@ void Instrument::applyRelease( sampleFrame * buf, const NotePlayHandle * _n )
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
 	const f_cnt_t fl = _n->framesLeft();
-	if( fl <= desiredReleaseFrames()+fpp )
+	if( fl < desiredReleaseFrames()+fpp )
 	{
 		for( fpp_t f = (fpp_t)( ( fl > desiredReleaseFrames() ) ?
 				(std::max(fpp - desiredReleaseFrames(), 0) +
