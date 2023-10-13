@@ -64,8 +64,8 @@ private:
 	std::vector<bool> m_processedWindows; // marks a window processed
 
 	// timeshift stuff
-	static const int s_windowSize = 512;
-	static const int s_overSampling = 32;
+	static constexpr int s_windowSize = 512;
+	static constexpr int s_overSampling = 32;
 
 	// depending on scaleRatio
 	int m_stepSize = 0;

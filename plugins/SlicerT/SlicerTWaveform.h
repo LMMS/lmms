@@ -73,11 +73,13 @@ private:
 	int m_width;
 	int m_height;
 
-	int m_seekerHorMargin = 5;
-	int m_seekerHeight = 38; // used to calcualte all vertical sizes
-	int m_seekerWidth;
+	// predefined sizes
+	static constexpr int m_seekerHorMargin = 5;
+	static constexpr int m_seekerHeight = 38; // used to calcualte all vertical sizes
+	static constexpr int m_middleMargin = 6;
 
-	int m_middleMargin = 6;
+	// later calculated
+	int m_seekerWidth;
 	int m_editorHeight;
 	int m_editorWidth;
 
@@ -96,9 +98,9 @@ private:
 	static constexpr QColor s_seekerShadowColor = QColor(0, 0, 0, 120);
 
 	// interaction vars
-	float m_distanceForClick = 0.03f;
-	float m_minSeekerDistance = 0.13f;
-	float m_zoomSensitivity = 0.5f;
+	static constexpr float m_distanceForClick = 0.03f;
+	static constexpr float m_minSeekerDistance = 0.13f;
+	static constexpr float m_zoomSensitivity = 0.5f;
 
 	// dragging vars
 	DraggingTypes m_currentlyDragging;
