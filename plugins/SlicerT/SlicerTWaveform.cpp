@@ -50,7 +50,6 @@ SlicerTWaveform::SlicerTWaveform(int w, int h, SlicerT* instrument, QWidget* par
 	, m_sliceEditor(QPixmap(w, m_editorHeight))
 
 	// references to instrument vars
-	, m_slicerTParent(instrument)
 	, m_currentSample(&instrument->m_originalSample)
 	, m_slicePoints(&instrument->m_slicePoints)
 {
@@ -63,8 +62,8 @@ SlicerTWaveform::SlicerTWaveform(int w, int h, SlicerT* instrument, QWidget* par
 	m_seekerSlicerTWaveform.fill(s_SlicerTWaveformBgColor);
 
 	// connect to playback
-	connect(m_slicerTParent, SIGNAL(isPlaying(float, float, float)), this, SLOT(isPlaying(float, float, float)));
-	connect(m_slicerTParent, SIGNAL(dataChanged()), this, SLOT(updateUI()));
+	connect(instrument, SIGNAL(isPlaying(float, float, float)), this, SLOT(isPlaying(float, float, float)));
+	connect(instrument, SIGNAL(dataChanged()), this, SLOT(updateUI()));
 
 	updateUI();
 }

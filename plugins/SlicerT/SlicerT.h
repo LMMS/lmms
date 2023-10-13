@@ -52,8 +52,8 @@ public:
 	float scaleRatio() { return m_scaleRatio; }
 
 	// timeshift config
-	static constexpr int s_windowSize = 512;
-	static constexpr int s_overSampling = 32;
+	const int s_windowSize = 512;
+	const int s_overSampling = 32;
 
 private:
 	QMutex m_dataLock;

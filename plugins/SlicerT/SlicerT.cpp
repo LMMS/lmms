@@ -664,7 +664,7 @@ extern "C" {
 // necessary for getting instance out of shared lib
 PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
 {
-	return (new SlicerT(static_cast<InstrumentTrack*>(m)));
+	return new SlicerT(static_cast<InstrumentTrack*>(m));
 }
 } // extern
 } // namespace lmms
