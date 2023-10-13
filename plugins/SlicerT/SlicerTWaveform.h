@@ -50,6 +50,30 @@ public slots:
 public:
 	SlicerTWaveform(int w, int h, SlicerT* instrument, QWidget* parent);
 
+	// predefined sizes
+	static constexpr int m_seekerHorMargin = 5;
+	static constexpr int m_seekerHeight = 38; // used to calcualte all vertical sizes
+	static constexpr int m_middleMargin = 6;
+
+	// colors
+	static constexpr QColor s_SlicerTWaveformBgColor = QColor(255, 255, 255, 0);
+	static constexpr QColor s_SlicerTWaveformColor = QColor(123, 49, 212);
+
+	static constexpr QColor s_playColor = QColor(255, 255, 255, 200);
+	static constexpr QColor s_playHighlighColor = QColor(255, 255, 255, 70);
+
+	static constexpr QColor s_sliceColor = QColor(218, 193, 255);
+	static constexpr QColor s_selectedSliceColor = QColor(178, 153, 215);
+
+	static constexpr QColor s_seekerColor = QColor(178, 115, 255);
+	static constexpr QColor s_seekerHighlightColor = QColor(178, 115, 255, 100);
+	static constexpr QColor s_seekerShadowColor = QColor(0, 0, 0, 120);
+
+	// interaction vars
+	static constexpr float m_distanceForClick = 0.03f;
+	static constexpr float m_minSeekerDistance = 0.13f;
+	static constexpr float m_zoomSensitivity = 0.5f;
+
 	enum class DraggingTypes
 	{
 		Nothing,
@@ -73,34 +97,10 @@ private:
 	int m_width;
 	int m_height;
 
-	// predefined sizes
-	static constexpr int m_seekerHorMargin = 5;
-	static constexpr int m_seekerHeight = 38; // used to calcualte all vertical sizes
-	static constexpr int m_middleMargin = 6;
-
 	// later calculated
 	int m_seekerWidth;
 	int m_editorHeight;
 	int m_editorWidth;
-
-	// colors
-	static constexpr QColor s_SlicerTWaveformBgColor = QColor(255, 255, 255, 0);
-	static constexpr QColor s_SlicerTWaveformColor = QColor(123, 49, 212);
-
-	static constexpr QColor s_playColor = QColor(255, 255, 255, 200);
-	static constexpr QColor s_playHighlighColor = QColor(255, 255, 255, 70);
-
-	static constexpr QColor s_sliceColor = QColor(218, 193, 255);
-	static constexpr QColor s_selectedSliceColor = QColor(178, 153, 215);
-
-	static constexpr QColor s_seekerColor = QColor(178, 115, 255);
-	static constexpr QColor s_seekerHighlightColor = QColor(178, 115, 255, 100);
-	static constexpr QColor s_seekerShadowColor = QColor(0, 0, 0, 120);
-
-	// interaction vars
-	static constexpr float m_distanceForClick = 0.03f;
-	static constexpr float m_minSeekerDistance = 0.13f;
-	static constexpr float m_zoomSensitivity = 0.5f;
 
 	// dragging vars
 	DraggingTypes m_currentlyDragging;

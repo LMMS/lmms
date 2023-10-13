@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef SLICERT_H
-#define SLICERT_H
+#ifndef LMMS_SLICERT_H
+#define LMMS_SLICERT_H
 
 #include <fftw3.h>
 
@@ -51,6 +51,10 @@ public:
 	int frames() { return m_processedBuffer.size(); }
 	float scaleRatio() { return m_scaleRatio; }
 
+	// timeshift config
+	static constexpr int s_windowSize = 512;
+	static constexpr int s_overSampling = 32;
+
 private:
 	QMutex m_dataLock;
 	// original data
@@ -62,10 +66,6 @@ private:
 	// output data
 	std::vector<float> m_processedBuffer; // final output
 	std::vector<bool> m_processedWindows; // marks a window processed
-
-	// timeshift stuff
-	static constexpr int s_windowSize = 512;
-	static constexpr int s_overSampling = 32;
 
 	// depending on scaleRatio
 	int m_stepSize = 0;
