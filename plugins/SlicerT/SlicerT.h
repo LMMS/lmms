@@ -162,7 +162,7 @@ signals:
 
 public:
 	SlicerT(InstrumentTrack* instrumentTrack);
-	~SlicerT() override = default;
+	~SlicerT();
 
 	void playNote(NotePlayHandle* handle, sampleFrame* workingBuffer) override;
 
@@ -188,6 +188,8 @@ private:
 	// sample buffers
 	SampleBuffer m_originalSample;
 	DynamicPlaybackBuffer m_phaseVocoder;
+
+	SRC_STATE* m_resamplerState;
 
 	std::vector<int> m_slicePoints;
 

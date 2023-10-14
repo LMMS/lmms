@@ -111,7 +111,8 @@ void PhaseVocoder::getFrames(std::vector<float>& outData, int start, int frames)
 	if (m_originalBuffer.size() < 2048) { return; }
 	m_dataLock.lock();
 
-	if (m_scaleRatio == 1) { // directly copy original data
+	if (typeInfo<float>::isEqual(m_scaleRatio, 1.0f))
+	{ // directly copy original data
 		std::copy_n(m_originalBuffer.data() + start, frames, outData.data());
 		m_dataLock.unlock();
 		return;
@@ -309,6 +310,13 @@ SlicerT::SlicerT(InstrumentTrack* instrumentTrack)
 	m_sliceSnap.addItem("1/16");
 	m_sliceSnap.addItem("1/32");
 	m_sliceSnap.setValue(0); // no snap by default
+
+	m_resamplerState = src_new(SRC_SINC_MEDIUM_QUALITY, 2, nullptr); // no error
+}
+
+SlicerT::~SlicerT()
+{
+	src_delete(m_resamplerState);
 }
 
 void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
@@ -359,7 +367,7 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 		m_phaseVocoder.getFrames(prePitchBuffer.data(), framesIndex, framesToCopy);
 
 		// if pitch is changed, resample, else just copy
-		if (pitchRatio != 1.0f)
+		if (!typeInfo<float>::isEqual(pitchRatio, 1.0f))
 		{
 			SRC_DATA resamplerData;
 
@@ -369,7 +377,7 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 			resamplerData.output_frames = frames;
 			resamplerData.src_ratio = inversePitchRatio;
 
-			src_simple(&resamplerData, SRC_LINEAR, 2);
+			src_process(m_resamplerState, &resamplerData);
 		}
 		else { memcpy(workingBuffer + offset, prePitchBuffer.data(), frames * sizeof(sampleFrame)); }
 
@@ -575,6 +583,8 @@ void SlicerT::updateFile(QString file)
 	float speedRatio = static_cast<float>(m_originalBPM.value()) / Engine::getSong()->getTempo();
 	m_phaseVocoder.loadSample(
 		m_originalSample.data(), m_originalSample.frames(), m_originalSample.sampleRate(), speedRatio);
+
+	src_reset(m_resamplerState);
 
 	emit dataChanged();
 }
