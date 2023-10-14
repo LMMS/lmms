@@ -118,8 +118,8 @@ void PhaseVocoder::getFrames(std::vector<float>& outData, int start, int frames)
 	}
 
 	int windowMargin = s_overSampling / 2; // numbers of windows before full quality
-	int startWindow = (float)start / m_outStepSize - windowMargin;
-	int endWindow = (float)(start + frames) / m_outStepSize + windowMargin;
+	int startWindow = static_cast<float>(start) / m_outStepSize - windowMargin;
+	int endWindow = static_cast<float>((start + frames)) / m_outStepSize + windowMargin;
 
 	startWindow = std::clamp(startWindow, 0, m_numWindows - 1);
 	endWindow = std::clamp(endWindow, 0, m_numWindows - 1);
@@ -157,12 +157,12 @@ void PhaseVocoder::updateParams(float newRatio)
 	m_dataLock.lock();
 
 	m_scaleRatio = newRatio;
-	m_stepSize = (float)s_windowSize / s_overSampling;
-	m_numWindows = (float)m_originalBuffer.size() / m_stepSize - s_overSampling - 1;
-	m_outStepSize = m_scaleRatio * (float)m_stepSize; // float, else inaccurate
+	m_stepSize = static_cast<float>(s_windowSize) / s_overSampling;
+	m_numWindows = static_cast<float>(m_originalBuffer.size()) / m_stepSize - s_overSampling - 1;
+	m_outStepSize = m_scaleRatio * m_stepSize; // float, else inaccurate
 	m_freqPerBin = m_originalSampleRate / s_windowSize;
-	m_expectedPhaseIn = 2. * F_PI * (float)m_stepSize / (float)s_windowSize;
-	m_expectedPhaseOut = 2. * F_PI * (float)m_outStepSize / (float)s_windowSize;
+	m_expectedPhaseIn = 2. * F_PI * m_stepSize / s_windowSize;
+	m_expectedPhaseOut = 2. * F_PI * m_outStepSize / s_windowSize;
 
 	m_processedBuffer.resize(m_scaleRatio * m_originalBuffer.size(), 0);
 
@@ -184,8 +184,8 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 {
 	// declare vars
 	float real, imag, phase, magnitude, freq, deltaPhase = 0;
-	int windowStart = (float)windowNum * m_stepSize;
-	int windowIndex = (float)windowNum * s_windowSize;
+	int windowStart = static_cast<float>(windowNum) * m_stepSize;
+	int windowIndex = static_cast<float>(windowNum) * s_windowSize;
 
 	if (!useCache)
 	{ // normal stuff
@@ -209,7 +209,7 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 				- m_lastPhase[std::max(0, windowIndex + j - s_windowSize)]; // subtract prev pahse to get phase diference
 			m_lastPhase[windowIndex + j] = phase;
 
-			freq -= (float)j * m_expectedPhaseIn; // subtract expected phase
+			freq -= m_expectedPhaseIn * j; // subtract expected phase
 			// at this point, freq is the difference in phase
 			// between the last phase, having removed the expected phase at this point in the sample
 
@@ -218,10 +218,10 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 			freq = fmod(freq + F_PI, -2.0f * F_PI) + F_PI;
 
 			// convert phase difference into bin freq mulitplier
-			freq = (float)s_overSampling * freq / (2. * F_PI);
+			freq = freq * s_overSampling / (2. * F_PI);
 
 			// add to the expected freq the change in freq calculated from the phase diff
-			freq = (float)j * m_freqPerBin + freq * m_freqPerBin;
+			freq = m_freqPerBin * j + m_freqPerBin * freq;
 
 			m_allMagnitudes[j] = magnitude;
 			m_allFrequencies[j] = freq;
@@ -244,7 +244,7 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 		freq = m_allFrequencies[j];
 
 		// difference to bin freq mulitplier
-		deltaPhase = freq - (float)j * m_freqPerBin;
+		deltaPhase = freq - m_freqPerBin * j;
 
 		// convert to phase difference
 		deltaPhase /= m_freqPerBin;
@@ -253,7 +253,7 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 		deltaPhase = 2. * F_PI * deltaPhase / s_overSampling;
 
 		// add the expected phase
-		deltaPhase += (float)j * m_expectedPhaseOut;
+		deltaPhase += m_expectedPhaseOut * j;
 
 		// sum this phase to the total, to keep track of the out phase along the sample
 		m_sumPhase[windowIndex + j] += deltaPhase;
@@ -325,7 +325,7 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 	const float inversePitchRatio = 1.0f / pitchRatio;
 
 	// update scaling parameters
-	float speedRatio = (float)m_originalBPM.value() / bpm;
+	float speedRatio = static_cast<float>(m_originalBPM.value()) / bpm;
 	if (!m_enableSync.value()) { speedRatio = 1; } // disable timeshift
 	m_phaseVocoder.setScaleRatio(speedRatio);
 	speedRatio *= inversePitchRatio; // adjust for pitch bend
@@ -351,7 +351,8 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 	if (noteFramesLeft > 0)
 	{
 		int framesToCopy = pitchRatio * frames + 1; // just in case
-		int framesIndex = std::min((int)(pitchRatio * currentNoteFrame), m_phaseVocoder.frames() - framesToCopy);
+		int framesIndex = pitchRatio * currentNoteFrame;
+		framesIndex = std::min(framesIndex, m_phaseVocoder.frames() - framesToCopy);
 
 		// load sample segmengt, with regards to pitch settings
 		std::vector<sampleFrame> prePitchBuffer(framesToCopy, {0.0f, 0.0f});
@@ -377,7 +378,7 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 		{
 			for (int i = 0; i < frames; i++)
 			{
-				float fadeValue = (float)(noteFramesLeft - i) / m_fadeOutFrames.value();
+				float fadeValue = static_cast<float>(noteFramesLeft - i) / m_fadeOutFrames.value();
 				// if the workingbuffer extends the sample
 				fadeValue = std::clamp(fadeValue, 0.0f, 1.0f);
 				fadeValue = pow(fadeValue, 2);
@@ -390,9 +391,9 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 		instrumentTrack()->processAudioBuffer(workingBuffer, frames + offset, handle);
 
 		// calculate absolute for the SlicerTWaveform
-		float absoluteCurrentNote = (float)currentNoteFrame / totalFrames;
-		float absoluteStartNote = (float)sliceStart / totalFrames;
-		float abslouteEndNote = (float)sliceEnd / totalFrames;
+		float absoluteCurrentNote = static_cast<float>(currentNoteFrame) / totalFrames;
+		float absoluteStartNote = static_cast<float>(sliceStart) / totalFrames;
+		float abslouteEndNote = static_cast<float>(sliceEnd) / totalFrames;
 		emit isPlaying(absoluteCurrentNote, absoluteStartNote, abslouteEndNote);
 	}
 	else { emit isPlaying(-1, 0, 0); }
@@ -531,7 +532,7 @@ void SlicerT::writeToMidi(std::vector<Note>* outClip)
 	if (m_originalSample.frames() < 2048) { return; }
 
 	// update incase bpm changed
-	float speedRatio = (float)m_originalBPM.value() / Engine::getSong()->getTempo();
+	float speedRatio = static_cast<float>(m_originalBPM.value()) / Engine::getSong()->getTempo();
 	m_phaseVocoder.setScaleRatio(speedRatio);
 
 	// calculate how many "beats" are in the sample
@@ -539,7 +540,7 @@ void SlicerT::writeToMidi(std::vector<Note>* outClip)
 	float sampleRate = m_originalSample.sampleRate();
 	float bpm = Engine::getSong()->getTempo();
 	float samplesPerBeat = 60.0f / bpm * sampleRate;
-	float beats = (float)m_phaseVocoder.frames() / samplesPerBeat;
+	float beats = m_phaseVocoder.frames() / samplesPerBeat;
 
 	// calculate how many ticks in sample
 	float barsInSample = beats / Engine::getSong()->getTimeSigModel().getDenominator();
@@ -551,7 +552,7 @@ void SlicerT::writeToMidi(std::vector<Note>* outClip)
 	for (int i = 0; i < m_slicePoints.size() - 1; i++)
 	{
 		float sliceStart = lastEnd;
-		float sliceEnd = (float)m_slicePoints[i + 1] / m_originalSample.frames() * totalTicks;
+		float sliceEnd = totalTicks * m_slicePoints[i + 1] / m_originalSample.frames();
 
 		Note sliceNote = Note();
 		sliceNote.setKey(i + m_parentTrack->baseNote());
@@ -571,7 +572,7 @@ void SlicerT::updateFile(QString file)
 	findBPM();
 	findSlices();
 
-	float speedRatio = (float)m_originalBPM.value() / Engine::getSong()->getTempo();
+	float speedRatio = static_cast<float>(m_originalBPM.value()) / Engine::getSong()->getTempo();
 	m_phaseVocoder.loadSample(
 		m_originalSample.data(), m_originalSample.frames(), m_originalSample.sampleRate(), speedRatio);
 
@@ -594,7 +595,7 @@ void SlicerT::saveSettings(QDomDocument& document, QDomElement& element)
 	}
 
 	// save slice points
-	element.setAttribute("totalSlices", (int)m_slicePoints.size());
+	element.setAttribute("totalSlices", static_cast<int>(m_slicePoints.size()));
 	for (int i = 0; i < m_slicePoints.size(); i++)
 	{
 		element.setAttribute(tr("slice_%1").arg(i), m_slicePoints[i]);
@@ -642,7 +643,7 @@ void SlicerT::loadSettings(const QDomElement& element)
 	m_originalBPM.loadSettings(element, "origBPM");
 
 	// create dynamic buffer
-	float speedRatio = (float)m_originalBPM.value() / Engine::getSong()->getTempo();
+	float speedRatio = static_cast<float>(m_originalBPM.value()) / Engine::getSong()->getTempo();
 	m_phaseVocoder.loadSample(
 		m_originalSample.data(), m_originalSample.frames(), m_originalSample.sampleRate(), speedRatio);
 

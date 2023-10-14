@@ -89,7 +89,7 @@ void SlicerTWaveform::drawSeeker()
 	brush.setPen(s_sliceColor);
 	for (int i = 0; i < m_slicePoints->size(); i++)
 	{
-		float xPos = (float)m_slicePoints->at(i) / m_currentSample->frames() * m_seekerWidth;
+		float xPos = static_cast<float>(m_slicePoints->at(i)) / m_currentSample->frames() * m_seekerWidth;
 		brush.drawLine(xPos, 0, xPos, m_seekerHeight);
 	}
 
@@ -146,7 +146,7 @@ void SlicerTWaveform::drawEditor()
 
 	// draw SlicerTWaveform
 	brush.setPen(s_SlicerTWaveformColor);
-	float zoomOffset = ((float)m_editorHeight - m_zoomLevel * m_editorHeight) / 2;
+	float zoomOffset = (m_editorHeight - m_zoomLevel * m_editorHeight) / 2;
 	m_currentSample->visualize(
 		brush, QRect(0, zoomOffset, m_editorWidth, m_zoomLevel * m_editorHeight), startFrame, endFrame);
 
@@ -154,13 +154,13 @@ void SlicerTWaveform::drawEditor()
 	brush.setPen(QPen(s_sliceColor, 2));
 	for (int i = 0; i < m_slicePoints->size(); i++)
 	{
-		float xPos = (float)(m_slicePoints->at(i) - startFrame) / numFramesToDraw * m_editorWidth;
+		float xPos = (m_slicePoints->at(i) - startFrame) / numFramesToDraw * m_editorWidth;
 
 		if (i == m_sliceSelected) { brush.setPen(QPen(s_selectedSliceColor, 2)); }
 		else { brush.setPen(QPen(s_sliceColor, 2)); }
 
 		brush.drawLine(xPos, 0, xPos, m_editorHeight);
-		brush.drawPixmap(xPos - (float)m_sliceArrow.width() / 2, 0, m_sliceArrow);
+		brush.drawPixmap(xPos - m_sliceArrow.width() / 2.0f, 0, m_sliceArrow);
 	}
 }
 
@@ -184,8 +184,8 @@ void SlicerTWaveform::isPlaying(float current, float start, float end)
 // events
 void SlicerTWaveform::mousePressEvent(QMouseEvent* me)
 {
-	float normalizedClickSeeker = (float)(me->x() - m_seekerHorMargin) / m_seekerWidth;
-	float normalizedClickEditor = (float)(me->x()) / m_editorWidth;
+	float normalizedClickSeeker = static_cast<float>(me->x() - m_seekerHorMargin) / m_seekerWidth;
+	float normalizedClickEditor = static_cast<float>(me->x()) / m_editorWidth;
 	// reset seeker on middle click
 	if (me->button() == Qt::MouseButton::MiddleButton)
 	{
@@ -220,7 +220,7 @@ void SlicerTWaveform::mousePressEvent(QMouseEvent* me)
 		for (int i = 0; i < m_slicePoints->size(); i++)
 		{
 			int sliceIndex = m_slicePoints->at(i);
-			float xPos = (float)(sliceIndex - startFrame) / (float)(endFrame - startFrame);
+			float xPos = (sliceIndex - startFrame) / (endFrame - startFrame);
 
 			if (abs(xPos - normalizedClickEditor) < m_distanceForClick)
 			{
@@ -251,8 +251,8 @@ void SlicerTWaveform::mouseReleaseEvent(QMouseEvent* me)
 
 void SlicerTWaveform::mouseMoveEvent(QMouseEvent* me)
 {
-	float normalizedClickSeeker = (float)(me->x() - m_seekerHorMargin) / m_seekerWidth;
-	float normalizedClickEditor = (float)(me->x()) / m_editorWidth;
+	float normalizedClickSeeker = static_cast<float>(me->x() - m_seekerHorMargin) / m_seekerWidth;
+	float normalizedClickEditor = static_cast<float>(me->x()) / m_editorWidth;
 
 	float distStart = m_seekerStart - m_seekerMiddle;
 	float distEnd = m_seekerEnd - m_seekerMiddle;
@@ -293,7 +293,7 @@ void SlicerTWaveform::mouseMoveEvent(QMouseEvent* me)
 
 void SlicerTWaveform::mouseDoubleClickEvent(QMouseEvent* me)
 {
-	float normalizedClickEditor = (float)(me->x()) / m_editorWidth;
+	float normalizedClickEditor = static_cast<float>(me->x()) / m_editorWidth;
 	float startFrame = m_seekerStart * m_currentSample->frames();
 	float endFrame = m_seekerEnd * m_currentSample->frames();
 
