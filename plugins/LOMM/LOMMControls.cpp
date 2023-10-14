@@ -72,7 +72,7 @@ LOMMControls::LOMMControls(LOMMEffect* effect) :
 	m_relHModel(132, 0, 1000, 0.001, this, tr("Release High")),
 	m_relMModel(282, 0, 1000, 0.001, this, tr("Release Mid")),
 	m_relLModel(282, 0, 1000, 0.001, this, tr("Release Low")),
-	m_rmsTimeModel(10, 0, 500, 0.001, this, tr("RMS Time")),
+	m_rmsTimeModel(25, 0, 500, 0.001, this, tr("RMS Time")),
 	m_kneeModel(6, 0, 36, 0.00001, this, tr("Knee")),
 	m_rangeModel(36, 0, 96, 0.00001, this, tr("Range")),
 	m_balanceModel(0, -18, 18, 0.00001, this, tr("Balance")),
