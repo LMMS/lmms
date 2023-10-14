@@ -56,7 +56,12 @@ LOMMEffect::LOMMEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* 
 	m_lp1(m_sampleRate),
 	m_lp2(m_sampleRate),
 	m_hp1(m_sampleRate),
-	m_hp2(m_sampleRate)
+	m_hp2(m_sampleRate),
+	m_needsUpdate(true),
+	m_coeffPrecalc(-0.05),
+	m_crestTimeConst(0.999),
+	m_lookWrite(0),
+	m_lookBufLength(2)
 {
 	autoQuitModel()->setValue(autoQuitModel()->maxValue());
 	
