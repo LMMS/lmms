@@ -111,7 +111,8 @@ AutomationEditor::AutomationEditor() :
 	m_nodeTangentLineColor(0, 0, 0),
 	m_scaleColor(Qt::SolidPattern),
 	m_crossColor(0, 0, 0),
-	m_backgroundShade(0, 0, 0)
+	m_backgroundShade(0, 0, 0),
+	m_ghostNoteColor(0, 0, 0)
 {
 	connect( this, SIGNAL(currentClipChanged()),
 				this, SLOT(updateAfterClipChange()),
@@ -1289,17 +1290,21 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				else if (len_ticks < 0) { len_ticks = 4; }
 
 				int note_width = len_ticks * m_ppb / TimePos::ticksPerBar();
+				int keyRange = maxKey - minKey;
 
-				int noteMargin = 40;
-				int noteHeight = 10;
+				if (keyRange < MIN_NOTE_RANGE) 
+				{
+					int padding = (MIN_NOTE_RANGE - keyRange) / 2.0f;
+					maxKey += padding;
+					minKey -= padding;
+					keyRange = MIN_NOTE_RANGE;
+				}
 
-				float absLevel = (float)(note->key() - minKey) / (maxKey - minKey);
-				if (maxKey == minKey) { absLevel = 0.5f; } // center if one key
-				int graphHeight = grid_bottom - TOP_MARGIN - noteMargin - noteHeight;
-				const int y = (graphHeight - graphHeight * absLevel) + noteMargin / 2 + TOP_MARGIN;
+				float absNoteHeight = (float)(note->key() - minKey) / (maxKey - minKey);
+				int graphHeight = grid_bottom - NOTE_HEIGHT - NOTE_MARGIN - TOP_MARGIN;
+				const int y = (graphHeight - graphHeight * absNoteHeight) + NOTE_HEIGHT / 2.0f + TOP_MARGIN;
 
-				// p.setPen(QColor(248, 248, 255));
-				p.fillRect(xCoordOfTick(note->pos()), y, note_width, noteHeight, QColor(248, 248, 255, 125));
+				p.fillRect(xCoordOfTick(note->pos()), y, note_width, NOTE_HEIGHT, m_ghostNoteColor);
 			}
 		}
 

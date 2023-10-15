@@ -69,6 +69,7 @@ class AutomationEditor : public QWidget, public JournallingObject
 	Q_PROPERTY(QBrush graphColor MEMBER m_graphColor)
 	Q_PROPERTY(QColor crossColor MEMBER m_crossColor)
 	Q_PROPERTY(QColor backgroundShade MEMBER m_backgroundShade)
+	Q_PROPERTY(QColor ghostNoteColor MEMBER m_ghostNoteColor)
 public:
 	void setCurrentClip(AutomationClip * new_clip);
 	void setGhostMidiClip(MidiClip* newMidiClip);
@@ -191,6 +192,10 @@ private:
 
 	static const int VALUES_WIDTH = 64;
 
+	static const int NOTE_HEIGHT = 10; // height of individual notes
+	static const int NOTE_MARGIN = 40; // total border margin for notes
+	static const int MIN_NOTE_RANGE = 20; // min number of keys for fixed size
+
 	AutomationEditor();
 	AutomationEditor( const AutomationEditor & );
 	~AutomationEditor() override;
@@ -271,6 +276,7 @@ private:
 	QBrush m_scaleColor;
 	QColor m_crossColor;
 	QColor m_backgroundShade;
+	QColor m_ghostNoteColor;
 
 	friend class AutomationEditorWindow;
 

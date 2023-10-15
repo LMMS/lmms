@@ -66,6 +66,7 @@ lmms--gui--AutomationEditor {
 
 	qproperty-graphColor: rgba(69,42,153,180);
 	qproperty-scaleColor: #262b30;
+	qproperty-ghostNoteColor: rgba(248, 248, 255, 125);
 }
 
 /* text box */
