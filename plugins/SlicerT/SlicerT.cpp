@@ -535,9 +535,9 @@ void SlicerT::findBPM()
 	m_originalBPM.setInitValue(bpmEstimate);
 }
 
-void SlicerT::writeToMidi(std::vector<Note>* outClip)
+std::vector<Note> SlicerT::getMidi()
 {
-	if (m_originalSample.frames() < 2048) { return; }
+	std::vector<Note> outputNotes;
 
 	// update incase bpm changed
 	float speedRatio = static_cast<float>(m_originalBPM.value()) / Engine::getSong()->getTempo();
@@ -566,10 +566,12 @@ void SlicerT::writeToMidi(std::vector<Note>* outClip)
 		sliceNote.setKey(i + m_parentTrack->baseNote());
 		sliceNote.setPos(sliceStart);
 		sliceNote.setLength(sliceEnd - sliceStart + 1); // + 1 needed for whatever reason
-		outClip->push_back(sliceNote);
+		outputNotes.push_back(sliceNote);
 
 		lastEnd = sliceEnd;
 	}
+
+	return outputNotes;
 }
 
 void SlicerT::updateFile(QString file)

@@ -175,7 +175,7 @@ public:
 	QString nodeName() const override;
 	gui::PluginView* instantiateView(QWidget* parent) override;
 
-	void writeToMidi(std::vector<Note>* outClip);
+	std::vector<Note> getMidi();
 
 private:
 	// models

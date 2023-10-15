@@ -117,8 +117,7 @@ void SlicerTView::exportMidi()
 	QDomElement note_list = dataFile.createElement("note-list");
 	dataFile.content().appendChild(note_list);
 
-	std::vector<Note> notes;
-	m_slicerTParent->writeToMidi(&notes);
+	std::vector<Note> notes = m_slicerTParent->getMidi();
 	if (notes.size() == 0) { return; }
 
 	TimePos start_pos(notes.front().pos().getBar(), 0);
