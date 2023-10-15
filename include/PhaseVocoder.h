@@ -45,7 +45,7 @@ public:
 	~PhaseVocoder();
 
 	//! Loads a new sample, and precomputes the analysis cache
-	void loadData(std::vector<float> originalData, int sampleRate, float newRatio);
+	void loadData(const std::vector<float>& originalData, int sampleRate, float newRatio);
 	//! Change the output timeshift ratio
 	void setScaleRatio(float newRatio) { updateParams(newRatio); }
 

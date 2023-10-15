@@ -134,4 +134,4 @@ private:
 };
 } // namespace gui
 } // namespace lmms
-#endif // LMMS_SLICERT_WAVEFORM_T
+#endif // LMMS_SLICERT_WAVEFORM_H

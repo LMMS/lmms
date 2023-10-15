@@ -59,8 +59,8 @@ SlicerTWaveform::SlicerTWaveform(int w, int h, SlicerT* instrument, QWidget* par
 	m_seekerSlicerTWaveform.fill(s_SlicerTWaveformBgColor);
 
 	// connect to playback
-	connect(instrument, SIGNAL(isPlaying(float, float, float)), this, SLOT(isPlaying(float, float, float)));
-	connect(instrument, SIGNAL(dataChanged()), this, SLOT(updateUI()));
+	connect(instrument, &SlicerT::isPlaying, this, &SlicerTWaveform::isPlaying);
+	connect(instrument, &SlicerT::dataChanged, this, &SlicerTWaveform::updateUI);
 
 	updateUI();
 }

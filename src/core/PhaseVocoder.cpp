@@ -51,7 +51,7 @@ PhaseVocoder::~PhaseVocoder()
 	fftwf_destroy_plan(m_ifftPlan);
 }
 
-void PhaseVocoder::loadData(std::vector<float> originalData, int sampleRate, float newRatio)
+void PhaseVocoder::loadData(const std::vector<float>& originalData, int sampleRate, float newRatio)
 {
 	m_dataLock.lock();
 
@@ -165,7 +165,7 @@ void PhaseVocoder::updateParams(float newRatio)
 void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 {
 	// declare vars
-	float real, imag, phase, magnitude, freq, deltaPhase;
+	float real, imag, phase, magnitude, freq, deltaPhase = 0;
 	int windowStart = static_cast<float>(windowNum) * m_stepSize;
 	int windowIndex = static_cast<float>(windowNum) * s_windowSize;
 

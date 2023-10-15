@@ -98,14 +98,14 @@ SlicerTView::SlicerTView(SlicerT* instrument, QWidget* parent)
 	m_midiExportButton.setActiveGraphic(PLUGIN_NAME::getIconPixmap("copyMidi"));
 	m_midiExportButton.setInactiveGraphic(PLUGIN_NAME::getIconPixmap("copyMidi"));
 	m_midiExportButton.setToolTip(tr("Copy midi pattern to clipboard"));
-	connect(&m_midiExportButton, SIGNAL(clicked()), this, SLOT(exportMidi()));
+	connect(&m_midiExportButton, &PixmapButton::clicked, this, &SlicerTView::exportMidi);
 
 	// slice reset button
 	m_resetButton.move(19, 150);
 	m_resetButton.setActiveGraphic(PLUGIN_NAME::getIconPixmap("resetSlices"));
 	m_resetButton.setInactiveGraphic(PLUGIN_NAME::getIconPixmap("resetSlices"));
 	m_resetButton.setToolTip(tr("Reset Slices"));
-	connect(&m_resetButton, SIGNAL(clicked()), m_slicerTParent, SLOT(updateSlices()));
+	connect(&m_resetButton, &PixmapButton::clicked, m_slicerTParent, &SlicerT::updateSlices);
 }
 
 // copied from piano roll
