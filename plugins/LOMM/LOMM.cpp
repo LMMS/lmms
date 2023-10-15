@@ -214,7 +214,7 @@ bool LOMMEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		float bands[3][2] = {{}};
 		float bandsDry[3][2] = {{}};
 		
-		for (int i = 0; i < 2; ++i)
+		for (int i = 0; i < 2; ++i)// Channels
 		{
 			// These values are for the Auto time knob.  Higher crest factor allows for faster attack/release.
 			float inSquared = s[i] * s[i];
@@ -245,7 +245,7 @@ bool LOMMEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			bands[2][i] *= band3Enabled;
 			
 			float detect[3] = {0, 0, 0};
-			for (int j = 0; j < 3; ++j)
+			for (int j = 0; j < 3; ++j)// Bands
 			{
 				bandsDry[j][i] = bands[j][i];
 				
@@ -376,9 +376,9 @@ bool LOMMEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			}
 		}
 		
-		for (int i = 0; i < 2; ++i)
+		for (int i = 0; i < 2; ++i)// Channels
 		{
-			for (int j = 0; j < 3; ++j)
+			for (int j = 0; j < 3; ++j)// Bands
 			{
 				if (lookaheadEnable)
 				{
