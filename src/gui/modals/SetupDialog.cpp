@@ -1166,10 +1166,14 @@ void SetupDialog::audioInterfaceChanged(const QString & iface)
 void SetupDialog::updateBufferSizeWarning(int value)
 {
 	QString text = "<ul>";
-	if((value & (value - 1)) != 0)  // <=> value is not a power of 2 (for value > 0)
+	// 'value' is not a power of 2 (for value > 0) and under 256. On buffer sizes larger than 256
+	// lmms works with chunks of size 256 and only the final mix will use the actual buffer size.
+	// Plugins don't see a larger buffer size than 256 so anything larger than this is functionally
+	// a 'power of 2' value.
+	if(((value & (value - 1)) != 0) && value < 256)
 	{
 		text += "<li>" + tr("The currently selected value is not a power of 2 "
-					"(32, 64, 128, 256, 512, 1024, ...). Some plugins may not be available.") + "</li>";
+					"(32, 64, 128, 256). Some plugins may not be available.") + "</li>";
 	}
 	if(value <= 32)
 	{

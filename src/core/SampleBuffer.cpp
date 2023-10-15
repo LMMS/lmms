@@ -305,10 +305,6 @@ void SampleBuffer::update(bool keepSettings)
 				}
 				sf_close(sndFile);
 			}
-			else
-			{
-				fileLoadError = FileLoadError::Invalid;
-			}
 			f.close();
 		}
 
@@ -336,6 +332,11 @@ void SampleBuffer::update(bool keepSettings)
 			if (m_frames == 0)
 			{
 				m_frames = decodeSampleDS(file, buf, channels, samplerate);
+			}
+
+			if (m_frames == 0)
+			{
+				fileLoadError = FileLoadError::Invalid;
 			}
 		}
 
