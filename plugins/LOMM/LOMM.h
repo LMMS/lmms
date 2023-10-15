@@ -77,27 +77,27 @@ private:
 	float m_coeffPrecalc;
 	
 	std::array<std::array<float, 2>, 3> m_yL;
-    std::array<std::array<float, 2>, 3> m_rms;
-    std::array<std::array<float, 2>, 3> m_gainResult;
-    
-    std::array<std::array<float, 2>, 3> m_displayIn;
-    std::array<std::array<float, 2>, 3> m_displayOut;
-    
-    std::array<float, 2> m_crestPeakVal;
-    std::array<float, 2> m_crestRmsVal;
-    std::array<float, 2> m_crestFactorVal;
-    float m_crestTimeConst = 0.0f;
-    
-    std::array<std::array<float, 2>, 3> m_prevOut;
-    
-    std::array<std::array<std::vector<float>, 2>, 3> m_inLookBuf;
-    std::array<std::array<std::vector<float>, 2>, 3> m_scLookBuf;
-    
-    int m_lookWrite = 0;
-    int m_lookBufLength = 0;
-    
-    friend class LOMMControls;
-    friend class gui::LOMMControlDialog;
+	std::array<std::array<float, 2>, 3> m_rms;
+	std::array<std::array<float, 2>, 3> m_gainResult;
+	
+	std::array<std::array<float, 2>, 3> m_displayIn;
+	std::array<std::array<float, 2>, 3> m_displayOut;
+	
+	std::array<float, 2> m_crestPeakVal;
+	std::array<float, 2> m_crestRmsVal;
+	std::array<float, 2> m_crestFactorVal;
+	float m_crestTimeConst = 0.0f;
+	
+	std::array<std::array<float, 2>, 3> m_prevOut;
+	
+	std::array<std::array<std::vector<float>, 2>, 3> m_inLookBuf;
+	std::array<std::array<std::vector<float>, 2>, 3> m_scLookBuf;
+	
+	int m_lookWrite = 0;
+	int m_lookBufLength = 0;
+	
+	friend class LOMMControls;
+	friend class gui::LOMMControlDialog;
 };
 
 
