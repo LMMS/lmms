@@ -211,8 +211,8 @@ bool LOMMEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			s[1] = tempS0 - s[1];
 		}
 		
-		float bands[3][2] = {{}};
-		float bandsDry[3][2] = {{}};
+		std::array<std::array<float, 2>, 3> bands = {{}};
+		std::array<std::array<float, 2>, 3> bandsDry = {{}};
 		
 		for (int i = 0; i < 2; ++i)// Channels
 		{
@@ -244,7 +244,7 @@ bool LOMMEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			bands[1][i] *= band2Enabled;
 			bands[2][i] *= band3Enabled;
 			
-			float detect[3] = {0, 0, 0};
+			std::array<float, 3> detect = {0, 0, 0};
 			for (int j = 0; j < 3; ++j)// Bands
 			{
 				bandsDry[j][i] = bands[j][i];
