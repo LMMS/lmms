@@ -152,7 +152,7 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 				float fadeValue = static_cast<float>(noteFramesLeft - i) / m_fadeOutFrames.value();
 				// if the workingbuffer extends the sample
 				fadeValue = std::clamp(fadeValue, 0.0f, 1.0f);
-				fadeValue = pow(fadeValue, 2);
+				fadeValue = std::pow(fadeValue, 2);
 
 				workingBuffer[i + offset][0] *= fadeValue;
 				workingBuffer[i + offset][1] *= fadeValue;
@@ -223,10 +223,10 @@ void SlicerT::findSlices()
 		{
 			real = fftOut[j][0];
 			imag = fftOut[j][1];
-			magnitude = sqrt(real * real + imag * imag);
+			magnitude = std::sqrt(real * real + imag * imag);
 
 			// using L2-norm (euclidean distance)
-			diff = sqrt(pow(magnitude - prevMags[j], 2));
+			diff = std::sqrt(std::pow(magnitude - prevMags[j], 2));
 			spectralFlux += diff;
 
 			prevMags[j] = magnitude;
@@ -249,7 +249,7 @@ void SlicerT::findSlices()
 	int noteSnap = m_sliceSnap.value();
 	int timeSignature = Engine::getSong()->getTimeSigModel().getNumerator();
 	int samplesPerBar = 60.0f * timeSignature / m_originalBPM.value() * m_originalSample.sampleRate();
-	int sliceLock = samplesPerBar / pow(2, noteSnap + 1); // lock to note: 1 / noteSnap²
+	int sliceLock = samplesPerBar / std::pow(2, noteSnap + 1); // lock to note: 1 / noteSnap²
 	if (noteSnap == 0) { sliceLock = 1; }				  // disable noteSnap
 
 	for (int i = 0; i < m_slicePoints.size(); i++)
@@ -427,12 +427,12 @@ void SlicerT::loadSettings(const QDomElement& element)
 
 QString SlicerT::nodeName() const
 {
-	return (slicert_plugin_descriptor.name);
+	return slicert_plugin_descriptor.name;
 }
 
 gui::PluginView* SlicerT::instantiateView(QWidget* parent)
 {
-	return (new gui::SlicerTView(this, parent));
+	return new gui::SlicerTView(this, parent);
 }
 
 extern "C" {

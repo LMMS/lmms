@@ -27,7 +27,7 @@
 #include <QMutex>
 #include <array>
 #include <fftw3.h>
-#include <math.h>
+#include <cmath>
 #include <vector>
 
 #include "lmms_export.h"

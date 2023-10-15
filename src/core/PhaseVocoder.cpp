@@ -182,8 +182,8 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 			real = m_FFTSpectrum[j][0];
 			imag = m_FFTSpectrum[j][1];
 
-			magnitude = 2. * sqrt(real * real + imag * imag);
-			phase = atan2(imag, real);
+			magnitude = 2. * std::sqrt(real * real + imag * imag);
+			phase = std::atan2(imag, real);
 
 			// calculate difference in phase with prev window
 			freq = phase;
@@ -197,7 +197,7 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 
 			// this puts freq in 0-2pi. Since the phase difference is proportional to the deviation in bin frequency,
 			// with this we can better estimate the true frequency
-			freq = fmod(freq + F_PI, -2.0f * F_PI) + F_PI;
+			freq = std::fmod(freq + F_PI, -2.0f * F_PI) + F_PI;
 
 			// convert phase difference into bin freq mulitplier
 			freq = freq * s_overSampling / (2. * F_PI);
@@ -243,8 +243,8 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 
 		m_sumPhase[windowIndex + j + s_windowSize] = deltaPhase; // copy to the next
 
-		m_FFTSpectrum[j][0] = magnitude * cos(deltaPhase);
-		m_FFTSpectrum[j][1] = magnitude * sin(deltaPhase);
+		m_FFTSpectrum[j][0] = magnitude * std::cos(deltaPhase);
+		m_FFTSpectrum[j][1] = magnitude * std::sin(deltaPhase);
 	}
 
 	// inverse fft
@@ -263,7 +263,7 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 
 		float piN2 = 2.0f * F_PI * j;
 		float window
-			= a0 - (a1 * cos(piN2 / s_windowSize)) + (a2 * cos(2.0f * piN2 / s_windowSize)) - (a3 * cos(3.0f * piN2));
+			= a0 - (a1 * std::cos(piN2 / s_windowSize)) + (a2 * std::cos(2.0f * piN2 / s_windowSize)) - (a3 * std::cos(3.0f * piN2));
 
 		// inverse fft magnitudes are windowsSize times bigger
 		m_processedBuffer[outIndex] += window * (m_IFFTReconstruction[j] / s_windowSize / s_overSampling);

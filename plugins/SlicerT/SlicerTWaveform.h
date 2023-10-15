@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_SlicerT_Waveform_H
-#define LMMS_SlicerT_Waveform_H
+#ifndef LMMS_SLICERT_WAVEFORM_H
+#define LMMS_SLICERT_WAVEFORM_H
 
 #include <QApplication>
 #include <QFontMetrics>
@@ -71,9 +71,9 @@ public:
 	const QColor s_seekerShadowColor = QColor(0, 0, 0, 120);
 
 	// interaction vars
-	const float m_distanceForClick = 0.03f;
-	const float m_minSeekerDistance = 0.13f;
-	const float m_zoomSensitivity = 0.5f;
+	static constexpr float s_distanceForClick = 0.03f;
+	static constexpr float s_minSeekerDistance = 0.13f;
+	static constexpr float s_zoomSensitivity = 0.5f;
 
 	enum class DraggingTypes
 	{
@@ -85,13 +85,13 @@ public:
 	};
 
 protected:
-	virtual void mousePressEvent(QMouseEvent* me);
-	virtual void mouseReleaseEvent(QMouseEvent* me);
-	virtual void mouseMoveEvent(QMouseEvent* me);
-	virtual void mouseDoubleClickEvent(QMouseEvent* me);
-	virtual void wheelEvent(QWheelEvent* _we);
+	void mousePressEvent(QMouseEvent* me) override;
+	void mouseReleaseEvent(QMouseEvent* me) override;
+	void mouseMoveEvent(QMouseEvent* me) override;
+	void mouseDoubleClickEvent(QMouseEvent* me) override;
+	void wheelEvent(QWheelEvent* we) override;
 
-	virtual void paintEvent(QPaintEvent* pe);
+	void paintEvent(QPaintEvent* pe) override;
 
 private:
 	// sizes
@@ -134,4 +134,4 @@ private:
 };
 } // namespace gui
 } // namespace lmms
-#endif // LMMS_SlicerT_Waveform_H
+#endif // LMMS_SLICERT_WAVEFORM_T

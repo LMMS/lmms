@@ -34,17 +34,15 @@ namespace gui {
 
 SlicerTWaveform::SlicerTWaveform(int w, int h, SlicerT* instrument, QWidget* parent)
 	: QWidget(parent)
-	,
 	// calculate sizes
-	m_width(w)
+	, m_width(w)
 	, m_height(h)
 	, m_seekerWidth(w - m_seekerHorMargin * 2)
 	, m_editorHeight(h - m_seekerHeight - m_middleMargin)
 	, m_editorWidth(w)
-	,
 
 	// create pixmaps
-	m_sliceArrow(PLUGIN_NAME::getIconPixmap("slide_indicator_arrow"))
+	, m_sliceArrow(PLUGIN_NAME::getIconPixmap("slide_indicator_arrow"))
 	, m_seeker(QPixmap(m_seekerWidth, m_seekerHeight))
 	, m_seekerSlicerTWaveform(QPixmap(m_seekerWidth, m_seekerHeight))
 	, m_sliceEditor(QPixmap(w, m_editorHeight))
@@ -198,11 +196,11 @@ void SlicerTWaveform::mousePressEvent(QMouseEvent* me)
 
 	if (me->y() < m_seekerHeight) // seeker click
 	{
-		if (abs(normalizedClickSeeker - m_seekerStart) < m_distanceForClick) // dragging start
+		if (std::abs(normalizedClickSeeker - m_seekerStart) < m_distanceForClick) // dragging start
 		{
 			m_currentlyDragging = DraggingTypes::SeekerStart;
 		}
-		else if (abs(normalizedClickSeeker - m_seekerEnd) < m_distanceForClick) // dragging end
+		else if (std::abs(normalizedClickSeeker - m_seekerEnd) < m_distanceForClick) // dragging end
 		{
 			m_currentlyDragging = DraggingTypes::SeekerEnd;
 		}
@@ -223,7 +221,7 @@ void SlicerTWaveform::mousePressEvent(QMouseEvent* me)
 			int sliceIndex = m_slicerTParent->m_slicePoints.at(i);
 			float xPos = (sliceIndex - startFrame) / (endFrame - startFrame);
 
-			if (abs(xPos - normalizedClickEditor) < m_distanceForClick)
+			if (std::abs(xPos - normalizedClickEditor) < m_distanceForClick)
 			{
 				m_currentlyDragging = DraggingTypes::SlicePoint;
 				m_sliceSelected = i;
