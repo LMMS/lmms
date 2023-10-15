@@ -47,14 +47,14 @@ public:
 	{
 	}
 
-	void loadSample(const sampleFrame* outData, int frames, int sampleRate, float newRatio)
+	void loadSample(const sampleFrame* inData, int frames, int sampleRate, float newRatio)
 	{
 		std::vector<float> leftData(frames, 0);
 		std::vector<float> rightData(frames, 0);
 		for (int i = 0; i < frames; i++)
 		{
-			leftData[i] = outData[i][0];
-			rightData[i] = outData[i][1];
+			leftData[i] = inData[i][0];
+			rightData[i] = inData[i][1];
 		}
 		m_leftChannel.loadData(leftData, sampleRate, newRatio);
 		m_rightChannel.loadData(rightData, sampleRate, newRatio);

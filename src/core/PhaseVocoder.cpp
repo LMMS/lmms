@@ -165,7 +165,7 @@ void PhaseVocoder::updateParams(float newRatio)
 void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 {
 	// declare vars
-	float real, imag, phase, magnitude, freq, deltaPhase = 0;
+	float real, imag, phase, magnitude, freq, deltaPhase;
 	int windowStart = static_cast<float>(windowNum) * m_stepSize;
 	int windowIndex = static_cast<float>(windowNum) * s_windowSize;
 

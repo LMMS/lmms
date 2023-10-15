@@ -142,7 +142,7 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 
 			src_process(m_resamplerState, &resamplerData);
 		}
-		else { memcpy(workingBuffer + offset, prePitchBuffer.data(), frames * sizeof(sampleFrame)); }
+		else { std::copy_n(prePitchBuffer.data(), frames, workingBuffer + offset); }
 
 		// exponential fade out, applyRelease kinda sucks
 		if (noteFramesLeft < m_fadeOutFrames.value())

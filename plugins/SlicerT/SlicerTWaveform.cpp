@@ -196,11 +196,11 @@ void SlicerTWaveform::mousePressEvent(QMouseEvent* me)
 
 	if (me->y() < m_seekerHeight) // seeker click
 	{
-		if (std::abs(normalizedClickSeeker - m_seekerStart) < m_distanceForClick) // dragging start
+		if (std::abs(normalizedClickSeeker - m_seekerStart) < s_distanceForClick) // dragging start
 		{
 			m_currentlyDragging = DraggingTypes::SeekerStart;
 		}
-		else if (std::abs(normalizedClickSeeker - m_seekerEnd) < m_distanceForClick) // dragging end
+		else if (std::abs(normalizedClickSeeker - m_seekerEnd) < s_distanceForClick) // dragging end
 		{
 			m_currentlyDragging = DraggingTypes::SeekerEnd;
 		}
@@ -221,7 +221,7 @@ void SlicerTWaveform::mousePressEvent(QMouseEvent* me)
 			int sliceIndex = m_slicerTParent->m_slicePoints.at(i);
 			float xPos = (sliceIndex - startFrame) / (endFrame - startFrame);
 
-			if (std::abs(xPos - normalizedClickEditor) < m_distanceForClick)
+			if (std::abs(xPos - normalizedClickEditor) < s_distanceForClick)
 			{
 				m_currentlyDragging = DraggingTypes::SlicePoint;
 				m_sliceSelected = i;
@@ -262,11 +262,11 @@ void SlicerTWaveform::mouseMoveEvent(QMouseEvent* me)
 	switch (m_currentlyDragging)
 	{
 	case DraggingTypes::SeekerStart:
-		m_seekerStart = std::clamp(normalizedClickSeeker, 0.0f, m_seekerEnd - m_minSeekerDistance);
+		m_seekerStart = std::clamp(normalizedClickSeeker, 0.0f, m_seekerEnd - s_minSeekerDistance);
 		break;
 
 	case DraggingTypes::SeekerEnd:
-		m_seekerEnd = std::clamp(normalizedClickSeeker, m_seekerStart + m_minSeekerDistance, 1.0f);
+		m_seekerEnd = std::clamp(normalizedClickSeeker, m_seekerStart + s_minSeekerDistance, 1.0f);
 		break;
 
 	case DraggingTypes::SeekerMiddle:
@@ -315,7 +315,7 @@ void SlicerTWaveform::mouseDoubleClickEvent(QMouseEvent* me)
 void SlicerTWaveform::wheelEvent(QWheelEvent* _we)
 {
 	// m_zoomLevel = _we-> / 360.0f * 2.0f;
-	m_zoomLevel += _we->angleDelta().y() / 360.0f * m_zoomSensitivity;
+	m_zoomLevel += _we->angleDelta().y() / 360.0f * s_zoomSensitivity;
 	m_zoomLevel = std::max(0.0f, m_zoomLevel);
 
 	drawEditor();
