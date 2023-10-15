@@ -137,15 +137,12 @@ void LOMMControlDialog::paintEvent(QPaintEvent *event)
 	QColor bColor(255, 0, 0, 31);
 	QPen aPen(QColor(255, 255, 0, 255), 1);
 	QPen bPen(QColor(255, 0, 0, 255), 1);
-	int thresholdsX[] = {
-		dbfsToX(m_controls->m_aThreshHModel.value()),
-		dbfsToX(m_controls->m_aThreshMModel.value()),
-		dbfsToX(m_controls->m_aThreshLModel.value()),
-		dbfsToX(m_controls->m_bThreshHModel.value()),
-		dbfsToX(m_controls->m_bThreshMModel.value()),
-		dbfsToX(m_controls->m_bThreshLModel.value())
-	};
-
+	int thresholdsX[] = {dbfsToX(m_controls->m_aThreshHModel.value()),
+						dbfsToX(m_controls->m_aThreshMModel.value()),
+						dbfsToX(m_controls->m_aThreshLModel.value()),
+						dbfsToX(m_controls->m_bThreshHModel.value()),
+						dbfsToX(m_controls->m_bThreshMModel.value()),
+						dbfsToX(m_controls->m_bThreshLModel.value())};
 	for (int i = 0; i < 3; ++i) {
 		p.setPen(aPen);
 		p.fillRect(thresholdsX[i], LOMM_DISPLAY_Y[2 * i], LOMM_DISPLAY_X + LOMM_DISPLAY_WIDTH - thresholdsX[i], LOMM_DISPLAY_Y[2 * i + 1] + LOMM_DISPLAY_HEIGHT - LOMM_DISPLAY_Y[2 * i], aColor);
@@ -156,7 +153,6 @@ void LOMMControlDialog::paintEvent(QPaintEvent *event)
 		p.drawLine(thresholdsX[i + 3], LOMM_DISPLAY_Y[2 * i], thresholdsX[i + 3], LOMM_DISPLAY_Y[2 * i + 1] + LOMM_DISPLAY_HEIGHT);
 	}
 	
-	// Draw input lines
 	QPen inputPen(QColor(200, 200, 200, 80), 1);
 	QPen outputPen(QColor(255, 255, 255, 255), 1);
 	for (int i = 0; i < 3; ++i) {
