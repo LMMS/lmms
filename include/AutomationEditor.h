@@ -26,16 +26,17 @@
 #ifndef LMMS_GUI_AUTOMATION_EDITOR_H
 #define LMMS_GUI_AUTOMATION_EDITOR_H
 
+#include <QPushButton>
 #include <QWidget>
 #include <array>
 
-#include "Editor.h"
-
-#include "lmms_basics.h"
-#include "JournallingObject.h"
-#include "TimePos.h"
 #include "AutomationClip.h"
 #include "ComboBoxModel.h"
+#include "Editor.h"
+#include "JournallingObject.h"
+#include "MidiClip.h"
+#include "TimePos.h"
+#include "lmms_basics.h"
 
 class QPainter;
 class QPixmap;
@@ -70,6 +71,7 @@ class AutomationEditor : public QWidget, public JournallingObject
 	Q_PROPERTY(QColor backgroundShade MEMBER m_backgroundShade)
 public:
 	void setCurrentClip(AutomationClip * new_clip);
+	void setGhostMidiClip(MidiClip* newMidiClip);
 
 	inline const AutomationClip * currentClip() const
 	{
@@ -159,6 +161,12 @@ protected slots:
 	/// Updates the clip's quantization using the current user selected value.
 	void setQuantization();
 
+	void resetGhostNotes()
+	{
+		m_ghostNotes.clear();
+		update();
+	}
+
 private:
 
 	enum class Action
@@ -210,6 +218,8 @@ private:
 	float m_scrollLevel;
 	float m_bottomLevel;
 	float m_topLevel;
+
+	NoteVector m_ghostNotes;
 
 	void centerTopBottomScroll();
 	void updateTopBottomLevels();
@@ -284,6 +294,8 @@ public:
 	~AutomationEditorWindow() override = default;
 
 	void setCurrentClip(AutomationClip* clip);
+	void setGhostMidiClip(MidiClip* clip) { m_editor->setGhostMidiClip(clip); };
+
 	const AutomationClip* currentClip();
 
 	void dropEvent( QDropEvent * _de ) override;
@@ -337,6 +349,8 @@ private:
 	ComboBox * m_zoomingXComboBox;
 	ComboBox * m_zoomingYComboBox;
 	ComboBox * m_quantizeComboBox;
+
+	QPushButton* m_resetGhostNotes;
 };
 
 } // namespace gui

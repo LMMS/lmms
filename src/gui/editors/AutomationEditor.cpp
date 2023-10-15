@@ -27,8 +27,6 @@
 
 #include "AutomationEditor.h"
 
-#include <cmath>
-
 #include <QApplication>
 #include <QInputDialog>
 #include <QKeyEvent>
@@ -38,7 +36,9 @@
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QToolTip>
+#include <cmath>
 
+#include "MidiClip.h"
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
 #endif
@@ -1074,8 +1074,19 @@ inline void AutomationEditor::drawAutomationTangents(QPainter& p, timeMap::itera
 	p.drawEllipse(tx - 3, ty - 3, 6, 6);
 }
 
-
-
+void AutomationEditor::setGhostMidiClip(MidiClip* newMidiClip)
+{
+	// Expects a pointer to a MIDI clip or nullptr.
+	m_ghostNotes.clear();
+	if (newMidiClip != nullptr)
+	{
+		for (Note* note : newMidiClip->notes())
+		{
+			auto new_note = new Note(note->length(), note->pos(), note->key());
+			m_ghostNotes.push_back(new_note);
+		}
+	}
+}
 
 void AutomationEditor::paintEvent(QPaintEvent * pe )
 {
@@ -1259,6 +1270,42 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		{
 			p.setPen(m_beatLineColor);
 			p.drawLine( x, grid_bottom, x, x_line_end );
+		}
+
+		// draw ghost notes
+		// const NoteVector* currentMidiNotes = &(getGUI()->pianoRoll()->currentMidiClip()->notes());
+		if (!m_ghostNotes.empty())
+		{
+			int minKey = 128;
+			int maxKey = 0;
+
+			for (const Note* note : m_ghostNotes)
+			{
+				int noteKey = note->key();
+
+				maxKey = std::max(maxKey, noteKey);
+				minKey = std::min(minKey, noteKey);
+			}
+
+			for (const Note* note : m_ghostNotes)
+			{
+				int len_ticks = note->length();
+
+				if (len_ticks == 0) { continue; }
+				else if (len_ticks < 0) { len_ticks = 4; }
+
+				int note_width = len_ticks * m_ppb / TimePos::ticksPerBar();
+
+				int noteMargin = 40;
+				int noteHeight = 10;
+
+				float absLevel = (float)(note->key() - minKey) / (maxKey - minKey);
+				int graphHeight = grid_bottom - TOP_MARGIN - noteMargin - noteHeight;
+				const int y = (graphHeight - graphHeight * absLevel) + noteMargin / 2 + TOP_MARGIN;
+
+				// p.setPen(QColor(248, 248, 255));
+				p.fillRect(xCoordOfTick(note->pos()), y, note_width, noteHeight, QColor(248, 248, 255, 125));
+			}
 		}
 
 		// and finally bars
@@ -2159,8 +2206,17 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	quantizationActionsToolBar->addWidget( quantize_lbl );
 	quantizationActionsToolBar->addWidget( m_quantizeComboBox );
 
+	m_resetGhostNotes = new QPushButton(m_toolBar);
+	m_resetGhostNotes->setIcon(embed::getIconPixmap("clear_ghost_note"));
+	m_resetGhostNotes->setToolTip(tr("Clear ghost notes"));
+	m_resetGhostNotes->setEnabled(true);
+
+	connect(m_resetGhostNotes, SIGNAL(pressed()), m_editor, SLOT(resetGhostNotes()));
+
+	quantizationActionsToolBar->addWidget(m_resetGhostNotes);
+
 	// Setup our actual window
-	setFocusPolicy( Qt::StrongFocus );
+	setFocusPolicy(Qt::StrongFocus);
 	setFocus();
 	setWindowIcon( embed::getIconPixmap( "automation" ) );
 	setAcceptDrops( true );

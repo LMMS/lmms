@@ -70,6 +70,7 @@ public slots:
 protected slots:
 	void openInPianoRoll();
 	void setGhostInPianoRoll();
+	void setGhostInAutomationEditor();
 
 	void resetName();
 	void changeName();
@@ -99,7 +100,7 @@ private:
 	QColor m_mutedNoteBorderColor;
 
 	QStaticText m_staticTextName;
-	
+
 	bool m_legacySEPattern;
 } ;
 

@@ -25,12 +25,13 @@
 
 #include "MidiClipView.h"
 
-#include <cmath>
 #include <QApplication>
 #include <QInputDialog>
 #include <QMenu>
 #include <QPainter>
+#include <cmath>
 
+#include "AutomationEditor.h"
 #include "ConfigManager.h"
 #include "DeprecationHelper.h"
 #include "GuiApplication.h"
@@ -127,8 +128,13 @@ void MidiClipView::setGhostInPianoRoll()
 	getGUI()->pianoRoll()->setFocus();
 }
 
-
-
+void MidiClipView::setGhostInAutomationEditor()
+{
+	getGUI()->automationEditor()->setGhostMidiClip(m_clip);
+	getGUI()->automationEditor()->parentWidget()->show();
+	getGUI()->automationEditor()->show();
+	getGUI()->automationEditor()->setFocus();
+}
 
 void MidiClipView::resetName() { m_clip->setName(""); }
 
@@ -216,7 +222,13 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 	_cm->insertAction( _cm->actions()[1], b );
 	connect( b, SIGNAL(triggered(bool)),
 					this, SLOT(setGhostInPianoRoll()));
-	_cm->insertSeparator( _cm->actions()[2] );
+
+	auto c = new QAction(embed::getIconPixmap("ghost_note"), tr("Set as ghost in automation editor"), _cm);
+	if (m_clip->empty()) { c->setEnabled(false); }
+	_cm->insertAction(_cm->actions()[2], c);
+	connect(c, SIGNAL(triggered(bool)), this, SLOT(setGhostInAutomationEditor()));
+
+	_cm->insertSeparator(_cm->actions()[3]);
 	_cm->addSeparator();
 
 	_cm->addAction( embed::getIconPixmap( "edit_erase" ),
