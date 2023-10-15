@@ -36,7 +36,7 @@ namespace lmms {
 
 /**
 	Dynamically timeshifts one audio channel by a changable ratio
-	Allows access to the timeshifted data in a threadsafe and realtime maner 
+	Allows access to the timeshifted data in a threadsafe and realtime maner
 */
 class LMMS_EXPORT PhaseVocoder
 {
@@ -49,7 +49,7 @@ public:
 	//! Change the output timeshift ratio
 	void setScaleRatio(float newRatio) { updateParams(newRatio); }
 
-	//! Copy a number of frames from a startpoint into an out buffer. 
+	//! Copy a number of frames from a startpoint into an out buffer.
 	//! This is NOT relative to the original sample
 	void getFrames(std::vector<float>& outData, int start, int frames);
 

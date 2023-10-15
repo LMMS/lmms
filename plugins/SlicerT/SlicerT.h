@@ -27,11 +27,11 @@
 
 #include <fftw3.h>
 
-#include "PhaseVocoder.h"
 #include "AutomatableModel.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Note.h"
+#include "PhaseVocoder.h"
 #include "SampleBuffer.h"
 #include "SlicerTView.h"
 
@@ -44,7 +44,8 @@ public:
 	DynamicPlaybackBuffer()
 		: m_leftChannel()
 		, m_rightChannel()
-	{}
+	{
+	}
 
 	void loadSample(const sampleFrame* outData, int frames, int sampleRate, float newRatio)
 	{

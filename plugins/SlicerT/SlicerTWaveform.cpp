@@ -282,7 +282,7 @@ void SlicerTWaveform::mouseMoveEvent(QMouseEvent* me)
 		break;
 
 	case DraggingTypes::SlicePoint:
-		if (m_sliceSelected == -1) {break;}
+		if (m_sliceSelected == -1) { break; }
 		m_slicerTParent->m_slicePoints.at(m_sliceSelected)
 			= startFrame + normalizedClickEditor * (endFrame - startFrame);
 		m_slicerTParent->m_slicePoints.at(m_sliceSelected) = std::clamp(

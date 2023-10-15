@@ -52,7 +52,6 @@ Plugin::Descriptor PLUGIN_EXPORT slicert_plugin_descriptor = {
 };
 } // end extern
 
-
 // ################################# SlicerT ####################################
 
 SlicerT::SlicerT(InstrumentTrack* instrumentTrack)
@@ -264,7 +263,7 @@ void SlicerT::findSlices()
 
 	// fit to sample size
 	m_slicePoints[0] = 0;
-	m_slicePoints[m_slicePoints.size()-1] = m_originalSample.frames();
+	m_slicePoints[m_slicePoints.size() - 1] = m_originalSample.frames();
 
 	// update UI
 	emit dataChanged();
