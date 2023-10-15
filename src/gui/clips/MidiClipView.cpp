@@ -130,10 +130,11 @@ void MidiClipView::setGhostInPianoRoll()
 
 void MidiClipView::setGhostInAutomationEditor()
 {
-	getGUI()->automationEditor()->setGhostMidiClip(m_clip);
-	getGUI()->automationEditor()->parentWidget()->show();
-	getGUI()->automationEditor()->show();
-	getGUI()->automationEditor()->setFocus();
+	auto aEditor = getGUI()->automationEditor();
+	aEditor->setGhostMidiClip(m_clip);
+	aEditor->parentWidget()->show();
+	aEditor->show();
+	aEditor->setFocus();
 }
 
 void MidiClipView::resetName() { m_clip->setName(""); }
