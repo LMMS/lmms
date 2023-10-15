@@ -1300,6 +1300,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				int noteHeight = 10;
 
 				float absLevel = (float)(note->key() - minKey) / (maxKey - minKey);
+				if (maxKey == minKey) { absLevel = 0.5f; } // center if one key
 				int graphHeight = grid_bottom - TOP_MARGIN - noteMargin - noteHeight;
 				const int y = (graphHeight - graphHeight * absLevel) + noteMargin / 2 + TOP_MARGIN;
 
@@ -2213,6 +2214,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	connect(m_resetGhostNotes, SIGNAL(pressed()), m_editor, SLOT(resetGhostNotes()));
 
+	quantizationActionsToolBar->addSeparator();
 	quantizationActionsToolBar->addWidget(m_resetGhostNotes);
 
 	// Setup our actual window
