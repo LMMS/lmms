@@ -1267,7 +1267,6 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		}
 
 		// draw ghost notes
-		// const NoteVector* currentMidiNotes = &(getGUI()->pianoRoll()->currentMidiClip()->notes());
 		if (m_ghostNotes != nullptr)
 		{
 			const NoteVector& notes = m_ghostNotes->notes();

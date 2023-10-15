@@ -110,10 +110,11 @@ void MidiClipView::update()
 
 void MidiClipView::openInPianoRoll()
 {
-	getGUI()->pianoRoll()->setCurrentMidiClip( m_clip );
-	getGUI()->pianoRoll()->parentWidget()->show();
-	getGUI()->pianoRoll()->show();
-	getGUI()->pianoRoll()->setFocus();
+	auto pRoll = getGUI()->pianoRoll();
+	pRoll->setCurrentMidiClip(m_clip);
+	pRoll->parentWidget()->show();
+	pRoll->show();
+	pRoll->setFocus();
 }
 
 
@@ -122,10 +123,11 @@ void MidiClipView::openInPianoRoll()
 
 void MidiClipView::setGhostInPianoRoll()
 {
-	getGUI()->pianoRoll()->setGhostMidiClip( m_clip );
-	getGUI()->pianoRoll()->parentWidget()->show();
-	getGUI()->pianoRoll()->show();
-	getGUI()->pianoRoll()->setFocus();
+	auto pRoll = getGUI()->pianoRoll();
+	pRoll->setGhostMidiClip(m_clip);
+	pRoll->parentWidget()->show();
+	pRoll->show();
+	pRoll->setFocus();
 }
 
 void MidiClipView::setGhostInAutomationEditor()
