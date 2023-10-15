@@ -89,7 +89,7 @@ QString SampleLoader::openWaveformFile(const QString& previousFile)
 
 std::unique_ptr<SampleBuffer> SampleLoader::createBufferFromFile(const QString& filePath, bool collectErrorWhenNotFound)
 {
-	if (filePath.isEmpty()) { return std::unique_ptr<SampleBuffer>(); }
+	if (filePath.isEmpty()) { return std::make_unique<SampleBuffer>(); }
 
 	if (collectErrorWhenNotFound)
 	{
@@ -115,7 +115,7 @@ std::unique_ptr<SampleBuffer> SampleLoader::createBufferFromFile(const QString& 
 
 std::unique_ptr<SampleBuffer> SampleLoader::createBufferFromBase64(const QString& base64, int sampleRate)
 {
-	if (base64.isEmpty()) { return std::unique_ptr<SampleBuffer>(); }
+	if (base64.isEmpty()) { return std::make_unique<SampleBuffer>(); }
 
 	try
 	{
