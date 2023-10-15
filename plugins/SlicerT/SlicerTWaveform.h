@@ -31,6 +31,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 
+#include "Instrument.h"
 #include "SampleBuffer.h"
 
 namespace lmms {
@@ -125,8 +126,7 @@ private:
 	QPixmap m_seekerSlicerTWaveform; // only stores SlicerTWaveform graphic
 	QPixmap m_sliceEditor;
 
-	SampleBuffer* m_currentSample;
-	std::vector<int>* m_slicePoints;
+	SlicerT* m_slicerTParent;
 
 	void drawEditor();
 	void drawSeekerSlicerTWaveform();
