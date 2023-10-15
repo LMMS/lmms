@@ -240,7 +240,7 @@ void LfoController::loadSettings( const QDomElement & _this )
 
 	if (!_this.attribute("userwavefile").isEmpty())
 	{
-		m_userDefSampleBuffer = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile"));
+		m_userDefSampleBuffer = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile"), true);
 	}
 
 	updateSampleFunction();

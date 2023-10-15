@@ -226,14 +226,7 @@ void AudioFileProcessor::loadSettings(const QDomElement& elem)
 {
 	if (!elem.attribute("src").isEmpty())
 	{
-		setAudioFile(elem.attribute("src"), false);
-
-		QString absolutePath = PathUtil::toAbsolute(m_sample.sampleFile());
-		if (!QFileInfo(absolutePath).exists())
-		{
-			QString message = tr("Sample not found: %1").arg(m_sample.sampleFile());
-			Engine::getSong()->collectError(message);
-		}
+		setAudioFile(elem.attribute("src"), false, true);
 	}
 	else if (!elem.attribute("sampledata").isEmpty())
 	{
@@ -317,11 +310,7 @@ gui::PluginView* AudioFileProcessor::instantiateView( QWidget * _parent )
 	return new gui::AudioFileProcessorView( this, _parent );
 }
 
-
-
-
-void AudioFileProcessor::setAudioFile( const QString & _audio_file,
-													bool _rename )
+void AudioFileProcessor::setAudioFile(const QString& _audio_file, bool _rename, bool loadingProject)
 {
 	// is current channel-name equal to previous-filename??
 	if( _rename &&
@@ -334,7 +323,7 @@ void AudioFileProcessor::setAudioFile( const QString & _audio_file,
 	}
 	// else we don't touch the track-name, because the user named it self
 
-	m_sample = Sample(gui::SampleLoader::createBufferFromFile(_audio_file));
+	m_sample = Sample(gui::SampleLoader::createBufferFromFile(_audio_file, loadingProject));
 	loopPointChanged();
 	emit sampleUpdated();
 }

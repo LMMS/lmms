@@ -30,6 +30,7 @@
 #include "ConfigManager.h"
 #include "FileDialog.h"
 #include "PathUtil.h"
+#include "Song.h"
 
 namespace lmms::gui {
 QString SampleLoader::openAudioFile(const QString& previousFile)
@@ -86,8 +87,21 @@ QString SampleLoader::openWaveformFile(const QString& previousFile)
 		previousFile.isEmpty() ? ConfigManager::inst()->factorySamplesDir() + "waveforms/10saw.flac" : previousFile);
 }
 
-std::unique_ptr<SampleBuffer> SampleLoader::createBufferFromFile(const QString& filePath)
+std::unique_ptr<SampleBuffer> SampleLoader::createBufferFromFile(const QString& filePath, bool collectErrorWhenNotFound)
 {
+	if (filePath.isEmpty()) { return std::unique_ptr<SampleBuffer>(); }
+
+	if (collectErrorWhenNotFound)
+	{
+		auto absolutePath = PathUtil::toAbsolute(filePath);
+		if (!QFileInfo(absolutePath).exists())
+		{
+			QString message = QObject::tr("Sample not found: %1").arg(filePath);
+			Engine::getSong()->collectError(message);
+			return std::make_unique<SampleBuffer>();
+		}
+	}
+
 	try
 	{
 		return std::make_unique<SampleBuffer>(filePath);
@@ -101,6 +115,8 @@ std::unique_ptr<SampleBuffer> SampleLoader::createBufferFromFile(const QString& 
 
 std::unique_ptr<SampleBuffer> SampleLoader::createBufferFromBase64(const QString& base64, int sampleRate)
 {
+	if (base64.isEmpty()) { return std::unique_ptr<SampleBuffer>(); }
+
 	try
 	{
 		return std::make_unique<SampleBuffer>(base64.toUtf8().toBase64(), sampleRate);

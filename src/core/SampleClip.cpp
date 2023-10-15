@@ -132,14 +132,14 @@ void SampleClip::setSampleBuffer(std::unique_ptr<SampleBuffer> sb)
 
 
 
-void SampleClip::setSampleFile(const QString & sf)
+void SampleClip::setSampleFile(const QString & sf, bool loadingProject)
 {
 	int length = 0;
 
 	if (!sf.isEmpty())
 	{
 		//Otherwise set it to the sample's length
-		m_sample = Sample(gui::SampleLoader::createBufferFromFile(sf));
+		m_sample = Sample(gui::SampleLoader::createBufferFromFile(sf, loadingProject));
 		length = sampleLength();
 	}
 
@@ -281,7 +281,7 @@ void SampleClip::loadSettings( const QDomElement & _this )
 	{
 		movePosition( _this.attribute( "pos" ).toInt() );
 	}
-	setSampleFile( _this.attribute( "src" ) );
+	setSampleFile(_this.attribute("src"), true);
 	if( sampleFile().isEmpty() && _this.hasAttribute( "data" ) )
 	{
 		auto sampleRate = _this.hasAttribute("sample_rate") ? _this.attribute("sample_rate").toInt() :

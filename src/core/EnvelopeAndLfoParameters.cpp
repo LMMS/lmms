@@ -389,7 +389,7 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 
 	if (!_this.attribute("userwavefile").isEmpty())
 	{
-		m_userWave = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile"));
+		m_userWave = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile"), true);
 	}
 
 	updateSampleVars();

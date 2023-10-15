@@ -284,7 +284,7 @@ void TripleOscillator::loadSettings( const QDomElement & _this )
 
 		if (!_this.attribute("userwavefile" + is).isEmpty())
 		{
-			m_osc[i]->m_sampleBuffer = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile" + is));
+			m_osc[i]->m_sampleBuffer = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile" + is), true);
 			m_osc[i]->m_userAntiAliasWaveTable = Oscillator::generateAntiAliasUserWaveTable(m_osc[i]->m_sampleBuffer.get());
 		}
 	}

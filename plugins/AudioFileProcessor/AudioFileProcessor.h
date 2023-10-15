@@ -79,8 +79,7 @@ public:
 
 
 public slots:
-	void setAudioFile( const QString & _audio_file, bool _rename = true );
-
+	void setAudioFile(const QString& _audio_file, bool _rename = true, bool loadingProject = false);
 
 private slots:
 	void reverseModelChanged();

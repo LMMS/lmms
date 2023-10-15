@@ -79,7 +79,7 @@ public:
 	void setSampleBuffer(std::unique_ptr<SampleBuffer> sb);
 
 public slots:
-	void setSampleFile( const QString & sf );
+	void setSampleFile(const QString& sf, bool loadingProject = false);
 	void updateLength();
 	void toggleRecord();
 	void playbackPositionChanged();
