@@ -163,7 +163,7 @@ protected slots:
 
 	void resetGhostNotes()
 	{
-		m_ghostNotes.clear();
+		m_ghostNotes = nullptr;
 		update();
 	}
 
@@ -219,7 +219,7 @@ private:
 	float m_bottomLevel;
 	float m_topLevel;
 
-	NoteVector m_ghostNotes;
+	MidiClip* m_ghostNotes;
 
 	void centerTopBottomScroll();
 	void updateTopBottomLevels();

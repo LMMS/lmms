@@ -39,6 +39,7 @@
 #include <cmath>
 
 #include "MidiClip.h"
+#include "qobjectdefs.h"
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
 #endif
@@ -1077,15 +1078,7 @@ inline void AutomationEditor::drawAutomationTangents(QPainter& p, timeMap::itera
 void AutomationEditor::setGhostMidiClip(MidiClip* newMidiClip)
 {
 	// Expects a pointer to a MIDI clip or nullptr.
-	m_ghostNotes.clear();
-	if (newMidiClip != nullptr)
-	{
-		for (Note* note : newMidiClip->notes())
-		{
-			auto new_note = new Note(note->length(), note->pos(), note->key());
-			m_ghostNotes.push_back(new_note);
-		}
-	}
+	m_ghostNotes = newMidiClip;
 }
 
 void AutomationEditor::paintEvent(QPaintEvent * pe )
@@ -1274,12 +1267,13 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 		// draw ghost notes
 		// const NoteVector* currentMidiNotes = &(getGUI()->pianoRoll()->currentMidiClip()->notes());
-		if (!m_ghostNotes.empty())
+		if (m_ghostNotes != nullptr)
 		{
+			const NoteVector& notes = m_ghostNotes->notes();
 			int minKey = 128;
 			int maxKey = 0;
 
-			for (const Note* note : m_ghostNotes)
+			for (const Note* note : notes)
 			{
 				int noteKey = note->key();
 
@@ -1287,7 +1281,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				minKey = std::min(minKey, noteKey);
 			}
 
-			for (const Note* note : m_ghostNotes)
+			for (const Note* note : notes)
 			{
 				int len_ticks = note->length();
 
