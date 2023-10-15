@@ -30,7 +30,9 @@
 #include <QMouseEvent>
 #include <QPainter>
 
+#include "embed.h"
 #include "GuiApplication.h"
+#include "Knob.h"
 #include "LcdFloatSpinBox.h"
 #include "LcdSpinBox.h"
 #include "LedCheckBox.h"
@@ -63,6 +65,38 @@ public:
 	
 	int dbfsToX(float dbfs);
 	float xToDbfs(int x);
+	
+	Knob* createKnob(KnobType knobType, QWidget* parent, int x, int y, FloatModel* model, const QString& hintText, const QString& unit, const QString& toolTip)
+	{
+		Knob* knob = new Knob(knobType, parent);
+		knob->move(x, y);
+		knob->setModel(model);
+		knob->setHintText(hintText, unit);
+		knob->setToolTip(toolTip);
+		return knob;
+	}
+	
+	LcdFloatSpinBox* createLcdFloatSpinBox(int integerDigits, int decimalDigits, const QString& color, const QString& unit, QWidget* parent, int x, int y, FloatModel* model, const QString& toolTip)
+	{
+		LcdFloatSpinBox* spinBox = new LcdFloatSpinBox(integerDigits, decimalDigits, color, unit, parent);
+		spinBox->move(x, y);
+		spinBox->setModel(model);
+		spinBox->setSeamless(true, true);
+		spinBox->setToolTip(toolTip);
+		return spinBox;
+	}
+	
+	PixmapButton* createPixmapButton(const QString& text, QWidget* parent, int x, int y, BoolModel* model, const QString& activeIcon, const QString& inactiveIcon, const QString& tooltip)
+	{
+		PixmapButton* button = new PixmapButton(parent, text);
+		button->move(x, y);
+		button->setCheckable(true);
+		if (model) { button->setModel(model); }
+		button->setActiveGraphic(PLUGIN_NAME::getIconPixmap(activeIcon));
+		button->setInactiveGraphic(PLUGIN_NAME::getIconPixmap(inactiveIcon));
+		button->setToolTip(tooltip);
+		return button;
+	}
 
 protected:
 	void paintEvent(QPaintEvent *event) override;

@@ -32,20 +32,18 @@ namespace lmms
 
 extern "C"
 {
-
-Plugin::Descriptor PLUGIN_EXPORT lomm_plugin_descriptor =
-{
-	LMMS_STRINGIFY(PLUGIN_NAME),
-	"LOMM",
-	QT_TRANSLATE_NOOP("PluginBrowser", "Upwards/downwards multiband compression plugin powered by the eldritch elder god LOMMUS."),
-	"Lost Robot <r94231/at/gmail/dot/com>",
-	0x0100,
-	Plugin::Type::Effect,
-	new PluginPixmapLoader("logo"),
-	nullptr,
-	nullptr
-};
-
+	Plugin::Descriptor PLUGIN_EXPORT lomm_plugin_descriptor =
+	{
+		LMMS_STRINGIFY(PLUGIN_NAME),
+		"LOMM",
+		QT_TRANSLATE_NOOP("PluginBrowser", "Upwards/downwards multiband compression plugin powered by the eldritch elder god LOMMUS."),
+		"Lost Robot <r94231/at/gmail/dot/com>",
+		0x0100,
+		Plugin::Type::Effect,
+		new PluginPixmapLoader("logo"),
+		nullptr,
+		nullptr
+	};
 }
 
 
@@ -220,8 +218,8 @@ bool LOMMEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		{
 			// These values are for the Auto time knob.  Higher crest factor allows for faster attack/release.
 			float inSquared = s[i] * s[i];
-			m_crestPeakVal[i] = qMax(qMax(LOMM_MIN_FLOOR, inSquared), m_crestTimeConst * m_crestPeakVal[i] + (1 - m_crestTimeConst) * (inSquared));
-			m_crestRmsVal[i] = qMax(LOMM_MIN_FLOOR, m_crestTimeConst * m_crestRmsVal[i] + ((1 - m_crestTimeConst) * (inSquared)));
+			m_crestPeakVal[i] = std::max(std::max(LOMM_MIN_FLOOR, inSquared), m_crestTimeConst * m_crestPeakVal[i] + (1 - m_crestTimeConst) * (inSquared));
+			m_crestRmsVal[i] = std::max(LOMM_MIN_FLOOR, m_crestTimeConst * m_crestRmsVal[i] + ((1 - m_crestTimeConst) * (inSquared)));
 			m_crestFactorVal[i] = m_crestPeakVal[i] / m_crestRmsVal[i];
 			float crestFactorValTemp = ((m_crestFactorVal[i] - LOMM_AUTO_TIME_ADJUST) * autoTime) + LOMM_AUTO_TIME_ADJUST;
 		
@@ -261,11 +259,11 @@ bool LOMMEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 				if (rmsTime > 0)// RMS
 				{
 					m_rms[j][i] = rmsTimeConst * m_rms[j][i] + ((1 - rmsTimeConst) * (bands[j][i] * bands[j][i]));
-					detect[j] = qMax(LOMM_MIN_FLOOR, std::sqrt(m_rms[j][i]));
+					detect[j] = std::max(LOMM_MIN_FLOOR, std::sqrt(m_rms[j][i]));
 				}
 				else// Peak
 				{
-					detect[j] = qMax(LOMM_MIN_FLOOR, std::abs(bands[j][i]));
+					detect[j] = std::max(LOMM_MIN_FLOOR, std::abs(bands[j][i]));
 				}
 				
 				if (detect[j] > m_yL[j][i])// Attack phase
@@ -287,7 +285,7 @@ bool LOMMEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 					m_yL[j][i] = m_yL[j][i] * currentRelease + (1 - currentRelease) * detect[j];
 				}
 				
-				m_yL[j][i] = qMax(LOMM_MIN_FLOOR, m_yL[j][i]);
+				m_yL[j][i] = std::max(LOMM_MIN_FLOOR, m_yL[j][i]);
 				
 				float yAmp = m_yL[j][i];
 				if (lookaheadEnable)
@@ -295,7 +293,7 @@ bool LOMMEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 					float temp = yAmp;
 					// Lookahead is calculated by picking the largest value between
 					// the current sidechain signal and the delayed sidechain signal.
-					yAmp = qMax(m_scLookBuf[j][i][m_lookWrite], m_scLookBuf[j][i][(m_lookWrite + m_lookBufLength - lookahead) % m_lookBufLength]);
+					yAmp = std::max(m_scLookBuf[j][i][m_lookWrite], m_scLookBuf[j][i][(m_lookWrite + m_lookBufLength - lookahead) % m_lookBufLength]);
 					m_scLookBuf[j][i][m_lookWrite] = temp;
 				}
 				
@@ -358,8 +356,8 @@ bool LOMMEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 				
 				m_displayIn[j][i] = yDbfs;
 				m_gainResult[j][i] = (dbfsToAmp(aboveGain) / yAmp) * (dbfsToAmp(belowGain) / yAmp);
-				m_gainResult[j][i] = qMin(m_gainResult[j][i], rangeAmp);
-				m_displayOut[j][i] = ampToDbfs(qMax(LOMM_MIN_FLOOR, yAmp * m_gainResult[j][i]));
+				m_gainResult[j][i] = std::min(m_gainResult[j][i], rangeAmp);
+				m_displayOut[j][i] = ampToDbfs(std::max(LOMM_MIN_FLOOR, yAmp * m_gainResult[j][i]));
 				
 				// Apply the same gain reduction to both channels if stereo link is enabled.
 				if (stereoLink && i == 1)
@@ -430,16 +428,13 @@ bool LOMMEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	return isRunning();
 }
 
-
 extern "C"
 {
-
-// necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main(Model* parent, void* data)
-{
-	return new LOMMEffect(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(data));
-}
-
+	// necessary for getting instance out of shared lib
+	PLUGIN_EXPORT Plugin * lmms_plugin_main(Model* parent, void* data)
+	{
+		return new LOMMEffect(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(data));
+	}
 }
 
 } // namespace lmms

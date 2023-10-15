@@ -76,27 +76,28 @@ private:
 	bool m_needsUpdate;
 	float m_coeffPrecalc;
 	
-	float m_yL[3][2] = {{}};
-	float m_rms[3][2] = {{}};
-	float m_gainResult[3][2] = {{}};
-	
-	float m_displayIn[3][2] = {{}};
-	float m_displayOut[3][2] = {{}};
-	
-	float m_crestPeakVal[2] = {};
-	float m_crestRmsVal[2] = {};
-	float m_crestFactorVal[2] = {};
-	float m_crestTimeConst;
-	
-	float m_prevOut[3][2] = {{}};
-	
-	std::vector<float> m_inLookBuf[3][2];
-	std::vector<float> m_scLookBuf[3][2];
-	int m_lookWrite;
-	int m_lookBufLength;
-
-	friend class LOMMControls;
-	friend class gui::LOMMControlDialog;
+	std::array<std::array<float, 2>, 3> m_yL;
+    std::array<std::array<float, 2>, 3> m_rms;
+    std::array<std::array<float, 2>, 3> m_gainResult;
+    
+    std::array<std::array<float, 2>, 3> m_displayIn;
+    std::array<std::array<float, 2>, 3> m_displayOut;
+    
+    std::array<float, 2> m_crestPeakVal;
+    std::array<float, 2> m_crestRmsVal;
+    std::array<float, 2> m_crestFactorVal;
+    float m_crestTimeConst = 0.0f;
+    
+    std::array<std::array<float, 2>, 3> m_prevOut;
+    
+    std::array<std::array<std::vector<float>, 2>, 3> m_inLookBuf;
+    std::array<std::array<std::vector<float>, 2>, 3> m_scLookBuf;
+    
+    int m_lookWrite = 0;
+    int m_lookBufLength = 0;
+    
+    friend class LOMMControls;
+    friend class gui::LOMMControlDialog;
 };
 
 

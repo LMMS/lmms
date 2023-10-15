@@ -72,7 +72,7 @@ LOMMControls::LOMMControls(LOMMEffect* effect) :
 	m_relHModel(132, 0, 1000, 0.001, this, tr("Release High")),
 	m_relMModel(282, 0, 1000, 0.001, this, tr("Release Mid")),
 	m_relLModel(282, 0, 1000, 0.001, this, tr("Release Low")),
-	m_rmsTimeModel(25, 0, 500, 0.001, this, tr("RMS Time")),
+	m_rmsTimeModel(10, 0, 500, 0.001, this, tr("RMS Time")),
 	m_kneeModel(6, 0, 36, 0.00001, this, tr("Knee")),
 	m_rangeModel(36, 0, 96, 0.00001, this, tr("Range")),
 	m_balanceModel(0, -18, 18, 0.00001, this, tr("Balance")),
@@ -85,29 +85,12 @@ LOMMControls::LOMMControls(LOMMEffect* effect) :
 	m_lookaheadEnableModel(false, this, tr("Lookahead")),
 	m_lookaheadModel(0.f, 0.f, LOMM_MAX_LOOKAHEAD, 0.01, this, tr("Lookahead"))
 {
-	m_timeModel.setScaleLogarithmic(true);
-	m_inVolModel.setScaleLogarithmic(true);
-	m_outVolModel.setScaleLogarithmic(true);
-	m_inHighModel.setScaleLogarithmic(true);
-	m_inMidModel.setScaleLogarithmic(true);
-	m_inLowModel.setScaleLogarithmic(true);
-	m_outHighModel.setScaleLogarithmic(true);
-	m_outMidModel.setScaleLogarithmic(true);
-	m_outLowModel.setScaleLogarithmic(true);
-	m_aRatioHModel.setScaleLogarithmic(true);
-	m_aRatioMModel.setScaleLogarithmic(true);
-	m_aRatioLModel.setScaleLogarithmic(true);
-	m_bRatioHModel.setScaleLogarithmic(true);
-	m_bRatioMModel.setScaleLogarithmic(true);
-	m_bRatioLModel.setScaleLogarithmic(true);
-	m_atkHModel.setScaleLogarithmic(true);
-	m_atkMModel.setScaleLogarithmic(true);
-	m_atkLModel.setScaleLogarithmic(true);
-	m_relHModel.setScaleLogarithmic(true);
-	m_relMModel.setScaleLogarithmic(true);
-	m_relLModel.setScaleLogarithmic(true);
-	m_rmsTimeModel.setScaleLogarithmic(true);
-	m_balanceModel.setScaleLogarithmic(true);
+	auto models = {&m_timeModel, &m_inVolModel, &m_outVolModel, &m_inHighModel, &m_inMidModel,
+		&m_inLowModel, &m_outHighModel, &m_outMidModel, &m_outLowModel, &m_aRatioHModel,
+		&m_aRatioMModel, &m_aRatioLModel, &m_bRatioHModel, &m_bRatioMModel, &m_bRatioLModel,
+		&m_atkHModel, &m_atkMModel, &m_atkLModel, &m_relHModel, &m_relMModel, &m_relLModel,
+		&m_rmsTimeModel, &m_balanceModel};
+	for (auto model : models) { model->setScaleLogarithmic(true); }
 }
 
 
@@ -122,104 +105,55 @@ void LOMMControls::resetAllParameters()
 	// This plugin's normal default values are fairly close to what they'd want in most applications.
 	// The Init button is there so the user can start from a clean slate instead.
 	// These are those values.
-	m_depthModel.setInitValue(1);
-	m_depthModel.reset();
-	m_timeModel.setInitValue(1);
-	m_timeModel.reset();
-	m_inVolModel.setInitValue(0);
-	m_inVolModel.reset();
-	m_outVolModel.setInitValue(0);
-	m_outVolModel.reset();
-	m_upwardModel.setInitValue(1);
-	m_upwardModel.reset();
-	m_downwardModel.setInitValue(1);
-	m_downwardModel.reset();
-	m_split1Model.setInitValue(2500);
-	m_split1Model.reset();
-	m_split2Model.setInitValue(88);
-	m_split2Model.reset();
-	m_split1EnabledModel.setInitValue(true);
-	m_split1EnabledModel.reset();
-	m_split2EnabledModel.setInitValue(true);
-	m_split2EnabledModel.reset();
-	m_band1EnabledModel.setInitValue(true);
-	m_band1EnabledModel.reset();
-	m_band2EnabledModel.setInitValue(true);
-	m_band2EnabledModel.reset();
-	m_band3EnabledModel.setInitValue(true);
-	m_band3EnabledModel.reset();
-	m_inHighModel.setInitValue(0);
-	m_inHighModel.reset();
-	m_inMidModel.setInitValue(0);
-	m_inMidModel.reset();
-	m_inLowModel.setInitValue(0);
-	m_inLowModel.reset();
-	m_outHighModel.setInitValue(0);
-	m_outHighModel.reset();
-	m_outMidModel.setInitValue(0);
-	m_outMidModel.reset();
-	m_outLowModel.setInitValue(0);
-	m_outLowModel.reset();
-	m_aThreshHModel.setInitValue(m_aThreshHModel.maxValue());
-	m_aThreshHModel.reset();
-	m_aThreshMModel.setInitValue(m_aThreshMModel.maxValue());
-	m_aThreshMModel.reset();
-	m_aThreshLModel.setInitValue(m_aThreshLModel.maxValue());
-	m_aThreshLModel.reset();
-	m_aRatioHModel.setInitValue(1);
-	m_aRatioHModel.reset();
-	m_aRatioMModel.setInitValue(1);
-	m_aRatioMModel.reset();
-	m_aRatioLModel.setInitValue(1);
-	m_aRatioLModel.reset();
-	m_bThreshHModel.setInitValue(m_bThreshHModel.minValue());
-	m_bThreshHModel.reset();
-	m_bThreshMModel.setInitValue(m_bThreshMModel.minValue());
-	m_bThreshMModel.reset();
-	m_bThreshLModel.setInitValue(m_bThreshLModel.minValue());
-	m_bThreshLModel.reset();
-	m_bRatioHModel.setInitValue(1);
-	m_bRatioHModel.reset();
-	m_bRatioMModel.setInitValue(1);
-	m_bRatioMModel.reset();
-	m_bRatioLModel.setInitValue(1);
-	m_bRatioLModel.reset();
-	m_atkHModel.setInitValue(13.5);
-	m_atkHModel.reset();
-	m_atkMModel.setInitValue(22.4);
-	m_atkMModel.reset();
-	m_atkLModel.setInitValue(47.8);
-	m_atkLModel.reset();
-	m_relHModel.setInitValue(132);
-	m_relHModel.reset();
-	m_relMModel.setInitValue(282);
-	m_relMModel.reset();
-	m_relLModel.setInitValue(282);
-	m_relLModel.reset();
-	m_rmsTimeModel.setInitValue(10);
-	m_rmsTimeModel.reset();
-	m_kneeModel.setInitValue(6);
-	m_kneeModel.reset();
-	m_rangeModel.setInitValue(36);
-	m_rangeModel.reset();
-	m_balanceModel.setInitValue(0);
-	m_balanceModel.reset();
-	m_depthScalingModel.setInitValue(true);
-	m_depthScalingModel.reset();
-	m_stereoLinkModel.setInitValue(false);
-	m_stereoLinkModel.reset();
-	m_autoTimeModel.setInitValue(0);
-	m_autoTimeModel.reset();
-	m_mixModel.setInitValue(1);
-	m_mixModel.reset();
-	m_feedbackModel.setInitValue(false);
-	m_feedbackModel.reset();
-	m_midsideModel.setInitValue(false);
-	m_midsideModel.reset();
-	m_lookaheadEnableModel.setInitValue(false);
-	m_lookaheadEnableModel.reset();
-	m_lookaheadModel.setInitValue(0.f);
-	m_lookaheadModel.reset();
+	setInitAndReset(m_depthModel, 1);
+    setInitAndReset(m_timeModel, 1);
+    setInitAndReset(m_inVolModel, 0);
+    setInitAndReset(m_outVolModel, 0);
+    setInitAndReset(m_upwardModel, 1);
+    setInitAndReset(m_downwardModel, 1);
+    setInitAndReset(m_split1Model, 2500);
+    setInitAndReset(m_split2Model, 88);
+    setInitAndReset(m_split1EnabledModel, true);
+    setInitAndReset(m_split2EnabledModel, true);
+    setInitAndReset(m_band1EnabledModel, true);
+    setInitAndReset(m_band2EnabledModel, true);
+    setInitAndReset(m_band3EnabledModel, true);
+    setInitAndReset(m_inHighModel, 0);
+    setInitAndReset(m_inMidModel, 0);
+    setInitAndReset(m_inLowModel, 0);
+    setInitAndReset(m_outHighModel, 0);
+    setInitAndReset(m_outMidModel, 0);
+    setInitAndReset(m_outLowModel, 0);
+    setInitAndReset(m_aThreshHModel, m_aThreshHModel.maxValue());
+    setInitAndReset(m_aThreshMModel, m_aThreshMModel.maxValue());
+    setInitAndReset(m_aThreshLModel, m_aThreshLModel.maxValue());
+    setInitAndReset(m_aRatioHModel, 1);
+    setInitAndReset(m_aRatioMModel, 1);
+    setInitAndReset(m_aRatioLModel, 1);
+    setInitAndReset(m_bThreshHModel, m_bThreshHModel.minValue());
+    setInitAndReset(m_bThreshMModel, m_bThreshMModel.minValue());
+    setInitAndReset(m_bThreshLModel, m_bThreshLModel.minValue());
+    setInitAndReset(m_bRatioHModel, 1);
+    setInitAndReset(m_bRatioMModel, 1);
+    setInitAndReset(m_bRatioLModel, 1);
+    setInitAndReset(m_atkHModel, 13.5);
+    setInitAndReset(m_atkMModel, 22.4);
+    setInitAndReset(m_atkLModel, 47.8);
+    setInitAndReset(m_relHModel, 132);
+    setInitAndReset(m_relMModel, 282);
+    setInitAndReset(m_relLModel, 282);
+    setInitAndReset(m_rmsTimeModel, 10);
+    setInitAndReset(m_kneeModel, 6);
+    setInitAndReset(m_rangeModel, 36);
+    setInitAndReset(m_balanceModel, 0);
+    setInitAndReset(m_depthScalingModel, true);
+    setInitAndReset(m_stereoLinkModel, false);
+    setInitAndReset(m_autoTimeModel, 0);
+    setInitAndReset(m_mixModel, 1);
+    setInitAndReset(m_feedbackModel, false);
+    setInitAndReset(m_midsideModel, false);
+    setInitAndReset(m_lookaheadEnableModel, false);
+    setInitAndReset(m_lookaheadModel, 0.f);
 }
 
 

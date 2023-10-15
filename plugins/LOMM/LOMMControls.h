@@ -62,6 +62,13 @@ public:
 		return m_view;
 	}
 	
+	template <typename T>
+	void setInitAndReset(AutomatableModel& model, T initValue)
+	{
+		model.setInitValue(initValue);
+		model.reset();
+	}
+	
 public slots:
 	void resetAllParameters();
 
