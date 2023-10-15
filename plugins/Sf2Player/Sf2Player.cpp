@@ -73,8 +73,8 @@ Plugin::Descriptor PLUGIN_EXPORT sf2player_plugin_descriptor =
 }
 
 /**
- * A non-owning reference to a single FluidSynth voice, for tracking whether the
- * referenced voice is still the same voice that was passed to the constructor.
+ * A non-owning reference to a single FluidSynth voice. Captures some initial
+ * properties of the referenced voice to help manage changes to it over time.
  */
 class FluidVoice
 {
@@ -82,11 +82,15 @@ public:
 	//! Create a reference to the voice currently pointed at by `voice`.
 	explicit FluidVoice(fluid_voice_t* voice) :
 		m_voice{voice},
-		m_id{fluid_voice_get_id(voice)}
+		m_id{fluid_voice_get_id(voice)},
+		m_coarseTune{fluid_voice_gen_get(voice, GEN_COARSETUNE)}
 	{ }
 
 	//! Get a pointer to the referenced voice.
 	fluid_voice_t* get() const noexcept { return m_voice; }
+
+	//! Get the original coarse tuning of the referenced voice.
+	float coarseTune() const noexcept { return m_coarseTune; }
 
 	//! Test whether this object still refers to the original voice.
 	bool isValid() const
@@ -97,6 +101,7 @@ public:
 private:
 	fluid_voice_t* m_voice;
 	unsigned int m_id;
+	float m_coarseTune;
 };
 
 struct Sf2PluginData
@@ -740,7 +745,7 @@ void Sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 		const auto detuning = _n->currentDetuning();
 		for (const auto& voice : data->fluidVoices) {
 			if (voice.isValid()) {
-				fluid_voice_gen_set(voice.get(), GEN_COARSETUNE, detuning);
+				fluid_voice_gen_set(voice.get(), GEN_COARSETUNE, voice.coarseTune() + detuning);
 				fluid_voice_update_param(voice.get(), GEN_COARSETUNE);
 			}
 		}

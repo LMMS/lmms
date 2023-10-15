@@ -301,22 +301,32 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 		float position = m_positionModel.value();
 		float modulator = m_modulatorModel.value();
 		float crossfade = m_crossfadeModel.value();
+		float pressure = m_pressureModel.value();
+		float speed = m_velocityModel.value();
 
 		if (p < 9)
 		{
-			hardness += random * static_cast<float>(fast_rand() % 128) - 64.0;
+			hardness += random * (static_cast<float>(fast_rand() % 128) - 64.0);
 			hardness = std::clamp(hardness, 0.0f, 128.0f);
 
-			position += random * static_cast<float>(fast_rand() % 64) - 32.0;
+			position += random * (static_cast<float>(fast_rand() % 64) - 32.0);
 			position = std::clamp(position, 0.0f, 64.0f);
 		}
 		else if (p == 9)
 		{
-			modulator += random * static_cast<float>(fast_rand() % 128) - 64.0;
+			modulator += random * (static_cast<float>(fast_rand() % 128) - 64.0);
 			modulator = std::clamp(modulator, 0.0f, 128.0f);
 
-			crossfade += random * static_cast<float>(fast_rand() % 128) - 64.0;
+			crossfade += random * (static_cast<float>(fast_rand() % 128) - 64.0);
 			crossfade = std::clamp(crossfade, 0.0f, 128.0f);
+		}
+		else
+		{
+			pressure += random * (static_cast<float>(fast_rand() % 128) - 64.0);
+			pressure = std::clamp(pressure, 0.0f, 128.0f);
+
+			speed += random * (static_cast<float>(fast_rand() % 128) - 64.0);
+			speed = std::clamp(speed, 0.0f, 128.0f);
 		}
 
 		// critical section as STK is not thread-safe
@@ -352,12 +362,12 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 		{
 			_n->m_pluginData = new MalletsSynth( freq,
 						vel,
-						m_pressureModel.value(),
+						pressure,
 						m_motionModel.value(),
 						m_vibratoModel.value(),
 						p - 10,
 						m_strikeModel.value() * 128.0,
-						m_velocityModel.value(),
+						speed,
 						(uint8_t) m_spreadModel.value(),
 				Engine::audioEngine()->processingSampleRate() );
 		}
@@ -369,8 +379,20 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 	const f_cnt_t offset = _n->noteOffset();
 
 	auto ps = static_cast<MalletsSynth*>(_n->m_pluginData);
-	ps->setFrequency( freq );
+	ps->setFrequency(freq);
+
 	p = ps->presetIndex();
+	if (p < 9) // ModalBar updates
+	{
+		ps->setVibratoGain(m_vibratoGainModel.value());
+		ps->setVibratoFreq(m_vibratoFreqModel.value());
+	}
+	else if (p == 9) // Tubular Bells updates
+	{
+		ps->setADSR(m_adsrModel.value());
+		ps->setLFODepth(m_lfoDepthModel.value());
+		ps->setLFOSpeed(m_lfoSpeedModel.value());
+	}
 
 	sample_t add_scale = 0.0f;
 	if( p == 10 && m_isOldVersionModel.value() == true )
