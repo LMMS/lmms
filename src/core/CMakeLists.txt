@@ -53,6 +53,7 @@ set(LMMS_SRCS
 	core/PatternStore.cpp
 	core/PeakController.cpp
 	core/PerfLog.cpp
+	core/PhaseVocoder.cpp
 	core/Piano.cpp
 	core/PlayHandle.cpp
 	core/Plugin.cpp

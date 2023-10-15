@@ -27,6 +27,7 @@
 
 #include <fftw3.h>
 
+#include "PhaseVocoder.h"
 #include "AutomatableModel.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
@@ -35,68 +36,6 @@
 #include "SlicerTView.h"
 
 namespace lmms {
-
-// takes one audio-channel and timeshifts it
-class PhaseVocoder
-{
-public:
-	PhaseVocoder();
-	~PhaseVocoder();
-
-	void loadData(std::vector<float> originalData, int sampleRate, float newRatio);
-	void setScaleRatio(float newRatio) { updateParams(newRatio); }
-
-	void getFrames(std::vector<float>& outData, int start, int frames);
-
-	int frames() { return m_processedBuffer.size(); }
-	float scaleRatio() { return m_scaleRatio; }
-
-	// timeshift config
-	static const int s_windowSize = 512;
-	static const int s_overSampling = 32;
-
-private:
-	QMutex m_dataLock;
-	// original data
-	std::vector<float> m_originalBuffer;
-	int m_originalSampleRate = 0;
-
-	float m_scaleRatio = -1; // to force on first load
-
-	// output data
-	std::vector<float> m_processedBuffer; // final output
-	std::vector<bool> m_processedWindows; // marks a window processed
-
-	// depending on scaleRatio
-	int m_stepSize = 0;
-	int m_numWindows = 0;
-	float m_outStepSize = 0;
-	float m_freqPerBin = 0;
-	float m_expectedPhaseIn = 0;
-	float m_expectedPhaseOut = 0;
-
-	// buffers
-	std::array<fftwf_complex, s_windowSize> m_FFTSpectrum;
-	std::vector<float> m_FFTInput;
-	std::vector<float> m_IFFTReconstruction;
-	std::vector<float> m_allMagnitudes;
-	std::vector<float> m_allFrequencies;
-	std::vector<float> m_processedFreq;
-	std::vector<float> m_processedMagn;
-	std::vector<float> m_lastPhase;
-	std::vector<float> m_sumPhase;
-
-	// cache
-	std::vector<float> m_freqCache;
-	std::vector<float> m_magCache;
-
-	// fftw plans
-	fftwf_plan m_fftPlan;
-	fftwf_plan m_ifftPlan;
-
-	void updateParams(float newRatio);
-	void generateWindow(int windowNum, bool useCache);
-};
 
 // simple helper class that handles the different audio channels
 class DynamicPlaybackBuffer
@@ -162,7 +101,7 @@ signals:
 
 public:
 	SlicerT(InstrumentTrack* instrumentTrack);
-	~SlicerT();
+	~SlicerT() override;
 
 	void playNote(NotePlayHandle* handle, sampleFrame* workingBuffer) override;
 
