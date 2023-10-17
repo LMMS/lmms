@@ -114,10 +114,7 @@ public:
 		Step
 	};
 
-	Type type() const
-	{
-		return m_type;
-	}
+	Type type() const { return m_type; }
 	inline void setType(Type t) { m_type = t; }
 
 	// used by GUI

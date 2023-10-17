@@ -200,6 +200,7 @@ void Note::loadSettings( const QDomElement & _this )
 	m_length = _this.attribute( "len" ).toInt();
 	m_pos = _this.attribute( "pos" ).toInt();
 	// Default m_type value is 0, which corresponds to RegularNote
+	static_assert(0 == static_cast<int>(Type::Regular));
 	m_type = static_cast<Type>(_this.attribute("type", "0").toInt());
 
 	if( _this.hasChildNodes() )

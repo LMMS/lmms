@@ -468,8 +468,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 		QPixmap stepon200;
 		QPixmap stepoff;
 		QPixmap stepoffl;
-		const int steps = std::max(1,
-					m_clip->m_steps);
+		const int steps = std::max(1, m_clip->m_steps);
 		const int w = width() - 2 * BORDER_WIDTH;
 
 		// scale step graphics to fit the beat clip length
@@ -492,7 +491,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 		for (int it = 0; it < steps; it++)	// go through all the steps in the beat clip
 		{
-			Note * n = m_clip->noteAtStep(it);
+			Note* n = m_clip->noteAtStep(it);
 
 			// figure out x and y coordinates for step graphic
 			const int x = BORDER_WIDTH + static_cast<int>(it * w / steps);
@@ -503,7 +502,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 				const int vol = n->getVolume();
 				p.drawPixmap(x, y, stepoffl);
 				p.drawPixmap(x, y, stepon0);
-				p.setOpacity(sqrt( vol / 200.0 ));
+				p.setOpacity(std::sqrt(vol / 200.0));
 				p.drawPixmap(x, y, stepon200);
 				p.setOpacity(1);
 			}
