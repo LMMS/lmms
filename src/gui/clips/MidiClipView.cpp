@@ -525,7 +525,12 @@ void MidiClipView::paintEvent( QPaintEvent * )
 		}
 	}
 	// Melody clip and Beat clip (on Song Editor) paint event
-	else if (m_clip->m_clipType == MidiClip::Type::MelodyClip && !noteCollection.empty())
+	else if
+	(
+		!noteCollection.empty() &&
+			(m_clip->m_clipType == MidiClip::Type::MelodyClip ||
+			m_clip->m_clipType == MidiClip::Type::BeatClip)
+	)
 	{
 		// Compute the minimum and maximum key in the clip
 		// so that we know how much there is to draw.
