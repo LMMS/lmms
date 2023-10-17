@@ -79,7 +79,7 @@ public:
 	void setStep( int step, bool enabled );
 
 	// Split the list of notes on the given position
-	void splitNotes(NoteVector notes, TimePos pos);
+	void splitNotes(const NoteVector& notes, TimePos pos);
 
 	// clip-type stuff
 	inline Type type() const

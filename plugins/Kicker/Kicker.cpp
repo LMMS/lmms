@@ -197,8 +197,6 @@ void KickerInstrument::playNote( NotePlayHandle * _n,
 			_working_buffer[f+offset][1] *= fac;
 		}
 	}
-
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
 }
 
 

@@ -48,7 +48,7 @@ Lv2Features::Lv2Features()
 {
 	const Lv2Manager* man = Engine::getLv2Manager();
 	// create (yet empty) map feature URI -> feature
-	for(const char* uri : man->supportedFeatureURIs())
+	for(auto uri : man->supportedFeatureURIs())
 	{
 		m_featureByUri.emplace(uri, nullptr);
 	}
@@ -71,7 +71,7 @@ void Lv2Features::initCommon()
 void Lv2Features::createFeatureVectors()
 {
 	// create vector of features
-	for(std::pair<const char* const, void*>& pr : m_featureByUri)
+	for(const auto& [uri, feature] : m_featureByUri)
 	{
 		/*
 			If pr.second is nullptr here, this means that the LV2_feature
@@ -82,7 +82,7 @@ void Lv2Features::createFeatureVectors()
 			  vector creation (This can be done in
 			  Lv2Proc::initPluginSpecificFeatures or in Lv2Features::initCommon)
 		*/
-		m_features.push_back(LV2_Feature { pr.first, pr.second });
+		m_features.push_back(LV2_Feature{(const char*)uri.data(), (void*)feature});
 	}
 
 	// create pointer vector (for lilv_plugin_instantiate)

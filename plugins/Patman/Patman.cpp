@@ -157,8 +157,6 @@ void PatmanInstrument::playNote( NotePlayHandle * _n,
 					play_freq, m_loopedModel.value() ? SampleBuffer::LoopMode::On : SampleBuffer::LoopMode::Off ) )
 	{
 		applyRelease( _working_buffer, _n );
-		instrumentTrack()->processAudioBuffer( _working_buffer,
-								frames + offset, _n );
 	}
 	else
 	{
@@ -446,7 +444,7 @@ namespace gui
 
 PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 	InstrumentViewFixedSize( _instrument, _parent ),
-	m_pi( nullptr )
+	m_pi(castModel<PatmanInstrument>())
 {
 	setAutoFillBackground( true );
 	QPalette pal;
@@ -487,7 +485,15 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 								"tune_off" ) );
 	m_tuneButton->setToolTip(tr("Tune mode"));
 
-	m_displayFilename = tr( "No file selected" );
+
+	if (m_pi->m_patchFile.isEmpty())
+	{
+		m_displayFilename = tr("No file selected");
+	}
+	else
+	{
+		updateFilename();
+	}
 
 	setAcceptDrops( true );
 }

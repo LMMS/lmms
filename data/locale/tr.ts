@@ -6646,7 +6646,7 @@ Lütfen dosyaya ve dosyayı içeren dizine yazma izniniz olduğundan emin olun v
     </message>
 </context>
 <context>
-    <name>InstrumentMiscView</name>
+    <name>InstrumentTuningView</name>
     <message>
         <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="221"/>
         <source>MASTER PITCH</source>
