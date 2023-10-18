@@ -73,18 +73,15 @@ SlicerT::SlicerT(InstrumentTrack* instrumentTrack)
 	m_sliceSnap.addItem("1/16");
 	m_sliceSnap.addItem("1/32");
 	m_sliceSnap.setValue(0); // no snap by default
-
-	m_resamplerState = src_new(SRC_SINC_MEDIUM_QUALITY, 2, nullptr); // no error
-}
-
-SlicerT::~SlicerT()
-{
-	src_delete(m_resamplerState);
 }
 
 void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 {
 	if (m_originalSample.frames() < 2048) { return; }
+
+	if (!handle->m_pluginData)  {
+		handle->m_pluginData = src_new(SRC_SINC_MEDIUM_QUALITY, 2, nullptr);
+	}
 
 	// playback parameters
 	const int noteIndex = handle->key() - m_parentTrack->baseNote();
@@ -140,12 +137,12 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 			resamplerData.output_frames = frames;
 			resamplerData.src_ratio = inversePitchRatio;
 
-			src_process(m_resamplerState, &resamplerData);
+			src_process((SRC_STATE*)(handle->m_pluginData), &resamplerData);
 		}
 		else { std::copy_n(prePitchBuffer.data(), frames, workingBuffer + offset); }
 
 		// exponential fade out, applyRelease kinda sucks
-		if (noteFramesLeft < m_fadeOutFrames.value())
+		if (noteFramesLeft * pitchRatio < m_fadeOutFrames.value())
 		{
 			for (int i = 0; i < frames; i++)
 			{
@@ -348,8 +345,6 @@ void SlicerT::updateFile(QString file)
 	float speedRatio = static_cast<float>(m_originalBPM.value()) / Engine::getSong()->getTempo();
 	m_phaseVocoder.loadSample(
 		m_originalSample.data(), m_originalSample.frames(), m_originalSample.sampleRate(), speedRatio);
-
-	src_reset(m_resamplerState);
 
 	emit dataChanged();
 }

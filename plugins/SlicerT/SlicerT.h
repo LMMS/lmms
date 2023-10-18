@@ -102,7 +102,6 @@ signals:
 
 public:
 	SlicerT(InstrumentTrack* instrumentTrack);
-	~SlicerT() override;
 
 	void playNote(NotePlayHandle* handle, sampleFrame* workingBuffer) override;
 
