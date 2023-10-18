@@ -49,6 +49,7 @@
 #include "ComboBox.h"
 #include "debug.h"
 #include "DeprecationHelper.h"
+#include "DetuningHelper.h"
 #include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
@@ -1272,10 +1273,17 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			const NoteVector& notes = m_ghostNotes->notes();
 			int minKey = 128;
 			int maxKey = 0;
+			int detuningOffset = 0;
+			const Note* detuningNote = nullptr;
 
 			for (const Note* note : notes)
 			{
 				int noteKey = note->key();
+
+				if (note->detuning()->automationClip() == m_clip) {
+					detuningOffset = note->pos();
+					detuningNote = note;
+				}
 
 				maxKey = std::max(maxKey, noteKey);
 				minKey = std::min(minKey, noteKey);
@@ -1283,12 +1291,17 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 			for (const Note* note : notes)
 			{
-				int len_ticks = note->length();
+				int lenTicks = note->length();
+				int notePos = note->pos();
 
-				if (len_ticks == 0) { continue; }
-				else if (len_ticks < 0) { len_ticks = 4; }
+				// offset note if detuning
+				if (notePos < detuningOffset) { continue; }
+				notePos -= detuningOffset;
 
-				int note_width = len_ticks * m_ppb / TimePos::ticksPerBar();
+				if (lenTicks == 0) { continue; }
+				else if (lenTicks < 0) { lenTicks = 4; }
+
+				int note_width = lenTicks * m_ppb / TimePos::ticksPerBar();
 				int keyRange = maxKey - minKey;
 
 				if (keyRange < MIN_NOTE_RANGE) 
@@ -1302,8 +1315,13 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				float absNoteHeight = (float)(note->key() - minKey) / (maxKey - minKey);
 				int graphHeight = grid_bottom - NOTE_HEIGHT - NOTE_MARGIN - TOP_MARGIN;
 				const int y = (graphHeight - graphHeight * absNoteHeight) + NOTE_HEIGHT / 2.0f + TOP_MARGIN;
+				const int x = xCoordOfTick(notePos);
 
-				p.fillRect(xCoordOfTick(note->pos()), y, note_width, NOTE_HEIGHT, m_ghostNoteColor);
+				if (note == detuningNote) {
+					p.fillRect(x, y, note_width, NOTE_HEIGHT, m_detuningNoteColor);
+				} else {
+					p.fillRect(x, y, note_width, NOTE_HEIGHT, m_ghostNoteColor);
+				}
 			}
 		}
 

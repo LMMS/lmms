@@ -37,6 +37,7 @@
 #include "MidiClip.h"
 #include "TimePos.h"
 #include "lmms_basics.h"
+#include "qcolor.h"
 
 class QPainter;
 class QPixmap;
@@ -70,6 +71,7 @@ class AutomationEditor : public QWidget, public JournallingObject
 	Q_PROPERTY(QColor crossColor MEMBER m_crossColor)
 	Q_PROPERTY(QColor backgroundShade MEMBER m_backgroundShade)
 	Q_PROPERTY(QColor ghostNoteColor MEMBER m_ghostNoteColor)
+	Q_PROPERTY(QColor detuningNoteColor MEMBER m_detuningNoteColor)
 public:
 	void setCurrentClip(AutomationClip * new_clip);
 	void setGhostMidiClip(MidiClip* newMidiClip);
@@ -224,7 +226,7 @@ private:
 	float m_bottomLevel;
 	float m_topLevel;
 
-	MidiClip* m_ghostNotes;
+	MidiClip* m_ghostNotes = nullptr;
 
 	void centerTopBottomScroll();
 	void updateTopBottomLevels();
@@ -277,6 +279,7 @@ private:
 	QColor m_crossColor;
 	QColor m_backgroundShade;
 	QColor m_ghostNoteColor;
+	QColor m_detuningNoteColor;
 
 	friend class AutomationEditorWindow;
 
