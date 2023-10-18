@@ -75,7 +75,8 @@ class MixerChannel : public ThreadableJob
 
 		bool requiresProcessing() const override { return true; }
 		void unmuteForSolo();
-
+		void unmuteSenderForSolo();
+		void unmuteReceiverForSolo();
 
 		void setColor (QColor newColor)
 		{
