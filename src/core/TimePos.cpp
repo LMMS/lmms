@@ -23,6 +23,7 @@
  *
  */
 
+#include <cassert>
 #include "TimePos.h"
 
 #include "MeterModel.h"
