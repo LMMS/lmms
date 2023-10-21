@@ -374,7 +374,9 @@ void FileBrowser::addItems(const QString & path )
 				d->update();
 				m_fileBrowserTreeWidget->addTopLevelItem(d);
 			}
-		} else if (entry.isFile()) {
+		}
+		else if (entry.isFile())
+		{
 			// TODO: don't insert instead of removing, order changed
 			// remove existing file-items
 			QList<QTreeWidgetItem *> existing = m_fileBrowserTreeWidget->findItems(
