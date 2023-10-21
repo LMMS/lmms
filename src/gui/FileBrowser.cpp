@@ -379,8 +379,7 @@ void FileBrowser::addItems(const QString & path )
 		{
 			// TODO: don't insert instead of removing, order changed
 			// remove existing file-items
-			QList<QTreeWidgetItem *> existing = m_fileBrowserTreeWidget->findItems(
-					fileName, Qt::MatchFixedString );
+			QList<QTreeWidgetItem *> existing = m_fileBrowserTreeWidget->findItems(fileName, Qt::MatchFixedString);
 			if (!existing.empty())
 			{
 				delete existing.front();
