@@ -45,6 +45,7 @@
 #include "Lv2Evbuf.h"
 #include "MidiEvent.h"
 #include "MidiEventToByteSeq.h"
+#include "NoCopyNoMove.h"
 
 
 namespace lmms
@@ -168,6 +169,27 @@ Plugin::Type Lv2Proc::check(const LilvPlugin *plugin,
 
 
 
+class Lv2ProcSuspender : NoCopyNoMove
+{
+public:
+	Lv2ProcSuspender(Lv2Proc* proc)
+		: m_proc(proc)
+		, m_wasActive(proc->m_instance)
+	{
+		if (m_wasActive) { m_proc->shutdownPlugin(); }
+	}
+	~Lv2ProcSuspender()
+	{
+		if (m_wasActive) { m_proc->initPlugin(); }
+	}
+private:
+	Lv2Proc* const m_proc;
+	const bool m_wasActive;
+};
+
+
+
+
 Lv2Proc::Lv2Proc(const LilvPlugin *plugin, Model* parent) :
 	LinkedModelGroup(parent),
 	m_plugin(plugin),
@@ -175,6 +197,7 @@ Lv2Proc::Lv2Proc(const LilvPlugin *plugin, Model* parent) :
 	m_midiInputBuf(m_maxMidiInputEvents),
 	m_midiInputReader(m_midiInputBuf)
 {
+	createPorts();
 	initPlugin();
 }
 
@@ -186,22 +209,7 @@ Lv2Proc::~Lv2Proc() { shutdownPlugin(); }
 
 
 
-void Lv2Proc::reload()
-{
-	// save controls, which we want to keep
-	QDomDocument doc;
-	QDomElement controls = doc.createElement("controls");
-	saveValues(doc, controls);
-	// backup construction variables
-	const LilvPlugin* plugin = m_plugin;
-	Model* parent = Model::parentModel();
-	// destroy everything using RAII ...
-	this->~Lv2Proc();
-	// ... and reuse it ("placement new")
-	new (this) Lv2Proc(plugin, parent);
-	// reload the controls
-	loadValues(controls);
-}
+void Lv2Proc::reload() { Lv2ProcSuspender(this); }
 
 
 
@@ -433,8 +441,6 @@ void Lv2Proc::initPlugin()
 	m_features.initCommon();
 	initPluginSpecificFeatures();
 	m_features.createFeatureVectors();
-
-	createPorts();
 
 	m_instance = lilv_plugin_instantiate(m_plugin,
 		Engine::audioEngine()->processingSampleRate(),
