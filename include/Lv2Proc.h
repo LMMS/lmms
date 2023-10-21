@@ -175,7 +175,7 @@ private:
 	bool m_valid = true;
 
 	const LilvPlugin* m_plugin;
-	LilvInstance* m_instance;
+	LilvInstance* m_instance = nullptr;
 	Lv2Features m_features;
 
 	// options
