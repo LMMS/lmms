@@ -158,7 +158,7 @@ AutomationEditor::AutomationEditor() :
 	static auto s_toolDraw = QPixmap{embed::getIconPixmap("edit_draw")};
 	static auto s_toolErase = QPixmap{embed::getIconPixmap("edit_erase")};
 	static auto s_toolDrawOut = QPixmap{embed::getIconPixmap("edit_draw_outvalue")};
-	static auto s_toolEditTangents = QPixmap(embed::getIconPixmap("edit_tangent"));
+	static auto s_toolEditTangents = QPixmap{embed::getIconPixmap("edit_tangent")};
 	static auto s_toolMove = QPixmap{embed::getIconPixmap("edit_move")};
 
 	m_toolDraw = &s_toolDraw;
