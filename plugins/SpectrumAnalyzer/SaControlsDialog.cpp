@@ -89,10 +89,10 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	// pause and freeze buttons
 	auto pauseButton = new PixmapButton(this, tr("Pause"));
 	pauseButton->setToolTip(tr("Pause data acquisition"));
-	static auto s_pauseOnPixmap = QPixmap(
-		PLUGIN_NAME::getIconPixmap("play").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-	static auto s_pauseOffPixmap = QPixmap(
-		PLUGIN_NAME::getIconPixmap("pause").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	static auto s_pauseOnPixmap
+		= PLUGIN_NAME::getIconPixmap("play").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+	static auto s_pauseOffPixmap
+		= PLUGIN_NAME::getIconPixmap("pause").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 	s_pauseOnPixmap.setDevicePixelRatio(devicePixelRatio());
 	s_pauseOffPixmap.setDevicePixelRatio(devicePixelRatio());
 	pauseButton->setActiveGraphic(s_pauseOnPixmap);
@@ -103,10 +103,10 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 
 	auto refFreezeButton = new PixmapButton(this, tr("Reference freeze"));
 	refFreezeButton->setToolTip(tr("Freeze current input as a reference / disable falloff in peak-hold mode."));
-	static auto s_freezeOnPixmap = QPixmap(
-		PLUGIN_NAME::getIconPixmap("freeze").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-	static auto s_freezeOffPixmap = QPixmap(
-		PLUGIN_NAME::getIconPixmap("freeze_off").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	static auto s_freezeOnPixmap
+		= PLUGIN_NAME::getIconPixmap("freeze").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+	static auto s_freezeOffPixmap
+		= PLUGIN_NAME::getIconPixmap("freeze_off").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 	s_freezeOnPixmap.setDevicePixelRatio(devicePixelRatio());
 	s_freezeOffPixmap.setDevicePixelRatio(devicePixelRatio());
 	refFreezeButton->setActiveGraphic(s_freezeOnPixmap);
@@ -147,10 +147,10 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	// frequency: linear / log. switch and range selector
 	auto logXButton = new PixmapButton(this, tr("Logarithmic frequency"));
 	logXButton->setToolTip(tr("Switch between logarithmic and linear frequency scale"));
-	static auto s_logXOnPixmap = QPixmap(
-		PLUGIN_NAME::getIconPixmap("x_log").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-	static auto s_logXOffPixmap = QPixmap(
-		PLUGIN_NAME::getIconPixmap("x_linear").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	static auto s_logXOnPixmap
+		= PLUGIN_NAME::getIconPixmap("x_log").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+	static auto s_logXOffPixmap
+		= PLUGIN_NAME::getIconPixmap("x_linear").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 	s_logXOnPixmap.setDevicePixelRatio(devicePixelRatio());
 	s_logXOffPixmap.setDevicePixelRatio(devicePixelRatio());
 	logXButton->setActiveGraphic(s_logXOnPixmap);
@@ -169,10 +169,10 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	// amplitude: linear / log switch and range selector
 	auto logYButton = new PixmapButton(this, tr("Logarithmic amplitude"));
 	logYButton->setToolTip(tr("Switch between logarithmic and linear amplitude scale"));
-	static auto s_logYOnPixmap = QPixmap(
-		PLUGIN_NAME::getIconPixmap("y_log").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-	static auto s_logYOffPixmap = QPixmap(
-		PLUGIN_NAME::getIconPixmap("y_linear").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	static auto s_logYOnPixmap
+		= PLUGIN_NAME::getIconPixmap("y_log").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+	static auto s_logYOffPixmap
+		= PLUGIN_NAME::getIconPixmap("y_linear").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 	s_logYOnPixmap.setDevicePixelRatio(devicePixelRatio());
 	s_logYOffPixmap.setDevicePixelRatio(devicePixelRatio());
 	logYButton->setActiveGraphic(s_logYOnPixmap);
