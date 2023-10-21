@@ -472,6 +472,7 @@ void Lv2Proc::shutdownPlugin()
 		m_instance = nullptr;
 
 		m_features.clear();
+		m_options.clear();
 	}
 	m_valid = true;
 }
