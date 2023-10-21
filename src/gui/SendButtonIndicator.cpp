@@ -14,8 +14,8 @@ SendButtonIndicator:: SendButtonIndicator( QWidget * _parent, MixerLine * _owner
 	m_parent( _owner ),
 	m_mv( _mv )
 {
-	static auto s_qpmOff = QPixmap{embed::getIconPixmap("mixer_send_off", 29, 20)};
-	static auto s_qpmOn = QPixmap{embed::getIconPixmap("mixer_send_on", 29, 20)};
+	static auto s_qpmOff = embed::getIconPixmap("mixer_send_off", 29, 20);
+	static auto s_qpmOn = embed::getIconPixmap("mixer_send_on", 29, 20);
 	m_qpmOff = &s_qpmOff;
 	m_qpmOn = &s_qpmOn;
 

@@ -91,12 +91,12 @@ PianoView::PianoView(QWidget *parent) :
 	m_movedNoteModel(nullptr)        /*!< Key marker which is being moved */
 {
 
-	static auto s_whiteKeyPm = QPixmap{embed::getIconPixmap("white_key")};
-	static auto s_blackKeyPm = QPixmap{embed::getIconPixmap("black_key")};
-	static auto s_whiteKeyPressedPm = QPixmap{embed::getIconPixmap("white_key_pressed")};
-	static auto s_blackKeyPressedPm = QPixmap{embed::getIconPixmap("black_key_pressed")};
-	static auto s_whiteKeyDisabledPm = QPixmap{embed::getIconPixmap("white_key_disabled")};
-	static auto s_blackKeyDisabledPm = QPixmap{embed::getIconPixmap("black_key_disabled")};
+	static auto s_whiteKeyPm = embed::getIconPixmap("white_key");
+	static auto s_blackKeyPm = embed::getIconPixmap("black_key");
+	static auto s_whiteKeyPressedPm = embed::getIconPixmap("white_key_pressed");
+	static auto s_blackKeyPressedPm = embed::getIconPixmap("black_key_pressed");
+	static auto s_whiteKeyDisabledPm = embed::getIconPixmap("white_key_disabled");
+	static auto s_blackKeyDisabledPm = embed::getIconPixmap("black_key_disabled");
 
 	m_whiteKeyPm = &s_whiteKeyPm;
 	m_blackKeyPm = &s_blackKeyPm;

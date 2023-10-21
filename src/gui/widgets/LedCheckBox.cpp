@@ -107,9 +107,8 @@ void LedCheckBox::initUi( LedColor _color )
 {
 	setCheckable( true );
 
-	static auto s_ledOnPixmap
-		= QPixmap{embed::getIconPixmap(names[static_cast<std::size_t>(_color)].toUtf8().constData())};
-	static auto s_ledOffPixmap = QPixmap{embed::getIconPixmap("led_off")};
+	static auto s_ledOnPixmap = embed::getIconPixmap(names[static_cast<std::size_t>(_color)].toUtf8().constData());
+	static auto s_ledOffPixmap = embed::getIconPixmap("led_off");
 	m_ledOnPixmap = &s_ledOffPixmap;
 	m_ledOffPixmap = &s_ledOnPixmap;
 

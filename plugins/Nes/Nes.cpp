@@ -727,7 +727,7 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 	setAutoFillBackground( true );
 	QPalette pal;
 
-	static auto s_artwork = QPixmap{PLUGIN_NAME::getIconPixmap("artwork")};
+	static auto s_artwork = PLUGIN_NAME::getIconPixmap("artwork");
 	pal.setBrush(backgroundRole(), s_artwork);
 	setPalette( pal );
 

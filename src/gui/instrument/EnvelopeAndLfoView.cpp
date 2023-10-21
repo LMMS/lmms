@@ -84,8 +84,8 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	ModelView( nullptr, this ),
 	m_params( nullptr )
 {
-	static auto s_envGraph = QPixmap{embed::getIconPixmap("envelope_graph")};
-	static auto s_lfoGraph = QPixmap{embed::getIconPixmap("lfo_graph")};
+	static auto s_envGraph = embed::getIconPixmap("envelope_graph");
+	static auto s_lfoGraph = embed::getIconPixmap("lfo_graph");
 	m_envGraph = &s_envGraph;
 	m_lfoGraph = &s_lfoGraph;
 

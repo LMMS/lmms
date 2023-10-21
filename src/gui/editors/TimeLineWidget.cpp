@@ -77,7 +77,7 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
 	m_loopPos[0] = 0;
 	m_loopPos[1] = DefaultTicksPerBar;
 
-	static auto s_posMarkerPixmap = QPixmap{embed::getIconPixmap("playpos_marker")};
+	static auto s_posMarkerPixmap = embed::getIconPixmap("playpos_marker");
 	m_posMarkerPixmap = &s_posMarkerPixmap;
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );

@@ -126,8 +126,8 @@ AutomationEditor::AutomationEditor() :
 					this, SLOT(setQuantization()));
 	m_quantizeModel.setValue( m_quantizeModel.findText( "1/8" ) );
 
-	static auto s_toolYFlip = QPixmap{embed::getIconPixmap("flip_y")};
-	static auto s_toolXFlip = QPixmap{embed::getIconPixmap("flip_x")};
+	static auto s_toolYFlip = embed::getIconPixmap("flip_y");
+	static auto s_toolXFlip = embed::getIconPixmap("flip_x");
 	m_toolYFlip = &s_toolYFlip;
 	m_toolXFlip = &s_toolXFlip;
 
@@ -155,11 +155,11 @@ AutomationEditor::AutomationEditor() :
 						SLOT(verScrolled(int)));
 
 	// init pixmaps
-	static auto s_toolDraw = QPixmap{embed::getIconPixmap("edit_draw")};
-	static auto s_toolErase = QPixmap{embed::getIconPixmap("edit_erase")};
-	static auto s_toolDrawOut = QPixmap{embed::getIconPixmap("edit_draw_outvalue")};
-	static auto s_toolEditTangents = QPixmap{embed::getIconPixmap("edit_tangent")};
-	static auto s_toolMove = QPixmap{embed::getIconPixmap("edit_move")};
+	static auto s_toolDraw = embed::getIconPixmap("edit_draw");
+	static auto s_toolErase = embed::getIconPixmap("edit_erase");
+	static auto s_toolDrawOut = embed::getIconPixmap("edit_draw_outvalue");
+	static auto s_toolEditTangents = embed::getIconPixmap("edit_tangent");
+	static auto s_toolMove = embed::getIconPixmap("edit_move");
 
 	m_toolDraw = &s_toolDraw;
 	m_toolErase = &s_toolErase;

@@ -82,9 +82,9 @@ Fader::Fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 		s_textFloat = new SimpleTextFloat;
 	}
 
-	static auto s_back = QPixmap{embed::getIconPixmap("fader_background")};
-	static auto s_leds = QPixmap{embed::getIconPixmap("fader_leds")};
-	static auto s_knob = QPixmap{embed::getIconPixmap("fader_knob")};
+	static auto s_back = embed::getIconPixmap("fader_background");
+	static auto s_leds = embed::getIconPixmap("fader_leds");
+	static auto s_knob = embed::getIconPixmap("fader_knob");
 
 	m_back = &s_back;
 	m_leds = &s_leds;

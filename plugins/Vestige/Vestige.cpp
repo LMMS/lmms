@@ -871,7 +871,7 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
-	static auto s_artwork = QPixmap{PLUGIN_NAME::getIconPixmap("artwork")};
+	static auto s_artwork = PLUGIN_NAME::getIconPixmap("artwork");
 	p.drawPixmap(0, 0, s_artwork);
 
 	QString plugin_name = ( m_vi->m_plugin != nullptr ) ?

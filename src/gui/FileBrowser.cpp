@@ -965,9 +965,9 @@ Directory::Directory(const QString & filename, const QString & path,
 	m_filter( filter ),
 	m_dirCount( 0 )
 {
-	static auto s_folderPixmap = QPixmap{embed::getIconPixmap("folder")};
-	static auto s_folderOpenedPixmap = QPixmap{embed::getIconPixmap("folder_opened")};
-	static auto s_folderLockedPixmap = QPixmap{embed::getIconPixmap("folder_locked")};
+	static auto s_folderPixmap = embed::getIconPixmap("folder");
+	static auto s_folderOpenedPixmap = embed::getIconPixmap("folder_opened");
+	static auto s_folderLockedPixmap = embed::getIconPixmap("folder_locked");
 
 	m_folderPixmap = &s_folderPixmap;
 	m_folderOpenedPixmap = &s_folderOpenedPixmap;
@@ -1084,13 +1084,13 @@ FileItem::FileItem(const QString & name, const QString & path ) :
 
 void FileItem::initPixmaps()
 {
-	static auto s_projectFilePixmap = QPixmap{embed::getIconPixmap("project_file", 16, 16)};
-	static auto s_presetFilePixmap = QPixmap{embed::getIconPixmap("preset_file", 16, 16)};
-	static auto s_sampleFilePixmap = QPixmap{embed::getIconPixmap("sample_file", 16, 16)};
-	static auto s_soundfontFilePixmap = QPixmap{embed::getIconPixmap("soundfont_file", 16, 16)};
-	static auto s_vstPluginFilePixmap = QPixmap{embed::getIconPixmap("vst_plugin_file", 16, 16)};
-	static auto s_midiFilePixmap = QPixmap{embed::getIconPixmap("midi_file", 16, 16)};
-	static auto s_unknownFilePixmap = QPixmap{embed::getIconPixmap("unknown_file")};
+	static auto s_projectFilePixmap = embed::getIconPixmap("project_file", 16, 16);
+	static auto s_presetFilePixmap = embed::getIconPixmap("preset_file", 16, 16);
+	static auto s_sampleFilePixmap = embed::getIconPixmap("sample_file", 16, 16);
+	static auto s_soundfontFilePixmap = embed::getIconPixmap("soundfont_file", 16, 16);
+	static auto s_vstPluginFilePixmap = embed::getIconPixmap("vst_plugin_file", 16, 16);
+	static auto s_midiFilePixmap = embed::getIconPixmap("midi_file", 16, 16);
+	static auto s_unknownFilePixmap = embed::getIconPixmap("unknown_file");
 
 	switch( m_type )
 	{

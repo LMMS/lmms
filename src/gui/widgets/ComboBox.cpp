@@ -49,9 +49,9 @@ ComboBox::ComboBox( QWidget * _parent, const QString & _name ) :
 {
 	setFixedHeight( ComboBox::DEFAULT_HEIGHT );
 
-	static auto s_background = QPixmap{embed::getIconPixmap("combobox_bg")};
-	static auto s_arrow = QPixmap{embed::getIconPixmap("combobox_arrow")};
-	static auto s_arrowSelected = QPixmap{embed::getIconPixmap("combobox_arrow_selected")};
+	static auto s_background = embed::getIconPixmap("combobox_bg");
+	static auto s_arrow = embed::getIconPixmap("combobox_arrow");
+	static auto s_arrowSelected = embed::getIconPixmap("combobox_arrow_selected");
 	m_background = &s_background;
 	m_arrow = &s_arrow;
 	m_arrowSelected = &s_arrowSelected;

@@ -638,7 +638,7 @@ void AudioFileProcessorView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
-	static auto s_artwork = QPixmap{PLUGIN_NAME::getIconPixmap("artwork")};
+	static auto s_artwork = PLUGIN_NAME::getIconPixmap("artwork");
 	p.drawPixmap(0, 0, s_artwork);
 
 	auto a = castModel<AudioFileProcessor>();

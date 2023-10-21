@@ -183,8 +183,8 @@ void MixerLine::drawMixerLine( QPainter* p, const MixerLine *mixerLine, bool isA
 
 	// draw the mixer send background
 
-	static auto s_sendBgArrow = QPixmap{embed::getIconPixmap("send_bg_arrow", 29, 56)};
-	static auto s_receiveBgArrow = QPixmap{embed::getIconPixmap("receive_bg_arrow", 29, 56)};
+	static auto s_sendBgArrow = embed::getIconPixmap("send_bg_arrow", 29, 56);
+	static auto s_receiveBgArrow = embed::getIconPixmap("receive_bg_arrow", 29, 56);
 	p->drawPixmap(2, 0, 29, 56, sendToThis ? s_sendBgArrow : s_receiveBgArrow);
 }
 

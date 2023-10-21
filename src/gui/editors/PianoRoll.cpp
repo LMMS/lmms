@@ -256,12 +256,12 @@ PianoRoll::PianoRoll() :
 	m_semiToneMarkerMenu->addAction( copyAllNotesAction );
 
 	// init pixmaps
-	static auto s_toolDraw = QPixmap{embed::getIconPixmap("edit_draw")};
-	static auto s_toolErase = QPixmap{embed::getIconPixmap("edit_erase")};
-	static auto s_toolSelect = QPixmap{embed::getIconPixmap("edit_select")};
-	static auto s_toolMove = QPixmap{embed::getIconPixmap("edit_move")};
-	static auto s_toolOpen = QPixmap{embed::getIconPixmap("automation")};
-	static auto s_toolKnife = QPixmap{embed::getIconPixmap("edit_knife")};
+	static auto s_toolDraw = embed::getIconPixmap("edit_draw");
+	static auto s_toolErase = embed::getIconPixmap("edit_erase");
+	static auto s_toolSelect = embed::getIconPixmap("edit_select");
+	static auto s_toolMove = embed::getIconPixmap("edit_move");
+	static auto s_toolOpen = embed::getIconPixmap("automation");
+	static auto s_toolKnife = embed::getIconPixmap("edit_knife");
 
 	m_toolDraw = &s_toolDraw;
 	m_toolErase = &s_toolErase;

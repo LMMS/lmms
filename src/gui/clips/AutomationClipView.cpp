@@ -373,7 +373,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 	// recording icon for when recording automation
 	if( m_clip->isRecording() )
 	{
-		static auto s_clipRec = QPixmap{embed::getIconPixmap("clip_rec")};
+		static auto s_clipRec = embed::getIconPixmap("clip_rec");
 		p.drawPixmap(1, rect().bottom() - s_clipRec.height(), s_clipRec);
 	}
 
