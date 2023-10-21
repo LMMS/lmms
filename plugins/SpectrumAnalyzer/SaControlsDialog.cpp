@@ -190,7 +190,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 
 	// FFT: block size: icon and selector
 	auto blockSizeLabel = new QLabel("", this);
-	static auto s_blockSizeIcon = QPixmap(PLUGIN_NAME::getIconPixmap("block_size"));
+	static auto s_blockSizeIcon = PLUGIN_NAME::getIconPixmap("block_size");
 	s_blockSizeIcon.setDevicePixelRatio(devicePixelRatio());
 	blockSizeLabel->setPixmap(s_blockSizeIcon.scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	config_layout->addWidget(blockSizeLabel, 0, 4, 2, 1, Qt::AlignRight);
@@ -206,7 +206,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 
 	// FFT: window type: icon and selector
 	auto windowLabel = new QLabel("", this);
-	static auto s_windowIcon = QPixmap(PLUGIN_NAME::getIconPixmap("window"));
+	static auto s_windowIcon = PLUGIN_NAME::getIconPixmap("window");
 	s_windowIcon.setDevicePixelRatio(devicePixelRatio());
 	windowLabel->setPixmap(s_windowIcon.scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	config_layout->addWidget(windowLabel, 2, 4, 2, 1, Qt::AlignRight);
@@ -307,10 +307,10 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	// Advanced settings button
 	auto advancedButton = new PixmapButton(this, tr("Advanced settings"));
 	advancedButton->setToolTip(tr("Access advanced settings"));
-	static auto s_advancedOnPixmap = QPixmap(PLUGIN_NAME::getIconPixmap("advanced_on")
-											.scaled(advButtonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-	static auto s_advancedOffPixmap = QPixmap(PLUGIN_NAME::getIconPixmap("advanced_off")
-											 .scaled(advButtonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	static auto s_advancedOnPixmap = PLUGIN_NAME::getIconPixmap("advanced_on")
+											.scaled(advButtonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+	static auto s_advancedOffPixmap = PLUGIN_NAME::getIconPixmap("advanced_off")
+											 .scaled(advButtonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 	s_advancedOnPixmap.setDevicePixelRatio(devicePixelRatio());
 	s_advancedOffPixmap.setDevicePixelRatio(devicePixelRatio());
 	advancedButton->setActiveGraphic(s_advancedOnPixmap);
