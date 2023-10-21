@@ -66,6 +66,7 @@ namespace Lv2Ports
 //! For Mono effects, 1 Lv2ControlBase references 2 Lv2Proc.
 class Lv2Proc : public LinkedModelGroup
 {
+	friend class Lv2ProcSuspender;
 public:
 	static Plugin::Type check(const LilvPlugin* plugin,
 		std::vector<PluginIssue> &issues);
