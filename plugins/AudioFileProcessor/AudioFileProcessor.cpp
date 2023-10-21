@@ -24,6 +24,8 @@
 
 #include "AudioFileProcessor.h"
 
+#include <cmath>
+
 #include <QPainter>
 #include <QFileInfo>
 #include <QDropEvent>
@@ -171,9 +173,6 @@ void AudioFileProcessor::playNote( NotePlayHandle * _n,
 						static_cast<SampleBuffer::LoopMode>( m_loopModel.value() ) ) )
 		{
 			applyRelease( _working_buffer, _n );
-			instrumentTrack()->processAudioBuffer( _working_buffer,
-									frames + offset, _n );
-
 			emit isPlaying( ((handleState *)_n->m_pluginData)->frameIndex() );
 		}
 		else
@@ -292,15 +291,24 @@ QString AudioFileProcessor::nodeName() const
 
 
 
-int AudioFileProcessor::getBeatLen( NotePlayHandle * _n ) const
+auto AudioFileProcessor::beatLen(NotePlayHandle* note) const -> int
 {
+	// If we can play indefinitely, use the default beat note duration
+	if (static_cast<SampleBuffer::LoopMode>(m_loopModel.value()) != SampleBuffer::LoopMode::Off) { return 0; }
+
+	// Otherwise, use the remaining sample duration
 	const auto baseFreq = instrumentTrack()->baseFreq();
-	const float freq_factor = baseFreq / _n->frequency() *
-			Engine::audioEngine()->processingSampleRate() / Engine::audioEngine()->baseSampleRate();
+	const auto freqFactor = baseFreq / note->frequency()
+		* Engine::audioEngine()->processingSampleRate()
+		/ Engine::audioEngine()->baseSampleRate();
 
-	return static_cast<int>( floorf( ( m_sampleBuffer.endFrame() - m_sampleBuffer.startFrame() ) * freq_factor ) );
+	const auto startFrame = m_nextPlayStartPoint >= m_sampleBuffer.endFrame()
+		? m_sampleBuffer.startFrame()
+		: m_nextPlayStartPoint;
+	const auto duration = m_sampleBuffer.endFrame() - startFrame;
+
+	return static_cast<int>(std::floor(duration * freqFactor));
 }
-
 
 
 

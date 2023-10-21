@@ -561,8 +561,6 @@ void NesInstrument::playNote( NotePlayHandle * n, sampleFrame * workingBuffer )
 	nes->renderOutput( workingBuffer + offset, frames );
 	
 	applyRelease( workingBuffer, n );
-
-	instrumentTrack()->processAudioBuffer( workingBuffer, frames + offset, n );
 }
 
 

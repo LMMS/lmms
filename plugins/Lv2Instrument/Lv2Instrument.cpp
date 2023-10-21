@@ -197,8 +197,6 @@ void Lv2Instrument::play(sampleFrame *buf)
 
 	copyModelsToLmms();
 	copyBuffersToLmms(buf, fpp);
-
-	instrumentTrack()->processAudioBuffer(buf, fpp, nullptr);
 }
 
 

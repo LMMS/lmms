@@ -57,7 +57,6 @@ ComboBox::ComboBox( QWidget * _parent, const QString & _name ) :
 	m_arrowSelected = &s_arrowSelected;
 
 	setFont( pointSize<9>( font() ) );
-	m_menu.setFont( pointSize<8>( m_menu.font() ) );
 
 	connect( &m_menu, SIGNAL(triggered(QAction*)),
 				this, SLOT(setItem(QAction*)));

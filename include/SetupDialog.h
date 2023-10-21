@@ -30,12 +30,12 @@
 
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
-#include "LedCheckBox.h"
 #include "lmmsconfig.h"
 #include "MidiClient.h"
 #include "MidiSetupWidget.h"
 
 
+class QCheckBox;
 class QComboBox;
 class QLabel;
 class QLineEdit;
@@ -102,6 +102,7 @@ private slots:
 	// Audio settings widget.
 	void audioInterfaceChanged(const QString & driver);
 	void toggleHQAudioDev(bool enabled);
+	void updateBufferSizeWarning(int value);
 	void setBufferSize(int value);
 	void resetBufferSize();
 
@@ -155,14 +156,14 @@ private:
 	bool m_enableRunningAutoSave;
 	QSlider * m_saveIntervalSlider;
 	QLabel * m_saveIntervalLbl;
-	LedCheckBox * m_autoSave;
-	LedCheckBox * m_runningAutoSave;
+	QCheckBox * m_autoSave;
+	QCheckBox * m_runningAutoSave;
 	bool m_smoothScroll;
 	bool m_animateAFP;
 	QLabel * m_vstEmbedLbl;
 	QComboBox* m_vstEmbedComboBox;
 	QString m_vstEmbedMethod;
-	LedCheckBox * m_vstAlwaysOnTopCheckBox;
+	QCheckBox * m_vstAlwaysOnTopCheckBox;
 	bool m_vstAlwaysOnTop;
 	bool m_disableAutoQuit;
 
@@ -179,6 +180,7 @@ private:
 	int m_bufferSize;
 	QSlider * m_bufferSizeSlider;
 	QLabel * m_bufferSizeLbl;
+	QLabel * m_bufferSizeWarnLbl;
 
 	// MIDI settings widgets.
 	QComboBox * m_midiInterfaces;

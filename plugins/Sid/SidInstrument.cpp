@@ -239,7 +239,7 @@ f_cnt_t SidInstrument::desiredReleaseFrames() const
 
 
 
-static int sid_fillbuffer(unsigned char* sidreg, SID *sid, int tdelta, short *ptr, int samples)
+static int sid_fillbuffer(unsigned char* sidreg, reSID::SID *sid, int tdelta, short *ptr, int samples)
 {
   int tdelta2;
   int result;
@@ -302,9 +302,9 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 
 	if (!_n->m_pluginData)
 	{
-		SID *sid = new SID();
-		sid->set_sampling_parameters( clockrate, SAMPLE_FAST, samplerate );
-		sid->set_chip_model( MOS8580 );
+		auto sid = new reSID::SID();
+		sid->set_sampling_parameters(clockrate, reSID::SAMPLE_FAST, samplerate);
+		sid->set_chip_model(reSID::MOS8580);
 		sid->enable_filter( true );
 		sid->reset();
 		_n->m_pluginData = sid;
@@ -312,7 +312,7 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 
-	SID *sid = static_cast<SID *>( _n->m_pluginData );
+	auto sid = static_cast<reSID::SID*>(_n->m_pluginData);
 	int delta_t = clockrate * frames / samplerate + 4;
 	// avoid variable length array for msvc compat
 	auto buf = reinterpret_cast<short*>(_working_buffer + offset);
@@ -325,20 +325,20 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 
 	if( (ChipModel)m_chipModel.value() == ChipModel::MOS6581 )
 	{
-		sid->set_chip_model( MOS6581 );
+		sid->set_chip_model(reSID::MOS6581);
 	}
 	else
 	{
-		sid->set_chip_model( MOS8580 );
+		sid->set_chip_model(reSID::MOS8580);
 	}
 
 	// voices
-	reg8 data8 = 0;
-	reg8 data16 = 0;
-	reg8 base = 0;
+	reSID::reg8 data8 = 0;
+	reSID::reg16 data16 = 0;
+	size_t base = 0;
 	float freq = 0.0;
 	float note = 0.0;
-	for( reg8 i = 0 ; i < 3 ; ++i )
+	for (size_t i = 0; i < 3; ++i)
 	{
 		base = i*7;
 		// freq ( Fn = Fout / Fclk * 16777216 ) + coarse detuning
@@ -429,8 +429,6 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 			_working_buffer[frame+offset][ch] = s;
 		}
 	}
-
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
 }
 
 
@@ -438,7 +436,7 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 
 void SidInstrument::deleteNotePluginData( NotePlayHandle * _n )
 {
-	delete static_cast<SID *>( _n->m_pluginData );
+	delete static_cast<reSID::SID*>(_n->m_pluginData);
 }
 
 

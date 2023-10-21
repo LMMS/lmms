@@ -126,6 +126,9 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 
 			m_framesPerPeriod = DEFAULT_BUFFER_SIZE;
 		}
+		// lmms works with chunks of size DEFAULT_BUFFER_SIZE (256) and only the final mix will use the actual
+		// buffer size. Plugins don't see a larger buffer size than 256. If m_framesPerPeriod is larger than
+		// DEFAULT_BUFFER_SIZE, it's set to DEFAULT_BUFFER_SIZE and the rest is handled by an increased fifoSize.
 		else if( m_framesPerPeriod > DEFAULT_BUFFER_SIZE )
 		{
 			fifoSize = m_framesPerPeriod / DEFAULT_BUFFER_SIZE;
@@ -701,7 +704,10 @@ void AudioEngine::removeAudioPort(AudioPort * port)
 
 bool AudioEngine::addPlayHandle( PlayHandle* handle )
 {
-	if( criticalXRuns() == false )
+	// Only add play handles if we have the CPU capacity to process them.
+	// Instrument play handles are not added during playback, but when the
+	// associated instrument is created, so add those unconditionally.
+	if (handle->type() == PlayHandle::Type::InstrumentPlayHandle || !criticalXRuns())
 	{
 		m_newPlayHandles.push( handle );
 		handle->audioPort()->addPlayHandle( handle );

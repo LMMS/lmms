@@ -28,7 +28,7 @@
 #ifdef LMMS_HAVE_SNDIO
 
 #include <cstdlib>
-#include <QLabel>
+#include <QFormLayout>
 #include <QLineEdit>
 
 #include "endian_handling.h"
@@ -183,12 +183,10 @@ void AudioSndio::run()
 AudioSndio::setupWidget::setupWidget( QWidget * _parent ) :
 	AudioDeviceSetupWidget( AudioSndio::name(), _parent )
 {
-	m_device = new QLineEdit( "", this );
-	m_device->setGeometry( 10, 20, 160, 20 );
+	QFormLayout * form = new QFormLayout(this);
 
-	QLabel * dev_lbl = new QLabel( tr( "Device" ), this );
-	dev_lbl->setFont( pointSize<6>( dev_lbl->font() ) );
-	dev_lbl->setGeometry( 10, 40, 160, 10 );
+	m_device = new QLineEdit( "", this );
+	form->addRow(tr("Device"), m_device);
 
 	gui::LcdSpinBoxModel * m = new gui::LcdSpinBoxModel( /* this */ );
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
@@ -198,9 +196,8 @@ AudioSndio::setupWidget::setupWidget( QWidget * _parent ) :
 
 	m_channels = new gui::LcdSpinBox( 1, this );
 	m_channels->setModel( m );
-	m_channels->setLabel( tr( "Channels" ) );
-	m_channels->move( 180, 20 );
 
+	form->addRow(tr("Channels"), m_channels);
 }
 
 
