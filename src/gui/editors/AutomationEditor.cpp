@@ -1312,7 +1312,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 					keyRange = MIN_NOTE_RANGE;
 				}
 
-				float absNoteHeight = (float)(note->key() - minKey) / (maxKey - minKey);
+				float absNoteHeight = static_cast<float>(note->key() - minKey) / (maxKey - minKey);
 				int graphHeight = grid_bottom - NOTE_HEIGHT - NOTE_MARGIN - TOP_MARGIN;
 				const int y = (graphHeight - graphHeight * absNoteHeight) + NOTE_HEIGHT / 2.0f + TOP_MARGIN;
 				const int x = xCoordOfTick(notePos);
@@ -2228,7 +2228,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	m_resetGhostNotes->setToolTip(tr("Clear ghost notes"));
 	m_resetGhostNotes->setEnabled(true);
 
-	connect(m_resetGhostNotes, SIGNAL(pressed()), m_editor, SLOT(resetGhostNotes()));
+	connect(m_resetGhostNotes, &QPushButton::pressed, m_editor, &AutomationEditor::resetGhostNotes);
 
 	quantizationActionsToolBar->addSeparator();
 	quantizationActionsToolBar->addWidget(m_resetGhostNotes);

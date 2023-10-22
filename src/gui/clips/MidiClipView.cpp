@@ -229,7 +229,7 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 	auto c = new QAction(embed::getIconPixmap("automation_ghost_note"), tr("Set as ghost in automation editor"), _cm);
 	if (m_clip->empty()) { c->setEnabled(false); }
 	_cm->insertAction(_cm->actions()[2], c);
-	connect(c, SIGNAL(triggered(bool)), this, SLOT(setGhostInAutomationEditor()));
+	connect(c, &QAction::triggered, this, &MidiClipView::setGhostInAutomationEditor);
 
 	_cm->insertSeparator(_cm->actions()[3]);
 	_cm->addSeparator();
