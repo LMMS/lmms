@@ -219,7 +219,7 @@ void AudioJack::startProcessing()
 	}
 
 	m_stopped = false;
-	free(ports);
+	jack_free(ports);
 }
 
 
