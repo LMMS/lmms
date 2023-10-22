@@ -1295,9 +1295,10 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				int notePos = note->pos();
 
 				// offset note if detuning
-				if (notePos < detuningOffset) { continue; }
+				if (notePos+lenTicks < detuningOffset) { continue; }
 				notePos -= detuningOffset;
 
+				// remove/change after #5902
 				if (lenTicks == 0) { continue; }
 				else if (lenTicks < 0) { lenTicks = 4; }
 
