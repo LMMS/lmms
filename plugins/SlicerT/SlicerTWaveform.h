@@ -125,6 +125,7 @@ private:
 	QPixmap m_seeker;
 	QPixmap m_seekerSlicerTWaveform; // only stores SlicerTWaveform graphic
 	QPixmap m_sliceEditor;
+	QPixmap m_emptySampleIcon;
 
 	SlicerT* m_slicerTParent;
 

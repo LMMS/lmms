@@ -112,6 +112,7 @@ SlicerTView::SlicerTView(SlicerT* instrument, QWidget* parent)
 void SlicerTView::exportMidi()
 {
 	using namespace Clipboard;
+	if (m_slicerTParent->m_originalSample.frames() < 2048) { return; }
 
 	DataFile dataFile(DataFile::Type::ClipboardData);
 	QDomElement note_list = dataFile.createElement("note-list");

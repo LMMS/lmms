@@ -22,7 +22,11 @@
  *
  */
 
+// TODO: restructure most of the interaction code into mouseMoveEvent
+
 #include "SlicerTWaveform.h"
+
+#include <QBitmap>
 
 #include "SlicerT.h"
 #include "SlicerTView.h"
@@ -46,6 +50,7 @@ SlicerTWaveform::SlicerTWaveform(int w, int h, SlicerT* instrument, QWidget* par
 	, m_seeker(QPixmap(m_seekerWidth, m_seekerHeight))
 	, m_seekerSlicerTWaveform(QPixmap(m_seekerWidth, m_seekerHeight))
 	, m_sliceEditor(QPixmap(w, m_editorHeight))
+	, m_emptySampleIcon(embed::getIconPixmap("sample_track.png"))
 
 	// references to instrument vars
 	, m_slicerTParent(instrument)
@@ -62,6 +67,9 @@ SlicerTWaveform::SlicerTWaveform(int w, int h, SlicerT* instrument, QWidget* par
 	connect(instrument, &SlicerT::isPlaying, this, &SlicerTWaveform::isPlaying);
 	connect(instrument, &SlicerT::dataChanged, this, &SlicerTWaveform::updateUI);
 
+	// preprocess icons
+	m_emptySampleIcon = m_emptySampleIcon.createMaskFromColor(QColor(255, 255, 255), Qt::MaskMode::MaskOutColor);
+	
 	updateUI();
 }
 
@@ -130,7 +138,10 @@ void SlicerTWaveform::drawEditor()
 		brush.setPen(s_playHighlighColor);
 		brush.setFont(QFont(brush.font().family(), 9.0f, -1, false));
 		brush.drawText(
-			m_editorWidth / 2 - 100, m_editorHeight / 2 - 100, 200, 200, Qt::AlignCenter, tr("Drag sample to load"));
+			m_editorWidth / 2 - 100, m_editorHeight / 2 - 110, 200, 200, Qt::AlignCenter, tr("Drag sample to load"));
+		int iconOffsetX = m_emptySampleIcon.width() / 2.0f;
+		int iconOffsetY = m_emptySampleIcon.height() / 2.0f - 13;
+		brush.drawPixmap(m_editorWidth / 2.0f - iconOffsetX, m_editorHeight / 2.0f - iconOffsetY, m_emptySampleIcon);
 		return;
 	}
 
@@ -250,6 +261,13 @@ void SlicerTWaveform::mouseReleaseEvent(QMouseEvent* me)
 
 void SlicerTWaveform::mouseMoveEvent(QMouseEvent* me)
 {
+	// Do nothing if no button pressed
+	if (me->buttons() == Qt::MouseButton::NoButton) 
+	{ 
+		m_currentlyDragging = DraggingTypes::Nothing;
+
+	}
+
 	float normalizedClickSeeker = static_cast<float>(me->x() - m_seekerHorMargin) / m_seekerWidth;
 	float normalizedClickEditor = static_cast<float>(me->x()) / m_editorWidth;
 
@@ -314,7 +332,6 @@ void SlicerTWaveform::mouseDoubleClickEvent(QMouseEvent* me)
 
 void SlicerTWaveform::wheelEvent(QWheelEvent* _we)
 {
-	// m_zoomLevel = _we-> / 360.0f * 2.0f;
 	m_zoomLevel += _we->angleDelta().y() / 360.0f * s_zoomSensitivity;
 	m_zoomLevel = std::max(0.0f, m_zoomLevel);
 
