@@ -341,6 +341,9 @@ auto ClapInstance::unload() -> bool
 	qDebug() << "Unloading plugin instance:" << m_pluginInfo->descriptor()->name;
 	assert(isMainThread());
 
+	// Destroy GUI
+	m_pluginGui.reset();
+
 	deactivate();
 
 	if (m_plugin)
@@ -391,10 +394,13 @@ auto ClapInstance::init() -> bool
 	m_audioPortInActive = m_audioPortOutActive = nullptr;
 	m_audioInBuffers.clear();
 	m_audioOutBuffers.clear();
+	LinkedModelGroup::clearModels();
 
 	// Initialize Audio Ports extension
 
-	if (!pluginExtensionInit(m_pluginExtAudioPorts, CLAP_EXT_AUDIO_PORTS))
+	// TODO: Create ClapAudioPorts class
+	if (!pluginExtensionInit(m_pluginExtAudioPorts, CLAP_EXT_AUDIO_PORTS,
+		+[](const clap_plugin_audio_ports* p) { return p && p->count && p->get; }))
 	{
 		qWarning() << "The required CLAP audio port extension is not supported by the plugin";
 		setPluginState(PluginState::LoadedWithError);
@@ -605,7 +611,7 @@ auto ClapInstance::init() -> bool
 
 	// Now initialize params and add param models
 
-	if (pluginExtensionInit(m_pluginExtParams, CLAP_EXT_PARAMS))
+	if (pluginExtensionInit(m_pluginExtParams, CLAP_EXT_PARAMS, &ClapParam::extensionSupported))
 	{
 		try
 		{
@@ -617,8 +623,8 @@ auto ClapInstance::init() -> bool
 			return false;
 		}
 
+		// TODO: Move this code to hostExtParamsRescan()?
 		qDebug() << "CLAP PARAMS: m_params.size():" << m_params.size();
-		LinkedModelGroup::clearModels();
 		for (auto param : m_params)
 		{
 			if (param && param->model())
@@ -645,7 +651,8 @@ auto ClapInstance::init() -> bool
 	}
 
 	// Initialize GUI
-	if (pluginExtensionInit(m_pluginExtGui, CLAP_EXT_GUI) && ClapGui::extensionSupported(m_pluginExtGui))
+	// TODO: What if this is the 2nd instance of a mono plugin?
+	if (pluginExtensionInit(m_pluginExtGui, CLAP_EXT_GUI, &ClapGui::extensionSupported))
 	{
 		m_pluginGui = std::make_unique<ClapGui>(m_pluginInfo, m_plugin, m_pluginExtGui);
 	}
@@ -863,22 +870,23 @@ void ClapInstance::generatePluginInputEvents()
 			m_evIn.push(&ev.header);
 		});
 
-	m_hostToPluginModQueue.consume([this](clap_id paramId, const HostToPluginParamQueueValue& value) {
-		clap_event_param_mod ev;
-		ev.header.time = 0;
-		ev.header.type = CLAP_EVENT_PARAM_MOD;
-		ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
-		ev.header.flags = 0;
-		ev.header.size = sizeof(ev);
-		ev.param_id = paramId;
-		ev.cookie = s_hostShouldProvideParamCookie ? value.cookie : nullptr;
-		ev.port_index = 0;
-		ev.key = -1;
-		ev.channel = -1;
-		ev.note_id = -1;
-		ev.amount = value.value;
-		m_evIn.push(&ev.header);
-	});
+	m_hostToPluginModQueue.consume(
+		[this](clap_id paramId, const HostToPluginParamQueueValue& value) {
+			clap_event_param_mod ev;
+			ev.header.time = 0;
+			ev.header.type = CLAP_EVENT_PARAM_MOD;
+			ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+			ev.header.flags = 0;
+			ev.header.size = sizeof(ev);
+			ev.param_id = paramId;
+			ev.cookie = s_hostShouldProvideParamCookie ? value.cookie : nullptr;
+			ev.port_index = 0;
+			ev.key = -1;
+			ev.channel = -1;
+			ev.note_id = -1;
+			ev.amount = value.value;
+			m_evIn.push(&ev.header);
+		});
 }
 
 void ClapInstance::handlePluginOutputEvents()
@@ -951,7 +959,7 @@ void ClapInstance::paramFlushOnMainThread()
 
 	generatePluginInputEvents();
 
-	if (canUsePluginParams())
+	if (m_pluginExtParams)
 	{
 		m_pluginExtParams->flush(m_plugin, m_evIn.clapInputEvents(), m_evOut.clapOutputEvents());
 	}
@@ -992,6 +1000,12 @@ auto ClapInstance::isErrorState() const -> bool
 		|| m_pluginState == PluginState::LoadedWithError
 		|| m_pluginState == PluginState::InactiveWithError
 		|| m_pluginState == PluginState::ActiveWithError;
+}
+
+template<typename... Args>
+void ClapInstance::checkPluginStateCurrent(Args... possibilities)
+{
+	assert(((m_pluginState == possibilities) || ...));
 }
 
 auto ClapInstance::isPluginNextStateValid(PluginState next) -> bool
@@ -1071,6 +1085,22 @@ auto ClapInstance::isAudioThread() -> bool
 	return QThread::currentThread() != QCoreApplication::instance()->thread();
 }
 
+template<typename T, class F>
+auto ClapInstance::pluginExtensionInit(const T*& ext, const char* id, F* checkFunc) -> bool
+{
+	static_assert(std::is_same_v<F, bool(const T*) noexcept> || std::is_same_v<F, bool(const T*)>);
+	assert(isMainThread());
+	assert(ext == nullptr && "Plugin extension already initialized");
+	ext = static_cast<const T*>(m_plugin->get_extension(m_plugin, id));
+	if (!ext) { return false; }
+	if (!checkFunc(ext))
+	{
+		// Plugin doesn't fully implement this extension
+		ext = nullptr;
+		return false;
+	}
+	return true;
+}
 
 ////////////////////////////////
 // ClapInstance host
@@ -1172,12 +1202,12 @@ auto ClapInstance::hostGetExtension(const clap_host* host, const char* extension
 
 	if (ClapManager::debugging()) { qDebug() << "--Plugin requested host extension:" << extensionId; }
 
-	const auto extensionIdView = std::string_view{extensionId};
-	if (extensionIdView == CLAP_EXT_LOG) { return &s_hostExtLog; }
-	if (extensionIdView == CLAP_EXT_THREAD_CHECK) { return &s_hostExtThreadCheck; }
-	if (extensionIdView == CLAP_EXT_PARAMS) { return &s_hostExtParams; }
-	if (extensionIdView == CLAP_EXT_LATENCY) { return &s_hostExtLatency; }
-	if (extensionIdView == CLAP_EXT_GUI) { return &s_hostExtGui; }
+	const auto id = std::string_view{extensionId};
+	if (id == CLAP_EXT_LOG)          { return &s_hostExtLog; }
+	if (id == CLAP_EXT_THREAD_CHECK) { return &s_hostExtThreadCheck; }
+	if (id == CLAP_EXT_PARAMS)       { return &s_hostExtParams; }
+	if (id == CLAP_EXT_LATENCY)      { return &s_hostExtLatency; }
+	if (id == CLAP_EXT_GUI)          { return &s_hostExtGui; }
 
 	return nullptr;
 }
@@ -1259,11 +1289,12 @@ auto ClapInstance::hostExtThreadCheckIsAudioThread(const clap_host* host) -> boo
 
 void ClapInstance::hostExtParamsRescan(const clap_host* host, std::uint32_t flags)
 {
+	// TODO: Update LinkedModelGroup when parameters are added/removed?
 	qDebug() << "ClapInstance::hostExtParamsRescan";
 	assert(isMainThread());
 	auto h = fromHost(host);
 
-	if (!h->canUsePluginParams()) { return; }
+	if (!h->m_pluginExtParams) { return; }
 
 	// 1. It is forbidden to use CLAP_PARAM_RESCAN_ALL if the plugin is active
 	if (h->isActive() && (flags & CLAP_PARAM_RESCAN_ALL))
@@ -1459,23 +1490,6 @@ void ClapInstance::hostExtGuiRequestClosed(const clap_host* host, bool wasDestro
 	gui->clapRequestClosed(wasDestroyed);
 }
 
-auto ClapInstance::canUsePluginParams() const noexcept -> bool
-{
-	return m_pluginExtParams && m_pluginExtParams->count && m_pluginExtParams->flush
-		&& m_pluginExtParams->get_info && m_pluginExtParams->get_value && m_pluginExtParams->text_to_value
-		&& m_pluginExtParams->value_to_text;
-}
-
-/*
-bool ClapInstance::canUsePluginGui() const noexcept
-{
-	return m_pluginGui && m_pluginGui->create && m_pluginGui->destroy && m_pluginGui->can_resize
-	&& m_pluginGui->get_size && m_pluginGui->adjust_size && m_pluginGui->set_size
-	&& m_pluginGui->set_scale && m_pluginGui->hide && m_pluginGui->show
-	&& m_pluginGui->suggest_title && m_pluginGui->is_api_supported;
-}
-*/
-
 void ClapInstance::setParamValueByHost(ClapParam& param, double value)
 {
 	assert(isMainThread());
@@ -1516,7 +1530,7 @@ auto ClapInstance::getParamValue(const clap_param_info& info) const -> double
 {
 	assert(isMainThread());
 
-	if (!canUsePluginParams()) { return 0.0; }
+	if (!m_pluginExtParams) { return 0.0; }
 
 	double value = 0.0;
 	if (m_pluginExtParams->get_value(m_plugin, info.id, &value)) { return value; }

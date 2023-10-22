@@ -33,7 +33,8 @@ namespace lmms::gui
 
 
 ClapFxControlDialog::ClapFxControlDialog(ClapFxControls* controls)
-	: EffectControlDialog{controls}, ClapViewBase{this, controls}
+	: EffectControlDialog{controls}
+	, ClapViewBase{this, controls}
 {
 	if (m_reloadPluginButton)
 	{

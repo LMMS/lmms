@@ -1,5 +1,5 @@
 /*
- * ClapInstrument.cpp - implementation of CLAP instrument
+ * ClapInstrument.cpp - Implementation of CLAP instrument
  *
  * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -24,9 +24,10 @@
 
 #include "ClapInstrument.h"
 
-#include <QDebug>
+#include <QApplication>
 #include <QDragEnterEvent>
 #include <QPushButton>
+#include <QDebug>
 
 #include "AudioEngine.h"
 #include "Engine.h"
@@ -43,7 +44,6 @@
 namespace lmms
 {
 
-
 extern "C"
 {
 
@@ -51,8 +51,7 @@ Plugin::Descriptor PLUGIN_EXPORT clapinstrument_plugin_descriptor =
 {
 	LMMS_STRINGIFY(PLUGIN_NAME),
 	"CLAP",
-	QT_TRANSLATE_NOOP("PluginBrowser",
-		"plugin for using arbitrary CLAP instruments inside LMMS."),
+	QT_TRANSLATE_NOOP("PluginBrowser", "plugin for using arbitrary CLAP instruments inside LMMS."),
 	"Dalton Messmer <messmer.dalton/at/gmail.com>",
 	0x0100,
 	Plugin::Type::Instrument,
@@ -63,18 +62,14 @@ Plugin::Descriptor PLUGIN_EXPORT clapinstrument_plugin_descriptor =
 
 }
 
-
-
-
 /*
-	ClapInstrument
-*/
+ * ClapInstrument
+ */
 
-
-ClapInstrument::ClapInstrument(InstrumentTrack* instrumentTrackArg, Descriptor::SubPluginFeatures::Key* key) :
-	Instrument{instrumentTrackArg, &clapinstrument_plugin_descriptor, key},
-	ClapControlBase{this, key->attributes["uri"]},
-	m_idleTimer{this}
+ClapInstrument::ClapInstrument(InstrumentTrack* track, Descriptor::SubPluginFeatures::Key* key)
+	: Instrument{track, &clapinstrument_plugin_descriptor, key}
+	, ClapControlBase{this, key->attributes["uri"]}
+	, m_idleTimer{this}
 {
 	if (ClapControlBase::isValid())
 	{
@@ -83,26 +78,22 @@ ClapInstrument::ClapInstrument(InstrumentTrack* instrumentTrackArg, Descriptor::
 		connect(instrumentTrack()->pitchRangeModel(), &IntModel::dataChanged,
 			this, &ClapInstrument::updatePitchRange, Qt::DirectConnection);
 		connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged, this, [this](){ onSampleRateChanged(); });
+
+		m_idleTimer.moveToThread(QApplication::instance()->thread());
 		connect(&m_idleTimer, &QTimer::timeout, this, [this](){ callHostIdle(); });
 		m_idleTimer.start(1000 / 30);
 
-		// now we need a play-handle which cares for calling play()
-		auto iph = new InstrumentPlayHandle{this, instrumentTrackArg};
+		// Now we need a play handle which cares for calling play()
+		auto iph = new InstrumentPlayHandle{this, track};
 		Engine::audioEngine()->addPlayHandle(iph);
 	}
 }
-
-
-
 
 ClapInstrument::~ClapInstrument()
 {
 	Engine::audioEngine()->removePlayHandlesOfTypes(instrumentTrack(),
 		PlayHandle::Type::NotePlayHandle | PlayHandle::Type::InstrumentPlayHandle);
 }
-
-
-
 
 void ClapInstrument::reload()
 {
@@ -111,9 +102,6 @@ void ClapInstrument::reload()
 	emit modelChanged();
 }
 
-
-
-
 void ClapInstrument::clearRunningNotes()
 {
 #ifdef CLAP_INSTRUMENT_USE_MIDI
@@ -121,71 +109,44 @@ void ClapInstrument::clearRunningNotes()
 #endif
 }
 
-
-
-
 void ClapInstrument::onSampleRateChanged()
 {
-	// TODO: once lv2 options are implemented,
-	//       plugins that support it might allow changing their samplerate
-	//       through it instead of reloading
 	reload();
 }
 
-
-
-
-bool ClapInstrument::isValid() const { return ClapControlBase::isValid(); }
-
-
-
+auto ClapInstrument::isValid() const -> bool
+{
+	return ClapControlBase::isValid();
+}
 
 void ClapInstrument::saveSettings(QDomDocument& doc, QDomElement& that)
 {
 	ClapControlBase::saveSettings(doc, that);
 }
 
-
-
-
 void ClapInstrument::loadSettings(const QDomElement& that)
 {
 	ClapControlBase::loadSettings(that);
 }
-
-
-
 
 void ClapInstrument::loadFile(const QString& file)
 {
 	ClapControlBase::loadFile(file);
 }
 
-
-
-
 #ifdef CLAP_INSTRUMENT_USE_MIDI
-bool ClapInstrument::handleMidiEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset)
+auto ClapInstrument::handleMidiEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset) -> bool
 {
 	// this function can be called from GUI threads while the plugin is running
 	// handleMidiInputEvent will use a thread-safe ringbuffer
 	handleMidiInputEvent(event, time, offset);
 	return true;
 }
-#endif
-
-
-
-
-// not yet working
-#ifndef CLAP_INSTRUMENT_USE_MIDI
+#else
 void ClapInstrument::playNote(NotePlayHandle* nph, sampleFrame*)
 {
 }
 #endif
-
-
-
 
 void ClapInstrument::play(sampleFrame* buf)
 {
@@ -199,44 +160,31 @@ void ClapInstrument::play(sampleFrame* buf)
 	copyBuffersToLmms(buf, fpp);
 }
 
-
-
-
-gui::PluginView* ClapInstrument::instantiateView(QWidget* parent)
+auto ClapInstrument::instantiateView(QWidget* parent) -> gui::PluginView*
 {
 	return new gui::ClapInsView{this, parent};
 }
-
-
-
 
 void ClapInstrument::updatePitchRange()
 {
 	qDebug() << "LMMS: Cannot update pitch range for CLAP plugin: not implemented yet";
 }
 
-
-
-
-QString ClapInstrument::nodeName() const
+auto ClapInstrument::nodeName() const -> QString
 {
 	return ClapControlBase::nodeName();
 }
-
-
-
 
 namespace gui
 {
 
 /*
-	ClapInsView
-*/
+ * ClapInsView
+ */
 
-
-ClapInsView::ClapInsView(ClapInstrument* instrument, QWidget* parent) :
-	InstrumentView{instrument, parent},
-	ClapViewBase{this, instrument}
+ClapInsView::ClapInsView(ClapInstrument* instrument, QWidget* parent)
+	: InstrumentView{instrument, parent}
+	, ClapViewBase{this, instrument}
 {
 	setAutoFillBackground(true);
 	if (m_reloadPluginButton)
@@ -244,20 +192,19 @@ ClapInsView::ClapInsView(ClapInstrument* instrument, QWidget* parent) :
 		connect(m_reloadPluginButton, &QPushButton::clicked,
 			this, [this](){ this->castModel<ClapInstrument>()->reload();} );
 	}
+
 	if (m_toggleUIButton)
 	{
 		connect(m_toggleUIButton, &QPushButton::toggled,
 			this, [this](){ toggleUI(); });
 	}
+
 	if (m_helpButton)
 	{
 		connect(m_helpButton, &QPushButton::toggled,
 			this, [this](bool visible){ toggleHelp(visible); });
 	}
 }
-
-
-
 
 void ClapInsView::dragEnterEvent(QDragEnterEvent* dee)
 {
@@ -278,9 +225,6 @@ void ClapInsView::dragEnterEvent(QDragEnterEvent* dee)
 	(dee->*reaction)();
 }
 
-
-
-
 void ClapInsView::dropEvent(QDropEvent* de)
 {
 	const QString type = StringPairDrag::decodeKey(de);
@@ -294,15 +238,11 @@ void ClapInsView::dropEvent(QDropEvent* de)
 	de->ignore();
 }
 
-
-
-
 void ClapInsView::modelChanged()
 {
 	ClapViewBase::modelChanged(castModel<ClapInstrument>());
 	connect(castModel<ClapInstrument>(), &ClapInstrument::modelChanged, this, [this](){ this->modelChanged(); } );
 }
-
 
 } // namespace gui
 
@@ -319,6 +259,5 @@ PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data)
 }
 
 }
-
 
 } // namespace lmms

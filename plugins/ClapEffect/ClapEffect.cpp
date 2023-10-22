@@ -1,5 +1,5 @@
 /*
- * ClapEffect.cpp - implementation of CLAP effect
+ * ClapEffect.cpp - Implementation of CLAP effect
  *
  * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -23,6 +23,8 @@
  */
 
 #include "ClapEffect.h"
+
+#include <QApplication>
 
 #include "ClapSubPluginFeatures.h"
 
@@ -55,12 +57,13 @@ Plugin::Descriptor PLUGIN_EXPORT clapeffect_plugin_descriptor =
 }
 
 
-ClapEffect::ClapEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
-	Effect{&clapeffect_plugin_descriptor, parent, key},
-	m_controls{this, key->attributes["uri"]},
-	m_tempOutputSamples(Engine::audioEngine()->framesPerPeriod()),
-	m_idleTimer{this}
+ClapEffect::ClapEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key)
+	: Effect{&clapeffect_plugin_descriptor, parent, key}
+	, m_controls{this, key->attributes["uri"]}
+	, m_tempOutputSamples(Engine::audioEngine()->framesPerPeriod())
+	, m_idleTimer{this}
 {
+	m_idleTimer.moveToThread(QApplication::instance()->thread());
 	connect(&m_idleTimer, &QTimer::timeout, this, [this](){ m_controls.callHostIdle(); });
 	m_idleTimer.start(1000 / 30);
 }

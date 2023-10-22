@@ -1,5 +1,5 @@
 /*
- * ClapEffect.h - implementation of CLAP effect
+ * ClapEffect.h - Implementation of CLAP effect
  *
  * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
  *

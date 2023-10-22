@@ -73,8 +73,6 @@ bool ClapManager::s_debug = false;
 
 ClapManager::ClapManager()
 {
-	ClapTransport::update(); // TODO: Is Song available at this point?
-
 	const char* dbgStr = std::getenv("LMMS_CLAP_DEBUG");
 	s_debug = (dbgStr && *dbgStr);
 	if (s_debug) { qDebug() << "CLAP host debugging enabled"; }
@@ -218,7 +216,7 @@ void ClapManager::loadClapFiles(const std::vector<std::filesystem::path>& search
 	{
 		for (const auto& entry : std::filesystem::recursive_directory_iterator{path})
 		{
-			auto entryPath = entry.path();
+			const auto& entryPath = entry.path();
 			std::error_code ec;
 			if (!entry.is_regular_file(ec) || entryPath.extension() != ".clap")
 			{
@@ -229,7 +227,7 @@ void ClapManager::loadClapFiles(const std::vector<std::filesystem::path>& search
 
 			if (debugging()) { qDebug() << "\n\n~~~CLAP FILE~~~\nfilename:" << entryPath.c_str(); }
 
-			auto& clapFile = m_files.emplace_back(this, std::move(entryPath));
+			auto& clapFile = m_files.emplace_back(entryPath);
 			clapFile.load();
 			if (!clapFile.isValid())
 			{

@@ -112,6 +112,8 @@ public:
 	//! Checks that the parameter info is valid, throwing exception if not
 	static void check(clap_param_info& info);
 
+	static auto extensionSupported(const clap_plugin_params* ext) noexcept -> bool;
+
 signals:
 	void isBeingAdjustedChanged();
 	void infoChanged();

@@ -1,5 +1,5 @@
 /*
- * ClapInstrument.h - implementation of CLAP instrument
+ * ClapInstrument.h - Implementation of CLAP instrument
  *
  * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -51,45 +51,44 @@ class ClapInsView;
 class ClapInstrument : public Instrument, public ClapControlBase
 {
 	Q_OBJECT
+
 signals:
 	void modelChanged();
+
 public:
-	/*
-		initialization
-	*/
-	ClapInstrument(InstrumentTrack* instrumentTrackArg, Descriptor::SubPluginFeatures::Key* key);
+	ClapInstrument(InstrumentTrack* track, Descriptor::SubPluginFeatures::Key* key);
 	~ClapInstrument() override;
 
 	void reload();
 	void onSampleRateChanged();
 
 	//! Must be checked after ctor or reload
-	bool isValid() const;
+	auto isValid() const -> bool;
 
 	/*
-		load/save
-	*/
+	 * Load/Save
+	 */
 	void saveSettings(QDomDocument& doc, QDomElement& that) override;
 	void loadSettings(const QDomElement& that) override;
 	void loadFile(const QString& file) override;
 
 	/*
-		realtime funcs
-	*/
-	bool hasNoteInput() const override { return ClapControlBase::hasNoteInput(); }
+	 * Realtime funcs
+	 */
+	auto hasNoteInput() const -> bool override { return ClapControlBase::hasNoteInput(); }
 
 #ifdef CLAP_INSTRUMENT_USE_MIDI
-	bool handleMidiEvent(const MidiEvent& event, const TimePos& time = TimePos{}, f_cnt_t offset = 0) override;
+	auto handleMidiEvent(const MidiEvent& event, const TimePos& time = TimePos{}, f_cnt_t offset = 0) -> bool override;
 #else
 	void playNote(NotePlayHandle* nph, sampleFrame*) override;
 #endif
 
-	void play(sampleFrame *buf) override;
+	void play(sampleFrame* buf) override;
 
 	/*
-		misc
-	*/
-	Flags flags() const override
+	 * Misc
+	 */
+	auto flags() const -> Flags override
 	{
 #ifdef CLAP_INSTRUMENT_USE_MIDI
 		return Flag::IsSingleStreamed | Flag::IsMidiBased;
@@ -97,18 +96,20 @@ public:
 		return Flag::IsSingleStreamed;
 #endif
 	}
-	gui::PluginView* instantiateView(QWidget* parent) override;
+
+	auto instantiateView(QWidget* parent) -> gui::PluginView* override;
 
 private slots:
 	void updatePitchRange();
 
 private:
-	QString nodeName() const override;
+	auto nodeName() const -> QString override;
+
+	void clearRunningNotes();
 
 #ifdef CLAP_INSTRUMENT_USE_MIDI
 	std::array<int, NumKeys> m_runningNotes{};
 #endif
-	void clearRunningNotes();
 
 	QTimer m_idleTimer;
 
@@ -118,7 +119,6 @@ private:
 
 namespace gui
 {
-
 
 class ClapInsView : public InstrumentView, public ClapViewBase
 {
@@ -134,9 +134,7 @@ private:
 	void modelChanged() override;
 };
 
-
 } // namespace gui
-
 
 } // namespace lmms
 

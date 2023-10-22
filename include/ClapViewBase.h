@@ -1,5 +1,5 @@
 /*
- * ClapViewBase.h - base class for CLAP plugin views
+ * ClapViewBase.h - Base class for CLAP plugin views
  *
  * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -38,15 +38,11 @@ class QMdiSubWindow;
 namespace lmms
 {
 
-
 class ClapInstance;
 class ClapControlBase;
 
-
 namespace gui
 {
-
-class LedCheckBox;
 
 //! View for one processor, ClapViewBase contains 2 of those for mono plugins
 class ClapViewInstance : public LinkedModelGroupView
@@ -57,7 +53,7 @@ public:
 	~ClapViewInstance() override = default;
 
 private:
-	///static AutoLilvNode uri(const char *uriStr);
+	ClapInstance* m_instance = nullptr;
 };
 
 
@@ -82,17 +78,16 @@ protected:
 	void modelChanged(ClapControlBase* ctrlBase);
 
 private:
-	enum Rows
+	enum class Rows
 	{
 		ButtonRow,
 		ProcRow,
 		LinkChannelsRow
 	};
 
-	///static auto uri(const char* uriStr) -> AutoLilvNode;
 	auto getGroupView() -> LinkedModelGroupView* override { return m_procView; }
 
-	ClapViewInstance* m_procView;
+	ClapViewInstance* m_procView = nullptr;
 
 	//! Numbers of controls per row; must be multiple of 2 for mono effects
 	static constexpr int s_colNum = 6;

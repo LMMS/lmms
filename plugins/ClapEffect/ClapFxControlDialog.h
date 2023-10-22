@@ -44,7 +44,7 @@ public:
 	ClapFxControlDialog(ClapFxControls* controls);
 
 private:
-	ClapFxControls* clapControls();
+	auto clapControls() -> ClapFxControls*;
 	void modelChanged() final;
 };
 

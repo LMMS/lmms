@@ -51,11 +51,11 @@ class ClapFile
 {
 public:
 	//! Loads .clap file and plugin info
-	ClapFile(const ClapManager* manager, std::filesystem::path filename);
+	explicit ClapFile(std::filesystem::path filename);
 	ClapFile(const ClapFile&) = delete;
 	ClapFile(ClapFile&& other) noexcept;
-	ClapFile& operator=(const ClapFile&) = delete;
-	ClapFile& operator=(ClapFile&& rhs) noexcept;
+	auto operator=(const ClapFile&) -> ClapFile& = delete;
+	auto operator=(ClapFile&& rhs) noexcept -> ClapFile&;
 	~ClapFile();
 
 	//! Represents a CLAP plugin within a .clap file
@@ -66,17 +66,17 @@ public:
 		ClapPluginInfo(const clap_plugin_factory* factory, std::uint32_t index);
 		ClapPluginInfo(const ClapPluginInfo&) = delete;
 		ClapPluginInfo(ClapPluginInfo&& other) noexcept;
-		ClapPluginInfo& operator=(const ClapPluginInfo&) = delete;
-		ClapPluginInfo& operator=(ClapPluginInfo&&) noexcept = delete;
+		auto operator=(const ClapPluginInfo&) -> ClapPluginInfo& = delete;
+		auto operator=(ClapPluginInfo&&) noexcept -> ClapPluginInfo& = delete;
 		~ClapPluginInfo() = default;
 
-		auto isValid() const -> bool { return m_valid; }
+		auto isValid() const { return m_valid; }
 		void invalidate() const { m_valid = false; }
 
-		auto factory() const -> const clap_plugin_factory* { return m_factory; };
-		auto index() const -> std::uint32_t { return m_index; }
-		auto type() const -> Plugin::Type { return m_type; }
-		auto descriptor() const -> const clap_plugin_descriptor* { return m_descriptor; }
+		auto factory() const { return m_factory; };
+		auto index() const { return m_index; }
+		auto type() const { return m_type; }
+		auto descriptor() const { return m_descriptor; }
 
 	private:
 
@@ -93,14 +93,15 @@ public:
 	auto load() -> bool;
 
 	auto filename() const -> const std::filesystem::path& { return m_filename; }
-	auto factory() const -> const clap_plugin_factory* { return m_factory; }
+	auto factory() const { return m_factory; }
 
 	//! Only includes plugins that successfully loaded
-	auto pluginInfo() const -> const std::vector<std::shared_ptr<const ClapPluginInfo>>& { return m_pluginInfo; }
+	auto pluginInfo() const -> const auto& { return m_pluginInfo; }
 
 	//! Includes plugins that failed to load
-	auto pluginCount() const -> std::uint32_t { return m_pluginCount; }
-	auto isValid() const -> bool { return m_valid; }
+	auto pluginCount() const { return m_pluginCount; }
+
+	auto isValid() const { return m_valid; }
 
 	//! Removes any invalid plugin info objects - be careful when using
 	void purgeInvalidPlugins();

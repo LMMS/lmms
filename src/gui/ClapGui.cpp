@@ -52,14 +52,14 @@ ClapGui::ClapGui(const ClapPluginInfo* info, const clap_plugin* plugin, const cl
 	assert(extensionSupported(m_gui));
 }
 
+ClapGui::~ClapGui()
+{
+	destroy();
+}
+
 auto ClapGui::create() -> bool
 {
-	if (m_guiCreated)
-	{
-		m_gui->destroy(m_plugin);
-		m_guiCreated = false;
-		m_guiVisible = false;
-	}
+	destroy();
 
 	m_embedMethod = WindowEmbed::Method::Headless;
 	const auto windowId = gui::getGUI()->mainWindow()->winId();
@@ -135,14 +135,40 @@ auto ClapGui::create() -> bool
 	return true;
 }
 
-auto ClapGui::extensionSupported(const clap_plugin_gui* gui) noexcept -> bool
+void ClapGui::destroy()
 {
-	return gui && gui->create && gui->destroy && gui->can_resize
-		&& gui->get_size && gui->adjust_size && gui->set_size
-		&& gui->set_scale && gui->hide && gui->show
-		&& gui->suggest_title && gui->is_api_supported;
+	if (m_guiCreated)
+	{
+		m_gui->destroy(m_plugin);
+		m_guiCreated = false;
+		m_guiVisible = false;
+	}
 }
 
+auto ClapGui::extensionSupported(const clap_plugin_gui* ext) noexcept -> bool
+{
+	return ext && ext->is_api_supported && ext->get_preferred_api && ext->create && ext->destroy
+		&& ext->set_scale && ext->get_size && ext->show && ext->hide
+		&& (windowSupported(ext, true) || windowSupported(ext, false));
+}
+
+auto ClapGui::windowSupported(const clap_plugin_gui* ext, bool floating) noexcept -> bool
+{
+	// NOTE: This method only checks if the needed API functions are implemented.
+	//       Still need to call ext->is_api_supported
+	assert(ext != nullptr);
+
+	if (floating)
+	{
+		// Needed for floating windows
+		return ext->set_transient && ext->suggest_title;
+	}
+	else
+	{
+		// Needed for embedded windows
+		return ext->can_resize && ext->get_resize_hints && ext->adjust_size && ext->set_size && ext->set_parent;
+	}
+}
 
 void ClapGui::clapResizeHintsChanged()
 {

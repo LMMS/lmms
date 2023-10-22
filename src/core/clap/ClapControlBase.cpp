@@ -35,10 +35,10 @@
 #include "Engine.h"
 #include "ClapManager.h"
 #include "ClapInstance.h"
+#include "ClapTransport.h"
 
 namespace lmms
 {
-
 
 ClapControlBase::ClapControlBase(Model* that, const QString& uri)
 {
@@ -68,6 +68,8 @@ void ClapControlBase::init(Model* that, const QString& uri)
 		return;
 	}
 
+	ClapTransport::update();
+
 	qDebug() << "Creating CLAP instance (#1)";
 	m_instances.clear();
 	auto& first = m_instances.emplace_back(std::make_unique<ClapInstance>(m_info, that));
@@ -95,6 +97,7 @@ void ClapControlBase::init(Model* that, const QString& uri)
 
 	m_valid = true;
 	m_channelsPerInstance = DEFAULT_CHANNELS / m_instances.size();
+	setHasGui(first->gui() != nullptr);
 	linkAllModels();
 }
 

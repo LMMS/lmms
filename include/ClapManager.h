@@ -58,13 +58,13 @@ public:
 	 * Returns a cached plugin info vector
 	 * ClapManager doesn't own the ClapPluginInfo objects, so pointers may be invalidated.
 	*/
-	auto pluginInfo() const -> const std::vector<std::weak_ptr<const ClapPluginInfo>>& { return m_pluginInfo; }
+	auto pluginInfo() const -> const auto& { return m_pluginInfo; }
 
 	/**
 	 * Returns a cached URI-to-PluginInfo map
 	 * ClapManager doesn't own the ClapPluginInfo objects, so pointers may be invalidated.
 	*/
-	auto uriToPluginInfo() const -> const std::unordered_map<std::string, std::weak_ptr<const ClapPluginInfo>>& { return m_uriToPluginInfo; }
+	auto uriToPluginInfo() const -> const auto& { return m_uriToPluginInfo; }
 
 	//! Return plugin info with URI @p uri or nullptr if none exists
 	auto pluginInfo(const std::string& uri) -> std::weak_ptr<const ClapPluginInfo>;

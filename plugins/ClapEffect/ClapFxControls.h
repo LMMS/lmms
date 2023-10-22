@@ -51,7 +51,7 @@ public:
 
 	void saveSettings(QDomDocument& _doc, QDomElement& _parent) override;
 	void loadSettings(const QDomElement& that) override;
-	inline auto nodeName() const -> QString override
+	auto nodeName() const -> QString override
 	{
 		return ClapControlBase::nodeName();
 	}

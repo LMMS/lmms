@@ -36,12 +36,12 @@
 namespace lmms
 {
 
-ClapParam::ClapParam(ClapInstance* pluginHost, const clap_param_info& info, double value) :
-	QObject{pluginHost},
-	m_info{info},
-	m_value{value},
-	m_id{"p" + std::to_string(m_info.id)},
-	m_displayName{m_info.name}
+ClapParam::ClapParam(ClapInstance* pluginHost, const clap_param_info& info, double value)
+	: QObject{pluginHost}
+	, m_info{info}
+	, m_value{value}
+	, m_id{"p" + std::to_string(m_info.id)}
+	, m_displayName{m_info.name}
 {
 	qDebug() << "ClapParam::ClapParam";
 	// Assume ClapParam::check() has already been called at this point
@@ -62,9 +62,9 @@ ClapParam::ClapParam(ClapInstance* pluginHost, const clap_param_info& info, doub
 
 	if ((flags & CLAP_PARAM_IS_STEPPED) || (flags & CLAP_PARAM_IS_BYPASS))
 	{
-		const auto minVal = static_cast<int>(std::lround(m_info.min_value));
-		const auto valueInt = static_cast<int>(std::lround(value));
-		const auto maxVal = static_cast<int>(std::lround(m_info.max_value));
+		const auto minVal = static_cast<int>(std::trunc(m_info.min_value));
+		const auto valueInt = static_cast<int>(std::trunc(value));
+		const auto maxVal = static_cast<int>(std::trunc(m_info.max_value));
 
 		if ((flags & CLAP_PARAM_IS_BYPASS) && (minVal != 0 || maxVal != 1))
 		{
@@ -110,17 +110,26 @@ ClapParam::ClapParam(ClapInstance* pluginHost, const clap_param_info& info, doub
 
 auto ClapParam::getValueText(const clap_plugin* plugin, const clap_plugin_params* params) const -> std::string
 {
-	constexpr std::uint32_t bufferSize = 50;
-	auto buffer = std::array<char, bufferSize>{};
-	if (!params->value_to_text(plugin, m_info.id, m_value, buffer.data(), bufferSize))
+	const auto valueStr = std::to_string(m_value);
+	if (!params->value_to_text)
 	{
-		return std::to_string(m_value);
+		return valueStr;
 	}
 
-	auto temp = std::to_string(m_value) + " (";
-	temp += buffer.data();
-	temp += ')';
-	return temp;
+	auto buffer = std::array<char, CLAP_NAME_SIZE>{};
+	if (!params->value_to_text(plugin, m_info.id, m_value, buffer.data(), CLAP_NAME_SIZE))
+	{
+		return valueStr;
+	}
+
+	if (valueStr == buffer.data())
+	{
+		// No point in displaying two identical strings
+		return valueStr;
+	}
+
+	// Use CLAP-provided string + internal value in brackets for automation purposes
+	return std::string{buffer.data()} + "\n[" + valueStr + "]";
 }
 
 void ClapParam::setValue(double v)
@@ -168,7 +177,7 @@ auto ClapParam::isInfoEqualTo(const clap_param_info& info) const -> bool
 auto ClapParam::isInfoCriticallyDifferentTo(const clap_param_info& info) const -> bool
 {
 	assert(m_info.id == info.id);
-	const std::uint32_t criticalFlags =
+	constexpr std::uint32_t criticalFlags =
 		CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_AUTOMATABLE_PER_NOTE_ID |
 		CLAP_PARAM_IS_AUTOMATABLE_PER_KEY | CLAP_PARAM_IS_AUTOMATABLE_PER_CHANNEL |
 		CLAP_PARAM_IS_AUTOMATABLE_PER_PORT | CLAP_PARAM_IS_MODULATABLE |
@@ -198,6 +207,12 @@ void ClapParam::check(clap_param_info& info)
 		//return false;
 	}
 	//return true;
+}
+
+auto ClapParam::extensionSupported(const clap_plugin_params* ext) noexcept -> bool
+{
+	// NOTE: ext->value_to_text and ext->text_to_value are optional
+	return ext && ext->count && ext->get_info && ext->get_value && ext->flush;
 }
 
 } // namespace lmms

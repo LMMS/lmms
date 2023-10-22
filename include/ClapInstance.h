@@ -242,8 +242,6 @@ private:
 	static auto hostExtGuiRequestHide(const clap_host* host) -> bool;
 	static void hostExtGuiRequestClosed(const clap_host* host, bool wasDestroyed);
 
-	auto canUsePluginParams() const noexcept -> bool;
-
 	void setParamValueByHost(ClapParam& param, double value);
 	void setParamModulationByHost(ClapParam& param, double value);
 	void checkValidParamValue(const ClapParam& param, double value);
@@ -260,23 +258,16 @@ private:
 	// Plugin
 	/////////////////////////////////////////
 
-	template<typename... Args> void checkPluginStateCurrent(Args... possibilities)
-	{
-		assert(((m_pluginState == possibilities) || ...));
-	}
+	template<typename... Args>
+	void checkPluginStateCurrent(Args... possibilities);
+
 	auto isPluginNextStateValid(PluginState next) -> bool;
 	void setPluginState(PluginState state);
 	static inline auto isMainThread() -> bool;
 	static inline auto isAudioThread() -> bool;
 
-	template<typename T>
-	auto pluginExtensionInit(const T*& ext, const char* id) -> bool
-	{
-		assert(isMainThread());
-		assert(ext == nullptr && "Plugin extension already initialized");
-		ext = static_cast<const T*>(m_plugin->get_extension(m_plugin, id));
-		return ext != nullptr;
-	}
+	template<typename T, class F>
+	auto pluginExtensionInit(const T*& ext, const char* id, F* checkFunc) -> bool;
 
 	const clap_plugin* m_plugin = nullptr;
 	const ClapPluginInfo* m_pluginInfo; // TODO: Use weak_ptr instead?

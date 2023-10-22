@@ -46,86 +46,14 @@
 #include "SubWindow.h"
 #include "CustomTextKnob.h"
 
-
 namespace lmms::gui
 {
 
-
 ClapViewInstance::ClapViewInstance(QWidget* parent, ClapInstance* instance, int colNum)
-	: LinkedModelGroupView(parent, instance, colNum)
+	: LinkedModelGroupView{parent, instance, static_cast<std::size_t>(colNum)}
+	, m_instance{instance}
 {
-	/*
-	class SetupWidget : public ClapPorts::ConstVisitor
-	{
-	public:
-		QWidget* m_par; // input
-		const LilvNode* m_commentUri; // input
-		Control* m_control = nullptr; // output
-		void visit(const ClapPorts::Control& port) override
-		{
-			if (port.m_flow == ClapPorts::Flow::Input)
-			{
-				using PortVis = ClapPorts::Vis;
-
-				switch (port.m_vis)
-				{
-					case PortVis::Generic:
-						m_control = new KnobControl(m_par);
-						break;
-					case PortVis::Integer:
-					{
-						sample_rate_t sr = Engine::audioEngine()->processingSampleRate();
-						m_control = new LcdControl((port.max(sr) <= 9.0f) ? 1 : 2,
-													m_par);
-						break;
-					}
-					case PortVis::Enumeration:
-						m_control = new ComboControl(m_par);
-						break;
-					case PortVis::Toggled:
-						m_control = new CheckControl(m_par);
-						break;
-				}
-				m_control->setText(port.name());
-
-				AutoLilvNodes props(lilv_port_get_value(
-					port.m_plugin, port.m_port, m_commentUri));
-				LILV_FOREACH(nodes, itr, props.get())
-				{
-					const LilvNode* nod = lilv_nodes_get(props.get(), itr);
-					m_control->topWidget()->setToolTip(lilv_node_as_string(nod));
-					break;
-				}
-			}
-		}
-	};
-
-	AutoLilvNode commentUri = uri(LILV_NS_RDFS "comment");
-	instance->foreach_port(
-		[this, &commentUri](const Lv2Ports::PortBase* port)
-		{
-			if(!lilv_port_has_property(port->m_plugin, port->m_port,
-										uri(LV2_PORT_PROPS__notOnGUI).get()))
-			{
-				SetupWidget setup;
-				setup.m_par = this;
-				setup.m_commentUri = commentUri.get();
-				port->accept(setup);
-
-				if (setup.m_control)
-				{
-					addControl(setup.m_control,
-						lilv_node_as_string(lilv_port_get_symbol(
-							port->m_plugin, port->m_port)),
-						port->name().toUtf8().data(),
-						false);
-				}
-			}
-		});
-
-	*/
-
-	for (auto param : instance->params())
+	for (auto param : m_instance->params())
 	{
 		if (!param || !param->model()) { continue; }
 
@@ -140,6 +68,7 @@ ClapViewInstance::ClapViewInstance(QWidget* parent, ClapInstance* instance, int 
 			// TODO: What if more digits are needed? Lv2 uses KnobControl in this case.
 			control = new LcdControl{(param->info().max_value <= 9.0) ? 1 : 2, this};
 			break;
+		// TODO: Are enum controls possible? Look into writing a CLAP proposal if not
 		case ClapParam::ParamType::Float:
 		{
 			control = new CustomTextKnobControl{this};
@@ -147,7 +76,7 @@ ClapViewInstance::ClapViewInstance(QWidget* parent, ClapInstance* instance, int 
 			// CustomTextKnob calls this lambda to update value text
 			auto customTextKnob = dynamic_cast<CustomTextKnob*>(control->modelView());
 			customTextKnob->setValueText([=]() {
-				return QString::fromUtf8(instance->getParamValueText(param).c_str());
+				return QString::fromUtf8(m_instance->getParamValueText(param).c_str());
 			});
 
 			break;
@@ -172,27 +101,20 @@ ClapViewInstance::ClapViewInstance(QWidget* parent, ClapInstance* instance, int 
 
 }
 
-/*
-auto ClapViewInstance::uri(const char* uriStr) -> AutoLilvNode
-{
-	return Engine::getClapManager()->uri(uriStr);
-}
-*/
-
 ClapViewBase::ClapViewBase(QWidget* meAsWidget, ClapControlBase* ctrlBase)
 {
-	auto grid = new QGridLayout(meAsWidget);
+	auto grid = new QGridLayout{meAsWidget};
 
-	auto btnBox = new QHBoxLayout();
+	auto btnBox = std::make_unique<QHBoxLayout>();
 	if (/* DISABLES CODE */ (false))
 	{
-		m_reloadPluginButton = new QPushButton(QObject::tr("Reload Plugin"), meAsWidget);
+		m_reloadPluginButton = new QPushButton{QObject::tr("Reload Plugin"), meAsWidget};
 		btnBox->addWidget(m_reloadPluginButton, 0);
 	}
 
 	if (/* DISABLES CODE */ (false)) // TODO: check if the plugin has the UI extension
 	{
-		m_toggleUIButton = new QPushButton(QObject::tr("Show GUI"), meAsWidget);
+		m_toggleUIButton = new QPushButton{QObject::tr("Show GUI"), meAsWidget};
 		m_toggleUIButton->setCheckable(true);
 		m_toggleUIButton->setChecked(false);
 		m_toggleUIButton->setIcon(embed::getIconPixmap("zoom"));
@@ -233,12 +155,11 @@ ClapViewBase::ClapViewBase(QWidget* meAsWidget, ClapControlBase* ctrlBase)
 
 	if (m_reloadPluginButton || m_toggleUIButton || m_helpButton)
 	{
-		grid->addLayout(btnBox, Rows::ButtonRow, 0, 1, s_colNum);
+		grid->addLayout(btnBox.release(), static_cast<int>(Rows::ButtonRow), 0, 1, s_colNum);
 	}
-	else { delete btnBox; }
 
-	m_procView = new ClapViewInstance(meAsWidget, ctrlBase->control(0), s_colNum);
-	grid->addWidget(m_procView, Rows::ProcRow, 0);
+	m_procView = new ClapViewInstance{meAsWidget, ctrlBase->control(0), s_colNum};
+	grid->addWidget(m_procView, static_cast<int>(Rows::ProcRow), 0);
 }
 
 
@@ -276,14 +197,6 @@ void ClapViewBase::modelChanged(ClapControlBase* ctrlBase)
 
 	LinkedModelGroupsView::modelChanged(ctrlBase);
 }
-
-/*
-auto ClapViewBase::uri(const char* uriStr) -> AutoLilvNode
-{
-	return Engine::getClapManager()->uri(uriStr);
-}
-*/
-
 
 } // namespace lmms::gui
 

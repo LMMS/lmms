@@ -49,15 +49,19 @@ public:
 	friend class ClapInstance;
 
 	ClapGui(const ClapPluginInfo* info, const clap_plugin* plugin, const clap_plugin_gui* gui);
+	~ClapGui();
 
 	auto create() -> bool;
+	void destroy();
 
-	static auto extensionSupported(const clap_plugin_gui* gui) noexcept -> bool;
+	static auto extensionSupported(const clap_plugin_gui* ext) noexcept -> bool;
 
 	auto gui() const { return m_gui; }
 	auto isFloating() const { return m_embedMethod == WindowEmbed::Method::None; }
 
 private:
+
+	static auto windowSupported(const clap_plugin_gui* ext, bool floating) noexcept -> bool;
 
 	/**
 	 * clap_host_gui implementation

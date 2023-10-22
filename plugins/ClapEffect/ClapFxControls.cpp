@@ -35,7 +35,8 @@ namespace lmms
 
 
 ClapFxControls::ClapFxControls(ClapEffect* effect, const QString& uri)
-	: EffectControls{effect}, ClapControlBase{this, uri}
+	: EffectControls{effect}
+	, ClapControlBase{this, uri}
 {
 	if (isValid())
 	{
