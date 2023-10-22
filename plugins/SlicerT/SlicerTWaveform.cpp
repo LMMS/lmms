@@ -112,11 +112,11 @@ void SlicerTWaveform::drawSeeker()
 
 	// shadow on not selected area
 	brush.fillRect(0, 0, seekerStartPosX, m_seekerHeight, s_seekerShadowColor);
-	brush.fillRect(seekerEndPosX + 1, 0, m_seekerWidth + 1, m_seekerHeight, s_seekerShadowColor);
+	brush.fillRect(seekerEndPosX, 0, m_seekerWidth, m_seekerHeight, s_seekerShadowColor);
 
 	// draw border around selection
 	brush.setPen(QPen(s_seekerColor, 1));
-	brush.drawRoundedRect(seekerStartPosX, 0, seekerMiddleWidth - 1, m_seekerHeight - 1, 4, 4); // -1 needed
+	brush.drawRoundedRect(seekerStartPosX, 0, seekerMiddleWidth - 1, m_seekerHeight - 1, 0, 0); // -1 needed
 }
 
 void SlicerTWaveform::drawEditor()

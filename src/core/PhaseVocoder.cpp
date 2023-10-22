@@ -23,6 +23,7 @@
  */
 #include "PhaseVocoder.h"
 
+#include <algorithm>
 #include <cstdio>
 #include <fftw3.h>
 #include <math.h>
@@ -55,7 +56,7 @@ void PhaseVocoder::loadData(const std::vector<float>& originalData, int sampleRa
 {
 	m_dataLock.lock();
 
-	m_originalBuffer = originalData;
+	m_originalBuffer = std::move(originalData);
 	m_originalSampleRate = sampleRate;
 	m_scaleRatio = -1; // force update, kinda hacky
 
@@ -77,10 +78,10 @@ void PhaseVocoder::loadData(const std::vector<float>& originalData, int sampleRa
 	// maybe limit this to a set amount of windows to reduce initial lag spikes
 	for (int i = 0; i < m_numWindows; i++)
 	{
-		if (!m_processedWindows[i])
+		if (!m_processedWindows.at(i))
 		{
 			generateWindow(i, false); // first pass, no cache
-			m_processedWindows[i] = true;
+			m_processedWindows.at(i) = true;
 		}
 	}
 
@@ -116,16 +117,16 @@ void PhaseVocoder::getFrames(std::vector<float>& outData, int start, int frames)
 	// which must be computed
 	for (int i = startWindow; i < endWindow; i++)
 	{
-		if (!m_processedWindows[i])
+		if (!m_processedWindows.at(i))
 		{
 			generateWindow(i, true); // theses should use the cache
-			m_processedWindows[i] = true;
+			m_processedWindows.at(i) = true;
 		}
 	}
 
 	for (int i = 0; i < frames; i++)
 	{
-		outData[i] = m_processedBuffer[start + i];
+		outData.at(i) = m_processedBuffer[start + i];
 	}
 
 	m_dataLock.unlock();
@@ -146,7 +147,7 @@ void PhaseVocoder::updateParams(float newRatio)
 	m_expectedPhaseIn = 2. * F_PI * m_stepSize / s_windowSize;
 	m_expectedPhaseOut = 2. * F_PI * m_outStepSize / s_windowSize;
 
-	m_processedBuffer.resize(m_scaleRatio * m_originalBuffer.size(), 0);
+	m_processedBuffer.resize(m_numWindows * m_outStepSize + s_windowSize, 0);
 
 	// very slow :(
 	std::fill(m_processedWindows.begin(), m_processedWindows.end(), false);
@@ -165,7 +166,7 @@ void PhaseVocoder::updateParams(float newRatio)
 void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 {
 	// declare vars
-	float real, imag, phase, magnitude, freq, deltaPhase = 0;
+	float real, imag, phase, magnitude, freq, deltaPhase;
 	int windowStart = static_cast<float>(windowNum) * m_stepSize;
 	int windowIndex = static_cast<float>(windowNum) * s_windowSize;
 
@@ -179,17 +180,17 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 		// analysis step
 		for (int j = 0; j < s_windowSize / 2; j++) // only process nyquistic frequency
 		{
-			real = m_FFTSpectrum[j][0];
-			imag = m_FFTSpectrum[j][1];
+			real = m_FFTSpectrum.at(j)[0];
+			imag = m_FFTSpectrum.at(j)[1];
 
 			magnitude = 2. * std::sqrt(real * real + imag * imag);
 			phase = std::atan2(imag, real);
 
 			// calculate difference in phase with prev window
 			freq = phase;
-			freq = phase - m_lastPhase[std::max(0, windowIndex + j - s_windowSize)]; // subtract prev pahse to get phase
+			freq = phase - m_lastPhase.at(std::max(0, windowIndex + j - s_windowSize)); // subtract prev pahse to get phase
 																					 // diference
-			m_lastPhase[windowIndex + j] = phase;
+			m_lastPhase.at(windowIndex + j) = phase;
 
 			freq -= m_expectedPhaseIn * j; // subtract expected phase
 			// at this point, freq is the difference in phase
@@ -205,8 +206,8 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 			// add to the expected freq the change in freq calculated from the phase diff
 			freq = m_freqPerBin * j + m_freqPerBin * freq;
 
-			m_allMagnitudes[j] = magnitude;
-			m_allFrequencies[j] = freq;
+			m_allMagnitudes.at(j) = magnitude;
+			m_allFrequencies.at(j) = freq;
 		}
 		// write cache
 		std::copy_n(m_allFrequencies.data(), s_windowSize, m_freqCache.data() + windowIndex);
@@ -222,8 +223,8 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 	// synthesis, all the operations are the reverse of the analysis
 	for (int j = 0; j < s_windowSize / 2; j++)
 	{
-		magnitude = m_allMagnitudes[j];
-		freq = m_allFrequencies[j];
+		magnitude = m_allMagnitudes.at(j);
+		freq = m_allFrequencies.at(j);
 
 		// difference to bin freq mulitplier
 		deltaPhase = freq - m_freqPerBin * j;
@@ -238,13 +239,13 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 		deltaPhase += m_expectedPhaseOut * j;
 
 		// sum this phase to the total, to keep track of the out phase along the sample
-		m_sumPhase[windowIndex + j] += deltaPhase;
-		deltaPhase = m_sumPhase[windowIndex + j]; // final bin phase
+		m_sumPhase.at(windowIndex + j) += deltaPhase;
+		deltaPhase = m_sumPhase.at(windowIndex + j); // final bin phase
 
-		m_sumPhase[windowIndex + j + s_windowSize] = deltaPhase; // copy to the next
+		m_sumPhase.at(windowIndex + j + s_windowSize) = deltaPhase; // copy to the next
 
-		m_FFTSpectrum[j][0] = magnitude * std::cos(deltaPhase);
-		m_FFTSpectrum[j][1] = magnitude * std::sin(deltaPhase);
+		m_FFTSpectrum.at(j)[0] = magnitude * std::cos(deltaPhase);
+		m_FFTSpectrum.at(j)[1] = magnitude * std::sin(deltaPhase);
 	}
 
 	// inverse fft
@@ -266,7 +267,7 @@ void PhaseVocoder::generateWindow(int windowNum, bool useCache)
 			= a0 - (a1 * std::cos(piN2 / s_windowSize)) + (a2 * std::cos(2.0f * piN2 / s_windowSize)) - (a3 * std::cos(3.0f * piN2));
 
 		// inverse fft magnitudes are windowsSize times bigger
-		m_processedBuffer[outIndex] += window * (m_IFFTReconstruction[j] / s_windowSize / s_overSampling);
+		m_processedBuffer.at(outIndex) += window * (m_IFFTReconstruction.at(j) / s_windowSize / s_overSampling);
 	}
 }
 } // namespace lmms

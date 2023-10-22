@@ -25,6 +25,7 @@
 #ifndef LMMS_SLICERT_H
 #define LMMS_SLICERT_H
 
+#include <algorithm>
 #include <fftw3.h>
 
 #include "AutomatableModel.h"
@@ -53,11 +54,11 @@ public:
 		std::vector<float> rightData(frames, 0);
 		for (int i = 0; i < frames; i++)
 		{
-			leftData[i] = inData[i][0];
-			rightData[i] = inData[i][1];
+			leftData.at(i) = inData[i][0];
+			rightData.at(i) = inData[i][1];
 		}
-		m_leftChannel.loadData(leftData, sampleRate, newRatio);
-		m_rightChannel.loadData(rightData, sampleRate, newRatio);
+		m_leftChannel.loadData(std::move(leftData), sampleRate, newRatio);
+		m_rightChannel.loadData(std::move(rightData), sampleRate, newRatio);
 	}
 
 	void getFrames(sampleFrame* outData, int startFrame, int frames)
@@ -70,8 +71,8 @@ public:
 
 		for (int i = 0; i < frames; i++)
 		{
-			outData[i][0] = leftOut[i];
-			outData[i][1] = rightOut[i];
+			outData[i][0] = leftOut.at(i);
+			outData[i][1] = rightOut.at(i);
 		}
 	}
 

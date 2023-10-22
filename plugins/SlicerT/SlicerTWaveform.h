@@ -52,9 +52,9 @@ public:
 	SlicerTWaveform(int w, int h, SlicerT* instrument, QWidget* parent);
 
 	// predefined sizes
-	const int m_seekerHorMargin = 5;
-	const int m_seekerHeight = 38; // used to calcualte all vertical sizes
-	const int m_middleMargin = 6;
+	static constexpr int m_seekerHorMargin = 5;
+	static constexpr int m_seekerHeight = 38; // used to calcualte all vertical sizes
+	static constexpr int m_middleMargin = 6;
 
 	// colors
 	const QColor s_SlicerTWaveformBgColor = QColor(255, 255, 255, 0);
