@@ -47,9 +47,10 @@ class Lv2Worker
 {
 public:
 	// CTOR/DTOR/feature access
-	Lv2Worker(const LV2_Worker_Interface* iface, Semaphore* common_work_lock, bool threaded);
+	Lv2Worker(Semaphore* common_work_lock, bool threaded);
 	~Lv2Worker();
-	void setHandle(LV2_Handle handle) { m_handle = handle; }
+	void setHandle(LV2_Handle handle);
+	void setIface(const LV2_Worker_Interface* iface);
 	LV2_Worker_Schedule* feature() { return &m_scheduleFeature; }
 
 	// public API

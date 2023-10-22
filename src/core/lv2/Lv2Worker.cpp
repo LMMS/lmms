@@ -60,10 +60,8 @@ std::size_t Lv2Worker::bufferSize() const
 
 
 
-Lv2Worker::Lv2Worker(const LV2_Worker_Interface* iface,
-	Semaphore* common_work_lock,
+Lv2Worker::Lv2Worker(Semaphore* common_work_lock,
 	bool threaded) :
-	m_iface(iface),
 	m_threaded(threaded),
 	m_response(bufferSize()),
 	m_requests(bufferSize()),
@@ -73,7 +71,6 @@ Lv2Worker::Lv2Worker(const LV2_Worker_Interface* iface,
 	m_sem(0),
 	m_workLock(common_work_lock)
 {
-	assert(iface);
 	m_scheduleFeature.handle = static_cast<LV2_Worker_Schedule_Handle>(this);
 	m_scheduleFeature.schedule_work = [](LV2_Worker_Schedule_Handle handle,
 		uint32_t size, const void* data) -> LV2_Worker_Status
@@ -86,6 +83,20 @@ Lv2Worker::Lv2Worker(const LV2_Worker_Interface* iface,
 
 	m_requests.mlock();
 	m_responses.mlock();
+}
+
+
+
+
+void Lv2Worker::setHandle(LV2_Handle handle) { m_handle = handle; }
+
+
+
+
+void Lv2Worker::setIface(const LV2_Worker_Interface* iface)
+{
+	assert (iface);
+	m_iface = iface;
 }
 
 
