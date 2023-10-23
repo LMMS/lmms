@@ -95,7 +95,7 @@ void Lv2Worker::setHandle(LV2_Handle handle) { m_handle = handle; }
 
 void Lv2Worker::setIface(const LV2_Worker_Interface* iface)
 {
-	assert (iface);
+	assert(iface);
 	m_iface = iface;
 }
 
