@@ -446,7 +446,7 @@ void Lv2Proc::initPlugin()
 			lilv_instance_get_extension_data(m_instance, LV2_WORKER__interface));
 		if(iface) {
 			m_worker->setHandle(lilv_instance_get_handle(m_instance));
-			m_worker->setIface(iface);
+			m_worker->setInterface(iface);
 		}
 		for (std::size_t portNum = 0; portNum < m_ports.size(); ++portNum)
 		{
