@@ -536,8 +536,7 @@ void Lv2Proc::initPluginSpecificFeatures()
 		bool threaded = !Engine::audioEngine()->renderOnly();
 		m_worker.emplace(&m_workLock, threaded);
 		m_features[LV2_WORKER__schedule] = m_worker->feature();
-		// note: the worker interface can not be instantiated yet - it requires m_instance
-		//       see initPlugin()
+		// note: the worker interface can not be instantiated yet - it requires m_instance. see initPlugin()
 	}
 }
 
