@@ -25,14 +25,13 @@
 #ifndef LMMS_AUDIO_ENGINE_H
 #define LMMS_AUDIO_ENGINE_H
 
-#include <QMutex>
-
-#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
-	#include <QRecursiveMutex>
+#ifdef __MINGW32__
+#include <mingw.mutex.h>
+#else
+#include <mutex>
 #endif
 
 #include <QThread>
-#include <QWaitCondition>
 #include <samplerate.h>
 
 #include <vector>
@@ -476,17 +475,7 @@ private:
 
 	bool m_clearSignal;
 
-	bool m_changesSignal;
-	unsigned int m_changes;
-	QMutex m_changesMutex;
-#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
-	QRecursiveMutex m_doChangesMutex;
-#else
-	QMutex m_doChangesMutex;
-#endif
-	QMutex m_waitChangesMutex;
-	QWaitCondition m_changesAudioEngineCondition;
-	QWaitCondition m_changesRequestCondition;
+	std::mutex m_changeMutex;
 
 	bool m_waitingForWrite;
 

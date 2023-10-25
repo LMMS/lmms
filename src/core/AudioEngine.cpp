@@ -67,6 +67,7 @@ namespace lmms
 using LocklessListElement = LocklessList<PlayHandle*>::Element;
 
 static thread_local bool s_renderingThread;
+static thread_local bool s_runningChange;
 
 
 
@@ -89,13 +90,7 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	m_audioDevStartFailed( false ),
 	m_profiler(),
 	m_metronomeActive(false),
-	m_clearSignal( false ),
-	m_changesSignal( false ),
-	m_changes( 0 ),
-#if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
-	m_doChangesMutex( QMutex::Recursive ),
-#endif
-	m_waitingForWrite( false )
+	m_clearSignal(false)
 {
 	for( int i = 0; i < 2; ++i )
 	{
@@ -165,8 +160,6 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 
 AudioEngine::~AudioEngine()
 {
-	runChangesInModel();
-
 	for( int w = 0; w < m_numWorkers; ++w )
 	{
 		m_workers[w]->quit();
@@ -447,8 +440,6 @@ void AudioEngine::renderStageMix()
 
 	emit nextAudioBuffer(m_outputBufferRead);
 
-	runChangesInModel();
-
 	// and trigger LFOs
 	EnvelopeAndLfoParameters::instances()->trigger();
 	Controller::triggerFrameCounter();
@@ -459,6 +450,8 @@ void AudioEngine::renderStageMix()
 
 const surroundSampleFrame *AudioEngine::renderNextBuffer()
 {
+	const auto lock = std::lock_guard{m_changeMutex};
+
 	m_profiler.startPeriod();
 	s_renderingThread = true;
 
@@ -811,57 +804,16 @@ void AudioEngine::removePlayHandlesOfTypes(Track * track, PlayHandle::Types type
 
 void AudioEngine::requestChangeInModel()
 {
-	if( s_renderingThread )
-		return;
-
-	m_changesMutex.lock();
-	m_changes++;
-	m_changesMutex.unlock();
-
-	m_doChangesMutex.lock();
-	m_waitChangesMutex.lock();
-	if (m_isProcessing && !m_waitingForWrite && !m_changesSignal)
-	{
-		m_changesSignal = true;
-		m_changesRequestCondition.wait( &m_waitChangesMutex );
-	}
-	m_waitChangesMutex.unlock();
+	if (s_renderingThread || s_runningChange) { return; }
+	s_runningChange = true;
+	m_changeMutex.lock();
 }
-
-
-
 
 void AudioEngine::doneChangeInModel()
 {
-	if( s_renderingThread )
-		return;
-
-	m_changesMutex.lock();
-	bool moreChanges = --m_changes;
-	m_changesMutex.unlock();
-
-	if( !moreChanges )
-	{
-		m_changesSignal = false;
-		m_changesAudioEngineCondition.wakeOne();
-	}
-	m_doChangesMutex.unlock();
-}
-
-
-
-
-void AudioEngine::runChangesInModel()
-{
-	if( m_changesSignal )
-	{
-		m_waitChangesMutex.lock();
-		// allow changes in the model from other threads ...
-		m_changesRequestCondition.wakeOne();
-		// ... and wait until they are done
-		m_changesAudioEngineCondition.wait( &m_waitChangesMutex );
-		m_waitChangesMutex.unlock();
-	}
+	if (s_renderingThread || !s_runningChange) { return; }
+	s_runningChange = false;
+	m_changeMutex.unlock();
 }
 
 bool AudioEngine::isAudioDevNameValid(QString name)
@@ -1297,29 +1249,12 @@ void AudioEngine::fifoWriter::run()
 		auto buffer = new surroundSampleFrame[frames];
 		const surroundSampleFrame * b = m_audioEngine->renderNextBuffer();
 		memcpy( buffer, b, frames * sizeof( surroundSampleFrame ) );
-		write( buffer );
+		m_fifo->write(buffer);
 	}
 
 	// Let audio backend stop processing
-	write( nullptr );
+	m_fifo->write(nullptr);
 	m_fifo->waitUntilRead();
-}
-
-
-
-
-void AudioEngine::fifoWriter::write( surroundSampleFrame * buffer )
-{
-	m_audioEngine->m_waitChangesMutex.lock();
-	m_audioEngine->m_waitingForWrite = true;
-	m_audioEngine->m_waitChangesMutex.unlock();
-	m_audioEngine->runChangesInModel();
-
-	m_fifo->write( buffer );
-
-	m_audioEngine->m_doChangesMutex.lock();
-	m_audioEngine->m_waitingForWrite = false;
-	m_audioEngine->m_doChangesMutex.unlock();
 }
 
 } // namespace lmms
