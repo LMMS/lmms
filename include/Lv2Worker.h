@@ -50,7 +50,7 @@ public:
 	Lv2Worker(Semaphore* commonWorkLock, bool threaded);
 	~Lv2Worker();
 	void setHandle(LV2_Handle handle);
-	void setInterface(const LV2_Worker_Interface* interface);
+	void setInterface(const LV2_Worker_Interface* new_interface);
 	LV2_Worker_Schedule* feature() { return &m_scheduleFeature; }
 
 	// public API
