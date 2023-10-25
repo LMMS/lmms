@@ -47,17 +47,17 @@ class Lv2Worker
 {
 public:
 	// CTOR/DTOR/feature access
-	Lv2Worker(Semaphore* common_work_lock, bool threaded);
+	Lv2Worker(Semaphore* commonWorkLock, bool threaded);
 	~Lv2Worker();
 	void setHandle(LV2_Handle handle);
-	void setInterface(const LV2_Worker_Interface* iface);
+	void setInterface(const LV2_Worker_Interface* interface);
 	LV2_Worker_Schedule* feature() { return &m_scheduleFeature; }
 
 	// public API
 	void emitResponses();
 	void notifyPluginThatRunFinished()
 	{
-		if(m_iface->end_run) { m_iface->end_run(m_scheduleFeature.handle); }
+		if(m_interface->end_run) { m_interface->end_run(m_scheduleFeature.handle); }
 	}
 
 	// to be called only by static functions
@@ -70,7 +70,7 @@ private:
 	std::size_t bufferSize() const;  //!< size of internal buffers
 
 	// parameters
-	const LV2_Worker_Interface* m_iface;
+	const LV2_Worker_Interface* m_interface;
 	bool m_threaded;
 	LV2_Handle m_handle;
 	LV2_Worker_Schedule m_scheduleFeature;

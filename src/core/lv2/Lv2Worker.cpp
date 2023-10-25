@@ -60,8 +60,7 @@ std::size_t Lv2Worker::bufferSize() const
 
 
 
-Lv2Worker::Lv2Worker(Semaphore* common_work_lock,
-	bool threaded) :
+Lv2Worker::Lv2Worker(Semaphore* commonWorkLock, bool threaded) :
 	m_threaded(threaded),
 	m_response(bufferSize()),
 	m_requests(bufferSize()),
@@ -69,7 +68,7 @@ Lv2Worker::Lv2Worker(Semaphore* common_work_lock,
 	m_requestsReader(m_requests),
 	m_responsesReader(m_responses),
 	m_sem(0),
-	m_workLock(common_work_lock)
+	m_workLock(commonWorkLock)
 {
 	m_scheduleFeature.handle = static_cast<LV2_Worker_Schedule_Handle>(this);
 	m_scheduleFeature.schedule_work = [](LV2_Worker_Schedule_Handle handle,
@@ -93,10 +92,10 @@ void Lv2Worker::setHandle(LV2_Handle handle) { m_handle = handle; }
 
 
 
-void Lv2Worker::setInterface(const LV2_Worker_Interface* iface)
+void Lv2Worker::setInterface(const LV2_Worker_Interface* interface)
 {
-	assert(iface);
-	m_iface = iface;
+	assert(interface);
+	m_interface = interface;
 }
 
 
@@ -131,7 +130,7 @@ LV2_Worker_Status Lv2Worker::respond(uint32_t size, const void* data)
 	}
 	else
 	{
-		m_iface->work_response(m_handle, size, data);
+		m_interface->work_response(m_handle, size, data);
 	}
 	return LV2_WORKER_SUCCESS;
 }
@@ -156,7 +155,7 @@ void Lv2Worker::workerFunc()
 		if(size) { m_requestsReader.read(size).copy(buf.data(), size); }
 
 		m_workLock->wait();
-		m_iface->work(m_handle, staticWorkerRespond, this, size, buf.data());
+		m_interface->work(m_handle, staticWorkerRespond, this, size, buf.data());
 		m_workLock->post();
 	}
 }
@@ -185,7 +184,7 @@ LV2_Worker_Status Lv2Worker::scheduleWork(uint32_t size, const void *data)
 	{
 		// Execute work immediately in this thread
 		m_workLock->wait();
-		m_iface->work(m_handle, staticWorkerRespond, this, size, data);
+		m_interface->work(m_handle, staticWorkerRespond, this, size, data);
 		m_workLock->post();
 	}
 
@@ -203,7 +202,7 @@ void Lv2Worker::emitResponses()
 	while (read_space > sizeof(size)) {
 		m_responsesReader.read(sizeof(size)).copy((char*)&size, sizeof(size));
 		if(size) { m_responsesReader.read(size).copy(m_response.data(), size); }
-		m_iface->work_response(m_handle, size, m_response.data());
+		m_interface->work_response(m_handle, size, m_response.data());
 		read_space -= sizeof(size) + size;
 	}
 }
