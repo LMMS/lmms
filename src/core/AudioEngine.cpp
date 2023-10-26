@@ -84,7 +84,6 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	m_newPlayHandles( PlayHandle::MaxNumber ),
 	m_qualitySettings( qualitySettings::Mode::Draft ),
 	m_masterGain( 1.0f ),
-	m_isProcessing( false ),
 	m_audioDev( nullptr ),
 	m_oldAudioDev( nullptr ),
 	m_audioDevStartFailed( false ),
@@ -225,8 +224,6 @@ void AudioEngine::startProcessing(bool needsFifo)
 	}
 
 	m_audioDev->startProcessing();
-
-	m_isProcessing = true;
 }
 
 
@@ -234,8 +231,6 @@ void AudioEngine::startProcessing(bool needsFifo)
 
 void AudioEngine::stopProcessing()
 {
-	m_isProcessing = false;
-
 	if( m_fifoWriter != nullptr )
 	{
 		m_fifoWriter->finish();

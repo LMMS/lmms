@@ -448,8 +448,6 @@ private:
 	struct qualitySettings m_qualitySettings;
 	float m_masterGain;
 
-	bool m_isProcessing;
-
 	// audio device stuff
 	void doSetAudioDevice( AudioDevice *_dev );
 	AudioDevice * m_audioDev;
