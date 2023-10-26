@@ -114,10 +114,10 @@ std::unique_ptr<SampleBuffer> SampleRecordHandle::createSampleBuffer()
 
 	// now copy all buffers into big buffer
 	auto framesCopied = 0;
-	for (auto& buffer : m_buffers)
+	for (const auto& [buf, numFrames] : m_buffers)
 	{
-		std::copy_n(buffer.first, buffer.second, bigBuffer.begin() + framesCopied);
-		framesCopied += buffer.second;
+		std::copy_n(buf, numFrames, bigBuffer.begin() + framesCopied);
+		framesCopied += numFrames;
 	}
 
 	// create according sample-buffer out of big buffer
