@@ -477,8 +477,6 @@ private:
 
 	std::mutex m_changeMutex;
 
-	bool m_waitingForWrite;
-
 	friend class Engine;
 	friend class AudioEngineWorkerThread;
 	friend class ProjectRenderer;
