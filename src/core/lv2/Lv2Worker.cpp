@@ -92,10 +92,10 @@ void Lv2Worker::setHandle(LV2_Handle handle) { m_handle = handle; }
 
 
 
-void Lv2Worker::setInterface(const LV2_Worker_Interface* new_interface)
+void Lv2Worker::setInterface(const LV2_Worker_Interface* newInterface)
 {
-	assert(new_interface);
-	m_interface = new_interface;
+	assert(newInterface);
+	m_interface = newInterface;
 }
 
 
