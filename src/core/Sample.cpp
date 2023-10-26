@@ -259,7 +259,8 @@ void Sample::visualize(QPainter& p, const QRect& dr, int fromFrame, int toFrame)
 auto Sample::sampleDuration() const -> std::chrono::milliseconds
 {
 	const auto lock = std::shared_lock{m_mutex};
-	const auto duration = m_buffer->size() / static_cast<float>(m_buffer->sampleRate()) * 1000;
+	const auto numFrames = m_endFrame - m_startFrame;
+	const auto duration = numFrames / static_cast<float>(m_buffer->sampleRate()) * 1000;
 	return std::chrono::milliseconds{static_cast<int>(duration)};
 }
 
