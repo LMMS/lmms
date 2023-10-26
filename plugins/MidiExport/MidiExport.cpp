@@ -134,9 +134,10 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 					// in frames. We try to fetch it and convert to the length in ticks. If there's no beat
 					// length in XML, the default beat length of 16 ticks will be used.
 					QDomNode iNode = it.elementsByTagName("instrument").at(0);
-					if(!iNode.isNull()){
+					if (!iNode.isNull())
+					{
 						QDomElement i = iNode.toElement();
-						if(i.hasAttribute("beatlen"))
+						if (i.hasAttribute("beatlen"))
 						{
 							base_beatLen = i.attribute("beatlen", "0").toInt() / Engine::framesPerTick();
 						}
@@ -216,9 +217,11 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 				}
 				base_volume = LocaleHelper::toDouble(it.attribute("volume", "100")) / 100.0;
 				QDomNode iNode = it.elementsByTagName("instrument").at(0);
-				if(!iNode.isNull()){
+				if (!iNode.isNull())
+				{
 					QDomElement i = iNode.toElement();
-					if(i.hasAttribute("beatlen")){
+					if (i.hasAttribute("beatlen"))
+					{
 						base_beatLen = i.attribute("beatlen", "0").toInt()/Engine::framesPerTick();
 					}
 				}
