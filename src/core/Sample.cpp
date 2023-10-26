@@ -132,18 +132,18 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, int numFrames, float d
 		if (state->m_frameIndex >= m_endFrame) { return false; }
 		break;
 	case Loop::On:
-		if (state->m_frameIndex >= m_endFrame) { state->m_frameIndex = m_startFrame; }
+		if (state->m_frameIndex >= m_loopEndFrame) { state->m_frameIndex = m_loopStartFrame; }
 		break;
 	case Loop::PingPong:
-		if (state->m_backwards && state->m_frameIndex <= m_startFrame)
+		if (state->m_backwards && state->m_frameIndex <= m_loopStartFrame)
 		{
 			state->m_backwards = false;
-			state->m_frameIndex = m_startFrame;
+			state->m_frameIndex = m_loopStartFrame;
 		}
-		else if (!state->m_backwards && state->m_frameIndex >= m_endFrame)
+		else if (!state->m_backwards && state->m_frameIndex >= m_loopEndFrame)
 		{
 			state->m_backwards = true;
-			state->m_frameIndex = m_endFrame - 1;
+			state->m_frameIndex = m_loopEndFrame - 1;
 		}
 		break;
 	default:
