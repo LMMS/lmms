@@ -29,6 +29,7 @@
 
 #include "ConfigManager.h"
 #include "FileDialog.h"
+#include "GuiApplication.h"
 #include "PathUtil.h"
 #include "Song.h"
 
@@ -108,7 +109,7 @@ std::unique_ptr<SampleBuffer> SampleLoader::createBufferFromFile(const QString& 
 	}
 	catch (const std::runtime_error& error)
 	{
-		displayError(QString::fromStdString(error.what()));
+		if (getGUI()) { displayError(QString::fromStdString(error.what())); }
 		return std::make_unique<SampleBuffer>();
 	}
 }
@@ -123,7 +124,7 @@ std::unique_ptr<SampleBuffer> SampleLoader::createBufferFromBase64(const QString
 	}
 	catch (const std::runtime_error& error)
 	{
-		displayError(QString::fromStdString(error.what()));
+		if (getGUI()) { displayError(QString::fromStdString(error.what())); }
 		return std::make_unique<SampleBuffer>();
 	}
 }
