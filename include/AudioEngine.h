@@ -419,10 +419,6 @@ private:
 
 	void clearInternal();
 
-	//! Called by the audio thread to give control to other threads,
-	//! such that they can do changes in the model (like e.g. removing effects)
-	void runChangesInModel();
-
 	bool m_renderOnly;
 
 	std::vector<AudioPort *> m_audioPorts;
