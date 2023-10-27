@@ -70,9 +70,9 @@ private:
 	std::size_t bufferSize() const;  //!< size of internal buffers
 
 	// parameters
-	const LV2_Worker_Interface* m_interface;
-	bool m_threaded;
-	LV2_Handle m_handle;
+	const bool m_threaded;
+	const LV2_Worker_Interface* m_interface = nullptr;
+	LV2_Handle m_handle = nullptr;
 	LV2_Worker_Schedule m_scheduleFeature;
 
 	// threading/synchronization

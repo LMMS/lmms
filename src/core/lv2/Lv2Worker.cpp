@@ -87,7 +87,11 @@ Lv2Worker::Lv2Worker(Semaphore* commonWorkLock, bool threaded) :
 
 
 
-void Lv2Worker::setHandle(LV2_Handle handle) { m_handle = handle; }
+void Lv2Worker::setHandle(LV2_Handle handle)
+{
+	assert(handle);
+	m_handle = handle;
+}
 
 
 
@@ -130,6 +134,8 @@ LV2_Worker_Status Lv2Worker::respond(uint32_t size, const void* data)
 	}
 	else
 	{
+		assert(m_handle);
+		assert(m_interface);
 		m_interface->work_response(m_handle, size, data);
 	}
 	return LV2_WORKER_SUCCESS;
@@ -146,6 +152,7 @@ void Lv2Worker::workerFunc()
 	while (true) {
 		m_sem.wait();
 		if (m_exit) { break; }
+
 		const std::size_t readSpace = m_requestsReader.read_space();
 		if (readSpace <= sizeof(size)) { continue; } // (should not happen)
 
@@ -154,6 +161,8 @@ void Lv2Worker::workerFunc()
 		if(size > buf.size()) { buf.resize(size); }
 		if(size) { m_requestsReader.read(size).copy(buf.data(), size); }
 
+		assert(m_handle);
+		assert(m_interface);
 		m_workLock->wait();
 		m_interface->work(m_handle, staticWorkerRespond, this, size, buf.data());
 		m_workLock->post();
@@ -182,6 +191,8 @@ LV2_Worker_Status Lv2Worker::scheduleWork(uint32_t size, const void *data)
 	}
 	else
 	{
+		assert(m_handle);
+		assert(m_interface);
 		// Execute work immediately in this thread
 		m_workLock->wait();
 		m_interface->work(m_handle, staticWorkerRespond, this, size, data);
@@ -199,7 +210,10 @@ void Lv2Worker::emitResponses()
 {
 	std::size_t read_space = m_responsesReader.read_space();
 	uint32_t size;
-	while (read_space > sizeof(size)) {
+	while (read_space > sizeof(size))
+	{
+		assert(m_handle);
+		assert(m_interface);
 		m_responsesReader.read(sizeof(size)).copy((char*)&size, sizeof(size));
 		if(size) { m_responsesReader.read(size).copy(m_response.data(), size); }
 		m_interface->work_response(m_handle, size, m_response.data());
