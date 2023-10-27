@@ -57,13 +57,10 @@ SampleBuffer::SampleBuffer(const QString& base64, int sampleRate)
 	: m_sampleRate(sampleRate)
 {
 	// TODO: Replace with non-Qt equivalent
-	if (auto result = QByteArray::fromBase64Encoding(base64.toUtf8()))
-	{
-		auto& data = result.decoded;
-		auto begin = reinterpret_cast<sampleFrame*>(data.begin());
-		auto end = begin + data.size() / sizeof(sampleFrame);
-		m_data = std::vector<sampleFrame>(begin, end);
-	}
+	auto data = QByteArray::fromBase64(base64.toUtf8());
+	auto begin = reinterpret_cast<sampleFrame*>(data.begin());
+	auto end = begin + data.size() / sizeof(sampleFrame);
+	m_data = std::vector<sampleFrame>(begin, end);
 }
 
 SampleBuffer::SampleBuffer(std::vector<sampleFrame> data, int sampleRate)
