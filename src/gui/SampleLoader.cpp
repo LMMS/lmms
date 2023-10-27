@@ -120,7 +120,7 @@ std::unique_ptr<SampleBuffer> SampleLoader::createBufferFromBase64(const QString
 
 	try
 	{
-		return std::make_unique<SampleBuffer>(base64.toUtf8().toBase64(), sampleRate);
+		return std::make_unique<SampleBuffer>(base64, sampleRate);
 	}
 	catch (const std::runtime_error& error)
 	{
