@@ -22,8 +22,6 @@
  *
  */
 
-// TODO: restructure most of the interaction code into mouseMoveEvent
-
 #include "SlicerTWaveform.h"
 
 #include <QBitmap>
@@ -69,7 +67,7 @@ SlicerTWaveform::SlicerTWaveform(int w, int h, SlicerT* instrument, QWidget* par
 
 	// preprocess icons
 	m_emptySampleIcon = m_emptySampleIcon.createMaskFromColor(QColor(255, 255, 255), Qt::MaskMode::MaskOutColor);
-	
+
 	updateUI();
 }
 
@@ -116,15 +114,15 @@ void SlicerTWaveform::drawSeeker()
 	brush.fillRect(noteStartPosX, 0, noteEndPosX, m_seekerHeight, s_playHighlighColor);
 
 	// highlight on selected area
-	brush.fillRect(seekerStartPosX, 0, seekerMiddleWidth, m_seekerHeight, s_seekerHighlightColor);
+	brush.fillRect(seekerStartPosX, 0, seekerMiddleWidth - 1, m_seekerHeight, s_seekerHighlightColor);
 
 	// shadow on not selected area
 	brush.fillRect(0, 0, seekerStartPosX, m_seekerHeight, s_seekerShadowColor);
-	brush.fillRect(seekerEndPosX, 0, m_seekerWidth, m_seekerHeight, s_seekerShadowColor);
+	brush.fillRect(seekerEndPosX - 1, 0, m_seekerWidth, m_seekerHeight, s_seekerShadowColor);
 
 	// draw border around selection
 	brush.setPen(QPen(s_seekerColor, 1));
-	brush.drawRoundedRect(seekerStartPosX, 0, seekerMiddleWidth - 1, m_seekerHeight - 1, 0, 0); // -1 needed
+	brush.drawRect(seekerStartPosX, 0, seekerMiddleWidth - 1, m_seekerHeight - 1); // -1 needed
 }
 
 void SlicerTWaveform::drawEditor()
@@ -166,20 +164,12 @@ void SlicerTWaveform::drawEditor()
 	{
 		float xPos = (m_slicerTParent->m_slicePoints.at(i) - startFrame) / numFramesToDraw * m_editorWidth;
 
-		if (i == m_sliceSelected) { brush.setPen(QPen(s_selectedSliceColor, 2)); }
+		if (i == m_closestSlice) { brush.setPen(QPen(s_selectedSliceColor, 2)); }
 		else { brush.setPen(QPen(s_sliceColor, 2)); }
 
 		brush.drawLine(xPos, 0, xPos, m_editorHeight);
 		brush.drawPixmap(xPos - m_sliceArrow.width() / 2.0f, 0, m_sliceArrow);
 	}
-}
-
-void SlicerTWaveform::updateUI()
-{
-	drawSeekerSlicerTWaveform();
-	drawSeeker();
-	drawEditor();
-	update();
 }
 
 void SlicerTWaveform::isPlaying(float current, float start, float end)
@@ -191,39 +181,41 @@ void SlicerTWaveform::isPlaying(float current, float start, float end)
 	update();
 }
 
-// events
-void SlicerTWaveform::mousePressEvent(QMouseEvent* me)
+void SlicerTWaveform::updateUI()
+{
+	drawSeekerSlicerTWaveform();
+	drawSeeker();
+	drawEditor();
+	update();
+}
+
+// updates the closest object and changes the cursor respectivly
+void SlicerTWaveform::updateClosest(QMouseEvent* me)
 {
 	float normalizedClickSeeker = static_cast<float>(me->x() - m_seekerHorMargin) / m_seekerWidth;
 	float normalizedClickEditor = static_cast<float>(me->x()) / m_editorWidth;
-	// reset seeker on middle click
-	if (me->button() == Qt::MouseButton::MiddleButton)
-	{
-		m_seekerStart = 0;
-		m_seekerEnd = 1;
-		m_zoomLevel = 1;
-		return;
-	}
+
+	m_closestObject = DraggingTypes::Nothing;
+	m_closestSlice = -1;
 
 	if (me->y() < m_seekerHeight) // seeker click
 	{
 		if (std::abs(normalizedClickSeeker - m_seekerStart) < s_distanceForClick) // dragging start
 		{
-			m_currentlyDragging = DraggingTypes::SeekerStart;
+			m_closestObject = DraggingTypes::SeekerStart;
 		}
 		else if (std::abs(normalizedClickSeeker - m_seekerEnd) < s_distanceForClick) // dragging end
 		{
-			m_currentlyDragging = DraggingTypes::SeekerEnd;
+			m_closestObject = DraggingTypes::SeekerEnd;
 		}
 		else if (normalizedClickSeeker > m_seekerStart && normalizedClickSeeker < m_seekerEnd) // dragging middle
 		{
-			m_currentlyDragging = DraggingTypes::SeekerMiddle;
-			m_seekerMiddle = normalizedClickSeeker;
+			m_closestObject = DraggingTypes::SeekerMiddle;
 		}
 	}
 	else // editor click
 	{
-		m_sliceSelected = -1;
+		m_closestSlice = -1;
 		float startFrame = m_seekerStart * m_slicerTParent->m_originalSample.frames();
 		float endFrame = m_seekerEnd * m_slicerTParent->m_originalSample.frames();
 		// select slice
@@ -234,38 +226,82 @@ void SlicerTWaveform::mousePressEvent(QMouseEvent* me)
 
 			if (std::abs(xPos - normalizedClickEditor) < s_distanceForClick)
 			{
-				m_currentlyDragging = DraggingTypes::SlicePoint;
-				m_sliceSelected = i;
+				m_closestObject = DraggingTypes::SlicePoint;
+				m_closestSlice = i;
 			}
 		}
 	}
+	updateCursor();
+}
 
-	if (me->button() == Qt::MouseButton::RightButton) // erase selected slice
+void SlicerTWaveform::updateCursor()
+{
+	if (m_closestObject == DraggingTypes::SlicePoint || m_closestObject == DraggingTypes::SeekerStart
+		|| m_closestObject == DraggingTypes::SeekerEnd)
 	{
-		if (m_sliceSelected != -1 && m_slicerTParent->m_slicePoints.size() > 2)
-		{
-			m_slicerTParent->m_slicePoints.erase(m_slicerTParent->m_slicePoints.begin() + m_sliceSelected);
-			m_sliceSelected = -1;
-		}
+		setCursor(Qt::SizeHorCursor);
+	}
+	else if (m_closestObject == DraggingTypes::SeekerMiddle && m_seekerEnd - m_seekerStart != 1.0f)
+	{
+		setCursor(Qt::SizeAllCursor);
+	}
+	else { setCursor(Qt::ArrowCursor); }
+}
+
+// handles reset, deletion and sets what to drag
+void SlicerTWaveform::mousePressEvent(QMouseEvent* me)
+{
+
+	updateClosest(me);
+
+	// reset seeker on middle click
+	if (me->button() == Qt::MouseButton::MiddleButton)
+	{
+		m_seekerStart = 0;
+		m_seekerEnd = 1;
+		m_zoomLevel = 1;
+		return;
+	}
+
+	if (me->button() == Qt::MouseButton::LeftButton)
+	{
+		m_draggedObject = m_closestObject;
+		m_sliceDragged = m_closestSlice;
+		// update seeker middle for correct movement
+		m_seekerMiddle = static_cast<float>(me->x() - m_seekerHorMargin) / m_seekerWidth;
+	}
+
+	// delete closesd slice to mouse
+	if (me->button() == Qt::MouseButton::RightButton && m_slicerTParent->m_slicePoints.size() > 2
+		&& m_closestObject == DraggingTypes::SlicePoint)
+	{
+		m_slicerTParent->m_slicePoints.erase(m_slicerTParent->m_slicePoints.begin() + m_closestSlice);
+		updateClosest(me);
 	}
 	updateUI();
 }
 
+// sort slices after moving and remove draggable object
 void SlicerTWaveform::mouseReleaseEvent(QMouseEvent* me)
 {
-	m_currentlyDragging = DraggingTypes::Nothing;
+	updateClosest(me);
+	m_draggedObject = DraggingTypes::Nothing;
 	std::sort(m_slicerTParent->m_slicePoints.begin(), m_slicerTParent->m_slicePoints.end());
-
 	updateUI();
 }
 
+// this handles dragging and mouse cursor changes
+// what is being dragged is determined in mousePressEvent
 void SlicerTWaveform::mouseMoveEvent(QMouseEvent* me)
 {
-	// Do nothing if no button pressed
-	if (me->buttons() == Qt::MouseButton::NoButton) 
-	{ 
-		m_currentlyDragging = DraggingTypes::Nothing;
+	// update for mouse changes
+	updateClosest(me);
 
+	// Do nothing if no button pressed
+	if (me->buttons() == Qt::MouseButton::NoButton)
+	{
+		updateUI();
+		return;
 	}
 
 	float normalizedClickSeeker = static_cast<float>(me->x() - m_seekerHorMargin) / m_seekerWidth;
@@ -277,7 +313,7 @@ void SlicerTWaveform::mouseMoveEvent(QMouseEvent* me)
 	float endFrame = m_seekerEnd * m_slicerTParent->m_originalSample.frames();
 
 	// handle dragging events
-	switch (m_currentlyDragging)
+	switch (m_draggedObject)
 	{
 	case DraggingTypes::SeekerStart:
 		m_seekerStart = std::clamp(normalizedClickSeeker, 0.0f, m_seekerEnd - s_minSeekerDistance);
@@ -298,11 +334,11 @@ void SlicerTWaveform::mouseMoveEvent(QMouseEvent* me)
 		break;
 
 	case DraggingTypes::SlicePoint:
-		if (m_sliceSelected == -1) { break; }
-		m_slicerTParent->m_slicePoints.at(m_sliceSelected)
+		if (m_sliceDragged == -1) { break; }
+		m_slicerTParent->m_slicePoints.at(m_sliceDragged)
 			= startFrame + normalizedClickEditor * (endFrame - startFrame);
-		m_slicerTParent->m_slicePoints.at(m_sliceSelected) = std::clamp(
-			m_slicerTParent->m_slicePoints.at(m_sliceSelected), 0, m_slicerTParent->m_originalSample.frames());
+		m_slicerTParent->m_slicePoints.at(m_sliceDragged) = std::clamp(
+			m_slicerTParent->m_slicePoints.at(m_sliceDragged), 0, m_slicerTParent->m_originalSample.frames());
 		break;
 	case DraggingTypes::Nothing:
 		break;
@@ -312,21 +348,14 @@ void SlicerTWaveform::mouseMoveEvent(QMouseEvent* me)
 
 void SlicerTWaveform::mouseDoubleClickEvent(QMouseEvent* me)
 {
+	if (me->button() != Qt::MouseButton::LeftButton) { return; }
+
 	float normalizedClickEditor = static_cast<float>(me->x()) / m_editorWidth;
 	float startFrame = m_seekerStart * m_slicerTParent->m_originalSample.frames();
 	float endFrame = m_seekerEnd * m_slicerTParent->m_originalSample.frames();
-
 	float slicePosition = startFrame + normalizedClickEditor * (endFrame - startFrame);
 
-	for (int i = 0; i < m_slicerTParent->m_slicePoints.size(); i++)
-	{
-		if (m_slicerTParent->m_slicePoints.at(i) < slicePosition)
-		{
-			m_slicerTParent->m_slicePoints.insert(m_slicerTParent->m_slicePoints.begin() + i, slicePosition);
-			break;
-		}
-	}
-
+	m_slicerTParent->m_slicePoints.insert(m_slicerTParent->m_slicePoints.begin(), slicePosition);
 	std::sort(m_slicerTParent->m_slicePoints.begin(), m_slicerTParent->m_slicePoints.end());
 }
 

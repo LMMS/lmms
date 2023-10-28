@@ -70,8 +70,8 @@ public:
 	const QColor s_seekerHighlightColor = QColor(178, 115, 255, 100);
 	const QColor s_seekerShadowColor = QColor(0, 0, 0, 120);
 
-	// interaction vars
-	static constexpr float s_distanceForClick = 0.03f;
+	// interaction behavior values
+	static constexpr float s_distanceForClick = 0.02f;
 	static constexpr float s_minSeekerDistance = 0.13f;
 	static constexpr float s_zoomSensitivity = 0.5f;
 
@@ -103,14 +103,16 @@ private:
 	int m_editorHeight;
 	int m_editorWidth;
 
-	// dragging vars
-	DraggingTypes m_currentlyDragging;
+	// interaction vars
+	DraggingTypes m_draggedObject;
+	DraggingTypes m_closestObject;
+	int m_closestSlice = -1;
+	int m_sliceDragged = -1;
 
 	// seeker vars
 	float m_seekerStart = 0;
 	float m_seekerEnd = 1;
 	float m_seekerMiddle = 0.5f;
-	int m_sliceSelected = 0;
 
 	// playback highlight vars
 	float m_noteCurrent;
@@ -132,6 +134,9 @@ private:
 	void drawEditor();
 	void drawSeekerSlicerTWaveform();
 	void drawSeeker();
+
+	void updateClosest(QMouseEvent* me);
+	void updateCursor();
 };
 } // namespace gui
 } // namespace lmms
