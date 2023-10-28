@@ -22,6 +22,7 @@
  *
  */
 
+#include <QDebug>
 #include "Lv2Effect.h"
 
 
@@ -109,8 +110,13 @@ extern "C"
 PLUGIN_EXPORT Plugin *lmms_plugin_main(Model *_parent, void *_data)
 {
 	using KeyType = Plugin::Descriptor::SubPluginFeatures::Key;
-	auto eff = new Lv2Effect(_parent, static_cast<const KeyType*>(_data));
-	if (!eff->isValid()) { delete eff; eff = nullptr; }
+	Lv2Effect* eff;
+	try {
+		eff = new Lv2Effect(_parent, static_cast<const KeyType*>(_data));
+	} catch (const std::runtime_error& e) {
+		qCritical() << e.what();
+		eff = nullptr;
+	}
 	return eff;
 }
 
