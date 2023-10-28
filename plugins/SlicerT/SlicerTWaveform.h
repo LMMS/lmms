@@ -57,14 +57,17 @@ public:
 	static constexpr int m_middleMargin = 6;
 
 	// colors
-	const QColor s_SlicerTWaveformBgColor = QColor(255, 255, 255, 0);
-	const QColor s_SlicerTWaveformColor = QColor(123, 49, 212);
+	const QColor s_emptyColor = QColor(0, 0, 0, 0);
+	
+	const QColor s_waveformColor = QColor(123, 49, 212);
+	const QColor s_waveformBgColor = QColor(255, 255, 255, 0);
 
 	const QColor s_playColor = QColor(255, 255, 255, 200);
-	const QColor s_playHighlighColor = QColor(255, 255, 255, 70);
+	const QColor s_playHighlightColor = QColor(255, 255, 255, 70);
 
 	const QColor s_sliceColor = QColor(218, 193, 255);
-	const QColor s_selectedSliceColor = QColor(178, 153, 215);
+	const QColor s_sliceShadowColor = QColor(136, 120, 158);
+	const QColor s_sliceHighlightColor = QColor(255, 255, 255);
 
 	const QColor s_seekerColor = QColor(178, 115, 255);
 	const QColor s_seekerHighlightColor = QColor(178, 115, 255, 100);
@@ -75,7 +78,7 @@ public:
 	static constexpr float s_minSeekerDistance = 0.13f;
 	static constexpr float s_zoomSensitivity = 0.5f;
 
-	enum class DraggingTypes
+	enum class UIObjects
 	{
 		Nothing,
 		SeekerStart,
@@ -104,10 +107,11 @@ private:
 	int m_editorWidth;
 
 	// interaction vars
-	DraggingTypes m_draggedObject;
-	DraggingTypes m_closestObject;
+	UIObjects m_draggedObject;
+	UIObjects m_closestObject;
 	int m_closestSlice = -1;
 	int m_sliceDragged = -1;
+	bool m_currentlyDragging = false;
 
 	// seeker vars
 	float m_seekerStart = 0;
@@ -125,15 +129,17 @@ private:
 	// pixmaps
 	QPixmap m_sliceArrow;
 	QPixmap m_seeker;
-	QPixmap m_seekerSlicerTWaveform; // only stores SlicerTWaveform graphic
+	QPixmap m_seekerWaveform; // only stores SlicerTWaveform graphic
+	QPixmap m_editorWaveform;
 	QPixmap m_sliceEditor;
 	QPixmap m_emptySampleIcon;
 
 	SlicerT* m_slicerTParent;
 
-	void drawEditor();
-	void drawSeekerSlicerTWaveform();
+	void drawSeekerWaveform();
 	void drawSeeker();
+	void drawEditorWaveform();
+	void drawEditor();
 
 	void updateClosest(QMouseEvent* me);
 	void updateCursor();
