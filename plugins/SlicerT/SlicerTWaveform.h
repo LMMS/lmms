@@ -58,9 +58,11 @@ public:
 
 	// colors
 	const QColor s_emptyColor = QColor(0, 0, 0, 0);
-	
+
 	const QColor s_waveformColor = QColor(123, 49, 212);
 	const QColor s_waveformBgColor = QColor(255, 255, 255, 0);
+	const QColor s_waveformMaskColor = QColor(151, 65, 255); // update this if s_waveformColor changes
+	const QColor s_waveformInnerColor = QColor(183, 124, 255);
 
 	const QColor s_playColor = QColor(255, 255, 255, 200);
 	const QColor s_playHighlightColor = QColor(255, 255, 255, 70);

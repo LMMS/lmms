@@ -81,6 +81,11 @@ void SlicerTWaveform::drawSeekerWaveform()
 
 	m_slicerTParent->m_originalSample.visualize(brush, QRect(0, 0, m_seekerWaveform.width(), m_seekerWaveform.height()),
 		0, m_slicerTParent->m_originalSample.frames());
+
+	// increase brightness in inner color
+	QBitmap innerMask = m_seekerWaveform.createMaskFromColor(s_waveformMaskColor, Qt::MaskMode::MaskOutColor);
+	brush.setPen(s_waveformInnerColor);
+	brush.drawPixmap(0, 0, innerMask);
 }
 
 void SlicerTWaveform::drawSeeker()
@@ -139,6 +144,11 @@ void SlicerTWaveform::drawEditorWaveform()
 	float zoomOffset = (m_editorHeight - m_zoomLevel * m_editorHeight) / 2;
 	m_slicerTParent->m_originalSample.visualize(
 		brush, QRect(0, zoomOffset, m_editorWidth, m_zoomLevel * m_editorHeight), startFrame, endFrame);
+
+	// increase brightness in inner color
+	QBitmap innerMask = m_editorWaveform.createMaskFromColor(s_waveformMaskColor, Qt::MaskMode::MaskOutColor);
+	brush.setPen(s_waveformInnerColor);
+	brush.drawPixmap(0, 0, innerMask);
 }
 
 void SlicerTWaveform::drawEditor()

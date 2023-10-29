@@ -42,19 +42,6 @@ class SlicerT;
 
 namespace gui {
 
-// style knob, defined in data/themes/default/style.css#L949
-class SlicerTKnob : public Knob
-{
-public:
-	SlicerTKnob(QWidget* _parent)
-		: Knob(KnobType::Styled, _parent)
-	{
-		setFixedSize(50, 40);
-		setCenterPointX(24.0);
-		setCenterPointY(15.0);
-	}
-};
-
 class SlicerTView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
@@ -64,6 +51,11 @@ protected slots:
 
 public:
 	SlicerTView(SlicerT* instrument, QWidget* parent);
+
+	static constexpr int textBoxHeight = 20;
+	static constexpr int textBoxWidth = 50;
+	static constexpr int topTextY = 170;
+	static constexpr int bottomTextY = 220;
 
 protected:
 	virtual void dragEnterEvent(QDragEnterEvent* _dee);
@@ -75,17 +67,19 @@ private:
 	SlicerT* m_slicerTParent;
 
 	// lmms UI
-	SlicerTKnob m_noteThresholdKnob;
-	SlicerTKnob m_fadeOutKnob;
+	Knob* m_noteThresholdKnob;
+	Knob* m_fadeOutKnob;
 	LcdSpinBox m_bpmBox;
 	ComboBox m_snapSetting;
 	LedCheckBox m_syncToggle;
 
 	// buttons
-	PixmapButton m_resetButton;
-	PixmapButton m_midiExportButton;
+	QPushButton m_resetButton;
+	QPushButton m_midiExportButton;
 
 	SlicerTWaveform m_wf;
+
+	Knob* createStyledKnob();
 };
 } // namespace gui
 } // namespace lmms

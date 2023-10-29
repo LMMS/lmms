@@ -44,13 +44,11 @@ namespace gui {
 SlicerTView::SlicerTView(SlicerT* instrument, QWidget* parent)
 	: InstrumentViewFixedSize(instrument, parent)
 	, m_slicerTParent(instrument)
-	, m_noteThresholdKnob(this)
-	, m_fadeOutKnob(this)
-	, m_bpmBox(3, "21pink", this)
+	, m_bpmBox(3, "19purple", this)
 	, m_snapSetting(this, tr("Slice snap"))
 	, m_syncToggle("Sync", this, tr("SyncToggle"), LedCheckBox::LedColor::Green)
-	, m_resetButton(this, nullptr)
-	, m_midiExportButton(this, nullptr)
+	, m_resetButton(this)
+	, m_midiExportButton(this)
 	, m_wf(248, 128, instrument, this)
 {
 	// window settings
@@ -76,36 +74,46 @@ SlicerTView::SlicerTView(SlicerT* instrument, QWidget* parent)
 	m_syncToggle.setModel(&m_slicerTParent->m_enableSync);
 
 	// bpm spin box
-	m_bpmBox.move(130, 203);
+	m_bpmBox.move(130, 201);
 	m_bpmBox.setToolTip(tr("Original sample BPM"));
-	m_bpmBox.setLabel(tr("BPM"));
+	/* m_bpmBox.setLabel(tr("BPM")); */
 	m_bpmBox.setModel(&m_slicerTParent->m_originalBPM);
 
 	// threshold knob
-	m_noteThresholdKnob.move(9, 195);
-	m_noteThresholdKnob.setToolTip(tr("Threshold used for slicing"));
-	m_noteThresholdKnob.setLabel(tr("Threshold"));
-	m_noteThresholdKnob.setModel(&m_slicerTParent->m_noteThreshold);
+	m_noteThresholdKnob = createStyledKnob();
+	m_noteThresholdKnob->move(10, 197);
+	m_noteThresholdKnob->setToolTip(tr("Threshold used for slicing"));
+	/* m_noteThresholdKnob->setLabel(tr("Threshold")); */
+	m_noteThresholdKnob->setModel(&m_slicerTParent->m_noteThreshold);
 
 	// fadeout knob
-	m_fadeOutKnob.move(75, 195);
-	m_fadeOutKnob.setToolTip(tr("Fade Out for notes"));
-	m_fadeOutKnob.setLabel(tr("Fade Out"));
-	m_fadeOutKnob.setModel(&m_slicerTParent->m_fadeOutFrames);
+	m_fadeOutKnob = createStyledKnob();
+	m_fadeOutKnob->move(64, 197);
+	m_fadeOutKnob->setToolTip(tr("Fade Out for notes"));
+	/* m_fadeOutKnob->setLabel(tr("Fade Out")); */
+	m_fadeOutKnob->setModel(&m_slicerTParent->m_fadeOutFrames);
 
 	// midi copy button
-	m_midiExportButton.move(215, 150);
-	m_midiExportButton.setActiveGraphic(PLUGIN_NAME::getIconPixmap("copyMidi"));
-	m_midiExportButton.setInactiveGraphic(PLUGIN_NAME::getIconPixmap("copyMidi"));
+	m_midiExportButton.move(199, 150);
+	m_midiExportButton.setIcon(PLUGIN_NAME::getIconPixmap("copyMidi"));
 	m_midiExportButton.setToolTip(tr("Copy midi pattern to clipboard"));
 	connect(&m_midiExportButton, &PixmapButton::clicked, this, &SlicerTView::exportMidi);
 
 	// slice reset button
-	m_resetButton.move(19, 150);
-	m_resetButton.setActiveGraphic(PLUGIN_NAME::getIconPixmap("resetSlices"));
-	m_resetButton.setInactiveGraphic(PLUGIN_NAME::getIconPixmap("resetSlices"));
+	m_resetButton.move(18, 150);
+	m_resetButton.setIcon(PLUGIN_NAME::getIconPixmap("resetSlices"));
 	m_resetButton.setToolTip(tr("Reset Slices"));
 	connect(&m_resetButton, &PixmapButton::clicked, m_slicerTParent, &SlicerT::updateSlices);
+}
+
+// style knob, defined in data/themes/default/style.css#L949
+Knob* SlicerTView::createStyledKnob()
+{
+	Knob* newKnob = new Knob(KnobType::Styled, this);
+	newKnob->setFixedSize(50, 40);
+	newKnob->setCenterPointX(24.0);
+	newKnob->setCenterPointY(15.0);
+	return newKnob;
 }
 
 // copied from piano roll
@@ -177,10 +185,17 @@ void SlicerTView::paintEvent(QPaintEvent* pe)
 {
 	QPainter brush(this);
 	brush.setPen(QColor(255, 255, 255));
-	brush.setFont(QFont(brush.font().family(), 7.5f, -1, false));
-	brush.drawText(212, 165, 25, 20, Qt::AlignCenter, tr("Midi"));
-	brush.drawText(14, 165, 30, 20, Qt::AlignCenter, tr("Reset"));
-	brush.drawText(185, 217, 55, 20, Qt::AlignCenter, tr("Snap"));
+	brush.setFont(QFont(brush.font().family(), 7, -1, false));
+
+	// top text
+	brush.drawText(8, topTextY, textBoxWidth, textBoxHeight, Qt::AlignCenter, tr("Reset"));
+	brush.drawText(188, topTextY, textBoxWidth, textBoxHeight, Qt::AlignCenter, tr("Midi"));
+
+	// bottom text
+	brush.drawText(8, bottomTextY, textBoxWidth, textBoxHeight, Qt::AlignCenter, tr("Threshold"));
+	brush.drawText(63, bottomTextY, textBoxWidth, textBoxHeight, Qt::AlignCenter, tr("Fade Out"));
+	brush.drawText(127, bottomTextY, textBoxWidth, textBoxHeight, Qt::AlignCenter, tr("BPM"));
+	brush.drawText(188, bottomTextY, textBoxWidth, textBoxHeight, Qt::AlignCenter, tr("Snap"));
 }
 
 } // namespace gui
