@@ -328,68 +328,63 @@ void FileBrowser::addItems(const QString & path )
 	}
 
 	// try to add all directories from file system alphabetically into the tree
-	QDir cdir( path );
-	QStringList files = cdir.entryList( QDir::Dirs, QDir::Name );
-	files.sort(Qt::CaseInsensitive);
-	for( QStringList::const_iterator it = files.constBegin();
-						it != files.constEnd(); ++it )
+	QDir cdir(path);
+	if (!cdir.isReadable()) { return; }
+	QFileInfoList entries = cdir.entryInfoList(
+			m_filter.split(' '),
+			QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot,
+			QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase);
+	for (const auto& entry : entries)
 	{
-		QString cur_file = *it;
-		if( cur_file[0] != '.' )
+		QString fileName = entry.fileName();
+		if (entry.isDir())
 		{
+			// Merge dir's together
 			bool orphan = true;
-			for( int i = 0; i < m_fileBrowserTreeWidget->topLevelItemCount(); ++i )
+			for (int i = 0; i < m_fileBrowserTreeWidget->topLevelItemCount(); ++i)
 			{
 				auto d = dynamic_cast<Directory*>(m_fileBrowserTreeWidget->topLevelItem(i));
-				if( d == nullptr || cur_file < d->text( 0 ) )
+				if (d == nullptr || fileName < d->text(0))
 				{
 					// insert before item, we're done
-					auto dd = new Directory(cur_file, path, m_filter);
-					m_fileBrowserTreeWidget->insertTopLevelItem( i,dd );
+					auto dd = new Directory(fileName, path, m_filter);
+					m_fileBrowserTreeWidget->insertTopLevelItem(i,dd);
 					dd->update(); // add files to the directory
 					orphan = false;
 					break;
 				}
-				else if( cur_file == d->text( 0 ) )
+				else if (fileName == d->text(0))
 				{
 					// imagine we have subdirs named "TripleOscillator/xyz" in
 					// two directories from m_directories
 					// then only add one tree widget for both
 					// so we don't add a new Directory - we just
 					// add the path to the current directory
-					d->addDirectory( path );
+					d->addDirectory(path);
 					d->update();
 					orphan = false;
 					break;
 				}
 			}
-			if( orphan )
+			if (orphan)
 			{
 				// it has not yet been added yet, so it's (lexically)
 				// larger than all other dirs => append it at the bottom
-				auto d = new Directory(cur_file, path, m_filter);
+				auto d = new Directory(fileName, path, m_filter);
 				d->update();
-				m_fileBrowserTreeWidget->addTopLevelItem( d );
+				m_fileBrowserTreeWidget->addTopLevelItem(d);
 			}
 		}
-	}
-
-	files = cdir.entryList( QDir::Files, QDir::Name );
-	for( QStringList::const_iterator it = files.constBegin();
-						it != files.constEnd(); ++it )
-	{
-		QString cur_file = *it;
-		if( cur_file[0] != '.' )
+		else if (entry.isFile())
 		{
 			// TODO: don't insert instead of removing, order changed
 			// remove existing file-items
-			QList<QTreeWidgetItem *> existing = m_fileBrowserTreeWidget->findItems(
-					cur_file, Qt::MatchFixedString );
-			if( !existing.empty() )
+			QList<QTreeWidgetItem *> existing = m_fileBrowserTreeWidget->findItems(fileName, Qt::MatchFixedString);
+			if (!existing.empty())
 			{
 				delete existing.front();
 			}
-			(void) new FileItem( m_fileBrowserTreeWidget, cur_file, path );
+			(void) new FileItem(m_fileBrowserTreeWidget, fileName, path);
 		}
 	}
 }
@@ -1063,8 +1058,11 @@ bool Directory::addItems(const QString& path)
 
 	treeWidget()->setUpdatesEnabled(false);
 
-	QFileInfoList entries = thisDir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::LocaleAware | QDir::DirsFirst | QDir::Name);
-	for (auto& entry : entries)
+	QFileInfoList entries = thisDir.entryInfoList(
+			m_filter.split(' '),
+			QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot,
+			QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase);
+	for (const auto& entry : entries)
 	{
 		QString fileName = entry.fileName();
 		if (entry.isDir())
@@ -1073,7 +1071,7 @@ bool Directory::addItems(const QString& path)
 			addChild(dir);
 			m_dirCount++;
 		}
-		else if (entry.isFile() && thisDir.match(m_filter, fileName.toLower()))
+		else if (entry.isFile())
 		{
 			auto fileItem = new FileItem(fileName, path);
 			addChild(fileItem);
