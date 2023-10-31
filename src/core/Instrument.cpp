@@ -188,7 +188,7 @@ void Instrument::applyRelease( sampleFrame * buf, const NotePlayHandle * _n )
 				(std::max(fpp - desiredReleaseFrames(), 0) +
 					fl) % fpp : 0); f < frames; ++f)
 		{
-			const float fac = (float)( fl-f-1 ) /
+			const float fac = (float)( fl-f ) /
 							desiredReleaseFrames();
 			for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 			{
