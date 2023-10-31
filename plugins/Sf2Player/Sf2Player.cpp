@@ -371,7 +371,7 @@ void Sf2Instrument::freeFont()
 
 	if (m_font != nullptr)
 	{
-		fluid_synth_sfunload( m_synth, m_fontId, true );
+		fluid_synth_sfunload(m_synth, m_fontId, true);
 		m_font = nullptr;
 	}
 
@@ -406,7 +406,7 @@ void Sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 		}
 	}
 
-	if(!loaded)
+	if (!loaded)
 	{
 		collectErrorForUI(Sf2Instrument::tr("A soundfont %1 could not be loaded.").arg(QFileInfo(_sf2File).baseName()));
 	}
