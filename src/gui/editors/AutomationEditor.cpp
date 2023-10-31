@@ -38,8 +38,6 @@
 #include <QToolTip>
 #include <cmath>
 
-#include "MidiClip.h"
-#include "qobjectdefs.h"
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
 #endif
@@ -56,6 +54,7 @@
 #include "gui_templates.h"
 #include "Knob.h"
 #include "MainWindow.h"
+#include "MidiClip.h"
 #include "PatternStore.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"

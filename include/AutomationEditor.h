@@ -37,7 +37,6 @@
 #include "MidiClip.h"
 #include "TimePos.h"
 #include "lmms_basics.h"
-#include "qcolor.h"
 
 class QPainter;
 class QPixmap;
