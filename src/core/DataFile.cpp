@@ -231,8 +231,11 @@ bool DataFile::validate( QString extension )
 		{
 			return true;
 		}
-		if( extension == "wav" || extension == "ogg" ||
-				extension == "ds" )
+		if( extension == "wav" || extension == "ogg" || extension == "ds"
+#ifdef LMMS_HAVE_SNDFILE_MP3
+				|| extension == "mp3"
+#endif
+				)
 		{
 			return true;
 		}
