@@ -380,8 +380,6 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 
 	applyFadeIn(_working_buffer, _n);
 	applyRelease( _working_buffer, _n );
-
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
 }
 
 

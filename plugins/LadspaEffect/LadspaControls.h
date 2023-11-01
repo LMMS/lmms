@@ -27,6 +27,7 @@
 
 #include "EffectControls.h"
 #include "LadspaControlDialog.h"
+#include "LadspaMatrixControlDialog.h"
 
 namespace lmms
 {
@@ -59,7 +60,7 @@ public:
 
 	gui::EffectControlDialog* createView() override
 	{
-		return new gui::LadspaControlDialog( this );
+		return new gui::LadspaMatrixControlDialog( this );
 	}
 
 
@@ -79,6 +80,7 @@ private:
 
 
 	friend class gui::LadspaControlDialog;
+	friend class gui::LadspaMatrixControlDialog;
 	friend class LadspaEffect;
 
 

@@ -68,6 +68,7 @@ namespace lmms::gui
 QPixmap * AutomationEditor::s_toolDraw = nullptr;
 QPixmap * AutomationEditor::s_toolErase = nullptr;
 QPixmap * AutomationEditor::s_toolDrawOut = nullptr;
+QPixmap * AutomationEditor::s_toolEditTangents = nullptr;
 QPixmap * AutomationEditor::s_toolMove = nullptr;
 QPixmap * AutomationEditor::s_toolYFlip = nullptr;
 QPixmap * AutomationEditor::s_toolXFlip = nullptr;
@@ -106,6 +107,7 @@ AutomationEditor::AutomationEditor() :
 	m_graphColor(Qt::SolidPattern),
 	m_nodeInValueColor(0, 0, 0),
 	m_nodeOutValueColor(0, 0, 0),
+	m_nodeTangentLineColor(0, 0, 0),
 	m_scaleColor(Qt::SolidPattern),
 	m_crossColor(0, 0, 0),
 	m_backgroundShade(0, 0, 0)
@@ -179,6 +181,10 @@ AutomationEditor::AutomationEditor() :
 	if (s_toolDrawOut == nullptr)
 	{
 		s_toolDrawOut = new QPixmap(embed::getIconPixmap("edit_draw_outvalue"));
+	}
+	if (s_toolEditTangents == nullptr)
+	{
+		s_toolEditTangents = new QPixmap(embed::getIconPixmap("edit_tangent"));
 	}
 	if (s_toolMove == nullptr)
 	{
@@ -470,6 +476,17 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 			Engine::getSong()->setModified();
 		}
 	};
+	auto resetTangent = [this](timeMap::iterator node)
+	{
+		if (node != m_clip->getTimeMap().end())
+		{
+			// Unlock the tangents from that node
+			node.value().setLockedTangents(false);
+			// Recalculate the tangents
+			m_clip->generateTangents(node, 1);
+			Engine::getSong()->setModified();
+		}
+	};
 
 	// If we clicked inside the AutomationEditor viewport (where the nodes are represented)
 	if (mouseEvent->y() > TOP_MARGIN && mouseEvent->x() >= VALUES_WIDTH)
@@ -531,7 +548,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 								: POS(clickedNode)
 							),
 							level,
-							true,
+							clickedNode == tm.end(),
 							mouseEvent->modifiers() & Qt::ControlModifier
 						);
 
@@ -651,6 +668,47 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 					m_drawLastTick = posTicks;
 
 					m_action = Action::ResetOutValues;
+				}
+			break;
+			}
+			case EditMode::EditTangents:
+			{
+				if (!m_clip->canEditTangents())
+				{
+					update();
+					return;
+				}
+
+				m_clip->addJournalCheckPoint();
+
+				// Gets the closest node to the mouse click
+				timeMap::iterator node = getClosestNode(mouseEvent->x());
+
+				// Starts dragging a tangent
+				if (m_mouseDownLeft && node != tm.end())
+				{
+					// Lock the tangents from that node, so it can only be
+					// manually edited
+					node.value().setLockedTangents(true);
+
+					m_draggedTangentTick = POS(node);
+
+					// Are we dragging the out or in tangent?
+					m_draggedOutTangent = posTicks >= m_draggedTangentTick;
+
+					m_action = Action::MoveTangent;
+				}
+				// Resets node's tangent
+				else if (m_mouseDownRight)
+				{
+					// Resets tangent from node
+					resetTangent(node);
+
+					// Update the last clicked position so we reset all tangents from
+					// that point up to the point we release the mouse button
+					m_drawLastTick = posTicks;
+
+					m_action = Action::ResetTangents;
 				}
 			break;
 			}
@@ -862,6 +920,51 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 				}
 			break;
 			}
+			case EditMode::EditTangents:
+			{
+				// If we moved the mouse past the beginning correct the position in ticks
+				posTicks = std::max(posTicks, 0);
+
+				if (m_mouseDownLeft && m_action == Action::MoveTangent)
+				{
+					timeMap& tm = m_clip->getTimeMap();
+					auto it = tm.find(m_draggedTangentTick);
+
+					// Safety check
+					if (it == tm.end())
+					{
+						update();
+						return;
+					}
+
+					// Calculate new tangent
+					float y = m_draggedOutTangent
+						? yCoordOfLevel(OUTVAL(it))
+						: yCoordOfLevel(INVAL(it));
+					float dy = m_draggedOutTangent
+						? y - mouseEvent->y()
+						: mouseEvent->y() - y;
+					float dx = std::abs(posTicks - POS(it));
+					float newTangent = dy / std::max(dx, 1.0f);
+
+					if (m_draggedOutTangent)
+					{
+						it.value().setOutTangent(newTangent);
+					}
+					else
+					{
+						it.value().setInTangent(newTangent);
+					}
+				}
+				else if (m_mouseDownRight && m_action == Action::ResetTangents)
+				{
+					// Resets all tangents from the last clicked tick up to the current position tick
+					m_clip->resetTangents(m_drawLastTick, posTicks);
+
+					Engine::getSong()->setModified();
+				}
+			break;
+			}
 		}
 	}
 	else // If the mouse Y position is above the AutomationEditor viewport
@@ -932,6 +1035,43 @@ inline void AutomationEditor::drawAutomationPoint(QPainter & p, timeMap::iterato
 	p.setPen(QPen(m_nodeInValueColor.lighter(200)));
 	p.setBrush(QBrush(m_nodeInValueColor));
 	p.drawEllipse(x - outerRadius, y - outerRadius, outerRadius * 2, outerRadius * 2);
+}
+
+
+
+
+inline void AutomationEditor::drawAutomationTangents(QPainter& p, timeMap::iterator it)
+{
+	int x = xCoordOfTick(POS(it));
+	int y, tx, ty;
+
+	// The tangent value correlates the variation in the node value related to the increase
+	// in ticks. So to have a proportionate drawing of the tangent line, we need to find the
+	// relation between the number of pixels per tick and the number of pixels per value level.
+	float viewportHeight = (height() - SCROLLBAR_SIZE - 1) - TOP_MARGIN;
+	float pixelsPerTick = m_ppb / TimePos::ticksPerBar();
+	// std::abs just in case the topLevel is smaller than the bottomLevel for some reason
+	float pixelsPerLevel = std::abs(viewportHeight / (m_topLevel - m_bottomLevel));
+	float proportion = pixelsPerLevel / pixelsPerTick;
+
+	p.setPen(QPen(m_nodeTangentLineColor));
+	p.setBrush(QBrush(m_nodeTangentLineColor));
+
+	y = yCoordOfLevel(INVAL(it));
+	tx = x - 20;
+	ty = y + 20 * INTAN(it) * proportion;
+	p.drawLine(x, y, tx, ty);
+	p.setBrush(QBrush(m_nodeTangentLineColor.darker(200)));
+	p.drawEllipse(tx - 3, ty - 3, 6, 6);
+
+	p.setBrush(QBrush(m_nodeTangentLineColor));
+
+	y = yCoordOfLevel(OUTVAL(it));
+	tx = x + 20;
+	ty = y - 20 * OUTTAN(it) * proportion;
+	p.drawLine(x, y, tx, ty);
+	p.setBrush(QBrush(m_nodeTangentLineColor.darker(200)));
+	p.drawEllipse(tx - 3, ty - 3, 6, 6);
 }
 
 
@@ -1197,6 +1337,11 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 				// Draw circle
 				drawAutomationPoint(p, it);
+				// Draw tangents if necessary (only for manually edited tangents)
+				if (m_clip->canEditTangents() && LOCKEDTAN(it))
+				{
+					drawAutomationTangents(p, it);
+				}
 
 				++it;
 			}
@@ -1213,6 +1358,11 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			}
 			// Draw circle(the last one)
 			drawAutomationPoint(p, it);
+			// Draw tangents if necessary (only for manually edited tangents)
+			if (m_clip->canEditTangents() && LOCKEDTAN(it))
+			{
+				drawAutomationTangents(p, it);
+			}
 		}
 	}
 	else
@@ -1265,6 +1415,11 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			if (m_action == Action::ResetOutValues) { cursor = s_toolErase; }
 			else if (m_action == Action::MoveOutValue) { cursor = s_toolMove; }
 			else { cursor = s_toolDrawOut; }
+			break;
+		}
+		case EditMode::EditTangents:
+		{
+			cursor = m_action == Action::MoveTangent ? s_toolMove : s_toolEditTangents;
 			break;
 		}
 	}
@@ -1819,6 +1974,49 @@ AutomationEditor::timeMap::iterator AutomationEditor::getNodeAt(int x, int y, bo
 	return tm.end();
 }
 
+AutomationEditor::timeMap::iterator AutomationEditor::getClosestNode(int x)
+{
+	// Remove the VALUES_WIDTH from the x position, so we have the actual viewport x
+	x -= VALUES_WIDTH;
+	// Convert the x position to the position in ticks
+	int posTicks = (x * TimePos::ticksPerBar() / m_ppb) + m_currentPosition;
+
+	// Get our pattern timeMap and create a iterator so we can check the nodes
+	timeMap& tm = m_clip->getTimeMap();
+
+	if (tm.isEmpty()) { return tm.end(); }
+
+	// Get the node with an equal or higher position
+	auto it = tm.lowerBound(posTicks);
+
+	// If there are no nodes equal or higher than the position return
+	// the one before it
+	if (it == tm.end())
+	{
+		--it;
+		return it;
+	}
+	// If the node returned is the first, return it
+	else if (it == tm.begin())
+	{
+		return it;
+	}
+	// Else return the closest node
+	else
+	{
+		// Distance from node to the right
+		int distanceRight = std::abs(POS(it) - posTicks);
+		// Distance from node to the left
+		int distanceLeft = std::abs(POS(--it) - posTicks);
+
+		if (distanceLeft >= distanceRight)
+		{
+			++it;
+		}
+		return it;
+	}
+}
+
 
 
 
@@ -1839,24 +2037,29 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	DropToolBar *editActionsToolBar = addDropToolBarToTop(tr("Edit actions"));
 
 	auto editModeGroup = new ActionGroup(this);
-	QAction* drawAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode (Shift+D)"));
-	drawAction->setShortcut(Qt::SHIFT | Qt::Key_D);
-	drawAction->setChecked(true);
+	m_drawAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode (Shift+D)"));
+	m_drawAction->setShortcut(Qt::SHIFT | Qt::Key_D);
+	m_drawAction->setChecked(true);
 
-	QAction* eraseAction = editModeGroup->addAction(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
-	eraseAction->setShortcut(Qt::SHIFT | Qt::Key_E);
+	m_eraseAction = editModeGroup->addAction(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
+	m_eraseAction->setShortcut(Qt::SHIFT | Qt::Key_E);
 
-	QAction* drawOutAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw_outvalue"), tr("Draw outValues mode (Shift+C)"));
-	drawOutAction->setShortcut(Qt::SHIFT | Qt::Key_C);
+	m_drawOutAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw_outvalue"), tr("Draw outValues mode (Shift+C)"));
+	m_drawOutAction->setShortcut(Qt::SHIFT | Qt::Key_C);
+
+	m_editTanAction = editModeGroup->addAction(embed::getIconPixmap("edit_tangent"), tr("Edit tangents mode (Shift+T)"));
+	m_editTanAction->setShortcut(Qt::SHIFT | Qt::Key_T);
+	m_editTanAction->setEnabled(false);
 
 	m_flipYAction = new QAction(embed::getIconPixmap("flip_y"), tr("Flip vertically"), this);
 	m_flipXAction = new QAction(embed::getIconPixmap("flip_x"), tr("Flip horizontally"), this);
 
 	connect(editModeGroup, SIGNAL(triggered(int)), m_editor, SLOT(setEditMode(int)));
 
-	editActionsToolBar->addAction(drawAction);
-	editActionsToolBar->addAction(eraseAction);
-	editActionsToolBar->addAction(drawOutAction);
+	editActionsToolBar->addAction(m_drawAction);
+	editActionsToolBar->addAction(m_eraseAction);
+	editActionsToolBar->addAction(m_drawOutAction);
+	editActionsToolBar->addAction(m_editTanAction);
 	editActionsToolBar->addAction(m_flipXAction);
 	editActionsToolBar->addAction(m_flipYAction);
 
@@ -1874,7 +2077,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	m_cubicHermiteAction = progression_type_group->addAction(
 				embed::getIconPixmap("progression_cubic_hermite"), tr( "Cubic Hermite progression"));
 
-	connect(progression_type_group, SIGNAL(triggered(int)), m_editor, SLOT(setProgressionType(int)));
+	connect(progression_type_group, SIGNAL(triggered(int)), this, SLOT(setProgressionType(int)));
 
 	// setup tension-stuff
 	m_tensionKnob = new Knob( KnobType::Small17, this, "Tension" );
@@ -2014,6 +2217,7 @@ void AutomationEditorWindow::setCurrentClip(AutomationClip* clip)
 		connect(m_flipYAction, SIGNAL(triggered()), clip, SLOT(flipY()));
 	}
 
+	updateEditTanButton();
 	emit currentClipChanged();
 }
 
@@ -2102,5 +2306,17 @@ void AutomationEditorWindow::updateWindowTitle()
 	setWindowTitle( tr( "Automation Editor - %1" ).arg( m_editor->m_clip->name() ) );
 }
 
+void AutomationEditorWindow::setProgressionType(int progType)
+{
+	m_editor->setProgressionType(progType);
+	updateEditTanButton();
+}
+
+void AutomationEditorWindow::updateEditTanButton()
+{
+	auto progType = currentClip()->progressionType();
+	m_editTanAction->setEnabled(AutomationClip::supportsTangentEditing(progType));
+	if (!m_editTanAction->isEnabled() && m_editTanAction->isChecked()) { m_drawAction->trigger(); }
+}
 
 } // namespace lmms::gui
