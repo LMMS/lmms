@@ -1852,26 +1852,21 @@ void DataFile::upgrade_loopsRename()
 	{
 		auto elements = elementsByTagName(elem);
 
-		for (int i = 0; i < srcAttrs.size(); ++i)
+		for (const auto& srcAttr : srcAttrs)
 		{
-			auto srcAttr = srcAttrs.at(i);
-
-			for (int j = 0; j < elements.length(); ++j)
+			for (int i = 0; i < elements.length(); ++i)
 			{
-				auto item = elements.item(j).toElement();
+				auto item = elements.item(i).toElement();
 
 				if (item.isNull()) { continue; }
 				if (item.hasAttribute(srcAttr))
 				{
-					for (auto& cur : loopBPMs)
+					for (const auto& cur : loopBPMs)
 					{
 						auto x = (QString) cur.first,  // loop name
 							 y = (QString) cur.second, // BPM
 							 srcVal = item.attribute(srcAttr),
 							 pattern = prefix + x + extension;
-
-						printf("srcVal: %s; pattern: %s\n", srcVal.toStdString().c_str(),
-								pattern.toStdString().c_str());
 
 						if (srcVal == pattern)
 						{
