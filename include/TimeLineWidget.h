@@ -55,19 +55,19 @@ public:
 	Q_PROPERTY( QColor activeLoopInnerColor READ getActiveLoopInnerColor WRITE setActiveLoopInnerColor )
 	Q_PROPERTY( int loopRectangleVerticalPadding READ getLoopRectangleVerticalPadding WRITE setLoopRectangleVerticalPadding )
 
-	enum AutoScrollStates
+	enum class AutoScrollState
 	{
-		AutoScrollEnabled,
-		AutoScrollDisabled
+		Enabled,
+		Disabled
 	} ;
 
-	enum LoopPointStates
+	enum class LoopPointState
 	{
-		LoopPointsDisabled,
-		LoopPointsEnabled
+		Disabled,
+		Enabled
 	} ;
 
-	enum BehaviourAtStopStates
+	enum class BehaviourAtStopState
 	{
 		BackToZero,
 		BackToStart,
@@ -76,7 +76,7 @@ public:
 
 
 	TimeLineWidget(int xoff, int yoff, float ppb, Song::PlayPos & pos,
-				const TimePos & begin, Song::PlayModes mode, QWidget * parent);
+				const TimePos & begin, Song::PlayMode mode, QWidget * parent);
 	~TimeLineWidget() override;
 
 	inline QColor const & getBarLineColor() const { return m_barLineColor; }
@@ -111,12 +111,12 @@ public:
 		return( m_pos );
 	}
 
-	AutoScrollStates autoScroll() const
+	AutoScrollState autoScroll() const
 	{
 		return m_autoScroll;
 	}
 
-	BehaviourAtStopStates behaviourAtStop() const
+	BehaviourAtStopState behaviourAtStop() const
 	{
 		return m_behaviourAtStop;
 	}
@@ -128,7 +128,7 @@ public:
 
 	bool loopPointsEnabled() const
 	{
-		return m_loopPoints == LoopPointsEnabled;
+		return m_loopPoints == LoopPointState::Enabled;
 	}
 
 	inline const TimePos & loopBegin() const
@@ -220,9 +220,9 @@ private:
 	QColor m_barLineColor;
 	QColor m_barNumberColor;
 
-	AutoScrollStates m_autoScroll;
-	LoopPointStates m_loopPoints;
-	BehaviourAtStopStates m_behaviourAtStop;
+	AutoScrollState m_autoScroll;
+	LoopPointState m_loopPoints;
+	BehaviourAtStopState m_behaviourAtStop;
 
 	bool m_changedPosition;
 
@@ -232,7 +232,7 @@ private:
 	float m_snapSize;
 	Song::PlayPos & m_pos;
 	const TimePos & m_begin;
-	const Song::PlayModes m_mode;
+	const Song::PlayMode m_mode;
 	TimePos m_loopPos[2];
 
 	TimePos m_savedPos;
@@ -242,7 +242,7 @@ private:
 	int m_initalXSelect;
 
 
-	enum actions
+	enum class Action
 	{
 		NoAction,
 		MovePositionMarker,

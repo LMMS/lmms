@@ -159,21 +159,21 @@ void LadspaManager::addPlugins(
 
 		if( plugIn->inputChannels == 0 && plugIn->outputChannels > 0 )
 		{
-			plugIn->type = SOURCE;
+			plugIn->type = LadspaPluginType::Source;
 		}
 		else if( plugIn->inputChannels > 0 &&
 				       plugIn->outputChannels > 0 )
 		{
-			plugIn->type = TRANSFER;
+			plugIn->type = LadspaPluginType::Transfer;
 		}
 		else if( plugIn->inputChannels > 0 &&
 				       plugIn->outputChannels == 0 )
 		{
-			plugIn->type = SINK;
+			plugIn->type = LadspaPluginType::Sink;
 		}
 		else
 		{
-			plugIn->type = OTHER;
+			plugIn->type = LadspaPluginType::Other;
 		}
 
 		m_ladspaManagerMap[key] = plugIn;

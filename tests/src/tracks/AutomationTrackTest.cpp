@@ -52,7 +52,7 @@ private slots:
 		using namespace lmms;
 
 		AutomationClip c(nullptr);
-		c.setProgressionType(AutomationClip::LinearProgression);
+		c.setProgressionType(AutomationClip::ProgressionType::Linear);
 		c.putValue(0, 0.0, false);
 		c.putValue(100, 1.0, false);
 
@@ -69,7 +69,7 @@ private slots:
 		using namespace lmms;
 
 		AutomationClip c(nullptr);
-		c.setProgressionType(AutomationClip::DiscreteProgression);
+		c.setProgressionType(AutomationClip::ProgressionType::Discrete);
 		c.putValue(0, 0.0, false);
 		c.putValue(100, 1.0, false);
 
@@ -89,14 +89,14 @@ private slots:
 		AutomationTrack track(song);
 
 		AutomationClip c1(&track);
-		c1.setProgressionType(AutomationClip::LinearProgression);
+		c1.setProgressionType(AutomationClip::ProgressionType::Linear);
 		c1.putValue(0, 0.0, false);
 		c1.putValue(10, 1.0, false);
 		c1.movePosition(0);
 		c1.addObject(&model);
 
 		AutomationClip c2(&track);
-		c2.setProgressionType(AutomationClip::LinearProgression);
+		c2.setProgressionType(AutomationClip::ProgressionType::Linear);
 		c2.putValue(0, 0.0, false);
 		c2.putValue(100, 1.0, false);
 		c2.movePosition(100);
@@ -125,7 +125,7 @@ private slots:
 		AutomationTrack track(song);
 
 		AutomationClip c(&track);
-		c.setProgressionType(AutomationClip::LinearProgression);
+		c.setProgressionType(AutomationClip::ProgressionType::Linear);
 		c.addObject(&model);
 
 		c.putValue(0, 0.0, false);
@@ -149,7 +149,7 @@ private slots:
 		auto song = Engine::getSong();
 
 		InstrumentTrack* instrumentTrack =
-				dynamic_cast<InstrumentTrack*>(Track::create(Track::InstrumentTrack, song));
+				dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, song));
 
 		MidiClip* midiClip = dynamic_cast<MidiClip*>(instrumentTrack->createClip(0));
 		midiClip->changeLength(TimePos(4, 0));
@@ -158,7 +158,7 @@ private slots:
 
 		DetuningHelper* dh = note->detuning();
 		auto clip = dh->automationClip();
-		clip->setProgressionType( AutomationClip::LinearProgression );
+		clip->setProgressionType( AutomationClip::ProgressionType::Linear );
 		clip->putValue(TimePos(0, 0), 0.0);
 		clip->putValue(TimePos(4, 0), 1.0);
 
@@ -175,7 +175,7 @@ private slots:
 		auto song = Engine::getSong();
 		auto patternStore = Engine::patternStore();
 		PatternTrack patternTrack(song);
-		Track* automationTrack = Track::create(Track::AutomationTrack, patternStore);
+		Track* automationTrack = Track::create(Track::Type::Automation, patternStore);
 
 		QVERIFY(automationTrack->numOfClips());
 		AutomationClip* c1 = dynamic_cast<AutomationClip*>(automationTrack->getClip(0));
@@ -183,7 +183,7 @@ private slots:
 
 		FloatModel model;
 
-		c1->setProgressionType(AutomationClip::LinearProgression);
+		c1->setProgressionType(AutomationClip::ProgressionType::Linear);
 		c1->putValue(0, 0.0, false);
 		c1->putValue(10, 1.0, false);
 		c1->addObject(&model);
@@ -222,8 +222,8 @@ private slots:
 		AutomationClip localClip(&localTrack);
 
 		FloatModel model;
-		globalClip.setProgressionType(AutomationClip::DiscreteProgression);
-		localClip.setProgressionType(AutomationClip::DiscreteProgression);
+		globalClip.setProgressionType(AutomationClip::ProgressionType::Discrete);
+		localClip.setProgressionType(AutomationClip::ProgressionType::Discrete);
 		globalClip.addObject(&model);
 		localClip.addObject(&model);
 		globalClip.putValue(0, 100.0f, false);

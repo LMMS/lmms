@@ -30,7 +30,7 @@
 
 #include "lmms_export.h"
 
-
+#include "Flags.h"
 #include "ThreadableJob.h"
 #include "lmms_basics.h"
 
@@ -45,19 +45,16 @@ class AudioPort;
 class LMMS_EXPORT PlayHandle : public ThreadableJob
 {
 public:
-	enum Types
+	enum class Type
 	{
-		TypeNotePlayHandle = 0x01,
-		TypeInstrumentPlayHandle = 0x02,
-		TypeSamplePlayHandle = 0x04,
-		TypePresetPreviewHandle = 0x08
+		NotePlayHandle = 0x01,
+		InstrumentPlayHandle = 0x02,
+		SamplePlayHandle = 0x04,
+		PresetPreviewHandle = 0x08
 	} ;
-	using Type = Types;
+	using Types = Flags<Type>;
 
-	enum
-	{
-		MaxNumber = 1024
-	} ;
+	constexpr static std::size_t MaxNumber = 1024;
 
 	PlayHandle( const Type type, f_cnt_t offset = 0 );
 
@@ -163,6 +160,8 @@ private:
 
 using PlayHandleList = QList<PlayHandle*>;
 using ConstPlayHandleList = QList<const PlayHandle*>;
+
+LMMS_DECLARE_OPERATORS_FOR_FLAGS(PlayHandle::Type)
 
 } // namespace lmms
 

@@ -48,31 +48,34 @@ class LMMS_EXPORT Oscillator
 {
 	MM_OPERATORS
 public:
-	enum WaveShapes
+	enum class WaveShape
 	{
-		SineWave,
-		TriangleWave,
-		SawWave,
-		SquareWave,
-		MoogSawWave,
-		ExponentialWave,
+		Sine,
+		Triangle,
+		Saw,
+		Square,
+		MoogSaw,
+		Exponential,
 		WhiteNoise,
-		UserDefinedWave,
-		NumWaveShapes,                                         //!< Number of all available wave shapes
-		FirstWaveShapeTable = TriangleWave,                    //!< First wave shape that has a pre-generated table
-		NumWaveShapeTables = WhiteNoise - FirstWaveShapeTable, //!< Number of band-limited wave shapes to be generated
+		UserDefined,
+		Count //!< Number of all available wave shapes
 	};
+	constexpr static auto NumWaveShapes = static_cast<std::size_t>(WaveShape::Count);
+	//! First wave shape that has a pre-generated table
+	constexpr static auto FirstWaveShapeTable = static_cast<std::size_t>(WaveShape::Triangle);
+	//! Number of band-limited wave shapes to be generated
+	constexpr static auto NumWaveShapeTables = static_cast<std::size_t>(WaveShape::WhiteNoise) - FirstWaveShapeTable;
 
-	enum ModulationAlgos
+	enum class ModulationAlgo
 	{
 		PhaseModulation,
 		AmplitudeModulation,
 		SignalMix,
 		SynchronizedBySubOsc,
 		FrequencyModulation,
-		NumModulationAlgos
+		Count
 	} ;
-
+	constexpr static auto NumModulationAlgos = static_cast<std::size_t>(ModulationAlgo::Count);
 
 	Oscillator( const IntModel *wave_shape_model,
 			const IntModel *mod_algo_model,
@@ -251,7 +254,7 @@ private:
 	bool m_isModulator;
 
 	/* Multiband WaveTable */
-	static sample_t s_waveTables[WaveShapes::NumWaveShapeTables][OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT][OscillatorConstants::WAVETABLE_LENGTH];
+	static sample_t s_waveTables[NumWaveShapeTables][OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT][OscillatorConstants::WAVETABLE_LENGTH];
 	static fftwf_plan s_fftPlan;
 	static fftwf_plan s_ifftPlan;
 	static fftwf_complex * s_specBuf;
@@ -284,26 +287,26 @@ private:
 							const ch_cnt_t _chnl );
 	inline bool syncOk( float _osc_coeff );
 
-	template<WaveShapes W>
+	template<WaveShape W>
 	void updateNoSub( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	template<WaveShapes W>
+	template<WaveShape W>
 	void updatePM( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	template<WaveShapes W>
+	template<WaveShape W>
 	void updateAM( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	template<WaveShapes W>
+	template<WaveShape W>
 	void updateMix( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	template<WaveShapes W>
+	template<WaveShape W>
 	void updateSync( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	template<WaveShapes W>
+	template<WaveShape W>
 	void updateFM( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 
-	template<WaveShapes W>
+	template<WaveShape W>
 	inline sample_t getSample( const float _sample );
 
 	inline void recalcPhase();

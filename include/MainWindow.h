@@ -113,7 +113,7 @@ public:
 		return m_autoSaveTimer.interval();
 	}
 
-	enum SessionState
+	enum class SessionState
 	{
 		Normal,
 		Recover

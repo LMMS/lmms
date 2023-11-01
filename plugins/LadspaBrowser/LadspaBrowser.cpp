@@ -56,7 +56,7 @@ Plugin::Descriptor PLUGIN_EXPORT ladspabrowser_plugin_descriptor =
 				"List installed LADSPA plugins" ),
 	"Danny McRae <khjklujn/at/users.sourceforge.net>",
 	0x0100,
-	Plugin::Tool,
+	Plugin::Type::Tool,
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,
@@ -107,12 +107,12 @@ LadspaBrowserView::LadspaBrowserView( ToolPlugin * _tool ) :
 	auto ws = new QWidget(this);
 	ws->setFixedSize( 500, 480 );
 
-	QWidget * available = createTab( ws, tr( "Available Effects" ), VALID );
+	QWidget * available = createTab( ws, tr( "Available Effects" ), LadspaPluginType::Valid );
 	QWidget * unavailable = createTab( ws, tr( "Unavailable Effects" ),
-								INVALID );
-	QWidget * instruments = createTab( ws, tr( "Instruments" ), SOURCE );
-	QWidget * analysis = createTab( ws, tr( "Analysis Tools" ), SINK );
-	QWidget * other = createTab( ws, tr( "Don't know" ), OTHER );
+								LadspaPluginType::Invalid );
+	QWidget * instruments = createTab( ws, tr( "Instruments" ), LadspaPluginType::Source );
+	QWidget * analysis = createTab( ws, tr( "Analysis Tools" ), LadspaPluginType::Sink );
+	QWidget * other = createTab( ws, tr( "Don't know" ), LadspaPluginType::Other );
 
 
 	m_tabBar->addTab( available, tr( "Available Effects" ), 

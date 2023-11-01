@@ -95,7 +95,7 @@ public slots:
 	void changePosition( const lmms::TimePos & newPos = TimePos( -1 ) );
 
 protected:
-	enum ContextMenuAction
+	enum class ContextMenuAction
 	{
 		Paste
 	};
