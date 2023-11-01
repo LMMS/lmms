@@ -1815,34 +1815,37 @@ void DataFile::upgrade_sampleAndHold()
 void DataFile::upgrade_loopsRename()
 {
 	constexpr auto loopBPMs = std::array{
-		std::pair{"briff01", "140"},
-		std::pair{"rave_bass01", "180"},
-		std::pair{"rave_bass02", "180"},
-		std::pair{"tb303_01", "123"},
-		std::pair{"techno_bass01", "140"},
-		std::pair{"techno_bass02", "140"},
-		std::pair{"techno_synth01", "140"},
-		std::pair{"techno_synth02", "140"},
-		std::pair{"techno_synth03", "130"},
-		std::pair{"techno_synth04", "140"},
-		std::pair{"909beat01", "122"},
-		std::pair{"break01", "168"},
-		std::pair{"break02", "141"},
-		std::pair{"break03", "168"},
-		std::pair{"electro_beat01", "120"},
-		std::pair{"electro_beat02", "119"},
-		std::pair{"house_loop01", "142"},
-		std::pair{"jungle01", "168"},
-		std::pair{"rave_hihat01", "180"},
-		std::pair{"rave_hihat02", "180"},
-		std::pair{"rave_kick01", "180"},
-		std::pair{"rave_kick02", "180"},
-		std::pair{"rave_snare01", "180"},
-		std::pair{"latin_brass01", "140"},
-		std::pair{"latin_guitar01", "126"},
-		std::pair{"latin_guitar02", "140"},
-		std::pair{"latin_guitar03", "120"},
+		std::pair{"bassloops/briff01", "140"},
+		std::pair{"bassloops/rave_bass01", "180"},
+		std::pair{"bassloops/rave_bass02", "180"},
+		std::pair{"bassloops/tb303_01", "123"},
+		std::pair{"bassloops/techno_bass01", "140"},
+		std::pair{"bassloops/techno_bass02", "140"},
+		std::pair{"bassloops/techno_synth01", "140"},
+		std::pair{"bassloops/techno_synth02", "140"},
+		std::pair{"bassloops/techno_synth03", "130"},
+		std::pair{"bassloops/techno_synth04", "140"},
+		std::pair{"beats/909beat01", "122"},
+		std::pair{"beats/break01", "168"},
+		std::pair{"beats/break02", "141"},
+		std::pair{"beats/break03", "168"},
+		std::pair{"beats/electro_beat01", "120"},
+		std::pair{"beats/electro_beat02", "119"},
+		std::pair{"beats/house_loop01", "142"},
+		std::pair{"beats/jungle01", "168"},
+		std::pair{"beats/rave_hihat01", "180"},
+		std::pair{"beats/rave_hihat02", "180"},
+		std::pair{"beats/rave_kick01", "180"},
+		std::pair{"beats/rave_kick02", "180"},
+		std::pair{"beats/rave_snare01", "180"},
+		std::pair{"latin/latin_brass01", "140"},
+		std::pair{"latin/latin_guitar01", "126"},
+		std::pair{"latin/latin_guitar02", "140"},
+		std::pair{"latin/latin_guitar03", "120"},
 	};
+
+	const QString prefix = "factorysample:",
+		  extension = ".ogg";
 
 	// Replace loop sample names
 	for (const auto& [elem, srcAttrs] : ELEMENTS_WITH_RESOURCES)
@@ -1862,17 +1865,20 @@ void DataFile::upgrade_loopsRename()
 				{
 					for (auto& cur : loopBPMs)
 					{
-						auto x = (QString) cur.first,
-							 y = (QString) cur.second,
-							 srcVal = item.attribute(srcAttr);
+						auto x = (QString) cur.first,  // loop name
+							 y = (QString) cur.second, // BPM
+							 srcVal = item.attribute(srcAttr),
+							 pattern = prefix + x + extension;
 
-						if (srcVal.contains(x, Qt::CaseInsensitive))
+						printf("srcVal: %s; pattern: %s\n", srcVal.toStdString().c_str(),
+								pattern.toStdString().c_str());
+
+						if (srcVal == pattern)
 						{
 							// Add " - X BPM" to filename
-							srcVal.replace(x,
-									x + " - " + y + " BPM");
-
-							item.setAttribute(srcAttr, srcVal);
+							item.setAttribute(srcAttr, 
+									prefix + x + " - " + y + " BPM" +
+									extension);
 						}
 					}
 				}
