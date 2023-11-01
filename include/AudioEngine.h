@@ -197,6 +197,7 @@ public:
 
 	// audio-device-stuff
 
+	bool renderOnly() const { return m_renderOnly; }
 	// Returns the current audio device's name. This is not necessarily
 	// the user's preferred audio device, in case you were thinking that.
 	inline const QString & audioDevName() const

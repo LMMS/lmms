@@ -130,7 +130,10 @@ QPixmap* PianoRoll::s_toolKnife = nullptr;
 
 SimpleTextFloat * PianoRoll::s_textFloat = nullptr;
 
-static std::array<QString, 12> s_noteStrings {"C", "C# / D\u266D", "D", "D# / E\u266D", "E", "F", "F# / G\u266D", "G", "G# / A\u266D", "A", "A# / B\u266D", "B"};
+static std::array<QString, 12> s_noteStrings {
+	"C", "C\u266F / D\u266D", "D", "D\u266F / E\u266D", "E", "F", "F\u266F / G\u266D", 
+	"G", "G\u266F / A\u266D", "A", "A\u266F / B\u266D", "B"
+};
 
 static QString getNoteString(int key)
 {
@@ -2514,7 +2517,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			// We iterate from last note in MIDI clip to the first,
 			// chronologically
 			auto it = notes.rbegin();
-			for( int i = 0; i < notes.size(); ++i )
+			while (it != notes.rend())
 			{
 				Note* n = *it;
 
