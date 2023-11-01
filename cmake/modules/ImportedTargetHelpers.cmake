@@ -11,12 +11,12 @@
 # with regular expressions, but do provide a function to get the version.
 #
 # Usage:
-# 	_determine_version_from_source(
+# 	determine_version_from_source(
 #		<output variable> # The cache variable in which to store the computed version
 #		<target>          # The target which the source will link to
 #		<source>          # The source code to determine the version
 #	)
-function(_determine_version_from_source _version_out _target _source)
+function(determine_version_from_source _version_out _target _source)
 	# Return if we already know the version, or the target was not found
 	if(NOT "${${_version_out}}" STREQUAL "" OR NOT TARGET "${_target}")
 		return()
@@ -72,7 +72,7 @@ endfunction()
 # if found for the caller to pass to `find_package_handle_standard_args`.
 #
 # Usage:
-# 	_find_package_config_mode_with_fallback(
+# 	find_package_config_mode_with_fallback(
 #		<package_name>                 # The package to search for with config mode
 #		<target_name>                  # The target to expect from config mode, or define if not found
 # 		LIBRARY_NAMES names...         # Possible library names to search for as a fallback
@@ -83,7 +83,7 @@ endfunction()
 #		[DEPENDS dependencies...]      # Dependencies of the target - added to INTERFACE_LINK_LIBRARIES, and will fail if not found
 #		[PREFIX <prefix>]              # The prefix for result variables - defaults to the package name
 # 	)
-function(_find_package_config_mode_with_fallback _fpcmwf_PACKAGE_NAME _fpcmwf_TARGET_NAME)
+function(find_package_config_mode_with_fallback _fpcmwf_PACKAGE_NAME _fpcmwf_TARGET_NAME)
 	# Parse remaining arguments
 	set(_options "")
 	set(_one_value_args "PKG_CONFIG" "PREFIX")
@@ -167,12 +167,12 @@ endfunction()
 # version.
 #
 # Usage:
-#	_get_vcpkg_library_configs(
+#	get_vcpkg_library_configs(
 #		<release library> # Variable in which to store the path to the release version of the library
 #		<debug library>   # Variable in which to store the path to the debug version of the library
 #		<base library>    # Known path to some version of the library
 #	)
-function(_get_vcpkg_library_configs _release_out _debug_out _library)
+function(get_vcpkg_library_configs _release_out _debug_out _library)
 	# We want to do all operations within the vcpkg directory
 	file(RELATIVE_PATH _lib_relative "${VCPKG_INSTALLED_DIR}" "${_library}")
 

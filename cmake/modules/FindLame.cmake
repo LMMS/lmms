@@ -5,13 +5,13 @@
 
 include(ImportedTargetHelpers)
 
-_find_package_config_mode_with_fallback(mp3lame mp3lame::mp3lame
+find_package_config_mode_with_fallback(mp3lame mp3lame::mp3lame
 	LIBRARY_NAMES "mp3lame"
 	INCLUDE_NAMES "lame/lame.h"
 	PREFIX Lame
 )
 
-_determine_version_from_source(Lame_VERSION mp3lame::mp3lame [[
+determine_version_from_source(Lame_VERSION mp3lame::mp3lame [[
 	#include <iostream>
 	#include <lame/lame.h>
 

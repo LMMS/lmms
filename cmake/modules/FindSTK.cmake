@@ -1,7 +1,7 @@
 include(ImportedTargetHelpers)
 
 # TODO CMake 3.18: Alias this target to something less hideous
-_find_package_config_mode_with_fallback(unofficial-libstk unofficial::libstk::libstk
+find_package_config_mode_with_fallback(unofficial-libstk unofficial::libstk::libstk
 	LIBRARY_NAMES "stk"
 	INCLUDE_NAMES "stk/Stk.h"
 	LIBRARY_HINTS "/usr/lib" "/usr/local/lib" "${CMAKE_INSTALL_PREFIX}/lib" "${CMAKE_FIND_ROOT_PATH}/lib"

@@ -5,20 +5,20 @@
 
 include(ImportedTargetHelpers)
 
-_find_package_config_mode_with_fallback(Ogg Ogg::ogg
+find_package_config_mode_with_fallback(Ogg Ogg::ogg
 	LIBRARY_NAMES "ogg"
 	INCLUDE_NAMES "ogg/ogg.h"
 	PKG_CONFIG ogg
 )
 
-_find_package_config_mode_with_fallback(Vorbis Vorbis::vorbis
+find_package_config_mode_with_fallback(Vorbis Vorbis::vorbis
 	LIBRARY_NAMES "vorbis"
 	INCLUDE_NAMES "vorbis/codec.h"
 	PKG_CONFIG vorbis
 	DEPENDS Ogg::ogg
 )
 
-_find_package_config_mode_with_fallback(Vorbis Vorbis::vorbisfile
+find_package_config_mode_with_fallback(Vorbis Vorbis::vorbisfile
 	LIBRARY_NAMES "vorbisfile"
 	INCLUDE_NAMES "vorbis/vorbisfile.h"
 	PKG_CONFIG vorbisfile
@@ -26,7 +26,7 @@ _find_package_config_mode_with_fallback(Vorbis Vorbis::vorbisfile
 	PREFIX VorbisFile
 )
 
-_find_package_config_mode_with_fallback(Vorbis Vorbis::vorbisenc
+find_package_config_mode_with_fallback(Vorbis Vorbis::vorbisenc
 	LIBRARY_NAMES "vorbisenc"
 	INCLUDE_NAMES "vorbis/vorbisenc.h"
 	PKG_CONFIG vorbisenc
@@ -34,7 +34,7 @@ _find_package_config_mode_with_fallback(Vorbis Vorbis::vorbisenc
 	PREFIX VorbisEnc
 )
 
-_determine_version_from_source(Vorbis_VERSION Vorbis::vorbis [[
+determine_version_from_source(Vorbis_VERSION Vorbis::vorbis [[
 	#include <iostream>
 	#include <string_view>
 	#include <vorbis/codec.h>

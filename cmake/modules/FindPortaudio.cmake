@@ -5,14 +5,14 @@
 
 include(ImportedTargetHelpers)
 
-_find_package_config_mode_with_fallback(portaudio portaudio
+find_package_config_mode_with_fallback(portaudio portaudio
 	LIBRARY_NAMES "portaudio"
 	INCLUDE_NAMES "portaudio.h"
 	PKG_CONFIG portaudio-2.0
 	PREFIX Portaudio
 )
 
-_determine_version_from_source(Portaudio_VERSION portaudio [[
+determine_version_from_source(Portaudio_VERSION portaudio [[
 	#include <iostream>
 	#include "portaudio.h"
 
