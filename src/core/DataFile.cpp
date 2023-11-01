@@ -1814,7 +1814,7 @@ void DataFile::upgrade_sampleAndHold()
 // Change loops' filenames in <sampleclip>s
 void DataFile::upgrade_loopsRename()
 {
-	constexpr auto loopBPMs = std::array{
+	static constexpr auto loopBPMs = std::array{
 		std::pair{"bassloops/briff01", "140"},
 		std::pair{"bassloops/rave_bass01", "180"},
 		std::pair{"bassloops/rave_bass02", "180"},
