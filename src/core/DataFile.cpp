@@ -1814,34 +1814,34 @@ void DataFile::upgrade_sampleAndHold()
 // Change loops' filenames in <sampleclip>s
 void DataFile::upgrade_loopsRename()
 {
-	const std::vector<std::pair<QString, QString>> LOOPBPMS{
-		{"briff01", "140"},
-		{"rave_bass01", "180"},
-		{"rave_bass02", "180"},
-		{"tb303_01", "123"},
-		{"techno_bass01", "140"},
-		{"techno_bass02", "140"},
-		{"techno_synth01", "140"},
-		{"techno_synth02", "140"},
-		{"techno_synth03", "130"},
-		{"techno_synth04", "140"},
-		{"909beat01", "122"},
-		{"break01", "168"},
-		{"break02", "141"},
-		{"break03", "168"},
-		{"electro_beat01", "120"},
-		{"electro_beat02", "119"},
-		{"house_loop01", "142"},
-		{"jungle01", "168"},
-		{"rave_hihat01", "180"},
-		{"rave_hihat02", "180"},
-		{"rave_kick01", "180"},
-		{"rave_kick02", "180"},
-		{"rave_snare01", "180"},
-		{"latin_brass01", "140"},
-		{"latin_guitar01", "126"},
-		{"latin_guitar02", "140"},
-		{"latin_guitar03", "120"},
+	constexpr auto loopBPMs = std::array{
+		std::pair{"briff01", "140"},
+		std::pair{"rave_bass01", "180"},
+		std::pair{"rave_bass02", "180"},
+		std::pair{"tb303_01", "123"},
+		std::pair{"techno_bass01", "140"},
+		std::pair{"techno_bass02", "140"},
+		std::pair{"techno_synth01", "140"},
+		std::pair{"techno_synth02", "140"},
+		std::pair{"techno_synth03", "130"},
+		std::pair{"techno_synth04", "140"},
+		std::pair{"909beat01", "122"},
+		std::pair{"break01", "168"},
+		std::pair{"break02", "141"},
+		std::pair{"break03", "168"},
+		std::pair{"electro_beat01", "120"},
+		std::pair{"electro_beat02", "119"},
+		std::pair{"house_loop01", "142"},
+		std::pair{"jungle01", "168"},
+		std::pair{"rave_hihat01", "180"},
+		std::pair{"rave_hihat02", "180"},
+		std::pair{"rave_kick01", "180"},
+		std::pair{"rave_kick02", "180"},
+		std::pair{"rave_snare01", "180"},
+		std::pair{"latin_brass01", "140"},
+		std::pair{"latin_guitar01", "126"},
+		std::pair{"latin_guitar02", "140"},
+		std::pair{"latin_guitar03", "120"},
 	};
 
 	// Replace loop sample names
@@ -1860,17 +1860,17 @@ void DataFile::upgrade_loopsRename()
 				if (item.isNull()) { continue; }
 				if (item.hasAttribute(srcAttr))
 				{
-					for (int k = 0; k < LOOPBPMS.size(); ++k)
+					for (auto& cur : loopBPMs)
 					{
-						auto currentPair = LOOPBPMS.at(k);
-						auto toReplace = currentPair.first;
-						auto srcVal = item.attribute(srcAttr);
+						auto x = (QString) cur.first,
+							 y = (QString) cur.second,
+							 srcVal = item.attribute(srcAttr);
 
-						if (srcVal.contains(toReplace, Qt::CaseInsensitive))
+						if (srcVal.contains(x, Qt::CaseInsensitive))
 						{
 							// Add " - X BPM" to filename
-							srcVal.replace(toReplace,
-									toReplace + " - " + currentPair.second + " BPM");
+							srcVal.replace(x,
+									x + " - " + y + " BPM");
 
 							item.setAttribute(srcAttr, srcVal);
 						}
