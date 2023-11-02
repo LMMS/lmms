@@ -59,12 +59,12 @@ ClapControlBase::ClapControlBase(Model* that, const QString& uri)
 
 void ClapControlBase::init(Model* that, const QString& uri)
 {
+	m_valid = false;
 	auto manager = Engine::getClapManager();
 	m_info = manager->pluginInfo(uri).lock().get();
 	if (!m_info)
 	{
 		qCritical() << "No CLAP plugin found for URI" << uri;
-		m_valid = false;
 		return;
 	}
 
@@ -77,7 +77,6 @@ void ClapControlBase::init(Model* that, const QString& uri)
 	{
 		qCritical() << "Failed instantiating CLAP processor";
 		m_instances.pop_back();
-		m_valid = false;
 		return;
 	}
 
@@ -90,14 +89,13 @@ void ClapControlBase::init(Model* that, const QString& uri)
 		{
 			qCritical() << "Failed instantiating CLAP processor";
 			m_instances.pop_back();
-			m_valid = false;
 			return;
 		}
 	}
 
-	m_valid = true;
 	m_channelsPerInstance = DEFAULT_CHANNELS / m_instances.size();
-	setHasGui(first->gui() != nullptr);
+	m_valid = true;
+
 	linkAllModels();
 }
 

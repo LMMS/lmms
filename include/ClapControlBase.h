@@ -58,8 +58,7 @@ public:
 	auto control(std::size_t idx) -> ClapInstance* { return m_instances[idx].get(); }
 	auto control(std::size_t idx) const -> const ClapInstance* { return m_instances[idx].get(); }
 
-	auto hasGui() const -> bool { return m_hasGUI; }
-	void setHasGui(bool val) { m_hasGUI = val; }
+	auto hasGui() const -> bool { return m_instances[0]->gui(); }
 
 	void callHostIdle();
 

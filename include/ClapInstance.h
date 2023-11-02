@@ -181,7 +181,7 @@ public:
 	// Plugin
 	/////////////////////////////////////////
 
-	auto state() const -> PluginState { return m_pluginState; };
+	auto state() const { return m_pluginState; };
 
 	auto start() -> bool; //!< Loads, inits, and activates in that order
 	auto restart() -> bool;
@@ -193,8 +193,8 @@ public:
 	auto deactivate() -> bool;
 
 	auto processBegin(std::uint32_t frames) -> bool;
-	void processNoteOff(f_cnt_t sampleOffset, std::int8_t channel, std::int16_t key, std::uint8_t velocity);
-	void processNoteOn(f_cnt_t sampleOffset, std::int8_t channel, std::int16_t key, std::uint8_t velocity);
+	void processNote(f_cnt_t offset, std::int8_t channel, std::int16_t key, std::uint8_t velocity, bool isOn);
+	void processKeyPressure(f_cnt_t offset, std::int8_t channel, std::int16_t key, std::uint8_t pressure);
 	auto process(std::uint32_t frames) -> bool;
 	auto processEnd(std::uint32_t frames) -> bool;
 
@@ -207,6 +207,8 @@ public:
 	auto isProcessing() const -> bool;
 	auto isSleeping() const -> bool;
 	auto isErrorState() const -> bool;
+
+	void log(clap_log_severity severity, const char* msg);
 
 signals:
 
@@ -224,23 +226,25 @@ private:
 	void setHost();
 	void hostPushToIdleQueue(std::function<bool()>&& functor);
 	static auto fromHost(const clap_host* host) -> ClapInstance*;
-	static auto hostGetExtension(const clap_host* host, const char* extension_id) -> const void*;
+	static auto hostGetExtension(const clap_host* host, const char* extensionId) -> const void*;
 	static void hostRequestCallback(const clap_host* host);
 	static void hostRequestProcess(const clap_host* host);
 	static void hostRequestRestart(const clap_host* host);
 	static void hostExtStateMarkDirty(const clap_host* host);
-	static void hostExtLogLog([[maybe_unused]] const clap_host* host, clap_log_severity severity, const char* msg);
+	static void hostExtLogLog(const clap_host* host, clap_log_severity severity, const char* msg);
 	static auto hostExtThreadCheckIsMainThread(const clap_host* host) -> bool;
 	static auto hostExtThreadCheckIsAudioThread(const clap_host* host) -> bool;
 	static void hostExtParamsRescan(const clap_host* host, std::uint32_t flags);
 	static void hostExtParamsClear(const clap_host* host, clap_id paramId, clap_param_clear_flags flags);
 	static void hostExtParamsRequestFlush(const clap_host* host);
-	static void hostExtLatencyChanged([[maybe_unused]] const clap_host* host);
+	static void hostExtLatencyChanged(const clap_host* host);
 	static void hostExtGuiResizeHintsChanged(const clap_host* host);
 	static auto hostExtGuiRequestResize(const clap_host* host, std::uint32_t width, std::uint32_t height) -> bool;
 	static auto hostExtGuiRequestShow(const clap_host* host) -> bool;
 	static auto hostExtGuiRequestHide(const clap_host* host) -> bool;
 	static void hostExtGuiRequestClosed(const clap_host* host, bool wasDestroyed);
+	static auto hostExtNotePortsSupportedDialects(const clap_host* host) -> std::uint32_t;
+	static void hostExtNotePortsRescan(const clap_host* host, std::uint32_t flags);
 
 	void setParamValueByHost(ClapParam& param, double value);
 	void setParamModulationByHost(ClapParam& param, double value);
@@ -363,6 +367,12 @@ private:
 	ringbuffer_reader_t<struct MidiInputEvent> m_midiInputReader;
 
 	/**
+	 * Note port
+	 */
+	std::uint16_t m_notePortIndex = 0; // Chosen plugin note port index (not the port id!)
+	std::uint32_t m_noteDialect = 0;   // Chosen plugin input dialect (0 == no note input)
+
+	/**
 	 * Parameter update queues
 	*/
 	std::unordered_map<clap_id, std::unique_ptr<ClapParam>> m_paramMap;
@@ -475,6 +485,12 @@ private:
 		&hostExtGuiRequestShow,
 		&hostExtGuiRequestHide,
 		&hostExtGuiRequestClosed
+	};
+
+	const clap_plugin_note_ports* m_pluginExtNotePorts = nullptr;
+	static const constexpr clap_host_note_ports s_hostExtNotePorts {
+		&hostExtNotePortsSupportedDialects,
+		&hostExtNotePortsRescan
 	};
 
 	/**

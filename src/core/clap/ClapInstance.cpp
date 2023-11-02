@@ -152,7 +152,7 @@ void ClapInstance::copyModelsFromCore()
 
 	// TODO: Handle parameter events similar to midi input? (with ringbuffer)
 
-	if (!hasNoteInput()) { return; } // TODO: Check for MIDI event / note event support instead?
+	if (!hasNoteInput()) { return; }
 
 	// TODO: Midi events and parameter events may not be ordered according to increasing sample offset
 	//       The event.header.time values need to be sorted in increasing order.
@@ -163,31 +163,14 @@ void ClapInstance::copyModelsFromCore()
 		switch (event.type())
 		{
 			case MidiNoteOff:
-				processNoteOff(offset, event.channel(), event.key(), event.velocity());
+				processNote(offset, event.channel(), event.key(), event.velocity(), false);
 				break;
 			case MidiNoteOn:
-				processNoteOn(offset, event.channel(), event.key(), event.velocity());
+				processNote(offset, event.channel(), event.key(), event.velocity(), true);
 				break;
 			case MidiKeyPressure:
-			{
-				assert(isAudioThread());
-				clap_event_note_expression ev;
-				ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
-				ev.header.type = CLAP_EVENT_NOTE_EXPRESSION;
-				ev.header.time = static_cast<std::uint32_t>(offset);
-				ev.header.flags = 0;
-				ev.header.size = sizeof(ev);
-				ev.port_index = 0;
-				ev.expression_id = CLAP_NOTE_EXPRESSION_VOLUME;
-				ev.note_id = 0;
-				ev.port_index = 0;
-				ev.channel = event.channel();
-				ev.key = event.key();
-				ev.value = event.velocity() / 32.0; // 0..127 --> 0..4
-
-				m_evIn.push(&ev.header);
+				processKeyPressure(offset, event.channel(), event.key(), event.velocity());
 				break;
-			}
 			default:
 				break;
 		}
@@ -282,8 +265,7 @@ void ClapInstance::handleMidiInputEvent(const MidiEvent& event, const TimePos& t
 
 auto ClapInstance::hasNoteInput() const -> bool
 {
-	// TODO: Check for midi in support?
-	return info().type() == Plugin::Type::Instrument;
+	return m_noteDialect != 0;
 }
 
 void ClapInstance::destroy()
@@ -360,6 +342,7 @@ auto ClapInstance::unload() -> bool
 	m_pluginExtState = nullptr;
 	m_pluginExtParams = nullptr;
 	m_pluginExtGui = nullptr;
+	m_pluginExtNotePorts = nullptr;
 
 	setPluginState(PluginState::None);
 	return true;
@@ -400,9 +383,9 @@ auto ClapInstance::init() -> bool
 
 	// TODO: Create ClapAudioPorts class
 	if (!pluginExtensionInit(m_pluginExtAudioPorts, CLAP_EXT_AUDIO_PORTS,
-		+[](const clap_plugin_audio_ports* p) { return p && p->count && p->get; }))
+		+[](const clap_plugin_audio_ports* p) { return p->count && p->get; }))
 	{
-		qWarning() << "The required CLAP audio port extension is not supported by the plugin";
+		log(CLAP_LOG_ERROR, "Plugin does not implement the required audio port extension");
 		setPluginState(PluginState::LoadedWithError);
 		return false;
 	}
@@ -652,12 +635,25 @@ auto ClapInstance::init() -> bool
 
 	// Initialize GUI
 	// TODO: What if this is the 2nd instance of a mono plugin?
+	m_pluginGui.reset();
 	if (pluginExtensionInit(m_pluginExtGui, CLAP_EXT_GUI, &ClapGui::extensionSupported))
 	{
 		m_pluginGui = std::make_unique<ClapGui>(m_pluginInfo, m_plugin, m_pluginExtGui);
 	}
 
-	//scanQuickControls();
+	// Set up note ports
+	m_notePortIndex = 0;
+	m_noteDialect = 0;
+	if (pluginExtensionInit(m_pluginExtNotePorts, CLAP_EXT_NOTE_PORTS,
+		+[](const clap_plugin_note_ports* p){ return p->count && p->get; }))
+	{
+		hostExtNotePortsRescan(host(), CLAP_NOTE_PORTS_RESCAN_ALL);
+	}
+
+	if (!hasNoteInput() && info().type() == Plugin::Type::Instrument)
+	{
+		log(CLAP_LOG_WARNING, "Plugin is instrument but doesn't implement note port extension");
+	}
 
 	setPluginState(PluginState::Inactive);
 
@@ -735,42 +731,99 @@ auto ClapInstance::processBegin(std::uint32_t frames) -> bool
 	return false;
 }
 
-void ClapInstance::processNoteOff(f_cnt_t sampleOffset, std::int8_t channel, std::int16_t key, std::uint8_t velocity)
+void ClapInstance::processNote(f_cnt_t offset, std::int8_t channel, std::int16_t key, std::uint8_t velocity, bool isOn)
 {
 	assert(isAudioThread());
+	assert(channel >= 0 && channel <= 15);
+	assert(key >= 0 && key <= 127);
+	assert(velocity >= 0 && velocity <= 127);
 
-	clap_event_note ev;
-	ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
-	ev.header.type = CLAP_EVENT_NOTE_OFF;
-	ev.header.time = static_cast<std::uint32_t>(sampleOffset);
-	ev.header.flags = 0;
-	ev.header.size = sizeof(ev);
-	ev.port_index = 0;
-	ev.key = key;
-	ev.channel = channel;
-	ev.note_id = -1;
-	ev.velocity = velocity / 127.0;
+	// NOTE: I've read that Bitwig Studio always sends CLAP dialect note events regardless of plugin's note dialect
+	switch (CLAP_NOTE_DIALECT_CLAP)
+	{
+		case CLAP_NOTE_DIALECT_CLAP:
+		{
+			clap_event_note ev;
+			ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+			ev.header.type = isOn ? CLAP_EVENT_NOTE_ON : CLAP_EVENT_NOTE_OFF;
+			ev.header.time = static_cast<std::uint32_t>(offset);
+			ev.header.flags = 0;
+			ev.header.size = sizeof(ev);
+			ev.note_id = -1; // TODO
+			ev.port_index = static_cast<std::int16_t>(m_notePortIndex);
+			ev.channel = channel;
+			ev.key = key;
+			ev.velocity = velocity / 127.0;
 
-	m_evIn.push(&ev.header);
+			m_evIn.push(&ev.header);
+			break;
+		}
+		case CLAP_NOTE_DIALECT_MIDI:
+		{
+			clap_event_midi ev;
+			ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+			ev.header.type = CLAP_EVENT_MIDI;
+			ev.header.time = static_cast<std::uint32_t>(offset);
+			ev.header.flags = 0;
+			ev.header.size = sizeof(ev);
+			ev.port_index = m_notePortIndex;
+			ev.data[0] = static_cast<std::uint8_t>((isOn ? 0x90 : 0x80) | (channel & 0x0F));
+			ev.data[1] = static_cast<std::uint8_t>(key);
+			ev.data[2] = static_cast<std::uint8_t>(velocity / 127.0);
+
+			m_evIn.push(&ev.header);
+			break;
+		}
+		default:
+			assert(false); // Shouldn't ever happen
+			break;
+	}
 }
 
-void ClapInstance::processNoteOn(f_cnt_t sampleOffset, std::int8_t channel, std::int16_t key, std::uint8_t velocity)
+void ClapInstance::processKeyPressure(f_cnt_t offset, std::int8_t channel, std::int16_t key, std::uint8_t pressure)
 {
 	assert(isAudioThread());
 
-	clap_event_note ev;
-	ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
-	ev.header.type = CLAP_EVENT_NOTE_ON;
-	ev.header.time = static_cast<std::uint32_t>(sampleOffset);
-	ev.header.flags = 0;
-	ev.header.size = sizeof(ev);
-	ev.port_index = 0;
-	ev.key = key;
-	ev.channel = channel;
-	ev.note_id = -1;
-	ev.velocity = velocity / 127.0;
+	switch (m_noteDialect)
+	{
+		case CLAP_NOTE_DIALECT_CLAP:
+		{
+			clap_event_note_expression ev;
+			ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+			ev.header.type = CLAP_EVENT_NOTE_EXPRESSION;
+			ev.header.time = static_cast<std::uint32_t>(offset);
+			ev.header.flags = 0;
+			ev.header.size = sizeof(ev);
+			ev.expression_id = CLAP_NOTE_EXPRESSION_VOLUME;
+			ev.note_id = 0; // TODO
+			ev.port_index = static_cast<std::int16_t>(m_notePortIndex);
+			ev.channel = channel;
+			ev.key = key;
+			ev.value = pressure / 32.0; // 0..127 --> 0..4
 
-	m_evIn.push(&ev.header);
+			m_evIn.push(&ev.header);
+			break;
+		}
+		case CLAP_NOTE_DIALECT_MIDI:
+		{
+			clap_event_midi ev;
+			ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+			ev.header.type = CLAP_EVENT_MIDI;
+			ev.header.time = static_cast<std::uint32_t>(offset);
+			ev.header.flags = 0;
+			ev.header.size = sizeof(ev);
+			ev.port_index = m_notePortIndex;
+			ev.data[0] = static_cast<std::uint8_t>(MidiEventTypes::MidiKeyPressure | channel);
+			ev.data[1] = static_cast<std::uint8_t>(key);
+			ev.data[2] = static_cast<std::uint8_t>(pressure / 127.0);
+
+			m_evIn.push(&ev.header);
+			break;
+		}
+		default:
+			assert(false); // Shouldn't ever happen
+			break;
+	}
 }
 
 auto ClapInstance::process(std::uint32_t frames) -> bool
@@ -1002,6 +1055,36 @@ auto ClapInstance::isErrorState() const -> bool
 		|| m_pluginState == PluginState::ActiveWithError;
 }
 
+void ClapInstance::log(clap_log_severity severity, const char* msg)
+{
+	// Thread-safe
+	if ((severity == CLAP_LOG_DEBUG || severity == CLAP_LOG_INFO)
+		&& !ClapManager::debugging()) { return; }
+
+	std::string_view severityStr;
+	switch (severity)
+	{
+	case CLAP_LOG_DEBUG:
+		severityStr = "DEBUG"; break;
+	case CLAP_LOG_INFO:
+		severityStr = "INFO"; break;
+	case CLAP_LOG_WARNING:
+		severityStr = "WARNING"; break;
+	case CLAP_LOG_ERROR:
+		severityStr = "ERROR"; break;
+	case CLAP_LOG_FATAL:
+		severityStr = "FATAL"; break;
+	case CLAP_LOG_HOST_MISBEHAVING:
+		severityStr = "HOST_MISBEHAVING"; break;
+	case CLAP_LOG_PLUGIN_MISBEHAVING:
+		severityStr = "PLUGIN_MISBEHAVING"; break;
+	default:
+		severityStr = "UNKNOWN"; break;
+	}
+
+	qDebug().nospace() << "CLAP [" << severityStr.data() << "] [" << info().descriptor()->id << "] - " << msg;
+}
+
 template<typename... Args>
 void ClapInstance::checkPluginStateCurrent(Args... possibilities)
 {
@@ -1208,6 +1291,7 @@ auto ClapInstance::hostGetExtension(const clap_host* host, const char* extension
 	if (id == CLAP_EXT_PARAMS)       { return &s_hostExtParams; }
 	if (id == CLAP_EXT_LATENCY)      { return &s_hostExtLatency; }
 	if (id == CLAP_EXT_GUI)          { return &s_hostExtGui; }
+	if (id == CLAP_EXT_NOTE_PORTS)   { return &s_hostExtNotePorts; }
 
 	return nullptr;
 }
@@ -1240,7 +1324,7 @@ void ClapInstance::hostExtStateMarkDirty(const clap_host* host)
 
 	if (!h->m_pluginExtState || !h->m_pluginExtState->save || !h->m_pluginExtState->load)
 	{
-		h->hostExtLogLog(host, CLAP_LOG_ERROR, "Plugin called clap_host_state.set_dirty() but the plugin does not "
+		h->log(CLAP_LOG_PLUGIN_MISBEHAVING, "Plugin called clap_host_state.set_dirty() but the plugin does not "
 			"provide a complete clap_plugin_state interface.");
 		return;
 	}
@@ -1251,30 +1335,8 @@ void ClapInstance::hostExtStateMarkDirty(const clap_host* host)
 void ClapInstance::hostExtLogLog(const clap_host* host, clap_log_severity severity, const char* msg)
 {
 	// Thread-safe
-	std::string_view severityStr;
-	switch (severity)
-	{
-	case CLAP_LOG_DEBUG:
-		if (!ClapManager::debugging()) { return; }
-		severityStr = "DEBUG"; break;
-	case CLAP_LOG_INFO:
-		if (!ClapManager::debugging()) { return; }
-		severityStr = "INFO"; break;
-	case CLAP_LOG_WARNING:
-		severityStr = "WARNING"; break;
-	case CLAP_LOG_ERROR:
-		severityStr = "ERROR"; break;
-	case CLAP_LOG_FATAL:
-		severityStr = "FATAL"; break;
-	case CLAP_LOG_HOST_MISBEHAVING:
-		severityStr = "HOST_MISBEHAVING"; break;
-	case CLAP_LOG_PLUGIN_MISBEHAVING:
-		severityStr = "PLUGIN_MISBEHAVING"; break;
-	default:
-		severityStr = "UNKNOWN"; break;
-	}
-
-	qDebug().nospace() << "CLAP LOG: severity=" << severityStr.data() << "; msg='" << msg << "'";
+	auto h = fromHost(host);
+	h->log(severity, msg);
 }
 
 auto ClapInstance::hostExtThreadCheckIsMainThread(const clap_host* host) -> bool
@@ -1449,7 +1511,7 @@ void ClapInstance::hostExtParamsRequestFlush(const clap_host* host)
 	h->m_scheduleParamFlush = true;
 }
 
-void ClapInstance::hostExtLatencyChanged(const clap_host* host)
+void ClapInstance::hostExtLatencyChanged([[maybe_unused]] const clap_host* host)
 {
 	/*
 	 * LMMS currently does not use latency data, but implementing this extension
@@ -1488,6 +1550,123 @@ void ClapInstance::hostExtGuiRequestClosed(const clap_host* host, bool wasDestro
 {
 	auto gui = fromHost(host)->gui();
 	gui->clapRequestClosed(wasDestroyed);
+}
+
+auto ClapInstance::hostExtNotePortsSupportedDialects([[maybe_unused]] const clap_host* host) -> std::uint32_t
+{
+	return CLAP_NOTE_DIALECT_CLAP | CLAP_NOTE_DIALECT_MIDI;
+}
+
+void ClapInstance::hostExtNotePortsRescan(const clap_host* host, std::uint32_t flags)
+{
+	qDebug() << "ClapInstance::hostExtNotePortsRescan";
+	auto h = fromHost(host);
+
+	if (!h->m_pluginExtNotePorts) { return; }
+
+	if (flags & CLAP_NOTE_PORTS_RESCAN_ALL)
+	{
+		if (h->isActive())
+		{
+			h->log(CLAP_LOG_PLUGIN_MISBEHAVING, "Host cannot rescan note ports while plugin is active");
+			return;
+		}
+
+		/*
+		 * I'm using a priority system to choose the note port we use.
+		 * This may not be very useful in practice.
+		 *
+		 * Highest to lowest priority:
+		 *   - CLAP preferred + MIDI (and CLAP) supported
+		 *   - MIDI preferred + CLAP (and MIDI) supported
+		 *   - Other preferred + CLAP and MIDI supported
+		 *   - CLAP supported
+		 *   - MIDI supported
+		 *   - (no note input support)
+		 */
+		class PriorityHelper
+		{
+		public:
+			using IndexDialectPair = std::tuple<std::uint16_t, std::uint32_t>;
+			auto check(std::uint16_t index, const clap_note_port_info& info)
+			{
+				// MIDI preferred + CLAP (and MIDI) supported
+				if (info.preferred_dialect == CLAP_NOTE_DIALECT_MIDI && (info.supported_dialects & CLAP_NOTE_DIALECT_CLAP))
+				{
+					m_cache[0] = { index, CLAP_NOTE_DIALECT_MIDI };
+					m_best = std::min(0u, m_best);
+				}
+				// CLAP and MIDI supported
+				else if ((info.supported_dialects & CLAP_NOTE_DIALECT_CLAP) && (info.supported_dialects & CLAP_NOTE_DIALECT_MIDI))
+				{
+					m_cache[1] = { index, CLAP_NOTE_DIALECT_CLAP };
+					m_best = std::min(1u, m_best);
+				}
+				// CLAP supported
+				else if (info.supported_dialects & CLAP_NOTE_DIALECT_CLAP)
+				{
+					m_cache[2] = { index, CLAP_NOTE_DIALECT_CLAP };
+					m_best = std::min(2u, m_best);
+				}
+				// MIDI supported
+				else if (info.supported_dialects & CLAP_NOTE_DIALECT_MIDI)
+				{
+					m_cache[3] = { index, CLAP_NOTE_DIALECT_MIDI };
+					m_best = std::min(3u, m_best);
+				}
+			}
+			auto getBest() -> IndexDialectPair
+			{
+				if (m_best == m_cache.size())
+				{
+					// No note port supported by host
+					return {0, 0};
+				}
+				return m_cache[m_best];
+			}
+		private:
+			std::array<IndexDialectPair, 4> m_cache; // priority 2 thru 5
+			unsigned m_best = static_cast<unsigned>(m_cache.size()); // best port seen so far
+		} priorityHelper;
+
+		const auto count = h->m_pluginExtNotePorts->count(h->plugin(), true);
+		assert(count < (std::numeric_limits<std::int16_t>::max)()); // just in case
+		for (std::uint16_t idx = 0; idx < static_cast<std::uint16_t>(count); ++idx)
+		{
+			auto info = clap_note_port_info{};
+			info.id = CLAP_INVALID_ID;
+			if (!h->m_pluginExtNotePorts->get(h->plugin(), idx, true, &info))
+			{
+				h->log(CLAP_LOG_DEBUG, "Failed to read note port info");
+				return;
+			}
+
+			// Just in case
+			if (info.id == CLAP_INVALID_ID)
+			{
+				h->log(CLAP_LOG_PLUGIN_MISBEHAVING, "Note port info contains invalid id");
+				continue;
+			}
+
+			// Check for #1 priority option: CLAP preferred + MIDI (and CLAP) supported
+			if (info.preferred_dialect == CLAP_NOTE_DIALECT_CLAP && (info.supported_dialects & CLAP_NOTE_DIALECT_MIDI))
+			{
+				h->m_notePortIndex = idx;
+				h->m_noteDialect = CLAP_NOTE_DIALECT_CLAP;
+				return;
+			}
+
+			// Check for match with lesser-priority options
+			priorityHelper.check(idx, info);
+		}
+
+		std::tie(h->m_notePortIndex, h->m_noteDialect) = priorityHelper.getBest();
+		// TODO: Also set the 2nd supported note dialect? Or use a boolean to indicate both CLAP and MIDI are supported?
+	}
+	else if (flags & CLAP_NOTE_PORTS_RESCAN_NAMES)
+	{
+		// Not implemented
+	}
 }
 
 void ClapInstance::setParamValueByHost(ClapParam& param, double value)

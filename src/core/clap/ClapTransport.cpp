@@ -38,10 +38,10 @@ namespace
 {
 
 template<std::size_t mask, typename T>
-inline void SetBit(T& number, bool value) noexcept
+inline void setBit(T& number, bool value) noexcept
 {
 	static_assert(mask && !(mask & (mask - 1)), "mask must have single bit set");
-	constexpr auto bitPos = [=]() {
+	constexpr auto bitPos = [=] {
 		// constexpr log2
 		unsigned pos = 0;
 		auto x = mask;
@@ -85,17 +85,17 @@ void ClapTransport::update()
 
 void ClapTransport::setPlaying(bool isPlaying)
 {
-	SetBit<CLAP_TRANSPORT_IS_PLAYING>(s_transport.flags, isPlaying);
+	setBit<CLAP_TRANSPORT_IS_PLAYING>(s_transport.flags, isPlaying);
 }
 
 void ClapTransport::setRecording(bool isRecording)
 {
-	SetBit<CLAP_TRANSPORT_IS_RECORDING>(s_transport.flags, isRecording);
+	setBit<CLAP_TRANSPORT_IS_RECORDING>(s_transport.flags, isRecording);
 }
 
 void ClapTransport::setLooping(bool isLooping)
 {
-	SetBit<CLAP_TRANSPORT_IS_LOOP_ACTIVE>(s_transport.flags, isLooping);
+	setBit<CLAP_TRANSPORT_IS_LOOP_ACTIVE>(s_transport.flags, isLooping);
 	// TODO: loop_start_* and loop_end_*
 }
 
