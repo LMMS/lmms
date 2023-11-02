@@ -570,13 +570,21 @@ void MainWindow::addSpacingToToolBar( int _size )
 								7, _size );
 }
 
+
+
+
 SubWindow* MainWindow::addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags)
 {
 	// wrap the widget in our own *custom* window that patches some errors in QMdiSubWindow
 	auto win = new SubWindow(m_workspace->viewport(), windowFlags);
 	win->setAttribute(Qt::WA_DeleteOnClose);
 	win->setWidget(w);
-	if (w && w->sizeHint().isValid()) {win->resize(w->sizeHint());}
+	if (w && w->sizeHint().isValid()) {
+		std::size_t titleBarHeight = win->titleBarHeight();
+		std::size_t frameWidth = win->frameWidth();
+		QSize delta(2* frameWidth, titleBarHeight + frameWidth);
+		win->resize(delta + w->sizeHint());
+	}
 	m_workspace->addSubWindow(win);
 	return win;
 }
