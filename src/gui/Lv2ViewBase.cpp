@@ -173,7 +173,7 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase) :
 	LILV_FOREACH(nodes, itr, props.get())
 	{
 		const LilvNode* node = lilv_nodes_get(props.get(), itr);
-		auto infoLabel = new QLabel(lilv_node_as_string(node));
+		auto infoLabel = new QLabel(QString(lilv_node_as_string(node)).trimmed());
 		infoLabel->setWordWrap(true);
 		infoLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 
