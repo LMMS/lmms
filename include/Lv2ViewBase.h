@@ -71,7 +71,7 @@ class HelpWindowEventFilter : public QObject
 	Q_OBJECT
 	class Lv2ViewBase* const m_viewBase;
 protected:
-	bool eventFilter(QObject *obj, QEvent *event) override;
+	bool eventFilter(QObject* obj, QEvent* event) override;
 public:
 	HelpWindowEventFilter(class Lv2ViewBase* viewBase);
 };

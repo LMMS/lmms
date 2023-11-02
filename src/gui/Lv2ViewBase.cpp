@@ -267,7 +267,7 @@ HelpWindowEventFilter::HelpWindowEventFilter(Lv2ViewBase* viewBase) :
 
 
 
-bool HelpWindowEventFilter::eventFilter(QObject *obj, QEvent *event)
+bool HelpWindowEventFilter::eventFilter(QObject* , QEvent* event)
 {
 	if (event->type() == QEvent::Close) {
 		m_viewBase->m_helpButton->setChecked(false);
