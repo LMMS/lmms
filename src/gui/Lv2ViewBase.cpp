@@ -137,7 +137,8 @@ AutoLilvNode Lv2ViewProc::uri(const char *uriStr)
 
 
 
-Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
+Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase) :
+	m_helpWindowEventFilter(this)
 {
 	auto grid = new QGridLayout(meAsWidget);
 
@@ -181,8 +182,9 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 		btnBox->addWidget(m_helpButton);
 
 		m_helpWindow = getGUI()->mainWindow()->addWindowedWidget(infoLabel);
-		m_helpWindow->setSizePolicy(QSizePolicy::Minimum,
+		m_helpWindow->setSizePolicy(QSizePolicy::Expanding,
 									QSizePolicy::Expanding);
+		m_helpWindow->installEventFilter(&m_helpWindowEventFilter);
 		m_helpWindow->setAttribute(Qt::WA_DeleteOnClose, false);
 		m_helpWindow->hide();
 
@@ -203,6 +205,7 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 
 
 Lv2ViewBase::~Lv2ViewBase() {
+	m_helpWindow->close();
 	// TODO: hide UI if required
 }
 
@@ -245,6 +248,32 @@ void Lv2ViewBase::modelChanged(Lv2ControlBase *ctrlBase)
 AutoLilvNode Lv2ViewBase::uri(const char *uriStr)
 {
 	return Engine::getLv2Manager()->uri(uriStr);
+}
+
+
+
+
+void Lv2ViewBase::onHelpWindowClosed()
+{
+	m_helpButton->setChecked(true);
+}
+
+
+
+
+HelpWindowEventFilter::HelpWindowEventFilter(Lv2ViewBase* viewBase) :
+	m_viewBase(viewBase) {}
+
+
+
+
+bool HelpWindowEventFilter::eventFilter(QObject *obj, QEvent *event)
+{
+	if (event->type() == QEvent::Close) {
+		m_viewBase->m_helpButton->setChecked(false);
+		return true;
+	}
+	return false;
 }
 
 
