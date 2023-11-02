@@ -580,8 +580,8 @@ SubWindow* MainWindow::addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags
 	win->setAttribute(Qt::WA_DeleteOnClose);
 	win->setWidget(w);
 	if (w && w->sizeHint().isValid()) {
-		std::size_t titleBarHeight = win->titleBarHeight();
-		std::size_t frameWidth = win->frameWidth();
+		int titleBarHeight = win->titleBarHeight();
+		int frameWidth = win->frameWidth();
 		QSize delta(2* frameWidth, titleBarHeight + frameWidth);
 		win->resize(delta + w->sizeHint());
 	}
