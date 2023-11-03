@@ -35,60 +35,9 @@
 #include "PhaseVocoder.h"
 #include "SampleBuffer.h"
 #include "SlicerTView.h"
+#include "lmms_basics.h"
 
 namespace lmms {
-
-// simple helper class that handles the different audio channels
-class DynamicPlaybackBuffer
-{
-public:
-	DynamicPlaybackBuffer()
-		: m_leftChannel()
-		, m_rightChannel()
-	{
-	}
-
-	void loadSample(const sampleFrame* inData, int frames, int sampleRate, float newRatio)
-	{
-		std::vector<float> leftData(frames, 0);
-		std::vector<float> rightData(frames, 0);
-		for (int i = 0; i < frames; i++)
-		{
-			leftData.at(i) = inData[i][0];
-			rightData.at(i) = inData[i][1];
-		}
-		m_leftChannel.loadData(std::move(leftData), sampleRate, newRatio);
-		m_rightChannel.loadData(std::move(rightData), sampleRate, newRatio);
-	}
-
-	void getFrames(sampleFrame* outData, int startFrame, int frames)
-	{
-		std::vector<float> leftOut(frames, 0); // not a huge performance issue
-		std::vector<float> rightOut(frames, 0);
-
-		m_leftChannel.getFrames(leftOut, startFrame, frames);
-		m_rightChannel.getFrames(rightOut, startFrame, frames);
-
-		for (int i = 0; i < frames; i++)
-		{
-			outData[i][0] = leftOut.at(i);
-			outData[i][1] = rightOut.at(i);
-		}
-	}
-
-	int frames() { return m_leftChannel.frames(); }
-	float scaleRatio() { return m_leftChannel.scaleRatio(); }
-
-	void setScaleRatio(float newRatio)
-	{
-		m_leftChannel.setScaleRatio(newRatio);
-		m_rightChannel.setScaleRatio(newRatio);
-	}
-
-private:
-	PhaseVocoder m_leftChannel;
-	PhaseVocoder m_rightChannel;
-};
 
 class SlicerT : public Instrument
 {
@@ -127,7 +76,7 @@ private:
 
 	// sample buffers
 	SampleBuffer m_originalSample;
-	DynamicPlaybackBuffer m_phaseVocoder;
+	std::vector<sampleFrame> m_playBackBuffer;
 
 	SRC_STATE* m_resamplerState;
 

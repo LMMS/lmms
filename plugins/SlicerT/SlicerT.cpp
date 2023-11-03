@@ -60,9 +60,8 @@ SlicerT::SlicerT(InstrumentTrack* instrumentTrack)
 	, m_fadeOutFrames(400.0f, 0.0f, 8192.0f, 1.0f, this, tr("FadeOut"))
 	, m_originalBPM(1, 1, 999, this, tr("Original bpm"))
 	, m_sliceSnap(this, tr("Slice snap"))
-	, m_enableSync(true, this, tr("BPM sync"))
+	, m_enableSync(false, this, tr("BPM sync"))
 	, m_originalSample()
-	, m_phaseVocoder()
 	, m_parentTrack(instrumentTrack)
 {
 	m_sliceSnap.addItem("Off");
@@ -79,26 +78,32 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 {
 	if (m_originalSample.frames() < 2048) { return; }
 
-	if (!handle->m_pluginData)  {
-		handle->m_pluginData = src_new(SRC_SINC_MEDIUM_QUALITY, 2, nullptr);
-	}
-
 	// playback parameters
 	const int noteIndex = handle->key() - m_parentTrack->baseNote();
 	const int playedFrames = handle->totalFramesPlayed();
 	const fpp_t frames = handle->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = handle->noteOffset();
 	const int bpm = Engine::getSong()->getTempo();
-	const float pitchRatio = pow(2, m_parentTrack->pitchModel()->value() / 1200);
-	const float inversePitchRatio = 1.0f / pitchRatio;
+	const float pitchRatio = 1 / pow(2, m_parentTrack->pitchModel()->value() / 1200);
 
 	// update scaling parameters
 	float speedRatio = static_cast<float>(m_originalBPM.value()) / bpm;
 	if (!m_enableSync.value()) { speedRatio = 1; } // disable timeshift
-	m_phaseVocoder.setScaleRatio(speedRatio);
-	speedRatio *= inversePitchRatio; // adjust for pitch bend
+	speedRatio *= pitchRatio; // adjust for pitch bend
 
-	int totalFrames = inversePitchRatio * m_phaseVocoder.frames(); // adjust frames played with regards to pitch
+	int totalFrames = m_originalSample.frames() * speedRatio;
+	if (m_playBackBuffer.size() != totalFrames) {
+		m_playBackBuffer.resize(totalFrames);
+		SRC_DATA resampleRate;
+		resampleRate.data_in = (float*)m_originalSample.data();
+		resampleRate.data_out = (float*)m_playBackBuffer.data();
+		resampleRate.input_frames = m_originalSample.frames();
+		resampleRate.output_frames = totalFrames;
+		resampleRate.src_ratio = speedRatio;
+
+		src_simple(&resampleRate, SRC_LINEAR, 2);
+	}
+
 	int sliceStart, sliceEnd;
 	if (noteIndex > m_slicePoints.size() - 2 || noteIndex < 0) // full sample if ouside range
 	{
@@ -118,31 +123,10 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 
 	if (noteFramesLeft > 0)
 	{
-		int framesToCopy = pitchRatio * frames + 1; // just in case
-		int framesIndex = pitchRatio * currentNoteFrame;
-		framesIndex = std::min(framesIndex, m_phaseVocoder.frames() - framesToCopy);
-
-		// load sample segmengt, with regards to pitch settings
-		std::vector<sampleFrame> prePitchBuffer(framesToCopy, {0.0f, 0.0f});
-		m_phaseVocoder.getFrames(prePitchBuffer.data(), framesIndex, framesToCopy);
-
-		// if pitch is changed, resample, else just copy
-		if (!typeInfo<float>::isEqual(pitchRatio, 1.0f))
-		{
-			SRC_DATA resamplerData;
-
-			resamplerData.data_in = (float*)prePitchBuffer.data();	   // wtf
-			resamplerData.data_out = (float*)(workingBuffer + offset); // wtf is this
-			resamplerData.input_frames = prePitchBuffer.size();
-			resamplerData.output_frames = frames;
-			resamplerData.src_ratio = inversePitchRatio;
-
-			src_process((SRC_STATE*)(handle->m_pluginData), &resamplerData);
-		}
-		else { std::copy_n(prePitchBuffer.data(), frames, workingBuffer + offset); }
+		std::copy_n(m_playBackBuffer.data() + currentNoteFrame, frames, workingBuffer + offset);
 
 		// exponential fade out, applyRelease kinda sucks
-		if (noteFramesLeft * pitchRatio < m_fadeOutFrames.value())
+		if (noteFramesLeft < m_fadeOutFrames.value())
 		{
 			for (int i = 0; i < frames; i++)
 			{
@@ -301,14 +285,13 @@ std::vector<Note> SlicerT::getMidi()
 
 	// update incase bpm changed
 	float speedRatio = static_cast<float>(m_originalBPM.value()) / Engine::getSong()->getTempo();
-	m_phaseVocoder.setScaleRatio(speedRatio);
 
 	// calculate how many "beats" are in the sample
 	float ticksPerBar = DefaultTicksPerBar;
 	float sampleRate = m_originalSample.sampleRate();
 	float bpm = Engine::getSong()->getTempo();
 	float samplesPerBeat = 60.0f / bpm * sampleRate;
-	float beats = m_phaseVocoder.frames() / samplesPerBeat;
+	float beats = m_originalSample.frames() * speedRatio / samplesPerBeat;
 
 	// calculate how many ticks in sample
 	float barsInSample = beats / Engine::getSong()->getTimeSigModel().getDenominator();
@@ -342,9 +325,8 @@ void SlicerT::updateFile(QString file)
 	findBPM();
 	findSlices();
 
-	float speedRatio = static_cast<float>(m_originalBPM.value()) / Engine::getSong()->getTempo();
-	m_phaseVocoder.loadSample(
-		m_originalSample.data(), m_originalSample.frames(), m_originalSample.sampleRate(), speedRatio);
+	m_playBackBuffer.resize(m_originalSample.frames());
+	std::copy_n(m_originalSample.data(), m_originalSample.frames(), m_playBackBuffer.data());
 
 	emit dataChanged();
 }
@@ -413,9 +395,8 @@ void SlicerT::loadSettings(const QDomElement& element)
 	m_originalBPM.loadSettings(element, "origBPM");
 
 	// create dynamic buffer
-	float speedRatio = static_cast<float>(m_originalBPM.value()) / Engine::getSong()->getTempo();
-	m_phaseVocoder.loadSample(
-		m_originalSample.data(), m_originalSample.frames(), m_originalSample.sampleRate(), speedRatio);
+	m_playBackBuffer.resize(m_originalSample.frames());
+	std::copy_n(m_originalSample.data(), m_originalSample.frames(), m_playBackBuffer.data());
 
 	emit dataChanged();
 }
