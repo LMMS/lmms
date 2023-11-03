@@ -82,7 +82,8 @@ auto ClapFile::load() -> bool
 
 	m_valid = false;
 
-	m_library = std::make_unique<QLibrary>(QString::fromUtf8(m_filename.c_str()));
+	// TODO: Replace QLibrary with in-house non-Qt alternative
+	m_library = std::make_unique<QLibrary>(QString::fromUtf8(filename().u8string().c_str()));
 	if (!m_library->load())
 	{
 		qWarning() << m_library->errorString();

@@ -33,7 +33,6 @@
 
 #include <string>
 #include <string_view>
-#include <ostream>
 #include <unordered_map>
 #include <algorithm>
 #include <memory>
@@ -52,7 +51,7 @@ class ClapParam : public QObject
 
 public:
 
-	enum class ParamType
+	enum class ValueType
 	{
 		Undefined,
 		Bool,
@@ -63,15 +62,15 @@ public:
 	ClapParam(ClapInstance* pluginHost, const clap_param_info& info, double value);
 
 	auto model() const -> AutomatableModel* { return m_connectedModel.get(); }
-	auto valueType() const -> ParamType { return m_valueType; }
+	auto valueType() const { return m_valueType; }
 	auto id() const -> std::string_view { return m_id; }
 	auto displayName() const -> std::string_view { return m_displayName; }
 	auto getValueText(const clap_plugin* plugin, const clap_plugin_params* params) const -> std::string;
 
-	auto value() const -> double { return m_value; }
+	auto value() const { return m_value; }
 	void setValue(double v);
 
-	auto modulation() const -> double { return m_modulation; }
+	auto modulation() const { return m_modulation; }
 	void setModulation(double v);
 
 	auto modulatedValue() const -> double
@@ -81,8 +80,8 @@ public:
 
 	auto isValueValid(const double v) const -> bool;
 
-	void printShortInfo(std::ostream& os) const;
-	void printInfo(std::ostream& os) const;
+	auto getShortInfoString() const -> std::string;
+	auto getInfoString() const -> std::string;
 
 	void setInfo(const clap_param_info& info) noexcept { m_info = info; }
 	auto isInfoEqualTo(const clap_param_info& info) const -> bool;
@@ -130,7 +129,7 @@ private:
 	//! An AutomatableModel is created if the param is to be shown to the user
 	std::unique_ptr<AutomatableModel> m_connectedModel;
 
-	ParamType m_valueType = ParamType::Undefined;
+	ValueType m_valueType = ValueType::Undefined;
 
 	std::string m_id;
 	std::string m_displayName;

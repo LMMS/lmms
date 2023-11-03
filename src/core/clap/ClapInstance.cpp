@@ -35,10 +35,10 @@
 #include <QApplication>
 #include <QDomDocument>
 #include <QDomElement>
-#include <QThread>
 #include <QDebug>
 
 #include <algorithm>
+#include <thread>
 #include <string_view>
 #include <cassert>
 
@@ -690,33 +690,19 @@ auto ClapInstance::deactivate() -> bool
 	assert(isMainThread());
 	if (!isActive()) { return false; }
 
-	class StopProcessingThread : public QThread
-	{
-	public:
-		explicit StopProcessingThread(ClapInstance* instance)
-			: m_instance{instance}
-		{
-		}
-	private:
-		void run() override
-		{
-			if (m_instance->m_pluginState == PluginState::ActiveAndProcessing)
-			{
-				m_instance->m_plugin->stop_processing(m_instance->m_plugin);
-			}
-			m_instance->setPluginState(PluginState::ActiveAndReadyToDeactivate);
-		}
-		ClapInstance* m_instance;
-	};
-
 	// stop_processing() needs to be called on the audio thread,
 	// but the main thread will hang if I try to use m_scheduleDeactivate
 	// and poll until the process() event is called - it never seems to be called
 	// TODO: Could try spoofing the thread check extension instead of
 	//       creating a thread here, but maybe that wouldn't be safe
-	auto thread = StopProcessingThread{this};
-	thread.start();
-	thread.wait();
+	auto thread = std::thread{[this] {
+		if (m_pluginState == PluginState::ActiveAndProcessing)
+		{
+			m_plugin->stop_processing(m_plugin);
+		}
+		setPluginState(PluginState::ActiveAndReadyToDeactivate);
+	}};
+	thread.join();
 
 	m_plugin->deactivate(m_plugin);
 	setPluginState(PluginState::Inactive);
@@ -1696,12 +1682,8 @@ void ClapInstance::checkValidParamValue(const ClapParam& param, double value)
 	assert(isMainThread());
 	if (!param.isValueValid(value))
 	{
-		std::ostringstream msg;
-		msg << "Invalid value for param. ";
-		param.printInfo(msg);
-		msg << "; value: " << value;
-		// std::cerr << msg.str() << std::endl;
-		throw std::invalid_argument{msg.str()};
+		std::string msg = "Invalid value for param. " + param.getInfoString() + "; value: " + std::to_string(value);
+		throw std::invalid_argument{msg};
 	}
 }
 

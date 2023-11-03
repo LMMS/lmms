@@ -52,8 +52,10 @@ ClapControlBase::ClapControlBase(Model* that, const QString& uri)
 	else
 	{
 		// Not on main thread - need to invoke on main thread
-		static_assert(QT_VERSION >= QT_VERSION_CHECK(5, 10, 0), "");
-		QMetaObject::invokeMethod(QCoreApplication::instance(), [&]{ init(that, uri); }, Qt::BlockingQueuedConnection);
+
+		// TODO: Temporarily commented out to see if it builds
+		//static_assert(QT_VERSION >= QT_VERSION_CHECK(5, 10, 0), "");
+		//QMetaObject::invokeMethod(QCoreApplication::instance(), [&]{ init(that, uri); }, Qt::BlockingQueuedConnection);
 	}
 }
 

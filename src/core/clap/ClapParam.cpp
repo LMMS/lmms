@@ -66,23 +66,23 @@ ClapParam::ClapParam(ClapInstance* pluginHost, const clap_param_info& info, doub
 		const auto valueInt = static_cast<int>(std::trunc(value));
 		const auto maxVal = static_cast<int>(std::trunc(m_info.max_value));
 
-		if ((flags & CLAP_PARAM_IS_BYPASS) && (minVal != 0 || maxVal != 1))
-		{
-			qWarning() << "CLAP param: Warning: Bypass parameter doesn't have range [0, 1]";
-		}
-
 		if (minVal == 0 && maxVal == 1)
 		{
 			qDebug() << "CLAP param: Creating BoolModel";
 			m_connectedModel = std::make_unique<BoolModel>(valueInt, pluginHost, name);
-			m_valueType = ParamType::Bool;
+			m_valueType = ValueType::Bool;
 		}
 		else
 		{
+			if (flags & CLAP_PARAM_IS_BYPASS)
+			{
+				pluginHost->log(CLAP_LOG_PLUGIN_MISBEHAVING, "Bypass parameter doesn't have range [0, 1]");
+			}
+
 			qDebug() << "CLAP param: Creating IntModel";
 			m_connectedModel = std::make_unique<IntModel>(valueInt, minVal, maxVal, pluginHost, name);
 			// TODO: Is there any way to differentiate between plain int parameters and enum parameters?
-			m_valueType = ParamType::Integer;
+			m_valueType = ValueType::Integer;
 		}
 	}
 	else
@@ -104,7 +104,7 @@ ClapParam::ClapParam(ClapInstance* pluginHost, const clap_param_info& info, doub
 			static_cast<float>(stepSize),
 			pluginHost, name);
 
-		m_valueType = ParamType::Float;
+		m_valueType = ValueType::Float;
 	}
 }
 
@@ -151,15 +151,14 @@ auto ClapParam::isValueValid(const double v) const -> bool
 	return m_info.min_value <= v && v <= m_info.max_value;
 }
 
-void ClapParam::printShortInfo(std::ostream& os) const
+auto ClapParam::getShortInfoString() const -> std::string
 {
-	os << "id: " << m_info.id << ", name: '" << m_info.name << "', module: '" << m_info.module << "'";
+	return "id: " + std::to_string(m_info.id) + ", name: '" + std::string{m_info.name} + "', module: '" + std::string{m_info.module} + "'";
 }
 
-void ClapParam::printInfo(std::ostream& os) const
+auto ClapParam::getInfoString() const -> std::string
 {
-	printShortInfo(os);
-	os << ", min: " << m_info.min_value << ", max: " << m_info.max_value;
+	return getShortInfoString() + ", min: " + std::to_string(m_info.min_value) + ", max: " + std::to_string(m_info.max_value);
 }
 
 auto ClapParam::isInfoEqualTo(const clap_param_info& info) const -> bool

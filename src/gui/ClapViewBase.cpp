@@ -61,15 +61,15 @@ ClapViewInstance::ClapViewInstance(QWidget* parent, ClapInstance* instance, int 
 
 		switch (param->valueType())
 		{
-		case ClapParam::ParamType::Bool:
+		case ClapParam::ValueType::Bool:
 			control = new CheckControl{this};
 			break;
-		case ClapParam::ParamType::Integer:
+		case ClapParam::ValueType::Integer:
 			// TODO: What if more digits are needed? Lv2 uses KnobControl in this case.
 			control = new LcdControl{(param->info().max_value <= 9.0) ? 1 : 2, this};
 			break;
 		// TODO: Are enum controls possible? Look into writing a CLAP proposal if not
-		case ClapParam::ParamType::Float:
+		case ClapParam::ValueType::Float:
 		{
 			control = new CustomTextKnobControl{this};
 

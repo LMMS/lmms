@@ -134,8 +134,7 @@ private:
 
 	const ClapPluginInfo* m_info = nullptr;
 
-	bool m_valid = true;
-	bool m_hasGUI = false;
+	bool m_valid = false;
 	unsigned m_channelsPerInstance = 0;
 };
 
