@@ -32,10 +32,20 @@
 #include "Plugin.h"
 #include "PluginIssue.h"
 
-#include <filesystem>
 #include <vector>
 #include <unordered_set>
 #include <memory>
+
+#if __has_include(<filesystem>)
+#include <filesystem>
+#elif __has_include(<experimental/filesystem>)
+#include <experimental/filesystem>
+namespace std {
+	namespace filesystem = experimental::filesystem;
+} // namespace std
+#else
+#error "Standard filesystem library not available"
+#endif
 
 #include <QLibrary>
 #include <clap/clap.h>

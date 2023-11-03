@@ -32,7 +32,6 @@
 #include "ClapFile.h"
 #include "ClapInstance.h"
 
-#include <filesystem>
 #include <vector>
 #include <string_view>
 #include <memory>

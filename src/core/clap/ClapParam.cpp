@@ -117,7 +117,7 @@ auto ClapParam::getValueText(const clap_plugin* plugin, const clap_plugin_params
 	}
 
 	auto buffer = std::array<char, CLAP_NAME_SIZE>{};
-	if (!params->value_to_text(plugin, m_info.id, m_value, buffer.data(), CLAP_NAME_SIZE))
+	if (!params->value_to_text(plugin, m_info.id, m_value, buffer.data(), CLAP_NAME_SIZE - 1))
 	{
 		return valueStr;
 	}

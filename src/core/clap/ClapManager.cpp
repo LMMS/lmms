@@ -27,7 +27,6 @@
 #ifdef LMMS_HAVE_CLAP
 
 #include <algorithm>
-#include <filesystem>
 #include <string_view>
 
 #include <cstdlib>
