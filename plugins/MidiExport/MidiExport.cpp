@@ -114,7 +114,6 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 			int base_pitch = 0;
 			double base_volume = 1.0;
 			int base_time = 0;
-			int base_beatLen = 16;
 
 			MidiNoteVector midiClip;
 
@@ -130,18 +129,6 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 						base_pitch += masterPitch;
 					}
 					base_volume = LocaleHelper::toDouble(it.attribute("volume", "100"))/100.0;
-					// From the PR 5902 forward (Note Types), the instrument XML includes the beat length
-					// in frames. We try to fetch it and convert to the length in ticks. If there's no beat
-					// length in XML, the default beat length of 16 ticks will be used.
-					QDomNode iNode = it.elementsByTagName("instrument").at(0);
-					if (!iNode.isNull())
-					{
-						QDomElement i = iNode.toElement();
-						if (i.hasAttribute("beatlen"))
-						{
-							base_beatLen = i.attribute("beatlen", "0").toInt() / Engine::framesPerTick();
-						}
-					}
 				}
 
 				if (n.nodeName() == "midiclip")
@@ -151,7 +138,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 				}
 
 			}
-			processPatternNotes(midiClip, base_beatLen, INT_MAX);
+			processPatternNotes(midiClip, INT_MAX);
 			writeMidiClipToTrack(mtrack, midiClip);
 			size = mtrack.writeToBuffer(buffer.data());
 			midiout.writeRawData((char *)buffer.data(), size);
@@ -202,7 +189,6 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 
 		int base_pitch = 0;
 		double base_volume = 1.0;
-		int base_beatLen = 16;
 
 		// for each pattern in the pattern editor
 		for (QDomNode n = element.firstChild(); !n.isNull(); n = n.nextSibling())
@@ -216,15 +202,6 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 					base_pitch += masterPitch;
 				}
 				base_volume = LocaleHelper::toDouble(it.attribute("volume", "100")) / 100.0;
-				QDomNode iNode = it.elementsByTagName("instrument").at(0);
-				if (!iNode.isNull())
-				{
-					QDomElement i = iNode.toElement();
-					if (i.hasAttribute("beatlen"))
-					{
-						base_beatLen = i.attribute("beatlen", "0").toInt()/Engine::framesPerTick();
-					}
-				}
 			}
 
 			if (n.nodeName() == "midiclip")
@@ -271,7 +248,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 					st.pop_back();
 				}
 
-				processPatternNotes(nv, base_beatLen, pos);
+				processPatternNotes(nv, pos);
 				writeMidiClipToTrack(mtrack, nv);
 
 				// next pattern track
@@ -344,7 +321,7 @@ void MidiExport::writePatternClip(MidiNoteVector& src, MidiNoteVector& dst,
 
 
 
-void MidiExport::processPatternNotes(MidiNoteVector& nv, int beatLen, int cutPos)
+void MidiExport::processPatternNotes(MidiNoteVector& nv, int cutPos)
 {
 	std::sort(nv.begin(), nv.end());
 	int cur = INT_MAX, next = INT_MAX;
@@ -357,7 +334,7 @@ void MidiExport::processPatternNotes(MidiNoteVector& nv, int beatLen, int cutPos
 		}
 		if (it->type == Note::Type::Step)
 		{
-			it->duration = qMin(qMin(beatLen, next - cur), cutPos - it->time);
+			it->duration = qMin(qMin(DefaultBeatLength, next - cur), cutPos - it->time);
 		}
 	}
 }
