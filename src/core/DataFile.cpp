@@ -380,7 +380,7 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 		}
 	}
 
-	QSaveFile outfile (fullNameTemp);
+	QSaveFile outfile(fullNameTemp);
 
 	if (!outfile.open(QIODevice::WriteOnly | QIODevice::Truncate))
 	{
@@ -413,7 +413,7 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 		return false;
 	}
 
-	if (ConfigManager::inst()->value("app", "disablebackup" ).toInt())
+	if (ConfigManager::inst()->value("app", "disablebackup").toInt())
 	{
 		// remove current file
 		QFile::remove(fullName);
