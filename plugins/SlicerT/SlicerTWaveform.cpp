@@ -404,8 +404,7 @@ void SlicerTWaveform::wheelEvent(QWheelEvent* _we)
 	m_zoomLevel += _we->angleDelta().y() / 360.0f * s_zoomSensitivity;
 	m_zoomLevel = std::max(0.0f, m_zoomLevel);
 
-	drawEditor();
-	update();
+	updateUI();
 }
 
 void SlicerTWaveform::paintEvent(QPaintEvent* pe)
