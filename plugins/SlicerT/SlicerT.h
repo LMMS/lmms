@@ -32,7 +32,6 @@
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Note.h"
-#include "PhaseVocoder.h"
 #include "SampleBuffer.h"
 #include "SlicerTView.h"
 #include "lmms_basics.h"

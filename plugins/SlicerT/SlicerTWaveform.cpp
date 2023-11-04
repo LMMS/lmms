@@ -44,7 +44,7 @@ SlicerTWaveform::SlicerTWaveform(int w, int h, SlicerT* instrument, QWidget* par
 	, m_editorWidth(w)
 
 	// create pixmaps
-	, m_sliceArrow(PLUGIN_NAME::getIconPixmap("slide_indicator_arrow"))
+	, m_sliceArrow(PLUGIN_NAME::getIconPixmap("slice_indicator_arrow"))
 	, m_seeker(QPixmap(m_seekerWidth, m_seekerHeight))
 	, m_seekerWaveform(QPixmap(m_seekerWidth, m_seekerHeight))
 	, m_editorWaveform(QPixmap(m_editorWidth, m_editorHeight))
