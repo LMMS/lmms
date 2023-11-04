@@ -179,21 +179,18 @@ void Instrument::applyFadeIn(sampleFrame * buf, NotePlayHandle * n)
 
 void Instrument::applyRelease( sampleFrame * buf, const NotePlayHandle * _n )
 {
-	const fpp_t frames = _n->framesLeftForCurrentPeriod();
-	const fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
-	const f_cnt_t fl = _n->framesLeft();
-	if( fl <= desiredReleaseFrames()+fpp )
+	const auto fpp = Engine::audioEngine()->framesPerPeriod();
+	const auto releaseFrames = desiredReleaseFrames();
+
+	const auto endFrame = _n->framesLeft();
+	const auto startFrame = std::max(0, endFrame - releaseFrames);
+
+	for (auto f = startFrame; f < endFrame && f < fpp; f++)
 	{
-		for( fpp_t f = (fpp_t)( ( fl > desiredReleaseFrames() ) ?
-				(std::max(fpp - desiredReleaseFrames(), 0) +
-					fl % fpp) : 0); f < frames; ++f)
+		const float fac = (float)(endFrame - f) / (float)releaseFrames;
+		for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ch++)
 		{
-			const float fac = (float)( fl-f-1 ) /
-							desiredReleaseFrames();
-			for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
-			{
-				buf[f][ch] *= fac;
-			}
+			buf[f][ch] *= fac;
 		}
 	}
 }

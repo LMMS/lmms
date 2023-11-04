@@ -442,11 +442,16 @@ void Lv2Proc::initPlugin()
 
 	if (m_instance)
 	{
-		if(m_worker) {
+		const auto iface = static_cast<const LV2_Worker_Interface*>(
+			lilv_instance_get_extension_data(m_instance, LV2_WORKER__interface));
+		if (iface) {
 			m_worker->setHandle(lilv_instance_get_handle(m_instance));
+			m_worker->setInterface(iface);
 		}
 		for (std::size_t portNum = 0; portNum < m_ports.size(); ++portNum)
+		{
 			connectPort(portNum);
+		}
 		lilv_instance_activate(m_instance);
 	}
 	else
@@ -528,12 +533,10 @@ void Lv2Proc::initPluginSpecificFeatures()
 	// worker (if plugin has worker extension)
 	Lv2Manager* mgr = Engine::getLv2Manager();
 	if (lilv_plugin_has_extension_data(m_plugin, mgr->uri(LV2_WORKER__interface).get())) {
-		const auto iface = static_cast<const LV2_Worker_Interface*>(
-			lilv_instance_get_extension_data(m_instance, LV2_WORKER__interface));
 		bool threaded = !Engine::audioEngine()->renderOnly();
-		m_worker.emplace(iface, &m_workLock, threaded);
+		m_worker.emplace(&m_workLock, threaded);
 		m_features[LV2_WORKER__schedule] = m_worker->feature();
-		// Note: m_worker::setHandle will still need to be called later
+		// note: the worker interface can not be instantiated yet - it requires m_instance. see initPlugin()
 	}
 }
 
