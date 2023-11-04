@@ -106,8 +106,8 @@ jobs:
         run: |
           brew bundle install --verbose
           # Update npm's built-in node-gyp to work with preinstalled Python 3.12
-          # TODO: Remove this once runner's npm version is at least 10.2.2
-          npm explore npm/node_modules/@npmcli/run-script -g -- \
+          # TODO: Remove this line once runner's npm version is at least 10.2.2
+          sudo npm explore npm/node_modules/@npmcli/run-script -g -- \
             npm_config_global=false npm install node-gyp@latest
           npm install --location=global appdmg
         env:
