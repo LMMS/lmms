@@ -39,6 +39,24 @@
 
 namespace lmms {
 
+class PlayBackState
+{
+public:
+	PlayBackState(float startFrame)
+		: currentNote(startFrame)
+	{
+		resamplingState = src_new(SRC_LINEAR, 2, nullptr);
+	}
+	~PlayBackState() { src_delete(resamplingState); }
+	float getNoteDone() { return currentNote; }
+	void setNoteDone(float newDone) { currentNote = newDone; }
+	SRC_STATE* getResampleState() { return resamplingState; }
+
+private:
+	float currentNote; // these are all absoute floats
+	SRC_STATE* resamplingState;
+};
+
 class SlicerT : public Instrument
 {
 	Q_OBJECT
@@ -76,11 +94,8 @@ private:
 
 	// sample buffers
 	SampleBuffer m_originalSample;
-	std::vector<sampleFrame> m_playBackBuffer;
 
-	SRC_STATE* m_resamplerState;
-
-	std::vector<int> m_slicePoints;
+	std::vector<float> m_slicePoints;
 
 	InstrumentTrack* m_parentTrack;
 

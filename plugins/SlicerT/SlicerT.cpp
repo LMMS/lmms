@@ -80,52 +80,56 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 
 	// playback parameters
 	const int noteIndex = handle->key() - m_parentTrack->baseNote();
-	const int playedFrames = handle->totalFramesPlayed();
 	const fpp_t frames = handle->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = handle->noteOffset();
 	const int bpm = Engine::getSong()->getTempo();
 	const float pitchRatio = 1 / pow(2, m_parentTrack->pitchModel()->value() / 1200);
 
-	// update scaling parameters
+	// update sync parameter
 	float speedRatio = static_cast<float>(m_originalBPM.value()) / bpm;
 	if (!m_enableSync.value()) { speedRatio = 1; } // disable timeshift
-	speedRatio *= pitchRatio; // adjust for pitch bend
+	speedRatio *= pitchRatio;					   // adjust for pitch bend
 
-	int totalFrames = m_originalSample.frames() * speedRatio;
-	if (m_playBackBuffer.size() != totalFrames) {
-		m_playBackBuffer.resize(totalFrames);
-		SRC_DATA resampleRate;
-		resampleRate.data_in = (float*)m_originalSample.data();
-		resampleRate.data_out = (float*)m_playBackBuffer.data();
-		resampleRate.input_frames = m_originalSample.frames();
-		resampleRate.output_frames = totalFrames;
-		resampleRate.src_ratio = speedRatio;
-
-		src_simple(&resampleRate, SRC_LINEAR, 2);
-	}
-
-	int sliceStart, sliceEnd;
+	// set start and end points
+	float sliceStart, sliceEnd;
 	if (noteIndex > m_slicePoints.size() - 2 || noteIndex < 0) // full sample if ouside range
 	{
 		sliceStart = 0;
-		sliceEnd = totalFrames;
+		sliceEnd = 1;
 	}
 	else
 	{
-		sliceStart = m_slicePoints[noteIndex] * speedRatio;
-		sliceEnd = m_slicePoints[noteIndex + 1] * speedRatio;
+		sliceStart = m_slicePoints[noteIndex];
+		sliceEnd = m_slicePoints[noteIndex + 1];
 	}
 
-	// slice vars
-	int sliceFrames = sliceEnd - sliceStart;
-	int currentNoteFrame = sliceStart + playedFrames;
-	int noteFramesLeft = sliceFrames - playedFrames;
+	// initliazize handle
+	if (!handle->m_pluginData) { handle->m_pluginData = new PlayBackState(sliceStart); }
 
-	if (noteFramesLeft > 0)
+	// slice vars
+	float noteDone = ((PlayBackState*)handle->m_pluginData)->getNoteDone();
+	float noteLeft = sliceEnd - noteDone;
+
+	if (noteLeft > 0)
 	{
-		std::copy_n(m_playBackBuffer.data() + currentNoteFrame, frames, workingBuffer + offset);
+		// resample in chunks
+		int noteFrame = noteDone * m_originalSample.frames();
+
+		SRC_STATE* resampleState = ((PlayBackState*)handle->m_pluginData)->getResampleState();
+		SRC_DATA resampleData;
+		resampleData.data_in = (float*)(m_originalSample.data() + noteFrame);
+		resampleData.data_out = (float*)(workingBuffer + offset);
+		resampleData.input_frames = noteLeft * m_originalSample.frames();
+		resampleData.output_frames = frames;
+		resampleData.src_ratio = speedRatio;
+
+		src_process(resampleState, &resampleData);
+
+		float nextNoteDone = noteDone + frames * (1.0f / speedRatio) / m_originalSample.frames();
+		((PlayBackState*)handle->m_pluginData)->setNoteDone(nextNoteDone);
 
 		// exponential fade out, applyRelease kinda sucks
+		int noteFramesLeft = noteLeft * m_originalSample.frames();
 		if (noteFramesLeft < m_fadeOutFrames.value())
 		{
 			for (int i = 0; i < frames; i++)
@@ -142,11 +146,7 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 
 		instrumentTrack()->processAudioBuffer(workingBuffer, frames + offset, handle);
 
-		// calculate absolute for the SlicerTWaveform
-		float absoluteCurrentNote = static_cast<float>(currentNoteFrame) / totalFrames;
-		float absoluteStartNote = static_cast<float>(sliceStart) / totalFrames;
-		float abslouteEndNote = static_cast<float>(sliceEnd) / totalFrames;
-		emit isPlaying(absoluteCurrentNote, absoluteStartNote, abslouteEndNote);
+		emit isPlaying(noteDone, sliceStart, sliceEnd);
 	}
 	else { emit isPlaying(-1, 0, 0); }
 }
@@ -227,24 +227,30 @@ void SlicerT::findSlices()
 	m_slicePoints.push_back(m_originalSample.frames());
 
 	// snap slices to notes
+	float beatsPerMin = m_originalBPM.value() / 60.0f;
+	float samplesPerBeat = m_originalSample.sampleRate() / beatsPerMin * 4.0f;
 	int noteSnap = m_sliceSnap.value();
-	int timeSignature = Engine::getSong()->getTimeSigModel().getNumerator();
-	int samplesPerBar = 60.0f * timeSignature / m_originalBPM.value() * m_originalSample.sampleRate();
-	int sliceLock = samplesPerBar / std::pow(2, noteSnap + 1); // lock to note: 1 / noteSnap²
-	if (noteSnap == 0) { sliceLock = 1; }				  // disable noteSnap
+	int sliceLock = samplesPerBeat / std::pow(2, noteSnap + 1); // lock to note: 1 / noteSnap²
+	if (noteSnap == 0) { sliceLock = 1; }						// disable noteSnap
 
 	for (int i = 0; i < m_slicePoints.size(); i++)
 	{
 		m_slicePoints[i] += sliceLock / 2;
-		m_slicePoints[i] -= m_slicePoints[i] % sliceLock;
+		m_slicePoints[i] -= static_cast<int>(m_slicePoints[i]) % sliceLock;
 	}
 
 	// remove duplicates
 	m_slicePoints.erase(std::unique(m_slicePoints.begin(), m_slicePoints.end()), m_slicePoints.end());
 
+	// scale between 0 and 1
+	for (float& sliceIndex : m_slicePoints)
+	{
+		sliceIndex /= m_originalSample.frames();
+	}
+
 	// fit to sample size
 	m_slicePoints[0] = 0;
-	m_slicePoints[m_slicePoints.size() - 1] = m_originalSample.frames();
+	m_slicePoints[m_slicePoints.size() - 1] = 1;
 
 	// update UI
 	emit dataChanged();
@@ -283,27 +289,18 @@ std::vector<Note> SlicerT::getMidi()
 {
 	std::vector<Note> outputNotes;
 
-	// update incase bpm changed
 	float speedRatio = static_cast<float>(m_originalBPM.value()) / Engine::getSong()->getTempo();
+	float outFrames = m_originalSample.frames() * speedRatio;
 
-	// calculate how many "beats" are in the sample
-	float ticksPerBar = DefaultTicksPerBar;
-	float sampleRate = m_originalSample.sampleRate();
-	float bpm = Engine::getSong()->getTempo();
-	float samplesPerBeat = 60.0f / bpm * sampleRate;
-	float beats = m_originalSample.frames() * speedRatio / samplesPerBeat;
-
-	// calculate how many ticks in sample
-	float barsInSample = beats / Engine::getSong()->getTimeSigModel().getDenominator();
-	float totalTicks = ticksPerBar * barsInSample;
-
+	float framesPerTick = Engine::framesPerTick();
+	float totalTicks = outFrames / framesPerTick;
 	float lastEnd = 0;
 
 	// write to midi
 	for (int i = 0; i < m_slicePoints.size() - 1; i++)
 	{
 		float sliceStart = lastEnd;
-		float sliceEnd = totalTicks * m_slicePoints[i + 1] / m_originalSample.frames();
+		float sliceEnd = totalTicks * m_slicePoints[i + 1];
 
 		Note sliceNote = Note();
 		sliceNote.setKey(i + m_parentTrack->baseNote());
@@ -324,9 +321,6 @@ void SlicerT::updateFile(QString file)
 
 	findBPM();
 	findSlices();
-
-	m_playBackBuffer.resize(m_originalSample.frames());
-	std::copy_n(m_originalSample.data(), m_originalSample.frames(), m_playBackBuffer.data());
 
 	emit dataChanged();
 }
@@ -357,6 +351,7 @@ void SlicerT::saveSettings(QDomDocument& document, QDomElement& element)
 	m_fadeOutFrames.saveSettings(document, element, "fadeOut");
 	m_noteThreshold.saveSettings(document, element, "threshold");
 	m_originalBPM.saveSettings(document, element, "origBPM");
+	m_enableSync.saveSettings(document, element, "syncEnable");
 }
 
 void SlicerT::loadSettings(const QDomElement& element)
@@ -385,7 +380,7 @@ void SlicerT::loadSettings(const QDomElement& element)
 		m_slicePoints = {};
 		for (int i = 0; i < totalSlices; i++)
 		{
-			m_slicePoints.push_back(element.attribute(tr("slice_%1").arg(i)).toInt());
+			m_slicePoints.push_back(element.attribute(tr("slice_%1").arg(i)).toFloat());
 		}
 	}
 
@@ -393,10 +388,7 @@ void SlicerT::loadSettings(const QDomElement& element)
 	m_fadeOutFrames.loadSettings(element, "fadeOut");
 	m_noteThreshold.loadSettings(element, "threshold");
 	m_originalBPM.loadSettings(element, "origBPM");
-
-	// create dynamic buffer
-	m_playBackBuffer.resize(m_originalSample.frames());
-	std::copy_n(m_originalSample.data(), m_originalSample.frames(), m_playBackBuffer.data());
+	m_enableSync.loadSettings(element, "syncEnable");
 
 	emit dataChanged();
 }

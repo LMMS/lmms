@@ -99,7 +99,7 @@ void SlicerTWaveform::drawSeeker()
 	for (int i = 0; i < m_slicerTParent->m_slicePoints.size(); i++)
 	{
 		float xPos = static_cast<float>(m_slicerTParent->m_slicePoints.at(i))
-			/ m_slicerTParent->m_originalSample.frames() * m_seekerWidth;
+			 * m_seekerWidth;
 		brush.drawLine(xPos, 0, xPos, m_seekerHeight);
 	}
 
@@ -170,9 +170,8 @@ void SlicerTWaveform::drawEditor()
 	}
 
 	// editor boundaries
-	float totalFrames = m_slicerTParent->m_originalSample.frames();
-	float startFrame = m_seekerStart * totalFrames;
-	float endFrame = m_seekerEnd * totalFrames;
+	float startFrame = m_seekerStart;
+	float endFrame = m_seekerEnd;
 	float numFramesToDraw = endFrame - startFrame;
 
 	// playback state
@@ -263,12 +262,12 @@ void SlicerTWaveform::updateClosest(QMouseEvent* me)
 	else // editor click
 	{
 		m_closestSlice = -1;
-		float startFrame = m_seekerStart * m_slicerTParent->m_originalSample.frames();
-		float endFrame = m_seekerEnd * m_slicerTParent->m_originalSample.frames();
+		float startFrame = m_seekerStart;
+		float endFrame = m_seekerEnd;
 		// select slice
 		for (int i = 0; i < m_slicerTParent->m_slicePoints.size(); i++)
 		{
-			int sliceIndex = m_slicerTParent->m_slicePoints.at(i);
+			float sliceIndex = m_slicerTParent->m_slicePoints.at(i);
 			float xPos = (sliceIndex - startFrame) / (endFrame - startFrame);
 
 			if (std::abs(xPos - normalizedClickEditor) < s_distanceForClick)
@@ -348,8 +347,8 @@ void SlicerTWaveform::mouseMoveEvent(QMouseEvent* me)
 
 	float distStart = m_seekerStart - m_seekerMiddle;
 	float distEnd = m_seekerEnd - m_seekerMiddle;
-	float startFrame = m_seekerStart * m_slicerTParent->m_originalSample.frames();
-	float endFrame = m_seekerEnd * m_slicerTParent->m_originalSample.frames();
+	float startFrame = m_seekerStart;
+	float endFrame = m_seekerEnd;
 
 	// handle dragging events
 	switch (m_closestObject)
@@ -377,7 +376,7 @@ void SlicerTWaveform::mouseMoveEvent(QMouseEvent* me)
 		m_slicerTParent->m_slicePoints.at(m_closestSlice)
 			= startFrame + normalizedClickEditor * (endFrame - startFrame);
 		m_slicerTParent->m_slicePoints.at(m_closestSlice) = std::clamp(
-			m_slicerTParent->m_slicePoints.at(m_closestSlice), 0, m_slicerTParent->m_originalSample.frames());
+			m_slicerTParent->m_slicePoints.at(m_closestSlice), 0.0f, 1.0f);
 		break;
 	case UIObjects::Nothing:
 		break;
@@ -392,8 +391,8 @@ void SlicerTWaveform::mouseDoubleClickEvent(QMouseEvent* me)
 	if (me->button() != Qt::MouseButton::LeftButton) { return; }
 
 	float normalizedClickEditor = static_cast<float>(me->x()) / m_editorWidth;
-	float startFrame = m_seekerStart * m_slicerTParent->m_originalSample.frames();
-	float endFrame = m_seekerEnd * m_slicerTParent->m_originalSample.frames();
+	float startFrame = m_seekerStart;
+	float endFrame = m_seekerEnd;
 	float slicePosition = startFrame + normalizedClickEditor * (endFrame - startFrame);
 
 	m_slicerTParent->m_slicePoints.insert(m_slicerTParent->m_slicePoints.begin(), slicePosition);
