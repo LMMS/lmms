@@ -89,6 +89,7 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 	float speedRatio = static_cast<float>(m_originalBPM.value()) / bpm;
 	if (!m_enableSync.value()) { speedRatio = 1; } // disable timeshift
 	speedRatio *= pitchRatio;					   // adjust for pitch bend
+	speedRatio *= Engine::audioEngine()->processingSampleRate() / static_cast<float>(m_originalSample.sampleRate()) ;
 
 	// set start and end points
 	float sliceStart, sliceEnd;

@@ -44,7 +44,7 @@ public:
 	PlayBackState(float startFrame)
 		: currentNote(startFrame)
 	{
-		resamplingState = src_new(SRC_LINEAR, 2, nullptr);
+		resamplingState = src_new(SRC_SINC_MEDIUM_QUALITY, 2, nullptr);
 	}
 	~PlayBackState() { src_delete(resamplingState); }
 	float getNoteDone() { return currentNote; }
