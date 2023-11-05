@@ -23,7 +23,12 @@
  *
  */
 
+#include <QFileInfo>
+#include <QTextCodec>
+#include <QTextStream>
 #include "AudioFileMP3.h"
+#include "Song.h"
+#include "base64.h"
 
 #ifdef LMMS_HAVE_MP3LAME
 
@@ -123,6 +128,48 @@ bool AudioFileMP3::initEncoder()
 	// Add a comment
 	id3tag_init(m_lame);
 	id3tag_set_comment(m_lame, "Created with LMMS");
+
+    // add optional Song meta data
+    const Song* song = Engine::getSong();
+    if (!song->getTitle().isNull())
+    {
+        id3tag_set_title(m_lame, song->getTitle().toStdString().c_str());
+    } else {
+        id3tag_set_title(m_lame, QFileInfo(song->projectFileName())
+                         .completeBaseName()
+                         .replace("[_-]", " ")
+                         .toStdString().c_str());
+    }
+    id3tag_set_textinfo_utf16(m_lame, "TBPM", QString::number( song->getTempo()).utf16());
+
+    if (!song->getArtist().isNull())
+    {
+        id3tag_set_artist(m_lame, song->getArtist().toStdString().c_str());
+    }
+    if (!song->getAlbum().isNull())
+    {
+        id3tag_set_album(m_lame, song->getAlbum().toStdString().c_str());
+    }
+    if (!song->getYear().isNull())
+    {
+        id3tag_set_year(m_lame, song->getYear().toStdString().c_str());
+    }
+    if (!song->getGenre().isNull())
+    {
+        id3tag_set_genre(m_lame, song->getGenre().toStdString().c_str());
+    }
+    if (!song->getComment().isNull())
+    {
+        id3tag_set_comment(m_lame, song->getComment().toStdString().c_str());
+    }
+    if (!song->getImage().isNull())
+    {
+        int imageSize = 0;
+        char * imageData = 0;
+        base64::decode( song->getImage(), &imageData, &imageSize );
+        id3tag_set_albumart(m_lame, imageData, imageSize);
+        delete[] imageData;
+    }
 
 	return lame_init_params(m_lame) != -1;
 }

@@ -80,6 +80,13 @@ Song::Song() :
 	m_oldFileName(),
 	m_modified( false ),
 	m_loadOnLaunch( true ),
+    m_title(),
+    m_artist(),
+    m_album(),
+    m_year(),
+    m_genre(),
+    m_comment(),
+    m_image(),
 	m_recording( false ),
 	m_exporting( false ),
 	m_exportLoop( false ),
@@ -1080,6 +1087,19 @@ void Song::loadProject( const QString & fileName )
 	m_masterVolumeModel.loadSettings( dataFile.head(), "mastervol" );
 	m_masterPitchModel.loadSettings( dataFile.head(), "masterpitch" );
 
+    // get song meta data
+    QDomElement metaElement = dataFile.content().firstChildElement( "meta" );
+    if( !metaElement.isNull() )
+    {
+        m_title = metaElement.attribute("title");
+        m_artist = metaElement.attribute("artist");
+        m_album = metaElement.attribute("album");
+        m_year = metaElement.attribute("year");
+        m_genre = metaElement.attribute("genre");
+        m_comment = metaElement.attribute("comment");
+        m_image = metaElement.attribute("image");
+    }
+
 	if( getPlayPos(PlayMode::Song).m_timeLine )
 	{
 		// reset loop-point-state
@@ -1242,6 +1262,16 @@ bool Song::saveProjectFile(const QString & filename, bool withResources)
 	m_timeSigModel.saveSettings( dataFile, dataFile.head(), "timesig" );
 	m_masterVolumeModel.saveSettings( dataFile, dataFile.head(), "mastervol" );
 	m_masterPitchModel.saveSettings( dataFile, dataFile.head(), "masterpitch" );
+
+    QDomElement meta = dataFile.createElement(QString("meta"));
+    meta.setAttribute( "title", m_title );
+    meta.setAttribute( "artist", m_artist );
+    meta.setAttribute( "album", m_album );
+    meta.setAttribute( "year", m_year );
+    meta.setAttribute( "genre", m_genre );
+    meta.setAttribute( "comment", m_comment );
+    meta.setAttribute( "image", m_image );
+    dataFile.content().appendChild(meta);
 
 	saveState( dataFile, dataFile.content() );
 
@@ -1438,10 +1468,8 @@ void Song::setProjectFileName(QString const & projectFileName)
 	{
 		m_fileName = projectFileName;
 		emit projectFileNameChanged();
-	}
+    }
 }
-
-
 
 
 void Song::addController( Controller * controller )

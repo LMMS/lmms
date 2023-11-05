@@ -26,6 +26,8 @@
 #define LMMS_GUI_PROJECT_NOTES_H
 
 #include <QMainWindow>
+#include <QLineEdit>
+#include <QPushButton>
 
 #include "SerializingObject.h"
 
@@ -45,7 +47,8 @@ public:
 	ProjectNotes();
 	~ProjectNotes() override = default;
 
-	void clear();
+    void clear();
+    void clearMetaData();
 	void setText( const QString & _text );
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
@@ -58,8 +61,10 @@ public:
 
 
 protected:
-	void closeEvent( QCloseEvent * _ce ) override;
+    void closeEvent( QCloseEvent * _ce ) override;
+    void showEvent( QShowEvent * _ce ) override;
 	void setupActions();
+    void setupMetaData();
 
 
 private slots:
@@ -72,10 +77,21 @@ private slots:
 	void textAlign( QAction * _a );
 
 	void formatChanged( const QTextCharFormat & _f );
-	void alignmentChanged( int _a );
+    void alignmentChanged( int _a );
+    void metaTextModified();
+    void selectSongImage();
 
 
 private:
+    QWidget * m_form;
+    QLineEdit * m_title;
+    QLineEdit * m_artist;
+    QLineEdit * m_album;
+    QLineEdit * m_year;
+    QLineEdit * m_genre;
+    QLineEdit * m_comment;
+    QLineEdit * m_image;
+    QPushButton * m_changeImageButton;
 	QTextEdit * m_edit;
 	QAction * m_actionTextBold,
 		* m_actionTextUnderline,
