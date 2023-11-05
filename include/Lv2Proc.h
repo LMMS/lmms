@@ -1,7 +1,7 @@
 /*
  * Lv2Proc.h - Lv2 processor class
  *
- * Copyright (c) 2019-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2019-2022 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -31,11 +31,14 @@
 
 #include <lilv/lilv.h>
 #include <memory>
+#include <optional>
 
+#include "LinkedModelGroups.h"
+#include "LmmsSemaphore.h"
 #include "Lv2Basics.h"
 #include "Lv2Features.h"
 #include "Lv2Options.h"
-#include "LinkedModelGroups.h"
+#include "Lv2Worker.h"
 #include "Plugin.h"
 #include "../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
 #include "TimePos.h"
@@ -174,7 +177,13 @@ private:
 	const LilvPlugin* m_plugin;
 	LilvInstance* m_instance;
 	Lv2Features m_features;
+
+	// options
 	Lv2Options m_options;
+
+	// worker
+	std::optional<Lv2Worker> m_worker;
+	Semaphore m_workLock; // this must be shared by different workers
 
 	// full list of ports
 	std::vector<std::unique_ptr<Lv2Ports::PortBase>> m_ports;

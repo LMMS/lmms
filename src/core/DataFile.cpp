@@ -79,6 +79,7 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_automationNodes  ,   &DataFile::upgrade_extendedNoteRange,
 	&DataFile::upgrade_defaultTripleOscillatorHQ,
 	&DataFile::upgrade_mixerRename      ,   &DataFile::upgrade_bbTcoRename,
+	&DataFile::upgrade_sampleAndHold    ,   &DataFile::upgrade_midiCCIndexing
 };
 
 // Vector of all versions that have upgrade routines.
@@ -1671,6 +1672,8 @@ void DataFile::upgrade_extendedNoteRange()
 {
 	auto root = documentElement();
 	UpgradeExtendedNoteRange upgradeExtendedNoteRange(root);
+
+	upgradeExtendedNoteRange.upgrade();
 }
 
 
@@ -1701,26 +1704,56 @@ void DataFile::upgrade_mixerRename()
 {
 	// Change nodename <fxmixer> to <mixer>
 	QDomNodeList fxmixer = elementsByTagName("fxmixer");
-	for (int i = 0; !fxmixer.item(i).isNull(); ++i)
+	for (int i = 0; i < fxmixer.length(); ++i)
 	{
-		fxmixer.item(i).toElement().setTagName("mixer");
+		auto item = fxmixer.item(i).toElement();
+		if (item.isNull())
+		{
+			continue;
+		}
+		item.setTagName("mixer");
 	}
 
 	// Change nodename <fxchannel> to <mixerchannel>
 	QDomNodeList fxchannel = elementsByTagName("fxchannel");
-	for (int i = 0; !fxchannel.item(i).isNull(); ++i)
+	for (int i = 0; i < fxchannel.length(); ++i)
 	{
-		fxchannel.item(i).toElement().setTagName("mixerchannel");
+		auto item = fxchannel.item(i).toElement();
+		if (item.isNull())
+		{
+			continue;
+		}
+		item.setTagName("mixerchannel");
 	}
 
 	// Change the attribute fxch of element <instrumenttrack> to mixch
 	QDomNodeList fxch = elementsByTagName("instrumenttrack");
-	for(int i = 0; !fxch.item(i).isNull(); ++i)
+	for (int i = 0; i < fxch.length(); ++i)
 	{
-		if(fxch.item(i).toElement().hasAttribute("fxch"))
+		auto item = fxch.item(i).toElement();
+		if (item.isNull())
 		{
-			fxch.item(i).toElement().setAttribute("mixch", fxch.item(i).toElement().attribute("fxch"));
-			fxch.item(i).toElement().removeAttribute("fxch");
+			continue;
+		}
+		if (item.hasAttribute("fxch"))
+		{
+			item.setAttribute("mixch", item.attribute("fxch"));
+			item.removeAttribute("fxch");
+		}
+	}
+	// Change the attribute fxch of element <sampletrack> to mixch
+	fxch = elementsByTagName("sampletrack");
+	for (int i = 0; i < fxch.length(); ++i)
+	{
+		auto item = fxch.item(i).toElement();
+		if (item.isNull())
+		{
+			continue;
+		}
+		if (item.hasAttribute("fxch"))
+		{
+			item.setAttribute("mixch", item.attribute("fxch"));
+			item.removeAttribute("fxch");
 		}
 	}
 }
@@ -1759,6 +1792,44 @@ void DataFile::upgrade_bbTcoRename()
 	}
 }
 
+
+// Set LFO speed to 0.01 on projects made before sample-and-hold PR
+void DataFile::upgrade_sampleAndHold()
+{
+	QDomNodeList elements = elementsByTagName("lfocontroller");
+	for (int i = 0; i < elements.length(); ++i)
+	{
+		if (elements.item(i).isNull()) { continue; }
+		auto e = elements.item(i).toElement();
+		// Correct old random wave LFO speeds
+		if (e.attribute("wave").toInt() == 6)
+		{
+			e.setAttribute("speed",0.01f);
+		}
+	}
+}
+
+//! Update MIDI CC indexes, so that they are counted from 0. Older releases of LMMS
+//! count the CCs from 1.
+void DataFile::upgrade_midiCCIndexing()
+{
+	static constexpr std::array attributesToUpdate{"inputcontroller", "outputcontroller"};
+
+	QDomNodeList elements = elementsByTagName("Midicontroller");
+	for(int i = 0; i < elements.length(); i++)
+	{
+		if (elements.item(i).isNull()) { continue; }
+		auto element = elements.item(i).toElement();
+		for (const char* attrName : attributesToUpdate)
+		{
+			if (element.hasAttribute(attrName))
+			{
+				int cc = element.attribute(attrName).toInt();
+				element.setAttribute(attrName, cc - 1);
+			}
+		}
+	}
+}
 
 void DataFile::upgrade()
 {

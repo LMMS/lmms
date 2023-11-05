@@ -399,8 +399,6 @@ void VestigeInstrument::play( sampleFrame * _buf )
 {
 	if (!m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0)) {return;}
 
-	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
-
 	if( m_plugin == nullptr )
 	{
 		m_pluginMutex.unlock();
@@ -408,8 +406,6 @@ void VestigeInstrument::play( sampleFrame * _buf )
 	}
 
 	m_plugin->process( nullptr, _buf );
-
-	instrumentTrack()->processAudioBuffer( _buf, frames, nullptr );
 
 	m_pluginMutex.unlock();
 }

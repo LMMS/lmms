@@ -130,7 +130,10 @@ QPixmap* PianoRoll::s_toolKnife = nullptr;
 
 SimpleTextFloat * PianoRoll::s_textFloat = nullptr;
 
-static std::array<QString, 12> s_noteStrings {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+static std::array<QString, 12> s_noteStrings {
+	"C", "C\u266F / D\u266D", "D", "D\u266F / E\u266D", "E", "F", "F\u266F / G\u266D", 
+	"G", "G\u266F / A\u266D", "A", "A\u266F / B\u266D", "B"
+};
 
 static QString getNoteString(int key)
 {
@@ -741,10 +744,10 @@ void PianoRoll::fitNoteLengths(bool fill)
 {
 	if (!hasValidMidiClip()) { return; }
 	m_midiClip->addJournalCheckPoint();
+	m_midiClip->rearrangeAllNotes();
 
 	// Reference notes
-	NoteVector refNotes = m_midiClip->notes();
-	std::sort(refNotes.begin(), refNotes.end(), Note::lessThan);
+	const NoteVector& refNotes = m_midiClip->notes();
 
 	// Notes to edit
 	NoteVector notes = getSelectedNotes();
@@ -762,7 +765,7 @@ void PianoRoll::fitNoteLengths(bool fill)
 	}
 
 	int length;
-	NoteVector::iterator ref = refNotes.begin();
+	auto ref = refNotes.begin();
 	for (Note* note : notes)
 	{
 		// Fast forward to next reference note
@@ -797,14 +800,11 @@ void PianoRoll::constrainNoteLengths(bool constrainMax)
 	if (!hasValidMidiClip()) { return; }
 	m_midiClip->addJournalCheckPoint();
 
-	NoteVector notes = getSelectedNotes();
-	if (notes.empty())
-	{
-		notes = m_midiClip->notes();
-	}
+	const NoteVector selectedNotes = getSelectedNotes();
+	const auto& notes = selectedNotes.empty() ? m_midiClip->notes() : selectedNotes;
 
-	TimePos bound = m_lenOfNewNotes;  // will be length of last note
-	for (Note* note : notes)
+	TimePos bound = m_lenOfNewNotes; // will be length of last note
+	for (auto note : notes)
 	{
 		if (constrainMax ? note->length() > bound : note->length() < bound)
 		{
@@ -1207,11 +1207,11 @@ void PianoRoll::shiftSemiTone(int amount) //Shift notes by amount semitones
 
 	auto selectedNotes = getSelectedNotes();
 	//If no notes are selected, shift all of them, otherwise shift selection
-	if (selectedNotes.empty()) { return shiftSemiTone(m_midiClip->notes(), amount); }
-	else { return shiftSemiTone(selectedNotes, amount); }
+	if (selectedNotes.empty()) { shiftSemiTone(m_midiClip->notes(), amount); }
+	else { shiftSemiTone(selectedNotes, amount); }
 }
 
-void PianoRoll::shiftSemiTone(NoteVector notes, int amount)
+void PianoRoll::shiftSemiTone(const NoteVector& notes, int amount)
 {
 	m_midiClip->addJournalCheckPoint();
 	for (Note *note : notes) { note->setKey( note->key() + amount ); }
@@ -1232,11 +1232,11 @@ void PianoRoll::shiftPos(int amount) //Shift notes pos by amount
 
 	auto selectedNotes = getSelectedNotes();
 	//If no notes are selected, shift all of them, otherwise shift selection
-	if (selectedNotes.empty()) { return shiftPos(m_midiClip->notes(), amount); }
-	else { return shiftPos(selectedNotes, amount); }
+	if (selectedNotes.empty()) { shiftPos(m_midiClip->notes(), amount); }
+	else { shiftPos(selectedNotes, amount); }
 }
 
-void PianoRoll::shiftPos(NoteVector notes, int amount)
+void PianoRoll::shiftPos(const NoteVector& notes, int amount)
 {
 	m_midiClip->addJournalCheckPoint();
 
@@ -1722,10 +1722,10 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 			const NoteVector & notes = m_midiClip->notes();
 
 			// will be our iterator in the following loop
-			auto it = notes.begin() + notes.size() - 1;
+			auto it = notes.rbegin();
 
 			// loop through whole note-vector...
-			for( int i = 0; i < notes.size(); ++i )
+			while (it != notes.rend())
 			{
 				Note *note = *it;
 				TimePos len = note->length();
@@ -1750,7 +1750,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				{
 					break;
 				}
-				--it;
+				++it;
 			}
 
 			// first check whether the user clicked in note-edit-
@@ -1772,7 +1772,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				Note * created_new_note = nullptr;
 				// did it reach end of vector because
 				// there's no note??
-				if( it == notes.begin()-1 )
+				if (it == notes.rend())
 				{
 					is_new_note = true;
 					m_midiClip->addJournalCheckPoint();
@@ -1819,8 +1819,8 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					// reset it so that it can be used for
 					// ops (move, resize) after this
 					// code-block
-					it = notes.begin();
-					while( it != notes.end() && *it != created_new_note )
+					it = notes.rbegin();
+					while (it != notes.rend() && *it != created_new_note)
 					{
 						++it;
 					}
@@ -1936,7 +1936,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 			{
 				// erase single note
 				m_mouseDownRight = true;
-				if( it != notes.begin()-1 )
+				if (it != notes.rend())
 				{
 					m_midiClip->addJournalCheckPoint();
 					m_midiClip->removeNote( *it );
@@ -2516,7 +2516,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			bool altPressed = me->modifiers() & Qt::AltModifier;
 			// We iterate from last note in MIDI clip to the first,
 			// chronologically
-			auto it = notes.begin() + notes.size() - 1;
+			auto it = notes.rbegin();
 			for( int i = 0; i < notes.size(); ++i )
 			{
 				Note* n = *it;
@@ -2559,7 +2559,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				}
 
 
-				--it;
+				++it;
 			}
 
 			// Emit MIDI clip has changed
@@ -2578,10 +2578,10 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			const NoteVector & notes = m_midiClip->notes();
 
 			// will be our iterator in the following loop
-			auto it = notes.begin() + notes.size() - 1;
+			auto it = notes.rbegin();
 
 			// loop through whole note-vector...
-			for( int i = 0; i < notes.size(); ++i )
+			while (it != notes.rend())
 			{
 				Note *note = *it;
 				// and check whether the cursor is over an
@@ -2594,12 +2594,12 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				{
 					break;
 				}
-				--it;
+				++it;
 			}
 
 			// did it reach end of vector because there's
 			// no note??
-			if( it != notes.begin()-1 )
+			if (it != notes.rend())
 			{
 				Note *note = *it;
 				// x coordinate of the right edge of the note
@@ -4134,9 +4134,9 @@ void PianoRoll::finishRecordNote(const Note & n )
 			{
 				if( it->key() == n.key() )
 				{
-					Note n1( n.length(), it->pos(),
+					Note n1(n.length(), it->pos(),
 							it->key(), it->getVolume(),
-							it->getPanning() );
+							it->getPanning(), n.detuning());
 					n1.quantizeLength( quantization() );
 					m_midiClip->addNote( n1 );
 					update();

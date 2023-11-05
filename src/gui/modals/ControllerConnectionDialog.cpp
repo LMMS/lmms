@@ -54,7 +54,7 @@ public:
 	AutoDetectMidiController( Model* parent ) :
 		MidiController( parent ),
 		m_detectedMidiChannel( 0 ),
-		m_detectedMidiController( 0 )
+		m_detectedMidiController(NONE)
 	{
 		updateName();
 	}
@@ -69,7 +69,7 @@ public:
 			( m_midiPort.inputChannel() == 0 || m_midiPort.inputChannel() == event.channel() + 1 ) )
 		{
 			m_detectedMidiChannel = event.channel() + 1;
-			m_detectedMidiController = event.controllerNumber() + 1;
+			m_detectedMidiController = event.controllerNumber();
 			m_detectedMidiPort = Engine::audioEngine()->midiClient()->sourcePortName( event );
 
 			emit valueChanged();
@@ -152,7 +152,7 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 
 	m_midiControllerSpinBox = new LcdSpinBox( 3, m_midiGroupBox,
 			tr( "Input controller" ) );
-	m_midiControllerSpinBox->addTextForValue( 0, "---" );
+	m_midiControllerSpinBox->addTextForValue(MidiController::NONE, "---" );
 	m_midiControllerSpinBox->setLabel( tr( "CONTROLLER" ) );
 	m_midiControllerSpinBox->move( 68, 24 );
 	

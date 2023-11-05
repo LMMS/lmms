@@ -72,21 +72,20 @@ void MidiController::updateName()
 
 
 
-void MidiController::processInEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset )
+void MidiController::processInEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset)
 {
 	unsigned char controllerNum;
-	switch( event.type() )
+	switch(event.type())
 	{
 		case MidiControlChange:
 			controllerNum = event.controllerNumber();
 
-			if( m_midiPort.inputController() == controllerNum + 1 &&
-					( m_midiPort.inputChannel() == event.channel() + 1 ||
-					  m_midiPort.inputChannel() == 0 ) )
+			if (m_midiPort.inputController() == controllerNum &&
+				(m_midiPort.inputChannel() == event.channel() + 1 || m_midiPort.inputChannel() == 0))
 			{
 				unsigned char val = event.controllerValue();
 				m_previousValue = m_lastValue;
-				m_lastValue = (float)( val ) / 127.0f;
+				m_lastValue = static_cast<float>(val) / 127.0f;
 				emit valueChanged();
 			}
 			break;
