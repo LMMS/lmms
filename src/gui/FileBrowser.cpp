@@ -1275,5 +1275,18 @@ QString FileItem::extension(const QString & file )
 	return QFileInfo( file ).suffix().toLower();
 }
 
+QString FileItem::defaultFilters()
+{
+	// TODO: Supported extensions should be in a centralized location
+	auto simpleExtensions
+		= QString{"*.mmp *.mpt *.mmpz *.xpf *.xml *.xiz *.sf2 *.sf3 *.pat *.mid *.midi *.rmi *.dll *.lv2"};
+#ifdef LMMS_BUILD_LINUX
+	simpleExtensions += " *.so";
+#endif
+	auto audioExtensions = QString{"*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw *.wav *.ogg *.ds "
+								   "*.flac *.spx *.voc *.aif *.aiff *.au *.raw"};
+	return simpleExtensions + " " + audioExtensions;
+}
+
 
 } // namespace lmms::gui

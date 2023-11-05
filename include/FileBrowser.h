@@ -274,6 +274,7 @@ public:
 
 	QString extension();
 	static QString extension( const QString & file );
+	static QString defaultFilters();
 
 
 private:
