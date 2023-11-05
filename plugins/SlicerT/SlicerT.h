@@ -27,6 +27,7 @@
 
 #include <algorithm>
 #include <fftw3.h>
+#include <stdexcept>
 
 #include "AutomatableModel.h"
 #include "Instrument.h"
