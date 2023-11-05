@@ -54,50 +54,40 @@ SlicerTView::SlicerTView(SlicerT* instrument, QWidget* parent)
 	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
 	setPalette(pal);
 
-	// move editor and seeker
 	m_wf = new SlicerTWaveform(248, 128, instrument, this);
 	m_wf->move(2, 6);
 
-	// snap combo box
 	m_snapSetting = new ComboBox(this, tr("Slice snap"));
 	m_snapSetting->setGeometry(185, 200, 55, ComboBox::DEFAULT_HEIGHT);
 	m_snapSetting->setToolTip(tr("Set slice snapping for detection"));
 	m_snapSetting->setModel(&m_slicerTParent->m_sliceSnap);
 
-	// sync toggle
 	m_syncToggle = new LedCheckBox("Sync", this, tr("SyncToggle"), LedCheckBox::LedColor::Green);
 	m_syncToggle->move(135, 187);
 	m_syncToggle->setToolTip(tr("Enable BPM sync"));
 	m_syncToggle->setModel(&m_slicerTParent->m_enableSync);
 
-	// bpm spin box
 	m_bpmBox = new LcdSpinBox(3, "19purple", this);
 	m_bpmBox->move(130, 201);
 	m_bpmBox->setToolTip(tr("Original sample BPM"));
 	m_bpmBox->setModel(&m_slicerTParent->m_originalBPM);
 
-	// threshold knob
 	m_noteThresholdKnob = createStyledKnob();
 	m_noteThresholdKnob->move(10, 197);
 	m_noteThresholdKnob->setToolTip(tr("Threshold used for slicing"));
-	/* m_noteThresholdKnob->setLabel(tr("Threshold")); */
 	m_noteThresholdKnob->setModel(&m_slicerTParent->m_noteThreshold);
 
-	// fadeout knob
 	m_fadeOutKnob = createStyledKnob();
 	m_fadeOutKnob->move(64, 197);
 	m_fadeOutKnob->setToolTip(tr("Fade Out for notes"));
-	/* m_fadeOutKnob->setLabel(tr("Fade Out")); */
 	m_fadeOutKnob->setModel(&m_slicerTParent->m_fadeOutFrames);
 
-	// midi copy button
 	m_midiExportButton = new QPushButton(this);
 	m_midiExportButton->move(199, 150);
 	m_midiExportButton->setIcon(PLUGIN_NAME::getIconPixmap("copyMidi"));
 	m_midiExportButton->setToolTip(tr("Copy midi pattern to clipboard"));
 	connect(m_midiExportButton, &PixmapButton::clicked, this, &SlicerTView::exportMidi);
 
-	// slice reset button
 	m_resetButton = new QPushButton(this);
 	m_resetButton->move(18, 150);
 	m_resetButton->setIcon(PLUGIN_NAME::getIconPixmap("resetSlices"));
@@ -177,18 +167,15 @@ void SlicerTView::dropEvent(QDropEvent* de)
 	de->ignore();
 }
 
-// display button text
 void SlicerTView::paintEvent(QPaintEvent* pe)
 {
 	QPainter brush(this);
 	brush.setPen(QColor(255, 255, 255));
 	brush.setFont(QFont(brush.font().family(), 7, -1, false));
 
-	// top text
 	brush.drawText(8, topTextY, textBoxWidth, textBoxHeight, Qt::AlignCenter, tr("Reset"));
 	brush.drawText(188, topTextY, textBoxWidth, textBoxHeight, Qt::AlignCenter, tr("Midi"));
 
-	// bottom text
 	brush.drawText(8, bottomTextY, textBoxWidth, textBoxHeight, Qt::AlignCenter, tr("Threshold"));
 	brush.drawText(63, bottomTextY, textBoxWidth, textBoxHeight, Qt::AlignCenter, tr("Fade Out"));
 	brush.drawText(127, bottomTextY, textBoxWidth, textBoxHeight, Qt::AlignCenter, tr("BPM"));

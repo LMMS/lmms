@@ -52,7 +52,7 @@ public:
 	SRC_STATE* getResampleState() { return resamplingState; }
 
 private:
-	float currentNote; // these are all absoute floats
+	float currentNote;
 	SRC_STATE* resamplingState;
 };
 
@@ -84,14 +84,12 @@ public:
 	std::vector<Note> getMidi();
 
 private:
-	// models
 	FloatModel m_noteThreshold;
 	FloatModel m_fadeOutFrames;
 	IntModel m_originalBPM;
 	ComboBoxModel m_sliceSnap;
 	BoolModel m_enableSync;
 
-	// sample buffers
 	SampleBuffer m_originalSample;
 
 	std::vector<float> m_slicePoints;

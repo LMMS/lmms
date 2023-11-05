@@ -56,24 +56,6 @@ public:
 	static constexpr int m_seekerHeight = 38; // used to calcualte all vertical sizes
 	static constexpr int m_middleMargin = 6;
 
-	// colors
-	const QColor s_emptyColor = QColor(0, 0, 0, 0);
-
-	const QColor s_waveformColor = QColor(123, 49, 212);
-	const QColor s_waveformBgColor = QColor(255, 255, 255, 0);
-	const QColor s_waveformMaskColor = QColor(151, 65, 255); // update this if s_waveformColor changes
-	const QColor s_waveformInnerColor = QColor(183, 124, 255);
-
-	const QColor s_playColor = QColor(255, 255, 255, 200);
-	const QColor s_playHighlightColor = QColor(255, 255, 255, 70);
-
-	const QColor s_sliceColor = QColor(218, 193, 255);
-	const QColor s_sliceShadowColor = QColor(136, 120, 158);
-	const QColor s_sliceHighlightColor = QColor(255, 255, 255);
-
-	const QColor s_seekerColor = QColor(178, 115, 255);
-	const QColor s_seekerHighlightColor = QColor(178, 115, 255, 100);
-	const QColor s_seekerShadowColor = QColor(0, 0, 0, 120);
 
 	// interaction behavior values
 	static constexpr float s_distanceForClick = 0.02f;
@@ -99,39 +81,29 @@ protected:
 	void paintEvent(QPaintEvent* pe) override;
 
 private:
-	// sizes
 	int m_width;
 	int m_height;
 
-	// later calculated
 	int m_seekerWidth;
 	int m_editorHeight;
 	int m_editorWidth;
 
-	// interaction vars
-	UIObjects m_draggedObject;
 	UIObjects m_closestObject;
 	int m_closestSlice = -1;
-	int m_sliceDragged = -1;
-	bool m_currentlyDragging = false;
 
-	// seeker vars
 	float m_seekerStart = 0;
 	float m_seekerEnd = 1;
 	float m_seekerMiddle = 0.5f;
 
-	// playback highlight vars
 	float m_noteCurrent;
 	float m_noteStart;
 	float m_noteEnd;
 
-	// editor vars
 	float m_zoomLevel = 1.0f;
 
-	// pixmaps
 	QPixmap m_sliceArrow;
 	QPixmap m_seeker;
-	QPixmap m_seekerWaveform; // only stores SlicerTWaveform graphic
+	QPixmap m_seekerWaveform;
 	QPixmap m_editorWaveform;
 	QPixmap m_sliceEditor;
 	QPixmap m_emptySampleIcon;

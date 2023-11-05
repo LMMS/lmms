@@ -34,39 +34,47 @@ namespace lmms {
 
 namespace gui {
 
+static QColor s_emptyColor = QColor(0, 0, 0, 0);
+static QColor s_waveformColor = QColor(123, 49, 212);
+static QColor s_waveformBgColor = QColor(255, 255, 255, 0);
+static QColor s_waveformMaskColor = QColor(151, 65, 255); // update this if s_waveformColor changes
+static QColor s_waveformInnerColor = QColor(183, 124, 255);
+
+static QColor s_playColor = QColor(255, 255, 255, 200);
+static QColor s_playHighlightColor = QColor(255, 255, 255, 70);
+
+static QColor s_sliceColor = QColor(218, 193, 255);
+static QColor s_sliceShadowColor = QColor(136, 120, 158);
+static QColor s_sliceHighlightColor = QColor(255, 255, 255);
+
+static QColor s_seekerColor = QColor(178, 115, 255);
+static QColor s_seekerHighlightColor = QColor(178, 115, 255, 100);
+static QColor s_seekerShadowColor = QColor(0, 0, 0, 120);
+
 SlicerTWaveform::SlicerTWaveform(int totalWidth, int totalHeight, SlicerT* instrument, QWidget* parent)
 	: QWidget(parent)
-	// calculate sizes
 	, m_width(totalWidth)
 	, m_height(totalHeight)
 	, m_seekerWidth(totalWidth - m_seekerHorMargin * 2)
 	, m_editorHeight(totalHeight - m_seekerHeight - m_middleMargin)
 	, m_editorWidth(totalWidth)
-
-	// create pixmaps
 	, m_sliceArrow(PLUGIN_NAME::getIconPixmap("slice_indicator_arrow"))
 	, m_seeker(QPixmap(m_seekerWidth, m_seekerHeight))
 	, m_seekerWaveform(QPixmap(m_seekerWidth, m_seekerHeight))
 	, m_editorWaveform(QPixmap(m_editorWidth, m_editorHeight))
 	, m_sliceEditor(QPixmap(totalWidth, m_editorHeight))
 	, m_emptySampleIcon(embed::getIconPixmap("sample_track"))
-
-	// references to instrument vars
 	, m_slicerTParent(instrument)
 {
-	// window config
 	setFixedSize(m_width, m_height);
 	setMouseTracking(true);
 
-	// draw backgrounds
 	m_seekerWaveform.fill(s_waveformBgColor);
 	m_editorWaveform.fill(s_waveformBgColor);
 
-	// connect to playback
 	connect(instrument, &SlicerT::isPlaying, this, &SlicerTWaveform::isPlaying);
 	connect(instrument, &SlicerT::dataChanged, this, &SlicerTWaveform::updateUI);
 
-	// preprocess icons
 	m_emptySampleIcon = m_emptySampleIcon.createMaskFromColor(QColor(255, 255, 255), Qt::MaskMode::MaskOutColor);
 
 	updateUI();
@@ -94,37 +102,30 @@ void SlicerTWaveform::drawSeeker()
 	if (m_slicerTParent->m_originalSample.frames() <= 1) { return; }
 	QPainter brush(&m_seeker);
 
-	// draw slice points
 	brush.setPen(s_sliceColor);
-	for (float sliceValue: m_slicerTParent->m_slicePoints)
+	for (float sliceValue : m_slicerTParent->m_slicePoints)
 	{
 		float xPos = sliceValue * m_seekerWidth;
 		brush.drawLine(xPos, 0, xPos, m_seekerHeight);
 	}
 
-	// seeker vars
 	float seekerStartPosX = m_seekerStart * m_seekerWidth;
 	float seekerEndPosX = m_seekerEnd * m_seekerWidth;
 	float seekerMiddleWidth = (m_seekerEnd - m_seekerStart) * m_seekerWidth;
 
-	// note playback vars
 	float noteCurrentPosX = m_noteCurrent * m_seekerWidth;
 	float noteStartPosX = m_noteStart * m_seekerWidth;
 	float noteEndPosX = (m_noteEnd - m_noteStart) * m_seekerWidth;
 
-	// draw current playBack
 	brush.setPen(s_playColor);
 	brush.drawLine(noteCurrentPosX, 0, noteCurrentPosX, m_seekerHeight);
 	brush.fillRect(noteStartPosX, 0, noteEndPosX, m_seekerHeight, s_playHighlightColor);
 
-	// highlight on selected area
 	brush.fillRect(seekerStartPosX, 0, seekerMiddleWidth - 1, m_seekerHeight, s_seekerHighlightColor);
 
-	// shadow on not selected area
 	brush.fillRect(0, 0, seekerStartPosX, m_seekerHeight, s_seekerShadowColor);
 	brush.fillRect(seekerEndPosX - 1, 0, m_seekerWidth, m_seekerHeight, s_seekerShadowColor);
 
-	// draw border around selection
 	brush.setPen(QPen(s_seekerColor, 1));
 	brush.drawRect(seekerStartPosX, 0, seekerMiddleWidth - 1, m_seekerHeight - 1); // -1 needed
 }
@@ -134,7 +135,6 @@ void SlicerTWaveform::drawEditorWaveform()
 	m_editorWaveform.fill(s_emptyColor);
 	if (m_slicerTParent->m_originalSample.frames() <= 1) { return; }
 
-	// draw SlicerTWaveform
 	QPainter brush(&m_editorWaveform);
 	float startFrame = m_seekerStart * m_slicerTParent->m_originalSample.frames();
 	float endFrame = m_seekerEnd * m_slicerTParent->m_originalSample.frames();
@@ -155,7 +155,7 @@ void SlicerTWaveform::drawEditor()
 	m_sliceEditor.fill(s_waveformBgColor);
 	QPainter brush(&m_sliceEditor);
 
-	// draw text if no sample loaded
+	// No sample loaded
 	if (m_slicerTParent->m_originalSample.frames() <= 1)
 	{
 		brush.setPen(s_playHighlightColor);
@@ -168,7 +168,6 @@ void SlicerTWaveform::drawEditor()
 		return;
 	}
 
-	// editor boundaries
 	float startFrame = m_seekerStart;
 	float endFrame = m_seekerEnd;
 	float numFramesToDraw = endFrame - startFrame;
@@ -178,19 +177,15 @@ void SlicerTWaveform::drawEditor()
 	float noteStartPos = (m_noteStart - m_seekerStart) / (m_seekerEnd - m_seekerStart) * m_editorWidth;
 	float noteLength = (m_noteEnd - m_noteStart) / (m_seekerEnd - m_seekerStart) * m_editorWidth;
 
-	// 0 centered line
 	brush.setPen(s_playHighlightColor);
 	brush.drawLine(0, m_editorHeight / 2, m_editorWidth, m_editorHeight / 2);
 
-	// draw waveform from pixmap
 	brush.drawPixmap(0, 0, m_editorWaveform);
 
-	// draw currently playing
 	brush.setPen(s_playColor);
 	brush.drawLine(noteCurrentPos, 0, noteCurrentPos, m_editorHeight);
 	brush.fillRect(noteStartPos, 0, noteLength, m_editorHeight, s_playHighlightColor);
 
-	// draw slicepoints
 	brush.setPen(QPen(s_sliceColor, 2));
 
 	for (int i = 0; i < m_slicerTParent->m_slicePoints.size(); i++)
@@ -243,27 +238,26 @@ void SlicerTWaveform::updateClosest(QMouseEvent* me)
 	m_closestObject = UIObjects::Nothing;
 	m_closestSlice = -1;
 
-	if (me->y() < m_seekerHeight) // seeker click
+	if (me->y() < m_seekerHeight)
 	{
-		if (std::abs(normalizedClickSeeker - m_seekerStart) < s_distanceForClick) // dragging start
+		if (std::abs(normalizedClickSeeker - m_seekerStart) < s_distanceForClick)
 		{
 			m_closestObject = UIObjects::SeekerStart;
 		}
-		else if (std::abs(normalizedClickSeeker - m_seekerEnd) < s_distanceForClick) // dragging end
+		else if (std::abs(normalizedClickSeeker - m_seekerEnd) < s_distanceForClick)
 		{
 			m_closestObject = UIObjects::SeekerEnd;
 		}
-		else if (normalizedClickSeeker > m_seekerStart && normalizedClickSeeker < m_seekerEnd) // dragging middle
+		else if (normalizedClickSeeker > m_seekerStart && normalizedClickSeeker < m_seekerEnd)
 		{
 			m_closestObject = UIObjects::SeekerMiddle;
 		}
 	}
-	else // editor click
+	else
 	{
 		m_closestSlice = -1;
 		float startFrame = m_seekerStart;
 		float endFrame = m_seekerEnd;
-		// select slice
 		for (int i = 0; i < m_slicerTParent->m_slicePoints.size(); i++)
 		{
 			float sliceIndex = m_slicerTParent->m_slicePoints.at(i);
@@ -297,9 +291,6 @@ void SlicerTWaveform::updateCursor()
 // handles deletion, reset and middles seeker
 void SlicerTWaveform::mousePressEvent(QMouseEvent* me)
 {
-	/* updateClosest(me); */
-
-	// reset seeker on middle click
 	switch (me->button())
 	{
 	case Qt::MouseButton::MiddleButton:
@@ -311,15 +302,13 @@ void SlicerTWaveform::mousePressEvent(QMouseEvent* me)
 		// update seeker middle for correct movement
 		m_seekerMiddle = static_cast<float>(me->x() - m_seekerHorMargin) / m_seekerWidth;
 		break;
-	// delete closesd slice to mouse
 	case Qt::MouseButton::RightButton:
 		if (m_slicerTParent->m_slicePoints.size() > 2 && m_closestObject == UIObjects::SlicePoint)
 		{
 			m_slicerTParent->m_slicePoints.erase(m_slicerTParent->m_slicePoints.begin() + m_closestSlice);
 		}
 		break;
-	default:
-		;	
+	default:;
 	}
 	updateClosest(me);
 }
@@ -350,7 +339,6 @@ void SlicerTWaveform::mouseMoveEvent(QMouseEvent* me)
 	float startFrame = m_seekerStart;
 	float endFrame = m_seekerEnd;
 
-	// handle dragging events
 	switch (m_closestObject)
 	{
 	case UIObjects::SeekerStart:

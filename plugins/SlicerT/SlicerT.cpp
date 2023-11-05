@@ -25,8 +25,8 @@
 #include "SlicerT.h"
 
 #include <QDomElement>
-#include <fftw3.h>
 #include <cmath>
+#include <fftw3.h>
 
 #include "Engine.h"
 #include "InstrumentTrack.h"
@@ -71,27 +71,24 @@ SlicerT::SlicerT(InstrumentTrack* instrumentTrack)
 	m_sliceSnap.addItem("1/8");
 	m_sliceSnap.addItem("1/16");
 	m_sliceSnap.addItem("1/32");
-	m_sliceSnap.setValue(0); // no snap by default
+	m_sliceSnap.setValue(0);
 }
 
 void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 {
 	if (m_originalSample.frames() <= 1) { return; }
 
-	// playback parameters
 	const int noteIndex = handle->key() - m_parentTrack->baseNote();
 	const fpp_t frames = handle->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = handle->noteOffset();
 	const int bpm = Engine::getSong()->getTempo();
 	const float pitchRatio = 1 / pow(2, m_parentTrack->pitchModel()->value() / 1200);
 
-	// update sync parameter
 	float speedRatio = static_cast<float>(m_originalBPM.value()) / bpm;
-	if (!m_enableSync.value()) { speedRatio = 1; } // disable timeshift
-	speedRatio *= pitchRatio;					   // adjust for pitch bend
+	if (!m_enableSync.value()) { speedRatio = 1; }
+	speedRatio *= pitchRatio;
 	speedRatio *= Engine::audioEngine()->processingSampleRate() / static_cast<float>(m_originalSample.sampleRate());
 
-	// set start and end points
 	float sliceStart, sliceEnd;
 	if (noteIndex > m_slicePoints.size() - 2 || noteIndex < 0) // full sample if ouside range
 	{
@@ -104,16 +101,13 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 		sliceEnd = m_slicePoints[noteIndex + 1];
 	}
 
-	// initliazize handle
 	if (!handle->m_pluginData) { handle->m_pluginData = new PlayBackState(sliceStart); }
 
-	// slice vars
 	float noteDone = ((PlayBackState*)handle->m_pluginData)->getNoteDone();
 	float noteLeft = sliceEnd - noteDone;
 
 	if (noteLeft > 0)
 	{
-		// resample in chunks
 		int noteFrame = noteDone * m_originalSample.frames();
 
 		SRC_STATE* resampleState = ((PlayBackState*)handle->m_pluginData)->getResampleState();
@@ -129,14 +123,13 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 		float nextNoteDone = noteDone + frames * (1.0f / speedRatio) / m_originalSample.frames();
 		((PlayBackState*)handle->m_pluginData)->setNoteDone(nextNoteDone);
 
-		// exponential fade out, applyRelease kinda sucks
+		// exponential fade out, applyRelease() not used since it extends the note length
 		int noteFramesLeft = noteLeft * m_originalSample.frames();
 		if (noteFramesLeft < m_fadeOutFrames.value())
 		{
 			for (int i = 0; i < frames; i++)
 			{
 				float fadeValue = static_cast<float>(noteFramesLeft - i) / m_fadeOutFrames.value();
-				// if the workingbuffer extends the sample
 				fadeValue = std::clamp(fadeValue, 0.0f, 1.0f);
 				fadeValue = std::pow(fadeValue, 2);
 
@@ -160,14 +153,12 @@ void SlicerT::findSlices()
 	if (m_originalSample.frames() <= 1) { return; }
 	m_slicePoints = {};
 
-	// computacion params
 	const int windowSize = 512;
 	const float minBeatLength = 0.05f; // in seconds, ~ 1/4 length at 220 bpm
 
 	int sampleRate = m_originalSample.sampleRate();
 	int minDist = sampleRate * minBeatLength;
 
-	// copy vector into one vector, averaging channels
 	float maxMag = -1;
 	std::vector<float> singleChannel(m_originalSample.frames(), 0);
 	for (int i = 0; i < m_originalSample.frames(); i++)
@@ -176,13 +167,11 @@ void SlicerT::findSlices()
 		maxMag = std::max(maxMag, singleChannel[i]);
 	}
 
-	// normalize
 	for (float& channelValue : singleChannel)
 	{
 		channelValue /= maxMag;
 	}
 
-	// buffers
 	std::vector<float> prevMags(windowSize / 2, 0);
 	std::vector<float> fftIn(windowSize, 0);
 	std::array<fftwf_complex, windowSize> fftOut;
@@ -214,7 +203,6 @@ void SlicerT::findSlices()
 			prevMags[j] = magnitude;
 		}
 
-		// detect increases in flux
 		if (spectralFlux / prevFlux > 1.0f + m_noteThreshold.value() && i - lastPoint > minDist)
 		{
 			m_slicePoints.push_back(i);
@@ -227,33 +215,27 @@ void SlicerT::findSlices()
 
 	m_slicePoints.push_back(m_originalSample.frames());
 
-	// snap slices to notes
 	float beatsPerMin = m_originalBPM.value() / 60.0f;
 	float samplesPerBeat = m_originalSample.sampleRate() / beatsPerMin * 4.0f;
 	int noteSnap = m_sliceSnap.value();
-	int sliceLock = samplesPerBeat / std::pow(2, noteSnap + 1); // lock to note: 1 / noteSnap²
-	if (noteSnap == 0) { sliceLock = 1; }						// disable noteSnap
-
+	int sliceLock = samplesPerBeat / std::pow(2, noteSnap + 1);
+	if (noteSnap == 0) { sliceLock = 1; }
 	for (float& sliceValue : m_slicePoints)
 	{
 		sliceValue += sliceLock / 2;
 		sliceValue -= static_cast<int>(sliceValue) % sliceLock;
 	}
 
-	// remove duplicates
 	m_slicePoints.erase(std::unique(m_slicePoints.begin(), m_slicePoints.end()), m_slicePoints.end());
 
-	// scale between 0 and 1
 	for (float& sliceIndex : m_slicePoints)
 	{
 		sliceIndex /= m_originalSample.frames();
 	}
 
-	// fit to sample size
 	m_slicePoints[0] = 0;
 	m_slicePoints[m_slicePoints.size() - 1] = 1;
 
-	// update UI
 	emit dataChanged();
 }
 
@@ -263,15 +245,12 @@ void SlicerT::findBPM()
 {
 	if (m_originalSample.frames() <= 1) { return; }
 
-	// caclulate length of sample
 	float sampleRate = m_originalSample.sampleRate();
 	float totalFrames = m_originalSample.frames();
 	float sampleLength = totalFrames / sampleRate;
 
-	// this assumes the sample has a time signature of x/4
 	float bpmEstimate = 240.0f / sampleLength;
 
-	// get into 100 - 200 range
 	while (bpmEstimate < 100)
 	{
 		bpmEstimate *= 2;
@@ -297,7 +276,6 @@ std::vector<Note> SlicerT::getMidi()
 	float totalTicks = outFrames / framesPerTick;
 	float lastEnd = 0;
 
-	// write to midi
 	for (int i = 0; i < m_slicePoints.size() - 1; i++)
 	{
 		float sliceStart = lastEnd;
@@ -306,7 +284,7 @@ std::vector<Note> SlicerT::getMidi()
 		Note sliceNote = Note();
 		sliceNote.setKey(i + m_parentTrack->baseNote());
 		sliceNote.setPos(sliceStart);
-		sliceNote.setLength(sliceEnd - sliceStart + 1); // + 1 needed for whatever reason
+		sliceNote.setLength(sliceEnd - sliceStart + 1); // + 1 so that the notes allign
 		outputNotes.push_back(sliceNote);
 
 		lastEnd = sliceEnd;
@@ -332,7 +310,6 @@ void SlicerT::updateSlices()
 
 void SlicerT::saveSettings(QDomDocument& document, QDomElement& element)
 {
-	// save sample
 	element.setAttribute("src", m_originalSample.audioFile());
 	if (m_originalSample.audioFile().isEmpty())
 	{
@@ -340,14 +317,12 @@ void SlicerT::saveSettings(QDomDocument& document, QDomElement& element)
 		element.setAttribute("sampledata", m_originalSample.toBase64(s));
 	}
 
-	// save slice points
 	element.setAttribute("totalSlices", static_cast<int>(m_slicePoints.size()));
 	for (int i = 0; i < m_slicePoints.size(); i++)
 	{
 		element.setAttribute(tr("slice_%1").arg(i), m_slicePoints[i]);
 	}
 
-	// save knobs
 	m_fadeOutFrames.saveSettings(document, element, "fadeOut");
 	m_noteThreshold.saveSettings(document, element, "threshold");
 	m_originalBPM.saveSettings(document, element, "origBPM");
@@ -356,7 +331,6 @@ void SlicerT::saveSettings(QDomDocument& document, QDomElement& element)
 
 void SlicerT::loadSettings(const QDomElement& element)
 {
-	// load sample
 	if (!element.attribute("src").isEmpty())
 	{
 		m_originalSample.setAudioFile(element.attribute("src"));
@@ -373,7 +347,6 @@ void SlicerT::loadSettings(const QDomElement& element)
 		m_originalSample.loadFromBase64(element.attribute("srcdata"));
 	}
 
-	// load slices
 	if (!element.attribute("totalSlices").isEmpty())
 	{
 		int totalSlices = element.attribute("totalSlices").toInt();
@@ -384,7 +357,6 @@ void SlicerT::loadSettings(const QDomElement& element)
 		}
 	}
 
-	// load knobs
 	m_fadeOutFrames.loadSettings(element, "fadeOut");
 	m_noteThreshold.loadSettings(element, "threshold");
 	m_originalBPM.loadSettings(element, "origBPM");
@@ -404,7 +376,6 @@ gui::PluginView* SlicerT::instantiateView(QWidget* parent)
 }
 
 extern "C" {
-// necessary for getting instance out of shared lib
 PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
 {
 	return new SlicerT(static_cast<InstrumentTrack*>(m));

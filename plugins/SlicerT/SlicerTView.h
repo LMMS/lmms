@@ -46,7 +46,7 @@ class SlicerTView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 
-protected slots:
+public slots:
 	void exportMidi();
 
 public:
@@ -66,14 +66,12 @@ protected:
 private:
 	SlicerT* m_slicerTParent;
 
-	// lmms UI
 	Knob* m_noteThresholdKnob;
 	Knob* m_fadeOutKnob;
 	LcdSpinBox* m_bpmBox;
 	ComboBox* m_snapSetting;
 	LedCheckBox* m_syncToggle;
 
-	// buttons
 	QPushButton* m_resetButton;
 	QPushButton* m_midiExportButton;
 
