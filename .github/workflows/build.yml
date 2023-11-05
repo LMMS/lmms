@@ -78,6 +78,7 @@ jobs:
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j3
+      DEVELOPER_DIR: /Applications/Xcode_13.1.app/Contents/Developer
     steps:
       - name: Check out
         uses: actions/checkout@v3
