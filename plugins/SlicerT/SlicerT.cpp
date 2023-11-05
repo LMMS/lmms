@@ -101,16 +101,16 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 		sliceEnd = m_slicePoints[noteIndex + 1];
 	}
 
-	if (!handle->m_pluginData) { handle->m_pluginData = new PlayBackState(sliceStart); }
+	if (!handle->m_pluginData) { handle->m_pluginData = new PlaybackState(sliceStart); }
 
-	float noteDone = ((PlayBackState*)handle->m_pluginData)->getNoteDone();
+	float noteDone = ((PlaybackState*)handle->m_pluginData)->noteDone();
 	float noteLeft = sliceEnd - noteDone;
 
 	if (noteLeft > 0)
 	{
 		int noteFrame = noteDone * m_originalSample.frames();
 
-		SRC_STATE* resampleState = ((PlayBackState*)handle->m_pluginData)->getResampleState();
+		SRC_STATE* resampleState = ((PlaybackState*)handle->m_pluginData)->resamplingState();
 		SRC_DATA resampleData;
 		resampleData.data_in = (float*)(m_originalSample.data() + noteFrame);
 		resampleData.data_out = (float*)(workingBuffer + offset);
@@ -121,7 +121,7 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 		src_process(resampleState, &resampleData);
 
 		float nextNoteDone = noteDone + frames * (1.0f / speedRatio) / m_originalSample.frames();
-		((PlayBackState*)handle->m_pluginData)->setNoteDone(nextNoteDone);
+		((PlaybackState*)handle->m_pluginData)->setNoteDone(nextNoteDone);
 
 		// exponential fade out, applyRelease() not used since it extends the note length
 		int noteFramesLeft = noteLeft * m_originalSample.frames();
@@ -167,9 +167,17 @@ void SlicerT::findSlices()
 		maxMag = std::max(maxMag, singleChannel[i]);
 	}
 
-	for (float& channelValue : singleChannel)
+	// normalize and find 0 crossings
+	std::vector<int> zeroCrossings;
+	float lastValue = 1;
+	for (int i = 0; i < singleChannel.size(); i++)
 	{
-		channelValue /= maxMag;
+		singleChannel[i] /= maxMag;
+		if (sign(lastValue) != sign(singleChannel[i]))
+		{
+			zeroCrossings.push_back(i);
+			lastValue = singleChannel[i];
+		}
 	}
 
 	std::vector<float> prevMags(windowSize / 2, 0);
@@ -215,6 +223,15 @@ void SlicerT::findSlices()
 	}
 
 	m_slicePoints.push_back(m_originalSample.frames());
+
+	for (float& sliceValue : m_slicePoints)
+	{
+		int closestZeroCrossing = *std::lower_bound(zeroCrossings.begin(), zeroCrossings.end(), sliceValue);
+		if (abs(sliceValue - closestZeroCrossing) < windowSize)
+		{
+			sliceValue = *std::lower_bound(zeroCrossings.begin(), zeroCrossings.end(), sliceValue);
+		}
+	}
 
 	float beatsPerMin = m_originalBPM.value() / 60.0f;
 	float samplesPerBeat = m_originalSample.sampleRate() / beatsPerMin * 4.0f;

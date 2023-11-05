@@ -38,22 +38,25 @@
 
 namespace lmms {
 
-class PlayBackState
+class PlaybackState
 {
 public:
-	PlayBackState(float startFrame)
-		: currentNote(startFrame)
-		, resamplingState(src_new(SRC_LINEAR, 2, nullptr))
+	explicit PlaybackState(float startFrame)
+		: m_currentNoteDone(startFrame)
+		, m_resamplingState(src_new(SRC_LINEAR, DEFAULT_CHANNELS, nullptr))
 	{
+		if (!m_resamplingState) { throw std::runtime_error{"Failed to create sample rate converter object"}; }
 	}
-	~PlayBackState() { src_delete(resamplingState); }
-	float getNoteDone() { return currentNote; }
-	void setNoteDone(float newDone) { currentNote = newDone; }
-	SRC_STATE* getResampleState() { return resamplingState; }
+	~PlaybackState() noexcept { src_delete(m_resamplingState); }
+
+	float noteDone() const { return m_currentNoteDone; }
+	void setNoteDone(float newNoteDone) { m_currentNoteDone = newNoteDone; }
+
+	SRC_STATE* resamplingState() const { return m_resamplingState; }
 
 private:
-	float currentNote;
-	SRC_STATE* resamplingState;
+	float m_currentNoteDone;
+	SRC_STATE* m_resamplingState;
 };
 
 class SlicerT : public Instrument

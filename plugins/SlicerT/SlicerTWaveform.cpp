@@ -303,6 +303,7 @@ void SlicerTWaveform::mousePressEvent(QMouseEvent* me)
 		m_seekerStart = 0;
 		m_seekerEnd = 1;
 		m_zoomLevel = 1;
+		drawEditorWaveform();
 		break;
 	case Qt::MouseButton::LeftButton:
 		if (m_slicerTParent->m_originalSample.frames() <= 1) {
@@ -352,10 +353,12 @@ void SlicerTWaveform::mouseMoveEvent(QMouseEvent* me)
 	{
 	case UIObjects::SeekerStart:
 		m_seekerStart = std::clamp(normalizedClickSeeker, 0.0f, m_seekerEnd - s_minSeekerDistance);
+		drawEditorWaveform();
 		break;
 
 	case UIObjects::SeekerEnd:
 		m_seekerEnd = std::clamp(normalizedClickSeeker, m_seekerStart + s_minSeekerDistance, 1.0f);
+		drawEditorWaveform();
 		break;
 
 	case UIObjects::SeekerMiddle:
@@ -366,6 +369,7 @@ void SlicerTWaveform::mouseMoveEvent(QMouseEvent* me)
 			m_seekerStart = m_seekerMiddle + distStart;
 			m_seekerEnd = m_seekerMiddle + distEnd;
 		}
+		drawEditorWaveform();
 		break;
 
 	case UIObjects::SlicePoint:
@@ -379,7 +383,6 @@ void SlicerTWaveform::mouseMoveEvent(QMouseEvent* me)
 		break;
 	}
 	// dont update closest, and update seeker waveform
-	drawEditorWaveform();
 	drawSeeker();
 	drawEditor();
 	update();
