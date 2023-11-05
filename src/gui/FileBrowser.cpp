@@ -23,8 +23,11 @@
  *
  */
 
+#include "FileBrowser.h"
+
 #include <QApplication>
 #include <QDesktopServices>
+#include <QDirIterator>
 #include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QLineEdit>
@@ -124,8 +127,9 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	m_filterEdit = new QLineEdit( searchWidget );
 	m_filterEdit->setPlaceholderText( tr("Search") );
 	m_filterEdit->setClearButtonEnabled( true );
-	connect( m_filterEdit, SIGNAL( textEdited( const QString& ) ),
-			this, SLOT( filterAndExpandItems( const QString& ) ) );
+
+	connect(m_filterEdit, &QLineEdit::textEdited, this, &FileBrowser::onSearch);
+	connect(FileBrowserSearcher::instance(), &FileBrowserSearcher::searchComplete, this, &FileBrowser::buildSearchTree);
 
 	auto reload_btn = new QPushButton(embed::getIconPixmap("reload"), QString(), searchWidget);
 	reload_btn->setToolTip( tr( "Refresh list" ) );
@@ -139,6 +143,10 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 
 	m_fileBrowserTreeWidget = new FileBrowserTreeWidget( contentParent() );
 	addContentWidget( m_fileBrowserTreeWidget );
+
+	m_searchTreeWidget = new FileBrowserTreeWidget(contentParent());
+	m_searchTreeWidget->hide();
+	addContentWidget(m_searchTreeWidget);
 
 	// Whenever the FileBrowser has focus, Ctrl+F should direct focus to its filter box.
 	auto filterFocusShortcut = new QShortcut(QKeySequence(QKeySequence::Find), this, SLOT(giveFocusToFilter()));
@@ -158,6 +166,86 @@ void FileBrowser::saveDirectoriesStates()
 void FileBrowser::restoreDirectoriesStates()
 {
 	expandItems(nullptr, m_savedExpandedDirs);
+}
+
+void FileBrowser::buildSearchTree(QStringList matches, QString id)
+{
+	if (title() != id) { return; }
+
+	m_searchTreeWidget->clear();
+
+	const auto rootPaths = m_directories.split('*');
+	for (const auto& rootPath : rootPaths)
+	{
+		const auto rootPathDir = QDir{rootPath};
+		const auto absoluteRootPath = rootPathDir.absolutePath();
+
+		for (const auto& match : matches)
+		{
+			if (!match.startsWith(absoluteRootPath)) { continue; }
+
+			const auto matchInfo = QFileInfo{match};
+			const auto matchName = matchInfo.fileName();
+			const auto matchParentPath = matchInfo.dir().path();
+			auto childWidget = static_cast<QTreeWidgetItem*>(nullptr);
+
+			if (matchInfo.isDir())
+			{
+				auto dirChildWidget = new Directory(matchName, matchParentPath, m_filter);
+				dirChildWidget->update();
+				childWidget = dirChildWidget;
+			}
+			else if (matchInfo.isFile()) { childWidget = new FileItem(matchName, matchParentPath); }
+
+			const auto relativeParentPath = rootPathDir.relativeFilePath(matchParentPath);
+			if (relativeParentPath == ".")
+			{
+				m_searchTreeWidget->addTopLevelItem(childWidget);
+				continue;
+			}
+
+			auto parentItems = m_searchTreeWidget->findItems(relativeParentPath, Qt::MatchExactly);
+			auto parentItem = parentItems.isEmpty() ? new Directory(relativeParentPath, matchParentPath, m_filter) : parentItems[0];
+
+			auto parentDirItem = dynamic_cast<Directory*>(parentItem);
+			if (!parentDirItem) { continue; }
+
+			parentDirItem->addChild(childWidget);
+			parentDirItem->setExpanded(true);
+			if (parentItems.isEmpty()) { parentDirItem->update(); }
+
+			m_searchTreeWidget->addTopLevelItem(parentDirItem);
+		}
+	}
+
+	toggleSearch(true);
+}
+
+	
+void FileBrowser::onSearch(const QString& filter)
+{
+	auto instance = FileBrowserSearcher::instance();
+	if (filter.isEmpty())
+	{
+		toggleSearch(false);
+		instance->cancel();
+		return;
+	}
+	instance->search(
+		{m_directories, filter, QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot, m_filter.split(' '), title()});
+}
+
+void FileBrowser::toggleSearch(bool on)
+{
+	if (on)
+	{
+		m_searchTreeWidget->show();
+		m_fileBrowserTreeWidget->hide();
+		return;
+	}
+	
+	m_searchTreeWidget->hide();
+	m_fileBrowserTreeWidget->show();
 }
 
 bool FileBrowser::filterAndExpandItems(const QString & filter, QTreeWidgetItem * item)
@@ -954,6 +1042,84 @@ void FileBrowserTreeWidget::updateDirectory(QTreeWidgetItem * item )
 }
 
 
+
+std::unique_ptr<FileBrowserSearcher> FileBrowserSearcher::s_instance = nullptr;
+
+FileBrowserSearcher::FileBrowserSearcher()
+	: m_worker([this] { run(); })
+{
+}
+
+FileBrowserSearcher::~FileBrowserSearcher() noexcept
+{
+	m_cancel = true;
+	{
+		const auto runLock = std::lock_guard{m_runMutex};
+		m_stopped = true;
+		m_cancel = false;
+	}
+	m_runCond.notify_one();
+	m_worker.join();
+}
+
+void FileBrowserSearcher::search(SearchTask task)
+{
+	m_cancel = true;
+	{
+		const auto runLock = std::lock_guard{m_runMutex};
+		m_currentTask = std::move(task);
+		m_run = true;
+		m_cancel = false;
+	}
+	m_runCond.notify_one();
+}
+
+void FileBrowserSearcher::cancel()
+{
+	m_cancel = true;
+}
+
+void FileBrowserSearcher::run()
+{
+	while (true)
+	{
+		auto lock = std::unique_lock{m_runMutex};
+		m_runCond.wait(lock, [this] { return m_run || m_stopped; });
+
+		if (m_stopped) { break; }
+
+		filter();
+		m_run = false;
+	}
+}
+
+void FileBrowserSearcher::filter()
+{
+	const auto& [directories, userFilter, filters, nameFilters, id] = m_currentTask;
+	const auto paths = directories.split('*');
+	auto matches = QStringList{};
+
+	for (const auto& path : paths)
+	{
+		auto it = QDirIterator{path, nameFilters, filters, QDirIterator::Subdirectories};
+		while (it.hasNext())
+		{
+			it.next();
+			const auto name = it.fileName();
+			const auto path = it.filePath();
+			if (name.contains(userFilter, Qt::CaseInsensitive)) { matches.push_back(path); }
+			if (m_cancel) { return; }
+		}
+	}
+
+	emit searchComplete(matches, id);
+}
+
+FileBrowserSearcher* FileBrowserSearcher::instance()
+{
+	if (!s_instance) { s_instance = std::make_unique<FileBrowserSearcher>(); }
+	return s_instance.get();
+}
 
 
 
