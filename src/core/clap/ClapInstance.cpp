@@ -106,6 +106,7 @@ namespace
 }
 
 //! Container for everything required to store MIDI events going to the plugin
+// TODO: Move to MidiEvent.h for both LV2 and CLAP?
 struct MidiInputEvent
 {
 	MidiEvent ev;
@@ -159,7 +160,8 @@ void ClapInstance::copyModelsFromCore()
 
 	while (m_midiInputReader.read_space() > 0)
 	{
-		const auto [event, _, offset] = m_midiInputReader.read(1)[0];
+		const auto [event, ignore, offset] = m_midiInputReader.read(1)[0];
+		(void)ignore;
 		switch (event.type())
 		{
 			case MidiNoteOff:

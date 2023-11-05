@@ -239,7 +239,7 @@ void ClapManager::loadClapFiles(const std::vector<std::filesystem::path>& search
 			totalClapPlugins += clapFile.pluginCount();
 			for (const auto& plugin : clapFile.pluginInfo())
 			{
-				auto [_, added] = m_uriToPluginInfo.emplace(std::string{plugin->descriptor()->id}, std::weak_ptr{plugin});
+				const bool added = m_uriToPluginInfo.emplace(std::string{plugin->descriptor()->id}, std::weak_ptr{plugin}).second;
 				if (!added)
 				{
 					if (debugging())

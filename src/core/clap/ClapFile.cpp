@@ -83,7 +83,8 @@ auto ClapFile::load() -> bool
 	m_valid = false;
 
 	// TODO: Replace QLibrary with in-house non-Qt alternative
-	m_library = std::make_unique<QLibrary>(QString::fromUtf8(filename().u8string().c_str()));
+	const auto filenameStr = filename().u8string();
+	m_library = std::make_unique<QLibrary>(QString::fromUtf8(filenameStr.c_str(), filenameStr.size()));
 	if (!m_library->load())
 	{
 		qWarning() << m_library->errorString();
@@ -98,7 +99,7 @@ auto ClapFile::load() -> bool
 		return false;
 	}
 
-	if (!m_entry->init(filename().c_str()))
+	if (!m_entry->init(filenameStr.c_str()))
 	{
 		qWarning().nospace() << "CLAP file '" << filename().c_str() << "' failed to initialize";
 		m_entry = nullptr; // Prevent deinit() from being called
