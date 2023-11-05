@@ -158,6 +158,11 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	show();
 }
 
+QDir::Filters FileBrowser::dirFilters()
+{
+	return QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot;
+}
+
 void FileBrowser::saveDirectoriesStates()
 {	
 	m_savedExpandedDirs = m_fileBrowserTreeWidget->expandedDirs();
@@ -231,8 +236,7 @@ void FileBrowser::onSearch(const QString& filter)
 		instance->cancel();
 		return;
 	}
-	instance->search(
-		{m_directories, filter, QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot, m_filter.split(' '), title()});
+	instance->search({m_directories, filter, dirFilters(), m_filter.split(' '), title()});
 }
 
 void FileBrowser::toggleSearch(bool on)
@@ -419,9 +423,7 @@ void FileBrowser::addItems(const QString & path )
 	QDir cdir(path);
 	if (!cdir.isReadable()) { return; }
 	QFileInfoList entries = cdir.entryInfoList(
-			m_filter.split(' '),
-			QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot,
-			QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase);
+		m_filter.split(' '), dirFilters(), QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase);
 	for (const auto& entry : entries)
 	{
 		QString fileName = entry.fileName();

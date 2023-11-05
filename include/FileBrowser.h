@@ -84,6 +84,8 @@ public:
 
 	~FileBrowser() override = default;
 
+	static QDir::Filters dirFilters();
+
 private slots:
 	void reloadTree();
 	void expandItems( QTreeWidgetItem * item=nullptr, QList<QString> expandedDirs = QList<QString>() );
