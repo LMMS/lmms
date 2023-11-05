@@ -520,7 +520,6 @@ void ProjectNotes::loadSettings( const QDomElement & _this )
 void ProjectNotes::showEvent( QShowEvent* event ) {
     setupMetaData();
     QWidget::showEvent( event );
-    qWarning("show event title='%s'", Engine::getSong()->getTitle().toStdString().c_str());
 }
 
 void ProjectNotes::closeEvent( QCloseEvent * _ce )
