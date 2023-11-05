@@ -1,0 +1,8 @@
+Building requires the CMake build system (version 3.0 or later).
+
+Most Unix-style systems:
+
+mkdir resid-build
+cmake ../resid
+make
+sudo make install
