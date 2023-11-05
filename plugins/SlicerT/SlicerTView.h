@@ -48,6 +48,7 @@ class SlicerTView : public InstrumentViewFixedSize
 
 public slots:
 	void exportMidi();
+	void openFiles();
 
 public:
 	SlicerTView(SlicerT* instrument, QWidget* parent);

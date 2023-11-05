@@ -30,6 +30,7 @@
 #include <QInputDialog>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QElapsedTimer>
 
 #include "Instrument.h"
 #include "SampleBuffer.h"
@@ -61,6 +62,7 @@ public:
 	static constexpr float s_distanceForClick = 0.02f;
 	static constexpr float s_minSeekerDistance = 0.13f;
 	static constexpr float s_zoomSensitivity = 0.5f;
+	static constexpr int s_minMilisPassed = 10;
 
 	enum class UIObjects
 	{
@@ -110,6 +112,7 @@ private:
 
 	SlicerT* m_slicerTParent;
 
+	QElapsedTimer m_updateTimer;
 	void drawSeekerWaveform();
 	void drawSeeker();
 	void drawEditorWaveform();

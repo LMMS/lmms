@@ -127,6 +127,12 @@ void SlicerTView::exportMidi()
 	copyString(dataFile.toString(), MimeType::Default);
 }
 
+void SlicerTView::openFiles() {
+	QString audioFile = m_slicerTParent->m_originalSample.openAudioFile();
+	if (audioFile.isEmpty()) { return; }
+	m_slicerTParent->updateFile(audioFile);
+}
+
 // all the drag stuff is copied from AudioFileProcessor
 void SlicerTView::dragEnterEvent(QDragEnterEvent* dee)
 {

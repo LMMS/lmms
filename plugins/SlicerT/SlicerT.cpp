@@ -207,6 +207,7 @@ void SlicerT::findSlices()
 		{
 			m_slicePoints.push_back(i);
 			lastPoint = i;
+			if (m_slicePoints.size() > 128) { break; } // no more keys on the keyboard
 		}
 
 		prevFlux = spectralFlux;

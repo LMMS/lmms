@@ -77,6 +77,7 @@ SlicerTWaveform::SlicerTWaveform(int totalWidth, int totalHeight, SlicerT* instr
 
 	m_emptySampleIcon = m_emptySampleIcon.createMaskFromColor(QColor(255, 255, 255), Qt::MaskMode::MaskOutColor);
 
+	m_updateTimer.start();
 	updateUI();
 }
 
@@ -161,7 +162,7 @@ void SlicerTWaveform::drawEditor()
 		brush.setPen(s_playHighlightColor);
 		brush.setFont(QFont(brush.font().family(), 9.0f, -1, false));
 		brush.drawText(
-			m_editorWidth / 2 - 100, m_editorHeight / 2 - 110, 200, 200, Qt::AlignCenter, tr("Drag sample to load"));
+			m_editorWidth / 2 - 100, m_editorHeight / 2 - 110, 200, 200, Qt::AlignCenter, tr("Click to load sample"));
 		int iconOffsetX = m_emptySampleIcon.width() / 2.0f;
 		int iconOffsetY = m_emptySampleIcon.height() / 2.0f - 13;
 		brush.drawPixmap(m_editorWidth / 2.0f - iconOffsetX, m_editorHeight / 2.0f - iconOffsetY, m_emptySampleIcon);
@@ -212,14 +213,17 @@ void SlicerTWaveform::drawEditor()
 
 void SlicerTWaveform::isPlaying(float current, float start, float end)
 {
+	if (!m_updateTimer.hasExpired(s_minMilisPassed)) {return;}
 	m_noteCurrent = current;
 	m_noteStart = start;
 	m_noteEnd = end;
 	drawSeeker();
 	drawEditor();
 	update();
+	m_updateTimer.restart();
 }
 
+// this should only be called if one of the waveforms has to update
 void SlicerTWaveform::updateUI()
 {
 	drawSeekerWaveform();
@@ -271,7 +275,9 @@ void SlicerTWaveform::updateClosest(QMouseEvent* me)
 		}
 	}
 	updateCursor();
-	updateUI();
+	drawSeeker();
+	drawEditor();
+	update();
 }
 
 void SlicerTWaveform::updateCursor()
@@ -299,6 +305,9 @@ void SlicerTWaveform::mousePressEvent(QMouseEvent* me)
 		m_zoomLevel = 1;
 		break;
 	case Qt::MouseButton::LeftButton:
+		if (m_slicerTParent->m_originalSample.frames() <= 1) {
+			static_cast<SlicerTView*>(parent())->openFiles();
+		}
 		// update seeker middle for correct movement
 		m_seekerMiddle = static_cast<float>(me->x() - m_seekerHorMargin) / m_seekerWidth;
 		break;
@@ -371,7 +380,9 @@ void SlicerTWaveform::mouseMoveEvent(QMouseEvent* me)
 	}
 	// dont update closest, and update seeker waveform
 	drawEditorWaveform();
-	updateUI();
+	drawSeeker();
+	drawEditor();
+	update();
 }
 
 void SlicerTWaveform::mouseDoubleClickEvent(QMouseEvent* me)
