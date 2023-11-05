@@ -26,7 +26,7 @@
 
 #include <QDomElement>
 #include <fftw3.h>
-#include <math.h>
+#include <cmath>
 
 #include "Engine.h"
 #include "InstrumentTrack.h"
@@ -76,7 +76,7 @@ SlicerT::SlicerT(InstrumentTrack* instrumentTrack)
 
 void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 {
-	if (m_originalSample.frames() < 2048) { return; }
+	if (m_originalSample.frames() <= 1) { return; }
 
 	// playback parameters
 	const int noteIndex = handle->key() - m_parentTrack->baseNote();
@@ -89,7 +89,7 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 	float speedRatio = static_cast<float>(m_originalBPM.value()) / bpm;
 	if (!m_enableSync.value()) { speedRatio = 1; } // disable timeshift
 	speedRatio *= pitchRatio;					   // adjust for pitch bend
-	speedRatio *= Engine::audioEngine()->processingSampleRate() / static_cast<float>(m_originalSample.sampleRate()) ;
+	speedRatio *= Engine::audioEngine()->processingSampleRate() / static_cast<float>(m_originalSample.sampleRate());
 
 	// set start and end points
 	float sliceStart, sliceEnd;
@@ -157,7 +157,7 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 // http://www.iro.umontreal.ca/~pift6080/H09/documents/papers/bello_onset_tutorial.pdf
 void SlicerT::findSlices()
 {
-	if (m_originalSample.frames() < 2048) { return; }
+	if (m_originalSample.frames() <= 1) { return; }
 	m_slicePoints = {};
 
 	// computacion params
@@ -177,9 +177,9 @@ void SlicerT::findSlices()
 	}
 
 	// normalize
-	for (int i = 0; i < singleChannel.size(); i++)
+	for (float& channelValue : singleChannel)
 	{
-		singleChannel[i] /= maxMag;
+		channelValue /= maxMag;
 	}
 
 	// buffers
@@ -234,10 +234,10 @@ void SlicerT::findSlices()
 	int sliceLock = samplesPerBeat / std::pow(2, noteSnap + 1); // lock to note: 1 / noteSnap²
 	if (noteSnap == 0) { sliceLock = 1; }						// disable noteSnap
 
-	for (int i = 0; i < m_slicePoints.size(); i++)
+	for (float& sliceValue : m_slicePoints)
 	{
-		m_slicePoints[i] += sliceLock / 2;
-		m_slicePoints[i] -= static_cast<int>(m_slicePoints[i]) % sliceLock;
+		sliceValue += sliceLock / 2;
+		sliceValue -= static_cast<int>(sliceValue) % sliceLock;
 	}
 
 	// remove duplicates
@@ -261,7 +261,7 @@ void SlicerT::findSlices()
 // and lies in the 100 - 200 bpm range
 void SlicerT::findBPM()
 {
-	if (m_originalSample.frames() < 2048) { return; }
+	if (m_originalSample.frames() <= 1) { return; }
 
 	// caclulate length of sample
 	float sampleRate = m_originalSample.sampleRate();
@@ -318,7 +318,6 @@ std::vector<Note> SlicerT::getMidi()
 void SlicerT::updateFile(QString file)
 {
 	m_originalSample.setAudioFile(file);
-	if (m_originalSample.frames() < 2048) { return; }
 
 	findBPM();
 	findSlices();

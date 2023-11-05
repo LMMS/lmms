@@ -49,7 +49,7 @@ public slots:
 	void isPlaying(float current, float start, float end);
 
 public:
-	SlicerTWaveform(int w, int h, SlicerT* instrument, QWidget* parent);
+	SlicerTWaveform(int totalWidth, int totalHeight, SlicerT* instrument, QWidget* parent);
 
 	// predefined sizes
 	static constexpr int m_seekerHorMargin = 5;

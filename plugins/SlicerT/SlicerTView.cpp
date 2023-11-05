@@ -44,12 +44,6 @@ namespace gui {
 SlicerTView::SlicerTView(SlicerT* instrument, QWidget* parent)
 	: InstrumentViewFixedSize(instrument, parent)
 	, m_slicerTParent(instrument)
-	, m_bpmBox(3, "19purple", this)
-	, m_snapSetting(this, tr("Slice snap"))
-	, m_syncToggle("Sync", this, tr("SyncToggle"), LedCheckBox::LedColor::Green)
-	, m_resetButton(this)
-	, m_midiExportButton(this)
-	, m_wf(248, 128, instrument, this)
 {
 	// window settings
 	setAcceptDrops(true);
@@ -61,23 +55,26 @@ SlicerTView::SlicerTView(SlicerT* instrument, QWidget* parent)
 	setPalette(pal);
 
 	// move editor and seeker
-	m_wf.move(2, 6);
+	m_wf = new SlicerTWaveform(248, 128, instrument, this);
+	m_wf->move(2, 6);
 
 	// snap combo box
-	m_snapSetting.setGeometry(185, 200, 55, ComboBox::DEFAULT_HEIGHT);
-	m_snapSetting.setToolTip(tr("Set slice snapping for detection"));
-	m_snapSetting.setModel(&m_slicerTParent->m_sliceSnap);
+	m_snapSetting = new ComboBox(this, tr("Slice snap"));
+	m_snapSetting->setGeometry(185, 200, 55, ComboBox::DEFAULT_HEIGHT);
+	m_snapSetting->setToolTip(tr("Set slice snapping for detection"));
+	m_snapSetting->setModel(&m_slicerTParent->m_sliceSnap);
 
 	// sync toggle
-	m_syncToggle.move(135, 187);
-	m_syncToggle.setToolTip(tr("Enable BPM sync"));
-	m_syncToggle.setModel(&m_slicerTParent->m_enableSync);
+	m_syncToggle = new LedCheckBox("Sync", this, tr("SyncToggle"), LedCheckBox::LedColor::Green);
+	m_syncToggle->move(135, 187);
+	m_syncToggle->setToolTip(tr("Enable BPM sync"));
+	m_syncToggle->setModel(&m_slicerTParent->m_enableSync);
 
 	// bpm spin box
-	m_bpmBox.move(130, 201);
-	m_bpmBox.setToolTip(tr("Original sample BPM"));
-	/* m_bpmBox.setLabel(tr("BPM")); */
-	m_bpmBox.setModel(&m_slicerTParent->m_originalBPM);
+	m_bpmBox = new LcdSpinBox(3, "19purple", this);
+	m_bpmBox->move(130, 201);
+	m_bpmBox->setToolTip(tr("Original sample BPM"));
+	m_bpmBox->setModel(&m_slicerTParent->m_originalBPM);
 
 	// threshold knob
 	m_noteThresholdKnob = createStyledKnob();
@@ -94,19 +91,20 @@ SlicerTView::SlicerTView(SlicerT* instrument, QWidget* parent)
 	m_fadeOutKnob->setModel(&m_slicerTParent->m_fadeOutFrames);
 
 	// midi copy button
-	m_midiExportButton.move(199, 150);
-	m_midiExportButton.setIcon(PLUGIN_NAME::getIconPixmap("copyMidi"));
-	m_midiExportButton.setToolTip(tr("Copy midi pattern to clipboard"));
-	connect(&m_midiExportButton, &PixmapButton::clicked, this, &SlicerTView::exportMidi);
+	m_midiExportButton = new QPushButton(this);
+	m_midiExportButton->move(199, 150);
+	m_midiExportButton->setIcon(PLUGIN_NAME::getIconPixmap("copyMidi"));
+	m_midiExportButton->setToolTip(tr("Copy midi pattern to clipboard"));
+	connect(m_midiExportButton, &PixmapButton::clicked, this, &SlicerTView::exportMidi);
 
 	// slice reset button
-	m_resetButton.move(18, 150);
-	m_resetButton.setIcon(PLUGIN_NAME::getIconPixmap("resetSlices"));
-	m_resetButton.setToolTip(tr("Reset Slices"));
-	connect(&m_resetButton, &PixmapButton::clicked, m_slicerTParent, &SlicerT::updateSlices);
+	m_resetButton = new QPushButton(this);
+	m_resetButton->move(18, 150);
+	m_resetButton->setIcon(PLUGIN_NAME::getIconPixmap("resetSlices"));
+	m_resetButton->setToolTip(tr("Reset Slices"));
+	connect(m_resetButton, &PixmapButton::clicked, m_slicerTParent, &SlicerT::updateSlices);
 }
 
-// style knob, defined in data/themes/default/style.css#L949
 Knob* SlicerTView::createStyledKnob()
 {
 	Knob* newKnob = new Knob(KnobType::Styled, this);
@@ -120,7 +118,7 @@ Knob* SlicerTView::createStyledKnob()
 void SlicerTView::exportMidi()
 {
 	using namespace Clipboard;
-	if (m_slicerTParent->m_originalSample.frames() < 2048) { return; }
+	if (m_slicerTParent->m_originalSample.frames() <= 1) { return; }
 
 	DataFile dataFile(DataFile::Type::ClipboardData);
 	QDomElement note_list = dataFile.createElement("note-list");
@@ -132,9 +130,8 @@ void SlicerTView::exportMidi()
 	TimePos start_pos(notes.front().pos().getBar(), 0);
 	for (Note note : notes)
 	{
-		Note clip_note(note);
-		clip_note.setPos(clip_note.pos(start_pos));
-		clip_note.saveState(dataFile, note_list);
+		note.setPos(note.pos(start_pos));
+		note.saveState(dataFile, note_list);
 	}
 
 	copyString(dataFile.toString(), MimeType::Default);

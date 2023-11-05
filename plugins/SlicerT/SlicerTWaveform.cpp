@@ -34,22 +34,22 @@ namespace lmms {
 
 namespace gui {
 
-SlicerTWaveform::SlicerTWaveform(int w, int h, SlicerT* instrument, QWidget* parent)
+SlicerTWaveform::SlicerTWaveform(int totalWidth, int totalHeight, SlicerT* instrument, QWidget* parent)
 	: QWidget(parent)
 	// calculate sizes
-	, m_width(w)
-	, m_height(h)
-	, m_seekerWidth(w - m_seekerHorMargin * 2)
-	, m_editorHeight(h - m_seekerHeight - m_middleMargin)
-	, m_editorWidth(w)
+	, m_width(totalWidth)
+	, m_height(totalHeight)
+	, m_seekerWidth(totalWidth - m_seekerHorMargin * 2)
+	, m_editorHeight(totalHeight - m_seekerHeight - m_middleMargin)
+	, m_editorWidth(totalWidth)
 
 	// create pixmaps
 	, m_sliceArrow(PLUGIN_NAME::getIconPixmap("slice_indicator_arrow"))
 	, m_seeker(QPixmap(m_seekerWidth, m_seekerHeight))
 	, m_seekerWaveform(QPixmap(m_seekerWidth, m_seekerHeight))
 	, m_editorWaveform(QPixmap(m_editorWidth, m_editorHeight))
-	, m_sliceEditor(QPixmap(w, m_editorHeight))
-	, m_emptySampleIcon(embed::getIconPixmap("sample_track.png"))
+	, m_sliceEditor(QPixmap(totalWidth, m_editorHeight))
+	, m_emptySampleIcon(embed::getIconPixmap("sample_track"))
 
 	// references to instrument vars
 	, m_slicerTParent(instrument)
@@ -75,7 +75,7 @@ SlicerTWaveform::SlicerTWaveform(int w, int h, SlicerT* instrument, QWidget* par
 void SlicerTWaveform::drawSeekerWaveform()
 {
 	m_seekerWaveform.fill(s_waveformBgColor);
-	if (m_slicerTParent->m_originalSample.frames() < 2048) { return; }
+	if (m_slicerTParent->m_originalSample.frames() <= 1) { return; }
 	QPainter brush(&m_seekerWaveform);
 	brush.setPen(s_waveformColor);
 
@@ -91,15 +91,14 @@ void SlicerTWaveform::drawSeekerWaveform()
 void SlicerTWaveform::drawSeeker()
 {
 	m_seeker.fill(s_emptyColor);
-	if (m_slicerTParent->m_originalSample.frames() < 2048) { return; }
+	if (m_slicerTParent->m_originalSample.frames() <= 1) { return; }
 	QPainter brush(&m_seeker);
 
 	// draw slice points
 	brush.setPen(s_sliceColor);
-	for (int i = 0; i < m_slicerTParent->m_slicePoints.size(); i++)
+	for (float sliceValue: m_slicerTParent->m_slicePoints)
 	{
-		float xPos = static_cast<float>(m_slicerTParent->m_slicePoints.at(i))
-			 * m_seekerWidth;
+		float xPos = sliceValue * m_seekerWidth;
 		brush.drawLine(xPos, 0, xPos, m_seekerHeight);
 	}
 
@@ -133,7 +132,7 @@ void SlicerTWaveform::drawSeeker()
 void SlicerTWaveform::drawEditorWaveform()
 {
 	m_editorWaveform.fill(s_emptyColor);
-	if (m_slicerTParent->m_originalSample.frames() < 2048) { return; }
+	if (m_slicerTParent->m_originalSample.frames() <= 1) { return; }
 
 	// draw SlicerTWaveform
 	QPainter brush(&m_editorWaveform);
@@ -157,7 +156,7 @@ void SlicerTWaveform::drawEditor()
 	QPainter brush(&m_sliceEditor);
 
 	// draw text if no sample loaded
-	if (m_slicerTParent->m_originalSample.frames() < 2048)
+	if (m_slicerTParent->m_originalSample.frames() <= 1)
 	{
 		brush.setPen(s_playHighlightColor);
 		brush.setFont(QFont(brush.font().family(), 9.0f, -1, false));
@@ -301,25 +300,26 @@ void SlicerTWaveform::mousePressEvent(QMouseEvent* me)
 	/* updateClosest(me); */
 
 	// reset seeker on middle click
-	if (me->button() == Qt::MouseButton::MiddleButton)
+	switch (me->button())
 	{
+	case Qt::MouseButton::MiddleButton:
 		m_seekerStart = 0;
 		m_seekerEnd = 1;
 		m_zoomLevel = 1;
-		return;
-	}
-
-	if (me->button() == Qt::MouseButton::LeftButton)
-	{
+		break;
+	case Qt::MouseButton::LeftButton:
 		// update seeker middle for correct movement
 		m_seekerMiddle = static_cast<float>(me->x() - m_seekerHorMargin) / m_seekerWidth;
-	}
-
+		break;
 	// delete closesd slice to mouse
-	if (me->button() == Qt::MouseButton::RightButton && m_slicerTParent->m_slicePoints.size() > 2
-		&& m_closestObject == UIObjects::SlicePoint)
-	{
-		m_slicerTParent->m_slicePoints.erase(m_slicerTParent->m_slicePoints.begin() + m_closestSlice);
+	case Qt::MouseButton::RightButton:
+		if (m_slicerTParent->m_slicePoints.size() > 2 && m_closestObject == UIObjects::SlicePoint)
+		{
+			m_slicerTParent->m_slicePoints.erase(m_slicerTParent->m_slicePoints.begin() + m_closestSlice);
+		}
+		break;
+	default:
+		;	
 	}
 	updateClosest(me);
 }
@@ -375,8 +375,8 @@ void SlicerTWaveform::mouseMoveEvent(QMouseEvent* me)
 		if (m_closestSlice == -1) { break; }
 		m_slicerTParent->m_slicePoints.at(m_closestSlice)
 			= startFrame + normalizedClickEditor * (endFrame - startFrame);
-		m_slicerTParent->m_slicePoints.at(m_closestSlice) = std::clamp(
-			m_slicerTParent->m_slicePoints.at(m_closestSlice), 0.0f, 1.0f);
+		m_slicerTParent->m_slicePoints.at(m_closestSlice)
+			= std::clamp(m_slicerTParent->m_slicePoints.at(m_closestSlice), 0.0f, 1.0f);
 		break;
 	case UIObjects::Nothing:
 		break;

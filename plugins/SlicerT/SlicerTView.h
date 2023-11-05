@@ -69,15 +69,15 @@ private:
 	// lmms UI
 	Knob* m_noteThresholdKnob;
 	Knob* m_fadeOutKnob;
-	LcdSpinBox m_bpmBox;
-	ComboBox m_snapSetting;
-	LedCheckBox m_syncToggle;
+	LcdSpinBox* m_bpmBox;
+	ComboBox* m_snapSetting;
+	LedCheckBox* m_syncToggle;
 
 	// buttons
-	QPushButton m_resetButton;
-	QPushButton m_midiExportButton;
+	QPushButton* m_resetButton;
+	QPushButton* m_midiExportButton;
 
-	SlicerTWaveform m_wf;
+	SlicerTWaveform* m_wf;
 
 	Knob* createStyledKnob();
 };
