@@ -28,6 +28,7 @@
 #include <QMainWindow>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QLabel>
 
 #include "SerializingObject.h"
 
@@ -65,6 +66,7 @@ protected:
     void showEvent( QShowEvent * _ce ) override;
 	void setupActions();
     void setupMetaData();
+    void renderImage();
 
 
 private slots:
@@ -90,7 +92,7 @@ private:
     QLineEdit * m_year;
     QLineEdit * m_genre;
     QLineEdit * m_comment;
-    QLineEdit * m_image;
+    QLabel * m_image;
     QPushButton * m_changeImageButton;
 	QTextEdit * m_edit;
 	QAction * m_actionTextBold,

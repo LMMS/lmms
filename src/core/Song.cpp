@@ -1098,6 +1098,14 @@ void Song::loadProject( const QString & fileName )
         m_genre = metaElement.attribute("genre");
         m_comment = metaElement.attribute("comment");
         m_image = metaElement.attribute("image");
+    } else {
+        m_title.clear();
+        m_artist.clear();
+        m_album.clear();
+        m_year.clear();
+        m_genre.clear();
+        m_comment.clear();
+        m_image.clear();
     }
 
 	if( getPlayPos(PlayMode::Song).m_timeLine )

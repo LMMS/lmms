@@ -64,7 +64,8 @@ ProjectNotes::ProjectNotes() :
     m_year = new QLineEdit(m_form);
     m_genre = new QLineEdit(m_form);
     m_comment = new QLineEdit(m_form);
-    m_image = new QLineEdit(m_form);
+    m_image = new QLabel(m_form);
+    m_image->setFixedSize(128, 128);
     m_changeImageButton = new QPushButton(embed::getIconPixmap("project_open", 16, 16), "", m_form);
     m_changeImageButton->setFixedSize(24, 24);
     m_edit = new QTextEdit(m_form);
@@ -99,12 +100,12 @@ ProjectNotes::ProjectNotes() :
 	connect( m_edit, SIGNAL(textChanged()),
 			Engine::getSong(), SLOT(setModified()));
 
-    connect( m_title, SIGNAL(editingFinished()), this, SLOT(metaTextModified()));
-    connect( m_artist, SIGNAL(editingFinished()), this, SLOT(metaTextModified()));
-    connect( m_album, SIGNAL(editingFinished()), this, SLOT(metaTextModified()));
-    connect( m_year, SIGNAL(editingFinished()), this, SLOT(metaTextModified()));
-    connect( m_genre, SIGNAL(editingFinished()), this, SLOT(metaTextModified()));
-    connect( m_comment, SIGNAL(editingFinished()), this, SLOT(metaTextModified()));
+    connect( m_title, SIGNAL(textEdited(const QString &)), this, SLOT(metaTextModified()));
+    connect( m_artist, SIGNAL(textEdited(const QString &)), this, SLOT(metaTextModified()));
+    connect( m_album, SIGNAL(textEdited(const QString &)), this, SLOT(metaTextModified()));
+    connect( m_year, SIGNAL(textEdited(const QString &)), this, SLOT(metaTextModified()));
+    connect( m_genre, SIGNAL(textEdited(const QString &)), this, SLOT(metaTextModified()));
+    connect( m_comment, SIGNAL(textEdited(const QString &)), this, SLOT(metaTextModified()));
     connect( m_changeImageButton, SIGNAL(clicked()), this, SLOT(selectSongImage()));
 
 	setupActions();
@@ -142,7 +143,8 @@ void ProjectNotes::clearMetaData()
     m_year->setText("");
     m_genre->setText("");
     m_comment->setText("");
-    m_image->setText("");
+    m_image->clear();
+    m_image->setFixedSize(16, 16);
 }
 
 
@@ -156,18 +158,13 @@ void ProjectNotes::setupMetaData()
     Song * song = Engine::getSong();
     if (song)
     {
-        clearMetaData();
         m_title->setText(song->getTitle());
         m_artist->setText(song->getArtist());
         m_album->setText(song->getAlbum());
         m_year->setText(song->getYear());
         m_genre->setText(song->getGenre());
         m_comment->setText(song->getComment());
-        if (song->getImage().isNull() || song->getImage().trimmed().length() == 0) {
-            m_image->setText("[no image]");
-        } else {
-            m_image->setText("[embedded image]");
-        }
+        renderImage();
     }
     else
     {
@@ -198,7 +195,6 @@ void ProjectNotes::selectSongImage()
 
         fileDialog.setAcceptMode(FileDialog::AcceptOpen);
         fileDialog.setFileMode(FileDialog::ExistingFile);
-        //fileDialog.setDefaultSuffix("png");
         fileDialog.setNameFilter("Images (*.png *.jpg *.jpeg)");
 
         if( fileDialog.exec() == QDialog::Accepted &&
@@ -212,12 +208,27 @@ void ProjectNotes::selectSongImage()
                 QString base64;
                 base64::encode(bytes, bytes.size(), base64);
                 song->setImage(base64);
-                m_image->setText(file.fileName());
+                renderImage();
                 return;
             }
         }
-        m_image->setText("failed to load image");
     }
+}
+
+void ProjectNotes::renderImage() {
+    Song * song = Engine::getSong();
+    if (! song->getImage().isNull() && song->getImage().size() > 0)
+    {
+        QPixmap image;
+        if (image.loadFromData(QByteArray::fromBase64(song->getImage().toStdString().c_str())))
+        {
+            m_image->setFixedSize(128, 128);
+            m_image->setPixmap(image.scaled(128, 128, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+            return;
+        }
+    }
+    m_image->setFixedSize(16, 16);
+    m_image->clear();
 }
 
 void ProjectNotes::setupActions()
@@ -502,12 +513,14 @@ void ProjectNotes::loadSettings( const QDomElement & _this )
 {
 	MainWindow::restoreWidgetState( this, _this );
 	m_edit->setHtml( _this.text() );
+    setupMetaData();
 }
 
 
 void ProjectNotes::showEvent( QShowEvent* event ) {
     setupMetaData();
     QWidget::showEvent( event );
+    qWarning("show event title='%s'", Engine::getSong()->getTitle().toStdString().c_str());
 }
 
 void ProjectNotes::closeEvent( QCloseEvent * _ce )
