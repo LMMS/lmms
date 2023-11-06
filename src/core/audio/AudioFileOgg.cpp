@@ -33,10 +33,13 @@
 #if (QT_VERSION >= QT_VERSION_CHECK(5,10,0))
 #include <QRandomGenerator>
 #endif
+#include <sstream>
 #include <string>
 #include <vorbis/vorbisenc.h>
 
+#include <QFileInfo>
 #include "AudioEngine.h"
+#include "Song.h"
 
 namespace lmms
 {
@@ -69,21 +72,37 @@ inline int AudioFileOgg::writePage()
 	return written;
 }
 
-
-
+bool AudioFileOgg::addComment(vorbis_comment *vc, const char* tag, QString comment)
+{
+    if (!comment.isNull() && comment.trimmed().size() > 0)
+    {
+        vorbis_comment_add_tag(vc, tag, comment.toStdString().c_str());
+        return true;
+    }
+    return false;
+}
 
 bool AudioFileOgg::startEncoding()
 {
-	vorbis_comment vc;
-	const char * comments = "Cool=This song has been made using LMMS";
-	std::string user_comments_str(comments);
-	int comment_length = user_comments_str.size();
-	char * user_comments = &user_comments_str[0];
+    vorbis_comment_init(&m_comments);
+    vorbis_comment_add_tag(&m_comments, "Cool", "This song has been made using LMMS");
 
-	vc.user_comments = &user_comments;
-	vc.comment_lengths = &comment_length;
-	vc.comments = 1;
-	vc.vendor = nullptr;
+    // add optional Song meta data
+    const Song* song = Engine::getSong();
+    if ( !song->getTitle().isNull() && song->getTitle().trimmed().size() > 0 )
+    {
+        vorbis_comment_add_tag(&m_comments, "TITLE", song->getTitle().toStdString().c_str());
+    } else {
+        vorbis_comment_add_tag(&m_comments, "TITLE", QFileInfo(song->projectFileName())
+                   .completeBaseName()
+                   .replace("[_-]", " ").toStdString().c_str());
+    }
+    vorbis_comment_add_tag(&m_comments, "BPM", QString::number( song->getTempo() ).toStdString().c_str());
+    addComment(&m_comments, "ARTIST", song->getArtist());
+    addComment(&m_comments, "ALBUM", song->getAlbum());
+    addComment(&m_comments, "DATE", song->getYear());
+    addComment(&m_comments, "GENRE", song->getGenre());
+    addComment(&m_comments, "COMMENT", song->getComment());
 
 	m_channels = channels();
 
@@ -104,8 +123,6 @@ bool AudioFileOgg::startEncoding()
 		m_rate = 48000;
 		setSampleRate( 48000 );
 	}
-
-	m_comments 	= &vc;			// comments for ogg-file
 
 	// Have vorbisenc choose a mode for us
 	vorbis_info_init( &m_vi );
@@ -159,7 +176,7 @@ bool AudioFileOgg::startEncoding()
 	int result;
 
 	// Build the packets
-	vorbis_analysis_headerout( &m_vd, m_comments, &header_main,
+    vorbis_analysis_headerout( &m_vd, &m_comments, &header_main,
 					&header_comments, &header_codebooks );
 
 	// And stream them out
@@ -265,7 +282,8 @@ void AudioFileOgg::finishEncoding()
 
 		vorbis_block_clear( &m_vb );
 		vorbis_dsp_clear( &m_vd );
-		vorbis_info_clear( &m_vi );
+        vorbis_info_clear( &m_vi );
+        vorbis_comment_clear( &m_comments );
 	}
 }
 
