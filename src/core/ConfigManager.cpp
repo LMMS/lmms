@@ -282,6 +282,22 @@ void ConfigManager::setGIGDir(const QString & gigDir)
 
 
 
+void ConfigManager::setPrefExportDir(const QString & prefExportDir)
+{
+    m_prefExportDir = prefExportDir;
+}
+
+
+
+
+void ConfigManager::setBounceDir(const QString & bounceDir)
+{
+    m_bounceDir = bounceDir;
+}
+
+
+
+
 void ConfigManager::setThemeDir(const QString & themeDir)
 {
 	m_themeDir = ensureTrailingSlash(themeDir);
@@ -492,7 +508,9 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 			setWorkingDir(value("paths", "workingdir"));
 
 			setGIGDir(value("paths", "gigdir") == "" ? gigDir() : value("paths", "gigdir"));
-			setSF2Dir(value("paths", "sf2dir") == "" ? sf2Dir() : value("paths", "sf2dir"));
+            setPrefExportDir(value("paths", "prefexportdir") == "" ? prefExportDir() : value("paths", "prefexportdir"));
+            setBounceDir(value("paths", "bouncedir") == "" ? bounceDir() : value("paths", "bouncedir"));
+            setSF2Dir(value("paths", "sf2dir") == "" ? sf2Dir() : value("paths", "sf2dir"));
 			setVSTDir(value("paths", "vstdir"));
 			setLADSPADir(value("paths", "ladspadir"));
 		#ifdef LMMS_HAVE_STK
@@ -577,8 +595,10 @@ void ConfigManager::saveConfigFile()
 	setValue("paths", "theme", m_themeDir);
 	setValue("paths", "workingdir", m_workingDir);
 	setValue("paths", "vstdir", m_vstDir);
-	setValue("paths", "gigdir", m_gigDir);
-	setValue("paths", "sf2dir", m_sf2Dir);
+    setValue("paths", "gigdir", m_gigDir);
+    setValue("paths", "sf2dir", m_sf2Dir);
+    setValue("paths", "prefexportdir", m_prefExportDir);
+    setValue("paths", "bouncedir", m_bounceDir);
 	setValue("paths", "ladspadir", m_ladspaDir);
 #ifdef LMMS_HAVE_STK
 	setValue("paths", "stkdir", m_stkDir);

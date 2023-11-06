@@ -44,6 +44,7 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 	m_renderManager( nullptr )
 {
 	setupUi( this );
+    selectDefaults();
 	setWindowTitle( tr( "Export project to %1" ).arg(
 					QFileInfo( _file_name ).fileName() ) );
 
@@ -247,6 +248,110 @@ void ExportProjectDialog::onFileFormatChanged(int index)
 	checkBoxVariableBitRate->setVisible(variableBitrateVisible);
 
 	depthWidget->setVisible(bitDepthControlEnabled);
+
+    selectDefaults();
+}
+
+void ExportProjectDialog::selectDefaults()
+{
+    QString prefStereomode = ConfigManager::inst()->value("outputprefs", "stereomode");
+    if ( ! prefStereomode.isNull() && ! prefStereomode.isEmpty())
+    {
+        stereoModeComboBox->setCurrentText(prefStereomode);
+    }
+    QString prefBirate = ConfigManager::inst()->value("outputprefs", "bitrate");
+    if ( ! prefBirate.isNull() && ! prefBirate.isEmpty())
+    {
+        if ( prefBirate == "64" )
+        {
+            bitrateCB->setCurrentIndex(0);
+        }
+        else if ( prefBirate == "128" )
+        {
+            bitrateCB->setCurrentIndex(1);
+        }
+        else if ( prefBirate == "160" )
+        {
+            bitrateCB->setCurrentIndex(2);
+        }
+        else if ( prefBirate == "192" ) {
+            bitrateCB->setCurrentIndex(3);
+        }
+        else if ( prefBirate == "256" ) {
+            bitrateCB->setCurrentIndex(4);
+        }
+        else if ( prefBirate == "320" ) {
+            bitrateCB->setCurrentIndex(5);
+        }
+    }
+    QString prefBitdepth = ConfigManager::inst()->value("outputprefs", "bitdepth");
+    if ( ! prefBitdepth.isNull() && ! prefBitdepth.isEmpty())
+    {
+        if ( prefBitdepth == "16" )
+        {
+            depthCB->setCurrentIndex(0);
+        }
+        else if ( prefBitdepth == "24" )
+        {
+            depthCB->setCurrentIndex(1);
+        }
+        else if ( prefBitdepth == "24" )
+        {
+            depthCB->setCurrentIndex(2);
+        }
+    }
+    QString prefInterpolation = ConfigManager::inst()->value("outputprefs", "interpolation");
+    if ( ! prefInterpolation.isNull() && ! prefInterpolation.isEmpty())
+    {
+        if ( prefInterpolation.toLower().contains("zero") )
+        {
+            interpolationCB->setCurrentIndex(0);
+        }
+        else if ( prefInterpolation.toLower().contains("worst") )
+        {
+            interpolationCB->setCurrentIndex(1);
+        }
+        else if ( prefInterpolation.toLower().contains("medium") )
+        {
+            interpolationCB->setCurrentIndex(2);
+        }
+        else if ( prefInterpolation.toLower().contains("best") )
+        {
+            interpolationCB->setCurrentIndex(3);
+        }
+    }
+
+    QString prefSamplerate = ConfigManager::inst()->value("outputprefs", "samplerate");
+    if ( ! prefSamplerate.isNull() && ! prefInterpolation.isEmpty())
+    {
+        if ( prefSamplerate == "44100" )
+        {
+            samplerateCB->setCurrentIndex(0);
+        }
+        else if ( prefSamplerate == "48000" )
+        {
+            samplerateCB->setCurrentIndex(1);
+        }
+        else if ( prefSamplerate == "88200" )
+        {
+            samplerateCB->setCurrentIndex(2);
+        }
+        else if ( prefSamplerate == "96000" )
+        {
+            samplerateCB->setCurrentIndex(3);
+        }
+        else if ( prefSamplerate == "192000" )
+        {
+            samplerateCB->setCurrentIndex(4);
+        }
+    }
+
+
+    QString prefOversampling = ConfigManager::inst()->value("outputprefs", "oversampling");
+    if ( ! prefOversampling.isNull() && ! prefOversampling.isEmpty())
+    {
+        oversamplingCB->setCurrentIndex(prefOversampling.left(1).toInt() - 1);
+    }
 }
 
 void ExportProjectDialog::startBtnClicked()

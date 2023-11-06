@@ -1458,6 +1458,7 @@ void MainWindow::exportProject(bool multiExport)
 	QString const & projectFileName = Engine::getSong()->projectFileName();
 
 	FileDialog efd( getGUI()->mainWindow() );
+    QString suffix = "wav";
 
 	if ( multiExport )
 	{
@@ -1481,7 +1482,7 @@ void MainWindow::exportProject(bool multiExport)
 			++idx;
 		}
 		efd.setNameFilters( types );
-		QString baseFilename;
+        QString baseFilename;
 		if( !projectFileName.isEmpty() )
 		{
 			efd.setDirectory( QFileInfo( projectFileName ).absolutePath() );
@@ -1492,12 +1493,47 @@ void MainWindow::exportProject(bool multiExport)
 			efd.setDirectory( ConfigManager::inst()->userProjectsDir() );
 			baseFilename = tr( "untitled" );
 		}
+
+        // export preference if its not empty
+        QString prefExportDir = ConfigManager::inst()->prefExportDir();
+        if ( ! prefExportDir.isNull() && !prefExportDir.isEmpty() )
+        {
+            efd.setDirectory( prefExportDir );
+        }
 		efd.selectFile( baseFilename + ProjectRenderer::fileEncodeDevices[0].m_extension );
 		efd.setWindowTitle( tr( "Select file for project-export..." ) );
+
+        // format preference if not empty
+        QString prefFormat = ConfigManager::inst()->value("outputprefs", "format");
+        if ( !prefFormat.isNull() && ! prefFormat.isEmpty() )
+        {
+            suffix = prefFormat;
+            if (suffix.contains("mp3"))
+            {
+                efd.selectNameFilter( "MP3 (*.mp3)" );
+                efd.selectFile( baseFilename + ".mp3" );
+            }
+            if (suffix.contains("wav"))
+            {
+                efd.selectNameFilter( "WAV (*.mp3)" );
+                efd.selectFile( baseFilename + ".wav" );
+            }
+            if (suffix.contains("ogg"))
+            {
+                efd.selectNameFilter( "OGG (*.ogg)" );
+                efd.selectFile( baseFilename + ".ogg" );
+            }
+            if (suffix.contains("flac"))
+            {
+                efd.selectNameFilter( "FLAC (*.flac)" );
+                efd.selectFile( baseFilename + ".flac" );
+            }
+        }
 	}
 
-	QString suffix = "wav";
-	efd.setDefaultSuffix( suffix );
+
+    efd.setDefaultSuffix( suffix );
+
 	efd.setAcceptMode( FileDialog::AcceptSave );
 
 	if( efd.exec() == QDialog::Accepted && !efd.selectedFiles().isEmpty() &&

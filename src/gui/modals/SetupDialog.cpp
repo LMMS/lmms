@@ -587,12 +587,127 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	setBufferSize(m_bufferSizeSlider->value());
 
+    // Audio preferences
+    QGroupBox * outputPrefsBox = new QGroupBox(tr("Output preferences"), audio_w);
+    QVBoxLayout * outputPrefsLayout = new QVBoxLayout(outputPrefsBox);
+    m_prefFormat = new QComboBox(outputPrefsBox);
+    m_prefFormat->addItem(""); // no preference
+    m_prefFormat->addItem("mp3");
+    m_prefFormat->addItem("wav");
+    m_prefFormat->addItem("flac");
+    m_prefFormat->addItem("ogg");
+    m_prefFormat->setCurrentIndex(0);
+    int currIdx = m_prefFormat->findText(ConfigManager::inst()->value("outputprefs", "format"));
+    if (currIdx >= 0)
+    {
+        m_prefFormat->setCurrentIndex(currIdx);
+    }
+    outputPrefsLayout->addWidget(new QLabel("preferred output format"));
+    outputPrefsLayout->addWidget(m_prefFormat);
+
+    m_prefStereoMode = new QComboBox(outputPrefsBox);
+    m_prefStereoMode->addItem("Stereo");
+    m_prefStereoMode->addItem("Mono");
+    m_prefStereoMode->addItem("Joint stereo");
+    m_prefStereoMode->setCurrentIndex(0);
+    currIdx = m_prefStereoMode->findText(ConfigManager::inst()->value("outputprefs", "stereomode"));
+    if (currIdx >= 0)
+    {
+        m_prefStereoMode->setCurrentIndex(currIdx);
+    }
+    outputPrefsLayout->addWidget(new QLabel("preferred stereo mode"));
+    outputPrefsLayout->addWidget(m_prefStereoMode);
+
+    m_prefBitrate = new QComboBox(outputPrefsBox);
+    m_prefBitrate->addItem("64");
+    m_prefBitrate->addItem("128");
+    m_prefBitrate->addItem("160");
+    m_prefBitrate->addItem("192");
+    m_prefBitrate->addItem("256");
+    m_prefBitrate->addItem("320");
+    m_prefBitrate->setCurrentIndex(4);
+    currIdx = m_prefBitrate->findText(ConfigManager::inst()->value("outputprefs", "bitrate"));
+    if (currIdx >= 0)
+    {
+        m_prefBitrate->setCurrentIndex(currIdx);
+    }
+    outputPrefsLayout->addWidget(new QLabel("preferred bit rate"));
+    outputPrefsLayout->addWidget(m_prefBitrate);
+
+    m_prefBitdepth = new QComboBox(outputPrefsBox);
+    m_prefBitdepth->addItem("16");
+    m_prefBitdepth->addItem("24");
+    m_prefBitdepth->addItem("32");
+    m_prefBitdepth->setCurrentIndex(0);
+    currIdx = m_prefBitdepth->findText(ConfigManager::inst()->value("outputprefs", "bitdepth"));
+    if (currIdx >= 0)
+    {
+        m_prefBitdepth->setCurrentIndex(currIdx);
+    }
+    outputPrefsLayout->addWidget(new QLabel("preferred bit depth"));
+    outputPrefsLayout->addWidget(m_prefBitdepth);
+
+    m_prefSamplerate = new QComboBox(outputPrefsBox);
+    m_prefSamplerate->addItem("44100");
+    m_prefSamplerate->addItem("48000");
+    m_prefSamplerate->addItem("88200");
+    m_prefSamplerate->addItem("96000");
+    m_prefSamplerate->addItem("192000");
+    m_prefSamplerate->setCurrentIndex(4);
+    currIdx = m_prefSamplerate->findText(ConfigManager::inst()->value("outputprefs", "samplerate"));
+    if (currIdx >= 0)
+    {
+        m_prefSamplerate->setCurrentIndex(currIdx);
+    }
+    outputPrefsLayout->addWidget(new QLabel("preferred sample rate"));
+    outputPrefsLayout->addWidget(m_prefSamplerate);
+
+    m_prefInterpolation = new QComboBox(outputPrefsBox);
+    m_prefInterpolation->addItem("Zero order hold");
+    m_prefInterpolation->addItem("Sinc worst (fastest)");
+    m_prefInterpolation->addItem("Sinc medium (recommended)");
+    m_prefInterpolation->addItem("Sinc best (slowest)");
+    m_prefInterpolation->setCurrentIndex(2);
+    currIdx = m_prefInterpolation->findText(ConfigManager::inst()->value("outputprefs", "interpolation"));
+    if (currIdx >= 0)
+    {
+        m_prefInterpolation->setCurrentIndex(currIdx);
+    }
+    outputPrefsLayout->addWidget(new QLabel("preferred interpolation"));
+    outputPrefsLayout->addWidget(m_prefInterpolation);
+
+    m_prefOversampling = new QComboBox(outputPrefsBox);
+    m_prefOversampling->addItem("1x (none)");
+    m_prefOversampling->addItem("2x");
+    m_prefOversampling->addItem("4x");
+    m_prefOversampling->addItem("8x");
+    m_prefOversampling->setCurrentIndex(1);
+    currIdx = m_prefOversampling->findText(ConfigManager::inst()->value("outputprefs", "oversampling"));
+    if (currIdx >= 0)
+    {
+        m_prefOversampling->setCurrentIndex(currIdx);
+    }
+    outputPrefsLayout->addWidget(new QLabel("preferred oversampling"));
+    outputPrefsLayout->addWidget(m_prefOversampling);
+
+    m_prefBounceFormat = new QComboBox(outputPrefsBox);
+    m_prefBounceFormat->addItem("wav");
+    m_prefBounceFormat->addItem("ogg");
+    m_prefBounceFormat->setCurrentIndex(0);
+    currIdx = m_prefBounceFormat->findText(ConfigManager::inst()->value("outputprefs", "bounceformat"));
+    if (currIdx >= 0)
+    {
+        m_prefBounceFormat->setCurrentIndex(currIdx);
+    }
+    outputPrefsLayout->addWidget(new QLabel("preferred format when bouncing clips"));
+    outputPrefsLayout->addWidget(m_prefBounceFormat);
 
 	// Audio layout ordering.
 	audio_layout->addWidget(audioInterfaceBox);
 	audio_layout->addWidget(as_w);
 	audio_layout->addWidget(hqaudio);
 	audio_layout->addWidget(bufferSizeBox);
+    audio_layout->addWidget(outputPrefsBox);
 	audio_layout->addStretch();
 
 
@@ -777,6 +892,17 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		SLOT(openSF2File()),
 		m_sf2FileLineEdit);
 #endif
+
+    // Audio output preferences
+    addPathEntry(tr("Export directory"), m_prefExportDir,
+        SLOT(setPrefExportDir(const QString&)),
+        SLOT(openPrefExportDir()),
+        m_prefExportDirLineEdit);
+    addPathEntry(tr("Bounce directory"), m_bounceDir,
+        SLOT(setBounceDir(const QString&)),
+        SLOT(openBounceDir()),
+        m_bounceDirLineEdit);
+
 	addPathEntry(tr("GIG directory"), m_gigDir,
 		SLOT(setGIGDir(const QString&)),
 		SLOT(openGIGDir()),
@@ -951,6 +1077,15 @@ void SetupDialog::accept()
 					m_midiIfaceNames[m_midiInterfaces->currentText()]);
 	ConfigManager::inst()->setValue("midi", "midiautoassign",
 					m_assignableMidiDevices->currentText());
+    // audio output prefs
+    ConfigManager::inst()->setValue("outputprefs", "format", m_prefFormat->currentText());
+    ConfigManager::inst()->setValue("outputprefs", "bitrate", m_prefBitrate->currentText());
+    ConfigManager::inst()->setValue("outputprefs", "bitdepth", m_prefBitdepth->currentText());
+    ConfigManager::inst()->setValue("outputprefs", "samplerate", m_prefSamplerate->currentText());
+    ConfigManager::inst()->setValue("outputprefs", "stereomode", m_prefStereoMode->currentText());
+    ConfigManager::inst()->setValue("outputprefs", "interpolation", m_prefInterpolation->currentText());
+    ConfigManager::inst()->setValue("outputprefs", "oversampling", m_prefOversampling->currentText());
+    ConfigManager::inst()->setValue("outputprefs", "bounceformat", m_prefBounceFormat->currentText());
 
 
 	ConfigManager::inst()->setWorkingDir(QDir::fromNativeSeparators(m_workingDir));
@@ -961,6 +1096,9 @@ void SetupDialog::accept()
 	ConfigManager::inst()->setSF2File(m_sf2File);
 #endif
 	ConfigManager::inst()->setGIGDir(QDir::fromNativeSeparators(m_gigDir));
+    ConfigManager::inst()->setPrefExportDir(QDir::fromNativeSeparators(m_prefExportDir));
+    ConfigManager::inst()->setBounceDir(QDir::fromNativeSeparators(m_bounceDir));
+
 	ConfigManager::inst()->setThemeDir(QDir::fromNativeSeparators(m_themeDir));
 	ConfigManager::inst()->setBackgroundPicFile(m_backgroundPicFile);
 
@@ -1345,11 +1483,43 @@ void SetupDialog::openGIGDir()
 }
 
 
-void SetupDialog::setGIGDir(const QString & gigDir)
+void SetupDialog::setPrefExportDir(const QString & exportDir)
 {
-	m_gigDir = gigDir;
+    m_prefExportDir = exportDir;
 }
 
+
+void SetupDialog::openPrefExportDir()
+{
+    QString new_dir = FileDialog::getExistingDirectory(this,
+        tr("Choose default export directory"), m_prefExportDir);
+    if(!new_dir.isEmpty())
+    {
+        m_prefExportDirLineEdit->setText(new_dir);
+    }
+}
+
+
+void SetupDialog::setBounceDir(const QString & bounceDir)
+{
+    m_bounceDir = bounceDir;
+}
+
+void SetupDialog::openBounceDir()
+{
+    QString new_dir = FileDialog::getExistingDirectory(this,
+        tr("Choose bounce directory"), m_bounceDir);
+    if(!new_dir.isEmpty())
+    {
+        m_bounceDirLineEdit->setText(new_dir);
+    }
+}
+
+
+void SetupDialog::setGIGDir(const QString & gigDir)
+{
+    m_gigDir = gigDir;
+}
 
 void SetupDialog::openThemeDir()
 {

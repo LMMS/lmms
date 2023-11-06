@@ -120,9 +120,13 @@ private slots:
 	void setSF2Dir(const QString & sf2Dir);
 	void openSF2File();
 	void setSF2File(const QString & sf2File);
-	void openGIGDir();
-	void setGIGDir(const QString & gigDir);
-	void openThemeDir();
+    void openGIGDir();
+    void setGIGDir(const QString & gigDir);
+    void openPrefExportDir();
+    void setPrefExportDir(const QString & prefExportDir);
+    void openBounceDir();
+    void setBounceDir(const QString & bounceDir);
+    void openThemeDir();
 	void setThemeDir(const QString & themeDir);
 	void openBackgroundPicFile();
 	void setBackgroundPicFile(const QString & backgroundPicFile);
@@ -181,6 +185,20 @@ private:
 	QSlider * m_bufferSizeSlider;
 	QLabel * m_bufferSizeLbl;
 	QLabel * m_bufferSizeWarnLbl;
+
+    // Audio output preferences
+    QComboBox * m_prefFormat;
+    QComboBox * m_prefStereoMode;
+    QComboBox * m_prefBitrate;
+    QComboBox * m_prefBitdepth;
+    QComboBox * m_prefSamplerate;
+    QComboBox * m_prefInterpolation;
+    QComboBox * m_prefOversampling;
+    QComboBox * m_prefBounceFormat;
+    QString m_prefExportDir;
+    QLineEdit * m_prefExportDirLineEdit;
+    QString m_bounceDir;
+    QLineEdit * m_bounceDirLineEdit;
 
 	// MIDI settings widgets.
 	QComboBox * m_midiInterfaces;

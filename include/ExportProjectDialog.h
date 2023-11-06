@@ -46,13 +46,14 @@ public:
 protected:
 	void reject() override;
 	void closeEvent( QCloseEvent * _ce ) override;
-
+    void selectDefaults();
 
 private slots:
 	void startBtnClicked();
 	void updateTitleBar( int );
 	void accept() override;
 	void startExport();
+
 
 	void onFileFormatChanged(int);
 
