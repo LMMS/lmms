@@ -124,9 +124,10 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	searchWidgetLayout->setContentsMargins(0, 0, 0, 0);
 	searchWidgetLayout->setSpacing( 0 );
 
-	m_filterEdit = new QLineEdit( searchWidget );
-	m_filterEdit->setPlaceholderText( tr("Search") );
-	m_filterEdit->setClearButtonEnabled( true );
+	m_filterEdit = new QLineEdit(searchWidget);
+	m_filterEdit->setPlaceholderText(tr("Search"));
+	m_filterEdit->setClearButtonEnabled(true);
+	m_filterEdit->addAction(embed::getIconPixmap("zoom"), QLineEdit::LeadingPosition);
 
 	connect(m_filterEdit, &QLineEdit::textEdited, this, &FileBrowser::onSearch);
 	connect(FileBrowserSearcher::instance(), &FileBrowserSearcher::searchComplete, this, &FileBrowser::buildSearchTree);
