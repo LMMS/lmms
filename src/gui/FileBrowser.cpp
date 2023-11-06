@@ -206,20 +206,19 @@ void FileBrowser::buildSearchTree(QStringList matches, QString id)
 			if (relativeParentPath == ".")
 			{
 				m_searchTreeWidget->addTopLevelItem(childWidget);
+				if (matchInfo.isDir()) { m_searchTreeWidget->expandItem(childWidget); }
 				continue;
 			}
 
 			auto parentItems = m_searchTreeWidget->findItems(relativeParentPath, Qt::MatchExactly);
 			auto parentItem = parentItems.isEmpty() ? new Directory(relativeParentPath, matchParentPath, m_filter) : parentItems[0];
-
 			auto parentDirItem = dynamic_cast<Directory*>(parentItem);
 			if (!parentDirItem) { continue; }
 
 			parentDirItem->addChild(childWidget);
-			parentDirItem->setExpanded(true);
-			if (parentItems.isEmpty()) { parentDirItem->update(); }
-
+			parentDirItem->update();
 			m_searchTreeWidget->addTopLevelItem(parentDirItem);
+			m_searchTreeWidget->expandItem(parentDirItem);
 		}
 	}
 
