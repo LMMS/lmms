@@ -95,6 +95,7 @@ protected:
 
 	void toggleUI();
 	void toggleHelp(bool visible);
+	void closeHelpWindow();
 
 	// to be called by child virtuals
 	//! Reconnect models if model changed

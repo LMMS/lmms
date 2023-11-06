@@ -205,7 +205,7 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase) :
 
 
 Lv2ViewBase::~Lv2ViewBase() {
-	if(m_helpWindow) { m_helpWindow->close(); }
+	closeHelpWindow();
 	// TODO: hide UI if required
 }
 
@@ -226,6 +226,14 @@ void Lv2ViewBase::toggleHelp(bool visible)
 		if (visible) { m_helpWindow->show(); m_helpWindow->raise(); }
 		else { m_helpWindow->hide(); }
 	}
+}
+
+
+
+
+void Lv2ViewBase::closeHelpWindow()
+{
+	if (m_helpWindow) { m_helpWindow->close(); }
 }
 
 
