@@ -98,12 +98,14 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 	m_model.setSourceModel( &m_sourceModel );
 	m_model.setFilterCaseSensitivity( Qt::CaseInsensitive );
 
-	connect( ui->filterEdit, SIGNAL( textChanged( const QString& ) ),
-				&m_model, SLOT( setFilterFixedString( const QString& ) ) );
-	connect( ui->filterEdit, SIGNAL( textChanged( const QString& ) ),
-					this, SLOT(updateSelection()));
-	connect( ui->filterEdit, SIGNAL( textChanged( const QString& ) ),
-							SLOT(sortAgain()));
+	ui->filterEdit->setPlaceholderText(tr("Search"));
+	ui->filterEdit->setClearButtonEnabled(true);
+	ui->filterEdit->addAction(embed::getIconPixmap("zoom"), QLineEdit::LeadingPosition);
+
+	connect(ui->filterEdit, SIGNAL(textChanged(const QString&)),
+				&m_model, SLOT(setFilterFixedString(const QString&)));
+	connect(ui->filterEdit, SIGNAL(textChanged(const QString&)), SLOT(updateSelection()));
+	connect(ui->filterEdit, SIGNAL(textChanged(const QString&)), SLOT(sortAgain()));
 
 	ui->pluginList->setModel( &m_model );
 
