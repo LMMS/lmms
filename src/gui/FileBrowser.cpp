@@ -125,8 +125,8 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	m_filterEdit->setPlaceholderText(tr("Search"));
 	m_filterEdit->setClearButtonEnabled(true);
 	m_filterEdit->addAction(embed::getIconPixmap("zoom"), QLineEdit::LeadingPosition);
-	connect(m_filterEdit, SIGNAL(textEdited(const QString&)),
-			this, SLOT(filterAndExpandItems(const QString&)));
+
+	connect(m_filterEdit, &QLineEdit::textEdited, [this](const QString & filter) { filterAndExpandItems(filter); });
 
 	auto reload_btn = new QPushButton(embed::getIconPixmap("reload"), QString(), searchWidget);
 	reload_btn->setToolTip( tr( "Refresh list" ) );
