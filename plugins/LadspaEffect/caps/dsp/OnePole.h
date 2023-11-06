@@ -25,6 +25,8 @@
 	02111-1307, USA or point your web browser to http://www.gnu.org.
 */
 
+#include "../basics.h"
+
 #ifndef _ONE_POLE_H_
 #define _ONE_POLE_H_
 

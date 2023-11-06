@@ -586,6 +586,9 @@ typedef struct _LADSPA_Descriptor {
    returning NULL, so the plugin count can be determined by checking
    for the least index that results in NULL being returned. */
 
+#ifdef _MSC_VER
+__declspec(dllexport)
+#endif
 const LADSPA_Descriptor * ladspa_descriptor(unsigned long Index);
 
 /* Datatype corresponding to the ladspa_descriptor() function. */
