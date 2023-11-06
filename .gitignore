@@ -4,8 +4,9 @@
 .DS_Store
 *~
 /CMakeLists.txt.user
-/plugins/zynaddsubfx/zynaddsubfx/ExternalPrograms/Controller/Makefile
-/plugins/zynaddsubfx/zynaddsubfx/ExternalPrograms/Spliter/Makefile
-/plugins/zynaddsubfx/zynaddsubfx/doc/Makefile
-/plugins/zynaddsubfx/zynaddsubfx/doc/gen/Makefile
+/plugins/ZynAddSubFx/zynaddsubfx/ExternalPrograms/Controller/Makefile
+/plugins/ZynAddSubFx/zynaddsubfx/ExternalPrograms/Spliter/Makefile
+/plugins/ZynAddSubFx/zynaddsubfx/doc/Makefile
+/plugins/ZynAddSubFx/zynaddsubfx/doc/gen/Makefile
 /data/locale/*.qm
+Brewfile.lock.json

@@ -22,11 +22,16 @@
  *
  */
 
-#ifndef LOCKLESS_ALLOCATOR_H
-#define LOCKLESS_ALLOCATOR_H
+#ifndef LMMS_LOCKLESS_ALLOCATOR_H
+#define LMMS_LOCKLESS_ALLOCATOR_H
 
 #include <atomic>
-#include <stddef.h>
+#include <cstddef>
+
+
+namespace lmms
+{
+
 
 class LocklessAllocator
 {
@@ -62,9 +67,7 @@ public:
 	{
 	}
 
-	virtual ~LocklessAllocatorT()
-	{
-	}
+	~LocklessAllocatorT() override = default;
 
 	T * alloc()
 	{
@@ -79,4 +82,6 @@ public:
 } ;
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_LOCKLESS_ALLOCATOR_H

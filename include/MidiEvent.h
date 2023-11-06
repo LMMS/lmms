@@ -22,13 +22,16 @@
  *
  */
 
-#ifndef MIDI_EVENT_H
-#define MIDI_EVENT_H
+#ifndef LMMS_MIDI_EVENT_H
+#define LMMS_MIDI_EVENT_H
 
 #include <cstdlib>
 #include "Midi.h"
 #include "panning_constants.h"
 #include "volume.h"
+
+namespace lmms
+{
 
 class MidiEvent
 {
@@ -44,7 +47,7 @@ public:
 		m_type( type ),
 		m_metaEvent( MidiMetaInvalid ),
 		m_channel( channel ),
-		m_sysExData( NULL ),
+		m_sysExData( nullptr ),
 		m_sourcePort(sourcePort),
 		m_source(source)
 	{
@@ -63,16 +66,7 @@ public:
 		m_data.m_sysExDataLen = dataLen;
 	}
 
-	MidiEvent( const MidiEvent& other ) :
-		m_type( other.m_type ),
-		m_metaEvent( other.m_metaEvent ),
-		m_channel( other.m_channel ),
-		m_data( other.m_data ),
-		m_sysExData( other.m_sysExData ),
-		m_sourcePort(other.m_sourcePort),
-		m_source(other.m_source)
-	{
-	}
+	MidiEvent( const MidiEvent& other ) = default;
 
 	MidiEventTypes type() const
 	{
@@ -218,11 +212,13 @@ private:
 		int32_t m_sysExDataLen;	// len of m_sysExData
 	} m_data;
 
-	const char* m_sysExData;
+	[[maybe_unused]] const char* m_sysExData;
 	const void* m_sourcePort;
 
 	// Stores the source of the MidiEvent: Internal or External (hardware controllers).
 	Source m_source;
 } ;
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_MIDI_EVENT_H

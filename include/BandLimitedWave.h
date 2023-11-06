@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef BANDLIMITEDWAVE_H
-#define BANDLIMITEDWAVE_H
+#ifndef LMMS_BANDLIMITEDWAVE_H
+#define LMMS_BANDLIMITEDWAVE_H
 
 class QDataStream;
 class QString;
@@ -34,14 +34,17 @@ class QString;
 #include "lmms_basics.h"
 #include "lmms_math.h"
 #include "Engine.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 
-#define MAXLEN 11
-#define MIPMAPSIZE 2 << ( MAXLEN + 1 )
-#define MIPMAPSIZE3 3 << ( MAXLEN + 1 )
-#define MAXTBL 23
-#define MINTLEN 2 << 0
-#define MAXTLEN 3 << MAXLEN
+namespace lmms
+{
+
+constexpr int MAXLEN = 11;
+constexpr int MIPMAPSIZE = 2 << ( MAXLEN + 1 );
+constexpr int MIPMAPSIZE3 = 3 << ( MAXLEN + 1 );
+constexpr int MAXTBL = 23;
+constexpr int MINTLEN = 2 << 0;
+constexpr int MAXTLEN = 3 << MAXLEN;
 
 // table for table sizes
 const int TLENS[MAXTBL+1] = { 2 << 0, 3 << 0, 2 << 1, 3 << 1,
@@ -51,29 +54,30 @@ const int TLENS[MAXTBL+1] = { 2 << 0, 3 << 0, 2 << 1, 3 << 1,
 					2 << 8, 3 << 8, 2 << 9, 3 << 9,
 					2 << 10, 3 << 10, 2 << 11, 3 << 11 };
 
-typedef struct
+struct WaveMipMap
 {
 public:
-	inline sample_t sampleAt( int table, int ph )
+	inline sample_t sampleAt(int table, int ph)
 	{
-		if( table % 2 == 0 )
-		{	return m_data[ TLENS[ table ] + ph ]; }
+		if (table % 2 == 0) { return m_data[TLENS[table] + ph]; }
 		else
-		{	return m_data3[ TLENS[ table ] + ph ]; }
+		{
+			return m_data3[TLENS[table] + ph];
+		}
 	}
-	inline void setSampleAt( int table, int ph, sample_t sample )
+	inline void setSampleAt(int table, int ph, sample_t sample)
 	{
-		if( table % 2 == 0 )
-		{	m_data[ TLENS[ table ] + ph ] = sample; }
+		if (table % 2 == 0) { m_data[TLENS[table] + ph] = sample; }
 		else
-		{ 	m_data3[ TLENS[ table ] + ph ] = sample; }
+		{
+			m_data3[TLENS[table] + ph] = sample;
+		}
 	}
+
 private:
-	sample_t m_data [ MIPMAPSIZE ];
-	sample_t m_data3 [ MIPMAPSIZE3 ];
-
-} WaveMipMap;
-
+	sample_t m_data[MIPMAPSIZE];
+	sample_t m_data3[MIPMAPSIZE3];
+};
 
 QDataStream& operator<< ( QDataStream &out, WaveMipMap &waveMipMap );
 
@@ -85,24 +89,25 @@ QDataStream& operator>> ( QDataStream &in, WaveMipMap &waveMipMap );
 class LMMS_EXPORT BandLimitedWave
 {
 public:
-	enum Waveforms
+	enum class Waveform
 	{
 		BLSaw,
 		BLSquare,
 		BLTriangle,
 		BLMoog,
-		NumBLWaveforms
+		Count
 	};
+	constexpr static auto NumWaveforms = static_cast<std::size_t>(Waveform::Count);
 
-	BandLimitedWave() {};
-	virtual ~BandLimitedWave() {};
+	BandLimitedWave() = default;
+	virtual ~BandLimitedWave() = default;
 
 	/*! \brief This method converts frequency to wavelength. The oscillate function takes wavelength as argument so
 	 * use this to convert your note frequency to wavelength before using it.
 	 */
 	static inline float freqToLen( float f )
 	{
-		return freqToLen( f, Engine::mixer()->processingSampleRate() );
+		return freqToLen( f, Engine::audioEngine()->processingSampleRate() );
 	}
 
 	/*! \brief This method converts frequency to wavelength, but you can use any custom sample rate with it.
@@ -123,7 +128,7 @@ public:
 	 *  \param _wavelen The wavelength (length of one cycle, ie. the inverse of frequency) of the wanted oscillation, measured in sample frames
 	 *  \param _wave The wanted waveform. Options currently are saw, triangle, square and moog saw.
 	 */
-	static inline sample_t oscillate( float _ph, float _wavelen, Waveforms _wave )
+	static inline sample_t oscillate( float _ph, float _wavelen, Waveform _wave )
 	{
 		// get the next higher tlen
 		int t = 0;
@@ -135,27 +140,28 @@ public:
 		int lookup = static_cast<int>( lookupf );
 		const float ip = fraction( lookupf );
 
-		const sample_t s1 = s_waveforms[ _wave ].sampleAt( t, lookup );
-		const sample_t s2 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 1 ) % tlen );
+		const sample_t s1 = s_waveforms[ static_cast<std::size_t>(_wave) ].sampleAt( t, lookup );
+		const sample_t s2 = s_waveforms[ static_cast<std::size_t>(_wave) ].sampleAt( t, ( lookup + 1 ) % tlen );
 
 		const int lm = lookup == 0 ? tlen - 1 : lookup - 1;
-		const sample_t s0 = s_waveforms[ _wave ].sampleAt( t, lm );
-		const sample_t s3 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 2 ) % tlen );
+		const sample_t s0 = s_waveforms[ static_cast<std::size_t>(_wave) ].sampleAt( t, lm );
+		const sample_t s3 = s_waveforms[ static_cast<std::size_t>(_wave) ].sampleAt( t, ( lookup + 2 ) % tlen );
 		const sample_t sr = optimal4pInterpolate( s0, s1, s2, s3, ip );
 
 		return sr;
 
-/*		lookup = lookup << 1;
+		/*
+		lookup = lookup << 1;
 		tlen = tlen << 1;
 		t += 1;
-		const sample_t s3 = s_waveforms[ _wave ].sampleAt( t, lookup );
-		const sample_t s4 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 1 ) % tlen );
+		const sample_t s3 = s_waveforms[ static_cast<std::size_t>(_wave) ].sampleAt( t, lookup );
+		const sample_t s4 = s_waveforms[ static_cast<std::size_t>(_wave) ].sampleAt( t, ( lookup + 1 ) % tlen );
 		const sample_t s34 = linearInterpolate( s3, s4, ip );
 
 		const float ip2 = ( ( tlen - _wavelen ) / tlen - 0.5 ) * 2.0;
 
 		return linearInterpolate( s12, s34, ip2 );
-	*/
+		*/
 	};
 
 
@@ -163,10 +169,11 @@ public:
 
 	static bool s_wavesGenerated;
 
-	static WaveMipMap s_waveforms [NumBLWaveforms];
+	static std::array<WaveMipMap, NumWaveforms> s_waveforms;
 
 	static QString s_wavetableDir;
 };
 
+} // namespace lmms
 
-#endif
+#endif // LMMS_BANDLIMITEDWAVE_H

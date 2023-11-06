@@ -23,7 +23,7 @@
  */
 
 #include <QComboBox>
-#include <QLabel>
+#include <QFormLayout>
 
 #include "AudioAlsaSetupWidget.h"
 
@@ -33,11 +33,15 @@
 #include "LcdSpinBox.h"
 #include "gui_templates.h"
 
+namespace lmms::gui
+{
 
 AudioAlsaSetupWidget::AudioAlsaSetupWidget( QWidget * _parent ) :
 	AudioDeviceSetupWidget( AudioAlsa::name(), _parent ),
 	m_selectedDevice(-1)
 {
+	QFormLayout * form = new QFormLayout(this);
+
 	m_deviceInfos = AudioAlsa::getAvailableDevices();
 
 	QString deviceText = ConfigManager::inst()->value( "audioalsa", "device" );
@@ -60,16 +64,13 @@ AudioAlsaSetupWidget::AudioAlsaSetupWidget( QWidget * _parent ) :
 
 	m_selectedDevice = m_deviceComboBox->currentIndex();
 
-	m_deviceComboBox->setGeometry( 10, 20, 160, 20 );
 	connect(m_deviceComboBox,
 			SIGNAL(currentIndexChanged(int)),
 			SLOT(onCurrentIndexChanged(int)));
 
-	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
-	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
-	dev_lbl->setGeometry( 10, 40, 160, 10 );
+	form->addRow(tr("Device"), m_deviceComboBox);
 
-	LcdSpinBoxModel * m = new LcdSpinBoxModel( /* this */ );
+	auto m = new LcdSpinBoxModel(/* this */);
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
 	m->setStep( 2 );
 	m->setValue( ConfigManager::inst()->value( "audioalsa",
@@ -77,9 +78,8 @@ AudioAlsaSetupWidget::AudioAlsaSetupWidget( QWidget * _parent ) :
 
 	m_channels = new LcdSpinBox( 1, this );
 	m_channels->setModel( m );
-	m_channels->setLabel( tr( "CHANNELS" ) );
-	m_channels->move( 180, 20 );
 
+	form->addRow(tr("Channels"), m_channels);
 }
 
 
@@ -116,4 +116,6 @@ void AudioAlsaSetupWidget::onCurrentIndexChanged(int index)
 }
 
 
-#endif
+} // namespace lmms::gui
+
+#endif // LMMS_HAVE_ALSA

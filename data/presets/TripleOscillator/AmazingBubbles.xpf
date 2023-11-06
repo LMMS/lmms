@@ -3,7 +3,7 @@
 <lmms-project version="1.0" creator="LMMS" creatorversion="1.0.2" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings muted="0" type="0" name="Amazing Bubbles" solo="0">
-    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="57" vol="50">
+    <instrumenttrack pan="0" mixch="0" pitchrange="1" pitch="0" basenote="57" vol="50">
       <instrument name="tripleoscillator">
         <tripleoscillator phoffset2="0" userwavefile0="samples/empty.wav" finer0="0" userwavefile1="samples/empty.wav" finer1="0" userwavefile2="samples/empty.wav" finer2="0" coarse0="-12" coarse1="-12" coarse2="0" finel0="0" finel1="0" modalgo1="2" modalgo2="1" finel2="0" pan0="0" modalgo3="2" pan1="0" stphdetun0="292" pan2="0" stphdetun1="56" wavetype0="4" stphdetun2="70" wavetype1="5" wavetype2="2" vol0="200" vol1="200" phoffset0="0" phoffset1="49" vol2="200"/>
       </instrument>

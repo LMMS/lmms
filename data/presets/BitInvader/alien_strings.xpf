@@ -3,7 +3,7 @@
 <multimediaproject version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings>
-    <instrumenttrack fxch="0" vol="59" name="alien_strings" tab="1">
+    <instrumenttrack mixch="0" vol="59" name="alien_strings" tab="1">
       <bitinvader sampleLength="128" version="0.1" normalize="0" sampleShape="PKaOPeKT5r6uR+G9CtejvczMTL2PwvW8CtejvAAAAAAK16M8CtejPI/C9TzMzEw9j8J1PY/CdT2PwnU9j8J1PY/CdT2PwnU9j8J1PczMTD2PwvU8CtejPArXIzwK1yO8CtejvI/C9bzMzEy9KVyPvQrXo73sUbi9rkfhvY/C9b2PwvW9uB4FvpqZGb4K1yO+CtcjvnsULr7sUTi+XI9Cvs3MTL7NzEy+zcxMvs3MTL7NzEy+PgpXvq5HYb6uR2G+rkdhvh6Fa76PwnW+j8J1vo/Cdb6PwnW+j8J1vo/Cdb6PwnW+j8J1vo/Cdb6PwnW+j8J1vo/Cdb6PwnW+HoVrvq5HYb4+Cle+zcxMvlyPQr57FC6+CtcjvpqZGb64HgW+rkfhvc3MzL3sUbi9KVyPvczMTL0K1yO9j8L1vArXI7wK1yM8CtejPI/C9TyPwvU8CtcjPSlcjz3sUbg9rkfhPY/C9T24HgU+mpkZPgrXIz57FC4+7FE4PlyPQj7NzEw+PgpXPh6Faz64HoU+KVyPPuJ6lD5SuJ4+exSuPuxRuD5cj8I+hevRPq5H4T7Xo/A+j8L1PgAAAD+4HgU/zMwMP+F6FD8+Chc/9igcP2ZmJj/XozA/MzMzP5DCNT9I4To/XI9CP3A9Sj/NzEw/KVxPP4XrUT/helQ/9ihcP2ZmZj8=" interpolation="1"/>
       <eldata fres="0.21" ftype="0" fcut="3840" fwet="1">
         <elvol userwavefile="" lpdel="0" ctlenvamt="0" amt="1" rel="0.33" latt="0" sus="0.49" lspd="0.7311" att="0.4" pdel="0" lfosyncmode="0" lamt="0" dec="0.897" x100="1" lshp="0" hold="0"/>

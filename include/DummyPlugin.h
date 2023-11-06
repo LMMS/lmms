@@ -23,24 +23,25 @@
  *
  */
 
-#ifndef DUMMY_PLUGIN_H
-#define DUMMY_PLUGIN_H
+#ifndef LMMS_DUMMY_PLUGIN_H
+#define LMMS_DUMMY_PLUGIN_H
 
 #include "Plugin.h"
 #include "PluginView.h"
 
 
+namespace lmms
+{
+
 class DummyPlugin : public Plugin
 {
 public:
 	DummyPlugin() :
-		Plugin( NULL, NULL )
+		Plugin( nullptr, nullptr )
 	{
 	}
 
-	virtual ~DummyPlugin()
-	{
-	}
+	~DummyPlugin() override = default;
 
 	void saveSettings( QDomDocument &, QDomElement & ) override
 	{
@@ -57,12 +58,14 @@ public:
 
 
 protected:
-	PluginView * instantiateView( QWidget * _parent ) override
+	gui::PluginView * instantiateView( QWidget * _parent ) override
 	{
-		return new PluginView( this, _parent );
+		return new gui::PluginView( this, _parent );
 	}
 
 } ;
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_DUMMY_PLUGIN_H

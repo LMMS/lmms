@@ -25,23 +25,29 @@
 #include "DelayEffect.h"
 #include "Engine.h"
 #include "embed.h"
-#include "interpolation.h"
+#include "Lfo.h"
+#include "lmms_math.h"
 #include "plugin_export.h"
+#include "StereoDelay.h"
+
+namespace lmms
+{
+
 
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT delay_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Delay",
 	QT_TRANSLATE_NOOP( "PluginBrowser", "A native delay plugin" ),
 	"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
-	NULL,
-	NULL
+	nullptr,
+	nullptr,
 } ;
 
 
@@ -52,8 +58,8 @@ DelayEffect::DelayEffect( Model* parent, const Plugin::Descriptor::SubPluginFeat
 	m_delayControls( this )
 {
 	m_delay = 0;
-	m_delay = new StereoDelay( 20, Engine::mixer()->processingSampleRate() );
-	m_lfo = new Lfo( Engine::mixer()->processingSampleRate() );
+	m_delay = new StereoDelay( 20, Engine::audioEngine()->processingSampleRate() );
+	m_lfo = new Lfo( Engine::audioEngine()->processingSampleRate() );
 	m_outGain = 1.0;
 }
 
@@ -82,10 +88,10 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 		return( false );
 	}
 	double outSum = 0.0;
-	const float sr = Engine::mixer()->processingSampleRate();
+	const float sr = Engine::audioEngine()->processingSampleRate();
 	const float d = dryLevel();
 	const float w = wetLevel();
-	sample_t dryS[2];
+	auto dryS = std::array<sample_t, 2>{};
 	float lPeak = 0.0;
 	float rPeak = 0.0;
 	float length = m_delayControls.m_delayTimeModel.value();
@@ -117,7 +123,7 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 
 		m_delay->setFeedback( *feedbackPtr );
 		m_lfo->setFrequency( *lfoTimePtr );
-		sampleLength = *lengthPtr * Engine::mixer()->processingSampleRate();
+		sampleLength = *lengthPtr * Engine::audioEngine()->processingSampleRate();
 		m_currentLength = sampleLength;
 		m_delay->setLength( m_currentLength + ( *amplitudePtr * ( float )m_lfo->tick() ) );
 		m_delay->tick( buf[f] );
@@ -146,8 +152,8 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 
 void DelayEffect::changeSampleRate()
 {
-	m_lfo->setSampleRate( Engine::mixer()->processingSampleRate() );
-	m_delay->setSampleRate( Engine::mixer()->processingSampleRate() );
+	m_lfo->setSampleRate( Engine::audioEngine()->processingSampleRate() );
+	m_delay->setSampleRate( Engine::audioEngine()->processingSampleRate() );
 }
 
 
@@ -164,3 +170,5 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 
 }}
 
+
+} // namespace lmms

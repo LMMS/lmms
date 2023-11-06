@@ -23,28 +23,34 @@
  *
  */
 
-#ifndef AUTOMATION_EDITOR_H
-#define AUTOMATION_EDITOR_H
+#ifndef LMMS_GUI_AUTOMATION_EDITOR_H
+#define LMMS_GUI_AUTOMATION_EDITOR_H
 
-#include <QtCore/QMutex>
-#include <QVector>
 #include <QWidget>
+#include <array>
 
 #include "Editor.h"
 
 #include "lmms_basics.h"
 #include "JournallingObject.h"
 #include "TimePos.h"
-#include "AutomationPattern.h"
+#include "AutomationClip.h"
 #include "ComboBoxModel.h"
-#include "Knob.h"
 
 class QPainter;
 class QPixmap;
 class QScrollBar;
 
-class ComboBox;
+namespace lmms
+{
+
 class NotePlayHandle;
+
+namespace gui
+{
+
+class Knob;
+class ComboBox;
 class TimeLineWidget;
 
 
@@ -52,25 +58,27 @@ class TimeLineWidget;
 class AutomationEditor : public QWidget, public JournallingObject
 {
 	Q_OBJECT
-	Q_PROPERTY(QColor barLineColor READ barLineColor WRITE setBarLineColor)
-	Q_PROPERTY(QColor beatLineColor READ beatLineColor WRITE setBeatLineColor)
-	Q_PROPERTY(QColor lineColor READ lineColor WRITE setLineColor)
-	Q_PROPERTY(QColor vertexColor READ vertexColor WRITE setVertexColor)
-	Q_PROPERTY(QBrush scaleColor READ scaleColor WRITE setScaleColor)
-	Q_PROPERTY(QBrush graphColor READ graphColor WRITE setGraphColor)
-	Q_PROPERTY(QColor crossColor READ crossColor WRITE setCrossColor)
-	Q_PROPERTY(QColor backgroundShade READ backgroundShade WRITE setBackgroundShade)
+	Q_PROPERTY(QColor barLineColor MEMBER m_barLineColor)
+	Q_PROPERTY(QColor beatLineColor MEMBER m_beatLineColor)
+	Q_PROPERTY(QColor lineColor MEMBER m_lineColor)
+	Q_PROPERTY(QColor nodeInValueColor MEMBER m_nodeInValueColor)
+	Q_PROPERTY(QColor nodeOutValueColor MEMBER m_nodeOutValueColor)
+	Q_PROPERTY(QColor nodeTangentLineColor MEMBER m_nodeTangentLineColor)
+	Q_PROPERTY(QBrush scaleColor MEMBER m_scaleColor)
+	Q_PROPERTY(QBrush graphColor MEMBER m_graphColor)
+	Q_PROPERTY(QColor crossColor MEMBER m_crossColor)
+	Q_PROPERTY(QColor backgroundShade MEMBER m_backgroundShade)
 public:
-	void setCurrentPattern(AutomationPattern * new_pattern);
+	void setCurrentClip(AutomationClip * new_clip);
 
-	inline const AutomationPattern * currentPattern() const
+	inline const AutomationClip * currentClip() const
 	{
-		return m_pattern;
+		return m_clip;
 	}
 
-	inline bool validPattern() const
+	inline bool validClip() const
 	{
-		return m_pattern != nullptr && m_pattern->hasAutomation();
+		return m_clip != nullptr;
 	}
 
 	void saveSettings(QDomDocument & doc, QDomElement & parent) override;
@@ -80,43 +88,26 @@ public:
 		return "automationeditor";
 	}
 
-	// qproperty access methods
-	QColor barLineColor() const;
-	void setBarLineColor(const QColor & c);
-	QColor beatLineColor() const;
-	void setBeatLineColor(const QColor & c);
-	QColor lineColor() const;
-	void setLineColor(const QColor & c);
-	QBrush graphColor() const;
-	void setGraphColor(const QBrush & c);
-	QColor vertexColor() const;
-	void setVertexColor(const QColor & c);
-	QBrush scaleColor() const;
-	void setScaleColor(const QBrush & c);
-	QColor crossColor() const;
-	void setCrossColor(const QColor & c);
-	QColor backgroundShade() const;
-	void setBackgroundShade(const QColor & c);
-
-	enum EditModes
+	enum class EditMode
 	{
-		DRAW,
-		ERASE,
-		SELECT,
-		MOVE
+		Draw,
+		Erase,
+		DrawOutValues,
+		EditTangents
 	};
 
 public slots:
 	void update();
-	void updateAfterPatternChange();
+	void updateAfterClipChange();
 
 
 protected:
-	typedef AutomationPattern::timeMap timeMap;
+	using timeMap = AutomationClip::timeMap;
 
 	void keyPressEvent(QKeyEvent * ke) override;
 	void leaveEvent(QEvent * e) override;
 	void mousePressEvent(QMouseEvent * mouseEvent) override;
+	void mouseDoubleClickEvent(QMouseEvent * mouseEvent) override;
 	void mouseReleaseEvent(QMouseEvent * mouseEvent) override;
 	void mouseMoveEvent(QMouseEvent * mouseEvent) override;
 	void paintEvent(QPaintEvent * pe) override;
@@ -126,13 +117,19 @@ protected:
 	float getLevel( int y );
 	int xCoordOfTick( int tick );
 	float yCoordOfLevel( float level );
-	inline void drawLevelTick( QPainter & p, int tick, float value);// bool is_selected ); //NEEDS Change in CSS
-	void removeSelection();
-	void selectAll();
-	void getSelectedValues(timeMap & selected_values );
+	inline void drawLevelTick(QPainter & p, int tick, float value);
+
+	timeMap::iterator getNodeAt(int x, int y, bool outValue = false, int r = 5);
+	/**
+	 * @brief Given a mouse X coordinate, returns a timeMap::iterator that points to
+	 *        the closest node.
+	 * @param Int X coordinate
+	 * @return timeMap::iterator with the closest node or timeMap.end() if there are no nodes.
+	 */
+	timeMap::iterator getClosestNode(int x);
 
 	void drawLine( int x0, float y0, int x1, float y1 );
-	void removePoints( int x0, int x1 );
+	bool fineTuneValue(timeMap::iterator node, bool editingOutValue);
 
 protected slots:
 	void play();
@@ -141,34 +138,39 @@ protected slots:
 	void horScrolled( int new_pos );
 	void verScrolled( int new_pos );
 
-	void setEditMode(AutomationEditor::EditModes mode);
+	void setEditMode(AutomationEditor::EditMode mode);
 	void setEditMode(int mode);
 
-	void setProgressionType(AutomationPattern::ProgressionTypes type);
+	void setProgressionType(AutomationClip::ProgressionType type);
+	/**
+	 * @brief This method handles the AutomationEditorWindow event of changing
+	 * progression types. After that, it calls updateEditTanButton so the edit
+	 * tangents button is updated accordingly
+	 * @param Int New progression type
+	 */
 	void setProgressionType(int type);
 	void setTension();
 
-	void copySelectedValues();
-	void cutSelectedValues();
-	void pasteValues();
-	void deleteSelectedValues();
-
-	void updatePosition( const TimePos & t );
+	void updatePosition( const lmms::TimePos & t );
 
 	void zoomingXChanged();
 	void zoomingYChanged();
 
-	/// Updates the pattern's quantization using the current user selected value.
+	/// Updates the clip's quantization using the current user selected value.
 	void setQuantization();
 
 private:
 
-	enum Actions
+	enum class Action
 	{
-		NONE,
-		MOVE_VALUE,
-		SELECT_VALUES,
-		MOVE_SELECTION
+		None,
+		MoveValue,
+		EraseValues,
+		MoveOutValue,
+		ResetOutValues,
+		DrawLine,
+		MoveTangent,
+		ResetTangents
 	} ;
 
 	// some constants...
@@ -183,11 +185,12 @@ private:
 
 	AutomationEditor();
 	AutomationEditor( const AutomationEditor & );
-	virtual ~AutomationEditor();
+	~AutomationEditor() override;
 
 	static QPixmap * s_toolDraw;
 	static QPixmap * s_toolErase;
-	static QPixmap * s_toolSelect;
+	static QPixmap * s_toolDrawOut;
+	static QPixmap * s_toolEditTangents;
 	static QPixmap * s_toolMove;
 	static QPixmap * s_toolYFlip;
 	static QPixmap * s_toolXFlip;
@@ -196,12 +199,11 @@ private:
 	ComboBoxModel m_zoomingYModel;
 	ComboBoxModel m_quantizeModel;
 
-	static const QVector<double> m_zoomXLevels;
+	static const std::array<float, 7> m_zoomXLevels;
 
 	FloatModel * m_tensionModel;
 
-	QMutex m_patternMutex;
-	AutomationPattern * m_pattern;
+	AutomationClip * m_clip;
 	float m_minLevel;
 	float m_maxLevel;
 	float m_step;
@@ -217,15 +219,8 @@ private:
 
 	TimePos m_currentPosition;
 
-	Actions m_action;
+	Action m_action;
 
-	tick_t m_selectStartTick;
-	tick_t m_selectedTick;
-	float m_selectStartLevel;
-	float m_selectedLevels;
-
-	float m_moveStartLevel;
-	tick_t m_moveStartTick;
 	int m_moveXOffset;
 
 	float m_drawLastLevel;
@@ -235,11 +230,15 @@ private:
 	int m_y_delta;
 	bool m_y_auto;
 
-	timeMap m_valuesToCopy;
-	timeMap m_selValuesForMove;
+	// Time position (key) of automation node whose outValue is being dragged
+	int m_draggedOutValueKey;
 
+	// The tick from the node whose tangent is being dragged
+	int m_draggedTangentTick;
+	// Whether the tangent being dragged is the InTangent or OutTangent
+	bool m_draggedOutTangent;
 
-	EditModes m_editMode;
+	EditMode m_editMode;
 
 	bool m_mouseDownLeft;
 	bool m_mouseDownRight; //true if right click is being held down
@@ -249,13 +248,16 @@ private:
 
 	void drawCross(QPainter & p );
 	void drawAutomationPoint( QPainter & p, timeMap::iterator it );
-	bool inBBEditor();
+	void drawAutomationTangents(QPainter& p, timeMap::iterator it);
+	bool inPatternEditor();
 
 	QColor m_barLineColor;
 	QColor m_beatLineColor;
 	QColor m_lineColor;
 	QBrush m_graphColor;
-	QColor m_vertexColor;
+	QColor m_nodeInValueColor;
+	QColor m_nodeOutValueColor;
+	QColor m_nodeTangentLineColor;
 	QBrush m_scaleColor;
 	QColor m_crossColor;
 	QColor m_backgroundShade;
@@ -264,8 +266,8 @@ private:
 
 
 signals:
-	void currentPatternChanged();
-	void positionChanged( const TimePos & );
+	void currentClipChanged();
+	void positionChanged( const lmms::TimePos & );
 } ;
 
 
@@ -279,25 +281,25 @@ class AutomationEditorWindow : public Editor
 	static const int INITIAL_HEIGHT = 480;
 public:
 	AutomationEditorWindow();
-	~AutomationEditorWindow();
+	~AutomationEditorWindow() override = default;
 
-	void setCurrentPattern(AutomationPattern* pattern);
-	const AutomationPattern* currentPattern();
+	void setCurrentClip(AutomationClip* clip);
+	const AutomationClip* currentClip();
 
 	void dropEvent( QDropEvent * _de ) override;
 	void dragEnterEvent( QDragEnterEvent * _dee ) override;
 
-	void open(AutomationPattern* pattern);
+	void open(AutomationClip* clip);
 
 	AutomationEditor* m_editor;
 
 	QSize sizeHint() const override;
 
 public slots:
-	void clearCurrentPattern();
+	void clearCurrentClip();
 
 signals:
-	void currentPatternChanged();
+	void currentClipChanged();
 
 protected:
 	void focusInEvent(QFocusEvent * event) override;
@@ -308,8 +310,21 @@ protected slots:
 
 private slots:
 	void updateWindowTitle();
+	void setProgressionType(int progType);
+	/**
+	 * @brief The Edit Tangent edit mode should only be available for
+	 * Cubic Hermite progressions, so this method is responsable for disabling it
+	 * for other edit modes and reenabling it when it changes back to the Edit Tangent
+	 * mode.
+	 */
+	void updateEditTanButton();
 
 private:
+	QAction* m_drawAction;
+	QAction* m_eraseAction;
+	QAction* m_drawOutAction;
+	QAction* m_editTanAction;
+
 	QAction* m_discreteAction;
 	QAction* m_linearAction;
 	QAction* m_cubicHermiteAction;
@@ -324,5 +339,8 @@ private:
 	ComboBox * m_quantizeComboBox;
 };
 
+} // namespace gui
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_GUI_AUTOMATION_EDITOR_H

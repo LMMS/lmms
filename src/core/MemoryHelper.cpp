@@ -21,10 +21,14 @@
  *
  */
 
-#include <stdlib.h>
+#include <cstdlib>
 
 #include "lmms_basics.h"
 #include "MemoryHelper.h"
+
+namespace lmms
+{
+
 
 /**
  * Allocate a number of bytes and return them.
@@ -33,14 +37,14 @@
 void* MemoryHelper::alignedMalloc( size_t byteNum )
 {
 	char *ptr, *ptr2, *aligned_ptr;
-	int align_mask = ALIGN_SIZE - 1;
+	int align_mask = LMMS_ALIGN_SIZE - 1;
 
-	ptr = static_cast<char*>( malloc( byteNum + ALIGN_SIZE + sizeof( int ) ) );
+	ptr = static_cast<char*>( malloc( byteNum + LMMS_ALIGN_SIZE + sizeof( int ) ) );
 
-	if( ptr == NULL ) return NULL;
+	if( ptr == nullptr ) return nullptr;
 
 	ptr2 = ptr + sizeof( int );
-	aligned_ptr = ptr2 + ( ALIGN_SIZE - ( ( size_t ) ptr2 & align_mask ) );
+	aligned_ptr = ptr2 + ( LMMS_ALIGN_SIZE - ( ( size_t ) ptr2 & align_mask ) );
 
 	ptr2 = aligned_ptr - sizeof( int );
 	*( ( int* ) ptr2 ) = ( int )( aligned_ptr - ptr );
@@ -63,3 +67,5 @@ void MemoryHelper::alignedFree( void* _buffer )
 	}
 }
 
+
+} // namespace lmms

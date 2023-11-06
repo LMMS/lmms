@@ -20,7 +20,7 @@
  *
  */
 
-#include <math.h>
+#include <cmath>
 #include "ReverbSC.h"
 
 #include "embed.h"
@@ -28,20 +28,24 @@
 
 #define DB2LIN(X) pow(10, X / 20.0f);
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT reverbsc_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"ReverbSC",
 	QT_TRANSLATE_NOOP( "PluginBrowser", "Reverb algorithm by Sean Costello" ),
 	"Paul Batchelor",
 	0x0123,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader( "logo" ),
-	NULL,
-	NULL
+	nullptr,
+	nullptr,
 } ;
 
 }
@@ -51,16 +55,16 @@ ReverbSCEffect::ReverbSCEffect( Model* parent, const Descriptor::SubPluginFeatur
 	m_reverbSCControls( this )
 {
 	sp_create(&sp);
-	sp->sr = Engine::mixer()->processingSampleRate();
+	sp->sr = Engine::audioEngine()->processingSampleRate();
 
 	sp_revsc_create(&revsc);
 	sp_revsc_init(sp, revsc);
 
 	sp_dcblock_create(&dcblk[0]);
 	sp_dcblock_create(&dcblk[1]);
-	
-	sp_dcblock_init(sp, dcblk[0], Engine::mixer()->currentQualitySettings().sampleRateMultiplier() );
-	sp_dcblock_init(sp, dcblk[1], Engine::mixer()->currentQualitySettings().sampleRateMultiplier() );
+
+	sp_dcblock_init(sp, dcblk[0], Engine::audioEngine()->currentQualitySettings().sampleRateMultiplier() );
+	sp_dcblock_init(sp, dcblk[1], Engine::audioEngine()->currentQualitySettings().sampleRateMultiplier() );
 }
 
 ReverbSCEffect::~ReverbSCEffect()
@@ -84,7 +88,7 @@ bool ReverbSCEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 
 	SPFLOAT tmpL, tmpR;
 	SPFLOAT dcblkL, dcblkR;
-	
+
 	ValueBuffer * inGainBuf = m_reverbSCControls.m_inputGainModel.valueBuffer();
 	ValueBuffer * sizeBuf = m_reverbSCControls.m_sizeModel.valueBuffer();
 	ValueBuffer * colorBuf = m_reverbSCControls.m_colorModel.valueBuffer();
@@ -92,23 +96,21 @@ bool ReverbSCEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 
 	for( fpp_t f = 0; f < frames; ++f )
 	{
-		sample_t s[2] = { buf[f][0], buf[f][1] };
+		auto s = std::array{buf[f][0], buf[f][1]};
 
-		const SPFLOAT inGain = (SPFLOAT)DB2LIN((inGainBuf ? 
-			inGainBuf->values()[f] 
-			: m_reverbSCControls.m_inputGainModel.value()));
-		const SPFLOAT outGain = (SPFLOAT)DB2LIN((outGainBuf ? 
-			outGainBuf->values()[f] 
-			: m_reverbSCControls.m_outputGainModel.value()));
+		const auto inGain
+			= (SPFLOAT)DB2LIN((inGainBuf ? inGainBuf->values()[f] : m_reverbSCControls.m_inputGainModel.value()));
+		const auto outGain
+			= (SPFLOAT)DB2LIN((outGainBuf ? outGainBuf->values()[f] : m_reverbSCControls.m_outputGainModel.value()));
 
 		s[0] *= inGain;
 		s[1] *= inGain;
-		revsc->feedback = (SPFLOAT)(sizeBuf ? 
-			sizeBuf->values()[f] 
+		revsc->feedback = (SPFLOAT)(sizeBuf ?
+			sizeBuf->values()[f]
 			: m_reverbSCControls.m_sizeModel.value());
 
-		revsc->lpfreq = (SPFLOAT)(colorBuf ? 
-			colorBuf->values()[f] 
+		revsc->lpfreq = (SPFLOAT)(colorBuf ?
+			colorBuf->values()[f]
 			: m_reverbSCControls.m_colorModel.value());
 
 
@@ -126,11 +128,11 @@ bool ReverbSCEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 
 	return isRunning();
 }
-	
+
 void ReverbSCEffect::changeSampleRate()
 {
 	// Change sr variable in Soundpipe. does not need to be destroyed
-	sp->sr = Engine::mixer()->processingSampleRate();
+	sp->sr = Engine::audioEngine()->processingSampleRate();
 
 	mutex.lock();
 	sp_revsc_destroy(&revsc);
@@ -142,9 +144,9 @@ void ReverbSCEffect::changeSampleRate()
 
 	sp_dcblock_create(&dcblk[0]);
 	sp_dcblock_create(&dcblk[1]);
-	
-	sp_dcblock_init(sp, dcblk[0], Engine::mixer()->currentQualitySettings().sampleRateMultiplier() );
-	sp_dcblock_init(sp, dcblk[1], Engine::mixer()->currentQualitySettings().sampleRateMultiplier() );
+
+	sp_dcblock_init(sp, dcblk[0], Engine::audioEngine()->currentQualitySettings().sampleRateMultiplier() );
+	sp_dcblock_init(sp, dcblk[1], Engine::audioEngine()->currentQualitySettings().sampleRateMultiplier() );
 	mutex.unlock();
 }
 
@@ -154,10 +156,13 @@ extern "C"
 // necessary for getting instance out of shared lib
 PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 {
-	return new ReverbSCEffect( 
-		parent, 
-		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data) 
+	return new ReverbSCEffect(
+		parent,
+		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data)
 	);
 }
 
 }
+
+
+} // namespace lmms

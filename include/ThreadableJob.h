@@ -22,12 +22,15 @@
  *
  */
 
-#ifndef THREADABLE_JOB_H
-#define THREADABLE_JOB_H
+#ifndef LMMS_THREADABLE_JOB_H
+#define LMMS_THREADABLE_JOB_H
 
 #include "lmms_basics.h"
 
 #include <atomic>
+
+namespace lmms
+{
 
 class ThreadableJob
 {
@@ -85,4 +88,6 @@ protected:
 	std::atomic<ProcessingState> m_state;
 } ;
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_THREADABLE_JOB_H

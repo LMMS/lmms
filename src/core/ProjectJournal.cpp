@@ -29,6 +29,9 @@
 #include "JournallingObject.h"
 #include "Song.h"
 
+namespace lmms
+{
+
 //! Avoid clashes between loaded IDs (have the bit cleared)
 //! and newly created IDs (have the bit set)
 static const int EO_ID_MSB = 1 << 23;
@@ -46,13 +49,6 @@ ProjectJournal::ProjectJournal() :
 
 
 
-ProjectJournal::~ProjectJournal()
-{
-}
-
-
-
-
 void ProjectJournal::undo()
 {
 	while( !m_undoCheckPoints.isEmpty() )
@@ -62,7 +58,7 @@ void ProjectJournal::undo()
 
 		if( jo )
 		{
-			DataFile curState( DataFile::JournalData );
+			DataFile curState( DataFile::Type::JournalData );
 			jo->saveState( curState, curState.content() );
 			m_redoCheckPoints.push( CheckPoint( c.joID, curState ) );
 
@@ -87,7 +83,7 @@ void ProjectJournal::redo()
 
 		if( jo )
 		{
-			DataFile curState( DataFile::JournalData );
+			DataFile curState( DataFile::Type::JournalData );
 			jo->saveState( curState, curState.content() );
 			m_undoCheckPoints.push( CheckPoint( c.joID, curState ) );
 
@@ -119,7 +115,7 @@ void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
 	{
 		m_redoCheckPoints.clear();
 
-		DataFile dataFile( DataFile::JournalData );
+		DataFile dataFile( DataFile::Type::JournalData );
 		jo->saveState( dataFile, dataFile.content() );
 
 		m_undoCheckPoints.push( CheckPoint( jo->id(), dataFile ) );
@@ -181,7 +177,7 @@ void ProjectJournal::clearJournal()
 
 	for( JoIdMap::Iterator it = m_joIDs.begin(); it != m_joIDs.end(); )
 	{
-		if( it.value() == NULL )
+		if( it.value() == nullptr )
 		{
 			it = m_joIDs.erase( it );
 		}
@@ -196,7 +192,7 @@ void ProjectJournal::stopAllJournalling()
 {
 	for( JoIdMap::Iterator it = m_joIDs.begin(); it != m_joIDs.end(); ++it)
 	{
-		if( it.value() != NULL ) 
+		if( it.value() != nullptr )
 		{
 			it.value()->setJournalling(false);
 		}
@@ -206,3 +202,4 @@ void ProjectJournal::stopAllJournalling()
 
 
 
+} // namespace lmms

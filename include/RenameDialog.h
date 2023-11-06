@@ -23,22 +23,22 @@
  *
  */
 
-
-#ifndef RENAME_DIALOG_H
-#define RENAME_DIALOG_H
+#ifndef LMMS_GUI_RENAME_DIALOG_H
+#define LMMS_GUI_RENAME_DIALOG_H
 
 #include <QDialog>
 
-
 class QLineEdit;
 
+namespace lmms::gui
+{
 
 class RenameDialog : public QDialog
 {
 	Q_OBJECT
 public:
 	RenameDialog( QString & _string );
-	~RenameDialog();
+	~RenameDialog() override = default;
 
 
 protected:
@@ -58,4 +58,6 @@ private:
 } ;
 
 
-#endif
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_RENAME_DIALOG_H

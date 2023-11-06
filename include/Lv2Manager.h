@@ -1,7 +1,7 @@
 /*
  * Lv2Manager.h - Implementation of Lv2Manager class
  *
- * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LV2MANAGER_H
-#define LV2MANAGER_H
+#ifndef LMMS_LV2_MANAGER_H
+#define LMMS_LV2_MANAGER_H
 
 #include "lmmsconfig.h"
 
@@ -31,6 +31,7 @@
 
 #include <map>
 #include <set>
+#include <string_view>
 #include <lilv/lilv.h>
 
 #include "Lv2Basics.h"
@@ -38,6 +39,9 @@
 #include "Lv2UridMap.h"
 #include "Plugin.h"
 
+
+namespace lmms
+{
 
 /*
 	all Lv2 classes in relation (use our "4 spaces per tab rule" to view):
@@ -92,18 +96,18 @@ public:
 		//! use only for std::map internals
 		Lv2Info() : m_plugin(nullptr) {}
 		//! ctor used inside Lv2Manager
-		Lv2Info(const LilvPlugin* plug, Plugin::PluginTypes type, bool valid) :
+		Lv2Info(const LilvPlugin* plug, Plugin::Type type, bool valid) :
 			m_plugin(plug), m_type(type), m_valid(valid) {}
 		Lv2Info(Lv2Info&& other) = default;
 		Lv2Info& operator=(Lv2Info&& other) = default;
 
 		const LilvPlugin* plugin() const { return m_plugin; }
-		Plugin::PluginTypes type() const { return m_type; }
+		Plugin::Type type() const { return m_type; }
 		bool isValid() const { return m_valid; }
 
 	private:
 		const LilvPlugin* m_plugin;
-		Plugin::PluginTypes m_type;
+		Plugin::Type m_type;
 		bool m_valid = false;
 	};
 
@@ -117,15 +121,9 @@ public:
 	Iterator begin() { return m_lv2InfoMap.begin(); }
 	Iterator end() { return m_lv2InfoMap.end(); }
 
-	//! strcmp based key comparator for std::set and std::map
-	struct CmpStr
-	{
-		bool operator()(char const *a, char const *b) const;
-	};
-
 	UridMap& uridMap() { return m_uridMap; }
 	const Lv2UridCache& uridCache() const { return m_uridCache; }
-	const std::set<const char*, CmpStr>& supportedFeatureURIs() const
+	const std::set<std::string_view>& supportedFeatureURIs() const
 	{
 		return m_supportedFeatureURIs;
 	}
@@ -133,9 +131,13 @@ public:
 	AutoLilvNodes findNodes(const LilvNode *subject,
 		const LilvNode *predicate, const LilvNode *object);
 
-	static const std::set<const char*, Lv2Manager::CmpStr>& getPluginBlacklist()
+	static const std::set<std::string_view>& getPluginBlacklist()
 	{
 		return pluginBlacklist;
+	}
+	static const std::set<std::string_view>& getPluginBlacklistBuffersizeLessThan32()
+	{
+		return pluginBlacklistBuffersizeLessThan32;
 	}
 
 private:
@@ -143,7 +145,7 @@ private:
 	bool m_debug; //!< if set, debug output will be printed
 	LilvWorld* m_world;
 	Lv2InfoMap m_lv2InfoMap;
-	std::set<const char*, CmpStr> m_supportedFeatureURIs;
+	std::set<std::string_view> m_supportedFeatureURIs;
 
 	// feature data that are common for all Lv2Proc
 	UridMap m_uridMap;
@@ -152,12 +154,16 @@ private:
 	Lv2UridCache m_uridCache;
 
 	// static
-	static const std::set<const char*, Lv2Manager::CmpStr> pluginBlacklist;
+	static const std::set<std::string_view>
+		pluginBlacklist, pluginBlacklistBuffersizeLessThan32;
 
 	// functions
 	bool isSubclassOf(const LilvPluginClass *clvss, const char *uriStr);
 };
 
+
+} // namespace lmms
+
 #endif // LMMS_HAVE_LV2
 
-#endif // LV2MANAGER_H
+#endif // LMMS_LV2_MANAGER_H

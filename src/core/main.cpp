@@ -55,7 +55,7 @@
 #include <unistd.h>
 #endif
 
-#include <signal.h>
+#include <csignal>
 
 #include "MainApplication.h"
 #include "ConfigManager.h"
@@ -71,7 +71,6 @@
 #include "ProjectRenderer.h"
 #include "RenderManager.h"
 #include "Song.h"
-#include "SetupDialog.h"
 
 #ifdef LMMS_DEBUG_FPE
 #include <fenv.h> // For feenableexcept
@@ -121,13 +120,13 @@ void consoleMessageHandler(QtMsgType type,
     QByteArray localMsg = msg.toLocal8Bit();
     fprintf(stderr, "%s\n", localMsg.constData());
 }
-#endif
+#endif // LMMS_BUILD_WIN32
 
 
 inline void loadTranslation( const QString & tname,
-	const QString & dir = ConfigManager::inst()->localeDir() )
+	const QString & dir = lmms::ConfigManager::inst()->localeDir() )
 {
-	QTranslator * t = new QTranslator( QCoreApplication::instance() );
+	auto t = new QTranslator(QCoreApplication::instance());
 	QString name = tname + ".qm";
 
 	if (t->load(name, dir))
@@ -148,7 +147,7 @@ void printVersion( char *executableName )
 		"License as published by the Free Software Foundation; either\n"
 		"version 2 of the License, or (at your option) any later version.\n\n"
 		"Try \"%s --help\" for more information.\n\n", LMMS_VERSION,
-		PLATFORM, MACHINE, QT_VERSION_STR, COMPILER_VERSION,
+		LMMS_BUILDCONF_PLATFORM, LMMS_BUILDCONF_MACHINE, QT_VERSION_STR, LMMS_BUILDCONF_COMPILER_VERSION,
 		LMMS_PROJECT_COPYRIGHT, executableName );
 }
 
@@ -169,6 +168,9 @@ void printHelp()
 		"  upgrade <in> [out]                    Upgrade file <in> and save as <out>\n"
 		"                                        Standard out is used if no output file\n"
 		"                                        is specified\n"
+		"  makebundle <in> [out]                 Make a project bundle from the project\n"
+		"                                        file <in> saving the resulting bundle\n"
+		"                                        as <out>\n"
 		"\nGlobal options:\n"
 		"      --allowroot                Bypass root user startup check (use with\n"
 		"          caution).\n"
@@ -250,6 +252,8 @@ int noInputFileError()
 
 int main( int argc, char * * argv )
 {
+	using namespace lmms;
+
 #ifdef LMMS_DEBUG_FPE
 	// Enable exceptions for certain floating point results
 	// FE_UNDERFLOW is disabled for the time being
@@ -357,11 +361,11 @@ int main( int argc, char * * argv )
 #endif
 	QCoreApplication * app = coreOnly ?
 			new QCoreApplication( argc, argv ) :
-					new MainApplication( argc, argv );
+					new gui::MainApplication(argc, argv);
 
-	Mixer::qualitySettings qs( Mixer::qualitySettings::Mode_HighQuality );
-	OutputSettings os( 44100, OutputSettings::BitRateSettings(160, false), OutputSettings::Depth_16Bit, OutputSettings::StereoMode_JointStereo );
-	ProjectRenderer::ExportFileFormats eff = ProjectRenderer::WaveFile;
+	AudioEngine::qualitySettings qs( AudioEngine::qualitySettings::Mode::HighQuality );
+	OutputSettings os( 44100, OutputSettings::BitRateSettings(160, false), OutputSettings::BitDepth::Depth16Bit, OutputSettings::StereoMode::JointStereo );
+	ProjectRenderer::ExportFileFormat eff = ProjectRenderer::ExportFileFormat::Wave;
 
 	// second of two command-line parsing stages
 	for( int i = 1; i < argc; ++i )
@@ -402,6 +406,28 @@ int main( int argc, char * * argv )
 			}
 
 			return EXIT_SUCCESS;
+		}
+		else if (arg == "makebundle")
+		{
+			++i;
+
+			if (i == argc)
+			{
+				return noInputFileError();
+			}
+
+			DataFile dataFile(QString::fromLocal8Bit(argv[i]));
+
+			if (argc > i+1) // Project bundle file name given
+			{
+				printf("Making bundle\n");
+				dataFile.writeFile(QString::fromLocal8Bit(argv[i+1]), true);
+				return EXIT_SUCCESS;
+			}
+			else
+			{
+				return usageError("No project bundle name given");
+			}
 		}
 		else if( arg == "--allowroot" )
 		{
@@ -491,23 +517,23 @@ int main( int argc, char * * argv )
 
 			if( ext == "wav" )
 			{
-				eff = ProjectRenderer::WaveFile;
+				eff = ProjectRenderer::ExportFileFormat::Wave;
 			}
 #ifdef LMMS_HAVE_OGGVORBIS
 			else if( ext == "ogg" )
 			{
-				eff = ProjectRenderer::OggFile;
+				eff = ProjectRenderer::ExportFileFormat::Ogg;
 			}
 #endif
 #ifdef LMMS_HAVE_MP3LAME
 			else if( ext == "mp3" )
 			{
-				eff = ProjectRenderer::MP3File;
+				eff = ProjectRenderer::ExportFileFormat::MP3;
 			}
 #endif
 			else if (ext == "flac")
 			{
-				eff = ProjectRenderer::FlacFile;
+				eff = ProjectRenderer::ExportFileFormat::Flac;
 			}
 			else
 			{
@@ -570,15 +596,15 @@ int main( int argc, char * * argv )
 
 			if( mode == "s" )
 			{
-				os.setStereoMode(OutputSettings::StereoMode_Stereo);
+				os.setStereoMode(OutputSettings::StereoMode::Stereo);
 			}
 			else if( mode == "j" )
 			{
-				os.setStereoMode(OutputSettings::StereoMode_JointStereo);
+				os.setStereoMode(OutputSettings::StereoMode::JointStereo);
 			}
 			else if( mode == "m" )
 			{
-				os.setStereoMode(OutputSettings::StereoMode_Mono);
+				os.setStereoMode(OutputSettings::StereoMode::Mono);
 			}
 			else
 			{
@@ -587,7 +613,7 @@ int main( int argc, char * * argv )
 		}
 		else if( arg =="--float" || arg == "-a" )
 		{
-			os.setBitDepth(OutputSettings::Depth_32Bit);
+			os.setBitDepth(OutputSettings::BitDepth::Depth32Bit);
 		}
 		else if( arg == "--interpolation" || arg == "-i" )
 		{
@@ -603,19 +629,19 @@ int main( int argc, char * * argv )
 
 			if( ip == "linear" )
 			{
-		qs.interpolation = Mixer::qualitySettings::Interpolation_Linear;
+		qs.interpolation = AudioEngine::qualitySettings::Interpolation::Linear;
 			}
 			else if( ip == "sincfastest" )
 			{
-		qs.interpolation = Mixer::qualitySettings::Interpolation_SincFastest;
+		qs.interpolation = AudioEngine::qualitySettings::Interpolation::SincFastest;
 			}
 			else if( ip == "sincmedium" )
 			{
-		qs.interpolation = Mixer::qualitySettings::Interpolation_SincMedium;
+		qs.interpolation = AudioEngine::qualitySettings::Interpolation::SincMedium;
 			}
 			else if( ip == "sincbest" )
 			{
-		qs.interpolation = Mixer::qualitySettings::Interpolation_SincBest;
+		qs.interpolation = AudioEngine::qualitySettings::Interpolation::SincBest;
 			}
 			else
 			{
@@ -637,16 +663,16 @@ int main( int argc, char * * argv )
 			switch( o )
 			{
 				case 1:
-		qs.oversampling = Mixer::qualitySettings::Oversampling_None;
+		qs.oversampling = AudioEngine::qualitySettings::Oversampling::None;
 		break;
 				case 2:
-		qs.oversampling = Mixer::qualitySettings::Oversampling_2x;
+		qs.oversampling = AudioEngine::qualitySettings::Oversampling::X2;
 		break;
 				case 4:
-		qs.oversampling = Mixer::qualitySettings::Oversampling_4x;
+		qs.oversampling = AudioEngine::qualitySettings::Oversampling::X4;
 		break;
 				case 8:
-		qs.oversampling = Mixer::qualitySettings::Oversampling_8x;
+		qs.oversampling = AudioEngine::qualitySettings::Oversampling::X8;
 		break;
 				default:
 				return usageError( QString( "Invalid oversampling %1" ).arg( argv[i] ) );
@@ -750,7 +776,7 @@ int main( int argc, char * * argv )
 		printf( "Notice: could not set realtime priority.\n" );
 	}
 #endif
-#endif
+#endif // LMMS_HAVE_SCHED_H
 #endif
 
 #ifdef LMMS_BUILD_WIN32
@@ -768,7 +794,7 @@ int main( int argc, char * * argv )
 	{
 		fprintf( stderr, "Signal initialization failed.\n" );
 	}
-	if ( sigaction( SIGPIPE, &sa, NULL ) )
+	if ( sigaction( SIGPIPE, &sa, nullptr ) )
 	{
 		fprintf( stderr, "Signal initialization failed.\n" );
 	}
@@ -803,19 +829,19 @@ int main( int argc, char * * argv )
 		}
 
 		// create renderer
-		RenderManager * r = new RenderManager( qs, os, eff, renderOut );
+		auto r = new RenderManager(qs, os, eff, renderOut);
 		QCoreApplication::instance()->connect( r,
-				SIGNAL( finished() ), SLOT( quit() ) );
+				SIGNAL(finished()), SLOT(quit()));
 
 		// timer for progress-updates
-		QTimer * t = new QTimer( r );
-		r->connect( t, SIGNAL( timeout() ),
-				SLOT( updateConsoleProgress() ) );
+		auto t = new QTimer(r);
+		r->connect( t, SIGNAL(timeout()),
+				SLOT(updateConsoleProgress()));
 		t->start( 200 );
 
 		if( profilerOutputFile.isEmpty() == false )
 		{
-			Engine::mixer()->profiler().setOutputFile( profilerOutputFile );
+			Engine::audioEngine()->profiler().setOutputFile( profilerOutputFile );
 		}
 
 		// start now!
@@ -830,6 +856,8 @@ int main( int argc, char * * argv )
 	}
 	else // otherwise, start the GUI
 	{
+		using namespace lmms::gui;
+
 		new GuiApplication();
 
 		// re-intialize RNG - shared libraries might have srand() or
@@ -903,12 +931,12 @@ int main( int argc, char * * argv )
 			mb.exec();
 			if( mb.clickedButton() == discard )
 			{
-				gui->mainWindow()->sessionCleanup();
+				getGUI()->mainWindow()->sessionCleanup();
 			}
 			else if( mb.clickedButton() == recover ) // Recover
 			{
 				fileToLoad = recoveryFile;
-				gui->mainWindow()->setSession( MainWindow::SessionState::Recover );
+				getGUI()->mainWindow()->setSession( MainWindow::SessionState::Recover );
 			}
 			else // Exit
 			{
@@ -920,10 +948,10 @@ int main( int argc, char * * argv )
 
 		// [Settel] workaround: showMaximized() doesn't work with
 		// FVWM2 unless the window is already visible -> show() first
-		gui->mainWindow()->show();
+		getGUI()->mainWindow()->show();
 		if( fullscreen )
 		{
-			gui->mainWindow()->showMaximized();
+			getGUI()->mainWindow()->showMaximized();
 		}
 
 		// Handle macOS-style FileOpen QEvents
@@ -983,7 +1011,7 @@ int main( int argc, char * * argv )
 		// instances of LMMS.
 		if( autoSaveEnabled )
 		{
-			gui->mainWindow()->autoSaveTimerReset();
+			gui::getGUI()->mainWindow()->autoSaveTimerReset();
 		}
 	}
 

@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef TRACK_CONTENT_WIDGET_H
-#define TRACK_CONTENT_WIDGET_H
+#ifndef LMMS_GUI_TRACK_CONTENT_WIDGET_H
+#define LMMS_GUI_TRACK_CONTENT_WIDGET_H
 
 #include <QWidget>
 
@@ -33,10 +33,16 @@
 
 class QMimeData;
 
-class Track;
-class TrackContentObjectView;
-class TrackView;
+namespace lmms
+{
 
+class Track;
+
+namespace gui
+{
+
+class TrackView;
+class ClipView;
 
 class TrackContentWidget : public QWidget, public JournallingObject
 {
@@ -50,25 +56,25 @@ class TrackContentWidget : public QWidget, public JournallingObject
 
 public:
 	TrackContentWidget( TrackView * parent );
-	virtual ~TrackContentWidget();
+	~TrackContentWidget() override = default;
 
 	/*! \brief Updates the background tile pixmap. */
 	void updateBackground();
 
-	void addTCOView( TrackContentObjectView * tcov );
-	void removeTCOView( TrackContentObjectView * tcov );
-	void removeTCOView( int tcoNum )
+	void addClipView( ClipView * clipv );
+	void removeClipView( ClipView * clipv );
+	void removeClipView( int clipNum )
 	{
-		if( tcoNum >= 0 && tcoNum < m_tcoViews.size() )
+		if( clipNum >= 0 && clipNum < m_clipViews.size() )
 		{
-			removeTCOView( m_tcoViews[tcoNum] );
+			removeClipView( m_clipViews[clipNum] );
 		}
 	}
 
-	bool canPasteSelection( TimePos tcoPos, const QDropEvent *de );
-	bool canPasteSelection( TimePos tcoPos, const QMimeData *md, bool allowSameBar = false );
-	bool pasteSelection( TimePos tcoPos, QDropEvent * de );
-	bool pasteSelection( TimePos tcoPos, const QMimeData * md, bool skipSafetyCheck = false );
+	bool canPasteSelection( TimePos clipPos, const QDropEvent *de );
+	bool canPasteSelection( TimePos clipPos, const QMimeData *md, bool allowSameBar = false );
+	bool pasteSelection( TimePos clipPos, QDropEvent * de );
+	bool pasteSelection( TimePos clipPos, const QMimeData * md, bool skipSafetyCheck = false );
 
 	TimePos endPosition( const TimePos & posStart );
 
@@ -86,10 +92,10 @@ public:
 
 public slots:
 	void update();
-	void changePosition( const TimePos & newPos = TimePos( -1 ) );
+	void changePosition( const lmms::TimePos & newPos = TimePos( -1 ) );
 
 protected:
-	enum ContextMenuAction
+	enum class ContextMenuAction
 	{
 		Paste
 	};
@@ -99,6 +105,7 @@ protected:
 	void dragEnterEvent( QDragEnterEvent * dee ) override;
 	void dropEvent( QDropEvent * de ) override;
 	void mousePressEvent( QMouseEvent * me ) override;
+	void mouseReleaseEvent( QMouseEvent * me ) override;
 	void paintEvent( QPaintEvent * pe ) override;
 	void resizeEvent( QResizeEvent * re ) override;
 
@@ -125,8 +132,8 @@ private:
 
 	TrackView * m_trackView;
 
-	typedef QVector<TrackContentObjectView *> tcoViewVector;
-	tcoViewVector m_tcoViews;
+	using clipViewVector = QVector<ClipView*>;
+	clipViewVector m_clipViews;
 
 	QPixmap m_background;
 
@@ -138,5 +145,8 @@ private:
 } ;
 
 
+} // namespace gui
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_GUI_TRACK_CONTENT_WIDGET_H

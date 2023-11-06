@@ -7,6 +7,10 @@
 #include <string>
 #include <QDomDocument>
 
+namespace lmms
+{
+
+
 class LocalFileMng
 {
 public:
@@ -25,5 +29,9 @@ public:
 	static QDomDocument openXmlDocument( const QString& filename );
 	std::vector<QString> m_allPatternList;
 };
+
+
+} // namespace lmms
+
 #endif //LFILEMNG_H
 

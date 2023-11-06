@@ -41,7 +41,7 @@ public:
 
     Alg_midifile_reader(istream &f, Alg_seq_ptr new_seq) {
         file = &f;
-        note_list = NULL;
+        note_list = nullptr;
         seq = new_seq;
         channel_offset_per_track = 0;
         channel_offset_per_port = 16;
@@ -65,36 +65,36 @@ protected:
 
     double get_time();
     void update(int chan, int key, Alg_parameter_ptr param);
-    void *Mf_malloc(size_t size) { return malloc(size); }
-    void Mf_free(void *obj, size_t size) { free(obj); }
+    void *Mf_malloc(size_t size) override { return malloc(size); }
+    void Mf_free(void *obj, size_t size) override { free(obj); }
     /* Methods to be called while processing the MIDI file. */
-    void Mf_starttrack();
-    void Mf_endtrack();
-    int Mf_getc();
-    void Mf_chanprefix(int chan);
-    void Mf_portprefix(int port);
-    void Mf_eot();
-    void Mf_error(char *);
+    void Mf_starttrack() override;
+    void Mf_endtrack() override;
+    int Mf_getc() override;
+    void Mf_chanprefix(int chan) override;
+    void Mf_portprefix(int port) override;
+    void Mf_eot() override;
+    void Mf_error(char *) override;
     void Mf_error(const char *);
-    void Mf_header(int,int,int);
-    void Mf_on(int,int,int);
-    void Mf_off(int,int,int);
-    void Mf_pressure(int,int,int);
-    void Mf_controller(int,int,int);
-    void Mf_pitchbend(int,int,int);
-    void Mf_program(int,int);
-    void Mf_chanpressure(int,int);
+    void Mf_header(int,int,int) override;
+    void Mf_on(int,int,int) override;
+    void Mf_off(int,int,int) override;
+    void Mf_pressure(int,int,int) override;
+    void Mf_controller(int,int,int) override;
+    void Mf_pitchbend(int,int,int) override;
+    void Mf_program(int,int) override;
+    void Mf_chanpressure(int,int) override;
     void binary_msg(int len, unsigned char *msg, const char *attr_string);
-    void Mf_sysex(int,unsigned char*);
-    void Mf_arbitrary(int,unsigned char*);
-    void Mf_metamisc(int,int,unsigned char*);
-    void Mf_seqnum(int);
-    void Mf_smpte(int,int,int,int,int);
-    void Mf_timesig(int,int,int,int);
-    void Mf_tempo(int);
-    void Mf_keysig(int,int);
-    void Mf_sqspecific(int,unsigned char*);
-    void Mf_text(int,int,unsigned char*);
+    void Mf_sysex(int,unsigned char*) override;
+    void Mf_arbitrary(int,unsigned char*) override;
+    void Mf_metamisc(int,int,unsigned char*) override;
+    void Mf_seqnum(int) override;
+    void Mf_smpte(int,int,int,int,int) override;
+    void Mf_timesig(int,int,int,int) override;
+    void Mf_tempo(int) override;
+    void Mf_keysig(int,int) override;
+    void Mf_sqspecific(int,unsigned char*) override;
+    void Mf_text(int,int,unsigned char*) override;
 };
 
 
@@ -137,7 +137,7 @@ void Alg_midifile_reader::Mf_endtrack()
     // note: track is already part of seq, so do not add it here
     // printf("finished track, length %d number %d\n", track->len, track_num / 100);
     channel_offset += seq->channel_offset_per_track;
-    track = NULL;
+    track = nullptr;
     double now = get_time();
     if (seq->get_beat_dur() < now) seq->set_beat_dur(now);
     meta_channel = -1;
@@ -255,7 +255,7 @@ void Alg_midifile_reader::update(int chan, int key, Alg_parameter_ptr param)
     update->parameter = *param;
     // prevent the destructor from destroying the string twice!
     // the new Update takes the string from param
-    if (param->attr_type() == 's') param->s = NULL;
+    if (param->attr_type() == 's') param->s = nullptr;
     track->append(update);
 }
 

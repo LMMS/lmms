@@ -3,7 +3,7 @@
 <lmms-project version="1.0" type="instrumenttracksettings" creatorversion="1.2.2" creator="LMMS">
   <head/>
   <instrumenttracksettings name="Snare" muted="0" solo="0" type="0">
-    <instrumenttrack vol="100" pitch="0" pitchrange="1" pan="0" fxch="0" usemasterpitch="1" basenote="57">
+    <instrumenttrack vol="100" pitch="0" pitchrange="1" pan="0" mixch="0" usemasterpitch="1" basenote="57">
       <instrument name="tripleoscillator">
         <tripleoscillator finer1="0" finel2="0" finer2="0" vol0="33" vol1="33" vol2="33" pan0="0" pan1="0" pan2="0" wavetype0="6" wavetype1="6" stphdetun0="0" wavetype2="6" stphdetun1="0" stphdetun2="0" phoffset0="0" phoffset1="0" phoffset2="0" userwavefile0="" userwavefile1="" modalgo1="2" userwavefile2="" coarse0="0" modalgo2="2" coarse1="-12" finel0="0" modalgo3="2" finer0="0" finel1="0" coarse2="-24"/>
       </instrument>

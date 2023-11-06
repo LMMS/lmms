@@ -25,71 +25,82 @@
 #ifndef LMMS_CONSTANTS_H
 #define LMMS_CONSTANTS_H
 
-const long double LD_PI = 3.14159265358979323846264338327950288419716939937510;
-const long double LD_2PI = LD_PI * 2.0;
-const long double LD_PI_2 = LD_PI * 0.5;
-const long double LD_PI_R = 1.0 / LD_PI;
-const long double LD_PI_SQR = LD_PI * LD_PI;
-const long double LD_E = 2.71828182845904523536028747135266249775724709369995;
-const long double LD_E_R = 1.0 / LD_E;
+namespace lmms
+{
 
-const double D_PI = (double) LD_PI;
-const double D_2PI = (double) LD_2PI;
-const double D_PI_2 = (double) LD_PI_2;
-const double D_PI_R = (double) LD_PI_R;
-const double D_PI_SQR = (double) LD_PI_SQR;
-const double D_E = (double) LD_E;
-const double D_E_R = (double) LD_E_R;
 
-const float F_PI = (float) LD_PI;
-const float F_2PI = (float) LD_2PI;
-const float F_PI_2 = (float) LD_PI_2;
-const float F_PI_R = (float) LD_PI_R;
-const float F_PI_SQR = (float) LD_PI_SQR;
-const float F_E = (float) LD_E;
-const float F_E_R = (float) LD_E_R;
+constexpr long double LD_PI = 3.14159265358979323846264338327950288419716939937510;
+constexpr long double LD_2PI = LD_PI * 2.0;
+constexpr long double LD_PI_2 = LD_PI * 0.5;
+constexpr long double LD_PI_R = 1.0 / LD_PI;
+constexpr long double LD_PI_SQR = LD_PI * LD_PI;
+constexpr long double LD_E = 2.71828182845904523536028747135266249775724709369995;
+constexpr long double LD_E_R = 1.0 / LD_E;
+
+constexpr double D_PI = (double) LD_PI;
+constexpr double D_2PI = (double) LD_2PI;
+constexpr double D_PI_2 = (double) LD_PI_2;
+constexpr double D_PI_R = (double) LD_PI_R;
+constexpr double D_PI_SQR = (double) LD_PI_SQR;
+constexpr double D_E = (double) LD_E;
+constexpr double D_E_R = (double) LD_E_R;
+
+constexpr float F_PI = (float) LD_PI;
+constexpr float F_2PI = (float) LD_2PI;
+constexpr float F_PI_2 = (float) LD_PI_2;
+constexpr float F_PI_R = (float) LD_PI_R;
+constexpr float F_PI_SQR = (float) LD_PI_SQR;
+constexpr float F_E = (float) LD_E;
+constexpr float F_E_R = (float) LD_E_R;
+
+// Microtuner
+constexpr unsigned int MaxScaleCount = 10;  //!< number of scales per project
+constexpr unsigned int MaxKeymapCount = 10; //!< number of keyboard mappings per project
 
 // Frequency ranges (in Hz).
 // Arbitrary low limit for logarithmic frequency scale; >1 Hz.
-const int LOWEST_LOG_FREQ = 10;
+constexpr int LOWEST_LOG_FREQ = 5;
 
 // Full range is defined by LOWEST_LOG_FREQ and current sample rate.
-enum FREQUENCY_RANGES
+enum class FrequencyRange
 {
-	FRANGE_FULL = 0,
-	FRANGE_AUDIBLE,
-	FRANGE_BASS,
-	FRANGE_MIDS,
-	FRANGE_HIGH
+	Full = 0,
+	Audible,
+	Bass,
+	Mids,
+	High
 };
 
-const int FRANGE_AUDIBLE_START = 20;
-const int FRANGE_AUDIBLE_END = 20000;
-const int FRANGE_BASS_START = 20;
-const int FRANGE_BASS_END = 300;
-const int FRANGE_MIDS_START = 200;
-const int FRANGE_MIDS_END = 5000;
-const int FRANGE_HIGH_START = 4000;
-const int FRANGE_HIGH_END = 20000;
+constexpr int FRANGE_AUDIBLE_START = 20;
+constexpr int FRANGE_AUDIBLE_END = 20000;
+constexpr int FRANGE_BASS_START = 20;
+constexpr int FRANGE_BASS_END = 300;
+constexpr int FRANGE_MIDS_START = 200;
+constexpr int FRANGE_MIDS_END = 5000;
+constexpr int FRANGE_HIGH_START = 4000;
+constexpr int FRANGE_HIGH_END = 20000;
 
 // Amplitude ranges (in dBFS).
 // Reference: full scale sine wave (-1.0 to 1.0) is 0 dB.
 // Doubling or halving the amplitude produces 3 dB difference.
-enum AMPLITUDE_RANGES
+enum class AmplitudeRange
 {
-	ARANGE_EXTENDED = 0,
-	ARANGE_AUDIBLE,
-	ARANGE_LOUD,
-	ARANGE_SILENT
+	Extended = 0,
+	Audible,
+	Loud,
+	Silent
 };
 
-const int ARANGE_EXTENDED_START = -80;
-const int ARANGE_EXTENDED_END = 20;
-const int ARANGE_AUDIBLE_START = -50;
-const int ARANGE_AUDIBLE_END = 0;
-const int ARANGE_LOUD_START = -30;
-const int ARANGE_LOUD_END = 0;
-const int ARANGE_SILENT_START = -60;
-const int ARANGE_SILENT_END = -10;
+constexpr int ARANGE_EXTENDED_START = -80;
+constexpr int ARANGE_EXTENDED_END = 20;
+constexpr int ARANGE_AUDIBLE_START = -50;
+constexpr int ARANGE_AUDIBLE_END = 0;
+constexpr int ARANGE_LOUD_START = -30;
+constexpr int ARANGE_LOUD_END = 0;
+constexpr int ARANGE_SILENT_START = -60;
+constexpr int ARANGE_SILENT_END = -10;
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_CONSTANTS_H

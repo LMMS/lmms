@@ -26,19 +26,22 @@
 #ifndef XPRESSIVE_H
 #define XPRESSIVE_H
 
-#include <QPlainTextEdit>
+
+#include <QTextEdit>
 
 #include "Graph.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "Knob.h"
-#include "LedCheckbox.h"
-#include "PixmapButton.h"
 
 #include "ExprSynth.h"
 
+class QPlainTextEdit;
+
+namespace lmms
+{
+
+
 class oscillator;
-class XpressiveView;
 
 const int	W1_EXPR = 0;
 const int	W2_EXPR = 1;
@@ -49,7 +52,12 @@ const int	NUM_EXPRS = 5;
 
 
 class ExprFront;
+
+namespace gui
+{
 class SubWindow;
+class XpressiveView;
+}
 
 
 
@@ -58,20 +66,19 @@ class Xpressive : public Instrument
 	Q_OBJECT
 public:
 	Xpressive(InstrumentTrack* instrument_track );
-	virtual ~Xpressive();
 
-	virtual void playNote(NotePlayHandle* nph,
-						sampleFrame* working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle* nph );
+	void playNote(NotePlayHandle* nph,
+						sampleFrame* working_buffer ) override;
+	void deleteNotePluginData( NotePlayHandle* nph ) override;
 
 
-	virtual void saveSettings( QDomDocument& _doc,
-							QDomElement& _this );
-	virtual void loadSettings( const QDomElement& _this );
+	void saveSettings( QDomDocument& _doc,
+							QDomElement& _this ) override;
+	void loadSettings( const QDomElement& _this ) override;
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
-	virtual PluginView* instantiateView( QWidget * parent );
+	gui::PluginView* instantiateView( QWidget * parent ) override;
 
 	graphModel& graphO1() { return m_graphO1; }
 	graphModel& graphO2() { return m_graphO2; }
@@ -138,6 +145,9 @@ private:
 	
 } ;
 
+namespace gui
+{
+
 
 class XpressiveView : public InstrumentViewFixedSize
 {
@@ -146,7 +156,6 @@ public:
 	XpressiveView( Instrument* _instrument,
 					QWidget* _parent );
 
-	virtual ~XpressiveView();
 protected:
 
 
@@ -162,12 +171,12 @@ protected slots:
 	void expWaveClicked();
 	void usrWaveClicked();
 	void helpClicked();
-	void expressionChanged( );
-	void smoothChanged( );
-	void graphDrawn( );
+	void expressionChanged();
+	void smoothChanged();
+	void graphDrawn();
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	Knob *m_generalPurposeKnob[3];
 	Knob *m_panningKnob[2];
@@ -217,5 +226,10 @@ private:
 	XpressiveHelpView();
 	static QString s_helpText;
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

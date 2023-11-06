@@ -27,6 +27,9 @@
 
 #include "MeterModel.h"
 
+namespace lmms
+{
+
 TimeSig::TimeSig( int num, int denom ) :
 	m_num(num),
 	m_denom(denom)
@@ -191,7 +194,7 @@ tick_t TimePos::ticksPerBar( const TimeSig &sig )
 int TimePos::stepsPerBar()
 {
 	int steps = ticksPerBar() / DefaultBeatsPerBar;
-	return qMax( 1, steps );
+	return std::max(1, steps);
 }
 
 
@@ -216,3 +219,6 @@ double TimePos::ticksToMilliseconds(double ticks, bpm_t beatsPerMinute)
 	// 60 * 1000 / 48 = 1250
 	return ( ticks * 1250 ) / beatsPerMinute;
 }
+
+
+} // namespace lmms

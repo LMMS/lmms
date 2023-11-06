@@ -4,7 +4,7 @@ INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/include")
 INCLUDE_DIRECTORIES("${CMAKE_BINARY_DIR}")
 INCLUDE_DIRECTORIES("${CMAKE_BINARY_DIR}/src")
 
-SET(CMAKE_CXX_STANDARD 14)
+SET(CMAKE_CXX_STANDARD 17)
 
 SET(CMAKE_AUTOMOC ON)
 
@@ -16,10 +16,12 @@ ENDIF()
 ADD_EXECUTABLE(tests
 	EXCLUDE_FROM_ALL
 	main.cpp
-	QTestSuite
+	QTestSuite.cpp
 	$<TARGET_OBJECTS:lmmsobjs>
 
+	src/core/ArrayVectorTest.cpp
 	src/core/AutomatableModelTest.cpp
+	src/core/MathTest.cpp
 	src/core/ProjectVersionTest.cpp
 	src/core/RelativePathsTest.cpp
 

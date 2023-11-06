@@ -23,10 +23,10 @@
  */
 
 #include "StereoDelay.h"
-#include <cstdlib>
 #include "lmms_basics.h"
-#include "interpolation.h"
-#include "lmms_math.h"
+
+namespace lmms
+{
 
 
 StereoDelay::StereoDelay( int maxTime, int sampleRate )
@@ -90,7 +90,4 @@ void StereoDelay::setSampleRate( int sampleRate )
 }
 
 
-
-
-
-
+} // namespace lmms

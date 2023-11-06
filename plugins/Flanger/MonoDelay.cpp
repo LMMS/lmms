@@ -23,9 +23,11 @@
  */
 
 #include "MonoDelay.h"
-#include "interpolation.h"
-#include "lmms_math.h"
 #include "string.h"
+
+namespace lmms
+{
+
 
 MonoDelay::MonoDelay( int maxTime , int sampleRate )
 {
@@ -76,3 +78,6 @@ void MonoDelay::setSampleRate( int sampleRate )
 	m_buffer = new sample_t[( int )( sampleRate * m_maxTime ) ];
 	memset( m_buffer, 0, sizeof(float) * ( int )( sampleRate * m_maxTime ) );
 }
+
+
+} // namespace lmms

@@ -1,7 +1,7 @@
 /*
  * Lv2ControlBase.h - Lv2 control base class
  *
- * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,19 +22,24 @@
  *
  */
 
-#ifndef LV2_CONTROL_BASE_H
-#define LV2_CONTROL_BASE_H
+#ifndef LMMS_LV2_CONTROL_BASE_H
+#define LMMS_LV2_CONTROL_BASE_H
 
 #include "lmmsconfig.h"
 
 #ifdef LMMS_HAVE_LV2
 
 #include <lilv/lilv.h>
+#include <memory>
 
 #include "DataFile.h"
 #include "LinkedModelGroups.h"
 #include "lmms_export.h"
 #include "Plugin.h"
+
+namespace lmms
+{
+
 
 class Lv2Proc;
 class PluginIssue;
@@ -69,8 +74,11 @@ class PluginIssue;
 class LMMS_EXPORT Lv2ControlBase : public LinkedModelGroups
 {
 public:
-	static Plugin::PluginTypes check(const LilvPlugin* m_plugin,
+	static Plugin::Type check(const LilvPlugin* m_plugin,
 		std::vector<PluginIssue> &issues);
+
+	void shutdown();
+	void init(Model* meAsModel);
 
 	const LilvPlugin* getPlugin() const { return m_plugin; }
 
@@ -90,6 +98,7 @@ protected:
 	Lv2ControlBase(class Model *that, const QString& uri);
 	Lv2ControlBase(const Lv2ControlBase&) = delete;
 	~Lv2ControlBase() override;
+	void reload();
 
 	Lv2ControlBase& operator=(const Lv2ControlBase&) = delete;
 
@@ -124,8 +133,6 @@ protected:
 	void saveSettings(QDomDocument &doc, QDomElement &that);
 	void loadSettings(const QDomElement &that);
 	void loadFile(const QString &file);
-	//! TODO: not implemented
-	void reloadPlugin();
 
 	/*
 		more functions that must be called from virtuals
@@ -137,11 +144,6 @@ protected:
 		const class TimePos &time, f_cnt_t offset);
 
 private:
-	//! Return the DataFile settings type
-	virtual DataFile::Types settingsType() = 0;
-	//! Inform the plugin about a file name change
-	virtual void setNameFromFile(const QString &fname) = 0;
-
 	//! Independent processors
 	//! If this is a mono effect, the vector will have size 2 in order to
 	//! fulfill LMMS' requirement of having stereo input and output
@@ -154,5 +156,9 @@ private:
 	const LilvPlugin* m_plugin;
 };
 
+
+} // namespace lmms
+
 #endif // LMMS_HAVE_LV2
-#endif // LV2_CONTROL_BASE_H
+
+#endif // LMMS_LV2_CONTROL_BASE_H

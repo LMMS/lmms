@@ -2,7 +2,7 @@
  * FreeBoy.cpp - GameBoy papu based instrument
  *
  * Copyright (c) 2008 Attila Herman <attila589/at/gmail.com>
- *				Csaba Hruska <csaba.hruska/at/gmail.com>
+ *                    Csaba Hruska <csaba.hruska/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -23,20 +23,18 @@
  *
  */
 
-#include <cmath>
-
-#include <QPainter>
-#include <QDomElement>
 #include "FreeBoy.h"
-#include "Gb_Apu_Buffer.h"
-#include "Multi_Buffer.h"
+
+#include <cmath>
+#include <QDomElement>
+
+#include "GbApuWrapper.h"
 #include "base64.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "NotePlayHandle.h"
 #include "PixmapButton.h"
-#include "ToolTip.h"
 #include "Engine.h"
 #include "Graph.h"
 
@@ -44,23 +42,30 @@
 
 #include "plugin_export.h"
 
-const blip_time_t FRAME_LENGTH = 70224;
-const long CLOCK_RATE = 4194304;
+namespace lmms
+{
+
+
+namespace
+{
+constexpr blip_time_t FRAME_LENGTH = 70224;
+constexpr long CLOCK_RATE = 4194304;
+}
 
 extern "C"
 {
 Plugin::Descriptor PLUGIN_EXPORT freeboy_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"FreeBoy",
 	QT_TRANSLATE_NOOP( "PluginBrowser", "Emulation of GameBoy (TM) APU" ),
 
 	"Attila Herman <attila589/at/gmail.com>"
 	"Csaba Hruska <csaba.hruska/at/gmail.com>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
-	NULL
+	nullptr,
 } ;
 
 }
@@ -117,14 +122,7 @@ FreeBoyInstrument::FreeBoyInstrument( InstrumentTrack * _instrument_track ) :
 	m_trebleModel( -20.0f, -100.0f, 200.0f, 1.0f, this, tr( "Treble" ) ),
 	m_bassModel( 461.0f, -1.0f, 600.0f, 1.0f, this, tr( "Bass" ) ),
 
-	m_graphModel( 0, 15, 32, this, false, 1 ),
-
-	m_time(0)
-{
-}
-
-
-FreeBoyInstrument::~FreeBoyInstrument()
+	m_graphModel( 0, 15, 32, this, false, 1 )
 {
 }
 
@@ -224,7 +222,7 @@ QString FreeBoyInstrument::nodeName() const
 
 /*f_cnt_t FreeBoyInstrument::desiredReleaseFrames() const
 {
-	const float samplerate = Engine::mixer()->processingSampleRate();
+	const float samplerate = Engine::audioEngine()->processingSampleRate();
 	int maxrel = 0;
 	for( int i = 0 ; i < 3 ; ++i )
 	{
@@ -242,205 +240,212 @@ f_cnt_t FreeBoyInstrument::desiredReleaseFrames() const
 
 
 
-void FreeBoyInstrument::playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer )
+void FreeBoyInstrument::playNote(NotePlayHandle* nph, sampleFrame* workingBuffer)
 {
-	const f_cnt_t tfp = _n->totalFramesPlayed();
-	const int samplerate = Engine::mixer()->processingSampleRate();
-	const fpp_t frames = _n->framesLeftForCurrentPeriod();
-	const f_cnt_t offset = _n->noteOffset();
+	const f_cnt_t tfp = nph->totalFramesPlayed();
+	const int samplerate = Engine::audioEngine()->processingSampleRate();
+	const fpp_t frames = nph->framesLeftForCurrentPeriod();
+	const f_cnt_t offset = nph->noteOffset();
 
 	int data = 0;
-	int freq = _n->frequency();
+	int freq = nph->frequency();
 
-	if ( tfp == 0 )
+	if (!nph->m_pluginData)
 	{
-		Gb_Apu_Buffer *papu = new Gb_Apu_Buffer();
-		papu->set_sample_rate( samplerate, CLOCK_RATE );
+		auto papu = new GbApuWrapper{};
+		papu->setSampleRate(samplerate, CLOCK_RATE);
 
 		// Master sound circuitry power control
-		papu->write_register( fakeClock(),  0xff26, 0x80 );
+		papu->writeRegister(0xff26, 0x80);
 
 		data = m_ch1VolumeModel.value();
-		data = data<<1;
+		data = data << 1;
 		data += m_ch1VolSweepDirModel.value();
-		data = data<<3;
+		data = data << 3;
 		data += m_ch1SweepStepLengthModel.value();
-		papu->write_register( fakeClock(),  0xff12, data );
+		papu->writeRegister(0xff12, data);
 
 		data = m_ch2VolumeModel.value();
-		data = data<<1;
+		data = data << 1;
 		data += m_ch2VolSweepDirModel.value();
-		data = data<<3;
+		data = data << 3;
 		data += m_ch2SweepStepLengthModel.value();
-		papu->write_register( fakeClock(),  0xff17, data );
+		papu->writeRegister(0xff17, data);
 
 		//channel 4 - noise
 		data = m_ch4VolumeModel.value();
-		data = data<<1;
+		data = data << 1;
 		data += m_ch4VolSweepDirModel.value();
-		data = data<<3;
+		data = data << 3;
 		data += m_ch4SweepStepLengthModel.value();
-		papu->write_register( fakeClock(),  0xff21, data );
+		papu->writeRegister(0xff21, data);
 
-		_n->m_pluginData = papu;
+		nph->m_pluginData = papu;
 	}
 
-	Gb_Apu_Buffer *papu = static_cast<Gb_Apu_Buffer *>( _n->m_pluginData );
+	auto papu = static_cast<GbApuWrapper*>(nph->m_pluginData);
 
-	papu->treble_eq( m_trebleModel.value() );
-	papu->bass_freq( m_bassModel.value() );
+	papu->trebleEq(m_trebleModel.value());
+	papu->bassFreq(m_bassModel.value());
 
 	//channel 1 - square
 	data = m_ch1SweepTimeModel.value();
-	data = data<<1;
+	data = data << 1;
 	data += m_ch1SweepDirModel.value();
 	data = data << 3;
 	data += m_ch1SweepRtShiftModel.value();
-	papu->write_register( fakeClock(),  0xff10, data );
+	papu->writeRegister(0xff10, data);
 
 	data = m_ch1WavePatternDutyModel.value();
-	data = data<<6;
-	papu->write_register( fakeClock(),  0xff11, data );
-
+	data = data << 6;
+	papu->writeRegister(0xff11, data);
 
 	//channel 2 - square
 	data = m_ch2WavePatternDutyModel.value();
-	data = data<<6;
-	papu->write_register( fakeClock(),  0xff16, data );
-
+	data = data << 6;
+	papu->writeRegister(0xff16, data);
 
 	//channel 3 - wave
-	//data = m_ch3OnModel.value()?128:0;
+	//data = m_ch3OnModel.value() ? 128 : 0;
 	data = 128;
-	papu->write_register( fakeClock(),  0xff1a, data );
+	papu->writeRegister(0xff1a, data);
 
-	int ch3voldata[4] = { 0, 3, 2, 1 };
+	auto ch3voldata = std::array{0, 3, 2, 1};
 	data = ch3voldata[(int)m_ch3VolumeModel.value()];
-	data = data<<5;
-	papu->write_register( fakeClock(),  0xff1c, data );
-
+	data = data << 5;
+	papu->writeRegister(0xff1c, data);
 
 	//controls
 	data = m_so1VolumeModel.value();
-	data = data<<4;
+	data = data << 4;
 	data += m_so2VolumeModel.value();
-	papu->write_register( fakeClock(),  0xff24, data );
+	papu->writeRegister(0xff24, data);
 
-	data = m_ch4So2Model.value()?128:0;
-	data += m_ch3So2Model.value()?64:0;
-	data += m_ch2So2Model.value()?32:0;
-	data += m_ch1So2Model.value()?16:0;
-	data += m_ch4So1Model.value()?8:0;
-	data += m_ch3So1Model.value()?4:0;
-	data += m_ch2So1Model.value()?2:0;
-	data += m_ch1So1Model.value()?1:0;
-	papu->write_register( fakeClock(),  0xff25, data );
+	data = m_ch4So2Model.value() ? 128 : 0;
+	data += m_ch3So2Model.value() ? 64 : 0;
+	data += m_ch2So2Model.value() ? 32 : 0;
+	data += m_ch1So2Model.value() ? 16 : 0;
+	data += m_ch4So1Model.value() ? 8 : 0;
+	data += m_ch3So1Model.value() ? 4 : 0;
+	data += m_ch2So1Model.value() ? 2 : 0;
+	data += m_ch1So1Model.value() ? 1 : 0;
+	papu->writeRegister(0xff25, data);
 
-	const float * wpm = m_graphModel.samples();
+	const float* wpm = m_graphModel.samples();
 
-	for( char i=0; i<16; i++ )
+	for (char i = 0; i < 16; ++i)
 	{
-		data = (int)floor(wpm[i*2]) << 4;
-		data += (int)floor(wpm[i*2+1]);
-		papu->write_register( fakeClock(),  0xff30 + i, data );
+		data = static_cast<int>(std::floor(wpm[i * 2])) << 4;
+		data += static_cast<int>(std::floor(wpm[(i * 2) + 1]));
+		papu->writeRegister(0xff30 + i, data);
 	}
 
-	if( ( freq >= 65 ) && ( freq <=4000 ) )
+	if ((freq >= 65) && (freq <= 4000))
 	{
-		int initflag = (tfp==0)?128:0;
-		// Hz = 4194304 / ( ( 2048 - ( 11-bit-freq ) ) << 5 )
-		data = 2048 - ( ( 4194304 / freq )>>5 );
-		if( tfp==0 )
+		int initFlag = (tfp == 0) ? 128 : 0;
+		// Hz = 4194304 / ((2048 - (11-bit-freq)) << 5)
+		data = 2048 - ((4194304 / freq) >> 5);
+		if (tfp == 0)
 		{
-			papu->write_register( fakeClock(),  0xff13, data & 0xff );
-			papu->write_register( fakeClock(),  0xff14, (data>>8) | initflag );
+			papu->writeRegister(0xff13, data & 0xff);
+			papu->writeRegister(0xff14, (data >> 8) | initFlag);
 		}
-		papu->write_register( fakeClock(),  0xff18, data & 0xff );
-		papu->write_register( fakeClock(),  0xff19, (data>>8) | initflag );
-		papu->write_register( fakeClock(),  0xff1d, data & 0xff );
-		papu->write_register( fakeClock(),  0xff1e, (data>>8) | initflag );
+		papu->writeRegister(0xff18, data & 0xff);
+		papu->writeRegister(0xff19, (data >> 8) | initFlag);
+		papu->writeRegister(0xff1d, data & 0xff);
+		papu->writeRegister(0xff1e, (data >> 8) | initFlag);
 	}
 
-	if( tfp == 0 )
+	if (tfp == 0)
 	{
-		//PRNG Frequency = (1048576 Hz / (ratio + 1)) / 2 ^ (shiftclockfreq + 1)
-		char sopt=0;
-		char ropt=1;
-		float fopt = 524288.0 / ( ropt * pow( 2.0, sopt + 1.0 ) );
-		float f;
-		for ( char s=0; s<16; s++ )
-		for ( char r=0; r<8; r++ ) {
-			f = 524288.0 / ( r * pow( 2.0, s + 1.0 ) );
-			if( fabs( freq-fopt ) > fabs( freq-f ) ) {
-				fopt = f;
-				ropt = r;
-				sopt = s;
+		// Initialize noise channel...
+		// PRNG Frequency = (1048576 Hz / (ratio + 1)) / 2 ^ (shiftclockfreq + 1)
+		// When div_ratio = 0 the ratio should be 0.5. Since s = 0 is the only case where r = 0 gives
+		// a unique frequency, we can start by guessing s = r = 0 here and then skip r = 0 in the loop.
+		char clock_freq = 0;
+		char div_ratio = 0;
+		float closest_freq = 524288.0 / (0.5 * std::pow(2.0, clock_freq + 1.0));
+		// This nested for loop iterates over all possible combinations of clock frequency and dividing
+		// ratio and chooses the combination whose resulting frequency is closest to the note frequency
+		for (char s = 0; s < 16; ++s)
+		{
+			for (char r = 1; r < 8; ++r)
+			{
+				float f = 524288.0 / (r * std::pow(2.0, s + 1.0));
+				if (std::fabs(freq - closest_freq) > std::fabs(freq - f))
+				{
+					closest_freq = f;
+					div_ratio = r;
+					clock_freq = s;
+				}
 			}
 		}
-		data = sopt;
+
+		data = clock_freq;
 		data = data << 1;
 		data += m_ch4ShiftRegWidthModel.value();
 		data = data << 3;
-		data += ropt;
-		papu->write_register( fakeClock(),  0xff22, data );
+		data += div_ratio;
+		papu->writeRegister(0xff22, data);
 
 		//channel 4 init
-		papu->write_register( fakeClock(),  0xff23, 128 );
+		papu->writeRegister(0xff23, 128);
 	}
 
-	int const buf_size = 2048;
-	int framesleft = frames;
-	int datalen = 0;
-	blip_sample_t buf [buf_size*2];
-	while( framesleft > 0 )
+	constexpr int bufSize = 2048;
+	int framesLeft = frames;
+	int dataLen = 0;
+	auto buf = std::array<blip_sample_t, bufSize * 2>{};
+	while (framesLeft > 0)
 	{
-		int avail = papu->samples_avail();
-		if( avail <= 0 )
+		int avail = papu->samplesAvail();
+		if (avail <= 0)
 		{
-			m_time = 0;
-			papu->end_frame(FRAME_LENGTH);
-			avail = papu->samples_avail();
+			papu->endFrame(FRAME_LENGTH);
+			avail = papu->samplesAvail();
 		}
-		datalen = framesleft>avail?avail:framesleft;
-		datalen = datalen>buf_size?buf_size:datalen;
+		dataLen = framesLeft > avail ? avail : framesLeft;
+		dataLen = dataLen > bufSize ? bufSize : dataLen;
 
-		long count = papu->read_samples( buf, datalen*2)/2;
+		long count = papu->readSamples(buf.data(), dataLen * 2) / 2;
 
-		for( fpp_t frame = 0; frame < count; ++frame )
+		for (fpp_t frame = 0; frame < count; ++frame)
 		{
-			for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
+			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 			{
-				sample_t s = float(buf[frame*2+ch])/32768.0;
-				_working_buffer[frames-framesleft+frame+offset][ch] = s;
+				sample_t s = static_cast<float>(buf[(frame * 2) + ch]) / 32768.0f;
+				workingBuffer[frames - framesLeft + frame + offset][ch] = s;
 			}
 		}
-		framesleft -= count;
+		framesLeft -= count;
 	}
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
 }
 
 
 
-void FreeBoyInstrument::deleteNotePluginData( NotePlayHandle * _n )
+void FreeBoyInstrument::deleteNotePluginData(NotePlayHandle* nph)
 {
-	delete static_cast<Gb_Apu_Buffer *>( _n->m_pluginData );
+	delete static_cast<GbApuWrapper*>(nph->m_pluginData);
 }
 
 
 
 
-PluginView * FreeBoyInstrument::instantiateView( QWidget * _parent )
+gui::PluginView * FreeBoyInstrument::instantiateView( QWidget * _parent )
 {
-	return( new FreeBoyInstrumentView( this, _parent ) );
+	return( new gui::FreeBoyInstrumentView( this, _parent ) );
 }
+
+
+namespace gui
+{
 
 
 class FreeBoyKnob : public Knob
 {
 public:
 	FreeBoyKnob( QWidget * _parent ) :
-			Knob( knobStyled, _parent )
+			Knob( KnobType::Styled, _parent )
 	{
 		setFixedSize( 30, 30 );
 		setCenterPointX( 15.0 );
@@ -468,31 +473,31 @@ FreeBoyInstrumentView::FreeBoyInstrumentView( Instrument * _instrument,
 	m_ch1SweepTimeKnob = new FreeBoyKnob( this );
 	m_ch1SweepTimeKnob->setHintText( tr( "Sweep time:" ), "" );
 	m_ch1SweepTimeKnob->move( 5 + 4*32, 106 );
-	ToolTip::add( m_ch1SweepTimeKnob, tr( "Sweep time" ) );
+	m_ch1SweepTimeKnob->setToolTip(tr("Sweep time"));
 
 	m_ch1SweepRtShiftKnob = new FreeBoyKnob( this );
 	m_ch1SweepRtShiftKnob->setHintText( tr( "Sweep rate shift amount:" )
 										, "" );
 	m_ch1SweepRtShiftKnob->move( 5 + 3*32, 106 );
-	ToolTip::add( m_ch1SweepRtShiftKnob, tr( "Sweep rate shift amount" ) );
+	m_ch1SweepRtShiftKnob->setToolTip(tr("Sweep rate shift amount"));
 
 	m_ch1WavePatternDutyKnob = new FreeBoyKnob( this );
 	m_ch1WavePatternDutyKnob->setHintText( tr( "Wave pattern duty cycle:" )
 									, "" );
 	m_ch1WavePatternDutyKnob->move( 5 + 2*32, 106 );
-	ToolTip::add( m_ch1WavePatternDutyKnob, tr( "Wave pattern duty cycle" ) );
+	m_ch1WavePatternDutyKnob->setToolTip(tr("Wave pattern duty cycle"));
 
 	m_ch1VolumeKnob = new FreeBoyKnob( this );
 	m_ch1VolumeKnob->setHintText( tr( "Square channel 1 volume:" )
 								, "" );
 	m_ch1VolumeKnob->move( 5, 106 );
-	ToolTip::add( m_ch1VolumeKnob, tr( "Square channel 1 volume" ) );
+	m_ch1VolumeKnob->setToolTip(tr("Square channel 1 volume"));
 
 	m_ch1SweepStepLengthKnob = new FreeBoyKnob( this );
 	m_ch1SweepStepLengthKnob->setHintText( tr( "Length of each step in sweep:" )
 									, "" );
 	m_ch1SweepStepLengthKnob->move( 5 + 32, 106 );
-	ToolTip::add( m_ch1SweepStepLengthKnob, tr( "Length of each step in sweep" ) );
+	m_ch1SweepStepLengthKnob->setToolTip(tr("Length of each step in sweep"));
 
 
 
@@ -500,79 +505,79 @@ FreeBoyInstrumentView::FreeBoyInstrumentView( Instrument * _instrument,
 	m_ch2WavePatternDutyKnob->setHintText( tr( "Wave pattern duty cycle:" )
 									, "" );
 	m_ch2WavePatternDutyKnob->move( 5 + 2*32, 155 );
-	ToolTip::add( m_ch2WavePatternDutyKnob, tr( "Wave pattern duty cycle" ) );
+	m_ch2WavePatternDutyKnob->setToolTip(tr("Wave pattern duty cycle"));
 
 	m_ch2VolumeKnob = new FreeBoyKnob( this );
 	m_ch2VolumeKnob->setHintText( tr( "Square channel 2 volume:" )
 							, "" );
 	m_ch2VolumeKnob->move( 5, 155 );
-	ToolTip::add( m_ch2VolumeKnob, tr( "Square channel 2 volume" ) );
+	m_ch2VolumeKnob->setToolTip(tr("Square channel 2 volume"));
 
 	m_ch2SweepStepLengthKnob = new FreeBoyKnob( this );
 	m_ch2SweepStepLengthKnob->setHintText( tr( "Length of each step in sweep:" )
 									, "" );
 	m_ch2SweepStepLengthKnob->move( 5 + 32, 155 );
-	ToolTip::add( m_ch2SweepStepLengthKnob, tr( "Length of each step in sweep" ) );
+	m_ch2SweepStepLengthKnob->setToolTip(tr("Length of each step in sweep"));
 
 
 
 	m_ch3VolumeKnob = new FreeBoyKnob( this );
 	m_ch3VolumeKnob->setHintText( tr( "Wave pattern channel volume:" ), "" );
 	m_ch3VolumeKnob->move( 5, 204 );
-	ToolTip::add( m_ch3VolumeKnob, tr( "Wave pattern channel volume" ) );
+	m_ch3VolumeKnob->setToolTip(tr("Wave pattern channel volume"));
 
 
 
 	m_ch4VolumeKnob = new FreeBoyKnob( this );
 	m_ch4VolumeKnob->setHintText( tr( "Noise channel volume:" ), "" );
 	m_ch4VolumeKnob->move( 144, 155 );
-	ToolTip::add( m_ch4VolumeKnob, tr( "Noise channel volume" ) );
+	m_ch4VolumeKnob->setToolTip(tr("Noise channel volume"));
 
 	m_ch4SweepStepLengthKnob = new FreeBoyKnob( this );
 	m_ch4SweepStepLengthKnob->setHintText( tr( "Length of each step in sweep:" )
 									, "" );
 	m_ch4SweepStepLengthKnob->move( 144 + 32, 155 );
-	ToolTip::add( m_ch4SweepStepLengthKnob, tr( "Length of each step in sweep" ) );
+	m_ch4SweepStepLengthKnob->setToolTip(tr("Length of each step in sweep"));
 
 
 
 	m_so1VolumeKnob = new FreeBoyKnob( this );
 	m_so1VolumeKnob->setHintText( tr( "SO1 volume (Right):" ), "" );
 	m_so1VolumeKnob->move( 5, 58 );
-	ToolTip::add( m_so1VolumeKnob, tr( "SO1 volume (Right)" ) );
+	m_so1VolumeKnob->setToolTip(tr("SO1 volume (Right)"));
 
 	m_so2VolumeKnob = new FreeBoyKnob( this );
 	m_so2VolumeKnob->setHintText( tr( "SO2 volume (Left):" ), "" );
 	m_so2VolumeKnob->move( 5 + 32, 58 );
-	ToolTip::add( m_so2VolumeKnob, tr( "SO2 volume (Left)" ) );
+	m_so2VolumeKnob->setToolTip(tr("SO2 volume (Left)"));
 
 	m_trebleKnob = new FreeBoyKnob( this );
 	m_trebleKnob->setHintText( tr( "Treble:" ), "" );
 	m_trebleKnob->move( 5 + 2*32, 58 );
-	ToolTip::add( m_trebleKnob, tr( "Treble" ) );
+	m_trebleKnob->setToolTip(tr("Treble"));
 
 	m_bassKnob = new FreeBoyKnob( this );
 	m_bassKnob->setHintText( tr( "Bass:" ), "" );
 	m_bassKnob->move( 5 + 3*32, 58 );
-	ToolTip::add( m_bassKnob, tr( "Bass" ) );
+	m_bassKnob->setToolTip(tr("Bass"));
 
-	m_ch1SweepDirButton = new PixmapButton( this, NULL );
+	m_ch1SweepDirButton = new PixmapButton( this, nullptr );
 	m_ch1SweepDirButton->setCheckable( true );
 	m_ch1SweepDirButton->move( 167, 108 );
 	m_ch1SweepDirButton->setActiveGraphic(
 							PLUGIN_NAME::getIconPixmap( "btn_down" ) );
 	m_ch1SweepDirButton->setInactiveGraphic(
 							PLUGIN_NAME::getIconPixmap( "btn_up" ) );
-	ToolTip::add( m_ch1SweepDirButton, tr( "Sweep direction" ) );
+	m_ch1SweepDirButton->setToolTip(tr("Sweep direction"));
 
-	m_ch1VolSweepDirButton = new PixmapButton( this, NULL );
+	m_ch1VolSweepDirButton = new PixmapButton( this, nullptr );
 	m_ch1VolSweepDirButton->setCheckable( true );
 	m_ch1VolSweepDirButton->move( 207, 108 );
 	m_ch1VolSweepDirButton->setActiveGraphic(
 								PLUGIN_NAME::getIconPixmap( "btn_up" ) );
 	m_ch1VolSweepDirButton->setInactiveGraphic(
 								PLUGIN_NAME::getIconPixmap( "btn_down" ) );
-	ToolTip::add( m_ch1VolSweepDirButton, tr( "Volume sweep direction" ) );
+	m_ch1VolSweepDirButton->setToolTip(tr("Volume sweep direction"));
 
 
 
@@ -584,7 +589,7 @@ FreeBoyInstrumentView::FreeBoyInstrumentView( Instrument * _instrument,
 								PLUGIN_NAME::getIconPixmap( "btn_up" ) );
 	m_ch2VolSweepDirButton->setInactiveGraphic(
 								PLUGIN_NAME::getIconPixmap( "btn_down" ) );
-	ToolTip::add( m_ch2VolSweepDirButton, tr( "Volume sweep direction" ) );
+	m_ch2VolSweepDirButton->setToolTip(tr("Volume sweep direction"));
 
 	//m_ch3OnButton = new PixmapButton( this, NULL );
 	//m_ch3OnButton->move( 176, 53 );
@@ -597,96 +602,91 @@ FreeBoyInstrumentView::FreeBoyInstrumentView( Instrument * _instrument,
 								PLUGIN_NAME::getIconPixmap( "btn_up" ) );
 	m_ch4VolSweepDirButton->setInactiveGraphic(
 								PLUGIN_NAME::getIconPixmap( "btn_down" ) );
-	ToolTip::add( m_ch4VolSweepDirButton, tr( "Volume sweep direction" ) );
+	m_ch4VolSweepDirButton->setToolTip(tr("Volume sweep direction"));
 
-	m_ch4ShiftRegWidthButton = new PixmapButton( this, NULL );
+	m_ch4ShiftRegWidthButton = new PixmapButton( this, nullptr );
 	m_ch4ShiftRegWidthButton->setCheckable( true );
 	m_ch4ShiftRegWidthButton->move( 207, 171 );
 	m_ch4ShiftRegWidthButton->setActiveGraphic(
 									PLUGIN_NAME::getIconPixmap( "btn_7" ) );
 	m_ch4ShiftRegWidthButton->setInactiveGraphic(
 									PLUGIN_NAME::getIconPixmap( "btn_15" ) );
-	ToolTip::add( m_ch4ShiftRegWidthButton, tr( "Shift register width" ) );
+	m_ch4ShiftRegWidthButton->setToolTip(tr("Shift register width"));
 
 
 
 
-	m_ch1So1Button = new PixmapButton( this, NULL );
+	m_ch1So1Button = new PixmapButton( this, nullptr );
 	m_ch1So1Button->setCheckable( true );
 	m_ch1So1Button->move( 208, 51 );
 	m_ch1So1Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
 	m_ch1So1Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
-	ToolTip::add( m_ch1So1Button, tr( "Channel 1 to SO1 (Right)" ) );
+	m_ch1So1Button->setToolTip(tr("Channel 1 to SO1 (Right)"));
 
-	m_ch2So1Button = new PixmapButton( this, NULL );
+	m_ch2So1Button = new PixmapButton( this, nullptr );
 	m_ch2So1Button->setCheckable( true );
 	m_ch2So1Button->move( 208, 51 + 12 );
 	m_ch2So1Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
 	m_ch2So1Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
-	ToolTip::add( m_ch2So1Button, tr( "Channel 2 to SO1 (Right)" ) );
+	m_ch2So1Button->setToolTip(tr("Channel 2 to SO1 (Right)"));
 
-	m_ch3So1Button = new PixmapButton( this, NULL );
+	m_ch3So1Button = new PixmapButton( this, nullptr );
 	m_ch3So1Button->setCheckable( true );
 	m_ch3So1Button->move( 208, 51 + 2*12 );
 	m_ch3So1Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
 	m_ch3So1Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
-	ToolTip::add( m_ch3So1Button, tr( "Channel 3 to SO1 (Right)" ) );
+	m_ch3So1Button->setToolTip(tr("Channel 3 to SO1 (Right)"));
 
-	m_ch4So1Button = new PixmapButton( this, NULL );
+	m_ch4So1Button = new PixmapButton( this, nullptr );
 	m_ch4So1Button->setCheckable( true );
 	m_ch4So1Button->setChecked( false );
 	m_ch4So1Button->move( 208, 51 + 3*12 );
 	m_ch4So1Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
 	m_ch4So1Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
-	ToolTip::add( m_ch4So1Button, tr( "Channel 4 to SO1 (Right)" ) );
+	m_ch4So1Button->setToolTip(tr("Channel 4 to SO1 (Right)"));
 
-	m_ch1So2Button = new PixmapButton( this, NULL );
+	m_ch1So2Button = new PixmapButton( this, nullptr );
 	m_ch1So2Button->setCheckable( true );
 	m_ch1So2Button->move( 148, 51 );
 	m_ch1So2Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
 	m_ch1So2Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
-	ToolTip::add( m_ch1So2Button, tr( "Channel 1 to SO2 (Left)" ) );
+	m_ch1So2Button->setToolTip(tr("Channel 1 to SO2 (Left)"));
 
-	m_ch2So2Button = new PixmapButton( this, NULL );
+	m_ch2So2Button = new PixmapButton( this, nullptr );
 	m_ch2So2Button->setCheckable( true );
 	m_ch2So2Button->move( 148, 51 + 12 );
 	m_ch2So2Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
 	m_ch2So2Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
-	ToolTip::add( m_ch2So2Button, tr( "Channel 2 to SO2 (Left)" ) );
+	m_ch2So2Button->setToolTip(tr("Channel 2 to SO2 (Left)"));
 
-	m_ch3So2Button = new PixmapButton( this, NULL );
+	m_ch3So2Button = new PixmapButton( this, nullptr );
 	m_ch3So2Button->setCheckable( true );
 	m_ch3So2Button->move( 148, 51 + 2*12 );
 	m_ch3So2Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
 	m_ch3So2Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
-	ToolTip::add( m_ch3So2Button, tr( "Channel 3 to SO2 (Left)" ) );
+	m_ch3So2Button->setToolTip(tr("Channel 3 to SO2 (Left)"));
 
-	m_ch4So2Button = new PixmapButton( this, NULL );
+	m_ch4So2Button = new PixmapButton( this, nullptr );
 	m_ch4So2Button->setCheckable( true );
 	m_ch4So2Button->setChecked( false );
 	m_ch4So2Button->move( 148, 51 + 3*12 );
 	m_ch4So2Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
 	m_ch4So2Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
-	ToolTip::add( m_ch4So2Button, tr( "Channel 4 to SO2 (Left)" ) );
+	m_ch4So2Button->setToolTip(tr("Channel 4 to SO2 (Left)"));
 
 
 	m_graph = new Graph( this );
-	m_graph->setGraphStyle( Graph::NearestStyle );
+	m_graph->setGraphStyle( Graph::Style::Nearest );
 	m_graph->setGraphColor( QColor(0x4E, 0x83, 0x2B) );
 	m_graph->move( 37, 199 );
 	m_graph->resize(208, 47);
-	ToolTip::add( m_graph, tr( "Wave pattern graph" ) );
-}
-
-
-FreeBoyInstrumentView::~FreeBoyInstrumentView()
-{
+	m_graph->setToolTip(tr("Wave pattern graph"));
 }
 
 
 void FreeBoyInstrumentView::modelChanged()
 {
-	FreeBoyInstrument * p = castModel<FreeBoyInstrument>();
+	auto p = castModel<FreeBoyInstrument>();
 
 	m_ch1SweepTimeKnob->setModel( &p->m_ch1SweepTimeModel );
 	m_ch1SweepDirButton->setModel( &p->m_ch1SweepDirModel );
@@ -724,6 +724,9 @@ void FreeBoyInstrumentView::modelChanged()
 	m_graph->setModel( &p->m_graphModel );
 }
 
+
+} // namespace gui
+
 extern "C"
 {
 
@@ -738,3 +741,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 }
 
 
+} // namespace lmms

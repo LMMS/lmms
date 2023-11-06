@@ -5,7 +5,7 @@
   <song>
     <trackcontainer visible="1" width="600" height="300" type="song" x="6" y="5" maximized="0" minimized="0">
       <track type="0" muted="0" name="Default" solo="0">
-        <instrumenttrack pitch="0" vol="100" fxch="0" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
+        <instrumenttrack pitch="0" vol="100" mixch="0" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
           <instrument name="tripleoscillator">
             <tripleoscillator finel0="0" vol1="33" finel1="0" coarse0="0" finer0="0" vol2="33" pan0="0" finer1="0" coarse1="0" finel2="0" pan1="0" coarse2="0" finer2="0" pan2="0" wavetype0="0" wavetype1="0" wavetype2="0" phoffset0="0" phoffset1="0" phoffset2="0" modalgo1="2" modalgo2="2" modalgo3="2" stphdetun0="0" stphdetun1="0" stphdetun2="0" userwavefile0="" userwavefile1="" userwavefile2="" vol0="33"/>
           </instrument>
@@ -20,11 +20,11 @@
           <fxchain numofeffects="0" enabled="0"/>
         </instrumenttrack>
       </track>
-      <track type="1" muted="0" name="Beat/Bassline 0" solo="0">
+      <track type="1" muted="0" name="Pattern 0" solo="0">
         <bbtrack>
           <trackcontainer visible="1" width="580" height="300" type="bbtrackcontainer" x="610" y="5" maximized="0" minimized="0">
             <track type="0" muted="0" name="Clap.ds" solo="0">
-              <instrumenttrack pitch="0" vol="100" fxch="1" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
+              <instrumenttrack pitch="0" vol="100" mixch="1" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
                 <instrument name="audiofileprocessor">
                   <audiofileprocessor interp="1" reversed="0" looped="0" sframe="0" lframe="0" eframe="1" src="drumsynth/cr8000/Clap.ds" amp="100" stutter="0"/>
                 </instrument>
@@ -41,7 +41,7 @@
               <pattern type="0" muted="0" steps="16" name="Clap.ds" pos="0" len="192"/>
             </track>
             <track type="0" muted="0" name="Clave.ds" solo="0">
-              <instrumenttrack pitch="0" vol="100" fxch="1" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
+              <instrumenttrack pitch="0" vol="100" mixch="1" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
                 <instrument name="audiofileprocessor">
                   <audiofileprocessor interp="1" reversed="0" looped="0" sframe="0" lframe="0" eframe="1" src="drumsynth/cr8000/Clave.ds" amp="100" stutter="0"/>
                 </instrument>
@@ -58,7 +58,7 @@
               <pattern type="0" muted="0" steps="16" name="Clave.ds" pos="0" len="192"/>
             </track>
             <track type="0" muted="0" name="Conga_l.ds" solo="0">
-              <instrumenttrack pitch="0" vol="100" fxch="1" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
+              <instrumenttrack pitch="0" vol="100" mixch="1" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
                 <instrument name="audiofileprocessor">
                   <audiofileprocessor interp="1" reversed="0" looped="0" sframe="0" lframe="0" eframe="1" src="drumsynth/cr8000/Conga_l.ds" amp="100" stutter="0"/>
                 </instrument>
@@ -75,7 +75,7 @@
               <pattern type="0" muted="0" steps="16" name="Conga_l.ds" pos="0" len="192"/>
             </track>
             <track type="0" muted="0" name="Conga_m.ds" solo="0">
-              <instrumenttrack pitch="0" vol="100" fxch="1" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
+              <instrumenttrack pitch="0" vol="100" mixch="1" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
                 <instrument name="audiofileprocessor">
                   <audiofileprocessor interp="1" reversed="0" looped="0" sframe="0" lframe="0" eframe="1" src="drumsynth/cr8000/Conga_m.ds" amp="100" stutter="0"/>
                 </instrument>
@@ -92,7 +92,7 @@
               <pattern type="0" muted="0" steps="16" name="Conga_m.ds" pos="0" len="192"/>
             </track>
             <track type="0" muted="0" name="Cowbell.ds" solo="0">
-              <instrumenttrack pitch="0" vol="100" fxch="1" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
+              <instrumenttrack pitch="0" vol="100" mixch="1" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
                 <instrument name="audiofileprocessor">
                   <audiofileprocessor interp="1" reversed="0" looped="0" sframe="0" lframe="0" eframe="1" src="drumsynth/cr8000/Cowbell.ds" amp="100" stutter="0"/>
                 </instrument>
@@ -109,7 +109,7 @@
               <pattern type="0" muted="0" steps="16" name="Cowbell.ds" pos="0" len="192"/>
             </track>
             <track type="0" muted="0" name="Cymbal.ds" solo="0">
-              <instrumenttrack pitch="0" vol="100" fxch="1" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
+              <instrumenttrack pitch="0" vol="100" mixch="1" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
                 <instrument name="audiofileprocessor">
                   <audiofileprocessor interp="1" reversed="0" looped="0" sframe="0" lframe="0" eframe="1" src="drumsynth/cr8000/Cymbal.ds" amp="100" stutter="0"/>
                 </instrument>
@@ -126,7 +126,7 @@
               <pattern type="0" muted="0" steps="16" name="Cymbal.ds" pos="0" len="192"/>
             </track>
             <track type="0" muted="0" name="Hat_c.ds" solo="0">
-              <instrumenttrack pitch="0" vol="100" fxch="1" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
+              <instrumenttrack pitch="0" vol="100" mixch="1" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
                 <instrument name="audiofileprocessor">
                   <audiofileprocessor interp="1" reversed="0" looped="0" sframe="0" lframe="0" eframe="1" src="drumsynth/cr8000/Hat_c.ds" amp="100" stutter="0"/>
                 </instrument>
@@ -143,7 +143,7 @@
               <pattern type="0" muted="0" steps="16" name="Hat_c.ds" pos="0" len="192"/>
             </track>
             <track type="0" muted="0" name="Hat_o.ds" solo="0">
-              <instrumenttrack pitch="0" vol="100" fxch="1" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
+              <instrumenttrack pitch="0" vol="100" mixch="1" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
                 <instrument name="audiofileprocessor">
                   <audiofileprocessor interp="1" reversed="0" looped="0" sframe="0" lframe="0" eframe="1" src="drumsynth/cr8000/Hat_o.ds" amp="100" stutter="0"/>
                 </instrument>
@@ -160,7 +160,7 @@
               <pattern type="0" muted="0" steps="16" name="Hat_o.ds" pos="0" len="192"/>
             </track>
             <track type="0" muted="0" name="Kick.ds" solo="0">
-              <instrumenttrack pitch="0" vol="100" fxch="1" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
+              <instrumenttrack pitch="0" vol="100" mixch="1" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
                 <instrument name="audiofileprocessor">
                   <audiofileprocessor interp="1" reversed="0" looped="0" sframe="0" lframe="0" eframe="1" src="drumsynth/cr8000/Kick.ds" amp="100" stutter="0"/>
                 </instrument>
@@ -177,7 +177,7 @@
               <pattern type="0" muted="0" steps="16" name="Kick.ds" pos="0" len="192"/>
             </track>
             <track type="0" muted="0" name="Rim.ds" solo="0">
-              <instrumenttrack pitch="0" vol="100" fxch="1" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
+              <instrumenttrack pitch="0" vol="100" mixch="1" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
                 <instrument name="audiofileprocessor">
                   <audiofileprocessor interp="1" reversed="0" looped="0" sframe="0" lframe="0" eframe="1" src="drumsynth/cr8000/Rim.ds" amp="100" stutter="0"/>
                 </instrument>
@@ -194,7 +194,7 @@
               <pattern type="0" muted="0" steps="16" name="Rim.ds" pos="0" len="192"/>
             </track>
             <track type="0" muted="0" name="Snare.ds" solo="0">
-              <instrumenttrack pitch="0" vol="100" fxch="1" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
+              <instrumenttrack pitch="0" vol="100" mixch="1" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
                 <instrument name="audiofileprocessor">
                   <audiofileprocessor interp="1" reversed="0" looped="0" sframe="0" lframe="0" eframe="1" src="drumsynth/cr8000/Snare.ds" amp="100" stutter="0"/>
                 </instrument>
@@ -232,15 +232,15 @@
       <automationpattern prog="0" mute="0" name="Master volume" pos="0" tens="1" len="192"/>
       <automationpattern prog="0" mute="0" name="Master pitch" pos="0" tens="1" len="192"/>
     </track>
-    <fxmixer visible="1" width="561" height="332" x="10" y="314" maximized="0" minimized="0">
-      <fxchannel num="0" muted="0" volume="1" name="Master" soloed="0">
+    <mixer visible="1" width="561" height="332" x="10" y="314" maximized="0" minimized="0">
+      <mixerchannel num="0" muted="0" volume="1" name="Master" soloed="0">
         <fxchain numofeffects="0" enabled="0"/>
-      </fxchannel>
-      <fxchannel num="1" muted="0" volume="0.4" name="cr8000" soloed="0">
+      </mixerchannel>
+      <mixerchannel num="1" muted="0" volume="0.4" name="cr8000" soloed="0">
         <fxchain numofeffects="0" enabled="0"/>
         <send amount="1" channel="0"/>
-      </fxchannel>
-    </fxmixer>
+      </mixerchannel>
+    </mixer>
     <ControllerRackView visible="1" width="258" height="142" x="608" y="307" maximized="0" minimized="0"/>
     <pianoroll visible="0" width="640" height="480" x="1" y="200" maximized="0" minimized="0"/>
     <automationeditor visible="0" width="640" height="400" x="56" y="255" maximized="0" minimized="0"/>

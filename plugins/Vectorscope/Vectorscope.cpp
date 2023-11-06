@@ -27,19 +27,22 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
 
 extern "C" {
 	Plugin::Descriptor PLUGIN_EXPORT vectorscope_plugin_descriptor =
 	{
-		STRINGIFY(PLUGIN_NAME),
+		LMMS_STRINGIFY(PLUGIN_NAME),
 		"Vectorscope",
 		QT_TRANSLATE_NOOP("PluginBrowser", "A stereo field visualizer."),
 		"Martin Pavelek <he29/dot/HS/at/gmail/dot/com>",
 		0x0100,
-		Plugin::Effect,
+		Plugin::Type::Effect,
 		new PluginPixmapLoader("logo"),
-		NULL,
-		NULL
+		nullptr,
+		nullptr,
 	};
 }
 
@@ -78,3 +81,5 @@ extern "C" {
 	}
 }
 
+
+} // namespace lmms

@@ -29,8 +29,17 @@
 
 #include "EffectControls.h"
 
+namespace lmms
+{
+
 
 class Vectorscope;
+
+namespace gui
+{
+class VecControlsDialog;
+class VectorView;
+}
 
 // Holds all the configuration values
 class VecControls : public EffectControls
@@ -38,9 +47,9 @@ class VecControls : public EffectControls
 	Q_OBJECT
 public:
 	explicit VecControls(Vectorscope *effect);
-	virtual ~VecControls() {}
+	~VecControls() override = default;
 
-	EffectControlDialog *createView() override;
+	gui::EffectControlDialog* createView() override;
 
 	void saveSettings (QDomDocument &document, QDomElement &element) override;
 	void loadSettings (const QDomElement &element) override;
@@ -60,7 +69,11 @@ private:
 	QColor m_colorLabels;
 	QColor m_colorOutline;
 
-	friend class VecControlsDialog;
-	friend class VectorView;
+	friend class gui::VecControlsDialog;
+	friend class gui::VectorView;
 };
+
+
+} // namespace lmms
+
 #endif // VECCONTROLS_H

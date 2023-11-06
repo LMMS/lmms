@@ -23,12 +23,15 @@
  *
  */
 
-#include <QLayout>
 
 #include "AmplifierControlDialog.h"
 #include "AmplifierControls.h"
 #include "embed.h"
+#include "Knob.h"
 
+
+namespace lmms::gui
+{
 
 
 AmplifierControlDialog::AmplifierControlDialog( AmplifierControls* controls ) :
@@ -40,30 +43,33 @@ AmplifierControlDialog::AmplifierControlDialog( AmplifierControls* controls ) :
 	setPalette( pal );
 	setFixedSize( 100, 110 );
 
-	Knob * volumeKnob = new Knob( knobBright_26, this);
+	auto volumeKnob = new Knob(KnobType::Bright26, this);
 	volumeKnob -> move( 16, 10 );
 	volumeKnob -> setVolumeKnob( true );
 	volumeKnob->setModel( &controls->m_volumeModel );
 	volumeKnob->setLabel( tr( "VOL" ) );
 	volumeKnob->setHintText( tr( "Volume:" ) , "%" );
 
-	Knob * panKnob = new Knob( knobBright_26, this);
+	auto panKnob = new Knob(KnobType::Bright26, this);
 	panKnob -> move( 57, 10 );
 	panKnob->setModel( &controls->m_panModel );
 	panKnob->setLabel( tr( "PAN" ) );
 	panKnob->setHintText( tr( "Panning:" ) , "" );
 
-	Knob * leftKnob = new Knob( knobBright_26, this);
+	auto leftKnob = new Knob(KnobType::Bright26, this);
 	leftKnob -> move( 16, 65 );
 	leftKnob -> setVolumeKnob( true );
 	leftKnob->setModel( &controls->m_leftModel );
 	leftKnob->setLabel( tr( "LEFT" ) );
 	leftKnob->setHintText( tr( "Left gain:" ) , "%" );
 
-	Knob * rightKnob = new Knob( knobBright_26, this);
+	auto rightKnob = new Knob(KnobType::Bright26, this);
 	rightKnob -> move( 57, 65 );
 	rightKnob -> setVolumeKnob( true );
 	rightKnob->setModel( &controls->m_rightModel );
 	rightKnob->setLabel( tr( "RIGHT" ) );
 	rightKnob->setHintText( tr( "Right gain:" ) , "%" );
 }
+
+
+} // namespace lmms::gui

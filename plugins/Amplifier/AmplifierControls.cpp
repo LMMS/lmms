@@ -28,9 +28,9 @@
 
 #include "AmplifierControls.h"
 #include "Amplifier.h"
-#include "Engine.h"
-#include "Song.h"
 
+namespace lmms
+{
 
 AmplifierControls::AmplifierControls( AmplifierEffect* effect ) :
 	EffectControls( effect ),
@@ -77,6 +77,6 @@ void AmplifierControls::saveSettings( QDomDocument& doc, QDomElement& _this )
 }
 
 
-
+} // namespace lmms
 
 

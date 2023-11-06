@@ -8,6 +8,12 @@
 
 #cmakedefine LMMS_HOST_X86
 #cmakedefine LMMS_HOST_X86_64
+#cmakedefine LMMS_HOST_ARM32
+#cmakedefine LMMS_HOST_ARM64
+#cmakedefine LMMS_HOST_RISCV32
+#cmakedefine LMMS_HOST_RISCV64
+#cmakedefine LMMS_HOST_PPC32
+#cmakedefine LMMS_HOST_PPC64
 
 #cmakedefine LMMS_HAVE_ALSA
 #cmakedefine LMMS_HAVE_FLUIDSYNTH
@@ -17,6 +23,7 @@
 #cmakedefine LMMS_HAVE_LV2
 #cmakedefine LMMS_HAVE_SUIL
 #cmakedefine LMMS_HAVE_MP3LAME
+#cmakedefine LMMS_HAVE_SNDFILE_MP3
 #cmakedefine LMMS_HAVE_OGGVORBIS
 #cmakedefine LMMS_HAVE_OSS
 #cmakedefine LMMS_HAVE_SNDIO
@@ -31,14 +38,11 @@
 
 #cmakedefine LMMS_DEBUG_FPE
 
-#cmakedefine LMMS_HAVE_STDINT_H
-#cmakedefine LMMS_HAVE_STDLIB_H
 #cmakedefine LMMS_HAVE_PTHREAD_H
 #cmakedefine LMMS_HAVE_UNISTD_H
 #cmakedefine LMMS_HAVE_SYS_TYPES_H
 #cmakedefine LMMS_HAVE_SYS_IPC_H
 #cmakedefine LMMS_HAVE_SEMAPHORE_H
-#cmakedefine LMMS_HAVE_SYS_SHM_H
 #cmakedefine LMMS_HAVE_SYS_TIME_H
 #cmakedefine LMMS_HAVE_SYS_TIMES_H
 #cmakedefine LMMS_HAVE_SCHED_H
@@ -50,25 +54,3 @@
 #cmakedefine LMMS_HAVE_STRING_H
 #cmakedefine LMMS_HAVE_PROCESS_H
 #cmakedefine LMMS_HAVE_LOCALE_H
-
-/* defines for libsamplerate */
-
-
-/* Target processor clips on negative float to int conversion. */
-#cmakedefine CPU_CLIPS_NEGATIVE 1
-#ifndef CPU_CLIPS_NEGATIVE
-#define CPU_CLIPS_NEGATIVE 0
-#endif
-
-/* Target processor clips on positive float to int conversion. */
-#cmakedefine CPU_CLIPS_POSITIVE 1
-#ifndef CPU_CLIPS_POSITIVE
-#define CPU_CLIPS_POSITIVE 0
-#endif
-
-/* Define if you have C99's lrint function. */
-#cmakedefine HAVE_LRINT 1
-
-/* Define if you have C99's lrintf function. */
-#cmakedefine HAVE_LRINTF 1
-

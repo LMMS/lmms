@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LV2URIDMAP_H
-#define LV2URIDMAP_H
+#ifndef LMMS_LV2_URID_MAP_H
+#define LMMS_LV2_URID_MAP_H
 
 #include "lmmsconfig.h"
 
@@ -34,6 +34,11 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+
+
+namespace lmms
+{
+
 
 /**
  * Complete implementation of the Lv2 Urid Map extension
@@ -50,8 +55,6 @@ class UridMap
 	LV2_URID_Map m_mapFeature;
 	LV2_URID_Unmap m_unmapFeature;
 
-	LV2_URID m_lastUrid = 0;
-
 public:
 	//! constructor; will set up the features
 	UridMap();
@@ -66,5 +69,9 @@ public:
 	LV2_URID_Unmap* unmapFeature() { return &m_unmapFeature; }
 };
 
+
+} // namespace lmms
+
 #endif // LMMS_HAVE_LV2
-#endif // LV2URIDMAP_H
+
+#endif // LMMS_LV2_URID_MAP_H

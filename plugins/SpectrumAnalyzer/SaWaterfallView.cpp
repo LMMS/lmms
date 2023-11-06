@@ -31,13 +31,17 @@
 #include <QMouseEvent>
 #include <QMutexLocker>
 #include <QPainter>
-#include <QSplitter>
 #include <QString>
 
 #include "EffectControlDialog.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "SaControls.h"
 #include "SaProcessor.h"
+
+
+namespace lmms::gui
+{
 
 
 SaWaterfallView::SaWaterfallView(SaControls *controls, SaProcessor *processor, QWidget *_parent) :
@@ -49,7 +53,7 @@ SaWaterfallView::SaWaterfallView(SaControls *controls, SaProcessor *processor, Q
 	setMinimumSize(300, 150);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-	connect(gui->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicUpdate()));
+	connect(getGUI()->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicUpdate()));
 
 	m_displayTop = 1;
 	m_displayBottom = height() -2;
@@ -341,3 +345,6 @@ void SaWaterfallView::resizeEvent(QResizeEvent *event)
 {
 	m_timeTics = makeTimeTics();
 }
+
+
+} // namespace lmms::gui

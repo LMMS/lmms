@@ -26,17 +26,20 @@
 
 #ifdef LMMS_HAVE_SDL
 
-#include <QLabel>
+#include <QFormLayout>
 #include <QLineEdit>
+#include <SDL.h>
 
-#include "Engine.h"
+#include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "gui_templates.h"
-#include "Mixer.h"
 
-AudioSdl::AudioSdl( bool & _success_ful, Mixer*  _mixer ) :
-	AudioDevice( DEFAULT_CHANNELS, _mixer ),
-	m_outBuf( new surroundSampleFrame[mixer()->framesPerPeriod()] )
+namespace lmms
+{
+
+AudioSdl::AudioSdl( bool & _success_ful, AudioEngine*  _audioEngine ) :
+	AudioDevice( DEFAULT_CHANNELS, _audioEngine ),
+	m_outBuf( new surroundSampleFrame[audioEngine()->framesPerPeriod()] )
 {
 	_success_ful = false;
 
@@ -44,7 +47,7 @@ AudioSdl::AudioSdl( bool & _success_ful, Mixer*  _mixer ) :
 	m_currentBufferFramesCount = 0;
 	m_currentBufferFramePos = 0;
 #else
-	m_convertedBufSize = mixer()->framesPerPeriod() * channels()
+	m_convertedBufSize = audioEngine()->framesPerPeriod() * channels()
 						* sizeof( int_sample_t );
 	m_convertedBufPos = 0;
 	m_convertedBuf = new Uint8[m_convertedBufSize];
@@ -67,7 +70,7 @@ AudioSdl::AudioSdl( bool & _success_ful, Mixer*  _mixer ) :
 						// to convert the buffers
 #endif
 	m_audioHandle.channels = channels();
-	m_audioHandle.samples = qMax( 1024, mixer()->framesPerPeriod()*2 );
+	m_audioHandle.samples = std::max(1024, audioEngine()->framesPerPeriod() * 2);
 
 	m_audioHandle.callback = sdlAudioCallback;
 	m_audioHandle.userdata = this;
@@ -75,7 +78,7 @@ AudioSdl::AudioSdl( bool & _success_ful, Mixer*  _mixer ) :
   	SDL_AudioSpec actual; 
 
 #ifdef LMMS_HAVE_SDL2
-	m_outputDevice = SDL_OpenAudioDevice (NULL,
+	m_outputDevice = SDL_OpenAudioDevice (nullptr,
 										  0,
 										  &m_audioHandle,
 										  &actual,
@@ -105,7 +108,7 @@ AudioSdl::AudioSdl( bool & _success_ful, Mixer*  _mixer ) :
 	m_inputAudioHandle = m_audioHandle;
 	m_inputAudioHandle.callback = sdlInputAudioCallback;
 
-	m_inputDevice = SDL_OpenAudioDevice (NULL,
+	m_inputDevice = SDL_OpenAudioDevice (nullptr,
 										 1,
 										 &m_inputAudioHandle,
 										 &actual,
@@ -200,7 +203,7 @@ void AudioSdl::applyQualitySettings()
 	{
 		SDL_CloseAudio();
 
-		setSampleRate( Engine::mixer()->processingSampleRate() );
+		setSampleRate( Engine::audioEngine()->processingSampleRate() );
 
 		m_audioHandle.freq = sampleRate();
 
@@ -222,7 +225,7 @@ void AudioSdl::applyQualitySettings()
 
 void AudioSdl::sdlAudioCallback( void * _udata, Uint8 * _buf, int _len )
 {
-	AudioSdl * _this = static_cast<AudioSdl *>( _udata );
+	auto _this = static_cast<AudioSdl*>(_udata);
 
 	_this->sdlAudioCallback( _buf, _len );
 }
@@ -254,11 +257,11 @@ void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 			m_currentBufferFramesCount = frames;
 
 		}
-		const uint min_frames_count = qMin( _len/sizeof(sampleFrame),
+		const uint min_frames_count = std::min(_len/sizeof(sampleFrame),
 										  m_currentBufferFramesCount
-										- m_currentBufferFramePos );
+										- m_currentBufferFramePos);
 
-		const float gain = mixer()->masterGain();
+		const float gain = audioEngine()->masterGain();
 		for (uint f = 0; f < min_frames_count; f++)
 		{
 			(m_outBuf + m_currentBufferFramePos)[f][0] *= gain;
@@ -289,34 +292,34 @@ void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 						* sizeof( int_sample_t );
 
 			convertToS16( m_outBuf, frames,
-						mixer()->masterGain(),
+						audioEngine()->masterGain(),
 						(int_sample_t *)m_convertedBuf,
 						m_outConvertEndian );
 		}
-		const int min_len = qMin( _len, m_convertedBufSize
-							- m_convertedBufPos );
+		const int min_len = std::min(_len, m_convertedBufSize
+							- m_convertedBufPos);
 		memcpy( _buf, m_convertedBuf + m_convertedBufPos, min_len );
 		_buf += min_len;
 		_len -= min_len;
 		m_convertedBufPos += min_len;
 		m_convertedBufPos %= m_convertedBufSize;
 	}
-#endif
+#endif // LMMS_HAVE_SDL2
 }
 
 #ifdef LMMS_HAVE_SDL2
 
 void AudioSdl::sdlInputAudioCallback(void *_udata, Uint8 *_buf, int _len) {
-	AudioSdl * _this = static_cast<AudioSdl *>( _udata );
+	auto _this = static_cast<AudioSdl*>(_udata);
 
 	_this->sdlInputAudioCallback( _buf, _len );
 }
 
 void AudioSdl::sdlInputAudioCallback(Uint8 *_buf, int _len) {
-	sampleFrame *samples_buffer = (sampleFrame *) _buf;
+	auto samples_buffer = (sampleFrame*)_buf;
 	fpp_t frames = _len / sizeof ( sampleFrame );
 
-	mixer()->pushInputFrames (samples_buffer, frames);
+	audioEngine()->pushInputFrames (samples_buffer, frames);
 }
 
 #endif
@@ -324,21 +327,12 @@ void AudioSdl::sdlInputAudioCallback(Uint8 *_buf, int _len) {
 AudioSdl::setupWidget::setupWidget( QWidget * _parent ) :
 	AudioDeviceSetupWidget( AudioSdl::name(), _parent )
 {
+	QFormLayout * form = new QFormLayout(this);
+
 	QString dev = ConfigManager::inst()->value( "audiosdl", "device" );
 	m_device = new QLineEdit( dev, this );
-	m_device->setGeometry( 10, 20, 160, 20 );
 
-	QLabel * dev_lbl = new QLabel( tr( "Device" ), this );
-	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
-	dev_lbl->setGeometry( 10, 40, 160, 10 );
-
-}
-
-
-
-
-AudioSdl::setupWidget::~setupWidget()
-{
+	form->addRow(tr("Device"), m_device);
 }
 
 
@@ -351,5 +345,7 @@ void AudioSdl::setupWidget::saveSettings()
 }
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_HAVE_SDL
 

@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef GUI_TEMPLATES_H
-#define GUI_TEMPLATES_H
+#ifndef LMMS_GUI_TEMPLATES_H
+#define LMMS_GUI_TEMPLATES_H
 
 #include "lmmsconfig.h"
 
@@ -32,6 +31,8 @@
 #include <QFont>
 #include <QDesktopWidget>
 
+namespace lmms
+{
 
 
 // return DPI-independent font-size - font with returned font-size has always
@@ -65,4 +66,6 @@ inline QFont pointSizeF( QFont _f, float SIZE )
 }
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_GUI_TEMPLATES_H

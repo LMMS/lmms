@@ -25,9 +25,8 @@
 #include "Plugin.h"
 
 #include <QtGlobal>
-#include <QtCore/QDebug>
-#include <QtCore/QDir>
-#include <QtCore/QLibrary>
+#include <QDomElement>
+#include <QLibrary>
 #include <QMessageBox>
 
 #include "embed.h"
@@ -36,6 +35,10 @@
 #include "DummyPlugin.h"
 #include "AutomatableModel.h"
 #include "Song.h"
+#include "PluginFactory.h"
+
+namespace lmms
+{
 
 
 static PixmapLoader dummyLoader;
@@ -47,9 +50,9 @@ static Plugin::Descriptor dummyPluginDescriptor =
 	QT_TRANSLATE_NOOP( "PluginBrowser", "no description" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
-	Plugin::Undefined,
+	Plugin::Type::Undefined,
 	&dummyLoader,
-	NULL
+	nullptr
 } ;
 
 
@@ -62,17 +65,10 @@ Plugin::Plugin(const Descriptor * descriptor, Model * parent, const
 	m_descriptor(descriptor),
 	m_key(key ? *key : Descriptor::SubPluginFeatures::Key(m_descriptor))
 {
-	if( m_descriptor == NULL )
+	if( m_descriptor == nullptr )
 	{
 		m_descriptor = &dummyPluginDescriptor;
 	}
-}
-
-
-
-
-Plugin::~Plugin()
-{
 }
 
 
@@ -184,7 +180,6 @@ AutomatableModel * Plugin::childModel( const QString & )
 
 
 
-#include "PluginFactory.h"
 Plugin * Plugin::instantiateWithKey(const QString& pluginName, Model * parent,
 				const Descriptor::SubPluginFeatures::Key *key,
 				bool keyFromDnd)
@@ -194,7 +189,7 @@ Plugin * Plugin::instantiateWithKey(const QString& pluginName, Model * parent,
 	const Descriptor::SubPluginFeatures::Key *keyPtr = keyFromDnd
 		? static_cast<Plugin::Descriptor::SubPluginFeatures::Key*>(Engine::pickDndPluginKey())
 		: key;
-	const PluginFactory::PluginInfo& pi = pluginFactory->pluginInfo(pluginName.toUtf8());
+	const PluginFactory::PluginInfo& pi = getPluginFactory()->pluginInfo(pluginName.toUtf8());
 	if(keyPtr)
 	{
 		// descriptor is not yet set when loading - set it now
@@ -214,17 +209,17 @@ Plugin * Plugin::instantiateWithKey(const QString& pluginName, Model * parent,
 Plugin * Plugin::instantiate(const QString& pluginName, Model * parent,
 								void *data)
 {
-	const PluginFactory::PluginInfo& pi = pluginFactory->pluginInfo(pluginName.toUtf8());
+	const PluginFactory::PluginInfo& pi = getPluginFactory()->pluginInfo(pluginName.toUtf8());
 
 	Plugin* inst;
 	if( pi.isNull() )
 	{
-		if( gui )
+		if (gui::getGUI() != nullptr)
 		{
-			QMessageBox::information( NULL,
+			QMessageBox::information( nullptr,
 				tr( "Plugin not found" ),
 				tr( "The plugin \"%1\" wasn't found or could not be loaded!\nReason: \"%2\"" ).
-						arg( pluginName ).arg( pluginFactory->errorString(pluginName) ),
+						arg( pluginName ).arg( getPluginFactory()->errorString(pluginName) ),
 				QMessageBox::Ok | QMessageBox::Default );
 		}
 		inst = new DummyPlugin();
@@ -241,9 +236,9 @@ Plugin * Plugin::instantiate(const QString& pluginName, Model * parent,
 		}
 		else
 		{
-			if( gui )
+			if (gui::getGUI() != nullptr)
 			{
-				QMessageBox::information( NULL,
+				QMessageBox::information( nullptr,
 					tr( "Error while loading plugin" ),
 					tr( "Failed to load plugin \"%1\"!").arg( pluginName ),
 					QMessageBox::Ok | QMessageBox::Default );
@@ -266,10 +261,10 @@ void Plugin::collectErrorForUI( QString errMsg )
 
 
 
-PluginView * Plugin::createView( QWidget * parent )
+gui::PluginView * Plugin::createView( QWidget * parent )
 {
-	PluginView * pv = instantiateView( parent );
-	if( pv != NULL )
+	gui::PluginView * pv = instantiateView( parent );
+	if( pv != nullptr )
 	{
 		pv->setModel( this );
 	}
@@ -280,7 +275,7 @@ PluginView * Plugin::createView( QWidget * parent )
 
 
 Plugin::Descriptor::SubPluginFeatures::Key::Key( const QDomElement & key ) :
-	desc( NULL ),
+	desc( nullptr ),
 	name( key.attribute( "key" ) ),
 	attributes()
 {
@@ -313,3 +308,4 @@ QDomElement Plugin::Descriptor::SubPluginFeatures::Key::saveXML(
 
 
 
+} // namespace lmms

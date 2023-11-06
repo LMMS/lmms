@@ -28,15 +28,23 @@
 #define SAPROCESSOR_H
 
 #include <atomic>
-#include <QColor>
+#include <fftw3.h>
 #include <QMutex>
+#include <QRgb>
 #include <vector>
 
-#include "fft_helpers.h"
-#include "SaControls.h"
+#include "lmms_basics.h"
+
+
+namespace lmms
+{
 
 template<class T>
 class LocklessRingBuffer;
+
+class SaControls;
+
+
 
 //! Receives audio data, runs FFT analysis and stores the result.
 class SaProcessor
@@ -156,5 +164,9 @@ private:
 		float m_max_execution;
 	#endif
 };
+
+
+} // namespace lmms
+
 #endif // SAPROCESSOR_H
 

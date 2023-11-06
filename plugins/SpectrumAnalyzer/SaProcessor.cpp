@@ -36,8 +36,13 @@
 #endif
 #include <QMutexLocker>
 
-#include "lmms_math.h"
+#include "fft_helpers.h"
+#include "lmms_constants.h"
 #include "LocklessRingBuffer.h"
+#include "SaControls.h"
+
+namespace lmms
+{
 
 
 SaProcessor::SaProcessor(const SaControls *controls) :
@@ -45,7 +50,7 @@ SaProcessor::SaProcessor(const SaControls *controls) :
 	m_terminate(false),
 	m_inBlockSize(FFT_BLOCK_SIZES[0]),
 	m_fftBlockSize(FFT_BLOCK_SIZES[0]),
-	m_sampleRate(Engine::mixer()->processingSampleRate()),
+	m_sampleRate(Engine::audioEngine()->processingSampleRate()),
 	m_framesFilledUp(0),
 	m_spectrumActive(false),
 	m_waterfallActive(false),
@@ -53,7 +58,7 @@ SaProcessor::SaProcessor(const SaControls *controls) :
 	m_reallocating(false)
 {
 	m_fftWindow.resize(m_inBlockSize, 1.0);
-	precomputeWindow(m_fftWindow.data(), m_inBlockSize, BLACKMAN_HARRIS);
+	precomputeWindow(m_fftWindow.data(), m_inBlockSize, FFTWindow::BlackmanHarris);
 
 	m_bufferL.resize(m_inBlockSize, 0);
 	m_bufferR.resize(m_inBlockSize, 0);
@@ -77,15 +82,15 @@ SaProcessor::SaProcessor(const SaControls *controls) :
 
 SaProcessor::~SaProcessor()
 {
-	if (m_fftPlanL != NULL) {fftwf_destroy_plan(m_fftPlanL);}
-	if (m_fftPlanR != NULL) {fftwf_destroy_plan(m_fftPlanR);}
-	if (m_spectrumL != NULL) {fftwf_free(m_spectrumL);}
-	if (m_spectrumR != NULL) {fftwf_free(m_spectrumR);}
+	if (m_fftPlanL != nullptr) {fftwf_destroy_plan(m_fftPlanL);}
+	if (m_fftPlanR != nullptr) {fftwf_destroy_plan(m_fftPlanR);}
+	if (m_spectrumL != nullptr) {fftwf_free(m_spectrumL);}
+	if (m_spectrumR != nullptr) {fftwf_free(m_spectrumR);}
 
-	m_fftPlanL = NULL;
-	m_fftPlanR = NULL;
-	m_spectrumL = NULL;
-	m_spectrumR = NULL;
+	m_fftPlanL = nullptr;
+	m_fftPlanR = nullptr;
+	m_spectrumL = nullptr;
+	m_spectrumR = nullptr;
 }
 
 
@@ -158,7 +163,7 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 				#endif
 
 				// update sample rate
-				m_sampleRate = Engine::mixer()->processingSampleRate();
+				m_sampleRate = Engine::audioEngine()->processingSampleRate();
 
 				// apply FFT window
 				for (unsigned int i = 0; i < m_inBlockSize; i++)
@@ -194,7 +199,7 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 				if (m_waterfallActive && m_waterfallNotEmpty)
 				{
 					// move waterfall history one line down and clear the top line
-					QRgb *pixel = (QRgb *)m_history_work.data();
+					auto pixel = (QRgb*)m_history_work.data();
 					std::copy(pixel,
 							  pixel + waterfallWidth() * m_waterfallHeight - waterfallWidth(),
 							  pixel + waterfallWidth());
@@ -225,12 +230,9 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 							if (band_end - band_start > 1.0)
 							{
 								// band spans multiple pixels: draw all pixels it covers
-								for (target = (int)band_start; target < (int)band_end; target++)
+								for (target = std::max((int)band_start, 0); target < band_end && target < waterfallWidth(); target++)
 								{
-									if (target >= 0 && target < waterfallWidth())
-									{
-										pixel[target] = makePixel(m_normSpectrumL[i], m_normSpectrumR[i]);
-									}
+									pixel[target] = makePixel(m_normSpectrumL[i], m_normSpectrumR[i]);
 								}
 								// save remaining portion of the band for the following band / pixel
 								// (in case the next band uses sub-pixel drawing)
@@ -265,12 +267,9 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 						else
 						{
 							// Linear: always draws one or more pixels per band
-							for (target = (int)band_start; target < band_end; target++)
+							for (target = std::max((int)band_start, 0); target < band_end && target < waterfallWidth(); target++)
 							{
-								if (target >= 0 && target < waterfallWidth())
-								{
-									pixel[target] = makePixel(m_normSpectrumL[i], m_normSpectrumR[i]);
-								}
+								pixel[target] = makePixel(m_normSpectrumL[i], m_normSpectrumR[i]);
 							}
 						}
 					}
@@ -396,14 +395,14 @@ void SaProcessor::reallocateBuffers()
 	QMutexLocker data_lock(&m_dataAccess);
 
 	// destroy old FFT plan and free the result buffer
-	if (m_fftPlanL != NULL) {fftwf_destroy_plan(m_fftPlanL);}
-	if (m_fftPlanR != NULL) {fftwf_destroy_plan(m_fftPlanR);}
-	if (m_spectrumL != NULL) {fftwf_free(m_spectrumL);}
-	if (m_spectrumR != NULL) {fftwf_free(m_spectrumR);}
+	if (m_fftPlanL != nullptr) {fftwf_destroy_plan(m_fftPlanL);}
+	if (m_fftPlanR != nullptr) {fftwf_destroy_plan(m_fftPlanR);}
+	if (m_spectrumL != nullptr) {fftwf_free(m_spectrumL);}
+	if (m_spectrumR != nullptr) {fftwf_free(m_spectrumR);}
 
 	// allocate new space, create new plan and resize containers
 	m_fftWindow.resize(new_in_size, 1.0);
-	precomputeWindow(m_fftWindow.data(), new_in_size, (FFT_WINDOWS) m_controls->m_windowModel.value());
+	precomputeWindow(m_fftWindow.data(), new_in_size, (FFTWindow) m_controls->m_windowModel.value());
 	m_bufferL.resize(new_in_size, 0);
 	m_bufferR.resize(new_in_size, 0);
 	m_filteredBufferL.resize(new_fft_size, 0);
@@ -413,7 +412,7 @@ void SaProcessor::reallocateBuffers()
 	m_fftPlanL = fftwf_plan_dft_r2c_1d(new_fft_size, m_filteredBufferL.data(), m_spectrumL, FFTW_MEASURE);
 	m_fftPlanR = fftwf_plan_dft_r2c_1d(new_fft_size, m_filteredBufferR.data(), m_spectrumR, FFTW_MEASURE);
 
-	if (m_fftPlanL == NULL || m_fftPlanR == NULL)
+	if (m_fftPlanL == nullptr || m_fftPlanR == nullptr)
 	{
 		#ifdef SA_DEBUG
 			std::cerr << "Analyzer: failed to create new FFT plan!" << std::endl;
@@ -449,7 +448,7 @@ void SaProcessor::rebuildWindow()
 {
 	// computation is done in fft_helpers
 	QMutexLocker lock(&m_dataAccess);
-	precomputeWindow(m_fftWindow.data(), m_inBlockSize, (FFT_WINDOWS) m_controls->m_windowModel.value());
+	precomputeWindow(m_fftWindow.data(), m_inBlockSize, (FFTWindow) m_controls->m_windowModel.value());
 }
 
 
@@ -546,33 +545,36 @@ float SaProcessor::binBandwidth() const
 
 float SaProcessor::getFreqRangeMin(bool linear) const
 {
-	switch (m_controls->m_freqRangeModel.value())
+	switch (static_cast<FrequencyRange>(m_controls->m_freqRangeModel.value()))
 	{
-		case FRANGE_AUDIBLE: return FRANGE_AUDIBLE_START;
-		case FRANGE_BASS: return FRANGE_BASS_START;
-		case FRANGE_MIDS: return FRANGE_MIDS_START;
-		case FRANGE_HIGH: return FRANGE_HIGH_START;
+		case FrequencyRange::Audible: return FRANGE_AUDIBLE_START;
+		case FrequencyRange::Bass: return FRANGE_BASS_START;
+		case FrequencyRange::Mids: return FRANGE_MIDS_START;
+		case FrequencyRange::High: return FRANGE_HIGH_START;
 		default:
-		case FRANGE_FULL: return linear ? 0 : LOWEST_LOG_FREQ;
+		case FrequencyRange::Full: return linear ? 0 : LOWEST_LOG_FREQ;
 	}
 }
 
 
 float SaProcessor::getFreqRangeMax() const
 {
-	switch (m_controls->m_freqRangeModel.value())
+	switch (static_cast<FrequencyRange>(m_controls->m_freqRangeModel.value()))
 	{
-		case FRANGE_AUDIBLE: return FRANGE_AUDIBLE_END;
-		case FRANGE_BASS: return FRANGE_BASS_END;
-		case FRANGE_MIDS: return FRANGE_MIDS_END;
-		case FRANGE_HIGH: return FRANGE_HIGH_END;
+		case FrequencyRange::Audible: return FRANGE_AUDIBLE_END;
+		case FrequencyRange::Bass: return FRANGE_BASS_END;
+		case FrequencyRange::Mids: return FRANGE_MIDS_END;
+		case FrequencyRange::High: return FRANGE_HIGH_END;
 		default:
-		case FRANGE_FULL: return getNyquistFreq();
+		case FrequencyRange::Full: return getNyquistFreq();
 	}
 }
 
 
 // Map frequency to pixel x position on a display of given width.
+// NOTE: Results of this function may be cached by SaSpectrumView. If you use
+// a new function call or variable that can affect results of this function,
+// make sure to also add it as a trigger for cache update in SaSpectrumView.
 float SaProcessor::freqToXPixel(float freq, unsigned int width) const
 {
 	if (m_controls->m_logXModel.value())
@@ -617,26 +619,26 @@ float SaProcessor::getAmpRangeMin(bool linear) const
 {
 	// return very low limit to make sure zero gets included at linear grid
 	if (linear) {return -900;}
-	switch (m_controls->m_ampRangeModel.value())
+	switch (static_cast<AmplitudeRange>(m_controls->m_ampRangeModel.value()))
 	{
-		case ARANGE_EXTENDED: return ARANGE_EXTENDED_START;
-		case ARANGE_SILENT: return ARANGE_SILENT_START;
-		case ARANGE_LOUD: return ARANGE_LOUD_START;
+		case AmplitudeRange::Extended: return ARANGE_EXTENDED_START;
+		case AmplitudeRange::Silent: return ARANGE_SILENT_START;
+		case AmplitudeRange::Loud: return ARANGE_LOUD_START;
 		default:
-		case ARANGE_AUDIBLE: return ARANGE_AUDIBLE_START;
+		case AmplitudeRange::Audible: return ARANGE_AUDIBLE_START;
 	}
 }
 
 
 float SaProcessor::getAmpRangeMax() const
 {
-	switch (m_controls->m_ampRangeModel.value())
+	switch (static_cast<AmplitudeRange>(m_controls->m_ampRangeModel.value()))
 	{
-		case ARANGE_EXTENDED: return ARANGE_EXTENDED_END;
-		case ARANGE_SILENT: return ARANGE_SILENT_END;
-		case ARANGE_LOUD: return ARANGE_LOUD_END;
+		case AmplitudeRange::Extended: return ARANGE_EXTENDED_END;
+		case AmplitudeRange::Silent: return ARANGE_SILENT_END;
+		case AmplitudeRange::Loud: return ARANGE_LOUD_END;
 		default:
-		case ARANGE_AUDIBLE: return ARANGE_AUDIBLE_END;
+		case AmplitudeRange::Audible: return ARANGE_AUDIBLE_END;
 	}
 }
 
@@ -690,3 +692,5 @@ float SaProcessor::yPixelToAmp(float y, unsigned int height) const
 	}
 }
 
+
+} // namespace lmms

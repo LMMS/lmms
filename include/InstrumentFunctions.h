@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef INSTRUMENT_FUNCTIONS_H
-#define INSTRUMENT_FUNCTIONS_H
+#ifndef LMMS_INSTRUMENT_FUNCTIONS_H
+#define LMMS_INSTRUMENT_FUNCTIONS_H
 
 #include "JournallingObject.h"
 #include "lmms_basics.h"
@@ -31,10 +31,19 @@
 #include "TempoSyncKnobModel.h"
 #include "ComboBoxModel.h"
 
+namespace lmms
+{
 
 class InstrumentTrack;
 class NotePlayHandle;
 
+namespace gui
+{
+
+class InstrumentFunctionNoteStackingView;
+class InstrumentFunctionArpeggioView;
+
+}
 
 
 class InstrumentFunctionNoteStacking : public Model, public JournallingObject
@@ -43,13 +52,14 @@ class InstrumentFunctionNoteStacking : public Model, public JournallingObject
 
 public:
 	static const int MAX_CHORD_POLYPHONY = 13;
+	static const int NUM_CHORD_TABLES = 95;
 
 private:
-	typedef int8_t ChordSemiTones [MAX_CHORD_POLYPHONY];
+	using ChordSemiTones = std::array<int8_t, MAX_CHORD_POLYPHONY>;
 
 public:
 	InstrumentFunctionNoteStacking( Model * _parent );
-	virtual ~InstrumentFunctionNoteStacking();
+	~InstrumentFunctionNoteStacking() override = default;
 
 	void processNote( NotePlayHandle* n );
 
@@ -109,7 +119,7 @@ public:
 	};
 
 
-	struct ChordTable : public QVector<Chord>
+	struct ChordTable
 	{
 	private:
 		ChordTable();
@@ -120,7 +130,8 @@ public:
 			ChordSemiTones m_semiTones;
 		};
 
-		static Init s_initTable[];
+		static std::array<Init, NUM_CHORD_TABLES> s_initTable;
+		std::vector<Chord> m_chords;
 
 	public:
 		static const ChordTable & getInstance()
@@ -140,6 +151,11 @@ public:
 		{
 			return getByName( name, false );
 		}
+
+		const std::vector<Chord>& chords() const
+		{
+			return m_chords;
+		}
 	};
 
 
@@ -149,7 +165,7 @@ private:
 	FloatModel m_chordRangeModel;
 
 
-	friend class InstrumentFunctionNoteStackingView;
+	friend class gui::InstrumentFunctionNoteStackingView;
 
 } ;
 
@@ -160,18 +176,17 @@ class InstrumentFunctionArpeggio : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
-	enum ArpDirections
+	enum class ArpDirection
 	{
-		ArpDirUp,
-		ArpDirDown,
-		ArpDirUpAndDown,
-		ArpDirDownAndUp,
-		ArpDirRandom,
-		NumArpDirections
+		Up,
+		Down,
+		UpAndDown,
+		DownAndUp,
+		Random
 	} ;
 
 	InstrumentFunctionArpeggio( Model * _parent );
-	virtual ~InstrumentFunctionArpeggio();
+	~InstrumentFunctionArpeggio() override = default;
 
 	void processNote( NotePlayHandle* n );
 
@@ -186,11 +201,11 @@ public:
 
 
 private:
-	enum ArpModes
+	enum class ArpMode
 	{
-		FreeMode,
-		SortMode,
-		SyncMode
+		Free,
+		Sort,
+		Sync
 	} ;
 
 	BoolModel m_arpEnabledModel;
@@ -207,9 +222,11 @@ private:
 
 
 	friend class InstrumentTrack;
-	friend class InstrumentFunctionArpeggioView;
+	friend class gui::InstrumentFunctionArpeggioView;
 
 } ;
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_INSTRUMENT_FUNCTIONS_H

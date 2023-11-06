@@ -30,9 +30,13 @@
 #include <QDomElement>
 #include <QMessageBox>
 
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "EffectChain.h"
-#include "plugins/peak_controller_effect/peak_controller_effect.h"
+#include "plugins/PeakControllerEffect/PeakControllerEffect.h"
+
+namespace lmms
+{
+
 
 PeakControllerEffectVector PeakController::s_effects;
 int PeakController::m_getCount;
@@ -42,21 +46,21 @@ bool PeakController::m_buggedFile;
 
 PeakController::PeakController( Model * _parent,
 		PeakControllerEffect * _peak_effect ) :
-	Controller( Controller::PeakController, _parent, tr( "Peak Controller" ) ),
+	Controller( ControllerType::Peak, _parent, tr( "Peak Controller" ) ),
 	m_peakEffect( _peak_effect ),
 	m_currentSample( 0.0f )
 {
 	setSampleExact( true );
 	if( m_peakEffect )
 	{
-		connect( m_peakEffect, SIGNAL( destroyed( ) ),
-			this, SLOT( handleDestroyedEffect( ) ) );
+		connect( m_peakEffect, SIGNAL(destroyed()),
+			this, SLOT(handleDestroyedEffect()));
 	}
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateCoeffs() ) );
-	connect( m_peakEffect->attackModel(), SIGNAL( dataChanged() ),
-			this, SLOT( updateCoeffs() ), Qt::DirectConnection );
-	connect( m_peakEffect->decayModel(), SIGNAL( dataChanged() ),
-			this, SLOT( updateCoeffs() ), Qt::DirectConnection );
+	connect( Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(updateCoeffs()));
+	connect( m_peakEffect->attackModel(), SIGNAL(dataChanged()),
+			this, SLOT(updateCoeffs()), Qt::DirectConnection );
+	connect( m_peakEffect->decayModel(), SIGNAL(dataChanged()),
+			this, SLOT(updateCoeffs()), Qt::DirectConnection );
 	m_coeffNeedsUpdate = true;
 }
 
@@ -65,7 +69,7 @@ PeakController::PeakController( Model * _parent,
 
 PeakController::~PeakController()
 {
-	if( m_peakEffect != NULL && m_peakEffect->effectChain() != NULL )
+	if( m_peakEffect != nullptr && m_peakEffect->effectChain() != nullptr )
 	{
 		m_peakEffect->effectChain()->removeEffect( m_peakEffect );
 	}
@@ -76,7 +80,7 @@ void PeakController::updateValueBuffer()
 {
 	if( m_coeffNeedsUpdate )
 	{
-		const float ratio = 44100.0f / Engine::mixer()->processingSampleRate();
+		const float ratio = 44100.0f / Engine::audioEngine()->processingSampleRate();
 		m_attackCoeff = 1.0f - powf( 2.0f, -0.3f * ( 1.0f - m_peakEffect->attackModel()->value() ) * ratio );
 		m_decayCoeff = 1.0f -  powf( 2.0f, -0.3f * ( 1.0f - m_peakEffect->decayModel()->value()  ) * ratio );
 		m_coeffNeedsUpdate = false;
@@ -87,7 +91,7 @@ void PeakController::updateValueBuffer()
 		float targetSample = m_peakEffect->lastSample();
 		if( m_currentSample != targetSample )
 		{
-			const f_cnt_t frames = Engine::mixer()->framesPerPeriod();
+			const f_cnt_t frames = Engine::audioEngine()->framesPerPeriod();
 			float * values = m_valueBuffer.values();
 
 			for( f_cnt_t f = 0; f < frames; ++f )
@@ -123,12 +127,12 @@ void PeakController::updateCoeffs()
 }
 
 
-void PeakController::handleDestroyedEffect( )
+void PeakController::handleDestroyedEffect()
 {
 	// possible race condition...
 	//printf("disconnecting effect\n");
 	disconnect( m_peakEffect );
-	m_peakEffect = NULL;
+	m_peakEffect = nullptr;
 	//deleteLater();
 	delete this;
 }
@@ -157,12 +161,11 @@ void PeakController::loadSettings( const QDomElement & _this )
 		effectId = m_loadCount++;
 	}
 
-	PeakControllerEffectVector::Iterator i;
-	for( i = s_effects.begin(); i != s_effects.end(); ++i )
+	for (const auto& effect : s_effects)
 	{
-		if( (*i)->m_effectId == effectId )
+		if (effect->m_effectId == effectId)
 		{
-			m_peakEffect = *i;
+			m_peakEffect = effect;
 			return;
 		}
 	}
@@ -186,16 +189,14 @@ PeakController * PeakController::getControllerBySetting(const QDomElement & _thi
 {
 	int effectId = _this.attribute( "effectId" ).toInt();
 
-	PeakControllerEffectVector::Iterator i;
-
 	//Backward compatibility for bug in <= 0.4.15 . For >= 1.0.0 ,
 	//foundCount should always be 1 because m_effectId is initialized with rand()
 	int foundCount = 0;
 	if( m_buggedFile == false )
 	{
-		for( i = s_effects.begin(); i != s_effects.end(); ++i )
+		for (const auto& effect : s_effects)
 		{
-			if( (*i)->m_effectId == effectId )
+			if (effect->m_effectId == effectId)
 			{
 				foundCount++;
 			}
@@ -204,9 +205,9 @@ PeakController * PeakController::getControllerBySetting(const QDomElement & _thi
 		{
 			m_buggedFile = true;
 			int newEffectId = 0;
-			for( i = s_effects.begin(); i != s_effects.end(); ++i )
+			for (const auto& effect : s_effects)
 			{
-				(*i)->m_effectId = newEffectId++;
+				effect->m_effectId = newEffectId++;
 			}
 			QMessageBox msgBox;
 			msgBox.setIcon( QMessageBox::Information );
@@ -227,15 +228,15 @@ PeakController * PeakController::getControllerBySetting(const QDomElement & _thi
 	}
 	m_getCount++; //NB: m_getCount should be increased even m_buggedFile is false
 
-	for( i = s_effects.begin(); i != s_effects.end(); ++i )
+	for (const auto& effect : s_effects)
 	{
-		if( (*i)->m_effectId == effectId )
+		if (effect->m_effectId == effectId)
 		{
-			return (*i)->controller();
+			return effect->controller();
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -247,11 +248,10 @@ QString PeakController::nodeName() const
 
 
 
-ControllerDialog * PeakController::createDialog( QWidget * _parent )
+gui::ControllerDialog * PeakController::createDialog( QWidget * _parent )
 {
-	return new PeakControllerDialog( this, _parent );
+	return new gui::PeakControllerDialog( this, _parent );
 }
 
 
-
-
+} // namespace lmms

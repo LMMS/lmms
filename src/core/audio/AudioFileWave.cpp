@@ -25,18 +25,18 @@
 
 #include "AudioFileWave.h"
 #include "endian_handling.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 
-#include <QFile>
-#include <QDebug>
 
+namespace lmms
+{
 
 AudioFileWave::AudioFileWave( OutputSettings const & outputSettings,
 				const ch_cnt_t channels, bool & successful,
 				const QString & file,
-				Mixer* mixer ) :
-	AudioFileDevice( outputSettings, channels, file, mixer ),
-	m_sf( NULL )
+				AudioEngine* audioEngine ) :
+	AudioFileDevice( outputSettings, channels, file, audioEngine ),
+	m_sf( nullptr )
 {
 	successful = outputFileOpened() && startEncoding();
 }
@@ -56,7 +56,7 @@ bool AudioFileWave::startEncoding()
 {
 	m_si.samplerate = sampleRate();
 	m_si.channels = channels();
-	m_si.frames = mixer()->framesPerPeriod();
+	m_si.frames = audioEngine()->framesPerPeriod();
 	m_si.sections = 1;
 	m_si.seekable = 0;
 
@@ -64,13 +64,13 @@ bool AudioFileWave::startEncoding()
 
 	switch( getOutputSettings().getBitDepth() )
 	{
-	case OutputSettings::Depth_32Bit:
+	case OutputSettings::BitDepth::Depth32Bit:
 		m_si.format |= SF_FORMAT_FLOAT;
 		break;
-	case OutputSettings::Depth_24Bit:
+	case OutputSettings::BitDepth::Depth24Bit:
 		m_si.format |= SF_FORMAT_PCM_24;
 		break;
-	case OutputSettings::Depth_16Bit:
+	case OutputSettings::BitDepth::Depth16Bit:
 	default:
 		m_si.format |= SF_FORMAT_PCM_16;
 		break;
@@ -86,7 +86,7 @@ bool AudioFileWave::startEncoding()
 	}
 
 	// Prevent fold overs when encountering clipped data
-	sf_command(m_sf, SFC_SET_CLIPPING, NULL, SF_TRUE);
+	sf_command(m_sf, SFC_SET_CLIPPING, nullptr, SF_TRUE);
 
 	sf_set_string ( m_sf, SF_STR_SOFTWARE, "LMMS" );
 
@@ -102,9 +102,9 @@ void AudioFileWave::writeBuffer( const surroundSampleFrame * _ab,
 {
 	OutputSettings::BitDepth bitDepth = getOutputSettings().getBitDepth();
 
-	if( bitDepth == OutputSettings::Depth_32Bit || bitDepth == OutputSettings::Depth_24Bit )
+	if( bitDepth == OutputSettings::BitDepth::Depth32Bit || bitDepth == OutputSettings::BitDepth::Depth24Bit )
 	{
-		float *  buf = new float[_frames*channels()];
+		auto buf = new float[_frames * channels()];
 		for( fpp_t frame = 0; frame < _frames; ++frame )
 		{
 			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
@@ -118,7 +118,7 @@ void AudioFileWave::writeBuffer( const surroundSampleFrame * _ab,
 	}
 	else
 	{
-		int_sample_t * buf = new int_sample_t[_frames * channels()];
+		auto buf = new int_sample_t[_frames * channels()];
 		convertToS16( _ab, _frames, _master_gain, buf,
 							!isLittleEndian() );
 
@@ -138,3 +138,4 @@ void AudioFileWave::finishEncoding()
 	}
 }
 
+} // namespace lmms

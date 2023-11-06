@@ -22,26 +22,58 @@
  *
  */
 
-#define COMPILE_REMOTE_PLUGIN_BASE
+#include "RemotePlugin.h"
+
 //#define DEBUG_REMOTE_PLUGIN
 #ifdef DEBUG_REMOTE_PLUGIN
 #include <QDebug>
 #endif
 
-#include "BufferManager.h"
-#include "RemotePlugin.h"
-#include "Mixer.h"
-#include "Engine.h"
+#ifdef LMMS_BUILD_WIN32
+#include <windows.h>
+#endif
 
+#include "BufferManager.h"
+#include "AudioEngine.h"
+#include "Engine.h"
+#include "Song.h"
+
+#include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
+#include <QUuid>
 
 #ifndef SYNC_WITH_SHM_FIFO
-#include <QtCore/QUuid>
 #include <sys/socket.h>
 #include <sys/un.h>
 #endif
 
+#ifdef LMMS_BUILD_WIN32
+
+namespace {
+
+HANDLE getRemotePluginJob()
+{
+	static const auto job = []
+	{
+		const auto job = CreateJobObject(nullptr, nullptr);
+
+		auto limitInfo = JOBOBJECT_EXTENDED_LIMIT_INFORMATION{};
+		limitInfo.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+		SetInformationJobObject(job, JobObjectExtendedLimitInformation, &limitInfo, sizeof(limitInfo));
+
+		return job;
+	}();
+
+	return job;
+}
+
+} // namespace
+
+#endif // LMMS_BUILD_WIN32
+
+namespace lmms
+{
 
 // simple helper thread monitoring our RemotePlugin - if process terminates
 // unexpectedly invalidate plugin so LMMS doesn't lock up
@@ -55,18 +87,41 @@ ProcessWatcher::ProcessWatcher( RemotePlugin * _p ) :
 
 void ProcessWatcher::run()
 {
-	m_plugin->m_process.start( m_plugin->m_exec, m_plugin->m_args );
-	exec();
-	m_plugin->m_process.moveToThread( m_plugin->thread() );
-	while( !m_quit && m_plugin->messagesLeft() )
-	{
-		msleep( 200 );
-	}
-	if( !m_quit )
-	{
-		fprintf( stderr,
-				"remote plugin died! invalidating now.\n" );
+	auto& process = m_plugin->m_process;
+	process.start(m_plugin->m_exec, m_plugin->m_args);
 
+#ifdef LMMS_BUILD_WIN32
+	// Add the process to our job so it is killed if we crash
+	if (process.waitForStarted(-1))
+	{
+		if (const auto processHandle = OpenProcess(PROCESS_SET_QUOTA | PROCESS_TERMINATE, false, process.processId()))
+		{
+			// Ensure the process is still running, otherwise the handle we
+			// obtained may be for a different process that happened to reuse
+			// the same process id.
+			// QProcess::state() alone is insufficient as it only returns a
+			// cached state variable that is updated asynchronously. To query
+			// the process itself, we can use QProcess::waitForFinished() with a
+			// zero timeout, but that too is insufficient as it fails if the
+			// process has already finished. Therefore, we check both.
+			if (!process.waitForFinished(0) && process.state() == QProcess::Running)
+			{
+				AssignProcessToJobObject(getRemotePluginJob(), processHandle);
+			}
+			CloseHandle(processHandle);
+		}
+	}
+#endif // LMMS_BUILD_WIN32
+
+	exec();
+	process.moveToThread(m_plugin->thread());
+	while (!m_quit && m_plugin->messagesLeft())
+	{
+		msleep(200);
+	}
+	if (!m_quit)
+	{
+		fprintf(stderr, "remote plugin died! invalidating now.\n");
 		m_plugin->invalidate();
 	}
 }
@@ -84,15 +139,11 @@ RemotePlugin::RemotePlugin() :
 #endif
 	m_failed( true ),
 	m_watcher( this ),
-	m_commMutex( QMutex::Recursive ),
-	m_splitChannels( false ),
-#ifdef USE_QT_SHMEM
-	m_shmObj(),
-#else
-	m_shmID( 0 ),
+#if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
+	m_commMutex(QMutex::Recursive),
 #endif
-	m_shmSize( 0 ),
-	m_shm( NULL ),
+	m_splitChannels( false ),
+	m_audioBufferSize( 0 ),
 	m_inputCount( DEFAULT_CHANNELS ),
 	m_outputCount( DEFAULT_CHANNELS )
 {
@@ -125,14 +176,14 @@ RemotePlugin::RemotePlugin() :
 	}
 #endif
 
-	connect( &m_process, SIGNAL( finished( int, QProcess::ExitStatus ) ),
-		this, SLOT( processFinished( int, QProcess::ExitStatus ) ),
+	connect( &m_process, SIGNAL(finished(int,QProcess::ExitStatus)),
+		this, SLOT(processFinished(int,QProcess::ExitStatus)),
 		Qt::DirectConnection );
-	connect( &m_process, SIGNAL( errorOccurred( QProcess::ProcessError ) ),
-			 this, SLOT( processErrored( QProcess::ProcessError ) ),
+	connect( &m_process, SIGNAL(errorOccurred(QProcess::ProcessError)),
+			 this, SLOT(processErrored(QProcess::ProcessError)),
 		Qt::DirectConnection );
-	connect( &m_process, SIGNAL( finished( int, QProcess::ExitStatus ) ),
-		&m_watcher, SLOT( quit() ), Qt::DirectConnection );
+	connect( &m_process, SIGNAL(finished(int,QProcess::ExitStatus)),
+		&m_watcher, SLOT(quit()), Qt::DirectConnection );
 }
 
 
@@ -158,11 +209,6 @@ RemotePlugin::~RemotePlugin()
 			}
 			unlock();
 		}
-
-#ifndef USE_QT_SHMEM
-		shmdt( m_shm );
-		shmctl( m_shmID, IPC_RMID, NULL );
-#endif
 	}
 
 #ifndef SYNC_WITH_SHM_FIFO
@@ -222,8 +268,8 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 	QStringList args;
 #ifdef SYNC_WITH_SHM_FIFO
 	// swap in and out for bidirectional communication
-	args << QString::number( out()->shmKey() );
-	args << QString::number( in()->shmKey() );
+	args << QString::fromStdString(out()->shmKey());
+	args << QString::fromStdString(in()->shmKey());
 #else
 	args << m_socketFile;
 #endif
@@ -256,7 +302,7 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 			break;
 
 		default:
-			m_socket = accept( m_server, NULL, NULL );
+			m_socket = accept( m_server, nullptr, nullptr );
 			if ( m_socket == -1 )
 			{
 				qWarning( "Unexpected socket error." );
@@ -264,6 +310,7 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 	}
 #endif
 
+	sendMessage(message(IdSyncKey).addString(Engine::getSong()->syncKey()));
 	resizeSharedProcessingMemory();
 
 	if( waitForInitDoneMsg )
@@ -278,44 +325,43 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 
 
 
-bool RemotePlugin::process( const sampleFrame * _in_buf,
-						sampleFrame * _out_buf )
+bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf )
 {
-	const fpp_t frames = Engine::mixer()->framesPerPeriod();
+	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 
 	if( m_failed || !isRunning() )
 	{
-		if( _out_buf != NULL )
+		if( _out_buf != nullptr )
 		{
 			BufferManager::clear( _out_buf, frames );
 		}
 		return false;
 	}
 
-	if( m_shm == NULL )
+	if (!m_audioBuffer)
 	{
-		// m_shm being zero means we didn't initialize everything so
+		// m_audioBuffer being zero means we didn't initialize everything so
 		// far so process one message each time (and hope we get
 		// information like SHM-key etc.) until we process messages
 		// in a later stage of this procedure
-		if( m_shmSize == 0 )
+		if( m_audioBufferSize == 0 )
 		{
 			lock();
 			fetchAndProcessAllMessages();
 			unlock();
 		}
-		if( _out_buf != NULL )
+		if( _out_buf != nullptr )
 		{
 			BufferManager::clear( _out_buf, frames );
 		}
 		return false;
 	}
 
-	memset( m_shm, 0, m_shmSize );
+	memset( m_audioBuffer.get(), 0, m_audioBufferSize );
 
-	ch_cnt_t inputs = qMin<ch_cnt_t>( m_inputCount, DEFAULT_CHANNELS );
+	ch_cnt_t inputs = std::min<ch_cnt_t>(m_inputCount, DEFAULT_CHANNELS);
 
-	if( _in_buf != NULL && inputs > 0 )
+	if( _in_buf != nullptr && inputs > 0 )
 	{
 		if( m_splitChannels )
 		{
@@ -323,18 +369,18 @@ bool RemotePlugin::process( const sampleFrame * _in_buf,
 			{
 				for( fpp_t frame = 0; frame < frames; ++frame )
 				{
-					m_shm[ch * frames + frame] =
+					m_audioBuffer[ch * frames + frame] =
 							_in_buf[frame][ch];
 				}
 			}
 		}
 		else if( inputs == DEFAULT_CHANNELS )
 		{
-			memcpy( m_shm, _in_buf, frames * BYTES_PER_FRAME );
+			memcpy( m_audioBuffer.get(), _in_buf, frames * BYTES_PER_FRAME );
 		}
 		else
 		{
-			sampleFrame * o = (sampleFrame *) m_shm;
+			auto o = (sampleFrame*)m_audioBuffer.get();
 			for( ch_cnt_t ch = 0; ch < inputs; ++ch )
 			{
 				for( fpp_t frame = 0; frame < frames; ++frame )
@@ -348,7 +394,7 @@ bool RemotePlugin::process( const sampleFrame * _in_buf,
 	lock();
 	sendMessage( IdStartProcessing );
 
-	if( m_failed || _out_buf == NULL || m_outputCount == 0 )
+	if( m_failed || _out_buf == nullptr || m_outputCount == 0 )
 	{
 		unlock();
 		return false;
@@ -357,33 +403,32 @@ bool RemotePlugin::process( const sampleFrame * _in_buf,
 	waitForMessage( IdProcessingDone );
 	unlock();
 
-	const ch_cnt_t outputs = qMin<ch_cnt_t>( m_outputCount,
-							DEFAULT_CHANNELS );
+	const ch_cnt_t outputs = std::min<ch_cnt_t>(m_outputCount,
+							DEFAULT_CHANNELS);
 	if( m_splitChannels )
 	{
 		for( ch_cnt_t ch = 0; ch < outputs; ++ch )
 		{
 			for( fpp_t frame = 0; frame < frames; ++frame )
 			{
-				_out_buf[frame][ch] = m_shm[( m_inputCount+ch )*
+				_out_buf[frame][ch] = m_audioBuffer[( m_inputCount+ch )*
 								frames + frame];
 			}
 		}
 	}
 	else if( outputs == DEFAULT_CHANNELS )
 	{
-		memcpy( _out_buf, m_shm + m_inputCount * frames,
+		memcpy( _out_buf, m_audioBuffer.get() + m_inputCount * frames,
 						frames * BYTES_PER_FRAME );
 	}
 	else
 	{
-		sampleFrame * o = (sampleFrame *) ( m_shm +
-							m_inputCount*frames );
+		auto o = (sampleFrame*)(m_audioBuffer.get() + m_inputCount * frames);
 		// clear buffer, if plugin didn't fill up both channels
 		BufferManager::clear( _out_buf, frames );
 
-		for( ch_cnt_t ch = 0; ch <
-				qMin<int>( DEFAULT_CHANNELS, outputs ); ++ch )
+		for (ch_cnt_t ch = 0; ch <
+				std::min<int>(DEFAULT_CHANNELS, outputs); ++ch)
 		{
 			for( fpp_t frame = 0; frame < frames; ++frame )
 			{
@@ -431,39 +476,19 @@ void RemotePlugin::hideUI()
 
 void RemotePlugin::resizeSharedProcessingMemory()
 {
-	const size_t s = ( m_inputCount+m_outputCount ) *
-				Engine::mixer()->framesPerPeriod() *
-							sizeof( float );
-	if( m_shm != NULL )
+	const size_t s = (m_inputCount + m_outputCount) * Engine::audioEngine()->framesPerPeriod();
+	try
 	{
-#ifdef USE_QT_SHMEM
-		m_shmObj.detach();
-#else
-		shmdt( m_shm );
-		shmctl( m_shmID, IPC_RMID, NULL );
-#endif
+		m_audioBuffer.create(QUuid::createUuid().toString().toStdString(), s);
 	}
-
-	static int shm_key = 0;
-#ifdef USE_QT_SHMEM
-	do
+	catch (const std::runtime_error& error)
 	{
-		m_shmObj.setKey( QString( "%1" ).arg( ++shm_key ) );
-		m_shmObj.create( s );
-	} while( m_shmObj.error() != QSharedMemory::NoError );
-
-	m_shm = (float *) m_shmObj.data();
-#else
-	while( ( m_shmID = shmget( ++shm_key, s, IPC_CREAT | IPC_EXCL |
-								0600 ) ) == -1 )
-	{
+		qCritical() << "Failed to allocate shared audio buffer:" << error.what();
+		m_audioBuffer.detach();
+		return;
 	}
-
-	m_shm = (float *) shmat( m_shmID, 0, 0 );
-#endif
-	m_shmSize = s;
-	sendMessage( message( IdChangeSharedMemoryKey ).
-				addInt( shm_key ).addInt( m_shmSize ) );
+	m_audioBufferSize = s * sizeof(float);
+	sendMessage(message(IdChangeSharedMemoryKey).addString(m_audioBuffer.key()));
 }
 
 
@@ -510,12 +535,12 @@ bool RemotePlugin::processMessage( const message & _m )
 
 		case IdSampleRateInformation:
 			reply = true;
-			reply_message.addInt( Engine::mixer()->processingSampleRate() );
+			reply_message.addInt( Engine::audioEngine()->processingSampleRate() );
 			break;
 
 		case IdBufferSizeInformation:
 			reply = true;
-			reply_message.addInt( Engine::mixer()->framesPerPeriod() );
+			reply_message.addInt( Engine::audioEngine()->framesPerPeriod() );
 			break;
 
 		case IdChangeInputCount:
@@ -552,3 +577,6 @@ bool RemotePlugin::processMessage( const message & _m )
 
 	return true;
 }
+
+
+} // namespace lmms

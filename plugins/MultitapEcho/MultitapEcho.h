@@ -28,19 +28,21 @@
 
 #include "Effect.h"
 #include "MultitapEchoControls.h"
-#include "ValueBuffer.h"
 #include "RingBuffer.h"
-#include "lmms_math.h"
 #include "BasicFilters.h"
+
+namespace lmms
+{
+
 
 class MultitapEchoEffect : public Effect
 {
 public:
 	MultitapEchoEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
-	virtual ~MultitapEchoEffect();
-	virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames );
+	~MultitapEchoEffect() override;
+	bool processAudioBuffer( sampleFrame* buf, const fpp_t frames ) override;
 
-	virtual EffectControls* controls()
+	EffectControls* controls() override
 	{
 		return &m_controls;
 	}
@@ -74,5 +76,7 @@ private:
 
 };
 
+
+} // namespace lmms
 
 #endif

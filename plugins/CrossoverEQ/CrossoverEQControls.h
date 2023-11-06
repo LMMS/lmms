@@ -30,6 +30,9 @@
 #include "EffectControls.h"
 #include "CrossoverEQControlDialog.h"
 
+namespace lmms
+{
+
 class CrossoverEQEffect;
 
 class CrossoverEQControls : public EffectControls
@@ -37,23 +40,23 @@ class CrossoverEQControls : public EffectControls
 	Q_OBJECT
 public:
 	CrossoverEQControls( CrossoverEQEffect * eff );
-	virtual ~CrossoverEQControls() {}
+	~CrossoverEQControls() override = default;
 
-	virtual void saveSettings( QDomDocument & doc, QDomElement & elem );
-	virtual void loadSettings( const QDomElement & elem );
-	inline virtual QString nodeName() const
+	void saveSettings( QDomDocument & doc, QDomElement & elem ) override;
+	void loadSettings( const QDomElement & elem ) override;
+	inline QString nodeName() const override
 	{
 		return( "crossoevereqcontrols" );
 	}
 
-	virtual int controlCount()
+	int controlCount() override
 	{
 		return( 11 );
 	}
 
-	virtual EffectControlDialog * createView()
+	gui::EffectControlDialog * createView() override
 	{
-		return( new CrossoverEQControlDialog( this ) );
+		return( new gui::CrossoverEQControlDialog( this ) );
 	}
 
 private slots:
@@ -79,8 +82,11 @@ private:
 	BoolModel m_mute3;
 	BoolModel m_mute4;
 	
-	friend class CrossoverEQControlDialog;
+	friend class gui::CrossoverEQControlDialog;
 	friend class CrossoverEQEffect;
 };
+
+
+} // namespace lmms
 
 #endif

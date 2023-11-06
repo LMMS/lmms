@@ -1,6 +1,6 @@
 #include "QTestSuite.h"
 
-#include <QtTest/QTest>
+#include <QTest>
 
 #include <QDebug>
 
@@ -9,14 +9,14 @@
 int main(int argc, char* argv[])
 {
 	new QCoreApplication(argc, argv);
-	Engine::init(true);
+	lmms::Engine::init(true);
 
 	int numsuites = QTestSuite::suites().size();
 	qDebug() << ">> Will run" << numsuites << "test suites";
 	int failed = 0;
 	for (QTestSuite*& suite : QTestSuite::suites())
 	{
-		failed += QTest::qExec(suite, argc, argv);
+		if (QTest::qExec(suite, argc, argv) != 0) { ++failed; }
 	}
 	qDebug() << "<<" << failed << "out of"<<numsuites<<"test suites failed.";
 	return failed;

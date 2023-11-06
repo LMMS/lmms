@@ -25,13 +25,15 @@
 #include "MidiAlsaSeq.h"
 #include "ConfigManager.h"
 #include "Engine.h"
-#include "gui_templates.h"
 #include "Song.h"
 #include "MidiPort.h"
-#include "Note.h"
 
 
 #ifdef LMMS_HAVE_ALSA
+
+
+namespace lmms
+{
 
 const int EventPollTimeOut = 250;
 
@@ -71,7 +73,7 @@ static QString portName( snd_seq_t * _seq, const snd_seq_addr_t * _addr )
 MidiAlsaSeq::MidiAlsaSeq() :
 	MidiClient(),
 	m_seqMutex(),
-	m_seqHandle( NULL ),
+	m_seqHandle( nullptr ),
 	m_queueID( -1 ),
 	m_quit( false ),
 	m_portListUpdateTimer( this )
@@ -97,16 +99,16 @@ MidiAlsaSeq::MidiAlsaSeq() :
 	snd_seq_set_queue_tempo( m_seqHandle, m_queueID, tempo );
 	snd_seq_queue_tempo_free( tempo );
 
-	snd_seq_start_queue( m_seqHandle, m_queueID, NULL );
+	snd_seq_start_queue( m_seqHandle, m_queueID, nullptr );
 	changeQueueTempo( Engine::getSong()->getTempo() );
-	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
-			this, SLOT( changeQueueTempo( bpm_t ) ), Qt::DirectConnection );
+	connect( Engine::getSong(), SIGNAL(tempoChanged(lmms::bpm_t)),
+			this, SLOT(changeQueueTempo(lmms::bpm_t)), Qt::DirectConnection );
 
 	// initial list-update
 	updatePortList();
 
-	connect( &m_portListUpdateTimer, SIGNAL( timeout() ),
-					this, SLOT( updatePortList() ) );
+	connect( &m_portListUpdateTimer, SIGNAL(timeout()),
+					this, SLOT(updatePortList()));
 	// we check for port-changes every second
 	m_portListUpdateTimer.start( 1000 );
 
@@ -130,7 +132,7 @@ MidiAlsaSeq::~MidiAlsaSeq()
 		wait( EventPollTimeOut*2 );
 
 		m_seqMutex.lock();
-		snd_seq_stop_queue( m_seqHandle, m_queueID, NULL );
+		snd_seq_stop_queue( m_seqHandle, m_queueID, nullptr );
 		snd_seq_free_queue( m_seqHandle, m_queueID );
 		snd_seq_close( m_seqHandle );
 		m_seqMutex.unlock();
@@ -145,7 +147,7 @@ QString MidiAlsaSeq::probeDevice()
 	QString dev = ConfigManager::inst()->value( "Midialsaseq", "device" );
 	if( dev.isEmpty() )
 	{
-		if( getenv( "MIDIDEV" ) != NULL )
+		if( getenv( "MIDIDEV" ) != nullptr )
 		{
 			return getenv( "MIDIDEV" );
 		}
@@ -162,7 +164,7 @@ void MidiAlsaSeq::processOutEvent( const MidiEvent& event, const TimePos& time, 
 	// HACK!!! - need a better solution which isn't that easy since we
 	// cannot store const-ptrs in our map because we need to call non-const
 	// methods of MIDI-port - it's a mess...
-	MidiPort* p = const_cast<MidiPort *>( port );
+	auto p = const_cast<MidiPort*>(port);
 
 	snd_seq_event_t ev;
 	snd_seq_ev_clear( &ev );
@@ -176,21 +178,21 @@ void MidiAlsaSeq::processOutEvent( const MidiEvent& event, const TimePos& time, 
 		case MidiNoteOn:
 			snd_seq_ev_set_noteon( &ev,
 						event.channel(),
-						event.key() + KeysPerOctave,
+						event.key(),
 						event.velocity() );
 			break;
 
 		case MidiNoteOff:
 			snd_seq_ev_set_noteoff( &ev,
 						event.channel(),
-						event.key() + KeysPerOctave,
+						event.key(),
 						event.velocity() );
 			break;
 
 		case MidiKeyPressure:
 			snd_seq_ev_set_keypress( &ev,
 						event.channel(),
-						event.key() + KeysPerOctave,
+						event.key(),
 						event.velocity() );
 			break;
 
@@ -239,20 +241,20 @@ void MidiAlsaSeq::applyPortMode( MidiPort * _port )
 	m_seqMutex.lock();
 
 	// determine port-capabilities
-	unsigned int caps[2] = { 0, 0 };
+	auto caps = std::array<unsigned int, 2>{};
 
 	switch( _port->mode() )
 	{
-		case MidiPort::Duplex:
+		case MidiPort::Mode::Duplex:
 			caps[1] |= SND_SEQ_PORT_CAP_READ |
 						SND_SEQ_PORT_CAP_SUBS_READ;
 
-		case MidiPort::Input:
+		case MidiPort::Mode::Input:
 			caps[0] |= SND_SEQ_PORT_CAP_WRITE |
 						SND_SEQ_PORT_CAP_SUBS_WRITE;
 			break;
 
-		case MidiPort::Output:
+		case MidiPort::Mode::Output:
 			caps[1] |= SND_SEQ_PORT_CAP_READ |
 						SND_SEQ_PORT_CAP_SUBS_READ;
 			break;
@@ -351,8 +353,7 @@ QString MidiAlsaSeq::sourcePortName( const MidiEvent & _event ) const
 {
 	if( _event.sourcePort() )
 	{
-		const snd_seq_addr_t * addr =
-			static_cast<const snd_seq_addr_t *>( _event.sourcePort() );
+		const auto addr = static_cast<const snd_seq_addr_t*>(_event.sourcePort());
 		return portName( m_seqHandle, addr );
 	}
 	return MidiClient::sourcePortName( _event );
@@ -460,7 +461,7 @@ void MidiAlsaSeq::run()
 	// watch the pipe and sequencer input events
 	int pollfd_count = snd_seq_poll_descriptors_count( m_seqHandle,
 								POLLIN );
-	struct pollfd * pollfd_set = new struct pollfd[pollfd_count + 1];
+	auto pollfd_set = new struct pollfd[pollfd_count + 1];
 	snd_seq_poll_descriptors( m_seqHandle, pollfd_set + 1, pollfd_count,
 								POLLIN );
 	pollfd_set[0].fd = m_pipe[0];
@@ -505,8 +506,8 @@ void MidiAlsaSeq::run()
 			}
 			m_seqMutex.unlock();
 
-			snd_seq_addr_t * source = NULL;
-			MidiPort * dest = NULL;
+			snd_seq_addr_t * source = nullptr;
+			MidiPort * dest = nullptr;
 			for( int i = 0; i < m_portIDs.size(); ++i )
 			{
 				if( m_portIDs.values()[i][0] == ev->dest.port )
@@ -521,7 +522,7 @@ void MidiAlsaSeq::run()
 				}
 			}
 
-			if( dest == NULL )
+			if( dest == nullptr )
 			{
 				continue;
 			}
@@ -531,8 +532,7 @@ void MidiAlsaSeq::run()
 				case SND_SEQ_EVENT_NOTEON:
 					dest->processInEvent( MidiEvent( MidiNoteOn,
 								ev->data.note.channel,
-								ev->data.note.note -
-								KeysPerOctave,
+								ev->data.note.note,
 								ev->data.note.velocity,
 								source
 								),
@@ -542,8 +542,7 @@ void MidiAlsaSeq::run()
 				case SND_SEQ_EVENT_NOTEOFF:
 					dest->processInEvent( MidiEvent( MidiNoteOff,
 								ev->data.note.channel,
-								ev->data.note.note -
-								KeysPerOctave,
+								ev->data.note.note,
 								ev->data.note.velocity,
 								source
 								),
@@ -554,8 +553,7 @@ void MidiAlsaSeq::run()
 					dest->processInEvent( MidiEvent(
 									MidiKeyPressure,
 								ev->data.note.channel,
-								ev->data.note.note -
-								KeysPerOctave,
+								ev->data.note.note,
 								ev->data.note.velocity,
 								source
 								), TimePos() );
@@ -625,7 +623,7 @@ void MidiAlsaSeq::changeQueueTempo( bpm_t _bpm )
 	m_seqMutex.lock();
 
 	snd_seq_change_queue_tempo( m_seqHandle, m_queueID,
-					60000000 / (int) _bpm, NULL );
+					60000000 / (int) _bpm, nullptr );
 	snd_seq_drain_output( m_seqHandle );
 
 	m_seqMutex.unlock();
@@ -698,5 +696,7 @@ void MidiAlsaSeq::updatePortList()
 }
 
 
-#endif
 
+} // namespace lmms
+
+#endif // LMMS_HAVE_ALSA

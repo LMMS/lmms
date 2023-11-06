@@ -3,7 +3,7 @@
 <multimediaproject version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings>
-    <instrumenttrack fxch="0" vol="50" name="wah_synth" tab="0">
+    <instrumenttrack mixch="0" vol="50" name="wah_synth" tab="0">
       <bitinvader sampleLength="56" version="0.1" normalize="1" sampleShape="AAAAAKJN5T2H3GM+VxqpPgMm3j5BMwg/CJ0fP/MENT89Ctc+XI/CPlyPwj57FK4+CtejPpqZmT4pXI8+rkdhPq5HYT7NzEw+zcxMPo/CdT4pXI8+CtejPgrXoz57FK4+7FG4PlyPwj6H3GM+nE3lPS69u7OzTeW9k9xjvlYaqb4DJt6+rkfhvq5H4b49Cte+zczMvs3MzL5cj8K+exSuvnsUrr57FK6+CtejvpqZmb4pXI++KVyPvilcj74pXI++KVyPvilcj74pXI++CtejvuxRuL5cj8K+gtxjvpBN5b0=" interpolation="1"/>
       <eldata fres="0.21" ftype="6" fcut="2720" fwet="1">
         <elvol userwavefile="" lpdel="0" ctlenvamt="0" amt="1" rel="0.528" latt="0" sus="0" lspd="0.7311" att="0.05" pdel="0" lfosyncmode="0" lamt="0" dec="0.897" x100="1" lshp="0" hold="0.234"/>

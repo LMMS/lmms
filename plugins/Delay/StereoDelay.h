@@ -27,6 +27,10 @@
 
 #include "lmms_basics.h"
 
+
+namespace lmms
+{
+
 class StereoDelay
 {
 public:
@@ -56,5 +60,8 @@ private:
 	float m_feedback;
 	float m_maxTime;
 };
+
+
+} // namespace lmms
 
 #endif // STEREODELAY_H

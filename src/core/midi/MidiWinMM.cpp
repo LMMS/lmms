@@ -23,9 +23,12 @@
  */
 
 #include "MidiWinMM.h"
-#include "Note.h"
 
 #ifdef LMMS_BUILD_WIN32
+
+
+namespace lmms
+{
 
 
 MidiWinMM::MidiWinMM() :
@@ -201,28 +204,25 @@ void MidiWinMM::handleInputEvent( HMIDIIN hm, DWORD ev )
 	}
 
 	const MidiPortList & l = m_inputSubs[d];
-	for( MidiPortList::ConstIterator it = l.begin(); it != l.end(); ++it )
+	for (MidiPortList::ConstIterator it = l.begin(); it != l.end(); ++it)
 	{
-		switch( cmdtype )
+		switch (cmdtype)
 		{
 			case MidiNoteOn:
 			case MidiNoteOff:
 			case MidiKeyPressure:
-				( *it )->processInEvent( MidiEvent( cmdtype, chan, par1 - KeysPerOctave, par2 & 0xff, &hm ) );
-				break;
-
 			case MidiControlChange:
 			case MidiProgramChange:
 			case MidiChannelPressure:
-				( *it )->processInEvent( MidiEvent( cmdtype, chan, par1, par2 & 0xff, &hm ) );
+				(*it)->processInEvent(MidiEvent(cmdtype, chan, par1, par2 & 0xff, &hm));
 				break;
 
 			case MidiPitchBend:
-				( *it )->processInEvent( MidiEvent( cmdtype, chan, par1 + par2*128, 0, &hm ) );
+				(*it)->processInEvent(MidiEvent(cmdtype, chan, par1 + par2 * 128, 0, &hm));
 				break;
 
 			default:
-				qWarning( "MidiWinMM: unhandled input event %d\n", cmdtype );
+				qWarning("MidiWinMM: unhandled input event %d\n", cmdtype);
 				break;
 		}
 	}
@@ -303,5 +303,6 @@ void MidiWinMM::openDevices()
 }
 
 
-#endif
+} // namespace lmms
 
+#endif // LMMS_BUILD_WIN32

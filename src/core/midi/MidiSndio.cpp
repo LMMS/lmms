@@ -27,20 +27,18 @@
 
 #ifdef LMMS_HAVE_SNDIO
 
-#include <QLabel>
-#include <QLineEdit>
-
-#ifdef LMMS_HAVE_STDLIB_H
-#include <stdlib.h>
-#endif
-
+#include <cstdlib>
+#include <sndio.h>
 #include <poll.h>
 
 #include "ConfigManager.h"
-#include "gui_templates.h"
 
 
-MidiSndio::MidiSndio( void ) :
+namespace lmms
+{
+
+
+MidiSndio::MidiSndio() :
 	MidiClientRaw(),
 	m_quit( false )
 {
@@ -48,14 +46,14 @@ MidiSndio::MidiSndio( void ) :
 
 	if (dev == "")
 	{
-		m_hdl = mio_open( NULL, MIO_IN | MIO_OUT, 0 );
+		m_hdl = mio_open( nullptr, MIO_IN | MIO_OUT, 0 );
 	}
 	else
 	{
 		m_hdl = mio_open( dev.toLatin1().constData(), MIO_IN | MIO_OUT, 0 );
 	}
 
-	if( m_hdl == NULL )
+	if( m_hdl == nullptr )
 	{
 		printf( "sndio: failed opening sndio midi device\n" );
 		return;
@@ -76,7 +74,7 @@ MidiSndio::~MidiSndio()
 }
 
 
-QString MidiSndio::probeDevice( void )
+QString MidiSndio::probeDevice()
 {
 	QString dev = ConfigManager::inst()->value( "MidiSndio", "device" );
 
@@ -90,7 +88,7 @@ void MidiSndio::sendByte( const unsigned char c )
 }
 
 
-void MidiSndio::run( void )
+void MidiSndio::run()
 {
 	struct pollfd pfd;
 	nfds_t nfds;
@@ -117,4 +115,7 @@ void MidiSndio::run( void )
 	}
 }
 
-#endif	/* LMMS_HAVE_SNDIO */
+
+} // namespace lmms
+
+#endif	// LMMS_HAVE_SNDIO

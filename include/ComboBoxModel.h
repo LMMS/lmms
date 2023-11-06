@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef COMBOBOX_MODEL_H
-#define COMBOBOX_MODEL_H
+#ifndef LMMS_COMBOBOX_MODEL_H
+#define LMMS_COMBOBOX_MODEL_H
 
 #include <memory>
 #include <utility>
@@ -32,25 +32,29 @@
 #include "AutomatableModel.h"
 #include "embed.h"
 
+namespace lmms
+{
 
 class LMMS_EXPORT ComboBoxModel : public IntModel
 {
 	Q_OBJECT
 	MODEL_IS_VISITABLE
 public:
-	ComboBoxModel( Model* parent = NULL,
+	ComboBoxModel( Model* parent = nullptr,
 					const QString& displayName = QString(),
 					bool isDefaultConstructed = false ) :
 		IntModel( 0, 0, 0, parent, displayName, isDefaultConstructed )
 	{
 	}
 
-	virtual ~ComboBoxModel()
+	~ComboBoxModel() override
 	{
 		clear();
 	}
 
 	void addItem( QString item, std::unique_ptr<PixmapLoader> loader = nullptr );
+
+	void replaceItem(std::size_t index, QString item, std::unique_ptr<PixmapLoader> loader = nullptr);
 
 	void clear();
 
@@ -68,12 +72,12 @@ public:
 
 	const QString & itemText( int i ) const
 	{
-		return m_items[qBound<int>( minValue(), i,  maxValue() )].first;
+		return m_items[std::clamp(i, minValue(), maxValue())].first;
 	}
 
 	const PixmapLoader* itemPixmap( int i ) const
 	{
-		return m_items[qBound<int>( minValue(), i, maxValue() )].second.get();
+		return m_items[std::clamp(i, minValue(), maxValue())].second.get();
 	}
 
 	int size() const
@@ -83,11 +87,12 @@ public:
 
 
 private:
-	typedef std::pair<QString, std::unique_ptr<PixmapLoader> > Item;
+	using Item = std::pair<QString, std::unique_ptr<PixmapLoader>>;
 
 	std::vector<Item> m_items;
 
 } ;
 
+} // namespace lmms
 
-#endif
+#endif // LMMS_COMBOBOX_MODEL_H

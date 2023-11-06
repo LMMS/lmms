@@ -24,14 +24,20 @@
 
 #include "MidiSetupWidget.h"
 
+#include <QFormLayout>
 #include <QLineEdit>
 
 #include "ConfigManager.h"
 #include "gui_templates.h"
 
+
+namespace lmms::gui
+{
+
+
 MidiSetupWidget::MidiSetupWidget(const QString & caption, const QString & configSection,
 	const QString & devName, QWidget * parent) :
-	TabWidget(TabWidget::tr("Settings for %1").arg(tr(caption.toUtf8())), parent),
+	QGroupBox(QGroupBox::tr("Settings for %1").arg(tr(caption.toUtf8())), parent),
 	m_configSection(configSection),
 	m_device(nullptr)
 {
@@ -39,12 +45,11 @@ MidiSetupWidget::MidiSetupWidget(const QString & caption, const QString & config
 	// to indicate that there is no editable device field
 	if (!devName.isNull())
 	{
-		m_device = new QLineEdit(devName, this);
-		m_device->setGeometry(10, 20, 160, 20);
+		QFormLayout * form = new QFormLayout(this);
 
-		QLabel * dev_lbl = new QLabel(tr("Device"), this);
-		dev_lbl->setFont(pointSize<7>(dev_lbl->font()));
-		dev_lbl->setGeometry(10, 40, 160, 10);
+		m_device = new QLineEdit(devName, this);
+
+		form->addRow(tr("Device"), m_device);
 	}
 }
 
@@ -64,3 +69,6 @@ void MidiSetupWidget::show()
 	parentWidget()->setVisible(visible);
 	QWidget::setVisible(visible);
 }
+
+
+} // namespace lmms::gui

@@ -28,19 +28,27 @@
 
 #include "EffectControlDialog.h"
 
+namespace lmms
+{
 
 class AmplifierControls;
 
+
+namespace gui
+{
 
 class AmplifierControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
 	AmplifierControlDialog( AmplifierControls* controls );
-	virtual ~AmplifierControlDialog()
-	{
-	}
+	~AmplifierControlDialog() override = default;
 
 } ;
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

@@ -22,50 +22,33 @@
  *
  */
 
-#ifndef MODEL_H
-#define MODEL_H
+#ifndef LMMS_MODEL_H
+#define LMMS_MODEL_H
 
-#include <QtCore/QString>
-#include <QtCore/QObject>
+#include <QString>
+#include <QObject>
 
 #include "lmms_export.h"
 
+namespace lmms
+{
 
 class LMMS_EXPORT Model : public QObject
 {
 	Q_OBJECT
 public:
-	Model( Model * _parent, QString _display_name = QString(),
-					bool _default_constructed = false ) :
-		QObject( _parent ),
-		m_displayName( _display_name ),
-		m_defaultConstructed( _default_constructed )
-	{
-	}
+	Model(Model* parent, QString displayName = QString(),
+		  bool defaultConstructed = false);
 
-	virtual ~Model()
-	{
-	}
+	~Model() override = default;
 
-	bool isDefaultConstructed()
-	{
-		return m_defaultConstructed;
-	}
+	bool isDefaultConstructed() const;
 
-	Model* parentModel() const
-	{
-		return static_cast<Model *>( parent() );
-	}
+	Model* parentModel() const;
 
-	virtual QString displayName() const
-	{
-		return m_displayName;
-	}
+	virtual QString displayName() const;
 
-	virtual void setDisplayName( const QString& displayName )
-	{
-		m_displayName = displayName;
-	}
+	virtual void setDisplayName(const QString& displayName);
 
 	virtual QString fullDisplayName() const;
 
@@ -88,5 +71,6 @@ signals:
 } ;
 
 
-#endif
+} // namespace lmms
 
+#endif // LMMS_MODEL_H

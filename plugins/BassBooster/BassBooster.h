@@ -30,15 +30,17 @@
 #include "DspEffectLibrary.h"
 #include "BassBoosterControls.h"
 
+namespace lmms
+{
 
 class BassBoosterEffect : public Effect
 {
 public:
 	BassBoosterEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
-	virtual ~BassBoosterEffect();
-	virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames );
+	~BassBoosterEffect() override = default;
+	bool processAudioBuffer( sampleFrame* buf, const fpp_t frames ) override;
 
-	virtual EffectControls* controls()
+	EffectControls* controls() override
 	{
 		return &m_bbControls;
 	}
@@ -59,5 +61,8 @@ private:
 	friend class BassBoosterControls;
 
 } ;
+
+
+} // namespace lmms
 
 #endif

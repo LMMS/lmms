@@ -3,7 +3,7 @@
 <multimediaproject version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings>
-    <instrumenttrack fxch="0" vol="59" name="Bass-Mania" tab="1">
+    <instrumenttrack mixch="0" vol="59" name="Bass-Mania" tab="1">
       <audiofileprocessor reversed="0" looped="0" eframe="0.999938" sframe="0" amp="100" src="misc/bass!.ogg"/>
       <eldata fres="0.5" ftype="0" fcut="16000" fwet="0">
         <elvol userwavefile="" lpdel="0" ctlenvamt="0" amt="1" rel="0.291" latt="0" sus="0" lspd="0.1" att="0.05" pdel="0" lfosyncmode="0" lamt="0" dec="0" x100="0" lshp="0" hold="0"/>

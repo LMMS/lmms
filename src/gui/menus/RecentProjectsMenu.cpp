@@ -10,15 +10,19 @@
 #include "GuiApplication.h"
 #include "MainWindow.h"
 
+namespace lmms::gui
+{
+
+
 RecentProjectsMenu::RecentProjectsMenu(QWidget *parent) :
 	QMenu(tr( "&Recently Opened Projects" ), parent)
 {
 	setIcon(embed::getIconPixmap( "project_open_recent" ));
 
-	connect( this, SIGNAL( aboutToShow() ),
-			 this, SLOT(fillMenu() ) );
-	connect( this, SIGNAL( triggered( QAction * ) ),
-			 this, SLOT(openProject(QAction * ) ) );
+	connect( this, SIGNAL(aboutToShow()),
+			 this, SLOT(fillMenu()));
+	connect( this, SIGNAL(triggered(QAction*)),
+			 this, SLOT(openProject(QAction*)));
 }
 
 
@@ -67,7 +71,7 @@ void RecentProjectsMenu::fillMenu()
 
 void RecentProjectsMenu::openProject(QAction * _action )
 {
-	auto mainWindow = gui->mainWindow();
+	auto mainWindow = getGUI()->mainWindow();
 	if (mainWindow->mayChangeProject(true))
 	{
 		const QString f = _action->text().replace("&&", "&");
@@ -76,3 +80,6 @@ void RecentProjectsMenu::openProject(QAction * _action )
 		mainWindow->setCursor( Qt::ArrowCursor );
 	}
 }
+
+
+} // namespace lmms::gui

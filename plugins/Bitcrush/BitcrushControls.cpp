@@ -28,7 +28,10 @@
 
 #include "BitcrushControls.h"
 #include "Bitcrush.h"
-#include "lmms_math.h"
+
+namespace lmms
+{
+
 
 
 BitcrushControls::BitcrushControls( BitcrushEffect * eff ) :
@@ -39,7 +42,7 @@ BitcrushControls::BitcrushControls( BitcrushEffect * eff ) :
 	m_outGain( 0.0f, -20.0f, 20.0f, 0.1f, this, tr( "Output gain" ) ),
 	m_outClip( 0.0f, -20.0f, 20.0f, 0.1f, this, tr( "Output clip" ) ),
 	m_rate( 44100.f, 20.f, 44100.f, 1.0f, this, tr( "Sample rate" ) ),
-	m_stereoDiff( 0.f, 0.f, 50.f, 0.1f, this, tr( "Stereo difference" ) ),
+	m_stereoDiff( 0.f, -50.f, 50.f, 0.1f, this, tr( "Stereo difference" ) ),
 	m_levels( 256.f, 1.f, 256.f, 0.01f, this, tr( "Levels" ) ),
 	m_rateEnabled( true, this, tr( "Rate enabled" ) ),
 	m_depthEnabled( true, this, tr( "Depth enabled" ) )
@@ -47,12 +50,9 @@ BitcrushControls::BitcrushControls( BitcrushEffect * eff ) :
 	m_rate.setStrictStepSize( true );
 	m_levels.setStrictStepSize( true );
 	
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
+	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
 }
 
-BitcrushControls::~BitcrushControls()
-{
-}
 
 void BitcrushControls::saveSettings( QDomDocument & doc, QDomElement & elem )
 {
@@ -87,3 +87,6 @@ void BitcrushControls::sampleRateChanged()
 {
 	m_effect->sampleRateChanged();
 }
+
+
+} // namespace lmms

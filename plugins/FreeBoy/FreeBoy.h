@@ -1,8 +1,8 @@
 /*
- * FreeBoyInstrument.h - GameBoy papu based instrument
+ * FreeBoy.h - GameBoy papu based instrument
  *
- * Copyright (c) 2008 <Attila Herman <attila589/at/gmail.com>
- *				Csaba Hruska <csaba.hruska/at/gmail.com>
+ * Copyright (c) 2008 Attila Herman <attila589/at/gmail.com>
+ *                    Csaba Hruska <csaba.hruska/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -23,19 +23,28 @@
  *
  */
 
-#ifndef FREEBOY_H
-#define FREEBOY_H
+#ifndef LMMS_FREEBOY_H
+#define LMMS_FREEBOY_H
 
-#include <QObject>
+#include "AutomatableModel.h"
+#include "Blip_Buffer.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "Knob.h"
 #include "Graph.h"
-#include "Gb_Apu.h"
 
-class FreeBoyInstrumentView;
+namespace lmms
+{
+
 class NotePlayHandle;
+
+
+namespace gui
+{
 class PixmapButton;
+class FreeBoyInstrumentView;
+class Knob;
+}
+
 
 class FreeBoyInstrument : public Instrument
 {
@@ -43,21 +52,19 @@ class FreeBoyInstrument : public Instrument
 public:
 
 	FreeBoyInstrument( InstrumentTrack * _instrument_track );
-	virtual ~FreeBoyInstrument();
+	~FreeBoyInstrument() override = default;
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	void playNote(NotePlayHandle* nph, sampleFrame* workingBuffer) override;
+	void deleteNotePluginData(NotePlayHandle* nph) override;
 
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	QString nodeName() const override;
 
-	virtual QString nodeName() const;
+	f_cnt_t desiredReleaseFrames() const override;
 
-	virtual f_cnt_t desiredReleaseFrames() const;
-
-	virtual PluginView * instantiateView( QWidget * _parent );
+	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 
 /*public slots:
@@ -103,12 +110,12 @@ private:
 
 	graphModel  m_graphModel;
 
-	// Fake CPU timing
-	blip_time_t m_time;
-	blip_time_t fakeClock() { return m_time += 4; }
+	friend class gui::FreeBoyInstrumentView;
+};
 
-	friend class FreeBoyInstrumentView;
-} ;
+
+namespace gui
+{
 
 
 class FreeBoyInstrumentView : public InstrumentViewFixedSize
@@ -116,10 +123,10 @@ class FreeBoyInstrumentView : public InstrumentViewFixedSize
 	Q_OBJECT
 public:
 	FreeBoyInstrumentView( Instrument * _instrument, QWidget * _parent );
-	virtual ~FreeBoyInstrumentView();
+	~FreeBoyInstrumentView() override = default;
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	Knob * m_ch1SweepTimeKnob;
 	PixmapButton * m_ch1SweepDirButton;
@@ -159,7 +166,11 @@ private:
 /*protected slots:
 	void updateKnobHint();
 	void updateKnobToolTip();*/
-} ;
+};
 
 
-#endif
+} // namespace gui
+
+} // namespace lmms
+
+#endif // LMMS_FREEBOY_H

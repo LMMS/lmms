@@ -22,21 +22,18 @@
  *
  */
 
-
 #ifndef LMMS_MATH_H
 #define LMMS_MATH_H
 
 #include <cstdint>
 #include "lmms_constants.h"
 #include "lmmsconfig.h"
-#include <QtCore/QtGlobal>
+#include <QtGlobal>
 
 #include <cmath>
-using namespace std;
 
-#ifndef exp10
-#define exp10(x) std::pow( 10.0, x )
-#endif
+namespace lmms
+{
 
 #ifdef __INTEL_COMPILER
 
@@ -120,11 +117,11 @@ static inline float absFraction( float _x )
 }
 #endif
 
-#endif
+#endif // __INTEL_COMPILER
 
 
 
-#define FAST_RAND_MAX 32767
+constexpr int FAST_RAND_MAX = 32767;
 static inline int fast_rand()
 {
 	static unsigned long next = 1;
@@ -155,7 +152,7 @@ static inline long double fastFmal( long double a, long double b, long double c 
 	#endif
 #else
 	return a * b + c;
-#endif
+#endif // FP_FAST_FMAL
 }
 
 //! @brief Takes advantage of fmaf() function if present in hardware
@@ -169,7 +166,7 @@ static inline float fastFmaf( float a, float b, float c )
 	#endif
 #else
 	return a * b + c;
-#endif
+#endif // FP_FAST_FMAF
 }
 
 //! @brief Takes advantage of fma() function if present in hardware
@@ -217,13 +214,13 @@ static inline float logToLinearScale( float min, float max, float value )
 {
 	if( min < 0 )
 	{
-		const float mmax = qMax( qAbs( min ), qAbs( max ) );
+		const float mmax = std::max(std::abs(min), std::abs(max));
 		const float val = value * ( max - min ) + min;
 		float result = signedPowf( val / mmax, F_E ) * mmax;
-		return isnan( result ) ? 0 : result;
+		return std::isnan( result ) ? 0 : result;
 	}
 	float result = powf( value, F_E ) * ( max - min ) + min;
-	return isnan( result ) ? 0 : result;
+	return std::isnan( result ) ? 0 : result;
 }
 
 
@@ -231,16 +228,16 @@ static inline float logToLinearScale( float min, float max, float value )
 static inline float linearToLogScale( float min, float max, float value )
 {
 	static const float EXP = 1.0f / F_E;
-	const float valueLimited = qBound( min, value, max);
+	const float valueLimited = std::clamp(value, min, max);
 	const float val = ( valueLimited - min ) / ( max - min );
 	if( min < 0 )
 	{
-		const float mmax = qMax( qAbs( min ), qAbs( max ) );
+		const float mmax = std::max(std::abs(min), std::abs(max));
 		float result = signedPowf( valueLimited / mmax, EXP ) * mmax;
-		return isnan( result ) ? 0 : result;
+		return std::isnan( result ) ? 0 : result;
 	}
 	float result = powf( val, EXP ) * ( max - min ) + min;
-	return isnan( result ) ? 0 : result;
+	return std::isnan( result ) ? 0 : result;
 }
 
 
@@ -262,9 +259,9 @@ static inline float safeAmpToDbfs( float amp )
 //! @return Linear amplitude
 static inline float safeDbfsToAmp( float dbfs )
 {
-	return isinf( dbfs )
+	return std::isinf( dbfs )
 		? 0.0f
-		: exp10( dbfs * 0.05f );
+		: std::pow(10.f, dbfs * 0.05f );
 }
 
 
@@ -282,7 +279,7 @@ static inline float ampToDbfs( float amp )
 //! @return Linear amplitude
 static inline float dbfsToAmp( float dbfs )
 {
-	return exp10( dbfs * 0.05f );
+	return std::pow(10.f, dbfs * 0.05f );
 }
 
 
@@ -318,14 +315,43 @@ static inline float fastSqrt( float n )
 template<class T>
 static inline T absMax( T a, T b )
 {
-	return qAbs<T>(a) > qAbs<T>(b) ? a : b;
+	return std::abs(a) > std::abs(b) ? a : b;
 }
 
 //! returns value nearest to zero
 template<class T>
 static inline T absMin( T a, T b )
 {
-	return qAbs<T>(a) < qAbs<T>(b) ? a : b;
+	return std::abs(a) < std::abs(b) ? a : b;
 }
 
-#endif
+// @brief Calculate number of digits which LcdSpinBox would show for a given number
+// @note Once we upgrade to C++20, we could probably use std::formatted_size
+static inline int numDigitsAsInt(float f)
+{
+	// use rounding:
+	// LcdSpinBox sometimes uses roundf(), sometimes cast rounding
+	// we use rounding to be on the "safe side"
+	const float rounded = roundf(f);
+	int asInt = static_cast<int>(rounded);
+	int digits = 1; // always at least 1
+	if(asInt < 0)
+	{
+		++digits;
+		asInt = -asInt;
+	}
+	// "asInt" is positive from now
+	int32_t power = 1;
+	for(int32_t i = 1; i<10; ++i)
+	{
+		power *= 10;
+		if(static_cast<int32_t>(asInt) >= power) { ++digits; } // 2 digits for >=10, 3 for >=100
+		else { break; }
+	}
+	return digits;
+}
+
+
+} // namespace lmms
+
+#endif // LMMS_MATH_H

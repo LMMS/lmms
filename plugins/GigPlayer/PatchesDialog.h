@@ -36,6 +36,10 @@
 //----------------------------------------------------------------------------
 // qsynthPresetForm -- UI wrapper form.
 
+namespace lmms::gui
+{
+
+
 class PatchesDialog : public QDialog, private Ui::PatchesDialog
 {
 	Q_OBJECT
@@ -46,7 +50,7 @@ public:
 	PatchesDialog(QWidget * pParent = 0, Qt::WindowFlags wflags = QFlag(0));
 
 	// Destructor.
-	virtual ~PatchesDialog();
+	~PatchesDialog() override = default;
 
 
 	void setup( GigInstance * pSynth, int iChan, const QString & chanName,
@@ -60,8 +64,8 @@ public slots:
 
 protected slots:
 
-	void accept();
-	void reject();
+	void accept() override;
+	void reject() override;
 
 protected:
 
@@ -87,5 +91,8 @@ private:
 	LcdSpinBoxModel * m_progModel;
 	QLabel * m_patchLabel;
 };
+
+
+} // namespace lmms::gui
 
 #endif

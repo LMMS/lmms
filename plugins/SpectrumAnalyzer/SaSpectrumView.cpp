@@ -33,13 +33,18 @@
 #include <QPainter>
 #include <QString>
 
+#include "fft_helpers.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "SaControls.h"
 #include "SaProcessor.h"
 
 #ifdef SA_DEBUG
 	#include <chrono>
 #endif
+
+namespace lmms::gui
+{
 
 
 SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWidget *_parent) :
@@ -47,12 +52,18 @@ SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWi
 	m_controls(controls),
 	m_processor(processor),
 	m_freezeRequest(false),
-	m_frozen(false)
+	m_frozen(false),
+	m_cachedRangeMin(-1),
+	m_cachedRangeMax(-1),
+	m_cachedLogX(true),
+	m_cachedDisplayWidth(0),
+	m_cachedBinCount(0),
+	m_cachedSampleRate(0)
 {
 	setMinimumSize(360, 170);
 	setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
-	connect(gui->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicUpdate()));
+	connect(getGUI()->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicUpdate()));
 
 	m_displayBufferL.resize(m_processor->binCount(), 0);
 	m_displayBufferR.resize(m_processor->binCount(), 0);
@@ -68,6 +79,9 @@ SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWi
 	m_linearAmpTics = makeLinearAmpTics(m_processor->getAmpRangeMin(), m_processor->getAmpRangeMax());
 
 	m_cursor = QPointF(0, 0);
+
+	// Initialize the size of bin → pixel X position LUT to the maximum allowed number of bins + 1.
+	m_cachedBinToX.resize(FFT_BLOCK_SIZES.back() / 2 + 2);
 
 	#ifdef SA_DEBUG
 		m_execution_avg = m_path_avg = m_draw_avg = 0;
@@ -348,10 +362,31 @@ QPainterPath SaSpectrumView::makePath(std::vector<float> &displayBuffer, float r
 	// Bins falling to interval [x_start, x_next) contribute to a single point.
 	float max = m_displayBottom;
 	float x_start = -1;		// lower bound of currently constructed point
+
+	// Speed up bin → x position translation by building a LUT cache.
+	// Update the cache only when range or display width are changed.
+	float rangeMin = m_processor->getFreqRangeMin(m_controls->m_logXModel.value());
+	float rangeMax = m_processor->getFreqRangeMax();
+	if (rangeMin != m_cachedRangeMin || rangeMax != m_cachedRangeMax || m_displayWidth != m_cachedDisplayWidth ||
+		m_controls->m_logXModel.value() != m_cachedLogX || m_processor->binCount() + 1 != m_cachedBinCount ||
+		m_processor->getSampleRate() != m_cachedSampleRate)
+	{
+		m_cachedRangeMin = rangeMin;
+		m_cachedRangeMax = rangeMax;
+		m_cachedDisplayWidth = m_displayWidth;
+		m_cachedLogX = m_controls->m_logXModel.value();
+		m_cachedBinCount = m_processor->binCount() + 1;
+		m_cachedSampleRate = m_processor->getSampleRate();
+		for (unsigned int n = 0; n < m_cachedBinCount; n++)
+		{
+			m_cachedBinToX[n] = freqToXPixel(binToFreq(n), m_displayWidth);
+		}
+	}
+
 	for (unsigned int n = 0; n < m_processor->binCount(); n++)
 	{
-		float x = freqToXPixel(binToFreq(n), m_displayWidth);
-		float x_next = freqToXPixel(binToFreq(n + 1), m_displayWidth);
+		float x = m_cachedBinToX[n];
+		float x_next = m_cachedBinToX[n + 1];
 		float y = ampToYPixel(displayBuffer[n], m_displayBottom);
 
 		// consider making a point only if x falls within display bounds
@@ -398,8 +433,8 @@ QPainterPath SaSpectrumView::makePath(std::vector<float> &displayBuffer, float r
 // Draw background, grid and associated frequency and amplitude labels.
 void SaSpectrumView::drawGrid(QPainter &painter)
 {
-	std::vector<std::pair<int, std::string>> *freqTics = NULL;
-	std::vector<std::pair<float, std::string>> *ampTics = NULL;
+	std::vector<std::pair<int, std::string>> *freqTics = nullptr;
+	std::vector<std::pair<float, std::string>> *ampTics = nullptr;
 	float pos = 0;
 	float label_width = 24;
 	float label_height = 15;
@@ -613,8 +648,8 @@ std::vector<std::pair<int, std::string>> SaSpectrumView::makeLogFreqTics(int low
 {
 	std::vector<std::pair<int, std::string>> result;
 	int i, j;
-	int a[] = {10, 20, 50};		// sparse series multipliers
-	int b[] = {14, 30, 70};		// additional (denser) series
+	auto a = std::array{10, 20, 50};		// sparse series multipliers
+	auto b = std::array{14, 30, 70};		// additional (denser) series
 
 	// generate main steps (powers of 10); use the series to specify smaller steps
 	for (i = 1; i <= high; i *= 10)
@@ -811,3 +846,5 @@ void SaSpectrumView::resizeEvent(QResizeEvent *event)
 	m_linearAmpTics = makeLinearAmpTics(m_processor->getAmpRangeMin(), m_processor->getAmpRangeMax());
 }
 
+
+} // namespace lmms::gui

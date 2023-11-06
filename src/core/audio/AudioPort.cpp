@@ -24,13 +24,15 @@
 
 #include "AudioPort.h"
 #include "AudioDevice.h"
+#include "AudioEngine.h"
 #include "EffectChain.h"
-#include "FxMixer.h"
-#include "Engine.h"
 #include "Mixer.h"
+#include "Engine.h"
 #include "MixHelpers.h"
 #include "BufferManager.h"
 
+namespace lmms
+{
 
 AudioPort::AudioPort( const QString & _name, bool _has_effect_chain,
 		FloatModel * volumeModel, FloatModel * panningModel,
@@ -38,14 +40,14 @@ AudioPort::AudioPort( const QString & _name, bool _has_effect_chain,
 	m_bufferUsage( false ),
 	m_portBuffer( BufferManager::acquire() ),
 	m_extOutputEnabled( false ),
-	m_nextFxChannel( 0 ),
+	m_nextMixerChannel( 0 ),
 	m_name( "unnamed port" ),
-	m_effects( _has_effect_chain ? new EffectChain( NULL ) : NULL ),
+	m_effects( _has_effect_chain ? new EffectChain( nullptr ) : nullptr ),
 	m_volumeModel( volumeModel ),
 	m_panningModel( panningModel ),
 	m_mutedModel( mutedModel )
 {
-	Engine::mixer()->addAudioPort( this );
+	Engine::audioEngine()->addAudioPort( this );
 	setExtOutputEnabled( true );
 }
 
@@ -55,7 +57,7 @@ AudioPort::AudioPort( const QString & _name, bool _has_effect_chain,
 AudioPort::~AudioPort()
 {
 	setExtOutputEnabled( false );
-	Engine::mixer()->removeAudioPort( this );
+	Engine::audioEngine()->removeAudioPort( this );
 	BufferManager::release( m_portBuffer );
 }
 
@@ -69,11 +71,11 @@ void AudioPort::setExtOutputEnabled( bool _enabled )
 		m_extOutputEnabled = _enabled;
 		if( m_extOutputEnabled )
 		{
-			Engine::mixer()->audioDev()->registerPort( this );
+			Engine::audioEngine()->audioDev()->registerPort( this );
 		}
 		else
 		{
-			Engine::mixer()->audioDev()->unregisterPort( this );
+			Engine::audioEngine()->audioDev()->unregisterPort( this );
 		}
 	}
 }
@@ -84,7 +86,7 @@ void AudioPort::setExtOutputEnabled( bool _enabled )
 void AudioPort::setName( const QString & _name )
 {
 	m_name = _name;
-	Engine::mixer()->audioDev()->renamePort( this );
+	Engine::audioEngine()->audioDev()->renamePort( this );
 }
 
 
@@ -94,7 +96,7 @@ bool AudioPort::processEffects()
 {
 	if( m_effects )
 	{
-		bool more = m_effects->processAudioBuffer( m_portBuffer, Engine::mixer()->framesPerPeriod(), m_bufferUsage );
+		bool more = m_effects->processAudioBuffer( m_portBuffer, Engine::audioEngine()->framesPerPeriod(), m_bufferUsage );
 		return more;
 	}
 	return false;
@@ -108,7 +110,7 @@ void AudioPort::doProcessing()
 		return;
 	}
 
-	const fpp_t fpp = Engine::mixer()->framesPerPeriod();
+	const fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
 
 	// clear the buffer
 	BufferManager::clear( m_portBuffer, fpp );
@@ -119,7 +121,7 @@ void AudioPort::doProcessing()
 		if( ph->buffer() )
 		{
 			if( ph->usesBuffer()
-				&& ( ph->type() == PlayHandle::TypeNotePlayHandle
+				&& ( ph->type() == PlayHandle::Type::NotePlayHandle
 					|| !MixHelpers::isSilent( ph->buffer(), fpp ) ) )
 			{
 				m_bufferUsage = true;
@@ -222,7 +224,7 @@ void AudioPort::doProcessing()
 	const bool me = processEffects();
 	if( me || m_bufferUsage )
 	{
-		Engine::fxMixer()->mixToChannel( m_portBuffer, m_nextFxChannel ); 	// send output to fx mixer
+		Engine::mixer()->mixToChannel( m_portBuffer, m_nextMixerChannel ); 	// send output to mixer
 																			// TODO: improve the flow here - convert to pull model
 		m_bufferUsage = false;
 	}
@@ -247,3 +249,5 @@ void AudioPort::removePlayHandle( PlayHandle * handle )
 		}
 	m_playHandleLock.unlock();
 }
+
+} // namespace lmms
