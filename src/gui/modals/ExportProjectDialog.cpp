@@ -125,7 +125,16 @@ void ExportProjectDialog::accept()
 }
 
 
-
+void ExportProjectDialog::showEvent( QShowEvent * _ce )
+{
+    QDialog::showEvent( _ce );
+    if (m_autoExec)
+    {
+        m_autoExec = false;
+        startButton->animateClick(100);
+        //QTimer::singleShot(0.5, startButton, [this]{ startButton->animateClick(100); });
+    }
+}
 
 void ExportProjectDialog::closeEvent( QCloseEvent * _ce )
 {
@@ -152,6 +161,12 @@ OutputSettings::StereoMode mapToStereoMode(int index)
 		return OutputSettings::StereoMode::Stereo;
 	}
 }
+
+void ExportProjectDialog::autoExec(bool autoExec)
+{
+    m_autoExec = autoExec;
+}
+
 
 void ExportProjectDialog::startExport()
 {

@@ -42,19 +42,20 @@ class ExportProjectDialog : public QDialog, public Ui::ExportProjectDialog
 	Q_OBJECT
 public:
 	ExportProjectDialog( const QString & _file_name, QWidget * _parent, bool multi_export );
+    void execExport();
+    void autoExec(bool);
 
 protected:
-	void reject() override;
-	void closeEvent( QCloseEvent * _ce ) override;
+    void reject() override;
+    void closeEvent( QCloseEvent * _ce ) override;
+    void showEvent( QShowEvent * _ce ) override;
     void selectDefaults();
 
 private slots:
 	void startBtnClicked();
 	void updateTitleBar( int );
 	void accept() override;
-	void startExport();
-
-
+    void startExport();
 	void onFileFormatChanged(int);
 
 private:
@@ -62,6 +63,7 @@ private:
 	QString m_dirName;
 	QString m_fileExtension;
 	bool m_multiExport;
+    bool m_autoExec;
 
 	ProjectRenderer::ExportFileFormat m_ft;
 	std::unique_ptr<RenderManager> m_renderManager;
