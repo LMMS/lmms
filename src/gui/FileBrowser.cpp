@@ -190,36 +190,39 @@ void FileBrowser::buildSearchTree(QStringList matches, QString id)
 		{
 			if (!match.startsWith(absoluteRootPath)) { continue; }
 
-			const auto matchInfo = QFileInfo{match};
-			const auto matchName = matchInfo.fileName();
-			const auto matchParentPath = matchInfo.dir().path();
+			const auto childInfo = QFileInfo{match};
+			const auto childName = childInfo.fileName();
+			const auto parentPath = childInfo.dir().path();
 			auto childWidget = static_cast<QTreeWidgetItem*>(nullptr);
 
-			if (matchInfo.isDir())
+			if (childInfo.isDir())
 			{
-				auto dirChildWidget = new Directory(matchName, matchParentPath, m_filter);
+				auto dirChildWidget = new Directory(childName, parentPath, m_filter);
 				dirChildWidget->update();
 				childWidget = dirChildWidget;
 			}
-			else if (matchInfo.isFile()) { childWidget = new FileItem(matchName, matchParentPath); }
+			else if (childInfo.isFile()) { childWidget = new FileItem(childName, parentPath); }
+			else { continue; }
 
-			const auto relativeParentPath = rootPathDir.relativeFilePath(matchParentPath);
+			const auto relativeParentPath = rootPathDir.relativeFilePath(parentPath);
 			if (relativeParentPath == ".")
 			{
 				m_searchTreeWidget->addTopLevelItem(childWidget);
-				if (matchInfo.isDir()) { m_searchTreeWidget->expandItem(childWidget); }
+				if (childInfo.isDir()) { m_searchTreeWidget->expandItem(childWidget); }
 				continue;
 			}
 
-			auto parentItems = m_searchTreeWidget->findItems(relativeParentPath, Qt::MatchExactly);
-			auto parentItem = parentItems.isEmpty() ? new Directory(relativeParentPath, matchParentPath, m_filter) : parentItems[0];
-			auto parentDirItem = dynamic_cast<Directory*>(parentItem);
-			if (!parentDirItem) { continue; }
+			const auto grandParentPath = QFileInfo{parentPath}.dir().path();
+			const auto parentItems = m_searchTreeWidget->findItems(relativeParentPath, Qt::MatchExactly);
 
-			parentDirItem->addChild(childWidget);
-			parentDirItem->update();
-			m_searchTreeWidget->addTopLevelItem(parentDirItem);
-			m_searchTreeWidget->expandItem(parentDirItem);
+			if (parentItems.isEmpty())
+			{
+				auto parentItem = new Directory(relativeParentPath, grandParentPath, m_filter);
+				parentItem->addChild(childWidget);
+				m_searchTreeWidget->addTopLevelItem(parentItem);
+				m_searchTreeWidget->expandItem(parentItem);
+			}
+			else { parentItems[0]->addChild(childWidget); }
 		}
 	}
 
