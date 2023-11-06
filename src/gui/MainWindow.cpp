@@ -118,14 +118,10 @@ MainWindow::MainWindow() :
 							splitter, false, true,
 				confMgr->userProjectsDir(),
 				confMgr->factoryProjectsDir()));
-	sideBar->appendTab( new FileBrowser(
-				confMgr->userSamplesDir() + "*" +
-				confMgr->factorySamplesDir(),
-					"*", tr( "My Samples" ),
-					embed::getIconPixmap( "sample_file" ).transformed( QTransform().rotate( 90 ) ),
-							splitter, false, true,
-					confMgr->userSamplesDir(),
-					confMgr->factorySamplesDir()));
+	sideBar->appendTab(
+		new FileBrowser(confMgr->userSamplesDir() + "*" + confMgr->factorySamplesDir(), FileItem::defaultFilters(),
+			tr("My Samples"), embed::getIconPixmap("sample_file").transformed(QTransform().rotate(90)), splitter, false,
+			true, confMgr->userSamplesDir(), confMgr->factorySamplesDir()));
 	sideBar->appendTab( new FileBrowser(
 				confMgr->userPresetsDir() + "*" +
 				confMgr->factoryPresetsDir(),
