@@ -68,9 +68,10 @@ PluginBrowser::PluginBrowser( QWidget * _parent ) :
 	hint->setWordWrap( true );
 
 	auto searchBar = new QLineEdit(m_view);
-	searchBar->setPlaceholderText( "Search" );
-	searchBar->setMaxLength( 64 );
-	searchBar->setClearButtonEnabled( true );
+	searchBar->setPlaceholderText(tr("Search"));
+	searchBar->setMaxLength(64);
+	searchBar->setClearButtonEnabled(true);
+	searchBar->addAction(embed::getIconPixmap("zoom"), QLineEdit::LeadingPosition);
 
 	m_descTree = new QTreeWidget( m_view );
 	m_descTree->setColumnCount( 1 );
