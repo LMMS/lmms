@@ -52,9 +52,6 @@ public:
 				const QString & _name = QString(),
 						LedColor _color = LedColor::Yellow );
 
-	~LedCheckBox() override;
-
-
 	inline const QString & text()
 	{
 		return( m_text );
@@ -69,8 +66,8 @@ protected:
 
 
 private:
-	QPixmap* m_ledOnPixmap;
-	QPixmap* m_ledOffPixmap;
+	QPixmap m_ledOnPixmap;
+	QPixmap m_ledOffPixmap;
 
 	QString m_text;
 
