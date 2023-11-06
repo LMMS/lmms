@@ -102,10 +102,9 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 	ui->filterEdit->setClearButtonEnabled(true);
 	ui->filterEdit->addAction(embed::getIconPixmap("zoom"), QLineEdit::LeadingPosition);
 
-	connect(ui->filterEdit, SIGNAL(textChanged(const QString&)),
-				&m_model, SLOT(setFilterFixedString(const QString&)));
-	connect(ui->filterEdit, SIGNAL(textChanged(const QString&)), SLOT(updateSelection()));
-	connect(ui->filterEdit, SIGNAL(textChanged(const QString&)), SLOT(sortAgain()));
+	connect(ui->filterEdit, &QLineEdit::textChanged, &m_model, &QSortFilterProxyModel::setFilterFixedString);
+	connect(ui->filterEdit, &QLineEdit::textChanged, this, &EffectSelectDialog::updateSelection);
+	connect(ui->filterEdit, &QLineEdit::textChanged, this, &EffectSelectDialog::sortAgain);
 
 	ui->pluginList->setModel( &m_model );
 
