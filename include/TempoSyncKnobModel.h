@@ -82,6 +82,9 @@ public:
 
 	void setScale( float _new_scale );
 
+	MeterModel & getCustomMeterModel() { return m_custom; }
+	MeterModel const & getCustomMeterModel() const { return m_custom; }
+
 signals:
 	void syncModeChanged( lmms::TempoSyncKnobModel::SyncMode _new_mode );
 	void scaleChanged( float _new_scale );

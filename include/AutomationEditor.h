@@ -63,6 +63,7 @@ class AutomationEditor : public QWidget, public JournallingObject
 	Q_PROPERTY(QColor lineColor MEMBER m_lineColor)
 	Q_PROPERTY(QColor nodeInValueColor MEMBER m_nodeInValueColor)
 	Q_PROPERTY(QColor nodeOutValueColor MEMBER m_nodeOutValueColor)
+	Q_PROPERTY(QColor nodeTangentLineColor MEMBER m_nodeTangentLineColor)
 	Q_PROPERTY(QBrush scaleColor MEMBER m_scaleColor)
 	Q_PROPERTY(QBrush graphColor MEMBER m_graphColor)
 	Q_PROPERTY(QColor crossColor MEMBER m_crossColor)
@@ -91,7 +92,8 @@ public:
 	{
 		Draw,
 		Erase,
-		DrawOutValues
+		DrawOutValues,
+		EditTangents
 	};
 
 public slots:
@@ -118,6 +120,13 @@ protected:
 	inline void drawLevelTick(QPainter & p, int tick, float value);
 
 	timeMap::iterator getNodeAt(int x, int y, bool outValue = false, int r = 5);
+	/**
+	 * @brief Given a mouse X coordinate, returns a timeMap::iterator that points to
+	 *        the closest node.
+	 * @param Int X coordinate
+	 * @return timeMap::iterator with the closest node or timeMap.end() if there are no nodes.
+	 */
+	timeMap::iterator getClosestNode(int x);
 
 	void drawLine( int x0, float y0, int x1, float y1 );
 	bool fineTuneValue(timeMap::iterator node, bool editingOutValue);
@@ -133,6 +142,12 @@ protected slots:
 	void setEditMode(int mode);
 
 	void setProgressionType(AutomationClip::ProgressionType type);
+	/**
+	 * @brief This method handles the AutomationEditorWindow event of changing
+	 * progression types. After that, it calls updateEditTanButton so the edit
+	 * tangents button is updated accordingly
+	 * @param Int New progression type
+	 */
 	void setProgressionType(int type);
 	void setTension();
 
@@ -153,7 +168,9 @@ private:
 		EraseValues,
 		MoveOutValue,
 		ResetOutValues,
-		DrawLine
+		DrawLine,
+		MoveTangent,
+		ResetTangents
 	} ;
 
 	// some constants...
@@ -173,6 +190,7 @@ private:
 	static QPixmap * s_toolDraw;
 	static QPixmap * s_toolErase;
 	static QPixmap * s_toolDrawOut;
+	static QPixmap * s_toolEditTangents;
 	static QPixmap * s_toolMove;
 	static QPixmap * s_toolYFlip;
 	static QPixmap * s_toolXFlip;
@@ -215,6 +233,11 @@ private:
 	// Time position (key) of automation node whose outValue is being dragged
 	int m_draggedOutValueKey;
 
+	// The tick from the node whose tangent is being dragged
+	int m_draggedTangentTick;
+	// Whether the tangent being dragged is the InTangent or OutTangent
+	bool m_draggedOutTangent;
+
 	EditMode m_editMode;
 
 	bool m_mouseDownLeft;
@@ -225,6 +248,7 @@ private:
 
 	void drawCross(QPainter & p );
 	void drawAutomationPoint( QPainter & p, timeMap::iterator it );
+	void drawAutomationTangents(QPainter& p, timeMap::iterator it);
 	bool inPatternEditor();
 
 	QColor m_barLineColor;
@@ -233,6 +257,7 @@ private:
 	QBrush m_graphColor;
 	QColor m_nodeInValueColor;
 	QColor m_nodeOutValueColor;
+	QColor m_nodeTangentLineColor;
 	QBrush m_scaleColor;
 	QColor m_crossColor;
 	QColor m_backgroundShade;
@@ -285,8 +310,21 @@ protected slots:
 
 private slots:
 	void updateWindowTitle();
+	void setProgressionType(int progType);
+	/**
+	 * @brief The Edit Tangent edit mode should only be available for
+	 * Cubic Hermite progressions, so this method is responsable for disabling it
+	 * for other edit modes and reenabling it when it changes back to the Edit Tangent
+	 * mode.
+	 */
+	void updateEditTanButton();
 
 private:
+	QAction* m_drawAction;
+	QAction* m_eraseAction;
+	QAction* m_drawOutAction;
+	QAction* m_editTanAction;
+
 	QAction* m_discreteAction;
 	QAction* m_linearAction;
 	QAction* m_cubicHermiteAction;

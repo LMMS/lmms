@@ -126,6 +126,9 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 
 			m_framesPerPeriod = DEFAULT_BUFFER_SIZE;
 		}
+		// lmms works with chunks of size DEFAULT_BUFFER_SIZE (256) and only the final mix will use the actual
+		// buffer size. Plugins don't see a larger buffer size than 256. If m_framesPerPeriod is larger than
+		// DEFAULT_BUFFER_SIZE, it's set to DEFAULT_BUFFER_SIZE and the rest is handled by an increased fifoSize.
 		else if( m_framesPerPeriod > DEFAULT_BUFFER_SIZE )
 		{
 			fifoSize = m_framesPerPeriod / DEFAULT_BUFFER_SIZE;
@@ -394,6 +397,17 @@ void AudioEngine::renderStageInstruments()
 
 	AudioEngineWorkerThread::fillJobQueue(m_playHandles);
 	AudioEngineWorkerThread::startAndWaitForJobs();
+}
+
+
+
+void AudioEngine::renderStageEffects()
+{
+	AudioEngineProfiler::Probe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::Effects);
+
+	// STAGE 2: process effects of all instrument- and sampletracks
+	AudioEngineWorkerThread::fillJobQueue(m_audioPorts);
+	AudioEngineWorkerThread::startAndWaitForJobs();
 
 	// removed all play handles which are done
 	for( PlayHandleList::Iterator it = m_playHandles.begin();
@@ -420,17 +434,6 @@ void AudioEngine::renderStageInstruments()
 			++it;
 		}
 	}
-}
-
-
-
-void AudioEngine::renderStageEffects()
-{
-	AudioEngineProfiler::Probe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::Effects);
-
-	// STAGE 2: process effects of all instrument- and sampletracks
-	AudioEngineWorkerThread::fillJobQueue(m_audioPorts);
-	AudioEngineWorkerThread::startAndWaitForJobs();
 }
 
 

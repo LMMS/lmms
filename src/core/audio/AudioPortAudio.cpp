@@ -49,7 +49,7 @@ void AudioPortAudioSetupUtil::updateChannels()
 
 #ifdef LMMS_HAVE_PORTAUDIO
 
-#include <QLabel>
+#include <QFormLayout>
 
 #include "Engine.h"
 #include "ConfigManager.h"
@@ -419,19 +419,13 @@ AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 {
 	using gui::ComboBox;
 
-	m_backend = new ComboBox( this, "BACKEND" );
-	m_backend->setGeometry( 64, 15, 260, ComboBox::DEFAULT_HEIGHT );
+	QFormLayout * form = new QFormLayout(this);
 
-	auto backend_lbl = new QLabel(tr("Backend"), this);
-	backend_lbl->setFont( pointSize<7>( backend_lbl->font() ) );
-	backend_lbl->move( 8, 18 );
+	m_backend = new ComboBox( this, "BACKEND" );
+	form->addRow(tr("Backend"), m_backend);
 
 	m_device = new ComboBox( this, "DEVICE" );
-	m_device->setGeometry( 64, 35, 260, ComboBox::DEFAULT_HEIGHT );
-
-	auto dev_lbl = new QLabel(tr("Device"), this);
-	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
-	dev_lbl->move( 8, 38 );
+	form->addRow(tr("Device"), m_device);
 	
 /*	LcdSpinBoxModel * m = new LcdSpinBoxModel(  );
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
