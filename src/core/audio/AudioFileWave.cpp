@@ -23,10 +23,12 @@
  *
  */
 
+
+#include <QFileInfo>
 #include "AudioFileWave.h"
 #include "endian_handling.h"
 #include "AudioEngine.h"
-
+#include "Song.h"
 
 namespace lmms
 {
@@ -89,6 +91,37 @@ bool AudioFileWave::startEncoding()
 	sf_command(m_sf, SFC_SET_CLIPPING, nullptr, SF_TRUE);
 
 	sf_set_string ( m_sf, SF_STR_SOFTWARE, "LMMS" );
+
+    const Song* song = Engine::getSong();
+    if (!song->getTitle().isNull() && song->getTitle().trimmed().size() > 0)
+    {
+        sf_set_string(m_sf, SF_STR_TITLE, song->getTitle().toStdString().c_str());
+    } else {
+        sf_set_string(m_sf, SF_STR_TITLE, QFileInfo(song->projectFileName())
+                         .completeBaseName()
+                         .replace("[_-]", " ")
+                         .toStdString().c_str());
+    }
+    if (!song->getArtist().isNull() && song->getArtist().trimmed().size() > 0)
+    {
+        sf_set_string(m_sf, SF_STR_ARTIST, song->getArtist().toStdString().c_str());
+    }
+    if (!song->getAlbum().isNull() && song->getAlbum().trimmed().size() > 0)
+    {
+        sf_set_string(m_sf, SF_STR_ALBUM, song->getAlbum().toStdString().c_str());
+    }
+    if (!song->getYear().isNull() && song->getYear().trimmed().size() > 0)
+    {
+        sf_set_string(m_sf, SF_STR_DATE, song->getYear().toStdString().c_str());
+    }
+    if (!song->getGenre().isNull() && song->getGenre().trimmed().size() > 0)
+    {
+        sf_set_string(m_sf, SF_STR_GENRE, song->getGenre().toStdString().c_str());
+    }
+    if (!song->getComment().isNull() && song->getComment().trimmed().size() > 0)
+    {
+        sf_set_string(m_sf, SF_STR_COMMENT, song->getComment().toStdString().c_str());
+    }
 
 	return true;
 }

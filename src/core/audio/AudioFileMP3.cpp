@@ -131,7 +131,7 @@ bool AudioFileMP3::initEncoder()
 
     // add optional Song meta data
     const Song* song = Engine::getSong();
-    if (!song->getTitle().isNull())
+    if (!song->getTitle().isNull() && song->getTitle().trimmed().size() > 0)
     {
         id3tag_set_title(m_lame, song->getTitle().toStdString().c_str());
     } else {
@@ -142,27 +142,27 @@ bool AudioFileMP3::initEncoder()
     }
     id3tag_set_textinfo_utf16(m_lame, "TBPM", QString::number( song->getTempo()).utf16());
 
-    if (!song->getArtist().isNull())
+    if (!song->getArtist().isNull() && song->getArtist().trimmed().size() > 0)
     {
         id3tag_set_artist(m_lame, song->getArtist().toStdString().c_str());
     }
-    if (!song->getAlbum().isNull())
+    if (!song->getAlbum().isNull() && song->getAlbum().trimmed().size() > 0)
     {
         id3tag_set_album(m_lame, song->getAlbum().toStdString().c_str());
     }
-    if (!song->getYear().isNull())
+    if (!song->getYear().isNull() && song->getYear().trimmed().size() > 0)
     {
         id3tag_set_year(m_lame, song->getYear().toStdString().c_str());
     }
-    if (!song->getGenre().isNull())
+    if (!song->getGenre().isNull() && song->getGenre().trimmed().size() > 0)
     {
         id3tag_set_genre(m_lame, song->getGenre().toStdString().c_str());
     }
-    if (!song->getComment().isNull())
+    if (!song->getComment().isNull() && song->getComment().trimmed().size() > 0)
     {
         id3tag_set_comment(m_lame, song->getComment().toStdString().c_str());
     }
-    if (!song->getImage().isNull())
+    if (!song->getImage().isNull() && song->getImage().trimmed().size() > 0)
     {
         int imageSize = 0;
         char * imageData = 0;
