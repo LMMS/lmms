@@ -37,6 +37,7 @@
 #include "Oscillator.h"
 #include "PixmapButton.h"
 #include "SampleBuffer.h"
+#include "PathUtil.h"
 
 #include "embed.h"
 #include "plugin_export.h"
@@ -99,7 +100,8 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 	m_detuningRight( 0.0f ),
 	m_phaseOffsetLeft( 0.0f ),
 	m_phaseOffsetRight( 0.0f ),
-	m_useWaveTable( true )
+	m_useWaveTable( true ),
+	m_dirScroller()
 {
 	// Connect knobs with Oscillators' inputs
 	connect( &m_volumeModel, SIGNAL( dataChanged() ),
@@ -146,16 +148,38 @@ OscillatorObject::~OscillatorObject()
 
 void OscillatorObject::oscUserDefWaveDblClick()
 {
-	QString af = m_sampleBuffer->openAndSetWaveformFile();
-	if( af != "" )
+	QString fileName = m_sampleBuffer->openAndSetWaveformFile();
+	if( fileName != "" )
 	{
 		// TODO:
 		//m_usrWaveBtn->setToolTip(m_sampleBuffer->audioFile());
+		m_dirScroller.setFile(fileName);
+		qWarning("set wave '%s'", PathUtil::toAbsolute(fileName).toStdString().c_str());
+	}
+}
+
+void OscillatorObject::oscUserDefWaveNext()
+{
+	QString newFile = m_dirScroller.next();
+	if ( ! newFile.isEmpty() )
+	{
+		qWarning("setting wave '%s'", newFile.toStdString().c_str());
+		QFileInfo fInfo(PathUtil::toAbsolute(m_sampleBuffer->audioFile()));
+		m_sampleBuffer->setAudioFile( PathUtil::toShortestRelative(fInfo.absolutePath() + QDir::separator() + newFile) );
 	}
 }
 
 
-
+void OscillatorObject::oscUserDefWavePrev()
+{
+	QString newFile = m_dirScroller.prev();
+	if ( ! newFile.isEmpty() )
+	{
+		qWarning("setting wave '%s' current='%s'", newFile.toStdString().c_str(), m_sampleBuffer->audioFile().toStdString().c_str());
+		QFileInfo fInfo(PathUtil::toAbsolute(m_sampleBuffer->audioFile()));
+		m_sampleBuffer->setAudioFile( PathUtil::toShortestRelative(fInfo.absolutePath() + QDir::separator() + newFile) );
+	}
+}
 
 void OscillatorObject::updateVolume()
 {
@@ -601,7 +625,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 		int btn_y = 96 + i * osc_h;
 
 		auto sin_wave_btn = new PixmapButton(this, nullptr);
-		sin_wave_btn->move( 128, btn_y );
+		sin_wave_btn->move( 128 - 34, btn_y );
 		sin_wave_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"sin_shape_active" ) );
 		sin_wave_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -610,7 +634,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 				tr( "Sine wave" ) );
 
 		auto triangle_wave_btn = new PixmapButton(this, nullptr);
-		triangle_wave_btn->move( 143, btn_y );
+		triangle_wave_btn->move( 143 - 34, btn_y );
 		triangle_wave_btn->setActiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "triangle_shape_active" ) );
 		triangle_wave_btn->setInactiveGraphic(
@@ -619,7 +643,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 				tr( "Triangle wave") );
 
 		auto saw_wave_btn = new PixmapButton(this, nullptr);
-		saw_wave_btn->move( 158, btn_y );
+		saw_wave_btn->move( 158 - 34, btn_y );
 		saw_wave_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"saw_shape_active" ) );
 		saw_wave_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -628,7 +652,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 				tr( "Saw wave" ) );
 
 		auto sqr_wave_btn = new PixmapButton(this, nullptr);
-		sqr_wave_btn->move( 173, btn_y );
+		sqr_wave_btn->move( 173 - 34, btn_y );
 		sqr_wave_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 						"square_shape_active" ) );
 		sqr_wave_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -637,7 +661,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 				tr( "Square wave" ) );
 
 		auto moog_saw_wave_btn = new PixmapButton(this, nullptr);
-		moog_saw_wave_btn->move( 188, btn_y );
+		moog_saw_wave_btn->move( 188 - 34, btn_y );
 		moog_saw_wave_btn->setActiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "moog_saw_shape_active" ) );
 		moog_saw_wave_btn->setInactiveGraphic(
@@ -646,7 +670,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 				tr( "Moog-like saw wave" ) );
 
 		auto exp_wave_btn = new PixmapButton(this, nullptr);
-		exp_wave_btn->move( 203, btn_y );
+		exp_wave_btn->move( 203 - 34, btn_y );
 		exp_wave_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"exp_shape_active" ) );
 		exp_wave_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -655,7 +679,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 				tr( "Exponential wave" ) );
 
 		auto white_noise_btn = new PixmapButton(this, nullptr);
-		white_noise_btn->move( 218, btn_y );
+		white_noise_btn->move( 218 - 34, btn_y );
 		white_noise_btn->setActiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "white_noise_shape_active" ) );
 		white_noise_btn->setInactiveGraphic(
@@ -664,7 +688,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 				tr( "White noise" ) );
 
 		auto uwb = new PixmapButton(this, nullptr);
-		uwb->move( 233, btn_y );
+		uwb->move( 233 - 34, btn_y );
 		uwb->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"usr_shape_active" ) );
 		uwb->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -672,13 +696,17 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 		uwb->setToolTip(tr("User-defined wave"));
 
 		auto uwt = new PixmapButton(this, nullptr);
-		uwt->move( 110, btn_y );
+		uwt->move( 110 - 34, btn_y );
 		uwt->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"wavetable_active" ) );
 		uwt->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"wavetable_inactive" ) );
 		uwt->setCheckable(true);
 		uwt->setToolTip(tr("Use alias-free wavetable oscillators."));
+
+		auto lrn = new LeftRightNav(this);
+		lrn->setCursor( QCursor( Qt::PointingHandCursor ) );
+		lrn->move( 215, btn_y -1 );
 
 		auto wsbg = new automatableButtonGroup(this);
 
@@ -693,7 +721,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 
 
 		m_oscKnobs[i] = OscillatorKnobs( vk, pk, ck, flk, frk, pok,
-							spdk, uwb, wsbg, uwt );
+							spdk, uwb, wsbg, uwt, lrn );
 	}
 }
 
@@ -730,6 +758,13 @@ void TripleOscillatorView::modelChanged()
 		connect( m_oscKnobs[i].m_userWaveButton,
 						SIGNAL( doubleClicked() ),
 				t->m_osc[i], SLOT( oscUserDefWaveDblClick() ) );
+
+		connect( m_oscKnobs[i].m_userWaveSwitcher,
+						SIGNAL( onNavLeft() ),
+				 t->m_osc[i], SLOT( oscUserDefWavePrev() ));
+		connect( m_oscKnobs[i].m_userWaveSwitcher,
+						SIGNAL( onNavRight() ),
+				 t->m_osc[i], SLOT( oscUserDefWaveNext() ));
 	}
 }
 

@@ -1,5 +1,6 @@
 /*
  * DirectoryScroller.h - class for selecting sounds in a given directory
+ * This enalbes, for example, quickly trying out sounds in audio file processor
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -36,17 +37,17 @@ class DirectoryScroller
 public:
 
     DirectoryScroller(  );
-    DirectoryScroller( const QString& fileName );
+    DirectoryScroller( const QString& path );
 
     virtual ~DirectoryScroller() = default;
 
-    void setFile( const QString& fileName );
+    void setFile( const QString& path );
     void disable();
 	QString next( );
 	QString prev( );
 
 private:
-    int m_index;
+    int m_index; // -1 = disabled
     QString m_suffix;
     QDir m_dir;
 

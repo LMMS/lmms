@@ -29,6 +29,8 @@
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "AutomatableModel.h"
+#include "LeftRightNav.h"
+#include "DirectoryScroller.h"
 
 namespace lmms
 {
@@ -83,13 +85,15 @@ private:
 	float m_phaseOffsetLeft;
 	float m_phaseOffsetRight;
 	bool m_useWaveTable;
+	DirectoryScroller m_dirScroller;
 
 	friend class TripleOscillator;
 	friend class gui::TripleOscillatorView;
 
-
 private slots:
 	void oscUserDefWaveDblClick();
+	void oscUserDefWaveNext();
+	void oscUserDefWavePrev();
 
 	void updateVolume();
 	void updateDetuningLeft();
@@ -97,7 +101,6 @@ private slots:
 	void updatePhaseOffsetLeft();
 	void updatePhaseOffsetRight();
 	void updateUseWaveTable();
-
 } ;
 
 
@@ -178,7 +181,8 @@ private:
 					Knob * spd,
 					PixmapButton * uwb,
 					automatableButtonGroup * wsbg,
-					PixmapButton * wt) :
+					PixmapButton * wt,
+					LeftRightNav * lrn) :
 			m_volKnob( v ),
 			m_panKnob( p ),
 			m_coarseKnob( c ),
@@ -188,7 +192,8 @@ private:
 			m_stereoPhaseDetuningKnob( spd ),
 			m_userWaveButton( uwb ),
 			m_waveShapeBtnGrp( wsbg ),
-			m_multiBandWaveTableButton( wt )
+			m_multiBandWaveTableButton( wt ),
+			m_userWaveSwitcher( lrn )
 		{
 		}
 		OscillatorKnobs() = default;
@@ -202,6 +207,7 @@ private:
 		PixmapButton * m_userWaveButton;
 		automatableButtonGroup * m_waveShapeBtnGrp;
 		PixmapButton * m_multiBandWaveTableButton;
+		LeftRightNav * m_userWaveSwitcher;
 
 	} ;
 

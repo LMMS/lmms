@@ -66,6 +66,7 @@ public:
 	void loadSettings(const QDomElement& elem) override;
 
 	void loadFile( const QString & _file ) override;
+	void nextFile( const QString & _audio_file, bool _rename = true );
 
 	QString nodeName() const override;
 
@@ -81,9 +82,8 @@ public:
 
 public slots:
 	void setAudioFile( const QString & _audio_file, bool _rename = true );
-    void nextAudioFile( const QString & _audio_file, bool _rename = true );
-    void setAudioFileNext();
-    void setAudioFilePrev();
+	void setAudioFileNext();
+	void setAudioFilePrev();
 
 
 private slots:
@@ -113,7 +113,7 @@ private:
 	IntModel m_loopModel;
 	BoolModel m_stutterModel;
 	ComboBoxModel m_interpolationModel;
-    DirectoryScroller m_dirScroller;
+	DirectoryScroller m_dirScroller;
 
 	f_cnt_t m_nextPlayStartPoint;
 	bool m_nextPlayBackwards;
@@ -164,7 +164,7 @@ private:
 	automatableButtonGroup * m_loopGroup;
 	PixmapButton * m_stutterButton;
 	ComboBox * m_interpBox;
-    LeftRightNav * m_fileSwitcher;
+	LeftRightNav * m_fileSwitcher;
 
 } ;
 

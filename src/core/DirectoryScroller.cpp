@@ -34,87 +34,93 @@
 namespace lmms
 {
 
-DirectoryScroller::DirectoryScroller( const QString& fileName ) :
-    m_index(-1)
+DirectoryScroller::DirectoryScroller( const QString& path )
 {
-    if ( !fileName.isEmpty() )
-    {
-        findIndex(fileName);
-    }
+	if ( !path.isEmpty() )
+	{
+		findIndex(path);
+	}
+	else disable();
 }
 
-DirectoryScroller::DirectoryScroller(  ) :
-    m_index(-1)
+DirectoryScroller::DirectoryScroller(  )
 {
+	disable();
 }
 
 QString DirectoryScroller::next()
 {
-    return findNext(true);
+	return findNext(true);
 }
 
 QString DirectoryScroller::prev()
 {
-    return findNext(false);
+	return findNext(false);
 }
 
 void DirectoryScroller::disable()
 {
-    m_index = -1;
+	m_index = -1;
 }
 
-void DirectoryScroller::setFile( const QString& fileName )
+void DirectoryScroller::setFile( const QString& path )
 {
-    if ( !fileName.isEmpty() )
-    {
-        findIndex(fileName);
-    }
-    else
-    {
-        m_index = -1;
-    }
+	if ( !path.isEmpty() )
+	{
+		findIndex(path);
+	}
+	else disable();
 }
 
 void DirectoryScroller::findIndex(const QString& path)
 {
-    QFileInfo fInfo(path);
-    m_dir = fInfo.dir();
-    m_suffix = fInfo.suffix();
-    QString fileName = fInfo.fileName();
-    QStringList files = m_dir.entryList(QStringList("*." + m_suffix), QDir::Files, QDir::Name);
-    for( int i = 0 ; i < files.length() ; i++ )
-    {
-        if ( files.at(i) == fileName )
-        {
-            m_index = i;
-            return;
-        }
-    }
+	QFileInfo fInfo(PathUtil::toAbsolute(path));
+	if ( ! fInfo.exists() )
+	{
+		disable();
+		return;
+	}
+
+	m_dir = fInfo.dir();
+	m_suffix = fInfo.suffix();
+	QString fileName = fInfo.fileName();
+	QStringList files = m_dir.entryList(QStringList("*." + m_suffix), QDir::Files, QDir::Name);
+	for( int i = 0 ; i < files.length() ; i++ )
+	{
+		if ( files.at(i) == fileName )
+		{
+			m_index = i;
+			return;
+		}
+	}
+	// should not be possible to get here since path exists
+	disable();
 }
 
 /**
- * @return relative filename of the next file to be used
+ * @return filename (no path) of the next file to be used from the same directory or an empty string
  */
 QString DirectoryScroller::findNext(bool upDown)
 {
-    if (m_index == -1)
-    {
-        return QString();
-    }
+	if (m_index < 0)
+	{
+		return QString();
+	}
 
-    QStringList files = m_dir.entryList(QStringList("*." + m_suffix), QDir::Files, QDir::Name);
-    if (upDown)
-    {
-        if (m_index < files.length() - 1)
-        {
-            m_index++;
-        }
-    }
-    else if (m_index > 0)
-    {
-        m_index--;
-    }
-    return files.at(m_index);
+	QStringList files = m_dir.entryList(QStringList("*." + m_suffix), QDir::Files, QDir::Name);
+	if (upDown)
+	{
+		if (m_index < files.length() - 1)
+		{
+			return files.at(++m_index);
+		}
+	}
+	else if (m_index > 0)
+	{
+		return files.at(--m_index);
+	}
+
+	return QString();
 }
 
 } // namespace lmms
