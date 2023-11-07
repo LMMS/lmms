@@ -34,8 +34,6 @@
 
 #include "AudioFileDevice.h"
 
-#define MAX_VC_COMMENTS 10
-
 namespace lmms
 {
 
