@@ -41,7 +41,8 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 	m_fileName( _file_name ),
 	m_fileExtension(),
 	m_multiExport( multi_export ),
-	m_renderManager( nullptr )
+    m_autoExec( false ),
+    m_renderManager( nullptr )
 {
 	setupUi( this );
     selectDefaults();
@@ -270,53 +271,35 @@ void ExportProjectDialog::onFileFormatChanged(int index)
 void ExportProjectDialog::selectDefaults()
 {
     QString prefStereomode = ConfigManager::inst()->value("outputprefs", "stereomode");
-    if ( ! prefStereomode.isNull() && ! prefStereomode.isEmpty())
+    if ( ! prefStereomode.isEmpty() )
     {
         stereoModeComboBox->setCurrentText(prefStereomode);
     }
+
+    const auto bitrates = std::array{64, 128, 160, 192, 256, 320};
     QString prefBirate = ConfigManager::inst()->value("outputprefs", "bitrate");
-    if ( ! prefBirate.isNull() && ! prefBirate.isEmpty())
+    if ( ! prefBirate.isEmpty() )
     {
-        if ( prefBirate == "64" )
-        {
-            bitrateCB->setCurrentIndex(0);
-        }
-        else if ( prefBirate == "128" )
-        {
-            bitrateCB->setCurrentIndex(1);
-        }
-        else if ( prefBirate == "160" )
-        {
-            bitrateCB->setCurrentIndex(2);
-        }
-        else if ( prefBirate == "192" ) {
-            bitrateCB->setCurrentIndex(3);
-        }
-        else if ( prefBirate == "256" ) {
-            bitrateCB->setCurrentIndex(4);
-        }
-        else if ( prefBirate == "320" ) {
-            bitrateCB->setCurrentIndex(5);
+        for (int i = 0 ; i < 6 ; i++) {
+            if (bitrates[i] == prefBirate.toInt()) {
+                bitrateCB->setCurrentIndex(i);
+            }
         }
     }
+
+    const auto bitdepths = std::array{16, 24, 32};
     QString prefBitdepth = ConfigManager::inst()->value("outputprefs", "bitdepth");
-    if ( ! prefBitdepth.isNull() && ! prefBitdepth.isEmpty())
+    if ( ! prefBitdepth.isEmpty() )
     {
-        if ( prefBitdepth == "16" )
-        {
-            depthCB->setCurrentIndex(0);
-        }
-        else if ( prefBitdepth == "24" )
-        {
-            depthCB->setCurrentIndex(1);
-        }
-        else if ( prefBitdepth == "24" )
-        {
-            depthCB->setCurrentIndex(2);
+        for (int i = 0 ; i < 3 ; i++) {
+            if (bitdepths[i] == prefBitdepth.toInt()) {
+                depthCB->setCurrentIndex(i);
+            }
         }
     }
+
     QString prefInterpolation = ConfigManager::inst()->value("outputprefs", "interpolation");
-    if ( ! prefInterpolation.isNull() && ! prefInterpolation.isEmpty())
+    if ( ! prefInterpolation.isEmpty() )
     {
         if ( prefInterpolation.toLower().contains("zero") )
         {
@@ -336,34 +319,19 @@ void ExportProjectDialog::selectDefaults()
         }
     }
 
+    const auto samplerates = std::array{44100, 48000, 88200, 96000, 192000};
     QString prefSamplerate = ConfigManager::inst()->value("outputprefs", "samplerate");
-    if ( ! prefSamplerate.isNull() && ! prefInterpolation.isEmpty())
+    if ( ! prefSamplerate.isEmpty() )
     {
-        if ( prefSamplerate == "44100" )
-        {
-            samplerateCB->setCurrentIndex(0);
-        }
-        else if ( prefSamplerate == "48000" )
-        {
-            samplerateCB->setCurrentIndex(1);
-        }
-        else if ( prefSamplerate == "88200" )
-        {
-            samplerateCB->setCurrentIndex(2);
-        }
-        else if ( prefSamplerate == "96000" )
-        {
-            samplerateCB->setCurrentIndex(3);
-        }
-        else if ( prefSamplerate == "192000" )
-        {
-            samplerateCB->setCurrentIndex(4);
+        for (int i = 0 ; i < 5 ; i++) {
+            if (samplerates[i] == prefSamplerate.toInt()) {
+                samplerateCB->setCurrentIndex(i);
+            }
         }
     }
 
-
     QString prefOversampling = ConfigManager::inst()->value("outputprefs", "oversampling");
-    if ( ! prefOversampling.isNull() && ! prefOversampling.isEmpty())
+    if ( ! prefOversampling.isEmpty() )
     {
         oversamplingCB->setCurrentIndex(prefOversampling.left(1).toInt() - 1);
     }
