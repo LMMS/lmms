@@ -81,8 +81,8 @@ private:
 
 	enum class StereoLinkMode { Unlinked, Maximum, Average, Minimum, Blend };
 
-	std::vector<float> m_inLookBuf[2];
-	std::vector<float> m_scLookBuf[2];
+	std::array<std::vector<float>, 2> m_inLookBuf;
+	std::array<std::vector<float>, 2> m_scLookBuf;
 	int m_lookWrite;
 	int m_lookBufLength;
 
