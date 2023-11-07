@@ -1,7 +1,5 @@
 /*
- * LeftRightNav.h - side-by-side left-facing and right-facing arrows for navigation (looks like < > )
- *
- * Copyright (c) 2015 Colin Wallace <wallacoloo/at/gmail.com>
+ * DirectoryScroller.h - class for selecting sounds in a given directory
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,35 +20,41 @@
  *
  */
 
-#ifndef LMMS_GUI_LEFT_RIGHT_NAV_H
-#define LMMS_GUI_LEFT_RIGHT_NAV_H
+#ifndef LMMS_DIRECTORY_SCROLLER_H
+#define LMMS_DIRECTORY_SCROLLER_H
 
-#include <QHBoxLayout>
+#include <QString>
+#include <QDir>
 
-#include "PixmapButton.h"
-
-
-namespace lmms::gui
+namespace lmms
 {
 
-class LeftRightNav : public QWidget
+
+class DirectoryScroller
 {
-	Q_OBJECT
+
 public:
-	LeftRightNav(QWidget *parent=nullptr);
-	PixmapButton* getLeftBtn();
-	PixmapButton* getRightBtn();
-	void setShortcuts(const QKeySequence &leftShortcut=Qt::Key_Minus, const QKeySequence &rightShortcut=Qt::Key_Plus);
-signals:
-	void onNavLeft();
-	void onNavRight();
+
+    DirectoryScroller(  );
+    DirectoryScroller( const QString& fileName );
+
+    virtual ~DirectoryScroller() = default;
+
+    void setFile( const QString& fileName );
+    void disable();
+	QString next( );
+	QString prev( );
+
 private:
-	QHBoxLayout m_layout;
-	PixmapButton m_leftBtn;
-	PixmapButton m_rightBtn;
-};
+    int m_index;
+    QString m_suffix;
+    QDir m_dir;
+
+    void findIndex(const QString& fileName);
+    QString findNext(bool upDown);
+} ;
 
 
-} // namespace lmms::gui
+} // namespace lmms
 
-#endif // LMMS_GUI_LEFT_RIGHT_NAV_H
+#endif // LMMS_DIRECTORY_SCROLLER_H
