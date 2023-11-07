@@ -60,6 +60,7 @@ private:
 						const fpp_t _frames,
 						float _master_gain ) override;
 
+    void addComment(int tag, QString comment);
 	bool startEncoding();
 	void finishEncoding();
 

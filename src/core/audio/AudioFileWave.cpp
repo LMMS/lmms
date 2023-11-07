@@ -51,8 +51,13 @@ AudioFileWave::~AudioFileWave()
 	finishEncoding();
 }
 
-
-
+void AudioFileWave::addComment(int tag, QString comment)
+{
+    if (!comment.isNull() && comment.trimmed().size() > 0)
+    {
+        sf_set_string(m_sf, tag, comment.toStdString().c_str());
+    }
+}
 
 bool AudioFileWave::startEncoding()
 {
@@ -90,38 +95,22 @@ bool AudioFileWave::startEncoding()
 	// Prevent fold overs when encountering clipped data
 	sf_command(m_sf, SFC_SET_CLIPPING, nullptr, SF_TRUE);
 
-	sf_set_string ( m_sf, SF_STR_SOFTWARE, "LMMS" );
+    sf_set_string( m_sf, SF_STR_SOFTWARE, "LMMS" );
 
     const Song* song = Engine::getSong();
     if (!song->getTitle().isNull() && song->getTitle().trimmed().size() > 0)
     {
-        sf_set_string(m_sf, SF_STR_TITLE, song->getTitle().toStdString().c_str());
+        addComment(SF_STR_TITLE, song->getTitle());
     } else {
-        sf_set_string(m_sf, SF_STR_TITLE, QFileInfo(song->projectFileName())
+        addComment(SF_STR_TITLE, QFileInfo(song->projectFileName())
                          .completeBaseName()
-                         .replace("[_-]", " ")
-                         .toStdString().c_str());
+                         .replace("[_-]", " "));
     }
-    if (!song->getArtist().isNull() && song->getArtist().trimmed().size() > 0)
-    {
-        sf_set_string(m_sf, SF_STR_ARTIST, song->getArtist().toStdString().c_str());
-    }
-    if (!song->getAlbum().isNull() && song->getAlbum().trimmed().size() > 0)
-    {
-        sf_set_string(m_sf, SF_STR_ALBUM, song->getAlbum().toStdString().c_str());
-    }
-    if (!song->getYear().isNull() && song->getYear().trimmed().size() > 0)
-    {
-        sf_set_string(m_sf, SF_STR_DATE, song->getYear().toStdString().c_str());
-    }
-    if (!song->getGenre().isNull() && song->getGenre().trimmed().size() > 0)
-    {
-        sf_set_string(m_sf, SF_STR_GENRE, song->getGenre().toStdString().c_str());
-    }
-    if (!song->getComment().isNull() && song->getComment().trimmed().size() > 0)
-    {
-        sf_set_string(m_sf, SF_STR_COMMENT, song->getComment().toStdString().c_str());
-    }
+    addComment(SF_STR_ARTIST, song->getArtist());
+    addComment(SF_STR_ALBUM, song->getAlbum());
+    addComment(SF_STR_DATE, song->getYear());
+    addComment(SF_STR_GENRE, song->getGenre());
+    addComment(SF_STR_COMMENT, song->getComment());
 
 	return true;
 }
