@@ -625,7 +625,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 		int btn_y = 96 + i * osc_h;
 
 		auto sin_wave_btn = new PixmapButton(this, nullptr);
-		sin_wave_btn->move( 128 - 34, btn_y );
+		sin_wave_btn->move( 94, btn_y );
 		sin_wave_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"sin_shape_active" ) );
 		sin_wave_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -634,7 +634,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 				tr( "Sine wave" ) );
 
 		auto triangle_wave_btn = new PixmapButton(this, nullptr);
-		triangle_wave_btn->move( 143 - 34, btn_y );
+		triangle_wave_btn->move( 109, btn_y );
 		triangle_wave_btn->setActiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "triangle_shape_active" ) );
 		triangle_wave_btn->setInactiveGraphic(
@@ -643,7 +643,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 				tr( "Triangle wave") );
 
 		auto saw_wave_btn = new PixmapButton(this, nullptr);
-		saw_wave_btn->move( 158 - 34, btn_y );
+		saw_wave_btn->move( 124, btn_y );
 		saw_wave_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"saw_shape_active" ) );
 		saw_wave_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -652,7 +652,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 				tr( "Saw wave" ) );
 
 		auto sqr_wave_btn = new PixmapButton(this, nullptr);
-		sqr_wave_btn->move( 173 - 34, btn_y );
+		sqr_wave_btn->move( 139, btn_y );
 		sqr_wave_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 						"square_shape_active" ) );
 		sqr_wave_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -670,7 +670,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 				tr( "Moog-like saw wave" ) );
 
 		auto exp_wave_btn = new PixmapButton(this, nullptr);
-		exp_wave_btn->move( 203 - 34, btn_y );
+		exp_wave_btn->move( 169, btn_y );
 		exp_wave_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"exp_shape_active" ) );
 		exp_wave_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -679,7 +679,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 				tr( "Exponential wave" ) );
 
 		auto white_noise_btn = new PixmapButton(this, nullptr);
-		white_noise_btn->move( 218 - 34, btn_y );
+		white_noise_btn->move( 184, btn_y );
 		white_noise_btn->setActiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "white_noise_shape_active" ) );
 		white_noise_btn->setInactiveGraphic(
@@ -688,7 +688,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 				tr( "White noise" ) );
 
 		auto uwb = new PixmapButton(this, nullptr);
-		uwb->move( 233 - 34, btn_y );
+		uwb->move( 199, btn_y );
 		uwb->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"usr_shape_active" ) );
 		uwb->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -696,7 +696,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 		uwb->setToolTip(tr("User-defined wave"));
 
 		auto uwt = new PixmapButton(this, nullptr);
-		uwt->move( 110 - 34, btn_y );
+		uwt->move( 76, btn_y );
 		uwt->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"wavetable_active" ) );
 		uwt->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -706,7 +706,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 
 		auto lrn = new LeftRightNav(this);
 		lrn->setCursor( QCursor( Qt::PointingHandCursor ) );
-		lrn->move( 215, btn_y -1 );
+		lrn->move( 215, btn_y );
 
 		auto wsbg = new automatableButtonGroup(this);
 
