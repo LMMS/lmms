@@ -31,6 +31,7 @@
 #include <QMainWindow>
 
 #include "ConfigManager.h"
+#include "BounceManager.h"
 
 class QAction;
 class QDomElement;

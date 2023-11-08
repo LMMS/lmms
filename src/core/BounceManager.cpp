@@ -134,9 +134,6 @@ bool BounceManager::setExportPoints()
 			auto clip = clipv->getClip();
 			begin = clip->startPosition() < begin ? clip->startPosition() : begin;
 			end = clip->endPosition() > end ? clip->endPosition() : end;
-			qWarning("selected clip: %s: %i to %i",
-					 clip->getTrack()->name().toStdString().c_str(),
-					 clip->startPosition().getTicks(), clip->endPosition().getTicks());
 			tracks << clip->getTrack();
 		}
 		so->setSelected(false);
@@ -196,6 +193,8 @@ void BounceManager::finished()
 		so->setSelected(false);
 	}
 	restoreMutedState();
+	// this works provided RenderManager does nothing after emit finished()
+	delete this;
 }
 
 // Unmute all tracks that were muted while rendering clips

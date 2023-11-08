@@ -74,6 +74,7 @@ void RenderManager::renderNextTrack()
 		// nothing left to render
 		restoreMutedState();
 		emit finished();
+		// must not do anything more after finished() see BounceManager::finished()
 	}
 	else
 	{
