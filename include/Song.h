@@ -238,7 +238,7 @@ public:
 			m_loopRenderCount = count;
 		m_loopRenderRemaining = m_loopRenderCount;
 	}
-    
+
 	inline int getLoopRenderCount() const
 	{
 		return m_loopRenderCount;
@@ -250,6 +250,21 @@ public:
 	inline void setRenderBetweenMarkers( bool renderBetweenMarkers )
 	{
 		m_renderBetweenMarkers = renderBetweenMarkers;
+		m_renderClips = false;
+	}
+
+	inline void setRenderClips( TimePos exportLoopBegin, TimePos exportLoopEnd )
+	{
+		m_renderClips = true;
+		m_exportLoop =  true;
+		m_exportLoopBegin = exportLoopBegin;
+		m_exportLoopEnd = exportLoopEnd;
+		m_loopRenderCount = 1;
+	}
+
+	inline void unsetRenderClips()
+	{
+		m_renderClips = false;
 	}
 
 	inline PlayMode playMode() const
@@ -470,6 +485,7 @@ private:
 	volatile bool m_exporting;
 	volatile bool m_exportLoop;
 	volatile bool m_renderBetweenMarkers;
+	volatile bool m_renderClips;
 	volatile bool m_playing;
 	volatile bool m_paused;
 

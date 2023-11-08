@@ -28,6 +28,9 @@
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "PatternStore.h"
+#include "PatternEditor.h"
+#include "ClipView.h"
+#include "TrackView.h"
 #include "Song.h"
 
 using namespace lmms::gui;
@@ -60,7 +63,7 @@ BounceManager::~BounceManager()
 	}
 }
 
-// set the file tou output and the file format settings based on defaults
+// set the file to output and the file format settings based on defaults
 void BounceManager::setOutputDefaults()
 {
 	// TODO defaults from settings
@@ -106,18 +109,51 @@ void BounceManager::setOutputDefaults()
 }
 
 // set the part of the timeline to export based on selected clips
-void BounceManager::setLoopPoints()
+bool BounceManager::setExportPoints()
 {
 	Song * song = Engine::getSong();
-	int startTick = 0;
 
-	song->getPlayPos().setTicks(startTick);
+	TimePos begin = TimePos(0);
+	TimePos end = TimePos(0);
+	bool foundSelection = false;
+
+	PatternEditorWindow* pew = getGUI()->patternEditor();
+	PatternEditor* pe = pew->m_editor;
+
+	QList<TrackView *> tvl = pe->trackViews();
+	for ( int i = 0 ; i < tvl.size() ; i++)
+	{
+		qWarning("track view %i", i);
+		QVector<ClipView*> clipViews = tvl.at(i)->getTrackContentWidget()->getClipViews();
+		for ( int j = 0 ; j < clipViews.size() ; j++)
+		{
+			qWarning("clip view %i", j);
+			auto selectedClips = clipViews.at(j)->getClickedClips();
+			for (auto clipv: selectedClips)
+			{
+				auto clip = clipv->getClip();
+				begin = clip->startPosition();
+				end = clip->endPosition();
+				foundSelection = true;
+			}
+			song->setRenderClips(begin, end);
+			break;
+		}
+	}
+
+	if (!foundSelection)
+	{
+		qWarning("bounce failed nothing selected");
+	}
+	return foundSelection;
+
 }
 
 // mute all tracks except those selected
-void BounceManager::muteUnsuedTracks()
+void BounceManager::muteUnusedTracks()
 {
-
+	PatternStore * ps = Engine::patternStore();
+	std::vector<Track*> tracks = ps->tracks();
 }
 
 void BounceManager::abortProcessing()
@@ -126,21 +162,15 @@ void BounceManager::abortProcessing()
 		m_renderer->abortProcessing();
 	}
 	restoreMutedState();
+	Engine::getSong()->unsetRenderClips();
 }
 
 
 // Bounce the clips into a .wav
-void BounceManager::renderProject()
-{
-	Song * song = Engine::getSong();
-	song->setExportLoop( true );
-	song->setRenderBetweenMarkers( true );
-	song->setLoopRenderCount( 1 );
-	render( );
-}
 
 void BounceManager::render()
 {
+	setOutputDefaults();
 	m_renderer = new ProjectRenderer(
 			*m_qualitySettings,
 			*m_outputSettings,

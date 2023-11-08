@@ -178,6 +178,7 @@ public slots:
 
 private slots:
 	void onExportProjectMidi();
+	void onBounceSelectedClip();
 
 protected:
 	void closeEvent( QCloseEvent * _ce ) override;
@@ -198,6 +199,7 @@ private:
 	void refocus();
 
 	void exportProject(bool multiExport = false);
+	void bounceSelectedClip();
 	void handleSaveResult(QString const & filename, bool songSavedSuccessfully);
 	bool guiSaveProject();
 	bool guiSaveProjectAs( const QString & filename );

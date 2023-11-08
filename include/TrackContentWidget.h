@@ -70,6 +70,10 @@ public:
 			removeClipView( m_clipViews[clipNum] );
 		}
 	}
+	QVector<ClipView*> getClipViews()
+	{
+		return m_clipViews;
+	}
 
 	bool canPasteSelection( TimePos clipPos, const QDropEvent *de );
 	bool canPasteSelection( TimePos clipPos, const QMimeData *md, bool allowSameBar = false );

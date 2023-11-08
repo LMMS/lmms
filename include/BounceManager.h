@@ -42,8 +42,10 @@ public:
 
 	~BounceManager() override;
 
+	bool setExportPoints( );
+
 	/// Export all unmuted tracks into a single file
-	void renderProject();
+	void render();
 
 	void abortProcessing();
 
@@ -54,10 +56,8 @@ private slots:
 
 private:
 	QString pathForTrack( const Track *track, int num );
-	void setLoopPoints( );
 	void setOutputDefaults( );
-	void muteUnsuedTracks( );
-	void render( );
+	void muteUnusedTracks( );
 	void restoreMutedState( );
 
 	const AudioEngine::qualitySettings * m_qualitySettings;

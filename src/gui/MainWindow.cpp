@@ -37,7 +37,9 @@
 
 #include "AboutDialog.h"
 #include "AutomationEditor.h"
+#include "BounceManager.h"
 #include "ControllerRackView.h"
+#include "ClipView.h"
 #include "embed.h"
 #include "Engine.h"
 #include "ExportProjectDialog.h"
@@ -50,6 +52,7 @@
 #include "InstrumentTrackWindow.h"
 #include "MicrotunerConfig.h"
 #include "PatternEditor.h"
+#include "PatternStore.h"
 #include "PianoRoll.h"
 #include "PianoView.h"
 #include "PluginBrowser.h"
@@ -327,6 +330,13 @@ void MainWindow::finalize()
 					this,
 					SLOT(onExportProjectTracks()),
 					Qt::CTRL + Qt::SHIFT + Qt::Key_E );
+
+	project_menu->addAction( embed::getIconPixmap( "project_export" ),
+					tr( "Bounce selected clip" ),
+					this,
+					SLOT(onBounceSelectedClip()),
+					Qt::CTRL + Qt::Key_B );
+
 
 	project_menu->addAction( embed::getIconPixmap( "midi_file" ),
 					tr( "Export &MIDI..." ),
@@ -1537,6 +1547,15 @@ void MainWindow::exportProject(bool multiExport)
 	}
 }
 
+void MainWindow::bounceSelectedClip()
+{
+	BounceManager bm = BounceManager();
+	if ( bm.setExportPoints() )
+	{
+		bm.render();
+	}
+}
+
 void MainWindow::handleSaveResult(QString const & filename, bool songSavedSuccessfully)
 {
 	if (songSavedSuccessfully)
@@ -1579,6 +1598,11 @@ void MainWindow::onExportProject()
 void MainWindow::onExportProjectTracks()
 {
 	this->exportProject(true);
+}
+
+void MainWindow::onBounceSelectedClip()
+{
+	this->bounceSelectedClip();
 }
 
 void MainWindow::onImportProject()

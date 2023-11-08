@@ -84,6 +84,7 @@ Song::Song() :
 	m_exporting( false ),
 	m_exportLoop( false ),
 	m_renderBetweenMarkers( false ),
+	m_renderClips( false ),
 	m_playing( false ),
 	m_paused( false ),
 	m_savingProject( false ),
@@ -726,19 +727,26 @@ void Song::startExport()
 
 		getPlayPos(PlayMode::Song).setTicks( getPlayPos(PlayMode::Song).m_timeLine->loopBegin().getTicks() );
 	}
+	else if (m_renderClips)
+	{
+		m_exportSongBegin = m_exportLoopBegin;
+		m_exportSongEnd = m_exportLoopEnd;
+	}
 	else
 	{
 		m_exportSongEnd = TimePos(m_length, 0);
-        
+
 		// Handle potentially ridiculous loop points gracefully.
 		if (m_loopRenderCount > 1 && getPlayPos(PlayMode::Song).m_timeLine->loopEnd() > m_exportSongEnd) 
 		{
 			m_exportSongEnd = getPlayPos(PlayMode::Song).m_timeLine->loopEnd();
 		}
 
-		if (!m_exportLoop) 
+		if (!m_exportLoop)
+		{
 			m_exportSongEnd += TimePos(1,0);
-        
+		}
+
 		m_exportSongBegin = TimePos(0,0);
 		// FIXME: remove this check once we load timeline in headless mode
 		if (getPlayPos(PlayMode::Song).m_timeLine)
