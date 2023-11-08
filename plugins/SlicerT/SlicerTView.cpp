@@ -180,13 +180,13 @@ void SlicerTView::paintEvent(QPaintEvent* pe)
 	brush.setPen(QColor(255, 255, 255));
 	brush.setFont(QFont(brush.font().family(), 7, -1, false));
 
-	brush.drawText(8, topTextY, textBoxWidth, textBoxHeight, Qt::AlignCenter, tr("Reset"));
-	brush.drawText(188, topTextY, textBoxWidth, textBoxHeight, Qt::AlignCenter, tr("Midi"));
+	brush.drawText(8, s_topTextY, s_textBoxWidth, s_textBoxHeight, Qt::AlignCenter, tr("Reset"));
+	brush.drawText(188, s_topTextY, s_textBoxWidth, s_textBoxHeight, Qt::AlignCenter, tr("Midi"));
 
-	brush.drawText(8, bottomTextY, textBoxWidth, textBoxHeight, Qt::AlignCenter, tr("Threshold"));
-	brush.drawText(63, bottomTextY, textBoxWidth, textBoxHeight, Qt::AlignCenter, tr("Fade Out"));
-	brush.drawText(127, bottomTextY, textBoxWidth, textBoxHeight, Qt::AlignCenter, tr("BPM"));
-	brush.drawText(188, bottomTextY, textBoxWidth, textBoxHeight, Qt::AlignCenter, tr("Snap"));
+	brush.drawText(8, s_bottomTextY, s_textBoxWidth, s_textBoxHeight, Qt::AlignCenter, tr("Threshold"));
+	brush.drawText(63, s_bottomTextY, s_textBoxWidth, s_textBoxHeight, Qt::AlignCenter, tr("Fade Out"));
+	brush.drawText(127, s_bottomTextY, s_textBoxWidth, s_textBoxHeight, Qt::AlignCenter, tr("BPM"));
+	brush.drawText(188, s_bottomTextY, s_textBoxWidth, s_textBoxHeight, Qt::AlignCenter, tr("Snap"));
 }
 
 } // namespace gui

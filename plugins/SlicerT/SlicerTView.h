@@ -53,10 +53,10 @@ public slots:
 public:
 	SlicerTView(SlicerT* instrument, QWidget* parent);
 
-	static constexpr int textBoxHeight = 20;
-	static constexpr int textBoxWidth = 50;
-	static constexpr int topTextY = 170;
-	static constexpr int bottomTextY = 220;
+	static constexpr int s_textBoxHeight = 20;
+	static constexpr int s_textBoxWidth = 50;
+	static constexpr int s_topTextY = 170;
+	static constexpr int s_bottomTextY = 220;
 
 protected:
 	virtual void dragEnterEvent(QDragEnterEvent* dee);

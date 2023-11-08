@@ -171,7 +171,7 @@ void SlicerT::findSlices()
 	for (int i = 0; i < singleChannel.size(); i++)
 	{
 		singleChannel[i] /= maxMag;
-		if (std::sign(lastValue) != std::sign(singleChannel[i]))
+		if (sign(lastValue) != sign(singleChannel[i]))
 		{
 			zeroCrossings.push_back(i);
 			lastValue = singleChannel[i];

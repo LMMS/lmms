@@ -55,12 +55,12 @@ SlicerTWaveform::SlicerTWaveform(int totalWidth, int totalHeight, SlicerT* instr
 	: QWidget(parent)
 	, m_width(totalWidth)
 	, m_height(totalHeight)
-	, m_seekerWidth(totalWidth - m_seekerHorMargin * 2)
-	, m_editorHeight(totalHeight - m_seekerHeight - m_middleMargin)
+	, m_seekerWidth(totalWidth - s_seekerHorMargin * 2)
+	, m_editorHeight(totalHeight - s_seekerHeight - s_middleMargin)
 	, m_editorWidth(totalWidth)
 	, m_sliceArrow(PLUGIN_NAME::getIconPixmap("slice_indicator_arrow"))
-	, m_seeker(QPixmap(m_seekerWidth, m_seekerHeight))
-	, m_seekerWaveform(QPixmap(m_seekerWidth, m_seekerHeight))
+	, m_seeker(QPixmap(m_seekerWidth, s_seekerHeight))
+	, m_seekerWaveform(QPixmap(m_seekerWidth, s_seekerHeight))
 	, m_editorWaveform(QPixmap(m_editorWidth, m_editorHeight))
 	, m_sliceEditor(QPixmap(totalWidth, m_editorHeight))
 	, m_emptySampleIcon(embed::getIconPixmap("sample_track"))
@@ -107,7 +107,7 @@ void SlicerTWaveform::drawSeeker()
 	for (float sliceValue : m_slicerTParent->m_slicePoints)
 	{
 		float xPos = sliceValue * m_seekerWidth;
-		brush.drawLine(xPos, 0, xPos, m_seekerHeight);
+		brush.drawLine(xPos, 0, xPos, s_seekerHeight);
 	}
 
 	float seekerStartPosX = m_seekerStart * m_seekerWidth;
@@ -119,16 +119,16 @@ void SlicerTWaveform::drawSeeker()
 	float noteEndPosX = (m_noteEnd - m_noteStart) * m_seekerWidth;
 
 	brush.setPen(s_playColor);
-	brush.drawLine(noteCurrentPosX, 0, noteCurrentPosX, m_seekerHeight);
-	brush.fillRect(noteStartPosX, 0, noteEndPosX, m_seekerHeight, s_playHighlightColor);
+	brush.drawLine(noteCurrentPosX, 0, noteCurrentPosX, s_seekerHeight);
+	brush.fillRect(noteStartPosX, 0, noteEndPosX, s_seekerHeight, s_playHighlightColor);
 
-	brush.fillRect(seekerStartPosX, 0, seekerMiddleWidth - 1, m_seekerHeight, s_seekerHighlightColor);
+	brush.fillRect(seekerStartPosX, 0, seekerMiddleWidth - 1, s_seekerHeight, s_seekerHighlightColor);
 
-	brush.fillRect(0, 0, seekerStartPosX, m_seekerHeight, s_seekerShadowColor);
-	brush.fillRect(seekerEndPosX - 1, 0, m_seekerWidth, m_seekerHeight, s_seekerShadowColor);
+	brush.fillRect(0, 0, seekerStartPosX, s_seekerHeight, s_seekerShadowColor);
+	brush.fillRect(seekerEndPosX - 1, 0, m_seekerWidth, s_seekerHeight, s_seekerShadowColor);
 
 	brush.setPen(QPen(s_seekerColor, 1));
-	brush.drawRect(seekerStartPosX, 0, seekerMiddleWidth - 1, m_seekerHeight - 1); // -1 needed
+	brush.drawRect(seekerStartPosX, 0, seekerMiddleWidth - 1, s_seekerHeight - 1); // -1 needed
 }
 
 void SlicerTWaveform::drawEditorWaveform()
@@ -236,13 +236,13 @@ void SlicerTWaveform::updateUI()
 // updates the closest object and changes the cursor respectivly
 void SlicerTWaveform::updateClosest(QMouseEvent* me)
 {
-	float normalizedClickSeeker = static_cast<float>(me->x() - m_seekerHorMargin) / m_seekerWidth;
+	float normalizedClickSeeker = static_cast<float>(me->x() - s_seekerHorMargin) / m_seekerWidth;
 	float normalizedClickEditor = static_cast<float>(me->x()) / m_editorWidth;
 
 	m_closestObject = UIObjects::Nothing;
 	m_closestSlice = -1;
 
-	if (me->y() < m_seekerHeight)
+	if (me->y() < s_seekerHeight)
 	{
 		if (std::abs(normalizedClickSeeker - m_seekerStart) < s_distanceForClick)
 		{
@@ -310,7 +310,7 @@ void SlicerTWaveform::mousePressEvent(QMouseEvent* me)
 			static_cast<SlicerTView*>(parent())->openFiles();
 		}
 		// update seeker middle for correct movement
-		m_seekerMiddle = static_cast<float>(me->x() - m_seekerHorMargin) / m_seekerWidth;
+		m_seekerMiddle = static_cast<float>(me->x() - s_seekerHorMargin) / m_seekerWidth;
 		break;
 	case Qt::MouseButton::RightButton:
 		if (m_slicerTParent->m_slicePoints.size() > 2 && m_closestObject == UIObjects::SlicePoint)
@@ -341,7 +341,7 @@ void SlicerTWaveform::mouseMoveEvent(QMouseEvent* me)
 		return;
 	}
 
-	float normalizedClickSeeker = static_cast<float>(me->x() - m_seekerHorMargin) / m_seekerWidth;
+	float normalizedClickSeeker = static_cast<float>(me->x() - s_seekerHorMargin) / m_seekerWidth;
 	float normalizedClickEditor = static_cast<float>(me->x()) / m_editorWidth;
 
 	float distStart = m_seekerStart - m_seekerMiddle;
@@ -412,9 +412,9 @@ void SlicerTWaveform::wheelEvent(QWheelEvent* we)
 void SlicerTWaveform::paintEvent(QPaintEvent* pe)
 {
 	QPainter p(this);
-	p.drawPixmap(m_seekerHorMargin, 0, m_seekerWaveform);
-	p.drawPixmap(m_seekerHorMargin, 0, m_seeker);
-	p.drawPixmap(0, m_seekerHeight + m_middleMargin, m_sliceEditor);
+	p.drawPixmap(s_seekerHorMargin, 0, m_seekerWaveform);
+	p.drawPixmap(s_seekerHorMargin, 0, m_seeker);
+	p.drawPixmap(0, s_seekerHeight + s_middleMargin, m_sliceEditor);
 }
 } // namespace gui
 } // namespace lmms

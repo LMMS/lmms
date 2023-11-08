@@ -53,9 +53,9 @@ public:
 	SlicerTWaveform(int totalWidth, int totalHeight, SlicerT* instrument, QWidget* parent);
 
 	// predefined sizes
-	static constexpr int m_seekerHorMargin = 5;
-	static constexpr int m_seekerHeight = 38; // used to calcualte all vertical sizes
-	static constexpr int m_middleMargin = 6;
+	static constexpr int s_seekerHorMargin = 5;
+	static constexpr int s_seekerHeight = 38; // used to calcualte all vertical sizes
+	static constexpr int s_middleMargin = 6;
 
 
 	// interaction behavior values
