@@ -79,7 +79,7 @@ SlicerTView::SlicerTView(SlicerT* instrument, QWidget* parent)
 
 	m_fadeOutKnob = createStyledKnob();
 	m_fadeOutKnob->move(64, 197);
-	m_fadeOutKnob->setToolTip(tr("Fade Out for notes"));
+	m_fadeOutKnob->setToolTip(tr("Fade Out per note in milliseconds"));
 	m_fadeOutKnob->setModel(&m_slicerTParent->m_fadeOutFrames);
 
 	m_midiExportButton = new QPushButton(this);

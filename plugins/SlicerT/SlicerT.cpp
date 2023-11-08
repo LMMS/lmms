@@ -57,7 +57,7 @@ Plugin::Descriptor PLUGIN_EXPORT slicert_plugin_descriptor = {
 SlicerT::SlicerT(InstrumentTrack* instrumentTrack)
 	: Instrument(instrumentTrack, &slicert_plugin_descriptor)
 	, m_noteThreshold(0.6f, 0.0f, 2.0f, 0.01f, this, tr("Note threshold"))
-	, m_fadeOutFrames(400.0f, 0.0f, 8192.0f, 1.0f, this, tr("FadeOut"))
+	, m_fadeOutFrames(10.0f, 0.0f, 100.0f, 0.1f, this, tr("FadeOut"))
 	, m_originalBPM(1, 1, 999, this, tr("Original bpm"))
 	, m_sliceSnap(this, tr("Slice snap"))
 	, m_enableSync(false, this, tr("BPM sync"))
@@ -112,8 +112,8 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 
 		SRC_STATE* resampleState = static_cast<PlaybackState*>(handle->m_pluginData)->resamplingState();
 		SRC_DATA resampleData;
-		resampleData.data_in = &(m_originalSample.data() + noteFrame)[0][0];
-		resampleData.data_out = &(workingBuffer + offset)[0][0];
+		resampleData.data_in = (m_originalSample.data() + noteFrame)->data();
+		resampleData.data_out = (workingBuffer + offset)->data();
 		resampleData.input_frames = noteLeft * m_originalSample.frames();
 		resampleData.output_frames = frames;
 		resampleData.src_ratio = speedRatio;
@@ -121,21 +121,19 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 		src_process(resampleState, &resampleData);
 
 		float nextNoteDone = noteDone + frames * (1.0f / speedRatio) / m_originalSample.frames();
-		((PlaybackState*)handle->m_pluginData)->setNoteDone(nextNoteDone);
+		static_cast<PlaybackState*>(handle->m_pluginData)->setNoteDone(nextNoteDone);
 
 		// exponential fade out, applyRelease() not used since it extends the note length
-		int noteFramesLeft = noteLeft * m_originalSample.frames();
-		if (noteFramesLeft < m_fadeOutFrames.value())
+		int fadeOutFrames = m_fadeOutFrames.value() / 1000.0f * Engine::audioEngine()->processingSampleRate();
+		int noteFramesLeft = noteLeft * m_originalSample.frames() * speedRatio;
+		for (int i = 0; i < frames; i++)
 		{
-			for (int i = 0; i < frames; i++)
-			{
-				float fadeValue = static_cast<float>(noteFramesLeft - i) / m_fadeOutFrames.value();
-				fadeValue = std::clamp(fadeValue, 0.0f, 1.0f);
-				fadeValue = std::pow(fadeValue, 2);
+			float fadeValue = static_cast<float>(noteFramesLeft - i) / fadeOutFrames;
+			fadeValue = std::clamp(fadeValue, 0.0f, 1.0f);
+			fadeValue = std::pow(fadeValue, 2);
 
-				workingBuffer[i + offset][0] *= fadeValue;
-				workingBuffer[i + offset][1] *= fadeValue;
-			}
+			workingBuffer[i + offset][0] *= fadeValue;
+			workingBuffer[i + offset][1] *= fadeValue;
 		}
 
 		instrumentTrack()->processAudioBuffer(workingBuffer, frames + offset, handle);
@@ -227,10 +225,7 @@ void SlicerT::findSlices()
 	for (float& sliceValue : m_slicePoints)
 	{
 		int closestZeroCrossing = *std::lower_bound(zeroCrossings.begin(), zeroCrossings.end(), sliceValue);
-		if (std::abs(sliceValue - closestZeroCrossing) < windowSize)
-		{
-			sliceValue = closestZeroCrossing;
-		}
+		if (std::abs(sliceValue - closestZeroCrossing) < windowSize) { sliceValue = closestZeroCrossing; }
 	}
 
 	float beatsPerMin = m_originalBPM.value() / 60.0f;
