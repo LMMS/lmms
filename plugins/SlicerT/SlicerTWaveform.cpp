@@ -213,7 +213,7 @@ void SlicerTWaveform::drawEditor()
 
 void SlicerTWaveform::isPlaying(float current, float start, float end)
 {
-	if (!m_updateTimer.hasExpired(s_minMilisPassed)) {return;}
+	if (!m_updateTimer.hasExpired(s_minMilisPassed)) { return; }
 	m_noteCurrent = current;
 	m_noteStart = start;
 	m_noteEnd = end;
@@ -401,9 +401,9 @@ void SlicerTWaveform::mouseDoubleClickEvent(QMouseEvent* me)
 	std::sort(m_slicerTParent->m_slicePoints.begin(), m_slicerTParent->m_slicePoints.end());
 }
 
-void SlicerTWaveform::wheelEvent(QWheelEvent* _we)
+void SlicerTWaveform::wheelEvent(QWheelEvent* we)
 {
-	m_zoomLevel += _we->angleDelta().y() / 360.0f * s_zoomSensitivity;
+	m_zoomLevel += we->angleDelta().y() / 360.0f * s_zoomSensitivity;
 	m_zoomLevel = std::max(0.0f, m_zoomLevel);
 
 	updateUI();

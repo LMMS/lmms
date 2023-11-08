@@ -111,17 +111,17 @@ void SlicerTView::exportMidi()
 	if (m_slicerTParent->m_originalSample.frames() <= 1) { return; }
 
 	DataFile dataFile(DataFile::Type::ClipboardData);
-	QDomElement note_list = dataFile.createElement("note-list");
-	dataFile.content().appendChild(note_list);
+	QDomElement noteList = dataFile.createElement("note-list");
+	dataFile.content().appendChild(noteList);
 
-	std::vector<Note> notes = m_slicerTParent->getMidi();
-	if (notes.size() == 0) { return; }
+	auto notes = m_slicerTParent->getMidi();
+	if (notes.empty()) { return; }
 
-	TimePos start_pos(notes.front().pos().getBar(), 0);
+	TimePos startPos(notes.front().pos().getBar(), 0);
 	for (Note& note : notes)
 	{
-		note.setPos(note.pos(start_pos));
-		note.saveState(dataFile, note_list);
+		note.setPos(note.pos(startPos));
+		note.saveState(dataFile, noteList);
 	}
 
 	copyString(dataFile.toString(), MimeType::Default);

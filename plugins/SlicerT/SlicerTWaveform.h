@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_SLICERT_WAVEFORM_H
-#define LMMS_SLICERT_WAVEFORM_H
+#ifndef LMMS_GUI_SLICERT_WAVEFORM_H
+#define LMMS_GUI_SLICERT_WAVEFORM_H
 
 #include <QApplication>
 #include <QFontMetrics>
@@ -123,4 +123,4 @@ private:
 };
 } // namespace gui
 } // namespace lmms
-#endif // LMMS_SLICERT_WAVEFORM_H
+#endif // LMMS_GUI_SLICERT_WAVEFORM_H

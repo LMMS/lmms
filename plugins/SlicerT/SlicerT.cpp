@@ -82,7 +82,7 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 	const fpp_t frames = handle->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = handle->noteOffset();
 	const int bpm = Engine::getSong()->getTempo();
-	const float pitchRatio = 1 / pow(2, m_parentTrack->pitchModel()->value() / 1200);
+	const float pitchRatio = 1 / std::exp2(m_parentTrack->pitchModel()->value() / 1200);
 
 	float speedRatio = static_cast<float>(m_originalBPM.value()) / bpm;
 	if (!m_enableSync.value()) { speedRatio = 1; }
@@ -171,7 +171,7 @@ void SlicerT::findSlices()
 	for (int i = 0; i < singleChannel.size(); i++)
 	{
 		singleChannel[i] /= maxMag;
-		if (sign(lastValue) != sign(singleChannel[i]))
+		if (std::sign(lastValue) != std::sign(singleChannel[i]))
 		{
 			zeroCrossings.push_back(i);
 			lastValue = singleChannel[i];
@@ -231,7 +231,7 @@ void SlicerT::findSlices()
 	float beatsPerMin = m_originalBPM.value() / 60.0f;
 	float samplesPerBeat = m_originalSample.sampleRate() / beatsPerMin * 4.0f;
 	int noteSnap = m_sliceSnap.value();
-	int sliceLock = samplesPerBeat / std::pow(2, noteSnap + 1);
+	int sliceLock = samplesPerBeat / std::exp2(noteSnap + 1);
 	if (noteSnap == 0) { sliceLock = 1; }
 	for (float& sliceValue : m_slicePoints)
 	{

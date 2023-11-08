@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_SLICERT_VIEW_H
-#define LMMS_SLICERT_VIEW_H
+#ifndef LMMS_GUI_SLICERT_VIEW_H
+#define LMMS_GUI_SLICERT_VIEW_H
 
 #include <QPushButton>
 
@@ -59,8 +59,8 @@ public:
 	static constexpr int bottomTextY = 220;
 
 protected:
-	virtual void dragEnterEvent(QDragEnterEvent* _dee);
-	virtual void dropEvent(QDropEvent* _de);
+	virtual void dragEnterEvent(QDragEnterEvent* dee);
+	virtual void dropEvent(QDropEvent* de);
 
 	virtual void paintEvent(QPaintEvent* pe);
 
@@ -82,4 +82,4 @@ private:
 };
 } // namespace gui
 } // namespace lmms
-#endif // LMMS_SLICERT_VIEW_H
+#endif // LMMS_GUI_SLICERT_VIEW_H
