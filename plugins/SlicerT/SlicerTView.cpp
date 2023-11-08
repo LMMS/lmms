@@ -118,7 +118,7 @@ void SlicerTView::exportMidi()
 	if (notes.size() == 0) { return; }
 
 	TimePos start_pos(notes.front().pos().getBar(), 0);
-	for (Note note : notes)
+	for (Note& note : notes)
 	{
 		note.setPos(note.pos(start_pos));
 		note.saveState(dataFile, note_list);
@@ -127,7 +127,8 @@ void SlicerTView::exportMidi()
 	copyString(dataFile.toString(), MimeType::Default);
 }
 
-void SlicerTView::openFiles() {
+void SlicerTView::openFiles()
+{
 	QString audioFile = m_slicerTParent->m_originalSample.openAudioFile();
 	if (audioFile.isEmpty()) { return; }
 	m_slicerTParent->updateFile(audioFile);

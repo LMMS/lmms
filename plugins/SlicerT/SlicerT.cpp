@@ -110,10 +110,10 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 	{
 		int noteFrame = noteDone * m_originalSample.frames();
 
-		SRC_STATE* resampleState = ((PlaybackState*)handle->m_pluginData)->resamplingState();
+		SRC_STATE* resampleState = static_cast<PlaybackState*>(handle->m_pluginData)->resamplingState();
 		SRC_DATA resampleData;
-		resampleData.data_in = (float*)(m_originalSample.data() + noteFrame);
-		resampleData.data_out = (float*)(workingBuffer + offset);
+		resampleData.data_in = &(m_originalSample.data() + noteFrame)[0][0];
+		resampleData.data_out = &(workingBuffer + offset)[0][0];
 		resampleData.input_frames = noteLeft * m_originalSample.frames();
 		resampleData.output_frames = frames;
 		resampleData.src_ratio = speedRatio;
@@ -227,9 +227,9 @@ void SlicerT::findSlices()
 	for (float& sliceValue : m_slicePoints)
 	{
 		int closestZeroCrossing = *std::lower_bound(zeroCrossings.begin(), zeroCrossings.end(), sliceValue);
-		if (abs(sliceValue - closestZeroCrossing) < windowSize)
+		if (std::abs(sliceValue - closestZeroCrossing) < windowSize)
 		{
-			sliceValue = *std::lower_bound(zeroCrossings.begin(), zeroCrossings.end(), sliceValue);
+			sliceValue = closestZeroCrossing;
 		}
 	}
 
@@ -328,6 +328,7 @@ void SlicerT::updateSlices()
 
 void SlicerT::saveSettings(QDomDocument& document, QDomElement& element)
 {
+	element.setAttribute("version", "1");
 	element.setAttribute("src", m_originalSample.audioFile());
 	if (m_originalSample.audioFile().isEmpty())
 	{
