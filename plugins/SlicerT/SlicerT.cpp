@@ -130,7 +130,7 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 		{
 			float fadeValue = static_cast<float>(noteFramesLeft - i) / fadeOutFrames;
 			fadeValue = std::clamp(fadeValue, 0.0f, 1.0f);
-			fadeValue = std::pow(fadeValue, 2);
+			fadeValue = cosinusInterpolate(0, 1, fadeValue);
 
 			workingBuffer[i + offset][0] *= fadeValue;
 			workingBuffer[i + offset][1] *= fadeValue;
