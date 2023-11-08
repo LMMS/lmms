@@ -21,6 +21,8 @@
  */
 
 #include <QDir>
+#include <QSet>
+#include <QMessageBox>
 
 #include "BounceManager.h"
 
@@ -29,6 +31,7 @@
 #include "MainWindow.h"
 #include "PatternStore.h"
 #include "PatternEditor.h"
+#include "SongEditor.h"
 #include "ClipView.h"
 #include "TrackView.h"
 #include "Song.h"
@@ -64,7 +67,7 @@ BounceManager::~BounceManager()
 }
 
 // set the file to output and the file format settings based on defaults
-void BounceManager::setOutputDefaults()
+bool BounceManager::setOutputDefaults()
 {
 	// TODO defaults from settings
 	QString defaultDir = QFileInfo( Engine::getSong()->projectFileName() ).absolutePath();
@@ -81,7 +84,8 @@ void BounceManager::setOutputDefaults()
 		m_outputPath = bfd.selectedFiles()[0];
 	}
 	else {
-		return;
+		restoreMutedState();
+		return false;
 	}
 
 	// TODO merge output prefs and allow users to configure
@@ -106,6 +110,7 @@ void BounceManager::setOutputDefaults()
 			static_cast<OutputSettings::BitDepth>( bitdepth ),
 			stereomode );
 
+	return true;
 }
 
 // set the part of the timeline to export based on selected clips
@@ -113,78 +118,84 @@ bool BounceManager::setExportPoints()
 {
 	Song * song = Engine::getSong();
 
-	TimePos begin = TimePos(0);
+	// find part of song to render
+	TimePos begin = TimePos(2147483647);
 	TimePos end = TimePos(0);
-	bool foundSelection = false;
 
-	PatternEditorWindow* pew = getGUI()->patternEditor();
-	PatternEditor* pe = pew->m_editor;
-
-	QList<TrackView *> tvl = pe->trackViews();
-	for ( int i = 0 ; i < tvl.size() ; i++)
+	// get selected clips
+	SongEditorWindow* sew = getGUI()->songEditor();
+	QVector<selectableObject *> sos = sew->m_editor->selectedObjects();
+	QSet<Track *> tracks;
+	for ( auto so: sos )
 	{
-		qWarning("track view %i", i);
-		QVector<ClipView*> clipViews = tvl.at(i)->getTrackContentWidget()->getClipViews();
-		for ( int j = 0 ; j < clipViews.size() ; j++)
+		auto clipv = dynamic_cast<ClipView*>(so);
+		if ( clipv != nullptr )
 		{
-			qWarning("clip view %i", j);
-			auto selectedClips = clipViews.at(j)->getClickedClips();
-			for (auto clipv: selectedClips)
-			{
-				auto clip = clipv->getClip();
-				begin = clip->startPosition();
-				end = clip->endPosition();
-				foundSelection = true;
-			}
-			song->setRenderClips(begin, end);
-			break;
+			auto clip = clipv->getClip();
+			begin = clip->startPosition() < begin ? clip->startPosition() : begin;
+			end = clip->endPosition() > end ? clip->endPosition() : end;
+			qWarning("selected clip: %s: %i to %i",
+					 clip->getTrack()->name().toStdString().c_str(),
+					 clip->startPosition().getTicks(), clip->endPosition().getTicks());
+			tracks << clip->getTrack();
+		}
+		so->setSelected(false);
+	}
+
+	if (tracks.size() == 0)
+	{
+		QMessageBox::information(
+			sew,
+			tr("LMMS"),
+			tr("Select clips to bounce") );
+		return false;
+	}
+
+	for (const auto& track : song->tracks())
+	{
+		if ( !tracks.contains(track) && track->isMuted() == false )
+		{
+			track->setMuted(true);
+			m_muted.push_back(track);
 		}
 	}
 
-	if (!foundSelection)
-	{
-		qWarning("bounce failed nothing selected");
-	}
-	return foundSelection;
-
+	song->setRenderClips(begin, end);
+	return true;
 }
-
-// mute all tracks except those selected
-void BounceManager::muteUnusedTracks()
-{
-	PatternStore * ps = Engine::patternStore();
-	std::vector<Track*> tracks = ps->tracks();
-}
-
-void BounceManager::abortProcessing()
-{
-	if ( m_renderer ) {
-		m_renderer->abortProcessing();
-	}
-	restoreMutedState();
-	Engine::getSong()->unsetRenderClips();
-}
-
 
 // Bounce the clips into a .wav
 
 void BounceManager::render()
 {
-	setOutputDefaults();
-	m_renderer = new ProjectRenderer(
-			*m_qualitySettings,
-			*m_outputSettings,
-			m_format,
-			m_outputPath);
+	if ( setExportPoints() && setOutputDefaults() )
+	{
+		m_renderer = new ProjectRenderer(
+				*m_qualitySettings,
+				*m_outputSettings,
+				m_format,
+				m_outputPath);
 
-	if ( m_renderer->isReady() )
-	{
-		m_renderer->startProcessing();
+		connect( m_renderer, SIGNAL(finished()), this, SLOT(finished()));
+
+		if ( m_renderer->isReady() )
+		{
+			m_renderer->startProcessing();
+		}
+		else
+		{
+			qDebug( "Renderer failed to acquire a file device!" );
+		}
 	}
-	else
+}
+
+void BounceManager::finished()
+{
+	for ( auto so: getGUI()->songEditor()->m_editor->selectedObjects() )
 	{
-		qDebug( "Renderer failed to acquire a file device!" );
+		so->setSelected(false);
 	}
+	restoreMutedState();
 }
 
 // Unmute all tracks that were muted while rendering clips
@@ -192,11 +203,10 @@ void BounceManager::restoreMutedState()
 {
 	while ( !m_muted.empty() )
 	{
-		Track* restoreTrack = m_muted.back();
+		Track* track = m_muted.back();
 		m_muted.pop_back();
-		restoreTrack->setMuted( false );
+		track->setMuted( false );
 	}
 }
-
 
 } // namespace lmms

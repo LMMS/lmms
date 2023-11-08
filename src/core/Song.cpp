@@ -731,6 +731,7 @@ void Song::startExport()
 	{
 		m_exportSongBegin = m_exportLoopBegin;
 		m_exportSongEnd = m_exportLoopEnd;
+		getPlayPos(PlayMode::Song).setTicks( m_exportSongBegin );
 	}
 	else
 	{

@@ -39,25 +39,16 @@ class BounceManager : public QObject
 	Q_OBJECT
 public:
 	BounceManager();
-
 	~BounceManager() override;
 
-	bool setExportPoints( );
-
-	/// Export all unmuted tracks into a single file
 	void render();
 
-	void abortProcessing();
-
-signals:
+public slots:
 	void finished();
 
-private slots:
-
 private:
-	QString pathForTrack( const Track *track, int num );
-	void setOutputDefaults( );
-	void muteUnusedTracks( );
+	bool setExportPoints( );
+	bool setOutputDefaults( );
 	void restoreMutedState( );
 
 	const AudioEngine::qualitySettings * m_qualitySettings;
