@@ -57,17 +57,17 @@ public:
 	friend void swap(SampleBuffer& first, SampleBuffer& second) noexcept;
 	auto toBase64() const -> QString;
 
-	auto audioFile() const -> const QString&;
-	auto sampleRate() const -> sample_rate_t;
+	inline auto audioFile() const -> const QString& { return m_audioFile; }
+	inline auto sampleRate() const -> sample_rate_t { return m_sampleRate; }
 
-	auto begin() const -> const_iterator;
-	auto end() const -> const_iterator;
-	auto rbegin() const -> const_reverse_iterator;
-	auto rend() const -> const_reverse_iterator;
+	inline auto begin() const -> const_iterator { return m_data.begin(); }
+	inline auto end() const -> const_iterator { return m_data.end(); }
+	inline auto rbegin() const -> const_reverse_iterator { return m_data.rbegin(); }
+	inline auto rend() const -> const_reverse_iterator { return m_data.rend(); }
 
-	auto data() const -> const sampleFrame*;
-	auto size() const -> size_type;
-	bool empty() const;
+	inline auto data() const -> const sampleFrame* { return m_data.data(); }
+	inline auto size() const -> size_type { return m_data.size(); }
+	inline auto empty() const -> bool { return m_data.empty(); }
 
 private:
 	std::vector<sampleFrame> m_data;
