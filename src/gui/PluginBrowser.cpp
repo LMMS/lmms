@@ -282,9 +282,9 @@ void PluginDescWidget::leaveEvent( QEvent * _e )
 
 void PluginDescWidget::mousePressEvent( QMouseEvent * _me )
 {
+	Engine::setDndPluginKey(&m_pluginKey);
 	if ( _me->button() == Qt::LeftButton )
 	{
-		Engine::setDndPluginKey(&m_pluginKey);
 		new StringPairDrag("instrument",
 			QString::fromUtf8(m_pluginKey.desc->name), m_logo, this);
 		leaveEvent( _me );
