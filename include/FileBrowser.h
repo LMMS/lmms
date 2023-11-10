@@ -28,7 +28,6 @@
 #include <QCheckBox>
 #include <QDir>
 #include <QMutex>
-#include <queue>
 
 #ifdef __MINGW32__
 #include <mingw.condition_variable.h>
