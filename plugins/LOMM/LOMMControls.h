@@ -125,6 +125,7 @@ private:
 	BoolModel m_midsideModel;
 	BoolModel m_lookaheadEnableModel;
 	FloatModel m_lookaheadModel;
+	BoolModel m_lowSideUpwardSuppressModel;
 	
 	friend class gui::LOMMControlDialog;
 	friend class LOMMEffect;

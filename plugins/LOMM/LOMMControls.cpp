@@ -83,7 +83,8 @@ LOMMControls::LOMMControls(LOMMEffect* effect) :
 	m_feedbackModel(false, this, tr("Feedback")),
 	m_midsideModel(false, this, tr("Mid/Side")),
 	m_lookaheadEnableModel(false, this, tr("Lookahead")),
-	m_lookaheadModel(0.f, 0.f, LOMM_MAX_LOOKAHEAD, 0.01, this, tr("Lookahead"))
+	m_lookaheadModel(0.f, 0.f, LOMM_MAX_LOOKAHEAD, 0.01, this, tr("Lookahead Length")),
+	m_lowSideUpwardSuppressModel(false, this, tr("Suppress upward compression for side band"))
 {
 	auto models = {&m_timeModel, &m_inVolModel, &m_outVolModel, &m_inHighModel, &m_inMidModel,
 		&m_inLowModel, &m_outHighModel, &m_outMidModel, &m_outLowModel, &m_aRatioHModel,
@@ -154,6 +155,7 @@ void LOMMControls::resetAllParameters()
 	setInitAndReset(m_midsideModel, false);
 	setInitAndReset(m_lookaheadEnableModel, false);
 	setInitAndReset(m_lookaheadModel, 0.f);
+	setInitAndReset(m_lowSideUpwardSuppressModel, false);
 }
 
 
@@ -209,6 +211,7 @@ void LOMMControls::loadSettings(const QDomElement& parent)
 	m_midsideModel.loadSettings(parent, "midside");
 	m_lookaheadEnableModel.loadSettings(parent, "lookaheadEnable");
 	m_lookaheadModel.loadSettings(parent, "lookahead");
+	m_lowSideUpwardSuppressModel.loadSettings(parent, "lowSideUpwardSuppress");
 }
 
 
@@ -265,6 +268,7 @@ void LOMMControls::saveSettings(QDomDocument& doc, QDomElement& parent)
 	m_midsideModel.saveSettings(doc, parent, "midside");
 	m_lookaheadEnableModel.saveSettings(doc, parent, "lookaheadEnable");
 	m_lookaheadModel.saveSettings(doc, parent, "lookahead");
+	m_lowSideUpwardSuppressModel.saveSettings(doc, parent, "lowSideUpwardSuppress");
 }
 
 

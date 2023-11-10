@@ -102,6 +102,8 @@ LOMMControlDialog::LOMMControlDialog(LOMMControls* controls) :
 	m_feedbackButton = createPixmapButton(tr("Feedback"), this, 317, 238, &controls->m_feedbackModel, "feedback_active", "feedback_inactive",
 										tr("Use output as sidechain signal instead of input"));
 	createPixmapButton(tr("Mid/Side"), this, 285, 238, &controls->m_midsideModel, "midside_active", "midside_inactive", tr("Compress mid/side channels instead of left/right"));
+	m_lowSideUpwardSuppressButton = createPixmapButton(tr("Suppress upward compression for side band"), this, 106, 180, &controls->m_lowSideUpwardSuppressModel,
+														"lowSideUpwardSuppress_active", "lowSideUpwardSuppress_inactive", tr("Suppress upward compression for side band"));
 	createPixmapButton(tr("Lookahead"), this, 147, 0, &controls->m_lookaheadEnableModel, "lookahead_active", "lookahead_inactive",
 						tr(("Enable lookahead with fixed " + std::to_string(int(LOMM_MAX_LOOKAHEAD)) + " ms latency").c_str()));
 	createLcdFloatSpinBox(2, 2, "11green", tr("Lookahead"), this, 214, 2, &controls->m_lookaheadModel, tr("Lookahead length"));
@@ -110,14 +112,21 @@ LOMMControlDialog::LOMMControlDialog(LOMMControls* controls) :
 	
 	connect(initButton, SIGNAL(clicked()), m_controls, SLOT(resetAllParameters()));
 	connect(&controls->m_lookaheadEnableModel, SIGNAL(dataChanged()), this, SLOT(updateFeedbackVisibility()));
+	connect(&controls->m_midsideModel, SIGNAL(dataChanged()), this, SLOT(updateLowSideUpwardSuppressVisibility()));
 	connect(getGUI()->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(updateDisplay()));
 	
 	emit updateFeedbackVisibility();
+	emit updateLowSideUpwardSuppressVisibility();
 }
 
 void LOMMControlDialog::updateFeedbackVisibility()
 {
 	m_feedbackButton->setVisible(!m_controls->m_lookaheadEnableModel.value());
+}
+
+void LOMMControlDialog::updateLowSideUpwardSuppressVisibility()
+{
+	m_lowSideUpwardSuppressButton->setVisible(m_controls->m_midsideModel.value());
 }
 
 void LOMMControlDialog::updateDisplay()

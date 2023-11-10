@@ -113,9 +113,11 @@ private:
 	int m_dragType = -1;
 	
 	PixmapButton* m_feedbackButton;
+	PixmapButton* m_lowSideUpwardSuppressButton;
 
 private slots:
 	void updateFeedbackVisibility();
+	void updateLowSideUpwardSuppressVisibility();
 	void updateDisplay();
 };
 

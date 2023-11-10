@@ -196,7 +196,7 @@ bool LOMMEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	const bool lookaheadEnable = m_lommControls.m_lookaheadEnableModel.value();
 	const int lookahead = std::ceil((m_lommControls.m_lookaheadModel.value() / 1000.f) * m_sampleRate);
 	const bool feedback = m_lommControls.m_feedbackModel.value() && !lookaheadEnable;
-	
+	const bool lowSideUpwardSuppress = m_lommControls.m_lowSideUpwardSuppressModel.value() && midside;
 	
 	for (fpp_t f = 0; f < frames; ++f)
 	{
@@ -356,6 +356,10 @@ bool LOMMEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 				
 				m_displayIn[j][i] = yDbfs;
 				m_gainResult[j][i] = (dbfsToAmp(aboveGain) / yAmp) * (dbfsToAmp(belowGain) / yAmp);
+				if (lowSideUpwardSuppress && m_gainResult[j][i] > 1 && j == 2 && i == 1) //undo upward compression if low side band
+				{
+					m_gainResult[j][i] = 1;
+				}
 				m_gainResult[j][i] = std::min(m_gainResult[j][i], rangeAmp);
 				m_displayOut[j][i] = ampToDbfs(std::max(LOMM_MIN_FLOOR, yAmp * m_gainResult[j][i]));
 				
