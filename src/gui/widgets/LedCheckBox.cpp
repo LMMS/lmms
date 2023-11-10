@@ -132,7 +132,7 @@ void LedCheckBox::paintNonLegacy(QPaintEvent * pe)
 
 	auto drawnPixmap = model()->value() ? m_ledOnPixmap : m_ledOffPixmap;
 
-	p.drawPixmap( 0, rect().height() / 2 - drawnPixmap.height() / 2, drawnPixmap);
+	p.drawPixmap(0, rect().height() / 2 - drawnPixmap.height() / 2, drawnPixmap);
 
 	QRect r = rect();
 	r -= QMargins(m_ledOffPixmap.width() + 5, 0, 0, 0);

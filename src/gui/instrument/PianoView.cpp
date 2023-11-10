@@ -903,7 +903,7 @@ void PianoView::paintEvent( QPaintEvent * )
 		}
 		else
 		{
-			p.drawPixmap(0 - PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, m_whiteKeyDisabledPm);
+			p.drawPixmap(0 - PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, m_blackKeyDisabledPm);
 		}
 	}
 
@@ -926,7 +926,7 @@ void PianoView::paintEvent( QPaintEvent * )
 			}
 			else
 			{
-				p.drawPixmap(x + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, m_whiteKeyDisabledPm);
+				p.drawPixmap(x + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, m_blackKeyDisabledPm);
 			}
 			x += PW_WHITE_KEY_WIDTH;
 			white_cnt = 0;
