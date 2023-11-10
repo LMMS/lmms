@@ -28,6 +28,7 @@
 #include <QCheckBox>
 #include <QDir>
 #include <QMutex>
+#include "embed.h"
 #if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 	#include <QRecursiveMutex>
 #endif
@@ -200,9 +201,9 @@ private:
 	bool addItems( const QString & path );
 
 
-	QPixmap* m_folderPixmap;
-	QPixmap* m_folderOpenedPixmap;
-	QPixmap* m_folderLockedPixmap;
+	QPixmap m_folderPixmap = embed::getIconPixmap("folder");
+	QPixmap m_folderOpenedPixmap = embed::getIconPixmap("folder_opened");
+	QPixmap m_folderLockedPixmap = embed::getIconPixmap("folder_locked");
 
 	//! Directories that lead here
 	//! Initially, this is just set to the current path of a directory
@@ -277,14 +278,6 @@ public:
 private:
 	void initPixmaps();
 	void determineFileType();
-
-	static QPixmap * s_projectFilePixmap;
-	static QPixmap * s_presetFilePixmap;
-	static QPixmap * s_sampleFilePixmap;
-	static QPixmap * s_soundfontFilePixmap;
-	static QPixmap * s_vstPluginFilePixmap;
-	static QPixmap * s_midiFilePixmap;
-	static QPixmap * s_unknownFilePixmap;
 
 	QString m_path;
 	FileType m_type;

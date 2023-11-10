@@ -227,9 +227,8 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 void MidiClipView::mousePressEvent( QMouseEvent * _me )
 {
 	bool displayPattern = fixedClips() || (pixelsPerBar() >= 96 && m_legacySEPattern);
-	if( _me->button() == Qt::LeftButton &&
-		m_clip->m_clipType == MidiClip::Type::BeatClip &&
-		displayPattern && _me->y() > height() - s_stepBtnOff->height() )
+	if (_me->button() == Qt::LeftButton && m_clip->m_clipType == MidiClip::Type::BeatClip && displayPattern
+		&& _me->y() > height() - m_stepBtnOff.height())
 
 	// when mouse button is pressed in pattern mode
 
@@ -299,7 +298,7 @@ void MidiClipView::wheelEvent(QWheelEvent * we)
 {
 	if(m_clip->m_clipType == MidiClip::Type::BeatClip &&
 				(fixedClips() || pixelsPerBar() >= 96) &&
-				position(we).y() > height() - s_stepBtnOff->height())
+				position(we).y() > height() - m_stepBtnOff.height())
 	{
 //	get the step number that was wheeled on and
 //	do calculations in floats to prevent rounding errors...
@@ -560,20 +559,15 @@ void MidiClipView::paintEvent( QPaintEvent * )
 					m_clip->m_steps );
 		const int w = width() - 2 * BORDER_WIDTH;
 
-		static auto s_stepBtnOn0 = embed::getIconPixmap("step_btn_on_0");
-		static auto s_stepBtnOn200 = embed::getIconPixmap("step_btn_on_200");
-		static auto s_stepBtnOff = embed::getIconPixmap("step_btn_off");
-		static auto s_stepBtnOffLight = embed::getIconPixmap("step_btn_off_light"); 
-
 		// scale step graphics to fit the beat clip length
 		stepon0
-			= s_stepBtnOn0.scaled(w / steps, s_stepBtnOn0.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-		stepon200 = s_stepBtnOn200.scaled(
-			w / steps, s_stepBtnOn200.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+			= m_stepBtnOn0.scaled(w / steps, m_stepBtnOn0.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+		stepon200 = m_stepBtnOn200.scaled(
+			w / steps, m_stepBtnOn200.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 		stepoff
-			= s_stepBtnOff.scaled(w / steps, s_stepBtnOff.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-		stepoffl = s_stepBtnOffLight.scaled(
-			w / steps, s_stepBtnOffLight.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+			= m_stepBtnOff.scaled(w / steps, m_stepBtnOff.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+		stepoffl = m_stepBtnOffLight.scaled(
+			w / steps, m_stepBtnOffLight.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
 		for( int it = 0; it < steps; it++ )	// go through all the steps in the beat clip
 		{
@@ -581,7 +575,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 			// figure out x and y coordinates for step graphic
 			const int x = BORDER_WIDTH + static_cast<int>( it * w / steps );
-			const int y = height() - s_stepBtnOff.height() - 1;
+			const int y = height() - m_stepBtnOff.height() - 1;
 
 			if( n )
 			{

@@ -255,21 +255,6 @@ PianoRoll::PianoRoll() :
 	m_semiToneMarkerMenu->addAction( unmarkAllAction );
 	m_semiToneMarkerMenu->addAction( copyAllNotesAction );
 
-	// init pixmaps
-	static auto s_toolDraw = embed::getIconPixmap("edit_draw");
-	static auto s_toolErase = embed::getIconPixmap("edit_erase");
-	static auto s_toolSelect = embed::getIconPixmap("edit_select");
-	static auto s_toolMove = embed::getIconPixmap("edit_move");
-	static auto s_toolOpen = embed::getIconPixmap("automation");
-	static auto s_toolKnife = embed::getIconPixmap("edit_knife");
-
-	m_toolDraw = &s_toolDraw;
-	m_toolErase = &s_toolErase;
-	m_toolSelect = &s_toolSelect;
-	m_toolMove = &s_toolMove;
-	m_toolOpen = &s_toolOpen;
-	m_toolOpen = &s_toolKnife;
-
 	// init text-float
 	if( s_textFloat == nullptr )
 	{
@@ -3679,28 +3664,28 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			case EditMode::Draw:
 				if( m_mouseDownRight )
 				{
-					cursor = m_toolErase;
+					cursor = &m_toolErase;
 				}
 				else if( m_action == Action::MoveNote )
 				{
-					cursor = m_toolMove;
+					cursor = &m_toolMove;
 				}
 				else
 				{
-					cursor = m_toolDraw;
+					cursor = &m_toolDraw;
 				}
 				break;
 			case EditMode::Erase:
-				cursor = m_toolErase;
+				cursor = &m_toolErase;
 				break;
 			case EditMode::Select:
-				cursor = m_toolSelect;
+				cursor = &m_toolSelect;
 				break;
 			case EditMode::Detuning:
-				cursor = m_toolOpen;
+				cursor = &m_toolOpen;
 				break;
 			case EditMode::Knife:
-				cursor = m_toolKnife;
+				cursor = &m_toolKnife;
 				break;
 		}
 		QPoint mousePosition = mapFromGlobal( QCursor::pos() );

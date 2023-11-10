@@ -965,15 +965,7 @@ Directory::Directory(const QString & filename, const QString & path,
 	m_filter( filter ),
 	m_dirCount( 0 )
 {
-	static auto s_folderPixmap = embed::getIconPixmap("folder");
-	static auto s_folderOpenedPixmap = embed::getIconPixmap("folder_opened");
-	static auto s_folderLockedPixmap = embed::getIconPixmap("folder_locked");
-
-	m_folderPixmap = &s_folderPixmap;
-	m_folderOpenedPixmap = &s_folderOpenedPixmap;
-	m_folderLockedPixmap = &s_folderLockedPixmap;
-
-	setIcon(0, !QDir{fullName()}.isReadable() ? s_folderLockedPixmap : s_folderPixmap);
+	setIcon(0, !QDir{fullName()}.isReadable() ? m_folderLockedPixmap : m_folderPixmap);
 	setChildIndicatorPolicy( QTreeWidgetItem::ShowIndicator );
 }
 
@@ -981,11 +973,11 @@ void Directory::update()
 {
 	if( !isExpanded() )
 	{
-		setIcon(0, *m_folderPixmap);
+		setIcon(0, m_folderPixmap);
 		return;
 	}
 
-	setIcon(0, *m_folderOpenedPixmap);
+	setIcon(0, m_folderOpenedPixmap);
 	if( !childCount() )
 	{
 		m_dirCount = 0;
@@ -1048,15 +1040,6 @@ bool Directory::addItems(const QString& path)
 }
 
 
-
-
-QPixmap * FileItem::s_projectFilePixmap = nullptr;
-QPixmap * FileItem::s_presetFilePixmap = nullptr;
-QPixmap * FileItem::s_sampleFilePixmap = nullptr;
-QPixmap * FileItem::s_soundfontFilePixmap = nullptr;
-QPixmap * FileItem::s_vstPluginFilePixmap = nullptr;
-QPixmap * FileItem::s_midiFilePixmap = nullptr;
-QPixmap * FileItem::s_unknownFilePixmap = nullptr;
 
 
 FileItem::FileItem(QTreeWidget * parent, const QString & name,

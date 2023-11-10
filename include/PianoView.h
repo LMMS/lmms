@@ -30,6 +30,7 @@
 
 #include "AutomatableModel.h"
 #include "ModelView.h"
+#include "embed.h"
 
 namespace lmms
 {
@@ -73,12 +74,12 @@ private:
 	int getKeyHeight(int key_num) const;
 	IntModel *getNearestMarker(int key, QString* title = nullptr);
 
-	QPixmap* m_whiteKeyPm;
-	QPixmap* m_blackKeyPm;
-	QPixmap* m_whiteKeyPressedPm;
-	QPixmap* m_blackKeyPressedPm;
-	QPixmap* m_whiteKeyDisabledPm;
-	QPixmap* m_blackKeyDisabledPm;
+	QPixmap m_whiteKeyPm = embed::getIconPixmap("white_key");
+	QPixmap m_blackKeyPm = embed::getIconPixmap("black_key");
+	QPixmap m_whiteKeyPressedPm = embed::getIconPixmap("white_key_pressed");
+	QPixmap m_blackKeyPressedPm = embed::getIconPixmap("black_key_pressed");
+	QPixmap m_whiteKeyDisabledPm = embed::getIconPixmap("white_key_disabled");
+	QPixmap m_blackKeyDisabledPm = embed::getIconPixmap("black_key_disabled");
 
 	Piano * m_piano;
 

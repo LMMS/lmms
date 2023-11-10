@@ -49,13 +49,6 @@ ComboBox::ComboBox( QWidget * _parent, const QString & _name ) :
 {
 	setFixedHeight( ComboBox::DEFAULT_HEIGHT );
 
-	static auto s_background = embed::getIconPixmap("combobox_bg");
-	static auto s_arrow = embed::getIconPixmap("combobox_arrow");
-	static auto s_arrowSelected = embed::getIconPixmap("combobox_arrow_selected");
-	m_background = &s_background;
-	m_arrow = &s_arrow;
-	m_arrowSelected = &s_arrowSelected;
-
 	setFont( pointSize<9>( font() ) );
 
 	connect( &m_menu, SIGNAL(triggered(QAction*)),
@@ -159,7 +152,7 @@ void ComboBox::paintEvent( QPaintEvent * _pe )
 {
 	QPainter p( this );
 
-	p.fillRect(2, 2, width() - 2, height() - 4, *m_background);
+	p.fillRect(2, 2, width() - 2, height() - 4, m_background);
 
 	QColor shadow = palette().shadow().color();
 	QColor highlight = palette().highlight().color();
@@ -183,7 +176,7 @@ void ComboBox::paintEvent( QPaintEvent * _pe )
 
 	auto arrow = m_pressed ? m_arrowSelected : m_arrow;
 
-	p.drawPixmap(width() - CB_ARROW_BTN_WIDTH + 3, 4, *arrow);
+	p.drawPixmap(width() - CB_ARROW_BTN_WIDTH + 3, 4, arrow);
 
 	if( model() && model()->size() > 0 )
 	{

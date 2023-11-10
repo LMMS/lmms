@@ -126,11 +126,6 @@ AutomationEditor::AutomationEditor() :
 					this, SLOT(setQuantization()));
 	m_quantizeModel.setValue( m_quantizeModel.findText( "1/8" ) );
 
-	static auto s_toolYFlip = embed::getIconPixmap("flip_y");
-	static auto s_toolXFlip = embed::getIconPixmap("flip_x");
-	m_toolYFlip = &s_toolYFlip;
-	m_toolXFlip = &s_toolXFlip;
-
 	// add time-line
 	m_timeLine = new TimeLineWidget( VALUES_WIDTH, 0, m_ppb,
 				Engine::getSong()->getPlayPos(
@@ -153,19 +148,6 @@ AutomationEditor::AutomationEditor() :
 	m_topBottomScroll->setPageStep( 20 );
 	connect( m_topBottomScroll, SIGNAL(valueChanged(int)), this,
 						SLOT(verScrolled(int)));
-
-	// init pixmaps
-	static auto s_toolDraw = embed::getIconPixmap("edit_draw");
-	static auto s_toolErase = embed::getIconPixmap("edit_erase");
-	static auto s_toolDrawOut = embed::getIconPixmap("edit_draw_outvalue");
-	static auto s_toolEditTangents = embed::getIconPixmap("edit_tangent");
-	static auto s_toolMove = embed::getIconPixmap("edit_move");
-
-	m_toolDraw = &s_toolDraw;
-	m_toolErase = &s_toolErase;
-	m_toolDrawOut = &s_toolDrawOut;
-	m_toolEditTangents = &s_toolEditTangents;
-	m_toolMove = &s_toolMove;
 
 	setCurrentClip(nullptr);
 
@@ -1376,26 +1358,26 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	{
 		case EditMode::Draw:
 		{
-			if (m_action == Action::EraseValues) { cursor = m_toolErase; }
-			else if (m_action == Action::MoveValue) { cursor = m_toolMove; }
-			else { cursor = m_toolDraw; }
+			if (m_action == Action::EraseValues) { cursor = &m_toolErase; }
+			else if (m_action == Action::MoveValue) { cursor = &m_toolMove; }
+			else { cursor = &m_toolDraw; }
 			break;
 		}
 		case EditMode::Erase:
 		{
-			cursor = m_toolErase;
+			cursor = &m_toolErase;
 			break;
 		}
 		case EditMode::DrawOutValues:
 		{
-			if (m_action == Action::ResetOutValues) { cursor = m_toolErase; }
-			else if (m_action == Action::MoveOutValue) { cursor = m_toolMove; }
-			else { cursor = m_toolDrawOut; }
+			if (m_action == Action::ResetOutValues) { cursor = &m_toolErase; }
+			else if (m_action == Action::MoveOutValue) { cursor = &m_toolMove; }
+			else { cursor = &m_toolDrawOut; }
 			break;
 		}
 		case EditMode::EditTangents:
 		{
-			cursor = m_action == Action::MoveTangent ? m_toolMove : m_toolEditTangents;
+			cursor = m_action == Action::MoveTangent ? &m_toolMove : &m_toolEditTangents;
 			break;
 		}
 	}
