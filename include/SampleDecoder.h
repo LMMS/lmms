@@ -44,7 +44,14 @@ public:
 
 	using Decoder = std::function<std::optional<Result>(const QString&)>;
 
+	struct AudioType
+	{
+		std::string name;
+		std::string extension;
+	};
+
 	static auto decode(const QString& audioFile) -> std::optional<Result>;
+	static auto supportedAudioTypes() -> std::vector<AudioType>;
 
 private:
 	static auto decodeSampleSF(const QString& audioFile) -> std::optional<Result>;

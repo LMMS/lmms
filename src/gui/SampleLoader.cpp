@@ -31,6 +31,7 @@
 #include "FileDialog.h"
 #include "GuiApplication.h"
 #include "PathUtil.h"
+#include "SampleDecoder.h"
 #include "Song.h"
 
 namespace lmms::gui {
@@ -57,13 +58,24 @@ QString SampleLoader::openAudioFile(const QString& previousFile)
 	openFileDialog.setFileMode(gui::FileDialog::ExistingFiles);
 
 	// set filters
-	// TODO: Since libsndfile 1.1.0, MP3 is supported
-	const auto fileTypes = QStringList{QObject::tr("All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc "
-												   "*.aif *.aiff *.au *.raw)"),
-		QObject::tr("Wave-Files (*.wav)"), QObject::tr("OGG-Files (*.ogg)"), QObject::tr("DrumSynth-Files (*.ds)"),
-		QObject::tr("FLAC-Files (*.flac)"), QObject::tr("SPEEX-Files (*.spx)"), QObject::tr("VOC-Files (*.voc)"),
-		QObject::tr("AIFF-Files (*.aif *.aiff)"), QObject::tr("AU-Files (*.au)"), QObject::tr("RAW-Files (*.raw)")};
+	auto fileTypes = QStringList{};
+	auto allFileTypes = QString{"All Audio-Files ("};
+	const auto supportedAudioTypes = SampleDecoder::supportedAudioTypes();
 
+	for (int i = 0; i < supportedAudioTypes.size(); ++i)
+	{
+		const auto& audioType = supportedAudioTypes[i];
+		const auto name = QString::fromStdString(audioType.name);
+		const auto extension = QString::fromStdString(audioType.extension);
+
+		fileTypes.append(QString{"%1-Files (*.%2)"}.arg(name, extension));
+
+		allFileTypes.append(QString{"*.%2"}.arg(extension));
+		if (i < supportedAudioTypes.size() - 1) { allFileTypes.append(" "); }
+		else { allFileTypes.append(")"); }
+	}
+
+	fileTypes.append("Other files (*)");
 	openFileDialog.setNameFilters(fileTypes);
 
 	if (!previousFile.isEmpty())
