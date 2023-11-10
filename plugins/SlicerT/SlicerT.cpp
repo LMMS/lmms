@@ -46,7 +46,7 @@ Plugin::Descriptor PLUGIN_EXPORT slicert_plugin_descriptor = {
 	"Daniel Kauss Serna <daniel.kauss.serna@gmail.com>",
 	0x0100,
 	Plugin::Type::Instrument,
-	new PluginPixmapLoader("icon"),
+	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,
 };

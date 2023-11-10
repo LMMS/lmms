@@ -84,13 +84,13 @@ SlicerTView::SlicerTView(SlicerT* instrument, QWidget* parent)
 
 	m_midiExportButton = new QPushButton(this);
 	m_midiExportButton->move(199, 150);
-	m_midiExportButton->setIcon(PLUGIN_NAME::getIconPixmap("copyMidi"));
+	m_midiExportButton->setIcon(PLUGIN_NAME::getIconPixmap("copy_midi"));
 	m_midiExportButton->setToolTip(tr("Copy midi pattern to clipboard"));
 	connect(m_midiExportButton, &PixmapButton::clicked, this, &SlicerTView::exportMidi);
 
 	m_resetButton = new QPushButton(this);
 	m_resetButton->move(18, 150);
-	m_resetButton->setIcon(PLUGIN_NAME::getIconPixmap("resetSlices"));
+	m_resetButton->setIcon(PLUGIN_NAME::getIconPixmap("reset_slices"));
 	m_resetButton->setToolTip(tr("Reset Slices"));
 	connect(m_resetButton, &PixmapButton::clicked, m_slicerTParent, &SlicerT::updateSlices);
 }
