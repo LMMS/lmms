@@ -221,7 +221,7 @@ private:
 	std::atomic<bool> m_cancel = false;
 	bool m_stopped = false;
 	bool m_run = false;
-	static std::unique_ptr<FileBrowserSearcher> s_instance;
+	inline static std::unique_ptr<FileBrowserSearcher> s_instance = nullptr;
 };
 
 

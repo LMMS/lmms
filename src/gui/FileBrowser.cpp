@@ -1048,8 +1048,6 @@ void FileBrowserTreeWidget::updateDirectory(QTreeWidgetItem * item )
 
 
 
-std::unique_ptr<FileBrowserSearcher> FileBrowserSearcher::s_instance = nullptr;
-
 FileBrowserSearcher::FileBrowserSearcher()
 	: m_worker([this] { run(); })
 {
