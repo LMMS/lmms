@@ -1456,15 +1456,27 @@ QString FileItem::extension(const QString & file )
 
 QString FileItem::defaultFilters()
 {
-	// TODO: Supported extensions should be in a centralized location
-	auto simpleExtensions
-		= QString{"*.mmp *.mpt *.mmpz *.xpf *.xml *.xiz *.sf2 *.sf3 *.pat *.mid *.midi *.rmi *.dll *.lv2"};
+	const auto projectFilters = QStringList{"*.mmp", "*.mpt", "*.mmpz"};
+	const auto presetFilters = QStringList{"*.xpf", "*.xml", "*.xiz", "*.lv2"};
+	const auto soundFontFilters = QStringList{"*.sf2", "*.sf3"};
+	const auto patchFilters = QStringList{"*.pat"};
+	const auto midiFilters = QStringList{"*.mid", "*.midi", "*.rmi"};
+	
+	auto vstPluginFilters = QStringList{"*.dll"};
 #ifdef LMMS_BUILD_LINUX
-	simpleExtensions += " *.so";
+	vstPluginFilters.append("*.so");
 #endif
-	auto audioExtensions = QString{"*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw *.wav *.ogg *.ds "
-								   "*.flac *.spx *.voc *.aif *.aiff *.au *.raw"};
-	return simpleExtensions + " " + audioExtensions;
+
+	auto audioFilters
+		= QStringList{"*.wav", "*.ogg", "*.ds", "*.flac", "*.spx", "*.voc", "*.aif", "*.aiff", "*.au", "*.raw"};
+#ifdef LMMS_HAVE_SNDFILE_MP3
+	audioFilters.append("*.mp3");
+#endif
+
+	const auto extensions = projectFilters + presetFilters + soundFontFilters + patchFilters + midiFilters
+		+ vstPluginFilters + audioFilters;
+
+	return extensions.join(" ");
 }
 
 
