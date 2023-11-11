@@ -118,14 +118,10 @@ MainWindow::MainWindow() :
 							splitter, false, true,
 				confMgr->userProjectsDir(),
 				confMgr->factoryProjectsDir()));
-	sideBar->appendTab( new FileBrowser(
-				confMgr->userSamplesDir() + "*" +
-				confMgr->factorySamplesDir(),
-					"*", tr( "My Samples" ),
-					embed::getIconPixmap( "sample_file" ).transformed( QTransform().rotate( 90 ) ),
-							splitter, false, true,
-					confMgr->userSamplesDir(),
-					confMgr->factorySamplesDir()));
+	sideBar->appendTab(
+		new FileBrowser(confMgr->userSamplesDir() + "*" + confMgr->factorySamplesDir(), FileItem::defaultFilters(),
+			tr("My Samples"), embed::getIconPixmap("sample_file").transformed(QTransform().rotate(90)), splitter, false,
+			true, confMgr->userSamplesDir(), confMgr->factorySamplesDir()));
 	sideBar->appendTab( new FileBrowser(
 				confMgr->userPresetsDir() + "*" +
 				confMgr->factoryPresetsDir(),
@@ -135,11 +131,8 @@ MainWindow::MainWindow() :
 							splitter , false, true,
 				confMgr->userPresetsDir(),
 				confMgr->factoryPresetsDir()));
-	sideBar->appendTab( new FileBrowser( QDir::homePath(), "*",
-							tr( "My Home" ),
-					embed::getIconPixmap( "home" ).transformed( QTransform().rotate( 90 ) ),
-							splitter, false, false ) );
-
+	sideBar->appendTab(new FileBrowser(QDir::homePath(), FileItem::defaultFilters(), tr("My Home"),
+		embed::getIconPixmap("home").transformed(QTransform().rotate(90)), splitter, false, false));
 
 	QStringList root_paths;
 	QString title = tr( "Root directory" );
@@ -161,9 +154,8 @@ MainWindow::MainWindow() :
 	}
 #endif
 
-	sideBar->appendTab( new FileBrowser( root_paths.join( "*" ), "*", title,
-					embed::getIconPixmap( "computer" ).transformed( QTransform().rotate( 90 ) ),
-							splitter, dirs_as_items) );
+	sideBar->appendTab(new FileBrowser(root_paths.join("*"), FileItem::defaultFilters(), title,
+		embed::getIconPixmap("computer").transformed(QTransform().rotate(90)), splitter, dirs_as_items));
 
 	m_workspace = new QMdiArea(splitter);
 
