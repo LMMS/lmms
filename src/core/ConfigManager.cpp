@@ -331,6 +331,35 @@ void ConfigManager::addRecentlyOpenedProject(const QString & file)
 	}
 }
 
+void ConfigManager::addExtraDirectory(const QString& path)
+{
+	if (!QFileInfo{path}.isDir()) { return; }
+	m_extraDirectories.push_back(path);
+}
+
+void ConfigManager::loadExtraDirectories(QDomNode& node)
+{
+	m_extraDirectories.clear();
+	const auto childNodes = node.childNodes();
+	for (int i = 0; i < childNodes.length(); ++i)
+	{
+		auto childElement = childNodes.at(i).toElement();
+		if (childElement.isNull() || !childElement.hasAttribute("path")) { continue; }
+		addExtraDirectory(childElement.attribute("path"));
+	}
+}
+
+void ConfigManager::saveExtraDirectories(QDomDocument& document, QDomElement& config)
+{
+	auto element = document.createElement("extradirectories");
+	for (const auto& directory : m_extraDirectories)
+	{
+		auto child = document.createElement("file");
+		child.setAttribute("path", directory);
+		element.appendChild(child);
+	}
+	config.appendChild(element);
+}
 
 
 
@@ -468,6 +497,7 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 						n = n.nextSibling();
 					}
 				}
+				else if (node.nodeName() == "extradirectories") { loadExtraDirectories(node); }
 				node = node.nextSibling();
 			}
 
@@ -614,6 +644,8 @@ void ConfigManager::saveConfigFile()
 		recent_files.appendChild(n);
 	}
 	lmms_config.appendChild(recent_files);
+
+	saveExtraDirectories(doc, lmms_config);
 
 	QString xml = "<?xml version=\"1.0\"?>\n" + doc.toString(2);
 
