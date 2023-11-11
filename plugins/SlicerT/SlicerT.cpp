@@ -108,15 +108,16 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 	}
 
 	if (!handle->m_pluginData) { handle->m_pluginData = new PlaybackState(sliceStart); }
+	auto playbackState = static_cast<PlaybackState*>(handle->m_pluginData);
 
-	float noteDone = ((PlaybackState*)handle->m_pluginData)->noteDone();
+	float noteDone = playbackState->noteDone();
 	float noteLeft = sliceEnd - noteDone;
 
 	if (noteLeft > 0)
 	{
 		int noteFrame = noteDone * m_originalSample.frames();
 
-		SRC_STATE* resampleState = static_cast<PlaybackState*>(handle->m_pluginData)->resamplingState();
+		SRC_STATE* resampleState = playbackState->resamplingState();
 		SRC_DATA resampleData;
 		resampleData.data_in = (m_originalSample.data() + noteFrame)->data();
 		resampleData.data_out = (workingBuffer + offset)->data();
@@ -127,7 +128,7 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 		src_process(resampleState, &resampleData);
 
 		float nextNoteDone = noteDone + frames * (1.0f / speedRatio) / m_originalSample.frames();
-		static_cast<PlaybackState*>(handle->m_pluginData)->setNoteDone(nextNoteDone);
+		playbackState->setNoteDone(nextNoteDone);
 
 		// exponential fade out, applyRelease() not used since it extends the note length
 		int fadeOutFrames = m_fadeOutFrames.value() / 1000.0f * Engine::audioEngine()->processingSampleRate();
@@ -147,6 +148,11 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 		emit isPlaying(noteDone, sliceStart, sliceEnd);
 	}
 	else { emit isPlaying(-1, 0, 0); }
+}
+
+void SlicerT::deleteNotePluginData(NotePlayHandle* handle)
+{
+	delete static_cast<PlaybackState*>(handle->m_pluginData);
 }
 
 // uses the spectral flux to determine the change in magnitude
