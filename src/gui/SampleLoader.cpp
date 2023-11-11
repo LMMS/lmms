@@ -59,24 +59,24 @@ QString SampleLoader::openAudioFile(const QString& previousFile)
 
 	// set filters
 	auto fileTypes = QStringList{};
-	auto allFileTypes = QString{"All Audio-Files ("};
+	auto allFileTypes = QStringList{};
+	auto nameFilters = QStringList{};
 	const auto& supportedAudioTypes = SampleDecoder::s_supportedAudioTypes;
 
-	for (int i = 0; i < supportedAudioTypes.size(); ++i)
+	for (const auto& audioType : supportedAudioTypes)
 	{
-		const auto& audioType = supportedAudioTypes[i];
 		const auto name = QString::fromStdString(audioType.name);
 		const auto extension = QString::fromStdString(audioType.extension);
-
-		fileTypes.append(QObject::tr(qPrintable(QString{"%1-Files (*.%2)"}.arg(name, extension))));
-
-		allFileTypes.append(QObject::tr(qPrintable(QString{"*.%2"}.arg(extension))));
-		if (i < supportedAudioTypes.size() - 1) { allFileTypes.append(" "); }
-		else { allFileTypes.append(")"); }
+		const auto displayExtension = QString{"*.%1"}.arg(extension);
+		fileTypes.append(QString{"%1 %2 (%3)"}.arg(name, QObject::tr("files"), displayExtension));
+		allFileTypes.append(displayExtension);
 	}
 
-	fileTypes.append(QObject::tr("Other files (*)"));
-	openFileDialog.setNameFilters(fileTypes);
+	nameFilters.append(QString{"%1 (%2)"}.arg(QObject::tr("All audio files"), allFileTypes.join(" ")));
+	nameFilters.append(fileTypes);
+	nameFilters.append(QString("%1 (*)").arg(QObject::tr("Other files")));
+
+	openFileDialog.setNameFilters(nameFilters);
 
 	if (!previousFile.isEmpty())
 	{
