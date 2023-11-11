@@ -26,11 +26,11 @@
 #define LMMS_GUI_SLICERT_WAVEFORM_H
 
 #include <QApplication>
+#include <QElapsedTimer>
 #include <QFontMetrics>
 #include <QInputDialog>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QElapsedTimer>
 
 #include "Instrument.h"
 #include "SampleBuffer.h"
@@ -56,7 +56,6 @@ public:
 	static constexpr int s_seekerHorMargin = 5;
 	static constexpr int s_seekerHeight = 38; // used to calcualte all vertical sizes
 	static constexpr int s_middleMargin = 6;
-
 
 	// interaction behavior values
 	static constexpr float s_distanceForClick = 0.02f;

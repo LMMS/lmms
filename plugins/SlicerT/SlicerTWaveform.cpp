@@ -306,9 +306,7 @@ void SlicerTWaveform::mousePressEvent(QMouseEvent* me)
 		drawEditorWaveform();
 		break;
 	case Qt::MouseButton::LeftButton:
-		if (m_slicerTParent->m_originalSample.frames() <= 1) {
-			static_cast<SlicerTView*>(parent())->openFiles();
-		}
+		if (m_slicerTParent->m_originalSample.frames() <= 1) { static_cast<SlicerTView*>(parent())->openFiles(); }
 		// update seeker middle for correct movement
 		m_seekerMiddle = static_cast<float>(me->x() - s_seekerHorMargin) / m_seekerWidth;
 		break;

@@ -75,7 +75,7 @@ public:
 	SlicerT(InstrumentTrack* instrumentTrack);
 
 	void playNote(NotePlayHandle* handle, sampleFrame* workingBuffer) override;
-void deleteNotePluginData(NotePlayHandle* handle) override;
+	void deleteNotePluginData(NotePlayHandle* handle) override;
 
 	void saveSettings(QDomDocument& document, QDomElement& element) override;
 	void loadSettings(const QDomElement& element) override;
