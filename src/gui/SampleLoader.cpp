@@ -61,7 +61,7 @@ QString SampleLoader::openAudioFile(const QString& previousFile)
 	auto fileTypes = QStringList{};
 	auto allFileTypes = QStringList{};
 	auto nameFilters = QStringList{};
-	const auto& supportedAudioTypes = SampleDecoder::s_supportedAudioTypes;
+	const auto& supportedAudioTypes = SampleDecoder::supportedAudioTypes();
 
 	for (const auto& audioType : supportedAudioTypes)
 	{

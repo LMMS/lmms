@@ -25,13 +25,15 @@ std::vector<SampleDecoder::Decoder> SampleDecoder::s_decoders = {
 	&SampleDecoder::decodeSampleDS
 };
 
-auto SampleDecoder::supportedAudioTypes() -> std::vector<AudioType>
+auto SampleDecoder::supportedAudioTypes() -> const std::vector<AudioType>&
 {
-	auto sfFormatInfo = SF_FORMAT_INFO{};
+	static auto s_audioTypes = std::vector<AudioType>{};
+	if (!s_audioTypes.empty()) { return s_audioTypes; }
 
 	// Add DrumSynth by default since that support comes from us
-	auto audioTypes = std::vector<AudioType>{AudioType{"DrumSynth", "ds"}};
+	s_audioTypes.push_back(AudioType{"DrumSynth", "ds"});
 
+	auto sfFormatInfo = SF_FORMAT_INFO{};
 	auto simpleTypeCount = 0;
 	sf_command(nullptr, SFC_GET_SIMPLE_FORMAT_COUNT, &simpleTypeCount, sizeof(int));
 
@@ -42,19 +44,19 @@ auto SampleDecoder::supportedAudioTypes() -> std::vector<AudioType>
 		sfFormatInfo.format = simple;
 		sf_command(nullptr, SFC_GET_SIMPLE_FORMAT, &sfFormatInfo, sizeof(sfFormatInfo));
 
-		auto it = std::find_if(audioTypes.begin(), audioTypes.end(),
+		auto it = std::find_if(s_audioTypes.begin(), s_audioTypes.end(),
 			[&](const AudioType& type) { return sfFormatInfo.extension == type.extension; });
-		if (it != audioTypes.end()) { continue; }
+		if (it != s_audioTypes.end()) { continue; }
 
 		auto name = std::string{sfFormatInfo.extension};
 		std::transform(name.begin(), name.end(), name.begin(), [](unsigned char ch) { return std::toupper(ch); });
 
-		audioTypes.push_back(AudioType{std::move(name), sfFormatInfo.extension});
+		s_audioTypes.push_back(AudioType{std::move(name), sfFormatInfo.extension});
 	}
 
 	std::sort(
-		audioTypes.begin(), audioTypes.end(), [&](const AudioType& a, const AudioType& b) { return a.name < b.name; });
-	return audioTypes;
+		s_audioTypes.begin(), s_audioTypes.end(), [&](const AudioType& a, const AudioType& b) { return a.name < b.name; });
+	return s_audioTypes;
 }
 
 auto SampleDecoder::decode(const QString& audioFile) -> std::optional<Result>
