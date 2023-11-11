@@ -69,7 +69,7 @@ jobs:
           CCACHE_MAXSIZE: 500M
   macos:
     name: macos
-    runs-on: macos-11
+    runs-on: macos-12
     env:
       CMAKE_OPTS: >-
         -DUSE_WERROR=ON
@@ -78,7 +78,7 @@ jobs:
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j3
-      DEVELOPER_DIR: /Applications/Xcode_11.7.app/Contents/Developer
+      DEVELOPER_DIR: /Applications/Xcode_13.1.app/Contents/Developer
     steps:
       - name: Check out
         uses: actions/checkout@v3
@@ -105,6 +105,7 @@ jobs:
       - name: Install dependencies
         run: |
           brew bundle install --verbose
+          npm update -g npm
           npm install --location=global appdmg
         env:
           HOMEBREW_NO_AUTO_UPDATE: 1
