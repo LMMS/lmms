@@ -68,14 +68,14 @@ QString SampleLoader::openAudioFile(const QString& previousFile)
 		const auto name = QString::fromStdString(audioType.name);
 		const auto extension = QString::fromStdString(audioType.extension);
 
-		fileTypes.append(QString{"%1-Files (*.%2)"}.arg(name, extension));
+		fileTypes.append(QObject::tr(qPrintable(QString{"%1-Files (*.%2)"}.arg(name, extension))));
 
-		allFileTypes.append(QString{"*.%2"}.arg(extension));
+		allFileTypes.append(QObject::tr(qPrintable(QString{"*.%2"}.arg(extension))));
 		if (i < supportedAudioTypes.size() - 1) { allFileTypes.append(" "); }
 		else { allFileTypes.append(")"); }
 	}
 
-	fileTypes.append("Other files (*)");
+	fileTypes.append(QObject::tr("Other files (*)"));
 	openFileDialog.setNameFilters(fileTypes);
 
 	if (!previousFile.isEmpty())
