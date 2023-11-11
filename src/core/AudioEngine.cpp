@@ -800,15 +800,15 @@ void AudioEngine::removePlayHandlesOfTypes(Track * track, PlayHandle::Types type
 void AudioEngine::requestChangeInModel()
 {
 	if (s_renderingThread || s_runningChange) { return; }
-	s_runningChange = true;
 	m_changeMutex.lock();
+	s_runningChange = true;
 }
 
 void AudioEngine::doneChangeInModel()
 {
 	if (s_renderingThread || !s_runningChange) { return; }
-	s_runningChange = false;
 	m_changeMutex.unlock();
+	s_runningChange = false;
 }
 
 bool AudioEngine::isAudioDevNameValid(QString name)
