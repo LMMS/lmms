@@ -26,6 +26,7 @@
 #define LMMS_GUI_SETUP_DIALOG_H
 
 #include <QDialog>
+#include <QListWidget>
 #include <QMap>
 
 #include "AudioDevice.h"
@@ -126,6 +127,9 @@ private slots:
 	void setThemeDir(const QString & themeDir);
 	void openBackgroundPicFile();
 	void setBackgroundPicFile(const QString & backgroundPicFile);
+	void addExtraDirectory();
+	void removeExtraDirectory();
+	QGroupBox* addExtraDirectoryWidget(QWidget* parent = nullptr);
 
 	void showRestartWarning();
 
@@ -199,6 +203,9 @@ private:
 #endif
 	QString m_themeDir;
 	QString m_backgroundPicFile;
+
+	QListWidget * m_extraDirectoriesWidget;
+	QStringList m_extraDirectories;
 
 	QLineEdit * m_workingDirLineEdit;
 	QLineEdit * m_vstDirLineEdit;

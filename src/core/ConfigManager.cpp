@@ -298,6 +298,14 @@ void ConfigManager::setBackgroundPicFile(const QString & backgroundPicFile)
 
 
 
+void ConfigManager::setExtraDirectories(const QStringList& directories)
+{
+	m_extraDirectories = directories;
+}
+
+
+
+
 void ConfigManager::createWorkingDir()
 {
 	QDir().mkpath(m_workingDir);
@@ -331,11 +339,6 @@ void ConfigManager::addRecentlyOpenedProject(const QString & file)
 	}
 }
 
-void ConfigManager::addExtraDirectory(const QString& path)
-{
-	if (!QFileInfo{path}.isDir()) { return; }
-	m_extraDirectories.push_back(path);
-}
 
 void ConfigManager::loadExtraDirectories(QDomNode& node)
 {
@@ -345,7 +348,7 @@ void ConfigManager::loadExtraDirectories(QDomNode& node)
 	{
 		auto childElement = childNodes.at(i).toElement();
 		if (childElement.isNull() || !childElement.hasAttribute("path")) { continue; }
-		addExtraDirectory(childElement.attribute("path"));
+		m_extraDirectories.push_back(childElement.attribute("path"));
 	}
 }
 

@@ -244,7 +244,6 @@ public:
 
 	void addRecentlyOpenedProject(const QString & _file);
 
-	void addExtraDirectory(const QString& path);
 	void loadExtraDirectories(QDomNode& node);
 	void saveExtraDirectories(QDomDocument& document, QDomElement& config);
 
@@ -267,6 +266,7 @@ public:
 	void setGIGDir(const QString & gigDir);
 	void setThemeDir(const QString & themeDir);
 	void setBackgroundPicFile(const QString & backgroundPicFile);
+	void setExtraDirectories(const QStringList& directories);
 
 	// Creates the working directory & subdirectories on disk.
 	void createWorkingDir();
