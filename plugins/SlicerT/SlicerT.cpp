@@ -78,7 +78,7 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 {
 	if (m_originalSample.frames() <= 1) { return; }
 
-	const int noteIndex = handle->key() - m_parentTrack->baseNote();
+	int noteIndex = handle->key() - m_parentTrack->baseNote();
 	const fpp_t frames = handle->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = handle->noteOffset();
 	const int bpm = Engine::getSong()->getTempo();
@@ -90,15 +90,21 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 	speedRatio *= Engine::audioEngine()->processingSampleRate() / static_cast<float>(m_originalSample.sampleRate());
 
 	float sliceStart, sliceEnd;
-	if (noteIndex > m_slicePoints.size() - 2 || noteIndex < 0) // full sample if ouside range
+	if (noteIndex == 0) // full sample at base note
 	{
 		sliceStart = 0;
 		sliceEnd = 1;
 	}
-	else
+	else if (noteIndex > 0 && noteIndex < m_slicePoints.size())
 	{
+		noteIndex -= 1;
 		sliceStart = m_slicePoints[noteIndex];
 		sliceEnd = m_slicePoints[noteIndex + 1];
+	}
+	else
+	{
+		emit isPlaying(-1, 0, 0);
+		return;
 	}
 
 	if (!handle->m_pluginData) { handle->m_pluginData = new PlaybackState(sliceStart); }
@@ -295,7 +301,7 @@ std::vector<Note> SlicerT::getMidi()
 		float sliceEnd = totalTicks * m_slicePoints[i + 1];
 
 		Note sliceNote = Note();
-		sliceNote.setKey(i + m_parentTrack->baseNote());
+		sliceNote.setKey(i + m_parentTrack->baseNote() + 1);
 		sliceNote.setPos(sliceStart);
 		sliceNote.setLength(sliceEnd - sliceStart + 1); // + 1 so that the notes allign
 		outputNotes.push_back(sliceNote);
