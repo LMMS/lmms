@@ -357,7 +357,7 @@ void ConfigManager::saveExtraDirectories(QDomDocument& document, QDomElement& co
 	auto element = document.createElement("extradirectories");
 	for (const auto& directory : m_extraDirectories)
 	{
-		auto child = document.createElement("file");
+		auto child = document.createElement("directory");
 		child.setAttribute("path", directory);
 		element.appendChild(child);
 	}
