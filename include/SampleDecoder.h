@@ -53,6 +53,8 @@ public:
 	static auto decode(const QString& audioFile) -> std::optional<Result>;
 	static auto supportedAudioTypes() -> std::vector<AudioType>;
 
+	inline static auto s_supportedAudioTypes = supportedAudioTypes();
+
 private:
 	static auto decodeSampleSF(const QString& audioFile) -> std::optional<Result>;
 	static auto decodeSampleDS(const QString& audioFile) -> std::optional<Result>;
