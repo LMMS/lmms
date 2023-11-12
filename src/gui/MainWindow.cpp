@@ -135,8 +135,8 @@ MainWindow::MainWindow() :
 	for (const auto& directory : ConfigManager::inst()->extraDirectories())
 	{
 		const auto name = QDir{directory}.dirName();
-		sideBar->appendTab(new FileBrowser(directory, FileItem::defaultFilters(), name,
-			embed::getIconPixmap("folder_opened").transformed(QTransform().rotate(90)), splitter, false, true));
+		const auto pixmap = embed::getIconPixmap("folder_opened").transformed(QTransform().rotate(90).scale(2, 2));
+		sideBar->appendTab(new FileBrowser(directory, FileItem::defaultFilters(), name, pixmap, splitter, false, true));
 	}
 
 	m_workspace = new QMdiArea(splitter);
