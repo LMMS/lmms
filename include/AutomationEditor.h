@@ -144,6 +144,8 @@ protected slots:
 	/// Updates the clip's quantization using the current user selected value.
 	void setQuantization();
 
+	void updateLeftRightScrollRange();
+
 private:
 
 	enum class Action

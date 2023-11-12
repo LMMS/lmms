@@ -220,6 +220,7 @@ void AutomationEditor::setCurrentClip(AutomationClip * new_clip )
 	if (m_clip != nullptr)
 	{
 		connect(m_clip, SIGNAL(dataChanged()), this, SLOT(update()));
+		connect(m_clip, &AutomationClip::lengthChanged, this, &AutomationEditor::updateLeftRightScrollRange);
 	}
 
 	emit currentClipChanged();
@@ -1229,16 +1230,6 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 					"the context menu of a control!" ) );
 	}
 
-	// TODO: Get this out of paint event
-	int l = validClip() ? (int) m_clip->length() : 0;
-
-	// reset scroll-range
-	if( m_leftRightScroll->maximum() != l )
-	{
-		m_leftRightScroll->setRange( 0, l );
-		m_leftRightScroll->setPageStep( l );
-	}
-
 	if(validClip() && GuiApplication::instance()->automationEditor()->m_editor->hasFocus())
 	{
 		drawCross( p );
@@ -1717,6 +1708,17 @@ void AutomationEditor::setQuantization()
 }
 
 
+
+
+void AutomationEditor::updateLeftRightScrollRange()
+{
+	const int length = validClip() ? static_cast<int>(m_clip->length()) : 0;
+	if (m_leftRightScroll->maximum() != length)
+	{
+		m_leftRightScroll->setRange(0, length);
+		m_leftRightScroll->setPageStep(length);
+	}
+}
 
 
 void AutomationEditor::updateTopBottomLevels()
