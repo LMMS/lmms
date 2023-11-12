@@ -40,6 +40,7 @@
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QToolButton>
+#include <QGraphicsView>
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -327,6 +328,9 @@ PianoRoll::PianoRoll() :
 	removeSelection();
 
 	// init scrollbars
+	m_cornerSquare = new QGraphicsView{this};
+	m_cornerSquare->setSceneRect(0, 0, SCROLLBAR_SIZE, SCROLLBAR_SIZE);
+
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
 	m_leftRightScroll->setSingleStep( 1 );
 	connect( m_leftRightScroll, SIGNAL(valueChanged(int)), this,
@@ -851,7 +855,7 @@ void PianoRoll::setScrollbarPos(double posX)
 	if (!hasValidMidiClip()) { return; }
 
 	const auto tpp = 1.0 * TimePos::ticksPerBar() / m_ppb; // ticks per pixel
-	const auto editorWidthTicks = tpp * (m_leftRightScroll->width() - m_topBottomScroll->width());
+	const auto editorWidthTicks = tpp * m_leftRightScroll->width();
 
 	// Set scrollbar to far left if entire clip can fit on screen
 	if (m_midiClip->exactLength().getTicks() <= editorWidthTicks)
@@ -3749,6 +3753,7 @@ void PianoRoll::updateScrollbars()
 {
 	updateXScroll();
 	updateYScroll();
+	m_cornerSquare->move(width() - SCROLLBAR_SIZE - 1, height() - SCROLLBAR_SIZE - 1);
 }
 
 
@@ -4318,7 +4323,7 @@ void PianoRoll::updateXScroll()
 	m_leftRightScroll->setGeometry(
 		m_whiteKeyWidth,
 		height() - SCROLLBAR_SIZE,
-		width() - m_whiteKeyWidth,
+		width() - m_whiteKeyWidth - SCROLLBAR_SIZE,
 		SCROLLBAR_SIZE
 	);
 

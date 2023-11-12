@@ -47,6 +47,7 @@ class QScrollBar;
 class QString;
 class QMenu;
 class QToolButton;
+class QGraphicsView;
 
 namespace lmms
 {
@@ -373,6 +374,7 @@ private:
 
 	QScrollBar * m_leftRightScroll;
 	QScrollBar * m_topBottomScroll;
+	QGraphicsView* m_cornerSquare;
 
 	TimePos m_currentPosition;
 	bool m_recording;
