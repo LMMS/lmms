@@ -829,7 +829,7 @@ QString BoolModel::displayValue( const float val ) const
 	return QString::number( castValue<bool>( scaledValue( val ) ) );
 }
 
-bool TwoPowerModel::validDenominator(int denom) const
+bool TwoPowerModel::validDenominator(int denom)
 {
 	// Restrict time signature denominator to 2, 4, 8, etc
 	if ( denom <= 1 )
@@ -844,7 +844,7 @@ bool TwoPowerModel::validDenominator(int denom) const
 	return numHighBits == 1;
 }
 
-int TwoPowerModel::nextValidDenom( int denom ) const
+int TwoPowerModel::nextValidDenom( int denom )
 {
 	int nextSig = 2; // 0b10
 	// We want to terminate the while loop when the last bit is 1
@@ -857,7 +857,7 @@ int TwoPowerModel::nextValidDenom( int denom ) const
 	return nextSig;
 }
 
-int TwoPowerModel::previousValidDenom( int denom ) const
+int TwoPowerModel::previousValidDenom( int denom )
 {
 	if ( denom <= 1 )
 		return 2;
@@ -873,7 +873,7 @@ int TwoPowerModel::previousValidDenom( int denom ) const
 	return prevSig;
 }
 
-int TwoPowerModel::closestValidDenom( int denom ) const
+int TwoPowerModel::closestValidDenom( int denom )
 {
 	int next = TwoPowerModel::nextValidDenom( denom );
 	int prev = std::max(2, next >> 1);

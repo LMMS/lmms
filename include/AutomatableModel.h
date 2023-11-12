@@ -509,24 +509,23 @@ public:
 class LMMS_EXPORT TwoPowerModel : public IntModel
 {
 public:
-	using AutomatableModel::AutomatableModel;
-	IntModel( int val = 2, int min = 2, int max = 2048,
+	TwoPowerModel( int val = 2, int min = 2, int max = 2048,
 				Model* parent = nullptr,
 				const QString& displayName = QString(),
 				bool defaultConstructed = false ) :
-		TypedAutomatableModel( val, min, max, 1, parent, displayName, defaultConstructed )
+		IntModel( val, min, max, parent, displayName, defaultConstructed )
 	{
 	}
-	int value( int frameOffset = 0 ) const override
+	int value( int frameOffset = 0 ) const
 	{
 		return TwoPowerModel::closestValidDenom( AutomatableModel::value<int>( frameOffset ) );
 	}
 	// Static helper methods
-	static bool validDenominator( int denom ) const;
-	static int nextValidDenom( int denom ) const;
-	static int previousValidDenom( int denom ) const;
-	static int closestValidDenom( int denom ) const;
-}
+	static bool validDenominator( int denom );
+	static int nextValidDenom( int denom );
+	static int previousValidDenom( int denom );
+	static int closestValidDenom( int denom );
+} ;
 
 using AutomatedValueMap = QMap<AutomatableModel*, float>;
 
