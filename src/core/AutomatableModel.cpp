@@ -829,5 +829,60 @@ QString BoolModel::displayValue( const float val ) const
 	return QString::number( castValue<bool>( scaledValue( val ) ) );
 }
 
+bool TwoPowerModel::validDenominator(int denom) const
+{
+	// Restrict time signature denominator to 2, 4, 8, etc
+	if ( denom <= 1 )
+		return false;
+	int numHighBits;
+	for ( numHighBits = 0; denom != 0; denom = denom >> 1 )
+	{
+		if ( denom & 0x1 )
+			numHighBits++;
+	}
+	// Denominator must be a positive power of two
+	return numHighBits == 1;
+}
+
+int TwoPowerModel::nextValidDenom( int denom ) const
+{
+	int nextSig = 2; // 0b10
+	// We want to terminate the while loop when the last bit is 1
+	// and all the remaining bits are 0
+	while ( denom > 0x1 )
+	{
+		nextSig = nextSig << 1;
+		denom = denom >> 1;
+	}
+	return nextSig;
+}
+
+int TwoPowerModel::previousValidDenom( int denom ) const
+{
+	if ( denom <= 1 )
+		return 2;
+	int prevSig = 1;
+	// We want to terminate the while loop when the last bit is 1
+	// and all the remaining bits are 0. The difference between this
+	// and nextValidDenom is the initial condition
+	while ( denom > 1 )
+	{
+		prevSig = prevSig << 1;
+		denom = denom >> 1;
+	}
+	return prevSig;
+}
+
+int TwoPowerModel::closestValidDenom( int denom ) const
+{
+	int next = TwoPowerModel::nextValidDenom( denom );
+	int prev = std::max(2, next >> 1);
+	if ( next - denom > denom - prev )
+	{
+		return prev;
+	}
+	return next;
+}
+
 
 } // namespace lmms

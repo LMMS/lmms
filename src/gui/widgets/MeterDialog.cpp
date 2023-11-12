@@ -111,5 +111,10 @@ void MeterDialog::modelChanged()
 	m_denominator->setModel( &mm->denominatorModel() );
 }
 
+void MeterDialog::validateDenominator( bool scrolledDown )
+{
+
+}
+
 
 } // namespace lmms::gui

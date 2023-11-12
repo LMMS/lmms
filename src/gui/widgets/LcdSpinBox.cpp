@@ -117,7 +117,7 @@ void LcdSpinBox::mouseMoveEvent( QMouseEvent* event )
 			float floatValRounded = roundf( floatValNotRounded );
 			m_remainder = floatValNotRounded - floatValRounded;
 			model()->setValue( floatValRounded );
-			emit manualChange();
+			emit manualChange( dy < 0 );
 			m_lastMousePos = event->globalPos();
 		}
 	}

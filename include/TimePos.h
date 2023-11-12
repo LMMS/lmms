@@ -53,10 +53,6 @@ public:
 	TimeSig( const MeterModel &model );
 	int numerator() const;
 	int denominator() const;
-	// Static helper methods
-	static bool validDenominator(int denom) const;
-	static int nextValidDenom(int denom) const;
-	static int previousValidDenom(int denom) const;
 private:
 	int m_num;
 	int m_denom;

@@ -34,14 +34,12 @@ TimeSig::TimeSig( int num, int denom ) :
 	m_num(num),
 	m_denom(denom)
 {
-	assert(TimeSig::validDenominator(denom));
 }
 
 TimeSig::TimeSig( const MeterModel &model ) :
 	m_num(model.getNumerator()),
 	m_denom(model.getDenominator())
 {
-	assert(TimeSig::validDenominator(denom));
 }
 
 
@@ -54,54 +52,6 @@ int TimeSig::denominator() const
 {
 	return m_denom;
 }
-
-bool TimeSig::validDenominator(int denom) const
-{
-	// Restrict time signature denominator to 2, 4, 8, etc
-	if (denom <= 1)
-		return false;
-	int numHighBits;
-	for (numHighBits = 0; denom != 0; denom = denom >> 1)
-	{
-		if (denom & 0x1)
-			numHighBits++;
-	}
-	// Denominator must be a positive power of two
-	return numHighBits == 1;
-}
-
-int TimeSig::nextValidDenom(int denom) const
-{
-	int nextSig = 2; // 0b10
-	unsigned int REMAINING_BITS = ~0x1;
-	// We want to terminate the while loop when the last bit is 1
-	// and all the remaining bits are 0
-	while (!((denom & 0x1) && !(denom & REMAINING_BITS)))
-	{
-		nextSig << 1;
-		denom >> 1;
-	}
-	return nextSig;
-}
-
-int TimeSig::previousValidDenom(int denom) const
-{
-	if (denom <= 1)
-		return 2;
-	int prevSig = 1;
-	unsigned int REMAINING_BITS = ~0x1;
-	// We want to terminate the while loop when the last bit is 1
-	// and all the remaining bits are 0. The difference between this
-	// and nextValidDenom is the initial condition
-	while (!((denom & 0x1) && !(denom & REMAINING_BITS)))
-	{
-		prevSig << 1;
-		denom >> 1;
-	}
-	return prevSig;
-}
-
-
 
 
 TimePos::TimePos( const bar_t bar, const tick_t ticks ) :

@@ -81,7 +81,7 @@ private:
 	void enterValue();
 
 signals:
-	void manualChange();
+	void manualChange(bool scrollDown=false);
 
 } ;
 

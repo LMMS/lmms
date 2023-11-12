@@ -53,7 +53,7 @@ public:
 		return m_numeratorModel;
 	}
 
-	IntModel & denominatorModel()
+	TwoPowerModel & denominatorModel()
 	{
 		return m_denominatorModel;
 	}
@@ -61,7 +61,7 @@ public:
 
 private:
 	IntModel m_numeratorModel;
-	IntModel m_denominatorModel;
+	TwoPowerModel m_denominatorModel;
 
 } ;
 
