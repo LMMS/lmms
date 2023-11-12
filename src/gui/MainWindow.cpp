@@ -131,31 +131,13 @@ MainWindow::MainWindow() :
 							splitter , false, true,
 				confMgr->userPresetsDir(),
 				confMgr->factoryPresetsDir()));
-	sideBar->appendTab(new FileBrowser(QDir::homePath(), FileItem::defaultFilters(), tr("My Home"),
-		embed::getIconPixmap("home").transformed(QTransform().rotate(90)), splitter, false, false));
 
-	QStringList root_paths;
-	QString title = tr( "Root directory" );
-	bool dirs_as_items = false;
-
-#ifdef LMMS_BUILD_APPLE
-	title = tr( "Volumes" );
-	root_paths += "/Volumes";
-#elif defined(LMMS_BUILD_WIN32)
-	title = tr( "My Computer" );
-	dirs_as_items = true;
-#endif
-
-#if ! defined(LMMS_BUILD_APPLE)
-	QFileInfoList drives = QDir::drives();
-	for( const QFileInfo & drive : drives )
+	for (const auto& directory : ConfigManager::inst()->extraDirectories())
 	{
-		root_paths += drive.absolutePath();
+		const auto name = QDir{directory}.dirName();
+		sideBar->appendTab(new FileBrowser(directory, FileItem::defaultFilters(), name,
+			embed::getIconPixmap("folder_opened").transformed(QTransform().rotate(90)), splitter, false, true));
 	}
-#endif
-
-	sideBar->appendTab(new FileBrowser(root_paths.join("*"), FileItem::defaultFilters(), title,
-		embed::getIconPixmap("computer").transformed(QTransform().rotate(90)), splitter, dirs_as_items));
 
 	m_workspace = new QMdiArea(splitter);
 
