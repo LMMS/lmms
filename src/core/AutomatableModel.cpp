@@ -836,7 +836,7 @@ QString BoolModel::displayValue( const float val ) const
 bool TwoPowerModel::validDenominator(int denom)
 {
 	// Restrict time signature denominator to 2, 4, 8, etc
-	if ( denom <= 1 )
+	if ( denom < 1 )
 		return false;
 	int numHighBits;
 	for ( numHighBits = 0; denom != 0; denom = denom >> 1 )
@@ -864,7 +864,7 @@ int TwoPowerModel::nextValidDenom( int denom )
 int TwoPowerModel::previousValidDenom( int denom )
 {
 	if ( denom <= 1 )
-		return 2;
+		return 1;
 	int prevSig = 1;
 	// We want to terminate the while loop when the last bit is 1
 	// and all the remaining bits are 0. The difference between this
@@ -880,7 +880,7 @@ int TwoPowerModel::previousValidDenom( int denom )
 int TwoPowerModel::closestValidDenom( int denom )
 {
 	int next = TwoPowerModel::nextValidDenom( denom );
-	int prev = std::max(2, next >> 1);
+	int prev = std::max(1, next >> 1);
 	if ( next - denom > denom - prev )
 	{
 		return prev;
