@@ -525,6 +525,7 @@ public:
 	static int nextValidDenom( int denom );
 	static int previousValidDenom( int denom );
 	static int closestValidDenom( int denom );
+	QString displayValue( const float val ) const override;
 } ;
 
 using AutomatedValueMap = QMap<AutomatableModel*, float>;

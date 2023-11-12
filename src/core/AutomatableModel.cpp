@@ -829,6 +829,11 @@ QString BoolModel::displayValue( const float val ) const
 	return QString::number( castValue<bool>( scaledValue( val ) ) );
 }
 
+QString TwoPowerModel::displayValue( const float val ) const
+{
+	return QString::number( closestValidDenom( castValue<int>( scaledValue( val ) ) ) );
+}
+
 bool TwoPowerModel::validDenominator(int denom)
 {
 	// Restrict time signature denominator to 2, 4, 8, etc
