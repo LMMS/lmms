@@ -44,7 +44,6 @@ public:
 	~MeterDialog() override = default;
 
 	void modelChanged() override;
-	void validateDenominator( bool scrolledDown=false );
 
 
 private:
