@@ -482,10 +482,18 @@ public:
 				Model* parent = nullptr,
 				const QString& displayName = QString(),
 				bool defaultConstructed = false ) :
-		TypedAutomatableModel( val, min, max, 1, parent, displayName, defaultConstructed )
+		TypedAutomatableModel( val, min, max, 1, parent, displayName, defaultConstructed ),
+		isTwoPowerModel(false)
 	{
 	}
 	QString displayValue( const float val ) const override;
+protected:
+	// Hackey workaround for the fact that LcdSpinBox uses model() to get
+	// the string value of the int. This is ONLY used in displayValue
+	// because without some major re-working, there's not an apparent
+	// other way to get the TwoPowerModel's value rather than the IntModel's
+	// value.
+	bool isTwoPowerModel;
 } ;
 
 
@@ -508,6 +516,8 @@ public:
 // support integers that are powers of two
 class LMMS_EXPORT TwoPowerModel : public IntModel
 {
+	Q_OBJECT
+	MODEL_IS_VISITABLE
 public:
 	TwoPowerModel( int val = 2, int min = 2, int max = 2048,
 				Model* parent = nullptr,
@@ -515,6 +525,7 @@ public:
 				bool defaultConstructed = false ) :
 		IntModel( val, min, max, parent, displayName, defaultConstructed )
 	{
+		this->isTwoPowerModel = true;
 	}
 	int value( int frameOffset = 0 ) const
 	{
@@ -525,7 +536,6 @@ public:
 	static int nextValidDenom( int denom );
 	static int previousValidDenom( int denom );
 	static int closestValidDenom( int denom );
-	QString displayValue( const float val ) const override;
 } ;
 
 using AutomatedValueMap = QMap<AutomatableModel*, float>;

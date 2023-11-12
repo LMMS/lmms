@@ -821,17 +821,16 @@ QString FloatModel::displayValue( const float val ) const
 
 QString IntModel::displayValue( const float val ) const
 {
+	if ( isTwoPowerModel )
+	{
+		return QString::number( TwoPowerModel::closestValidDenom( castValue<int>( scaledValue( val ) ) ) );
+	}
 	return QString::number( castValue<int>( scaledValue( val ) ) );
 }
 
 QString BoolModel::displayValue( const float val ) const
 {
 	return QString::number( castValue<bool>( scaledValue( val ) ) );
-}
-
-QString TwoPowerModel::displayValue( const float val ) const
-{
-	return QString::number( closestValidDenom( castValue<int>( scaledValue( val ) ) ) );
 }
 
 bool TwoPowerModel::validDenominator(int denom)
