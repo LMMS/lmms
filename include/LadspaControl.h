@@ -41,6 +41,7 @@ namespace gui
 {
 
 class LadspaControlView;
+class LadspaMatrixControlDialog;
 
 } // namespace gui
 
@@ -125,6 +126,7 @@ private:
 
 
 	friend class gui::LadspaControlView;
+	friend class gui::LadspaMatrixControlDialog;
 
 } ;
 

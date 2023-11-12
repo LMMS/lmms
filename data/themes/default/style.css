@@ -3,12 +3,13 @@
  ********************/
 
 /* most foreground text items */
-QLabel, QTreeWidget, QListWidget, QGroupBox, QMenuBar {
+QLabel, QTreeWidget, QListWidget, QGroupBox, QMenuBar, QCheckBox {
 	color: #d1d8e4;
 }
 
 QTreeView {
 	outline: none;
+	alternate-background-color: #111314;
 }
 
 QTreeWidget::item {
@@ -56,6 +57,7 @@ lmms--gui--AutomationEditor {
 	qproperty-backgroundShade: rgba(255, 255, 255, 15);
 	qproperty-nodeInValueColor: rgba(103, 73, 194, 150);
 	qproperty-nodeOutValueColor: rgba(125, 40, 40, 150);
+	qproperty-nodeTangentLineColor: rgba(200, 200, 200, 255);
 	qproperty-crossColor: rgba(215, 210, 254, 150);
 	/* Grid colors */
 	qproperty-lineColor: #292929;
@@ -235,7 +237,7 @@ lmms--gui--Oscilloscope {
 
 lmms--gui--CPULoadWidget {
 	border: none;
-	background: url(resources:cpuload_bg.png);
+	background: url("resources:cpuload_bg.png");
 	qproperty-stepSize: 1;
 }
 
@@ -354,16 +356,16 @@ QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
 	margin-left: 3px;
 }
 
-QScrollBar::left-arrow:horizontal { background-image: url(resources:sbarrow_left.png);}
-QScrollBar::right-arrow:horizontal { background-image: url(resources:sbarrow_right.png);}
-QScrollBar::up-arrow:vertical { background-image: url(resources:sbarrow_up.png);}
-QScrollBar::down-arrow:vertical { background-image: url(resources:sbarrow_down.png);}
-QScrollBar::left-arrow:horizontal:disabled { background-image: url(resources:sbarrow_left_d.png);}
-QScrollBar::right-arrow:horizontal:disabled { background-image: url(resources:sbarrow_right_d.png);}
-QScrollBar::up-arrow:vertical:disabled { background-image: url(resources:sbarrow_up_d.png);}
-QScrollBar::down-arrow:vertical:disabled { background-image: url(resources:sbarrow_down_d.png);}
-lmms--gui--EffectRackView QScrollBar::up-arrow:vertical:disabled { background-image: url(resources:sbarrow_up.png);}
-lmms--gui--EffectRackView QScrollBar::down-arrow:vertical:disabled { background-image: url(resources:sbarrow_down.png);}
+QScrollBar::left-arrow:horizontal { background-image: url("resources:sbarrow_left.png");}
+QScrollBar::right-arrow:horizontal { background-image: url("resources:sbarrow_right.png");}
+QScrollBar::up-arrow:vertical { background-image: url("resources:sbarrow_up.png");}
+QScrollBar::down-arrow:vertical { background-image: url("resources:sbarrow_down.png");}
+QScrollBar::left-arrow:horizontal:disabled { background-image: url("resources:sbarrow_left_d.png");}
+QScrollBar::right-arrow:horizontal:disabled { background-image: url("resources:sbarrow_right_d.png");}
+QScrollBar::up-arrow:vertical:disabled { background-image: url("resources:sbarrow_up_d.png");}
+QScrollBar::down-arrow:vertical:disabled { background-image: url("resources:sbarrow_down_d.png");}
+lmms--gui--EffectRackView QScrollBar::up-arrow:vertical:disabled { background-image: url("resources:sbarrow_up.png");}
+lmms--gui--EffectRackView QScrollBar::down-arrow:vertical:disabled { background-image: url("resources:sbarrow_down.png");}
 
 /* background for song editor and pattern editor */
 
@@ -400,7 +402,7 @@ lmms--gui--TrackOperationsWidget > QPushButton {
 }
 
 lmms--gui--TrackOperationsWidget > QPushButton::menu-indicator {
-	image: url(resources:trackop.png);
+	image: url("resources:trackop.png");
 	subcontrol-origin: padding;
 	subcontrol-position: center;
 	position: relative;
@@ -409,7 +411,7 @@ lmms--gui--TrackOperationsWidget > QPushButton::menu-indicator {
 
 lmms--gui--TrackOperationsWidget > QPushButton::menu-indicator:pressed,
 lmms--gui--TrackOperationsWidget > QPushButton::menu-indicator:checked {
-	image: url(resources:trackop.png);
+	image: url("resources:trackop.png");
 	position: relative;
 	top: 2px;
 }
@@ -432,7 +434,7 @@ lmms--gui--AutomatableSlider::groove:vertical {
 
 lmms--gui--AutomatableSlider::handle:vertical {
 	background: none;
-	border-image: url(resources:main_slider.png);
+	border-image: url("resources:main_slider.png");
 	width: 26px;
 	height: 10px;
 	border-radius: 2px;
@@ -451,7 +453,7 @@ lmms--gui--AutomatableSlider::groove:horizontal {
 
 lmms--gui--AutomatableSlider::handle:horizontal {
 	background: none;
-	border-image: url(resources:horizontal_slider.png);
+	border-image: url("resources:horizontal_slider.png");
 	width: 10px;
 	height: 26px;
 	border-radius: 2px;
@@ -462,6 +464,10 @@ lmms--gui--AutomatableSlider::handle:horizontal {
 
 lmms--gui--EffectSelectDialog QScrollArea {
 	background: #262b30;
+}
+
+lmms--gui--SetupDialog QScrollArea {
+	border: 0px;
 }
 
 /* the inner boxes in LADSPA effect windows */
@@ -537,7 +543,7 @@ QToolButton:checked {
 	border-top: 1px solid #1b1f22;
 	border-bottom: 1px solid #4a515e;
 	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #1b1f22, stop:1 #13161a);
-	background-image: url(resources:shadow_p.png);
+	background-image: url("resources:shadow_p.png");
 }
 
 /* buttons with combined menu */
@@ -586,7 +592,7 @@ lmms--gui--TrackLabelButton:pressed {
 lmms--gui--TrackLabelButton:checked {
 	border: 1px solid #485059;
 	background: #1C1F24;
-	background-image: url(resources:track_shadow_p.png);
+	background-image: url("resources:track_shadow_p.png");
 	border-radius: none;
 	font-size: 11px;
 	font-weight: normal;
@@ -596,7 +602,7 @@ lmms--gui--TrackLabelButton:checked {
 lmms--gui--TrackLabelButton:checked:pressed {
 	border: 1px solid #2f353b;
 	background: #0e1012;
-	background-image: url(resources:track_shadow_p.png);
+	background-image: url("resources:track_shadow_p.png");
 	font-size: 11px;
 	padding: 2px 1px;
 	font-weight: solid;
@@ -711,10 +717,6 @@ lmms--gui--TimeLineWidget {
 
 	qproperty-barLineColor: rgb( 192, 192, 192 );
 	qproperty-barNumberColor: rgb( 192, 192, 192 );
-}
-
-QTreeView {
-	alternate-background-color: #111314;
 }
 
 lmms--gui--TrackContainerView QLabel
@@ -941,6 +943,14 @@ lmms--gui--SidInstrumentView lmms--gui--Knob {
 	qproperty-lineWidth: 2;
 }
 
+lmms--gui--SlicerTView lmms--gui--Knob {
+	color: rgb(162, 128, 226);
+	qproperty-outerColor: rgb( 162, 128, 226 );
+	qproperty-innerRadius: 1;
+	qproperty-outerRadius: 11;
+	qproperty-lineWidth: 3;
+}
+
 lmms--gui--WatsynView lmms--gui--Knob {
 	qproperty-innerRadius: 1;
 	qproperty-outerRadius: 7;
@@ -1015,6 +1025,11 @@ lmms--gui--CompressorControlDialog lmms--gui--Knob {
 	color: #2fcc71;
 	qproperty-outerColor: #2fcc71;
 	qproperty-lineWidth: 2;
+}
+
+lmms--gui--BarModelEditor {
+	qproperty-backgroundBrush: rgba(28, 73, 51, 255);
+	qproperty-barBrush: rgba(17, 136, 71, 255);
 }
 
 /* palette information  */

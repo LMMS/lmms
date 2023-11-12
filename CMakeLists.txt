@@ -1,19 +1,30 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.9)
 
+# Set the given policy to NEW. If it does not exist, it will not be set. If it
+# is already set to NEW (most likely due to predating the minimum required CMake
+# version), a developer warning is emitted indicating that the policy need no
+# longer be explicitly set.
+function(enable_policy_if_exists id)
+	if(POLICY "${id}")
+		cmake_policy(GET "${id}" current_value)
+		if(current_value STREQUAL "NEW")
+			message(AUTHOR_WARNING "${id} is now set to NEW by default, and no longer needs to be explicitly set.")
+		else()
+			cmake_policy(SET "${id}" NEW)
+		endif()
+	endif()
+endfunction()
+
+# Needed for the SWH Ladspa plugins. See below.
+enable_policy_if_exists(CMP0074) # find_package() uses <PackageName>_ROOT variables.
+# Needed for ccache support with MSVC
+enable_policy_if_exists(CMP0141) # MSVC debug information format flags are selected by an abstraction.
+
 PROJECT(lmms)
 
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
 SET(LMMS_BINARY_DIR ${CMAKE_BINARY_DIR})
 SET(LMMS_SOURCE_DIR ${CMAKE_SOURCE_DIR})
-
-# CMAKE_POLICY Section
-IF(COMMAND CMAKE_POLICY)
-	# TODO: Keep CMP0074 but remove this condition when cmake 3.12+ is guaranteed
-	IF(${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.12)
-		# Needed for the SWH Ladspa plugins. See below.
-		CMAKE_POLICY(SET CMP0074 NEW) # find_package() uses <PackageName>_ROOT variables
-	ENDIF()
-ENDIF(COMMAND CMAKE_POLICY)
 
 # Import of windows.h breaks min()/max()
 ADD_DEFINITIONS(-DNOMINMAX)
@@ -35,7 +46,7 @@ INCLUDE(GenerateExportHeader)
 
 STRING(TOUPPER          "${CMAKE_PROJECT_NAME}" PROJECT_NAME_UCASE)
 
-SET(PROJECT_YEAR 2020)
+SET(PROJECT_YEAR 2023)
 
 SET(PROJECT_AUTHOR      "LMMS Developers")
 SET(PROJECT_URL         "https://lmms.io")
@@ -201,7 +212,14 @@ SET(QT_QTTEST_LIBRARY Qt5::Test)
 
 # check for libsndfile
 FIND_PACKAGE(SndFile REQUIRED)
-IF(NOT SNDFILE_FOUND)
+IF(SNDFILE_FOUND)
+	IF(SndFile_VERSION VERSION_GREATER_EQUAL "1.1.0")
+		SET(LMMS_HAVE_SNDFILE_MP3 TRUE)
+	ELSE()
+		MESSAGE("libsndfile version is < 1.1.0; MP3 import disabled")
+		SET(LMMS_HAVE_SNDFILE_MP3 FALSE)
+	ENDIF()
+ELSE()
 	MESSAGE(FATAL_ERROR "LMMS requires libsndfile1 and libsndfile1-dev >= 1.0.18 - please install, remove CMakeCache.txt and try again!")
 ENDIF()
 # check if we can use SFC_SET_COMPRESSION_LEVEL
@@ -428,8 +446,6 @@ IF(WANT_MP3LAME)
 		SET(STATUS_MP3LAME "OK")
 	ELSE(LAME_FOUND)
 		SET(STATUS_MP3LAME "not found, please install libmp3lame-dev (or similar)")
-		SET(LAME_LIBRARIES "")
-		SET(LAME_INCLUDE_DIRS "")
 	ENDIF(LAME_FOUND)
 ELSE(WANT_MP3LAME)
 	SET(STATUS_MP3LAME "Disabled for build")

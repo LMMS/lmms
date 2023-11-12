@@ -94,6 +94,22 @@ void LcdWidget::setValue(int value)
 	update();
 }
 
+void LcdWidget::setValue(float value)
+{
+	if (value < 0 && value > -1)
+	{
+		QString s = QString::number(static_cast<int>(value));
+		s.prepend('-');
+		
+		m_display = s;
+		update();
+	}
+	else
+	{
+		setValue(static_cast<int>(value));
+	}
+}
+
 
 
 
