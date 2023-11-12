@@ -344,7 +344,7 @@ bool TrackContentWidget::canPasteSelection( TimePos clipPos, const QMimeData* md
 	const int initialTrackIndex = tiAttr.value().toInt();
 
 	// Get the current track's index
-	const TrackContainer::TrackList tracks = t->trackContainer()->tracks();
+	const TrackContainer::TrackList& tracks = t->trackContainer()->tracks();
 	const auto currentTrackIt = std::find(tracks.begin(), tracks.end(), t);
 	const int currentTrackIndex = currentTrackIt != tracks.end() ? std::distance(tracks.begin(), currentTrackIt) : -1;
 
@@ -443,7 +443,7 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, 
 	TimePos grabbedClipPos = clipPosAttr.value().toInt();
 
 	// Snap the mouse position to the beginning of the dropped bar, in ticks
-	const TrackContainer::TrackList tracks = getTrack()->trackContainer()->tracks();
+	const TrackContainer::TrackList& tracks = getTrack()->trackContainer()->tracks();
 	const auto currentTrackIt = std::find(tracks.begin(), tracks.end(), getTrack());
 	const int currentTrackIndex = currentTrackIt != tracks.end() ? std::distance(tracks.begin(), currentTrackIt) : -1;
 

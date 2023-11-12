@@ -193,6 +193,7 @@ static void fixTrack(QDomElement & track, std::set<unsigned int> & automatedBase
 		for (int i = 0; i < subTracks.size(); ++i)
 		{
 			QDomElement subTrack = subTracks.item(i).toElement();
+			assert (static_cast<Track::Type>(subTrack.attribute("type").toInt()) != Track::Type::Pattern);
 			fixTrack(subTrack, automatedBaseNoteIds);
 		}
 	}

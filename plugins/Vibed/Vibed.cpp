@@ -251,8 +251,6 @@ void Vibed::playNote(NotePlayHandle* n, sampleFrame* workingBuffer)
 			}
 		}
 	}
-
-	instrumentTrack()->processAudioBuffer(workingBuffer, frames + offset, n);
 }
 
 void Vibed::deleteNotePluginData(NotePlayHandle* n)

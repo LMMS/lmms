@@ -23,7 +23,6 @@
  *
  */
 
-
 #include <QApplication>
 #include <QDesktopServices>
 #include <QHBoxLayout>
@@ -126,7 +125,7 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	m_filterEdit->setPlaceholderText( tr("Search") );
 	m_filterEdit->setClearButtonEnabled( true );
 	connect( m_filterEdit, SIGNAL( textEdited( const QString& ) ),
-			this, SLOT( filterItems( const QString& ) ) );
+			this, SLOT( filterAndExpandItems( const QString& ) ) );
 
 	auto reload_btn = new QPushButton(embed::getIconPixmap("reload"), QString(), searchWidget);
 	reload_btn->setToolTip( tr( "Refresh list" ) );
@@ -145,53 +144,95 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	auto filterFocusShortcut = new QShortcut(QKeySequence(QKeySequence::Find), this, SLOT(giveFocusToFilter()));
 	filterFocusShortcut->setContext(Qt::WidgetWithChildrenShortcut);
 
+	m_previousFilterValue = "";
+
 	reloadTree();
 	show();
 }
 
-bool FileBrowser::filterItems( const QString & filter, QTreeWidgetItem * item )
+void FileBrowser::saveDirectoriesStates()
+{	
+	m_savedExpandedDirs = m_fileBrowserTreeWidget->expandedDirs();
+}
+	
+void FileBrowser::restoreDirectoriesStates()
 {
-	// call with item=NULL to filter the entire tree
+	expandItems(nullptr, m_savedExpandedDirs);
+}
+
+bool FileBrowser::filterAndExpandItems(const QString & filter, QTreeWidgetItem * item)
+{
+	// Call with item = nullptr to filter the entire tree
+
+	if (item == nullptr)
+	{
+		// First search character so need to save current expanded directories
+		if (m_previousFilterValue.isEmpty())
+		{
+			saveDirectoriesStates();
+		}
+
+		m_previousFilterValue = filter;
+	}
+
+	if (filter.isEmpty())
+	{
+		// Restore previous expanded directories
+		if (item == nullptr) 
+		{
+			restoreDirectoriesStates();
+		}
+
+		return false;
+	}
+	
 	bool anyMatched = false;
 
 	int numChildren = item ? item->childCount() : m_fileBrowserTreeWidget->topLevelItemCount();
-	for( int i = 0; i < numChildren; ++i )
+
+	for (int i = 0; i < numChildren; ++i)
 	{
 		QTreeWidgetItem * it = item ? item->child( i ) : m_fileBrowserTreeWidget->topLevelItem(i);
 
-		// is directory?
-		if( it->childCount() )
+		auto d = dynamic_cast<Directory*>(it);	
+		if (d)
 		{
-			// matches filter?
-			if( it->text( 0 ).
-				contains( filter, Qt::CaseInsensitive ) )
+			if (it->text(0).contains(filter, Qt::CaseInsensitive))
 			{
-				// yes, then show everything below
-				it->setHidden( false );
-				filterItems( QString(), it );
+				it->setHidden(false);
+				it->setExpanded(true);
+				filterAndExpandItems(QString(), it);
 				anyMatched = true;
 			}
 			else
 			{
-				// only show if item below matches filter
-				bool didMatch = filterItems( filter, it );
-				it->setHidden( !didMatch );
+				// Expanding is required when recursive to load in its contents, even if it's collapsed right afterward
+				it->setExpanded(true);
+
+				bool didMatch = filterAndExpandItems(filter, it);
+				it->setHidden(!didMatch);
+				it->setExpanded(didMatch);
 				anyMatched = anyMatched || didMatch;
 			}
 		}
-		// a standard item (i.e. no file or directory item?)
-		else if( it->type() == QTreeWidgetItem::Type )
-		{
-			// hide if there's any filter
-			it->setHidden( !filter.isEmpty() );
-		}
+
 		else
 		{
-			// file matches filter?
-			bool didMatch = it->text( 0 ).
-				contains( filter, Qt::CaseInsensitive );
-			it->setHidden( !didMatch );
-			anyMatched = anyMatched || didMatch;
+			auto f = dynamic_cast<FileItem*>(it);
+			if (f)
+			{
+				// File
+				bool didMatch = it->text(0).contains(filter, Qt::CaseInsensitive);
+				it->setHidden(!didMatch);
+				anyMatched = anyMatched || didMatch;
+			}
+			
+			// A standard item (i.e. no file or directory item?)
+			else
+			{
+				// Hide if there's any filter
+				it->setHidden(!filter.isEmpty());
+			}
 		}
 	}
 
@@ -201,15 +242,20 @@ bool FileBrowser::filterItems( const QString & filter, QTreeWidgetItem * item )
 
 void FileBrowser::reloadTree()
 {
-	QList<QString> expandedDirs = m_fileBrowserTreeWidget->expandedDirs();
-	const QString text = m_filterEdit->text();
-	m_filterEdit->clear();
+	if (m_filterEdit->text().isEmpty())
+	{
+		saveDirectoriesStates();	
+	}
+
 	m_fileBrowserTreeWidget->clear();
+
 	QStringList paths = m_directories.split('*');
+
 	if (m_showUserContent && !m_showUserContent->isChecked())
 	{
 		paths.removeAll(m_userDir);
 	}
+
 	if (m_showFactoryContent && !m_showFactoryContent->isChecked())
 	{
 		paths.removeAll(m_factoryDir);
@@ -222,9 +268,15 @@ void FileBrowser::reloadTree()
 			addItems(path);
 		}
 	}
-	expandItems(nullptr, expandedDirs);
-	m_filterEdit->setText( text );
-	filterItems( text );
+
+	if (m_filterEdit->text().isEmpty())
+	{
+		restoreDirectoriesStates();
+	}
+	else
+	{
+		filterAndExpandItems(m_filterEdit->text());
+	}
 }
 
 
@@ -240,12 +292,16 @@ void FileBrowser::expandItems(QTreeWidgetItem* item, QList<QString> expandedDirs
 		{
 			// Expanding is required when recursive to load in its contents, even if it's collapsed right afterward
 			if (m_recurse) { d->setExpanded(true); }
+
 			d->setExpanded(expandedDirs.contains(d->fullName()));
+
 			if (m_recurse && it->childCount())
 			{
 				expandItems(it, expandedDirs);
 			}
 		}
+		
+		it->setHidden(false);		
 	}
 }
 
@@ -414,8 +470,6 @@ QList<QString> FileBrowserTreeWidget::expandedDirs( QTreeWidgetItem * item ) con
 	}
 	return dirs;
 }
-
-
 
 
 void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )

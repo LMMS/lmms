@@ -26,6 +26,7 @@
 #define LMMS_GUI_SAMPLE_TRACK_VIEW_H
 
 
+#include "MixerLineLcdSpinBox.h"
 #include "TrackView.h"
 
 namespace lmms
@@ -90,6 +91,7 @@ private slots:
 
 private:
 	SampleTrackWindow * m_window;
+	MixerLineLcdSpinBox* m_mixerChannelNumber;
 	Knob * m_volumeKnob;
 	Knob * m_panningKnob;
 	FadeButton * m_activityIndicator;

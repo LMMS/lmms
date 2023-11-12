@@ -532,7 +532,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 								: POS(clickedNode)
 							),
 							level,
-							true,
+							clickedNode == tm.end(),
 							mouseEvent->modifiers() & Qt::ControlModifier
 						);
 

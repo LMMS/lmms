@@ -394,8 +394,8 @@ void Mixer::moveChannelLeft( int index )
 	else if (m_lastSoloed == b) { m_lastSoloed = a; }
 
 	// go through every instrument and adjust for the channel index change
-	TrackContainer::TrackList songTrackList = Engine::getSong()->tracks();
-	TrackContainer::TrackList patternTrackList = Engine::patternStore()->tracks();
+	const TrackContainer::TrackList& songTrackList = Engine::getSong()->tracks();
+	const TrackContainer::TrackList& patternTrackList = Engine::patternStore()->tracks();
 
 	for (const auto& trackList : {songTrackList, patternTrackList})
 	{
