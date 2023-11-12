@@ -61,5 +61,5 @@ public:
 
 } // namespace lmms
 
-#endif // LMMS_UPGRADE03_H
+#endif // LMMS_UPGRADE_03_H
 

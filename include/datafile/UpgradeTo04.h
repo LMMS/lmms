@@ -146,5 +146,5 @@ public:
 
 } // namespace lmms
 
-#endif // LMMS_UPGRADE04_H
+#endif // LMMS_UPGRADE_04_H
 
