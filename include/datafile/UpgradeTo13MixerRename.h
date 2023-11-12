@@ -20,10 +20,8 @@
  *
  */
 
-#pragma once
-
-#ifndef LMMS_UPGRADETO13MIXERRENAME_H
-#define LMMS_UPGRADETO13MIXERRENAME_H
+#ifndef LMMS_UPGRADE_TO_13_MIXER_RENAME_H
+#define LMMS_UPGRADE_TO_13_MIXER_RENAME_H
 
 #include "datafile/DataFileUpgrade.h"
 
@@ -43,5 +41,5 @@ public:
 
 } // namespace lmms
 
-#endif // LMMS_UPGRADETO13MIXERRENAME_H
+#endif // LMMS_UPGRADE_TO_13_MIXER_RENAME_H
 

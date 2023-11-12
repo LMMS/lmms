@@ -21,16 +21,13 @@
  *
  */
 
-#pragma once
-
-#ifndef LMMS_UPGRADETO1_3_0_H
-#define LMMS_UPGRADETO1_3_0_H
+#ifndef LMMS_UPGRADE_TO_13_H
+#define LMMS_UPGRADE_TO_13_H
 
 #include "datafile/DataFileUpgrade.h"
 
 #include <map>
 
-using StringMap = std::map<QString, QString>;
 
 namespace lmms
 {
@@ -65,6 +62,8 @@ private:
 	QString attrVal;
 	QString plugin;
 
+	using StringMap = std::map<QString, QString>;
+
 	const StringMap pluginNames = {
 		{"Sidechaincompressor", "SidechainCompressor"},
 		{"Sidechaingate", "SidechainGate"},
@@ -77,4 +76,4 @@ private:
 
 } // namespace lmms
 
-#endif // LMMS_UPGRADETO1_3_0_H
+#endif // LMMS_UPGRADE_TO_13_H

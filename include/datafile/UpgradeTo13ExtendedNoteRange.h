@@ -21,10 +21,8 @@
  *
  */
 
-#pragma once
-
-#ifndef LMMS_UPGRADEEXTENDEDNOTERANGE_H
-#define LMMS_UPGRADEEXTENDEDNOTERANGE_H
+#ifndef LMMS_UPGRADE_EXTENDED_NOTE_RANGE_H
+#define LMMS_UPGRADE_EXTENDED_NOTE_RANGE_H
 
 #include "datafile/DataFileUpgrade.h"
 
@@ -47,4 +45,4 @@ public:
 
 } // namespace lmms
 
-#endif // LMMS_UPGRADEEXTENDEDNOTERANGE_H
+#endif // LMMS_UPGRADE_EXTENDED_NOTE_RANGE_H

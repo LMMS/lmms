@@ -76,7 +76,7 @@ void DataFileUpgrade::renameAttribute(QDomNodeList& elements, const QString& old
 }
 
 
-void findIds(const QDomElement& elem, QList<jo_id_t>& idList)
+void DataFileUpgrade::findIds(const QDomElement& elem, QList<jo_id_t>& idList)
 {
 	if(elem.hasAttribute("id"))
 	{

@@ -20,10 +20,8 @@
  *
  */
 
-#pragma once
-
-#ifndef LMMS_UPGRADEOLD_H
-#define LMMS_UPGRADEOLD_H
+#ifndef LMMS_UPGRADE_02_H
+#define LMMS_UPGRADE_02_H
 
 #include "datafile/DataFileUpgrade.h"
 
@@ -61,5 +59,5 @@ public:
 
 } // namespace lmms
 
-#endif // LMMS_UPGRADEOLD_H
+#endif // LMMS_UPGRADE_02_H
 

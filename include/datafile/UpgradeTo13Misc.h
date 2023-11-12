@@ -21,10 +21,8 @@
  *
  */
 
-#pragma once
-
-#ifndef LMMS_CLASS_NAME_GUARD_H
-#define LMMS_CLASS_NAME_GUARD_H
+#ifndef LMMS_UPGRADE_TO_13_MISC_H
+#define LMMS_UPGRADE_TO_13_MISC_H
 
 #include "datafile/DataFileUpgrade.h"
 
@@ -75,5 +73,5 @@ public:
 
 } // namespace lmms
 
-#endif // LMMS_CLASS_NAME_GUARD_H
+#endif // LMMS_UPGRADE_TO_13_MISC_H
 

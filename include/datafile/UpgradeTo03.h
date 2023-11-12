@@ -21,10 +21,8 @@
  *
  */
 
-#pragma once
-
-#ifndef LMMS_UPGRADE03_H
-#define LMMS_UPGRADE03_H
+#ifndef LMMS_UPGRADE_03_H
+#define LMMS_UPGRADE_03_H
 
 #include "datafile/DataFileUpgrade.h"
 

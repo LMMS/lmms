@@ -20,10 +20,8 @@
  *
  */
 
-#pragma once
-
-#ifndef LMMS_UPGRADETO13RENAMEBBTCO_H
-#define LMMS_UPGRADETO13RENAMEBBTCO_H
+#ifndef LMMS_UPGRADE_TO_13_RENAME_BBTCO_H
+#define LMMS_UPGRADE_TO_13_RENAME_BBTCO_H
 
 #include "datafile/DataFileUpgrade.h"
 
@@ -43,4 +41,4 @@ public:
 
 } // namespace lmms
 
-#endif // LMMS_UPGRADETO13RENAMEBBTCO_H
+#endif // LMMS_UPGRADE_TO_13_RENAME_BBTCO_H

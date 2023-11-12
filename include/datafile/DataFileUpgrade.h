@@ -20,10 +20,8 @@
  *
  */
 
-#pragma once
-
-#ifndef LMMS_DATAFILEUPGRADE_H
-#define LMMS_DATAFILEUPGRADE_H
+#ifndef LMMS_DATA_FILE_UPGRADE_H
+#define LMMS_DATA_FILE_UPGRADE_H
 
 #include "DataFile.h"
 
@@ -38,6 +36,8 @@ class DataFileUpgrade
 {
 public:
 	DataFileUpgrade(DataFile& document) : m_document(document) {}
+	// These functors are non-copyable
+	DataFileUpgrade(const DataFileUpgrade&) = delete;
 
 	virtual void upgrade() {}
 
@@ -54,14 +54,12 @@ public:
 	void renameElements(QDomNodeList& elements, const QString& newTagName);
 	void renameAttribute(QDomNodeList& elements, const QString& oldName, const QString& newName);
 
+	static void findIds(const QDomElement& elem, QList<jo_id_t>& idList);
+
 protected:
 	DataFile& m_document;
 };
 
-// common free functions
-void findIds(const QDomElement& elem, QList<jo_id_t>& idList);
-
-
 } // namespace lmms
 
-#endif // LMMS_DATAFILEUPGRADE_H
+#endif // LMMS_DATA_FILE_UPGRADE_H

@@ -123,8 +123,10 @@ private:
 	unsigned int m_fileVersion;
 
 	template<unsigned int i, class Up>
-	void upgrade() {
-		if (i >= m_fileVersion) {
+	void upgrade()
+	{
+		if (i >= m_fileVersion)
+		{
 			Up{*this}();
 		}
 	}
