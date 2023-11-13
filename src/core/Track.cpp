@@ -208,9 +208,9 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 		element.setAttribute( "trackheight", m_height );
 	}
 	
-	if( m_color.has_value())
+	if (m_color.has_value())
 	{
-		element.setAttribute( "color", m_color->name() );
+		element.setAttribute("color", m_color->name());
 	}
 	
 	QDomElement tsDe = doc.createElement( nodeName() );

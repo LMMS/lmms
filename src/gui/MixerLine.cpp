@@ -174,9 +174,9 @@ void MixerLine::drawMixerLine( QPainter* p, const MixerLine *mixerLine, bool isA
 	int width = mixerLine->rect().width();
 	int height = mixerLine->rect().height();
 	
-	if( channel->m_color.has_value() && !muted )
+	if (channel->m_color.has_value() && !muted)
 	{
-		p->fillRect( mixerLine->rect(), channel->m_color->darker( isActive ? 120 : 150 ) );
+		p->fillRect(mixerLine->rect(), channel->m_color->darker(isActive ? 120 : 150));
 	}
 	else
 	{
@@ -446,7 +446,7 @@ void MixerLine::selectColor()
 // Disable the usage of color on this mixer line
 void MixerLine::resetColor()
 {
-	Engine::mixer()->mixerChannel( m_channelIndex )->m_color = std::nullopt;
+	Engine::mixer()->mixerChannel(m_channelIndex)->m_color = std::nullopt;
 	Engine::getSong()->setModified();
 	update();
 }
