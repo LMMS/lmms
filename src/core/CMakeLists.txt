@@ -78,8 +78,6 @@ set(LMMS_SRCS
 	core/ToolPlugin.cpp
 	core/Track.cpp
 	core/TrackContainer.cpp
-	core/UpgradeExtendedNoteRange.h
-	core/UpgradeExtendedNoteRange.cpp
 	core/Clip.cpp
 	core/ValueBuffer.cpp
 	core/VstSyncController.cpp
@@ -101,6 +99,17 @@ set(LMMS_SRCS
 	core/audio/AudioPulseAudio.cpp
 	core/audio/AudioSampleRecorder.cpp
 	core/audio/AudioSdl.cpp
+
+	core/datafile/DataFileUpgrade.cpp
+	core/datafile/UpgradeTo02.cpp
+	core/datafile/UpgradeTo03.cpp
+	core/datafile/UpgradeTo04.cpp
+	core/datafile/UpgradeTo1Pre3.cpp
+	core/datafile/UpgradeTo13.cpp
+	core/datafile/UpgradeTo13Misc.cpp
+	core/datafile/UpgradeTo13ExtendedNoteRange.cpp
+	core/datafile/UpgradeTo13MixerRename.cpp
+	core/datafile/UpgradeTo13RenameBBTCO.cpp
 
 	core/lv2/Lv2Basics.cpp
 	core/lv2/Lv2ControlBase.cpp

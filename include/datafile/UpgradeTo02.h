@@ -1,5 +1,5 @@
 /*
- * UpgradeExtendedNoteRange.h - Upgrades the extended note range
+ * UpgradeTo02.h - upgrades pre lmms 0.2.0 files
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -20,28 +20,44 @@
  *
  */
 
-#pragma once
+#ifndef LMMS_UPGRADE_02_H
+#define LMMS_UPGRADE_02_H
 
-#ifndef LMMS_UPGRADEEXTENDEDNOTERANGE_H
-#define LMMS_UPGRADEEXTENDEDNOTERANGE_H
+#include "datafile/DataFileUpgrade.h"
 
-
-class QDomElement;
 
 namespace lmms
 {
 
-class UpgradeExtendedNoteRange
+/*
+ * Upgrade to 0.2.1-20070501
+ *
+ * Upgrade to version 0.2.1-20070501
+ */
+class UpgradeTo0_2_1_20070501 : public DataFileUpgrade
 {
 public:
-	UpgradeExtendedNoteRange(QDomElement & domElement);
+	UpgradeTo0_2_1_20070501(DataFile& document) : DataFileUpgrade(document) {}
 
-	void upgrade();
-
-private:
-	QDomElement & m_domElement;
+	void upgrade() override;
 };
+
+/*
+ * Upgrade to 0.2.1-20070508
+ *
+ * Upgrade to version 0.2.1-20070508 from some version greater than
+ * or equal to 0.2.1-20070501
+ */
+class UpgradeTo0_2_1_20070508 : public DataFileUpgrade
+{
+public:
+	UpgradeTo0_2_1_20070508(DataFile& document) : DataFileUpgrade(document) {}
+
+	void upgrade() override;
+};
+
 
 } // namespace lmms
 
-#endif // LMMS_UPGRADEEXTENDEDNOTERANGE_H
+#endif // LMMS_UPGRADE_02_H
+

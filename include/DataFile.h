@@ -37,6 +37,9 @@ class QTextStream;
 namespace lmms
 {
 
+const unsigned int DATAFILE_VERSION = 24;
+
+
 class ProjectVersion;
 
 
@@ -102,35 +105,6 @@ private:
 
 	void cleanMetaNodes( QDomElement de );
 
-	// helper upgrade routines
-	void upgrade_0_2_1_20070501();
-	void upgrade_0_2_1_20070508();
-	void upgrade_0_3_0_rc2();
-	void upgrade_0_3_0();
-	void upgrade_0_4_0_20080104();
-	void upgrade_0_4_0_20080118();
-	void upgrade_0_4_0_20080129();
-	void upgrade_0_4_0_20080409();
-	void upgrade_0_4_0_20080607();
-	void upgrade_0_4_0_20080622();
-	void upgrade_0_4_0_beta1();
-	void upgrade_0_4_0_rc2();
-	void upgrade_1_0_99();
-	void upgrade_1_1_0();
-	void upgrade_1_1_91();
-	void upgrade_1_2_0_rc3();
-	void upgrade_1_3_0();
-	void upgrade_noHiddenClipNames();
-	void upgrade_automationNodes();
-	void upgrade_extendedNoteRange();
-	void upgrade_defaultTripleOscillatorHQ();
-	void upgrade_mixerRename();
-	void upgrade_bbTcoRename();
-	void upgrade_sampleAndHold();
-	void upgrade_midiCCIndexing();
-
-	// List of all upgrade methods
-	static const std::vector<UpgradeMethod> UPGRADE_METHODS;
 	// List of ProjectVersions for the legacyFileVersion method
 	static const std::vector<ProjectVersion> UPGRADE_VERSIONS;
 
@@ -138,7 +112,7 @@ private:
 	using ResourcesMap = std::map<QString, std::vector<QString>>;
 	static const ResourcesMap ELEMENTS_WITH_RESOURCES;
 
-	void upgrade();
+	void upgradeAll();
 
 	void loadData( const QByteArray & _data, const QString & _sourceFile );
 
@@ -147,6 +121,15 @@ private:
 	QDomElement m_head;
 	Type m_type;
 	unsigned int m_fileVersion;
+
+	template<unsigned int i, class Up>
+	void upgrade()
+	{
+		if (i >= m_fileVersion)
+		{
+			Up{*this}();
+		}
+	}
 
 } ;
 
