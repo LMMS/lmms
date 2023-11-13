@@ -202,8 +202,6 @@ public:
 	void search(SearchTask task);
 	void cancel();
 
-	bool inHiddenDirectory(const QString& path);
-
 	static FileBrowserSearcher* instance();
 
 signals:

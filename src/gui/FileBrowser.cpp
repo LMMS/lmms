@@ -1110,7 +1110,7 @@ void FileBrowserSearcher::filter()
 			it.next();
 			const auto name = it.fileName();
 			const auto path = it.filePath();
-			if (!inHiddenDirectory(path) && name.contains(userFilter, Qt::CaseInsensitive)) { matches.push_back(path); }
+			if (name.contains(userFilter, Qt::CaseInsensitive)) { matches.push_back(path); }
 			if (m_cancel) { return; }
 		}
 	}
@@ -1122,18 +1122,6 @@ FileBrowserSearcher* FileBrowserSearcher::instance()
 {
 	if (!s_instance) { s_instance = std::make_unique<FileBrowserSearcher>(); }
 	return s_instance.get();
-}
-
-bool FileBrowserSearcher::inHiddenDirectory(const QString& path)
-{
-	auto dir = QDir{path};
-	while (!dir.isRoot())
-	{
-		auto info = QFileInfo{dir.path()};
-		if (info.isHidden()) { return true; }
-		dir.cdUp();
-	}
-	return false;
 }
 
 
