@@ -109,29 +109,19 @@ MainWindow::MainWindow() :
 	emit initProgress(tr("Preparing plugin browser"));
 	sideBar->appendTab( new PluginBrowser( splitter ) );
 	emit initProgress(tr("Preparing file browsers"));
-	sideBar->appendTab( new FileBrowser(
-				confMgr->userProjectsDir() + "*" +
-				confMgr->factoryProjectsDir(),
-					"*.mmp *.mmpz *.xml *.mid *.mpt",
-							tr( "My Projects" ),
-					embed::getIconPixmap( "project_file" ).transformed( QTransform().rotate( 90 ) ),
-							splitter, false, true,
-				confMgr->userProjectsDir(),
-				confMgr->factoryProjectsDir()));
+	sideBar->appendTab(new FileBrowser(confMgr->userProjectsDir() + "*" + confMgr->factoryProjectsDir(),
+		"*.mmp *.mmpz *.xml *.mid *.mpt", "projects", tr("My Projects"),
+		embed::getIconPixmap("project_file").transformed(QTransform().rotate(90)), splitter, false, true,
+		confMgr->userProjectsDir(), confMgr->factoryProjectsDir()));
 	sideBar->appendTab(
 		new FileBrowser(confMgr->userSamplesDir() + "*" + confMgr->factorySamplesDir(), FileItem::defaultFilters(),
-			tr("My Samples"), embed::getIconPixmap("sample_file").transformed(QTransform().rotate(90)), splitter, false,
-			true, confMgr->userSamplesDir(), confMgr->factorySamplesDir()));
-	sideBar->appendTab( new FileBrowser(
-				confMgr->userPresetsDir() + "*" +
-				confMgr->factoryPresetsDir(),
-					"*.xpf *.cs.xml *.xiz *.lv2",
-					tr( "My Presets" ),
-					embed::getIconPixmap( "preset_file" ).transformed( QTransform().rotate( 90 ) ),
-							splitter , false, true,
-				confMgr->userPresetsDir(),
-				confMgr->factoryPresetsDir()));
-	sideBar->appendTab(new FileBrowser(QDir::homePath(), FileItem::defaultFilters(), tr("My Home"),
+			"samples", tr("My Samples"), embed::getIconPixmap("sample_file").transformed(QTransform().rotate(90)),
+			splitter, false, true, confMgr->userSamplesDir(), confMgr->factorySamplesDir()));
+	sideBar->appendTab(
+		new FileBrowser(confMgr->userPresetsDir() + "*" + confMgr->factoryPresetsDir(), "*.xpf *.cs.xml *.xiz *.lv2",
+			"presets", tr("My Presets"), embed::getIconPixmap("preset_file").transformed(QTransform().rotate(90)),
+			splitter, false, true, confMgr->userPresetsDir(), confMgr->factoryPresetsDir()));
+	sideBar->appendTab(new FileBrowser(QDir::homePath(), FileItem::defaultFilters(), "home", tr("My Home"),
 		embed::getIconPixmap("home").transformed(QTransform().rotate(90)), splitter, false, false));
 
 	QStringList root_paths;
@@ -154,7 +144,7 @@ MainWindow::MainWindow() :
 	}
 #endif
 
-	sideBar->appendTab(new FileBrowser(root_paths.join("*"), FileItem::defaultFilters(), title,
+	sideBar->appendTab(new FileBrowser(root_paths.join("*"), FileItem::defaultFilters(), "root", title,
 		embed::getIconPixmap("computer").transformed(QTransform().rotate(90)), splitter, dirs_as_items));
 
 	m_workspace = new QMdiArea(splitter);

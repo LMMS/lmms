@@ -76,7 +76,7 @@ public:
 		@param recurse *to be documented*
 	*/
 	FileBrowser( const QString & directories, const QString & filter,
-			const QString & title, const QPixmap & pm,
+			const QString& id, const QString & title, const QPixmap & pm,
 			QWidget * parent, bool dirs_as_items = false, bool recurse = false,
 			const QString& userDir = "",
 			const QString& factoryDir = "");
@@ -108,6 +108,7 @@ private:
 
 	QLineEdit * m_filterEdit;
 
+	QString m_id;
 	QString m_directories; //!< Directories to search, split with '*'
 	QString m_filter; //!< Filter as used in QDir::match()
 
@@ -187,38 +188,37 @@ class FileBrowserSearcher : public QObject
 {
 	Q_OBJECT
 public:
-	struct SearchTask
-	{
-		QString directories;
-		QString userFilter;
-		QDir::Filters dirFilters;
-		QStringList nameFilters;
-		QString id;
-	};
-
 	FileBrowserSearcher();
 	~FileBrowserSearcher() noexcept override;
 
-	void search(SearchTask task);
+	void search(const QString& filter, const QStringList& paths, const QString& id,
+		const QStringList& fileExtensions = QStringList());
+
 	void cancel();
 
-	static FileBrowserSearcher* instance();
+	static FileBrowserSearcher* instance() { return s_instance.get(); }
 
 signals:
-	void searchComplete(QStringList matches, QString id);
+	void searchBatchComplete(QStringList matches, QString id);
 
 private:
+	struct Task
+	{
+		QString id;
+		QString filter;
+		QStringList paths;
+		QStringList fileExtensions;
+	};
+
 	void run();
-	void filter();
-	SearchTask m_currentTask;
-	std::thread m_worker;
-	std::mutex m_runMutex;
-	std::mutex m_cancelMutex;
+
+	Task m_currentTask;
+	bool m_run, m_cancel, m_stopped = false;
+	std::mutex m_runMutex, m_cancelMutex;
 	std::condition_variable m_runCond;
-	std::atomic<bool> m_cancel = false;
-	bool m_stopped = false;
-	bool m_run = false;
-	inline static std::unique_ptr<FileBrowserSearcher> s_instance = nullptr;
+	std::thread m_worker;
+	inline static int s_batchSize = 1024;
+	inline static std::unique_ptr<FileBrowserSearcher> s_instance = std::make_unique<FileBrowserSearcher>();
 };
 
 

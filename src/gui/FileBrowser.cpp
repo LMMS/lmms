@@ -98,11 +98,12 @@ void FileBrowser::addContentCheckBox()
 
 
 FileBrowser::FileBrowser(const QString & directories, const QString & filter,
-			const QString & title, const QPixmap & pm,
+			const QString& id, const QString & title, const QPixmap & pm,
 			QWidget * parent, bool dirs_as_items, bool recurse,
 			const QString& userDir,
 			const QString& factoryDir):
 	SideBarWidget( title, pm, parent ),
+	m_id(id),
 	m_directories( directories ),
 	m_filter( filter ),
 	m_dirsAsItems( dirs_as_items ),
@@ -130,7 +131,7 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	m_filterEdit->addAction(embed::getIconPixmap("zoom"), QLineEdit::LeadingPosition);
 
 	connect(m_filterEdit, &QLineEdit::textEdited, this, &FileBrowser::onSearch);
-	connect(FileBrowserSearcher::instance(), &FileBrowserSearcher::searchComplete, this, &FileBrowser::buildSearchTree);
+	connect(FileBrowserSearcher::instance(), &FileBrowserSearcher::searchBatchComplete, this, &FileBrowser::buildSearchTree);
 
 	auto reload_btn = new QPushButton(embed::getIconPixmap("reload"), QString(), searchWidget);
 	reload_btn->setToolTip( tr( "Refresh list" ) );
@@ -177,56 +178,6 @@ void FileBrowser::restoreDirectoriesStates()
 void FileBrowser::buildSearchTree(QStringList matches, QString id)
 {
 	if (title() != id) { return; }
-
-	m_searchTreeWidget->clear();
-
-	const auto rootPaths = m_directories.split('*');
-	for (const auto& rootPath : rootPaths)
-	{
-		const auto rootPathDir = QDir{rootPath};
-		const auto absoluteRootPath = rootPathDir.absolutePath();
-
-		for (const auto& match : matches)
-		{
-			if (!match.startsWith(absoluteRootPath)) { continue; }
-
-			const auto childInfo = QFileInfo{match};
-			const auto childName = childInfo.fileName();
-			const auto parentPath = childInfo.dir().path();
-			auto childWidget = static_cast<QTreeWidgetItem*>(nullptr);
-
-			if (childInfo.isDir())
-			{
-				auto dirChildWidget = new Directory(childName, parentPath, m_filter);
-				dirChildWidget->update();
-				childWidget = dirChildWidget;
-			}
-			else if (childInfo.isFile()) { childWidget = new FileItem(childName, parentPath); }
-			else { continue; }
-
-			const auto relativeParentPath = rootPathDir.relativeFilePath(parentPath);
-			if (relativeParentPath == ".")
-			{
-				m_searchTreeWidget->addTopLevelItem(childWidget);
-				if (childInfo.isDir()) { m_searchTreeWidget->expandItem(childWidget); }
-				continue;
-			}
-
-			const auto grandParentPath = QFileInfo{parentPath}.dir().path();
-			const auto parentItems = m_searchTreeWidget->findItems(relativeParentPath, Qt::MatchExactly);
-
-			if (parentItems.isEmpty())
-			{
-				auto parentItem = new Directory(relativeParentPath, grandParentPath, m_filter);
-				parentItem->addChild(childWidget);
-				m_searchTreeWidget->addTopLevelItem(parentItem);
-				m_searchTreeWidget->expandItem(parentItem);
-			}
-			else { parentItems[0]->addChild(childWidget); }
-		}
-	}
-
-	toggleSearch(true);
 }
 
 	
@@ -239,7 +190,9 @@ void FileBrowser::onSearch(const QString& filter)
 		instance->cancel();
 		return;
 	}
-	instance->search({m_directories, filter, dirFilters(), m_filter.split(' '), title()});
+
+	const auto extensions = m_filter.remove("*.").split(' ');
+	instance->search(filter, m_directories.split('*'), m_id, extensions);
 }
 
 void FileBrowser::toggleSearch(bool on)
@@ -1046,39 +999,46 @@ void FileBrowserTreeWidget::updateDirectory(QTreeWidgetItem * item )
 	}
 }
 
-
-
 FileBrowserSearcher::FileBrowserSearcher()
-	: m_worker([this] { run(); })
+	: QObject()
+	, m_worker([this] { run(); })
 {
 }
 
 FileBrowserSearcher::~FileBrowserSearcher() noexcept
 {
+	const auto cancelLock = std::lock_guard{m_cancelMutex};
 	m_cancel = true;
+
 	{
 		const auto runLock = std::lock_guard{m_runMutex};
 		m_stopped = true;
 		m_cancel = false;
 	}
+
 	m_runCond.notify_one();
 	m_worker.join();
 }
 
-void FileBrowserSearcher::search(SearchTask task)
+void FileBrowserSearcher::search(
+	const QString& filter, const QStringList& paths, const QString& id, const QStringList& fileExtensions)
 {
+	const auto cancelLock = std::lock_guard{m_cancelMutex};
 	m_cancel = true;
+
 	{
 		const auto runLock = std::lock_guard{m_runMutex};
-		m_currentTask = std::move(task);
+		m_currentTask = {id, filter, paths, fileExtensions};
 		m_run = true;
 		m_cancel = false;
 	}
+
 	m_runCond.notify_one();
 }
 
 void FileBrowserSearcher::cancel()
 {
+	const auto cancelLock = std::lock_guard{m_cancelMutex};
 	m_cancel = true;
 }
 
@@ -1091,38 +1051,11 @@ void FileBrowserSearcher::run()
 
 		if (m_stopped) { break; }
 
-		filter();
+		// TODO ...
 		m_run = false;
 	}
 }
 
-void FileBrowserSearcher::filter()
-{
-	const auto& [directories, userFilter, filters, nameFilters, id] = m_currentTask;
-	const auto paths = directories.split('*');
-	auto matches = QStringList{};
-
-	for (const auto& path : paths)
-	{
-		auto it = QDirIterator{path, nameFilters, filters, QDirIterator::Subdirectories};
-		while (it.hasNext())
-		{
-			it.next();
-			const auto name = it.fileName();
-			const auto path = it.filePath();
-			if (name.contains(userFilter, Qt::CaseInsensitive)) { matches.push_back(path); }
-			if (m_cancel) { return; }
-		}
-	}
-
-	emit searchComplete(matches, id);
-}
-
-FileBrowserSearcher* FileBrowserSearcher::instance()
-{
-	if (!s_instance) { s_instance = std::make_unique<FileBrowserSearcher>(); }
-	return s_instance.get();
-}
 
 
 QPixmap * Directory::s_folderPixmap = nullptr;
