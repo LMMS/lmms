@@ -814,30 +814,27 @@ int FloatModel::getDigitCount() const
 
 
 
-QString FloatModel::displayValue( const float val ) const
+QString FloatModel::displayValue(const float val) const
 {
-	return QString::number( castValue<float>( scaledValue( val ) ) );
+	return QString::number(castValue<float>(scaledValue(val)));
 }
 
-QString IntModel::displayValue( const float val ) const
+QString IntModel::displayValue(const float val) const
 {
-	if ( isTwoPowerModel )
+	if (m_restrictToTwoPowers)
 	{
-		return QString::number( TwoPowerModel::closestValidDenom( castValue<int>( scaledValue( val ) ) ) );
+		return QString::number(IntModel::closestValidDenom(castValue<int>(scaledValue(val))));
 	}
 	return QString::number( castValue<int>( scaledValue( val ) ) );
 }
 
-QString BoolModel::displayValue( const float val ) const
-{
-	return QString::number( castValue<bool>( scaledValue( val ) ) );
-}
-
-bool TwoPowerModel::validDenominator(int denom)
+bool IntModel::validDenominator(int denom)
 {
 	// Restrict time signature denominator to 2, 4, 8, etc
 	if ( denom < 1 )
+	{
 		return false;
+	}
 	int numHighBits;
 	for ( numHighBits = 0; denom != 0; denom = denom >> 1 )
 	{
@@ -848,7 +845,7 @@ bool TwoPowerModel::validDenominator(int denom)
 	return numHighBits == 1;
 }
 
-int TwoPowerModel::nextValidDenom( int denom )
+int IntModel::nextValidDenom( int denom )
 {
 	int nextSig = 2; // 0b10
 	// We want to terminate the while loop when the last bit is 1
@@ -861,10 +858,12 @@ int TwoPowerModel::nextValidDenom( int denom )
 	return nextSig;
 }
 
-int TwoPowerModel::previousValidDenom( int denom )
+int IntModel::previousValidDenom( int denom )
 {
 	if ( denom <= 1 )
+	{
 		return 1;
+	}
 	int prevSig = 1;
 	// We want to terminate the while loop when the last bit is 1
 	// and all the remaining bits are 0. The difference between this
@@ -877,15 +876,20 @@ int TwoPowerModel::previousValidDenom( int denom )
 	return prevSig;
 }
 
-int TwoPowerModel::closestValidDenom( int denom )
+int IntModel::closestValidDenom( int denom )
 {
-	int next = TwoPowerModel::nextValidDenom( denom );
+	int next = IntModel::nextValidDenom( denom );
 	int prev = std::max(1, next >> 1);
 	if ( next - denom > denom - prev )
 	{
 		return prev;
 	}
 	return next;
+}
+
+QString BoolModel::displayValue( const float val ) const
+{
+	return QString::number( castValue<bool>( scaledValue( val ) ) );
 }
 
 

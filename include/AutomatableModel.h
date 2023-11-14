@@ -481,20 +481,47 @@ public:
 	IntModel( int val = 0, int min = 0, int max = 0,
 				Model* parent = nullptr,
 				const QString& displayName = QString(),
-				bool defaultConstructed = false ) :
-		TypedAutomatableModel( val, min, max, 1, parent, displayName, defaultConstructed ),
-		isTwoPowerModel(false)
+				bool defaultConstructed = false,
+				bool restrictToTwoPowers = false) :
+		TypedAutomatableModel(val, min, max, 1, parent, displayName, defaultConstructed),
+		m_restrictToTwoPowers(restrictToTwoPowers)
 	{
 	}
-	QString displayValue( const float val ) const override;
-protected:
-	// Hackey workaround for the fact that LcdSpinBox uses model() to get
-	// the string value of the int. This is ONLY used in displayValue
-	// because without some major re-working, there's not an apparent
-	// other way to get the TwoPowerModel's value rather than the IntModel's
-	// value.
-	bool isTwoPowerModel;
-} ;
+	QString displayValue(const float val) const override;
+
+	int value(int frameOffset = 0) const
+	{
+		if (m_restrictToTwoPowers)
+		{
+			return IntModel::closestValidDenom(AutomatableModel::value<int>(frameOffset));
+		}
+		else
+		{
+			return AutomatableModel::value<int>(frameOffset);
+		}
+	}
+
+	bool restrictToTwoPowers() const
+	{
+		return m_restrictToTwoPowers;
+	}
+
+	bool setRestrictToTwoPowers(bool restrict)
+	{
+		m_restrictToTwoPowers = restrict;
+	}
+
+	// Static helper methods
+	static bool validDenominator(int denom);
+	static int nextValidDenom(int denom);
+	static int previousValidDenom(int denom);
+	static int closestValidDenom(int denom);
+private:
+
+	// Member variables
+	// Restricts the output value to
+	bool m_restrictToTwoPowers;
+};
 
 
 class LMMS_EXPORT BoolModel : public TypedAutomatableModel<bool>
@@ -510,32 +537,6 @@ public:
 	{
 	}
 	QString displayValue( const float val ) const override;
-} ;
-
-// A custom class for time signature denominators which only
-// support integers that are powers of two
-class LMMS_EXPORT TwoPowerModel : public IntModel
-{
-	Q_OBJECT
-	MODEL_IS_VISITABLE
-public:
-	TwoPowerModel( int val = 2, int min = 2, int max = 2048,
-				Model* parent = nullptr,
-				const QString& displayName = QString(),
-				bool defaultConstructed = false ) :
-		IntModel( val, min, max, parent, displayName, defaultConstructed )
-	{
-		this->isTwoPowerModel = true;
-	}
-	int value( int frameOffset = 0 ) const
-	{
-		return TwoPowerModel::closestValidDenom( AutomatableModel::value<int>( frameOffset ) );
-	}
-	// Static helper methods
-	static bool validDenominator( int denom );
-	static int nextValidDenom( int denom );
-	static int previousValidDenom( int denom );
-	static int closestValidDenom( int denom );
 } ;
 
 using AutomatedValueMap = QMap<AutomatableModel*, float>;

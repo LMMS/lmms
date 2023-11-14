@@ -32,12 +32,12 @@ namespace lmms
 
 MeterModel::MeterModel( Model * _parent ) :
 	Model( _parent ),
-	m_numeratorModel( 4, 1, 32, this, tr( "Numerator" ) ),
-	m_denominatorModel( 4, 1, 32, this, tr( "Denominator" ) )
+	m_numeratorModel(4, 1, 32, this, tr("Numerator")),
+	m_denominatorModel(4, 1, 32, this, tr("Denominator"), false, true)
 {
-	connect( &m_numeratorModel, SIGNAL(dataChanged()), 
+	connect( &m_numeratorModel, SIGNAL(dataChanged()),
 			this, SIGNAL(dataChanged()), Qt::DirectConnection );
-	connect( &m_denominatorModel, SIGNAL(dataChanged()), 
+	connect( &m_denominatorModel, SIGNAL(dataChanged()),
 			this, SIGNAL(dataChanged()), Qt::DirectConnection );
 }
 

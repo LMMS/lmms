@@ -35,9 +35,9 @@ class LMMS_EXPORT LcdSpinBox : public LcdWidget, public IntModelView
 {
 	Q_OBJECT
 public:
-	LcdSpinBox( int numDigits, QWidget* parent, const QString& name = QString(), bool restrictToPowersOfTwo = false );
+	LcdSpinBox(int numDigits, QWidget* parent, const QString& name = QString());
 
-	LcdSpinBox( int numDigits, const QString& style, QWidget* parent, const QString& name = QString(), bool restrictToPowersOfTwo = false );
+	LcdSpinBox(int numDigits, const QString& style, QWidget* parent, const QString& name = QString());
 
 	~LcdSpinBox() override = default;
 
@@ -78,7 +78,6 @@ private:
 	bool m_mouseMoving;
 	QPoint m_lastMousePos; //!< mouse position in last mouseMoveEvent
 	int m_displayOffset;
-	bool m_restrictToPowersOfTwo;
 	void enterValue();
 
 signals:

@@ -51,7 +51,7 @@ MeterDialog::MeterDialog( QWidget * _parent, bool _simple ) :
 	num_layout->setContentsMargins(0, 0, 0, 0);
 
 
-	m_numerator = new LcdSpinBox( 2, num, tr( "Meter Numerator" ) );
+	m_numerator = new LcdSpinBox(2, num, tr( "Meter Numerator" ));
 	m_numerator->setToolTip(tr("Meter numerator"));
 
 	num_layout->addWidget( m_numerator );
@@ -71,7 +71,7 @@ MeterDialog::MeterDialog( QWidget * _parent, bool _simple ) :
 	den_layout->setSpacing( 0 );
 	den_layout->setContentsMargins(0, 0, 0, 0);
 
-	m_denominator = new LcdSpinBox( 2, den, tr( "Meter Denominator" ), true );
+	m_denominator = new LcdSpinBox(2, den, tr( "Meter Denominator" ));
 	m_denominator->setToolTip(tr("Meter denominator"));
 	if( _simple )
 	{

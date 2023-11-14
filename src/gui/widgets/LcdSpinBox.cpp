@@ -34,41 +34,32 @@
 namespace lmms::gui
 {
 
-LcdSpinBox::LcdSpinBox( int numDigits, QWidget* parent, const QString& name, bool restrictToPowersOfTwo ) :
+LcdSpinBox::LcdSpinBox(int numDigits, QWidget* parent, const QString& name) :
 	LcdWidget( numDigits, parent, name ),
 	IntModelView( new IntModel( 0, 0, 0, nullptr, name, true ), this ),
 	m_remainder( 0.f ),
 	m_mouseMoving( false ),
 	m_lastMousePos(),
-	m_displayOffset( 0 ),
-	m_restrictToPowersOfTwo(restrictToPowersOfTwo)
+	m_displayOffset( 0 )
 {
 }
 
 
 
 
-LcdSpinBox::LcdSpinBox( int numDigits, const QString& style, QWidget* parent, const QString& name, bool restrictToPowersOfTwo ) :
+LcdSpinBox::LcdSpinBox( int numDigits, const QString& style, QWidget* parent, const QString& name) :
 	LcdWidget( numDigits, style, parent, name ),
 	IntModelView( new IntModel( 0, 0, 0, nullptr, name, true ), this ),
 	m_remainder( 0.f ),
 	m_mouseMoving( false ),
 	m_lastMousePos(),
-	m_displayOffset( 0 ),
-	m_restrictToPowersOfTwo(restrictToPowersOfTwo)
+	m_displayOffset( 0 )
 {
 }
 
 void LcdSpinBox::update()
 {
-	if ( m_restrictToPowersOfTwo )
-	{
-		setValue( TwoPowerModel::closestValidDenom( model()->value() + m_displayOffset ) );
-	}
-	else
-	{
-		setValue( model()->value() + m_displayOffset );
-	}
+	setValue( model()->value() + m_displayOffset );
 
 	QWidget::update();
 }
