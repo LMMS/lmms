@@ -23,48 +23,42 @@
  *
  */
 
-#include <cmath>
-#include <QMouseEvent>
-#include <QInputDialog>
-
 #include "LcdSpinBox.h"
+
+#include <QInputDialog>
+#include <QMouseEvent>
+#include <cmath>
+
 #include "CaptionMenu.h"
 
+namespace lmms::gui {
 
-namespace lmms::gui
-{
-
-LcdSpinBox::LcdSpinBox(int numDigits, QWidget* parent, const QString& name) :
-	LcdWidget( numDigits, parent, name ),
-	IntModelView( new IntModel( 0, 0, 0, nullptr, name, true ), this ),
-	m_remainder( 0.f ),
-	m_mouseMoving( false ),
-	m_lastMousePos(),
-	m_displayOffset( 0 )
+LcdSpinBox::LcdSpinBox(int numDigits, QWidget* parent, const QString& name)
+	: LcdWidget(numDigits, parent, name)
+	, IntModelView(new IntModel(0, 0, 0, nullptr, name, true), this)
+	, m_remainder(0.f)
+	, m_mouseMoving(false)
+	, m_lastMousePos()
+	, m_displayOffset(0)
 {
 }
 
-
-
-
-LcdSpinBox::LcdSpinBox( int numDigits, const QString& style, QWidget* parent, const QString& name) :
-	LcdWidget( numDigits, style, parent, name ),
-	IntModelView( new IntModel( 0, 0, 0, nullptr, name, true ), this ),
-	m_remainder( 0.f ),
-	m_mouseMoving( false ),
-	m_lastMousePos(),
-	m_displayOffset( 0 )
+LcdSpinBox::LcdSpinBox(int numDigits, const QString& style, QWidget* parent, const QString& name)
+	: LcdWidget(numDigits, style, parent, name)
+	, IntModelView(new IntModel(0, 0, 0, nullptr, name, true), this)
+	, m_remainder(0.f)
+	, m_mouseMoving(false)
+	, m_lastMousePos()
+	, m_displayOffset(0)
 {
 }
 
 void LcdSpinBox::update()
 {
-	setValue( model()->value() + m_displayOffset );
+	setValue(model()->value() + m_displayOffset);
 
 	QWidget::update();
 }
-
-
 
 void LcdSpinBox::contextMenuEvent(QContextMenuEvent* event)
 {
@@ -73,58 +67,42 @@ void LcdSpinBox::contextMenuEvent(QContextMenuEvent* event)
 	contextMenu.exec(QCursor::pos());
 }
 
-
-
-
-void LcdSpinBox::mousePressEvent( QMouseEvent* event )
+void LcdSpinBox::mousePressEvent(QMouseEvent* event)
 {
-	if( event->button() == Qt::LeftButton &&
-		! ( event->modifiers() & Qt::ControlModifier ) &&
-						event->y() < cellHeight() + 2  )
+	if (event->button() == Qt::LeftButton && !(event->modifiers() & Qt::ControlModifier)
+		&& event->y() < cellHeight() + 2)
 	{
 		m_mouseMoving = true;
 		m_lastMousePos = event->globalPos();
 
-		AutomatableModel *thisModel = model();
-		if( thisModel )
+		AutomatableModel* thisModel = model();
+		if (thisModel)
 		{
 			thisModel->addJournalCheckPoint();
-			thisModel->saveJournallingState( false );
+			thisModel->saveJournallingState(false);
 		}
 	}
-	else
-	{
-		IntModelView::mousePressEvent( event );
-	}
+	else { IntModelView::mousePressEvent(event); }
 }
 
-
-
-
-void LcdSpinBox::mouseMoveEvent( QMouseEvent* event )
+void LcdSpinBox::mouseMoveEvent(QMouseEvent* event)
 {
-	if( m_mouseMoving )
+	if (m_mouseMoving)
 	{
 		int dy = event->globalY() - m_lastMousePos.y();
-		if( dy )
+		if (dy)
 		{
 			auto fdy = static_cast<float>(dy);
-			if( event->modifiers() & Qt::ShiftModifier ) {
-				fdy = qBound( -4.f, fdy/4.f, 4.f );
-			}
-			float floatValNotRounded =
-				model()->value() + m_remainder - fdy / 2.f * model()->step<int>();
-			float floatValRounded = roundf( floatValNotRounded );
+			if (event->modifiers() & Qt::ShiftModifier) { fdy = qBound(-4.f, fdy / 4.f, 4.f); }
+			float floatValNotRounded = model()->value() + m_remainder - fdy / 2.f * model()->step<int>();
+			float floatValRounded = roundf(floatValNotRounded);
 			m_remainder = floatValNotRounded - floatValRounded;
-			model()->setValue( floatValRounded );
+			model()->setValue(floatValRounded);
 			emit manualChange();
 			m_lastMousePos = event->globalPos();
 		}
 	}
 }
-
-
-
 
 void LcdSpinBox::mouseReleaseEvent(QMouseEvent*)
 {
@@ -135,17 +113,14 @@ void LcdSpinBox::mouseReleaseEvent(QMouseEvent*)
 	}
 }
 
-
-
-
-void LcdSpinBox::wheelEvent(QWheelEvent * we)
+void LcdSpinBox::wheelEvent(QWheelEvent* we)
 {
 	we->accept();
 	model()->setValue(model()->value() + ((we->angleDelta().y() > 0) ? 1 : -1) * model()->step<int>());
 	emit manualChange();
 }
 
-void LcdSpinBox::mouseDoubleClickEvent( QMouseEvent * )
+void LcdSpinBox::mouseDoubleClickEvent(QMouseEvent*)
 {
 	enterValue();
 }
@@ -155,20 +130,11 @@ void LcdSpinBox::enterValue()
 	bool ok;
 	int new_val;
 
-	new_val = QInputDialog::getInt(
-			this, tr( "Set value" ),
-			tr( "Please enter a new value between %1 and %2:" ).
-			arg( model()->minValue() ).
-			arg( model()->maxValue() ),
-			model()->value(),
-			model()->minValue(),
-			model()->maxValue(),
-			model()->step<int>(), &ok );
+	new_val = QInputDialog::getInt(this, tr("Set value"),
+		tr("Please enter a new value between %1 and %2:").arg(model()->minValue()).arg(model()->maxValue()),
+		model()->value(), model()->minValue(), model()->maxValue(), model()->step<int>(), &ok);
 
-	if( ok )
-	{
-		model()->setValue( new_val );
-	}
+	if (ok) { model()->setValue(new_val); }
 }
 
 } // namespace lmms::gui

@@ -25,11 +25,10 @@
 #ifndef LMMS_GUI_LCD_SPINBOX_H
 #define LMMS_GUI_LCD_SPINBOX_H
 
-#include "LcdWidget.h"
 #include "AutomatableModelView.h"
+#include "LcdWidget.h"
 
-namespace lmms::gui
-{
+namespace lmms::gui {
 
 class LMMS_EXPORT LcdSpinBox : public LcdWidget, public IntModelView
 {
@@ -48,30 +47,22 @@ public:
 	}
 
 	/*! Sets an offset which is always added to value of model so we can
-	    display values in a user-friendly way if they internally start at 0 */
-	void setDisplayOffset( int offset )
-	{
-		m_displayOffset = offset;
-	}
+		display values in a user-friendly way if they internally start at 0 */
+	void setDisplayOffset(int offset) { m_displayOffset = offset; }
 
-	/*! \brief Returns internal offset for displaying values */
-	int displayOffset() const
-	{
-		return m_displayOffset;
-	}
-
+	/*! rief Returns internal offset for displaying values */
+	int displayOffset() const { return m_displayOffset; }
 
 public slots:
 	virtual void update();
 
-
 protected:
-	void contextMenuEvent( QContextMenuEvent * _me ) override;
-	void mousePressEvent( QMouseEvent * _me ) override;
-	void mouseMoveEvent( QMouseEvent * _me ) override;
-	void mouseReleaseEvent( QMouseEvent * _me ) override;
-	void wheelEvent( QWheelEvent * _we ) override;
-	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
+	void contextMenuEvent(QContextMenuEvent* _me) override;
+	void mousePressEvent(QMouseEvent* _me) override;
+	void mouseMoveEvent(QMouseEvent* _me) override;
+	void mouseReleaseEvent(QMouseEvent* _me) override;
+	void wheelEvent(QWheelEvent* _we) override;
+	void mouseDoubleClickEvent(QMouseEvent* _me) override;
 
 private:
 	float m_remainder; //!< floating offset of spinbox in [-0.5, 0.5]
@@ -82,8 +73,7 @@ private:
 
 signals:
 	void manualChange();
-
-} ;
+};
 
 using LcdSpinBoxModel = IntModel;
 
