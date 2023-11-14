@@ -370,12 +370,14 @@ public:
 	int value(int frameOffset = 0) const
 	{
 		if (m_restrictToTwoPowers) { return IntModel::closestValidDenom(AutomatableModel::value<int>(frameOffset)); }
-		else { return AutomatableModel::value<int>(frameOffset); }
+		return AutomatableModel::value<int>(frameOffset);
 	}
+
+	void loadSettings(const QDomElement& element, const QString& name);
 
 	bool restrictToTwoPowers() const { return m_restrictToTwoPowers; }
 
-	bool setRestrictToTwoPowers(bool restrict) { m_restrictToTwoPowers = restrict; }
+	void setRestrictToTwoPowers(bool restrict) { this->m_restrictToTwoPowers = restrict; }
 
 	// Static helper methods
 	static bool validDenominator(int denom);

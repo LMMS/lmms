@@ -24,6 +24,8 @@
 
 #include "AutomatableModel.h"
 
+#include <QMessageBox>
+
 #include "AudioEngine.h"
 #include "AutomationClip.h"
 #include "ControllerConnection.h"
@@ -675,6 +677,29 @@ QString IntModel::displayValue(const float val) const
 		return QString::number(IntModel::closestValidDenom(castValue<int>(scaledValue(val))));
 	}
 	return QString::number(castValue<int>(scaledValue(val)));
+}
+
+void IntModel::loadSettings(const QDomElement& element, const QString& name)
+{
+	AutomatableModel::loadSettings(element, name);
+	// Check to see if we need to turn off power of two only
+	if (m_restrictToTwoPowers)
+	{
+		// This only checks if an irregular time signature appears at the beginning
+		int actualIntValue = AutomatableModel::value<int>(0);
+		if (!validDenominator(actualIntValue))
+		{
+			// Inform the user that we are going to disable the two-power restriction
+
+			int answer = QMessageBox::question(nullptr, tr("Irregular time signature"), tr("LMMS has detected an irregular time signature.\n"
+							"Keep?"));
+			if (answer == QMessageBox::Yes) {
+				m_restrictToTwoPowers = false;
+			}
+		}
+	}
+	// Re-emit this signal so re-rendering occurs
+	emit dataChanged();
 }
 
 bool IntModel::validDenominator(int denom)

@@ -67,6 +67,9 @@ void MeterModel::saveSettings( QDomDocument & _doc, QDomElement & _this,
 void MeterModel::loadSettings( const QDomElement & _this,
 								const QString & _name )
 {
+	// Reset the denominator model to only accept powers of two and then
+	// if it encounters a non-base2 denominator, it will disable this itself
+	m_denominatorModel.setRestrictToTwoPowers(true);
 	m_numeratorModel.loadSettings( _this, _name + "_numerator" );
 	m_denominatorModel.loadSettings( _this, _name + "_denominator" );
 }
