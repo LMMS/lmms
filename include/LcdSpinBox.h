@@ -28,7 +28,8 @@
 #include "AutomatableModelView.h"
 #include "LcdWidget.h"
 
-namespace lmms::gui {
+namespace lmms::gui
+{
 
 class LMMS_EXPORT LcdSpinBox : public LcdWidget, public IntModelView
 {

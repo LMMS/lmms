@@ -34,7 +34,8 @@
 #include "Song.h"
 #include "lmms_math.h"
 
-namespace lmms {
+namespace lmms
+{
 
 long AutomatableModel::s_periodCounter = 0;
 

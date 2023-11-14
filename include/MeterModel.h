@@ -27,7 +27,8 @@
 
 #include "AutomatableModel.h"
 
-namespace lmms {
+namespace lmms
+{
 
 class LMMS_EXPORT MeterModel : public Model
 {

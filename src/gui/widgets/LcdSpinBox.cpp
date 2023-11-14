@@ -31,7 +31,8 @@
 
 #include "CaptionMenu.h"
 
-namespace lmms::gui {
+namespace lmms::gui
+{
 
 LcdSpinBox::LcdSpinBox(int numDigits, QWidget* parent, const QString& name)
 	: LcdWidget(numDigits, parent, name)

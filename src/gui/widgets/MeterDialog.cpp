@@ -33,7 +33,8 @@
 #include "MeterModel.h"
 #include "gui_templates.h"
 
-namespace lmms::gui {
+namespace lmms::gui
+{
 
 MeterDialog::MeterDialog(QWidget* _parent, bool _simple)
 	: QWidget(_parent)

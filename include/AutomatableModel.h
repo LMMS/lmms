@@ -36,7 +36,8 @@
 #include "TimePos.h"
 #include "ValueBuffer.h"
 
-namespace lmms {
+namespace lmms
+{
 
 // simple way to map a property of a view to a model
 #define mapPropertyFromModelPtr(type, getfunc, setfunc, modelname) \

@@ -27,7 +27,8 @@
 
 #include "MeterModel.h"
 
-namespace lmms {
+namespace lmms
+{
 
 TimeSig::TimeSig(int num, int denom)
 	: m_num(num)
