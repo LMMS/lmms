@@ -693,7 +693,7 @@ void IntModel::loadSettings(const QDomElement& element, const QString& name)
 			// Inform the user that we are going to disable the two-power restriction
 
 			int answer = QMessageBox::question(nullptr, tr("Irregular time signature"), tr("LMMS has detected an irregular time signature.\n"
-							"Keep?"));
+							"Keep irregular time signature?"));
 			if (answer == QMessageBox::Yes) {
 				m_restrictToTwoPowers = false;
 			}
