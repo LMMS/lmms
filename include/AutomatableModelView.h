@@ -29,6 +29,7 @@
 #include "ModelView.h"
 #include "AutomatableModel.h"
 
+class QAction;
 class QMenu;
 class QMouseEvent;
 
@@ -134,6 +135,10 @@ public:
 using FloatModelView = TypedModelView<FloatModel>;
 using IntModelView = TypedModelView<IntModel>;
 using BoolModelView = TypedModelView<BoolModel>;
+
+
+// Helper function to connect a BoolModel to a QAction
+QAction* qActionFromModel(BoolModel& model, const QString& text, QObject* parent);
 
 } // namespace lmms::gui
 
