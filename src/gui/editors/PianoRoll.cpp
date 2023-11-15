@@ -40,6 +40,7 @@
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QToolButton>
+#include <QGraphicsView>
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -330,6 +331,9 @@ PianoRoll::PianoRoll() :
 	removeSelection();
 
 	// init scrollbars
+	m_cornerSquare = new QGraphicsView{this};
+	m_cornerSquare->setSceneRect(0, 0, SCROLLBAR_SIZE, SCROLLBAR_SIZE);
+
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
 	m_leftRightScroll->setSingleStep( 1 );
 	connect( m_leftRightScroll, SIGNAL(valueChanged(int)), this,
@@ -843,6 +847,31 @@ void PianoRoll::loadMarkedSemiTones(const QDomElement & de)
 	m_markedSemiTones.erase(new_end, m_markedSemiTones.end());
 }
 
+void PianoRoll::setScrollbarPos(double posX)
+{
+	assert(posX >= 0.0 && posX <= 1.0);
+	assert(m_leftRightScroll->minimum() == 0);
+
+	if (!hasValidMidiClip()) { return; }
+
+	const auto tpp = 1.0 * TimePos::ticksPerBar() / m_ppb; // ticks per pixel
+	const auto editorWidthTicks = tpp * m_leftRightScroll->width();
+
+	// Set scrollbar to far left if entire clip can fit on screen
+	if (m_midiClip->exactLength().getTicks() <= editorWidthTicks)
+	{
+		m_leftRightScroll->setValue(0);
+		return;
+	}
+
+	// Convert posX to position on scrollbar
+	auto scrollPosX = posX * m_leftRightScroll->maximum(); // Simplified from: posX * (max - min) + min
+
+	// Center the position within the editor
+	scrollPosX -= 0.5 * editorWidthTicks;
+
+	m_leftRightScroll->setValue(std::max(static_cast<int>(scrollPosX), 0));
+}
 
 void PianoRoll::setCurrentMidiClip( MidiClip* newMidiClip )
 {
@@ -880,6 +909,7 @@ void PianoRoll::setCurrentMidiClip( MidiClip* newMidiClip )
 	{
 		//resizeEvent( NULL );
 
+		updateXScroll();
 		update();
 		emit currentMidiClipChanged();
 		return;
@@ -923,6 +953,9 @@ void PianoRoll::setCurrentMidiClip( MidiClip* newMidiClip )
 	connect(m_midiClip->instrumentTrack()->microtuner()->keyRangeImportModel(), SIGNAL(dataChanged()),
 		this, SLOT(update()));
 
+	connect(m_midiClip, &MidiClip::lengthChanged, this, &PianoRoll::updateXScroll);
+
+	updateXScroll();
 	update();
 	emit currentMidiClipChanged();
 }
@@ -3660,16 +3693,6 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	p.setBrush( Qt::NoBrush );
 	p.drawRect(x + m_whiteKeyWidth, y, w, h);
 
-	// TODO: Get this out of paint event
-	int l = ( hasValidMidiClip() )? (int) m_midiClip->length() : 0;
-
-	// reset scroll-range
-	if( m_leftRightScroll->maximum() != l )
-	{
-		m_leftRightScroll->setRange( 0, l );
-		m_leftRightScroll->setPageStep( l );
-	}
-
 	// set line colors
 	auto editAreaCol = QColor(m_lineColor);
 	auto currentKeyCol = QColor(m_beatLineColor);
@@ -3728,28 +3751,11 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 void PianoRoll::updateScrollbars()
 {
-	m_leftRightScroll->setGeometry(
-		m_whiteKeyWidth,
-		height() - SCROLLBAR_SIZE,
-		width() - m_whiteKeyWidth,
-		SCROLLBAR_SIZE
-	);
-	m_topBottomScroll->setGeometry(
-		width() - SCROLLBAR_SIZE,
-		PR_TOP_MARGIN,
-		SCROLLBAR_SIZE,
-		height() - PR_TOP_MARGIN - SCROLLBAR_SIZE
-	);
-	int pianoAreaHeight = keyAreaBottom() - PR_TOP_MARGIN;
-	int numKeysVisible = pianoAreaHeight / m_keyLineHeight;
-	m_totalKeysToScroll = qMax(0, NumKeys - numKeysVisible);
-	m_topBottomScroll->setRange(0, m_totalKeysToScroll);
-	if (m_startKey > m_totalKeysToScroll)
-	{
-		m_startKey = qMax(0, m_totalKeysToScroll);
-	}
-	m_topBottomScroll->setValue(m_totalKeysToScroll - m_startKey);
+	updateXScroll();
+	updateYScroll();
+	m_cornerSquare->move(width() - SCROLLBAR_SIZE - 1, height() - SCROLLBAR_SIZE - 1);
 }
+
 
 // responsible for moving/resizing scrollbars after window-resizing
 void PianoRoll::resizeEvent(QResizeEvent* re)
@@ -4312,20 +4318,39 @@ void PianoRoll::enterValue( NoteVector* nv )
 	}
 }
 
+void PianoRoll::updateXScroll()
+{
+	m_leftRightScroll->setGeometry(
+		m_whiteKeyWidth,
+		height() - SCROLLBAR_SIZE,
+		width() - m_whiteKeyWidth - SCROLLBAR_SIZE,
+		SCROLLBAR_SIZE
+	);
+
+	const int length = hasValidMidiClip() ? static_cast<int>(m_midiClip->length()) : 0;
+	if (m_leftRightScroll->maximum() != length)
+	{
+		m_leftRightScroll->setRange(0, length);
+		m_leftRightScroll->setPageStep(length);
+	}
+}
 
 void PianoRoll::updateYScroll()
 {
-	m_topBottomScroll->setGeometry(width() - SCROLLBAR_SIZE, PR_TOP_MARGIN,
-						SCROLLBAR_SIZE,
-						height() - PR_TOP_MARGIN -
-						SCROLLBAR_SIZE);
+	m_topBottomScroll->setGeometry(
+		width() - SCROLLBAR_SIZE,
+		PR_TOP_MARGIN,
+		SCROLLBAR_SIZE,
+		height() - PR_TOP_MARGIN - SCROLLBAR_SIZE
+	);
 
-	const int visible_space = keyAreaBottom() - keyAreaTop();
-	m_totalKeysToScroll = qMax(0, NumKeys - 1 - visible_space / m_keyLineHeight);
+	int pianoAreaHeight = keyAreaBottom() - keyAreaTop();
+	int numKeysVisible = pianoAreaHeight / m_keyLineHeight;
 
+	m_totalKeysToScroll = std::max(0, NumKeys - numKeysVisible);
 	m_topBottomScroll->setRange(0, m_totalKeysToScroll);
 
-	if(m_startKey > m_totalKeysToScroll)
+	if (m_startKey > m_totalKeysToScroll)
 	{
 		m_startKey = m_totalKeysToScroll;
 	}
@@ -5230,6 +5255,11 @@ bool PianoRollWindow::hasFocus() const
 	return m_editor->hasFocus();
 }
 
+
+void PianoRollWindow::setScrollbarPos(double posX)
+{
+	m_editor->setScrollbarPos(posX);
+}
 
 
 void PianoRollWindow::updateAfterMidiClipChange()

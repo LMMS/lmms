@@ -144,49 +144,37 @@ void MidiClip::init()
 
 void MidiClip::updateLength()
 {
-	if( m_clipType == Type::BeatClip )
-	{
-		changeLength( beatClipLength() );
-		updatePatternTrack();
-		return;
-	}
+	tick_t maxLength = TimePos::ticksPerBar();
 
-	tick_t max_length = TimePos::ticksPerBar();
-
-	for (const auto& note : m_notes)
+	if (m_clipType == Type::BeatClip)
 	{
-		if (note->length() > 0)
+		for (const auto& note : m_notes)
 		{
-			max_length = std::max<tick_t>(max_length, note->endPos());
+			if (note->length() < 0)
+			{
+				maxLength = std::max<tick_t>(maxLength, note->pos() + 1);
+			}
+		}
+
+		if (m_steps != TimePos::stepsPerBar())
+		{
+			maxLength = m_steps * TimePos::ticksPerBar() / TimePos::stepsPerBar();
 		}
 	}
-	changeLength( TimePos( max_length ).nextFullBar() *
-						TimePos::ticksPerBar() );
+	else
+	{
+		for (const auto& note : m_notes)
+		{
+			if (note->length() > 0)
+			{
+				maxLength = std::max<tick_t>(maxLength, note->endPos());
+			}
+		}
+	}
+
+	m_exactLength = maxLength;
+	changeLength(TimePos{maxLength}.nextFullBar() * TimePos::ticksPerBar());
 	updatePatternTrack();
-}
-
-
-
-
-TimePos MidiClip::beatClipLength() const
-{
-	tick_t max_length = TimePos::ticksPerBar();
-
-	for (const auto& note : m_notes)
-	{
-		if (note->length() < 0)
-		{
-			max_length = std::max<tick_t>(max_length, note->pos() + 1);
-		}
-	}
-
-	if( m_steps != TimePos::stepsPerBar() )
-	{
-		max_length = m_steps * TimePos::ticksPerBar() /
-						TimePos::stepsPerBar();
-	}
-
-	return TimePos( max_length ).nextFullBar() * TimePos::ticksPerBar();
 }
 
 

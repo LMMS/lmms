@@ -38,6 +38,7 @@
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QToolTip>
+#include <QGraphicsView>
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -158,6 +159,9 @@ AutomationEditor::AutomationEditor() :
 			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
 
 	// init scrollbars
+	m_cornerSquare = new QGraphicsView{this};
+	m_cornerSquare->setSceneRect(0, 0, SCROLLBAR_SIZE, SCROLLBAR_SIZE);
+
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
 	m_leftRightScroll->setSingleStep( 1 );
 	connect( m_leftRightScroll, SIGNAL(valueChanged(int)), this,
@@ -226,6 +230,7 @@ void AutomationEditor::setCurrentClip(AutomationClip * new_clip )
 	if (m_clip != nullptr)
 	{
 		connect(m_clip, SIGNAL(dataChanged()), this, SLOT(update()));
+		connect(m_clip, &AutomationClip::lengthChanged, this, &AutomationEditor::updateLeftRightScrollRange);
 	}
 
 	emit currentClipChanged();
@@ -1379,16 +1384,6 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 					"the context menu of a control!" ) );
 	}
 
-	// TODO: Get this out of paint event
-	int l = validClip() ? (int) m_clip->length() : 0;
-
-	// reset scroll-range
-	if( m_leftRightScroll->maximum() != l )
-	{
-		m_leftRightScroll->setRange( 0, l );
-		m_leftRightScroll->setPageStep( l );
-	}
-
 	if(validClip() && GuiApplication::instance()->automationEditor()->m_editor->hasFocus())
 	{
 		drawCross( p );
@@ -1528,13 +1523,20 @@ void AutomationEditor::centerTopBottomScroll()
 // responsible for moving/resizing scrollbars after window-resizing
 void AutomationEditor::resizeEvent(QResizeEvent * re)
 {
-	m_leftRightScroll->setGeometry( VALUES_WIDTH, height() - SCROLLBAR_SIZE,
-							width() - VALUES_WIDTH,
-							SCROLLBAR_SIZE );
+	m_leftRightScroll->setGeometry(
+		VALUES_WIDTH,
+		height() - SCROLLBAR_SIZE,
+		width() - VALUES_WIDTH - SCROLLBAR_SIZE,
+		SCROLLBAR_SIZE
+	);
 
 	int grid_height = height() - TOP_MARGIN - SCROLLBAR_SIZE;
-	m_topBottomScroll->setGeometry( width() - SCROLLBAR_SIZE, TOP_MARGIN,
-						SCROLLBAR_SIZE, grid_height );
+	m_topBottomScroll->setGeometry(
+		width() - SCROLLBAR_SIZE,
+		TOP_MARGIN,
+		SCROLLBAR_SIZE,
+		grid_height
+	);
 
 	int half_grid = grid_height / 2;
 	int total_pixels = (int)( ( m_maxLevel - m_minLevel ) * m_y_delta + 1 );
@@ -1552,6 +1554,8 @@ void AutomationEditor::resizeEvent(QResizeEvent * re)
 							(int) m_scrollLevel );
 	}
 	centerTopBottomScroll();
+
+	m_cornerSquare->move(width() - SCROLLBAR_SIZE - 1, height() - SCROLLBAR_SIZE - 1);
 
 	if( Engine::getSong() )
 	{
@@ -1872,6 +1876,17 @@ void AutomationEditor::setQuantization()
 }
 
 
+
+
+void AutomationEditor::updateLeftRightScrollRange()
+{
+	const int length = validClip() ? static_cast<int>(m_clip->length()) : 0;
+	if (m_leftRightScroll->maximum() != length)
+	{
+		m_leftRightScroll->setRange(0, length);
+		m_leftRightScroll->setPageStep(length);
+	}
+}
 
 
 void AutomationEditor::updateTopBottomLevels()

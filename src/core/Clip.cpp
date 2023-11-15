@@ -111,9 +111,9 @@ void Clip::movePosition( const TimePos & pos )
  *  If the clip's length has changed, update it.  We
  *  also add a journal entry for undo and update the display.
  *
- * \param _length The new length of the clip.
+ * \param length The new length of the clip in ticks.
  */
-void Clip::changeLength( const TimePos & length )
+void Clip::changeLength(TimePos length)
 {
 	m_length = length;
 	Engine::getSong()->updateLength();

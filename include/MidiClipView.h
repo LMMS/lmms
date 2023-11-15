@@ -68,7 +68,7 @@ public slots:
 
 
 protected slots:
-	void openInPianoRoll();
+	void openInPianoRoll(double scrollX = 0.0);
 	void setGhostInPianoRoll();
 
 	void resetName();
@@ -85,6 +85,9 @@ protected:
 
 
 private:
+	//! Width in pixels of the area where notes are drawn over the clip
+	float noteAreaWidth() const;
+
 	static QPixmap * s_stepBtnOn0;
 	static QPixmap * s_stepBtnOn200;
 	static QPixmap * s_stepBtnOff;

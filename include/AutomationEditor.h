@@ -40,6 +40,7 @@
 class QPainter;
 class QPixmap;
 class QScrollBar;
+class QGraphicsView;
 
 namespace lmms
 {
@@ -159,6 +160,8 @@ protected slots:
 	/// Updates the clip's quantization using the current user selected value.
 	void setQuantization();
 
+	void updateLeftRightScrollRange();
+
 private:
 
 	enum class Action
@@ -214,8 +217,9 @@ private:
 	void centerTopBottomScroll();
 	void updateTopBottomLevels();
 
-	QScrollBar * m_leftRightScroll;
-	QScrollBar * m_topBottomScroll;
+	QScrollBar* m_leftRightScroll;
+	QScrollBar* m_topBottomScroll;
+	QGraphicsView* m_cornerSquare;
 
 	TimePos m_currentPosition;
 

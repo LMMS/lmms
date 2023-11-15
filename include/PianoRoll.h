@@ -47,6 +47,7 @@ class QScrollBar;
 class QString;
 class QMenu;
 class QToolButton;
+class QGraphicsView;
 
 namespace lmms
 {
@@ -125,6 +126,7 @@ public:
 	void setGhostMidiClip( MidiClip* newMidiClip );
 	void loadGhostNotes( const QDomElement & de );
 	void loadMarkedSemiTones(const QDomElement & de);
+	void setScrollbarPos(double posX); //!< posX is in range [0, 1]
 
 	inline void stopRecording()
 	{
@@ -200,6 +202,7 @@ protected:
 	// for entering values with dblclick in the vol/pan bars
 	void enterValue( NoteVector* nv );
 
+	void updateXScroll();
 	void updateYScroll();
 
 protected slots:
@@ -248,7 +251,6 @@ protected slots:
 	void constrainNoteLengths(bool constrainMax);
 
 	void changeSnapMode();
-
 
 signals:
 	void currentMidiClipChanged();
@@ -372,6 +374,7 @@ private:
 
 	QScrollBar * m_leftRightScroll;
 	QScrollBar * m_topBottomScroll;
+	QGraphicsView* m_cornerSquare;
 
 	TimePos m_currentPosition;
 	bool m_recording;
@@ -539,6 +542,8 @@ public:
 
 	QSize sizeHint() const override;
 	bool hasFocus() const;
+
+	void setScrollbarPos(double posX); //!< posX is in range [0, 1]
 
 signals:
 	void currentMidiClipChanged();

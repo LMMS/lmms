@@ -107,9 +107,10 @@ void MidiClipView::update()
 
 
 
-void MidiClipView::openInPianoRoll()
+void MidiClipView::openInPianoRoll(double scrollX)
 {
-	getGUI()->pianoRoll()->setCurrentMidiClip( m_clip );
+	getGUI()->pianoRoll()->setCurrentMidiClip(m_clip);
+	getGUI()->pianoRoll()->setScrollbarPos(scrollX);
 	getGUI()->pianoRoll()->parentWidget()->show();
 	getGUI()->pianoRoll()->show();
 	getGUI()->pianoRoll()->setFocus();
@@ -313,7 +314,9 @@ void MidiClipView::mouseDoubleClickEvent(QMouseEvent *_me)
 	}
 	if( m_clip->m_clipType == MidiClip::Type::MelodyClip || !fixedClips() )
 	{
-		openInPianoRoll();
+		// Local X position of mouse over clip's note drawing area, normalized to range of [0, 1]
+		const auto scrollX = std::min(_me->localPos().x() / noteAreaWidth(), 1.0);
+		openInPianoRoll(scrollX);
 	}
 }
 
@@ -372,6 +375,11 @@ void MidiClipView::wheelEvent(QWheelEvent * we)
 	}
 }
 
+
+float MidiClipView::noteAreaWidth() const
+{
+	return fixedClips() ? parentWidget()->width() - 2 * BORDER_WIDTH : width() - BORDER_WIDTH;
+}
 
 static int computeNoteRange(int minKey, int maxKey)
 {
@@ -447,9 +455,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	}
 
 	// Compute pixels per bar
-	const int baseWidth = fixedClips() ? parentWidget()->width() - 2 * BORDER_WIDTH
-						: width() - BORDER_WIDTH;
-	const float pixelsPerBar = baseWidth / (float) m_clip->length().getBar();
+	const float pixelsPerBar = noteAreaWidth() / static_cast<float>(m_clip->length().getBar());
 
 	// Length of one bar/beat in the [0,1] x [0,1] coordinate system
 	const float barLength = 1. / m_clip->length().getBar();

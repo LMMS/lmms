@@ -73,7 +73,7 @@ public:
 		return m_track;
 	}
 
-	inline TrackContainerView* trackContainerView()
+	inline TrackContainerView* trackContainerView() const
 	{
 		return m_trackContainerView;
 	}
