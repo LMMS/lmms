@@ -184,7 +184,6 @@ void FileBrowser::buildSearchTree()
 {
 	const auto matches = FileBrowserSearcher::requestSearchBatch(m_searchID);
 	if (!matches) { return; }
-	if (FileBrowserSearcher::completed(m_searchID)) { m_runningSearch = false; }
 
 	for (const auto& match : *matches)
 	{
@@ -196,7 +195,7 @@ void FileBrowser::buildSearchTree()
 			break;
 		}
 
-		if (basePath.isEmpty()) { return; }
+		if (basePath.isEmpty()) { continue; }
 
 		const auto baseDir = QDir{basePath};
 		const auto matchInfo = QFileInfo{match};
@@ -243,9 +242,11 @@ void FileBrowser::buildSearchTree()
 			}
 
 			currentItem = childItem;
-			if (!currentDir.cd(pathPart)) { return; }
+			if (!currentDir.cd(pathPart)) { continue; }
 		}
 	}
+
+	if (FileBrowserSearcher::completed(m_searchID)) { m_runningSearch = false; }
 }
 
 	
@@ -258,9 +259,11 @@ void FileBrowser::onSearch(const QString& filter)
 		return;
 	}
 
+	m_searchTreeWidget->clear();
+	toggleSearch(true);
+
 	const auto extensions = m_filter.remove("*.").split(' ');
 	FileBrowserSearcher::search(m_directories.split('*'), filter, m_searchID, extensions);
-	toggleSearch(true);
 }
 
 void FileBrowser::toggleSearch(bool on)
