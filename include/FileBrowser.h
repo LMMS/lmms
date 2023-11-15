@@ -28,6 +28,7 @@
 #include <QCheckBox>
 #include <QDir>
 #include <QMutex>
+#include <optional>
 
 #ifdef __MINGW32__
 #include <mingw.condition_variable.h>
@@ -76,14 +77,14 @@ public:
 		@param recurse *to be documented*
 	*/
 	FileBrowser( const QString & directories, const QString & filter,
-			const QString& id, const QString & title, const QPixmap & pm,
+			const QString& searchID, const QString & title, const QPixmap & pm,
 			QWidget * parent, bool dirs_as_items = false, bool recurse = false,
 			const QString& userDir = "",
 			const QString& factoryDir = "");
 
 	~FileBrowser() override = default;
 
-	static QDir::Filters dirFilters();
+	static QDir::Filters dirFilters() { return QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot; }
 
 private slots:
 	void reloadTree();
@@ -99,7 +100,7 @@ private:
 	void saveDirectoriesStates();
 	void restoreDirectoriesStates();
 
-	void buildSearchTree(QStringList matches, QString id);
+	void buildSearchTree();
 	void onSearch(const QString& filter);
 	void toggleSearch(bool on);
 
@@ -108,12 +109,13 @@ private:
 
 	QLineEdit * m_filterEdit;
 
-	QString m_id;
+	QString m_searchID;
 	QString m_directories; //!< Directories to search, split with '*'
 	QString m_filter; //!< Filter as used in QDir::match()
 
 	bool m_dirsAsItems;
 	bool m_recurse;
+	bool m_runningSearch = false;
 
 	void addContentCheckBox();
 	QCheckBox* m_showUserContent = nullptr;
@@ -184,43 +186,51 @@ private slots:
 
 } ;
 
-class FileBrowserSearcher : public QObject
+class FileBrowserSearcher
 {
-	Q_OBJECT
 public:
-	FileBrowserSearcher();
-	~FileBrowserSearcher() noexcept override;
+	static constexpr int s_millisecondsPerBatch = 1000;
 
-	void search(const QString& filter, const QStringList& paths, const QString& id,
-		const QStringList& fileExtensions = QStringList());
+	//! Stop the searcher thread
+	static void stop() noexcept;
 
-	void cancel();
+	//! Enqueue a search task to be ran by the searcher
+	static void search(const QStringList& paths, const QString& filter, const QString& id, const QStringList& fileExtensions = QStringList());
+	
+	//! Cancel the ongoing task, if any
+	static void cancel();
 
-	static FileBrowserSearcher* instance() { return s_instance.get(); }
+	//! Retrieve an available batch if there is any. If the currently running task does not have this id, no
+	//! batch will be returned.
+	static std::optional<QStringList> requestSearchBatch(const QString& id);
 
-signals:
-	void searchBatchComplete(QStringList matches, QString id);
+	//! The search operation is considered complete for an id when it is not the current task and no batches are found
+	//! for it
+	static bool completed(const QString& id) { return s_currentTask.id != id && s_batchQueue.empty(); }
 
 private:
 	struct Task
 	{
-		QString id;
-		QString filter;
 		QStringList paths;
+		QString filter;
+		QString id;
 		QStringList fileExtensions;
 	};
 
-	void run();
+	static void run();
+	static void process();
+	static void moveToBatchQueue(QStringList& matches);
 
-	Task m_currentTask;
-	bool m_run, m_cancel, m_stopped = false;
-	std::mutex m_runMutex, m_cancelMutex;
-	std::condition_variable m_runCond;
-	std::thread m_worker;
-	inline static int s_batchSize = 1024;
-	inline static std::unique_ptr<FileBrowserSearcher> s_instance = std::make_unique<FileBrowserSearcher>();
+	inline static Task s_currentTask;
+	inline static std::list<QStringList> s_batchQueue;
+
+	inline static bool s_run, s_cancel, s_stopped = false;
+	inline static std::mutex s_runMutex, s_cancelMutex, s_batchMutex;
+	inline static std::condition_variable s_runCond;
+	inline static std::thread s_worker{[] { run(); }};
+
+	inline static constexpr int s_batchSize = 2048;
 };
-
 
 
 

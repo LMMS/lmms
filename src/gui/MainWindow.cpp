@@ -248,6 +248,7 @@ MainWindow::~MainWindow()
 	delete getGUI()->songEditor();
 	// destroy engine which will do further cleanups etc.
 	Engine::destroy();
+	FileBrowserSearcher::stop();
 }
 
 
