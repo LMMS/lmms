@@ -262,8 +262,9 @@ void FileBrowser::onSearch(const QString& filter)
 	m_searchTreeWidget->clear();
 	toggleSearch(true);
 
-	const auto extensions = m_filter.remove("*.").split(' ');
-	FileBrowserSearcher::search(m_directories.split('*'), filter, m_searchID, extensions);
+	auto browserExtensions = m_filter;
+	const auto searchExtensions = browserExtensions.remove("*.").split(' ');
+	FileBrowserSearcher::search(m_directories.split('*'), filter, m_searchID, searchExtensions);
 }
 
 void FileBrowser::toggleSearch(bool on)
