@@ -38,6 +38,7 @@
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QToolTip>
+#include <QGraphicsView>
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -158,6 +159,9 @@ AutomationEditor::AutomationEditor() :
 			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
 
 	// init scrollbars
+	m_cornerSquare = new QGraphicsView{this};
+	m_cornerSquare->setSceneRect(0, 0, SCROLLBAR_SIZE, SCROLLBAR_SIZE);
+
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
 	m_leftRightScroll->setSingleStep( 1 );
 	connect( m_leftRightScroll, SIGNAL(valueChanged(int)), this,
@@ -1519,13 +1523,20 @@ void AutomationEditor::centerTopBottomScroll()
 // responsible for moving/resizing scrollbars after window-resizing
 void AutomationEditor::resizeEvent(QResizeEvent * re)
 {
-	m_leftRightScroll->setGeometry( VALUES_WIDTH, height() - SCROLLBAR_SIZE,
-							width() - VALUES_WIDTH,
-							SCROLLBAR_SIZE );
+	m_leftRightScroll->setGeometry(
+		VALUES_WIDTH,
+		height() - SCROLLBAR_SIZE,
+		width() - VALUES_WIDTH - SCROLLBAR_SIZE,
+		SCROLLBAR_SIZE
+	);
 
 	int grid_height = height() - TOP_MARGIN - SCROLLBAR_SIZE;
-	m_topBottomScroll->setGeometry( width() - SCROLLBAR_SIZE, TOP_MARGIN,
-						SCROLLBAR_SIZE, grid_height );
+	m_topBottomScroll->setGeometry(
+		width() - SCROLLBAR_SIZE,
+		TOP_MARGIN,
+		SCROLLBAR_SIZE,
+		grid_height
+	);
 
 	int half_grid = grid_height / 2;
 	int total_pixels = (int)( ( m_maxLevel - m_minLevel ) * m_y_delta + 1 );
@@ -1543,6 +1554,8 @@ void AutomationEditor::resizeEvent(QResizeEvent * re)
 							(int) m_scrollLevel );
 	}
 	centerTopBottomScroll();
+
+	m_cornerSquare->move(width() - SCROLLBAR_SIZE - 1, height() - SCROLLBAR_SIZE - 1);
 
 	if( Engine::getSong() )
 	{

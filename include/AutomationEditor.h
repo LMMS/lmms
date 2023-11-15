@@ -40,6 +40,7 @@
 class QPainter;
 class QPixmap;
 class QScrollBar;
+class QGraphicsView;
 
 namespace lmms
 {
@@ -216,8 +217,9 @@ private:
 	void centerTopBottomScroll();
 	void updateTopBottomLevels();
 
-	QScrollBar * m_leftRightScroll;
-	QScrollBar * m_topBottomScroll;
+	QScrollBar* m_leftRightScroll;
+	QScrollBar* m_topBottomScroll;
+	QGraphicsView* m_cornerSquare;
 
 	TimePos m_currentPosition;
 
