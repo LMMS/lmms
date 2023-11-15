@@ -237,8 +237,7 @@ private:
 class Directory : public QTreeWidgetItem
 {
 public:
-	Directory( const QString & filename, const QString & path,
-						const QString & filter );
+	Directory(const QString& filename, const QString& path, const QString& filter, bool updateOnExpand = true);
 
 	void update();
 
@@ -260,6 +259,8 @@ public:
 	{
 		m_directories.push_back( dir );
 	}
+
+	bool updateOnExpand() { return m_updateOnExpand; }
 
 
 private:
@@ -283,7 +284,7 @@ private:
 	QString m_filter;
 
 	int m_dirCount;
-
+	bool m_updateOnExpand = true;
 } ;
 
 

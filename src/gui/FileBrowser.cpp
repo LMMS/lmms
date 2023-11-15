@@ -218,7 +218,6 @@ void FileBrowser::buildSearchTree()
 				if (item->text(0) == pathPart)
 				{
 					childItem = item;
-					if (pathParts.indexOf(pathPart) < pathParts.size() - 1) { m_searchTreeWidget->expandItem(childItem); }
 					break;
 				}
 
@@ -231,7 +230,11 @@ void FileBrowser::buildSearchTree()
 
 				if (pathPartInfo.isDir())
 				{
-					auto dirItem = new Directory(pathPart, currentDir.path(), m_filter);
+					// Only update directory (i.e., add entries) when it is the matched directory (so do not update
+					// parents since entries would be added to them that did not match the filter)
+					const auto updateOnExpand = pathParts.indexOf(pathPart) == pathParts.size() - 1;
+
+					auto dirItem = new Directory(pathPart, currentDir.path(), m_filter, updateOnExpand);
 					dirItem->update();
 					item = dirItem;
 				}
@@ -239,6 +242,7 @@ void FileBrowser::buildSearchTree()
 
 				currentItem ? currentItem->addChild(item) : m_searchTreeWidget->addTopLevelItem(item);
 				childItem = item;
+				if (pathParts.indexOf(pathPart) < pathParts.size() - 1) { m_searchTreeWidget->expandItem(childItem); }
 			}
 
 			currentItem = childItem;
@@ -1069,7 +1073,7 @@ void FileBrowserTreeWidget::updateDirectory(QTreeWidgetItem * item )
 	auto dir = dynamic_cast<Directory*>(item);
 	if( dir != nullptr )
 	{
-		dir->update();
+		if (dir->updateOnExpand()) { dir->update(); }
 	}
 }
 
@@ -1180,13 +1184,12 @@ QPixmap * Directory::s_folderPixmap = nullptr;
 QPixmap * Directory::s_folderOpenedPixmap = nullptr;
 QPixmap * Directory::s_folderLockedPixmap = nullptr;
 
-
-Directory::Directory(const QString & filename, const QString & path,
-						const QString & filter ) :
-	QTreeWidgetItem( QStringList( filename ), TypeDirectoryItem ),
-	m_directories( path ),
-	m_filter( filter ),
-	m_dirCount( 0 )
+Directory::Directory(const QString& filename, const QString& path, const QString& filter, bool updateOnExpand)
+	: QTreeWidgetItem(QStringList(filename), TypeDirectoryItem)
+	, m_directories(path)
+	, m_filter(filter)
+	, m_dirCount(0)
+	, m_updateOnExpand(updateOnExpand)
 {
 	initPixmaps();
 
