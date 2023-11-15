@@ -185,6 +185,7 @@ void FileBrowser::buildSearchTree()
 	const auto matches = FileBrowserSearcher::requestSearchBatch(m_searchID);
 	if (!matches) { return; }
 	// TODO ...
+	if (FileBrowserSearcher::completed(m_searchID)) { m_runningSearch = false; }
 }
 
 	
@@ -1010,9 +1011,7 @@ void FileBrowserTreeWidget::updateDirectory(QTreeWidgetItem * item )
 
 void FileBrowserSearcher::stop() noexcept
 {
-	const auto cancelLock = std::lock_guard{s_cancelMutex};
-	s_cancel = true;
-
+	cancel();
 	{
 		const auto runLock = std::lock_guard{s_runMutex};
 		s_stopped = true;
@@ -1026,12 +1025,11 @@ void FileBrowserSearcher::stop() noexcept
 void FileBrowserSearcher::search(
 	const QStringList& paths, const QString& filter, const QString& id, const QStringList& fileExtensions)
 {
-	const auto cancelLock = std::lock_guard{s_cancelMutex};
-	s_cancel = true;
-
+	cancel();
 	{
 		const auto runLock = std::lock_guard{s_runMutex};
 		s_currentTask = Task{paths, filter, id, fileExtensions};
+		s_batchQueue.clear();
 		s_run = true;
 		s_cancel = false;
 	}
@@ -1086,6 +1084,7 @@ void FileBrowserSearcher::process()
 		const auto path = bfsQueue.front();
 		bfsQueue.pop();
 
+		dir.setPath(path);
 		for (const auto& entry : dir.entryInfoList(FileBrowser::dirFilters()))
 		{
 			const auto absoluteFilePath = entry.absoluteFilePath();
