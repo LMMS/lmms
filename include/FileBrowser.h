@@ -189,7 +189,7 @@ private slots:
 class FileBrowserSearcher
 {
 public:
-	static constexpr int s_millisecondsPerBatch = 1000;
+	static constexpr int s_millisecondsPerBatch = 100;
 
 	//! Stop the searcher thread
 	static void stop() noexcept;
@@ -229,7 +229,7 @@ private:
 	inline static std::condition_variable s_runCond;
 	inline static std::thread s_worker{[] { run(); }};
 
-	inline static constexpr int s_batchSize = 2048;
+	inline static constexpr int s_batchSize = 512;
 };
 
 
