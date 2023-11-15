@@ -1148,9 +1148,9 @@ void FileBrowserSearcher::process()
 		for (const auto& entry : dir.entryInfoList(FileBrowser::dirFilters()))
 		{
 			const auto absoluteFilePath = entry.absoluteFilePath();
-			const auto baseName = entry.baseName();
+			const auto name = entry.fileName();
 			const auto validFile = entry.isFile() && fileExtensions.contains(entry.suffix());
-			const auto passesFilter = baseName.contains(filter, Qt::CaseInsensitive);
+			const auto passesFilter = name.contains(filter, Qt::CaseInsensitive);
 
 			if ((validFile || entry.isDir()) && passesFilter) { matches.push_back(absoluteFilePath); }
 			if (entry.isDir() && !passesFilter) { bfsQueue.push(absoluteFilePath); }
