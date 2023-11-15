@@ -184,8 +184,68 @@ void FileBrowser::buildSearchTree()
 {
 	const auto matches = FileBrowserSearcher::requestSearchBatch(m_searchID);
 	if (!matches) { return; }
-	// TODO ...
 	if (FileBrowserSearcher::completed(m_searchID)) { m_runningSearch = false; }
+
+	for (const auto& match : *matches)
+	{
+		auto basePath = QString{};
+		for (const auto& path : m_directories.split('*'))
+		{
+			if (!match.startsWith(QDir{path}.absolutePath())) { continue; }
+			basePath = path;
+			break;
+		}
+
+		if (basePath.isEmpty()) { return; }
+
+		const auto baseDir = QDir{basePath};
+		const auto matchInfo = QFileInfo{match};
+		const auto matchRelativeToBasePath = baseDir.relativeFilePath(match);
+
+		auto pathParts = QDir::cleanPath(matchRelativeToBasePath).split("/");
+		if (!pathParts.isEmpty() && pathParts[0].isEmpty()) { pathParts[0] = "/"; }
+
+		auto currentItem = static_cast<QTreeWidgetItem*>(nullptr);
+		auto currentDir = baseDir;
+
+		for (const auto& pathPart : pathParts)
+		{
+			auto childCount = currentItem ? currentItem->childCount() : m_searchTreeWidget->topLevelItemCount();
+			auto childItem = static_cast<QTreeWidgetItem*>(nullptr);
+
+			for (int i = 0; i < childCount; ++i)
+			{
+				auto item = currentItem ? currentItem->child(i) : m_searchTreeWidget->topLevelItem(i);
+				if (item->text(0) == pathPart)
+				{
+					childItem = item;
+					if (pathParts.indexOf(pathPart) < pathParts.size() - 1) { m_searchTreeWidget->expandItem(childItem); }
+					break;
+				}
+
+			}
+
+			if (!childItem)
+			{
+				auto pathPartInfo = QFileInfo(currentDir, pathPart);
+				auto item = static_cast<QTreeWidgetItem*>(nullptr);
+
+				if (pathPartInfo.isDir())
+				{
+					auto dirItem = new Directory(pathPart, currentDir.path(), m_filter);
+					dirItem->update();
+					item = dirItem;
+				}
+				else { item = new FileItem(pathPart, currentDir.path()); }
+
+				currentItem ? currentItem->addChild(item) : m_searchTreeWidget->addTopLevelItem(item);
+				childItem = item;
+			}
+
+			currentItem = childItem;
+			if (!currentDir.cd(pathPart)) { return; }
+		}
+	}
 }
 
 	
