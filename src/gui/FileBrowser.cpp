@@ -187,7 +187,8 @@ void FileBrowser::buildSearchTree()
 	const auto matches = m_currentSearch->batch();
 
 	using State = FileBrowserSearcher::SearchFuture::State;
-	if (m_currentSearch->state() == State::Completed && matches.empty())
+	if ((m_currentSearch->state() == State::Completed && matches.empty())
+		|| m_currentSearch->state() == State::Cancelled)
 	{
 		m_currentSearch = nullptr;
 		m_searchIndicator->setMaximum(100);
