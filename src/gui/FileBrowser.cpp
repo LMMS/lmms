@@ -270,12 +270,14 @@ void FileBrowser::onSearch(const QString& filter)
 		return;
 	}
 
-	m_searchTreeWidget->clear();
-	toggleSearch(true);
 
 	auto directories = m_directories.split('*');
 	if (m_showUserContent && !m_showUserContent->isChecked()) { directories.removeAll(m_userDir); }
 	if (m_showFactoryContent && !m_showFactoryContent->isChecked()) { directories.removeAll(m_factoryDir); }
+	if (directories.isEmpty()) { return; }
+
+	m_searchTreeWidget->clear();
+	toggleSearch(true);
 
 	auto browserExtensions = m_filter;
 	const auto searchExtensions = browserExtensions.remove("*.").split(' ');
