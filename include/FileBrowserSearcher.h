@@ -28,7 +28,6 @@
 #include <QHash>
 #include <QString>
 #include <QStringList>
-#include <QUuid>
 #include <optional>
 #include <queue>
 
