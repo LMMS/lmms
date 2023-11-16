@@ -183,9 +183,10 @@ private slots:
 class Directory : public QTreeWidgetItem
 {
 public:
-	Directory(const QString& filename, const QString& path, const QString& filter, bool updateOnExpand = true);
+	Directory(const QString& filename, const QString& path, const QString& filter);
 
 	void update();
+	void updatePixmaps();
 
 	inline QString fullName( QString path = QString() )
 	{
@@ -205,8 +206,6 @@ public:
 	{
 		m_directories.push_back( dir );
 	}
-
-	bool updateOnExpand() { return m_updateOnExpand; }
 
 
 private:
@@ -230,7 +229,6 @@ private:
 	QString m_filter;
 
 	int m_dirCount;
-	bool m_updateOnExpand = true;
 } ;
 
 
