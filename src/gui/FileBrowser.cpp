@@ -243,7 +243,7 @@ void FileBrowser::buildSearchTree()
 					auto item = new Directory(pathPart, currentDir.path(), m_filter, disablePopulation);
 					currentItem ? currentItem->addChild(item) : m_searchTreeWidget->addTopLevelItem(item);
 					item->update();
-					m_searchTreeWidget->expandItem(item);
+					if (disablePopulation) { m_searchTreeWidget->expandItem(item); }
 					childItem = item;
 				}
 				else
