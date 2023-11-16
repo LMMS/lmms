@@ -28,6 +28,8 @@
 #include <QMenu>
 #include <QPainter>
 
+#include "GuiApplication.h"
+#include "AutomationEditor.h"
 #include "embed.h"
 #include "PathUtil.h"
 #include "SampleBuffer.h"
@@ -83,6 +85,12 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 		SLOT(reverseSample())
 	);
 
+	cm->addAction(
+		embed::getIconPixmap("automation_ghost_note"),
+		tr("Set as ghost in automation editor"),
+		this,
+		SLOT(setAutomationGhost())
+	);
 
 }
 
@@ -325,6 +333,14 @@ void SampleClipView::reverseSample()
 
 
 
+void SampleClipView::setAutomationGhost()
+{
+	auto aEditor = gui::getGUI()->automationEditor();
+	aEditor->setGhostSample(m_clip);
+	aEditor->parentWidget()->show();
+	aEditor->show();
+	aEditor->setFocus();
+}
 
 //! Split this Clip.
 /*! \param pos the position of the split, relative to the start of the clip */

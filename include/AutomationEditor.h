@@ -35,6 +35,7 @@
 #include "Editor.h"
 #include "JournallingObject.h"
 #include "MidiClip.h"
+#include "SampleClip.h"
 #include "TimePos.h"
 #include "lmms_basics.h"
 
@@ -71,9 +72,11 @@ class AutomationEditor : public QWidget, public JournallingObject
 	Q_PROPERTY(QColor backgroundShade MEMBER m_backgroundShade)
 	Q_PROPERTY(QColor ghostNoteColor MEMBER m_ghostNoteColor)
 	Q_PROPERTY(QColor detuningNoteColor MEMBER m_detuningNoteColor)
+	Q_PROPERTY(QColor ghostSampleColor MEMBER m_ghostSampleColor)
 public:
 	void setCurrentClip(AutomationClip * new_clip);
 	void setGhostMidiClip(MidiClip* newMidiClip);
+	void setGhostSample(SampleClip* newSample);
 
 	inline const AutomationClip * currentClip() const
 	{
@@ -166,6 +169,7 @@ protected slots:
 	void resetGhostNotes()
 	{
 		m_ghostNotes = nullptr;
+		m_ghostSample = nullptr;
 		update();
 	}
 
@@ -196,6 +200,8 @@ private:
 	static const int NOTE_HEIGHT = 10; // height of individual notes
 	static const int NOTE_MARGIN = 40; // total border margin for notes
 	static const int MIN_NOTE_RANGE = 20; // min number of keys for fixed size
+	static const int SAMPLE_MARGIN = 40;
+	static const int MAX_SAMPLE_HEIGHT = 400;
 
 	AutomationEditor();
 	AutomationEditor( const AutomationEditor & );
@@ -226,6 +232,8 @@ private:
 	float m_topLevel;
 
 	MidiClip* m_ghostNotes = nullptr;
+	QPointer<SampleClip> m_ghostSample = nullptr; // QPointer to set to nullptr on deletion
+	bool m_renderSample = false;
 
 	void centerTopBottomScroll();
 	void updateTopBottomLevels();
@@ -279,6 +287,7 @@ private:
 	QColor m_backgroundShade;
 	QColor m_ghostNoteColor;
 	QColor m_detuningNoteColor;
+	QColor m_ghostSampleColor;
 
 	friend class AutomationEditorWindow;
 
@@ -303,6 +312,7 @@ public:
 
 	void setCurrentClip(AutomationClip* clip);
 	void setGhostMidiClip(MidiClip* clip) { m_editor->setGhostMidiClip(clip); };
+	void setGhostSample(SampleClip* newSample) { m_editor->setGhostSample(newSample); };
 
 	const AutomationClip* currentClip();
 

@@ -38,6 +38,8 @@
 #include <QToolTip>
 #include <cmath>
 
+#include "SampleClip.h"
+
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
 #endif
@@ -45,22 +47,23 @@
 #include "ActionGroup.h"
 #include "AutomationNode.h"
 #include "ComboBox.h"
-#include "debug.h"
 #include "DeprecationHelper.h"
 #include "DetuningHelper.h"
-#include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
 #include "Knob.h"
 #include "MainWindow.h"
 #include "MidiClip.h"
 #include "PatternStore.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
+#include "SampleBuffer.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
+#include "debug.h"
+#include "embed.h"
+#include "gui_templates.h"
 
 
 namespace lmms::gui
@@ -1080,6 +1083,14 @@ void AutomationEditor::setGhostMidiClip(MidiClip* newMidiClip)
 {
 	// Expects a pointer to a MIDI clip or nullptr.
 	m_ghostNotes = newMidiClip;
+	m_renderSample = false;
+}
+
+void AutomationEditor::setGhostSample(SampleClip* newGhostSample)
+{
+	// Expects a pointer to a Sample buffer or nullptr.
+	m_ghostSample = newGhostSample;
+	m_renderSample = true;
 }
 
 void AutomationEditor::paintEvent(QPaintEvent * pe )
@@ -1266,8 +1277,24 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			p.drawLine( x, grid_bottom, x, x_line_end );
 		}
 
+		// draw ghost sample
+		if (m_ghostSample != nullptr && m_ghostSample->sampleBuffer()->frames() > 1 && m_renderSample)
+		{
+			int sampleFrames = m_ghostSample->sampleBuffer()->frames();
+			int length = static_cast<float>(sampleFrames) / Engine::framesPerTick();
+			int editorHeight = grid_bottom - TOP_MARGIN;
+
+			int startPos = xCoordOfTick(0);
+			int sampleWidth = xCoordOfTick(length) - startPos;
+			int sampleHeight = std::min(editorHeight - SAMPLE_MARGIN, MAX_SAMPLE_HEIGHT);
+			int yOffset = (editorHeight - sampleHeight) / 2.0f + TOP_MARGIN;
+
+			p.setPen(m_ghostSampleColor);
+			m_ghostSample->sampleBuffer()->visualize(p, QRect(startPos, yOffset, sampleWidth, sampleHeight), 0, sampleFrames);
+		}
+
 		// draw ghost notes
-		if (m_ghostNotes != nullptr)
+		if (m_ghostNotes != nullptr && !m_renderSample)
 		{
 			const NoteVector& notes = m_ghostNotes->notes();
 			int minKey = 128;

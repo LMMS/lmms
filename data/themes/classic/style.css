@@ -36,6 +36,7 @@ lmms--gui--AutomationEditor {
 	
 	qproperty-ghostNoteColor: rgba(248, 248, 255, 125);
 	qproperty-detuningNoteColor: rgba(248, 11, 11, 125);
+	qproperty-ghostSampleColor: rgba(125, 125, 125, 125);
 }
 
 /* text box */
