@@ -30,6 +30,8 @@
 #include <QMutex>
 
 #include "FileBrowserSearcher.h"
+#include <QProgressBar>
+
 #if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 	#include <QRecursiveMutex>
 #endif
@@ -100,6 +102,7 @@ private:
 	QLineEdit * m_filterEdit;
 
 	std::shared_ptr<FileBrowserSearcher::SearchFuture> m_currentSearch;
+	QProgressBar* m_searchIndicator = nullptr;
 
 	QString m_directories; //!< Directories to search, split with '*'
 	QString m_filter; //!< Filter as used in QDir::match()

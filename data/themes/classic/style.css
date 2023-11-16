@@ -7,6 +7,10 @@ QLabel, QTreeWidget, QListWidget, QGroupBox, QMenuBar {
 	color: #e0e0e0;
 }
 
+QProgressBar::chunk {
+	background-color: #e0e0e0;
+}
+
 QMdiArea {
 	background-image: url("resources:background_artwork.png");
 }

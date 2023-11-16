@@ -131,10 +131,6 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	m_filterEdit->setClearButtonEnabled(true);
 	m_filterEdit->addAction(embed::getIconPixmap("zoom"), QLineEdit::LeadingPosition);
 
-	auto searchTimer = new QTimer(this);
-	connect(searchTimer, &QTimer::timeout, this, &FileBrowser::buildSearchTree);
-
-	searchTimer->start(FileBrowserSearcher::s_millisecondsPerBatch);
 
 	connect(m_filterEdit, &QLineEdit::textEdited, this, &FileBrowser::onSearch);
 
@@ -154,6 +150,15 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	m_searchTreeWidget = new FileBrowserTreeWidget(contentParent());
 	m_searchTreeWidget->hide();
 	addContentWidget(m_searchTreeWidget);
+
+	auto searchTimer = new QTimer(this);
+	connect(searchTimer, &QTimer::timeout, this, &FileBrowser::buildSearchTree);
+	searchTimer->start(FileBrowserSearcher::s_millisecondsPerBatch);
+
+	m_searchIndicator = new QProgressBar(this);
+	m_searchIndicator->setMinimum(0);
+	m_searchIndicator->setMaximum(100);
+	addContentWidget(m_searchIndicator);
 
 	// Whenever the FileBrowser has focus, Ctrl+F should direct focus to its filter box.
 	auto filterFocusShortcut = new QShortcut(QKeySequence(QKeySequence::Find), this, SLOT(giveFocusToFilter()));
@@ -185,6 +190,7 @@ void FileBrowser::buildSearchTree()
 	if (m_currentSearch->state() == State::Completed && matches.empty())
 	{
 		m_currentSearch = nullptr;
+		m_searchIndicator->setMaximum(100);
 		return;
 	}
 
@@ -278,11 +284,13 @@ void FileBrowser::toggleSearch(bool on)
 	{
 		m_searchTreeWidget->show();
 		m_fileBrowserTreeWidget->hide();
+		m_searchIndicator->setMaximum(0);
 		return;
 	}
 	
 	m_searchTreeWidget->hide();
 	m_fileBrowserTreeWidget->show();
+	m_searchIndicator->setMaximum(100);
 }
 
 bool FileBrowser::filterAndExpandItems(const QString & filter, QTreeWidgetItem * item)
