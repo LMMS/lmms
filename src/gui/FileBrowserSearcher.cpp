@@ -52,9 +52,9 @@ auto FileBrowserSearcher::search(const QString& filter, const QStringList& paths
 	{
 		const auto lock = std::lock_guard{m_workerMutex};
 		m_searchQueue.push(future);
+		m_cancelRunningSearch = false;
 	}
 
-	m_cancelRunningSearch = false;
 	m_workerCond.notify_one();
 	return future;
 }
