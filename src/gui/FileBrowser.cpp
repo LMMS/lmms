@@ -212,8 +212,6 @@ void FileBrowser::buildSearchTree()
 		const auto matchRelativeToBasePath = baseDir.relativeFilePath(match);
 
 		auto pathParts = QDir::cleanPath(matchRelativeToBasePath).split("/");
-		if (!pathParts.isEmpty() && pathParts[0].isEmpty()) { pathParts[0] = "/"; }
-
 		auto currentItem = static_cast<QTreeWidgetItem*>(nullptr);
 		auto currentDir = baseDir;
 
@@ -236,27 +234,28 @@ void FileBrowser::buildSearchTree()
 			if (!childItem)
 			{
 				auto pathPartInfo = QFileInfo(currentDir, pathPart);
-				auto item = static_cast<QTreeWidgetItem*>(nullptr);
-
 				if (pathPartInfo.isDir())
 				{
 					// Only update directory (i.e., add entries) when it is the matched directory (so do not update
 					// parents since entries would be added to them that did not match the filter)
-					const auto updateDirectory = pathParts.indexOf(pathPart) == pathParts.size() - 1;
+					const auto disablePopulation = pathParts.indexOf(pathPart) < pathParts.size() - 1;
 
-					auto dirItem = new Directory(pathPart, currentDir.path(), m_filter);
-					updateDirectory ? dirItem->update() : dirItem->updatePixmaps();
-					item = dirItem;
+					auto item = new Directory(pathPart, currentDir.path(), m_filter, disablePopulation);
+					currentItem ? currentItem->addChild(item) : m_searchTreeWidget->addTopLevelItem(item);
+					item->update();
+					m_searchTreeWidget->expandItem(item);
+					childItem = item;
 				}
-				else { item = new FileItem(pathPart, currentDir.path()); }
-
-				currentItem ? currentItem->addChild(item) : m_searchTreeWidget->addTopLevelItem(item);
-				childItem = item;
-				if (pathParts.indexOf(pathPart) < pathParts.size() - 1) { m_searchTreeWidget->expandItem(childItem); }
+				else
+				{
+					auto item = new FileItem(pathPart, currentDir.path());
+					currentItem ? currentItem->addChild(item) : m_searchTreeWidget->addTopLevelItem(item);
+					childItem = item;
+				}
 			}
 
 			currentItem = childItem;
-			if (!currentDir.cd(pathPart)) { continue; }
+			if (!currentDir.cd(pathPart)) { break; }
 		}
 	}
 }
@@ -1011,13 +1010,12 @@ QPixmap * Directory::s_folderPixmap = nullptr;
 QPixmap * Directory::s_folderOpenedPixmap = nullptr;
 QPixmap * Directory::s_folderLockedPixmap = nullptr;
 
-
-Directory::Directory(const QString & filename, const QString & path,
-						const QString & filter ) :
-	QTreeWidgetItem( QStringList( filename ), TypeDirectoryItem ),
-	m_directories( path ),
-	m_filter( filter ),
-	m_dirCount( 0 )
+Directory::Directory(const QString& filename, const QString& path, const QString& filter, bool disableEntryPopulation)
+	: QTreeWidgetItem(QStringList(filename), TypeDirectoryItem)
+	, m_directories(path)
+	, m_filter(filter)
+	, m_dirCount(0)
+	, m_disableEntryPopulation(disableEntryPopulation)
 {
 	initPixmaps();
 
@@ -1069,7 +1067,7 @@ void Directory::update()
 	}
 
 	setIcon( 0, *s_folderOpenedPixmap );
-	if( !childCount() )
+	if (!m_disableEntryPopulation && !childCount())
 	{
 		m_dirCount = 0;
 		// for all paths leading here, add their items
@@ -1095,17 +1093,6 @@ void Directory::update()
 			}
 		}
 	}
-}
-
-void Directory::updatePixmaps()
-{
-	if (!isExpanded())
-	{
-		setIcon(0, *s_folderPixmap);
-		return;
-	}
-
-	setIcon(0, *s_folderOpenedPixmap);
 }
 
 

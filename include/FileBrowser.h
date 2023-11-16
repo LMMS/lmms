@@ -183,10 +183,9 @@ private slots:
 class Directory : public QTreeWidgetItem
 {
 public:
-	Directory(const QString& filename, const QString& path, const QString& filter);
+	Directory(const QString& filename, const QString& path, const QString& filter, bool disableEntryPopulation = false);
 
 	void update();
-	void updatePixmaps();
 
 	inline QString fullName( QString path = QString() )
 	{
@@ -229,6 +228,7 @@ private:
 	QString m_filter;
 
 	int m_dirCount;
+	bool m_disableEntryPopulation = false;
 } ;
 
 
