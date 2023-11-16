@@ -81,7 +81,6 @@ public:
 private slots:
 	void reloadTree();
 	void expandItems( QTreeWidgetItem * item=nullptr, QList<QString> expandedDirs = QList<QString>() );
-	bool filterAndExpandItems(const QString & filter, QTreeWidgetItem * item = nullptr);
 	void giveFocusToFilter();
 
 private:

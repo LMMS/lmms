@@ -293,85 +293,6 @@ void FileBrowser::toggleSearch(bool on)
 	m_searchIndicator->setMaximum(100);
 }
 
-bool FileBrowser::filterAndExpandItems(const QString & filter, QTreeWidgetItem * item)
-{
-	// Call with item = nullptr to filter the entire tree
-
-	if (item == nullptr)
-	{
-		// First search character so need to save current expanded directories
-		if (m_previousFilterValue.isEmpty())
-		{
-			saveDirectoriesStates();
-		}
-
-		m_previousFilterValue = filter;
-	}
-
-	if (filter.isEmpty())
-	{
-		// Restore previous expanded directories
-		if (item == nullptr) 
-		{
-			restoreDirectoriesStates();
-		}
-
-		return false;
-	}
-	
-	bool anyMatched = false;
-
-	int numChildren = item ? item->childCount() : m_fileBrowserTreeWidget->topLevelItemCount();
-
-	for (int i = 0; i < numChildren; ++i)
-	{
-		QTreeWidgetItem * it = item ? item->child( i ) : m_fileBrowserTreeWidget->topLevelItem(i);
-
-		auto d = dynamic_cast<Directory*>(it);	
-		if (d)
-		{
-			if (it->text(0).contains(filter, Qt::CaseInsensitive))
-			{
-				it->setHidden(false);
-				it->setExpanded(true);
-				filterAndExpandItems(QString(), it);
-				anyMatched = true;
-			}
-			else
-			{
-				// Expanding is required when recursive to load in its contents, even if it's collapsed right afterward
-				it->setExpanded(true);
-
-				bool didMatch = filterAndExpandItems(filter, it);
-				it->setHidden(!didMatch);
-				it->setExpanded(didMatch);
-				anyMatched = anyMatched || didMatch;
-			}
-		}
-
-		else
-		{
-			auto f = dynamic_cast<FileItem*>(it);
-			if (f)
-			{
-				// File
-				bool didMatch = it->text(0).contains(filter, Qt::CaseInsensitive);
-				it->setHidden(!didMatch);
-				anyMatched = anyMatched || didMatch;
-			}
-			
-			// A standard item (i.e. no file or directory item?)
-			else
-			{
-				// Hide if there's any filter
-				it->setHidden(!filter.isEmpty());
-			}
-		}
-	}
-
-	return anyMatched;
-}
-
 
 void FileBrowser::reloadTree()
 {
@@ -408,7 +329,7 @@ void FileBrowser::reloadTree()
 	}
 	else
 	{
-		filterAndExpandItems(m_filterEdit->text());
+		onSearch(m_filterEdit->text());
 	}
 }
 
