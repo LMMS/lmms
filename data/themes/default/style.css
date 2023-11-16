@@ -9,6 +9,7 @@ QLabel, QTreeWidget, QListWidget, QGroupBox, QMenuBar, QCheckBox {
 
 QProgressBar::chunk {
 	background-color: #d1d8e4;
+	border-radius: 5px;
 }
 
 QTreeView {
