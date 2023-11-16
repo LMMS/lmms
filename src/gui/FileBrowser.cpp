@@ -42,6 +42,7 @@
 #include <queue>
 
 #include "FileBrowser.h"
+#include "FileBrowserSearcher.h"
 #include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
@@ -62,7 +63,6 @@
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
-
 namespace lmms::gui
 {
 
@@ -100,12 +100,11 @@ void FileBrowser::addContentCheckBox()
 
 
 FileBrowser::FileBrowser(const QString & directories, const QString & filter,
-			const QString& searchID, const QString & title, const QPixmap & pm,
+			const QString & title, const QPixmap & pm,
 			QWidget * parent, bool dirs_as_items, bool recurse,
 			const QString& userDir,
 			const QString& factoryDir):
 	SideBarWidget( title, pm, parent ),
-	m_searchID(searchID),
 	m_directories( directories ),
 	m_filter( filter ),
 	m_dirsAsItems( dirs_as_items ),
@@ -133,11 +132,7 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	m_filterEdit->addAction(embed::getIconPixmap("zoom"), QLineEdit::LeadingPosition);
 
 	auto searchTimer = new QTimer(this);
-	connect(searchTimer, &QTimer::timeout, this, [this]
-	{
-		if (!m_runningSearch) { return; }
-		buildSearchTree();
-	});
+	connect(searchTimer, &QTimer::timeout, this, &FileBrowser::buildSearchTree);
 
 	searchTimer->start(FileBrowserSearcher::s_millisecondsPerBatch);
 
@@ -182,10 +177,18 @@ void FileBrowser::restoreDirectoriesStates()
 
 void FileBrowser::buildSearchTree()
 {
-	const auto matches = FileBrowserSearcher::requestSearchBatch(m_searchID);
-	if (!matches) { return; }
+	if (!m_currentSearch) { return; }
 
-	for (const auto& match : *matches)
+	const auto matches = m_currentSearch->batch();
+
+	using State = FileBrowserSearcher::SearchFuture::State;
+	if (m_currentSearch->state() == State::Completed && matches.empty())
+	{
+		m_currentSearch = nullptr;
+		return;
+	}
+
+	for (const auto& match : matches)
 	{
 		auto basePath = QString{};
 		for (const auto& path : m_directories.split('*'))
@@ -249,8 +252,6 @@ void FileBrowser::buildSearchTree()
 			if (!currentDir.cd(pathPart)) { continue; }
 		}
 	}
-
-	if (FileBrowserSearcher::completed(m_searchID)) { m_runningSearch = false; }
 }
 
 	
@@ -259,7 +260,7 @@ void FileBrowser::onSearch(const QString& filter)
 	if (filter.isEmpty())
 	{
 		toggleSearch(false);
-		FileBrowserSearcher::cancel();
+		FileBrowserSearcher::instance()->cancel();
 		return;
 	}
 
@@ -268,7 +269,7 @@ void FileBrowser::onSearch(const QString& filter)
 
 	auto browserExtensions = m_filter;
 	const auto searchExtensions = browserExtensions.remove("*.").split(' ');
-	FileBrowserSearcher::search(m_directories.split('*'), filter, m_searchID, searchExtensions);
+	m_currentSearch = FileBrowserSearcher::instance()->search(filter, m_directories.split('*'), searchExtensions);
 }
 
 void FileBrowser::toggleSearch(bool on)
@@ -277,13 +278,11 @@ void FileBrowser::toggleSearch(bool on)
 	{
 		m_searchTreeWidget->show();
 		m_fileBrowserTreeWidget->hide();
-		m_runningSearch = true;
 		return;
 	}
 	
 	m_searchTreeWidget->hide();
 	m_fileBrowserTreeWidget->show();
-	m_runningSearch = false;
 }
 
 bool FileBrowser::filterAndExpandItems(const QString & filter, QTreeWidgetItem * item)
@@ -1075,108 +1074,6 @@ void FileBrowserTreeWidget::updateDirectory(QTreeWidgetItem * item )
 	{
 		if (dir->updateOnExpand()) { dir->update(); }
 	}
-}
-
-void FileBrowserSearcher::stop() noexcept
-{
-	cancel();
-	{
-		const auto runLock = std::lock_guard{s_runMutex};
-		s_stopped = true;
-		s_cancel = false;
-	}
-
-	s_runCond.notify_one();
-	s_worker.join();
-}
-
-void FileBrowserSearcher::search(
-	const QStringList& paths, const QString& filter, const QString& id, const QStringList& fileExtensions)
-{
-	cancel();
-	{
-		const auto runLock = std::lock_guard{s_runMutex};
-		s_currentTask = Task{paths, filter, id, fileExtensions};
-		s_batchQueue.clear();
-		s_run = true;
-		s_cancel = false;
-	}
-
-	s_runCond.notify_one();
-}
-
-void FileBrowserSearcher::cancel()
-{
-	const auto cancelLock = std::lock_guard{s_cancelMutex};
-	s_cancel = true;
-}
-
-std::optional<QStringList> FileBrowserSearcher::requestSearchBatch(const QString& id)
-{
-	const auto batchLock = std::lock_guard{s_batchMutex};
-
-	if (s_batchQueue.empty() || s_currentTask.id != id) { return std::nullopt; }
-	const auto batch = s_batchQueue.front();
-	s_batchQueue.pop_front();
-
-	return batch;
-}
-
-void FileBrowserSearcher::run()
-{
-	while (true)
-	{
-		auto runLock = std::unique_lock{s_runMutex};
-		s_runCond.wait(runLock, [] { return s_run || s_stopped; });
-		if (s_stopped) { break; }
-		process();
-		s_run = false;
-	}
-}
-
-void FileBrowserSearcher::process()
-{
-	const auto& [paths, filter, id, fileExtensions] = s_currentTask;
-
-	auto matches = QStringList{};
-	auto bfsQueue = std::queue<QString>{};
-
-	for (const auto& path : paths)
-	{
-		bfsQueue.push(path);
-	}
-
-	auto dir = QDir{};
-	while (!bfsQueue.empty())
-	{
-		const auto path = bfsQueue.front();
-		bfsQueue.pop();
-
-		dir.setPath(path);
-		for (const auto& entry : dir.entryInfoList(FileBrowser::dirFilters()))
-		{
-			const auto absoluteFilePath = entry.absoluteFilePath();
-			const auto name = entry.fileName();
-			const auto validFile = entry.isFile() && fileExtensions.contains(entry.suffix());
-			const auto passesFilter = name.contains(filter, Qt::CaseInsensitive);
-
-			if ((validFile || entry.isDir()) && passesFilter) { matches.push_back(absoluteFilePath); }
-			if (entry.isDir() && !passesFilter) { bfsQueue.push(absoluteFilePath); }
-			if (matches.size() == s_batchSize) { moveToBatchQueue(matches); }
-			
-			const auto cancelLock = std::lock_guard{s_cancelMutex};
-			if (s_cancel) { return; }
-		}
-	}
-
-	if (!matches.empty()) { moveToBatchQueue(matches); }
-}
-
-void FileBrowserSearcher::moveToBatchQueue(QStringList& matches)
-{
-	const auto batchLock = std::lock_guard{s_batchMutex};
-	s_batchQueue.push_back(matches);
-	matches.clear();
 }
 
 

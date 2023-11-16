@@ -110,18 +110,18 @@ MainWindow::MainWindow() :
 	sideBar->appendTab( new PluginBrowser( splitter ) );
 	emit initProgress(tr("Preparing file browsers"));
 	sideBar->appendTab(new FileBrowser(confMgr->userProjectsDir() + "*" + confMgr->factoryProjectsDir(),
-		"*.mmp *.mmpz *.xml *.mid *.mpt", "projects", tr("My Projects"),
+		"*.mmp *.mmpz *.xml *.mid *.mpt", tr("My Projects"),
 		embed::getIconPixmap("project_file").transformed(QTransform().rotate(90)), splitter, false, true,
 		confMgr->userProjectsDir(), confMgr->factoryProjectsDir()));
 	sideBar->appendTab(
 		new FileBrowser(confMgr->userSamplesDir() + "*" + confMgr->factorySamplesDir(), FileItem::defaultFilters(),
-			"samples", tr("My Samples"), embed::getIconPixmap("sample_file").transformed(QTransform().rotate(90)),
+			tr("My Samples"), embed::getIconPixmap("sample_file").transformed(QTransform().rotate(90)),
 			splitter, false, true, confMgr->userSamplesDir(), confMgr->factorySamplesDir()));
 	sideBar->appendTab(
 		new FileBrowser(confMgr->userPresetsDir() + "*" + confMgr->factoryPresetsDir(), "*.xpf *.cs.xml *.xiz *.lv2",
-			"presets", tr("My Presets"), embed::getIconPixmap("preset_file").transformed(QTransform().rotate(90)),
+			tr("My Presets"), embed::getIconPixmap("preset_file").transformed(QTransform().rotate(90)),
 			splitter, false, true, confMgr->userPresetsDir(), confMgr->factoryPresetsDir()));
-	sideBar->appendTab(new FileBrowser(QDir::homePath(), FileItem::defaultFilters(), "home", tr("My Home"),
+	sideBar->appendTab(new FileBrowser(QDir::homePath(), FileItem::defaultFilters(), tr("My Home"),
 		embed::getIconPixmap("home").transformed(QTransform().rotate(90)), splitter, false, false));
 
 	QStringList root_paths;
@@ -144,7 +144,7 @@ MainWindow::MainWindow() :
 	}
 #endif
 
-	sideBar->appendTab(new FileBrowser(root_paths.join("*"), FileItem::defaultFilters(), "root", title,
+	sideBar->appendTab(new FileBrowser(root_paths.join("*"), FileItem::defaultFilters(), title,
 		embed::getIconPixmap("computer").transformed(QTransform().rotate(90)), splitter, dirs_as_items));
 
 	m_workspace = new QMdiArea(splitter);
@@ -248,7 +248,6 @@ MainWindow::~MainWindow()
 	delete getGUI()->songEditor();
 	// destroy engine which will do further cleanups etc.
 	Engine::destroy();
-	FileBrowserSearcher::stop();
 }
 
 

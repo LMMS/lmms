@@ -28,18 +28,8 @@
 #include <QCheckBox>
 #include <QDir>
 #include <QMutex>
-#include <optional>
 
-#ifdef __MINGW32__
-#include <mingw.condition_variable.h>
-#include <mingw.mutex.h>
-#include <mingw.thread.h>
-#else
-#include <condition_variable>
-#include <mutex>
-#include <thread>
-#endif
-
+#include "FileBrowserSearcher.h"
 #if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 	#include <QRecursiveMutex>
 #endif
@@ -77,7 +67,7 @@ public:
 		@param recurse *to be documented*
 	*/
 	FileBrowser( const QString & directories, const QString & filter,
-			const QString& searchID, const QString & title, const QPixmap & pm,
+			const QString & title, const QPixmap & pm,
 			QWidget * parent, bool dirs_as_items = false, bool recurse = false,
 			const QString& userDir = "",
 			const QString& factoryDir = "");
@@ -109,13 +99,13 @@ private:
 
 	QLineEdit * m_filterEdit;
 
-	QString m_searchID;
+	std::shared_ptr<FileBrowserSearcher::SearchFuture> m_currentSearch;
+
 	QString m_directories; //!< Directories to search, split with '*'
 	QString m_filter; //!< Filter as used in QDir::match()
 
 	bool m_dirsAsItems;
 	bool m_recurse;
-	bool m_runningSearch = false;
 
 	void addContentCheckBox();
 	QCheckBox* m_showUserContent = nullptr;
@@ -185,52 +175,6 @@ private slots:
 	void openContainingFolder( lmms::gui::FileItem* item );
 
 } ;
-
-class FileBrowserSearcher
-{
-public:
-	static constexpr int s_millisecondsPerBatch = 100;
-
-	//! Stop the searcher thread
-	static void stop() noexcept;
-
-	//! Enqueue a search task to be ran by the searcher
-	static void search(const QStringList& paths, const QString& filter, const QString& id, const QStringList& fileExtensions = QStringList());
-	
-	//! Cancel the ongoing task, if any
-	static void cancel();
-
-	//! Retrieve an available batch if there is any. If the currently running task does not have this id, no
-	//! batch will be returned.
-	static std::optional<QStringList> requestSearchBatch(const QString& id);
-
-	//! The search operation is considered complete for an id when it is not the current task and no batches are found
-	//! for it
-	static bool completed(const QString& id) { return s_currentTask.id != id && s_batchQueue.empty(); }
-
-private:
-	struct Task
-	{
-		QStringList paths;
-		QString filter;
-		QString id;
-		QStringList fileExtensions;
-	};
-
-	static void run();
-	static void process();
-	static void moveToBatchQueue(QStringList& matches);
-
-	inline static Task s_currentTask;
-	inline static std::list<QStringList> s_batchQueue;
-
-	inline static bool s_run, s_cancel, s_stopped = false;
-	inline static std::mutex s_runMutex, s_cancelMutex, s_batchMutex;
-	inline static std::condition_variable s_runCond;
-	inline static std::thread s_worker{[] { run(); }};
-
-	inline static constexpr int s_batchSize = 512;
-};
 
 
 
