@@ -77,6 +77,7 @@ public:
 	~FileBrowser() override = default;
 
 	static QDir::Filters dirFilters() { return QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot; }
+	static QDir::SortFlags sortFlags() { return QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase; }
 
 private slots:
 	void reloadTree();

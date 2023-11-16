@@ -92,7 +92,7 @@ auto FileBrowserSearcher::process(std::shared_ptr<SearchFuture> searchFuture) ->
 		queue.pop();
 
 		dir.setPath(path);
-		for (const auto& entry : dir.entryInfoList(FileBrowser::dirFilters()))
+		for (const auto& entry : dir.entryInfoList(FileBrowser::dirFilters(), FileBrowser::sortFlags()))
 		{
 			const auto name = entry.fileName();
 			const auto path = entry.absoluteFilePath();

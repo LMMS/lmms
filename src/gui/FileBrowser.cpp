@@ -1105,10 +1105,8 @@ bool Directory::addItems(const QString& path)
 
 	treeWidget()->setUpdatesEnabled(false);
 
-	QFileInfoList entries = thisDir.entryInfoList(
-			m_filter.split(' '),
-			QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot,
-			QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase);
+	QFileInfoList entries
+		= thisDir.entryInfoList(m_filter.split(' '), FileBrowser::dirFilters(), FileBrowser::sortFlags());
 	for (const auto& entry : entries)
 	{
 		QString fileName = entry.fileName();
