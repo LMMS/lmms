@@ -126,9 +126,9 @@ auto FileBrowserSearcher::pushInBatches(SearchFuture* future, QStringList matche
 	while (!matches.empty())
 	{
 		const auto batchSize = std::min(FileBrowserSearcher::BatchSize, matches.size());
-		const auto batch = QStringList{matches.begin(), matches.begin() + batchSize};
+		const auto batch = QStringList(matches.begin(), matches.begin() + batchSize);
 		future->m_batchQueue.push_front(matches);
-		matches = QStringList{matches.begin() + batchSize, matches.end()};
+		matches = QStringList(matches.begin() + batchSize, matches.end());
 	}
 }
 
