@@ -153,7 +153,7 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 
 	auto searchTimer = new QTimer(this);
 	connect(searchTimer, &QTimer::timeout, this, &FileBrowser::buildSearchTree);
-	searchTimer->start(FileBrowserSearcher::MillisecondsPerBatch);
+	searchTimer->start(FileBrowserSearcher::MillisecondsPerMatch);
 
 	m_searchIndicator = new QProgressBar(this);
 	m_searchIndicator->setMinimum(0);
@@ -184,79 +184,76 @@ void FileBrowser::buildSearchTree()
 {
 	if (!m_currentSearch) { return; }
 
-	const auto matches = m_currentSearch->batch();
-
+	const auto match = m_currentSearch->match();
 	using State = FileBrowserSearcher::SearchFuture::State;
-	if ((m_currentSearch->state() == State::Completed && matches.empty())
+	if ((m_currentSearch->state() == State::Completed && match.isEmpty())
 		|| m_currentSearch->state() == State::Cancelled)
 	{
 		m_currentSearch = nullptr;
 		m_searchIndicator->setMaximum(100);
 		return;
 	}
+	else if (match.isEmpty()) { return; }
 
-	for (const auto& match : matches)
+	auto basePath = QString{};
+	for (const auto& path : m_directories.split('*'))
 	{
-		auto basePath = QString{};
-		for (const auto& path : m_directories.split('*'))
+		if (!match.startsWith(QDir{path}.absolutePath())) { continue; }
+		basePath = path;
+		break;
+	}
+
+	if (basePath.isEmpty()) { return; }
+
+	const auto baseDir = QDir{basePath};
+	const auto matchInfo = QFileInfo{match};
+	const auto matchRelativeToBasePath = baseDir.relativeFilePath(match);
+
+	auto pathParts = QDir::cleanPath(matchRelativeToBasePath).split("/");
+	auto currentItem = static_cast<QTreeWidgetItem*>(nullptr);
+	auto currentDir = baseDir;
+
+	for (const auto& pathPart : pathParts)
+	{
+		auto childCount = currentItem ? currentItem->childCount() : m_searchTreeWidget->topLevelItemCount();
+		auto childItem = static_cast<QTreeWidgetItem*>(nullptr);
+
+		for (int i = 0; i < childCount; ++i)
 		{
-			if (!match.startsWith(QDir{path}.absolutePath())) { continue; }
-			basePath = path;
-			break;
-		}
-
-		if (basePath.isEmpty()) { continue; }
-
-		const auto baseDir = QDir{basePath};
-		const auto matchInfo = QFileInfo{match};
-		const auto matchRelativeToBasePath = baseDir.relativeFilePath(match);
-
-		auto pathParts = QDir::cleanPath(matchRelativeToBasePath).split("/");
-		auto currentItem = static_cast<QTreeWidgetItem*>(nullptr);
-		auto currentDir = baseDir;
-
-		for (const auto& pathPart : pathParts)
-		{
-			auto childCount = currentItem ? currentItem->childCount() : m_searchTreeWidget->topLevelItemCount();
-			auto childItem = static_cast<QTreeWidgetItem*>(nullptr);
-
-			for (int i = 0; i < childCount; ++i)
+			auto item = currentItem ? currentItem->child(i) : m_searchTreeWidget->topLevelItem(i);
+			if (item->text(0) == pathPart)
 			{
-				auto item = currentItem ? currentItem->child(i) : m_searchTreeWidget->topLevelItem(i);
-				if (item->text(0) == pathPart)
-				{
-					childItem = item;
-					break;
-				}
-
+				childItem = item;
+				break;
 			}
 
-			if (!childItem)
-			{
-				auto pathPartInfo = QFileInfo(currentDir, pathPart);
-				if (pathPartInfo.isDir())
-				{
-					// Only update directory (i.e., add entries) when it is the matched directory (so do not update
-					// parents since entries would be added to them that did not match the filter)
-					const auto disablePopulation = pathParts.indexOf(pathPart) < pathParts.size() - 1;
-
-					auto item = new Directory(pathPart, currentDir.path(), m_filter, disablePopulation);
-					currentItem ? currentItem->addChild(item) : m_searchTreeWidget->addTopLevelItem(item);
-					item->update();
-					if (disablePopulation) { m_searchTreeWidget->expandItem(item); }
-					childItem = item;
-				}
-				else
-				{
-					auto item = new FileItem(pathPart, currentDir.path());
-					currentItem ? currentItem->addChild(item) : m_searchTreeWidget->addTopLevelItem(item);
-					childItem = item;
-				}
-			}
-
-			currentItem = childItem;
-			if (!currentDir.cd(pathPart)) { break; }
 		}
+
+		if (!childItem)
+		{
+			auto pathPartInfo = QFileInfo(currentDir, pathPart);
+			if (pathPartInfo.isDir())
+			{
+				// Only update directory (i.e., add entries) when it is the matched directory (so do not update
+				// parents since entries would be added to them that did not match the filter)
+				const auto disablePopulation = pathParts.indexOf(pathPart) < pathParts.size() - 1;
+
+				auto item = new Directory(pathPart, currentDir.path(), m_filter, disablePopulation);
+				currentItem ? currentItem->addChild(item) : m_searchTreeWidget->addTopLevelItem(item);
+				item->update();
+				if (disablePopulation) { m_searchTreeWidget->expandItem(item); }
+				childItem = item;
+			}
+			else
+			{
+				auto item = new FileItem(pathPart, currentDir.path());
+				currentItem ? currentItem->addChild(item) : m_searchTreeWidget->addTopLevelItem(item);
+				childItem = item;
+			}
+		}
+
+		currentItem = childItem;
+		if (!currentDir.cd(pathPart)) { break; }
 	}
 }
 

@@ -76,6 +76,8 @@ auto FileBrowserSearcher::run() -> void
 		auto cancelled = false;
 		for (const auto& path : future->m_paths)
 		{
+			if (FileBrowser::directoryBlacklist().contains(path)) { continue; }
+
 			if (!process(future.get(), path))
 			{
 				future->m_state = SearchFuture::State::Cancelled;
@@ -90,7 +92,6 @@ auto FileBrowserSearcher::run() -> void
 
 auto FileBrowserSearcher::process(SearchFuture* searchFuture, const QString& path) -> bool
 {
-	auto matches = QStringList{};
 	auto stack = QFileInfoList{};
 
 	auto dir = QDir{path};
@@ -106,6 +107,8 @@ auto FileBrowserSearcher::process(SearchFuture* searchFuture, const QString& pat
 
 		const auto info = stack.takeFirst();
 		const auto path = info.absoluteFilePath();
+		if (FileBrowser::directoryBlacklist().contains(path)) { continue; }
+
 		const auto name = info.fileName();
 		const auto validFile = info.isFile() && searchFuture->m_extensions.contains(info.suffix(), Qt::CaseInsensitive);
 		const auto passesFilter = name.contains(searchFuture->m_filter, Qt::CaseInsensitive);
@@ -124,30 +127,9 @@ auto FileBrowserSearcher::process(SearchFuture* searchFuture, const QString& pat
 				stack.push_front(entry);
 			}
 		}
-		else if ((validFile || info.isDir()) && passesFilter) { matches.push_back(path); }
-
-		if (matches.size() == FileBrowserSearcher::BatchSize) { searchFuture->addBatch(matches); }
+		else if ((validFile || info.isDir()) && passesFilter) { searchFuture->addMatch(path); }
 	}
-
-	if (!matches.empty()) { searchFuture->addBatch(matches); }
 	return true;
-}
-
-auto FileBrowserSearcher::SearchFuture::addBatch(QStringList& matches) -> void
-{
-	const auto batchLock = std::lock_guard{m_batchQueueMutex};
-	m_batchQueue.push_back(matches);
-	matches.clear();
-}
-
-auto FileBrowserSearcher::SearchFuture::batch() -> QStringList
-{
-	const auto batchLock = std::lock_guard{m_batchQueueMutex};
-	if (m_batchQueue.empty()) { return QStringList{}; }
-
-	const auto batch = m_batchQueue.front();
-	m_batchQueue.pop_front();
-	return batch;
 }
 
 } // namespace lmms::gui

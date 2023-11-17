@@ -45,20 +45,11 @@ namespace lmms::gui {
 class FileBrowserSearcher
 {
 public:
-	static constexpr int BatchSize = 64;
-	static constexpr int MillisecondsPerBatch = 250;
+	static constexpr int MillisecondsPerMatch = 1;
 
-	//! The future that will be returned to the requester, as well as read and modified by both the requester and
-	//! worker thread. Acessing the filter, paths to search, and valid file extensions can be done concurrently since
-	//! they do not change after construction. Access to the batch queue is protected under a mutex, while the state
-	//! variable is atomic.
 	class SearchFuture
 	{
 	public:
-		//! The state for this future. The state of this object can be read/written atomically. In a cancelled
-		//! state, the requester doesn't need to continue using this future and can abort any operations made using it.
-		//! Once in a completed or cancelled state, the worker thread no longer has shared ownership of this future
-		//! (i.e., all ownership will go to the requester).
 		enum class State
 		{
 			Idle,
@@ -74,26 +65,30 @@ public:
 		{
 		}
 
-		//! Read the current state of the future object. This function can run concurrently with the worker thread.
+		auto match() -> QString
+		{
+			const auto lock = std::lock_guard{m_matchesMutex};
+			return m_matches.empty() ? QString{} : m_matches.takeFirst();
+		}
+
 		auto state() -> State { return m_state; }
-
-		//! Read a batch of search results. This function can run concurrently with the worker thread. Returns a empty
-		//! list if no batches are available.
-		auto batch() -> QStringList;
-
 		auto filter() -> const QString& { return m_filter; }
 		auto paths() -> const QStringList& { return m_paths; }
 		auto extensions() -> const QStringList& { return m_extensions; }
 
 	private:
-		auto addBatch(QStringList& matches) -> void;
+		auto addMatch(const QString& match) -> void
+		{
+			const auto lock = std::lock_guard{m_matchesMutex};
+			m_matches.append(match);
+		}
 
 		QString m_filter;
 		QStringList m_paths;
 		QStringList m_extensions;
 
-		std::list<QStringList> m_batchQueue;
-		std::mutex m_batchQueueMutex;
+		QStringList m_matches;
+		std::mutex m_matchesMutex;
 
 		std::atomic<State> m_state = State::Idle;
 
