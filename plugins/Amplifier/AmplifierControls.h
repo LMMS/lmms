@@ -39,34 +39,24 @@ namespace gui
 class AmplifierControlDialog;
 }
 
-
 class AmplifierControls : public EffectControls
 {
 	Q_OBJECT
 public:
-	AmplifierControls( AmplifierEffect* effect );
+	AmplifierControls(AmplifierEffect* effect);
 	~AmplifierControls() override = default;
 
-	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
-	void loadSettings( const QDomElement & _this ) override;
+	void saveSettings(QDomDocument & doc, QDomElement & parent) override;
+	void loadSettings(const QDomElement & parent) override;
 	inline QString nodeName() const override
 	{
 		return "AmplifierControls";
 	}
-
-	int controlCount() override
-	{
-		return 4;
-	}
-
 	gui::EffectControlDialog* createView() override
 	{
-		return new gui::AmplifierControlDialog( this );
+		return new gui::AmplifierControlDialog(this);
 	}
-
-
-private slots:
-	void changeControl();
+	int controlCount() override { return 4; }
 
 private:
 	AmplifierEffect* m_effect;
@@ -77,9 +67,7 @@ private:
 
 	friend class gui::AmplifierControlDialog;
 	friend class AmplifierEffect;
-
-} ;
-
+};
 
 } // namespace lmms
 
