@@ -59,7 +59,7 @@ AmplifierEffect::AmplifierEffect(Model* parent, const Descriptor::SubPluginFeatu
 
 bool AmplifierEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 {
-	if (!isEnabled() || !isRunning()) { return(false); }
+	if (!isEnabled() || !isRunning()) { return false ; }
 
 	double outSum = 0.0;
 	const float d = dryLevel();
@@ -77,13 +77,13 @@ bool AmplifierEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		const float left = (leftBuf ? leftBuf->value(f) : m_ampControls.m_leftModel.value()) * 0.01f;
 		const float right = (rightBuf ? rightBuf->value(f) : m_ampControls.m_rightModel.value()) * 0.01f;
 		
-		const float left2 = pan <= 0 ? 1.0 : 1.0 - pan;
-		const float right2 = pan >= 0 ? 1.0 : 1.0 + pan;
+		const float panLeft = std::min(1.0f, 1.0f - pan);
+		const float panRight = std::min(1.0f, 1.0f + pan);
 		
-		sample_t s[2] = {buf[f][0], buf[f][1]};
+		std::array<sample_t, 2> s = {buf[f][0], buf[f][1]};
 			
-		s[0] *= volume * left * left2;
-		s[1] *= volume * right * right2;
+		s[0] *= volume * left * panLeft;
+		s[1] *= volume * right * panRight;
 
 		buf[f][0] = d * buf[f][0] + w * s[0];
 		buf[f][1] = d * buf[f][1] + w * s[1];
@@ -100,9 +100,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main(Model* parent, void* data)
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data)
 {
-	return new AmplifierEffect(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(data));
+	return new AmplifierEffect(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data));
 }
 
 }

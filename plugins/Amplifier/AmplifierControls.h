@@ -46,8 +46,8 @@ public:
 	AmplifierControls(AmplifierEffect* effect);
 	~AmplifierControls() override = default;
 
-	void saveSettings(QDomDocument & doc, QDomElement & parent) override;
-	void loadSettings(const QDomElement & parent) override;
+	void saveSettings(QDomDocument& doc, QDomElement& parent) override;
+	void loadSettings(const QDomElement& parent) override;
 	inline QString nodeName() const override
 	{
 		return "AmplifierControls";
