@@ -82,6 +82,7 @@ auto FileBrowserSearcher::process(std::shared_ptr<SearchFuture> searchFuture) ->
 
 	for (const auto& path : searchFuture->paths())
 	{
+		if (FileBrowser::directoryBlacklist().contains(path)) { continue; }
 		queue.push(path);
 	}
 
@@ -94,8 +95,10 @@ auto FileBrowserSearcher::process(std::shared_ptr<SearchFuture> searchFuture) ->
 		dir.setPath(path);
 		for (const auto& entry : dir.entryInfoList(FileBrowser::dirFilters(), FileBrowser::sortFlags()))
 		{
-			const auto name = entry.fileName();
 			const auto path = entry.absoluteFilePath();
+			if (FileBrowser::directoryBlacklist().contains(path)) { continue; }
+
+			const auto name = entry.fileName();
 			const auto validFile
 				= entry.isFile() && searchFuture->extensions().contains(entry.suffix(), Qt::CaseInsensitive);
 			const auto passesFilter = name.contains(searchFuture->filter(), Qt::CaseInsensitive);

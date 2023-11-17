@@ -380,6 +380,8 @@ void FileBrowser::giveFocusToFilter()
 
 void FileBrowser::addItems(const QString & path )
 {
+	if (FileBrowser::directoryBlacklist().contains(path)) { return; }
+
 	if( m_dirsAsItems )
 	{
 		m_fileBrowserTreeWidget->addTopLevelItem( new Directory( path, QString(), m_filter ) );
@@ -393,6 +395,8 @@ void FileBrowser::addItems(const QString & path )
 		m_filter.split(' '), dirFilters(), QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase);
 	for (const auto& entry : entries)
 	{
+		if (FileBrowser::directoryBlacklist().contains(entry.absoluteFilePath())) { continue; }
+
 		QString fileName = entry.fileName();
 		if (entry.isDir())
 		{
@@ -1105,6 +1109,8 @@ void Directory::update()
 
 bool Directory::addItems(const QString& path)
 {
+	if (FileBrowser::directoryBlacklist().contains(path)) { return false; }
+
 	QDir thisDir(path);
 	if (!thisDir.isReadable()) { return false; }
 
@@ -1114,6 +1120,8 @@ bool Directory::addItems(const QString& path)
 		= thisDir.entryInfoList(m_filter.split(' '), FileBrowser::dirFilters(), FileBrowser::sortFlags());
 	for (const auto& entry : entries)
 	{
+		if (FileBrowser::directoryBlacklist().contains(entry.absoluteFilePath())) { continue; }
+
 		QString fileName = entry.fileName();
 		if (entry.isDir())
 		{

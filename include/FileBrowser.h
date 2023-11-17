@@ -37,9 +37,8 @@
 #endif
 #include <QTreeWidget>
 
-
 #include "SideBarWidget.h"
-
+#include "lmmsconfig.h"
 
 class QLineEdit;
 
@@ -76,6 +75,19 @@ public:
 
 	~FileBrowser() override = default;
 
+	static QStringList directoryBlacklist()
+	{
+		static auto s_blacklist = QStringList{
+#ifdef LMMS_BUILD_LINUX
+			"/bin", "/boot", "/dev", "/etc", "/proc", "/run", "/sbin",
+			"/sys"
+#endif
+#ifdef LMMS_BUILD_WIN32
+			"C:\\Windows"
+#endif
+		};
+		return s_blacklist;
+	}
 	static QDir::Filters dirFilters() { return QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot; }
 	static QDir::SortFlags sortFlags() { return QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase; }
 
