@@ -127,7 +127,8 @@ private:
 	void upgrade_mixerRename();
 	void upgrade_bbTcoRename();
 	void upgrade_sampleAndHold();
-	void upgrade_midiCCIndexing();
+  	void upgrade_midiCCIndexing();
+	void upgrade_loopsRename();
 
 	// List of all upgrade methods
 	static const std::vector<UpgradeMethod> UPGRADE_METHODS;
