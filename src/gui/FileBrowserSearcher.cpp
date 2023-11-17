@@ -25,6 +25,7 @@
 #include "FileBrowserSearcher.h"
 
 #include <QDir>
+#include <stack>
 
 #include "FileBrowser.h"
 
@@ -71,72 +72,72 @@ auto FileBrowserSearcher::run() -> void
 		const auto future = m_searchQueue.front();
 		future->m_state = SearchFuture::State::Running;
 		m_searchQueue.pop();
-		process(std::move(future));
-	}
-}
 
-auto FileBrowserSearcher::process(std::shared_ptr<SearchFuture> searchFuture) -> void
-{
-	auto matches = QStringList{};
-	auto queue = std::queue<QString>{};
-
-	for (const auto& path : searchFuture->paths())
-	{
-		if (FileBrowser::directoryBlacklist().contains(path)) { continue; }
-		queue.push(path);
-	}
-
-	auto dir = QDir{};
-	while (!queue.empty())
-	{
-		const auto path = queue.front();
-		queue.pop();
-
-		dir.setPath(path);
-		for (const auto& entry : dir.entryInfoList(FileBrowser::dirFilters(), FileBrowser::sortFlags()))
+		auto cancelled = false;
+		for (const auto& path : future->m_paths)
 		{
-			const auto path = entry.absoluteFilePath();
-			if (FileBrowser::directoryBlacklist().contains(path)) { continue; }
-
-			const auto name = entry.fileName();
-			const auto validFile
-				= entry.isFile() && searchFuture->extensions().contains(entry.suffix(), Qt::CaseInsensitive);
-			const auto passesFilter = name.contains(searchFuture->filter(), Qt::CaseInsensitive);
-
-			if ((validFile || entry.isDir()) && passesFilter) { matches.push_back(path); }
-			if (entry.isDir() && !passesFilter) { queue.push(path); }
-
-			if (m_cancelRunningSearch)
+			if (!process(future.get(), path))
 			{
-				m_cancelRunningSearch = false;
-				searchFuture->m_state = SearchFuture::State::Cancelled;
-				return;
+				future->m_state = SearchFuture::State::Cancelled;
+				cancelled = true;
+				break;
 			}
 		}
 
-		pushInBatches(searchFuture.get(), std::move(matches));
+		if (!cancelled) { future->m_state = SearchFuture::State::Completed; }
 	}
-
-	searchFuture->m_state = SearchFuture::State::Completed;
 }
 
-auto FileBrowserSearcher::pushInBatches(SearchFuture* future, QStringList matches) -> void
+auto FileBrowserSearcher::process(SearchFuture* searchFuture, const QString& path) -> bool
 {
-	const auto batchLock = std::lock_guard{future->m_batchQueueMutex};
-	while (!matches.empty())
+	auto matches = QStringList{};
+	auto stack = QFileInfoList{};
+
+	auto dir = QDir{path};
+	stack.append(dir.entryInfoList(FileBrowser::dirFilters(), FileBrowser::sortFlags()));
+
+	while (!stack.empty())
 	{
-		const auto batchSize = std::min(FileBrowserSearcher::BatchSize, matches.size());
-
-		auto batch = QStringList{};
-		batch.reserve(batchSize);
-
-		for (int i = 0; i < batchSize; ++i)
+		if (m_cancelRunningSearch)
 		{
-			batch.push_back(matches.takeFirst());
+			m_cancelRunningSearch = false;
+			return false;
 		}
 
-		future->m_batchQueue.push_front(batch);
+		const auto info = stack.takeFirst();
+		const auto path = info.absoluteFilePath();
+		const auto name = info.fileName();
+		const auto validFile = info.isFile() && searchFuture->m_extensions.contains(info.suffix(), Qt::CaseInsensitive);
+		const auto passesFilter = name.contains(searchFuture->m_filter, Qt::CaseInsensitive);
+
+		// Only when a directory doesn't pass the filter should we search further
+		if (info.isDir() && !passesFilter)
+		{
+			dir.setPath(path);
+			auto entries = dir.entryInfoList(FileBrowser::dirFilters(), FileBrowser::sortFlags());
+
+			// Reverse to maintain the sorting within this directory when popped
+			std::reverse(entries.begin(), entries.end());
+
+			for (const auto& entry : entries)
+			{
+				stack.push_front(entry);
+			}
+		}
+		else if ((validFile || info.isDir()) && passesFilter) { matches.push_back(path); }
+
+		if (matches.size() == FileBrowserSearcher::BatchSize) { searchFuture->addBatch(matches); }
 	}
+
+	if (!matches.empty()) { searchFuture->addBatch(matches); }
+	return true;
+}
+
+auto FileBrowserSearcher::SearchFuture::addBatch(QStringList& matches) -> void
+{
+	const auto batchLock = std::lock_guard{m_batchQueueMutex};
+	m_batchQueue.push_back(matches);
+	matches.clear();
 }
 
 auto FileBrowserSearcher::SearchFuture::batch() -> QStringList
