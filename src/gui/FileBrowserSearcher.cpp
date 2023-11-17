@@ -102,7 +102,6 @@ auto FileBrowserSearcher::process(std::shared_ptr<SearchFuture> searchFuture) ->
 
 			if ((validFile || entry.isDir()) && passesFilter) { matches.push_back(path); }
 			if (entry.isDir() && !passesFilter) { queue.push(path); }
-			if (matches.size() == BatchSize) { searchFuture->addBatch(matches); }
 
 			if (m_cancelRunningSearch)
 			{
@@ -111,10 +110,23 @@ auto FileBrowserSearcher::process(std::shared_ptr<SearchFuture> searchFuture) ->
 				return;
 			}
 		}
+
+		pushInBatches(searchFuture.get(), std::move(matches));
 	}
 
-	if (!matches.empty()) { searchFuture->addBatch(matches); }
 	searchFuture->m_state = SearchFuture::State::Completed;
+}
+
+auto FileBrowserSearcher::pushInBatches(SearchFuture* future, QStringList matches) -> void
+{
+	const auto batchLock = std::lock_guard{future->m_batchQueueMutex};
+	while (!matches.empty())
+	{
+		const auto batchSize = std::min(FileBrowserSearcher::BatchSize, matches.size());
+		const auto batch = QStringList{matches.begin(), matches.begin() + batchSize};
+		future->m_batchQueue.push_front(matches);
+		matches = QStringList{matches.begin() + batchSize, matches.end()};
+	}
 }
 
 auto FileBrowserSearcher::SearchFuture::batch() -> QStringList
@@ -125,13 +137,6 @@ auto FileBrowserSearcher::SearchFuture::batch() -> QStringList
 	const auto batch = m_batchQueue.front();
 	m_batchQueue.pop_front();
 	return batch;
-}
-
-auto FileBrowserSearcher::SearchFuture::addBatch(QStringList& matches) -> void
-{
-	const auto batchLock = std::lock_guard{m_batchQueueMutex};
-	m_batchQueue.push_back(matches);
-	matches.clear();
 }
 
 } // namespace lmms::gui

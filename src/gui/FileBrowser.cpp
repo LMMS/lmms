@@ -270,7 +270,6 @@ void FileBrowser::onSearch(const QString& filter)
 		return;
 	}
 
-
 	auto directories = m_directories.split('*');
 	if (m_showUserContent && !m_showUserContent->isChecked()) { directories.removeAll(m_userDir); }
 	if (m_showFactoryContent && !m_showFactoryContent->isChecked()) { directories.removeAll(m_factoryDir); }

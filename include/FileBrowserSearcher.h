@@ -86,8 +86,6 @@ public:
 		auto extensions() -> const QStringList& { return m_extensions; }
 
 	private:
-		auto addBatch(QStringList& matches) -> void;
-
 		QString m_filter;
 		QStringList m_paths;
 		QStringList m_extensions;
@@ -120,6 +118,7 @@ public:
 private:
 	auto run() -> void;
 	auto process(std::shared_ptr<SearchFuture> searchFuture) -> void;
+	auto pushInBatches(SearchFuture* future, QStringList matches) -> void;
 
 	std::queue<std::shared_ptr<SearchFuture>> m_searchQueue;
 	std::atomic<bool> m_cancelRunningSearch = false;
