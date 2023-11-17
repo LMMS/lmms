@@ -64,11 +64,11 @@ bool AmplifierEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	double outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
-	
-	const ValueBuffer * volumeBuf = m_ampControls.m_volumeModel.valueBuffer();
-	const ValueBuffer * panBuf = m_ampControls.m_panModel.valueBuffer();
-	const ValueBuffer * leftBuf = m_ampControls.m_leftModel.valueBuffer();
-	const ValueBuffer * rightBuf = m_ampControls.m_rightModel.valueBuffer();
+
+	const ValueBuffer* volumeBuf = m_ampControls.m_volumeModel.valueBuffer();
+	const ValueBuffer* panBuf = m_ampControls.m_panModel.valueBuffer();
+	const ValueBuffer* leftBuf = m_ampControls.m_leftModel.valueBuffer();
+	const ValueBuffer* rightBuf = m_ampControls.m_rightModel.valueBuffer();
 
 	for (fpp_t f = 0; f < frames; ++f)
 	{
@@ -76,12 +76,12 @@ bool AmplifierEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		const float pan = (panBuf ? panBuf->value(f) : m_ampControls.m_panModel.value()) * 0.01f;
 		const float left = (leftBuf ? leftBuf->value(f) : m_ampControls.m_leftModel.value()) * 0.01f;
 		const float right = (rightBuf ? rightBuf->value(f) : m_ampControls.m_rightModel.value()) * 0.01f;
-		
+
 		const float panLeft = std::min(1.0f, 1.0f - pan);
 		const float panRight = std::min(1.0f, 1.0f + pan);
-		
-		std::array<sample_t, 2> s = {buf[f][0], buf[f][1]};
-			
+
+		auto s = std::array{buf[f][0], buf[f][1]};
+
 		s[0] *= volume * left * panLeft;
 		s[1] *= volume * right * panRight;
 

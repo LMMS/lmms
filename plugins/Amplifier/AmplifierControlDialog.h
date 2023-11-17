@@ -45,8 +45,6 @@ class AmplifierControlDialog : public EffectControlDialog
 public:
 	AmplifierControlDialog(AmplifierControls* controls);
 	~AmplifierControlDialog() override = default;
-	
-	Knob* makeKnob(int x, int y, const QString& label, const QString& hintText, const QString& unit, FloatModel* model, bool isVolume);
 };
 
 } // namespace gui
