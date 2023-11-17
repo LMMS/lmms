@@ -1858,23 +1858,20 @@ void DataFile::upgrade_loopsRename()
 			{
 				auto item = elements.item(i).toElement();
 
-				if (item.isNull()) { continue; }
-				if (item.hasAttribute(srcAttr))
+				if (item.isNull() || !item.hasAttribute(srcAttr)) { continue; }
+				for (const auto& cur : loopBPMs)
 				{
-					for (const auto& cur : loopBPMs)
-					{
-						auto x = (QString) cur.first,  // loop name
-							 y = (QString) cur.second, // BPM
-							 srcVal = item.attribute(srcAttr),
-							 pattern = prefix + x + extension;
+					QString x = cur.first, // loop name
+						y = cur.second,    // BPM
+						srcVal = item.attribute(srcAttr),
+						pattern = prefix + x + extension;
 
-						if (srcVal == pattern)
-						{
-							// Add " - X BPM" to filename
-							item.setAttribute(srcAttr, 
-									prefix + x + " - " + y + " BPM" +
-									extension);
-						}
+					if (srcVal == pattern)
+					{
+						// Add " - X BPM" to filename
+						item.setAttribute(srcAttr, 
+								prefix + x + " - " + y + " BPM" +
+								extension);
 					}
 				}
 			}
