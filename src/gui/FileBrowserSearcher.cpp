@@ -102,7 +102,7 @@ auto FileBrowserSearcher::process(std::shared_ptr<SearchFuture> searchFuture) ->
 
 			if ((validFile || entry.isDir()) && passesFilter) { matches.push_back(path); }
 			if (entry.isDir() && !passesFilter) { queue.push(path); }
-			if (matches.size() == s_batchSize) { searchFuture->addBatch(matches); }
+			if (matches.size() == BatchSize) { searchFuture->addBatch(matches); }
 
 			if (m_cancelRunningSearch)
 			{

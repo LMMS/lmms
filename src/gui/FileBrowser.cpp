@@ -153,7 +153,7 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 
 	auto searchTimer = new QTimer(this);
 	connect(searchTimer, &QTimer::timeout, this, &FileBrowser::buildSearchTree);
-	searchTimer->start(FileBrowserSearcher::s_millisecondsPerBatch);
+	searchTimer->start(FileBrowserSearcher::MillisecondsPerBatch);
 
 	m_searchIndicator = new QProgressBar(this);
 	m_searchIndicator->setMinimum(0);

@@ -45,8 +45,8 @@ namespace lmms::gui {
 class FileBrowserSearcher
 {
 public:
-	static constexpr int s_batchSize = 16;
-	static constexpr int s_millisecondsPerBatch = 500;
+	static constexpr int BatchSize = 16;
+	static constexpr int MillisecondsPerBatch = 500;
 
 	//! The future that will be returned to the requester, as well as read and modified by both the requester and
 	//! worker thread. Acessing the filter, paths to search, and valid file extensions can be done concurrently since
