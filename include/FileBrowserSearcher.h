@@ -42,14 +42,20 @@
 #endif
 
 namespace lmms::gui {
+
+//! An active object that handles searching for files that match a certain filter across the file system.
 class FileBrowserSearcher
 {
 public:
+	//! Number of milliseconds to wait for before a match should be processed by the user.
 	static constexpr int MillisecondsPerMatch = 1;
 
+	//! The future object for FileBrowserSearcher. It is used to track the current state of search operations, as
+	// well as retrieve matches.
 	class SearchFuture
 	{
 	public:
+		//! Possible state values of the future object.
 		enum class State
 		{
 			Idle,
@@ -58,6 +64,7 @@ public:
 			Completed
 		};
 
+		//! Constructs a future object using the specified filter, paths, and valid file extensions in the Idle state.
 		SearchFuture(const QString& filter, const QStringList& paths, const QStringList& extensions)
 			: m_filter(filter)
 			, m_paths(paths)
@@ -65,18 +72,27 @@ public:
 		{
 		}
 
+		//! Retrieves a match from the match list.
 		auto match() -> QString
 		{
 			const auto lock = std::lock_guard{m_matchesMutex};
 			return m_matches.empty() ? QString{} : m_matches.takeFirst();
 		}
 
+		//! Returns the current state of this future object.
 		auto state() -> State { return m_state; }
+
+		//! Returns the filter used.
 		auto filter() -> const QString& { return m_filter; }
+
+		//! Returns the paths to filter.
 		auto paths() -> const QStringList& { return m_paths; }
+
+		//! Returns the valid file extensions.
 		auto extensions() -> const QStringList& { return m_extensions; }
 
 	private:
+		//! Adds a match to the match list.
 		auto addMatch(const QString& match) -> void
 		{
 			const auto lock = std::lock_guard{m_matchesMutex};
@@ -113,9 +129,11 @@ public:
 	}
 
 private:
+	//! Event loop for the worker thread.
 	auto run() -> void;
+
+	//! Using Depth-first search (DFS), filters the specified path and adds any matches to the future list.
 	auto process(SearchFuture* searchFuture, const QString& path) -> bool;
-	auto pushInBatches(SearchFuture* future, QStringList matches) -> void;
 
 	std::queue<std::shared_ptr<SearchFuture>> m_searchQueue;
 	std::atomic<bool> m_cancelRunningSearch = false;
