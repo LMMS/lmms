@@ -721,7 +721,7 @@ void Mixer::clearChannel(mix_ch_t index)
 	ch->m_volumeModel.setDisplayName( ch->m_name + ">" + tr( "Volume" ) );
 	ch->m_muteModel.setDisplayName( ch->m_name + ">" + tr( "Mute" ) );
 	ch->m_soloModel.setDisplayName( ch->m_name + ">" + tr( "Solo" ) );
-	ch->m_color = std::nullopt;
+	ch->setColor(std::nullopt);
 
 	// send only to master
 	if( index > 0)
@@ -759,7 +759,7 @@ void Mixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		ch->m_soloModel.saveSettings( _doc, mixch, "soloed" );
 		mixch.setAttribute( "num", i );
 		mixch.setAttribute( "name", ch->m_name );
-		if (ch->m_color.has_value()) { mixch.setAttribute("color", ch->m_color->name()); }
+		if (const auto& color = ch->color()) { mixch.setAttribute("color", color->name()); }
 
 		// add the channel sends
 		for (const auto& send : ch->m_sends)
@@ -805,9 +805,9 @@ void Mixer::loadSettings( const QDomElement & _this )
 		m_mixerChannels[num]->m_muteModel.loadSettings( mixch, "muted" );
 		m_mixerChannels[num]->m_soloModel.loadSettings( mixch, "soloed" );
 		m_mixerChannels[num]->m_name = mixch.attribute( "name" );
-		if( mixch.hasAttribute( "color" ) )
+		if (mixch.hasAttribute("color"))
 		{
-			m_mixerChannels[num]->m_color = QColor(mixch.attribute("color"));
+			m_mixerChannels[num]->setColor(QColor{mixch.attribute("color")});
 		}
 
 		m_mixerChannels[num]->m_fxChain.restoreState( mixch.firstChildElement(

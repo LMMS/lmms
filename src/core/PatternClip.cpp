@@ -62,9 +62,9 @@ void PatternClip::saveSettings(QDomDocument& doc, QDomElement& element)
 	element.setAttribute( "len", length() );
 	element.setAttribute("off", startTimeOffset());
 	element.setAttribute( "muted", isMuted() );
-	if( usesCustomClipColor() )
+	if (const auto& c = color())
 	{
-		element.setAttribute( "color", color().name() );
+		element.setAttribute("color", c->name());
 	}
 }
 
@@ -90,19 +90,13 @@ void PatternClip::loadSettings(const QDomElement& element)
 		if (!element.hasAttribute("usestyle"))
 		{
 			// for colors saved in 1.3-onwards
-			setColor(element.attribute("color"));
-			useCustomClipColor(true);
+			setColor(QColor{element.attribute("color")});
 		}
-		else
+		else if (element.attribute("usestyle").toUInt() == 0)
 		{
 			// for colors saved before 1.3
-			setColor(QColor(element.attribute("color").toUInt()));
-			useCustomClipColor(element.attribute("usestyle").toUInt() == 0);
+			setColor(QColor{element.attribute("color").toUInt()});
 		}
-	}
-	else
-	{
-		useCustomClipColor(false);
 	}
 }
 

@@ -76,12 +76,8 @@ class MixerChannel : public ThreadableJob
 		bool requiresProcessing() const override { return true; }
 		void unmuteForSolo();
 
-		void setColor (QColor newColor)
-		{
-			m_color = newColor;
-		}
-
-		std::optional<QColor> m_color;
+		auto color() const -> const std::optional<QColor>& { return m_color; }
+		void setColor(const std::optional<QColor>& color) { m_color = color; }
 
 		std::atomic_int m_dependenciesMet;
 		void incrementDeps();
@@ -89,8 +85,9 @@ class MixerChannel : public ThreadableJob
 		
 	private:
 		void doProcessing() override;
-};
 
+		std::optional<QColor> m_color;
+};
 
 class MixerRoute : public QObject
 {
