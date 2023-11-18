@@ -66,6 +66,7 @@ SET(LMMS_PLUGIN_LIST
 	TapTempo
 	VstBase
 	Vestige
+	Voxpop
 	VstEffect
 	Watsyn
 	WaveShaper

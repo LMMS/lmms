@@ -1023,7 +1023,7 @@ void AudioFileProcessorWaveView::updateGraph()
 
 	m_graph.fill( Qt::transparent );
 	QPainter p( &m_graph );
-	p.setPen( QColor( 255, 255, 255 ) );
+	p.setPen( QColor( 255, 200, 200 ) );
 
 	m_sampleBuffer.visualize(
 		p,
