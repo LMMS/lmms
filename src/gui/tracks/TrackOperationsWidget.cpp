@@ -267,7 +267,7 @@ void TrackOperationsWidget::selectTrackColor()
 {
 	QColor new_color = ColorChooser{this}
 		.withPalette(ColorChooser::Palette::Track)
-		->getColor(m_trackView->getTrack()->color().value_or(QColorConstants::White));
+		->getColor(m_trackView->getTrack()->color().value_or(Qt::white));
 
 	if( ! new_color.isValid() )
 	{ return; }
