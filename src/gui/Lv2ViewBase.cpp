@@ -31,7 +31,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <lilv/lilv.h>
-#include <lv2/lv2plug.in/ns/ext/port-props/port-props.h>
+#include <lv2/port-props/port-props.h>
 
 #include "AudioEngine.h"
 #include "Controls.h"

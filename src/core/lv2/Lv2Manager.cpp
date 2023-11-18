@@ -29,9 +29,9 @@
 #include <algorithm>
 #include <cstdlib>
 #include <lilv/lilv.h>
-#include <lv2/lv2plug.in/ns/ext/buf-size/buf-size.h>
-#include <lv2/lv2plug.in/ns/ext/options/options.h>
-#include <lv2/lv2plug.in/ns/ext/worker/worker.h>
+#include <lv2/buf-size/buf-size.h>
+#include <lv2/options/options.h>
+#include <lv2/worker/worker.h>
 #include <QDebug>
 #include <QElapsedTimer>
 
