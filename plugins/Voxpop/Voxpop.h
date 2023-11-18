@@ -39,8 +39,8 @@
 namespace lmms
 {
 
-const int MAX_CUES = 99;
-QString * DEFAULT_TEXT = new QString("");
+const int VOXPOP_MAX_CUES = 99;
+const QString VOXPOP_DEFAULT_TEXT = "...";
 
 namespace gui
 {
@@ -94,7 +94,7 @@ public:
 
 	QString * sampleText()
 	{
-		return m_cueCount > 0 ?  m_sampleText[m_cueIndexModel.value()] : DEFAULT_TEXT;
+		return m_cueCount > 0 ?  m_sampleText[m_cueIndexModel.value()] : (QString *) &VOXPOP_DEFAULT_TEXT;
 	}
 
 	auto beatLen(NotePlayHandle* note) const -> int override;

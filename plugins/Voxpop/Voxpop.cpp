@@ -409,9 +409,7 @@ void Voxpop::cueIndexChanged()
 
 f_cnt_t Voxpop::cuePointToFrames(QString field)
 {
-	QStringList secNanons = field.split( "." );
-	int nanos = 1000000 * secNanons[0].toInt() + secNanons[1].toInt();
-	return 0;
+	return m_sampleBuffer.sampleRate() * field.toDouble();
 }
 
 
@@ -450,7 +448,7 @@ bool Voxpop::reloadCuesheet()
 				quePoints << line;
 			}
 		}
-		if (quePoints.length() > MAX_CUES)
+		if (quePoints.length() > VOXPOP_MAX_CUES)
 		{
 			qWarning("too many queue points");
 			return false;
@@ -465,7 +463,8 @@ bool Voxpop::reloadCuesheet()
 			f_cnt_t veryEndFrame = 0;
 			
 			m_sampleText.clear(); // TODO memory leak
-			m_sampleOffset.clear(); // TODO memory leak
+			m_sampleOffset.clear();
+			m_sampleBuffers.clear(); // TODO memory leak
 			for ( int i = 0 ; i < m_cueCount ; i++ )
 			{
 				QStringList fields = quePoints[i].split( "\t" );
@@ -701,7 +700,7 @@ void VoxpopView::updateCuePoints()
 	for ( int i = 0 ; i < voxpop->m_cueCount ; i++)
 	{
 		int linePx = voxpop->m_sampleOffset[i] * graphWidth / voxpop->m_sampleBuffer.frames();
-		p.drawLine( linePx, 175, linePx, 242 );
+		p.drawLine( linePx + 2, 175, linePx + 2, 242 );
 		qDebug("%d: cue point %d drawn at pixel %d", i, voxpop->m_sampleOffset[i], linePx);
 	}
 }
