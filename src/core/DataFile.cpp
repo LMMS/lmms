@@ -43,6 +43,7 @@
 #include "embed.h"
 #include "GuiApplication.h"
 #include "LocaleHelper.h"
+#include "Note.h"
 #include "PluginFactory.h"
 #include "ProjectVersion.h"
 #include "SongEditor.h"
@@ -81,7 +82,7 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_defaultTripleOscillatorHQ,
 	&DataFile::upgrade_mixerRename      ,   &DataFile::upgrade_bbTcoRename,
 	&DataFile::upgrade_sampleAndHold    ,   &DataFile::upgrade_midiCCIndexing,
-	&DataFile::upgrade_loopsRename
+	&DataFile::upgrade_loopsRename      ,   &DataFile::upgrade_noteTypes
 };
 
 // Vector of all versions that have upgrade routines.
@@ -1662,6 +1663,24 @@ void DataFile::upgrade_automationNodes()
 			// inValue will be equal to "value" and outValue will
 			// be set to the same
 			el.setAttribute("outValue", value);
+		}
+	}
+}
+
+// Convert the negative length notes to StepNotes
+void DataFile::upgrade_noteTypes()
+{
+	const auto notes = elementsByTagName("note");
+
+	for (int i = 0; i < notes.size(); ++i)
+	{
+		auto note = notes.item(i).toElement();
+
+		const auto noteSize = note.attribute("len").toInt();
+		if (noteSize < 0)
+		{
+			note.setAttribute("len", DefaultTicksPerBar / 16);
+			note.setAttribute("type", static_cast<int>(Note::Type::Step));
 		}
 	}
 }
