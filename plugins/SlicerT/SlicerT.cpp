@@ -78,7 +78,6 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 {
 	if (m_sampleData.size() <= 1) { return; }
 
-	int noteIndex = handle->key() - m_parentTrack->baseNote();
 	const fpp_t frames = handle->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = handle->noteOffset();
 	const int bpm = Engine::getSong()->getTempo();
@@ -89,27 +88,18 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 	speedRatio *= pitchRatio;
 	speedRatio *= Engine::audioEngine()->processingSampleRate() / static_cast<float>(m_originalSample.sampleRate());
 
-	float sliceStart, sliceEnd;
+	float sliceStart = 0;
+	float sliceEnd = 1;
 	bool reversed = false;
-	if (noteIndex == 0) // full sample at base note
+	int noteIndex = handle->key() - m_parentTrack->baseNote();
+	if (std::abs(noteIndex) < m_slicePoints.size() && noteIndex != 0)
 	{
-		sliceStart = 0;
-		sliceEnd = 1;
-	}
-	else if (noteIndex > 0 && noteIndex < m_slicePoints.size())
-	{
-		noteIndex -= 1;
+		if (noteIndex < 0) { reversed = true; }
+		noteIndex = std::abs(noteIndex) - 1;
 		sliceStart = m_slicePoints[noteIndex];
 		sliceEnd = m_slicePoints[noteIndex + 1];
 	}
-	else if (noteIndex < 0 && -noteIndex < m_slicePoints.size())
-	{
-		noteIndex = -noteIndex - 1;
-		sliceStart = m_slicePoints[noteIndex];
-		sliceEnd = m_slicePoints[noteIndex + 1];
-		reversed = true;
-	}
-	else
+	else if (noteIndex != 0)
 	{
 		emit isPlaying(-1, 0, 0);
 		return;
@@ -331,7 +321,7 @@ void SlicerT::updateFile(QString file)
 	m_originalSample.setAudioFile(file);
 	m_sampleData.resize(m_originalSample.frames());
 	m_reversedSampleData.resize(m_originalSample.frames());
-	std::copy_n(m_originalSample.data(),m_originalSample.frames(), m_sampleData.data());
+	std::copy_n(m_originalSample.data(), m_originalSample.frames(), m_sampleData.data());
 	std::copy_n(m_originalSample.data(), m_originalSample.frames(), m_reversedSampleData.data());
 	std::reverse(m_reversedSampleData.begin(), m_reversedSampleData.end());
 
@@ -375,7 +365,7 @@ void SlicerT::loadSettings(const QDomElement& element)
 		m_originalSample.setAudioFile(element.attribute("src"));
 		m_sampleData.resize(m_originalSample.frames());
 		m_reversedSampleData.resize(m_originalSample.frames());
-		std::copy_n(m_originalSample.data(),m_originalSample.frames(), m_sampleData.data());
+		std::copy_n(m_originalSample.data(), m_originalSample.frames(), m_sampleData.data());
 		std::copy_n(m_originalSample.data(), m_originalSample.frames(), m_reversedSampleData.data());
 		std::reverse(m_reversedSampleData.begin(), m_reversedSampleData.end());
 
