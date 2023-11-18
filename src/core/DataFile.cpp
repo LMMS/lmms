@@ -35,6 +35,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QMessageBox>
+#include <QSaveFile>
 
 #include "base64.h"
 #include "ConfigManager.h"
@@ -81,7 +82,7 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_defaultTripleOscillatorHQ,
 	&DataFile::upgrade_mixerRename      ,   &DataFile::upgrade_bbTcoRename,
 	&DataFile::upgrade_sampleAndHold    ,   &DataFile::upgrade_midiCCIndexing,
-	&DataFile::upgrade_noteTypes
+	&DataFile::upgrade_loopsRename      ,   &DataFile::upgrade_noteTypes
 };
 
 // Vector of all versions that have upgrade routines.
@@ -233,8 +234,11 @@ bool DataFile::validate( QString extension )
 		{
 			return true;
 		}
-		if( extension == "wav" || extension == "ogg" ||
-				extension == "ds" )
+		if( extension == "wav" || extension == "ogg" || extension == "ds"
+#ifdef LMMS_HAVE_SNDFILE_MP3
+				|| extension == "mp3"
+#endif
+				)
 		{
 			return true;
 		}
@@ -378,12 +382,12 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 		}
 	}
 
-	QFile outfile (fullNameTemp);
+	QSaveFile outfile(fullNameTemp);
 
 	if (!outfile.open(QIODevice::WriteOnly | QIODevice::Truncate))
 	{
 		showError(SongEditor::tr("Could not write file"),
-			SongEditor::tr("Could not open %1 for writing. You probably are not permitted to"
+			SongEditor::tr("Could not open %1 for writing. You probably are not permitted to "
 				"write to this file. Please make sure you have write-access to "
 				"the file and try again.").arg(fullName));
 
@@ -404,30 +408,29 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 		write( ts );
 	}
 
-	outfile.close();
-
-	// make sure the file has been written correctly
-	if( QFileInfo( outfile.fileName() ).size() > 0 )
+	if (!outfile.commit())
 	{
-		if( ConfigManager::inst()->value( "app", "disablebackup" ).toInt() )
-		{
-			// remove current file
-			QFile::remove( fullName );
-		}
-		else
-		{
-			// remove old backup file
-			QFile::remove( fullNameBak );
-			// move current file to backup file
-			QFile::rename( fullName, fullNameBak );
-		}
-		// move temporary file to current file
-		QFile::rename( fullNameTemp, fullName );
-
-		return true;
+		showError(SongEditor::tr("Could not write file"),
+			SongEditor::tr("An unknown error has occured and the file could not be saved."));
+		return false;
 	}
 
-	return false;
+	if (ConfigManager::inst()->value("app", "disablebackup").toInt())
+	{
+		// remove current file
+		QFile::remove(fullName);
+	}
+	else
+	{
+		// remove old backup file
+		QFile::remove(fullNameBak);
+		// move current file to backup file
+		QFile::rename(fullName, fullNameBak);
+	}
+	// move temporary file to current file
+	QFile::rename(fullNameTemp, fullName);
+
+	return true;
 }
 
 
@@ -1824,7 +1827,76 @@ void DataFile::upgrade_sampleAndHold()
 		// Correct old random wave LFO speeds
 		if (e.attribute("wave").toInt() == 6)
 		{
-			e.setAttribute("speed",0.01f);
+			e.setAttribute("speed", 0.01f);
+		}
+	}
+}
+
+
+// Change loops' filenames in <sampleclip>s
+void DataFile::upgrade_loopsRename()
+{
+	static constexpr auto loopBPMs = std::array{
+		std::pair{"bassloops/briff01", "140"},
+		std::pair{"bassloops/rave_bass01", "180"},
+		std::pair{"bassloops/rave_bass02", "180"},
+		std::pair{"bassloops/tb303_01", "123"},
+		std::pair{"bassloops/techno_bass01", "140"},
+		std::pair{"bassloops/techno_bass02", "140"},
+		std::pair{"bassloops/techno_synth01", "140"},
+		std::pair{"bassloops/techno_synth02", "140"},
+		std::pair{"bassloops/techno_synth03", "130"},
+		std::pair{"bassloops/techno_synth04", "140"},
+		std::pair{"beats/909beat01", "122"},
+		std::pair{"beats/break01", "168"},
+		std::pair{"beats/break02", "141"},
+		std::pair{"beats/break03", "168"},
+		std::pair{"beats/electro_beat01", "120"},
+		std::pair{"beats/electro_beat02", "119"},
+		std::pair{"beats/house_loop01", "142"},
+		std::pair{"beats/jungle01", "168"},
+		std::pair{"beats/rave_hihat01", "180"},
+		std::pair{"beats/rave_hihat02", "180"},
+		std::pair{"beats/rave_kick01", "180"},
+		std::pair{"beats/rave_kick02", "180"},
+		std::pair{"beats/rave_snare01", "180"},
+		std::pair{"latin/latin_brass01", "140"},
+		std::pair{"latin/latin_guitar01", "126"},
+		std::pair{"latin/latin_guitar02", "140"},
+		std::pair{"latin/latin_guitar03", "120"},
+	};
+
+	const QString prefix = "factorysample:",
+		  extension = ".ogg";
+
+	// Replace loop sample names
+	for (const auto& [elem, srcAttrs] : ELEMENTS_WITH_RESOURCES)
+	{
+		auto elements = elementsByTagName(elem);
+
+		for (const auto& srcAttr : srcAttrs)
+		{
+			for (int i = 0; i < elements.length(); ++i)
+			{
+				auto item = elements.item(i).toElement();
+
+				if (item.isNull() || !item.hasAttribute(srcAttr)) { continue; }
+				for (const auto& cur : loopBPMs)
+				{
+					QString x = cur.first, // loop name
+						y = cur.second,    // BPM
+						srcVal = item.attribute(srcAttr),
+						pattern = prefix + x + extension;
+
+					if (srcVal == pattern)
+					{
+						// Add " - X BPM" to filename
+						item.setAttribute(srcAttr, 
+								prefix + x + " - " + y + " BPM" +
+								extension);
+					}
+				}
+			}
 		}
 	}
 }
@@ -2000,6 +2072,5 @@ unsigned int DataFile::legacyFileVersion()
 	// Convert the iterator to an index, which is our file version (starting at 0)
 	return std::distance( UPGRADE_VERSIONS.begin(), firstRequiredUpgrade );
 }
-
 
 } // namespace lmms

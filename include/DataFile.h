@@ -128,6 +128,7 @@ private:
 	void upgrade_bbTcoRename();
 	void upgrade_sampleAndHold();
 	void upgrade_midiCCIndexing();
+	void upgrade_loopsRename();
 	void upgrade_noteTypes();
 
 	// List of all upgrade methods

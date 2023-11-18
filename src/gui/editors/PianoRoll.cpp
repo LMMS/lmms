@@ -2517,7 +2517,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			// We iterate from last note in MIDI clip to the first,
 			// chronologically
 			auto it = notes.rbegin();
-			for( int i = 0; i < notes.size(); ++i )
+			while (it != notes.rend())
 			{
 				Note* n = *it;
 

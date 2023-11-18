@@ -28,6 +28,17 @@
 #include <QCheckBox>
 #include <QDir>
 #include <QMutex>
+
+#ifdef __MINGW32__
+#include <mingw.condition_variable.h>
+#include <mingw.mutex.h>
+#include <mingw.thread.h>
+#else
+#include <condition_variable>
+#include <mutex>
+#include <thread>
+#endif
+
 #if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 	#include <QRecursiveMutex>
 #endif
@@ -72,6 +83,8 @@ public:
 
 	~FileBrowser() override = default;
 
+	static QDir::Filters dirFilters();
+
 private slots:
 	void reloadTree();
 	void expandItems( QTreeWidgetItem * item=nullptr, QList<QString> expandedDirs = QList<QString>() );
@@ -86,7 +99,12 @@ private:
 	void saveDirectoriesStates();
 	void restoreDirectoriesStates();
 
+	void buildSearchTree(QStringList matches, QString id);
+	void onSearch(const QString& filter);
+	void toggleSearch(bool on);
+
 	FileBrowserTreeWidget * m_fileBrowserTreeWidget;
+	FileBrowserTreeWidget * m_searchTreeWidget;
 
 	QLineEdit * m_filterEdit;
 
@@ -164,6 +182,46 @@ private slots:
 	void openContainingFolder( lmms::gui::FileItem* item );
 
 } ;
+
+class FileBrowserSearcher : public QObject
+{
+	Q_OBJECT
+public:
+	struct SearchTask
+	{
+		QString directories;
+		QString userFilter;
+		QDir::Filters dirFilters;
+		QStringList nameFilters;
+		QString id;
+	};
+
+	FileBrowserSearcher();
+	~FileBrowserSearcher() noexcept override;
+
+	void search(SearchTask task);
+	void cancel();
+
+	bool inHiddenDirectory(const QString& path);
+
+	static FileBrowserSearcher* instance();
+
+signals:
+	void searchComplete(QStringList matches, QString id);
+
+private:
+	void run();
+	void filter();
+	SearchTask m_currentTask;
+	std::thread m_worker;
+	std::mutex m_runMutex;
+	std::mutex m_cancelMutex;
+	std::condition_variable m_runCond;
+	std::atomic<bool> m_cancel = false;
+	bool m_stopped = false;
+	bool m_run = false;
+	inline static std::unique_ptr<FileBrowserSearcher> s_instance = nullptr;
+};
 
 
 
@@ -274,6 +332,7 @@ public:
 
 	QString extension();
 	static QString extension( const QString & file );
+	static QString defaultFilters();
 
 
 private:

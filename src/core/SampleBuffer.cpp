@@ -1185,14 +1185,20 @@ QString SampleBuffer::openAudioFile() const
 
 	// set filters
 	QStringList types;
-	types << tr("All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc "
+	types << tr("All Audio-Files (*.wav *.ogg "
+#ifdef LMMS_HAVE_SNDFILE_MP3
+					"*.mp3 "
+#endif
+					"*.ds *.flac *.spx *.voc "
 					"*.aif *.aiff *.au *.raw)")
 		<< tr("Wave-Files (*.wav)")
 		<< tr("OGG-Files (*.ogg)")
+#ifdef LMMS_HAVE_SNDFILE_MP3
+		<< tr("MP3-Files (*.mp3)")
+#endif
 		<< tr("DrumSynth-Files (*.ds)")
 		<< tr("FLAC-Files (*.flac)")
 		<< tr("SPEEX-Files (*.spx)")
-		//<< tr("MP3-Files (*.mp3)")
 		//<< tr("MIDI-Files (*.mid)")
 		<< tr("VOC-Files (*.voc)")
 		<< tr("AIFF-Files (*.aif *.aiff)")
