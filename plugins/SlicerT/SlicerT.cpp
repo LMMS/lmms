@@ -76,7 +76,7 @@ SlicerT::SlicerT(InstrumentTrack* instrumentTrack)
 
 void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 {
-	if (m_originalSample.frames() <= 1) { return; }
+	if (m_sampleData.size() <= 1) { return; }
 
 	int noteIndex = handle->key() - m_parentTrack->baseNote();
 	const fpp_t frames = handle->framesLeftForCurrentPeriod();
@@ -90,6 +90,7 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 	speedRatio *= Engine::audioEngine()->processingSampleRate() / static_cast<float>(m_originalSample.sampleRate());
 
 	float sliceStart, sliceEnd;
+	bool reversed = false;
 	if (noteIndex == 0) // full sample at base note
 	{
 		sliceStart = 0;
@@ -100,6 +101,13 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 		noteIndex -= 1;
 		sliceStart = m_slicePoints[noteIndex];
 		sliceEnd = m_slicePoints[noteIndex + 1];
+	}
+	else if (noteIndex < 0 && -noteIndex < m_slicePoints.size())
+	{
+		noteIndex = -noteIndex - 1;
+		sliceStart = m_slicePoints[noteIndex];
+		sliceEnd = m_slicePoints[noteIndex + 1];
+		reversed = true;
 	}
 	else
 	{
@@ -115,25 +123,26 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 
 	if (noteLeft > 0)
 	{
-		int noteFrame = noteDone * m_originalSample.frames();
+		int noteFrame = noteDone * m_sampleData.size();
 
 		SRC_STATE* resampleState = playbackState->resamplingState();
 		SRC_DATA resampleData;
-		resampleData.data_in = (m_originalSample.data() + noteFrame)->data();
+		if (reversed) { resampleData.data_in = (m_reversedSampleData.data() + noteFrame)->data(); }
+		else { resampleData.data_in = (m_sampleData.data() + noteFrame)->data(); }
 		resampleData.data_out = (workingBuffer + offset)->data();
-		resampleData.input_frames = noteLeft * m_originalSample.frames();
+		resampleData.input_frames = noteLeft * m_sampleData.size();
 		resampleData.output_frames = frames;
 		resampleData.src_ratio = speedRatio;
 
 		src_process(resampleState, &resampleData);
 
-		float nextNoteDone = noteDone + frames * (1.0f / speedRatio) / m_originalSample.frames();
+		float nextNoteDone = noteDone + frames * (1.0f / speedRatio) / m_sampleData.size();
 		playbackState->setNoteDone(nextNoteDone);
 
 		// exponential fade out, applyRelease() not used since it extends the note length
 		int fadeOutFrames = m_fadeOutFrames.value() / 1000.0f * Engine::audioEngine()->processingSampleRate();
-		int noteFramesLeft = noteLeft * m_originalSample.frames() * speedRatio;
-		for (int i = 0; i < frames; i++)
+		int noteFramesLeft = noteLeft * m_sampleData.size() * speedRatio;
+		for (int i = 0; i < frames && fadeOutFrames != 0; i++)
 		{
 			float fadeValue = static_cast<float>(noteFramesLeft - i) / fadeOutFrames;
 			fadeValue = std::clamp(fadeValue, 0.0f, 1.0f);
@@ -143,8 +152,7 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 			workingBuffer[i + offset][1] *= fadeValue;
 		}
 
-		instrumentTrack()->processAudioBuffer(workingBuffer, frames + offset, handle);
-
+		if (reversed) { noteDone = sliceEnd - noteDone + sliceStart; }
 		emit isPlaying(noteDone, sliceStart, sliceEnd);
 	}
 	else { emit isPlaying(-1, 0, 0); }
@@ -160,7 +168,7 @@ void SlicerT::deleteNotePluginData(NotePlayHandle* handle)
 // http://www.iro.umontreal.ca/~pift6080/H09/documents/papers/bello_onset_tutorial.pdf
 void SlicerT::findSlices()
 {
-	if (m_originalSample.frames() <= 1) { return; }
+	if (m_sampleData.size() <= 1) { return; }
 	m_slicePoints = {};
 
 	const int windowSize = 512;
@@ -170,10 +178,10 @@ void SlicerT::findSlices()
 	int minDist = sampleRate * minBeatLength;
 
 	float maxMag = -1;
-	std::vector<float> singleChannel(m_originalSample.frames(), 0);
-	for (int i = 0; i < m_originalSample.frames(); i++)
+	std::vector<float> singleChannel(m_sampleData.size(), 0);
+	for (int i = 0; i < m_sampleData.size(); i++)
 	{
-		singleChannel[i] = (m_originalSample.data()[i][0] + m_originalSample.data()[i][1]) / 2;
+		singleChannel[i] = (m_sampleData[i][0] + m_sampleData[i][1]) / 2;
 		maxMag = std::max(maxMag, singleChannel[i]);
 	}
 
@@ -232,7 +240,7 @@ void SlicerT::findSlices()
 		spectralFlux = 1E-10; // again for no divison by zero
 	}
 
-	m_slicePoints.push_back(m_originalSample.frames());
+	m_slicePoints.push_back(m_sampleData.size());
 
 	for (float& sliceValue : m_slicePoints)
 	{
@@ -255,7 +263,7 @@ void SlicerT::findSlices()
 
 	for (float& sliceIndex : m_slicePoints)
 	{
-		sliceIndex /= m_originalSample.frames();
+		sliceIndex /= m_sampleData.size();
 	}
 
 	m_slicePoints[0] = 0;
@@ -268,10 +276,10 @@ void SlicerT::findSlices()
 // and lies in the 100 - 200 bpm range
 void SlicerT::findBPM()
 {
-	if (m_originalSample.frames() <= 1) { return; }
+	if (m_sampleData.size() <= 1) { return; }
 
 	float sampleRate = m_originalSample.sampleRate();
-	float totalFrames = m_originalSample.frames();
+	float totalFrames = m_sampleData.size();
 	float sampleLength = totalFrames / sampleRate;
 
 	float bpmEstimate = 240.0f / sampleLength;
@@ -295,7 +303,7 @@ std::vector<Note> SlicerT::getMidi()
 	std::vector<Note> outputNotes;
 
 	float speedRatio = static_cast<float>(m_originalBPM.value()) / Engine::getSong()->getTempo();
-	float outFrames = m_originalSample.frames() * speedRatio;
+	float outFrames = m_sampleData.size() * speedRatio;
 
 	float framesPerTick = Engine::framesPerTick();
 	float totalTicks = outFrames / framesPerTick;
@@ -321,6 +329,11 @@ std::vector<Note> SlicerT::getMidi()
 void SlicerT::updateFile(QString file)
 {
 	m_originalSample.setAudioFile(file);
+	m_sampleData.resize(m_originalSample.frames());
+	m_reversedSampleData.resize(m_originalSample.frames());
+	std::copy_n(m_originalSample.data(),m_originalSample.frames(), m_sampleData.data());
+	std::copy_n(m_originalSample.data(), m_originalSample.frames(), m_reversedSampleData.data());
+	std::reverse(m_reversedSampleData.begin(), m_reversedSampleData.end());
 
 	findBPM();
 	findSlices();
@@ -360,6 +373,11 @@ void SlicerT::loadSettings(const QDomElement& element)
 	if (!element.attribute("src").isEmpty())
 	{
 		m_originalSample.setAudioFile(element.attribute("src"));
+		m_sampleData.resize(m_originalSample.frames());
+		m_reversedSampleData.resize(m_originalSample.frames());
+		std::copy_n(m_originalSample.data(),m_originalSample.frames(), m_sampleData.data());
+		std::copy_n(m_originalSample.data(), m_originalSample.frames(), m_reversedSampleData.data());
+		std::reverse(m_reversedSampleData.begin(), m_reversedSampleData.end());
 
 		QString absolutePath = PathUtil::toAbsolute(m_originalSample.audioFile());
 		if (!QFileInfo(absolutePath).exists())
