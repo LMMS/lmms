@@ -125,28 +125,28 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, int numFrames, float d
 		playBuffer.resize(playBuffer.size() + s_interpolationMargins[state->m_interpolationMode]);
 	}
 
-	state->m_frameIndex = std::max(m_startFrame, state->m_frameIndex);
 	switch (loopMode)
 	{
 	case Loop::Off:
-		if (state->m_frameIndex >= m_endFrame) { return false; }
+		state->m_frameIndex = std::clamp(state->m_frameIndex, m_startFrame, m_endFrame);
+		if (state->m_frameIndex == m_endFrame) { return false; }
 		break;
 	case Loop::On:
-		if (state->m_frameIndex >= m_loopEndFrame) { state->m_frameIndex = m_loopStartFrame; }
+		state->m_frameIndex = std::clamp(state->m_frameIndex, m_startFrame, m_loopEndFrame);
+		if (state->m_frameIndex == m_loopEndFrame) { state->m_frameIndex = m_loopStartFrame; }
 		break;
 	case Loop::PingPong:
-		if (state->m_backwards && state->m_frameIndex <= m_loopStartFrame)
+		state->m_frameIndex = std::clamp(state->m_frameIndex, m_startFrame, m_loopEndFrame);
+		if (state->m_frameIndex == m_loopEndFrame)
 		{
-			state->m_backwards = false;
-			state->m_frameIndex = m_loopStartFrame;
-		}
-		else if (!state->m_backwards && state->m_frameIndex >= m_loopEndFrame)
-		{
-			state->m_backwards = true;
 			state->m_frameIndex = m_loopEndFrame - 1;
+			state->m_backwards = true;
 		}
-		break;
-	default:
+		else if (state->m_frameIndex <= m_loopStartFrame && state->m_backwards)
+		{
+			state->m_frameIndex = m_loopStartFrame;
+			state->m_backwards = false;
+		}
 		break;
 	}
 
