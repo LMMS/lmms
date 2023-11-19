@@ -8,7 +8,7 @@ jobs:
   linux:
     name: linux
     runs-on: ubuntu-latest
-    container: lmmsci/linux.gcc:18.04
+    container: lmmsci/linux.gcc:20.04
     env:
       CMAKE_OPTS: >-
         -DUSE_WERROR=ON
