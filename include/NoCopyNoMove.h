@@ -1,7 +1,7 @@
 /*
- * Lv2FxControlDialog.h - Lv2FxControlDialog implementation
+ * NoCopyNoMove.h - NoCopyNoMove class
  *
- * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2023-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,36 +22,26 @@
  *
  */
 
-#ifndef LV2_FX_CONTROL_DIALOG_H
-#define LV2_FX_CONTROL_DIALOG_H
-
-#include "EffectControlDialog.h"
-#include "Lv2ViewBase.h"
+#ifndef LMMS_NOCOPYNOMOVE_H
+#define LMMS_NOCOPYNOMOVE_H
 
 namespace lmms
 {
 
-class Lv2FxControls;
-
-namespace gui
+/**
+ * Inherit this class to make your class non-copyable and non-movable
+ */
+class NoCopyNoMove
 {
-
-class Lv2FxControlDialog : public EffectControlDialog, public Lv2ViewBase
-{
-	Q_OBJECT
-
-public:
-	Lv2FxControlDialog(Lv2FxControls *controls);
-
-private:
-	Lv2FxControls *lv2Controls();
-	void modelChanged() final;
-	void hideEvent(QHideEvent *event) override;
+protected:
+	NoCopyNoMove() = default;
+	NoCopyNoMove(const NoCopyNoMove& other) = delete;
+	NoCopyNoMove& operator=(const NoCopyNoMove& other) = delete;
+	NoCopyNoMove(NoCopyNoMove&& other) = delete;
+	NoCopyNoMove& operator=(NoCopyNoMove&& other) = delete;
 };
-
-
-} // namespace gui
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_NOCOPYNOMOVE_H
+
