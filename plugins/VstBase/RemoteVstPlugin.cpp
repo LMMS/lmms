@@ -1092,33 +1092,29 @@ void RemoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 	int numOutputChannels = outputCount();
 
 	// Handle the case where the plugin can only process mono input but needs to produce stereo output
-	if( numInputChannels == 1 && numOutputChannels == 2 )
+	if (numInputChannels == 1 && numOutputChannels == 2)
 	{
-		float * leftInput = m_inputs[0];
-		float * leftOutput = m_outputs[0];
-		float * rightOutput = m_outputs[1];
+		float* leftInput = m_inputs[0];
+		float* leftOutput = m_outputs[0];
+		float* rightOutput = m_outputs[1];
 
 		// Process left channel using the mono input data
-		m_plugin->processReplacing( m_plugin, &leftInput, &leftOutput,
-								bufferSize() );
+		m_plugin->processReplacing(m_plugin, &leftInput, &leftOutput, bufferSize());
 
 		// Process right channel using the mono input data
-		m_plugin->processReplacing( m_plugin, &leftInput, &rightOutput,
-								bufferSize() );
+		m_plugin->processReplacing(m_plugin, &leftInput, &rightOutput, bufferSize());
 	}
 	else
 	{
 		// Standard processing for plugins that support the required number of input and output channels
 #ifdef OLD_VST_SDK
-	if( m_plugin->flags & effFlagsCanReplacing )
-	{
-		m_plugin->processReplacing( m_plugin, m_inputs, m_outputs,
-								bufferSize() );
-	}
-	else { m_plugin->process(m_plugin, m_inputs, m_outputs,
-							bufferSize() ); }
+		if (m_plugin->flags & effFlagsCanReplacing)
+		{
+			m_plugin->processReplacing(m_plugin, m_inputs, m_outputs, bufferSize());
+		}
+		else { m_plugin->process(m_plugin, m_inputs, m_outputs, bufferSize()); }
 #else
-	m_plugin->processReplacing(m_plugin, m_inputs, m_outputs, bufferSize());
+		m_plugin->processReplacing(m_plugin, m_inputs, m_outputs, bufferSize());
 #endif
 	}
 
