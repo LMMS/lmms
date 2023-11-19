@@ -343,15 +343,15 @@ void ClipView::updatePosition()
 void ClipView::selectColor()
 {
 	// Get a color from the user
-	QColor new_color = ColorChooser{this}
+	const auto newColor = ColorChooser{this}
 		.withPalette(ColorChooser::Palette::Track)
 		->getColor(m_clip->color().value_or(palette().background().color()));
-	if (new_color.isValid()) { setColor(new_color); }
+	if (newColor.isValid()) { setColor(newColor); }
 }
 
 void ClipView::randomizeColor()
 {
-	setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[rand() % 48]);
+	setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[std::rand() % 48]);
 }
 
 void ClipView::resetColor()

@@ -433,12 +433,12 @@ void MixerLine::setStrokeInnerInactive( const QColor & c )
 // Ask user for a color, and set it as the mixer line color
 void MixerLine::selectColor()
 {
-	auto channel = Engine::mixer()->mixerChannel( m_channelIndex );
-	auto new_color = ColorChooser(this)
+	const auto channel = Engine::mixer()->mixerChannel(m_channelIndex);
+	const auto newColor = ColorChooser{this}
 		.withPalette(ColorChooser::Palette::Mixer)
 		->getColor(channel->color().value_or(backgroundActive().color()));
-	if (!new_color.isValid()) { return; }
-	channel->setColor(new_color);
+	if (!newColor.isValid()) { return; }
+	channel->setColor(newColor);
 	Engine::getSong()->setModified();
 	update();
 }
@@ -454,8 +454,8 @@ void MixerLine::resetColor()
 // Pick a random color from the mixer palette and set it as our color
 void MixerLine::randomizeColor()
 {
-	auto channel = Engine::mixer()->mixerChannel( m_channelIndex );
-	channel->setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[rand() % 48]);
+	const auto channel = Engine::mixer()->mixerChannel(m_channelIndex);
+	channel->setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[std::rand() % 48]);
 	Engine::getSong()->setModified();
 	update();
 }

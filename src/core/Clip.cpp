@@ -48,7 +48,7 @@ Clip::Clip( Track * track ) :
 	m_startPosition(),
 	m_length(),
 	m_mutedModel( false, this, tr( "Mute" ) ),
-	m_selectViewOnCreate( false )
+	m_selectViewOnCreate{false}
 {
 	if( getTrack() )
 	{

@@ -265,16 +265,15 @@ void TrackOperationsWidget::removeTrack()
 
 void TrackOperationsWidget::selectTrackColor()
 {
-	QColor new_color = ColorChooser{this}
+	const auto newColor = ColorChooser{this}
 		.withPalette(ColorChooser::Palette::Track)
 		->getColor(m_trackView->getTrack()->color().value_or(Qt::white));
 
-	if( ! new_color.isValid() )
-	{ return; }
+	if (!newColor.isValid()) { return; }
 
-	auto track = m_trackView->getTrack();
+	const auto track = m_trackView->getTrack();
 	track->addJournalCheckPoint();
-	track->setColor(new_color);
+	track->setColor(newColor);
 	Engine::getSong()->setModified();
 }
 
