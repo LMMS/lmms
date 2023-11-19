@@ -32,6 +32,7 @@
 #include "AutomatableModel.h"
 #include "JournallingObject.h"
 #include "lmms_basics.h"
+#include <optional>
 
 
 namespace lmms
@@ -191,11 +192,11 @@ public:
 	
 	QColor color()
 	{
-		return m_color;
+		return m_color.value();
 	}
 	bool useColor()
 	{
-		return m_hasColor;
+		return m_color.has_value();
 	}
 
 	bool isMutedBeforeSolo() const
@@ -241,8 +242,7 @@ private:
 
 	QMutex m_processingLock;
 	
-	QColor m_color;
-	bool m_hasColor;
+	std::optional<QColor> m_color;
 
 	friend class gui::TrackView;
 

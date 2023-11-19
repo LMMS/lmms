@@ -31,7 +31,7 @@
 #include "ThreadableJob.h"
 
 #include <atomic>
-
+#include <optional>
 #include <QColor>
 
 namespace lmms
@@ -76,18 +76,13 @@ class MixerChannel : public ThreadableJob
 		bool requiresProcessing() const override { return true; }
 		void unmuteForSolo();
 
-
 		void setColor (QColor newColor)
 		{
 			m_color = newColor;
-			m_hasColor = true;
 		}
 
-		// TODO C++17 and above: use std::optional instead
-		QColor m_color;
-		bool m_hasColor;
+		std::optional<QColor> m_color;
 
-	
 		std::atomic_int m_dependenciesMet;
 		void incrementDeps();
 		void processed();

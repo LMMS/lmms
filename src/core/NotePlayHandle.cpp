@@ -53,7 +53,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 								NotePlayHandle *parent,
 								int midiEventChannel,
 								Origin origin ) :
-	PlayHandle( Type::NotePlayHandle, _offset ),
+	PlayHandle( PlayHandle::Type::NotePlayHandle, _offset ),
 	Note( n.length(), n.pos(), n.key(), n.getVolume(), n.getPanning(), n.detuning() ),
 	m_pluginData( nullptr ),
 	m_instrumentTrack( instrumentTrack ),

@@ -74,7 +74,8 @@ Note::Note( const Note & note ) :
 	m_panning( note.m_panning ),
 	m_length( note.m_length ),
 	m_pos( note.m_pos ),
-	m_detuning( nullptr )
+	m_detuning(nullptr),
+	m_type(note.m_type)
 {
 	if( note.m_detuning )
 	{
@@ -179,6 +180,7 @@ void Note::saveSettings( QDomDocument & doc, QDomElement & parent )
 	parent.setAttribute( "pan", m_panning );
 	parent.setAttribute( "len", m_length );
 	parent.setAttribute( "pos", m_pos );
+	parent.setAttribute("type", static_cast<int>(m_type));
 
 	if( m_detuning && m_length )
 	{
@@ -197,6 +199,9 @@ void Note::loadSettings( const QDomElement & _this )
 	m_panning = _this.attribute( "pan" ).toInt();
 	m_length = _this.attribute( "len" ).toInt();
 	m_pos = _this.attribute( "pos" ).toInt();
+	// Default m_type value is 0, which corresponds to RegularNote
+	static_assert(0 == static_cast<int>(Type::Regular));
+	m_type = static_cast<Type>(_this.attribute("type", "0").toInt());
 
 	if( _this.hasChildNodes() )
 	{
