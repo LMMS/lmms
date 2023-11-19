@@ -63,17 +63,28 @@ public:
 	class LMMS_EXPORT PlaybackState
 	{
 	public:
-		PlaybackState(bool varyingPitch = false, int mode = SRC_LINEAR);
-		~PlaybackState() noexcept;
+		PlaybackState(bool varyingPitch = false, int interpolationMode = SRC_LINEAR)
+			: m_varyingPitch(varyingPitch)
+			, m_interpolationMode(interpolationMode)
+		{
+			auto error = 0;
+			m_resampleState = src_new(m_interpolationMode, DEFAULT_CHANNELS, &error);
+			if (error != 0)
+			{
+				throw std::runtime_error{"Error creating resample state: " + std::string{src_strerror(error)}};
+			}
+		}
 
-		auto frameIndex() const -> f_cnt_t;
-		auto varyingPitch() const -> bool;
-		auto isBackwards() const -> bool;
-		auto interpolationMode() const -> int;
+		~PlaybackState() noexcept { src_delete(m_resampleState); }
 
-		auto setFrameIndex(f_cnt_t index) -> void;
-		auto setVaryingPitch(bool varyingPitch) -> void;
-		auto setBackwards(bool backwards) -> void;
+		auto frameIndex() const -> f_cnt_t { return m_frameIndex; }
+		auto varyingPitch() const -> bool { return m_varyingPitch; }
+		auto backwards() const -> bool { return m_backwards; }
+		auto interpolationMode() const -> int { return m_interpolationMode; }
+
+		auto setFrameIndex(f_cnt_t frameIndex) -> void { m_frameIndex = frameIndex; }
+		auto setVaryingPitch(bool varyingPitch) -> void { m_varyingPitch = varyingPitch; }
+		auto setBackwards(bool backwards) -> void { m_backwards = backwards; }
 
 	private:
 		f_cnt_t m_frameIndex = 0;
