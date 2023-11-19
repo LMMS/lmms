@@ -64,8 +64,7 @@ Track::Track( Type type, TrackContainer * tc ) :
 	m_mutedModel( false, this, tr( "Mute" ) ), /*!< For controlling track muting */
 	m_soloModel( false, this, tr( "Solo" ) ), /*!< For controlling track soloing */
 	m_simpleSerializingMode( false ),
-	m_clips(),        /*!< The clips (segments) */
-	m_color(std::nullopt)
+	m_clips()        /*!< The clips (segments) */
 {	
 	m_trackContainer->addTrack( this );
 	m_height = -1;
@@ -263,14 +262,9 @@ void Track::loadSettings( const QDomElement & element )
 	// Older project files that didn't have this attribute will set the value to false (issue 5562)
 	m_mutedBeforeSolo = QVariant( element.attribute( "mutedBeforeSolo", "0" ) ).toBool();
 
-	if( element.hasAttribute( "color" ) )
+	if (element.hasAttribute("color"))
 	{
-		QColor newColor = QColor(element.attribute("color"));
-		setColor(newColor);
-	}
-	else
-	{
-		resetColor();
+		setColor(QColor{element.attribute("color")});
 	}
 
 	if( m_simpleSerializingMode )
@@ -633,18 +627,11 @@ void Track::toggleSolo()
 	}
 }
 
-void Track::setColor(const QColor& c)
+void Track::setColor(const std::optional<QColor>& color)
 {
-	m_color = c;
+	m_color = color;
 	emit colorChanged();
 }
-
-void Track::resetColor()
-{
-	m_color = std::nullopt;
-	emit colorChanged();
-}
-
 
 BoolModel *Track::getMutedModel()
 {

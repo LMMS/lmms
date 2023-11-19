@@ -163,9 +163,9 @@ void MixerLine::drawMixerLine( QPainter* p, const MixerLine *mixerLine, bool isA
 	int width = mixerLine->rect().width();
 	int height = mixerLine->rect().height();
 	
-	if (channel->m_color.has_value() && !muted)
+	if (channel->color().has_value() && !muted)
 	{
-		p->fillRect(mixerLine->rect(), channel->m_color->darker(isActive ? 120 : 150));
+		p->fillRect(mixerLine->rect(), channel->color()->darker(isActive ? 120 : 150));
 	}
 	else
 	{
@@ -415,36 +415,34 @@ void MixerLine::setStrokeInnerInactive( const QColor & c )
 	m_strokeInnerInactive = c;
 }
 
-
 // Ask user for a color, and set it as the mixer line color
 void MixerLine::selectColor()
 {
-	auto channel = Engine::mixer()->mixerChannel( m_channelIndex );
-	auto new_color = ColorChooser(this).withPalette(ColorChooser::Palette::Mixer)->getColor(channel->m_color.value_or(backgroundActive().color()));
-	if(!new_color.isValid()) { return; }
-	channel->setColor (new_color);
+	const auto channel = Engine::mixer()->mixerChannel(m_channelIndex);
+	const auto newColor = ColorChooser{this}
+		.withPalette(ColorChooser::Palette::Mixer)
+		->getColor(channel->color().value_or(backgroundActive().color()));
+	if (!newColor.isValid()) { return; }
+	channel->setColor(newColor);
 	Engine::getSong()->setModified();
 	update();
 }
-
 
 // Disable the usage of color on this mixer line
 void MixerLine::resetColor()
 {
-	Engine::mixer()->mixerChannel(m_channelIndex)->m_color = std::nullopt;
+	Engine::mixer()->mixerChannel(m_channelIndex)->setColor(std::nullopt);
 	Engine::getSong()->setModified();
 	update();
 }
-
 
 // Pick a random color from the mixer palette and set it as our color
 void MixerLine::randomizeColor()
 {
-	auto channel = Engine::mixer()->mixerChannel( m_channelIndex );
-	channel->setColor (ColorChooser::getPalette(ColorChooser::Palette::Mixer)[rand() % 48]);
+	const auto channel = Engine::mixer()->mixerChannel(m_channelIndex);
+	channel->setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[std::rand() % 48]);
 	Engine::getSong()->setModified();
 	update();
 }
-
 
 } // namespace lmms::gui

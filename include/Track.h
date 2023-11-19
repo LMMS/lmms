@@ -189,15 +189,9 @@ public:
 	{
 		return m_processingLock.tryLock();
 	}
-	
-	QColor color()
-	{
-		return m_color.value();
-	}
-	bool useColor()
-	{
-		return m_color.has_value();
-	}
+
+	auto color() const -> const std::optional<QColor>& { return m_color; }
+	void setColor(const std::optional<QColor>& color);
 
 	bool isMutedBeforeSolo() const
 	{
@@ -219,9 +213,6 @@ public slots:
 	}
 
 	void toggleSolo();
-
-	void setColor(const QColor& c);
-	void resetColor();
 
 private:
 	TrackContainer* m_trackContainer;
