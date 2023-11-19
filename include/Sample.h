@@ -52,6 +52,7 @@ public:
 	// if there appears problems with playback on some interpolation mode, then the value for that mode
 	// may need to be higher - conversely, to optimize, some may work with lower values
 	static constexpr auto s_interpolationMargins = std::array<int, 5>{64, 64, 64, 4, 4};
+	static constexpr int s_min_resolution = 512;
 
 	enum class Loop
 	{
