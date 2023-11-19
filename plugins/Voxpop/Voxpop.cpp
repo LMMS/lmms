@@ -73,11 +73,7 @@ Plugin::Descriptor PLUGIN_EXPORT voxpop_plugin_descriptor =
 	0x0100,
 	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
-	"wav,ogg,ds,spx,au,voc,aif,aiff,flac,raw"
-#ifdef LMMS_HAVE_SNDFILE_MP3
-	",mp3"
-#endif
-	,
+	nullptr,
 	nullptr,
 } ;
 
