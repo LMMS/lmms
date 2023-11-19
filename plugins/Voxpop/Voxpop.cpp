@@ -235,6 +235,7 @@ void Voxpop::deleteNotePluginData( NotePlayHandle * _n )
 
 void Voxpop::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
+	m_cueIndexModel.saveSettings(doc, elem, "cueindex");
 	m_ampModel.saveSettings(doc, elem, "amp");
 	m_stutterModel.saveSettings(doc, elem, "stutter");
 	m_interpolationModel.saveSettings(doc, elem, "interp");
@@ -303,6 +304,11 @@ void Voxpop::loadSettings(const QDomElement& elem)
 	}
 	m_respectEndpointModel.loadSettings(elem, "respectendpoint");
 	modeChanged();
+	if (m_cueCount > 0)
+	{
+		m_cueIndexModel.loadSettings(elem, "cueindex");
+		cueIndexChanged();
+	}
 }
 
 
@@ -516,7 +522,7 @@ VoxpopView::VoxpopView( Instrument * _instrument, QWidget * _parent ) :
 
 	m_respectEnpointsCheckBox = new LedCheckBox(this);
 	m_respectEnpointsCheckBox->setToolTip( tr("Respect cue endpoints") );
-	m_respectEnpointsCheckBox->move(3, 90);
+	m_respectEnpointsCheckBox->move(3, 86);
 
 	m_openAudioFileButton = new PixmapButton( this );
 	m_openAudioFileButton->setCursor( QCursor( Qt::PointingHandCursor ) );
@@ -714,7 +720,7 @@ void VoxpopView::updateCuePoints()
 	}
 
 	QPainter p( this );
-	p.setPen( QColor( 255, 60, 60, 150 ) );
+	p.setPen( QColor( 60, 255, 60, 150 ) );
 
 	double graphWidth = 241;
 	for ( int i = 0 ; i < voxpop->m_cueCount ; i++)
@@ -773,7 +779,7 @@ void VoxpopWaveView::updateGraph()
 
 	m_graph.fill( Qt::transparent );
 	QPainter p( &m_graph );
-	p.setPen( QColor( 200, 200, 250 ) );
+	p.setPen( QColor( 200, 255, 200 ) );
 
 	m_sampleBuffer.visualize(
 		p,
