@@ -172,11 +172,11 @@ void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
 
 	p.fillRect(rect(), palette().brush(QPalette::Window));
 
-	if( m_trackView->getTrack()->useColor() && ! m_trackView->getTrack()->getMutedModel()->value() ) 
+	if (m_trackView->getTrack()->color().has_value() && !m_trackView->getTrack()->getMutedModel()->value()) 
 	{
 		QRect coloredRect( 0, 0, 10, m_trackView->getTrack()->getHeight() );
-		
-		p.fillRect( coloredRect, m_trackView->getTrack()->color() );
+
+		p.fillRect(coloredRect, m_trackView->getTrack()->color().value());
 	}
 
 	p.drawPixmap(2, 2, embed::getIconPixmap(m_trackView->isMovingTrack() ? "track_op_grip_c" : "track_op_grip"));
@@ -265,15 +265,15 @@ void TrackOperationsWidget::removeTrack()
 
 void TrackOperationsWidget::selectTrackColor()
 {
-	QColor new_color = ColorChooser( this ).withPalette( ColorChooser::Palette::Track )-> \
-		getColor( m_trackView->getTrack()->color() );
+	const auto newColor = ColorChooser{this}
+		.withPalette(ColorChooser::Palette::Track)
+		->getColor(m_trackView->getTrack()->color().value_or(Qt::white));
 
-	if( ! new_color.isValid() )
-	{ return; }
+	if (!newColor.isValid()) { return; }
 
-	auto track = m_trackView->getTrack();
+	const auto track = m_trackView->getTrack();
 	track->addJournalCheckPoint();
-	track->setColor(new_color);
+	track->setColor(newColor);
 	Engine::getSong()->setModified();
 }
 
@@ -281,7 +281,7 @@ void TrackOperationsWidget::resetTrackColor()
 {
 	auto track = m_trackView->getTrack();
 	track->addJournalCheckPoint();
-	track->resetColor();
+	track->setColor(std::nullopt);
 	Engine::getSong()->setModified();
 }
 
@@ -298,15 +298,12 @@ void TrackOperationsWidget::resetClipColors()
 {
 	auto track = m_trackView->getTrack();
 	track->addJournalCheckPoint();
-	for (auto clip: track->getClips())
+	for (auto clip : track->getClips())
 	{
-		clip->useCustomClipColor(false);
+		clip->setColor(std::nullopt);
 	}
 	Engine::getSong()->setModified();
 }
-
-
-
 
 /*! \brief Update the trackOperationsWidget context menu
  *

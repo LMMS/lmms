@@ -830,10 +830,10 @@ void AutomationClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "prog", QString::number( static_cast<int>(progressionType()) ) );
 	_this.setAttribute( "tens", QString::number( getTension() ) );
 	_this.setAttribute( "mute", QString::number( isMuted() ) );
-	
-	if( usesCustomClipColor() )
+
+	if (const auto& c = color())
 	{
-		_this.setAttribute( "color", color().name() );
+		_this.setAttribute("color", c->name());
 	}
 
 	for( timeMap::const_iterator it = m_timeMap.begin();
@@ -919,10 +919,9 @@ void AutomationClip::loadSettings( const QDomElement & _this )
 		}
 	}
 	
-	if( _this.hasAttribute( "color" ) )
+	if (_this.hasAttribute("color"))
 	{
-		useCustomClipColor( true );
-		setColor( _this.attribute( "color" ) );
+		setColor(QColor{_this.attribute("color")});
 	}
 
 	int len = _this.attribute( "len" ).toInt();

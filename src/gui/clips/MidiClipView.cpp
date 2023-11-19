@@ -562,7 +562,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 		QColor noteFillColor = muted ? getMutedNoteFillColor().lighter(200)
 									 : (c.lightness() > 175 ? getNoteFillColor().darker(400) : getNoteFillColor());
 		QColor noteBorderColor = muted ? getMutedNoteBorderColor()
-									   : ( m_clip->hasColor() ? c.lighter( 200 ) : getNoteBorderColor() );
+									   : (hasCustomColor() ? c.lighter(200) : getNoteBorderColor());
 
 		bool const drawAsLines = height() < 64;
 		if (drawAsLines)
