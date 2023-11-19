@@ -204,9 +204,8 @@ void Voxpop::playNote( NotePlayHandle * _n,
 
 	if( ! _n->isFinished() )
 	{
-		// TODO modes
 		float freq = 440.f;
-		if (false) // TODO automation mode
+		if( m_mode == CueSelectionMode::Automation)
 		{
 			freq = _n->frequency();
 		}
