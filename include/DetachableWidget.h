@@ -28,9 +28,11 @@
 
 #include <QWidget>
 
+#include "lmms_export.h"
+
 namespace lmms::gui {
 
-class DetachableWidget : public QWidget
+class LMMS_EXPORT DetachableWidget : public QWidget
 {
 	Q_OBJECT
 public:
