@@ -169,7 +169,7 @@ void SampleClipView::mouseReleaseEvent(QMouseEvent *_me)
 
 void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 {
-	QString af = gui::SampleLoader::openAudioFile();
+	QString af = SampleLoader::openAudioFile();
 
 	if ( af.isEmpty() ) {} //Don't do anything if no file is loaded
 	else if (af == m_clip->m_sample.sampleFile())
