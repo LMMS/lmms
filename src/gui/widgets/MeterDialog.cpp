@@ -43,12 +43,12 @@ MeterDialog::MeterDialog( QWidget * _parent, bool _simple ) :
 {
 	auto vlayout = new QVBoxLayout(this);
 	vlayout->setSpacing( 0 );
-	vlayout->setMargin( 0 );
+	vlayout->setContentsMargins(0, 0, 0, 0);
 
 	auto num = new QWidget(this);
 	auto num_layout = new QHBoxLayout(num);
 	num_layout->setSpacing( 0 );
-	num_layout->setMargin( 0 );
+	num_layout->setContentsMargins(0, 0, 0, 0);
 
 
 	m_numerator = new LcdSpinBox( 2, num, tr( "Meter Numerator" ) );
@@ -69,7 +69,7 @@ MeterDialog::MeterDialog( QWidget * _parent, bool _simple ) :
 	auto den = new QWidget(this);
 	auto den_layout = new QHBoxLayout(den);
 	den_layout->setSpacing( 0 );
-	den_layout->setMargin( 0 );
+	den_layout->setContentsMargins(0, 0, 0, 0);
 
 	m_denominator = new LcdSpinBox( 2, den, tr( "Meter Denominator" ) );
 	m_denominator->setToolTip(tr("Meter denominator"));

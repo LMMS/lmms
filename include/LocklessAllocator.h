@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LOCKLESS_ALLOCATOR_H
-#define LOCKLESS_ALLOCATOR_H
+#ifndef LMMS_LOCKLESS_ALLOCATOR_H
+#define LMMS_LOCKLESS_ALLOCATOR_H
 
 #include <atomic>
 #include <cstddef>
@@ -84,4 +84,4 @@ public:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_LOCKLESS_ALLOCATOR_H

@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LV2PORTS_H
-#define LV2PORTS_H
+#ifndef LMMS_LV2PORTS_H
+#define LMMS_LV2PORTS_H
 
 #include "lmmsconfig.h"
 
@@ -33,6 +33,7 @@
 #include <memory>
 #include <vector>
 
+#include "Flags.h"
 #include "lmms_basics.h"
 #include "PluginIssue.h"
 
@@ -210,12 +211,12 @@ private:
 
 struct AtomSeq : public VisitablePort<AtomSeq, PortBase>
 {
-	enum FlagType
+	enum class FlagType
 	{
 		None = 0,
 		Midi = 1
 	};
-	unsigned flags = FlagType::None;
+	Flags<FlagType> flags = FlagType::None;
 
 	struct Lv2EvbufDeleter
 	{
@@ -270,4 +271,5 @@ const Target* dcast(const PortBase* base)
 } // namespace lmms
 
 #endif // LMMS_HAVE_LV2
-#endif // LV2PORTS_H
+
+#endif // LMMS_LV2PORTS_H

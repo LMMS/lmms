@@ -25,8 +25,8 @@
  *
  */
 
-#ifndef LOCALEHELPER_H
-#define LOCALEHELPER_H
+#ifndef LMMS_LOCALEHELPER_H
+#define LMMS_LOCALEHELPER_H
 
 #include <QLocale>
 
@@ -67,4 +67,4 @@ inline float toFloat(QString str, bool* ok = nullptr)
 
 } // namespace lmms::LocaleHelper
 
-#endif // LOCALEHELPER_H
+#endif // LMMS_LOCALEHELPER_H

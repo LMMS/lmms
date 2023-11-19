@@ -21,9 +21,8 @@
  *
  */
 
-
-#ifndef MEMORY_HELPER_H
-#define MEMORY_HELPER_H
+#ifndef LMMS_MEMORY_HELPER_H
+#define LMMS_MEMORY_HELPER_H
 
 #include <cstddef>
 
@@ -47,5 +46,4 @@ private:
 
 } // namespace lmms
 
-#endif
-
+#endif // LMMS_MEMORY_HELPER_H

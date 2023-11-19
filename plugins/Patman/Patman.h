@@ -98,17 +98,17 @@ private:
 	BoolModel m_tunedModel;
 
 
-	enum LoadErrors
+	enum class LoadError
 	{
-		LoadOK,
-		LoadOpen,
-		LoadNotGUS,
-		LoadInstruments,
-		LoadLayers,
-		LoadIO
+		OK,
+		Open,
+		NotGUS,
+		Instruments,
+		Layers,
+		IO
 	} ;
 
-	LoadErrors loadPatch( const QString & _filename );
+	LoadError loadPatch( const QString & _filename );
 	void unloadCurrentPatch();
 
 	void selectSample( NotePlayHandle * _n );

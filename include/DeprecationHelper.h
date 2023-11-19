@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef DEPRECATIONHELPER_H
-#define DEPRECATIONHELPER_H
+#ifndef LMMS_DEPRECATIONHELPER_H
+#define LMMS_DEPRECATIONHELPER_H
 
 #include <QFontMetrics>
 #include <QWheelEvent>
@@ -66,4 +66,4 @@ inline QPoint position(QWheelEvent *wheelEvent)
 
 } // namespace lmms
 
-#endif // DEPRECATIONHELPER_H
+#endif // LMMS_DEPRECATIONHELPER_H

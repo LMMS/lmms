@@ -23,11 +23,11 @@
  *
  */
 
-#ifndef NOTE_H
-#define NOTE_H
+#ifndef LMMS_NOTE_H
+#define LMMS_NOTE_H
 
 #include <optional>
-#include <QVector>
+#include <vector>
 
 #include "volume.h"
 #include "panning.h"
@@ -42,50 +42,56 @@ namespace lmms
 class DetuningHelper;
 
 
-enum Keys
+enum class Key : int
 {
-	Key_C = 0,
-	Key_CIS = 1, Key_DES = 1,
-	Key_D = 2,
-	Key_DIS = 3, Key_ES = 3,
-	Key_E = 4, Key_FES = 4,
-	Key_F = 5,
-	Key_FIS = 6, Key_GES = 6,
-	Key_G = 7,
-	Key_GIS = 8, Key_AS = 8,
-	Key_A = 9,
-	Key_AIS = 10, Key_B = 10,
-	Key_H = 11
+	C = 0,
+	Cis = 1, Des = 1,
+	D = 2,
+	Dis = 3, Es = 3,
+	E = 4, Fes = 4,
+	F = 5,
+	Fis = 6, Ges = 6,
+	G = 7,
+	Gis = 8, As = 8,
+	A = 9,
+	Ais = 10, B = 10,
+	H = 11
 } ;
 
 
-enum Octaves
+enum class Octave : int
 {
 	Octave_m1,	// MIDI standard starts at C-1
 	Octave_0,
 	Octave_1,
 	Octave_2,
 	Octave_3,
-	Octave_4, DefaultOctave = Octave_4,
+	Octave_4,
 	Octave_5,
 	Octave_6,
 	Octave_7,
 	Octave_8,
 	Octave_9,	// incomplete octave, MIDI only goes up to G9
-	NumOctaves
 };
 
 const int FirstOctave = -1;
 const int KeysPerOctave = 12;
-const int DefaultKey = DefaultOctave * KeysPerOctave + Key_A;
+
+constexpr inline auto operator+(Octave octave, Key key) -> int
+{
+	return static_cast<int>(octave) * KeysPerOctave + static_cast<int>(key);
+}
+
+constexpr auto DefaultOctave = Octave::Octave_4;
+const int DefaultKey = DefaultOctave + Key::A;
 //! Number of physical keys, limited to MIDI range (valid for both MIDI 1.0 and 2.0)
 const int NumKeys = 128;
 
-const int DefaultMiddleKey = Octave_4 * KeysPerOctave + Key_C;
-const int DefaultBaseKey = Octave_4 * KeysPerOctave + Key_A;
+const int DefaultMiddleKey = Octave::Octave_4 + Key::C;
+const int DefaultBaseKey = Octave::Octave_4 + Key::A;
 const float DefaultBaseFreq = 440.f;
 
-const float MaxDetuning = 4 * 12.0f;
+const float MaxDetuning = 5 * 12.0f;
 
 
 
@@ -100,6 +106,16 @@ public:
 		DetuningHelper * detuning = nullptr );
 	Note( const Note & note );
 	~Note() override;
+
+	// Note types
+	enum class Type
+	{
+		Regular = 0,
+		Step
+	};
+
+	Type type() const { return m_type; }
+	inline void setType(Type t) { m_type = t; }
 
 	// used by GUI
 	inline void setSelected( const bool selected ) { m_selected = selected; }
@@ -198,7 +214,7 @@ public:
 
 	int midiVelocity( int midiBaseVelocity ) const
 	{
-		return qMin( MidiMaxVelocity, getVolume() * midiBaseVelocity / DefaultVolume );
+		return std::min(MidiMaxVelocity, getVolume() * midiBaseVelocity / DefaultVolume);
 	}
 
 	inline panning_t getPanning() const
@@ -247,9 +263,11 @@ private:
 	TimePos m_length;
 	TimePos m_pos;
 	DetuningHelper * m_detuning;
+
+	Type m_type = Type::Regular;
 };
 
-using NoteVector = QVector<Note*>;
+using NoteVector = std::vector<Note*>;
 
 struct NoteBounds
 {
@@ -265,4 +283,4 @@ std::optional<NoteBounds> boundsForNotes(const NoteVector& notes);
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_NOTE_H

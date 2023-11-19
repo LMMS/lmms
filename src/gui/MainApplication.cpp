@@ -39,6 +39,19 @@ MainApplication::MainApplication(int& argc, char** argv) :
 	QApplication(argc, argv),
 	m_queuedFile()
 {
+#if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_APPLE) && !defined(LMMS_BUILD_HAIKU)
+	// Work around a bug of KXmlGui < 5.55
+	// which breaks the recent files menu
+	// https://bugs.kde.org/show_bug.cgi?id=337491
+	for (auto child : children())
+	{
+		if (child->inherits("KCheckAcceleratorsInitializer"))
+		{
+			delete child;
+		}
+	}
+#endif
+
 #if defined(LMMS_BUILD_WIN32)
 	installNativeEventFilter(this);
 #endif

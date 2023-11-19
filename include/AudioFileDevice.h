@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef AUDIO_FILE_DEVICE_H
-#define AUDIO_FILE_DEVICE_H
+#ifndef LMMS_AUDIO_FILE_DEVICE_H
+#define LMMS_AUDIO_FILE_DEVICE_H
 
 #include <QFile>
 
@@ -73,4 +73,4 @@ using AudioFileDeviceInstantiaton
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AUDIO_FILE_DEVICE_H

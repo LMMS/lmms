@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef GROUP_BOX_H
-#define GROUP_BOX_H
+#ifndef LMMS_GUI_GROUP_BOX_H
+#define LMMS_GUI_GROUP_BOX_H
 
 #include <QWidget>
 
@@ -74,5 +73,4 @@ private:
 
 } // namespace lmms::gui
 
-
-#endif
+#endif // LMMS_GUI_GROUP_BOX_H

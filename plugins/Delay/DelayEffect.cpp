@@ -44,7 +44,7 @@ Plugin::Descriptor PLUGIN_EXPORT delay_plugin_descriptor =
 	QT_TRANSLATE_NOOP( "PluginBrowser", "A native delay plugin" ),
 	"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,
@@ -91,7 +91,7 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	const float sr = Engine::audioEngine()->processingSampleRate();
 	const float d = dryLevel();
 	const float w = wetLevel();
-	sample_t dryS[2];
+	auto dryS = std::array<sample_t, 2>{};
 	float lPeak = 0.0;
 	float rPeak = 0.0;
 	float length = m_delayControls.m_delayTimeModel.value();

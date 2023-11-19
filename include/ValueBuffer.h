@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef VALUE_BUFFER_H
-#define VALUE_BUFFER_H
+#ifndef LMMS_VALUE_BUFFER_H
+#define LMMS_VALUE_BUFFER_H
 
 #include <vector>
 
@@ -57,4 +57,4 @@ public:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_VALUE_BUFFER_H

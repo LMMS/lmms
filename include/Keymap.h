@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef KEYMAP_H
-#define KEYMAP_H
+#ifndef LMMS_KEYMAP_H
+#define LMMS_KEYMAP_H
 
 #include <vector>
 #include <QObject>
@@ -80,4 +80,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_KEYMAP_H

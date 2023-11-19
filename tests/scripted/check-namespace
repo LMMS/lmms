@@ -77,7 +77,9 @@ exclude_files = re.compile(
     'plugins/MidiExport/MidiFile.hpp|'
     'plugins/ReverbSC/[a-z]|'
     'plugins/Sf2Player/fluidsynthshims.h|'
-    '/portsmf/'
+    '/portsmf/|'
+    # only forward to headers that are not ours:
+    'plugins/ZynAddSubFx/ThreadShims.h'
 )
 
 files = [Path(f) for f in result.stdout.splitlines() if not exclude_files.search(f)]
@@ -131,7 +133,7 @@ for cur_file in files:
     if cur_file.is_file():
         cur_text = cur_file.read_text(errors='replace')
 
-        if str(cur_file) not in known_no_namespace_lmms:
+        if cur_file.as_posix() not in known_no_namespace_lmms:
             namespace_pattern.search(cur_text) or error(cur_file, None, f'File has no namespace lmms')
 
         header_guard = str(cur_file).endswith('.h')

@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef COMBOBOX_MODEL_H
-#define COMBOBOX_MODEL_H
+#ifndef LMMS_COMBOBOX_MODEL_H
+#define LMMS_COMBOBOX_MODEL_H
 
 #include <memory>
 #include <utility>
@@ -72,12 +72,12 @@ public:
 
 	const QString & itemText( int i ) const
 	{
-		return m_items[qBound<int>( minValue(), i,  maxValue() )].first;
+		return m_items[std::clamp(i, minValue(), maxValue())].first;
 	}
 
 	const PixmapLoader* itemPixmap( int i ) const
 	{
-		return m_items[qBound<int>( minValue(), i, maxValue() )].second.get();
+		return m_items[std::clamp(i, minValue(), maxValue())].second.get();
 	}
 
 	int size() const
@@ -95,4 +95,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_COMBOBOX_MODEL_H

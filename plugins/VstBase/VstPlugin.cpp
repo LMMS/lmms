@@ -216,18 +216,18 @@ void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 
 	lock();
 
-	VstHostLanguages hlang = LanguageEnglish;
+	VstHostLanguage hlang = VstHostLanguage::English;
 	switch( QLocale::system().language() )
 	{
-		case QLocale::French: hlang = LanguageFrench; break;
-		case QLocale::German: hlang = LanguageGerman; break;
-		case QLocale::Italian: hlang = LanguageItalian; break;
-		case QLocale::Japanese: hlang = LanguageJapanese; break;
-		case QLocale::Korean: hlang = LanguageKorean; break;
-		case QLocale::Spanish: hlang = LanguageSpanish; break;
+		case QLocale::French: hlang = VstHostLanguage::French; break;
+		case QLocale::German: hlang = VstHostLanguage::German; break;
+		case QLocale::Italian: hlang = VstHostLanguage::Italian; break;
+		case QLocale::Japanese: hlang = VstHostLanguage::Japanese; break;
+		case QLocale::Korean: hlang = VstHostLanguage::Korean; break;
+		case QLocale::Spanish: hlang = VstHostLanguage::Spanish; break;
 		default: break;
 	}
-	sendMessage( message( IdVstSetLanguage ).addInt( hlang ) );
+	sendMessage( message( IdVstSetLanguage ).addInt( static_cast<int>(hlang) ) );
 	sendMessage( message( IdVstLoadPlugin ).addString( QSTR_TO_STDSTR( m_plugin ) ) );
 
 	waitForInitDone();
@@ -504,20 +504,14 @@ QWidget *VstPlugin::editor()
 
 void VstPlugin::openPreset()
 {
-
-	gui::FileDialog ofd( nullptr, tr( "Open Preset" ), "",
-		tr( "Vst Plugin Preset (*.fxp *.fxb)" ) );
-	ofd.setFileMode( gui::FileDialog::ExistingFiles );
-	if( ofd.exec () == QDialog::Accepted &&
-					!ofd.selectedFiles().isEmpty() )
+	gui::FileDialog ofd(nullptr, tr("Open Preset"), "", tr("VST Plugin Preset (*.fxp *.fxb)"));
+	ofd.setFileMode(gui::FileDialog::ExistingFiles);
+	if (ofd.exec() == QDialog::Accepted && !ofd.selectedFiles().isEmpty())
 	{
 		lock();
-		sendMessage( message( IdLoadPresetFile ).
-			addString(
-				QSTR_TO_STDSTR(
-					QDir::toNativeSeparators( ofd.selectedFiles()[0] ) ) )
-			);
-		waitForMessage( IdLoadPresetFile, true );
+		sendMessage(message(IdLoadPresetFile).addString(QSTR_TO_STDSTR(
+			QDir::toNativeSeparators(ofd.selectedFiles()[0]))));
+		waitForMessage(IdLoadPresetFile, true);
 		unlock();
 	}
 }
@@ -585,32 +579,32 @@ void VstPlugin::savePreset()
 	QString presName = currentProgramName().isEmpty() ? tr(": default") : currentProgramName();
 	presName.replace("\"", "'"); // QFileDialog unable to handle double quotes properly
 
-	gui::FileDialog sfd( nullptr, tr( "Save Preset" ), presName.section(": ", 1, 1) + tr(".fxp"),
-		tr( "Vst Plugin Preset (*.fxp *.fxb)" ) );
+	gui::FileDialog sfd(nullptr, tr("Save Preset"), presName.section(": ", 1, 1) + tr(".fxp"),
+		tr("VST Plugin Preset (*.fxp *.fxb)"));
 
-	if( p_name != "" ) // remember last directory
+	if (p_name != "") // remember last directory
 	{
-		sfd.setDirectory( QFileInfo( p_name ).absolutePath() );
+		sfd.setDirectory(QFileInfo(p_name).absolutePath());
 	}
 
-	sfd.setAcceptMode( gui::FileDialog::AcceptSave );
-	sfd.setFileMode( gui::FileDialog::AnyFile );
-	if( sfd.exec () == QDialog::Accepted &&
-				!sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "" )
+	sfd.setAcceptMode(gui::FileDialog::AcceptSave);
+	sfd.setFileMode(gui::FileDialog::AnyFile);
+	if (sfd.exec() == QDialog::Accepted && !sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "")
 	{
 		QString fns = sfd.selectedFiles()[0];
 		p_name = fns;
 
 		if ((fns.toUpper().indexOf(tr(".FXP")) == -1) && (fns.toUpper().indexOf(tr(".FXB")) == -1))
+		{
 			fns = fns + tr(".fxb");
-		else fns = fns.left(fns.length() - 4) + (fns.right( 4 )).toLower();
+		}
+		else
+		{
+			fns = fns.left(fns.length() - 4) + (fns.right(4)).toLower();
+		}
 		lock();
-		sendMessage( message( IdSavePresetFile ).
-			addString(
-				QSTR_TO_STDSTR(
-					QDir::toNativeSeparators( fns ) ) )
-			);
-		waitForMessage( IdSavePresetFile, true );
+		sendMessage(message(IdSavePresetFile).addString(QSTR_TO_STDSTR(QDir::toNativeSeparators(fns))));
+		waitForMessage(IdSavePresetFile, true);
 		unlock();
 	}
 }
@@ -757,7 +751,7 @@ void VstPlugin::createUI( QWidget * parent )
 		QHBoxLayout * l = new QHBoxLayout( helper );
 		QWidget * target = new QWidget( helper );
 		l->setSpacing( 0 );
-		l->setMargin( 0 );
+		l->setContentsMargins(0, 0, 0, 0);
 		l->addWidget( target );
 
 		// we've to call that for making sure, Qt created the windows

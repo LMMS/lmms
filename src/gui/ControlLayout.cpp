@@ -258,8 +258,8 @@ int ControlLayout::doLayout(const QRect &rect, bool testOnly) const
 				if (first)
 				{
 					// for the search bar, only show it if there are at least
-					// two control widgets (i.e. at least 3 widgets)
-					if (m_itemMap.size() > 2) { wid->show(); }
+					// five control widgets (i.e. at least 6 widgets)
+					if (m_itemMap.size() > 5) { wid->show(); }
 					else { wid->hide(); }
 				}
 				else { wid->show(); }

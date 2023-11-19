@@ -22,13 +22,23 @@
  *
  */
 
-
-#ifndef FILE_BROWSER_H
-#define FILE_BROWSER_H
+#ifndef LMMS_GUI_FILE_BROWSER_H
+#define LMMS_GUI_FILE_BROWSER_H
 
 #include <QCheckBox>
 #include <QDir>
 #include <QMutex>
+
+#ifdef __MINGW32__
+#include <mingw.condition_variable.h>
+#include <mingw.mutex.h>
+#include <mingw.thread.h>
+#else
+#include <condition_variable>
+#include <mutex>
+#include <thread>
+#endif
+
 #if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 	#include <QRecursiveMutex>
 #endif
@@ -73,11 +83,12 @@ public:
 
 	~FileBrowser() override = default;
 
+	static QDir::Filters dirFilters();
+
 private slots:
 	void reloadTree();
 	void expandItems( QTreeWidgetItem * item=nullptr, QList<QString> expandedDirs = QList<QString>() );
-	// call with item=NULL to filter the entire tree
-	bool filterItems( const QString & filter, QTreeWidgetItem * item=nullptr );
+	bool filterAndExpandItems(const QString & filter, QTreeWidgetItem * item = nullptr);
 	void giveFocusToFilter();
 
 private:
@@ -85,7 +96,15 @@ private:
 
 	void addItems( const QString & path );
 
+	void saveDirectoriesStates();
+	void restoreDirectoriesStates();
+
+	void buildSearchTree(QStringList matches, QString id);
+	void onSearch(const QString& filter);
+	void toggleSearch(bool on);
+
 	FileBrowserTreeWidget * m_fileBrowserTreeWidget;
+	FileBrowserTreeWidget * m_searchTreeWidget;
 
 	QLineEdit * m_filterEdit;
 
@@ -100,6 +119,8 @@ private:
 	QCheckBox* m_showFactoryContent = nullptr;
 	QString m_userDir;
 	QString m_factoryDir;
+	QList<QString> m_savedExpandedDirs;
+	QString m_previousFilterValue;
 } ;
 
 
@@ -115,7 +136,6 @@ public:
 	//! This method returns a QList with paths (QString's) of all directories
 	//! that are expanded in the tree.
 	QList<QString> expandedDirs( QTreeWidgetItem * item = nullptr ) const;
-
 
 protected:
 	void contextMenuEvent( QContextMenuEvent * e ) override;
@@ -162,6 +182,46 @@ private slots:
 	void openContainingFolder( lmms::gui::FileItem* item );
 
 } ;
+
+class FileBrowserSearcher : public QObject
+{
+	Q_OBJECT
+public:
+	struct SearchTask
+	{
+		QString directories;
+		QString userFilter;
+		QDir::Filters dirFilters;
+		QStringList nameFilters;
+		QString id;
+	};
+
+	FileBrowserSearcher();
+	~FileBrowserSearcher() noexcept override;
+
+	void search(SearchTask task);
+	void cancel();
+
+	bool inHiddenDirectory(const QString& path);
+
+	static FileBrowserSearcher* instance();
+
+signals:
+	void searchComplete(QStringList matches, QString id);
+
+private:
+	void run();
+	void filter();
+	SearchTask m_currentTask;
+	std::thread m_worker;
+	std::mutex m_runMutex;
+	std::mutex m_cancelMutex;
+	std::condition_variable m_runCond;
+	std::atomic<bool> m_cancel = false;
+	bool m_stopped = false;
+	bool m_run = false;
+	inline static std::unique_ptr<FileBrowserSearcher> s_instance = nullptr;
+};
 
 
 
@@ -224,20 +284,19 @@ private:
 class FileItem : public QTreeWidgetItem
 {
 public:
-	enum FileTypes
+	enum class FileType
 	{
-		ProjectFile,
-		PresetFile,
-		SampleFile,
-		SoundFontFile,
-		PatchFile,
-		MidiFile,
-		VstPluginFile,
-		UnknownFile,
-		NumFileTypes
+		Project,
+		Preset,
+		Sample,
+		SoundFont,
+		Patch,
+		Midi,
+		VstPlugin,
+		Unknown
 	} ;
 
-	enum FileHandling
+	enum class FileHandling
 	{
 		NotSupported,
 		LoadAsProject,
@@ -256,7 +315,7 @@ public:
 		return QFileInfo(m_path, text(0)).absoluteFilePath();
 	}
 
-	inline FileTypes type() const
+	inline FileType type() const
 	{
 		return( m_type );
 	}
@@ -268,11 +327,12 @@ public:
 
 	inline bool isTrack() const
 	{
-		return m_handling == LoadAsPreset || m_handling == LoadByPlugin;
+		return m_handling == FileHandling::LoadAsPreset || m_handling == FileHandling::LoadByPlugin;
 	}
 
 	QString extension();
 	static QString extension( const QString & file );
+	static QString defaultFilters();
 
 
 private:
@@ -288,7 +348,7 @@ private:
 	static QPixmap * s_unknownFilePixmap;
 
 	QString m_path;
-	FileTypes m_type;
+	FileType m_type;
 	FileHandling m_handling;
 
 } ;
@@ -298,4 +358,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_FILE_BROWSER_H

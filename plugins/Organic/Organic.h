@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef ORGANIC_H
-#define ORGANIC_H
+#ifndef LMMS_ORGANIC_H
+#define LMMS_ORGANIC_H
 
 #include <QString>
 
@@ -131,8 +130,8 @@ public:
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
-	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
-	void loadSettings( const QDomElement & _this ) override;
+	void saveSettings(QDomDocument& doc, QDomElement& elem) override;
+	void loadSettings(const QDomElement& elem) override;
 
 	QString nodeName() const override;
 
@@ -239,4 +238,4 @@ protected slots:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_ORGANIC_H

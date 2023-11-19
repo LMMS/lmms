@@ -36,14 +36,14 @@ namespace lmms::gui
 
 TimeDisplayWidget::TimeDisplayWidget() :
 	QWidget(),
-	m_displayMode( MinutesSeconds ),
+	m_displayMode( DisplayMode::MinutesSeconds ),
 	m_spinBoxesLayout( this ),
 	m_majorLCD( 4, this ),
 	m_minorLCD( 2, this ),
 	m_milliSecondsLCD( 3, this )
 {
 	m_spinBoxesLayout.setSpacing( 0 );
-	m_spinBoxesLayout.setMargin( 0 );
+	m_spinBoxesLayout.setContentsMargins(0, 0, 0, 0);
 	m_spinBoxesLayout.addWidget( &m_majorLCD );
 	m_spinBoxesLayout.addWidget( &m_minorLCD );
 	m_spinBoxesLayout.addWidget( &m_milliSecondsLCD );
@@ -65,13 +65,13 @@ void TimeDisplayWidget::setDisplayMode( DisplayMode displayMode )
 
 	switch( m_displayMode )
 	{
-		case MinutesSeconds:
+		case DisplayMode::MinutesSeconds:
 			m_majorLCD.setLabel( tr( "MIN" ) );
 			m_minorLCD.setLabel( tr( "SEC" ) );
 			m_milliSecondsLCD.setLabel( tr( "MSEC" ) );
 			break;
 
-		case BarsTicks:
+		case DisplayMode::BarsTicks:
 			m_majorLCD.setLabel( tr( "BAR" ) );
 			m_minorLCD.setLabel( tr( "BEAT" ) );
 			m_milliSecondsLCD.setLabel( tr( "TICK" ) );
@@ -90,7 +90,7 @@ void TimeDisplayWidget::updateTime()
 
 	switch( m_displayMode )
 	{
-		case MinutesSeconds:
+		case DisplayMode::MinutesSeconds:
 			int msec;
 			msec = s->getMilliseconds();
 			m_majorLCD.setValue(msec / 60000);
@@ -98,7 +98,7 @@ void TimeDisplayWidget::updateTime()
 			m_milliSecondsLCD.setValue(msec % 1000);
 			break;
 
-		case BarsTicks:
+		case DisplayMode::BarsTicks:
 			int tick;
 			tick = s->getPlayPos().getTicks();
 			m_majorLCD.setValue((int)(tick / s->ticksPerBar()) + 1);
@@ -119,13 +119,13 @@ void TimeDisplayWidget::mousePressEvent( QMouseEvent* mouseEvent )
 {
 	if( mouseEvent->button() == Qt::LeftButton )
 	{
-		if( m_displayMode == MinutesSeconds )
+		if( m_displayMode == DisplayMode::MinutesSeconds )
 		{
-			setDisplayMode( BarsTicks );
+			setDisplayMode( DisplayMode::BarsTicks );
 		}
 		else
 		{
-			setDisplayMode( MinutesSeconds );
+			setDisplayMode( DisplayMode::MinutesSeconds );
 		}
 	}
 }

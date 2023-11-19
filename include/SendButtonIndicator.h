@@ -21,8 +21,9 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-#ifndef SENDBUTTONINDICATOR_H
-#define SENDBUTTONINDICATOR_H
+
+#ifndef LMMS_GUI_SEND_BUTTON_INDICATOR_H
+#define LMMS_GUI_SEND_BUTTON_INDICATOR_H
 
 #include <QLabel>
 
@@ -63,4 +64,4 @@ private:
 
 } // namespace lmms
 
-#endif // SENDBUTTONINDICATOR_H
+#endif // LMMS_GUI_SEND_BUTTON_INDICATOR_H

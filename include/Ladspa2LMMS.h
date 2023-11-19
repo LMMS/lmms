@@ -23,12 +23,10 @@
  *
  */
 
-#ifndef LADSPA_2_LMMS_H
-#define LADSPA_2_LMMS_H
-
+#ifndef LMMS_LADSPA_2_LMMS_H
+#define LMMS_LADSPA_2_LMMS_H
 
 #include "LadspaManager.h"
-
 
 namespace lmms
 {
@@ -83,4 +81,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_LADSPA_2_LMMS_H

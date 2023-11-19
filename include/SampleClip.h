@@ -21,9 +21,9 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
-#ifndef SAMPLE_CLIP_H
-#define SAMPLE_CLIP_H
+
+#ifndef LMMS_SAMPLE_CLIP_H
+#define LMMS_SAMPLE_CLIP_H
 
 #include "Clip.h"
 
@@ -77,7 +77,7 @@ public:
 
 public slots:
 	void setSampleBuffer( lmms::SampleBuffer* sb );
-	void setSampleFile( const QString & _sf );
+	void setSampleFile( const QString & sf );
 	void updateLength();
 	void toggleRecord();
 	void playbackPositionChanged();
@@ -100,4 +100,4 @@ signals:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_SAMPLE_CLIP_H

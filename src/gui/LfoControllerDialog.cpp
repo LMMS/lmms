@@ -61,22 +61,22 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
 	setFixedSize( 240, 58 );
 	
-	m_baseKnob = new Knob( knobBright_26, this );
+	m_baseKnob = new Knob( KnobType::Bright26, this );
 	m_baseKnob->setLabel( tr( "BASE" ) );
 	m_baseKnob->move( CD_LFO_BASE_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_baseKnob->setHintText( tr( "Base:" ), "" );
 
-	m_speedKnob = new TempoSyncKnob( knobBright_26, this );
+	m_speedKnob = new TempoSyncKnob( KnobType::Bright26, this );
 	m_speedKnob->setLabel( tr( "FREQ" ) );
 	m_speedKnob->move( CD_LFO_SPEED_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_speedKnob->setHintText( tr( "LFO frequency:" ), "" );
 
-	m_amountKnob = new Knob( knobBright_26, this );
+	m_amountKnob = new Knob( KnobType::Bright26, this );
 	m_amountKnob->setLabel( tr( "AMNT" ) );
 	m_amountKnob->move( CD_LFO_AMOUNT_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_amountKnob->setHintText( tr( "Modulation amount:" ), "" );
 
-	m_phaseKnob = new Knob( knobBright_26, this );
+	m_phaseKnob = new Knob( KnobType::Bright26, this );
 	m_phaseKnob->setLabel( tr( "PHS" ) );
 	m_phaseKnob->move( CD_LFO_PHASE_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_phaseKnob->setHintText( tr( "Phase offset:" ) , "" + tr( " degrees" ) );
@@ -167,31 +167,22 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	m_waveBtnGrp->addButton( m_userWaveBtn );
 
 	auto x1 = new PixmapButton(this, nullptr);
-	x1->move( CD_LFO_MULTIPLIER_X, CD_LFO_SHAPES_Y +7);
-	x1->setActiveGraphic( embed::getIconPixmap(
-						"lfo_x1_active" ) );
-	x1->setInactiveGraphic( embed::getIconPixmap(
-						"lfo_x1_inactive" ) );
-	x1->setToolTip(
-				tr( "Mutliply modulation frequency by 1" ));
+	x1->move(CD_LFO_MULTIPLIER_X, CD_LFO_SHAPES_Y + 7);
+	x1->setActiveGraphic(embed::getIconPixmap("lfo_x1_active"));
+	x1->setInactiveGraphic(embed::getIconPixmap("lfo_x1_inactive"));
+	x1->setToolTip(tr("Multiply modulation frequency by 1"));
 
 	auto x100 = new PixmapButton(this, nullptr);
-	x100->move( CD_LFO_MULTIPLIER_X, CD_LFO_SHAPES_Y - 8 );
-	x100->setActiveGraphic( embed::getIconPixmap(
-						"lfo_x100_active" ) );
-	x100->setInactiveGraphic( embed::getIconPixmap(
-						"lfo_x100_inactive" ) );
-	x100->setToolTip(
-				tr( "Mutliply modulation frequency by 100" ));
+	x100->move(CD_LFO_MULTIPLIER_X, CD_LFO_SHAPES_Y - 8);
+	x100->setActiveGraphic(embed::getIconPixmap("lfo_x100_active"));
+	x100->setInactiveGraphic(embed::getIconPixmap("lfo_x100_inactive"));
+	x100->setToolTip(tr("Multiply modulation frequency by 100"));
 
 	auto d100 = new PixmapButton(this, nullptr);
-	d100->move( CD_LFO_MULTIPLIER_X, CD_LFO_SHAPES_Y + 22 );
-	d100->setActiveGraphic( embed::getIconPixmap(
-						"lfo_d100_active" ) );
-	d100->setInactiveGraphic( embed::getIconPixmap(
-						"lfo_d100_inactive" ) );
-	d100->setToolTip(
-				tr( "Divide modulation frequency by 100" ));
+	d100->move(CD_LFO_MULTIPLIER_X, CD_LFO_SHAPES_Y + 22);
+	d100->setActiveGraphic(embed::getIconPixmap("lfo_d100_active"));
+	d100->setInactiveGraphic(embed::getIconPixmap("lfo_d100_inactive"));
+	d100->setToolTip(tr("Divide modulation frequency by 100"));
 
 	m_multiplierBtnGrp = new automatableButtonGroup( this );
 	m_multiplierBtnGrp->addButton( x1 );

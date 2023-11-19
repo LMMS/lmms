@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef AUDIO_SAMPLE_RECORDER_H
-#define AUDIO_SAMPLE_RECORDER_H
+#ifndef LMMS_AUDIO_SAMPLE_RECORDER_H
+#define LMMS_AUDIO_SAMPLE_RECORDER_H
 
 #include <QList>
 #include <QPair>
@@ -59,4 +59,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AUDIO_SAMPLE_RECORDER_H

@@ -28,7 +28,7 @@ namespace lmms::gui
 {
 
 AudioDeviceSetupWidget::AudioDeviceSetupWidget(const QString & caption, QWidget * parent) :
-	TabWidget(TabWidget::tr("Settings for %1").arg(tr(caption.toUtf8())), parent)
+	QGroupBox(QGroupBox::tr("Settings for %1").arg(tr(caption.toUtf8())), parent)
 {
 }
 

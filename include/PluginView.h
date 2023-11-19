@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef PLUGIN_VIEW_H
-#define PLUGIN_VIEW_H
+#ifndef LMMS_GUI_PLUGIN_VIEW_H
+#define LMMS_GUI_PLUGIN_VIEW_H
 
 #include <QWidget>
 
@@ -47,4 +47,4 @@ public:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_PLUGIN_VIEW_H

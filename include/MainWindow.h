@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MAIN_WINDOW_H
-#define MAIN_WINDOW_H
+#ifndef LMMS_GUI_MAIN_WINDOW_H
+#define LMMS_GUI_MAIN_WINDOW_H
 
 #include <QBasicTimer>
 #include <QTimer>
@@ -113,7 +113,7 @@ public:
 		return m_autoSaveTimer.interval();
 	}
 
-	enum SessionState
+	enum class SessionState
 	{
 		Normal,
 		Recover
@@ -263,4 +263,4 @@ signals:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_MAIN_WINDOW_H

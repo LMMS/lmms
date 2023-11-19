@@ -44,7 +44,7 @@ Plugin::Descriptor PLUGIN_EXPORT eq_plugin_descriptor =
 	QT_TRANSLATE_NOOP( "PluginBrowser", "A native eq plugin" ),
 	"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,
@@ -71,7 +71,7 @@ bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 	//wet/dry controls
 	const float dry = dryLevel();
 	const float wet = wetLevel();
-	sample_t dryS[2];
+	auto dryS = std::array<sample_t, 2>{};
 	// setup sample exact controls
 	float hpRes = m_eqControls.m_hpResModel.value();
 	float lowShelfRes = m_eqControls.m_lowShelfResModel.value();

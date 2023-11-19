@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef INSTRUMENT_FUNCTIONS_H
-#define INSTRUMENT_FUNCTIONS_H
+#ifndef LMMS_INSTRUMENT_FUNCTIONS_H
+#define LMMS_INSTRUMENT_FUNCTIONS_H
 
 #include "JournallingObject.h"
 #include "lmms_basics.h"
@@ -52,6 +52,7 @@ class InstrumentFunctionNoteStacking : public Model, public JournallingObject
 
 public:
 	static const int MAX_CHORD_POLYPHONY = 13;
+	static const int NUM_CHORD_TABLES = 95;
 
 private:
 	using ChordSemiTones = std::array<int8_t, MAX_CHORD_POLYPHONY>;
@@ -118,7 +119,7 @@ public:
 	};
 
 
-	struct ChordTable : public QVector<Chord>
+	struct ChordTable
 	{
 	private:
 		ChordTable();
@@ -129,7 +130,8 @@ public:
 			ChordSemiTones m_semiTones;
 		};
 
-		static Init s_initTable[];
+		static std::array<Init, NUM_CHORD_TABLES> s_initTable;
+		std::vector<Chord> m_chords;
 
 	public:
 		static const ChordTable & getInstance()
@@ -148,6 +150,11 @@ public:
 		const Chord & getChordByName( const QString & name ) const
 		{
 			return getByName( name, false );
+		}
+
+		const std::vector<Chord>& chords() const
+		{
+			return m_chords;
 		}
 	};
 
@@ -169,14 +176,13 @@ class InstrumentFunctionArpeggio : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
-	enum ArpDirections
+	enum class ArpDirection
 	{
-		ArpDirUp,
-		ArpDirDown,
-		ArpDirUpAndDown,
-		ArpDirDownAndUp,
-		ArpDirRandom,
-		NumArpDirections
+		Up,
+		Down,
+		UpAndDown,
+		DownAndUp,
+		Random
 	} ;
 
 	InstrumentFunctionArpeggio( Model * _parent );
@@ -195,11 +201,11 @@ public:
 
 
 private:
-	enum ArpModes
+	enum class ArpMode
 	{
-		FreeMode,
-		SortMode,
-		SyncMode
+		Free,
+		Sort,
+		Sync
 	} ;
 
 	BoolModel m_arpEnabledModel;
@@ -223,4 +229,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_INSTRUMENT_FUNCTIONS_H

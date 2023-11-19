@@ -49,22 +49,22 @@ LadspaDescription::LadspaDescription( QWidget * _parent,
 	l_sortable_plugin_t plugins;
 	switch( _type )
 	{
-		case SOURCE:
+		case LadspaPluginType::Source:
 			plugins = manager->getInstruments();
 			break;
-		case TRANSFER:
+		case LadspaPluginType::Transfer:
 			plugins = manager->getValidEffects();
 			break;
-		case VALID:
+		case LadspaPluginType::Valid:
 			plugins = manager->getValidEffects();
 			break;
-		case INVALID:
+		case LadspaPluginType::Invalid:
 			plugins = manager->getInvalidEffects();
 			break;
-		case SINK:
+		case LadspaPluginType::Sink:
 			plugins = manager->getAnalysisTools();
 			break;
-		case OTHER:
+		case LadspaPluginType::Other:
 			plugins = manager->getOthers();
 			break;
 		default:
@@ -75,7 +75,7 @@ LadspaDescription::LadspaDescription( QWidget * _parent,
 	for (const auto& plugin : plugins)
 	{
 		ch_cnt_t audioDeviceChannels = Engine::audioEngine()->audioDev()->channels();
-		if (_type != VALID || manager->getDescription(plugin.second)->inputChannels <= audioDeviceChannels)
+		if (_type != LadspaPluginType::Valid || manager->getDescription(plugin.second)->inputChannels <= audioDeviceChannels)
 		{
 			pluginNames.push_back(plugin.first);
 			m_pluginKeys.push_back(plugin.second);
@@ -94,7 +94,7 @@ LadspaDescription::LadspaDescription( QWidget * _parent,
 	auto descriptionBox = new QGroupBox(tr("Description"), this);
 	auto descriptionLayout = new QVBoxLayout(descriptionBox);
 	descriptionLayout->setSpacing( 0 );
-	descriptionLayout->setMargin( 0 );
+	descriptionLayout->setContentsMargins(0, 0, 0, 0);
 
 	m_scrollArea = new QScrollArea( descriptionBox );
 	descriptionLayout->addWidget( m_scrollArea );
@@ -130,7 +130,7 @@ void LadspaDescription::update( const ladspa_key_t & _key )
 
 	auto maker = new QWidget(description);
 	auto makerLayout = new QHBoxLayout(maker);
-	makerLayout->setMargin( 0 );
+	makerLayout->setContentsMargins(0, 0, 0, 0);
 	makerLayout->setSpacing( 0 );
 	layout->addWidget( maker );
 
@@ -145,7 +145,7 @@ void LadspaDescription::update( const ladspa_key_t & _key )
 
 	auto copyright = new QWidget(description);
 	auto copyrightLayout = new QHBoxLayout(copyright);
-	copyrightLayout->setMargin( 0 );
+	copyrightLayout->setContentsMargins(0, 0, 0, 0);
 	copyrightLayout->setSpacing( 0 );
 	layout->addWidget( copyright );
 

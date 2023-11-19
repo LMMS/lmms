@@ -21,10 +21,10 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
-#ifndef MIDI_CLIP_VIEW_H
-#define MIDI_CLIP_VIEW_H
- 
+
+#ifndef LMMS_GUI_MIDI_CLIP_VIEW_H
+#define LMMS_GUI_MIDI_CLIP_VIEW_H
+
 #include <QStaticText>
 #include "ClipView.h"
 
@@ -43,7 +43,7 @@ class MidiClipView : public ClipView
 
 public:
 	MidiClipView( MidiClip* clip, TrackView* parent );
- 	~MidiClipView() override = default;
+	~MidiClipView() override = default;
 
 	Q_PROPERTY(QColor noteFillColor READ getNoteFillColor WRITE setNoteFillColor)
 	Q_PROPERTY(QColor noteBorderColor READ getNoteBorderColor WRITE setNoteBorderColor)
@@ -107,5 +107,5 @@ private:
 } // namespace gui
 
 } // namespace lmms
- 
- #endif
+
+#endif // LMMS_GUI_MIDI_CLIP_VIEW_H

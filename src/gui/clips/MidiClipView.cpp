@@ -25,6 +25,7 @@
 
 #include "MidiClipView.h"
 
+#include <algorithm>
 #include <cmath>
 #include <QApplication>
 #include <QInputDialog>
@@ -204,7 +205,7 @@ void MidiClipView::transposeSelection()
 
 void MidiClipView::constructContextMenu( QMenu * _cm )
 {
-	bool isBeat = m_clip->type() == MidiClip::BeatClip;
+	bool isBeat = m_clip->type() == MidiClip::Type::BeatClip;
 
 	auto a = new QAction(embed::getIconPixmap("piano"), tr("Open in piano-roll"), _cm);
 	_cm->insertAction( _cm->actions()[0], a );
@@ -253,7 +254,7 @@ void MidiClipView::mousePressEvent( QMouseEvent * _me )
 {
 	bool displayPattern = fixedClips() || (pixelsPerBar() >= 96 && m_legacySEPattern);
 	if( _me->button() == Qt::LeftButton &&
-		m_clip->m_clipType == MidiClip::BeatClip &&
+		m_clip->m_clipType == MidiClip::Type::BeatClip &&
 		displayPattern && _me->y() > height() - s_stepBtnOff->height() )
 
 	// when mouse button is pressed in pattern mode
@@ -311,7 +312,7 @@ void MidiClipView::mouseDoubleClickEvent(QMouseEvent *_me)
 		_me->ignore();
 		return;
 	}
-	if( m_clip->m_clipType == MidiClip::MelodyClip || !fixedClips() )
+	if( m_clip->m_clipType == MidiClip::Type::MelodyClip || !fixedClips() )
 	{
 		openInPianoRoll();
 	}
@@ -322,7 +323,7 @@ void MidiClipView::mouseDoubleClickEvent(QMouseEvent *_me)
 
 void MidiClipView::wheelEvent(QWheelEvent * we)
 {
-	if(m_clip->m_clipType == MidiClip::BeatClip &&
+	if(m_clip->m_clipType == MidiClip::Type::BeatClip &&
 				(fixedClips() || pixelsPerBar() >= 96) &&
 				position(we).y() > height() - s_stepBtnOff->height())
 	{
@@ -400,7 +401,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	QColor c;
 	bool const muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();
 	bool current = getGUI()->pianoRoll()->currentMidiClip() == m_clip;
-	bool beatClip = m_clip->m_clipType == MidiClip::BeatClip;
+	bool beatClip = m_clip->m_clipType == MidiClip::Type::BeatClip;
 
 	if( beatClip )
 	{
@@ -458,9 +459,78 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	const int x_base = BORDER_WIDTH;
 
 	bool displayPattern = fixedClips() || (pixelsPerBar >= 96 && m_legacySEPattern);
-	// melody clip paint event
 	NoteVector const & noteCollection = m_clip->m_notes;
-	if( m_clip->m_clipType == MidiClip::MelodyClip && !noteCollection.empty() )
+
+	// Beat clip paint event (on BB Editor)
+	if (beatClip && displayPattern)
+	{
+		QPixmap stepon0;
+		QPixmap stepon200;
+		QPixmap stepoff;
+		QPixmap stepoffl;
+		const int steps = std::max(1, m_clip->m_steps);
+		const int w = width() - 2 * BORDER_WIDTH;
+
+		// scale step graphics to fit the beat clip length
+		stepon0 = s_stepBtnOn0->scaled(w / steps,
+					      s_stepBtnOn0->height(),
+					      Qt::IgnoreAspectRatio,
+					      Qt::SmoothTransformation);
+		stepon200 = s_stepBtnOn200->scaled(w / steps,
+					      s_stepBtnOn200->height(),
+					      Qt::IgnoreAspectRatio,
+					      Qt::SmoothTransformation);
+		stepoff = s_stepBtnOff->scaled(w / steps,
+						s_stepBtnOff->height(),
+						Qt::IgnoreAspectRatio,
+						Qt::SmoothTransformation);
+		stepoffl = s_stepBtnOffLight->scaled(w / steps,
+						s_stepBtnOffLight->height(),
+						Qt::IgnoreAspectRatio,
+						Qt::SmoothTransformation);
+
+		for (int it = 0; it < steps; it++)	// go through all the steps in the beat clip
+		{
+			Note* n = m_clip->noteAtStep(it);
+
+			// figure out x and y coordinates for step graphic
+			const int x = BORDER_WIDTH + static_cast<int>(it * w / steps);
+			const int y = height() - s_stepBtnOff->height() - 1;
+
+			if (n)
+			{
+				const int vol = n->getVolume();
+				p.drawPixmap(x, y, stepoffl);
+				p.drawPixmap(x, y, stepon0);
+				p.setOpacity(std::sqrt(vol / 200.0));
+				p.drawPixmap(x, y, stepon200);
+				p.setOpacity(1);
+			}
+			else if ((it / 4) % 2)
+			{
+				p.drawPixmap(x, y, stepoffl);
+			}
+			else
+			{
+				p.drawPixmap(x, y, stepoff);
+			}
+		} // end for loop
+
+		// draw a transparent rectangle over muted clips
+		if (muted)
+		{
+			p.setBrush(mutedBackgroundColor());
+			p.setOpacity(0.5);
+			p.drawRect(0, 0, width(), height());
+		}
+	}
+	// Melody clip and Beat clip (on Song Editor) paint event
+	else if
+	(
+		!noteCollection.empty() &&
+			(m_clip->m_clipType == MidiClip::Type::MelodyClip ||
+			m_clip->m_clipType == MidiClip::Type::BeatClip)
+	)
 	{
 		// Compute the minimum and maximum key in the clip
 		// so that we know how much there is to draw.
@@ -523,7 +593,8 @@ void MidiClipView::paintEvent( QPaintEvent * )
 		p.scale(width(), height() - distanceToTop - 2 * notesBorder);
 
 		// set colour based on mute status
-		QColor noteFillColor = muted ? getMutedNoteFillColor() : getNoteFillColor();
+		QColor noteFillColor = muted ? getMutedNoteFillColor().lighter(200)
+									 : (c.lightness() > 175 ? getNoteFillColor().darker(400) : getNoteFillColor());
 		QColor noteBorderColor = muted ? getMutedNoteBorderColor()
 									   : ( m_clip->hasColor() ? c.lighter( 200 ) : getNoteBorderColor() );
 
@@ -572,70 +643,6 @@ void MidiClipView::paintEvent( QPaintEvent * )
 		}
 
 		p.restore();
-	}
-	// beat clip paint event
-	else if (beatClip && displayPattern)
-	{
-		QPixmap stepon0;
-		QPixmap stepon200;
-		QPixmap stepoff;
-		QPixmap stepoffl;
-		const int steps = qMax( 1,
-					m_clip->m_steps );
-		const int w = width() - 2 * BORDER_WIDTH;
-
-		// scale step graphics to fit the beat clip length
-		stepon0 = s_stepBtnOn0->scaled( w / steps,
-					      s_stepBtnOn0->height(),
-					      Qt::IgnoreAspectRatio,
-					      Qt::SmoothTransformation );
-		stepon200 = s_stepBtnOn200->scaled( w / steps,
-					      s_stepBtnOn200->height(),
-					      Qt::IgnoreAspectRatio,
-					      Qt::SmoothTransformation );
-		stepoff = s_stepBtnOff->scaled( w / steps,
-						s_stepBtnOff->height(),
-						Qt::IgnoreAspectRatio,
-						Qt::SmoothTransformation );
-		stepoffl = s_stepBtnOffLight->scaled( w / steps,
-						s_stepBtnOffLight->height(),
-						Qt::IgnoreAspectRatio,
-						Qt::SmoothTransformation );
-
-		for( int it = 0; it < steps; it++ )	// go through all the steps in the beat clip
-		{
-			Note * n = m_clip->noteAtStep( it );
-
-			// figure out x and y coordinates for step graphic
-			const int x = BORDER_WIDTH + static_cast<int>( it * w / steps );
-			const int y = height() - s_stepBtnOff->height() - 1;
-
-			if( n )
-			{
-				const int vol = n->getVolume();
-				p.drawPixmap( x, y, stepoffl );
-				p.drawPixmap( x, y, stepon0 );
-				p.setOpacity( sqrt( vol / 200.0 ) );
-				p.drawPixmap( x, y, stepon200 );
-				p.setOpacity( 1 );
-			}
-			else if( ( it / 4 ) % 2 )
-			{
-				p.drawPixmap( x, y, stepoffl );
-			}
-			else
-			{
-				p.drawPixmap( x, y, stepoff );
-			}
-		} // end for loop
-
-		// draw a transparent rectangle over muted clips
-		if ( muted )
-		{
-			p.setBrush( mutedBackgroundColor() );
-			p.setOpacity( 0.5 );
-			p.drawRect( 0, 0, width(), height() );
-		}
 	}
 
 	// bar lines

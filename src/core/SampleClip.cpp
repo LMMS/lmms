@@ -53,7 +53,7 @@ SampleClip::SampleClip( Track * _track ) :
 					this, SLOT(updateLength()));
 
 	//care about positionmarker
-	gui::TimeLineWidget* timeLine = Engine::getSong()->getPlayPos( Engine::getSong()->Mode_PlaySong ).m_timeLine;
+	gui::TimeLineWidget* timeLine = Engine::getSong()->getPlayPos( Song::PlayMode::Song ).m_timeLine;
 	if( timeLine )
 	{
 		connect( timeLine, SIGNAL(positionMarkerMoved()), this, SLOT(playbackPositionChanged()));
@@ -74,11 +74,11 @@ SampleClip::SampleClip( Track * _track ) :
 
 	switch( getTrack()->trackContainer()->type() )
 	{
-		case TrackContainer::PatternContainer:
+		case TrackContainer::Type::Pattern:
 			setAutoResize( true );
 			break;
 
-		case TrackContainer::SongContainer:
+		case TrackContainer::Type::Song:
 			// move down
 		default:
 			setAutoResize( false );
@@ -117,7 +117,7 @@ SampleClip::~SampleClip()
 
 void SampleClip::changeLength( const TimePos & _length )
 {
-	Clip::changeLength( qMax( static_cast<int>( _length ), 1 ) );
+	Clip::changeLength(std::max(static_cast<int>(_length), 1));
 }
 
 
@@ -143,23 +143,26 @@ void SampleClip::setSampleBuffer( SampleBuffer* sb )
 
 
 
-void SampleClip::setSampleFile( const QString & _sf )
+void SampleClip::setSampleFile(const QString & sf)
 {
-	int length;
-	if ( _sf.isEmpty() )
-	{	//When creating an empty sample clip make it a bar long
-		float nom = Engine::getSong()->getTimeSigModel().getNumerator();
-		float den = Engine::getSong()->getTimeSigModel().getDenominator();
-		length = DefaultTicksPerBar * ( nom / den );
-	}
-	else
-	{	//Otherwise set it to the sample's length
-		m_sampleBuffer->setAudioFile( _sf );
+	int length = 0;
+
+	if (!sf.isEmpty())
+	{
+		m_sampleBuffer->setAudioFile(sf);
 		length = sampleLength();
 	}
-	changeLength(length);
 
-	setStartTimeOffset( 0 );
+	if (length == 0)
+	{
+		//If there is no sample, make the clip a bar long
+		float nom = Engine::getSong()->getTimeSigModel().getNumerator();
+		float den = Engine::getSong()->getTimeSigModel().getDenominator();
+		length = DefaultTicksPerBar * (nom / den);
+	}
+
+	changeLength(length);
+	setStartTimeOffset(0);
 
 	emit sampleChanged();
 	emit playbackPositionChanged();
@@ -179,7 +182,7 @@ void SampleClip::toggleRecord()
 
 void SampleClip::playbackPositionChanged()
 {
-	Engine::audioEngine()->removePlayHandlesOfTypes( getTrack(), PlayHandle::TypeSamplePlayHandle );
+	Engine::audioEngine()->removePlayHandlesOfTypes( getTrack(), PlayHandle::Type::SamplePlayHandle );
 	auto st = dynamic_cast<SampleTrack*>(getTrack());
 	st->setPlayingClips( false );
 }
@@ -292,14 +295,14 @@ void SampleClip::loadSettings( const QDomElement & _this )
 	if( sampleFile().isEmpty() && _this.hasAttribute( "data" ) )
 	{
 		m_sampleBuffer->loadFromBase64( _this.attribute( "data" ) );
+		if (_this.hasAttribute("sample_rate"))
+		{
+			m_sampleBuffer->setSampleRate(_this.attribute("sample_rate").toInt());
+		}
 	}
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );
 	setStartTimeOffset( _this.attribute( "off" ).toInt() );
-
-	if ( _this.hasAttribute( "sample_rate" ) ) {
-		m_sampleBuffer->setSampleRate( _this.attribute( "sample_rate" ).toInt() );
-	}
 
 	if( _this.hasAttribute( "color" ) )
 	{

@@ -165,7 +165,7 @@ public:
 
 	Flags flags() const override
 	{
-		return IsSingleStreamed;
+		return Flag::IsSingleStreamed;
 	}
 
 	f_cnt_t desiredReleaseFrames() const override
@@ -213,9 +213,9 @@ private:
 	      vco_slideinc,     //* Slide base to use in next node. Nonzero=slide next note
 	      vco_slidebase;    //* The base vco_inc while sliding.
 
-	enum  vco_shape_t { SAWTOOTH, SQUARE, TRIANGLE, MOOG, ROUND_SQUARE, SINE, EXPONENTIAL, WHITE_NOISE,
-							BL_SAWTOOTH, BL_SQUARE, BL_TRIANGLE, BL_MOOG };
-	vco_shape_t vco_shape;
+	enum class VcoShape { Sawtooth, Square, Triangle, Moog, RoundSquare, Sine, Exponential, WhiteNoise,
+							BLSawtooth, BLSquare, BLTriangle, BLMoog };
+	VcoShape vco_shape;
 
 	// Filters (just keep both loaded and switch)
 	Lb302Filter* vcfs[NUM_FILTERS];
@@ -235,14 +235,14 @@ private:
 	      vca_a;            // Amplifier coefficient.
 
 	// Envelope State
-	enum VCA_Mode
+	enum class VcaMode
 	{
-		attack = 0,
-		decay = 1,
-		idle = 2,
-		never_played = 3
+		Attack = 0,
+		Decay = 1,
+		Idle = 2,
+		NeverPlayed = 3
 	};
-	VCA_Mode vca_mode;
+	VcaMode vca_mode;
 
 	// My hacks
 	int   sample_cnt;

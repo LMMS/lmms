@@ -149,6 +149,7 @@ fi
 
 # Patch the desktop file
 sed -i 's/.*Exec=.*/Exec=lmms.real/' "$DESKTOPFILE"
+echo "X-AppImage-Version=@VERSION@" >> "$DESKTOPFILE"
 
 # Fix linking for soft-linked plugins
 for file in "${APPDIR}usr/lib/lmms/"*.so; do
@@ -200,6 +201,9 @@ fi
 # Point the AppRun to the shim launcher
 rm -f "${APPDIR}/AppRun"
 ln -sr "${APPDIR}/usr/bin/lmms" "${APPDIR}/AppRun"
+
+# Add icon
+ln -srf "${APPDIR}/lmms.png" "${APPDIR}/.DirIcon"
 
 # Create AppImage
 echo -e "\nFinishing the AppImage..."

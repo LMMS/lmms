@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef AUDIO_FILE_MP3_H
-#define AUDIO_FILE_MP3_H
+#ifndef LMMS_AUDIO_FILE_MP3_H
+#define LMMS_AUDIO_FILE_MP3_H
 
 #include "lmmsconfig.h"
 
@@ -75,4 +75,4 @@ private:
 
 #endif // LMMS_HAVE_MP3LAME
 
-#endif
+#endif // LMMS_AUDIO_FILE_MP3_H

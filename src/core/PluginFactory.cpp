@@ -85,8 +85,7 @@ void PluginFactory::setupSearchPaths()
 	addRelativeIfExists(PLUGIN_DIR);
 #endif
 	// Or via an environment variable:
-	QString env_path;
-	if (!(env_path = qgetenv("LMMS_PLUGIN_DIR")).isEmpty())
+	if (const char* env_path = std::getenv("LMMS_PLUGIN_DIR"))
 		QDir::addSearchPath("plugins", env_path);
 
 	QDir::addSearchPath("plugins", ConfigManager::inst()->workingDir() + "plugins");
@@ -105,12 +104,12 @@ PluginFactory* getPluginFactory()
 	return PluginFactory::instance();
 }
 
-const Plugin::DescriptorList PluginFactory::descriptors() const
+Plugin::DescriptorList PluginFactory::descriptors() const
 {
 	return m_descriptors.values();
 }
 
-const Plugin::DescriptorList PluginFactory::descriptors(Plugin::PluginTypes type) const
+Plugin::DescriptorList PluginFactory::descriptors(Plugin::Type type) const
 {
 	return m_descriptors.values(type);
 }
@@ -120,12 +119,12 @@ const PluginFactory::PluginInfoList& PluginFactory::pluginInfos() const
 	return m_pluginInfos;
 }
 
-const PluginFactory::PluginInfoAndKey PluginFactory::pluginSupportingExtension(const QString& ext)
+PluginFactory::PluginInfoAndKey PluginFactory::pluginSupportingExtension(const QString& ext)
 {
 	return m_pluginByExt.value(ext, PluginInfoAndKey());
 }
 
-const PluginFactory::PluginInfo PluginFactory::pluginInfo(const char* name) const
+PluginFactory::PluginInfo PluginFactory::pluginInfo(const char* name) const
 {
 	for (const PluginInfo& info : m_pluginInfos)
 	{
@@ -248,7 +247,7 @@ void PluginFactory::discoverPlugins()
 
 
 
-const QString PluginFactory::PluginInfo::name() const
+QString PluginFactory::PluginInfo::name() const
 {
 	return descriptor ? descriptor->name : QString();
 }

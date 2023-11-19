@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef LCD_WIDGET_H
-#define LCD_WIDGET_H
+#ifndef LMMS_GUI_LCD_WIDGET_H
+#define LMMS_GUI_LCD_WIDGET_H
 
 #include <QMap>
 #include <QWidget>
@@ -50,8 +49,9 @@ public:
 
 	~LcdWidget() override;
 
-	void setValue( int value );
-	void setLabel( const QString& label );
+	void setValue(int value);
+	void setValue(float value);
+	void setLabel(const QString& label);
 
 	void addTextForValue( int value, const QString& text )
 	{
@@ -117,4 +117,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_LCD_WIDGET_H

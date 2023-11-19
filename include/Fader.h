@@ -44,9 +44,8 @@
  *
  */
 
-
-#ifndef FADER_H
-#define FADER_H
+#ifndef LMMS_GUI_FADER_H
+#define LMMS_GUI_FADER_H
 
 #include <QElapsedTimer>
 #include <QPixmap>
@@ -55,10 +54,11 @@
 
 #include "AutomatableModelView.h"
 
+
 namespace lmms::gui
 {
 
-class TextFloat;
+class SimpleTextFloat;
 
 
 class LMMS_EXPORT Fader : public QWidget, public FloatModelView
@@ -164,7 +164,7 @@ private:
 	int m_moveStartPoint;
 	float m_startValue;
 
-	static TextFloat * s_textFloat;
+	static SimpleTextFloat * s_textFloat;
 
 	QColor m_peakGreen;
 	QColor m_peakRed;
@@ -174,5 +174,4 @@ private:
 
 } // namespace lmms::gui
 
-
-#endif
+#endif // LMMS_GUI_FADER_H
