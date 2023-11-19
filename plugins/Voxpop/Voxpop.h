@@ -1,6 +1,10 @@
 /*
  * Voxpop.h - declaration of class Voxpop
  *             (voice instrument-plugin)
+ * This is a sample palyer that also has a cue sheet of start,
+ * and optionally end points with text titles.  There are 3
+ * play modes by which users can trigger samples at these cue
+ * points.
  *
  * Copyright (c) 2023 Teknopaul <teknopaul/at/fastmail.es>
  *
@@ -27,6 +31,7 @@
 #define LMMS_VOXPOP_H
 
 #include <QPixmap>
+#include <QCheckBox>
 
 #include "ComboBoxModel.h"
 #include "Instrument.h"
@@ -94,7 +99,7 @@ public:
 
 	QString * sampleText()
 	{
-		return m_cueCount > 0 ?  m_sampleText[m_cueIndexModel.value()] : (QString *) &VOXPOP_DEFAULT_TEXT;
+		return m_cueCount > 0 ?  m_cueTexts[m_cueIndexModel.value()] : (QString *) &VOXPOP_DEFAULT_TEXT;
 	}
 
 	auto beatLen(NotePlayHandle* note) const -> int override;
@@ -141,16 +146,18 @@ private slots:
 	void ampModelChanged();
 	void stutterModelChanged();
 	void cueIndexChanged();
+	void modeChanged();
 
 
 signals:
 	void isPlaying( lmms::f_cnt_t _current_frame );
-	void cueChanged(int cue);
+	void cueChanged(int cue, QString * text);
 
 private:
 	using handleState = SampleBuffer::handleState;
 	CueSelectionMode m_mode;
 
+	BoolModel m_respectEndpointModel;
 	FloatModel m_ampModel;
 	IntModel m_cueIndexModel;
 	BoolModel m_stutterModel;
@@ -162,14 +169,14 @@ private:
 	int m_cueCount;
 	SampleBuffer m_sampleBuffer;                 // used for view
 	std::vector<SampleBuffer *> m_sampleBuffers;  // used to play
-	std::vector<QString *> m_sampleText;
-	std::vector<f_cnt_t> m_sampleOffset;
+	std::vector<QString *> m_cueTexts;
+	std::vector<f_cnt_t> m_cueOffsets;
 	std::vector<f_cnt_t> m_nextPlayStartPoint;
 
 	friend class gui::VoxpopView;
 	
 	bool reloadCuesheet();
-	void deleteSamples();
+	void deleteSamples(int count);
 	f_cnt_t cuePointToFrames(QString field);
 
 } ;
@@ -195,6 +202,7 @@ protected slots:
 	void openCuesheetFile();
 	void openAudioFile();
 	void cueSheetChanged();
+	void cueChanged(int cue, QString * text);
 
 
 protected:
@@ -206,7 +214,8 @@ private:
 
 	static QPixmap * s_artwork;
 
-	VoxpopWaveView * m_waveView;
+	LedCheckBox * m_respectEnpointsCheckBox;
+	QString * m_cuelabel;
 	Knob * m_ampKnob;
 	LcdSpinBox * m_cueIndexControl;
 
@@ -217,6 +226,7 @@ private:
 	ComboBox * m_interpBox;
 	ComboBox * m_modeBox;
 
+	VoxpopWaveView * m_waveView;
 } ;
 
 

@@ -29,6 +29,7 @@
 #include <QPainter>
 #include <QFileInfo>
 #include <QDropEvent>
+#include <QLabel>
 #include <QTextStream>
 
 #include <samplerate.h>
@@ -42,6 +43,7 @@
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "LcdSpinBox.h"
+#include "LedCheckBox.h"
 #include "NotePlayHandle.h"
 #include "PathUtil.h"
 #include "PixmapButton.h"
@@ -85,6 +87,7 @@ Voxpop::Voxpop( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &voxpop_plugin_descriptor ),
 
 	m_mode( CueSelectionMode::Automation ),
+	m_respectEndpointModel( false ),
 	m_ampModel( 100, 0, 500, 1, this, tr( "Amplify" ) ),
 	m_cueIndexModel( 0, 0, 99 , this, tr("Cue index") ),
 	m_stutterModel( false, this, tr( "Stutter" ) ),
@@ -96,8 +99,8 @@ Voxpop::Voxpop( InstrumentTrack * _instrument_track ) :
 	m_cueCount( 0 ),
 	m_sampleBuffer(),
 	m_sampleBuffers( 0 ),
-	m_sampleText( 0 ),
-	m_sampleOffset( 0 ),
+	m_cueTexts( 0 ),
+	m_cueOffsets( 0 ),
 	m_nextPlayStartPoint( 0 )
 {
 	connect( &m_ampModel, SIGNAL( dataChanged() ),
@@ -106,6 +109,8 @@ Voxpop::Voxpop( InstrumentTrack * _instrument_track ) :
 				this, SLOT( stutterModelChanged() ), Qt::DirectConnection );
 	connect( &m_cueIndexModel, SIGNAL( dataChanged() ),
 				this, SLOT( cueIndexChanged() ), Qt::DirectConnection );
+	connect( &m_modeModel, SIGNAL( dataChanged() ),
+				this, SLOT( modeChanged() ), Qt::DirectConnection );
 
 //interpolation modes
 	m_interpolationModel.addItem( tr( "None" ) );
@@ -116,7 +121,7 @@ Voxpop::Voxpop( InstrumentTrack * _instrument_track ) :
 	m_modeModel.addItem( tr( "Automation" ) );
 	m_modeModel.addItem( tr( "Piano" ) );
 	m_modeModel.addItem( tr( "Sequential" ) );
-	m_modeModel.setValue( 1 );
+	m_modeModel.setValue( 0 );
 
 	qDebug("Instantiated");
 }
@@ -167,7 +172,7 @@ void Voxpop::playNote( NotePlayHandle * _n,
 		if( m_stutterModel.value() == true && m_nextPlayStartPoint[cue] >= m_sampleBuffers[cue]->endFrame() )
 		{
 			// Restart playing the note if in stutter mode and we're at the end of the sample.
-			m_nextPlayStartPoint[cue] = m_sampleBuffers[cue]->startFrame() + m_sampleOffset[cue];
+			m_nextPlayStartPoint[cue] = m_sampleBuffers[cue]->startFrame() + m_cueOffsets[cue];
 		}
 		// set interpolation mode for libsamplerate
 		int srcmode = SRC_LINEAR;
@@ -242,7 +247,6 @@ void Voxpop::deleteNotePluginData( NotePlayHandle * _n )
 
 void Voxpop::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
-	elem.setAttribute("cuecount", m_cueCount);
 	m_ampModel.saveSettings(doc, elem, "amp");
 	m_stutterModel.saveSettings(doc, elem, "stutter");
 	m_interpolationModel.saveSettings(doc, elem, "interp");
@@ -253,7 +257,7 @@ void Voxpop::saveSettings(QDomDocument& doc, QDomElement& elem)
 		elem.setAttribute("audio", m_audioFile);
 		elem.setAttribute("cuesheet", m_cuesheetFile);
 	}
-	// TODO play mode
+	m_respectEndpointModel.saveSettings(doc, elem, "respectendpoint");
 }
 
 
@@ -261,40 +265,35 @@ void Voxpop::saveSettings(QDomDocument& doc, QDomElement& elem)
 
 void Voxpop::loadSettings(const QDomElement& elem)
 {
-	m_cueCount = elem.attribute("cuecount").toInt();
-	if ( m_cueCount > 0 )
+	QString src = elem.attribute("cuesheet");
+	if ( !elem.attribute("cuesheet").isEmpty() )
 	{
-		QString src = elem.attribute("cuesheet");
-		if ( !elem.attribute("cuesheet").isEmpty() )
+		QString absolutePath = PathUtil::toAbsolute(src);
+		if (!QFileInfo(absolutePath).exists())
 		{
-			QString absolutePath = PathUtil::toAbsolute(src);
-			if (!QFileInfo(absolutePath).exists())
-			{
-				QString message = tr("Cue sheet not found: %1").arg(absolutePath);
-				Engine::getSong()->collectError(message);
-			}
-			else 
-			{
-				setCuesheetFile(src, false);
-			}
+			QString message = tr("Cue sheet not found: %1").arg(absolutePath);
+			Engine::getSong()->collectError(message);
 		}
-		
-		src = elem.attribute("audio");
-		if ( !src.isEmpty() )
+		else
 		{
-			QString absolutePath = PathUtil::toAbsolute(src);
-			if (!QFileInfo(absolutePath).exists())
-			{
-				QString message = tr("Sample not found: %1").arg(absolutePath);
-				Engine::getSong()->collectError(message);
-			}
-			else 
-			{
-				setAudioFile(src, false);
-			}
+			setCuesheetFile(src, false);
 		}
 	}
 
+	src = elem.attribute("audio");
+	if ( !src.isEmpty() )
+	{
+		QString absolutePath = PathUtil::toAbsolute(src);
+		if (!QFileInfo(absolutePath).exists())
+		{
+			QString message = tr("Sample not found: %1").arg(absolutePath);
+			Engine::getSong()->collectError(message);
+		}
+		else
+		{
+			setAudioFile(src, false);
+		}
+	}
 
 	m_ampModel.loadSettings(elem, "amp");
 	m_stutterModel.loadSettings(elem, "stutter");
@@ -314,7 +313,8 @@ void Voxpop::loadSettings(const QDomElement& elem)
 	{
 		m_modeModel.setValue(1.0f); // Automation bty default
 	}
-
+	m_respectEndpointModel.loadSettings(elem, "respectendpoint");
+	modeChanged();
 }
 
 
@@ -349,7 +349,6 @@ auto Voxpop::beatLen(NotePlayHandle* note) const -> int
 
 gui::PluginView* Voxpop::instantiateView( QWidget * _parent )
 {
-	qDebug("Instantiate view");
 	return new gui::VoxpopView( this, _parent );
 }
 
@@ -391,20 +390,23 @@ void Voxpop::stutterModelChanged()
 {
 	for (int i = 0 ; i < m_cueCount ; i++ )
 	{
-		m_nextPlayStartPoint[i] = m_sampleOffset[i];
+		m_nextPlayStartPoint[i] = m_cueOffsets[i];
 	}
 }
 
 
 void Voxpop::cueIndexChanged()
 {
-	// TODO does anything else care?
-	/*
-	if (m_cueIndexModel.value() >= m_cueCount)
+	if (m_cueCount > 0 && m_cueTexts.size() == m_cueCount)
 	{
-		m_cueIndexModel.setValue(m_cueCount - 1);
+		int cue = m_cueIndexModel.value();
+		emit cueChanged(cue, m_cueTexts[cue]);
 	}
-	*/
+}
+
+void Voxpop::modeChanged()
+{
+	m_mode = static_cast<Voxpop::CueSelectionMode>(m_modeModel.value());
 }
 
 f_cnt_t Voxpop::cuePointToFrames(QString field)
@@ -454,24 +456,26 @@ bool Voxpop::reloadCuesheet()
 			return false;
 		}
 		
-		m_cueCount = quePoints.length();
-		if ( m_cueCount > 0 )
+		if ( quePoints.length() > 0 )
 		{
-			qDebug("Loading %d que points", m_cueCount);
+			// dont play during relaod of samples
+			Engine::getSong()->stop();
 
-			// TODO delete previous data
+			int oldCueCount = m_cueCount;
+			int newCueCount = quePoints.length();
+			bool respectEndpoint = m_respectEndpointModel.value();
+
+			deleteSamples(oldCueCount);
+
 			f_cnt_t veryEndFrame = 0;
-			
-			m_sampleText.clear(); // TODO memory leak
-			m_sampleOffset.clear();
-			m_sampleBuffers.clear(); // TODO memory leak
-			for ( int i = 0 ; i < m_cueCount ; i++ )
+			for ( int i = 0 ; i < newCueCount ; i++ )
 			{
 				QStringList fields = quePoints[i].split( "\t" );
-				m_sampleText.push_back( new QString( fields[2].trimmed() ) );
-				f_cnt_t startFrame = cuePointToFrames( fields[0] ); // TODO this needs to know sample rate
-				f_cnt_t endFrame = cuePointToFrames( fields[1] );
-				m_sampleOffset.push_back( startFrame );
+				m_cueTexts.push_back( new QString( fields[2].trimmed() ) );
+				f_cnt_t startFrame = cuePointToFrames( fields[0] );
+				f_cnt_t endFrame = respectEndpoint ? cuePointToFrames( fields[1] ) : m_sampleBuffer.frames();
+				m_cueOffsets.push_back( startFrame );
+				m_nextPlayStartPoint.push_back( startFrame );
 				m_sampleBuffers.push_back(  new SampleBuffer() );
 				m_sampleBuffers.at(i)->setAudioFile( audioPath ) ;
 				m_sampleBuffers.at(i)->setAmplification( m_ampModel.value() / 100.0f );
@@ -480,15 +484,32 @@ bool Voxpop::reloadCuesheet()
 			}
 			m_sampleBuffer.setAllPointFrames( 0, veryEndFrame, 0, 0 );
 
-			qDebug("Loading %d que points", m_cueCount);
 			m_cueIndexModel.setValue(0);
-			m_cueIndexModel.setRange(0, m_cueCount - 1);
+			m_cueIndexModel.setRange(0, newCueCount - 1);
+			m_cueCount = newCueCount;
+			qDebug("loaded cue sheet: %d", newCueCount);
 			return true;
 		}
 	}
 	return false;
 }
 
+void Voxpop::deleteSamples(int count)
+{
+	// make sure View does not have dangling popinters
+	emit cueChanged(-1, (QString *) &VOXPOP_DEFAULT_TEXT);
+
+	m_cueCount = 0; // TODO race conditions?
+	for ( int i = count - 1 ; i >= 0 ; i-- )
+	{
+		delete m_cueTexts.at(i);
+		m_cueTexts.pop_back();
+		delete m_sampleBuffers.at(i); // TODO memory leak
+		m_sampleBuffers.pop_back();
+	}
+	m_cueOffsets.clear();
+	m_nextPlayStartPoint.clear();
+}
 
 namespace gui
 {
@@ -504,6 +525,11 @@ VoxpopView::VoxpopView( Instrument * _instrument, QWidget * _parent ) :
 	{
 		s_artwork = new QPixmap( PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	}
+	m_cuelabel = (QString *) &VOXPOP_DEFAULT_TEXT;
+
+	m_respectEnpointsCheckBox = new LedCheckBox(this);
+	m_respectEnpointsCheckBox->setToolTip( tr("Respect cue endpoints") );
+	m_respectEnpointsCheckBox->move(3, 90);
 
 	m_openAudioFileButton = new PixmapButton( this );
 	m_openAudioFileButton->setCursor( QCursor( Qt::PointingHandCursor ) );
@@ -537,24 +563,20 @@ VoxpopView::VoxpopView( Instrument * _instrument, QWidget * _parent ) :
 	m_stutterButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "stutter_off" ) );
 	m_stutterButton->setToolTip( tr( "Continue sample playback across notes" ) );
 
-// play mode selector
 	m_modeBox = new ComboBox( this );
 	m_modeBox->setGeometry( 96, baseline, 87, ComboBox::DEFAULT_HEIGHT );
 	m_modeBox->setFont( pointSize<8>( m_modeBox->font() ) );
 
-// interpolation selector
 	m_interpBox = new ComboBox( this );
 	m_interpBox->setGeometry( 186, baseline, 60, ComboBox::DEFAULT_HEIGHT );
 	m_interpBox->setFont( pointSize<8>( m_interpBox->font() ) );
 
-	// TODO combos not conencted up?
-
-// wavegraph
 	m_waveView = 0;
 	newWaveView();
 	qRegisterMetaType<lmms::f_cnt_t>( "lmms::f_cnt_t" );
 
-	qDebug("Instantiated VoxpopView view");
+	qDebug("Instantiated VoxpopView");
+
 }
 
 
@@ -611,6 +633,12 @@ void VoxpopView::paintEvent( QPaintEvent * )
 	}
 	p.drawText( 8, 133, file_name );
 
+	file_name = "";
+	if (!m_cuelabel->isEmpty())
+	{
+		p.drawText( 5, 60, file_name + m_cuelabel );
+	}
+
 	updateCuePoints();
 }
 
@@ -626,6 +654,12 @@ void VoxpopView::cueSheetChanged()
 	m_waveView->update();
 }
 
+
+void VoxpopView::cueChanged(int cue, QString * text)
+{
+	m_cuelabel = text;
+	update();
+}
 
 
 void VoxpopView::openAudioFile()
@@ -682,6 +716,8 @@ void VoxpopView::modelChanged()
 	m_interpBox->setModel( &voxpop->m_interpolationModel );
 	m_modeBox->setModel( &voxpop->m_modeModel );
 	m_cueIndexControl->setModel( &voxpop->m_cueIndexModel );
+	m_respectEnpointsCheckBox->setModel( &voxpop->m_respectEndpointModel );
+	connect( voxpop, SIGNAL( cueChanged(int, QString *) ), this, SLOT( cueChanged(int, QString *) ) );
 	sampleUpdated();
 }
 
@@ -699,9 +735,8 @@ void VoxpopView::updateCuePoints()
 	double graphWidth = 244;
 	for ( int i = 0 ; i < voxpop->m_cueCount ; i++)
 	{
-		int linePx = voxpop->m_sampleOffset[i] * graphWidth / voxpop->m_sampleBuffer.frames();
+		int linePx = voxpop->m_cueOffsets[i] * graphWidth / voxpop->m_sampleBuffer.frames();
 		p.drawLine( linePx + 2, 175, linePx + 2, 242 );
-		qDebug("%d: cue point %d drawn at pixel %d", i, voxpop->m_sampleOffset[i], linePx);
 	}
 }
 
