@@ -76,8 +76,8 @@ ControllerRackView::ControllerRackView() :
 	layout->addWidget( m_addButton );
 	this->setLayout( layout );
 
-	setFixedWidth( 350 );
-	setMinimumHeight( 200 );
+	setFixedWidth(350);
+	setMinimumHeight(200);
 
 	QMdiSubWindow * subWin = getGUI()->mainWindow()->addWindowedWidget( this );
 

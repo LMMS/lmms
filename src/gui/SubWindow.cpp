@@ -59,38 +59,28 @@ SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
 	m_textShadowColor = Qt::black;
 	m_borderColor = Qt::black;
 
-	// close, maximize and restore (after maximizing) buttons
-	m_closeBtn = new QPushButton( embed::getIconPixmap( "close" ), QString(), this );
-	m_closeBtn->resize( m_buttonSize );
-	m_closeBtn->setFocusPolicy( Qt::NoFocus );
-	m_closeBtn->setCursor( Qt::ArrowCursor );
-	m_closeBtn->setAttribute( Qt::WA_NoMousePropagation );
-	m_closeBtn->setToolTip( tr( "Close" ) );
-	connect( m_closeBtn, SIGNAL(clicked(bool)), this, SLOT(close()));
+	// close, maximize, restore, and detach buttons
+	auto createButton = [this](const QIcon& icon, const QString& tooltip) -> QPushButton* {
+		auto button = new QPushButton{icon, QString{}, this};
+		button->resize(m_buttonSize);
+		button->setFocusPolicy(Qt::NoFocus);
+		button->setCursor(Qt::ArrowCursor);
+		button->setAttribute(Qt::WA_NoMousePropagation);
+		button->setToolTip(tooltip);
+		return button;
+	};
 
-	m_maximizeBtn = new QPushButton( embed::getIconPixmap( "maximize" ), QString(), this );
-	m_maximizeBtn->resize( m_buttonSize );
-	m_maximizeBtn->setFocusPolicy( Qt::NoFocus );
-	m_maximizeBtn->setCursor( Qt::ArrowCursor );
-	m_maximizeBtn->setAttribute( Qt::WA_NoMousePropagation );
-	m_maximizeBtn->setToolTip( tr( "Maximize" ) );
-	connect( m_maximizeBtn, SIGNAL(clicked(bool)), this, SLOT(showMaximized()));
+	m_closeBtn = createButton(embed::getIconPixmap("close"), tr("Close"));
+	connect(m_closeBtn, &QPushButton::clicked, this, &QWidget::close);
 
-	m_restoreBtn = new QPushButton( embed::getIconPixmap( "restore" ), QString(), this );
-	m_restoreBtn->resize( m_buttonSize );
-	m_restoreBtn->setFocusPolicy( Qt::NoFocus );
-	m_restoreBtn->setCursor( Qt::ArrowCursor );
-	m_restoreBtn->setAttribute( Qt::WA_NoMousePropagation );
-	m_restoreBtn->setToolTip( tr( "Restore" ) );
-	connect( m_restoreBtn, SIGNAL(clicked(bool)), this, SLOT(showNormal()));
+	m_maximizeBtn = createButton(embed::getIconPixmap("maximize"), tr("Maximize"));
+	connect(m_maximizeBtn, &QPushButton::clicked, this, &QWidget::showMaximized);
 
-	m_detachBtn = new QPushButton( embed::getIconPixmap( "window" ), QString(), this );
-	m_detachBtn->resize( m_buttonSize );
-	m_detachBtn->setFocusPolicy( Qt::NoFocus );
-	m_detachBtn->setCursor( Qt::ArrowCursor );
-	m_detachBtn->setAttribute( Qt::WA_NoMousePropagation );
-	m_detachBtn->setToolTip( tr( "Detach" ) );
-	connect( m_detachBtn, SIGNAL( clicked( bool ) ), this, SLOT( detach() ) );
+	m_restoreBtn = createButton(embed::getIconPixmap("restore"), tr("Restore"));
+	connect(m_restoreBtn, &QPushButton::clicked, this, &QWidget::showNormal);
+
+	m_detachBtn = createButton(embed::getIconPixmap("window"), tr("Detach"));
+	connect(m_detachBtn, &QPushButton::clicked, this, &SubWindow::detach);
 
 	// QLabel for the window title and the shadow effect
 	m_shadow = new QGraphicsDropShadowEffect();
@@ -166,7 +156,7 @@ void SubWindow::changeEvent( QEvent *event )
 
 }
 
-void SubWindow::showEvent(QShowEvent *e)
+void SubWindow::showEvent(QShowEvent* e)
 {
 	attach();
 	QMdiSubWindow::showEvent(e);
@@ -262,9 +252,7 @@ void SubWindow::setBorderColor( const QColor &c )
 
 void SubWindow::detach()
 {
-	if (isDetached()) {
-		return;
-	}
+	if (isDetached()) { return; }
 
 	auto pos = mapToGlobal(widget()->pos());
 	widget()->setWindowFlags(Qt::Window);
@@ -276,18 +264,17 @@ void SubWindow::detach()
 
 void SubWindow::attach()
 {
-	if (! isDetached()) {
-		return;
-	}
-	auto frame = widget()->windowHandle()->frameGeometry();
+	if (!isDetached()) { return; }
 
+	auto frame = widget()->windowHandle()->frameGeometry();
 	widget()->setWindowFlags(Qt::Widget);
 	widget()->show();
 	show();
 
 	// Delay moving & resizing using event queue. Ensures that this widget is
 	// visible first, so that resizing works.
-	QObject o; connect(&o, &QObject::destroyed, this, [this, frame]() {
+	QObject obj;
+	connect(&obj, &QObject::destroyed, this, [this, frame]() {
 		move(mdiArea()->mapFromGlobal(frame.topLeft()));
 		resize(frame.size());
 	}, Qt::QueuedConnection);
@@ -356,7 +343,7 @@ void SubWindow::adjustTitleBar()
 	const int buttonGap = 1;
 	const int menuButtonSpace = 24;
 
-	QPoint buttonPos( width() - rightSpace - m_buttonSize.width(), 3 );
+	QPoint buttonPos(width() - rightSpace - m_buttonSize.width(), 3);
 	const QPoint buttonStep( m_buttonSize.width() + buttonGap, 0 );
 
 	// the buttonBarWidth depends on the number of buttons.
@@ -365,7 +352,7 @@ void SubWindow::adjustTitleBar()
 
 	// set the buttons on their positions.
 	// the close button is always needed and on the rightButtonPos
-	m_closeBtn->move( buttonPos );
+	m_closeBtn->move(buttonPos);
 	buttonPos -= buttonStep;
 
 	// here we ask: is the Subwindow maximizable and
@@ -373,9 +360,10 @@ void SubWindow::adjustTitleBar()
 	if( windowFlags() & Qt::WindowMaximizeButtonHint )
 	{
 		buttonBarWidth = buttonBarWidth + m_buttonSize.width() + buttonGap;
-		m_maximizeBtn->move( buttonPos );
-		m_restoreBtn->move( buttonPos );
-		if ( ! isMaximized() ) {
+		m_maximizeBtn->move(buttonPos);
+		m_restoreBtn->move(buttonPos);
+		if (!isMaximized())
+		{
 			m_maximizeBtn->show();
 			buttonPos -= buttonStep;
 		}
@@ -383,12 +371,13 @@ void SubWindow::adjustTitleBar()
 
 	// we're keeping the restore button around if we open projects
 	// from older versions that have saved minimized windows
-	if ( isMaximized() || isMinimized() ) {
+	if (isMaximized() || isMinimized())
+	{
 		m_restoreBtn->show();
 		buttonPos -= buttonStep;
 	}
 
-	m_detachBtn->move( buttonPos );
+	m_detachBtn->move(buttonPos);
 	m_detachBtn->show();
 
 	if( widget() )
@@ -461,12 +450,15 @@ void SubWindow::resizeEvent( QResizeEvent * event )
 	}
 }
 
-bool SubWindow::eventFilter(QObject * obj, QEvent * event)
+bool SubWindow::eventFilter(QObject* obj, QEvent* event)
 {
-	if (obj != static_cast<QObject *>(widget())) {
+	if (obj != static_cast<QObject*>(widget()))
+	{
 		return QMdiSubWindow::eventFilter(obj, event);
 	}
-	switch (event->type()) {
+
+	switch (event->type())
+	{
 	case QEvent::WindowStateChange:
 		event->accept();
 		return true;
