@@ -540,7 +540,7 @@ ENDIF()
 
 # check for Fluidsynth
 IF(WANT_SF2)
-	find_package(FluidSynth 1.1.0)
+	find_package(FluidSynth 1.1.7)
 	if(FluidSynth_FOUND)
 		SET(LMMS_HAVE_FLUIDSYNTH TRUE)
 		if(FluidSynth_VERSION_STRING VERSION_GREATER_EQUAL 2)

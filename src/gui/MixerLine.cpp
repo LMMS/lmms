@@ -68,8 +68,6 @@ bool MixerLine::eventFilter( QObject *dist, QEvent *event )
 }
 
 const int MixerLine::MixerLineHeight = 287;
-QPixmap * MixerLine::s_sendBgArrow = nullptr;
-QPixmap * MixerLine::s_receiveBgArrow = nullptr;
 
 MixerLine::MixerLine( QWidget * _parent, MixerView * _mv, int _channelIndex ) :
 	QWidget( _parent ),
@@ -82,15 +80,6 @@ MixerLine::MixerLine( QWidget * _parent, MixerView * _mv, int _channelIndex ) :
 	m_strokeInnerInactive( 0, 0, 0 ),
 	m_inRename( false )
 {
-	if( !s_sendBgArrow )
-	{
-		s_sendBgArrow = new QPixmap( embed::getIconPixmap( "send_bg_arrow", 29, 56 ) );
-	}
-	if( !s_receiveBgArrow )
-	{
-		s_receiveBgArrow = new QPixmap( embed::getIconPixmap( "receive_bg_arrow", 29, 56 ) );
-	}
-
 	setFixedSize( 33, MixerLineHeight );
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
@@ -174,9 +163,9 @@ void MixerLine::drawMixerLine( QPainter* p, const MixerLine *mixerLine, bool isA
 	int width = mixerLine->rect().width();
 	int height = mixerLine->rect().height();
 	
-	if( channel->m_hasColor && !muted )
+	if (channel->m_color.has_value() && !muted)
 	{
-		p->fillRect( mixerLine->rect(), channel->m_color.darker( isActive ? 120 : 150 ) );
+		p->fillRect(mixerLine->rect(), channel->m_color->darker(isActive ? 120 : 150));
 	}
 	else
 	{
@@ -193,14 +182,10 @@ void MixerLine::drawMixerLine( QPainter* p, const MixerLine *mixerLine, bool isA
 	p->drawRect( 0, 0, width-1, height-1 );
 
 	// draw the mixer send background
-	if( sendToThis )
-	{
-		p->drawPixmap( 2, 0, 29, 56, *s_sendBgArrow );
-	}
-	else if( receiveFromThis )
-	{
-		p->drawPixmap( 2, 0, 29, 56, *s_receiveBgArrow );
-	}
+
+	static auto s_sendBgArrow = embed::getIconPixmap("send_bg_arrow", 29, 56);
+	static auto s_receiveBgArrow = embed::getIconPixmap("receive_bg_arrow", 29, 56);
+	p->drawPixmap(2, 0, 29, 56, sendToThis ? s_sendBgArrow : s_receiveBgArrow);
 }
 
 
@@ -435,7 +420,7 @@ void MixerLine::setStrokeInnerInactive( const QColor & c )
 void MixerLine::selectColor()
 {
 	auto channel = Engine::mixer()->mixerChannel( m_channelIndex );
-	auto new_color = ColorChooser(this).withPalette(ColorChooser::Palette::Mixer)->getColor(channel->m_color);
+	auto new_color = ColorChooser(this).withPalette(ColorChooser::Palette::Mixer)->getColor(channel->m_color.value_or(backgroundActive().color()));
 	if(!new_color.isValid()) { return; }
 	channel->setColor (new_color);
 	Engine::getSong()->setModified();
@@ -446,7 +431,7 @@ void MixerLine::selectColor()
 // Disable the usage of color on this mixer line
 void MixerLine::resetColor()
 {
-	Engine::mixer()->mixerChannel( m_channelIndex )->m_hasColor = false;
+	Engine::mixer()->mixerChannel(m_channelIndex)->m_color = std::nullopt;
 	Engine::getSong()->setModified();
 	update();
 }

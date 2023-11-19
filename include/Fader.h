@@ -53,6 +53,7 @@
 
 
 #include "AutomatableModelView.h"
+#include "embed.h"
 
 
 namespace lmms::gui
@@ -131,7 +132,7 @@ private:
 		float fRange = model()->maxValue() - model()->minValue();
 		float realVal = model()->value() - model()->minValue();
 
-		return height() - ( ( height() - m_knob->height() ) * ( realVal / fRange ) );
+		return height() - ((height() - m_knob.height()) * (realVal / fRange));
 	}
 
 	void setPeak( float fPeak, float &targetPeak, float &persistentPeak, QElapsedTimer &lastPeakTimer );
@@ -151,13 +152,9 @@ private:
 	QElapsedTimer m_lastPeakTimer_L;
 	QElapsedTimer m_lastPeakTimer_R;
 
-	static QPixmap * s_back;
-	static QPixmap * s_leds;
-	static QPixmap * s_knob;
-	
-	QPixmap * m_back;
-	QPixmap * m_leds;
-	QPixmap * m_knob;
+	QPixmap m_back = embed::getIconPixmap("fader_background");
+	QPixmap m_leds = embed::getIconPixmap("fader_leds");
+	QPixmap m_knob = embed::getIconPixmap("fader_knob");
 
 	bool m_levelsDisplayedInDBFS;
 

@@ -73,6 +73,7 @@ class PianoRoll : public QWidget
 	Q_PROPERTY(QColor lineColor MEMBER m_lineColor)
 	Q_PROPERTY(QColor noteModeColor MEMBER m_noteModeColor)
 	Q_PROPERTY(QColor noteColor MEMBER m_noteColor)
+	Q_PROPERTY(QColor stepNoteColor MEMBER m_stepNoteColor)
 	Q_PROPERTY(QColor ghostNoteColor MEMBER m_ghostNoteColor)
 	Q_PROPERTY(QColor noteTextColor MEMBER m_noteTextColor)
 	Q_PROPERTY(QColor ghostNoteTextColor MEMBER m_ghostNoteTextColor)
@@ -339,12 +340,12 @@ private:
 	static const int cm_scrollAmtHoriz = 10;
 	static const int cm_scrollAmtVert = 1;
 
-	static QPixmap * s_toolDraw;
-	static QPixmap * s_toolErase;
-	static QPixmap * s_toolSelect;
-	static QPixmap * s_toolMove;
-	static QPixmap * s_toolOpen;
-	static QPixmap* s_toolKnife;
+	QPixmap m_toolDraw = embed::getIconPixmap("edit_draw");
+	QPixmap m_toolErase = embed::getIconPixmap("edit_erase");
+	QPixmap m_toolSelect = embed::getIconPixmap("edit_select");
+	QPixmap m_toolMove = embed::getIconPixmap("edit_move");
+	QPixmap m_toolOpen = embed::getIconPixmap("automation");
+	QPixmap m_toolKnife = embed::getIconPixmap("edit_knife");
 
 	static std::array<KeyType, 12> prKeyOrder;
 
@@ -466,6 +467,7 @@ private:
 	QColor m_lineColor;
 	QColor m_noteModeColor;
 	QColor m_noteColor;
+	QColor m_stepNoteColor;
 	QColor m_noteTextColor;
 	QColor m_ghostNoteColor;
 	QColor m_ghostNoteTextColor;

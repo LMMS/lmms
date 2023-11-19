@@ -107,6 +107,16 @@ public:
 	Note( const Note & note );
 	~Note() override;
 
+	// Note types
+	enum class Type
+	{
+		Regular = 0,
+		Step
+	};
+
+	Type type() const { return m_type; }
+	inline void setType(Type t) { m_type = t; }
+
 	// used by GUI
 	inline void setSelected( const bool selected ) { m_selected = selected; }
 	inline void setOldKey( const int oldKey ) { m_oldKey = oldKey; }
@@ -253,6 +263,8 @@ private:
 	TimePos m_length;
 	TimePos m_pos;
 	DetuningHelper * m_detuning;
+
+	Type m_type = Type::Regular;
 };
 
 using NoteVector = std::vector<Note*>;

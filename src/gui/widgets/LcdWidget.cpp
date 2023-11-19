@@ -66,17 +66,6 @@ LcdWidget::LcdWidget(int numDigits, const QString& style, QWidget* parent, const
 	initUi( name, style );
 }
 
-
-
-
-LcdWidget::~LcdWidget()
-{
-	delete m_lcdPixmap;
-}
-
-
-
-
 void LcdWidget::setValue(int value)
 {
 	QString s = m_textForValue[value];
@@ -162,11 +151,8 @@ void LcdWidget::paintEvent( QPaintEvent* )
 	{
 		p.translate(margin, margin);
 		// Left Margin
-		p.drawPixmap(
-			cellRect,
-			*m_lcdPixmap,
-			QRect(QPoint(charsPerPixmap * m_cellWidth, isEnabled() ? 0 : m_cellHeight), cellSize)
-		);
+		p.drawPixmap(cellRect, m_lcdPixmap,
+			QRect(QPoint(charsPerPixmap * m_cellWidth, isEnabled() ? 0 : m_cellHeight), cellSize));
 
 		p.translate(m_marginWidth, 0);
 	}
@@ -174,8 +160,7 @@ void LcdWidget::paintEvent( QPaintEvent* )
 	// Padding
 	for( int i=0; i < m_numDigits - m_display.length(); i++ ) 
 	{
-		p.drawPixmap( cellRect, *m_lcdPixmap, 
-			QRect( QPoint( 10 * m_cellWidth, isEnabled()?0:m_cellHeight) , cellSize ) );
+		p.drawPixmap(cellRect, m_lcdPixmap, QRect(QPoint(10 * m_cellWidth, isEnabled() ? 0 : m_cellHeight), cellSize));
 		p.translate( m_cellWidth, 0 );
 	}
 
@@ -189,18 +174,13 @@ void LcdWidget::paintEvent( QPaintEvent* )
 			else
 				val = 10;
 		}
-		p.drawPixmap( cellRect, *m_lcdPixmap,
-				QRect( QPoint( val*m_cellWidth, 
-					isEnabled()?0:m_cellHeight ),
-				cellSize ) );
+		p.drawPixmap(cellRect, m_lcdPixmap, QRect(QPoint(val * m_cellWidth, isEnabled() ? 0 : m_cellHeight), cellSize));
 		p.translate( m_cellWidth, 0 );
 	}
 
 	// Right Margin
-	p.drawPixmap(QRect(0, 0, m_seamlessRight ? 0 : m_marginWidth - 1, m_cellHeight),
-		*m_lcdPixmap,
+	p.drawPixmap(QRect(0, 0, m_seamlessRight ? 0 : m_marginWidth - 1, m_cellHeight), m_lcdPixmap,
 		QRect(charsPerPixmap * m_cellWidth, isEnabled() ? 0 : m_cellHeight, m_cellWidth / 2, m_cellHeight));
-
 
 	p.restore();
 
@@ -294,12 +274,12 @@ void LcdWidget::initUi(const QString& name , const QString& style)
 	setWindowTitle( name );
 
 	// We should make a factory for these or something.
-	//m_lcdPixmap = new QPixmap( embed::getIconPixmap( QString( "lcd_" + style ).toUtf8().constData() ) );
-	//m_lcdPixmap = new QPixmap( embed::getIconPixmap( "lcd_19green" ) ); // TODO!!
-	m_lcdPixmap = new QPixmap( embed::getIconPixmap( QString( "lcd_" + style ).toUtf8().constData() ) );
+	//m_lcdPixmap = embed::getIconPixmap(QString("lcd_" + style).toUtf8().constData());
+	//m_lcdPixmap = embed::getIconPixmap("lcd_19green"); // TODO!!
 
-	m_cellWidth = m_lcdPixmap->size().width() / LcdWidget::charsPerPixmap;
-	m_cellHeight = m_lcdPixmap->size().height() / 2;
+	m_lcdPixmap = embed::getIconPixmap(QString("lcd_" + style).toUtf8().constData());
+	m_cellWidth = m_lcdPixmap.size().width() / LcdWidget::charsPerPixmap;
+	m_cellHeight = m_lcdPixmap.size().height() / 2;
 
 	m_marginWidth =  m_cellWidth / 2;
 

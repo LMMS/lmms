@@ -372,7 +372,6 @@ private:
 	Knob *			m_masterVolKnob;
 	Knob *			m_vibratoKnob;	
 	
-	static QPixmap *	s_artwork;
 };
 
 
