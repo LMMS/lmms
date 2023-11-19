@@ -23,6 +23,8 @@
  *
  */
 
+#include "ControllerRackView.h"
+
 #include <QApplication>
 #include <QAction>
 #include <QPushButton>
@@ -31,21 +33,20 @@
 #include <QVBoxLayout>
 
 #include "Song.h"
-#include "embed.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
-#include "ControllerRackView.h"
 #include "ControllerView.h"
 #include "LfoController.h"
 #include "SubWindow.h"
+#include "embed.h"
 
 namespace lmms::gui
 {
 
 
-ControllerRackView::ControllerRackView() :
-	QWidget(),
-	m_nextIndex(0)
+ControllerRackView::ControllerRackView()
+	: DetachableWidget{}
+	, m_nextIndex{0}
 {
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
 	setWindowTitle( tr( "Controller Rack" ) );
@@ -226,27 +227,5 @@ void ControllerRackView::addController()
 	// new controller
 	setFocus();
 }
-
-
-
-
-void ControllerRackView::closeEvent( QCloseEvent * _ce )
- {
-	if (windowFlags().testFlag(Qt::Window))
-	{
-		_ce->accept();
-	}
-	else if (getGUI()->mainWindow()->workspace())
-	{
-		parentWidget()->hide();
-		_ce->ignore();
-	}
-	else
-	{
-		hide();
-		_ce->ignore();
-	}
- }
-
 
 } // namespace lmms::gui

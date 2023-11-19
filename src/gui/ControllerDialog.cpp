@@ -23,45 +23,17 @@
  *
  */
 
-#include <QCloseEvent>
-
 #include "ControllerDialog.h"
+
 #include "Controller.h"
-#include "GuiApplication.h"
-#include "MainWindow.h"
 
 namespace lmms::gui
 {
 
-
-ControllerDialog::ControllerDialog( Controller * _controller,
-							QWidget * _parent ) :
-	QWidget( _parent ),
-	ModelView( _controller, this )
+ControllerDialog::ControllerDialog(Controller* controller, QWidget* parent)
+	: DetachableWidget{parent}
+	, ModelView{controller, this}
 {
 }
-
-
-
-void ControllerDialog::closeEvent( QCloseEvent * _ce )
-{
-	if (windowFlags().testFlag(Qt::Window))
-	{
-		_ce->accept();
-	}
-	else if (getGUI()->mainWindow()->workspace())
-	{
-		parentWidget()->hide();
-		_ce->ignore();
-	}
-	else
-	{
-		hide();
-		_ce->ignore();
-	}
-	emit closed();
-}
-
-
 
 } // namespace lmms::gui

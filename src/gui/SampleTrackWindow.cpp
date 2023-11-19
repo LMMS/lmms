@@ -46,11 +46,11 @@ namespace lmms::gui
 {
 
 
-SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
-	QWidget(),
-	ModelView(nullptr, this),
-	m_track(tv->model()),
-	m_stv(tv)
+SampleTrackWindow::SampleTrackWindow(SampleTrackView* stv)
+	: DetachableWidget{}
+	, ModelView{nullptr, this}
+	, m_track{stv->model()}
+	, m_stv{stv}
 {
 #if QT_VERSION < 0x50C00
 	// Workaround for a bug in Qt versions below 5.12,
@@ -139,14 +139,14 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 
 	generalSettingsLayout->addLayout(basicControlsLayout);
 
-	m_effectRack = new EffectRackView(tv->model()->audioPort()->effects());
+	m_effectRack = new EffectRackView(stv->model()->audioPort()->effects());
 	m_effectRack->setFixedSize(EffectRackView::DEFAULT_WIDTH, 242);
 
 	vlayout->addWidget(generalSettingsWidget);
 	vlayout->addWidget(m_effectRack);
 
 
-	setModel(tv->model());
+	setModel(stv->model());
 
 	QMdiSubWindow * subWin = getGUI()->mainWindow()->addWindowedWidget(this);
 	Qt::WindowFlags flags = subWin->windowFlags();
@@ -238,20 +238,7 @@ void SampleTrackWindow::toggleVisibility(bool on)
 
 void SampleTrackWindow::closeEvent(QCloseEvent* ce)
 {
-	if (windowFlags().testFlag(Qt::Window))
-	{
-		ce->accept();
-	}
-	else if (getGUI()->mainWindow()->workspace())
-	{
-		parentWidget()->hide();
-		ce->ignore();
-	}
-	else
-	{
-		hide();
-		ce->ignore();
-	}
+	DetachableWidget::closeEvent(ce);
 
 	m_stv->m_tlb->setFocus();
 	m_stv->m_tlb->setChecked(false);
@@ -259,10 +246,9 @@ void SampleTrackWindow::closeEvent(QCloseEvent* ce)
 
 
 
-void SampleTrackWindow::saveSettings(QDomDocument& doc, QDomElement & element)
+void SampleTrackWindow::saveSettings([[maybe_unused]] QDomDocument& doc, QDomElement& element)
 {
 	MainWindow::saveWidgetState(this, element);
-	Q_UNUSED(element)
 }
 
 

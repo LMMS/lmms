@@ -25,17 +25,13 @@
 #ifndef LMMS_GUI_CONTROLLER_RACK_VIEW_H
 #define LMMS_GUI_CONTROLLER_RACK_VIEW_H
 
-#include <QWidget>
-#include <QCloseEvent>
-
+#include "DetachableWidget.h"
 #include "SerializingObject.h"
 #include "lmms_basics.h"
-
 
 class QPushButton;
 class QScrollArea;
 class QVBoxLayout;
-
 
 namespace lmms
 {
@@ -47,8 +43,7 @@ namespace gui
 
 class ControllerView;
 
-
-class ControllerRackView : public QWidget, public SerializingObject
+class ControllerRackView : public DetachableWidget, public SerializingObject
 {
 	Q_OBJECT
 public:
@@ -70,9 +65,6 @@ public slots:
 	void moveDown(ControllerView* view);
 	void addController(Controller* controller);
 	void removeController(Controller* controller);
-
-protected:
-	void closeEvent( QCloseEvent * _ce ) override;
 
 private slots:
 	void addController();
