@@ -227,7 +227,6 @@ private:
 
 	int m_numOscillators;
 
-	static QPixmap * s_artwork;
 	
 protected slots:
 	void updateKnobHint();

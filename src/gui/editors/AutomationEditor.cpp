@@ -64,15 +64,6 @@
 
 namespace lmms::gui
 {
-
-QPixmap * AutomationEditor::s_toolDraw = nullptr;
-QPixmap * AutomationEditor::s_toolErase = nullptr;
-QPixmap * AutomationEditor::s_toolDrawOut = nullptr;
-QPixmap * AutomationEditor::s_toolEditTangents = nullptr;
-QPixmap * AutomationEditor::s_toolMove = nullptr;
-QPixmap * AutomationEditor::s_toolYFlip = nullptr;
-QPixmap * AutomationEditor::s_toolXFlip = nullptr;
-
 const std::array<float, 7> AutomationEditor::m_zoomXLevels =
 		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f };
 
@@ -135,17 +126,6 @@ AutomationEditor::AutomationEditor() :
 					this, SLOT(setQuantization()));
 	m_quantizeModel.setValue( m_quantizeModel.findText( "1/8" ) );
 
-	if (s_toolYFlip == nullptr)
-	{
-		s_toolYFlip = new QPixmap( embed::getIconPixmap(
-							"flip_y" ) );
-	}
-	if (s_toolXFlip == nullptr)
-	{
-		s_toolXFlip = new QPixmap( embed::getIconPixmap(
-							"flip_x" ) );
-	}
-
 	// add time-line
 	m_timeLine = new TimeLineWidget( VALUES_WIDTH, 0, m_ppb,
 				Engine::getSong()->getPlayPos(
@@ -168,28 +148,6 @@ AutomationEditor::AutomationEditor() :
 	m_topBottomScroll->setPageStep( 20 );
 	connect( m_topBottomScroll, SIGNAL(valueChanged(int)), this,
 						SLOT(verScrolled(int)));
-
-	// init pixmaps
-	if (s_toolDraw == nullptr)
-	{
-		s_toolDraw = new QPixmap(embed::getIconPixmap("edit_draw"));
-	}
-	if (s_toolErase == nullptr)
-	{
-		s_toolErase= new QPixmap(embed::getIconPixmap("edit_erase"));
-	}
-	if (s_toolDrawOut == nullptr)
-	{
-		s_toolDrawOut = new QPixmap(embed::getIconPixmap("edit_draw_outvalue"));
-	}
-	if (s_toolEditTangents == nullptr)
-	{
-		s_toolEditTangents = new QPixmap(embed::getIconPixmap("edit_tangent"));
-	}
-	if (s_toolMove == nullptr)
-	{
-		s_toolMove = new QPixmap(embed::getIconPixmap("edit_move"));
-	}
 
 	setCurrentClip(nullptr);
 
@@ -1400,26 +1358,26 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	{
 		case EditMode::Draw:
 		{
-			if (m_action == Action::EraseValues) { cursor = s_toolErase; }
-			else if (m_action == Action::MoveValue) { cursor = s_toolMove; }
-			else { cursor = s_toolDraw; }
+			if (m_action == Action::EraseValues) { cursor = &m_toolErase; }
+			else if (m_action == Action::MoveValue) { cursor = &m_toolMove; }
+			else { cursor = &m_toolDraw; }
 			break;
 		}
 		case EditMode::Erase:
 		{
-			cursor = s_toolErase;
+			cursor = &m_toolErase;
 			break;
 		}
 		case EditMode::DrawOutValues:
 		{
-			if (m_action == Action::ResetOutValues) { cursor = s_toolErase; }
-			else if (m_action == Action::MoveOutValue) { cursor = s_toolMove; }
-			else { cursor = s_toolDrawOut; }
+			if (m_action == Action::ResetOutValues) { cursor = &m_toolErase; }
+			else if (m_action == Action::MoveOutValue) { cursor = &m_toolMove; }
+			else { cursor = &m_toolDrawOut; }
 			break;
 		}
 		case EditMode::EditTangents:
 		{
-			cursor = m_action == Action::MoveTangent ? s_toolMove : s_toolEditTangents;
+			cursor = m_action == Action::MoveTangent ? &m_toolMove : &m_toolEditTangents;
 			break;
 		}
 	}

@@ -61,17 +61,6 @@ LedCheckBox::LedCheckBox( QWidget * _parent,
 {
 }
 
-
-
-LedCheckBox::~LedCheckBox()
-{
-	delete m_ledOnPixmap;
-	delete m_ledOffPixmap;
-}
-
-
-
-
 void LedCheckBox::setText( const QString &s )
 {
 	m_text = s;
@@ -100,9 +89,8 @@ void LedCheckBox::initUi( LedColor _color )
 {
 	setCheckable( true );
 
-	m_ledOnPixmap = new QPixmap( embed::getIconPixmap(
-					names[static_cast<std::size_t>(_color)].toUtf8().constData() ) );
-	m_ledOffPixmap = new QPixmap( embed::getIconPixmap( "led_off" ) );
+	m_ledOnPixmap = embed::getIconPixmap(names[static_cast<std::size_t>(_color)].toUtf8().constData());
+	m_ledOffPixmap = embed::getIconPixmap("led_off");
 
 	if (m_legacyMode)
 	{
@@ -119,8 +107,8 @@ void LedCheckBox::onTextUpdated()
 {
 	QFontMetrics const fm = fontMetrics();
 
-	int const width = m_ledOffPixmap->width() + 5 + horizontalAdvance(fm, text());
-	int const height = m_legacyMode ? m_ledOffPixmap->height() : qMax(m_ledOffPixmap->height(), fm.height());
+	int const width = m_ledOffPixmap.width() + 5 + horizontalAdvance(fm, text());
+	int const height = m_legacyMode ? m_ledOffPixmap.height() : qMax(m_ledOffPixmap.height(), fm.height());
 
 	setFixedSize(width, height);
 }
@@ -130,31 +118,24 @@ void LedCheckBox::paintLegacy(QPaintEvent * pe)
 	QPainter p( this );
 	p.setFont( pointSize<7>( font() ) );
 
-	if( model()->value() == true )
-	{
-		p.drawPixmap( 0, 0, *m_ledOnPixmap );
-	}
-	else
-	{
-		p.drawPixmap( 0, 0, *m_ledOffPixmap );
-	}
+	p.drawPixmap(0, 0, model()->value() ? m_ledOnPixmap : m_ledOffPixmap);
 
 	p.setPen( QColor( 64, 64, 64 ) );
-	p.drawText( m_ledOffPixmap->width() + 4, 11, text() );
+	p.drawText(m_ledOffPixmap.width() + 4, 11, text());
 	p.setPen( QColor( 255, 255, 255 ) );
-	p.drawText( m_ledOffPixmap->width() + 3, 10, text() );
+	p.drawText(m_ledOffPixmap.width() + 3, 10, text());
 }
 
 void LedCheckBox::paintNonLegacy(QPaintEvent * pe)
 {
 	QPainter p(this);
 
-	QPixmap * drawnPixmap = model()->value() ? m_ledOnPixmap : m_ledOffPixmap;
+	auto drawnPixmap = model()->value() ? m_ledOnPixmap : m_ledOffPixmap;
 
-	p.drawPixmap( 0, rect().height() / 2 - drawnPixmap->height() / 2, *drawnPixmap);
+	p.drawPixmap(0, rect().height() / 2 - drawnPixmap.height() / 2, drawnPixmap);
 
 	QRect r = rect();
-	r -= QMargins(m_ledOffPixmap->width() + 5, 0, 0, 0);
+	r -= QMargins(m_ledOffPixmap.width() + 5, 0, 0, 0);
 	p.drawText(r, text());
 }
 

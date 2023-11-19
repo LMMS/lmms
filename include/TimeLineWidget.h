@@ -28,6 +28,7 @@
 #include <QWidget>
 
 #include "Song.h"
+#include "embed.h"
 
 
 class QPixmap;
@@ -205,7 +206,7 @@ protected:
 
 
 private:
-	static QPixmap * s_posMarkerPixmap;
+	QPixmap m_posMarkerPixmap = embed::getIconPixmap("playpos_marker");
 
 	QColor m_inactiveLoopColor;
 	QBrush m_inactiveLoopBrush;

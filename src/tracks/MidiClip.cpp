@@ -39,13 +39,6 @@
 namespace lmms
 {
 
-QPixmap * gui::MidiClipView::s_stepBtnOn0 = nullptr;
-QPixmap * gui::MidiClipView::s_stepBtnOn200 = nullptr;
-QPixmap * gui::MidiClipView::s_stepBtnOff = nullptr;
-QPixmap * gui::MidiClipView::s_stepBtnOffLight = nullptr;
-
-
-
 MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
 	Clip( _instrument_track ),
 	m_instrumentTrack( _instrument_track ),

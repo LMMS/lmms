@@ -719,7 +719,6 @@ namespace gui
 {
 
 
-QPixmap * NesInstrumentView::s_artwork = nullptr;
 
 
 NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent ) :
@@ -728,12 +727,8 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 	setAutoFillBackground( true );
 	QPalette pal;
 
-	if( s_artwork == nullptr )
-	{
-		s_artwork = new QPixmap( PLUGIN_NAME::getIconPixmap( "artwork" ) );
-	}
-
-	pal.setBrush( backgroundRole(),	*s_artwork );
+	static auto s_artwork = PLUGIN_NAME::getIconPixmap("artwork");
+	pal.setBrush(backgroundRole(), s_artwork);
 	setPalette( pal );
 
 	const int KNOB_Y1 = 24;

@@ -28,6 +28,7 @@
 #include <QCheckBox>
 #include <QDir>
 #include <QMutex>
+#include "embed.h"
 
 #include "FileBrowserSearcher.h"
 #include <QProgressBar>
@@ -221,14 +222,12 @@ public:
 
 
 private:
-	void initPixmaps();
-
 	bool addItems( const QString & path );
 
 
-	static QPixmap * s_folderPixmap;
-	static QPixmap * s_folderOpenedPixmap;
-	static QPixmap * s_folderLockedPixmap;
+	QPixmap m_folderPixmap = embed::getIconPixmap("folder");
+	QPixmap m_folderOpenedPixmap = embed::getIconPixmap("folder_opened");
+	QPixmap m_folderLockedPixmap = embed::getIconPixmap("folder_locked");
 
 	//! Directories that lead here
 	//! Initially, this is just set to the current path of a directory
@@ -304,14 +303,6 @@ public:
 private:
 	void initPixmaps();
 	void determineFileType();
-
-	static QPixmap * s_projectFilePixmap;
-	static QPixmap * s_presetFilePixmap;
-	static QPixmap * s_sampleFilePixmap;
-	static QPixmap * s_soundfontFilePixmap;
-	static QPixmap * s_vstPluginFilePixmap;
-	static QPixmap * s_midiFilePixmap;
-	static QPixmap * s_unknownFilePixmap;
 
 	QString m_path;
 	FileType m_type;

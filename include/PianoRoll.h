@@ -340,12 +340,12 @@ private:
 	static const int cm_scrollAmtHoriz = 10;
 	static const int cm_scrollAmtVert = 1;
 
-	static QPixmap * s_toolDraw;
-	static QPixmap * s_toolErase;
-	static QPixmap * s_toolSelect;
-	static QPixmap * s_toolMove;
-	static QPixmap * s_toolOpen;
-	static QPixmap* s_toolKnife;
+	QPixmap m_toolDraw = embed::getIconPixmap("edit_draw");
+	QPixmap m_toolErase = embed::getIconPixmap("edit_erase");
+	QPixmap m_toolSelect = embed::getIconPixmap("edit_select");
+	QPixmap m_toolMove = embed::getIconPixmap("edit_move");
+	QPixmap m_toolOpen = embed::getIconPixmap("automation");
+	QPixmap m_toolKnife = embed::getIconPixmap("edit_knife");
 
 	static std::array<KeyType, 12> prKeyOrder;
 

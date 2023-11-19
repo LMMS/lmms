@@ -54,9 +54,6 @@ public:
 						LedColor _color = LedColor::Yellow,
 						bool legacyMode = true);
 
-	~LedCheckBox() override;
-
-
 	inline const QString & text()
 	{
 		return( m_text );
@@ -71,8 +68,8 @@ protected:
 
 
 private:
-	QPixmap * m_ledOnPixmap;
-	QPixmap * m_ledOffPixmap;
+	QPixmap m_ledOnPixmap;
+	QPixmap m_ledOffPixmap;
 
 	QString m_text;
 
