@@ -25,8 +25,9 @@
 #ifndef LMMS_GUI_EDITOR_H
 #define LMMS_GUI_EDITOR_H
 
-#include <QMainWindow>
 #include <QToolBar>
+
+#include "DetachableWindow.h"
 
 class QAction;
 
@@ -45,7 +46,7 @@ class DropToolBar;
 ///
 /// Those editors include the Song Editor, the Automation Editor, B&B Editor,
 /// and the Piano Roll.
-class Editor : public QMainWindow
+class Editor : public DetachableWindow
 {
 	Q_OBJECT
 public:
@@ -56,7 +57,6 @@ protected:
 	DropToolBar * addDropToolBar(Qt::ToolBarArea whereToAdd, QString const & windowTitle);
 	DropToolBar * addDropToolBar(QWidget * parent, Qt::ToolBarArea whereToAdd, QString const & windowTitle);
 
-	void closeEvent( QCloseEvent * _ce ) override;
 protected slots:
 	virtual void play() {}
 	virtual void record() {}

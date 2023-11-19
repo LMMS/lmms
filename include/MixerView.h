@@ -25,11 +25,11 @@
 #ifndef LMMS_GUI_MIXER_VIEW_H
 #define LMMS_GUI_MIXER_VIEW_H
 
-#include <QWidget>
 #include <QHBoxLayout>
 #include <QStackedLayout>
 #include <QScrollArea>
 
+#include "DetachableWidget.h"
 #include "ModelView.h"
 #include "Engine.h"
 #include "Fader.h"
@@ -45,8 +45,10 @@ namespace lmms::gui
 
 class MixerLine;
 
-class LMMS_EXPORT MixerView : public QWidget, public ModelView,
-					public SerializingObjectHook
+class LMMS_EXPORT MixerView
+	: public DetachableWidget
+	, public ModelView
+	, public SerializingObjectHook
 {
 	Q_OBJECT
 public:
@@ -114,9 +116,6 @@ public:
 public slots:
 	int addNewChannel();
 
-protected:
-	void closeEvent( QCloseEvent * _ce ) override;
-	
 private slots:
 	void updateFaders();
 	void toggledSolo();

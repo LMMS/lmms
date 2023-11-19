@@ -52,10 +52,10 @@ namespace lmms::gui
 {
 
 
-MixerView::MixerView() :
-	QWidget(),
-	ModelView( nullptr, this ),
-	SerializingObjectHook()
+MixerView::MixerView()
+	: DetachableWidget{}
+	, ModelView{nullptr, this}
+	, SerializingObjectHook{}
 {
 #if QT_VERSION < 0x50C00
 	// Workaround for a bug in Qt versions below 5.12,
@@ -580,26 +580,6 @@ void MixerView::keyPressEvent(QKeyEvent * e)
 		case Qt::Key_F2:
 			renameChannel( m_currentMixerLine->channelIndex() );
 			break;
-	}
-}
-
-
-
-void MixerView::closeEvent( QCloseEvent * _ce )
-{
-	if (windowFlags().testFlag(Qt::Window))
-	{
-		_ce->accept();
-	}
-	else if (getGUI()->mainWindow()->workspace())
-	{
-		parentWidget()->hide();
-		_ce->ignore();
-	}
-	else
-	{
-		hide();
-		_ce->ignore();
 	}
 }
 

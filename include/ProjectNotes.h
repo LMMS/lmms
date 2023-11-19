@@ -25,8 +25,7 @@
 #ifndef LMMS_GUI_PROJECT_NOTES_H
 #define LMMS_GUI_PROJECT_NOTES_H
 
-#include <QMainWindow>
-
+#include "DetachableWindow.h"
 #include "SerializingObject.h"
 
 class QAction;
@@ -38,7 +37,7 @@ namespace lmms::gui
 {
 
 
-class LMMS_EXPORT ProjectNotes : public QMainWindow, public SerializingObject
+class LMMS_EXPORT ProjectNotes : public DetachableWindow, public SerializingObject
 {
 	Q_OBJECT
 public:
@@ -58,7 +57,6 @@ public:
 
 
 protected:
-	void closeEvent( QCloseEvent * _ce ) override;
 	void setupActions();
 
 

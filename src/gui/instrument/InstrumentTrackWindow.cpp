@@ -518,6 +518,7 @@ void InstrumentTrackWindow::toggleVisibility( bool on )
 
 void InstrumentTrackWindow::closeEvent( QCloseEvent* event )
 {
+	// TODO: When is this event used?
 	if (windowFlags().testFlag(Qt::Window))
 	{
 		event->accept();

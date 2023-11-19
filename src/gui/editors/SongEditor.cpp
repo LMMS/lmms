@@ -586,21 +586,6 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 
 
 
-void SongEditor::closeEvent( QCloseEvent * ce )
-{
-	if( parentWidget() )
-	{
-		parentWidget()->hide();
-	}
-	else
-	{
-		hide();
-	}
-	ce->ignore();
-}
-
-
-
 
 void SongEditor::mousePressEvent(QMouseEvent *me)
 {
