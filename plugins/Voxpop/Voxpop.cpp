@@ -87,7 +87,7 @@ Voxpop::Voxpop( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &voxpop_plugin_descriptor ),
 
 	m_mode( CueSelectionMode::Automation ),
-	m_respectEndpointModel( false ),
+	m_respectEndpointModel( true ),
 	m_ampModel( 100, 0, 500, 1, this, tr( "Amplify" ) ),
 	m_cueIndexModel( 0, 0, 99 , this, tr("Cue index") ),
 	m_stutterModel( false, this, tr( "Stutter" ) ),
@@ -123,7 +123,6 @@ Voxpop::Voxpop( InstrumentTrack * _instrument_track ) :
 	m_modeModel.addItem( tr( "Sequential" ) );
 	m_modeModel.setValue( 0 );
 
-	qDebug("Instantiated");
 }
 
 
@@ -132,8 +131,8 @@ Voxpop::Voxpop( InstrumentTrack * _instrument_track ) :
 void Voxpop::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
-	// Magic key - ciopied from AudioFileProcessor
-	if( m_stutterModel.value() == true && _n->frequency() < 20.0 )
+	// Magic key - idea copied from AudioFileProcessor
+	if ( m_stutterModel.value() == true && _n->frequency() < 20.0 )
 	{
 		resetStutter();
 		return;
@@ -169,43 +168,38 @@ void Voxpop::playNote( NotePlayHandle * _n,
 				}
 		}
 
-		if( m_stutterModel.value() == true && m_nextPlayStartPoint[cue] >= m_sampleBuffers[cue]->endFrame() )
+		if ( m_stutterModel.value() == true && m_nextPlayStartPoint[cue] >= m_sampleBuffers[cue]->endFrame() )
 		{
 			// Restart playing the note if in stutter mode and we're at the end of the sample.
 			m_nextPlayStartPoint[cue] = m_sampleBuffers[cue]->startFrame() + m_cueOffsets[cue];
 		}
-		// set interpolation mode for libsamplerate
-		int srcmode = SRC_LINEAR;
+
+		int srcMode = SRC_LINEAR;
 		switch( m_interpolationModel.value() )
 		{
 			case 0:
-				srcmode = SRC_ZERO_ORDER_HOLD;
+				srcMode = SRC_ZERO_ORDER_HOLD;
 				break;
 			case 1:
-				srcmode = SRC_LINEAR;
+				srcMode = SRC_LINEAR;
 				break;
 			case 2:
-				srcmode = SRC_SINC_MEDIUM_QUALITY;
+				srcMode = SRC_SINC_MEDIUM_QUALITY;
 				break;
 		}
-		_n->m_pluginData = new VoxpopHandleState(cue, _n->hasDetuningInfo(), srcmode );
+		_n->m_pluginData = new VoxpopHandleState(cue, _n->hasDetuningInfo(), srcMode );
 		((handleState *)_n->m_pluginData)->setFrameIndex( m_nextPlayStartPoint[cue] );
-		((handleState *)_n->m_pluginData)->setBackwards( false );
 
-// debug code
-/*		qDebug( "frames %d", m_sampleBuffers[cue].frames() );
-		qDebug( "startframe %d", m_sampleBuffers[cue].startFrame() );
-		qDebug( "nextPlayStartPoint %d", m_nextPlayStartPoint[cue] );*/
 	}
 	else
 	{
 		cue = ((VoxpopHandleState *)_n->m_pluginData)->cue;
 	}
 
-	if( ! _n->isFinished() )
+	if ( ! _n->isFinished() )
 	{
 		float freq = 440.f;
-		if( m_mode == CueSelectionMode::Automation)
+		if ( m_mode == CueSelectionMode::Automation)
 		{
 			freq = _n->frequency();
 		}
@@ -215,19 +209,14 @@ void Voxpop::playNote( NotePlayHandle * _n,
 						frames, freq, SampleBuffer::LoopMode::Off ) )
 		{
 			applyRelease( _working_buffer, _n );
-			emit isPlaying( ((handleState *)_n->m_pluginData)->frameIndex() );
 		}
 		else
 		{
 			memset( _working_buffer, 0, ( frames + offset ) * sizeof( sampleFrame ) );
-			emit isPlaying( 0 );
 		}
 	}
-	else
-	{
-		emit isPlaying( 0 );
-	}
-	if( m_stutterModel.value() == true )
+
+	if ( m_stutterModel.value() == true )
 	{
 		m_nextPlayStartPoint[cue] = ((handleState *)_n->m_pluginData)->frameIndex();
 	}
@@ -486,7 +475,6 @@ bool Voxpop::reloadCuesheet()
 			m_cueIndexModel.setValue(0);
 			m_cueIndexModel.setRange(0, newCueCount - 1);
 			m_cueCount = newCueCount;
-			qDebug("loaded cue sheet: %d", newCueCount);
 			return true;
 		}
 	}
@@ -573,9 +561,6 @@ VoxpopView::VoxpopView( Instrument * _instrument, QWidget * _parent ) :
 	m_waveView = 0;
 	newWaveView();
 	qRegisterMetaType<lmms::f_cnt_t>( "lmms::f_cnt_t" );
-
-	qDebug("Instantiated VoxpopView");
-
 }
 
 
@@ -729,13 +714,13 @@ void VoxpopView::updateCuePoints()
 	}
 
 	QPainter p( this );
-	p.setPen( QColor( 255, 60, 60 ) );
+	p.setPen( QColor( 255, 60, 60, 150 ) );
 
-	double graphWidth = 244;
+	double graphWidth = 241;
 	for ( int i = 0 ; i < voxpop->m_cueCount ; i++)
 	{
 		int linePx = voxpop->m_cueOffsets[i] * graphWidth / voxpop->m_sampleBuffer.frames();
-		p.drawLine( linePx + 2, 175, linePx + 2, 242 );
+		p.drawLine( linePx + 4, 173, linePx + 4, 243 );
 	}
 }
 
@@ -789,8 +774,6 @@ void VoxpopWaveView::updateGraph()
 	m_graph.fill( Qt::transparent );
 	QPainter p( &m_graph );
 	p.setPen( QColor( 200, 200, 250 ) );
-
-	qDebug("graph paint: %d %d  w=%d, h=%d", m_from, m_to, m_graph.width(), m_graph.height() ),
 
 	m_sampleBuffer.visualize(
 		p,

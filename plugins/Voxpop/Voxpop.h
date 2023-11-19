@@ -150,7 +150,6 @@ private slots:
 
 
 signals:
-	void isPlaying( lmms::f_cnt_t _current_frame );
 	void cueChanged(int cue, QString * text);
 
 private:
