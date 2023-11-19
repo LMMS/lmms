@@ -28,9 +28,11 @@
 
 #include <QMainWindow>
 
+#include "lmms_export.h"
+
 namespace lmms::gui {
 
-class DetachableWindow : public QMainWindow
+class LMMS_EXPORT DetachableWindow : public QMainWindow
 {
 	Q_OBJECT
 public:
