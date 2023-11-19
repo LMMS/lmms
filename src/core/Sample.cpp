@@ -164,95 +164,72 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, int numFrames, float d
 void Sample::visualize(QPainter& p, const QRect& dr, int fromFrame, int toFrame) const
 {
 	const auto lock = std::shared_lock{m_mutex};
-	const auto numFrames = static_cast<int>(m_buffer->size());
 
-	const bool focusOnRange = toFrame <= numFrames && 0 <= fromFrame && fromFrame < toFrame;
-	const int w = dr.width();
-	const int h = dr.height();
+	fromFrame = std::clamp(fromFrame, 0, (int)m_buffer->size());
+	toFrame = std::clamp(toFrame, 0, (int)m_buffer->size());
 
-	const int yb = h / 2 + dr.y();
-	const float ySpace = h * 0.5f;
-	const int nbFrames = focusOnRange ? toFrame - fromFrame : numFrames;
+	int x = dr.x();
+	int y = dr.y();
+	int h = dr.height();
+	int w = dr.width();
 
-	const double fpp = std::max(1., static_cast<double>(nbFrames) / w);
-	// There are 2 possibilities: Either nbFrames is bigger than
-	// the width, so we will have width points, or nbFrames is
-	// smaller than the width (fpp = 1) and we will have nbFrames
-	// points
-	const int totalPoints = std::min(nbFrames, w);
-	std::vector<QPointF> fEdgeMax(totalPoints);
-	std::vector<QPointF> fEdgeMin(totalPoints);
-	std::vector<QPointF> fRmsMax(totalPoints);
-	std::vector<QPointF> fRmsMin(totalPoints);
-	int curPixel = 0;
-	const int xb = dr.x();
-	const int first = focusOnRange ? fromFrame : 0;
-	const int last = focusOnRange ? toFrame - 1 : numFrames - 1;
-	// When the number of frames isn't perfectly divisible by the
-	// width, the remaining frames don't fit the last pixel and are
-	// past the visible area. lastVisibleFrame is the index number of
-	// the last visible frame.
-	const int visibleFrames = (fpp * w);
-	const int lastVisibleFrame = focusOnRange ? fromFrame + visibleFrames - 1 : visibleFrames - 1;
+	const int halfHeight = y + h / 2.0f;
+	const int h2 = h / 2;
 
-	for (double frame = first; frame <= last && frame <= lastVisibleFrame; frame += fpp)
+	const sampleFrame* buffer = m_buffer->data() + fromFrame;
+	int frames = toFrame - fromFrame;
+	if (frames == 0) { frames = m_buffer->size(); }
+	const float framesPerPixel = frames / static_cast<float>(w);
+
+	int resolution = 1;
+	while (framesPerPixel / resolution > s_min_resolution)
 	{
-		float maxData = -1;
-		float minData = 1;
-
-		auto rmsData = std::array<float, 2>{};
-
-		// Find maximum and minimum samples within range
-		for (int i = 0; i < fpp && frame + i <= last; ++i)
-		{
-			for (int j = 0; j < 2; ++j)
-			{
-				auto curData = m_buffer->data()[static_cast<int>(frame) + i][j];
-
-				if (curData > maxData) { maxData = curData; }
-				if (curData < minData) { minData = curData; }
-
-				rmsData[j] += curData * curData;
-			}
-		}
-
-		const float trueRmsData = (rmsData[0] + rmsData[1]) / 2 / fpp;
-		const float sqrtRmsData = std::sqrt(trueRmsData);
-		const float maxRmsData = std::clamp(sqrtRmsData, minData, maxData);
-		const float minRmsData = std::clamp(-sqrtRmsData, minData, maxData);
-
-		double x = 0;
-		if (m_reversed)
-		{
-			x = nbFrames >= w ? xb + w - curPixel : xb + ((1 - static_cast<double>(curPixel) / nbFrames) * w);
-		}
-		else
-		{
-			// If nbFrames >= w, we can use curPixel to calculate X
-			// but if nbFrames < w, we need to calculate it proportionally
-			// to the total number of points
-			x = nbFrames >= w ? xb + curPixel : xb + ((static_cast<double>(curPixel) / nbFrames) * w);
-		}
-
-		// Partial Y calculation
-		auto py = ySpace * m_amplification;
-		fEdgeMax[curPixel] = QPointF(x, (yb - (maxData * py)));
-		fEdgeMin[curPixel] = QPointF(x, (yb - (minData * py)));
-		fRmsMax[curPixel] = QPointF(x, (yb - (maxRmsData * py)));
-		fRmsMin[curPixel] = QPointF(x, (yb - (minRmsData * py)));
-		++curPixel;
+		resolution++;
 	}
 
-	for (int i = 0; i < totalPoints; ++i)
+	std::vector<float> min(w, 1);
+	std::vector<float> max(w, -1);
+	std::vector<float> rms(w, 0);
+
+	int pixelIndex;
+	float value;
+	for (int i = 0; i < frames - resolution; i += resolution)
 	{
-		p.drawLine(fEdgeMax[i], fEdgeMin[i]);
+		pixelIndex = i / framesPerPixel;
+		value = buffer[i][0];
+
+		if (value > max[pixelIndex]) { max[pixelIndex] = value; }
+		if (value < min[pixelIndex]) { min[pixelIndex] = value; }
+		rms[pixelIndex] += value * value;
+	}
+
+	int lineX, lineY1, lineY2;
+	float trueRMS, minRMS, maxRMS;
+	for (int i = 0; i < w; i++)
+	{
+		lineY1 = halfHeight - (max[i] * h2);
+		lineY2 = halfHeight - (min[i] * h2);
+
+		lineX = i + x;
+		if (m_reversed) { lineX = w - lineX; }
+
+		p.drawLine(lineX, lineY1, lineX, lineY2);
 	}
 
 	p.setPen(p.pen().color().lighter(123));
-
-	for (int i = 0; i < totalPoints; ++i)
+	for (int i = 0; i < w; i++)
 	{
-		p.drawLine(fRmsMax[i], fRmsMin[i]);
+		trueRMS = sqrt(rms[i] / (framesPerPixel / resolution));
+		maxRMS = std::clamp(trueRMS, min[i], max[i]);
+		minRMS = std::clamp(-trueRMS, min[i], max[i]);
+
+		lineY1 = halfHeight - maxRMS * h2;
+		lineY2 = halfHeight - minRMS * h2;
+
+		lineX = i + x;
+		if (m_reversed) { lineX = w - lineX; }
+
+		p.drawLine(lineX, lineY1, lineX, lineY2);
 	}
 }
 
