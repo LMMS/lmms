@@ -117,6 +117,7 @@ public:
 
 	auto toBase64() const -> QString;
 
+	auto data() -> const sampleFrame*;
 	auto buffer() const -> std::shared_ptr<const SampleBuffer>;
 	auto startFrame() const -> int;
 	auto endFrame() const -> int;

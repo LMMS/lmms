@@ -25,7 +25,9 @@
 #include "SampleClip.h"
 
 #include <QDomElement>
+#include <QFileInfo>
 
+#include "PathUtil.h"
 #include "SampleBuffer.h"
 #include "SampleClipView.h"
 #include "SampleLoader.h"
@@ -130,16 +132,14 @@ void SampleClip::setSampleBuffer(std::unique_ptr<SampleBuffer> sb)
 	emit sampleChanged();
 }
 
-
-
-void SampleClip::setSampleFile(const QString & sf, bool loadingProject)
+void SampleClip::setSampleFile(const QString& sf)
 {
 	int length = 0;
 
 	if (!sf.isEmpty())
 	{
 		//Otherwise set it to the sample's length
-		m_sample = Sample(gui::SampleLoader::createBufferFromFile(sf, loadingProject));
+		m_sample = Sample(gui::SampleLoader::createBufferFromFile(sf));
 		length = sampleLength();
 	}
 
@@ -281,7 +281,16 @@ void SampleClip::loadSettings( const QDomElement & _this )
 	{
 		movePosition( _this.attribute( "pos" ).toInt() );
 	}
-	setSampleFile(_this.attribute("src"), true);
+
+	if (const auto srcFile = _this.attribute("src"); !srcFile.isEmpty())
+	{
+		if (QFileInfo(PathUtil::toAbsolute(srcFile)).exists())
+		{
+			setSampleFile(srcFile);
+		}
+		else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), srcFile)); }
+	}
+
 	if( sampleFile().isEmpty() && _this.hasAttribute( "data" ) )
 	{
 		auto sampleRate = _this.hasAttribute("sample_rate") ? _this.attribute("sample_rate").toInt() :

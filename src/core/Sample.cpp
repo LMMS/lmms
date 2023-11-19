@@ -284,6 +284,11 @@ auto Sample::toBase64() const -> QString
 	return m_buffer->toBase64();
 }
 
+auto Sample::data() -> const sampleFrame*
+{
+	return m_buffer->data();
+}
+
 auto Sample::buffer() const -> std::shared_ptr<const SampleBuffer>
 {
 	const auto lock = std::shared_lock{m_mutex};

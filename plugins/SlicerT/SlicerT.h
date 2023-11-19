@@ -33,6 +33,7 @@
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Note.h"
+#include "Sample.h"
 #include "SampleBuffer.h"
 #include "SlicerTView.h"
 #include "lmms_basics.h"
@@ -95,7 +96,7 @@ private:
 	ComboBoxModel m_sliceSnap;
 	BoolModel m_enableSync;
 
-	SampleBuffer m_originalSample;
+	Sample m_originalSample;
 
 	std::vector<float> m_slicePoints;
 

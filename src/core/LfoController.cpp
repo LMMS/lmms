@@ -23,14 +23,15 @@
  *
  */
 
-#include <QDomElement>
-
-
 #include "LfoController.h"
+
+#include <QDomElement>
+#include <QFileInfo>
+
 #include "AudioEngine.h"
+#include "PathUtil.h"
 #include "SampleLoader.h"
 #include "Song.h"
-
 
 namespace lmms
 {
@@ -238,9 +239,13 @@ void LfoController::loadSettings( const QDomElement & _this )
 	m_waveModel.loadSettings( _this, "wave" );
 	m_multiplierModel.loadSettings( _this, "multiplier" );
 
-	if (!_this.attribute("userwavefile").isEmpty())
+	if (const auto userWaveFile = _this.attribute("userwavefile"); !userWaveFile.isEmpty())
 	{
-		m_userDefSampleBuffer = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile"), true);
+		if (QFileInfo(PathUtil::toAbsolute(userWaveFile)).exists())
+		{
+			m_userDefSampleBuffer = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile"));
+		}
+		else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), userWaveFile)); }
 	}
 
 	updateSampleFunction();

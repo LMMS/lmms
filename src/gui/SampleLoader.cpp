@@ -100,20 +100,9 @@ QString SampleLoader::openWaveformFile(const QString& previousFile)
 		previousFile.isEmpty() ? ConfigManager::inst()->factorySamplesDir() + "waveforms/10saw.flac" : previousFile);
 }
 
-std::unique_ptr<SampleBuffer> SampleLoader::createBufferFromFile(const QString& filePath, bool collectErrorWhenNotFound)
+std::unique_ptr<SampleBuffer> SampleLoader::createBufferFromFile(const QString& filePath)
 {
 	if (filePath.isEmpty()) { return std::make_unique<SampleBuffer>(); }
-
-	if (collectErrorWhenNotFound)
-	{
-		auto absolutePath = PathUtil::toAbsolute(filePath);
-		if (!QFileInfo(absolutePath).exists())
-		{
-			QString message = QObject::tr("Sample not found: %1").arg(filePath);
-			Engine::getSong()->collectError(message);
-			return std::make_unique<SampleBuffer>();
-		}
-	}
 
 	try
 	{
