@@ -48,8 +48,8 @@ public:
 	ProjectNotes();
 	~ProjectNotes() override = default;
 
-    void clear();
-    void clearMetaData();
+	void clear();
+	void clearMetaData();
 	void setText( const QString & _text );
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
@@ -62,11 +62,11 @@ public:
 
 
 protected:
-    void closeEvent( QCloseEvent * _ce ) override;
-    void showEvent( QShowEvent * _ce ) override;
+	void closeEvent( QCloseEvent * _ce ) override;
+	void showEvent( QShowEvent * _ce ) override;
 	void setupActions();
-    void setupMetaData();
-    void renderImage();
+	void setupMetaData();
+	void renderImage();
 
 
 private slots:
@@ -79,21 +79,23 @@ private slots:
 	void textAlign( QAction * _a );
 
 	void formatChanged( const QTextCharFormat & _f );
-    void alignmentChanged( int _a );
-    void metaTextModified();
-    void selectSongImage();
-
+	void alignmentChanged( int _a );
+	void metaTextModified();
+	void selectSongImage();
+	void deleteImage();
 
 private:
-    QWidget * m_form;
-    QLineEdit * m_title;
-    QLineEdit * m_artist;
-    QLineEdit * m_album;
-    QLineEdit * m_year;
-    QLineEdit * m_genre;
-    QLineEdit * m_comment;
-    QLabel * m_image;
-    QPushButton * m_changeImageButton;
+	QWidget * m_form;
+	QLineEdit * m_title;
+	QLineEdit * m_artist;
+	QLineEdit * m_album;
+	QLineEdit * m_year;
+	QLineEdit * m_genre;
+	QLineEdit * m_comment;
+	QLabel * m_image;
+	QWidget * m_imagesWidget;
+	QPushButton * m_changeImageButton;
+	QPushButton * m_deleteImageButton;
 	QTextEdit * m_edit;
 	QAction * m_actionTextBold,
 		* m_actionTextUnderline,
