@@ -22,14 +22,21 @@
  *
  */
 
+#include "AudioFileFlac.h"
+
+#include <QBuffer>
+#include <QDataStream>
+#include <QFileInfo>
 #include <QtGlobal>
+#include <QIODevice>
 
 #include <cmath>
 #include <memory>
 
-#include "AudioFileFlac.h"
 #include "endian_handling.h"
+#include "base64.h"
 #include "AudioEngine.h"
+#include "Song.h"
 
 namespace lmms
 {
@@ -46,17 +53,25 @@ AudioFileFlac::~AudioFileFlac()
 	finishEncoding();
 }
 
+void AudioFileFlac::addComment(int tag, QString comment)
+{
+	if ( !comment.isEmpty() )
+	{
+		sf_set_string(m_sf, tag, comment.toUtf8().constData());
+	}
+}
+
 bool AudioFileFlac::startEncoding()
 {
-	m_sfinfo.samplerate=sampleRate();
-	m_sfinfo.channels=channels();
+	m_sfinfo.samplerate = sampleRate();
+	m_sfinfo.channels = channels();
 	m_sfinfo.frames = audioEngine()->framesPerPeriod();
-	m_sfinfo.sections=1;
-	m_sfinfo.seekable=0;
+	m_sfinfo.sections = 1;
+	m_sfinfo.seekable = 0;
 
 	m_sfinfo.format = SF_FORMAT_FLAC;
 
-	switch (getOutputSettings().getBitDepth())
+	switch ( getOutputSettings().getBitDepth() )
 	{
 		case OutputSettings::BitDepth::Depth24Bit:
 		case OutputSettings::BitDepth::Depth32Bit:
@@ -85,6 +100,21 @@ bool AudioFileFlac::startEncoding()
 	sf_command(m_sf, SFC_SET_CLIPPING, nullptr, SF_TRUE);
 
 	sf_set_string(m_sf, SF_STR_SOFTWARE, "LMMS");
+
+	const Song* song = Engine::getSong();
+	if ( !song->getTitle().isEmpty() )
+	{
+		addComment(SF_STR_TITLE, song->getTitle());
+	} else {
+		addComment(SF_STR_TITLE, QFileInfo(song->projectFileName())
+												.completeBaseName()
+												.replace("[_-]", " "));
+	}
+	addComment(SF_STR_ARTIST, song->getArtist());
+	addComment(SF_STR_ALBUM, song->getAlbum());
+	addComment(SF_STR_DATE, song->getYear());
+	addComment(SF_STR_GENRE, song->getGenre());
+	addComment(SF_STR_COMMENT, song->getComment());
 
 	return true;
 }

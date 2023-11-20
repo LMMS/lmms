@@ -71,7 +71,7 @@ private:
 
 	bool startEncoding();
 	void finishEncoding();
-
+	void addComment(int tag, QString comment);
 };
 
 
