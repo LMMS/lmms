@@ -27,6 +27,7 @@
 
 #include "lmmsconfig.h"
 
+#include <QDomNode>
 #include <QMap>
 #include <QPair>
 #include <QStringList>
@@ -34,7 +35,6 @@
 
 #include <vector>
 #include "lmms_export.h"
-
 
 namespace lmms
 {
@@ -214,6 +214,11 @@ public:
 		return m_recentlyOpenedProjects;
 	}
 
+	const QStringList& extraDirectories() const
+	{
+		return m_extraDirectories;
+	}
+
 	QString localeDir() const
 	{
 		return m_dataDir + LOCALE_PATH;
@@ -239,6 +244,9 @@ public:
 
 	void addRecentlyOpenedProject(const QString & _file);
 
+	void loadExtraDirectories(QDomNode& node);
+	void saveExtraDirectories(QDomDocument& document, QDomElement& config);
+
 	QString value(const QString& cls, const QString& attribute, const QString& defaultVal = "") const;
 
 	void setValue(const QString & cls, const QString & attribute,
@@ -258,6 +266,7 @@ public:
 	void setGIGDir(const QString & gigDir);
 	void setThemeDir(const QString & themeDir);
 	void setBackgroundPicFile(const QString & backgroundPicFile);
+	void setExtraDirectories(const QStringList& directories);
 
 	// Creates the working directory & subdirectories on disk.
 	void createWorkingDir();
@@ -298,6 +307,7 @@ private:
 	QString m_version;
 	unsigned int m_configVersion;
 	QStringList m_recentlyOpenedProjects;
+	QStringList m_extraDirectories;
 
 	using stringPairVector = std::vector<QPair<QString, QString>>;
 	using settingsMap = QMap<QString, stringPairVector>;

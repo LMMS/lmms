@@ -28,6 +28,8 @@
 #include <QGroupBox>
 #include <QImageReader>
 #include <QLabel>
+#include <QListView>
+#include <QListWidget>
 #include <QLayout>
 #include <QLineEdit>
 #include <QScrollArea>
@@ -155,7 +157,8 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_sf2File(QDir::toNativeSeparators(ConfigManager::inst()->sf2File())),
 #endif
 	m_themeDir(QDir::toNativeSeparators(ConfigManager::inst()->themeDir())),
-	m_backgroundPicFile(QDir::toNativeSeparators(ConfigManager::inst()->backgroundPicFile()))
+	m_backgroundPicFile(QDir::toNativeSeparators(ConfigManager::inst()->backgroundPicFile())),
+	m_extraDirectories(ConfigManager::inst()->extraDirectories())
 {
 	setWindowIcon(embed::getIconPixmap("setup_general"));
 	setWindowTitle(tr("Settings"));
@@ -790,6 +793,9 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		SLOT(openBackgroundPicFile()),
 		m_backgroundPicFileLineEdit);
 
+	pathSelectorsLayout->addWidget(addExtraDirectoryWidget(pathSelectors));
+	pathSelectorsLayout->addSpacing(10);
+
 	pathSelectorsLayout->addStretch();
 
 	pathSelectors->setLayout(pathSelectorsLayout);
@@ -963,6 +969,7 @@ void SetupDialog::accept()
 	ConfigManager::inst()->setGIGDir(QDir::fromNativeSeparators(m_gigDir));
 	ConfigManager::inst()->setThemeDir(QDir::fromNativeSeparators(m_themeDir));
 	ConfigManager::inst()->setBackgroundPicFile(m_backgroundPicFile);
+	ConfigManager::inst()->setExtraDirectories(m_extraDirectories);
 
 	// Tell all audio-settings-widgets to save their settings.
 	for(AswMap::iterator it = m_audioIfaceSetupWidgets.begin();
@@ -1402,7 +1409,55 @@ void SetupDialog::setBackgroundPicFile(const QString & backgroundPicFile)
 	m_backgroundPicFile = backgroundPicFile;
 }
 
+void SetupDialog::addExtraDirectory()
+{
+	const auto newDir = FileDialog::getExistingDirectory(this, tr("Choose directory to add"), QDir::homePath());
+	if (newDir.isEmpty() || m_extraDirectories.contains(newDir)) { return; }
 
+	m_extraDirectories.push_back(newDir);
+
+	const auto item = new QListWidgetItem(embed::getIconPixmap("folder"), newDir);
+	m_extraDirectoriesWidget->addItem(item);
+}
+
+void SetupDialog::removeExtraDirectory()
+{
+	for (const auto item : m_extraDirectoriesWidget->selectedItems())
+	{
+		m_extraDirectories.removeOne(item->text());
+		delete item;
+	}
+}
+
+QGroupBox* SetupDialog::addExtraDirectoryWidget(QWidget* parent)
+{
+	auto extraDirectoryGroupBox = new QGroupBox(tr("Extra directories"), parent);
+	auto extraDirectoryLayout = new QVBoxLayout(extraDirectoryGroupBox);
+
+	auto extraDirectoryButtonLayout = new QHBoxLayout();
+	auto addExtraDirectoryButton = new QPushButton(tr("Add"));
+	auto removeExtraDirectoryButton = new QPushButton(tr("Remove"));
+
+	connect(addExtraDirectoryButton, &QPushButton::clicked, this, &SetupDialog::addExtraDirectory);
+	connect(removeExtraDirectoryButton, &QPushButton::clicked, this, &SetupDialog::removeExtraDirectory);
+
+	extraDirectoryButtonLayout->addStretch(1);
+	extraDirectoryButtonLayout->addWidget(addExtraDirectoryButton);
+	extraDirectoryButtonLayout->addWidget(removeExtraDirectoryButton);
+	extraDirectoryLayout->addLayout(extraDirectoryButtonLayout, Qt::AlignRight);
+
+	auto extraDirectoryWidget = new QListWidget(parent);
+	extraDirectoryWidget->insertItems(0, ConfigManager::inst()->extraDirectories());
+	extraDirectoryLayout->addWidget(extraDirectoryWidget);
+
+	for (int i = 0; i < extraDirectoryWidget->count(); ++i)
+	{
+		extraDirectoryWidget->item(i)->setIcon(embed::getIconPixmap("folder"));
+	}
+
+	m_extraDirectoriesWidget = extraDirectoryWidget;
+	return extraDirectoryGroupBox;
+}
 
 
 void SetupDialog::showRestartWarning()
