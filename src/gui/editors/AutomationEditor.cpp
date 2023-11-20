@@ -1244,6 +1244,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 			int startPos = xCoordOfTick(0);
 			int sampleWidth = xCoordOfTick(length) - startPos;
+			// workaround due to weird behaviour with std::min()
 			int sampleHeight = editorHeight - SAMPLE_MARGIN < MAX_SAMPLE_HEIGHT ? editorHeight - SAMPLE_MARGIN : MAX_SAMPLE_HEIGHT;
 			int yOffset = (editorHeight - sampleHeight) / 2.0f + TOP_MARGIN;
 
