@@ -37,8 +37,11 @@
 #include <string>
 #include <vorbis/vorbisenc.h>
 
+#include <QBuffer>
+#include <QDataStream>
 #include <QFileInfo>
 #include "AudioEngine.h"
+#include "base64.h"
 #include "Song.h"
 
 namespace lmms
@@ -74,7 +77,7 @@ inline int AudioFileOgg::writePage()
 
 bool AudioFileOgg::addComment(vorbis_comment *vc, const char* tag, QString comment)
 {
-	if (!comment.isNull() && comment.trimmed().size() > 0)
+	if ( ! comment.isEmpty() )
 	{
 		vorbis_comment_add_tag(vc, tag, comment.toStdString().c_str());
 		return true;
@@ -89,7 +92,7 @@ bool AudioFileOgg::startEncoding()
 
 	// add optional Song meta data
 	const Song* song = Engine::getSong();
-	if ( !song->getTitle().isNull() && song->getTitle().trimmed().size() > 0 )
+	if ( ! song->getTitle().isEmpty() )
 	{
 		vorbis_comment_add_tag(&m_comments, "TITLE", song->getTitle().toStdString().c_str());
 	} else {
@@ -104,13 +107,34 @@ bool AudioFileOgg::startEncoding()
 	addComment(&m_comments, "GENRE", song->getGenre());
 	addComment(&m_comments, "COMMENT", song->getComment());
 
+	if ( ! song->getImage().isEmpty() )
+	{
+		QByteArray bindata = QByteArray::fromBase64(song->getImage().toStdString().c_str());
+		QBuffer * buf = new QBuffer();
+		QDataStream out(buf);
+		buf->open(QIODevice::OpenModeFlag::ReadWrite);
+		// ref https://xiph.org/flac/format.html#metadata_block_picture
+		out << (quint32) 0x02;
+		out << (quint32) 0; // mime type length
+		out << (quint32) 0; // desc length
+		out << (quint32) 0; // w
+		out << (quint32) 0; // h
+		out << (quint32) 24; //depth
+		out << (quint32) 0; // colors
+		out << (quint32) bindata.length();
+		out.writeRawData(bindata.constData(), bindata.length());
+		QString base64;
+		base64::encode(buf->data(), buf->size(), base64);
+		vorbis_comment_add_tag(&m_comments, "METADATA_BLOCK_PICTURE", base64.toStdString().c_str());
+	}
+
 	m_channels = channels();
 
 	bool useVariableBitRate = getOutputSettings().getBitRateSettings().isVariableBitRate();
 	bitrate_t minimalBitrate = nominalBitrate();
 	bitrate_t maximumBitrate = nominalBitrate();
 
-	if( useVariableBitRate )
+	if ( useVariableBitRate )
 	{
 		minimalBitrate = minBitrate();		// min for vbr
 		maximumBitrate = maxBitrate();		// max for vbr
@@ -118,7 +142,7 @@ bool AudioFileOgg::startEncoding()
 
 
 	m_rate = sampleRate();		// default-samplerate
-	if( m_rate > 48000 )
+	if ( m_rate > 48000 )
 	{
 		m_rate = 48000;
 		setSampleRate( 48000 );
@@ -127,7 +151,7 @@ bool AudioFileOgg::startEncoding()
 	// Have vorbisenc choose a mode for us
 	vorbis_info_init( &m_vi );
 
-	if( vorbis_encode_setup_managed( &m_vi, m_channels, m_rate,
+	if ( vorbis_encode_setup_managed( &m_vi, m_channels, m_rate,
 			( maximumBitrate > 0 )? maximumBitrate * 1000 : -1,
 						nominalBitrate() * 1000, 
 			( minimalBitrate > 0 )? minimalBitrate * 1000 : -1 ) )
@@ -138,7 +162,7 @@ bool AudioFileOgg::startEncoding()
 		return false;
 	}
 
-	if( useVariableBitRate )
+	if ( useVariableBitRate )
 	{
 		// Turn off management entirely (if it was turned on).
 		vorbis_encode_ctl( &m_vi, OV_ECTL_RATEMANAGE_SET, nullptr );
@@ -184,9 +208,9 @@ bool AudioFileOgg::startEncoding()
 	ogg_stream_packetin( &m_os, &header_comments );
 	ogg_stream_packetin( &m_os, &header_codebooks );
 
-	while( ( result = ogg_stream_flush( &m_os, &m_og ) ) )
+	while ( ( result = ogg_stream_flush( &m_os, &m_og ) ) )
 	{
-		if( !result )
+		if ( !result )
 		{
 			break;
 		}
@@ -214,9 +238,9 @@ void AudioFileOgg::writeBuffer( const surroundSampleFrame * _ab,
 	float * * buffer = vorbis_analysis_buffer( &m_vd, _frames *
 							BYTES_PER_SAMPLE *
 								channels() );
-	for( fpp_t frame = 0; frame < _frames; ++frame )
+	for ( fpp_t frame = 0; frame < _frames; ++frame )
 	{
-		for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
+		for ( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 		{
 			buffer[chnl][frame] = _ab[frame][chnl] * _master_gain;
 		}
@@ -226,13 +250,13 @@ void AudioFileOgg::writeBuffer( const surroundSampleFrame * _ab,
 
 	// While we can get enough data from the library to analyse,
 	// one block at a time...
-	while( vorbis_analysis_blockout( &m_vd, &m_vb ) == 1 )
+	while ( vorbis_analysis_blockout( &m_vd, &m_vb ) == 1 )
 	{
 		// Do the main analysis, creating a packet
 		vorbis_analysis( &m_vb, nullptr );
 		vorbis_bitrate_addblock( &m_vb );
 
-		while( vorbis_bitrate_flushpacket( &m_vd, &m_op ) )
+		while ( vorbis_bitrate_flushpacket( &m_vd, &m_op ) )
 		{
 			// Add packet to bitstream
 			ogg_stream_packetin( &m_os, &m_op );
@@ -240,7 +264,7 @@ void AudioFileOgg::writeBuffer( const surroundSampleFrame * _ab,
 			// If we've gone over a page boundary, we can do
 			// actual output, so do so (for however many pages
 			// are available)
-			while( !eos )
+			while ( !eos )
 			{
 				int result = ogg_stream_pageout( &m_os,
 								&m_og );
@@ -272,7 +296,7 @@ void AudioFileOgg::writeBuffer( const surroundSampleFrame * _ab,
 
 void AudioFileOgg::finishEncoding()
 {
-	if( m_ok )
+	if ( m_ok )
 	{
 		// just for flushing buffers...
 		writeBuffer( nullptr, 0, 0.0f );
