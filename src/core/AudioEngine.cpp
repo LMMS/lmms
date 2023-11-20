@@ -67,6 +67,7 @@ namespace lmms
 using LocklessListElement = LocklessList<PlayHandle*>::Element;
 
 static thread_local bool s_renderingThread;
+static thread_local bool s_runningChange;
 
 
 
@@ -83,19 +84,12 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	m_newPlayHandles( PlayHandle::MaxNumber ),
 	m_qualitySettings( qualitySettings::Mode::Draft ),
 	m_masterGain( 1.0f ),
-	m_isProcessing( false ),
 	m_audioDev( nullptr ),
 	m_oldAudioDev( nullptr ),
 	m_audioDevStartFailed( false ),
 	m_profiler(),
 	m_metronomeActive(false),
-	m_clearSignal( false ),
-	m_changesSignal( false ),
-	m_changes( 0 ),
-#if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
-	m_doChangesMutex( QMutex::Recursive ),
-#endif
-	m_waitingForWrite( false )
+	m_clearSignal(false)
 {
 	for( int i = 0; i < 2; ++i )
 	{
@@ -165,8 +159,6 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 
 AudioEngine::~AudioEngine()
 {
-	runChangesInModel();
-
 	for( int w = 0; w < m_numWorkers; ++w )
 	{
 		m_workers[w]->quit();
@@ -232,8 +224,6 @@ void AudioEngine::startProcessing(bool needsFifo)
 	}
 
 	m_audioDev->startProcessing();
-
-	m_isProcessing = true;
 }
 
 
@@ -241,8 +231,6 @@ void AudioEngine::startProcessing(bool needsFifo)
 
 void AudioEngine::stopProcessing()
 {
-	m_isProcessing = false;
-
 	if( m_fifoWriter != nullptr )
 	{
 		m_fifoWriter->finish();
@@ -397,6 +385,17 @@ void AudioEngine::renderStageInstruments()
 
 	AudioEngineWorkerThread::fillJobQueue(m_playHandles);
 	AudioEngineWorkerThread::startAndWaitForJobs();
+}
+
+
+
+void AudioEngine::renderStageEffects()
+{
+	AudioEngineProfiler::Probe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::Effects);
+
+	// STAGE 2: process effects of all instrument- and sampletracks
+	AudioEngineWorkerThread::fillJobQueue(m_audioPorts);
+	AudioEngineWorkerThread::startAndWaitForJobs();
 
 	// removed all play handles which are done
 	for( PlayHandleList::Iterator it = m_playHandles.begin();
@@ -427,17 +426,6 @@ void AudioEngine::renderStageInstruments()
 
 
 
-void AudioEngine::renderStageEffects()
-{
-	AudioEngineProfiler::Probe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::Effects);
-
-	// STAGE 2: process effects of all instrument- and sampletracks
-	AudioEngineWorkerThread::fillJobQueue(m_audioPorts);
-	AudioEngineWorkerThread::startAndWaitForJobs();
-}
-
-
-
 void AudioEngine::renderStageMix()
 {
 	AudioEngineProfiler::Probe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::Mixing);
@@ -446,8 +434,6 @@ void AudioEngine::renderStageMix()
 	mixer->masterMix(m_outputBufferWrite);
 
 	emit nextAudioBuffer(m_outputBufferRead);
-
-	runChangesInModel();
 
 	// and trigger LFOs
 	EnvelopeAndLfoParameters::instances()->trigger();
@@ -459,6 +445,8 @@ void AudioEngine::renderStageMix()
 
 const surroundSampleFrame *AudioEngine::renderNextBuffer()
 {
+	const auto lock = std::lock_guard{m_changeMutex};
+
 	m_profiler.startPeriod();
 	s_renderingThread = true;
 
@@ -811,57 +799,16 @@ void AudioEngine::removePlayHandlesOfTypes(Track * track, PlayHandle::Types type
 
 void AudioEngine::requestChangeInModel()
 {
-	if( s_renderingThread )
-		return;
-
-	m_changesMutex.lock();
-	m_changes++;
-	m_changesMutex.unlock();
-
-	m_doChangesMutex.lock();
-	m_waitChangesMutex.lock();
-	if (m_isProcessing && !m_waitingForWrite && !m_changesSignal)
-	{
-		m_changesSignal = true;
-		m_changesRequestCondition.wait( &m_waitChangesMutex );
-	}
-	m_waitChangesMutex.unlock();
+	if (s_renderingThread || s_runningChange) { return; }
+	m_changeMutex.lock();
+	s_runningChange = true;
 }
-
-
-
 
 void AudioEngine::doneChangeInModel()
 {
-	if( s_renderingThread )
-		return;
-
-	m_changesMutex.lock();
-	bool moreChanges = --m_changes;
-	m_changesMutex.unlock();
-
-	if( !moreChanges )
-	{
-		m_changesSignal = false;
-		m_changesAudioEngineCondition.wakeOne();
-	}
-	m_doChangesMutex.unlock();
-}
-
-
-
-
-void AudioEngine::runChangesInModel()
-{
-	if( m_changesSignal )
-	{
-		m_waitChangesMutex.lock();
-		// allow changes in the model from other threads ...
-		m_changesRequestCondition.wakeOne();
-		// ... and wait until they are done
-		m_changesAudioEngineCondition.wait( &m_waitChangesMutex );
-		m_waitChangesMutex.unlock();
-	}
+	if (s_renderingThread || !s_runningChange) { return; }
+	m_changeMutex.unlock();
+	s_runningChange = false;
 }
 
 bool AudioEngine::isAudioDevNameValid(QString name)
@@ -1297,29 +1244,12 @@ void AudioEngine::fifoWriter::run()
 		auto buffer = new surroundSampleFrame[frames];
 		const surroundSampleFrame * b = m_audioEngine->renderNextBuffer();
 		memcpy( buffer, b, frames * sizeof( surroundSampleFrame ) );
-		write( buffer );
+		m_fifo->write(buffer);
 	}
 
 	// Let audio backend stop processing
-	write( nullptr );
+	m_fifo->write(nullptr);
 	m_fifo->waitUntilRead();
-}
-
-
-
-
-void AudioEngine::fifoWriter::write( surroundSampleFrame * buffer )
-{
-	m_audioEngine->m_waitChangesMutex.lock();
-	m_audioEngine->m_waitingForWrite = true;
-	m_audioEngine->m_waitChangesMutex.unlock();
-	m_audioEngine->runChangesInModel();
-
-	m_fifo->write( buffer );
-
-	m_audioEngine->m_doChangesMutex.lock();
-	m_audioEngine->m_waitingForWrite = false;
-	m_audioEngine->m_doChangesMutex.unlock();
 }
 
 } // namespace lmms

@@ -28,14 +28,18 @@
 #include <QCheckBox>
 #include <QDir>
 #include <QMutex>
+#include "embed.h"
+
+#include "FileBrowserSearcher.h"
+#include <QProgressBar>
+
 #if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 	#include <QRecursiveMutex>
 #endif
 #include <QTreeWidget>
 
-
 #include "SideBarWidget.h"
-
+#include "lmmsconfig.h"
 
 class QLineEdit;
 
@@ -72,10 +76,25 @@ public:
 
 	~FileBrowser() override = default;
 
+	static QStringList directoryBlacklist()
+	{
+		static auto s_blacklist = QStringList{
+#ifdef LMMS_BUILD_LINUX
+			"/bin", "/boot", "/dev", "/etc", "/proc", "/run", "/sbin",
+			"/sys"
+#endif
+#ifdef LMMS_BUILD_WIN32
+			"C:\\Windows"
+#endif
+		};
+		return s_blacklist;
+	}
+	static QDir::Filters dirFilters() { return QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot; }
+	static QDir::SortFlags sortFlags() { return QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase; }
+
 private slots:
 	void reloadTree();
 	void expandItems( QTreeWidgetItem * item=nullptr, QList<QString> expandedDirs = QList<QString>() );
-	bool filterAndExpandItems(const QString & filter, QTreeWidgetItem * item = nullptr);
 	void giveFocusToFilter();
 
 private:
@@ -86,9 +105,17 @@ private:
 	void saveDirectoriesStates();
 	void restoreDirectoriesStates();
 
+	void buildSearchTree();
+	void onSearch(const QString& filter);
+	void toggleSearch(bool on);
+
 	FileBrowserTreeWidget * m_fileBrowserTreeWidget;
+	FileBrowserTreeWidget * m_searchTreeWidget;
 
 	QLineEdit * m_filterEdit;
+
+	std::shared_ptr<FileBrowserSearcher::SearchFuture> m_currentSearch;
+	QProgressBar* m_searchIndicator = nullptr;
 
 	QString m_directories; //!< Directories to search, split with '*'
 	QString m_filter; //!< Filter as used in QDir::match()
@@ -167,12 +194,10 @@ private slots:
 
 
 
-
 class Directory : public QTreeWidgetItem
 {
 public:
-	Directory( const QString & filename, const QString & path,
-						const QString & filter );
+	Directory(const QString& filename, const QString& path, const QString& filter, bool disableEntryPopulation = false);
 
 	void update();
 
@@ -197,14 +222,12 @@ public:
 
 
 private:
-	void initPixmaps();
-
 	bool addItems( const QString & path );
 
 
-	static QPixmap * s_folderPixmap;
-	static QPixmap * s_folderOpenedPixmap;
-	static QPixmap * s_folderLockedPixmap;
+	QPixmap m_folderPixmap = embed::getIconPixmap("folder");
+	QPixmap m_folderOpenedPixmap = embed::getIconPixmap("folder_opened");
+	QPixmap m_folderLockedPixmap = embed::getIconPixmap("folder_locked");
 
 	//! Directories that lead here
 	//! Initially, this is just set to the current path of a directory
@@ -217,7 +240,7 @@ private:
 	QString m_filter;
 
 	int m_dirCount;
-
+	bool m_disableEntryPopulation = false;
 } ;
 
 
@@ -274,19 +297,12 @@ public:
 
 	QString extension();
 	static QString extension( const QString & file );
+	static QString defaultFilters();
 
 
 private:
 	void initPixmaps();
 	void determineFileType();
-
-	static QPixmap * s_projectFilePixmap;
-	static QPixmap * s_presetFilePixmap;
-	static QPixmap * s_sampleFilePixmap;
-	static QPixmap * s_soundfontFilePixmap;
-	static QPixmap * s_vstPluginFilePixmap;
-	static QPixmap * s_midiFilePixmap;
-	static QPixmap * s_unknownFilePixmap;
 
 	QString m_path;
 	FileType m_type;

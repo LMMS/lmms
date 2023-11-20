@@ -68,7 +68,11 @@ Plugin::Descriptor PLUGIN_EXPORT audiofileprocessor_plugin_descriptor =
 	0x0100,
 	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
-	"wav,ogg,ds,spx,au,voc,aif,aiff,flac,raw",
+	"wav,ogg,ds,spx,au,voc,aif,aiff,flac,raw"
+#ifdef LMMS_HAVE_SNDFILE_MP3
+	",mp3"
+#endif
+	,
 	nullptr,
 } ;
 
@@ -447,19 +451,12 @@ namespace gui
 {
 
 
-QPixmap * AudioFileProcessorView::s_artwork = nullptr;
 
 
 AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 							QWidget * _parent ) :
 	InstrumentViewFixedSize( _instrument, _parent )
 {
-	if( s_artwork == nullptr )
-	{
-		s_artwork = new QPixmap( PLUGIN_NAME::getIconPixmap(
-								"artwork" ) );
-	}
-
 	m_openAudioFileButton = new PixmapButton( this );
 	m_openAudioFileButton->setCursor( QCursor( Qt::PointingHandCursor ) );
 	m_openAudioFileButton->move( 227, 72 );
@@ -645,7 +642,8 @@ void AudioFileProcessorView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
-	p.drawPixmap( 0, 0, *s_artwork );
+	static auto s_artwork = PLUGIN_NAME::getIconPixmap("artwork");
+	p.drawPixmap(0, 0, s_artwork);
 
 	auto a = castModel<AudioFileProcessor>();
 

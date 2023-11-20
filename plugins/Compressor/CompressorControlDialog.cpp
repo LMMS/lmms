@@ -58,7 +58,10 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	m_graphColor(209, 216, 228, 50),
 	m_resetColor(200, 100, 15, 200)
 {
-	setAutoFillBackground(true);
+	setAutoFillBackground(false);
+	setAttribute(Qt::WA_OpaquePaintEvent, true);
+	setAttribute(Qt::WA_NoSystemBackground, true);
+	
 	QPalette pal;
 	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
 	setPalette(pal);
@@ -358,6 +361,7 @@ void CompressorControlDialog::lookaheadChanged()
 {
 	m_lookaheadLengthKnob->setVisible(m_controls->m_lookaheadModel.value());
 	m_lookaheadEnabledLabel->setVisible(m_controls->m_lookaheadModel.value());
+	feedbackButton->setVisible(!m_controls->m_lookaheadModel.value());
 }
 
 

@@ -45,9 +45,6 @@ namespace
 	constexpr int MIN_BAR_LABEL_DISTANCE = 35;
 }
 
-
-QPixmap * TimeLineWidget::s_posMarkerPixmap = nullptr;
-
 TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
 			Song::PlayPos & pos, const TimePos & begin, Song::PlayMode mode,
 							QWidget * parent ) :
@@ -80,16 +77,10 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
 	m_loopPos[0] = 0;
 	m_loopPos[1] = DefaultTicksPerBar;
 
-	if( s_posMarkerPixmap == nullptr )
-	{
-		s_posMarkerPixmap = new QPixmap( embed::getIconPixmap(
-							"playpos_marker" ) );
-	}
-
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	move( 0, yoff );
 
-	m_xOffset -= s_posMarkerPixmap->width() / 2;
+	m_xOffset -= m_posMarkerPixmap.width() / 2;
 
 	setMouseTracking(true);
 	m_pos.m_timeLine = this;
@@ -119,7 +110,7 @@ TimeLineWidget::~TimeLineWidget()
 void TimeLineWidget::setXOffset(const int x)
 {
 	m_xOffset = x;
-	if (s_posMarkerPixmap != nullptr) { m_xOffset -= s_posMarkerPixmap->width() / 2; }
+	m_xOffset -= m_posMarkerPixmap.width() / 2;
 }
 
 
@@ -245,7 +236,7 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	p.fillRect( 0, 0, width(), height(), p.background() );
 
 	// Clip so that we only draw everything starting from the offset
-	const int leftMargin = m_xOffset + s_posMarkerPixmap->width() / 2;
+	const int leftMargin = m_xOffset + m_posMarkerPixmap.width() / 2;
 	p.setClipRect(leftMargin, 0, width() - leftMargin, height() );
 
 	// Draw the loop rectangle
@@ -273,8 +264,8 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	QColor const & barNumberColor = getBarNumberColor();
 
 	bar_t barNumber = m_begin.getBar();
-	int const x = m_xOffset + s_posMarkerPixmap->width() / 2 -
-			( ( static_cast<int>( m_begin * m_ppb ) / TimePos::ticksPerBar() ) % static_cast<int>( m_ppb ) );
+	int const x = m_xOffset + m_posMarkerPixmap.width() / 2
+		- ((static_cast<int>(m_begin * m_ppb) / TimePos::ticksPerBar()) % static_cast<int>(m_ppb));
 
 	// Double the interval between bar numbers until they are far enough appart
 	int barLabelInterval = 1;
@@ -307,12 +298,12 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	p.drawRect( innerRectangle );
 
 	// Only draw the position marker if the position line is in view
-	if (m_posMarkerX >= m_xOffset && m_posMarkerX < width() - s_posMarkerPixmap->width() / 2)
+	if (m_posMarkerX >= m_xOffset && m_posMarkerX < width() - m_posMarkerPixmap.width() / 2)
 	{
 		// Let the position marker extrude to the left
 		p.setClipping(false);
 		p.setOpacity(0.6);
-		p.drawPixmap(m_posMarkerX, height() - s_posMarkerPixmap->height(), *s_posMarkerPixmap);
+		p.drawPixmap(m_posMarkerX, height() - m_posMarkerPixmap.height(), m_posMarkerPixmap);
 	}
 }
 
@@ -328,13 +319,13 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 	if( event->button() == Qt::LeftButton  && !(event->modifiers() & Qt::ShiftModifier) )
 	{
 		m_action = Action::MovePositionMarker;
-		if( event->x() - m_xOffset < s_posMarkerPixmap->width() )
+		if (event->x() - m_xOffset < m_posMarkerPixmap.width())
 		{
 			m_moveXOff = event->x() - m_xOffset;
 		}
 		else
 		{
-			m_moveXOff = s_posMarkerPixmap->width() / 2;
+			m_moveXOff = m_posMarkerPixmap.width() / 2;
 		}
 	}
 	else if( event->button() == Qt::LeftButton  && (event->modifiers() & Qt::ShiftModifier) )
@@ -344,7 +335,7 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 	}
 	else if( event->button() == Qt::RightButton )
 	{
-		m_moveXOff = s_posMarkerPixmap->width() / 2;
+		m_moveXOff = m_posMarkerPixmap.width() / 2;
 		const TimePos t = m_begin + static_cast<int>( qMax( event->x() - m_xOffset - m_moveXOff, 0 ) * TimePos::ticksPerBar() / m_ppb );
 		const TimePos loopMid = ( m_loopPos[0] + m_loopPos[1] ) / 2;
 

@@ -207,13 +207,13 @@ private:
 	AutomationEditor( const AutomationEditor & );
 	~AutomationEditor() override;
 
-	static QPixmap * s_toolDraw;
-	static QPixmap * s_toolErase;
-	static QPixmap * s_toolDrawOut;
-	static QPixmap * s_toolEditTangents;
-	static QPixmap * s_toolMove;
-	static QPixmap * s_toolYFlip;
-	static QPixmap * s_toolXFlip;
+	QPixmap m_toolDraw = embed::getIconPixmap("edit_draw");
+	QPixmap m_toolErase = embed::getIconPixmap("edit_erase");
+	QPixmap m_toolDrawOut = embed::getIconPixmap("edit_draw_outvalue");
+	QPixmap m_toolEditTangents = embed::getIconPixmap("edit_tangent");
+	QPixmap m_toolMove = embed::getIconPixmap("edit_move");
+	QPixmap m_toolYFlip = embed::getIconPixmap("flip_y");
+	QPixmap m_toolXFlip = embed::getIconPixmap("flip_x");
 
 	ComboBoxModel m_zoomingXModel;
 	ComboBoxModel m_zoomingYModel;

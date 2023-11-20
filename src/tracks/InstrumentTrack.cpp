@@ -727,7 +727,8 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 	// Handle automation: detuning
 	for (const auto& processHandle : m_processHandles)
 	{
-		processHandle->processTimePos(_start, m_pitchModel.value(), gui::GuiApplication::instance()->pianoRoll()->isRecording());
+		processHandle->processTimePos(
+			_start, m_pitchModel.value(), gui::getGUI() && gui::getGUI()->pianoRoll()->isRecording());
 	}
 
 	if ( clips.size() == 0 )
@@ -775,8 +776,11 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 		while( nit != notes.end() &&
 					( cur_note = *nit )->pos() == cur_start )
 		{
-			const f_cnt_t note_frames =
-				cur_note->length().frames( frames_per_tick );
+			// If the note is a Step Note, frames will be 0 so the NotePlayHandle
+			// plays for the whole length of the sample
+			const auto note_frames = cur_note->type() == Note::Type::Step
+				? 0
+				: cur_note->length().frames(frames_per_tick);
 
 			NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire( this, _offset, note_frames, *cur_note );
 			notePlayHandle->setPatternTrack(pattern_track);

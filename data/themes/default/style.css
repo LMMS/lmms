@@ -178,6 +178,7 @@ lmms--gui--PianoRoll {
 	qproperty-backgroundShade: rgba(255, 255, 255, 10);
 	qproperty-noteModeColor: #0bd556;
 	qproperty-noteColor: #0bd556;
+	qproperty-stepNoteColor: #9b1313;
 	qproperty-noteTextColor: #ffffff;
 	qproperty-noteOpacity: 165;
 	qproperty-noteBorders: false; /* boolean property, set false to have borderless notes */
@@ -946,6 +947,14 @@ lmms--gui--SidInstrumentView lmms--gui--Knob {
 	qproperty-lineWidth: 2;
 }
 
+lmms--gui--SlicerTView lmms--gui--Knob {
+	color: rgb(162, 128, 226);
+	qproperty-outerColor: rgb( 162, 128, 226 );
+	qproperty-innerRadius: 1;
+	qproperty-outerRadius: 11;
+	qproperty-lineWidth: 3;
+}
+
 lmms--gui--WatsynView lmms--gui--Knob {
 	qproperty-innerRadius: 1;
 	qproperty-outerRadius: 7;
@@ -1020,6 +1029,11 @@ lmms--gui--CompressorControlDialog lmms--gui--Knob {
 	color: #2fcc71;
 	qproperty-outerColor: #2fcc71;
 	qproperty-lineWidth: 2;
+}
+
+lmms--gui--BarModelEditor {
+	qproperty-backgroundBrush: rgba(28, 73, 51, 255);
+	qproperty-barBrush: rgba(17, 136, 71, 255);
 }
 
 /* palette information  */

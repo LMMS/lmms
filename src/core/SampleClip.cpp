@@ -271,9 +271,9 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	}
 
 	_this.setAttribute( "sample_rate", m_sampleBuffer->sampleRate());
-	if( usesCustomClipColor() )
+	if (const auto& c = color())
 	{
-		_this.setAttribute( "color", color().name() );
+		_this.setAttribute("color", c->name());
 	}
 	if (m_sampleBuffer->reversed())
 	{
@@ -304,14 +304,9 @@ void SampleClip::loadSettings( const QDomElement & _this )
 	setMuted( _this.attribute( "muted" ).toInt() );
 	setStartTimeOffset( _this.attribute( "off" ).toInt() );
 
-	if( _this.hasAttribute( "color" ) )
+	if (_this.hasAttribute("color"))
 	{
-		useCustomClipColor( true );
-		setColor( _this.attribute( "color" ) );
-	}
-	else
-	{
-		useCustomClipColor(false);
+		setColor(QColor{_this.attribute("color")});
 	}
 
 	if(_this.hasAttribute("reversed"))

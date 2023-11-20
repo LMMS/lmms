@@ -239,11 +239,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 		p.fillRect( rect(), c );
 	}
 
-	auto clipColor = m_clip->hasColor()
-			? (m_clip->usesCustomClipColor()
-				? m_clip->color()
-				: m_clip->getTrack()->color())
-			: painter.pen().brush().color();
+	auto clipColor = m_clip->color().value_or(m_clip->getTrack()->color().value_or(painter.pen().brush().color()));
 
 	p.setPen(clipColor);
 
