@@ -201,7 +201,7 @@ private:
 	static const int NOTE_MARGIN = 40; // total border margin for notes
 	static const int MIN_NOTE_RANGE = 20; // min number of keys for fixed size
 	static const int SAMPLE_MARGIN = 40;
-	static const int MAX_SAMPLE_HEIGHT = 400;
+	static constexpr int MAX_SAMPLE_HEIGHT = 400; // constexpr for use in min
 
 	AutomationEditor();
 	AutomationEditor( const AutomationEditor & );
