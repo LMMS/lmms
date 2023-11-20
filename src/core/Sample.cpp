@@ -204,8 +204,8 @@ void Sample::visualize(QPainter& p, const QRect& dr, int fromFrame, int toFrame)
 
 	for (int i = 0; i < width; i++)
 	{
-		const auto lineY1 = centerY - max[i] * halfHeight;
-		const auto lineY2 = centerY - min[i] * halfHeight;
+		const auto lineY1 = centerY - max[i] * halfHeight * m_amplification;
+		const auto lineY2 = centerY - min[i] * halfHeight * m_amplification;
 
 		auto lineX = i + x;
 		if (m_reversed) { lineX = width - lineX; }
@@ -216,8 +216,8 @@ void Sample::visualize(QPainter& p, const QRect& dr, int fromFrame, int toFrame)
 		const auto maxRMS = std::clamp(trueRMS, min[i], max[i]);
 		const auto minRMS = std::clamp(-trueRMS, min[i], max[i]);
 
-		const auto rmsLineY1 = centerY - maxRMS * halfHeight;
-		const auto rmsLineY2 = centerY - minRMS * halfHeight;
+		const auto rmsLineY1 = centerY - maxRMS * halfHeight * m_amplification;
+		const auto rmsLineY2 = centerY - minRMS * halfHeight * m_amplification;
 
 		p.setPen(rmsColor);
 		p.drawLine(lineX, rmsLineY1, lineX, rmsLineY2);
