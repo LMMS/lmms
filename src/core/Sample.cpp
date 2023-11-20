@@ -165,71 +165,63 @@ void Sample::visualize(QPainter& p, const QRect& dr, int fromFrame, int toFrame)
 {
 	const auto lock = std::shared_lock{m_mutex};
 
-	fromFrame = std::clamp(fromFrame, 0, (int)m_buffer->size());
-	toFrame = std::clamp(toFrame, 0, (int)m_buffer->size());
+	const auto x = dr.x();
+	const auto height = dr.height();
+	const auto width = dr.width();
+	const auto centerY = dr.center().y();
 
-	int x = dr.x();
-	int y = dr.y();
-	int h = dr.height();
-	int w = dr.width();
+	const auto halfHeight = height / 2;
+	const auto buffer = m_buffer->data() + fromFrame;
 
-	const int halfHeight = y + h / 2.0f;
-	const int h2 = h / 2;
+	const auto color = p.pen().color();
+	const auto rmsColor = color.lighter(123);
 
-	const sampleFrame* buffer = m_buffer->data() + fromFrame;
-	int frames = toFrame - fromFrame;
-	if (frames == 0) { frames = m_buffer->size(); }
-	const float framesPerPixel = frames / static_cast<float>(w);
+	auto numFrames = toFrame - fromFrame;
+	if (numFrames == 0) { numFrames = m_buffer->size(); }
 
-	int resolution = 1;
-	while (framesPerPixel / resolution > s_min_resolution)
+	const float framesPerPixel = numFrames / static_cast<float>(width);
+
+	constexpr auto minResolution = 512;
+	auto resolution = 1;
+	while (framesPerPixel / resolution > minResolution)
 	{
 		resolution++;
 	}
 
-	std::vector<float> min(w, 1);
-	std::vector<float> max(w, -1);
-	std::vector<float> rms(w, 0);
+	auto min = std::vector<float>(width);
+	auto max = std::vector<float>(width);
+	auto rms = std::vector<float>(width);
 
-	int pixelIndex;
-	float value;
-	for (int i = 0; i < frames - resolution; i += resolution)
+	for (int i = 0; i < numFrames - resolution; i += resolution)
 	{
-		pixelIndex = i / framesPerPixel;
-		value = buffer[i][0];
+		const auto pixelIndex = i / framesPerPixel;
+		const auto value = buffer[i][0];
 
 		if (value > max[pixelIndex]) { max[pixelIndex] = value; }
 		if (value < min[pixelIndex]) { min[pixelIndex] = value; }
 		rms[pixelIndex] += value * value;
 	}
 
-	int lineX, lineY1, lineY2;
-	float trueRMS, minRMS, maxRMS;
-	for (int i = 0; i < w; i++)
+	for (int i = 0; i < width; i++)
 	{
-		lineY1 = halfHeight - (max[i] * h2);
-		lineY2 = halfHeight - (min[i] * h2);
+		const auto lineY1 = centerY - max[i] * halfHeight;
+		const auto lineY2 = centerY - min[i] * halfHeight;
 
-		lineX = i + x;
-		if (m_reversed) { lineX = w - lineX; }
+		auto lineX = i + x;
+		if (m_reversed) { lineX = width - lineX; }
 
 		p.drawLine(lineX, lineY1, lineX, lineY2);
-	}
 
-	p.setPen(p.pen().color().lighter(123));
-	for (int i = 0; i < w; i++)
-	{
-		trueRMS = sqrt(rms[i] / (framesPerPixel / resolution));
-		maxRMS = std::clamp(trueRMS, min[i], max[i]);
-		minRMS = std::clamp(-trueRMS, min[i], max[i]);
+		const auto trueRMS = std::sqrt(rms[i] / (framesPerPixel / resolution));
+		const auto maxRMS = std::clamp(trueRMS, min[i], max[i]);
+		const auto minRMS = std::clamp(-trueRMS, min[i], max[i]);
 
-		lineY1 = halfHeight - maxRMS * h2;
-		lineY2 = halfHeight - minRMS * h2;
+		const auto rmsLineY1 = centerY - maxRMS * halfHeight;
+		const auto rmsLineY2 = centerY - minRMS * halfHeight;
 
-		lineX = i + x;
-		if (m_reversed) { lineX = w - lineX; }
-
-		p.drawLine(lineX, lineY1, lineX, lineY2);
+		p.setPen(rmsColor);
+		p.drawLine(lineX, rmsLineY1, lineX, rmsLineY2);
+		p.setPen(color);
 	}
 }
 
