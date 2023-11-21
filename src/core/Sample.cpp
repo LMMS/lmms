@@ -188,8 +188,8 @@ void Sample::visualize(QPainter& p, const QRect& dr, int fromFrame, int toFrame)
 		resolution++;
 	}
 
-	auto min = std::vector<float>(width);
-	auto max = std::vector<float>(width);
+	auto min = std::vector<float>(width, 1);
+	auto max = std::vector<float>(width, -1);
 	auto rms = std::vector<float>(width);
 
 	for (int i = 0; i < numFrames - resolution; i += resolution)
