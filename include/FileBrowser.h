@@ -69,7 +69,7 @@ public:
 	*/
 	FileBrowser( const QString & directories, const QString & filter,
 			const QString & title, const QPixmap & pm,
-			QWidget * parent, bool dirs_as_items = false, bool recurse = false,
+			QWidget * parent, bool dirs_as_items = false,
 			const QString& userDir = "",
 			const QString& factoryDir = "");
 
@@ -93,7 +93,7 @@ public:
 
 private slots:
 	void reloadTree();
-	void expandItems( QTreeWidgetItem * item=nullptr, QList<QString> expandedDirs = QList<QString>() );
+	void expandItems(const QList<QString>& expandedDirs, QTreeWidgetItem* item = nullptr);
 	void giveFocusToFilter();
 
 private:
@@ -120,7 +120,6 @@ private:
 	QString m_filter; //!< Filter as used in QDir::match()
 
 	bool m_dirsAsItems;
-	bool m_recurse;
 
 	void addContentCheckBox();
 	QCheckBox* m_showUserContent = nullptr;
