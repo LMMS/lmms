@@ -68,7 +68,7 @@ private:
 	void tearDownEncoder();
 
 private:
-	bool m_writHeader = false;
+	int m_imageSize = 0;
 	lame_t m_lame;
 };
 

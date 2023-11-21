@@ -78,9 +78,10 @@ void AudioFileMP3::writeBuffer( const surroundSampleFrame * _buf,
 	}
 
 	size_t minimumBufferSize = 1.25 * _frames + 7200;
-	if ( !m_writHeader )
+	if ( m_imageSize )
 	{
-		minimumBufferSize += LAME_MAXALBUMART;
+		minimumBufferSize += m_imageSize;
+		minimumBufferSize += 1024;
 	}
 	std::vector<unsigned char> encodingBuffer(minimumBufferSize);
 
@@ -88,6 +89,7 @@ void AudioFileMP3::writeBuffer( const surroundSampleFrame * _buf,
 	assert (bytesWritten >= 0);
 
 	writeData(&encodingBuffer[0], bytesWritten);
+	m_imageSize = 0;
 }
 
 void AudioFileMP3::flushRemainingBuffers()
@@ -170,25 +172,26 @@ bool AudioFileMP3::initEncoder()
 	}
 	if ( !song->getImage().isEmpty() )
 	{
-		int imageSize = 0;
+
 		char * imageData = (char *) malloc(song->getImage().size() * 2);
-		base64::decode( song->getImage(), &imageData, &imageSize );
-		if ( imageSize == 0 )
+		base64::decode( song->getImage(), &imageData, &m_imageSize );
+		if ( m_imageSize == 0 )
 		{
 			qWarning("Base64 didnt like image data");
 		}
-		else if ( imageSize > LAME_MAXALBUMART )
+		else if ( m_imageSize > LAME_MAXALBUMART )
 		{
 			qWarning("Image to big for lame");
 		}
-		else if ( id3tag_set_albumart(m_lame, imageData, imageSize) )
+		else if ( id3tag_set_albumart(m_lame, imageData, m_imageSize) )
 		{
 			qWarning("LAME didnt like image type");
 		}
 		else {
-			qWarning("Image set of size %d bytes", imageSize);
+			qWarning("Image set of size %d bytes", m_imageSize);
 		}
 		delete[] imageData;
+
 	}
 
 	return lame_init_params(m_lame) != -1;
