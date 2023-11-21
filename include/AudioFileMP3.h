@@ -68,6 +68,7 @@ private:
 	void tearDownEncoder();
 
 private:
+	bool m_writHeader = false;
 	lame_t m_lame;
 };
 
