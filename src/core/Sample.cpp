@@ -187,23 +187,22 @@ void Sample::visualize(QPainter& p, const QRect& dr, int fromFrame, int toFrame)
 	const auto resolution = std::max(1, framesPerPixel / maxFramesPerPixel);
 	const auto framesPerResolution = framesPerPixel / resolution;
 
-	const auto numPoints = std::min(numFrames, width);
-	auto min = std::vector<float>(numPoints, 1);
-	auto max = std::vector<float>(numPoints, -1);
-	auto squared = std::vector<float>(numPoints);
+	const auto numPixels = std::min(numFrames, width);
+	auto min = std::vector<float>(numPixels, 1);
+	auto max = std::vector<float>(numPixels, -1);
+	auto squared = std::vector<float>(numPixels);
 
-	for (int i = 0; i < numFrames; i += resolution)
+	const auto maxFrames = numPixels * framesPerPixel;
+	for (int i = 0; i < maxFrames; i += resolution)
 	{
 		const auto pixelIndex = i / framesPerPixel;
-		if (pixelIndex >= numPoints) { break; }
-
 		const auto value = std::accumulate(buffer[i].begin(), buffer[i].end(), 0.0f) / buffer[i].size();
 		if (value > max[pixelIndex]) { max[pixelIndex] = value; }
 		if (value < min[pixelIndex]) { min[pixelIndex] = value; }
 		squared[pixelIndex] += value * value;
 	}
 
-	for (int i = 0; i < numPoints; i++)
+	for (int i = 0; i < numPixels; i++)
 	{
 		const auto lineY1 = centerY - max[i] * halfHeight * m_amplification;
 		const auto lineY2 = centerY - min[i] * halfHeight * m_amplification;
