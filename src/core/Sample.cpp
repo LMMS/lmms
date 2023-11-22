@@ -195,7 +195,7 @@ void Sample::visualize(QPainter& p, const QRect& dr, int fromFrame, int toFrame)
 	for (int i = 0; i < numFrames - resolution; i += resolution)
 	{
 		const auto pixelIndex = i / framesPerPixel;
-		const auto value = buffer[i][0];
+		const auto value = std::accumulate(buffer[i].begin(), buffer[i].end(), 0.0f) / buffer[i].size();
 
 		if (value > max[pixelIndex]) { max[pixelIndex] = value; }
 		if (value < min[pixelIndex]) { min[pixelIndex] = value; }
