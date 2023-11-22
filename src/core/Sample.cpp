@@ -163,6 +163,8 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, int numFrames, float d
 
 void Sample::visualize(QPainter& p, const QRect& dr, int fromFrame, int toFrame) const
 {
+	if (m_buffer->size() == 0) { return; }
+
 	const auto lock = std::shared_lock{m_mutex};
 
 	const auto x = dr.x();
@@ -179,30 +181,29 @@ void Sample::visualize(QPainter& p, const QRect& dr, int fromFrame, int toFrame)
 	auto numFrames = toFrame - fromFrame;
 	if (numFrames == 0) { numFrames = m_buffer->size(); }
 
-	const float framesPerPixel = numFrames / static_cast<float>(width);
+	const auto framesPerPixel = std::max(1, numFrames / width);
 
-	constexpr auto minResolution = 512;
-	auto resolution = 1;
-	while (framesPerPixel / resolution > minResolution)
-	{
-		resolution++;
-	}
+	constexpr auto maxFramesPerPixel = 512;
+	const auto resolution = std::max(1, framesPerPixel / maxFramesPerPixel);
+	const auto framesPerResolution = framesPerPixel / resolution;
 
-	auto min = std::vector<float>(width, 1);
-	auto max = std::vector<float>(width, -1);
-	auto rms = std::vector<float>(width);
+	const auto numPoints = std::min(numFrames, width);
+	auto min = std::vector<float>(numPoints, 1);
+	auto max = std::vector<float>(numPoints, -1);
+	auto squared = std::vector<float>(numPoints);
 
-	for (int i = 0; i < numFrames - resolution; i += resolution)
+	for (int i = 0; i < numFrames; i += resolution)
 	{
 		const auto pixelIndex = i / framesPerPixel;
-		const auto value = std::accumulate(buffer[i].begin(), buffer[i].end(), 0.0f) / buffer[i].size();
+		if (pixelIndex >= numPoints) { break; }
 
+		const auto value = std::accumulate(buffer[i].begin(), buffer[i].end(), 0.0f) / buffer[i].size();
 		if (value > max[pixelIndex]) { max[pixelIndex] = value; }
 		if (value < min[pixelIndex]) { min[pixelIndex] = value; }
-		rms[pixelIndex] += value * value;
+		squared[pixelIndex] += value * value;
 	}
 
-	for (int i = 0; i < width; i++)
+	for (int i = 0; i < numPoints; i++)
 	{
 		const auto lineY1 = centerY - max[i] * halfHeight * m_amplification;
 		const auto lineY2 = centerY - min[i] * halfHeight * m_amplification;
@@ -212,9 +213,9 @@ void Sample::visualize(QPainter& p, const QRect& dr, int fromFrame, int toFrame)
 
 		p.drawLine(lineX, lineY1, lineX, lineY2);
 
-		const auto trueRMS = std::sqrt(rms[i] / (framesPerPixel / resolution));
-		const auto maxRMS = std::clamp(trueRMS, min[i], max[i]);
-		const auto minRMS = std::clamp(-trueRMS, min[i], max[i]);
+		const auto rms = std::sqrt(squared[i] / framesPerResolution);
+		const auto maxRMS = std::clamp(rms, min[i], max[i]);
+		const auto minRMS = std::clamp(-rms, min[i], max[i]);
 
 		const auto rmsLineY1 = centerY - maxRMS * halfHeight * m_amplification;
 		const auto rmsLineY2 = centerY - minRMS * halfHeight * m_amplification;
