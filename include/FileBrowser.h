@@ -166,6 +166,8 @@ private:
 	void handleFile( FileItem * fi, InstrumentTrack * it );
 	void openInNewInstrumentTrack( TrackContainer* tc, FileItem* item );
 
+	void handleFileWith( FileItem * fi, InstrumentTrack * it, const char * name );
+	void openInNewInstrumentTrackWith( TrackContainer* tc, FileItem* item, const char * name );
 
 	bool m_mousePressed;
 	QPoint m_pressPos;
@@ -185,6 +187,7 @@ private:
 private slots:
 	void activateListItem( QTreeWidgetItem * item, int column );
 	void openInNewInstrumentTrack( lmms::gui::FileItem* item, bool songEditor );
+	void openInNewInstrumentTrackWith( lmms::gui::FileItem* item, bool songEditor, const char * name);
 	bool openInNewSampleTrack( lmms::gui::FileItem* item );
 	void sendToActiveInstrumentTrack( lmms::gui::FileItem* item );
 	void updateDirectory( QTreeWidgetItem * item );

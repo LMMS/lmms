@@ -318,6 +318,17 @@ std::vector<Note> SlicerT::getMidi()
 	return outputNotes;
 }
 
+
+
+
+void SlicerT::loadFile( const QString & _file )
+{
+	updateFile(_file);
+}
+
+
+
+
 void SlicerT::updateFile(QString file)
 {
 	m_originalSample.setAudioFile(file);
