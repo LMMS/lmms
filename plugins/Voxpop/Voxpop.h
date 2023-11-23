@@ -45,7 +45,7 @@ namespace lmms
 {
 
 const int VOXPOP_MAX_CUES = 99;
-const QString VOXPOP_DEFAULT_TEXT = "...";
+const QString VOXPOP_DEFAULT_TEXT = "";
 
 namespace gui
 {
@@ -92,6 +92,7 @@ public:
 	void saveSettings(QDomDocument& doc, QDomElement& elem) override;
 	void loadSettings(const QDomElement& elem) override;
 
+	void loadFile( const QString & _file ) override;
 	void loadAudioFile( const QString & _file );
 	void loadCuesheetFile( const QString & _file );
 
@@ -159,6 +160,7 @@ private:
 	BoolModel m_respectEndpointModel;
 	FloatModel m_ampModel;
 	IntModel m_cueIndexModel;
+	mutable QReadWriteLock m_idxLock;
 	BoolModel m_stutterModel;
 	ComboBoxModel m_interpolationModel;
 	ComboBoxModel m_modeModel;

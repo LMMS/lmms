@@ -155,14 +155,18 @@ void Voxpop::playNote( NotePlayHandle * _n,
 				break;
 			case CueSelectionMode::Sequential :
 				cue = m_cueIndexModel.value();
-				if (cue + 1 < m_cueCount - 1)
+				m_idxLock.lockForWrite();
+				if ( cue + 1 < m_cueCount )
 				{
 					m_cueIndexModel.setValue(cue + 1);
 				}
 				else {
 					m_cueIndexModel.setValue(0);
 				}
+				m_idxLock.unlock();
+			break;
 		}
+		emit cueChanged(cue, m_cueTexts[cue]);
 
 		if ( m_stutterModel.value() == true && m_nextPlayStartPoint[cue] >= m_sampleBuffers[cue]->endFrame() )
 		{
@@ -211,6 +215,12 @@ void Voxpop::playNote( NotePlayHandle * _n,
 			memset( _working_buffer, 0, ( frames + offset ) * sizeof( sampleFrame ) );
 		}
 	}
+
+	if( _n->isReleased() )
+	{
+		emit cueChanged(-1, (QString *) &VOXPOP_DEFAULT_TEXT);
+	}
+
 
 	if ( m_stutterModel.value() == true )
 	{
@@ -310,10 +320,19 @@ void Voxpop::loadSettings(const QDomElement& elem)
 
 
 
+void Voxpop::loadFile( const QString & _file )
+{
+	setAudioFile( _file );
+}
+
+
+
+
 void Voxpop::loadAudioFile( const QString & _file )
 {
 	setAudioFile( _file );
 }
+
 
 
 void Voxpop::loadCuesheetFile( const QString & _file )
@@ -721,6 +740,11 @@ void VoxpopView::updateCuePoints()
 	double graphWidth = 241;
 	for ( int i = 0 ; i < voxpop->m_cueCount ; i++)
 	{
+		p.setPen( QColor( 60, 255, 60, 150 ) );
+		if ( i == voxpop->m_cueIndexModel.value() )
+		{
+			p.setPen( QColor( 255, 60, 60, 150 ) );
+		}
 		int linePx = voxpop->m_cueOffsets[i] * graphWidth / voxpop->m_sampleBuffer.frames();
 		p.drawLine( linePx + 4, 173, linePx + 4, 243 );
 	}
