@@ -96,45 +96,45 @@ public:
 	};
 
 	Sample() = default;
-	explicit Sample(const QString& audioFile);
 	Sample(const QByteArray& base64, int sampleRate = Engine::audioEngine()->processingSampleRate());
 	Sample(const sampleFrame* data, int numFrames, int sampleRate = Engine::audioEngine()->processingSampleRate());
-	explicit Sample(std::shared_ptr<const SampleBuffer> buffer);
 	Sample(const Sample& other);
-	Sample(Sample&& other) noexcept;
+	Sample(Sample&& other);
+	explicit Sample(const QString& audioFile);
+	explicit Sample(std::shared_ptr<const SampleBuffer> buffer);
 
-	Sample& operator=(Sample other) noexcept;
-	friend auto swap(Sample& first, Sample& second) -> void;
+	auto operator=(const Sample&) -> Sample&;
+	auto operator=(Sample&&) -> Sample&;
 
 	auto play(sampleFrame* dst, PlaybackState* state, int numFrames, float desiredFrequency = DefaultBaseFreq,
 		Loop loopMode = Loop::Off) const -> bool;
 	auto visualize(QPainter& p, const QRect& dr, int fromFrame = 0, int toFrame = 0) const -> void;
 
 	auto sampleDuration() const -> std::chrono::milliseconds;
-	auto sampleFile() const -> const QString&;
-	auto sampleRate() const -> int;
-	auto sampleSize() const -> int;
+	auto sampleFile() const -> const QString& { return m_buffer->audioFile(); }
+	auto sampleRate() const -> int { return m_buffer->sampleRate(); }
+	auto sampleSize() const -> int { return m_buffer->size(); }
 
-	auto toBase64() const -> QString;
+	auto toBase64() const -> QString { return m_buffer->toBase64(); }
 
-	auto data() -> const sampleFrame*;
-	auto buffer() const -> std::shared_ptr<const SampleBuffer>;
-	auto startFrame() const -> int;
-	auto endFrame() const -> int;
-	auto loopStartFrame() const -> int;
-	auto loopEndFrame() const -> int;
-	auto amplification() const -> float;
-	auto frequency() const -> float;
-	auto reversed() const -> bool;
+	auto data() -> const sampleFrame* { return m_buffer->data(); }
+	auto buffer() const -> std::shared_ptr<const SampleBuffer> { return m_buffer; }
+	auto startFrame() const -> int { return m_startFrame.load(std::memory_order_relaxed); }
+	auto endFrame() const -> int { return m_endFrame.load(std::memory_order_relaxed); }
+	auto loopStartFrame() const -> int { return m_loopStartFrame.load(std::memory_order_relaxed); }
+	auto loopEndFrame() const -> int { return m_loopEndFrame.load(std::memory_order_relaxed); }
+	auto amplification() const -> float { return m_amplification.load(std::memory_order_relaxed); }
+	auto frequency() const -> float { return m_frequency.load(std::memory_order_relaxed); }
+	auto reversed() const -> bool { return m_reversed.load(std::memory_order_relaxed); }
 
-	auto setStartFrame(int startFrame) -> void;
-	auto setEndFrame(int endFrame) -> void;
-	auto setLoopStartFrame(int loopStartFrame) -> void;
-	auto setLoopEndFrame(int loopEndFrame) -> void;
+	auto setStartFrame(int startFrame) -> void { m_startFrame.store(startFrame, std::memory_order_relaxed); }
+	auto setEndFrame(int endFrame) -> void { m_endFrame.store(endFrame, std::memory_order_relaxed); }
+	auto setLoopStartFrame(int loopStartFrame) -> void { m_loopStartFrame.store(loopStartFrame, std::memory_order_relaxed); }
+	auto setLoopEndFrame(int loopEndFrame) -> void { m_loopEndFrame.store(loopEndFrame, std::memory_order_relaxed); }
 	auto setAllPointFrames(int startFrame, int endFrame, int loopStartFrame, int loopEndFrame) -> void;
-	auto setAmplification(float amplification) -> void;
-	auto setFrequency(float frequency) -> void;
-	auto setReversed(bool reversed) -> void;
+	auto setAmplification(float amplification) -> void { m_amplification.store(amplification, std::memory_order_relaxed); }
+	auto setFrequency(float frequency) -> void { m_frequency.store(frequency, std::memory_order_relaxed); }
+	auto setReversed(bool reversed) -> void { m_reversed.store(reversed, std::memory_order_relaxed); }
 
 private:
 	auto playSampleRange(PlaybackState* state, sampleFrame* dst, size_t numFrames) const -> void;
@@ -146,14 +146,13 @@ private:
 
 private:
 	std::shared_ptr<const SampleBuffer> m_buffer = std::make_shared<SampleBuffer>();
-	int m_startFrame = 0;
-	int m_endFrame = 0;
-	int m_loopStartFrame = 0;
-	int m_loopEndFrame = 0;
-	float m_amplification = 1.0f;
-	float m_frequency = DefaultBaseFreq;
-	bool m_reversed = false;
-	mutable std::shared_mutex m_mutex;
+	std::atomic<int> m_startFrame = 0;
+	std::atomic<int> m_endFrame = 0;
+	std::atomic<int> m_loopStartFrame = 0;
+	std::atomic<int> m_loopEndFrame = 0;
+	std::atomic<float> m_amplification = 1.0f;
+	std::atomic<float> m_frequency = DefaultBaseFreq;
+	std::atomic<bool> m_reversed = false;
 };
 } // namespace lmms
 #endif

@@ -66,58 +66,67 @@ Sample::Sample(std::shared_ptr<const SampleBuffer> buffer)
 }
 
 Sample::Sample(const Sample& other)
+	: m_buffer(other.m_buffer)
+	, m_startFrame(other.startFrame())
+	, m_endFrame(other.endFrame())
+	, m_loopStartFrame(other.loopStartFrame())
+	, m_loopEndFrame(other.loopEndFrame())
+	, m_amplification(other.amplification())
+	, m_frequency(other.frequency())
+	, m_reversed(other.reversed())
 {
-	auto lock = std::shared_lock{other.m_mutex};
+}
+
+Sample::Sample(Sample&& other)
+	: m_buffer(other.m_buffer)
+	, m_startFrame(other.startFrame())
+	, m_endFrame(other.endFrame())
+	, m_loopStartFrame(other.loopStartFrame())
+	, m_loopEndFrame(other.loopEndFrame())
+	, m_amplification(other.amplification())
+	, m_frequency(other.frequency())
+	, m_reversed(other.reversed())
+{
+}
+
+auto Sample::operator=(const Sample& other) -> Sample&
+{
+	if (this == &other) { return *this; }
+
 	m_buffer = other.m_buffer;
-	m_startFrame = other.m_startFrame;
-	m_endFrame = other.m_endFrame;
-	m_loopStartFrame = other.m_loopStartFrame;
-	m_loopEndFrame = other.m_loopEndFrame;
-	m_amplification = other.m_amplification;
-	m_frequency = other.m_frequency;
-	m_reversed = other.m_reversed;
-}
+	m_startFrame = other.startFrame();
+	m_endFrame = other.endFrame();
+	m_loopStartFrame = other.loopStartFrame();
+	m_loopEndFrame = other.loopEndFrame();
+	m_amplification = other.amplification();
+	m_frequency = other.frequency();
+	m_reversed = other.reversed();
 
-Sample::Sample(Sample&& other) noexcept
-{
-	auto lock = std::unique_lock{other.m_mutex};
-	m_buffer = std::move(other.m_buffer);
-	m_startFrame = std::exchange(other.m_startFrame, 0);
-	m_endFrame = std::exchange(other.m_endFrame, 0);
-	m_loopStartFrame = std::exchange(other.m_loopStartFrame, 0);
-	m_loopEndFrame = std::exchange(other.m_loopEndFrame, 0);
-	m_amplification = std::exchange(other.m_amplification, 0);
-	m_frequency = std::exchange(other.m_frequency, DefaultBaseFreq);
-	m_reversed = std::exchange(other.m_reversed, false);
-}
-
-Sample& Sample::operator=(Sample other) noexcept
-{
-	swap(*this, other);
 	return *this;
 }
 
-auto swap(Sample& first, Sample& second) -> void
+auto Sample::operator=(Sample&& other) -> Sample&
 {
-	auto lock = std::scoped_lock{first.m_mutex, second.m_mutex};
-	using std::swap;
-	swap(first.m_buffer, second.m_buffer);
-	swap(first.m_startFrame, second.m_startFrame);
-	swap(first.m_endFrame, second.m_endFrame);
-	swap(first.m_loopStartFrame, second.m_loopStartFrame);
-	swap(first.m_loopEndFrame, second.m_loopEndFrame);
-	swap(first.m_amplification, second.m_amplification);
-	swap(first.m_frequency, second.m_frequency);
-	swap(first.m_reversed, second.m_reversed);
+	if (this == &other) { return *this; }
+
+	m_buffer = other.m_buffer;
+	m_startFrame = other.startFrame();
+	m_endFrame = other.endFrame();
+	m_loopStartFrame = other.loopStartFrame();
+	m_loopEndFrame = other.loopEndFrame();
+	m_amplification = other.amplification();
+	m_frequency = other.frequency();
+	m_reversed = other.reversed();
+
+	return *this;
 }
 
 bool Sample::play(sampleFrame* dst, PlaybackState* state, int numFrames, float desiredFrequency, Loop loopMode) const
 {
-	auto lock = std::shared_lock{m_mutex};
 	if (numFrames <= 0 || desiredFrequency <= 0) { return false; }
 
 	auto resampleRatio = static_cast<float>(Engine::audioEngine()->processingSampleRate()) / m_buffer->sampleRate();
-	resampleRatio *= m_frequency / desiredFrequency;
+	resampleRatio *= frequency() / desiredFrequency;
 
 	auto playBuffer = std::vector<sampleFrame>(numFrames / resampleRatio);
 	if (!typeInfo<float>::isEqual(resampleRatio, 1.0f))
@@ -125,26 +134,31 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, int numFrames, float d
 		playBuffer.resize(playBuffer.size() + s_interpolationMargins[state->m_interpolationMode]);
 	}
 
+	const auto start = startFrame();
+	const auto end = endFrame();
+	const auto loopStart = loopStartFrame();
+	const auto loopEnd = loopEndFrame();
+
 	switch (loopMode)
 	{
 	case Loop::Off:
-		state->m_frameIndex = std::clamp(state->m_frameIndex, m_startFrame, m_endFrame);
-		if (state->m_frameIndex == m_endFrame) { return false; }
+		state->m_frameIndex = std::clamp(state->m_frameIndex, start, end);
+		if (state->m_frameIndex == end) { return false; }
 		break;
 	case Loop::On:
-		state->m_frameIndex = std::clamp(state->m_frameIndex, m_startFrame, m_loopEndFrame);
-		if (state->m_frameIndex == m_loopEndFrame) { state->m_frameIndex = m_loopStartFrame; }
+		state->m_frameIndex = std::clamp(state->m_frameIndex, start, loopEnd);
+		if (state->m_frameIndex == loopEnd) { state->m_frameIndex = loopStart; }
 		break;
 	case Loop::PingPong:
-		state->m_frameIndex = std::clamp(state->m_frameIndex, m_startFrame, m_loopEndFrame);
-		if (state->m_frameIndex == m_loopEndFrame)
+		state->m_frameIndex = std::clamp(state->m_frameIndex, start, loopEnd);
+		if (state->m_frameIndex == loopEnd)
 		{
-			state->m_frameIndex = m_loopEndFrame - 1;
+			state->m_frameIndex = loopEnd - 1;
 			state->m_backwards = true;
 		}
-		else if (state->m_frameIndex <= m_loopStartFrame && state->m_backwards)
+		else if (state->m_frameIndex <= loopStart && state->m_backwards)
 		{
-			state->m_frameIndex = m_loopStartFrame;
+			state->m_frameIndex = loopStart;
 			state->m_backwards = false;
 		}
 		break;
@@ -164,8 +178,6 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, int numFrames, float d
 void Sample::visualize(QPainter& p, const QRect& dr, int fromFrame, int toFrame) const
 {
 	if (m_buffer->size() == 0) { return; }
-
-	const auto lock = std::shared_lock{m_mutex};
 
 	const auto x = dr.x();
 	const auto height = dr.height();
@@ -202,13 +214,16 @@ void Sample::visualize(QPainter& p, const QRect& dr, int fromFrame, int toFrame)
 		squared[pixelIndex] += value * value;
 	}
 
+	const auto amplification = m_amplification.load(std::memory_order_relaxed);
+	const auto reversed = m_reversed.load(std::memory_order_relaxed);
+
 	for (int i = 0; i < numPixels; i++)
 	{
-		const auto lineY1 = centerY - max[i] * halfHeight * m_amplification;
-		const auto lineY2 = centerY - min[i] * halfHeight * m_amplification;
+		const auto lineY1 = centerY - max[i] * halfHeight * amplification;
+		const auto lineY2 = centerY - min[i] * halfHeight * amplification;
 
 		auto lineX = i + x;
-		if (m_reversed) { lineX = width - lineX; }
+		if (reversed) { lineX = width - lineX; }
 
 		p.drawLine(lineX, lineY1, lineX, lineY2);
 
@@ -216,8 +231,8 @@ void Sample::visualize(QPainter& p, const QRect& dr, int fromFrame, int toFrame)
 		const auto maxRMS = std::clamp(rms, min[i], max[i]);
 		const auto minRMS = std::clamp(-rms, min[i], max[i]);
 
-		const auto rmsLineY1 = centerY - maxRMS * halfHeight * m_amplification;
-		const auto rmsLineY2 = centerY - minRMS * halfHeight * m_amplification;
+		const auto rmsLineY1 = centerY - maxRMS * halfHeight * amplification;
+		const auto rmsLineY2 = centerY - minRMS * halfHeight * amplification;
 
 		p.setPen(rmsColor);
 		p.drawLine(lineX, rmsLineY1, lineX, rmsLineY2);
@@ -227,134 +242,17 @@ void Sample::visualize(QPainter& p, const QRect& dr, int fromFrame, int toFrame)
 
 auto Sample::sampleDuration() const -> std::chrono::milliseconds
 {
-	const auto lock = std::shared_lock{m_mutex};
-	const auto numFrames = m_endFrame - m_startFrame;
+	const auto numFrames = endFrame() - startFrame();
 	const auto duration = numFrames / static_cast<float>(m_buffer->sampleRate()) * 1000;
 	return std::chrono::milliseconds{static_cast<int>(duration)};
 }
 
-auto Sample::sampleFile() const -> const QString&
-{
-	return m_buffer->audioFile();
-}
-
-auto Sample::sampleRate() const -> int
-{
-	return m_buffer->sampleRate();
-}
-
-auto Sample::sampleSize() const -> int
-{
-	return m_buffer->size();
-}
-
-auto Sample::toBase64() const -> QString
-{
-	return m_buffer->toBase64();
-}
-
-auto Sample::data() -> const sampleFrame*
-{
-	return m_buffer->data();
-}
-
-auto Sample::buffer() const -> std::shared_ptr<const SampleBuffer>
-{
-	const auto lock = std::shared_lock{m_mutex};
-	return m_buffer;
-}
-
-auto Sample::startFrame() const -> int
-{
-	const auto lock = std::shared_lock{m_mutex};
-	return m_startFrame;
-}
-
-auto Sample::endFrame() const -> int
-{
-	const auto lock = std::shared_lock{m_mutex};
-	return m_endFrame;
-}
-
-auto Sample::loopStartFrame() const -> int
-{
-	const auto lock = std::shared_lock{m_mutex};
-	return m_loopStartFrame;
-}
-
-auto Sample::loopEndFrame() const -> int
-{
-	const auto lock = std::shared_lock{m_mutex};
-	return m_loopEndFrame;
-}
-
-auto Sample::amplification() const -> float
-{
-	const auto lock = std::shared_lock{m_mutex};
-	return m_amplification;
-}
-
-auto Sample::frequency() const -> float
-{
-	const auto lock = std::shared_lock{m_mutex};
-	return m_frequency;
-}
-
-auto Sample::reversed() const -> bool
-{
-	const auto lock = std::shared_lock{m_mutex};
-	return m_reversed;
-}
-
-auto Sample::setStartFrame(int startFrame) -> void
-{
-	const auto lock = std::unique_lock{m_mutex};
-	m_startFrame = startFrame;
-}
-
-auto Sample::setEndFrame(int endFrame) -> void
-{
-	const auto lock = std::unique_lock{m_mutex};
-	m_endFrame = endFrame;
-}
-
-auto Sample::setLoopStartFrame(int loopStartFrame) -> void
-{
-	const auto lock = std::unique_lock{m_mutex};
-	m_loopStartFrame = loopStartFrame;
-}
-
-auto Sample::setLoopEndFrame(int loopEndFrame) -> void
-{
-	const auto lock = std::unique_lock{m_mutex};
-	m_loopEndFrame = loopEndFrame;
-}
-
 void Sample::setAllPointFrames(int startFrame, int endFrame, int loopStartFrame, int loopEndFrame)
 {
-	const auto lock = std::unique_lock{m_mutex};
-	m_startFrame = startFrame;
-	m_endFrame = endFrame;
-	m_loopStartFrame = loopStartFrame;
-	m_loopEndFrame = loopEndFrame;
-}
-
-auto Sample::setAmplification(float amplification) -> void
-{
-	const auto lock = std::unique_lock{m_mutex};
-	m_amplification = amplification;
-}
-
-auto Sample::setFrequency(float frequency) -> void
-{
-	const auto lock = std::unique_lock{m_mutex};
-	m_frequency = frequency;
-}
-
-auto Sample::setReversed(bool reversed) -> void
-{
-	const auto lock = std::unique_lock{m_mutex};
-	m_reversed = reversed;
+	setStartFrame(startFrame);
+	setEndFrame(endFrame);
+	setLoopStartFrame(loopStartFrame);
+	setLoopEndFrame(loopEndFrame);
 }
 
 auto Sample::playSampleRange(PlaybackState* state, sampleFrame* dst, size_t numFrames) const -> void
@@ -362,12 +260,12 @@ auto Sample::playSampleRange(PlaybackState* state, sampleFrame* dst, size_t numF
 	auto framesToCopy = 0;
 	if (state->m_backwards)
 	{
-		framesToCopy = std::min<int>(state->m_frameIndex - m_startFrame, numFrames);
+		framesToCopy = std::min<int>(state->m_frameIndex - startFrame(), numFrames);
 		copyBufferBackward(dst, state->m_frameIndex, framesToCopy);
 	}
 	else
 	{
-		framesToCopy = std::min<int>(m_endFrame - state->m_frameIndex, numFrames);
+		framesToCopy = std::min<int>(endFrame() - state->m_frameIndex, numFrames);
 		copyBufferForward(dst, state->m_frameIndex, framesToCopy);
 	}
 
@@ -376,13 +274,13 @@ auto Sample::playSampleRange(PlaybackState* state, sampleFrame* dst, size_t numF
 
 auto Sample::copyBufferForward(sampleFrame* dst, int initialPosition, int advanceAmount) const -> void
 {
-	m_reversed ? std::copy_n(m_buffer->rbegin() + initialPosition, advanceAmount, dst)
+	reversed() ? std::copy_n(m_buffer->rbegin() + initialPosition, advanceAmount, dst)
 			   : std::copy_n(m_buffer->begin() + initialPosition, advanceAmount, dst);
 }
 
 auto Sample::copyBufferBackward(sampleFrame* dst, int initialPosition, int advanceAmount) const -> void
 {
-	m_reversed ? std::reverse_copy(
+	reversed() ? std::reverse_copy(
 		m_buffer->rbegin() + initialPosition - advanceAmount, m_buffer->rbegin() + initialPosition, dst)
 			   : std::reverse_copy(
 				   m_buffer->begin() + initialPosition - advanceAmount, m_buffer->begin() + initialPosition, dst);
@@ -404,11 +302,11 @@ auto Sample::resampleSampleRange(SRC_STATE* state, sampleFrame* src, sampleFrame
 
 auto Sample::amplifySampleRange(sampleFrame* src, int numFrames) const -> void
 {
-	const auto lock = std::shared_lock{m_mutex};
+	const auto amplification = m_amplification.load(std::memory_order_relaxed);
 	for (int i = 0; i < numFrames; ++i)
 	{
-		src[i][0] *= m_amplification;
-		src[i][1] *= m_amplification;
+		src[i][0] *= amplification;
+		src[i][1] *= amplification;
 	}
 }
 } // namespace lmms
