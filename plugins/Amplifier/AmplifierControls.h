@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef AMPLIFIER_CONTROLS_H
-#define AMPLIFIER_CONTROLS_H
+#ifndef LMMS_AMPLIFIER_CONTROLS_H
+#define LMMS_AMPLIFIER_CONTROLS_H
 
 #include "EffectControls.h"
 #include "AmplifierControlDialog.h"
