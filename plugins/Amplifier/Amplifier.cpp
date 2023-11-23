@@ -36,9 +36,9 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT amplifier_plugin_descriptor =
 {
-	LMMS_STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY(PLUGIN_NAME),
 	"Amplifier",
-	QT_TRANSLATE_NOOP( "PluginBrowser", "A native amplifier plugin" ),
+	QT_TRANSLATE_NOOP("PluginBrowser", "A native amplifier plugin"),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Type::Effect,
@@ -50,97 +50,59 @@ Plugin::Descriptor PLUGIN_EXPORT amplifier_plugin_descriptor =
 }
 
 
-
-AmplifierEffect::AmplifierEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key ) :
-	Effect( &amplifier_plugin_descriptor, parent, key ),
-	m_ampControls( this )
+AmplifierEffect::AmplifierEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
+	Effect(&amplifier_plugin_descriptor, parent, key),
+	m_ampControls(this)
 {
 }
 
 
-
-
-
-
-
-
-bool AmplifierEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
+bool AmplifierEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 {
-	if( !isEnabled() || !isRunning () )
-	{
-		return( false );
-	}
+	if (!isEnabled() || !isRunning()) { return false ; }
 
 	double outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 
-	const ValueBuffer * volBuf = m_ampControls.m_volumeModel.valueBuffer();
-	const ValueBuffer * panBuf = m_ampControls.m_panModel.valueBuffer();
-	const ValueBuffer * leftBuf = m_ampControls.m_leftModel.valueBuffer();
-	const ValueBuffer * rightBuf = m_ampControls.m_rightModel.valueBuffer();
+	const ValueBuffer* volumeBuf = m_ampControls.m_volumeModel.valueBuffer();
+	const ValueBuffer* panBuf = m_ampControls.m_panModel.valueBuffer();
+	const ValueBuffer* leftBuf = m_ampControls.m_leftModel.valueBuffer();
+	const ValueBuffer* rightBuf = m_ampControls.m_rightModel.valueBuffer();
 
-	for( fpp_t f = 0; f < frames; ++f )
+	for (fpp_t f = 0; f < frames; ++f)
 	{
-//		qDebug( "offset %d, value %f", f, m_ampControls.m_volumeModel.value( f ) );
+		const float volume = (volumeBuf ? volumeBuf->value(f) : m_ampControls.m_volumeModel.value()) * 0.01f;
+		const float pan = (panBuf ? panBuf->value(f) : m_ampControls.m_panModel.value()) * 0.01f;
+		const float left = (leftBuf ? leftBuf->value(f) : m_ampControls.m_leftModel.value()) * 0.01f;
+		const float right = (rightBuf ? rightBuf->value(f) : m_ampControls.m_rightModel.value()) * 0.01f;
+
+		const float panLeft = std::min(1.0f, 1.0f - pan);
+		const float panRight = std::min(1.0f, 1.0f + pan);
 
 		auto s = std::array{buf[f][0], buf[f][1]};
 
-		// vol knob
-		if( volBuf )
-		{
-			s[0] *= volBuf->value( f ) * 0.01f;
-			s[1] *= volBuf->value( f ) * 0.01f;
-		}
-		else
-		{
-			s[0] *= m_ampControls.m_volumeModel.value() * 0.01f;
-			s[1] *= m_ampControls.m_volumeModel.value() * 0.01f;
-		}
-
-		// convert pan values to left/right values
-		const float pan = panBuf
-			? panBuf->value( f )
-			: m_ampControls.m_panModel.value();
-		const float left1 = pan <= 0
-			? 1.0
-			: 1.0 - pan * 0.01f;
-		const float right1 = pan >= 0
-			? 1.0
-			: 1.0 + pan * 0.01f;
-
-		// second stage amplification
-		const float left2 = leftBuf
-			? leftBuf->value( f )
-			: m_ampControls.m_leftModel.value();
-		const float right2 = rightBuf
-			? rightBuf->value( f )
-			: m_ampControls.m_rightModel.value();
-
-		s[0] *= left1 * left2 * 0.01;
-		s[1] *= right1 * right2 * 0.01;
+		s[0] *= volume * left * panLeft;
+		s[1] *= volume * right * panRight;
 
 		buf[f][0] = d * buf[f][0] + w * s[0];
 		buf[f][1] = d * buf[f][1] + w * s[1];
 		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 	}
 
-	checkGate( outSum / frames );
+	checkGate(outSum / frames);
 
 	return isRunning();
 }
-
-
-
 
 
 extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data)
 {
-	return new AmplifierEffect( parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
+	return new AmplifierEffect(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data));
 }
 
 }
