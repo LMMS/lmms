@@ -71,4 +71,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AMPLIFIER_CONTROLS_H

@@ -51,4 +51,4 @@ public:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_AMPLIFIER_CONTROL_DIALOG_H

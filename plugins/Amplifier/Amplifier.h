@@ -52,4 +52,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AMPLIFIER_H
