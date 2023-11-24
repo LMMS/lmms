@@ -53,7 +53,7 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 
 	EffectKeyList subPluginEffectKeys;
 
-	for (const Plugin::Descriptor* desc: getPluginFactory()->descriptors(Plugin::Effect))
+	for (const Plugin::Descriptor* desc: getPluginFactory()->descriptors(Plugin::Type::Effect))
 	{
 		if( desc->subPluginFeatures )
 		{
@@ -98,12 +98,13 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 	m_model.setSourceModel( &m_sourceModel );
 	m_model.setFilterCaseSensitivity( Qt::CaseInsensitive );
 
-	connect( ui->filterEdit, SIGNAL( textChanged( const QString& ) ),
-				&m_model, SLOT( setFilterFixedString( const QString& ) ) );
-	connect( ui->filterEdit, SIGNAL( textChanged( const QString& ) ),
-					this, SLOT(updateSelection()));
-	connect( ui->filterEdit, SIGNAL( textChanged( const QString& ) ),
-							SLOT(sortAgain()));
+	ui->filterEdit->setPlaceholderText(tr("Search"));
+	ui->filterEdit->setClearButtonEnabled(true);
+	ui->filterEdit->addAction(embed::getIconPixmap("zoom"), QLineEdit::LeadingPosition);
+
+	connect(ui->filterEdit, &QLineEdit::textChanged, &m_model, &QSortFilterProxyModel::setFilterFixedString);
+	connect(ui->filterEdit, &QLineEdit::textChanged, this, &EffectSelectDialog::updateSelection);
+	connect(ui->filterEdit, &QLineEdit::textChanged, this, &EffectSelectDialog::sortAgain);
 
 	ui->pluginList->setModel( &m_model );
 

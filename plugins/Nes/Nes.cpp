@@ -51,7 +51,7 @@ Plugin::Descriptor PLUGIN_EXPORT nes_plugin_descriptor =
 				"A NES-like synthesizer" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
@@ -550,7 +550,7 @@ void NesInstrument::playNote( NotePlayHandle * n, sampleFrame * workingBuffer )
 	const fpp_t frames = n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = n->noteOffset();
 	
-	if ( n->totalFramesPlayed() == 0 || n->m_pluginData == nullptr )
+	if (!n->m_pluginData)
 	{
 		auto nes = new NesObject(this, Engine::audioEngine()->processingSampleRate(), n);
 		n->m_pluginData = nes;
@@ -561,8 +561,6 @@ void NesInstrument::playNote( NotePlayHandle * n, sampleFrame * workingBuffer )
 	nes->renderOutput( workingBuffer + offset, frames );
 	
 	applyRelease( workingBuffer, n );
-
-	instrumentTrack()->processAudioBuffer( workingBuffer, frames + offset, n );
 }
 
 
@@ -721,7 +719,6 @@ namespace gui
 {
 
 
-QPixmap * NesInstrumentView::s_artwork = nullptr;
 
 
 NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent ) :
@@ -730,12 +727,8 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 	setAutoFillBackground( true );
 	QPalette pal;
 
-	if( s_artwork == nullptr )
-	{
-		s_artwork = new QPixmap( PLUGIN_NAME::getIconPixmap( "artwork" ) );
-	}
-
-	pal.setBrush( backgroundRole(),	*s_artwork );
+	static auto s_artwork = PLUGIN_NAME::getIconPixmap("artwork");
+	pal.setBrush(backgroundRole(), s_artwork);
 	setPalette( pal );
 
 	const int KNOB_Y1 = 24;

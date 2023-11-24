@@ -79,7 +79,7 @@ VecControlsDialog::VecControlsDialog(VecControls *controls) :
 	config_layout->addStretch();
 
 	// Persistence knob
-	auto persistenceKnob = new Knob(knobSmall_17, this);
+	auto persistenceKnob = new Knob(KnobType::Small17, this);
 	persistenceKnob->setModel(&controls->m_persistenceModel);
 	persistenceKnob->setLabel(tr("Persist."));
 	persistenceKnob->setToolTip(tr("Trace persistence: higher amount means the trace will stay bright for longer time."));

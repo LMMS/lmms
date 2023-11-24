@@ -27,6 +27,7 @@
 
 #include "MidiExport.h"
 
+#include "Engine.h"
 #include "TrackContainer.h"
 #include "DataFile.h"
 #include "InstrumentTrack.h"
@@ -51,7 +52,7 @@ Plugin::Descriptor PLUGIN_EXPORT midiexport_plugin_descriptor =
 	"Mohamed Abdel Maksoud <mohamed at amaksoud.com> and "
 	"Hyunjin Song <tteu.ingog/at/gmail.com>",
 	0x0100,
-	Plugin::ExportFilter,
+	Plugin::Type::ExportFilter,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -84,8 +85,8 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 	auto buffer = std::array<uint8_t, BUFFER_SIZE>{};
 	uint32_t size;
 
-	for (const Track* track : tracks) if (track->type() == Track::InstrumentTrack) nTracks++;
-	for (const Track* track : patternStoreTracks) if (track->type() == Track::InstrumentTrack) nTracks++;
+	for (const Track* track : tracks) if (track->type() == Track::Type::Instrument) nTracks++;
+	for (const Track* track : patternStoreTracks) if (track->type() == Track::Type::Instrument) nTracks++;
 
 	// midi header
 	MidiFile::MIDIHeader header(nTracks);
@@ -97,10 +98,10 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 	// midi tracks
 	for (Track* track : tracks)
 	{
-		DataFile dataFile(DataFile::SongProject);
+		DataFile dataFile(DataFile::Type::SongProject);
 		MTrack mtrack;
 
-		if (track->type() == Track::InstrumentTrack)
+		if (track->type() == Track::Type::Instrument)
 		{
 
 			mtrack.addName(track->name().toStdString(), 0);
@@ -143,7 +144,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 			midiout.writeRawData((char *)buffer.data(), size);
 		}
 
-		if (track->type() == Track::PatternTrack)
+		if (track->type() == Track::Type::Pattern)
 		{
 			patternTrack = dynamic_cast<PatternTrack*>(track);
 			element = patternTrack->saveState(dataFile, dataFile.content());
@@ -169,7 +170,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 	// for each instrument in the pattern editor
 	for (Track* track : patternStoreTracks)
 	{
-		DataFile dataFile(DataFile::SongProject);
+		DataFile dataFile(DataFile::Type::SongProject);
 		MTrack mtrack;
 
 		// begin at the first pattern track (first pattern)
@@ -177,7 +178,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 
 		std::vector<std::pair<int,int>> st;
 
-		if (track->type() != Track::InstrumentTrack) continue;
+		if (track->type() != Track::Type::Instrument) continue;
 
 		mtrack.addName(track->name().toStdString(), 0);
 		//mtrack.addProgramChange(0, 0);
@@ -279,6 +280,7 @@ void MidiExport::writeMidiClip(MidiNoteVector &midiClip, const QDomNode& n,
 		mnote.volume = qMin(qRound(base_volume * LocaleHelper::toDouble(note.attribute("vol", "100")) * (127.0 / 200.0)), 127);
 		mnote.time = base_time + note.attribute("pos", "0").toInt();
 		mnote.duration = note.attribute("len", "0").toInt();
+		mnote.type = static_cast<Note::Type>(note.attribute("type", "0").toInt());
 		midiClip.push_back(mnote);
 	}
 }
@@ -311,6 +313,7 @@ void MidiExport::writePatternClip(MidiNoteVector& src, MidiNoteVector& dst,
 			note.pitch = srcNote.pitch;
 			note.time = base + time;
 			note.volume = srcNote.volume;
+			note.type = srcNote.type;
 			dst.push_back(note);
 		}
 	}
@@ -329,9 +332,9 @@ void MidiExport::processPatternNotes(MidiNoteVector& nv, int cutPos)
 			next = cur;
 			cur = it->time;
 		}
-		if (it->duration < 0)
+		if (it->type == Note::Type::Step)
 		{
-			it->duration = qMin(qMin(-it->duration, next - cur), cutPos - it->time);
+			it->duration = qMin(qMin(DefaultBeatLength, next - cur), cutPos - it->time);
 		}
 	}
 }

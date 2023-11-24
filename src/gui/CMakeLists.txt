@@ -14,6 +14,7 @@ SET(LMMS_SRCS
 	gui/EffectView.cpp
 	gui/embed.cpp
 	gui/FileBrowser.cpp
+	gui/FileBrowserSearcher.cpp
 	gui/GuiApplication.cpp
 	gui/LadspaControlView.cpp
 	gui/LfoControllerDialog.cpp
@@ -61,7 +62,7 @@ SET(LMMS_SRCS
 	gui/instrument/EnvelopeAndLfoView.cpp
 	gui/instrument/InstrumentFunctionViews.cpp
 	gui/instrument/InstrumentMidiIOView.cpp
-	gui/instrument/InstrumentMiscView.cpp
+	gui/instrument/InstrumentTuningView.cpp
 	gui/instrument/InstrumentSoundShapingView.cpp
 	gui/instrument/InstrumentTrackWindow.cpp
 	gui/instrument/InstrumentView.cpp
@@ -94,11 +95,13 @@ SET(LMMS_SRCS
 
 	gui/widgets/AutomatableButton.cpp
 	gui/widgets/AutomatableSlider.cpp
+	gui/widgets/BarModelEditor.cpp
 	gui/widgets/CPULoadWidget.cpp
 	gui/widgets/CaptionMenu.cpp
 	gui/widgets/ComboBox.cpp
 	gui/widgets/CustomTextKnob.cpp
 	gui/widgets/Fader.cpp
+	gui/widgets/FloatModelEditorBase.cpp
 	gui/widgets/Graph.cpp
 	gui/widgets/GroupBox.cpp
 	gui/widgets/Knob.cpp
@@ -115,6 +118,7 @@ SET(LMMS_SRCS
 	gui/widgets/SimpleTextFloat.cpp
 	gui/widgets/TabBar.cpp
 	gui/widgets/TabWidget.cpp
+	gui/widgets/TempoSyncBarModelEditor.cpp
 	gui/widgets/TempoSyncKnob.cpp
 	gui/widgets/TextFloat.cpp
 	gui/widgets/TimeDisplayWidget.cpp

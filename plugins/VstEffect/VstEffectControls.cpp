@@ -50,7 +50,6 @@ VstEffectControls::VstEffectControls( VstEffect * _eff ) :
 	EffectControls( _eff ),
 	m_effect( _eff ),
 	m_subWindow( nullptr ),
-	knobFModel( nullptr ),
 	ctrHandle( nullptr ),
 	lastPosInMenu (0),
 	m_vstGuiVisible ( true )
@@ -84,7 +83,7 @@ void VstEffectControls::loadSettings( const QDomElement & _this )
 		const QMap<QString, QString> & dump = m_effect->m_plugin->parameterDump();
 		paramCount = dump.size();
 		auto paramStr = std::array<char, 35>{};
-		knobFModel = new FloatModel *[ paramCount ];
+		knobFModel.resize(paramCount);
 		QStringList s_dumpValues;
 		for( int i = 0; i < paramCount; i++ )
 		{
@@ -131,7 +130,7 @@ void VstEffectControls::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	if( m_effect->m_plugin != nullptr )
 	{
 		m_effect->m_plugin->saveSettings( _doc, _this );
-		if (knobFModel != nullptr) {
+		if (!knobFModel.empty()) {
 			const QMap<QString, QString> & dump = m_effect->m_plugin->parameterDump();
 			paramCount = dump.size();
 			auto paramStr = std::array<char, 35>{};
@@ -316,6 +315,16 @@ namespace gui
 ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * m_vi ) :
 	m_effect( _eff )
 {
+#if QT_VERSION < 0x50C00
+	// Workaround for a bug in Qt versions below 5.12,
+	// where argument-dependent-lookup fails for QFlags operators
+	// declared inside a namepsace.
+	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
+	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
+
+	using ::operator|;
+#endif
+
 	m_vi2 = m_vi;
 	widget = new QWidget();
         m_vi->m_scrollArea = new QScrollArea( widget );
@@ -366,8 +375,9 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 	vstKnobs = new CustomTextKnob *[ m_vi->paramCount ];
 
 	bool hasKnobModel = true;
-	if (m_vi->knobFModel == nullptr) {
-		m_vi->knobFModel = new FloatModel *[ m_vi->paramCount ];
+	if (m_vi->knobFModel.empty())
+	{
+		m_vi->knobFModel.resize(m_vi->paramCount);
 		hasKnobModel = false;
 	}
 
@@ -379,7 +389,7 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 		sprintf(paramStr.data(), "param%d", i);
 		s_dumpValues = dump[paramStr.data()].split(":");
 
-		vstKnobs[ i ] = new CustomTextKnob( knobBright_26, widget, s_dumpValues.at( 1 ) );
+		vstKnobs[ i ] = new CustomTextKnob( KnobType::Bright26, widget, s_dumpValues.at( 1 ) );
 		vstKnobs[ i ]->setDescription( s_dumpValues.at( 1 ) + ":" );
 		vstKnobs[ i ]->setLabel( s_dumpValues.at( 1 ).left( 15 ) );
 
@@ -533,7 +543,7 @@ void ManageVSTEffectView::syncParameterText()
 
 ManageVSTEffectView::~ManageVSTEffectView()
 {
-	if( m_vi2->knobFModel != nullptr )
+	if (!m_vi2->knobFModel.empty())
 	{
 		for( int i = 0; i < m_vi2->paramCount; i++ )
 		{
@@ -548,11 +558,7 @@ ManageVSTEffectView::~ManageVSTEffectView()
 		vstKnobs = nullptr;
 	}
 
-	if( m_vi2->knobFModel != nullptr )
-	{
-		delete [] m_vi2->knobFModel;
-		m_vi2->knobFModel = nullptr;
-	}
+	m_vi2->knobFModel.clear();
 
 	if( m_vi2->m_scrollArea != nullptr )
 	{

@@ -25,6 +25,7 @@
 #include "ClipView.h"
 
 #include <set>
+#include <cassert>
 
 #include <QMenu>
 #include <QMouseEvent>
@@ -87,7 +88,7 @@ ClipView::ClipView( Clip * clip,
 	m_initialClipPos( TimePos(0) ),
 	m_initialClipEnd( TimePos(0) ),
 	m_clip( clip ),
-	m_action( NoAction ),
+	m_action( Action::None ),
 	m_initialMousePos( QPoint( 0, 0 ) ),
 	m_initialMouseGlobalPos( QPoint( 0, 0 ) ),
 	m_initialOffsets( QVector<TimePos>() ),
@@ -125,7 +126,7 @@ ClipView::ClipView( Clip * clip,
 
 	connect( m_clip, SIGNAL(lengthChanged()),
 			this, SLOT(updateLength()));
-	connect( getGUI()->songEditor()->m_editor->zoomingModel(), SIGNAL(dataChanged()), this, SLOT(updateLength()));
+	connect(getGUI()->songEditor()->m_editor, &SongEditor::pixelsPerBarChanged, this, &ClipView::updateLength);
 	connect( m_clip, SIGNAL(positionChanged()),
 			this, SLOT(updatePosition()));
 	connect( m_clip, SIGNAL(destroyedClip()), this, SLOT(close()));
@@ -135,7 +136,7 @@ ClipView::ClipView( Clip * clip,
 	connect(m_trackView->getTrack(), &Track::colorChanged, this, [this]
 	{
 		// redraw if clip uses track color
-		if (!m_clip->usesCustomClipColor()) { update(); }
+		if (!m_clip->color().has_value()) { update(); }
 	});
 
 	m_trackView->getTrackContentWidget()->addClipView( this );
@@ -314,10 +315,9 @@ void ClipView::updateLength()
 	}
 	else
 	{
-		setFixedWidth(
-		static_cast<int>( m_clip->length() * pixelsPerBar() /
-					TimePos::ticksPerBar() ) + 1 /*+
-						BORDER_WIDTH * 2-1*/ );
+		// this std::max function is needed for clips that do not start or end on the beat, otherwise, they "disappear" when zooming to min 
+		// 3 is the minimun width needed to make a clip visible
+		setFixedWidth(std::max(static_cast<int>(m_clip->length() * pixelsPerBar() / TimePos::ticksPerBar() + 1), 3));
 	}
 	m_trackView->trackContainerView()->update();
 }
@@ -340,45 +340,35 @@ void ClipView::updatePosition()
 	m_trackView->trackContainerView()->update();
 }
 
-
-
-
 void ClipView::selectColor()
 {
 	// Get a color from the user
-	QColor new_color = ColorChooser( this ).withPalette( ColorChooser::Palette::Track )->getColor( m_clip->color() );
-	if (new_color.isValid()) { setColor(&new_color); }
+	const auto newColor = ColorChooser{this}
+		.withPalette(ColorChooser::Palette::Track)
+		->getColor(m_clip->color().value_or(palette().background().color()));
+	if (newColor.isValid()) { setColor(newColor); }
 }
-
-
-
 
 void ClipView::randomizeColor()
 {
-	setColor(&ColorChooser::getPalette(ColorChooser::Palette::Mixer)[rand() % 48]);
+	setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[std::rand() % 48]);
 }
-
-
-
 
 void ClipView::resetColor()
 {
-	setColor(nullptr);
+	setColor(std::nullopt);
 }
-
-
-
 
 /*! \brief Change color of all selected clips
  *
- *  \param color The new QColor. Pass nullptr to use the Track's color.
+ *  \param color The new color.
  */
-void ClipView::setColor(const QColor* color)
+void ClipView::setColor(const std::optional<QColor>& color)
 {
 	std::set<Track*> journaledTracks;
 
 	auto selectedClips = getClickedClips();
-	for (auto clipv: selectedClips)
+	for (auto clipv : selectedClips)
 	{
 		auto clip = clipv->getClip();
 		auto track = clip->getTrack();
@@ -397,24 +387,12 @@ void ClipView::setColor(const QColor* color)
 			track->addJournalCheckPoint();
 		}
 
-		if (color)
-		{
-			clip->useCustomClipColor(true);
-			clip->setColor(*color);
-		}
-		else
-		{
-			clip->useCustomClipColor(false);
-		}
+		clip->setColor(color);
 		clipv->update();
 	}
 
 	Engine::getSong()->setModified();
 }
-
-
-
-
 
 /*! \brief Change the ClipView's display when something
  *  being dragged enters it.
@@ -436,7 +414,7 @@ void ClipView::dragEnterEvent( QDragEnterEvent * dee )
 	else
 	{
 		StringPairDrag::processDragEnterEvent( dee, "clip_" +
-					QString::number( m_clip->getTrack()->type() ) );
+					QString::number( static_cast<int>(m_clip->getTrack()->type()) ) );
 	}
 }
 
@@ -458,7 +436,7 @@ void ClipView::dropEvent( QDropEvent * de )
 	QString value = StringPairDrag::decodeValue( de );
 
 	// Track must be the same type to paste into
-	if( type != ( "clip_" + QString::number( m_clip->getTrack()->type() ) ) )
+	if( type != ( "clip_" + QString::number( static_cast<int>(m_clip->getTrack()->type()) ) ) )
 	{
 		return;
 	}
@@ -538,17 +516,18 @@ DataFile ClipView::createClipDataFiles(
 {
 	Track * t = m_trackView->getTrack();
 	TrackContainer * tc = t->trackContainer();
-	DataFile dataFile( DataFile::DragNDropData );
+	DataFile dataFile( DataFile::Type::DragNDropData );
 	QDomElement clipParent = dataFile.createElement("clips");
 
 	for (const auto& clipView : clipViews)
 	{
 		// Insert into the dom under the "clips" element
 		Track* clipTrack = clipView->m_trackView->getTrack();
-		int trackIndex = tc->tracks().indexOf( clipTrack );
+		int trackIndex = std::distance(tc->tracks().begin(), std::find(tc->tracks().begin(), tc->tracks().end(), clipTrack));
+		assert(trackIndex != tc->tracks().size());
 		QDomElement clipElement = dataFile.createElement("clip");
 		clipElement.setAttribute( "trackIndex", trackIndex );
-		clipElement.setAttribute( "trackType", clipTrack->type() );
+		clipElement.setAttribute( "trackType", static_cast<int>(clipTrack->type()) );
 		clipElement.setAttribute( "trackName", clipTrack->name() );
 		clipView->m_clip->saveState(dataFile, clipElement);
 		clipParent.appendChild( clipElement );
@@ -557,12 +536,15 @@ DataFile ClipView::createClipDataFiles(
 	dataFile.content().appendChild( clipParent );
 
 	// Add extra metadata needed for calculations later
-	int initialTrackIndex = tc->tracks().indexOf( t );
-	if( initialTrackIndex < 0 )
+
+	const auto initialTrackIt = std::find(tc->tracks().begin(), tc->tracks().end(), t);
+	if (initialTrackIt == tc->tracks().end())
 	{
 		printf("Failed to find selected track in the TrackContainer.\n");
 		return dataFile;
 	}
+
+	const int initialTrackIndex = std::distance(tc->tracks().begin(), initialTrackIt);
 	QDomElement metadata = dataFile.createElement( "copyMetadata" );
 	// initialTrackIndex is the index of the track that was touched
 	metadata.setAttribute( "initialTrackIndex", initialTrackIndex );
@@ -643,27 +625,27 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 		{
 			if( isSelected() )
 			{
-				m_action = CopySelection;
+				m_action = Action::CopySelection;
 			}
 			else
 			{
-				m_action = ToggleSelected;
+				m_action = Action::ToggleSelected;
 			}
 		}
 		else
 		{
 			if( isSelected() )
 			{
-				m_action = MoveSelection;
+				m_action = Action::MoveSelection;
 			}
 			else
 			{
 				getGUI()->songEditor()->m_editor->selectAllClips( false );
 				m_clip->addJournalCheckPoint();
 
-				// Move, Resize and ResizeLeft
-				// Split action doesn't disable Clip journalling
-				if (m_action == Move || m_action == Resize || m_action == ResizeLeft)
+				// Action::Move, Action::Resize and Action::ResizeLeft
+				// Action::Split action doesn't disable Clip journalling
+				if (m_action == Action::Move || m_action == Action::Resize || m_action == Action::ResizeLeft)
 				{
 					m_clip->setJournalling(false);
 				}
@@ -673,22 +655,22 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 
 				if( m_clip->getAutoResize() )
 				{	// Always move clips that can't be manually resized
-					m_action = Move;
+					m_action = Action::Move;
 					setCursor( Qt::SizeAllCursor );
 				}
 				else if( me->x() >= width() - RESIZE_GRIP_WIDTH )
 				{
-					m_action = Resize;
+					m_action = Action::Resize;
 					setCursor( Qt::SizeHorCursor );
 				}
 				else if( me->x() < RESIZE_GRIP_WIDTH && (sClip || pClip) )
 				{
-					m_action = ResizeLeft;
+					m_action = Action::ResizeLeft;
 					setCursor( Qt::SizeHorCursor );
 				}
 				else if( sClip && knifeMode )
 				{
-					m_action = Split;
+					m_action = Action::Split;
 					setCursor( m_cursorKnife );
 					setMarkerPos( knifeMarkerPos( me ) );
 					setMarkerEnabled( true );
@@ -696,11 +678,11 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 				}
 				else
 				{
-					m_action = Move;
+					m_action = Action::Move;
 					setCursor( Qt::SizeAllCursor );
 				}
 
-				if( m_action == Move )
+				if( m_action == Action::Move )
 				{
 					s_textFloat->setTitle( tr( "Current position" ) );
 					s_textFloat->setText( QString( "%1:%2" ).
@@ -708,7 +690,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 						arg( m_clip->startPosition().getTicks() %
 								TimePos::ticksPerBar() ) );
 				}
-				else if( m_action == Resize || m_action == ResizeLeft )
+				else if( m_action == Action::Resize || m_action == Action::ResizeLeft )
 				{
 					s_textFloat->setTitle( tr( "Current length" ) );
 					s_textFloat->setText( tr( "%1:%2 (%3:%4 to %5:%6)" ).
@@ -725,11 +707,11 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 				// s_textFloat->reparent( this );
 				// setup text-float as if Clip was already moved/resized
 				s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
-				if ( m_action != Split) { s_textFloat->show(); }
+				if ( m_action != Action::Split) { s_textFloat->show(); }
 			}
 
 			delete m_hint;
-			QString hint = m_action == Move || m_action == MoveSelection
+			QString hint = m_action == Action::Move || m_action == Action::MoveSelection
 						? tr( "Press <%1> and drag to make a copy." )
 						: tr( "Press <%1> for free resizing." );
 			m_hint = TextFloat::displayMessage( tr( "Hint" ), hint.arg(UI_CTRL_KEY),
@@ -746,9 +728,9 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 		{
 			remove( active );
 		}
-		if (m_action == Split)
+		if (m_action == Action::Split)
 		{
-			m_action = NoAction;
+			m_action = Action::None;
 			auto sClip = dynamic_cast<SampleClip*>(m_clip);
 			if (sClip)
 			{
@@ -788,12 +770,12 @@ void ClipView::mousePressEvent( QMouseEvent * me )
  */
 void ClipView::mouseMoveEvent( QMouseEvent * me )
 {
-	if( m_action == CopySelection || m_action == ToggleSelected )
+	if( m_action == Action::CopySelection || m_action == Action::ToggleSelected )
 	{
 		if( mouseMovedDistance( me, 2 ) == true )
 		{
 			QVector<ClipView *> clipViews;
-			if( m_action == CopySelection )
+			if( m_action == Action::CopySelection )
 			{
 				// Collect all selected Clips
 				QVector<selectableObject *> so =
@@ -814,7 +796,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 			}
 			// Clear the action here because mouseReleaseEvent will not get
 			// triggered once we go into drag.
-			m_action = NoAction;
+			m_action = Action::None;
 
 			// Write the Clips to the DataFile for copying
 			DataFile dataFile = createClipDataFiles( clipViews );
@@ -825,7 +807,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 				Qt::KeepAspectRatio,
 				Qt::SmoothTransformation );
 			new StringPairDrag( QString( "clip_%1" ).arg(
-								m_clip->getTrack()->type() ),
+								static_cast<int>(m_clip->getTrack()->type()) ),
 								dataFile.toString(), thumbnail, this );
 		}
 	}
@@ -837,7 +819,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 	}
 
 	const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
-	if( m_action == Move )
+	if( m_action == Action::Move )
 	{
 		TimePos newPos = draggedClipPos( me );
 		m_clip->movePosition(newPos);
@@ -849,7 +831,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 						TimePos::ticksPerBar() ) );
 		s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2 ) );
 	}
-	else if( m_action == MoveSelection )
+	else if( m_action == Action::MoveSelection )
 	{
 		// 1: Find the position we want to move the grabbed Clip to
 		TimePos newPos = draggedClipPos( me );
@@ -879,13 +861,13 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 			( *it )->movePosition( newPos + m_initialOffsets[index] );
 		}
 	}
-	else if( m_action == Resize || m_action == ResizeLeft )
+	else if( m_action == Action::Resize || m_action == Action::ResizeLeft )
 	{
 		const float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
 		// Length in ticks of one snap increment
 		const TimePos snapLength = TimePos( (int)(snapSize * TimePos::ticksPerBar()) );
 
-		if( m_action == Resize )
+		if( m_action == Action::Resize )
 		{
 			// The clip's new length
 			TimePos l = static_cast<int>( me->x() * TimePos::ticksPerBar() / ppb );
@@ -988,7 +970,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 						TimePos::ticksPerBar() ) );
 		s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
 	}
-	else if( m_action == Split )
+	else if( m_action == Action::Split )
 	{
 		auto sClip = dynamic_cast<SampleClip*>(m_clip);
 		if (sClip) {
@@ -1013,21 +995,21 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
  */
 void ClipView::mouseReleaseEvent( QMouseEvent * me )
 {
-	// If the CopySelection was chosen as the action due to mouse movement,
+	// If the Action::CopySelection was chosen as the action due to mouse movement,
 	// it will have been cleared.  At this point Toggle is the desired action.
 	// An active StringPairDrag will prevent this method from being called,
-	// so a real CopySelection would not have occurred.
-	if( m_action == CopySelection ||
-	    ( m_action == ToggleSelected && mouseMovedDistance( me, 2 ) == false ) )
+	// so a real Action::CopySelection would not have occurred.
+	if( m_action == Action::CopySelection ||
+	    ( m_action == Action::ToggleSelected && mouseMovedDistance( me, 2 ) == false ) )
 	{
 		setSelected( !isSelected() );
 	}
-	else if( m_action == Move || m_action == Resize || m_action == ResizeLeft )
+	else if( m_action == Action::Move || m_action == Action::Resize || m_action == Action::ResizeLeft )
 	{
 		// TODO: Fix m_clip->setJournalling() consistency
 		m_clip->setJournalling( true );
 	}
-	else if( m_action == Split )
+	else if( m_action == Action::Split )
 	{
 		const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
 		const TimePos relPos = me->pos().x() * TimePos::ticksPerBar() / ppb;
@@ -1037,7 +1019,7 @@ void ClipView::mouseReleaseEvent( QMouseEvent * me )
 		);
 	}
 
-	m_action = NoAction;
+	m_action = Action::None;
 	delete m_hint;
 	m_hint = nullptr;
 	s_textFloat->hide();
@@ -1077,7 +1059,7 @@ void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 			individualClip
 				? tr("Delete (middle mousebutton)")
 				: tr("Delete selection (middle mousebutton)"),
-			[this](){ contextMenuAction( Remove ); } );
+			[this](){ contextMenuAction( ContextMenuAction::Remove ); } );
 
 		contextMenu.addSeparator();
 
@@ -1086,14 +1068,14 @@ void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 			individualClip
 				? tr("Cut")
 				: tr("Cut selection"),
-			[this](){ contextMenuAction( Cut ); } );
+			[this](){ contextMenuAction( ContextMenuAction::Cut ); } );
 
 		if (canMergeSelection(selectedClips))
 		{
 			contextMenu.addAction(
 				embed::getIconPixmap("edit_merge"),
 				tr("Merge Selection"),
-				[this]() { contextMenuAction(Merge); }
+				[this]() { contextMenuAction(ContextMenuAction::Merge); }
 			);
 		}
 	}
@@ -1103,12 +1085,12 @@ void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 		individualClip
 			? tr("Copy")
 			: tr("Copy selection"),
-		[this](){ contextMenuAction( Copy ); } );
+		[this](){ contextMenuAction( ContextMenuAction::Copy ); } );
 
 	contextMenu.addAction(
 		embed::getIconPixmap( "edit_paste" ),
 		tr( "Paste" ),
-		[this](){ contextMenuAction( Paste ); } );
+		[this](){ contextMenuAction( ContextMenuAction::Paste ); } );
 
 	contextMenu.addSeparator();
 
@@ -1117,7 +1099,7 @@ void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 		(individualClip
 			? tr("Mute/unmute (<%1> + middle click)")
 			: tr("Mute/unmute selection (<%1> + middle click)")).arg(UI_CTRL_KEY),
-		[this](){ contextMenuAction( Mute ); } );
+		[this](){ contextMenuAction( ContextMenuAction::Mute ); } );
 
 	contextMenu.addSeparator();
 
@@ -1141,22 +1123,22 @@ void ClipView::contextMenuAction( ContextMenuAction action )
 
 	switch( action )
 	{
-		case Remove:
+		case ContextMenuAction::Remove:
 			remove( active );
 			break;
-		case Cut:
+		case ContextMenuAction::Cut:
 			cut( active );
 			break;
-		case Copy:
+		case ContextMenuAction::Copy:
 			copy( active );
 			break;
-		case Paste:
+		case ContextMenuAction::Paste:
 			paste();
 			break;
-		case Mute:
+		case ContextMenuAction::Mute:
 			toggleMute( active );
 			break;
-		case Merge:
+		case ContextMenuAction::Merge:
 			mergeClips(active);
 			break;
 	}
@@ -1203,7 +1185,7 @@ void ClipView::copy( QVector<ClipView *> clipvs )
 	DataFile dataFile = createClipDataFiles( clipvs );
 
 	// Copy the Clip type as a key and the Clip data file to the clipboard
-	copyStringPair( QString( "clip_%1" ).arg( m_clip->getTrack()->type() ),
+	copyStringPair( QString( "clip_%1" ).arg( static_cast<int>(m_clip->getTrack()->type()) ),
 		dataFile.toString() );
 }
 
@@ -1306,7 +1288,7 @@ void ClipView::mergeClips(QVector<ClipView*> clipvs)
 			continue;
 		}
 
-		NoteVector currentClipNotes = mcView->getMidiClip()->notes();
+		const NoteVector& currentClipNotes = mcView->getMidiClip()->notes();
 		TimePos mcViewPos = mcView->getMidiClip()->startPosition();
 
 		for (Note* note: currentClipNotes)
@@ -1479,11 +1461,7 @@ TimePos ClipView::quantizeSplitPos( TimePos midiPos, bool shiftMode )
 QColor ClipView::getColorForDisplay( QColor defaultColor )
 {
 	// Get the pure Clip color
-	auto clipColor = m_clip->hasColor()
-					? m_clip->usesCustomClipColor()
-						? m_clip->color()
-						: m_clip->getTrack()->color()
-					: defaultColor;
+	auto clipColor = m_clip->color().value_or(m_clip->getTrack()->color().value_or(defaultColor));
 
 	// Set variables
 	QColor c, mutedCustomColor;
@@ -1494,7 +1472,7 @@ QColor ClipView::getColorForDisplay( QColor defaultColor )
 	// Change the pure color by state: selected, muted, colored, normal
 	if( isSelected() )
 	{
-		c = m_clip->hasColor()
+		c = hasCustomColor()
 			? ( muted
 				? mutedCustomColor.darker( 350 )
 				: clipColor.darker( 150 ) )
@@ -1504,7 +1482,7 @@ QColor ClipView::getColorForDisplay( QColor defaultColor )
 	{
 		if( muted )
 		{
-			c = m_clip->hasColor()
+			c = hasCustomColor()
 				? mutedCustomColor.darker( 250 )
 				: mutedBackgroundColor();
 		}
@@ -1518,5 +1496,9 @@ QColor ClipView::getColorForDisplay( QColor defaultColor )
 	return c;
 }
 
+auto ClipView::hasCustomColor() const -> bool
+{
+	return m_clip->color().has_value() || m_clip->getTrack()->color().has_value();
+}
 
 } // namespace lmms::gui

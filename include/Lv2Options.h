@@ -84,6 +84,8 @@ public:
 		return m_options.data();
 	}
 
+	void clear();
+
 private:
 	//! Initialize an option internally
 	void initOption(LV2_URID key,

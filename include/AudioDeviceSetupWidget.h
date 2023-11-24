@@ -2,6 +2,7 @@
  * AudioDeviceSetupWidget.h - Base class for audio device setup widgets
  *
  * Copyright (c) 2004-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2023- Michael Gregorius
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -25,12 +26,12 @@
 #ifndef LMMS_GUI_AUDIO_DEVICE_SETUP_WIDGET_H
 #define LMMS_GUI_AUDIO_DEVICE_SETUP_WIDGET_H
 
-#include "TabWidget.h"
+#include <QGroupBox>
 
 namespace lmms::gui
 {
 
-class AudioDeviceSetupWidget : public TabWidget
+class AudioDeviceSetupWidget : public QGroupBox
 {
     Q_OBJECT
 public:

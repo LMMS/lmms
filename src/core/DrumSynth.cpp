@@ -273,7 +273,9 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t *&wave, int channels, sa
   //generation
   long  Length, tpos=0, tplus, totmp, t, i, j;
   float x[3] = {0.f, 0.f, 0.f};
-  float MasterTune, randmax, randmax2;
+  float MasterTune;
+  constexpr float randmax = 1.f / static_cast<float>(RAND_MAX);
+  constexpr float randmax2 = 2.f / static_cast<float>(RAND_MAX);
   int   MainFilter, HighPass;
 
   long  NON, NT, TON, DiON, TDroop=0, DStep;
@@ -454,7 +456,6 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t *&wave, int channels, sa
   }
 
   //prepare envelopes
-  randmax = 1.f / RAND_MAX; randmax2 = 2.f * randmax;
   for (i=1;i<8;i++) { envData[i][NEXTT]=0; envData[i][PNT]=0; }
   Length = LongestEnv();
 

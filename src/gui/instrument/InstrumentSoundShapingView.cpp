@@ -80,13 +80,13 @@ InstrumentSoundShapingView::InstrumentSoundShapingView( QWidget * _parent ) :
 	m_filterComboBox->setFont( pointSize<8>( m_filterComboBox->font() ) );
 
 
-	m_filterCutKnob = new Knob( knobBright_26, m_filterGroupBox );
+	m_filterCutKnob = new Knob( KnobType::Bright26, m_filterGroupBox );
 	m_filterCutKnob->setLabel( tr( "FREQ" ) );
 	m_filterCutKnob->move( 140, 18 );
 	m_filterCutKnob->setHintText( tr( "Cutoff frequency:" ), " " + tr( "Hz" ) );
 
 
-	m_filterResKnob = new Knob( knobBright_26, m_filterGroupBox );
+	m_filterResKnob = new Knob( KnobType::Bright26, m_filterGroupBox );
 	m_filterResKnob->setLabel( tr( "Q/RESO" ) );
 	m_filterResKnob->move( 196, 18 );
 	m_filterResKnob->setHintText( tr( "Q/Resonance:" ), "" );
