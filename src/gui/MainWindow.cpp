@@ -115,24 +115,24 @@ MainWindow::MainWindow() :
 					"*.mmp *.mmpz *.xml *.mid *.mpt",
 							tr( "My Projects" ),
 					embed::getIconPixmap( "project_file" ).transformed( QTransform().rotate( 90 ) ),
-							splitter, false, true,
+							splitter, false,
 				confMgr->userProjectsDir(),
 				confMgr->factoryProjectsDir()));
 	sideBar->appendTab(
 		new FileBrowser(confMgr->userSamplesDir() + "*" + confMgr->factorySamplesDir(), FileItem::defaultFilters(),
 			tr("My Samples"), embed::getIconPixmap("sample_file").transformed(QTransform().rotate(90)), splitter, false,
-			true, confMgr->userSamplesDir(), confMgr->factorySamplesDir()));
+			confMgr->userSamplesDir(), confMgr->factorySamplesDir()));
 	sideBar->appendTab( new FileBrowser(
 				confMgr->userPresetsDir() + "*" +
 				confMgr->factoryPresetsDir(),
 					"*.xpf *.cs.xml *.xiz *.lv2",
 					tr( "My Presets" ),
 					embed::getIconPixmap( "preset_file" ).transformed( QTransform().rotate( 90 ) ),
-							splitter , false, true,
+							splitter , false,
 				confMgr->userPresetsDir(),
 				confMgr->factoryPresetsDir()));
 	sideBar->appendTab(new FileBrowser(QDir::homePath(), FileItem::defaultFilters(), tr("My Home"),
-		embed::getIconPixmap("home").transformed(QTransform().rotate(90)), splitter, false, false));
+		embed::getIconPixmap("home").transformed(QTransform().rotate(90)), splitter, false));
 
 	QStringList root_paths;
 	QString title = tr( "Root directory" );

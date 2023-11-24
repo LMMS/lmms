@@ -102,14 +102,13 @@ void FileBrowser::addContentCheckBox()
 
 FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 			const QString & title, const QPixmap & pm,
-			QWidget * parent, bool dirs_as_items, bool recurse,
+			QWidget * parent, bool dirs_as_items,
 			const QString& userDir,
 			const QString& factoryDir):
 	SideBarWidget( title, pm, parent ),
 	m_directories( directories ),
 	m_filter( filter ),
 	m_dirsAsItems( dirs_as_items ),
-	m_recurse( recurse ),
 	m_userDir(userDir),
 	m_factoryDir(factoryDir)
 {
@@ -177,7 +176,7 @@ void FileBrowser::saveDirectoriesStates()
 	
 void FileBrowser::restoreDirectoriesStates()
 {
-	expandItems(nullptr, m_savedExpandedDirs);
+	expandItems(m_savedExpandedDirs);
 }
 
 void FileBrowser::buildSearchTree()
@@ -337,8 +336,10 @@ void FileBrowser::reloadTree()
 
 
 
-void FileBrowser::expandItems(QTreeWidgetItem* item, QList<QString> expandedDirs)
+void FileBrowser::expandItems(const QList<QString>& expandedDirs, QTreeWidgetItem* item)
 {
+	if (expandedDirs.isEmpty()) { return; }
+
 	int numChildren = item ? item->childCount() : m_fileBrowserTreeWidget->topLevelItemCount();
 	for (int i = 0; i < numChildren; ++i)
 	{
@@ -346,14 +347,10 @@ void FileBrowser::expandItems(QTreeWidgetItem* item, QList<QString> expandedDirs
 		auto d = dynamic_cast<Directory*>(it);
 		if (d)
 		{
-			// Expanding is required when recursive to load in its contents, even if it's collapsed right afterward
-			if (m_recurse) { d->setExpanded(true); }
-
 			d->setExpanded(expandedDirs.contains(d->fullName()));
-
-			if (m_recurse && it->childCount())
+			if (it->childCount() > 0)
 			{
-				expandItems(it, expandedDirs);
+				expandItems(expandedDirs, it);
 			}
 		}
 		
