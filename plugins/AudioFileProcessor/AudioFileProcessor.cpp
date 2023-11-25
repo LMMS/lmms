@@ -1169,14 +1169,19 @@ void AudioFileProcessorWaveView::slideSampleByFrames( f_cnt_t _frames )
 		return;
 	}
 	const double v = static_cast<double>( _frames ) / m_sampleBuffer.frames();
-	if( m_startKnob ) {
-		m_startKnob->slideBy( v, false );
+	// update knobs in the right order
+	// to avoid them clamping each other
+	if (v < 0)
+	{
+		m_startKnob->slideBy(v, false);
+		m_loopKnob->slideBy(v, false);
+		m_endKnob->slideBy(v, false);
 	}
-	if( m_endKnob ) {
-		m_endKnob->slideBy( v, false );
-	}
-	if( m_loopKnob ) {
-		m_loopKnob->slideBy( v, false );
+	else
+	{
+		m_endKnob->slideBy(v, false);
+		m_loopKnob->slideBy(v, false);
+		m_startKnob->slideBy(v, false);
 	}
 }
 
