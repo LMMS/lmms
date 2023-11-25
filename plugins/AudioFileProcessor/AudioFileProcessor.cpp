@@ -1160,8 +1160,8 @@ void AudioFileProcessorWaveView::slideSampleByFrames( f_cnt_t _frames )
 		return;
 	}
 	const double v = static_cast<double>( _frames ) / m_sampleBuffer.frames();
-	//update knobs in the right order
-	//to avoid them clamping each other
+	// update knobs in the right order
+	// to avoid them clamping each other
 	if (v < 0)
 	{
 		if (m_startKnob)
