@@ -1164,33 +1164,15 @@ void AudioFileProcessorWaveView::slideSampleByFrames( f_cnt_t _frames )
 	// to avoid them clamping each other
 	if (v < 0)
 	{
-		if (m_startKnob)
-		{
-			m_startKnob->slideBy(v, false);
-		}
-		if (m_loopKnob)
-		{
-			m_loopKnob->slideBy(v, false);
-		}
-		if (m_endKnob)
-		{
-			m_endKnob->slideBy(v, false);
-		}
+		m_startKnob->slideBy(v, false);
+		m_loopKnob->slideBy(v, false);
+		m_endKnob->slideBy(v, false);
 	}
 	else
 	{
-		if (m_endKnob)
-		{
-			m_endKnob->slideBy(v, false);
-		}
-		if (m_loopKnob)
-		{
-			m_loopKnob->slideBy(v, false);
-		}
-		if (m_startKnob)
-		{
-			m_startKnob->slideBy(v, false);
-		}
+		m_endKnob->slideBy(v, false);
+		m_loopKnob->slideBy(v, false);
+		m_startKnob->slideBy(v, false);
 	}
 }
 
