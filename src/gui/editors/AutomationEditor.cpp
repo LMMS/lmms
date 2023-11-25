@@ -27,8 +27,6 @@
 
 #include "AutomationEditor.h"
 
-#include <cmath>
-
 #include <QApplication>
 #include <QInputDialog>
 #include <QKeyEvent>
@@ -38,6 +36,9 @@
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QToolTip>
+#include <cmath>
+
+#include "SampleClip.h"
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -46,20 +47,23 @@
 #include "ActionGroup.h"
 #include "AutomationNode.h"
 #include "ComboBox.h"
-#include "debug.h"
 #include "DeprecationHelper.h"
-#include "embed.h"
+#include "DetuningHelper.h"
 #include "Engine.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
 #include "Knob.h"
 #include "MainWindow.h"
+#include "MidiClip.h"
 #include "PatternStore.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
+#include "SampleBuffer.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
+#include "debug.h"
+#include "embed.h"
+#include "gui_templates.h"
 
 
 namespace lmms::gui
@@ -101,7 +105,8 @@ AutomationEditor::AutomationEditor() :
 	m_nodeTangentLineColor(0, 0, 0),
 	m_scaleColor(Qt::SolidPattern),
 	m_crossColor(0, 0, 0),
-	m_backgroundShade(0, 0, 0)
+	m_backgroundShade(0, 0, 0),
+	m_ghostNoteColor(0, 0, 0)
 {
 	connect( this, SIGNAL(currentClipChanged()),
 				this, SLOT(updateAfterClipChange()),
@@ -1032,8 +1037,19 @@ inline void AutomationEditor::drawAutomationTangents(QPainter& p, timeMap::itera
 	p.drawEllipse(tx - 3, ty - 3, 6, 6);
 }
 
+void AutomationEditor::setGhostMidiClip(MidiClip* newMidiClip)
+{
+	// Expects a pointer to a MIDI clip or nullptr.
+	m_ghostNotes = newMidiClip;
+	m_renderSample = false;
+}
 
-
+void AutomationEditor::setGhostSample(SampleClip* newGhostSample)
+{
+	// Expects a pointer to a Sample buffer or nullptr.
+	m_ghostSample = newGhostSample;
+	m_renderSample = true;
+}
 
 void AutomationEditor::paintEvent(QPaintEvent * pe )
 {
@@ -1217,6 +1233,81 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		{
 			p.setPen(m_beatLineColor);
 			p.drawLine( x, grid_bottom, x, x_line_end );
+		}
+
+		// draw ghost sample
+		if (m_ghostSample != nullptr && m_ghostSample->sampleBuffer()->frames() > 1 && m_renderSample)
+		{
+			int sampleFrames = m_ghostSample->sampleBuffer()->frames();
+			int length = static_cast<float>(sampleFrames) / Engine::framesPerTick();
+			int editorHeight = grid_bottom - TOP_MARGIN;
+
+			int startPos = xCoordOfTick(0);
+			int sampleWidth = xCoordOfTick(length) - startPos;
+			int sampleHeight = std::min(editorHeight - SAMPLE_MARGIN, MAX_SAMPLE_HEIGHT);
+			int yOffset = (editorHeight - sampleHeight) / 2.0f + TOP_MARGIN;
+
+			p.setPen(m_ghostSampleColor);
+			m_ghostSample->sampleBuffer()->visualize(p, QRect(startPos, yOffset, sampleWidth, sampleHeight), 0, sampleFrames);
+		}
+
+		// draw ghost notes
+		if (m_ghostNotes != nullptr && !m_renderSample)
+		{
+			const NoteVector& notes = m_ghostNotes->notes();
+			int minKey = 128;
+			int maxKey = 0;
+			int detuningOffset = 0;
+			const Note* detuningNote = nullptr;
+
+			for (const Note* note : notes)
+			{
+				int noteKey = note->key();
+
+				if (note->detuning()->automationClip() == m_clip) {
+					detuningOffset = note->pos();
+					detuningNote = note;
+				}
+
+				maxKey = std::max(maxKey, noteKey);
+				minKey = std::min(minKey, noteKey);
+			}
+
+			for (const Note* note : notes)
+			{
+				int lenTicks = note->length();
+				int notePos = note->pos();
+
+				// offset note if detuning
+				if (notePos+lenTicks < detuningOffset) { continue; }
+				notePos -= detuningOffset;
+
+				// remove/change after #5902
+				if (lenTicks == 0) { continue; }
+				else if (lenTicks < 0) { lenTicks = 4; }
+
+				int note_width = lenTicks * m_ppb / TimePos::ticksPerBar();
+				int keyRange = maxKey - minKey;
+
+				if (keyRange < MIN_NOTE_RANGE) 
+				{
+					int padding = (MIN_NOTE_RANGE - keyRange) / 2.0f;
+					maxKey += padding;
+					minKey -= padding;
+					keyRange = MIN_NOTE_RANGE;
+				}
+
+				float absNoteHeight = static_cast<float>(note->key() - minKey) / (maxKey - minKey);
+				int graphHeight = grid_bottom - NOTE_HEIGHT - NOTE_MARGIN - TOP_MARGIN;
+				const int y = (graphHeight - graphHeight * absNoteHeight) + NOTE_HEIGHT / 2.0f + TOP_MARGIN;
+				const int x = xCoordOfTick(notePos);
+
+				if (note == detuningNote) {
+					p.fillRect(x, y, note_width, NOTE_HEIGHT, m_detuningNoteColor);
+				} else {
+					p.fillRect(x, y, note_width, NOTE_HEIGHT, m_ghostNoteColor);
+				}
+			}
 		}
 
 		// and finally bars
@@ -2117,8 +2208,18 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	quantizationActionsToolBar->addWidget( quantize_lbl );
 	quantizationActionsToolBar->addWidget( m_quantizeComboBox );
 
+	m_resetGhostNotes = new QPushButton(m_toolBar);
+	m_resetGhostNotes->setIcon(embed::getIconPixmap("clear_ghost_note"));
+	m_resetGhostNotes->setToolTip(tr("Clear ghost notes"));
+	m_resetGhostNotes->setEnabled(true);
+
+	connect(m_resetGhostNotes, &QPushButton::pressed, m_editor, &AutomationEditor::resetGhostNotes);
+
+	quantizationActionsToolBar->addSeparator();
+	quantizationActionsToolBar->addWidget(m_resetGhostNotes);
+
 	// Setup our actual window
-	setFocusPolicy( Qt::StrongFocus );
+	setFocusPolicy(Qt::StrongFocus);
 	setFocus();
 	setWindowIcon( embed::getIconPixmap( "automation" ) );
 	setAcceptDrops( true );
