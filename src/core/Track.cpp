@@ -312,6 +312,11 @@ void Track::loadSettings( const QDomElement & element )
 				Clip * clip = createClip(
 								TimePos( 0 ) );
 				clip->restoreState( node.toElement() );
+				// loading AutomationClip connections correctly
+				if (node.nodeName() == "automationclip")
+				{
+					AutomationClip::resolveAllIDs();
+				}
 			}
 		}
 		node = node.nextSibling();
