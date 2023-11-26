@@ -296,6 +296,8 @@ void Track::loadSettings( const QDomElement & element )
 //		m_clips.erase( m_clips.begin() );
 	}
 
+	bool resolveIDs = false;
+
 	QDomNode node = element.firstChild();
 	while( !node.isNull() )
 	{
@@ -312,13 +314,20 @@ void Track::loadSettings( const QDomElement & element )
 				Clip * clip = createClip(
 								TimePos( 0 ) );
 				clip->restoreState( node.toElement() );
+				if (node.nodeName() == "automationclip")
+				{
+					resolveIDs = true;
+				}
 			}
 		}
 		node = node.nextSibling();
 	}
 
 	// loading AutomationClip connections correctly
-	AutomationClip::resolveAllIDs();
+	if (resolveIDs)
+	{
+		AutomationClip::resolveAllIDs();
+	}
 
 	int storedHeight = element.attribute( "trackheight" ).toInt();
 	if( storedHeight >= MINIMAL_TRACK_HEIGHT )
