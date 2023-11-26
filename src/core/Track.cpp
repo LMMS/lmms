@@ -312,15 +312,13 @@ void Track::loadSettings( const QDomElement & element )
 				Clip * clip = createClip(
 								TimePos( 0 ) );
 				clip->restoreState( node.toElement() );
-				// loading AutomationClip connections correctly
-				if (node.nodeName() == "automationclip")
-				{
-					AutomationClip::resolveAllIDs();
-				}
 			}
 		}
 		node = node.nextSibling();
 	}
+
+	// loading AutomationClip connections correctly
+	AutomationClip::resolveAllIDs();
 
 	int storedHeight = element.attribute( "trackheight" ).toInt();
 	if( storedHeight >= MINIMAL_TRACK_HEIGHT )
