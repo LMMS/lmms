@@ -23,11 +23,13 @@
  */
 
 #include <cstdlib>
+#include <QDomElement>
 
 #include "ProjectJournal.h"
 #include "Engine.h"
 #include "JournallingObject.h"
 #include "Song.h"
+#include "AutomationClip.h"
 
 namespace lmms
 {
@@ -67,6 +69,19 @@ void ProjectJournal::undo()
 			jo->restoreState( c.data.content().firstChildElement() );
 			setJournalling( prev );
 			Engine::getSong()->setModified();
+
+			// loading AutomationClip connections correctly
+			QDomNode node = c.data.content().firstChildElement().firstChild();
+			while (!node.isNull())
+			{
+				if (node.isElement() &&
+					node.nodeName() == "automationclip")
+				{
+					AutomationClip::resolveAllIDs();
+					break;
+				}
+				node = node.nextSibling();
+			}	
 			break;
 		}
 	}
@@ -92,6 +107,7 @@ void ProjectJournal::redo()
 			jo->restoreState( c.data.content().firstChildElement() );
 			setJournalling( prev );
 			Engine::getSong()->setModified();
+
 			break;
 		}
 	}
