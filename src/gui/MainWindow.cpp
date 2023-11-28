@@ -226,8 +226,6 @@ MainWindow::MainWindow() :
 	connect( Engine::getSong(), SIGNAL(playbackStateChanged()),
 				this, SLOT(updatePlayPauseIcons()));
 
-	connect(Engine::getSong(), SIGNAL(stopped()), SLOT(onSongStopped()));
-
 	connect(Engine::getSong(), SIGNAL(modified()), SLOT(onSongModified()));
 	connect(Engine::getSong(), SIGNAL(projectFileNameChanged()), SLOT(onProjectFileNameChanged()));
 
@@ -1603,42 +1601,6 @@ void MainWindow::onImportProject()
 		}
 
 		song->setLoadOnLaunch(false);
-	}
-}
-
-void MainWindow::onSongStopped()
-{
-	Song * song = Engine::getSong();
-	Song::PlayPos const & playPos = song->getPlayPos();
-
-	TimeLineWidget * tl = playPos.m_timeLine;
-
-	if( tl )
-	{
-		SongEditorWindow* songEditor = getGUI()->songEditor();
-		switch( tl->behaviourAtStop() )
-		{
-			case TimeLineWidget::BehaviourAtStopState::BackToZero:
-				if( songEditor && ( tl->autoScroll() == TimeLineWidget::AutoScrollState::Enabled ) )
-				{
-					songEditor->m_editor->updatePosition(0);
-				}
-				break;
-
-			case TimeLineWidget::BehaviourAtStopState::BackToStart:
-				if( tl->savedPos() >= 0 )
-				{
-					if(songEditor && ( tl->autoScroll() == TimeLineWidget::AutoScrollState::Enabled ) )
-					{
-						songEditor->m_editor->updatePosition( TimePos(tl->savedPos().getTicks() ) );
-					}
-					tl->savePos( -1 );
-				}
-				break;
-
-			case TimeLineWidget::BehaviourAtStopState::KeepStopPosition:
-				break;
-		}
 	}
 }
 
