@@ -25,13 +25,16 @@
 
 #include "MidiClipView.h"
 
+
 #include <algorithm>
 #include <cmath>
 #include <QApplication>
 #include <QInputDialog>
 #include <QMenu>
 #include <QPainter>
+#include <cmath>
 
+#include "AutomationEditor.h"
 #include "ConfigManager.h"
 #include "DeprecationHelper.h"
 #include "GuiApplication.h"
@@ -85,10 +88,11 @@ void MidiClipView::update()
 
 void MidiClipView::openInPianoRoll()
 {
-	getGUI()->pianoRoll()->setCurrentMidiClip( m_clip );
-	getGUI()->pianoRoll()->parentWidget()->show();
-	getGUI()->pianoRoll()->show();
-	getGUI()->pianoRoll()->setFocus();
+	auto pRoll = getGUI()->pianoRoll();
+	pRoll->setCurrentMidiClip(m_clip);
+	pRoll->parentWidget()->show();
+	pRoll->show();
+	pRoll->setFocus();
 }
 
 
@@ -97,14 +101,21 @@ void MidiClipView::openInPianoRoll()
 
 void MidiClipView::setGhostInPianoRoll()
 {
-	getGUI()->pianoRoll()->setGhostMidiClip( m_clip );
-	getGUI()->pianoRoll()->parentWidget()->show();
-	getGUI()->pianoRoll()->show();
-	getGUI()->pianoRoll()->setFocus();
+	auto pRoll = getGUI()->pianoRoll();
+	pRoll->setGhostMidiClip(m_clip);
+	pRoll->parentWidget()->show();
+	pRoll->show();
+	pRoll->setFocus();
 }
 
-
-
+void MidiClipView::setGhostInAutomationEditor()
+{
+	auto aEditor = getGUI()->automationEditor();
+	aEditor->setGhostMidiClip(m_clip);
+	aEditor->parentWidget()->show();
+	aEditor->show();
+	aEditor->setFocus();
+}
 
 void MidiClipView::resetName() { m_clip->setName(""); }
 
@@ -192,7 +203,13 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 	_cm->insertAction( _cm->actions()[1], b );
 	connect( b, SIGNAL(triggered(bool)),
 					this, SLOT(setGhostInPianoRoll()));
-	_cm->insertSeparator( _cm->actions()[2] );
+
+	auto c = new QAction(embed::getIconPixmap("automation_ghost_note"), tr("Set as ghost in automation editor"), _cm);
+	if (m_clip->empty()) { c->setEnabled(false); }
+	_cm->insertAction(_cm->actions()[2], c);
+	connect(c, &QAction::triggered, this, &MidiClipView::setGhostInAutomationEditor);
+
+	_cm->insertSeparator(_cm->actions()[3]);
 	_cm->addSeparator();
 
 	_cm->addAction( embed::getIconPixmap( "edit_erase" ),

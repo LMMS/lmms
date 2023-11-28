@@ -1635,6 +1635,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 		}
 		detuningClip = n->detuning()->automationClip();
 		connect(detuningClip.data(), SIGNAL(dataChanged()), this, SLOT(update()));
+		getGUI()->automationEditor()->setGhostMidiClip(m_midiClip);
 		getGUI()->automationEditor()->open(detuningClip);
 		return;
 	}
