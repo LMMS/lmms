@@ -109,8 +109,6 @@ public:
 		return m_autoScroll;
 	}
 
-	auto timeline() const -> Timeline& { return *m_timeline; }
-
 	inline void setPixelsPerBar( float ppb )
 	{
 		m_ppb = ppb;
