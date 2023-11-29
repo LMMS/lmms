@@ -275,10 +275,12 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 	else if( event->button() == Qt::RightButton )
 	{
 		m_moveXOff = m_posMarkerPixmap.width() / 2;
-		const TimePos t = m_begin + static_cast<int>(std::max(event->x() - m_xOffset - m_moveXOff, 0) * TimePos::ticksPerBar() / m_ppb);
+
+		const auto cursorXOffset = std::max(event->x() - m_xOffset - m_moveXOff, 0);
+		const TimePos timeAtCursor = m_begin + static_cast<int>(cursorXOffset * TimePos::ticksPerBar() / m_ppb);
 		const TimePos loopMid = (m_timeline->loopBegin() + m_timeline->loopEnd()) / 2;
 
-		m_action = t < loopMid ? Action::MoveLoopBegin : Action::MoveLoopEnd;
+		m_action = timeAtCursor < loopMid ? Action::MoveLoopBegin : Action::MoveLoopEnd;
 	}
 
 	if( m_action == Action::MoveLoopBegin || m_action == Action::MoveLoopEnd )
@@ -297,17 +299,19 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 {
 	parentWidget()->update(); // essential for widgets that this timeline had taken their mouse move event from.
-	TimePos t = m_begin + static_cast<int>(std::max(event->x() - m_xOffset - m_moveXOff, 0) * TimePos::ticksPerBar() / m_ppb);
+
+	const auto cursorXOffset = std::max(event->x() - m_xOffset - m_moveXOff, 0);
+	TimePos timeAtCursor = m_begin + static_cast<int>(cursorXOffset * TimePos::ticksPerBar() / m_ppb);
 
 	switch( m_action )
 	{
 		case Action::MovePositionMarker:
-			m_pos.setTicks(t.getTicks());
-			Engine::getSong()->setToTime(t, m_mode);
+			m_pos.setTicks(timeAtCursor.getTicks());
+			Engine::getSong()->setToTime(timeAtCursor, m_mode);
 			if (!( Engine::getSong()->isPlaying()))
 			{
 				//Song::PlayMode::None is used when nothing is being played.
-				Engine::getSong()->setToTime(t, Song::PlayMode::None);
+				Engine::getSong()->setToTime(timeAtCursor, Song::PlayMode::None);
 			}
 			m_pos.setCurrentFrame( 0 );
 			m_pos.setJumped( true );
@@ -329,19 +333,19 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			}
 			else
 			{
-				t = t.quantize(m_snapSize);
+				timeAtCursor = timeAtCursor.quantize(m_snapSize);
 			}
 			// Catch begin == end
-			if (t == otherPoint)
+			if (timeAtCursor == otherPoint)
 			{
 				const int offset = control ? 1 : m_snapSize * TimePos::ticksPerBar();
-				if (m_action == Action::MoveLoopBegin) { t -= offset; }
-				else { t += offset; }
+				if (m_action == Action::MoveLoopBegin) { timeAtCursor -= offset; }
+				else { timeAtCursor += offset; }
 			}
 			// Update m_action so we still move the correct point even if it is
 			// dragged past the other.
-			m_action = t < otherPoint ? Action::MoveLoopBegin : Action::MoveLoopEnd;
-			m_timeline->setLoopPoints(t, otherPoint);
+			m_action = timeAtCursor < otherPoint ? Action::MoveLoopBegin : Action::MoveLoopEnd;
+			m_timeline->setLoopPoints(timeAtCursor, otherPoint);
 			update();
 			break;
 		}
