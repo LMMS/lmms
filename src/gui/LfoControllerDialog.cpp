@@ -211,16 +211,15 @@ LfoControllerDialog::~LfoControllerDialog()
 
 void LfoControllerDialog::askUserDefWave()
 {
-	auto sampleBuffer = dynamic_cast<LfoController*>(this->model())->m_userDefSampleBuffer;
-	QString fileName = SampleLoader::openWaveformFile();
+	const auto fileName = SampleLoader::openWaveformFile();
+	if (fileName.isEmpty()) { return; }
 
-	if (!fileName.isEmpty())
-	{
-		sampleBuffer = SampleLoader::createBufferFromFile(fileName);
+	auto lfoModel = dynamic_cast<LfoController*>(model());
+	auto& buffer = lfoModel->m_userDefSampleBuffer;
+	buffer = SampleLoader::createBufferFromFile(fileName);
 
-		// TODO:
-		m_userWaveBtn->setToolTip(sampleBuffer->audioFile());
-	}
+	// TODO:
+	m_userWaveBtn->setToolTip(buffer->audioFile());
 }
 
 
