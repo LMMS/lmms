@@ -71,17 +71,10 @@ void ProjectJournal::undo()
 			Engine::getSong()->setModified();
 
 			// loading AutomationClip connections correctly
-			QDomNode node = c.data.content().firstChildElement().firstChild();
-			while (!node.isNull())
+			if (!c.data.content().elementsByTagName("automationtrack").isEmpty())
 			{
-				if (node.isElement() &&
-					node.nodeName() == "automationclip")
-				{
-					AutomationClip::resolveAllIDs();
-					break;
-				}
-				node = node.nextSibling();
-			}	
+				AutomationClip::resolveAllIDs();
+			}
 			break;
 		}
 	}
@@ -107,7 +100,6 @@ void ProjectJournal::redo()
 			jo->restoreState( c.data.content().firstChildElement() );
 			setJournalling( prev );
 			Engine::getSong()->setModified();
-
 			break;
 		}
 	}
