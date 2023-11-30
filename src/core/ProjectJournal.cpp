@@ -71,7 +71,7 @@ void ProjectJournal::undo()
 			Engine::getSong()->setModified();
 
 			// loading AutomationClip connections correctly
-			if (!c.data.content().elementsByTagName("automationtrack").isEmpty())
+			if (!c.data.content().elementsByTagName("automationclip").isEmpty())
 			{
 				AutomationClip::resolveAllIDs();
 			}
