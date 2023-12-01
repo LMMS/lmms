@@ -310,6 +310,8 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	connect(&m_controls->m_lookaheadModel, SIGNAL(dataChanged()), this, SLOT(lookaheadChanged()));
 	connect(&m_controls->m_limiterModel, SIGNAL(dataChanged()), this, SLOT(limiterChanged()));
 
+	guiVisibility = true;
+
 	m_timeElapsed.start();
 
 	peakmodeChanged();
@@ -687,6 +689,59 @@ void CompressorControlDialog::drawGraph()
 	}
 
 	m_p.end();
+}
+
+
+void CompressorControlDialog::mouseDoubleClickEvent(QMouseEvent * event)
+{
+	setAllGuiVisible(!getGuiVisibility());
+}
+
+
+void CompressorControlDialog::setAllGuiVisible(bool isVisible)
+{
+	m_controlsBoxLabel->setVisible(isVisible);
+	m_rmsEnabledLabel->setVisible(isVisible);
+	m_blendEnabledLabel->setVisible(isVisible);
+	m_lookaheadEnabledLabel->setVisible(isVisible);
+	m_ratioEnabledLabel->setVisible(isVisible);
+	m_thresholdKnob->setVisible(isVisible);
+	m_ratioKnob->setVisible(isVisible);
+	m_attackKnob->setVisible(isVisible);
+	m_releaseKnob->setVisible(isVisible);
+	m_kneeKnob->setVisible(isVisible);
+	m_rangeKnob->setVisible(isVisible);
+	m_lookaheadLengthKnob->setVisible(isVisible);
+	m_holdKnob->setVisible(isVisible);
+	m_rmsKnob->setVisible(isVisible);
+	m_inBalanceKnob->setVisible(isVisible);
+	m_outBalanceKnob->setVisible(isVisible);
+	m_stereoBalanceKnob->setVisible(isVisible);
+	m_blendKnob->setVisible(isVisible);
+	m_tiltKnob->setVisible(isVisible);
+	m_tiltFreqKnob->setVisible(isVisible);
+	m_mixKnob->setVisible(isVisible);
+	m_autoAttackKnob->setVisible(isVisible);
+	m_autoReleaseKnob->setVisible(isVisible);
+	m_outFader->setVisible(isVisible);
+	m_inFader->setVisible(isVisible);
+	rmsButton->setVisible(isVisible);
+	peakButton->setVisible(isVisible);
+	rmsPeakGroup->setVisible(isVisible);
+	leftRightButton->setVisible(isVisible);
+	midSideButton->setVisible(isVisible);
+	compressButton->setVisible(isVisible);
+	limitButton->setVisible(isVisible);
+	unlinkedButton->setVisible(isVisible);
+	maximumButton->setVisible(isVisible);
+	averageButton->setVisible(isVisible);
+	minimumButton->setVisible(isVisible);
+	blendButton->setVisible(isVisible);
+	autoMakeupButton->setVisible(isVisible);
+	auditionButton->setVisible(isVisible);
+	feedbackButton->setVisible(isVisible);
+	lookaheadButton->setVisible(isVisible);
+	guiVisibility = isVisible;
 }
 
 
