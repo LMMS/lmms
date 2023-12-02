@@ -310,8 +310,6 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	connect(&m_controls->m_lookaheadModel, SIGNAL(dataChanged()), this, SLOT(lookaheadChanged()));
 	connect(&m_controls->m_limiterModel, SIGNAL(dataChanged()), this, SLOT(limiterChanged()));
 
-	guiVisibility = true;
-
 	m_timeElapsed.start();
 
 	peakmodeChanged();
@@ -692,13 +690,13 @@ void CompressorControlDialog::drawGraph()
 }
 
 
-void CompressorControlDialog::mouseDoubleClickEvent(QMouseEvent * event)
+void CompressorControlDialog::mouseDoubleClickEvent(QMouseEvent* event)
 {
-	setAllGuiVisible(!getGuiVisibility());
+	setGuiVisibility(!m_guiVisibility);
 }
 
 
-void CompressorControlDialog::setAllGuiVisible(bool isVisible)
+void CompressorControlDialog::setGuiVisibility(bool isVisible)
 {
 	m_controlsBoxLabel->setVisible(isVisible);
 	m_rmsEnabledLabel->setVisible(isVisible);
@@ -741,7 +739,7 @@ void CompressorControlDialog::setAllGuiVisible(bool isVisible)
 	auditionButton->setVisible(isVisible);
 	feedbackButton->setVisible(isVisible);
 	lookaheadButton->setVisible(isVisible);
-	guiVisibility = isVisible;
+	m_guiVisibility = isVisible;
 }
 
 

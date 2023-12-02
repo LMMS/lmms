@@ -108,12 +108,8 @@ private:
 	void drawKneePixmap2();
 	void drawMiscPixmap();
 	void drawGraph();
-	void mouseDoubleClickEvent(QMouseEvent *event) override;
-	inline bool getGuiVisibility()
-	{
-		return guiVisibility;
-	}
-	void setAllGuiVisible(bool isVisible);
+	void mouseDoubleClickEvent(QMouseEvent* event) override;
+	void setGuiVisibility(bool isVisible);
 
 	QPainter m_p;
 
@@ -220,7 +216,7 @@ private:
 	PixmapButton * feedbackButton;
 	PixmapButton * lookaheadButton;
 
-	bool guiVisibility;
+	bool m_guiVisibility = true;
 
 	QElapsedTimer m_timeElapsed;
 	int m_timeSinceLastUpdate = 0;
