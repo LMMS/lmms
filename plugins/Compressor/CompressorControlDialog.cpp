@@ -698,24 +698,44 @@ void CompressorControlDialog::mouseDoubleClickEvent(QMouseEvent* event)
 
 void CompressorControlDialog::setGuiVisibility(bool isVisible)
 {
+	if (!isVisible)
+	{
+		m_rmsKnob->setVisible(isVisible);
+		m_rmsEnabledLabel->setVisible(isVisible);
+
+		m_lookaheadLengthKnob->setVisible(isVisible);
+		m_lookaheadEnabledLabel->setVisible(isVisible);
+
+		m_blendKnob->setVisible(isVisible);
+		m_blendEnabledLabel->setVisible(isVisible);
+
+		m_ratioKnob->setVisible(isVisible);
+		m_ratioEnabledLabel->setVisible(isVisible);
+	}
+	else
+	{
+		m_rmsKnob->setVisible(!m_controls->m_peakmodeModel.value());
+		m_rmsEnabledLabel->setVisible(!m_controls->m_peakmodeModel.value());
+
+		m_blendKnob->setVisible(m_controls->m_stereoLinkModel.value() == 4);
+		m_blendEnabledLabel->setVisible(m_controls->m_stereoLinkModel.value() == 4);
+
+		m_lookaheadLengthKnob->setVisible(m_controls->m_lookaheadModel.value());
+		m_lookaheadEnabledLabel->setVisible(m_controls->m_lookaheadModel.value());
+
+		m_ratioKnob->setVisible(!m_controls->m_limiterModel.value());
+		m_ratioEnabledLabel->setVisible(!m_controls->m_limiterModel.value());
+	}
 	m_controlsBoxLabel->setVisible(isVisible);
-	m_rmsEnabledLabel->setVisible(isVisible);
-	m_blendEnabledLabel->setVisible(isVisible);
-	m_lookaheadEnabledLabel->setVisible(isVisible);
-	m_ratioEnabledLabel->setVisible(isVisible);
 	m_thresholdKnob->setVisible(isVisible);
-	m_ratioKnob->setVisible(isVisible);
 	m_attackKnob->setVisible(isVisible);
 	m_releaseKnob->setVisible(isVisible);
 	m_kneeKnob->setVisible(isVisible);
 	m_rangeKnob->setVisible(isVisible);
-	m_lookaheadLengthKnob->setVisible(isVisible);
 	m_holdKnob->setVisible(isVisible);
-	m_rmsKnob->setVisible(isVisible);
 	m_inBalanceKnob->setVisible(isVisible);
 	m_outBalanceKnob->setVisible(isVisible);
 	m_stereoBalanceKnob->setVisible(isVisible);
-	m_blendKnob->setVisible(isVisible);
 	m_tiltKnob->setVisible(isVisible);
 	m_tiltFreqKnob->setVisible(isVisible);
 	m_mixKnob->setVisible(isVisible);
