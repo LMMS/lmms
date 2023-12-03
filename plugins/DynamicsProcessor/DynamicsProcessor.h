@@ -65,6 +65,7 @@ private:
 	bool m_needsUpdate;
 	
 	RmsHelper * m_rms [2];
+	double m_smoothRms[2];
 
 	friend class DynProcControls;
 

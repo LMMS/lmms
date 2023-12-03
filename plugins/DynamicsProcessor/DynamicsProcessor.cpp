@@ -64,8 +64,10 @@ DynProcEffect::DynProcEffect( Model * _parent,
 	m_dpControls( this )
 {
 	m_currentPeak[0] = m_currentPeak[1] = DYN_NOISE_FLOOR;
-	m_rms[0] = new RmsHelper( 64 * Engine::audioEngine()->processingSampleRate() / 44100 );
-	m_rms[1] = new RmsHelper( 64 * Engine::audioEngine()->processingSampleRate() / 44100 );
+	m_rms[0] = new RmsHelper(256 * Engine::audioEngine()->processingSampleRate() / 44100);
+	m_rms[1] = new RmsHelper(256 * Engine::audioEngine()->processingSampleRate() / 44100);
+	m_smoothRms[0] = 0;
+	m_smoothRms[1] = 0;
 	calcAttack();
 	calcRelease();
 }
@@ -123,8 +125,8 @@ bool DynProcEffect::processAudioBuffer( sampleFrame * _buf,
 
 	if( m_needsUpdate )
 	{
-		m_rms[0]->setSize( 64 * Engine::audioEngine()->processingSampleRate() / 44100 );
-		m_rms[1]->setSize( 64 * Engine::audioEngine()->processingSampleRate() / 44100 );
+		m_rms[0]->setSize(256 * Engine::audioEngine()->processingSampleRate() / 44100);
+		m_rms[1]->setSize(256 * Engine::audioEngine()->processingSampleRate() / 44100);
 		calcAttack();
 		calcRelease();
 		m_needsUpdate = false;
@@ -153,14 +155,17 @@ bool DynProcEffect::processAudioBuffer( sampleFrame * _buf,
 		for ( i=0; i <= 1; i++ )
 		{
 			const double t = m_rms[i]->update( s[i] );
+			// smoothing "t" to filter unwanted noise
+			const double dif = qMin(std::abs(t-m_smoothRms[i])*0.1, 0.05);
+			m_smoothRms[i] = m_smoothRms[i] * (1-dif) + t * dif;
 			if( t > m_currentPeak[i] )
 			{
-				m_currentPeak[i] = qMin( m_currentPeak[i] * m_attCoeff, t );
+				m_currentPeak[i] = qMin(m_currentPeak[i] * m_attCoeff, m_smoothRms[i]);
 			}
 			else
 			if( t < m_currentPeak[i] )
 			{
-				m_currentPeak[i] = qMax( m_currentPeak[i] * m_relCoeff, t );
+				m_currentPeak[i] = qMax(m_currentPeak[i] * m_relCoeff, m_smoothRms[i]);
 			}
 
 			m_currentPeak[i] = qBound( DYN_NOISE_FLOOR, m_currentPeak[i], 10.0f );
