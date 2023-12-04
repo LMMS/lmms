@@ -87,7 +87,6 @@ jobs:
               wget                                       \
               file                                       \
               libwine-dev                                \
-              libwine-dev:i386                           \
               wine64-tools                               \
           && sudo rm -rf /var/lib/apt/lists/*
       - name: Cache ccache data
