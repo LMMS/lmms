@@ -78,7 +78,7 @@ public:
 
 	static auto clapGuiApi() -> const char*;
 
-	static auto debugging() -> bool { return s_debug; }
+	static auto debugging() { return s_debugging; }
 
 private:
 
@@ -99,7 +99,7 @@ private:
 	std::unordered_map<std::string, std::weak_ptr<const ClapPluginInfo>> m_uriToPluginInfo; //!< Non-owning map of plugin URIs (IDs) to ClapPluginInfo
 	//std::vector<std::weak_ptr<ClapInstance>> m_instances; //!< Vector of all CLAP plugin instances (for guaranteeing correct clean-up order)
 
-	static bool s_debug; //!< If LMMS_CLAP_DEBUG is set, debug output will be printed
+	static inline bool s_debugging = false; //!< If LMMS_CLAP_DEBUG is set, debug output will be printed
 };
 
 

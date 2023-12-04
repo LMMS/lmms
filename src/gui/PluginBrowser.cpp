@@ -36,6 +36,7 @@
 #include "embed.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
+#include "Instrument.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "TrackContainerView.h"
@@ -307,8 +308,17 @@ void PluginDescWidget::openInNewInstrumentTrack(QString value)
 {
 	TrackContainer* tc = Engine::getSong();
 	auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, tc));
-	auto ilt = new InstrumentLoaderThread(this, it, value);
-	ilt->start();
+
+	if (value == "clapinstrument")
+	{
+		// Special case for CLAP, since CLAP API requires plugin to load on main thread
+		it->loadInstrument(value, nullptr, true /*always DnD*/);
+	}
+	else
+	{
+		auto ilt = new InstrumentLoaderThread(this, it, value);
+		ilt->start();
+	}
 }
 
 

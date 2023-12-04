@@ -39,9 +39,8 @@ namespace lmms
 ////////////////////////////////
 
 ClapFile::ClapFile(std::filesystem::path filename)
-	: m_filename{std::move(filename)}
+	: m_filename{std::move(filename.make_preferred())}
 {
-	m_filename.make_preferred();
 }
 
 ClapFile::ClapFile(ClapFile&& other) noexcept
@@ -115,7 +114,7 @@ auto ClapFile::load() -> bool
 
 	m_pluginCount = m_factory->get_plugin_count(m_factory);
 	if (ClapManager::debugging()) { qDebug() << "plugin count:" << m_pluginCount; }
-	if (m_pluginCount <= 0)
+	if (m_pluginCount == 0)
 	{
 		qWarning().nospace() << "CLAP file '" << filename().c_str() << "' contains no plugins";
 		return false;

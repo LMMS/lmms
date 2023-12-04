@@ -27,6 +27,8 @@
 #ifdef LMMS_HAVE_CLAP
 
 #include <algorithm>
+#include <cassert>
+
 #include <QDebug>
 #include <QtGlobal>
 #include <QThread>
@@ -43,24 +45,14 @@ namespace lmms
 ClapControlBase::ClapControlBase(Model* that, const QString& uri)
 {
 	qDebug() << "ClapControlBase::ClapControlBase";
-
-	if (QThread::currentThread() == QCoreApplication::instance()->thread())
-	{
-		// On main thread - can start ClapInstance normally
-		init(that, uri);
-	}
-	else
-	{
-		// Not on main thread - need to invoke on main thread
-
-		// TODO: Temporarily commented out to see if it builds
-		//static_assert(QT_VERSION >= QT_VERSION_CHECK(5, 10, 0), "");
-		//QMetaObject::invokeMethod(QCoreApplication::instance(), [&]{ init(that, uri); }, Qt::BlockingQueuedConnection);
-	}
+	init(that, uri);
 }
 
 void ClapControlBase::init(Model* that, const QString& uri)
 {
+	// CLAP API requires main thread for plugin loading
+	assert(QThread::currentThread() == QCoreApplication::instance()->thread());
+
 	m_valid = false;
 	auto manager = Engine::getClapManager();
 	m_info = manager->pluginInfo(uri).lock().get();

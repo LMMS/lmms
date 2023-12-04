@@ -66,15 +66,13 @@ namespace
 #endif
 		return std::filesystem::path{dir};
 	}
-}
-
-bool ClapManager::s_debug = false;
+} // namespace
 
 ClapManager::ClapManager()
 {
-	const char* dbgStr = std::getenv("LMMS_CLAP_DEBUG");
-	s_debug = (dbgStr && *dbgStr);
-	if (s_debug) { qDebug() << "CLAP host debugging enabled"; }
+	const char* debug = std::getenv("LMMS_CLAP_DEBUG");
+	s_debugging = debug && *debug;
+	if (s_debugging) { qDebug() << "CLAP host debugging enabled"; }
 }
 
 ClapManager::~ClapManager()
