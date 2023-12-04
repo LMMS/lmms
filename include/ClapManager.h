@@ -33,11 +33,11 @@
 #include "ClapInstance.h"
 
 #include <vector>
+#include <unordered_set>
 #include <string_view>
 #include <memory>
 
 #include <QString>
-#include <clap/clap.h>
 
 namespace lmms
 {
@@ -86,12 +86,12 @@ private:
 	void findSearchPaths();
 
 	//! Returns search paths found by prior call to findSearchPaths()
-	auto getSearchPaths() const -> const std::vector<std::filesystem::path>& { return m_searchPaths; }
+	auto searchPaths() const -> const auto& { return m_searchPaths; }
 
 	//! Finds and loads all .clap files in the provided search paths @p searchPaths
-	void loadClapFiles(const std::vector<std::filesystem::path>& searchPaths);
+	void loadClapFiles(const std::unordered_set<std::filesystem::path>& searchPaths);
 
-	std::vector<std::filesystem::path> m_searchPaths; //!< Owns all CLAP search paths; Populated by findSearchPaths()
+	std::unordered_set<std::filesystem::path> m_searchPaths; //!< Owns all CLAP search paths; Populated by findSearchPaths()
 	std::vector<ClapFile> m_files; //!< Owns all loaded .clap files; Populated by loadClapFiles()
 
 	// Non-owning plugin caches (for fast iteration/lookup)
