@@ -27,8 +27,6 @@
 
 #include "AutomationEditor.h"
 
-#include <cmath>
-
 #include <QApplication>
 #include <QInputDialog>
 #include <QKeyEvent>
@@ -38,6 +36,9 @@
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QToolTip>
+#include <cmath>
+
+#include "SampleClip.h"
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -46,33 +47,27 @@
 #include "ActionGroup.h"
 #include "AutomationNode.h"
 #include "ComboBox.h"
-#include "debug.h"
 #include "DeprecationHelper.h"
-#include "embed.h"
+#include "DetuningHelper.h"
 #include "Engine.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
 #include "Knob.h"
 #include "MainWindow.h"
+#include "MidiClip.h"
 #include "PatternStore.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
+#include "SampleBuffer.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
+#include "debug.h"
+#include "embed.h"
+#include "gui_templates.h"
 
 
 namespace lmms::gui
 {
-
-QPixmap * AutomationEditor::s_toolDraw = nullptr;
-QPixmap * AutomationEditor::s_toolErase = nullptr;
-QPixmap * AutomationEditor::s_toolDrawOut = nullptr;
-QPixmap * AutomationEditor::s_toolEditTangents = nullptr;
-QPixmap * AutomationEditor::s_toolMove = nullptr;
-QPixmap * AutomationEditor::s_toolYFlip = nullptr;
-QPixmap * AutomationEditor::s_toolXFlip = nullptr;
-
 const std::array<float, 7> AutomationEditor::m_zoomXLevels =
 		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f };
 
@@ -110,7 +105,8 @@ AutomationEditor::AutomationEditor() :
 	m_nodeTangentLineColor(0, 0, 0),
 	m_scaleColor(Qt::SolidPattern),
 	m_crossColor(0, 0, 0),
-	m_backgroundShade(0, 0, 0)
+	m_backgroundShade(0, 0, 0),
+	m_ghostNoteColor(0, 0, 0)
 {
 	connect( this, SIGNAL(currentClipChanged()),
 				this, SLOT(updateAfterClipChange()),
@@ -135,17 +131,6 @@ AutomationEditor::AutomationEditor() :
 					this, SLOT(setQuantization()));
 	m_quantizeModel.setValue( m_quantizeModel.findText( "1/8" ) );
 
-	if (s_toolYFlip == nullptr)
-	{
-		s_toolYFlip = new QPixmap( embed::getIconPixmap(
-							"flip_y" ) );
-	}
-	if (s_toolXFlip == nullptr)
-	{
-		s_toolXFlip = new QPixmap( embed::getIconPixmap(
-							"flip_x" ) );
-	}
-
 	// add time-line
 	m_timeLine = new TimeLineWidget( VALUES_WIDTH, 0, m_ppb,
 				Engine::getSong()->getPlayPos(
@@ -168,28 +153,6 @@ AutomationEditor::AutomationEditor() :
 	m_topBottomScroll->setPageStep( 20 );
 	connect( m_topBottomScroll, SIGNAL(valueChanged(int)), this,
 						SLOT(verScrolled(int)));
-
-	// init pixmaps
-	if (s_toolDraw == nullptr)
-	{
-		s_toolDraw = new QPixmap(embed::getIconPixmap("edit_draw"));
-	}
-	if (s_toolErase == nullptr)
-	{
-		s_toolErase= new QPixmap(embed::getIconPixmap("edit_erase"));
-	}
-	if (s_toolDrawOut == nullptr)
-	{
-		s_toolDrawOut = new QPixmap(embed::getIconPixmap("edit_draw_outvalue"));
-	}
-	if (s_toolEditTangents == nullptr)
-	{
-		s_toolEditTangents = new QPixmap(embed::getIconPixmap("edit_tangent"));
-	}
-	if (s_toolMove == nullptr)
-	{
-		s_toolMove = new QPixmap(embed::getIconPixmap("edit_move"));
-	}
 
 	setCurrentClip(nullptr);
 
@@ -1074,8 +1037,19 @@ inline void AutomationEditor::drawAutomationTangents(QPainter& p, timeMap::itera
 	p.drawEllipse(tx - 3, ty - 3, 6, 6);
 }
 
+void AutomationEditor::setGhostMidiClip(MidiClip* newMidiClip)
+{
+	// Expects a pointer to a MIDI clip or nullptr.
+	m_ghostNotes = newMidiClip;
+	m_renderSample = false;
+}
 
-
+void AutomationEditor::setGhostSample(SampleClip* newGhostSample)
+{
+	// Expects a pointer to a Sample buffer or nullptr.
+	m_ghostSample = newGhostSample;
+	m_renderSample = true;
+}
 
 void AutomationEditor::paintEvent(QPaintEvent * pe )
 {
@@ -1261,6 +1235,81 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			p.drawLine( x, grid_bottom, x, x_line_end );
 		}
 
+		// draw ghost sample
+		if (m_ghostSample != nullptr && m_ghostSample->sampleBuffer()->frames() > 1 && m_renderSample)
+		{
+			int sampleFrames = m_ghostSample->sampleBuffer()->frames();
+			int length = static_cast<float>(sampleFrames) / Engine::framesPerTick();
+			int editorHeight = grid_bottom - TOP_MARGIN;
+
+			int startPos = xCoordOfTick(0);
+			int sampleWidth = xCoordOfTick(length) - startPos;
+			int sampleHeight = std::min(editorHeight - SAMPLE_MARGIN, MAX_SAMPLE_HEIGHT);
+			int yOffset = (editorHeight - sampleHeight) / 2.0f + TOP_MARGIN;
+
+			p.setPen(m_ghostSampleColor);
+			m_ghostSample->sampleBuffer()->visualize(p, QRect(startPos, yOffset, sampleWidth, sampleHeight), 0, sampleFrames);
+		}
+
+		// draw ghost notes
+		if (m_ghostNotes != nullptr && !m_renderSample)
+		{
+			const NoteVector& notes = m_ghostNotes->notes();
+			int minKey = 128;
+			int maxKey = 0;
+			int detuningOffset = 0;
+			const Note* detuningNote = nullptr;
+
+			for (const Note* note : notes)
+			{
+				int noteKey = note->key();
+
+				if (note->detuning()->automationClip() == m_clip) {
+					detuningOffset = note->pos();
+					detuningNote = note;
+				}
+
+				maxKey = std::max(maxKey, noteKey);
+				minKey = std::min(minKey, noteKey);
+			}
+
+			for (const Note* note : notes)
+			{
+				int lenTicks = note->length();
+				int notePos = note->pos();
+
+				// offset note if detuning
+				if (notePos+lenTicks < detuningOffset) { continue; }
+				notePos -= detuningOffset;
+
+				// remove/change after #5902
+				if (lenTicks == 0) { continue; }
+				else if (lenTicks < 0) { lenTicks = 4; }
+
+				int note_width = lenTicks * m_ppb / TimePos::ticksPerBar();
+				int keyRange = maxKey - minKey;
+
+				if (keyRange < MIN_NOTE_RANGE) 
+				{
+					int padding = (MIN_NOTE_RANGE - keyRange) / 2.0f;
+					maxKey += padding;
+					minKey -= padding;
+					keyRange = MIN_NOTE_RANGE;
+				}
+
+				float absNoteHeight = static_cast<float>(note->key() - minKey) / (maxKey - minKey);
+				int graphHeight = grid_bottom - NOTE_HEIGHT - NOTE_MARGIN - TOP_MARGIN;
+				const int y = (graphHeight - graphHeight * absNoteHeight) + NOTE_HEIGHT / 2.0f + TOP_MARGIN;
+				const int x = xCoordOfTick(notePos);
+
+				if (note == detuningNote) {
+					p.fillRect(x, y, note_width, NOTE_HEIGHT, m_detuningNoteColor);
+				} else {
+					p.fillRect(x, y, note_width, NOTE_HEIGHT, m_ghostNoteColor);
+				}
+			}
+		}
+
 		// and finally bars
 		for( tick = m_currentPosition - m_currentPosition % TimePos::ticksPerBar(),
 				 x = xCoordOfTick( tick );
@@ -1400,26 +1449,26 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	{
 		case EditMode::Draw:
 		{
-			if (m_action == Action::EraseValues) { cursor = s_toolErase; }
-			else if (m_action == Action::MoveValue) { cursor = s_toolMove; }
-			else { cursor = s_toolDraw; }
+			if (m_action == Action::EraseValues) { cursor = &m_toolErase; }
+			else if (m_action == Action::MoveValue) { cursor = &m_toolMove; }
+			else { cursor = &m_toolDraw; }
 			break;
 		}
 		case EditMode::Erase:
 		{
-			cursor = s_toolErase;
+			cursor = &m_toolErase;
 			break;
 		}
 		case EditMode::DrawOutValues:
 		{
-			if (m_action == Action::ResetOutValues) { cursor = s_toolErase; }
-			else if (m_action == Action::MoveOutValue) { cursor = s_toolMove; }
-			else { cursor = s_toolDrawOut; }
+			if (m_action == Action::ResetOutValues) { cursor = &m_toolErase; }
+			else if (m_action == Action::MoveOutValue) { cursor = &m_toolMove; }
+			else { cursor = &m_toolDrawOut; }
 			break;
 		}
 		case EditMode::EditTangents:
 		{
-			cursor = m_action == Action::MoveTangent ? s_toolMove : s_toolEditTangents;
+			cursor = m_action == Action::MoveTangent ? &m_toolMove : &m_toolEditTangents;
 			break;
 		}
 	}
@@ -2159,8 +2208,18 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	quantizationActionsToolBar->addWidget( quantize_lbl );
 	quantizationActionsToolBar->addWidget( m_quantizeComboBox );
 
+	m_resetGhostNotes = new QPushButton(m_toolBar);
+	m_resetGhostNotes->setIcon(embed::getIconPixmap("clear_ghost_note"));
+	m_resetGhostNotes->setToolTip(tr("Clear ghost notes"));
+	m_resetGhostNotes->setEnabled(true);
+
+	connect(m_resetGhostNotes, &QPushButton::pressed, m_editor, &AutomationEditor::resetGhostNotes);
+
+	quantizationActionsToolBar->addSeparator();
+	quantizationActionsToolBar->addWidget(m_resetGhostNotes);
+
 	// Setup our actual window
-	setFocusPolicy( Qt::StrongFocus );
+	setFocusPolicy(Qt::StrongFocus);
 	setFocus();
 	setWindowIcon( embed::getIconPixmap( "automation" ) );
 	setAcceptDrops( true );

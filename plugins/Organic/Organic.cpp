@@ -60,7 +60,6 @@ Plugin::Descriptor PLUGIN_EXPORT organic_plugin_descriptor =
 
 }
 
-QPixmap * gui::OrganicInstrumentView::s_artwork = nullptr;
 float * OrganicInstrument::s_harmonics = nullptr;
 
 /***********************************************************************
@@ -420,8 +419,8 @@ OrganicInstrumentView::OrganicInstrumentView( Instrument * _instrument,
 
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
-								"artwork" ) );
+	static auto s_artwork = PLUGIN_NAME::getIconPixmap("artwork");
+	pal.setBrush(backgroundRole(), s_artwork);
 	setPalette( pal );
 
 	// setup knob for FX1
@@ -450,12 +449,6 @@ OrganicInstrumentView::OrganicInstrumentView( Instrument * _instrument,
 	connect( m_randBtn, SIGNAL ( clicked() ),
 					oi, SLOT( randomiseSettings() ) );
 
-
-	if( s_artwork == nullptr )
-	{
-		s_artwork = new QPixmap( PLUGIN_NAME::getIconPixmap(
-								"artwork" ) );
-	}
 
 }
 

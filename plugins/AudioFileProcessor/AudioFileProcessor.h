@@ -145,7 +145,6 @@ protected:
 private:
 	virtual void modelChanged();
 
-	static QPixmap * s_artwork;
 
 	AudioFileProcessorWaveView * m_waveView;
 	Knob * m_ampKnob;

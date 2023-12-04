@@ -44,8 +44,6 @@
 namespace lmms::gui
 {
 
-QPixmap * AutomationClipView::s_clip_rec = nullptr;
-
 AutomationClipView::AutomationClipView( AutomationClip * _clip,
 						TrackView * _parent ) :
 	ClipView( _clip, _parent ),
@@ -61,10 +59,6 @@ AutomationClipView::AutomationClipView( AutomationClip * _clip,
 
 	setToolTip(m_clip->name());
 	setStyle( QApplication::style() );
-
-	if( s_clip_rec == nullptr ) { s_clip_rec = new QPixmap( embed::getIconPixmap(
-							"clip_rec" ) ); }
-
 	update();
 }
 
@@ -379,7 +373,8 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 	// recording icon for when recording automation
 	if( m_clip->isRecording() )
 	{
-		p.drawPixmap( 1, rect().bottom() - s_clip_rec->height(), *s_clip_rec );
+		static auto s_clipRec = embed::getIconPixmap("clip_rec");
+		p.drawPixmap(1, rect().bottom() - s_clipRec.height(), s_clipRec);
 	}
 
 	// clip name

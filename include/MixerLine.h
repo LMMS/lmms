@@ -94,8 +94,6 @@ private:
 	QColor m_strokeOuterInactive;
 	QColor m_strokeInnerActive;
 	QColor m_strokeInnerInactive;
-	static QPixmap * s_sendBgArrow;
-	static QPixmap * s_receiveBgArrow;
 	bool m_inRename;
 	QLineEdit * m_renameLineEdit;
 	QGraphicsView * m_view;

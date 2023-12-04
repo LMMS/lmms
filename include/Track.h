@@ -32,6 +32,7 @@
 #include "AutomatableModel.h"
 #include "JournallingObject.h"
 #include "lmms_basics.h"
+#include <optional>
 
 
 namespace lmms
@@ -188,15 +189,9 @@ public:
 	{
 		return m_processingLock.tryLock();
 	}
-	
-	QColor color()
-	{
-		return m_color;
-	}
-	bool useColor()
-	{
-		return m_hasColor;
-	}
+
+	auto color() const -> const std::optional<QColor>& { return m_color; }
+	void setColor(const std::optional<QColor>& color);
 
 	bool isMutedBeforeSolo() const
 	{
@@ -219,9 +214,6 @@ public slots:
 
 	void toggleSolo();
 
-	void setColor(const QColor& c);
-	void resetColor();
-
 private:
 	TrackContainer* m_trackContainer;
 	Type m_type;
@@ -241,8 +233,7 @@ private:
 
 	QMutex m_processingLock;
 	
-	QColor m_color;
-	bool m_hasColor;
+	std::optional<QColor> m_color;
 
 	friend class gui::TrackView;
 

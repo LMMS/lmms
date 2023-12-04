@@ -451,19 +451,12 @@ namespace gui
 {
 
 
-QPixmap * AudioFileProcessorView::s_artwork = nullptr;
 
 
 AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 							QWidget * _parent ) :
 	InstrumentViewFixedSize( _instrument, _parent )
 {
-	if( s_artwork == nullptr )
-	{
-		s_artwork = new QPixmap( PLUGIN_NAME::getIconPixmap(
-								"artwork" ) );
-	}
-
 	m_openAudioFileButton = new PixmapButton( this );
 	m_openAudioFileButton->setCursor( QCursor( Qt::PointingHandCursor ) );
 	m_openAudioFileButton->move( 227, 72 );
@@ -649,7 +642,8 @@ void AudioFileProcessorView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
-	p.drawPixmap( 0, 0, *s_artwork );
+	static auto s_artwork = PLUGIN_NAME::getIconPixmap("artwork");
+	p.drawPixmap(0, 0, s_artwork);
 
 	auto a = castModel<AudioFileProcessor>();
 
@@ -1175,14 +1169,19 @@ void AudioFileProcessorWaveView::slideSampleByFrames( f_cnt_t _frames )
 		return;
 	}
 	const double v = static_cast<double>( _frames ) / m_sampleBuffer.frames();
-	if( m_startKnob ) {
-		m_startKnob->slideBy( v, false );
+	// update knobs in the right order
+	// to avoid them clamping each other
+	if (v < 0)
+	{
+		m_startKnob->slideBy(v, false);
+		m_loopKnob->slideBy(v, false);
+		m_endKnob->slideBy(v, false);
 	}
-	if( m_endKnob ) {
-		m_endKnob->slideBy( v, false );
-	}
-	if( m_loopKnob ) {
-		m_loopKnob->slideBy( v, false );
+	else
+	{
+		m_endKnob->slideBy(v, false);
+		m_loopKnob->slideBy(v, false);
+		m_startKnob->slideBy(v, false);
 	}
 }
 

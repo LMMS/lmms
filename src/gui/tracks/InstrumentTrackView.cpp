@@ -227,7 +227,7 @@ void InstrumentTrackView::createMixerLine()
 	auto channel = Engine::mixer()->mixerChannel(channelIndex);
 
 	channel->m_name = getTrack()->name();
-	if (getTrack()->useColor()) { channel->setColor (getTrack()->color()); }
+	channel->setColor(getTrack()->color());
 
 	assignMixerLine(channelIndex);
 }

@@ -68,6 +68,8 @@ public:
 	void setActiveColor( const QBrush & b );
 	void setTextShadowColor( const QColor &c );
 	void setBorderColor( const QColor &c );
+	int titleBarHeight() const;
+	int frameWidth() const;
 
 protected:
 	// hook the QWidget move/resize events to update the tracked geometry

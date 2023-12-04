@@ -33,6 +33,10 @@ lmms--gui--AutomationEditor {
 	qproperty-scaleColor: qlineargradient(spread:reflect,
                      x1:0, y1:0.5, x2:1, y2:0.5,
                      stop:0 #333, stop:1 #202020);
+	
+	qproperty-ghostNoteColor: rgba(248, 248, 255, 125);
+	qproperty-detuningNoteColor: rgba(248, 11, 11, 125);
+	qproperty-ghostSampleColor: rgba(125, 125, 125, 125);
 }
 
 /* text box */
@@ -143,6 +147,7 @@ lmms--gui--PianoRoll {
 	qproperty-backgroundShade: rgba( 255, 255, 255, 10 );
 	qproperty-noteModeColor: rgb( 255, 255, 255 );
 	qproperty-noteColor: rgb( 119, 199, 216 );
+	qproperty-stepNoteColor: #9b1313;
 	qproperty-noteTextColor: rgb( 255, 255, 255 );
 	qproperty-noteOpacity: 128;
 	qproperty-noteBorders: true; /* boolean property, set false to have borderless notes */
@@ -897,6 +902,14 @@ lmms--gui--SidInstrumentView lmms--gui--Knob {
 	qproperty-innerRadius: 2;
 	qproperty-outerRadius: 7;
 	qproperty-lineWidth: 2;
+}
+
+lmms--gui--SlicerTView lmms--gui--Knob {
+	color: rgb(162, 128, 226);
+	qproperty-outerColor: rgb( 162, 128, 226 );
+	qproperty-innerRadius: 1;
+	qproperty-outerRadius: 11;
+	qproperty-lineWidth: 3;
 }
 
 lmms--gui--WatsynView lmms--gui--Knob {
