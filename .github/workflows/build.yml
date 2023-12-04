@@ -24,72 +24,72 @@ jobs:
           submodules: recursive
       - name: Install dependencies - part 1
         run: |
-          apt-get update && apt-get install -y    \
-          --no-install-recommends                 \
-          ca-certificates                         \
-          software-properties-common              \
-          make                                    \
-          libc6-dev                               \
-          cmake                                   \
-          git                                     \
-          ssh-client                              \
-          ccache                                  \
-          perl                                    \
-          libxml2-utils                           \
-          libxml-perl                             \
-          liblist-moreutils-perl                  \
-          && rm -rf /var/lib/apt/lists/*
+          sudo apt-get update && sudo apt-get install -y \
+              --no-install-recommends                    \
+              ca-certificates                            \
+              software-properties-common                 \
+              make                                       \
+              libc6-dev                                  \
+              cmake                                      \
+              git                                        \
+              ssh-client                                 \
+              ccache                                     \
+              perl                                       \
+              libxml2-utils                              \
+              libxml-perl                                \
+              liblist-moreutils-perl                     \
+          && sudo rm -rf /var/lib/apt/lists/*
       - name: Install dependencies - part 2
         run: |
-          apt-get update && apt-get install -y    \
-          qt5-default qttools5-dev-tools          \
-          && rm -rf /var/lib/apt/lists/*
+          sudo apt-get update && sudo apt-get install -y \
+              qt5-default qttools5-dev-tools             \
+          && sudo rm -rf /var/lib/apt/lists/*
       - name: Install dependencies - part 3
         run: |
-          dpkg --add-architecture i386
-          apt-get update -qq &&       \
-          apt-get install -y          \
-          --no-install-recommends     \
-              ccache                  \
-              fluid                   \
-              libasound2-dev          \
-              libc6-dev-i386          \
-              libfftw3-dev            \
-              libfltk1.3-dev          \
-              libfluidsynth-dev       \
-              libgig-dev              \
-              libjack-jackd2-dev      \
-              libmp3lame-dev          \
-              liblilv-dev             \
-              libogg-dev              \
-              libsamplerate0-dev      \
-              libsdl-dev              \
-              libsndfile1-dev         \
-              libstk0-dev             \
-              libvorbis-dev           \
-              libxft-dev              \
-              libxinerama-dev         \
-              lv2-dev                 \
-              portaudio19-dev         \
-              gcc-multilib            \
-              g++-multilib            \
-              qt5-default             \
-              qtbase5-dev             \
-              libqt5x11extras5-dev    \
-              libxcb-keysyms1-dev     \
-              libxcb-util0-dev        \
-              qtbase5-private-dev     \
-              && rm -rf /var/lib/apt/lists/*
+          sudo dpkg --add-architecture i386
+          sudo apt-get update -qq &&     \
+          sudo apt-get install -y        \
+              --no-install-recommends    \
+              ccache                     \
+              fluid                      \
+              libasound2-dev             \
+              libc6-dev-i386             \
+              libfftw3-dev               \
+              libfltk1.3-dev             \
+              libfluidsynth-dev          \
+              libgig-dev                 \
+              libjack-jackd2-dev         \
+              libmp3lame-dev             \
+              liblilv-dev                \
+              libogg-dev                 \
+              libsamplerate0-dev         \
+              libsdl-dev                 \
+              libsndfile1-dev            \
+              libstk0-dev                \
+              libvorbis-dev              \
+              libxft-dev                 \
+              libxinerama-dev            \
+              lv2-dev                    \
+              portaudio19-dev            \
+              gcc-multilib               \
+              g++-multilib               \
+              qt5-default                \
+              qtbase5-dev                \
+              libqt5x11extras5-dev       \
+              libxcb-keysyms1-dev        \
+              libxcb-util0-dev           \
+              qtbase5-private-dev        \
+          && sudo rm -rf /var/lib/apt/lists/*
       - name: Install dependencies - part 4
         run: |
-          apt-get update && apt-get install -y    \
-          stk                                     \
-          wget                                    \
-          file                                    \
-          libwine-dev                             \
-          libwine-dev:i386                        \
-          wine64-tools                            \
-          && rm -rf /var/lib/apt/lists/*
+          sudo apt-get update && sudo apt-get install -y \
+              stk                                        \
+              wget                                       \
+              file                                       \
+              libwine-dev                                \
+              libwine-dev:i386                           \
+              wine64-tools                               \
+          && sudo rm -rf /var/lib/apt/lists/*
       - name: Cache ccache data
         uses: actions/cache@v3
         with:
