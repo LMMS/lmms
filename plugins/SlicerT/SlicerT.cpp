@@ -359,7 +359,7 @@ void SlicerT::loadSettings(const QDomElement& element)
 {
 	if (auto srcFile = element.attribute("src"); !srcFile.isEmpty())
 	{
-		if (QFileInfo(PathUtil::toAbsolute(m_originalSample.sampleFile())).exists())
+		if (QFileInfo(PathUtil::toAbsolute(srcFile)).exists())
 		{
 			auto buffer = gui::SampleLoader::createBufferFromFile(srcFile);
 			m_originalSample = Sample(std::move(buffer));
