@@ -138,4 +138,4 @@ private:
 
 } // namespace lmms
 
-#endif // CLAP_INSTRUMENT_H
+#endif // LMMS_CLAP_INSTRUMENT_H

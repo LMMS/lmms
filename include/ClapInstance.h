@@ -499,7 +499,7 @@ private:
 	bool m_hostExtStateIsDirty = false;
 };
 
-}
+} // namespace lmms
 
 #endif // LMMS_HAVE_CLAP
 
