@@ -81,11 +81,11 @@ jobs:
               qtbase5-private-dev     \
               && rm -rf /var/lib/apt/lists/*
       - name: Install dependencies - part 4
-      - run: |
+        run: |
           apt-get update && apt-get install -y    \
           stk                                     \
           wget                                    \
-          file									                  \
+          file                                    \
           libwine-dev                             \
           libwine-dev:i386                        \
           wine64-tools                            \
