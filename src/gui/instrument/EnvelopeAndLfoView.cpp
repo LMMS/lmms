@@ -319,8 +319,7 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 		auto file = dataFile.content().
 					firstChildElement().firstChildElement().
 					firstChildElement().attribute("src");
-		auto buffer = SampleLoader::createBufferFromFile(file);
-		m_params->m_userWave = std::shared_ptr<const SampleBuffer>(std::move(buffer));
+		m_params->m_userWave = SampleLoader::createBufferFromFile(file);
 		m_userLfoBtn->model()->setValue( true );
 		m_params->m_lfoWaveModel.setValue(static_cast<int>(EnvelopeAndLfoParameters::LfoShape::UserDefinedWave));
 		_de->accept();
