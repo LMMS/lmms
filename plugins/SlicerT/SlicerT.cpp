@@ -366,7 +366,7 @@ void SlicerT::loadSettings(const QDomElement& element)
 		}
 		else
 		{
-			QString message = tr("Sample not found: %1").arg(m_originalSample.sampleFile());
+			QString message = tr("Sample not found: %1").arg(srcFile);
 			Engine::getSong()->collectError(message);
 		}
 	}
