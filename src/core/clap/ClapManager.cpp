@@ -28,17 +28,12 @@
 
 #include <algorithm>
 #include <string_view>
-
 #include <cstdlib>
 #include <cstring>
 
 #include <QDebug>
 #include <QElapsedTimer>
 #include <QLibrary>
-
-#if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_APPLE)
-#include <QDir>
-#endif
 
 #include <clap/clap.h>
 
@@ -60,11 +55,16 @@ namespace
 #if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_APPLE)
 		if (!dir.empty() && dir[0] == '~')
 		{
-			dir.remove_prefix(1);
-			return QDir::home().absolutePath().toStdString().append(dir.data(), dir.size());
+			if (auto home = std::getenv("HOME"))
+			{
+				const auto pos = dir.find_first_not_of(R"(/\)", 1);
+				if (pos == std::string_view::npos) { return home; }
+				dir.remove_prefix(pos);
+				return std::filesystem::path{home} / dir;
+			}
 		}
 #endif
-		return std::filesystem::path{dir};
+		return dir;
 	}
 } // namespace
 
@@ -120,7 +120,9 @@ void ClapManager::findSearchPaths()
 			auto path = expandHomeDir(paths.substr(0, pos));
 			if (std::error_code ec; fs::is_directory(path, ec))
 			{
-				m_searchPaths.emplace(std::move(path.make_preferred()));
+				path = fs::canonical(path.make_preferred(), ec);
+				if (ec) { continue; }
+				m_searchPaths.emplace(std::move(path));
 			}
 		} while (pos++ != std::string_view::npos);
 	};
@@ -143,12 +145,12 @@ void ClapManager::findSearchPaths()
 	auto path = expandHomeDir("~/.clap");
 	if (fs::is_directory(path, ec))
 	{
-		m_searchPaths.emplace(std::move(path.make_preferred()));
+		m_searchPaths.emplace(std::move(path));
 	}
 	path = "/usr/lib/clap";
 	if (fs::is_directory(path, ec))
 	{
-		m_searchPaths.emplace(std::move(path.make_preferred()));
+		m_searchPaths.emplace(std::move(path));
 	}
 #elif defined(LMMS_BUILD_WIN32) || defined(LMMS_BUILD_WIN64)
 	// %COMMONPROGRAMFILES%\CLAP
@@ -177,17 +179,17 @@ void ClapManager::findSearchPaths()
 	auto path = fs::path{"/Library/Audio/Plug-Ins/CLAP"};
 	if (fs::is_directory(path, ec))
 	{
-		m_searchPaths.emplace(std::move(path.make_preferred()));
+		m_searchPaths.emplace(std::move(path));
 	}
 	path = expandHomeDir("~/Library/Audio/Plug-Ins/CLAP");
 	if (fs::is_directory(path, ec))
 	{
-		m_searchPaths.emplace(std::move(path.make_preferred()));
+		m_searchPaths.emplace(std::move(path));
 	}
 #endif
 }
 
-void ClapManager::loadClapFiles(const std::unordered_set<std::filesystem::path>& searchPaths)
+void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 {
 	if (!m_files.empty()) { return; } // Cannot unload CLAP plugins yet
 

@@ -29,9 +29,6 @@
 
 #ifdef LMMS_HAVE_CLAP
 
-#include "Plugin.h"
-#include "PluginIssue.h"
-
 #include <vector>
 #include <unordered_set>
 #include <memory>
@@ -48,7 +45,13 @@ namespace std {
 #endif
 
 #include <QLibrary>
-#include <clap/clap.h>
+
+#include <clap/entry.h>
+#include <clap/plugin.h>
+#include <clap/factory/plugin-factory.h>
+
+#include "Plugin.h"
+#include "PluginIssue.h"
 
 namespace lmms
 {

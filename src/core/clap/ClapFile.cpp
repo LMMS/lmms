@@ -26,10 +26,9 @@
 
 #ifdef LMMS_HAVE_CLAP
 
-#include "ClapManager.h"
-
 #include <QDebug>
-#include <clap/clap.h>
+
+#include "ClapManager.h"
 
 namespace lmms
 {
@@ -123,7 +122,7 @@ auto ClapFile::load() -> bool
 	m_pluginInfo.clear();
 	for (std::uint32_t i = 0; i < m_pluginCount; ++i)
 	{
-		auto& plugin = m_pluginInfo.emplace_back(std::make_shared<ClapPluginInfo>(m_factory, i));
+		auto& plugin = m_pluginInfo.emplace_back(std::make_shared<const ClapPluginInfo>(m_factory, i));
 		if (!plugin || !plugin->isValid())
 		{
 			m_pluginInfo.pop_back();
@@ -192,9 +191,10 @@ ClapPluginInfo::ClapPluginInfo(const clap_plugin_factory* factory, std::uint32_t
 
 	if (!clap_version_is_compatible(m_descriptor->clap_version))
 	{
-		qWarning() << "Incompatible CLAP version: Plugin is: " << m_descriptor->clap_version.major << "."
-			<< m_descriptor->clap_version.minor << "." << m_descriptor->clap_version.revision << " Host is "
-			<< CLAP_VERSION.major << "." << CLAP_VERSION.minor << "." << CLAP_VERSION.revision;
+		qWarning().nospace() << "CLAP plugin '" << m_descriptor->id << "' uses unsupported CLAP version ("
+			<< m_descriptor->clap_version.major << "." << m_descriptor->clap_version.minor
+			<< "." << m_descriptor->clap_version.revision << "). Host is "
+			<< CLAP_VERSION.major << "." << CLAP_VERSION.minor << "." << CLAP_VERSION.revision << ".";
 		return;
 	}
 
@@ -233,7 +233,8 @@ ClapPluginInfo::ClapPluginInfo(const clap_plugin_factory* factory, std::uint32_t
 
 	if (m_type == Plugin::Type::Undefined)
 	{
-		qWarning() << "CLAP plugin is not recognized as an instrument or audio effect";
+		qWarning().nospace() << "CLAP plugin '" << m_descriptor->name
+			<< "' is not recognized as an instrument or audio effect";
 		return;
 	}
 

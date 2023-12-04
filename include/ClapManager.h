@@ -29,9 +29,6 @@
 
 #ifdef LMMS_HAVE_CLAP
 
-#include "ClapFile.h"
-#include "ClapInstance.h"
-
 #include <vector>
 #include <unordered_set>
 #include <string_view>
@@ -39,9 +36,11 @@
 
 #include <QString>
 
+#include "ClapFile.h"
+#include "ClapInstance.h"
+
 namespace lmms
 {
-
 
 //! Manages loaded .clap files, plugin info, and plugin instances
 class ClapManager
@@ -82,6 +81,17 @@ public:
 
 private:
 
+	//! For hashing since std::hash<std::filesystem::path> is not available until C++23's LWG issue 3657 for god knows why
+	struct PathHash
+	{
+		auto operator()(const std::filesystem::path& path) const -> std::size_t
+		{
+			return std::filesystem::hash_value(path);
+		}
+	};
+
+	using UniquePaths = std::unordered_set<std::filesystem::path, PathHash>;
+
 	//! Finds all CLAP search paths and populates m_searchPaths
 	void findSearchPaths();
 
@@ -89,9 +99,9 @@ private:
 	auto searchPaths() const -> const auto& { return m_searchPaths; }
 
 	//! Finds and loads all .clap files in the provided search paths @p searchPaths
-	void loadClapFiles(const std::unordered_set<std::filesystem::path>& searchPaths);
+	void loadClapFiles(const UniquePaths& searchPaths);
 
-	std::unordered_set<std::filesystem::path> m_searchPaths; //!< Owns all CLAP search paths; Populated by findSearchPaths()
+	UniquePaths m_searchPaths; //!< Owns all CLAP search paths; Populated by findSearchPaths()
 	std::vector<ClapFile> m_files; //!< Owns all loaded .clap files; Populated by loadClapFiles()
 
 	// Non-owning plugin caches (for fast iteration/lookup)
@@ -101,8 +111,6 @@ private:
 
 	static inline bool s_debugging = false; //!< If LMMS_CLAP_DEBUG is set, debug output will be printed
 };
-
-
 
 } // namespace lmms
 
