@@ -7,8 +7,7 @@ concurrency:
 jobs:
   linux:
     name: linux
-    runs-on: ubuntu-latest
-    container: lmmsci/linux.gcc:20.04
+    runs-on: ubuntu-20.04
     env:
       CMAKE_OPTS: >-
         -DUSE_WERROR=ON
@@ -18,12 +17,6 @@ jobs:
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
     steps:
-      - name: Update and configure Git
-        run: |
-          add-apt-repository ppa:git-core/ppa
-          apt-get update
-          apt-get --yes install git
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check out
         uses: actions/checkout@v3
         with:
