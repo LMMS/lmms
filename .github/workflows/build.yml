@@ -123,9 +123,9 @@ jobs:
         run: |
           ccache --cleanup
           echo "[ccache config]"
-          ccache --print-config
+          ccache --show-config
           echo "[ccache stats]"
-          ccache --show-stats
+          ccache --show-stats --verbose
         env:
           CCACHE_MAXSIZE: 500M
   macos:
