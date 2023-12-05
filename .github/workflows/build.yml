@@ -125,7 +125,7 @@ jobs:
           echo "[ccache config]"
           ccache --show-config
           echo "[ccache stats]"
-          ccache --show-stats --verbose
+          ccache --show-stats
         env:
           CCACHE_MAXSIZE: 500M
   macos:
