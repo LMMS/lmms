@@ -79,6 +79,7 @@ jobs:
               libxcb-keysyms1-dev        \
               libxcb-util0-dev           \
               qtbase5-private-dev        \
+              libx11-xcb-dev             \
           && sudo rm -rf /var/lib/apt/lists/*
       - name: Install dependencies - part 4
         run: |
