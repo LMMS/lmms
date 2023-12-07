@@ -43,10 +43,12 @@
 
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "BarModelEditor.h"
 
 
 namespace lmms::gui
 {
+
 
 LadspaMatrixControlDialog::LadspaMatrixControlDialog(LadspaControls * ladspaControls) :
 	EffectControlDialog(ladspaControls),
@@ -167,6 +169,7 @@ void LadspaMatrixControlDialog::arrangeControls(QWidget * parent, QGridLayout* g
 			if (controlWidget)
 			{
 				gridLayout->addWidget(controlWidget, currentRow, currentChannelColumn);
+				addTextHints(controlWidget, ladspaControl);
 			}
 
 			// Record the maximum row so that we add a vertical spacer after that row
@@ -180,6 +183,55 @@ void LadspaMatrixControlDialog::arrangeControls(QWidget * parent, QGridLayout* g
 	QSpacerItem * spacer = new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 	gridLayout->addItem(spacer, maxRow + 1, 0);
 }
+
+void LadspaMatrixControlDialog::addTextHints( QWidget * modelEditor, LadspaControl * ladspaControl )
+{
+
+	BarModelEditor * barModelEditor = dynamic_cast<BarModelEditor *>(modelEditor);
+	if ( barModelEditor )
+	{
+		auto const * port = ladspaControl->port();
+		if ( port->name == "Reverb Type" ) // see https://tomscii.sig7.se/tap-plugins/ladspa/reverb.html
+		{
+			connect(barModelEditor, &BarModelEditor::sliderMoved, barModelEditor, [barModelEditor](float value) {
+				int i = (int) value;
+				if ( i >= 0 && i < MaxTAPReverbTypes )
+				{
+					barModelEditor->setDescription( TAPReverbTypes[i] );
+				}
+			});
+		}
+		else if ( port->name == "Function" ) // see https://tomscii.sig7.se/tap-plugins/ladspa/dynamics.html
+		{
+			connect(barModelEditor, &BarModelEditor::sliderMoved, barModelEditor, [barModelEditor](float value) {
+				int i = (int) value;
+				if (i >= 0 && value < MaxTAPDynamicsModes )
+				{
+					barModelEditor->setDescription( TAPDynamicsModes[i] );
+				}
+			});
+		}
+		else if ( port->name == "Tape--Tube Blend" ) // see https://tomscii.sig7.se/tap-plugins/ladspa/tubewarmth.html
+		{
+			connect(barModelEditor, &BarModelEditor::sliderMoved, barModelEditor, [barModelEditor](float value) {
+				int i = (int) value;
+				if (i == -10 )
+				{
+					barModelEditor->setDescription( "analog tape" );
+				}
+				else if (i == 10 )
+				{
+					barModelEditor->setDescription( "triode tube distortion" );
+				}
+				else {
+					barModelEditor->setDescription( QString::number(value) );
+				}
+			});
+		}
+
+	}
+}
+
 
 QWidget * LadspaMatrixControlDialog::createMatrixWidget()
 {
