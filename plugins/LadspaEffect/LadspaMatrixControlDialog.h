@@ -27,6 +27,7 @@
 #define LADSPA_MATRIX_CONTROL_DIALOG_H
 
 #include "EffectControlDialog.h"
+#include "LadspaControl.h"
 
 #include "lmms_basics.h"
 
@@ -43,6 +44,79 @@ namespace gui
 {
 
 class LedCheckBox;
+
+
+// see tap_reverb_presets.h
+const int MaxTAPReverbTypes = 43;
+const QString TAPReverbTypes[] {
+	"AfterBurn",
+	"AfterBurn(Long)",
+	"Ambience",
+	"Ambience(Thick)",
+	"Ambience(Thick) HD",
+	"Cathedral",
+	"Cathedral HD",
+	"Drum Chamber",
+	"Garage",
+	"Garage(Bright)",
+	"Gymnasium",
+	"Gymnasium(Bright)",
+	"Gymnasium(Bright) HD",
+	"Hall(Small)",
+	"Hall(Medium)",
+	"Hall(Large)",
+	"Hall(Large) HD",
+	"Plate(Small)",
+	"Plate(Medium)",
+	"Plate(Large)",
+	"Plate(Large) HD",
+	"PulseChamber",
+	"PulseChamber(Reverse)",
+	"Resonator(96 ms)",
+	"Resonator(152 ms)",
+	"Resonator(208 ms)",
+	"Room(Small)",
+	"Room(Medium)",
+	"Room(Large)",
+	"Room(Large) HD",
+	"Slap Chamber",
+	"Slap Chamber HD",
+	"Slap Chamber(Bright)",
+	"Slap Chamber(Bright) HD",
+	"Smooth Hall(Small)",
+	"Smooth Hall(Medium)",
+	"Smooth Hall(Large)",
+	"Smooth Hall(Large) HD",
+	"Vocal Plate",
+	"Vocal Plate HD",
+	"Warble Chamber",
+	"Warehouse",
+	"Warehouse HD"
+};
+static_assert (std::end(TAPReverbTypes) - std::begin(TAPReverbTypes) == MaxTAPReverbTypes , "TAPReverbTypes should match NUM_MODES in tap_reverb_presets.h");
+
+
+// see tap_dynamics_presets.h
+const int MaxTAPDynamicsModes = 15;
+const QString TAPDynamicsModes[] {
+	"2:1 compression starting at -6 dB",
+	"2:1 compression starting at -9 dB",
+	"2:1 compression starting at -12 dB",
+	"2:1 compression starting at -18 dB",
+	"2.5:1 compression starting at -12 dB",
+	"3:1 compression starting at -12 dB",
+	"3:1 compression starting at -15 dB",
+	"Compressor/Gate",
+	"Expander",
+	"Hard limiter at -6 dB",
+	"Hard limiter at -12 dB",
+	"Hard noise gate at -35 dB",
+	"Soft limiter",
+	"Soft knee comp/gate (-24 dB threshold)",
+	"Soft noise gate below -36 dB",
+};
+static_assert (std::end(TAPDynamicsModes) - std::begin(TAPDynamicsModes) == MaxTAPDynamicsModes , "TAPDynamicsModes should match NUM_MODES in tap_dynamics_presets.h");
+
 
 
 class LadspaMatrixControlDialog : public EffectControlDialog
@@ -78,6 +152,11 @@ private:
 
 	LadspaControls * getLadspaControls() const;
 	ch_cnt_t getChannelCount() const;
+
+	/**
+	 * @brief for enum types show text values in the UI if known
+	 */
+	void addTextHints( QWidget * modelEditor, LadspaControl * ladspaControl );
 
 private:
 	QScrollArea* m_scrollArea;
