@@ -20,9 +20,8 @@ jobs:
     steps:
       - name: Check out
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          submodules: recursive
+      - name: Check out submodules
+        run: git submodule update --init --recursive
       - name: Install dependencies
         run: >
           sudo dpkg --add-architecture i386 &&
