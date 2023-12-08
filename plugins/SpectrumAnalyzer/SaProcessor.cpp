@@ -654,7 +654,8 @@ float SaProcessor::ampToYPixel(float amplitude, unsigned int height) const
 	{
 		// logarithmic scale: convert linear amplitude to dB (relative to 1.0)
 		assert (amplitude >= 0);
-		float amplitude_dB = 10 * log10(amplitude == 0 ? std::numeric_limits<float>::min() : amplitude);
+		const float minNonZeroAmplitude = std::numeric_limits<float>::min();
+		float amplitude_dB = 10 * std::log10(std::max(amplitude, minNonZeroAmplitude));
 		if (amplitude_dB < getAmpRangeMin())
 		{
 			return height;
