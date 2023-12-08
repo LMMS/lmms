@@ -23,6 +23,19 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+      - name: Install wine
+        run: >
+          sudo dpkg --add-architecture i386 &&
+          sudo apt-get update &&
+          sudo apt-get install aptitude --yes &&
+          sudo aptitude install --full-resolver -y
+          libwine-dev:i386
+          libwine-dev
+          g++-multilib
+          gcc-multilib
+          libc6-dev
+          libc6-dev-i386
+          wine64-tools
       - name: Install dependencies
         run: >
           sudo dpkg --add-architecture i386 &&
