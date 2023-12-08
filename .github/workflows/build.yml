@@ -22,52 +22,48 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
-      - name: Set up dpkg architecture
-        run: sudo dpkg --add-architecture i386
       - name: Install dependencies
-        uses: awalsh128/cache-apt-pkgs-action@latest
-        with:
-          packages: >
-            ca-certificates
-            ccache
-            g++-multilib
-            gcc-multilib
-            libasound2-dev
-            libc6-dev
-            libc6-dev-i386
-            libfftw3-dev
-            libfltk1.3-dev
-            libfluidsynth-dev
-            libgig-dev
-            libjack-jackd2-dev
-            liblilv-dev
-            liblist-moreutils-perl
-            libmp3lame-dev
-            libogg-dev
-            libqt5x11extras5-dev
-            libsamplerate0-dev
-            libsdl2-dev
-            libsndfile1-dev
-            libstk0-dev
-            libvorbis-dev
-            libwine-dev
-            libwine-dev:i386
-            libx11-xcb-dev
-            libxcb-keysyms1-dev
-            libxcb-util0-dev
-            libxft-dev
-            libxinerama-dev
-            libxml-perl
-            libxml2-utils
-            lv2-dev
-            portaudio19-dev
-            qt5-default
-            qtbase5-dev
-            qtbase5-private-dev
-            qttools5-dev-tools
-            stk
-            wine64-tools
-          version: 1.0
+        run: >
+          sudo dpkg --add-architecture i386 &&
+          sudo apt-get install --yes
+          ccache
+          g++-multilib
+          gcc-multilib
+          libasound2-dev
+          libc6-dev
+          libc6-dev-i386
+          libfftw3-dev
+          libfltk1.3-dev
+          libfluidsynth-dev
+          libgig-dev
+          libjack-jackd2-dev
+          liblilv-dev
+          liblist-moreutils-perl
+          libmp3lame-dev
+          libogg-dev
+          libqt5x11extras5-dev
+          libsamplerate0-dev
+          libsdl2-dev
+          libsndfile1-dev
+          libstk0-dev
+          libvorbis-dev
+          libwine-dev
+          libwine-dev:i386
+          libx11-xcb-dev
+          libxcb-keysyms1-dev
+          libxcb-util0-dev
+          libxft-dev
+          libxinerama-dev
+          libxml-perl
+          libxml2-utils
+          lv2-dev
+          portaudio19-dev
+          qt5-default
+          qtbase5-dev
+          qtbase5-private-dev
+          qttools5-dev-tools
+          stk
+          wine64-tools
       - name: Cache ccache data
         uses: actions/cache@v3
         with:
