@@ -8,7 +8,6 @@ jobs:
   linux:
     name: linux
     runs-on: ubuntu-20.04
-    container: ubuntu:20.04
     env:
       CMAKE_OPTS: >-
         -DUSE_WERROR=ON
@@ -17,11 +16,8 @@ jobs:
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
+      DEBIAN_FRONTEND: noninteractive
     steps:
-      - name: Install git
-        run: |
-          sudo apt-get update
-          sudo apt-get install git --yes
       - name: Check out
         uses: actions/checkout@v3
         with:
@@ -31,7 +27,8 @@ jobs:
         run: >
           sudo dpkg --add-architecture i386 &&
           sudo apt-get update &&
-          sudo apt-get install --yes
+          sudo apt-get install --yes --allow-downgrades
+          libpcre2-8-0=10.34-7
           ccache
           g++-multilib
           gcc-multilib
