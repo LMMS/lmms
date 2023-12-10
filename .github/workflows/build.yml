@@ -23,7 +23,7 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
-      - name: Install wine
+      - name: Install wine - part 1
         run: >
           sudo dpkg --add-architecture i386 &&
           sudo apt-get update &&
@@ -31,22 +31,26 @@ jobs:
           sudo aptitude install --safe-resolver -y
           libwine-dev:i386
           libwine-dev
+      - name: Print info - 1
+        run: |
+          lsb_release -a
+          dpkg -l | grep wine
+      - name: Install wine - part 2
+        run: >
+          sudo aptitude install --safe-resolver -y
           g++-multilib
           gcc-multilib
           libc6-dev
           libc6-dev-i386
           wine64-tools
+      - name: Print info - 2
+        run: |
+          dpkg -l | grep wine
       - name: Install dependencies
         run: >
-          sudo dpkg --add-architecture i386 &&
-          sudo apt-get update &&
           sudo apt-get install --yes
           ccache
-          g++-multilib
-          gcc-multilib
           libasound2-dev
-          libc6-dev
-          libc6-dev-i386
           libfftw3-dev
           libfltk1.3-dev
           libfluidsynth-dev
@@ -79,7 +83,6 @@ jobs:
           qtbase5-private-dev
           qttools5-dev-tools
           stk
-          wine64-tools
       - name: Cache ccache data
         uses: actions/cache@v3
         with:
