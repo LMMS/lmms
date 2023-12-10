@@ -32,6 +32,11 @@ jobs:
           md5sum libwine-dev_*_i386.deb
           apt-get download libwine-dev:amd64
           md5sum libwine-dev_*_amd64.deb
+      - name: diff
+        run: |
+          dpkg-deb -R libwine-dev_*amd64.deb tmp_amd64/
+          dpkg-deb -R libwine-dev_*i386.deb tmp_i386/
+          diff -r tmp_amd64/ tmp_i386/
       - name: Install wine - part 1
         run: >
           sudo dpkg --add-architecture i386 &&
