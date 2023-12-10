@@ -28,7 +28,7 @@ jobs:
           sudo dpkg --add-architecture i386 &&
           sudo apt-get update &&
           sudo apt-get install aptitude --yes &&
-          sudo aptitude install --safe-resolver --with-reccommends -y
+          sudo aptitude install --safe-resolver -y
           libwine-dev:amd64
           libwine-dev:i386
       - name: Print info - 1
