@@ -7,7 +7,8 @@ concurrency:
 jobs:
   linux:
     name: linux
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
+    container: ghcr.io/lmms/linux.gcc:20.04
     env:
       CMAKE_OPTS: >-
         -DUSE_WERROR=ON
@@ -23,90 +24,6 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
-      - name: Print versions
-        run: |
-          apt-get --version
-          dpkg --version
-      - name: Print all packages
-        run: dpkg -l
-      - name: Checksum
-        run: |
-          sudo dpkg --add-architecture i386
-          sudo apt-get update
-          sudo apt-get clean
-          apt-get download libwine-dev:i386
-          md5sum libwine-dev_*_i386.deb
-          apt-get download libwine-dev:amd64
-          md5sum libwine-dev_*_amd64.deb
-      - name: diff
-        run: |
-          dpkg-deb -R libwine-dev_*amd64.deb tmp_amd64/
-          dpkg-deb -R libwine-dev_*i386.deb tmp_i386/
-          diff -r tmp_amd64/ tmp_i386/ >&2
-      - name: Install wine - part 1
-        run: >
-          sudo dpkg --add-architecture i386 &&
-          sudo apt-get update &&
-          sudo apt-get install aptitude --yes &&
-          sudo aptitude install --safe-resolver -y
-          libwine-dev:amd64
-          libwine-dev:i386
-      - name: Print info - 1
-        run: |
-          lsb_release -a
-          dpkg -l | grep wine
-          dpkg-query -s libwine-dev:amd64
-          dpkg-query -s libwine-dev:i386
-      - name: Install wine - part 2
-        run: >
-          sudo aptitude install --safe-resolver -y
-          g++-multilib
-          gcc-multilib
-          libc6-dev
-          libc6-dev-i386
-          wine64-tools
-      - name: Print info - 2
-        run: |
-          dpkg -l | grep wine
-          dpkg-query -s libwine-dev:amd64
-          dpkg-query -s libwine-dev:i386
-      - name: Install dependencies
-        run: >
-          sudo apt-get install --yes
-          ccache
-          libasound2-dev
-          libfftw3-dev
-          libfltk1.3-dev
-          libfluidsynth-dev
-          libgig-dev
-          libjack-jackd2-dev
-          liblilv-dev
-          liblist-moreutils-perl
-          libmp3lame-dev
-          libogg-dev
-          libqt5x11extras5-dev
-          libsamplerate0-dev
-          libsdl2-dev
-          libsndfile1-dev
-          libstk0-dev
-          libvorbis-dev
-          libwine-dev
-          libwine-dev:i386
-          libx11-xcb-dev
-          libxcb-keysyms1-dev
-          libxcb-util0-dev
-          libxft-dev
-          libxinerama-dev
-          libxml-perl
-          libxml2-utils
-          lv2-dev
-          portaudio19-dev
-          qt5-qmake
-          qtbase5-dev
-          qtbase5-dev-tools
-          qtbase5-private-dev
-          qttools5-dev-tools
-          stk
       - name: Cache ccache data
         uses: actions/cache@v3
         with:
