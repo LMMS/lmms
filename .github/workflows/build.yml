@@ -23,6 +23,15 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+      - name: Checksum
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get clean
+          apt-get download libwine-dev:i386
+          md5sum libwine-dev_*_i386.deb
+          apt-get download libwine-dev:amd64
+          md5sum libwine-dev_*_amd64.deb
       - name: Install wine - part 1
         run: >
           sudo dpkg --add-architecture i386 &&
