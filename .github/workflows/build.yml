@@ -28,13 +28,15 @@ jobs:
           sudo dpkg --add-architecture i386 &&
           sudo apt-get update &&
           sudo apt-get install aptitude --yes &&
-          sudo aptitude install --safe-resolver -y
+          sudo aptitude install --safe-resolver --with-reccommends -y
+          libwine-dev:amd64
           libwine-dev:i386
-          libwine-dev
       - name: Print info - 1
         run: |
           lsb_release -a
           dpkg -l | grep wine
+          dpkg-query -s libwine-dev:amd64
+          dpkg-query -s libwine-dev:i386
       - name: Install wine - part 2
         run: >
           sudo aptitude install --safe-resolver -y
@@ -46,6 +48,8 @@ jobs:
       - name: Print info - 2
         run: |
           dpkg -l | grep wine
+          dpkg-query -s libwine-dev:amd64
+          dpkg-query -s libwine-dev:i386
       - name: Install dependencies
         run: >
           sudo apt-get install --yes
