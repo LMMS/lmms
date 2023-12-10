@@ -23,6 +23,12 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+      - name: Print versions
+        run: |
+          apt-get --version
+          dpkg --version
+      - name: Print all packages
+        run: dpkg -l
       - name: Checksum
         run: |
           sudo dpkg --add-architecture i386
@@ -36,7 +42,7 @@ jobs:
         run: |
           dpkg-deb -R libwine-dev_*amd64.deb tmp_amd64/
           dpkg-deb -R libwine-dev_*i386.deb tmp_i386/
-          diff -r tmp_amd64/ tmp_i386/
+          diff -r tmp_amd64/ tmp_i386/ >&2
       - name: Install wine - part 1
         run: >
           sudo dpkg --add-architecture i386 &&
