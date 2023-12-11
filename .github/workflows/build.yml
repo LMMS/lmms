@@ -8,7 +8,11 @@ jobs:
   linux:
     name: linux
     runs-on: ubuntu-latest
-    container: ghcr.io/lmms/linux.gcc:20.04
+    container:
+      image: ghcr.io/lmms/linux.gcc:20.04
+      credentials:
+       username: ${{ github.actor }}
+       password: ${{ secrets.github_token }}
     env:
       CMAKE_OPTS: >-
         -DUSE_WERROR=ON
