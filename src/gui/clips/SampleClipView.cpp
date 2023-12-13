@@ -31,6 +31,7 @@
 #include "GuiApplication.h"
 #include "AutomationEditor.h"
 #include "embed.h"
+#include "gui_templates.h"
 #include "PathUtil.h"
 #include "SampleBuffer.h"
 #include "SampleClip.h"
@@ -74,9 +75,10 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 {
 	cm->addSeparator();
 
-	/*contextMenu.addAction( embed::getIconPixmap( "record" ),
-				tr( "Set/clear record" ),
-						m_clip, SLOT(toggleRecord()));*/
+
+	cm->addAction(embed::getIconPixmap("record"),
+                          tr("Set/clear record"),
+                          m_clip, SLOT(toggleRecord()));
 
 	cm->addAction(
 		embed::getIconPixmap("flip_x"),
@@ -299,7 +301,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	}
 	// recording sample tracks is not possible at the moment
 
-	/* if( m_clip->isRecord() )
+	if (m_clip->isRecord())
 	{
 		p.setFont( pointSize<7>( p.font() ) );
 
@@ -310,7 +312,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 		p.setBrush( QBrush( textColor() ) );
 		p.drawEllipse( 4, 5, 4, 4 );
-	}*/
+	}
 
 	p.end();
 
