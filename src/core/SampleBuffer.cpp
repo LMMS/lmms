@@ -38,14 +38,14 @@ SampleBuffer::SampleBuffer(const sampleFrame* data, int numFrames, int sampleRat
 SampleBuffer::SampleBuffer(const QString& audioFile)
 {
 	if (audioFile.isEmpty()) { throw std::runtime_error{"Failure loading audio file: Audio file path is empty."}; }
-	auto resolvedFileName = PathUtil::toAbsolute(PathUtil::toShortestRelative(audioFile));
+	const auto absolutePath = PathUtil::toAbsolute(audioFile);
 
-	if (auto decodedResult = SampleDecoder::decode(resolvedFileName))
+	if (auto decodedResult = SampleDecoder::decode(absolutePath))
 	{
 		auto& [data, sampleRate] = *decodedResult;
 		m_data = std::move(data);
 		m_sampleRate = sampleRate;
-		m_audioFile = audioFile;
+		m_audioFile = PathUtil::toShortestRelative(audioFile);
 		return;
 	}
 
