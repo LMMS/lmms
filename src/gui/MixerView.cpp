@@ -629,7 +629,7 @@ void MixerView::updateFaders()
 	auto& peakLeft = m->mixerChannel(0)->m_peakLeft;
 	auto& peakRight = m->mixerChannel(0)->m_peakRight;
 	peakLeft.store(peakLeft * masterGain);
-	peakRight.store(peakLeft * masterGain);
+	peakRight.store(peakRight * masterGain);
 
 	for( int i = 0; i < m_mixerChannelViews.size(); ++i )
 	{
