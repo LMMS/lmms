@@ -97,14 +97,12 @@ SongEditor::SongEditor( Song * song ) :
 	m_zoomingModel->setParent(this);
 	m_snappingModel->setParent(this);
 
-	m_timeLine = new TimeLineWidget( m_trackHeadWidth, 32,
-					pixelsPerBar(),
-					m_song->getPlayPos(Song::PlayMode::Song),
-					m_currentPosition,
-					Song::PlayMode::Song, this );
-	connect( this, SIGNAL( positionChanged( const lmms::TimePos& ) ),
-				m_song->getPlayPos(Song::PlayMode::Song).m_timeLine,
-			SLOT( updatePosition( const lmms::TimePos& ) ) );
+	m_timeLine = new TimeLineWidget(m_trackHeadWidth, 32, pixelsPerBar(),
+		m_song->getPlayPos(Song::PlayMode::Song),
+		m_song->getTimeline(Song::PlayMode::Song),
+		m_currentPosition, Song::PlayMode::Song, this
+	);
+	connect(this, &TrackContainerView::positionChanged, m_timeLine, &TimeLineWidget::updatePosition);
 	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos& ) ),
 			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
 	connect( m_timeLine, SIGNAL(regionSelectedFromPixels(int,int)),
@@ -560,7 +558,7 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		m_leftRightScroll->setValue(m_leftRightScroll->value() + bar - newBar);
 
 		// update timeline
-		m_song->getPlayPos(Song::PlayMode::Song).m_timeLine->setPixelsPerBar(pixelsPerBar());
+		m_timeLine->setPixelsPerBar(pixelsPerBar());
 		// and make sure, all Clip's are resized and relocated
 		realignTracks();
 	}
@@ -808,8 +806,7 @@ void SongEditor::updatePosition( const TimePos & t )
 		m_scrollBack = false;
 	}
 
-	const int x = m_song->getPlayPos(Song::PlayMode::Song).m_timeLine->
-							markerX( t ) + 8;
+	const int x = m_timeLine->markerX(t) + 8;
 	if( x >= trackOpWidth + widgetWidth -1 )
 	{
 		m_positionLine->show();
@@ -872,7 +869,7 @@ void SongEditor::zoomingChanged()
 	int ppb = calculatePixelsPerBar();
 	setPixelsPerBar(ppb);
 
-	m_song->getPlayPos(Song::PlayMode::Song).m_timeLine->setPixelsPerBar(ppb);
+	m_timeLine->setPixelsPerBar(ppb);
 	realignTracks();
 	updateRubberband();
 	m_timeLine->setSnapSize(getSnapSize());

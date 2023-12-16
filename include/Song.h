@@ -25,16 +25,18 @@
 #ifndef LMMS_SONG_H
 #define LMMS_SONG_H
 
+#include <array>
 #include <memory>
 
 #include <QHash>
 #include <QString>
 
-#include "TrackContainer.h"
 #include "AudioEngine.h"
 #include "Controller.h"
 #include "lmms_constants.h"
 #include "MeterModel.h"
+#include "Timeline.h"
+#include "TrackContainer.h"
 #include "VstSyncController.h"
 
 namespace lmms
@@ -105,7 +107,6 @@ public:
 	public:
 		PlayPos( const int abs = 0 ) :
 			TimePos( abs ),
-			m_timeLine( nullptr ),
 			m_currentFrame( 0.0f )
 		{
 		}
@@ -125,13 +126,11 @@ public:
 		{
 			return m_jumped;
 		}
-		gui::TimeLineWidget * m_timeLine;
 
 	private:
 		float m_currentFrame;
 		bool m_jumped;
-
-	} ;
+	};
 
 	void processNextBuffer();
 
@@ -274,6 +273,11 @@ public:
 		return getPlayPos(m_playMode);
 	}
 
+	auto getTimeline(PlayMode mode) -> Timeline& { return m_timelines[static_cast<std::size_t>(mode)]; }
+	auto getTimeline(PlayMode mode) const -> const Timeline& { return m_timelines[static_cast<std::size_t>(mode)]; }
+	auto getTimeline() -> Timeline& { return getTimeline(m_playMode); }
+	auto getTimeline() const -> const Timeline& { return getTimeline(m_playMode); }
+
 	void updateLength();
 	bar_t length() const
 	{
@@ -402,7 +406,7 @@ private slots:
 
 	void masterVolumeChanged();
 
-	void savePos();
+	void savePlayStartPosition();
 
 	void updateFramesPerTick();
 
@@ -480,6 +484,8 @@ private:
 	SaveOptions m_saveOptions;
 
 	QHash<QString, int> m_errors;
+
+	std::array<Timeline, PlayModeCount> m_timelines;
 
 	PlayMode m_playMode;
 	PlayPos m_playPos[PlayModeCount];
