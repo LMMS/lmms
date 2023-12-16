@@ -126,7 +126,10 @@ const QString& SampleClip::sampleFile() const
 
 void SampleClip::setSampleBuffer(std::unique_ptr<SampleBuffer> sb)
 {
-	m_sample = Sample(std::move(sb));
+	{
+		const auto guard = Engine::audioEngine()->requestChangesGuard();
+		m_sample = Sample(std::move(sb));
+	}
 	updateLength();
 
 	emit sampleChanged();
