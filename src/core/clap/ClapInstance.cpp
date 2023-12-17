@@ -38,9 +38,14 @@
 #include <QDebug>
 
 #include <algorithm>
-#include <thread>
 #include <string_view>
 #include <cassert>
+
+#ifdef __MINGW32__
+#include <mingw.thread.h>
+#else
+#include <thread>
+#endif
 
 #include "lmmsversion.h"
 
