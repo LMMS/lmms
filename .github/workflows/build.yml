@@ -157,7 +157,7 @@ jobs:
         arch: ['32', '64']
     name: mingw${{ matrix.arch }}
     runs-on: ubuntu-latest
-    container: lmmsci/linux.mingw${{ matrix.arch }}:18.04
+    container: lmmsci/linux.mingw${{ matrix.arch }}:20.04
     env:
       CMAKE_OPTS: >-
         -DUSE_WERROR=ON
