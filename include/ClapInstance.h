@@ -357,7 +357,7 @@ private:
 	 * MIDI
 	 */
 	// many things here may be moved into the `Instrument` class
-	constexpr const static std::size_t s_maxMidiInputEvents = 1024;
+	static constexpr std::size_t s_maxMidiInputEvents = 1024;
 	//! Spinlock for the MIDI ringbuffer (for MIDI events going to the plugin)
 	std::atomic_flag m_ringLock = ATOMIC_FLAG_INIT;
 
@@ -453,33 +453,33 @@ private:
 	const clap_plugin_audio_ports* m_pluginExtAudioPorts = nullptr;
 
 	const clap_plugin_state* m_pluginExtState = nullptr;
-	static const constexpr clap_host_state s_hostExtState {
-		&ClapInstance::hostExtStateMarkDirty
+	static constexpr const clap_host_state s_hostExtState {
+		&hostExtStateMarkDirty
 	};
 
-	static const constexpr clap_host_log s_hostExtLog {
-		&ClapInstance::hostExtLogLog
+	static constexpr const clap_host_log s_hostExtLog {
+		&hostExtLogLog
 	};
 
-	static const constexpr clap_host_thread_check s_hostExtThreadCheck {
-		&ClapInstance::hostExtThreadCheckIsMainThread,
-		&ClapInstance::hostExtThreadCheckIsAudioThread
+	static constexpr const clap_host_thread_check s_hostExtThreadCheck {
+		&hostExtThreadCheckIsMainThread,
+		&hostExtThreadCheckIsAudioThread
 	};
 
 	const clap_plugin_params* m_pluginExtParams = nullptr;
-	static const constexpr clap_host_params s_hostExtParams {
-		&ClapInstance::hostExtParamsRescan,
-		&ClapInstance::hostExtParamsClear,
-		&ClapInstance::hostExtParamsRequestFlush,
+	static constexpr const clap_host_params s_hostExtParams {
+		&hostExtParamsRescan,
+		&hostExtParamsClear,
+		&hostExtParamsRequestFlush,
 	};
 
-	static const constexpr clap_host_latency s_hostExtLatency {
-		&ClapInstance::hostExtLatencyChanged
+	static constexpr const clap_host_latency s_hostExtLatency {
+		&hostExtLatencyChanged
 	};
 
 	std::unique_ptr<ClapGui> m_pluginGui;
 	const clap_plugin_gui* m_pluginExtGui = nullptr;
-	static const constexpr clap_host_gui s_hostExtGui {
+	static constexpr const clap_host_gui s_hostExtGui {
 		&hostExtGuiResizeHintsChanged,
 		&hostExtGuiRequestResize,
 		&hostExtGuiRequestShow,
@@ -488,7 +488,7 @@ private:
 	};
 
 	const clap_plugin_note_ports* m_pluginExtNotePorts = nullptr;
-	static const constexpr clap_host_note_ports s_hostExtNotePorts {
+	static constexpr const clap_host_note_ports s_hostExtNotePorts {
 		&hostExtNotePortsSupportedDialects,
 		&hostExtNotePortsRescan
 	};

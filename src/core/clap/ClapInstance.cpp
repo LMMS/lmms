@@ -103,7 +103,7 @@ namespace
 			hostBuf[f][channel] = hostBuf[f][channel + 1] = pluginBuf[0][isConstant ? 0 : f];
 		}
 	}
-}
+} // namespace
 
 //! Container for everything required to store MIDI events going to the plugin
 // TODO: Move to MidiEvent.h for both LV2 and CLAP?
@@ -396,12 +396,24 @@ auto ClapInstance::init() -> bool
 	const bool needInputPort = m_pluginInfo->type() != Plugin::Type::Instrument;
 	constexpr bool needOutputPort = true;
 
-	auto readPorts = [this, needInputPort, needOutputPort](
+	auto readPorts = [&](
 		std::vector<AudioPort>& audioPorts,
 		std::unique_ptr<clap_audio_buffer[]>& audioBuffers,
 		std::vector<AudioBuffer>& rawAudioBuffers,
 		bool isInput) -> AudioPort*
 	{
+		if (isInput && !needInputPort)
+		{
+			log(CLAP_LOG_DEBUG, "Don't need audio input ports - skipping.");
+			return nullptr;
+		}
+
+		if (!isInput && !needOutputPort)
+		{
+			log(CLAP_LOG_DEBUG, "Don't need audio output ports - skipping.");
+			return nullptr;
+		}
+
 		const auto portCount = m_pluginExtAudioPorts->count(m_plugin, isInput);
 
 		if (isInput)
@@ -494,9 +506,6 @@ auto ClapInstance::init() -> bool
 
 			audioPorts.emplace_back(AudioPort{info, idx, isInput, type, false});
 		}
-
-		if (isInput && !needInputPort) { return nullptr; }
-		if (!isInput && !needOutputPort) { return nullptr; }
 
 		assert(portCount == audioPorts.size());
 		audioBuffers = std::make_unique<clap_audio_buffer[]>(audioPorts.size());
