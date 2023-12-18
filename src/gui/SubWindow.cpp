@@ -252,10 +252,24 @@ void SubWindow::setBorderColor( const QColor &c )
 
 void SubWindow::detach()
 {
+#if QT_VERSION < 0x50C00
+	// Workaround for a bug in Qt versions below 5.12,
+	// where argument-dependent-lookup fails for QFlags operators
+	// declared inside a namepsace.
+	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
+	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
+
+	using ::operator|;
+#endif
+
 	if (isDetached()) { return; }
 
-	auto pos = mapToGlobal(widget()->pos());
-	widget()->setWindowFlags(Qt::Window);
+	const auto pos = mapToGlobal(widget()->pos());
+
+	auto flags = windowFlags();
+	flags |= Qt::Window;
+	flags &= ~Qt::Widget;
+	widget()->setWindowFlags(flags);
 	widget()->show();
 	hide();
 
@@ -264,10 +278,24 @@ void SubWindow::detach()
 
 void SubWindow::attach()
 {
+#if QT_VERSION < 0x50C00
+	// Workaround for a bug in Qt versions below 5.12,
+	// where argument-dependent-lookup fails for QFlags operators
+	// declared inside a namepsace.
+	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
+	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
+
+	using ::operator|;
+#endif
+
 	if (!isDetached()) { return; }
 
 	auto frame = widget()->windowHandle()->frameGeometry();
-	widget()->setWindowFlags(Qt::Widget);
+
+	auto flags = windowFlags();
+	flags &= ~Qt::Window;
+	flags |= Qt::Widget;
+	widget()->setWindowFlags(flags);
 	widget()->show();
 	show();
 
