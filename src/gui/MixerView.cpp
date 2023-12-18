@@ -166,6 +166,15 @@ MixerView::MixerView(Mixer* mixer)
 	// timer for updating faders
 	connect(mainWindow, &MainWindow::periodicUpdate, this, &MixerView::updateFaders);
 
+	// adjust window size
+	layout()->invalidate();
+	resize(sizeHint());
+	if (parentWidget())
+	{
+		parentWidget()->resize(parentWidget()->sizeHint());
+	}
+	setFixedHeight(height());
+
 	// add ourself to workspace
 	QMdiSubWindow* subWin = mainWindow->addWindowedWidget(this);
 	layout()->setSizeConstraint(QLayout::SetMinimumSize);

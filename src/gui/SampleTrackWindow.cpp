@@ -154,6 +154,15 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView* stv)
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	subWin->setWindowFlags(flags);
 
+	// adjust window size
+	layout()->invalidate();
+	resize(sizeHint());
+	if (parentWidget())
+	{
+		parentWidget()->resize(parentWidget()->sizeHint());
+	}
+	setFixedSize(size());
+
 	// Hide the Size and Maximize options from the system menu
 	// since the dialog size is fixed.
 	QMenu * systemMenu = subWin->systemMenu();

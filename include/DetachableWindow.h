@@ -36,7 +36,7 @@ class LMMS_EXPORT DetachableWindow : public QMainWindow
 {
 	Q_OBJECT
 public:
-	explicit DetachableWindow(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
+	using QMainWindow::QMainWindow;
 
 	void closeEvent(QCloseEvent* ce) override;
 

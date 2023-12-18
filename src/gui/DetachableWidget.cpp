@@ -25,18 +25,12 @@
 
 #include "DetachableWidget.h"
 
-#include <QWidget>
 #include <QCloseEvent>
 
 #include "GuiApplication.h"
 #include "MainWindow.h"
 
 namespace lmms::gui {
-
-DetachableWidget::DetachableWidget(QWidget* parent, Qt::WindowFlags f)
-	: QWidget{parent, f}
-{
-}
 
 void DetachableWidget::closeEvent(QCloseEvent* ce)
 {
