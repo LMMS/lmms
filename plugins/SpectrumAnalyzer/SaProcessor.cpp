@@ -41,6 +41,12 @@
 #include "LocklessRingBuffer.h"
 #include "SaControls.h"
 
+#include <cassert>
+#include <limits>
+
+namespace lmms
+{
+
 
 SaProcessor::SaProcessor(const SaControls *controls) :
 	m_controls(controls),
@@ -55,7 +61,7 @@ SaProcessor::SaProcessor(const SaControls *controls) :
 	m_reallocating(false)
 {
 	m_fftWindow.resize(m_inBlockSize, 1.0);
-	precomputeWindow(m_fftWindow.data(), m_inBlockSize, BLACKMAN_HARRIS);
+	precomputeWindow(m_fftWindow.data(), m_inBlockSize, FFTWindow::BlackmanHarris);
 
 	m_bufferL.resize(m_inBlockSize, 0);
 	m_bufferR.resize(m_inBlockSize, 0);
@@ -196,7 +202,7 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 				if (m_waterfallActive && m_waterfallNotEmpty)
 				{
 					// move waterfall history one line down and clear the top line
-					QRgb *pixel = (QRgb *)m_history_work.data();
+					auto pixel = (QRgb*)m_history_work.data();
 					std::copy(pixel,
 							  pixel + waterfallWidth() * m_waterfallHeight - waterfallWidth(),
 							  pixel + waterfallWidth());
@@ -399,7 +405,7 @@ void SaProcessor::reallocateBuffers()
 
 	// allocate new space, create new plan and resize containers
 	m_fftWindow.resize(new_in_size, 1.0);
-	precomputeWindow(m_fftWindow.data(), new_in_size, (FFT_WINDOWS) m_controls->m_windowModel.value());
+	precomputeWindow(m_fftWindow.data(), new_in_size, (FFTWindow) m_controls->m_windowModel.value());
 	m_bufferL.resize(new_in_size, 0);
 	m_bufferR.resize(new_in_size, 0);
 	m_filteredBufferL.resize(new_fft_size, 0);
@@ -445,7 +451,7 @@ void SaProcessor::rebuildWindow()
 {
 	// computation is done in fft_helpers
 	QMutexLocker lock(&m_dataAccess);
-	precomputeWindow(m_fftWindow.data(), m_inBlockSize, (FFT_WINDOWS) m_controls->m_windowModel.value());
+	precomputeWindow(m_fftWindow.data(), m_inBlockSize, (FFTWindow) m_controls->m_windowModel.value());
 }
 
 
@@ -542,28 +548,28 @@ float SaProcessor::binBandwidth() const
 
 float SaProcessor::getFreqRangeMin(bool linear) const
 {
-	switch (m_controls->m_freqRangeModel.value())
+	switch (static_cast<FrequencyRange>(m_controls->m_freqRangeModel.value()))
 	{
-		case FRANGE_AUDIBLE: return FRANGE_AUDIBLE_START;
-		case FRANGE_BASS: return FRANGE_BASS_START;
-		case FRANGE_MIDS: return FRANGE_MIDS_START;
-		case FRANGE_HIGH: return FRANGE_HIGH_START;
+		case FrequencyRange::Audible: return FRANGE_AUDIBLE_START;
+		case FrequencyRange::Bass: return FRANGE_BASS_START;
+		case FrequencyRange::Mids: return FRANGE_MIDS_START;
+		case FrequencyRange::High: return FRANGE_HIGH_START;
 		default:
-		case FRANGE_FULL: return linear ? 0 : LOWEST_LOG_FREQ;
+		case FrequencyRange::Full: return linear ? 0 : LOWEST_LOG_FREQ;
 	}
 }
 
 
 float SaProcessor::getFreqRangeMax() const
 {
-	switch (m_controls->m_freqRangeModel.value())
+	switch (static_cast<FrequencyRange>(m_controls->m_freqRangeModel.value()))
 	{
-		case FRANGE_AUDIBLE: return FRANGE_AUDIBLE_END;
-		case FRANGE_BASS: return FRANGE_BASS_END;
-		case FRANGE_MIDS: return FRANGE_MIDS_END;
-		case FRANGE_HIGH: return FRANGE_HIGH_END;
+		case FrequencyRange::Audible: return FRANGE_AUDIBLE_END;
+		case FrequencyRange::Bass: return FRANGE_BASS_END;
+		case FrequencyRange::Mids: return FRANGE_MIDS_END;
+		case FrequencyRange::High: return FRANGE_HIGH_END;
 		default:
-		case FRANGE_FULL: return getNyquistFreq();
+		case FrequencyRange::Full: return getNyquistFreq();
 	}
 }
 
@@ -616,26 +622,26 @@ float SaProcessor::getAmpRangeMin(bool linear) const
 {
 	// return very low limit to make sure zero gets included at linear grid
 	if (linear) {return -900;}
-	switch (m_controls->m_ampRangeModel.value())
+	switch (static_cast<AmplitudeRange>(m_controls->m_ampRangeModel.value()))
 	{
-		case ARANGE_EXTENDED: return ARANGE_EXTENDED_START;
-		case ARANGE_SILENT: return ARANGE_SILENT_START;
-		case ARANGE_LOUD: return ARANGE_LOUD_START;
+		case AmplitudeRange::Extended: return ARANGE_EXTENDED_START;
+		case AmplitudeRange::Silent: return ARANGE_SILENT_START;
+		case AmplitudeRange::Loud: return ARANGE_LOUD_START;
 		default:
-		case ARANGE_AUDIBLE: return ARANGE_AUDIBLE_START;
+		case AmplitudeRange::Audible: return ARANGE_AUDIBLE_START;
 	}
 }
 
 
 float SaProcessor::getAmpRangeMax() const
 {
-	switch (m_controls->m_ampRangeModel.value())
+	switch (static_cast<AmplitudeRange>(m_controls->m_ampRangeModel.value()))
 	{
-		case ARANGE_EXTENDED: return ARANGE_EXTENDED_END;
-		case ARANGE_SILENT: return ARANGE_SILENT_END;
-		case ARANGE_LOUD: return ARANGE_LOUD_END;
+		case AmplitudeRange::Extended: return ARANGE_EXTENDED_END;
+		case AmplitudeRange::Silent: return ARANGE_SILENT_END;
+		case AmplitudeRange::Loud: return ARANGE_LOUD_END;
 		default:
-		case ARANGE_AUDIBLE: return ARANGE_AUDIBLE_END;
+		case AmplitudeRange::Audible: return ARANGE_AUDIBLE_END;
 	}
 }
 
@@ -647,7 +653,8 @@ float SaProcessor::ampToYPixel(float amplitude, unsigned int height) const
 	if (m_controls->m_logYModel.value())
 	{
 		// logarithmic scale: convert linear amplitude to dB (relative to 1.0)
-		float amplitude_dB = 10 * log10(amplitude);
+		assert (amplitude >= 0);
+		float amplitude_dB = 10 * std::log10(std::max(amplitude, std::numeric_limits<float>::min()));
 		if (amplitude_dB < getAmpRangeMin())
 		{
 			return height;
@@ -689,3 +696,5 @@ float SaProcessor::yPixelToAmp(float y, unsigned int height) const
 	}
 }
 
+
+} // namespace lmms

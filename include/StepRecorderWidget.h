@@ -19,14 +19,17 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-#ifndef STEP_RECOREDER_WIDGET_H
-#define STEP_RECOREDER_WIDGET_H
 
+#ifndef LMMS_GUI_STEP_RECOREDER_WIDGET_H
+#define LMMS_GUI_STEP_RECOREDER_WIDGET_H
 
 #include <QWidget>
 #include <QColor>
 
 #include "TimePos.h"
+
+namespace lmms::gui
+{
 
 class StepRecorderWidget : public QWidget
 {
@@ -87,7 +90,9 @@ private:
 	const int m_marginRight;
 
 signals:
-	void positionChanged(const TimePos & t);
+	void positionChanged(const lmms::TimePos & t);
 } ;
 
-#endif //STEP_RECOREDER_WIDGET_H
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_STEP_RECOREDER_WIDGET_H

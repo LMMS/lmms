@@ -28,20 +28,23 @@
 #include "gui_templates.h"
 
 
+namespace lmms::gui
+{
+
 
 TabBar::TabBar( QWidget * _parent, QBoxLayout::Direction _dir ) :
 	QWidget( _parent ),
 	m_layout( new QBoxLayout( _dir, this ) ),
 	m_exclusive( false )
 {
-	m_layout->setMargin( 8 );
+	m_layout->setContentsMargins(8, 8, 8, 8);
 	m_layout->setSpacing( 0 );
 
 	setLayout( m_layout );
 }
 
 TabButton * TabBar::addTab( QWidget * _w, const QString & _text, int _id,
-				bool _add_stretch, bool _text_is_tooltip )
+				bool _add_stretch, bool _text_is_tooltip, bool fixWidgetToParentSize )
 {
 	// already tab with id?
 	if( m_tabs.contains( _id ) )
@@ -51,8 +54,8 @@ TabButton * TabBar::addTab( QWidget * _w, const QString & _text, int _id,
 	}
 	QString caption = ( _text_is_tooltip ) ? QString( "" ) : _text;
 	// create tab-button
-	TabButton * b = new TabButton( caption, _id, this );
-	connect( b, SIGNAL( clicked( int ) ), this, SLOT( tabClicked( int ) ) );
+	auto b = new TabButton(caption, _id, this);
+	connect( b, SIGNAL(clicked(int)), this, SLOT(tabClicked(int)));
 	b->setIconSize( QSize( 48, 48 ) );
 	b->setFixedSize( 64, 64 );
 	b->show();
@@ -80,10 +83,12 @@ TabButton * TabBar::addTab( QWidget * _w, const QString & _text, int _id,
 		m_layout->addStretch();
 	}
 
-
-	// we assume, parent-widget is a widget acting as widget-stack so all
-	// widgets have the same size and only the one on the top is visible
-	_w->setFixedSize( _w->parentWidget()->size() );
+	if (fixWidgetToParentSize)
+	{
+		// we assume, parent-widget is a widget acting as widget-stack so all
+		// widgets have the same size and only the one on the top is visible
+		_w->setFixedSize( _w->parentWidget()->size() );
+	}
 
 	b->setFont( pointSize<8>( b->font() ) );
 
@@ -229,9 +234,4 @@ bool TabBar::allHidden()
 }
 
 
-
-
-
-
-
-
+} // namespace lmms::gui

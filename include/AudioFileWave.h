@@ -23,14 +23,16 @@
  *
  */
 
-#ifndef AUDIO_FILE_WAVE_H
-#define AUDIO_FILE_WAVE_H
+#ifndef LMMS_AUDIO_FILE_WAVE_H
+#define LMMS_AUDIO_FILE_WAVE_H
 
 #include "lmmsconfig.h"
 #include "AudioFileDevice.h"
 
 #include <sndfile.h>
 
+namespace lmms
+{
 
 class AudioFileWave : public AudioFileDevice
 {
@@ -40,7 +42,7 @@ public:
 			bool & successful,
 			const QString & file,
 			AudioEngine* audioEngine );
-	virtual ~AudioFileWave();
+	~AudioFileWave() override;
 
 	static AudioFileDevice * getInst( const QString & outputFilename,
 					  OutputSettings const & outputSettings,
@@ -54,7 +56,7 @@ public:
 
 
 private:
-	virtual void writeBuffer( const surroundSampleFrame * _ab,
+	void writeBuffer( const surroundSampleFrame * _ab,
 						const fpp_t _frames,
 						float _master_gain ) override;
 
@@ -66,4 +68,7 @@ private:
 	SNDFILE * m_sf;
 } ;
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_AUDIO_FILE_WAVE_H

@@ -36,7 +36,8 @@
 
 #include "vstbase_export.h"
 
-class vstSubWin;
+namespace lmms
+{
 
 
 class VSTBASE_EXPORT VstPlugin : public RemotePlugin, public JournallingObject
@@ -44,7 +45,7 @@ class VSTBASE_EXPORT VstPlugin : public RemotePlugin, public JournallingObject
 	Q_OBJECT
 public:
 	VstPlugin( const QString & _plugin );
-	virtual ~VstPlugin();
+	~VstPlugin() override;
 
 	void tryLoad( const QString &remoteVstPluginExecutable );
 
@@ -111,7 +112,7 @@ public:
 	void loadSettings( const QDomElement & _this ) override;
 	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
 
-	virtual QString nodeName() const override
+	QString nodeName() const override
 	{
 		return "vstplugin";
 	}
@@ -123,15 +124,15 @@ public:
 	QString embedMethod() const;
 
 public slots:
-	void setTempo( bpm_t _bpm );
+	void setTempo( lmms::bpm_t _bpm );
 	void updateSampleRate();
-	void openPreset( void );
+	void openPreset();
 	void setProgram( int index );
 	void rotateProgram( int offset );
 	void loadProgramNames();
 	void loadParameterLabels();
 	void loadParameterDisplays();
-	void savePreset( void );
+	void savePreset();
 	void setParam( int i, float f );
 	void idleUpdate();
 
@@ -172,5 +173,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

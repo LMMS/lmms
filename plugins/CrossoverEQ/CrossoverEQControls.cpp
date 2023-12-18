@@ -27,6 +27,10 @@
 #include "CrossoverEQControls.h"
 #include "CrossoverEQ.h"
 
+namespace lmms
+{
+
+
 CrossoverEQControls::CrossoverEQControls( CrossoverEQEffect * eff ) :
 	EffectControls( eff ),
 	m_effect( eff ),
@@ -115,3 +119,6 @@ void CrossoverEQControls::sampleRateChanged()
 {
 	m_effect->sampleRateChanged();
 }
+
+
+} // namespace lmms

@@ -30,11 +30,19 @@
 #include <QWidget>
 
 
+namespace lmms
+{
+
 class BoolModel;
 class EqControls;
+class FloatModel;
+
+
+namespace gui
+{
+
 class EqCurve;
 class EqHandle;
-class FloatModel;
 
 class EqBand
 {
@@ -66,8 +74,8 @@ class EqParameterWidget : public QWidget
 	Q_OBJECT
 public:
 	explicit EqParameterWidget( QWidget *parent = 0, EqControls * controls = 0 );
-	~EqParameterWidget();
-	QList<EqHandle*> *m_handleList;
+	~EqParameterWidget() override;
+	QList<EqHandle*> m_handleList;
 
 	const int bandCount()
 	{
@@ -93,4 +101,10 @@ private slots:
 	void updateModels();
 	void updateHandle();
 };
+
+
+} // namespace gui
+
+} // namespace lmms
+
 #endif // EQPARAMETERWIDGET_H

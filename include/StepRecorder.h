@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef STEP_RECORDER_H
-#define STEP_RECORDER_H
+#ifndef LMMS_STEP_RECORDER_H
+#define LMMS_STEP_RECORDER_H
 
 #include <QColor>
 #include <QElapsedTimer>
@@ -28,18 +28,26 @@
 
 #include "Note.h"
 
-class MidiClip;
-class PianoRoll;
 class QKeyEvent;
 class QMouseEvent;
+
+namespace lmms
+{
+
+class MidiClip;
+
+namespace gui
+{
+class PianoRoll;
 class StepRecorderWidget;
+} // namespace gui
 
 class StepRecorder : public QObject
 {
 	Q_OBJECT
 
 	public:
-	StepRecorder(PianoRoll& pianoRoll, StepRecorderWidget& stepRecorderWidget);
+	StepRecorder(gui::PianoRoll& pianoRoll, gui::StepRecorderWidget& stepRecorderWidget);
 
 	void initialize();
 	void start(const TimePos& currentPosition,const TimePos& stepLength);
@@ -51,7 +59,7 @@ class StepRecorder : public QObject
 	void setCurrentMidiClip(MidiClip* newMidiClip);
 	void setStepsLength(const TimePos& newLength);
 
-	QVector<Note*> getCurStepNotes();
+	std::vector<Note*> getCurStepNotes();
 
 	bool isRecording() const
 	{
@@ -81,8 +89,8 @@ class StepRecorder : public QObject
 
 	bool allCurStepNotesReleased();
 
-	PianoRoll& m_pianoRoll;
-	StepRecorderWidget& m_stepRecorderWidget;
+	gui::PianoRoll& m_pianoRoll;
+	gui::StepRecorderWidget& m_stepRecorderWidget;
 
 	bool m_isRecording = false;
 	TimePos m_curStepStartPos = 0;
@@ -134,11 +142,14 @@ class StepRecorder : public QObject
 		QElapsedTimer releasedTimer;
 	} ;
 
-	QVector<StepNote*> m_curStepNotes; // contains the current recorded step notes (i.e. while user still press the notes; before they are applied to the clip)
+	std::vector<StepNote*> m_curStepNotes; // contains the current recorded step notes (i.e. while user still press the notes; before they are applied to the clip)
 
 	StepNote* findCurStepNote(const int key);
 
 	bool m_isStepInProgress = false;
 };
 
-#endif //STEP_RECORDER_H
+
+} // namespace lmms
+
+#endif // LMMS_STEP_RECORDER_H

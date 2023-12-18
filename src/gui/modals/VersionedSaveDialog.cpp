@@ -34,6 +34,10 @@
 #include "LedCheckBox.h"
 
 
+namespace lmms::gui
+{
+
+
 VersionedSaveDialog::VersionedSaveDialog( QWidget *parent,
 										  QWidget *saveOptionsWidget,
 										  const QString &caption,
@@ -45,20 +49,20 @@ VersionedSaveDialog::VersionedSaveDialog( QWidget *parent,
 	setFileMode( QFileDialog::AnyFile );
 
 	// Create + and - buttons
-	QPushButton *plusButton( new QPushButton( "+", this) );
+	auto plusButton(new QPushButton("+", this));
 	plusButton->setToolTip( tr( "Increment version number" ) );
-	QPushButton *minusButton( new QPushButton( "-", this ) );
+	auto minusButton(new QPushButton("-", this));
 	minusButton->setToolTip( tr( "Decrement version number" ) );
 	plusButton->setFixedWidth(horizontalAdvance(plusButton->fontMetrics(), "+") + 30);
 	minusButton->setFixedWidth(horizontalAdvance(minusButton->fontMetrics(), "+") + 30);
 
 	// Add buttons to grid layout. For doing this, remove the lineEdit and
 	// replace it with a HBox containing lineEdit and the buttons.
-	QGridLayout *layout = dynamic_cast<QGridLayout*>( this->layout() );
+	auto layout = dynamic_cast<QGridLayout*>(this->layout());
 	QWidget *lineEdit = findChild<QLineEdit*>();
 	layout->removeWidget( lineEdit );
 
-	QHBoxLayout* hLayout( new QHBoxLayout() );
+	auto hLayout(new QHBoxLayout());
 	hLayout->addWidget( lineEdit );
 	hLayout->addWidget( plusButton );
 	hLayout->addWidget( minusButton );
@@ -76,8 +80,8 @@ VersionedSaveDialog::VersionedSaveDialog( QWidget *parent,
 	}
 
 	// Connect + and - buttons
-	connect( plusButton, SIGNAL( clicked() ), this, SLOT( incrementVersion() ));
-	connect( minusButton, SIGNAL( clicked() ), this, SLOT( decrementVersion() ));
+	connect( plusButton, SIGNAL(clicked()), this, SLOT(incrementVersion()));
+	connect( minusButton, SIGNAL(clicked()), this, SLOT(decrementVersion()));
 }
 
 
@@ -189,3 +193,6 @@ SaveOptionsWidget::SaveOptionsWidget(Song::SaveOptions &saveOptions) {
 
 	setLayout(layout);
 }
+
+
+} // namespace lmms::gui

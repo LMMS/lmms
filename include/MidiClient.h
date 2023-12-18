@@ -22,18 +22,22 @@
  *
  */
 
-#ifndef MIDI_CLIENT_H
-#define MIDI_CLIENT_H
+#ifndef LMMS_MIDI_CLIENT_H
+#define LMMS_MIDI_CLIENT_H
 
 #include <QStringList>
-#include <QVector>
+#include <vector>
 
 
 #include "MidiEvent.h"
 
+class QObject;
+
+
+namespace lmms
+{
 
 class MidiPort;
-class QObject;
 class TimePos;
 
 
@@ -41,7 +45,7 @@ class TimePos;
 class MidiClient
 {
 public:
-	MidiClient();
+	MidiClient() = default;
 	virtual ~MidiClient();
 
 	// to be implemented by sub-classes
@@ -107,7 +111,7 @@ public:
 	static MidiClient * openMidiClient();
 
 protected:
-	QVector<MidiPort *> m_midiPorts;
+	std::vector<MidiPort *> m_midiPorts;
 
 } ;
 
@@ -120,8 +124,8 @@ const uint32_t RAW_MIDI_PARSE_BUF_SIZE = 16;
 class MidiClientRaw : public MidiClient
 {
 public:
-	MidiClientRaw();
-	virtual ~MidiClientRaw();
+	MidiClientRaw() = default;
+	~MidiClientRaw() override = default;
 
 	// we are raw-clients for sure!
 	bool isRaw() const override
@@ -167,6 +171,6 @@ private:
 
 } ;
 
+} // namespace lmms
 
-#endif
-
+#endif // LMMS_MIDI_CLIENT_H

@@ -45,21 +45,22 @@
 #include "embed.h"
 
 
+namespace lmms
+{
+
 class AutoDetectMidiController : public MidiController
 {
 public:
 	AutoDetectMidiController( Model* parent ) :
 		MidiController( parent ),
 		m_detectedMidiChannel( 0 ),
-		m_detectedMidiController( 0 )
+		m_detectedMidiController(NONE)
 	{
 		updateName();
 	}
 
 
-	virtual ~AutoDetectMidiController()
-	{
-	}
+	~AutoDetectMidiController() override = default;
 
 
 	void processInEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0 ) override
@@ -68,7 +69,7 @@ public:
 			( m_midiPort.inputChannel() == 0 || m_midiPort.inputChannel() == event.channel() + 1 ) )
 		{
 			m_detectedMidiChannel = event.channel() + 1;
-			m_detectedMidiController = event.controllerNumber() + 1;
+			m_detectedMidiController = event.controllerNumber();
 			m_detectedMidiPort = Engine::audioEngine()->midiClient()->sourcePortName( event );
 
 			emit valueChanged();
@@ -80,7 +81,7 @@ public:
 	// model has none.
 	MidiController* copyToMidiController( Model* parent )
 	{
-		MidiController* c = new MidiController( parent );
+		auto c = new MidiController(parent);
 		c->m_midiPort.setInputChannel( m_midiPort.inputChannel() );
 		c->m_midiPort.setInputController( m_midiPort.inputController() );
 		c->subscribeReadablePorts( m_midiPort.readablePorts() );
@@ -121,6 +122,8 @@ private:
 
 
 
+namespace gui
+{
 
 ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent, 
 		const AutomatableModel * _target_model ) :
@@ -138,8 +141,8 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 	// Midi stuff
 	m_midiGroupBox = new GroupBox( tr( "MIDI CONTROLLER" ), this );
 	m_midiGroupBox->setGeometry( 8, 10, 240, 80 );
-	connect( m_midiGroupBox->model(), SIGNAL( dataChanged() ),
-			this, SLOT( midiToggled() ) );
+	connect( m_midiGroupBox->model(), SIGNAL(dataChanged()),
+			this, SLOT(midiToggled()));
 	
 	m_midiChannelSpinBox = new LcdSpinBox( 2, m_midiGroupBox,
 			tr( "Input channel" ) );
@@ -149,7 +152,7 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 
 	m_midiControllerSpinBox = new LcdSpinBox( 3, m_midiGroupBox,
 			tr( "Input controller" ) );
-	m_midiControllerSpinBox->addTextForValue( 0, "---" );
+	m_midiControllerSpinBox->addTextForValue(MidiController::NONE, "---" );
 	m_midiControllerSpinBox->setLabel( tr( "CONTROLLER" ) );
 	m_midiControllerSpinBox->move( 68, 24 );
 	
@@ -159,17 +162,17 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 				m_midiGroupBox, tr("Auto Detect") );
 	m_midiAutoDetectCheckBox->setModel( &m_midiAutoDetect );
 	m_midiAutoDetectCheckBox->move( 8, 60 );
-	connect( &m_midiAutoDetect, SIGNAL( dataChanged() ),
-			this, SLOT( autoDetectToggled() ) );
+	connect( &m_midiAutoDetect, SIGNAL(dataChanged()),
+			this, SLOT(autoDetectToggled()));
 
 	// when using with non-raw-clients we can provide buttons showing
 	// our port-menus when being clicked
 	if( !Engine::audioEngine()->midiClient()->isRaw() )
 	{
-		m_readablePorts = new MidiPortMenu( MidiPort::Input );
-		connect( m_readablePorts, SIGNAL( triggered( QAction * ) ),
-				this, SLOT( enableAutoDetect( QAction * ) ) );
-		ToolButton * rp_btn = new ToolButton( m_midiGroupBox );
+		m_readablePorts = new MidiPortMenu( MidiPort::Mode::Input );
+		connect( m_readablePorts, SIGNAL(triggered(QAction*)),
+				this, SLOT(enableAutoDetect(QAction*)));
+		auto rp_btn = new ToolButton(m_midiGroupBox);
 		rp_btn->setText( tr( "MIDI-devices to receive "
 						"MIDI-events from" ) );
 		rp_btn->setIcon( embed::getIconPixmap( "piano" ) );
@@ -182,8 +185,8 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 	// User stuff
 	m_userGroupBox = new GroupBox( tr( "USER CONTROLLER" ), this );
 	m_userGroupBox->setGeometry( 8, 100, 240, 60 );
-	connect( m_userGroupBox->model(), SIGNAL( dataChanged() ),
-			this, SLOT( userToggled() ) );
+	connect( m_userGroupBox->model(), SIGNAL(dataChanged()),
+			this, SLOT(userToggled()));
 
 	m_userController = new ComboBox( m_userGroupBox, "Controller" );
 	m_userController->setGeometry( 10, 24, 200, ComboBox::DEFAULT_HEIGHT );
@@ -191,10 +194,10 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 	{
 		m_userController->model()->addItem( c->name() );
 	}
-	connect( m_userController->model(), SIGNAL( dataUnchanged() ),
-			this, SLOT( userSelected() ) );
-	connect( m_userController->model(), SIGNAL( dataChanged() ),
-			this, SLOT( userSelected() ) );
+	connect( m_userController->model(), SIGNAL(dataUnchanged()),
+			this, SLOT(userSelected()));
+	connect( m_userController->model(), SIGNAL(dataChanged()),
+			this, SLOT(userSelected()));
 
 
 	// Mapping functions
@@ -207,24 +210,20 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 
 
 	// Buttons
-	QWidget * buttons = new QWidget( this );
+	auto buttons = new QWidget(this);
 	buttons->setGeometry( 8, 240, 240, 32 );
 
-	QHBoxLayout * btn_layout = new QHBoxLayout( buttons );
+	auto btn_layout = new QHBoxLayout(buttons);
 	btn_layout->setSpacing( 0 );
-	btn_layout->setMargin( 0 );
-	
-	QPushButton * select_btn = new QPushButton( 
-					embed::getIconPixmap( "add" ),
-					tr( "OK" ), buttons );
-	connect( select_btn, SIGNAL( clicked() ), 
-				this, SLOT( selectController() ) );
-	
-	QPushButton * cancel_btn = new QPushButton( 
-					embed::getIconPixmap( "cancel" ),
-					tr( "Cancel" ), buttons );
-	connect( cancel_btn, SIGNAL( clicked() ),
-				this, SLOT( reject() ) );
+	btn_layout->setContentsMargins(0, 0, 0, 0);
+
+	auto select_btn = new QPushButton(embed::getIconPixmap("add"), tr("OK"), buttons);
+	connect( select_btn, SIGNAL(clicked()), 
+				this, SLOT(selectController()));
+
+	auto cancel_btn = new QPushButton(embed::getIconPixmap("cancel"), tr("Cancel"), buttons);
+	connect( cancel_btn, SIGNAL(clicked()),
+				this, SLOT(reject()));
 
 	btn_layout->addStretch();
 	btn_layout->addSpacing( 10 );
@@ -243,15 +242,15 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 	{
 		cc = m_targetModel->controllerConnection();
 
-		if( cc && cc->getController()->type() != Controller::DummyController && Engine::getSong() )
+		if( cc && cc->getController()->type() != Controller::ControllerType::Dummy && Engine::getSong() )
 		{
-			if ( cc->getController()->type() == Controller::MidiController )
+			if ( cc->getController()->type() == Controller::ControllerType::Midi )
 			{
 				m_midiGroupBox->model()->setValue( true );
 				// ensure controller is created
 				midiToggled();
-			
-				MidiController * cont = (MidiController*)( cc->getController() );
+
+				auto cont = (MidiController*)(cc->getController());
 				m_midiChannelSpinBox->model()->setValue( cont->m_midiPort.inputChannel() );
 				m_midiControllerSpinBox->model()->setValue( cont->m_midiPort.inputController() );
 
@@ -259,10 +258,12 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 			}
 			else
 			{
-				int idx = Engine::getSong()->controllers().indexOf( cc->getController() );
+				auto& controllers = Engine::getSong()->controllers();
+				auto it = std::find(controllers.begin(), controllers.end(), cc->getController());
 
-				if( idx >= 0 )
+				if (it != controllers.end())
 				{
+					int idx = std::distance(controllers.begin(), it);
 					m_userGroupBox->model()->setValue( true );
 					m_userController->model()->setValue( idx );
 				}
@@ -371,7 +372,7 @@ void ControllerConnectionDialog::midiToggled()
 				m_readablePorts->setModel( &m_midiController->m_midiPort );
 			}
 
-			connect( m_midiController, SIGNAL( valueChanged() ), this, SLOT( midiValueChanged() ) );
+			connect( m_midiController, SIGNAL(valueChanged()), this, SLOT(midiValueChanged()));
 		}
 	}
 	m_midiAutoDetect.setValue( enabled );
@@ -407,7 +408,7 @@ void ControllerConnectionDialog::userSelected()
 
 void ControllerConnectionDialog::autoDetectToggled()
 {
-	if( m_midiAutoDetect.value() )
+	if (m_midiAutoDetect.value() && m_midiController)
 	{
 		m_midiController->reset();
 	}
@@ -440,5 +441,6 @@ void ControllerConnectionDialog::enableAutoDetect( QAction * _a )
 
 
 
+} // namespace gui
 
-
+} // namespace lmms

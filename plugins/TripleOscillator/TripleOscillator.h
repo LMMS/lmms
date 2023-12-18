@@ -30,13 +30,23 @@
 #include "InstrumentView.h"
 #include "AutomatableModel.h"
 
+namespace lmms
+{
 
+
+class NotePlayHandle;
+class SampleBuffer;
+class Oscillator;
+
+
+namespace gui
+{
 class automatableButtonGroup;
 class Knob;
-class NotePlayHandle;
-class Oscillator;
 class PixmapButton;
-class SampleBuffer;
+class TripleOscillatorView;
+} // namespace gui
+
 
 const int NUM_OF_OSCILLATORS = 3;
 
@@ -47,7 +57,7 @@ class OscillatorObject : public Model
 	Q_OBJECT
 public:
 	OscillatorObject( Model * _parent, int _idx );
-	virtual ~OscillatorObject();
+	~OscillatorObject() override;
 
 
 private:
@@ -75,7 +85,7 @@ private:
 	bool m_useWaveTable;
 
 	friend class TripleOscillator;
-	friend class TripleOscillatorView;
+	friend class gui::TripleOscillatorView;
 
 
 private slots:
@@ -98,24 +108,24 @@ class TripleOscillator : public Instrument
 	Q_OBJECT
 public:
 	TripleOscillator( InstrumentTrack * _track );
-	virtual ~TripleOscillator();
+	~TripleOscillator() override = default;
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	void playNote( NotePlayHandle * _n,
+						sampleFrame * _working_buffer ) override;
+	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
-	virtual f_cnt_t desiredReleaseFrames() const
+	f_cnt_t desiredReleaseFrames() const override
 	{
 		return( 128 );
 	}
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 
 protected slots:
@@ -133,10 +143,13 @@ private:
 	} ;
 
 
-	friend class TripleOscillatorView;
+	friend class gui::TripleOscillatorView;
 
 } ;
 
+
+namespace gui
+{
 
 
 class TripleOscillatorView : public InstrumentViewFixedSize
@@ -144,11 +157,11 @@ class TripleOscillatorView : public InstrumentViewFixedSize
 	Q_OBJECT
 public:
 	TripleOscillatorView( Instrument * _instrument, QWidget * _parent );
-	virtual ~TripleOscillatorView();
+	~TripleOscillatorView() override = default;
 
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	automatableButtonGroup * m_mod1BtnGrp;
 	automatableButtonGroup * m_mod2BtnGrp;
@@ -178,9 +191,7 @@ private:
 			m_multiBandWaveTableButton( wt )
 		{
 		}
-		OscillatorKnobs()
-		{
-		}
+		OscillatorKnobs() = default;
 		Knob * m_volKnob;
 		Knob * m_panKnob;
 		Knob * m_coarseKnob;
@@ -198,5 +209,8 @@ private:
 } ;
 
 
+} // namespace gui
+
+} // namespace lmms
 
 #endif

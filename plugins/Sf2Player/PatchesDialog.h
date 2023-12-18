@@ -34,6 +34,9 @@
 class QLabel;
 
 
+namespace lmms::gui
+{
+
 //----------------------------------------------------------------------------
 // qsynthPresetForm -- UI wrapper form.
 
@@ -47,7 +50,7 @@ public:
 	PatchesDialog(QWidget *pParent = 0, Qt::WindowFlags wflags = QFlag(0));
 
 	// Destructor.
-	virtual ~PatchesDialog();
+	~PatchesDialog() override = default;
 
 
 	void setup(fluid_synth_t *pSynth, int iChan, const QString & _chanName,
@@ -61,8 +64,8 @@ public slots:
 
 protected slots:
 
-	void accept();
-	void reject();
+	void accept() override;
+	void reject() override;
 
 protected:
 
@@ -91,6 +94,8 @@ private:
 	QLabel *m_patchLabel;
 };
 
+
+} // namespace lmms::gui
 
 #endif
 

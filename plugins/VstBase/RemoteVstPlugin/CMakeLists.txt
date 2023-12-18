@@ -43,6 +43,10 @@ if(NOT WIN32)
 	target_link_libraries(${EXE_NAME} pthread)
 endif()
 
+if(LMMS_HAVE_LIBRT)
+	target_link_libraries(${EXE_NAME} rt)
+endif()
+
 target_include_directories(${EXE_NAME}
 	PRIVATE 
 		"${LMMS_SOURCE_DIR}/plugins/vst_base/common"
@@ -85,9 +89,25 @@ if(IS_MINGW)
 	endif()
 endif()
 
-IF(STRIP)
-	ADD_CUSTOM_COMMAND(TARGET ${EXE_NAME} POST_BUILD COMMAND "${STRIP}" "$<TARGET_FILE:${EXE_NAME}>")
-ENDIF()
+if(LMMS_BUILD_WIN32)
+	if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.16")
+		set(NOOP_COMMAND "${CMAKE_COMMAND}" "-E" "true")
+	else()
+		set(NOOP_COMMAND "${CMAKE_COMMAND}" "-E" "echo")
+	endif()
+	if(STRIP)
+		set(STRIP_COMMAND "$<IF:$<TARGET:Debug,RelWithDebInfo>,${NOOP_COMMAND},${STRIP}>")
+	else()
+		set(STRIP_COMMAND "${NOOP_COMMAND}")
+	endif()
+	add_custom_command(
+		TARGET "${EXE_NAME}"
+		POST_BUILD
+		COMMAND "${STRIP_COMMAND}" "$<TARGET_FILE:${EXE_NAME}>"
+		VERBATIM
+		COMMAND_EXPAND_LISTS
+	)
+endif()
 
 if(BITNESS EQUAL 32)
 	INSTALL(TARGETS ${EXE_NAME} RUNTIME DESTINATION "${PLUGIN_DIR}/32")

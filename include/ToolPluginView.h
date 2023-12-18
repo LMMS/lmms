@@ -23,12 +23,19 @@
  *
  */
 
-#ifndef TOOL_PLUGIN_VIEW_H
-#define TOOL_PLUGIN_VIEW_H
+#ifndef LMMS_GUI_TOOL_PLUGIN_VIEW_H
+#define LMMS_GUI_TOOL_PLUGIN_VIEW_H
 
 #include "PluginView.h"
 
+namespace lmms
+{
+
 class ToolPlugin;
+
+namespace gui
+{
+
 
 class LMMS_EXPORT ToolPluginView : public PluginView
 {
@@ -38,4 +45,8 @@ public:
 } ;
 
 
-#endif
+} // namespace gui
+
+} // namespace lmms
+
+#endif // LMMS_GUI_TOOL_PLUGIN_VIEW_H

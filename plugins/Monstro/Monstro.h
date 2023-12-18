@@ -38,21 +38,19 @@
 #include "lmms_math.h"
 #include "BandLimitedWave.h"
 
-class ComboBox;
-
 //
 //	UI Macros
 //
 
 #define makeknob( name, x, y, hint, unit, oname ) 		\
-	name = new Knob( knobStyled, view ); 				\
+	name = new Knob( KnobType::Styled, view ); 				\
 	name ->move( x, y );								\
 	name ->setHintText( hint, unit );             \
 	name ->setObjectName( oname );						\
 	name ->setFixedSize( 20, 20 );
 
 #define maketsknob( name, x, y, hint, unit, oname ) 		\
-	name = new TempoSyncKnob( knobStyled, view ); 				\
+	name = new TempoSyncKnob( KnobType::Styled, view ); 				\
 	name ->move( x, y );								\
 	name ->setHintText( hint, unit );		\
 	name ->setObjectName( oname );						\
@@ -65,6 +63,14 @@ class ComboBox;
 	name -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "tinyled_on" ) ); \
 	name -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "tinyled_off" ) ); \
 	name->setToolTip(ttip);
+
+namespace lmms
+{
+
+
+namespace gui
+{
+
 
 // UI constants
 const int O1ROW = 22;
@@ -107,6 +113,9 @@ const int MATROW6 = 22 + 39*5;
 
 const int OPVIEW = 0;
 const int MATVIEW = 1;
+
+
+} // namespace gui
 
 // waveform enumerators
 const int WAVE_SINE = 0;
@@ -154,7 +163,12 @@ const float PW_MIN = 0.25f;
 const float PW_MAX = 100.0f - PW_MIN;
 
 class MonstroInstrument;
+
+namespace gui
+{
 class MonstroView;
+class ComboBox;
+}
 
 
 class MonstroSynth
@@ -162,7 +176,7 @@ class MonstroSynth
 	MM_OPERATORS
 public:
 	MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph );
-	virtual ~MonstroSynth();
+	virtual ~MonstroSynth() = default;
 
 	void renderOutput( fpp_t _frames, sampleFrame * _buf );
 
@@ -197,19 +211,19 @@ private:
 				break;
 			case WAVE_TRI:
 				//return Oscillator::triangleSample( _ph );
-				return BandLimitedWave::oscillate( _ph, _wavelen, BandLimitedWave::BLTriangle );
+				return BandLimitedWave::oscillate( _ph, _wavelen, BandLimitedWave::Waveform::BLTriangle );
 				break;
 			case WAVE_SAW:
 				//return Oscillator::sawSample( _ph );
-				return BandLimitedWave::oscillate( _ph, _wavelen, BandLimitedWave::BLSaw );
+				return BandLimitedWave::oscillate( _ph, _wavelen, BandLimitedWave::Waveform::BLSaw );
 				break;
 			case WAVE_RAMP:
 				//return Oscillator::sawSample( _ph ) * -1.0;
-				return BandLimitedWave::oscillate( _ph, _wavelen, BandLimitedWave::BLSaw ) * -1.0;
+				return BandLimitedWave::oscillate( _ph, _wavelen, BandLimitedWave::Waveform::BLSaw ) * -1.0;
 				break;
 			case WAVE_SQR:
 				//return Oscillator::squareSample( _ph );
-				return BandLimitedWave::oscillate( _ph, _wavelen, BandLimitedWave::BLSquare );
+				return BandLimitedWave::oscillate( _ph, _wavelen, BandLimitedWave::Waveform::BLSquare );
 				break;
 			case WAVE_SQRSOFT:
 			{
@@ -222,7 +236,7 @@ private:
 			}
 			case WAVE_MOOG:
 				//return Oscillator::moogSawSample( _ph );
-				return BandLimitedWave::oscillate( _ph, _wavelen, BandLimitedWave::BLMoog );
+				return BandLimitedWave::oscillate( _ph, _wavelen, BandLimitedWave::Waveform::BLMoog );
 				break;
 			case WAVE_SINABS:
 				return qAbs( Oscillator::sinSample( _ph ) );
@@ -341,21 +355,21 @@ class MonstroInstrument : public Instrument
 
 public:
 	MonstroInstrument( InstrumentTrack * _instrument_track );
-	virtual ~MonstroInstrument();
+	~MonstroInstrument() override = default;
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	void playNote( NotePlayHandle * _n,
+						sampleFrame * _working_buffer ) override;
+	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
-	virtual void saveSettings( QDomDocument & _doc,
-							QDomElement & _this );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc,
+							QDomElement & _this ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
-	virtual f_cnt_t desiredReleaseFrames() const;
+	f_cnt_t desiredReleaseFrames() const override;
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 public slots:
 	void updateVolume1();
@@ -564,9 +578,14 @@ private:
 	FloatModel	m_sub3lfo2;
 
 	friend class MonstroSynth;
-	friend class MonstroView;
+	friend class gui::MonstroView;
 
 };
+
+
+namespace gui
+{
+
 
 class MonstroView : public InstrumentViewFixedSize
 {
@@ -574,13 +593,13 @@ class MonstroView : public InstrumentViewFixedSize
 public:
 	MonstroView( Instrument * _instrument,
 					QWidget * _parent );
-	virtual ~MonstroView();
+	~MonstroView() override = default;
 
 protected slots:
 	void updateLayout();
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	void setWidgetBackground( QWidget * _widget, const QString & _pic );
 	QWidget * setupOperatorsView( QWidget * _parent );
@@ -718,5 +737,9 @@ private:
 
 };
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

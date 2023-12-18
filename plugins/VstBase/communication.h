@@ -27,6 +27,8 @@
 #ifndef _COMMUNICATION_H
 #define _COMMUNICATION_H
 
+namespace lmms
+{
 
 
 struct VstParameterDumpItem
@@ -38,15 +40,15 @@ struct VstParameterDumpItem
 
 
 
-enum VstHostLanguages
+enum class VstHostLanguage
 {
-	LanguageEnglish = 1,
-	LanguageGerman,
-	LanguageFrench,
-	LanguageItalian,
-	LanguageSpanish,
-	LanguageJapanese,
-	LanguageKorean
+	English = 1,
+	German,
+	French,
+	Italian,
+	Spanish,
+	Japanese,
+	Korean
 } ;
 
 
@@ -54,7 +56,7 @@ enum VstHostLanguages
 enum VstRemoteMessageIDs
 {
 	// vstPlugin -> remoteVstPlugin
-	IdVstLoadPlugin = IdUserBase,
+	IdVstLoadPlugin = RemoteMessageIDs::IdUserBase,
 	IdVstClosePlugin,
 	IdVstSetTempo,
 	IdVstSetLanguage,
@@ -87,5 +89,6 @@ enum VstRemoteMessageIDs
 } ;
 
 
+} // namespace lmms
 
 #endif

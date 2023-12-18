@@ -31,7 +31,8 @@
 
 #include "LadspaManager.h"
 
-
+namespace lmms::gui
+{
 
 
 class LadspaPortDialog : public QDialog
@@ -39,11 +40,11 @@ class LadspaPortDialog : public QDialog
 	Q_OBJECT
 public:
 	LadspaPortDialog( const ladspa_key_t & _key );
-	virtual ~LadspaPortDialog();
+	~LadspaPortDialog() override = default;
 
 };
 
 
-
+} // namespace lmms::gui
 
 #endif

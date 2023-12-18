@@ -23,11 +23,10 @@
  *
  */
 
-
+#include "Kicker.h"
 
 #include <QDomElement>
 
-#include "Kicker.h"
 #include "AudioEngine.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
@@ -40,18 +39,22 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT kicker_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Kicker",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Versatile drum synthesizer" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
@@ -81,72 +84,64 @@ KickerInstrument::KickerInstrument( InstrumentTrack * _instrument_track ) :
 
 
 
-KickerInstrument::~KickerInstrument()
+void KickerInstrument::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
+	m_startFreqModel.saveSettings(doc, elem, "startfreq");
+	m_endFreqModel.saveSettings(doc, elem, "endfreq");
+	m_decayModel.saveSettings(doc, elem, "decay");
+	m_distModel.saveSettings(doc, elem, "dist");
+	m_distEndModel.saveSettings(doc, elem, "distend");
+	m_gainModel.saveSettings(doc, elem, "gain");
+	m_envModel.saveSettings(doc, elem, "env");
+	m_noiseModel.saveSettings(doc, elem, "noise");
+	m_clickModel.saveSettings(doc, elem, "click");
+	m_slopeModel.saveSettings(doc, elem, "slope");
+	m_startNoteModel.saveSettings(doc, elem, "startnote");
+	m_endNoteModel.saveSettings(doc, elem, "endnote");
+	m_versionModel.saveSettings(doc, elem, "version");
 }
 
 
 
 
-void KickerInstrument::saveSettings( QDomDocument & _doc,
-							QDomElement & _this )
+void KickerInstrument::loadSettings(const QDomElement& elem)
 {
-	m_startFreqModel.saveSettings( _doc, _this, "startfreq" );
-	m_endFreqModel.saveSettings( _doc, _this, "endfreq" );
-	m_decayModel.saveSettings( _doc, _this, "decay" );
-	m_distModel.saveSettings( _doc, _this, "dist" );
-	m_distEndModel.saveSettings( _doc, _this, "distend" );
-	m_gainModel.saveSettings( _doc, _this, "gain" );
-	m_envModel.saveSettings( _doc, _this, "env" );
-	m_noiseModel.saveSettings( _doc, _this, "noise" );
-	m_clickModel.saveSettings( _doc, _this, "click" );
-	m_slopeModel.saveSettings( _doc, _this, "slope" );
-	m_startNoteModel.saveSettings( _doc, _this, "startnote" );
-	m_endNoteModel.saveSettings( _doc, _this, "endnote" );
-	m_versionModel.saveSettings( _doc, _this, "version" );
-}
+	m_versionModel.loadSettings(elem, "version");
 
-
-
-
-void KickerInstrument::loadSettings( const QDomElement & _this )
-{
-	m_versionModel.loadSettings( _this, "version" );
-
-	m_startFreqModel.loadSettings( _this, "startfreq" );
-	m_endFreqModel.loadSettings( _this, "endfreq" );
-	m_decayModel.loadSettings( _this, "decay" );
-	m_distModel.loadSettings( _this, "dist" );
-	if( _this.hasAttribute( "distend" ) )
+	m_startFreqModel.loadSettings(elem, "startfreq");
+	m_endFreqModel.loadSettings(elem, "endfreq");
+	m_decayModel.loadSettings(elem, "decay");
+	m_distModel.loadSettings(elem, "dist");
+	if (elem.hasAttribute("distend") || !elem.firstChildElement("distend").isNull())
 	{
-		m_distEndModel.loadSettings( _this, "distend" );
+		m_distEndModel.loadSettings(elem, "distend");
 	}
 	else
 	{
-		m_distEndModel.setValue( m_distModel.value() );
+		m_distEndModel.setValue(m_distModel.value());
 	}
-	m_gainModel.loadSettings( _this, "gain" );
-	m_envModel.loadSettings( _this, "env" );
-	m_noiseModel.loadSettings( _this, "noise" );
-	m_clickModel.loadSettings( _this, "click" );
-	m_slopeModel.loadSettings( _this, "slope" );
-	m_startNoteModel.loadSettings( _this, "startnote" );
-	if( m_versionModel.value() < 1 )
+	m_gainModel.loadSettings(elem, "gain");
+	m_envModel.loadSettings(elem, "env");
+	m_noiseModel.loadSettings(elem, "noise");
+	m_clickModel.loadSettings(elem, "click");
+	m_slopeModel.loadSettings(elem, "slope");
+	m_startNoteModel.loadSettings(elem, "startnote");
+	if (m_versionModel.value() < 1)
 	{
-		m_startNoteModel.setValue( false );
+		m_startNoteModel.setValue(false);
 	}
-	m_endNoteModel.loadSettings( _this, "endnote" );
+	m_endNoteModel.loadSettings(elem, "endnote");
 
 	// Try to maintain backwards compatibility
-	if( !_this.hasAttribute( "version" ) )
+	if (!elem.hasAttribute("version"))
 	{
-		m_startNoteModel.setValue( false );
-		m_decayModel.setValue( m_decayModel.value() * 1.33f );
-		m_envModel.setValue( 1.0f );
-		m_slopeModel.setValue( 1.0f );
-		m_clickModel.setValue( 0.0f );
+		m_startNoteModel.setValue(false);
+		m_decayModel.setValue(m_decayModel.value() * 1.33f);
+		m_envModel.setValue(1.0f);
+		m_slopeModel.setValue(1.0f);
+		m_clickModel.setValue(0.0f);
 	}
-	m_versionModel.setValue( KICKER_PRESET_VERSION );
+	m_versionModel.setValue(KICKER_PRESET_VERSION);
 }
 
 
@@ -157,11 +152,8 @@ QString KickerInstrument::nodeName() const
 	return kicker_plugin_descriptor.name;
 }
 
-
-
-typedef DspEffectLibrary::Distortion DistFX;
-typedef KickerOsc<DspEffectLibrary::MonoToStereoAdaptor<DistFX> > SweepOsc;
-
+using DistFX = DspEffectLibrary::Distortion;
+using SweepOsc = KickerOsc<DspEffectLibrary::MonoToStereoAdaptor<DistFX>>;
 
 void KickerInstrument::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
@@ -171,7 +163,7 @@ void KickerInstrument::playNote( NotePlayHandle * _n,
 	const float decfr = m_decayModel.value() * Engine::audioEngine()->processingSampleRate() / 1000.0f;
 	const f_cnt_t tfp = _n->totalFramesPlayed();
 
-	if ( tfp == 0 )
+	if (!_n->m_pluginData)
 	{
 		_n->m_pluginData = new SweepOsc(
 					DistFX( m_distModel.value(),
@@ -191,7 +183,7 @@ void KickerInstrument::playNote( NotePlayHandle * _n,
 		_n->noteOff();
 	}
 
-	SweepOsc * so = static_cast<SweepOsc *>( _n->m_pluginData );
+	auto so = static_cast<SweepOsc*>(_n->m_pluginData);
 	so->update( _working_buffer + offset, frames, Engine::audioEngine()->processingSampleRate() );
 
 	if( _n->isReleased() )
@@ -205,8 +197,6 @@ void KickerInstrument::playNote( NotePlayHandle * _n,
 			_working_buffer[f+offset][1] *= fac;
 		}
 	}
-
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
 }
 
 
@@ -220,19 +210,21 @@ void KickerInstrument::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-PluginView * KickerInstrument::instantiateView( QWidget * _parent )
+gui::PluginView * KickerInstrument::instantiateView( QWidget * _parent )
 {
-	return new KickerInstrumentView( this, _parent );
+	return new gui::KickerInstrumentView( this, _parent );
 }
 
 
+namespace gui
+{
 
 
 class KickerKnob : public Knob
 {
 public:
 	KickerKnob( QWidget * _parent ) :
-			Knob( knobStyled, _parent )
+			Knob( KnobType::Styled, _parent )
 	{
 		setFixedSize( 29, 29 );
 		setObjectName( "smallKnob" );
@@ -244,7 +236,7 @@ class KickerEnvKnob : public TempoSyncKnob
 {
 public:
 	KickerEnvKnob( QWidget * _parent ) :
-			TempoSyncKnob( knobStyled, _parent )
+			TempoSyncKnob( KnobType::Styled, _parent )
 	{
 		setFixedSize( 29, 29 );
 		setObjectName( "smallKnob" );
@@ -256,7 +248,7 @@ class KickerLargeKnob : public Knob
 {
 public:
 	KickerLargeKnob( QWidget * _parent ) :
-			Knob( knobStyled, _parent )
+			Knob( KnobType::Styled, _parent )
 	{
 		setFixedSize( 34, 34 );
 		setObjectName( "largeKnob" );
@@ -321,10 +313,10 @@ KickerInstrumentView::KickerInstrumentView( Instrument * _instrument,
 	m_distEndKnob->setHintText( tr( "End distortion:" ), "" );
 	m_distEndKnob->move( COL5, ROW2 );
 
-	m_startNoteToggle = new LedCheckBox( "", this, "", LedCheckBox::Green );
+	m_startNoteToggle = new LedCheckBox( "", this, "", LedCheckBox::LedColor::Green );
 	m_startNoteToggle->move( COL1 + 8, LED_ROW );
 
-	m_endNoteToggle = new LedCheckBox( "", this, "", LedCheckBox::Green );
+	m_endNoteToggle = new LedCheckBox( "", this, "", LedCheckBox::LedColor::Green );
 	m_endNoteToggle->move( END_COL + 8, LED_ROW );
 
 	setAutoFillBackground( true );
@@ -336,16 +328,9 @@ KickerInstrumentView::KickerInstrumentView( Instrument * _instrument,
 
 
 
-KickerInstrumentView::~KickerInstrumentView()
-{
-}
-
-
-
-
 void KickerInstrumentView::modelChanged()
 {
-	KickerInstrument * k = castModel<KickerInstrument>();
+	auto k = castModel<KickerInstrument>();
 	m_startFreqKnob->setModel( &k->m_startFreqModel );
 	m_endFreqKnob->setModel( &k->m_endFreqModel );
 	m_decayKnob->setModel( &k->m_decayModel );
@@ -361,7 +346,7 @@ void KickerInstrumentView::modelChanged()
 }
 
 
-
+} // namespace gui
 
 
 extern "C"
@@ -377,5 +362,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * m, void * )
 }
 
 
-
-
+} // namespace lmms

@@ -22,15 +22,17 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
- 
-#ifndef DELAY_H
-#define DELAY_H
+
+#ifndef LMMS_DELAY_H
+#define LMMS_DELAY_H
 
 #include "lmms_basics.h"
 #include "lmms_math.h"
 #include "interpolation.h"
 #include "MemoryManager.h"
+
+namespace lmms
+{
 
 // brief usage 
 
@@ -63,7 +65,7 @@ template<ch_cnt_t CHANNELS>
 class CombFeedback
 {
 public:
-	typedef double frame[CHANNELS];
+	using frame = std::array<double, CHANNELS>;
 
 	CombFeedback( int maxDelay ) :
 		m_size( maxDelay ),
@@ -134,7 +136,7 @@ private:
 template<ch_cnt_t CHANNELS>
 class CombFeedfwd
 {
-	typedef double frame[CHANNELS];
+	using frame = std::array<double, CHANNELS>;
 
 	CombFeedfwd( int maxDelay ) :
 		m_size( maxDelay ),
@@ -205,7 +207,7 @@ private:
 template<ch_cnt_t CHANNELS>
 class CombFeedbackDualtap
 {
-	typedef double frame[CHANNELS];
+	using frame = std::array<double, CHANNELS>;
 
 	CombFeedbackDualtap( int maxDelay ) :
 		m_size( maxDelay ),
@@ -286,7 +288,7 @@ template<ch_cnt_t CHANNELS>
 class AllpassDelay
 {
 public:
-	typedef double frame[CHANNELS];
+	using frame = std::array<double, CHANNELS>;
 
 	AllpassDelay( int maxDelay ) :
 		m_size( maxDelay ),
@@ -355,9 +357,11 @@ private:
 };
 
 // convenience typedefs for stereo effects
-typedef CombFeedback<2> StereoCombFeedback;
-typedef CombFeedfwd<2> StereoCombFeedfwd;
-typedef CombFeedbackDualtap<2> StereoCombFeedbackDualtap;
-typedef AllpassDelay<2> StereoAllpassDelay;
+using StereoCombFeedback = CombFeedback<2>;
+using StereoCombFeedfwd = CombFeedfwd<2>;
+using StereoCombFeedbackDualtap = CombFeedbackDualtap<2>;
+using StereoAllpassDelay = AllpassDelay<2>;
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_DELAY_H

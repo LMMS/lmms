@@ -27,7 +27,7 @@
 #ifndef _MALLET_H
 #define _MALLET_H
 
-#include "Instrmnt.h"
+#include <stk/Instrmnt.h>
 
 #include "ComboBox.h"
 #include "Instrument.h"
@@ -40,9 +40,21 @@
 // However in older versions this namespace does not exist, therefore declare it
 // so this plugin builds with all versions of Stk.
 namespace stk { } ;
+
+namespace lmms
+{
+
+
 using namespace stk;
 
 static const int MALLETS_PRESET_VERSION = 1;
+
+
+namespace gui
+{
+class MalletsInstrumentView;
+} // namespace gui
+
 
 class MalletsSynth
 {
@@ -112,12 +124,38 @@ public:
 		return( s );
 	}
 
-	inline void setFrequency( const StkFloat _pitch )
+	inline void setFrequency(const StkFloat _pitch)
 	{
-		if( m_voice )
-		{
-			m_voice->setFrequency( _pitch );
-		}
+		if (m_voice) { m_voice->setFrequency(_pitch); }
+	}
+
+	// ModalBar updates
+	inline void setVibratoGain(const StkFloat _control8)
+	{
+		// bug in stk, Control Number 8 and 1 swapped in ModalBar
+		// we send the control number for stick direct mix instead
+		if (m_voice) { m_voice->controlChange(8, _control8); }
+	}
+
+	inline void setVibratoFreq(const StkFloat _control11)
+	{
+		if (m_voice) { m_voice->controlChange(11, _control11); }
+	}
+
+	// Tubular Bells updates
+	inline void setADSR(const StkFloat _control128)
+	{
+		if (m_voice) { m_voice->controlChange(128, _control128); }
+	}
+
+	inline void setLFODepth(const StkFloat _control1)
+	{
+		if (m_voice) { m_voice->controlChange(1, _control1); }
+	}
+
+	inline void setLFOSpeed(const StkFloat _control11)
+	{
+		if (m_voice) { m_voice->controlChange(11, _control11); }
 	}
 
 	inline int presetIndex()
@@ -148,19 +186,19 @@ class MalletsInstrument : public Instrument
 	Q_OBJECT
 public:
 	MalletsInstrument( InstrumentTrack * _instrument_track );
-	virtual ~MalletsInstrument();
+	~MalletsInstrument() override = default;
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	void playNote( NotePlayHandle * _n,
+						sampleFrame * _working_buffer ) override;
+	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 
 private:
@@ -185,6 +223,7 @@ private:
 
 	ComboBoxModel m_presetsModel;
 	FloatModel m_spreadModel;
+	FloatModel m_randomModel;
 	IntModel m_versionModel;
 	BoolModel m_isOldVersionModel;
 
@@ -193,9 +232,12 @@ private:
 	bool m_filesMissing;
 
 
-	friend class MalletsInstrumentView;
+	friend class gui::MalletsInstrumentView;
 
 } ;
+
+namespace gui
+{
 
 
 class MalletsInstrumentView: public InstrumentViewFixedSize
@@ -204,13 +246,13 @@ class MalletsInstrumentView: public InstrumentViewFixedSize
 public:
 	MalletsInstrumentView( MalletsInstrument * _instrument,
 				QWidget * _parent );
-	virtual ~MalletsInstrumentView();
+	~MalletsInstrumentView() override = default;
 
 public slots:
 	void changePreset();
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	void setWidgetBackground( QWidget * _widget, const QString & _pic );
 	QWidget * setupModalBarControls( QWidget * _parent );
@@ -240,6 +282,12 @@ private:
 
 	ComboBox * m_presetsCombo;
 	Knob * m_spreadKnob;
+	Knob * m_randomKnob;
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

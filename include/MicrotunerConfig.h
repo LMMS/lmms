@@ -22,9 +22,8 @@
  *
  */
 
-#ifndef MICROTUNER_CONFIG_H
-#define MICROTUNER_CONFIG_H
-
+#ifndef LMMS_GUI_MICROTUNER_CONFIG_H
+#define LMMS_GUI_MICROTUNER_CONFIG_H
 
 #include <QWidget>
 
@@ -34,6 +33,10 @@
 
 class QLineEdit;
 class QPlainTextEdit;
+
+namespace lmms::gui
+{
+
 
 class LMMS_EXPORT MicrotunerConfig : public QWidget, public SerializingObject
 {
@@ -89,4 +92,7 @@ private:
 	FloatModel m_baseFreqModel;             //!< model for spinbox of currently edited base note frequency
 };
 
-#endif
+
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_MICROTUNER_CONFIG_H

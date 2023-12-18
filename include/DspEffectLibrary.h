@@ -22,23 +22,22 @@
  *
  */
 
-
-#ifndef DSP_EFFECT_LIBRARY_H
-#define DSP_EFFECT_LIBRARY_H
+#ifndef LMMS_DSPEFFECTLIBRARY_H
+#define LMMS_DSPEFFECTLIBRARY_H
 
 #include "lmms_math.h"
 #include "lmms_constants.h"
 #include "lmms_basics.h"
 
 
-namespace DspEffectLibrary
+namespace lmms::DspEffectLibrary
 {
 
 	template<typename T>
 	class MonoBase
 	{
 	public:
-		typedef class MonoBypass bypassType;
+		using bypassType = class MonoBypass;
 
 		static void process( sample_t * * _buf, const f_cnt_t _frames )
 		{
@@ -53,7 +52,7 @@ namespace DspEffectLibrary
 	class StereoBase
 	{
 	public:
-		typedef class StereoBypass bypassType;
+		using bypassType = class StereoBypass;
 
 		static void process( sample_t * * _buf, const f_cnt_t _frames )
 		{
@@ -164,7 +163,7 @@ namespace DspEffectLibrary
 	class Chain : public FX0::bypassType
 	{
 	public:
-		typedef typename FX0::sample_t sample_t;
+		using sample_t = typename FX0::sample_t;
 		Chain( const FX0& fx0, const FX1& fx1 = FX1() ) :
 			m_FX0( fx0 ),
 			m_FX1( fx1 )
@@ -188,7 +187,7 @@ namespace DspEffectLibrary
 	template<typename sample_t>
 	inline sample_t saturate( sample_t x )
 	{
-		return qMin<sample_t>( qMax<sample_t>( -1.0f, x ), 1.0f );
+		return std::min<sample_t>(std::max<sample_t>(-1.0f, x), 1.0f);
 	}
 
 
@@ -199,7 +198,7 @@ namespace DspEffectLibrary
 				const sample_t _gain,
 				const sample_t _ratio,
 				const FastBassBoost & _orig = FastBassBoost() ) :
-			m_frequency( qMax<sample_t>( _frequency, 10.0 ) ),
+			m_frequency(std::max<sample_t>(_frequency, 10.0)),
 			m_gain1( 1.0 / ( m_frequency + 1.0 ) ),
 			m_gain2( _gain ),
 			m_ratio( _ratio ),
@@ -329,7 +328,6 @@ namespace DspEffectLibrary
 
 	} ;
 
-} ;
+} // namespace lmms::DspEffectLibrary
 
-
-#endif
+#endif // LMMS_DSPEFFECTLIBRARY_H

@@ -30,6 +30,9 @@
 #include "Oscillator.h"
 
 
+namespace lmms
+{
+
 // how long should be each envelope-segment maximal (e.g. attack)?
 extern const float SECS_PER_ENV_SEGMENT = 5.0f;
 // how long should be one LFO-oscillation maximal?
@@ -44,11 +47,10 @@ EnvelopeAndLfoParameters::LfoInstances * EnvelopeAndLfoParameters::s_lfoInstance
 void EnvelopeAndLfoParameters::LfoInstances::trigger()
 {
 	QMutexLocker m( &m_lfoListMutex );
-	for( LfoList::Iterator it = m_lfos.begin();
-							it != m_lfos.end(); ++it )
+	for (const auto& lfo : m_lfos)
 	{
-		( *it )->m_lfoFrame += Engine::audioEngine()->framesPerPeriod();
-		( *it )->m_bad_lfoShapeData = true;
+		lfo->m_lfoFrame += Engine::audioEngine()->framesPerPeriod();
+		lfo->m_bad_lfoShapeData = true;
 	}
 }
 
@@ -58,11 +60,10 @@ void EnvelopeAndLfoParameters::LfoInstances::trigger()
 void EnvelopeAndLfoParameters::LfoInstances::reset()
 {
 	QMutexLocker m( &m_lfoListMutex );
-	for( LfoList::Iterator it = m_lfos.begin();
-							it != m_lfos.end(); ++it )
+	for (const auto& lfo : m_lfos)
 	{
-		( *it )->m_lfoFrame = 0;
-		( *it )->m_bad_lfoShapeData = true;
+		lfo->m_lfoFrame = 0;
+		lfo->m_bad_lfoShapeData = true;
 	}
 }
 
@@ -112,7 +113,7 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 				SECS_PER_LFO_OSCILLATION * 1000.0, this,
 							tr( "LFO frequency" ) ),
 	m_lfoAmountModel( 0.0, -1.0, 1.0, 0.005, this, tr( "LFO mod amount" ) ),
-	m_lfoWaveModel( SineWave, 0, NumLfoShapes, this, tr( "LFO wave shape" ) ),
+	m_lfoWaveModel( static_cast<int>(LfoShape::SineWave), 0, NumLfoShapes, this, tr( "LFO wave shape" ) ),
 	m_x100Model( false, this, tr( "LFO frequency x 100" ) ),
 	m_controlEnvAmountModel( false, this, tr( "Modulate env amount" ) ),
 	m_lfoFrame( 0 ),
@@ -129,36 +130,36 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 
 	instances()->add( this );
 
-	connect( &m_predelayModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
-	connect( &m_attackModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
-	connect( &m_holdModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
-	connect( &m_decayModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
-	connect( &m_sustainModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
-	connect( &m_releaseModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
-	connect( &m_amountModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
+	connect( &m_predelayModel, SIGNAL(dataChanged()),
+			this, SLOT(updateSampleVars()), Qt::DirectConnection );
+	connect( &m_attackModel, SIGNAL(dataChanged()),
+			this, SLOT(updateSampleVars()), Qt::DirectConnection );
+	connect( &m_holdModel, SIGNAL(dataChanged()),
+			this, SLOT(updateSampleVars()), Qt::DirectConnection );
+	connect( &m_decayModel, SIGNAL(dataChanged()),
+			this, SLOT(updateSampleVars()), Qt::DirectConnection );
+	connect( &m_sustainModel, SIGNAL(dataChanged()),
+			this, SLOT(updateSampleVars()), Qt::DirectConnection );
+	connect( &m_releaseModel, SIGNAL(dataChanged()),
+			this, SLOT(updateSampleVars()), Qt::DirectConnection );
+	connect( &m_amountModel, SIGNAL(dataChanged()),
+			this, SLOT(updateSampleVars()), Qt::DirectConnection );
 
-	connect( &m_lfoPredelayModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
-	connect( &m_lfoAttackModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
-	connect( &m_lfoSpeedModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
-	connect( &m_lfoAmountModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
-	connect( &m_lfoWaveModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
-	connect( &m_x100Model, SIGNAL( dataChanged() ),
-			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
+	connect( &m_lfoPredelayModel, SIGNAL(dataChanged()),
+			this, SLOT(updateSampleVars()), Qt::DirectConnection );
+	connect( &m_lfoAttackModel, SIGNAL(dataChanged()),
+			this, SLOT(updateSampleVars()), Qt::DirectConnection );
+	connect( &m_lfoSpeedModel, SIGNAL(dataChanged()),
+			this, SLOT(updateSampleVars()), Qt::DirectConnection );
+	connect( &m_lfoAmountModel, SIGNAL(dataChanged()),
+			this, SLOT(updateSampleVars()), Qt::DirectConnection );
+	connect( &m_lfoWaveModel, SIGNAL(dataChanged()),
+			this, SLOT(updateSampleVars()), Qt::DirectConnection );
+	connect( &m_x100Model, SIGNAL(dataChanged()),
+			this, SLOT(updateSampleVars()), Qt::DirectConnection );
 
-	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ),
-				this, SLOT( updateSampleVars() ) );
+	connect( Engine::audioEngine(), SIGNAL(sampleRateChanged()),
+				this, SLOT(updateSampleVars()));
 
 
 	m_lfoShapeData =
@@ -208,28 +209,28 @@ inline sample_t EnvelopeAndLfoParameters::lfoShapeSample( fpp_t _frame_offset )
 	const float phase = frame / static_cast<float>(
 						m_lfoOscillationFrames );
 	sample_t shape_sample;
-	switch( m_lfoWaveModel.value()  )
+	switch( static_cast<LfoShape>(m_lfoWaveModel.value())  )
 	{
-		case TriangleWave:
+		case LfoShape::TriangleWave:
 			shape_sample = Oscillator::triangleSample( phase );
 			break;
-		case SquareWave:
+		case LfoShape::SquareWave:
 			shape_sample = Oscillator::squareSample( phase );
 			break;
-		case SawWave:
+		case LfoShape::SawWave:
 			shape_sample = Oscillator::sawSample( phase );
 			break;
-		case UserDefinedWave:
+		case LfoShape::UserDefinedWave:
 			shape_sample = m_userWave.userWaveSample( phase );
 			break;
-		case RandomWave:
+		case LfoShape::RandomWave:
 			if( frame == 0 )
 			{
 				m_random = Oscillator::noiseSample( 0.0f );
 			}
 			shape_sample = m_random;
 			break;
-		case SineWave:
+		case LfoShape::SineWave:
 		default:
 			shape_sample = Oscillator::sinSample( phase );
 			break;
@@ -273,7 +274,7 @@ inline void EnvelopeAndLfoParameters::fillLfoLevel( float * _buf,
 	}
 
 	fpp_t offset = 0;
-	const float lafI = 1.0f / qMax( minimumFrames, m_lfoAttackFrames );
+	const float lafI = 1.0f / std::max(minimumFrames, m_lfoAttackFrames);
 	for( ; offset < _frames && _frame < m_lfoAttackFrames; ++offset,
 								++_frame )
 	{
@@ -401,21 +402,18 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 				Engine::audioEngine()->processingSampleRate();
 
 	// TODO: Remove the expKnobVals, time should be linear
-	const f_cnt_t predelay_frames = static_cast<f_cnt_t>(
-							frames_per_env_seg *
-					expKnobVal( m_predelayModel.value() ) );
+	const auto predelay_frames = static_cast<f_cnt_t>(frames_per_env_seg * expKnobVal(m_predelayModel.value()));
 
-	const f_cnt_t attack_frames = qMax( minimumFrames,
-					static_cast<f_cnt_t>( frames_per_env_seg *
-					expKnobVal( m_attackModel.value() ) ) );
+	const f_cnt_t attack_frames = std::max(minimumFrames,
+					static_cast<f_cnt_t>(frames_per_env_seg *
+					expKnobVal(m_attackModel.value())));
 
-	const f_cnt_t hold_frames = static_cast<f_cnt_t>( frames_per_env_seg *
-					expKnobVal( m_holdModel.value() ) );
+	const auto hold_frames = static_cast<f_cnt_t>(frames_per_env_seg * expKnobVal(m_holdModel.value()));
 
-	const f_cnt_t decay_frames = qMax( minimumFrames,
-					static_cast<f_cnt_t>( frames_per_env_seg *
-					expKnobVal( m_decayModel.value() *
-					( 1 - m_sustainModel.value() ) ) ) );
+	const f_cnt_t decay_frames = std::max(minimumFrames,
+					static_cast<f_cnt_t>(frames_per_env_seg *
+					expKnobVal(m_decayModel.value() *
+					(1 - m_sustainModel.value()))));
 
 	m_sustainLevel = m_sustainModel.value();
 	m_amount = m_amountModel.value();
@@ -432,7 +430,7 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 								decay_frames;
 	m_rFrames = static_cast<f_cnt_t>( frames_per_env_seg *
 					expKnobVal( m_releaseModel.value() ) );
-	m_rFrames = qMax( minimumFrames, m_rFrames );
+	m_rFrames = std::max(minimumFrames, m_rFrames);
 
 	if( static_cast<int>( floorf( m_amount * 1000.0f ) ) == 0 )
 	{
@@ -540,4 +538,4 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 
 
 
-
+} // namespace lmms

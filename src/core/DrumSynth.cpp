@@ -37,7 +37,10 @@
 #ifdef _MSC_VER
 //not #if LMMS_BUILD_WIN32 because we have strncasecmp in mingw
 #define strcasecmp _stricmp
-#endif
+#endif // _MSC_VER
+
+namespace lmms
+{
 
 
 using namespace std;
@@ -64,7 +67,7 @@ long  wavewords, wavemode=0;
 float mem_t=1.0f, mem_o=1.0f, mem_n=1.0f, mem_b=1.0f, mem_tune=1.0f, mem_time=1.0f;
 
 
-int DrumSynth::LongestEnv(void)
+int DrumSynth::LongestEnv()
 {
   long e, eon, p;
   float l=0.f;
@@ -83,7 +86,7 @@ int DrumSynth::LongestEnv(void)
 }
 
 
-float DrumSynth::LoudestEnv(void)
+float DrumSynth::LoudestEnv()
 {
   float loudest=0.f;
   int i=0;
@@ -270,7 +273,9 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t *&wave, int channels, sa
   //generation
   long  Length, tpos=0, tplus, totmp, t, i, j;
   float x[3] = {0.f, 0.f, 0.f};
-  float MasterTune, randmax, randmax2;
+  float MasterTune;
+  constexpr float randmax = 1.f / static_cast<float>(RAND_MAX);
+  constexpr float randmax2 = 2.f / static_cast<float>(RAND_MAX);
   int   MainFilter, HighPass;
 
   long  NON, NT, TON, DiON, TDroop=0, DStep;
@@ -451,7 +456,6 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t *&wave, int channels, sa
   }
 
   //prepare envelopes
-  randmax = 1.f / RAND_MAX; randmax2 = 2.f * randmax;
   for (i=1;i<8;i++) { envData[i][NEXTT]=0; envData[i][PNT]=0; }
   Length = LongestEnv();
 
@@ -741,3 +745,5 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t *&wave, int channels, sa
   return Length;
 }
 
+
+} // namespace lmms

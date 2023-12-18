@@ -23,12 +23,13 @@
  *
  */
 
-#ifndef LADSPA_2_LMMS_H
-#define LADSPA_2_LMMS_H
-
+#ifndef LMMS_LADSPA_2_LMMS_H
+#define LMMS_LADSPA_2_LMMS_H
 
 #include "LadspaManager.h"
 
+namespace lmms
+{
 
 //! Class responsible for sorting found plugins (by LadspaManager)
 //! into categories
@@ -65,7 +66,7 @@ public:
 
 private:
 	Ladspa2LMMS();
-	virtual ~Ladspa2LMMS();
+	~Ladspa2LMMS() override = default;
 
 	l_sortable_plugin_t m_instruments;
 	l_sortable_plugin_t m_validEffects;
@@ -73,8 +74,11 @@ private:
 	l_sortable_plugin_t m_analysisTools;
 	l_sortable_plugin_t m_otherPlugins;
 	
-	friend class LmmsCore;
+	friend class Engine;
 
 } ;
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_LADSPA_2_LMMS_H

@@ -27,6 +27,9 @@
 #include "AutomationClip.h"
 
 
+namespace lmms
+{
+
 // Dummy constructor for the QMap
 AutomationNode::AutomationNode() :
 	m_clip(nullptr),
@@ -34,7 +37,8 @@ AutomationNode::AutomationNode() :
 	m_inValue(0),
 	m_outValue(0),
 	m_inTangent(0),
-	m_outTangent(0)
+	m_outTangent(0),
+	m_lockedTangents(false)
 {
 }
 
@@ -44,7 +48,8 @@ AutomationNode::AutomationNode(AutomationClip* clip, float value, int pos) :
 	m_inValue(value),
 	m_outValue(value),
 	m_inTangent(0),
-	m_outTangent(0)
+	m_outTangent(0),
+	m_lockedTangents(false)
 {
 }
 
@@ -54,7 +59,8 @@ AutomationNode::AutomationNode(AutomationClip* clip, float inValue, float outVal
 	m_inValue(inValue),
 	m_outValue(outValue),
 	m_inTangent(0),
-	m_outTangent(0)
+	m_outTangent(0),
+	m_lockedTangents(false)
 {
 }
 
@@ -107,3 +113,5 @@ void AutomationNode::resetOutValue()
 	// the tangents
 	setOutValue(m_inValue);
 }
+
+} // namespace lmms

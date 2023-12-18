@@ -31,6 +31,10 @@
 #include "Effect.h"
 
 
+namespace lmms
+{
+
+
 constexpr float COMP_LOG = -2.2;
 
 class CompressorEffect : public Effect
@@ -38,7 +42,7 @@ class CompressorEffect : public Effect
 	Q_OBJECT
 public:
 	CompressorEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
-	~CompressorEffect() override;
+	~CompressorEffect() override = default;
 	bool processAudioBuffer(sampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls* controls() override
@@ -75,16 +79,12 @@ private:
 	inline int realmod(int k, int n);
 	inline float realfmod(float k, float n);
 
-	enum StereoLinkModes { Unlinked, Maximum, Average, Minimum, Blend };
+	enum class StereoLinkMode { Unlinked, Maximum, Average, Minimum, Blend };
 
-	std::vector<float> m_preLookaheadBuf[2];
-	int m_preLookaheadBufLoc[2] = {0};
-
-	std::vector<float> m_lookaheadBuf[2];
-	int m_lookaheadBufLoc[2] = {0};
-
-	std::vector<float> m_inputBuf[2];
-	int m_inputBufLoc = 0;
+	std::array<std::vector<float>, 2> m_inLookBuf;
+	std::array<std::vector<float>, 2> m_scLookBuf;
+	int m_lookWrite;
+	int m_lookBufLength;
 
 	float m_attCoeff;
 	float m_relCoeff;
@@ -95,8 +95,6 @@ private:
 	int m_holdTimer[2] = {0, 0};
 
 	int m_lookaheadLength;
-	int m_lookaheadDelayLength;
-	int m_preLookaheadLength;
 	float m_thresholdAmpVal;
 	float m_autoMakeupVal;
 	float m_outGainVal;
@@ -145,7 +143,10 @@ private:
 	bool m_redrawThreshold = true;
 
 	friend class CompressorControls;
-	friend class CompressorControlDialog;
+	friend class gui::CompressorControlDialog;
 } ;
+
+
+} // namespace lmms
 
 #endif

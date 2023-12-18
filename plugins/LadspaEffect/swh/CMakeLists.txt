@@ -16,6 +16,7 @@ SET(COMPILE_FLAGS "${COMPILE_FLAGS} ${PIC_FLAGS}")
 # Loop over every XML file
 FILE(GLOB XML_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/ladspa/*.xml")
 LIST(SORT XML_SOURCES)
+
 FOREACH(_item ${XML_SOURCES})
 	# Get library name and (soon to be) C file
 	GET_FILENAME_COMPONENT(_plugin "${_item}" NAME_WE)
@@ -24,7 +25,7 @@ FOREACH(_item ${XML_SOURCES})
 	# Coerce XML source file to C
 	ADD_CUSTOM_COMMAND(
 		OUTPUT "${_out_file}"
-		COMMAND ./makestub.pl "${_item}" > "${_out_file}"
+		COMMAND "${PERL_EXECUTABLE}" ./makestub.pl "${_item}" > "${_out_file}"
 		DEPENDS "${_item}"
 		WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/ladspa"
 		VERBATIM
@@ -40,6 +41,16 @@ FOREACH(_item ${XML_SOURCES})
 	IF(NOT MSVC)
 		TARGET_LINK_LIBRARIES("${_plugin}" m)
 	ENDIF()
+
+	if(LMMS_BUILD_WIN32)
+		add_custom_command(
+			TARGET "${_plugin}"
+			POST_BUILD
+			COMMAND "${STRIP_COMMAND}" "$<TARGET_FILE:${_plugin}>"
+			VERBATIM
+			COMMAND_EXPAND_LISTS
+		)
+	endif(LMMS_BUILD_WIN32)
 
 	SET_TARGET_PROPERTIES("${_plugin}" PROPERTIES PREFIX "")
 	SET_TARGET_PROPERTIES("${_plugin}" PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS}")

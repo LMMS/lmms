@@ -28,6 +28,7 @@
 
 #include <fluidsynth.h>
 
+
 #if FLUIDSYNTH_VERSION_MAJOR < 2
 
 inline const char* fluid_preset_get_name(fluid_preset_t* preset)

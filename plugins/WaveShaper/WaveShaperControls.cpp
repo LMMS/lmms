@@ -33,6 +33,9 @@
 #include "Engine.h"
 #include "Song.h"
 
+namespace lmms
+{
+
 
 #define onedB 1.1220184543019633f
 
@@ -66,7 +69,7 @@ void WaveShaperControls::loadSettings( const QDomElement & _this )
 //load input, output knobs
 	m_inputModel.loadSettings( _this, "inputGain" );
 	m_outputModel.loadSettings( _this, "outputGain" );
-	
+
 	m_clipModel.loadSettings( _this, "clipInput" );
 
 //load waveshape
@@ -102,7 +105,7 @@ void WaveShaperControls::saveSettings( QDomDocument & _doc,
 
 void WaveShaperControls::setDefaultShape()
 {
-	float shp [200] = { };
+	auto shp = std::array<float, 200>{};
 	for ( int i = 0; i<200; i++)
 	{
 		shp[i] = ((float)i + 1.0f) / 200.0f;
@@ -143,5 +146,4 @@ void WaveShaperControls::subOneClicked()
 }
 
 
-
-
+} // namespace lmms

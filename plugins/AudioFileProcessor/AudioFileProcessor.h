@@ -23,9 +23,8 @@
  *
  */
 
-
-#ifndef AUDIO_FILE_PROCESSOR_H
-#define AUDIO_FILE_PROCESSOR_H
+#ifndef LMMS_AUDIO_FILE_PROCESSOR_H
+#define LMMS_AUDIO_FILE_PROCESSOR_H
 
 #include <QPixmap>
 
@@ -35,9 +34,20 @@
 #include "SampleBuffer.h"
 #include "Knob.h"
 
+
+namespace lmms
+{
+
+namespace gui
+{
 class automatableButtonGroup;
-class ComboBox;
+class PluginView;
+class InstrumentViewFixedSize;
+class Knob;
 class PixmapButton;
+class ComboBox;
+class AudioFileProcessorView;
+}
 
 
 class AudioFileProcessor : public Instrument
@@ -45,28 +55,26 @@ class AudioFileProcessor : public Instrument
 	Q_OBJECT
 public:
 	AudioFileProcessor( InstrumentTrack * _instrument_track );
-	virtual ~AudioFileProcessor();
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	void playNote( NotePlayHandle * _n,
+						sampleFrame * _working_buffer ) override;
+	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
-	virtual void saveSettings( QDomDocument & _doc,
-						QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings(QDomDocument& doc, QDomElement& elem) override;
+	void loadSettings(const QDomElement& elem) override;
 
-	virtual void loadFile( const QString & _file );
+	void loadFile( const QString & _file ) override;
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
-	virtual int getBeatLen( NotePlayHandle * _n ) const;
+	auto beatLen(NotePlayHandle* note) const -> int override;
 
-	virtual f_cnt_t desiredReleaseFrames() const
+	f_cnt_t desiredReleaseFrames() const override
 	{
 		return 128;
 	}
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 
 public slots:
@@ -84,11 +92,11 @@ private slots:
 
 
 signals:
-	void isPlaying( f_cnt_t _current_frame );
+	void isPlaying( lmms::f_cnt_t _current_frame );
 
 
 private:
-	typedef SampleBuffer::handleState handleState;
+	using handleState = SampleBuffer::handleState;
 
 	SampleBuffer m_sampleBuffer;
 
@@ -104,21 +112,23 @@ private:
 	f_cnt_t m_nextPlayStartPoint;
 	bool m_nextPlayBackwards;
 
-	friend class AudioFileProcessorView;
+	friend class gui::AudioFileProcessorView;
 
 } ;
 
 
+namespace gui
+{
 
 class AudioFileProcessorWaveView;
 
 
-class AudioFileProcessorView : public InstrumentViewFixedSize
+class AudioFileProcessorView : public gui::InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
 	AudioFileProcessorView( Instrument * _instrument, QWidget * _parent );
-	virtual ~AudioFileProcessorView();
+	virtual ~AudioFileProcessorView() = default;
 
 	void newWaveView();
 protected slots:
@@ -135,7 +145,6 @@ protected:
 private:
 	virtual void modelChanged();
 
-	static QPixmap * s_artwork;
 
 	AudioFileProcessorWaveView * m_waveView;
 	Knob * m_ampKnob;
@@ -143,7 +152,7 @@ private:
 	Knob * m_endKnob;
 	Knob * m_loopKnob;
 
-	PixmapButton * m_openAudioFileButton;
+	gui::PixmapButton * m_openAudioFileButton;
 	PixmapButton * m_reverseButton;
 	automatableButtonGroup * m_loopGroup;
 	PixmapButton * m_stutterButton;
@@ -167,14 +176,14 @@ protected:
 
 
 public:
-	enum knobType
+	enum class Point
 	{
-		start,
-		end,
-		loop
+		Start,
+		End,
+		Loop
 	} ;
 
-	class knob : public ::Knob
+	class knob : public Knob
 	{
 		const AudioFileProcessorWaveView * m_waveView;
 		const Knob * m_relatedKnob;
@@ -182,7 +191,7 @@ public:
 
 	public:
 		knob( QWidget * _parent ) :
-			::Knob( knobBright_26, _parent ),
+			Knob( KnobType::Bright26, _parent ),
 			m_waveView( 0 ),
 			m_relatedKnob( 0 )
 		{
@@ -223,18 +232,18 @@ public slots:
 		QWidget::update();
 	}
 
-	void isPlaying( f_cnt_t _current_frame );
+	void isPlaying( lmms::f_cnt_t _current_frame );
 
 
 private:
 	static const int s_padding = 2;
 
-	enum draggingType
+	enum class DraggingType
 	{
-		wave,
-		sample_start,
-		sample_end,
-		sample_loop
+		Wave,
+		SampleStart,
+		SampleEnd,
+		SampleLoop
 	} ;
 
 	SampleBuffer& m_sampleBuffer;
@@ -252,7 +261,7 @@ private:
 	f_cnt_t m_loopFrameX;
 	bool m_isDragging;
 	QPoint m_draggingLastPoint;
-	draggingType m_draggingType;
+	DraggingType m_draggingType;
 	bool m_reversed;
 	f_cnt_t m_framesPlayed;
 	bool m_animation;
@@ -266,11 +275,11 @@ public:
 private:
 	void zoom( const bool _out = false );
 	void slide( int _px );
-	void slideSamplePointByPx( knobType _point, int _px );
-	void slideSamplePointByFrames( knobType _point, f_cnt_t _frames, bool _slide_to = false );
+	void slideSamplePointByPx( Point _point, int _px );
+	void slideSamplePointByFrames( Point _point, f_cnt_t _frames, bool _slide_to = false );
 	void slideSampleByFrames( f_cnt_t _frames );
 
-	void slideSamplePointToFrames( knobType _point, f_cnt_t _frames )
+	void slideSamplePointToFrames( Point _point, f_cnt_t _frames )
 	{
 		slideSamplePointByFrames( _point, _frames, true );
 	}
@@ -287,6 +296,8 @@ private:
 } ;
 
 
+} // namespace gui
 
+} // namespace lmms
 
-#endif
+#endif // LMMS_AUDIO_FILE_PROCESSOR_H

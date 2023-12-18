@@ -23,22 +23,30 @@
  *
  */
 
-#ifndef MIDI_CLIP_H
-#define MIDI_CLIP_H
-
+#ifndef LMMS_MIDI_CLIP_H
+#define LMMS_MIDI_CLIP_H
 
 #include "Clip.h"
 #include "Note.h"
 
 
+namespace lmms
+{
+
+
 class InstrumentTrack;
+
+namespace gui
+{
+class MidiClipView;
+}
 
 
 class LMMS_EXPORT MidiClip : public Clip
 {
 	Q_OBJECT
 public:
-	enum MidiClipTypes
+	enum class Type
 	{
 		BeatClip,
 		MelodyClip
@@ -46,7 +54,7 @@ public:
 
 	MidiClip( InstrumentTrack* instrumentTrack );
 	MidiClip( const MidiClip& other );
-	virtual ~MidiClip();
+	~MidiClip() override;
 
 	void init();
 
@@ -71,10 +79,10 @@ public:
 	void setStep( int step, bool enabled );
 
 	// Split the list of notes on the given position
-	void splitNotes(NoteVector notes, TimePos pos);
+	void splitNotes(const NoteVector& notes, TimePos pos);
 
 	// clip-type stuff
-	inline MidiClipTypes type() const
+	inline Type type() const
 	{
 		return m_clipType;
 	}
@@ -100,7 +108,7 @@ public:
 	bool empty();
 
 
-	ClipView * createView( TrackView * _tv ) override;
+	gui::ClipView * createView( gui::TrackView * _tv ) override;
 
 
 	using Model::dataChanged;
@@ -121,14 +129,14 @@ protected slots:
 private:
 	TimePos beatClipLength() const;
 
-	void setType( MidiClipTypes _new_clip_type );
+	void setType( Type _new_clip_type );
 	void checkType();
 
 	void resizeToFirstTrack();
 
 	InstrumentTrack * m_instrumentTrack;
 
-	MidiClipTypes m_clipType;
+	Type m_clipType;
 
 	// data-stuff
 	NoteVector m_notes;
@@ -136,13 +144,14 @@ private:
 
 	MidiClip * adjacentMidiClipByOffset(int offset) const;
 
-	friend class MidiClipView;
+	friend class gui::MidiClipView;
 
 
 signals:
-	void destroyedMidiClip( MidiClip* );
+	void destroyedMidiClip( lmms::MidiClip* );
 } ;
 
 
+} // namespace lmms
 
-#endif
+#endif // LMMS_MIDI_CLIP_H

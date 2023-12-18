@@ -14,18 +14,23 @@
 #include "plugin_export.h"
 
 #define MAX_LAYERS 4
+
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT hydrogenimport_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Hydrogen Import",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Filter for importing Hydrogen files into LMMS" ),
 	"frank mather",
 	0x0100,
-	Plugin::ImportFilter,
+	Plugin::Type::ImportFilter,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37,7 +42,7 @@ QString filename;
 class NoteKey
 {
 public:
-	enum Key {
+	enum class Key {
 		C = 0,
 		Cs,
 		D,
@@ -54,7 +59,7 @@ public:
 
 	static int stringToNoteKey( const QString& str )
 	{
-		int m_key = NoteKey::C;
+		auto m_key = Key::C;
 
 
 		QString sKey = str.left( str.length() - 1 );
@@ -69,54 +74,54 @@ public:
 
 		if ( sKey == "C" ) 
 		{
-			m_key = NoteKey::C;
+			m_key = Key::C;
 		} 
 		else if ( sKey == "Cs" ) 
 		{
-			m_key = NoteKey::Cs;
+			m_key = Key::Cs;
 		} 
 		else if ( sKey == "D" ) 
 		{
-			m_key = NoteKey::D;
+			m_key = Key::D;
 		}
 		else if ( sKey == "Ef" ) 
 		{
-			m_key = NoteKey::Ef;
+			m_key = Key::Ef;
 		}
 		else if ( sKey == "E" ) 
 		{
-			m_key = NoteKey::E;
+			m_key = Key::E;
 		} 
 		else if ( sKey == "F" ) 
 		{
-			m_key = NoteKey::F;
+			m_key = Key::F;
 		} 
 		else if ( sKey == "Fs" ) 
 		{
-			m_key = NoteKey::Fs;
+			m_key = Key::Fs;
 		} 
 		else if ( sKey == "G" ) 
 		{
-			m_key = NoteKey::G;
+			m_key = Key::G;
 		} 
 		else if ( sKey == "Af" ) 
 		{
-			m_key = NoteKey::Af;
+			m_key = Key::Af;
 		} 
 		else if ( sKey == "A" ) 
 		{
-			m_key = NoteKey::A;
+			m_key = Key::A;
 		} 
 		else if ( sKey == "Bf" ) 
 		{
-			m_key = NoteKey::Bf;
+			m_key = Key::Bf;
 		} 
 		else if ( sKey == "B" ) {
-			m_key = NoteKey::B;
+			m_key = Key::B;
 		} 
 
         // Hydrogen records MIDI notes from C-1 to B5, and exports them as a number ranging from -3 to 3
-        return m_key + ((nOctave + 3) * 12);
+        return static_cast<int>(m_key) + ((nOctave + 3) * 12);
 	}
 
 };
@@ -129,9 +134,6 @@ HydrogenImport::HydrogenImport( const QString & _file ) :
 
 
 
-HydrogenImport::~HydrogenImport()
-{
-}
 Instrument * ins;
 bool HydrogenImport::readSong() 
 {
@@ -216,7 +218,7 @@ bool HydrogenImport::readSong()
 					if ( nLayer == 0 ) 
 					{
 						drum_track[sId] = static_cast<InstrumentTrack*>(
-							Track::create(Track::InstrumentTrack, Engine::patternStore())
+							Track::create(Track::Type::Instrument, Engine::patternStore())
 						);
 						drum_track[sId]->volumeModel()->setValue( fVolume * 100 );
 						drum_track[sId]->panningModel()->setValue( ( fPan_R - fPan_L ) * 100 );
@@ -274,7 +276,7 @@ bool HydrogenImport::readSong()
 				QString instrId = LocalFileMng::readXmlString( noteNode, "instrument", 0,false, false );
 				int i = pattern_count - 1 + existing_patterns;
 				pattern_id[sName] = pattern_count - 1;
-				MidiClip*p = dynamic_cast<MidiClip*>( drum_track[instrId]->getClip( i ) );
+				auto p = dynamic_cast<MidiClip*>(drum_track[instrId]->getClip(i));
 				Note n; 
 				n.setPos( nPosition );
 				if ( (nPosition + 48) <= nSize ) 
@@ -351,3 +353,5 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
 
 }
 
+
+} // namespace lmms

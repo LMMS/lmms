@@ -44,9 +44,8 @@
  *
  */
 
-
-#ifndef FADER_H
-#define FADER_H
+#ifndef LMMS_GUI_FADER_H
+#define LMMS_GUI_FADER_H
 
 #include <QElapsedTimer>
 #include <QPixmap>
@@ -54,8 +53,13 @@
 
 
 #include "AutomatableModelView.h"
+#include "embed.h"
 
-class TextFloat;
+
+namespace lmms::gui
+{
+
+class SimpleTextFloat;
 
 
 class LMMS_EXPORT Fader : public QWidget, public FloatModelView
@@ -69,7 +73,7 @@ public:
 
 	Fader( FloatModel * _model, const QString & _name, QWidget * _parent );
 	Fader( FloatModel * _model, const QString & _name, QWidget * _parent, QPixmap * back, QPixmap * leds, QPixmap * knob );
-	virtual ~Fader() = default;
+	~Fader() override = default;
 
 	void init(FloatModel * model, QString const & name);
 
@@ -128,7 +132,7 @@ private:
 		float fRange = model()->maxValue() - model()->minValue();
 		float realVal = model()->value() - model()->minValue();
 
-		return height() - ( ( height() - m_knob->height() ) * ( realVal / fRange ) );
+		return height() - ((height() - m_knob.height()) * (realVal / fRange));
 	}
 
 	void setPeak( float fPeak, float &targetPeak, float &persistentPeak, QElapsedTimer &lastPeakTimer );
@@ -148,20 +152,16 @@ private:
 	QElapsedTimer m_lastPeakTimer_L;
 	QElapsedTimer m_lastPeakTimer_R;
 
-	static QPixmap * s_back;
-	static QPixmap * s_leds;
-	static QPixmap * s_knob;
-	
-	QPixmap * m_back;
-	QPixmap * m_leds;
-	QPixmap * m_knob;
+	QPixmap m_back = embed::getIconPixmap("fader_background");
+	QPixmap m_leds = embed::getIconPixmap("fader_leds");
+	QPixmap m_knob = embed::getIconPixmap("fader_knob");
 
 	bool m_levelsDisplayedInDBFS;
 
 	int m_moveStartPoint;
 	float m_startValue;
 
-	static TextFloat * s_textFloat;
+	static SimpleTextFloat * s_textFloat;
 
 	QColor m_peakGreen;
 	QColor m_peakRed;
@@ -169,4 +169,6 @@ private:
 } ;
 
 
-#endif
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_FADER_H

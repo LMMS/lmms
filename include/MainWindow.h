@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MAIN_WINDOW_H
-#define MAIN_WINDOW_H
+#ifndef LMMS_GUI_MAIN_WINDOW_H
+#define LMMS_GUI_MAIN_WINDOW_H
 
 #include <QBasicTimer>
 #include <QTimer>
@@ -37,10 +37,18 @@ class QDomElement;
 class QGridLayout;
 class QMdiArea;
 
+namespace lmms
+{
+
 class ConfigManager;
+
+namespace gui
+{
+
 class PluginView;
 class SubWindow;
 class ToolButton;
+class GuiApplication;
 
 
 class MainWindow : public QMainWindow
@@ -105,7 +113,7 @@ public:
 		return m_autoSaveTimer.interval();
 	}
 
-	enum SessionState
+	enum class SessionState
 	{
 		Normal,
 		Recover
@@ -182,7 +190,7 @@ protected:
 private:
 	MainWindow();
 	MainWindow( const MainWindow & );
-	virtual ~MainWindow();
+	~MainWindow() override;
 
 	void finalize();
 
@@ -234,13 +242,12 @@ private:
 private slots:
 	void browseHelp();
 	void showTool( QAction * _idx );
-	void updateViewMenu( void );
+	void updateViewMenu();
 	void updateConfig( QAction * _who );
 	void onToggleMetronome();
 	void onExportProject();
 	void onExportProjectTracks();
 	void onImportProject();
-	void onSongStopped();
 	void onSongModified();
 	void onProjectFileNameChanged();
 
@@ -250,4 +257,9 @@ signals:
 
 } ;
 
-#endif
+
+} // namespace gui
+
+} // namespace lmms
+
+#endif // LMMS_GUI_MAIN_WINDOW_H

@@ -32,6 +32,9 @@
 
 #include "fluidsynthshims.h"
 
+namespace lmms::gui
+{
+
 
 // Custom list-view item (as for numerical sort purposes...)
 class PatchItem : public QTreeWidgetItem
@@ -44,7 +47,7 @@ public:
 		: QTreeWidgetItem( pListView, pItemAfter ) {}
 
 	// Sort/compare overriden method.
-	bool operator< ( const QTreeWidgetItem& other ) const
+	bool operator< ( const QTreeWidgetItem& other ) const override
 	{
 		int iColumn = QTreeWidgetItem::treeWidget()->sortColumn();
 		const QString& s1 = text( iColumn );
@@ -108,12 +111,6 @@ PatchesDialog::PatchesDialog( QWidget *pParent, Qt::WindowFlags wflags )
 }
 
 
-// Destructor.
-PatchesDialog::~PatchesDialog()
-{
-}
-
-
 // Dialog setup loader.
 void PatchesDialog::setup ( fluid_synth_t * pSynth, int iChan,
 						const QString & _chanName,
@@ -157,7 +154,7 @@ void PatchesDialog::setup ( fluid_synth_t * pSynth, int iChan,
 			fluid_preset_t preset;
 			fluid_preset_t *pCurPreset = &preset;
 #else
-			fluid_preset_t *pCurPreset;
+			fluid_preset_t *pCurPreset = nullptr;
 #endif
 			while ((pCurPreset = fluid_sfont_iteration_next_wrapper(pSoundFont, pCurPreset))) {
 				int iBank = fluid_preset_get_banknum(pCurPreset);
@@ -261,7 +258,7 @@ void PatchesDialog::accept()
 
 
 // Reject settings (Cancel button slot).
-void PatchesDialog::reject (void)
+void PatchesDialog::reject ()
 {
 	// Reset selection to initial selection, if applicable...
 	if (m_dirty > 0)
@@ -303,7 +300,7 @@ QTreeWidgetItem *PatchesDialog::findProgItem ( int iProg )
 
 
 // Bank change slot.
-void PatchesDialog::bankChanged (void)
+void PatchesDialog::bankChanged ()
 {
 	if (m_pSynth == nullptr)
 		return;
@@ -381,4 +378,4 @@ void PatchesDialog::progChanged (QTreeWidgetItem * _curr, QTreeWidgetItem * _pre
 }
 
 
-
+} // namespace lmms::gui

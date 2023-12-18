@@ -38,6 +38,8 @@
 
 #include "AudioEngine.h"
 
+namespace lmms
+{
 
 AudioFileOgg::AudioFileOgg(	OutputSettings const & outputSettings,
 				const ch_cnt_t channels,
@@ -268,6 +270,8 @@ void AudioFileOgg::finishEncoding()
 }
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_HAVE_OGGVORBIS
 
 

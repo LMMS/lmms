@@ -68,6 +68,9 @@
 // Old config
 //
 
+namespace lmms
+{
+
 
 //#define engine::audioEngine()->processingSampleRate() 44100.0f
 const float sampleRateCutoff = 44100.0f;
@@ -77,13 +80,13 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT lb302_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"LB302",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 			"Incomplete monophonic imitation TB-303" ),
 	"Paul Giblock <pgib/at/users.sf.net>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
@@ -287,29 +290,29 @@ Lb302Synth::Lb302Synth( InstrumentTrack * _instrumentTrack ) :
 	vca_decay(0.99897516),
 	vca_a0(0.5),
 	vca_a(0.),
-	vca_mode(never_played)
+	vca_mode(VcaMode::NeverPlayed)
 {
 
-	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged( ) ),
-	         this, SLOT ( filterChanged( ) ) );
+	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ),
+	         this, SLOT ( filterChanged() ) );
 
-	connect( &vcf_cut_knob, SIGNAL( dataChanged( ) ),
-	         this, SLOT ( filterChanged( ) ) );
+	connect( &vcf_cut_knob, SIGNAL( dataChanged() ),
+	         this, SLOT ( filterChanged() ) );
 
-	connect( &vcf_res_knob, SIGNAL( dataChanged( ) ),
-	         this, SLOT ( filterChanged( ) ) );
+	connect( &vcf_res_knob, SIGNAL( dataChanged() ),
+	         this, SLOT ( filterChanged() ) );
 
-	connect( &vcf_mod_knob, SIGNAL( dataChanged( ) ),
-	         this, SLOT ( filterChanged( ) ) );
+	connect( &vcf_mod_knob, SIGNAL( dataChanged() ),
+	         this, SLOT ( filterChanged() ) );
 
-	connect( &vcf_dec_knob, SIGNAL( dataChanged( ) ),
-	         this, SLOT ( filterChanged( ) ) );
+	connect( &vcf_dec_knob, SIGNAL( dataChanged() ),
+	         this, SLOT ( filterChanged() ) );
 
-	connect( &db24Toggle, SIGNAL( dataChanged( ) ),
-	         this, SLOT ( db24Toggled( ) ) );
+	connect( &db24Toggle, SIGNAL( dataChanged() ),
+	         this, SLOT ( db24Toggled() ) );
 
-	connect( &dist_knob, SIGNAL( dataChanged( ) ),
-	         this, SLOT ( filterChanged( )));
+	connect( &dist_knob, SIGNAL( dataChanged() ),
+	         this, SLOT ( filterChanged()));
 
 
 	// SYNTH
@@ -329,7 +332,7 @@ Lb302Synth::Lb302Synth( InstrumentTrack * _instrumentTrack ) :
 
 	vcf_envpos = ENVINC;
 
-	vco_shape = BL_SAWTOOTH;
+	vco_shape = VcoShape::BLSawtooth;
 
 	vcfs[0] = new Lb302FilterIIR2(&fs);
 	vcfs[1] = new Lb302Filter3Pole(&fs);
@@ -346,15 +349,16 @@ Lb302Synth::Lb302Synth( InstrumentTrack * _instrumentTrack ) :
 
 	filterChanged();
 
-	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrumentTrack );
+	auto iph = new InstrumentPlayHandle(this, _instrumentTrack);
 	Engine::audioEngine()->addPlayHandle( iph );
 }
 
 
 Lb302Synth::~Lb302Synth()
 {
-	for (int i=0; i<NUM_FILTERS; ++i) {
-		delete vcfs[i];
+	for (const auto& vcf : vcfs) 
+	{
+		delete vcf;
 	}
 }
 
@@ -465,7 +469,7 @@ int Lb302Synth::process(sampleFrame *outbuf, const int size)
 
 	if( release_frame == 0 || ! m_playingNote ) 
 	{
-		vca_mode = decay;
+		vca_mode = VcaMode::Decay;
 	}
 
 	if( new_freq ) 
@@ -489,7 +493,7 @@ int Lb302Synth::process(sampleFrame *outbuf, const int size)
 		// start decay if we're past release
 		if( i >= release_frame )
 		{
-			vca_mode = decay;
+			vca_mode = VcaMode::Decay;
 		}
 
 		// update vcf
@@ -519,43 +523,43 @@ int Lb302Synth::process(sampleFrame *outbuf, const int size)
 			vco_c -= 1.0;
 
 		switch(int(rint(wave_shape.value()))) {
-			case 0: vco_shape = SAWTOOTH; break;
-			case 1: vco_shape = TRIANGLE; break;
-			case 2: vco_shape = SQUARE; break;
-			case 3: vco_shape = ROUND_SQUARE; break;
-			case 4: vco_shape = MOOG; break;
-			case 5: vco_shape = SINE; break;
-			case 6: vco_shape = EXPONENTIAL; break;
-			case 7: vco_shape = WHITE_NOISE; break;
-			case 8: vco_shape = BL_SAWTOOTH; break;
-			case 9: vco_shape = BL_SQUARE; break;
-			case 10: vco_shape = BL_TRIANGLE; break;
-			case 11: vco_shape = BL_MOOG; break;
-			default:  vco_shape = SAWTOOTH; break;
+			case 0: vco_shape = VcoShape::Sawtooth; break;
+			case 1: vco_shape = VcoShape::Triangle; break;
+			case 2: vco_shape = VcoShape::Square; break;
+			case 3: vco_shape = VcoShape::RoundSquare; break;
+			case 4: vco_shape = VcoShape::Moog; break;
+			case 5: vco_shape = VcoShape::Sine; break;
+			case 6: vco_shape = VcoShape::Exponential; break;
+			case 7: vco_shape = VcoShape::WhiteNoise; break;
+			case 8: vco_shape = VcoShape::BLSawtooth; break;
+			case 9: vco_shape = VcoShape::BLSquare; break;
+			case 10: vco_shape = VcoShape::BLTriangle; break;
+			case 11: vco_shape = VcoShape::BLMoog; break;
+			default:  vco_shape = VcoShape::Sawtooth; break;
 		}
 
 		// add vco_shape_param the changes the shape of each curve.
 		// merge sawtooths with triangle and square with round square?
 		switch (vco_shape) {
-			case SAWTOOTH: // p0: curviness of line
+			case VcoShape::Sawtooth: // p0: curviness of line
 				vco_k = vco_c;  // Is this sawtooth backwards?
 				break;
 
-			case TRIANGLE:  // p0: duty rev.saw<->triangle<->saw p1: curviness
+			case VcoShape::Triangle:  // p0: duty rev.saw<->triangle<->saw p1: curviness
 				vco_k = (vco_c*2.0)+0.5;
 				if (vco_k>0.5)
 					vco_k = 1.0- vco_k;
 				break;
 
-			case SQUARE: // p0: slope of top
+			case VcoShape::Square: // p0: slope of top
 				vco_k = (vco_c<0)?0.5:-0.5;
 				break;
 
-			case ROUND_SQUARE: // p0: width of round
+			case VcoShape::RoundSquare: // p0: width of round
 				vco_k = (vco_c<0)?(sqrtf(1-(vco_c*vco_c*4))-0.5):-0.5;
 				break;
 
-			case MOOG: // Maybe the fall should be exponential/sinsoidal instead of quadric.
+			case VcoShape::Moog: // Maybe the fall should be exponential/sinsoidal instead of quadric.
 				// [-0.5, 0]: Rise, [0,0.25]: Slope down, [0.25,0.5]: Low
 				vco_k = (vco_c*2.0)+0.5;
 				if (vco_k>1.0) {
@@ -568,33 +572,33 @@ int Lb302Synth::process(sampleFrame *outbuf, const int size)
 				vco_k *= 2.0;  // MOOG wave gets filtered away
 				break;
 
-			case SINE:
+			case VcoShape::Sine:
 				// [-0.5, 0.5]  : [-pi, pi]
 				vco_k = 0.5f * Oscillator::sinSample( vco_c );
 				break;
 
-			case EXPONENTIAL:
+			case VcoShape::Exponential:
 				vco_k = 0.5 * Oscillator::expSample( vco_c );
 				break;
 
-			case WHITE_NOISE:
+			case VcoShape::WhiteNoise:
 				vco_k = 0.5 * Oscillator::noiseSample( vco_c );
 				break;
 
-			case BL_SAWTOOTH:
-				vco_k = BandLimitedWave::oscillate( vco_c + 0.5f, BandLimitedWave::pdToLen( vco_inc ), BandLimitedWave::BLSaw ) * 0.5f;
+			case VcoShape::BLSawtooth:
+				vco_k = BandLimitedWave::oscillate( vco_c + 0.5f, BandLimitedWave::pdToLen( vco_inc ), BandLimitedWave::Waveform::BLSaw ) * 0.5f;
 				break;
 
-			case BL_SQUARE:
-				vco_k = BandLimitedWave::oscillate( vco_c + 0.5f, BandLimitedWave::pdToLen( vco_inc ), BandLimitedWave::BLSquare ) * 0.5f;
+			case VcoShape::BLSquare:
+				vco_k = BandLimitedWave::oscillate( vco_c + 0.5f, BandLimitedWave::pdToLen( vco_inc ), BandLimitedWave::Waveform::BLSquare ) * 0.5f;
 				break;
 
-			case BL_TRIANGLE:
-				vco_k = BandLimitedWave::oscillate( vco_c + 0.5f, BandLimitedWave::pdToLen( vco_inc ), BandLimitedWave::BLTriangle ) * 0.5f;
+			case VcoShape::BLTriangle:
+				vco_k = BandLimitedWave::oscillate( vco_c + 0.5f, BandLimitedWave::pdToLen( vco_inc ), BandLimitedWave::Waveform::BLTriangle ) * 0.5f;
 				break;
 
-			case BL_MOOG:
-				vco_k = BandLimitedWave::oscillate( vco_c + 0.5f, BandLimitedWave::pdToLen( vco_inc ), BandLimitedWave::BLMoog );
+			case VcoShape::BLMoog:
+				vco_k = BandLimitedWave::oscillate( vco_c + 0.5f, BandLimitedWave::pdToLen( vco_inc ), BandLimitedWave::Waveform::BLMoog );
 				break;
 		}
 
@@ -629,18 +633,18 @@ int Lb302Synth::process(sampleFrame *outbuf, const int size)
 		}
 
 		// Handle Envelope
-		if(vca_mode==attack) {
+		if(vca_mode==VcaMode::Attack) {
 			vca_a+=(vca_a0-vca_a)*vca_attack;
 			if(sample_cnt>=0.5*Engine::audioEngine()->processingSampleRate())
-				vca_mode = idle;
+				vca_mode = VcaMode::Idle;
 		}
-		else if(vca_mode == decay) {
+		else if(vca_mode == VcaMode::Decay) {
 			vca_a *= vca_decay;
 
 			// the following line actually speeds up processing
 			if(vca_a < (1/65536.0)) {
 				vca_a = 0;
-				vca_mode = never_played;
+				vca_mode = VcaMode::NeverPlayed;
 			}
 		}
 
@@ -662,15 +666,15 @@ void Lb302Synth::initNote( Lb302Note *n)
 
 	// Always reset vca on non-dead notes, and
 	// Only reset vca on decaying(decayed) and never-played
-	if(n->dead == 0 || (vca_mode == decay || vca_mode == never_played)) {
+	if(n->dead == 0 || (vca_mode == VcaMode::Decay || vca_mode == VcaMode::NeverPlayed)) {
 		//printf("    good\n");
 		sample_cnt = 0;
-		vca_mode = attack;
+		vca_mode = VcaMode::Attack;
 		// LB303:
 		//vca_a = 0;
 	}
 	else {
-		vca_mode = idle;
+		vca_mode = VcaMode::Idle;
 	}
 
 	initSlide();
@@ -742,7 +746,7 @@ void Lb302Synth::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 void Lb302Synth::processNote( NotePlayHandle * _n )
 {
 		/// Start a new note.
-		if( _n->m_pluginData != this ) 
+		if (_n->m_pluginData != this)
 		{
 			m_playingNote = _n;
 			new_freq = true;
@@ -786,7 +790,6 @@ void Lb302Synth::play( sampleFrame * _working_buffer )
 	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 
 	process( _working_buffer, frames );
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames, nullptr );
 //	release_frame = 0; //removed for issue # 1432
 }
 
@@ -802,32 +805,35 @@ void Lb302Synth::deleteNotePluginData( NotePlayHandle * _n )
 }
 
 
-PluginView * Lb302Synth::instantiateView( QWidget * _parent )
+gui::PluginView * Lb302Synth::instantiateView( QWidget * _parent )
 {
-	return( new Lb302SynthView( this, _parent ) );
+	return( new gui::Lb302SynthView( this, _parent ) );
 }
+
+namespace gui
+{
 
 
 Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	InstrumentViewFixedSize( _instrument, _parent )
 {
 	// GUI
-	m_vcfCutKnob = new Knob( knobBright_26, this );
+	m_vcfCutKnob = new Knob( KnobType::Bright26, this );
 	m_vcfCutKnob->move( 75, 130 );
 	m_vcfCutKnob->setHintText( tr( "Cutoff Freq:" ), "" );
 	m_vcfCutKnob->setLabel( "" );
 
-	m_vcfResKnob = new Knob( knobBright_26, this );
+	m_vcfResKnob = new Knob( KnobType::Bright26, this );
 	m_vcfResKnob->move( 120, 130 );
 	m_vcfResKnob->setHintText( tr( "Resonance:" ), "" );
 	m_vcfResKnob->setLabel( "" );
 
-	m_vcfModKnob = new Knob( knobBright_26, this );
+	m_vcfModKnob = new Knob( KnobType::Bright26, this );
 	m_vcfModKnob->move( 165, 130 );
 	m_vcfModKnob->setHintText( tr( "Env Mod:" ), "" );
 	m_vcfModKnob->setLabel( "" );
 
-	m_vcfDecKnob = new Knob( knobBright_26, this );
+	m_vcfDecKnob = new Knob( KnobType::Bright26, this );
 	m_vcfDecKnob->move( 210, 130 );
 	m_vcfDecKnob->setHintText( tr( "Decay:" ), "" );
 	m_vcfDecKnob->setLabel( "" );
@@ -848,12 +854,12 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 			tr( "303-es-que, 24dB/octave, 3 pole filter" ) );
 
 
-	m_slideDecKnob = new Knob( knobBright_26, this );
+	m_slideDecKnob = new Knob( KnobType::Bright26, this );
 	m_slideDecKnob->move( 210, 75 );
 	m_slideDecKnob->setHintText( tr( "Slide Decay:" ), "" );
 	m_slideDecKnob->setLabel( "");
 
-	m_distKnob = new Knob( knobBright_26, this );
+	m_distKnob = new Knob( KnobType::Bright26, this );
 	m_distKnob->move( 210, 190 );
 	m_distKnob->setHintText( tr( "DIST:" ), "" );
 	m_distKnob->setLabel( tr( ""));
@@ -863,7 +869,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	// move to 120,75
 	const int waveBtnX = 10;
 	const int waveBtnY = 96;
-	PixmapButton * sawWaveBtn = new PixmapButton( this, tr( "Saw wave" ) );
+	auto sawWaveBtn = new PixmapButton(this, tr("Saw wave"));
 	sawWaveBtn->move( waveBtnX, waveBtnY );
 	sawWaveBtn->setActiveGraphic( embed::getIconPixmap(
 						"saw_wave_active" ) );
@@ -872,8 +878,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	sawWaveBtn->setToolTip(
 			tr( "Click here for a saw-wave." ) );
 
-	PixmapButton * triangleWaveBtn =
-		new PixmapButton( this, tr( "Triangle wave" ) );
+	auto triangleWaveBtn = new PixmapButton(this, tr("Triangle wave"));
 	triangleWaveBtn->move( waveBtnX+(16*1), waveBtnY );
 	triangleWaveBtn->setActiveGraphic(
 		embed::getIconPixmap( "triangle_wave_active" ) );
@@ -882,7 +887,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	triangleWaveBtn->setToolTip(
 			tr( "Click here for a triangle-wave." ) );
 
-	PixmapButton * sqrWaveBtn = new PixmapButton( this, tr( "Square wave" ) );
+	auto sqrWaveBtn = new PixmapButton(this, tr("Square wave"));
 	sqrWaveBtn->move( waveBtnX+(16*2), waveBtnY );
 	sqrWaveBtn->setActiveGraphic( embed::getIconPixmap(
 					"square_wave_active" ) );
@@ -891,8 +896,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	sqrWaveBtn->setToolTip(
 			tr( "Click here for a square-wave." ) );
 
-	PixmapButton * roundSqrWaveBtn =
-		new PixmapButton( this, tr( "Rounded square wave" ) );
+	auto roundSqrWaveBtn = new PixmapButton(this, tr("Rounded square wave"));
 	roundSqrWaveBtn->move( waveBtnX+(16*3), waveBtnY );
 	roundSqrWaveBtn->setActiveGraphic( embed::getIconPixmap(
 					"round_square_wave_active" ) );
@@ -901,8 +905,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	roundSqrWaveBtn->setToolTip(
 			tr( "Click here for a square-wave with a rounded end." ) );
 
-	PixmapButton * moogWaveBtn =
-		new PixmapButton( this, tr( "Moog wave" ) );
+	auto moogWaveBtn = new PixmapButton(this, tr("Moog wave"));
 	moogWaveBtn->move( waveBtnX+(16*4), waveBtnY );
 	moogWaveBtn->setActiveGraphic(
 		embed::getIconPixmap( "moog_saw_wave_active" ) );
@@ -911,7 +914,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	moogWaveBtn->setToolTip(
 			tr( "Click here for a moog-like wave." ) );
 
-	PixmapButton * sinWaveBtn = new PixmapButton( this, tr( "Sine wave" ) );
+	auto sinWaveBtn = new PixmapButton(this, tr("Sine wave"));
 	sinWaveBtn->move( waveBtnX+(16*5), waveBtnY );
 	sinWaveBtn->setActiveGraphic( embed::getIconPixmap(
 						"sin_wave_active" ) );
@@ -920,8 +923,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	sinWaveBtn->setToolTip(
 			tr( "Click for a sine-wave." ) );
 
-	PixmapButton * exponentialWaveBtn =
-		new PixmapButton( this, tr( "White noise wave" ) );
+	auto exponentialWaveBtn = new PixmapButton(this, tr("White noise wave"));
 	exponentialWaveBtn->move( waveBtnX+(16*6), waveBtnY );
 	exponentialWaveBtn->setActiveGraphic(
 		embed::getIconPixmap( "exp_wave_active" ) );
@@ -930,9 +932,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	exponentialWaveBtn->setToolTip(
 			tr( "Click here for an exponential wave." ) );
 
-
-	PixmapButton * whiteNoiseWaveBtn =
-		new PixmapButton( this, tr( "White noise wave" ) );
+	auto whiteNoiseWaveBtn = new PixmapButton(this, tr("White noise wave"));
 	whiteNoiseWaveBtn->move( waveBtnX+(16*7), waveBtnY );
 	whiteNoiseWaveBtn->setActiveGraphic(
 		embed::getIconPixmap( "white_noise_wave_active" ) );
@@ -941,8 +941,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	whiteNoiseWaveBtn->setToolTip(
 			tr( "Click here for white-noise." ) );
 
-	PixmapButton * blSawWaveBtn =
-		new PixmapButton( this, tr( "Bandlimited saw wave" ) );
+	auto blSawWaveBtn = new PixmapButton(this, tr("Bandlimited saw wave"));
 	blSawWaveBtn->move( waveBtnX+(16*9)-8, waveBtnY );
 	blSawWaveBtn->setActiveGraphic(
 		embed::getIconPixmap( "saw_wave_active" ) );
@@ -951,8 +950,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	blSawWaveBtn->setToolTip(
 			tr( "Click here for bandlimited saw wave." ) );
 
-	PixmapButton * blSquareWaveBtn =
-		new PixmapButton( this, tr( "Bandlimited square wave" ) );
+	auto blSquareWaveBtn = new PixmapButton(this, tr("Bandlimited square wave"));
 	blSquareWaveBtn->move( waveBtnX+(16*10)-8, waveBtnY );
 	blSquareWaveBtn->setActiveGraphic(
 		embed::getIconPixmap( "square_wave_active" ) );
@@ -961,8 +959,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	blSquareWaveBtn->setToolTip(
 			tr( "Click here for bandlimited square wave." ) );
 
-	PixmapButton * blTriangleWaveBtn =
-		new PixmapButton( this, tr( "Bandlimited triangle wave" ) );
+	auto blTriangleWaveBtn = new PixmapButton(this, tr("Bandlimited triangle wave"));
 	blTriangleWaveBtn->move( waveBtnX+(16*11)-8, waveBtnY );
 	blTriangleWaveBtn->setActiveGraphic(
 		embed::getIconPixmap( "triangle_wave_active" ) );
@@ -971,8 +968,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	blTriangleWaveBtn->setToolTip(
 			tr( "Click here for bandlimited triangle wave." ) );
 
-	PixmapButton * blMoogWaveBtn =
-		new PixmapButton( this, tr( "Bandlimited moog saw wave" ) );
+	auto blMoogWaveBtn = new PixmapButton(this, tr("Bandlimited moog saw wave"));
 	blMoogWaveBtn->move( waveBtnX+(16*12)-8, waveBtnY );
 	blMoogWaveBtn->setActiveGraphic(
 		embed::getIconPixmap( "moog_saw_wave_active" ) );
@@ -1004,14 +1000,9 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 }
 
 
-Lb302SynthView::~Lb302SynthView()
-{
-}
-
-
 void Lb302SynthView::modelChanged()
 {
-	Lb302Synth * syn = castModel<Lb302Synth>();
+	auto syn = castModel<Lb302Synth>();
 
 	m_vcfCutKnob->setModel( &syn->vcf_cut_knob );
 	m_vcfResKnob->setModel( &syn->vcf_res_knob );
@@ -1029,6 +1020,8 @@ void Lb302SynthView::modelChanged()
 }
 
 
+} // namespace gui
+
 
 extern "C"
 {
@@ -1045,3 +1038,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * m, void * )
 }
 
 
+} // namespace lmms

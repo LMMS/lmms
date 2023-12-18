@@ -21,12 +21,14 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
 
-#ifndef PATTERN_CLIP_H
-#define PATTERN_CLIP_H
+#ifndef LMMS_PATTERN_CLIP_H
+#define LMMS_PATTERN_CLIP_H
 
 #include "Clip.h"
+
+namespace lmms
+{
 
 /*! \brief Dummy clip for PatternTracks
  *
@@ -36,7 +38,7 @@ class PatternClip : public Clip
 {
 public:
 	PatternClip(Track* track);
-	virtual ~PatternClip() = default;
+	~PatternClip() override = default;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
@@ -47,12 +49,13 @@ public:
 
 	int patternIndex();
 
-	ClipView * createView( TrackView * _tv ) override;
+	gui::ClipView * createView( gui::TrackView * _tv ) override;
 
 private:
 	friend class PatternClipView;
 } ;
 
 
+} // namespace lmms
 
-#endif
+#endif // LMMS_PATTERN_CLIP_H

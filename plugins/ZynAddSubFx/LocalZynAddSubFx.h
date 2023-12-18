@@ -28,8 +28,13 @@
 #include "Note.h"
 
 class Master;
-class MidiEvent;
 class NulEngine;
+
+namespace lmms
+{
+
+class MidiEvent;
+
 
 class LocalZynAddSubFx
 {
@@ -67,10 +72,13 @@ protected:
 
 	std::string m_presetsDir;
 
-	int m_runningNotes[NumKeys];
+	std::array<int, NumKeys> m_runningNotes = {};
 	Master * m_master;
 	NulEngine* m_ioEngine;
 
 } ;
+
+
+} // namespace lmms
 
 #endif

@@ -30,6 +30,9 @@
 #include "ConfigManager.h"
 
 
+namespace lmms
+{
+
 
 MidiOss::MidiOss() :
 	MidiClientRaw(),
@@ -106,6 +109,6 @@ void MidiOss::run()
 }
 
 
-#endif
+} // namespace lmms
 
-
+#endif // LMMS_HAVE_OSS

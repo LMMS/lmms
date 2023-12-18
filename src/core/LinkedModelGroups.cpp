@@ -22,15 +22,18 @@
  *
  */
 
-#include "LinkedModelGroups.h"
-
 #include <QDomDocument>
 #include <QDomElement>
+
+#include "LinkedModelGroups.h"
+
 
 #include "AutomatableModel.h"
 
 
 
+namespace lmms
+{
 
 /*
 	LinkedModelGroup
@@ -137,11 +140,6 @@ bool LinkedModelGroup::containsModel(const QString &name) const
 
 
 
-LinkedModelGroups::~LinkedModelGroups() {}
-
-
-
-
 void LinkedModelGroups::linkAllModels()
 {
 	LinkedModelGroup* first = getGroup(0);
@@ -182,3 +180,5 @@ void LinkedModelGroups::loadSettings(const QDomElement& that)
 	}
 }
 
+
+} // namespace lmms

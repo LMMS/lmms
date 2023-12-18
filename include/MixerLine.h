@@ -23,16 +23,18 @@
  *
  */
 
-#ifndef MIXER_LINE_H
-#define MIXER_LINE_H
+#ifndef LMMS_GUI_MIXER_LINE_H
+#define LMMS_GUI_MIXER_LINE_H
 
 #include <QWidget>
 
-
-
-
 class QGraphicsView;
 class QLineEdit;
+
+namespace lmms::gui
+{
+
+
 class Knob;
 class LcdWidget;
 class MixerView;
@@ -48,7 +50,7 @@ public:
 	Q_PROPERTY( QColor strokeInnerActive READ strokeInnerActive WRITE setStrokeInnerActive )
 	Q_PROPERTY( QColor strokeInnerInactive READ strokeInnerInactive WRITE setStrokeInnerInactive )
 	MixerLine( QWidget * _parent, MixerView * _mv, int _channelIndex);
-	~MixerLine();
+	~MixerLine() override;
 
 	void paintEvent( QPaintEvent * ) override;
 	void mousePressEvent( QMouseEvent * ) override;
@@ -92,8 +94,6 @@ private:
 	QColor m_strokeOuterInactive;
 	QColor m_strokeInnerActive;
 	QColor m_strokeInnerInactive;
-	static QPixmap * s_sendBgArrow;
-	static QPixmap * s_receiveBgArrow;
 	bool m_inRename;
 	QLineEdit * m_renameLineEdit;
 	QGraphicsView * m_view;
@@ -113,4 +113,6 @@ private slots:
 };
 
 
-#endif // MIXERLINE_H
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_MIXER_LINE_H

@@ -33,6 +33,10 @@
 #include <QCloseEvent>
 
 
+namespace lmms::gui
+{
+
+
 void Editor::setPauseIcon(bool displayPauseIcon)
 {
 	// If we're playing, show a pause icon
@@ -54,7 +58,7 @@ DropToolBar * Editor::addDropToolBar(Qt::ToolBarArea whereToAdd, QString const &
 
 DropToolBar * Editor::addDropToolBar(QWidget * parent, Qt::ToolBarArea whereToAdd, QString const & windowTitle)
 {
-	DropToolBar *toolBar = new DropToolBar(parent);
+	auto toolBar = new DropToolBar(parent);
 	addToolBar(whereToAdd, toolBar);
 	toolBar->setMovable(false);
 	toolBar->setFloatable(false);
@@ -129,11 +133,6 @@ Editor::Editor(bool record, bool stepRecord) :
 	addButton(m_stopAction, "stopButton");
 }
 
-Editor::~Editor()
-{
-
-}
-
 QAction *Editor::playAction() const
 {
 	return m_playAction;
@@ -169,3 +168,4 @@ void DropToolBar::dropEvent(QDropEvent* event)
 
 
 
+} // namespace lmms::gui

@@ -22,15 +22,18 @@
  *
  */
 
-#ifndef AUDIO_FILE_FLAC_H
-#define AUDIO_FILE_FLAC_H
+#ifndef LMMS_AUDIO_FILE_FLAC_H
+#define LMMS_AUDIO_FILE_FLAC_H
 
 #include "lmmsconfig.h"
 
 #include "AudioFileDevice.h"
 #include <sndfile.h>
 
-class AudioFileFlac: public AudioFileDevice
+namespace lmms
+{
+
+class AudioFileFlac : public AudioFileDevice
 {
 public:
 	AudioFileFlac(OutputSettings const& outputSettings,
@@ -40,7 +43,7 @@ public:
 			AudioEngine* audioEngine
 	);
 
-	virtual ~AudioFileFlac();
+	~AudioFileFlac() override;
 
 	static AudioFileDevice* getInst(QString const& outputFilename,
 			OutputSettings const& outputSettings,
@@ -62,7 +65,7 @@ private:
 	SF_INFO  m_sfinfo;
 	SNDFILE* m_sf;
 
-	virtual void writeBuffer(surroundSampleFrame const* _ab,
+	void writeBuffer(surroundSampleFrame const* _ab,
 						fpp_t const frames,
 						float master_gain) override;
 
@@ -71,4 +74,7 @@ private:
 
 };
 
-#endif //AUDIO_FILE_FLAC_H
+
+} // namespace lmms
+
+#endif // LMMS_AUDIO_FILE_FLAC_H

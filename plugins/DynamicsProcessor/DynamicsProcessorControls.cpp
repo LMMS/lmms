@@ -33,6 +33,9 @@
 #include "Engine.h"
 #include "Song.h"
 
+namespace lmms
+{
+
 
 #define onedB 1.1220184543019633f
 
@@ -113,7 +116,7 @@ void DynProcControls::saveSettings( QDomDocument & _doc,
 
 void DynProcControls::setDefaultShape()
 {
-	float shp [200] = { };
+	auto shp = std::array<float, 200>{};
 	for ( int i = 0; i<200; i++)
 	{
 		shp[i] = ((float)i + 1.0f) / 200.0f;
@@ -154,5 +157,4 @@ void DynProcControls::subOneClicked()
 }
 
 
-
-
+} // namespace lmms

@@ -23,8 +23,9 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-#ifndef SUBWINDOW_H
-#define SUBWINDOW_H
+
+#ifndef LMMS_GUI_SUBWINDOW_H
+#define LMMS_GUI_SUBWINDOW_H
 
 #include <QMdiSubWindow>
 #include <QString>
@@ -37,6 +38,10 @@ class QMoveEvent;
 class QPushButton;
 class QResizeEvent;
 class QWidget;
+
+namespace lmms::gui
+{
+
 
 /**
  * @brief The SubWindow class
@@ -63,6 +68,8 @@ public:
 	void setActiveColor( const QBrush & b );
 	void setTextShadowColor( const QColor &c );
 	void setBorderColor( const QColor &c );
+	int titleBarHeight() const;
+	int frameWidth() const;
 
 protected:
 	// hook the QWidget move/resize events to update the tracked geometry
@@ -96,4 +103,8 @@ private slots:
 	void focusChanged( QMdiSubWindow * subWindow );
 };
 
-#endif
+
+
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_SUBWINDOW_H

@@ -22,23 +22,37 @@
  *
  */
 
+#ifndef LMMS_GUI_TIMELINE_WIDGET_H
+#define LMMS_GUI_TIMELINE_WIDGET_H
 
-#ifndef TIMELINE_H
-#define TIMELINE_H
+#include <array>
 
+#include <QBrush>
+#include <QSize>
 #include <QWidget>
 
 #include "Song.h"
+#include "embed.h"
 
 
 class QPixmap;
 class QToolBar;
+
+namespace lmms {
+
+class Timeline;
+
+} // namespace lmms
+
+namespace lmms::gui
+{
+
 class NStateButton;
 class TextFloat;
 class SongEditor;
 
 
-class TimeLineWidget : public QWidget, public JournallingObject
+class TimeLineWidget : public QWidget
 {
 	Q_OBJECT
 public:
@@ -57,29 +71,15 @@ public:
 	Q_PROPERTY( QSize mouseHotspotSelLeft WRITE setMouseHotspotSelLeft )
 	Q_PROPERTY( QSize mouseHotspotSelRight WRITE setMouseHotspotSelRight )
 
-	enum AutoScrollStates
+	enum class AutoScrollState
 	{
-		AutoScrollEnabled,
-		AutoScrollDisabled
-	} ;
+		Enabled,
+		Disabled
+	};
 
-	enum LoopPointStates
-	{
-		LoopPointsDisabled,
-		LoopPointsEnabled
-	} ;
-
-	enum BehaviourAtStopStates
-	{
-		BackToZero,
-		BackToStart,
-		KeepStopPosition
-	} ;
-
-
-	TimeLineWidget(int xoff, int yoff, float ppb, Song::PlayPos & pos,
-				const TimePos & begin, Song::PlayModes mode, QWidget * parent);
-	virtual ~TimeLineWidget();
+	TimeLineWidget(int xoff, int yoff, float ppb, Song::PlayPos& pos, Timeline& timeline,
+				const TimePos& begin, Song::PlayMode mode, QWidget* parent);
+	~TimeLineWidget() override;
 
 	inline QColor const & getBarLineColor() const { return m_barLineColor; }
 	inline void setBarLineColor(QColor const & barLineColor) { m_barLineColor = barLineColor; }
@@ -116,40 +116,9 @@ public:
 		return( m_pos );
 	}
 
-	AutoScrollStates autoScroll() const
+	AutoScrollState autoScroll() const
 	{
 		return m_autoScroll;
-	}
-
-	BehaviourAtStopStates behaviourAtStop() const
-	{
-		return m_behaviourAtStop;
-	}
-
-	bool loopPointsEnabled() const
-	{
-		return m_loopPoints == LoopPointsEnabled;
-	}
-
-	inline const TimePos & loopBegin() const
-	{
-		return ( m_loopPos[0] < m_loopPos[1] ) ?
-						m_loopPos[0] : m_loopPos[1];
-	}
-
-	inline const TimePos & loopEnd() const
-	{
-		return ( m_loopPos[0] > m_loopPos[1] ) ?
-						m_loopPos[0] : m_loopPos[1];
-	}
-
-	inline void savePos( const TimePos & pos )
-	{
-		m_savedPos = pos;
-	}
-	inline const TimePos & savedPos() const
-	{
-		return m_savedPos;
 	}
 
 	inline void setPixelsPerBar( float ppb )
@@ -166,14 +135,6 @@ public:
 
 	void addToolButtons(QToolBar* _tool_bar );
 
-
-	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
-	void loadSettings( const QDomElement & _this ) override;
-	inline QString nodeName() const override
-	{
-		return "timeline";
-	}
-
 	inline int markerX( const TimePos & _t ) const
 	{
 		return m_xOffset + static_cast<int>( ( _t - m_begin ) *
@@ -181,24 +142,17 @@ public:
 	}
 
 signals:
-
+	void positionChanged(const lmms::TimePos& postion);
 	void regionSelectedFromPixels( int, int );
 	void selectionFinished();
 
-
 public slots:
-	void updatePosition( const TimePos & );
-	void updatePosition()
-	{
-		updatePosition( TimePos() );
-	}
+	void updatePosition();
 	void setSnapSize( const float snapSize )
 	{
 		m_snapSize = snapSize;
 	}
 	void toggleAutoScroll( int _n );
-	void toggleLoopPoints( int _n );
-	void toggleBehaviourAtStop( int _n );
 	void setShiftHeld(bool held);
 
 protected:
@@ -208,7 +162,7 @@ protected:
 	void mouseReleaseEvent( QMouseEvent * _me ) override;
 
 private:
-	static QPixmap * s_posMarkerPixmap;
+	QPixmap m_posMarkerPixmap = embed::getIconPixmap("playpos_marker");
 
 	QColor m_inactiveLoopColor;
 	QBrush m_inactiveLoopBrush;
@@ -231,9 +185,7 @@ private:
 	QCursor m_cursorSelectLeft;
 	QCursor m_cursorSelectRight;
 
-	AutoScrollStates m_autoScroll;
-	LoopPointStates m_loopPoints;
-	BehaviourAtStopStates m_behaviourAtStop;
+	AutoScrollState m_autoScroll;
 
 	bool m_changedPosition;
 
@@ -242,23 +194,20 @@ private:
 	float m_ppb;
 	float m_snapSize;
 	Song::PlayPos & m_pos;
+	Timeline* m_timeline;
 	// Leftmost position visible in parent editor
 	const TimePos & m_begin;
-	const Song::PlayModes m_mode;
-	TimePos m_loopPos[2];
+	const Song::PlayMode m_mode;
 	// When in MoveLoop mode we need the initial positions. Storing only the latest
 	// position allows for unquantized drag but fails when toggling quantization.
-	TimePos m_oldLoopPos[2];
+	std::array<TimePos, 2> m_oldLoopPos;
 	TimePos m_dragStartPos;
-
-	TimePos m_savedPos;
-
 
 	TextFloat * m_hint;
 	int m_initalXSelect;
 	bool m_shiftHeld;
 
-	enum actions
+	enum class Action
 	{
 		NoAction,
 		MovePositionMarker,
@@ -268,18 +217,11 @@ private:
 		SelectSongClip,
 	} m_action;
 	
-	actions getLoopAction(QMouseEvent* event);
-	actions getLoopAction(QString mode, int xPos, Qt::MouseButton button);
-	QCursor actionCursor(actions action);
+	Action getLoopAction(QMouseEvent* event);
+	Action getLoopAction(QString mode, int xPos, Qt::MouseButton button);
+	QCursor actionCursor(Action action);
+};
 
+} // namespace lmms::gui
 
-signals:
-	void positionChanged( const TimePos & _t );
-	void loopPointStateLoaded( int _n );
-	void positionMarkerMoved();
-	void loadBehaviourAtStop( int _n );
-
-} ;
-
-
-#endif
+#endif // LMMS_GUI_TIMELINE_WIDGET_H

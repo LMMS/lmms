@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef EFFECT_SELECT_DIALOG_H
-#define EFFECT_SELECT_DIALOG_H
+#ifndef LMMS_GUI_EFFECT_SELECT_DIALOG_H
+#define LMMS_GUI_EFFECT_SELECT_DIALOG_H
 
 #include <QDialog>
 #include <QSortFilterProxyModel>
@@ -34,13 +34,16 @@
 
 namespace Ui { class EffectSelectDialog; }
 
+namespace lmms::gui
+{
+
 
 class EffectSelectDialog : public QDialog
 {
 	Q_OBJECT
 public:
 	EffectSelectDialog( QWidget * _parent );
-	virtual ~EffectSelectDialog();
+	~EffectSelectDialog() override;
 
 	Effect * instantiateSelectedPlugin( EffectChain * _parent );
 
@@ -65,5 +68,6 @@ private:
 } ;
 
 
+} // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_EFFECT_SELECT_DIALOG_H

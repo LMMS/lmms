@@ -29,6 +29,8 @@
 #include <QDomElement>
 
 
+namespace lmms
+{
 
 CompressorControls::CompressorControls(CompressorEffect* effect) :
 	EffectControls(effect),
@@ -143,3 +145,4 @@ void CompressorControls::loadSettings(const QDomElement& _this)
 }
 
 
+} // namespace lmms

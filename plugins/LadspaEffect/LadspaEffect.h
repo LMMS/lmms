@@ -33,9 +33,11 @@
 #include "LadspaControls.h"
 #include "LadspaManager.h"
 
+namespace lmms
+{
 
-typedef struct PortDescription port_desc_t;
-typedef QVector<port_desc_t *> multi_proc_t;
+struct port_desc_t;
+using multi_proc_t = QVector<port_desc_t*>;
 
 class LadspaEffect : public Effect
 {
@@ -43,14 +45,14 @@ class LadspaEffect : public Effect
 public:
 	LadspaEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key );
-	virtual ~LadspaEffect();
+	~LadspaEffect() override;
 
-	virtual bool processAudioBuffer( sampleFrame * _buf,
-							const fpp_t _frames );
+	bool processAudioBuffer( sampleFrame * _buf,
+							const fpp_t _frames ) override;
 	
 	void setControl( int _control, LADSPA_Data _data );
 
-	virtual EffectControls * controls()
+	EffectControls * controls() override
 	{
 		return m_controls;
 	}
@@ -87,5 +89,8 @@ private:
 	multi_proc_t m_portControls;
 
 } ;
+
+
+} // namespace lmms
 
 #endif

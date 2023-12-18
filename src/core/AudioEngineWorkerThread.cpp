@@ -37,6 +37,9 @@
 #include <xmmintrin.h>
 #endif
 
+namespace lmms
+{
+
 AudioEngineWorkerThread::JobQueue AudioEngineWorkerThread::globalJobQueue;
 QWaitCondition * AudioEngineWorkerThread::queueReadyWaitCond = nullptr;
 QList<AudioEngineWorkerThread *> AudioEngineWorkerThread::workerThreads;
@@ -88,7 +91,7 @@ void AudioEngineWorkerThread::JobQueue::run()
 			}
 		}
 		// always exit loop if we're not in dynamic mode
-		processedJob = processedJob && ( m_opMode == Dynamic );
+		processedJob = processedJob && ( m_opMode == OperationMode::Dynamic );
 	}
 }
 
@@ -177,4 +180,4 @@ void AudioEngineWorkerThread::run()
 	}
 }
 
-
+} // namespace lmms

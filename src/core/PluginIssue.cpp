@@ -26,47 +26,51 @@
 
 #include "PluginIssue.h"
 
+namespace lmms
+{
+
+
 const char *PluginIssue::msgFor(const PluginIssueType &it)
 {
 	switch (it)
 	{
-		case unknownPortFlow:
+		case PluginIssueType::UnknownPortFlow:
 			return "unknown port flow for mandatory port";
-		case unknownPortType:
+		case PluginIssueType::UnknownPortType:
 			return "unknown port type for mandatory port";
-		case tooManyInputChannels:
+		case PluginIssueType::TooManyInputChannels:
 			return "too many audio input channels";
-		case tooManyOutputChannels:
+		case PluginIssueType::TooManyOutputChannels:
 			return "too many audio output channels";
-		case tooManyMidiInputChannels:
+		case PluginIssueType::TooManyMidiInputChannels:
 			return "too many MIDI input channels";
-		case tooManyMidiOutputChannels:
+		case PluginIssueType::TooManyMidiOutputChannels:
 			return "too many MIDI output channels";
-		case noOutputChannel:
+		case PluginIssueType::NoOutputChannel:
 			return "no audio output channel";
-		case portHasNoDef:
+		case PluginIssueType::PortHasNoDef:
 			return "port is missing default value";
-		case portHasNoMin:
+		case PluginIssueType::PortHasNoMin:
 			return "port is missing min value";
-		case portHasNoMax:
+		case PluginIssueType::PortHasNoMax:
 			return "port is missing max value";
-		case minGreaterMax:
+		case PluginIssueType::MinGreaterMax:
 			return "port minimum is greater than maximum";
-		case defaultValueNotInRange:
+		case PluginIssueType::DefaultValueNotInRange:
 			return "default value is not in range [min, max]";
-		case logScaleMinMissing:
+		case PluginIssueType::LogScaleMinMissing:
 			return "logscale requires minimum value";
-		case logScaleMaxMissing:
+		case PluginIssueType::LogScaleMaxMissing:
 			return "logscale requires maximum value";
-		case logScaleMinMaxDifferentSigns:
+		case PluginIssueType::LogScaleMinMaxDifferentSigns:
 			return "logscale with min < 0 < max";
-		case featureNotSupported:
+		case PluginIssueType::FeatureNotSupported:
 			return "required feature not supported";
-		case badPortType:
+		case PluginIssueType::BadPortType:
 			return "unsupported port type";
-		case blacklisted:
+		case PluginIssueType::Blacklisted:
 			return "blacklisted plugin";
-		case noIssue:
+		case PluginIssueType::NoIssue:
 			return nullptr;
 	}
 	return nullptr;
@@ -91,8 +95,6 @@ bool PluginIssue::operator<(const PluginIssue &other) const
 }
 
 
-
-
 QDebug operator<<(QDebug stream, const PluginIssue &iss)
 {
 	stream << PluginIssue::msgFor(iss.m_issueType);
@@ -102,5 +104,8 @@ QDebug operator<<(QDebug stream, const PluginIssue &iss)
 	}
 	return stream;
 }
+
+} // namespace lmms
+
 
 

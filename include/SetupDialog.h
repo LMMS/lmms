@@ -22,25 +22,29 @@
  *
  */
 
-
-#ifndef SETUP_DIALOG_H
-#define SETUP_DIALOG_H
+#ifndef LMMS_GUI_SETUP_DIALOG_H
+#define LMMS_GUI_SETUP_DIALOG_H
 
 #include <QDialog>
 #include <QMap>
 
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
-#include "LedCheckBox.h"
 #include "lmmsconfig.h"
 #include "MidiClient.h"
 #include "MidiSetupWidget.h"
 
 
+class QCheckBox;
 class QComboBox;
 class QLabel;
 class QLineEdit;
 class QSlider;
+
+
+namespace lmms::gui
+{
+
 
 class TabBar;
 
@@ -49,7 +53,7 @@ class SetupDialog : public QDialog
 	Q_OBJECT
 
 public:
-	enum ConfigTabs
+	enum class ConfigTab
 	{
 		GeneralSettings,
 		PerformanceSettings,
@@ -58,8 +62,8 @@ public:
 		PathsSettings
 	};
 
-	SetupDialog(ConfigTabs tab_to_open = GeneralSettings);
-	virtual ~SetupDialog();
+	SetupDialog(ConfigTab tab_to_open = ConfigTab::GeneralSettings);
+	~SetupDialog() override;
 
 
 protected slots:
@@ -78,6 +82,7 @@ private slots:
 	void toggleLetPreviewsFinish(bool enabled);
 	void toggleSoloLegacyBehavior(bool enabled);
 	void toggleTrackDeletionWarning(bool enabled);
+	void toggleMixerChannelDeletionWarning(bool enabled);
 	void toggleMMPZ(bool enabled);
 	void toggleDisableBackup(bool enabled);
 	void toggleOpenLastProject(bool enabled);
@@ -91,7 +96,6 @@ private slots:
 	void toggleRunningAutoSave(bool enabled);
 	void toggleSmoothScroll(bool enabled);
 	void toggleAnimateAFP(bool enabled);
-	void toggleSyncVSTPlugins(bool enabled);
 	void vstEmbedMethodChanged();
 	void toggleVSTAlwaysOnTop(bool en);
 	void toggleDisableAutoQuit(bool enabled);
@@ -99,6 +103,7 @@ private slots:
 	// Audio settings widget.
 	void audioInterfaceChanged(const QString & driver);
 	void toggleHQAudioDev(bool enabled);
+	void updateBufferSizeWarning(int value);
 	void setBufferSize(int value);
 	void resetBufferSize();
 
@@ -139,6 +144,7 @@ private:
 	bool m_letPreviewsFinish;
 	bool m_soloLegacyBehavior;
 	bool m_trackDeletionWarning;
+	bool m_mixerChannelDeletionWarning;
 	bool m_MMPZ;
 	bool m_disableBackup;
 	bool m_openLastProject;
@@ -153,22 +159,20 @@ private:
 	bool m_enableRunningAutoSave;
 	QSlider * m_saveIntervalSlider;
 	QLabel * m_saveIntervalLbl;
-	LedCheckBox * m_autoSave;
-	LedCheckBox * m_runningAutoSave;
+	QCheckBox * m_autoSave;
+	QCheckBox * m_runningAutoSave;
 	bool m_smoothScroll;
 	bool m_animateAFP;
 	QLabel * m_vstEmbedLbl;
 	QComboBox* m_vstEmbedComboBox;
 	QString m_vstEmbedMethod;
-	LedCheckBox * m_vstAlwaysOnTopCheckBox;
+	QCheckBox * m_vstAlwaysOnTopCheckBox;
 	bool m_vstAlwaysOnTop;
-	bool m_syncVSTPlugins;
 	bool m_disableAutoQuit;
 
-
-	typedef QMap<QString, AudioDeviceSetupWidget *> AswMap;
-	typedef QMap<QString, MidiSetupWidget *> MswMap;
-	typedef QMap<QString, QString> trMap;
+	using AswMap = QMap<QString, AudioDeviceSetupWidget*>;
+	using MswMap = QMap<QString, MidiSetupWidget*>;
+	using trMap = QMap<QString, QString>;
 
 	// Audio settings widgets.
 	QComboBox * m_audioInterfaces;
@@ -179,6 +183,7 @@ private:
 	int m_bufferSize;
 	QSlider * m_bufferSizeSlider;
 	QLabel * m_bufferSizeLbl;
+	QLabel * m_bufferSizeWarnLbl;
 
 	// MIDI settings widgets.
 	QComboBox * m_midiInterfaces;
@@ -211,4 +216,8 @@ private:
 
 	QLabel * restartWarningLbl;
 };
-#endif
+
+
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_SETUP_DIALOG_H

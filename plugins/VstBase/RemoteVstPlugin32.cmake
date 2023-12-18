@@ -51,7 +51,7 @@ ELSEIF(LMMS_BUILD_LINUX)
 	INCLUDE(CheckWineGcc)
 	CheckWineGcc(32 "${WINEGCC}" WINEGCC_WORKING)
 	IF(NOT WINEGCC_WORKING)
-		MESSAGE(WARNING "winegcc fails to complie 32-bit binaries, please make sure you have 32-bit GCC libraries")
+		MESSAGE(WARNING "winegcc fails to compile 32-bit binaries, please make sure you have 32-bit GCC libraries")
 		RETURN()
 	ENDIF()
 	ExternalProject_Add(RemoteVstPlugin32

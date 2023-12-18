@@ -30,6 +30,10 @@
 #include "WaveShaperControlDialog.h"
 #include "Graph.h"
 
+namespace lmms
+{
+
+
 class WaveShaperEffect;
 
 
@@ -38,27 +42,25 @@ class WaveShaperControls : public EffectControls
 	Q_OBJECT
 public:
 	WaveShaperControls( WaveShaperEffect * _eff );
-	virtual ~WaveShaperControls()
-	{
-	}
+	~WaveShaperControls() override = default;
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName() const
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
+	inline QString nodeName() const override
 	{
 		return( "waveshapercontrols" );
 	}
 
 	virtual void setDefaultShape();
 
-	virtual int controlCount()
+	int controlCount() override
 	{
 		return( 4 );
 	}
 
-	virtual EffectControlDialog * createView()
+	gui::EffectControlDialog* createView() override
 	{
-		return( new WaveShaperControlDialog( this ) );
+		return( new gui::WaveShaperControlDialog( this ) );
 	}
 
 
@@ -78,9 +80,12 @@ private:
 	graphModel m_wavegraphModel;
 	BoolModel  m_clipModel;
 
-	friend class WaveShaperControlDialog;
+	friend class gui::WaveShaperControlDialog;
 	friend class WaveShaperEffect;
 
 } ;
+
+
+} // namespace lmms
 
 #endif

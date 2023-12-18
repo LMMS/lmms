@@ -32,6 +32,9 @@
 
 #include "ConfigManager.h"
 
+namespace lmms
+{
+
 
 Effect::Effect( const Plugin::Descriptor * _desc,
 			Model * _parent,
@@ -63,11 +66,11 @@ Effect::Effect( const Plugin::Descriptor * _desc,
 
 Effect::~Effect()
 {
-	for( int i = 0; i < 2; ++i )
+	for (const auto& state : m_srcState)
 	{
-		if( m_srcState[i] != nullptr )
+		if (state != nullptr)
 		{
-			src_delete( m_srcState[i] );
+			src_delete(state);
 		}
 	}
 }
@@ -121,7 +124,7 @@ Effect * Effect::instantiate( const QString& pluginName,
 	if( dynamic_cast<Effect *>( p ) != nullptr )
 	{
 		// everything ok, so return pointer
-		Effect * effect = dynamic_cast<Effect *>( p );
+		auto effect = dynamic_cast<Effect*>(p);
 		effect->m_parent = dynamic_cast<EffectChain *>(_parent);
 		return effect;
 	}
@@ -162,9 +165,9 @@ void Effect::checkGate( double _out_sum )
 
 
 
-PluginView * Effect::instantiateView( QWidget * _parent )
+gui::PluginView * Effect::instantiateView( QWidget * _parent )
 {
-	return new EffectView( this, _parent );
+	return new gui::EffectView( this, _parent );
 }
 
 	
@@ -172,17 +175,15 @@ PluginView * Effect::instantiateView( QWidget * _parent )
 
 void Effect::reinitSRC()
 {
-	for( int i = 0; i < 2; ++i )
+	for (auto& state : m_srcState)
 	{
-		if( m_srcState[i] != nullptr )
+		if (state != nullptr)
 		{
-			src_delete( m_srcState[i] );
+			src_delete(state);
 		}
 		int error;
-		if( ( m_srcState[i] = src_new(
-			Engine::audioEngine()->currentQualitySettings().
-							libsrcInterpolation(),
-					DEFAULT_CHANNELS, &error ) ) == nullptr )
+		const int currentInterpolation = Engine::audioEngine()->currentQualitySettings().libsrcInterpolation();
+		if((state = src_new(currentInterpolation, DEFAULT_CHANNELS, &error)) == nullptr)
 		{
 			qFatal( "Error: src_new() failed in effect.cpp!\n" );
 		}
@@ -215,3 +216,4 @@ void Effect::resample( int _i, const sampleFrame * _src_buf,
 	}
 }
 
+} // namespace lmms

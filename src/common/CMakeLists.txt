@@ -1,5 +1,6 @@
 set(COMMON_SRCS
 	RemotePluginBase.cpp
+	SharedMemory.cpp
 )
 
 foreach(SRC ${COMMON_SRCS})

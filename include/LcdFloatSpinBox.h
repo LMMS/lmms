@@ -23,14 +23,16 @@
  *
  */
 
-
-#ifndef LCD_FLOATSPINBOX_H
-#define LCD_FLOATSPINBOX_H
+#ifndef LMMS_GUI_LCD_FLOATSPINBOX_H
+#define LMMS_GUI_LCD_FLOATSPINBOX_H
 
 #include <QString>
 
 #include "LcdWidget.h"
 #include "AutomatableModelView.h"
+
+namespace lmms::gui
+{
 
 
 class LMMS_EXPORT LcdFloatSpinBox : public QWidget, public FloatModelView
@@ -47,6 +49,12 @@ public:
 	}
 
 	void setLabel(const QString &label) { m_label = label; }
+	
+	void setSeamless(bool left, bool right)
+	{
+		m_wholeDisplay.setSeamless(left, true);
+		m_fractionDisplay.setSeamless(true, right);
+	}
 
 public slots:
 	virtual void update();
@@ -80,4 +88,6 @@ signals:
 
 using LcdFloatSpinBoxModel = FloatModel;
 
-#endif
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_LCD_FLOATSPINBOX_H

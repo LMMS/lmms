@@ -28,6 +28,10 @@
 #include <QtGlobal>
 #include "rpmalloc.h"
 
+namespace lmms
+{
+
+
 /// Global static object handling rpmalloc intializing and finalizing
 struct MemoryManagerGlobalGuard {
 	MemoryManagerGlobalGuard() {
@@ -75,3 +79,6 @@ void MemoryManager::free(void * ptr)
 	Q_ASSERT_X(rpmalloc_is_thread_initialized(), "MemoryManager::free", "Thread not initialized");
 	return rpfree(ptr);
 }
+
+
+} // namespace lmms

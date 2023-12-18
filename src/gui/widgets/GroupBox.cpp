@@ -34,6 +34,9 @@
 #include "gui_templates.h"
 
 
+namespace lmms::gui
+{
+
 
 GroupBox::GroupBox( const QString & _caption, QWidget * _parent ) :
 	QWidget( _parent ),
@@ -101,3 +104,6 @@ void GroupBox::paintEvent( QPaintEvent * pe )
 	p.setFont( pointSize<8>( font() ) );
 	p.drawText( 22, m_titleBarHeight, m_caption );
 }
+
+
+} // namespace lmms::gui

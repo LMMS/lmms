@@ -36,16 +36,24 @@
 #include "LcdSpinBox.h"
 #include "MemoryManager.h"
 
-class Sf2InstrumentView;
-class Sf2Font;
-class Knob;
-class NotePlayHandle;
-class PixmapButton;
-
-class PatchesDialog;
 class QLabel;
 
+namespace lmms
+{
+
+
+class Sf2Font;
 struct Sf2PluginData;
+class NotePlayHandle;
+
+namespace gui
+{
+class Knob;
+class PixmapButton;
+class Sf2InstrumentView;
+class PatchesDialog;
+} // namespace gui
+
 
 class Sf2Instrument : public Instrument
 {
@@ -55,35 +63,35 @@ class Sf2Instrument : public Instrument
 
 public:
 	Sf2Instrument( InstrumentTrack * _instrument_track );
-	virtual ~Sf2Instrument();
+	~Sf2Instrument() override;
 
-	virtual void play( sampleFrame * _working_buffer );
+	void play( sampleFrame * _working_buffer ) override;
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	void playNote( NotePlayHandle * _n,
+						sampleFrame * _working_buffer ) override;
+	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	virtual void loadFile( const QString & _file );
+	void loadFile( const QString & _file ) override;
 
-	virtual AutomatableModel * childModel( const QString & _modelName );
+	AutomatableModel * childModel( const QString & _modelName ) override;
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
-	virtual f_cnt_t desiredReleaseFrames() const
+	f_cnt_t desiredReleaseFrames() const override
 	{
 		return 0;
 	}
 
-	virtual Flags flags() const
+	Flags flags() const override
 	{
-		return IsSingleStreamed;
+		return Flag::IsSingleStreamed;
 	}
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	gui::PluginView* instantiateView( QWidget * _parent ) override;
 	
 	QString getCurrentPatchName();
 
@@ -103,19 +111,15 @@ public slots:
 	void updateChorusOn();
 	void updateChorus();
 	void updateGain();
-
+	void updateTuning();
 
 private:
-	static QMutex s_fontsMutex;
-	static QMap<QString, Sf2Font*> s_fonts;
-	static int (* s_origFree)( fluid_sfont_t * );
-
 	SRC_STATE * m_srcState;
 
 	fluid_settings_t* m_settings;
 	fluid_synth_t* m_synth;
 
-	Sf2Font* m_font;
+	fluid_sfont_t* m_font;
 
 	int m_fontId;
 	QString m_filename;
@@ -127,14 +131,14 @@ private:
 	QMutex m_synthMutex;
 	QMutex m_loadMutex;
 
-	int m_notesRunning[128];
+	std::array<int, 128> m_notesRunning = {};
 	sample_rate_t m_internalSampleRate;
 	int m_lastMidiPitch;
 	int m_lastMidiPitchRange;
 	int m_channel;
 
-	LcdSpinBoxModel m_bankNum;
-	LcdSpinBoxModel m_patchNum;
+	gui::LcdSpinBoxModel m_bankNum;
+	gui::LcdSpinBoxModel m_patchNum;
 
 	FloatModel m_gain;
 
@@ -159,7 +163,7 @@ private:
 	void noteOff( Sf2PluginData * n );
 	void renderFrames( f_cnt_t frames, sampleFrame * buf );
 
-	friend class Sf2InstrumentView;
+	friend class gui::Sf2InstrumentView;
 
 signals:
 	void fileLoading();
@@ -169,21 +173,8 @@ signals:
 } ;
 
 
-
-// A soundfont in our font-map
-class Sf2Font
+namespace gui
 {
-	MM_OPERATORS
-public:
-	Sf2Font( fluid_sfont_t * f ) :
-		fluidFont( f ),
-		refCount( 1 )
-	{};
-
-	fluid_sfont_t * fluidFont;
-	int refCount;
-};
-
 
 
 class Sf2InstrumentView : public InstrumentViewFixedSize
@@ -192,10 +183,10 @@ class Sf2InstrumentView : public InstrumentViewFixedSize
 public:
 	Sf2InstrumentView( Instrument * _instrument,
 					QWidget * _parent );
-	virtual ~Sf2InstrumentView();
+	~Sf2InstrumentView() override = default;
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	PixmapButton * m_fileDialogButton;
 	PixmapButton * m_patchDialogButton;
@@ -231,5 +222,8 @@ protected slots:
 } ;
 
 
+} // namespace gui
+
+} // namespace lmms
 
 #endif

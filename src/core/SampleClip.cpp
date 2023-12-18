@@ -31,6 +31,11 @@
 #include "SampleTrack.h"
 #include "TimeLineWidget.h"
 
+
+namespace lmms
+{
+
+
 SampleClip::SampleClip( Track * _track ) :
 	Clip( _track ),
 	m_sampleBuffer( new SampleBuffer ),
@@ -42,38 +47,32 @@ SampleClip::SampleClip( Track * _track ) :
 
 	// we need to receive bpm-change-events, because then we have to
 	// change length of this Clip
-	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
-					this, SLOT( updateLength() ), Qt::DirectConnection );
-	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int,int ) ),
-					this, SLOT( updateLength() ) );
+	connect( Engine::getSong(), SIGNAL(tempoChanged(lmms::bpm_t)),
+					this, SLOT(updateLength()), Qt::DirectConnection );
+	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
+					this, SLOT(updateLength()));
 
-	//care about positionmarker
-	TimeLineWidget * timeLine = Engine::getSong()->getPlayPos( Engine::getSong()->Mode_PlaySong ).m_timeLine;
-	if( timeLine )
-	{
-		connect( timeLine, SIGNAL( positionMarkerMoved() ), this, SLOT( playbackPositionChanged() ) );
-	}
 	//playbutton clicked or space key / on Export Song set isPlaying to false
-	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ),
-			this, SLOT( playbackPositionChanged() ), Qt::DirectConnection );
-	//care about loops
-	connect( Engine::getSong(), SIGNAL( updateSampleTracks() ),
-			this, SLOT( playbackPositionChanged() ), Qt::DirectConnection );
+	connect( Engine::getSong(), SIGNAL(playbackStateChanged()),
+			this, SLOT(playbackPositionChanged()), Qt::DirectConnection );
+	//care about loops and jumps
+	connect( Engine::getSong(), SIGNAL(updateSampleTracks()),
+			this, SLOT(playbackPositionChanged()), Qt::DirectConnection );
 	//care about mute Clips
-	connect( this, SIGNAL( dataChanged() ), this, SLOT( playbackPositionChanged() ) );
+	connect( this, SIGNAL(dataChanged()), this, SLOT(playbackPositionChanged()));
 	//care about mute track
-	connect( getTrack()->getMutedModel(), SIGNAL( dataChanged() ),
-			this, SLOT( playbackPositionChanged() ), Qt::DirectConnection );
+	connect( getTrack()->getMutedModel(), SIGNAL(dataChanged()),
+			this, SLOT(playbackPositionChanged()), Qt::DirectConnection );
 	//care about Clip position
-	connect( this, SIGNAL( positionChanged() ), this, SLOT( updateTrackClips() ) );
+	connect( this, SIGNAL(positionChanged()), this, SLOT(updateTrackClips()));
 
 	switch( getTrack()->trackContainer()->type() )
 	{
-		case TrackContainer::PatternContainer:
+		case TrackContainer::Type::Pattern:
 			setAutoResize( true );
 			break;
 
-		case TrackContainer::SongContainer:
+		case TrackContainer::Type::Song:
 			// move down
 		default:
 			setAutoResize( false );
@@ -97,7 +96,7 @@ SampleClip::SampleClip(const SampleClip& orig) :
 
 SampleClip::~SampleClip()
 {
-	SampleTrack * sampletrack = dynamic_cast<SampleTrack*>( getTrack() );
+	auto sampletrack = dynamic_cast<SampleTrack*>(getTrack());
 	if ( sampletrack )
 	{
 		sampletrack->updateClips();
@@ -112,7 +111,7 @@ SampleClip::~SampleClip()
 
 void SampleClip::changeLength( const TimePos & _length )
 {
-	Clip::changeLength( qMax( static_cast<int>( _length ), 1 ) );
+	Clip::changeLength(std::max(static_cast<int>(_length), 1));
 }
 
 
@@ -138,23 +137,26 @@ void SampleClip::setSampleBuffer( SampleBuffer* sb )
 
 
 
-void SampleClip::setSampleFile( const QString & _sf )
+void SampleClip::setSampleFile(const QString & sf)
 {
-	int length;
-	if ( _sf.isEmpty() )
-	{	//When creating an empty sample clip make it a bar long
-		float nom = Engine::getSong()->getTimeSigModel().getNumerator();
-		float den = Engine::getSong()->getTimeSigModel().getDenominator();
-		length = DefaultTicksPerBar * ( nom / den );
-	}
-	else
-	{	//Otherwise set it to the sample's length
-		m_sampleBuffer->setAudioFile( _sf );
+	int length = 0;
+
+	if (!sf.isEmpty())
+	{
+		m_sampleBuffer->setAudioFile(sf);
 		length = sampleLength();
 	}
-	changeLength(length);
 
-	setStartTimeOffset( 0 );
+	if (length == 0)
+	{
+		//If there is no sample, make the clip a bar long
+		float nom = Engine::getSong()->getTimeSigModel().getNumerator();
+		float den = Engine::getSong()->getTimeSigModel().getDenominator();
+		length = DefaultTicksPerBar * (nom / den);
+	}
+
+	changeLength(length);
+	setStartTimeOffset(0);
 
 	emit sampleChanged();
 	emit playbackPositionChanged();
@@ -174,8 +176,8 @@ void SampleClip::toggleRecord()
 
 void SampleClip::playbackPositionChanged()
 {
-	Engine::audioEngine()->removePlayHandlesOfTypes( getTrack(), PlayHandle::TypeSamplePlayHandle );
-	SampleTrack * st = dynamic_cast<SampleTrack*>( getTrack() );
+	Engine::audioEngine()->removePlayHandlesOfTypes( getTrack(), PlayHandle::Type::SamplePlayHandle );
+	auto st = dynamic_cast<SampleTrack*>(getTrack());
 	st->setPlayingClips( false );
 }
 
@@ -184,7 +186,7 @@ void SampleClip::playbackPositionChanged()
 
 void SampleClip::updateTrackClips()
 {
-	SampleTrack * sampletrack = dynamic_cast<SampleTrack*>( getTrack() );
+	auto sampletrack = dynamic_cast<SampleTrack*>(getTrack());
 	if( sampletrack)
 	{
 		sampletrack->updateClips();
@@ -263,9 +265,9 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	}
 
 	_this.setAttribute( "sample_rate", m_sampleBuffer->sampleRate());
-	if( usesCustomClipColor() )
+	if (const auto& c = color())
 	{
-		_this.setAttribute( "color", color().name() );
+		_this.setAttribute("color", c->name());
 	}
 	if (m_sampleBuffer->reversed())
 	{
@@ -287,23 +289,18 @@ void SampleClip::loadSettings( const QDomElement & _this )
 	if( sampleFile().isEmpty() && _this.hasAttribute( "data" ) )
 	{
 		m_sampleBuffer->loadFromBase64( _this.attribute( "data" ) );
+		if (_this.hasAttribute("sample_rate"))
+		{
+			m_sampleBuffer->setSampleRate(_this.attribute("sample_rate").toInt());
+		}
 	}
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );
 	setStartTimeOffset( _this.attribute( "off" ).toInt() );
 
-	if ( _this.hasAttribute( "sample_rate" ) ) {
-		m_sampleBuffer->setSampleRate( _this.attribute( "sample_rate" ).toInt() );
-	}
-
-	if( _this.hasAttribute( "color" ) )
+	if (_this.hasAttribute("color"))
 	{
-		useCustomClipColor( true );
-		setColor( _this.attribute( "color" ) );
-	}
-	else
-	{
-		useCustomClipColor(false);
+		setColor(QColor{_this.attribute("color")});
 	}
 
 	if(_this.hasAttribute("reversed"))
@@ -316,7 +313,10 @@ void SampleClip::loadSettings( const QDomElement & _this )
 
 
 
-ClipView * SampleClip::createView( TrackView * _tv )
+gui::ClipView * SampleClip::createView( gui::TrackView * _tv )
 {
-	return new SampleClipView( this, _tv );
+	return new gui::SampleClipView( this, _tv );
 }
+
+
+} // namespace lmms

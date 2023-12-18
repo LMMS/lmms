@@ -42,6 +42,10 @@
 
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 static const int wavetableSize = 200;
 static const float defaultNormalizationFactor = 1.0f;
 
@@ -50,13 +54,13 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT bitinvader_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"BitInvader",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Customizable wavetable synthesizer" ),
 	"Andreas Brandmaier <andreas/at/brandmaier/dot/de>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
@@ -99,10 +103,8 @@ BSynth::~BSynth()
 
 sample_t BSynth::nextStringSample( float sample_length )
 {
-	float sample_step = 
-		static_cast<float>( sample_length / ( sample_rate / nph->frequency() ) );
+	auto sample_step = static_cast<float>(sample_length / (sample_rate / nph->frequency()));
 
-	
 	// check overflow
 	while (sample_realindex >= sample_length) {
 		sample_realindex -= sample_length;
@@ -157,8 +159,8 @@ BitInvader::BitInvader( InstrumentTrack * _instrument_track ) :
 	m_graph.setWaveToSine();
 	lengthChanged();
 
-	connect( &m_sampleLength, SIGNAL( dataChanged( ) ),
-			this, SLOT( lengthChanged( ) ), Qt::DirectConnection );
+	connect( &m_sampleLength, SIGNAL( dataChanged() ),
+			this, SLOT( lengthChanged() ), Qt::DirectConnection );
 
 	connect( &m_graph, SIGNAL( samplesChanged( int, int ) ),
 			this, SLOT( samplesChanged( int, int ) ) );
@@ -166,10 +168,6 @@ BitInvader::BitInvader( InstrumentTrack * _instrument_track ) :
 
 
 
-
-BitInvader::~BitInvader()
-{
-}
 
 
 
@@ -276,9 +274,8 @@ QString BitInvader::nodeName() const
 void BitInvader::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
-	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == nullptr )
+	if (!_n->m_pluginData)
 	{
-	
 		float factor;
 		if( !m_normalize.value() )
 		{
@@ -299,7 +296,7 @@ void BitInvader::playNote( NotePlayHandle * _n,
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 
-	BSynth * ps = static_cast<BSynth *>( _n->m_pluginData );
+	auto ps = static_cast<BSynth*>(_n->m_pluginData);
 	for( fpp_t frame = offset; frame < frames + offset; ++frame )
 	{
 		const sample_t cur = ps->nextStringSample( m_graph.length() );
@@ -310,8 +307,6 @@ void BitInvader::playNote( NotePlayHandle * _n,
 	}
 
 	applyRelease( _working_buffer, _n );
-
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
 }
 
 
@@ -325,15 +320,16 @@ void BitInvader::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-PluginView * BitInvader::instantiateView( QWidget * _parent )
+gui::PluginView * BitInvader::instantiateView( QWidget * _parent )
 {
-	return( new BitInvaderView( this, _parent ) );
+	return( new gui::BitInvaderView( this, _parent ) );
 }
 
 
 
 
-
+namespace gui
+{
 
 
 BitInvaderView::BitInvaderView( Instrument * _instrument,
@@ -347,11 +343,11 @@ BitInvaderView::BitInvaderView( Instrument * _instrument,
 								"artwork" ) );
 	setPalette( pal );
 	
-	m_sampleLengthKnob = new Knob( knobDark_28, this );
+	m_sampleLengthKnob = new Knob( KnobType::Dark28, this );
 	m_sampleLengthKnob->move( 6, 201 );
 	m_sampleLengthKnob->setHintText( tr( "Sample length" ), "" );
 
-	m_graph = new Graph( this, Graph::NearestStyle, 204, 134 );
+	m_graph = new Graph( this, Graph::Style::Nearest, 204, 134 );
 	m_graph->move(23,59);	// 55,120 - 2px border
 	m_graph->setAutoFillBackground( true );
 	m_graph->setGraphColor( QColor( 255, 255, 255 ) );
@@ -433,12 +429,12 @@ BitInvaderView::BitInvaderView( Instrument * _instrument,
 
 
 	m_interpolationToggle = new LedCheckBox( "Interpolation", this,
-							tr( "Interpolation" ), LedCheckBox::Yellow );
+							tr( "Interpolation" ), LedCheckBox::LedColor::Yellow );
 	m_interpolationToggle->move( 131, 221 );
 
 
 	m_normalizeToggle = new LedCheckBox( "Normalize", this,
-							tr( "Normalize" ), LedCheckBox::Green );
+							tr( "Normalize" ), LedCheckBox::LedColor::Green );
 	m_normalizeToggle->move( 131, 236 );
 	
 	
@@ -471,7 +467,7 @@ BitInvaderView::BitInvaderView( Instrument * _instrument,
 
 void BitInvaderView::modelChanged()
 {
-	BitInvader * b = castModel<BitInvader>();
+	auto b = castModel<BitInvader>();
 
 	m_graph->setModel( &b->m_graph );
 	m_sampleLengthKnob->setModel( &b->m_sampleLength );
@@ -558,7 +554,7 @@ void BitInvaderView::smoothClicked()
 
 void BitInvaderView::interpolationToggled( bool value )
 {
-	m_graph->setGraphStyle( value ? Graph::LinearStyle : Graph::NearestStyle);
+	m_graph->setGraphStyle( value ? Graph::Style::Linear : Graph::Style::Nearest);
 	Engine::getSong()->setModified();
 }
 
@@ -571,6 +567,7 @@ void BitInvaderView::normalizeToggled( bool value )
 }
 
 
+} // namespace gui
 
 
 extern "C"
@@ -584,3 +581,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 
 
 }
+
+
+} // namespace lmms

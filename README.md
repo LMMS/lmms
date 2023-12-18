@@ -1,12 +1,10 @@
 # ![LMMS Logo](https://raw.githubusercontent.com/LMMS/artwork/master/Icon%20%26%20Mimetypes/lmms-64x64.svg) LMMS
 
-[![Build status](https://circleci.com/gh/LMMS/lmms.svg?style=shield)](https://circleci.com/gh/LMMS/lmms)
+[![Build status](https://github.com/LMMS/lmms/actions/workflows/build.yml/badge.svg)](https://github.com/LMMS/lmms/actions/workflows/build.yml)
 [![Latest stable release](https://img.shields.io/github/release/LMMS/lmms.svg?maxAge=3600)](https://lmms.io/download)
 [![Overall downloads on Github](https://img.shields.io/github/downloads/LMMS/lmms/total.svg?maxAge=3600)](https://github.com/LMMS/lmms/releases)
 [![Join the chat at Discord](https://img.shields.io/badge/chat-on%20discord-7289DA.svg)](https://discord.gg/3sc5su7)
 [![Localise on transifex](https://img.shields.io/badge/localise-on_transifex-green.svg)](https://www.transifex.com/lmms/lmms/)
-
-**New PRs may be affected by ongoing reorganization ([#5592](https://github.com/LMMS/lmms/issues/5592)). Please be prepared to rebase your PR as necessary.**
 
 What is LMMS?
 --------------

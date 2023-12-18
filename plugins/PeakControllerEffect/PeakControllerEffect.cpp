@@ -33,18 +33,22 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT peakcontrollereffect_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Peak Controller",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 			"Plugin for controlling knobs with sound peaks" ),
 	"Paul Giblock <drfaygo/at/gmail.com>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,
@@ -72,7 +76,7 @@ PeakControllerEffect::PeakControllerEffect(
 	{
 		Engine::getSong()->addController( m_autoController );
 	}
-	PeakController::s_effects.append( this );
+	PeakController::s_effects.push_back(this);
 }
 
 
@@ -80,11 +84,11 @@ PeakControllerEffect::PeakControllerEffect(
 
 PeakControllerEffect::~PeakControllerEffect()
 {
-	int idx = PeakController::s_effects.indexOf( this );
-	if( idx >= 0 )
+	auto it = std::find(PeakController::s_effects.begin(), PeakController::s_effects.end(), this);
+	if (it != PeakController::s_effects.end())
 	{
-		PeakController::s_effects.remove( idx );
-		Engine::getSong()->removeController( m_autoController );
+		PeakController::s_effects.erase(it);
+		Engine::getSong()->removeController(m_autoController);
 	}
 }
 
@@ -157,3 +161,5 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * _parent, void * _data )
 
 }
 
+
+} // namespace lmms

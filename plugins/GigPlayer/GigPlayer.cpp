@@ -55,17 +55,21 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT gigplayer_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"GIG Player",
 	QT_TRANSLATE_NOOP( "PluginBrowser", "Player for GIG files" ),
 	"Garrett Wilson <g/at/floft/dot/net>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	"gig",
 	nullptr,
@@ -88,7 +92,7 @@ GigInstrument::GigInstrument( InstrumentTrack * _instrument_track ) :
 	m_RandomSeed( 0 ),
 	m_currentKeyDimension( 0 )
 {
-	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
+	auto iph = new InstrumentPlayHandle(this, _instrument_track);
 	Engine::audioEngine()->addPlayHandle( iph );
 
 	updateSampleRate();
@@ -104,8 +108,8 @@ GigInstrument::GigInstrument( InstrumentTrack * _instrument_track ) :
 GigInstrument::~GigInstrument()
 {
 	Engine::audioEngine()->removePlayHandlesOfTypes( instrumentTrack(),
-				PlayHandle::TypeNotePlayHandle
-				| PlayHandle::TypeInstrumentPlayHandle );
+				PlayHandle::Type::NotePlayHandle
+				| PlayHandle::Type::InstrumentPlayHandle );
 	freeInstance();
 }
 
@@ -289,8 +293,6 @@ void GigInstrument::playNote( NotePlayHandle * _n, sampleFrame * )
 {
 	const float LOG440 = 2.643452676f;
 
-	const f_cnt_t tfp = _n->totalFramesPlayed();
-
 	int midiNote = (int) floor( 12.0 * ( log2( _n->unpitchedFrequency() ) - LOG440 ) - 4.0 );
 
 	// out of range?
@@ -299,9 +301,9 @@ void GigInstrument::playNote( NotePlayHandle * _n, sampleFrame * )
 		return;
 	}
 
-	if( tfp == 0 )
+	if (!_n->m_pluginData)
 	{
-		GIGPluginData * pluginData = new GIGPluginData;
+		auto pluginData = new GIGPluginData;
 		pluginData->midiNote = midiNote;
 		_n->m_pluginData = pluginData;
 
@@ -339,22 +341,21 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 	for( QList<GigNote>::iterator it = m_notes.begin(); it != m_notes.end(); ++it )
 	{
 		// Process notes in the KeyUp state, adding release samples if desired
-		if( it->state == KeyUp )
+		if( it->state == GigState::KeyUp )
 		{
 			// If there are no samples, we're done
 			if( it->samples.empty() )
 			{
-				it->state = Completed;
+				it->state = GigState::Completed;
 			}
 			else
 			{
-				it->state = PlayingKeyUp;
+				it->state = GigState::PlayingKeyUp;
 
 				// Notify each sample that the key has been released
-				for( QList<GigSample>::iterator sample = it->samples.begin();
-						sample != it->samples.end(); ++sample )
+				for (auto& sample : it->samples)
 				{
-					sample->adsr.keyup();
+					sample.adsr.keyup();
 				}
 
 				// Add release samples if available
@@ -365,9 +366,9 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			}
 		}
 		// Process notes in the KeyDown state, adding samples for the notes
-		else if( it->state == KeyDown )
+		else if( it->state == GigState::KeyDown )
 		{
-			it->state = PlayingKeyDown;
+			it->state = GigState::PlayingKeyDown;
 			addSamples( *it, false );
 		}
 
@@ -392,7 +393,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 		}
 
 		// Delete ended notes (either in the completed state or all the samples ended)
-		if( it->state == Completed || it->samples.empty() )
+		if( it->state == GigState::Completed || it->samples.empty() )
 		{
 			it = m_notes.erase( it );
 
@@ -404,22 +405,17 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 	}
 
 	// Fill buffer with portions of the note samples
-	for( QList<GigNote>::iterator it = m_notes.begin(); it != m_notes.end(); ++it )
+	for (auto& note : m_notes)
 	{
 		// Only process the notes if we're in a playing state
-		if( !( it->state == PlayingKeyDown ||
-				it->state == PlayingKeyUp ) )
+		if (!(note.state == GigState::PlayingKeyDown || note.state == GigState::PlayingKeyUp ))
 		{
 			continue;
 		}
 
-		for( QList<GigSample>::iterator sample = it->samples.begin();
-				sample != it->samples.end(); ++sample )
+		for (auto& sample : note.samples)
 		{
-			if( sample->sample == nullptr || sample->region == nullptr )
-			{
-				continue;
-			}
+			if (sample.sample == nullptr || sample.region == nullptr) { continue; }
 
 			// Will change if resampling
 			bool resample = false;
@@ -430,18 +426,15 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			// Resample to be the correct pitch when the sample provided isn't
 			// solely for this one note (e.g. one or two samples per octave) or
 			// we are processing at a different sample rate
-			if( sample->region->PitchTrack == true || rate != sample->sample->SamplesPerSecond )
+			if (sample.region->PitchTrack == true || rate != sample.sample->SamplesPerSecond)
 			{
 				resample = true;
 
 				// Factor just for resampling
-				freq_factor = 1.0 * rate / sample->sample->SamplesPerSecond;
+				freq_factor = 1.0 * rate / sample.sample->SamplesPerSecond;
 
 				// Factor for pitch shifting as well as resampling
-				if( sample->region->PitchTrack == true )
-				{
-					freq_factor *= sample->freqFactor;
-				}
+				if (sample.region->PitchTrack == true) { freq_factor *= sample.freqFactor; }
 
 				// We need a bit of margin so we don't get glitching
 				samples = frames / freq_factor + MARGIN[m_interpolation];
@@ -449,11 +442,11 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 
 			// Load this note's data
 			sampleFrame sampleData[samples];
-			loadSample( *sample, sampleData, samples );
+			loadSample(sample, sampleData, samples);
 
 			// Apply ADSR using a copy so if we don't use these samples when
 			// resampling, the ADSR doesn't get messed up
-			ADSR copy = sample->adsr;
+			ADSR copy = sample.adsr;
 
 			for( f_cnt_t i = 0; i < samples; ++i )
 			{
@@ -468,8 +461,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 				sampleFrame convertBuf[frames];
 
 				// Only output if resampling is successful (note that "used" is output)
-				if( sample->convertSampleRate( *sampleData, *convertBuf, samples, frames,
-							freq_factor, used ) )
+				if (sample.convertSampleRate(*sampleData, *convertBuf, samples, frames, freq_factor, used))
 				{
 					for( f_cnt_t i = 0; i < frames; ++i )
 					{
@@ -488,8 +480,8 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			}
 
 			// Update note position with how many samples we actually used
-			sample->pos += used;
-			sample->adsr.inc( used );
+			sample.pos += used;
+			sample.adsr.inc(used);
 		}
 	}
 
@@ -502,8 +494,6 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 		_working_buffer[i][0] *= m_gain.value();
 		_working_buffer[i][1] *= m_gain.value();
 	}
-
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames, nullptr );
 }
 
 
@@ -589,7 +579,7 @@ void GigInstrument::loadSample( GigSample& sample, sampleFrame* sampleData, f_cn
 	// Convert from 16 or 24 bit into 32-bit float
 	if( sample.sample->BitDepth == 24 ) // 24 bit
 	{
-		uint8_t * pInt = reinterpret_cast<uint8_t*>( &buffer );
+		auto pInt = reinterpret_cast<uint8_t*>(&buffer);
 
 		for( f_cnt_t i = 0; i < samples; ++i )
 		{
@@ -621,7 +611,7 @@ void GigInstrument::loadSample( GigSample& sample, sampleFrame* sampleData, f_cn
 	}
 	else // 16 bit
 	{
-		int16_t * pInt = reinterpret_cast<int16_t*>( &buffer );
+		auto pInt = reinterpret_cast<int16_t*>(&buffer);
 
 		for( f_cnt_t i = 0; i < samples; ++i )
 		{
@@ -680,18 +670,17 @@ f_cnt_t GigInstrument::getPingPongIndex( f_cnt_t index, f_cnt_t startf, f_cnt_t 
 // A key has been released
 void GigInstrument::deleteNotePluginData( NotePlayHandle * _n )
 {
-	GIGPluginData * pluginData = static_cast<GIGPluginData *>( _n->m_pluginData );
+	auto pluginData = static_cast<GIGPluginData*>(_n->m_pluginData);
 	QMutexLocker locker( &m_notesMutex );
 
 	// Mark the note as being released, but only if it was playing or was just
 	// pressed (i.e., not if the key was already released)
-	for( QList<GigNote>::iterator i = m_notes.begin(); i != m_notes.end(); ++i )
+	for (auto& note : m_notes)
 	{
 		// Find the note by matching pointers to the plugin data
-		if( i->handle == pluginData &&
-				( i->state == KeyDown || i->state == PlayingKeyDown ) )
+		if (note.handle == pluginData && (note.state == GigState::KeyDown || note.state == GigState::PlayingKeyDown))
 		{
-			i->state = KeyUp;
+			note.state = GigState::KeyUp;
 		}
 	}
 
@@ -703,9 +692,9 @@ void GigInstrument::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-PluginView * GigInstrument::instantiateView( QWidget * _parent )
+gui::PluginView* GigInstrument::instantiateView( QWidget * _parent )
 {
-	return new GigInstrumentView( this, _parent );
+	return new gui::GigInstrumentView( this, _parent );
 }
 
 
@@ -907,12 +896,15 @@ void GigInstrument::updateSampleRate()
 
 
 
+namespace gui
+{
+
 
 class gigKnob : public Knob
 {
 public:
 	gigKnob( QWidget * _parent ) :
-			Knob( knobBright_26, _parent )
+			Knob( KnobType::Bright26, _parent )
 	{
 		setFixedSize( 31, 38 );
 	}
@@ -924,7 +916,7 @@ public:
 GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _parent ) :
         InstrumentViewFixedSize( _instrument, _parent )
 {
-	GigInstrument * k = castModel<GigInstrument>();
+	auto k = castModel<GigInstrument>();
 
 	connect( &k->m_bankNum, SIGNAL( dataChanged() ), this, SLOT( updatePatchName() ) );
 	connect( &k->m_patchNum, SIGNAL( dataChanged() ), this, SLOT( updatePatchName() ) );
@@ -981,16 +973,9 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 
 
 
-GigInstrumentView::~GigInstrumentView()
-{
-}
-
-
-
-
 void GigInstrumentView::modelChanged()
 {
-	GigInstrument * k = castModel<GigInstrument>();
+	auto k = castModel<GigInstrument>();
 	m_bankNumLcd->setModel( &k->m_bankNum );
 	m_patchNumLcd->setModel( &k->m_patchNum );
 
@@ -1007,7 +992,7 @@ void GigInstrumentView::modelChanged()
 
 void GigInstrumentView::updateFilename()
 {
-	GigInstrument * i = castModel<GigInstrument>();
+	auto i = castModel<GigInstrument>();
 	QFontMetrics fm( m_filenameLabel->font() );
 	QString file = i->m_filename.endsWith( ".gig", Qt::CaseInsensitive ) ?
 			i->m_filename.left( i->m_filename.length() - 4 ) :
@@ -1025,7 +1010,7 @@ void GigInstrumentView::updateFilename()
 
 void GigInstrumentView::updatePatchName()
 {
-	GigInstrument * i = castModel<GigInstrument>();
+	auto i = castModel<GigInstrument>();
 	QFontMetrics fm( font() );
 	QString patch = i->getCurrentPatchName();
 	m_patchLabel->setText( fm.elidedText( patch, Qt::ElideLeft, m_patchLabel->width() ) );
@@ -1046,7 +1031,7 @@ void GigInstrumentView::invalidateFile()
 
 void GigInstrumentView::showFileDialog()
 {
-	GigInstrument * k = castModel<GigInstrument>();
+	auto k = castModel<GigInstrument>();
 
 	FileDialog ofd( nullptr, tr( "Open GIG file" ) );
 	ofd.setFileMode( FileDialog::ExistingFiles );
@@ -1087,13 +1072,14 @@ void GigInstrumentView::showFileDialog()
 
 void GigInstrumentView::showPatchDialog()
 {
-	GigInstrument * k = castModel<GigInstrument>();
+	auto k = castModel<GigInstrument>();
 	PatchesDialog pd( this );
 	pd.setup( k->m_instance, 1, k->instrumentTrack()->name(), &k->m_bankNum, &k->m_patchNum, m_patchLabel );
 	pd.exec();
 }
 
 
+} // namespace gui
 
 
 // Store information related to playing a sample from the GIG file
@@ -1396,3 +1382,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 }
 
 }
+
+
+} // namespace lmms

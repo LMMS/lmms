@@ -29,7 +29,8 @@
 #include "ConfigManager.h"
 #include "debug.h"
 
-
+namespace lmms
+{
 
 AudioDevice::AudioDevice( const ch_cnt_t _channels, AudioEngine*  _audioEngine ) :
 	m_supportsCapture( false ),
@@ -267,3 +268,4 @@ bool AudioDevice::hqAudio() const
 }
 
 
+} // namespace lmms

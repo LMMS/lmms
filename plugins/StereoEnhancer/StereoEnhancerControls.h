@@ -28,6 +28,10 @@
 #include "EffectControls.h"
 #include "StereoEnhancerControlDialog.h"
 
+namespace lmms
+{
+
+
 class StereoEnhancerEffect;
 
 class StereoEnhancerControls : public EffectControls
@@ -35,25 +39,23 @@ class StereoEnhancerControls : public EffectControls
 	Q_OBJECT
 public:
 	StereoEnhancerControls( StereoEnhancerEffect( * _eff ) ); 
-	virtual ~StereoEnhancerControls()
-	{
-	}
+	~StereoEnhancerControls() override = default;
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName() const
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
+	inline QString nodeName() const override
 	{
 		return( "stereoenhancercontrols" );
 	}
 
-	virtual int controlCount()
+	int controlCount() override
 	{
 		return( 1 );
 	}
 	
-	virtual EffectControlDialog * createView()
+	gui::EffectControlDialog* createView() override
 	{
-		return new StereoEnhancerControlDialog( this );
+		return new gui::StereoEnhancerControlDialog( this );
 	}
 
 
@@ -65,9 +67,11 @@ private:
 	StereoEnhancerEffect * m_effect;
 	FloatModel m_widthModel;
 	
-	friend class StereoEnhancerControlDialog;
+	friend class gui::StereoEnhancerControlDialog;
 
 } ;
 
+
+} // namespace lmms
 
 #endif /*_STEREO_ENHANCER_CONTROLS_H*/
