@@ -281,8 +281,8 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	// Draw loop handles if necessary
 	bool handleMode = ConfigManager::inst()->value( "app", "loopmarkermode" ) == "Handles";
 	const int hw = std::min(m_loopHandleWidth, loopRectWidth/2 - 1);
-	QRect leftHandle(loopStart, 0.5, hw, loopRectHeight);
-	QRect rightHandle(loopEndR - hw, 0.5, hw, loopRectHeight);
+	QRectF leftHandle(loopStart - .5, loopRectMargin - .5, hw, loopRectHeight);
+	QRectF rightHandle(loopEndR - hw - .5, loopRectMargin - .5, hw, loopRectHeight);
 	if (handleMode && underMouse() && m_shiftHeld)
 	{
 		auto color = loopPointsActive ? m_activeLoopHandleColor : m_inactiveLoopHandleColor;
