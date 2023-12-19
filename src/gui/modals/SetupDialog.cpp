@@ -120,8 +120,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			"app", "disablebackup").toInt()),
 	m_openLastProject(ConfigManager::inst()->value(
 			"app", "openlastproject").toInt()),
-	m_loopMarkerMode(ConfigManager::inst()->value(
-			"app", "loopmarkermode")),
+	m_loopMarkerMode(ConfigManager::inst()->value("app", "loopmarkermode")),
 	m_lang(ConfigManager::inst()->value(
 			"app", "language")),
 	m_saveInterval(	ConfigManager::inst()->value(
@@ -257,7 +256,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	addCheckBox(tr("Show warning when deleting a mixer channel that is in use"), guiGroupBox, guiGroupLayout,
 		m_mixerChannelDeletionWarning,	SLOT(toggleMixerChannelDeletionWarning(bool)), false);
 
-	QComboBox * changeLoop = new QComboBox(guiGroupBox);
+	const auto changeLoop = new QComboBox(guiGroupBox);
 
 	m_loopMarkerModes.append(QString("Grab closest"));
 	m_loopMarkerModes.append(QString("Handles"));
@@ -268,17 +267,17 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		changeLoop->addItem(mode);
 	}
 
-	for(int i = 0; i < changeLoop->count(); ++i)
+	for (int i = 0; i < changeLoop->count(); ++i)
 	{
-		if(m_loopMarkerMode == m_loopMarkerModes.at(i))
+		if (m_loopMarkerMode == m_loopMarkerModes.at(i))
 		{
 			changeLoop->setCurrentIndex(i);
 			break;
 		}
 	}
 
-	connect(changeLoop, SIGNAL(currentIndexChanged(int)),
-			this, SLOT(setLoopMarkerMode(int)));
+	connect(changeLoop, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+		this, &SetupDialog::setLoopMarkerMode);
 
 	guiGroupLayout->addWidget(changeLoop);
 
@@ -1089,9 +1088,9 @@ void SetupDialog::toggleOpenLastProject(bool enabled)
 }
 
 
-void SetupDialog::setLoopMarkerMode(int lang)
+void SetupDialog::setLoopMarkerMode(int mode)
 {
-	m_loopMarkerMode = m_loopMarkerModes[lang];
+	m_loopMarkerMode = m_loopMarkerModes[mode];
 }
 
 

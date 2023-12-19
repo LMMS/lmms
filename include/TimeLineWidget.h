@@ -68,8 +68,8 @@ public:
 	Q_PROPERTY(QColor activeLoopHandleColor MEMBER m_activeLoopHandleColor)
 	Q_PROPERTY( int loopRectangleVerticalPadding READ getLoopRectangleVerticalPadding WRITE setLoopRectangleVerticalPadding )
 	Q_PROPERTY(int loopHandleWidth MEMBER m_loopHandleWidth)
-	Q_PROPERTY( QSize mouseHotspotSelLeft WRITE setMouseHotspotSelLeft )
-	Q_PROPERTY( QSize mouseHotspotSelRight WRITE setMouseHotspotSelRight )
+	Q_PROPERTY(QSize mouseHotspotSelLeft WRITE setMouseHotspotSelLeft)
+	Q_PROPERTY(QSize mouseHotspotSelRight WRITE setMouseHotspotSelRight)
 
 	enum class AutoScrollState
 	{
@@ -108,8 +108,8 @@ public:
 	inline int const & getLoopRectangleVerticalPadding() const { return m_loopRectangleVerticalPadding; }
 	inline void setLoopRectangleVerticalPadding(int const & loopRectangleVerticalPadding) { m_loopRectangleVerticalPadding = loopRectangleVerticalPadding; }
 
-	inline void setMouseHotspotSelLeft(const QSize & s) { m_mouseHotspotSelLeft = s; }
-	inline void setMouseHotspotSelRight(const QSize & s) { m_mouseHotspotSelRight = s; }
+	void setMouseHotspotSelLeft(const QSize& s) { m_mouseHotspotSelLeft = s; }
+	void setMouseHotspotSelRight(const QSize& s) { m_mouseHotspotSelRight = s; }
 
 	inline Song::PlayPos & pos()
 	{
@@ -128,10 +128,10 @@ public:
 	}
 
 	void setXOffset(const int x);
-	TimePos getClickedTime(const QMouseEvent *event);
-	TimePos getClickedTime(const int xPosition);
+	auto getClickedTime(const QMouseEvent* event) -> TimePos;
+	auto getClickedTime(int xPosition) -> TimePos;
 	// Rightmost position visible on timeline (disregards parent editor scrollbar)
-	TimePos getEnd();
+	auto getEnd() -> TimePos;
 
 	void addToolButtons(QToolBar* _tool_bar );
 
@@ -162,6 +162,20 @@ protected:
 	void mouseReleaseEvent( QMouseEvent * _me ) override;
 
 private:
+	enum class Action
+	{
+		NoAction,
+		MovePositionMarker,
+		MoveLoopBegin,
+		MoveLoopEnd,
+		MoveLoop,
+		SelectSongClip,
+	};
+
+	auto getLoopAction(QMouseEvent* event) -> Action;
+	auto getLoopAction(QString mode, int xPos, Qt::MouseButton button) -> Action;
+	auto actionCursor(Action action) -> QCursor;
+
 	QPixmap m_posMarkerPixmap = embed::getIconPixmap("playpos_marker");
 
 	QColor m_inactiveLoopColor;
@@ -207,19 +221,7 @@ private:
 	int m_initalXSelect;
 	bool m_shiftHeld;
 
-	enum class Action
-	{
-		NoAction,
-		MovePositionMarker,
-		MoveLoopBegin,
-		MoveLoopEnd,
-		MoveLoop,
-		SelectSongClip,
-	} m_action;
-	
-	Action getLoopAction(QMouseEvent* event);
-	Action getLoopAction(QString mode, int xPos, Qt::MouseButton button);
-	QCursor actionCursor(Action action);
+	Action m_action;
 };
 
 } // namespace lmms::gui
