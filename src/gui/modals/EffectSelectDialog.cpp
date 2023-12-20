@@ -54,6 +54,7 @@ EffectSelectDialog::EffectSelectDialog(QWidget* _parent) :
 	m_pluginList(new QTableView(this)),
 	m_scrollArea(new QScrollArea(this))
 {
+	setWindowTitle("Add effect");
 	resize(640, 480);
 	
 	setWindowIcon(embed::getIconPixmap("setup_audio"));
@@ -124,6 +125,7 @@ EffectSelectDialog::EffectSelectDialog(QWidget* _parent) :
 	connect(m_filterEdit, &QLineEdit::textChanged, this, &EffectSelectDialog::updateSelection);
 	m_filterEdit->setFocus();
 	m_filterEdit->setFocusPolicy(Qt::StrongFocus);
+	m_filterEdit->setPlaceholderText("Search");
 
 	m_pluginList->setModel(&m_model);
 	m_pluginList->setEditTriggers(QAbstractItemView::NoEditTriggers);
