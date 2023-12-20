@@ -255,7 +255,7 @@ void EffectSelectDialog::rowChanged(const QModelIndex& _idx, const QModelIndex&)
 				if (w->parent() == subWidget)
 				{
 					subLayout->addWidget(w);
-					subLayout->setAlignment(w, Qt::AlignTop | Qt::AlignLeft);
+					subLayout->setAlignment(w, QFlags<Qt::AlignmentFlag>(Qt::AlignTop | Qt::AlignLeft));
 				}
 			}
 			textWidgetLayout->addWidget(subWidget);
