@@ -68,8 +68,8 @@ public:
 	Q_PROPERTY(QColor activeLoopHandleColor MEMBER m_activeLoopHandleColor)
 	Q_PROPERTY( int loopRectangleVerticalPadding READ getLoopRectangleVerticalPadding WRITE setLoopRectangleVerticalPadding )
 	Q_PROPERTY(int loopHandleWidth MEMBER m_loopHandleWidth)
-	Q_PROPERTY(QSize mouseHotspotSelLeft WRITE setMouseHotspotSelLeft)
-	Q_PROPERTY(QSize mouseHotspotSelRight WRITE setMouseHotspotSelRight)
+	Q_PROPERTY(QSize mouseHotspotSelLeft READ mouseHotspotSelLeft WRITE setMouseHotspotSelLeft)
+	Q_PROPERTY(QSize mouseHotspotSelRight READ mouseHotspotSelRight WRITE setMouseHotspotSelRight)
 
 	enum class AutoScrollState
 	{
@@ -108,8 +108,27 @@ public:
 	inline int const & getLoopRectangleVerticalPadding() const { return m_loopRectangleVerticalPadding; }
 	inline void setLoopRectangleVerticalPadding(int const & loopRectangleVerticalPadding) { m_loopRectangleVerticalPadding = loopRectangleVerticalPadding; }
 
-	void setMouseHotspotSelLeft(const QSize& s) { m_mouseHotspotSelLeft = s; }
-	void setMouseHotspotSelRight(const QSize& s) { m_mouseHotspotSelRight = s; }
+	auto mouseHotspotSelLeft() const -> QSize
+	{
+		const auto point = m_cursorSelectLeft.hotSpot();
+		return QSize{point.x(), point.y()};
+	}
+
+	void setMouseHotspotSelLeft(const QSize& s)
+	{
+		m_cursorSelectLeft = QCursor{m_cursorSelectLeft.pixmap(), s.width(), s.height()};
+	}
+
+	auto mouseHotspotSelRight() const -> QSize
+	{
+		const auto point = m_cursorSelectRight.hotSpot();
+		return QSize{point.x(), point.y()};
+	}
+
+	void setMouseHotspotSelRight(const QSize& s)
+	{
+		m_cursorSelectRight = QCursor{m_cursorSelectRight.pixmap(), s.width(), s.height()};
+	}
 
 	inline Song::PlayPos & pos()
 	{
@@ -174,7 +193,7 @@ private:
 
 	auto getLoopAction(QMouseEvent* event) -> Action;
 	auto getLoopAction(QString mode, int xPos, Qt::MouseButton button) -> Action;
-	auto actionCursor(Action action) -> QCursor;
+	auto actionCursor(Action action) const -> QCursor;
 
 	QPixmap m_posMarkerPixmap = embed::getIconPixmap("playpos_marker");
 
@@ -193,11 +212,9 @@ private:
 
 	QColor m_barLineColor;
 	QColor m_barNumberColor;
-	
-	QSize m_mouseHotspotSelLeft;
-	QSize m_mouseHotspotSelRight;
-	QCursor m_cursorSelectLeft;
-	QCursor m_cursorSelectRight;
+
+	QCursor m_cursorSelectLeft = QCursor{embed::getIconPixmap("cursor_select_left"), 0, 16};
+	QCursor m_cursorSelectRight = QCursor{embed::getIconPixmap("cursor_select_right"), 32, 16};
 
 	AutoScrollState m_autoScroll;
 

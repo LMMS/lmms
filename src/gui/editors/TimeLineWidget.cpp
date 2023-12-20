@@ -61,10 +61,6 @@ TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb, 
 	m_loopHandleWidth(5),
 	m_barLineColor( 192, 192, 192 ),
 	m_barNumberColor( m_barLineColor.darker( 120 ) ),
-	m_mouseHotspotSelLeft(0, 0),
-	m_mouseHotspotSelRight(0, 0),
-	m_cursorSelectLeft(QCursor(embed::getIconPixmap("cursor_select_left"))),
-	m_cursorSelectRight(QCursor(embed::getIconPixmap("cursor_select_right"))),
 	m_autoScroll( AutoScrollState::Enabled ),
 	m_changedPosition( true ),
 	m_xOffset( xoff ),
@@ -89,11 +85,6 @@ TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb, 
 	updateTimer->start( 1000 / 60 );  // 60 fps
 	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
 					this, SLOT(update()));
-
-	m_cursorSelectLeft = QCursor(embed::getIconPixmap("cursor_select_left"),
-		m_mouseHotspotSelLeft.width(), m_mouseHotspotSelLeft.height());
-	m_cursorSelectRight = QCursor(embed::getIconPixmap("cursor_select_right"),
-		m_mouseHotspotSelRight.width(), m_mouseHotspotSelRight.height());
 }
 
 
@@ -310,8 +301,8 @@ auto TimeLineWidget::getLoopAction(QString mode, int xPos, Qt::MouseButton butto
 		const auto deltaRight = rightMost - xPos;
 
 		if (deltaLeft < 0 || deltaRight < 0) { return Action::NoAction; } // Clicked outside loop
-		else if (deltaLeft <= 5 && deltaLeft < deltaRight) { return Action::MoveLoopBegin; }
-		else if (deltaRight <= 5) { return Action::MoveLoopEnd; }
+		else if (deltaLeft <= m_loopHandleWidth && deltaLeft < deltaRight) { return Action::MoveLoopBegin; }
+		else if (deltaRight <= m_loopHandleWidth) { return Action::MoveLoopEnd; }
 		else { return Action::MoveLoop; }
 	}
 	else if (mode == "Grab closest")
@@ -329,19 +320,15 @@ auto TimeLineWidget::getLoopAction(QString mode, int xPos, Qt::MouseButton butto
 	return Action::NoAction;
 }
 
-auto TimeLineWidget::actionCursor(Action action) -> QCursor
+auto TimeLineWidget::actionCursor(Action action) const -> QCursor
 {
-	// For whatever reason hotspots can't be set properly in the constructor
-	m_cursorSelectLeft = QCursor(embed::getIconPixmap("cursor_select_left"),
-		m_mouseHotspotSelLeft.width(), m_mouseHotspotSelLeft.height());
-	m_cursorSelectRight = QCursor(embed::getIconPixmap("cursor_select_right"),
-		m_mouseHotspotSelRight.width(), m_mouseHotspotSelRight.height());
-
-	if (action == Action::MoveLoop) { return Qt::SizeHorCursor; }
-	else if (action == Action::MoveLoopBegin) { return m_cursorSelectLeft; }
-	else if (action == Action::MoveLoopEnd) { return m_cursorSelectRight; }
-	// Fall back to normal cursor if no action or action cursor not specified
-	return Qt::ArrowCursor;
+	switch (action) {
+		case Action::MoveLoop: return Qt::SizeHorCursor;
+		case Action::MoveLoopBegin: return m_cursorSelectLeft;
+		case Action::MoveLoopEnd: return m_cursorSelectRight;
+		// Fall back to normal cursor if no action or action cursor not specified
+		default: return Qt::ArrowCursor;
+	}
 }
 
 void TimeLineWidget::mousePressEvent(QMouseEvent* event)
