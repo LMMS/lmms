@@ -178,6 +178,7 @@ protected:
 	void mousePressEvent( QMouseEvent * _me ) override;
 	void mouseMoveEvent( QMouseEvent * _me ) override;
 	void mouseReleaseEvent( QMouseEvent * _me ) override;
+	void contextMenuEvent(QContextMenuEvent* event) override;
 
 private:
 	enum class Action

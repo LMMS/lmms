@@ -28,6 +28,7 @@
 
 #include <QDomElement>
 #include <QGuiApplication>
+#include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QTimer>
@@ -340,7 +341,6 @@ void TimeLineWidget::mousePressEvent(QMouseEvent* event)
 	{
 		m_action = Action::MovePositionMarker;
 	}
-	else if (event->button() == Qt::RightButton) {} // TODO: right click menu
 
 	if (m_action == Action::MoveLoopBegin || m_action == Action::MoveLoopEnd)
 	{
@@ -349,6 +349,8 @@ void TimeLineWidget::mousePressEvent(QMouseEvent* event)
 			tr("Press <%1> to disable magnetic loop points.").arg(UI_CTRL_KEY),
 			embed::getIconPixmap("hint"), 0);
 	}
+
+	setContextMenuPolicy(m_action == Action::NoAction ? Qt::DefaultContextMenu : Qt::PreventContextMenu);
 
 	mouseMoveEvent(event);
 }
@@ -448,5 +450,45 @@ void TimeLineWidget::mouseReleaseEvent( QMouseEvent* event )
 	m_action = Action::NoAction;
 }
 
+void TimeLineWidget::contextMenuEvent(QContextMenuEvent* event)
+{
+	if (event->x() < m_xOffset) { return; }
+
+	auto menu = QMenu{};
+
+	menu.addAction("Set loop begin here", [this, event] {
+		auto begin = getClickedTime(event->x());
+		const auto end = m_timeline->loopEnd();
+		if (!QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier)) { begin = begin.quantize(m_snapSize); }
+		if (begin == end) { m_timeline->setLoopEnd(end + m_snapSize * TimePos::ticksPerBar()); }
+		m_timeline->setLoopBegin(begin);
+		update();
+	});
+	menu.addAction("Set loop end here", [this, event] {
+		const auto begin = m_timeline->loopBegin();
+		auto end = getClickedTime(event->x());
+		if (!QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier)) { end = end.quantize(m_snapSize); }
+		if (begin == end) { m_timeline->setLoopBegin(begin - m_snapSize * TimePos::ticksPerBar()); }
+		m_timeline->setLoopEnd(end);
+		update();
+	});
+
+	menu.addSeparator();
+
+	const auto loopMenu = menu.addMenu(tr("Loop marker edit mode"));
+	const auto loopMode = ConfigManager::inst()->value("app", "loopmarkermode", "dual");
+	const auto addLoopModeAction = [loopMenu, &loopMode](QString text, QString mode) {
+		const auto action = loopMenu->addAction(text, [mode] {
+			ConfigManager::inst()->setValue("app", "loopmarkermode", mode);
+		});
+		action->setCheckable(true);
+		if (loopMode == mode) { action->setChecked(true); }
+	};
+	addLoopModeAction(tr("Dual-button"), "dual");
+	addLoopModeAction(tr("Grab closest"), "closest");
+	addLoopModeAction(tr("Handles"), "handles");
+
+	menu.exec(event->globalPos());
+}
 
 } // namespace lmms::gui
