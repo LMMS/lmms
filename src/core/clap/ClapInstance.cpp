@@ -330,8 +330,8 @@ auto ClapInstance::unload() -> bool
 	qDebug() << "Unloading plugin instance:" << m_pluginInfo->descriptor()->name;
 	assert(isMainThread());
 
-	// Destroy GUI
 	m_pluginGui.reset();
+	m_pluginTimerSupport.deinit();
 
 	deactivate();
 
@@ -709,6 +709,8 @@ auto ClapInstance::deactivate() -> bool
 	assert(isMainThread());
 	if (!isActive()) { return false; }
 
+	// TODO: m_pluginTimerSupport.killTimers()?
+
 	// stop_processing() needs to be called on the audio thread,
 	// but the main thread will hang if I try to use m_scheduleDeactivate
 	// and poll until the process() event is called - it never seems to be called
@@ -1060,7 +1062,7 @@ auto ClapInstance::isErrorState() const -> bool
 		|| m_pluginState == PluginState::ActiveWithError;
 }
 
-void ClapInstance::log(clap_log_severity severity, const char* msg)
+void ClapInstance::log(clap_log_severity severity, const char* msg) const
 {
 	// Thread-safe
 	if ((severity == CLAP_LOG_DEBUG || severity == CLAP_LOG_INFO)
@@ -1087,7 +1089,7 @@ void ClapInstance::log(clap_log_severity severity, const char* msg)
 		severityStr = "UNKNOWN"; break;
 	}
 
-	qDebug().nospace() << "CLAP [" << severityStr.data() << "] [" << info().descriptor()->id << "] - " << msg;
+	qDebug().nospace() << "[" << severityStr.data() << "] [" << info().descriptor()->id << "] [CLAP] - " << msg;
 }
 
 auto ClapInstance::isMainThread() -> bool

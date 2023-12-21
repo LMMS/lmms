@@ -28,6 +28,7 @@
 
 #include <QTimerEvent>
 
+#include <string>
 #include <cassert>
 
 #include "ClapInstance.h"
@@ -48,33 +49,76 @@ auto ClapTimerSupport::init(const clap_plugin* plugin) -> bool
 	return true;
 }
 
+void ClapTimerSupport::killTimers()
+{
+	for (int timerId : m_timerIds)
+	{
+		killTimer(timerId);
+	}
+	m_timerIds.clear();
+}
+
+void ClapTimerSupport::deinit()
+{
+	killTimers();
+	m_ext = nullptr;
+	m_plugin = nullptr;
+}
+
 auto ClapTimerSupport::clapRegisterTimer(const clap_host* host, std::uint32_t periodMilliseconds, clap_id* timerId) -> bool
 {
 	assert(ClapInstance::isMainThread());
+	const auto h = ClapInstance::fromHost(host);
 
-	if (!timerId) { return false; }
+	if (!timerId)
+	{
+		h->log(CLAP_LOG_PLUGIN_MISBEHAVING, "register_timer()'s `timerId` cannot be null");
+		return false;
+	}
 	*timerId = CLAP_INVALID_ID;
 
-	auto& timerSupport = ClapInstance::fromHost(host)->timerSupport();
-	if (!timerSupport.supported()) { return false; }
+	auto& timerSupport = h->timerSupport();
+	if (!timerSupport.supported())
+	{
+		h->log(CLAP_LOG_PLUGIN_MISBEHAVING, "Plugin cannot register a timer when it does not implement the timer support extension");
+		return false;
+	}
 
-	// Period should be no lower than 20 ms (arbitrary)
-	periodMilliseconds = std::max<std::uint32_t>(20, periodMilliseconds);
+	// Period should be no lower than 15 ms (arbitrary)
+	periodMilliseconds = std::max<std::uint32_t>(15, periodMilliseconds);
 
 	const auto id = timerSupport.startTimer(periodMilliseconds);
-	if (id <= 0) { return false; }
+	if (id <= 0)
+	{
+		h->log(CLAP_LOG_WARNING, "Failed to start timer");
+		return false;
+	}
 
 	*timerId = static_cast<clap_id>(id);
+	timerSupport.m_timerIds.insert(*timerId);
+
 	return true;
 }
 
 auto ClapTimerSupport::clapUnregisterTimer(const clap_host* host, clap_id timerId) -> bool
 {
 	assert(ClapInstance::isMainThread());
+	const auto h = ClapInstance::fromHost(host);
 
-	if (timerId == 0 || timerId == CLAP_INVALID_ID) { return false; }
+	if (timerId == 0 || timerId == CLAP_INVALID_ID)
+	{
+		h->log(CLAP_LOG_PLUGIN_MISBEHAVING, "Invalid timer id");
+		return false;
+	}
 
-	auto& timerSupport = ClapInstance::fromHost(host)->timerSupport();
+	auto& timerSupport = h->timerSupport();
+	if (timerSupport.m_timerIds.find(timerId) == timerSupport.m_timerIds.end())
+	{
+		const auto msg = "Unrecognized timer id: " + std::to_string(timerId);
+		h->log(CLAP_LOG_PLUGIN_MISBEHAVING, msg.c_str());
+		return false;
+	}
+
 	timerSupport.killTimer(static_cast<int>(timerId));
 
 	return true; // assume successful

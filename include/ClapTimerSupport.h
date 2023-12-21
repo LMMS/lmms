@@ -31,6 +31,8 @@
 
 #include <QObject>
 
+#include <unordered_set>
+
 #include <clap/ext/timer-support.h>
 
 namespace lmms
@@ -49,6 +51,8 @@ private:
 	using QObject::QObject;
 
 	auto init(const clap_plugin* plugin) -> bool;
+	void killTimers();
+	void deinit();
 
 	/**
 	 * clap_host_timer_support implementation
@@ -60,6 +64,7 @@ private:
 
 	const clap_plugin* m_plugin = nullptr;
 	const clap_plugin_timer_support* m_ext = nullptr;
+	std::unordered_set<clap_id> m_timerIds;
 };
 
 } // namespace lmms

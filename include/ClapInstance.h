@@ -210,7 +210,7 @@ public:
 	auto isSleeping() const -> bool;
 	auto isErrorState() const -> bool;
 
-	void log(clap_log_severity severity, const char* msg);
+	void log(clap_log_severity severity, const char* msg) const;
 
 	static auto isMainThread() -> bool;
 	static auto isAudioThread() -> bool;
