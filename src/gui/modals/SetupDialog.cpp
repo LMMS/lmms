@@ -256,30 +256,21 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	addCheckBox(tr("Show warning when deleting a mixer channel that is in use"), guiGroupBox, guiGroupLayout,
 		m_mixerChannelDeletionWarning,	SLOT(toggleMixerChannelDeletionWarning(bool)), false);
 
-	const auto changeLoop = new QComboBox(guiGroupBox);
+	m_loopMarkerComboBox = new QComboBox{guiGroupBox};
 
-	m_loopMarkerModes.append(QString("Grab closest"));
-	m_loopMarkerModes.append(QString("Handles"));
-	m_loopMarkerModes.append(QString("Dual-button"));
+	m_loopMarkerComboBox->addItem(tr("Dual-button"), "dual");
+	m_loopMarkerComboBox->addItem(tr("Grab closest"), "closest");
+	m_loopMarkerComboBox->addItem(tr("Handles"), "handles");
 
-	for (QString mode : m_loopMarkerModes)
-	{
-		changeLoop->addItem(mode);
+	if (const auto index = m_loopMarkerComboBox->findData(m_loopMarkerMode); index != -1) {
+		m_loopMarkerComboBox->setCurrentIndex(index);
 	}
 
-	for (int i = 0; i < changeLoop->count(); ++i)
-	{
-		if (m_loopMarkerMode == m_loopMarkerModes.at(i))
-		{
-			changeLoop->setCurrentIndex(i);
-			break;
-		}
-	}
+	connect(m_loopMarkerComboBox, qOverload<int>(&QComboBox::currentIndexChanged),
+		this, &SetupDialog::loopMarkerModeChanged);
 
-	connect(changeLoop, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-		this, &SetupDialog::setLoopMarkerMode);
-
-	guiGroupLayout->addWidget(changeLoop);
+	guiGroupLayout->addWidget(new QLabel{tr("Loop marker edit mode"), guiGroupBox});
+	guiGroupLayout->addWidget(m_loopMarkerComboBox);
 
 	generalControlsLayout->addWidget(guiGroupBox);
 
@@ -1088,9 +1079,9 @@ void SetupDialog::toggleOpenLastProject(bool enabled)
 }
 
 
-void SetupDialog::setLoopMarkerMode(int mode)
+void SetupDialog::loopMarkerModeChanged()
 {
-	m_loopMarkerMode = m_loopMarkerModes[mode];
+	m_loopMarkerMode = m_loopMarkerComboBox->currentData().toString();
 }
 
 

@@ -247,7 +247,7 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	p.drawRect( innerRectangle );
 	
 	// Draw loop handles if necessary
-	const auto handleMode = ConfigManager::inst()->value("app", "loopmarkermode") == "Handles";
+	const auto handleMode = ConfigManager::inst()->value("app", "loopmarkermode") == "handles";
 	const auto hw = std::min(m_loopHandleWidth, loopRectWidth / 2 - 1);
 	const auto leftHandle = QRectF(loopStart - .5, loopRectMargin - .5, hw, loopRectHeight);
 	const auto rightHandle = QRectF(loopEndR - hw - .5, loopRectMargin - .5, hw, loopRectHeight);
@@ -275,7 +275,7 @@ auto TimeLineWidget::getLoopAction(QMouseEvent* event) -> TimeLineWidget::Action
 	const auto xPos = event->x();
 	const auto button = event->button();
 
-	if (mode == "Handles")
+	if (mode == "handles")
 	{
 		// Loop start and end pos, or closest edge of screen if loop extends off it
 		const auto leftMost = std::max(markerX(m_timeline->loopBegin()), m_xOffset);
@@ -289,19 +289,17 @@ auto TimeLineWidget::getLoopAction(QMouseEvent* event) -> TimeLineWidget::Action
 		else if (deltaRight <= m_loopHandleWidth) { return Action::MoveLoopEnd; }
 		else { return Action::MoveLoop; }
 	}
-	else if (mode == "Grab closest")
+	else if (mode == "closest")
 	{
 		const TimePos loopMid = (m_timeline->loopBegin() + m_timeline->loopEnd()) / 2;
 		return getClickedTime(xPos) < loopMid ? Action::MoveLoopBegin : Action::MoveLoopEnd;
 	}
-	else if (mode == "Dual-button")
+	else // Default to dual-button mode
 	{
 		if (button == Qt::LeftButton) { return Action::MoveLoopBegin; }
 		else if (button == Qt::RightButton) { return Action::MoveLoopEnd; }
+		return Action::NoAction;
 	}
-	
-	// Fallback
-	return Action::NoAction;
 }
 
 auto TimeLineWidget::actionCursor(Action action) const -> QCursor
