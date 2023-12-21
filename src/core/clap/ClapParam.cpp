@@ -43,10 +43,11 @@ ClapParam::ClapParam(ClapInstance* pluginHost, const clap_param_info& info, doub
 	, m_id{"p" + std::to_string(m_info.id)}
 	, m_displayName{m_info.name}
 {
-	qDebug() << "ClapParam::ClapParam";
 	// Assume ClapParam::check() has already been called at this point
 
-	qDebug().nospace() << "--id:" << info.id << "; name:'" << info.name << "'; module:'" << info.module << "'; flags:" << info.flags;
+#if 0
+	qDebug().nospace() << "CLAP param --- id:" << info.id << "; name:'" << info.name << "'; module:'" << info.module << "'; flags:" << info.flags;
+#endif
 
 	// If the user cannot control this param, no AutomatableModel is needed
 	const auto flags = m_info.flags;
@@ -68,7 +69,6 @@ ClapParam::ClapParam(ClapInstance* pluginHost, const clap_param_info& info, doub
 
 		if (minVal == 0 && maxVal == 1)
 		{
-			qDebug() << "CLAP param: Creating BoolModel";
 			m_connectedModel = std::make_unique<BoolModel>(valueInt, pluginHost, name);
 			m_valueType = ValueType::Bool;
 		}
@@ -79,16 +79,13 @@ ClapParam::ClapParam(ClapInstance* pluginHost, const clap_param_info& info, doub
 				pluginHost->log(CLAP_LOG_PLUGIN_MISBEHAVING, "Bypass parameter doesn't have range [0, 1]");
 			}
 
-			qDebug() << "CLAP param: Creating IntModel";
 			m_connectedModel = std::make_unique<IntModel>(valueInt, minVal, maxVal, pluginHost, name);
-			// TODO: Is there any way to differentiate between plain int parameters and enum parameters?
+			// TODO: Use CLAP_PARAM_IS_ENUM
 			m_valueType = ValueType::Integer;
 		}
 	}
 	else
 	{
-		qDebug() << "CLAP param: Creating FloatModel";
-
 		// Allow ~1000 steps
 		double stepSize = (m_info.max_value - m_info.min_value) / 1000.0;
 

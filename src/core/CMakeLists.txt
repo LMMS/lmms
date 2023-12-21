@@ -113,6 +113,7 @@ set(LMMS_SRCS
 	core/clap/ClapManager.cpp
 	core/clap/ClapParam.cpp
 	core/clap/ClapSubPluginFeatures.cpp
+	core/clap/ClapTimerSupport.cpp
 	core/clap/ClapTransport.cpp
 
 	core/lv2/Lv2Basics.cpp

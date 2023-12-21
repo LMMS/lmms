@@ -32,6 +32,7 @@
 #include "ClapFile.h"
 #include "ClapParam.h"
 #include "ClapGui.h"
+#include "ClapTimerSupport.h"
 
 #include "LinkedModelGroups.h"
 #include "Plugin.h"
@@ -167,6 +168,7 @@ public:
 	auto info() const -> const ClapPluginInfo& { return *m_pluginInfo; }
 	auto params() const -> const std::vector<ClapParam*>& { return m_params; }
 	auto gui() const { return m_pluginGui.get(); }
+	auto timerSupport() -> ClapTimerSupport& { return m_pluginTimerSupport; }
 
 	/////////////////////////////////////////
 	// Host
@@ -210,6 +212,11 @@ public:
 
 	void log(clap_log_severity severity, const char* msg);
 
+	static auto isMainThread() -> bool;
+	static auto isAudioThread() -> bool;
+
+	static auto fromHost(const clap_host* host) -> ClapInstance*;
+
 signals:
 
 	void paramsChanged(); //!< Called when CLAP plugin changes params and LMMS core needs to update
@@ -225,7 +232,6 @@ private:
 
 	void setHost();
 	void hostPushToIdleQueue(std::function<bool()>&& functor);
-	static auto fromHost(const clap_host* host) -> ClapInstance*;
 	static auto hostGetExtension(const clap_host* host, const char* extensionId) -> const void*;
 	static void hostRequestCallback(const clap_host* host);
 	static void hostRequestProcess(const clap_host* host);
@@ -267,8 +273,6 @@ private:
 
 	auto isPluginNextStateValid(PluginState next) -> bool;
 	void setPluginState(PluginState state);
-	static inline auto isMainThread() -> bool;
-	static inline auto isAudioThread() -> bool;
 
 	template<typename T, class F>
 	auto pluginExtensionInit(const T*& ext, const char* id, F* checkFunc) -> bool;
@@ -491,6 +495,12 @@ private:
 	static constexpr const clap_host_note_ports s_hostExtNotePorts {
 		&hostExtNotePortsSupportedDialects,
 		&hostExtNotePortsRescan
+	};
+
+	ClapTimerSupport m_pluginTimerSupport{ this };
+	static constexpr const clap_host_timer_support s_hostExtTimerSupport {
+		&ClapTimerSupport::clapRegisterTimer,
+		&ClapTimerSupport::clapUnregisterTimer
 	};
 
 	/**

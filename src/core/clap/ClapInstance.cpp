@@ -671,6 +671,9 @@ auto ClapInstance::init() -> bool
 		log(CLAP_LOG_WARNING, "Plugin is instrument but doesn't implement note port extension");
 	}
 
+	// Timer support
+	m_pluginTimerSupport.init(m_plugin);
+
 	setPluginState(PluginState::Inactive);
 
 	return true;
@@ -1003,7 +1006,7 @@ void ClapInstance::handlePluginOutputEvents()
 
 void ClapInstance::paramFlushOnMainThread()
 {
-	qDebug() << "ClapInstance::paramFlushOnMainThread";
+	//qDebug() << "ClapInstance::paramFlushOnMainThread";
 	assert(isMainThread());
 	assert(!isActive());
 
@@ -1087,6 +1090,34 @@ void ClapInstance::log(clap_log_severity severity, const char* msg)
 	qDebug().nospace() << "CLAP [" << severityStr.data() << "] [" << info().descriptor()->id << "] - " << msg;
 }
 
+auto ClapInstance::isMainThread() -> bool
+{
+	return QThread::currentThread() == QCoreApplication::instance()->thread();
+}
+
+auto ClapInstance::isAudioThread() -> bool
+{
+	// Assume any non-GUI thread is an audio thread
+	return QThread::currentThread() != QCoreApplication::instance()->thread();
+}
+
+auto ClapInstance::fromHost(const clap_host* host) -> ClapInstance*
+{
+	// TODO: Return nullptr instead of throwing exceptions?
+	if (!host) { throw std::invalid_argument{"Passed a null host pointer"}; }
+
+	auto h = static_cast<ClapInstance*>(host->host_data);
+	if (!h) { throw std::invalid_argument{"Passed an invalid host pointer because the host_data is null"}; }
+
+	if (!h->plugin())
+	{
+		throw std::logic_error{"The plugin can't query for extensions during the create method. Wait "
+			"for clap_plugin.init() call."};
+	}
+
+	return h;
+}
+
 template<typename... Args>
 void ClapInstance::checkPluginStateCurrent(Args... possibilities)
 {
@@ -1159,17 +1190,6 @@ void ClapInstance::setPluginState(PluginState state)
 	}
 }
 
-auto ClapInstance::isMainThread() -> bool
-{
-	return QThread::currentThread() == QCoreApplication::instance()->thread();
-}
-
-auto ClapInstance::isAudioThread() -> bool
-{
-	// Assume any non-GUI thread is an audio thread
-	return QThread::currentThread() != QCoreApplication::instance()->thread();
-}
-
 template<typename T, class F>
 auto ClapInstance::pluginExtensionInit(const T*& ext, const char* id, F* checkFunc) -> bool
 {
@@ -1180,7 +1200,7 @@ auto ClapInstance::pluginExtensionInit(const T*& ext, const char* id, F* checkFu
 	if (!ext) { return false; }
 	if (!checkFunc(ext))
 	{
-		// Plugin doesn't fully implement this extension
+		// Extension doesn't implement the functions required by LMMS
 		ext = nullptr;
 		return false;
 	}
@@ -1264,22 +1284,6 @@ void ClapInstance::hostPushToIdleQueue(std::function<bool()>&& functor)
 	m_idleQueue.push(std::move(functor));
 }
 
-auto ClapInstance::fromHost(const clap_host* host) -> ClapInstance*
-{
-	if (!host) { throw std::invalid_argument{"Passed a null host pointer"}; }
-
-	auto h = static_cast<ClapInstance*>(host->host_data);
-	if (!h) { throw std::invalid_argument{"Passed an invalid host pointer because the host_data is null"}; }
-
-	if (!h->plugin())
-	{
-		throw std::logic_error{"The plugin can't query for extensions during the create method. Wait "
-			"for clap_plugin.init() call."};
-	}
-
-	return h;
-}
-
 auto ClapInstance::hostGetExtension(const clap_host* host, const char* extensionId) -> const void*
 {
 	[[maybe_unused]] auto h = fromHost(host);
@@ -1288,12 +1292,13 @@ auto ClapInstance::hostGetExtension(const clap_host* host, const char* extension
 	if (ClapManager::debugging()) { qDebug() << "--Plugin requested host extension:" << extensionId; }
 
 	const auto id = std::string_view{extensionId};
-	if (id == CLAP_EXT_LOG)          { return &s_hostExtLog; }
-	if (id == CLAP_EXT_THREAD_CHECK) { return &s_hostExtThreadCheck; }
-	if (id == CLAP_EXT_PARAMS)       { return &s_hostExtParams; }
-	if (id == CLAP_EXT_LATENCY)      { return &s_hostExtLatency; }
-	if (id == CLAP_EXT_GUI)          { return &s_hostExtGui; }
-	if (id == CLAP_EXT_NOTE_PORTS)   { return &s_hostExtNotePorts; }
+	if (id == CLAP_EXT_LOG)           { return &s_hostExtLog; }
+	if (id == CLAP_EXT_THREAD_CHECK)  { return &s_hostExtThreadCheck; }
+	if (id == CLAP_EXT_PARAMS)        { return &s_hostExtParams; }
+	if (id == CLAP_EXT_LATENCY)       { return &s_hostExtLatency; }
+	if (id == CLAP_EXT_GUI)           { return &s_hostExtGui; }
+	if (id == CLAP_EXT_NOTE_PORTS)    { return &s_hostExtNotePorts; }
+	if (id == CLAP_EXT_TIMER_SUPPORT) { return &s_hostExtTimerSupport; }
 
 	return nullptr;
 }
@@ -1589,7 +1594,7 @@ void ClapInstance::hostExtNotePortsRescan(const clap_host* host, std::uint32_t f
 		class PriorityHelper
 		{
 		public:
-			using IndexDialectPair = std::tuple<std::uint16_t, std::uint32_t>;
+			using IndexDialectPair = std::pair<std::uint16_t, std::uint32_t>;
 			auto check(std::uint16_t index, const clap_note_port_info& info)
 			{
 				// MIDI preferred + CLAP (and MIDI) supported
@@ -1722,7 +1727,6 @@ auto ClapInstance::getParamValueText(const ClapParam* param) const -> std::strin
 	assert(param != nullptr);
 	return param->getValueText(m_plugin, m_pluginExtParams);
 }
-
 
 } // namespace lmms
 
