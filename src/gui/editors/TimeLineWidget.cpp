@@ -27,6 +27,7 @@
 #include <cmath>
 
 #include <QDomElement>
+#include <QGuiApplication>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QTimer>
@@ -72,7 +73,6 @@ TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb, 
 	m_mode( mode ),
 	m_dragStartPos(0),
 	m_hint( nullptr ),
-	m_shiftHeld(false),
 	m_action(Action::NoAction)
 {
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
@@ -179,20 +179,6 @@ void TimeLineWidget::toggleAutoScroll( int _n )
 	m_autoScroll = static_cast<AutoScrollState>( _n );
 }
 
-void TimeLineWidget::setShiftHeld(bool held)
-{
-	m_shiftHeld = held;
-	if (m_shiftHeld)
-	{
-		setCursor(actionCursor(getLoopAction(
-			ConfigManager::inst()->value("app", "loopmarkermode"),
-			QWidget::mapFromGlobal(QCursor::pos()).x(),
-			Qt::NoButton
-		)));
-	}
-	else { setCursor(actionCursor(getLoopAction("", 0, Qt::NoButton))); }
-}
-
 void TimeLineWidget::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
@@ -265,7 +251,7 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	const auto hw = std::min(m_loopHandleWidth, loopRectWidth / 2 - 1);
 	const auto leftHandle = QRectF(loopStart - .5, loopRectMargin - .5, hw, loopRectHeight);
 	const auto rightHandle = QRectF(loopEndR - hw - .5, loopRectMargin - .5, hw, loopRectHeight);
-	if (handleMode && underMouse() && m_shiftHeld)
+	if (handleMode && underMouse() && QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier))
 	{
 		auto color = loopPointsActive ? m_activeLoopHandleColor : m_inactiveLoopHandleColor;
 		p.fillRect(leftHandle, color);
@@ -286,11 +272,9 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 auto TimeLineWidget::getLoopAction(QMouseEvent* event) -> TimeLineWidget::Action
 {
 	const auto mode = ConfigManager::inst()->value("app", "loopmarkermode");
-	return getLoopAction(mode, event->x(), event->button());
-}
+	const auto xPos = event->x();
+	const auto button = event->button();
 
-auto TimeLineWidget::getLoopAction(QString mode, int xPos, Qt::MouseButton button) -> TimeLineWidget::Action
-{
 	if (mode == "Handles")
 	{
 		// Loop start and end pos, or closest edge of screen if loop extends off it
@@ -446,9 +430,12 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			break;
 	}
 
-	if (m_shiftHeld && event->buttons() == Qt::NoButton)
+	if (event->buttons() == Qt::NoButton)
 	{
-		setCursor(actionCursor(getLoopAction(event)));
+		setCursor(QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier)
+			? actionCursor(getLoopAction(event))
+			: Qt::ArrowCursor
+		);
 	}
 }
 

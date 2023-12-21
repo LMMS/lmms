@@ -172,7 +172,6 @@ public slots:
 		m_snapSize = snapSize;
 	}
 	void toggleAutoScroll( int _n );
-	void setShiftHeld(bool held);
 
 protected:
 	void paintEvent( QPaintEvent * _pe ) override;
@@ -192,7 +191,6 @@ private:
 	};
 
 	auto getLoopAction(QMouseEvent* event) -> Action;
-	auto getLoopAction(QString mode, int xPos, Qt::MouseButton button) -> Action;
 	auto actionCursor(Action action) const -> QCursor;
 
 	QPixmap m_posMarkerPixmap = embed::getIconPixmap("playpos_marker");
@@ -236,7 +234,6 @@ private:
 
 	TextFloat * m_hint;
 	int m_initalXSelect;
-	bool m_shiftHeld;
 
 	Action m_action;
 };
