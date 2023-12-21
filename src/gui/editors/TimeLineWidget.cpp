@@ -54,13 +54,10 @@ TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb, 
 	m_inactiveLoopColor( 52, 63, 53, 64 ),
 	m_inactiveLoopBrush( QColor( 255, 255, 255, 32 ) ),
 	m_inactiveLoopInnerColor( 255, 255, 255, 32 ),
-	m_inactiveLoopHandleColor(255, 255, 255, 32),
 	m_activeLoopColor( 52, 63, 53, 255 ),
 	m_activeLoopBrush( QColor( 55, 141, 89 ) ),
 	m_activeLoopInnerColor( 74, 155, 100, 255 ),
-	m_activeLoopHandleColor(74, 155, 100, 255),
 	m_loopRectangleVerticalPadding( 1 ),
-	m_loopHandleWidth(5),
 	m_barLineColor( 192, 192, 192 ),
 	m_barNumberColor( m_barLineColor.darker( 120 ) ),
 	m_autoScroll( AutoScrollState::Enabled ),
@@ -72,9 +69,8 @@ TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb, 
 	m_timeline{&timeline},
 	m_begin( begin ),
 	m_mode( mode ),
-	m_dragStartPos(0),
 	m_hint( nullptr ),
-	m_action(Action::NoAction)
+	m_action( Action::NoAction )
 {
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	move( 0, yoff );
@@ -101,26 +97,6 @@ TimeLineWidget::~TimeLineWidget()
 void TimeLineWidget::setXOffset(const int x)
 {
 	m_xOffset = x;
-}
-
-auto TimeLineWidget::getClickedTime(const QMouseEvent* event) -> TimePos
-{
-	return getClickedTime(event->x());
-}
-
-
-auto TimeLineWidget::getClickedTime(const int xPosition) -> TimePos
-{
-	// How far into the timeline we clicked, measuring pixels from the leftmost part of the editor
-	const auto pixelDelta = std::max(xPosition - m_xOffset, 0);
-	return m_begin + static_cast<int>(pixelDelta * TimePos::ticksPerBar() / m_ppb);
-}
-
-auto TimeLineWidget::getEnd() -> TimePos
-{
-	const auto contentWidth = width() - m_xOffset;
-	const auto ticksPerPixel = TimePos::ticksPerBar() / m_ppb;
-	return m_begin + (contentWidth * ticksPerPixel);
 }
 
 void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
@@ -270,7 +246,14 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	}
 }
 
-auto TimeLineWidget::getLoopAction(QMouseEvent* event) -> TimeLineWidget::Action
+auto TimeLineWidget::getClickedTime(const int xPosition) const -> TimePos
+{
+	// How far into the timeline we clicked, measuring pixels from the leftmost part of the editor
+	const auto pixelDelta = std::max(xPosition - m_xOffset, 0);
+	return m_begin + static_cast<int>(pixelDelta * TimePos::ticksPerBar() / m_ppb);
+}
+
+auto TimeLineWidget::getLoopAction(QMouseEvent* event) const -> TimeLineWidget::Action
 {
 	const auto mode = ConfigManager::inst()->value("app", "loopmarkermode");
 	const auto xPos = event->x();
@@ -328,7 +311,7 @@ void TimeLineWidget::mousePressEvent(QMouseEvent* event)
 
 		if (m_action == Action::MoveLoop)
 		{
-			m_dragStartPos = getClickedTime(event);
+			m_dragStartPos = getClickedTime(event->x());
 			m_oldLoopPos = {m_timeline->loopBegin(), m_timeline->loopEnd()};
 		}
 	}
@@ -355,14 +338,11 @@ void TimeLineWidget::mousePressEvent(QMouseEvent* event)
 	mouseMoveEvent(event);
 }
 
-
-
-
 void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 {
 	parentWidget()->update(); // essential for widgets that this timeline had taken their mouse move event from.
 
-	auto timeAtCursor = getClickedTime(event);
+	auto timeAtCursor = getClickedTime(event->x());
 	const auto control = event->modifiers() & Qt::ControlModifier;
 
 	switch( m_action )
@@ -438,9 +418,6 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 		);
 	}
 }
-
-
-
 
 void TimeLineWidget::mouseReleaseEvent( QMouseEvent* event )
 {

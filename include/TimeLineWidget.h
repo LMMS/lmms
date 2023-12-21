@@ -147,10 +147,6 @@ public:
 	}
 
 	void setXOffset(const int x);
-	auto getClickedTime(const QMouseEvent* event) -> TimePos;
-	auto getClickedTime(int xPosition) -> TimePos;
-	// Rightmost position visible on timeline (disregards parent editor scrollbar)
-	auto getEnd() -> TimePos;
 
 	void addToolButtons(QToolBar* _tool_bar );
 
@@ -191,7 +187,8 @@ private:
 		SelectSongClip,
 	};
 
-	auto getLoopAction(QMouseEvent* event) -> Action;
+	auto getClickedTime(int xPosition) const -> TimePos;
+	auto getLoopAction(QMouseEvent* event) const -> Action;
 	auto actionCursor(Action action) const -> QCursor;
 
 	QPixmap m_posMarkerPixmap = embed::getIconPixmap("playpos_marker");
@@ -199,15 +196,15 @@ private:
 	QColor m_inactiveLoopColor;
 	QBrush m_inactiveLoopBrush;
 	QColor m_inactiveLoopInnerColor;
-	QColor m_inactiveLoopHandleColor;
+	QColor m_inactiveLoopHandleColor = QColor{255, 255, 255, 32};
 
 	QColor m_activeLoopColor;
 	QBrush m_activeLoopBrush;
 	QColor m_activeLoopInnerColor;
-	QColor m_activeLoopHandleColor;
+	QColor m_activeLoopHandleColor = QColor{74, 155, 100, 255};
 
 	int m_loopRectangleVerticalPadding;
-	int m_loopHandleWidth;
+	int m_loopHandleWidth = 5;
 
 	QColor m_barLineColor;
 	QColor m_barNumberColor;

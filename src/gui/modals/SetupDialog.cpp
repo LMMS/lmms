@@ -120,7 +120,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			"app", "disablebackup").toInt()),
 	m_openLastProject(ConfigManager::inst()->value(
 			"app", "openlastproject").toInt()),
-	m_loopMarkerMode(ConfigManager::inst()->value("app", "loopmarkermode")),
+	m_loopMarkerMode{ConfigManager::inst()->value("app", "loopmarkermode", "dual")},
 	m_lang(ConfigManager::inst()->value(
 			"app", "language")),
 	m_saveInterval(	ConfigManager::inst()->value(
@@ -262,10 +262,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_loopMarkerComboBox->addItem(tr("Grab closest"), "closest");
 	m_loopMarkerComboBox->addItem(tr("Handles"), "handles");
 
-	if (const auto index = m_loopMarkerComboBox->findData(m_loopMarkerMode); index != -1) {
-		m_loopMarkerComboBox->setCurrentIndex(index);
-	}
-
+	m_loopMarkerComboBox->setCurrentIndex(m_loopMarkerComboBox->findData(m_loopMarkerMode));
 	connect(m_loopMarkerComboBox, qOverload<int>(&QComboBox::currentIndexChanged),
 		this, &SetupDialog::loopMarkerModeChanged);
 
