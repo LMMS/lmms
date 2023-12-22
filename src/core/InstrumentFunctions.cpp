@@ -427,7 +427,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 
 			// avoid playing same key for all
 			// currently playing notes
-			if(minIndex != _n->index())
+			if (minIndex != _n->index())
 			{
 				break;
 			}
