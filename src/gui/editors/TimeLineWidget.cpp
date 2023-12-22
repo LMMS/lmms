@@ -418,7 +418,7 @@ void TimeLineWidget::contextMenuEvent(QContextMenuEvent* event)
 
 	auto menu = QMenu{};
 
-	menu.addAction("Set loop begin here", [this, event] {
+	menu.addAction(tr("Set loop begin here"), [this, event] {
 		auto begin = getClickedTime(event->x());
 		const auto end = m_timeline->loopEnd();
 		if (!QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier)) { begin = begin.quantize(m_snapSize); }
@@ -426,7 +426,7 @@ void TimeLineWidget::contextMenuEvent(QContextMenuEvent* event)
 		m_timeline->setLoopBegin(begin);
 		update();
 	});
-	menu.addAction("Set loop end here", [this, event] {
+	menu.addAction(tr("Set loop end here"), [this, event] {
 		const auto begin = m_timeline->loopBegin();
 		auto end = getClickedTime(event->x());
 		if (!QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier)) { end = end.quantize(m_snapSize); }
