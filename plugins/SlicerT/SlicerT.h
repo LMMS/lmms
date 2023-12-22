@@ -96,6 +96,8 @@ private:
 	BoolModel m_enableSync;
 
 	SampleBuffer m_originalSample;
+	std::vector<sampleFrame> m_sampleData;
+	std::vector<sampleFrame> m_reversedSampleData;
 
 	std::vector<float> m_slicePoints;
 
