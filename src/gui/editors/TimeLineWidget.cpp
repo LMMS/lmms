@@ -50,27 +50,13 @@ namespace
 
 TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb, Song::PlayPos& pos, Timeline& timeline,
 		const TimePos& begin, Song::PlayMode mode, QWidget* parent) :
-	QWidget( parent ),
-	m_inactiveLoopColor( 52, 63, 53, 64 ),
-	m_inactiveLoopBrush( QColor( 255, 255, 255, 32 ) ),
-	m_inactiveLoopInnerColor( 255, 255, 255, 32 ),
-	m_activeLoopColor( 52, 63, 53, 255 ),
-	m_activeLoopBrush( QColor( 55, 141, 89 ) ),
-	m_activeLoopInnerColor( 74, 155, 100, 255 ),
-	m_loopRectangleVerticalPadding( 1 ),
-	m_barLineColor( 192, 192, 192 ),
-	m_barNumberColor( m_barLineColor.darker( 120 ) ),
-	m_autoScroll( AutoScrollState::Enabled ),
-	m_changedPosition( true ),
-	m_xOffset( xoff ),
-	m_ppb( ppb ),
-	m_snapSize( 1.0 ),
-	m_pos( pos ),
+	QWidget{parent},
+	m_xOffset{xoff},
+	m_ppb{ppb},
+	m_pos{pos},
 	m_timeline{&timeline},
-	m_begin( begin ),
-	m_mode( mode ),
-	m_hint( nullptr ),
-	m_action( Action::NoAction )
+	m_begin{begin},
+	m_mode{mode}
 {
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	move( 0, yoff );
@@ -146,7 +132,6 @@ void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
 
 void TimeLineWidget::updatePosition()
 {
-	m_changedPosition = true;
 	emit positionChanged(m_pos);
 	update();
 }
@@ -230,7 +215,7 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	const auto rightHandle = QRectF(loopEndR - hw - .5, loopRectMargin - .5, hw, loopRectHeight);
 	if (handleMode && underMouse() && QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier))
 	{
-		auto color = loopPointsActive ? m_activeLoopHandleColor : m_inactiveLoopHandleColor;
+		const auto color = loopPointsActive ? m_activeLoopHandleColor : m_inactiveLoopHandleColor;
 		p.fillRect(leftHandle, color);
 		p.fillRect(rightHandle, color);
 	}
@@ -392,7 +377,7 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 		}
 		case Action::MoveLoop:
 		{
-			TimePos dragDelta = timeAtCursor - m_dragStartPos;
+			const TimePos dragDelta = timeAtCursor - m_dragStartPos;
 			auto loopPos = m_oldLoopPos;
 			for (auto& point : loopPos)
 			{

@@ -193,33 +193,31 @@ private:
 
 	QPixmap m_posMarkerPixmap = embed::getIconPixmap("playpos_marker");
 
-	QColor m_inactiveLoopColor;
-	QBrush m_inactiveLoopBrush;
-	QColor m_inactiveLoopInnerColor;
+	QColor m_inactiveLoopColor = QColor{52, 63, 53, 64};
+	QBrush m_inactiveLoopBrush = QColor{255, 255, 255, 32};
+	QColor m_inactiveLoopInnerColor = QColor{255, 255, 255, 32};
 	QColor m_inactiveLoopHandleColor = QColor{255, 255, 255, 32};
 
-	QColor m_activeLoopColor;
-	QBrush m_activeLoopBrush;
-	QColor m_activeLoopInnerColor;
+	QColor m_activeLoopColor = QColor{52, 63, 53, 255};
+	QBrush m_activeLoopBrush = QColor{55, 141, 89};
+	QColor m_activeLoopInnerColor = QColor{74, 155, 100, 255};
 	QColor m_activeLoopHandleColor = QColor{74, 155, 100, 255};
 
-	int m_loopRectangleVerticalPadding;
+	int m_loopRectangleVerticalPadding = 1;
 	int m_loopHandleWidth = 5;
 
-	QColor m_barLineColor;
-	QColor m_barNumberColor;
+	QColor m_barLineColor = QColor{192, 192, 192};
+	QColor m_barNumberColor = m_barLineColor.darker(120);
 
 	QCursor m_cursorSelectLeft = QCursor{embed::getIconPixmap("cursor_select_left"), 0, 16};
 	QCursor m_cursorSelectRight = QCursor{embed::getIconPixmap("cursor_select_right"), 32, 16};
 
-	AutoScrollState m_autoScroll;
-
-	bool m_changedPosition;
+	AutoScrollState m_autoScroll = AutoScrollState::Enabled;
 
 	// Width of the unused region on the widget's left (above track labels or piano)
 	int m_xOffset;
 	float m_ppb;
-	float m_snapSize;
+	float m_snapSize = 1.f;
 	Song::PlayPos & m_pos;
 	Timeline* m_timeline;
 	// Leftmost position visible in parent editor
@@ -230,10 +228,10 @@ private:
 	std::array<TimePos, 2> m_oldLoopPos;
 	TimePos m_dragStartPos;
 
-	TextFloat * m_hint;
+	TextFloat* m_hint = nullptr;
 	int m_initalXSelect;
 
-	Action m_action;
+	Action m_action = Action::NoAction;
 };
 
 } // namespace lmms::gui
