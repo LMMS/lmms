@@ -1304,6 +1304,7 @@ auto ClapInstance::hostGetExtension(const clap_host* host, const char* extension
 	if (id == CLAP_EXT_GUI)           { return &s_hostExtGui; }
 	if (id == CLAP_EXT_NOTE_PORTS)    { return &s_hostExtNotePorts; }
 	if (id == CLAP_EXT_TIMER_SUPPORT) { return &s_hostExtTimerSupport; }
+	if (id == CLAP_EXT_THREAD_POOL)   { return &s_hostExtThreadPool; }
 
 	return nullptr;
 }
