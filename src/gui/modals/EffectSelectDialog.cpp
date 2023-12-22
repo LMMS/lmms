@@ -35,17 +35,14 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QScrollArea>
-#include <QSortFilterProxyModel>
-#include <QStandardItemModel>
-#include <QTableView>
 #include <QVBoxLayout>
 
 
 namespace lmms::gui
 {
 
-EffectSelectDialog::EffectSelectDialog(QWidget* _parent) :
-	QDialog(_parent),
+EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
+	QDialog(parent),
 	m_effectKeys(),
 	m_currentSelection(),
 	m_sourceModel(),
@@ -61,7 +58,7 @@ EffectSelectDialog::EffectSelectDialog(QWidget* _parent) :
 
 	// Query effects
 	EffectKeyList subPluginEffectKeys;
-	for (const Plugin::Descriptor* desc : getPluginFactory()->descriptors(Plugin::Type::Effect))
+	for (const auto desc : getPluginFactory()->descriptors(Plugin::Type::Effect))
 	{
 		if (desc->subPluginFeatures)
 		{
@@ -114,14 +111,19 @@ EffectSelectDialog::EffectSelectDialog(QWidget* _parent) :
 		button->setFocusPolicy(Qt::NoFocus);
 		leftSectionLayout->addWidget(button);
 		
-		connect(button, &QPushButton::clicked, this, [this, label] { m_model.setEffectTypeFilter(label == "All" ? "" : label); updateSelection(); });
+		connect(button, &QPushButton::clicked, this, [this, label] {
+			m_model.setEffectTypeFilter(label == "All" ? "" : label);
+			updateSelection();
+		});
 	}
 
 	leftSectionLayout->addStretch();// Add stretch to the button layout to push buttons to the top
 	mainLayout->addLayout(leftSectionLayout);
 
 	m_filterEdit = new QLineEdit(this);
-	connect(m_filterEdit, &QLineEdit::textChanged, this, [this](const QString &text) { m_model.setFilterRegExp(QRegExp(text, Qt::CaseInsensitive)); });
+	connect(m_filterEdit, &QLineEdit::textChanged, this, [this](const QString &text) {
+		m_model.setFilterRegExp(QRegExp(text, Qt::CaseInsensitive));
+	});
 	connect(m_filterEdit, &QLineEdit::textChanged, this, &EffectSelectDialog::updateSelection);
 	m_filterEdit->setFocus();
 	m_filterEdit->setFocusPolicy(Qt::StrongFocus);
@@ -165,7 +167,8 @@ EffectSelectDialog::EffectSelectDialog(QWidget* _parent) :
 
 	auto selectionModel = new QItemSelectionModel(&m_model);
 	m_pluginList->setSelectionModel(selectionModel);
-	connect(selectionModel, SIGNAL(currentRowChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(rowChanged(const QModelIndex&, const QModelIndex&)));
+	connect(selectionModel, SIGNAL(currentRowChanged(const QModelIndex&, const QModelIndex&)),
+		this, SLOT(rowChanged(const QModelIndex&, const QModelIndex&)));
 
 	connect(m_pluginList, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(acceptSelection()));
 	
@@ -180,16 +183,16 @@ EffectSelectDialog::~EffectSelectDialog()
 {
 }
 
-Effect* EffectSelectDialog::instantiateSelectedPlugin(EffectChain* _parent)
+Effect* EffectSelectDialog::instantiateSelectedPlugin(EffectChain* parent)
 {
 	Effect* result = nullptr;
 	if (!m_currentSelection.name.isEmpty() && m_currentSelection.desc)
 	{
-		result = Effect::instantiate(m_currentSelection.desc->name, _parent, &m_currentSelection);
+		result = Effect::instantiate(m_currentSelection.desc->name, parent, &m_currentSelection);
 	}
 	if (!result)
 	{
-		result = new DummyEffect(_parent, QDomElement());
+		result = new DummyEffect(parent, QDomElement());
 	}
 	return result;
 }
@@ -202,19 +205,19 @@ void EffectSelectDialog::acceptSelection()
 	}
 }
 
-void EffectSelectDialog::rowChanged(const QModelIndex& _idx, const QModelIndex&)
+void EffectSelectDialog::rowChanged(const QModelIndex& idx, const QModelIndex&)
 {
 	delete m_descriptionWidget;
 	m_descriptionWidget = nullptr;
 
-	if (m_model.mapToSource(_idx).row() < 0)
+	if (m_model.mapToSource(idx).row() < 0)
 	{
 		// Invalidate current selection
 		m_currentSelection = Plugin::Descriptor::SubPluginFeatures::Key();
 	}
 	else
 	{
-		m_currentSelection = m_effectKeys[m_model.mapToSource(_idx).row()];
+		m_currentSelection = m_effectKeys[m_model.mapToSource(idx).row()];
 	}
 	if (m_currentSelection.desc)
 	{
@@ -249,7 +252,8 @@ void EffectSelectDialog::rowChanged(const QModelIndex& _idx, const QModelIndex&)
 		subLayout->setSpacing(8);
 		if (m_currentSelection.desc->subPluginFeatures)
 		{
-			m_currentSelection.desc->subPluginFeatures->fillDescriptionWidget(subWidget, &m_currentSelection);
+			m_currentSelection.desc->subPluginFeatures->
+				fillDescriptionWidget(subWidget, &m_currentSelection);
 			for (QWidget* w : subWidget->findChildren<QWidget*>())
 			{
 				if (w->parent() == subWidget)
@@ -284,7 +288,8 @@ void EffectSelectDialog::updateSelection()
 	if (m_pluginList->selectionModel()->selection().size() <= 0)
 	{
 		// Then select our first item
-		m_pluginList->selectionModel()->select(m_model.index(0, 0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+		m_pluginList->selectionModel()->
+			select(m_model.index(0, 0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
 		rowChanged(m_model.index(0, 0), QModelIndex());
 	}
 }
@@ -302,7 +307,8 @@ bool EffectSelectDialog::eventFilter(QObject *obj, QEvent *event)
 			int rowCount = m_pluginList->model()->rowCount();
 			newRow = qBound(0, newRow, rowCount - 1);
 			
-			selectionModel->setCurrentIndex(m_pluginList->model()->index(newRow, 0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+			selectionModel->setCurrentIndex(m_pluginList->model()->index(newRow, 0),
+				QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
 			m_pluginList->scrollTo(m_pluginList->model()->index(newRow, 0));
 			return true;
 		}
