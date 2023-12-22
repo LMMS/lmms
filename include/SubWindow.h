@@ -80,6 +80,7 @@ protected:
 
 signals:
 	void focusLost();
+	void closeSignal();
 
 private:
 	const QSize m_buttonSize;
@@ -95,12 +96,17 @@ private:
 	QLabel * m_windowTitle;
 	QGraphicsDropShadowEffect * m_shadow;
 	bool m_hasFocus;
+	QMenu* m_systemMenu;
+	QAction* m_closeAllAction;
+	QAction* m_closeOthersAction;
 
 	static void elideText( QLabel *label, QString text );
 	void adjustTitleBar();
 
 private slots:
 	void focusChanged( QMdiSubWindow * subWindow );
+	void closeOthersEmit();
+	void closeOthersRecive( SubWindow * source);
 };
 
 

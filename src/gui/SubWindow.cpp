@@ -33,14 +33,29 @@
 #include <QMdiArea>
 #include <QMoveEvent>
 #include <QPainter>
+#include <QScrollBar>
+#include <QMenu>
 #include <QPushButton>
 #include <QStyleOption>
 
 #include "embed.h"
+#include "SignalSender.h"
 
 namespace lmms::gui
 {
+void SubWindow::closeOthersEmit()
+{
+	// trigger signal sender to send a close event to all elements
+	emit SignalSender::getInstance()->closeOthers(this);
+}
 
+void SubWindow::closeOthersRecive(SubWindow* source)
+{
+	// make sure source of signal is not the current window
+	if (source != this) {
+		emit closeSignal();
+	}
+}
 
 SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
 	QMdiSubWindow(parent, windowFlags),
@@ -97,7 +112,38 @@ SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
 	setWindowFlags( Qt::SubWindow | Qt::WindowMaximizeButtonHint |
 		Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint |
 		Qt::CustomizeWindowHint );
-	connect( mdiArea(), SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(focusChanged(QMdiSubWindow*)));
+  connect( mdiArea(), SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(focusChanged(QMdiSubWindow*)));
+	// get the default systemMenu
+	m_systemMenu = systemMenu();
+
+	// create 'close all' action
+	m_closeAllAction = new QAction("Close all", this);
+	m_closeAllAction->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_W));
+	// connect action to SignalSender
+	connect(m_closeAllAction, SIGNAL(triggered()), SignalSender::getInstance(), SLOT(closeAll()));
+	// connect SignalSender to close action
+	connect(SignalSender::getInstance(), SIGNAL(closeAllSignal()), this, SLOT(close()));
+	// add action to subwindow to capture keypress
+	addAction(m_closeAllAction);
+	// add action to systemMenu
+	m_systemMenu->addAction(m_closeAllAction);
+
+	// create 'close others' action
+	m_closeOthersAction = new QAction("Close others", this);
+	m_closeOthersAction->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Q));
+	// connect action to signal emit
+	connect(m_closeOthersAction, SIGNAL(triggered()), this, SLOT(closeOthersEmit()));
+	// connect SignalSender to signal recive
+	connect(SignalSender::getInstance(), SIGNAL(closeOthersSignal(SubWindow*)), this, SLOT(closeOthersRecive(SubWindow*)));
+	// connect signal to close action
+	connect(this, SIGNAL(closeSignal()), this, SLOT(close()));
+	// add action to subwindow to capture keypress
+	addAction(m_closeOthersAction);
+	// add action to systemMenu
+	m_systemMenu->addAction(m_closeOthersAction);
+
+	// update systemMenu
+	setSystemMenu(m_systemMenu);
 }
 
 

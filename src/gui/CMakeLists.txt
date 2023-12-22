@@ -34,6 +34,8 @@ SET(LMMS_SRCS
 	gui/PluginBrowser.cpp
 	gui/ProjectNotes.cpp
 	gui/RowTableView.cpp
+	gui/SetupDialog.cpp
+	gui/SignalSender.cpp
 	gui/SampleTrackWindow.cpp
 	gui/SendButtonIndicator.cpp
 	gui/SideBar.cpp
