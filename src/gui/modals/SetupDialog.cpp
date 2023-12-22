@@ -266,7 +266,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	connect(m_loopMarkerComboBox, qOverload<int>(&QComboBox::currentIndexChanged),
 		this, &SetupDialog::loopMarkerModeChanged);
 
-	guiGroupLayout->addWidget(new QLabel{tr("Loop marker edit mode"), guiGroupBox});
+	guiGroupLayout->addWidget(new QLabel{tr("Loop edit mode"), guiGroupBox});
 	guiGroupLayout->addWidget(m_loopMarkerComboBox);
 
 	generalControlsLayout->addWidget(guiGroupBox);

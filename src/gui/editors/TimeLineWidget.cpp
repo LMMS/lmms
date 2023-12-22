@@ -437,7 +437,7 @@ void TimeLineWidget::contextMenuEvent(QContextMenuEvent* event)
 
 	menu.addSeparator();
 
-	const auto loopMenu = menu.addMenu(tr("Loop marker edit mode"));
+	const auto loopMenu = menu.addMenu(tr("Loop edit mode (hold shift)"));
 	const auto loopMode = ConfigManager::inst()->value("app", "loopmarkermode", "dual");
 	const auto addLoopModeAction = [loopMenu, &loopMode](QString text, QString mode) {
 		const auto action = loopMenu->addAction(text, [mode] {
