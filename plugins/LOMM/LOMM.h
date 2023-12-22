@@ -73,6 +73,8 @@ private:
 	StereoLinkwitzRiley m_hp1;
 	StereoLinkwitzRiley m_hp2;
 	
+	BasicFilters<2> m_ap;
+	
 	bool m_needsUpdate;
 	float m_coeffPrecalc;
 	
