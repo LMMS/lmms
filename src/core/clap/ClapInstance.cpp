@@ -674,6 +674,9 @@ auto ClapInstance::init() -> bool
 	// Timer support
 	m_pluginTimerSupport.init(m_plugin);
 
+	// Thread pool
+	m_pluginThreadPool.init(m_plugin);
+
 	setPluginState(PluginState::Inactive);
 
 	return true;

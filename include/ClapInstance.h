@@ -33,6 +33,7 @@
 #include "ClapParam.h"
 #include "ClapGui.h"
 #include "ClapTimerSupport.h"
+#include "ClapThreadPool.h"
 
 #include "LinkedModelGroups.h"
 #include "Plugin.h"
@@ -169,6 +170,7 @@ public:
 	auto params() const -> const std::vector<ClapParam*>& { return m_params; }
 	auto gui() const { return m_pluginGui.get(); }
 	auto timerSupport() -> ClapTimerSupport& { return m_pluginTimerSupport; }
+	auto threadPool() -> ClapThreadPool& { return m_pluginThreadPool; }
 
 	/////////////////////////////////////////
 	// Host
@@ -501,6 +503,11 @@ private:
 	static constexpr const clap_host_timer_support s_hostExtTimerSupport {
 		&ClapTimerSupport::clapRegisterTimer,
 		&ClapTimerSupport::clapUnregisterTimer
+	};
+
+	ClapThreadPool m_pluginThreadPool;
+	static constexpr const clap_host_thread_pool s_hostExtThreadPool {
+		&ClapThreadPool::clapRequestExec
 	};
 
 	/**
