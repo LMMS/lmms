@@ -82,9 +82,9 @@ public:
 		auto backwards() const -> bool { return m_backwards; }
 		auto interpolationMode() const -> int { return m_interpolationMode; }
 
-		auto setFrameIndex(f_cnt_t frameIndex) -> void { m_frameIndex = frameIndex; }
-		auto setVaryingPitch(bool varyingPitch) -> void { m_varyingPitch = varyingPitch; }
-		auto setBackwards(bool backwards) -> void { m_backwards = backwards; }
+		void setFrameIndex(f_cnt_t frameIndex) { m_frameIndex = frameIndex; }
+		void setVaryingPitch(bool varyingPitch) { m_varyingPitch = varyingPitch; }
+		void setBackwards(bool backwards) { m_backwards = backwards; }
 
 	private:
 		f_cnt_t m_frameIndex = 0;
@@ -108,7 +108,7 @@ public:
 
 	auto play(sampleFrame* dst, PlaybackState* state, int numFrames, float desiredFrequency = DefaultBaseFreq,
 		Loop loopMode = Loop::Off) const -> bool;
-	auto visualize(QPainter& p, const QRect& dr, int fromFrame = 0, int toFrame = 0) const -> void;
+	void visualize(QPainter& p, const QRect& dr, int fromFrame = 0, int toFrame = 0) const;
 
 	auto sampleDuration() const -> std::chrono::milliseconds;
 	auto sampleFile() const -> const QString& { return m_buffer->audioFile(); }
@@ -127,22 +127,22 @@ public:
 	auto frequency() const -> float { return m_frequency.load(std::memory_order_relaxed); }
 	auto reversed() const -> bool { return m_reversed.load(std::memory_order_relaxed); }
 
-	auto setStartFrame(int startFrame) -> void { m_startFrame.store(startFrame, std::memory_order_relaxed); }
-	auto setEndFrame(int endFrame) -> void { m_endFrame.store(endFrame, std::memory_order_relaxed); }
-	auto setLoopStartFrame(int loopStartFrame) -> void { m_loopStartFrame.store(loopStartFrame, std::memory_order_relaxed); }
-	auto setLoopEndFrame(int loopEndFrame) -> void { m_loopEndFrame.store(loopEndFrame, std::memory_order_relaxed); }
-	auto setAllPointFrames(int startFrame, int endFrame, int loopStartFrame, int loopEndFrame) -> void;
-	auto setAmplification(float amplification) -> void { m_amplification.store(amplification, std::memory_order_relaxed); }
-	auto setFrequency(float frequency) -> void { m_frequency.store(frequency, std::memory_order_relaxed); }
-	auto setReversed(bool reversed) -> void { m_reversed.store(reversed, std::memory_order_relaxed); }
+	void setStartFrame(int startFrame) { m_startFrame.store(startFrame, std::memory_order_relaxed); }
+	void setEndFrame(int endFrame) { m_endFrame.store(endFrame, std::memory_order_relaxed); }
+	void setLoopStartFrame(int loopStartFrame) { m_loopStartFrame.store(loopStartFrame, std::memory_order_relaxed); }
+	void setLoopEndFrame(int loopEndFrame) { m_loopEndFrame.store(loopEndFrame, std::memory_order_relaxed); }
+	void setAllPointFrames(int startFrame, int endFrame, int loopStartFrame, int loopEndFrame);
+	void setAmplification(float amplification) { m_amplification.store(amplification, std::memory_order_relaxed); }
+	void setFrequency(float frequency) { m_frequency.store(frequency, std::memory_order_relaxed); }
+	void setReversed(bool reversed) { m_reversed.store(reversed, std::memory_order_relaxed); }
 
 private:
-	auto playSampleRange(PlaybackState* state, sampleFrame* dst, size_t numFrames) const -> void;
+	void playSampleRange(PlaybackState* state, sampleFrame* dst, size_t numFrames) const;
 	auto resampleSampleRange(SRC_STATE* state, sampleFrame* src, sampleFrame* dst, size_t numInputFrames,
 		size_t numOutputFrames, double ratio) const -> SRC_DATA;
-	auto amplifySampleRange(sampleFrame* src, int numFrames) const -> void;
-	auto copyBufferForward(sampleFrame* dst, int initialPosition, int advanceAmount) const -> void;
-	auto copyBufferBackward(sampleFrame* dst, int initialPosition, int advanceAmount) const -> void;
+	void amplifySampleRange(sampleFrame* src, int numFrames) const;
+	void copyBufferForward(sampleFrame* dst, int initialPosition, int advanceAmount) const;
+	void copyBufferBackward(sampleFrame* dst, int initialPosition, int advanceAmount) const;
 
 private:
 	std::shared_ptr<const SampleBuffer> m_buffer = std::make_shared<SampleBuffer>();

@@ -255,7 +255,7 @@ void Sample::setAllPointFrames(int startFrame, int endFrame, int loopStartFrame,
 	setLoopEndFrame(loopEndFrame);
 }
 
-auto Sample::playSampleRange(PlaybackState* state, sampleFrame* dst, size_t numFrames) const -> void
+void Sample::playSampleRange(PlaybackState* state, sampleFrame* dst, size_t numFrames) const
 {
 	auto framesToCopy = 0;
 	if (state->m_backwards)
@@ -272,13 +272,13 @@ auto Sample::playSampleRange(PlaybackState* state, sampleFrame* dst, size_t numF
 	if (framesToCopy < numFrames) { std::fill_n(dst + framesToCopy, numFrames - framesToCopy, sampleFrame{0, 0}); }
 }
 
-auto Sample::copyBufferForward(sampleFrame* dst, int initialPosition, int advanceAmount) const -> void
+void Sample::copyBufferForward(sampleFrame* dst, int initialPosition, int advanceAmount) const
 {
 	reversed() ? std::copy_n(m_buffer->rbegin() + initialPosition, advanceAmount, dst)
 			   : std::copy_n(m_buffer->begin() + initialPosition, advanceAmount, dst);
 }
 
-auto Sample::copyBufferBackward(sampleFrame* dst, int initialPosition, int advanceAmount) const -> void
+void Sample::copyBufferBackward(sampleFrame* dst, int initialPosition, int advanceAmount) const
 {
 	reversed() ? std::reverse_copy(
 		m_buffer->rbegin() + initialPosition - advanceAmount, m_buffer->rbegin() + initialPosition, dst)
@@ -300,7 +300,7 @@ auto Sample::resampleSampleRange(SRC_STATE* state, sampleFrame* src, sampleFrame
 	return data;
 }
 
-auto Sample::amplifySampleRange(sampleFrame* src, int numFrames) const -> void
+void Sample::amplifySampleRange(sampleFrame* src, int numFrames) const
 {
 	const auto amplification = m_amplification.load(std::memory_order_relaxed);
 	for (int i = 0; i < numFrames; ++i)
