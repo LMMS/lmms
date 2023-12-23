@@ -72,7 +72,7 @@ public:
 private:
 	std::vector<sampleFrame> m_data;
 	QString m_audioFile;
-	int m_sampleRate = Engine::audioEngine()->processingSampleRate();
+	sample_rate_t m_sampleRate = Engine::audioEngine()->processingSampleRate();
 };
 
 } // namespace lmms
