@@ -108,7 +108,7 @@ GENERATE_EXPORT_HEADER(lmmsobjs
 	BASE_NAME lmms
 )
 
-IF(MSVC)
+IF(WIN32)
 	# Win32 flag needed to remove the unnecessary terminal
 	# instance popping up on msvc builds
 	SET(WIN32_FLAG "WIN32")
@@ -116,7 +116,8 @@ ELSE()
 	SET(WIN32_FLAG "")
 ENDIF()
 
-ADD_EXECUTABLE(lmms ${WIN32_FLAG}
+ADD_EXECUTABLE(lmms 
+	${WIN32_FLAG}
 	core/main.cpp
 	$<TARGET_OBJECTS:lmmsobjs>
 	"${WINRC}"
@@ -218,14 +219,10 @@ ENDFOREACH()
 
 set_target_properties(lmms PROPERTIES
 	ENABLE_EXPORTS ON
+	WIN32_EXECUTABLE $<NOT:$<CONFIG:DEBUG>>
 )
 
 IF(LMMS_BUILD_WIN32)
-	IF(NOT MSVC)
-		SET_PROPERTY(TARGET lmms
-			APPEND_STRING PROPERTY LINK_FLAGS " -mwindows"
-		)
-	ENDIF()
 	IF(LMMS_BUILD_MSYS)
 		# ENABLE_EXPORTS property has no effect in some MSYS2 configurations.
 		# Add the linker flag manually to create liblmms.dll.a import library
