@@ -28,6 +28,7 @@
 #include <QString>
 #include <functional>
 #include <optional>
+#include <string>
 #include <vector>
 
 #include "lmms_basics.h"
@@ -42,8 +43,6 @@ public:
 		int sampleRate;
 	};
 
-	using Decoder = std::function<std::optional<Result>(const QString&)>;
-
 	struct AudioType
 	{
 		std::string name;
@@ -52,14 +51,6 @@ public:
 
 	static auto decode(const QString& audioFile) -> std::optional<Result>;
 	static auto supportedAudioTypes() -> const std::vector<AudioType>&;
-
-private:
-	static auto decodeSampleSF(const QString& audioFile) -> std::optional<Result>;
-	static auto decodeSampleDS(const QString& audioFile) -> std::optional<Result>;
-#ifdef LMMS_HAVE_OGGVORBIS
-	static auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<Result>;
-#endif
-	static std::vector<Decoder> s_decoders;
 };
 } // namespace lmms
 

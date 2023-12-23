@@ -17,61 +17,23 @@
 
 namespace lmms {
 
-std::vector<SampleDecoder::Decoder> SampleDecoder::s_decoders = {
-	&SampleDecoder::decodeSampleSF,
+namespace {
+
+using Decoder = std::optional<SampleDecoder::Result>(*)(const QString&);
+
+auto decodeSampleSF(const QString& audioFile) -> std::optional<SampleDecoder::Result>;
+auto decodeSampleDS(const QString& audioFile) -> std::optional<SampleDecoder::Result>;
 #ifdef LMMS_HAVE_OGGVORBIS
-	&SampleDecoder::decodeSampleOggVorbis,
+auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleDecoder::Result>;
 #endif
-	&SampleDecoder::decodeSampleDS
-};
 
-auto SampleDecoder::supportedAudioTypes() -> const std::vector<AudioType>&
-{
-	static auto s_audioTypes = std::vector<AudioType>{};
-	if (!s_audioTypes.empty()) { return s_audioTypes; }
+static constexpr std::array<Decoder, 3> decoders = {&decodeSampleSF,
+#ifdef LMMS_HAVE_OGGVORBIS
+	&decodeSampleOggVorbis,
+#endif
+	&decodeSampleDS};
 
-	// Add DrumSynth by default since that support comes from us
-	s_audioTypes.push_back(AudioType{"DrumSynth", "ds"});
-
-	auto sfFormatInfo = SF_FORMAT_INFO{};
-	auto simpleTypeCount = 0;
-	sf_command(nullptr, SFC_GET_SIMPLE_FORMAT_COUNT, &simpleTypeCount, sizeof(int));
-
-	// TODO: Ideally, this code should be iterating over the major formats, but some important extensions such as *.ogg
-	// are not included. This is planned for future versions of sndfile.
-	for (int simple = 0; simple < simpleTypeCount; ++simple)
-	{
-		sfFormatInfo.format = simple;
-		sf_command(nullptr, SFC_GET_SIMPLE_FORMAT, &sfFormatInfo, sizeof(sfFormatInfo));
-
-		auto it = std::find_if(s_audioTypes.begin(), s_audioTypes.end(),
-			[&](const AudioType& type) { return sfFormatInfo.extension == type.extension; });
-		if (it != s_audioTypes.end()) { continue; }
-
-		auto name = std::string{sfFormatInfo.extension};
-		std::transform(name.begin(), name.end(), name.begin(), [](unsigned char ch) { return std::toupper(ch); });
-
-		s_audioTypes.push_back(AudioType{std::move(name), sfFormatInfo.extension});
-	}
-
-	std::sort(
-		s_audioTypes.begin(), s_audioTypes.end(), [&](const AudioType& a, const AudioType& b) { return a.name < b.name; });
-	return s_audioTypes;
-}
-
-auto SampleDecoder::decode(const QString& audioFile) -> std::optional<Result>
-{
-	auto result = std::optional<Result>{};
-	for (const auto& decoder : s_decoders)
-	{
-		result = decoder(audioFile);
-		if (result) { break; }
-	}
-
-	return result;
-}
-
-auto SampleDecoder::decodeSampleSF(const QString& audioFile) -> std::optional<Result>
+auto decodeSampleSF(const QString& audioFile) -> std::optional<SampleDecoder::Result>
 {
 	SNDFILE* sndFile = nullptr;
 	auto sfInfo = SF_INFO{};
@@ -106,10 +68,10 @@ auto SampleDecoder::decodeSampleSF(const QString& audioFile) -> std::optional<Re
 		}
 	}
 
-	return Result{std::move(result), static_cast<int>(sfInfo.samplerate)};
+	return SampleDecoder::Result{std::move(result), static_cast<int>(sfInfo.samplerate)};
 }
 
-auto SampleDecoder::decodeSampleDS(const QString& audioFile) -> std::optional<Result>
+auto decodeSampleDS(const QString& audioFile) -> std::optional<SampleDecoder::Result>
 {
 	// Populated by DrumSynth::GetDSFileSamples
 	int_sample_t* dataPtr = nullptr;
@@ -124,11 +86,11 @@ auto SampleDecoder::decodeSampleDS(const QString& audioFile) -> std::optional<Re
 	auto result = std::vector<sampleFrame>(frames);
 	src_short_to_float_array(data.get(), &result[0][0], frames * DEFAULT_CHANNELS);
 
-	return Result{std::move(result), static_cast<int>(engineRate)};
+	return SampleDecoder::Result{std::move(result), static_cast<int>(engineRate)};
 }
 
 #ifdef LMMS_HAVE_OGGVORBIS
-auto SampleDecoder::decodeSampleOggVorbis(const QString& audioFile) -> std::optional<Result>
+auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleDecoder::Result>
 {
 	auto vorbisFile = OggVorbis_File{};
 	const auto openError = ov_fopen(audioFile.toLocal8Bit(), &vorbisFile);
@@ -163,7 +125,55 @@ auto SampleDecoder::decodeSampleOggVorbis(const QString& audioFile) -> std::opti
 		else if (numChannels > 1) { result[i] = {buffer[i * numChannels], buffer[i * numChannels + 1]}; }
 	}
 
-	return Result{std::move(result), static_cast<int>(sampleRate)};
+	return SampleDecoder::Result{std::move(result), static_cast<int>(sampleRate)};
 }
 #endif // LMMS_HAVE_OGGVORBIS
+} // namespace
+
+auto SampleDecoder::supportedAudioTypes() -> const std::vector<AudioType>&
+{
+	static auto s_audioTypes = std::vector<AudioType>{};
+	if (!s_audioTypes.empty()) { return s_audioTypes; }
+
+	// Add DrumSynth by default since that support comes from us
+	s_audioTypes.push_back(AudioType{"DrumSynth", "ds"});
+
+	auto sfFormatInfo = SF_FORMAT_INFO{};
+	auto simpleTypeCount = 0;
+	sf_command(nullptr, SFC_GET_SIMPLE_FORMAT_COUNT, &simpleTypeCount, sizeof(int));
+
+	// TODO: Ideally, this code should be iterating over the major formats, but some important extensions such as *.ogg
+	// are not included. This is planned for future versions of sndfile.
+	for (int simple = 0; simple < simpleTypeCount; ++simple)
+	{
+		sfFormatInfo.format = simple;
+		sf_command(nullptr, SFC_GET_SIMPLE_FORMAT, &sfFormatInfo, sizeof(sfFormatInfo));
+
+		auto it = std::find_if(s_audioTypes.begin(), s_audioTypes.end(),
+			[&](const AudioType& type) { return sfFormatInfo.extension == type.extension; });
+		if (it != s_audioTypes.end()) { continue; }
+
+		auto name = std::string{sfFormatInfo.extension};
+		std::transform(name.begin(), name.end(), name.begin(), [](unsigned char ch) { return std::toupper(ch); });
+
+		s_audioTypes.push_back(AudioType{std::move(name), sfFormatInfo.extension});
+	}
+
+	std::sort(s_audioTypes.begin(), s_audioTypes.end(),
+		[&](const AudioType& a, const AudioType& b) { return a.name < b.name; });
+	return s_audioTypes;
+}
+
+auto SampleDecoder::decode(const QString& audioFile) -> std::optional<Result>
+{
+	auto result = std::optional<Result>{};
+	for (const auto& decoder : decoders)
+	{
+		result = decoder(audioFile);
+		if (result) { break; }
+	}
+
+	return result;
+}
+
 } // namespace lmms
