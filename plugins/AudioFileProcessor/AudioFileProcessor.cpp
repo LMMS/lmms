@@ -236,9 +236,9 @@ void AudioFileProcessor::loadSettings(const QDomElement& elem)
 		}
 		else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), srcFile)); }
 	}
-	else if (!elem.attribute("sampledata").isEmpty())
+	else if (auto sampleData = elem.attribute("sampledata"); !sampleData.isEmpty())
 	{
-		m_sample = Sample(gui::SampleLoader::createBufferFromBase64(elem.attribute("srcdata")));
+		m_sample = Sample(gui::SampleLoader::createBufferFromBase64(sampleData));
 	}
 
 	m_loopModel.loadSettings(elem, "looped");
