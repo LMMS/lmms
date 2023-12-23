@@ -42,10 +42,13 @@ class LMMS_EXPORT SampleBuffer
 public:
 	using value_type = sampleFrame;
 	using reference = sampleFrame&;
+	using const_reference = const sampleFrame&;
+	using iterator = std::vector<sampleFrame>::iterator;
 	using const_iterator = std::vector<sampleFrame>::const_iterator;
-	using const_reverse_iterator = std::vector<sampleFrame>::const_reverse_iterator;
 	using difference_type = std::vector<sampleFrame>::difference_type;
 	using size_type = std::vector<sampleFrame>::size_type;
+	using reverse_iterator = std::vector<sampleFrame>::reverse_iterator;
+	using const_reverse_iterator = std::vector<sampleFrame>::const_reverse_iterator;
 
 	SampleBuffer() = default;
 	explicit SampleBuffer(const QString& audioFile);
@@ -60,10 +63,23 @@ public:
 	auto audioFile() const -> const QString& { return m_audioFile; }
 	auto sampleRate() const -> sample_rate_t { return m_sampleRate; }
 
+	auto begin() -> iterator { return m_data.begin(); }
+	auto end() -> iterator { return m_data.end(); }
+
 	auto begin() const -> const_iterator { return m_data.begin(); }
 	auto end() const -> const_iterator { return m_data.end(); }
+
+	auto cbegin() const -> const_iterator { return m_data.cbegin(); }
+	auto cend() const -> const_iterator { return m_data.cend(); }
+
+	auto rbegin() -> reverse_iterator { return m_data.rbegin(); }
+	auto rend() -> reverse_iterator { return m_data.rend(); }
+
 	auto rbegin() const -> const_reverse_iterator { return m_data.rbegin(); }
 	auto rend() const -> const_reverse_iterator { return m_data.rend(); }
+
+	auto crbegin() const -> const_reverse_iterator { return m_data.crbegin(); }
+	auto crend() const -> const_reverse_iterator { return m_data.crend(); }
 
 	auto data() const -> const sampleFrame* { return m_data.data(); }
 	auto size() const -> size_type { return m_data.size(); }
