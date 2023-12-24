@@ -22,11 +22,12 @@
  *
  */
 
+#ifndef LMMS_SAMPLE_WAVEFORM_H
+#define LMMS_SAMPLE_WAVEFORM_H
+
 #include <QPainter>
 
 #include "Sample.h"
-
-#ifndef LMMS_SAMPLE_WAVEFORM_H
 
 namespace lmms::gui {
 class SampleWaveform
