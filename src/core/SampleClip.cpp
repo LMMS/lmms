@@ -34,14 +34,13 @@
 #include "SampleTrack.h"
 #include "TimeLineWidget.h"
 
-
 namespace lmms
 {
 
-
-SampleClip::SampleClip( Track * _track ) :
-	Clip( _track ),
-	m_isPlaying( false )
+SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying)
+	: Clip(_track)
+	, m_sample(std::move(sample))
+	, m_isPlaying(false)
 {
 	saveJournallingState( false );
 	setSampleFile( "" );
@@ -89,11 +88,14 @@ SampleClip::SampleClip( Track * _track ) :
 	updateTrackClips();
 }
 
-SampleClip::SampleClip(const SampleClip& orig) :
-	SampleClip(orig.getTrack())
+SampleClip::SampleClip(Track* track)
+	: SampleClip(track, Sample(), false)
 {
-	m_sample = orig.m_sample;
-	m_isPlaying = orig.m_isPlaying;
+}
+
+SampleClip::SampleClip(const SampleClip& orig) :
+	SampleClip(orig.getTrack(), orig.m_sample, orig.m_isPlaying)
+{
 }
 
 
