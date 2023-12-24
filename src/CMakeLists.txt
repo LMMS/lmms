@@ -108,16 +108,8 @@ GENERATE_EXPORT_HEADER(lmmsobjs
 	BASE_NAME lmms
 )
 
-IF(WIN32)
-	# Win32 flag needed to remove the unnecessary terminal
-	# instance popping up on msvc builds
-	SET(WIN32_FLAG "WIN32")
-ELSE()
-	SET(WIN32_FLAG "")
-ENDIF()
 
 ADD_EXECUTABLE(lmms 
-	${WIN32_FLAG}
 	core/main.cpp
 	$<TARGET_OBJECTS:lmmsobjs>
 	"${WINRC}"
