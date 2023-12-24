@@ -99,12 +99,12 @@ public:
 		m_useWaveTable = n;
 	}
 
-	inline void setUserWave(std::shared_ptr<const SampleBuffer> _wave)
+	void setUserWave(std::shared_ptr<const SampleBuffer> _wave)
 	{
 		m_userWave = _wave;
 	}
 
-	inline void setUserAntiAliasWaveTable(std::shared_ptr<const OscillatorConstants::waveform_t> waveform)
+	void setUserAntiAliasWaveTable(std::shared_ptr<const OscillatorConstants::waveform_t> waveform)
 	{
 		m_userAntiAliasWaveTable = waveform;
 	}
@@ -170,7 +170,7 @@ public:
 		return 1.0f - fast_rand() * 2.0f / FAST_RAND_MAX;
 	}
 
-	static inline sample_t userWaveSample(const SampleBuffer* buffer, const float sample)
+	static sample_t userWaveSample(const SampleBuffer* buffer, const float sample)
 	{
 		if (buffer == nullptr || buffer->size() == 0) { return 0; }
 		const auto frames = buffer->size();
@@ -218,7 +218,7 @@ public:
 				table[control.band][control.f2], fraction(control.frame));
 	}
 
-	inline sample_t wtSample(const OscillatorConstants::waveform_t* table, const float sample) const
+	sample_t wtSample(const OscillatorConstants::waveform_t* table, const float sample) const
 	{
 		assert(table != nullptr);
 		wtSampleControl control = getWtSampleControl(sample);
