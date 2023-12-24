@@ -30,11 +30,10 @@
 
 #include "ConfigManager.h"
 #include "embed.h"
-#include "Engine.h"
 #include "RenameDialog.h"
-#include "Song.h"
 #include "TrackRenameLineEdit.h"
 #include "TrackView.h"
+#include "Track.h"
 
 namespace lmms::gui
 {
@@ -83,7 +82,6 @@ void TrackLabelButton::rename()
 		if( txt != text() )
 		{
 			m_trackView->getTrack()->setName( txt );
-			Engine::getSong()->setModified();
 		}
 	}
 	else
@@ -111,7 +109,6 @@ void TrackLabelButton::renameFinished()
 			{
 				setText( elideName( m_renameLineEdit->text() ) );
 				m_trackView->getTrack()->setName( m_renameLineEdit->text() );
-				Engine::getSong()->setModified();
 			}
 		}
 	}
