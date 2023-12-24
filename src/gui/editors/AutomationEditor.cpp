@@ -132,13 +132,12 @@ AutomationEditor::AutomationEditor() :
 	m_quantizeModel.setValue( m_quantizeModel.findText( "1/8" ) );
 
 	// add time-line
-	m_timeLine = new TimeLineWidget( VALUES_WIDTH, 0, m_ppb,
-				Engine::getSong()->getPlayPos(
-					Song::PlayMode::AutomationClip ),
-					m_currentPosition,
-					Song::PlayMode::AutomationClip, this );
-	connect( this, SIGNAL( positionChanged( const lmms::TimePos& ) ),
-		m_timeLine, SLOT( updatePosition( const lmms::TimePos& ) ) );
+	m_timeLine = new TimeLineWidget(VALUES_WIDTH, 0, m_ppb,
+		Engine::getSong()->getPlayPos(Song::PlayMode::AutomationClip),
+		Engine::getSong()->getTimeline(Song::PlayMode::AutomationClip),
+		m_currentPosition, Song::PlayMode::AutomationClip, this
+	);
+	connect(this, &AutomationEditor::positionChanged, m_timeLine, &TimeLineWidget::updatePosition);
 	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos& ) ),
 			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
 
@@ -1602,11 +1601,7 @@ void AutomationEditor::resizeEvent(QResizeEvent * re)
 	}
 	centerTopBottomScroll();
 
-	if( Engine::getSong() )
-	{
-		Engine::getSong()->getPlayPos( Song::PlayMode::AutomationClip
-					).m_timeLine->setFixedWidth( width() );
-	}
+	m_timeLine->setFixedWidth(width());
 
 	updateTopBottomLevels();
 	update();
