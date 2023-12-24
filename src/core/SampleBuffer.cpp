@@ -23,9 +23,11 @@
  */
 
 #include "SampleBuffer.h"
+#include <cstring>
 
 #include "PathUtil.h"
 #include "SampleDecoder.h"
+#include "lmms_basics.h"
 
 namespace lmms {
 
@@ -57,10 +59,9 @@ SampleBuffer::SampleBuffer(const QString& base64, int sampleRate)
 	: m_sampleRate(sampleRate)
 {
 	// TODO: Replace with non-Qt equivalent
-	auto data = QByteArray::fromBase64(base64.toUtf8());
-	auto begin = reinterpret_cast<sampleFrame*>(data.begin());
-	auto end = begin + data.size() / sizeof(sampleFrame);
-	m_data = std::vector<sampleFrame>(begin, end);
+	const auto bytes = QByteArray::fromBase64(base64.toUtf8());
+	m_data.resize(bytes.size() / sizeof(sampleFrame));
+	std::memcpy(reinterpret_cast<char*>(m_data.data()), bytes, bytes.size());
 }
 
 SampleBuffer::SampleBuffer(std::vector<sampleFrame> data, int sampleRate)
