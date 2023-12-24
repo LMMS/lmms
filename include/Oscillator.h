@@ -262,7 +262,7 @@ private:
 	Oscillator * m_subOsc;
 	float m_phaseOffset;
 	float m_phase;
-	std::shared_ptr<const SampleBuffer> m_userWave = std::make_shared<SampleBuffer>();
+	std::shared_ptr<const SampleBuffer> m_userWave = SampleBuffer::emptyBuffer();
 	std::shared_ptr<const OscillatorConstants::waveform_t> m_userAntiAliasWaveTable;
 	bool m_useWaveTable;
 	// There are many update*() variants; the modulator flag is stored as a member variable to avoid

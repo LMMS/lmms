@@ -90,7 +90,7 @@ QString SampleLoader::openWaveformFile(const QString& previousFile)
 
 std::shared_ptr<SampleBuffer> SampleLoader::createBufferFromFile(const QString& filePath)
 {
-	if (filePath.isEmpty()) { return std::make_shared<SampleBuffer>(); }
+	if (filePath.isEmpty()) { return SampleBuffer::emptyBuffer(); }
 
 	try
 	{
@@ -99,13 +99,13 @@ std::shared_ptr<SampleBuffer> SampleLoader::createBufferFromFile(const QString& 
 	catch (const std::runtime_error& error)
 	{
 		if (getGUI()) { displayError(QString::fromStdString(error.what())); }
-		return std::make_shared<SampleBuffer>();
+		return SampleBuffer::emptyBuffer();
 	}
 }
 
 std::shared_ptr<SampleBuffer> SampleLoader::createBufferFromBase64(const QString& base64, int sampleRate)
 {
-	if (base64.isEmpty()) { return std::make_shared<SampleBuffer>(); }
+	if (base64.isEmpty()) { return SampleBuffer::emptyBuffer(); }
 
 	try
 	{
@@ -114,7 +114,7 @@ std::shared_ptr<SampleBuffer> SampleLoader::createBufferFromBase64(const QString
 	catch (const std::runtime_error& error)
 	{
 		if (getGUI()) { displayError(QString::fromStdString(error.what())); }
-		return std::make_shared<SampleBuffer>();
+		return SampleBuffer::emptyBuffer();
 	}
 }
 

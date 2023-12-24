@@ -85,6 +85,8 @@ public:
 	auto size() const -> size_type { return m_data.size(); }
 	auto empty() const -> bool { return m_data.empty(); }
 
+	static auto emptyBuffer() -> std::shared_ptr<SampleBuffer>;
+
 private:
 	std::vector<sampleFrame> m_data;
 	QString m_audioFile;

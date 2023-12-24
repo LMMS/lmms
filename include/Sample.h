@@ -136,7 +136,7 @@ private:
 	void copyBufferBackward(sampleFrame* dst, int initialPosition, int advanceAmount) const;
 
 private:
-	std::shared_ptr<const SampleBuffer> m_buffer = std::make_shared<SampleBuffer>();
+	std::shared_ptr<const SampleBuffer> m_buffer = SampleBuffer::emptyBuffer();
 	std::atomic<int> m_startFrame = 0;
 	std::atomic<int> m_endFrame = 0;
 	std::atomic<int> m_loopStartFrame = 0;
