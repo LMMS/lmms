@@ -131,7 +131,7 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, int numFrames, float d
 	auto playBuffer = std::vector<sampleFrame>(numFrames / resampleRatio);
 	if (!typeInfo<float>::isEqual(resampleRatio, 1.0f))
 	{
-		playBuffer.resize(playBuffer.size() + s_interpolationMargins[state->m_interpolationMode]);
+		playBuffer.resize(playBuffer.size() + s_interpolationMargins[state->resampler().interpolationMode()]);
 	}
 
 	const auto start = startFrame();
@@ -166,12 +166,13 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, int numFrames, float d
 
 	playSampleRange(state, playBuffer.data(), playBuffer.size());
 
-	auto resample = resampleSampleRange(
-		state->m_resampleState, playBuffer.data(), dst, playBuffer.size(), numFrames, resampleRatio);
-	state->m_frameIndex += (state->m_backwards ? -1 : 1) * resample.input_frames_used;
-	if (src_error(state->m_resampleState) != 0) { return false; }
+	const auto result
+		= state->resampler().resample(&playBuffer[0][0], playBuffer.size(), &dst[0][0], numFrames, resampleRatio);
+	if (result.error != 0) { return false; }
 
-	amplifySampleRange(dst, numFrames);
+	state->m_frameIndex += (state->m_backwards ? -1 : 1) * result.inputFramesUsed;
+	amplifySampleRange(dst, result.outputFramesGenerated);
+
 	return true;
 }
 

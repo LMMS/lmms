@@ -28,6 +28,7 @@
 #include <cmath>
 #include <memory>
 
+#include "AudioResampler.h"
 #include "Note.h"
 #include "SampleBuffer.h"
 #include "lmms_export.h"
@@ -64,34 +65,25 @@ public:
 	{
 	public:
 		PlaybackState(bool varyingPitch = false, int interpolationMode = SRC_LINEAR)
-			: m_varyingPitch(varyingPitch)
-			, m_interpolationMode(interpolationMode)
+			: m_resampler(interpolationMode, DEFAULT_CHANNELS)
+			, m_varyingPitch(varyingPitch)
 		{
-			auto error = 0;
-			m_resampleState = src_new(m_interpolationMode, DEFAULT_CHANNELS, &error);
-			if (error != 0)
-			{
-				throw std::runtime_error{"Error creating resample state: " + std::string{src_strerror(error)}};
-			}
 		}
 
-		~PlaybackState() noexcept { src_delete(m_resampleState); }
-
+		auto resampler() const -> const AudioResampler& { return m_resampler; }
 		auto frameIndex() const -> f_cnt_t { return m_frameIndex; }
 		auto varyingPitch() const -> bool { return m_varyingPitch; }
 		auto backwards() const -> bool { return m_backwards; }
-		auto interpolationMode() const -> int { return m_interpolationMode; }
 
 		void setFrameIndex(f_cnt_t frameIndex) { m_frameIndex = frameIndex; }
 		void setVaryingPitch(bool varyingPitch) { m_varyingPitch = varyingPitch; }
 		void setBackwards(bool backwards) { m_backwards = backwards; }
 
 	private:
+		AudioResampler m_resampler;
 		f_cnt_t m_frameIndex = 0;
 		bool m_varyingPitch = false;
 		bool m_backwards = false;
-		SRC_STATE* m_resampleState = nullptr;
-		int m_interpolationMode = SRC_LINEAR;
 		friend class Sample;
 	};
 
