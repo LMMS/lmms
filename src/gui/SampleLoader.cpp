@@ -38,20 +38,7 @@ namespace lmms::gui {
 QString SampleLoader::openAudioFile(const QString& previousFile)
 {
 	auto openFileDialog = FileDialog(nullptr, QObject::tr("Open audio file"));
-	auto dir = QString{};
-
-	if (!previousFile.isEmpty())
-	{
-		auto file = QString{previousFile};
-		if (QFileInfo{file}.isRelative())
-		{
-			file = ConfigManager::inst()->userSamplesDir() + file;
-			if (!QFileInfo{file}.exists()) { file = ConfigManager::inst()->factorySamplesDir() + previousFile; }
-		}
-
-		dir = QFileInfo{file}.absolutePath();
-	}
-	else { dir = ConfigManager::inst()->userSamplesDir(); }
+	auto dir = !previousFile.isEmpty() ? PathUtil::toAbsolute(previousFile) : ConfigManager::inst()->userSamplesDir();
 
 	// change dir to position of previously opened file
 	openFileDialog.setDirectory(dir);
