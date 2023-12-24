@@ -214,15 +214,13 @@ set_target_properties(lmms PROPERTIES
 	WIN32_EXECUTABLE $<NOT:$<CONFIG:DEBUG>>
 )
 
-IF(LMMS_BUILD_WIN32)
-	IF(LMMS_BUILD_MSYS)
-		# ENABLE_EXPORTS property has no effect in some MSYS2 configurations.
-		# Add the linker flag manually to create liblmms.dll.a import library
-		SET_PROPERTY(TARGET lmms
-			APPEND_STRING PROPERTY LINK_FLAGS " -Wl,--out-implib,liblmms.dll.a"
-		)
-	ENDIF()
-ELSE()
+IF(LMMS_BUILD_MSYS)
+	# ENABLE_EXPORTS property has no effect in some MSYS2 configurations.
+	# Add the linker flag manually to create liblmms.dll.a import library
+	SET_PROPERTY(TARGET lmms
+		APPEND_STRING PROPERTY LINK_FLAGS " -Wl,--out-implib,liblmms.dll.a"
+	)
+ELSEIF(NOT WIN32)
 	if(CMAKE_INSTALL_MANDIR)
 		SET(INSTALL_MANDIR ${CMAKE_INSTALL_MANDIR})
 	ELSE(CMAKE_INSTALL_MANDIR)
