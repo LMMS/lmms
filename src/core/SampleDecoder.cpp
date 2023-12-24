@@ -132,35 +132,40 @@ auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleDeco
 
 auto SampleDecoder::supportedAudioTypes() -> const std::vector<AudioType>&
 {
-	static auto s_audioTypes = std::vector<AudioType>{};
-	if (!s_audioTypes.empty()) { return s_audioTypes; }
-
-	// Add DrumSynth by default since that support comes from us
-	s_audioTypes.push_back(AudioType{"DrumSynth", "ds"});
-
-	auto sfFormatInfo = SF_FORMAT_INFO{};
-	auto simpleTypeCount = 0;
-	sf_command(nullptr, SFC_GET_SIMPLE_FORMAT_COUNT, &simpleTypeCount, sizeof(int));
-
-	// TODO: Ideally, this code should be iterating over the major formats, but some important extensions such as *.ogg
-	// are not included. This is planned for future versions of sndfile.
-	for (int simple = 0; simple < simpleTypeCount; ++simple)
+	static const auto s_audioTypes = []
 	{
-		sfFormatInfo.format = simple;
-		sf_command(nullptr, SFC_GET_SIMPLE_FORMAT, &sfFormatInfo, sizeof(sfFormatInfo));
+		auto types = std::vector<AudioType>();
 
-		auto it = std::find_if(s_audioTypes.begin(), s_audioTypes.end(),
-			[&](const AudioType& type) { return sfFormatInfo.extension == type.extension; });
-		if (it != s_audioTypes.end()) { continue; }
+		// Add DrumSynth by default since that support comes from us
+		types.push_back(AudioType{"DrumSynth", "ds"});
 
-		auto name = std::string{sfFormatInfo.extension};
-		std::transform(name.begin(), name.end(), name.begin(), [](unsigned char ch) { return std::toupper(ch); });
+		auto sfFormatInfo = SF_FORMAT_INFO{};
+		auto simpleTypeCount = 0;
+		sf_command(nullptr, SFC_GET_SIMPLE_FORMAT_COUNT, &simpleTypeCount, sizeof(int));
 
-		s_audioTypes.push_back(AudioType{std::move(name), sfFormatInfo.extension});
-	}
+		// TODO: Ideally, this code should be iterating over the major formats, but some important extensions such as *.ogg
+		// are not included. This is planned for future versions of sndfile.
+		for (int simple = 0; simple < simpleTypeCount; ++simple)
+		{
+			sfFormatInfo.format = simple;
+			sf_command(nullptr, SFC_GET_SIMPLE_FORMAT, &sfFormatInfo, sizeof(sfFormatInfo));
 
-	std::sort(s_audioTypes.begin(), s_audioTypes.end(),
-		[&](const AudioType& a, const AudioType& b) { return a.name < b.name; });
+			auto it = std::find_if(types.begin(), types.end(),
+				[&](const AudioType& type) { return sfFormatInfo.extension == type.extension; });
+			if (it != types.end()) { continue; }
+
+			auto name = std::string{sfFormatInfo.extension};
+			std::transform(name.begin(), name.end(), name.begin(), [](unsigned char ch) { return std::toupper(ch); });
+
+			types.push_back(AudioType{std::move(name), sfFormatInfo.extension});
+
+			return types;
+		}
+
+		std::sort(types.begin(), types.end(),
+			[&](const AudioType& a, const AudioType& b) { return a.name < b.name; });
+		return types;
+	}();
 	return s_audioTypes;
 }
 
