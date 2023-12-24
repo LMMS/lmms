@@ -77,7 +77,7 @@ public:
 
 	bool isPlaying() const;
 	void setIsPlaying(bool isPlaying);
-	void setSampleBuffer(std::unique_ptr<SampleBuffer> sb);
+	void setSampleBuffer(std::shared_ptr<SampleBuffer> sb);
 
 public slots:
 	void setSampleFile(const QString& sf);

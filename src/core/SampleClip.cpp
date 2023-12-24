@@ -126,7 +126,7 @@ const QString& SampleClip::sampleFile() const
 	return m_sample.sampleFile();
 }
 
-void SampleClip::setSampleBuffer(std::unique_ptr<SampleBuffer> sb)
+void SampleClip::setSampleBuffer(std::shared_ptr<SampleBuffer> sb)
 {
 	{
 		const auto guard = Engine::audioEngine()->requestChangesGuard();
