@@ -36,8 +36,9 @@ AudioResampler::AudioResampler(SRC_STATE* state, int interpolationMode, int chan
 {
 	if (!m_state)
 	{
-		const auto message = std::string{"Failed to create an AudioResampler: "} + src_strerror(m_error);
-		throw std::runtime_error{message};
+		const auto errorMessage = std::string{src_strerror(m_error)};
+		const auto fullMessage = std::string{"Failed to create an AudioResampler: "} + errorMessage;
+		throw std::runtime_error{fullMessage};
 	}
 }
 
