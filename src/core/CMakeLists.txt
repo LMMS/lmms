@@ -108,9 +108,11 @@ set(LMMS_SRCS
 	core/audio/AudioSdl.cpp
 
 	core/clap/ClapControlBase.cpp
+	core/clap/ClapExtension.cpp
 	core/clap/ClapFile.cpp
 	core/clap/ClapInstance.cpp
 	core/clap/ClapManager.cpp
+	core/clap/ClapNotePorts.cpp
 	core/clap/ClapParam.cpp
 	core/clap/ClapSubPluginFeatures.cpp
 	core/clap/ClapThreadPool.cpp

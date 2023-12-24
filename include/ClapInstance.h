@@ -32,6 +32,7 @@
 #include "ClapFile.h"
 #include "ClapParam.h"
 #include "ClapGui.h"
+#include "ClapNotePorts.h"
 #include "ClapTimerSupport.h"
 #include "ClapThreadPool.h"
 
@@ -168,6 +169,7 @@ public:
 	auto plugin() const -> const clap_plugin* { return m_plugin; }
 	auto info() const -> const ClapPluginInfo& { return *m_pluginInfo; }
 	auto params() const -> const std::vector<ClapParam*>& { return m_params; }
+	auto notePorts() -> ClapNotePorts& { return m_notePorts; }
 	auto gui() const { return m_pluginGui.get(); }
 	auto timerSupport() -> ClapTimerSupport& { return m_pluginTimerSupport; }
 	auto threadPool() -> ClapThreadPool& { return m_pluginThreadPool; }
@@ -373,12 +375,6 @@ private:
 	ringbuffer_reader_t<struct MidiInputEvent> m_midiInputReader;
 
 	/**
-	 * Note port
-	 */
-	std::uint16_t m_notePortIndex = 0; // Chosen plugin note port index (not the port id!)
-	std::uint32_t m_noteDialect = 0;   // Chosen plugin input dialect (0 == no note input)
-
-	/**
 	 * Parameter update queues
 	*/
 	std::unordered_map<clap_id, std::unique_ptr<ClapParam>> m_paramMap;
@@ -493,11 +489,7 @@ private:
 		&hostExtGuiRequestClosed
 	};
 
-	const clap_plugin_note_ports* m_pluginExtNotePorts = nullptr;
-	static constexpr const clap_host_note_ports s_hostExtNotePorts {
-		&hostExtNotePortsSupportedDialects,
-		&hostExtNotePortsRescan
-	};
+	ClapNotePorts m_notePorts;
 
 	ClapTimerSupport m_pluginTimerSupport{ this };
 	static constexpr const clap_host_timer_support s_hostExtTimerSupport {
