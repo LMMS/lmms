@@ -265,12 +265,11 @@ PianoRoll::PianoRoll() :
 
 	// add time-line
 	m_timeLine = new TimeLineWidget(m_whiteKeyWidth, 0, m_ppb,
-					Engine::getSong()->getPlayPos(
-						Song::PlayMode::MidiClip ),
-						m_currentPosition,
-						Song::PlayMode::MidiClip, this );
-	connect( this, SIGNAL( positionChanged( const lmms::TimePos& ) ),
-		m_timeLine, SLOT( updatePosition( const lmms::TimePos& ) ) );
+		Engine::getSong()->getPlayPos(Song::PlayMode::MidiClip),
+		Engine::getSong()->getTimeline(Song::PlayMode::MidiClip),
+		m_currentPosition, Song::PlayMode::MidiClip, this
+	);
+	connect(this, &PianoRoll::positionChanged, m_timeLine, &TimeLineWidget::updatePosition);
 	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos& ) ),
 			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
 
@@ -282,10 +281,7 @@ PianoRoll::PianoRoll() :
 			this, SLOT( updatePositionStepRecording( const lmms::TimePos& ) ) );
 
 	// update timeline when in record-accompany mode
-	connect( Engine::getSong()->getPlayPos( Song::PlayMode::Song ).m_timeLine,
-				SIGNAL( positionChanged( const lmms::TimePos& ) ),
-			this,
-			SLOT( updatePositionAccompany( const lmms::TimePos& ) ) );
+	connect(m_timeLine, &TimeLineWidget::positionChanged, this, &PianoRoll::updatePositionAccompany);
 	// TODO
 /*	connect( engine::getSong()->getPlayPos( Song::PlayMode::Pattern ).m_timeLine,
 				SIGNAL( positionChanged( const lmms::TimePos& ) ),
@@ -3734,8 +3730,7 @@ void PianoRoll::resizeEvent(QResizeEvent* re)
 {
 	updatePositionLineHeight();
 	updateScrollbars();
-	Engine::getSong()->getPlayPos(Song::PlayMode::MidiClip)
-		.m_timeLine->setFixedWidth(width());
+	m_timeLine->setFixedWidth(width());
 	update();
 }
 
@@ -5167,7 +5162,8 @@ void PianoRollWindow::saveSettings( QDomDocument & doc, QDomElement & de )
 		de.appendChild(markedSemiTonesRoot);
 	}
 
-	de.setAttribute("stopbehaviour", static_cast<int>(m_editor->m_timeLine->behaviourAtStop()));
+	de.setAttribute("stopbehaviour", static_cast<int>(
+		Engine::getSong()->getTimeline(Song::PlayMode::MidiClip).stopBehaviour()));
 
 	MainWindow::saveWidgetState( this, de );
 }
@@ -5182,7 +5178,8 @@ void PianoRollWindow::loadSettings( const QDomElement & de )
 
 	MainWindow::restoreWidgetState( this, de );
 
-	m_editor->m_timeLine->setBehaviourAtStop(de.attribute("stopbehaviour").toInt());
+	Engine::getSong()->getTimeline(Song::PlayMode::MidiClip).setStopBehaviour(
+		static_cast<Timeline::StopBehaviour>(de.attribute("stopbehaviour").toInt()));
 
 	// update margins here because we're later in the startup process
 	// We can't earlier because everything is still starting with the

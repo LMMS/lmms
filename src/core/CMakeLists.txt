@@ -74,6 +74,7 @@ set(LMMS_SRCS
 	core/SerializingObject.cpp
 	core/Song.cpp
 	core/TempoSyncKnobModel.cpp
+	core/Timeline.cpp
 	core/TimePos.cpp
 	core/ToolPlugin.cpp
 	core/Track.cpp

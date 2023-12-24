@@ -34,6 +34,12 @@
 class QPixmap;
 class QToolBar;
 
+namespace lmms {
+
+class Timeline;
+
+} // namespace lmms
+
 namespace lmms::gui
 {
 
@@ -42,7 +48,7 @@ class TextFloat;
 class SongEditor;
 
 
-class TimeLineWidget : public QWidget, public JournallingObject
+class TimeLineWidget : public QWidget
 {
 	Q_OBJECT
 public:
@@ -60,24 +66,10 @@ public:
 	{
 		Enabled,
 		Disabled
-	} ;
+	};
 
-	enum class LoopPointState
-	{
-		Disabled,
-		Enabled
-	} ;
-
-	enum class BehaviourAtStopState
-	{
-		BackToZero,
-		BackToStart,
-		KeepStopPosition
-	} ;
-
-
-	TimeLineWidget(int xoff, int yoff, float ppb, Song::PlayPos & pos,
-				const TimePos & begin, Song::PlayMode mode, QWidget * parent);
+	TimeLineWidget(int xoff, int yoff, float ppb, Song::PlayPos& pos, Timeline& timeline,
+				const TimePos& begin, Song::PlayMode mode, QWidget* parent);
 	~TimeLineWidget() override;
 
 	inline QColor const & getBarLineColor() const { return m_barLineColor; }
@@ -117,42 +109,6 @@ public:
 		return m_autoScroll;
 	}
 
-	BehaviourAtStopState behaviourAtStop() const
-	{
-		return m_behaviourAtStop;
-	}
-
-	void setBehaviourAtStop (int state)
-	{
-		emit loadBehaviourAtStop (state);
-	}
-
-	bool loopPointsEnabled() const
-	{
-		return m_loopPoints == LoopPointState::Enabled;
-	}
-
-	inline const TimePos & loopBegin() const
-	{
-		return ( m_loopPos[0] < m_loopPos[1] ) ?
-						m_loopPos[0] : m_loopPos[1];
-	}
-
-	inline const TimePos & loopEnd() const
-	{
-		return ( m_loopPos[0] > m_loopPos[1] ) ?
-						m_loopPos[0] : m_loopPos[1];
-	}
-
-	inline void savePos( const TimePos & pos )
-	{
-		m_savedPos = pos;
-	}
-	inline const TimePos & savedPos() const
-	{
-		return m_savedPos;
-	}
-
 	inline void setPixelsPerBar( float ppb )
 	{
 		m_ppb = ppb;
@@ -163,14 +119,6 @@ public:
 
 	void addToolButtons(QToolBar* _tool_bar );
 
-
-	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
-	void loadSettings( const QDomElement & _this ) override;
-	inline QString nodeName() const override
-	{
-		return "timeline";
-	}
-
 	inline int markerX( const TimePos & _t ) const
 	{
 		return m_xOffset + static_cast<int>( ( _t - m_begin ) *
@@ -178,25 +126,17 @@ public:
 	}
 
 signals:
-
+	void positionChanged(const lmms::TimePos& postion);
 	void regionSelectedFromPixels( int, int );
 	void selectionFinished();
 
-
 public slots:
-	void updatePosition( const lmms::TimePos & );
-	void updatePosition()
-	{
-		updatePosition( TimePos() );
-	}
+	void updatePosition();
 	void setSnapSize( const float snapSize )
 	{
 		m_snapSize = snapSize;
 	}
 	void toggleAutoScroll( int _n );
-	void toggleLoopPoints( int _n );
-	void toggleBehaviourAtStop( int _n );
-
 
 protected:
 	void paintEvent( QPaintEvent * _pe ) override;
@@ -222,8 +162,6 @@ private:
 	QColor m_barNumberColor;
 
 	AutoScrollState m_autoScroll;
-	LoopPointState m_loopPoints;
-	BehaviourAtStopState m_behaviourAtStop;
 
 	bool m_changedPosition;
 
@@ -232,12 +170,9 @@ private:
 	float m_ppb;
 	float m_snapSize;
 	Song::PlayPos & m_pos;
+	Timeline* m_timeline;
 	const TimePos & m_begin;
 	const Song::PlayMode m_mode;
-	TimePos m_loopPos[2];
-
-	TimePos m_savedPos;
-
 
 	TextFloat * m_hint;
 	int m_initalXSelect;
@@ -253,17 +188,7 @@ private:
 	} m_action;
 
 	int m_moveXOff;
-
-
-signals:
-	void positionChanged( const lmms::TimePos & _t );
-	void loopPointStateLoaded( int _n );
-	void positionMarkerMoved();
-	void loadBehaviourAtStop( int _n );
-
-} ;
-
-
+};
 
 } // namespace lmms::gui
 

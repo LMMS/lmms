@@ -52,16 +52,10 @@ SampleClip::SampleClip( Track * _track ) :
 	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
 					this, SLOT(updateLength()));
 
-	//care about positionmarker
-	gui::TimeLineWidget* timeLine = Engine::getSong()->getPlayPos( Song::PlayMode::Song ).m_timeLine;
-	if( timeLine )
-	{
-		connect( timeLine, SIGNAL(positionMarkerMoved()), this, SLOT(playbackPositionChanged()));
-	}
 	//playbutton clicked or space key / on Export Song set isPlaying to false
 	connect( Engine::getSong(), SIGNAL(playbackStateChanged()),
 			this, SLOT(playbackPositionChanged()), Qt::DirectConnection );
-	//care about loops
+	//care about loops and jumps
 	connect( Engine::getSong(), SIGNAL(updateSampleTracks()),
 			this, SLOT(playbackPositionChanged()), Qt::DirectConnection );
 	//care about mute Clips
