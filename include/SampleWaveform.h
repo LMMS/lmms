@@ -28,9 +28,10 @@
 #include <QPainter>
 
 #include "Sample.h"
+#include "lmms_export.h"
 
 namespace lmms::gui {
-class SampleWaveform
+class LMMS_EXPORT SampleWaveform
 {
 public:
 	static void visualize(const Sample& sample, QPainter& p, const QRect& dr, int fromFrame = 0, int toFrame = 0);
