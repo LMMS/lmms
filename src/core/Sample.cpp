@@ -78,7 +78,7 @@ Sample::Sample(const Sample& other)
 }
 
 Sample::Sample(Sample&& other)
-	: m_buffer(other.m_buffer)
+	: m_buffer(std::move(other.m_buffer))
 	, m_startFrame(other.startFrame())
 	, m_endFrame(other.endFrame())
 	, m_loopStartFrame(other.loopStartFrame())
@@ -91,8 +91,6 @@ Sample::Sample(Sample&& other)
 
 auto Sample::operator=(const Sample& other) -> Sample&
 {
-	if (this == &other) { return *this; }
-
 	m_buffer = other.m_buffer;
 	m_startFrame = other.startFrame();
 	m_endFrame = other.endFrame();
@@ -107,9 +105,7 @@ auto Sample::operator=(const Sample& other) -> Sample&
 
 auto Sample::operator=(Sample&& other) -> Sample&
 {
-	if (this == &other) { return *this; }
-
-	m_buffer = other.m_buffer;
+	m_buffer = std::move(other.m_buffer);
 	m_startFrame = other.startFrame();
 	m_endFrame = other.endFrame();
 	m_loopStartFrame = other.loopStartFrame();
