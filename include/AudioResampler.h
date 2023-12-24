@@ -26,10 +26,11 @@
 #define LMMS_AUDIO_RESAMPLER_H
 
 #include <samplerate.h>
+#include "lmms_export.h"
 
 namespace lmms {
 
-class AudioResampler
+class LMMS_EXPORT AudioResampler
 {
 public:
 	struct ProcessResult
