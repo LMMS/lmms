@@ -32,6 +32,7 @@
 #include "ClapFile.h"
 #include "ClapParam.h"
 #include "ClapGui.h"
+#include "ClapAudioPorts.h"
 #include "ClapNotePorts.h"
 #include "ClapTimerSupport.h"
 #include "ClapThreadPool.h"
@@ -120,32 +121,6 @@ public:
 	//! Bring values from all ports to the LMMS core
 	void copyModelsToCore();
 
-	/**
-	 * Copy buffer passed by the core into our ports
-	 * @param buf buffer of sample frames, each sample frame is something like
-	 *   a `float[<number-of-procs> * <channels per proc>]` array.
-	 * @param firstChannel The offset for @p buf where we have to read our
-	 *   first channel.
-	 *   This marks the first sample in each sample frame where we read from.
-	 *   If we are the 2nd of 2 mono procs, this can be greater than 0.
-	 * @param numChannels Number of channels we must read from @param buf (starting at
-	 *   @p offset)
-	 */
-	void copyBuffersFromCore(const sampleFrame* buf, unsigned firstChannel, unsigned numChannels, fpp_t frames);
-
-	/**
-	 * Copy our ports into buffers passed by the core
-	 * @param buf buffer of sample frames, each sample frame is something like
-	 *   a `float[<number-of-procs> * <channels per proc>]` array.
-	 * @param firstChannel The offset for @p buf where we have to write our
-	 *   first channel.
-	 *   This marks the first sample in each sample frame where we write to.
-	 *   If we are the 2nd of 2 mono procs, this can be greater than 0.
-	 * @param numChannels Number of channels we must write to @param buf (starting at
-	 *   @p offset)
-	 */
-	void copyBuffersToCore(sampleFrame* buf, unsigned firstChannel, unsigned numChannels, fpp_t frames) const;
-
 	//! Run the CLAP plugin instance for @param frames frames
 	void run(fpp_t frames);
 
@@ -162,17 +137,16 @@ public:
 	void destroy();
 
 	auto isValid() const -> bool;
-	auto hasStereoInput() const { return m_hasStereoInput; } //!< Can call after init()
-	auto hasStereoOutput() const { return m_hasStereoOutput; } //!< Can call after init()
 
 	auto host() const -> const clap_host* { return &m_host; }
 	auto plugin() const -> const clap_plugin* { return m_plugin; }
 	auto info() const -> const ClapPluginInfo& { return *m_pluginInfo; }
+	auto audioPorts() -> ClapAudioPorts& { return m_audioPorts; }
 	auto params() const -> const std::vector<ClapParam*>& { return m_params; }
 	auto notePorts() -> ClapNotePorts& { return m_notePorts; }
 	auto gui() const { return m_pluginGui.get(); }
-	auto timerSupport() -> ClapTimerSupport& { return m_pluginTimerSupport; }
-	auto threadPool() -> ClapThreadPool& { return m_pluginThreadPool; }
+	auto timerSupport() -> ClapTimerSupport& { return m_timerSupport; }
+	auto threadPool() -> ClapThreadPool& { return m_threadPool; }
 
 	/////////////////////////////////////////
 	// Host
@@ -253,8 +227,6 @@ private:
 	static auto hostExtGuiRequestShow(const clap_host* host) -> bool;
 	static auto hostExtGuiRequestHide(const clap_host* host) -> bool;
 	static void hostExtGuiRequestClosed(const clap_host* host, bool wasDestroyed);
-	static auto hostExtNotePortsSupportedDialects(const clap_host* host) -> std::uint32_t;
-	static void hostExtNotePortsRescan(const clap_host* host, std::uint32_t flags);
 
 	void setParamValueByHost(ClapParam& param, double value);
 	void setParamModulationByHost(ClapParam& param, double value);
@@ -285,78 +257,12 @@ private:
 	const ClapPluginInfo* m_pluginInfo; // TODO: Use weak_ptr instead?
 
 	PluginState m_pluginState = PluginState::Inactive;
-	bool m_hasStereoInput = false;
-	bool m_hasStereoOutput = false;
 
 	std::vector<PluginIssue> m_pluginIssues;
 
 	/**
 	 * Process-related
 	*/
-	std::unique_ptr<clap_audio_buffer_t[]> m_audioIn, m_audioOut; // TODO: Why not use a std::vector?
-	clap_audio_buffer_t* m_audioInActive = nullptr; //!< Pointer to m_audioIn element used by LMMS
-	clap_audio_buffer_t* m_audioOutActive = nullptr; //!< Pointer to m_audioOut element used by LMMS
-
-	//! RAII-enabled CLAP AudioBuffer
-	class AudioBuffer
-	{
-	public:
-		AudioBuffer(std::uint32_t channels, std::uint32_t frames)
-			: m_channels(channels), m_frames(frames)
-		{
-			m_data = new float*[m_channels]();
-			for (std::uint32_t channel = 0; channel < m_channels; ++channel)
-			{
-				m_data[channel] = new float[m_frames]();
-			}
-		}
-
-		AudioBuffer(const AudioBuffer&) = delete;
-		AudioBuffer& operator=(const AudioBuffer&) = delete;
-
-		AudioBuffer(AudioBuffer&& other) noexcept :
-			m_channels(std::exchange(other.m_channels, 0)),
-			m_frames(std::exchange(other.m_frames, 0)),
-			m_data(std::exchange(other.m_data, nullptr))
-		{
-		}
-
-		AudioBuffer& operator=(AudioBuffer&& other) noexcept
-		{
-			if (this != &other)
-			{
-				free();
-				m_channels = std::exchange(other.m_channels, 0);
-				m_frames = std::exchange(other.m_frames, 0);
-				m_data = std::exchange(other.m_data, nullptr);
-			}
-			return *this;
-		}
-
-		~AudioBuffer() { free(); }
-
-		//! [channel][frame]
-		auto data() const -> float** { return m_data; }
-
-	private:
-
-		void free() noexcept
-		{
-			if (!m_data) { return; }
-			for (std::uint32_t channel = 0; channel < m_channels; ++channel)
-			{
-				if (m_data[channel]) { delete[] m_data[channel]; }
-			}
-			delete[] m_data;
-		}
-
-		std::uint32_t m_channels;
-		std::uint32_t m_frames;
-		float** m_data = nullptr;
-	};
-
-	std::vector<AudioBuffer> m_audioInBuffers, m_audioOutBuffers; //!< [port][channel][frame]
-
 	clap::helpers::EventList m_evIn;
 	clap::helpers::EventList m_evOut;
 	clap_process m_process{};
@@ -427,32 +333,9 @@ private:
 	bool m_scheduleMainThreadCallback = false;
 
 	/**
-	 * Ports
-	 */
-	enum class AudioPortType
-	{
-		Unsupported,
-		Mono,
-		Stereo
-	};
-
-	struct AudioPort
-	{
-		clap_audio_port_info info{};
-		std::uint32_t index = 0; //!< Index on plugin side, not m_audioPorts***
-		bool isInput = false;
-		AudioPortType type = AudioPortType::Unsupported;
-		bool used = false; //!< In use by LMMS
-	};
-
-	std::vector<AudioPort> m_audioPortsIn, m_audioPortsOut;
-	AudioPort* m_audioPortInActive = nullptr; //!< Pointer to m_audioPortsIn element used by LMMS
-	AudioPort* m_audioPortOutActive = nullptr; //!< Pointer to m_audioPortsOut element used by LMMS
-
-	/**
 	 * Plugin/Host extension pointers
 	*/
-	const clap_plugin_audio_ports* m_pluginExtAudioPorts = nullptr;
+	ClapAudioPorts m_audioPorts{ this };
 
 	const clap_plugin_state* m_pluginExtState = nullptr;
 	static constexpr const clap_host_state s_hostExtState {
@@ -490,17 +373,8 @@ private:
 	};
 
 	ClapNotePorts m_notePorts;
-
-	ClapTimerSupport m_pluginTimerSupport{ this };
-	static constexpr const clap_host_timer_support s_hostExtTimerSupport {
-		&ClapTimerSupport::clapRegisterTimer,
-		&ClapTimerSupport::clapUnregisterTimer
-	};
-
-	ClapThreadPool m_pluginThreadPool;
-	static constexpr const clap_host_thread_pool s_hostExtThreadPool {
-		&ClapThreadPool::clapRequestExec
-	};
+	ClapTimerSupport m_timerSupport{ this };
+	ClapThreadPool m_threadPool;
 
 	/**
 	 * Plugin/Host extension data

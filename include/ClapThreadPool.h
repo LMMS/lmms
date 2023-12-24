@@ -38,22 +38,25 @@
 
 #include <clap/ext/thread-pool.h>
 
+#include "ClapExtension.h"
+
 namespace lmms
 {
 
-class ClapThreadPool
+class ClapThreadPool final : public ClapExtension<clap_host_thread_pool, clap_plugin_thread_pool>
 {
 public:
-	friend class ClapInstance;
+	ClapThreadPool() = default;
+	~ClapThreadPool() override { deinit(); }
 
-	~ClapThreadPool() { deinit(); }
+	auto init(const clap_host* host, const clap_plugin* plugin) -> bool override;
+	void deinit() override;
 
-	auto supported() const -> bool { return m_ext != nullptr; }
+	auto extensionId() const -> std::string_view override { return CLAP_EXT_THREAD_POOL; }
+	auto hostExt() const -> const clap_host_thread_pool* override;
 
 private:
-
-	auto init(const clap_plugin* plugin) -> bool;
-	void deinit();
+	auto checkSupported(const clap_plugin_thread_pool* ext) -> bool override;
 
 	void entry();
 	void terminate();
@@ -62,9 +65,6 @@ private:
 	 * clap_host_thread_pool implementation
 	 */
 	static auto clapRequestExec(const clap_host* host, std::uint32_t numTasks) -> bool;
-
-	const clap_plugin* m_plugin = nullptr;
-	const clap_plugin_thread_pool* m_ext = nullptr;
 
 	std::vector<std::unique_ptr<QThread>> m_threads;
 	std::atomic<bool> m_stop{ false };

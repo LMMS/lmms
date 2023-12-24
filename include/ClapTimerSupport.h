@@ -35,24 +35,29 @@
 
 #include <clap/ext/timer-support.h>
 
+#include "ClapExtension.h"
+
 namespace lmms
 {
 
-class ClapTimerSupport : public QObject
+class ClapTimerSupport
+	: public QObject
+	, public ClapExtension<clap_host_timer_support, clap_plugin_timer_support>
 {
 	Q_OBJECT
 public:
-	friend class ClapInstance;
-
-	auto supported() const -> bool { return m_ext != nullptr; }
-
-private:
 
 	using QObject::QObject;
 
-	auto init(const clap_plugin* plugin) -> bool;
+	void deinit() override;
+	auto extensionId() const -> std::string_view override { return CLAP_EXT_TIMER_SUPPORT; }
+	auto hostExt() const -> const clap_host_timer_support* override;
+
 	void killTimers();
-	void deinit();
+
+private:
+
+	auto checkSupported(const clap_plugin_timer_support* ext) -> bool override;
 
 	/**
 	 * clap_host_timer_support implementation

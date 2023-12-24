@@ -107,6 +107,7 @@ set(LMMS_SRCS
 	core/audio/AudioSampleRecorder.cpp
 	core/audio/AudioSdl.cpp
 
+	core/clap/ClapAudioPorts.cpp
 	core/clap/ClapControlBase.cpp
 	core/clap/ClapExtension.cpp
 	core/clap/ClapFile.cpp

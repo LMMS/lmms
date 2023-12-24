@@ -74,7 +74,7 @@ void ClapControlBase::init(Model* that, const QString& uri)
 		return;
 	}
 
-	if (!first->hasStereoOutput())
+	if (!first->audioPorts().hasStereoOutput())
 	{
 		// A second instance is needed for stereo input/output
 		qDebug() << "Creating CLAP instance (#2)";
@@ -126,7 +126,7 @@ void ClapControlBase::copyBuffersFromLmms(const sampleFrame* buf, fpp_t frames)
 	unsigned firstChan = 0; // tell the instances which channels they shall read from
 	for (const auto& instance : m_instances) 
 	{
-		instance->copyBuffersFromCore(buf, firstChan, m_channelsPerInstance, frames);
+		instance->audioPorts().copyBuffersFromCore(buf, firstChan, m_channelsPerInstance, frames);
 		firstChan += m_channelsPerInstance;
 	}
 }
@@ -136,7 +136,7 @@ void ClapControlBase::copyBuffersToLmms(sampleFrame* buf, fpp_t frames) const
 	unsigned firstChan = 0; // tell the instances which channels they shall write to
 	for (const auto& instance : m_instances)
 	{
-		instance->copyBuffersToCore(buf, firstChan, m_channelsPerInstance, frames);
+		instance->audioPorts().copyBuffersToCore(buf, firstChan, m_channelsPerInstance, frames);
 		firstChan += m_channelsPerInstance;
 	}
 }

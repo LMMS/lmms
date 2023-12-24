@@ -36,17 +36,25 @@
 namespace lmms
 {
 
-auto ClapTimerSupport::init(const clap_plugin* plugin) -> bool
+void ClapTimerSupport::deinit()
 {
-	assert(ClapInstance::isMainThread());
-	assert(m_ext == nullptr && "Plugin extension already initialized");
+	killTimers();
+	m_ext = nullptr;
+	m_plugin = nullptr;
+}
 
-	m_plugin = plugin;
-	const auto ext = static_cast<const clap_plugin_timer_support*>(plugin->get_extension(plugin, CLAP_EXT_TIMER_SUPPORT));
-	if (!ext || !ext->on_timer) { return false; }
+auto ClapTimerSupport::hostExt() const -> const clap_host_timer_support*
+{
+	static clap_host_timer_support ext {
+		&clapRegisterTimer,
+		&clapUnregisterTimer
+	};
+	return &ext;
+}
 
-	m_ext = ext;
-	return true;
+auto ClapTimerSupport::checkSupported(const clap_plugin_timer_support* ext) -> bool
+{
+	return ext->on_timer;
 }
 
 void ClapTimerSupport::killTimers()
@@ -56,13 +64,6 @@ void ClapTimerSupport::killTimers()
 		killTimer(timerId);
 	}
 	m_timerIds.clear();
-}
-
-void ClapTimerSupport::deinit()
-{
-	killTimers();
-	m_ext = nullptr;
-	m_plugin = nullptr;
 }
 
 auto ClapTimerSupport::clapRegisterTimer(const clap_host* host, std::uint32_t periodMilliseconds, clap_id* timerId) -> bool

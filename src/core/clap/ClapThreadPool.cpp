@@ -26,7 +26,6 @@
 
 #ifdef LMMS_HAVE_CLAP
 
-#include <string>
 #include <cassert>
 
 #include "ClapInstance.h"
@@ -34,14 +33,9 @@
 namespace lmms
 {
 
-auto ClapThreadPool::init(const clap_plugin* plugin) -> bool
+auto ClapThreadPool::init(const clap_host* host, const clap_plugin* plugin) -> bool
 {
-	assert(ClapInstance::isMainThread());
-	assert(m_ext == nullptr && "Plugin extension already initialized");
-
-	m_plugin = plugin;
-	const auto ext = static_cast<const clap_plugin_thread_pool*>(plugin->get_extension(plugin, CLAP_EXT_THREAD_POOL));
-	if (!ext || !ext->exec) { return false; }
+	if (!ClapExtension::init(host, plugin)) { return false; }
 
 	m_stop = false;
 	m_taskIndex = 0;
@@ -53,15 +47,26 @@ auto ClapThreadPool::init(const clap_plugin* plugin) -> bool
 		m_threads[i]->start(QThread::HighestPriority);
 	}
 
-	m_ext = ext;
 	return true;
 }
 
 void ClapThreadPool::deinit()
 {
 	terminate();
-	m_ext = nullptr;
-	m_plugin = nullptr;
+	ClapExtension::deinit();
+}
+
+auto ClapThreadPool::hostExt() const -> const clap_host_thread_pool*
+{
+	static clap_host_thread_pool ext {
+		&clapRequestExec
+	};
+	return &ext;
+}
+
+auto ClapThreadPool::checkSupported(const clap_plugin_thread_pool* ext) -> bool
+{
+	return ext->exec;
 }
 
 void ClapThreadPool::entry()
@@ -72,7 +77,7 @@ void ClapThreadPool::entry()
 		if (m_stop) { return; }
 
 		int taskIndex = m_taskIndex++;
-		m_ext->exec(m_plugin, taskIndex);
+		pluginExt()->exec(m_plugin, taskIndex);
 		m_semaphoreDone.release();
 	}
 }
@@ -95,7 +100,8 @@ auto ClapThreadPool::clapRequestExec(const clap_host* host, std::uint32_t numTas
 	assert(ClapInstance::isAudioThread());
 	// TODO: Check that this is called from within the process method
 
-	const auto h = ClapInstance::fromHost(host);
+	const auto h = fromHost(host);
+	if (!h) { return false; }
 	auto& threadPool = h->threadPool();
 
 	if (!threadPool.supported())
@@ -111,7 +117,7 @@ auto ClapThreadPool::clapRequestExec(const clap_host* host, std::uint32_t numTas
 
 	if (numTasks == 1)
 	{
-		threadPool.m_ext->exec(threadPool.m_plugin, 0);
+		threadPool.pluginExt()->exec(threadPool.m_plugin, 0);
 		return true;
 	}
 
