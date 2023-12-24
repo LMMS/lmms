@@ -34,6 +34,7 @@
 #include "PathUtil.h"
 #include "SampleClip.h"
 #include "SampleLoader.h"
+#include "SampleWaveform.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 
@@ -268,7 +269,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	float offset =  m_clip->startTimeOffset() / ticksPerBar * pixelsPerBar();
 	QRect r = QRect( offset, spacing,
 			qMax( static_cast<int>( m_clip->sampleLength() * ppb / ticksPerBar ), 1 ), rect().bottom() - 2 * spacing );
-	m_clip->m_sample.visualize(p, r);
+	SampleWaveform::visualize(m_clip->m_sample, p, r);
 
 	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
 	paintTextLabel(name, p);

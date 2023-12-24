@@ -100,7 +100,6 @@ public:
 
 	auto play(sampleFrame* dst, PlaybackState* state, int numFrames, float desiredFrequency = DefaultBaseFreq,
 		Loop loopMode = Loop::Off) const -> bool;
-	void visualize(QPainter& p, const QRect& dr, int fromFrame = 0, int toFrame = 0) const;
 
 	auto sampleDuration() const -> std::chrono::milliseconds;
 	auto sampleFile() const -> const QString& { return m_buffer->audioFile(); }
@@ -109,7 +108,7 @@ public:
 
 	auto toBase64() const -> QString { return m_buffer->toBase64(); }
 
-	auto data() -> const sampleFrame* { return m_buffer->data(); }
+	auto data() const -> const sampleFrame* { return m_buffer->data(); }
 	auto buffer() const -> std::shared_ptr<const SampleBuffer> { return m_buffer; }
 	auto startFrame() const -> int { return m_startFrame.load(std::memory_order_relaxed); }
 	auto endFrame() const -> int { return m_endFrame.load(std::memory_order_relaxed); }

@@ -42,6 +42,7 @@
 #include "PathUtil.h"
 #include "PixmapButton.h"
 #include "SampleLoader.h"
+#include "SampleWaveform.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "Clipboard.h"
@@ -1013,12 +1014,7 @@ void AudioFileProcessorWaveView::updateGraph()
 	m_graph.fill( Qt::transparent );
 	QPainter p( &m_graph );
 	p.setPen( QColor( 255, 255, 255 ) );
-
-	m_sample->visualize(
-		p,
-		QRect( 0, 0, m_graph.width(), m_graph.height() ),
-		m_from, m_to
-	);
+	SampleWaveform::visualize(*m_sample, p, QRect(0, 0, m_graph.width(), m_graph.height()), m_from, m_to);
 }
 
 

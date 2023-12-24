@@ -26,6 +26,7 @@
 
 #include <QBitmap>
 
+#include "SampleWaveform.h"
 #include "SlicerT.h"
 #include "SlicerTView.h"
 #include "embed.h"
@@ -88,8 +89,9 @@ void SlicerTWaveform::drawSeekerWaveform()
 	QPainter brush(&m_seekerWaveform);
 	brush.setPen(s_waveformColor);
 
-	m_slicerTParent->m_originalSample.visualize(brush, QRect(0, 0, m_seekerWaveform.width(), m_seekerWaveform.height()),
-		0, m_slicerTParent->m_originalSample.sampleSize());
+	SampleWaveform::visualize(m_slicerTParent->m_originalSample, brush,
+		QRect(0, 0, m_seekerWaveform.width(), m_seekerWaveform.height()), 0,
+		m_slicerTParent->m_originalSample.sampleSize());
 
 	// increase brightness in inner color
 	QBitmap innerMask = m_seekerWaveform.createMaskFromColor(s_waveformMaskColor, Qt::MaskMode::MaskOutColor);
@@ -142,8 +144,9 @@ void SlicerTWaveform::drawEditorWaveform()
 
 	brush.setPen(s_waveformColor);
 	float zoomOffset = (m_editorHeight - m_zoomLevel * m_editorHeight) / 2;
-	m_slicerTParent->m_originalSample.visualize(
-		brush, QRect(0, zoomOffset, m_editorWidth, m_zoomLevel * m_editorHeight), startFrame, endFrame);
+
+	SampleWaveform::visualize(m_slicerTParent->m_originalSample, brush,
+		QRect(0, zoomOffset, m_editorWidth, m_zoomLevel * m_editorHeight), startFrame, endFrame);
 
 	// increase brightness in inner color
 	QBitmap innerMask = m_editorWaveform.createMaskFromColor(s_waveformMaskColor, Qt::MaskMode::MaskOutColor);
