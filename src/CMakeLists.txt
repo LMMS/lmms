@@ -108,7 +108,7 @@ GENERATE_EXPORT_HEADER(lmmsobjs
 	BASE_NAME lmms
 )
 
-ADD_EXECUTABLE(lmms 
+ADD_EXECUTABLE(lmms
 	core/main.cpp
 	$<TARGET_OBJECTS:lmmsobjs>
 	"${WINRC}"
