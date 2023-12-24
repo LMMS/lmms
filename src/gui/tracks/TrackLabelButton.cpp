@@ -31,8 +31,6 @@
 #include "ConfigManager.h"
 #include "embed.h"
 #include "Engine.h"
-#include "Instrument.h"
-#include "InstrumentTrack.h"
 #include "RenameDialog.h"
 #include "Song.h"
 #include "TrackRenameLineEdit.h"
@@ -180,35 +178,6 @@ void TrackLabelButton::mouseReleaseEvent( QMouseEvent *_me )
 	}
 	QToolButton::mouseReleaseEvent( _me );
 	_me->ignore();
-}
-
-
-
-
-void TrackLabelButton::paintEvent( QPaintEvent * _pe )
-{
-	if( m_trackView->getTrack()->type() == Track::Type::Instrument )
-	{
-		auto it = dynamic_cast<InstrumentTrack*>(m_trackView->getTrack());
-		const PixmapLoader * pl;
-		auto get_logo = [](InstrumentTrack* it) -> const PixmapLoader*
-		{
-			return it->instrument()->key().isValid()
-				? it->instrument()->key().logo()
-				: it->instrument()->descriptor()->logo;
-		};
-		if( it && it->instrument() &&
-			it->instrument()->descriptor() &&
-			( pl = get_logo(it) ) )
-		{
-			if( pl->pixmapName() != m_iconName )
-			{
-				m_iconName = pl->pixmapName();
-				setIcon( pl->pixmap() );
-			}
-		}
-	}
-	QToolButton::paintEvent( _pe );
 }
 
 

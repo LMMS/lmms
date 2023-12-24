@@ -40,6 +40,7 @@
 #include "Mixer.h"
 #include "MixerView.h"
 #include "GuiApplication.h"
+#include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "InstrumentTrackWindow.h"
 #include "MainWindow.h"
@@ -62,7 +63,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 
 	m_tlb = new TrackLabelButton( this, getTrackSettingsWidget() );
 	m_tlb->setCheckable( true );
-	m_tlb->setIcon( embed::getIconPixmap( "instrument_track" ) );
+	m_tlb->setIcon(determinePixmap(_it));
 	m_tlb->show();
 
 	connect( m_tlb, SIGNAL(toggled(bool)),
@@ -390,6 +391,29 @@ QMenu * InstrumentTrackView::createMixerMenu(QString title, QString newMixerLabe
 	}
 
 	return mixerMenu;
+}
+
+
+QPixmap InstrumentTrackView::determinePixmap(InstrumentTrack * instrumentTrack)
+{
+	if (instrumentTrack)
+	{
+		Instrument * instrument = instrumentTrack->instrument();
+
+		if (instrument && instrument->descriptor())
+		{
+			const PixmapLoader * pl = instrument->key().isValid() ?
+				instrument->key().logo() :
+				instrument->descriptor()->logo;
+
+			if(pl)
+			{
+				return pl->pixmap();
+			}
+		}
+	}
+
+	return embed::getIconPixmap("instrument_track");
 }
 
 
