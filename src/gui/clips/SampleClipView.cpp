@@ -62,8 +62,11 @@ void SampleClipView::updateSample()
 	update();
 	// set tooltip to filename so that user can see what sample this
 	// sample-clip contains
-	setToolTip(!m_clip->m_sample.sampleFile().isEmpty() ? PathUtil::toAbsolute(m_clip->m_sample.sampleFile())
-														 : tr("Double-click to open sample"));
+	setToolTip(
+		!m_clip->m_sample.sampleFile().isEmpty()
+			? PathUtil::toAbsolute(m_clip->m_sample.sampleFile())
+			: tr("Double-click to open sample")
+	);
 }
 
 
