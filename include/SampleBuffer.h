@@ -27,6 +27,7 @@
 
 #include <QByteArray>
 #include <QString>
+#include <memory>
 #include <optional>
 #include <samplerate.h>
 #include <vector>
