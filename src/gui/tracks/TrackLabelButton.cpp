@@ -51,7 +51,7 @@ TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 	m_renameLineEdit = new TrackRenameLineEdit( this );
 	m_renameLineEdit->hide();
 	
-	if( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
+	if (isInCompactMode())
 	{
 		setFixedSize( 32, 29 );
 	}
@@ -75,7 +75,7 @@ TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 
 void TrackLabelButton::rename()
 {
-	if( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
+	if(isInCompactMode())
 	{
 		QString txt = m_trackView->getTrack()->name();
 		RenameDialog renameDlg( txt );
@@ -101,7 +101,7 @@ void TrackLabelButton::rename()
 
 void TrackLabelButton::renameFinished()
 {
-	if( !( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() ) )
+	if(!isInCompactMode())
 	{
 		m_renameLineEdit->clearFocus();
 		m_renameLineEdit->hide();
@@ -206,5 +206,9 @@ QString TrackLabelButton::elideName( const QString &name )
 	return elidedName;
 }
 
+bool TrackLabelButton::isInCompactMode() const
+{
+	return ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt();
+}
 
 } // namespace lmms::gui

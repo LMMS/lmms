@@ -57,6 +57,8 @@ protected:
 	void mouseReleaseEvent( QMouseEvent * _me ) override;
 	void resizeEvent( QResizeEvent * _re ) override;
 
+private:
+	bool isInCompactMode() const;
 
 private:
 	TrackView * m_trackView;
