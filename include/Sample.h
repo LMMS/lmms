@@ -121,8 +121,6 @@ public:
 
 private:
 	void playSampleRange(PlaybackState* state, sampleFrame* dst, size_t numFrames) const;
-	auto resampleSampleRange(SRC_STATE* state, sampleFrame* src, sampleFrame* dst, size_t numInputFrames,
-		size_t numOutputFrames, double ratio) const -> SRC_DATA;
 	void amplifySampleRange(sampleFrame* src, int numFrames) const;
 	void copyBufferForward(sampleFrame* dst, int initialPosition, int advanceAmount) const;
 	void copyBufferBackward(sampleFrame* dst, int initialPosition, int advanceAmount) const;

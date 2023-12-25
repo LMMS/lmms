@@ -218,20 +218,6 @@ void Sample::copyBufferBackward(sampleFrame* dst, int initialPosition, int advan
 				   m_buffer->begin() + initialPosition - advanceAmount, m_buffer->begin() + initialPosition, dst);
 }
 
-auto Sample::resampleSampleRange(SRC_STATE* state, sampleFrame* src, sampleFrame* dst, size_t numInputFrames,
-	size_t numOutputFrames, double ratio) const -> SRC_DATA
-{
-	auto data = SRC_DATA{};
-	data.data_in = &src[0][0];
-	data.data_out = &dst[0][0];
-	data.input_frames = numInputFrames;
-	data.output_frames = numOutputFrames;
-	data.src_ratio = ratio;
-	data.end_of_input = 0;
-	src_process(state, &data);
-	return data;
-}
-
 void Sample::amplifySampleRange(sampleFrame* src, int numFrames) const
 {
 	const auto amplification = m_amplification.load(std::memory_order_relaxed);
