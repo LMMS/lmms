@@ -62,6 +62,7 @@ auto AudioResampler::resample(const float* in, long inputFrames, float* out, lon
 	data.data_out = out;
 	data.output_frames = outputFrames;
 	data.src_ratio = ratio;
+	data.end_of_input = 0;
 	return {src_process(m_state, &data), data.input_frames_used, data.output_frames_gen};
 }
 
