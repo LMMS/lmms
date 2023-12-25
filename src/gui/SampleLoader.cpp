@@ -88,7 +88,7 @@ QString SampleLoader::openWaveformFile(const QString& previousFile)
 		previousFile.isEmpty() ? ConfigManager::inst()->factorySamplesDir() + "waveforms/10saw.flac" : previousFile);
 }
 
-std::shared_ptr<SampleBuffer> SampleLoader::createBufferFromFile(const QString& filePath)
+std::shared_ptr<const SampleBuffer> SampleLoader::createBufferFromFile(const QString& filePath)
 {
 	if (filePath.isEmpty()) { return SampleBuffer::emptyBuffer(); }
 
@@ -103,7 +103,7 @@ std::shared_ptr<SampleBuffer> SampleLoader::createBufferFromFile(const QString& 
 	}
 }
 
-std::shared_ptr<SampleBuffer> SampleLoader::createBufferFromBase64(const QString& base64, int sampleRate)
+std::shared_ptr<const SampleBuffer> SampleLoader::createBufferFromBase64(const QString& base64, int sampleRate)
 {
 	if (base64.isEmpty()) { return SampleBuffer::emptyBuffer(); }
 

@@ -45,7 +45,7 @@ public:
 	~AudioSampleRecorder() override;
 
 	f_cnt_t framesRecorded() const;
-	std::unique_ptr<SampleBuffer> createSampleBuffer();
+	std::shared_ptr<const SampleBuffer> createSampleBuffer();
 
 private:
 	void writeBuffer( const surroundSampleFrame * _ab,

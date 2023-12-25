@@ -86,7 +86,7 @@ public:
 	auto size() const -> size_type { return m_data.size(); }
 	auto empty() const -> bool { return m_data.empty(); }
 
-	static auto emptyBuffer() -> std::shared_ptr<SampleBuffer>;
+	static auto emptyBuffer() -> std::shared_ptr<const SampleBuffer>;
 
 private:
 	std::vector<sampleFrame> m_data;

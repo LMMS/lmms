@@ -54,7 +54,7 @@ public:
 	bool isFromTrack( const Track * _track ) const override;
 
 	f_cnt_t framesRecorded() const;
-	std::unique_ptr<SampleBuffer> createSampleBuffer();
+	std::shared_ptr<const SampleBuffer> createSampleBuffer();
 
 
 private:
