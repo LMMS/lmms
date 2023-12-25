@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_SAMPLE_WAVEFORM_H
-#define LMMS_SAMPLE_WAVEFORM_H
+#ifndef LMMS_GUI_SAMPLE_WAVEFORM_H
+#define LMMS_GUI_SAMPLE_WAVEFORM_H
 
 #include <QPainter>
 
@@ -38,4 +38,4 @@ public:
 };
 } // namespace lmms::gui
 
-#endif // LMMS_SAMPLE_WAVEFORM_H
+#endif // LMMS_GUI_SAMPLE_WAVEFORM_H
