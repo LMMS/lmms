@@ -64,7 +64,7 @@ public:
 		return "sampleclip";
 	}
 
-	const Sample& sample()
+	Sample& sample()
 	{
 		return m_sample;
 	}

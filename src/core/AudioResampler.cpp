@@ -53,7 +53,7 @@ AudioResampler::~AudioResampler()
 	src_delete(m_state);
 }
 
-auto AudioResampler::resample(const float* in, long inputFrames, float* out, long outputFrames, double ratio) const
+auto AudioResampler::resample(const float* in, long inputFrames, float* out, long outputFrames, double ratio)
 	-> ProcessResult
 {
 	auto data = SRC_DATA{};

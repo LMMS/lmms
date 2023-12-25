@@ -26,6 +26,7 @@
 #define LMMS_AUDIO_RESAMPLER_H
 
 #include <samplerate.h>
+
 #include "lmms_export.h"
 
 namespace lmms {
@@ -48,8 +49,7 @@ public:
 	AudioResampler& operator=(const AudioResampler&) = delete;
 	AudioResampler& operator=(AudioResampler&&) = delete;
 
-	auto resample(const float* in, long inputFrames, float* out, long outputFrames, double ratio) const
-		-> ProcessResult;
+	auto resample(const float* in, long inputFrames, float* out, long outputFrames, double ratio) -> ProcessResult;
 	auto interpolationMode() const -> int { return m_interpolationMode; }
 	auto channels() const -> int { return m_channels; }
 

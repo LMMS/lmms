@@ -117,7 +117,7 @@ auto Sample::operator=(Sample&& other) -> Sample&
 	return *this;
 }
 
-bool Sample::play(sampleFrame* dst, PlaybackState* state, int numFrames, float desiredFrequency, Loop loopMode) const
+bool Sample::play(sampleFrame* dst, PlaybackState* state, int numFrames, float desiredFrequency, Loop loopMode)
 {
 	if (numFrames <= 0 || desiredFrequency <= 0) { return false; }
 

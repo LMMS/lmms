@@ -35,7 +35,7 @@ namespace lmms
 {
 
 
-SamplePlayHandle::SamplePlayHandle(const Sample* sample, bool ownAudioPort) :
+SamplePlayHandle::SamplePlayHandle(Sample* sample, bool ownAudioPort) :
 	PlayHandle( Type::SamplePlayHandle ),
 	m_sample(sample),
 	m_doneMayReturnTrue( true ),
