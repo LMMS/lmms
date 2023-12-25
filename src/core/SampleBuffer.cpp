@@ -61,7 +61,7 @@ SampleBuffer::SampleBuffer(const QString& base64, int sampleRate)
 	// TODO: Replace with non-Qt equivalent
 	const auto bytes = QByteArray::fromBase64(base64.toUtf8());
 	m_data.resize(bytes.size() / sizeof(sampleFrame));
-	std::memcpy(reinterpret_cast<char*>(m_data.data()), bytes, bytes.size());
+	std::memcpy(reinterpret_cast<char*>(m_data.data()), bytes, m_data.size() * sizeof(sampleFrame));
 }
 
 SampleBuffer::SampleBuffer(std::vector<sampleFrame> data, int sampleRate)
