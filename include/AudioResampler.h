@@ -54,11 +54,10 @@ public:
 	auto channels() const -> int { return m_channels; }
 
 private:
-	AudioResampler(SRC_STATE*, int interpolationMode, int channels);
-	SRC_STATE* m_state = nullptr;
-	int m_error = 0;
 	int m_interpolationMode = -1;
 	int m_channels = 0;
+	int m_error = 0;
+	SRC_STATE* m_state = nullptr;
 };
 } // namespace lmms
 

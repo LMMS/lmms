@@ -30,10 +30,10 @@
 
 namespace lmms {
 
-AudioResampler::AudioResampler(SRC_STATE* state, int interpolationMode, int channels)
-	: m_state(state)
-	, m_interpolationMode(interpolationMode)
+AudioResampler::AudioResampler(int interpolationMode, int channels)
+	: m_interpolationMode(interpolationMode)
 	, m_channels(channels)
+	, m_state(src_new(interpolationMode, channels, &m_error))
 {
 	if (!m_state)
 	{
@@ -41,11 +41,6 @@ AudioResampler::AudioResampler(SRC_STATE* state, int interpolationMode, int chan
 		const auto fullMessage = std::string{"Failed to create an AudioResampler: "} + errorMessage;
 		throw std::runtime_error{fullMessage};
 	}
-}
-
-AudioResampler::AudioResampler(int interpolationMode, int channels)
-	: AudioResampler(src_new(interpolationMode, channels, &m_error), interpolationMode, channels)
-{
 }
 
 AudioResampler::~AudioResampler()
