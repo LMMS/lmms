@@ -143,7 +143,9 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_activityIndicator->setFixedSize(8, 28);
 	m_activityIndicator->show();
 
-	auto layout = new QHBoxLayout(getTrackSettingsWidget());
+	auto masterLayout = new QVBoxLayout(getTrackSettingsWidget());
+	masterLayout->setContentsMargins(0, 1, 0, 0);
+	auto layout = new QHBoxLayout();
 	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(0);
 	layout->addWidget(m_tlb);
@@ -151,6 +153,8 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	layout->addWidget(m_activityIndicator);
 	layout->addWidget(m_volumeKnob);
 	layout->addWidget(m_panningKnob);
+	masterLayout->addLayout(layout);
+	masterLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	connect( m_activityIndicator, SIGNAL(pressed()),
 				this, SLOT(activityIndicatorPressed()));
