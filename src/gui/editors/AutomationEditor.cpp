@@ -39,6 +39,7 @@
 #include <cmath>
 
 #include "SampleClip.h"
+#include "SampleWaveform.h"
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -1235,9 +1236,9 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		}
 
 		// draw ghost sample
-		if (m_ghostSample != nullptr && m_ghostSample->sampleBuffer()->frames() > 1 && m_renderSample)
+		if (m_ghostSample != nullptr && m_ghostSample->sample().sampleSize() > 1 && m_renderSample)
 		{
-			int sampleFrames = m_ghostSample->sampleBuffer()->frames();
+			int sampleFrames = m_ghostSample->sample().sampleSize();
 			int length = static_cast<float>(sampleFrames) / Engine::framesPerTick();
 			int editorHeight = grid_bottom - TOP_MARGIN;
 
@@ -1247,7 +1248,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			int yOffset = (editorHeight - sampleHeight) / 2.0f + TOP_MARGIN;
 
 			p.setPen(m_ghostSampleColor);
-			m_ghostSample->sampleBuffer()->visualize(p, QRect(startPos, yOffset, sampleWidth, sampleHeight), 0, sampleFrames);
+			SampleWaveform::visualize(m_ghostSample->sample(), p, QRect(startPos, yOffset, sampleWidth, sampleHeight), 0, sampleFrames);
 		}
 
 		// draw ghost notes

@@ -153,8 +153,8 @@ void PatmanInstrument::playNote( NotePlayHandle * _n,
 	float play_freq = hdata->tuned ? _n->frequency() :
 						hdata->sample->frequency();
 
-	if( hdata->sample->play( _working_buffer + offset, hdata->state, frames,
-					play_freq, m_loopedModel.value() ? SampleBuffer::LoopMode::On : SampleBuffer::LoopMode::Off ) )
+	if (hdata->sample->play(_working_buffer + offset, hdata->state, frames,
+					play_freq, m_loopedModel.value() ? Sample::Loop::On : Sample::Loop::Off))
 	{
 		applyRelease( _working_buffer, _n );
 	}
@@ -170,7 +170,6 @@ void PatmanInstrument::playNote( NotePlayHandle * _n,
 void PatmanInstrument::deleteNotePluginData( NotePlayHandle * _n )
 {
 	auto hdata = (handle_data*)_n->m_pluginData;
-	sharedObject::unref( hdata->sample );
 	delete hdata->state;
 	delete hdata;
 }
@@ -356,9 +355,8 @@ PatmanInstrument::LoadError PatmanInstrument::loadPatch(
 			}
 		}
 
-		auto psample = new SampleBuffer(data, frames);
-		psample->setFrequency( root_freq / 1000.0f );
-		psample->setSampleRate( sample_rate );
+		auto psample = std::make_shared<Sample>(data, frames, sample_rate);
+		psample->setFrequency(root_freq / 1000.0f);
 
 		if( modes & MODES_LOOPING )
 		{
@@ -366,7 +364,7 @@ PatmanInstrument::LoadError PatmanInstrument::loadPatch(
 			psample->setLoopEndFrame( loop_end );
 		}
 
-		m_patchSamples.push_back( psample );
+		m_patchSamples.push_back(psample);
 
 		delete[] wave_samples;
 		delete[] data;
@@ -382,7 +380,6 @@ void PatmanInstrument::unloadCurrentPatch()
 {
 	while( !m_patchSamples.empty() )
 	{
-		sharedObject::unref( m_patchSamples.back() );
 		m_patchSamples.pop_back();
 	}
 }
@@ -395,7 +392,7 @@ void PatmanInstrument::selectSample( NotePlayHandle * _n )
 	const float freq = _n->frequency();
 
 	float min_dist = HUGE_VALF;
-	SampleBuffer* sample = nullptr;
+	std::shared_ptr<Sample> sample = nullptr;
 
 	for (const auto& patchSample : m_patchSamples)
 	{
@@ -412,15 +409,8 @@ void PatmanInstrument::selectSample( NotePlayHandle * _n )
 
 	auto hdata = new handle_data;
 	hdata->tuned = m_tunedModel.value();
-	if( sample )
-	{
-		hdata->sample = sharedObject::ref( sample );
-	}
-	else
-	{
-		hdata->sample = new SampleBuffer( nullptr, 0 );
-	}
-	hdata->state = new SampleBuffer::handleState( _n->hasDetuningInfo() );
+	hdata->sample = sample ? sample : std::make_shared<Sample>();
+	hdata->state = new Sample::PlaybackState(_n->hasDetuningInfo());
 
 	_n->m_pluginData = hdata;
 }

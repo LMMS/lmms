@@ -294,6 +294,17 @@ void ClipView::remove()
 
 	// delete ourself
 	close();
+
+	if (m_clip->getTrack())
+	{
+		auto guard = Engine::audioEngine()->requestChangesGuard();
+		m_clip->getTrack()->removeClip(m_clip);
+	}
+
+	// TODO: Clip::~Clip should not be responsible for removing the Clip from the Track.
+	// One would expect that a call to Track::removeClip would already do that for you, as well
+	// as actually deleting the Clip with the deleteLater function. That being said, it shouldn't
+	// be possible to make a Clip without a Track (i.e., Clip::getTrack is never nullptr).
 	m_clip->deleteLater();
 }
 
