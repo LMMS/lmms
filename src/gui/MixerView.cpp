@@ -52,10 +52,10 @@ namespace lmms::gui
 {
 
 
-MixerView::MixerView() :
-	QWidget(),
-	ModelView( nullptr, this ),
-	SerializingObjectHook()
+MixerView::MixerView()
+	: DetachableWidget{}
+	, ModelView{nullptr, this}
+	, SerializingObjectHook{}
 {
 #if QT_VERSION < 0x50C00
 	// Workaround for a bug in Qt versions below 5.12,
@@ -163,6 +163,15 @@ MixerView::MixerView() :
 					this, SLOT(updateFaders()));
 
 
+	// adjust window size
+	layout()->invalidate();
+	resize(sizeHint());
+	if (parentWidget())
+	{
+		parentWidget()->resize(parentWidget()->sizeHint());
+	}
+	setFixedHeight(height());
+
 	// add ourself to workspace
 	QMdiSubWindow * subWin = getGUI()->mainWindow()->addWindowedWidget( this );
 	Qt::WindowFlags flags = subWin->windowFlags();
@@ -170,6 +179,7 @@ MixerView::MixerView() :
 	subWin->setWindowFlags( flags );
 	layout()->setSizeConstraint( QLayout::SetMinimumSize );
 	subWin->layout()->setSizeConstraint( QLayout::SetMinAndMaxSize );
+	subWin->setFixedHeight(subWin->height());
 
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
 	parentWidget()->move( 5, 310 );
@@ -582,21 +592,6 @@ void MixerView::keyPressEvent(QKeyEvent * e)
 			break;
 	}
 }
-
-
-
-void MixerView::closeEvent( QCloseEvent * _ce )
- {
-	if( parentWidget() )
-	{
-		parentWidget()->hide();
-	}
-	else
-	{
-		hide();
-	}
-	_ce->ignore();
- }
 
 
 

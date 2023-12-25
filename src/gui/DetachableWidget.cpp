@@ -1,8 +1,8 @@
 /*
- * EffectControlDialog.h - base-class for effect-dialogs for displaying and
- *                         editing control port values
+ * DetachableWidget.cpp - Allows a widget to be detached from
+ *                        LMMS's main window
  *
- * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -23,34 +23,32 @@
  *
  */
 
-#ifndef LMMS_GUI_EFFECT_CONTROL_DIALOG_H
-#define LMMS_GUI_EFFECT_CONTROL_DIALOG_H
-
 #include "DetachableWidget.h"
-#include "ModelView.h"
 
-namespace lmms
+#include <QCloseEvent>
+
+#include "GuiApplication.h"
+#include "MainWindow.h"
+
+namespace lmms::gui {
+
+void DetachableWidget::closeEvent(QCloseEvent* ce)
 {
+	if (windowFlags().testFlag(Qt::Window))
+	{
+		ce->accept();
+	}
+	else if (getGUI()->mainWindow()->workspace())
+	{
+		parentWidget()->hide();
+		ce->ignore();
+	}
+	else
+	{
+		hide();
+		ce->ignore();
+	}
+	emit closed();
+}
 
-class EffectControls;
-
-namespace gui
-{
-
-class LMMS_EXPORT EffectControlDialog : public DetachableWidget, public ModelView
-{
-public:
-	EffectControlDialog(EffectControls* controls);
-	~EffectControlDialog() override = default;
-
-	virtual bool isResizable() const { return false; }
-
-protected:
-	EffectControls* m_effectControls;
-};
-
-} // namespace gui
-
-} // namespace lmms
-
-#endif // LMMS_GUI_EFFECT_CONTROL_DIALOG_H
+} // namespace lmms::gui
