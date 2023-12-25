@@ -120,6 +120,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			"app", "disablebackup").toInt()),
 	m_openLastProject(ConfigManager::inst()->value(
 			"app", "openlastproject").toInt()),
+	m_loopMarkerMode{ConfigManager::inst()->value("app", "loopmarkermode", "dual")},
 	m_lang(ConfigManager::inst()->value(
 			"app", "language")),
 	m_saveInterval(	ConfigManager::inst()->value(
@@ -254,6 +255,19 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		m_trackDeletionWarning, SLOT(toggleTrackDeletionWarning(bool)), false);
 	addCheckBox(tr("Show warning when deleting a mixer channel that is in use"), guiGroupBox, guiGroupLayout,
 		m_mixerChannelDeletionWarning,	SLOT(toggleMixerChannelDeletionWarning(bool)), false);
+
+	m_loopMarkerComboBox = new QComboBox{guiGroupBox};
+
+	m_loopMarkerComboBox->addItem(tr("Dual-button"), "dual");
+	m_loopMarkerComboBox->addItem(tr("Grab closest"), "closest");
+	m_loopMarkerComboBox->addItem(tr("Handles"), "handles");
+
+	m_loopMarkerComboBox->setCurrentIndex(m_loopMarkerComboBox->findData(m_loopMarkerMode));
+	connect(m_loopMarkerComboBox, qOverload<int>(&QComboBox::currentIndexChanged),
+		this, &SetupDialog::loopMarkerModeChanged);
+
+	guiGroupLayout->addWidget(new QLabel{tr("Loop edit mode"), guiGroupBox});
+	guiGroupLayout->addWidget(m_loopMarkerComboBox);
 
 	generalControlsLayout->addWidget(guiGroupBox);
 
@@ -922,6 +936,7 @@ void SetupDialog::accept()
 					QString::number(!m_disableBackup));
 	ConfigManager::inst()->setValue("app", "openlastproject",
 					QString::number(m_openLastProject));
+	ConfigManager::inst()->setValue("app", "loopmarkermode", m_loopMarkerMode);
 	ConfigManager::inst()->setValue("app", "language", m_lang);
 	ConfigManager::inst()->setValue("ui", "saveinterval",
 					QString::number(m_saveInterval));
@@ -1058,6 +1073,12 @@ void SetupDialog::toggleDisableBackup(bool enabled)
 void SetupDialog::toggleOpenLastProject(bool enabled)
 {
 	m_openLastProject = enabled;
+}
+
+
+void SetupDialog::loopMarkerModeChanged()
+{
+	m_loopMarkerMode = m_loopMarkerComboBox->currentData().toString();
 }
 
 

@@ -704,23 +704,32 @@ lmms--gui--TimeLineWidget {
 	/* Properties for the loop indicator rectangle in inactive state:
 	    - LoopColor: Color of the outermost border
 	    - LoopBrush: Brush to paint the main portion of the rectangle
-	    - LoopInnerColor: Color used to paint the inlayed border */
+	    - LoopInnerColor: Color used to paint the inlayed border
+	    - LoopHandleColor: Color used to paint loop marker handles */
 	qproperty-inactiveLoopColor: #3B424A;
 	qproperty-inactiveLoopBrush: #3B424A;
 	qproperty-inactiveLoopInnerColor: #3B424A;
+	qproperty-inactiveLoopHandleColor: rgba( 192, 192, 192, 100 );
 
 	/* Properties for the loop indicator rectangle in active state.
 	   See above for detailed description. */
 	qproperty-activeLoopColor: #21A14F;
 	qproperty-activeLoopBrush: #21A14F;
 	qproperty-activeLoopInnerColor: #21A14F;
+	qproperty-activeLoopHandleColor: rgba( 192, 192, 192, 200 );
 
 	/* Vertical padding for the loop indicator rectangle.
 	   A value of zero draws the rectangle at the full height of the widget. */
 	qproperty-loopRectangleVerticalPadding: 1;
+	/* Width of loop marker handles (when handle mode is active) */
+	qproperty-loopHandleWidth: 8;
 
 	qproperty-barLineColor: rgb( 192, 192, 192 );
 	qproperty-barNumberColor: rgb( 192, 192, 192 );
+
+	/* Cursor hotspots for loop marker adjustment */
+	qproperty-mouseHotspotSelLeft: 0px 16px;
+	qproperty-mouseHotspotSelRight: 32px 16px;
 }
 
 lmms--gui--TrackContainerView QLabel
