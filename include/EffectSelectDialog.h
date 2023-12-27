@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef EFFECT_SELECT_DIALOG_H
-#define EFFECT_SELECT_DIALOG_H
+#ifndef LMMS_GUI_EFFECT_SELECT_DIALOG_H
+#define LMMS_GUI_EFFECT_SELECT_DIALOG_H
 
 #include <QDialog>
 #include <QSortFilterProxyModel>
@@ -70,5 +70,4 @@ private:
 
 } // namespace lmms::gui
 
-
-#endif
+#endif // LMMS_GUI_EFFECT_SELECT_DIALOG_H

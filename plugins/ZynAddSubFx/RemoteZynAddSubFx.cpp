@@ -22,17 +22,19 @@
  *
  */
 
+#include "RemoteZynAddSubFx.h"
+
 #include <lmmsconfig.h>
 #ifdef LMMS_BUILD_WIN32
 #include <winsock2.h>
 #endif
 
 #include <queue>
+#include "ThreadShims.h"
 
 #undef CursorShape // is, by mistake, not undefed in FL
 
 #include "RemotePluginClient.h"
-#include "RemoteZynAddSubFx.h"
 #include "LocalZynAddSubFx.h"
 
 #include "zynaddsubfx/src/Nio/Nio.h"
@@ -60,12 +62,12 @@ public:
 		sendMessage( IdInitDone );
 		waitForMessage( IdInitDone );
 
-		pthread_mutex_init( &m_guiMutex, nullptr );
-		pthread_create( &m_messageThreadHandle, nullptr, messageLoop, this );
+		m_messageThread = std::thread{&RemoteZynAddSubFx::messageLoop, this};
 	}
 
 	~RemoteZynAddSubFx() override
 	{
+		m_messageThread.join();
 		Nio::stop();
 	}
 
@@ -84,9 +86,8 @@ public:
 		message m;
 		while( ( m = receiveMessage() ).id != IdQuit )
 		{
-			pthread_mutex_lock( &m_master->mutex );
+			const auto lock = std::lock_guard{m_master->mutex};
 			processMessage( m );
-			pthread_mutex_unlock( &m_master->mutex );
 		}
 		m_guiExit = true;
 	}
@@ -102,9 +103,10 @@ public:
 			case IdHideUI:
 			case IdLoadSettingsFromFile:
 			case IdLoadPresetFile:
-				pthread_mutex_lock( &m_guiMutex );
-				m_guiMessages.push( _m );
-				pthread_mutex_unlock( &m_guiMutex );
+				{
+					const auto lock = std::lock_guard{m_guiMutex};
+					m_guiMessages.push( _m );
+				}
 				break;
 
 			case IdSaveSettingsToFile:
@@ -144,22 +146,13 @@ public:
 		LocalZynAddSubFx::processAudio( _out );
 	}
 
-	static void * messageLoop( void * _arg )
-	{
-		auto _this = static_cast<RemoteZynAddSubFx*>(_arg);
-
-		_this->messageLoop();
-
-		return nullptr;
-	}
-
 	void guiLoop();
 
 private:
 	const int m_guiSleepTime;
 
-	pthread_t m_messageThreadHandle;
-	pthread_mutex_t m_guiMutex;
+	std::thread m_messageThread;
+	std::mutex m_guiMutex;
 	std::queue<RemotePluginClient::message> m_guiMessages;
 	bool m_guiExit;
 
@@ -189,12 +182,11 @@ void RemoteZynAddSubFx::guiLoop()
 		}
 		if( exitProgram == 1 )
 		{
-			pthread_mutex_lock( &m_master->mutex );
+			const auto lock = std::lock_guard{m_master->mutex};
 			sendMessage( IdHideUI );
 			exitProgram = 0;
-			pthread_mutex_unlock( &m_master->mutex );
 		}
-		pthread_mutex_lock( &m_guiMutex );
+		const auto lock = std::lock_guard{m_guiMutex};
 		while( m_guiMessages.size() )
 		{
 			RemotePluginClient::message m = m_guiMessages.front();
@@ -219,9 +211,8 @@ void RemoteZynAddSubFx::guiLoop()
 					{
 						ui->refresh_master_ui();
 					}
-					pthread_mutex_lock( &m_master->mutex );
+					const auto lock = std::lock_guard{m_master->mutex};
 					sendMessage( IdLoadSettingsFromFile );
-					pthread_mutex_unlock( &m_master->mutex );
 					break;
 				}
 
@@ -235,9 +226,8 @@ void RemoteZynAddSubFx::guiLoop()
 						ui->updatepanel();
 						ui->refresh_master_ui();
 					}
-					pthread_mutex_lock( &m_master->mutex );
+					const auto lock = std::lock_guard{m_master->mutex};
 					sendMessage( IdLoadPresetFile );
-					pthread_mutex_unlock( &m_master->mutex );
 					break;
 				}
 
@@ -245,7 +235,6 @@ void RemoteZynAddSubFx::guiLoop()
 					break;
 			}
 		}
-		pthread_mutex_unlock( &m_guiMutex );
 	}
 	Fl::flush();
 
@@ -271,15 +260,6 @@ int main( int _argc, char * * _argv )
 	const auto pollParentThread = PollParentThread{};
 #endif
 
-#ifdef LMMS_BUILD_WIN32
-#ifndef __WINPTHREADS_VERSION
-	// (non-portable) initialization of statically linked pthread library
-	pthread_win32_process_attach_np();
-	pthread_win32_thread_attach_np();
-#endif
-#endif // LMMS_BUILD_WIN32
-
-
 #ifdef SYNC_WITH_SHM_FIFO
 	RemoteZynAddSubFx * remoteZASF =
 		new RemoteZynAddSubFx( _argv[1], _argv[2] );
@@ -290,14 +270,6 @@ int main( int _argc, char * * _argv )
 	remoteZASF->guiLoop();
 
 	delete remoteZASF;
-
-
-#ifdef LMMS_BUILD_WIN32
-#ifndef __WINPTHREADS_VERSION
-	pthread_win32_thread_detach_np();
-	pthread_win32_process_detach_np();
-#endif
-#endif // LMMS_BUILD_WIN32
 
 	return 0;
 }

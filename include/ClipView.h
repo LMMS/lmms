@@ -22,9 +22,10 @@
  *
  */
 
-#ifndef TRACK_CONTENT_OBJECT_VIEW_H
-#define TRACK_CONTENT_OBJECT_VIEW_H
+#ifndef LMMS_GUI_CLIP_VIEW_H
+#define LMMS_GUI_CLIP_VIEW_H
 
+#include <optional>
 
 #include <QVector>
 
@@ -140,7 +141,7 @@ public slots:
 	void resetColor();
 
 protected:
-	enum ContextMenuAction
+	enum class ContextMenuAction
 	{
 		Remove,
 		Cut,
@@ -184,6 +185,7 @@ protected:
 
 	virtual void paintTextLabel(QString const & text, QPainter & painter);
 
+	auto hasCustomColor() const -> bool;
 
 protected slots:
 	void updateLength();
@@ -191,9 +193,9 @@ protected slots:
 
 
 private:
-	enum Actions
+	enum class Action
 	{
-		NoAction,
+		None,
 		Move,
 		MoveSelection,
 		Resize,
@@ -206,7 +208,7 @@ private:
 	static TextFloat * s_textFloat;
 
 	Clip * m_clip;
-	Actions m_action;
+	Action m_action;
 	QPoint m_initialMousePos;
 	QPoint m_initialMouseGlobalPos;
 	QVector<TimePos> m_initialOffsets;
@@ -241,7 +243,7 @@ private:
 	bool mouseMovedDistance( QMouseEvent * me, int distance );
 	TimePos draggedClipPos( QMouseEvent * me );
 	int knifeMarkerPos( QMouseEvent * me );
-	void setColor(const QColor* color);
+	void setColor(const std::optional<QColor>& color);
 	//! Return true iff the clip could be split. Currently only implemented for samples
 	virtual bool splitClip( const TimePos pos ){ return false; };
 	void updateCursor(QMouseEvent * me);
@@ -252,4 +254,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_CLIP_VIEW_H

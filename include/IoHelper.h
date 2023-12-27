@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef IO_HELPER_H
-#define IO_HELPER_H
+#ifndef LMMS_IO_HELPER_H
+#define LMMS_IO_HELPER_H
 
 #include "lmmsconfig.h"
 
@@ -47,7 +47,7 @@ namespace lmms
 
 #ifdef _WIN32
 
-std::wstring toWString(const std::string& s)
+inline std::wstring toWString(const std::string& s)
 {
 	std::wstring ret;
 	int len = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, s.data(),
@@ -64,7 +64,7 @@ std::wstring toWString(const std::string& s)
 #endif
 
 
-FILE* F_OPEN_UTF8(std::string const& fname, const char* mode){
+inline FILE* F_OPEN_UTF8(std::string const& fname, const char* mode){
 #ifdef LMMS_BUILD_WIN32
 	return _wfopen(toWString(fname).data(), toWString(mode).data());
 #else
@@ -73,7 +73,7 @@ FILE* F_OPEN_UTF8(std::string const& fname, const char* mode){
 }
 
 
-int fileToDescriptor(FILE* f, bool closeFile = true)
+inline int fileToDescriptor(FILE* f, bool closeFile = true)
 {
 	int fh;
 	if (f == nullptr) {return -1;}
@@ -91,4 +91,4 @@ int fileToDescriptor(FILE* f, bool closeFile = true)
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_IO_HELPER_H

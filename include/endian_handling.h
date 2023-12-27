@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef ENDIAN_HANDLING_H
-#define ENDIAN_HANDLING_H
+#ifndef LMMS_ENDIAN_HANDLING_H
+#define LMMS_ENDIAN_HANDLING_H
 
 #include <QSysInfo>
 
@@ -57,4 +57,4 @@ inline int32_t swap32IfBE( int32_t i )
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_ENDIAN_HANDLING_H

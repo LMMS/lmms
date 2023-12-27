@@ -23,10 +23,10 @@
  *
  */
 
+#ifndef LMMS_GUI_CPU_LOAD_WIDGET_H
+#define LMMS_GUI_CPU_LOAD_WIDGET_H
 
-#ifndef CPULOAD_WIDGET_H
-#define CPULOAD_WIDGET_H
-
+#include <algorithm>
 #include <QTimer>
 #include <QPixmap>
 #include <QWidget>
@@ -41,6 +41,7 @@ namespace lmms::gui
 class CPULoadWidget : public QWidget
 {
 	Q_OBJECT
+	Q_PROPERTY(int stepSize MEMBER m_stepSize)
 public:
 	CPULoadWidget( QWidget * _parent );
 	~CPULoadWidget() override = default;
@@ -55,6 +56,8 @@ protected slots:
 
 
 private:
+	int stepSize() const { return std::max(1, m_stepSize); }
+
 	int m_currentLoad;
 
 	QPixmap m_temp;
@@ -65,9 +68,11 @@ private:
 
 	QTimer m_updateTimer;
 
+	int m_stepSize = 1;
+
 } ;
 
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_CPU_LOAD_WIDGET_H

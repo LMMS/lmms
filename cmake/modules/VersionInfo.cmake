@@ -3,6 +3,13 @@ IF(GIT_FOUND AND NOT FORCE_VERSION)
 	SET(MAJOR_VERSION 0)
 	SET(MINOR_VERSION 0)
 	SET(PATCH_VERSION 0)
+
+	# If this is a GitHub Actions pull request build, get the pull request
+	# number from the environment and add it to the build metadata
+	if("$ENV{GITHUB_REF}" MATCHES "refs/pull/([0-9]+)/merge")
+		list(APPEND BUILD_METADATA "pr${CMAKE_MATCH_1}")
+	endif()
+
 	# Look for git tag information (e.g. Tagged: "v1.0.0", Untagged: "v1.0.0-123-a1b2c3d")
 	# Untagged format: [latest tag]-[number of commits]-[latest commit hash]
 	EXECUTE_PROCESS(
@@ -30,28 +37,43 @@ IF(GIT_FOUND AND NOT FORCE_VERSION)
 	ENDIF()
 	# 1 dash total: Dash in latest tag, no additional commits => pre-release
 	IF(TAG_LIST_LENGTH EQUAL 2)
+		# Get the pre-release stage
 		LIST(GET TAG_LIST 1 VERSION_STAGE)
-		SET(FORCE_VERSION "${FORCE_VERSION}-${VERSION_STAGE}")
+		list(APPEND PRERELEASE_DATA "${VERSION_STAGE}")
 	# 2 dashes: Assume untagged with no dashes in latest tag name => stable + commits
 	ELSEIF(TAG_LIST_LENGTH EQUAL 3)
 		# Get the number of commits and latest commit hash
 		LIST(GET TAG_LIST 1 EXTRA_COMMITS)
 		LIST(GET TAG_LIST 2 COMMIT_HASH)
-		# Bump the patch version
+		list(APPEND PRERELEASE_DATA "${EXTRA_COMMITS}")
+		list(APPEND BUILD_METADATA "${COMMIT_HASH}")
+		# Bump the patch version, since a pre-release (as specified by the extra
+		# commits) compares lower than the main version alone
 		MATH(EXPR PATCH_VERSION "${PATCH_VERSION}+1")
-		# Set the version to MAJOR.MINOR.PATCH-EXTRA_COMMITS+COMMIT_HASH
-		SET(FORCE_VERSION "${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}")
-		SET(FORCE_VERSION "${FORCE_VERSION}-${EXTRA_COMMITS}+${COMMIT_HASH}")
+		# Reassemble the main version using the new patch version
+		set(FORCE_VERSION "${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}")
 	# 3 dashes: Assume untagged with 1 dash in latest tag name => pre-release + commits
 	ELSEIF(TAG_LIST_LENGTH EQUAL 4)
-		# Get pre-release stage, number of commits, and latest commit hash
+		# Get the pre-release stage, number of commits, and latest commit hash
 		LIST(GET TAG_LIST 1 VERSION_STAGE)
 		LIST(GET TAG_LIST 2 EXTRA_COMMITS)
 		LIST(GET TAG_LIST 3 COMMIT_HASH)
-		# Set the version to MAJOR.MINOR.PATCH-VERSION_STAGE.EXTRA_COMMITS+COMMIT_HASH
-		SET(FORCE_VERSION "${FORCE_VERSION}-${VERSION_STAGE}")
-		SET(FORCE_VERSION "${FORCE_VERSION}.${EXTRA_COMMITS}+${COMMIT_HASH}")
+		list(APPEND PRERELEASE_DATA "${VERSION_STAGE}")
+		list(APPEND PRERELEASE_DATA "${EXTRA_COMMITS}")
+		list(APPEND BUILD_METADATA "${COMMIT_HASH}")
 	ENDIF()
+
+	# If there is any pre-release data, append it after a hyphen
+	if(PRERELEASE_DATA)
+		string(REPLACE ";" "." PRERELEASE_DATA "${PRERELEASE_DATA}")
+		set(FORCE_VERSION "${FORCE_VERSION}-${PRERELEASE_DATA}")
+	endif()
+
+	# If there is any build metadata, append it after a plus
+	if(BUILD_METADATA)
+		string(REPLACE ";" "." BUILD_METADATA "${BUILD_METADATA}")
+		set(FORCE_VERSION "${FORCE_VERSION}+${BUILD_METADATA}")
+	endif()
 ENDIF()
 
 IF(FORCE_VERSION STREQUAL "internal")

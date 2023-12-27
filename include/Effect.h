@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef EFFECT_H
-#define EFFECT_H
+#ifndef LMMS_EFFECT_H
+#define LMMS_EFFECT_H
 
 #include "Plugin.h"
 #include "Engine.h"
@@ -157,6 +157,11 @@ public:
 	{
 		m_noRun = _state;
 	}
+	
+	inline TempoSyncKnobModel* autoQuitModel()
+	{
+		return &m_autoQuitModel;
+	}
 
 	EffectChain * effectChain() const
 	{
@@ -241,4 +246,4 @@ using EffectKeyList = Effect::Descriptor::SubPluginFeatures::KeyList;
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_EFFECT_H

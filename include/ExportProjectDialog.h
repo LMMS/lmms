@@ -23,9 +23,8 @@
  *
  */
 
-
-#ifndef EXPORT_PROJECT_DIALOG_H
-#define EXPORT_PROJECT_DIALOG_H
+#ifndef LMMS_GUI_EXPORT_PROJECT_DIALOG_H
+#define LMMS_GUI_EXPORT_PROJECT_DIALOG_H
 
 #include <QDialog>
 #include <memory>
@@ -63,12 +62,11 @@ private:
 	QString m_fileExtension;
 	bool m_multiExport;
 
-	ProjectRenderer::ExportFileFormats m_ft;
+	ProjectRenderer::ExportFileFormat m_ft;
 	std::unique_ptr<RenderManager> m_renderManager;
 } ;
 
 
 } // namespace lmms::gui
 
-
-#endif
+#endif // LMMS_GUI_EXPORT_PROJECT_DIALOG_H

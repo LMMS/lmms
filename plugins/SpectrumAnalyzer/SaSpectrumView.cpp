@@ -648,8 +648,8 @@ std::vector<std::pair<int, std::string>> SaSpectrumView::makeLogFreqTics(int low
 {
 	std::vector<std::pair<int, std::string>> result;
 	int i, j;
-	int a[] = {10, 20, 50};		// sparse series multipliers
-	int b[] = {14, 30, 70};		// additional (denser) series
+	auto a = std::array{10, 20, 50};		// sparse series multipliers
+	auto b = std::array{14, 30, 70};		// additional (denser) series
 
 	// generate main steps (powers of 10); use the series to specify smaller steps
 	for (i = 1; i <= high; i *= 10)

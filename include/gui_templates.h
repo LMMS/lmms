@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef GUI_TEMPLATES_H
-#define GUI_TEMPLATES_H
+#ifndef LMMS_GUI_TEMPLATES_H
+#define LMMS_GUI_TEMPLATES_H
 
 #include "lmmsconfig.h"
 
@@ -69,4 +68,4 @@ inline QFont pointSizeF( QFont _f, float SIZE )
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_TEMPLATES_H

@@ -21,7 +21,7 @@ jobs:
         run: tests/scripted/check-namespace
   shellcheck:
     runs-on: ubuntu-latest
-    container: koalaman/shellcheck-alpine:v0.4.6
+    container: koalaman/shellcheck-alpine:v0.9.0
     steps:
       - name: Check out
         uses: actions/checkout@v3

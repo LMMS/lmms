@@ -3,8 +3,15 @@ IF(LMMS_BUILD_LINUX AND WANT_VST)
 	add_subdirectory(qt5-x11embed)
 ENDIF()
 
+ADD_SUBDIRECTORY(hiir)
 ADD_SUBDIRECTORY(rpmalloc)
 ADD_SUBDIRECTORY(weakjack)
+
+if(MINGW)
+	option(MINGW_STDTHREADS_GENERATE_STDHEADERS "" ON)
+	add_subdirectory(mingw-std-threads)
+	set(LMMS_USE_MINGW_STD_THREADS ON PARENT_SCOPE)
+endif()
 
 # The lockless ring buffer library is compiled as part of the core
 SET(RINGBUFFER_DIR "${CMAKE_SOURCE_DIR}/src/3rdparty/ringbuffer/")

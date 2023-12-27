@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_OSS_H
-#define AUDIO_OSS_H
+#ifndef LMMS_AUDIO_OSS_H
+#define LMMS_AUDIO_OSS_H
 
 #include "lmmsconfig.h"
 
@@ -92,4 +92,4 @@ private:
 
 #endif // LMMS_HAVE_OSS
 
-#endif
+#endif // LMMS_AUDIO_OSS_H

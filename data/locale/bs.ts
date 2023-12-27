@@ -3677,7 +3677,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>InstrumentMiscView</name>
+    <name>InstrumentTuningView</name>
     <message>
         <location filename="src/gui/instrument/InstrumentMidiIOView.cpp" line="213"/>
         <source>MASTER PITCH</source>

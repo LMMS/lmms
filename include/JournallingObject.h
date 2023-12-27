@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef JOURNALLING_OBJECT_H
-#define JOURNALLING_OBJECT_H
+#ifndef LMMS_JOURNALLING_OBJECT_H
+#define LMMS_JOURNALLING_OBJECT_H
 
 #include <QStack>
 
@@ -103,5 +103,4 @@ private:
 
 } // namespace lmms
 
-#endif
-
+#endif // LMMS_JOURNALLING_OBJECT_H

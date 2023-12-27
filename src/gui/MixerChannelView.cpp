@@ -60,7 +60,7 @@ namespace lmms::gui
         m_sendButton = new SendButtonIndicator{this, this, mixerView};
         retainSizeWhenHidden(m_sendButton);
 
-        m_sendKnob = new Knob{knobBright_26, this, tr("Channel send amount")};
+        m_sendKnob = new Knob{KnobType::Bright26, this, tr("Channel send amount")};
         retainSizeWhenHidden(m_sendKnob);
 
         m_channelNumberLcd = new LcdWidget{2, this};
@@ -188,9 +188,9 @@ namespace lmms::gui
         const auto height = rect().height();
         auto painter = QPainter{this};
 
-        if (channel->m_hasColor && !muted)
+        if (channel->color().has_value() && !muted)
         {
-            painter.fillRect(rect(), channel->m_color.darker(isActive ? 120 : 150));
+            painter.fillRect(rect(), channel->color()->darker(isActive ? 120 : 150));
         }
         else
         {
@@ -377,18 +377,19 @@ namespace lmms::gui
 
     void MixerChannelView::resetColor()
     {
-        Engine::mixer()->mixerChannel(m_channelIndex)->m_hasColor = false;
+        Engine::mixer()->mixerChannel(m_channelIndex)->setColor(std::nullopt);
         Engine::getSong()->setModified();
         update();
     }
 
     void MixerChannelView::selectColor()
     {
-        auto channel = Engine::mixer()->mixerChannel(m_channelIndex);
-        auto new_color = ColorChooser(this).withPalette(ColorChooser::Palette::Mixer)->getColor(channel->m_color);
-
-        if (!new_color.isValid()) { return; }
-        channel->setColor(new_color);
+        const auto channel = Engine::mixer()->mixerChannel(m_channelIndex);
+	    const auto newColor = ColorChooser{this}
+		    .withPalette(ColorChooser::Palette::Mixer)
+		    ->getColor(channel->color().value_or(backgroundActive().color()));
+	    if (!newColor.isValid()) { return; }
+	    channel->setColor(newColor);
 
         Engine::getSong()->setModified();
         update();

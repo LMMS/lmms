@@ -48,22 +48,22 @@ StereoMatrixControlDialog::StereoMatrixControlDialog(
 				PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
 
-	auto llKnob = new Knob(knobBright_26, this);
+	auto llKnob = new Knob(KnobType::Bright26, this);
 	llKnob->setModel( &_controls->m_llModel );
 	llKnob->setHintText( tr( "Left to Left Vol:" ) , "" );
 	llKnob->move( 10, 79 );
 
-	auto lrKnob = new Knob(knobBright_26, this);
+	auto lrKnob = new Knob(KnobType::Bright26, this);
 	lrKnob->setModel( &_controls->m_lrModel );
 	lrKnob->setHintText( tr( "Left to Right Vol:" ) , "" );
 	lrKnob->move( 48, 79 );
 
-	auto rlKnob = new Knob(knobBright_26, this);
+	auto rlKnob = new Knob(KnobType::Bright26, this);
 	rlKnob->setModel( &_controls->m_rlModel );
 	rlKnob->setHintText( tr( "Right to Left Vol:" ) , "" );
 	rlKnob->move( 85, 79 );
 
-	auto rrKnob = new Knob(knobBright_26, this);
+	auto rrKnob = new Knob(KnobType::Bright26, this);
 	rrKnob->setModel( &_controls->m_rrModel );
 	rrKnob->setHintText( tr( "Right to Right Vol:" ) , "" );
 	rrKnob->move( 123, 79 );

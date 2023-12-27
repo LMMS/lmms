@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef PROJECT_JOURNAL_H
-#define PROJECT_JOURNAL_H
+#ifndef LMMS_PROJECT_JOURNAL_H
+#define LMMS_PROJECT_JOURNAL_H
 
 #include <QHash>
 #include <QStack>
@@ -104,7 +104,7 @@ private:
 
 	struct CheckPoint
 	{
-		CheckPoint( jo_id_t initID = 0, const DataFile& initData = DataFile( DataFile::JournalData ) ) :
+		CheckPoint( jo_id_t initID = 0, const DataFile& initData = DataFile( DataFile::Type::JournalData ) ) :
 			joID( initID ),
 			data( initData )
 		{
@@ -126,5 +126,4 @@ private:
 
 } // namespace lmms
 
-#endif
-
+#endif // LMMS_PROJECT_JOURNAL_H

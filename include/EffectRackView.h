@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef EFFECT_RACK_VIEW_H
-#define EFFECT_RACK_VIEW_H
+#ifndef LMMS_GUI_EFFECT_RACK_VIEW_H
+#define LMMS_GUI_EFFECT_RACK_VIEW_H
 
 #include <QWidget>
 
@@ -88,4 +88,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_EFFECT_RACK_VIEW_H

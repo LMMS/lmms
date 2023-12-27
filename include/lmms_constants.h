@@ -62,13 +62,13 @@ constexpr unsigned int MaxKeymapCount = 10; //!< number of keyboard mappings per
 constexpr int LOWEST_LOG_FREQ = 5;
 
 // Full range is defined by LOWEST_LOG_FREQ and current sample rate.
-enum FREQUENCY_RANGES
+enum class FrequencyRange
 {
-	FRANGE_FULL = 0,
-	FRANGE_AUDIBLE,
-	FRANGE_BASS,
-	FRANGE_MIDS,
-	FRANGE_HIGH
+	Full = 0,
+	Audible,
+	Bass,
+	Mids,
+	High
 };
 
 constexpr int FRANGE_AUDIBLE_START = 20;
@@ -83,12 +83,12 @@ constexpr int FRANGE_HIGH_END = 20000;
 // Amplitude ranges (in dBFS).
 // Reference: full scale sine wave (-1.0 to 1.0) is 0 dB.
 // Doubling or halving the amplitude produces 3 dB difference.
-enum AMPLITUDE_RANGES
+enum class AmplitudeRange
 {
-	ARANGE_EXTENDED = 0,
-	ARANGE_AUDIBLE,
-	ARANGE_LOUD,
-	ARANGE_SILENT
+	Extended = 0,
+	Audible,
+	Loud,
+	Silent
 };
 
 constexpr int ARANGE_EXTENDED_START = -80;
@@ -103,4 +103,4 @@ constexpr int ARANGE_SILENT_END = -10;
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_CONSTANTS_H

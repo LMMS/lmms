@@ -22,12 +22,12 @@
  *
  */
 
-
-#ifndef SAMPLE_RECORD_HANDLE_H
-#define SAMPLE_RECORD_HANDLE_H
+#ifndef LMMS_SAMPLE_RECORD_HANDLE_H
+#define LMMS_SAMPLE_RECORD_HANDLE_H
 
 #include <QList>
 #include <QPair>
+#include <memory>
 
 #include "PlayHandle.h"
 #include "TimePos.h"
@@ -54,7 +54,7 @@ public:
 	bool isFromTrack( const Track * _track ) const override;
 
 	f_cnt_t framesRecorded() const;
-	void createSampleBuffer( SampleBuffer * * _sample_buf );
+	std::shared_ptr<const SampleBuffer> createSampleBuffer();
 
 
 private:
@@ -75,4 +75,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_SAMPLE_RECORD_HANDLE_H

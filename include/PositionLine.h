@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef POSITION_LINE_H
-#define POSITION_LINE_H
+#ifndef LMMS_GUI_POSITION_LINE_H
+#define LMMS_GUI_POSITION_LINE_H
 
 #include <QWidget>
 
@@ -51,4 +51,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_POSITION_LINE_H

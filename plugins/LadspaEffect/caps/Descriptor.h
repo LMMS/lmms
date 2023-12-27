@@ -53,7 +53,7 @@ class DescriptorStub
 				PortCount = 0;
 			}
 
-		~DescriptorStub()
+		virtual ~DescriptorStub()
 			{
 				if (PortCount)
 				{
@@ -87,6 +87,7 @@ class Descriptor
 
 	public:
 		Descriptor() { setup(); }
+		~Descriptor() override = default;
 		void setup();
 
 		void autogen() 

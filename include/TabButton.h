@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef TAB_BUTTON_H
-#define TAB_BUTTON_H
+#ifndef LMMS_GUI_TAB_BUTTON_H
+#define LMMS_GUI_TAB_BUTTON_H
 
 #include <QPushButton>
 
@@ -67,4 +66,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_TAB_BUTTON_H

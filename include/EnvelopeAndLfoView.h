@@ -23,12 +23,13 @@
  *
  */
 
-#ifndef ENVELOPE_AND_LFO_VIEW_H
-#define ENVELOPE_AND_LFO_VIEW_H
+#ifndef LMMS_GUI_ENVELOPE_AND_LFO_VIEW_H
+#define LMMS_GUI_ENVELOPE_AND_LFO_VIEW_H
 
 #include <QWidget>
 
 #include "ModelView.h"
+#include "embed.h"
 
 class QPaintEvent;
 class QPixmap;
@@ -71,8 +72,8 @@ protected slots:
 
 
 private:
-	static QPixmap * s_envGraph;
-	static QPixmap * s_lfoGraph;
+	QPixmap m_envGraph = embed::getIconPixmap("envelope_graph");
+	QPixmap m_lfoGraph = embed::getIconPixmap("lfo_graph");
 
 	EnvelopeAndLfoParameters * m_params;
 
@@ -104,4 +105,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_ENVELOPE_AND_LFO_VIEW_H

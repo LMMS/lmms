@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef QUADRATURELFO_H
-#define QUADRATURELFO_H
+#ifndef LMMS_QUADRATURE_LFO_H
+#define LMMS_QUADRATURE_LFO_H
 
 #include "lmms_math.h"
 
@@ -100,4 +100,4 @@ private:
 
 } // namespace lmms
 
-#endif // QUADRATURELFO_H
+#endif // LMMS_QUADRATURE_LFO_H

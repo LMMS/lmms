@@ -22,9 +22,8 @@
  *
  */
 
-#ifndef SAMPLE_TRACK_H
-#define SAMPLE_TRACK_H
-
+#ifndef LMMS_SAMPLE_TRACK_H
+#define LMMS_SAMPLE_TRACK_H
 
 #include "AudioPort.h"
 #include "Track.h"
@@ -110,4 +109,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_SAMPLE_TRACK_H

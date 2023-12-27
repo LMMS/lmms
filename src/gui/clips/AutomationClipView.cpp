@@ -44,8 +44,6 @@
 namespace lmms::gui
 {
 
-QPixmap * AutomationClipView::s_clip_rec = nullptr;
-
 AutomationClipView::AutomationClipView( AutomationClip * _clip,
 						TrackView * _parent ) :
 	ClipView( _clip, _parent ),
@@ -61,10 +59,6 @@ AutomationClipView::AutomationClipView( AutomationClip * _clip,
 
 	setToolTip(m_clip->name());
 	setStyle( QApplication::style() );
-
-	if( s_clip_rec == nullptr ) { s_clip_rec = new QPixmap( embed::getIconPixmap(
-							"clip_rec" ) ); }
-
 	update();
 }
 
@@ -191,10 +185,10 @@ void AutomationClipView::constructContextMenu( QMenu * _cm )
 	_cm->addAction( embed::getIconPixmap( "flip_x" ),
 						tr( "Flip Horizontally (Visible)" ),
 						this, SLOT(flipX()));
-	if( !m_clip->m_objects.isEmpty() )
+	if (!m_clip->m_objects.empty())
 	{
 		_cm->addSeparator();
-		auto m = new QMenu(tr("%1 Connections").arg(m_clip->m_objects.count()), _cm);
+		auto m = new QMenu(tr("%1 Connections").arg(m_clip->m_objects.size()), _cm);
 		for (const auto& object : m_clip->m_objects)
 		{
 			if (object)
@@ -321,7 +315,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 		// the value of the end of the shape between the two nodes will be the inValue of
 		// the next node.
 		float nextValue;
-		if( m_clip->progressionType() == AutomationClip::DiscreteProgression )
+		if( m_clip->progressionType() == AutomationClip::ProgressionType::Discrete )
 		{
 			nextValue = OUTVAL(it);
 		}
@@ -379,7 +373,8 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 	// recording icon for when recording automation
 	if( m_clip->isRecording() )
 	{
-		p.drawPixmap( 1, rect().bottom() - s_clip_rec->height(), *s_clip_rec );
+		static auto s_clipRec = embed::getIconPixmap("clip_rec");
+		p.drawPixmap(1, rect().bottom() - s_clipRec.height(), s_clipRec);
 	}
 
 	// clip name

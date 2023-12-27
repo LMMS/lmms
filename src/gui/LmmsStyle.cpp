@@ -23,6 +23,7 @@
  *
  */
 
+#include <array>
 
 #include <QFile>
 #include <QApplication>
@@ -71,7 +72,7 @@ QLinearGradient getGradient( const QColor & _col, const QRectF & _rect )
 QLinearGradient darken( const QLinearGradient & _gradient )
 {
 	QGradientStops stops = _gradient.stops();
-	for (auto& stop : stops) 
+	for (auto& stop : stops)
 	{
 		QColor color = stop.second;
 		stop.second = color.lighter(133);
@@ -188,7 +189,7 @@ void LmmsStyle::drawComplexControl( ComplexControl control,
 /*	else if( control == CC_ScrollBar )
 	{
 		painter->fillRect( option->rect, QApplication::palette().color( QPalette::Active,
-							QPalette::Background ) );
+							QPalette::Window ) );
 
 	}*/
 	QProxyStyle::drawComplexControl( control, option, painter, widget );
@@ -216,8 +217,8 @@ void LmmsStyle::drawPrimitive( PrimitiveElement element,
 		int a50 = static_cast<int>( a100 * .6 );
 		int a25 = static_cast<int>( a100 * .33 );
 
-		QLine lines[4];
-		QPoint points[4];
+		auto lines = std::array<QLine, 4>{};
+		auto points = std::array<QPoint, 4>{};
 
 		// black inside lines
 		// 50%
@@ -231,7 +232,7 @@ void LmmsStyle::drawPrimitive( PrimitiveElement element,
 					rect.left() + 1, rect.bottom() - 2);
 		lines[3] = QLine(rect.right() - 1, rect.top() + 2,
 					rect.right() - 1, rect.bottom() - 2);
-		painter->drawLines(lines, 4);
+		painter->drawLines(lines.data(), 4);
 
 		// black inside dots
 		black.setAlpha(a50);
@@ -240,7 +241,7 @@ void LmmsStyle::drawPrimitive( PrimitiveElement element,
 		points[1] = QPoint(rect.left() + 2, rect.bottom() - 2);
 		points[2] = QPoint(rect.right() - 2, rect.top() + 2);
 		points[3] = QPoint(rect.right() - 2, rect.bottom() - 2);
-		painter->drawPoints(points, 4);
+		painter->drawPoints(points.data(), 4);
 
 
 		// outside lines - shadow
@@ -251,7 +252,7 @@ void LmmsStyle::drawPrimitive( PrimitiveElement element,
 						rect.right() - 2, rect.top());
 		lines[1] = QLine(rect.left(), rect.top() + 2,
 						rect.left(), rect.bottom() - 2);
-		painter->drawLines(lines, 2);
+		painter->drawLines(lines.data(), 2);
 
 		// outside corner dots - shadow
 		// 75%
@@ -259,7 +260,7 @@ void LmmsStyle::drawPrimitive( PrimitiveElement element,
 		painter->setPen(QPen(shadow, 0));
 		points[0] = QPoint(rect.left() + 1, rect.top() + 1);
 		points[1] = QPoint(rect.right() - 1, rect.top() + 1);
-		painter->drawPoints(points, 2);
+		painter->drawPoints(points.data(), 2);
 
 		// outside end dots - shadow
 		// 50%
@@ -269,7 +270,7 @@ void LmmsStyle::drawPrimitive( PrimitiveElement element,
 		points[1] = QPoint(rect.left(), rect.top() + 1);
 		points[2] = QPoint(rect.right() - 1, rect.top());
 		points[3] = QPoint(rect.left(), rect.bottom() - 1);
-		painter->drawPoints(points, 4);
+		painter->drawPoints(points.data(), 4);
 
 
 		// outside lines - highlight
@@ -280,7 +281,7 @@ void LmmsStyle::drawPrimitive( PrimitiveElement element,
 					rect.right() - 2, rect.bottom());
 		lines[1] = QLine(rect.right(), rect.top() + 2,
 					rect.right(), rect.bottom() - 2);
-		painter->drawLines(lines, 2);
+		painter->drawLines(lines.data(), 2);
 
 		// outside corner dots - highlight
 		// 75%
@@ -288,7 +289,7 @@ void LmmsStyle::drawPrimitive( PrimitiveElement element,
 		painter->setPen(QPen(highlight, 0));
 		points[0] = QPoint(rect.left() + 1, rect.bottom() - 1);
 		points[1] = QPoint(rect.right() - 1, rect.bottom() - 1);
-		painter->drawPoints(points, 2);
+		painter->drawPoints(points.data(), 2);
 
 		// outside end dots - highlight
 		// 50%
@@ -298,7 +299,7 @@ void LmmsStyle::drawPrimitive( PrimitiveElement element,
 		points[1] = QPoint(rect.right(), rect.bottom() - 1);
 		points[2] = QPoint(rect.left() + 1, rect.bottom());
 		points[3] = QPoint(rect.right(), rect.top() + 1);
-		painter->drawPoints(points, 4);
+		painter->drawPoints(points.data(), 4);
 	}
 	else
 	{

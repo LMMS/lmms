@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MIX_HELPERS_H
-#define MIX_HELPERS_H
+#ifndef LMMS_MIX_HELPERS_H
+#define LMMS_MIX_HELPERS_H
 
 #include "lmms_basics.h"
 
@@ -81,5 +81,4 @@ void multiplyAndAddMultipliedJoined( sampleFrame* dst, const sample_t* srcLeft, 
 
 } // namespace lmms
 
-#endif
-
+#endif // LMMS_MIX_HELPERS_H

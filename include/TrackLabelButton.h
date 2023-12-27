@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef TRACK_LABEL_BUTTON_H
-#define TRACK_LABEL_BUTTON_H
+#ifndef LMMS_GUI_TRACK_LABEL_BUTTON_H
+#define LMMS_GUI_TRACK_LABEL_BUTTON_H
 
 #include <QToolButton>
 
@@ -72,4 +71,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_TRACK_LABEL_BUTTON_H

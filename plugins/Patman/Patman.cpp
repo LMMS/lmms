@@ -61,7 +61,7 @@ Plugin::Descriptor PLUGIN_EXPORT patman_plugin_descriptor =
 				"GUS-compatible patch instrument" ),
 	"Javier Serrano Polo <jasp00/at/users.sourceforge.net>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	"pat",
 	nullptr,
@@ -144,7 +144,7 @@ void PatmanInstrument::playNote( NotePlayHandle * _n,
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 
-	if( !_n->m_pluginData )
+	if (!_n->m_pluginData)
 	{
 		selectSample( _n );
 	}
@@ -153,12 +153,10 @@ void PatmanInstrument::playNote( NotePlayHandle * _n,
 	float play_freq = hdata->tuned ? _n->frequency() :
 						hdata->sample->frequency();
 
-	if( hdata->sample->play( _working_buffer + offset, hdata->state, frames,
-					play_freq, m_loopedModel.value() ? SampleBuffer::LoopOn : SampleBuffer::LoopOff ) )
+	if (hdata->sample->play(_working_buffer + offset, hdata->state, frames,
+					play_freq, m_loopedModel.value() ? Sample::Loop::On : Sample::Loop::Off))
 	{
 		applyRelease( _working_buffer, _n );
-		instrumentTrack()->processAudioBuffer( _working_buffer,
-								frames + offset, _n );
 	}
 	else
 	{
@@ -172,7 +170,6 @@ void PatmanInstrument::playNote( NotePlayHandle * _n,
 void PatmanInstrument::deleteNotePluginData( NotePlayHandle * _n )
 {
 	auto hdata = (handle_data*)_n->m_pluginData;
-	sharedObject::unref( hdata->sample );
 	delete hdata->state;
 	delete hdata;
 }
@@ -201,8 +198,8 @@ void PatmanInstrument::setFile( const QString & _patch_file, bool _rename )
 	// named it self
 
 	m_patchFile = PathUtil::toShortestRelative( _patch_file );
-	LoadErrors error = loadPatch( PathUtil::toAbsolute( _patch_file ) );
-	if( error )
+	LoadError error = loadPatch( PathUtil::toAbsolute( _patch_file ) );
+	if( error != LoadError::OK )
 	{
 		printf("Load error\n");
 	}
@@ -213,7 +210,7 @@ void PatmanInstrument::setFile( const QString & _patch_file, bool _rename )
 
 
 
-PatmanInstrument::LoadErrors PatmanInstrument::loadPatch(
+PatmanInstrument::LoadError PatmanInstrument::loadPatch(
 						const QString & _filename )
 {
 	unloadCurrentPatch();
@@ -222,29 +219,29 @@ PatmanInstrument::LoadErrors PatmanInstrument::loadPatch(
 	if( !fd )
 	{
 		perror( "fopen" );
-		return( LoadOpen );
+		return( LoadError::Open );
 	}
 
-	unsigned char header[239];
+	auto header = std::array<unsigned char, 239>{};
 
-	if( fread( header, 1, 239, fd ) != 239 ||
-			( memcmp( header, "GF1PATCH110\0ID#000002", 22 )
-			&& memcmp( header, "GF1PATCH100\0ID#000002", 22 ) ) )
+	if (fread(header.data(), 1, 239, fd ) != 239 ||
+			(memcmp(header.data(), "GF1PATCH110\0ID#000002", 22)
+			&& memcmp(header.data(), "GF1PATCH100\0ID#000002", 22)))
 	{
 		fclose( fd );
-		return( LoadNotGUS );
+		return( LoadError::NotGUS );
 	}
 
 	if( header[82] != 1 && header[82] != 0 )
 	{
 		fclose( fd );
-		return( LoadInstruments );
+		return( LoadError::Instruments );
 	}
 
 	if( header[151] != 1 && header[151] != 0 )
 	{
 		fclose( fd );
-		return( LoadLayers );
+		return( LoadError::Layers );
 	}
 
 	int sample_count = header[198];
@@ -256,14 +253,14 @@ PatmanInstrument::LoadErrors PatmanInstrument::loadPatch(
 		if ( fseek( fd, x, SEEK_CUR ) == -1 ) \
 		{ \
 			fclose( fd ); \
-			return( LoadIO ); \
+			return( LoadError::IO ); \
 		}
 
 #define READ_SHORT( x ) \
 		if ( fread( &tmpshort, 2, 1, fd ) != 1 ) \
 		{ \
 			fclose( fd ); \
-			return( LoadIO ); \
+			return( LoadError::IO ); \
 		} \
 		x = (unsigned short)swap16IfBE( tmpshort );
 
@@ -271,7 +268,7 @@ PatmanInstrument::LoadErrors PatmanInstrument::loadPatch(
 		if ( fread( &x, 4, 1, fd ) != 1 ) \
 		{ \
 			fclose( fd ); \
-			return( LoadIO ); \
+			return( LoadError::IO ); \
 		} \
 		x = (unsigned)swap32IfBE( x );
 
@@ -295,7 +292,7 @@ PatmanInstrument::LoadErrors PatmanInstrument::loadPatch(
 		if ( fread( &modes, 1, 1, fd ) != 1 )
 		{
 			fclose( fd );
-			return( LoadIO );
+			return( LoadError::IO );
 		}
 		// skip scale frequency, scale factor, reserved space
 		SKIP_BYTES( 2 + 2 + 36 );
@@ -313,7 +310,7 @@ PatmanInstrument::LoadErrors PatmanInstrument::loadPatch(
 				{
 					delete[] wave_samples;
 					fclose( fd );
-					return( LoadIO );
+					return( LoadError::IO );
 				}
 				sample = swap16IfBE( sample );
 				if( modes & MODES_UNSIGNED )
@@ -337,7 +334,7 @@ PatmanInstrument::LoadErrors PatmanInstrument::loadPatch(
 				{
 					delete[] wave_samples;
 					fclose( fd );
-					return( LoadIO );
+					return( LoadError::IO );
 				}
 				if( modes & MODES_UNSIGNED )
 				{
@@ -358,9 +355,8 @@ PatmanInstrument::LoadErrors PatmanInstrument::loadPatch(
 			}
 		}
 
-		auto psample = new SampleBuffer(data, frames);
-		psample->setFrequency( root_freq / 1000.0f );
-		psample->setSampleRate( sample_rate );
+		auto psample = std::make_shared<Sample>(data, frames, sample_rate);
+		psample->setFrequency(root_freq / 1000.0f);
 
 		if( modes & MODES_LOOPING )
 		{
@@ -368,13 +364,13 @@ PatmanInstrument::LoadErrors PatmanInstrument::loadPatch(
 			psample->setLoopEndFrame( loop_end );
 		}
 
-		m_patchSamples.push_back( psample );
+		m_patchSamples.push_back(psample);
 
 		delete[] wave_samples;
 		delete[] data;
 	}
 	fclose( fd );
-	return( LoadOK );
+	return( LoadError::OK );
 }
 
 
@@ -384,7 +380,6 @@ void PatmanInstrument::unloadCurrentPatch()
 {
 	while( !m_patchSamples.empty() )
 	{
-		sharedObject::unref( m_patchSamples.back() );
 		m_patchSamples.pop_back();
 	}
 }
@@ -397,7 +392,7 @@ void PatmanInstrument::selectSample( NotePlayHandle * _n )
 	const float freq = _n->frequency();
 
 	float min_dist = HUGE_VALF;
-	SampleBuffer* sample = nullptr;
+	std::shared_ptr<Sample> sample = nullptr;
 
 	for (const auto& patchSample : m_patchSamples)
 	{
@@ -414,15 +409,8 @@ void PatmanInstrument::selectSample( NotePlayHandle * _n )
 
 	auto hdata = new handle_data;
 	hdata->tuned = m_tunedModel.value();
-	if( sample )
-	{
-		hdata->sample = sharedObject::ref( sample );
-	}
-	else
-	{
-		hdata->sample = new SampleBuffer( nullptr, 0 );
-	}
-	hdata->state = new SampleBuffer::handleState( _n->hasDetuningInfo() );
+	hdata->sample = sample ? sample : std::make_shared<Sample>();
+	hdata->state = new Sample::PlaybackState(_n->hasDetuningInfo());
 
 	_n->m_pluginData = hdata;
 }
@@ -446,7 +434,7 @@ namespace gui
 
 PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 	InstrumentViewFixedSize( _instrument, _parent ),
-	m_pi( nullptr )
+	m_pi(castModel<PatmanInstrument>())
 {
 	setAutoFillBackground( true );
 	QPalette pal;
@@ -487,7 +475,15 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 								"tune_off" ) );
 	m_tuneButton->setToolTip(tr("Tune mode"));
 
-	m_displayFilename = tr( "No file selected" );
+
+	if (m_pi->m_patchFile.isEmpty())
+	{
+		m_displayFilename = tr("No file selected");
+	}
+	else
+	{
+		updateFilename();
+	}
 
 	setAcceptDrops( true );
 }

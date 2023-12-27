@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef LCD_WIDGET_H
-#define LCD_WIDGET_H
+#ifndef LMMS_GUI_LCD_WIDGET_H
+#define LMMS_GUI_LCD_WIDGET_H
 
 #include <QMap>
 #include <QWidget>
@@ -48,10 +47,9 @@ public:
 	LcdWidget(int numDigits, const QString& style, QWidget* parent, const QString& name = QString(),
 		bool leadingZero = false);
 
-	~LcdWidget() override;
-
-	void setValue( int value );
-	void setLabel( const QString& label );
+	void setValue(int value);
+	void setValue(float value);
+	void setLabel(const QString& label);
 
 	void addTextForValue( int value, const QString& text )
 	{
@@ -98,7 +96,7 @@ private:
 	QString m_display;
 
 	QString m_label;
-	QPixmap* m_lcdPixmap;
+	QPixmap m_lcdPixmap;
 
 	QColor m_textColor;
 	QColor m_textShadowColor;
@@ -117,4 +115,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_LCD_WIDGET_H

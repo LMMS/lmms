@@ -90,13 +90,13 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	//keeps the direction of the widget, undepended on the locale
 	setLayoutDirection( Qt::LeftToRight );
 	auto layout = new QVBoxLayout(this);
-	layout->setMargin( 0 );
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing( 0 );
 	layout->addWidget( m_scrollArea );
 
 	auto scrollContent = new QWidget;
 	m_scrollLayout = new QVBoxLayout( scrollContent );
-	m_scrollLayout->setMargin( 0 );
+	m_scrollLayout->setContentsMargins(0, 0, 0, 0);
 	m_scrollLayout->setSpacing( 0 );
 	m_scrollLayout->setSizeConstraint( QLayout::SetMinAndMaxSize );
 
@@ -199,8 +199,8 @@ void TrackContainerView::moveTrackView( TrackView * trackView, int indexTo )
 
 	Track * track = m_tc->m_tracks[indexFrom];
 
-	m_tc->m_tracks.remove( indexFrom );
-	m_tc->m_tracks.insert( indexTo, track );
+	m_tc->m_tracks.erase(m_tc->m_tracks.begin() + indexFrom);
+	m_tc->m_tracks.insert(m_tc->m_tracks.begin() + indexTo, track);
 	m_trackViews.move( indexFrom, indexTo );
 
 	realignTracks();
@@ -372,8 +372,8 @@ void TrackContainerView::dragEnterEvent( QDragEnterEvent * _dee )
 		QString( "presetfile,pluginpresetfile,samplefile,instrument,"
 				"importedproject,soundfontfile,patchfile,vstpluginfile,projectfile,"
 				"track_%1,track_%2" ).
-						arg( Track::InstrumentTrack ).
-						arg( Track::SampleTrack ) );
+						arg( static_cast<int>(Track::Type::Instrument) ).
+						arg( static_cast<int>(Track::Type::Sample) ) );
 }
 
 
@@ -394,7 +394,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 	QString value = StringPairDrag::decodeValue( _de );
 	if( type == "instrument" )
 	{
-		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::InstrumentTrack, m_tc));
+		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, m_tc));
 		auto ilt = new InstrumentLoaderThread(this, it, value);
 		ilt->start();
 		//it->toggledInstrumentTrackButton( true );
@@ -404,7 +404,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		|| type == "soundfontfile" || type == "vstpluginfile"
 		|| type == "patchfile" )
 	{
-		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::InstrumentTrack, m_tc));
+		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, m_tc));
 		PluginFactory::PluginInfoAndKey piakn =
 			getPluginFactory()->pluginSupportingExtension(FileItem::extension(value));
 		Instrument * i = it->loadInstrument(piakn.info.name(), &piakn.key);
@@ -415,7 +415,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 	else if( type == "presetfile" )
 	{
 		DataFile dataFile( value );
-		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::InstrumentTrack, m_tc));
+		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, m_tc));
 		it->setSimpleSerializing();
 		it->loadSettings( dataFile.content().toElement() );
 		//it->toggledInstrumentTrackButton( true );

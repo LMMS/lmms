@@ -77,7 +77,7 @@ Plugin::Descriptor Q_DECL_EXPORT  vestige_plugin_descriptor =
 			"VST-host for using VST(i)-plugins within LMMS" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 #ifdef LMMS_BUILD_LINUX
 	"dll,so",
@@ -185,8 +185,8 @@ VestigeInstrument::~VestigeInstrument()
 	}
 
 	Engine::audioEngine()->removePlayHandlesOfTypes( instrumentTrack(),
-				PlayHandle::TypeNotePlayHandle
-				| PlayHandle::TypeInstrumentPlayHandle );
+				PlayHandle::Type::NotePlayHandle
+				| PlayHandle::Type::InstrumentPlayHandle );
 	closePlugin();
 }
 
@@ -221,16 +221,16 @@ void VestigeInstrument::loadSettings( const QDomElement & _this )
 
 		const QMap<QString, QString> & dump = m_plugin->parameterDump();
 		paramCount = dump.size();
-		char paramStr[35];
+		auto paramStr = std::array<char, 35>{};
 		knobFModel = new FloatModel *[ paramCount ];
 		QStringList s_dumpValues;
 		for( int i = 0; i < paramCount; i++ )
 		{
-			sprintf( paramStr, "param%d", i );
-			s_dumpValues = dump[ paramStr ].split( ":" );
+			sprintf(paramStr.data(), "param%d", i);
+			s_dumpValues = dump[paramStr.data()].split(":");
 
 			knobFModel[i] = new FloatModel( 0.0f, 0.0f, 1.0f, 0.01f, this, QString::number(i) );
-			knobFModel[i]->loadSettings( _this, paramStr );
+			knobFModel[i]->loadSettings(_this, paramStr.data());
 
 			if( !( knobFModel[ i ]->isAutomated() || knobFModel[ i ]->controllerConnection() ) )
 			{
@@ -286,12 +286,12 @@ void VestigeInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		if (knobFModel != nullptr) {
 			const QMap<QString, QString> & dump = m_plugin->parameterDump();
 			paramCount = dump.size();
-			char paramStr[35];
+			auto paramStr = std::array<char, 35>{};
 			for( int i = 0; i < paramCount; i++ )
 			{
 				if (knobFModel[i]->isAutomated() || knobFModel[i]->controllerConnection()) {
-					sprintf( paramStr, "param%d", i);
-					knobFModel[i]->saveSettings( _doc, _this, paramStr );
+					sprintf(paramStr.data(), "param%d", i);
+					knobFModel[i]->saveSettings(_doc, _this, paramStr.data());
 				}
 
 /*				QDomElement me = _doc.createElement( paramStr );
@@ -399,8 +399,6 @@ void VestigeInstrument::play( sampleFrame * _buf )
 {
 	if (!m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0)) {return;}
 
-	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
-
 	if( m_plugin == nullptr )
 	{
 		m_pluginMutex.unlock();
@@ -408,8 +406,6 @@ void VestigeInstrument::play( sampleFrame * _buf )
 	}
 
 	m_plugin->process( nullptr, _buf );
-
-	instrumentTrack()->processAudioBuffer( _buf, frames, nullptr );
 
 	m_pluginMutex.unlock();
 }
@@ -489,21 +485,11 @@ gui::PluginView * VestigeInstrument::instantiateView( QWidget * _parent )
 namespace gui
 {
 
-QPixmap * VestigeInstrumentView::s_artwork = nullptr;
-QPixmap * ManageVestigeInstrumentView::s_artwork = nullptr;
-
-
 VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 							QWidget * _parent ) :
 	InstrumentViewFixedSize( _instrument, _parent ),
 	lastPosInMenu (0)
 {
-	if( s_artwork == nullptr )
-	{
-		s_artwork = new QPixmap( PLUGIN_NAME::getIconPixmap(
-								"artwork" ) );
-	}
-
 	m_openPluginButton = new PixmapButton( this, "" );
 	m_openPluginButton->setCheckable( false );
 	m_openPluginButton->setCursor( Qt::PointingHandCursor );
@@ -885,7 +871,8 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
-	p.drawPixmap( 0, 0, *s_artwork );
+	static auto s_artwork = PLUGIN_NAME::getIconPixmap("artwork");
+	p.drawPixmap(0, 0, s_artwork);
 
 	QString plugin_name = ( m_vi->m_plugin != nullptr ) ?
 				m_vi->m_plugin->name()/* + QString::number(
@@ -938,7 +925,7 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 	using ::operator|;
 
 #endif
-	
+
 	m_vi = m_vi2;
 	m_vi->m_scrollArea = new QScrollArea( this );
 	widget = new QWidget(this);
@@ -996,23 +983,23 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 		hasKnobModel = false;
 	}
 
-	char paramStr[35];
+	auto paramStr = std::array<char, 35>{};
 	QStringList s_dumpValues;
 
 	for( int i = 0; i < m_vi->paramCount; i++ )
 	{
-		sprintf( paramStr, "param%d", i);
-		s_dumpValues = dump[ paramStr ].split( ":" );
+		sprintf(paramStr.data(), "param%d", i);
+		s_dumpValues = dump[paramStr.data()].split(":");
 
-		vstKnobs[ i ] = new CustomTextKnob( knobBright_26, this, s_dumpValues.at( 1 ) );
+		vstKnobs[ i ] = new CustomTextKnob( KnobType::Bright26, this, s_dumpValues.at( 1 ) );
 		vstKnobs[ i ]->setDescription( s_dumpValues.at( 1 ) + ":" );
 		vstKnobs[ i ]->setLabel( s_dumpValues.at( 1 ).left( 15 ) );
 
 		if( !hasKnobModel )
 		{
-			sprintf( paramStr, "%d", i);
-			m_vi->knobFModel[ i ] = new FloatModel( LocaleHelper::toFloat(s_dumpValues.at(2)),
-				0.0f, 1.0f, 0.01f, castModel<VestigeInstrument>(), paramStr );
+			sprintf(paramStr.data(), "%d", i);
+			m_vi->knobFModel[i] = new FloatModel(LocaleHelper::toFloat(s_dumpValues.at(2)),
+				0.0f, 1.0f, 0.01f, castModel<VestigeInstrument>(), paramStr.data());
 		}
 
 		FloatModel * model = m_vi->knobFModel[i];
@@ -1063,7 +1050,7 @@ void ManageVestigeInstrumentView::closeWindow()
 
 void ManageVestigeInstrumentView::syncPlugin( void )
 {
-	char paramStr[35];
+	auto paramStr = std::array<char, 35>{};
 	QStringList s_dumpValues;
 	const QMap<QString, QString> & dump = m_vi->m_plugin->parameterDump();
 	float f_value;
@@ -1074,8 +1061,8 @@ void ManageVestigeInstrumentView::syncPlugin( void )
 		// those auto-setted values are not jurnaled, tracked for undo / redo
 		if( !( m_vi->knobFModel[ i ]->isAutomated() || m_vi->knobFModel[ i ]->controllerConnection() ) )
 		{
-			sprintf( paramStr, "param%d", i );
-    			s_dumpValues = dump[ paramStr ].split( ":" );
+			sprintf(paramStr.data(), "param%d", i);
+    		s_dumpValues = dump[paramStr.data()].split(":");
 			f_value = LocaleHelper::toFloat(s_dumpValues.at(2));
 			m_vi->knobFModel[ i ]->setAutomatedValue( f_value );
 			m_vi->knobFModel[ i ]->setInitValue( f_value );
