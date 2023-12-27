@@ -114,6 +114,12 @@ namespace lmms::gui
         m_soloButton->setToolTip(tr("Solo this channel"));
         connect(&mixerChannel->m_soloModel, &BoolModel::dataChanged, mixerView, &MixerView::toggledSolo, Qt::DirectConnection);
 
+        QVBoxLayout * soloMuteLayout = new QVBoxLayout();
+        soloMuteLayout->setContentsMargins(0, 0, 0, 0);
+        soloMuteLayout->setSpacing(0);
+        soloMuteLayout->addWidget(m_soloButton, 0, Qt::AlignHCenter);
+        soloMuteLayout->addWidget(m_muteButton, 0, Qt::AlignHCenter);
+
         m_fader = new Fader{&mixerChannel->m_volumeModel, tr("Fader %1").arg(channelIndex), this};
         m_fader->setLevelsDisplayedInDBFS();
         m_fader->setMinPeak(dbfsToAmp(-42));
@@ -131,8 +137,7 @@ namespace lmms::gui
         mainLayout->addWidget(m_channelNumberLcd, 0, Qt::AlignHCenter);
         mainLayout->addStretch();
         mainLayout->addWidget(m_renameLineEditView, 0, Qt::AlignHCenter);
-        mainLayout->addWidget(m_soloButton, 0, Qt::AlignHCenter);
-        mainLayout->addWidget(m_muteButton, 0, Qt::AlignHCenter);
+        mainLayout->addLayout(soloMuteLayout, 0);
         mainLayout->addWidget(m_fader, 0, Qt::AlignHCenter);
 
         connect(m_renameLineEdit, &QLineEdit::editingFinished, this, &MixerChannelView::renameFinished);
