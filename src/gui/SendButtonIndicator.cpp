@@ -13,8 +13,6 @@ SendButtonIndicator:: SendButtonIndicator(QWidget * _parent, MixerChannelView * 
 	m_parent( _owner ),
 	m_mv( _mv )
 {
-
-
 	// don't do any initializing yet, because the MixerView and MixerChannelView
 	// that were passed to this constructor are not done with their constructors
 	// yet.

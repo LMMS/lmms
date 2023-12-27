@@ -354,7 +354,6 @@ namespace lmms::gui
         m_renameLineEditView->setFocus();
         m_renameLineEdit->selectAll();
         m_renameLineEdit->setFocus();
-
     }
 
     void MixerChannelView::renameFinished()
