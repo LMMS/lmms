@@ -46,7 +46,7 @@ namespace lmms
 class ClapThreadPool final : public ClapExtension<clap_host_thread_pool, clap_plugin_thread_pool>
 {
 public:
-	ClapThreadPool() = default;
+	using ClapExtension::ClapExtension;
 	~ClapThreadPool() override { deinit(); }
 
 	auto init(const clap_host* host, const clap_plugin* plugin) -> bool override;
@@ -68,7 +68,7 @@ private:
 
 	std::vector<std::unique_ptr<QThread>> m_threads;
 	std::atomic<bool> m_stop{ false };
-	std::atomic<int> m_taskIndex{ 0 };
+	std::atomic<std::uint32_t> m_taskIndex{ 0 };
 	QSemaphore m_semaphoreProd;
 	QSemaphore m_semaphoreDone;
 };

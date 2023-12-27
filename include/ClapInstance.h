@@ -33,6 +33,7 @@
 #include "ClapParam.h"
 #include "ClapGui.h"
 #include "ClapAudioPorts.h"
+#include "ClapState.h"
 #include "ClapNotePorts.h"
 #include "ClapTimerSupport.h"
 #include "ClapThreadPool.h"
@@ -143,6 +144,7 @@ public:
 	auto info() const -> const ClapPluginInfo& { return *m_pluginInfo; }
 	auto audioPorts() -> ClapAudioPorts& { return m_audioPorts; }
 	auto params() const -> const std::vector<ClapParam*>& { return m_params; }
+	auto state() -> ClapState& { return m_state; }
 	auto notePorts() -> ClapNotePorts& { return m_notePorts; }
 	auto gui() const { return m_pluginGui.get(); }
 	auto timerSupport() -> ClapTimerSupport& { return m_timerSupport; }
@@ -160,8 +162,6 @@ public:
 	/////////////////////////////////////////
 	// Plugin
 	/////////////////////////////////////////
-
-	auto state() const { return m_pluginState; };
 
 	auto start() -> bool; //!< Loads, inits, and activates in that order
 	auto restart() -> bool;
@@ -214,7 +214,6 @@ private:
 	static void hostRequestCallback(const clap_host* host);
 	static void hostRequestProcess(const clap_host* host);
 	static void hostRequestRestart(const clap_host* host);
-	static void hostExtStateMarkDirty(const clap_host* host);
 	static void hostExtLogLog(const clap_host* host, clap_log_severity severity, const char* msg);
 	static auto hostExtThreadCheckIsMainThread(const clap_host* host) -> bool;
 	static auto hostExtThreadCheckIsAudioThread(const clap_host* host) -> bool;
@@ -337,11 +336,6 @@ private:
 	*/
 	ClapAudioPorts m_audioPorts{ this };
 
-	const clap_plugin_state* m_pluginExtState = nullptr;
-	static constexpr const clap_host_state s_hostExtState {
-		&hostExtStateMarkDirty
-	};
-
 	static constexpr const clap_host_log s_hostExtLog {
 		&hostExtLogLog
 	};
@@ -372,14 +366,10 @@ private:
 		&hostExtGuiRequestClosed
 	};
 
-	ClapNotePorts m_notePorts;
+	ClapState m_state{ this };
+	ClapNotePorts m_notePorts{ this };
 	ClapTimerSupport m_timerSupport{ this };
-	ClapThreadPool m_threadPool;
-
-	/**
-	 * Plugin/Host extension data
-	*/
-	bool m_hostExtStateIsDirty = false;
+	ClapThreadPool m_threadPool{ this };
 };
 
 } // namespace lmms

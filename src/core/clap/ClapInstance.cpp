@@ -164,7 +164,7 @@ void ClapInstance::handleMidiInputEvent(const MidiEvent& event, const TimePos& t
 
 auto ClapInstance::hasNoteInput() const -> bool
 {
-	return m_notePorts.hasNoteInput();
+	return m_notePorts.hasInput();
 }
 
 void ClapInstance::destroy()
@@ -238,9 +238,9 @@ auto ClapInstance::unload() -> bool
 
 	// Clear all plugin extensions
 	m_audioPorts.deinit();
-	m_pluginExtState = nullptr;
 	m_pluginExtParams = nullptr;
 	m_pluginExtGui = nullptr;
+	m_state.deinit();
 	m_notePorts.deinit();
 
 	setPluginState(PluginState::None);
@@ -255,7 +255,7 @@ auto ClapInstance::init() -> bool
 	if (isErrorState()) { return false; }
 	checkPluginStateCurrent(PluginState::Loaded);
 
-	if (state() != PluginState::Loaded) { return false; }
+	if (m_pluginState != PluginState::Loaded) { return false; }
 
 	if (!m_plugin->init(m_plugin))
 	{
@@ -326,19 +326,15 @@ auto ClapInstance::init() -> bool
 		m_pluginGui = std::make_unique<ClapGui>(m_pluginInfo, m_plugin, m_pluginExtGui);
 	}
 
-	// Note ports
 	m_notePorts.init(host(), m_plugin);
-
 	if (!hasNoteInput() && info().type() == Plugin::Type::Instrument)
 	{
 		log(CLAP_LOG_WARNING, "Plugin is instrument but doesn't implement note port extension");
 	}
 
-	// Timer support
-	m_timerSupport.init(host(), m_plugin);
-
-	// Thread pool
+	m_state.init(host(), m_plugin);
 	m_threadPool.init(host(), m_plugin);
+	m_timerSupport.init(host(), m_plugin);
 
 	setPluginState(PluginState::Inactive);
 
@@ -960,14 +956,16 @@ auto ClapInstance::hostGetExtension(const clap_host* host, const char* extension
 	if (ClapManager::debugging()) { qDebug() << "--Plugin requested host extension:" << extensionId; }
 
 	const auto id = std::string_view{extensionId};
-	if (id == CLAP_EXT_LOG)           { return &s_hostExtLog; }
-	if (id == CLAP_EXT_THREAD_CHECK)  { return &s_hostExtThreadCheck; }
-	if (id == CLAP_EXT_PARAMS)        { return &s_hostExtParams; }
-	if (id == CLAP_EXT_LATENCY)       { return &s_hostExtLatency; }
+	//if (id == CLAP_EXT_AUDIO_PORTS)   { return h->audioPorts().hostExt(); }
 	if (id == CLAP_EXT_GUI)           { return &s_hostExtGui; }
+	if (id == CLAP_EXT_LATENCY)       { return &s_hostExtLatency; }
+	if (id == CLAP_EXT_LOG)           { return &s_hostExtLog; }
 	if (id == CLAP_EXT_NOTE_PORTS)    { return h->notePorts().hostExt(); }
-	if (id == CLAP_EXT_TIMER_SUPPORT) { return h->timerSupport().hostExt(); }
+	if (id == CLAP_EXT_PARAMS)        { return &s_hostExtParams; }
+	if (id == CLAP_EXT_STATE)         { return h->state().hostExt(); }
+	if (id == CLAP_EXT_THREAD_CHECK)  { return &s_hostExtThreadCheck; }
 	if (id == CLAP_EXT_THREAD_POOL)   { return h->threadPool().hostExt(); }
+	if (id == CLAP_EXT_TIMER_SUPPORT) { return h->timerSupport().hostExt(); }
 
 	return nullptr;
 }
@@ -991,21 +989,6 @@ void ClapInstance::hostRequestRestart(const clap_host* host)
 	qDebug() << "ClapInstance::hostRequestRestart";
 	auto h = fromHost(host);
 	h->m_scheduleRestart = true;
-}
-
-void ClapInstance::hostExtStateMarkDirty(const clap_host* host)
-{
-	assert(isMainThread());
-	auto h = fromHost(host);
-
-	if (!h->m_pluginExtState || !h->m_pluginExtState->save || !h->m_pluginExtState->load)
-	{
-		h->log(CLAP_LOG_PLUGIN_MISBEHAVING, "Plugin called clap_host_state.set_dirty() but the plugin does not "
-			"provide a complete clap_plugin_state interface.");
-		return;
-	}
-
-	h->m_hostExtStateIsDirty = true;
 }
 
 void ClapInstance::hostExtLogLog(const clap_host* host, clap_log_severity severity, const char* msg)

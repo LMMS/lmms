@@ -39,6 +39,8 @@ namespace lmms
 class ClapNotePorts final : public ClapExtension<clap_host_note_ports, clap_plugin_note_ports>
 {
 public:
+	using ClapExtension::ClapExtension;
+
 	auto init(const clap_host* host, const clap_plugin* plugin) -> bool override;
 	auto extensionId() const -> std::string_view override { return CLAP_EXT_NOTE_PORTS; }
 	auto hostExt() const -> const clap_host_note_ports* override;
@@ -46,7 +48,7 @@ public:
 	auto portIndex() const { return m_portIndex; }
 	auto dialect() const { return m_dialect; }
 
-	auto hasNoteInput() const -> bool { return m_dialect != 0; }
+	auto hasInput() const -> bool { return m_dialect != 0; }
 
 private:
 	auto checkSupported(const clap_plugin_note_ports* ext) -> bool override;

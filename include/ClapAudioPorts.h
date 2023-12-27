@@ -105,7 +105,7 @@ private:
 class ClapAudioPorts final : public ClapExtension<clap_host_audio_ports, clap_plugin_audio_ports>
 {
 public:
-	ClapAudioPorts(const ClapInstance* instance) : m_instance{instance} {}
+	using ClapExtension::ClapExtension;
 	~ClapAudioPorts() override { deinit(); }
 
 	auto init(const clap_host* host, const clap_plugin* plugin, clap_process& process) -> bool;
@@ -144,8 +144,6 @@ public:
 
 private:
 	auto checkSupported(const clap_plugin_audio_ports* ext) -> bool override;
-
-	const ClapInstance* m_instance;
 
 	bool m_hasStereoInput = false;
 	bool m_hasStereoOutput = false;

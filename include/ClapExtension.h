@@ -52,7 +52,7 @@ template<class HostExt, class PluginExt>
 class ClapExtension : public detail::ClapExtensionHelper
 {
 public:
-	ClapExtension() = default;
+	ClapExtension(const ClapInstance* parent) : m_parent{parent} {}
 	virtual ~ClapExtension() = default;
 
 	ClapExtension(const ClapExtension&) = delete;
@@ -86,11 +86,13 @@ public:
 	auto pluginExt() const { return m_pluginExt; }
 
 protected:
+	auto parent() const { return m_parent; }
 	auto host() const { return m_host; }
 	auto plugin() const { return m_plugin; }
 
 	virtual auto checkSupported(const PluginExt* ext) -> bool = 0;
 
+	const ClapInstance* m_parent = nullptr;
 	const clap_host* m_host = nullptr;
 	const clap_plugin* m_plugin = nullptr;
 	//const HostExt* m_hostExt = nullptr;

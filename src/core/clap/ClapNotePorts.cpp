@@ -28,7 +28,7 @@
 
 #include <QTimerEvent>
 
-#include <string>
+#include <utility>
 #include <cassert>
 
 #include "ClapInstance.h"

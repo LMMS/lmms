@@ -36,6 +36,12 @@
 namespace lmms
 {
 
+ClapTimerSupport::ClapTimerSupport(ClapInstance* parent)
+	: QObject{parent}
+	, ClapExtension{parent}
+{
+}
+
 void ClapTimerSupport::deinit()
 {
 	killTimers();
@@ -70,6 +76,7 @@ auto ClapTimerSupport::clapRegisterTimer(const clap_host* host, std::uint32_t pe
 {
 	assert(ClapInstance::isMainThread());
 	const auto h = ClapInstance::fromHost(host);
+	if (!h) { return false; }
 
 	if (!timerId)
 	{
@@ -105,6 +112,7 @@ auto ClapTimerSupport::clapUnregisterTimer(const clap_host* host, clap_id timerI
 {
 	assert(ClapInstance::isMainThread());
 	const auto h = ClapInstance::fromHost(host);
+	if (!h) { return false; }
 
 	if (timerId == 0 || timerId == CLAP_INVALID_ID)
 	{

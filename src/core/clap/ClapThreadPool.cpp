@@ -76,7 +76,7 @@ void ClapThreadPool::entry()
 		m_semaphoreProd.acquire();
 		if (m_stop) { return; }
 
-		int taskIndex = m_taskIndex++;
+		const auto taskIndex = m_taskIndex++;
 		pluginExt()->exec(m_plugin, taskIndex);
 		m_semaphoreDone.release();
 	}

@@ -46,8 +46,7 @@ class ClapTimerSupport
 {
 	Q_OBJECT
 public:
-
-	using QObject::QObject;
+	ClapTimerSupport(ClapInstance* parent);
 
 	void deinit() override;
 	auto extensionId() const -> std::string_view override { return CLAP_EXT_TIMER_SUPPORT; }

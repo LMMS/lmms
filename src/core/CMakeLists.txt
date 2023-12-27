@@ -115,6 +115,7 @@ set(LMMS_SRCS
 	core/clap/ClapManager.cpp
 	core/clap/ClapNotePorts.cpp
 	core/clap/ClapParam.cpp
+	core/clap/ClapState.cpp
 	core/clap/ClapSubPluginFeatures.cpp
 	core/clap/ClapThreadPool.cpp
 	core/clap/ClapTimerSupport.cpp

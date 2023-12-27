@@ -96,7 +96,7 @@ auto ClapAudioPorts::init(const clap_host* host, const clap_plugin* plugin, clap
 {
 	if (!ClapExtension::init(host, plugin))
 	{
-		m_instance->log(CLAP_LOG_ERROR, "Plugin does not implement the required audio port extension");
+		parent()->log(CLAP_LOG_ERROR, "Plugin does not implement the required audio port extension");
 		return false;
 	}
 
@@ -112,7 +112,7 @@ auto ClapAudioPorts::init(const clap_host* host, const clap_plugin* plugin, clap
 	m_audioOutBuffers.clear();
 
 	// Effect, Instrument, and Tool are the only options
-	const bool needInputPort = m_instance->info().type() != Plugin::Type::Instrument;
+	const bool needInputPort = parent()->info().type() != Plugin::Type::Instrument;
 	constexpr bool needOutputPort = true;
 
 	auto readPorts = [&](
@@ -123,13 +123,13 @@ auto ClapAudioPorts::init(const clap_host* host, const clap_plugin* plugin, clap
 	{
 		if (isInput && !needInputPort)
 		{
-			m_instance->log(CLAP_LOG_DEBUG, "Don't need audio input ports - skipping.");
+			parent()->log(CLAP_LOG_DEBUG, "Don't need audio input ports - skipping.");
 			return nullptr;
 		}
 
 		if (!isInput && !needOutputPort)
 		{
-			m_instance->log(CLAP_LOG_DEBUG, "Don't need audio output ports - skipping.");
+			parent()->log(CLAP_LOG_DEBUG, "Don't need audio output ports - skipping.");
 			return nullptr;
 		}
 
