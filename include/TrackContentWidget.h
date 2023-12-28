@@ -58,9 +58,6 @@ public:
 	TrackContentWidget( TrackView * parent );
 	~TrackContentWidget() override = default;
 
-	/*! \brief Updates the background tile pixmap. */
-	void updateBackground();
-
 	void addClipView( ClipView * clipv );
 	void removeClipView( ClipView * clipv );
 	void removeClipView( int clipNum )
@@ -93,6 +90,8 @@ public:
 public slots:
 	void update();
 	void changePosition( const lmms::TimePos & newPos = TimePos( -1 ) );
+	/*! \brief Updates the background tile pixmap. */
+	void updateBackground();
 
 protected:
 	enum class ContextMenuAction

@@ -43,14 +43,15 @@
 #include "ClipView.h"
 #include "TrackView.h"
 
-
 namespace lmms::gui
 {
 
 /*! Alternate between a darker and a lighter background color every 4 bars
  */
 const int BARS_PER_GROUP = 4;
-
+/* Lines between bars will disappear if zoomed too far out (i.e
+	if there are less than 4 pixels between lines)*/
+const int MIN_PIXELS_PER_LINE = 4;
 
 /*! \brief Create a new trackContentWidget
  *
@@ -74,6 +75,16 @@ TrackContentWidget::TrackContentWidget( TrackView * parent ) :
 			SIGNAL( positionChanged( const lmms::TimePos& ) ),
 			this, SLOT( changePosition( const lmms::TimePos& ) ) );
 
+	// Update background if snap size changes
+	connect( getGUI()->songEditor()->m_editor->snappingModel(),
+			SIGNAL( dataChanged() ),
+			this, SLOT( updateBackground() ) );
+
+	// Also update background if proportional snap is enabled/disabled
+	connect( getGUI()->songEditor()->m_editor,
+			SIGNAL( proportionalSnapChanged() ),
+			this, SLOT( updateBackground() ) );
+
 	setStyle( QApplication::style() );
 
 	updateBackground();
@@ -82,11 +93,11 @@ TrackContentWidget::TrackContentWidget( TrackView * parent ) :
 
 
 
-
-
-
 void TrackContentWidget::updateBackground()
 {
+	// use snapSize to determine number of lines to draw
+	float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
+
 	const TrackContainerView * tcv = m_trackView->trackContainerView();
 
 	// Assume even-pixels-per-bar. Makes sense, should be like this anyways
@@ -101,17 +112,29 @@ void TrackContentWidget::updateBackground()
 	pmp.fillRect( w, 0, w , h, lighterColor() );
 
 	// draw lines
-	// vertical lines
-	pmp.setPen( QPen( gridColor(), 1 ) );
-	for( float x = 0; x < w * 2; x += ppb )
+	// vertical lines (per bar)
+	pmp.setPen( QPen( gridColor(), 2 ) );
+	for( int x = 0; x < w * 2; x += ppb )
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
 	}
 
 	pmp.setPen( QPen( embossColor(), 1 ) );
-	for( float x = 1.0; x < w * 2; x += ppb )
+	for( int x = 1; x < w * 2; x += ppb )
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
+	}
+
+	// vertical lines (between bars)
+	pmp.setPen( QPen( gridColor(), 1 ) );
+	while ((ppb * snapSize) < MIN_PIXELS_PER_LINE)
+	{
+		snapSize *= 2;
+	}
+	for( float x = 0; x < w * 2; x += ppb * snapSize )
+	{
+		// "round" with floats
+		pmp.drawLine( QLineF( static_cast<int>( x ), 0.0, static_cast<int>( x ), h ) );
 	}
 
 	// horizontal line

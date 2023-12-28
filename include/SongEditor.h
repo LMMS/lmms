@@ -166,6 +166,7 @@ private:
 
 signals:
 	void pixelsPerBarChanged(float);
+	void proportionalSnapChanged();
 } ;
 
 

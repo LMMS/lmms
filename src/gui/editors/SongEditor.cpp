@@ -63,7 +63,7 @@ namespace lmms::gui
 namespace
 {
 
-constexpr int MIN_PIXELS_PER_BAR = 2;
+constexpr int MIN_PIXELS_PER_BAR = 4;
 constexpr int MAX_PIXELS_PER_BAR = 400;
 constexpr int ZOOM_STEPS = 200;
 
@@ -471,6 +471,8 @@ void SongEditor::toggleProportionalSnap()
 {
 	m_proportionalSnap = !m_proportionalSnap;
 	m_timeLine->setSnapSize(getSnapSize());
+
+	emit proportionalSnapChanged();
 }
 
 
