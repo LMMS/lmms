@@ -51,7 +51,7 @@ namespace lmms::gui
 const int BARS_PER_GROUP = 4;
 /* Lines between bars will disappear if zoomed too far out (i.e
 	if there are less than 4 pixels between lines)*/
-const int MIN_PIXELS_PER_LINE = 4;
+const int MIN_PIXELS_BETWEEN_LINES = 4;
 
 /*! \brief Create a new trackContentWidget
  *
@@ -103,6 +103,19 @@ void TrackContentWidget::updateBackground()
 	// Assume even-pixels-per-bar. Makes sense, should be like this anyways
 	int ppb = static_cast<int>( tcv->pixelsPerBar() );
 
+	// Bars between big lines
+	// There must be at least one bar between each big line
+	// Smaller intervals are handled by small lines
+	float bbBigLines = (snapSize >= 1) ? snapSize : 1;
+	// Bars between small lines
+	// Decrease the number of small lines if it results in less than
+	// 4 pixels between each line
+	float bbSmallLines = snapSize;
+	while ((ppb * bbSmallLines) < MIN_PIXELS_BETWEEN_LINES)
+	{
+		bbSmallLines *= 2;
+	}
+
 	int w = ppb * BARS_PER_GROUP;
 	int h = height();
 	m_background = QPixmap( w * 2, height() );
@@ -112,26 +125,22 @@ void TrackContentWidget::updateBackground()
 	pmp.fillRect( w, 0, w , h, lighterColor() );
 
 	// draw lines
-	// vertical lines (per bar)
+	// draw big vertical lines (per bar)
 	pmp.setPen( QPen( gridColor(), 2 ) );
-	for( int x = 0; x < w * 2; x += ppb )
+	for( float x = 0; x < w * 2; x += ppb * bbBigLines )
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
 	}
 
 	pmp.setPen( QPen( embossColor(), 1 ) );
-	for( int x = 1; x < w * 2; x += ppb )
+	for( float x = 1; x < w * 2; x += ppb * bbBigLines )
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
 	}
 
-	// vertical lines (between bars)
+	// draw small vertical lines (between bars)
 	pmp.setPen( QPen( gridColor(), 1 ) );
-	while ((ppb * snapSize) < MIN_PIXELS_PER_LINE)
-	{
-		snapSize *= 2;
-	}
-	for( float x = 0; x < w * 2; x += ppb * snapSize )
+	for( float x = 0; x < w * 2; x += ppb * bbSmallLines )
 	{
 		// "round" with floats
 		pmp.drawLine( QLineF( static_cast<int>( x ), 0.0, static_cast<int>( x ), h ) );
