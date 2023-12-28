@@ -142,7 +142,6 @@ void TrackContentWidget::updateBackground()
 	pmp.setPen( QPen( gridColor(), 1 ) );
 	for( float x = 0; x < w * 2; x += ppb * bbSmallLines )
 	{
-		// "round" with floats
 		pmp.drawLine( QLineF( static_cast<int>( x ), 0.0, static_cast<int>( x ), h ) );
 	}
 
