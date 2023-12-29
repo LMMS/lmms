@@ -274,7 +274,7 @@ SongEditor::SongEditor( Song * song ) :
 			m_snappingModel->addItem(QString("1/%1 Bar").arg(1 / bars));
 		}
 	}
-	m_snappingModel->setInitValue( m_snappingModel->findText( "1 Bar" ) );
+	m_snappingModel->setInitValue( m_snappingModel->findText( "1/16 Bar" ) );
 
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
