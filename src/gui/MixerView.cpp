@@ -102,7 +102,7 @@ MixerView::MixerView() :
 
 	// add master channel
 	m_mixerChannelViews.resize(m->numChannels());
-	m_mixerChannelViews[0] = new MixerChannelView(0, this, this);
+	m_mixerChannelViews[0] = new MixerChannelView(this, this, 0);
 
 	m_racksLayout->addWidget(m_mixerChannelViews[0]->m_effectRackView);
 
@@ -114,7 +114,7 @@ MixerView::MixerView() :
 	// add mixer channels
 	for (int i = 1; i < m_mixerChannelViews.size(); ++i)
 	{
-		m_mixerChannelViews[i] = new MixerChannelView(i, this, m_channelAreaWidget);
+		m_mixerChannelViews[i] = new MixerChannelView(m_channelAreaWidget, this, i);
 		chLayout->addWidget(m_mixerChannelViews[i]);
 	}
 
@@ -187,7 +187,7 @@ int MixerView::addNewChannel()
 	Mixer * mix = Engine::mixer();
 
 	int newChannelIndex = mix->createChannel();
-	m_mixerChannelViews.push_back(new MixerChannelView(newChannelIndex, this, m_channelAreaWidget));
+	m_mixerChannelViews.push_back(new MixerChannelView(m_channelAreaWidget, this, newChannelIndex));
 	chLayout->addWidget(m_mixerChannelViews[newChannelIndex]);
 	m_racksLayout->addWidget(m_mixerChannelViews[newChannelIndex]->m_effectRackView);
 
@@ -213,7 +213,7 @@ void MixerView::refreshDisplay()
 	m_mixerChannelViews.resize(Engine::mixer()->numChannels());
 	for (int i = 1; i < m_mixerChannelViews.size(); ++i)
 	{
-		m_mixerChannelViews[i] = new MixerChannelView(i, this, m_channelAreaWidget);
+		m_mixerChannelViews[i] = new MixerChannelView(m_channelAreaWidget, this, i);
 		chLayout->addWidget(m_mixerChannelViews[i]);
 		m_racksLayout->addWidget(m_mixerChannelViews[i]->m_effectRackView);
 	}

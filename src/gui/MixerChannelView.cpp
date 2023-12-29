@@ -43,7 +43,7 @@
 
 namespace lmms::gui
 {
-    MixerChannelView::MixerChannelView(int channelIndex, MixerView* mixerView, QWidget* parent) :
+    MixerChannelView::MixerChannelView(QWidget* parent, MixerView* mixerView, int channelIndex) :
         QWidget(parent),
         m_mixerView(mixerView),
         m_channelIndex(channelIndex)

@@ -57,7 +57,7 @@ namespace lmms::gui
             None, SendToThis, ReceiveFromThis
         };
 
-        MixerChannelView(int channelIndex, MixerView* mixerView, QWidget* parent = nullptr);
+        MixerChannelView(QWidget* parent, MixerView* mixerView, int channelIndex);
         void paintEvent(QPaintEvent* event) override;
         void contextMenuEvent(QContextMenuEvent*) override;
         void mousePressEvent(QMouseEvent*) override;
