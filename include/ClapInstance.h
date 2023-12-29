@@ -30,30 +30,27 @@
 #ifdef LMMS_HAVE_CLAP
 
 #include "ClapFile.h"
-#include "ClapParam.h"
 #include "ClapGui.h"
 #include "ClapAudioPorts.h"
 #include "ClapState.h"
 #include "ClapNotePorts.h"
+#include "ClapParams.h"
 #include "ClapTimerSupport.h"
+#include "ClapThreadCheck.h"
 #include "ClapThreadPool.h"
 
-#include "LinkedModelGroups.h"
 #include "Plugin.h"
 #include "MidiEvent.h"
 #include "TimePos.h"
 #include "../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
 
 #include <memory>
-#include <queue>
-#include <functional>
 #include <atomic>
 #include <cassert>
 #include <cstddef>
 
 #include <clap/clap.h>
 #include <clap/helpers/event-list.hh>
-#include <clap/helpers/reducing-param-queue.hh>
 
 namespace lmms
 {
@@ -74,7 +71,7 @@ namespace lmms
  *
  * Every ClapInstance is owned by a ClapControlBase object.
  */
-class ClapInstance final : public LinkedModelGroup
+class ClapInstance final : public QObject
 {
 	Q_OBJECT;
 
@@ -127,7 +124,7 @@ public:
 
 	void handleMidiInputEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset);
 
-	auto controlCount() const -> std::size_t { return LinkedModelGroup::modelNum(); }
+	auto controlCount() const -> std::size_t;
 	auto hasNoteInput() const -> bool;
 
 	/////////////////////////////////////////
@@ -139,13 +136,17 @@ public:
 
 	auto isValid() const -> bool;
 
-	auto host() const -> const clap_host* { return &m_host; }
+	auto host() const -> const clap_host* { return &m_host; };
 	auto plugin() const -> const clap_plugin* { return m_plugin; }
 	auto info() const -> const ClapPluginInfo& { return *m_pluginInfo; }
+
+	/**
+	 * Extensions
+	 */
 	auto audioPorts() -> ClapAudioPorts& { return m_audioPorts; }
-	auto params() const -> const std::vector<ClapParam*>& { return m_params; }
 	auto state() -> ClapState& { return m_state; }
 	auto notePorts() -> ClapNotePorts& { return m_notePorts; }
+	auto params() -> ClapParams& { return m_params; }
 	auto gui() const { return m_pluginGui.get(); }
 	auto timerSupport() -> ClapTimerSupport& { return m_timerSupport; }
 	auto threadPool() -> ClapThreadPool& { return m_threadPool; }
@@ -154,10 +155,8 @@ public:
 	// Host
 	/////////////////////////////////////////
 
-	void hostDestroy();
-
-	//! Executes tasks in idle queue
-	void hostIdle();
+	//! Executes idle tasks
+	void idle();
 
 	/////////////////////////////////////////
 	// Plugin
@@ -178,10 +177,8 @@ public:
 	auto process(std::uint32_t frames) -> bool;
 	auto processEnd(std::uint32_t frames) -> bool;
 
-	void paramFlushOnMainThread();
-	void handlePluginOutputEvents();
-	void generatePluginInputEvents();
-	auto getParamValueText(const ClapParam* param) const -> std::string;
+	//void handlePluginOutputEvents();
+	//void generatePluginInputEvents();
 
 	auto isActive() const -> bool;
 	auto isProcessing() const -> bool;
@@ -190,17 +187,11 @@ public:
 
 	void log(clap_log_severity severity, const char* msg) const;
 
-	static auto isMainThread() -> bool;
-	static auto isAudioThread() -> bool;
-
 	static auto fromHost(const clap_host* host) -> ClapInstance*;
 
 signals:
-
-	void paramsChanged(); //!< Called when CLAP plugin changes params and LMMS core needs to update
 	//void quickControlsPagesChanged();
 	//void quickControlsSelectedPageChanged();
-	void paramAdjusted(clap_id paramId);
 
 private:
 
@@ -209,7 +200,8 @@ private:
 	/////////////////////////////////////////
 
 	void setHost();
-	void hostPushToIdleQueue(std::function<bool()>&& functor);
+	clap_host m_host;
+
 	static auto hostGetExtension(const clap_host* host, const char* extensionId) -> const void*;
 	static void hostRequestCallback(const clap_host* host);
 	static void hostRequestProcess(const clap_host* host);
@@ -217,25 +209,12 @@ private:
 	static void hostExtLogLog(const clap_host* host, clap_log_severity severity, const char* msg);
 	static auto hostExtThreadCheckIsMainThread(const clap_host* host) -> bool;
 	static auto hostExtThreadCheckIsAudioThread(const clap_host* host) -> bool;
-	static void hostExtParamsRescan(const clap_host* host, std::uint32_t flags);
-	static void hostExtParamsClear(const clap_host* host, clap_id paramId, clap_param_clear_flags flags);
-	static void hostExtParamsRequestFlush(const clap_host* host);
 	static void hostExtLatencyChanged(const clap_host* host);
 	static void hostExtGuiResizeHintsChanged(const clap_host* host);
 	static auto hostExtGuiRequestResize(const clap_host* host, std::uint32_t width, std::uint32_t height) -> bool;
 	static auto hostExtGuiRequestShow(const clap_host* host) -> bool;
 	static auto hostExtGuiRequestHide(const clap_host* host) -> bool;
 	static void hostExtGuiRequestClosed(const clap_host* host, bool wasDestroyed);
-
-	void setParamValueByHost(ClapParam& param, double value);
-	void setParamModulationByHost(ClapParam& param, double value);
-	void checkValidParamValue(const ClapParam& param, double value);
-	auto getParamValue(const clap_param_info& info) const -> double;
-	static auto clapParamsRescanMayValueChange(std::uint32_t flags) -> bool { return flags & (CLAP_PARAM_RESCAN_ALL | CLAP_PARAM_RESCAN_VALUES); }
-	static auto clapParamsRescanMayInfoChange(std::uint32_t flags) -> bool { return flags & (CLAP_PARAM_RESCAN_ALL | CLAP_PARAM_RESCAN_INFO); }
-
-	clap_host m_host;
-	std::queue<std::function<bool()>> m_idleQueue;
 
 	std::int64_t m_steadyTime = 0;
 
@@ -262,8 +241,8 @@ private:
 	/**
 	 * Process-related
 	*/
-	clap::helpers::EventList m_evIn;
-	clap::helpers::EventList m_evOut;
+	mutable clap::helpers::EventList m_evIn;  // TODO: Find better way to handle param and note events
+	mutable clap::helpers::EventList m_evOut; // TODO: Find better way to handle param and note events
 	clap_process m_process{};
 
 	/**
@@ -280,55 +259,11 @@ private:
 	ringbuffer_reader_t<struct MidiInputEvent> m_midiInputReader;
 
 	/**
-	 * Parameter update queues
-	*/
-	std::unordered_map<clap_id, std::unique_ptr<ClapParam>> m_paramMap;
-	std::vector<ClapParam*> m_params; //!< Cache for faster iteration
-
-	struct HostToPluginParamQueueValue
-	{
-		void* cookie;
-		double value;
-	};
-
-	struct PluginToHostParamQueueValue
-	{
-		void update(const PluginToHostParamQueueValue& v) noexcept
-		{
-			if (v.hasValue)
-			{
-				hasValue = true;
-				value = v.value;
-			}
-
-			if (v.hasGesture)
-			{
-				hasGesture = true;
-				isBegin = v.isBegin;
-			}
-		}
-
-		bool hasValue = false;
-		bool hasGesture = false;
-		bool isBegin = false;
-		double value = 0;
-	};
-
-	clap::helpers::ReducingParamQueue<clap_id, HostToPluginParamQueueValue> m_hostToPluginValueQueue;
-	clap::helpers::ReducingParamQueue<clap_id, HostToPluginParamQueueValue> m_hostToPluginModQueue;
-	clap::helpers::ReducingParamQueue<clap_id, PluginToHostParamQueueValue> m_pluginToHostValueQueue;
-
-	std::unordered_map<clap_id, bool> m_isAdjustingParameter;
-
-	static constexpr bool s_hostShouldProvideParamCookie = true;
-
-	/**
 	 * Scheduling
 	*/
 	bool m_scheduleRestart = false;
 	bool m_scheduleDeactivate = false;
 	bool m_scheduleProcess = true; // TODO: ???
-	bool m_scheduleParamFlush = false;
 	bool m_scheduleMainThreadCallback = false;
 
 	/**
@@ -338,18 +273,6 @@ private:
 
 	static constexpr const clap_host_log s_hostExtLog {
 		&hostExtLogLog
-	};
-
-	static constexpr const clap_host_thread_check s_hostExtThreadCheck {
-		&hostExtThreadCheckIsMainThread,
-		&hostExtThreadCheckIsAudioThread
-	};
-
-	const clap_plugin_params* m_pluginExtParams = nullptr;
-	static constexpr const clap_host_params s_hostExtParams {
-		&hostExtParamsRescan,
-		&hostExtParamsClear,
-		&hostExtParamsRequestFlush,
 	};
 
 	static constexpr const clap_host_latency s_hostExtLatency {
@@ -368,7 +291,9 @@ private:
 
 	ClapState m_state{ this };
 	ClapNotePorts m_notePorts{ this };
+	ClapParams m_params;
 	ClapTimerSupport m_timerSupport{ this };
+	//ClapThreadCheck m_threadCheck;
 	ClapThreadPool m_threadPool{ this };
 };
 

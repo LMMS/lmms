@@ -39,6 +39,7 @@
 #include <clap/ext/thread-pool.h>
 
 #include "ClapExtension.h"
+// TODO: Use #include "LmmsSemaphore.h"
 
 namespace lmms
 {

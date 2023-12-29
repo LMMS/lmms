@@ -51,7 +51,7 @@ auto ClapState::checkSupported(const clap_plugin_state* ext) -> bool
 
 auto ClapState::load(std::string_view base64) -> bool
 {
-	assert(ClapInstance::isMainThread());
+	assert(ClapThreadCheck::isMainThread());
 
 	if (!supported()) { return false; }
 
@@ -110,7 +110,7 @@ auto ClapState::load() -> bool
 
 auto ClapState::save() -> std::optional<std::string_view>
 {
-	assert(ClapInstance::isMainThread());
+	assert(ClapThreadCheck::isMainThread());
 
 	if (!supported()) { return std::nullopt; }
 
@@ -142,7 +142,7 @@ auto ClapState::save() -> std::optional<std::string_view>
 
 	if (!pluginExt()->save(plugin(), &clapStream))
 	{
-		parent()->log(CLAP_LOG_WARNING, "Plugin failed to save its state");
+		instance()->log(CLAP_LOG_WARNING, "Plugin failed to save its state");
 		return std::nullopt;
 	}
 
@@ -154,7 +154,7 @@ auto ClapState::save() -> std::optional<std::string_view>
 
 void ClapState::clapMarkDirty(const clap_host* host)
 {
-	assert(ClapInstance::isMainThread());
+	assert(ClapThreadCheck::isMainThread());
 	auto h = fromHost(host);
 	if (!h) { return; }
 	auto& state = h->state();

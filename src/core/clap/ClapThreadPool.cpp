@@ -84,7 +84,7 @@ void ClapThreadPool::entry()
 
 void ClapThreadPool::terminate()
 {
-	assert(ClapInstance::isMainThread());
+	assert(ClapThreadCheck::isMainThread());
 
 	m_stop = true;
 	m_semaphoreProd.release(m_threads.size());
@@ -97,7 +97,7 @@ void ClapThreadPool::terminate()
 
 auto ClapThreadPool::clapRequestExec(const clap_host* host, std::uint32_t numTasks) -> bool
 {
-	assert(ClapInstance::isAudioThread());
+	assert(ClapThreadCheck::isAudioThread());
 	// TODO: Check that this is called from within the process method
 
 	const auto h = fromHost(host);

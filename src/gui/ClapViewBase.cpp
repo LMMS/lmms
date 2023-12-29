@@ -41,7 +41,6 @@
 #include "ClapControlBase.h"
 #include "ClapManager.h"
 #include "ClapInstance.h"
-#include "ClapParam.h"
 #include "MainWindow.h"
 #include "SubWindow.h"
 #include "CustomTextKnob.h"
@@ -50,10 +49,10 @@ namespace lmms::gui
 {
 
 ClapViewInstance::ClapViewInstance(QWidget* parent, ClapInstance* instance, int colNum)
-	: LinkedModelGroupView{parent, instance, static_cast<std::size_t>(colNum)}
+	: LinkedModelGroupView{parent, &instance->params(), static_cast<std::size_t>(colNum)}
 	, m_instance{instance}
 {
-	for (auto param : m_instance->params())
+	for (auto param : m_instance->params().parameters())
 	{
 		if (!param || !param->model()) { continue; }
 
@@ -61,22 +60,22 @@ ClapViewInstance::ClapViewInstance(QWidget* parent, ClapInstance* instance, int 
 
 		switch (param->valueType())
 		{
-		case ClapParam::ValueType::Bool:
+		case ClapParameter::ValueType::Bool:
 			control = new CheckControl{this};
 			break;
-		case ClapParam::ValueType::Integer:
+		case ClapParameter::ValueType::Integer:
 			// TODO: What if more digits are needed? Lv2 uses KnobControl in this case.
 			control = new LcdControl{(param->info().max_value <= 9.0) ? 1 : 2, this};
 			break;
-		// TODO: Are enum controls possible? Look into writing a CLAP proposal if not
-		case ClapParam::ValueType::Float:
+		// TODO: Add support for enum controls
+		case ClapParameter::ValueType::Float:
 		{
 			control = new CustomTextKnobControl{this};
 
 			// CustomTextKnob calls this lambda to update value text
 			auto customTextKnob = dynamic_cast<CustomTextKnob*>(control->modelView());
 			customTextKnob->setValueText([=]() {
-				return QString::fromUtf8(m_instance->getParamValueText(param).c_str());
+				return QString::fromUtf8(m_instance->params().getValueText(*param).c_str());
 			});
 
 			break;

@@ -97,12 +97,12 @@ ClapControlBase::~ClapControlBase() = default;
 
 auto ClapControlBase::getGroup(std::size_t idx) -> LinkedModelGroup*
 {
-	return (idx < m_instances.size()) ? m_instances[idx].get() : nullptr;
+	return (idx < m_instances.size()) ? &m_instances[idx]->params() : nullptr;
 }
 
 auto ClapControlBase::getGroup(std::size_t idx) const -> const LinkedModelGroup*
 {
-	return (idx < m_instances.size()) ? m_instances[idx].get() : nullptr;
+	return (idx < m_instances.size()) ? &m_instances[idx]->params() : nullptr;
 }
 
 void ClapControlBase::copyModelsFromLmms()
@@ -201,11 +201,11 @@ void ClapControlBase::handleMidiInputEvent(const MidiEvent& event, const TimePos
 	}
 }
 
-void ClapControlBase::callHostIdle()
+void ClapControlBase::idle()
 {
 	for (const auto& instance : m_instances)
 	{
-		instance->hostIdle();
+		instance->idle();
 	}
 }
 

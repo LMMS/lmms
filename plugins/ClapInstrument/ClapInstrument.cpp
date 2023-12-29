@@ -80,7 +80,7 @@ ClapInstrument::ClapInstrument(InstrumentTrack* track, Descriptor::SubPluginFeat
 		connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged, this, [this](){ onSampleRateChanged(); });
 
 		m_idleTimer.moveToThread(QApplication::instance()->thread());
-		connect(&m_idleTimer, &QTimer::timeout, this, [this](){ callHostIdle(); });
+		connect(&m_idleTimer, &QTimer::timeout, this, [this](){ idle(); });
 		m_idleTimer.start(1000 / 30);
 
 		// Now we need a play handle which cares for calling play()

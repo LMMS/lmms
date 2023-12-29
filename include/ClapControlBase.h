@@ -60,7 +60,7 @@ public:
 
 	auto hasGui() const -> bool { return m_instances[0]->gui(); }
 
-	void callHostIdle();
+	void idle();
 
 protected:
 

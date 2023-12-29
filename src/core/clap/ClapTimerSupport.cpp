@@ -74,7 +74,7 @@ void ClapTimerSupport::killTimers()
 
 auto ClapTimerSupport::clapRegisterTimer(const clap_host* host, std::uint32_t periodMilliseconds, clap_id* timerId) -> bool
 {
-	assert(ClapInstance::isMainThread());
+	assert(ClapThreadCheck::isMainThread());
 	const auto h = ClapInstance::fromHost(host);
 	if (!h) { return false; }
 
@@ -110,7 +110,7 @@ auto ClapTimerSupport::clapRegisterTimer(const clap_host* host, std::uint32_t pe
 
 auto ClapTimerSupport::clapUnregisterTimer(const clap_host* host, clap_id timerId) -> bool
 {
-	assert(ClapInstance::isMainThread());
+	assert(ClapThreadCheck::isMainThread());
 	const auto h = ClapInstance::fromHost(host);
 	if (!h) { return false; }
 
@@ -135,7 +135,7 @@ auto ClapTimerSupport::clapUnregisterTimer(const clap_host* host, clap_id timerI
 
 void ClapTimerSupport::timerEvent(QTimerEvent* event)
 {
-	assert(ClapInstance::isMainThread());
+	assert(ClapThreadCheck::isMainThread());
 	const auto timerId = static_cast<clap_id>(event->timerId());
 	assert(timerId > 0 && "Timer must be active");
 	if (m_ext && m_plugin)

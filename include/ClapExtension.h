@@ -33,6 +33,8 @@
 
 #include <clap/plugin.h>
 
+#include "ClapThreadCheck.h"
+
 namespace lmms
 {
 
@@ -52,7 +54,7 @@ template<class HostExt, class PluginExt>
 class ClapExtension : public detail::ClapExtensionHelper
 {
 public:
-	ClapExtension(const ClapInstance* parent) : m_parent{parent} {}
+	ClapExtension(const ClapInstance* instance) : m_instance{instance} {}
 	virtual ~ClapExtension() = default;
 
 	ClapExtension(const ClapExtension&) = delete;
@@ -79,6 +81,7 @@ public:
 		m_plugin = nullptr;
 	}
 
+	auto instance() const { return m_instance; }
 	auto supported() const -> bool { return m_pluginExt != nullptr; }
 
 	virtual auto extensionId() const -> std::string_view = 0;
@@ -86,17 +89,16 @@ public:
 	auto pluginExt() const { return m_pluginExt; }
 
 protected:
-	auto parent() const { return m_parent; }
 	auto host() const { return m_host; }
 	auto plugin() const { return m_plugin; }
 
 	virtual auto checkSupported(const PluginExt* ext) -> bool = 0;
 
-	const ClapInstance* m_parent = nullptr;
+	const ClapInstance* m_instance = nullptr;
 	const clap_host* m_host = nullptr;
 	const clap_plugin* m_plugin = nullptr;
 	//const HostExt* m_hostExt = nullptr;
-	const PluginExt* m_pluginExt = nullptr;
+	const PluginExt* m_pluginExt = nullptr; //!< stays null if extension is unsupported
 };
 
 } // namespace lmms

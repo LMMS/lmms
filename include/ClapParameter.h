@@ -1,5 +1,5 @@
 /*
- * ClapParam.h - Declaration of ClapParam class
+ * ClapParameter.h - Declaration of ClapParameter class
  *
  * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_CLAP_PARAM_H
-#define LMMS_CLAP_PARAM_H
+#ifndef LMMS_CLAP_PARAMETER_H
+#define LMMS_CLAP_PARAMETER_H
 
 #include "lmmsconfig.h"
 
@@ -45,7 +45,9 @@ namespace lmms
 {
 
 class ClapInstance;
-class ClapParam : public QObject
+class ClapParams;
+
+class ClapParameter : public QObject
 {
 	Q_OBJECT;
 
@@ -59,13 +61,12 @@ public:
 		Float
 	};
 
-	ClapParam(ClapInstance* pluginHost, const clap_param_info& info, double value);
+	ClapParameter(ClapParams* parent, const clap_param_info& info, double value);
 
 	auto model() const -> AutomatableModel* { return m_connectedModel.get(); }
 	auto valueType() const { return m_valueType; }
 	auto id() const -> std::string_view { return m_id; }
 	auto displayName() const -> std::string_view { return m_displayName; }
-	auto getValueText(const clap_plugin* plugin, const clap_plugin_params* params) const -> std::string;
 
 	auto value() const { return m_value; }
 	void setValue(double v);
@@ -108,10 +109,8 @@ public:
 		emit isBeingAdjustedChanged();
 	}
 
-	//! Checks that the parameter info is valid, throwing exception if not
-	static void check(clap_param_info& info);
-
-	static auto extensionSupported(const clap_plugin_params* ext) noexcept -> bool;
+	//! Checks if the parameter info is valid
+	static auto check(clap_param_info& info) -> bool;
 
 signals:
 	void isBeingAdjustedChanged();
@@ -139,4 +138,4 @@ private:
 
 #endif // LMMS_HAVE_CLAP
 
-#endif // LMMS_CLAP_PARAM_H
+#endif // LMMS_CLAP_PARAMETER_H

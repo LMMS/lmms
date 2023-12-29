@@ -1,5 +1,5 @@
 /*
- * ClapParam.cpp - Implementation of ClapParam class
+ * ClapParameter.cpp - Implementation of ClapParameter class
  *
  * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -22,11 +22,12 @@
  *
  */
 
-#include "ClapParam.h"
+#include "ClapParameter.h"
 
 #ifdef LMMS_HAVE_CLAP
 
 #include "ClapInstance.h"
+#include "ClapParams.h"
 
 #include <cmath>
 
@@ -36,8 +37,8 @@
 namespace lmms
 {
 
-ClapParam::ClapParam(ClapInstance* pluginHost, const clap_param_info& info, double value)
-	: QObject{pluginHost}
+ClapParameter::ClapParameter(ClapParams* parent, const clap_param_info& info, double value)
+	: QObject{parent}
 	, m_info{info}
 	, m_value{value}
 	, m_id{"p" + std::to_string(m_info.id)}
@@ -69,17 +70,17 @@ ClapParam::ClapParam(ClapInstance* pluginHost, const clap_param_info& info, doub
 
 		if (minVal == 0 && maxVal == 1)
 		{
-			m_connectedModel = std::make_unique<BoolModel>(valueInt, pluginHost, name);
+			m_connectedModel = std::make_unique<BoolModel>(valueInt, parent, name);
 			m_valueType = ValueType::Bool;
 		}
 		else
 		{
 			if (flags & CLAP_PARAM_IS_BYPASS)
 			{
-				pluginHost->log(CLAP_LOG_PLUGIN_MISBEHAVING, "Bypass parameter doesn't have range [0, 1]");
+				parent->instance()->log(CLAP_LOG_PLUGIN_MISBEHAVING, "Bypass parameter doesn't have range [0, 1]");
 			}
 
-			m_connectedModel = std::make_unique<IntModel>(valueInt, minVal, maxVal, pluginHost, name);
+			m_connectedModel = std::make_unique<IntModel>(valueInt, minVal, maxVal, parent, name);
 			// TODO: Use CLAP_PARAM_IS_ENUM
 			m_valueType = ValueType::Integer;
 		}
@@ -99,66 +100,42 @@ ClapParam::ClapParam(ClapInstance* pluginHost, const clap_param_info& info, doub
 			static_cast<float>(m_info.min_value),
 			static_cast<float>(m_info.max_value),
 			static_cast<float>(stepSize),
-			pluginHost, name);
+			parent, name);
 
 		m_valueType = ValueType::Float;
 	}
 }
 
-auto ClapParam::getValueText(const clap_plugin* plugin, const clap_plugin_params* params) const -> std::string
-{
-	const auto valueStr = std::to_string(m_value);
-	if (!params->value_to_text)
-	{
-		return valueStr;
-	}
-
-	auto buffer = std::array<char, CLAP_NAME_SIZE>{};
-	if (!params->value_to_text(plugin, m_info.id, m_value, buffer.data(), CLAP_NAME_SIZE - 1))
-	{
-		return valueStr;
-	}
-
-	if (valueStr == buffer.data())
-	{
-		// No point in displaying two identical strings
-		return valueStr;
-	}
-
-	// Use CLAP-provided string + internal value in brackets for automation purposes
-	return std::string{buffer.data()} + "\n[" + valueStr + "]";
-}
-
-void ClapParam::setValue(double v)
+void ClapParameter::setValue(double v)
 {
 	if (m_value == v) { return; }
 	m_value = v;
 	valueChanged();
 }
 
-void ClapParam::setModulation(double v)
+void ClapParameter::setModulation(double v)
 {
 	if (m_modulation == v) { return; }
 	m_modulation = v;
 	modulatedValueChanged();
 }
 
-auto ClapParam::isValueValid(const double v) const -> bool
+auto ClapParameter::isValueValid(const double v) const -> bool
 {
 	return m_info.min_value <= v && v <= m_info.max_value;
 }
 
-auto ClapParam::getShortInfoString() const -> std::string
+auto ClapParameter::getShortInfoString() const -> std::string
 {
 	return "id: " + std::to_string(m_info.id) + ", name: '" + std::string{m_info.name} + "', module: '" + std::string{m_info.module} + "'";
 }
 
-auto ClapParam::getInfoString() const -> std::string
+auto ClapParameter::getInfoString() const -> std::string
 {
 	return getShortInfoString() + ", min: " + std::to_string(m_info.min_value) + ", max: " + std::to_string(m_info.max_value);
 }
 
-auto ClapParam::isInfoEqualTo(const clap_param_info& info) const -> bool
+auto ClapParameter::isInfoEqualTo(const clap_param_info& info) const -> bool
 {
 	return info.cookie == m_info.cookie
 		&& info.default_value == m_info.default_value
@@ -170,7 +147,7 @@ auto ClapParam::isInfoEqualTo(const clap_param_info& info) const -> bool
 		&& !::std::strncmp(info.module, m_info.module, sizeof(info.module));
 }
 
-auto ClapParam::isInfoCriticallyDifferentTo(const clap_param_info& info) const -> bool
+auto ClapParameter::isInfoCriticallyDifferentTo(const clap_param_info& info) const -> bool
 {
 	assert(m_info.id == info.id);
 	constexpr std::uint32_t criticalFlags =
@@ -184,31 +161,26 @@ auto ClapParam::isInfoCriticallyDifferentTo(const clap_param_info& info) const -
 		|| m_info.min_value != m_info.min_value || m_info.max_value != m_info.max_value;
 }
 
-void ClapParam::check(clap_param_info& info)
+auto ClapParameter::check(clap_param_info& info) -> bool
 {
 	if (info.min_value > info.max_value)
 	{
-		throw std::logic_error{"CLAP param: Error: min value > max value"};
+		qWarning() << "CLAP param: Error: min value > max value";
 		// TODO: Use PluginIssueType::MinGreaterMax ??
+		return false;
 	}
 
 	if (info.default_value > info.max_value || info.default_value < info.min_value)
 	{
 		std::string msg = "CLAP param: Error: default value is out of range\ndefault: " + std::to_string(info.default_value)
 			+ "; min: " + std::to_string(info.min_value) + "; max: " + std::to_string(info.max_value);
-		throw std::logic_error{msg};
 		// TODO: Use PluginIssueType::DefaultValueNotInRange ??
-		//qDebug() << "CLAP param: Warning: default value is out of range; clamping to valid range";
+		qWarning() << "CLAP param: Warning: default value is out of range; clamping to valid range";
 		//info.default_value = std::clamp(info.default_value, info.min_value, info.max_value);
-		//return false;
+		return false;
 	}
-	//return true;
-}
 
-auto ClapParam::extensionSupported(const clap_plugin_params* ext) noexcept -> bool
-{
-	// NOTE: ext->value_to_text and ext->text_to_value are optional
-	return ext && ext->count && ext->get_info && ext->get_value && ext->flush;
+	return true;
 }
 
 } // namespace lmms

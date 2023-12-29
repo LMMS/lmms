@@ -64,7 +64,7 @@ ClapEffect::ClapEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* 
 	, m_idleTimer{this}
 {
 	m_idleTimer.moveToThread(QApplication::instance()->thread());
-	connect(&m_idleTimer, &QTimer::timeout, this, [this](){ m_controls.callHostIdle(); });
+	connect(&m_idleTimer, &QTimer::timeout, this, [this](){ m_controls.idle(); });
 	m_idleTimer.start(1000 / 30);
 }
 
