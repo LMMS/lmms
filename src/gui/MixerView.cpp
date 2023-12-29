@@ -54,7 +54,7 @@ namespace lmms::gui
 
 MixerView::MixerView() :
 	QWidget(),
-	ModelView( nullptr, this ),
+	ModelView(nullptr, this),
 	SerializingObjectHook()
 {
 #if QT_VERSION < 0x50C00
@@ -68,40 +68,40 @@ MixerView::MixerView() :
 #endif
 
 	Mixer * m = Engine::mixer();
-	m->setHook( this );
+	m->setHook(this);
 
 	//QPalette pal = palette();
-	//pal.setColor( QPalette::Window, QColor( 72, 76, 88 ) );
-	//setPalette( pal );
+	//pal.setColor(QPalette::Window, QColor(72, 76, 88));
+	//setPalette(pal);
 
-	setAutoFillBackground( true );
-	setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
+	setAutoFillBackground(true);
+	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
-	setWindowTitle( tr( "Mixer" ) );
-	setWindowIcon( embed::getIconPixmap( "mixer" ) );
+	setWindowTitle(tr("Mixer"));
+	setWindowIcon(embed::getIconPixmap("mixer"));
 
 	// main-layout
 	auto ml = new QHBoxLayout{this};
 
 	// Set margins
-	ml->setContentsMargins( 0, 4, 0, 0 );
+	ml->setContentsMargins(0, 4, 0, 0);
 
 	// Channel area
 	m_channelAreaWidget = new QWidget;
-	chLayout = new QHBoxLayout( m_channelAreaWidget );
-	chLayout->setSizeConstraint( QLayout::SetMinimumSize );
-	chLayout->setSpacing( 0 );
+	chLayout = new QHBoxLayout(m_channelAreaWidget);
+	chLayout->setSizeConstraint(QLayout::SetMinimumSize);
+	chLayout->setSpacing(0);
 	chLayout->setContentsMargins(0, 0, 0, 0);
 	m_channelAreaWidget->setLayout(chLayout);
 
 	// create rack layout before creating the first channel
 	m_racksWidget = new QWidget;
-	m_racksLayout = new QStackedLayout( m_racksWidget );
-	m_racksLayout->setContentsMargins( 0, 0, 0, 0 );
-	m_racksWidget->setLayout( m_racksLayout );
+	m_racksLayout = new QStackedLayout(m_racksWidget);
+	m_racksLayout->setContentsMargins(0, 0, 0, 0);
+	m_racksWidget->setLayout(m_racksLayout);
 
 	// add master channel
-	m_mixerChannelViews.resize( m->numChannels() );
+	m_mixerChannelViews.resize(m->numChannels());
 	m_mixerChannelViews[0] = new MixerChannelView(0, this, this);
 
 	m_racksLayout->addWidget(m_mixerChannelViews[0]->m_effectRackView);
@@ -112,7 +112,7 @@ MixerView::MixerView() :
 	auto mixerChannelSize = masterView->sizeHint();
 
 	// add mixer channels
-	for( int i = 1; i < m_mixerChannelViews.size(); ++i )
+	for (int i = 1; i < m_mixerChannelViews.size(); ++i)
 	{
 		m_mixerChannelViews[i] = new MixerChannelView(i, this, m_channelAreaWidget);
 		chLayout->addWidget(m_mixerChannelViews[i]);
@@ -123,31 +123,31 @@ MixerView::MixerView() :
 	class ChannelArea : public QScrollArea
 	{
 		public:
-			ChannelArea( QWidget * parent, MixerView * mv ) :
-				QScrollArea( parent ), m_mv( mv ) {}
+			ChannelArea(QWidget * parent, MixerView * mv) :
+				QScrollArea(parent), m_mv(mv) {}
 			~ChannelArea() override = default;
-			void keyPressEvent( QKeyEvent * e ) override
+			void keyPressEvent(QKeyEvent * e) override
 			{
-				m_mv->keyPressEvent( e );
+				m_mv->keyPressEvent(e);
 			}
 		private:
 			MixerView * m_mv;
 	};
-	channelArea = new ChannelArea( this, this );
-	channelArea->setWidget( m_channelAreaWidget );
-	channelArea->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-	channelArea->setFrameStyle( QFrame::NoFrame );
+	channelArea = new ChannelArea(this, this);
+	channelArea->setWidget(m_channelAreaWidget);
+	channelArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	channelArea->setFrameStyle(QFrame::NoFrame);
 	channelArea->setMinimumWidth(mixerChannelSize.width() * 6);
 	channelArea->setFixedHeight(mixerChannelSize.height() +
-			style()->pixelMetric( QStyle::PM_ScrollBarExtent ) );
-	ml->addWidget( channelArea, 1, Qt::AlignTop );
+			style()->pixelMetric(QStyle::PM_ScrollBarExtent));
+	ml->addWidget(channelArea, 1, Qt::AlignTop);
 
 	// show the add new mixer channel button
 	auto newChannelBtn = new QPushButton(embed::getIconPixmap("new_channel"), QString(), this);
-	newChannelBtn->setObjectName( "newChannelBtn" );
-	newChannelBtn->setFixedSize( mixerChannelSize );
-	connect( newChannelBtn, SIGNAL(clicked()), this, SLOT(addNewChannel()));
-	ml->addWidget( newChannelBtn, 0, Qt::AlignTop );
+	newChannelBtn->setObjectName("newChannelBtn");
+	newChannelBtn->setFixedSize(mixerChannelSize);
+	connect(newChannelBtn, SIGNAL(clicked()), this, SLOT(addNewChannel()));
+	ml->addWidget(newChannelBtn, 0, Qt::AlignTop);
 
 
 	// add the stacked layout for the effect racks of mixer channels
@@ -159,23 +159,23 @@ MixerView::MixerView() :
 	updateGeometry();
 
 	// timer for updating faders
-	connect( getGUI()->mainWindow(), SIGNAL(periodicUpdate()),
+	connect(getGUI()->mainWindow(), SIGNAL(periodicUpdate()),
 					this, SLOT(updateFaders()));
 
 
 	// add ourself to workspace
-	QMdiSubWindow * subWin = getGUI()->mainWindow()->addWindowedWidget( this );
+	QMdiSubWindow * subWin = getGUI()->mainWindow()->addWindowedWidget(this);
 	Qt::WindowFlags flags = subWin->windowFlags();
 	flags &= ~Qt::WindowMaximizeButtonHint;
-	subWin->setWindowFlags( flags );
-	layout()->setSizeConstraint( QLayout::SetMinimumSize );
-	subWin->layout()->setSizeConstraint( QLayout::SetMinAndMaxSize );
+	subWin->setWindowFlags(flags);
+	layout()->setSizeConstraint(QLayout::SetMinimumSize);
+	subWin->layout()->setSizeConstraint(QLayout::SetMinAndMaxSize);
 
-	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
-	parentWidget()->move( 5, 310 );
+	parentWidget()->setAttribute(Qt::WA_DeleteOnClose, false);
+	parentWidget()->move(5, 310);
 
 	// we want to receive dataChanged-signals in order to update
-	setModel( m );
+	setModel(m);
 }
 
 
@@ -202,7 +202,7 @@ int MixerView::addNewChannel()
 void MixerView::refreshDisplay()
 {
 	// delete all views and re-add them
-	for( int i = 1; i<m_mixerChannelViews.size(); ++i )
+	for (int i = 1; i<m_mixerChannelViews.size(); ++i)
 	{
 		chLayout->removeWidget(m_mixerChannelViews[i]);
 		m_racksLayout->removeWidget(m_mixerChannelViews[i]->m_effectRackView);
@@ -211,18 +211,18 @@ void MixerView::refreshDisplay()
 
 	// re-add the views
 	m_mixerChannelViews.resize(Engine::mixer()->numChannels());
-	for( int i = 1; i < m_mixerChannelViews.size(); ++i )
+	for (int i = 1; i < m_mixerChannelViews.size(); ++i)
 	{
 		m_mixerChannelViews[i] = new MixerChannelView(i, this, m_channelAreaWidget);
 		chLayout->addWidget(m_mixerChannelViews[i]);
-		m_racksLayout->addWidget( m_mixerChannelViews[i]->m_effectRackView);
+		m_racksLayout->addWidget(m_mixerChannelViews[i]->m_effectRackView);
 	}
 
 	// set selected mixer channel to 0
-	setCurrentMixerChannel( 0 );
+	setCurrentMixerChannel(0);
 
 	// update all mixer lines
-	for( int i = 0; i < m_mixerChannelViews.size(); ++i )
+	for (int i = 0; i < m_mixerChannelViews.size(); ++i)
 	{
 		updateMixerChannel(i);
 	}
@@ -258,17 +258,17 @@ void MixerView::updateMaxChannelSelector()
 }
 
 
-void MixerView::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void MixerView::saveSettings(QDomDocument & _doc, QDomElement & _this)
 {
-	MainWindow::saveWidgetState( this, _this );
+	MainWindow::saveWidgetState(this, _this);
 }
 
 
 
 
-void MixerView::loadSettings( const QDomElement & _this )
+void MixerView::loadSettings(const QDomElement & _this)
 {
-	MainWindow::restoreWidgetState( this, _this );
+	MainWindow::restoreWidgetState(this, _this);
 }
 
 
@@ -289,7 +289,7 @@ void MixerView::setCurrentMixerChannel(MixerChannelView* channel)
 	m_racksLayout->setCurrentWidget(m_mixerChannelViews[channel->channelIndex()]->m_effectRackView);
 
 	// set up send knob
-	for(int i = 0; i < m_mixerChannelViews.size(); ++i)
+	for (int i = 0; i < m_mixerChannelViews.size(); ++i)
 	{
 		updateMixerChannel(i);
 	}
@@ -303,10 +303,10 @@ void MixerView::updateMixerChannel(int index)
 	// does current channel send to this channel?
 	int selIndex = m_currentMixerChannel->channelIndex();
 	auto thisLine = m_mixerChannelViews[index];
-	thisLine->setToolTip( Engine::mixer()->mixerChannel( index )->m_name );
+	thisLine->setToolTip(Engine::mixer()->mixerChannel(index)->m_name);
 
 	FloatModel * sendModel = mix->channelSendModel(selIndex, index);
-	if( sendModel == nullptr )
+	if (sendModel == nullptr)
 	{
 		// does not send, hide send knob
 		thisLine->m_sendKnob->setVisible(false);
@@ -319,7 +319,7 @@ void MixerView::updateMixerChannel(int index)
 	}
 
 	// disable the send button if it would cause an infinite loop
-	thisLine->m_sendButton->setVisible(! mix->isInfiniteLoop(selIndex, index));
+	thisLine->m_sendButton->setVisible(!mix->isInfiniteLoop(selIndex, index));
 	thisLine->m_sendButton->updateLightStatus();
 	thisLine->update();
 }
@@ -328,7 +328,7 @@ void MixerView::updateMixerChannel(int index)
 void MixerView::deleteChannel(int index)
 {
 	// can't delete master
-	if( index == 0 ) return;
+	if (index == 0) return;
 
 	// if there is no user confirmation, do nothing
 	if (!confirmRemoval(index))
@@ -347,7 +347,7 @@ void MixerView::deleteChannel(int index)
 	Engine::mixer()->deleteChannel(index);
 
 	chLayout->removeWidget(m_mixerChannelViews[index]);
-	m_racksLayout->removeWidget( m_mixerChannelViews[index]);
+	m_racksLayout->removeWidget(m_mixerChannelViews[index]);
 	// delete MixerChannelView later to prevent a crash when deleting from context menu
 	m_mixerChannelViews[index]->hide();
 	m_mixerChannelViews[index]->deleteLater();
@@ -430,16 +430,16 @@ void MixerView::deleteUnusedChannels()
 void MixerView::moveChannelLeft(int index, int focusIndex)
 {
 	// can't move master or first channel left or last channel right
-	if( index <= 1 || index >= m_mixerChannelViews.size() ) return;
+	if (index <= 1 || index >= m_mixerChannelViews.size()) return;
 
 	Mixer *m = Engine::mixer();
 
 	// Move instruments channels
-	m->moveChannelLeft( index );
+	m->moveChannelLeft(index);
 
 	// Update widgets models
-	m_mixerChannelViews[index]->setChannelIndex( index );
-	m_mixerChannelViews[index - 1]->setChannelIndex( index - 1 );
+	m_mixerChannelViews[index]->setChannelIndex(index);
+	m_mixerChannelViews[index - 1]->setChannelIndex(index - 1);
 
 	// Focus on new position
 	setCurrentMixerChannel(focusIndex);
@@ -449,14 +449,14 @@ void MixerView::moveChannelLeft(int index, int focusIndex)
 
 void MixerView::moveChannelLeft(int index)
 {
-	moveChannelLeft( index, index - 1 );
+	moveChannelLeft(index, index - 1);
 }
 
 
 
 void MixerView::moveChannelRight(int index)
 {
-	moveChannelLeft( index + 1, index + 1 );
+	moveChannelLeft(index + 1, index + 1);
 }
 
 
@@ -475,7 +475,7 @@ void MixerView::keyPressEvent(QKeyEvent * e)
 			deleteChannel(m_currentMixerChannel->channelIndex());
 			break;
 		case Qt::Key_Left:
-			if( e->modifiers() & Qt::AltModifier )
+			if (e->modifiers() & Qt::AltModifier)
 			{
 				moveChannelLeft(m_currentMixerChannel->channelIndex());
 			}
@@ -486,7 +486,7 @@ void MixerView::keyPressEvent(QKeyEvent * e)
 			}
 			break;
 		case Qt::Key_Right:
-			if( e->modifiers() & Qt::AltModifier )
+			if (e->modifiers() & Qt::AltModifier)
 			{
 				moveChannelRight(m_currentMixerChannel->channelIndex());
 			}
@@ -497,7 +497,7 @@ void MixerView::keyPressEvent(QKeyEvent * e)
 			}
 			break;
 		case Qt::Key_Insert:
-			if ( e->modifiers() & Qt::ShiftModifier )
+			if (e->modifiers() & Qt::ShiftModifier)
 			{
 				addNewChannel();
 			}
@@ -512,9 +512,9 @@ void MixerView::keyPressEvent(QKeyEvent * e)
 
 
 
-void MixerView::closeEvent( QCloseEvent * _ce )
+void MixerView::closeEvent(QCloseEvent * _ce)
  {
-	if( parentWidget() )
+	if (parentWidget())
 	{
 		parentWidget()->hide();
 	}
@@ -555,31 +555,31 @@ void MixerView::updateFaders()
 	m->mixerChannel(0)->m_peakLeft *= Engine::audioEngine()->masterGain();
 	m->mixerChannel(0)->m_peakRight *= Engine::audioEngine()->masterGain();
 
-	for( int i = 0; i < m_mixerChannelViews.size(); ++i )
+	for (int i = 0; i < m_mixerChannelViews.size(); ++i)
 	{
 		const float opl = m_mixerChannelViews[i]->m_fader->getPeak_L();
 		const float opr = m_mixerChannelViews[i]->m_fader->getPeak_R();
 		const float fallOff = 1.25;
-		if( m->mixerChannel(i)->m_peakLeft >= opl/fallOff )
+		if (m->mixerChannel(i)->m_peakLeft >= opl/fallOff)
 		{
-			m_mixerChannelViews[i]->m_fader->setPeak_L( m->mixerChannel(i)->m_peakLeft );
+			m_mixerChannelViews[i]->m_fader->setPeak_L(m->mixerChannel(i)->m_peakLeft);
 			// Set to -1 so later we'll know if this value has been refreshed yet.
 			m->mixerChannel(i)->m_peakLeft = -1;
 		}
-		else if( m->mixerChannel(i)->m_peakLeft != -1 )
+		else if (m->mixerChannel(i)->m_peakLeft != -1)
 		{
-			m_mixerChannelViews[i]->m_fader->setPeak_L( opl/fallOff );
+			m_mixerChannelViews[i]->m_fader->setPeak_L(opl/fallOff);
 		}
 
-		if( m->mixerChannel(i)->m_peakRight >= opr/fallOff )
+		if (m->mixerChannel(i)->m_peakRight >= opr/fallOff)
 		{
-			m_mixerChannelViews[i]->m_fader->setPeak_R( m->mixerChannel(i)->m_peakRight );
+			m_mixerChannelViews[i]->m_fader->setPeak_R(m->mixerChannel(i)->m_peakRight);
 			// Set to -1 so later we'll know if this value has been refreshed yet.
 			m->mixerChannel(i)->m_peakRight = -1;
 		}
-		else if( m->mixerChannel(i)->m_peakRight != -1 )
+		else if (m->mixerChannel(i)->m_peakRight != -1)
 		{
-			m_mixerChannelViews[i]->m_fader->setPeak_R( opr/fallOff );
+			m_mixerChannelViews[i]->m_fader->setPeak_R(opr/fallOff);
 		}
 	}
 }

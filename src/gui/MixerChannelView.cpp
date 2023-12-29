@@ -145,7 +145,7 @@ namespace lmms::gui
 
     void MixerChannelView::contextMenuEvent(QContextMenuEvent*)
     {
-        auto contextMenu = new CaptionMenu( Engine::mixer()->mixerChannel( m_channelIndex )->m_name, this );
+        auto contextMenu = new CaptionMenu(Engine::mixer()->mixerChannel(m_channelIndex)->m_name, this);
 
         if (m_channelIndex != 0) // no move-options in master
         {
@@ -178,11 +178,13 @@ namespace lmms::gui
 
     void MixerChannelView::paintEvent(QPaintEvent* event)
     {
-        const auto channel = Engine::mixer()->mixerChannel(m_channelIndex);
+        auto * mixer = Engine::mixer();
+        const auto channel = mixer->mixerChannel(m_channelIndex);
         const bool muted = channel->m_muteModel.value();
         const auto name = channel->m_name;
         const auto elidedName = elideName(name);
-        const auto isActive = m_mixerView->currentMixerChannel() == this;
+        const auto * mixerChannelView = m_mixerView->currentMixerChannel();
+        const auto isActive = mixerChannelView == this;
 
         if (!m_inRename && m_renameLineEdit->text() != elidedName)
         {
@@ -210,8 +212,9 @@ namespace lmms::gui
         painter.setPen(isActive ? strokeOuterActive() : strokeOuterInactive());
         painter.drawRect(0, 0, width - MIXER_CHANNEL_OUTER_BORDER_SIZE, height - MIXER_CHANNEL_OUTER_BORDER_SIZE);
 
-        const auto sendToThis = Engine::mixer()->channelSendModel(m_mixerView->currentMixerChannel()->m_channelIndex, m_channelIndex) != nullptr;
-	    const auto receiveFromThis = Engine::mixer()->channelSendModel(m_channelIndex, m_mixerView->currentMixerChannel()->m_channelIndex) != nullptr;
+        const auto & currentMixerChannelIndex = mixerChannelView->m_channelIndex;
+        const auto sendToThis = mixer->channelSendModel(currentMixerChannelIndex, m_channelIndex) != nullptr;
+        const auto receiveFromThis = mixer->channelSendModel(m_channelIndex, currentMixerChannelIndex) != nullptr;
         const auto sendReceiveStateNone = !sendToThis && !receiveFromThis;
 
         // Only one or none of them can be on
@@ -389,10 +392,13 @@ namespace lmms::gui
     void MixerChannelView::selectColor()
     {
         const auto channel = Engine::mixer()->mixerChannel(m_channelIndex);
-	    const auto newColor = ColorChooser{this}
-		    .withPalette(ColorChooser::Palette::Mixer)
-		    ->getColor(channel->color().value_or(backgroundActive().color()));
+
+        const auto initialColor = channel->color().value_or(backgroundActive().color());
+        const auto * colorChooser = ColorChooser{this}.withPalette(ColorChooser::Palette::Mixer);
+	    const auto newColor = colorChooser->getColor(initialColor);
+
 	    if (!newColor.isValid()) { return; }
+
 	    channel->setColor(newColor);
 
         Engine::getSong()->setModified();
@@ -410,25 +416,25 @@ namespace lmms::gui
     void MixerChannelView::removeChannel()
     {
         auto mix = getGUI()->mixerView();
-	    mix->deleteChannel(m_channelIndex);
+        mix->deleteChannel(m_channelIndex);
     }
 
     void MixerChannelView::removeUnusedChannels()
     {
         auto mix = getGUI()->mixerView();
-	    mix->deleteUnusedChannels();
+        mix->deleteUnusedChannels();
     }
 
     void MixerChannelView::moveChannelLeft()
     {
         auto mix = getGUI()->mixerView();
-	    mix->moveChannelLeft(m_channelIndex);
+        mix->moveChannelLeft(m_channelIndex);
     }
 
     void MixerChannelView::moveChannelRight()
     {
         auto mix = getGUI()->mixerView();
-	    mix->moveChannelRight(m_channelIndex);
+        mix->moveChannelRight(m_channelIndex);
     }
 
     QString MixerChannelView::elideName(const QString& name)

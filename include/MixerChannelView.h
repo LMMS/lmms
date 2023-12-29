@@ -61,7 +61,7 @@ namespace lmms::gui
         void paintEvent(QPaintEvent* event) override;
         void contextMenuEvent(QContextMenuEvent*) override;
         void mousePressEvent(QMouseEvent*) override;
-	    void mouseDoubleClickEvent(QMouseEvent*) override;
+        void mouseDoubleClickEvent(QMouseEvent*) override;
         bool eventFilter(QObject* dist, QEvent* event) override;
 
         int channelIndex() const;

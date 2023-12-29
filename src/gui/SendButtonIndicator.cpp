@@ -8,10 +8,10 @@
 namespace lmms::gui
 {
 
-SendButtonIndicator:: SendButtonIndicator(QWidget * _parent, MixerChannelView * _owner, MixerView * _mv) :
-	QLabel( _parent ),
-	m_parent( _owner ),
-	m_mv( _mv )
+SendButtonIndicator:: SendButtonIndicator(QWidget * parent, MixerChannelView * owner, MixerView * mv) :
+	QLabel(parent),
+	m_parent(owner),
+	m_mv(mv)
 {
 	// don't do any initializing yet, because the MixerView and MixerChannelView
 	// that were passed to this constructor are not done with their constructors
@@ -19,13 +19,13 @@ SendButtonIndicator:: SendButtonIndicator(QWidget * _parent, MixerChannelView * 
 	setPixmap(m_qpmOff);
 }
 
-void SendButtonIndicator::mousePressEvent( QMouseEvent * e )
+void SendButtonIndicator::mousePressEvent(QMouseEvent * e)
 {
 	Mixer * mix = Engine::mixer();
 	int from = m_mv->currentMixerChannel()->channelIndex();
 	int to = m_parent->channelIndex();
 	FloatModel * sendModel = mix->channelSendModel(from, to);
-	if( sendModel == nullptr )
+	if (sendModel == nullptr)
 	{
 		// not sending. create a mixer send.
 		mix->createChannelSend( from, to );
