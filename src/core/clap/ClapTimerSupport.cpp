@@ -42,11 +42,9 @@ ClapTimerSupport::ClapTimerSupport(ClapInstance* parent)
 {
 }
 
-void ClapTimerSupport::deinit()
+void ClapTimerSupport::deinitImpl() noexcept
 {
 	killTimers();
-	m_ext = nullptr;
-	m_plugin = nullptr;
 }
 
 auto ClapTimerSupport::hostExt() const -> const clap_host_timer_support*
@@ -58,9 +56,9 @@ auto ClapTimerSupport::hostExt() const -> const clap_host_timer_support*
 	return &ext;
 }
 
-auto ClapTimerSupport::checkSupported(const clap_plugin_timer_support* ext) -> bool
+auto ClapTimerSupport::checkSupported(const clap_plugin_timer_support& ext) -> bool
 {
-	return ext->on_timer;
+	return ext.on_timer;
 }
 
 void ClapTimerSupport::killTimers()
@@ -138,9 +136,9 @@ void ClapTimerSupport::timerEvent(QTimerEvent* event)
 	assert(ClapThreadCheck::isMainThread());
 	const auto timerId = static_cast<clap_id>(event->timerId());
 	assert(timerId > 0 && "Timer must be active");
-	if (m_ext && m_plugin)
+	if (pluginExt() && plugin())
 	{
-		m_ext->on_timer(m_plugin, timerId);
+		pluginExt()->on_timer(plugin(), timerId);
 	}
 }
 

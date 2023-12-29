@@ -29,15 +29,15 @@
 
 #ifdef LMMS_HAVE_CLAP
 
+#include "ClapAudioPorts.h"
 #include "ClapFile.h"
 #include "ClapGui.h"
-#include "ClapAudioPorts.h"
-#include "ClapState.h"
 #include "ClapNotePorts.h"
 #include "ClapParams.h"
-#include "ClapTimerSupport.h"
+#include "ClapState.h"
 #include "ClapThreadCheck.h"
 #include "ClapThreadPool.h"
+#include "ClapTimerSupport.h"
 
 #include "Plugin.h"
 #include "MidiEvent.h"
@@ -144,12 +144,12 @@ public:
 	 * Extensions
 	 */
 	auto audioPorts() -> ClapAudioPorts& { return m_audioPorts; }
-	auto state() -> ClapState& { return m_state; }
+	auto gui() -> ClapGui& { return m_gui; }
 	auto notePorts() -> ClapNotePorts& { return m_notePorts; }
 	auto params() -> ClapParams& { return m_params; }
-	auto gui() const { return m_pluginGui.get(); }
-	auto timerSupport() -> ClapTimerSupport& { return m_timerSupport; }
+	auto state() -> ClapState& { return m_state; }
 	auto threadPool() -> ClapThreadPool& { return m_threadPool; }
+	auto timerSupport() -> ClapTimerSupport& { return m_timerSupport; }
 
 	/////////////////////////////////////////
 	// Host
@@ -176,9 +176,6 @@ public:
 	void processKeyPressure(f_cnt_t offset, std::int8_t channel, std::int16_t key, std::uint8_t pressure);
 	auto process(std::uint32_t frames) -> bool;
 	auto processEnd(std::uint32_t frames) -> bool;
-
-	//void handlePluginOutputEvents();
-	//void generatePluginInputEvents();
 
 	auto isActive() const -> bool;
 	auto isProcessing() const -> bool;
@@ -241,8 +238,8 @@ private:
 	/**
 	 * Process-related
 	*/
-	mutable clap::helpers::EventList m_evIn;  // TODO: Find better way to handle param and note events
-	mutable clap::helpers::EventList m_evOut; // TODO: Find better way to handle param and note events
+	clap::helpers::EventList m_evIn;  // TODO: Find better way to handle param and note events
+	clap::helpers::EventList m_evOut; // TODO: Find better way to handle param and note events
 	clap_process m_process{};
 
 	/**
@@ -269,7 +266,6 @@ private:
 	/**
 	 * Plugin/Host extension pointers
 	*/
-	ClapAudioPorts m_audioPorts{ this };
 
 	static constexpr const clap_host_log s_hostExtLog {
 		&hostExtLogLog
@@ -279,22 +275,14 @@ private:
 		&hostExtLatencyChanged
 	};
 
-	std::unique_ptr<ClapGui> m_pluginGui;
-	const clap_plugin_gui* m_pluginExtGui = nullptr;
-	static constexpr const clap_host_gui s_hostExtGui {
-		&hostExtGuiResizeHintsChanged,
-		&hostExtGuiRequestResize,
-		&hostExtGuiRequestShow,
-		&hostExtGuiRequestHide,
-		&hostExtGuiRequestClosed
-	};
-
+	ClapAudioPorts m_audioPorts{ this };
+	ClapGui m_gui{ this };
 	ClapState m_state{ this };
 	ClapNotePorts m_notePorts{ this };
 	ClapParams m_params;
-	ClapTimerSupport m_timerSupport{ this };
 	//ClapThreadCheck m_threadCheck;
 	ClapThreadPool m_threadPool{ this };
+	ClapTimerSupport m_timerSupport{ this };
 };
 
 } // namespace lmms

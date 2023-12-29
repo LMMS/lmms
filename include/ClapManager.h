@@ -75,8 +75,6 @@ public:
 	//! Creates a plugin instance given plugin info; Plugin instance is owned by ClapManager
 	//auto createInstance(const ClapPluginInfo* info) -> std::weak_ptr<ClapPluginInstance>;
 
-	static auto clapGuiApi() -> const char*;
-
 	static auto debugging() { return s_debugging; }
 
 private:

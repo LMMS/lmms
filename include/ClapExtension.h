@@ -62,43 +62,85 @@ public:
 	auto operator=(const ClapExtension&) = delete;
 	auto operator=(ClapExtension&&) = delete;
 
-	virtual auto init(const clap_host* host, const clap_plugin* plugin) -> bool
+	auto init(const clap_host* host, const clap_plugin* plugin) -> bool
 	{
 		if (m_pluginExt) { return false; } // already init
 
 		m_host = host;
 		m_plugin = plugin;
 		const auto ext = static_cast<const PluginExt*>(plugin->get_extension(plugin, extensionId().data()));
-		if (!ext || !checkSupported(ext)) { return false; }
+		if (!ext || !checkSupported(*ext))
+		{
+			m_pluginExt = nullptr;
+			m_supported = false;
+			return false;
+		}
 
 		m_pluginExt = ext;
+		m_supported = true;
+		if (!initImpl(host, plugin))
+		{
+			m_supported = false;
+			return false;
+		}
+
 		return true;
 	}
 
-	virtual void deinit()
+	void deinit()
 	{
+		deinitImpl();
 		m_pluginExt = nullptr;
-		m_plugin = nullptr;
+		m_supported = false;
 	}
 
 	auto instance() const { return m_instance; }
-	auto supported() const -> bool { return m_pluginExt != nullptr; }
+
+	/**
+	 * Returns whether plugin implements required interface
+	 *   and passes any additional checks from initImpl().
+	 * Do not use before init().
+	 * 
+	*/
+	auto supported() const { return m_supported; }
+
+	/**
+	 * Checks whether the plugin extension implements the required
+	 *   API methods for use within LMMS. May not be all the methods.
+	*/
+	virtual auto checkSupported(const PluginExt& ext) -> bool = 0;
 
 	virtual auto extensionId() const -> std::string_view = 0;
 	virtual auto hostExt() const -> const HostExt* = 0;
+
+	//! Non-null after init() is called if plugin implements the needed interface
 	auto pluginExt() const { return m_pluginExt; }
 
 protected:
+	/**
+	 * For additional initialization steps.
+	 * - Only called if basic init was successful
+	 * - pluginExt() is non-null and supported() == true during this call
+	*/
+	virtual auto initImpl(const clap_host* host, const clap_plugin* plugin) noexcept -> bool { return true; }
+
+	/**
+	 * For additional deinitialization steps.
+	*/
+	virtual void deinitImpl() noexcept {}
+
 	auto host() const { return m_host; }
 	auto plugin() const { return m_plugin; }
 
-	virtual auto checkSupported(const PluginExt* ext) -> bool = 0;
-
+private:
 	const ClapInstance* m_instance = nullptr;
+
 	const clap_host* m_host = nullptr;
 	const clap_plugin* m_plugin = nullptr;
 	//const HostExt* m_hostExt = nullptr;
-	const PluginExt* m_pluginExt = nullptr; //!< stays null if extension is unsupported
+	const PluginExt* m_pluginExt = nullptr;
+
+	bool m_supported = false;
 };
 
 } // namespace lmms

@@ -129,7 +129,7 @@ public:
 		if ( !hasEditor() ) {
 			return;
 		}
-		if (embedMethod() != WindowEmbed::Method::None) {
+		if (embedMethod() != WindowEmbed::Method::Floating) {
 			m_pluginSubWindow.reset(new gui::vstSubWin( gui::getGUI()->mainWindow()->workspace() ));
 			VstPlugin::createUI( m_pluginSubWindow.get() );
 			m_pluginSubWindow->setWidget(pluginWidget());

@@ -44,9 +44,9 @@ auto ClapState::hostExt() const -> const clap_host_state*
 	return &ext;
 }
 
-auto ClapState::checkSupported(const clap_plugin_state* ext) -> bool
+auto ClapState::checkSupported(const clap_plugin_state& ext) -> bool
 {
-	return ext->load && ext->save;
+	return ext.load && ext.save;
 }
 
 auto ClapState::load(std::string_view base64) -> bool

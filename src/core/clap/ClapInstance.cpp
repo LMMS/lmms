@@ -223,7 +223,7 @@ auto ClapInstance::unload() -> bool
 	qDebug() << "Unloading plugin instance:" << m_pluginInfo->descriptor()->name;
 	assert(ClapThreadCheck::isMainThread());
 
-	m_pluginGui.reset();
+	m_gui.deinit();
 	m_timerSupport.deinit();
 
 	deactivate();
@@ -237,7 +237,6 @@ auto ClapInstance::unload() -> bool
 	// Clear all plugin extensions
 	m_audioPorts.deinit();
 	m_params.deinit();
-	m_pluginExtGui = nullptr;
 	m_state.deinit();
 	m_notePorts.deinit();
 
@@ -257,40 +256,34 @@ auto ClapInstance::init() -> bool
 
 	if (!m_plugin->init(m_plugin))
 	{
-		qWarning() << "Could not init the plugin with id:" << info().descriptor()->id;
+		std::string msg = "Could not init the plugin with id:" + std::string(info().descriptor()->id);
+		log(CLAP_LOG_ERROR, msg.c_str());
 		setPluginState(PluginState::LoadedWithError);
 		m_plugin->destroy(m_plugin);
 		m_plugin = nullptr;
 		return false;
 	}
 
-	// Clear everything just to be safe
 	m_pluginIssues.clear();
 
-	// Initialize Audio Ports extension
 	if (!m_audioPorts.init(host(), m_plugin, m_process))
 	{
 		setPluginState(PluginState::LoadedWithError);
 		return false;
 	}
 
-	if (!m_params.init(host(), m_plugin))
-	{
-		log(CLAP_LOG_DEBUG, "Plugin does not support params extension");
-	}
-
-	// Initialize GUI
 	// TODO: What if this is the 2nd instance of a mono plugin?
-	m_pluginGui.reset();
-	if (pluginExtensionInit(m_pluginExtGui, CLAP_EXT_GUI, &ClapGui::extensionSupported))
-	{
-		m_pluginGui = std::make_unique<ClapGui>(m_pluginInfo, m_plugin, m_pluginExtGui);
-	}
+	m_gui.init(host(), m_plugin);
 
 	m_notePorts.init(host(), m_plugin);
 	if (!hasNoteInput() && info().type() == Plugin::Type::Instrument)
 	{
 		log(CLAP_LOG_WARNING, "Plugin is instrument but doesn't implement note ports extension");
+	}
+
+	if (!m_params.init(host(), m_plugin))
+	{
+		log(CLAP_LOG_DEBUG, "Plugin does not support params extension");
 	}
 
 	m_state.init(host(), m_plugin);
@@ -320,7 +313,7 @@ auto ClapInstance::activate() -> bool
 		return false;
 	}
 
-	m_scheduleProcess = true; // TODO: ?????
+	m_scheduleProcess = true;
 	setPluginState(PluginState::ActiveAndSleeping);
 	return true;
 }
@@ -434,7 +427,8 @@ void ClapInstance::processKeyPressure(f_cnt_t offset, std::int8_t channel, std::
 			m_evIn.push(&ev.header);
 			break;
 		}
-		case CLAP_NOTE_DIALECT_MIDI:
+		case CLAP_NOTE_DIALECT_MIDI: [[fallthrough]];
+		case CLAP_NOTE_DIALECT_MIDI_MPE:
 		{
 			clap_event_midi ev;
 			ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
@@ -749,7 +743,7 @@ auto ClapInstance::hostGetExtension(const clap_host* host, const char* extension
 
 	const auto id = std::string_view{extensionId};
 	//if (id == CLAP_EXT_AUDIO_PORTS)   { return h->audioPorts().hostExt(); }
-	if (id == CLAP_EXT_GUI)           { return &s_hostExtGui; }
+	if (id == CLAP_EXT_GUI)           { return h->gui().hostExt(); }
 	if (id == CLAP_EXT_LATENCY)       { return &s_hostExtLatency; }
 	if (id == CLAP_EXT_LOG)           { return &s_hostExtLog; }
 	if (id == CLAP_EXT_NOTE_PORTS)    { return h->notePorts().hostExt(); }
@@ -799,36 +793,6 @@ void ClapInstance::hostExtLatencyChanged([[maybe_unused]] const clap_host* host)
 	 * https://github.com/DISTRHO/DPF/commit/4f11f8cc49b24ede1735a16606e7bad5a52ab41d
 	 */
 	//qDebug() << "ClapInstance::hostExtLatencyChanged";
-}
-
-void ClapInstance::hostExtGuiResizeHintsChanged(const clap_host* host)
-{
-	auto gui = fromHost(host)->gui();
-	gui->clapResizeHintsChanged();
-}
-
-auto ClapInstance::hostExtGuiRequestResize(const clap_host* host, std::uint32_t width, std::uint32_t height) -> bool
-{
-	auto gui = fromHost(host)->gui();
-	return gui->clapRequestResize(width, height);
-}
-
-auto ClapInstance::hostExtGuiRequestShow(const clap_host* host) -> bool
-{
-	auto gui = fromHost(host)->gui();
-	return gui->clapRequestShow();
-}
-
-auto ClapInstance::hostExtGuiRequestHide(const clap_host* host) -> bool
-{
-	auto gui = fromHost(host)->gui();
-	return gui->clapRequestHide();
-}
-
-void ClapInstance::hostExtGuiRequestClosed(const clap_host* host, bool wasDestroyed)
-{
-	auto gui = fromHost(host)->gui();
-	gui->clapRequestClosed(wasDestroyed);
 }
 
 } // namespace lmms

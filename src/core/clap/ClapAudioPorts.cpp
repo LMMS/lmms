@@ -92,8 +92,9 @@ namespace
 	}
 } // namespace
 
-auto ClapAudioPorts::init(const clap_host* host, const clap_plugin* plugin, clap_process& process) -> bool
+auto ClapAudioPorts::init(const clap_host* host, const clap_plugin* plugin, clap_process& process) noexcept -> bool
 {
+	// NOTE: I'm using this init() method instead of implementing initImpl() because I need the `process` parameter
 	if (!ClapExtension::init(host, plugin))
 	{
 		instance()->log(CLAP_LOG_ERROR, "Plugin does not implement the required audio port extension");
@@ -133,7 +134,7 @@ auto ClapAudioPorts::init(const clap_host* host, const clap_plugin* plugin, clap
 			return nullptr;
 		}
 
-		const auto portCount = pluginExt()->count(m_plugin, isInput);
+		const auto portCount = pluginExt()->count(this->plugin(), isInput);
 
 		if (isInput)
 		{
@@ -166,7 +167,7 @@ auto ClapAudioPorts::init(const clap_host* host, const clap_plugin* plugin, clap
 			auto info = clap_audio_port_info{};
 			info.id = CLAP_INVALID_ID;
 			info.in_place_pair = CLAP_INVALID_ID;
-			if (!pluginExt()->get(m_plugin, idx, isInput, &info))
+			if (!pluginExt()->get(this->plugin(), idx, isInput, &info))
 			{
 				qWarning() << "Unknown error calling clap_plugin_audio_ports->get(...)";
 				m_issues.emplace_back(PluginIssueType::PortHasNoDef);
@@ -319,9 +320,9 @@ auto ClapAudioPorts::init(const clap_host* host, const clap_plugin* plugin, clap
 	return true;
 }
 
-auto ClapAudioPorts::checkSupported(const clap_plugin_audio_ports* ext) -> bool
+auto ClapAudioPorts::checkSupported(const clap_plugin_audio_ports& ext) -> bool
 {
-	return ext->count && ext->get;
+	return ext.count && ext.get;
 }
 
 void ClapAudioPorts::copyBuffersFromCore(const sampleFrame* buf, unsigned firstChannel, unsigned numChannels, fpp_t frames)

@@ -274,20 +274,6 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 	}
 }
 
-auto ClapManager::clapGuiApi() -> const char*
-{
-#if defined(LMMS_BUILD_LINUX)
-	return CLAP_WINDOW_API_X11;
-#elif defined(LMMS_BUILD_WIN32) || defined(LMMS_BUILD_WIN64)
-	return CLAP_WINDOW_API_WIN32;
-#elif defined(LMMS_BUILD_APPLE)
-	return CLAP_WINDOW_API_COCOA;
-#else
-	// Unsupported platform
-	return nullptr;
-#endif
-}
-
 auto ClapManager::pluginInfo(const std::string& uri) -> std::weak_ptr<const ClapPluginInfo>
 {
 	const auto iter = m_uriToPluginInfo.find(uri);

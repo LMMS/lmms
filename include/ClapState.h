@@ -64,7 +64,7 @@ public:
 	auto encodedState() const -> std::string_view { return m_state; }
 
 private:
-	auto checkSupported(const clap_plugin_state* ext) -> bool override;
+	auto checkSupported(const clap_plugin_state& ext) -> bool override;
 
 	/**
 	 * clap_host_state implementation

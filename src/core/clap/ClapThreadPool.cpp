@@ -33,10 +33,8 @@
 namespace lmms
 {
 
-auto ClapThreadPool::init(const clap_host* host, const clap_plugin* plugin) -> bool
+auto ClapThreadPool::initImpl(const clap_host* host, const clap_plugin* plugin) noexcept -> bool
 {
-	if (!ClapExtension::init(host, plugin)) { return false; }
-
 	m_stop = false;
 	m_taskIndex = 0;
 	auto numThreads = QThread::idealThreadCount();
@@ -50,10 +48,9 @@ auto ClapThreadPool::init(const clap_host* host, const clap_plugin* plugin) -> b
 	return true;
 }
 
-void ClapThreadPool::deinit()
+void ClapThreadPool::deinitImpl() noexcept
 {
 	terminate();
-	ClapExtension::deinit();
 }
 
 auto ClapThreadPool::hostExt() const -> const clap_host_thread_pool*
@@ -64,9 +61,9 @@ auto ClapThreadPool::hostExt() const -> const clap_host_thread_pool*
 	return &ext;
 }
 
-auto ClapThreadPool::checkSupported(const clap_plugin_thread_pool* ext) -> bool
+auto ClapThreadPool::checkSupported(const clap_plugin_thread_pool& ext) -> bool
 {
-	return ext->exec;
+	return ext.exec;
 }
 
 void ClapThreadPool::entry()
@@ -77,7 +74,7 @@ void ClapThreadPool::entry()
 		if (m_stop) { return; }
 
 		const auto taskIndex = m_taskIndex++;
-		pluginExt()->exec(m_plugin, taskIndex);
+		pluginExt()->exec(plugin(), taskIndex);
 		m_semaphoreDone.release();
 	}
 }
@@ -117,7 +114,7 @@ auto ClapThreadPool::clapRequestExec(const clap_host* host, std::uint32_t numTas
 
 	if (numTasks == 1)
 	{
-		threadPool.pluginExt()->exec(threadPool.m_plugin, 0);
+		threadPool.pluginExt()->exec(threadPool.plugin(), 0);
 		return true;
 	}
 

@@ -44,19 +44,17 @@ ClapParams::ClapParams(Model* parent, ClapInstance* instance,
 {
 }
 
-auto ClapParams::init(const clap_host* host, const clap_plugin* plugin) -> bool
+auto ClapParams::initImpl(const clap_host* host, const clap_plugin* plugin) noexcept -> bool
 {
-	if (!ClapExtension::init(host, plugin)) { return false; }
 	if (!rescan(CLAP_PARAM_RESCAN_ALL)) { return false; }
 	setModels();
 	return true;
 }
 
-void ClapParams::deinit()
+void ClapParams::deinitImpl() noexcept
 {
 	m_paramMap.clear();
 	m_params.clear();
-	ClapExtension::deinit();
 }
 
 auto ClapParams::hostExt() const -> const clap_host_params*
@@ -69,10 +67,10 @@ auto ClapParams::hostExt() const -> const clap_host_params*
 	return &ext;
 }
 
-auto ClapParams::checkSupported(const clap_plugin_params* ext) -> bool
+auto ClapParams::checkSupported(const clap_plugin_params& ext) -> bool
 {
 	// NOTE: value_to_text and text_to_value are not strictly required
-	return ext->count && ext->get_info && ext->get_value && ext->flush;
+	return ext.count && ext.get_info && ext.get_value && ext.flush;
 }
 
 auto ClapParams::rescan(clap_param_rescan_flags flags) -> bool
@@ -277,7 +275,7 @@ void ClapParams::flushOnMainThread()
 
 	generatePluginInputEvents();
 
-	pluginExt()->flush(m_plugin, m_evIn->clapInputEvents(), m_evOut->clapOutputEvents());
+	pluginExt()->flush(plugin(), m_evIn->clapInputEvents(), m_evOut->clapOutputEvents());
 
 	handlePluginOutputEvents();
 
@@ -424,7 +422,7 @@ auto ClapParams::getValue(const clap_param_info& info) const -> double
 	assert(supported());
 
 	double value = 0.0;
-	if (pluginExt()->get_value(m_plugin, info.id, &value)) { return value; }
+	if (pluginExt()->get_value(plugin(), info.id, &value)) { return value; }
 
 	std::string msg = "failed to get the param value, id: " + std::to_string(info.id)
 		+ ", name: " + std::string{info.name} + ", module: " + std::string{info.module};

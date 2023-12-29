@@ -425,7 +425,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	m_vstEmbedComboBox = new QComboBox(pluginsBox);
 
-	m_vstEmbedComboBox->addItem(tr("No embedding"), static_cast<int>(WindowEmbed::Method::None));
+	m_vstEmbedComboBox->addItem(tr("No embedding"), static_cast<int>(WindowEmbed::Method::Floating));
 	for (const auto embedMethod : WindowEmbed::availableMethods())
 	{
 		switch (embedMethod)
@@ -1155,7 +1155,7 @@ void SetupDialog::toggleAnimateAFP(bool enabled)
 void SetupDialog::vstEmbedMethodChanged()
 {
 	m_vstEmbedMethod = WindowEmbed::Method{m_vstEmbedComboBox->currentData().toInt()};
-	m_vstAlwaysOnTopCheckBox->setVisible(m_vstEmbedMethod == WindowEmbed::Method::None);
+	m_vstAlwaysOnTopCheckBox->setVisible(m_vstEmbedMethod == WindowEmbed::Method::Floating);
 }
 
 

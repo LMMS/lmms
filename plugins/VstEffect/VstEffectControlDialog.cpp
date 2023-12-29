@@ -69,7 +69,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 					_ctl->m_effect->m_plugin != nullptr )
 	{
 		m_plugin = _ctl->m_effect->m_plugin;
-		embed_vst = m_plugin->embedMethod() != WindowEmbed::Method::None;
+		embed_vst = m_plugin->embedMethod() != WindowEmbed::Method::Floating;
 
 		if (embed_vst) {
 			if (m_plugin->hasEditor() && ! m_plugin->pluginWidget()) {

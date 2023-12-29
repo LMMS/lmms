@@ -1,5 +1,5 @@
 /*
- * ClapGui.h - Implements CLAP GUI extension
+ * ClapGui.h - Implements CLAP gui extension
  *
  * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -30,6 +30,7 @@
 #ifdef LMMS_HAVE_CLAP
 
 #include "ClapFile.h"
+#include "ClapExtension.h"
 #include "WindowEmbed.h"
 
 #include <string_view>
@@ -43,41 +44,47 @@ struct clap_plugin;
 namespace lmms
 {
 
-class ClapGui
+class ClapGui : public ClapExtension<clap_host_gui, clap_plugin_gui>
 {
 public:
-	friend class ClapInstance;
+	ClapGui(ClapInstance* instance);
+	~ClapGui() { destroy(); }
 
-	ClapGui(const ClapPluginInfo* info, const clap_plugin* plugin, const clap_plugin_gui* gui);
-	~ClapGui();
+	auto extensionId() const -> std::string_view override { return CLAP_EXT_GUI; }
+	auto hostExt() const -> const clap_host_gui* override;
 
 	auto create() -> bool;
 	void destroy();
 
-	static auto extensionSupported(const clap_plugin_gui* ext) noexcept -> bool;
+	auto isFloating() const { return m_embedMethod == WindowEmbed::Method::Floating; }
 
-	auto gui() const { return m_gui; }
-	auto isFloating() const { return m_embedMethod == WindowEmbed::Method::None; }
+	auto supportsEmbed() const { return m_supportsEmbed; }
+	auto supportsFloating() const { return m_supportsFloating; }
 
 private:
+	auto initImpl(const clap_host* host, const clap_plugin* plugin) noexcept -> bool override;
+	void deinitImpl() noexcept override;
+	auto checkSupported(const clap_plugin_gui& ext) -> bool override;
 
-	static auto windowSupported(const clap_plugin_gui* ext, bool floating) noexcept -> bool;
+	static auto windowSupported(const clap_plugin_gui& ext, bool floating) -> bool;
 
 	/**
 	 * clap_host_gui implementation
 	 */
-	void clapResizeHintsChanged();
-	auto clapRequestResize(std::uint32_t width, std::uint32_t height) -> bool;
-	auto clapRequestShow() -> bool;
-	auto clapRequestHide() -> bool;
-	void clapRequestClosed(bool wasDestroyed);
+	static void clapResizeHintsChanged(const clap_host* host);
+	static auto clapRequestResize(const clap_host* host, std::uint32_t width, std::uint32_t height) -> bool;
+	static auto clapRequestShow(const clap_host* host) -> bool;
+	static auto clapRequestHide(const clap_host* host) -> bool;
+	static void clapRequestClosed(const clap_host* host, bool wasDestroyed);
 
-	const ClapPluginInfo* m_pluginInfo = nullptr;
-	const clap_plugin* m_plugin = nullptr;
-	const clap_plugin_gui* m_gui = nullptr;
+	clap_window m_window{};
+
+	bool m_created = false;
+	bool m_visible = false;
+
 	WindowEmbed::Method m_embedMethod = WindowEmbed::Method::Headless;
-	bool m_guiCreated = false;
-	bool m_guiVisible = false;
+	bool m_supportsEmbed = false;
+	bool m_supportsFloating = false;
 };
 
 } // namespace lmms

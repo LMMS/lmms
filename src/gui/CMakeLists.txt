@@ -4,7 +4,6 @@ SET(LMMS_SRCS
 	gui/AudioAlsaSetupWidget.cpp
 	gui/AudioDeviceSetupWidget.cpp
 	gui/AutomatableModelView.cpp
-	gui/ClapGui.cpp
 	gui/ClapViewBase.cpp
 	gui/ControlLayout.cpp
 	gui/ControllerDialog.cpp

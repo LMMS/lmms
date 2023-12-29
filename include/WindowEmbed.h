@@ -35,8 +35,8 @@ struct WindowEmbed
 {
 	enum class Method
 	{
-		None,     // Detached/Floating
-		Headless, // No GUI at all
+		Headless, // no GUI at all
+		Floating, // detached
 		Qt,
 		Win32,
 		Cocoa,
@@ -55,8 +55,8 @@ struct WindowEmbed
 		// NOTE: These strings must NOT change - used in files saved to disk
 		switch (method)
 		{
-			case Method::None:     return "none";
 			case Method::Headless: return "headless";
+			case Method::Floating: return "none";
 			case Method::Qt:       return "qt";
 			case Method::Win32:    return "win32";
 			case Method::Cocoa:    return "cocoa";
@@ -68,14 +68,14 @@ struct WindowEmbed
 
 	static auto toEnum(std::string_view method) -> Method
 	{
-		if (method == "none") { return Method::None; }
 		if (method == "headless") { return Method::Headless; }
+		if (method == "none") { return Method::Floating; }
 		if (method == "qt") { return Method::Qt; }
 		if (method == "win32") { return Method::Win32; }
 		if (method == "cocoa") { return Method::Cocoa; }
 		if (method == "xembed") { return Method::XEmbed; }
 		//assert("invalid window embed method");
-		return Method::None;
+		return Method::Floating;
 	}
 };
 

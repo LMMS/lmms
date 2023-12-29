@@ -111,6 +111,7 @@ set(LMMS_SRCS
 	core/clap/ClapControlBase.cpp
 	core/clap/ClapExtension.cpp
 	core/clap/ClapFile.cpp
+	core/clap/ClapGui.cpp
 	core/clap/ClapInstance.cpp
 	core/clap/ClapManager.cpp
 	core/clap/ClapNotePorts.cpp

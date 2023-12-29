@@ -36,11 +36,10 @@
 namespace lmms
 {
 
-auto ClapNotePorts::init(const clap_host* host, const clap_plugin* plugin) -> bool
+auto ClapNotePorts::initImpl(const clap_host* host, const clap_plugin* plugin) noexcept -> bool
 {
 	m_portIndex = 0;
 	m_dialect = 0;
-	if (!ClapExtension::init(host, plugin)) { return false; }
 	clapRescan(host, CLAP_NOTE_PORTS_RESCAN_ALL);
 	return true;
 }
@@ -54,9 +53,9 @@ auto ClapNotePorts::hostExt() const -> const clap_host_note_ports*
 	return &ext;
 }
 
-auto ClapNotePorts::checkSupported(const clap_plugin_note_ports* ext) -> bool
+auto ClapNotePorts::checkSupported(const clap_plugin_note_ports& ext) -> bool
 {
-	return ext->count && ext->get;
+	return ext.count && ext.get;
 }
 
 auto ClapNotePorts::clapSupportedDialects([[maybe_unused]] const clap_host* host) -> std::uint32_t

@@ -272,7 +272,7 @@ void VstPlugin::loadSettings( const QDomElement & _this )
 
 void VstPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	if (m_embedMethod != WindowEmbed::Method::None)
+	if (m_embedMethod != WindowEmbed::Method::Floating)
 	{
 		if( pluginWidget() != nullptr )
 		{
@@ -312,7 +312,7 @@ void VstPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void VstPlugin::toggleUI()
 {
-	if (m_embedMethod == WindowEmbed::Method::None)
+	if (m_embedMethod == WindowEmbed::Method::Floating)
 	{
 		RemotePlugin::toggleUI();
 	}
@@ -405,7 +405,7 @@ bool VstPlugin::processMessage( const message & _m )
 	{
 	case IdVstPluginWindowID:
 		m_pluginWindowID = _m.getInt();
-		if (m_embedMethod == WindowEmbed::Method::None
+		if (m_embedMethod == WindowEmbed::Method::Floating
 			&& ConfigManager::inst()->value(
 				"ui", "vstalwaysontop" ).toInt() )
 		{
@@ -632,7 +632,7 @@ void VstPlugin::idleUpdate()
 
 void VstPlugin::showUI()
 {
-	if (m_embedMethod == WindowEmbed::Method::None)
+	if (m_embedMethod == WindowEmbed::Method::Floating)
 	{
 		RemotePlugin::showUI();
 	}
@@ -647,7 +647,7 @@ void VstPlugin::showUI()
 
 void VstPlugin::hideUI()
 {
-	if (m_embedMethod == WindowEmbed::Method::None)
+	if (m_embedMethod == WindowEmbed::Method::Floating)
 	{
 		RemotePlugin::hideUI();
 	}

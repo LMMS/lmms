@@ -41,7 +41,6 @@ class ClapNotePorts final : public ClapExtension<clap_host_note_ports, clap_plug
 public:
 	using ClapExtension::ClapExtension;
 
-	auto init(const clap_host* host, const clap_plugin* plugin) -> bool override;
 	auto extensionId() const -> std::string_view override { return CLAP_EXT_NOTE_PORTS; }
 	auto hostExt() const -> const clap_host_note_ports* override;
 
@@ -51,7 +50,8 @@ public:
 	auto hasInput() const -> bool { return m_dialect != 0; }
 
 private:
-	auto checkSupported(const clap_plugin_note_ports* ext) -> bool override;
+	auto initImpl(const clap_host* host, const clap_plugin* plugin) noexcept -> bool override;
+	auto checkSupported(const clap_plugin_note_ports& ext) -> bool override;
 
 	/**
 	 * clap_host_note_ports implementation

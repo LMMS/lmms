@@ -108,7 +108,7 @@ public:
 	using ClapExtension::ClapExtension;
 	~ClapAudioPorts() override { deinit(); }
 
-	auto init(const clap_host* host, const clap_plugin* plugin, clap_process& process) -> bool;
+	auto init(const clap_host* host, const clap_plugin* plugin, clap_process& process) noexcept -> bool;
 
 	auto extensionId() const -> std::string_view override { return CLAP_EXT_AUDIO_PORTS; }
 	auto hostExt() const -> const clap_host_audio_ports* override { return nullptr; } // not impl for host yet
@@ -143,7 +143,7 @@ public:
 	void copyBuffersToCore(sampleFrame* buf, unsigned firstChannel, unsigned numChannels, fpp_t frames) const;
 
 private:
-	auto checkSupported(const clap_plugin_audio_ports* ext) -> bool override;
+	auto checkSupported(const clap_plugin_audio_ports& ext) -> bool override;
 
 	bool m_hasStereoInput = false;
 	bool m_hasStereoOutput = false;

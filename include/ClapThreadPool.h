@@ -50,14 +50,13 @@ public:
 	using ClapExtension::ClapExtension;
 	~ClapThreadPool() override { deinit(); }
 
-	auto init(const clap_host* host, const clap_plugin* plugin) -> bool override;
-	void deinit() override;
-
 	auto extensionId() const -> std::string_view override { return CLAP_EXT_THREAD_POOL; }
 	auto hostExt() const -> const clap_host_thread_pool* override;
 
 private:
-	auto checkSupported(const clap_plugin_thread_pool* ext) -> bool override;
+	auto initImpl(const clap_host* host, const clap_plugin* plugin) noexcept -> bool override;
+	void deinitImpl() noexcept override;
+	auto checkSupported(const clap_plugin_thread_pool& ext) -> bool override;
 
 	void entry();
 	void terminate();

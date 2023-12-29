@@ -2464,7 +2464,7 @@ int main( int _argc, char * * _argv )
 	#endif
 		auto embedMethod = lmms::WindowEmbed::toEnum(_argv[embedMethodIndex]);
 
-		if (embedMethod == lmms::WindowEmbed::Method::None)
+		if (embedMethod == lmms::WindowEmbed::Method::Floating)
 		{
 			std::cerr << "Starting detached." << std::endl;
 			EMBED = EMBED_X11 = EMBED_WIN32 = HEADLESS = false;

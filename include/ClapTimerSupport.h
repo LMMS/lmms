@@ -48,15 +48,14 @@ class ClapTimerSupport
 public:
 	ClapTimerSupport(ClapInstance* parent);
 
-	void deinit() override;
 	auto extensionId() const -> std::string_view override { return CLAP_EXT_TIMER_SUPPORT; }
 	auto hostExt() const -> const clap_host_timer_support* override;
 
 	void killTimers();
 
 private:
-
-	auto checkSupported(const clap_plugin_timer_support* ext) -> bool override;
+	void deinitImpl() noexcept override;
+	auto checkSupported(const clap_plugin_timer_support& ext) -> bool override;
 
 	/**
 	 * clap_host_timer_support implementation
@@ -66,8 +65,6 @@ private:
 
 	void timerEvent(QTimerEvent* event) override;
 
-	const clap_plugin* m_plugin = nullptr;
-	const clap_plugin_timer_support* m_ext = nullptr;
 	std::unordered_set<clap_id> m_timerIds;
 };
 
