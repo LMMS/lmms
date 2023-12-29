@@ -79,7 +79,6 @@ namespace lmms::gui
 
         auto renameLineEditScene = new QGraphicsScene{};
         m_renameLineEditView = new QGraphicsView{};
-        m_renameLineEditView->setStyleSheet("border-style: none; background: transparent;");
         m_renameLineEditView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         m_renameLineEditView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         m_renameLineEditView->setAttribute(Qt::WA_TransparentForMouseEvents, true);

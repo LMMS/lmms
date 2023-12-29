@@ -684,6 +684,11 @@ lmms--gui--MixerChannelView {
 	qproperty-strokeInnerInactive: #0C0D0F;
 }
 
+lmms--gui--MixerChannelView QGraphicsView {
+	background: transparent;
+	border-style: none;
+}
+
 /* persistent peak markers for fx peak meters */
 lmms--gui--Fader {
 	qproperty-peakGreen: #0ad45c;
