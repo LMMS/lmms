@@ -46,17 +46,17 @@ class LMMS_EXPORT MixerView : public QWidget, public ModelView,
 	Q_OBJECT
 public:
 	MixerView();
-	void keyPressEvent(QKeyEvent * e) override;
+	void keyPressEvent(QKeyEvent* e) override;
 
-	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
-	void loadSettings( const QDomElement & _this ) override;
+	void saveSettings(QDomDocument& doc, QDomElement& domElement) override;
+	void loadSettings(const QDomElement& domElement) override;
 
 	inline MixerChannelView* currentMixerChannel()
 	{
 		return m_currentMixerChannel;
 	}
 
-	inline MixerChannelView * channelView(int index)
+	inline MixerChannelView* channelView(int index)
 	{
 		return m_mixerChannelViews[index];
 	}
@@ -93,22 +93,22 @@ public slots:
 	int addNewChannel();
 
 protected:
-	void closeEvent( QCloseEvent * _ce ) override;
+	void closeEvent(QCloseEvent* ce) override;
 
 private slots:
 	void updateFaders();
 	void toggledSolo();
 
 private:
-	QVector<MixerChannelView *> m_mixerChannelViews;
+	QVector<MixerChannelView*> m_mixerChannelViews;
 
 	MixerChannelView* m_currentMixerChannel;
 
-	QScrollArea * channelArea;
-	QHBoxLayout * chLayout;
-	QWidget * m_channelAreaWidget;
-	QStackedLayout * m_racksLayout;
-	QWidget * m_racksWidget;
+	QScrollArea* channelArea;
+	QHBoxLayout* chLayout;
+	QWidget* m_channelAreaWidget;
+	QStackedLayout* m_racksLayout;
+	QWidget* m_racksWidget;
 
 	void updateMaxChannelSelector();
 

@@ -71,16 +71,16 @@ namespace lmms::gui
         void setSendReceiveState(const SendReceiveState& state);
 
         QBrush backgroundActive() const;
-        void setBackgroundActive(const QBrush & c);
+        void setBackgroundActive(const QBrush& c);
 
         QColor strokeOuterActive() const;
-        void setStrokeOuterActive(const QColor & c);
+        void setStrokeOuterActive(const QColor& c);
 
         QColor strokeOuterInactive() const;
-        void setStrokeOuterInactive(const QColor & c );
+        void setStrokeOuterInactive(const QColor& c);
 
         QColor strokeInnerActive() const;
-        void setStrokeInnerActive(const QColor & c );
+        void setStrokeInnerActive(const QColor& c);
 
         QColor strokeInnerInactive() const;
         void setStrokeInnerInactive(const QColor& c);

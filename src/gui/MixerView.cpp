@@ -123,23 +123,25 @@ MixerView::MixerView() :
 	class ChannelArea : public QScrollArea
 	{
 		public:
-			ChannelArea(QWidget * parent, MixerView * mv) :
+			ChannelArea(QWidget* parent, MixerView* mv) :
 				QScrollArea(parent), m_mv(mv) {}
 			~ChannelArea() override = default;
-			void keyPressEvent(QKeyEvent * e) override
+			void keyPressEvent(QKeyEvent* e) override
 			{
 				m_mv->keyPressEvent(e);
 			}
 		private:
-			MixerView * m_mv;
+			MixerView* m_mv;
 	};
 	channelArea = new ChannelArea(this, this);
 	channelArea->setWidget(m_channelAreaWidget);
 	channelArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	channelArea->setFrameStyle(QFrame::NoFrame);
 	channelArea->setMinimumWidth(mixerChannelSize.width() * 6);
-	channelArea->setFixedHeight(mixerChannelSize.height() +
-			style()->pixelMetric(QStyle::PM_ScrollBarExtent));
+
+	int const scrollBarExtent = style()->pixelMetric(QStyle::PM_ScrollBarExtent);
+	channelArea->setFixedHeight(mixerChannelSize.height() + scrollBarExtent);
+
 	ml->addWidget(channelArea, 1, Qt::AlignTop);
 
 	// show the add new mixer channel button
@@ -158,13 +160,13 @@ MixerView::MixerView() :
 
 	updateGeometry();
 
-	// timer for updating faders
-	connect(getGUI()->mainWindow(), SIGNAL(periodicUpdate()),
-					this, SLOT(updateFaders()));
+	auto* mainWindow = getGUI()->mainWindow();
 
+	// timer for updating faders
+	connect(mainWindow, &MainWindow::periodicUpdate, this, &MixerView::updateFaders);
 
 	// add ourself to workspace
-	QMdiSubWindow * subWin = getGUI()->mainWindow()->addWindowedWidget(this);
+	QMdiSubWindow* subWin = mainWindow->addWindowedWidget(this);
 	Qt::WindowFlags flags = subWin->windowFlags();
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	subWin->setWindowFlags(flags);
@@ -258,17 +260,17 @@ void MixerView::updateMaxChannelSelector()
 }
 
 
-void MixerView::saveSettings(QDomDocument & _doc, QDomElement & _this)
+void MixerView::saveSettings(QDomDocument& doc, QDomElement& domElement)
 {
-	MainWindow::saveWidgetState(this, _this);
+	MainWindow::saveWidgetState(this, domElement);
 }
 
 
 
 
-void MixerView::loadSettings(const QDomElement & _this)
+void MixerView::loadSettings(const QDomElement& domElement)
 {
-	MainWindow::restoreWidgetState(this, _this);
+	MainWindow::restoreWidgetState(this, domElement);
 }
 
 
@@ -512,7 +514,7 @@ void MixerView::keyPressEvent(QKeyEvent * e)
 
 
 
-void MixerView::closeEvent(QCloseEvent * _ce)
+void MixerView::closeEvent(QCloseEvent * ce)
  {
 	if (parentWidget())
 	{
@@ -522,7 +524,7 @@ void MixerView::closeEvent(QCloseEvent * _ce)
 	{
 		hide();
 	}
-	_ce->ignore();
+	ce->ignore();
  }
 
 

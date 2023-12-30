@@ -69,13 +69,13 @@ namespace lmms::gui
 
         const auto mixerChannel = Engine::mixer()->mixerChannel(channelIndex);
         const auto mixerName = mixerChannel->m_name;
-    	setToolTip(mixerName);
+        setToolTip(mixerName);
 
         m_renameLineEdit = new QLineEdit{mixerName, nullptr};
         m_renameLineEdit->setFixedWidth(65);
         m_renameLineEdit->setFont(pointSizeF(font(), 7.5f));
         m_renameLineEdit->setReadOnly(true);
-    	m_renameLineEdit->installEventFilter(this);
+        m_renameLineEdit->installEventFilter(this);
 
         auto renameLineEditScene = new QGraphicsScene{};
         m_renameLineEditView = new QGraphicsView{};
@@ -113,7 +113,7 @@ namespace lmms::gui
         m_soloButton->setToolTip(tr("Solo this channel"));
         connect(&mixerChannel->m_soloModel, &BoolModel::dataChanged, mixerView, &MixerView::toggledSolo, Qt::DirectConnection);
 
-        QVBoxLayout * soloMuteLayout = new QVBoxLayout();
+        QVBoxLayout* soloMuteLayout = new QVBoxLayout();
         soloMuteLayout->setContentsMargins(0, 0, 0, 0);
         soloMuteLayout->setSpacing(0);
         soloMuteLayout->addWidget(m_soloButton, 0, Qt::AlignHCenter);
@@ -298,7 +298,7 @@ namespace lmms::gui
         return m_backgroundActive;
     }
 
-    void MixerChannelView::setBackgroundActive(const QBrush & c)
+    void MixerChannelView::setBackgroundActive(const QBrush& c)
     {
         m_backgroundActive = c;
     }
@@ -308,7 +308,7 @@ namespace lmms::gui
         return m_strokeOuterActive;
     }
 
-    void MixerChannelView::setStrokeOuterActive(const QColor & c)
+    void MixerChannelView::setStrokeOuterActive(const QColor& c)
     {
         m_strokeOuterActive = c;
     }
@@ -394,11 +394,11 @@ namespace lmms::gui
 
         const auto initialColor = channel->color().value_or(backgroundActive().color());
         const auto * colorChooser = ColorChooser{this}.withPalette(ColorChooser::Palette::Mixer);
-	    const auto newColor = colorChooser->getColor(initialColor);
+        const auto newColor = colorChooser->getColor(initialColor);
 
-	    if (!newColor.isValid()) { return; }
+        if (!newColor.isValid()) { return; }
 
-	    channel->setColor(newColor);
+        channel->setColor(newColor);
 
         Engine::getSong()->setModified();
         update();
