@@ -124,8 +124,7 @@ private:
 
 	inline bool clips(float const & value) const { return value >= 1.0f; }
 
-	void paintDBFSLevels(QPaintEvent *ev, QPainter & painter);
-	void paintLinearLevels(QPaintEvent *ev, QPainter & painter);
+	void paintLevels(QPaintEvent *ev, QPainter & painter, bool linear = false);
 
 	int knobPosY() const
 	{
@@ -136,7 +135,6 @@ private:
 	}
 
 	void setPeak( float fPeak, float &targetPeak, float &persistentPeak, QElapsedTimer &lastPeakTimer );
-	int calculateDisplayPeak( float fPeak );
 
 	void updateTextFloat();
 
