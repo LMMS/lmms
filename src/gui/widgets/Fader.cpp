@@ -74,9 +74,9 @@ Fader::Fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 	m_levelsDisplayedInDBFS(false),
 	m_moveStartPoint( -1 ),
 	m_startValue( 0 ),
-	m_peakGreen( 0, 0, 0 ),
-	m_peakRed( 0, 0, 0 ),
-	m_peakYellow( 0, 0, 0 )
+	m_peakOk(10, 212, 92),
+	m_peakClip(193, 32, 56),
+	m_peakWarn(214, 236, 82)
 {
 	if( s_textFloat == nullptr )
 	{
@@ -101,8 +101,9 @@ Fader::Fader( FloatModel * model, const QString & name, QWidget * parent, QPixma
 	m_levelsDisplayedInDBFS(false),
 	m_moveStartPoint( -1 ),
 	m_startValue( 0 ),
-	m_peakGreen( 0, 0, 0 ),
-	m_peakRed( 0, 0, 0 )
+	m_peakOk(10, 212, 92),
+	m_peakClip(193, 32, 56),
+	m_peakWarn(214, 236, 82)
 {
 	if( s_textFloat == nullptr )
 	{
@@ -411,10 +412,9 @@ void Fader::paintLevels(QPaintEvent * ev, QPainter & painter, bool linear)
 	PaintHelper ph(mappedMinPeak, mappedMaxPeak);
 
 	// Prepare the gradient for the meters
-	// TODO Enable for style sheets
-	QColor const clippingColor = QColor(193, 32, 56); //Qt::red;
-	QColor const warnColor = QColor(214, 236, 82); //Qt::yellow;
-	QColor const okColor = QColor(10, 212, 92); //Qt::green;
+	QColor const & clippingColor = peakClip();
+	QColor const & warnColor = peakWarn();
+	QColor const & okColor = peakOk();
 
 	QLinearGradient linearGrad(0, margin, 0, leftMeterRect.y() + leftMeterRect.height());
 	linearGrad.setColorAt(0, clippingColor);
@@ -457,34 +457,34 @@ void Fader::paintLevels(QPaintEvent * ev, QPainter & painter, bool linear)
 	painter.restore();
 }
 
-QColor const & Fader::peakGreen() const
+QColor const & Fader::peakOk() const
 {
-	return m_peakGreen;
+	return m_peakOk;
 }
 
-QColor const & Fader::peakRed() const
+QColor const & Fader::peakClip() const
 {
-	return m_peakRed;
+	return m_peakClip;
 }
 
-QColor const & Fader::peakYellow() const
+QColor const & Fader::peakWarn() const
 {
-	return m_peakYellow;
+	return m_peakWarn;
 }
 
-void Fader::setPeakGreen( const QColor & c )
+void Fader::setPeakOk(const QColor& c)
 {
-	m_peakGreen = c;
+	m_peakOk = c;
 }
 
-void Fader::setPeakRed( const QColor & c )
+void Fader::setPeakClip(const QColor& c)
 {
-	m_peakRed = c;
+	m_peakClip = c;
 }
 
-void Fader::setPeakYellow( const QColor & c )
+void Fader::setPeakWarn(const QColor& c)
 {
-	m_peakYellow = c;
+	m_peakWarn = c;
 }
 
 

@@ -66,10 +66,10 @@ class LMMS_EXPORT Fader : public QWidget, public FloatModelView
 {
 	Q_OBJECT
 public:
-	Q_PROPERTY( QColor peakGreen READ peakGreen WRITE setPeakGreen )
-	Q_PROPERTY( QColor peakRed READ peakRed WRITE setPeakRed )
-	Q_PROPERTY( QColor peakYellow READ peakYellow WRITE setPeakYellow )
-	Q_PROPERTY( bool levelsDisplayedInDBFS READ getLevelsDisplayedInDBFS WRITE setLevelsDisplayedInDBFS )
+	Q_PROPERTY(QColor peakOk READ peakOk WRITE setPeakOk)
+	Q_PROPERTY(QColor peakClip READ peakClip WRITE setPeakClip)
+	Q_PROPERTY(QColor peakWarn READ peakWarn WRITE setPeakWarn)
+	Q_PROPERTY(bool levelsDisplayedInDBFS READ getLevelsDisplayedInDBFS WRITE setLevelsDisplayedInDBFS)
 
 	Fader( FloatModel * _model, const QString & _name, QWidget * _parent );
 	Fader( FloatModel * _model, const QString & _name, QWidget * _parent, QPixmap * back, QPixmap * leds, QPixmap * knob );
@@ -89,14 +89,14 @@ public:
 	inline float getMaxPeak() const { return m_fMaxPeak; }
 	inline void setMaxPeak(float maxPeak) { m_fMaxPeak = maxPeak; }
 
-	QColor const & peakGreen() const;
-	void setPeakGreen( const QColor & c );
+	QColor const & peakOk() const;
+	void setPeakOk(const QColor& c);
 
-	QColor const & peakRed() const;
-	void setPeakRed( const QColor & c );
+	QColor const & peakClip() const;
+	void setPeakClip(const QColor& c);
 
-	QColor const & peakYellow() const;
-	void setPeakYellow( const QColor & c );
+	QColor const & peakWarn() const;
+	void setPeakWarn(const QColor& c);
 
 	inline bool getLevelsDisplayedInDBFS() const { return m_levelsDisplayedInDBFS; }
 	inline void setLevelsDisplayedInDBFS(bool value = true) { m_levelsDisplayedInDBFS = value; }
@@ -159,9 +159,9 @@ private:
 
 	static SimpleTextFloat * s_textFloat;
 
-	QColor m_peakGreen;
-	QColor m_peakRed;
-	QColor m_peakYellow;
+	QColor m_peakOk;
+	QColor m_peakClip;
+	QColor m_peakWarn;
 } ;
 
 
