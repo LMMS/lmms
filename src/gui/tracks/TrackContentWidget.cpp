@@ -53,6 +53,11 @@ const int BARS_PER_GROUP = 4;
 	if there are less than 4 pixels between lines)*/
 const int MIN_PIXELS_BETWEEN_LINES = 4;
 
+const int HORIZONTAL_LINE_WIDTH = 1;
+const int SMALL_VERTICAL_LINE_WIDTH = 1;
+const int BIG_VERTICAL_LINE_WIDTH = 2;
+const int EMBOSS_WIDTH = 1;
+
 /*! \brief Create a new trackContentWidget
  *
  *  Creates a new track content widget for the given track.
@@ -103,11 +108,11 @@ void TrackContentWidget::updateBackground()
 	// Assume even-pixels-per-bar. Makes sense, should be like this anyways
 	int ppb = static_cast<int>( tcv->pixelsPerBar() );
 
-	// Bars between big lines
-	// There must be at least one bar between each big line
+	// bbBigLines = Bars between big lines
+	// Big lines appear every bar (or less frequently if quantization > 1 bar)
 	// Smaller intervals are handled by small lines
 	float bbBigLines = (snapSize >= 1) ? snapSize : 1;
-	// Bars between small lines
+	// bbSmallLines = Bars between small lines
 	// Decrease the number of small lines if it results in less than
 	// 4 pixels between each line
 	float bbSmallLines = snapSize;
@@ -126,28 +131,28 @@ void TrackContentWidget::updateBackground()
 
 	// draw lines
 	// draw big vertical lines (per bar)
-	pmp.setPen( QPen( gridColor(), 2 ) );
+	pmp.setPen( QPen( gridColor(), BIG_VERTICAL_LINE_WIDTH ) );
 	for( float x = 0; x < w * 2; x += ppb * bbBigLines )
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
 	}
 
-	pmp.setPen( QPen( embossColor(), 1 ) );
-	for( float x = 1; x < w * 2; x += ppb * bbBigLines )
+	pmp.setPen( QPen( embossColor(), EMBOSS_WIDTH ) );
+	for( float x = (BIG_VERTICAL_LINE_WIDTH + 1) / 2; x < w * 2; x += ppb * bbBigLines )
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
 	}
 
 	// draw small vertical lines (between bars)
-	pmp.setPen( QPen( gridColor(), 1 ) );
+	pmp.setPen( QPen( gridColor(), SMALL_VERTICAL_LINE_WIDTH ) );
 	for( float x = 0; x < w * 2; x += ppb * bbSmallLines )
 	{
 		pmp.drawLine( QLineF( static_cast<int>( x ), 0.0, static_cast<int>( x ), h ) );
 	}
 
 	// horizontal line
-	pmp.setPen( QPen( gridColor(), 1 ) );
-	pmp.drawLine( 0, h-1, w*2, h-1 );
+	pmp.setPen( QPen( gridColor(), HORIZONTAL_LINE_WIDTH ) );
+	pmp.drawLine( 0, h - (HORIZONTAL_LINE_WIDTH + 1) / 2, w * 2, h - (HORIZONTAL_LINE_WIDTH + 1) / 2 );
 
 	pmp.end();
 
