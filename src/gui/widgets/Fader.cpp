@@ -311,7 +311,7 @@ void Fader::paintEvent( QPaintEvent * ev)
 	paintLevels(ev, painter, !getLevelsDisplayedInDBFS());
 
 	// Draw the knob
-	painter.drawPixmap(0, knobPosY() - m_knob.height(), m_knob);
+	painter.drawPixmap((width() - m_knob.width()) / 2, knobPosY() - m_knob.height(), m_knob);
 }
 
 class PaintHelper
