@@ -43,7 +43,7 @@ namespace gui
 {
 
 class EffectRackView;
-class MixerLineLcdSpinBox;
+class MixerChannelLcdSpinBox;
 class InstrumentFunctionArpeggioView;
 class InstrumentFunctionNoteStackingView;
 class InstrumentMidiIOView;
@@ -142,7 +142,7 @@ private:
 	QLabel * m_pitchLabel;
 	LcdSpinBox* m_pitchRangeSpinBox;
 	QLabel * m_pitchRangeLabel;
-	MixerLineLcdSpinBox * m_mixerChannelNumber;
+	MixerChannelLcdSpinBox * m_mixerChannelNumber;
 
 
 

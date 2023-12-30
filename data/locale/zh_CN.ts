@@ -5343,62 +5343,62 @@ Please make sure you have write permission to the file and the directory contain
     </message>
 </context>
 <context>
-    <name>MixerLine</name>
+    <name>MixerChannelView</name>
     <message>
-        <location filename="../../src/gui/MixerLine.cpp" line="86"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="86"/>
         <source>Channel send amount</source>
         <translation>通道发送的数量</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerLine.cpp" line="242"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="242"/>
         <source>Move &amp;left</source>
         <translation>向左移(&amp;L)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerLine.cpp" line="243"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="243"/>
         <source>Move &amp;right</source>
         <translation>向右移(&amp;R)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerLine.cpp" line="245"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="245"/>
         <source>Rename &amp;channel</source>
         <translation>重命名通道(&amp;C)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerLine.cpp" line="250"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="250"/>
         <source>R&amp;emove channel</source>
         <translation>删除通道(&amp;E)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerLine.cpp" line="253"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="253"/>
         <source>Remove &amp;unused channels</source>
         <translation>移除所有未用通道(&amp;U)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerLine.cpp" line="255"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="255"/>
         <source>Set channel color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/MixerLine.cpp" line="256"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="256"/>
         <source>Remove channel color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/MixerLine.cpp" line="257"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="257"/>
         <source>Pick random channel color</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
-    <name>MixerLineLcdSpinBox</name>
+    <name>MixerChannelLcdSpinBox</name>
     <message>
-        <location filename="../../src/gui/widgets/MixerLineLcdSpinBox.cpp" line="58"/>
+        <location filename="../../src/gui/widgets/MixerChannelLcdSpinBox.cpp" line="58"/>
         <source>Assign to:</source>
         <translation>分配给:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/MixerLineLcdSpinBox.cpp" line="58"/>
+        <location filename="../../src/gui/widgets/MixerChannelLcdSpinBox.cpp" line="58"/>
         <source>New mixer Channel</source>
         <translation>新的效果通道</translation>
     </message>
