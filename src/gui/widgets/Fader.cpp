@@ -119,6 +119,7 @@ void Fader::init(FloatModel * model, QString const & name)
 	setAttribute( Qt::WA_OpaquePaintEvent, false );
 	// TODO For now resize the widget to the size of the previous background image "fader_background.png" as found in the classic and default theme
 	setMinimumSize(23, 116);
+	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 	setModel( model );
 	setHintText( "Volume:","%");
 }
