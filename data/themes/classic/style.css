@@ -632,7 +632,7 @@ lmms--gui--ControllerRackView QPushButton {
 	font-size: 10px;
 }
 
-lmms--gui--MixerLine {
+lmms--gui--MixerChannelView {
 	background: #5b6571;
 	color: #e0e0e0;
 	qproperty-backgroundActive: qlineargradient(spread:reflect, x1:0, y1:0, x2:1, y2:0,
@@ -641,6 +641,11 @@ lmms--gui--MixerLine {
 	qproperty-strokeOuterInactive: rgba( 0, 0, 0, 50 );
 	qproperty-strokeInnerActive: rgba( 255, 255, 255, 100 );
 	qproperty-strokeInnerInactive: rgba( 255, 255, 255, 50 );
+}
+
+lmms--gui--MixerChannelView QGraphicsView {
+	background: transparent;
+	border-style: none;
 }
 
 /* persistent peak markers for fx peak meters */

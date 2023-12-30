@@ -25,7 +25,7 @@
 #ifndef LMMS_GUI_INSTRUMENT_TRACK_VIEW_H
 #define LMMS_GUI_INSTRUMENT_TRACK_VIEW_H
 
-#include "MixerLineLcdSpinBox.h"
+#include "MixerChannelLcdSpinBox.h"
 #include "TrackView.h"
 
 #include "InstrumentTrack.h"
@@ -99,7 +99,7 @@ private:
 
 	// widgets in track-settings-widget
 	TrackLabelButton * m_tlb;
-	MixerLineLcdSpinBox* m_mixerChannelNumber;
+	MixerChannelLcdSpinBox* m_mixerChannelNumber;
 	Knob * m_volumeKnob;
 	Knob * m_panningKnob;
 	FadeButton * m_activityIndicator;

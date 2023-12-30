@@ -1,5 +1,5 @@
 /*
- * MixerLineLcdSpinBox.h - a specialization of LcdSpnBox for setting mixer channels
+ * MixerChannelLcdSpinBox.h - a specialization of LcdSpnBox for setting mixer channels
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_GUI_MIXER_LINE_LCD_SPIN_BOX_H
-#define LMMS_GUI_MIXER_LINE_LCD_SPIN_BOX_H
+#ifndef LMMS_GUI_MIXER_CHANNEL_LCD_SPIN_BOX_H
+#define LMMS_GUI_MIXER_CHANNEL_LCD_SPIN_BOX_H
 
 #include "LcdSpinBox.h"
 
@@ -34,14 +34,14 @@ namespace lmms::gui
 class TrackView;
 
 
-class MixerLineLcdSpinBox : public LcdSpinBox
+class MixerChannelLcdSpinBox : public LcdSpinBox
 {
 	Q_OBJECT
 public:
-	MixerLineLcdSpinBox(int numDigits, QWidget * parent, const QString& name, TrackView * tv = nullptr) :
+	MixerChannelLcdSpinBox(int numDigits, QWidget * parent, const QString& name, TrackView * tv = nullptr) :
 		LcdSpinBox(numDigits, parent, name), m_tv(tv)
 	{}
-	~MixerLineLcdSpinBox() override = default;
+	~MixerChannelLcdSpinBox() override = default;
 
 	void setTrackView(TrackView * tv);
 
@@ -56,4 +56,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif // LMMS_GUI_MIXER_LINE_LCD_SPIN_BOX_H
+#endif // LMMS_GUI_MIXER_CHANNEL_LCD_SPIN_BOX_H

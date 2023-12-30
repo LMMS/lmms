@@ -21,7 +21,7 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 #include "SampleTrackView.h"
 
 #include <QApplication>
@@ -58,7 +58,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	m_tlb->setIcon(embed::getIconPixmap("sample_track"));
 	m_tlb->show();
 
-	m_mixerChannelNumber = new MixerLineLcdSpinBox(2, getTrackSettingsWidget(), tr("Mixer channel"), this);
+	m_mixerChannelNumber = new MixerChannelLcdSpinBox(2, getTrackSettingsWidget(), tr("Mixer channel"), this);
 	m_mixerChannelNumber->show();
 
 	m_volumeKnob = new Knob( KnobType::Small17, getTrackSettingsWidget(),
@@ -241,7 +241,7 @@ void SampleTrackView::assignMixerLine(int channelIndex)
 {
 	model()->mixerChannelModel()->setValue(channelIndex);
 
-	getGUI()->mixerView()->setCurrentMixerLine(channelIndex);
+	getGUI()->mixerView()->setCurrentMixerChannel(channelIndex);
 }
 
 
