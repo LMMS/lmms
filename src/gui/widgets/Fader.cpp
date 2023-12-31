@@ -297,12 +297,12 @@ void Fader::updateTextFloat()
 {
 	if( ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() && m_conversionFactor == 100.0 )
 	{
-		s_textFloat->setText( QString("Volume: %1 dBFS").
-				arg( ampToDbfs( model()->value() ), 3, 'f', 2 ) );
+		s_textFloat->setText(QString("Volume: %1 dB").
+				arg(ampToDbfs(model()->value()), 3, 'f', 2));
 	}
 	else
 	{
-		s_textFloat->setText( m_description + " " + QString("%1 ").arg( model()->value() * m_conversionFactor ) + " " + m_unit );
+		s_textFloat->setText(m_description + " " + QString("%1").arg(model()->value() * m_conversionFactor) + m_unit);
 	}
 
 	s_textFloat->moveGlobal(this, QPoint(width() + 2, knobPosY() - s_textFloat->height() / 2));
