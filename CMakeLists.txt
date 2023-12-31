@@ -74,6 +74,7 @@ OPTION(WANT_ALSA	"Include ALSA (Advanced Linux Sound Architecture) support" ON)
 OPTION(WANT_CALF	"Include CALF LADSPA plugins" ON)
 OPTION(WANT_CAPS	"Include C* Audio Plugin Suite (LADSPA plugins)" ON)
 OPTION(WANT_CARLA	"Include Carla plugin" ON)
+OPTION(WANT_CLAP	"Include CLAP plugins" ON)
 OPTION(WANT_CMT		"Include Computer Music Toolkit LADSPA plugins" ON)
 OPTION(WANT_JACK	"Include JACK (Jack Audio Connection Kit) support" ON)
 OPTION(WANT_WEAKJACK	"Loosely link JACK libraries" ON)
@@ -276,6 +277,13 @@ IF(WANT_SUIL)
 ELSE(WANT_SUIL)
 	SET(STATUS_SUIL "not built as requested")
 ENDIF(WANT_SUIL)
+
+IF(WANT_CLAP)
+	SET(LMMS_HAVE_CLAP TRUE)
+	SET(STATUS_CLAP "OK")
+ELSE(WANT_CLAP)
+	SET(STATUS_CLAP "not built as requested")
+ENDIF(WANT_CLAP)
 
 IF(WANT_CALF)
 	SET(LMMS_HAVE_CALF TRUE)
@@ -842,6 +850,7 @@ MESSAGE(
 "----------------\n"
 "* Lv2 plugins                 : ${STATUS_LV2}\n"
 "* SUIL for plugin UIs         : ${STATUS_SUIL}\n"
+"* CLAP plugins                : ${STATUS_CLAP}\n"
 "* ZynAddSubFX instrument      : ${STATUS_ZYN}\n"
 "* Carla Patchbay & Rack       : ${STATUS_CARLA}\n"
 "* SoundFont2 player           : ${STATUS_FLUIDSYNTH}\n"
