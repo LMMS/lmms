@@ -46,10 +46,10 @@ Plugin::Descriptor PLUGIN_EXPORT clapeffect_plugin_descriptor =
 		"plugin for using CLAP effects inside LMMS."),
 	"Dalton Messmer <messmer.dalton/at/gmail.com>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
-	new ClapSubPluginFeatures(Plugin::Effect)
+	new ClapSubPluginFeatures(Plugin::Type::Effect)
 };
 
 }

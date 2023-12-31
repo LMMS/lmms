@@ -143,7 +143,7 @@ protected:
 
 private:
 	//! Return the DataFile settings type
-	virtual auto settingsType() -> DataFile::Types = 0;
+	virtual auto settingsType() -> DataFile::Type = 0;
 	//! Inform the plugin about a file name change
 	virtual void setNameFromFile(const QString& fname) = 0;
 

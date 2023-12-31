@@ -196,7 +196,7 @@ ClapPluginInfo::ClapPluginInfo(const clap_plugin_factory* factory, uint32_t inde
 		qDebug() << "description:" << m_descriptor->description;
 	}
 
-	m_type = Plugin::PluginTypes::Undefined;
+	m_type = Plugin::Type::Undefined;
 	auto features = m_descriptor->features;
 	while (features && *features)
 	{
@@ -204,16 +204,16 @@ ClapPluginInfo::ClapPluginInfo(const clap_plugin_factory* factory, uint32_t inde
 		if (ClapManager::kDebug)
 			qDebug() << "feature:" << feature.data();
 		if (feature == CLAP_PLUGIN_FEATURE_INSTRUMENT)
-			m_type = Plugin::PluginTypes::Instrument;
+			m_type = Plugin::Type::Instrument;
 		else if (feature == CLAP_PLUGIN_FEATURE_AUDIO_EFFECT
 				|| feature == "effect" /* non-standard, but used by Surge XT Effects */)
-			m_type = Plugin::PluginTypes::Effect;
+			m_type = Plugin::Type::Effect;
 		else if (feature == CLAP_PLUGIN_FEATURE_ANALYZER)
-			m_type = Plugin::PluginTypes::Tool;
+			m_type = Plugin::Type::Tool;
 		++features;
 	}
 
-	if (m_type == Plugin::PluginTypes::Undefined)
+	if (m_type == Plugin::Type::Undefined)
 	{
 		qWarning() << "CLAP plugin is not recognized as an instrument, effect, or tool";
 		return;
@@ -228,7 +228,7 @@ ClapPluginInfo::ClapPluginInfo(ClapPluginInfo&& other) noexcept
 	m_factory = std::exchange(other.m_factory, nullptr);
 	m_index = other.m_index;
 	m_descriptor = std::exchange(other.m_descriptor, nullptr);
-	m_type = std::exchange(other.m_type, Plugin::PluginTypes::Undefined);
+	m_type = std::exchange(other.m_type, Plugin::Type::Undefined);
 	m_valid = std::exchange(other.m_valid, false);
 	m_issues = std::move(other.m_issues);
 }

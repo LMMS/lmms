@@ -76,9 +76,9 @@ void ClapFxControls::changeControl()
 	//	engine::getSong()->setModified();
 }
 
-auto ClapFxControls::settingsType() -> DataFile::Types
+auto ClapFxControls::settingsType() -> DataFile::Type
 {
-	return DataFile::EffectSettings;
+	return DataFile::Type::EffectSettings;
 }
 
 void ClapFxControls::setNameFromFile(const QString& name)

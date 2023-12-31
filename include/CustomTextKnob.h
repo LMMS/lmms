@@ -41,7 +41,8 @@ public:
 	CustomTextKnob(
 		KnobType knobNum,
 		QWidget* parent = nullptr,
-		const QString& name = QString{});
+		const QString& name = QString{},
+		const QString& valueText = QString{});
 
 	//! default ctor
 	CustomTextKnob(

@@ -39,7 +39,7 @@ namespace lmms
 {
 
 
-ClapSubPluginFeatures::ClapSubPluginFeatures(Plugin::PluginTypes type)
+ClapSubPluginFeatures::ClapSubPluginFeatures(Plugin::Type type)
 	: SubPluginFeatures(type)
 {
 }
@@ -119,7 +119,7 @@ void ClapSubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor* desc, Ke
 
 				kl.push_back(Key{desc, QString::fromUtf8(clapDesc->name), atm});
 				if (ClapManager::kDebug)
-					qDebug() << "Found CLAP sub plugin key of type" << m_type << ":" << clapDesc->id;
+					qDebug() << "Found CLAP sub plugin key of type" << static_cast<int>(m_type) << ":" << clapDesc->id;
 			}
 		}
 	}

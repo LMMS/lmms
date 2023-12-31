@@ -75,7 +75,7 @@ public:
 
 		auto getFactory() const -> const clap_plugin_factory* { return m_factory; };
 		auto getIndex() const -> uint32_t { return m_index; }
-		auto getType() const -> Plugin::PluginTypes { return m_type; }
+		auto getType() const -> Plugin::Type { return m_type; }
 		auto getDescriptor() const -> const clap_plugin_descriptor* { return m_descriptor; }
 
 	private:
@@ -84,7 +84,7 @@ public:
 		const clap_plugin_factory* m_factory;
 		uint32_t m_index; //!< Plugin index within the .clap file
 		const clap_plugin_descriptor* m_descriptor;
-		Plugin::PluginTypes m_type{Plugin::PluginTypes::Undefined};
+		Plugin::Type m_type{Plugin::Type::Undefined};
 		mutable bool m_valid{false};
 		std::unordered_set<PluginIssue, PluginIssueHash> m_issues;
 	};

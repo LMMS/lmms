@@ -43,7 +43,7 @@ namespace lmms
 class LMMS_EXPORT ClapSubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures
 {
 public:
-	ClapSubPluginFeatures(Plugin::PluginTypes type);
+	ClapSubPluginFeatures(Plugin::Type type);
 
 	void fillDescriptionWidget(QWidget* parent, const Key* key) const override;
 	void listSubPluginKeys(const Plugin::Descriptor* desc, KeyList& kl) const override;

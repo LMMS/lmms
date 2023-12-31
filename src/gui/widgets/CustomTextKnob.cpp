@@ -28,8 +28,8 @@ namespace lmms::gui
 {
 
 
-CustomTextKnob::CustomTextKnob(KnobType knobNum, QWidget* parent, const QString& name)
-	: Knob(knobNum, parent, name) {}
+CustomTextKnob::CustomTextKnob(KnobType knobNum, QWidget* parent, const QString& name, const QString& valueText)
+	: Knob(knobNum, parent, name), m_valueText(valueText) {}
 
 CustomTextKnob::CustomTextKnob(QWidget* parent, const QString& name)
 	: Knob(parent, name) {}

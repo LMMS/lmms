@@ -325,8 +325,8 @@ auto ClapInstance::pluginInit() -> bool
 	}
 
 	// Effect, Instrument, and Tool are the only options
-	const bool needInputPort = m_pluginInfo->getType() != Plugin::PluginTypes::Instrument;
-	const bool needOutputPort = m_pluginInfo->getType() != Plugin::PluginTypes::Tool;
+	const bool needInputPort = m_pluginInfo->getType() != Plugin::Type::Instrument;
+	const bool needOutputPort = m_pluginInfo->getType() != Plugin::Type::Tool;
 
 	auto readPorts = [this, needInputPort, needOutputPort](
 		std::vector<AudioPort>& audioPorts,
@@ -345,7 +345,7 @@ auto ClapInstance::pluginInit() -> bool
 		{
 			if (portCount == 0 && needOutputPort)
 			{
-				m_pluginIssues.emplace_back(PluginIssueType::noOutputChannel);
+				m_pluginIssues.emplace_back(PluginIssueType::NoOutputChannel);
 			}
 			//if (portCount > 2)
 			//	m_pluginIssues.emplace_back(PluginIssueType::tooManyOutputChannels, std::to_string(outCount));
@@ -362,7 +362,7 @@ auto ClapInstance::pluginInit() -> bool
 			if (!m_pluginExtAudioPorts->get(m_plugin, idx, is_input, &info))
 			{
 				qWarning() << "Unknown error calling m_pluginExtAudioPorts->get(...)";
-				m_pluginIssues.emplace_back(PluginIssueType::portHasNoDef);
+				m_pluginIssues.emplace_back(PluginIssueType::PortHasNoDef);
 				return nullptr;
 			}
 
@@ -464,7 +464,7 @@ auto ClapInstance::pluginInit() -> bool
 
 		// Missing a required port type that LMMS supports - i.e. an effect where the only input is surround sound
 		qWarning() << "An" << (is_input ? "input" : "output") << "port is required, but CLAP plugin has none that are usable";
-		m_pluginIssues.emplace_back(PluginIssueType::unknownPortType);
+		m_pluginIssues.emplace_back(PluginIssueType::UnknownPortType);
 		return nullptr;
 	};
 
