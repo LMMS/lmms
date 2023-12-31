@@ -210,7 +210,8 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 		{
 			const auto& entryPath = entry.path();
 			std::error_code ec;
-			if (!entry.is_regular_file(ec) || entryPath.extension() != ".clap")
+			// NOTE: Using is_regular_file() free function workaround due to std::experimental::filesystem
+			if (!std::filesystem::is_regular_file(entry, ec) || entryPath.extension() != ".clap")
 			{
 				continue;
 			}
