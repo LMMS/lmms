@@ -99,15 +99,19 @@ ClapParam::ClapParam(ClapInstance* pluginHost, const clap_param_info& info, doub
 	}
 }
 
-auto ClapParam::getValueText(const clap_plugin* plugin, const clap_plugin_params* params, clap_id paramId, double value) -> std::string
+auto ClapParam::getValueText(const clap_plugin* plugin, const clap_plugin_params* params) const -> std::string
 {
-	constexpr uint32_t bufferSize = 256;
-	std::string buffer((std::size_t)bufferSize, '\0');
-	if (!params->value_to_text(plugin, paramId, value, &buffer[0], bufferSize))
+	constexpr uint32_t bufferSize = 50;
+	std::string buffer(bufferSize, '\0');
+	if (!params->value_to_text(plugin, m_info.id, m_value, &buffer[0], bufferSize))
 	{
-		return std::to_string(value);
+		return std::to_string(m_value);
 	}
-	return buffer;
+
+	auto temp = std::to_string(m_value) + " (";
+	temp += buffer.c_str();
+	temp += ')';
+	return temp;
 }
 
 void ClapParam::setValue(double v)

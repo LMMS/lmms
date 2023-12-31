@@ -196,7 +196,7 @@ public:
 	void paramFlushOnMainThread();
 	void handlePluginOutputEvents();
 	void generatePluginInputEvents();
-	auto getParamValueText(clap_id paramId, double value) const -> std::string;
+	auto getParamValueText(const ClapParam* param) const -> std::string;
 
 	auto isPluginActive() const -> bool;
 	auto isPluginProcessing() const -> bool;

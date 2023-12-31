@@ -66,8 +66,7 @@ public:
 	auto valueType() const -> ParamType { return m_valueType; }
 	auto getId() const -> std::string_view { return m_id; }
 	auto getDisplayName() const -> std::string_view { return m_displayName; }
-
-	static auto getValueText(const clap_plugin* plugin, const clap_plugin_params* params, clap_id paramId, double value) -> std::string;
+	auto getValueText(const clap_plugin* plugin, const clap_plugin_params* params) const -> std::string;
 
 	auto value() const -> double { return m_value; }
 	void setValue(double v);

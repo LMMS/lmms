@@ -44,6 +44,7 @@
 #include "ClapParam.h"
 #include "MainWindow.h"
 #include "SubWindow.h"
+#include "CustomTextKnob.h"
 
 
 namespace lmms::gui
@@ -140,11 +141,20 @@ ClapViewInstance::ClapViewInstance(QWidget* parent, ClapInstance* instance, int 
 			control = new LcdControl{(param->info().max_value <= 9.0) ? 1 : 2, this};
 			break;
 		case ClapParam::ParamType::Float:
-			control = new KnobControl{this};
+		{
+			auto derived = new CustomTextKnobControl{this};
+
+			// CustomTextKnob calls this lambda to update value text
+			auto customTextKnob = dynamic_cast<CustomTextKnob*>(derived->modelView());
+			customTextKnob->setValueText([instance, param](){
+					return QString::fromUtf8(instance->getParamValueText(param).c_str());
+			});
+
+			control = derived;
 			break;
+		}
 		default:
 			throw std::runtime_error{"Invalid CLAP param value type"};
-			// TODO: Use ComboControl for params with enum-like values? Use clap_plugin_params::value_to_text
 		}
 
 		if (!control) { continue; }

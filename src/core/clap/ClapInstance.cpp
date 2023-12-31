@@ -1315,9 +1315,9 @@ auto ClapInstance::getParamValue(const clap_param_info& info) const -> double
 	throw std::logic_error{msg.str()};
 }
 
-auto ClapInstance::getParamValueText(clap_id paramId, double value) const -> std::string
+auto ClapInstance::getParamValueText(const ClapParam* param) const -> std::string
 {
-	return ClapParam::getValueText(m_plugin, m_pluginExtParams, paramId, value);
+	return param->getValueText(m_plugin, m_pluginExtParams);
 }
 
 
