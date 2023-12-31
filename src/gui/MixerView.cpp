@@ -75,7 +75,6 @@ MixerView::MixerView() :
 	//setPalette(pal);
 
 	setAutoFillBackground(true);
-	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
 	setWindowTitle(tr("Mixer"));
 	setWindowIcon(embed::getIconPixmap("mixer"));
@@ -153,7 +152,6 @@ MixerView::MixerView() :
 
 
 	// add the stacked layout for the effect racks of mixer channels
-	m_racksWidget->setFixedHeight(mixerChannelSize.height());
 	ml->addWidget(m_racksWidget);
 
 	setCurrentMixerChannel(m_mixerChannelViews[0]);
