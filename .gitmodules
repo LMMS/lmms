@@ -52,3 +52,6 @@
 [submodule "src/3rdparty/hiir/hiir"]
 	path = src/3rdparty/hiir/hiir
 	url = https://github.com/LostRobotMusic/hiir
+[submodule "plugins/CLAP/clap"]
+	path = plugins/CLAP/clap
+	url = https://github.com/free-audio/clap.git
