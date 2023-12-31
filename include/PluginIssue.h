@@ -27,6 +27,7 @@
 
 #include <QDebug>
 #include <string>
+#include <cstddef>
 
 namespace lmms
 {
@@ -78,9 +79,20 @@ public:
 	bool operator==(const PluginIssue& other) const;
 	bool operator<(const PluginIssue& other) const;
 	friend QDebug operator<<(QDebug stream, const PluginIssue& iss);
+	friend struct PluginIssueHash;
 };
 
 QDebug operator<<(QDebug stream, const PluginIssue& iss);
+
+struct PluginIssueHash
+{
+	inline std::size_t operator()(const PluginIssue& issue) const noexcept
+	{
+		auto h1 = std::hash<std::string>{}(issue.m_info);
+		auto h2 = static_cast<int>(issue.m_issueType);
+		return h1 ^ (h2 << 1);
+	}
+};
 
 } // namespace lmms
 
