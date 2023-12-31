@@ -134,11 +134,13 @@ int TabWidget::findTabAtPos(const QPoint* pos)
 
 		for (widgetStack::iterator it = m_widgets.begin(); it != m_widgets.end(); ++it)
 		{
-			if (pos->x() >= cx && pos->x() <= cx + (*it).nwidth)
+			int const currentWidgetWidth = it->nwidth;
+
+			if (pos->x() >= cx && pos->x() <= cx + currentWidgetWidth)
 			{
 				return(it.key());
 			}
-			cx += (*it).nwidth;
+			cx += currentWidgetWidth;
 		}
 	}
 
@@ -251,43 +253,45 @@ void TabWidget::paintEvent(QPaintEvent* pe)
 	p.setPen(tabText());
 	for (widgetStack::iterator it = first ; it != last ; ++it)
 	{
+		auto & currentWidgetDesc = *it;
+
 		// Draw a text tab or a artwork tab.
 		if (m_usePixmap)
 		{
 			// Fixes tab's width, because original size is only correct for text tabs
-			(*it).nwidth = tab_width;
+			currentWidgetDesc.nwidth = tab_width;
 
 			// Get artwork
-			QPixmap artwork(embed::getIconPixmap((*it).pixmap));
+			QPixmap artwork(embed::getIconPixmap(currentWidgetDesc.pixmap));
 
 			// Highlight active tab
 			if (it.key() == m_activeTab)
 			{
-				p.fillRect(tab_x_offset, 0, (*it).nwidth, m_tabbarHeight - 1, tabSelected());
+				p.fillRect(tab_x_offset, 0, currentWidgetDesc.nwidth, m_tabbarHeight - 1, tabSelected());
 			}
 
 			// Draw artwork
-			p.drawPixmap(tab_x_offset + ((*it).nwidth - artwork.width()) / 2, 1, artwork);
+			p.drawPixmap(tab_x_offset + (currentWidgetDesc.nwidth - artwork.width()) / 2, 1, artwork);
 		}
 		else
 		{
 			// Highlight tab when active
 			if (it.key() == m_activeTab)
 			{
-				p.fillRect(tab_x_offset, 2, (*it).nwidth - 6, m_tabbarHeight - 4, tabSelected());
+				p.fillRect(tab_x_offset, 2, currentWidgetDesc.nwidth - 6, m_tabbarHeight - 4, tabSelected());
 				p.setPen(tabTextSelected());
-				p.drawText(tab_x_offset + 3, m_tabheight + 1, (*it).name);
+				p.drawText(tab_x_offset + 3, m_tabheight + 1, currentWidgetDesc.name);
 			}
 			else
 			{
 				// Draw text
 				p.setPen(tabText());
-				p.drawText(tab_x_offset + 3, m_tabheight + 1, (*it).name);
+				p.drawText(tab_x_offset + 3, m_tabheight + 1, currentWidgetDesc.name);
 			}
 		}
 
 		// Next tab's horizontal position
-		tab_x_offset += (*it).nwidth;
+		tab_x_offset += currentWidgetDesc.nwidth;
 	}
 }
 
