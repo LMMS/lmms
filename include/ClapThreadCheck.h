@@ -43,7 +43,7 @@ public:
 	static auto hostExt() -> const clap_host_thread_check*;
 
 	static auto isMainThread() -> bool { return clapIsMainThread(nullptr); }
-	static auto isAudioThread() -> bool { return clapIsMainThread(nullptr); }
+	static auto isAudioThread() -> bool { return clapIsAudioThread(nullptr); }
 
 	/**
 	 * clap_host_thread_check implementation
