@@ -213,8 +213,6 @@ auto SampleDecoder::supportedAudioTypes() -> const std::vector<AudioType>&
 			std::transform(name.begin(), name.end(), name.begin(), [](unsigned char ch) { return std::toupper(ch); });
 
 			types.push_back(AudioType{std::move(name), sfFormatInfo.extension});
-
-			return types;
 		}
 
 		std::sort(types.begin(), types.end(), [&](const AudioType& a, const AudioType& b) { return a.name < b.name; });
