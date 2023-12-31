@@ -43,7 +43,7 @@ namespace lmms {
 
 namespace {
 
-using Decoder = std::optional<SampleDecoder::Result>(*)(const QString&);
+using Decoder = std::optional<SampleDecoder::Result> (*)(const QString&);
 
 auto decodeSampleSF(const QString& audioFile) -> std::optional<SampleDecoder::Result>;
 auto decodeSampleDS(const QString& audioFile) -> std::optional<SampleDecoder::Result>;
@@ -62,7 +62,7 @@ auto decodeSampleSF(const QString& audioFile) -> std::optional<SampleDecoder::Re
 	SNDFILE* sndFile = nullptr;
 	auto sfInfo = SF_INFO{};
 
-	// Use QFile to handle unicode file names on Windows
+	// TODO: Remove use of QFile
 	auto file = QFile{audioFile};
 	if (!file.open(QIODevice::ReadOnly)) { return std::nullopt; }
 
@@ -116,15 +116,47 @@ auto decodeSampleDS(const QString& audioFile) -> std::optional<SampleDecoder::Re
 #ifdef LMMS_HAVE_OGGVORBIS
 auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleDecoder::Result>
 {
-	auto vorbisFile = OggVorbis_File{};
-	const auto openError = ov_fopen(audioFile.toLocal8Bit(), &vorbisFile);
+	static auto s_read = [](void* buffer, size_t size, size_t count, void* stream) -> size_t {
+		auto file = static_cast<QFile*>(stream);
+		return file->read(static_cast<char*>(buffer), size * count);
+	};
 
-	if (openError != 0) { return std::nullopt; }
+	static auto s_seek = [](void* stream, ogg_int64_t offset, int whence) -> int {
+		auto file = static_cast<QFile*>(stream);
+		if (whence == SEEK_SET) { file->seek(offset); }
+		else if (whence == SEEK_CUR) { file->seek(file->pos() + offset); }
+		else if (whence == SEEK_END) { file->seek(file->size() + offset); }
+		else { return -1; }
+		return 0;
+	};
+
+	static auto s_close = [](void* stream) -> int {
+		auto file = static_cast<QFile*>(stream);
+		file->close();
+		return 0;
+	};
+
+	static auto s_tell = [](void* stream) -> long {
+		auto file = static_cast<QFile*>(stream);
+		return file->pos();
+	};
+
+	static ov_callbacks s_callbacks = {s_read, s_seek, s_close, s_tell};
+
+	// TODO: Remove use of QFile
+	auto file = QFile{audioFile};
+	if (!file.open(QIODevice::ReadOnly)) { return std::nullopt; }
+
+	auto vorbisFile = OggVorbis_File{};
+	if (ov_open_callbacks(&file, &vorbisFile, nullptr, 0, s_callbacks) < 0) { return std::nullopt; }
 
 	const auto vorbisInfo = ov_info(&vorbisFile, -1);
+	if (vorbisInfo == nullptr) { return std::nullopt; }
+
 	const auto numChannels = vorbisInfo->channels;
 	const auto sampleRate = vorbisInfo->rate;
 	const auto numSamples = ov_pcm_total(&vorbisFile, -1);
+	if (numSamples < 0) { return std::nullopt; }
 
 	auto buffer = std::vector<float>(numSamples);
 	auto output = static_cast<float**>(nullptr);
@@ -141,14 +173,14 @@ auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleDeco
 		totalSamplesRead += samplesRead;
 	}
 
-	ov_clear(&vorbisFile);
-	auto result = std::vector<sampleFrame>(numSamples / numChannels);
-	for (int i = 0; i < buffer.size(); ++i)
+	auto result = std::vector<sampleFrame>(totalSamplesRead / numChannels);
+	for (int i = 0; i < result.size(); ++i)
 	{
 		if (numChannels == 1) { result[i] = {buffer[i], buffer[i]}; }
 		else if (numChannels > 1) { result[i] = {buffer[i * numChannels], buffer[i * numChannels + 1]}; }
 	}
 
+	ov_clear(&vorbisFile);
 	return SampleDecoder::Result{std::move(result), static_cast<int>(sampleRate)};
 }
 #endif // LMMS_HAVE_OGGVORBIS
@@ -156,8 +188,7 @@ auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleDeco
 
 auto SampleDecoder::supportedAudioTypes() -> const std::vector<AudioType>&
 {
-	static const auto s_audioTypes = []
-	{
+	static const auto s_audioTypes = [] {
 		auto types = std::vector<AudioType>();
 
 		// Add DrumSynth by default since that support comes from us
@@ -167,8 +198,8 @@ auto SampleDecoder::supportedAudioTypes() -> const std::vector<AudioType>&
 		auto simpleTypeCount = 0;
 		sf_command(nullptr, SFC_GET_SIMPLE_FORMAT_COUNT, &simpleTypeCount, sizeof(int));
 
-		// TODO: Ideally, this code should be iterating over the major formats, but some important extensions such as *.ogg
-		// are not included. This is planned for future versions of sndfile.
+		// TODO: Ideally, this code should be iterating over the major formats, but some important extensions such as
+		// *.ogg are not included. This is planned for future versions of sndfile.
 		for (int simple = 0; simple < simpleTypeCount; ++simple)
 		{
 			sfFormatInfo.format = simple;
@@ -182,12 +213,9 @@ auto SampleDecoder::supportedAudioTypes() -> const std::vector<AudioType>&
 			std::transform(name.begin(), name.end(), name.begin(), [](unsigned char ch) { return std::toupper(ch); });
 
 			types.push_back(AudioType{std::move(name), sfFormatInfo.extension});
-
-			return types;
 		}
 
-		std::sort(types.begin(), types.end(),
-			[&](const AudioType& a, const AudioType& b) { return a.name < b.name; });
+		std::sort(types.begin(), types.end(), [&](const AudioType& a, const AudioType& b) { return a.name < b.name; });
 		return types;
 	}();
 	return s_audioTypes;
