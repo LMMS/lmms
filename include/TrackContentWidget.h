@@ -51,7 +51,9 @@ class TrackContentWidget : public QWidget, public JournallingObject
 	// qproperties for track background gradients
 	Q_PROPERTY( QBrush darkerColor READ darkerColor WRITE setDarkerColor )
 	Q_PROPERTY( QBrush lighterColor READ lighterColor WRITE setLighterColor )
-	Q_PROPERTY( QBrush gridColor READ gridColor WRITE setGridColor )
+	Q_PROPERTY( QBrush coarseGridColor READ coarseGridColor WRITE setCoarseGridColor )
+	Q_PROPERTY( QBrush fineGridColor READ fineGridColor WRITE setFineGridColor )
+	Q_PROPERTY( QBrush horizontalColor READ horizontalColor WRITE setHorizontalColor )
 	Q_PROPERTY( QBrush embossColor READ embossColor WRITE setEmbossColor )
 
 public:
@@ -79,12 +81,16 @@ public:
 
 	QBrush darkerColor() const;
 	QBrush lighterColor() const;
-	QBrush gridColor() const;
+	QBrush coarseGridColor() const;
+	QBrush fineGridColor() const;
+	QBrush horizontalColor() const;
 	QBrush embossColor() const;
 
 	void setDarkerColor( const QBrush & c );
 	void setLighterColor( const QBrush & c );
-	void setGridColor( const QBrush & c );
+	void setCoarseGridColor( const QBrush & c );
+	void setFineGridColor( const QBrush & c );
+	void setHorizontalColor( const QBrush & c );
 	void setEmbossColor( const QBrush & c);
 
 public slots:
@@ -139,7 +145,9 @@ private:
 	// qproperty fields
 	QBrush m_darkerColor;
 	QBrush m_lighterColor;
-	QBrush m_gridColor;
+	QBrush m_coarseGridColor;
+	QBrush m_fineGridColor;
+	QBrush m_horizontalColor;
 	QBrush m_embossColor;
 } ;
 

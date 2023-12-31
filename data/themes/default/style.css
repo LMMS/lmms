@@ -389,7 +389,9 @@ lmms--gui--TrackView > QWidget {
 lmms--gui--TrackContentWidget {
 	qproperty-darkerColor: #0C0E0F;
 	qproperty-lighterColor: #14151A;
-	qproperty-gridColor: #262B30;
+	qproperty-coarseGridColor: #3C444C;
+	qproperty-fineGridColor: #262B30;
+	qproperty-horizontalColor: #3C444C;
 	qproperty-embossColor: rgba( 0, 0, 0, 0 );
 }
 

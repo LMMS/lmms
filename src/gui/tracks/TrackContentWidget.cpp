@@ -52,11 +52,11 @@ const int BARS_PER_GROUP = 4;
 /* Lines between bars will disappear if zoomed too far out (i.e
 	if there are less than 4 pixels between lines)*/
 const int MIN_PIXELS_BETWEEN_LINES = 4;
-
+// Line widths in pixels
 const int HORIZONTAL_LINE_WIDTH = 1;
-const int SMALL_VERTICAL_LINE_WIDTH = 1;
-const int BIG_VERTICAL_LINE_WIDTH = 2;
-const int EMBOSS_WIDTH = 1;
+const int COARSE_GRID_LINE_WIDTH = 2;
+const int FINE_GRID_LINE_WIDTH = 1;
+const int EMBOSS_LINE_WIDTH = 1;
 
 /*! \brief Create a new trackContentWidget
  *
@@ -71,7 +71,9 @@ TrackContentWidget::TrackContentWidget( TrackView * parent ) :
 	m_trackView( parent ),
 	m_darkerColor( Qt::SolidPattern ),
 	m_lighterColor( Qt::SolidPattern ),
-	m_gridColor( Qt::SolidPattern ),
+	m_coarseGridColor( Qt::SolidPattern ),
+	m_fineGridColor( Qt::SolidPattern ),
+	m_horizontalColor( Qt::SolidPattern ),
 	m_embossColor( Qt::SolidPattern )
 {
 	setAcceptDrops( true );
@@ -108,17 +110,15 @@ void TrackContentWidget::updateBackground()
 	// Assume even-pixels-per-bar. Makes sense, should be like this anyways
 	int ppb = static_cast<int>( tcv->pixelsPerBar() );
 
-	// bbBigLines = Bars between big lines
-	// Big lines appear every bar (or less frequently if quantization > 1 bar)
-	// Smaller intervals are handled by small lines
-	float bbBigLines = (snapSize >= 1) ? snapSize : 1;
-	// bbSmallLines = Bars between small lines
-	// Decrease the number of small lines if it results in less than
+	// Coarse grid appears every bar (less frequently if quantization > 1 bar)
+	// Fine grid handles smaller grids
+	float coarseGridResolution = (snapSize >= 1) ? snapSize : 1;
+	float fineGridResolution = snapSize;
+	// Decrease fine grid resolution if it results in less than
 	// 4 pixels between each line
-	float bbSmallLines = snapSize;
-	while ((ppb * bbSmallLines) < MIN_PIXELS_BETWEEN_LINES)
+	while ((ppb * fineGridResolution) < MIN_PIXELS_BETWEEN_LINES)
 	{
-		bbSmallLines *= 2;
+		fineGridResolution *= 2;
 	}
 
 	int w = ppb * BARS_PER_GROUP;
@@ -130,28 +130,28 @@ void TrackContentWidget::updateBackground()
 	pmp.fillRect( w, 0, w , h, lighterColor() );
 
 	// draw lines
-	// draw big vertical lines (per bar)
-	pmp.setPen( QPen( gridColor(), BIG_VERTICAL_LINE_WIDTH ) );
-	for( float x = 0; x < w * 2; x += ppb * bbBigLines )
-	{
-		pmp.drawLine( QLineF( x, 0.0, x, h ) );
-	}
-
-	pmp.setPen( QPen( embossColor(), EMBOSS_WIDTH ) );
-	for( float x = (BIG_VERTICAL_LINE_WIDTH + 1) / 2; x < w * 2; x += ppb * bbBigLines )
-	{
-		pmp.drawLine( QLineF( x, 0.0, x, h ) );
-	}
-
-	// draw small vertical lines (between bars)
-	pmp.setPen( QPen( gridColor(), SMALL_VERTICAL_LINE_WIDTH ) );
-	for( float x = 0; x < w * 2; x += ppb * bbSmallLines )
+	// draw fine grid
+	pmp.setPen( QPen( fineGridColor(), FINE_GRID_LINE_WIDTH ) );
+	for( float x = 0; x < w * 2; x += ppb * fineGridResolution )
 	{
 		pmp.drawLine( QLineF( static_cast<int>( x ), 0.0, static_cast<int>( x ), h ) );
 	}
 
-	// horizontal line
-	pmp.setPen( QPen( gridColor(), HORIZONTAL_LINE_WIDTH ) );
+	// draw coarse grid
+	pmp.setPen( QPen( coarseGridColor(), COARSE_GRID_LINE_WIDTH ) );
+	for( float x = 0; x < w * 2; x += ppb * coarseGridResolution )
+	{
+		pmp.drawLine( QLineF( x, 0.0, x, h ) );
+	}
+
+	pmp.setPen( QPen( embossColor(), EMBOSS_LINE_WIDTH ) );
+	for( float x = (COARSE_GRID_LINE_WIDTH + 1) / 2; x < w * 2; x += ppb * coarseGridResolution )
+	{
+		pmp.drawLine( QLineF( x, 0.0, x, h ) );
+	}
+
+	// draw horizontal line
+	pmp.setPen( QPen( horizontalColor(), HORIZONTAL_LINE_WIDTH ) );
 	pmp.drawLine( 0, h - (HORIZONTAL_LINE_WIDTH + 1) / 2, w * 2, h - (HORIZONTAL_LINE_WIDTH + 1) / 2 );
 
 	pmp.end();
@@ -726,8 +726,16 @@ QBrush TrackContentWidget::lighterColor() const
 { return m_lighterColor; }
 
 //! \brief CSS theming qproperty access method
-QBrush TrackContentWidget::gridColor() const
-{ return m_gridColor; }
+QBrush TrackContentWidget::coarseGridColor() const
+{ return m_coarseGridColor; }
+
+//! \brief CSS theming qproperty access method
+QBrush TrackContentWidget::fineGridColor() const
+{ return m_fineGridColor; }
+
+//! \brief CSS theming qproperty access method
+QBrush TrackContentWidget::horizontalColor() const
+{ return m_horizontalColor; }
 
 //! \brief CSS theming qproperty access method
 QBrush TrackContentWidget::embossColor() const
@@ -742,8 +750,16 @@ void TrackContentWidget::setLighterColor( const QBrush & c )
 { m_lighterColor = c; }
 
 //! \brief CSS theming qproperty access method
-void TrackContentWidget::setGridColor( const QBrush & c )
-{ m_gridColor = c; }
+void TrackContentWidget::setCoarseGridColor( const QBrush & c )
+{ m_coarseGridColor = c; }
+
+//! \brief CSS theming qproperty access method
+void TrackContentWidget::setFineGridColor( const QBrush & c )
+{ m_fineGridColor = c; }
+
+//! \brief CSS theming qproperty access method
+void TrackContentWidget::setHorizontalColor( const QBrush & c )
+{ m_horizontalColor = c; }
 
 //! \brief CSS theming qproperty access method
 void TrackContentWidget::setEmbossColor( const QBrush & c )
