@@ -56,7 +56,7 @@ public:
 			}
 			if( fabs( buf[f][1] ) > peak[0][1] )
 			{
-				peak[0][1] = fabs( buf[f][0] );
+				peak[0][1] = fabs( buf[f][1] );
 			}
 
 		}
