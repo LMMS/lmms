@@ -188,32 +188,16 @@ QString ConfigManager::defaultVersion() const
 	return LMMS_VERSION;
 }
 
-QStringList ConfigManager::availableVstEmbedMethods()
+WindowEmbed::Method ConfigManager::vstEmbedMethod() const
 {
-	QStringList methods;
-	methods.append("none");
-#if QT_VERSION >= 0x050100
-	methods.append("qt");
-#endif
-#ifdef LMMS_BUILD_WIN32
-	methods.append("win32");
-#endif
-#ifdef LMMS_BUILD_LINUX
-	if (static_cast<QGuiApplication*>(QApplication::instance())->
-		platformName() == "xcb")
-	{
-		methods.append("xembed");
-	}
-#endif
-	return methods;
-}
-
-QString ConfigManager::vstEmbedMethod() const
-{
-	QStringList methods = availableVstEmbedMethods();
-	QString defaultMethod = *(methods.end() - 1);
-	QString currentMethod = value( "ui", "vstembedmethod", defaultMethod );
-	return methods.contains(currentMethod) ? currentMethod : defaultMethod;
+	const auto methods = WindowEmbed::availableMethods();
+	const auto defaultMethod = methods.empty() ? WindowEmbed::Method::None : methods.back();
+	const auto defaultMethodStr = QString{WindowEmbed::toString(defaultMethod).data()};
+	const auto currentMethodStr = value("ui", "vstembedmethod", defaultMethodStr);
+	const auto currentMethod = WindowEmbed::toEnum(currentMethodStr.toStdString());
+	return std::find(methods.begin(), methods.end(), currentMethod) != methods.end()
+		? currentMethod
+		: defaultMethod;
 }
 
 bool ConfigManager::hasWorkingDir() const

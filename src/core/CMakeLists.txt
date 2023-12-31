@@ -11,6 +11,7 @@ set(LMMS_SRCS
 	core/BandLimitedWave.cpp
 	core/base64.cpp
 	core/BufferManager.cpp
+	core/Clip.cpp
 	core/Clipboard.cpp
 	core/ComboBoxModel.cpp
 	core/ConfigManager.cpp
@@ -23,7 +24,6 @@ set(LMMS_SRCS
 	core/Engine.cpp
 	core/EnvelopeAndLfoParameters.cpp
 	core/fft_helpers.cpp
-	core/Mixer.cpp
 	core/ImportFilter.cpp
 	core/InlineAutomation.cpp
 	core/Instrument.cpp
@@ -43,6 +43,7 @@ set(LMMS_SRCS
 	core/MeterModel.cpp
 	core/MicroTimer.cpp
 	core/Microtuner.cpp
+	core/Mixer.cpp
 	core/MixHelpers.cpp
 	core/Model.cpp
 	core/ModelVisitor.cpp
@@ -76,6 +77,7 @@ set(LMMS_SRCS
 	core/LmmsSemaphore.cpp
 	core/SerializingObject.cpp
 	core/Song.cpp
+	core/StepRecorder.cpp
 	core/TempoSyncKnobModel.cpp
 	core/Timeline.cpp
 	core/TimePos.cpp
@@ -84,10 +86,9 @@ set(LMMS_SRCS
 	core/TrackContainer.cpp
 	core/UpgradeExtendedNoteRange.h
 	core/UpgradeExtendedNoteRange.cpp
-	core/Clip.cpp
 	core/ValueBuffer.cpp
 	core/VstSyncController.cpp
-	core/StepRecorder.cpp
+	core/WindowEmbed.cpp
 
 	core/audio/AudioAlsa.cpp
 	core/audio/AudioDevice.cpp

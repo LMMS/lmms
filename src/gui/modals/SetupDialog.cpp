@@ -425,27 +425,36 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	m_vstEmbedComboBox = new QComboBox(pluginsBox);
 
-	QStringList embedMethods = ConfigManager::availableVstEmbedMethods();
-	m_vstEmbedComboBox->addItem(tr("No embedding"), "none");
-	if(embedMethods.contains("qt"))
+	m_vstEmbedComboBox->addItem(tr("No embedding"), static_cast<int>(WindowEmbed::Method::None));
+	for (const auto embedMethod : WindowEmbed::availableMethods())
 	{
-		m_vstEmbedComboBox->addItem(tr("Embed using Qt API"), "qt");
+		switch (embedMethod)
+		{
+			case WindowEmbed::Method::Qt:
+				m_vstEmbedComboBox->addItem(tr("Embed using Qt API"),
+					static_cast<int>(WindowEmbed::Method::Qt));
+				break;
+			case WindowEmbed::Method::Win32:
+				m_vstEmbedComboBox->addItem(tr("Embed using native Win32 API"),
+					static_cast<int>(WindowEmbed::Method::Win32));
+				break;
+			case WindowEmbed::Method::XEmbed:
+				m_vstEmbedComboBox->addItem(tr("Embed using XEmbed protocol"),
+					static_cast<int>(WindowEmbed::Method::XEmbed));
+				break;
+			default:
+				break;
+		}
 	}
-	if(embedMethods.contains("win32"))
-	{
-		m_vstEmbedComboBox->addItem(tr("Embed using native Win32 API"), "win32");
-	}
-	if(embedMethods.contains("xembed"))
-	{
-		m_vstEmbedComboBox->addItem(tr("Embed using XEmbed protocol"), "xembed");
-	}
-	m_vstEmbedComboBox->setCurrentIndex(m_vstEmbedComboBox->findData(m_vstEmbedMethod));
+
+	m_vstEmbedComboBox->setCurrentIndex(m_vstEmbedComboBox->findData(static_cast<int>(m_vstEmbedMethod)));
 	connect(m_vstEmbedComboBox, SIGNAL(currentIndexChanged(int)),
 			this, SLOT(vstEmbedMethodChanged()));
 	pluginsLayout->addWidget(m_vstEmbedComboBox);
 
 	m_vstAlwaysOnTopCheckBox = addCheckBox(tr("Keep plugin windows on top when not embedded"), pluginsBox, pluginsLayout,
 		m_vstAlwaysOnTop, SLOT(toggleVSTAlwaysOnTop(bool)), false);
+	vstEmbedMethodChanged();
 
 	addCheckBox(tr("Keep effects running even without input"), pluginsBox, pluginsLayout,
 		m_disableAutoQuit, SLOT(toggleDisableAutoQuit(bool)), false);
@@ -949,7 +958,7 @@ void SetupDialog::accept()
 	ConfigManager::inst()->setValue("ui", "animateafp",
 					QString::number(m_animateAFP));
 	ConfigManager::inst()->setValue("ui", "vstembedmethod",
-					m_vstEmbedComboBox->currentData().toString());
+					WindowEmbed::toString(WindowEmbed::Method{m_vstEmbedComboBox->currentData().toInt()}).data());
 	ConfigManager::inst()->setValue("ui", "vstalwaysontop",
 					QString::number(m_vstAlwaysOnTop));
 	ConfigManager::inst()->setValue("ui", "disableautoquit",
@@ -1145,8 +1154,8 @@ void SetupDialog::toggleAnimateAFP(bool enabled)
 
 void SetupDialog::vstEmbedMethodChanged()
 {
-	m_vstEmbedMethod = m_vstEmbedComboBox->currentData().toString();
-	m_vstAlwaysOnTopCheckBox->setVisible(m_vstEmbedMethod == "none");
+	m_vstEmbedMethod = WindowEmbed::Method{m_vstEmbedComboBox->currentData().toInt()};
+	m_vstAlwaysOnTopCheckBox->setVisible(m_vstEmbedMethod == WindowEmbed::Method::None);
 }
 
 

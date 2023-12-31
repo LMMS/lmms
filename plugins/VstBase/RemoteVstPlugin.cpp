@@ -122,6 +122,7 @@ struct ERect
 #include "Midi.h"
 #include "communication.h"
 #include "IoHelper.h"
+#include "WindowEmbed.h"
 
 #include "VstSyncData.h"
 
@@ -2461,36 +2462,36 @@ int main( int _argc, char * * _argv )
 	#else
 		int embedMethodIndex = 2;
 	#endif
-		std::string embedMethod = _argv[embedMethodIndex];
+		auto embedMethod = lmms::WindowEmbed::toEnum(_argv[embedMethodIndex]);
 
-		if ( embedMethod == "none" )
+		if (embedMethod == lmms::WindowEmbed::Method::None)
 		{
 			std::cerr << "Starting detached." << std::endl;
 			EMBED = EMBED_X11 = EMBED_WIN32 = HEADLESS = false;
 		}
-		else if ( embedMethod == "win32" )
+		else if (embedMethod == lmms::WindowEmbed::Method::Win32)
 		{
 			std::cerr << "Starting using Win32-native embedding." << std::endl;
 			EMBED = EMBED_WIN32 = true; EMBED_X11 = HEADLESS = false;
 		}
-		else if ( embedMethod == "qt" )
+		else if (embedMethod == lmms::WindowEmbed::Method::Qt)
 		{
 			std::cerr << "Starting using Qt-native embedding." << std::endl;
 			EMBED = true; EMBED_X11 = EMBED_WIN32 = HEADLESS = false;
 		}
-		else if ( embedMethod == "xembed" )
+		else if (embedMethod == lmms::WindowEmbed::Method::XEmbed)
 		{
 			std::cerr << "Starting using X11Embed protocol." << std::endl;
 			EMBED = EMBED_X11 = true; EMBED_WIN32 = HEADLESS = false;
 		}
-		else if ( embedMethod == "headless" )
+		else if (embedMethod == lmms::WindowEmbed::Method::Headless)
 		{
 			std::cerr << "Starting without UI." << std::endl;
 			HEADLESS = true; EMBED = EMBED_X11 = EMBED_WIN32 = false;
 		}
 		else
 		{
-			std::cerr << "Unknown embed method " << embedMethod << ". Starting detached instead." << std::endl;
+			std::cerr << "Unknown embed method " << _argv[embedMethodIndex] << ". Starting detached instead." << std::endl;
 			EMBED = EMBED_X11 = EMBED_WIN32 = HEADLESS = false;
 		}
 	}
