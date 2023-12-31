@@ -255,7 +255,7 @@ private:
 	{
 		assert(((m_pluginState == possibilities) || ...));
 	}
-	void checkPluginStateNext(PluginState next);
+	auto isPluginNextStateValid(PluginState next) -> bool;
 	void setPluginState(PluginState state);
 	static inline auto isMainThread() -> bool;
 	static inline auto isAudioThread() -> bool;
@@ -401,7 +401,7 @@ private:
 	*/
 	bool m_scheduleRestart = false;
 	bool m_scheduleDeactivate = false;
-	bool m_scheduleProcess = true;
+	bool m_scheduleProcess = true; // TODO: ???
 	bool m_scheduleParamFlush = false;
 	bool m_scheduleMainThreadCallback = false;
 

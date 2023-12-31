@@ -114,6 +114,7 @@ ClapInstance::ClapInstance(const ClapPluginInfo* pluginInfo, Model* parent)
 	setHost();
 
 	m_process.steady_time = -1; // Not supported yet
+	m_process.transport = ClapManager::transport();
 
 	pluginStart();
 }
@@ -123,6 +124,7 @@ ClapInstance::ClapInstance(ClapInstance&& other) noexcept
 	m_pluginInfo(std::move(other.m_pluginInfo)),
 	m_pluginIssues(std::move(other.m_pluginIssues))
 {
+	assert(false && "Shouldn't see this");
 	qDebug() << "TODO: Move constructor not fully implemented yet";
 	m_idleQueue = std::move(other.m_idleQueue);
 	m_plugin = std::exchange(other.m_plugin, nullptr);
@@ -257,8 +259,6 @@ auto ClapInstance::pluginLoad() -> bool
 {
 	qDebug() << "Loading plugin instance:" << m_pluginInfo->descriptor()->name;
 	checkPluginStateCurrent(PluginState::None);
-	checkPluginStateNext(PluginState::Loaded); // success
-	checkPluginStateNext(PluginState::None); // failure (stay None)
 
 	// Create plugin instance, destroying any previous plugin instance first
 	const auto factory = m_pluginInfo->factory();
@@ -303,8 +303,6 @@ auto ClapInstance::pluginInit() -> bool
 
 	if (isPluginErrorState()) { return false; }
 	checkPluginStateCurrent(PluginState::Loaded);
-	checkPluginStateNext(PluginState::Inactive); // success
-	checkPluginStateNext(PluginState::LoadedWithError); // failure (init fail)
 
 	if (pluginState() != PluginState::Loaded) { return false; }
 
@@ -583,8 +581,6 @@ auto ClapInstance::pluginActivate() -> bool
 
 	if (isPluginErrorState()) { return false; }
 	checkPluginStateCurrent(PluginState::Inactive);
-	checkPluginStateNext(PluginState::ActiveAndSleeping); // success
-	checkPluginStateNext(PluginState::InactiveWithError); // failure (activation fail)
 
 	const auto sampleRate = Engine::audioEngine()->processingSampleRate();
 	static_assert(DEFAULT_BUFFER_SIZE > MINIMUM_BUFFER_SIZE);
@@ -596,7 +592,7 @@ auto ClapInstance::pluginActivate() -> bool
 		return false;
 	}
 
-	m_scheduleProcess = true;
+	m_scheduleProcess = true; // TODO: ?????
 	setPluginState(PluginState::ActiveAndSleeping);
 	return true;
 }
@@ -606,6 +602,16 @@ auto ClapInstance::pluginDeactivate() -> bool
 	qDebug() << "ClapInstance::pluginDeactivate";
 	assert(isMainThread());
 	if (!isPluginActive()) { return false; }
+
+	/*
+	TODO: Need to fix this
+	while (isPluginProcessing() || isPluginSleeping())
+	{
+		m_scheduleDeactivate = true;
+		QThread::msleep(10);
+	}
+	m_scheduleDeactivate = false;
+	*/
 
 	m_plugin->deactivate(m_plugin);
 	setPluginState(PluginState::Inactive);
@@ -638,15 +644,12 @@ auto ClapInstance::pluginProcess(std::uint32_t frames) -> bool
 		{
 			m_plugin->stop_processing(m_plugin);
 		}
-		checkPluginStateNext(PluginState::ActiveAndReadyToDeactivate);
 		setPluginState(PluginState::ActiveAndReadyToDeactivate);
 		return true;
 	}
 
 	// We can't process a plugin which failed to start processing
 	if (m_pluginState == PluginState::ActiveWithError) { return false; }
-
-	m_process.transport = nullptr; // TODO
 
 	m_process.in_events = m_evIn.clapInputEvents();
 	m_process.out_events = m_evOut.clapOutputEvents();
@@ -844,52 +847,49 @@ auto ClapInstance::isPluginErrorState() const -> bool
 		|| m_pluginState == PluginState::ActiveWithError;
 }
 
-void ClapInstance::checkPluginStateNext(PluginState next)
+auto ClapInstance::isPluginNextStateValid(PluginState next) -> bool
 {
 	switch (next)
 	{
 	case PluginState::None:
-		assert(m_pluginState == PluginState::Inactive
+		return m_pluginState == PluginState::Inactive
 			|| m_pluginState == PluginState::InactiveWithError
 			|| m_pluginState == PluginState::Loaded
 			|| m_pluginState == PluginState::LoadedWithError
-			|| m_pluginState == PluginState::None); // TODO
-		break;
+			|| m_pluginState == PluginState::None; // TODO
 	case PluginState::Loaded:
-		assert(m_pluginState == PluginState::None);
-		break;
+		return m_pluginState == PluginState::None;
 	case PluginState::LoadedWithError:
-		assert(m_pluginState == PluginState::Loaded);
-		break;
+		return m_pluginState == PluginState::Loaded;
 	case PluginState::Inactive:
-		assert(m_pluginState == PluginState::Loaded
-			|| m_pluginState == PluginState::ActiveAndReadyToDeactivate);
-		break;
+		return true; // TODO: Remove once ClapInstance::pluginDeactivate() is fixed
+		return m_pluginState == PluginState::Loaded
+			|| m_pluginState == PluginState::ActiveAndReadyToDeactivate;
 	case PluginState::InactiveWithError:
-		assert(m_pluginState == PluginState::Inactive);
-		break;
+		return m_pluginState == PluginState::Inactive;
 	case PluginState::ActiveAndSleeping:
-		assert(m_pluginState == PluginState::Inactive
-			|| m_pluginState == PluginState::ActiveAndProcessing);
-		break;
+		return m_pluginState == PluginState::Inactive
+			|| m_pluginState == PluginState::ActiveAndProcessing;
 	case PluginState::ActiveAndProcessing:
-		assert(m_pluginState == PluginState::ActiveAndSleeping);
-		break;
+		return m_pluginState == PluginState::ActiveAndSleeping;
 	case PluginState::ActiveWithError:
-		assert(m_pluginState == PluginState::ActiveAndProcessing);
-		break;
+		return m_pluginState == PluginState::ActiveAndProcessing;
 	case PluginState::ActiveAndReadyToDeactivate:
-		assert(m_pluginState == PluginState::ActiveAndProcessing
+		return m_pluginState == PluginState::ActiveAndProcessing
 			|| m_pluginState == PluginState::ActiveAndSleeping
-			|| m_pluginState == PluginState::ActiveWithError);
+			|| m_pluginState == PluginState::ActiveWithError;
 		break;
 	default:
 		throw std::runtime_error{"CLAP plugin state error"};
 	}
+	return false;
 }
 
 void ClapInstance::setPluginState(PluginState state)
 {
+	// Assert that it's okay to transition to the desired next state from the current state
+	assert(isPluginNextStateValid(state) && "Invalid state transition");
+
 	m_pluginState = state;
 	switch (state)
 	{
@@ -1023,7 +1023,7 @@ auto ClapInstance::hostGetExtension(const clap_host* host, const char* extension
 	[[maybe_unused]] auto h = fromHost(host);
 	if (!extensionId) { return nullptr; }
 
-	if (ClapManager::s_debug) { qDebug() << "--Plugin requested host extension:" << extensionId; }
+	if (ClapManager::debugging()) { qDebug() << "--Plugin requested host extension:" << extensionId; }
 
 	const auto extensionIdView = std::string_view{extensionId};
 	if (extensionIdView == CLAP_EXT_LOG) { return &m_hostExtLog; }
@@ -1076,10 +1076,10 @@ void ClapInstance::hostExtLogLog(const clap_host_t* host, clap_log_severity seve
 	switch (severity)
 	{
 	case CLAP_LOG_DEBUG:
-		if (!ClapManager::s_debug) { return; }
+		if (!ClapManager::debugging()) { return; }
 		severityStr = "DEBUG"; break;
 	case CLAP_LOG_INFO:
-		if (!ClapManager::s_debug) { return; }
+		if (!ClapManager::debugging()) { return; }
 		severityStr = "INFO"; break;
 	case CLAP_LOG_WARNING:
 		severityStr = "WARNING"; break;

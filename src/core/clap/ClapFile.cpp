@@ -75,7 +75,7 @@ auto ClapFile::load() -> bool
 	m_factory = static_cast<const clap_plugin_factory*>(pluginEntry->get_factory(CLAP_PLUGIN_FACTORY_ID));
 
 	m_pluginCount = m_factory->get_plugin_count(m_factory);
-	if (ClapManager::s_debug) { qDebug() << "plugin count:" << m_pluginCount; }
+	if (ClapManager::debugging()) { qDebug() << "plugin count:" << m_pluginCount; }
 	if (m_pluginCount <= 0) { return false; }
 
 	m_pluginInfo.clear();
@@ -144,7 +144,7 @@ ClapPluginInfo::ClapPluginInfo(const clap_plugin_factory* factory, std::uint32_t
 		return;
 	}
 
-	if (ClapManager::s_debug)
+	if (ClapManager::debugging())
 	{
 		qDebug().nospace() << "CLAP version: "
 			<< m_descriptor->clap_version.major << "."
@@ -160,7 +160,7 @@ ClapPluginInfo::ClapPluginInfo(const clap_plugin_factory* factory, std::uint32_t
 		return;
 	}
 
-	if (ClapManager::s_debug)
+	if (ClapManager::debugging())
 	{
 		qDebug() << "name:" << m_descriptor->name;
 		qDebug() << "description:" << m_descriptor->description;
@@ -171,7 +171,7 @@ ClapPluginInfo::ClapPluginInfo(const clap_plugin_factory* factory, std::uint32_t
 	while (features && *features)
 	{
 		auto feature = std::string_view{*features};
-		if (ClapManager::s_debug) { qDebug() << "feature:" << feature.data(); }
+		if (ClapManager::debugging()) { qDebug() << "feature:" << feature.data(); }
 		if (feature == CLAP_PLUGIN_FEATURE_INSTRUMENT)
 		{
 			m_type = Plugin::Type::Instrument;

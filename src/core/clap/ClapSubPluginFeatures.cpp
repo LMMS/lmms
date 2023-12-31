@@ -118,7 +118,7 @@ void ClapSubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor* desc, Ke
 				atm["uri"] = QString::fromUtf8(clapDesc->id);
 
 				kl.push_back(Key{desc, QString::fromUtf8(clapDesc->name), atm});
-				if (ClapManager::s_debug)
+				if (ClapManager::debugging())
 				{
 					qDebug() << "Found CLAP sub plugin key of type" << static_cast<int>(m_type) << ":" << clapDesc->id;
 				}

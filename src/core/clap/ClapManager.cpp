@@ -45,6 +45,7 @@
 
 #include "ClapFile.h"
 #include "Engine.h"
+#include "Song.h"
 #include "Plugin.h"
 #include "PluginIssue.h"
 #include "lmmsversion.h"
@@ -67,10 +68,13 @@ namespace
 	}
 }
 
+clap_event_transport ClapManager::s_transport = {};
 bool ClapManager::s_debug = false;
 
 ClapManager::ClapManager()
 {
+	updateTransport(); // TODO: Is Song available at this point?
+
 	const char* dbgStr = std::getenv("LMMS_CLAP_DEBUG");
 	s_debug = (dbgStr && *dbgStr);
 	if (s_debug) { qDebug() << "CLAP host debugging enabled"; }
@@ -298,6 +302,64 @@ void ClapManager::loadClapFiles(const std::vector<std::filesystem::path>& search
 				"  environment variable \"LMMS_CLAP_DEBUG\" to nonempty.";
 		}
 	}
+}
+
+void ClapManager::updateTransport()
+{
+	s_transport = {};
+	s_transport.header.size = sizeof(clap_event_transport);
+	s_transport.header.type = CLAP_EVENT_TRANSPORT;
+
+	const Song* song = Engine::getSong();
+	if (!song) { return; }
+
+	s_transport.flags = 0;
+
+	setPlaying(song->isPlaying());
+	setRecording(song->isRecording());
+	//setLooping(song->isLooping()); // TODO
+
+	setTimePosition(song->getMilliseconds());
+
+	// TODO: Find a way to get the absolute beat within the song in order to support beats timeline
+	s_transport.flags &= ~static_cast<std::uint32_t>(CLAP_TRANSPORT_HAS_BEATS_TIMELINE);
+
+	setTempo(song->getTempo());
+	setTimeSignature(song->getTimeSigModel().getNumerator(), song->getTimeSigModel().getDenominator());
+}
+
+void ClapManager::setPlaying(bool isPlaying)
+{
+	s_transport.flags |= isPlaying ? CLAP_TRANSPORT_IS_PLAYING : 0;
+}
+
+void ClapManager::setRecording(bool isRecording)
+{
+	s_transport.flags |= isRecording ? CLAP_TRANSPORT_IS_RECORDING : 0;
+}
+
+void ClapManager::setLooping(bool isLooping)
+{
+	s_transport.flags |= isLooping ? CLAP_TRANSPORT_IS_LOOP_ACTIVE : 0;
+}
+
+void ClapManager::setTimePosition(int elapsedMilliseconds)
+{
+	s_transport.flags |= static_cast<std::uint32_t>(CLAP_TRANSPORT_HAS_SECONDS_TIMELINE);
+	s_transport.song_pos_seconds = std::lround(CLAP_SECTIME_FACTOR * (elapsedMilliseconds / 1000.0));
+}
+
+void ClapManager::setTempo(bpm_t tempo)
+{
+	s_transport.flags |= static_cast<std::uint32_t>(CLAP_TRANSPORT_HAS_TEMPO);
+	s_transport.tempo  = static_cast<double>(tempo);
+}
+
+void ClapManager::setTimeSignature(int num, int denom)
+{
+	s_transport.flags |= static_cast<std::uint32_t>(CLAP_TRANSPORT_HAS_TIME_SIGNATURE);
+	s_transport.tsig_num = static_cast<std::uint16_t>(num);
+	s_transport.tsig_denom = static_cast<std::uint16_t>(denom);
 }
 
 auto ClapManager::clapGuiApi() -> const char*

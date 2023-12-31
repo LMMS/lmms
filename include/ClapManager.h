@@ -77,19 +77,25 @@ public:
 	//! Creates a plugin instance given plugin info; Plugin instance is owned by ClapManager
 	//auto createInstance(const ClapPluginInfo* info) -> std::weak_ptr<ClapPluginInstance>;
 
+	/**
+	 * Transport update methods
+	 * TODO: Add pre-roll and beat position
+	 */
+	static void updateTransport();
+	static void setPlaying(bool isPlaying);
+	static void setRecording(bool isRecording);
+	static void setLooping(bool isLooping);
+	static void setTimePosition(int elapsedMilliseconds);
+	static void setTempo(bpm_t tempo);
+	static void setTimeSignature(int num, int denom);
+
+	static auto transport() -> const clap_event_transport* { return &s_transport; }
+
 	static auto clapGuiApi() -> const char*;
 
-	static bool s_debug; //!< If LMMS_CLAP_DEBUG is set, debug output will be printed
+	static auto debugging() -> bool { return s_debug; }
 
 private:
-
-	std::vector<std::filesystem::path> m_searchPaths; //!< Owns all CLAP search paths; Populated by findSearchPaths()
-	std::vector<ClapFile> m_files; //!< Owns all loaded .clap files; Populated by loadClapFiles()
-
-	// Non-owning plugin caches (for fast iteration/lookup)
-	std::vector<std::weak_ptr<const ClapPluginInfo>> m_pluginInfo; //!< Non-owning vector of info for all successfully loaded CLAP plugins
-	std::unordered_map<std::string, std::weak_ptr<const ClapPluginInfo>> m_uriToPluginInfo; //!< Non-owning map of plugin URIs (IDs) to ClapPluginInfo
-	//std::vector<std::weak_ptr<ClapInstance>> m_instances; //!< Vector of all CLAP plugin instances (for guaranteeing correct clean-up order)
 
 	//! Finds all CLAP search paths and populates m_searchPaths
 	void findSearchPaths();
@@ -99,6 +105,17 @@ private:
 
 	//! Finds and loads all .clap files in the provided search paths @p searchPaths
 	void loadClapFiles(const std::vector<std::filesystem::path>& searchPaths);
+
+	std::vector<std::filesystem::path> m_searchPaths; //!< Owns all CLAP search paths; Populated by findSearchPaths()
+	std::vector<ClapFile> m_files; //!< Owns all loaded .clap files; Populated by loadClapFiles()
+
+	// Non-owning plugin caches (for fast iteration/lookup)
+	std::vector<std::weak_ptr<const ClapPluginInfo>> m_pluginInfo; //!< Non-owning vector of info for all successfully loaded CLAP plugins
+	std::unordered_map<std::string, std::weak_ptr<const ClapPluginInfo>> m_uriToPluginInfo; //!< Non-owning map of plugin URIs (IDs) to ClapPluginInfo
+	//std::vector<std::weak_ptr<ClapInstance>> m_instances; //!< Vector of all CLAP plugin instances (for guaranteeing correct clean-up order)
+
+	static clap_event_transport s_transport;
+	static bool s_debug; //!< If LMMS_CLAP_DEBUG is set, debug output will be printed
 };
 
 

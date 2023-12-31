@@ -185,7 +185,9 @@ void ClapParam::check(clap_param_info& info)
 
 	if (info.default_value > info.max_value || info.default_value < info.min_value)
 	{
-		throw std::logic_error{"CLAP param: Error: default value is out of range"};
+		std::string msg = "CLAP param: Error: default value is out of range\ndefault: " + std::to_string(info.default_value)
+			+ "; min: " + std::to_string(info.min_value) + "; max: " + std::to_string(info.max_value);
+		throw std::logic_error{msg};
 		//qDebug() << "CLAP param: Warning: default value is out of range; clamping to valid range";
 		//info.default_value = std::clamp(info.default_value, info.min_value, info.max_value);
 		//return false;
