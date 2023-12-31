@@ -62,7 +62,7 @@ auto decodeSampleSF(const QString& audioFile) -> std::optional<SampleDecoder::Re
 	SNDFILE* sndFile = nullptr;
 	auto sfInfo = SF_INFO{};
 
-	// Use QFile to handle unicode file names on Windows
+	// TODO: Remove use of QFile
 	auto file = QFile{audioFile};
 	if (!file.open(QIODevice::ReadOnly)) { return std::nullopt; }
 
@@ -143,6 +143,7 @@ auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleDeco
 
 	static ov_callbacks s_callbacks = {s_read, s_seek, s_close, s_tell};
 
+	// TODO: Remove use of QFile
 	auto file = QFile{audioFile};
 	if (!file.open(QIODevice::ReadOnly)) { return std::nullopt; }
 
