@@ -76,7 +76,8 @@ Fader::Fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 	m_startValue( 0 ),
 	m_peakOk(10, 212, 92),
 	m_peakClip(193, 32, 56),
-	m_peakWarn(214, 236, 82)
+	m_peakWarn(214, 236, 82),
+	m_renderUnityLine(true)
 {
 	if( s_textFloat == nullptr )
 	{
@@ -103,7 +104,8 @@ Fader::Fader( FloatModel * model, const QString & name, QWidget * parent, QPixma
 	m_startValue( 0 ),
 	m_peakOk(10, 212, 92),
 	m_peakClip(193, 32, 56),
-	m_peakWarn(214, 236, 82)
+	m_peakWarn(214, 236, 82),
+	m_renderUnityLine(true)
 {
 	if( s_textFloat == nullptr )
 	{
@@ -117,8 +119,10 @@ void Fader::init(FloatModel * model, QString const & name)
 {
 	setWindowTitle( name );
 	setAttribute( Qt::WA_OpaquePaintEvent, false );
-	// TODO For now resize the widget to the size of the previous background image "fader_background.png" as found in the classic and default theme
-	setMinimumSize(23, 116);
+	// For now resize the widget to the size of the previous background image "fader_background.png" as it was found in the classic and default theme
+	QSize minimumSize(23, 116);
+	setMinimumSize(minimumSize);
+	resize(minimumSize);
 	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 	setModel( model );
 	setHintText( "Volume:","%");
@@ -434,8 +438,11 @@ void Fader::paintLevels(QPaintEvent * ev, QPainter & painter, bool linear)
 	painter.fillRect(peakRectL, linearGrad);
 
 	// Draw unity line (0 dbFS, 1.0 amplitude)
-	auto const unityRectL = ph.getPersistentPeakRect(leftMeterRect, mappedUnity);
-	painter.fillRect(unityRectL, unityMarkerColor);
+	if (getRenderUnityLine())
+	{
+		auto const unityRectL = ph.getPersistentPeakRect(leftMeterRect, mappedUnity);
+		painter.fillRect(unityRectL, unityMarkerColor);
+	}
 
 	// Draw right levels
 	QRect rightMeterMargins = rightMeterRect.marginsRemoved(QMargins(1, 0, 1, 0));
@@ -446,8 +453,11 @@ void Fader::paintLevels(QPaintEvent * ev, QPainter & painter, bool linear)
 	painter.fillRect(peakRectR, linearGrad);
 
 	// Draw unity line (0 dbFS, 1.0 amplitude)
-	auto const unityRectR = ph.getPersistentPeakRect(rightMeterRect, mappedUnity);
-	painter.fillRect(unityRectR, unityMarkerColor);
+	if (getRenderUnityLine())
+	{
+		auto const unityRectR = ph.getPersistentPeakRect(rightMeterRect, mappedUnity);
+		painter.fillRect(unityRectR, unityMarkerColor);
+	}
 
 	// TODO
 	QPen pen(QColor(255, 255, 255, 18));

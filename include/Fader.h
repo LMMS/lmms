@@ -70,6 +70,7 @@ public:
 	Q_PROPERTY(QColor peakClip READ peakClip WRITE setPeakClip)
 	Q_PROPERTY(QColor peakWarn READ peakWarn WRITE setPeakWarn)
 	Q_PROPERTY(bool levelsDisplayedInDBFS READ getLevelsDisplayedInDBFS WRITE setLevelsDisplayedInDBFS)
+	Q_PROPERTY(bool renderUnityLine READ getRenderUnityLine WRITE setRenderUnityLine)
 
 	Fader( FloatModel * _model, const QString & _name, QWidget * _parent );
 	Fader( FloatModel * _model, const QString & _name, QWidget * _parent, QPixmap * back, QPixmap * leds, QPixmap * knob );
@@ -100,6 +101,9 @@ public:
 
 	inline bool getLevelsDisplayedInDBFS() const { return m_levelsDisplayedInDBFS; }
 	inline void setLevelsDisplayedInDBFS(bool value = true) { m_levelsDisplayedInDBFS = value; }
+
+	inline bool getRenderUnityLine() const { return m_renderUnityLine; }
+	inline void setRenderUnityLine(bool value = true) { m_renderUnityLine = value; }
 
 	void setDisplayConversion( bool b )
 	{
@@ -162,6 +166,8 @@ private:
 	QColor m_peakOk;
 	QColor m_peakClip;
 	QColor m_peakWarn;
+
+	bool m_renderUnityLine;
 } ;
 
 
