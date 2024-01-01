@@ -52,7 +52,7 @@ SimpleTextFloat * FloatModelEditorBase::s_textFloat = nullptr;
 FloatModelEditorBase::FloatModelEditorBase(DirectionOfManipulation directionOfManipulation, QWidget * parent, const QString & name) :
 	QWidget(parent),
 	FloatModelView(new FloatModel(0, 0, 0, 1, nullptr, name, true), this),
-	m_volumeKnob(false),
+	m_volKnobType(VolKnobType::Normal),
 	m_volumeRatio(100.0, 0.0, 1000000.0),
 	m_buttonPressed(false),
 	m_directionOfManipulation(directionOfManipulation)
@@ -385,13 +385,14 @@ void FloatModelEditorBase::enterValue()
 	bool ok;
 	float new_val;
 
-	if (isVolumeKnob() &&
+	if (volKnobType() != VolKnobType::Normal &&
 		ConfigManager::inst()->value("app", "displaydbfs").toInt())
 	{
 		new_val = QInputDialog::getDouble(
 			this, tr("Set value"),
-			tr("Please enter a new value between "
-					"-96.0 dBFS and 6.0 dBFS:"),
+			tr(volKnobType() == VolKnobType::AbsVol ?
+				"Please enter a new value between -96.0 dBFS and 6.0 dBFS:"
+				: "Please enter a new value between -96.0 dB and 6.0 dB:"),
 				ampToDbfs(model()->getRoundedValue() / 100.0),
 							-96.0, 6.0, model()->getDigitCount(), &ok);
 		if (new_val <= -96.0)
@@ -436,10 +437,10 @@ void FloatModelEditorBase::friendlyUpdate()
 
 QString FloatModelEditorBase::displayValue() const
 {
-	if (isVolumeKnob() &&
+	if (volKnobType() != VolKnobType::Normal &&
 		ConfigManager::inst()->value("app", "displaydbfs").toInt())
 	{
-		return m_description.trimmed() + QString(" %1 dBFS").
+		return m_description.trimmed() + QString(volKnobType() == VolKnobType::AbsVol ? " %1 dBFS" : " %1 dB").
 				arg(ampToDbfs(model()->getRoundedValue() / volumeRatio()),
 								3, 'f', 2);
 	}

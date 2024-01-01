@@ -705,10 +705,10 @@ WatsynView::WatsynView( Instrument * _instrument,
 	makeknob(m_xtalkKnob, 88, B2ROW, tr("Crosstalk:"), "", "xtalkKnob")
 
 // let's set volume knobs
-	a1_volKnob -> setVolumeKnob( true );
-	a2_volKnob -> setVolumeKnob( true );
-	b1_volKnob -> setVolumeKnob( true );
-	b2_volKnob -> setVolumeKnob( true );
+	a1_volKnob->setVolKnobType(VolKnobType::AbsVol);
+	a2_volKnob->setVolKnobType(VolKnobType::AbsVol);
+	b1_volKnob->setVolKnobType(VolKnobType::AbsVol);
+	b2_volKnob->setVolKnobType(VolKnobType::AbsVol);
 
 	m_abmixKnob -> setFixedSize( 31, 31 );
 

@@ -59,7 +59,7 @@ DynProcControlDialog::DynProcControlDialog(
 	waveGraph -> setMaximumSize( 204, 205 );
 
 	auto inputKnob = new Knob(KnobType::Bright26, this);
-	inputKnob -> setVolumeKnob( true );
+	inputKnob->setVolKnobType(VolKnobType::RelVol);
 	inputKnob -> setVolumeRatio( 1.0 );
 	inputKnob -> move( 26, 223 );
 	inputKnob->setModel( &_controls->m_inputModel );
@@ -67,7 +67,7 @@ DynProcControlDialog::DynProcControlDialog(
 	inputKnob->setHintText( tr( "Input gain:" ) , "" );
 
 	auto outputKnob = new Knob(KnobType::Bright26, this);
-	outputKnob -> setVolumeKnob( true );
+	outputKnob->setVolKnobType(VolKnobType::RelVol);
 	outputKnob -> setVolumeRatio( 1.0 );
 	outputKnob -> move( 76, 223 );
 	outputKnob->setModel( &_controls->m_outputModel );

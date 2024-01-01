@@ -1640,7 +1640,7 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	makeknob(m_osc1SpoKnob, KNOBCOL6, O1ROW, tr("Stereo phase offset:" ), tr(" deg"), "osc1Knob")
 	makeknob(m_osc1PwKnob,  KNOBCOL7, O1ROW, tr("Pulse width:" ), "%", "osc1Knob")
 
-	m_osc1VolKnob -> setVolumeKnob( true );
+	m_osc1VolKnob->setVolKnobType(VolKnobType::AbsVol);
 
 	maketinyled( m_osc1SSRButton, 230, 34, tr( "Send sync on pulse rise" ) )
 	maketinyled( m_osc1SSFButton, 230, 44, tr( "Send sync on pulse fall" ) )
@@ -1652,7 +1652,7 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	makeknob( m_osc2FtrKnob, KNOBCOL5, O2ROW, tr("Fine tune right:"), tr(" cents"), "osc2Knob")
 	makeknob( m_osc2SpoKnob, KNOBCOL6, O2ROW, tr("Stereo phase offset:"), tr(" deg"), "osc2Knob")
 
-	m_osc2VolKnob -> setVolumeKnob( true );
+	m_osc2VolKnob->setVolKnobType(VolKnobType::AbsVol);
 
 	m_osc2WaveBox = new ComboBox( view );
 	m_osc2WaveBox -> setGeometry( 204, O2ROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
@@ -1667,7 +1667,7 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	makeknob( m_osc3SpoKnob, KNOBCOL4, O3ROW, tr("Stereo phase offset:"), tr(" deg"), "osc3Knob")
 	makeknob( m_osc3SubKnob, KNOBCOL5, O3ROW, tr("Sub-osc mix:"), "", "osc3Knob")
 
-	m_osc3VolKnob -> setVolumeKnob( true );
+	m_osc3VolKnob->setVolKnobType(VolKnobType::AbsVol);
 
 	m_osc3Wave1Box = new ComboBox( view );
 	m_osc3Wave1Box -> setGeometry( 160, O3ROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
