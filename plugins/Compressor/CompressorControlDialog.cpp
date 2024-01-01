@@ -191,13 +191,13 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	m_outFader = new EqFader(&controls->m_outGainModel,tr("Output gain"),
 		this, &controls->m_outPeakL, &controls->m_outPeakR);
 	m_outFader->setDisplayConversion(false);
-	m_outFader->setHintText(tr("Gain"), "dBFS");
+	m_outFader->setHintText(tr("Gain"), " dBFS");
 	m_outFader->setToolTip(tr("Output volume"));
 
 	m_inFader = new EqFader(&controls->m_inGainModel,tr("Input gain"),
 		this, &controls->m_inPeakL, &controls->m_inPeakR);
 	m_inFader->setDisplayConversion(false);
-	m_inFader->setHintText(tr("Gain"), "dBFS");
+	m_inFader->setHintText(tr("Gain"), " dBFS");
 	m_inFader->setToolTip(tr("Input volume"));
 
 	rmsButton = new PixmapButton(this, tr("Root Mean Square"));
