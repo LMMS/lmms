@@ -83,7 +83,7 @@ auto ClapParams::rescan(clap_param_rescan_flags flags) -> bool
 	// 1. It is forbidden to use CLAP_PARAM_RESCAN_ALL if the plugin is active
 	if (instance()->isActive() && (flags & CLAP_PARAM_RESCAN_ALL))
 	{
-		instance()->log(CLAP_LOG_WARNING, "clap_host_params.recan(CLAP_PARAM_RESCAN_ALL) was called while the plugin is active");
+		logger()->log(CLAP_LOG_WARNING, "clap_host_params.recan(CLAP_PARAM_RESCAN_ALL) was called while the plugin is active");
 		return false;
 	}
 
@@ -100,7 +100,7 @@ auto ClapParams::rescan(clap_param_rescan_flags flags) -> bool
 
 		if (!pluginExt()->get_info(plugin(), i, &info))
 		{
-			instance()->log(CLAP_LOG_WARNING, "clap_plugin_params.get_info() returned false!");
+			logger()->log(CLAP_LOG_WARNING, "clap_plugin_params.get_info() returned false!");
 			return false; // TODO: continue?
 		}
 
@@ -110,7 +110,7 @@ auto ClapParams::rescan(clap_param_rescan_flags flags) -> bool
 		{
 			std::string msg = "clap_plugin_params.get_info() reported a parameter with id = CLAP_INVALID_ID\n"
 				" 2. name: " + std::string{info.name} + ", module: " + std::string{info.module};
-			instance()->log(CLAP_LOG_WARNING, msg.c_str());
+			logger()->log(CLAP_LOG_WARNING, msg.c_str());
 			return false; // TODO: continue?
 		}
 
@@ -123,7 +123,7 @@ auto ClapParams::rescan(clap_param_rescan_flags flags) -> bool
 			std::string msg = "the parameter with id: " + std::to_string(info.id) + " was declared twice.\n"
 				" 1. name: " + std::string{it->second->info().name} + ", module: " + std::string{it->second->info().module} + "\n"
 				" 2. name: " + std::string{info.name} + ", module: " + std::string{info.module};
-			instance()->log(CLAP_LOG_WARNING, msg.c_str());
+			logger()->log(CLAP_LOG_WARNING, msg.c_str());
 			return false; // TODO: continue?
 		}
 		paramIds.insert(info.id);
@@ -134,7 +134,7 @@ auto ClapParams::rescan(clap_param_rescan_flags flags) -> bool
 			{
 				std::string msg = "A new parameter was declared, but the flag CLAP_PARAM_RESCAN_ALL was not specified; "
 					"id: " + std::to_string(info.id) + ", name: " + std::string{info.name} + ", module: " + std::string{info.module};
-				instance()->log(CLAP_LOG_WARNING, msg.c_str());
+				logger()->log(CLAP_LOG_WARNING, msg.c_str());
 				return false; // TODO: continue?
 			}
 
@@ -153,7 +153,7 @@ auto ClapParams::rescan(clap_param_rescan_flags flags) -> bool
 				{
 					std::string msg = "a parameter's info did change, but the flag CLAP_PARAM_RESCAN_INFO was not specified; "
 						"id: " + std::to_string(info.id) + ", name: " + std::string{info.name} + ", module: " + std::string{info.module};
-					instance()->log(CLAP_LOG_WARNING, msg.c_str());
+					logger()->log(CLAP_LOG_WARNING, msg.c_str());
 					return false; // TODO: continue?
 				}
 
@@ -161,7 +161,7 @@ auto ClapParams::rescan(clap_param_rescan_flags flags) -> bool
 				{
 					std::string msg = "a parameter's info has critical changes, but the flag CLAP_PARAM_RESCAN_ALL was not specified; "
 						"id: " + std::to_string(info.id) + ", name: " + std::string{info.name} + ", module: " + std::string{info.module};
-					instance()->log(CLAP_LOG_WARNING, msg.c_str());
+					logger()->log(CLAP_LOG_WARNING, msg.c_str());
 					return false; // TODO: continue?
 				}
 
@@ -175,7 +175,7 @@ auto ClapParams::rescan(clap_param_rescan_flags flags) -> bool
 				{
 					std::string msg = "a parameter's value did change but, but the flag CLAP_PARAM_RESCAN_VALUES was not specified; "
 						"id: " + std::to_string(info.id) + ", name: " + std::string{info.name} + ", module: " + std::string{info.module};
-					instance()->log(CLAP_LOG_WARNING, msg.c_str());
+					logger()->log(CLAP_LOG_WARNING, msg.c_str());
 					return false; // TODO: continue?
 				}
 
@@ -197,7 +197,7 @@ auto ClapParams::rescan(clap_param_rescan_flags flags) -> bool
 				const auto& info = it->second->info();
 				std::string msg = "a parameter was removed, but the flag CLAP_PARAM_RESCAN_ALL was not specified; "
 					"id: " + std::to_string(info.id) + ", name: " + std::string{info.name} + ", module: " + std::string{info.module};
-				instance()->log(CLAP_LOG_WARNING, msg.c_str());
+				logger()->log(CLAP_LOG_WARNING, msg.c_str());
 				return false;
 			}
 			it = m_paramMap.erase(it);
@@ -234,7 +234,7 @@ void ClapParams::idle()
 			if (it == m_paramMap.end())
 			{
 				std::string msg = "Plugin produced a CLAP_EVENT_PARAM_SET with an unknown param id: " + std::to_string(paramId);
-				instance()->log(CLAP_LOG_WARNING, msg.c_str());
+				logger()->log(CLAP_LOG_WARNING, msg.c_str());
 				return;
 			}
 
@@ -264,7 +264,7 @@ void ClapParams::flushOnMainThread()
 
 	if (!supported())
 	{
-		instance()->log(CLAP_LOG_WARNING, "Attempted to flush parameters on main thread, but plugin does not support params extension");
+		logger()->log(CLAP_LOG_WARNING, "Attempted to flush parameters on main thread, but plugin does not support params extension");
 		return;
 	}
 
@@ -360,7 +360,7 @@ void ClapParams::handlePluginOutputEvent(const clap_event_param_gesture* event, 
 
 	if (isAdj == gestureBegin)
 	{
-		instance()->log(CLAP_LOG_PLUGIN_MISBEHAVING, gestureBegin
+		logger()->log(CLAP_LOG_PLUGIN_MISBEHAVING, gestureBegin
 			? "The plugin sent BEGIN_ADJUST twice"
 			: "The plugin sent END_ADJUST without a preceding BEGIN_ADJUST");
 	}
@@ -409,7 +409,7 @@ auto ClapParams::checkValidParamValue(const ClapParameter& param, double value) 
 	if (!param.isValueValid(value))
 	{
 		std::string msg = "Invalid value for param. " + param.getInfoString() + "; value: " + std::to_string(value);
-		instance()->log(CLAP_LOG_WARNING, msg.c_str());
+		logger()->log(CLAP_LOG_WARNING, msg);
 		return false;
 	}
 	return true;
@@ -485,13 +485,12 @@ void ClapParams::clapRescan(const clap_host* host, clap_param_rescan_flags flags
 void ClapParams::clapClear(const clap_host* host, clap_id param_id, clap_param_clear_flags flags)
 {
 	assert(ClapThreadCheck::isMainThread());
-	qDebug() << "ClapParams::clapClear";
+	ClapLog::globalLog(CLAP_LOG_INFO, "ClapParams::clapClear [UNIMPLEMENTED]");
 	// TODO
 }
 
 void ClapParams::clapRequestFlush(const clap_host* host)
 {
-	//qDebug() << "ClapInstance::hostExtParamsRequestFlush";
 	auto h = fromHost(host);
 	if (!h) { return; }
 	auto& params = h->params();

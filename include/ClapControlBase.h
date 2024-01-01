@@ -29,6 +29,8 @@
 
 #ifdef LMMS_HAVE_CLAP
 
+#include <memory>
+
 #include "ClapFile.h"
 #include "ClapInstance.h"
 #include "DataFile.h"
@@ -36,9 +38,6 @@
 #include "Plugin.h"
 #include "ArrayVector.h"
 #include "lmms_export.h"
-
-#include <memory>
-#include <clap/clap.h>
 
 namespace lmms
 {
@@ -49,7 +48,7 @@ class Model;
  * Common base class for CLAP plugins.
  * The design of this class is based on Lv2ControlBase by Johannes Lorenz.
  * See Lv2ControlBase for more information.
- */
+*/
 class LMMS_EXPORT ClapControlBase : public LinkedModelGroups
 {
 public:
@@ -68,9 +67,10 @@ protected:
 	//!   this is the same pointer as this, but a different type
 	//! @param uri the CLAP URI telling this class what plugin to construct
 	ClapControlBase(Model* that, const QString& uri);
+	~ClapControlBase() override = default;
+
 	ClapControlBase(const ClapControlBase&) = delete;
 	auto operator=(const ClapControlBase&) -> ClapControlBase& = delete;
-	~ClapControlBase() override;
 
 	void init(Model* that, const QString& uri);
 

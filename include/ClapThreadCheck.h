@@ -29,22 +29,25 @@
 
 #ifdef LMMS_HAVE_CLAP
 
-#include <string_view>
-
 #include <clap/ext/thread-check.h>
+
+#include "ClapExtension.h"
 
 namespace lmms
 {
 
-class ClapThreadCheck
+class ClapThreadCheck : public ClapExtension<clap_host_thread_check>
 {
 public:
-	//static auto extensionId() const -> std::string_view { return CLAP_EXT_THREAD_CHECK; }
-	static auto hostExt() -> const clap_host_thread_check*;
+	using ClapExtension::ClapExtension;
+
+	auto extensionId() const -> std::string_view override { return CLAP_EXT_THREAD_CHECK; }
+	auto hostExt() const -> const clap_host_thread_check* override;
 
 	static auto isMainThread() -> bool { return clapIsMainThread(nullptr); }
 	static auto isAudioThread() -> bool { return clapIsAudioThread(nullptr); }
 
+private:
 	/**
 	 * clap_host_thread_check implementation
 	 */

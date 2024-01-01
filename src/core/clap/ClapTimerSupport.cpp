@@ -73,12 +73,12 @@ void ClapTimerSupport::killTimers()
 auto ClapTimerSupport::clapRegisterTimer(const clap_host* host, std::uint32_t periodMilliseconds, clap_id* timerId) -> bool
 {
 	assert(ClapThreadCheck::isMainThread());
-	const auto h = ClapInstance::fromHost(host);
+	const auto h = fromHost(host);
 	if (!h) { return false; }
 
 	if (!timerId)
 	{
-		h->log(CLAP_LOG_PLUGIN_MISBEHAVING, "register_timer()'s `timerId` cannot be null");
+		h->logger().log(CLAP_LOG_PLUGIN_MISBEHAVING, "register_timer()'s `timerId` cannot be null");
 		return false;
 	}
 	*timerId = CLAP_INVALID_ID;
@@ -86,7 +86,7 @@ auto ClapTimerSupport::clapRegisterTimer(const clap_host* host, std::uint32_t pe
 	auto& timerSupport = h->timerSupport();
 	if (!timerSupport.supported())
 	{
-		h->log(CLAP_LOG_PLUGIN_MISBEHAVING, "Plugin cannot register a timer when it does not implement the timer support extension");
+		h->logger().log(CLAP_LOG_PLUGIN_MISBEHAVING, "Plugin cannot register a timer when it does not implement the timer support extension");
 		return false;
 	}
 
@@ -96,7 +96,7 @@ auto ClapTimerSupport::clapRegisterTimer(const clap_host* host, std::uint32_t pe
 	const auto id = timerSupport.startTimer(periodMilliseconds);
 	if (id <= 0)
 	{
-		h->log(CLAP_LOG_WARNING, "Failed to start timer");
+		h->logger().log(CLAP_LOG_WARNING, "Failed to start timer");
 		return false;
 	}
 
@@ -109,12 +109,12 @@ auto ClapTimerSupport::clapRegisterTimer(const clap_host* host, std::uint32_t pe
 auto ClapTimerSupport::clapUnregisterTimer(const clap_host* host, clap_id timerId) -> bool
 {
 	assert(ClapThreadCheck::isMainThread());
-	const auto h = ClapInstance::fromHost(host);
+	const auto h = fromHost(host);
 	if (!h) { return false; }
 
 	if (timerId == 0 || timerId == CLAP_INVALID_ID)
 	{
-		h->log(CLAP_LOG_PLUGIN_MISBEHAVING, "Invalid timer id");
+		h->logger().log(CLAP_LOG_PLUGIN_MISBEHAVING, "Invalid timer id");
 		return false;
 	}
 
@@ -122,7 +122,7 @@ auto ClapTimerSupport::clapUnregisterTimer(const clap_host* host, clap_id timerI
 	if (timerSupport.m_timerIds.find(timerId) == timerSupport.m_timerIds.end())
 	{
 		const auto msg = "Unrecognized timer id: " + std::to_string(timerId);
-		h->log(CLAP_LOG_PLUGIN_MISBEHAVING, msg.c_str());
+		h->logger().log(CLAP_LOG_PLUGIN_MISBEHAVING, msg);
 		return false;
 	}
 

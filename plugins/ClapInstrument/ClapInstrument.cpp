@@ -27,7 +27,6 @@
 #include <QApplication>
 #include <QDragEnterEvent>
 #include <QPushButton>
-#include <QDebug>
 
 #include "AudioEngine.h"
 #include "Engine.h"
@@ -167,7 +166,8 @@ auto ClapInstrument::instantiateView(QWidget* parent) -> gui::PluginView*
 
 void ClapInstrument::updatePitchRange()
 {
-	qDebug() << "LMMS: Cannot update pitch range for CLAP plugin: not implemented yet";
+	ClapLog::globalLog(CLAP_LOG_ERROR, "Cannot update pitch range for CLAP plugin: not implemented yet");
+	// TODO
 }
 
 auto ClapInstrument::nodeName() const -> QString

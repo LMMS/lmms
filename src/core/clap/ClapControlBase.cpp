@@ -29,29 +29,23 @@
 #include <algorithm>
 #include <cassert>
 
-#include <QDebug>
-#include <QtGlobal>
-#include <QThread>
-#include <QCoreApplication>
-
-#include "Engine.h"
 #include "ClapManager.h"
 #include "ClapInstance.h"
 #include "ClapTransport.h"
+#include "Engine.h"
 
 namespace lmms
 {
 
 ClapControlBase::ClapControlBase(Model* that, const QString& uri)
 {
-	qDebug() << "ClapControlBase::ClapControlBase";
 	init(that, uri);
 }
 
 void ClapControlBase::init(Model* that, const QString& uri)
 {
 	// CLAP API requires main thread for plugin loading
-	assert(QThread::currentThread() == QCoreApplication::instance()->thread());
+	assert(ClapThreadCheck::isMainThread());
 
 	m_valid = false;
 	auto manager = Engine::getClapManager();
@@ -64,25 +58,25 @@ void ClapControlBase::init(Model* that, const QString& uri)
 
 	ClapTransport::update();
 
-	qDebug() << "Creating CLAP instance (#1)";
+	ClapLog::globalLog(CLAP_LOG_INFO, "Creating CLAP instance (#1)");
 	m_instances.clear();
 	auto& first = m_instances.emplace_back(std::make_unique<ClapInstance>(m_info, that));
 	if (!first || !first->isValid())
 	{
-		qCritical() << "Failed instantiating CLAP processor";
-		m_instances.pop_back();
+		ClapLog::globalLog(CLAP_LOG_ERROR, "Failed instantiating CLAP processor");
+		m_instances.clear();
 		return;
 	}
 
 	if (!first->audioPorts().hasStereoOutput())
 	{
 		// A second instance is needed for stereo input/output
-		qDebug() << "Creating CLAP instance (#2)";
+		ClapLog::globalLog(CLAP_LOG_INFO, "Creating CLAP instance (#2)");
 		auto& second = m_instances.emplace_back(std::make_unique<ClapInstance>(m_info, that));
 		if (!second || !second->isValid())
 		{
-			qCritical() << "Failed instantiating CLAP processor";
-			m_instances.pop_back();
+			ClapLog::globalLog(CLAP_LOG_ERROR, "Failed instantiating CLAP processor");
+			m_instances.clear();
 			return;
 		}
 	}
@@ -92,8 +86,6 @@ void ClapControlBase::init(Model* that, const QString& uri)
 
 	linkAllModels();
 }
-
-ClapControlBase::~ClapControlBase() = default;
 
 auto ClapControlBase::getGroup(std::size_t idx) -> LinkedModelGroup*
 {
@@ -166,7 +158,7 @@ void ClapControlBase::loadSettings(const QDomElement& elem)
 void ClapControlBase::loadFile([[maybe_unused]] const QString& file)
 {
 	// TODO: load preset using clap_plugin_preset_load if supported by plugin
-	qDebug() << "ClapControlBase::loadFile called, but it is unimplemented.";
+	ClapLog::globalLog(CLAP_LOG_ERROR, "ClapControlBase::loadFile() called, but it is unimplemented");
 }
 
 void ClapControlBase::reload()

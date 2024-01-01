@@ -33,34 +33,50 @@
 
 #include <clap/plugin.h>
 
+#include "NoCopyNoMove.h"
 #include "ClapThreadCheck.h"
 
 namespace lmms
 {
 
 class ClapInstance;
+class ClapLog;
 
 namespace detail
 {
 
-struct ClapExtensionHelper
+class ClapExtensionHelper : public NoCopyNoMove
 {
+public:
+	ClapExtensionHelper(const ClapInstance* instance)
+		: m_instance{instance}
+	{
+	}
+
+	virtual auto extensionId() const -> std::string_view = 0;
+
+	auto instance() const { return m_instance; }
+	auto logger() const -> const ClapLog*;
+
+	// TODO: Make protected?
 	static auto fromHost(const clap_host* host) -> ClapInstance*;
+
+private:
+	const ClapInstance* m_instance = nullptr;
 };
 
 } // namespace detail
 
-template<class HostExt, class PluginExt>
+
+/**
+ * Template for extensions with both a host and plugin side
+*/
+template<class HostExt, class PluginExt = void>
 class ClapExtension : public detail::ClapExtensionHelper
 {
 public:
-	ClapExtension(const ClapInstance* instance) : m_instance{instance} {}
+	using detail::ClapExtensionHelper::ClapExtensionHelper;
 	virtual ~ClapExtension() = default;
-
-	ClapExtension(const ClapExtension&) = delete;
-	ClapExtension(ClapExtension&&) = delete;
-	auto operator=(const ClapExtension&) = delete;
-	auto operator=(ClapExtension&&) = delete;
 
 	auto init(const clap_host* host, const clap_plugin* plugin) -> bool
 	{
@@ -94,13 +110,10 @@ public:
 		m_supported = false;
 	}
 
-	auto instance() const { return m_instance; }
-
 	/**
 	 * Returns whether plugin implements required interface
 	 *   and passes any additional checks from initImpl().
 	 * Do not use before init().
-	 * 
 	*/
 	auto supported() const { return m_supported; }
 
@@ -110,7 +123,6 @@ public:
 	*/
 	virtual auto checkSupported(const PluginExt& ext) -> bool = 0;
 
-	virtual auto extensionId() const -> std::string_view = 0;
 	virtual auto hostExt() const -> const HostExt* = 0;
 
 	//! Non-null after init() is called if plugin implements the needed interface
@@ -133,7 +145,7 @@ protected:
 	auto plugin() const { return m_plugin; }
 
 private:
-	const ClapInstance* m_instance = nullptr;
+
 
 	const clap_host* m_host = nullptr;
 	const clap_plugin* m_plugin = nullptr;
@@ -141,6 +153,72 @@ private:
 	const PluginExt* m_pluginExt = nullptr;
 
 	bool m_supported = false;
+};
+
+
+/**
+ * Template for host-only extensions
+*/
+template<class HostExt>
+class ClapExtension<HostExt, void> : public detail::ClapExtensionHelper
+{
+public:
+	using detail::ClapExtensionHelper::ClapExtensionHelper;
+	virtual ~ClapExtension() = default;
+
+	auto init(const clap_host* host) -> bool
+	{
+		if (m_initialized) { return false; } // already init
+		m_initialized = true;
+
+		m_host = host;
+		m_supported = true;
+		if (!initImpl(host))
+		{
+			m_supported = false;
+			return false;
+		}
+
+		return true;
+	}
+
+	void deinit()
+	{
+		deinitImpl();
+		m_initialized = false;
+		m_supported = false;
+	}
+
+	/**
+	 * Returns whether initImpl() was successful.
+	 * Do not use before init().
+	*/
+	auto supported() const { return m_supported; }
+
+	virtual auto hostExt() const -> const HostExt* = 0;
+
+protected:
+	/**
+	 * For any custom initialization step.
+	 * - supported() == true during this call
+	*/
+	virtual auto initImpl(const clap_host* host) noexcept -> bool { return true; }
+
+	/**
+	 * For additional deinitialization steps.
+	*/
+	virtual void deinitImpl() noexcept {}
+
+	auto host() const { return m_host; }
+
+private:
+	const ClapInstance* m_instance = nullptr;
+
+	const clap_host* m_host = nullptr;
+	//const HostExt* m_hostExt = nullptr;
+
+	bool m_supported = false;
+	bool m_initialized = false;
 };
 
 } // namespace lmms

@@ -32,6 +32,7 @@
 #include "ClapAudioPorts.h"
 #include "ClapFile.h"
 #include "ClapGui.h"
+#include "ClapLog.h"
 #include "ClapNotePorts.h"
 #include "ClapParams.h"
 #include "ClapState.h"
@@ -78,11 +79,12 @@ class ClapInstance final : public QObject
 public:
 	ClapInstance() = delete;
 	ClapInstance(const ClapPluginInfo* pluginInfo, Model* parent);
+	~ClapInstance() override;
+
 	ClapInstance(const ClapInstance&) = delete;
 	ClapInstance(ClapInstance&&) noexcept = delete;
 	auto operator=(const ClapInstance&) -> ClapInstance& = delete;
 	auto operator=(ClapInstance&&) noexcept -> ClapInstance& = delete;
-	~ClapInstance() override;
 
 	enum class PluginState
 	{
@@ -106,7 +108,6 @@ public:
 		// thread
 		ActiveAndReadyToDeactivate
 	};
-
 
 	/////////////////////////////////////////
 	// LMMS audio thread
@@ -140,11 +141,13 @@ public:
 	auto plugin() const -> const clap_plugin* { return m_plugin; }
 	auto info() const -> const ClapPluginInfo& { return *m_pluginInfo; }
 
-	/**
-	 * Extensions
-	 */
+	/////////////////////////////////////////
+	// Extensions
+	/////////////////////////////////////////
+
 	auto audioPorts() -> ClapAudioPorts& { return m_audioPorts; }
 	auto gui() -> ClapGui& { return m_gui; }
+	auto logger() const -> const ClapLog& { return m_log; }
 	auto notePorts() -> ClapNotePorts& { return m_notePorts; }
 	auto params() -> ClapParams& { return m_params; }
 	auto state() -> ClapState& { return m_state; }
@@ -182,18 +185,10 @@ public:
 	auto isSleeping() const -> bool;
 	auto isErrorState() const -> bool;
 
-	void log(clap_log_severity severity, const char* msg) const;
-
-	static auto fromHost(const clap_host* host) -> ClapInstance*;
-
-signals:
-	//void quickControlsPagesChanged();
-	//void quickControlsSelectedPageChanged();
-
 private:
 
 	/////////////////////////////////////////
-	// Host
+	// Host API implementation
 	/////////////////////////////////////////
 
 	void setHost();
@@ -203,17 +198,9 @@ private:
 	static void hostRequestCallback(const clap_host* host);
 	static void hostRequestProcess(const clap_host* host);
 	static void hostRequestRestart(const clap_host* host);
-	static void hostExtLogLog(const clap_host* host, clap_log_severity severity, const char* msg);
 	static auto hostExtThreadCheckIsMainThread(const clap_host* host) -> bool;
 	static auto hostExtThreadCheckIsAudioThread(const clap_host* host) -> bool;
 	static void hostExtLatencyChanged(const clap_host* host);
-	static void hostExtGuiResizeHintsChanged(const clap_host* host);
-	static auto hostExtGuiRequestResize(const clap_host* host, std::uint32_t width, std::uint32_t height) -> bool;
-	static auto hostExtGuiRequestShow(const clap_host* host) -> bool;
-	static auto hostExtGuiRequestHide(const clap_host* host) -> bool;
-	static void hostExtGuiRequestClosed(const clap_host* host, bool wasDestroyed);
-
-	std::int64_t m_steadyTime = 0;
 
 	/////////////////////////////////////////
 	// Plugin
@@ -234,6 +221,8 @@ private:
 	PluginState m_pluginState = PluginState::Inactive;
 
 	std::vector<PluginIssue> m_pluginIssues;
+
+	std::int64_t m_steadyTime = 0;
 
 	/**
 	 * Process-related
@@ -267,20 +256,17 @@ private:
 	 * Plugin/Host extension pointers
 	*/
 
-	static constexpr const clap_host_log s_hostExtLog {
-		&hostExtLogLog
-	};
-
 	static constexpr const clap_host_latency s_hostExtLatency {
 		&hostExtLatencyChanged
 	};
 
 	ClapAudioPorts m_audioPorts{ this };
 	ClapGui m_gui{ this };
+	ClapLog m_log{ this };
 	ClapState m_state{ this };
 	ClapNotePorts m_notePorts{ this };
 	ClapParams m_params;
-	//ClapThreadCheck m_threadCheck;
+	ClapThreadCheck m_threadCheck{ this };
 	ClapThreadPool m_threadPool{ this };
 	ClapTimerSupport m_timerSupport{ this };
 };

@@ -26,8 +26,6 @@
 
 #ifdef LMMS_HAVE_CLAP
 
-#include <QDebug>
-
 #include "ClapManager.h"
 
 namespace lmms
@@ -85,21 +83,23 @@ auto ClapFile::load() -> bool
 	m_library = std::make_unique<QLibrary>(QString::fromUtf8(filenameStr.c_str(), filenameStr.size()));
 	if (!m_library->load())
 	{
-		qWarning() << m_library->errorString();
+		ClapLog::globalLog(CLAP_LOG_ERROR, m_library->errorString().toStdString());
 		return false;
 	}
 
 	m_entry = reinterpret_cast<const clap_plugin_entry*>(m_library->resolve("clap_entry"));
 	if (!m_entry)
 	{
-		qWarning().nospace() << "Unable to resolve entry point 'clap_entry' in CLAP file '" << filename().c_str() << "'";
+		std::string msg = "Unable to resolve entry point in '" + filename().string() + "'";
+		ClapLog::globalLog(CLAP_LOG_ERROR, msg);
 		m_library->unload();
 		return false;
 	}
 
 	if (!m_entry->init(filenameStr.c_str()))
 	{
-		qWarning().nospace() << "CLAP file '" << filename().c_str() << "' failed to initialize";
+		std::string msg = "Failed to initialize '" + filename().string() + "'";
+		ClapLog::globalLog(CLAP_LOG_ERROR, msg);
 		m_entry = nullptr; // Prevent deinit() from being called
 		return false;
 	}
@@ -107,15 +107,16 @@ auto ClapFile::load() -> bool
 	m_factory = static_cast<const clap_plugin_factory*>(m_entry->get_factory(CLAP_PLUGIN_FACTORY_ID));
 	if (!m_factory)
 	{
-		qWarning().nospace() << "Failed to get the plugin factory in CLAP file '" << filename().c_str() << "'";
+		std::string msg = "Failed to retrieve plugin factory from '" + filename().string() + "'";
+		ClapLog::globalLog(CLAP_LOG_ERROR, msg);
 		return false;
 	}
 
 	m_pluginCount = m_factory->get_plugin_count(m_factory);
-	if (ClapManager::debugging()) { qDebug() << "plugin count:" << m_pluginCount; }
 	if (m_pluginCount == 0)
 	{
-		qWarning().nospace() << "CLAP file '" << filename().c_str() << "' contains no plugins";
+		std::string msg = "Plugin file '" + filename().string() + "' contains no plugins";
+		ClapLog::globalLog(CLAP_LOG_INFO, msg);
 		return false;
 	}
 
@@ -174,38 +175,48 @@ ClapPluginInfo::ClapPluginInfo(const clap_plugin_factory* factory, std::uint32_t
 	, m_index{index}
 {
 	assert(m_factory != nullptr);
-	if (ClapManager::debugging()) { qDebug() << ""; }
 
 	m_descriptor = m_factory->get_plugin_descriptor(m_factory, m_index);
 	if (!m_descriptor)
 	{
-		qWarning() << "No CLAP plugin descriptor";
+		ClapLog::globalLog(CLAP_LOG_ERROR, "No plugin descriptor");
 		return;
 	}
 
 	if (!m_descriptor->id || !m_descriptor->name)
 	{
-		qWarning() << "Invalid CLAP plugin descriptor";
+		ClapLog::globalLog(CLAP_LOG_ERROR, "Invalid plugin descriptor");
 		return;
 	}
 
 	if (!clap_version_is_compatible(m_descriptor->clap_version))
 	{
-		qWarning().nospace() << "CLAP plugin '" << m_descriptor->id << "' uses unsupported CLAP version ("
-			<< m_descriptor->clap_version.major << "." << m_descriptor->clap_version.minor
-			<< "." << m_descriptor->clap_version.revision << "). Host is "
-			<< CLAP_VERSION.major << "." << CLAP_VERSION.minor << "." << CLAP_VERSION.revision << ".";
+		std::string msg = "Plugin '";
+		msg += m_descriptor->id;
+		msg += "' uses unsupported CLAP version '";
+		msg += std::to_string(m_descriptor->clap_version.major) + "."
+			+ std::to_string(m_descriptor->clap_version.minor) + "."
+			+ std::to_string(m_descriptor->clap_version.revision);
+		msg += "'. Must be at least 1.0.0.";
+		ClapLog::globalLog(CLAP_LOG_ERROR, msg);
 		return;
 	}
 
 	if (ClapManager::debugging())
 	{
-		qDebug() << "name:" << m_descriptor->name;
-		qDebug().nospace() << "CLAP version: "
-			<< m_descriptor->clap_version.major << "."
-			<< m_descriptor->clap_version.minor << "."
-			<< m_descriptor->clap_version.revision;
-		qDebug() << "description:" << m_descriptor->description;
+		std::string msg = "name: ";
+		msg += m_descriptor->name;
+		msg += "\nid: ";
+		msg += m_descriptor->id;
+		msg += "\nversion: ";
+		msg += (m_descriptor->version ? m_descriptor->version : "");
+		msg += "\nCLAP version: ";
+		msg += std::to_string(m_descriptor->clap_version.major) + "."
+			+ std::to_string(m_descriptor->clap_version.minor) + "."
+			+ std::to_string(m_descriptor->clap_version.revision);
+		msg += "\ndescription: ";
+		msg += (m_descriptor->description ? m_descriptor->description : "");
+		ClapLog::globalLog(CLAP_LOG_ERROR, msg);
 	}
 
 	m_type = Plugin::Type::Undefined;
@@ -213,7 +224,11 @@ ClapPluginInfo::ClapPluginInfo(const clap_plugin_factory* factory, std::uint32_t
 	while (features && *features)
 	{
 		auto feature = std::string_view{*features};
-		if (ClapManager::debugging()) { qDebug() << "feature:" << feature.data(); }
+		if (ClapManager::debugging())
+		{
+			std::string msg = "feature: " + std::string{feature};
+			ClapLog::globalLog(CLAP_LOG_INFO, msg);
+		}
 
 		if (feature == CLAP_PLUGIN_FEATURE_INSTRUMENT)
 		{
@@ -233,8 +248,9 @@ ClapPluginInfo::ClapPluginInfo(const clap_plugin_factory* factory, std::uint32_t
 
 	if (m_type == Plugin::Type::Undefined)
 	{
-		qWarning().nospace() << "CLAP plugin '" << m_descriptor->name
-			<< "' is not recognized as an instrument or audio effect";
+		std::string msg = "Plugin '" + std::string{m_descriptor->id}
+			+ "' is not recognized as an instrument or audio effect";
+		ClapLog::globalLog(CLAP_LOG_INFO, msg);
 		return;
 	}
 

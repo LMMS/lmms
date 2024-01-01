@@ -91,6 +91,7 @@ private:
 
 	//! Numbers of controls per row; must be multiple of 2 for mono effects
 	static constexpr int s_colNum = 6;
+
 	QMdiSubWindow* m_helpWindow = nullptr;
 };
 

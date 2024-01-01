@@ -35,7 +35,6 @@
 #include <QApplication>
 #include <QDomDocument>
 #include <QDomElement>
-#include <QDebug>
 
 #include <algorithm>
 #include <string_view>
@@ -83,7 +82,10 @@ ClapInstance::ClapInstance(const ClapPluginInfo* pluginInfo, Model* parent)
 
 ClapInstance::~ClapInstance()
 {
-	qDebug() << "ClapInstance::~ClapInstance";
+#if 0
+	logger().log(CLAP_LOG_INFO, "ClapInstance::~ClapInstance");
+#endif
+
 	destroy();
 }
 
@@ -143,7 +145,6 @@ void ClapInstance::handleMidiInputEvent(const MidiEvent& event, const TimePos& t
 {
 	// TODO: Use MidiInputEvent from LV2 code, moved to common location?
 
-	// TODO: Early return if plugin does not support midi input or note events
 	if (!hasNoteInput()) { return; }
 
 	const auto ev = MidiInputEvent{event, time, offset};
@@ -157,7 +158,7 @@ void ClapInstance::handleMidiInputEvent(const MidiEvent& event, const TimePos& t
 
 	if (written != 1)
 	{
-		qWarning("MIDI ringbuffer is too small! Discarding MIDI event.");
+		logger().log(CLAP_LOG_WARNING, "MIDI ringbuffer is too small! Discarding MIDI event.");
 	}
 }
 
@@ -192,7 +193,12 @@ auto ClapInstance::start() -> bool
 
 auto ClapInstance::restart() -> bool
 {
-	qDebug() << "ClapInstance::restart";
+#if 0
+	{
+		std::string msg = "Restarting plugin instance: " + std::string{m_pluginInfo->descriptor()->name};
+		logger().log(CLAP_LOG_INFO, msg);
+	}
+#endif
 
 	if (!deactivate()) { return false; }
 	return activate();
@@ -200,7 +206,13 @@ auto ClapInstance::restart() -> bool
 
 auto ClapInstance::load() -> bool
 {
-	qDebug() << "Loading plugin instance:" << m_pluginInfo->descriptor()->name;
+#if 0
+	{
+		std::string msg = "Loading plugin instance: " + std::string{m_pluginInfo->descriptor()->name};
+		logger().log(CLAP_LOG_INFO, msg);
+	}
+#endif
+
 	checkPluginStateCurrent(PluginState::None);
 
 	// Create plugin instance, destroying any previous plugin instance first
@@ -209,7 +221,7 @@ auto ClapInstance::load() -> bool
 	m_plugin = factory->create_plugin(factory, host(), m_pluginInfo->descriptor()->id);
 	if (!m_plugin)
 	{
-		qWarning() << "Failed to create instance of CLAP plugin";
+		logger().log(CLAP_LOG_ERROR, "Failed to create plugin instance");
 		// TODO: Set state to NoneWithError?
 		return false;
 	}
@@ -220,10 +232,23 @@ auto ClapInstance::load() -> bool
 
 auto ClapInstance::unload() -> bool
 {
-	qDebug() << "Unloading plugin instance:" << m_pluginInfo->descriptor()->name;
+#if 0
+	{
+		std::string msg = "Unloading plugin instance: " + std::string{m_pluginInfo->descriptor()->name};
+		logger().log(CLAP_LOG_INFO, msg);
+	}
+#endif
+
 	assert(ClapThreadCheck::isMainThread());
 
+	// Deinitialize extensions
+	m_audioPorts.deinit();
 	m_gui.deinit();
+	m_log.deinit();
+	m_notePorts.deinit();
+	m_params.deinit();
+	m_state.deinit();
+	m_threadPool.deinit();
 	m_timerSupport.deinit();
 
 	deactivate();
@@ -234,19 +259,12 @@ auto ClapInstance::unload() -> bool
 		m_plugin = nullptr;
 	}
 
-	// Clear all plugin extensions
-	m_audioPorts.deinit();
-	m_params.deinit();
-	m_state.deinit();
-	m_notePorts.deinit();
-
 	setPluginState(PluginState::None);
 	return true;
 }
 
 auto ClapInstance::init() -> bool
 {
-	qDebug() << "ClapInstance::init";
 	assert(ClapThreadCheck::isMainThread());
 
 	if (isErrorState()) { return false; }
@@ -256,8 +274,10 @@ auto ClapInstance::init() -> bool
 
 	if (!m_plugin->init(m_plugin))
 	{
-		std::string msg = "Could not init the plugin with id:" + std::string(info().descriptor()->id);
-		log(CLAP_LOG_ERROR, msg.c_str());
+		{
+			std::string msg = "Could not init the plugin with id: " + std::string{info().descriptor()->id};
+			logger().log(CLAP_LOG_ERROR, msg);
+		}
 		setPluginState(PluginState::LoadedWithError);
 		m_plugin->destroy(m_plugin);
 		m_plugin = nullptr;
@@ -278,12 +298,12 @@ auto ClapInstance::init() -> bool
 	m_notePorts.init(host(), m_plugin);
 	if (!hasNoteInput() && info().type() == Plugin::Type::Instrument)
 	{
-		log(CLAP_LOG_WARNING, "Plugin is instrument but doesn't implement note ports extension");
+		logger().log(CLAP_LOG_WARNING, "Plugin is instrument but doesn't implement note ports extension");
 	}
 
 	if (!m_params.init(host(), m_plugin))
 	{
-		log(CLAP_LOG_DEBUG, "Plugin does not support params extension");
+		logger().log(CLAP_LOG_DEBUG, "Plugin does not support params extension");
 	}
 
 	m_state.init(host(), m_plugin);
@@ -297,7 +317,6 @@ auto ClapInstance::init() -> bool
 
 auto ClapInstance::activate() -> bool
 {
-	qDebug() << "ClapInstance::activate";
 	assert(ClapThreadCheck::isMainThread());
 
 	if (isErrorState()) { return false; }
@@ -321,7 +340,7 @@ auto ClapInstance::activate() -> bool
 auto ClapInstance::deactivate() -> bool
 {
 	// NOTE: This method assumes that process() cannot be called concurrently
-	qDebug() << "ClapInstance::deactivate";
+
 	assert(ClapThreadCheck::isMainThread());
 	if (!isActive()) { return false; }
 
@@ -461,11 +480,9 @@ auto ClapInstance::process(std::uint32_t frames) -> bool
 	// Do we want to deactivate the plugin?
 	if (m_scheduleDeactivate)
 	{
-		qDebug() << "ClapInstance::process - Schedule deactivate";
 		m_scheduleDeactivate = false;
 		if (m_pluginState == PluginState::ActiveAndProcessing)
 		{
-			qDebug() << "ClapInstance::process - stop_processing()";
 			m_plugin->stop_processing(m_plugin);
 		}
 		setPluginState(PluginState::ActiveAndReadyToDeactivate);
@@ -559,53 +576,6 @@ auto ClapInstance::isErrorState() const -> bool
 		|| m_pluginState == PluginState::ActiveWithError;
 }
 
-void ClapInstance::log(clap_log_severity severity, const char* msg) const
-{
-	// Thread-safe
-	if ((severity == CLAP_LOG_DEBUG || severity == CLAP_LOG_INFO)
-		&& !ClapManager::debugging()) { return; }
-
-	std::string_view severityStr;
-	switch (severity)
-	{
-	case CLAP_LOG_DEBUG:
-		severityStr = "DEBUG"; break;
-	case CLAP_LOG_INFO:
-		severityStr = "INFO"; break;
-	case CLAP_LOG_WARNING:
-		severityStr = "WARNING"; break;
-	case CLAP_LOG_ERROR:
-		severityStr = "ERROR"; break;
-	case CLAP_LOG_FATAL:
-		severityStr = "FATAL"; break;
-	case CLAP_LOG_HOST_MISBEHAVING:
-		severityStr = "HOST_MISBEHAVING"; break;
-	case CLAP_LOG_PLUGIN_MISBEHAVING:
-		severityStr = "PLUGIN_MISBEHAVING"; break;
-	default:
-		severityStr = "UNKNOWN"; break;
-	}
-
-	qDebug().nospace() << "[" << severityStr.data() << "] [" << info().descriptor()->id << "] [CLAP] - " << msg;
-}
-
-auto ClapInstance::fromHost(const clap_host* host) -> ClapInstance*
-{
-	// TODO: Return nullptr instead of throwing exceptions?
-	if (!host) { throw std::invalid_argument{"Passed a null host pointer"}; }
-
-	auto h = static_cast<ClapInstance*>(host->host_data);
-	if (!h) { throw std::invalid_argument{"Passed an invalid host pointer because the host_data is null"}; }
-
-	if (!h->plugin())
-	{
-		throw std::logic_error{"The plugin can't query for extensions during the create method. Wait "
-			"for clap_plugin.init() call."};
-	}
-
-	return h;
-}
-
 template<typename... Args>
 void ClapInstance::checkPluginStateCurrent(Args... possibilities)
 {
@@ -655,26 +625,28 @@ void ClapInstance::setPluginState(PluginState state)
 	assert(isPluginNextStateValid(state) && "Invalid state transition");
 
 	m_pluginState = state;
+	if (!ClapManager::debugging()) { return; }
+
 	switch (state)
 	{
 		case PluginState::None:
-			qDebug() << "Set state to None"; break;
+			logger().log(CLAP_LOG_INFO, "Set state to None"); break;
 		case PluginState::Loaded:
-			qDebug() << "Set state to Loaded"; break;
+			logger().log(CLAP_LOG_INFO, "Set state to Loaded"); break;
 		case PluginState::LoadedWithError:
-			qDebug() << "Set state to LoadedWithError"; break;
+			logger().log(CLAP_LOG_INFO, "Set state to LoadedWithError"); break;
 		case PluginState::Inactive:
-			qDebug() << "Set state to Inactive"; break;
+			logger().log(CLAP_LOG_INFO, "Set state to Inactive"); break;
 		case PluginState::InactiveWithError:
-			qDebug() << "Set state to InactiveWithError"; break;
+			logger().log(CLAP_LOG_INFO, "Set state to InactiveWithError"); break;
 		case PluginState::ActiveAndSleeping:
-			qDebug() << "Set state to ActiveAndSleeping"; break;
+			logger().log(CLAP_LOG_INFO, "Set state to ActiveAndSleeping"); break;
 		case PluginState::ActiveAndProcessing:
-			qDebug() << "Set state to ActiveAndProcessing"; break;
+			logger().log(CLAP_LOG_INFO, "Set state to ActiveAndProcessing"); break;
 		case PluginState::ActiveWithError:
-			qDebug() << "Set state to ActiveWithError"; break;
+			logger().log(CLAP_LOG_INFO, "Set state to ActiveWithError"); break;
 		case PluginState::ActiveAndReadyToDeactivate:
-			qDebug() << "Set state to ActiveAndReadyToDeactivate"; break;
+			logger().log(CLAP_LOG_INFO, "Set state to ActiveAndReadyToDeactivate"); break;
 	}
 }
 
@@ -736,20 +708,26 @@ void ClapInstance::setHost()
 
 auto ClapInstance::hostGetExtension(const clap_host* host, const char* extensionId) -> const void*
 {
-	auto h = fromHost(host);
+	auto h = detail::ClapExtensionHelper::fromHost(host);
 	if (!h || !extensionId) { return nullptr; }
 
-	if (ClapManager::debugging()) { qDebug() << "--Plugin requested host extension:" << extensionId; }
+#if 1
+	{
+		std::string msg = "Plugin requested host extension: ";
+		msg += (extensionId ? extensionId : "(NULL)");
+		h->logger().log(CLAP_LOG_INFO, msg);
+	}
+#endif
 
 	const auto id = std::string_view{extensionId};
 	//if (id == CLAP_EXT_AUDIO_PORTS)   { return h->audioPorts().hostExt(); }
 	if (id == CLAP_EXT_GUI)           { return h->gui().hostExt(); }
 	if (id == CLAP_EXT_LATENCY)       { return &s_hostExtLatency; }
-	if (id == CLAP_EXT_LOG)           { return &s_hostExtLog; }
+	if (id == CLAP_EXT_LOG)           { return h->logger().hostExt(); }
 	if (id == CLAP_EXT_NOTE_PORTS)    { return h->notePorts().hostExt(); }
 	if (id == CLAP_EXT_PARAMS)        { return h->params().hostExt(); }
 	if (id == CLAP_EXT_STATE)         { return h->state().hostExt(); }
-	if (id == CLAP_EXT_THREAD_CHECK)  { return ClapThreadCheck::hostExt(); }
+	if (id == CLAP_EXT_THREAD_CHECK)  { return h->m_threadCheck.hostExt(); }
 	if (id == CLAP_EXT_THREAD_POOL)   { return h->threadPool().hostExt(); }
 	if (id == CLAP_EXT_TIMER_SUPPORT) { return h->timerSupport().hostExt(); }
 
@@ -758,30 +736,23 @@ auto ClapInstance::hostGetExtension(const clap_host* host, const char* extension
 
 void ClapInstance::hostRequestCallback(const clap_host* host)
 {
-	qDebug() << "ClapInstance::hostRequestCallback";
-	const auto h = fromHost(host);
+	const auto h = detail::ClapExtensionHelper::fromHost(host);
+	if (!h) { return; }
 	h->m_scheduleMainThreadCallback = true;
 }
 
 void ClapInstance::hostRequestProcess(const clap_host* host)
 {
-	qDebug() << "ClapInstance::hostRequestProcess";
-	auto h = fromHost(host);
+	auto h = detail::ClapExtensionHelper::fromHost(host);
+	if (!h) { return; }
 	h->m_scheduleProcess = true;
 }
 
 void ClapInstance::hostRequestRestart(const clap_host* host)
 {
-	qDebug() << "ClapInstance::hostRequestRestart";
-	auto h = fromHost(host);
+	auto h = detail::ClapExtensionHelper::fromHost(host);
+	if (!h) { return; }
 	h->m_scheduleRestart = true;
-}
-
-void ClapInstance::hostExtLogLog(const clap_host* host, clap_log_severity severity, const char* msg)
-{
-	// Thread-safe
-	auto h = fromHost(host);
-	h->log(severity, msg);
 }
 
 void ClapInstance::hostExtLatencyChanged([[maybe_unused]] const clap_host* host)
@@ -792,7 +763,6 @@ void ClapInstance::hostExtLatencyChanged([[maybe_unused]] const clap_host* host)
 	 * framework prior to this commit:
 	 * https://github.com/DISTRHO/DPF/commit/4f11f8cc49b24ede1735a16606e7bad5a52ab41d
 	 */
-	//qDebug() << "ClapInstance::hostExtLatencyChanged";
 }
 
 } // namespace lmms

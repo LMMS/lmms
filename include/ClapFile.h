@@ -65,11 +65,12 @@ class ClapFile
 public:
 	//! Loads .clap file and plugin info
 	explicit ClapFile(std::filesystem::path filename);
+	~ClapFile();
+
 	ClapFile(const ClapFile&) = delete;
 	ClapFile(ClapFile&& other) noexcept;
 	auto operator=(const ClapFile&) -> ClapFile& = delete;
 	auto operator=(ClapFile&& rhs) noexcept -> ClapFile&;
-	~ClapFile();
 
 	//! Represents a CLAP plugin within a .clap file
 	class ClapPluginInfo
@@ -77,11 +78,12 @@ public:
 	public:
 		//! Loads plugin info but does not activate
 		ClapPluginInfo(const clap_plugin_factory* factory, std::uint32_t index);
+		~ClapPluginInfo() = default;
+
 		ClapPluginInfo(const ClapPluginInfo&) = delete;
 		ClapPluginInfo(ClapPluginInfo&& other) noexcept;
 		auto operator=(const ClapPluginInfo&) -> ClapPluginInfo& = delete;
 		auto operator=(ClapPluginInfo&&) noexcept -> ClapPluginInfo& = delete;
-		~ClapPluginInfo() = default;
 
 		auto isValid() const { return m_valid; }
 		void invalidate() const { m_valid = false; }
@@ -120,7 +122,6 @@ public:
 	void purgeInvalidPlugins();
 
 private:
-
 	void unload();
 
 	// Are set when the .clap file is loaded:

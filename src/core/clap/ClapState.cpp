@@ -93,7 +93,7 @@ auto ClapState::load(std::string_view base64) -> bool
 	{
 		if (auto h = fromHost(host()))
 		{
-			h->log(CLAP_LOG_WARNING, "Plugin failed to load its state");
+			h->logger().log(CLAP_LOG_WARNING, "Plugin failed to load its state");
 		}
 		return false;
 	}
@@ -142,7 +142,7 @@ auto ClapState::save() -> std::optional<std::string_view>
 
 	if (!pluginExt()->save(plugin(), &clapStream))
 	{
-		instance()->log(CLAP_LOG_WARNING, "Plugin failed to save its state");
+		logger()->log(CLAP_LOG_WARNING, "Plugin failed to save its state");
 		return std::nullopt;
 	}
 
@@ -161,7 +161,7 @@ void ClapState::clapMarkDirty(const clap_host* host)
 
 	if (!state.supported())
 	{
-		h->log(CLAP_LOG_PLUGIN_MISBEHAVING, "Plugin called clap_host_state.set_dirty() but the plugin does not "
+		h->logger().log(CLAP_LOG_PLUGIN_MISBEHAVING, "Plugin called clap_host_state.set_dirty() but the plugin does not "
 			"provide a complete clap_plugin_state interface.");
 		return;
 	}

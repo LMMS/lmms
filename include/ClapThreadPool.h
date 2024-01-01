@@ -65,12 +65,6 @@ private:
 	 * clap_host_thread_pool implementation
 	 */
 	static auto clapRequestExec(const clap_host* host, std::uint32_t numTasks) -> bool;
-
-	std::vector<std::unique_ptr<QThread>> m_threads;
-	std::atomic<bool> m_stop{ false };
-	std::atomic<std::uint32_t> m_taskIndex{ 0 };
-	QSemaphore m_semaphoreProd;
-	QSemaphore m_semaphoreDone;
 };
 
 } // namespace lmms

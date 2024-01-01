@@ -32,7 +32,7 @@
 namespace lmms
 {
 
-auto ClapThreadCheck::hostExt() -> const clap_host_thread_check*
+auto ClapThreadCheck::hostExt() const -> const clap_host_thread_check*
 {
 	static clap_host_thread_check ext {
 		&clapIsMainThread,

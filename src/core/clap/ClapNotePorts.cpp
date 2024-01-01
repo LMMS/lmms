@@ -75,7 +75,7 @@ void ClapNotePorts::clapRescan(const clap_host* host, std::uint32_t flags)
 	{
 		if (h->isActive())
 		{
-			h->log(CLAP_LOG_PLUGIN_MISBEHAVING, "Host cannot rescan note ports while plugin is active");
+			h->logger().log(CLAP_LOG_PLUGIN_MISBEHAVING, "Host cannot rescan note ports while plugin is active");
 			return;
 		}
 
@@ -145,14 +145,14 @@ void ClapNotePorts::clapRescan(const clap_host* host, std::uint32_t flags)
 			info.id = CLAP_INVALID_ID;
 			if (!notePorts.pluginExt()->get(h->plugin(), idx, true, &info))
 			{
-				h->log(CLAP_LOG_DEBUG, "Failed to read note port info");
+				h->logger().log(CLAP_LOG_DEBUG, "Failed to read note port info");
 				return;
 			}
 
 			// Just in case
 			if (info.id == CLAP_INVALID_ID)
 			{
-				h->log(CLAP_LOG_PLUGIN_MISBEHAVING, "Note port info contains invalid id");
+				h->logger().log(CLAP_LOG_PLUGIN_MISBEHAVING, "Note port info contains invalid id");
 				continue;
 			}
 

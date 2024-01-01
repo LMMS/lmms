@@ -26,8 +26,6 @@
 
 #ifdef LMMS_HAVE_CLAP
 
-#include <QDebug>
-
 #include <cassert>
 
 #include "ClapInstance.h"
@@ -97,7 +95,7 @@ auto ClapAudioPorts::init(const clap_host* host, const clap_plugin* plugin, clap
 	// NOTE: I'm using this init() method instead of implementing initImpl() because I need the `process` parameter
 	if (!ClapExtension::init(host, plugin))
 	{
-		instance()->log(CLAP_LOG_ERROR, "Plugin does not implement the required audio port extension");
+		logger()->log(CLAP_LOG_ERROR, "Plugin does not implement the required audio port extension");
 		return false;
 	}
 
@@ -124,13 +122,13 @@ auto ClapAudioPorts::init(const clap_host* host, const clap_plugin* plugin, clap
 	{
 		if (isInput && !needInputPort)
 		{
-			instance()->log(CLAP_LOG_DEBUG, "Don't need audio input ports - skipping.");
+			logger()->log(CLAP_LOG_DEBUG, "Skipping plugin's audio input ports (not needed)");
 			return nullptr;
 		}
 
 		if (!isInput && !needOutputPort)
 		{
-			instance()->log(CLAP_LOG_DEBUG, "Don't need audio output ports - skipping.");
+			logger()->log(CLAP_LOG_DEBUG, "Skipping plugin's audio output ports (not needed)");
 			return nullptr;
 		}
 
@@ -142,8 +140,6 @@ auto ClapAudioPorts::init(const clap_host* host, const clap_plugin* plugin, clap
 
 			//if (portCount == 0 && m_pluginInfo->getType() == Plugin::PluginTypes::Effect)
 			//	m_issues.emplace_back( ... );
-
-			qDebug() << "Input ports:" << portCount;
 		}
 		else
 		{
@@ -155,9 +151,14 @@ auto ClapAudioPorts::init(const clap_host* host, const clap_plugin* plugin, clap
 			}
 			//if (portCount > 2)
 			//	m_issues.emplace_back(PluginIssueType::tooManyOutputChannels, std::to_string(outCount));
-
-			qDebug() << "Output ports:" << portCount;
 		}
+
+#if 0
+	{
+		std::string msg = (isInput ? "Input ports: " : "Output ports: ") + std::to_string(portCount);
+		logger()->log(CLAP_LOG_DEBUG, msg);
+	}
+#endif
 
 		clap_id monoPort = CLAP_INVALID_ID;
 		clap_id stereoPort = CLAP_INVALID_ID;
@@ -169,30 +170,23 @@ auto ClapAudioPorts::init(const clap_host* host, const clap_plugin* plugin, clap
 			info.in_place_pair = CLAP_INVALID_ID;
 			if (!pluginExt()->get(this->plugin(), idx, isInput, &info))
 			{
-				qWarning() << "Unknown error calling clap_plugin_audio_ports->get(...)";
+				logger()->log(CLAP_LOG_ERROR, "Unknown error calling clap_plugin_audio_ports.get()");
 				m_issues.emplace_back(PluginIssueType::PortHasNoDef);
 				return nullptr;
 			}
 
-			qDebug() << "- port id:" << info.id;
-			qDebug() << "- port name:" << info.name;
-			qDebug() << "- port flags:" << info.flags;
-
 			if (idx == 0 && !(info.flags & CLAP_AUDIO_PORT_IS_MAIN))
 			{
-				qDebug() << "CLAP plugin audio port #0 is not main";
+				logger()->log(CLAP_LOG_DEBUG, "Plugin audio port #0 is not main");
 			}
 
 			//if (info.flags & CLAP_AUDIO_PORT_IS_MAIN)
 			//	mainPort = idx;
 
-			qDebug() << "- port channel_count:" << info.channel_count;
-
 			auto type = AudioPortType::Unsupported;
 			if (info.port_type)
 			{
 				auto portType = std::string_view{info.port_type};
-				qDebug() << "- port type:" << portType.data();
 				if (portType == CLAP_PORT_MONO)
 				{
 					assert(info.channel_count == 1);
@@ -209,7 +203,6 @@ auto ClapAudioPorts::init(const clap_host* host, const clap_plugin* plugin, clap
 			}
 			else
 			{
-				qDebug() << "- port type: (nullptr)";
 				if (info.channel_count == 1)
 				{
 					type = AudioPortType::Mono;
@@ -222,7 +215,23 @@ auto ClapAudioPorts::init(const clap_host* host, const clap_plugin* plugin, clap
 				}
 			}
 
-			qDebug() << "- port in place pair:" << info.in_place_pair;
+#if 0
+			{
+				std::string msg = "---audio port---\nid: ";
+				msg += std::to_string(info.id);
+				msg += "\nname: ";
+				msg += info.name;
+				msg += "\nflags: ";
+				msg += std::to_string(info.flags);
+				msg += "\nchannel count: ";
+				msg += std::to_string(info.channel_count);
+				msg += "\ntype: ";
+				msg += (info.port_type ? info.port_type : "(null)");
+				msg += "\nin place pair: ";
+				msg += std::to_string(info.in_place_pair);
+				logger()->log(CLAP_LOG_DEBUG, msg);
+			}
+#endif
 
 			audioPorts.emplace_back(AudioPort{info, idx, isInput, type, false});
 		}
@@ -268,7 +277,10 @@ auto ClapAudioPorts::init(const clap_host* host, const clap_plugin* plugin, clap
 		}
 
 		// Missing a required port type that LMMS supports - i.e. an effect where the only input is surround sound
-		qWarning() << "An" << (isInput ? "input" : "output") << "port is required, but CLAP plugin has none that are usable";
+		{
+			std::string msg = std::string{isInput ? "An input" : "An output"} + " audio port is required, but plugin has none that are usable";
+			logger()->log(CLAP_LOG_ERROR, msg);
+		}
 		m_issues.emplace_back(PluginIssueType::UnknownPortType); // TODO: Add better entry to PluginIssueType
 		return nullptr;
 	};
@@ -333,20 +345,17 @@ void ClapAudioPorts::copyBuffersFromCore(const sampleFrame* buf, unsigned firstC
 		if (hasStereoInput())
 		{
 			// Stereo LMMS to Stereo CLAP
-			//qDebug() << "***stereo lmms to stereo clap";
 			copyBuffersHostToPlugin<true>(buf, m_audioInActive->data32, firstChannel, frames);
 		}
 		else
 		{
 			// Stereo LMMS to Mono CLAP
-			//qDebug() << "***stereo lmms to mono clap";
 			copyBuffersStereoHostToMonoPlugin(buf, m_audioInActive->data32, firstChannel, frames);
 		}
 	}
 	else
 	{
 		// Mono LMMS to Mono CLAP
-		//qDebug() << "***mono lmms to mono clap";
 		copyBuffersHostToPlugin<false>(buf, m_audioInActive->data32, firstChannel, frames);
 	}
 }
@@ -359,20 +368,17 @@ void ClapAudioPorts::copyBuffersToCore(sampleFrame* buf, unsigned firstChannel, 
 		if (hasStereoOutput())
 		{
 			// Stereo CLAP to Stereo LMMS
-			//qDebug() << "***stereo clap to stereo lmms";
 			copyBuffersPluginToHost<true>(m_audioOutActive->data32, buf, m_audioOutActive->constant_mask, firstChannel, frames);
 		}
 		else
 		{
 			// Mono CLAP to Stereo LMMS
-			//qDebug() << "***mono clap to stereo lmms";
 			copyBuffersMonoPluginToStereoHost(m_audioOutActive->data32, buf, m_audioOutActive->constant_mask, firstChannel, frames);
 		}
 	}
 	else
 	{
 		// Mono CLAP to Mono LMMS
-		//qDebug() << "***mono clap to mono lmms";
 		copyBuffersPluginToHost<false>(m_audioOutActive->data32, buf, m_audioOutActive->constant_mask, firstChannel, frames);
 	}
 }

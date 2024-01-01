@@ -26,8 +26,6 @@
 
 #ifdef LMMS_HAVE_CLAP
 
-#include <QDebug>
-
 #include <cassert>
 
 #include "ClapInstance.h"
@@ -75,7 +73,7 @@ auto ClapGui::initImpl(const clap_host* host, const clap_plugin* plugin) noexcep
 	{
 		if (!m_supportsFloating)
 		{
-			instance()->log(CLAP_LOG_ERROR, "Plugin does not support any GUI API that the host implements");
+			logger()->log(CLAP_LOG_ERROR, "Plugin does not support any GUI API that the host implements");
 			return false;
 		}
 
@@ -134,7 +132,7 @@ auto ClapGui::create() -> bool
 
 	if (!pluginExt()->create(plugin(), m_window.api, isFloating()))
 	{
-		instance()->log(CLAP_LOG_ERROR, "Failed to create the plugin GUI");
+		logger()->log(CLAP_LOG_ERROR, "Failed to create the plugin GUI");
 		return false;
 	}
 
@@ -156,7 +154,7 @@ auto ClapGui::create() -> bool
 
 		if (!pluginExt()->get_size(plugin(), &width, &height))
 		{
-			instance()->log(CLAP_LOG_PLUGIN_MISBEHAVING, "Could not get the size of the plugin gui");
+			logger()->log(CLAP_LOG_PLUGIN_MISBEHAVING, "Could not get the size of the plugin gui");
 			m_created = false;
 			pluginExt()->destroy(plugin());
 			return false;
@@ -166,7 +164,7 @@ auto ClapGui::create() -> bool
 
 		if (!pluginExt()->set_parent(plugin(), &m_window))
 		{
-			instance()->log(CLAP_LOG_ERROR, "Failed to embed the plugin GUI");
+			logger()->log(CLAP_LOG_ERROR, "Failed to embed the plugin GUI");
 			m_created = false;
 			pluginExt()->destroy(plugin());
 			return false;
@@ -189,13 +187,13 @@ void ClapGui::destroy()
 
 void ClapGui::clapResizeHintsChanged(const clap_host* host)
 {
-	qDebug() << "ClapGui::clapResizeHintsChanged";
+	ClapLog::globalLog(CLAP_LOG_ERROR, "ClapGui::clapResizeHintsChanged() [NOT IMPLEMENTED YET]");
 	// TODO
 }
 
 auto ClapGui::clapRequestResize(const clap_host* host, std::uint32_t width, std::uint32_t height) -> bool
 {
-	qDebug() << "ClapGui::clapRequestResize";
+	ClapLog::globalLog(CLAP_LOG_ERROR, "ClapGui::clapRequestResize() [NOT IMPLEMENTED YET]");
 	// TODO
 
 	return true;
@@ -203,7 +201,7 @@ auto ClapGui::clapRequestResize(const clap_host* host, std::uint32_t width, std:
 
 auto ClapGui::clapRequestShow(const clap_host* host) -> bool
 {
-	qDebug() << "ClapGui::clapRequestShow";
+	ClapLog::globalLog(CLAP_LOG_ERROR, "ClapGui::clapRequestShow() [NOT IMPLEMENTED YET]");
 	// TODO
 
 	return true;
@@ -211,7 +209,7 @@ auto ClapGui::clapRequestShow(const clap_host* host) -> bool
 
 auto ClapGui::clapRequestHide(const clap_host* host) -> bool
 {
-	qDebug() << "ClapGui::clapRequestHide";
+	ClapLog::globalLog(CLAP_LOG_ERROR, "ClapGui::clapRequestHide() [NOT IMPLEMENTED YET]");
 	// TODO
 
 	return true;
@@ -219,7 +217,6 @@ auto ClapGui::clapRequestHide(const clap_host* host) -> bool
 
 void ClapGui::clapRequestClosed(const clap_host* host, bool wasDestroyed)
 {
-	qDebug() << "ClapGui::clapRequestClosed";
 	if (!wasDestroyed) { return; }
 
 	auto h = fromHost(host);

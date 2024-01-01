@@ -47,7 +47,17 @@ ClapParameter::ClapParameter(ClapParams* parent, const clap_param_info& info, do
 	// Assume ClapParam::check() has already been called at this point
 
 #if 0
-	qDebug().nospace() << "CLAP param --- id:" << info.id << "; name:'" << info.name << "'; module:'" << info.module << "'; flags:" << info.flags;
+	{
+		std::string msg = "param --- id: '";
+		msg += info.id;
+		msg += "'; name: '";
+		msg += info.name;
+		msg += "'; module: '";
+		msg += info.module;
+		msg += "'; flags: ";
+		msg += std::to_string(info.flags);
+		parent->logger()->log(CLAP_LOG_DEBUG, msg);
+	}
 #endif
 
 	// If the user cannot control this param, no AutomatableModel is needed
@@ -77,7 +87,7 @@ ClapParameter::ClapParameter(ClapParams* parent, const clap_param_info& info, do
 		{
 			if (flags & CLAP_PARAM_IS_BYPASS)
 			{
-				parent->instance()->log(CLAP_LOG_PLUGIN_MISBEHAVING, "Bypass parameter doesn't have range [0, 1]");
+				parent->logger()->log(CLAP_LOG_PLUGIN_MISBEHAVING, "Bypass parameter doesn't have range [0, 1]");
 			}
 
 			m_connectedModel = std::make_unique<IntModel>(valueInt, minVal, maxVal, parent, name);
@@ -165,17 +175,18 @@ auto ClapParameter::check(clap_param_info& info) -> bool
 {
 	if (info.min_value > info.max_value)
 	{
-		qWarning() << "CLAP param: Error: min value > max value";
+		ClapLog::globalLog(CLAP_LOG_PLUGIN_MISBEHAVING, "param --- min value > max value");
 		// TODO: Use PluginIssueType::MinGreaterMax ??
 		return false;
 	}
 
 	if (info.default_value > info.max_value || info.default_value < info.min_value)
 	{
-		std::string msg = "CLAP param: Error: default value is out of range\ndefault: " + std::to_string(info.default_value)
+		std::string msg = "param --- default value is out of range\ndefault: " + std::to_string(info.default_value)
 			+ "; min: " + std::to_string(info.min_value) + "; max: " + std::to_string(info.max_value);
+		ClapLog::globalLog(CLAP_LOG_PLUGIN_MISBEHAVING, msg);
+
 		// TODO: Use PluginIssueType::DefaultValueNotInRange ??
-		qWarning() << "CLAP param: Warning: default value is out of range; clamping to valid range";
 		//info.default_value = std::clamp(info.default_value, info.min_value, info.max_value);
 		return false;
 	}

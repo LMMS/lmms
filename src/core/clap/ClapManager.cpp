@@ -72,18 +72,20 @@ ClapManager::ClapManager()
 {
 	const char* debug = std::getenv("LMMS_CLAP_DEBUG");
 	s_debugging = debug && *debug;
-	if (s_debugging) { qDebug() << "CLAP host debugging enabled"; }
+	ClapLog::plainLog(CLAP_LOG_DEBUG, "CLAP host debugging enabled");
 }
 
 ClapManager::~ClapManager()
 {
-	qDebug() << "ClapManager::~ClapManager";
+	ClapLog::plainLog(CLAP_LOG_DEBUG, "ClapManager::~ClapManager()");
+
 	// Deactivate and destroy plugin instances first
 	//m_instances.clear();
 
 	// Then deinit the .clap files and unload the shared libraries
 	m_files.clear();
-	qDebug() << "ClapManager::~ClapManager end";
+
+	ClapLog::plainLog(CLAP_LOG_DEBUG, "ClapManager::~ClapManager() end");
 }
 
 void ClapManager::initPlugins()
@@ -91,12 +93,13 @@ void ClapManager::initPlugins()
 	findSearchPaths();
 	if (debugging())
 	{
-		qDebug() << "CLAP search paths:";
+		ClapLog::plainLog("CLAP search paths:");
 		for (const auto& searchPath : m_searchPaths)
 		{
-			qDebug() << "-" << searchPath.c_str();
+			std::string msg = "-" + searchPath.string();
+			ClapLog::plainLog(msg);
 		}
-		qDebug() << "Found .clap files:";
+		ClapLog::plainLog("Found .clap files:");
 	}
 	loadClapFiles(searchPaths());
 }
@@ -218,13 +221,21 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 
 			++totalClapFiles;
 
-			if (debugging()) { qDebug() << "\n\n~~~CLAP FILE~~~\nfilename:" << entryPath.c_str(); }
+			if (debugging())
+			{
+				std::string msg = "\n\n~~~CLAP FILE~~~\nfilename: ";
+				msg += entryPath;
+				ClapLog::plainLog(msg);
+			}
 
 			auto& clapFile = m_files.emplace_back(entryPath);
 			clapFile.load();
 			if (!clapFile.isValid())
 			{
-				qWarning() << "Failed to load .clap file";
+				std::string msg = "Failed to load '";
+				msg += entryPath;
+				msg += "'";
+				ClapLog::globalLog(CLAP_LOG_ERROR, msg);
 				m_files.pop_back(); // Remove/unload invalid clap file
 				continue;
 			}
@@ -238,9 +249,13 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 				{
 					if (debugging())
 					{
-						qDebug().nospace() << "The CLAP plugin ID '" << plugin->descriptor()->id
-							<< "' in the plugin file '" << entry.path().c_str() << "' is identical to an ID"
-							<< " in a previously loaded plugin file. Skipping the duplicate CLAP plugin.";
+						std::string msg = "Plugin ID '";
+						msg += plugin->descriptor()->id;
+						msg += "' in the plugin file '";
+						msg += entryPath;
+						msg += "' is identical to an ID from a previously loaded plugin file.";
+						ClapLog::globalLog(CLAP_LOG_DEBUG, msg);
+						ClapLog::globalLog(CLAP_LOG_DEBUG, "Skipping the duplicate plugin");
 					}
 					plugin->invalidate();
 					purgeNeeded = true;
@@ -253,24 +268,26 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 		}
 	}
 
-	qDebug() << "CLAP plugin SUMMARY:"
-		<< m_files.size() << "of" << totalClapFiles << "files and"
-		<< m_pluginInfo.size() << "of" << totalClapPlugins
-		<< "plugins loaded in" << timer.elapsed() << "msecs.";
+	{
+		std::string msg = "CLAP plugin SUMMARY: ";
+		msg += std::to_string(m_files.size()) + " of " + std::to_string(totalClapPlugins);
+		msg += " plugins loaded in " + std::to_string(timer.elapsed()) + " msecs.";
+		ClapLog::plainLog(msg);
+	}
+
 	if (m_files.size() != totalClapFiles || m_pluginInfo.size() != totalClapPlugins)
 	{
 		if (debugging())
 		{
-			qDebug() <<
+			ClapLog::plainLog(
 				"If you don't want to see all this debug output, please set\n"
 				"  environment variable \"LMMS_CLAP_DEBUG\" to empty or\n"
-				"  do not set it.";
+				"  do not set it.");
 		}
 		else
 		{
-			qDebug() <<
-				"For details about not loaded plugins, please set\n"
-				"  environment variable \"LMMS_CLAP_DEBUG\" to nonempty.";
+			ClapLog::plainLog("For details about not loaded plugins, please set\n"
+				"  environment variable \"LMMS_CLAP_DEBUG\" to nonempty.");
 		}
 	}
 }

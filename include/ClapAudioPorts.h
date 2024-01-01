@@ -29,9 +29,6 @@
 
 #ifdef LMMS_HAVE_CLAP
 
-#include <QThread>
-#include <QSemaphore>
-
 #include <memory>
 #include <vector>
 

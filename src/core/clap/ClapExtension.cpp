@@ -26,31 +26,36 @@
 
 #ifdef LMMS_HAVE_CLAP
 
-#include <QDebug>
-
 #include "ClapInstance.h"
+#include "ClapLog.h"
 
 namespace lmms
 {
+
+auto detail::ClapExtensionHelper::logger() const -> const ClapLog*
+{
+	return &instance()->logger();
+}
 
 auto detail::ClapExtensionHelper::fromHost(const clap_host* host) -> ClapInstance*
 {
 	if (!host)
 	{
-		qWarning() << "CLAP: Plugin passed an invalid host pointer";
+		ClapLog::globalLog(CLAP_LOG_ERROR, "A plugin passed an invalid host pointer");
 		return nullptr;
 	}
 
 	auto h = static_cast<ClapInstance*>(host->host_data);
 	if (!h)
 	{
-		qWarning() << "CLAP: Plugin invalidated the host context pointer";
+		ClapLog::globalLog(CLAP_LOG_ERROR, "A plugin invalidated the host context pointer");
 		return nullptr;
 	}
 
 	if (!h->plugin())
 	{
-		qWarning() << "CLAP: Plugin is calling the host API during factory.create_plugin(). It needs to wait for plugin.init() first.";
+		ClapLog::globalLog(CLAP_LOG_ERROR, "A plugin is calling the host API during factory.create_plugin(). "
+			"It needs to wait for plugin.init() first.");
 		return nullptr;
 	}
 
