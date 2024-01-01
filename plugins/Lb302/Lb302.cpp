@@ -589,19 +589,19 @@ int Lb302Synth::process(sampleFrame *outbuf, const int size)
 			// If that oscillator increment is 0 we return a 0 sample because calling BandLimitedWave::pdToLen(0) leads to a
 			// division by 0 which in turn leads to floating point exceptions.
 			case VcoShape::BLSawtooth:
-				vco_k = vco_inc == 0. ? 0. : BandLimitedWave::oscillate( vco_c + 0.5f, BandLimitedWave::pdToLen( vco_inc ), BandLimitedWave::Waveform::BLSaw ) * 0.5f;
+				vco_k = vco_inc == 0. ? 0. : BandLimitedWave::oscillate(vco_c + 0.5f, BandLimitedWave::pdToLen(vco_inc), BandLimitedWave::Waveform::BLSaw) * 0.5f;
 				break;
 
 			case VcoShape::BLSquare:
-				vco_k = vco_inc == 0. ? 0. : BandLimitedWave::oscillate( vco_c + 0.5f, BandLimitedWave::pdToLen( vco_inc ), BandLimitedWave::Waveform::BLSquare ) * 0.5f;
+				vco_k = vco_inc == 0. ? 0. : BandLimitedWave::oscillate(vco_c + 0.5f, BandLimitedWave::pdToLen(vco_inc), BandLimitedWave::Waveform::BLSquare) * 0.5f;
 				break;
 
 			case VcoShape::BLTriangle:
-				vco_k = vco_inc == 0. ? 0. : BandLimitedWave::oscillate( vco_c + 0.5f, BandLimitedWave::pdToLen( vco_inc ), BandLimitedWave::Waveform::BLTriangle ) * 0.5f;
+				vco_k = vco_inc == 0. ? 0. : BandLimitedWave::oscillate(vco_c + 0.5f, BandLimitedWave::pdToLen(vco_inc), BandLimitedWave::Waveform::BLTriangle) * 0.5f;
 				break;
 
 			case VcoShape::BLMoog:
-				vco_k = vco_inc == 0. ? 0. : BandLimitedWave::oscillate( vco_c + 0.5f, BandLimitedWave::pdToLen( vco_inc ), BandLimitedWave::Waveform::BLMoog );
+				vco_k = vco_inc == 0. ? 0. : BandLimitedWave::oscillate(vco_c + 0.5f, BandLimitedWave::pdToLen(vco_inc), BandLimitedWave::Waveform::BLMoog);
 				break;
 		}
 
