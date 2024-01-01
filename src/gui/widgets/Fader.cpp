@@ -90,29 +90,10 @@ Fader::Fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 }
 
 
-Fader::Fader( FloatModel * model, const QString & name, QWidget * parent, QPixmap * back, QPixmap * leds, QPixmap * knob ) :
-	QWidget( parent ),
-	FloatModelView( model, this ),
-	m_fPeakValue_L( 0.0 ),
-	m_fPeakValue_R( 0.0 ),
-	m_persistentPeak_L( 0.0 ),
-	m_persistentPeak_R( 0.0 ),
-	m_fMinPeak(dbfsToAmp(-42)),
-	m_fMaxPeak(dbfsToAmp(9)),
-	m_levelsDisplayedInDBFS(true),
-	m_moveStartPoint( -1 ),
-	m_startValue( 0 ),
-	m_peakOk(10, 212, 92),
-	m_peakClip(193, 32, 56),
-	m_peakWarn(214, 236, 82),
-	m_renderUnityLine(true)
+Fader::Fader(FloatModel* model, const QString& name, QWidget* parent, const QPixmap& knob) :
+	Fader(model, name, parent)
 {
-	if( s_textFloat == nullptr )
-	{
-		s_textFloat = new SimpleTextFloat;
-	}
-
-	init(model, name);
+	m_knob = knob;
 }
 
 void Fader::init(FloatModel * model, QString const & name)
