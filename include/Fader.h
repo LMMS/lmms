@@ -72,11 +72,9 @@ public:
 	Q_PROPERTY(bool levelsDisplayedInDBFS READ getLevelsDisplayedInDBFS WRITE setLevelsDisplayedInDBFS)
 	Q_PROPERTY(bool renderUnityLine READ getRenderUnityLine WRITE setRenderUnityLine)
 
-	Fader( FloatModel * _model, const QString & _name, QWidget * _parent );
+	Fader(FloatModel* model, const QString& name, QWidget* parent);
 	Fader(FloatModel* model, const QString& name, QWidget* parent, const QPixmap& knob);
 	~Fader() override = default;
-
-	void init(FloatModel * model, QString const & name);
 
 	void setPeak_L( float fPeak );
 	float getPeak_L() {	return m_fPeakValue_L;	}

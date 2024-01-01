@@ -62,18 +62,18 @@ namespace lmms::gui
 
 SimpleTextFloat * Fader::s_textFloat = nullptr;
 
-Fader::Fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
-	QWidget( _parent ),
-	FloatModelView( _model, this ),
-	m_fPeakValue_L( 0.0 ),
-	m_fPeakValue_R( 0.0 ),
-	m_persistentPeak_L( 0.0 ),
-	m_persistentPeak_R( 0.0 ),
+Fader::Fader(FloatModel* model, const QString& name, QWidget* parent ) :
+	QWidget(parent),
+	FloatModelView(model, this),
+	m_fPeakValue_L(0.0),
+	m_fPeakValue_R(0.0),
+	m_persistentPeak_L(0.0),
+	m_persistentPeak_R(0.0),
 	m_fMinPeak(dbfsToAmp(-42)),
 	m_fMaxPeak(dbfsToAmp(9)),
 	m_levelsDisplayedInDBFS(true),
-	m_moveStartPoint( -1 ),
-	m_startValue( 0 ),
+	m_moveStartPoint(-1),
+	m_startValue(0),
 	m_peakOk(10, 212, 92),
 	m_peakClip(193, 32, 56),
 	m_peakWarn(214, 236, 82),
@@ -84,7 +84,15 @@ Fader::Fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 		s_textFloat = new SimpleTextFloat;
 	}
 
-	init(_model, _name);
+	setWindowTitle( name );
+	setAttribute( Qt::WA_OpaquePaintEvent, false );
+	// For now resize the widget to the size of the previous background image "fader_background.png" as it was found in the classic and default theme
+	QSize minimumSize(23, 116);
+	setMinimumSize(minimumSize);
+	resize(minimumSize);
+	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+	setModel( model );
+	setHintText( "Volume:","%");
 
 	m_conversionFactor = 100.0;
 }
@@ -95,20 +103,6 @@ Fader::Fader(FloatModel* model, const QString& name, QWidget* parent, const QPix
 {
 	m_knob = knob;
 }
-
-void Fader::init(FloatModel * model, QString const & name)
-{
-	setWindowTitle( name );
-	setAttribute( Qt::WA_OpaquePaintEvent, false );
-	// For now resize the widget to the size of the previous background image "fader_background.png" as it was found in the classic and default theme
-	QSize minimumSize(23, 116);
-	setMinimumSize(minimumSize);
-	resize(minimumSize);
-	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-	setModel( model );
-	setHintText( "Volume:","%");
-}
-
 
 
 void Fader::contextMenuEvent( QContextMenuEvent * _ev )
