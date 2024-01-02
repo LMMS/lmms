@@ -1424,8 +1424,8 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		p.drawText( VALUES_WIDTH + 20, TOP_MARGIN + 40,
 				width() - VALUES_WIDTH - 20 - SCROLLBAR_SIZE,
 				grid_height - 40, Qt::TextWordWrap,
-				tr( "Please open an automation clip with "
-					"the context menu of a control!" ) );
+				tr( "Please open an automation clip by "
+					"double-clicking on it!" ) );
 	}
 
 	// TODO: Get this out of paint event
