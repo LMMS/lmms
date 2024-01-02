@@ -145,7 +145,7 @@ void ClapNotePorts::clapRescan(const clap_host* host, std::uint32_t flags)
 			info.id = CLAP_INVALID_ID;
 			if (!notePorts.pluginExt()->get(h->plugin(), idx, true, &info))
 			{
-				h->logger().log(CLAP_LOG_DEBUG, "Failed to read note port info");
+				h->logger().log(CLAP_LOG_ERROR, "Failed to read note port info");
 				return;
 			}
 

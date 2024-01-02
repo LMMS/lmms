@@ -254,8 +254,8 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 						msg += "' in the plugin file '";
 						msg += entryPath;
 						msg += "' is identical to an ID from a previously loaded plugin file.";
-						ClapLog::globalLog(CLAP_LOG_DEBUG, msg);
-						ClapLog::globalLog(CLAP_LOG_DEBUG, "Skipping the duplicate plugin");
+						ClapLog::globalLog(CLAP_LOG_INFO, msg);
+						ClapLog::globalLog(CLAP_LOG_INFO, "Skipping the duplicate plugin");
 					}
 					plugin->invalidate();
 					purgeNeeded = true;

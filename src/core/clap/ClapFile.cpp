@@ -116,7 +116,7 @@ auto ClapFile::load() -> bool
 	if (m_pluginCount == 0)
 	{
 		std::string msg = "Plugin file '" + filename().string() + "' contains no plugins";
-		ClapLog::globalLog(CLAP_LOG_INFO, msg);
+		ClapLog::globalLog(CLAP_LOG_DEBUG, msg);
 		return false;
 	}
 
@@ -216,7 +216,7 @@ ClapPluginInfo::ClapPluginInfo(const clap_plugin_factory* factory, std::uint32_t
 			+ std::to_string(m_descriptor->clap_version.revision);
 		msg += "\ndescription: ";
 		msg += (m_descriptor->description ? m_descriptor->description : "");
-		ClapLog::globalLog(CLAP_LOG_ERROR, msg);
+		ClapLog::plainLog(CLAP_LOG_DEBUG, msg);
 	}
 
 	m_type = Plugin::Type::Undefined;
@@ -227,7 +227,7 @@ ClapPluginInfo::ClapPluginInfo(const clap_plugin_factory* factory, std::uint32_t
 		if (ClapManager::debugging())
 		{
 			std::string msg = "feature: " + std::string{feature};
-			ClapLog::globalLog(CLAP_LOG_INFO, msg);
+			ClapLog::plainLog(CLAP_LOG_DEBUG, msg);
 		}
 
 		if (feature == CLAP_PLUGIN_FEATURE_INSTRUMENT)
@@ -250,7 +250,7 @@ ClapPluginInfo::ClapPluginInfo(const clap_plugin_factory* factory, std::uint32_t
 	{
 		std::string msg = "Plugin '" + std::string{m_descriptor->id}
 			+ "' is not recognized as an instrument or audio effect";
-		ClapLog::globalLog(CLAP_LOG_INFO, msg);
+		ClapLog::globalLog(CLAP_LOG_ERROR, msg);
 		return;
 	}
 

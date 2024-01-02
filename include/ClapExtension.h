@@ -34,7 +34,6 @@
 #include <clap/plugin.h>
 
 #include "NoCopyNoMove.h"
-#include "ClapThreadCheck.h"
 
 namespace lmms
 {

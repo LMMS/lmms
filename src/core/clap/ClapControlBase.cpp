@@ -58,7 +58,7 @@ void ClapControlBase::init(Model* that, const QString& uri)
 
 	ClapTransport::update();
 
-	ClapLog::globalLog(CLAP_LOG_INFO, "Creating CLAP instance (#1)");
+	ClapLog::globalLog(CLAP_LOG_DEBUG, "Creating CLAP instance (#1)");
 	m_instances.clear();
 	auto& first = m_instances.emplace_back(std::make_unique<ClapInstance>(m_info, that));
 	if (!first || !first->isValid())
@@ -71,7 +71,7 @@ void ClapControlBase::init(Model* that, const QString& uri)
 	if (!first->audioPorts().hasStereoOutput())
 	{
 		// A second instance is needed for stereo input/output
-		ClapLog::globalLog(CLAP_LOG_INFO, "Creating CLAP instance (#2)");
+		ClapLog::globalLog(CLAP_LOG_DEBUG, "Creating CLAP instance (#2)");
 		auto& second = m_instances.emplace_back(std::make_unique<ClapInstance>(m_info, that));
 		if (!second || !second->isValid())
 		{

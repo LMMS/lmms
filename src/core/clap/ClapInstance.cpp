@@ -83,7 +83,7 @@ ClapInstance::ClapInstance(const ClapPluginInfo* pluginInfo, Model* parent)
 ClapInstance::~ClapInstance()
 {
 #if 0
-	logger().log(CLAP_LOG_INFO, "ClapInstance::~ClapInstance");
+	logger().log(CLAP_LOG_DEBUG, "ClapInstance::~ClapInstance");
 #endif
 
 	destroy();
@@ -248,7 +248,6 @@ auto ClapInstance::unload() -> bool
 	m_notePorts.deinit();
 	m_params.deinit();
 	m_state.deinit();
-	m_threadPool.deinit();
 	m_timerSupport.deinit();
 
 	deactivate();
@@ -307,7 +306,6 @@ auto ClapInstance::init() -> bool
 	}
 
 	m_state.init(host(), m_plugin);
-	m_threadPool.init(host(), m_plugin);
 	m_timerSupport.init(host(), m_plugin);
 
 	setPluginState(PluginState::Inactive);
@@ -630,23 +628,23 @@ void ClapInstance::setPluginState(PluginState state)
 	switch (state)
 	{
 		case PluginState::None:
-			logger().log(CLAP_LOG_INFO, "Set state to None"); break;
+			logger().log(CLAP_LOG_DEBUG, "Set state to None"); break;
 		case PluginState::Loaded:
-			logger().log(CLAP_LOG_INFO, "Set state to Loaded"); break;
+			logger().log(CLAP_LOG_DEBUG, "Set state to Loaded"); break;
 		case PluginState::LoadedWithError:
-			logger().log(CLAP_LOG_INFO, "Set state to LoadedWithError"); break;
+			logger().log(CLAP_LOG_DEBUG, "Set state to LoadedWithError"); break;
 		case PluginState::Inactive:
-			logger().log(CLAP_LOG_INFO, "Set state to Inactive"); break;
+			logger().log(CLAP_LOG_DEBUG, "Set state to Inactive"); break;
 		case PluginState::InactiveWithError:
-			logger().log(CLAP_LOG_INFO, "Set state to InactiveWithError"); break;
+			logger().log(CLAP_LOG_DEBUG, "Set state to InactiveWithError"); break;
 		case PluginState::ActiveAndSleeping:
-			logger().log(CLAP_LOG_INFO, "Set state to ActiveAndSleeping"); break;
+			logger().log(CLAP_LOG_DEBUG, "Set state to ActiveAndSleeping"); break;
 		case PluginState::ActiveAndProcessing:
-			logger().log(CLAP_LOG_INFO, "Set state to ActiveAndProcessing"); break;
+			logger().log(CLAP_LOG_DEBUG, "Set state to ActiveAndProcessing"); break;
 		case PluginState::ActiveWithError:
-			logger().log(CLAP_LOG_INFO, "Set state to ActiveWithError"); break;
+			logger().log(CLAP_LOG_DEBUG, "Set state to ActiveWithError"); break;
 		case PluginState::ActiveAndReadyToDeactivate:
-			logger().log(CLAP_LOG_INFO, "Set state to ActiveAndReadyToDeactivate"); break;
+			logger().log(CLAP_LOG_DEBUG, "Set state to ActiveAndReadyToDeactivate"); break;
 	}
 }
 
@@ -715,7 +713,7 @@ auto ClapInstance::hostGetExtension(const clap_host* host, const char* extension
 	{
 		std::string msg = "Plugin requested host extension: ";
 		msg += (extensionId ? extensionId : "(NULL)");
-		h->logger().log(CLAP_LOG_INFO, msg);
+		h->logger().log(CLAP_LOG_DEBUG, msg);
 	}
 #endif
 
@@ -728,7 +726,6 @@ auto ClapInstance::hostGetExtension(const clap_host* host, const char* extension
 	if (id == CLAP_EXT_PARAMS)        { return h->params().hostExt(); }
 	if (id == CLAP_EXT_STATE)         { return h->state().hostExt(); }
 	if (id == CLAP_EXT_THREAD_CHECK)  { return h->m_threadCheck.hostExt(); }
-	if (id == CLAP_EXT_THREAD_POOL)   { return h->threadPool().hostExt(); }
 	if (id == CLAP_EXT_TIMER_SUPPORT) { return h->timerSupport().hostExt(); }
 
 	return nullptr;

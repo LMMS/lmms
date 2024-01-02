@@ -89,7 +89,7 @@ auto ClapParams::rescan(clap_param_rescan_flags flags) -> bool
 
 	// 2. Scan the params
 	auto count = pluginExt()->count(plugin());
-	qDebug() << "CLAP PARAMS: count:" << count;
+
 	std::unordered_set<clap_id> paramIds(count * 2);
 	bool needToUpdateParamsCache = false;
 
@@ -258,7 +258,6 @@ void ClapParams::processEnd()
 
 void ClapParams::flushOnMainThread()
 {
-	//qDebug() << "ClapParams::flushOnMainThread";
 	assert(ClapThreadCheck::isMainThread());
 	assert(!instance()->isActive());
 

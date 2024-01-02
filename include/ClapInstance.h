@@ -37,7 +37,6 @@
 #include "ClapParams.h"
 #include "ClapState.h"
 #include "ClapThreadCheck.h"
-#include "ClapThreadPool.h"
 #include "ClapTimerSupport.h"
 
 #include "Plugin.h"
@@ -151,7 +150,6 @@ public:
 	auto notePorts() -> ClapNotePorts& { return m_notePorts; }
 	auto params() -> ClapParams& { return m_params; }
 	auto state() -> ClapState& { return m_state; }
-	auto threadPool() -> ClapThreadPool& { return m_threadPool; }
 	auto timerSupport() -> ClapTimerSupport& { return m_timerSupport; }
 
 	/////////////////////////////////////////
@@ -267,7 +265,6 @@ private:
 	ClapNotePorts m_notePorts{ this };
 	ClapParams m_params;
 	ClapThreadCheck m_threadCheck{ this };
-	ClapThreadPool m_threadPool{ this };
 	ClapTimerSupport m_timerSupport{ this };
 };
 

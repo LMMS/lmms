@@ -1,5 +1,5 @@
 /*
- * ClapThreadPool.h - Implements CLAP thread pool extension
+ * ClapLog.h - Implements CLAP log extension
  *
  * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -22,53 +22,48 @@
  *
  */
 
-#ifndef LMMS_CLAP_THREAD_POOL_H
-#define LMMS_CLAP_THREAD_POOL_H
+#ifndef LMMS_CLAP_LOG_H
+#define LMMS_CLAP_LOG_H
 
 #include "lmmsconfig.h"
 
 #ifdef LMMS_HAVE_CLAP
 
-#include <QThread>
-#include <QSemaphore>
-
-#include <memory>
-#include <vector>
-#include <atomic>
-
-#include <clap/ext/thread-pool.h>
+#include <clap/ext/log.h>
 
 #include "ClapExtension.h"
-// TODO: Use #include "LmmsSemaphore.h"
 
 namespace lmms
 {
 
-class ClapThreadPool final : public ClapExtension<clap_host_thread_pool, clap_plugin_thread_pool>
+class ClapLog : public ClapExtension<clap_host_log>
 {
 public:
 	using ClapExtension::ClapExtension;
-	~ClapThreadPool() override { deinit(); }
 
-	auto extensionId() const -> std::string_view override { return CLAP_EXT_THREAD_POOL; }
-	auto hostExt() const -> const clap_host_thread_pool* override;
+	auto extensionId() const -> std::string_view override { return CLAP_EXT_LOG; }
+	auto hostExt() const -> const clap_host_log* override;
+
+	void log(clap_log_severity severity, std::string_view msg) const;
+	void log(clap_log_severity severity, const char* msg) const;
+
+	//! Log without plugin information
+	static void globalLog(clap_log_severity severity, std::string_view msg);
+
+	//! Log without any additional information
+	static void plainLog(clap_log_severity severity, std::string_view msg);
+
+	static void plainLog(std::string_view msg);
 
 private:
-	auto initImpl(const clap_host* host, const clap_plugin* plugin) noexcept -> bool override;
-	void deinitImpl() noexcept override;
-	auto checkSupported(const clap_plugin_thread_pool& ext) -> bool override;
-
-	void entry();
-	void terminate();
-
 	/**
-	 * clap_host_thread_pool implementation
+	 * clap_host_log implementation
 	 */
-	static auto clapRequestExec(const clap_host* host, std::uint32_t numTasks) -> bool;
+	static void clapLog(const clap_host_t* host, clap_log_severity severity, const char* msg);
 };
 
 } // namespace lmms
 
 #endif // LMMS_HAVE_CLAP
 
-#endif // LMMS_CLAP_THREAD_POOL_H
+#endif // LMMS_CLAP_LOG_H
