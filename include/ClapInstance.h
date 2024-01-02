@@ -52,6 +52,8 @@
 #include <clap/clap.h>
 #include <clap/helpers/event-list.hh>
 
+#include "lmms_export.h"
+
 namespace lmms
 {
 
@@ -71,7 +73,7 @@ namespace lmms
  *
  * Every ClapInstance is owned by a ClapControlBase object.
  */
-class ClapInstance final : public QObject
+class LMMS_EXPORT ClapInstance final : public QObject
 {
 	Q_OBJECT;
 
@@ -196,8 +198,6 @@ private:
 	static void hostRequestCallback(const clap_host* host);
 	static void hostRequestProcess(const clap_host* host);
 	static void hostRequestRestart(const clap_host* host);
-	static auto hostExtThreadCheckIsMainThread(const clap_host* host) -> bool;
-	static auto hostExtThreadCheckIsAudioThread(const clap_host* host) -> bool;
 	static void hostExtLatencyChanged(const clap_host* host);
 
 	/////////////////////////////////////////

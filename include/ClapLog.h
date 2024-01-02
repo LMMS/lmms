@@ -32,11 +32,12 @@
 #include <clap/ext/log.h>
 
 #include "ClapExtension.h"
+#include "lmms_export.h"
 
 namespace lmms
 {
 
-class ClapLog : public ClapExtension<clap_host_log>
+class LMMS_EXPORT ClapLog : public ClapExtension<clap_host_log>
 {
 public:
 	using ClapExtension::ClapExtension;

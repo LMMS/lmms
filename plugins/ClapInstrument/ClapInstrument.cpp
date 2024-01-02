@@ -35,6 +35,7 @@
 #include "ClapSubPluginFeatures.h"
 #include "StringPairDrag.h"
 #include "Clipboard.h"
+#include "ClapLog.h"
 
 #include "embed.h"
 #include "plugin_export.h"

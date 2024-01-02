@@ -38,12 +38,13 @@
 
 #include "ClapFile.h"
 #include "ClapInstance.h"
+#include "lmms_export.h"
 
 namespace lmms
 {
 
 //! Manages loaded .clap files, plugin info, and plugin instances
-class ClapManager
+class LMMS_EXPORT ClapManager
 {
 public:
 	ClapManager();
