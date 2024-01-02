@@ -224,7 +224,7 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 			if (debugging())
 			{
 				std::string msg = "\n\n~~~CLAP FILE~~~\nfilename: ";
-				msg += entryPath;
+				msg += entryPath.string();
 				ClapLog::plainLog(msg);
 			}
 
@@ -233,7 +233,7 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 			if (!clapFile.isValid())
 			{
 				std::string msg = "Failed to load '";
-				msg += entryPath;
+				msg += entryPath.string();
 				msg += "'";
 				ClapLog::globalLog(CLAP_LOG_ERROR, msg);
 				m_files.pop_back(); // Remove/unload invalid clap file
@@ -252,7 +252,7 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 						std::string msg = "Plugin ID '";
 						msg += plugin->descriptor()->id;
 						msg += "' in the plugin file '";
-						msg += entryPath;
+						msg += entryPath.string();
 						msg += "' is identical to an ID from a previously loaded plugin file.";
 						ClapLog::globalLog(CLAP_LOG_INFO, msg);
 						ClapLog::globalLog(CLAP_LOG_INFO, "Skipping the duplicate plugin");
