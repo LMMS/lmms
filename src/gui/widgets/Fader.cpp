@@ -71,6 +71,7 @@ Fader::Fader(FloatModel* model, const QString& name, QWidget* parent ) :
 	m_persistentPeak_R(0.0),
 	m_fMinPeak(dbfsToAmp(-42)),
 	m_fMaxPeak(dbfsToAmp(9)),
+	m_knob(embed::getIconPixmap("fader_knob")),
 	m_levelsDisplayedInDBFS(true),
 	m_moveStartPoint(-1),
 	m_startValue(0),
