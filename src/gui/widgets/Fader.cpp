@@ -403,8 +403,6 @@ void Fader::paintLevels(QPaintEvent * ev, QPainter & painter, bool linear)
 	linearGrad.setColorAt(ph.mapMaxZeroAndMinOne(mappedLastOk), okColor);
 	linearGrad.setColorAt(1, okColor);
 
-	QColor unityMarkerColor(127, 127, 127, 127);
-
 	// Draw left levels
 	QRect leftMeterMargins = leftMeterRect.marginsRemoved(QMargins(1, 0, 1, 0));
 	painter.fillRect(ph.getMeterRect(leftMeterMargins, mappedPeakL), linearGrad);
@@ -412,13 +410,6 @@ void Fader::paintLevels(QPaintEvent * ev, QPainter & painter, bool linear)
 	// Draw left peaks
 	auto const peakRectL = ph.getPersistentPeakRect(leftMeterMargins, mappedPersistentPeakL);
 	painter.fillRect(peakRectL, linearGrad);
-
-	// Draw unity line (0 dbFS, 1.0 amplitude)
-	if (getRenderUnityLine())
-	{
-		auto const unityRectL = ph.getPersistentPeakRect(leftMeterRect, mappedUnity);
-		painter.fillRect(unityRectL, unityMarkerColor);
-	}
 
 	// Draw right levels
 	QRect rightMeterMargins = rightMeterRect.marginsRemoved(QMargins(1, 0, 1, 0));
@@ -428,18 +419,27 @@ void Fader::paintLevels(QPaintEvent * ev, QPainter & painter, bool linear)
 	auto const peakRectR = ph.getPersistentPeakRect(rightMeterMargins, mappedPersistentPeakR);
 	painter.fillRect(peakRectR, linearGrad);
 
-	// Draw unity line (0 dbFS, 1.0 amplitude)
+	// TODO
+	QPen pen(QColor(255, 255, 255, 18));
+	pen.setWidth(2);
+	painter.setPen(pen);
+	painter.drawPath(path);
+
+	// Draw left and right unity lines (0 dbFS, 1.0 amplitude)
+	QColor unityMarkerColor(127, 127, 127, 127);
+
+	if (getRenderUnityLine())
+	{
+		auto const unityRectL = ph.getPersistentPeakRect(leftMeterRect, mappedUnity);
+		painter.fillRect(unityRectL, unityMarkerColor);
+	}
+
 	if (getRenderUnityLine())
 	{
 		auto const unityRectR = ph.getPersistentPeakRect(rightMeterRect, mappedUnity);
 		painter.fillRect(unityRectR, unityMarkerColor);
 	}
 
-	// TODO
-	QPen pen(QColor(255, 255, 255, 18));
-	pen.setWidth(2);
-	painter.setPen(pen);
-	painter.drawPath(path);
 
 	painter.restore();
 }
