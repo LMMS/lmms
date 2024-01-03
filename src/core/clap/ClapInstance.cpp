@@ -1,7 +1,7 @@
 /*
  * ClapInstance.cpp - Implementation of ClapInstance class
  *
- * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -26,18 +26,10 @@
 
 #ifdef LMMS_HAVE_CLAP
 
-#include "ClapManager.h"
-#include "ClapTransport.h"
-#include "Engine.h"
-#include "AudioEngine.h"
-#include "MidiEvent.h"
-
 #include <QApplication>
 #include <QDomDocument>
 #include <QDomElement>
-
 #include <algorithm>
-#include <string_view>
 #include <cassert>
 
 #ifdef __MINGW32__
@@ -46,6 +38,11 @@
 #include <thread>
 #endif
 
+#include "AudioEngine.h"
+#include "ClapManager.h"
+#include "ClapTransport.h"
+#include "Engine.h"
+#include "MidiEvent.h"
 #include "lmmsversion.h"
 
 namespace lmms
@@ -59,11 +56,6 @@ struct MidiInputEvent
 	TimePos time;
 	f_cnt_t offset;
 };
-
-
-////////////////////////////////
-// ClapInstance
-////////////////////////////////
 
 ClapInstance::ClapInstance(const ClapPluginInfo* pluginInfo, Model* parent)
 	: QObject{parent}
@@ -665,10 +657,6 @@ auto ClapInstance::pluginExtensionInit(const T*& ext, const char* id, F* checkFu
 	return true;
 }
 
-////////////////////////////////
-// ClapInstance host
-////////////////////////////////
-
 void ClapInstance::idle()
 {
 	assert(ClapThreadCheck::isMainThread());
@@ -698,13 +686,13 @@ void ClapInstance::setHost()
 	m_host.version = LMMS_VERSION;
 	m_host.vendor = "";
 	m_host.url = "https://lmms.io/";
-	m_host.get_extension = &hostGetExtension;
-	m_host.request_callback = &hostRequestCallback;
-	m_host.request_process = &hostRequestProcess;
-	m_host.request_restart = &hostRequestRestart;
+	m_host.get_extension = &clapGetExtension;
+	m_host.request_callback = &clapRequestCallback;
+	m_host.request_process = &clapRequestProcess;
+	m_host.request_restart = &clapRequestRestart;
 }
 
-auto ClapInstance::hostGetExtension(const clap_host* host, const char* extensionId) -> const void*
+auto ClapInstance::clapGetExtension(const clap_host* host, const char* extensionId) -> const void*
 {
 	auto h = detail::ClapExtensionHelper::fromHost(host);
 	if (!h || !extensionId) { return nullptr; }
@@ -720,7 +708,7 @@ auto ClapInstance::hostGetExtension(const clap_host* host, const char* extension
 	const auto id = std::string_view{extensionId};
 	//if (id == CLAP_EXT_AUDIO_PORTS)   { return h->audioPorts().hostExt(); }
 	if (id == CLAP_EXT_GUI)           { return h->gui().hostExt(); }
-	if (id == CLAP_EXT_LATENCY)       { return &s_hostExtLatency; }
+	if (id == CLAP_EXT_LATENCY)       { return &s_clapLatency; }
 	if (id == CLAP_EXT_LOG)           { return h->logger().hostExt(); }
 	if (id == CLAP_EXT_NOTE_PORTS)    { return h->notePorts().hostExt(); }
 	if (id == CLAP_EXT_PARAMS)        { return h->params().hostExt(); }
@@ -731,28 +719,28 @@ auto ClapInstance::hostGetExtension(const clap_host* host, const char* extension
 	return nullptr;
 }
 
-void ClapInstance::hostRequestCallback(const clap_host* host)
+void ClapInstance::clapRequestCallback(const clap_host* host)
 {
 	const auto h = detail::ClapExtensionHelper::fromHost(host);
 	if (!h) { return; }
 	h->m_scheduleMainThreadCallback = true;
 }
 
-void ClapInstance::hostRequestProcess(const clap_host* host)
+void ClapInstance::clapRequestProcess(const clap_host* host)
 {
 	auto h = detail::ClapExtensionHelper::fromHost(host);
 	if (!h) { return; }
 	h->m_scheduleProcess = true;
 }
 
-void ClapInstance::hostRequestRestart(const clap_host* host)
+void ClapInstance::clapRequestRestart(const clap_host* host)
 {
 	auto h = detail::ClapExtensionHelper::fromHost(host);
 	if (!h) { return; }
 	h->m_scheduleRestart = true;
 }
 
-void ClapInstance::hostExtLatencyChanged([[maybe_unused]] const clap_host* host)
+void ClapInstance::clapLatencyChanged([[maybe_unused]] const clap_host* host)
 {
 	/*
 	 * LMMS currently does not use latency data, but implementing this extension

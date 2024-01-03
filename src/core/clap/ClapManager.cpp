@@ -1,7 +1,7 @@
 /*
  * ClapManager.cpp - Implementation of ClapManager class
  *
- * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -27,22 +27,12 @@
 #ifdef LMMS_HAVE_CLAP
 
 #include <algorithm>
-#include <string_view>
+#include <chrono>
 #include <cstdlib>
-#include <cstring>
+#include <string>
 
-#include <QDebug>
-#include <QElapsedTimer>
-#include <QLibrary>
-
-#include <clap/clap.h>
-
-#include "ClapFile.h"
+#include "ClapLog.h"
 #include "ClapTransport.h"
-#include "Engine.h"
-#include "Song.h"
-#include "Plugin.h"
-#include "PluginIssue.h"
 #include "lmmsversion.h"
 
 namespace lmms
@@ -50,7 +40,7 @@ namespace lmms
 
 namespace
 {
-	auto expandHomeDir(std::string_view dir) -> std::filesystem::path
+	auto expandHomeDir(std::string_view dir) -> fs::path
 	{
 #if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_APPLE)
 		if (!dir.empty() && dir[0] == '~')
@@ -60,7 +50,7 @@ namespace
 				const auto pos = dir.find_first_not_of(R"(/\)", 1);
 				if (pos == std::string_view::npos) { return home; }
 				dir.remove_prefix(pos);
-				return std::filesystem::path{home} / dir;
+				return fs::path{home} / dir;
 			}
 		}
 #endif
@@ -106,7 +96,6 @@ void ClapManager::initPlugins()
 
 void ClapManager::findSearchPaths()
 {
-	namespace fs = std::filesystem;
 	m_searchPaths.clear();
 
 	// Parses a string of paths, adding results to m_searchPaths
@@ -201,20 +190,19 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 	m_uriToPluginInfo.clear();
 	m_pluginInfo.clear();
 
-	QElapsedTimer timer; // TODO: Use <chrono> library
-	timer.start();
+	const auto startTime = std::chrono::steady_clock::now();
 
 	// Search searchPaths for files with ".clap" extension
 	int totalClapFiles = 0;
 	int totalClapPlugins = 0;
 	for (const auto& path : searchPaths)
 	{
-		for (const auto& entry : std::filesystem::recursive_directory_iterator{path})
+		for (const auto& entry : fs::recursive_directory_iterator{path})
 		{
 			const auto& entryPath = entry.path();
 			std::error_code ec;
 			// NOTE: Using is_regular_file() free function workaround due to std::experimental::filesystem
-			if (!std::filesystem::is_regular_file(entry, ec) || entryPath.extension() != ".clap")
+			if (!fs::is_regular_file(entry, ec) || entryPath.extension() != ".clap")
 			{
 				continue;
 			}
@@ -269,9 +257,11 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 	}
 
 	{
+		const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+			std::chrono::steady_clock::now() - startTime);
 		std::string msg = "CLAP plugin SUMMARY: ";
 		msg += std::to_string(m_files.size()) + " of " + std::to_string(totalClapPlugins);
-		msg += " plugins loaded in " + std::to_string(timer.elapsed()) + " msecs.";
+		msg += " plugins loaded in " + std::to_string(elapsed.count()) + " msecs.";
 		ClapLog::plainLog(msg);
 	}
 

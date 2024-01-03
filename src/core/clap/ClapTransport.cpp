@@ -1,7 +1,7 @@
 /*
  * ClapTransport.cpp - CLAP transport events
  *
- * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -28,8 +28,6 @@
 
 #include "Engine.h"
 #include "Song.h"
-
-#include <cstdint>
 
 namespace lmms
 {

@@ -1,7 +1,7 @@
 /*
  * ClapControlBase.h - CLAP control base class
  *
- * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -31,12 +31,12 @@
 
 #include <memory>
 
+#include "ArrayVector.h"
 #include "ClapFile.h"
 #include "ClapInstance.h"
 #include "DataFile.h"
 #include "LinkedModelGroups.h"
 #include "Plugin.h"
-#include "ArrayVector.h"
 #include "lmms_export.h"
 
 namespace lmms

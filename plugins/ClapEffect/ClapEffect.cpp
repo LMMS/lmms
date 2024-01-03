@@ -1,7 +1,7 @@
 /*
  * ClapEffect.cpp - Implementation of CLAP effect
  *
- * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -25,17 +25,14 @@
 #include "ClapEffect.h"
 
 #include <QApplication>
+#include <memory>
 
 #include "ClapSubPluginFeatures.h"
-
 #include "embed.h"
 #include "plugin_export.h"
 
-#include <memory>
-
 namespace lmms
 {
-
 
 extern "C"
 {
@@ -76,9 +73,9 @@ bool ClapEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	m_controls.copyBuffersFromLmms(buf, frames);
 	m_controls.copyModelsFromLmms();
 
-//	m_pluginMutex.lock();
+	// m_pluginMutex.lock();
 	m_controls.run(frames);
-//	m_pluginMutex.unlock();
+	// m_pluginMutex.unlock();
 
 	m_controls.copyModelsToLmms();
 	m_controls.copyBuffersToLmms(m_tempOutputSamples.data(), frames);

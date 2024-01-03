@@ -1,7 +1,7 @@
 /*
  * ClapManager.h - Implementation of ClapManager class
  *
- * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -29,15 +29,14 @@
 
 #ifdef LMMS_HAVE_CLAP
 
-#include <vector>
-#include <unordered_set>
-#include <string_view>
-#include <memory>
-
 #include <QString>
+#include <memory>
+#include <string_view>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
 
 #include "ClapFile.h"
-#include "ClapInstance.h"
 #include "lmms_export.h"
 
 namespace lmms
@@ -83,13 +82,13 @@ private:
 	//! For hashing since std::hash<std::filesystem::path> is not available until C++23's LWG issue 3657 for god knows why
 	struct PathHash
 	{
-		auto operator()(const std::filesystem::path& path) const -> std::size_t
+		auto operator()(const fs::path& path) const -> std::size_t
 		{
-			return std::filesystem::hash_value(path);
+			return fs::hash_value(path);
 		}
 	};
 
-	using UniquePaths = std::unordered_set<std::filesystem::path, PathHash>;
+	using UniquePaths = std::unordered_set<fs::path, PathHash>;
 
 	//! Finds all CLAP search paths and populates m_searchPaths
 	void findSearchPaths();

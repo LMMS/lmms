@@ -1,5 +1,5 @@
 /*
- * ClapTransport.h - CLAP transport events
+ * lmms_filesystem.h - std::filesystem include helper
  *
  * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -22,41 +22,23 @@
  *
  */
 
-#ifndef LMMS_CLAP_TRANSPORT_H
-#define LMMS_CLAP_TRANSPORT_H
+// TODO: Remove this header once all build runners support std::filesystem
 
-#include "lmmsconfig.h"
+#ifndef LMMS_FILESYSTEM_H
+#define LMMS_FILESYSTEM_H
 
-#ifdef LMMS_HAVE_CLAP
-
-#include <clap/events.h>
-
-#include "lmms_basics.h"
-
-namespace lmms
-{
-
-//! Static class for managing CLAP transport events
-class ClapTransport
-{
-public:
-	static void update();
-	static void setPlaying(bool isPlaying);
-	static void setRecording(bool isRecording);
-	static void setLooping(bool isLooping);
-	static void setBeatPosition();
-	static void setTimePosition(int elapsedMilliseconds);
-	static void setTempo(bpm_t tempo);
-	static void setTimeSignature(int num, int denom);
-
-	static auto get() -> const clap_event_transport* { return &s_transport; }
-
-private:
-	static clap_event_transport s_transport;
-};
-
+#if __has_include(<filesystem>)
+#include <filesystem>
+namespace lmms {
+	namespace fs = std::filesystem;
 } // namespace lmms
+#elif __has_include(<experimental/filesystem>)
+#include <experimental/filesystem>
+namespace lmms {
+	namespace fs = std::experimental::filesystem;
+} // namespace lmms
+#else
+#error "Standard filesystem library not available"
+#endif
 
-#endif // LMMS_HAVE_CLAP
-
-#endif // LMMS_CLAP_TRANSPORT_H
+#endif // LMMS_FILESYSTEM_H

@@ -1,7 +1,7 @@
 /*
  * ClapFxControlDialog.cpp - ClapFxControlDialog implementation
  *
- * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -31,7 +31,6 @@
 namespace lmms::gui
 {
 
-
 ClapFxControlDialog::ClapFxControlDialog(ClapFxControls* controls)
 	: EffectControlDialog{controls}
 	, ClapViewBase{this, controls}
@@ -54,8 +53,8 @@ ClapFxControlDialog::ClapFxControlDialog(ClapFxControls* controls)
 			this, [this](bool visible){ toggleHelp(visible); });
 	}
 
-	// for Effects, modelChanged only goes to the top EffectView
-	// we need to call it manually
+	// For Effects, modelChanged only goes to the top EffectView
+	// We need to call it manually
 	modelChanged();
 }
 
@@ -69,6 +68,5 @@ void ClapFxControlDialog::modelChanged()
 	ClapViewBase::modelChanged(clapControls());
 	connect(clapControls(), &ClapFxControls::modelChanged, this, [this](){ this->modelChanged();} );
 }
-
 
 } // namespace lmms::gui

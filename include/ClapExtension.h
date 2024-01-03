@@ -1,7 +1,7 @@
 /*
  * ClapExtension.h - Base class template for implementing CLAP extensions
  *
- * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -30,7 +30,6 @@
 #ifdef LMMS_HAVE_CLAP
 
 #include <string_view>
-
 #include <clap/plugin.h>
 
 #include "NoCopyNoMove.h"

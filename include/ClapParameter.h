@@ -1,7 +1,7 @@
 /*
  * ClapParameter.h - Declaration of ClapParameter class
  *
- * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -29,17 +29,15 @@
 
 #ifdef LMMS_HAVE_CLAP
 
-#include "AutomatableModel.h"
-
+#include <QObject>
+#include <algorithm>
+#include <memory>
 #include <string>
 #include <string_view>
 #include <unordered_map>
-#include <algorithm>
-#include <memory>
+#include <clap/ext/params.h>
 
-#include <QObject>
-
-#include <clap/clap.h>
+#include "AutomatableModel.h"
 
 namespace lmms
 {

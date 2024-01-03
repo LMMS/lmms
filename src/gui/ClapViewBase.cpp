@@ -1,7 +1,7 @@
 /*
  * ClapViewBase.cpp - Base class for CLAP plugin views
  *
- * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -27,23 +27,22 @@
 #ifdef LMMS_HAVE_CLAP
 
 #include <QGridLayout>
-#include <QPushButton>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <clap/clap.h>
+#include <QPushButton>
 
 #include "AudioEngine.h"
+#include "ClapControlBase.h"
+#include "ClapInstance.h"
+#include "ClapManager.h"
 #include "Controls.h"
+#include "CustomTextKnob.h"
+#include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
-#include "embed.h"
 #include "gui_templates.h"
-#include "ClapControlBase.h"
-#include "ClapManager.h"
-#include "ClapInstance.h"
 #include "MainWindow.h"
 #include "SubWindow.h"
-#include "CustomTextKnob.h"
 
 namespace lmms::gui
 {

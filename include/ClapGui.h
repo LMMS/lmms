@@ -1,7 +1,7 @@
 /*
  * ClapGui.h - Implements CLAP gui extension
  *
- * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -29,17 +29,13 @@
 
 #ifdef LMMS_HAVE_CLAP
 
+#include <string_view>
+#include <clap/ext/gui.h>
+
 #include "ClapFile.h"
 #include "ClapExtension.h"
 #include "WindowEmbed.h"
-
-#include <string_view>
-
 #include "lmms_basics.h"
-
-#include <clap/ext/gui.h>
-
-struct clap_plugin;
 
 namespace lmms
 {

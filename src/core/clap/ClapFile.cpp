@@ -1,7 +1,7 @@
 /*
  * ClapFile.cpp - Implementation of ClapFile class
  *
- * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -26,16 +26,13 @@
 
 #ifdef LMMS_HAVE_CLAP
 
+#include "ClapLog.h"
 #include "ClapManager.h"
 
 namespace lmms
 {
 
-////////////////////////////////
-// ClapFile
-////////////////////////////////
-
-ClapFile::ClapFile(std::filesystem::path filename)
+ClapFile::ClapFile(fs::path filename)
 	: m_filename{std::move(filename.make_preferred())}
 {
 }
@@ -166,10 +163,6 @@ void ClapFile::purgeInvalidPlugins()
 	);
 }
 
-////////////////////////////////
-// ClapPluginInfo
-////////////////////////////////
-
 ClapPluginInfo::ClapPluginInfo(const clap_plugin_factory* factory, std::uint32_t index)
 	: m_factory{factory}
 	, m_index{index}
@@ -267,7 +260,6 @@ ClapPluginInfo::ClapPluginInfo(ClapPluginInfo&& other) noexcept
 	, m_issues{std::move(other.m_issues)}
 {
 }
-
 
 } // namespace lmms
 

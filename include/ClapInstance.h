@@ -1,7 +1,7 @@
 /*
  * ClapInstance.h - Implementation of ClapInstance class
  *
- * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -29,6 +29,12 @@
 
 #ifdef LMMS_HAVE_CLAP
 
+#include <atomic>
+#include <memory>
+#include <clap/ext/latency.h>
+#include <clap/helpers/event-list.hh>
+#include <clap/host.h>
+
 #include "ClapAudioPorts.h"
 #include "ClapFile.h"
 #include "ClapGui.h"
@@ -38,20 +44,10 @@
 #include "ClapState.h"
 #include "ClapThreadCheck.h"
 #include "ClapTimerSupport.h"
-
-#include "Plugin.h"
 #include "MidiEvent.h"
+#include "Plugin.h"
 #include "TimePos.h"
 #include "../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
-
-#include <memory>
-#include <atomic>
-#include <cassert>
-#include <cstddef>
-
-#include <clap/clap.h>
-#include <clap/helpers/event-list.hh>
-
 #include "lmms_export.h"
 
 namespace lmms
@@ -194,11 +190,11 @@ private:
 	void setHost();
 	clap_host m_host;
 
-	static auto hostGetExtension(const clap_host* host, const char* extensionId) -> const void*;
-	static void hostRequestCallback(const clap_host* host);
-	static void hostRequestProcess(const clap_host* host);
-	static void hostRequestRestart(const clap_host* host);
-	static void hostExtLatencyChanged(const clap_host* host);
+	static auto clapGetExtension(const clap_host* host, const char* extensionId) -> const void*;
+	static void clapRequestCallback(const clap_host* host);
+	static void clapRequestProcess(const clap_host* host);
+	static void clapRequestRestart(const clap_host* host);
+	static void clapLatencyChanged(const clap_host* host);
 
 	/////////////////////////////////////////
 	// Plugin
@@ -251,11 +247,10 @@ private:
 	bool m_scheduleMainThreadCallback = false;
 
 	/**
-	 * Plugin/Host extension pointers
+	 * Extensions
 	*/
-
-	static constexpr const clap_host_latency s_hostExtLatency {
-		&hostExtLatencyChanged
+	static constexpr const clap_host_latency s_clapLatency {
+		&clapLatencyChanged
 	};
 
 	ClapAudioPorts m_audioPorts{ this };

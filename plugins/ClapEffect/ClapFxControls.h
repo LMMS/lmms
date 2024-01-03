@@ -1,7 +1,7 @@
 /*
  * ClapFxControls.h - ClapFxControls implementation
  *
- * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -25,26 +25,25 @@
 #ifndef LMMS_CLAP_FX_CONTROLS_H
 #define LMMS_CLAP_FX_CONTROLS_H
 
-#include "EffectControls.h"
 #include "ClapControlBase.h"
+#include "EffectControls.h"
 
 namespace lmms
 {
-
 
 class ClapEffect;
 
 namespace gui
 {
+
 class ClapFxControlDialog;
-}
+
+} // namespace gui
 
 
 class ClapFxControls : public EffectControls, public ClapControlBase
 {
 	Q_OBJECT
-signals:
-	void modelChanged();
 public:
 	ClapFxControls(ClapEffect* effect, const QString& uri);
 	void reload();
@@ -59,6 +58,9 @@ public:
 	auto controlCount() -> int override;
 	auto createView() -> gui::EffectControlDialog* override;
 
+signals:
+	void modelChanged();
+
 private slots:
 	void changeControl();
 
@@ -69,7 +71,6 @@ private:
 	friend class gui::ClapFxControlDialog;
 	friend class ClapEffect;
 };
-
 
 } // namespace lmms
 

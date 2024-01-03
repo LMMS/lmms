@@ -1,7 +1,7 @@
 /*
  * ClapFile.h - Implementation of ClapFile class
  *
- * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -29,34 +29,20 @@
 
 #ifdef LMMS_HAVE_CLAP
 
-#include <vector>
-#include <unordered_set>
-#include <memory>
-
-#if __has_include(<filesystem>)
-#include <filesystem>
-#elif __has_include(<experimental/filesystem>)
-#include <experimental/filesystem>
-namespace std {
-	namespace filesystem = experimental::filesystem;
-} // namespace std
-#else
-#error "Standard filesystem library not available"
-#endif
-
 #include <QLibrary>
-
+#include <memory>
+#include <unordered_set>
+#include <vector>
 #include <clap/entry.h>
-#include <clap/plugin.h>
 #include <clap/factory/plugin-factory.h>
 
 #include "Plugin.h"
 #include "PluginIssue.h"
+#include "lmms_filesystem.h"
 
 namespace lmms
 {
 
-//! Forward declare
 class ClapManager;
 
 //! Class representing info for one .clap file, which contains 1 or more CLAP plugins
@@ -64,7 +50,7 @@ class ClapFile
 {
 public:
 	//! Loads .clap file and plugin info
-	explicit ClapFile(std::filesystem::path filename);
+	explicit ClapFile(fs::path filename);
 	~ClapFile();
 
 	ClapFile(const ClapFile&) = delete;
@@ -107,7 +93,7 @@ public:
 	//! Call after creating ClapFile to load the .clap file
 	auto load() -> bool;
 
-	auto filename() const -> const std::filesystem::path& { return m_filename; }
+	auto filename() const -> const fs::path& { return m_filename; }
 	auto factory() const { return m_factory; }
 
 	//! Only includes plugins that successfully loaded
@@ -125,7 +111,7 @@ private:
 	void unload();
 
 	// Are set when the .clap file is loaded:
-	std::filesystem::path m_filename;
+	fs::path m_filename;
 	std::unique_ptr<QLibrary> m_library;
 	const clap_plugin_entry* m_entry = nullptr;
 	const clap_plugin_factory* m_factory = nullptr;

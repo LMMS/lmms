@@ -1,7 +1,7 @@
 /*
  * ClapState.h - Implements CLAP state extension
  *
- * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -32,7 +32,6 @@
 #include <optional>
 #include <string>
 #include <string_view>
-
 #include <clap/ext/state.h>
 
 #include "ClapExtension.h"

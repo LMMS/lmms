@@ -1,7 +1,7 @@
 /*
  * ClapEffect.h - Implementation of CLAP effect
  *
- * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -25,14 +25,13 @@
 #ifndef LMMS_CLAP_EFFECT_H
 #define LMMS_CLAP_EFFECT_H
 
-#include "Effect.h"
-#include "ClapFxControls.h"
-
 #include <QTimer>
+
+#include "ClapFxControls.h"
+#include "Effect.h"
 
 namespace lmms
 {
-
 
 class ClapEffect : public Effect
 {
@@ -57,7 +56,6 @@ private:
 
 	QTimer m_idleTimer;
 };
-
 
 } // namespace lmms
 

@@ -1,7 +1,7 @@
 /*
  * ClapTimerSupport.h - Implements CLAP timer support extension
  *
- * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -30,9 +30,7 @@
 #ifdef LMMS_HAVE_CLAP
 
 #include <QObject>
-
 #include <unordered_set>
-
 #include <clap/ext/timer-support.h>
 
 #include "ClapExtension.h"
@@ -40,7 +38,7 @@
 namespace lmms
 {
 
-class ClapTimerSupport
+class ClapTimerSupport final
 	: public QObject
 	, public ClapExtension<clap_host_timer_support, clap_plugin_timer_support>
 {

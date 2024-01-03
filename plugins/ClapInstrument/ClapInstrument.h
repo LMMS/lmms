@@ -1,7 +1,7 @@
 /*
  * ClapInstrument.h - Implementation of CLAP instrument
  *
- * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -28,11 +28,11 @@
 #include <QString>
 #include <QTimer>
 
+#include "ClapControlBase.h"
+#include "ClapViewBase.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Note.h"
-#include "ClapControlBase.h"
-#include "ClapViewBase.h"
 
 // whether to use MIDI vs playHandle
 // currently only MIDI works
@@ -46,7 +46,7 @@ namespace gui
 
 class ClapInsView;
 
-}
+} // namespace gui
 
 class ClapInstrument : public Instrument, public ClapControlBase
 {

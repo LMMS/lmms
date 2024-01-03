@@ -1,7 +1,7 @@
 /*
  * ClapParameter.cpp - Implementation of ClapParameter class
  *
- * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -26,13 +26,11 @@
 
 #ifdef LMMS_HAVE_CLAP
 
-#include "ClapInstance.h"
-#include "ClapParams.h"
-
+#include <QString>
 #include <cmath>
 
-#include <QString>
-#include <QDebug>
+#include "ClapInstance.h"
+#include "ClapParams.h"
 
 namespace lmms
 {

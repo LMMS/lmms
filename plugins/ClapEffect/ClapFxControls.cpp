@@ -1,7 +1,7 @@
 /*
  * ClapFxControls.cpp - ClapFxControls implementation
  *
- * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -24,11 +24,11 @@
 
 #include "ClapFxControls.h"
 
+#include <QDomElement>
+
 #include "ClapEffect.h"
 #include "ClapFxControlDialog.h"
 #include "Engine.h"
-
-#include <QDomElement>
 
 namespace lmms
 {

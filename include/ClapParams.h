@@ -1,7 +1,7 @@
 /*
  * ClapParams.h - Implements CLAP params extension
  *
- * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -31,7 +31,6 @@
 
 #include <vector>
 #include <unordered_map>
-
 #include <clap/ext/params.h>
 #include <clap/helpers/event-list.hh>
 #include <clap/helpers/reducing-param-queue.hh>

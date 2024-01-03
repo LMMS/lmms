@@ -1,7 +1,7 @@
 /*
  * ClapControlBase.cpp - CLAP control base class
  *
- * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -158,7 +158,7 @@ void ClapControlBase::loadSettings(const QDomElement& elem)
 void ClapControlBase::loadFile([[maybe_unused]] const QString& file)
 {
 	// TODO: load preset using clap_plugin_preset_load if supported by plugin
-	ClapLog::globalLog(CLAP_LOG_ERROR, "ClapControlBase::loadFile() called, but it is unimplemented");
+	ClapLog::globalLog(CLAP_LOG_ERROR, "ClapControlBase::loadFile() [NOT IMPLEMENTED YET]");
 }
 
 void ClapControlBase::reload()

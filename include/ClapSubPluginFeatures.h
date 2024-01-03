@@ -3,7 +3,7 @@
  *                           Plugin::Descriptor::SubPluginFeatures for
  *                           hosting CLAP plugins
  *
- * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -33,7 +33,6 @@
 
 #include "ClapFile.h"
 #include "Plugin.h"
-
 #include "lmms_export.h"
 
 namespace lmms

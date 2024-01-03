@@ -1,7 +1,7 @@
 /*
  * ClapLog.cpp - Implements CLAP log extension
  *
- * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -28,6 +28,7 @@
 
 #include <iostream>
 
+#include "ClapInstance.h"
 #include "ClapManager.h"
 
 namespace lmms

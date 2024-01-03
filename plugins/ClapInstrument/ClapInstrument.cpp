@@ -1,7 +1,7 @@
 /*
  * ClapInstrument.cpp - Implementation of CLAP instrument
  *
- * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -29,17 +29,15 @@
 #include <QPushButton>
 
 #include "AudioEngine.h"
+#include "ClapLog.h"
+#include "ClapSubPluginFeatures.h"
+#include "Clipboard.h"
+#include "embed.h"
 #include "Engine.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
-#include "ClapSubPluginFeatures.h"
-#include "StringPairDrag.h"
-#include "Clipboard.h"
-#include "ClapLog.h"
-
-#include "embed.h"
 #include "plugin_export.h"
-
+#include "StringPairDrag.h"
 
 namespace lmms
 {
@@ -167,7 +165,7 @@ auto ClapInstrument::instantiateView(QWidget* parent) -> gui::PluginView*
 
 void ClapInstrument::updatePitchRange()
 {
-	ClapLog::globalLog(CLAP_LOG_ERROR, "Cannot update pitch range for CLAP plugin: not implemented yet");
+	ClapLog::globalLog(CLAP_LOG_ERROR, "ClapInstrument::updatePitchRange() [NOT IMPLEMENTED YET]");
 	// TODO
 }
 

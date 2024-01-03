@@ -1,7 +1,7 @@
 /*
  * ClapTimerSupport.cpp - Implements CLAP timer support extension
  *
- * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -27,9 +27,8 @@
 #ifdef LMMS_HAVE_CLAP
 
 #include <QTimerEvent>
-
-#include <string>
 #include <cassert>
+#include <string>
 
 #include "ClapInstance.h"
 

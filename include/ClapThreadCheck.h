@@ -1,7 +1,7 @@
 /*
  * ClapThreadCheck.h - Implements CLAP thread check extension
  *
- * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -36,7 +36,7 @@
 namespace lmms
 {
 
-class ClapThreadCheck : public ClapExtension<clap_host_thread_check>
+class ClapThreadCheck final : public ClapExtension<clap_host_thread_check>
 {
 public:
 	using ClapExtension::ClapExtension;

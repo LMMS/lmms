@@ -1,7 +1,7 @@
 /*
  * ClapParams.cpp - Implements CLAP params extension
  *
- * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -27,7 +27,6 @@
 #ifdef LMMS_HAVE_CLAP
 
 #include <cassert>
-
 #include <clap/helpers/reducing-param-queue.hxx>
 
 #include "ClapInstance.h"
@@ -484,7 +483,7 @@ void ClapParams::clapRescan(const clap_host* host, clap_param_rescan_flags flags
 void ClapParams::clapClear(const clap_host* host, clap_id param_id, clap_param_clear_flags flags)
 {
 	assert(ClapThreadCheck::isMainThread());
-	ClapLog::globalLog(CLAP_LOG_INFO, "ClapParams::clapClear [UNIMPLEMENTED]");
+	ClapLog::globalLog(CLAP_LOG_ERROR, "ClapParams::clapClear() [NOT IMPLEMENTED YET]");
 	// TODO
 }
 
