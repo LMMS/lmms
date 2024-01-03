@@ -37,14 +37,18 @@ ClapFile::ClapFile(fs::path filename)
 {
 }
 
+ClapFile::~ClapFile()
+{
+	unload();
+}
+
 ClapFile::ClapFile(ClapFile&& other) noexcept
 	: m_filename{std::move(other.m_filename)}
-	, m_library{std::exchange(other.m_library, nullptr)}
-	, m_entry{std::exchange(other.m_entry, nullptr)}
-	, m_factory{std::exchange(other.m_factory, nullptr)}
+	, m_library{std::move(other.m_library)}
+	, m_entry{std::move(other.m_entry)}
+	, m_factory{other.m_factory}
 	, m_pluginInfo{std::move(other.m_pluginInfo)}
 	, m_pluginCount{other.m_pluginCount}
-	, m_valid{std::exchange(other.m_valid, false)}
 {
 }
 
@@ -53,19 +57,13 @@ auto ClapFile::operator=(ClapFile&& rhs) noexcept -> ClapFile&
 	if (this != &rhs)
 	{
 		m_filename = std::move(rhs.m_filename);
-		m_library = std::exchange(rhs.m_library, nullptr);
-		m_entry = std::exchange(rhs.m_entry, nullptr);
-		m_factory = std::exchange(rhs.m_factory, nullptr);
+		m_library = std::move(rhs.m_library);
+		m_entry = std::move(rhs.m_entry);
+		m_factory = rhs.m_factory;
 		m_pluginInfo = std::move(rhs.m_pluginInfo);
 		m_pluginCount = rhs.m_pluginCount;
-		m_valid = std::exchange(rhs.m_valid, false);
 	}
 	return *this;
-}
-
-ClapFile::~ClapFile()
-{
-	unload();
 }
 
 auto ClapFile::load() -> bool
@@ -73,18 +71,16 @@ auto ClapFile::load() -> bool
 	// Do not allow reloading yet
 	if (m_library && m_library->isLoaded()) { return false; }
 
-	m_valid = false;
-
 	// TODO: Replace QLibrary with in-house non-Qt alternative
-	const auto filenameStr = filename().u8string();
-	m_library = std::make_unique<QLibrary>(QString::fromUtf8(filenameStr.c_str(), filenameStr.size()));
+	const auto file = filename().u8string();
+	m_library = std::make_unique<QLibrary>(QString::fromUtf8(file.c_str(), file.size()));
 	if (!m_library->load())
 	{
 		ClapLog::globalLog(CLAP_LOG_ERROR, m_library->errorString().toStdString());
 		return false;
 	}
 
-	m_entry = reinterpret_cast<const clap_plugin_entry*>(m_library->resolve("clap_entry"));
+	m_entry.reset(reinterpret_cast<const clap_plugin_entry*>(m_library->resolve("clap_entry")));
 	if (!m_entry)
 	{
 		std::string msg = "Unable to resolve entry point in '" + filename().string() + "'";
@@ -93,7 +89,7 @@ auto ClapFile::load() -> bool
 		return false;
 	}
 
-	if (!m_entry->init(filenameStr.c_str()))
+	if (!m_entry->init(file.c_str()))
 	{
 		std::string msg = "Failed to initialize '" + filename().string() + "'";
 		ClapLog::globalLog(CLAP_LOG_ERROR, msg);
@@ -118,147 +114,37 @@ auto ClapFile::load() -> bool
 	}
 
 	m_pluginInfo.clear();
-	for (std::uint32_t i = 0; i < m_pluginCount; ++i)
+	for (std::uint32_t idx = 0; idx < m_pluginCount; ++idx)
 	{
-		auto& plugin = m_pluginInfo.emplace_back(std::make_shared<const ClapPluginInfo>(m_factory, i));
-		if (!plugin || !plugin->isValid())
+		if (auto plugin = ClapPluginInfo::create(*m_factory, idx))
 		{
-			m_pluginInfo.pop_back();
-			continue;
+			m_pluginInfo.emplace_back(std::move(plugin));
 		}
 	}
 
-	m_valid = true;
 	return true;
 }
 
-void ClapFile::unload()
+void ClapFile::unload() noexcept
 {
 	// NOTE: Need to destroy any plugin instances from this .clap file before
 	// calling this method. This should be okay as long as the ClapManager
 	// singleton is destroyed after any ClapControlBase objects.
+	// TODO: Enforce this?
 
-	if (m_entry)
-	{
-		// No more calls into the shared library can be made after this
-		m_entry->deinit();
-		m_entry = nullptr;
-	}
+	m_entry.reset();
 
 	if (m_library)
 	{
 		m_library->unload();
 		m_library = nullptr;
 	}
-
-	m_valid = false;
 }
 
-void ClapFile::purgeInvalidPlugins()
+void ClapFile::EntryDeleter::operator()(const clap_plugin_entry* ptr)
 {
-	m_pluginInfo.erase(std::remove_if(
-		m_pluginInfo.begin(), m_pluginInfo.end(), [](const auto& pi) {
-			return !pi || !pi->isValid();
-		})
-	);
-}
-
-ClapPluginInfo::ClapPluginInfo(const clap_plugin_factory* factory, std::uint32_t index)
-	: m_factory{factory}
-	, m_index{index}
-{
-	assert(m_factory != nullptr);
-
-	m_descriptor = m_factory->get_plugin_descriptor(m_factory, m_index);
-	if (!m_descriptor)
-	{
-		ClapLog::globalLog(CLAP_LOG_ERROR, "No plugin descriptor");
-		return;
-	}
-
-	if (!m_descriptor->id || !m_descriptor->name)
-	{
-		ClapLog::globalLog(CLAP_LOG_ERROR, "Invalid plugin descriptor");
-		return;
-	}
-
-	if (!clap_version_is_compatible(m_descriptor->clap_version))
-	{
-		std::string msg = "Plugin '";
-		msg += m_descriptor->id;
-		msg += "' uses unsupported CLAP version '";
-		msg += std::to_string(m_descriptor->clap_version.major) + "."
-			+ std::to_string(m_descriptor->clap_version.minor) + "."
-			+ std::to_string(m_descriptor->clap_version.revision);
-		msg += "'. Must be at least 1.0.0.";
-		ClapLog::globalLog(CLAP_LOG_ERROR, msg);
-		return;
-	}
-
-	if (ClapManager::debugging())
-	{
-		std::string msg = "name: ";
-		msg += m_descriptor->name;
-		msg += "\nid: ";
-		msg += m_descriptor->id;
-		msg += "\nversion: ";
-		msg += (m_descriptor->version ? m_descriptor->version : "");
-		msg += "\nCLAP version: ";
-		msg += std::to_string(m_descriptor->clap_version.major) + "."
-			+ std::to_string(m_descriptor->clap_version.minor) + "."
-			+ std::to_string(m_descriptor->clap_version.revision);
-		msg += "\ndescription: ";
-		msg += (m_descriptor->description ? m_descriptor->description : "");
-		ClapLog::plainLog(CLAP_LOG_DEBUG, msg);
-	}
-
-	m_type = Plugin::Type::Undefined;
-	auto features = m_descriptor->features;
-	while (features && *features)
-	{
-		auto feature = std::string_view{*features};
-		if (ClapManager::debugging())
-		{
-			std::string msg = "feature: " + std::string{feature};
-			ClapLog::plainLog(CLAP_LOG_DEBUG, msg);
-		}
-
-		if (feature == CLAP_PLUGIN_FEATURE_INSTRUMENT)
-		{
-			m_type = Plugin::Type::Instrument;
-		}
-		else if (feature == CLAP_PLUGIN_FEATURE_AUDIO_EFFECT
-			|| feature == "effect" /* non-standard, but used by Surge XT Effects */)
-		{
-			m_type = Plugin::Type::Effect;
-		}
-		/*else if (feature == CLAP_PLUGIN_FEATURE_ANALYZER)
-		{
-			m_type = Plugin::Type::Tool;
-		}*/
-		++features;
-	}
-
-	if (m_type == Plugin::Type::Undefined)
-	{
-		std::string msg = "Plugin '" + std::string{m_descriptor->id}
-			+ "' is not recognized as an instrument or audio effect";
-		ClapLog::globalLog(CLAP_LOG_ERROR, msg);
-		return;
-	}
-
-	// So far the plugin is valid, but it may be invalidated later TODO: ???
-	m_valid = true;
-}
-
-ClapPluginInfo::ClapPluginInfo(ClapPluginInfo&& other) noexcept
-	: m_factory{std::exchange(other.m_factory, nullptr)}
-	, m_index{other.m_index}
-	, m_descriptor{std::exchange(other.m_descriptor, nullptr)}
-	, m_type{std::exchange(other.m_type, Plugin::Type::Undefined)}
-	, m_valid{std::exchange(other.m_valid, false)}
-	, m_issues{std::move(other.m_issues)}
-{
+	// No more calls into the shared library can be made after this
+	ptr->deinit();
 }
 
 } // namespace lmms

@@ -46,27 +46,27 @@ ClapSubPluginFeatures::ClapSubPluginFeatures(Plugin::Type type)
 
 void ClapSubPluginFeatures::fillDescriptionWidget(QWidget* parent, const Key* key) const
 {
-	const auto descriptor = pluginInfo(*key)->descriptor();
+	const auto& descriptor = pluginInfo(*key)->descriptor();
 
 	auto label = new QLabel(parent);
-	label->setText(QWidget::tr("Name: ") + QString::fromUtf8(descriptor->name));
+	label->setText(QWidget::tr("Name: ") + QString::fromUtf8(descriptor.name));
 
 	auto versionLabel = new QLabel(parent);
-	versionLabel->setText(QWidget::tr("Version: ") + QString::fromUtf8(descriptor->version));
+	versionLabel->setText(QWidget::tr("Version: ") + QString::fromUtf8(descriptor.version));
 
 	auto urlLabel = new QLabel(parent);
-	urlLabel->setText(QWidget::tr("URL: ") + QString::fromUtf8(descriptor->url));
+	urlLabel->setText(QWidget::tr("URL: ") + QString::fromUtf8(descriptor.url));
 
-	if (descriptor->manual_url && descriptor->manual_url[0] != '\0')
+	if (descriptor.manual_url && descriptor.manual_url[0] != '\0')
 	{
 		auto urlLabel = new QLabel(parent);
-		urlLabel->setText(QWidget::tr("Manual URL: ") + QString::fromUtf8(descriptor->manual_url));
+		urlLabel->setText(QWidget::tr("Manual URL: ") + QString::fromUtf8(descriptor.manual_url));
 	}
 
-	if (descriptor->support_url && descriptor->support_url[0] != '\0')
+	if (descriptor.support_url && descriptor.support_url[0] != '\0')
 	{
 		auto urlLabel = new QLabel(parent);
-		urlLabel->setText(QWidget::tr("Support URL: ") + QString::fromUtf8(descriptor->support_url));
+		urlLabel->setText(QWidget::tr("Support URL: ") + QString::fromUtf8(descriptor.support_url));
 	}
 
 	auto author = new QWidget(parent);
@@ -79,7 +79,7 @@ void ClapSubPluginFeatures::fillDescriptionWidget(QWidget* parent, const Key* ke
 	authorLabel->setAlignment(Qt::AlignTop);
 
 	auto authorContent = new QLabel(author);
-	authorContent->setText(QString::fromUtf8(descriptor->vendor));
+	authorContent->setText(QString::fromUtf8(descriptor.vendor));
 	authorContent->setWordWrap(true);
 
 	l->addWidget(authorLabel);
@@ -108,18 +108,17 @@ void ClapSubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor* desc, Ke
 {
 	for (const auto& file : Engine::getClapManager()->files())
 	{
-		assert(file.isValid());
-		for (const auto& pluginInfo : file.pluginInfo())
-		{
-			assert(pluginInfo != nullptr);
-			if (pluginInfo->type() == m_type && pluginInfo->isValid())
-			{
-				const auto clapDesc = pluginInfo->descriptor();
-				Key::AttributeMap atm;
-				atm["uri"] = QString::fromUtf8(clapDesc->id);
+		if (!file) { continue; }
 
-				kl.push_back(Key{desc, QString::fromUtf8(clapDesc->name), atm});
-			}
+		for (const auto& info : file->pluginInfo())
+		{
+			if (!info || info->type() != m_type) { continue; }
+
+			const auto& plugin = info->descriptor();
+			Key::AttributeMap atm;
+			atm["uri"] = QString::fromUtf8(plugin.id);
+
+			kl.push_back(Key{desc, QString::fromUtf8(plugin.name), atm});
 		}
 	}
 }
@@ -132,12 +131,12 @@ auto ClapSubPluginFeatures::additionalFileExtensions([[maybe_unused]] const Key&
 
 auto ClapSubPluginFeatures::displayName(const Key& key) const -> QString
 {
-	return QString::fromUtf8(pluginInfo(key)->descriptor()->name);
+	return QString::fromUtf8(pluginInfo(key)->descriptor().name);
 }
 
 auto ClapSubPluginFeatures::description(const Key& key) const -> QString
 {
-	return QString::fromUtf8(pluginInfo(key)->descriptor()->description);
+	return QString::fromUtf8(pluginInfo(key)->descriptor().description);
 }
 
 auto ClapSubPluginFeatures::logo([[maybe_unused]] const Key& key) const -> const PixmapLoader*
@@ -145,11 +144,9 @@ auto ClapSubPluginFeatures::logo([[maybe_unused]] const Key& key) const -> const
 	return nullptr;
 }
 
-auto ClapSubPluginFeatures::pluginInfo(const Key& key) -> std::shared_ptr<const ClapPluginInfo>
+auto ClapSubPluginFeatures::pluginInfo(const Key& key) -> const ClapPluginInfo*
 {
-	const auto result = Engine::getClapManager()->pluginInfo(key.attributes["uri"]);
-	Q_ASSERT(!result.expired());
-	return result.lock();
+	return Engine::getClapManager()->pluginInfo(key.attributes["uri"]);
 }
 
 } // namespace lmms

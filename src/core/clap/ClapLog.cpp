@@ -89,7 +89,7 @@ void ClapLog::log(clap_log_severity severity, std::string_view msg) const
 	std::ostream* ostr;
 	const auto severityStr = logHelper(severity, ostr);
 
-	*ostr << "[" << severityStr << "] [" << instance()->info().descriptor()->id << "] [CLAP] " << msg << "\n";
+	*ostr << "[" << severityStr << "] [" << instance()->info().descriptor().id << "] " << msg << "\n";
 }
 
 void ClapLog::log(clap_log_severity severity, const char* msg) const
@@ -104,7 +104,7 @@ void ClapLog::globalLog(clap_log_severity severity, std::string_view msg)
 	std::ostream* ostr;
 	const auto severityStr = logHelper(severity, ostr);
 
-	*ostr << "[" << severityStr << "] [*] [CLAP] " << msg << "\n";
+	*ostr << "[" << severityStr << "] [*] " << msg << "\n";
 }
 
 void ClapLog::plainLog(clap_log_severity severity, std::string_view msg)

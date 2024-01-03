@@ -57,7 +57,7 @@ struct MidiInputEvent
 	f_cnt_t offset;
 };
 
-ClapInstance::ClapInstance(const ClapPluginInfo* pluginInfo, Model* parent)
+ClapInstance::ClapInstance(const ClapPluginInfo& pluginInfo, Model* parent)
 	: QObject{parent}
 	, m_pluginInfo{pluginInfo}
 	, m_midiInputBuf{s_maxMidiInputEvents}
@@ -208,9 +208,8 @@ auto ClapInstance::load() -> bool
 	checkPluginStateCurrent(PluginState::None);
 
 	// Create plugin instance, destroying any previous plugin instance first
-	const auto factory = m_pluginInfo->factory();
-	assert(factory != nullptr);
-	m_plugin = factory->create_plugin(factory, host(), m_pluginInfo->descriptor()->id);
+	const auto& factory = info().factory();
+	m_plugin = factory.create_plugin(&factory, host(), info().descriptor().id);
 	if (!m_plugin)
 	{
 		logger().log(CLAP_LOG_ERROR, "Failed to create plugin instance");
@@ -266,7 +265,7 @@ auto ClapInstance::init() -> bool
 	if (!m_plugin->init(m_plugin))
 	{
 		{
-			std::string msg = "Could not init the plugin with id: " + std::string{info().descriptor()->id};
+			std::string msg = "Could not init the plugin with id: " + std::string{info().descriptor().id};
 			logger().log(CLAP_LOG_ERROR, msg);
 		}
 		setPluginState(PluginState::LoadedWithError);

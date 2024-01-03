@@ -59,6 +59,9 @@ clap_event_transport ClapTransport::s_transport = {};
 
 void ClapTransport::update()
 {
+	// TODO: If the main thread calls this while any of the setters
+	//       are called, a data race could occur
+
 	s_transport = {};
 	s_transport.header.size = sizeof(clap_event_transport);
 	s_transport.header.type = CLAP_EVENT_TRANSPORT;

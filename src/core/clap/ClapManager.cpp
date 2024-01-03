@@ -27,6 +27,7 @@
 #ifdef LMMS_HAVE_CLAP
 
 #include <algorithm>
+#include <cassert>
 #include <chrono>
 #include <cstdlib>
 #include <string>
@@ -69,10 +70,9 @@ ClapManager::~ClapManager()
 {
 	ClapLog::plainLog(CLAP_LOG_DEBUG, "ClapManager::~ClapManager()");
 
-	// Deactivate and destroy plugin instances first
-	//m_instances.clear();
+	// NOTE: All plugin instances need to be deactivated and destroyed first
 
-	// Then deinit the .clap files and unload the shared libraries
+	// Deinit the .clap files and unload the shared libraries
 	m_files.clear();
 
 	ClapLog::plainLog(CLAP_LOG_DEBUG, "ClapManager::~ClapManager() end");
@@ -185,16 +185,15 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 {
 	if (!m_files.empty()) { return; } // Cannot unload CLAP plugins yet
 
-	//m_instances.clear();
 	m_files.clear();
-	m_uriToPluginInfo.clear();
+	m_uriMap.clear();
 	m_pluginInfo.clear();
 
 	const auto startTime = std::chrono::steady_clock::now();
 
-	// Search searchPaths for files with ".clap" extension
+	// Search `searchPaths` for files with ".clap" extension
 	int totalClapFiles = 0;
-	int totalClapPlugins = 0;
+	int totalPlugins = 0;
 	for (const auto& path : searchPaths)
 	{
 		for (const auto& entry : fs::recursive_directory_iterator{path})
@@ -216,9 +215,8 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 				ClapLog::plainLog(msg);
 			}
 
-			auto& clapFile = m_files.emplace_back(entryPath);
-			clapFile.load();
-			if (!clapFile.isValid())
+			auto& file = m_files.emplace_back(std::make_unique<ClapFile>(entryPath));
+			if (!file || !file->load())
 			{
 				std::string msg = "Failed to load '";
 				msg += entryPath.string();
@@ -228,31 +226,29 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 				continue;
 			}
 
-			bool purgeNeeded = false;
-			totalClapPlugins += clapFile.pluginCount();
-			for (const auto& plugin : clapFile.pluginInfo())
+			totalPlugins += file->pluginCount();
+			for (auto& plugin : file->pluginInfo(ClapFile::AccessKey{}))
 			{
-				const bool added = m_uriToPluginInfo.emplace(std::string{plugin->descriptor()->id}, std::weak_ptr{plugin}).second;
+				assert(plugin.has_value());
+				const bool added = m_uriMap.emplace(std::string{plugin->descriptor().id}, *plugin).second;
 				if (!added)
 				{
 					if (debugging())
 					{
 						std::string msg = "Plugin ID '";
-						msg += plugin->descriptor()->id;
+						msg += plugin->descriptor().id;
 						msg += "' in the plugin file '";
 						msg += entryPath.string();
 						msg += "' is identical to an ID from a previously loaded plugin file.";
 						ClapLog::globalLog(CLAP_LOG_INFO, msg);
 						ClapLog::globalLog(CLAP_LOG_INFO, "Skipping the duplicate plugin");
 					}
-					plugin->invalidate();
-					purgeNeeded = true;
+					plugin.reset(); // invalidate duplicate plugin
 					continue;
 				}
-				m_pluginInfo.push_back(plugin);
-			}
 
-			if (purgeNeeded) { clapFile.purgeInvalidPlugins(); }
+				m_pluginInfo.push_back(&plugin.value());
+			}
 		}
 	}
 
@@ -260,35 +256,33 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 		const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
 			std::chrono::steady_clock::now() - startTime);
 		std::string msg = "CLAP plugin SUMMARY: ";
-		msg += std::to_string(m_files.size()) + " of " + std::to_string(totalClapPlugins);
-		msg += " plugins loaded in " + std::to_string(elapsed.count()) + " msecs.";
+		msg += std::to_string(m_pluginInfo.size()) + " out of " + std::to_string(totalPlugins);
+		msg += " plugins in " + std::to_string(m_files.size()) + " out of " + std::to_string(totalClapFiles);
+		msg += " plugin files loaded in " + std::to_string(elapsed.count()) + " msecs.";
 		ClapLog::plainLog(msg);
 	}
 
-	if (m_files.size() != totalClapFiles || m_pluginInfo.size() != totalClapPlugins)
+	if (debugging())
 	{
-		if (debugging())
-		{
-			ClapLog::plainLog(
-				"If you don't want to see all this debug output, please set\n"
-				"  environment variable \"LMMS_CLAP_DEBUG\" to empty or\n"
-				"  do not set it.");
-		}
-		else
-		{
-			ClapLog::plainLog("For details about not loaded plugins, please set\n"
-				"  environment variable \"LMMS_CLAP_DEBUG\" to nonempty.");
-		}
+		ClapLog::plainLog(
+			"If you don't want to see all this debug output, please set\n"
+			"  environment variable \"LMMS_CLAP_DEBUG\" to empty or\n"
+			"  do not set it.");
+	}
+	else if (m_files.size() != totalClapFiles || m_pluginInfo.size() != totalPlugins)
+	{
+		ClapLog::plainLog("For details about not loaded plugins, please set\n"
+			"  environment variable \"LMMS_CLAP_DEBUG\" to nonempty.");
 	}
 }
 
-auto ClapManager::pluginInfo(const std::string& uri) -> std::weak_ptr<const ClapPluginInfo>
+auto ClapManager::pluginInfo(const std::string& uri) const -> const ClapPluginInfo*
 {
-	const auto iter = m_uriToPluginInfo.find(uri);
-	return iter != m_uriToPluginInfo.end() ? iter->second : std::weak_ptr<const ClapPluginInfo>{};
+	const auto iter = m_uriMap.find(uri);
+	return iter != m_uriMap.end() ? &iter->second : nullptr;
 }
 
-auto ClapManager::pluginInfo(const QString& uri) -> std::weak_ptr<const ClapPluginInfo>
+auto ClapManager::pluginInfo(const QString& uri) const -> const ClapPluginInfo*
 {
 	return pluginInfo(uri.toStdString());
 }

@@ -92,12 +92,12 @@ auto ClapParams::rescan(clap_param_rescan_flags flags) -> bool
 	std::unordered_set<clap_id> paramIds(count * 2);
 	bool needToUpdateParamsCache = false;
 
-	for (std::int32_t i = 0; i < count; ++i)
+	for (std::int32_t idx = 0; idx < count; ++idx)
 	{
 		clap_param_info info{};
 		info.id = CLAP_INVALID_ID;
 
-		if (!pluginExt()->get_info(plugin(), i, &info))
+		if (!pluginExt()->get_info(plugin(), idx, &info))
 		{
 			logger()->log(CLAP_LOG_WARNING, "clap_plugin_params.get_info() returned false!");
 			return false; // TODO: continue?
@@ -208,11 +208,11 @@ auto ClapParams::rescan(clap_param_rescan_flags flags) -> bool
 	if (needToUpdateParamsCache)
 	{
 		m_params.resize(m_paramMap.size());
-		int i = 0;
+		int idx = 0;
 		for (const auto& elem : m_paramMap)
 		{
-			m_params[i] = elem.second.get();
-			++i;
+			m_params[idx] = elem.second.get();
+			++idx;
 		}
 	}
 
@@ -323,9 +323,9 @@ void ClapParams::generatePluginInputEvents()
 void ClapParams::handlePluginOutputEvents()
 {
 	// TODO: Are LMMS models being updated with values here?
-	for (std::uint32_t i = 0; i < m_evOut->size(); ++i)
+	for (std::uint32_t idx = 0; idx < m_evOut->size(); ++idx)
 	{
-		auto header = m_evOut->get(i);
+		auto header = m_evOut->get(idx);
 		switch (header->type)
 		{
 			case CLAP_EVENT_PARAM_GESTURE_BEGIN:

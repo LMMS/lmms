@@ -31,13 +31,12 @@
 
 #ifdef LMMS_HAVE_CLAP
 
-#include "ClapFile.h"
+#include "ClapPluginInfo.h"
 #include "Plugin.h"
 #include "lmms_export.h"
 
 namespace lmms
 {
-
 
 class LMMS_EXPORT ClapSubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures
 {
@@ -52,9 +51,8 @@ public:
 	auto logo(const Key& key) const -> const PixmapLoader* override;
 
 private:
-	static auto pluginInfo(const Key& key) -> std::shared_ptr<const ClapPluginInfo>;
+	static auto pluginInfo(const Key& key) -> const ClapPluginInfo*;
 };
-
 
 } // namespace lmms
 

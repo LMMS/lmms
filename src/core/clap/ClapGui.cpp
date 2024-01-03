@@ -142,7 +142,7 @@ auto ClapGui::create() -> bool
 	if (isFloating())
 	{
 		pluginExt()->set_transient(plugin(), &m_window);
-		if (const auto name = instance()->info().descriptor()->name; name && name[0] != '\0')
+		if (const auto name = instance()->info().descriptor().name; name && name[0] != '\0')
 		{
 			pluginExt()->suggest_title(plugin(), name);
 		}

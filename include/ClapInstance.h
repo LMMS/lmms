@@ -36,11 +36,11 @@
 #include <clap/host.h>
 
 #include "ClapAudioPorts.h"
-#include "ClapFile.h"
 #include "ClapGui.h"
 #include "ClapLog.h"
 #include "ClapNotePorts.h"
 #include "ClapParams.h"
+#include "ClapPluginInfo.h"
 #include "ClapState.h"
 #include "ClapThreadCheck.h"
 #include "ClapTimerSupport.h"
@@ -75,7 +75,7 @@ class LMMS_EXPORT ClapInstance final : public QObject
 
 public:
 	ClapInstance() = delete;
-	ClapInstance(const ClapPluginInfo* pluginInfo, Model* parent);
+	ClapInstance(const ClapPluginInfo& pluginInfo, Model* parent);
 	~ClapInstance() override;
 
 	ClapInstance(const ClapInstance&) = delete;
@@ -136,7 +136,7 @@ public:
 
 	auto host() const -> const clap_host* { return &m_host; };
 	auto plugin() const -> const clap_plugin* { return m_plugin; }
-	auto info() const -> const ClapPluginInfo& { return *m_pluginInfo; }
+	auto info() const -> const ClapPluginInfo& { return m_pluginInfo; }
 
 	/////////////////////////////////////////
 	// Extensions
@@ -210,7 +210,7 @@ private:
 	auto pluginExtensionInit(const T*& ext, const char* id, F* checkFunc) -> bool;
 
 	const clap_plugin* m_plugin = nullptr;
-	const ClapPluginInfo* m_pluginInfo; // TODO: Use weak_ptr instead?
+	ClapPluginInfo m_pluginInfo;
 
 	PluginState m_pluginState = PluginState::Inactive;
 

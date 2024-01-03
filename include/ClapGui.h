@@ -32,7 +32,6 @@
 #include <string_view>
 #include <clap/ext/gui.h>
 
-#include "ClapFile.h"
 #include "ClapExtension.h"
 #include "WindowEmbed.h"
 #include "lmms_basics.h"

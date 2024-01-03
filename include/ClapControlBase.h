@@ -32,8 +32,8 @@
 #include <memory>
 
 #include "ArrayVector.h"
-#include "ClapFile.h"
 #include "ClapInstance.h"
+#include "ClapPluginInfo.h"
 #include "DataFile.h"
 #include "LinkedModelGroups.h"
 #include "Plugin.h"

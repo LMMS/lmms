@@ -121,7 +121,7 @@ private:
 	clap_param_info m_info;
 	double m_value = 0.0;
 	double m_modulation = 0.0;
-	std::unordered_map<int64_t, std::string> m_enumEntries;
+	std::unordered_map<std::int64_t, std::string> m_enumEntries;
 
 	//! An AutomatableModel is created if the param is to be shown to the user
 	std::unique_ptr<AutomatableModel> m_connectedModel;

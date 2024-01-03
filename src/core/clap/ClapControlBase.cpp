@@ -49,10 +49,13 @@ void ClapControlBase::init(Model* that, const QString& uri)
 
 	m_valid = false;
 	auto manager = Engine::getClapManager();
-	m_info = manager->pluginInfo(uri).lock().get();
+	m_info = manager->pluginInfo(uri);
 	if (!m_info)
 	{
-		qCritical() << "No CLAP plugin found for URI" << uri;
+		std::string msg = "No plugin found for ID '";
+		msg += uri.toStdString();
+		msg += "'";
+		ClapLog::globalLog(CLAP_LOG_ERROR, msg);
 		return;
 	}
 
@@ -60,7 +63,7 @@ void ClapControlBase::init(Model* that, const QString& uri)
 
 	ClapLog::globalLog(CLAP_LOG_DEBUG, "Creating CLAP instance (#1)");
 	m_instances.clear();
-	auto& first = m_instances.emplace_back(std::make_unique<ClapInstance>(m_info, that));
+	auto& first = m_instances.emplace_back(std::make_unique<ClapInstance>(*m_info, that));
 	if (!first || !first->isValid())
 	{
 		ClapLog::globalLog(CLAP_LOG_ERROR, "Failed instantiating CLAP processor");
@@ -72,7 +75,7 @@ void ClapControlBase::init(Model* that, const QString& uri)
 	{
 		// A second instance is needed for stereo input/output
 		ClapLog::globalLog(CLAP_LOG_DEBUG, "Creating CLAP instance (#2)");
-		auto& second = m_instances.emplace_back(std::make_unique<ClapInstance>(m_info, that));
+		auto& second = m_instances.emplace_back(std::make_unique<ClapInstance>(*m_info, that));
 		if (!second || !second->isValid())
 		{
 			ClapLog::globalLog(CLAP_LOG_ERROR, "Failed instantiating CLAP processor");

@@ -50,35 +50,26 @@ public:
 	~ClapManager();
 
 	//! Allows access to loaded .clap files
-	auto files() const -> const std::vector<ClapFile>& { return m_files; }
+	auto files() const -> auto& { return m_files; }
 
-	/**
-	 * Returns a cached plugin info vector
-	 * ClapManager doesn't own the ClapPluginInfo objects, so pointers may be invalidated.
-	*/
-	auto pluginInfo() const -> const auto& { return m_pluginInfo; }
+	//! Returns a cached plugin info vector
+	auto pluginInfo() const -> auto& { return m_pluginInfo; }
 
-	/**
-	 * Returns a cached URI-to-PluginInfo map
-	 * ClapManager doesn't own the ClapPluginInfo objects, so pointers may be invalidated.
-	*/
-	auto uriToPluginInfo() const -> const auto& { return m_uriToPluginInfo; }
+	//! Returns a URI-to-PluginInfo map
+	auto uriMap() const -> auto& { return m_uriMap; }
 
-	//! Return plugin info with URI @p uri or nullptr if none exists
-	auto pluginInfo(const std::string& uri) -> std::weak_ptr<const ClapPluginInfo>;
-	//! Return plugin info with URI @p uri or nullptr if none exists
-	auto pluginInfo(const QString& uri) -> std::weak_ptr<const ClapPluginInfo>;
+	//! Return plugin info with URI `uri` or nullptr if none exists
+	auto pluginInfo(const std::string& uri) const -> const ClapPluginInfo*;
+
+	//! Return plugin info with URI `uri` or nullptr if none exists
+	auto pluginInfo(const QString& uri) const -> const ClapPluginInfo*;
 
 	//! Called by Engine at LMMS startup
 	void initPlugins();
 
-	//! Creates a plugin instance given plugin info; Plugin instance is owned by ClapManager
-	//auto createInstance(const ClapPluginInfo* info) -> std::weak_ptr<ClapPluginInstance>;
-
 	static auto debugging() { return s_debugging; }
 
 private:
-
 	//! For hashing since std::hash<std::filesystem::path> is not available until C++23's LWG issue 3657 for god knows why
 	struct PathHash
 	{
@@ -94,18 +85,18 @@ private:
 	void findSearchPaths();
 
 	//! Returns search paths found by prior call to findSearchPaths()
-	auto searchPaths() const -> const auto& { return m_searchPaths; }
+	auto searchPaths() const -> auto& { return m_searchPaths; }
 
 	//! Finds and loads all .clap files in the provided search paths @p searchPaths
 	void loadClapFiles(const UniquePaths& searchPaths);
 
 	UniquePaths m_searchPaths; //!< Owns all CLAP search paths; Populated by findSearchPaths()
-	std::vector<ClapFile> m_files; //!< Owns all loaded .clap files; Populated by loadClapFiles()
+	std::vector<std::unique_ptr<ClapFile>> m_files; //!< Owns all loaded .clap files; Populated by loadClapFiles()
 
 	// Non-owning plugin caches (for fast iteration/lookup)
-	std::vector<std::weak_ptr<const ClapPluginInfo>> m_pluginInfo; //!< Non-owning vector of info for all successfully loaded CLAP plugins
-	std::unordered_map<std::string, std::weak_ptr<const ClapPluginInfo>> m_uriToPluginInfo; //!< Non-owning map of plugin URIs (IDs) to ClapPluginInfo
-	//std::vector<std::weak_ptr<ClapInstance>> m_instances; //!< Vector of all CLAP plugin instances (for guaranteeing correct clean-up order)
+
+	std::vector<const ClapPluginInfo*> m_pluginInfo; //!< successfully loaded plugins
+	std::unordered_map<std::string, ClapPluginInfo> m_uriMap; //!< maps plugin URIs (IDs) to ClapPluginInfo
 
 	static inline bool s_debugging = false; //!< If LMMS_CLAP_DEBUG is set, debug output will be printed
 };
