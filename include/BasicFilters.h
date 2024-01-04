@@ -328,7 +328,7 @@ public:
 		}
 	}
 
-	inline void setSampleRate(float sampleRate)
+	inline void setSampleRate(const sample_rate_t sampleRate)
 	{
 		m_sampleRate = sampleRate;
 		m_sampleRatio = 1.f / m_sampleRate;
