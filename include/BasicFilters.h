@@ -328,6 +328,12 @@ public:
 		}
 	}
 
+	inline void setSampleRate(float sampleRate)
+	{
+		m_sampleRate = sampleRate;
+		m_sampleRatio = 1.f / m_sampleRate;
+	}
+
 	inline sample_t update( sample_t _in0, ch_cnt_t _chnl )
 	{
 		sample_t out;
