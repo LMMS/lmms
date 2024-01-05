@@ -67,6 +67,14 @@ private slots:
 		QCOMPARE(*cache.get("test"), buffer);
 	}
 
+    void cannotGetNonExistingEntry()
+    {
+        using namespace lmms;
+
+        auto cache = SampleCache{};
+        QVERIFY(!cache.get("test").has_value());
+    }
+
 	void canRemoveEntry()
 	{
 		using namespace lmms;
