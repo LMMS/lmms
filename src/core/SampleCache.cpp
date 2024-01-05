@@ -32,6 +32,13 @@ void SampleCache::add(const std::string& key, std::shared_ptr<const SampleBuffer
 	m_entries.emplace(key, buffer);
 }
 
+auto SampleCache::get(const std::string& key) -> std::optional<std::shared_ptr<const SampleBuffer>>
+{
+	const auto it = m_entries.find(key);
+	if (it == m_entries.end()) { return std::nullopt; }
+	return it->second;
+}
+
 auto SampleCache::contains(const std::string& key) -> bool
 {
 	return m_entries.find(key) != m_entries.end();

@@ -41,6 +41,17 @@ private slots:
         QVERIFY(cache.contains("test"));
     }
 
+    void canGetEntry()
+    {
+        using namespace lmms;
+
+        auto cache = SampleCache{};
+        auto buffer = std::make_shared<const SampleBuffer>();
+        cache.add("test", buffer);
+
+        QCOMPARE(*cache.get("test"), buffer);
+    }
+
 } SampleCacheTests;
 
 #include "SampleCacheTest.moc"

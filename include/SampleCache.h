@@ -26,6 +26,7 @@
 #define LMMS_SAMPLE_CACHE_H
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <unordered_map>
 
@@ -36,6 +37,10 @@ class SampleCache
 public:
 	//! Add an entry with the given `key` and `buffer` to the cache.
 	void add(const std::string& key, std::shared_ptr<const SampleBuffer> buffer);
+
+	//! Get an entry with the given `key` from the cache.
+	//! Returns `nullopt` if the entry does not exist.
+	auto get(const std::string& key) -> std::optional<std::shared_ptr<const SampleBuffer>>;
 
 	//! Checks if an entry with the given `key` exists within the cache.
 	auto contains(const std::string& key) -> bool;
