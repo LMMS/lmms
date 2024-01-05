@@ -42,6 +42,20 @@ private slots:
 		QVERIFY(cache.contains("test"));
 	}
 
+    void cannotReplaceExistingEntry()
+    {
+        using namespace lmms;
+
+        auto cache = SampleCache{};
+        auto bufferOne = std::make_shared<const SampleBuffer>();
+        auto bufferTwo = std::make_shared<const SampleBuffer>();
+
+        cache.add("test", bufferOne);
+        cache.add("test", bufferTwo);
+
+        QCOMPARE(*cache.get("test"), bufferOne);
+    }
+
 	void canGetEntry()
 	{
 		using namespace lmms;
