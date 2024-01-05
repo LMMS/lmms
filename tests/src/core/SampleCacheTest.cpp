@@ -22,35 +22,49 @@
  *
  */
 
-#include "QTestSuite.h"
 #include "SampleCache.h"
+
+#include "QTestSuite.h"
 #include "SampleBuffer.h"
 
 class SampleCacheTest : QTestSuite
 {
 	Q_OBJECT
 private slots:
-    void canAddEntry()
-    {
-        using namespace lmms;
+	void canAddEntry()
+	{
+		using namespace lmms;
 
-        auto cache = SampleCache{};
-        auto buffer = std::make_shared<const SampleBuffer>();
-        cache.add("test", buffer);
+		auto cache = SampleCache{};
+		auto buffer = std::make_shared<const SampleBuffer>();
+		cache.add("test", buffer);
 
-        QVERIFY(cache.contains("test"));
-    }
+		QVERIFY(cache.contains("test"));
+	}
 
-    void canGetEntry()
-    {
-        using namespace lmms;
+	void canGetEntry()
+	{
+		using namespace lmms;
 
-        auto cache = SampleCache{};
-        auto buffer = std::make_shared<const SampleBuffer>();
-        cache.add("test", buffer);
+		auto cache = SampleCache{};
+		auto buffer = std::make_shared<const SampleBuffer>();
+		cache.add("test", buffer);
 
-        QCOMPARE(*cache.get("test"), buffer);
-    }
+		QCOMPARE(*cache.get("test"), buffer);
+	}
+
+	void canRemoveEntry()
+	{
+		using namespace lmms;
+
+		auto cache = SampleCache{};
+		auto buffer = std::make_shared<const SampleBuffer>();
+
+		cache.add("test", buffer);
+		cache.remove("test");
+
+		QVERIFY(!cache.contains("test"));
+	}
 
 } SampleCacheTests;
 

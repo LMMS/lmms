@@ -32,6 +32,11 @@ void SampleCache::add(const std::string& key, std::shared_ptr<const SampleBuffer
 	m_entries.emplace(key, buffer);
 }
 
+void SampleCache::remove(const std::string& key)
+{
+	m_entries.erase(key);
+}
+
 auto SampleCache::get(const std::string& key) -> std::optional<std::shared_ptr<const SampleBuffer>>
 {
 	const auto it = m_entries.find(key);

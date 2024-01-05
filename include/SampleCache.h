@@ -38,6 +38,9 @@ public:
 	//! Add an entry with the given `key` and `buffer` to the cache.
 	void add(const std::string& key, std::shared_ptr<const SampleBuffer> buffer);
 
+	//! Remove an entry with the given `key` from the cache if one exists.
+	void remove(const std::string& key);
+
 	//! Get an entry with the given `key` from the cache.
 	//! Returns `nullopt` if the entry does not exist.
 	auto get(const std::string& key) -> std::optional<std::shared_ptr<const SampleBuffer>>;
