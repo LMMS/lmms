@@ -307,26 +307,6 @@ public:
 	{
 	}
 
-	float mapMaxZeroAndMinOne(float value)
-	{
-		return (m_max - value) * m_fullSpanReciprocal;
-	}
-
-	float mapMaxZeroAndMinOneClamped(float value)
-	{
-		return std::clamp(mapMaxZeroAndMinOne(value), 0.f, 1.f);
-	}
-
-	float mapMinZeroAndMaxOne(float value)
-	{
-		return 1. - mapMaxZeroAndMinOne(value);
-	}
-
-	float mapMinZeroAndMaxOneClamped(float value)
-	{
-		return std::clamp(mapMinZeroAndMaxOne(value), 0.f, 1.f);
-	}
-
 	QRect getMeterRect(QRect const & meterRect, float peak)
 	{
 		float const span = peak - m_min;
