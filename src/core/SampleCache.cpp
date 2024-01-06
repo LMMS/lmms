@@ -24,6 +24,7 @@
 
 #include "SampleCache.h"
 
+#include <algorithm>
 #include <memory>
 
 namespace lmms {
@@ -47,6 +48,22 @@ auto SampleCache::get(const std::string& key) -> std::optional<std::shared_ptr<c
 auto SampleCache::contains(const std::string& key) -> bool
 {
 	return m_entries.find(key) != m_entries.end();
+}
+
+auto SampleCache::addEvictor(std::unique_ptr<Evictor> evictor) -> const std::unique_ptr<Evictor>&
+{
+	m_evictors.push_back(std::move(evictor));
+
+	auto& addedEvictor = m_evictors.back();
+	addedEvictor->start(*this);
+	return addedEvictor;
+}
+
+void SampleCache::removeEvictor(const std::unique_ptr<Evictor>& evictor)
+{
+	const auto it = std::remove_if(
+		m_evictors.begin(), m_evictors.end(), [&](const auto& other) { return evictor == other; });
+	m_evictors.erase(it, m_evictors.end());
 }
 
 } // namespace lmms
