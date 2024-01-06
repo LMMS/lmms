@@ -37,10 +37,10 @@ public:
 
 private:
     //! Setup signal to evict entries on changes within the file system.
-    virtual void setup(SampleCache& cache) override;
+    void setup(SampleCache& cache) override;
 
 	//! Treats `key` as a path to a sample on the filesystem and evicts the added entry if the file changes.
-	virtual void notifyAdd(const std::string& key) override;
+	void notifyAdd(const std::string& key) override;
 
 private:
 	QFileSystemWatcher m_watcher;
