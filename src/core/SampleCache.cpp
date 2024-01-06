@@ -55,7 +55,7 @@ auto SampleCache::addEvictor(std::unique_ptr<Evictor> evictor) -> const std::uni
 	m_evictors.push_back(std::move(evictor));
 
 	auto& addedEvictor = m_evictors.back();
-	addedEvictor->start(*this);
+	addedEvictor->setup(*this);
 	return addedEvictor;
 }
 

@@ -50,8 +50,11 @@ public:
 		virtual ~Evictor() = default;
 
 	private:
-		//! Start necessary functionality for managing `cache`.
-		virtual void start(SampleCache& cache) = 0;
+		//! Setup functionality to start evicting entries from the cache.
+		virtual void setup(SampleCache& cache) = 0;
+
+		//! Notify to the evictor that an entry has been added to the cache.
+		virtual void notifyAdd(const std::string& key) = 0;
 
 		friend class SampleCache;
 	};
