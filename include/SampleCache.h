@@ -25,63 +25,22 @@
 #ifndef LMMS_SAMPLE_CACHE_H
 #define LMMS_SAMPLE_CACHE_H
 
+#include <QFileSystemWatcher>
+#include <QHash>
+#include <QString>
 #include <memory>
-#include <optional>
-#include <string>
-#include <unordered_map>
-#include <vector>
 
 namespace lmms {
 class SampleBuffer;
-
-/*
- * A cache for `SampleBuffer`.
- * Useful for preventing usage of the same buffer in multiple places.
- */
 class SampleCache
 {
 public:
-	/*
-	 * A manager that can be added to the `SampleCache` to evict its entries when needed.
-	 */
-	class Evictor
-	{
-	public:
-		virtual ~Evictor() = default;
-
-	private:
-		//! Setup functionality to start evicting entries from the cache.
-		virtual void setup(SampleCache& cache) = 0;
-
-		//! Notify to the evictor that an entry has been added to the cache.
-		virtual void notifyAdd(const std::string& key) = 0;
-
-		friend class SampleCache;
-	};
-
-	//! Add an entry with the given `key` and `buffer` to the cache.
-	void add(const std::string& key, std::shared_ptr<const SampleBuffer> buffer);
-
-	//! Remove an entry with the given `key` from the cache if one exists.
-	void remove(const std::string& key);
-
-	//! Get an entry with the given `key` from the cache.
-	//! Returns `nullopt` if the entry does not exist.
-	auto get(const std::string& key) -> std::optional<std::shared_ptr<const SampleBuffer>>;
-
-	//! Checks if an entry with the given `key` exists within the cache.
-	auto contains(const std::string& key) -> bool;
-
-	//! Add an evictor to the cache.
-	//! Returns a reference to the evictor.
-	auto addEvictor(std::unique_ptr<Evictor> evictor) -> const std::unique_ptr<Evictor>&;
-
-	//! Remove an evictor from the cache.
-	void removeEvictor(const std::unique_ptr<Evictor>& evictor);
+	SampleCache();
+	auto get(const QString& path) -> std::shared_ptr<const SampleBuffer>;
 
 private:
-	std::unordered_map<std::string, std::shared_ptr<const SampleBuffer>> m_entries;
-	std::vector<std::unique_ptr<Evictor>> m_evictors;
+	QHash<QString, std::weak_ptr<const SampleBuffer>> m_samples;
+	QFileSystemWatcher m_fsWatcher;
 };
 } // namespace lmms
 

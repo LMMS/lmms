@@ -24,46 +24,31 @@
 
 #include "SampleCache.h"
 
-#include <algorithm>
-#include <memory>
+#include "SampleBuffer.h"
 
 namespace lmms {
-void SampleCache::add(const std::string& key, std::shared_ptr<const SampleBuffer> buffer)
+
+SampleCache::SampleCache()
 {
-	m_entries.emplace(key, buffer);
+	QObject::connect(&m_fsWatcher, &QFileSystemWatcher::fileChanged, [&, this](const QString& path) {
+		m_samples.remove(path);
+		if (m_fsWatcher.files().contains(path)) { m_fsWatcher.removePath(path); }
+	});
 }
 
-void SampleCache::remove(const std::string& key)
+auto SampleCache::get(const QString& path) -> std::shared_ptr<const SampleBuffer>
 {
-	m_entries.erase(key);
-}
+	if (const auto it = m_samples.find(path); it != m_samples.end())
+	{
+		if (const auto buffer = it.value().lock()) { return buffer; }
+		const auto buffer = std::make_shared<const SampleBuffer>(path);
+		it.value() = buffer;
+		return buffer;
+	}
 
-auto SampleCache::get(const std::string& key) -> std::optional<std::shared_ptr<const SampleBuffer>>
-{
-	const auto it = m_entries.find(key);
-	if (it == m_entries.end()) { return std::nullopt; }
-	return it->second;
-}
-
-auto SampleCache::contains(const std::string& key) -> bool
-{
-	return m_entries.find(key) != m_entries.end();
-}
-
-auto SampleCache::addEvictor(std::unique_ptr<Evictor> evictor) -> const std::unique_ptr<Evictor>&
-{
-	m_evictors.push_back(std::move(evictor));
-
-	auto& addedEvictor = m_evictors.back();
-	addedEvictor->setup(*this);
-	return addedEvictor;
-}
-
-void SampleCache::removeEvictor(const std::unique_ptr<Evictor>& evictor)
-{
-	const auto it = std::remove_if(
-		m_evictors.begin(), m_evictors.end(), [&](const auto& other) { return evictor == other; });
-	m_evictors.erase(it, m_evictors.end());
+	const auto buffer = std::make_shared<const SampleBuffer>(path);
+	m_samples.insert(path, buffer);
+	return buffer;
 }
 
 } // namespace lmms
