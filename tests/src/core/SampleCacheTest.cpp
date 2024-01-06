@@ -42,19 +42,19 @@ private slots:
 		QVERIFY(cache.contains("test"));
 	}
 
-    void cannotReplaceExistingEntry()
-    {
-        using namespace lmms;
+	void cannotReplaceExistingEntry()
+	{
+		using namespace lmms;
 
-        auto cache = SampleCache{};
-        auto bufferOne = std::make_shared<const SampleBuffer>();
-        auto bufferTwo = std::make_shared<const SampleBuffer>();
+		auto cache = SampleCache{};
+		auto bufferOne = std::make_shared<const SampleBuffer>();
+		auto bufferTwo = std::make_shared<const SampleBuffer>();
 
-        cache.add("test", bufferOne);
-        cache.add("test", bufferTwo);
+		cache.add("test", bufferOne);
+		cache.add("test", bufferTwo);
 
-        QCOMPARE(*cache.get("test"), bufferOne);
-    }
+		QCOMPARE(*cache.get("test"), bufferOne);
+	}
 
 	void canGetEntry()
 	{
@@ -67,13 +67,13 @@ private slots:
 		QCOMPARE(*cache.get("test"), buffer);
 	}
 
-    void cannotGetNonExistingEntry()
-    {
-        using namespace lmms;
+	void cannotGetNonExistingEntry()
+	{
+		using namespace lmms;
 
-        auto cache = SampleCache{};
-        QVERIFY(!cache.get("test").has_value());
-    }
+		auto cache = SampleCache{};
+		QVERIFY(!cache.get("test").has_value());
+	}
 
 	void canRemoveEntry()
 	{
@@ -87,7 +87,6 @@ private slots:
 
 		QVERIFY(!cache.contains("test"));
 	}
-
 } SampleCacheTests;
 
 #include "SampleCacheTest.moc"
