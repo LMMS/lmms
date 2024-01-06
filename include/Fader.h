@@ -124,8 +124,6 @@ private:
 	void wheelEvent( QWheelEvent *ev ) override;
 	void paintEvent( QPaintEvent *ev ) override;
 
-	inline bool clips(float const & value) const { return value >= 1.0f; }
-
 	void paintLevels(QPaintEvent *ev, QPainter & painter, bool linear = false);
 
 	int knobPosY() const
