@@ -30,6 +30,7 @@
 #include "lmmsconfig.h"
 #include <QtGlobal>
 
+#include <cassert>
 #include <cmath>
 
 namespace lmms
