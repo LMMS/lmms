@@ -62,7 +62,7 @@ namespace lmms::gui
 
 SimpleTextFloat * Fader::s_textFloat = nullptr;
 
-Fader::Fader(FloatModel* model, const QString& name, QWidget* parent ) :
+Fader::Fader(FloatModel* model, const QString& name, QWidget* parent) :
 	QWidget(parent),
 	FloatModelView(model, this),
 	m_fPeakValue_L(0.0),
