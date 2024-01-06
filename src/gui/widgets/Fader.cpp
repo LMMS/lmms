@@ -388,7 +388,9 @@ void Fader::paintLevels(QPaintEvent * ev, QPainter & painter, bool linear)
 	float const mappedPersistentPeakL(mapper(m_persistentPeak_L));
 	float const mappedPersistentPeakR(mapper(m_persistentPeak_R));
 	float const mappedUnity(mapper(1.f));
-	float const mappedLastOk(mapper(dbfsToAmp(-12.f)));
+	float const mappedWarnEnd(mappedUnity);
+	float const mappedWarnStart(mapper(dbfsToAmp(-6.f)));
+	float const mappedOkEnd(mapper(dbfsToAmp(-12.f)));
 
 	PaintHelper ph(mappedMinPeak, mappedMaxPeak);
 
@@ -399,8 +401,9 @@ void Fader::paintLevels(QPaintEvent * ev, QPainter & painter, bool linear)
 
 	QLinearGradient linearGrad(0, margin, 0, leftMeterRect.y() + leftMeterRect.height());
 	linearGrad.setColorAt(0, clippingColor);
-	linearGrad.setColorAt(ph.mapMaxZeroAndMinOne(mappedUnity), warnColor);
-	linearGrad.setColorAt(ph.mapMaxZeroAndMinOne(mappedLastOk), okColor);
+	linearGrad.setColorAt(ph.mapMaxZeroAndMinOne(mappedWarnEnd), warnColor);
+	linearGrad.setColorAt(ph.mapMaxZeroAndMinOne(mappedWarnStart), warnColor);
+	linearGrad.setColorAt(ph.mapMaxZeroAndMinOne(mappedOkEnd), okColor);
 	linearGrad.setColorAt(1, okColor);
 
 	// Draw left levels
