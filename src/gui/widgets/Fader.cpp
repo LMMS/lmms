@@ -388,23 +388,42 @@ void Fader::paintLevels(QPaintEvent * ev, QPainter & painter, bool linear)
 	float const mappedPersistentPeakL(mapper(m_persistentPeak_L));
 	float const mappedPersistentPeakR(mapper(m_persistentPeak_R));
 	float const mappedUnity(mapper(1.f));
+
+	// These values define where the gradient changes values, i.e. the ranges
+	// for clipping, warning and ok.
+	// Please ensure that "clip starts" is the maximum value and that "ok ends"
+	// is the minimum value and that all other values lie inbetween. Otherwise
+	// there will be warnings when the gradient is defined.
+	float const mappedClipStarts(mapper(dbfsToAmp(6.f)));
 	float const mappedWarnEnd(mappedUnity);
 	float const mappedWarnStart(mapper(dbfsToAmp(-6.f)));
 	float const mappedOkEnd(mapper(dbfsToAmp(-12.f)));
 
-	PaintHelper ph(mappedMinPeak, mappedMaxPeak);
-
 	// Prepare the gradient for the meters
-	QColor const & clippingColor = peakClip();
-	QColor const & warnColor = peakWarn();
-	QColor const & okColor = peakOk();
+	//
+	// The idea is the following. We want to be able to render arbitrary ranges of min and max values.
+	// Therefore we first compute the start and end point of the gradient in window coordinates.
+	// The gradient is assumed to start with the clip color and to end with the ok color with warning values in between.
+	// We know the min and max peaks that map to a rectangle where we draw the levels. We can use the values of the min and max peaks
+	// as well as the Y-coordinates of the rectangle to compute a map which will give us the coordinates of the value where the clipping
+	// starts and where the ok area end. These coordinates are used to initialize the gradient. Please note that the gradient might thus
+	// extend the rectangle into which we paint.
+	LinearMap<float> const valuesToWindowCoordinates(mappedMaxPeak, leftMeterRect.y(), mappedMinPeak, leftMeterRect.y() + leftMeterRect.height());
+	float clipStartYCoord = valuesToWindowCoordinates.map(mappedClipStarts);
+	float okEndYCoord = valuesToWindowCoordinates.map(mappedOkEnd);
 
-	QLinearGradient linearGrad(0, margin, 0, leftMeterRect.y() + leftMeterRect.height());
-	linearGrad.setColorAt(0, clippingColor);
-	linearGrad.setColorAt(ph.mapMaxZeroAndMinOne(mappedWarnEnd), warnColor);
-	linearGrad.setColorAt(ph.mapMaxZeroAndMinOne(mappedWarnStart), warnColor);
-	linearGrad.setColorAt(ph.mapMaxZeroAndMinOne(mappedOkEnd), okColor);
-	linearGrad.setColorAt(1, okColor);
+	QLinearGradient linearGrad(0, clipStartYCoord, 0, okEndYCoord);
+
+	// We already know for the gradient that the clip color will be at 0 and that the ok color is at 1.
+	// What's left to do is to map the inbetween values into the interval [0,1].
+	LinearMap<float> const mapBetweenClipAndOk(mappedClipStarts, 0.f, mappedOkEnd, 1.f);
+
+	linearGrad.setColorAt(0, peakClip());
+	linearGrad.setColorAt(mapBetweenClipAndOk.map(mappedWarnEnd), peakWarn());
+	linearGrad.setColorAt(mapBetweenClipAndOk.map(mappedWarnStart), peakWarn());
+	linearGrad.setColorAt(1, peakOk());
+
+	PaintHelper ph(mappedMinPeak, mappedMaxPeak);
 
 	// Draw left levels
 	QRect leftMeterMargins = leftMeterRect.marginsRemoved(QMargins(1, 0, 1, 0));
