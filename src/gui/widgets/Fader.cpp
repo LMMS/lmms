@@ -78,6 +78,7 @@ Fader::Fader(FloatModel* model, const QString& name, QWidget* parent) :
 	m_peakOk(10, 212, 92),
 	m_peakClip(193, 32, 56),
 	m_peakWarn(214, 236, 82),
+	m_unityMarker(127, 127, 127, 255),
 	m_renderUnityLine(true)
 {
 	if( s_textFloat == nullptr )
@@ -428,18 +429,16 @@ void Fader::paintLevels(QPaintEvent * ev, QPainter & painter, bool linear)
 	painter.drawPath(path);
 
 	// Draw left and right unity lines (0 dbFS, 1.0 amplitude)
-	QColor unityMarkerColor(127, 127, 127, 127);
-
 	if (getRenderUnityLine())
 	{
 		auto const unityRectL = ph.getPersistentPeakRect(leftMeterRect, mappedUnity);
-		painter.fillRect(unityRectL, unityMarkerColor);
+		painter.fillRect(unityRectL, getUnityMarker());
 	}
 
 	if (getRenderUnityLine())
 	{
 		auto const unityRectR = ph.getPersistentPeakRect(rightMeterRect, mappedUnity);
-		painter.fillRect(unityRectR, unityMarkerColor);
+		painter.fillRect(unityRectR, getUnityMarker());
 	}
 
 
@@ -474,6 +473,16 @@ void Fader::setPeakClip(const QColor& c)
 void Fader::setPeakWarn(const QColor& c)
 {
 	m_peakWarn = c;
+}
+
+QColor const & Fader::getUnityMarker() const
+{
+	return m_unityMarker;
+}
+
+void Fader::setUnityMarker(const QColor& c)
+{
+	m_unityMarker = c;
 }
 
 

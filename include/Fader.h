@@ -71,6 +71,7 @@ public:
 	Q_PROPERTY(QColor peakWarn READ peakWarn WRITE setPeakWarn)
 	Q_PROPERTY(bool levelsDisplayedInDBFS READ getLevelsDisplayedInDBFS WRITE setLevelsDisplayedInDBFS)
 	Q_PROPERTY(bool renderUnityLine READ getRenderUnityLine WRITE setRenderUnityLine)
+	Q_PROPERTY(QColor unityMarker READ getUnityMarker WRITE setUnityMarker)
 
 	Fader(FloatModel* model, const QString& name, QWidget* parent);
 	Fader(FloatModel* model, const QString& name, QWidget* parent, const QPixmap& knob);
@@ -96,6 +97,9 @@ public:
 
 	QColor const & peakWarn() const;
 	void setPeakWarn(const QColor& c);
+
+	QColor const & getUnityMarker() const;
+	void setUnityMarker(const QColor& c);
 
 	inline bool getLevelsDisplayedInDBFS() const { return m_levelsDisplayedInDBFS; }
 	inline void setLevelsDisplayedInDBFS(bool value = true) { m_levelsDisplayedInDBFS = value; }
@@ -162,6 +166,7 @@ private:
 	QColor m_peakOk;
 	QColor m_peakClip;
 	QColor m_peakWarn;
+	QColor m_unityMarker;
 
 	bool m_renderUnityLine;
 } ;
