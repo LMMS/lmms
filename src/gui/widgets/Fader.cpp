@@ -78,7 +78,7 @@ Fader::Fader(FloatModel* model, const QString& name, QWidget* parent) :
 	m_peakOk(10, 212, 92),
 	m_peakClip(193, 32, 56),
 	m_peakWarn(214, 236, 82),
-	m_unityMarker(127, 127, 127, 255),
+	m_unityMarker(63, 63, 63, 255),
 	m_renderUnityLine(true)
 {
 	if( s_textFloat == nullptr )
