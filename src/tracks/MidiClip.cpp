@@ -185,13 +185,9 @@ TimePos MidiClip::beatClipLength() const
 
 
 
-Note * MidiClip::addNote( const Note & _new_note, const bool _quant_pos )
+Note * MidiClip::addNote(const Note& _new_note)
 {
 	auto new_note = new Note(_new_note);
-	if (_quant_pos && gui::getGUI()->pianoRoll())
-	{
-		new_note->quantizePos(gui::getGUI()->pianoRoll()->quantization());
-	}
 
 	instrumentTrack()->lock();
 	m_notes.insert(std::upper_bound(m_notes.begin(), m_notes.end(), new_note, Note::lessThan), new_note);
@@ -274,7 +270,7 @@ Note * MidiClip::addStepNote( int step )
 	Note stepNote = Note(TimePos(DefaultTicksPerBar / 16), TimePos::stepPosition(step));
 	stepNote.setType(Note::Type::Step);
 
-	return addNote(stepNote, false);
+	return addNote(stepNote);
 }
 
 
@@ -325,7 +321,7 @@ void MidiClip::splitNotes(const NoteVector& notes, TimePos pos)
 		newNote.setLength(rightLength);
 		newNote.setPos(note->pos() + leftLength);
 
-		addNote(newNote, false);
+		addNote(newNote);
 	}
 }
 

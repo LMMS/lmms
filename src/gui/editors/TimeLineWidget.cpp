@@ -49,14 +49,15 @@ namespace
 }
 
 TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb, Song::PlayPos& pos, Timeline& timeline,
-		const TimePos& begin, Song::PlayMode mode, QWidget* parent) :
+		const TimePos& begin, Song::PlayMode mode, bool isMaster, QWidget* parent) :
 	QWidget{parent},
 	m_xOffset{xoff},
 	m_ppb{ppb},
 	m_pos{pos},
 	m_timeline{&timeline},
 	m_begin{begin},
-	m_mode{mode}
+	m_mode{mode},
+	m_isMaster{isMaster}
 {
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	move( 0, yoff );
@@ -175,8 +176,9 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	QColor const & barLineColor = getBarLineColor();
 	QColor const & barNumberColor = getBarNumberColor();
 
-	bar_t barNumber = m_begin.getBar();
-	int const x = m_xOffset - ((static_cast<int>(m_begin * m_ppb) / TimePos::ticksPerBar()) % static_cast<int>(m_ppb));
+	const auto begin = TimePos{m_begin + barOffset()};
+	bar_t barNumber = begin.getBar();
+	int const x = m_xOffset - ((static_cast<int>(begin * m_ppb) / TimePos::ticksPerBar()) % static_cast<int>(m_ppb));
 
 	// Double the interval between bar numbers until they are far enough appart
 	int barLabelInterval = 1;
@@ -283,6 +285,20 @@ auto TimeLineWidget::actionCursor(Action action) const -> QCursor
 	}
 }
 
+auto TimeLineWidget::barOffset() const -> TimePos
+{
+	switch (m_barNumbering) {
+		case BarNumbering::Absolute: return m_clipOffset;
+		case BarNumbering::Aligned: return m_clipOffset - TimePos{m_clipOffset.nextFullBar(), 0};
+		default: return TimePos{0};
+	}
+}
+
+auto TimeLineWidget::quantization() const -> QuantizationGrid
+{
+	return QuantizationGrid{m_snapSize, -barOffset()};
+}
+
 void TimeLineWidget::mousePressEvent(QMouseEvent* event)
 {
 	if (event->x() < m_xOffset) { return; }
@@ -360,12 +376,12 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			}
 			else
 			{
-				timeAtCursor = timeAtCursor.quantize(m_snapSize);
+				timeAtCursor = quantization().quantize(timeAtCursor);
 			}
 			// Catch begin == end
 			if (timeAtCursor == otherPoint)
 			{
-				const int offset = control ? 1 : m_snapSize * TimePos::ticksPerBar();
+				const int offset = control ? 1 : m_snapSize;
 				if (m_action == Action::MoveLoopBegin) { timeAtCursor -= offset; }
 				else { timeAtCursor += offset; }
 			}
@@ -383,7 +399,7 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			for (auto& point : loopPos)
 			{
 				point += dragDelta;
-				if (!control) { point = point.quantize(m_snapSize); }
+				if (!control) { point = quantization().quantize(point); }
 			}
 			m_timeline->setLoopPoints(loopPos[0], loopPos[1]);
 			break;
@@ -422,16 +438,16 @@ void TimeLineWidget::contextMenuEvent(QContextMenuEvent* event)
 	menu.addAction(tr("Set loop begin here"), [this, event] {
 		auto begin = getClickedTime(event->x());
 		const auto end = m_timeline->loopEnd();
-		if (!QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier)) { begin = begin.quantize(m_snapSize); }
-		if (begin == end) { m_timeline->setLoopEnd(end + m_snapSize * TimePos::ticksPerBar()); }
+		if (!QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier)) { begin = quantization().quantize(begin); }
+		if (begin == end) { m_timeline->setLoopEnd(end + m_snapSize); }
 		m_timeline->setLoopBegin(begin);
 		update();
 	});
 	menu.addAction(tr("Set loop end here"), [this, event] {
 		const auto begin = m_timeline->loopBegin();
 		auto end = getClickedTime(event->x());
-		if (!QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier)) { end = end.quantize(m_snapSize); }
-		if (begin == end) { m_timeline->setLoopBegin(begin - m_snapSize * TimePos::ticksPerBar()); }
+		if (!QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier)) { end = quantization().quantize(end); }
+		if (begin == end) { m_timeline->setLoopBegin(begin - m_snapSize); }
 		m_timeline->setLoopEnd(end);
 		update();
 	});
@@ -450,6 +466,20 @@ void TimeLineWidget::contextMenuEvent(QContextMenuEvent* event)
 	addLoopModeAction(tr("Dual-button"), "dual");
 	addLoopModeAction(tr("Grab closest"), "closest");
 	addLoopModeAction(tr("Handles"), "handles");
+
+	if (!m_isMaster) {
+		const auto numberingMenu = menu.addMenu(tr("Bar numbering mode"));
+		const auto addNumberingAction = [this, numberingMenu](QString text, BarNumbering mode) {
+			const auto action = numberingMenu->addAction(text, [this, mode] {
+				m_barNumbering = mode;
+			});
+			action->setCheckable(true);
+			action->setChecked(m_barNumbering == mode);
+		};
+		addNumberingAction(tr("Relative to clip"), BarNumbering::Relative);
+		addNumberingAction(tr("Relative to clip, aligned with song"), BarNumbering::Aligned);
+		addNumberingAction(tr("Relative to song"), BarNumbering::Absolute);
+	}
 
 	menu.exec(event->globalPos());
 }

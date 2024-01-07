@@ -31,6 +31,7 @@
 #include <QSize>
 #include <QWidget>
 
+#include "QuantizationGrid.h"
 #include "Song.h"
 #include "embed.h"
 
@@ -78,7 +79,7 @@ public:
 	};
 
 	TimeLineWidget(int xoff, int yoff, float ppb, Song::PlayPos& pos, Timeline& timeline,
-				const TimePos& begin, Song::PlayMode mode, QWidget* parent);
+				const TimePos& begin, Song::PlayMode mode, bool isMaster, QWidget* parent);
 	~TimeLineWidget() override;
 
 	inline QColor const & getBarLineColor() const { return m_barLineColor; }
@@ -130,6 +131,8 @@ public:
 		m_cursorSelectRight = QCursor{m_cursorSelectRight.pixmap(), s.width(), s.height()};
 	}
 
+	void setClipOffset(TimePos offset) { m_clipOffset = offset; }
+
 	inline Song::PlayPos & pos()
 	{
 		return( m_pos );
@@ -156,6 +159,9 @@ public:
 					m_ppb / TimePos::ticksPerBar() );
 	}
 
+	auto barOffset() const -> TimePos;
+	auto quantization() const -> QuantizationGrid;
+
 signals:
 	void positionChanged(const lmms::TimePos& postion);
 	void regionSelectedFromPixels( int, int );
@@ -163,10 +169,7 @@ signals:
 
 public slots:
 	void updatePosition();
-	void setSnapSize( const float snapSize )
-	{
-		m_snapSize = snapSize;
-	}
+	void setSnapSize(tick_t snapSize) { m_snapSize = snapSize; }
 	void toggleAutoScroll( int _n );
 
 protected:
@@ -186,6 +189,8 @@ private:
 		MoveLoop,
 		SelectSongClip,
 	};
+
+	enum class BarNumbering { Relative, Aligned, Absolute };
 
 	auto getClickedTime(int xPosition) const -> TimePos;
 	auto getLoopAction(QMouseEvent* event) const -> Action;
@@ -213,16 +218,19 @@ private:
 	QCursor m_cursorSelectRight = QCursor{embed::getIconPixmap("cursor_select_right"), 32, 16};
 
 	AutoScrollState m_autoScroll = AutoScrollState::Enabled;
+	BarNumbering m_barNumbering = BarNumbering::Relative;
 
 	// Width of the unused region on the widget's left (above track labels or piano)
 	int m_xOffset;
 	float m_ppb;
-	float m_snapSize = 1.f;
+	tick_t m_snapSize = 1;
 	Song::PlayPos & m_pos;
 	Timeline* m_timeline;
+	TimePos m_clipOffset = TimePos{0}; //!< Offset of associated clip from beginning of song
 	// Leftmost position visible in parent editor
 	const TimePos & m_begin;
 	const Song::PlayMode m_mode;
+	bool m_isMaster; //!< Whether this widget views the master timeline for the project (that of the Song Editor)
 	// When in MoveLoop mode we need the initial positions. Storing only the latest
 	// position allows for unquantized drag but fails when toggling quantization.
 	std::array<TimePos, 2> m_oldLoopPos;

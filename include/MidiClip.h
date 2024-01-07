@@ -61,7 +61,7 @@ public:
 	void updateLength();
 
 	// note management
-	Note * addNote( const Note & _new_note, const bool _quant_pos = true );
+	Note * addNote(const Note& _new_note);
 
 	void removeNote( Note * _note_to_del );
 

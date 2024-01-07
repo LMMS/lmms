@@ -290,7 +290,7 @@ bool HydrogenImport::readSong()
 				n.setVolume( fVelocity * 100 );
 				n.setPanning( ( fPan_R - fPan_L ) * 100 );
 				n.setKey( NoteKey::stringToNoteKey( sKey ) );
-				p->addNote( n,false );
+				p->addNote(n);
 				pn = pn + 1;
 				noteNode = ( QDomNode ) noteNode.nextSiblingElement( "note" );
 			}        

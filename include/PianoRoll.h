@@ -515,8 +515,6 @@ public:
 	void setCurrentMidiClip( MidiClip* clip );
 	void setGhostMidiClip( MidiClip* clip );
 
-	int quantization() const;
-
 	void play() override;
 	void stop() override;
 	void record() override;
