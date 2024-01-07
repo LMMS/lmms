@@ -206,8 +206,11 @@ void MixerView::refreshDisplay()
 	// delete all views and re-add them
 	for (int i = 1; i<m_mixerChannelViews.size(); ++i)
 	{
-		chLayout->removeWidget(m_mixerChannelViews[i]);
-		m_racksLayout->removeWidget(m_mixerChannelViews[i]->m_effectRackView);
+		auto * mixerChannelView = m_mixerChannelViews[i];
+		chLayout->removeWidget(mixerChannelView);
+		m_racksLayout->removeWidget(mixerChannelView->m_effectRackView);
+
+		delete mixerChannelView;
 	}
 	m_channelAreaWidget->adjustSize();
 
