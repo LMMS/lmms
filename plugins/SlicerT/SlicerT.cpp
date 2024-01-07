@@ -322,7 +322,7 @@ std::vector<Note> SlicerT::getMidi()
 
 void SlicerT::updateFile(QString file)
 {
-	m_originalSample = Sample(SampleCache::get(file));
+	m_originalSample = Sample(SampleCache::instance().get(file));
 
 	findBPM();
 	findSlices();
@@ -362,7 +362,7 @@ void SlicerT::loadSettings(const QDomElement& element)
 	{
 		if (QFileInfo(PathUtil::toAbsolute(srcFile)).exists())
 		{
-			m_originalSample = Sample(SampleCache::get(srcFile));
+			m_originalSample = Sample(SampleCache::instance().get(srcFile));
 		}
 		else
 		{

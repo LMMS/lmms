@@ -308,7 +308,7 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 	QString value = StringPairDrag::decodeValue( _de );
 	if( type == "samplefile" )
 	{
-		m_params->m_userWave = SampleCache::get(value);
+		m_params->m_userWave = SampleCache::instance().get(value);
 		m_userLfoBtn->model()->setValue( true );
 		m_params->m_lfoWaveModel.setValue(static_cast<int>(EnvelopeAndLfoParameters::LfoShape::UserDefinedWave));
 		_de->accept();
@@ -320,7 +320,7 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 		auto file = dataFile.content().
 					firstChildElement().firstChildElement().
 					firstChildElement().attribute("src");
-		m_params->m_userWave = SampleCache::get(file);
+		m_params->m_userWave = SampleCache::instance().get(file);
 		m_userLfoBtn->model()->setValue( true );
 		m_params->m_lfoWaveModel.setValue(static_cast<int>(EnvelopeAndLfoParameters::LfoShape::UserDefinedWave));
 		_de->accept();

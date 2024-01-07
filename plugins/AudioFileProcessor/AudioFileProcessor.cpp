@@ -322,7 +322,7 @@ gui::PluginView* AudioFileProcessor::instantiateView( QWidget * _parent )
 
 void AudioFileProcessor::setAudioFile(const QString& _audio_file, bool _rename)
 {
-	m_sample = Sample(SampleCache::get(_audio_file));
+	m_sample = Sample(SampleCache::instance().get(_audio_file));
 
 	// is current channel-name equal to previous-filename??
 	if( _rename &&

@@ -30,25 +30,29 @@ namespace lmms {
 
 SampleCache::SampleCache()
 {
-	QObject::connect(&s_fsWatcher, &QFileSystemWatcher::fileChanged, [&](const QString& path) {
-		s_samples.remove(path);
-		if (s_fsWatcher.files().contains(path)) { s_fsWatcher.removePath(path); }
+	QObject::connect(&m_fsWatcher, &QFileSystemWatcher::fileChanged, [this](const QString& path) {
+		m_samples.remove(path);
+		if (m_fsWatcher.files().contains(path)) { m_fsWatcher.removePath(path); }
 	});
 }
 
 auto SampleCache::get(const QString& path) -> std::shared_ptr<const SampleBuffer>
 {
-	if (const auto it = s_samples.find(path); it != s_samples.end())
+	if (const auto it = m_samples.find(path); it != m_samples.end())
 	{
 		if (const auto buffer = it.value().lock()) { return buffer; }
-		const auto buffer = std::make_shared<const SampleBuffer>(path);
-		it.value() = buffer;
-		return buffer;
 	}
 
 	const auto buffer = std::make_shared<const SampleBuffer>(path);
-	s_samples.insert(path, buffer);
+	m_samples.insert(path, buffer);
+	m_fsWatcher.addPath(path);
 	return buffer;
+}
+
+auto SampleCache::instance() -> SampleCache&
+{
+	static auto instance = SampleCache{};
+	return instance;
 }
 
 } // namespace lmms

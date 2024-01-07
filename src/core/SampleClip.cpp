@@ -139,7 +139,7 @@ void SampleClip::setSampleFile(const QString& sf)
 	if (!sf.isEmpty())
 	{
 		//Otherwise set it to the sample's length
-		m_sample = Sample(SampleCache::get(sf));
+		m_sample = Sample(SampleCache::instance().get(sf));
 		length = sampleLength();
 	}
 

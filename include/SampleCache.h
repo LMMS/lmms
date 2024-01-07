@@ -36,11 +36,13 @@ class SampleCache
 {
 public:
 	SampleCache();
-	static auto get(const QString& path) -> std::shared_ptr<const SampleBuffer>;
+
+	auto get(const QString& path) -> std::shared_ptr<const SampleBuffer>;
+	static auto instance() -> SampleCache&;
 
 private:
-	inline static QHash<QString, std::weak_ptr<const SampleBuffer>> s_samples;
-	inline static QFileSystemWatcher s_fsWatcher;
+	QHash<QString, std::weak_ptr<const SampleBuffer>> m_samples;
+	QFileSystemWatcher m_fsWatcher;
 };
 } // namespace lmms
 
