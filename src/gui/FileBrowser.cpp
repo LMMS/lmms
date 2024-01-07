@@ -719,7 +719,7 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 		qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 		if (auto buffer = SampleLoader::createBufferFromFile(fileName))
 		{
-			auto s = new SamplePlayHandle(new lmms::Sample{std::move(buffer)});
+			auto s = new SamplePlayHandle(new Sample{std::move(buffer)});
 			s->setDoneMayReturnTrue(false);
 			newPPH = s;
 		}

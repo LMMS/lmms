@@ -93,8 +93,6 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 				Oscillator::NumModulationAlgos-1, this,
 				tr( "Modulation type %1" ).arg( _idx+1 ) ),
 	m_useWaveTableModel(true),
-
-	m_sampleBuffer( new SampleBuffer ),
 	m_volumeLeft( 0.0f ),
 	m_volumeRight( 0.0f ),
 	m_detuningLeft( 0.0f ),
@@ -254,8 +252,11 @@ void TripleOscillator::saveSettings( QDomDocument & _doc, QDomElement & _this )
 					"modalgo" + QString::number( i+1 ) );
 		m_osc[i]->m_useWaveTableModel.saveSettings( _doc, _this,
 					"useWaveTable" + QString::number (i+1 ) );
-		_this.setAttribute( "userwavefile" + is,
-					m_osc[i]->m_sampleBuffer->audioFile() );
+
+		if (auto sampleBuffer = m_osc[i]->m_sampleBuffer)
+		{
+			_this.setAttribute("userwavefile" + is, sampleBuffer->audioFile());
+		}
 	}
 }
 

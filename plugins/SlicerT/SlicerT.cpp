@@ -321,7 +321,10 @@ std::vector<Note> SlicerT::getMidi()
 
 void SlicerT::updateFile(QString file)
 {
-	if (auto buffer = gui::SampleLoader::createBufferFromFile(file)) { m_originalSample = Sample(std::move(buffer)); }
+	if (auto buffer = gui::SampleLoader::createBufferFromFile(file))
+	{
+		m_originalSample = Sample(std::move(buffer));
+	} else { return; }
 
 	findBPM();
 	findSlices();

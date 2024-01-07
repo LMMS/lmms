@@ -68,7 +68,6 @@ Oscillator::Oscillator(const IntModel *wave_shape_model,
 	m_subOsc(sub_osc),
 	m_phaseOffset(phase_offset),
 	m_phase(phase_offset),
-	m_userWave(nullptr),
 	m_useWaveTable(false),
 	m_isModulator(false)
 {
