@@ -68,8 +68,10 @@ set(LMMS_SRCS
 	core/RingBuffer.cpp
 	core/Sample.cpp
 	core/SampleBuffer.cpp
+	core/SampleCache.cpp
 	core/SampleClip.cpp
 	core/SampleDecoder.cpp
+	core/SampleLoader.cpp
 	core/SamplePlayHandle.cpp
 	core/SampleRecordHandle.cpp
 	core/Scale.cpp

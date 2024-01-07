@@ -31,7 +31,7 @@
 #include "DataFile.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
-#include "SampleLoader.h"
+#include "SampleLoaderDialog.h"
 #include "SlicerT.h"
 #include "Song.h"
 #include "StringPairDrag.h"
@@ -130,7 +130,7 @@ void SlicerTView::exportMidi()
 
 void SlicerTView::openFiles()
 {
-	const auto audioFile = SampleLoader::openAudioFile();
+	const auto audioFile = SampleLoaderDialog::openAudioFile();
 	if (audioFile.isEmpty()) { return; }
 	m_slicerTParent->updateFile(audioFile);
 }

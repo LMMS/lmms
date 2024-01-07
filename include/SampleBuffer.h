@@ -39,6 +39,7 @@
 
 namespace lmms {
 class LMMS_EXPORT SampleBuffer
+	: public std::enable_shared_from_this<SampleBuffer>
 {
 public:
 	using value_type = sampleFrame;
@@ -51,17 +52,46 @@ public:
 	using reverse_iterator = std::vector<sampleFrame>::reverse_iterator;
 	using const_reverse_iterator = std::vector<sampleFrame>::const_reverse_iterator;
 
-	SampleBuffer() = default;
-	explicit SampleBuffer(const QString& audioFile);
-	SampleBuffer(const QString& base64, int sampleRate);
-	SampleBuffer(std::vector<sampleFrame> data, int sampleRate);
-	SampleBuffer(
-		const sampleFrame* data, int numFrames, int sampleRate = Engine::audioEngine()->processingSampleRate());
+	enum class Source
+	{
+		Unknown,
+		AudioFile,
+		Base64
+	};
+
+	class Access
+	{
+		Access() = default;
+		Access(const Access&) = default;
+		friend class CachedSampleBuffer;
+	};
+
+	SampleBuffer() = delete;
+	SampleBuffer(Access) {}
+	SampleBuffer(Access, const QString& audioFile);
+	SampleBuffer(Access, const QString& base64, int sampleRate);
+	SampleBuffer(Access, std::vector<sampleFrame> data, int sampleRate);
+	SampleBuffer(Access, const sampleFrame* data, int numFrames, int sampleRate);
+
+	static auto create() -> std::shared_ptr<SampleBuffer>;
+	static auto create(const QString& audioFile) -> std::shared_ptr<SampleBuffer>;
+	static auto create(const QString& base64, int sampleRate) -> std::shared_ptr<SampleBuffer>;
+	static auto create(std::vector<sampleFrame> data, int sampleRate) -> std::shared_ptr<SampleBuffer>;
+	static auto create(const sampleFrame* data, int numFrames,
+		int sampleRate = Engine::audioEngine()->processingSampleRate()) -> std::shared_ptr<SampleBuffer>;
+
+	~SampleBuffer() = default;
 
 	friend void swap(SampleBuffer& first, SampleBuffer& second) noexcept;
+
+	auto get() const -> std::shared_ptr<const SampleBuffer>;
+
 	auto toBase64() const -> QString;
 
-	auto audioFile() const -> const QString& { return m_audioFile; }
+	auto source() const -> const QString& { return m_source; }
+	auto sourceType() const -> Source { return m_sourceType; }
+	auto audioFile() const -> const QString&;
+	auto base64() const -> const QString&;
 	auto sampleRate() const -> sample_rate_t { return m_sampleRate; }
 
 	auto begin() -> iterator { return m_data.begin(); }
@@ -88,7 +118,8 @@ public:
 
 private:
 	std::vector<sampleFrame> m_data;
-	QString m_audioFile;
+	QString m_source; //!< audio file name or base64 data
+	Source m_sourceType = Source::Unknown;
 	sample_rate_t m_sampleRate = Engine::audioEngine()->processingSampleRate();
 };
 

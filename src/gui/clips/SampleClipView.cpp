@@ -33,7 +33,7 @@
 #include "embed.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
-#include "SampleLoader.h"
+#include "SampleLoaderDialog.h"
 #include "SampleWaveform.h"
 #include "Song.h"
 #include "StringPairDrag.h"
@@ -181,7 +181,7 @@ void SampleClipView::mouseReleaseEvent(QMouseEvent *_me)
 
 void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 {
-	QString af = SampleLoader::openAudioFile();
+	QString af = SampleLoaderDialog::openAudioFile();
 
 	if ( af.isEmpty() ) {} //Don't do anything if no file is loaded
 	else if (af == m_clip->m_sample.sampleFile())

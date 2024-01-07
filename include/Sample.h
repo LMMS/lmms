@@ -94,6 +94,7 @@ public:
 		Loop loopMode = Loop::Off) -> bool;
 
 	auto sampleDuration() const -> std::chrono::milliseconds;
+	auto sampleSourceType() const -> SampleBuffer::Source { return m_buffer->sourceType(); }
 	auto sampleFile() const -> const QString& { return m_buffer->audioFile(); }
 	auto sampleRate() const -> int { return m_buffer->sampleRate(); }
 	auto sampleSize() const -> int { return m_buffer->size(); }
@@ -126,7 +127,7 @@ private:
 	void copyBufferBackward(sampleFrame* dst, int initialPosition, int advanceAmount) const;
 
 private:
-	std::shared_ptr<const SampleBuffer> m_buffer = std::make_shared<SampleBuffer>();
+	std::shared_ptr<const SampleBuffer> m_buffer = SampleBuffer::create();
 	std::atomic<int> m_startFrame = 0;
 	std::atomic<int> m_endFrame = 0;
 	std::atomic<int> m_loopStartFrame = 0;

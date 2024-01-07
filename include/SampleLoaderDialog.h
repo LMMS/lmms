@@ -1,5 +1,5 @@
 /*
- * SampleLoader.h - Load audio and waveform files
+ * SampleLoaderDialog.h - Load audio and waveform files
  *
  * Copyright (c) 2023 saker <sakertooth@gmail.com>
  *
@@ -22,24 +22,23 @@
  *
  */
 
-#ifndef LMMS_SAMPLE_LOADER_H
-#define LMMS_SAMPLE_LOADER_H
+#ifndef LMMS_GUI_SAMPLE_LOADER_DIALOG_H
+#define LMMS_GUI_SAMPLE_LOADER_DIALOG_H
 
-#include "SampleBuffer.h"
+#include <QString>
+
+#include "SampleLoader.h"
 #include "lmms_export.h"
 
-namespace lmms {
+namespace lmms::gui {
 
-class LMMS_EXPORT SampleLoader
+class LMMS_EXPORT SampleLoaderDialog
 {
 public:
-	static auto createBufferFromFile(const QString& filePath) -> std::shared_ptr<const SampleBuffer>;
-	static auto createBufferFromBase64(const QString& base64,
-		int sampleRate = Engine::audioEngine()->processingSampleRate()) -> std::shared_ptr<const SampleBuffer>;
-private:
-	static void displayError(const QString& message);
+	static auto openAudioFile(const QString& previousFile = "") -> QString;
+	static auto openWaveformFile(const QString& previousFile = "") -> QString;
 };
 
-} // namespace lmms
+} // namespace lmms::gui
 
-#endif // LMMS_SAMPLE_LOADER_H
+#endif // LMMS_GUI_SAMPLE_LOADER_DIALOG_H
