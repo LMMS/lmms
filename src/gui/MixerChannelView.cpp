@@ -104,6 +104,7 @@ namespace lmms::gui
         m_muteButton->setInactiveGraphic(embed::getIconPixmap("led_green"));
         m_muteButton->setCheckable(true);
         m_muteButton->setToolTip(tr("Mute this channel"));
+        connect(&mixerChannel->m_muteModel, &BoolModel::dataChanged, mixerView, &MixerView::toggledMute, Qt::DirectConnection);
 
         m_soloButton = new PixmapButton(this, tr("Solo"));
         m_soloButton->setModel(&mixerChannel->m_soloModel);

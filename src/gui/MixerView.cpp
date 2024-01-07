@@ -283,6 +283,22 @@ void MixerView::loadSettings(const QDomElement& domElement)
 void MixerView::toggledSolo()
 {
 	Engine::mixer()->toggledSolo();
+
+	updateAllMixerChannels();
+}
+
+
+void MixerView::toggledMute()
+{
+	updateAllMixerChannels();
+}
+
+void MixerView::updateAllMixerChannels()
+{
+	for (int i = 0; i < m_mixerChannelViews.size(); ++i)
+	{
+		m_mixerChannelViews[i]->update();
+	}
 }
 
 
