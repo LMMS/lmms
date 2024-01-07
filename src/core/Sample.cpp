@@ -48,7 +48,7 @@ Sample::Sample(const sampleFrame* data, size_t numFrames, sample_rate_t sampleRa
 }
 
 Sample::Sample(std::shared_ptr<const SampleBuffer> buffer)
-	: m_buffer(buffer)
+	: m_buffer(std::move(buffer))
 	, m_startFrame(0)
 	, m_endFrame(m_buffer->size())
 	, m_loopStartFrame(0)
