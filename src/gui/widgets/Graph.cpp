@@ -29,6 +29,7 @@
 #include "SampleLoader.h"
 #include "StringPairDrag.h"
 #include "SampleBuffer.h"
+#include "SampleCache.h"
 #include "Oscillator.h"
 
 namespace lmms
@@ -592,8 +593,8 @@ QString graphModel::setWaveToUser()
 	QString fileName = gui::SampleLoader::openWaveformFile();
 	if( fileName.isEmpty() == false )
 	{
-		auto sampleBuffer = gui::SampleLoader::createBufferFromFile(fileName);
-		for( int i = 0; i < length(); i++ )
+		auto sampleBuffer = SampleCache::get(fileName);
+		for (int i = 0; i < length(); i++)
 		{
 			m_samples[i] = Oscillator::userWaveSample(sampleBuffer.get(), i / static_cast<float>(length()));
 		}

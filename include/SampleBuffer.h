@@ -53,12 +53,15 @@ public:
 
 	SampleBuffer() = default;
 	explicit SampleBuffer(const QString& audioFile);
-	SampleBuffer(const QString& base64, int sampleRate);
-	SampleBuffer(std::vector<sampleFrame> data, int sampleRate);
+	SampleBuffer(std::vector<sampleFrame> data, sample_rate_t sampleRate);
 	SampleBuffer(
-		const sampleFrame* data, int numFrames, int sampleRate = Engine::audioEngine()->processingSampleRate());
+		const sampleFrame* data, size_t numFrames, sample_rate_t sampleRate = Engine::audioEngine()->processingSampleRate());
 
 	friend void swap(SampleBuffer& first, SampleBuffer& second) noexcept;
+
+	static auto fromBase64(
+		const QString& base64, sample_rate_t sampleRate = Engine::audioEngine()->processingSampleRate())
+		-> std::shared_ptr<const SampleBuffer>;
 	auto toBase64() const -> QString;
 
 	auto audioFile() const -> const QString& { return m_audioFile; }

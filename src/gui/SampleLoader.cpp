@@ -25,15 +25,12 @@
 #include "SampleLoader.h"
 
 #include <QFileInfo>
-#include <QMessageBox>
 #include <memory>
 
 #include "ConfigManager.h"
 #include "FileDialog.h"
-#include "GuiApplication.h"
 #include "PathUtil.h"
 #include "SampleDecoder.h"
-#include "Song.h"
 
 namespace lmms::gui {
 QString SampleLoader::openAudioFile(const QString& previousFile)
@@ -86,41 +83,6 @@ QString SampleLoader::openWaveformFile(const QString& previousFile)
 {
 	return openAudioFile(
 		previousFile.isEmpty() ? ConfigManager::inst()->factorySamplesDir() + "waveforms/10saw.flac" : previousFile);
-}
-
-std::shared_ptr<const SampleBuffer> SampleLoader::createBufferFromFile(const QString& filePath)
-{
-	if (filePath.isEmpty()) { return SampleBuffer::emptyBuffer(); }
-
-	try
-	{
-		return std::make_shared<SampleBuffer>(filePath);
-	}
-	catch (const std::runtime_error& error)
-	{
-		if (getGUI()) { displayError(QString::fromStdString(error.what())); }
-		return SampleBuffer::emptyBuffer();
-	}
-}
-
-std::shared_ptr<const SampleBuffer> SampleLoader::createBufferFromBase64(const QString& base64, int sampleRate)
-{
-	if (base64.isEmpty()) { return SampleBuffer::emptyBuffer(); }
-
-	try
-	{
-		return std::make_shared<SampleBuffer>(base64, sampleRate);
-	}
-	catch (const std::runtime_error& error)
-	{
-		if (getGUI()) { displayError(QString::fromStdString(error.what())); }
-		return SampleBuffer::emptyBuffer();
-	}
-}
-
-void SampleLoader::displayError(const QString& message)
-{
-	QMessageBox::critical(nullptr, QObject::tr("Error loading sample"), message);
 }
 
 } // namespace lmms::gui

@@ -29,6 +29,7 @@
 
 #include "PathUtil.h"
 #include "SampleBuffer.h"
+#include "SampleCache.h"
 #include "SampleClipView.h"
 #include "SampleLoader.h"
 #include "SampleTrack.h"
@@ -138,7 +139,7 @@ void SampleClip::setSampleFile(const QString& sf)
 	if (!sf.isEmpty())
 	{
 		//Otherwise set it to the sample's length
-		m_sample = Sample(gui::SampleLoader::createBufferFromFile(sf));
+		m_sample = Sample(SampleCache::get(sf));
 		length = sampleLength();
 	}
 
@@ -295,7 +296,7 @@ void SampleClip::loadSettings( const QDomElement & _this )
 		auto sampleRate = _this.hasAttribute("sample_rate") ? _this.attribute("sample_rate").toInt() :
 			Engine::audioEngine()->processingSampleRate();
 
-		auto buffer = gui::SampleLoader::createBufferFromBase64(_this.attribute("data"), sampleRate);
+		auto buffer = SampleBuffer::fromBase64(_this.attribute("data"), sampleRate);
 		m_sample = Sample(std::move(buffer));
 	}
 	changeLength( _this.attribute( "len" ).toInt() );

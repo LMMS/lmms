@@ -30,6 +30,7 @@
 
 #include "AudioEngine.h"
 #include "PathUtil.h"
+#include "SampleCache.h"
 #include "SampleLoader.h"
 #include "Song.h"
 
@@ -243,7 +244,7 @@ void LfoController::loadSettings( const QDomElement & _this )
 	{
 		if (QFileInfo(PathUtil::toAbsolute(userWaveFile)).exists())
 		{
-			m_userDefSampleBuffer = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile"));
+			m_userDefSampleBuffer = SampleCache::get(_this.attribute("userwavefile"));
 		}
 		else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), userWaveFile)); }
 	}

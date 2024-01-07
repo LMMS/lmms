@@ -23,6 +23,7 @@
  */
 
 #include "SampleBuffer.h"
+
 #include <cstring>
 
 #include "PathUtil.h"
@@ -31,7 +32,7 @@
 
 namespace lmms {
 
-SampleBuffer::SampleBuffer(const sampleFrame* data, int numFrames, int sampleRate)
+SampleBuffer::SampleBuffer(const sampleFrame* data, size_t numFrames, sample_rate_t sampleRate)
 	: m_data(data, data + numFrames)
 	, m_sampleRate(sampleRate)
 {
@@ -55,16 +56,7 @@ SampleBuffer::SampleBuffer(const QString& audioFile)
 		"Failed to decode audio file: Either the audio codec is unsupported, or the file is corrupted."};
 }
 
-SampleBuffer::SampleBuffer(const QString& base64, int sampleRate)
-	: m_sampleRate(sampleRate)
-{
-	// TODO: Replace with non-Qt equivalent
-	const auto bytes = QByteArray::fromBase64(base64.toUtf8());
-	m_data.resize(bytes.size() / sizeof(sampleFrame));
-	std::memcpy(reinterpret_cast<char*>(m_data.data()), bytes, m_data.size() * sizeof(sampleFrame));
-}
-
-SampleBuffer::SampleBuffer(std::vector<sampleFrame> data, int sampleRate)
+SampleBuffer::SampleBuffer(std::vector<sampleFrame> data, sample_rate_t sampleRate)
 	: m_data(std::move(data))
 	, m_sampleRate(sampleRate)
 {
@@ -76,6 +68,16 @@ void swap(SampleBuffer& first, SampleBuffer& second) noexcept
 	swap(first.m_data, second.m_data);
 	swap(first.m_audioFile, second.m_audioFile);
 	swap(first.m_sampleRate, second.m_sampleRate);
+}
+
+auto SampleBuffer::fromBase64(const QString& base64, sample_rate_t sampleRate) -> std::shared_ptr<const SampleBuffer>
+{
+	// TODO: Replace with non-Qt equivalent
+	const auto bytes = QByteArray::fromBase64(base64.toUtf8());
+	auto data = std::vector<sampleFrame>(bytes.size() / sizeof(sampleFrame));
+	std::memcpy(reinterpret_cast<char*>(data.data()), bytes, data.size() * sizeof(sampleFrame));
+
+	return std::make_shared<const SampleBuffer>(std::move(data), sampleRate);
 }
 
 QString SampleBuffer::toBase64() const

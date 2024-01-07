@@ -31,6 +31,7 @@
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "PathUtil.h"
+#include "SampleCache.h"
 #include "SampleLoader.h"
 #include "Song.h"
 #include "embed.h"
@@ -321,7 +322,7 @@ std::vector<Note> SlicerT::getMidi()
 
 void SlicerT::updateFile(QString file)
 {
-	if (auto buffer = gui::SampleLoader::createBufferFromFile(file)) { m_originalSample = Sample(std::move(buffer)); }
+	m_originalSample = Sample(SampleCache::get(file));
 
 	findBPM();
 	findSlices();
@@ -361,8 +362,7 @@ void SlicerT::loadSettings(const QDomElement& element)
 	{
 		if (QFileInfo(PathUtil::toAbsolute(srcFile)).exists())
 		{
-			auto buffer = gui::SampleLoader::createBufferFromFile(srcFile);
-			m_originalSample = Sample(std::move(buffer));
+			m_originalSample = Sample(SampleCache::get(srcFile));
 		}
 		else
 		{
@@ -372,7 +372,7 @@ void SlicerT::loadSettings(const QDomElement& element)
 	}
 	else if (auto sampleData = element.attribute("sampledata"); !sampleData.isEmpty())
 	{
-		auto buffer = gui::SampleLoader::createBufferFromBase64(sampleData);
+		auto buffer = SampleBuffer::fromBase64(sampleData);
 		m_originalSample = Sample(std::move(buffer));
 	}
 

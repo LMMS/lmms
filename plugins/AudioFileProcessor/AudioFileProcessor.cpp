@@ -41,6 +41,7 @@
 #include "NotePlayHandle.h"
 #include "PathUtil.h"
 #include "PixmapButton.h"
+#include "SampleCache.h"
 #include "SampleLoader.h"
 #include "SampleWaveform.h"
 #include "Song.h"
@@ -239,7 +240,7 @@ void AudioFileProcessor::loadSettings(const QDomElement& elem)
 	}
 	else if (auto sampleData = elem.attribute("sampledata"); !sampleData.isEmpty())
 	{
-		m_sample = Sample(gui::SampleLoader::createBufferFromBase64(sampleData));
+		m_sample = Sample(SampleBuffer::fromBase64(sampleData));
 	}
 
 	m_loopModel.loadSettings(elem, "looped");
@@ -321,6 +322,8 @@ gui::PluginView* AudioFileProcessor::instantiateView( QWidget * _parent )
 
 void AudioFileProcessor::setAudioFile(const QString& _audio_file, bool _rename)
 {
+	m_sample = Sample(SampleCache::get(_audio_file));
+
 	// is current channel-name equal to previous-filename??
 	if( _rename &&
 		( instrumentTrack()->name() ==
@@ -330,9 +333,7 @@ void AudioFileProcessor::setAudioFile(const QString& _audio_file, bool _rename)
 		// then set it to new one
 		instrumentTrack()->setName( PathUtil::cleanName( _audio_file ) );
 	}
-	// else we don't touch the track-name, because the user named it self
 
-	m_sample = Sample(gui::SampleLoader::createBufferFromFile(_audio_file));
 	loopPointChanged();
 	emit sampleUpdated();
 }
