@@ -43,10 +43,15 @@ auto SampleCache::get(const QString& path) -> std::shared_ptr<const SampleBuffer
 		if (const auto buffer = it.value().lock()) { return buffer; }
 	}
 
-	const auto buffer = std::make_shared<const SampleBuffer>(path);
-	m_samples.insert(path, buffer);
-	m_fsWatcher.addPath(path);
-	return buffer;
+	// TODO: Do not signify failure by returning an empty buffer.
+	try
+	{
+		const auto buffer = std::make_shared<const SampleBuffer>(path);
+		m_samples.insert(path, buffer);
+		m_fsWatcher.addPath(path);
+		return buffer;
+	}
+	catch (const std::runtime_error& error) { return SampleBuffer::emptyBuffer(); }
 }
 
 auto SampleCache::instance() -> SampleCache&
