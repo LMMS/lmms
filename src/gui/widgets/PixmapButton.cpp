@@ -131,11 +131,11 @@ QSize PixmapButton::sizeHint() const
 {
 	if( ( model() != nullptr && model()->value() ) || m_pressed )
 	{
-		return m_activePixmap.size() / devicePixelRatio();
+		return m_activePixmap.size();
 	}
 	else 
 	{
-		return m_inactivePixmap.size() / devicePixelRatio();
+		return m_inactivePixmap.size();
 	}
 }
 
