@@ -509,7 +509,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 						// The TimePos of either the clicked node or a new one
 						const auto clickedPos = clickedNode == tm.end()
 							? quantization.quantize(posTicks)
-							: POS(clickedNode);
+							: TimePos{POS(clickedNode)};
 						// Starts actually moving/draging the node
 						TimePos newTime = m_clip->setDragValue(
 							clickedPos,
