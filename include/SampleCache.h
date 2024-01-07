@@ -30,9 +30,12 @@
 #include <QString>
 #include <memory>
 
+#include "lmms_export.h"
+
 namespace lmms {
 class SampleBuffer;
-class SampleCache
+
+class LMMS_EXPORT SampleCache
 {
 public:
 	SampleCache();
