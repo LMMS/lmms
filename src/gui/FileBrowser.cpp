@@ -718,10 +718,14 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 			embed::getIconPixmap("sample_file", 24, 24), 0);
 		// TODO: this can be removed once we do this outside the event thread
 		qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-		auto buffer = SampleCache::instance().get(fileName);
-		auto s = new SamplePlayHandle(new lmms::Sample{std::move(buffer)});
-		s->setDoneMayReturnTrue(false);
-		newPPH = s;
+		try
+		{
+			auto buffer = std::make_shared<const SampleBuffer>(fileName);
+			auto s = new SamplePlayHandle(new lmms::Sample{std::move(buffer)});
+			s->setDoneMayReturnTrue(false);
+			newPPH = s;
+		}
+		catch (const std::runtime_error& error) { QMessageBox::critical(nullptr, tr("Error loading sample"), error.what()); }
 		delete tf;
 	}
 	else if (
