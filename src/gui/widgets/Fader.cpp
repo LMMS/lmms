@@ -435,13 +435,6 @@ void Fader::paintLevels(QPaintEvent * ev, QPainter & painter, bool linear)
 	auto const peakRectR = ph.getPersistentPeakRect(rightMeterMargins, mappedPersistentPeakR);
 	painter.fillRect(peakRectR, linearGrad);
 
-	// Draw a transparent white line around the levels outlines to make it look similar to the pixmaps
-	// that were used before the change to painting the levels in code.
-	QPen pen(QColor(255, 255, 255, 18));
-	pen.setWidth(2);
-	painter.setPen(pen);
-	painter.drawPath(path);
-
 	painter.restore();
 }
 
