@@ -390,8 +390,8 @@ void Fader::paintLevels(QPaintEvent * ev, QPainter & painter, bool linear)
 	// Please ensure that "clip starts" is the maximum value and that "ok ends"
 	// is the minimum value and that all other values lie inbetween. Otherwise
 	// there will be warnings when the gradient is defined.
-	float const mappedClipStarts(mapper(dbfsToAmp(6.f)));
-	float const mappedWarnEnd(mappedUnity);
+	float const mappedClipStarts(mapper(dbfsToAmp(0.f)));
+	float const mappedWarnEnd(mapper(dbfsToAmp(-0.01)));
 	float const mappedWarnStart(mapper(dbfsToAmp(-6.f)));
 	float const mappedOkEnd(mapper(dbfsToAmp(-12.f)));
 
