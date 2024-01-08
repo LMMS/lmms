@@ -125,45 +125,39 @@ void LadspaDescription::update( const ladspa_key_t & _key )
 	Ladspa2LMMS * manager = Engine::getLADSPAManager();
 
 	auto name = new QLabel(description);
-	name->setText( QWidget::tr( "Name: " ) + manager->getName( _key ) );
+	name->setText(tr("Name: ") + manager->getName(_key));
 	layout->addWidget( name );
 
 	auto maker = new QLabel(description);
-	maker->setText(QWidget::tr("Maker: ") + manager->getMaker(_key));
+	maker->setText(tr("Maker: ") + manager->getMaker(_key));
 	layout->addWidget( maker );
 
 	auto copyright = new QLabel(description);
-	copyright->setText(QWidget::tr("Copyright: ") + manager->getCopyright(_key));
+	copyright->setText(tr("Copyright: ") + manager->getCopyright(_key));
 	layout->addWidget( copyright );
 
 	auto requiresRealTime = new QLabel(description);
-	requiresRealTime->setText( QWidget::tr( "Requires Real Time: " ) +
-				( manager->hasRealTimeDependency( _key ) ?
-							QWidget::tr( "Yes" ) :
-							QWidget::tr( "No" ) ) );
+	requiresRealTime->setText(tr("Requires Real Time: ") +
+				(manager->hasRealTimeDependency(_key) ? tr("Yes") : tr("No")));
 	layout->addWidget( requiresRealTime );
 
 	auto realTimeCapable = new QLabel(description);
-	realTimeCapable->setText( QWidget::tr( "Real Time Capable: " ) +
-					( manager->isRealTimeCapable( _key ) ?
-							QWidget::tr( "Yes" ) :
-							QWidget::tr( "No" ) ) );
+	realTimeCapable->setText(tr("Real Time Capable: ") +
+				(manager->isRealTimeCapable(_key) ? tr("Yes") : tr("No")));
 	layout->addWidget( realTimeCapable );
 
 	auto inplaceBroken = new QLabel(description);
-	inplaceBroken->setText( QWidget::tr( "In Place Broken: " ) +
-					( manager->isInplaceBroken( _key ) ?
-							QWidget::tr( "Yes" ) :
-							QWidget::tr( "No" ) ) );
+	inplaceBroken->setText(tr("In Place Broken: ") +
+				(manager->isInplaceBroken(_key) ? tr("Yes") : tr("No")));
 	layout->addWidget( inplaceBroken );
 
 	auto channelsIn = new QLabel(description);
-	channelsIn->setText( QWidget::tr( "Channels In: " ) + QString::number(
+	channelsIn->setText(tr("Channels In: ") + QString::number(
 			manager->getDescription( _key )->inputChannels ) );
 	layout->addWidget( channelsIn );
 
 	auto channelsOut = new QLabel(description);
-	channelsOut->setText( QWidget::tr( "Channels Out: " ) + QString::number(
+	channelsOut->setText(tr("Channels Out: ") + QString::number(
 			manager->getDescription( _key )->outputChannels ) );
 	layout->addWidget( channelsOut );
 }
