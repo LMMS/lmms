@@ -338,6 +338,14 @@ void Fader::paintLevels(QPaintEvent * ev, QPainter & painter, bool linear)
 		mapper = [this](float value) { return value; };
 	}
 
+	float const mappedMinPeak(mapper(m_fMinPeak));
+	float const mappedMaxPeak(mapper(m_fMaxPeak));
+	float const mappedPeakL(mapper(m_fPeakValue_L));
+	float const mappedPeakR(mapper(m_fPeakValue_R));
+	float const mappedPersistentPeakL(mapper(m_persistentPeak_L));
+	float const mappedPersistentPeakR(mapper(m_persistentPeak_R));
+	float const mappedUnity(mapper(1.f));
+
 	painter.save();
 
 	QRect const baseRect = rect();
@@ -361,14 +369,6 @@ void Fader::paintLevels(QPaintEvent * ev, QPainter & painter, bool linear)
 
 	// Now clip everything to the paths of the meters
 	painter.setClipPath(path);
-
-	float const mappedMinPeak(mapper(m_fMinPeak));
-	float const mappedMaxPeak(mapper(m_fMaxPeak));
-	float const mappedPeakL(mapper(m_fPeakValue_L));
-	float const mappedPeakR(mapper(m_fPeakValue_R));
-	float const mappedPersistentPeakL(mapper(m_persistentPeak_L));
-	float const mappedPersistentPeakR(mapper(m_persistentPeak_R));
-	float const mappedUnity(mapper(1.f));
 
 	// These values define where the gradient changes values, i.e. the ranges
 	// for clipping, warning and ok.
