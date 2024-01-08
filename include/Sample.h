@@ -95,7 +95,8 @@ public:
 
 	auto sampleDuration() const -> std::chrono::milliseconds;
 	auto sampleSourceType() const -> SampleBuffer::Source { return m_buffer->sourceType(); }
-	auto sampleFile() const -> const QString& { return m_buffer->audioFile(); }
+	auto sampleFileAbsolute() const -> const QString& { return m_buffer->audioFileAbsolute(); }
+	auto sampleFileRelative() const -> QString { return m_buffer->audioFileRelative(); }
 	auto sampleRate() const -> int { return m_buffer->sampleRate(); }
 	auto sampleSize() const -> int { return m_buffer->size(); }
 

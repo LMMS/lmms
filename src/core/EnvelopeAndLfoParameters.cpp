@@ -28,10 +28,10 @@
 #include <QFileInfo>
 
 #include "AudioEngine.h"
+#include "CachedSampleLoader.h"
 #include "Engine.h"
 #include "Oscillator.h"
 #include "PathUtil.h"
-#include "SampleLoader.h"
 #include "Song.h"
 
 namespace lmms
@@ -361,7 +361,7 @@ void EnvelopeAndLfoParameters::saveSettings( QDomDocument & _doc,
 
 	if (m_userWave)
 	{
-		_parent.setAttribute("userwavefile", m_userWave->audioFile());
+		_parent.setAttribute("userwavefile", m_userWave->audioFileRelative());
 	}
 }
 
@@ -398,7 +398,7 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 	{
 		if (QFileInfo(PathUtil::toAbsolute(userWaveFile)).exists())
 		{
-			m_userWave = SampleLoader::createBufferFromFile(_this.attribute("userwavefile"));
+			m_userWave = CachedSampleLoader::createBufferFromFile(_this.attribute("userwavefile"));
 		}
 		else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), userWaveFile)); }
 	}

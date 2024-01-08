@@ -1,5 +1,5 @@
 /*
- * SampleCache.h - SampleBuffer cache
+ * CachedSampleLoader.h - Sample loader with a cache
  *
  * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_SAMPLE_CACHE_H
-#define LMMS_SAMPLE_CACHE_H
+#ifndef LMMS_CACHED_SAMPLE_LOADER_H
+#define LMMS_CACHED_SAMPLE_LOADER_H
 
 #include <QFileSystemWatcher>
 #include <QHash>
@@ -34,15 +34,17 @@
 
 #include "NoCopyNoMove.h"
 #include "SampleBuffer.h"
+#include "SampleLoader.h"
 #include "lmms_export.h"
 
 namespace lmms {
-class LMMS_EXPORT SampleCache : public QObject
+class LMMS_EXPORT CachedSampleLoader : public QObject, public SampleLoader
 {
 	Q_OBJECT
 public:
-	SampleCache();
-	~SampleCache() = default;
+	~CachedSampleLoader() = default;
+
+	static auto inst() -> CachedSampleLoader&;
 
 	static auto createBufferFromFile(const QString& filePath,
 		std::chrono::seconds keepAlive = std::chrono::seconds{0}) -> std::shared_ptr<const SampleBuffer>;
@@ -51,41 +53,45 @@ public:
 		int sampleRate = Engine::audioEngine()->processingSampleRate(),
 		std::chrono::seconds keepAlive = std::chrono::seconds{0}) -> std::shared_ptr<const SampleBuffer>;
 
-	static void add(const SampleBuffer& buffer);
-	static auto remove(const SampleBuffer& buffer) -> bool;
+	class AutoEvicter;
 
-	static auto get(const QString& source, SampleBuffer::Source sourceType) -> std::shared_ptr<const SampleBuffer>;
-
-	static auto replace(const SampleBuffer& buffer) -> bool;
-
-public slots:
+private slots:
 	void removeFile(const QString& path);
 
 private:
-	static std::map<std::pair<QString, SampleBuffer::Source>, std::weak_ptr<const SampleBuffer>> s_entries;
-	static QFileSystemWatcher s_watcher;
+	CachedSampleLoader();
+
+	void add(const std::shared_ptr<const SampleBuffer>& buffer);
+	auto remove(const SampleBuffer& buffer) -> bool;
+
+	auto get(const QString& source, SampleBuffer::Source sourceType) -> std::shared_ptr<const SampleBuffer>;
+
+	auto replace(const std::shared_ptr<const SampleBuffer>& buffer) -> bool;
+
+	std::map<std::pair<QString, SampleBuffer::Source>, std::weak_ptr<const SampleBuffer>> m_entries;
+	QFileSystemWatcher m_watcher;
 };
 
-class KeepAlive : public QObject, public NoCopyNoMove
+
+namespace detail {
+
+class CacheKeepAlive : public QObject, public NoCopyNoMove
 {
 	Q_OBJECT
 public:
-	KeepAlive(QObject* parent, std::shared_ptr<const SampleBuffer>&& p)
-		: QObject{parent}
-		, m_data{std::move(p)}
-	{
-	}
+	friend class CachedSampleLoader::AutoEvicter;
 
 public slots:
-	void destroy()
-	{
-		m_data.reset();
-		delete this;
-	}
+	void destroy() noexcept;
+
 private:
+	CacheKeepAlive(std::shared_ptr<const SampleBuffer>&& p) noexcept;
+
 	std::shared_ptr<const SampleBuffer> m_data;
 };
 
+} // namespace detail
+
 } // namespace lmms
 
-#endif // LMMS_SAMPLE_CACHE_H
+#endif // LMMS_CACHED_SAMPLE_LOADER_H

@@ -24,17 +24,13 @@
 
 #include "SampleLoader.h"
 
+#include <QDebug>
 #include <QMessageBox>
-#include <QTimer>
-#include <QObject>
 #include <chrono>
-#include <memory>
 #include <iostream>
 
 #include "AudioEngine.h"
 #include "GuiApplication.h"
-#include "NoCopyNoMove.h"
-#include "SampleCache.h"
 
 using namespace std::chrono_literals;
 
@@ -44,16 +40,11 @@ auto SampleLoader::createBufferFromFile(const QString& filePath) -> std::shared_
 {
 	if (filePath.isEmpty()) { return nullptr; }
 
-	if (auto buffer = SampleCache::get(filePath, SampleBuffer::Source::AudioFile))
-	{
-		return buffer;
-	}
+	qDebug() << "SampleLoader::createBufferFromFile";
 
 	try
 	{
-		auto buffer = SampleCache::createBufferFromFile(filePath);
-		SampleCache::add(*buffer);
-		return buffer;
+		return SampleBuffer::create(filePath);
 	}
 	catch (const std::runtime_error& error)
 	{
@@ -67,16 +58,11 @@ auto SampleLoader::createBufferFromBase64(const QString& base64, int sampleRate)
 {
 	if (base64.isEmpty()) { return nullptr; }
 
-	if (auto buffer = SampleCache::get(base64, SampleBuffer::Source::Base64))
-	{
-		return buffer;
-	}
+	qDebug() << "SampleLoader::createBufferFromBase64";
 
 	try
 	{
-		auto buffer = SampleCache::createBufferFromBase64(base64, sampleRate);
-		SampleCache::add(*buffer);
-		return buffer;
+		return SampleBuffer::create(base64, sampleRate);
 	}
 	catch (const std::runtime_error& error)
 	{

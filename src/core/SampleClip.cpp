@@ -27,10 +27,10 @@
 #include <QDomElement>
 #include <QFileInfo>
 
+#include "CachedSampleLoader.h"
 #include "PathUtil.h"
 #include "SampleBuffer.h"
 #include "SampleClipView.h"
-#include "SampleLoader.h"
 #include "SampleTrack.h"
 #include "TimeLineWidget.h"
 
@@ -117,7 +117,7 @@ void SampleClip::changeLength( const TimePos & _length )
 
 const QString& SampleClip::sampleFile() const
 {
-	return m_sample.sampleFile();
+	return m_sample.sampleFileAbsolute();
 }
 
 void SampleClip::setSampleBuffer(std::shared_ptr<const SampleBuffer> sb)
@@ -138,7 +138,7 @@ void SampleClip::setSampleFile(const QString& sf)
 	if (!sf.isEmpty())
 	{
 		//Otherwise set it to the sample's length
-		m_sample = Sample(SampleLoader::createBufferFromFile(sf));
+		m_sample = Sample(CachedSampleLoader::createBufferFromFile(sf));
 		length = sampleLength();
 	}
 
@@ -251,9 +251,11 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	}
 	_this.setAttribute( "len", length() );
 	_this.setAttribute( "muted", isMuted() );
-	_this.setAttribute( "src", sampleFile() );
+
+	const auto sampleFile = sample().sampleFileRelative();
+	_this.setAttribute("src", sampleFile);
 	_this.setAttribute( "off", startTimeOffset() );
-	if( sampleFile() == "" )
+	if (sampleFile.isEmpty())
 	{
 		QString s;
 		_this.setAttribute("data", m_sample.toBase64());
@@ -295,7 +297,7 @@ void SampleClip::loadSettings( const QDomElement & _this )
 		auto sampleRate = _this.hasAttribute("sample_rate") ? _this.attribute("sample_rate").toInt() :
 			Engine::audioEngine()->processingSampleRate();
 
-		auto buffer = SampleLoader::createBufferFromBase64(_this.attribute("data"), sampleRate);
+		auto buffer = CachedSampleLoader::createBufferFromBase64(_this.attribute("data"), sampleRate);
 		m_sample = Sample(std::move(buffer));
 	}
 	changeLength( _this.attribute( "len" ).toInt() );

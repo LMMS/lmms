@@ -35,7 +35,10 @@ namespace lmms::gui {
 class LMMS_EXPORT SampleLoaderDialog
 {
 public:
+	//! Returns relative path
 	static auto openAudioFile(const QString& previousFile = "") -> QString;
+
+	//! Returns relative path
 	static auto openWaveformFile(const QString& previousFile = "") -> QString;
 };
 

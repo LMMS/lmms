@@ -42,14 +42,14 @@ SampleBuffer::SampleBuffer(Access, const QString& audioFile)
 	: m_sourceType(Source::AudioFile)
 {
 	if (audioFile.isEmpty()) { throw std::runtime_error{"Failure loading audio file: Audio file path is empty."}; }
-	const auto absolutePath = PathUtil::toAbsolute(audioFile);
+	auto absolutePath = PathUtil::toAbsolute(audioFile);
 
 	if (auto decodedResult = SampleDecoder::decode(absolutePath))
 	{
 		auto& [data, sampleRate] = *decodedResult;
 		m_data = std::move(data);
 		m_sampleRate = sampleRate;
-		m_source = PathUtil::toShortestRelative(audioFile);
+		m_source = std::move(absolutePath);
 		return;
 	}
 
@@ -74,27 +74,28 @@ SampleBuffer::SampleBuffer(Access, std::vector<sampleFrame> data, int sampleRate
 {
 }
 
-auto SampleBuffer::create() -> std::shared_ptr<SampleBuffer>
+auto SampleBuffer::create() -> std::shared_ptr<const SampleBuffer>
 {
 	return std::shared_ptr<SampleBuffer>(new SampleBuffer{Access{}});
 }
 
-auto SampleBuffer::create(const QString& audioFile) -> std::shared_ptr<SampleBuffer>
+auto SampleBuffer::create(const QString& audioFile) -> std::shared_ptr<const SampleBuffer>
 {
 	return std::shared_ptr<SampleBuffer>(new SampleBuffer{Access{}, audioFile});
 }
 
-auto SampleBuffer::create(const QString& base64, int sampleRate) -> std::shared_ptr<SampleBuffer>
+auto SampleBuffer::create(const QString& base64, int sampleRate) -> std::shared_ptr<const SampleBuffer>
 {
 	return std::shared_ptr<SampleBuffer>(new SampleBuffer{Access{}, base64, sampleRate});
 }
 
-auto SampleBuffer::create(std::vector<sampleFrame> data, int sampleRate) -> std::shared_ptr<SampleBuffer>
+auto SampleBuffer::create(std::vector<sampleFrame> data, int sampleRate) -> std::shared_ptr<const SampleBuffer>
 {
 	return std::shared_ptr<SampleBuffer>(new SampleBuffer{Access{}, std::move(data), sampleRate});
 }
 
-auto SampleBuffer::create(const sampleFrame* data, int numFrames, int sampleRate) -> std::shared_ptr<SampleBuffer>
+auto SampleBuffer::create(const sampleFrame* data, int numFrames, int sampleRate)
+	-> std::shared_ptr<const SampleBuffer>
 {
 	return std::shared_ptr<SampleBuffer>(new SampleBuffer{Access{}, data, numFrames, sampleRate});
 }
@@ -108,10 +109,11 @@ void swap(SampleBuffer& first, SampleBuffer& second) noexcept
 	swap(first.m_sampleRate, second.m_sampleRate);
 }
 
+/*
 auto SampleBuffer::get() const -> std::shared_ptr<const SampleBuffer>
 {
 	return shared_from_this();
-}
+}*/
 
 auto SampleBuffer::toBase64() const -> QString
 {
@@ -127,10 +129,15 @@ auto SampleBuffer::toBase64() const -> QString
 	return byteArray.toBase64();
 }
 
-auto SampleBuffer::audioFile() const -> const QString&
+auto SampleBuffer::audioFileAbsolute() const -> const QString&
 {
 	static const QString empty;
 	return m_sourceType == Source::AudioFile ? m_source : empty;
+}
+
+auto SampleBuffer::audioFileRelative() const -> QString
+{
+	return m_sourceType == Source::AudioFile ? PathUtil::toShortestRelative(m_source) : QString{};
 }
 
 auto SampleBuffer::base64() const -> const QString&

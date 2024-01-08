@@ -11,6 +11,7 @@ set(LMMS_SRCS
 	core/BandLimitedWave.cpp
 	core/base64.cpp
 	core/BufferManager.cpp
+	core/CachedSampleLoader.cpp
 	core/Clipboard.cpp
 	core/ComboBoxModel.cpp
 	core/ConfigManager.cpp
@@ -68,7 +69,6 @@ set(LMMS_SRCS
 	core/RingBuffer.cpp
 	core/Sample.cpp
 	core/SampleBuffer.cpp
-	core/SampleCache.cpp
 	core/SampleClip.cpp
 	core/SampleDecoder.cpp
 	core/SampleLoader.cpp

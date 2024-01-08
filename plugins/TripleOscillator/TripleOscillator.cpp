@@ -22,13 +22,14 @@
  *
  */
 
+#include "TripleOscillator.h"
 
 #include <QDomElement>
 #include <QFileInfo>
 
-#include "TripleOscillator.h"
 #include "AudioEngine.h"
 #include "AutomatableButton.h"
+#include "CachedSampleLoader.h"
 #include "debug.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
@@ -138,10 +139,10 @@ void OscillatorObject::oscUserDefWaveDblClick()
 	auto af = gui::SampleLoaderDialog::openWaveformFile();
 	if( af != "" )
 	{
-		m_sampleBuffer = SampleLoader::createBufferFromFile(af);
+		m_sampleBuffer = CachedSampleLoader::createBufferFromFile(af);
 		m_userAntiAliasWaveTable = Oscillator::generateAntiAliasUserWaveTable(m_sampleBuffer.get());
 		// TODO:
-		//m_usrWaveBtn->setToolTip(m_sampleBuffer->audioFile());
+		//m_usrWaveBtn->setToolTip(m_sampleBuffer->audioFileRelative());
 	}
 }
 
@@ -255,7 +256,7 @@ void TripleOscillator::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 		if (auto sampleBuffer = m_osc[i]->m_sampleBuffer)
 		{
-			_this.setAttribute("userwavefile" + is, sampleBuffer->audioFile());
+			_this.setAttribute("userwavefile" + is, sampleBuffer->audioFileRelative());
 		}
 	}
 }
@@ -288,7 +289,7 @@ void TripleOscillator::loadSettings( const QDomElement & _this )
 		{
 			if (QFileInfo(PathUtil::toAbsolute(userWaveFile)).exists())
 			{
-				m_osc[i]->m_sampleBuffer = SampleLoader::createBufferFromFile(userWaveFile);
+				m_osc[i]->m_sampleBuffer = CachedSampleLoader::createBufferFromFile(userWaveFile);
 				m_osc[i]->m_userAntiAliasWaveTable = Oscillator::generateAntiAliasUserWaveTable(m_osc[i]->m_sampleBuffer.get());
 			}
 			else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), userWaveFile)); }

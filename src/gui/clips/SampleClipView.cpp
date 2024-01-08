@@ -28,8 +28,9 @@
 #include <QMenu>
 #include <QPainter>
 
-#include "GuiApplication.h"
 #include "AutomationEditor.h"
+#include "CachedSampleLoader.h"
+#include "GuiApplication.h"
 #include "embed.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
@@ -64,8 +65,8 @@ void SampleClipView::updateSample()
 	// set tooltip to filename so that user can see what sample this
 	// sample-clip contains
 	setToolTip(
-		!m_clip->m_sample.sampleFile().isEmpty()
-			? PathUtil::toAbsolute(m_clip->m_sample.sampleFile())
+		!m_clip->sampleFile().isEmpty()
+			? m_clip->sampleFile()
 			: tr("Double-click to open sample")
 	);
 }
@@ -123,7 +124,7 @@ void SampleClipView::dropEvent( QDropEvent * _de )
 	}
 	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )
 	{
-		m_clip->setSampleBuffer(SampleLoader::createBufferFromBase64(StringPairDrag::decodeValue(_de)));
+		m_clip->setSampleBuffer(CachedSampleLoader::createBufferFromBase64(StringPairDrag::decodeValue(_de)));
 		m_clip->updateLength();
 		update();
 		_de->accept();
@@ -183,8 +184,9 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 {
 	QString af = SampleLoaderDialog::openAudioFile();
 
-	if ( af.isEmpty() ) {} //Don't do anything if no file is loaded
-	else if (af == m_clip->m_sample.sampleFile())
+	if (af.isEmpty()) { return; } //Don't do anything if no file is loaded
+
+	if (af == PathUtil::toShortestRelative(m_clip->sampleFile()))
 	{	//Instead of reloading the existing file, just reset the size
 		int length = static_cast<int>(m_clip->m_sample.sampleSize() / Engine::framesPerTick());
 		m_clip->changeLength(length);
@@ -271,7 +273,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 			qMax( static_cast<int>( m_clip->sampleLength() * ppb / ticksPerBar ), 1 ), rect().bottom() - 2 * spacing );
 	SampleWaveform::visualize(m_clip->m_sample, p, r);
 
-	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
+	QString name = PathUtil::cleanName(m_clip->sampleFile());
 	paintTextLabel(name, p);
 
 	// disable antialiasing for borders, since its not needed

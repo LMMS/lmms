@@ -32,6 +32,7 @@
 #include <samplerate.h>
 
 #include "AudioEngine.h"
+#include "CachedSampleLoader.h"
 #include "ComboBox.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
@@ -209,8 +210,9 @@ void AudioFileProcessor::deleteNotePluginData( NotePlayHandle * _n )
 
 void AudioFileProcessor::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
-	elem.setAttribute("src", m_sample.sampleFile());
-	if (m_sample.sampleFile().isEmpty())
+	auto sampleFile = m_sample.sampleFileRelative();
+	elem.setAttribute("src", sampleFile);
+	if (sampleFile.isEmpty())
 	{
 		elem.setAttribute("sampledata", m_sample.toBase64());
 	}
@@ -239,7 +241,7 @@ void AudioFileProcessor::loadSettings(const QDomElement& elem)
 	}
 	else if (auto sampleData = elem.attribute("sampledata"); !sampleData.isEmpty())
 	{
-		m_sample = Sample(SampleLoader::createBufferFromBase64(sampleData));
+		m_sample = Sample(CachedSampleLoader::createBufferFromBase64(sampleData));
 	}
 
 	m_loopModel.loadSettings(elem, "looped");
@@ -324,15 +326,15 @@ void AudioFileProcessor::setAudioFile(const QString& _audio_file, bool _rename)
 	// is current channel-name equal to previous-filename??
 	if( _rename &&
 		( instrumentTrack()->name() ==
-			QFileInfo(m_sample.sampleFile()).fileName() ||
-				m_sample.sampleFile().isEmpty()))
+			QFileInfo(m_sample.sampleFileAbsolute()).fileName() ||
+				m_sample.sampleFileAbsolute().isEmpty()))
 	{
 		// then set it to new one
 		instrumentTrack()->setName( PathUtil::cleanName( _audio_file ) );
 	}
 	// else we don't touch the track-name, because the user named it self
 
-	m_sample = Sample(SampleLoader::createBufferFromFile(_audio_file));
+	m_sample = Sample(CachedSampleLoader::createBufferFromFile(_audio_file));
 	loopPointChanged();
 	emit sampleUpdated();
 }
@@ -645,7 +647,8 @@ void AudioFileProcessorView::paintEvent( QPaintEvent * )
 
 	QString file_name = "";
 
-	int idx = a->m_sample.sampleFile().length();
+	const auto sampleFile = a->m_sample.sampleFileRelative();
+	int idx = sampleFile.length();
 
 	p.setFont( pointSize<8>( font() ) );
 
@@ -656,7 +659,7 @@ void AudioFileProcessorView::paintEvent( QPaintEvent * )
 	while( idx > 0 &&
 		fm.size( Qt::TextSingleLine, file_name + "..." ).width() < 210 )
 	{
-		file_name = a->m_sample.sampleFile()[--idx] + file_name;
+		file_name = sampleFile[--idx] + file_name;
 	}
 
 	if( idx > 0 )

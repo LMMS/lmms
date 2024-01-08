@@ -36,7 +36,7 @@ public:
 	static auto createBufferFromFile(const QString& filePath) -> std::shared_ptr<const SampleBuffer>;
 	static auto createBufferFromBase64(const QString& base64,
 		int sampleRate = Engine::audioEngine()->processingSampleRate()) -> std::shared_ptr<const SampleBuffer>;
-private:
+protected:
 	static void displayError(const QString& message);
 };
 

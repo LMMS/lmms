@@ -23,15 +23,14 @@
  *
  */
 
-
-#include "embed.h"
-
-
 #include "LfoController.h"
+
+#include "CachedSampleLoader.h"
+#include "embed.h"
 #include "Knob.h"
-#include "TempoSyncKnob.h"
 #include "PixmapButton.h"
 #include "SampleLoaderDialog.h"
+#include "TempoSyncKnob.h"
 
 namespace lmms::gui
 {
@@ -216,9 +215,9 @@ void LfoControllerDialog::askUserDefWave()
 
 	auto lfoModel = dynamic_cast<LfoController*>(model());
 	auto& buffer = lfoModel->m_userDefSampleBuffer;
-	buffer = SampleLoader::createBufferFromFile(fileName);
+	buffer = CachedSampleLoader::createBufferFromFile(fileName);
 
-	m_userWaveBtn->setToolTip(buffer ? buffer->audioFile() : "");
+	m_userWaveBtn->setToolTip(buffer ? buffer->audioFileRelative() : "");
 }
 
 
