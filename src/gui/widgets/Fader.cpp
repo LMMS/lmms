@@ -370,6 +370,21 @@ void Fader::paintLevels(QPaintEvent * ev, QPainter & painter, bool linear)
 	// Now clip everything to the paths of the meters
 	painter.setClipPath(path);
 
+	PaintHelper ph(mappedMinPeak, mappedMaxPeak);
+
+	// Draw left and right unity lines (0 dbFS, 1.0 amplitude)
+	if (getRenderUnityLine())
+	{
+		auto const unityRectL = ph.getPersistentPeakRect(leftMeterRect, mappedUnity);
+		painter.fillRect(unityRectL, getUnityMarker());
+	}
+
+	if (getRenderUnityLine())
+	{
+		auto const unityRectR = ph.getPersistentPeakRect(rightMeterRect, mappedUnity);
+		painter.fillRect(unityRectR, getUnityMarker());
+	}
+
 	// These values define where the gradient changes values, i.e. the ranges
 	// for clipping, warning and ok.
 	// Please ensure that "clip starts" is the maximum value and that "ok ends"
@@ -404,8 +419,6 @@ void Fader::paintLevels(QPaintEvent * ev, QPainter & painter, bool linear)
 	linearGrad.setColorAt(mapBetweenClipAndOk.map(mappedWarnStart), peakWarn());
 	linearGrad.setColorAt(1, peakOk());
 
-	PaintHelper ph(mappedMinPeak, mappedMaxPeak);
-
 	// Draw left levels
 	QRect leftMeterMargins = leftMeterRect.marginsRemoved(QMargins(1, 0, 1, 0));
 	painter.fillRect(ph.getMeterRect(leftMeterMargins, mappedPeakL), linearGrad);
@@ -428,20 +441,6 @@ void Fader::paintLevels(QPaintEvent * ev, QPainter & painter, bool linear)
 	pen.setWidth(2);
 	painter.setPen(pen);
 	painter.drawPath(path);
-
-	// Draw left and right unity lines (0 dbFS, 1.0 amplitude)
-	if (getRenderUnityLine())
-	{
-		auto const unityRectL = ph.getPersistentPeakRect(leftMeterRect, mappedUnity);
-		painter.fillRect(unityRectL, getUnityMarker());
-	}
-
-	if (getRenderUnityLine())
-	{
-		auto const unityRectR = ph.getPersistentPeakRect(rightMeterRect, mappedUnity);
-		painter.fillRect(unityRectR, getUnityMarker());
-	}
-
 
 	painter.restore();
 }
