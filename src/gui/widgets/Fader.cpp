@@ -296,39 +296,6 @@ void Fader::paintEvent( QPaintEvent * ev)
 	painter.drawPixmap((width() - m_knob.width()) / 2, knobPosY() - m_knob.height(), m_knob);
 }
 
-class PaintHelper
-{
-public:
-	PaintHelper(float min, float max) :
-		m_min(min),
-		m_max(max),
-		// We will need to divide by the span between min and max several times. It's more
-		// efficient to calculate the reciprocal once and then to multiply.
-		m_fullSpanReciprocal(1. / (max - min))
-	{
-	}
-
-	QRect getMeterRect(QRect const & meterRect, float peak)
-	{
-		float const span = peak - m_min;
-		int mappedHeight = meterRect.height() * span * m_fullSpanReciprocal;
-
-		return meterRect.adjusted(0, meterRect.height() - mappedHeight, 0, 0);
-	}
-
-	QRect getPersistentPeakRect(QRect const & meterRect, float peak)
-	{
-		int persistentPeak_L = meterRect.height() * (1 - (peak - m_min) * m_fullSpanReciprocal);
-
-		return QRect(meterRect.x(), persistentPeak_L, meterRect.width(), 1);
-	}
-
-private:
-	float const m_min;
-	float const m_max;
-	float const m_fullSpanReciprocal;
-};
-
 void Fader::paintLevels(QPaintEvent * ev, QPainter & painter, bool linear)
 {
 	std::function<float(float value)> mapper = [this](float value) { return ampToDbfs(qMax<float>(0.0001, value)); };
@@ -370,18 +337,36 @@ void Fader::paintLevels(QPaintEvent * ev, QPainter & painter, bool linear)
 	// Now clip everything to the paths of the meters
 	painter.setClipPath(path);
 
-	PaintHelper ph(mappedMinPeak, mappedMaxPeak);
+	// This linear map performs the following mapping:
+	// Value (dbFS or linear) -> window coordinates of the widget
+	// It is for example used to determine the height of peaks, markers and to define the gradient for the levels
+	LinearMap<float> const valuesToWindowCoordinates(mappedMaxPeak, leftMeterRect.y(), mappedMinPeak, leftMeterRect.y() + leftMeterRect.height());
+
+	// This lambda takes a peak value (in dbFS or linear) and a rectangle and computes a rectangle
+	// that represent the peak value within the rectangle. It's used to compute the peak indicators
+	// which "dance" on top of the level meters.
+	auto const computePeakRect = [&valuesToWindowCoordinates](QRect const & rect, float peak) -> QRect
+	{
+		return QRect(rect.x(), valuesToWindowCoordinates.map(peak), rect.width(), 1);
+	};
+
+	// This lambda takes a peak value (in dbFS or linear) and a rectangle and returns an adjusted copy of the
+	// rectangle that represents the peak value. It is used to compute the level meters themselves.
+	auto const computeLevelRect = [&valuesToWindowCoordinates](QRect const & rect, float peak) -> QRect
+	{
+		QRect result(rect);
+		result.setTop(valuesToWindowCoordinates.map(peak));
+
+		return result;
+	};
 
 	// Draw left and right unity lines (0 dbFS, 1.0 amplitude)
 	if (getRenderUnityLine())
 	{
-		auto const unityRectL = ph.getPersistentPeakRect(leftMeterRect, mappedUnity);
+		auto const unityRectL = computePeakRect(leftMeterRect, mappedUnity);
 		painter.fillRect(unityRectL, getUnityMarker());
-	}
 
-	if (getRenderUnityLine())
-	{
-		auto const unityRectR = ph.getPersistentPeakRect(rightMeterRect, mappedUnity);
+		auto const unityRectR = computePeakRect(rightMeterRect, mappedUnity);
 		painter.fillRect(unityRectR, getUnityMarker());
 	}
 
@@ -404,7 +389,6 @@ void Fader::paintLevels(QPaintEvent * ev, QPainter & painter, bool linear)
 	// as well as the Y-coordinates of the rectangle to compute a map which will give us the coordinates of the value where the clipping
 	// starts and where the ok area end. These coordinates are used to initialize the gradient. Please note that the gradient might thus
 	// extend the rectangle into which we paint.
-	LinearMap<float> const valuesToWindowCoordinates(mappedMaxPeak, leftMeterRect.y(), mappedMinPeak, leftMeterRect.y() + leftMeterRect.height());
 	float clipStartYCoord = valuesToWindowCoordinates.map(mappedClipStarts);
 	float okEndYCoord = valuesToWindowCoordinates.map(mappedOkEnd);
 
@@ -421,18 +405,18 @@ void Fader::paintLevels(QPaintEvent * ev, QPainter & painter, bool linear)
 
 	// Draw left levels
 	QRect leftMeterMargins = leftMeterRect.marginsRemoved(QMargins(1, 0, 1, 0));
-	painter.fillRect(ph.getMeterRect(leftMeterMargins, mappedPeakL), linearGrad);
+	painter.fillRect(computeLevelRect(leftMeterMargins, mappedPeakL), linearGrad);
 
 	// Draw left peaks
-	auto const peakRectL = ph.getPersistentPeakRect(leftMeterMargins, mappedPersistentPeakL);
+	auto const peakRectL = computePeakRect(leftMeterMargins, mappedPersistentPeakL);
 	painter.fillRect(peakRectL, linearGrad);
 
 	// Draw right levels
 	QRect rightMeterMargins = rightMeterRect.marginsRemoved(QMargins(1, 0, 1, 0));
-	painter.fillRect(ph.getMeterRect(rightMeterMargins, mappedPeakR), linearGrad);
+	painter.fillRect(computeLevelRect(rightMeterMargins, mappedPeakR), linearGrad);
 
 	// Draw right peaks
-	auto const peakRectR = ph.getPersistentPeakRect(rightMeterMargins, mappedPersistentPeakR);
+	auto const peakRectR = computePeakRect(rightMeterMargins, mappedPersistentPeakR);
 	painter.fillRect(peakRectR, linearGrad);
 
 	painter.restore();
