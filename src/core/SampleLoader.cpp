@@ -24,23 +24,16 @@
 
 #include "SampleLoader.h"
 
-#include <QDebug>
 #include <QMessageBox>
-#include <chrono>
 #include <iostream>
 
-#include "AudioEngine.h"
 #include "GuiApplication.h"
-
-using namespace std::chrono_literals;
 
 namespace lmms {
 
 auto SampleLoader::createBufferFromFile(const QString& filePath) -> std::shared_ptr<const SampleBuffer>
 {
 	if (filePath.isEmpty()) { return nullptr; }
-
-	qDebug() << "SampleLoader::createBufferFromFile";
 
 	try
 	{
@@ -57,8 +50,6 @@ auto SampleLoader::createBufferFromBase64(const QString& base64, int sampleRate)
 	-> std::shared_ptr<const SampleBuffer>
 {
 	if (base64.isEmpty()) { return nullptr; }
-
-	qDebug() << "SampleLoader::createBufferFromBase64";
 
 	try
 	{

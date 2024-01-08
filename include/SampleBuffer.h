@@ -39,7 +39,7 @@
 
 namespace lmms {
 class LMMS_EXPORT SampleBuffer
-	//: public std::enable_shared_from_this<SampleBuffer>
+	: public std::enable_shared_from_this<SampleBuffer>
 {
 public:
 	using value_type = sampleFrame;
@@ -85,7 +85,7 @@ public:
 
 	friend void swap(SampleBuffer& first, SampleBuffer& second) noexcept;
 
-	//auto get() const -> std::shared_ptr<const SampleBuffer>;
+	auto get() const -> std::shared_ptr<const SampleBuffer>;
 
 	auto toBase64() const -> QString;
 

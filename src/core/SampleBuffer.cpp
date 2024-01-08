@@ -109,11 +109,10 @@ void swap(SampleBuffer& first, SampleBuffer& second) noexcept
 	swap(first.m_sampleRate, second.m_sampleRate);
 }
 
-/*
 auto SampleBuffer::get() const -> std::shared_ptr<const SampleBuffer>
 {
 	return shared_from_this();
-}*/
+}
 
 auto SampleBuffer::toBase64() const -> QString
 {

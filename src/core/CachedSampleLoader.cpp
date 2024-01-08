@@ -24,11 +24,7 @@
 
 #include "CachedSampleLoader.h"
 
-#include <QDebug>
-#include <QTimer>
-#include <QObject>
 #include <cassert>
-#include <unordered_map>
 
 #include "PathUtil.h"
 #include "lmms_basics.h"
@@ -37,100 +33,19 @@ namespace lmms {
 
 /**
  * An auto evictor which automatically evicts sample buffers from the cache
- * a specified time after the last reference to the buffer is dropped
+ * immediately after the last reference to the buffer is dropped
 */
 class CachedSampleLoader::AutoEvictor
 {
 public:
-	AutoEvictor(std::chrono::milliseconds keepAlive = std::chrono::seconds{60})
-		: m_keepAlive{keepAlive}
-	{
-	}
-
-	AutoEvictor(const AutoEvictor&) noexcept = default;
-	AutoEvictor(AutoEvictor&&) noexcept = default;
-	auto operator=(const AutoEvictor&) noexcept -> AutoEvictor& = default;
-	auto operator=(AutoEvictor&&) noexcept -> AutoEvictor& = default;
-	~AutoEvictor() = default;
-
 	void operator()(SampleBuffer* p) const noexcept
 	{
 		if (!p) { return; }
 
-		qDebug() << "AutoEvictor - deleter";
-
-		if (m_postponedEviction)
-		{
-			qDebug() << "AutoEvictor - postponed eviction period has passed, time to delete";
-			//CachedSampleLoader::inst().remove(*p);
-			delete p;
-			qDebug() << "AutoEvictor - done";
-			return;
-		}
-
-		if (m_keepAlive.count() == 0)
-		{
-			// Evict from cache immediately
-			qDebug() << "AutoEvictor - evict immediately";
-			CachedSampleLoader::inst().remove(*p);
-			delete p;
-			qDebug() << "AutoEvictor - done";
-			return;
-		}
-
-		qDebug() << "AutoEvictor - postpone evict";
-
-		auto buffer = std::shared_ptr<const SampleBuffer>{p, AutoEvictor{true, m_keepAlive}};
-
-		if (!CachedSampleLoader::inst().replace(buffer))
-		{
-			std::get_deleter<AutoEvictor>(buffer)->resetPostponedEviction();
-			return;
-		}
-
-		// Postpone buffer deletion TODO: Will this work?
-		QTimer::singleShot(m_keepAlive,
-			new detail::CacheKeepAlive{std::move(buffer)},
-			&detail::CacheKeepAlive::destroy);
-
-		qDebug() << "AutoEvictor - deleter return";
+		CachedSampleLoader::inst().remove(*p);
+		delete p;
 	}
-
-	//! Keep alive duration
-	auto keepAlive() -> auto& { return m_keepAlive; }
-
-	void resetPostponedEviction() { m_postponedEviction = false; qDebug() << "resetPostponedEviction()"; }
-
-private:
-	AutoEvictor(bool postponedEviction, std::chrono::milliseconds keepAlive = std::chrono::seconds{60})
-		: m_keepAlive{keepAlive}
-		, m_postponedEviction{postponedEviction}
-	{
-	}
-
-	std::chrono::milliseconds m_keepAlive;
-	bool m_postponedEviction = false;
 };
-
-detail::CacheKeepAlive::CacheKeepAlive(std::shared_ptr<const SampleBuffer>&& p) noexcept
-	: QObject{}
-	, m_data{std::move(p)}
-{
-}
-
-detail::CacheKeepAlive::~CacheKeepAlive()
-{
-	qDebug() << "CacheKeepAlive::~CacheKeepAlive()";
-}
-
-void detail::CacheKeepAlive::destroy() noexcept
-{
-	qDebug() << "CacheKeepAlive - destroy; m_data.get():" << m_data.get();
-	qDebug() << "CacheKeepAlive - destroy; use count before:" << m_data.use_count();
-	m_data = nullptr;
-	qDebug() << "CacheKeepAlive - use count should be 0:" << m_data.use_count();
-	delete this; // ???
-}
 
 CachedSampleLoader::CachedSampleLoader()
 {
@@ -143,26 +58,21 @@ auto CachedSampleLoader::inst() -> CachedSampleLoader&
 	return *singleton;
 }
 
-auto CachedSampleLoader::createBufferFromFile(const QString& filePath,
-	std::chrono::seconds keepAlive) -> std::shared_ptr<const SampleBuffer>
+auto CachedSampleLoader::createBufferFromFile(const QString& filePath)
+	-> std::shared_ptr<const SampleBuffer>
 {
 	if (filePath.isEmpty()) { return nullptr; }
 
-	qDebug() << "CachedSampleLoader::createBufferFromFile";
-
 	if (auto buffer = CachedSampleLoader::inst().get(filePath, SampleBuffer::Source::AudioFile))
 	{
-		//std::get_deleter<AutoEvictor>(buffer)->keepAlive() = keepAlive; // TODO?
 		return buffer;
 	}
-
-	qDebug() << "CachedSampleLoader: Cache returned null";
 
 	try
 	{
 		auto buffer = std::shared_ptr<SampleBuffer> {
 			new SampleBuffer{SampleBuffer::Access{}, filePath},
-			AutoEvictor{keepAlive} // TODO
+			AutoEvictor{}
 		};
 		CachedSampleLoader::inst().add(buffer);
 		return buffer;
@@ -174,27 +84,21 @@ auto CachedSampleLoader::createBufferFromFile(const QString& filePath,
 	}
 }
 
-auto CachedSampleLoader::createBufferFromBase64(const QString& base64,
-	int sampleRate, std::chrono::seconds keepAlive) -> std::shared_ptr<const SampleBuffer>
+auto CachedSampleLoader::createBufferFromBase64(const QString& base64, int sampleRate)
+	-> std::shared_ptr<const SampleBuffer>
 {
 	if (base64.isEmpty()) { return nullptr; }
 
-	qDebug() << "CachedSampleLoader::createBufferFromBase64";
-
 	if (auto buffer = CachedSampleLoader::inst().get(base64, SampleBuffer::Source::Base64))
 	{
-		//qDebug() << "CachedSampleLoader: AutoEvictor keepAlive ms:" << std::get_deleter<AutoEvictor>(buffer)->keepAlive().count();
-		//std::get_deleter<AutoEvictor>(buffer)->keepAlive() = keepAlive; // TODO?
 		return buffer;
 	}
-
-	qDebug() << "CachedSampleLoader: Cache returned null";
 
 	try
 	{
 		auto buffer = std::shared_ptr<SampleBuffer> {
 			new SampleBuffer{SampleBuffer::Access{}, base64, sampleRate},
-			AutoEvictor{keepAlive}
+			AutoEvictor{}
 		};
 		CachedSampleLoader::inst().add(buffer);
 		return buffer;
@@ -214,8 +118,6 @@ void CachedSampleLoader::add(const std::shared_ptr<const SampleBuffer>& buffer)
 		throw std::runtime_error{"Unsupported sample buffer source"};
 	}
 
-	qDebug() << QString{"add: Emplacing {%1, %2}"}.arg(buffer->source(), QString::number((int)buffer->sourceType()));
-
 	const bool added = m_entries.try_emplace(std::pair{buffer->source(), buffer->sourceType()}, buffer).second;
 
 	if (added && buffer->sourceType() == SampleBuffer::Source::AudioFile)
@@ -226,7 +128,6 @@ void CachedSampleLoader::add(const std::shared_ptr<const SampleBuffer>& buffer)
 
 auto CachedSampleLoader::remove(const SampleBuffer& buffer) -> bool
 {
-	qDebug() << "CachedSampleLoader::remove";
 	const bool removed = m_entries.erase(std::pair{buffer.source(), buffer.sourceType()}) > 0;
 
 	if (removed && buffer.sourceType() == SampleBuffer::Source::AudioFile)
@@ -240,26 +141,21 @@ auto CachedSampleLoader::remove(const SampleBuffer& buffer) -> bool
 auto CachedSampleLoader::get(const QString& source, SampleBuffer::Source sourceType)
 	-> std::shared_ptr<const SampleBuffer>
 {
-	std::shared_ptr<const SampleBuffer> buffer;
 	switch (sourceType)
 	{
 		case SampleBuffer::Source::AudioFile:
 		{
-			qDebug() << QString{"get: Finding {%1, %2}"}.arg(PathUtil::toAbsolute(source), QString::number((int)sourceType));
 			if (auto it = m_entries.find(std::pair{PathUtil::toAbsolute(source), sourceType}); it != m_entries.end())
 			{
-				qDebug() << "Found in cache:" << PathUtil::toAbsolute(source);
-				buffer = it->second.lock();
+				return it->second.lock();
 			}
 			break;
 		}
 		case SampleBuffer::Source::Base64:
 		{
-			qDebug() << QString{"get: Finding {%1, %2}"}.arg(source, QString::number((int)sourceType));
 			if (auto it = m_entries.find(std::pair{source, sourceType}); it != m_entries.end())
 			{
-				qDebug() << "Found in cache:" << source;
-				buffer = it->second.lock();
+				return it->second.lock();
 			}
 			break;
 		}
@@ -267,47 +163,11 @@ auto CachedSampleLoader::get(const QString& source, SampleBuffer::Source sourceT
 			throw std::runtime_error{"Unsupported sample buffer source"};
 	}
 
-	if (!buffer)
-	{
-		qDebug() << "Not found in cache";
-		return nullptr;
-	}
-
-	std::get_deleter<AutoEvictor>(buffer)->resetPostponedEviction();
-	return buffer;
-}
-
-auto CachedSampleLoader::replace(const std::shared_ptr<const SampleBuffer>& buffer) -> bool
-{
-	// NOTE: This method cannot take `const SampleBuffer&` and use `buffer.get()` because
-	// using `shared_from_this()` from the shared pointer deleter is UB.
-
-	assert(buffer != nullptr);
-	if (buffer->sourceType() == SampleBuffer::Source::Unknown)
-	{
-		// Unsupported sample buffer source
-		qDebug() << "Unsupported sample buffer source";
-		return false;
-	}
-
-	if (auto it = m_entries.find(std::pair{buffer->source(), buffer->sourceType()}); it != m_entries.end())
-	{
-		qDebug() << "CachedSampleLoader::replace buffer.get():" << buffer.get();
-		qDebug() << "it->second.expired():" << it->second.expired() << "  (should be true)";
-		///m_entries.erase(it);
-		///m_entries.try_emplace(std::pair{buffer->source(), buffer->sourceType()}, buffer);
-		it->second = buffer;
-		qDebug() << "CachedSampleLoader::replace success";
-		return true;
-	}
-
-	qDebug() << "CachedSampleLoader::replace FAIL";
-	return false;
+	return nullptr;
 }
 
 void CachedSampleLoader::removeFile(const QString& path)
 {
-	qDebug() << "FILE WATCHER: CachedSampleLoader::removeFile(); path:" << path;
 	m_entries.erase(std::pair{path, SampleBuffer::Source::AudioFile});
 }
 

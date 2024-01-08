@@ -26,13 +26,10 @@
 #define LMMS_CACHED_SAMPLE_LOADER_H
 
 #include <QFileSystemWatcher>
-#include <QHash>
+#include <QObject>
 #include <QString>
-#include <chrono>
-#include <unordered_map>
 #include <map>
 
-#include "NoCopyNoMove.h"
 #include "SampleBuffer.h"
 #include "SampleLoader.h"
 #include "lmms_export.h"
@@ -46,14 +43,12 @@ public:
 
 	static auto inst() -> CachedSampleLoader&;
 
-	static auto createBufferFromFile(const QString& filePath,
-		std::chrono::seconds keepAlive = std::chrono::seconds{0}) -> std::shared_ptr<const SampleBuffer>;
+	static auto createBufferFromFile(const QString& filePath) -> std::shared_ptr<const SampleBuffer>;
 
 	static auto createBufferFromBase64(const QString& base64,
-		int sampleRate = Engine::audioEngine()->processingSampleRate(),
-		std::chrono::seconds keepAlive = std::chrono::seconds{0}) -> std::shared_ptr<const SampleBuffer>;
+		int sampleRate = Engine::audioEngine()->processingSampleRate())
+		-> std::shared_ptr<const SampleBuffer>;
 
-	class AutoEvictor;
 
 private slots:
 	void removeFile(const QString& path);
@@ -61,38 +56,16 @@ private slots:
 private:
 	CachedSampleLoader();
 
+	class AutoEvictor;
+
 	void add(const std::shared_ptr<const SampleBuffer>& buffer);
 	auto remove(const SampleBuffer& buffer) -> bool;
 
 	auto get(const QString& source, SampleBuffer::Source sourceType) -> std::shared_ptr<const SampleBuffer>;
 
-	auto replace(const std::shared_ptr<const SampleBuffer>& buffer) -> bool;
-
 	std::map<std::pair<QString, SampleBuffer::Source>, std::weak_ptr<const SampleBuffer>> m_entries;
 	QFileSystemWatcher m_watcher;
 };
-
-
-namespace detail {
-
-class CacheKeepAlive : public QObject, public NoCopyNoMove
-{
-	Q_OBJECT
-public:
-	friend class CachedSampleLoader::AutoEvictor;
-	~CacheKeepAlive() override;
-
-public slots:
-	void destroy() noexcept;
-
-private:
-	CacheKeepAlive() = delete;
-	CacheKeepAlive(std::shared_ptr<const SampleBuffer>&& p) noexcept;
-
-	std::shared_ptr<const SampleBuffer> m_data;
-};
-
-} // namespace detail
 
 } // namespace lmms
 
