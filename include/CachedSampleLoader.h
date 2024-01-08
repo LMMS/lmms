@@ -53,7 +53,7 @@ public:
 		int sampleRate = Engine::audioEngine()->processingSampleRate(),
 		std::chrono::seconds keepAlive = std::chrono::seconds{0}) -> std::shared_ptr<const SampleBuffer>;
 
-	class AutoEvicter;
+	class AutoEvictor;
 
 private slots:
 	void removeFile(const QString& path);
@@ -79,12 +79,14 @@ class CacheKeepAlive : public QObject, public NoCopyNoMove
 {
 	Q_OBJECT
 public:
-	friend class CachedSampleLoader::AutoEvicter;
+	friend class CachedSampleLoader::AutoEvictor;
+	~CacheKeepAlive() override;
 
 public slots:
 	void destroy() noexcept;
 
 private:
+	CacheKeepAlive() = delete;
 	CacheKeepAlive(std::shared_ptr<const SampleBuffer>&& p) noexcept;
 
 	std::shared_ptr<const SampleBuffer> m_data;
