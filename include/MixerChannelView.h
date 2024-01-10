@@ -97,6 +97,7 @@ namespace lmms::gui
         void removeUnusedChannels();
         void moveChannelLeft();
         void moveChannelRight();
+	    void toggledMute();
 
     private:
         QString elideName(const QString& name);

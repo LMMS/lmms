@@ -104,7 +104,7 @@ namespace lmms::gui
         m_muteButton->setInactiveGraphic(embed::getIconPixmap("led_green"));
         m_muteButton->setCheckable(true);
         m_muteButton->setToolTip(tr("Mute this channel"));
-        connect(&mixerChannel->m_muteModel, &BoolModel::dataChanged, mixerView, &MixerView::toggledMute, Qt::DirectConnection);
+        connect(&mixerChannel->m_muteModel, &BoolModel::dataChanged, this, &MixerChannelView::toggledMute, Qt::DirectConnection);
 
         m_soloButton = new PixmapButton(this, tr("Solo"));
         m_soloButton->setModel(&mixerChannel->m_soloModel);
@@ -274,11 +274,24 @@ namespace lmms::gui
 
     void MixerChannelView::setChannelIndex(int index)
     {
+        // First disconnect the signals of the previous mixer channel
+        auto * currentMixerChannel = Engine::mixer()->mixerChannel(m_channelIndex);
+        disconnect(&currentMixerChannel->m_muteModel, &BoolModel::dataChanged, this, &MixerChannelView::toggledMute);
+        disconnect(&currentMixerChannel->m_soloModel, &BoolModel::dataChanged, m_mixerView, &MixerView::toggledSolo);
+
         MixerChannel* mixerChannel = Engine::mixer()->mixerChannel(index);
         m_fader->setModel(&mixerChannel->m_volumeModel);
-        m_muteButton->setModel(&mixerChannel->m_muteModel);
-        m_soloButton->setModel(&mixerChannel->m_soloModel);
+
+        auto * muteModel = &mixerChannel->m_muteModel;
+        m_muteButton->setModel(muteModel);
+        connect(muteModel, &BoolModel::dataChanged, this, &MixerChannelView::toggledMute, Qt::DirectConnection);
+
+        auto * soloModel = &mixerChannel->m_soloModel;
+        m_soloButton->setModel(soloModel);
+        connect(soloModel, &BoolModel::dataChanged, m_mixerView, &MixerView::toggledSolo, Qt::DirectConnection);
+
         m_effectRackView->setModel(&mixerChannel->m_fxChain);
+
         m_channelIndex = index;
     }
 
@@ -435,6 +448,11 @@ namespace lmms::gui
     {
         auto mix = getGUI()->mixerView();
         mix->moveChannelRight(m_channelIndex);
+    }
+
+    void MixerChannelView::toggledMute()
+    {
+        update();
     }
 
     QString MixerChannelView::elideName(const QString& name)

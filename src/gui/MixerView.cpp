@@ -288,11 +288,6 @@ void MixerView::toggledSolo()
 }
 
 
-void MixerView::toggledMute()
-{
-	updateAllMixerChannels();
-}
-
 void MixerView::updateAllMixerChannels()
 {
 	for (int i = 0; i < m_mixerChannelViews.size(); ++i)
