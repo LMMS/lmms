@@ -59,12 +59,14 @@ public:
 		Base64
 	};
 
+	//! passkey idiom
 	class Access
 	{
+		friend class SampleBuffer;
+		friend class SampleLoader;
 	private:
-		Access() = default;
+		Access() {}
 		Access(const Access&) = default;
-		friend class SampleCache;
 	};
 
 	SampleBuffer() = delete;
