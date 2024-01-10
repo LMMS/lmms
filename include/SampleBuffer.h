@@ -62,8 +62,10 @@ public:
 	//! passkey idiom
 	class Access
 	{
+	public:
 		friend class SampleBuffer;
 		friend class SampleLoader;
+		Access(Access&&) = default;
 	private:
 		Access() {}
 		Access(const Access&) = default;

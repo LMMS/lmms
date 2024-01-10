@@ -92,9 +92,7 @@ auto SampleLoader::fromFile(const QString& filePath, Cache cache)
 					return buffer;
 				}
 
-				return std::shared_ptr<SampleBuffer> {
-					new SampleBuffer{SampleBuffer::Access{}, filePath}
-				};
+				return std::make_shared<SampleBuffer>(SampleBuffer::Access{}, filePath);
 			}
 			catch (const std::runtime_error& error)
 			{
@@ -137,9 +135,7 @@ auto SampleLoader::fromBase64(const QString& base64, int sampleRate, Cache cache
 					return buffer;
 				}
 
-				return std::shared_ptr<SampleBuffer> {
-					new SampleBuffer{SampleBuffer::Access{}, base64, sampleRate}
-				};
+				return std::make_shared<SampleBuffer>(SampleBuffer::Access{}, base64, sampleRate);
 			}
 			catch (const std::runtime_error& error)
 			{

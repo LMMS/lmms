@@ -76,28 +76,28 @@ SampleBuffer::SampleBuffer(Access, std::vector<sampleFrame> data, int sampleRate
 
 auto SampleBuffer::create() -> std::shared_ptr<const SampleBuffer>
 {
-	return std::shared_ptr<SampleBuffer>(new SampleBuffer{Access{}});
+	return std::make_shared<SampleBuffer>(Access{});
 }
 
 auto SampleBuffer::create(const QString& audioFile) -> std::shared_ptr<const SampleBuffer>
 {
-	return std::shared_ptr<SampleBuffer>(new SampleBuffer{Access{}, audioFile});
+	return std::make_shared<SampleBuffer>(Access{}, audioFile);
 }
 
 auto SampleBuffer::create(const QString& base64, int sampleRate) -> std::shared_ptr<const SampleBuffer>
 {
-	return std::shared_ptr<SampleBuffer>(new SampleBuffer{Access{}, base64, sampleRate});
+	return std::make_shared<SampleBuffer>(Access{}, base64, sampleRate);
 }
 
 auto SampleBuffer::create(std::vector<sampleFrame> data, int sampleRate) -> std::shared_ptr<const SampleBuffer>
 {
-	return std::shared_ptr<SampleBuffer>(new SampleBuffer{Access{}, std::move(data), sampleRate});
+	return std::make_shared<SampleBuffer>(Access{}, std::move(data), sampleRate);
 }
 
 auto SampleBuffer::create(const sampleFrame* data, int numFrames, int sampleRate)
 	-> std::shared_ptr<const SampleBuffer>
 {
-	return std::shared_ptr<SampleBuffer>(new SampleBuffer{Access{}, data, numFrames, sampleRate});
+	return std::make_shared<SampleBuffer>(Access{}, data, numFrames, sampleRate);
 }
 
 void swap(SampleBuffer& first, SampleBuffer& second) noexcept
