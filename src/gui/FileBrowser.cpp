@@ -38,16 +38,14 @@
 #include <QMessageBox>
 #include <QShortcut>
 #include <QStringList>
-
 #include <queue>
 
-#include "FileBrowser.h"
-#include "FileBrowserSearcher.h"
 #include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
 #include "embed.h"
 #include "Engine.h"
+#include "FileBrowserSearcher.h"
 #include "GuiApplication.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
@@ -717,7 +715,7 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 			embed::getIconPixmap("sample_file", 24, 24), 0);
 		// TODO: this can be removed once we do this outside the event thread
 		qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-		if (auto buffer = SampleLoader::createBufferFromFile(fileName))
+		if (auto buffer = SampleLoader::fromFile(fileName, SampleLoader::Cache::None))
 		{
 			auto s = new SamplePlayHandle(new Sample{std::move(buffer)});
 			s->setDoneMayReturnTrue(false);

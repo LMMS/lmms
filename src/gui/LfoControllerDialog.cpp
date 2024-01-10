@@ -25,10 +25,10 @@
 
 #include "LfoController.h"
 
-#include "CachedSampleLoader.h"
 #include "embed.h"
 #include "Knob.h"
 #include "PixmapButton.h"
+#include "SampleLoader.h"
 #include "SampleLoaderDialog.h"
 #include "TempoSyncKnob.h"
 
@@ -215,7 +215,7 @@ void LfoControllerDialog::askUserDefWave()
 
 	auto lfoModel = dynamic_cast<LfoController*>(model());
 	auto& buffer = lfoModel->m_userDefSampleBuffer;
-	buffer = CachedSampleLoader::createBufferFromFile(fileName);
+	buffer = SampleLoader::fromFile(fileName);
 
 	m_userWaveBtn->setToolTip(buffer ? buffer->audioFileRelative() : "");
 }

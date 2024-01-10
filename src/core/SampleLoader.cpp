@@ -1,7 +1,8 @@
 /*
- * SampleLoader.cpp - Static functions that open audio files
+ * SampleLoader.cpp - Sample loader with an optional cache
  *
  * Copyright (c) 2023 saker <sakertooth@gmail.com>
+ *               2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -25,41 +26,188 @@
 #include "SampleLoader.h"
 
 #include <QMessageBox>
+#include <cassert>
 #include <iostream>
 
 #include "GuiApplication.h"
+#include "PathUtil.h"
+#include "lmms_basics.h"
 
 namespace lmms {
 
-auto SampleLoader::createBufferFromFile(const QString& filePath) -> std::shared_ptr<const SampleBuffer>
+/**
+ * An auto evictor which automatically evicts sample buffers from the cache
+ * immediately after the last reference to the buffer is dropped
+*/
+class SampleLoader::AutoEvictor
+{
+public:
+	void operator()(SampleBuffer* p) const noexcept
+	{
+		if (!p) { return; }
+
+		SampleLoader::inst().remove(*p);
+		delete p;
+	}
+};
+
+SampleLoader::SampleLoader()
+{
+	connect(&m_watcher, &QFileSystemWatcher::fileChanged, this, &SampleLoader::removeFile);
+}
+
+auto SampleLoader::inst() -> SampleLoader&
+{
+	static auto singleton = std::unique_ptr<SampleLoader>(new SampleLoader{});
+	return *singleton;
+}
+
+auto SampleLoader::fromFile(const QString& filePath, Cache cache)
+	-> std::shared_ptr<const SampleBuffer>
 {
 	if (filePath.isEmpty()) { return nullptr; }
 
-	try
+	switch (cache)
 	{
-		return SampleBuffer::create(filePath);
-	}
-	catch (const std::runtime_error& error)
-	{
-		displayError(QString::fromStdString(error.what()));
-		return nullptr;
+		case Cache::Read: [[fallthrough]];
+		case Cache::ReadWrite:
+		{
+			if (auto buffer = SampleLoader::inst().getFile(filePath))
+			{
+				return buffer;
+			}
+		}
+		[[fallthrough]];
+		case Cache::None:
+		{
+			try
+			{
+				if (cache == Cache::ReadWrite)
+				{
+					auto buffer = std::shared_ptr<SampleBuffer> {
+						new SampleBuffer{SampleBuffer::Access{}, filePath},
+						AutoEvictor{}
+					};
+					SampleLoader::inst().add(buffer);
+					return buffer;
+				}
+
+				return std::shared_ptr<SampleBuffer> {
+					new SampleBuffer{SampleBuffer::Access{}, filePath}
+				};
+			}
+			catch (const std::runtime_error& error)
+			{
+				displayError(QString::fromStdString(error.what()));
+				return nullptr;
+			}
+		}
+		default:
+			return nullptr; // invalid
 	}
 }
 
-auto SampleLoader::createBufferFromBase64(const QString& base64, int sampleRate)
+auto SampleLoader::fromBase64(const QString& base64, int sampleRate, Cache cache)
 	-> std::shared_ptr<const SampleBuffer>
 {
 	if (base64.isEmpty()) { return nullptr; }
 
-	try
+	switch (cache)
 	{
-		return SampleBuffer::create(base64, sampleRate);
+		case Cache::Read: [[fallthrough]];
+		case Cache::ReadWrite:
+		{
+			if (auto buffer = SampleLoader::inst().getBase64(base64))
+			{
+				return buffer;
+			}
+		}
+		[[fallthrough]];
+		case Cache::None:
+		{
+			try
+			{
+				if (cache == Cache::ReadWrite)
+				{
+					auto buffer = std::shared_ptr<SampleBuffer> {
+						new SampleBuffer{SampleBuffer::Access{}, base64, sampleRate},
+						AutoEvictor{}
+					};
+					SampleLoader::inst().add(buffer);
+					return buffer;
+				}
+
+				return std::shared_ptr<SampleBuffer> {
+					new SampleBuffer{SampleBuffer::Access{}, base64, sampleRate}
+				};
+			}
+			catch (const std::runtime_error& error)
+			{
+				displayError(QString::fromStdString(error.what()));
+				return nullptr;
+			}
+		}
+		default:
+			return nullptr; // invalid
 	}
-	catch (const std::runtime_error& error)
+}
+
+auto SampleLoader::fromBase64(const QString& base64, Cache cache)
+	-> std::shared_ptr<const SampleBuffer>
+{
+	return fromBase64(base64, Engine::audioEngine()->processingSampleRate(), cache);
+}
+
+void SampleLoader::add(const std::shared_ptr<const SampleBuffer>& buffer)
+{
+	assert(buffer != nullptr);
+	if (buffer->sourceType() == SampleBuffer::Source::Unknown)
 	{
-		displayError(QString::fromStdString(error.what()));
-		return nullptr;
+		throw std::runtime_error{"Unsupported sample buffer source"};
 	}
+
+	const bool added = m_entries.try_emplace(Key{buffer->source(), buffer->sourceType()}, buffer).second;
+
+	if (added && buffer->sourceType() == SampleBuffer::Source::AudioFile)
+	{
+		m_watcher.addPath(buffer->audioFileAbsolute());
+	}
+}
+
+auto SampleLoader::remove(const SampleBuffer& buffer) -> bool
+{
+	const bool removed = m_entries.erase(Key{buffer.source(), buffer.sourceType()}) > 0;
+
+	if (removed && buffer.sourceType() == SampleBuffer::Source::AudioFile)
+	{
+		m_watcher.removePath(buffer.audioFileAbsolute());
+	}
+
+	return removed;
+}
+
+auto SampleLoader::getFile(const QString& filePath) -> std::shared_ptr<const SampleBuffer>
+{
+	if (auto it = m_entries.find(Key{PathUtil::toAbsolute(filePath), Source::AudioFile}); it != m_entries.end())
+	{
+		return it->second.lock();
+	}
+	return nullptr;
+}
+
+auto SampleLoader::getBase64(const QString& base64) -> std::shared_ptr<const SampleBuffer>
+{
+	// TODO: Also include sample rate in base64 key?
+	if (auto it = m_entries.find(Key{base64, Source::Base64}); it != m_entries.end())
+	{
+		return it->second.lock();
+	}
+	return nullptr;
+}
+
+void SampleLoader::removeFile(const QString& path)
+{
+	m_entries.erase(Key{path, SampleBuffer::Source::AudioFile});
 }
 
 void SampleLoader::displayError(const QString& message)

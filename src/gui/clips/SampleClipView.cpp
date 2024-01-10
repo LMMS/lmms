@@ -29,11 +29,11 @@
 #include <QPainter>
 
 #include "AutomationEditor.h"
-#include "CachedSampleLoader.h"
 #include "GuiApplication.h"
 #include "embed.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
+#include "SampleLoader.h"
 #include "SampleLoaderDialog.h"
 #include "SampleWaveform.h"
 #include "Song.h"
@@ -124,7 +124,7 @@ void SampleClipView::dropEvent( QDropEvent * _de )
 	}
 	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )
 	{
-		m_clip->setSampleBuffer(CachedSampleLoader::createBufferFromBase64(StringPairDrag::decodeValue(_de)));
+		m_clip->setSampleBuffer(SampleLoader::fromBase64(StringPairDrag::decodeValue(_de)));
 		m_clip->updateLength();
 		update();
 		_de->accept();
