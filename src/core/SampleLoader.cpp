@@ -27,16 +27,26 @@
 
 #include <QMessageBox>
 #include <cassert>
-#include <iostream>
 
+#include "Engine.h"
 #include "GuiApplication.h"
 #include "PathUtil.h"
+#include "Song.h"
 #include "lmms_basics.h"
 
 namespace lmms {
 
+namespace {
+
+void displayError(const QString& message)
+{
+	Engine::getSong()->collectError(QString("%1: %2").arg(QObject::tr("Error loading sample"), message));
+}
+
+} // namespace
+
 /**
- * An auto evictor which automatically evicts sample buffers from the cache
+ * An evictor which automatically evicts sample buffers from the cache
  * immediately after the last reference to the buffer is dropped
 */
 class SampleLoader::AutoEvictor
@@ -58,8 +68,8 @@ SampleLoader::SampleLoader()
 
 auto SampleLoader::inst() -> SampleLoader&
 {
-	static auto singleton = std::unique_ptr<SampleLoader>(new SampleLoader{});
-	return *singleton;
+	static SampleLoader singleton;
+	return singleton;
 }
 
 auto SampleLoader::fromFile(const QString& filePath, Cache cache)
@@ -204,18 +214,6 @@ auto SampleLoader::getBase64(const QString& base64) -> std::shared_ptr<const Sam
 void SampleLoader::removeFile(const QString& path)
 {
 	m_entries.erase(Key{path, SampleBuffer::Source::AudioFile});
-}
-
-void SampleLoader::displayError(const QString& message)
-{
-	if (gui::getGUI())
-	{
-		QMessageBox::critical(nullptr, QObject::tr("Error loading sample"), message);
-	}
-	else
-	{
-		std::cerr << QObject::tr("Error loading sample: %1").arg(message).toStdString() << "\n";
-	}
 }
 
 } // namespace lmms

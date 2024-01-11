@@ -32,15 +32,15 @@
 #include <map>
 
 #include "SampleBuffer.h"
-#include "SampleLoader.h"
 #include "lmms_export.h"
 
 namespace lmms {
+
 class LMMS_EXPORT SampleLoader : public QObject
 {
 	Q_OBJECT
 public:
-	~SampleLoader() = default;
+	~SampleLoader() override = default;
 
 	using Source = SampleBuffer::Source;
 
@@ -75,8 +75,6 @@ private:
 
 	auto getFile(const QString& filePath) -> std::shared_ptr<const SampleBuffer>;
 	auto getBase64(const QString& base64) -> std::shared_ptr<const SampleBuffer>;
-
-	static void displayError(const QString& message);
 
 	using Key = std::pair<QString, Source>;
 	using Value = std::weak_ptr<const SampleBuffer>;
