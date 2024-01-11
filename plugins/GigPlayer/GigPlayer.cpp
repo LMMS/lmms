@@ -945,10 +945,10 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 	m_patchDialogButton->setToolTip(tr("Choose patch"));
 
 	// LCDs
-	m_bankNumLcd = new LcdSpinBox( 3, "21pink", this );
+	m_bankNumLcd = new LcdSpinBox(3, "19green", this);
 	m_bankNumLcd->move( 111, 150 );
 
-	m_patchNumLcd = new LcdSpinBox( 3, "21pink", this );
+	m_patchNumLcd = new LcdSpinBox(3, "19green", this);
 	m_patchNumLcd->move( 161, 150 );
 
 	// Next row
@@ -960,7 +960,7 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 	// Gain
 	m_gainKnob = new gigKnob( this );
 	m_gainKnob->setHintText( tr( "Gain:" ) + " ", "" );
-	m_gainKnob->move( 32, 140 );
+	m_gainKnob->move(32, 150);
 
 	setAutoFillBackground( true );
 	QPalette pal;
