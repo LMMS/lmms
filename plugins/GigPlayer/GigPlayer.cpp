@@ -900,19 +900,6 @@ namespace gui
 {
 
 
-class gigKnob : public Knob
-{
-public:
-	gigKnob( QWidget * _parent ) :
-			Knob( KnobType::Bright26, _parent )
-	{
-		setFixedSize( 31, 38 );
-	}
-} ;
-
-
-
-
 GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _parent ) :
         InstrumentViewFixedSize( _instrument, _parent )
 {
@@ -958,7 +945,7 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 	m_patchLabel->setGeometry( 61, 94, 156, 14 );
 
 	// Gain
-	m_gainKnob = new gigKnob( this );
+	m_gainKnob = new Knob(this);
 	m_gainKnob->setHintText( tr( "Gain:" ) + " ", "" );
 	m_gainKnob->move(32, 150);
 
