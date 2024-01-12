@@ -22,7 +22,7 @@
  *
  */
 
-#include "QTestSuite.h"
+#include <QtTest/QtTest>
 
 #include "QCoreApplication"
 
@@ -39,12 +39,14 @@
 #include "Engine.h"
 #include "Song.h"
 
-class AutomationTrackTest : QTestSuite
+class AutomationTrackTest : public QObject
 {
 	Q_OBJECT
 private slots:
 	void initTestCase()
 	{
+		using namespace lmms;
+		Engine::init(true);
 	}
 
 	void testClipLinear()
@@ -232,6 +234,7 @@ private slots:
 		QCOMPARE(song->automatedValuesAt(0)[&model], 50.0f);
 	}
 
-} AutomationTrackTest;
+};
 
+QTEST_MAIN(AutomationTrackTest)
 #include "AutomationTrackTest.moc"
