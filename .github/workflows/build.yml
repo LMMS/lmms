@@ -45,10 +45,10 @@ jobs:
           cmake .. $CMAKE_OPTS -DCMAKE_INSTALL_PREFIX=./install
       - name: Build
         run: cmake --build build
-      - name: Build tests
-        run: cmake --build build --target tests
       - name: Run tests
-        run: build/tests/tests
+        run: |
+          cd build/tests
+          ctest --output-on-failure
       - name: Package
         run: |
           cmake --build build --target install
@@ -123,10 +123,10 @@ jobs:
                 -DUSE_WERROR=OFF
       - name: Build
         run: cmake --build build
-      - name: Build tests
-        run: cmake --build build --target tests
       - name: Run tests
-        run: build/tests/tests
+        run: |
+          cd build/tests
+          ctest --output-on-failure
       - name: Package
         run: |
           cmake --build build --target install
