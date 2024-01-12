@@ -925,7 +925,7 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 	m_patchDialogButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "patches_on" ) );
 	m_patchDialogButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "patches_off" ) );
 	m_patchDialogButton->setEnabled( false );
-	m_patchDialogButton->move( 223, 94 );
+	m_patchDialogButton->move(223, 92);
 
 	connect( m_patchDialogButton, SIGNAL( clicked() ), this, SLOT( showPatchDialog() ) );
 
