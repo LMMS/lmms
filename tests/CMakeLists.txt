@@ -20,8 +20,7 @@ foreach(LMMS_TEST_SRC IN LISTS LMMS_TESTS)
 	add_test(NAME ${LMMS_TEST_NAME} COMMAND ${LMMS_TEST_NAME})
 
 	# TODO CMake 3.12: Propagate usage requirements by linking to lmmsobjs
-	get_property(LMMS_INCLUDE_DIRS TARGET lmmsobjs PROPERTY INCLUDE_DIRECTORIES)
-	set_property(TARGET ${LMMS_TEST_NAME} PROPERTY INCLUDE_DIRECTORIES ${LMMS_INCLUDE_DIRS})
+	target_include_directories(${LMMS_TEST_NAME} PRIVATE $<TARGET_PROPERTY:lmmsobjs,INCLUDE_DIRECTORIES>)
 
 	target_link_libraries(${LMMS_TEST_NAME} PRIVATE
 		${LMMS_REQUIRED_LIBS}
