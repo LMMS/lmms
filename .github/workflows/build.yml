@@ -48,7 +48,7 @@ jobs:
       - name: Run tests
         run: |
           cd build/tests
-          ctest --output-on-failure
+          ctest --output-on-failure -j $(nproc)
       - name: Package
         run: |
           cmake --build build --target install
@@ -126,7 +126,7 @@ jobs:
       - name: Run tests
         run: |
           cd build/tests
-          ctest --output-on-failure
+          ctest --output-on-failure -j $(nproc)
       - name: Package
         run: |
           cmake --build build --target install
