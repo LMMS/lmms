@@ -25,4 +25,5 @@ foreach(LMMS_TEST_SRC IN LISTS LMMS_TESTS)
 
 	target_link_libraries(${LMMS_TEST_NAME} PRIVATE ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
 	target_link_libraries(${LMMS_TEST_NAME} PRIVATE ${LMMS_REQUIRED_LIBS})
+	target_compile_features(${LMMS_TEST_NAME} PRIVATE cxx_std_17)
 endforeach()
