@@ -77,5 +77,5 @@ private slots:
 	}
 };
 
-QTEST_MAIN(ProjectVersionTest)
+QTEST_GUILESS_MAIN(ProjectVersionTest)
 #include "ProjectVersionTest.moc"

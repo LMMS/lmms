@@ -50,5 +50,5 @@ private slots:
 	}
 };
 
-QTEST_MAIN(MathTest)
+QTEST_GUILESS_MAIN(MathTest)
 #include "MathTest.moc"

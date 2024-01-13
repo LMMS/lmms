@@ -827,5 +827,5 @@ private slots:
 	}
 };
 
-QTEST_MAIN(ArrayVectorTest)
+QTEST_GUILESS_MAIN(ArrayVectorTest)
 #include "ArrayVectorTest.moc"

@@ -236,5 +236,5 @@ private slots:
 
 };
 
-QTEST_MAIN(AutomationTrackTest)
+QTEST_GUILESS_MAIN(AutomationTrackTest)
 #include "AutomationTrackTest.moc"

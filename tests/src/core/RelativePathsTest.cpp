@@ -68,5 +68,5 @@ private slots:
 	}
 };
 
-QTEST_MAIN(RelativePathsTest)
+QTEST_GUILESS_MAIN(RelativePathsTest)
 #include "RelativePathsTest.moc"

@@ -110,5 +110,5 @@ private slots: // tests
 	}
 };
 
-QTEST_MAIN(AutomatableModelTest)
+QTEST_GUILESS_MAIN(AutomatableModelTest)
 #include "AutomatableModelTest.moc"
