@@ -105,8 +105,8 @@ namespace lmms::gui
 
     private:
         QString elideName(const QString& name);
-        MixerChannel* getMixerChannel() const;
-        bool isMasterChannel() const;
+        MixerChannel* mixerChannel() const;
+        inline auto isMasterChannel() const -> bool { return m_channelIndex == 0; }
 
     private:
         SendButtonIndicator* m_sendButton;

@@ -144,7 +144,7 @@ namespace lmms::gui
 
     void MixerChannelView::contextMenuEvent(QContextMenuEvent*)
     {
-        auto contextMenu = new CaptionMenu(getMixerChannel()->m_name, this);
+        auto contextMenu = new CaptionMenu(mixerChannel()->m_name, this);
 
         if (!isMasterChannel()) // no move-options in master
         {
@@ -178,7 +178,7 @@ namespace lmms::gui
     void MixerChannelView::paintEvent(QPaintEvent* event)
     {
         auto * mixer = Engine::mixer();
-        const auto channel = getMixerChannel();
+        const auto channel = mixerChannel();
         const bool muted = channel->m_muteModel.value();
         const auto name = channel->m_name;
         const auto elidedName = elideName(name);
@@ -351,7 +351,7 @@ namespace lmms::gui
 
         m_channelNumberLcd->hide();
         m_renameLineEdit->setFixedWidth(m_renameLineEdit->width());
-        m_renameLineEdit->setText(getMixerChannel()->m_name);
+        m_renameLineEdit->setText(mixerChannel()->m_name);
 
         m_renameLineEditView->setFocus();
         m_renameLineEdit->selectAll();
@@ -370,27 +370,27 @@ namespace lmms::gui
         auto newName = m_renameLineEdit->text();
         setFocus();
 
-        const auto mixerChannel = getMixerChannel();
-        if (!newName.isEmpty() && mixerChannel->m_name != newName)
+        const auto mc = mixerChannel();
+        if (!newName.isEmpty() && mc->m_name != newName)
         {
-            mixerChannel->m_name = newName;
+            mc->m_name = newName;
             m_renameLineEdit->setText(elideName(newName));
             Engine::getSong()->setModified();
         }
 
-        setToolTip(mixerChannel->m_name);
+        setToolTip(mc->m_name);
     }
 
     void MixerChannelView::resetColor()
     {
-        getMixerChannel()->setColor(std::nullopt);
+        mixerChannel()->setColor(std::nullopt);
         Engine::getSong()->setModified();
         update();
     }
 
     void MixerChannelView::selectColor()
     {
-        const auto channel = getMixerChannel();
+        const auto channel = mixerChannel();
 
         const auto initialColor = channel->color().value_or(backgroundActive().color());
         const auto * colorChooser = ColorChooser{this}.withPalette(ColorChooser::Palette::Mixer);
@@ -406,7 +406,7 @@ namespace lmms::gui
 
     void MixerChannelView::randomizeColor()
     {
-        auto channel = getMixerChannel();
+        auto channel = mixerChannel();
         channel->setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[rand() % 48]);
         Engine::getSong()->setModified();
         update();
@@ -444,14 +444,9 @@ namespace lmms::gui
         return elidedName;
     }
 
-    MixerChannel* MixerChannelView::getMixerChannel() const
+    MixerChannel* MixerChannelView::mixerChannel() const
     {
         return Engine::mixer()->mixerChannel(m_channelIndex);
-    }
-
-    bool MixerChannelView::isMasterChannel() const
-    {
-        return m_channelIndex == 0;
     }
 
 } // namespace lmms::gui
