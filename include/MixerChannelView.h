@@ -38,6 +38,11 @@
 #include <QPixmap>
 #include <QWidget>
 
+namespace lmms
+{
+    class MixerChannel;
+}
+
 namespace lmms::gui
 {
     constexpr int MIXER_CHANNEL_INNER_BORDER_SIZE = 3;
@@ -100,6 +105,8 @@ namespace lmms::gui
 
     private:
         QString elideName(const QString& name);
+        MixerChannel* mixerChannel() const;
+        auto isMasterChannel() const -> bool { return m_channelIndex == 0; }
 
     private:
         SendButtonIndicator* m_sendButton;
