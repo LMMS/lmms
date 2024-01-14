@@ -147,7 +147,7 @@ void SlicerTWaveform::drawEditorWaveform()
 	float zoomOffset = (m_editorHeight - m_zoomLevel * m_editorHeight) / 2;
 
 	const auto& sample = m_slicerTParent->m_originalSample;
-	const auto waveform = SampleWaveform::Parameters{sample.data() + startFrame, endFrame, sample.amplification(), sample.reversed()};
+	const auto waveform = SampleWaveform::Parameters{sample.data() + startFrame, endFrame - startFrame, sample.amplification(), sample.reversed()};
 	const auto rect = QRect(0, zoomOffset, m_editorWidth, m_zoomLevel * m_editorHeight);
 	SampleWaveform::visualize(waveform, brush, rect);
 
