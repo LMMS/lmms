@@ -256,7 +256,7 @@ void TripleOscillator::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 		if (auto sampleBuffer = m_osc[i]->m_sampleBuffer)
 		{
-			_this.setAttribute("userwavefile" + is, sampleBuffer->audioFileRelative());
+			_this.setAttribute("userwavefile" + is, sampleBuffer->source().audioFileRelative());
 		}
 	}
 }

@@ -44,7 +44,7 @@ public:
 	// the array positions correspond to the converter_type parameter values in libsamplerate
 	// if there appears problems with playback on some interpolation mode, then the value for that mode
 	// may need to be higher - conversely, to optimize, some may work with lower values
-	static constexpr auto s_interpolationMargins = std::array<int, 5>{64, 64, 64, 4, 4};
+	static constexpr auto InterpolationMargins = std::array<int, 5>{64, 64, 64, 4, 4};
 
 	enum class Loop
 	{
@@ -80,25 +80,24 @@ public:
 	};
 
 	Sample() = default;
-	Sample(const QByteArray& base64, int sampleRate = Engine::audioEngine()->processingSampleRate());
-	Sample(const sampleFrame* data, int numFrames, int sampleRate = Engine::audioEngine()->processingSampleRate());
+	Sample(const QByteArray& base64, sample_rate_t sampleRate = Engine::audioEngine()->processingSampleRate());
+	Sample(const sampleFrame* data, int numFrames,
+		sample_rate_t sampleRate = Engine::audioEngine()->processingSampleRate());
 	Sample(const Sample& other);
-	Sample(Sample&& other);
+	Sample(Sample&& other) noexcept;
 	explicit Sample(const QString& audioFile);
 	explicit Sample(std::shared_ptr<const SampleBuffer> buffer);
 
 	auto operator=(const Sample&) -> Sample&;
-	auto operator=(Sample&&) -> Sample&;
+	auto operator=(Sample&&) noexcept -> Sample&;
 
 	auto play(sampleFrame* dst, PlaybackState* state, int numFrames, float desiredFrequency = DefaultBaseFreq,
 		Loop loopMode = Loop::Off) -> bool;
 
 	auto sampleDuration() const -> std::chrono::milliseconds;
-	auto sampleSourceType() const -> SampleBuffer::Source { return m_buffer->sourceType(); }
-	auto sampleFileAbsolute() const -> const QString& { return m_buffer->audioFileAbsolute(); }
-	auto sampleFileRelative() const -> QString { return m_buffer->audioFileRelative(); }
 	auto sampleRate() const -> int { return m_buffer->sampleRate(); }
 	auto sampleSize() const -> int { return m_buffer->size(); }
+	auto source() const -> const SampleBuffer::Source& { return m_buffer->source(); }
 
 	auto toBase64() const -> QString { return m_buffer->toBase64(); }
 

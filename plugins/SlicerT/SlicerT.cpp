@@ -341,7 +341,7 @@ void SlicerT::saveSettings(QDomDocument& document, QDomElement& element)
 {
 	element.setAttribute("version", "1");
 
-	const auto sampleFile = m_originalSample.sampleFileRelative();
+	const auto sampleFile = m_originalSample.source().audioFileRelative();
 	element.setAttribute("src", sampleFile);
 	if (sampleFile.isEmpty())
 	{

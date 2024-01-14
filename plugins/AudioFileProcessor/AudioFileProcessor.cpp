@@ -210,7 +210,7 @@ void AudioFileProcessor::deleteNotePluginData( NotePlayHandle * _n )
 
 void AudioFileProcessor::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
-	auto sampleFile = m_sample.sampleFileRelative();
+	auto sampleFile = m_sample.source().audioFileRelative();
 	elem.setAttribute("src", sampleFile);
 	if (sampleFile.isEmpty())
 	{
@@ -326,8 +326,8 @@ void AudioFileProcessor::setAudioFile(const QString& _audio_file, bool _rename)
 	// is current channel-name equal to previous-filename??
 	if( _rename &&
 		( instrumentTrack()->name() ==
-			QFileInfo(m_sample.sampleFileAbsolute()).fileName() ||
-				m_sample.sampleFileAbsolute().isEmpty()))
+			QFileInfo(m_sample.source().audioFileAbsolute()).fileName() ||
+				m_sample.source().audioFileAbsolute().isEmpty()))
 	{
 		// then set it to new one
 		instrumentTrack()->setName( PathUtil::cleanName( _audio_file ) );
@@ -647,7 +647,7 @@ void AudioFileProcessorView::paintEvent( QPaintEvent * )
 
 	QString file_name = "";
 
-	const auto sampleFile = a->m_sample.sampleFileRelative();
+	const auto sampleFile = a->m_sample.source().audioFileRelative();
 	int idx = sampleFile.length();
 
 	p.setFont( pointSize<8>( font() ) );

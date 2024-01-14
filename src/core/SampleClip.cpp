@@ -117,7 +117,7 @@ void SampleClip::changeLength( const TimePos & _length )
 
 const QString& SampleClip::sampleFile() const
 {
-	return m_sample.sampleFileAbsolute();
+	return m_sample.source().audioFileAbsolute();
 }
 
 void SampleClip::setSampleBuffer(std::shared_ptr<const SampleBuffer> sb)
@@ -252,7 +252,7 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "len", length() );
 	_this.setAttribute( "muted", isMuted() );
 
-	const auto sampleFile = sample().sampleFileRelative();
+	const auto sampleFile = sample().source().audioFileRelative();
 	_this.setAttribute("src", sampleFile);
 	_this.setAttribute( "off", startTimeOffset() );
 	if (sampleFile.isEmpty())

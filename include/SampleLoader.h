@@ -28,8 +28,7 @@
 
 #include <QFileSystemWatcher>
 #include <QObject>
-#include <QString>
-#include <map>
+#include <unordered_map>
 
 #include "SampleBuffer.h"
 #include "lmms_export.h"
@@ -42,44 +41,31 @@ class LMMS_EXPORT SampleLoader : public QObject
 public:
 	~SampleLoader() override = default;
 
-	using Source = SampleBuffer::Source;
+	static auto instance() -> SampleLoader&;
 
-	enum class Cache
-	{
-		None,
-		Read,
-		ReadWrite
-	};
-
-	static auto inst() -> SampleLoader&;
-
-	static auto fromFile(const QString& filePath, Cache cache = Cache::ReadWrite)
+	static auto fromFile(const QString& filePath, bool cache = true)
 		-> std::shared_ptr<const SampleBuffer>;
 
-	static auto fromBase64(const QString& base64, int sampleRate, Cache cache = Cache::ReadWrite)
+	static auto fromBase64(const QString& base64, sample_rate_t sampleRate, bool cache = true)
 		-> std::shared_ptr<const SampleBuffer>;
 
-	static auto fromBase64(const QString& base64, Cache cache = Cache::ReadWrite)
+	static auto fromBase64(const QString& base64, bool cache = true)
 		-> std::shared_ptr<const SampleBuffer>;
-
-private slots:
-	void removeFile(const QString& path);
 
 private:
 	SampleLoader();
 
-	class AutoEvictor;
+	struct Evictor;
+
+	auto get(const SampleBuffer::Source& source) -> std::shared_ptr<const SampleBuffer>;
 
 	void add(const std::shared_ptr<const SampleBuffer>& buffer);
 	auto remove(const SampleBuffer& buffer) -> bool;
 
-	auto getFile(const QString& filePath) -> std::shared_ptr<const SampleBuffer>;
-	auto getBase64(const QString& base64) -> std::shared_ptr<const SampleBuffer>;
-
-	using Key = std::pair<QString, Source>;
+	using Key = SampleBuffer::Source;
 	using Value = std::weak_ptr<const SampleBuffer>;
 
-	std::map<Key, Value> m_entries;
+	std::unordered_map<Key, Value, Key::Hasher> m_entries;
 	QFileSystemWatcher m_watcher;
 };
 

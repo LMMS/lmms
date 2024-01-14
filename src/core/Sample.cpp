@@ -38,7 +38,7 @@ Sample::Sample(const QString& audioFile)
 {
 }
 
-Sample::Sample(const QByteArray& base64, int sampleRate)
+Sample::Sample(const QByteArray& base64, sample_rate_t sampleRate)
 	: m_buffer(SampleBuffer::create(base64, sampleRate))
 	, m_startFrame(0)
 	, m_endFrame(m_buffer->size())
@@ -47,7 +47,7 @@ Sample::Sample(const QByteArray& base64, int sampleRate)
 {
 }
 
-Sample::Sample(const sampleFrame* data, int numFrames, int sampleRate)
+Sample::Sample(const sampleFrame* data, int numFrames, sample_rate_t sampleRate)
 	: m_buffer(SampleBuffer::create(data, numFrames, sampleRate))
 	, m_startFrame(0)
 	, m_endFrame(m_buffer->size())
@@ -77,7 +77,7 @@ Sample::Sample(const Sample& other)
 {
 }
 
-Sample::Sample(Sample&& other)
+Sample::Sample(Sample&& other) noexcept
 	: m_buffer(std::move(other.m_buffer))
 	, m_startFrame(other.startFrame())
 	, m_endFrame(other.endFrame())
@@ -103,7 +103,7 @@ auto Sample::operator=(const Sample& other) -> Sample&
 	return *this;
 }
 
-auto Sample::operator=(Sample&& other) -> Sample&
+auto Sample::operator=(Sample&& other) noexcept -> Sample&
 {
 	m_buffer = std::move(other.m_buffer);
 	m_startFrame = other.startFrame();
@@ -127,7 +127,7 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, int numFrames, float d
 	auto playBuffer = std::vector<sampleFrame>(numFrames / resampleRatio);
 	if (!typeInfo<float>::isEqual(resampleRatio, 1.0f))
 	{
-		playBuffer.resize(playBuffer.size() + s_interpolationMargins[state->resampler().interpolationMode()]);
+		playBuffer.resize(playBuffer.size() + InterpolationMargins[state->resampler().interpolationMode()]);
 	}
 
 	const auto start = startFrame();

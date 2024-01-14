@@ -361,7 +361,7 @@ void EnvelopeAndLfoParameters::saveSettings( QDomDocument & _doc,
 
 	if (m_userWave)
 	{
-		_parent.setAttribute("userwavefile", m_userWave->audioFileRelative());
+		_parent.setAttribute("userwavefile", m_userWave->source().audioFileRelative());
 	}
 }
 

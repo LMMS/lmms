@@ -225,7 +225,7 @@ void LfoController::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 	if (m_userDefSampleBuffer)
 	{
-		_this.setAttribute("userwavefile", m_userDefSampleBuffer->audioFileRelative());
+		_this.setAttribute("userwavefile", m_userDefSampleBuffer->source().audioFileRelative());
 	}
 }
 
