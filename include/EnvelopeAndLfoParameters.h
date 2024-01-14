@@ -168,7 +168,7 @@ private:
 	sample_t * m_lfoShapeData;
 	sample_t m_random;
 	bool m_bad_lfoShapeData;
-	std::shared_ptr<const SampleBuffer> m_userWave = SampleBuffer::emptyBuffer();
+	std::shared_ptr<const SampleBuffer> m_userWave;
 
 	enum class LfoShape
 	{

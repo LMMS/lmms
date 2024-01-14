@@ -82,7 +82,7 @@ std::shared_ptr<const SampleBuffer> AudioSampleRecorder::createSampleBuffer()
 	}
 
 	// create according sample-buffer out of big buffer
-	return std::make_shared<const SampleBuffer>(std::move(bigBuffer), sampleRate());
+	return SampleBuffer::create(std::move(bigBuffer), sampleRate());
 }
 
 

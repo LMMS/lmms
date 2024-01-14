@@ -1,7 +1,8 @@
 /*
- * SampleLoader.h - Load audio and waveform files
+ * SampleLoader.h - Sample loader with an optional cache
  *
  * Copyright (c) 2023 saker <sakertooth@gmail.com>
+ *               2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,27 +23,66 @@
  *
  */
 
-#ifndef LMMS_GUI_SAMPLE_LOADER_H
-#define LMMS_GUI_SAMPLE_LOADER_H
+#ifndef LMMS_SAMPLE_LOADER_H
+#define LMMS_SAMPLE_LOADER_H
 
+#include <QFileSystemWatcher>
+#include <QObject>
 #include <QString>
-#include <memory>
+#include <map>
 
 #include "SampleBuffer.h"
 #include "lmms_export.h"
 
-namespace lmms::gui {
-class LMMS_EXPORT SampleLoader
-{
-public:
-	static QString openAudioFile(const QString& previousFile = "");
-	static QString openWaveformFile(const QString& previousFile = "");
-	static std::shared_ptr<const SampleBuffer> createBufferFromFile(const QString& filePath);
-	static std::shared_ptr<const SampleBuffer> createBufferFromBase64(
-		const QString& base64, int sampleRate = Engine::audioEngine()->processingSampleRate());
-private:
-	static void displayError(const QString& message);
-};
-} // namespace lmms::gui
+namespace lmms {
 
-#endif // LMMS_GUI_SAMPLE_LOADER_H
+class LMMS_EXPORT SampleLoader : public QObject
+{
+	Q_OBJECT
+public:
+	~SampleLoader() override = default;
+
+	using Source = SampleBuffer::Source;
+
+	enum class Cache
+	{
+		None,
+		Read,
+		ReadWrite
+	};
+
+	static auto inst() -> SampleLoader&;
+
+	static auto fromFile(const QString& filePath, Cache cache = Cache::ReadWrite)
+		-> std::shared_ptr<const SampleBuffer>;
+
+	static auto fromBase64(const QString& base64, int sampleRate, Cache cache = Cache::ReadWrite)
+		-> std::shared_ptr<const SampleBuffer>;
+
+	static auto fromBase64(const QString& base64, Cache cache = Cache::ReadWrite)
+		-> std::shared_ptr<const SampleBuffer>;
+
+private slots:
+	void removeFile(const QString& path);
+
+private:
+	SampleLoader();
+
+	class AutoEvictor;
+
+	void add(const std::shared_ptr<const SampleBuffer>& buffer);
+	auto remove(const SampleBuffer& buffer) -> bool;
+
+	auto getFile(const QString& filePath) -> std::shared_ptr<const SampleBuffer>;
+	auto getBase64(const QString& base64) -> std::shared_ptr<const SampleBuffer>;
+
+	using Key = std::pair<QString, Source>;
+	using Value = std::weak_ptr<const SampleBuffer>;
+
+	std::map<Key, Value> m_entries;
+	QFileSystemWatcher m_watcher;
+};
+
+} // namespace lmms
+
+#endif // LMMS_SAMPLE_LOADER_H

@@ -49,8 +49,7 @@ LfoController::LfoController( Model * _parent ) :
 	m_duration( 1000 ),
 	m_phaseOffset( 0 ),
 	m_currentPhase( 0 ),
-	m_sampleFunction( &Oscillator::sinSample ),
-	m_userDefSampleBuffer(std::make_shared<SampleBuffer>())
+	m_sampleFunction( &Oscillator::sinSample )
 {
 	setSampleExact( true );
 	connect( &m_waveModel, SIGNAL(dataChanged()),
@@ -223,7 +222,11 @@ void LfoController::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	m_phaseModel.saveSettings( _doc, _this, "phase" );
 	m_waveModel.saveSettings( _doc, _this, "wave" );
 	m_multiplierModel.saveSettings( _doc, _this, "multiplier" );
-	_this.setAttribute("userwavefile", m_userDefSampleBuffer->audioFile());
+
+	if (m_userDefSampleBuffer)
+	{
+		_this.setAttribute("userwavefile", m_userDefSampleBuffer->audioFileRelative());
+	}
 }
 
 
@@ -243,7 +246,7 @@ void LfoController::loadSettings( const QDomElement & _this )
 	{
 		if (QFileInfo(PathUtil::toAbsolute(userWaveFile)).exists())
 		{
-			m_userDefSampleBuffer = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile"));
+			m_userDefSampleBuffer = SampleLoader::fromFile(_this.attribute("userwavefile"));
 		}
 		else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), userWaveFile)); }
 	}

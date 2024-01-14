@@ -28,12 +28,13 @@
 #include <QMenu>
 #include <QPainter>
 
-#include "GuiApplication.h"
 #include "AutomationEditor.h"
+#include "GuiApplication.h"
 #include "embed.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
 #include "SampleLoader.h"
+#include "SampleLoaderDialog.h"
 #include "SampleWaveform.h"
 #include "Song.h"
 #include "StringPairDrag.h"
@@ -64,8 +65,8 @@ void SampleClipView::updateSample()
 	// set tooltip to filename so that user can see what sample this
 	// sample-clip contains
 	setToolTip(
-		!m_clip->m_sample.sampleFile().isEmpty()
-			? PathUtil::toAbsolute(m_clip->m_sample.sampleFile())
+		!m_clip->sampleFile().isEmpty()
+			? m_clip->sampleFile()
 			: tr("Double-click to open sample")
 	);
 }
@@ -123,7 +124,7 @@ void SampleClipView::dropEvent( QDropEvent * _de )
 	}
 	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )
 	{
-		m_clip->setSampleBuffer(SampleLoader::createBufferFromBase64(StringPairDrag::decodeValue(_de)));
+		m_clip->setSampleBuffer(SampleLoader::fromBase64(StringPairDrag::decodeValue(_de)));
 		m_clip->updateLength();
 		update();
 		_de->accept();
@@ -181,10 +182,11 @@ void SampleClipView::mouseReleaseEvent(QMouseEvent *_me)
 
 void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 {
-	QString af = SampleLoader::openAudioFile();
+	QString af = SampleLoaderDialog::openAudioFile();
 
-	if ( af.isEmpty() ) {} //Don't do anything if no file is loaded
-	else if (af == m_clip->m_sample.sampleFile())
+	if (af.isEmpty()) { return; } //Don't do anything if no file is loaded
+
+	if (af == PathUtil::toShortestRelative(m_clip->sampleFile()))
 	{	//Instead of reloading the existing file, just reset the size
 		int length = static_cast<int>(m_clip->m_sample.sampleSize() / Engine::framesPerTick());
 		m_clip->changeLength(length);
@@ -274,7 +276,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	const auto waveform = SampleWaveform::Parameters{sample.data(), sample.sampleSize(), sample.amplification(), sample.reversed()};
 	SampleWaveform::visualize(waveform, p, r);
 
-	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
+	QString name = PathUtil::cleanName(m_clip->sampleFile());
 	paintTextLabel(name, p);
 
 	// disable antialiasing for borders, since its not needed
