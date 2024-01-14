@@ -52,10 +52,11 @@ namespace lmms::gui
 {
 
 
-MixerView::MixerView() :
+MixerView::MixerView(Mixer* mixer) :
 	QWidget(),
 	ModelView(nullptr, this),
-	SerializingObjectHook()
+	SerializingObjectHook(),
+	m_mixer(mixer)
 {
 #if QT_VERSION < 0x50C00
 	// Workaround for a bug in Qt versions below 5.12,
@@ -67,8 +68,7 @@ MixerView::MixerView() :
 	using ::operator|;
 #endif
 
-	Mixer * m = getMixer();
-	m->setHook(this);
+	mixer->setHook(this);
 
 	//QPalette pal = palette();
 	//pal.setColor(QPalette::Window, QColor(72, 76, 88));
@@ -101,7 +101,7 @@ MixerView::MixerView() :
 	m_racksWidget->setLayout(m_racksLayout);
 
 	// add master channel
-	m_mixerChannelViews.resize(m->numChannels());
+	m_mixerChannelViews.resize(mixer->numChannels());
 	MixerChannelView * masterView = new MixerChannelView(this, this, 0);
 	connectToSoloAndMute(0);
 	m_mixerChannelViews[0] = masterView;
@@ -179,7 +179,7 @@ MixerView::MixerView() :
 	parentWidget()->move(5, 310);
 
 	// we want to receive dataChanged-signals in order to update
-	setModel(m);
+	setModel(mixer);
 }
 
 
@@ -302,7 +302,7 @@ void MixerView::toggledMute()
 
 Mixer* MixerView::getMixer() const
 {
-	return Engine::mixer();
+	return m_mixer;
 }
 
 void MixerView::updateAllMixerChannels()

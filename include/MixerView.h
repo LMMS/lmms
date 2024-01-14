@@ -50,7 +50,7 @@ class LMMS_EXPORT MixerView : public QWidget, public ModelView,
 {
 	Q_OBJECT
 public:
-	MixerView();
+	MixerView(Mixer* mixer);
 	void keyPressEvent(QKeyEvent* e) override;
 
 	void saveSettings(QDomDocument& doc, QDomElement& domElement) override;
@@ -124,6 +124,7 @@ private:
 	QWidget* m_channelAreaWidget;
 	QStackedLayout* m_racksLayout;
 	QWidget* m_racksWidget;
+	Mixer* m_mixer;
 
 	void updateMaxChannelSelector();
 
