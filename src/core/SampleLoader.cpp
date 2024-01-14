@@ -1,5 +1,5 @@
 /*
- * SampleLoader.cpp - Sample loader with an optional cache
+ * SampleLoader.cpp - Sample loader with support for caching
  *
  * Copyright (c) 2023 saker <sakertooth@gmail.com>
  *               2024 Dalton Messmer <messmer.dalton/at/gmail.com>
@@ -44,9 +44,10 @@ void displayError(const QString& message)
 
 /**
  * An evictor which automatically evicts sample buffers from the cache
- * immediately after the last reference to the buffer is dropped
+ * immediately after the last reference to the buffer is dropped.
+ * Used as std::shared_ptr<const SampleBuffer>'s deleter.
 */
-class SampleLoader::Evictor
+struct SampleLoader::AutoEvictor
 {
 	void operator()(SampleBuffer* p) const noexcept
 	{
@@ -83,7 +84,7 @@ auto SampleLoader::fromFile(const QString& filePath, bool cache)
 		{
 			auto buffer = std::shared_ptr<SampleBuffer> {
 				new SampleBuffer{SampleBuffer::Access{}, filePath},
-				Evictor{}
+				AutoEvictor{}
 			};
 
 			instance().add(buffer);
@@ -115,7 +116,7 @@ auto SampleLoader::fromBase64(const QString& base64, sample_rate_t sampleRate, b
 		{
 			auto buffer = std::shared_ptr<SampleBuffer> {
 				new SampleBuffer{SampleBuffer::Access{}, base64, sampleRate},
-				Evictor{}
+				AutoEvictor{}
 			};
 
 			instance().add(buffer);

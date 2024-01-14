@@ -1,5 +1,5 @@
 /*
- * SampleLoader.h - Sample loader with an optional cache
+ * SampleLoader.h - Sample loader with support for caching
  *
  * Copyright (c) 2023 saker <sakertooth@gmail.com>
  *               2024 Dalton Messmer <messmer.dalton/at/gmail.com>
@@ -55,7 +55,7 @@ public:
 private:
 	SampleLoader();
 
-	struct Evictor;
+	struct AutoEvictor;
 
 	auto get(const SampleBuffer::Source& source) -> std::shared_ptr<const SampleBuffer>;
 

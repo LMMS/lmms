@@ -35,20 +35,20 @@ namespace lmms {
 
 SampleBuffer::Source::Source(const QString& filePath)
 	: m_type(Type::AudioFile)
-	, m_identifier(PathUtil::toAbsolute(filePath))
-	, m_hash(qHash(m_identifier, static_cast<unsigned int>(m_type)))
 {
 	if (filePath.isEmpty()) { throw std::runtime_error{"Audio file path is empty."}; }
+
+	m_identifier = PathUtil::toAbsolute(filePath);
+	m_hash = qHash(m_identifier, static_cast<unsigned int>(m_type));
 }
 
 SampleBuffer::Source::Source(const QString& base64, sample_rate_t sampleRate)
 	: m_type(Type::Base64)
-	, m_hash(qHash(base64, sampleRate))
 {
 	if (base64.isEmpty()) { throw std::runtime_error{"Base64 string is empty."}; }
 
-	// Using colons to ensure base64 identifiers cannot be a valid file paths
-	m_identifier = "::" + base64 + ":" + QString::number(sampleRate);
+	m_identifier = base64 + " " + QString::number(sampleRate);
+	m_hash = qHash(base64, sampleRate);
 }
 
 auto SampleBuffer::Source::audioFileAbsolute() const -> const QString&
