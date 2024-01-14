@@ -52,7 +52,7 @@ public:
 	using reverse_iterator = std::vector<sampleFrame>::reverse_iterator;
 	using const_reverse_iterator = std::vector<sampleFrame>::const_reverse_iterator;
 
-	class Source
+	class LMMS_EXPORT Source
 	{
 	public:
 		enum class Type
