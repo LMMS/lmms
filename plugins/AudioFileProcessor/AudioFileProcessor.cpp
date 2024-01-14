@@ -611,28 +611,25 @@ void AudioFileProcessorView::newWaveView()
 
 void AudioFileProcessorView::dropEvent( QDropEvent * _de )
 {
-	QString type = StringPairDrag::decodeKey( _de );
-	QString value = StringPairDrag::decodeValue( _de );
-	if( type == "samplefile" )
+	const auto type = StringPairDrag::decodeKey(_de);
+	const auto value = StringPairDrag::decodeValue(_de);
+
+	if (type == "samplefile") { castModel<AudioFileProcessor>()->setAudioFile(value); }
+	else if (type == QString("clip_%1").arg(static_cast<int>(Track::Type::Sample)))
 	{
-		castModel<AudioFileProcessor>()->setAudioFile( value );
-		_de->accept();
-		newWaveView();
-		return;
+		DataFile dataFile(value.toUtf8());
+		castModel<AudioFileProcessor>()->setAudioFile(dataFile.content().firstChild().toElement().attribute("src"));
 	}
-	else if( type == QString( "clip_%1" ).arg( static_cast<int>(Track::Type::Sample) ) )
+	else
 	{
-		DataFile dataFile( value.toUtf8() );
-		castModel<AudioFileProcessor>()->setAudioFile( dataFile.content().firstChild().toElement().attribute( "src" ) );
-		_de->accept();
+		_de->ignore();
 		return;
 	}
 
-	_de->ignore();
+	m_waveView->updateSampleRange();
+	Engine::getSong()->setModified();
+	_de->accept();
 }
-
-
-
 
 void AudioFileProcessorView::paintEvent( QPaintEvent * )
 {
