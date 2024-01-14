@@ -209,14 +209,14 @@ void MixerView::refreshDisplay()
 	// delete all views and re-add them
 	for (int i = 1; i<m_mixerChannelViews.size(); ++i)
 	{
+		// First disconnect from the solo/mute models.
+		disconnectFromSoloAndMute(i);
+
 		auto * mixerChannelView = m_mixerChannelViews[i];
 		chLayout->removeWidget(mixerChannelView);
 		m_racksLayout->removeWidget(mixerChannelView->m_effectRackView);
 
 		delete mixerChannelView;
-
-		// We are only deleting the views but not the actual mixer channels.
-		// Therefore we do not have to disconnect from the solo/mute models.
 	}
 	m_channelAreaWidget->adjustSize();
 
@@ -225,7 +225,8 @@ void MixerView::refreshDisplay()
 	for (int i = 1; i < m_mixerChannelViews.size(); ++i)
 	{
 		m_mixerChannelViews[i] = new MixerChannelView(m_channelAreaWidget, this, i);
-		// We are readding the views for existing channels so we do not have to connect to solo/mute here
+		connectToSoloAndMute(i);
+
 		chLayout->addWidget(m_mixerChannelViews[i]);
 		m_racksLayout->addWidget(m_mixerChannelViews[i]->m_effectRackView);
 	}
