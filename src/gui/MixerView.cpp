@@ -102,12 +102,12 @@ MixerView::MixerView() :
 
 	// add master channel
 	m_mixerChannelViews.resize(m->numChannels());
-	m_mixerChannelViews[0] = new MixerChannelView(this, this, 0);
+	MixerChannelView * masterView = new MixerChannelView(this, this, 0);
 	connectToSoloAndMute(0);
+	m_mixerChannelViews[0] = masterView;
 
 	m_racksLayout->addWidget(m_mixerChannelViews[0]->m_effectRackView);
 
-	MixerChannelView * masterView = m_mixerChannelViews[0];
 	ml->addWidget(masterView, 0, Qt::AlignTop);
 
 	auto mixerChannelSize = masterView->sizeHint();
