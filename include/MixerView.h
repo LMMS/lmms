@@ -38,6 +38,11 @@
 #include "embed.h"
 #include "EffectRackView.h"
 
+namespace lmms
+{
+	class Mixer;
+}
+
 namespace lmms::gui
 {
 class LMMS_EXPORT MixerView : public QWidget, public ModelView,
@@ -104,6 +109,7 @@ private slots:
 	void toggledMute();
 
 private:
+	Mixer* getMixer() const;
 	void updateAllMixerChannels();
 
 private:

@@ -67,7 +67,7 @@ MixerView::MixerView() :
 	using ::operator|;
 #endif
 
-	Mixer * m = Engine::mixer();
+	Mixer * m = getMixer();
 	m->setHook(this);
 
 	//QPalette pal = palette();
@@ -186,7 +186,7 @@ MixerView::MixerView() :
 int MixerView::addNewChannel()
 {
 	// add new mixer channel and redraw the form.
-	Mixer * mix = Engine::mixer();
+	Mixer * mix = getMixer();
 
 	int newChannelIndex = mix->createChannel();
 	m_mixerChannelViews.push_back(new MixerChannelView(m_channelAreaWidget, this, newChannelIndex));
@@ -215,7 +215,7 @@ void MixerView::refreshDisplay()
 	m_channelAreaWidget->adjustSize();
 
 	// re-add the views
-	m_mixerChannelViews.resize(Engine::mixer()->numChannels());
+	m_mixerChannelViews.resize(getMixer()->numChannels());
 	for (int i = 1; i < m_mixerChannelViews.size(); ++i)
 	{
 		m_mixerChannelViews[i] = new MixerChannelView(m_channelAreaWidget, this, i);
@@ -282,7 +282,7 @@ void MixerView::loadSettings(const QDomElement& domElement)
 
 void MixerView::toggledSolo()
 {
-	Engine::mixer()->toggledSolo();
+	getMixer()->toggledSolo();
 
 	updateAllMixerChannels();
 }
@@ -291,6 +291,11 @@ void MixerView::toggledSolo()
 void MixerView::toggledMute()
 {
 	updateAllMixerChannels();
+}
+
+Mixer* MixerView::getMixer() const
+{
+	return Engine::mixer();
 }
 
 void MixerView::updateAllMixerChannels()
@@ -319,12 +324,12 @@ void MixerView::setCurrentMixerChannel(MixerChannelView* channel)
 
 void MixerView::updateMixerChannel(int index)
 {
-	Mixer * mix = Engine::mixer();
+	Mixer * mix = getMixer();
 
 	// does current channel send to this channel?
 	int selIndex = m_currentMixerChannel->channelIndex();
 	auto thisLine = m_mixerChannelViews[index];
-	thisLine->setToolTip(Engine::mixer()->mixerChannel(index)->m_name);
+	thisLine->setToolTip(getMixer()->mixerChannel(index)->m_name);
 
 	FloatModel * sendModel = mix->channelSendModel(selIndex, index);
 	if (sendModel == nullptr)
@@ -360,12 +365,13 @@ void MixerView::deleteChannel(int index)
 	// remember selected line
 	int selLine = m_currentMixerChannel->channelIndex();
 
+	Mixer* mixer = getMixer();
 	// in case the deleted channel is soloed or the remaining
 	// channels will be left in a muted state
-	Engine::mixer()->clearChannel(index);
+	mixer->clearChannel(index);
 
 	// delete the real channel
-	Engine::mixer()->deleteChannel(index);
+	mixer->deleteChannel(index);
 
 	chLayout->removeWidget(m_mixerChannelViews[index]);
 	m_racksLayout->removeWidget(m_mixerChannelViews[index]);
@@ -397,7 +403,7 @@ bool MixerView::confirmRemoval(int index)
 	bool needConfirm = ConfigManager::inst()->value("ui", "mixerchanneldeletionwarning", "1").toInt();
 	if (!needConfirm) { return true; }
 
-	Mixer* mix = Engine::mixer();
+	Mixer* mix = getMixer();
 
 	if (!mix->isChannelInUse(index))
 	{
@@ -434,7 +440,7 @@ bool MixerView::confirmRemoval(int index)
 
 void MixerView::deleteUnusedChannels()
 {
-	Mixer* mix = Engine::mixer();
+	Mixer* mix = getMixer();
 
 	// Check all channels except master, delete those with no incoming sends
 	for (int i = m_mixerChannelViews.size() - 1; i > 0; --i)
@@ -453,7 +459,7 @@ void MixerView::moveChannelLeft(int index, int focusIndex)
 	// can't move master or first channel left or last channel right
 	if (index <= 1 || index >= m_mixerChannelViews.size()) return;
 
-	Mixer *m = Engine::mixer();
+	Mixer *m = getMixer();
 
 	// Move instruments channels
 	m->moveChannelLeft(index);
@@ -560,7 +566,7 @@ void MixerView::setCurrentMixerChannel(int channel)
 
 void MixerView::clear()
 {
-	Engine::mixer()->clear();
+	getMixer()->clear();
 
 	refreshDisplay();
 }
@@ -570,7 +576,7 @@ void MixerView::clear()
 
 void MixerView::updateFaders()
 {
-	Mixer * m = Engine::mixer();
+	Mixer * m = getMixer();
 
 	// apply master gain
 	m->mixerChannel(0)->m_peakLeft *= Engine::audioEngine()->masterGain();
