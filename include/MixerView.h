@@ -98,6 +98,7 @@ protected:
 private slots:
 	void updateFaders();
 	void toggledSolo();
+	void toggledMute();
 
 private:
 	void updateAllMixerChannels();
