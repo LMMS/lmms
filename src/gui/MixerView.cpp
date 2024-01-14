@@ -103,6 +103,7 @@ MixerView::MixerView() :
 	// add master channel
 	m_mixerChannelViews.resize(m->numChannels());
 	m_mixerChannelViews[0] = new MixerChannelView(this, this, 0);
+	connectToSoloAndMute(0);
 
 	m_racksLayout->addWidget(m_mixerChannelViews[0]->m_effectRackView);
 
@@ -115,6 +116,7 @@ MixerView::MixerView() :
 	for (int i = 1; i < m_mixerChannelViews.size(); ++i)
 	{
 		m_mixerChannelViews[i] = new MixerChannelView(m_channelAreaWidget, this, i);
+		connectToSoloAndMute(i);
 		chLayout->addWidget(m_mixerChannelViews[i]);
 	}
 
@@ -190,6 +192,7 @@ int MixerView::addNewChannel()
 
 	int newChannelIndex = mix->createChannel();
 	m_mixerChannelViews.push_back(new MixerChannelView(m_channelAreaWidget, this, newChannelIndex));
+	connectToSoloAndMute(newChannelIndex);
 	chLayout->addWidget(m_mixerChannelViews[newChannelIndex]);
 	m_racksLayout->addWidget(m_mixerChannelViews[newChannelIndex]->m_effectRackView);
 
@@ -211,6 +214,9 @@ void MixerView::refreshDisplay()
 		m_racksLayout->removeWidget(mixerChannelView->m_effectRackView);
 
 		delete mixerChannelView;
+
+		// We are only deleting the views but not the actual mixer channels.
+		// Therefore we do not have to disconnect from the solo/mute models.
 	}
 	m_channelAreaWidget->adjustSize();
 
@@ -219,6 +225,7 @@ void MixerView::refreshDisplay()
 	for (int i = 1; i < m_mixerChannelViews.size(); ++i)
 	{
 		m_mixerChannelViews[i] = new MixerChannelView(m_channelAreaWidget, this, i);
+		// We are readding the views for existing channels so we do not have to connect to solo/mute here
 		chLayout->addWidget(m_mixerChannelViews[i]);
 		m_racksLayout->addWidget(m_mixerChannelViews[i]->m_effectRackView);
 	}
@@ -306,6 +313,21 @@ void MixerView::updateAllMixerChannels()
 	}
 }
 
+void MixerView::connectToSoloAndMute(int channelIndex)
+{
+	auto * mixerChannel = getMixer()->mixerChannel(channelIndex);
+
+	connect(&mixerChannel->m_muteModel, &BoolModel::dataChanged, this, &MixerView::toggledMute, Qt::DirectConnection);
+	connect(&mixerChannel->m_soloModel, &BoolModel::dataChanged, this, &MixerView::toggledSolo, Qt::DirectConnection);
+}
+
+void MixerView::disconnectFromSoloAndMute(int channelIndex)
+{
+	auto * mixerChannel = getMixer()->mixerChannel(channelIndex);
+
+	disconnect(&mixerChannel->m_muteModel, &BoolModel::dataChanged, this, &MixerView::toggledMute);
+	disconnect(&mixerChannel->m_soloModel, &BoolModel::dataChanged, this, &MixerView::toggledSolo);
+}
 
 
 void MixerView::setCurrentMixerChannel(MixerChannelView* channel)
@@ -361,6 +383,9 @@ void MixerView::deleteChannel(int index)
 	{
 		return;
 	}
+
+	// Disconnect from the solo/mute models of the channel we are about to delete
+	disconnectFromSoloAndMute(index);
 
 	// remember selected line
 	int selLine = m_currentMixerChannel->channelIndex();

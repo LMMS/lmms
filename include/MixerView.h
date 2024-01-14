@@ -111,6 +111,8 @@ private slots:
 private:
 	Mixer* getMixer() const;
 	void updateAllMixerChannels();
+	void connectToSoloAndMute(int channelIndex);
+	void disconnectFromSoloAndMute(int channelIndex);
 
 private:
 	QVector<MixerChannelView*> m_mixerChannelViews;
