@@ -19,5 +19,6 @@ int main(int argc, char* argv[])
 		if (QTest::qExec(suite, argc, argv) != 0) { ++failed; }
 	}
 	qDebug() << "<<" << failed << "out of"<<numsuites<<"test suites failed.";
+	lmms::Engine::destroy();
 	return failed;
 }
