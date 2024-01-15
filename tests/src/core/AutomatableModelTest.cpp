@@ -49,6 +49,12 @@ private slots: // tests
 		Engine::init(true);
 	}
 
+	void cleanupTestCase()
+	{
+		using namespace lmms;
+		Engine::destroy();
+	}
+
 	void CastTests()
 	{
 		using namespace lmms;

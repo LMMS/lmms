@@ -34,7 +34,15 @@ namespace lmms::gui {
 class LMMS_EXPORT SampleWaveform
 {
 public:
-	static void visualize(const Sample& sample, QPainter& p, const QRect& dr, int fromFrame = 0, int toFrame = 0);
+	struct Parameters
+	{
+		const sampleFrame* buffer;
+		size_t size;
+		float amplification;
+		bool reversed;
+	};
+
+	static void visualize(Parameters parameters, QPainter& painter, const QRect& rect);
 };
 } // namespace lmms::gui
 

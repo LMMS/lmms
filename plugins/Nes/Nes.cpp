@@ -482,53 +482,53 @@ void NesObject::updatePitch()
 
 NesInstrument::NesInstrument( InstrumentTrack * instrumentTrack ) :
 	Instrument( instrumentTrack, &nes_plugin_descriptor ),
-	m_ch1Enabled( true, this ),
+	m_ch1Enabled(true, this, tr("Channel 1 enable")),
 	m_ch1Crs( 0.f, -24.f, 24.f, 1.f, this, tr( "Channel 1 coarse detune" ) ),
 	m_ch1Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 1 volume" ) ),
 	
-	m_ch1EnvEnabled( false, this ),
-	m_ch1EnvLooped( false, this ),
+	m_ch1EnvEnabled(false, this, tr("Channel 1 envelope enable")),
+	m_ch1EnvLooped(false, this, tr("Channel 1 envelope loop")),
 	m_ch1EnvLen( 0.f, 0.f, 15.f, 1.f, this, tr( "Channel 1 envelope length" ) ),
 	
 	m_ch1DutyCycle( 0, 0, 3, this, tr( "Channel 1 duty cycle" ) ),
 	
-	m_ch1SweepEnabled( false, this ),
+	m_ch1SweepEnabled(false, this, tr("Channel 1 sweep enable")),
 	m_ch1SweepAmt( 0.f, -7.f, 7.f, 1.f, this, tr( "Channel 1 sweep amount" ) ),
 	m_ch1SweepRate( 0.f, 0.f, 7.f, 1.f, this, tr( "Channel 1 sweep rate" ) ),
 	
-	m_ch2Enabled( true, this ),
-	m_ch2Crs( 0.f, -24.f, 24.f, 1.f, this, tr( "Channel 2 Coarse detune" ) ),
-	m_ch2Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 2 Volume" ) ),
+	m_ch2Enabled(true, this, tr("Channel 2 enable")),
+	m_ch2Crs( 0.f, -24.f, 24.f, 1.f, this, tr( "Channel 2 coarse detune" ) ),
+	m_ch2Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 2 volume" ) ),
 	
-	m_ch2EnvEnabled( false, this ),
-	m_ch2EnvLooped( false, this ),
+	m_ch2EnvEnabled(false, this, tr("Channel 2 envelope enable")),
+	m_ch2EnvLooped(false, this, tr("Channel 2 envelope loop")),
 	m_ch2EnvLen( 0.f, 0.f, 15.f, 1.f, this, tr( "Channel 2 envelope length" ) ),
 	
 	m_ch2DutyCycle( 2, 0, 3, this, tr( "Channel 2 duty cycle" ) ),
 	
-	m_ch2SweepEnabled( false, this ),
+	m_ch2SweepEnabled(false, this, tr("Channel 2 sweep enable")),
 	m_ch2SweepAmt( 0.f, -7.f, 7.f, 1.f, this, tr( "Channel 2 sweep amount" ) ),
 	m_ch2SweepRate( 0.f, 0.f, 7.f, 1.f, this, tr( "Channel 2 sweep rate" ) ),
 	
 	//channel 3
-	m_ch3Enabled( true, this ),
+	m_ch3Enabled(true, this, tr("Channel 3 enable")),
 	m_ch3Crs( 0.f, -24.f, 24.f, 1.f, this, tr( "Channel 3 coarse detune" ) ),
 	m_ch3Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 3 volume" ) ),
 
 	//channel 4
-	m_ch4Enabled( false, this ),
+	m_ch4Enabled(false, this, tr("Channel 4 enable")),
 	m_ch4Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 4 volume" ) ),
 	
-	m_ch4EnvEnabled( false, this ),
-	m_ch4EnvLooped( false, this ),
+	m_ch4EnvEnabled(false, this, tr("Channel 4 envelope enable")),
+	m_ch4EnvLooped(false, this, tr("Channel 4 envelope loop")),
 	m_ch4EnvLen( 0.f, 0.f, 15.f, 1.f, this, tr( "Channel 4 envelope length" ) ),
 	
-	m_ch4NoiseMode( false, this ),
-	m_ch4NoiseFreqMode( false, this ),
+	m_ch4NoiseMode(false, this, tr("Channel 4 noise mode")),
+	m_ch4NoiseFreqMode(false, this, tr("Channel 4 frequency mode")),
 	m_ch4NoiseFreq( 0.f, 0.f, 15.f, 1.f, this, tr( "Channel 4 noise frequency" ) ),
 	
 	m_ch4Sweep( 0.f, -7.f, 7.f, 1.f, this, tr( "Channel 4 noise frequency sweep" ) ),
-	m_ch4NoiseQuantize( true, this ),
+	m_ch4NoiseQuantize(true, this, tr("Channel 4 quantize")),
 	
 	//master
 	m_masterVol( 1.0f, 0.0f, 2.0f, 0.01f, this, tr( "Master volume" ) ),

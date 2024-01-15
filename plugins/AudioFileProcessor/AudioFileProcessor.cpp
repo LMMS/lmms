@@ -611,28 +611,25 @@ void AudioFileProcessorView::newWaveView()
 
 void AudioFileProcessorView::dropEvent( QDropEvent * _de )
 {
-	QString type = StringPairDrag::decodeKey( _de );
-	QString value = StringPairDrag::decodeValue( _de );
-	if( type == "samplefile" )
+	const auto type = StringPairDrag::decodeKey(_de);
+	const auto value = StringPairDrag::decodeValue(_de);
+
+	if (type == "samplefile") { castModel<AudioFileProcessor>()->setAudioFile(value); }
+	else if (type == QString("clip_%1").arg(static_cast<int>(Track::Type::Sample)))
 	{
-		castModel<AudioFileProcessor>()->setAudioFile( value );
-		_de->accept();
-		newWaveView();
-		return;
+		DataFile dataFile(value.toUtf8());
+		castModel<AudioFileProcessor>()->setAudioFile(dataFile.content().firstChild().toElement().attribute("src"));
 	}
-	else if( type == QString( "clip_%1" ).arg( static_cast<int>(Track::Type::Sample) ) )
+	else
 	{
-		DataFile dataFile( value.toUtf8() );
-		castModel<AudioFileProcessor>()->setAudioFile( dataFile.content().firstChild().toElement().attribute( "src" ) );
-		_de->accept();
+		_de->ignore();
 		return;
 	}
 
-	_de->ignore();
+	m_waveView->updateSampleRange();
+	Engine::getSong()->setModified();
+	_de->accept();
 }
-
-
-
 
 void AudioFileProcessorView::paintEvent( QPaintEvent * )
 {
@@ -719,7 +716,7 @@ void AudioFileProcessorWaveView::updateSampleRange()
 	{
 		const f_cnt_t marging = (m_sample->endFrame() - m_sample->startFrame()) * 0.1;
 		m_from = qMax(0, m_sample->startFrame() - marging);
-		m_to = qMin(m_sample->endFrame() + marging, m_sample->sampleSize());
+		m_to = qMin<size_t>(m_sample->endFrame() + marging, m_sample->sampleSize());
 	}
 }
 
@@ -1014,7 +1011,11 @@ void AudioFileProcessorWaveView::updateGraph()
 	m_graph.fill( Qt::transparent );
 	QPainter p( &m_graph );
 	p.setPen( QColor( 255, 255, 255 ) );
-	SampleWaveform::visualize(*m_sample, p, QRect(0, 0, m_graph.width(), m_graph.height()), m_from, m_to);
+
+	const auto rect = QRect{0, 0, m_graph.width(), m_graph.height()};
+	const auto waveform = SampleWaveform::Parameters{
+		m_sample->data() + m_from, static_cast<size_t>(m_to - m_from), m_sample->amplification(), m_sample->reversed()};
+	SampleWaveform::visualize(waveform, p, rect);
 }
 
 
@@ -1076,8 +1077,8 @@ void AudioFileProcessorWaveView::slide( int _px )
 		step = -step;
 	}
 
-	f_cnt_t step_from = qBound(0, m_from + step, m_sample->sampleSize()) - m_from;
-	f_cnt_t step_to = qBound(m_from + 1, m_to + step, m_sample->sampleSize()) - m_to;
+	f_cnt_t step_from = qBound<size_t>(0, m_from + step, m_sample->sampleSize()) - m_from;
+	f_cnt_t step_to = qBound<size_t>(m_from + 1, m_to + step, m_sample->sampleSize()) - m_to;
 
 	step = qAbs( step_from ) < qAbs( step_to ) ? step_from : step_to;
 
