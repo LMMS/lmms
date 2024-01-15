@@ -284,6 +284,10 @@ jobs:
             ${{ steps.cache-deps.outputs.cache-hit == 'true' && 'NO' || 'YES' }}
       - name: Build
         run: cmake --build build
+      - name: Run tests
+        run: |
+          cd build/tests
+          ctest --output-on-failure -j2
       - name: Package
         run: cmake --build build --target package
       - name: Upload artifacts
