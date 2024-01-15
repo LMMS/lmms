@@ -22,11 +22,11 @@
  *
  */
 
-#include "QTestSuite.h"
-
 #include "ProjectVersion.h"
 
-class ProjectVersionTest : QTestSuite
+#include <QtTest/QtTest>
+
+class ProjectVersionTest : public QObject
 {
 	Q_OBJECT
 private slots:
@@ -75,6 +75,7 @@ private slots:
 		//An identifier of the form "-x" is non-numeric, not negative
 		QVERIFY(ProjectVersion("1.0.0-alpha.-1") > "1.0.0-alpha.1");
 	}
-} ProjectVersionTests;
+};
 
+QTEST_GUILESS_MAIN(ProjectVersionTest)
 #include "ProjectVersionTest.moc"
