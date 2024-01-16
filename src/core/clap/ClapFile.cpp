@@ -42,30 +42,6 @@ ClapFile::~ClapFile()
 	unload();
 }
 
-ClapFile::ClapFile(ClapFile&& other) noexcept
-	: m_filename{std::move(other.m_filename)}
-	, m_library{std::move(other.m_library)}
-	, m_entry{std::move(other.m_entry)}
-	, m_factory{other.m_factory}
-	, m_pluginInfo{std::move(other.m_pluginInfo)}
-	, m_pluginCount{other.m_pluginCount}
-{
-}
-
-auto ClapFile::operator=(ClapFile&& rhs) noexcept -> ClapFile&
-{
-	if (this != &rhs)
-	{
-		m_filename = std::move(rhs.m_filename);
-		m_library = std::move(rhs.m_library);
-		m_entry = std::move(rhs.m_entry);
-		m_factory = rhs.m_factory;
-		m_pluginInfo = std::move(rhs.m_pluginInfo);
-		m_pluginCount = rhs.m_pluginCount;
-	}
-	return *this;
-}
-
 auto ClapFile::load() -> bool
 {
 	// Do not allow reloading yet
@@ -139,12 +115,6 @@ void ClapFile::unload() noexcept
 		m_library->unload();
 		m_library = nullptr;
 	}
-}
-
-void ClapFile::EntryDeleter::operator()(const clap_plugin_entry* ptr)
-{
-	// No more calls into the shared library can be made after this
-	ptr->deinit();
 }
 
 } // namespace lmms

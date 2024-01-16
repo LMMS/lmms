@@ -198,7 +198,7 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 	{
 		for (const auto& entry : fs::recursive_directory_iterator{path})
 		{
-			const auto& entryPath = entry.path();
+			auto& entryPath = entry.path();
 			std::error_code ec;
 			// NOTE: Using is_regular_file() free function workaround due to std::experimental::filesystem
 			if (!fs::is_regular_file(entry, ec) || entryPath.extension() != ".clap")
@@ -215,19 +215,19 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 				ClapLog::plainLog(msg);
 			}
 
-			auto& file = m_files.emplace_back(std::make_unique<ClapFile>(entryPath));
-			if (!file || !file->load())
+			auto& file = m_files.emplace_back(std::move(entryPath));
+			if (!file.load())
 			{
 				std::string msg = "Failed to load '";
-				msg += entryPath.string();
+				msg += file.filename().string();
 				msg += "'";
 				ClapLog::globalLog(CLAP_LOG_ERROR, msg);
 				m_files.pop_back(); // Remove/unload invalid clap file
 				continue;
 			}
 
-			totalPlugins += file->pluginCount();
-			for (auto& plugin : file->pluginInfo(ClapFile::AccessKey{}))
+			totalPlugins += file.pluginCount();
+			for (auto& plugin : file.pluginInfo({}))
 			{
 				assert(plugin.has_value());
 				const bool added = m_uriMap.emplace(std::string{plugin->descriptor().id}, *plugin).second;

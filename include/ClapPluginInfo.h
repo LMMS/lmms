@@ -46,6 +46,7 @@ public:
 	//! Creates plugin info, populated via a quick scan of the plugin; may fail
 	static auto create(const clap_plugin_factory& factory, std::uint32_t index) -> std::optional<ClapPluginInfo>;
 
+	ClapPluginInfo() = delete;
 	~ClapPluginInfo() = default;
 
 	ClapPluginInfo(const ClapPluginInfo&) = default;

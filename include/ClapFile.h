@@ -34,42 +34,46 @@
 #include <vector>
 
 #include "ClapPluginInfo.h"
-#include "NoCopyNoMove.h"
 #include "lmms_filesystem.h"
 #include "lmms_export.h"
 
 namespace lmms
 {
 
-//! Class representing info for one .clap file, which contains 1 or more CLAP plugins
+//! Manages a .clap file, each of which may contain multiple plugins
 class LMMS_EXPORT ClapFile
 {
 public:
-	class AccessKey : public NoCopyNoMove
+	//! passkey idiom
+	class Access
 	{
-		AccessKey() = default;
+	public:
 		friend class ClapManager;
+		Access(Access&&) noexcept = default;
+	private:
+		Access() {}
+		Access(const Access&) = default;
 	};
 
 	explicit ClapFile(fs::path filename);
 	~ClapFile();
 
 	ClapFile(const ClapFile&) = delete;
-	ClapFile(ClapFile&& other) noexcept;
+	ClapFile(ClapFile&&) noexcept = default;
 	auto operator=(const ClapFile&) -> ClapFile& = delete;
-	auto operator=(ClapFile&& rhs) noexcept -> ClapFile&;
+	auto operator=(ClapFile&&) noexcept -> ClapFile& = default;
 
 	//! Loads the .clap file and scans for plugins
 	auto load() -> bool;
 
-	auto filename() const -> const fs::path& { return m_filename; }
+	auto filename() const -> auto& { return m_filename; }
 	auto factory() const { return m_factory; }
 
 	//! Only includes plugins that successfully loaded; Some may be invalidated later
 	auto pluginInfo() const -> auto& { return m_pluginInfo; }
 
 	//! Only includes plugins that successfully loaded; Some may be invalidated later
-	auto pluginInfo(AccessKey) -> auto& { return m_pluginInfo; }
+	auto pluginInfo(Access) -> auto& { return m_pluginInfo; }
 
 	//! Includes plugins that failed to load
 	auto pluginCount() const { return m_pluginCount; }
@@ -83,7 +87,10 @@ private:
 
 	struct EntryDeleter
 	{
-		void operator()(const clap_plugin_entry* ptr);
+		void operator()(const clap_plugin_entry* p) const noexcept
+		{
+			p->deinit();
+		}
 	};
 
 	std::unique_ptr<const clap_plugin_entry, EntryDeleter> m_entry;

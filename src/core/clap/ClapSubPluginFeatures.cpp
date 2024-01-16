@@ -108,9 +108,7 @@ void ClapSubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor* desc, Ke
 {
 	for (const auto& file : Engine::getClapManager()->files())
 	{
-		if (!file) { continue; }
-
-		for (const auto& info : file->pluginInfo())
+		for (const auto& info : file.pluginInfo())
 		{
 			if (!info || info->type() != m_type) { continue; }
 
