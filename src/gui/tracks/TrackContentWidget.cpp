@@ -52,11 +52,6 @@ const int BARS_PER_GROUP = 4;
 /* Lines between bars will disappear if zoomed too far out (i.e
 	if there are less than 4 pixels between lines)*/
 const int MIN_PIXELS_BETWEEN_LINES = 4;
-// Line widths in pixels
-const int HORIZONTAL_LINE_WIDTH = 1;
-const int COARSE_GRID_LINE_WIDTH = 2;
-const int FINE_GRID_LINE_WIDTH = 1;
-const int EMBOSS_LINE_WIDTH = 1;
 
 /*! \brief Create a new trackContentWidget
  *
@@ -131,28 +126,28 @@ void TrackContentWidget::updateBackground()
 
 	// draw lines
 	// draw fine grid
-	pmp.setPen( QPen( fineGridColor(), FINE_GRID_LINE_WIDTH ) );
+	pmp.setPen( QPen( fineGridColor(), fineGridWidth() ) );
 	for( float x = 0; x < w * 2; x += ppb * fineGridResolution )
 	{
 		pmp.drawLine( QLineF( static_cast<int>( x ), 0.0, static_cast<int>( x ), h ) );
 	}
 
 	// draw coarse grid
-	pmp.setPen( QPen( coarseGridColor(), COARSE_GRID_LINE_WIDTH ) );
+	pmp.setPen( QPen( coarseGridColor(), coarseGridWidth() ) );
 	for( float x = 0; x < w * 2; x += ppb * coarseGridResolution )
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
 	}
 
-	pmp.setPen( QPen( embossColor(), EMBOSS_LINE_WIDTH ) );
-	for( float x = (COARSE_GRID_LINE_WIDTH + 1) / 2; x < w * 2; x += ppb * coarseGridResolution )
+	pmp.setPen( QPen( embossColor(), embossWidth() ) );
+	for (float x = (coarseGridWidth() + embossOffset()); x < w * 2; x += ppb * coarseGridResolution)
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
 	}
 
 	// draw horizontal line
-	pmp.setPen( QPen( horizontalColor(), HORIZONTAL_LINE_WIDTH ) );
-	pmp.drawLine( 0, h - (HORIZONTAL_LINE_WIDTH + 1) / 2, w * 2, h - (HORIZONTAL_LINE_WIDTH + 1) / 2 );
+	pmp.setPen( QPen( horizontalColor(), horizontalWidth() ) );
+	pmp.drawLine(0, h - (horizontalWidth() + 1) / 2, w * 2, h - (horizontalWidth() + 1) / 2);
 
 	pmp.end();
 
@@ -742,6 +737,26 @@ QBrush TrackContentWidget::embossColor() const
 { return m_embossColor; }
 
 //! \brief CSS theming qproperty access method
+int TrackContentWidget::coarseGridWidth() const
+{ return m_coarseGridWidth; }
+
+//! \brief CSS theming qproperty access method
+int TrackContentWidget::fineGridWidth() const
+{ return m_fineGridWidth; }
+
+//! \brief CSS theming qproperty access method
+int TrackContentWidget::horizontalWidth() const
+{ return m_horizontalWidth; }
+
+//! \brief CSS theming qproperty access method
+int TrackContentWidget::embossWidth() const
+{ return m_embossWidth; }
+
+//! \brief CSS theming qproperty access method
+int TrackContentWidget::embossOffset() const
+{ return m_embossOffset; }
+
+//! \brief CSS theming qproperty access method
 void TrackContentWidget::setDarkerColor( const QBrush & c )
 { m_darkerColor = c; }
 
@@ -765,5 +780,24 @@ void TrackContentWidget::setHorizontalColor( const QBrush & c )
 void TrackContentWidget::setEmbossColor( const QBrush & c )
 { m_embossColor = c; }
 
+//! \brief CSS theming qproperty access method
+void TrackContentWidget::setCoarseGridWidth(const int & c)
+{ m_coarseGridWidth = c; }
+
+//! \brief CSS theming qproperty access method
+void TrackContentWidget::setFineGridWidth(const int & c)
+{ m_fineGridWidth = c; }
+
+//! \brief CSS theming qproperty access method
+void TrackContentWidget::setHorizontalWidth(const int & c)
+{ m_horizontalWidth = c; }
+
+//! \brief CSS theming qproperty access method
+void TrackContentWidget::setEmbossWidth(const int & c)
+{ m_embossWidth = c; }
+
+//! \brief CSS theming qproperty access method
+void TrackContentWidget::setEmbossOffset(const int& c)
+{ m_embossOffset = c; }
 
 } // namespace lmms::gui
