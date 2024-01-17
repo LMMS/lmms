@@ -104,7 +104,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 
 	// set up volume knob
 	m_volumeKnob = new Knob(KnobType::Bright26, nullptr, tr("Sample volume"));
-	m_volumeKnob->setVolumeKnob(true);
+	m_volumeKnob->setVolKnobType(VolKnobType::RelVol);
 	m_volumeKnob->setHintText(tr("Volume:"), "%");
 
 	basicControlsLayout->addWidget(m_volumeKnob, 0, 0);
