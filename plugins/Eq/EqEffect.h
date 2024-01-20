@@ -28,6 +28,9 @@
 #include "EqControls.h"
 #include "EqFilter.h"
 
+#include <algorithm>
+
+
 namespace lmms
 {
 
@@ -42,23 +45,20 @@ public:
 	{
 		return &m_eqControls;
 	}
-	inline void  gain( sampleFrame * buf, const fpp_t frames, float scale, sampleFrame * peak )
+	inline void gain( sampleFrame * buf, const fpp_t frames, float scale, sampleFrame * peak )
 	{
 		peak[0][0] = 0.0f; peak[0][1] = 0.0f;
 		for( fpp_t f = 0; f < frames; ++f )
 		{
-			buf[f][0] *= scale;
-			buf[f][1] *= scale;
+			auto & sf = buf[f];
 
-			if( fabs( buf[f][0] ) > peak[0][0] )
-			{
-				peak[0][0] = fabs( buf[f][0] );
-			}
-			if( fabs( buf[f][1] ) > peak[0][1] )
-			{
-				peak[0][1] = fabs( buf[f][0] );
-			}
+			// Apply gain to sample frame
+			sf[0] *= scale;
+			sf[1] *= scale;
 
+			// Update peaks
+			peak[0][0] = std::max(peak[0][0], (float)fabs(sf[0]));
+			peak[0][1] = std::max(peak[0][1], (float)fabs(sf[1]));
 		}
 	}
 

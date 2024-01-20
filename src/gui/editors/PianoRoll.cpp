@@ -119,18 +119,12 @@ const int INITIAL_START_KEY = Octave::Octave_4 + Key::C;
 const int NUM_EVEN_LENGTHS = 6;
 const int NUM_TRIPLET_LENGTHS = 5;
 
-
-
-QPixmap * PianoRoll::s_toolDraw = nullptr;
-QPixmap * PianoRoll::s_toolErase = nullptr;
-QPixmap * PianoRoll::s_toolSelect = nullptr;
-QPixmap * PianoRoll::s_toolMove = nullptr;
-QPixmap * PianoRoll::s_toolOpen = nullptr;
-QPixmap* PianoRoll::s_toolKnife = nullptr;
-
 SimpleTextFloat * PianoRoll::s_textFloat = nullptr;
 
-static std::array<QString, 12> s_noteStrings {"C", "C# / D\u266D", "D", "D# / E\u266D", "E", "F", "F# / G\u266D", "G", "G# / A\u266D", "A", "A# / B\u266D", "B"};
+static std::array<QString, 12> s_noteStrings {
+	"C", "C\u266F / D\u266D", "D", "D\u266F / E\u266D", "E", "F", "F\u266F / G\u266D", 
+	"G", "G\u266F / A\u266D", "A", "A\u266F / B\u266D", "B"
+};
 
 static QString getNoteString(int key)
 {
@@ -261,32 +255,6 @@ PianoRoll::PianoRoll() :
 	m_semiToneMarkerMenu->addAction( unmarkAllAction );
 	m_semiToneMarkerMenu->addAction( copyAllNotesAction );
 
-	// init pixmaps
-	if( s_toolDraw == nullptr )
-	{
-		s_toolDraw = new QPixmap( embed::getIconPixmap( "edit_draw" ) );
-	}
-	if( s_toolErase == nullptr )
-	{
-		s_toolErase= new QPixmap( embed::getIconPixmap( "edit_erase" ) );
-	}
-	if( s_toolSelect == nullptr )
-	{
-		s_toolSelect = new QPixmap( embed::getIconPixmap( "edit_select" ) );
-	}
-	if( s_toolMove == nullptr )
-	{
-		s_toolMove = new QPixmap( embed::getIconPixmap( "edit_move" ) );
-	}
-	if( s_toolOpen == nullptr )
-	{
-		s_toolOpen = new QPixmap( embed::getIconPixmap( "automation" ) );
-	}
-	if (s_toolKnife == nullptr)
-	{
-		s_toolKnife = new QPixmap(embed::getIconPixmap("edit_knife"));
-	}
-
 	// init text-float
 	if( s_textFloat == nullptr )
 	{
@@ -297,12 +265,11 @@ PianoRoll::PianoRoll() :
 
 	// add time-line
 	m_timeLine = new TimeLineWidget(m_whiteKeyWidth, 0, m_ppb,
-					Engine::getSong()->getPlayPos(
-						Song::PlayMode::MidiClip ),
-						m_currentPosition,
-						Song::PlayMode::MidiClip, this );
-	connect( this, SIGNAL( positionChanged( const lmms::TimePos& ) ),
-		m_timeLine, SLOT( updatePosition( const lmms::TimePos& ) ) );
+		Engine::getSong()->getPlayPos(Song::PlayMode::MidiClip),
+		Engine::getSong()->getTimeline(Song::PlayMode::MidiClip),
+		m_currentPosition, Song::PlayMode::MidiClip, this
+	);
+	connect(this, &PianoRoll::positionChanged, m_timeLine, &TimeLineWidget::updatePosition);
 	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos& ) ),
 			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
 
@@ -314,10 +281,7 @@ PianoRoll::PianoRoll() :
 			this, SLOT( updatePositionStepRecording( const lmms::TimePos& ) ) );
 
 	// update timeline when in record-accompany mode
-	connect( Engine::getSong()->getPlayPos( Song::PlayMode::Song ).m_timeLine,
-				SIGNAL( positionChanged( const lmms::TimePos& ) ),
-			this,
-			SLOT( updatePositionAccompany( const lmms::TimePos& ) ) );
+	connect(m_timeLine, &TimeLineWidget::positionChanged, this, &PianoRoll::updatePositionAccompany);
 	// TODO
 /*	connect( engine::getSong()->getPlayPos( Song::PlayMode::Pattern ).m_timeLine,
 				SIGNAL( positionChanged( const lmms::TimePos& ) ),
@@ -1667,6 +1631,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 		}
 		detuningClip = n->detuning()->automationClip();
 		connect(detuningClip.data(), SIGNAL(dataChanged()), this, SLOT(update()));
+		getGUI()->automationEditor()->setGhostMidiClip(m_midiClip);
 		getGUI()->automationEditor()->open(detuningClip);
 		return;
 	}
@@ -2514,7 +2479,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			// We iterate from last note in MIDI clip to the first,
 			// chronologically
 			auto it = notes.rbegin();
-			for( int i = 0; i < notes.size(); ++i )
+			while (it != notes.rend())
 			{
 				Note* n = *it;
 
@@ -3495,11 +3460,15 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			// is the note in visible area?
 			if (note->key() > bottomKey && note->key() <= topKey)
 			{
-				// we've done and checked all, let's draw the note
+				// We've done and checked all, let's draw the note with
+				// the appropriate color
+				const auto fillColor = note->type() == Note::Type::Regular ? m_noteColor : m_stepNoteColor;
+
 				drawNoteRect(
 					p, x + m_whiteKeyWidth, noteYPos(note->key()), note_width,
-					note, m_noteColor, m_noteTextColor, m_selectedNoteColor,
-					m_noteOpacity, m_noteBorders, drawNoteNames);
+					note, fillColor, m_noteTextColor, m_selectedNoteColor,
+					m_noteOpacity, m_noteBorders, drawNoteNames
+				);
 			}
 
 			// draw note editing stuff
@@ -3696,21 +3665,29 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			case EditMode::Draw:
 				if( m_mouseDownRight )
 				{
-					cursor = s_toolErase;
+					cursor = &m_toolErase;
 				}
 				else if( m_action == Action::MoveNote )
 				{
-					cursor = s_toolMove;
+					cursor = &m_toolMove;
 				}
 				else
 				{
-					cursor = s_toolDraw;
+					cursor = &m_toolDraw;
 				}
 				break;
-			case EditMode::Erase: cursor = s_toolErase; break;
-			case EditMode::Select: cursor = s_toolSelect; break;
-			case EditMode::Detuning: cursor = s_toolOpen; break;
-			case EditMode::Knife: cursor = s_toolKnife; break;
+			case EditMode::Erase:
+				cursor = &m_toolErase;
+				break;
+			case EditMode::Select:
+				cursor = &m_toolSelect;
+				break;
+			case EditMode::Detuning:
+				cursor = &m_toolOpen;
+				break;
+			case EditMode::Knife:
+				cursor = &m_toolKnife;
+				break;
 		}
 		QPoint mousePosition = mapFromGlobal( QCursor::pos() );
 		if( cursor != nullptr && mousePosition.y() > keyAreaTop() && mousePosition.x() > noteEditLeft())
@@ -3753,8 +3730,7 @@ void PianoRoll::resizeEvent(QResizeEvent* re)
 {
 	updatePositionLineHeight();
 	updateScrollbars();
-	Engine::getSong()->getPlayPos(Song::PlayMode::MidiClip)
-		.m_timeLine->setFixedWidth(width());
+	m_timeLine->setFixedWidth(width());
 	update();
 }
 
@@ -5186,7 +5162,8 @@ void PianoRollWindow::saveSettings( QDomDocument & doc, QDomElement & de )
 		de.appendChild(markedSemiTonesRoot);
 	}
 
-	de.setAttribute("stopbehaviour", static_cast<int>(m_editor->m_timeLine->behaviourAtStop()));
+	de.setAttribute("stopbehaviour", static_cast<int>(
+		Engine::getSong()->getTimeline(Song::PlayMode::MidiClip).stopBehaviour()));
 
 	MainWindow::saveWidgetState( this, de );
 }
@@ -5201,7 +5178,8 @@ void PianoRollWindow::loadSettings( const QDomElement & de )
 
 	MainWindow::restoreWidgetState( this, de );
 
-	m_editor->m_timeLine->setBehaviourAtStop(de.attribute("stopbehaviour").toInt());
+	Engine::getSong()->getTimeline(Song::PlayMode::MidiClip).setStopBehaviour(
+		static_cast<Timeline::StopBehaviour>(de.attribute("stopbehaviour").toInt()));
 
 	// update margins here because we're later in the startup process
 	// We can't earlier because everything is still starting with the

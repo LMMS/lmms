@@ -64,10 +64,8 @@ Track::Track( Type type, TrackContainer * tc ) :
 	m_mutedModel( false, this, tr( "Mute" ) ), /*!< For controlling track muting */
 	m_soloModel( false, this, tr( "Solo" ) ), /*!< For controlling track soloing */
 	m_simpleSerializingMode( false ),
-	m_clips(),        /*!< The clips (segments) */
-	m_color( 0, 0, 0 ),
-	m_hasColor( false )
-{
+	m_clips()        /*!< The clips (segments) */
+{	
 	m_trackContainer->addTrack( this );
 	m_height = -1;
 }
@@ -209,9 +207,9 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 		element.setAttribute( "trackheight", m_height );
 	}
 	
-	if( m_hasColor )
+	if (m_color.has_value())
 	{
-		element.setAttribute( "color", m_color.name() );
+		element.setAttribute("color", m_color->name());
 	}
 	
 	QDomElement tsDe = doc.createElement( nodeName() );
@@ -264,14 +262,9 @@ void Track::loadSettings( const QDomElement & element )
 	// Older project files that didn't have this attribute will set the value to false (issue 5562)
 	m_mutedBeforeSolo = QVariant( element.attribute( "mutedBeforeSolo", "0" ) ).toBool();
 
-	if( element.hasAttribute( "color" ) )
+	if (element.hasAttribute("color"))
 	{
-		QColor newColor = QColor(element.attribute("color"));
-		setColor(newColor);
-	}
-	else
-	{
-		resetColor();
+		setColor(QColor{element.attribute("color")});
 	}
 
 	if( m_simpleSerializingMode )
@@ -290,10 +283,9 @@ void Track::loadSettings( const QDomElement & element )
 		return;
 	}
 
-	while( !m_clips.empty() )
 	{
-		delete m_clips.front();
-//		m_clips.erase( m_clips.begin() );
+		auto guard = Engine::audioEngine()->requestChangesGuard();
+		deleteClips();
 	}
 
 	QDomNode node = element.firstChild();
@@ -634,19 +626,11 @@ void Track::toggleSolo()
 	}
 }
 
-void Track::setColor(const QColor& c)
+void Track::setColor(const std::optional<QColor>& color)
 {
-	m_hasColor = true;
-	m_color = c;
+	m_color = color;
 	emit colorChanged();
 }
-
-void Track::resetColor()
-{
-	m_hasColor = false;
-	emit colorChanged();
-}
-
 
 BoolModel *Track::getMutedModel()
 {

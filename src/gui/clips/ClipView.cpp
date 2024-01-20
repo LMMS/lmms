@@ -136,7 +136,7 @@ ClipView::ClipView( Clip * clip,
 	connect(m_trackView->getTrack(), &Track::colorChanged, this, [this]
 	{
 		// redraw if clip uses track color
-		if (!m_clip->usesCustomClipColor()) { update(); }
+		if (!m_clip->color().has_value()) { update(); }
 	});
 
 	m_trackView->getTrackContentWidget()->addClipView( this );
@@ -294,6 +294,17 @@ void ClipView::remove()
 
 	// delete ourself
 	close();
+
+	if (m_clip->getTrack())
+	{
+		auto guard = Engine::audioEngine()->requestChangesGuard();
+		m_clip->getTrack()->removeClip(m_clip);
+	}
+
+	// TODO: Clip::~Clip should not be responsible for removing the Clip from the Track.
+	// One would expect that a call to Track::removeClip would already do that for you, as well
+	// as actually deleting the Clip with the deleteLater function. That being said, it shouldn't
+	// be possible to make a Clip without a Track (i.e., Clip::getTrack is never nullptr).
 	m_clip->deleteLater();
 }
 
@@ -340,45 +351,35 @@ void ClipView::updatePosition()
 	m_trackView->trackContainerView()->update();
 }
 
-
-
-
 void ClipView::selectColor()
 {
 	// Get a color from the user
-	QColor new_color = ColorChooser( this ).withPalette( ColorChooser::Palette::Track )->getColor( m_clip->color() );
-	if (new_color.isValid()) { setColor(&new_color); }
+	const auto newColor = ColorChooser{this}
+		.withPalette(ColorChooser::Palette::Track)
+		->getColor(m_clip->color().value_or(palette().background().color()));
+	if (newColor.isValid()) { setColor(newColor); }
 }
-
-
-
 
 void ClipView::randomizeColor()
 {
-	setColor(&ColorChooser::getPalette(ColorChooser::Palette::Mixer)[rand() % 48]);
+	setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[std::rand() % 48]);
 }
-
-
-
 
 void ClipView::resetColor()
 {
-	setColor(nullptr);
+	setColor(std::nullopt);
 }
-
-
-
 
 /*! \brief Change color of all selected clips
  *
- *  \param color The new QColor. Pass nullptr to use the Track's color.
+ *  \param color The new color.
  */
-void ClipView::setColor(const QColor* color)
+void ClipView::setColor(const std::optional<QColor>& color)
 {
 	std::set<Track*> journaledTracks;
 
 	auto selectedClips = getClickedClips();
-	for (auto clipv: selectedClips)
+	for (auto clipv : selectedClips)
 	{
 		auto clip = clipv->getClip();
 		auto track = clip->getTrack();
@@ -397,24 +398,12 @@ void ClipView::setColor(const QColor* color)
 			track->addJournalCheckPoint();
 		}
 
-		if (color)
-		{
-			clip->useCustomClipColor(true);
-			clip->setColor(*color);
-		}
-		else
-		{
-			clip->useCustomClipColor(false);
-		}
+		clip->setColor(color);
 		clipv->update();
 	}
 
 	Engine::getSong()->setModified();
 }
-
-
-
-
 
 /*! \brief Change the ClipView's display when something
  *  being dragged enters it.
@@ -1483,11 +1472,7 @@ TimePos ClipView::quantizeSplitPos( TimePos midiPos, bool shiftMode )
 QColor ClipView::getColorForDisplay( QColor defaultColor )
 {
 	// Get the pure Clip color
-	auto clipColor = m_clip->hasColor()
-					? m_clip->usesCustomClipColor()
-						? m_clip->color()
-						: m_clip->getTrack()->color()
-					: defaultColor;
+	auto clipColor = m_clip->color().value_or(m_clip->getTrack()->color().value_or(defaultColor));
 
 	// Set variables
 	QColor c, mutedCustomColor;
@@ -1498,7 +1483,7 @@ QColor ClipView::getColorForDisplay( QColor defaultColor )
 	// Change the pure color by state: selected, muted, colored, normal
 	if( isSelected() )
 	{
-		c = m_clip->hasColor()
+		c = hasCustomColor()
 			? ( muted
 				? mutedCustomColor.darker( 350 )
 				: clipColor.darker( 150 ) )
@@ -1508,7 +1493,7 @@ QColor ClipView::getColorForDisplay( QColor defaultColor )
 	{
 		if( muted )
 		{
-			c = m_clip->hasColor()
+			c = hasCustomColor()
 				? mutedCustomColor.darker( 250 )
 				: mutedBackgroundColor();
 		}
@@ -1522,5 +1507,9 @@ QColor ClipView::getColorForDisplay( QColor defaultColor )
 	return c;
 }
 
+auto ClipView::hasCustomColor() const -> bool
+{
+	return m_clip->color().has_value() || m_clip->getTrack()->color().has_value();
+}
 
 } // namespace lmms::gui

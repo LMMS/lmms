@@ -46,6 +46,7 @@ public:
 private:
 	Lv2FxControls *lv2Controls();
 	void modelChanged() final;
+	void hideEvent(QHideEvent *event) override;
 };
 
 

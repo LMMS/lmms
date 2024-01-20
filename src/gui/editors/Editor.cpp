@@ -148,7 +148,7 @@ void Editor::closeEvent( QCloseEvent * _ce )
 	{
 		hide();
 	}
-	_ce->ignore();
+	_ce->accept();
  }
 
 DropToolBar::DropToolBar(QWidget* parent) : QToolBar(parent)

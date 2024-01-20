@@ -157,6 +157,11 @@ public:
 	{
 		m_noRun = _state;
 	}
+	
+	inline TempoSyncKnobModel* autoQuitModel()
+	{
+		return &m_autoQuitModel;
+	}
 
 	EffectChain * effectChain() const
 	{

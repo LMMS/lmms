@@ -197,8 +197,6 @@ void Lv2Instrument::play(sampleFrame *buf)
 
 	copyModelsToLmms();
 	copyBuffersToLmms(buf, fpp);
-
-	instrumentTrack()->processAudioBuffer(buf, fpp, nullptr);
 }
 
 
@@ -292,6 +290,15 @@ void Lv2InsView::dropEvent(QDropEvent *_de)
 		return;
 	}
 	_de->ignore();
+}
+
+
+
+
+void Lv2InsView::hideEvent(QHideEvent *event)
+{
+	closeHelpWindow();
+	QWidget::hideEvent(event);
 }
 
 

@@ -25,12 +25,13 @@
 #ifndef LMMS_MATH_H
 #define LMMS_MATH_H
 
+#include <QtGlobal>
+#include <algorithm>
+#include <cmath>
 #include <cstdint>
+
 #include "lmms_constants.h"
 #include "lmmsconfig.h"
-#include <QtGlobal>
-
-#include <cmath>
 
 namespace lmms
 {
@@ -323,6 +324,32 @@ template<class T>
 static inline T absMin( T a, T b )
 {
 	return std::abs(a) < std::abs(b) ? a : b;
+}
+
+// @brief Calculate number of digits which LcdSpinBox would show for a given number
+// @note Once we upgrade to C++20, we could probably use std::formatted_size
+static inline int numDigitsAsInt(float f)
+{
+	// use rounding:
+	// LcdSpinBox sometimes uses roundf(), sometimes cast rounding
+	// we use rounding to be on the "safe side"
+	const float rounded = roundf(f);
+	int asInt = static_cast<int>(rounded);
+	int digits = 1; // always at least 1
+	if(asInt < 0)
+	{
+		++digits;
+		asInt = -asInt;
+	}
+	// "asInt" is positive from now
+	int32_t power = 1;
+	for(int32_t i = 1; i<10; ++i)
+	{
+		power *= 10;
+		if(static_cast<int32_t>(asInt) >= power) { ++digits; } // 2 digits for >=10, 3 for >=100
+		else { break; }
+	}
+	return digits;
 }
 
 

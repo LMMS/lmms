@@ -58,7 +58,10 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	m_graphColor(209, 216, 228, 50),
 	m_resetColor(200, 100, 15, 200)
 {
-	setAutoFillBackground(true);
+	setAutoFillBackground(false);
+	setAttribute(Qt::WA_OpaquePaintEvent, true);
+	setAttribute(Qt::WA_NoSystemBackground, true);
+	
 	QPalette pal;
 	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
 	setPalette(pal);
@@ -358,6 +361,7 @@ void CompressorControlDialog::lookaheadChanged()
 {
 	m_lookaheadLengthKnob->setVisible(m_controls->m_lookaheadModel.value());
 	m_lookaheadEnabledLabel->setVisible(m_controls->m_lookaheadModel.value());
+	feedbackButton->setVisible(!m_controls->m_lookaheadModel.value());
 }
 
 
@@ -497,10 +501,12 @@ void CompressorControlDialog::redrawKnee()
 	float actualRatio = m_controls->m_limiterModel.value() ? 0 : m_controls->m_effect->m_ratioVal;
 
 	// Calculate endpoints for the two straight lines
-	float kneePoint1 = m_controls->m_effect->m_thresholdVal - m_controls->m_effect->m_kneeVal;
-	float kneePoint2X = m_controls->m_effect->m_thresholdVal + m_controls->m_effect->m_kneeVal;
-	float kneePoint2Y = (m_controls->m_effect->m_thresholdVal + (-m_controls->m_effect->m_thresholdVal * (actualRatio * (m_controls->m_effect->m_kneeVal / -m_controls->m_effect->m_thresholdVal))));
-	float ratioPoint = m_controls->m_effect->m_thresholdVal + (-m_controls->m_effect->m_thresholdVal * actualRatio);
+	const float thresholdVal = m_controls->m_effect->m_thresholdVal;
+	const float kneeVal = m_controls->m_effect->m_kneeVal;
+	float kneePoint1 = thresholdVal - kneeVal;
+	float kneePoint2X = thresholdVal + kneeVal;
+	float kneePoint2Y = thresholdVal + kneeVal * actualRatio;
+	float ratioPoint = thresholdVal + (-thresholdVal * actualRatio);
 
 	// Draw two straight lines
 	m_p.drawLine(0, m_kneeWindowSizeY, dbfsToXPoint(kneePoint1), dbfsToYPoint(kneePoint1));
@@ -510,7 +516,7 @@ void CompressorControlDialog::redrawKnee()
 	}
 
 	// Draw knee section
-	if (m_controls->m_effect->m_kneeVal)
+	if (kneeVal)
 	{
 		m_p.setPen(QPen(m_kneeColor2, 3));
 
@@ -522,8 +528,8 @@ void CompressorControlDialog::redrawKnee()
 		{
 			newPoint[0] = linearInterpolate(kneePoint1, kneePoint2X, (i + 1) / (float)COMP_KNEE_LINES);
 
-			const float temp = newPoint[0] - m_controls->m_effect->m_thresholdVal + m_controls->m_effect->m_kneeVal;
-			newPoint[1] = (newPoint[0] + (actualRatio - 1) * temp * temp / (4 * m_controls->m_effect->m_kneeVal));
+			const float temp = newPoint[0] - thresholdVal + kneeVal;
+			newPoint[1] = (newPoint[0] + (actualRatio - 1) * temp * temp / (4 * kneeVal));
 
 			m_p.drawLine(dbfsToXPoint(prevPoint[0]), dbfsToYPoint(prevPoint[1]), dbfsToXPoint(newPoint[0]), dbfsToYPoint(newPoint[1]));
 
@@ -685,6 +691,79 @@ void CompressorControlDialog::drawGraph()
 	}
 
 	m_p.end();
+}
+
+
+void CompressorControlDialog::mouseDoubleClickEvent(QMouseEvent* event)
+{
+	setGuiVisibility(!m_guiVisibility);
+}
+
+
+void CompressorControlDialog::setGuiVisibility(bool isVisible)
+{
+	if (!isVisible)
+	{
+		m_rmsKnob->setVisible(isVisible);
+		m_rmsEnabledLabel->setVisible(isVisible);
+
+		m_lookaheadLengthKnob->setVisible(isVisible);
+		m_lookaheadEnabledLabel->setVisible(isVisible);
+
+		m_blendKnob->setVisible(isVisible);
+		m_blendEnabledLabel->setVisible(isVisible);
+
+		m_ratioKnob->setVisible(isVisible);
+		m_ratioEnabledLabel->setVisible(isVisible);
+	}
+	else
+	{
+		m_rmsKnob->setVisible(!m_controls->m_peakmodeModel.value());
+		m_rmsEnabledLabel->setVisible(!m_controls->m_peakmodeModel.value());
+
+		m_blendKnob->setVisible(m_controls->m_stereoLinkModel.value() == 4);
+		m_blendEnabledLabel->setVisible(m_controls->m_stereoLinkModel.value() == 4);
+
+		m_lookaheadLengthKnob->setVisible(m_controls->m_lookaheadModel.value());
+		m_lookaheadEnabledLabel->setVisible(m_controls->m_lookaheadModel.value());
+
+		m_ratioKnob->setVisible(!m_controls->m_limiterModel.value());
+		m_ratioEnabledLabel->setVisible(!m_controls->m_limiterModel.value());
+	}
+	m_controlsBoxLabel->setVisible(isVisible);
+	m_thresholdKnob->setVisible(isVisible);
+	m_attackKnob->setVisible(isVisible);
+	m_releaseKnob->setVisible(isVisible);
+	m_kneeKnob->setVisible(isVisible);
+	m_rangeKnob->setVisible(isVisible);
+	m_holdKnob->setVisible(isVisible);
+	m_inBalanceKnob->setVisible(isVisible);
+	m_outBalanceKnob->setVisible(isVisible);
+	m_stereoBalanceKnob->setVisible(isVisible);
+	m_tiltKnob->setVisible(isVisible);
+	m_tiltFreqKnob->setVisible(isVisible);
+	m_mixKnob->setVisible(isVisible);
+	m_autoAttackKnob->setVisible(isVisible);
+	m_autoReleaseKnob->setVisible(isVisible);
+	m_outFader->setVisible(isVisible);
+	m_inFader->setVisible(isVisible);
+	rmsButton->setVisible(isVisible);
+	peakButton->setVisible(isVisible);
+	rmsPeakGroup->setVisible(isVisible);
+	leftRightButton->setVisible(isVisible);
+	midSideButton->setVisible(isVisible);
+	compressButton->setVisible(isVisible);
+	limitButton->setVisible(isVisible);
+	unlinkedButton->setVisible(isVisible);
+	maximumButton->setVisible(isVisible);
+	averageButton->setVisible(isVisible);
+	minimumButton->setVisible(isVisible);
+	blendButton->setVisible(isVisible);
+	autoMakeupButton->setVisible(isVisible);
+	auditionButton->setVisible(isVisible);
+	feedbackButton->setVisible(isVisible);
+	lookaheadButton->setVisible(isVisible);
+	m_guiVisibility = isVisible;
 }
 
 

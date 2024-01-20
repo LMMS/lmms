@@ -41,6 +41,9 @@
 #include "LocklessRingBuffer.h"
 #include "SaControls.h"
 
+#include <cassert>
+#include <limits>
+
 namespace lmms
 {
 
@@ -650,7 +653,8 @@ float SaProcessor::ampToYPixel(float amplitude, unsigned int height) const
 	if (m_controls->m_logYModel.value())
 	{
 		// logarithmic scale: convert linear amplitude to dB (relative to 1.0)
-		float amplitude_dB = 10 * log10(amplitude);
+		assert (amplitude >= 0);
+		float amplitude_dB = 10 * std::log10(std::max(amplitude, std::numeric_limits<float>::min()));
 		if (amplitude_dB < getAmpRangeMin())
 		{
 			return height;

@@ -570,6 +570,10 @@ f_cnt_t InstrumentTrack::beatLen( NotePlayHandle * _n ) const
 
 void InstrumentTrack::playNote( NotePlayHandle* n, sampleFrame* workingBuffer )
 {
+	// Note: under certain circumstances the working buffer is a nullptr.
+	// These cases are triggered in PlayHandle::doProcessing when the play method is called with a nullptr.
+	// TODO: Find out if we can skip processing at a higher level if the buffer is nullptr.
+
 	// arpeggio- and chord-widget has to do its work -> adding sub-notes
 	// for chords/arpeggios
 	m_noteStacking.processNote( n );
@@ -579,6 +583,15 @@ void InstrumentTrack::playNote( NotePlayHandle* n, sampleFrame* workingBuffer )
 	{
 		// all is done, so now lets play the note!
 		m_instrument->playNote( n, workingBuffer );
+
+		// This is effectively the same as checking if workingBuffer is not a nullptr.
+		// Calling processAudioBuffer with a nullptr leads to crashes. Hence the check.
+		if (n->usesBuffer())
+		{
+			const fpp_t frames = n->framesLeftForCurrentPeriod();
+			const f_cnt_t offset = n->noteOffset();
+			processAudioBuffer(workingBuffer, frames + offset, n);
+		}
 	}
 }
 
@@ -714,7 +727,8 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 	// Handle automation: detuning
 	for (const auto& processHandle : m_processHandles)
 	{
-		processHandle->processTimePos(_start, m_pitchModel.value(), gui::GuiApplication::instance()->pianoRoll()->isRecording());
+		processHandle->processTimePos(
+			_start, m_pitchModel.value(), gui::getGUI() && gui::getGUI()->pianoRoll()->isRecording());
 	}
 
 	if ( clips.size() == 0 )
@@ -762,8 +776,11 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 		while( nit != notes.end() &&
 					( cur_note = *nit )->pos() == cur_start )
 		{
-			const f_cnt_t note_frames =
-				cur_note->length().frames( frames_per_tick );
+			// If the note is a Step Note, frames will be 0 so the NotePlayHandle
+			// plays for the whole length of the sample
+			const auto note_frames = cur_note->type() == Note::Type::Step
+				? 0
+				: cur_note->length().frames(frames_per_tick);
 
 			NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire( this, _offset, note_frames, *cur_note );
 			notePlayHandle->setPatternTrack(pattern_track);
@@ -842,9 +859,11 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 	m_noteStacking.saveState( doc, thisElement );
 	m_arpeggio.saveState( doc, thisElement );
 
-	// Don't save midi port info if the user chose to.
-	if (Engine::getSong()->isSavingProject()
-		&& !Engine::getSong()->getSaveOptions().discardMIDIConnections.value())
+	// Save the midi port info if we are not in song saving mode, e.g. in
+	// track cloning mode or if we are in song saving mode and the user
+	// has chosen to discard the MIDI connections.
+	if (!Engine::getSong()->isSavingProject() ||
+	    !Engine::getSong()->getSaveOptions().discardMIDIConnections.value())
 	{
 		// Don't save auto assigned midi device connection
 		bool hasAuto = m_hasAutoMidiDev;

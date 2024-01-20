@@ -74,7 +74,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	connect(ConfigManager::inst(), SIGNAL(valueChanged(QString,QString,QString)),
 			this, SLOT(handleConfigChange(QString,QString,QString)));
 
-	m_mixerChannelNumber = new MixerLineLcdSpinBox(2, getTrackSettingsWidget(), tr("Mixer channel"), this);
+	m_mixerChannelNumber = new MixerChannelLcdSpinBox(2, getTrackSettingsWidget(), tr("Mixer channel"), this);
 	m_mixerChannelNumber->show();
 
 	m_volumeKnob = new Knob( KnobType::Small17, getTrackSettingsWidget(),
@@ -227,7 +227,7 @@ void InstrumentTrackView::createMixerLine()
 	auto channel = Engine::mixer()->mixerChannel(channelIndex);
 
 	channel->m_name = getTrack()->name();
-	if (getTrack()->useColor()) { channel->setColor (getTrack()->color()); }
+	channel->setColor(getTrack()->color());
 
 	assignMixerLine(channelIndex);
 }
@@ -240,7 +240,7 @@ void InstrumentTrackView::assignMixerLine(int channelIndex)
 {
 	model()->mixerChannelModel()->setValue( channelIndex );
 
-	getGUI()->mixerView()->setCurrentMixerLine( channelIndex );
+	getGUI()->mixerView()->setCurrentMixerChannel(channelIndex);
 }
 
 

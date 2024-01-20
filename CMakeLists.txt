@@ -1,12 +1,30 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.9)
 
+# Set the given policy to NEW. If it does not exist, it will not be set. If it
+# is already set to NEW (most likely due to predating the minimum required CMake
+# version), a developer warning is emitted indicating that the policy need no
+# longer be explicitly set.
+function(enable_policy_if_exists id)
+	if(POLICY "${id}")
+		cmake_policy(GET "${id}" current_value)
+		if(current_value STREQUAL "NEW")
+			message(AUTHOR_WARNING "${id} is now set to NEW by default, and no longer needs to be explicitly set.")
+		else()
+			cmake_policy(SET "${id}" NEW)
+		endif()
+	endif()
+endfunction()
+
+# Needed for the SWH Ladspa plugins. See below.
+enable_policy_if_exists(CMP0074) # find_package() uses <PackageName>_ROOT variables.
+# Needed for ccache support with MSVC
+enable_policy_if_exists(CMP0141) # MSVC debug information format flags are selected by an abstraction.
+
 PROJECT(lmms)
 
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
 SET(LMMS_BINARY_DIR ${CMAKE_BINARY_DIR})
 SET(LMMS_SOURCE_DIR ${CMAKE_SOURCE_DIR})
-
-# CMAKE_POLICY Section
 
 # Import of windows.h breaks min()/max()
 ADD_DEFINITIONS(-DNOMINMAX)
@@ -31,7 +49,7 @@ INCLUDE(GenerateExportHeader)
 
 STRING(TOUPPER          "${CMAKE_PROJECT_NAME}" PROJECT_NAME_UCASE)
 
-SET(PROJECT_YEAR 2020)
+SET(PROJECT_YEAR 2023)
 
 SET(PROJECT_AUTHOR      "LMMS Developers")
 SET(PROJECT_URL         "https://lmms.io")
@@ -73,6 +91,7 @@ OPTION(WANT_SOUNDIO	"Include libsoundio support" ON)
 OPTION(WANT_SDL		"Include SDL (Simple DirectMedia Layer) support" ON)
 OPTION(WANT_SF2		"Include SoundFont2 player plugin" ON)
 OPTION(WANT_GIG		"Include GIG player plugin" ON)
+option(WANT_SID		"Include Sid instrument" ON)
 OPTION(WANT_STK		"Include Stk (Synthesis Toolkit) support" ON)
 OPTION(WANT_SWH		"Include Steve Harris's LADSPA plugins" ON)
 OPTION(WANT_TAP		"Include Tom's Audio Processing LADSPA plugins" ON)
@@ -196,7 +215,14 @@ SET(QT_QTTEST_LIBRARY Qt5::Test)
 
 # check for libsndfile
 FIND_PACKAGE(SndFile REQUIRED)
-IF(NOT SNDFILE_FOUND)
+IF(SNDFILE_FOUND)
+	IF(SndFile_VERSION VERSION_GREATER_EQUAL "1.1.0")
+		SET(LMMS_HAVE_SNDFILE_MP3 TRUE)
+	ELSE()
+		MESSAGE("libsndfile version is < 1.1.0; MP3 import disabled")
+		SET(LMMS_HAVE_SNDFILE_MP3 FALSE)
+	ENDIF()
+ELSE()
 	MESSAGE(FATAL_ERROR "LMMS requires libsndfile1 and libsndfile1-dev >= 1.0.18 - please install, remove CMakeCache.txt and try again!")
 ENDIF()
 # check if we can use SFC_SET_COMPRESSION_LEVEL
@@ -206,6 +232,13 @@ CHECK_CXX_SOURCE_COMPILES(
 		int main() {SFC_SET_COMPRESSION_LEVEL;}"
 	LMMS_HAVE_SF_COMPLEVEL
 )
+
+# check for perl
+if(LMMS_BUILD_APPLE)
+	# Prefer system perl over Homebrew, MacPorts, etc
+	set(Perl_ROOT "/usr/bin")
+endif()
+find_package(Perl)
 
 IF(WANT_LV2)
 	IF(PKG_CONFIG_FOUND)
@@ -269,8 +302,12 @@ ELSE(WANT_CMT)
 ENDIF(WANT_CMT)
 
 IF(WANT_SWH)
-	SET(LMMS_HAVE_SWH TRUE)
-	SET(STATUS_SWH "OK")
+	IF(PERL_FOUND)
+		SET(LMMS_HAVE_SWH TRUE)
+		SET(STATUS_SWH "OK")
+	ELSE()
+		SET(STATUS_SWH "Skipping, perl is missing")
+	ENDIF()
 ELSE(WANT_SWH)
 	SET(STATUS_SWH "not built as requested")
 ENDIF(WANT_SWH)
@@ -335,6 +372,16 @@ IF(WANT_SDL AND NOT LMMS_HAVE_SDL2)
 		SET(SDL_LIBRARY "")
 	ENDIF()
 ENDIF()
+
+# check for Sid
+if(WANT_SID)
+	if(PERL_FOUND)
+		set(LMMS_HAVE_SID TRUE)
+		set(STATUS_SID "OK")
+	else()
+		set(STATUS_SID "not found, please install perl if you require the Sid instrument")
+	endif()
+endif()
 
 # check for Stk
 IF(WANT_STK)
@@ -402,8 +449,6 @@ IF(WANT_MP3LAME)
 		SET(STATUS_MP3LAME "OK")
 	ELSE(LAME_FOUND)
 		SET(STATUS_MP3LAME "not found, please install libmp3lame-dev (or similar)")
-		SET(LAME_LIBRARIES "")
-		SET(LAME_INCLUDE_DIRS "")
 	ENDIF(LAME_FOUND)
 ELSE(WANT_MP3LAME)
 	SET(STATUS_MP3LAME "Disabled for build")
@@ -498,7 +543,7 @@ ENDIF()
 
 # check for Fluidsynth
 IF(WANT_SF2)
-	find_package(FluidSynth 1.1.0)
+	find_package(FluidSynth 1.1.7)
 	if(FluidSynth_FOUND)
 		SET(LMMS_HAVE_FLUIDSYNTH TRUE)
 		if(FluidSynth_VERSION_STRING VERSION_GREATER_EQUAL 2)
@@ -654,6 +699,9 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	ELSE(WIN32)
 		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -DPIC")
 	ENDIF(WIN32)
+elseif(MSVC)
+	# Use UTF-8 as the source and execution character set
+	add_compile_options("/utf-8")
 ENDIF()
 
 # add enabled sanitizers
@@ -800,6 +848,7 @@ MESSAGE(
 "* ZynAddSubFX instrument      : ${STATUS_ZYN}\n"
 "* Carla Patchbay & Rack       : ${STATUS_CARLA}\n"
 "* SoundFont2 player           : ${STATUS_FLUIDSYNTH}\n"
+"* Sid instrument              : ${STATUS_SID}\n"
 "* Stk Mallets                 : ${STATUS_STK}\n"
 "* VST-instrument hoster       : ${STATUS_VST}\n"
 "* VST-effect hoster           : ${STATUS_VST}\n"

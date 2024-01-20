@@ -26,6 +26,7 @@
 #include <QPainter>
 
 #include "Graph.h"
+#include "SampleLoader.h"
 #include "StringPairDrag.h"
 #include "SampleBuffer.h"
 #include "Oscillator.h"
@@ -588,20 +589,15 @@ void graphModel::setWaveToNoise()
 
 QString graphModel::setWaveToUser()
 {
-	auto sampleBuffer = new SampleBuffer;
-	QString fileName = sampleBuffer->openAndSetWaveformFile();
+	QString fileName = gui::SampleLoader::openWaveformFile();
 	if( fileName.isEmpty() == false )
 	{
-		sampleBuffer->dataReadLock();
+		auto sampleBuffer = gui::SampleLoader::createBufferFromFile(fileName);
 		for( int i = 0; i < length(); i++ )
 		{
-			m_samples[i] = sampleBuffer->userWaveSample(
-					i / static_cast<float>( length() ) );
+			m_samples[i] = Oscillator::userWaveSample(sampleBuffer.get(), i / static_cast<float>(length()));
 		}
-		sampleBuffer->dataUnlock();
 	}
-
-	sharedObject::unref( sampleBuffer );
 
 	emit samplesChanged( 0, length() - 1 );
 	return fileName;

@@ -28,13 +28,14 @@
 
 #include <algorithm>
 #include <cstdlib>
-#include <cstring>
 #include <lilv/lilv.h>
 #include <lv2/lv2plug.in/ns/ext/buf-size/buf-size.h>
 #include <lv2/lv2plug.in/ns/ext/options/options.h>
+#include <lv2/lv2plug.in/ns/ext/worker/worker.h>
 #include <QDebug>
 #include <QElapsedTimer>
 
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "Plugin.h"
 #include "Lv2ControlBase.h"
@@ -46,7 +47,7 @@ namespace lmms
 {
 
 
-const std::set<const char*, Lv2Manager::CmpStr> Lv2Manager::pluginBlacklist =
+const std::set<std::string_view> Lv2Manager::pluginBlacklist =
 {
 	// github.com/calf-studio-gear/calf, #278
 	"http://calf.sourceforge.net/plugins/Analyzer",
@@ -137,6 +138,26 @@ const std::set<const char*, Lv2Manager::CmpStr> Lv2Manager::pluginBlacklist =
 	"urn:juced:DrumSynth"
 };
 
+const std::set<std::string_view> Lv2Manager::pluginBlacklistBuffersizeLessThan32 =
+{
+	"http://moddevices.com/plugins/mod-devel/2Voices",
+	"http://moddevices.com/plugins/mod-devel/Capo",
+	"http://moddevices.com/plugins/mod-devel/Drop",
+	"http://moddevices.com/plugins/mod-devel/Harmonizer",
+	"http://moddevices.com/plugins/mod-devel/Harmonizer2",
+	"http://moddevices.com/plugins/mod-devel/HarmonizerCS",
+	"http://moddevices.com/plugins/mod-devel/SuperCapo",
+	"http://moddevices.com/plugins/mod-devel/SuperWhammy",
+	"http://moddevices.com/plugins/mod-devel/Gx2Voices",
+	"http://moddevices.com/plugins/mod-devel/GxCapo",
+	"http://moddevices.com/plugins/mod-devel/GxDrop",
+	"http://moddevices.com/plugins/mod-devel/GxHarmonizer",
+	"http://moddevices.com/plugins/mod-devel/GxHarmonizer2",
+	"http://moddevices.com/plugins/mod-devel/GxHarmonizerCS",
+	"http://moddevices.com/plugins/mod-devel/GxSuperCapo",
+	"http://moddevices.com/plugins/mod-devel/GxSuperWhammy"
+};
+
 
 
 
@@ -152,10 +173,15 @@ Lv2Manager::Lv2Manager() :
 	m_supportedFeatureURIs.insert(LV2_URID__map);
 	m_supportedFeatureURIs.insert(LV2_URID__unmap);
 	m_supportedFeatureURIs.insert(LV2_OPTIONS__options);
+	m_supportedFeatureURIs.insert(LV2_WORKER__schedule);
 	// min/max is always passed in the options
 	m_supportedFeatureURIs.insert(LV2_BUF_SIZE__boundedBlockLength);
 	// block length is only changed initially in AudioEngine CTOR
 	m_supportedFeatureURIs.insert(LV2_BUF_SIZE__fixedBlockLength);
+	if (const auto fpp = Engine::audioEngine()->framesPerPeriod(); (fpp & (fpp - 1)) == 0)  // <=> ffp is power of 2 (for ffp > 0)
+	{
+		m_supportedFeatureURIs.insert(LV2_BUF_SIZE__powerOf2BlockLength);
+	}
 
 	auto supportOpt = [this](Lv2UridCache::Id id)
 	{
@@ -283,14 +309,6 @@ void Lv2Manager::initPlugins()
 			"  If you want to ignore the blacklist (dangerous!), please set\n"
 			"  environment variable \"LMMS_IGNORE_BLACKLIST\" to nonempty.";
 	}
-}
-
-
-
-
-bool Lv2Manager::CmpStr::operator()(const char *a, const char *b) const
-{
-	return std::strcmp(a, b) < 0;
 }
 
 

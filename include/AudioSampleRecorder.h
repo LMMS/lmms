@@ -28,6 +28,7 @@
 
 #include <QList>
 #include <QPair>
+#include <memory>
 
 #include "AudioDevice.h"
 
@@ -44,8 +45,7 @@ public:
 	~AudioSampleRecorder() override;
 
 	f_cnt_t framesRecorded() const;
-	void createSampleBuffer( SampleBuffer** sampleBuffer );
-
+	std::shared_ptr<const SampleBuffer> createSampleBuffer();
 
 private:
 	void writeBuffer( const surroundSampleFrame * _ab,
