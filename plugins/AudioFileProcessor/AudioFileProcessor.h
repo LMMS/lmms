@@ -63,16 +63,16 @@ public:
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
-	Sample const & getSample() const { return m_sample; }
+	Sample const & sample() const { return m_sample; }
 
-	FloatModel & getAmpModel() { return m_ampModel; }
-	FloatModel & getStartPointModel() { return m_startPointModel; }
-	FloatModel & getEndPointModel() { return m_endPointModel; }
-	FloatModel & getLoopPointModel() { return m_loopPointModel; }
-	BoolModel & getReverseModel() { return m_reverseModel; }
-	IntModel & getLoopModel() { return m_loopModel; }
-	BoolModel & getStutterModel() { return m_stutterModel; }
-	ComboBoxModel & getInterpolationModel() { return m_interpolationModel; }
+	FloatModel & ampModel() { return m_ampModel; }
+	FloatModel & startPointModel() { return m_startPointModel; }
+	FloatModel & endPointModel() { return m_endPointModel; }
+	FloatModel & loopPointModel() { return m_loopPointModel; }
+	BoolModel & reverseModel() { return m_reverseModel; }
+	IntModel & loopModel() { return m_loopModel; }
+	BoolModel & stutterModel() { return m_stutterModel; }
+	ComboBoxModel & interpolationModel() { return m_interpolationModel; }
 
 
 public slots:

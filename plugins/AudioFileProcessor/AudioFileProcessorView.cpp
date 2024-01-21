@@ -184,7 +184,7 @@ void AudioFileProcessorView::newWaveView()
 		delete m_waveView;
 		m_waveView = 0;
 	}
-	m_waveView = new AudioFileProcessorWaveView(this, 245, 75, &castModel<AudioFileProcessor>()->getSample());
+	m_waveView = new AudioFileProcessorWaveView(this, 245, 75, &castModel<AudioFileProcessor>()->sample());
 	m_waveView->move( 2, 172 );
 	m_waveView->setKnobs(
 		dynamic_cast<AudioFileProcessorWaveView::knob *>( m_startKnob ),
@@ -226,7 +226,7 @@ void AudioFileProcessorView::paintEvent( QPaintEvent * )
 
 	QString file_name = "";
 
-	int idx = a->getSample().sampleFile().length();
+	int idx = a->sample().sampleFile().length();
 
 	p.setFont( pointSize<8>( font() ) );
 
@@ -237,7 +237,7 @@ void AudioFileProcessorView::paintEvent( QPaintEvent * )
 	while( idx > 0 &&
 		fm.size( Qt::TextSingleLine, file_name + "..." ).width() < 210 )
 	{
-		file_name = a->getSample().sampleFile()[--idx] + file_name;
+		file_name = a->sample().sampleFile()[--idx] + file_name;
 	}
 
 	if( idx > 0 )
@@ -270,14 +270,14 @@ void AudioFileProcessorView::modelChanged()
 {
 	auto a = castModel<AudioFileProcessor>();
 	connect(a, &AudioFileProcessor::sampleUpdated, this, &AudioFileProcessorView::sampleUpdated);
-	m_ampKnob->setModel( &a->getAmpModel() );
-	m_startKnob->setModel( &a->getStartPointModel() );
-	m_endKnob->setModel( &a->getEndPointModel() );
-	m_loopKnob->setModel( &a->getLoopPointModel() );
-	m_reverseButton->setModel( &a->getReverseModel() );
-	m_loopGroup->setModel( &a->getLoopModel() );
-	m_stutterButton->setModel( &a->getStutterModel() );
-	m_interpBox->setModel( &a->getInterpolationModel() );
+	m_ampKnob->setModel( &a->ampModel() );
+	m_startKnob->setModel( &a->startPointModel() );
+	m_endKnob->setModel( &a->endPointModel() );
+	m_loopKnob->setModel( &a->loopPointModel() );
+	m_reverseButton->setModel( &a->reverseModel() );
+	m_loopGroup->setModel( &a->loopModel() );
+	m_stutterButton->setModel( &a->stutterModel() );
+	m_interpBox->setModel( &a->interpolationModel() );
 	sampleUpdated();
 }
 
