@@ -48,7 +48,7 @@ void AudioFileProcessorWaveView::updateSampleRange()
 	}
 }
 
-AudioFileProcessorWaveView::AudioFileProcessorWaveView(QWidget * _parent, int _w, int _h, Sample* buf) :
+AudioFileProcessorWaveView::AudioFileProcessorWaveView(QWidget * _parent, int _w, int _h, Sample const * buf) :
 	QWidget( _parent ),
 	m_sample(buf),
 	m_graph( QPixmap( _w - 2 * s_padding, _h - 2 * s_padding ) ),

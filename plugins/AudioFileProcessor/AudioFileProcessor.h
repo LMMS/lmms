@@ -37,14 +37,6 @@
 namespace lmms
 {
 
-namespace gui
-{
-
-class AudioFileProcessorView;
-
-}
-
-
 class AudioFileProcessor : public Instrument
 {
 	Q_OBJECT
@@ -70,6 +62,17 @@ public:
 	}
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
+
+	Sample const & getSample() const { return m_sample; }
+
+	FloatModel & getAmpModel() { return m_ampModel; }
+	FloatModel & getStartPointModel() { return m_startPointModel; }
+	FloatModel & getEndPointModel() { return m_endPointModel; }
+	FloatModel & getLoopPointModel() { return m_loopPointModel; }
+	BoolModel & getReverseModel() { return m_reverseModel; }
+	IntModel & getLoopModel() { return m_loopModel; }
+	BoolModel & getStutterModel() { return m_stutterModel; }
+	ComboBoxModel & getInterpolationModel() { return m_interpolationModel; }
 
 
 public slots:
@@ -103,8 +106,6 @@ private:
 
 	f_cnt_t m_nextPlayStartPoint;
 	bool m_nextPlayBackwards;
-
-	friend class gui::AudioFileProcessorView;
 } ;
 
 } // namespace lmms

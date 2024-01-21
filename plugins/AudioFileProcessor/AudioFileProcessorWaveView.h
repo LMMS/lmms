@@ -127,7 +127,7 @@ private:
 		SampleLoop
 	} ;
 
-	Sample* m_sample;
+	Sample const * m_sample;
 	QPixmap m_graph;
 	f_cnt_t m_from;
 	f_cnt_t m_to;
@@ -150,7 +150,7 @@ private:
 	friend class AudioFileProcessorView;
 
 public:
-	AudioFileProcessorWaveView(QWidget * _parent, int _w, int _h, Sample* buf);
+	AudioFileProcessorWaveView(QWidget * _parent, int _w, int _h, Sample const * buf);
 	void setKnobs(knob *_start, knob *_end, knob *_loop );
 
 
