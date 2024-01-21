@@ -26,14 +26,12 @@
 #ifndef LMMS_AUDIO_FILE_PROCESSOR_H
 #define LMMS_AUDIO_FILE_PROCESSOR_H
 
-#include <QPixmap>
 
+#include "AutomatableModel.h"
 #include "ComboBoxModel.h"
+
 #include "Instrument.h"
-#include "InstrumentView.h"
 #include "Sample.h"
-#include "SampleBuffer.h"
-#include "Knob.h"
 
 
 namespace lmms
@@ -41,13 +39,9 @@ namespace lmms
 
 namespace gui
 {
-class automatableButtonGroup;
-class PluginView;
-class InstrumentViewFixedSize;
-class Knob;
-class PixmapButton;
-class ComboBox;
+
 class AudioFileProcessorView;
+
 }
 
 
@@ -111,54 +105,7 @@ private:
 	bool m_nextPlayBackwards;
 
 	friend class gui::AudioFileProcessorView;
-
 } ;
-
-
-namespace gui
-{
-
-class AudioFileProcessorWaveView;
-
-
-class AudioFileProcessorView : public gui::InstrumentViewFixedSize
-{
-	Q_OBJECT
-public:
-	AudioFileProcessorView( Instrument * _instrument, QWidget * _parent );
-	virtual ~AudioFileProcessorView() = default;
-
-	void newWaveView();
-protected slots:
-	void sampleUpdated();
-	void openAudioFile();
-
-
-protected:
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
-	virtual void paintEvent( QPaintEvent * );
-
-
-private:
-	virtual void modelChanged();
-
-
-	AudioFileProcessorWaveView * m_waveView;
-	Knob * m_ampKnob;
-	Knob * m_startKnob;
-	Knob * m_endKnob;
-	Knob * m_loopKnob;
-
-	gui::PixmapButton * m_openAudioFileButton;
-	PixmapButton * m_reverseButton;
-	automatableButtonGroup * m_loopGroup;
-	PixmapButton * m_stutterButton;
-	ComboBox * m_interpBox;
-
-} ;
-
-} // namespace gui
 
 } // namespace lmms
 

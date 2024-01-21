@@ -25,22 +25,18 @@
 #ifndef LMMS_AUDIO_FILE_PROCESSOR_WAVE_VIEW_H
 #define LMMS_AUDIO_FILE_PROCESSOR_WAVE_VIEW_H
 
-#include <QPixmap>
 
-#include "ComboBoxModel.h"
-#include "Instrument.h"
-#include "InstrumentView.h"
-#include "Sample.h"
-#include "SampleBuffer.h"
 #include "Knob.h"
 
 
 namespace lmms
 {
 
+class Sample;
+
 namespace gui
 {
-class Knob;
+
 class AudioFileProcessorView;
 }
 
