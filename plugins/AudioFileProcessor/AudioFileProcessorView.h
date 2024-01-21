@@ -45,36 +45,37 @@ class AudioFileProcessorView : public gui::InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
-	AudioFileProcessorView( Instrument * _instrument, QWidget * _parent );
+	AudioFileProcessorView(Instrument* instrument, QWidget* parent);
 	virtual ~AudioFileProcessorView() = default;
 
 	void newWaveView();
+
 protected slots:
 	void sampleUpdated();
 	void openAudioFile();
 
-
 protected:
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
-	virtual void paintEvent( QPaintEvent * );
+	virtual void dragEnterEvent(QDragEnterEvent* dee);
+	virtual void dropEvent(QDropEvent* de);
+	virtual void paintEvent(QPaintEvent*);
 
-
+	// Private methods
 private:
 	virtual void modelChanged();
 
+	// Private members
+private:
+	AudioFileProcessorWaveView* m_waveView;
+	Knob* m_ampKnob;
+	Knob* m_startKnob;
+	Knob* m_endKnob;
+	Knob* m_loopKnob;
 
-	AudioFileProcessorWaveView * m_waveView;
-	Knob * m_ampKnob;
-	Knob * m_startKnob;
-	Knob * m_endKnob;
-	Knob * m_loopKnob;
-
-	gui::PixmapButton * m_openAudioFileButton;
-	PixmapButton * m_reverseButton;
-	automatableButtonGroup * m_loopGroup;
-	PixmapButton * m_stutterButton;
-	ComboBox * m_interpBox;
+	gui::PixmapButton* m_openAudioFileButton;
+	PixmapButton* m_reverseButton;
+	automatableButtonGroup* m_loopGroup;
+	PixmapButton* m_stutterButton;
+	ComboBox* m_interpBox;
 } ;
 
 } // namespace gui

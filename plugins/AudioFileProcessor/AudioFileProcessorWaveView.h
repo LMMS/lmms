@@ -38,22 +38,18 @@ namespace gui
 {
 
 class AudioFileProcessorView;
-}
-
-namespace gui
-{
 
 class AudioFileProcessorWaveView : public QWidget
 {
 	Q_OBJECT
 protected:
-	virtual void enterEvent( QEvent * _e );
-	virtual void leaveEvent( QEvent * _e );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
-	virtual void mouseMoveEvent( QMouseEvent * _me );
-	virtual void wheelEvent( QWheelEvent * _we );
-	virtual void paintEvent( QPaintEvent * _pe );
+	virtual void enterEvent(QEvent* e);
+	virtual void leaveEvent(QEvent* e);
+	virtual void mousePressEvent(QMouseEvent* me);
+	virtual void mouseReleaseEvent(QMouseEvent* me);
+	virtual void mouseMoveEvent(QMouseEvent* me);
+	virtual void wheelEvent(QWheelEvent* we);
+	virtual void paintEvent(QPaintEvent* pe);
 
 
 public:
@@ -66,43 +62,43 @@ public:
 
 	class knob : public Knob
 	{
-		const AudioFileProcessorWaveView * m_waveView;
-		const Knob * m_relatedKnob;
+		const AudioFileProcessorWaveView* m_waveView;
+		const Knob* m_relatedKnob;
 
 
 	public:
-		knob( QWidget * _parent ) :
-			Knob( KnobType::Bright26, _parent ),
-			m_waveView( 0 ),
-			m_relatedKnob( 0 )
+		knob(QWidget* parent) :
+			Knob(KnobType::Bright26, parent),
+			m_waveView(0),
+			m_relatedKnob(0)
 		{
-			setFixedSize( 37, 47 );
+			setFixedSize(37, 47);
 		}
 
-		void setWaveView( const AudioFileProcessorWaveView * _wv )
+		void setWaveView(const AudioFileProcessorWaveView* wv)
 		{
-			m_waveView = _wv;
+			m_waveView = wv;
 		}
 
-		void setRelatedKnob( const Knob * _knob )
+		void setRelatedKnob(const Knob* knob)
 		{
-			m_relatedKnob = _knob;
+			m_relatedKnob = knob;
 		}
 
-		void slideBy( double _v, bool _check_bound = true )
+		void slideBy(double v, bool check_bound = true)
 		{
-			slideTo( model()->value() + _v, _check_bound );
+			slideTo(model()->value() + v, check_bound);
 		}
 
-		void slideTo( double _v, bool _check_bound = true );
+		void slideTo(double v, bool check_bound = true);
 
 
 	protected:
-		float getValue( const QPoint & _p );
+		float getValue(const QPoint & p);
 
 
 	private:
-		bool checkBound( double _v ) const;
+		bool checkBound(double v) const;
 	} ;
 
 
@@ -113,7 +109,7 @@ public slots:
 		QWidget::update();
 	}
 
-	void isPlaying( lmms::f_cnt_t _current_frame );
+	void isPlaying(lmms::f_cnt_t current_frame);
 
 
 private:
@@ -127,16 +123,16 @@ private:
 		SampleLoop
 	} ;
 
-	Sample const * m_sample;
+	Sample const* m_sample;
 	QPixmap m_graph;
 	f_cnt_t m_from;
 	f_cnt_t m_to;
 	f_cnt_t m_last_from;
 	f_cnt_t m_last_to;
 	float m_last_amp;
-	knob * m_startKnob;
-	knob * m_endKnob;
-	knob * m_loopKnob;
+	knob* m_startKnob;
+	knob* m_endKnob;
+	knob* m_loopKnob;
 	f_cnt_t m_startFrameX;
 	f_cnt_t m_endFrameX;
 	f_cnt_t m_loopFrameX;
@@ -150,30 +146,30 @@ private:
 	friend class AudioFileProcessorView;
 
 public:
-	AudioFileProcessorWaveView(QWidget * _parent, int _w, int _h, Sample const * buf);
-	void setKnobs(knob *_start, knob *_end, knob *_loop );
+	AudioFileProcessorWaveView(QWidget* parent, int w, int h, Sample const* buf);
+	void setKnobs(knob* start, knob* end, knob* loop);
 
 
 	void updateSampleRange();
 private:
-	void zoom( const bool _out = false );
-	void slide( int _px );
-	void slideSamplePointByPx( Point _point, int _px );
-	void slideSamplePointByFrames( Point _point, f_cnt_t _frames, bool _slide_to = false );
-	void slideSampleByFrames( f_cnt_t _frames );
+	void zoom(const bool out = false);
+	void slide(int px);
+	void slideSamplePointByPx(Point point, int px);
+	void slideSamplePointByFrames(Point point, f_cnt_t frames, bool slide_to = false);
+	void slideSampleByFrames(f_cnt_t frames);
 
-	void slideSamplePointToFrames( Point _point, f_cnt_t _frames )
+	void slideSamplePointToFrames(Point point, f_cnt_t frames)
 	{
-		slideSamplePointByFrames( _point, _frames, true );
+		slideSamplePointByFrames(point, frames, true);
 	}
 
 	void updateGraph();
 	void reverse();
-	void updateCursor( QMouseEvent * _me = nullptr );
+	void updateCursor(QMouseEvent* me = nullptr);
 
-	static bool isCloseTo( int _a, int _b )
+	static bool isCloseTo(int a, int b)
 	{
-		return qAbs( _a - _b ) < 4;
+		return qAbs(a - b) < 4;
 	}
 
 } ;
