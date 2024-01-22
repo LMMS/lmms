@@ -1,5 +1,5 @@
 /*
- * ClapExtension.cpp - Base class template for implementing CLAP extensions
+ * ClapExtension.cpp - Base class templates for implementing CLAP extensions
  *
  * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *

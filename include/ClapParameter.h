@@ -77,7 +77,10 @@ public:
 		return std::clamp(m_value + m_modulation, m_info.min_value, m_info.max_value);
 	}
 
-	auto isValueValid(const double v) const -> bool;
+	auto isValueValid(const double v) const -> bool
+	{
+		return m_info.min_value <= v && v <= m_info.max_value;
+	}
 
 	auto getShortInfoString() const -> std::string;
 	auto getInfoString() const -> std::string;
@@ -89,17 +92,20 @@ public:
 	auto info() const noexcept -> const clap_param_info& { return m_info; }
 
 	auto isBeingAdjusted() const noexcept -> bool { return m_isBeingAdjusted; }
+
 	void setIsAdjusting(bool isAdjusting)
 	{
 		if (isAdjusting && !m_isBeingAdjusted) { beginAdjust(); }
 		else if (!isAdjusting && m_isBeingAdjusted) { endAdjust(); }
 	}
+
 	void beginAdjust()
 	{
 		Q_ASSERT(!m_isBeingAdjusted);
 		m_isBeingAdjusted = true;
 		emit isBeingAdjustedChanged();
 	}
+
 	void endAdjust()
 	{
 		Q_ASSERT(m_isBeingAdjusted);

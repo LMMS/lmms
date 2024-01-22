@@ -26,6 +26,7 @@
 
 #ifdef LMMS_HAVE_CLAP
 
+#include <QDebug>
 #include <algorithm>
 #include <cassert>
 
@@ -63,25 +64,33 @@ void ClapControlBase::init(Model* that, const QString& uri)
 
 	ClapLog::globalLog(CLAP_LOG_DEBUG, "Creating CLAP instance (#1)");
 	m_instances.clear();
-	auto& first = m_instances.emplace_back(std::make_unique<ClapInstance>(*m_info, that));
-	if (!first || !first->isValid())
+	if (auto first = ClapInstance::create(*m_info, that))
 	{
-		ClapLog::globalLog(CLAP_LOG_ERROR, "Failed instantiating CLAP processor");
-		m_instances.clear();
-		return;
-	}
-
-	if (!first->audioPorts().hasStereoOutput())
-	{
-		// A second instance is needed for stereo input/output
-		ClapLog::globalLog(CLAP_LOG_DEBUG, "Creating CLAP instance (#2)");
-		auto& second = m_instances.emplace_back(std::make_unique<ClapInstance>(*m_info, that));
-		if (!second || !second->isValid())
+		if (first->audioPorts().hasStereoOutput())
 		{
-			ClapLog::globalLog(CLAP_LOG_ERROR, "Failed instantiating CLAP processor");
-			m_instances.clear();
-			return;
+			// Stereo plugin - Only one instance needed for stereo output
+			m_instances.emplace_back(std::move(first));
 		}
+		else
+		{
+			// Mono plugin - A second instance is needed for stereo output
+			ClapLog::globalLog(CLAP_LOG_DEBUG, "Creating CLAP instance (#2)");
+			if (auto second = ClapInstance::create(*m_info, that))
+			{
+				m_instances.emplace_back(std::move(first));
+				m_instances.emplace_back(std::move(second));
+			}
+			else
+			{
+				ClapLog::globalLog(CLAP_LOG_ERROR, "Failed instantiating CLAP instance (#2)");
+				return;
+			}
+		}
+	}
+	else
+	{
+		ClapLog::globalLog(CLAP_LOG_ERROR, "Failed instantiating CLAP instance (#1)");
+		return;
 	}
 
 	m_channelsPerInstance = DEFAULT_CHANNELS / m_instances.size();
@@ -146,16 +155,59 @@ void ClapControlBase::run(fpp_t frames)
 
 void ClapControlBase::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
-	LinkedModelGroups::saveSettings(doc, elem);
+	elem.setAttribute("version", "0");
 
-	// TODO: save state using clap_plugin_state if supported by plugin
+	if (elem.ownerDocument().doctype().name() != "clonedtrack")
+	{
+		qDebug() << "SAVING TO PROJECT FILE";
+		// Saving to project file
+		LinkedModelGroups::saveSettings(doc, elem);
+		return;
+	}
+
+	// Cloning an instrument/effect - use clap_state if possible
+
+	qDebug() << "SAVING TO CLAP_STATE";
+
+	for (unsigned int idx = 0; idx < m_instances.size(); ++idx)
+	{
+		if (!m_instances[idx]->state().supported()) { continue; }
+
+		const auto state = m_instances[idx]->state().save();
+		qDebug().nospace() << "inst:" << idx << "; clap_state supported; state='" << (state ? QString::fromUtf8(state->data(), state->size()) : QString{}) << "'";
+		elem.setAttribute("state" + QString::number(idx),
+			state ? QString::fromUtf8(state->data(), state->size()) : QString{});
+	}
 }
 
 void ClapControlBase::loadSettings(const QDomElement& elem)
 {
-	LinkedModelGroups::loadSettings(elem);
+	[[maybe_unused]] const auto version = elem.attribute("version", "0").toInt();
 
-	// TODO: load state using clap_plugin_state if supported by plugin
+	if (elem.ownerDocument().doctype().name() != "clonedtrack")
+	{
+		qDebug() << "LOADING FROM PROJECT FILE";
+		// Loading from project file
+		LinkedModelGroups::loadSettings(elem);
+		return;
+	}
+
+	// Cloning an instrument/effect - use clap_state if possible
+
+	qDebug() << "LOADING FROM CLAP_STATE";
+
+	for (unsigned int idx = 0; idx < m_instances.size(); ++idx)
+	{
+		if (!m_instances[idx]->state().supported()) { continue; }
+
+		const auto state = elem.attribute("state" + QString::number(idx), "");
+		qDebug().nospace() << "inst:" << idx << "; clap_state supported; state='" << state << "'";
+		if (!m_instances[idx]->state().load(std::string_view{state.toStdString()})) { continue; }
+
+		// Parameters may have changed in the plugin;
+		// Those values need to be reflected in host
+		m_instances[idx]->params().rescan(CLAP_PARAM_RESCAN_VALUES);
+	}
 }
 
 void ClapControlBase::loadFile([[maybe_unused]] const QString& file)

@@ -99,20 +99,20 @@ ClapViewInstance::ClapViewInstance(QWidget* parent, ClapInstance* instance, int 
 
 }
 
-ClapViewBase::ClapViewBase(QWidget* meAsWidget, ClapControlBase* ctrlBase)
+ClapViewBase::ClapViewBase(QWidget* pluginWidget, ClapControlBase* ctrlBase)
 {
-	auto grid = new QGridLayout{meAsWidget};
+	auto grid = new QGridLayout{pluginWidget};
 
 	auto btnBox = std::make_unique<QHBoxLayout>();
-	if (/* DISABLES CODE */ (false))
+	if (ClapManager::debugging())
 	{
-		m_reloadPluginButton = new QPushButton{QObject::tr("Reload Plugin"), meAsWidget};
+		m_reloadPluginButton = new QPushButton{QObject::tr("Reload Plugin"), pluginWidget};
 		btnBox->addWidget(m_reloadPluginButton, 0);
 	}
 
-	if (/* DISABLES CODE */ (false)) // TODO: check if the plugin has the UI extension
+	if (ctrlBase->hasGui())
 	{
-		m_toggleUIButton = new QPushButton{QObject::tr("Show GUI"), meAsWidget};
+		m_toggleUIButton = new QPushButton{QObject::tr("Show GUI"), pluginWidget};
 		m_toggleUIButton->setCheckable(true);
 		m_toggleUIButton->setChecked(false);
 		m_toggleUIButton->setIcon(embed::getIconPixmap("zoom"));
@@ -121,42 +121,14 @@ ClapViewBase::ClapViewBase(QWidget* meAsWidget, ClapControlBase* ctrlBase)
 	}
 	btnBox->addStretch(1);
 
-	meAsWidget->setAcceptDrops(true);
-
-	// note: the lifetime of C++ objects ends after the top expression in the
-	// expression syntax tree, so the AutoLilvNode gets freed after the function
-	// has been called
-
-	/*
-	AutoLilvNodes props(lilv_plugin_get_value(ctrlBase->getPlugin(),
-				uri(LILV_NS_RDFS "comment").get()));
-	LILV_FOREACH(nodes, itr, props.get())
-	{
-		const LilvNode* node = lilv_nodes_get(props.get(), itr);
-		auto infoLabel = new QLabel(lilv_node_as_string(node));
-		infoLabel->setWordWrap(true);
-		infoLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-		m_helpButton = new QPushButton(QObject::tr("Help"));
-		m_helpButton->setCheckable(true);
-		btnBox->addWidget(m_helpButton);
-
-		m_helpWindow = getGUI()->mainWindow()->addWindowedWidget(infoLabel);
-		m_helpWindow->setSizePolicy(QSizePolicy::Minimum,
-									QSizePolicy::Expanding);
-		m_helpWindow->setAttribute(Qt::WA_DeleteOnClose, false);
-		m_helpWindow->hide();
-
-		break;
-	}
-	*/
+	pluginWidget->setAcceptDrops(true);
 
 	if (m_reloadPluginButton || m_toggleUIButton || m_helpButton)
 	{
 		grid->addLayout(btnBox.release(), static_cast<int>(Rows::ButtonRow), 0, 1, s_colNum);
 	}
 
-	m_procView = new ClapViewInstance{meAsWidget, ctrlBase->control(0), s_colNum};
+	m_procView = new ClapViewInstance{pluginWidget, ctrlBase->control(0), s_colNum};
 	grid->addWidget(m_procView, static_cast<int>(Rows::ProcRow), 0);
 }
 

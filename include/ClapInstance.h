@@ -74,8 +74,23 @@ class LMMS_EXPORT ClapInstance final : public QObject
 	Q_OBJECT;
 
 public:
+
+	//! Passkey idiom
+	class Access
+	{
+	public:
+		friend class ClapInstance;
+		Access(Access&&) noexcept = default;
+	private:
+		Access() {}
+		Access(const Access&) = default;
+	};
+
+	//! Creates and starts a plugin, returning nullptr if an error occurred
+	static auto create(const ClapPluginInfo& pluginInfo, Model* parent) -> std::unique_ptr<ClapInstance>;
+
 	ClapInstance() = delete;
-	ClapInstance(const ClapPluginInfo& pluginInfo, Model* parent);
+	ClapInstance(Access, const ClapPluginInfo& pluginInfo, Model* parent);
 	~ClapInstance() override;
 
 	ClapInstance(const ClapInstance&) = delete;
@@ -85,33 +100,22 @@ public:
 
 	enum class PluginState
 	{
-		// The plugin hasn't been created yet or failed to load (NoneWithError)
-		None,
-		// The plugin has been created but not initialized
-		Loaded,
-		// Initialization failed - LMMS probably does not support this plugin yet
-		LoadedWithError,
-		// The plugin is initialized and inactive, only the main thread uses it
-		Inactive,
-		// Activation failed
-		InactiveWithError,
-		// The plugin is active and sleeping, the audio engine can call set_processing()
-		ActiveAndSleeping,
-		// The plugin is processing
+		None, // Plugin hasn't been created yet or failed to load (NoneWithError)
+		Loaded, // Plugin has been created but not initialized
+		LoadedWithError, // Initialization failed - LMMS might not support this plugin yet
+		Inactive, // Plugin is initialized and inactive, only the main thread uses it
+		InactiveWithError, // Activation failed
+		ActiveAndSleeping, // The audio engine can call set_processing()
 		ActiveAndProcessing,
-		// The plugin did process but is in error
-		ActiveWithError,
-		// The plugin is not used anymore by the audio engine and can be deactivated on the main
-		// thread
-		ActiveAndReadyToDeactivate
+		ActiveWithError, // The plugin did process but an irrecoverable error occurred
+		ActiveAndReadyToDeactivate // Plugin is unused by audio engine; can deactivate on main thread
 	};
 
-	/////////////////////////////////////////
-	// LMMS audio thread
-	/////////////////////////////////////////
+	/**
+	 * LMMS audio thread
+	*/
 
-	//! Copy values from the LMMS core (connected models, MIDI events, ...) into
-	//! the respective ports
+	//! Copy values from the LMMS core (connected models, MIDI events, ...) into the respective ports
 	void copyModelsFromCore();
 
 	//! Bring values from all ports to the LMMS core
@@ -125,50 +129,28 @@ public:
 	auto controlCount() const -> std::size_t;
 	auto hasNoteInput() const -> bool;
 
-	/////////////////////////////////////////
-	// Instance
-	/////////////////////////////////////////
-
-	//! Destroy the plugin instance
-	void destroy();
+	/**
+	 * Info
+	*/
 
 	auto isValid() const -> bool;
-
-	auto host() const -> const clap_host* { return &m_host; };
-	auto plugin() const -> const clap_plugin* { return m_plugin; }
 	auto info() const -> const ClapPluginInfo& { return m_pluginInfo; }
 
-	/////////////////////////////////////////
-	// Extensions
-	/////////////////////////////////////////
-
-	auto audioPorts() -> ClapAudioPorts& { return m_audioPorts; }
-	auto gui() -> ClapGui& { return m_gui; }
-	auto logger() const -> const ClapLog& { return m_log; }
-	auto notePorts() -> ClapNotePorts& { return m_notePorts; }
-	auto params() -> ClapParams& { return m_params; }
-	auto state() -> ClapState& { return m_state; }
-	auto timerSupport() -> ClapTimerSupport& { return m_timerSupport; }
-
-	/////////////////////////////////////////
-	// Host
-	/////////////////////////////////////////
-
-	//! Executes idle tasks
-	void idle();
-
-	/////////////////////////////////////////
-	// Plugin
-	/////////////////////////////////////////
+	/**
+	 * Control
+	*/
 
 	auto start() -> bool; //!< Loads, inits, and activates in that order
 	auto restart() -> bool;
+	void destroy();
 
 	auto load() -> bool;
 	auto unload() -> bool;
 	auto init() -> bool;
 	auto activate() -> bool;
 	auto deactivate() -> bool;
+
+	void idle();
 
 	auto processBegin(std::uint32_t frames) -> bool;
 	void processNote(f_cnt_t offset, std::int8_t channel, std::int16_t key, std::uint8_t velocity, bool isOn);
@@ -181,77 +163,100 @@ public:
 	auto isSleeping() const -> bool;
 	auto isErrorState() const -> bool;
 
+	/**
+	 * Extensions
+	*/
+
+	auto host() const -> const clap_host* { return &m_host; };
+	auto plugin() const -> const clap_plugin* { return m_plugin; }
+
+	auto audioPorts() -> ClapAudioPorts& { return m_audioPorts; }
+	auto gui() -> ClapGui& { return m_gui; }
+	auto logger() const -> const ClapLog& { return m_log; }
+	auto notePorts() -> ClapNotePorts& { return m_notePorts; }
+	auto params() -> ClapParams& { return m_params; }
+	auto state() -> ClapState& { return m_state; }
+	auto timerSupport() -> ClapTimerSupport& { return m_timerSupport; }
+
 private:
+	/**
+	 * State
+	*/
 
-	/////////////////////////////////////////
-	// Host API implementation
-	/////////////////////////////////////////
+	void setPluginState(PluginState state);
+	auto isNextStateValid(PluginState next) const -> bool;
 
-	void setHost();
-	clap_host m_host;
+	template<typename... Args>
+	auto isCurrentStateValid(Args... validStates) const -> bool
+	{
+		return ((m_pluginState == validStates) || ...);
+	}
+
+	/**
+	 * Host API implementation
+	*/
 
 	static auto clapGetExtension(const clap_host* host, const char* extensionId) -> const void*;
 	static void clapRequestCallback(const clap_host* host);
 	static void clapRequestProcess(const clap_host* host);
 	static void clapRequestRestart(const clap_host* host);
+
+	/**
+	 * Latency extension
+	 * TODO: Fully implement and move to separate class
+	*/
+
 	static void clapLatencyChanged(const clap_host* host);
+	static constexpr const clap_host_latency s_clapLatency {
+		&clapLatencyChanged
+	};
 
-	/////////////////////////////////////////
-	// Plugin
-	/////////////////////////////////////////
+	/**
+	 * Important data members
+	*/
 
-	template<typename... Args>
-	void checkPluginStateCurrent(Args... possibilities);
-
-	auto isPluginNextStateValid(PluginState next) -> bool;
-	void setPluginState(PluginState state);
-
-	template<typename T, class F>
-	auto pluginExtensionInit(const T*& ext, const char* id, F* checkFunc) -> bool;
-
-	const clap_plugin* m_plugin = nullptr;
 	ClapPluginInfo m_pluginInfo;
+	PluginState m_pluginState = PluginState::None;
 
-	PluginState m_pluginState = PluginState::Inactive;
-
-	std::vector<PluginIssue> m_pluginIssues;
-
-	std::int64_t m_steadyTime = 0;
+	clap_host m_host;
+	const clap_plugin* m_plugin = nullptr;
 
 	/**
 	 * Process-related
 	*/
+
+	clap_process m_process{};
 	clap::helpers::EventList m_evIn;  // TODO: Find better way to handle param and note events
 	clap::helpers::EventList m_evOut; // TODO: Find better way to handle param and note events
-	clap_process m_process{};
 
 	/**
 	 * MIDI
-	 */
+	*/
+
 	// many things here may be moved into the `Instrument` class
 	static constexpr std::size_t s_maxMidiInputEvents = 1024;
+
 	//! Spinlock for the MIDI ringbuffer (for MIDI events going to the plugin)
 	std::atomic_flag m_ringLock = ATOMIC_FLAG_INIT;
 
 	//! MIDI ringbuffer (for MIDI events going to the plugin)
 	ringbuffer_t<struct MidiInputEvent> m_midiInputBuf;
+
 	//! MIDI ringbuffer reader
 	ringbuffer_reader_t<struct MidiInputEvent> m_midiInputReader;
 
 	/**
 	 * Scheduling
 	*/
+
 	bool m_scheduleRestart = false;
 	bool m_scheduleDeactivate = false;
-	bool m_scheduleProcess = true; // TODO: ???
+	bool m_scheduleProcess = true;
 	bool m_scheduleMainThreadCallback = false;
 
 	/**
 	 * Extensions
 	*/
-	static constexpr const clap_host_latency s_clapLatency {
-		&clapLatencyChanged
-	};
 
 	ClapAudioPorts m_audioPorts{ this };
 	ClapGui m_gui{ this };

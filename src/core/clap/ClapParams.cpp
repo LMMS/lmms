@@ -216,7 +216,7 @@ auto ClapParams::rescan(clap_param_rescan_flags flags) -> bool
 		}
 	}
 
-	if (flags & CLAP_PARAM_RESCAN_ALL) { paramsChanged(); }
+	if (flags & CLAP_PARAM_RESCAN_ALL) { emit paramsChanged(); }
 
 	return true;
 }

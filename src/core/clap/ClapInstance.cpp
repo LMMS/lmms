@@ -57,19 +57,36 @@ struct MidiInputEvent
 	f_cnt_t offset;
 };
 
-ClapInstance::ClapInstance(const ClapPluginInfo& pluginInfo, Model* parent)
+auto ClapInstance::create(const ClapPluginInfo& pluginInfo, Model* parent) -> std::unique_ptr<ClapInstance>
+{
+	if (auto instance = std::make_unique<ClapInstance>(Access{}, pluginInfo, parent); instance->start())
+	{
+		return instance;
+	}
+	return nullptr;
+}
+
+ClapInstance::ClapInstance(Access, const ClapPluginInfo& pluginInfo, Model* parent)
 	: QObject{parent}
 	, m_pluginInfo{pluginInfo}
+	, m_host {
+		CLAP_VERSION,         // clap_version
+		this,                 // host_data // NOTE: Need to update if class is copied/moved
+		"LMMS",               // name
+		"LMMS contributors",  // vendor
+		"https://lmms.io/",   // url
+		LMMS_VERSION,         // version
+		&clapGetExtension,    // get_extension
+		&clapRequestCallback, // request_callback
+		&clapRequestProcess,  // request_process
+		&clapRequestRestart   // request_restart
+	}
 	, m_midiInputBuf{s_maxMidiInputEvents}
 	, m_midiInputReader{m_midiInputBuf}
 	, m_params{parent, this, &m_evIn, &m_evOut}
 {
-	m_pluginState = PluginState::None;
-	setHost();
-
+	m_process.steady_time = 0;
 	m_process.transport = ClapTransport::get();
-
-	start();
 }
 
 ClapInstance::~ClapInstance()
@@ -123,7 +140,7 @@ void ClapInstance::copyModelsFromCore()
 
 void ClapInstance::copyModelsToCore()
 {
-	//
+	//m_params.rescan(CLAP_PARAM_RESCAN_VALUES);
 }
 
 void ClapInstance::run(fpp_t frames)
@@ -173,7 +190,7 @@ void ClapInstance::destroy()
 
 auto ClapInstance::isValid() const -> bool
 {
-	return m_plugin != nullptr && !isErrorState() && m_pluginIssues.empty();
+	return m_plugin != nullptr && !isErrorState();
 }
 
 auto ClapInstance::start() -> bool
@@ -205,7 +222,7 @@ auto ClapInstance::load() -> bool
 	}
 #endif
 
-	checkPluginStateCurrent(PluginState::None);
+	assert(isCurrentStateValid(PluginState::None));
 
 	// Create plugin instance, destroying any previous plugin instance first
 	const auto& factory = info().factory();
@@ -258,7 +275,7 @@ auto ClapInstance::init() -> bool
 	assert(ClapThreadCheck::isMainThread());
 
 	if (isErrorState()) { return false; }
-	checkPluginStateCurrent(PluginState::Loaded);
+	assert(isCurrentStateValid(PluginState::Loaded));
 
 	if (m_pluginState != PluginState::Loaded) { return false; }
 
@@ -273,8 +290,6 @@ auto ClapInstance::init() -> bool
 		m_plugin = nullptr;
 		return false;
 	}
-
-	m_pluginIssues.clear();
 
 	if (!m_audioPorts.init(host(), m_plugin, m_process))
 	{
@@ -309,7 +324,7 @@ auto ClapInstance::activate() -> bool
 	assert(ClapThreadCheck::isMainThread());
 
 	if (isErrorState()) { return false; }
-	checkPluginStateCurrent(PluginState::Inactive);
+	assert(isCurrentStateValid(PluginState::Inactive));
 
 	const auto sampleRate = static_cast<double>(Engine::audioEngine()->processingSampleRate());
 	static_assert(DEFAULT_BUFFER_SIZE > MINIMUM_BUFFER_SIZE);
@@ -358,7 +373,6 @@ auto ClapInstance::deactivate() -> bool
 auto ClapInstance::processBegin(std::uint32_t frames) -> bool
 {
 	m_process.frames_count = frames;
-	m_process.steady_time = m_steadyTime;
 	return false;
 }
 
@@ -527,9 +541,8 @@ auto ClapInstance::process(std::uint32_t frames) -> bool
 
 auto ClapInstance::processEnd(std::uint32_t frames) -> bool
 {
-	m_steadyTime += frames;
 	m_process.frames_count = frames;
-	m_process.steady_time = m_steadyTime;
+	m_process.steady_time += frames;
 	return false;
 }
 
@@ -565,13 +578,59 @@ auto ClapInstance::isErrorState() const -> bool
 		|| m_pluginState == PluginState::ActiveWithError;
 }
 
-template<typename... Args>
-void ClapInstance::checkPluginStateCurrent(Args... possibilities)
+void ClapInstance::setPluginState(PluginState state)
 {
-	assert(((m_pluginState == possibilities) || ...));
+	// Assert that it's okay to transition to the desired next state from the current state
+	assert(isNextStateValid(state) && "Invalid state transition");
+
+	m_pluginState = state;
+	if (!ClapManager::debugging()) { return; }
+
+	switch (state)
+	{
+		case PluginState::None:
+			logger().log(CLAP_LOG_DEBUG, "Set state to None"); break;
+		case PluginState::Loaded:
+			logger().log(CLAP_LOG_DEBUG, "Set state to Loaded"); break;
+		case PluginState::LoadedWithError:
+			logger().log(CLAP_LOG_DEBUG, "Set state to LoadedWithError"); break;
+		case PluginState::Inactive:
+			logger().log(CLAP_LOG_DEBUG, "Set state to Inactive"); break;
+		case PluginState::InactiveWithError:
+			logger().log(CLAP_LOG_DEBUG, "Set state to InactiveWithError"); break;
+		case PluginState::ActiveAndSleeping:
+			logger().log(CLAP_LOG_DEBUG, "Set state to ActiveAndSleeping"); break;
+		case PluginState::ActiveAndProcessing:
+			logger().log(CLAP_LOG_DEBUG, "Set state to ActiveAndProcessing"); break;
+		case PluginState::ActiveWithError:
+			logger().log(CLAP_LOG_DEBUG, "Set state to ActiveWithError"); break;
+		case PluginState::ActiveAndReadyToDeactivate:
+			logger().log(CLAP_LOG_DEBUG, "Set state to ActiveAndReadyToDeactivate"); break;
+	}
 }
 
-auto ClapInstance::isPluginNextStateValid(PluginState next) -> bool
+void ClapInstance::idle()
+{
+	assert(ClapThreadCheck::isMainThread());
+	if (isErrorState()) { return; }
+
+	m_params.idle();
+
+	if (m_scheduleMainThreadCallback)
+	{
+		m_scheduleMainThreadCallback = false;
+		m_plugin->on_main_thread(m_plugin);
+	}
+
+	if (m_scheduleRestart)
+	{
+		deactivate();
+		m_scheduleRestart = false;
+		activate();
+	}
+}
+
+auto ClapInstance::isNextStateValid(PluginState next) const -> bool
 {
 	switch (next)
 	{
@@ -606,89 +665,6 @@ auto ClapInstance::isPluginNextStateValid(PluginState next) -> bool
 		throw std::runtime_error{"CLAP plugin state error"};
 	}
 	return false;
-}
-
-void ClapInstance::setPluginState(PluginState state)
-{
-	// Assert that it's okay to transition to the desired next state from the current state
-	assert(isPluginNextStateValid(state) && "Invalid state transition");
-
-	m_pluginState = state;
-	if (!ClapManager::debugging()) { return; }
-
-	switch (state)
-	{
-		case PluginState::None:
-			logger().log(CLAP_LOG_DEBUG, "Set state to None"); break;
-		case PluginState::Loaded:
-			logger().log(CLAP_LOG_DEBUG, "Set state to Loaded"); break;
-		case PluginState::LoadedWithError:
-			logger().log(CLAP_LOG_DEBUG, "Set state to LoadedWithError"); break;
-		case PluginState::Inactive:
-			logger().log(CLAP_LOG_DEBUG, "Set state to Inactive"); break;
-		case PluginState::InactiveWithError:
-			logger().log(CLAP_LOG_DEBUG, "Set state to InactiveWithError"); break;
-		case PluginState::ActiveAndSleeping:
-			logger().log(CLAP_LOG_DEBUG, "Set state to ActiveAndSleeping"); break;
-		case PluginState::ActiveAndProcessing:
-			logger().log(CLAP_LOG_DEBUG, "Set state to ActiveAndProcessing"); break;
-		case PluginState::ActiveWithError:
-			logger().log(CLAP_LOG_DEBUG, "Set state to ActiveWithError"); break;
-		case PluginState::ActiveAndReadyToDeactivate:
-			logger().log(CLAP_LOG_DEBUG, "Set state to ActiveAndReadyToDeactivate"); break;
-	}
-}
-
-template<typename T, class F>
-auto ClapInstance::pluginExtensionInit(const T*& ext, const char* id, F* checkFunc) -> bool
-{
-	static_assert(std::is_same_v<F, bool(const T*) noexcept> || std::is_same_v<F, bool(const T*)>);
-	assert(ClapThreadCheck::isMainThread());
-	assert(ext == nullptr && "Plugin extension already initialized");
-	ext = static_cast<const T*>(m_plugin->get_extension(m_plugin, id));
-	if (!ext) { return false; }
-	if (!checkFunc(ext))
-	{
-		// Extension doesn't implement the functions required by LMMS
-		ext = nullptr;
-		return false;
-	}
-	return true;
-}
-
-void ClapInstance::idle()
-{
-	assert(ClapThreadCheck::isMainThread());
-	if (isErrorState()) { return; }
-
-	m_params.idle();
-
-	if (m_scheduleMainThreadCallback)
-	{
-		m_scheduleMainThreadCallback = false;
-		m_plugin->on_main_thread(m_plugin);
-	}
-
-	if (m_scheduleRestart)
-	{
-		deactivate();
-		m_scheduleRestart = false;
-		activate();
-	}
-}
-
-void ClapInstance::setHost()
-{
-	m_host.host_data = this;
-	m_host.clap_version = CLAP_VERSION;
-	m_host.name = "LMMS";
-	m_host.version = LMMS_VERSION;
-	m_host.vendor = "";
-	m_host.url = "https://lmms.io/";
-	m_host.get_extension = &clapGetExtension;
-	m_host.request_callback = &clapRequestCallback;
-	m_host.request_process = &clapRequestProcess;
-	m_host.request_restart = &clapRequestRestart;
 }
 
 auto ClapInstance::clapGetExtension(const clap_host* host, const char* extensionId) -> const void*

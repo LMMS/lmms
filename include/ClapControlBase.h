@@ -115,7 +115,7 @@ protected:
 	 * more functions that must be called from virtuals
 	 */
 	auto controlCount() const -> std::size_t;
-	auto nodeName() const -> QString { return "clapcontrols"; }
+	auto nodeName() const -> const char* { return "clapcontrols"; }
 	auto hasNoteInput() const -> bool;
 	void handleMidiInputEvent(const class MidiEvent& event, const class TimePos& time, f_cnt_t offset);
 

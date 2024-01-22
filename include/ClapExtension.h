@@ -1,5 +1,5 @@
 /*
- * ClapExtension.h - Base class template for implementing CLAP extensions
+ * ClapExtension.h - Base class templates for implementing CLAP extensions
  *
  * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *

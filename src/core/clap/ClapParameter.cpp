@@ -118,6 +118,10 @@ void ClapParameter::setValue(double v)
 {
 	if (m_value == v) { return; }
 	m_value = v;
+	if (m_connectedModel)
+	{
+		m_connectedModel->setValue(static_cast<float>(v));
+	}
 	valueChanged();
 }
 
@@ -126,11 +130,6 @@ void ClapParameter::setModulation(double v)
 	if (m_modulation == v) { return; }
 	m_modulation = v;
 	modulatedValueChanged();
-}
-
-auto ClapParameter::isValueValid(const double v) const -> bool
-{
-	return m_info.min_value <= v && v <= m_info.max_value;
 }
 
 auto ClapParameter::getShortInfoString() const -> std::string
@@ -158,13 +157,12 @@ auto ClapParameter::isInfoEqualTo(const clap_param_info& info) const -> bool
 auto ClapParameter::isInfoCriticallyDifferentTo(const clap_param_info& info) const -> bool
 {
 	assert(m_info.id == info.id);
-	constexpr std::uint32_t criticalFlags =
-		CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_AUTOMATABLE_PER_NOTE_ID |
-		CLAP_PARAM_IS_AUTOMATABLE_PER_KEY | CLAP_PARAM_IS_AUTOMATABLE_PER_CHANNEL |
-		CLAP_PARAM_IS_AUTOMATABLE_PER_PORT | CLAP_PARAM_IS_MODULATABLE |
-		CLAP_PARAM_IS_MODULATABLE_PER_NOTE_ID | CLAP_PARAM_IS_MODULATABLE_PER_KEY |
-		CLAP_PARAM_IS_MODULATABLE_PER_CHANNEL | CLAP_PARAM_IS_MODULATABLE_PER_PORT |
-		CLAP_PARAM_IS_READONLY | CLAP_PARAM_REQUIRES_PROCESS;
+	constexpr std::uint32_t criticalFlags = CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_AUTOMATABLE_PER_NOTE_ID
+		| CLAP_PARAM_IS_AUTOMATABLE_PER_KEY | CLAP_PARAM_IS_AUTOMATABLE_PER_CHANNEL
+		| CLAP_PARAM_IS_AUTOMATABLE_PER_PORT | CLAP_PARAM_IS_MODULATABLE
+		| CLAP_PARAM_IS_MODULATABLE_PER_NOTE_ID | CLAP_PARAM_IS_MODULATABLE_PER_KEY
+		| CLAP_PARAM_IS_MODULATABLE_PER_CHANNEL | CLAP_PARAM_IS_MODULATABLE_PER_PORT
+		| CLAP_PARAM_IS_READONLY | CLAP_PARAM_REQUIRES_PROCESS;
 	return (m_info.flags & criticalFlags) == (info.flags & criticalFlags)
 		|| m_info.min_value != m_info.min_value || m_info.max_value != m_info.max_value;
 }
