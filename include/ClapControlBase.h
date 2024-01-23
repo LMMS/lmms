@@ -110,6 +110,7 @@ protected:
 	void saveSettings(QDomDocument& doc, QDomElement& that);
 	void loadSettings(const QDomElement& that);
 	void loadFile(const QString& file);
+	auto stateSupported() const -> bool;
 
 	/*
 	 * more functions that must be called from virtuals

@@ -26,7 +26,6 @@
 
 #ifdef LMMS_HAVE_CLAP
 
-#include <QDebug>
 #include <algorithm>
 #include <cassert>
 
@@ -159,7 +158,6 @@ void ClapControlBase::saveSettings(QDomDocument& doc, QDomElement& elem)
 
 	if (elem.ownerDocument().doctype().name() != "clonedtrack")
 	{
-		qDebug() << "SAVING TO PROJECT FILE";
 		// Saving to project file
 		LinkedModelGroups::saveSettings(doc, elem);
 		return;
@@ -167,16 +165,18 @@ void ClapControlBase::saveSettings(QDomDocument& doc, QDomElement& elem)
 
 	// Cloning an instrument/effect - use clap_state if possible
 
-	qDebug() << "SAVING TO CLAP_STATE";
-
-	for (unsigned int idx = 0; idx < m_instances.size(); ++idx)
+	if (stateSupported())
 	{
-		if (!m_instances[idx]->state().supported()) { continue; }
-
-		const auto state = m_instances[idx]->state().save();
-		qDebug().nospace() << "inst:" << idx << "; clap_state supported; state='" << (state ? QString::fromUtf8(state->data(), state->size()) : QString{}) << "'";
-		elem.setAttribute("state" + QString::number(idx),
-			state ? QString::fromUtf8(state->data(), state->size()) : QString{});
+		for (unsigned int idx = 0; idx < m_instances.size(); ++idx)
+		{
+			const auto state = m_instances[idx]->state().save();
+			elem.setAttribute("state" + QString::number(idx),
+				state ? QString::fromUtf8(state->data(), state->size()) : QString{});
+		}
+	}
+	else
+	{
+		LinkedModelGroups::saveSettings(doc, elem);
 	}
 }
 
@@ -186,7 +186,6 @@ void ClapControlBase::loadSettings(const QDomElement& elem)
 
 	if (elem.ownerDocument().doctype().name() != "clonedtrack")
 	{
-		qDebug() << "LOADING FROM PROJECT FILE";
 		// Loading from project file
 		LinkedModelGroups::loadSettings(elem);
 		return;
@@ -194,19 +193,21 @@ void ClapControlBase::loadSettings(const QDomElement& elem)
 
 	// Cloning an instrument/effect - use clap_state if possible
 
-	qDebug() << "LOADING FROM CLAP_STATE";
-
-	for (unsigned int idx = 0; idx < m_instances.size(); ++idx)
+	if (stateSupported())
 	{
-		if (!m_instances[idx]->state().supported()) { continue; }
+		for (unsigned int idx = 0; idx < m_instances.size(); ++idx)
+		{
+			const auto state = elem.attribute("state" + QString::number(idx), "");
+			if (!m_instances[idx]->state().load(std::string_view{state.toStdString()})) { continue; }
 
-		const auto state = elem.attribute("state" + QString::number(idx), "");
-		qDebug().nospace() << "inst:" << idx << "; clap_state supported; state='" << state << "'";
-		if (!m_instances[idx]->state().load(std::string_view{state.toStdString()})) { continue; }
-
-		// Parameters may have changed in the plugin;
-		// Those values need to be reflected in host
-		m_instances[idx]->params().rescan(CLAP_PARAM_RESCAN_VALUES);
+			// Parameters may have changed in the plugin;
+			// Those values need to be reflected in host
+			m_instances[idx]->params().rescan(CLAP_PARAM_RESCAN_VALUES);
+		}
+	}
+	else
+	{
+		LinkedModelGroups::loadSettings(elem);
 	}
 }
 
@@ -214,6 +215,12 @@ void ClapControlBase::loadFile([[maybe_unused]] const QString& file)
 {
 	// TODO: load preset using clap_plugin_preset_load if supported by plugin
 	ClapLog::globalLog(CLAP_LOG_ERROR, "ClapControlBase::loadFile() [NOT IMPLEMENTED YET]");
+}
+
+auto ClapControlBase::stateSupported() const -> bool
+{
+	return std::all_of(m_instances.begin(), m_instances.end(),
+		[](const auto& instance) { return instance->state().supported(); });
 }
 
 void ClapControlBase::reload()
@@ -234,9 +241,9 @@ auto ClapControlBase::controlCount() const -> std::size_t
 	return res;
 }
 
-bool ClapControlBase::hasNoteInput() const
+auto ClapControlBase::hasNoteInput() const -> bool
 {
-	return std::any_of(m_instances.begin(), m_instances.end(),
+	return std::all_of(m_instances.begin(), m_instances.end(),
 		[](const auto& instance) { return instance->hasNoteInput(); });
 }
 

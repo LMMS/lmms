@@ -66,18 +66,19 @@ auto ClapState::load(std::string_view base64) -> bool
 		//! Implements clap_istream.read
 		static auto clapRead(const clap_istream* stream, void* buffer, std::uint64_t size) -> std::int64_t
 		{
-			if (!stream || !buffer || size == 0) { return -1; }
+			if (!stream || !buffer || size == 0) { return -1; } // error
 			auto self = static_cast<IStream*>(stream->ctx);
-			if (!self) { return -1; }
+			if (!self) { return -1; } // error
 
 			const auto bytesLeft = self->m_state.size() - self->m_readPos;
+			if (bytesLeft == 0) { return 0; } // end of file
 			const auto readAmount = std::min<std::uint64_t>(bytesLeft, size);
 
 			auto ptr = static_cast<char*>(buffer);
 			std::memcpy(ptr, self->m_state.data() + self->m_readPos, readAmount);
 			self->m_readPos += readAmount;
 
-			return bytesLeft > size ? readAmount : 0;
+			return readAmount;
 		}
 	private:
 		QByteArray m_state; //!< unencoded state data
@@ -119,9 +120,9 @@ auto ClapState::save() -> std::optional<std::string_view>
 		//! Implements clap_ostream.write
 		static auto clapWrite(const clap_ostream* stream, const void* buffer, std::uint64_t size) -> std::int64_t
 		{
-			if (!stream || !buffer) { return -1; }
+			if (!stream || !buffer) { return -1; } // error
 			auto self = static_cast<OStream*>(stream->ctx);
-			if (!self) { return -1; }
+			if (!self) { return -1; } // error
 			if (size == 0) { return 0; }
 
 			auto ptr = static_cast<const char*>(buffer);
