@@ -31,6 +31,8 @@
 #include <QPainter>
 #include <QMouseEvent>
 
+#include <algorithm>
+
 
 namespace lmms
 {
@@ -43,9 +45,24 @@ void AudioFileProcessorWaveView::updateSampleRange()
 	if (m_sample->sampleSize() > 1)
 	{
 		const f_cnt_t marging = (m_sample->endFrame() - m_sample->startFrame()) * 0.1;
-		m_from = qMax(0, m_sample->startFrame() - marging);
-		m_to = qMin<size_t>(m_sample->endFrame() + marging, m_sample->sampleSize());
+		setFrom(m_sample->startFrame() - marging);
+		setTo(m_sample->endFrame() + marging);
 	}
+}
+
+void AudioFileProcessorWaveView::setTo(f_cnt_t to)
+{
+	m_to = std::min(to, static_cast<lmms::f_cnt_t>(m_sample->sampleSize()));
+}
+
+void AudioFileProcessorWaveView::setFrom(f_cnt_t from)
+{
+	m_from = std::max(from, 0);
+}
+
+f_cnt_t AudioFileProcessorWaveView::range() const
+{
+	return m_to - m_from;
 }
 
 AudioFileProcessorWaveView::AudioFileProcessorWaveView(QWidget * parent, int w, int h, Sample const * buf) :
@@ -176,7 +193,7 @@ void AudioFileProcessorWaveView::paintEvent(QPaintEvent * pe)
 	p.drawPixmap(s_padding, s_padding, m_graph);
 
 	const QRect graph_rect(s_padding, s_padding, width() - 2 * s_padding, height() - 2 * s_padding);
-	const f_cnt_t frames = m_to - m_from;
+	const f_cnt_t frames = range();
 	m_startFrameX = graph_rect.x() + (m_sample->startFrame() - m_from) *
 						double(graph_rect.width()) / frames;
 	m_endFrameX = graph_rect.x() + (m_sample->endFrame() - m_from) *
@@ -282,18 +299,18 @@ void AudioFileProcessorWaveView::updateGraph()
 {
 	if (m_to == 1)
 	{
-		m_to = m_sample->sampleSize() * 0.7;
+		setTo(m_sample->sampleSize() * 0.7);
 		slideSamplePointToFrames(Point::End, m_to * 0.7);
 	}
 
 	if (m_from > m_sample->startFrame())
 	{
-		m_from = m_sample->startFrame();
+		setFrom(m_sample->startFrame());
 	}
 
 	if (m_to < m_sample->endFrame())
 	{
-		m_to = m_sample->endFrame();
+		setTo(m_sample->endFrame());
 	}
 
 	if (m_sample->reversed() != m_reversed)
@@ -315,7 +332,7 @@ void AudioFileProcessorWaveView::updateGraph()
 
 	const auto rect = QRect{0, 0, m_graph.width(), m_graph.height()};
 	const auto waveform = SampleWaveform::Parameters{
-		m_sample->data() + m_from, static_cast<size_t>(m_to - m_from), m_sample->amplification(), m_sample->reversed()};
+		m_sample->data() + m_from, static_cast<size_t>(range()), m_sample->amplification(), m_sample->reversed()};
 	SampleWaveform::visualize(waveform, p, rect);
 }
 
@@ -358,15 +375,15 @@ void AudioFileProcessorWaveView::zoom(const bool out)
 
 	if (static_cast<double>(new_to - new_from) / m_sample->sampleRate() > 0.05)
 	{
-		m_from = new_from;
-		m_to = new_to;
+		setFrom(new_from);
+		setTo(new_to);
 	}
 }
 
 void AudioFileProcessorWaveView::slide(int px)
 {
 	const double fact = qAbs(double(px) / width());
-	f_cnt_t step = (m_to - m_from) * fact;
+	f_cnt_t step = range() * fact;
 	if (px > 0)
 	{
 		step = -step;
@@ -377,8 +394,8 @@ void AudioFileProcessorWaveView::slide(int px)
 
 	step = qAbs(step_from) < qAbs(step_to) ? step_from : step_to;
 
-	m_from += step;
-	m_to += step;
+	setFrom(m_from + step);
+	setTo(m_to + step);
 	slideSampleByFrames(step);
 }
 
@@ -401,7 +418,7 @@ void AudioFileProcessorWaveView::slideSamplePointByPx(Point point, int px)
 {
 	slideSamplePointByFrames(
 		point,
-		f_cnt_t((double(px) / width()) * (m_to - m_from))
+		f_cnt_t((double(px) / width()) * range())
 	);
 }
 
@@ -472,8 +489,8 @@ void AudioFileProcessorWaveView::reverse()
 	);
 
 	const f_cnt_t from = m_from;
-	m_from = m_sample->sampleSize() - m_to;
-	m_to = m_sample->sampleSize() - from;
+	setFrom(m_sample->sampleSize() - m_to);
+	setTo(m_sample->sampleSize() - from);
 
 	m_reversed = ! m_reversed;
 }
