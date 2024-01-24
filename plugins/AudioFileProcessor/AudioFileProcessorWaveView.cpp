@@ -45,8 +45,8 @@ void AudioFileProcessorWaveView::updateSampleRange()
 	if (m_sample->sampleSize() > 1)
 	{
 		const f_cnt_t marging = (m_sample->endFrame() - m_sample->startFrame()) * 0.1;
-		setFrom(qMax(0, m_sample->startFrame() - marging));
-		setTo(qMin<size_t>(m_sample->endFrame() + marging, m_sample->sampleSize()));
+		setFrom(m_sample->startFrame() - marging);
+		setTo(m_sample->endFrame() + marging);
 	}
 }
 
