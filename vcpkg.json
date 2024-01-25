@@ -5,6 +5,10 @@
 			"name": "fftw3",
 			"default-features": false,
 			"features": [
+				"sse",
+				"sse2",
+				"avx",
+				"avx2"
 			]
 		},
 		{
