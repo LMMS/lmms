@@ -269,7 +269,10 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	float offset =  m_clip->startTimeOffset() / ticksPerBar * pixelsPerBar();
 	QRect r = QRect( offset, spacing,
 			qMax( static_cast<int>( m_clip->sampleLength() * ppb / ticksPerBar ), 1 ), rect().bottom() - 2 * spacing );
-	SampleWaveform::visualize(m_clip->m_sample, p, r);
+
+	const auto& sample = m_clip->m_sample;
+	const auto waveform = SampleWaveform::Parameters{sample.data(), sample.sampleSize(), sample.amplification(), sample.reversed()};
+	SampleWaveform::visualize(waveform, p, r);
 
 	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
 	paintTextLabel(name, p);

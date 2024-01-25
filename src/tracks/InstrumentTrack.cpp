@@ -859,9 +859,11 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 	m_noteStacking.saveState( doc, thisElement );
 	m_arpeggio.saveState( doc, thisElement );
 
-	// Don't save midi port info if the user chose to.
-	if (Engine::getSong()->isSavingProject()
-		&& !Engine::getSong()->getSaveOptions().discardMIDIConnections.value())
+	// Save the midi port info if we are not in song saving mode, e.g. in
+	// track cloning mode or if we are in song saving mode and the user
+	// has chosen to discard the MIDI connections.
+	if (!Engine::getSong()->isSavingProject() ||
+	    !Engine::getSong()->getSaveOptions().discardMIDIConnections.value())
 	{
 		// Don't save auto assigned midi device connection
 		bool hasAuto = m_hasAutoMidiDev;
