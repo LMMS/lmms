@@ -63,7 +63,7 @@ public:
 	// note management
 	Note * addNote( const Note & _new_note, const bool _quant_pos = true );
 
-	NoteVecotr::const_iterator removeNote(Note* note_to_del);
+	NoteVector::const_iterator removeNote(Note* note_to_del);
 
 	Note * noteAtStep( int _step );
 
