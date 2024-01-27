@@ -78,7 +78,7 @@ int RemotePluginBase::sendMessage(const message & _m)
 	m_out->writeInt(_m.id);
 	m_out->writeInt(_m.data.size());
 	int j = 8;
-	for(unsigned int i = 0; i < _m.data.size(); ++i)
+	for (unsigned int i = 0; i < _m.data.size(); ++i)
 	{
 		m_out->writeString(_m.data[i]);
 		j += 4 + _m.data[i].size();
@@ -112,7 +112,7 @@ RemotePluginBase::message RemotePluginBase::receiveMessage()
 	message m;
 	m.id = m_in->readInt();
 	const int s = m_in->readInt();
-	for(int i = 0; i < s; ++i)
+	for (int i = 0; i < s; ++i)
 	{
 		m.data.push_back(m_in->readString());
 	}
@@ -122,7 +122,7 @@ RemotePluginBase::message RemotePluginBase::receiveMessage()
 	message m;
 	m.id = readInt();
 	const int s = readInt();
-	for(int i = 0; i < s; ++i)
+	for (int i = 0; i < s; ++i)
 	{
 		m.data.push_back(readString());
 	}
@@ -139,7 +139,7 @@ RemotePluginBase::message RemotePluginBase::waitForMessage(
 							bool _busy_waiting)
 {
 #ifndef BUILD_REMOTE_PLUGIN_CLIENT
-	if(_busy_waiting)
+	if (_busy_waiting)
 	{
 		// No point processing events outside of the main thread
 		_busy_waiting = QThread::currentThread() ==
@@ -152,12 +152,12 @@ RemotePluginBase::message RemotePluginBase::waitForMessage(
 			m_depth(depth),
 			m_busy(busy)
 		{
-			if(m_busy) { ++m_depth; }
+			if (m_busy) { ++m_depth; }
 		}
 
 		~WaitDepthCounter()
 		{
-			if(m_busy) { --m_depth; }
+			if (m_busy) { --m_depth; }
 		}
 
 		int & m_depth;
@@ -166,10 +166,10 @@ RemotePluginBase::message RemotePluginBase::waitForMessage(
 
 	WaitDepthCounter wdc(waitDepthCounter(), _busy_waiting);
 #endif
-	while(!isInvalid())
+	while (!isInvalid())
 	{
 #ifndef BUILD_REMOTE_PLUGIN_CLIENT
-		if(_busy_waiting && !messagesLeft())
+		if (_busy_waiting && !messagesLeft())
 		{
 			QCoreApplication::processEvents(
 				QEventLoop::ExcludeUserInputEvents, 50);
@@ -178,11 +178,11 @@ RemotePluginBase::message RemotePluginBase::waitForMessage(
 #endif
 		message m = receiveMessage();
 		processMessage(m);
-		if(m.id == _wm.id)
+		if (m.id == _wm.id)
 		{
 			return m;
 		}
-		else if(m.id == IdUndefined)
+		else if (m.id == IdUndefined)
 		{
 			return m;
 		}
