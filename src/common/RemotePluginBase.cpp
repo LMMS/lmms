@@ -63,8 +63,8 @@ RemotePluginBase::~RemotePluginBase()
 	delete m_in;
 	delete m_out;
 #else
-	pthread_mutex_destroy(&m_receiveMutex);
-	pthread_mutex_destroy(&m_sendMutex);
+	pthread_mutex_destroy( &m_receiveMutex);
+	pthread_mutex_destroy( &m_sendMutex);
 #endif
 }
 
