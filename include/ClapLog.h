@@ -60,7 +60,7 @@ private:
 	/**
 	 * clap_host_log implementation
 	 */
-	static void clapLog(const clap_host_t* host, clap_log_severity severity, const char* msg);
+	static void clapLog(const clap_host* host, clap_log_severity severity, const char* msg);
 };
 
 } // namespace lmms

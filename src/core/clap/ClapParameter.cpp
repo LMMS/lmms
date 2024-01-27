@@ -118,10 +118,11 @@ void ClapParameter::setValue(double v)
 {
 	if (m_value == v) { return; }
 	m_value = v;
+	/* // TODO
 	if (m_connectedModel)
 	{
 		m_connectedModel->setValue(static_cast<float>(v));
-	}
+	}*/
 	valueChanged();
 }
 

@@ -52,6 +52,7 @@ public:
 	}
 
 	virtual auto extensionId() const -> std::string_view = 0;
+	virtual auto extensionIdCompat() const -> std::string_view { return std::string_view{}; }
 
 	auto instance() const { return m_instance; }
 	auto logger() const -> const ClapLog*;
@@ -82,7 +83,17 @@ public:
 
 		m_host = host;
 		m_plugin = plugin;
-		const auto ext = static_cast<const PluginExt*>(plugin->get_extension(plugin, extensionId().data()));
+
+		auto ext = static_cast<const PluginExt*>(plugin->get_extension(plugin, extensionId().data()));
+		if (!ext)
+		{
+			// Try using compatibility ID if it exists
+			if (const auto compatId = extensionIdCompat(); !compatId.empty())
+			{
+				ext = static_cast<const PluginExt*>(plugin->get_extension(plugin, compatId.data()));
+			}
+		}
+
 		if (!ext || !checkSupported(*ext))
 		{
 			m_pluginExt = nullptr;
@@ -143,8 +154,6 @@ protected:
 	auto plugin() const { return m_plugin; }
 
 private:
-
-
 	const clap_host* m_host = nullptr;
 	const clap_plugin* m_plugin = nullptr;
 	//const HostExt* m_hostExt = nullptr;
