@@ -102,7 +102,7 @@ bool MainApplication::nativeEventFilter(const QByteArray& eventType,
 	
 	if(msg->wParam != GWL_EXSTYLE)
 	{
-		return false
+		return false;
 	}
 	
 	// Prevent plugins making the main window transparent
