@@ -95,24 +95,25 @@ bool MainApplication::nativeEventFilter(const QByteArray& eventType,
 	}
 
 	MSG *msg = static_cast<MSG *>(message);
-	if((msg->message) != WM_STYLECHANGING)
-	{
-		return false;
-	}
-	
 	if(msg->wParam != GWL_EXSTYLE)
 	{
 		return false;
 	}
 	
-	// Prevent plugins making the main window transparent
-	STYLESTRUCT * style = reinterpret_cast<STYLESTRUCT *>(msg->lParam);
-	if(!(style->styleOld & WS_EX_LAYERED))
+	switch(msg->message)
 	{
-		style->styleNew &= ~WS_EX_LAYERED;
-	}
-	*result = 0;
-	return true;
+		case WM_STYLECHANGING:
+			// Prevent plugins making the main window transparent
+			STYLESTRUCT * style = reinterpret_cast<STYLESTRUCT *>(msg->lParam);
+			if(!(style->styleOld & WS_EX_LAYERED))
+			{
+				style->styleNew &= ~WS_EX_LAYERED;
+			}
+			*result = 0;
+			return true;
+		default: 
+			return false;
+	} 	
 }
 #endif // LMMS_BUILD_WIN32
 
