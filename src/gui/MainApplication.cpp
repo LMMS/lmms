@@ -103,6 +103,7 @@ bool MainApplication::nativeEventFilter(const QByteArray& eventType,
 	switch(msg->message)
 	{
 		case WM_STYLECHANGING:
+		{
 			// Prevent plugins making the main window transparent
 			STYLESTRUCT * style = reinterpret_cast<STYLESTRUCT *>(msg->lParam);
 			if(!(style->styleOld & WS_EX_LAYERED))
@@ -111,6 +112,7 @@ bool MainApplication::nativeEventFilter(const QByteArray& eventType,
 			}
 			*result = 0;
 			return true;
+		}
 		default: 
 			return false;
 	} 	
