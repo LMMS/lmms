@@ -2646,7 +2646,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 					)
 				{
 					// delete this note
-					it = m_midiClip->removeNote(note);
+					it = m_midiClip->removeNote(it);
 					Engine::getSong()->setModified();
 				}
 				else
