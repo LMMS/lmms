@@ -222,11 +222,11 @@ NoteVector::const_iterator MidiClip::removeNote(NoteVector::const_iterator note)
 	return new_it;
 }
 
-NoteVector::const_iterator MidiClip::removeNote(Note* note_to_del )
+NoteVector::const_iterator MidiClip::removeNote(Note* note)
 {
 	instrumentTrack()->lock();
 
-	auto it = std::find(m_notes.begin(), m_notes.end(), note_to_del);
+	auto it = std::find(m_notes.begin(), m_notes.end(), note);
 	if (it != m_notes.end())
 	{
 		delete *it;

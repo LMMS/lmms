@@ -64,7 +64,7 @@ public:
 	Note * addNote( const Note & _new_note, const bool _quant_pos = true );
 
 	NoteVector::const_iterator removeNote(NoteVector::const_iterator note);
-	NoteVector::const_iterator removeNote(Note* note_to_del);
+	NoteVector::const_iterator removeNote(Note* note);
 
 	Note * noteAtStep( int _step );
 
