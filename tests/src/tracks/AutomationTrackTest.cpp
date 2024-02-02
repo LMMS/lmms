@@ -22,7 +22,7 @@
  *
  */
 
-#include "QTestSuite.h"
+#include <QtTest/QtTest>
 
 #include "QCoreApplication"
 
@@ -39,12 +39,20 @@
 #include "Engine.h"
 #include "Song.h"
 
-class AutomationTrackTest : QTestSuite
+class AutomationTrackTest : public QObject
 {
 	Q_OBJECT
 private slots:
 	void initTestCase()
 	{
+		using namespace lmms;
+		Engine::init(true);
+	}
+
+	void cleanupTestCase()
+	{
+		using namespace lmms;
+		Engine::destroy();
 	}
 
 	void testClipLinear()
@@ -148,12 +156,11 @@ private slots:
 
 		auto song = Engine::getSong();
 
-		InstrumentTrack* instrumentTrack =
-				dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, song));
+		InstrumentTrack instrumentTrack(song);
 
-		MidiClip* midiClip = dynamic_cast<MidiClip*>(instrumentTrack->createClip(0));
-		midiClip->changeLength(TimePos(4, 0));
-		Note* note = midiClip->addNote(Note(TimePos(4, 0)));
+		MidiClip midiClip(&instrumentTrack);
+		midiClip.changeLength(TimePos(4, 0));
+		Note* note = midiClip.addNote(Note(TimePos(4, 0)));
 		note->createDetuning();
 
 		DetuningHelper* dh = note->detuning();
@@ -175,10 +182,11 @@ private slots:
 		auto song = Engine::getSong();
 		auto patternStore = Engine::patternStore();
 		PatternTrack patternTrack(song);
-		Track* automationTrack = Track::create(Track::Type::Automation, patternStore);
+		AutomationTrack automationTrack(patternStore);
+		automationTrack.createClipsForPattern(patternStore->numOfPatterns() - 1);
 
-		QVERIFY(automationTrack->numOfClips());
-		AutomationClip* c1 = dynamic_cast<AutomationClip*>(automationTrack->getClip(0));
+		QVERIFY(automationTrack.numOfClips());
+		auto c1 = dynamic_cast<AutomationClip*>(automationTrack.getClip(0));
 		QVERIFY(c1);
 
 		FloatModel model;
@@ -232,6 +240,7 @@ private slots:
 		QCOMPARE(song->automatedValuesAt(0)[&model], 50.0f);
 	}
 
-} AutomationTrackTest;
+};
 
+QTEST_GUILESS_MAIN(AutomationTrackTest)
 #include "AutomationTrackTest.moc"

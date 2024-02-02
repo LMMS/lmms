@@ -23,9 +23,10 @@
 
 #include "QuantizationGrid.h"
 
-#include "QTestSuite.h"
+#include <QObject>
+#include <QtTest/QtTest>
 
-class QuantizationGridTest : public QTestSuite
+class QuantizationGridTest : public QObject
 {
 	Q_OBJECT
 
@@ -103,6 +104,8 @@ private slots:
 		QCOMPARE(grid.quantizeDuration(0), 0); // Zero
 		QCOMPARE(grid.quantizeDuration(20), 20); // Positive
 	}
-} QuantizationGridTests;
+};
+
+QTEST_GUILESS_MAIN(QuantizationGridTest)
 
 #include "QuantizationGridTest.moc"
