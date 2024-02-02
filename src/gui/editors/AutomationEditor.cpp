@@ -317,8 +317,8 @@ void AutomationEditor::leaveEvent(QEvent * e )
 void AutomationEditor::drawLine( int x0In, float y0, int x1In, float y1 )
 {
 	const auto quantization = m_timeLine->quantization();
-	int x0 = quantization.quantize(x0In);
-	int x1 = quantization.quantize(x1In);
+	const int x0 = quantization.quantize(x0In);
+	const int x1 = quantization.quantize(x1In);
 	int deltax = qAbs( x1 - x0 );
 	auto deltay = qAbs<float>(y1 - y0);
 	int x = x0;
@@ -605,7 +605,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 					{
 						// We check if the quantized position of the time we clicked has a
 						// node and set its outValue
-						TimePos quantizedPos = m_timeLine->quantization().quantize(TimePos(posTicks));
+						const TimePos quantizedPos = m_timeLine->quantization().quantize(TimePos(posTicks));
 
 						clickedNode = tm.find(quantizedPos);
 
@@ -1144,12 +1144,12 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			grid_bottom - ( m_topLevel - m_bottomLevel ) * m_y_delta );
 
 		const auto quantizationInterval = m_timeLine->quantization().interval();
-		if( m_zoomingXModel.value() > 3 )
+		if (m_zoomingXModel.value() > 3)
 		{
 			// If we're over 100% zoom, we allow all quantization level grids
 			q = quantizationInterval;
 		}
-		else if( quantizationInterval % 3 != 0 )
+		else if (quantizationInterval % 3 != 0)
 		{
 			// If we're under 100% zoom, we allow quantization grid up to 1/24 for triplets
 			// to ensure a dense doesn't fill out the background
@@ -1168,10 +1168,9 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		// 3 independent loops, because quantization might not divide evenly into
 		// exotic denominators (e.g. 7/11 time), which are allowed ATM.
 		// First quantization grid...
-		for( tick = barPosition - barPosition % q,
-				 x = xCoordOfBarTick( tick );
-			 x<=width();
-			 tick += q, x = xCoordOfBarTick( tick ) )
+		for (tick = barPosition - barPosition % q, x = xCoordOfBarTick(tick);
+			x <= width();
+			tick += q, x = xCoordOfBarTick(tick))
 		{
 			p.setPen(m_lineColor);
 			p.drawLine( x, grid_bottom, x, x_line_end );
@@ -1210,10 +1209,12 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				/ static_cast<float>( Engine::getSong()->getTimeSigModel().getDenominator() );
 		float zoomFactor = m_zoomXLevels[m_zoomingXModel.value()];
 		//the bars which disappears at the left side by scrolling
-		int leftBars = barPosition * zoomFactor / TimePos::ticksPerBar();
+		const int leftBars = barPosition * zoomFactor / TimePos::ticksPerBar();
 
 		//iterates the visible bars and draw the shading on uneven bars
-		for( int x = VALUES_WIDTH, barCount = leftBars; x < width() + barPosition * zoomFactor / timeSignature; x += m_ppb, ++barCount )
+		for (int x = VALUES_WIDTH, barCount = leftBars;
+			x < width() + barPosition * zoomFactor / timeSignature;
+			x += m_ppb, ++barCount)
 		{
 			if( ( barCount + leftBars )  % 2 != 0 )
 			{
@@ -1231,10 +1232,9 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		int ticksPerBeat = DefaultTicksPerBar /
 			Engine::getSong()->getTimeSigModel().getDenominator();
 
-		for( tick = barPosition - barPosition % ticksPerBeat,
-				 x = xCoordOfBarTick( tick );
-			 x<=width();
-			 tick += ticksPerBeat, x = xCoordOfBarTick( tick ) )
+		for (tick = barPosition - barPosition % ticksPerBeat, x = xCoordOfBarTick(tick);
+			x <= width();
+			tick += ticksPerBeat, x = xCoordOfBarTick(tick))
 		{
 			p.setPen(m_beatLineColor);
 			p.drawLine( x, grid_bottom, x, x_line_end );
@@ -1321,10 +1321,9 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		}
 
 		// and finally bars
-		for( tick = barPosition - barPosition % TimePos::ticksPerBar(),
-				 x = xCoordOfBarTick( tick );
-			 x<=width();
-			 tick += TimePos::ticksPerBar(), x = xCoordOfBarTick( tick ) )
+		for (tick = barPosition - barPosition % TimePos::ticksPerBar(), x = xCoordOfBarTick(tick);
+			x <= width();
+			tick += TimePos::ticksPerBar(), x = xCoordOfBarTick(tick))
 		{
 			p.setPen(m_barLineColor);
 			p.drawLine( x, grid_bottom, x, x_line_end );

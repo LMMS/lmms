@@ -185,9 +185,9 @@ TimePos MidiClip::beatClipLength() const
 
 
 
-Note * MidiClip::addNote(const Note& _new_note)
+Note* MidiClip::addNote(const Note& note)
 {
-	auto new_note = new Note(_new_note);
+	auto new_note = new Note(note);
 
 	instrumentTrack()->lock();
 	m_notes.insert(std::upper_bound(m_notes.begin(), m_notes.end(), new_note, Note::lessThan), new_note);

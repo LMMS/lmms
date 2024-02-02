@@ -2812,8 +2812,8 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 
 			// Now we quantize the mouse position to snap it to the grid
 			const auto quantization = m_timeLine->quantization();
-			TimePos mousePosQ = quantization.quantize(mousePos);
-			TimePos mousePosEndQ = quantization.quantize(mousePosEnd);
+			const TimePos mousePosQ = quantization.quantize(mousePos);
+			const TimePos mousePosEndQ = quantization.quantize(mousePosEnd);
 
 			bool snapEnd = abs(mousePosEndQ - mousePosEnd) < abs(mousePosQ - mousePos);
 
@@ -3287,7 +3287,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			static_cast<float>(Engine::getSong()->getTimeSigModel().getDenominator());
 		float zoomFactor = m_zoomLevels[m_zoomingModel.value()];
 		//the bars which disappears at the left side by scrolling
-		int leftBars = barPosition * zoomFactor / TimePos::ticksPerBar();
+		const int leftBars = barPosition * zoomFactor / TimePos::ticksPerBar();
 		//iterates the visible bars and draw the shading on uneven bars
 		for (int x = m_whiteKeyWidth, barCount = leftBars;
 			x < width() + barPosition * zoomFactor / timeSignature;
@@ -3307,8 +3307,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		int ticksPerBeat = DefaultTicksPerBar /
 			Engine::getSong()->getTimeSigModel().getDenominator();
 		p.setPen(m_beatLineColor);
-		for(tick = barPosition - barPosition % ticksPerBeat,
-			x = xCoordOfTick( tick );
+		for (tick = barPosition - barPosition % ticksPerBeat, x = xCoordOfTick(tick);
 			x <= width();
 			tick += ticksPerBeat, x = xCoordOfTick(tick))
 		{
@@ -3317,8 +3316,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 		// draw vertical bar lines
 		p.setPen(m_barLineColor);
-		for(tick = barPosition - barPosition % TimePos::ticksPerBar(),
-			x = xCoordOfTick( tick );
+		for (tick = barPosition - barPosition % TimePos::ticksPerBar(), x = xCoordOfTick(tick);
 			x <= width();
 			tick += TimePos::ticksPerBar(), x = xCoordOfTick(tick))
 		{

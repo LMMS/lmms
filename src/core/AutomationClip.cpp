@@ -247,7 +247,7 @@ TimePos AutomationClip::putValue(
 
 	time = std::max(time, TimePos{0});
 
-	// Create a node or replace the existing one on time
+	// Create a node or replace the existing one at time
 	m_timeMap[time] = AutomationNode(this, value, time);
 
 	timeMap::iterator it = m_timeMap.find(time);
