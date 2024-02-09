@@ -29,6 +29,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <functional>
 
 #include "lmms_constants.h"
 #include "lmmsconfig.h"
@@ -352,6 +353,12 @@ static inline int numDigitsAsInt(float f)
 	return digits;
 }
 
+//! Taken from N3876 / boost::hash_combine
+template<typename T>
+inline void hashCombine(std::size_t& seed, const T& val) noexcept
+{
+	seed ^= std::hash<T>{}(val) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+}
 
 } // namespace lmms
 
