@@ -63,7 +63,7 @@ public:
 	 * 
 	 * @param value Set to true to show the LED check box or to false to hide it.
 	 */
-	void setLedButtonShown(bool value) const;
+	void setLedButtonShown(bool value);
 
 	int titleBarHeight() const
 	{

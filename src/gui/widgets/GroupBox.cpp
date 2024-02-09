@@ -78,7 +78,7 @@ bool GroupBox::ledButtonShown() const
 }
 
 
-void GroupBox::setLedButtonShown(bool value) const
+void GroupBox::setLedButtonShown(bool value)
 {
 	m_led->setVisible(value);
 }
