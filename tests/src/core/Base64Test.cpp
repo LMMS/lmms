@@ -26,6 +26,8 @@
 
 #include <QtTest/QtTest>
 
+// The core Base64 encoding and decoding methods are primarily used for storing arrays of floating-point samples, so the tests focus on those.
+// A compatibility decoding method for an old data format is provided in lmms::base64, but it should be considered deprecated and is not tested here.
 class Base64Test : public QObject
 {
     Q_OBJECT
@@ -51,20 +53,20 @@ private slots:
         const char *TEST_STRING = "test string for base 64 encoding decoding";
         QString encodedString;
 
-        lmms::base64::encode(TEST_STRING, strlen(TEST_STRING) + 1, encodedString);
+        lmms::base64::encode(TEST_STRING, strlen(TEST_STRING) + 1, encodedString); // The + 1 is because the strlen function excludes the terminating character of the string.
 
         char *decodedData = new char[strlen(TEST_STRING)];
         int size;
         lmms::base64::decode(encodedString, &decodedData, &size);
 
-        QVERIFY(strcmp(decodedData, TEST_STRING) == 0);
+        QVERIFY(strcmp(decodedData, TEST_STRING) == 0); // A value of 0 means that they are equal
 
         delete[] decodedData;
     }
 
     void encodeDecodePositiveArrayTest()
     {
-        const int TEST_COUNT = 4096;
+        const int TEST_COUNT = 4096; // How long the array of test data will be.
         QString encodedString;
 
         float *positiveFloats = new float[TEST_COUNT];
@@ -78,8 +80,8 @@ private slots:
         int size;
         lmms::base64::decode(encodedString, &decodedData, &size);
 
-        QCOMPARE(size, TEST_COUNT * (int)sizeof(float));
-        QVERIFY(memcmp(positiveFloats, decodedData, TEST_COUNT * sizeof(float)) == 0);
+        QCOMPARE(size, TEST_COUNT * (int)sizeof(float)); // Confirm that both arrays have the same length.
+        QVERIFY(memcmp(positiveFloats, decodedData, TEST_COUNT * sizeof(float)) == 0); // Check that the original and decoded arrays are identical in memory. A value of 0 means that they are equal.
 
         delete[] decodedData;
         delete[] positiveFloats;
@@ -87,7 +89,7 @@ private slots:
 
     void encodeDecodeNegativeArrayTest()
     {
-        const int TEST_COUNT = 4096;
+        const int TEST_COUNT = 4096; // How long the array of test data will be.
         QString encodedString;
 
         float *negativeFloats = new float[TEST_COUNT];
@@ -101,8 +103,8 @@ private slots:
         int size;
         lmms::base64::decode(encodedString, &decodedData, &size);
 
-        QCOMPARE(size, TEST_COUNT * (int)sizeof(float));
-        QVERIFY(memcmp(negativeFloats, decodedData, TEST_COUNT * sizeof(float)) == 0);
+        QCOMPARE(size, TEST_COUNT * (int)sizeof(float)); // Confirm that both arrays have the same length.
+        QVERIFY(memcmp(negativeFloats, decodedData, TEST_COUNT * sizeof(float)) == 0); // Check that the original and decoded arrays are identical in memory. A value of 0 means that they are equal.
 
         delete[] decodedData;
         delete[] negativeFloats;
