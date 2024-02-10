@@ -590,7 +590,8 @@ void MixerView::setCurrentMixerChannel(int channel)
 
 void MixerView::clear()
 {
-	while (m_mixerChannelViews.size() > 1) { deleteChannel(1); }
+	for (auto i = m_mixerChannelViews.size() - 1; i > 0; --i) { deleteChannel(i); }
+	getMixer()->clearChannel(0);
 
 	refreshDisplay();
 }
