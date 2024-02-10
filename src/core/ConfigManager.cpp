@@ -64,14 +64,17 @@ ConfigManager::ConfigManager() :
 	m_version(defaultVersion()),
 	m_configVersion( UPGRADE_METHODS.size() )
 {
+	checkDevelopment();
+
 	if (QFileInfo::exists(qApp->applicationDirPath() + PORTABLE_MODE_FILE))
 	{
-		initPortableWorkingDir();
+		initPortablePaths();
 	}
 	else
 	{
-		initInstalledWorkingDir();
+		initInstalledPaths();
 	}
+
 	m_dataDir = "data:/";
 	m_vstDir = m_workingDir + "vst/";
 	m_sf2Dir = m_workingDir + SF2_PATH;
@@ -81,7 +84,6 @@ ConfigManager::ConfigManager() :
 	{
 		QDir::addSearchPath("data", QString::fromLocal8Bit(std::getenv("LMMS_DATA_DIR")));
 	}
-	initDevelopmentWorkingDir();
 
 #ifdef LMMS_BUILD_WIN32
 	QDir::addSearchPath("data", qApp->applicationDirPath() + "/data/");
@@ -644,33 +646,23 @@ void ConfigManager::saveConfigFile()
 	outfile.close();
 }
 
-void ConfigManager::initPortableWorkingDir()
+void ConfigManager::checkDevelopment()
 {
-	QString applicationPath = qApp->applicationDirPath();
-	m_workingDir = applicationPath + "/lmms-workspace/";
-	m_lmmsRcFile = applicationPath + "/.lmmsrc.xml";
-}
+	m_isDevelopment = false;
 
-void ConfigManager::initInstalledWorkingDir()
-{
-	m_workingDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/lmms/";
-	m_lmmsRcFile = QDir::home().absolutePath() +"/.lmmsrc.xml";
-	// Detect < 1.2.0 working directory as a courtesy
-	if ( QFileInfo( QDir::home().absolutePath() + "/lmms/projects/" ).exists() )
-		m_workingDir = QDir::home().absolutePath() + "/lmms/";
-}
-
-void ConfigManager::initDevelopmentWorkingDir()
-{
 	// If we're in development (lmms is not installed) let's get the source and
 	// binary directories by reading the CMake Cache
 	QDir appPath = qApp->applicationDirPath();
+
 	// If in tests, get parent directory
-	if (appPath.dirName() == "tests") {
+	if (appPath.dirName() == "tests")
+	{
 		appPath.cdUp();
 	}
+
 	QFile cmakeCache(appPath.absoluteFilePath("CMakeCache.txt"));
-	if (cmakeCache.exists()) {
+	if (cmakeCache.exists())
+	{
 		cmakeCache.open(QFile::ReadOnly);
 		QTextStream stream(&cmakeCache);
 
@@ -681,16 +673,20 @@ void ConfigManager::initDevelopmentWorkingDir()
 		{
 			QString line = stream.readLine();
 
-			if (line.startsWith("lmms_SOURCE_DIR:")) {
+			if (line.startsWith("lmms_SOURCE_DIR:"))
+			{
 				QString srcDir = line.section('=', -1).trimmed();
 				QDir::addSearchPath("data", srcDir + "/data/");
 				done++;
 			}
-			if (line.startsWith("lmms_BINARY_DIR:")) {
-				m_lmmsRcFile = line.section('=', -1).trimmed() +  QDir::separator() +
-							   ".lmmsrc.xml";
+
+			if (line.startsWith("lmms_BINARY_DIR:"))
+			{
+				m_lmmsRcFile = line.section('=', -1).trimmed() +  QDir::separator() + ".lmmsrc.xml";
+				m_isDevelopment = true;
 				done++;
 			}
+
 			if (done == 2)
 			{
 				break;
@@ -698,6 +694,81 @@ void ConfigManager::initDevelopmentWorkingDir()
 		}
 
 		cmakeCache.close();
+	}
+}
+
+void ConfigManager::initPortablePaths()
+{
+	QString applicationPath = qApp->applicationDirPath();
+	m_workingDir = applicationPath + "/lmms-workspace/";
+
+	if (!m_isDevelopment)
+	{
+		m_lmmsRcFile = applicationPath + "/.lmmsrc.xml";
+	}
+}
+
+void ConfigManager::initInstalledPaths()
+{
+	QString home = QDir::home().absolutePath();
+
+	m_workingDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/lmms/";
+
+	// Detect < 1.2.0 working directory as a courtesy
+	if (QFileInfo(home + "/lmms/projects/").exists())
+	{
+		m_workingDir = home + "/lmms/";
+	}
+
+	// Determine RC file location to use if not in development
+	if (!m_isDevelopment)
+	{
+		QStringList standardLocations = QStandardPaths::standardLocations(QStandardPaths::AppConfigLocation);
+		QString newCfgDir = "";
+
+		bool useNewLocation;
+		QString newRcLocation = "";
+		QString legacyRcLocation = home + "/.lmmsrc.xml";
+
+		if (standardLocations.length() > 0)
+		{
+			newCfgDir = standardLocations.at(0);
+			newRcLocation = newCfgDir + "/lmms.xml";
+		}
+
+		if (!newRcLocation.isEmpty() && QFileInfo(newRcLocation).exists() && QFileInfo(newRcLocation).isWritable())
+		{
+			useNewLocation = true;
+		}
+		else if (QFileInfo(legacyRcLocation).exists())
+		{
+			useNewLocation = false;
+		}
+		else
+		{
+			QDir dir;
+
+			// Create the RC file if it has not been found
+			if (!newCfgDir.isEmpty() && dir.mkpath(newCfgDir))
+			{
+				QFileInfo fileInfo(newCfgDir);
+
+				if (fileInfo.isWritable())
+				{
+					useNewLocation = true;
+				}
+				else
+				{
+					useNewLocation = false;
+				}
+			}
+			else
+			{
+				useNewLocation = false;
+			}
+		}
+
+		m_lmmsRcFile = (useNewLocation) ? newRcLocation : legacyRcLocation;
 	}
 }
 

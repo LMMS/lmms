@@ -76,12 +76,6 @@ public:
 		return m_workingDir;
 	}
 
-	void initPortableWorkingDir();
-
-	void initInstalledWorkingDir();
-
-	void initDevelopmentWorkingDir();
-
 	const QString & dataDir() const
 	{
 		return m_dataDir;
@@ -277,9 +271,16 @@ private:
 	void upgrade_1_2_2();
 	void upgrade();
 
+	void checkDevelopment();
+
+	//Methods to determine the paths to the working directory and the RC file
+	void initPortablePaths();
+	void initInstalledPaths();
+
 	// List of all upgrade methods
 	static const std::vector<UpgradeMethod> UPGRADE_METHODS;
 
+	bool m_isDevelopment;
 	QString m_workingDir;
 	QString m_dataDir;
 	QString m_vstDir;
