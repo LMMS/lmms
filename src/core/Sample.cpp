@@ -24,9 +24,6 @@
 
 #include "Sample.h"
 
-#include <QPainter>
-#include <QRect>
-
 namespace lmms {
 
 Sample::Sample(const QString& audioFile)
