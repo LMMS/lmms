@@ -119,10 +119,8 @@ public:
 private:
 	void playRaw(sampleFrame* dst, size_t numFrames, PlaybackState* state, Loop loopMode);
 	void advance(PlaybackState* state, size_t advanceAmount, Loop loopMode);
-	void playSampleRange(sampleFrame* dst, size_t numFrames, int index, bool backwards) const;
+	void copyBuffer(sampleFrame* dst, size_t initialPosition, size_t advanceAmount, bool backwards) const;
 	void amplifySampleRange(sampleFrame* src, int numFrames) const;
-	void copyBufferForward(sampleFrame* dst, size_t initialPosition, size_t advanceAmount) const;
-	void copyBufferBackward(sampleFrame* dst, size_t initialPosition, size_t advanceAmount) const;
 
 private:
 	std::shared_ptr<const SampleBuffer> m_buffer = SampleBuffer::emptyBuffer();

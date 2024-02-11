@@ -167,7 +167,7 @@ void Sample::playRaw(sampleFrame* dst, size_t numFrames, PlaybackState* state, L
 		const auto framesToPlay = state->m_backwards
 			? std::min<int>(numFrames, state->m_frameIndex)
 			: std::min<int>(numFrames, m_buffer->size() - state->m_frameIndex);
-		playSampleRange(dst, framesToPlay, state->m_frameIndex, state->m_backwards);
+		copyBuffer(dst, framesToPlay, state->m_frameIndex, state->m_backwards);
 		break;
 	}
 	case Loop::On: {
@@ -176,7 +176,7 @@ void Sample::playRaw(sampleFrame* dst, size_t numFrames, PlaybackState* state, L
 		{
 			if (loopIndex < m_loopStartFrame && state->m_backwards) { loopIndex = m_loopEndFrame - 1; }
 			else if (loopIndex >= m_loopEndFrame) { loopIndex = m_loopStartFrame; }
-			playSampleRange(dst + i, 1, state->m_backwards ? loopIndex-- : loopIndex++, state->m_backwards);
+			copyBuffer(dst + i, 1, state->m_backwards ? loopIndex-- : loopIndex++, state->m_backwards);
 		}
 		break;
 	}
@@ -195,7 +195,7 @@ void Sample::playRaw(sampleFrame* dst, size_t numFrames, PlaybackState* state, L
 				loopIndex = m_loopEndFrame - 1;
 				backwards = true;
 			}
-			playSampleRange(dst + i, 1, backwards ? loopIndex-- : loopIndex++, backwards);
+			copyBuffer(dst + i, 1, backwards ? loopIndex-- : loopIndex++, backwards);
 		}
 		break;
 	}
@@ -253,21 +253,11 @@ void Sample::advance(PlaybackState* state, size_t advanceAmount, Loop loopMode)
 	}
 }
 
-void Sample::playSampleRange(sampleFrame* dst, size_t numFrames, int index, bool backwards) const
+void Sample::copyBuffer(sampleFrame* dst, size_t initialPosition, size_t advanceAmount, bool backwards) const
 {
-	backwards ? copyBufferBackward(dst, index, numFrames) : copyBufferForward(dst, index, numFrames);
-}
-
-void Sample::copyBufferForward(sampleFrame* dst, size_t initialPosition, size_t advanceAmount) const
-{
-	m_reversed ? std::copy_n(m_buffer->rbegin() + initialPosition, advanceAmount, dst)
-			   : std::copy_n(m_buffer->begin() + initialPosition, advanceAmount, dst);
-}
-
-void Sample::copyBufferBackward(sampleFrame* dst, size_t initialPosition, size_t advanceAmount) const
-{
-	m_reversed ? std::copy_n(m_buffer->begin() + m_buffer->size() - initialPosition, advanceAmount, dst)
-			   : std::copy_n(m_buffer->rbegin() + m_buffer->size() - initialPosition, advanceAmount, dst);
+	const auto position = backwards ? m_buffer->size() - initialPosition : initialPosition;
+	m_reversed ? std::copy_n(m_buffer->rbegin() + position, advanceAmount, dst)
+			   : std::copy_n(m_buffer->begin() + position, advanceAmount, dst);
 }
 
 void Sample::amplifySampleRange(sampleFrame* src, int numFrames) const
