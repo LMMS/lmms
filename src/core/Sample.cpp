@@ -219,8 +219,7 @@ void Sample::advance(PlaybackState* state, size_t advanceAmount, Loop loopMode) 
 		}
 		else if (state->m_frameIndex >= m_loopEndFrame)
 		{
-			state->m_frameIndex
-				= m_loopStartFrame + distanceFromLoopEnd % (m_loopEndFrame - m_loopStartFrame);
+			state->m_frameIndex = m_loopStartFrame + distanceFromLoopEnd % (m_loopEndFrame - m_loopStartFrame);
 		}
 		break;
 	case Loop::PingPong:
