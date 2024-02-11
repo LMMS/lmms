@@ -141,7 +141,11 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, int numFrames, float d
 
 	if (!typeInfo<float>::isEqual(m_amplification, 1.0f))
 	{
-		amplifySampleRange(dst, resampleResult.outputFramesGenerated);
+		for (int i = 0; i < numFrames; ++i)
+		{
+			dst[i][0] *= m_amplification;
+			dst[i][1] *= m_amplification;
+		}
 	}
 
 	return true;
@@ -234,13 +238,4 @@ void Sample::advance(PlaybackState* state, size_t advanceAmount, Loop loopMode)
 	}
 }
 
-void Sample::amplifySampleRange(sampleFrame* src, int numFrames) const
-{
-	const auto amplification = m_amplification.load(std::memory_order_relaxed);
-	for (int i = 0; i < numFrames; ++i)
-	{
-		src[i][0] *= amplification;
-		src[i][1] *= amplification;
-	}
-}
 } // namespace lmms
