@@ -38,6 +38,11 @@
 #include "embed.h"
 #include "EffectRackView.h"
 
+namespace lmms
+{
+	class Mixer;
+}
+
 namespace lmms::gui
 {
 class LMMS_EXPORT MixerView : public QWidget, public ModelView,
@@ -45,7 +50,7 @@ class LMMS_EXPORT MixerView : public QWidget, public ModelView,
 {
 	Q_OBJECT
 public:
-	MixerView();
+	MixerView(Mixer* mixer);
 	void keyPressEvent(QKeyEvent* e) override;
 
 	void saveSettings(QDomDocument& doc, QDomElement& domElement) override;
@@ -97,7 +102,17 @@ protected:
 
 private slots:
 	void updateFaders();
+	// TODO This should be improved. Currently the solo and mute models are connected via
+	// the MixerChannelView's constructor with the MixerView. It would already be an improvement
+	// if the MixerView connected itself to each new MixerChannel that it creates/handles.
 	void toggledSolo();
+	void toggledMute();
+
+private:
+	Mixer* getMixer() const;
+	void updateAllMixerChannels();
+	void connectToSoloAndMute(int channelIndex);
+	void disconnectFromSoloAndMute(int channelIndex);
 
 private:
 	QVector<MixerChannelView*> m_mixerChannelViews;
@@ -109,6 +124,7 @@ private:
 	QWidget* m_channelAreaWidget;
 	QStackedLayout* m_racksLayout;
 	QWidget* m_racksWidget;
+	Mixer* m_mixer;
 
 	void updateMaxChannelSelector();
 

@@ -25,12 +25,13 @@
 #ifndef LMMS_MATH_H
 #define LMMS_MATH_H
 
+#include <QtGlobal>
+#include <algorithm>
+#include <cmath>
 #include <cstdint>
+
 #include "lmms_constants.h"
 #include "lmmsconfig.h"
-#include <QtGlobal>
-
-#include <cmath>
 
 namespace lmms
 {

@@ -1248,7 +1248,12 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			int yOffset = (editorHeight - sampleHeight) / 2.0f + TOP_MARGIN;
 
 			p.setPen(m_ghostSampleColor);
-			SampleWaveform::visualize(m_ghostSample->sample(), p, QRect(startPos, yOffset, sampleWidth, sampleHeight), 0, sampleFrames);
+			
+			const auto& sample = m_ghostSample->sample();
+			const auto waveform = SampleWaveform::Parameters{
+				sample.data(), sample.sampleSize(), sample.amplification(), sample.reversed()};
+			const auto rect = QRect(startPos, yOffset, sampleWidth, sampleHeight);
+			SampleWaveform::visualize(waveform, p, rect);
 		}
 
 		// draw ghost notes
@@ -1424,8 +1429,8 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		p.drawText( VALUES_WIDTH + 20, TOP_MARGIN + 40,
 				width() - VALUES_WIDTH - 20 - SCROLLBAR_SIZE,
 				grid_height - 40, Qt::TextWordWrap,
-				tr( "Please open an automation clip with "
-					"the context menu of a control!" ) );
+				tr( "Please open an automation clip by "
+					"double-clicking on it!" ) );
 	}
 
 	// TODO: Get this out of paint event
