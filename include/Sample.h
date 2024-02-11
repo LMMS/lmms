@@ -33,9 +33,6 @@
 #include "SampleBuffer.h"
 #include "lmms_export.h"
 
-class QPainter;
-class QRect;
-
 namespace lmms {
 class LMMS_EXPORT Sample
 {
