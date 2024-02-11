@@ -221,7 +221,7 @@ void Sample::advance(PlaybackState* state, size_t advanceAmount, Loop loopMode)
 			if (state->m_frameIndex >= m_loopEndFrame)
 			{
 				state->m_frameIndex
-					= m_loopStartFrame + std::abs(state->m_frameIndex) % (m_loopEndFrame - m_loopStartFrame);
+					= m_loopStartFrame + state->m_frameIndex % (m_loopEndFrame - m_loopStartFrame);
 			}
 		}
 		break;
