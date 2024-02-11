@@ -118,7 +118,7 @@ public:
 
 private:
 	void playRaw(sampleFrame* dst, size_t numFrames, const PlaybackState* state, Loop loopMode) const;
-	void advance(PlaybackState* state, size_t advanceAmount, Loop loopMode);
+	void advance(PlaybackState* state, size_t advanceAmount, Loop loopMode) const;
 
 private:
 	std::shared_ptr<const SampleBuffer> m_buffer = SampleBuffer::emptyBuffer();

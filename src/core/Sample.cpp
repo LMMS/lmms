@@ -204,7 +204,7 @@ void Sample::playRaw(sampleFrame* dst, size_t numFrames, const PlaybackState* st
 	}
 }
 
-void Sample::advance(PlaybackState* state, size_t advanceAmount, Loop loopMode)
+void Sample::advance(PlaybackState* state, size_t advanceAmount, Loop loopMode) const
 {
 	state->m_frameIndex += (state->m_backwards ? -1 : 1) * advanceAmount;
 
