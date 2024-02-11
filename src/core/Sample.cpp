@@ -200,51 +200,34 @@ void Sample::playRaw(sampleFrame* dst, size_t numFrames, const PlaybackState* st
 
 void Sample::advance(PlaybackState* state, size_t advanceAmount, Loop loopMode)
 {
+	state->m_frameIndex += (state->m_backwards ? -1 : 1) * advanceAmount;
+
+	const auto absIndex = std::abs(state->m_frameIndex);
 	switch (loopMode)
 	{
-	case Loop::Off:
-		state->m_frameIndex += (state->m_backwards ? -1 : 1) * advanceAmount;
-		break;
 	case Loop::On:
-		if (state->m_backwards)
+		if (state->m_frameIndex < m_loopStartFrame && state->m_backwards)
 		{
-			state->m_frameIndex -= advanceAmount;
-			if (state->m_frameIndex < m_loopStartFrame)
-			{
-				state->m_frameIndex
-					= m_loopEndFrame - 1 - std::abs(state->m_frameIndex) % (m_loopEndFrame - m_loopStartFrame);
-			}
+			state->m_frameIndex = m_loopEndFrame - 1 - absIndex % (m_loopEndFrame - m_loopStartFrame);
 		}
-		else
+		else if (state->m_frameIndex >= m_loopEndFrame)
 		{
-			state->m_frameIndex += advanceAmount;
-			if (state->m_frameIndex >= m_loopEndFrame)
-			{
-				state->m_frameIndex
-					= m_loopStartFrame + state->m_frameIndex % (m_loopEndFrame - m_loopStartFrame);
-			}
+			state->m_frameIndex = m_loopStartFrame + absIndex % (m_loopEndFrame - m_loopStartFrame);
 		}
 		break;
 	case Loop::PingPong:
-		if (state->m_backwards)
+		if (state->m_frameIndex < m_loopStartFrame && state->m_backwards)
 		{
-			state->m_frameIndex -= advanceAmount;
-			if (state->m_frameIndex < m_loopStartFrame)
-			{
-				state->m_frameIndex
-					= m_loopStartFrame + std::abs(state->m_frameIndex) % (m_loopEndFrame - m_loopStartFrame);
-				state->m_backwards = false;
-			}
+			state->m_frameIndex = m_loopStartFrame + absIndex % (m_loopEndFrame - m_loopStartFrame);
+			state->m_backwards = false;
 		}
-		else
+		else if (state->m_frameIndex >= m_loopEndFrame)
 		{
-			state->m_frameIndex += advanceAmount;
-			if (state->m_frameIndex >= m_loopEndFrame)
-			{
-				state->m_frameIndex = m_loopEndFrame - 1 - state->m_frameIndex % (m_loopEndFrame - m_loopStartFrame);
-				state->m_backwards = true;
-			}
+			state->m_frameIndex = m_loopEndFrame - 1 - absIndex % (m_loopEndFrame - m_loopStartFrame);
+			state->m_backwards = true;
 		}
+		break;
+	default:
 		break;
 	}
 }
