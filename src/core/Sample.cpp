@@ -114,7 +114,7 @@ auto Sample::operator=(Sample&& other) -> Sample&
 	return *this;
 }
 
-bool Sample::play(sampleFrame* dst, PlaybackState* state, size_t numFrames, float desiredFrequency, Loop loopMode)
+bool Sample::play(sampleFrame* dst, PlaybackState* state, size_t numFrames, float desiredFrequency, Loop loopMode) const
 {
 	if (loopMode == Loop::Off && (state->m_frameIndex >= m_endFrame || (state->m_frameIndex < 0 && state->m_backwards)))
 	{
