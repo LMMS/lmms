@@ -201,18 +201,16 @@ void Sample::playSampleRange(PlaybackState* state, sampleFrame* dst, size_t numF
 	if (framesToCopy < numFrames) { std::fill_n(dst + framesToCopy, numFrames - framesToCopy, sampleFrame{0, 0}); }
 }
 
-void Sample::copyBufferForward(sampleFrame* dst, int initialPosition, int advanceAmount) const
+void Sample::copyBufferForward(sampleFrame* dst, size_t initialPosition, size_t advanceAmount) const
 {
-	reversed() ? std::copy_n(m_buffer->rbegin() + initialPosition, advanceAmount, dst)
+	m_reversed ? std::copy_n(m_buffer->rbegin() + initialPosition, advanceAmount, dst)
 			   : std::copy_n(m_buffer->begin() + initialPosition, advanceAmount, dst);
 }
 
-void Sample::copyBufferBackward(sampleFrame* dst, int initialPosition, int advanceAmount) const
+void Sample::copyBufferBackward(sampleFrame* dst, size_t initialPosition, size_t advanceAmount) const
 {
-	reversed() ? std::reverse_copy(
-		m_buffer->rbegin() + initialPosition - advanceAmount, m_buffer->rbegin() + initialPosition, dst)
-			   : std::reverse_copy(
-				   m_buffer->begin() + initialPosition - advanceAmount, m_buffer->begin() + initialPosition, dst);
+	m_reversed ? std::copy_n(m_buffer->begin() + initialPosition, advanceAmount, dst)
+			   : std::copy_n(m_buffer->rbegin() + initialPosition, advanceAmount, dst);
 }
 
 void Sample::amplifySampleRange(sampleFrame* src, int numFrames) const

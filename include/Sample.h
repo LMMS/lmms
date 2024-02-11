@@ -122,8 +122,8 @@ public:
 private:
 	void playSampleRange(PlaybackState* state, sampleFrame* dst, size_t numFrames) const;
 	void amplifySampleRange(sampleFrame* src, int numFrames) const;
-	void copyBufferForward(sampleFrame* dst, int initialPosition, int advanceAmount) const;
-	void copyBufferBackward(sampleFrame* dst, int initialPosition, int advanceAmount) const;
+	void copyBufferForward(sampleFrame* dst, size_t initialPosition, size_t advanceAmount) const;
+	void copyBufferBackward(sampleFrame* dst, size_t initialPosition, size_t advanceAmount) const;
 
 private:
 	std::shared_ptr<const SampleBuffer> m_buffer = SampleBuffer::emptyBuffer();
