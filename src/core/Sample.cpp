@@ -116,7 +116,10 @@ auto Sample::operator=(Sample&& other) -> Sample&
 
 bool Sample::play(sampleFrame* dst, PlaybackState* state, int numFrames, float desiredFrequency, Loop loopMode)
 {
-	if (loopMode == Loop::Off && state->m_frameIndex >= m_endFrame) { return false; }
+	if (loopMode == Loop::Off && (state->m_frameIndex >= m_endFrame || (state->m_frameIndex < 0 && state->m_backwards)))
+	{
+		return false;
+	}
 
 	const auto outputSampleRate = Engine::audioEngine()->processingSampleRate() * m_frequency / desiredFrequency;
 	const auto inputSampleRate = m_buffer->sampleRate();
