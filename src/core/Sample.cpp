@@ -133,7 +133,8 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, size_t numFrames, floa
 
 	if (resampleResult.outputFramesGenerated < numFrames)
 	{
-		std::fill_n(dst + resampleResult.outputFramesGenerated, numFrames, sampleFrame{});
+		std::fill_n(dst + resampleResult.outputFramesGenerated, numFrames - resampleResult.outputFramesGenerated,
+			sampleFrame{});
 	}
 
 	if (!typeInfo<float>::isEqual(m_amplification, 1.0f))
