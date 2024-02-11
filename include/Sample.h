@@ -78,7 +78,7 @@ public:
 
 	Sample() = default;
 	Sample(const QByteArray& base64, int sampleRate = Engine::audioEngine()->processingSampleRate());
-	Sample(const sampleFrame* data, int numFrames, int sampleRate = Engine::audioEngine()->processingSampleRate());
+	Sample(const sampleFrame* data, size_t numFrames, int sampleRate = Engine::audioEngine()->processingSampleRate());
 	Sample(const Sample& other);
 	Sample(Sample&& other);
 	explicit Sample(const QString& audioFile);
@@ -87,7 +87,7 @@ public:
 	auto operator=(const Sample&) -> Sample&;
 	auto operator=(Sample&&) -> Sample&;
 
-	auto play(sampleFrame* dst, PlaybackState* state, int numFrames, float desiredFrequency = DefaultBaseFreq,
+	auto play(sampleFrame* dst, PlaybackState* state, size_t numFrames, float desiredFrequency = DefaultBaseFreq,
 		Loop loopMode = Loop::Off) -> bool;
 
 	auto sampleDuration() const -> std::chrono::milliseconds;

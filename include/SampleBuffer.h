@@ -56,7 +56,7 @@ public:
 	SampleBuffer(const QString& base64, int sampleRate);
 	SampleBuffer(std::vector<sampleFrame> data, int sampleRate);
 	SampleBuffer(
-		const sampleFrame* data, int numFrames, int sampleRate = Engine::audioEngine()->processingSampleRate());
+		const sampleFrame* data, size_t numFrames, int sampleRate = Engine::audioEngine()->processingSampleRate());
 
 	friend void swap(SampleBuffer& first, SampleBuffer& second) noexcept;
 	auto toBase64() const -> QString;
