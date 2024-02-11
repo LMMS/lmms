@@ -131,11 +131,8 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, size_t numFrames, floa
 		= state->resampler().resample(&playBuffer[0][0], playBuffer.size(), &dst[0][0], numFrames, resampleRatio);
 	advance(state, resampleResult.inputFramesUsed, loopMode);
 
-	if (resampleResult.outputFramesGenerated < numFrames)
-	{
-		std::fill_n(dst + resampleResult.outputFramesGenerated, numFrames - resampleResult.outputFramesGenerated,
-			sampleFrame{});
-	}
+	const auto outputFrames = resampleResult.outputFramesGenerated;
+	if (outputFrames < numFrames) { std::fill_n(dst + outputFrames, numFrames - outputFrames, sampleFrame{}); }
 
 	if (!typeInfo<float>::isEqual(m_amplification, 1.0f))
 	{
