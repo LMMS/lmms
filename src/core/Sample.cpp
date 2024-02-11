@@ -116,6 +116,9 @@ auto Sample::operator=(Sample&& other) -> Sample&
 
 bool Sample::play(sampleFrame* dst, PlaybackState* state, size_t numFrames, float desiredFrequency, Loop loopMode) const
 {
+	assert(numFrames > 0);
+	assert(desiredFrequency > 0);
+
 	const auto pastBounds = state->m_frameIndex >= m_endFrame || (state->m_frameIndex < 0 && state->m_backwards);
 	if (loopMode == Loop::Off && pastBounds) { return false; }
 
