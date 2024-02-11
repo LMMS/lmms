@@ -135,7 +135,8 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, size_t numFrames, floa
 
 	if (resampleResult.outputFramesGenerated < numFrames)
 	{
-		std::fill(dst + resampleResult.outputFramesGenerated, dst + resampleResult.outputFramesGenerated + numFrames,
+		std::fill(dst + resampleResult.outputFramesGenerated,
+			dst + resampleResult.outputFramesGenerated + numFrames,
 			sampleFrame{0, 0});
 	}
 
