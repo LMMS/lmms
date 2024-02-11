@@ -159,46 +159,39 @@ void Sample::setAllPointFrames(int startFrame, int endFrame, int loopStartFrame,
 	setLoopEndFrame(loopEndFrame);
 }
 
-void Sample::playRaw(sampleFrame* dst, size_t numFrames, PlaybackState* state, Loop loopMode)
+void Sample::playRaw(sampleFrame* dst, size_t numFrames, const PlaybackState* state, Loop loopMode) const
 {
-	switch (loopMode)
+	auto index = state->m_frameIndex;
+	auto backwards = state->m_backwards;
+
+	for (size_t i = 0; i < numFrames; ++i)
 	{
-	case Loop::Off: {
-		const auto framesToPlay = state->m_backwards
-			? std::min<int>(numFrames, state->m_frameIndex)
-			: std::min<int>(numFrames, m_buffer->size() - state->m_frameIndex);
-		copyBuffer(dst, framesToPlay, state->m_frameIndex, state->m_backwards);
-		break;
-	}
-	case Loop::On: {
-		auto loopIndex = state->m_frameIndex;
-		for (size_t i = 0; i < numFrames; ++i)
+		switch (loopMode)
 		{
-			if (loopIndex < m_loopStartFrame && state->m_backwards) { loopIndex = m_loopEndFrame - 1; }
-			else if (loopIndex >= m_loopEndFrame) { loopIndex = m_loopStartFrame; }
-			copyBuffer(dst + i, 1, state->m_backwards ? loopIndex-- : loopIndex++, state->m_backwards);
-		}
-		break;
-	}
-	case Loop::PingPong: {
-		auto loopIndex = state->m_frameIndex;
-		auto backwards = state->m_backwards;
-		for (size_t i = 0; i < numFrames; ++i)
-		{
-			if (loopIndex < m_loopStartFrame && backwards)
+		case Loop::Off:
+			if (index > m_endFrame || (index < 0 && state->m_backwards)) { return; }
+			break;
+		case Loop::On:
+			if (index < m_loopStartFrame && backwards) { index = m_loopEndFrame - 1; }
+			else if (index >= m_loopEndFrame) { index = m_loopStartFrame; }
+			break;
+		case Loop::PingPong:
+			if (index < m_loopStartFrame && backwards)
 			{
-				loopIndex = m_loopStartFrame;
+				index = m_loopStartFrame;
 				backwards = false;
 			}
-			else if (loopIndex >= m_loopEndFrame)
+			else if (index >= m_loopEndFrame)
 			{
-				loopIndex = m_loopEndFrame - 1;
+				index = m_loopEndFrame - 1;
 				backwards = true;
 			}
-			copyBuffer(dst + i, 1, backwards ? loopIndex-- : loopIndex++, backwards);
+			break;
+		default:
+			break;
 		}
-		break;
-	}
+
+		dst[i] = m_buffer->data()[backwards ? index-- : index++];
 	}
 }
 
@@ -251,13 +244,6 @@ void Sample::advance(PlaybackState* state, size_t advanceAmount, Loop loopMode)
 		}
 		break;
 	}
-}
-
-void Sample::copyBuffer(sampleFrame* dst, size_t initialPosition, size_t advanceAmount, bool backwards) const
-{
-	const auto position = backwards ? m_buffer->size() - initialPosition : initialPosition;
-	m_reversed ? std::copy_n(m_buffer->rbegin() + position, advanceAmount, dst)
-			   : std::copy_n(m_buffer->begin() + position, advanceAmount, dst);
 }
 
 void Sample::amplifySampleRange(sampleFrame* src, int numFrames) const
