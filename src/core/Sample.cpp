@@ -124,45 +124,7 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, int numFrames, float d
 	const auto marginSize = s_interpolationMargins[state->resampler().interpolationMode()];
 
 	auto playBuffer = std::vector<sampleFrame>(numFrames / resampleRatio + marginSize);
-	switch (loopMode)
-	{
-	case Loop::Off: {
-		const auto framesToPlay = state->m_backwards
-			? std::min<int>(playBuffer.size(), state->m_frameIndex)
-			: std::min<int>(playBuffer.size(), m_buffer->size() - state->m_frameIndex);
-		playSampleRange(playBuffer.data(), framesToPlay, state->m_frameIndex, state->m_backwards);
-		break;
-	}
-	case Loop::On: {
-		auto loopIndex = state->m_frameIndex;
-		for (auto& frame : playBuffer)
-		{
-			if (loopIndex < m_loopStartFrame && state->m_backwards) { loopIndex = m_loopEndFrame - 1; }
-			else if (loopIndex >= m_loopEndFrame) { loopIndex = m_loopStartFrame; }
-			playSampleRange(&frame, 1, state->m_backwards ? loopIndex-- : loopIndex++, state->m_backwards);
-		}
-		break;
-	}
-	case Loop::PingPong: {
-		auto loopIndex = state->m_frameIndex;
-		auto backwards = state->m_backwards;
-		for (auto& frame : playBuffer)
-		{
-			if (loopIndex < m_loopStartFrame && backwards)
-			{
-				loopIndex = m_loopStartFrame;
-				backwards = false;
-			}
-			else if (loopIndex >= m_loopEndFrame)
-			{
-				loopIndex = m_loopEndFrame - 1;
-				backwards = true;
-			}
-			playSampleRange(&frame, 1, backwards ? loopIndex-- : loopIndex++, backwards);
-		}
-		break;
-	}
-	}
+	playRaw(playBuffer.data(), playBuffer.size(), state, loopMode);
 
 	const auto resampleResult
 		= state->resampler().resample(&playBuffer[0][0], playBuffer.size(), &dst[0][0], numFrames, resampleRatio);
@@ -195,6 +157,49 @@ void Sample::setAllPointFrames(int startFrame, int endFrame, int loopStartFrame,
 	setEndFrame(endFrame);
 	setLoopStartFrame(loopStartFrame);
 	setLoopEndFrame(loopEndFrame);
+}
+
+void Sample::playRaw(sampleFrame* dst, size_t numFrames, PlaybackState* state, Loop loopMode)
+{
+	switch (loopMode)
+	{
+	case Loop::Off: {
+		const auto framesToPlay = state->m_backwards
+			? std::min<int>(numFrames, state->m_frameIndex)
+			: std::min<int>(numFrames, m_buffer->size() - state->m_frameIndex);
+		playSampleRange(dst, framesToPlay, state->m_frameIndex, state->m_backwards);
+		break;
+	}
+	case Loop::On: {
+		auto loopIndex = state->m_frameIndex;
+		for (size_t i = 0; i < numFrames; ++i)
+		{
+			if (loopIndex < m_loopStartFrame && state->m_backwards) { loopIndex = m_loopEndFrame - 1; }
+			else if (loopIndex >= m_loopEndFrame) { loopIndex = m_loopStartFrame; }
+			playSampleRange(dst + i, 1, state->m_backwards ? loopIndex-- : loopIndex++, state->m_backwards);
+		}
+		break;
+	}
+	case Loop::PingPong: {
+		auto loopIndex = state->m_frameIndex;
+		auto backwards = state->m_backwards;
+		for (size_t i = 0; i < numFrames; ++i)
+		{
+			if (loopIndex < m_loopStartFrame && backwards)
+			{
+				loopIndex = m_loopStartFrame;
+				backwards = false;
+			}
+			else if (loopIndex >= m_loopEndFrame)
+			{
+				loopIndex = m_loopEndFrame - 1;
+				backwards = true;
+			}
+			playSampleRange(dst + i, 1, backwards ? loopIndex-- : loopIndex++, backwards);
+		}
+		break;
+	}
+	}
 }
 
 void Sample::advance(PlaybackState* state, size_t advanceAmount, Loop loopMode)
@@ -240,8 +245,7 @@ void Sample::advance(PlaybackState* state, size_t advanceAmount, Loop loopMode)
 			state->m_frameIndex += advanceAmount;
 			if (state->m_frameIndex >= m_loopEndFrame)
 			{
-				state->m_frameIndex
-					= m_loopEndFrame - 1 - state->m_frameIndex % (m_loopEndFrame - m_loopStartFrame);
+				state->m_frameIndex = m_loopEndFrame - 1 - state->m_frameIndex % (m_loopEndFrame - m_loopStartFrame);
 				state->m_backwards = true;
 			}
 		}

@@ -117,6 +117,7 @@ public:
 	void setReversed(bool reversed) { m_reversed.store(reversed, std::memory_order_relaxed); }
 
 private:
+	void playRaw(sampleFrame* dst, size_t numFrames, PlaybackState* state, Loop loopMode);
 	void advance(PlaybackState* state, size_t advanceAmount, Loop loopMode);
 	void playSampleRange(sampleFrame* dst, size_t numFrames, int index, bool backwards) const;
 	void amplifySampleRange(sampleFrame* src, int numFrames) const;
