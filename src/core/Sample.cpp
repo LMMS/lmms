@@ -262,8 +262,8 @@ void Sample::copyBufferForward(sampleFrame* dst, size_t initialPosition, size_t 
 
 void Sample::copyBufferBackward(sampleFrame* dst, size_t initialPosition, size_t advanceAmount) const
 {
-	m_reversed ? std::copy_n(m_buffer->begin() + initialPosition, advanceAmount, dst)
-			   : std::copy_n(m_buffer->rbegin() + initialPosition, advanceAmount, dst);
+	m_reversed ? std::copy_n(m_buffer->begin() + m_buffer->size() - initialPosition, advanceAmount, dst)
+			   : std::copy_n(m_buffer->rbegin() + m_buffer->size() - initialPosition, advanceAmount, dst);
 }
 
 void Sample::amplifySampleRange(sampleFrame* src, int numFrames) const
