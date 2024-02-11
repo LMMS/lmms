@@ -194,7 +194,9 @@ void Sample::playRaw(sampleFrame* dst, size_t numFrames, const PlaybackState* st
 			break;
 		}
 
-		dst[i] = m_buffer->data()[backwards ? index-- : index++];
+		auto playIndex = backwards ? index-- : index++;
+		if (m_reversed) { playIndex = m_buffer->size() - playIndex; }
+		dst[i] = m_buffer->data()[playIndex];
 	}
 }
 
