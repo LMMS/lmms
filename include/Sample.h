@@ -60,17 +60,17 @@ public:
 		}
 
 		auto resampler() -> AudioResampler& { return m_resampler; }
-		auto frameIndex() const -> f_cnt_t { return m_frameIndex; }
+		auto frameIndex() const -> int { return m_frameIndex; }
 		auto varyingPitch() const -> bool { return m_varyingPitch; }
 		auto backwards() const -> bool { return m_backwards; }
 
-		void setFrameIndex(f_cnt_t frameIndex) { m_frameIndex = frameIndex; }
+		void setFrameIndex(int frameIndex) { m_frameIndex = frameIndex; }
 		void setVaryingPitch(bool varyingPitch) { m_varyingPitch = varyingPitch; }
 		void setBackwards(bool backwards) { m_backwards = backwards; }
 
 	private:
 		AudioResampler m_resampler;
-		f_cnt_t m_frameIndex = 0;
+		int m_frameIndex = 0;
 		bool m_varyingPitch = false;
 		bool m_backwards = false;
 		friend class Sample;
