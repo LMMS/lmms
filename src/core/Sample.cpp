@@ -198,46 +198,46 @@ void Sample::playRaw(sampleFrame* dst, size_t numFrames, const PlaybackState* st
 			break;
 		}
 
-		auto playIndex = backwards ? index-- : index++;
-		if (m_reversed) { playIndex = m_buffer->size() - playIndex; }
-		dst[i] = m_buffer->data()[playIndex];
+		dst[i] = m_buffer->data()[m_reversed ? m_buffer->size() - index : index];
+		backwards ? --index : ++index;
 	}
 }
 
 void Sample::advance(PlaybackState* state, size_t advanceAmount, Loop loopMode) const
 {
-	const auto distanceAfterLoopEnd = std::abs(state->m_frameIndex - m_loopEndFrame);
-	const auto distanceAfterLoopStart = std::abs(state->m_frameIndex - m_loopStartFrame);
+	state->m_frameIndex += (state->m_backwards ? -1 : 1) * advanceAmount;
+
+	const auto distanceFromLoopStart = std::abs(state->m_frameIndex - m_loopStartFrame);
+	const auto distanceFromLoopEnd = std::abs(state->m_frameIndex - m_loopEndFrame);
 
 	switch (loopMode)
 	{
 	case Loop::On:
 		if (state->m_frameIndex < m_loopStartFrame && state->m_backwards)
 		{
-			state->m_frameIndex = m_loopEndFrame - 1 - distanceAfterLoopStart % (m_loopEndFrame - m_loopStartFrame);
+			state->m_frameIndex = m_loopEndFrame - 1 - distanceFromLoopStart % (m_loopEndFrame - m_loopStartFrame);
 		}
 		else if (state->m_frameIndex >= m_loopEndFrame)
 		{
-			state->m_frameIndex = m_loopStartFrame + distanceAfterLoopEnd % (m_loopEndFrame - m_loopStartFrame);
+			state->m_frameIndex
+				= m_loopStartFrame + distanceFromLoopEnd % (m_loopEndFrame - m_loopStartFrame);
 		}
 		break;
 	case Loop::PingPong:
 		if (state->m_frameIndex < m_loopStartFrame && state->m_backwards)
 		{
-			state->m_frameIndex = m_loopStartFrame + distanceAfterLoopStart % (m_loopEndFrame - m_loopStartFrame);
+			state->m_frameIndex = m_loopStartFrame + distanceFromLoopStart % (m_loopEndFrame - m_loopStartFrame);
 			state->m_backwards = false;
 		}
 		else if (state->m_frameIndex >= m_loopEndFrame)
 		{
-			state->m_frameIndex = m_loopEndFrame - 1 - distanceAfterLoopEnd % (m_loopEndFrame - m_loopStartFrame);
+			state->m_frameIndex = m_loopEndFrame - 1 - distanceFromLoopEnd % (m_loopEndFrame - m_loopStartFrame);
 			state->m_backwards = true;
 		}
 		break;
 	default:
 		break;
 	}
-
-	state->m_frameIndex += (state->m_backwards ? -1 : 1) * advanceAmount;
 }
 
 } // namespace lmms
