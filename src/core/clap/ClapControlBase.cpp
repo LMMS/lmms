@@ -40,6 +40,30 @@ namespace lmms
 ClapControlBase::ClapControlBase(Model* that, const QString& uri)
 {
 	init(that, uri);
+
+#if 0
+	/*
+		loc: flag: 1 name: Factory ROM kind: 1 location:
+		clapBeginPreset: name: AR Dirty Square FD loadKey: patches/Factory Arps/AR Dirty Square FD.synthpatch
+		clapBeginPreset: name: AR Everlasting 1 loadKey: patches/Factory Arps/AR Everlasting 1.synthpatch
+		clapBeginPreset: name: AR Everlasting 2 loadKey: patches/Factory Arps/AR Everlasting 2.synthpatch
+	*/
+
+	PresetLoadData test; // Nakst Apricot
+	test.location = "internal:"; // internal plugin
+	test.loadKey = "patches/Factory Arps/AR Everlasting 2.synthpatch";
+
+	ClapLog::globalLog(CLAP_LOG_INFO, "~~~PRESET LOAD START~~~");
+	if (loadPreset(test))
+	{
+		ClapLog::globalLog(CLAP_LOG_INFO, "Success!");
+	}
+	else
+	{
+		ClapLog::globalLog(CLAP_LOG_INFO, "FAILURE");
+	}
+
+#endif
 }
 
 void ClapControlBase::init(Model* that, const QString& uri)
@@ -253,6 +277,22 @@ void ClapControlBase::handleMidiInputEvent(const MidiEvent& event, const TimePos
 	{
 		instance->handleMidiInputEvent(event, time, offset);
 	}
+}
+
+auto ClapControlBase::loadPreset(const PresetLoadData& preset) -> bool
+{
+	for (const auto& instance : m_instances)
+	{
+		if (!instance->presetLoader().supported()) { return false; }
+		instance->presetLoader().load(preset);
+	}
+	return true;
+}
+
+auto ClapControlBase::savePreset() -> bool
+{
+	// [NOT IMPLEMENTED YET]
+	return false;
 }
 
 void ClapControlBase::idle()

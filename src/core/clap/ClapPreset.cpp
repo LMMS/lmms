@@ -1,5 +1,5 @@
 /*
- * ClapExtension.cpp - Base class templates for implementing CLAP extensions
+ * ClapPreset.cpp - CLAP presets
  *
  * Copyright (c) 2024 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -22,45 +22,13 @@
  *
  */
 
-#include "ClapExtension.h"
+#include "ClapPreset.h"
 
 #ifdef LMMS_HAVE_CLAP
-
-#include "ClapInstance.h"
-#include "ClapLog.h"
 
 namespace lmms
 {
 
-auto detail::ClapExtensionHelper::logger() const -> const ClapLog&
-{
-	return instance()->logger();
-}
-
-auto detail::ClapExtensionHelper::fromHost(const clap_host* host) -> ClapInstance*
-{
-	if (!host)
-	{
-		ClapLog::globalLog(CLAP_LOG_ERROR, "A plugin passed an invalid host pointer");
-		return nullptr;
-	}
-
-	auto h = static_cast<ClapInstance*>(host->host_data);
-	if (!h)
-	{
-		ClapLog::globalLog(CLAP_LOG_ERROR, "A plugin invalidated the host context pointer");
-		return nullptr;
-	}
-
-	if (!h->plugin())
-	{
-		ClapLog::globalLog(CLAP_LOG_ERROR, "A plugin is calling the host API during factory.create_plugin(). "
-			"It needs to wait for plugin.init() first.");
-		return nullptr;
-	}
-
-	return h;
-}
 
 } // namespace lmms
 

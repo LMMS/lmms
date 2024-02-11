@@ -119,6 +119,9 @@ set(LMMS_SRCS
 	core/clap/ClapParameter.cpp
 	core/clap/ClapParams.cpp
 	core/clap/ClapPluginInfo.cpp
+	core/clap/ClapPreset.cpp
+	core/clap/ClapPresetDiscovery.cpp
+	core/clap/ClapPresetLoader.cpp
 	core/clap/ClapState.cpp
 	core/clap/ClapSubPluginFeatures.cpp
 	core/clap/ClapThreadCheck.cpp

@@ -34,6 +34,7 @@
 #include "ArrayVector.h"
 #include "ClapInstance.h"
 #include "ClapPluginInfo.h"
+#include "ClapPreset.h"
 #include "DataFile.h"
 #include "LinkedModelGroups.h"
 #include "Plugin.h"
@@ -119,6 +120,12 @@ protected:
 	auto nodeName() const -> const char* { return "clapcontrols"; }
 	auto hasNoteInput() const -> bool;
 	void handleMidiInputEvent(const class MidiEvent& event, const class TimePos& time, f_cnt_t offset);
+
+	/*
+	 * presets
+	 */
+	auto loadPreset(const PresetLoadData& preset) -> bool;
+	auto savePreset() -> bool;
 
 private:
 

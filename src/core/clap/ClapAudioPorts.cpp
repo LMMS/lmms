@@ -95,7 +95,7 @@ auto ClapAudioPorts::init(const clap_host* host, const clap_plugin* plugin, clap
 	// NOTE: I'm using this init() method instead of implementing initImpl() because I need the `process` parameter
 	if (!ClapExtension::init(host, plugin))
 	{
-		logger()->log(CLAP_LOG_ERROR, "Plugin does not implement the required audio port extension");
+		logger().log(CLAP_LOG_ERROR, "Plugin does not implement the required audio port extension");
 		return false;
 	}
 
@@ -122,13 +122,13 @@ auto ClapAudioPorts::init(const clap_host* host, const clap_plugin* plugin, clap
 	{
 		if (isInput && !needInputPort)
 		{
-			logger()->log(CLAP_LOG_DEBUG, "Skipping plugin's audio input ports (not needed)");
+			logger().log(CLAP_LOG_DEBUG, "Skipping plugin's audio input ports (not needed)");
 			return nullptr;
 		}
 
 		if (!isInput && !needOutputPort)
 		{
-			logger()->log(CLAP_LOG_DEBUG, "Skipping plugin's audio output ports (not needed)");
+			logger().log(CLAP_LOG_DEBUG, "Skipping plugin's audio output ports (not needed)");
 			return nullptr;
 		}
 
@@ -170,14 +170,14 @@ auto ClapAudioPorts::init(const clap_host* host, const clap_plugin* plugin, clap
 			info.in_place_pair = CLAP_INVALID_ID;
 			if (!pluginExt()->get(this->plugin(), idx, isInput, &info))
 			{
-				logger()->log(CLAP_LOG_ERROR, "Unknown error calling clap_plugin_audio_ports.get()");
+				logger().log(CLAP_LOG_ERROR, "Unknown error calling clap_plugin_audio_ports.get()");
 				m_issues.emplace_back(PluginIssueType::PortHasNoDef);
 				return nullptr;
 			}
 
 			if (idx == 0 && !(info.flags & CLAP_AUDIO_PORT_IS_MAIN))
 			{
-				logger()->log(CLAP_LOG_DEBUG, "Plugin audio port #0 is not main");
+				logger().log(CLAP_LOG_DEBUG, "Plugin audio port #0 is not main");
 			}
 
 			//if (info.flags & CLAP_AUDIO_PORT_IS_MAIN)
@@ -279,7 +279,7 @@ auto ClapAudioPorts::init(const clap_host* host, const clap_plugin* plugin, clap
 		// Missing a required port type that LMMS supports - i.e. an effect where the only input is surround sound
 		{
 			std::string msg = std::string{isInput ? "An input" : "An output"} + " audio port is required, but plugin has none that are usable";
-			logger()->log(CLAP_LOG_ERROR, msg);
+			logger().log(CLAP_LOG_ERROR, msg);
 		}
 		m_issues.emplace_back(PluginIssueType::UnknownPortType); // TODO: Add better entry to PluginIssueType
 		return nullptr;

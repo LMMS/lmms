@@ -41,6 +41,7 @@
 #include "ClapNotePorts.h"
 #include "ClapParams.h"
 #include "ClapPluginInfo.h"
+#include "ClapPresetLoader.h"
 #include "ClapState.h"
 #include "ClapThreadCheck.h"
 #include "ClapTimerSupport.h"
@@ -175,6 +176,7 @@ public:
 	auto logger() const -> const ClapLog& { return m_log; }
 	auto notePorts() -> ClapNotePorts& { return m_notePorts; }
 	auto params() -> ClapParams& { return m_params; }
+	auto presetLoader() -> ClapPresetLoader& { return m_presetLoader; }
 	auto state() -> ClapState& { return m_state; }
 	auto timerSupport() -> ClapTimerSupport& { return m_timerSupport; }
 
@@ -264,6 +266,7 @@ private:
 	ClapState m_state{ this };
 	ClapNotePorts m_notePorts{ this };
 	ClapParams m_params;
+	ClapPresetLoader m_presetLoader{ this };
 	ClapThreadCheck m_threadCheck{ this };
 	ClapTimerSupport m_timerSupport{ this };
 };

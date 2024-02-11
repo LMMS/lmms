@@ -55,7 +55,7 @@ public:
 	virtual auto extensionIdCompat() const -> std::string_view { return std::string_view{}; }
 
 	auto instance() const { return m_instance; }
-	auto logger() const -> const ClapLog*;
+	auto logger() const -> const ClapLog&;
 
 	// TODO: Make protected?
 	static auto fromHost(const clap_host* host) -> ClapInstance*;

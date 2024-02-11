@@ -227,6 +227,7 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 			}
 
 			totalPlugins += file.pluginCount();
+			bool loadedFromThisFile = false;
 			for (auto& plugin : file.pluginInfo({}))
 			{
 				assert(plugin.has_value());
@@ -248,6 +249,12 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 				}
 
 				m_pluginInfo.push_back(&plugin.value());
+				loadedFromThisFile = true;
+			}
+
+			if (loadedFromThisFile)
+			{
+				file.discoverPresets();
 			}
 		}
 	}

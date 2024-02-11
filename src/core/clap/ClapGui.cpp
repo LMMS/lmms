@@ -73,7 +73,7 @@ auto ClapGui::initImpl(const clap_host* host, const clap_plugin* plugin) noexcep
 	{
 		if (!m_supportsFloating)
 		{
-			logger()->log(CLAP_LOG_ERROR, "Plugin does not support any GUI API that the host implements");
+			logger().log(CLAP_LOG_ERROR, "Plugin does not support any GUI API that the host implements");
 			return false;
 		}
 
@@ -132,7 +132,7 @@ auto ClapGui::create() -> bool
 
 	if (!pluginExt()->create(plugin(), m_window.api, isFloating()))
 	{
-		logger()->log(CLAP_LOG_ERROR, "Failed to create the plugin GUI");
+		logger().log(CLAP_LOG_ERROR, "Failed to create the plugin GUI");
 		return false;
 	}
 
@@ -154,7 +154,7 @@ auto ClapGui::create() -> bool
 
 		if (!pluginExt()->get_size(plugin(), &width, &height))
 		{
-			logger()->log(CLAP_LOG_PLUGIN_MISBEHAVING, "Could not get the size of the plugin gui");
+			logger().log(CLAP_LOG_PLUGIN_MISBEHAVING, "Could not get the size of the plugin gui");
 			m_created = false;
 			pluginExt()->destroy(plugin());
 			return false;
@@ -164,7 +164,7 @@ auto ClapGui::create() -> bool
 
 		if (!pluginExt()->set_parent(plugin(), &m_window))
 		{
-			logger()->log(CLAP_LOG_ERROR, "Failed to embed the plugin GUI");
+			logger().log(CLAP_LOG_ERROR, "Failed to embed the plugin GUI");
 			m_created = false;
 			pluginExt()->destroy(plugin());
 			return false;

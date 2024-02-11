@@ -28,30 +28,60 @@
 #include "lmms_export.h"
 
 #include <QDir>
+#include <optional>
+#include <string>
+#include <string_view>
 
 namespace lmms::PathUtil
 {
 	enum class Base { Absolute, ProjectDir, FactorySample, UserSample, UserVST, Preset,
 		UserLADSPA, DefaultLADSPA, UserSoundfont, DefaultSoundfont, UserGIG, DefaultGIG,
-		LocalDir };
+		LocalDir, Internal };
 
 	//! Return the directory associated with a given base as a QString
 	//! Optionally, if a pointer to boolean is given the method will
 	//! use it to indicate whether the prefix could be resolved properly
 	//! or not.
 	QString LMMS_EXPORT baseLocation(const Base base, bool* error = nullptr);
+
+	//! Return the directory associated with a given base as a std::string.
+	//! Will return std::nullopt if the prefix could not be resolved.
+	std::optional<std::string> LMMS_EXPORT getBaseLocation(Base base);
+
 	//! Return the directory associated with a given base as a QDir.
 	//! Optional pointer to boolean to indicate if the prefix could
 	//! be resolved properly.
 	QDir LMMS_EXPORT baseQDir (const Base base, bool* error = nullptr);
+
 	//! Return the prefix used to denote this base in path strings
-	QString LMMS_EXPORT basePrefix(const Base base);
+	QString LMMS_EXPORT basePrefixQString(const Base base);
+
+	//! Return the prefix used to denote this base in path strings
+	std::string_view LMMS_EXPORT basePrefix(const Base base);
+
+	//! Return whether the path uses the `base` prefix
+	bool LMMS_EXPORT hasBase(const QString& path, Base base);
+
+	//! Return whether the path uses the `base` prefix
+	bool LMMS_EXPORT hasBase(std::string_view path, Base base);
+
 	//! Check the prefix of a path and return the base it corresponds to
 	//! Defaults to Base::Absolute
 	Base LMMS_EXPORT baseLookup(const QString & path);
 
+	//! Check the prefix of a path and return the base it corresponds to
+	//! Defaults to Base::Absolute
+	Base LMMS_EXPORT baseLookup(std::string_view path);
+
 	//! Remove the prefix from a path, iff there is one
 	QString LMMS_EXPORT stripPrefix(const QString & path);
+
+	//! Remove the prefix from a path, iff there is one
+	std::string_view LMMS_EXPORT stripPrefix(std::string_view path);
+
+	//! Return the results of baseLookup() and stripPrefix()
+	std::pair<Base, std::string_view> LMMS_EXPORT parsePath(std::string_view path);
+
 	//! Get the filename for a path, handling prefixed paths correctly
 	QString LMMS_EXPORT cleanName(const QString & path);
 

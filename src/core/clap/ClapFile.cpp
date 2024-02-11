@@ -117,6 +117,12 @@ void ClapFile::unload() noexcept
 	}
 }
 
+void ClapFile::discoverPresets()
+{
+	// TODO: Run in separate thread?
+	m_presetDiscovery.discover(m_entry.get());
+}
+
 } // namespace lmms
 
 #endif // LMMS_HAVE_CLAP

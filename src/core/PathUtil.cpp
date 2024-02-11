@@ -9,9 +9,9 @@
 
 namespace lmms::PathUtil
 {
-	auto relativeBases = std::array{ Base::ProjectDir, Base::FactorySample, Base::UserSample, Base::UserVST, Base::Preset,
+	constexpr auto relativeBases = std::array{ Base::ProjectDir, Base::FactorySample, Base::UserSample, Base::UserVST, Base::Preset,
 		Base::UserLADSPA, Base::DefaultLADSPA, Base::UserSoundfont, Base::DefaultSoundfont, Base::UserGIG, Base::DefaultGIG,
-		Base::LocalDir };
+		Base::LocalDir, Base::Internal };
 
 	QString baseLocation(const Base base, bool* error /* = nullptr*/)
 	{
@@ -50,9 +50,18 @@ namespace lmms::PathUtil
 				if (error) { *error = (!s || projectPath.isEmpty()); }
 				break;
 			}
+			case Base::Internal       : [[fallthrough]];
 			default                   : return QString("");
 		}
 		return QDir::cleanPath(loc) + "/";
+	}
+
+	std::optional<std::string> getBaseLocation(Base base)
+	{
+		bool error = false;
+		auto str = baseLocation(base, &error);
+		if (error) { return std::nullopt; }
+		return str.toStdString();
 	}
 
 	QDir baseQDir (const Base base, bool* error /* = nullptr*/)
@@ -65,51 +74,103 @@ namespace lmms::PathUtil
 		return QDir(baseLocation(base, error));
 	}
 
-	QString basePrefix(const Base base)
+	QString basePrefixQString(const Base base)
+	{
+		const auto prefix = basePrefix(base);
+		return QString::fromLatin1(prefix.data(), prefix.size());
+	}
+
+	std::string_view basePrefix(const Base base)
 	{
 		switch (base)
 		{
-			case Base::ProjectDir       : return QStringLiteral("userprojects:");
-			case Base::FactorySample    : return QStringLiteral("factorysample:");
-			case Base::UserSample       : return QStringLiteral("usersample:");
-			case Base::UserVST          : return QStringLiteral("uservst:");
-			case Base::Preset           : return QStringLiteral("preset:");
-			case Base::UserLADSPA       : return QStringLiteral("userladspa:");
-			case Base::DefaultLADSPA    : return QStringLiteral("defaultladspa:");
-			case Base::UserSoundfont    : return QStringLiteral("usersoundfont:");
-			case Base::DefaultSoundfont : return QStringLiteral("defaultsoundfont:");
-			case Base::UserGIG          : return QStringLiteral("usergig:");
-			case Base::DefaultGIG       : return QStringLiteral("defaultgig:");
-			case Base::LocalDir         : return QStringLiteral("local:");
-			default                     : return QStringLiteral("");
+			case Base::ProjectDir       : return "userprojects:";
+			case Base::FactorySample    : return "factorysample:";
+			case Base::UserSample       : return "usersample:";
+			case Base::UserVST          : return "uservst:";
+			case Base::Preset           : return "preset:";
+			case Base::UserLADSPA       : return "userladspa:";
+			case Base::DefaultLADSPA    : return "defaultladspa:";
+			case Base::UserSoundfont    : return "usersoundfont:";
+			case Base::DefaultSoundfont : return "defaultsoundfont:";
+			case Base::UserGIG          : return "usergig:";
+			case Base::DefaultGIG       : return "defaultgig:";
+			case Base::LocalDir         : return "local:";
+			case Base::Internal         : return "internal:";
+			default                     : return "";
 		}
+	}
+
+	bool hasBase(const QString& path, Base base)
+	{
+		if (base == Base::Absolute)
+		{
+			return baseLookup(path) == base;
+		}
+
+		return path.startsWith(basePrefixQString(base), Qt::CaseInsensitive);
+	}
+
+	bool hasBase(std::string_view path, Base base)
+	{
+		if (base == Base::Absolute)
+		{
+			return baseLookup(path) == base;
+		}
+
+		auto prefix = basePrefix(base);
+		return path.rfind(prefix, 0) == 0;
 	}
 
 	Base baseLookup(const QString & path)
 	{
-		for (auto base: relativeBases)
+		for (auto base : relativeBases)
 		{
-			QString prefix = basePrefix(base);
+			QString prefix = basePrefixQString(base);
 			if ( path.startsWith(prefix) ) { return base; }
 		}
 		return Base::Absolute;
 	}
 
-
-
+	Base baseLookup(std::string_view path)
+	{
+		for (auto base : relativeBases)
+		{
+			const auto prefix = basePrefix(base);
+			if (path.rfind(prefix, 0) == 0) { return base; }
+		}
+		return Base::Absolute;
+	}
 
 	QString stripPrefix(const QString & path)
 	{
 		return path.mid( basePrefix(baseLookup(path)).length() );
 	}
 
+	std::string_view stripPrefix(std::string_view path)
+	{
+		path.remove_prefix(basePrefix(baseLookup(path)).length());
+		return path;
+	}
+
+	std::pair<Base, std::string_view> parsePath(std::string_view path)
+	{
+		for (auto base : relativeBases)
+		{
+			auto prefix = basePrefix(base);
+			if (path.rfind(prefix, 0) == 0)
+			{
+				path.remove_prefix(prefix.length());
+				return { base, path };
+			}
+		}
+		return { Base::Absolute, path };
+	}
+
 	QString cleanName(const QString & path)
 	{
 		return stripPrefix(QFileInfo(path).baseName());
 	}
-
-
-
 
 	QString oldRelativeUpgrade(const QString & input)
 	{
@@ -129,7 +190,7 @@ namespace lmms::PathUtil
 		if (vstInfo.exists()) { assumedBase = Base::UserVST; }
 
 		//Assume we've found the correct base location, return the full path
-		return basePrefix(assumedBase) + input;
+		return basePrefixQString(assumedBase) + input;
 	}
 
 
@@ -185,7 +246,7 @@ namespace lmms::PathUtil
 				shortestPath = otherPath;
 			}
 		}
-		return basePrefix(shortestBase) + relativeOrAbsolute(absolutePath, shortestBase);
+		return basePrefixQString(shortestBase) + relativeOrAbsolute(absolutePath, shortestBase);
 	}
 
 } // namespace lmms::PathUtil

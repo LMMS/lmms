@@ -85,7 +85,7 @@ ClapParameter::ClapParameter(ClapParams* parent, const clap_param_info& info, do
 		{
 			if (flags & CLAP_PARAM_IS_BYPASS)
 			{
-				parent->logger()->log(CLAP_LOG_PLUGIN_MISBEHAVING, "Bypass parameter doesn't have range [0, 1]");
+				parent->logger().log(CLAP_LOG_PLUGIN_MISBEHAVING, "Bypass parameter doesn't have range [0, 1]");
 			}
 
 			m_connectedModel = std::make_unique<IntModel>(valueInt, minVal, maxVal, parent, name);

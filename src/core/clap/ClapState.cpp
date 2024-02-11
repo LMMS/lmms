@@ -143,7 +143,7 @@ auto ClapState::save() -> std::optional<std::string_view>
 
 	if (!pluginExt()->save(plugin(), &clapStream))
 	{
-		logger()->log(CLAP_LOG_WARNING, "Plugin failed to save its state");
+		logger().log(CLAP_LOG_WARNING, "Plugin failed to save its state");
 		return std::nullopt;
 	}
 

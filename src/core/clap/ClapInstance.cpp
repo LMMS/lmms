@@ -255,6 +255,7 @@ auto ClapInstance::unload() -> bool
 	m_log.deinit();
 	m_notePorts.deinit();
 	m_params.deinit();
+	m_presetLoader.deinit();
 	m_state.deinit();
 	m_timerSupport.deinit();
 
@@ -311,6 +312,7 @@ auto ClapInstance::init() -> bool
 		logger().log(CLAP_LOG_DEBUG, "Plugin does not support params extension");
 	}
 
+	m_presetLoader.init(host(), m_plugin);
 	m_state.init(host(), m_plugin);
 	m_timerSupport.init(host(), m_plugin);
 
@@ -687,6 +689,8 @@ auto ClapInstance::clapGetExtension(const clap_host* host, const char* extension
 	if (id == CLAP_EXT_LOG)           { return h->logger().hostExt(); }
 	if (id == CLAP_EXT_NOTE_PORTS)    { return h->notePorts().hostExt(); }
 	if (id == CLAP_EXT_PARAMS)        { return h->params().hostExt(); }
+	if (id == CLAP_EXT_PRESET_LOAD)   { return h->presetLoader().hostExt(); }
+	if (id == CLAP_EXT_PRESET_LOAD_COMPAT) { return h->presetLoader().hostExt(); }
 	if (id == CLAP_EXT_STATE)         { return h->state().hostExt(); }
 	if (id == CLAP_EXT_THREAD_CHECK)  { return h->m_threadCheck.hostExt(); }
 	if (id == CLAP_EXT_TIMER_SUPPORT) { return h->timerSupport().hostExt(); }
