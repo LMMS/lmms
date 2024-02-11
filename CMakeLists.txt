@@ -473,8 +473,8 @@ ENDIF(WANT_OGGVORBIS)
 IF(WANT_OSS AND (LMMS_HAVE_SOUNDCARD_H OR LMMS_HAVE_SYS_SOUNDCARD_H))
 	SET(LMMS_HAVE_OSS TRUE)
 	SET(STATUS_OSS "OK")
-ELSE()
-	SET(STATUS_OSS "<not built as per request or unsupported platform>")
+ELSEIF(WANT_OSS)
+	SET(STATUS_OSS "<not found or not supported on this platform>")
 ENDIF()
 
 
