@@ -206,36 +206,38 @@ void Sample::playRaw(sampleFrame* dst, size_t numFrames, const PlaybackState* st
 
 void Sample::advance(PlaybackState* state, size_t advanceAmount, Loop loopMode) const
 {
-	state->m_frameIndex += (state->m_backwards ? -1 : 1) * advanceAmount;
+	const auto distanceAfterLoopEnd = std::abs(state->m_frameIndex - m_loopEndFrame);
+	const auto distanceAfterLoopStart = std::abs(state->m_frameIndex - m_loopStartFrame);
 
-	const auto absIndex = std::abs(state->m_frameIndex);
 	switch (loopMode)
 	{
 	case Loop::On:
 		if (state->m_frameIndex < m_loopStartFrame && state->m_backwards)
 		{
-			state->m_frameIndex = m_loopEndFrame - 1 - absIndex % (m_loopEndFrame - m_loopStartFrame);
+			state->m_frameIndex = m_loopEndFrame - 1 - distanceAfterLoopStart % (m_loopEndFrame - m_loopStartFrame);
 		}
 		else if (state->m_frameIndex >= m_loopEndFrame)
 		{
-			state->m_frameIndex = m_loopStartFrame + absIndex % (m_loopEndFrame - m_loopStartFrame);
+			state->m_frameIndex = m_loopStartFrame + distanceAfterLoopEnd % (m_loopEndFrame - m_loopStartFrame);
 		}
 		break;
 	case Loop::PingPong:
 		if (state->m_frameIndex < m_loopStartFrame && state->m_backwards)
 		{
-			state->m_frameIndex = m_loopStartFrame + absIndex % (m_loopEndFrame - m_loopStartFrame);
+			state->m_frameIndex = m_loopStartFrame + distanceAfterLoopStart % (m_loopEndFrame - m_loopStartFrame);
 			state->m_backwards = false;
 		}
 		else if (state->m_frameIndex >= m_loopEndFrame)
 		{
-			state->m_frameIndex = m_loopEndFrame - 1 - absIndex % (m_loopEndFrame - m_loopStartFrame);
+			state->m_frameIndex = m_loopEndFrame - 1 - distanceAfterLoopEnd % (m_loopEndFrame - m_loopStartFrame);
 			state->m_backwards = true;
 		}
 		break;
 	default:
 		break;
 	}
+
+	state->m_frameIndex += (state->m_backwards ? -1 : 1) * advanceAmount;
 }
 
 } // namespace lmms
