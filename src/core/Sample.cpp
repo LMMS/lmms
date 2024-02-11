@@ -116,55 +116,68 @@ auto Sample::operator=(Sample&& other) -> Sample&
 
 bool Sample::play(sampleFrame* dst, PlaybackState* state, int numFrames, float desiredFrequency, Loop loopMode)
 {
-	if (numFrames <= 0 || desiredFrequency <= 0) { return false; }
+	if (loopMode == Loop::Off && state->m_frameIndex >= m_endFrame) { return false; }
 
-	auto resampleRatio = static_cast<float>(Engine::audioEngine()->processingSampleRate()) / m_buffer->sampleRate();
-	resampleRatio *= frequency() / desiredFrequency;
+	const auto outputSampleRate = Engine::audioEngine()->processingSampleRate() * m_frequency / desiredFrequency;
+	const auto inputSampleRate = m_buffer->sampleRate();
+	const auto resampleRatio = outputSampleRate / inputSampleRate;
+	const auto marginSize = s_interpolationMargins[state->resampler().interpolationMode()];
 
-	auto playBuffer = std::vector<sampleFrame>(numFrames / resampleRatio);
-	if (!typeInfo<float>::isEqual(resampleRatio, 1.0f))
-	{
-		playBuffer.resize(playBuffer.size() + s_interpolationMargins[state->resampler().interpolationMode()]);
-	}
-
-	const auto start = startFrame();
-	const auto end = endFrame();
-	const auto loopStart = loopStartFrame();
-	const auto loopEnd = loopEndFrame();
-
+	auto playBuffer = std::vector<sampleFrame>(numFrames / resampleRatio + marginSize);
 	switch (loopMode)
 	{
-	case Loop::Off:
-		state->m_frameIndex = std::clamp(state->m_frameIndex, start, end);
-		if (state->m_frameIndex == end) { return false; }
+	case Loop::Off: {
+		const auto framesToPlay = state->m_backwards
+			? std::min<int>(playBuffer.size(), state->m_frameIndex)
+			: std::min<int>(playBuffer.size(), m_buffer->size() - state->m_frameIndex);
+		playSampleRange(playBuffer.data(), framesToPlay, state->m_frameIndex, state->m_backwards);
 		break;
-	case Loop::On:
-		state->m_frameIndex = std::clamp(state->m_frameIndex, start, loopEnd);
-		if (state->m_frameIndex == loopEnd) { state->m_frameIndex = loopStart; }
-		break;
-	case Loop::PingPong:
-		state->m_frameIndex = std::clamp(state->m_frameIndex, start, loopEnd);
-		if (state->m_frameIndex == loopEnd)
+	}
+	case Loop::On: {
+		auto loopIndex = state->m_frameIndex;
+		for (auto& frame : playBuffer)
 		{
-			state->m_frameIndex = loopEnd - 1;
-			state->m_backwards = true;
-		}
-		else if (state->m_frameIndex <= loopStart && state->m_backwards)
-		{
-			state->m_frameIndex = loopStart;
-			state->m_backwards = false;
+			if (loopIndex < m_loopStartFrame && state->m_backwards) { loopIndex = m_loopEndFrame - 1; }
+			else if (loopIndex >= m_loopEndFrame) { loopIndex = m_loopStartFrame; }
+			playSampleRange(&frame, 1, state->m_backwards ? loopIndex-- : loopIndex++, state->m_backwards);
 		}
 		break;
 	}
+	case Loop::PingPong: {
+		auto loopIndex = state->m_frameIndex;
+		auto backwards = state->m_backwards;
+		for (auto& frame : playBuffer)
+		{
+			if (loopIndex < m_loopStartFrame && backwards)
+			{
+				loopIndex = m_loopStartFrame;
+				backwards = false;
+			}
+			else if (loopIndex >= m_loopEndFrame)
+			{
+				loopIndex = m_loopEndFrame - 1;
+				backwards = true;
+			}
+			playSampleRange(&frame, 1, backwards ? loopIndex-- : loopIndex++, backwards);
+		}
+		break;
+	}
+	}
 
-	playSampleRange(state, playBuffer.data(), playBuffer.size());
-
-	const auto result
+	const auto resampleResult
 		= state->resampler().resample(&playBuffer[0][0], playBuffer.size(), &dst[0][0], numFrames, resampleRatio);
-	if (result.error != 0) { return false; }
+	advance(state, resampleResult.inputFramesUsed, loopMode);
 
-	state->m_frameIndex += (state->m_backwards ? -1 : 1) * result.inputFramesUsed;
-	amplifySampleRange(dst, result.outputFramesGenerated);
+	if (resampleResult.outputFramesGenerated < numFrames)
+	{
+		std::fill(dst + resampleResult.outputFramesGenerated, dst + resampleResult.outputFramesGenerated + numFrames,
+			sampleFrame{0, 0});
+	}
+
+	if (!typeInfo<float>::isEqual(m_amplification, 1.0f))
+	{
+		amplifySampleRange(dst, resampleResult.outputFramesGenerated);
+	}
 
 	return true;
 }
@@ -184,21 +197,61 @@ void Sample::setAllPointFrames(int startFrame, int endFrame, int loopStartFrame,
 	setLoopEndFrame(loopEndFrame);
 }
 
-void Sample::playSampleRange(PlaybackState* state, sampleFrame* dst, size_t numFrames) const
+void Sample::advance(PlaybackState* state, size_t advanceAmount, Loop loopMode)
 {
-	auto framesToCopy = 0;
-	if (state->m_backwards)
+	switch (loopMode)
 	{
-		framesToCopy = std::min<int>(state->m_frameIndex - startFrame(), numFrames);
-		copyBufferBackward(dst, state->m_frameIndex, framesToCopy);
+	case Loop::Off:
+		state->m_frameIndex += (state->m_backwards ? -1 : 1) * advanceAmount;
+		break;
+	case Loop::On:
+		if (state->m_backwards)
+		{
+			state->m_frameIndex -= advanceAmount;
+			if (state->m_frameIndex < m_loopStartFrame)
+			{
+				state->m_frameIndex
+					= m_loopEndFrame - 1 - std::abs(state->m_frameIndex) % (m_loopEndFrame - m_loopStartFrame);
+			}
+		}
+		else
+		{
+			state->m_frameIndex += advanceAmount;
+			if (state->m_frameIndex >= m_loopEndFrame)
+			{
+				state->m_frameIndex
+					= m_loopStartFrame + std::abs(state->m_frameIndex) % (m_loopEndFrame - m_loopStartFrame);
+			}
+		}
+		break;
+	case Loop::PingPong:
+		if (state->m_backwards)
+		{
+			state->m_frameIndex -= advanceAmount;
+			if (state->m_frameIndex < m_loopStartFrame)
+			{
+				state->m_frameIndex
+					= m_loopStartFrame + std::abs(state->m_frameIndex) % (m_loopEndFrame - m_loopStartFrame);
+				state->m_backwards = false;
+			}
+		}
+		else
+		{
+			state->m_frameIndex += advanceAmount;
+			if (state->m_frameIndex >= m_loopEndFrame)
+			{
+				state->m_frameIndex
+					= m_loopEndFrame - 1 - state->m_frameIndex % (m_loopEndFrame - m_loopStartFrame);
+				state->m_backwards = true;
+			}
+		}
+		break;
 	}
-	else
-	{
-		framesToCopy = std::min<int>(endFrame() - state->m_frameIndex, numFrames);
-		copyBufferForward(dst, state->m_frameIndex, framesToCopy);
-	}
+}
 
-	if (framesToCopy < numFrames) { std::fill_n(dst + framesToCopy, numFrames - framesToCopy, sampleFrame{0, 0}); }
+void Sample::playSampleRange(sampleFrame* dst, size_t numFrames, int index, bool backwards) const
+{
+	backwards ? copyBufferBackward(dst, index, numFrames) : copyBufferForward(dst, index, numFrames);
 }
 
 void Sample::copyBufferForward(sampleFrame* dst, size_t initialPosition, size_t advanceAmount) const
