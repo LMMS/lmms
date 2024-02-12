@@ -127,6 +127,8 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, size_t numFrames, floa
 	const auto resampleRatio = outputSampleRate / inputSampleRate;
 	const auto marginSize = s_interpolationMargins[state->resampler().interpolationMode()];
 
+	state->m_frameIndex = std::max<int>(m_startFrame, state->m_frameIndex);
+
 	auto playBuffer = std::vector<sampleFrame>(numFrames / resampleRatio + marginSize);
 	playRaw(playBuffer.data(), playBuffer.size(), state, loopMode);
 
