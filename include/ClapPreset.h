@@ -45,14 +45,7 @@ class ClapPresets : public PluginPresets
 {
 public:
 	using PluginPresets::PluginPresets;
-
-	struct Filetype
-	{
-		// TODO: Can clap_preset_discovery_filetype be used? (Are the const char*'s safe to store?)
-		std::string name;
-		std::string description;
-		std::string extension;
-	};
+	~ClapPresets() override = default;
 
 	struct LocationMetadata
 	{
@@ -63,16 +56,17 @@ public:
 
 	auto locationMetadata() const -> auto& { return m_locationMetadata; }
 
+	auto fromKey(const Plugin::Descriptor::SubPluginFeatures::Key* key) const
+		-> std::vector<const Preset*> override;
+
+	auto queryPreset(const PresetLoadData& loadData,
+		const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr) const -> Preset override;
+
 	// Used during construction
 
 	void addLocationMetadata(std::string_view location, LocationMetadata&& metadata)
 	{
 		m_locationMetadata[location] = std::move(metadata);
-	}
-
-	void addFiletype(Filetype&& filetype)
-	{
-		m_filetypes.push_back(std::move(filetype));
 	}
 
 private:
@@ -81,8 +75,6 @@ private:
 
 	//! Maps locations to their metadata
 	std::unordered_map<std::string_view, LocationMetadata> m_locationMetadata;
-
-	std::vector<Filetype> m_filetypes;
 };
 
 } // namespace lmms

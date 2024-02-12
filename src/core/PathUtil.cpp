@@ -50,7 +50,9 @@ namespace lmms::PathUtil
 				if (error) { *error = (!s || projectPath.isEmpty()); }
 				break;
 			}
-			case Base::Internal       : [[fallthrough]];
+			case Base::Internal:
+				if (error) { *error = true; }
+				[[fallthrough]];
 			default                   : return QString("");
 		}
 		return QDir::cleanPath(loc) + "/";
@@ -59,7 +61,7 @@ namespace lmms::PathUtil
 	std::optional<std::string> getBaseLocation(Base base)
 	{
 		bool error = false;
-		auto str = baseLocation(base, &error);
+		const auto str = baseLocation(base, &error);
 		if (error) { return std::nullopt; }
 		return str.toStdString();
 	}
@@ -193,30 +195,39 @@ namespace lmms::PathUtil
 		return basePrefixQString(assumedBase) + input;
 	}
 
-
-
-
 	QString toAbsolute(const QString & input, bool* error /* = nullptr*/)
 	{
-		//First, do no harm to absolute paths
+		// First, check if it's Internal
+		if (hasBase(input, Base::Internal)) { return input; }
+
+		// Secondly, do no harm to absolute paths
 		QFileInfo inputFileInfo = QFileInfo(input);
 		if (inputFileInfo.isAbsolute())
 		{
 			if (error) { *error = false; }
 			return input;
 		}
-		//Next, handle old relative paths with no prefix
+
+		// Next, handle old relative paths with no prefix
 		QString upgraded = input.contains(":") ? input : oldRelativeUpgrade(input);
 
 		Base base = baseLookup(upgraded);
 		return baseLocation(base, error) + upgraded.remove(0, basePrefix(base).length());
 	}
 
+	std::optional<std::string> toAbsolute(std::string_view input)
+	{
+		bool error = false;
+		const auto str = toAbsolute(QString::fromUtf8(input.data(), input.size()), &error);
+		if (error) { return std::nullopt; }
+		return str.toStdString();
+	}
+
 	QString relativeOrAbsolute(const QString & input, const Base base)
 	{
 		if (input.isEmpty()) { return input; }
 		QString absolutePath = toAbsolute(input);
-		if (base == Base::Absolute) { return absolutePath; }
+		if (base == Base::Absolute || base == Base::Internal) { return absolutePath; }
 		bool error;
 		QString relativePath = baseQDir(base, &error).relativeFilePath(absolutePath);
 		// Return the relative path if it didn't result in a path starting with ..
@@ -228,6 +239,8 @@ namespace lmms::PathUtil
 
 	QString toShortestRelative(const QString & input, bool allowLocal /* = false*/)
 	{
+		if (hasBase(input, Base::Internal)) { return input; }
+
 		QFileInfo inputFileInfo = QFileInfo(input);
 		QString absolutePath = inputFileInfo.isAbsolute() ? input : toAbsolute(input);
 
@@ -247,6 +260,33 @@ namespace lmms::PathUtil
 			}
 		}
 		return basePrefixQString(shortestBase) + relativeOrAbsolute(absolutePath, shortestBase);
+	}
+
+	std::string toShortestRelative(std::string_view input, bool allowLocal)
+	{
+		if (hasBase(input, Base::Internal)) { return std::string{input}; }
+
+		const auto qstr = QString::fromUtf8(input.data(), input.size());
+		QFileInfo inputFileInfo = QFileInfo(qstr);
+		QString absolutePath = inputFileInfo.isAbsolute() ? qstr : toAbsolute(qstr);
+
+		Base shortestBase = Base::Absolute;
+		QString shortestPath = relativeOrAbsolute(absolutePath, shortestBase);
+		for (auto base : relativeBases)
+		{
+			// Skip local paths when searching for the shortest relative if those
+			// are not allowed for that resource
+			if (base == Base::LocalDir && !allowLocal) { continue; }
+
+			QString otherPath = relativeOrAbsolute(absolutePath, base);
+			if (otherPath.length() < shortestPath.length())
+			{
+				shortestBase = base;
+				shortestPath = otherPath;
+			}
+		}
+
+		return (basePrefixQString(shortestBase) + relativeOrAbsolute(absolutePath, shortestBase)).toStdString();
 	}
 
 } // namespace lmms::PathUtil

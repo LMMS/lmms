@@ -26,9 +26,39 @@
 
 #ifdef LMMS_HAVE_CLAP
 
+#include "ClapLog.h"
+#include "ClapManager.h"
+#include "Engine.h"
+
 namespace lmms
 {
 
+auto ClapPresets::fromKey(const Plugin::Descriptor::SubPluginFeatures::Key* key) const
+	-> std::vector<const Preset*>
+{
+	std::vector<const Preset*> ret;
+	if (!key) { return ret; }
+
+	for (auto& mapPair : presets())
+	{
+		for (auto& preset : mapPair.second)
+		{
+			if (preset.key == key)
+			{
+				ret.push_back(&preset);
+			}
+		}
+	}
+
+	return ret;
+}
+
+auto ClapPresets::queryPreset(const PresetLoadData& loadData,
+	const Plugin::Descriptor::SubPluginFeatures::Key* key) const -> Preset
+{
+	// TODO: [NOT IMPLEMENTED YET]
+	return PluginPresets::queryPreset(loadData, key);
+}
 
 } // namespace lmms
 

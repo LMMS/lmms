@@ -46,7 +46,7 @@ struct PresetLoadData
 	 * Valid examples:
 	 * - "internal:" (for presets stored within the plugin's DSO)
 	 * - "userprojects:"
-	 * - "preset:MyPresetFolder"
+	 * - "preset:MyPresetFolder" (TODO: disallow? Makes openPresetFile() difficult to implement)
 	 * - "/my/absolute/directory"
 	 * - "preset:my_plugin/my_preset_database.txt" (depending on the plugin, it could even be a file!)
 	 *
@@ -62,13 +62,19 @@ struct PresetLoadData
 
 	// Whether `location` and `loadKey` can be concatenated together
 	// to form a single string depends entirely on the plugin.
+
+	friend auto operator==(const PresetLoadData& lhs, const PresetLoadData& rhs) -> bool
+	{
+		return lhs.location == rhs.location && lhs.loadKey == rhs.loadKey;
+	}
 };
 
 //! Stores metadata for use by the preset browser and for categorizing the preset
 struct PresetMetadata
 {
-	std::string category;
-	std::string author;
+	std::string category; // TODO: Use vector?
+	std::string creator;
+	std::string description;
 
 	// [...]
 };
@@ -82,8 +88,8 @@ struct Preset
 
 	const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr;
 
-	//! Some plugins may cache preset data for faster loading; empty = uncached
-	std::string data;
+	//! TODO: Some plugins may cache preset data for faster loading; empty = uncached
+	//std::string data;
 };
 
 //! A fixed-size plugin-specific collection of presets
@@ -92,14 +98,11 @@ struct Preset
 class PluginPresets : public NoCopyNoMove
 {
 public:
+	using PresetMap = std::map<std::string, std::vector<Preset>, std::less<>>;
+
 	PluginPresets() = default;
-	PluginPresets(const std::vector<std::string>& locations)
-	{
-		for (const auto& location : locations)
-		{
-			m_presets.emplace(location, std::vector<Preset>{});
-		}
-	}
+	//PluginPresets(const Plugin::Descriptor::SubPluginFeatures::Key* key);
+	virtual ~PluginPresets() = default;
 
 	auto presets() const -> auto& { return m_presets; }
 
@@ -113,30 +116,54 @@ public:
 		return m_presets.at(location);
 	}
 
-	auto presets(std::string_view location) -> std::vector<Preset>&
+	auto presets(std::string_view location) -> PresetMap::iterator
 	{
-#if defined(__cpp_lib_associative_heterogeneous_insertion) && __cpp_lib_associative_heterogeneous_insertion >= 202306L
-		return m_presets.at(location);
-#else
-		return m_presets.find(location)->second;
-#endif
+		return m_presets.find(location);
 	}
 
-	// Used during construction
+	//! Used during construction; The returned iterator is used to add presets at the location
+	auto addInternalLocation() -> PresetMap::iterator;
 
-	auto addLocation(std::string&& location) -> std::string_view
+	//! Used during construction; The returned iterator is used to add presets at the location
+	auto addLocation(std::string_view path) -> PresetMap::iterator;
+
+	//! Returns all presets that can be loaded by the plugin with the given subplugin key
+	virtual auto fromKey(const Plugin::Descriptor::SubPluginFeatures::Key* key) const
+		-> std::vector<const Preset*> = 0;
+
+	struct Filetype
 	{
-		return m_presets.emplace(std::move(location), std::vector<Preset>{}).first->first;
+		std::string name;
+		std::string description;
+		std::string extension;
+	};
+
+	void addFiletype(Filetype&& filetype)
+	{
+		m_filetypes.push_back(std::move(filetype));
 	}
+
+	//! Open preset dialog
+	auto openPresetFile(std::string_view previousFile) -> const Preset*;
+
+	//! Save preset dialog
+	auto savePresetFile(const Preset& preset) -> bool;
+
+	//! Creates a Preset from PresetLoadData.
+	//! Plugins should override this to provide better preset info.
+	virtual auto queryPreset(const PresetLoadData& loadData,
+		const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr) const -> Preset;
 
 private:
-
-	virtual auto populate() -> bool = 0;
 
 	//! Maps locations to presets.
 	//! PresetLoadData references this map's key (location), so this map must remain stable after construction.
 	//! See `PresetLoadData::location` for more info.
-	std::map<std::string, std::vector<Preset>, std::less<>> m_presets;
+	PresetMap m_presets;
+
+	std::vector<Filetype> m_filetypes;
+
+	//const Plugin::Descriptor::SubPluginFeatures::Key* m_key = nullptr;
 };
 
 } // namespace lmms

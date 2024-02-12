@@ -31,6 +31,7 @@
 #include <clap/entry.h>
 
 #include "ClapLog.h"
+#include "lmms_filesystem.h"
 #include "lmmsversion.h"
 
 namespace lmms
@@ -96,6 +97,9 @@ ClapPresetDiscovery::Indexer::Indexer(const clap_preset_discovery_factory& facto
 	}
 	, m_provider{factory.create(&factory, &m_indexer, descriptor.id), ProviderDeleter{}}
 {
+	std::string tempMsg = "PRESET DISCOVERY PROVIDER DESCRIPTOR ID" + std::string{descriptor.id};
+	ClapLog::globalLog(CLAP_LOG_ERROR, tempMsg);
+
 	if (!m_provider)
 	{
 		ClapLog::globalLog(CLAP_LOG_ERROR, "Failed to create preset discovery provider");
@@ -131,7 +135,7 @@ ClapPresetDiscovery::Indexer::Indexer(const clap_preset_discovery_factory& facto
 		qDebug() << "loc metadata: name:" << metadata.name.c_str()
 			<< "flags:" << metadata.flags << "kind:" << metadata.kind;
 
-		auto receiver = MetadataReceiver{loc, m_presets->presets(loc)};
+		auto receiver = MetadataReceiver{m_presets->presets(loc)};
 		if (!m_provider->get_metadata(m_provider.get(), metadata.kind, loc.data(), receiver.receiver()))
 		{
 			std::string msg = "Failed to get metadata for preset discovery provider: " + receiver.errorMessage();
@@ -166,14 +170,46 @@ auto ClapPresetDiscovery::Indexer::clapDeclareLocation(const clap_preset_discove
 	auto self = static_cast<Indexer*>(indexer->indexer_data);
 	if (!self) { return false; }
 
-	const auto locationRef = self->m_presets->addLocation(std::string{location->location ? location->location : ""});
+	PluginPresets::PresetMap::iterator iter;
+	switch (location->kind)
+	{
+		case CLAP_PRESET_DISCOVERY_LOCATION_PLUGIN:
+			if (location->location) { return false; } // PLUGIN kind must have null location
+			iter = self->m_presets->addInternalLocation();
+			break;
+		case CLAP_PRESET_DISCOVERY_LOCATION_FILE:
+		{
+			if (!location->location)
+			{
+				ClapLog::globalLog(CLAP_LOG_PLUGIN_MISBEHAVING,
+					"Preset with FILE location kind cannot have null location");
+				return false;
+			}
 
-	auto loc = ClapPresets::LocationMetadata{};
-	if (location->name) { loc.name = location->name; }
-	loc.flags = static_cast<clap_preset_discovery_flags>(location->flags);
-	loc.kind = static_cast<clap_preset_discovery_location_kind>(location->kind);
+			if (std::error_code ec; !fs::is_regular_file(location->location, ec) || ec)
+			{
+				std::string msg = "Preset location \"" + std::string{location->location}
+					+ "\" does not exist";
+				ClapLog::globalLog(CLAP_LOG_WARNING, msg);
+				return false;
+			}
 
-	self->m_presets->addLocationMetadata(locationRef, std::move(loc));
+			iter = self->m_presets->addLocation(location->location);
+			break;
+		}
+		default:
+			ClapLog::globalLog(CLAP_LOG_PLUGIN_MISBEHAVING, "Invalid preset location kind");
+			return false;
+	}
+
+	const auto& locationRef = iter->first;
+
+	auto metadata = ClapPresets::LocationMetadata{};
+	if (location->name) { metadata.name = location->name; }
+	metadata.flags = static_cast<clap_preset_discovery_flags>(location->flags);
+	metadata.kind = static_cast<clap_preset_discovery_location_kind>(location->kind);
+
+	self->m_presets->addLocationMetadata(locationRef, std::move(metadata));
 	return true;
 }
 
@@ -191,7 +227,7 @@ auto ClapPresetDiscovery::Indexer::clapGetExtension(const clap_preset_discovery_
 	return nullptr;
 }
 
-ClapPresetDiscovery::MetadataReceiver::MetadataReceiver(std::string_view location, std::vector<Preset>& presets)
+ClapPresetDiscovery::MetadataReceiver::MetadataReceiver(PluginPresets::PresetMap::iterator presets)
 	: m_receiver {
 		this,
 		&clapOnError,
@@ -205,8 +241,7 @@ ClapPresetDiscovery::MetadataReceiver::MetadataReceiver(std::string_view locatio
 		&clapAddFeature,
 		&clapAddExtraInfo
 	}
-	, m_location{location}
-	, m_presets{&presets}
+	, m_presets{presets}
 {
 }
 
@@ -227,9 +262,11 @@ auto ClapPresetDiscovery::MetadataReceiver::clapBeginPreset(
 	auto rec = from(receiver);
 	if (!rec) { return false; }
 
-	auto& preset = rec->m_presets->emplace_back();
+	auto& [location, presets] = *rec->m_presets;
+
+	auto& preset = presets.emplace_back();
 	preset.displayName = name ? name : std::string{};
-	preset.loadData.location = rec->m_location;
+	preset.loadData.location = location; // references the map's key
 	preset.loadData.loadKey =  loadKey ? loadKey : std::string{};
 
 	qDebug() << "clapBeginPreset: display name:" << preset.displayName.c_str() << "load key:" << preset.loadData.loadKey.c_str();

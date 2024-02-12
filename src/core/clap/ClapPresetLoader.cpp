@@ -44,23 +44,25 @@ auto ClapPresetLoader::load(const PresetLoadData& preset) -> bool
 
 	clap_preset_discovery_location_kind locationKind;
 	std::string location;
-	if (base == PathUtil::Base::Internal)
+	switch (base)
 	{
-		locationKind = CLAP_PRESET_DISCOVERY_LOCATION_PLUGIN;
-	}
-	else if (base == PathUtil::Base::Absolute)
-	{
-		locationKind = CLAP_PRESET_DISCOVERY_LOCATION_FILE;
-		location = path;
-	}
-	else
-	{
-		locationKind = CLAP_PRESET_DISCOVERY_LOCATION_FILE;
-		if (auto temp = PathUtil::getBaseLocation(base))
+		case PathUtil::Base::Internal:
+			locationKind = CLAP_PRESET_DISCOVERY_LOCATION_PLUGIN;
+			break;
+		case PathUtil::Base::Absolute:
+			locationKind = CLAP_PRESET_DISCOVERY_LOCATION_FILE;
+			location = path;
+			break;
+		default:
 		{
-			location = temp.value();
+			locationKind = CLAP_PRESET_DISCOVERY_LOCATION_FILE;
+			if (auto temp = PathUtil::getBaseLocation(base))
+			{
+				location = temp.value();
+			}
+			else { return false; }
+			break;
 		}
-		else { return false; }
 	}
 
 	if (!pluginExt()->from_location(plugin(), locationKind, location.c_str(), preset.loadKey.c_str()))

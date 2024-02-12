@@ -104,7 +104,7 @@ private:
 	{
 	public:
 		MetadataReceiver() = delete;
-		MetadataReceiver(std::string_view location, std::vector<Preset>& presets);
+		MetadataReceiver(PluginPresets::PresetMap::iterator presets);
 
 		auto receiver() const -> const auto* { return &m_receiver; }
 		auto errorMessage() const -> auto& { return m_error; }
@@ -136,8 +136,10 @@ private:
 
 		clap_preset_discovery_metadata_receiver m_receiver;
 
-		std::string_view m_location;
-		std::vector<Preset>* m_presets;
+		//std::string_view m_location;
+		//std::vector<Preset>* m_presets;
+
+		PluginPresets::PresetMap::iterator m_presets;
 
 		std::string m_error;
 	};
