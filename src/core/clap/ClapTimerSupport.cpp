@@ -118,16 +118,18 @@ auto ClapTimerSupport::clapUnregisterTimer(const clap_host* host, clap_id timerI
 	}
 
 	auto& timerSupport = h->timerSupport();
-	if (timerSupport.m_timerIds.find(timerId) == timerSupport.m_timerIds.end())
+	if (auto it = timerSupport.m_timerIds.find(timerId); it != timerSupport.m_timerIds.end())
+	{
+		timerSupport.killTimer(static_cast<int>(timerId));
+		timerSupport.m_timerIds.erase(it);
+		return true; // assume successful
+	}
+	else
 	{
 		const auto msg = "Unrecognized timer id: " + std::to_string(timerId);
 		h->logger().log(CLAP_LOG_PLUGIN_MISBEHAVING, msg);
 		return false;
 	}
-
-	timerSupport.killTimer(static_cast<int>(timerId));
-
-	return true; // assume successful
 }
 
 void ClapTimerSupport::timerEvent(QTimerEvent* event)
