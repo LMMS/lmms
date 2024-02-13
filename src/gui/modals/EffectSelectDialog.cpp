@@ -116,8 +116,8 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
 		leftSectionLayout->addWidget(button);
 
 		connect(button, &QPushButton::clicked, this, [this, searchString] {
-		    m_model.setEffectTypeFilter(searchString);
-		    updateSelection();
+			m_model.setEffectTypeFilter(searchString);
+			updateSelection();
 		});
 	}
 
