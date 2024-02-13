@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef EFFECT_SELECT_DIALOG_H
-#define EFFECT_SELECT_DIALOG_H
+#ifndef LMMS_GUI_EFFECT_SELECT_DIALOG_H
+#define LMMS_GUI_EFFECT_SELECT_DIALOG_H
 
 #include "Effect.h"
 
@@ -48,7 +48,6 @@ class DualColumnFilterProxyModel : public QSortFilterProxyModel
 public:
 	DualColumnFilterProxyModel(QObject* parent = nullptr) : QSortFilterProxyModel(parent)
 	{
-		m_effectTypeFilter = "";
 	}
 
 	void setEffectTypeFilter(const QString& filter)
@@ -70,7 +69,7 @@ protected:
 		nameRegExp.setCaseSensitivity(Qt::CaseInsensitive);
 
 		bool nameFilterPassed = nameRegExp.indexIn(name) != -1;
-		bool typeFilterPassed = (m_effectTypeFilter.isEmpty() || type.contains(m_effectTypeFilter, Qt::CaseInsensitive));
+		bool typeFilterPassed = type.contains(m_effectTypeFilter, Qt::CaseInsensitive);
 
 		return nameFilterPassed && typeFilterPassed;
 	}
@@ -85,7 +84,6 @@ class EffectSelectDialog : public QDialog
 	Q_OBJECT
 public:
 	EffectSelectDialog(QWidget* parent);
-	~EffectSelectDialog() override;
 
 	Effect* instantiateSelectedPlugin(EffectChain* parent);
 
@@ -111,4 +109,3 @@ private:
 } // namespace lmms::gui
 
 #endif
-

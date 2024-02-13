@@ -51,7 +51,7 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
 	m_pluginList(new QTableView(this)),
 	m_scrollArea(new QScrollArea(this))
 {
-	setWindowTitle("Add effect");
+	setWindowTitle(tr("Add effect"));
 	resize(640, 480);
 	
 	setWindowIcon(embed::getIconPixmap("setup_audio"));
@@ -102,17 +102,16 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
 
 	QVBoxLayout* leftSectionLayout = new QVBoxLayout();
 
-	QStringList buttonLabels = { "All", "LMMS", "LADSPA", "LV2", "VST" };
+	QStringList buttonLabels = { tr("All"), "LMMS", "LADSPA", "LV2", "VST" };
 	for (const QString& label : buttonLabels)
 	{
 		QPushButton* button = new QPushButton(label, this);
 		button->setFixedSize(50, 50);
-		button->setFont(QFont("Arial", 15, QFont::Bold));
 		button->setFocusPolicy(Qt::NoFocus);
 		leftSectionLayout->addWidget(button);
 		
 		connect(button, &QPushButton::clicked, this, [this, label] {
-			m_model.setEffectTypeFilter(label == "All" ? "" : label);
+			m_model.setEffectTypeFilter(label == tr("All") ? "" : label);
 			updateSelection();
 		});
 	}
@@ -127,7 +126,9 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
 	connect(m_filterEdit, &QLineEdit::textChanged, this, &EffectSelectDialog::updateSelection);
 	m_filterEdit->setFocus();
 	m_filterEdit->setFocusPolicy(Qt::StrongFocus);
-	m_filterEdit->setPlaceholderText("Search");
+	m_filterEdit->setPlaceholderText(tr("Search"));
+	m_filterEdit->setClearButtonEnabled(true);
+	m_filterEdit->addAction(embed::getIconPixmap("zoom"), QLineEdit::LeadingPosition);
 
 	m_pluginList->setModel(&m_model);
 	m_pluginList->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -153,8 +154,8 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
 	QDialogButtonBox* buttonBox = new QDialogButtonBox(Qt::Horizontal, this);
 	buttonBox->setStandardButtons(QDialogButtonBox::Cancel | QDialogButtonBox::Ok);
 	buttonBox->setFocusPolicy(Qt::NoFocus);
-	connect(buttonBox, SIGNAL(accepted()), this, SLOT(acceptSelection()));
-	connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+	connect(buttonBox, &QDialogButtonBox::accepted, this, &EffectSelectDialog::acceptSelection);
+	connect(buttonBox, &QDialogButtonBox::rejected, this, &EffectSelectDialog::reject);
 
 	QVBoxLayout* rightSectionLayout = new QVBoxLayout();
 	rightSectionLayout->addWidget(m_filterEdit);
@@ -167,10 +168,11 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
 
 	auto selectionModel = new QItemSelectionModel(&m_model);
 	m_pluginList->setSelectionModel(selectionModel);
-	connect(selectionModel, SIGNAL(currentRowChanged(const QModelIndex&, const QModelIndex&)),
-		this, SLOT(rowChanged(const QModelIndex&, const QModelIndex&)));
+	connect(selectionModel, &QItemSelectionModel::currentRowChanged,
+			this, &EffectSelectDialog::rowChanged);
 
-	connect(m_pluginList, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(acceptSelection()));
+	connect(m_pluginList, &QTableView::doubleClicked,
+			this, &EffectSelectDialog::acceptSelection);
 	
 	setModal(true);
 	installEventFilter(this);
@@ -179,9 +181,6 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
 	show();
 }
 
-EffectSelectDialog::~EffectSelectDialog()
-{
-}
 
 Effect* EffectSelectDialog::instantiateSelectedPlugin(EffectChain* parent)
 {
@@ -246,12 +245,13 @@ void EffectSelectDialog::rowChanged(const QModelIndex& idx, const QModelIndex&)
 		textWidgetLayout->setContentsMargins(4, 4, 4, 4);
 		textWidgetLayout->setSpacing(8);
 
-		auto subWidget = new QWidget(textualInfoWidget);
-		auto subLayout = new QVBoxLayout(subWidget);
-		subLayout->setContentsMargins(0, 0, 0, 0);
-		subLayout->setSpacing(8);
 		if (m_currentSelection.desc->subPluginFeatures)
 		{
+			auto subWidget = new QWidget(textualInfoWidget);
+			auto subLayout = new QVBoxLayout(subWidget);
+			subLayout->setContentsMargins(0, 0, 0, 0);
+			subLayout->setSpacing(8);
+
 			m_currentSelection.desc->subPluginFeatures->
 				fillDescriptionWidget(subWidget, &m_currentSelection);
 			for (QWidget* w : subWidget->findChildren<QWidget*>())
