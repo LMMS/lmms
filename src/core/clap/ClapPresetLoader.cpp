@@ -40,32 +40,35 @@ auto ClapPresetLoader::load(const PresetLoadData& preset) -> bool
 	assert(ClapThreadCheck::isMainThread());
 	if (!supported()) { return false; }
 
-	const auto [base, path] = PathUtil::parsePath(preset.location);
+	const auto base = PathUtil::baseLookup(preset.location);
 
 	clap_preset_discovery_location_kind locationKind;
-	std::string location;
+	std::string locationStr;
+	const char* location = nullptr;
 	switch (base)
 	{
 		case PathUtil::Base::Internal:
 			locationKind = CLAP_PRESET_DISCOVERY_LOCATION_PLUGIN;
+			//location = nullptr;
 			break;
 		case PathUtil::Base::Absolute:
 			locationKind = CLAP_PRESET_DISCOVERY_LOCATION_FILE;
-			location = path;
+			location = preset.location.data();
 			break;
 		default:
 		{
 			locationKind = CLAP_PRESET_DISCOVERY_LOCATION_FILE;
-			if (auto temp = PathUtil::getBaseLocation(base))
+			if (auto temp = PathUtil::toAbsolute(preset.location))
 			{
-				location = temp.value();
+				locationStr = std::move(*temp);
+				location = locationStr.c_str();
 			}
 			else { return false; }
 			break;
 		}
 	}
 
-	if (!pluginExt()->from_location(plugin(), locationKind, location.c_str(), preset.loadKey.c_str()))
+	if (!pluginExt()->from_location(plugin(), locationKind, location, preset.loadKey.c_str()))
 	{
 		logger().log(CLAP_LOG_ERROR, "Failed to load preset");
 		return false;
