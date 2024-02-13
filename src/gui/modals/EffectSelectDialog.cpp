@@ -103,16 +103,21 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
 	QVBoxLayout* leftSectionLayout = new QVBoxLayout();
 
 	QStringList buttonLabels = { tr("All"), "LMMS", "LADSPA", "LV2", "VST" };
-	for (const QString& label : buttonLabels)
+	QStringList buttonSearchString = { "", "LMMS", "LADSPA", "LV2", "VST" };
+
+	for (int i = 0; i < buttonLabels.size(); ++i)
 	{
+		const QString& label = buttonLabels[i];
+		const QString& searchString = buttonSearchString[i];
+
 		QPushButton* button = new QPushButton(label, this);
 		button->setFixedSize(50, 50);
 		button->setFocusPolicy(Qt::NoFocus);
 		leftSectionLayout->addWidget(button);
-		
-		connect(button, &QPushButton::clicked, this, [this, label] {
-			m_model.setEffectTypeFilter(label == tr("All") ? "" : label);
-			updateSelection();
+
+		connect(button, &QPushButton::clicked, this, [this, searchString] {
+		    m_model.setEffectTypeFilter(searchString);
+		    updateSelection();
 		});
 	}
 
