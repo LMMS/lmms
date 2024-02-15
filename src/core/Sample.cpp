@@ -206,31 +206,34 @@ void Sample::playRaw(sampleFrame* dst, size_t numFrames, const PlaybackState* st
 void Sample::advance(PlaybackState* state, size_t advanceAmount, Loop loopMode) const
 {
 	state->m_frameIndex += (state->m_backwards ? -1 : 1) * advanceAmount;
+	if (loopMode == Loop::Off) { return; }
 
 	const auto distanceFromLoopStart = std::abs(state->m_frameIndex - m_loopStartFrame);
 	const auto distanceFromLoopEnd = std::abs(state->m_frameIndex - m_loopEndFrame);
+	const auto loopSize = m_loopEndFrame - m_loopStartFrame;
+	if (loopSize == 0) { return; }
 
 	switch (loopMode)
 	{
 	case Loop::On:
 		if (state->m_frameIndex < m_loopStartFrame && state->m_backwards)
 		{
-			state->m_frameIndex = m_loopEndFrame - 1 - distanceFromLoopStart % (m_loopEndFrame - m_loopStartFrame);
+			state->m_frameIndex = m_loopEndFrame - 1 - distanceFromLoopStart % loopSize;
 		}
 		else if (state->m_frameIndex >= m_loopEndFrame)
 		{
-			state->m_frameIndex = m_loopStartFrame + distanceFromLoopEnd % (m_loopEndFrame - m_loopStartFrame);
+			state->m_frameIndex = m_loopStartFrame + distanceFromLoopEnd % loopSize;
 		}
 		break;
 	case Loop::PingPong:
 		if (state->m_frameIndex < m_loopStartFrame && state->m_backwards)
 		{
-			state->m_frameIndex = m_loopStartFrame + distanceFromLoopStart % (m_loopEndFrame - m_loopStartFrame);
+			state->m_frameIndex = m_loopStartFrame + distanceFromLoopStart % loopSize;
 			state->m_backwards = false;
 		}
 		else if (state->m_frameIndex >= m_loopEndFrame)
 		{
-			state->m_frameIndex = m_loopEndFrame - 1 - distanceFromLoopEnd % (m_loopEndFrame - m_loopStartFrame);
+			state->m_frameIndex = m_loopEndFrame - 1 - distanceFromLoopEnd % loopSize;
 			state->m_backwards = true;
 		}
 		break;
