@@ -24,7 +24,7 @@
 	url = https://github.com/swh/ladspa
 [submodule "plugins/LadspaEffect/tap/tap-plugins"]
 	path = plugins/LadspaEffect/tap/tap-plugins
-	url = https://git.hq.sig7.se/tap-plugins.git
+	url = https://github.com/lmms/tap-plugins
 [submodule "src/3rdparty/weakjack/weakjack"]
 	path = src/3rdparty/weakjack/weakjack
 	url = https://github.com/x42/weakjack.git
