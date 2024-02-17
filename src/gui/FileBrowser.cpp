@@ -636,9 +636,9 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 }
 
 bool instrumentActionsInitialised = false;
-const std::array<std::pair<QString, QString>, INSTRUMENTACTIONS_LENGTH> instrumentActions;
+const std::array<std::array<QString, 3>, INSTRUMENTACTIONS_LENGTH> instrumentActions;
 
-#define INSTRUMENT_INSTRUMENTACTIONS 2
+#define INSTRUMENTACTIONS_INSTRUMENT_INDEX 2
 
 QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool songEditor)
 {
@@ -646,30 +646,54 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 	{
 		// instrumentActions has not been initialised yet.
 		// Let's fix that
-		instrumentActions = {
+		instrumentActions =
+		{
 			{
-				{ tr("Send to new AudioFileProcessor instance"), "audiofileprocessor" },
-				{ tr("Send to new SlicerT instance"), "slicert" },
-				{ tr("Send to instrument track"), "" }
+				// doing this here because we can't call tr()
+				// in global scope
+				{
+					{
+						tr("Send to new AudioFileProcessor instance"),
+						"audiofileprocessor",
+						"Enter"
+					}
+				},
+				{
+					{
+						tr("Send to new SlicerT instance"),
+						"slicert",
+						"S"
+					}
+				},
+				{
+					{
+						tr("Send to instrument track"),
+						"",
+						"Enter"
+					}
+				}
 			}
 		};
 		instrumentActionsInitialised = true;
 	}
-
+	
 	QList<QAction*> result = QList<QAction*>();
 	const bool fileIsSample = file->type() == FileItem::FileType::Sample;
 
-	QString shortcutMod = songEditor ? "" : UI_CTRL_KEY + QString(" + "); // TODO
-
-	for (int i = fileIsSample ? 0 : INSTRUMENT_INSTRUMENTACTIONS;
-			i < (fileIsSample ? INSTRUMENT_INSTRUMENTACTIONS
+	for (int i = fileIsSample ? 0 : INSTRUMENTACTIONS_INSTRUMENT_INDEX;
+			i < (fileIsSample ? INSTRUMENTACTIONS_INSTRUMENT_INDEX
 				: INSTRUMENTACTIONS_LENGTH); i++)
 	{
-		const std::pair<QString, QString>& instrumentAction = instrumentActions[i];
+		const std::array<QString, 3>& instrumentAction = instrumentActions[i];
 
-		auto toInstrument = new QAction(instrumentAction.first + tr(" (%2Enter)").arg(shortcutMod), nullptr);
+		auto toInstrument = new QAction(
+				instrumentAction[0] + tr(" (%2)")
+				.arg((songEditor ? "" : UI_CTRL_KEY + QString(" + "))
+					+ instrumentAction[2]),
+				nullptr
+				);
 		connect(toInstrument, &QAction::triggered,
-			[=]{ openInNewInstrumentTrack(file, songEditor, instrumentAction.second); });
+			[=]{ openInNewInstrumentTrack(file, songEditor, instrumentAction[1]); });
 		result.append(toInstrument);
 	}
 

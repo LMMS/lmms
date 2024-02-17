@@ -182,7 +182,7 @@ private:
 
 #define INSTRUMENTACTIONS_LENGTH 3
 	bool instrumentActionsInitialised;
-	std::array<std::pair<QString, QString>, 3> instrumentActions;
+	std::array<std::array<QString, 3>, INSTRUMENTACTIONS_LENGTH> instrumentActions;
 	QList<QAction*> getContextActions(FileItem* item, bool songEditor);
 
 
