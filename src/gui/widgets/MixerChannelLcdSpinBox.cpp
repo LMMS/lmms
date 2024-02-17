@@ -1,5 +1,5 @@
 /*
- * MixerLineLcdSpinBox.cpp - a specialization of LcdSpnBox for setting mixer channels
+ * MixerChannelLcdSpinBox.cpp - a specialization of LcdSpnBox for setting mixer channels
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,7 +22,7 @@
  *
  */
 
-#include "MixerLineLcdSpinBox.h"
+#include "MixerChannelLcdSpinBox.h"
 
 #include "CaptionMenu.h"
 #include "MixerView.h"
@@ -33,14 +33,14 @@ namespace lmms::gui
 {
 
 
-void MixerLineLcdSpinBox::setTrackView(TrackView * tv)
+void MixerChannelLcdSpinBox::setTrackView(TrackView * tv)
 {
 	m_tv = tv;
 }
 
-void MixerLineLcdSpinBox::mouseDoubleClickEvent(QMouseEvent* event)
+void MixerChannelLcdSpinBox::mouseDoubleClickEvent(QMouseEvent* event)
 {
-	getGUI()->mixerView()->setCurrentMixerLine(model()->value());
+	getGUI()->mixerView()->setCurrentMixerChannel(model()->value());
 
 	getGUI()->mixerView()->parentWidget()->show();
 	getGUI()->mixerView()->show();// show Mixer window
@@ -48,7 +48,7 @@ void MixerLineLcdSpinBox::mouseDoubleClickEvent(QMouseEvent* event)
 	//engine::getMixerView()->raise();
 }
 
-void MixerLineLcdSpinBox::contextMenuEvent(QContextMenuEvent* event)
+void MixerChannelLcdSpinBox::contextMenuEvent(QContextMenuEvent* event)
 {
 	// for the case, the user clicked right while pressing left mouse-
 	// button, the context-menu appears while mouse-cursor is still hidden

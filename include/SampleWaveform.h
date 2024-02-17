@@ -1,7 +1,7 @@
 /*
- * MixerLineLcdSpinBox.h - a specialization of LcdSpnBox for setting mixer channels
+ * SampleWaveform.h
  *
- * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2023 saker <sakertooth@gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,38 +22,28 @@
  *
  */
 
-#ifndef LMMS_GUI_MIXER_LINE_LCD_SPIN_BOX_H
-#define LMMS_GUI_MIXER_LINE_LCD_SPIN_BOX_H
+#ifndef LMMS_GUI_SAMPLE_WAVEFORM_H
+#define LMMS_GUI_SAMPLE_WAVEFORM_H
 
-#include "LcdSpinBox.h"
+#include <QPainter>
 
-namespace lmms::gui
+#include "Sample.h"
+#include "lmms_export.h"
+
+namespace lmms::gui {
+class LMMS_EXPORT SampleWaveform
 {
-
-
-class TrackView;
-
-
-class MixerLineLcdSpinBox : public LcdSpinBox
-{
-	Q_OBJECT
 public:
-	MixerLineLcdSpinBox(int numDigits, QWidget * parent, const QString& name, TrackView * tv = nullptr) :
-		LcdSpinBox(numDigits, parent, name), m_tv(tv)
-	{}
-	~MixerLineLcdSpinBox() override = default;
+	struct Parameters
+	{
+		const sampleFrame* buffer;
+		size_t size;
+		float amplification;
+		bool reversed;
+	};
 
-	void setTrackView(TrackView * tv);
-
-protected:
-	void mouseDoubleClickEvent(QMouseEvent* event) override;
-	void contextMenuEvent(QContextMenuEvent* event) override;
-
-private:
-	TrackView * m_tv;
+	static void visualize(Parameters parameters, QPainter& painter, const QRect& rect);
 };
-
-
 } // namespace lmms::gui
 
-#endif // LMMS_GUI_MIXER_LINE_LCD_SPIN_BOX_H
+#endif // LMMS_GUI_SAMPLE_WAVEFORM_H

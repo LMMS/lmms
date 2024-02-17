@@ -21,7 +21,7 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 #include "SampleTrackWindow.h"
 
 #include <QCloseEvent>
@@ -37,7 +37,7 @@
 #include "GuiApplication.h"
 #include "Knob.h"
 #include "MainWindow.h"
-#include "MixerLineLcdSpinBox.h"
+#include "MixerChannelLcdSpinBox.h"
 #include "SampleTrackView.h"
 #include "Song.h"
 #include "SubWindow.h"
@@ -133,7 +133,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 
 
 	// setup spinbox for selecting Mixer-channel
-	m_mixerChannelNumber = new MixerLineLcdSpinBox(2, nullptr, tr("Mixer channel"), m_stv);
+	m_mixerChannelNumber = new MixerChannelLcdSpinBox(2, nullptr, tr("Mixer channel"), m_stv);
 
 	basicControlsLayout->addWidget(m_mixerChannelNumber, 0, 3);
 	basicControlsLayout->setAlignment(m_mixerChannelNumber, widgetAlignment);

@@ -694,6 +694,79 @@ void CompressorControlDialog::drawGraph()
 }
 
 
+void CompressorControlDialog::mouseDoubleClickEvent(QMouseEvent* event)
+{
+	setGuiVisibility(!m_guiVisibility);
+}
+
+
+void CompressorControlDialog::setGuiVisibility(bool isVisible)
+{
+	if (!isVisible)
+	{
+		m_rmsKnob->setVisible(isVisible);
+		m_rmsEnabledLabel->setVisible(isVisible);
+
+		m_lookaheadLengthKnob->setVisible(isVisible);
+		m_lookaheadEnabledLabel->setVisible(isVisible);
+
+		m_blendKnob->setVisible(isVisible);
+		m_blendEnabledLabel->setVisible(isVisible);
+
+		m_ratioKnob->setVisible(isVisible);
+		m_ratioEnabledLabel->setVisible(isVisible);
+	}
+	else
+	{
+		m_rmsKnob->setVisible(!m_controls->m_peakmodeModel.value());
+		m_rmsEnabledLabel->setVisible(!m_controls->m_peakmodeModel.value());
+
+		m_blendKnob->setVisible(m_controls->m_stereoLinkModel.value() == 4);
+		m_blendEnabledLabel->setVisible(m_controls->m_stereoLinkModel.value() == 4);
+
+		m_lookaheadLengthKnob->setVisible(m_controls->m_lookaheadModel.value());
+		m_lookaheadEnabledLabel->setVisible(m_controls->m_lookaheadModel.value());
+
+		m_ratioKnob->setVisible(!m_controls->m_limiterModel.value());
+		m_ratioEnabledLabel->setVisible(!m_controls->m_limiterModel.value());
+	}
+	m_controlsBoxLabel->setVisible(isVisible);
+	m_thresholdKnob->setVisible(isVisible);
+	m_attackKnob->setVisible(isVisible);
+	m_releaseKnob->setVisible(isVisible);
+	m_kneeKnob->setVisible(isVisible);
+	m_rangeKnob->setVisible(isVisible);
+	m_holdKnob->setVisible(isVisible);
+	m_inBalanceKnob->setVisible(isVisible);
+	m_outBalanceKnob->setVisible(isVisible);
+	m_stereoBalanceKnob->setVisible(isVisible);
+	m_tiltKnob->setVisible(isVisible);
+	m_tiltFreqKnob->setVisible(isVisible);
+	m_mixKnob->setVisible(isVisible);
+	m_autoAttackKnob->setVisible(isVisible);
+	m_autoReleaseKnob->setVisible(isVisible);
+	m_outFader->setVisible(isVisible);
+	m_inFader->setVisible(isVisible);
+	rmsButton->setVisible(isVisible);
+	peakButton->setVisible(isVisible);
+	rmsPeakGroup->setVisible(isVisible);
+	leftRightButton->setVisible(isVisible);
+	midSideButton->setVisible(isVisible);
+	compressButton->setVisible(isVisible);
+	limitButton->setVisible(isVisible);
+	unlinkedButton->setVisible(isVisible);
+	maximumButton->setVisible(isVisible);
+	averageButton->setVisible(isVisible);
+	minimumButton->setVisible(isVisible);
+	blendButton->setVisible(isVisible);
+	autoMakeupButton->setVisible(isVisible);
+	auditionButton->setVisible(isVisible);
+	feedbackButton->setVisible(isVisible);
+	lookaheadButton->setVisible(isVisible);
+	m_guiVisibility = isVisible;
+}
+
+
 void CompressorControlDialog::resetCompressorView()
 {
 	m_windowSizeX = size().width();

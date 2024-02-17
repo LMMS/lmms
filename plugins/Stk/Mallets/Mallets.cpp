@@ -85,7 +85,7 @@ MalletsInstrument::MalletsInstrument( InstrumentTrack * _instrument_track ):
 //	TODO: m_vibratoModel
 	m_velocityModel(64.0f, 0.1f, 128.0f, 0.1f, this, tr( "Speed" )),
 	m_strikeModel( true, this, tr( "Bowed" ) ),
-	m_presetsModel(this),
+	m_presetsModel(this, tr("Instrument")),
 	m_spreadModel(0, 0, 255, 1, this, tr( "Spread" )),
 	m_randomModel(0.0f, 0.0f, 1.0f, 0.01f, this, tr("Randomness")),
 	m_versionModel( MALLETS_PRESET_VERSION, 0, MALLETS_PRESET_VERSION, this, "" ),

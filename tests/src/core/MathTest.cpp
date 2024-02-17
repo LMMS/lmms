@@ -22,13 +22,13 @@
  *
  */
 
-#include "QTestSuite.h"
+#include <QDir>
+#include <QObject>
+#include <QtTest/QtTest>
 
 #include "lmms_math.h"
 
-#include <QDir>
-
-class MathTest : QTestSuite
+class MathTest : public QObject
 {
 	Q_OBJECT
 private slots:
@@ -48,6 +48,7 @@ private slots:
 		QCOMPARE(numDigitsAsInt(900000000), 9);
 		QCOMPARE(numDigitsAsInt(-900000000), 10);
 	}
-} MathTests;
+};
 
+QTEST_GUILESS_MAIN(MathTest)
 #include "MathTest.moc"

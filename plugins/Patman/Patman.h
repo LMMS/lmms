@@ -28,6 +28,7 @@
 
 #include "Instrument.h"
 #include "InstrumentView.h"
+#include "Sample.h"
 #include "SampleBuffer.h"
 #include "AutomatableModel.h"
 #include "MemoryManager.h"
@@ -87,13 +88,13 @@ private:
 	struct handle_data
 	{
 		MM_OPERATORS
-		SampleBuffer::handleState* state;
+		Sample::PlaybackState* state;
 		bool tuned;
-		SampleBuffer* sample;
+		std::shared_ptr<Sample> sample;
 	};
 
 	QString m_patchFile;
-	QVector<SampleBuffer *> m_patchSamples;
+	QVector<std::shared_ptr<Sample>> m_patchSamples;
 	BoolModel m_loopedModel;
 	BoolModel m_tunedModel;
 
