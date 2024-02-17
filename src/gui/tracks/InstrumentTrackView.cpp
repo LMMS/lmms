@@ -398,19 +398,19 @@ QMenu * InstrumentTrackView::createMixerMenu(QString title, QString newMixerLabe
 }
 
 
-QPixmap InstrumentTrackView::determinePixmap(InstrumentTrack * instrumentTrack)
+QPixmap InstrumentTrackView::determinePixmap(InstrumentTrack* instrumentTrack)
 {
 	if (instrumentTrack)
 	{
-		Instrument * instrument = instrumentTrack->instrument();
+		Instrument* instrument = instrumentTrack->instrument();
 
 		if (instrument && instrument->descriptor())
 		{
-			const PixmapLoader * pl = instrument->key().isValid() ?
-				instrument->key().logo() :
-				instrument->descriptor()->logo;
+			const PixmapLoader* pl = instrument->key().isValid()
+				? instrument->key().logo()
+				: instrument->descriptor()->logo;
 
-			if(pl)
+			if (pl)
 			{
 				return pl->pixmap();
 			}

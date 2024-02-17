@@ -391,7 +391,7 @@ void TrackView::mouseReleaseEvent( QMouseEvent * me )
 	QWidget::mouseReleaseEvent( me );
 }
 
-void TrackView::wheelEvent(QWheelEvent * we)
+void TrackView::wheelEvent(QWheelEvent* we)
 {
 	we->accept();
 	

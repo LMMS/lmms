@@ -74,7 +74,7 @@ TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 
 void TrackLabelButton::rename()
 {
-	if(isInCompactMode())
+	if (isInCompactMode())
 	{
 		QString txt = m_trackView->getTrack()->name();
 		RenameDialog renameDlg( txt );
@@ -99,7 +99,7 @@ void TrackLabelButton::rename()
 
 void TrackLabelButton::renameFinished()
 {
-	if(!isInCompactMode())
+	if (!isInCompactMode())
 	{
 		m_renameLineEdit->clearFocus();
 		m_renameLineEdit->hide();

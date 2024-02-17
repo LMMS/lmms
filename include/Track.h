@@ -201,7 +201,7 @@ public:
 	BoolModel* getMutedModel();
 
 public slots:
-	virtual void setName( const QString & newName );
+	virtual void setName(const QString& newName);
 
 	void setMutedBeforeSolo(const bool muted)
 	{
