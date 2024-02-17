@@ -162,7 +162,9 @@ private:
 	//! If a preview is playing, stop it.
 	void stopPreview();
 
+	void handleFile(FileItem * f, InstrumentTrack * it, const QString& pluginPreference);
 	void handleFile( FileItem * fi, InstrumentTrack * it );
+	void openInNewInstrumentTrack( TrackContainer* tc, FileItem* item, const QString& pluginCode );
 	void openInNewInstrumentTrack( TrackContainer* tc, FileItem* item );
 
 
@@ -184,6 +186,7 @@ private:
 private slots:
 	void activateListItem( QTreeWidgetItem * item, int column );
 	void openInNewInstrumentTrack( lmms::gui::FileItem* item, bool songEditor );
+	void openInNewInstrumentTrack( lmms::gui::FileItem* item, bool songEditor, const QString& pluginCode );
 	bool openInNewSampleTrack( lmms::gui::FileItem* item );
 	void sendToActiveInstrumentTrack( lmms::gui::FileItem* item );
 	void updateDirectory( QTreeWidgetItem * item );

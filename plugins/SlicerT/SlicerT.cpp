@@ -394,6 +394,11 @@ void SlicerT::loadSettings(const QDomElement& element)
 	emit dataChanged();
 }
 
+void SlicerT::loadFile( const QString & _file )
+{
+	updateFile(_file);
+}
+
 QString SlicerT::nodeName() const
 {
 	return slicert_plugin_descriptor.name;

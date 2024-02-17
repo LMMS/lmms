@@ -81,6 +81,8 @@ public:
 	void saveSettings(QDomDocument& document, QDomElement& element) override;
 	void loadSettings(const QDomElement& element) override;
 
+	void loadFile( const QString & _file ) override;
+
 	void findSlices();
 	void findBPM();
 
