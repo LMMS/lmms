@@ -22,9 +22,9 @@
  *
  */
 
-#include <QDebug>
 #include "Lv2Effect.h"
 
+#include <QDebug>
 
 #include "Lv2SubPluginFeatures.h"
 
