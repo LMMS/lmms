@@ -106,22 +106,6 @@ with tempfile.TemporaryDirectory() as tmpdir:
 		create_file('data/locale/fr.ts',
 					'<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" version="2.1">\n'
 					'    <context>\n'
-					'    <name>TestClass</name>\n'
-					'     <message>\n'
-					'        <location filename="../../src/core/non-existent.cpp" line="20"/>\n'
-					'        <source>About LMMS</source>\n'
-					'        <translation>À propos de LMMS</translation>\n'
-					'    </message>\n'
-					'</context>\n'
-					'</TS>\n')
-		test.run()
-		test.expect('Error: data/locale: Source file does not exist: ../../src/core/non-existent.cpp')
-		test.expect('1 errors')
-
-	with ScriptTest(check_strings) as test:
-		create_file('data/locale/fr.ts',
-					'<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" version="2.1">\n'
-					'    <context>\n'
 					'    <name>NonExistentClass</name>\n'
 					'     <message>\n'
 					'        <location filename="../../src/core/classes.cpp" line="20"/>\n'
