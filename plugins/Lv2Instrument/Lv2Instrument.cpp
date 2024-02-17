@@ -313,14 +313,12 @@ extern "C"
 PLUGIN_EXPORT Plugin *lmms_plugin_main(Model *_parent, void *_data)
 {
 	using KeyType = Plugin::Descriptor::SubPluginFeatures::Key;
-	Lv2Instrument *ins;
 	try {
-		ins = new Lv2Instrument(static_cast<InstrumentTrack*>(_parent), static_cast<KeyType*>(_data));
+		return new Lv2Instrument(static_cast<InstrumentTrack*>(_parent), static_cast<KeyType*>(_data));
 	} catch (const std::runtime_error& e) {
 		qCritical() << e.what();
-		ins = nullptr;
+		return nullptr;
 	}
-	return ins;
 }
 
 }
