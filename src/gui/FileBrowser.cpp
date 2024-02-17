@@ -528,10 +528,11 @@ void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 {
 	// Shorter names for some commonly used properties of the event
 	const auto key = ke->key();
-	const bool vertical   = (key == Qt::Key_Up    || key == Qt::Key_Down);
-	const bool horizontal = (key == Qt::Key_Left  || key == Qt::Key_Right);
-	const bool insert     = (key == Qt::Key_Enter || key == Qt::Key_Return);
-	const bool preview    = (key == Qt::Key_Space);
+	const bool vertical      = (key == Qt::Key_Up    || key == Qt::Key_Down);
+	const bool horizontal    = (key == Qt::Key_Left  || key == Qt::Key_Right);
+	const bool insert        = (key == Qt::Key_Enter || key == Qt::Key_Return);
+	const bool insertSlicert = (key == Qt::Key_Slash);
+	const bool preview       = (key == Qt::Key_Space);
 
 	// First of all, forward all keypresses
 	QTreeWidget::keyPressEvent(ke);
@@ -562,6 +563,14 @@ void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 		if (sampleTrack && songEditor){ openInNewSampleTrack(file); }
 		// Otherwise we send the item as a new instrument track
 		else if (!sampleTrack){ openInNewInstrumentTrack(file, songEditor); }
+	}
+
+	// When / is pressed, add SlicerT...
+	if (insertSlicert)
+	{
+		// ...to the song editor by default, or to the pattern editor if ctrl is held
+		bool songEditor = !(ke->modifiers() & Qt::ControlModifier);
+		openInNewInstrumentTrack(file, songEditor, "slicert");
 	}
 
 	// When space is pressed, start a preview of the selected item
@@ -662,7 +671,7 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 					{
 						tr("Send to new SlicerT instance"),
 						"slicert",
-						"S"
+						"/"
 					}
 				},
 				{
