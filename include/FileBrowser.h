@@ -180,6 +180,9 @@ private:
 	QMutex m_pphMutex;
 #endif
 
+#define INSTRUMENTACTIONS_LENGTH 3
+	bool instrumentActionsInitialised;
+	std::array<std::pair<QString, QString>, 3> instrumentActions;
 	QList<QAction*> getContextActions(FileItem* item, bool songEditor);
 
 

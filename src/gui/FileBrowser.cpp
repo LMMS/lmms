@@ -635,29 +635,38 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 	}
 }
 
+bool instrumentActionsInitialised = false;
+const std::array<std::pair<QString, QString>, INSTRUMENTACTIONS_LENGTH> instrumentActions;
+
+#define INSTRUMENT_INSTRUMENTACTIONS 2
+
 QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool songEditor)
 {
+	if (!instrumentActionsInitialised)
+	{
+		// instrumentActions has not been initialised yet.
+		// Let's fix that
+		instrumentActions = {
+			{
+				{ tr("Send to new AudioFileProcessor instance"), "audiofileprocessor" },
+				{ tr("Send to new SlicerT instance"), "slicert" },
+				{ tr("Send to instrument track"), "" }
+			}
+		};
+		instrumentActionsInitialised = true;
+	}
+
 	QList<QAction*> result = QList<QAction*>();
 	const bool fileIsSample = file->type() == FileItem::FileType::Sample;
 
-	std::pair<QString, QString> instrumentActions[2];
-	if (fileIsSample)
-	{
-		// I feel like this whole section can be done better.
-		// I would like to just create the array outside of the function and instantly
-		// initialise it. I can't though, because of that tr().
-		instrumentActions[0].first = tr("Send to new AudioFileProcessor instance");
-		instrumentActions[0].second = "audiofileprocessor"; // plugin key
-	       	instrumentActions[1].first = tr("Send to new SlicerT instance");
-		instrumentActions[1].second = "slicert";
-	} else {
-		instrumentActions[0].first = tr("Send to new instrument track");
-		instrumentActions[0].second = "instrument";
-		// FIXME: we are wasting that extra array slot here
-	}
 	QString shortcutMod = songEditor ? "" : UI_CTRL_KEY + QString(" + "); // TODO
 
-	for (const std::pair<QString, QString>& instrumentAction : instrumentActions) {
+	for (int i = fileIsSample ? 0 : INSTRUMENT_INSTRUMENTACTIONS;
+			i < (fileIsSample ? INSTRUMENT_INSTRUMENTACTIONS
+				: INSTRUMENTACTIONS_LENGTH); i++)
+	{
+		const std::pair<QString, QString>& instrumentAction = instrumentActions[i];
+
 		auto toInstrument = new QAction(instrumentAction.first + tr(" (%2Enter)").arg(shortcutMod), nullptr);
 		connect(toInstrument, &QAction::triggered,
 			[=]{ openInNewInstrumentTrack(file, songEditor, instrumentAction.second); });
