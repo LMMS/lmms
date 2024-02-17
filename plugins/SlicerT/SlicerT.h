@@ -66,7 +66,8 @@ class SlicerT : public Instrument
 	Q_OBJECT
 
 public slots:
-	void updateFile(QString file);
+	void updateFile(QString file, bool rename);
+	void updateFile(QString file); // assumes rename = false
 	void updateSlices();
 
 signals:
