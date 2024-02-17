@@ -112,14 +112,14 @@ for theme in sorted([d for d in Path('data/themes').iterdir() if d.is_dir()]):
                         if str(c.value).startswith(GUI_NAMESPACE_PREFIX):
                             classes_in_sheet.add(unscope_classname(stylesheet, c.value))
                         else:
-                            error(str(stylesheet), f"Namespace prefix missing from class {c.value}")
+                            error(stylesheet.as_posix(), f"Namespace prefix missing from class {c.value}")
                     class_found = True
                 # After whitespace or comma comes a new class
                 elif c.type == 'whitespace' or (c.type == 'literal' and c.value == ','):
                     class_found = False
     missing_classes = classes_in_sheet - classes
     for class_in_sheet in sorted(missing_classes):
-        error(str(stylesheet), f'Class does not exist in source code: {class_in_sheet}')
+        error(stylesheet.as_posix(), f'Class does not exist in source code: {class_in_sheet}')
 
 
 caption('patches (checks only plugins/)')
@@ -138,7 +138,7 @@ for cur_file in sorted(Path('.').glob('*/patches/*.patch')):
             if mpath.parent == Path('plugins/LadspaEffect/swh/ladspa/'):
                 mpath = mpath.with_suffix('.xml')
             if not mpath.is_file():
-                error(str(cur_file), f'Source file does not exist: {str(mpath)}')
+                error(cur_file.as_posix(), f'Source file does not exist: {mpath.as_posix()}')
 
 
 caption('debian docs (only one string)')
