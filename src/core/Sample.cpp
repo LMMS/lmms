@@ -178,7 +178,7 @@ void Sample::playRaw(sampleFrame* dst, size_t numFrames, const PlaybackState* st
 		switch (loopMode)
 		{
 		case Loop::Off:
-			if (index < 0 || index > m_endFrame) { return; }
+			if (index < 0 || index >= m_endFrame) { return; }
 			break;
 		case Loop::On:
 			if (index < m_loopStartFrame && backwards) { index = m_loopEndFrame - 1; }
