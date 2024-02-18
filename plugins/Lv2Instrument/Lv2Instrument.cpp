@@ -81,7 +81,7 @@ Lv2Instrument::Lv2Instrument(InstrumentTrack *instrumentTrackArg,
 	connect(instrumentTrack()->pitchRangeModel(), SIGNAL(dataChanged()),
 		this, SLOT(updatePitchRange()), Qt::DirectConnection);
 	connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged,
-		this, [this](){onSampleRateChanged();});
+		this, &Lv2Instrument::onSampleRateChanged);
 
 	// now we need a play-handle which cares for calling play()
 	auto iph = new InstrumentPlayHandle(this, instrumentTrackArg);
