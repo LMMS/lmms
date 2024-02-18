@@ -134,9 +134,12 @@ protected:
 	void mousePressEvent( QMouseEvent * me ) override;
 	void mouseMoveEvent( QMouseEvent * me ) override;
 	void mouseReleaseEvent( QMouseEvent * me ) override;
+	void wheelEvent(QWheelEvent* we) override;
 	void paintEvent( QPaintEvent * pe ) override;
 	void resizeEvent( QResizeEvent * re ) override;
 
+private:
+	void resizeToHeight(int height);
 
 private:
 	enum class Action
