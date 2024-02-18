@@ -462,8 +462,8 @@ void TrackView::setIndicatorMute(FadeButton* indicator, bool muted)
 void TrackView::resizeToHeight(int h)
 {
 	setFixedHeight(qMax<int>(h, MINIMAL_TRACK_HEIGHT));
-		m_trackContainerView->realignTracks();
-		m_track->setHeight(height());
+	m_trackContainerView->realignTracks();
+	m_track->setHeight(height());
 }
 
 

@@ -46,7 +46,7 @@
 namespace lmms::gui
 {
 
-static int const s_beatStepButtonOffset = 4;
+constexpr int BeatStepButtonOffset = 4;
 
 MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent ) :
 	ClipView( clip, parent ),
@@ -247,7 +247,7 @@ void MidiClipView::mousePressEvent( QMouseEvent * _me )
 {
 	bool displayPattern = fixedClips() || (pixelsPerBar() >= 96 && m_legacySEPattern);
 	if (_me->button() == Qt::LeftButton && m_clip->m_clipType == MidiClip::Type::BeatClip && displayPattern
-		&& _me->y() > s_beatStepButtonOffset && _me->y() < s_beatStepButtonOffset + m_stepBtnOff.height())
+		&& _me->y() > BeatStepButtonOffset && _me->y() < BeatStepButtonOffset + m_stepBtnOff.height())
 
 	// when mouse button is pressed in pattern mode
 
@@ -479,7 +479,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 			// figure out x and y coordinates for step graphic
 			const int x = BORDER_WIDTH + static_cast<int>(it * w / steps);
-			const int y = s_beatStepButtonOffset;
+			const int y = BeatStepButtonOffset;
 
 			if (n)
 			{

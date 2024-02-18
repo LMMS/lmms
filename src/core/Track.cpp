@@ -637,7 +637,7 @@ BoolModel *Track::getMutedModel()
 	return &m_mutedModel;
 }
 
-void Track::setName( const QString & newName )
+void Track::setName(const QString& newName)
 {
 	if (m_name != newName)
 	{

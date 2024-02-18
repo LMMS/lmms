@@ -94,7 +94,7 @@ private slots:
 	void handleConfigChange(QString cls, QString attr, QString value);
 
 private:
-	QPixmap determinePixmap(InstrumentTrack* instrumentTrack);
+	static QPixmap determinePixmap(InstrumentTrack* instrumentTrack);
 
 private:
 	InstrumentTrackWindow * m_window;
