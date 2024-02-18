@@ -563,7 +563,7 @@ OscillatorObject::OscillatorObject( Model * _parent, int _index ) :
 	m_panModel( DefaultPanning, PanningLeft, PanningRight, 1.0f,
 			this, tr( "Osc %1 panning" ).arg( _index + 1 ) ),
 	m_detuneModel( 0.0f, -1200.0f, 1200.0f, 1.0f,
-			this, tr( "Osc %1 fine detuning left" ).arg( _index + 1 ) )
+			this, tr( "Osc %1 stereo detuning" ).arg( _index + 1 ) )
 {
 }
 

@@ -37,27 +37,25 @@ class FloatModel;
 namespace gui
 {
 
-class MixerLine;
+class MixerChannelView;
 class MixerView;
 
-
-class SendButtonIndicator : public QLabel 
+class SendButtonIndicator : public QLabel
 {
 public:
-	SendButtonIndicator( QWidget * _parent, MixerLine * _owner,
-						 MixerView * _mv);
+	SendButtonIndicator(QWidget* parent, MixerChannelView* owner, MixerView* mv);
 
-	void mousePressEvent( QMouseEvent * e ) override;
+	void mousePressEvent(QMouseEvent* e) override;
 	void updateLightStatus();
 
 private:
 
-	MixerLine * m_parent;
-	MixerView * m_mv;
+	MixerChannelView* m_parent;
+	MixerView* m_mv;
 	QPixmap m_qpmOff = embed::getIconPixmap("mixer_send_off", 29, 20);
 	QPixmap m_qpmOn = embed::getIconPixmap("mixer_send_on", 29, 20);
 
-	FloatModel * getSendModel();
+	FloatModel* getSendModel();
 };
 
 

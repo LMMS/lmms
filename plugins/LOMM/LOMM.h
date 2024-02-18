@@ -52,8 +52,6 @@ public:
 		return &m_lommControls;
 	}
 	
-	void clearFilterHistories();
-	
 	inline float msToCoeff(float ms)
 	{
 		return (ms == 0) ? 0 : exp(m_coeffPrecalc / ms);
@@ -72,6 +70,8 @@ private:
 	
 	StereoLinkwitzRiley m_hp1;
 	StereoLinkwitzRiley m_hp2;
+	
+	BasicFilters<2> m_ap;
 	
 	bool m_needsUpdate;
 	float m_coeffPrecalc;

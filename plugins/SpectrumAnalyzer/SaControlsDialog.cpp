@@ -119,28 +119,28 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	auto waterfallButton = new LedCheckBox(tr("Waterfall"), this);
 	waterfallButton->setToolTip(tr("Display real-time spectrogram"));
 	waterfallButton->setCheckable(true);
-	waterfallButton->setMinimumSize(70, 12);
+	waterfallButton->setMinimumSize(100, 12);
 	waterfallButton->setModel(&controls->m_waterfallModel);
 	config_layout->addWidget(waterfallButton, 0, 1);
 
 	auto smoothButton = new LedCheckBox(tr("Averaging"), this);
 	smoothButton->setToolTip(tr("Enable exponential moving average"));
 	smoothButton->setCheckable(true);
-	smoothButton->setMinimumSize(70, 12);
+	smoothButton->setMinimumSize(100, 12);
 	smoothButton->setModel(&controls->m_smoothModel);
 	config_layout->addWidget(smoothButton, 1, 1);
 
 	auto stereoButton = new LedCheckBox(tr("Stereo"), this);
 	stereoButton->setToolTip(tr("Display stereo channels separately"));
 	stereoButton->setCheckable(true);
-	stereoButton->setMinimumSize(70, 12);
+	stereoButton->setMinimumSize(100, 12);
 	stereoButton->setModel(&controls->m_stereoModel);
 	config_layout->addWidget(stereoButton, 2, 1);
 
 	auto peakHoldButton = new LedCheckBox(tr("Peak hold"), this);
 	peakHoldButton->setToolTip(tr("Display envelope of peak values"));
 	peakHoldButton->setCheckable(true);
-	peakHoldButton->setMinimumSize(70, 12);
+	peakHoldButton->setMinimumSize(100, 12);
 	peakHoldButton->setModel(&controls->m_peakHoldModel);
 	config_layout->addWidget(peakHoldButton, 3, 1);
 

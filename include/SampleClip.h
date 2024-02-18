@@ -25,7 +25,9 @@
 #ifndef LMMS_SAMPLE_CLIP_H
 #define LMMS_SAMPLE_CLIP_H
 
+#include <memory>
 #include "Clip.h"
+#include "Sample.h"
 
 namespace lmms
 {
@@ -45,14 +47,15 @@ class SampleClip : public Clip
 	Q_OBJECT
 	mapPropertyFromModel(bool,isRecord,setRecord,m_recordModel);
 public:
-	SampleClip( Track * _track );
+	SampleClip(Track* track, Sample sample, bool isPlaying);
+	SampleClip(Track* track);
 	SampleClip( const SampleClip& orig );
 	~SampleClip() override;
 
 	SampleClip& operator=( const SampleClip& that ) = delete;
 
 	void changeLength( const TimePos & _length ) override;
-	const QString & sampleFile() const;
+	const QString& sampleFile() const;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
@@ -61,9 +64,9 @@ public:
 		return "sampleclip";
 	}
 
-	SampleBuffer* sampleBuffer()
+	Sample& sample()
 	{
-		return m_sampleBuffer;
+		return m_sample;
 	}
 
 	TimePos sampleLength() const;
@@ -74,10 +77,10 @@ public:
 
 	bool isPlaying() const;
 	void setIsPlaying(bool isPlaying);
+	void setSampleBuffer(std::shared_ptr<const SampleBuffer> sb);
 
 public slots:
-	void setSampleBuffer( lmms::SampleBuffer* sb );
-	void setSampleFile( const QString & sf );
+	void setSampleFile(const QString& sf);
 	void updateLength();
 	void toggleRecord();
 	void playbackPositionChanged();
@@ -85,7 +88,7 @@ public slots:
 
 
 private:
-	SampleBuffer* m_sampleBuffer;
+	Sample m_sample;
 	BoolModel m_recordModel;
 	bool m_isPlaying;
 

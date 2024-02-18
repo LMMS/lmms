@@ -806,7 +806,7 @@ void SongEditor::updatePosition( const TimePos & t )
 		m_scrollBack = false;
 	}
 
-	const int x = m_timeLine->markerX(t) + 8;
+	const int x = m_timeLine->markerX(t);
 	if( x >= trackOpWidth + widgetWidth -1 )
 	{
 		m_positionLine->show();

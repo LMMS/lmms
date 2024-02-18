@@ -152,9 +152,9 @@ private:
 	QElapsedTimer m_lastPeakTimer_L;
 	QElapsedTimer m_lastPeakTimer_R;
 
-	QPixmap m_back = embed::getIconPixmap("fader_background");
-	QPixmap m_leds = embed::getIconPixmap("fader_leds");
-	QPixmap m_knob = embed::getIconPixmap("fader_knob");
+	QPixmap m_back;
+	QPixmap m_leds;
+	QPixmap m_knob;
 
 	bool m_levelsDisplayedInDBFS;
 

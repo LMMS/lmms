@@ -28,6 +28,7 @@
 
 #include "EnvelopeAndLfoView.h"
 #include "EnvelopeAndLfoParameters.h"
+#include "SampleLoader.h"
 #include "embed.h"
 #include "Engine.h"
 #include "gui_templates.h"
@@ -306,8 +307,7 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 	QString value = StringPairDrag::decodeValue( _de );
 	if( type == "samplefile" )
 	{
-		m_params->m_userWave.setAudioFile(
-					StringPairDrag::decodeValue( _de ) );
+		m_params->m_userWave = SampleLoader::createBufferFromFile(value);
 		m_userLfoBtn->model()->setValue( true );
 		m_params->m_lfoWaveModel.setValue(static_cast<int>(EnvelopeAndLfoParameters::LfoShape::UserDefinedWave));
 		_de->accept();
@@ -316,9 +316,10 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 	else if( type == QString( "clip_%1" ).arg( static_cast<int>(Track::Type::Sample) ) )
 	{
 		DataFile dataFile( value.toUtf8() );
-		m_params->m_userWave.setAudioFile( dataFile.content().
+		auto file = dataFile.content().
 					firstChildElement().firstChildElement().
-					firstChildElement().attribute( "src" ) );
+					firstChildElement().attribute("src");
+		m_params->m_userWave = SampleLoader::createBufferFromFile(file);
 		m_userLfoBtn->model()->setValue( true );
 		m_params->m_lfoWaveModel.setValue(static_cast<int>(EnvelopeAndLfoParameters::LfoShape::UserDefinedWave));
 		_de->accept();
@@ -428,8 +429,6 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 		osc_frames *= 100.0f;
 	}
 
-	// userWaveSample() may be used, called out of loop for efficiency
-	m_params->m_userWave.dataReadLock();
 	float old_y = 0;
 	for( int x = 0; x <= LFO_GRAPH_W; ++x )
 	{
@@ -465,8 +464,7 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 					val = m_randomGraph;
 					break;
 				case EnvelopeAndLfoParameters::LfoShape::UserDefinedWave:
-					val = m_params->m_userWave.
-							userWaveSample( phase );
+					val = Oscillator::userWaveSample(m_params->m_userWave.get(), phase);
 					break;
 			}
 			if( static_cast<f_cnt_t>( cur_sample ) <=
@@ -481,7 +479,6 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 						graph_y_base + cur_y ) );
 		old_y = cur_y;
 	}
-	m_params->m_userWave.dataUnlock();
 
 	p.setPen( QColor( 201, 201, 225 ) );
 	int ms_per_osc = static_cast<int>( SECS_PER_LFO_OSCILLATION *
@@ -499,7 +496,7 @@ void EnvelopeAndLfoView::lfoUserWaveChanged()
 	if( static_cast<EnvelopeAndLfoParameters::LfoShape>(m_params->m_lfoWaveModel.value()) ==
 				EnvelopeAndLfoParameters::LfoShape::UserDefinedWave )
 	{
-		if( m_params->m_userWave.frames() <= 1 )
+		if (m_params->m_userWave->size() <= 1)
 		{
 			TextFloat::displayMessage( tr( "Hint" ),
 				tr( "Drag and drop a sample into this window." ),
