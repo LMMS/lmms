@@ -132,7 +132,6 @@ SET(LMMS_SRCS
 set(LMMS_UIS
 	${LMMS_UIS}
 	gui/modals/about_dialog.ui
-	gui/modals/EffectSelectDialog.ui
 	gui/modals/export_project.ui
 
 	PARENT_SCOPE
