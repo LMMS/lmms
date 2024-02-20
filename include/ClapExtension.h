@@ -69,7 +69,7 @@ private:
 
 /**
  * Template for extensions with both a host and plugin side
-*/
+ */
 template<class HostExt, class PluginExt = void>
 class ClapExtension : public detail::ClapExtensionHelper
 {
@@ -123,13 +123,13 @@ public:
 	 * Returns whether plugin implements required interface
 	 *   and passes any additional checks from initImpl().
 	 * Do not use before init().
-	*/
+	 */
 	auto supported() const { return m_supported; }
 
 	/**
 	 * Checks whether the plugin extension implements the required
 	 *   API methods for use within LMMS. May not be all the methods.
-	*/
+	 */
 	virtual auto checkSupported(const PluginExt& ext) -> bool = 0;
 
 	virtual auto hostExt() const -> const HostExt* = 0;
@@ -142,12 +142,12 @@ protected:
 	 * For additional initialization steps.
 	 * - Only called if basic init was successful
 	 * - pluginExt() is non-null and supported() == true during this call
-	*/
+	 */
 	virtual auto initImpl(const clap_host* host, const clap_plugin* plugin) noexcept -> bool { return true; }
 
 	/**
 	 * For additional deinitialization steps.
-	*/
+	 */
 	virtual void deinitImpl() noexcept {}
 
 	auto host() const { return m_host; }

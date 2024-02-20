@@ -55,20 +55,12 @@ namespace lmms
 {
 
 /**
- * @brief ClapInstance stores a CLAP host/plugin instance pair.
- *
- * When a new CLAP plugin instance is created by the ClapManager,
- * a new clap_host instance needs to be passed to the plugin instance,
- * creating a CLAP host instance / CLAP plugin instance pair.
- * The plugin instance will pass the host pointer whenever it calls the
- * host's API (instead of passing the plugin pointer), and that is how
- * the host instance can know which plugin instance called the host API.
- * 
- * The ClapInstance class implements the CLAP host API and
- *     stores a pointer to a clap_host object. It also provides access
- *     to the plugin instance for making plugin API calls.
+ * ClapInstance is a CLAP instrument/effect processor which
+ * provides basic CLAP functionality plus multiple CLAP extensions.
  *
  * Every ClapInstance is owned by a ClapControlBase object.
+ * For stereo plugins, there is a single stereo ClapInstance,
+ * but for mono plugins, a linked ClapInstance pair is used.
  */
 class LMMS_EXPORT ClapInstance final : public QObject
 {
@@ -114,7 +106,7 @@ public:
 
 	/**
 	 * LMMS audio thread
-	*/
+	 */
 
 	//! Copy values from the LMMS core (connected models, MIDI events, ...) into the respective ports
 	void copyModelsFromCore();
@@ -132,14 +124,14 @@ public:
 
 	/**
 	 * Info
-	*/
+	 */
 
 	auto isValid() const -> bool;
 	auto info() const -> const ClapPluginInfo& { return m_pluginInfo; }
 
 	/**
 	 * Control
-	*/
+	 */
 
 	auto start() -> bool; //!< Loads, inits, and activates in that order
 	auto restart() -> bool;
@@ -166,7 +158,7 @@ public:
 
 	/**
 	 * Extensions
-	*/
+	 */
 
 	auto host() const -> const clap_host* { return &m_host; };
 	auto plugin() const -> const clap_plugin* { return m_plugin; }
@@ -183,7 +175,7 @@ public:
 private:
 	/**
 	 * State
-	*/
+	 */
 
 	void setPluginState(PluginState state);
 	auto isNextStateValid(PluginState next) const -> bool;
@@ -196,7 +188,7 @@ private:
 
 	/**
 	 * Host API implementation
-	*/
+	 */
 
 	static auto clapGetExtension(const clap_host* host, const char* extensionId) -> const void*;
 	static void clapRequestCallback(const clap_host* host);
@@ -206,7 +198,7 @@ private:
 	/**
 	 * Latency extension
 	 * TODO: Fully implement and move to separate class
-	*/
+	 */
 
 	static void clapLatencyChanged(const clap_host* host);
 	static constexpr const clap_host_latency s_clapLatency {
@@ -215,7 +207,7 @@ private:
 
 	/**
 	 * Important data members
-	*/
+	 */
 
 	ClapPluginInfo m_pluginInfo;
 	PluginState m_pluginState = PluginState::None;
@@ -225,7 +217,7 @@ private:
 
 	/**
 	 * Process-related
-	*/
+	 */
 
 	clap_process m_process{};
 	clap::helpers::EventList m_evIn;  // TODO: Find better way to handle param and note events
@@ -233,9 +225,9 @@ private:
 
 	/**
 	 * MIDI
-	*/
+	 */
 
-	// many things here may be moved into the `Instrument` class
+	// TODO: Many things here may be moved into the `Instrument` class
 	static constexpr std::size_t s_maxMidiInputEvents = 1024;
 
 	//! Spinlock for the MIDI ringbuffer (for MIDI events going to the plugin)
@@ -249,7 +241,7 @@ private:
 
 	/**
 	 * Scheduling
-	*/
+	 */
 
 	bool m_scheduleRestart = false;
 	bool m_scheduleDeactivate = false;
@@ -258,7 +250,7 @@ private:
 
 	/**
 	 * Extensions
-	*/
+	 */
 
 	ClapAudioPorts m_audioPorts{ this };
 	ClapGui m_gui{ this };

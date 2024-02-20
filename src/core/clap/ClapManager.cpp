@@ -254,7 +254,7 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 
 			if (loadedFromThisFile)
 			{
-				file.discoverPresets();
+				file.presetDatabase().discover();
 			}
 		}
 	}

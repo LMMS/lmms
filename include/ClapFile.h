@@ -34,7 +34,7 @@
 #include <vector>
 
 #include "ClapPluginInfo.h"
-#include "ClapPresetDiscovery.h"
+#include "ClapPresetDatabase.h"
 #include "lmms_filesystem.h"
 #include "lmms_export.h"
 
@@ -79,7 +79,7 @@ public:
 	//! Includes plugins that failed to load
 	auto pluginCount() const { return m_pluginCount; }
 
-	void discoverPresets();
+	auto presetDatabase() -> auto& { return m_presetDatabase; }
 
 private:
 	void unload() noexcept;
@@ -106,7 +106,7 @@ private:
 	//! Includes plugins that failed to load
 	std::uint32_t m_pluginCount = 0;
 
-	ClapPresetDiscovery m_presetDiscovery;
+	ClapPresetDatabase m_presetDatabase;
 };
 
 } // namespace lmms

@@ -29,7 +29,7 @@
 #include <cassert>
 
 #include "ClapInstance.h"
-#include "ClapPreset.h"
+#include "ClapPresetDatabase.h"
 #include "PathUtil.h"
 
 namespace lmms
@@ -40,39 +40,17 @@ auto ClapPresetLoader::load(const PresetLoadData& preset) -> bool
 	assert(ClapThreadCheck::isMainThread());
 	if (!supported()) { return false; }
 
-	const auto base = PathUtil::baseLookup(preset.location);
+	std::string temp;
+	const auto location = ClapPresetDatabase::toClapLocation(preset.location, temp);
+	if (!location) { return false; }
 
-	clap_preset_discovery_location_kind locationKind;
-	std::string locationStr;
-	const char* location = nullptr;
-	switch (base)
-	{
-		case PathUtil::Base::Internal:
-			locationKind = CLAP_PRESET_DISCOVERY_LOCATION_PLUGIN;
-			//location = nullptr;
-			break;
-		case PathUtil::Base::Absolute:
-			locationKind = CLAP_PRESET_DISCOVERY_LOCATION_FILE;
-			location = preset.location.data();
-			break;
-		default:
-		{
-			locationKind = CLAP_PRESET_DISCOVERY_LOCATION_FILE;
-			if (auto temp = PathUtil::toAbsolute(preset.location))
-			{
-				locationStr = std::move(*temp);
-				location = locationStr.c_str();
-			}
-			else { return false; }
-			break;
-		}
-	}
-
-	if (!pluginExt()->from_location(plugin(), locationKind, location, preset.loadKey.c_str()))
+	if (!pluginExt()->from_location(plugin(), location->first, location->second, preset.loadKey.c_str()))
 	{
 		logger().log(CLAP_LOG_ERROR, "Failed to load preset");
 		return false;
 	}
+
+	// TODO: Mark that this preset is active
 
 	return true;
 }

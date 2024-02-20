@@ -85,14 +85,16 @@ auto ClapTimerSupport::clapRegisterTimer(const clap_host* host, std::uint32_t pe
 	auto& timerSupport = h->timerSupport();
 	if (!timerSupport.supported())
 	{
-		h->logger().log(CLAP_LOG_PLUGIN_MISBEHAVING, "Plugin cannot register a timer when it does not implement the timer support extension");
+		h->logger().log(CLAP_LOG_PLUGIN_MISBEHAVING,
+			"Plugin cannot register a timer when it does not implement the timer support extension");
 		return false;
 	}
 
 	// Period should be no lower than 15 ms (arbitrary)
 	periodMilliseconds = std::max<std::uint32_t>(15, periodMilliseconds);
 
-	const auto id = timerSupport.startTimer(periodMilliseconds);
+	const auto id = timerSupport.startTimer(periodMilliseconds,
+		periodMilliseconds >= 2000 ? Qt::CoarseTimer : Qt::PreciseTimer);
 	if (id <= 0)
 	{
 		h->logger().log(CLAP_LOG_WARNING, "Failed to start timer");

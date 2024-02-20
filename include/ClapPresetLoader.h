@@ -29,6 +29,7 @@
 
 #ifdef LMMS_HAVE_CLAP
 
+#include <optional>
 #include <clap/ext/preset-load.h>
 
 #include "ClapExtension.h"
@@ -37,10 +38,12 @@
 namespace lmms
 {
 
+// TODO: Inherit from PluginPresets
 class ClapPresetLoader final : public ClapExtension<clap_host_preset_load, clap_plugin_preset_load>
 {
 public:
 	using ClapExtension::ClapExtension;
+	~ClapPresetLoader() override = default;
 
 	auto extensionId() const -> std::string_view override { return CLAP_EXT_PRESET_LOAD; }
 	auto extensionIdCompat() const -> std::string_view override { return CLAP_EXT_PRESET_LOAD_COMPAT; }
@@ -60,7 +63,9 @@ private:
 	static void clapLoaded(const clap_host* host, std::uint32_t locationKind,
 		const char* location, const char* loadKey);
 
-	// TODO: Keep track of current preset (and dirty state?)
+	// TODO: Make these plugin-independent? A plugin-independent preset viewer will need them.
+	std::optional<Preset> m_activePreset;
+	bool m_dirty = false; //!< Whether the active preset has been modified
 };
 
 } // namespace lmms

@@ -98,6 +98,8 @@ auto ClapFile::load() -> bool
 		}
 	}
 
+	m_presetDatabase.init(m_entry.get());
+
 	return true;
 }
 
@@ -115,12 +117,6 @@ void ClapFile::unload() noexcept
 		m_library->unload();
 		m_library = nullptr;
 	}
-}
-
-void ClapFile::discoverPresets()
-{
-	// TODO: Run in separate thread?
-	m_presetDiscovery.discover(m_entry.get());
 }
 
 } // namespace lmms

@@ -60,7 +60,7 @@ set(LMMS_SRCS
 	core/Plugin.cpp
 	core/PluginFactory.cpp
 	core/PluginIssue.cpp
-	core/Preset.cpp
+	core/PresetDatabase.cpp
 	core/PresetPreviewPlayHandle.cpp
 	core/ProjectJournal.cpp
 	core/ProjectRenderer.cpp
@@ -120,8 +120,7 @@ set(LMMS_SRCS
 	core/clap/ClapParameter.cpp
 	core/clap/ClapParams.cpp
 	core/clap/ClapPluginInfo.cpp
-	core/clap/ClapPreset.cpp
-	core/clap/ClapPresetDiscovery.cpp
+	core/clap/ClapPresetDatabase.cpp
 	core/clap/ClapPresetLoader.cpp
 	core/clap/ClapState.cpp
 	core/clap/ClapSubPluginFeatures.cpp
