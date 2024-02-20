@@ -288,7 +288,11 @@ void TrackOperationsWidget::clearTrack()
 	t->unlock();
 }
 
+/*! \brief Export this track to an audio file */
+void TrackOperationsWidget::bounceTrack()
+{
 
+}
 
 /*! \brief Remove this track from the track list
  *
@@ -366,6 +370,12 @@ void TrackOperationsWidget::updateMenu()
 	{
 		toMenu->addAction( tr( "Clear this track" ), this, SLOT(clearTrack()));
 	}
+
+	if (!dynamic_cast<AutomationTrackView*>(m_trackView))
+	{
+		toMenu->addAction(tr("Bounce this track"), this, &TrackOperationsWidget::bounceTrack);
+	}
+
 	if (QMenu *mixerMenu = m_trackView->createMixerMenu(tr("Channel %1: %2"), tr("Assign to new Mixer Channel")))
 	{
 		toMenu->addMenu(mixerMenu);
