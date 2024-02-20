@@ -110,6 +110,8 @@ void ClapFile::unload() noexcept
 	// singleton is destroyed after any ClapControlBase objects.
 	// TODO: Enforce this?
 
+	m_presetDatabase.deinit();
+
 	m_entry.reset();
 
 	if (m_library)
