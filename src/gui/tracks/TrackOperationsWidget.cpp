@@ -37,6 +37,9 @@
 #include "ColorChooser.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
+#include "ExportProjectDialog.h"
+#include "FileDialog.h"
+#include "ProjectRenderer.h"
 #include "embed.h"
 #include "Engine.h"
 #include "InstrumentTrackView.h"
@@ -291,7 +294,27 @@ void TrackOperationsWidget::clearTrack()
 /*! \brief Export this track to an audio file */
 void TrackOperationsWidget::bounceTrack()
 {
+	auto dialog = FileDialog{this};
+	dialog.setFileMode(FileDialog::AnyFile);
+	dialog.setAcceptMode(FileDialog::AcceptSave);
+	dialog.setDirectory(ConfigManager::inst()->userSamplesDir());
+	dialog.setNameFilters(ProjectRenderer::availableDescriptions());
+	dialog.setWindowTitle(tr("Select file to bounce track to..."));
 
+	const auto defaultExtension = ProjectRenderer::fileEncodeDevices[0].m_extension;
+	dialog.setDefaultSuffix(defaultExtension);
+
+	const auto track = m_trackView->getTrack();
+	const auto projectName = Engine::getSong()->projectFileName().split('.')[0];
+	const auto fileNamePrefix = projectName.isEmpty() ? "" : projectName + "_";
+	dialog.selectFile(fileNamePrefix + track->name() + defaultExtension);
+
+	if (dialog.exec() == QDialog::Accepted && !dialog.selectedFiles().isEmpty() && !dialog.selectedFiles()[0].isEmpty())
+	{
+		const auto bounceDestination = dialog.selectedFiles()[0];
+		// auto epd = ExportProjectDialog{bounceDestination, m_trackView->getTrack()};
+		// epd.exec();
+	}
 }
 
 /*! \brief Remove this track from the track list

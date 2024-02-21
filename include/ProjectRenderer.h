@@ -72,6 +72,8 @@ public:
 		return m_fileDev != nullptr;
 	}
 
+	static QStringList availableDescriptions();
+
 	static ExportFileFormat getFileFormatFromExtension(
 							const QString & _ext );
 
