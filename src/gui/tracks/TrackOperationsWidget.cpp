@@ -312,8 +312,8 @@ void TrackOperationsWidget::bounceTrack()
 	if (dialog.exec() == QDialog::Accepted && !dialog.selectedFiles().isEmpty() && !dialog.selectedFiles()[0].isEmpty())
 	{
 		const auto bounceDestination = dialog.selectedFiles()[0];
-		// auto epd = ExportProjectDialog{bounceDestination, m_trackView->getTrack()};
-		// epd.exec();
+		auto exportDialog = ExportProjectDialog{bounceDestination, false, m_trackView->getTrack(), this};
+		exportDialog.exec();
 	}
 }
 

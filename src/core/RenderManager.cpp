@@ -66,7 +66,7 @@ void RenderManager::abortProcessing()
 }
 
 // Called to render each new track when rendering tracks individually.
-void RenderManager::renderNextTrack()
+void RenderManager::renderNextTrack(bool useOutputPath)
 {
 	m_activeRenderer.reset();
 
@@ -91,8 +91,25 @@ void RenderManager::renderNextTrack()
 		// for multi-render, prefix each output file with a different number
 		int trackNum = m_tracksToRender.size() + 1;
 
-		render( pathForTrack(renderTrack, trackNum) );
+		render(useOutputPath ? m_outputPath : pathForTrack(renderTrack, trackNum));
 	}
+}
+
+void RenderManager::renderTrack(Track* track)
+{
+	const auto songTracks = Engine::getSong()->tracks();
+	const auto patternTracks = Engine::patternStore()->tracks();
+
+	for (const auto& trackGroup : {songTracks, patternTracks})
+	{
+		for (const auto& otherTrack : trackGroup)
+		{
+			m_unmuted.push_back(otherTrack);
+		}
+	}
+
+	m_tracksToRender.push_back(track);
+	renderNextTrack(true);
 }
 
 // Render the song into individual tracks

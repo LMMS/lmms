@@ -51,6 +51,9 @@ public:
 	/// Export all unmuted tracks into a single file
 	void renderProject();
 
+	//! Export `track` to an audio file.
+	void renderTrack(Track* track);
+
 	/// Export all unmuted tracks into individual file
 	void renderTracks();
 
@@ -61,7 +64,7 @@ signals:
 	void finished();
 
 private slots:
-	void renderNextTrack();
+	void renderNextTrack(bool useOutputPath = false);
 	void updateConsoleProgress();
 
 private:
