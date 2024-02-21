@@ -3,9 +3,6 @@ description: File a bug report to help us improve
 labels:
   - bug
 body:
-  - type: markdown
-    attributes:
-      value: "# Please search the issue tracker for existing bug reports before submitting your own."
   - type: input
     id: system-information
     attributes:
@@ -33,7 +30,6 @@ body:
       label: Most Recent Working Version
       description: |
         - If there is a previous version of LMMS that did not exhibit the bug, please include it here.
-        - Using `git bisect` to determine exactly where the regression occurred will make it easier for LMMS developers to find and fix the bug.
       placeholder: ex. 1.2.2, 1.3.0-alpha.1.518+gdd53bec31, 2d185df
     validations:
       required: false
@@ -56,7 +52,7 @@ body:
     attributes:
       label: Steps To Reproduce
       description: |
-        - Describe the minimum steps one can follow to reproduce this bug for themself.
+        - Describe the minimum set of steps required to reproduce this bug.
         - If you included an MRP below, you can describe here how it should be used.
     validations:
       required: true
@@ -65,8 +61,7 @@ body:
     attributes:
       label: Logs
       description: |
-        - Please copy and paste any relevant log output where instructed.
-        - LMMS log output can be obtained by running it via the console.
+        - Please copy and paste any relevant log output into the code block below.
       value: |
         <details>
         <summary>Click to expand</summary>
@@ -83,3 +78,11 @@ body:
       description: |
         - Please upload any screenshots showing the bug in action.
         - If possible, also include a .mmp/.mmpz project containing the simplest possible setup needed to reproduce the bug.
+        ***Note:** To upload a project file to GitHub, it will need to placed in a .zip archive.*
+  - type: checkboxes
+    id: search-for-existing
+    attributes:
+      label: "# Please search the issue tracker for existing bug reports before submitting your own."
+      options:
+        - label: I have searched all existing issues and confirmed that this is not a duplicate.
+          required: true

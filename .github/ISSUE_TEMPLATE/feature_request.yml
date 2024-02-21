@@ -12,16 +12,7 @@ body:
       label: Enhancement Summary
       description: |
         - Briefly describe the enhancement.
-        - Explain how the proposed enhancement helps overcome a limitation of LMMS you are currently facing.
-    validations:
-      required: true
-  - type: textarea
-    id: justification
-    attributes:
-      label: Justification
-      description: |
-        - Describe why you believe this to be a good idea, and how you think it would improve LMMS.
-        - Is there a reason why this should be included in LMMS itself and not as a plugin?
+        - Explain why you believe the proposed enhancement to be a good idea, and (if applicable) how it helps overcome a limitation of LMMS you are currently facing.
     validations:
       required: true
   - type: textarea
@@ -33,3 +24,10 @@ body:
         - If your proposal encompasses changes to the user interface, please include **diagrams** displaying your intent.
     validations:
       required: true
+  - type: checkboxes
+    id: search-for-existing
+    attributes:
+      label: "# Please search the issue tracker for existing feature requests before submitting your own."
+      options:
+        - label: I have searched all existing issues and confirmed that this is not a duplicate.
+          required: true
