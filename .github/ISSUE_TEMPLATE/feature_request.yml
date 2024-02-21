@@ -27,7 +27,7 @@ body:
   - type: checkboxes
     id: search-for-existing
     attributes:
-      label: "# Please search the issue tracker for existing feature requests before submitting your own."
+      label: Please search the issue tracker for existing feature requests before submitting your own.
       options:
         - label: I have searched all existing issues and confirmed that this is not a duplicate.
           required: true

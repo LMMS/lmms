@@ -61,7 +61,7 @@ body:
     attributes:
       label: Logs
       description: |
-        - Please copy and paste any relevant log output into the code block below.
+        - Please copy and paste any relevant log output here.
       value: |
         <details>
         <summary>Click to expand</summary>
@@ -78,11 +78,12 @@ body:
       description: |
         - Please upload any screenshots showing the bug in action.
         - If possible, also include a .mmp/.mmpz project containing the simplest possible setup needed to reproduce the bug.
+
         ***Note:** To upload a project file to GitHub, it will need to placed in a .zip archive.*
   - type: checkboxes
     id: search-for-existing
     attributes:
-      label: "# Please search the issue tracker for existing bug reports before submitting your own."
+      label: Please search the issue tracker for existing bug reports before submitting your own.
       options:
         - label: I have searched all existing issues and confirmed that this is not a duplicate.
           required: true
