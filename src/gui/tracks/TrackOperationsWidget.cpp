@@ -292,14 +292,14 @@ void TrackOperationsWidget::clearTrack()
 }
 
 /*! \brief Export this track to an audio file */
-void TrackOperationsWidget::bounceTrack()
+void TrackOperationsWidget::exportTrack()
 {
 	auto dialog = FileDialog{this};
 	dialog.setFileMode(FileDialog::AnyFile);
 	dialog.setAcceptMode(FileDialog::AcceptSave);
 	dialog.setDirectory(ConfigManager::inst()->userSamplesDir());
 	dialog.setNameFilters(ProjectRenderer::availableDescriptions());
-	dialog.setWindowTitle(tr("Select file to bounce track to..."));
+	dialog.setWindowTitle(tr("Export track to..."));
 
 	const auto defaultExtension = ProjectRenderer::fileEncodeDevices[0].m_extension;
 	dialog.setDefaultSuffix(defaultExtension);
@@ -311,8 +311,7 @@ void TrackOperationsWidget::bounceTrack()
 
 	if (dialog.exec() == QDialog::Accepted && !dialog.selectedFiles().isEmpty() && !dialog.selectedFiles()[0].isEmpty())
 	{
-		const auto bounceDestination = dialog.selectedFiles()[0];
-		auto exportDialog = ExportProjectDialog{bounceDestination, false, m_trackView->getTrack(), this};
+		auto exportDialog = ExportProjectDialog{dialog.selectedFiles()[0], false, m_trackView->getTrack(), this};
 		exportDialog.exec();
 	}
 }
@@ -396,7 +395,7 @@ void TrackOperationsWidget::updateMenu()
 
 	if (!dynamic_cast<AutomationTrackView*>(m_trackView))
 	{
-		toMenu->addAction(tr("Bounce this track"), this, &TrackOperationsWidget::bounceTrack);
+		toMenu->addAction(tr("Export this track"), this, &TrackOperationsWidget::exportTrack);
 	}
 
 	if (QMenu *mixerMenu = m_trackView->createMixerMenu(tr("Channel %1: %2"), tr("Assign to new Mixer Channel")))
