@@ -25,6 +25,7 @@
 #include <QDir>
 #include <QRegularExpression>
 
+#include "AutomationTrack.h"
 #include "RenderManager.h"
 
 #include "PatternStore.h"
@@ -66,7 +67,7 @@ void RenderManager::abortProcessing()
 }
 
 // Called to render each new track when rendering tracks individually.
-void RenderManager::renderNextTrack(bool useOutputPath)
+void RenderManager::renderNextTrack()
 {
 	m_activeRenderer.reset();
 
@@ -91,7 +92,7 @@ void RenderManager::renderNextTrack(bool useOutputPath)
 		// for multi-render, prefix each output file with a different number
 		int trackNum = m_tracksToRender.size() + 1;
 
-		render(useOutputPath ? m_outputPath : pathForTrack(renderTrack, trackNum));
+		render(pathForTrack(renderTrack, trackNum));
 	}
 }
 
@@ -104,12 +105,17 @@ void RenderManager::renderTrack(Track* track)
 	{
 		for (const auto& otherTrack : trackGroup)
 		{
-			m_unmuted.push_back(otherTrack);
+			if (dynamic_cast<AutomationTrack*>(otherTrack)) { continue; }
+
+			if (!otherTrack->isMuted() && otherTrack != track)
+			{
+				m_unmuted.push_back(otherTrack);
+				otherTrack->setMuted(true);
+			}
 		}
 	}
 
-	m_tracksToRender.push_back(track);
-	renderNextTrack(true);
+	render(m_outputPath);
 }
 
 // Render the song into individual tracks

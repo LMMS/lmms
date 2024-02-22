@@ -64,7 +64,7 @@ signals:
 	void finished();
 
 private slots:
-	void renderNextTrack(bool useOutputPath = false);
+	void renderNextTrack();
 	void updateConsoleProgress();
 
 private:
