@@ -76,7 +76,8 @@ public:
 
 	void write( QTextStream& strm );
 	bool writeFile(const QString& fn, bool withResources = false);
-	bool copyResources(const QString& resourcesDir); //!< Copies resources to the resourcesDir and changes the DataFile to use local paths to them
+	// Copies resources to the resourcesDir and changes the DataFile to use local paths to them
+	bool copyResources(const QString& resourcesDir);
 	bool hasLocalPlugins(QDomElement parent = QDomElement(), bool firstCall = true) const;
 
 	QDomElement& content()
@@ -94,6 +95,8 @@ public:
 		return m_type;
 	}
 
+	// Detects the number of necessary upgrade routines based on how outdated of a version of LMMS a file originated from.
+	// Note: many of these legacy upgrade routines are upwards of 15 years old, and can/should probably be removed in a future version of LMMS.
 	unsigned int legacyFileVersion();
 
 private:

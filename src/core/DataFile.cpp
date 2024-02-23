@@ -219,8 +219,9 @@ bool DataFile::validate( QString extension )
 		}
 		break;
 	case Type::Unknown:
-		if (! ( extension == "mmp" || extension == "mpt" || extension == "mmpz" ||
+		if (extension == "mmp" || extension == "mpt" || extension == "mmpz" ||
 				extension == "xpf" || extension == "xml" ||
+				extension == "xpt" || extension == "xptz" ||
 				( extension == "xiz" && ! getPluginFactory()->pluginSupportingExtension(extension).isNull()) ||
 				extension == "sf2" || extension == "sf3" || extension == "pat" || extension == "mid" ||
 				extension == "dll"
@@ -230,18 +231,11 @@ bool DataFile::validate( QString extension )
 #ifdef LMMS_HAVE_LV2
 				|| extension == "lv2"
 #endif
-				) )
-		{
-			return true;
-		}
-		if( extension == "wav" || extension == "ogg" || extension == "ds"
-#ifdef LMMS_HAVE_SNDFILE_MP3
-				|| extension == "mp3"
-#endif
 				)
 		{
-			return true;
+			return false;
 		}
+		return true;
 		break;
 	default:
 		return false;
@@ -2060,8 +2054,7 @@ void findIds(const QDomElement& elem, QList<jo_id_t>& idList)
 }
 
 unsigned int DataFile::legacyFileVersion()
-{
-	// Version of LMMs that created this project
+{	// Version of LMMS that created this project
 	ProjectVersion creator =
 		documentElement().attribute( "creatorversion" ).
 		replace( "svn", "" );
