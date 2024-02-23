@@ -40,6 +40,8 @@
 #include "ExportProjectDialog.h"
 #include "FileDialog.h"
 #include "ProjectRenderer.h"
+#include "SampleClip.h"
+#include "TimePos.h"
 #include "embed.h"
 #include "Engine.h"
 #include "InstrumentTrackView.h"
@@ -291,7 +293,7 @@ void TrackOperationsWidget::clearTrack()
 	t->unlock();
 }
 
-/*! \brief Export this track to an audio file */
+/*! \brief Export this track to an audio file and add it to the project */
 void TrackOperationsWidget::bounceTrack()
 {
 	auto dialog = FileDialog{this};
@@ -304,7 +306,7 @@ void TrackOperationsWidget::bounceTrack()
 	const auto defaultExtension = ProjectRenderer::fileEncodeDevices[0].m_extension;
 	dialog.setDefaultSuffix(defaultExtension);
 
-	const auto track = m_trackView->getTrack();
+	auto track = m_trackView->getTrack();
 	const auto projectName = Engine::getSong()->projectFileName().split('.')[0];
 	const auto fileNamePrefix = projectName.isEmpty() ? "" : projectName + "_";
 	dialog.selectFile(fileNamePrefix + track->name() + defaultExtension);
@@ -314,6 +316,12 @@ void TrackOperationsWidget::bounceTrack()
 		const auto bounceDestination = dialog.selectedFiles()[0];
 		auto exportDialog = ExportProjectDialog{bounceDestination, false, m_trackView->getTrack(), this};
 		exportDialog.exec();
+
+		auto guard = Engine::audioEngine()->requestChangesGuard();
+		auto bouncedTrack = Track::create(Track::Type::Sample, Engine::getSong());
+		auto bouncedClip = static_cast<SampleClip*>(bouncedTrack->createClip(TimePos{}));
+		bouncedClip->setSampleFile(bounceDestination);
+		track->setMuted(true);
 	}
 }
 
