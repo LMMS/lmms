@@ -260,12 +260,14 @@ jobs:
       - name: Cache ccache data
         uses: actions/cache@v3
         with:
+          # yamllint disable rule:line-length
           key: "ccache-${{ github.job }}-${{ matrix.arch }}-${{ github.ref }}\
             -${{ github.run_id }}"
           restore-keys: |
             ccache-${{ github.job }}-${{ matrix.arch }}-${{ github.ref }}-
             ccache-${{ github.job }}-${{ matrix.arch }}-
           path: ~\AppData\Local\ccache
+          # yamllint enable rule:line-length
       - name: Install tools
         run: choco install ccache
       - name: Install Qt
