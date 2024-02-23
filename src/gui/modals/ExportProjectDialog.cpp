@@ -35,12 +35,12 @@ namespace lmms::gui
 {
 
 ExportProjectDialog::ExportProjectDialog(
-	const QString& exportLocation, bool exportStems, Track* trackToExport, QWidget* parent)
+	const QString& exportLocation, bool exportStems, Track* trackToBounce, QWidget* parent)
 	: QDialog(parent)
 	, Ui::ExportProjectDialog()
 	, m_exportLocation(exportLocation)
 	, m_exportTracks(exportStems)
-	, m_trackToExport(trackToExport)
+	, m_trackToBounce(trackToBounce)
 	, m_renderManager(nullptr)
 {
 	setupUi( this );
@@ -194,7 +194,7 @@ void ExportProjectDialog::startExport()
 	connect( m_renderManager.get(), SIGNAL(finished()),
 			getGUI()->mainWindow(), SLOT(resetWindowTitle()));
 
-	if (m_trackToExport) { m_renderManager->renderTrack(m_trackToExport); }
+	if (m_trackToBounce) { m_renderManager->renderTrack(m_trackToBounce); }
 	else if (m_exportTracks) { m_renderManager->renderTracks(); }
 	else { m_renderManager->renderProject(); }
 }
