@@ -736,8 +736,12 @@ add_sanitizer(undefined "GNU|Clang" WANT_DEBUG_UBSAN STATUS_DEBUG_UBSAN -fno-san
 include(CompileCache)
 
 # enable LTO (link-time optimizations)
-IF(ENABLE_LTO)
-	set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+include(CheckIPOSupported)
+check_ipo_supported(RESULT result)
+IF(result)
+	IF(ENABLE_LTO)
+		set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+	ENDIF()
 ENDIF()
 
 # make sub-directories
