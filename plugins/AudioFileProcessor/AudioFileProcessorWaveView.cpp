@@ -65,8 +65,8 @@ f_cnt_t AudioFileProcessorWaveView::range() const
 	return m_to - m_from;
 }
 
-AudioFileProcessorWaveView::AudioFileProcessorWaveView(QWidget * parent, int w, int h, Sample const * buf,
-	knob * start, knob * end, knob * loop) :
+AudioFileProcessorWaveView::AudioFileProcessorWaveView(QWidget* parent, int w, int h, Sample const* buf,
+	knob* start, knob* end, knob* loop) :
 	QWidget(parent),
 	m_sample(buf),
 	m_graph(QPixmap(w - 2 * s_padding, h - 2 * s_padding)),

@@ -147,7 +147,7 @@ private:
 
 public:
 	AudioFileProcessorWaveView(QWidget* parent, int w, int h, Sample const* buf,
-		knob * start, knob * end, knob * loop);
+		knob* start, knob* end, knob* loop);
 
 
 	void updateSampleRange();
