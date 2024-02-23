@@ -103,6 +103,7 @@ option(WANT_DEBUG_TSAN	"Enable ThreadSanitizer" OFF)
 option(WANT_DEBUG_MSAN	"Enable MemorySanitizer" OFF)
 option(WANT_DEBUG_UBSAN	"Enable UndefinedBehaviorSanitizer" OFF)
 OPTION(BUNDLE_QT_TRANSLATIONS	"Install Qt translation files for LMMS" OFF)
+OPTION(ENABLE_LTO	"Enable LTO (link-time optimizations)" ON)
 
 
 IF(LMMS_BUILD_APPLE)
@@ -733,6 +734,11 @@ add_sanitizer(undefined "GNU|Clang" WANT_DEBUG_UBSAN STATUS_DEBUG_UBSAN -fno-san
 
 # use ccache
 include(CompileCache)
+
+# enable LTO (link-time optimizations)
+IF(ENABLE_LTO)
+	set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+ENDIF()
 
 # make sub-directories
 ADD_SUBDIRECTORY(cmake)
