@@ -297,7 +297,7 @@ void TrackOperationsWidget::bounceTrack()
 	auto dialog = FileDialog{this};
 	dialog.setFileMode(FileDialog::AnyFile);
 	dialog.setAcceptMode(FileDialog::AcceptSave);
-	dialog.setDirectory(ConfigManager::inst()->userSamplesDir());
+	dialog.setDirectory(ConfigManager::inst()->userProjectsDir());
 	dialog.setNameFilters(ProjectRenderer::availableDescriptions());
 	dialog.setWindowTitle(tr("Select file to bounce track to..."));
 
