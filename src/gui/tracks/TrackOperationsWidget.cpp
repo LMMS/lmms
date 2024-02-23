@@ -296,6 +296,8 @@ void TrackOperationsWidget::clearTrack()
 /*! \brief Export this track to an audio file and add it to the project */
 void TrackOperationsWidget::bounceTrack()
 {
+	// TODO: Considering creating new projects in their own folders to have a dedicated place to store samples like
+	// these, removing the need for `FileDialog`
 	auto dialog = FileDialog{this};
 	dialog.setFileMode(FileDialog::AnyFile);
 	dialog.setAcceptMode(FileDialog::AcceptSave);
@@ -315,13 +317,20 @@ void TrackOperationsWidget::bounceTrack()
 	{
 		const auto bounceDestination = dialog.selectedFiles()[0];
 		auto exportDialog = ExportProjectDialog{bounceDestination, false, m_trackView->getTrack(), this};
-		exportDialog.exec();
 
-		auto guard = Engine::audioEngine()->requestChangesGuard();
-		auto bouncedTrack = Track::create(Track::Type::Sample, Engine::getSong());
-		auto bouncedClip = static_cast<SampleClip*>(bouncedTrack->createClip(TimePos{}));
-		bouncedClip->setSampleFile(bounceDestination);
-		track->setMuted(true);
+		if (exportDialog.exec() == QDialog::Accepted)
+		{
+			auto guard = Engine::audioEngine()->requestChangesGuard();
+			auto containerView = m_trackView->trackContainerView();
+
+			auto bouncedTrack = Track::create(Track::Type::Sample, containerView->model());
+			auto bouncedClip = static_cast<SampleClip*>(bouncedTrack->createClip(TimePos{}));
+			bouncedClip->setSampleFile(bounceDestination);
+			track->setMuted(true);
+
+			auto bouncedTrackView = containerView->createTrackView(bouncedTrack);
+			containerView->moveTrackView(bouncedTrackView, containerView->trackViews().indexOf(m_trackView));
+		}
 	}
 }
 
