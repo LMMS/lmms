@@ -208,11 +208,11 @@ Note * MidiClip::addNote( const Note & _new_note, const bool _quant_pos )
 
 
 
-NoteVector::const_iterator MidiClip::removeNote(NoteVector::const_iterator note)
+NoteVector::const_iterator MidiClip::removeNote(NoteVector::const_iterator it)
 {
 	instrumentTrack()->lock();
-	delete *note;
-	auto new_it = m_notes.erase(note);
+	delete *it;
+	auto new_it = m_notes.erase(it);
 	instrumentTrack()->unlock();
 
 	checkType();
