@@ -1,0 +1,74 @@
+/*
+ * AmplifierControls.cpp - controls for amplifier effect
+ *
+ * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
+ * This file is part of LMMS - https://lmms.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ *
+ */
+
+#include <QDomElement>
+
+#include "FFTFilterControls.h"
+#include "FFTFilter.h"
+#include "PointGraph.h"
+
+namespace lmms
+{
+
+FFTFilterControls::FFTFilterControls(FFTFilterEffect* effect) :
+	EffectControls(effect),
+	m_effect(effect),
+	m_volumeModel(100.0f, 0.0f, 200.0f, 0.1f, this, tr("Volume")),
+	m_freqControlModel(100.0f, 0.0f, 200.0f, 0.1f, this, tr("Freq")),
+	m_effectControlModel(0.0f, -100.0f, 100.0f, 0.1f, this, tr("Effect")),
+	m_bufferModel(16, 2, 2048, this, "Quality"),
+	//m_filterModel(0.0f, 1.0f, 200, this),
+	m_displayFFTModel( true, this, tr("Display fft")),
+	m_graphModel(1024, this, false)
+{
+	m_graphModel.addArray();
+}
+
+
+void FFTFilterControls::loadSettings(const QDomElement& parent)
+{
+	m_volumeModel.loadSettings(parent, "volume");
+	m_freqControlModel.loadSettings(parent, "freqcontrol");
+	m_effectControlModel.loadSettings(parent, "effectcontrol");
+	m_bufferModel.loadSettings(parent, "buffer");
+	m_displayFFTModel.loadSettings(parent, "display");
+}
+
+
+void FFTFilterControls::saveSettings(QDomDocument& doc, QDomElement& parent)
+{
+	m_volumeModel.saveSettings(doc, parent, "volume"); 
+	m_freqControlModel.saveSettings(doc, parent, "freqcontrol"); 
+	m_effectControlModel.saveSettings(doc, parent, "effectcontrol"); 
+	m_bufferModel.saveSettings(doc, parent, "buffer"); 
+	m_displayFFTModel.saveSettings(doc, parent, "display"); 
+}
+
+void FFTFilterControls::resetClicked()
+{
+
+}
+
+} // namespace lmms
