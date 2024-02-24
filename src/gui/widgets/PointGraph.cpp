@@ -79,16 +79,16 @@ void PointGraphView::setFillColor(QColor colorIn, unsigned int dataArrayLocation
 	}
 }
 
-std::pair<unsigned int, float> PointGraphView::getSelectedData()
+std::pair<float, float> PointGraphView::getSelectedData()
 {
-	std::pair<unsigned int, float> output(0, -2.0f);
+	std::pair<float, float> output(0, -2.0f);
 	if (m_isSelected == true)
 	{
 		output = *model()->getDataArray(m_selectedArray)->getData(m_selectedLocation);
 	}
 	return output;
 }
-void PointGraphView::setSelectedData(std::pair<unsigned int, float> dataIn)
+void PointGraphView::setSelectedData(std::pair<float, float> dataIn)
 {
 	if (m_isSelected == true)
 	{
@@ -118,7 +118,7 @@ void PointGraphView::mousePressEvent(QMouseEvent* me)
 			if (m_isSelected == true)
 			{
 				// display dialog
-				std::pair<unsigned int, float> curData = showInputDialog();
+				std::pair<float, float> curData = showInputDialog();
 				// change data
 				setSelectedData(curData);
 			}
@@ -162,7 +162,7 @@ void PointGraphView::mouseReleaseEvent(QMouseEvent* me)
 			qDebug("release size: %ld", model()->getDataArraySize());
 			for(unsigned int i = 0; i < model()->getDataArraySize(); i++)
 			{
-				std::pair<unsigned int, float> curMouseData = mapMousePos(x, y,
+				std::pair<float, float> curMouseData = mapMousePos(x, y,
 					model()->getDataArray(i)->getNonNegative()); // TODO optimize
 				int location = model()->getDataArray(i)->add(curMouseData.first);
 				// if adding was successful
@@ -202,7 +202,7 @@ void PointGraphView::mouseDoubleClickEvent(QMouseEvent * me)
 	if (m_isSelected == true && me->button() == Qt::LeftButton)
 	{
 		// display dialog
-		std::pair<unsigned int, float> curData = showInputDialog();
+		std::pair<float, float> curData = showInputDialog();
 		// change data
 		setSelectedData(curData);
 	}
@@ -243,7 +243,7 @@ void PointGraphView::paintEvent(QPaintEvent* pe)
 	qDebug("paint size: %d", length);
 			for (unsigned int j = 0; j < length - 1; j++)
 			{
-				std::pair<int, int> posB = mapDataPos(*dataArray->getData(j + 1), dataArray->getNonNegative());
+				posB = mapDataPos(*dataArray->getData(j + 1), dataArray->getNonNegative());
 				// x1, y1, x2, y2
 	//qDebug("paint positions: x: %d, y: %d, x2: %d, y2: %d", posA.first, posA.second, posB.first, posB.second);
 				p.drawLine(posA.first, posA.second, posB.first, posB.second);
@@ -271,38 +271,38 @@ void PointGraphView::updateGraph()
 	update();
 }
 
-std::pair<unsigned int, float> PointGraphView::mapMousePos(int xIn, int yIn, bool nonNegativeIn)
+std::pair<float, float> PointGraphView::mapMousePos(int xIn, int yIn, bool nonNegativeIn)
 {
 	if (nonNegativeIn == true)
 	{
-		// mapping the position to 0 - m_maxLength, 0 - 1 using qWidget width and height
-		return std::pair<unsigned int, float>(
-			static_cast<unsigned int>(xIn * (model()->getMaxLength() - 1) / width()),
+		// mapping the position to 0 - 1, 0 - 1 using qWidget width and height
+		return std::pair<float, float>(
+			static_cast<float>(xIn / (float)width()),
 			static_cast<float>(yIn / (float)height()));
 	}
 	else
 	{
-		// mapping the position to 0 - m_maxLength, -1 - 1 using qWidget width and height
-		return std::pair<unsigned int, float>(
-			static_cast<unsigned int>(xIn * (model()->getMaxLength() - 1) / width()),
+		// mapping the position to 0 - 1, -1 - 1 using qWidget width and height
+		return std::pair<float, float>(
+			static_cast<float>(xIn / (float)width()),
 			static_cast<float>((yIn * 2.0f / (float)height()) - 1.0f));
 	}
 }
-std::pair<int, int> PointGraphView::mapDataPos(std::pair<unsigned int, float> posIn,
+std::pair<int, int> PointGraphView::mapDataPos(std::pair<float, float> posIn,
 	bool nonNegativeIn)
 {
 	if (nonNegativeIn == true)
 	{
 		// mapping the point/sample positon to mouse/view position
 		return std::pair<int, int>(
-			static_cast<int>(posIn.first * width() / model()->getMaxLength()),
+			static_cast<int>(posIn.first * width()),
 			static_cast<int>(posIn.second * height()));
 	}
 	else
 	{
 		// mapping the point/sample positon to mouse/view position
 		return std::pair<int, int>(
-			static_cast<int>(posIn.first * width() / model()->getMaxLength()),
+			static_cast<int>(posIn.first * width()),
 			static_cast<int>((posIn.second / 2.0f + 0.5f) * height()));
 	}
 }
@@ -312,32 +312,32 @@ float PointGraphView::getDistance(int xAIn, int yAIn, int xBIn, int yBIn)
 	return std::sqrt(static_cast<float>((xAIn - xBIn) * (xAIn - xBIn) + (yAIn - yBIn) * (yAIn - yBIn)));
 }
 
-std::pair<unsigned int, float> PointGraphView::showInputDialog()
+std::pair<float, float> PointGraphView::showInputDialog()
 {
-	std::pair<unsigned int, float> curData(0, 0.0f);
+	std::pair<float, float> curData(0.0f, 0.0f);
 	if (m_isSelected == true)
 	{
 		curData = getSelectedData();
-		double minValue = model()->getDataArray(m_selectedArray)->getNonNegative() == true ? 0.0 : -1.0;
+		double minValue = model()->getDataArray(m_selectedArray)->getNonNegative() == true ? 0.0 : -100.0;
 
 		// show position input dialog
 		bool ok;
 		double changedPos = QInputDialog::getDouble(this, tr("Set value"),
-			tr("Please enter a new value between 0 and ") + QString::number(model()->getMaxLength()),
-			static_cast<double>(curData.first),
-			0.0, static_cast<double>(model()->getMaxLength()), 0, &ok);
+			tr("Please enter a new value between 0 and ") + QString::number(100.0),
+			static_cast<double>(curData.first * 100.0f),
+			0.0, 100.0, 0, &ok);
 		if (ok == true)
 		{
-			curData.first = static_cast<unsigned int>(changedPos);
+			curData.first = static_cast<float>(changedPos) / 100.0f;
 		}
 
 		double changedValue = QInputDialog::getDouble(this, tr("Set value"),
-			tr("Please enter a new value between") + QString::number(minValue) + tr(" and 1.0"),
-			static_cast<double>(curData.second),
-			minValue, 1.0, 2, &ok);
+			tr("Please enter a new value between ") + QString::number(minValue) + tr(" and 100"),
+			static_cast<double>(curData.second * 100.0f),
+			minValue, 100.0, 2, &ok);
 		if (ok == true)
 		{
-			curData.second = static_cast<unsigned int>(changedValue);
+			curData.second = static_cast<float>(changedValue) / 100.0f;
 		}
 	}
 	return curData;
@@ -351,9 +351,9 @@ void PointGraphView::selectData(int mouseXIn, int mouseYIn)
 	m_selectedArray = 0;
 	m_isSelected = false;
 
-	std::pair<unsigned int, float> transformedMouseA = mapMousePos(mouseXIn, mouseYIn, false);
-	std::pair<unsigned int, float> transformedMouseB = mapMousePos(mouseXIn, mouseYIn, true);
-	std::pair<unsigned int, float>* transformedMouse = &transformedMouseA;
+	std::pair<float, float> transformedMouseA = mapMousePos(mouseXIn, mouseYIn, false);
+	std::pair<float, float> transformedMouseB = mapMousePos(mouseXIn, mouseYIn, true);
+	std::pair<float, float>* transformedMouse = &transformedMouseA;
 
 	for (unsigned int i = 0; i < model()->getDataArraySize(); i++)
 	{
@@ -439,7 +439,7 @@ PointGraphModel::~PointGraphModel()
 	m_dataArrays.clear();
 }
 
-unsigned int PointGraphModel::addArray(std::vector<std::pair<unsigned int, float>>* arrayIn)
+unsigned int PointGraphModel::addArray(std::vector<std::pair<float, float>>* arrayIn)
 {
 	unsigned int location = addArray();
 	m_dataArrays[location].setDataArray(arrayIn);
@@ -627,10 +627,10 @@ QColor* PointGraphDataArray::getFillColor()
 
 // array:
 
-int PointGraphDataArray::add(unsigned int posIn)
+int PointGraphDataArray::add(float posIn)
 {
 	int location = -1;
-	if (posIn < *m_maxLength)
+	if (m_dataArray.size() < *m_maxLength)
 	{
 	qDebug("add 1. success");
 		bool found = false;
@@ -654,7 +654,7 @@ int PointGraphDataArray::add(unsigned int posIn)
 						targetLocation++;
 					}
 				}
-				m_dataArray.push_back(std::pair<unsigned int, float>(posIn, 0.0f));
+				m_dataArray.push_back(std::pair<float, float>(posIn, 0.0f));
 	qDebug("add 4. success, target: %d", targetLocation);
 				swap(m_dataArray.size() - 1, targetLocation, true);
 				dataChangedVal = true;
@@ -662,7 +662,7 @@ int PointGraphDataArray::add(unsigned int posIn)
 			else if (m_dataArray.size() <= 0)
 			{
 	qDebug("add 5. success");
-				m_dataArray.push_back(std::pair<unsigned int, float>(posIn, 0.0f));
+				m_dataArray.push_back(std::pair<float, float>(posIn, 0.0f));
 				targetLocation = 0;
 				dataChangedVal = true;
 			}
@@ -704,9 +704,9 @@ void PointGraphDataArray::formatArray(bool clampIn, bool sortIn)
 	{
 		for (unsigned int i = 0; i < m_dataArray.size(); i++)
 		{
-			if (m_dataArray[i].first > *m_maxLength)
+			if (m_dataArray[i].first > 1)
 			{
-				m_dataArray[i].first = *m_maxLength;
+				m_dataArray[i].first = 1;
 			}
 			if (m_dataArray[i].second > 1)
 			{
@@ -734,7 +734,7 @@ void PointGraphDataArray::formatArray(bool clampIn, bool sortIn)
 	if (sortIn == true)
 	{
 		std::sort(m_dataArray.begin(), m_dataArray.end(),
-			[](std::pair<unsigned int, float> a, std::pair<unsigned int, float> b)
+			[](std::pair<float, float> a, std::pair<float, float> b)
 			{
 				return a.first > b.first;
 			});
@@ -759,7 +759,7 @@ void PointGraphDataArray::formatArray(bool clampIn, bool sortIn)
 	}
 }
 
-int PointGraphDataArray::getLocation(unsigned int posIn)
+int PointGraphDataArray::getLocation(float posIn)
 {
 	bool found = false;
 	int location = getNearestLocation(posIn, &found);
@@ -770,9 +770,9 @@ int PointGraphDataArray::getLocation(unsigned int posIn)
 	return location;
 }
 
-int PointGraphDataArray::getNearestLocation(unsigned int posIn, bool* foundOut)
+int PointGraphDataArray::getNearestLocation(float posIn, bool* foundOut)
 {
-	if (posIn < *m_maxLength && m_dataArray.size() > 0)
+	if (m_dataArray.size() > 0)
 	{
 		int start = 0;
 		int end = m_dataArray.size() - 1;
@@ -782,7 +782,7 @@ int PointGraphDataArray::getNearestLocation(unsigned int posIn, bool* foundOut)
 		{
 			mid = start + (end - start) / 2;
 	qDebug("getNearestLocation, mid: %d, start: %d, end: %d", mid, start, end);
-	qDebug("getNearestLocation, val: %d, pos: %d", m_dataArray[mid].first, posIn);
+	qDebug("getNearestLocation, val: %f, pos: %f", m_dataArray[mid].first, posIn);
 			if (m_dataArray[mid].first == posIn)
 			{
 				*foundOut = true;
@@ -804,8 +804,8 @@ int PointGraphDataArray::getNearestLocation(unsigned int posIn, bool* foundOut)
 			mid = mid - 1;
 		}
 		if (mid + 1 < m_dataArray.size() &&
-			std::abs(static_cast<int>(m_dataArray[mid].first) - static_cast<int>(posIn)) >
-			std::abs(static_cast<int>(m_dataArray[mid + 1].first) - static_cast<int>(posIn)))
+			std::abs(static_cast<float>(m_dataArray[mid].first) - posIn) >
+			std::abs(static_cast<float>(m_dataArray[mid + 1].first) - posIn))
 		{
 			outputDif = 1;
 		}
@@ -813,16 +813,16 @@ int PointGraphDataArray::getNearestLocation(unsigned int posIn, bool* foundOut)
 		*foundOut = false;
 		return mid + outputDif;
 	}
-	qDebug("getNearestLocation, posIn: %d", posIn);
+	qDebug("getNearestLocation, posIn: %f", posIn);
 	*foundOut = false;
 	return -1;
 }
 
 float PointGraphDataArray::getValueAtPositon(float posIn)
 {
-	float posB = posIn / static_cast<float>(*m_maxLength);
+	float posB = posIn;
 	bool found = false;
-	unsigned int location = getNearestLocation(static_cast<unsigned int>(posIn), &found);
+	unsigned int location = getNearestLocation(posIn, &found);
 	if (location >= 0)
 	{
 		if (found == true)
@@ -863,8 +863,8 @@ void PointGraphDataArray::setValue(unsigned int locationIn, float valueIn)
 {
 	if (m_isFixedValue == false)
 	{
-		if (m_isFixedEndPoints == true && locationIn < m_dataArray.size() - 1
-			&& locationIn > 0 || m_isFixedEndPoints == false)
+		if ((m_isFixedEndPoints == true && locationIn < m_dataArray.size() - 1 &&
+			locationIn > 0) || m_isFixedEndPoints == false)
 		{
 			m_dataArray[locationIn].second = valueIn;
 			dataChanged();
@@ -872,26 +872,26 @@ void PointGraphDataArray::setValue(unsigned int locationIn, float valueIn)
 	}
 }
 
-unsigned int PointGraphDataArray::setPos(unsigned int locationIn, unsigned int posIn)
+unsigned int PointGraphDataArray::setPos(unsigned int locationIn, float posIn)
 {
 	int location = locationIn;
-	if (m_isFixedPos == false && posIn < *m_maxLength)
+	if (m_isFixedPos == false && posIn <= 1.0f)
 	{
 		bool found = false;
 		location = getNearestLocation(posIn, &found);
 		// if an other point was not found at posIn
 		// and if getNearestLocation returned a value
 		// and if dataArray end points are changeable
-		if (found == false && m_isFixedEndPoints == true &&
-			locationIn < m_dataArray.size() - 1 && location > 0 ||
-			found == false && m_isFixedEndPoints == false)
+		if (found == false && ((m_isFixedEndPoints == true &&
+			locationIn < m_dataArray.size() - 1 && location > 0) ||
+			m_isFixedEndPoints == false))
 		{
 			int targetLocation = location;
-			bool dataChangedVal = false;
+			// bool dataChangedVal = false;
 			// if getNearestLocation returned a value
 			if (location >= 0)
 			{
-				// slide the new data if the closest data pos is bigger
+				// slide the new data if the closest data pos is bigger TODO fix
 	qDebug("set 3. success, location: %d", targetLocation);
 				if (m_dataArray[location].first < posIn)
 				{
@@ -930,12 +930,12 @@ void PointGraphDataArray::swap(unsigned int locationAIn, unsigned int locationBI
 			
 			for (unsigned int i = 0; i < m_dataArray.size(); i++)
 			{
-				qDebug("   - i: %d  -  x: %d", i, m_dataArray[i].first);
+				qDebug("   - i: %d  -  x: %f", i, m_dataArray[i].first);
 			}
 			
 			if (locationAIn < locationBIn)
 			{
-				std::pair<unsigned int, float> swap = m_dataArray[locationAIn];
+				std::pair<float, float> swap = m_dataArray[locationAIn];
 				for (unsigned int i = locationAIn; i < locationBIn; i++)
 				{
 					m_dataArray[i] = m_dataArray[i + 1];
@@ -944,7 +944,7 @@ void PointGraphDataArray::swap(unsigned int locationAIn, unsigned int locationBI
 			}
 			else
 			{
-				std::pair<unsigned int, float> swap = m_dataArray[locationAIn];
+				std::pair<float, float> swap = m_dataArray[locationAIn];
 				for (unsigned int i = locationAIn; i > locationBIn; i--)
 				{
 					m_dataArray[i] = m_dataArray[i - 1];
@@ -955,12 +955,12 @@ void PointGraphDataArray::swap(unsigned int locationAIn, unsigned int locationBI
 			qDebug(" --------- ");
 			for (unsigned int i = 0; i < m_dataArray.size(); i++)
 			{
-				qDebug("   - i: %d  -  x: %d", i, m_dataArray[i].first);
+				qDebug("   - i: %d  -  x: %f", i, m_dataArray[i].first);
 			}
 		}
 		else
 		{
-			std::pair<unsigned int, float> swap = m_dataArray[locationAIn];
+			std::pair<float, float> swap = m_dataArray[locationAIn];
 			m_dataArray[locationAIn] = m_dataArray[locationBIn];
 			m_dataArray[locationBIn] = swap;
 		}

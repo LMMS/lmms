@@ -25,13 +25,14 @@ class LMMS_EXPORT PointGraphView : public QWidget, public ModelView
 	Q_OBJECT
 public:
 	// TODO: remove styles			Done
-	// TODO: change x to float
-	// TODO: revrite comments
+	// TODO: change x unsigned int to float			Done
 	// TODO: make a new class inside PointGraphDataArray to store the point data
 	// TODO: add is selectable			Done
 	// TODO: add new setting to make the last point cord 1, 1			Done
 	// TODO: flip mouse y position
 	// TODO: function to get multiple values
+	// TODO: revrite comments
+	// TODO: rename functions and values
 
 	// TODO: automation:
 	// TODO: add 4 new values to the nested class: curve, type, valueA, valueB (1 type is 3 value long)
@@ -39,11 +40,12 @@ public:
 	// TODO: setPointAutomatedAttrib() --> changes the type value between y pos, valueA, valueB
 	// TODO  setPointType(unsigned int type)
 	// TODO: add effector int location to the PointDataArray class
-	// TODO: add effector line attreibutes to the nested class
+	// TODO: add effector line attributes to the nested class
 	// TODO: add effects
 
 	// TODO: clear array when 2. last point is deleted in the widget
 	// TODO: event when a dataArray's size gets to 0
+	// TODO: abiliti to scale displayed coords in PointGraphView (not 0 - 100) (add scalers)
 
 	PointGraphView(QWidget * parentIn,
 		int widthIn, int heightIn,
@@ -60,8 +62,8 @@ public:
 	}
 	
 	// returns -2.0f at second when nothing is selected
-	std::pair<unsigned int, float> getSelectedData();
-	void setSelectedData(std::pair<unsigned int, float> dataIn);
+	std::pair<float, float> getSelectedData();
+	void setSelectedData(std::pair<float, float> dataIn);
 	
 signals:
 	inline void drawn();
@@ -78,12 +80,12 @@ protected slots:
 private:
 	void modelChanged() override;
 
-	std::pair<unsigned int, float> mapMousePos(int xIn, int yIn, bool nonNegativeIn);
-	std::pair<int, int> mapDataPos(std::pair<unsigned int, float> posIn, bool nonNegativeIn);
+	std::pair<float, float> mapMousePos(int xIn, int yIn, bool nonNegativeIn);
+	std::pair<int, int> mapDataPos(std::pair<float, float> posIn, bool nonNegativeIn);
 
 	float getDistance(int xAIn, int yAIn, int xBIn, int yBIn);
 
-	std::pair<unsigned int, float> showInputDialog(); //TODO
+	std::pair<float, float> showInputDialog(); //TODO
 	void selectData(int mouseXIn, int mouseYIn);
 
 	bool m_mouseDown;
@@ -134,7 +136,7 @@ public:
 		}
 	}
 	// returns location
-	unsigned int addArray(std::vector<std::pair<unsigned int, float>>* arrayIn);
+	unsigned int addArray(std::vector<std::pair<float, float>>* arrayIn);
 	// returns location
 	unsigned int addArray();
 	// preservs the order
@@ -201,7 +203,7 @@ public:
 
 	// array:
 	// returns the location of added/found point, -1 if not found and can not be added
-	int add(unsigned int posIn);
+	int add(float posIn);
 	// deletes the data/sample if m_isFixedSize is disabled
 	void del(unsigned int locationIn);
 	// clears data/sample array without any checks
@@ -220,28 +222,28 @@ public:
 	void formatArray(bool clampIn, bool sortIn);
 
 	// get:
-	inline std::pair<unsigned int, float>* getData(unsigned int locationIn)
+	inline std::pair<float, float>* getData(unsigned int locationIn)
 	{
 		return &m_dataArray[locationIn];
 	}
 	// returns -1 when position is not found
-	int getLocation(unsigned int posIn);
+	int getLocation(float posIn);
 	// gets the nearest data location to the position,
 	// foundOut is true when the nearest position = posIn,
 	// reurns -1 when search failed
-	int getNearestLocation(unsigned int posIn, bool* foundOut);
+	int getNearestLocation(float posIn, bool* foundOut);
 	float getValueAtPositon(float posIn); // TODO
 
 	// set:
 	// sets data array without any checks
-	inline void setDataArray(std::vector<std::pair<unsigned int, float>>* dataArrayIn)
+	inline void setDataArray(std::vector<std::pair<float, float>>* dataArrayIn)
 	{
 		m_dataArray = *dataArrayIn;
 	}
 	// sets value when m_isFixedValue is disabed
 	void setValue(unsigned int locationIn, float valueIn);
 	// sets position when m_isFixedPos is disabed, returns final location
-	unsigned int setPos(unsigned int locationIn, unsigned int posIn); // TODO
+	unsigned int setPos(unsigned int locationIn, float posIn); // TODO
 // signals: // not qt
 	// m_dataArray
 	void dataChanged();
@@ -279,7 +281,7 @@ private:
 	unsigned int* m_maxLength;
 
 	// ordered array of 0 < position < max_Length, -1(or 0) < value < 1
-	std::vector<std::pair<unsigned int, float>> m_dataArray;
+	std::vector<std::pair<float, float>> m_dataArray;
 };
 
 } // namespace lmms
