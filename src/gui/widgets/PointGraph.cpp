@@ -366,9 +366,7 @@ void PointGraphView::selectData(int mouseXIn, int mouseYIn)
 		{
 			transformedMouse = &transformedMouseA;
 		}
-		if (dataArray->getFixedSize() == false ||
-			dataArray->getFixedValue() == false ||
-			dataArray->getFixedPos() == false)
+		if (dataArray->getSelectable() == true)
 		{
 			// we dont use this bool
 			bool found = false;
@@ -451,7 +449,7 @@ unsigned int PointGraphModel::addArray(std::vector<std::pair<unsigned int, float
 unsigned int PointGraphModel::addArray()
 {
 	PointGraphDataArray tempArray(&m_maxLength,
-		false, false, false, false, this);
+		false, false, false, false, false, false, false, this);
 	m_dataArrays.push_back(tempArray);
 	return m_dataArrays.size() - 1;
 }
@@ -483,6 +481,9 @@ PointGraphDataArray::PointGraphDataArray()
 	m_isFixedSize = false;
 	m_isFixedValue = false;
 	m_isFixedPos = false;
+	m_isFixedEndPoints = false;
+	m_isSelectable = false;
+	m_isEditableAttrib = false;
 	m_nonNegative = false;
 	
 	m_lineColor = QColor(200, 200, 200, 255);
@@ -495,12 +496,15 @@ PointGraphDataArray::PointGraphDataArray()
 
 PointGraphDataArray::PointGraphDataArray(unsigned int* maxLengthIn,
 	bool isFixedSizeIn, bool isFixedValueIn, bool isFixedPosIn, bool nonNegativeIn,
-	PointGraphModel* parentIn)
+	bool isFixedEndPointsIn, bool isSelectableIn, bool isEditableAttribIn, PointGraphModel* parentIn)
 {
 	m_maxLength = maxLengthIn;
 	m_isFixedSize = isFixedSizeIn;
 	m_isFixedValue = isFixedValueIn;
 	m_isFixedPos = isFixedPosIn;
+	m_isFixedEndPoints = isFixedEndPointsIn;
+	m_isSelectable = isSelectableIn;
+	m_isEditableAttrib = isEditableAttribIn;
 	m_nonNegative = nonNegativeIn;
 	
 	m_lineColor = QColor(200, 200, 200, 255);
@@ -539,6 +543,22 @@ void PointGraphDataArray::setFixedPos(bool valueIn)
 	m_isFixedPos = valueIn;
 	dataChanged();
 }
+void PointGraphDataArray::setFixedEndPoints(bool valueIn)
+{
+	m_isFixedEndPoints = valueIn;
+	formatDataArrayEndPoints();
+	dataChanged();
+}
+void PointGraphDataArray::setSelectable(bool valueIn)
+{
+	m_isSelectable = valueIn;
+	dataChanged();
+}
+void PointGraphDataArray::setEditableAttrib(bool valueIn)
+{
+	m_isEditableAttrib = valueIn;
+	dataChanged();
+}
 void PointGraphDataArray::setNonNegative(bool valueIn)
 {
 	m_nonNegative = valueIn;
@@ -575,6 +595,18 @@ bool PointGraphDataArray::getFixedValue()
 bool PointGraphDataArray::getFixedPos()
 {
 	return m_isFixedPos;
+}
+bool PointGraphDataArray::getFixedEndPoints()
+{
+	return m_isFixedEndPoints;
+}
+bool PointGraphDataArray::getSelectable()
+{
+	return m_isSelectable;
+}
+bool PointGraphDataArray::getEditableAttrib()
+{
+	return m_isEditableAttrib;
 }
 bool PointGraphDataArray::getNonNegative()
 {
@@ -636,6 +668,11 @@ int PointGraphDataArray::add(unsigned int posIn)
 			}
 	qDebug("add size: %ld", m_dataArray.size());
 			location = targetLocation;
+			if (m_dataArray.size() <= 2)
+			{
+				formatDataArrayEndPoints();
+				dataChangedVal = true;
+			}
 			if (dataChangedVal == true)
 			{
 				dataChanged();
@@ -651,10 +688,15 @@ void PointGraphDataArray::del(unsigned int locationIn)
 	{
 		swap(locationIn, m_dataArray.size() - 1, true);
 		m_dataArray.pop_back();
+		if (locationIn == 0 || locationIn == m_dataArray.size() - 1)
+		{
+			formatDataArrayEndPoints();
+		}
 		dataChanged();
 	}
 }
 
+// TODO input scaleing values
 void PointGraphDataArray::formatArray(bool clampIn, bool sortIn)
 {
 	// clamp
@@ -685,6 +727,7 @@ void PointGraphDataArray::formatArray(bool clampIn, bool sortIn)
 				}
 			}
 		}
+		formatDataArrayEndPoints();
 	}
 
 	// sort
@@ -820,19 +863,28 @@ void PointGraphDataArray::setValue(unsigned int locationIn, float valueIn)
 {
 	if (m_isFixedValue == false)
 	{
-		m_dataArray[locationIn].second = valueIn;
-		dataChanged();
+		if (m_isFixedEndPoints == true && locationIn < m_dataArray.size() - 1
+			&& locationIn > 0 || m_isFixedEndPoints == false)
+		{
+			m_dataArray[locationIn].second = valueIn;
+			dataChanged();
+		}
 	}
 }
 
 unsigned int PointGraphDataArray::setPos(unsigned int locationIn, unsigned int posIn)
 {
 	int location = locationIn;
-	if (posIn < *m_maxLength)
+	if (m_isFixedPos == false && posIn < *m_maxLength)
 	{
 		bool found = false;
 		location = getNearestLocation(posIn, &found);
-		if (found == false && m_isFixedPos == false)
+		// if an other point was not found at posIn
+		// and if getNearestLocation returned a value
+		// and if dataArray end points are changeable
+		if (found == false && m_isFixedEndPoints == true &&
+			locationIn < m_dataArray.size() - 1 && location > 0 ||
+			found == false && m_isFixedEndPoints == false)
 		{
 			int targetLocation = location;
 			bool dataChangedVal = false;
@@ -841,13 +893,13 @@ unsigned int PointGraphDataArray::setPos(unsigned int locationIn, unsigned int p
 			{
 				// slide the new data if the closest data pos is bigger
 	qDebug("set 3. success, location: %d", targetLocation);
-				//if (m_dataArray[location].first < posIn)
-				//{
-				//	if (targetLocation + 1 < m_dataArray.size())
-				//	{
-				//		targetLocation++;
-				//	}
-				//}
+				if (m_dataArray[location].first < posIn)
+				{
+					if (targetLocation + 1 < m_dataArray.size())
+					{
+						//targetLocation++;
+					}
+				}
 	qDebug("set 4. success, target: %d", targetLocation);
 				m_dataArray[locationIn].first = posIn;
 				swap(locationIn, targetLocation, true);
@@ -913,6 +965,16 @@ void PointGraphDataArray::swap(unsigned int locationAIn, unsigned int locationBI
 			m_dataArray[locationBIn] = swap;
 		}
 		dataChanged();
+	}
+}
+void PointGraphDataArray::formatDataArrayEndPoints()
+{
+	if (m_isFixedEndPoints == true && m_dataArray.size() > 0)
+	{
+		m_dataArray[m_dataArray.size() - 1].first = 1;
+		m_dataArray[m_dataArray.size() - 1].second = 1.0f;
+		m_dataArray[0].first = 0;
+		m_dataArray[0].second = m_nonNegative == true ? 0.0f : -1.0f;
 	}
 }
 
