@@ -184,12 +184,12 @@ void AudioFileProcessorView::newWaveView()
 		delete m_waveView;
 		m_waveView = 0;
 	}
-	m_waveView = new AudioFileProcessorWaveView(this, 245, 75, &castModel<AudioFileProcessor>()->sample());
-	m_waveView->move(2, 172);
-	m_waveView->setKnobs(
+	m_waveView = new AudioFileProcessorWaveView(this, 245, 75, &castModel<AudioFileProcessor>()->sample(),
 		dynamic_cast<AudioFileProcessorWaveView::knob*>(m_startKnob),
 		dynamic_cast<AudioFileProcessorWaveView::knob*>(m_endKnob),
 		dynamic_cast<AudioFileProcessorWaveView::knob*>(m_loopKnob));
+	m_waveView->move(2, 172);
+	
 	m_waveView->show();
 }
 
