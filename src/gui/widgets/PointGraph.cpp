@@ -18,8 +18,7 @@ namespace gui
 
 PointGraphView::PointGraphView(QWidget * parentIn,
 		int widthIn, int heightIn,
-		unsigned int pointSizeIn, unsigned int maxLengthIn,
-		Style styleIn) :
+		unsigned int pointSizeIn, unsigned int maxLengthIn) :
 		QWidget(parentIn),
 		ModelView(new PointGraphModel(maxLengthIn, nullptr, false), this)
 {
@@ -40,8 +39,6 @@ PointGraphView::PointGraphView(QWidget * parentIn,
 	m_lastTrackPoint.second = 0;
 	m_lastScndTrackPoint.first = 0;
 	m_lastScndTrackPoint.second = 0;
-	
-	m_defaultStyle = styleIn;
 
 	setCursor(Qt::CrossCursor);
 
@@ -57,31 +54,6 @@ PointGraphView::~PointGraphView()
 
 }
 
-// update this when adding new styles
-void PointGraphView::setStyle(Style styleIn, unsigned int dataArrayLocationIn)
-{
-	if (model()->getDataArraySize() > dataArrayLocationIn)
-	{
-		switch (styleIn)
-		{
-			case Style::Linear:
-				model()->getDataArray(dataArrayLocationIn)->setStyle(PointGraphDataArray::Style::Linear);
-				break;
-			case Style::LinearPoints:
-				model()->getDataArray(dataArrayLocationIn)->setStyle(PointGraphDataArray::Style::LinearPoints);
-				break;
-			case Style::Curved:
-				model()->getDataArray(dataArrayLocationIn)->setStyle(PointGraphDataArray::Style::Curved);
-				break;
-			case Style::CurvedPoints:
-				model()->getDataArray(dataArrayLocationIn)->setStyle(PointGraphDataArray::Style::CurvedPoints);
-				break;
-			default:
-				break;
-		}
-		update();
-	}
-}
 void PointGraphView::setLineColor(QColor colorIn, unsigned int dataArrayLocationIn)
 {
 	if (model()->getDataArraySize() > dataArrayLocationIn)
@@ -262,37 +234,24 @@ void PointGraphView::paintEvent(QPaintEvent* pe)
 		{
 			std::pair<int, int> posA = mapDataPos(*dataArray->getData(0), dataArray->getNonNegative());
 
-			switch (dataArray->getStyle())
+			// if first data/sample > 0, draw a line to the first data/sample from 0
+			if (posA.first > 0)
 			{
-				case PointGraphDataArray::Style::Linear:
-					// if first data/sample > 0, draw a line to the first data/sample from 0
-					if (posA.first > 0)
-					{
-						//p.drawLine(0, posA.second, posA.first, posA.second);
-					}
-					// drawing lines
-			qDebug("paint size: %d", length);
-					for (unsigned int j = 0; j < length - 1; j++)
-					{
-						std::pair<int, int> posB = mapDataPos(*dataArray->getData(j + 1), dataArray->getNonNegative());
-						// x1, y1, x2, y2
-			//qDebug("paint positions: x: %d, y: %d, x2: %d, y2: %d", posA.first, posA.second, posB.first, posB.second);
-						p.drawLine(posA.first, posA.second, posB.first, posB.second);
-						posA = posB;
-					}
-					if (posA.first < width())
-					{
-						//p.drawLine(posA.first, posA.second, width(), posA.second);
-					}
-					break;
-				case PointGraphDataArray::Style::LinearPoints:
-					break;
-				case PointGraphDataArray::Style::Curved:
-					break;
-				case PointGraphDataArray::Style::CurvedPoints:
-					break;
-				default:
-					break;
+				//p.drawLine(0, posA.second, posA.first, posA.second);
+			}
+			// drawing lines
+	qDebug("paint size: %d", length);
+			for (unsigned int j = 0; j < length - 1; j++)
+			{
+				std::pair<int, int> posB = mapDataPos(*dataArray->getData(j + 1), dataArray->getNonNegative());
+				// x1, y1, x2, y2
+	//qDebug("paint positions: x: %d, y: %d, x2: %d, y2: %d", posA.first, posA.second, posB.first, posB.second);
+				p.drawLine(posA.first, posA.second, posB.first, posB.second);
+				posA = posB;
+			}
+			if (posA.first < width())
+			{
+				//p.drawLine(posA.first, posA.second, width(), posA.second);
 			}
 		}
 	}
@@ -491,7 +450,7 @@ unsigned int PointGraphModel::addArray(std::vector<std::pair<unsigned int, float
 
 unsigned int PointGraphModel::addArray()
 {
-	PointGraphDataArray tempArray(&m_maxLength, PointGraphDataArray::Style::Linear,
+	PointGraphDataArray tempArray(&m_maxLength,
 		false, false, false, false, this);
 	m_dataArrays.push_back(tempArray);
 	return m_dataArrays.size() - 1;
@@ -521,7 +480,6 @@ void PointGraphModel::dataArrayStyleChanged()
 PointGraphDataArray::PointGraphDataArray()
 {
 	m_maxLength = nullptr;
-	m_graphStyle = Style::Linear;
 	m_isFixedSize = false;
 	m_isFixedValue = false;
 	m_isFixedPos = false;
@@ -535,12 +493,11 @@ PointGraphDataArray::PointGraphDataArray()
 	m_dataArray = {};
 }
 
-PointGraphDataArray::PointGraphDataArray(unsigned int* maxLengthIn, Style graphStyleIn,
+PointGraphDataArray::PointGraphDataArray(unsigned int* maxLengthIn,
 	bool isFixedSizeIn, bool isFixedValueIn, bool isFixedPosIn, bool nonNegativeIn,
 	PointGraphModel* parentIn)
 {
 	m_maxLength = maxLengthIn;
-	m_graphStyle = graphStyleIn;
 	m_isFixedSize = isFixedSizeIn;
 	m_isFixedValue = isFixedValueIn;
 	m_isFixedPos = isFixedPosIn;
@@ -602,11 +559,6 @@ void PointGraphDataArray::setFillColor(QColor colorIn)
 	m_fillColor = colorIn;
 	styleChanged();
 }
-void PointGraphDataArray::setStyle(Style styleIn)
-{
-	m_graphStyle = styleIn;
-	styleChanged();
-}
 void PointGraphDataArray::setMaxLength(unsigned int* maxLengthIn)
 {
 	m_maxLength = maxLengthIn;
@@ -639,10 +591,6 @@ QColor* PointGraphDataArray::getActiveColor()
 QColor* PointGraphDataArray::getFillColor()
 {
 	return &m_fillColor;
-}
-PointGraphDataArray::Style PointGraphDataArray::getStyle()
-{
-	return m_graphStyle;
 }
 
 // array:
@@ -851,6 +799,7 @@ float PointGraphDataArray::getValueAtPositon(float posIn)
 			{
 				slide = -1;
 			}
+			/*
 			if (m_graphStyle == Style::Linear && m_graphStyle == Style::LinearPoints)
 			{
 				// if linear
@@ -861,6 +810,7 @@ float PointGraphDataArray::getValueAtPositon(float posIn)
 				// if curved TODO
 
 			}
+			*/
 			return value;
 		}
 	}
