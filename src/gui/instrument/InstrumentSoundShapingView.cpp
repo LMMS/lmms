@@ -22,8 +22,6 @@
  *
  */
 
-#include <QLabel>
-
 #include "InstrumentSoundShapingView.h"
 #include "EnvelopeAndLfoParameters.h"
 #include "EnvelopeAndLfoView.h"
@@ -90,16 +88,6 @@ InstrumentSoundShapingView::InstrumentSoundShapingView( QWidget * _parent ) :
 	m_filterResKnob->setLabel( tr( "Q/RESO" ) );
 	m_filterResKnob->move( 196, 18 );
 	m_filterResKnob->setHintText( tr( "Q/Resonance:" ), "" );
-
-
-	m_singleStreamInfoLabel = new QLabel( tr( "Envelopes, LFOs and filters are not supported by the current instrument." ), this );
-	m_singleStreamInfoLabel->setWordWrap( true );
-	m_singleStreamInfoLabel->setFont( pointSize<8>( m_singleStreamInfoLabel->font() ) );
-
-	m_singleStreamInfoLabel->setGeometry( TARGETS_TABWIDGET_X,
-						TARGETS_TABWIDGET_Y,
-						TARGETS_TABWIDGET_WIDTH,
-						TARGETS_TABWIDGET_HEIGTH );
 }
 
 
@@ -108,15 +96,6 @@ InstrumentSoundShapingView::InstrumentSoundShapingView( QWidget * _parent ) :
 InstrumentSoundShapingView::~InstrumentSoundShapingView()
 {
 	delete m_targetsTabWidget;
-}
-
-
-
-void InstrumentSoundShapingView::setFunctionsHidden( bool hidden )
-{
-	m_targetsTabWidget->setHidden( hidden );
-	m_filterGroupBox->setHidden( hidden );
-	m_singleStreamInfoLabel->setHidden( !hidden );
 }
 
 
