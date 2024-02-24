@@ -24,22 +24,29 @@ class LMMS_EXPORT PointGraphView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
-	// fake styles, update setStyle when adding new styles
-	enum class Style
-	{
-		Linear, // just lines
-		LinearPoints, // linear + draw data/sample points
-		Curved, // curved lines
-		CurvedPoints, // curced lines + draw data/sample points
-	};
+	// TODO: remove styles
+	// TODO: change x to float
+	// TODO: revrite comments
+	// TODO: make a new class inside PointGraphDataArray to store the point data
+	// TODO: add is selectable
+	// TODO: add new setting to make the last point cord 1, 1
+	// TODO: flip mouse y position
+	// TODO: function to get multiple values
+
+	// TODO: automation:
+	// TODO: add 4 new values to the nested class: curve, type, valueA, valueB (1 type is 3 value long)
+	// TODO: add automation support
+	// TODO: setPointAutomatedAttrib() --> changes the type value between y pos, valueA, valueB
+	// TODO  setPointType(unsigned int type)
+	// TODO: add effector PointDataArray pointer to the PointDataArray class
+	// TODO: add effector line attreibutes to the nested class
+	// TODO: add effects
 
 	PointGraphView(QWidget * parentIn,
 		int widthIn, int heightIn,
-		unsigned int pointSizeIn, unsigned int maxLengthIn,
-		Style styleIn);
+		unsigned int pointSizeIn, unsigned int maxLengthIn);
 	~PointGraphView();
 
-	void setStyle(Style styleIn, unsigned int dataArrayLocationIn);
 	void setLineColor(QColor colorIn, unsigned int dataArrayLocationIn);
 	void setActiveColor(QColor colorIn, unsigned int dataArrayLocationIn);
 	void setFillColor(QColor colorIn, unsigned int dataArrayLocationIn);
@@ -92,8 +99,6 @@ private:
 	
 	std::pair<int, int> m_lastTrackPoint;
 	std::pair<int, int> m_lastScndTrackPoint;
-
-	Style m_defaultStyle; // TODO
 };
 
 } // namespace gui
@@ -160,16 +165,8 @@ class LMMS_EXPORT PointGraphDataArray
 {
 
 public:
-	enum class Style
-	{
-		Linear, // just lines
-		LinearPoints, // linear + draw data/sample points
-		Curved, // curved lines
-		CurvedPoints, // curced lines + draw data/sample points
-	};
-
 	PointGraphDataArray();
-	PointGraphDataArray(unsigned int* maxLengthIn, Style graphStyleIn,
+	PointGraphDataArray(unsigned int* maxLengthIn,
 		bool isFixedSizeIn, bool isFixedValueIn, bool isFixedPosIn, bool nonNegativeIn,
 		PointGraphModel* parentIn);
 	~PointGraphDataArray();
@@ -183,7 +180,6 @@ public:
 	void setLineColor(QColor colorIn);
 	void setActiveColor(QColor colorIn);
 	void setFillColor(QColor colorIn);
-	void setStyle(Style graphStyleIn);
 	void setMaxLength(unsigned int* maxLengthIn);
 
 	bool getFixedSize();
@@ -193,7 +189,6 @@ public:
 	QColor* getLineColor();
 	QColor* getActiveColor();
 	QColor* getFillColor();
-	Style getStyle();
 
 	// array:
 	// returns the location of added/found point, -1 if not found and can not be added
@@ -241,7 +236,7 @@ public:
 // signals: // not qt
 	// m_dataArray
 	void dataChanged();
-	// color and style
+	// color
 	void styleChanged();
 private:
 	// swapping values, slide moves the values ()between) once left or right
@@ -260,8 +255,6 @@ private:
 	QColor m_lineColor;
 	QColor m_activeColor;
 	QColor m_fillColor;
-
-	Style m_graphStyle;
 
 	PointGraphModel* m_parent;
 
