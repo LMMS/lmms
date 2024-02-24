@@ -24,12 +24,12 @@ class LMMS_EXPORT PointGraphView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
-	// TODO: remove styles
+	// TODO: remove styles			Done
 	// TODO: change x to float
 	// TODO: revrite comments
 	// TODO: make a new class inside PointGraphDataArray to store the point data
-	// TODO: add is selectable
-	// TODO: add new setting to make the last point cord 1, 1
+	// TODO: add is selectable			Done
+	// TODO: add new setting to make the last point cord 1, 1			Done
 	// TODO: flip mouse y position
 	// TODO: function to get multiple values
 
@@ -38,9 +38,12 @@ public:
 	// TODO: add automation support
 	// TODO: setPointAutomatedAttrib() --> changes the type value between y pos, valueA, valueB
 	// TODO  setPointType(unsigned int type)
-	// TODO: add effector PointDataArray pointer to the PointDataArray class
+	// TODO: add effector int location to the PointDataArray class
 	// TODO: add effector line attreibutes to the nested class
 	// TODO: add effects
+
+	// TODO: clear array when 2. last point is deleted in the widget
+	// TODO: event when a dataArray's size gets to 0
 
 	PointGraphView(QWidget * parentIn,
 		int widthIn, int heightIn,
@@ -135,7 +138,7 @@ public:
 	// returns location
 	unsigned int addArray();
 	// preservs the order
-	void delArray(unsigned int locationIn); // TODO
+	void delArray(unsigned int locationIn);
 	inline void clearArray()
 	{
 		m_dataArrays.clear();
@@ -167,8 +170,8 @@ class LMMS_EXPORT PointGraphDataArray
 public:
 	PointGraphDataArray();
 	PointGraphDataArray(unsigned int* maxLengthIn,
-		bool isFixedSizeIn, bool isFixedValueIn, bool isFixedPosIn, bool nonNegativeIn,
-		PointGraphModel* parentIn);
+	bool isFixedSizeIn, bool isFixedValueIn, bool isFixedPosIn, bool nonNegativeIn,
+	bool isFixedEndPointsIn, bool isSelectableIn, bool isEditableAttribIn, PointGraphModel* parentIn);
 	~PointGraphDataArray();
 
 	void updateConnections(PointGraphModel* parentIn);
@@ -176,6 +179,9 @@ public:
 	void setFixedSize(bool valueIn);
 	void setFixedValue(bool valueIn);
 	void setFixedPos(bool valueIn);
+	void setFixedEndPoints(bool valueIn);
+	void setSelectable(bool valueIn);
+	void setEditableAttrib(bool valueIn);
 	void setNonNegative(bool valueIn);
 	void setLineColor(QColor colorIn);
 	void setActiveColor(QColor colorIn);
@@ -185,6 +191,9 @@ public:
 	bool getFixedSize();
 	bool getFixedValue();
 	bool getFixedPos();
+	bool getFixedEndPoints();
+	bool getSelectable();
+	bool getEditableAttrib();
 	bool getNonNegative();
 	QColor* getLineColor();
 	QColor* getActiveColor();
@@ -204,7 +213,7 @@ public:
 	{
 		return m_dataArray.size();
 	}
-	// clamps down the values to 0 - m_maxLength, -1 - 1, does not sort
+	// clamps down the values to 0 - 1, -1 - 1
 	// does check m_isFixedSize, m_isFixedValue, m_isFixedPos,
 	// sorts array, removes duplicated positions,
 	// clampIn: should clamp, sortIn: should sort
@@ -232,15 +241,18 @@ public:
 	// sets value when m_isFixedValue is disabed
 	void setValue(unsigned int locationIn, float valueIn);
 	// sets position when m_isFixedPos is disabed, returns final location
-	unsigned int setPos(unsigned int locationIn, unsigned int posIn);
+	unsigned int setPos(unsigned int locationIn, unsigned int posIn); // TODO
 // signals: // not qt
 	// m_dataArray
 	void dataChanged();
 	// color
 	void styleChanged();
 private:
-	// swapping values, slide moves the values ()between) once left or right
+	// swapping values, "slide" moves the values (between) once left or right
+	// handle m_isFixedEndPoints when using this
 	void swap(unsigned int locationAIn, unsigned int locationBIn, bool slide);
+	// checks m_isFixedEndPoints, does not call dataChanged()
+	void formatDataArrayEndPoints();
 
 	// can new data be added or removed
 	bool m_isFixedSize;
@@ -248,6 +260,12 @@ private:
 	bool m_isFixedValue;
 	// can the positions be changed
 	bool m_isFixedPos;
+	// if true then it makes the last position coordinate 1, 1, the first point coordinate to -1 (ot 0), 0
+	bool m_isFixedEndPoints;
+	// can PointGraphView select this
+	bool m_isSelectable;
+	// can PointGraphView edit the point attributes
+	bool m_isEditableAttrib;
 
 	// can values be less than 0
 	bool m_nonNegative;
