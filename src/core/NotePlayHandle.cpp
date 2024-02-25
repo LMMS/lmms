@@ -656,7 +656,7 @@ void NotePlayHandleManager::extend( int c )
 {
 	s_size += c;
 	auto tmp = MM_ALLOC<NotePlayHandle*>(s_size);
-	MM_FREE( s_available );
+	freeAvailable();
 	s_available = tmp;
 
 	auto n = MM_ALLOC<NotePlayHandle>(c);
@@ -668,9 +668,17 @@ void NotePlayHandleManager::extend( int c )
 	}
 }
 
+void NotePlayHandleManager::freeAvailable()
+{
+	// rpmalloc catches this as a non-free'd alloc
+	NotePlayHandle * n = s_available[0];
+	MM_FREE(n);
+	MM_FREE(s_available);
+}
+
 void NotePlayHandleManager::free()
 {
-	MM_FREE(s_available);
+	freeAvailable();
 }
 
 
