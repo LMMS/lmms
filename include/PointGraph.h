@@ -29,7 +29,7 @@ public:
 	// TODO: make a new class inside PointGraphDataArray to store the point data
 	// TODO: add is selectable			Done
 	// TODO: add new setting to make the last point cord 1, 1			Done
-	// TODO: flip mouse y position
+	// TODO: flip mouse y position			Done
 	// TODO: function to get multiple values
 	// TODO: revrite comments
 	// TODO: rename functions and values
@@ -243,7 +243,7 @@ public:
 	// sets value when m_isFixedValue is disabed
 	void setValue(unsigned int locationIn, float valueIn);
 	// sets position when m_isFixedPos is disabed, returns final location
-	unsigned int setPos(unsigned int locationIn, float posIn); // TODO
+	unsigned int setPos(unsigned int locationIn, float posIn);
 // signals: // not qt
 	// m_dataArray
 	void dataChanged();

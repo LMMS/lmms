@@ -113,7 +113,7 @@ void PointGraphView::mousePressEvent(QMouseEvent* me)
 		// show new inputDialog to change data if control is pressed
 		if ((me->modifiers() & Qt::ControlModifier) == true)
 		{
-			selectData(x, y);
+			selectData(x, height() - y);
 			// if selecting was successful
 			if (m_isSelected == true)
 			{
@@ -154,7 +154,7 @@ void PointGraphView::mouseReleaseEvent(QMouseEvent* me)
 	if (m_mousePress == true)
 	{
 		// add/delete point
-		selectData(x, y);
+		selectData(x, height() - y);
 		if (m_isSelected == false && m_addition == true)
 		{
 			// if selection failed and addition
@@ -162,7 +162,7 @@ void PointGraphView::mouseReleaseEvent(QMouseEvent* me)
 			qDebug("release size: %ld", model()->getDataArraySize());
 			for(unsigned int i = 0; i < model()->getDataArraySize(); i++)
 			{
-				std::pair<float, float> curMouseData = mapMousePos(x, y,
+				std::pair<float, float> curMouseData = mapMousePos(x, height() - y,
 					model()->getDataArray(i)->getNonNegative()); // TODO optimize
 				int location = model()->getDataArray(i)->add(curMouseData.first);
 				// if adding was successful
@@ -246,7 +246,7 @@ void PointGraphView::paintEvent(QPaintEvent* pe)
 				posB = mapDataPos(*dataArray->getData(j + 1), dataArray->getNonNegative());
 				// x1, y1, x2, y2
 	//qDebug("paint positions: x: %d, y: %d, x2: %d, y2: %d", posA.first, posA.second, posB.first, posB.second);
-				p.drawLine(posA.first, posA.second, posB.first, posB.second);
+				p.drawLine(posA.first, height() - posA.second, posB.first, height() - posB.second);
 				posA = posB;
 			}
 			if (posA.first < width())
@@ -891,13 +891,20 @@ unsigned int PointGraphDataArray::setPos(unsigned int locationIn, float posIn)
 			// if getNearestLocation returned a value
 			if (location >= 0)
 			{
-				// slide the new data if the closest data pos is bigger TODO fix
+				// slide the new data if the closest data pos is bigger TODO test ifs
 	qDebug("set 3. success, location: %d", targetLocation);
-				if (m_dataArray[location].first < posIn)
+				if (location < locationIn && m_dataArray[location].first < posIn)
 				{
 					if (targetLocation + 1 < m_dataArray.size())
 					{
-						//targetLocation++;
+						targetLocation++;
+					}
+				}
+				else if (location > locationIn && m_dataArray[location].first > posIn)
+				{
+					if (targetLocation > 0)
+					{
+						targetLocation--;
 					}
 				}
 	qDebug("set 4. success, target: %d", targetLocation);
