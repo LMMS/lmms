@@ -168,7 +168,7 @@ class CombFeedfwd
 	{
 		memset( m_buffer, 0, sizeof( frame ) * m_size );
 	}
-
+	
 	inline void setDelay( double delay )
 	{
 		m_delay = static_cast<int>( ceil( delay ) );
