@@ -1255,7 +1255,7 @@ void SetupDialog::resetBufferSize()
 void SetupDialog::updateSampleRates()
 {
 	m_sampleRate->clear();
-	if (m_audioInterfaces->currentText() == "JACK (JACK Audio Connection Kit)")
+	if (m_audioInterfaces->currentText() == AudioJack::name())
 	{
 		m_sampleRate->setDisabled(true);
 	}
