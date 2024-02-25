@@ -84,7 +84,6 @@ const float CENT = 1.0f / 1200.0f;
 class OscillatorObject : public Model
 {
 	Q_OBJECT
-	MM_OPERATORS
 private:
 	int m_numOscillators;
 	IntModel m_waveShape;
@@ -159,7 +158,6 @@ private:
 
 	struct oscPtr
 	{
-		MM_OPERATORS
 		Oscillator * oscLeft;
 		Oscillator * oscRight;
 		float phaseOffsetLeft[NUM_OSCILLATORS];
@@ -196,7 +194,6 @@ private:
 
 	struct OscillatorKnobs
 	{
-		MM_OPERATORS
 		OscillatorKnobs( 
 					Knob * h,
 					Knob * v,

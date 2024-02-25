@@ -40,7 +40,6 @@
 #include "lmms_basics.h"
 #include "lmms_constants.h"
 #include "interpolation.h"
-#include "MemoryManager.h"
 
 namespace lmms
 {
@@ -50,7 +49,6 @@ template<ch_cnt_t CHANNELS=DEFAULT_CHANNELS> class BasicFilters;
 template<ch_cnt_t CHANNELS>
 class LinkwitzRiley
 {
-	MM_OPERATORS
 public:
 	LinkwitzRiley( float sampleRate )
 	{
@@ -145,7 +143,6 @@ using StereoLinkwitzRiley = LinkwitzRiley<2>;
 template<ch_cnt_t CHANNELS>
 class BiQuad
 {
-	MM_OPERATORS
 public:
 	BiQuad() 
 	{
@@ -188,7 +185,6 @@ using StereoBiQuad = BiQuad<2>;
 template<ch_cnt_t CHANNELS>
 class OnePole
 {
-	MM_OPERATORS
 public:
 	OnePole()
 	{
@@ -222,7 +218,6 @@ using StereoOnePole = OnePole<2>;
 template<ch_cnt_t CHANNELS>
 class BasicFilters
 {
-	MM_OPERATORS
 public:
 	enum class FilterType
 	{

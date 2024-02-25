@@ -38,7 +38,6 @@
 #include "Knob.h"
 #include "LcdSpinBox.h"
 #include "LedCheckBox.h"
-#include "MemoryManager.h"
 #include "gig.h"
 
 
@@ -236,7 +235,6 @@ public:
 class GigInstrument : public Instrument
 {
 	Q_OBJECT
-	MM_OPERATORS
 
 	mapPropertyFromModel( int, getBank, setBank, m_bankNum );
 	mapPropertyFromModel( int, getPatch, setPatch, m_patchNum );

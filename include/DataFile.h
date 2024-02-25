@@ -28,9 +28,9 @@
 
 #include <map>
 #include <QDomDocument>
+#include <vector>
 
 #include "lmms_export.h"
-#include "MemoryManager.h"
 
 class QTextStream;
 
@@ -42,7 +42,6 @@ class ProjectVersion;
 
 class LMMS_EXPORT DataFile : public QDomDocument
 {
-	MM_OPERATORS
 
 	using UpgradeMethod = void(DataFile::*)();
 
@@ -149,7 +148,6 @@ private:
 	QDomElement m_head;
 	Type m_type;
 	unsigned int m_fileVersion;
-
 } ;
 
 
