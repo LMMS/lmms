@@ -29,6 +29,7 @@
 #include <cmath>
 #include <QObject>
 #include "lmms_basics.h"
+#include "lmms_export.h"
 
 
 namespace lmms

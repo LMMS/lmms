@@ -28,6 +28,7 @@
 
 #include <map>
 #include <QDomDocument>
+#include <vector>
 
 #include "lmms_export.h"
 
