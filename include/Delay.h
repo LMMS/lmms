@@ -73,20 +73,20 @@ public:
 		m_delay( 0 ),
 		m_fraction( 0.0 )
 	{
-		m_buffer = MM_ALLOC<frame>(maxDelay );
+		m_buffer = new frame[maxDelay];
 		memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 	}
 	virtual ~CombFeedback()
 	{
-		MM_FREE( m_buffer );
+		delete[] m_buffer;
 	}
 	
 	inline void setMaxDelay( int maxDelay )
 	{
 		if( maxDelay > m_size )
 		{
-			MM_FREE( m_buffer );
-			m_buffer = MM_ALLOC<frame>( maxDelay );
+			delete[] m_buffer;
+			m_buffer = new frame[maxDelay];
 			memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 		}
 		m_size = maxDelay;
@@ -97,7 +97,7 @@ public:
 	{
 		memset( m_buffer, 0, sizeof( frame ) * m_size );
 	}
-	
+
 	inline void setDelay( double delay )
 	{
 		m_delay = static_cast<int>( ceil( delay ) );
@@ -144,20 +144,20 @@ class CombFeedfwd
 		m_delay( 0 ),
 		m_fraction( 0.0 )
 	{
-		m_buffer = MM_ALLOC<frame>( maxDelay );
+		m_buffer = new frame[maxDelay];
 		memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 	}
 	virtual ~CombFeedfwd()
 	{
-		MM_FREE( m_buffer );
+		delete[] m_buffer;
 	}
 	
 	inline void setMaxDelay( int maxDelay )
 	{
 		if( maxDelay > m_size )
 		{
-			MM_FREE( m_buffer );
-			m_buffer = MM_ALLOC<frame>( maxDelay );
+			delete[] m_buffer;
+			m_buffer = new frame[maxDelay];
 			memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 		}
 		m_size = maxDelay;
@@ -168,7 +168,7 @@ class CombFeedfwd
 	{
 		memset( m_buffer, 0, sizeof( frame ) * m_size );
 	}
-	
+
 	inline void setDelay( double delay )
 	{
 		m_delay = static_cast<int>( ceil( delay ) );
@@ -215,20 +215,20 @@ class CombFeedbackDualtap
 		m_delay( 0 ),
 		m_fraction( 0.0 )
 	{
-		m_buffer = MM_ALLOC<frame>( maxDelay );
+		m_buffer = new frame[maxDelay];
 		memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 	}
 	virtual ~CombFeedbackDualtap()
 	{
-		MM_FREE( m_buffer );
+		delete[] m_buffer;
 	}
 	
 	inline void setMaxDelay( int maxDelay )
 	{
 		if( maxDelay > m_size )
 		{
-			MM_FREE( m_buffer );
-			m_buffer = MM_ALLOC<frame>( maxDelay );
+			delete[] m_buffer;
+			m_buffer = new frame[maxDelay];
 			memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 		}
 		m_size = maxDelay;
@@ -239,7 +239,7 @@ class CombFeedbackDualtap
 	{
 		memset( m_buffer, 0, sizeof( frame ) * m_size );
 	}
-	
+
 	inline void setDelays( double delay1, double delay2 )
 	{
 		m_delay1 = static_cast<int>( ceil( delay1 ) );
@@ -296,26 +296,26 @@ public:
 		m_delay( 0 ),
 		m_fraction( 0.0 )
 	{
-		m_buffer = MM_ALLOC<frame>( maxDelay );
+		m_buffer = new frame[maxDelay];
 		memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 	}
 	virtual ~AllpassDelay()
 	{
-		MM_FREE( m_buffer );
+		delete[] m_buffer;
 	}
 	
 	inline void setMaxDelay( int maxDelay )
 	{
 		if( maxDelay > m_size )
 		{
-			MM_FREE( m_buffer );
-			m_buffer = MM_ALLOC<frame>( maxDelay );
+			delete[] m_buffer;
+			m_buffer = new frame[maxDelay];
 			memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 		}
 		m_size = maxDelay;
 		m_position %= m_size;
 	}
-	
+		
 	inline void clearHistory()
 	{
 		memset( m_buffer, 0, sizeof( frame ) * m_size );
