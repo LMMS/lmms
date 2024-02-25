@@ -148,7 +148,6 @@ private:
 	QDomElement m_head;
 	Type m_type;
 	unsigned int m_fileVersion;
-
 } ;
 
 

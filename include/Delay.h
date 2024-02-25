@@ -239,7 +239,7 @@ class CombFeedbackDualtap
 	{
 		memset( m_buffer, 0, sizeof( frame ) * m_size );
 	}
-
+	
 	inline void setDelays( double delay1, double delay2 )
 	{
 		m_delay1 = static_cast<int>( ceil( delay1 ) );
@@ -315,7 +315,7 @@ public:
 		m_size = maxDelay;
 		m_position %= m_size;
 	}
-		
+	
 	inline void clearHistory()
 	{
 		memset( m_buffer, 0, sizeof( frame ) * m_size );
