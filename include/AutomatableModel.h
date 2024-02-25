@@ -33,7 +33,6 @@
 #include "Model.h"
 #include "TimePos.h"
 #include "ValueBuffer.h"
-#include "MemoryManager.h"
 #include "ModelVisitor.h"
 
 
@@ -77,7 +76,6 @@ class ControllerConnection;
 class LMMS_EXPORT AutomatableModel : public Model, public JournallingObject
 {
 	Q_OBJECT
-	MM_OPERATORS
 public:
 	using AutoModelVector = std::vector<AutomatableModel*>;
 

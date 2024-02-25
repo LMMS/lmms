@@ -28,7 +28,6 @@
 
 #include <cstring>
 
-#include "MemoryManager.h"
 
 namespace lmms
 {

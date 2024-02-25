@@ -30,7 +30,6 @@
 #include <QDomDocument>
 
 #include "lmms_export.h"
-#include "MemoryManager.h"
 
 class QTextStream;
 
@@ -42,7 +41,6 @@ class ProjectVersion;
 
 class LMMS_EXPORT DataFile : public QDomDocument
 {
-	MM_OPERATORS
 
 	using UpgradeMethod = void(DataFile::*)();
 
