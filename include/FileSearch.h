@@ -22,6 +22,9 @@
  *
  */
 
+#ifndef LMMS_FILE_SEARCH_H
+#define LMMS_FILE_SEARCH_H
+
 #include <QObject>
 
 namespace lmms {
@@ -55,3 +58,4 @@ private:
 	static QStringList s_blacklist;
 };
 } // namespace lmms
+#endif // LMMS_FILE_SEARCH_H
