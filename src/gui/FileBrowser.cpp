@@ -47,7 +47,6 @@
 #include "DataFile.h"
 #include "Engine.h"
 #include "FileBrowser.h"
-#include "FileBrowserSearcher.h"
 #include "FileSearch.h"
 #include "GuiApplication.h"
 #include "ImportFilter.h"
@@ -282,7 +281,8 @@ void FileBrowser::onSearch(const QString& filter)
 	auto browserExtensions = m_filter;
 	const auto searchExtensions = browserExtensions.remove("*.").split(' ');
 
-	auto search = std::make_shared<FileSearch>(filter, directories, searchExtensions);
+	auto search = std::make_shared<FileSearch>(
+		filter, directories, searchExtensions, directoryBlacklist(), dirFilters(), sortFlags());
 	connect(search.get(), &FileSearch::foundMatch, this, &FileBrowser::foundSearchMatch, Qt::QueuedConnection);
 	connect(search.get(), &FileSearch::searchCompleted, this, &FileBrowser::searchCompleted, Qt::QueuedConnection);
 

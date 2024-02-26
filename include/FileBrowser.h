@@ -28,11 +28,10 @@
 #include <QCheckBox>
 #include <QDir>
 #include <QMutex>
+#include <QProgressBar>
+
 #include "FileSearch.h"
 #include "embed.h"
-
-#include "FileBrowserSearcher.h"
-#include <QProgressBar>
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 	#include <QRecursiveMutex>

@@ -31,10 +31,14 @@
 #include <thread>
 
 namespace lmms {
-FileSearch::FileSearch(const QString& filter, const QStringList& paths, const QStringList& extensions)
+FileSearch::FileSearch(const QString& filter, const QStringList& paths, const QStringList& extensions,
+	const QStringList& blacklist, QDir::Filters dirFilters, QDir::SortFlags sortFlags)
 	: m_filter(filter)
 	, m_paths(paths)
 	, m_extensions(extensions)
+	, m_blacklist(blacklist)
+	, m_dirFilters(dirFilters)
+	, m_sortFlags(sortFlags)
 {
 }
 
@@ -43,10 +47,10 @@ void FileSearch::operator()()
 	auto stack = QFileInfoList{};
 	for (const auto& path : m_paths)
 	{
-		if (pathInBlacklist(path)) { continue; }
+		if (m_blacklist.contains(path)) { continue; }
 
 		auto dir = QDir{path};
-		stack.append(dir.entryInfoList(dirFilters(), sortFlags()));
+		stack.append(dir.entryInfoList(m_dirFilters, m_sortFlags));
 
 		while (!stack.empty())
 		{
@@ -62,7 +66,7 @@ void FileSearch::operator()()
 			if (info.isDir() && !passesFilter)
 			{
 				dir.setPath(entryPath);
-				auto entries = dir.entryInfoList(dirFilters(), sortFlags());
+				auto entries = dir.entryInfoList(m_dirFilters, m_sortFlags);
 
 				// Reverse to maintain the sorting within this directory when popped
 				std::reverse(entries.begin(), entries.end());
@@ -86,30 +90,6 @@ void FileSearch::operator()()
 void FileSearch::cancel()
 {
 	m_cancel.store(true, std::memory_order_relaxed);
-}
-
-bool FileSearch::pathInBlacklist(const QString& path)
-{
-	static auto s_blacklist = QStringList{
-#ifdef LMMS_BUILD_LINUX
-		"/bin", "/boot", "/dev", "/etc", "/proc", "/run", "/sbin",
-		"/sys"
-#endif
-#ifdef LMMS_BUILD_WIN32
-		"C:\\Windows"
-#endif
-	};
-	return s_blacklist.contains(path);
-}
-
-QDir::Filters FileSearch::dirFilters()
-{
-	return QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot;
-}
-
-QDir::SortFlags FileSearch::sortFlags()
-{
-	return QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase;
 }
 
 } // namespace lmms
