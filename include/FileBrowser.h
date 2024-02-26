@@ -29,6 +29,7 @@
 #include <QDir>
 #include <QMutex>
 #include <QProgressBar>
+#include <memory>
 
 #include "FileSearch.h"
 #include "embed.h"
