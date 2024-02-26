@@ -58,6 +58,8 @@ void FileSearch::operator()()
 
 			const auto info = stack.takeFirst();
 			const auto entryPath = info.absoluteFilePath();
+			if (m_blacklist.contains(entryPath)) { continue; }
+
 			const auto name = info.fileName();
 			const auto validFile = info.isFile() && m_extensions.contains(info.suffix(), Qt::CaseInsensitive);
 			const auto passesFilter = name.contains(m_filter, Qt::CaseInsensitive);
