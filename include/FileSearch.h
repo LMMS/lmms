@@ -42,7 +42,7 @@ public:
 	//! `extensions` to search within the given `paths`.
 	FileSearch(const QString& filter, const QStringList& paths, const QStringList& extensions);
 
-	//! Execute the search, emitting the `foundResult` signal when results are found.
+	//! Execute the search, emitting the `foundResult` signal when matches are found.
 	void operator()();
 
 	//! Cancel the search.
@@ -50,7 +50,10 @@ public:
 
 signals:
 	//! Emitted when a result is found when searching the file system.
-	void foundResult(FileSearch* search, QString result);
+	void foundMatch(FileSearch* search, const QString& match);
+
+	//! Emitted when the search completes.
+	void searchCompleted(FileSearch* search);
 
 private:
 	static auto pathInBlacklist(const QString& path) -> bool;

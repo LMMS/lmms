@@ -75,10 +75,12 @@ void FileSearch::operator()()
 			else if ((validFile || info.isDir()) && passesFilter)
 			{
 				std::this_thread::sleep_for(std::chrono::milliseconds{MillisecondsBetweenResults});
-				emit foundResult(this, entryPath);
+				emit foundMatch(this, entryPath);
 			}
 		}
 	}
+
+	emit searchCompleted(this);
 }
 
 void FileSearch::cancel()

@@ -31,23 +31,24 @@
 #include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QLineEdit>
-#include <QMenu>
-#include <QPushButton>
 #include <QMdiArea>
 #include <QMdiSubWindow>
+#include <QMenu>
 #include <QMessageBox>
+#include <QPushButton>
 #include <QShortcut>
 #include <QStringList>
-
+#include <atomic>
+#include <cassert>
 #include <queue>
 
-#include "FileBrowser.h"
-#include "FileBrowserSearcher.h"
 #include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
-#include "embed.h"
 #include "Engine.h"
+#include "FileBrowser.h"
+#include "FileBrowserSearcher.h"
+#include "FileSearch.h"
 #include "GuiApplication.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
@@ -65,6 +66,9 @@
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
+#include "ThreadPool.h"
+#include "embed.h"
+#include "qnamespace.h"
 
 namespace lmms::gui
 {
@@ -152,10 +156,6 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	m_searchTreeWidget->hide();
 	addContentWidget(m_searchTreeWidget);
 
-	auto searchTimer = new QTimer(this);
-	connect(searchTimer, &QTimer::timeout, this, &FileBrowser::buildSearchTree);
-	searchTimer->start(FileBrowserSearcher::MillisecondsPerMatch);
-
 	m_searchIndicator = new QProgressBar(this);
 	m_searchIndicator->setMinimum(0);
 	m_searchIndicator->setMaximum(100);
@@ -181,20 +181,10 @@ void FileBrowser::restoreDirectoriesStates()
 	expandItems(m_savedExpandedDirs);
 }
 
-void FileBrowser::buildSearchTree()
+void FileBrowser::foundSearchMatch(FileSearch* search, const QString& match)
 {
-	if (!m_currentSearch) { return; }
-
-	const auto match = m_currentSearch->match();
-	using State = FileBrowserSearcher::SearchFuture::State;
-	if ((m_currentSearch->state() == State::Completed && match.isEmpty())
-		|| m_currentSearch->state() == State::Cancelled)
-	{
-		m_currentSearch = nullptr;
-		m_searchIndicator->setMaximum(100);
-		return;
-	}
-	else if (match.isEmpty()) { return; }
+	assert(search != nullptr);
+	if (m_currentSearch.get() != search) { return; }
 
 	auto basePath = QString{};
 	for (const auto& path : m_directories.split('*'))
@@ -258,13 +248,26 @@ void FileBrowser::buildSearchTree()
 	}
 }
 
-	
+void FileBrowser::searchCompleted(FileSearch* search)
+{
+	assert(search != nullptr);
+	if (m_currentSearch.get() != search) { return; }
+
+	m_currentSearch.reset();
+	m_searchIndicator->setMaximum(100);
+}
+
 void FileBrowser::onSearch(const QString& filter)
 {
+	if (m_currentSearch)
+	{
+		m_currentSearch->cancel();
+		m_currentSearch.reset();
+	}
+
 	if (filter.isEmpty())
 	{
-		toggleSearch(false);
-		FileBrowserSearcher::instance()->cancel();
+		displaySearch(false);
 		return;
 	}
 
@@ -274,14 +277,20 @@ void FileBrowser::onSearch(const QString& filter)
 	if (directories.isEmpty()) { return; }
 
 	m_searchTreeWidget->clear();
-	toggleSearch(true);
+	displaySearch(true);
 
 	auto browserExtensions = m_filter;
 	const auto searchExtensions = browserExtensions.remove("*.").split(' ');
-	m_currentSearch = FileBrowserSearcher::instance()->search(filter, directories, searchExtensions);
+
+	auto search = std::make_shared<FileSearch>(filter, directories, searchExtensions);
+	connect(search.get(), &FileSearch::foundMatch, this, &FileBrowser::foundSearchMatch, Qt::QueuedConnection);
+	connect(search.get(), &FileSearch::searchCompleted, this, &FileBrowser::searchCompleted, Qt::QueuedConnection);
+
+	m_currentSearch = search;
+	ThreadPool::instance().enqueue([search] { (*search)(); });
 }
 
-void FileBrowser::toggleSearch(bool on)
+void FileBrowser::displaySearch(bool on)
 {
 	if (on)
 	{
