@@ -38,7 +38,6 @@
 #include <QPushButton>
 #include <QShortcut>
 #include <QStringList>
-#include <atomic>
 #include <cassert>
 #include <queue>
 
