@@ -34,7 +34,7 @@ private slots:
 	void canConstructAndDeconstructTest()
 	{
         using namespace lmms;
-		constexpr auto numWorkers = 1;
+		constexpr size_t numWorkers = 1;
 		const auto pool = ThreadPool{numWorkers};
         QCOMPARE(pool.numWorkers(), numWorkers);
 	}
