@@ -40,6 +40,8 @@
 #include "Engine.h"
 #include "gui_templates.h"
 #include "InstrumentTrackView.h"
+#include "PatternTrack.h"
+#include "PatternTrackView.h"
 #include "PixmapButton.h"
 #include "Song.h"
 #include "StringPairDrag.h"
@@ -342,6 +344,19 @@ void TrackOperationsWidget::updateMenu()
 	{
 		toMenu->addAction( tr( "Turn all recording on" ), this, SLOT(recordingOn()));
 		toMenu->addAction( tr( "Turn all recording off" ), this, SLOT(recordingOff()));
+	}
+
+	PatternTrackView* patternTrackView = dynamic_cast<PatternTrackView *>(m_trackView);
+	if (patternTrackView)
+	{
+		PatternTrack* pT = patternTrackView->getPatternTrack();
+		int patternIndex = pT->patternIndex();
+		toMenu->addSeparator();
+		toMenu->addAction(tr("Convert PatternTrack to Song Editor"), [patternIndex, pT](){
+			Engine::getSong()->convertPatterntoSE(true, patternIndex);
+			pT->getMutedModel()->setValue(true);
+			pT->dataChanged();
+		});
 	}
 
 	toMenu->addSeparator();

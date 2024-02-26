@@ -33,6 +33,7 @@
 #include <QScrollBar>
 #include <QSlider>
 #include <QTimeLine>
+#include <QToolButton>
 
 #include "ActionGroup.h"
 #include "AudioDevice.h"
@@ -959,8 +960,21 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	// Track actions
 	DropToolBar *trackActionsToolBar = addDropToolBarToTop(tr("Track actions"));
 
+	// PatternTrack tool button
+	QToolButton* patternTrackButton = new QToolButton(trackActionsToolBar);
+	QMenu* patternTrackMenu = new QMenu(patternTrackButton);
+	// PatternTrack tool button actions
 	m_addPatternTrackAction = new QAction(embed::getIconPixmap("add_pattern_track"),
-									 tr("Add pattern-track"), this);
+		tr("Add pattern-track"), this);
+	QAction* convertToSE = new QAction(tr("Convert pattern tracks to Song Editor"), this);
+
+	connect(m_addPatternTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addPatternTrack()));
+	connect(convertToSE, SIGNAL(triggered()), m_editor->m_song, SLOT(convertPatterntoSE()));
+	// PatternTrack tool button setup
+	patternTrackButton->setPopupMode(QToolButton::MenuButtonPopup);
+	patternTrackButton->setDefaultAction(m_addPatternTrackAction);
+	patternTrackButton->setMenu(patternTrackMenu);
+	patternTrackMenu->addAction(convertToSE);
 
 	m_addSampleTrackAction = new QAction(embed::getIconPixmap("add_sample_track"),
 										 tr("Add sample-track"), this);
@@ -968,11 +982,11 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_addAutomationTrackAction = new QAction(embed::getIconPixmap("add_automation"),
 											 tr("Add automation-track"), this);
 
-	connect(m_addPatternTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addPatternTrack()));
+
 	connect(m_addSampleTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addSampleTrack()));
 	connect(m_addAutomationTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addAutomationTrack()));
 
-	trackActionsToolBar->addAction( m_addPatternTrackAction );
+	trackActionsToolBar->addWidget(patternTrackButton);
 	trackActionsToolBar->addAction( m_addSampleTrackAction );
 	trackActionsToolBar->addAction( m_addAutomationTrackAction );
 

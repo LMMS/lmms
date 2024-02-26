@@ -799,6 +799,108 @@ void Song::addPatternTrack()
 	Engine::patternStore()->setCurrentPattern(dynamic_cast<PatternTrack*>(t)->patternIndex());
 }
 
+/* @brief Converts all PatternTracks to regular tracks on the Song Editor
+ * @param bool singlePattern Indicates whether we are converting a single
+ * PatternTrack or all of the Song PatternTracks.
+ * @param int pattern If single Pattern is true, indicates the index of the
+ * PatternTrack being converted.
+ */
+void Song::convertPatterntoSE(bool singlePattern /* = false*/, int pattern /* = 0*/)
+{
+	// Get all tracks from the Pattern editor
+	PatternStore* patternStore = Engine::patternStore();
+	const TrackList& tl = patternStore->tracks();
+
+	// For each track, go through all clips and copy them in every place
+	// the corresponding PatternTrack has PatternClips in.
+	for (Track* track : tl)
+	{
+		// Create a clone of the track and add it to the song editor
+		Track* clonedTrack = nullptr;
+		if
+		(
+			track->type() == Track::Type::Instrument
+			|| track->type() == Track::Type::Sample
+			|| track->type() == Track::Type::Automation
+		)
+		{
+			// Create XML data of the track for the clone
+			QDomDocument doc;
+			QDomElement parent = doc.createElement("clone");
+			track->saveState(doc, parent);
+			clonedTrack = Track::create(parent.firstChild().toElement(), this);
+			clonedTrack->deleteClips();
+		}
+		else { continue; }
+
+		// Convert either a single PatternTrack or all of them
+		auto numClips = track->numOfClips();
+		int firstPattern = singlePattern ? pattern : 0;
+		int lastPattern = singlePattern ? pattern : numClips - 1;
+
+		// Now go through all the Clips and copy them in the appropriate place
+		// in the cloned track
+		for (int i = firstPattern; i <= lastPattern; ++i)
+		{
+			// Find the PatternTrack
+			PatternTrack* pt = PatternTrack::findPatternTrack(i);
+			if (!pt) { continue; }
+
+			// Get the Clip from the track inside the PatternTrack
+			Clip* src = track->getClip(i);
+
+			// If Clip is a MidiClip and it's empty, skip it
+			MidiClip* mc = dynamic_cast<MidiClip *>(src);
+			if (mc && mc->empty()) { continue; }
+
+			// Go through the PatternTrack's Clips
+			const auto& patternclips = pt->getClips();
+			for (Clip* patternclip : patternclips)
+			{
+				auto pos = patternclip->startPosition();
+				auto clipLen = src->length().getTicks();
+				auto patternClipLen = patternclip->length().getTicks();
+				auto patternTrackLen = patternStore->lengthOfPattern(i) * TimePos::ticksPerBar();
+				auto numOfCopies = patternClipLen / patternTrackLen;
+				// If we have an pattern clip that isn't a perfect multiple of the pattern size
+				// we check if the clip that will be copied would fit the remainder of the pattern clip
+				if (patternClipLen % patternTrackLen >= clipLen)
+				{
+					++numOfCopies;
+				}
+
+				for (int j = 0; j < numOfCopies; ++j)
+				{
+					Clip* dst = clonedTrack->createClip(pos + j * patternTrackLen);
+					Clip::copyStateTo(src, dst);
+					dst->movePosition(pos + j * patternTrackLen);
+				}
+			}
+		}
+	}
+
+	// If we are converting all pattern tracks, mute them all
+	// (if we convert a single one it will mute itself)
+	if (!singlePattern) { muteAllPatternTracks(); }
+
+	// Resolve all automation IDs
+	AutomationClip::resolveAllIDs();
+}
+
+void Song::muteAllPatternTracks()
+{
+	// Get a list of all tracks
+	const TrackList& tracks = this->tracks();
+	// Go through them and mute the pattern tracks only
+	for (Track* t : tracks)
+	{
+		if (t->type() == Track::Type::Pattern)
+		{
+			t->getMutedModel()->setValue(true);
+			t->dataChanged();
+		}
+	}
+}
 
 
 

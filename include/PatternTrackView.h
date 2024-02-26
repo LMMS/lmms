@@ -49,13 +49,23 @@ public:
 
 	const PatternTrack* getPatternTrack() const
 	{
-		return (m_patternTrack);
+		return m_patternTrack;
+	}
+	PatternTrack* getPatternTrack()
+	{
+		return m_patternTrack;
 	}
 
+	// Create menu to assign all tracks from the PatternTrack to a mixer channel
+	QMenu* createMixerMenu(QString title, QString newMixerLabel) override;
 
 public slots:
 	void clickedTrackLabel();
 
+
+private slots:
+	void createMixerLine();
+	void assignMixerLine(int channelIndex);
 
 private:
 	PatternTrack* m_patternTrack;
