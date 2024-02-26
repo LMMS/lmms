@@ -53,6 +53,15 @@ private slots:
 		auto task = ThreadPool::instance().enqueue([] { return true; });
         QCOMPARE(task.get(), true);
 	}
+
+	void canProcessMultipleTasksTest()
+	{
+		using namespace lmms;
+		auto taskOne = ThreadPool::instance().enqueue([] { return true; });
+		auto taskTwo = ThreadPool::instance().enqueue([] { return true; });
+        QCOMPARE(taskOne.get(), true);
+        QCOMPARE(taskTwo.get(), true);
+	}
 };
 
 QTEST_GUILESS_MAIN(ThreadPoolTest)
