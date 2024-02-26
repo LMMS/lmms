@@ -38,6 +38,14 @@ private slots:
 		const auto pool = ThreadPool{numWorkers};
         QCOMPARE(pool.numWorkers(), numWorkers);
 	}
+
+    void canProcessTaskTest()
+    {
+        using namespace lmms;
+        auto pool = ThreadPool{1};
+		auto task = pool.enqueue([] { return true; });
+        QCOMPARE(task.get(), true);
+	}
 };
 
 QTEST_GUILESS_MAIN(ThreadPoolTest)

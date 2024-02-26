@@ -25,8 +25,21 @@
 #ifndef LMMS_THREAD_POOL_H
 #define LMMS_THREAD_POOL_H
 
+#include <atomic>
+#include <future>
+#include <queue>
 #include <thread>
+#include <tuple>
+#include <type_traits>
 #include <vector>
+
+#ifdef __MINGW32__
+#include <mingw.condition_variable.h>
+#include <mingw.mutex.h>
+#else
+#include <condition_variable>
+#include <mutex>
+#endif
 
 namespace lmms {
 //! A thread pool that can be used for asynchronous processing.
@@ -37,8 +50,30 @@ public:
 	//! Precondition: `numWorkers > 0`.
 	ThreadPool(size_t numWorkers = std::thread::hardware_concurrency());
 
-	//! Destroys `ThreadPool`, aborting all running tasks and joining the worker threads.
+	//! Destroys the `ThreadPool` object.
+	//! This blocks until all workers have finished executing.
 	~ThreadPool();
+
+	//! Enqueue function `fn` with arguments `args` to be ran asynchronously.
+	template <typename Fn, typename... Args>
+	auto enqueue(Fn&& fn, Args&&... args) -> std::future<std::invoke_result_t<Fn, Args...>>
+	{
+		using ReturnType = std::invoke_result_t<Fn, Args...>;
+		using PackagedTaskType = std::packaged_task<ReturnType()>;
+
+		auto packagedTask = std::make_shared<PackagedTaskType>(
+			[fn = std::forward<Fn>(fn), args = std::make_tuple(std::forward<Args>(args)...)] {
+				return std::apply(fn, args);
+			});
+
+		{
+			const auto lock = std::unique_lock{m_runMutex};
+			m_queue.push([packagedTask] { (*packagedTask)(); });
+		}
+
+		m_runCond.notify_one();
+		return packagedTask->get_future();
+	}
 
 	//! Returns the number of worker threads used.
 	auto numWorkers() const -> size_t;
@@ -46,6 +81,10 @@ public:
 private:
 	void run();
 	std::vector<std::thread> m_workers;
+	std::queue<std::function<void()>> m_queue;
+	std::atomic<bool> m_done = false;
+	std::condition_variable m_runCond;
+	std::mutex m_runMutex;
 };
 } // namespace lmms
 

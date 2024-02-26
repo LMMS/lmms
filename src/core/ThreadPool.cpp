@@ -25,6 +25,7 @@
 
 #include <cassert>
 #include <cstddef>
+#include <memory>
 
 namespace lmms {
 ThreadPool::ThreadPool(size_t numWorkers)
@@ -40,6 +41,13 @@ ThreadPool::ThreadPool(size_t numWorkers)
 
 ThreadPool::~ThreadPool()
 {
+    {
+        const auto lock = std::unique_lock{m_runMutex};
+        m_done = true;
+    }
+
+    m_runCond.notify_all();
+
     for (auto& worker : m_workers)
     {
 		if (worker.joinable()) { worker.join(); }
@@ -53,5 +61,15 @@ auto ThreadPool::numWorkers() const -> size_t
 
 void ThreadPool::run()
 {
+    while (!m_done)
+    {
+        auto lock = std::unique_lock{m_runMutex};
+        m_runCond.wait(lock, [this] { return !m_queue.empty() || m_done; });
+        if (m_done) { break; }
+
+        auto task = m_queue.front();
+        m_queue.pop();
+        task();
+    }
 }
 } // namespace lmms
