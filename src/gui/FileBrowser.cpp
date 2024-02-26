@@ -67,7 +67,6 @@
 #include "TextFloat.h"
 #include "ThreadPool.h"
 #include "embed.h"
-#include "qnamespace.h"
 
 namespace lmms::gui
 {
