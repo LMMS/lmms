@@ -22,11 +22,11 @@
  *
  */
 
-#include "ThreadPool.h"
-
 #include <QObject>
 #include <QtTest/QtTest>
 #include <chrono>
+
+#include "ThreadPool.h"
 
 class ThreadPoolTest : public QObject
 {
