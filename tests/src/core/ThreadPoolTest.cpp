@@ -26,12 +26,23 @@
 
 #include <QObject>
 #include <QtTest/QtTest>
+#include <chrono>
 
 class ThreadPoolTest : public QObject
 {
 	Q_OBJECT
 private:
 	static constexpr size_t NumWorkers = 1;
+
+	auto enqueueDummyTask() -> std::future<bool>
+	{
+		using namespace lmms;
+		auto task = ThreadPool::instance().enqueue([] {
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			return true;
+		});
+		return task;
+	}
 
 private slots:
 
@@ -43,24 +54,24 @@ private slots:
 
 	void canSetNumWorkersTest()
 	{
-        using namespace lmms;
-        QCOMPARE(ThreadPool::instance().numWorkers(), NumWorkers);
+		using namespace lmms;
+		QCOMPARE(ThreadPool::instance().numWorkers(), NumWorkers);
 	}
 
-    void canProcessTaskTest()
-    {
-        using namespace lmms;
-		auto task = ThreadPool::instance().enqueue([] { return true; });
-        QCOMPARE(task.get(), true);
+	void canProcessTaskTest()
+	{
+		using namespace lmms;
+		auto task = enqueueDummyTask();
+		QCOMPARE(task.get(), true);
 	}
 
 	void canProcessMultipleTasksTest()
 	{
 		using namespace lmms;
-		auto taskOne = ThreadPool::instance().enqueue([] { return true; });
-		auto taskTwo = ThreadPool::instance().enqueue([] { return true; });
-        QCOMPARE(taskOne.get(), true);
-        QCOMPARE(taskTwo.get(), true);
+		auto taskOne = enqueueDummyTask();
+		auto taskTwo = enqueueDummyTask();
+		QCOMPARE(taskOne.get(), true);
+		QCOMPARE(taskTwo.get(), true);
 	}
 };
 
