@@ -25,7 +25,9 @@
 #ifndef LMMS_FILE_SEARCH_H
 #define LMMS_FILE_SEARCH_H
 
+#include <QDir>
 #include <QObject>
+#include <atomic>
 
 namespace lmms {
 //! A Qt object that encapsulates the operation of searching the file system.
@@ -48,14 +50,16 @@ public:
 
 signals:
 	//! Emitted when a result is found when searching the file system.
-	void foundResult(QString result);
+	void foundResult(FileSearch* search, QString result);
 
 private:
+	static auto pathInBlacklist(const QString& path) -> bool;
+	static auto dirFilters() -> QDir::Filters;
+	static auto sortFlags() -> QDir::SortFlags;
 	QString m_filter;
 	QStringList m_paths;
 	QStringList m_extensions;
 	std::atomic<bool> m_cancel = false;
-	static QStringList s_blacklist;
 };
 } // namespace lmms
 #endif // LMMS_FILE_SEARCH_H
