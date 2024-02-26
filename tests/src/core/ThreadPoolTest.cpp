@@ -32,7 +32,7 @@ class ThreadPoolTest : public QObject
 {
 	Q_OBJECT
 private:
-	static constexpr size_t NumWorkers = 1;
+	static constexpr size_t NumWorkers = 2;
 
 	auto enqueueDummyTask() -> std::future<bool>
 	{
