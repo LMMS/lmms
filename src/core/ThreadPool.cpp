@@ -63,12 +63,15 @@ void ThreadPool::run()
 {
 	while (!m_done)
 	{
-		auto lock = std::unique_lock{m_runMutex};
-		m_runCond.wait(lock, [this] { return !m_queue.empty() || m_done; });
-		if (m_done) { break; }
+		std::function<void()> task;
+		{
+			auto lock = std::unique_lock{m_runMutex};
+			m_runCond.wait(lock, [this] { return !m_queue.empty() || m_done; });
 
-		auto task = m_queue.front();
-		m_queue.pop();
+			if (m_done) { break; }
+			task = m_queue.front();
+			m_queue.pop();
+		}
 		task();
 	}
 }
