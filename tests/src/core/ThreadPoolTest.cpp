@@ -30,20 +30,27 @@
 class ThreadPoolTest : public QObject
 {
 	Q_OBJECT
+private:
+	static constexpr size_t NumWorkers = 1;
+
 private slots:
-	void canConstructAndDeconstructTest()
+
+	void initTestCase()
+	{
+		using namespace lmms;
+		ThreadPool::init(NumWorkers);
+	}
+
+	void canSetNumWorkersTest()
 	{
         using namespace lmms;
-		constexpr size_t numWorkers = 1;
-		const auto pool = ThreadPool{numWorkers};
-        QCOMPARE(pool.numWorkers(), numWorkers);
+        QCOMPARE(ThreadPool::instance().numWorkers(), NumWorkers);
 	}
 
     void canProcessTaskTest()
     {
         using namespace lmms;
-        auto pool = ThreadPool{1};
-		auto task = pool.enqueue([] { return true; });
+		auto task = ThreadPool::instance().enqueue([] { return true; });
         QCOMPARE(task.get(), true);
 	}
 };

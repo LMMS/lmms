@@ -48,10 +48,6 @@ namespace lmms {
 class ThreadPool
 {
 public:
-	//! Creates a `ThreadPool` containing `numWorkers` worker threads.
-	//! Precondition: `numWorkers > 0`.
-	ThreadPool(size_t numWorkers = std::thread::hardware_concurrency());
-
 	//! Destroys the `ThreadPool` object.
 	//! This blocks until all workers have finished executing.
 	~ThreadPool();
@@ -77,16 +73,25 @@ public:
 		return packagedTask->get_future();
 	}
 
-	//! Returns the number of worker threads used.
+	//! Return the number of worker threads used.
 	auto numWorkers() const -> size_t;
 
+	//! Initializes the global `ThreadPool` instance with `numWorkers` worker threads.
+	//! This can only have an effect the first time it is called.
+	static void init(size_t numWorkers);
+
+	//! Return the global `ThreadPool` instance.
+	static auto instance() -> ThreadPool&;
+
 private:
+	ThreadPool(size_t numWorkers);
 	void run();
 	std::vector<std::thread> m_workers;
 	std::queue<std::function<void()>> m_queue;
 	std::atomic<bool> m_done = false;
 	std::condition_variable m_runCond;
 	std::mutex m_runMutex;
+	inline static size_t s_numWorkers = std::thread::hardware_concurrency();
 };
 } // namespace lmms
 

@@ -30,7 +30,7 @@
 namespace lmms {
 ThreadPool::ThreadPool(size_t numWorkers)
 {
-    assert(numWorkers > 0);
+	assert(numWorkers > 0);
 
 	m_workers.reserve(numWorkers);
 	for (size_t i = 0; i < numWorkers; ++i)
@@ -41,15 +41,15 @@ ThreadPool::ThreadPool(size_t numWorkers)
 
 ThreadPool::~ThreadPool()
 {
-    {
-        const auto lock = std::unique_lock{m_runMutex};
-        m_done = true;
-    }
+	{
+		const auto lock = std::unique_lock{m_runMutex};
+		m_done = true;
+	}
 
-    m_runCond.notify_all();
+	m_runCond.notify_all();
 
-    for (auto& worker : m_workers)
-    {
+	for (auto& worker : m_workers)
+	{
 		if (worker.joinable()) { worker.join(); }
 	}
 }
@@ -61,15 +61,27 @@ auto ThreadPool::numWorkers() const -> size_t
 
 void ThreadPool::run()
 {
-    while (!m_done)
-    {
-        auto lock = std::unique_lock{m_runMutex};
-        m_runCond.wait(lock, [this] { return !m_queue.empty() || m_done; });
-        if (m_done) { break; }
+	while (!m_done)
+	{
+		auto lock = std::unique_lock{m_runMutex};
+		m_runCond.wait(lock, [this] { return !m_queue.empty() || m_done; });
+		if (m_done) { break; }
 
-        auto task = m_queue.front();
-        m_queue.pop();
-        task();
-    }
+		auto task = m_queue.front();
+		m_queue.pop();
+		task();
+	}
 }
+
+void ThreadPool::init(size_t numWorkers)
+{
+	s_numWorkers = numWorkers;
+}
+
+auto ThreadPool::instance() -> ThreadPool&
+{
+	static auto s_pool = ThreadPool{s_numWorkers};
+	return s_pool;
+}
+
 } // namespace lmms
