@@ -26,19 +26,21 @@
 #define LMMS_THREAD_POOL_H
 
 #include <atomic>
-#include <future>
 #include <queue>
-#include <thread>
 #include <tuple>
 #include <type_traits>
 #include <vector>
 
 #ifdef __MINGW32__
 #include <mingw.condition_variable.h>
+#include <mingw.future.h>
 #include <mingw.mutex.h>
+#include <mingw.thread.h>
 #else
 #include <condition_variable>
+#include <future>
 #include <mutex>
+#include <thread>
 #endif
 
 namespace lmms {
