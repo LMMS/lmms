@@ -1,5 +1,5 @@
 /*
- * ThreadPoolTest.cpp
+ * ThreadPool.h
  *
  * Copyright (c) 2024 saker
  *
@@ -22,23 +22,31 @@
  *
  */
 
-#include "ThreadPool.h"
+#ifndef LMMS_THREAD_POOL_H
+#define LMMS_THREAD_POOL_H
 
-#include <QObject>
-#include <QtTest/QtTest>
+#include <thread>
+#include <vector>
 
-class ThreadPoolTest : public QObject
+namespace lmms {
+//! A thread pool that can be used for asynchronous processing.
+class ThreadPool
 {
-	Q_OBJECT
-private slots:
-	void canConstructAndDeconstructTest()
-	{
-        using namespace lmms;
-		constexpr auto numWorkers = 1;
-		const auto pool = ThreadPool{numWorkers};
-        QCOMPARE(pool.numWorkers(), numWorkers);
-	}
-};
+public:
+	//! Creates a `ThreadPool` containing `numWorkers` worker threads.
+	//! Precondition: `numWorkers > 0`.
+	ThreadPool(size_t numWorkers = std::thread::hardware_concurrency());
 
-QTEST_GUILESS_MAIN(ThreadPoolTest)
-#include "ThreadPoolTest.moc"
+	//! Destroys `ThreadPool`, aborting all running tasks and joining the worker threads.
+	~ThreadPool();
+
+	//! Returns the number of worker threads used.
+	auto numWorkers() const -> size_t;
+
+private:
+	void run();
+	std::vector<std::thread> m_workers;
+};
+} // namespace lmms
+
+#endif // LMMS_THREAD_POOL_H

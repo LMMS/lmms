@@ -1,5 +1,5 @@
 /*
- * ThreadPoolTest.cpp
+ * ThreadPool.cpp
  *
  * Copyright (c) 2024 saker
  *
@@ -21,24 +21,37 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-
 #include "ThreadPool.h"
 
-#include <QObject>
-#include <QtTest/QtTest>
+#include <cassert>
+#include <cstddef>
 
-class ThreadPoolTest : public QObject
+namespace lmms {
+ThreadPool::ThreadPool(size_t numWorkers)
 {
-	Q_OBJECT
-private slots:
-	void canConstructAndDeconstructTest()
-	{
-        using namespace lmms;
-		constexpr auto numWorkers = 1;
-		const auto pool = ThreadPool{numWorkers};
-        QCOMPARE(pool.numWorkers(), numWorkers);
-	}
-};
+    assert(numWorkers > 0);
 
-QTEST_GUILESS_MAIN(ThreadPoolTest)
-#include "ThreadPoolTest.moc"
+	m_workers.reserve(numWorkers);
+	for (size_t i = 0; i < numWorkers; ++i)
+	{
+		m_workers.emplace_back([this] { run(); });
+	}
+}
+
+ThreadPool::~ThreadPool()
+{
+    for (auto& worker : m_workers)
+    {
+		if (worker.joinable()) { worker.join(); }
+	}
+}
+
+auto ThreadPool::numWorkers() const -> size_t
+{
+	return m_workers.size();
+}
+
+void ThreadPool::run()
+{
+}
+} // namespace lmms
