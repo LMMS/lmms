@@ -26,26 +26,27 @@ class LMMS_EXPORT PointGraphView : public QWidget, public ModelView
 public:
 	// TODO: remove styles			Done
 	// TODO: change x unsigned int to float			Done
-	// TODO: make a new class inside PointGraphDataArray to store the point data
+	// TODO: make a new class inside PointGraphDataArray to store the point data			Done
 	// TODO: add is selectable			Done
 	// TODO: add new setting to make the last point cord 1, 1			Done
 	// TODO: flip mouse y position			Done
 	// TODO: function to get multiple values
-	// TODO: revrite comments
+	// TODO: rewrite comments
 	// TODO: rename functions and values
 
 	// TODO: automation:
-	// TODO: add 4 new values to the nested class: curve, type, valueA, valueB (1 type is 3 value long)
+	// TODO: add 4 new values to the nested class: curve, type, valueA, valueB (1 type is 4 value long)			Done
 	// TODO: add automation support
-	// TODO: setPointAutomatedAttrib() --> changes the type value between y pos, valueA, valueB
-	// TODO  setPointType(unsigned int type)
-	// TODO: add effector int location to the PointDataArray class
+	// TODO: setPointAutomatedAttrib() --> changes the type value between y pos, curve, valueA, valueB			Done
+	// TODO  setPointType(unsigned int type)			Done
+	// TODO: add effector(PointGraphDataArray) int location to the PointGraphDataArray class
 	// TODO: add effector line attributes to the nested class
 	// TODO: add effects
 
 	// TODO: clear array when 2. last point is deleted in the widget
 	// TODO: event when a dataArray's size gets to 0
-	// TODO: abiliti to scale displayed coords in PointGraphView (not 0 - 100) (add scalers)
+	// TODO: ability to scale displayed coords in PointGraphView (not 0 - 100) (add scalers)
+	// TODO: check PointGraphDataArray signals
 
 	PointGraphView(QWidget * parentIn,
 		int widthIn, int heightIn,
@@ -81,7 +82,7 @@ private:
 	void modelChanged() override;
 
 	std::pair<float, float> mapMousePos(int xIn, int yIn, bool nonNegativeIn);
-	std::pair<int, int> mapDataPos(std::pair<float, float> posIn, bool nonNegativeIn);
+	std::pair<int, int> mapDataPos(float xIn, float yIn, bool nonNegativeIn);
 
 	float getDistance(int xAIn, int yAIn, int xBIn, int yBIn);
 
@@ -136,7 +137,9 @@ public:
 		}
 	}
 	// returns location
-	unsigned int addArray(std::vector<std::pair<float, float>>* arrayIn);
+	unsigned int addArray(std::vector<std::pair<float, float>>* arrayIn, bool isCurvedIn);
+	// returns location
+	unsigned int addArray(std::vector<float>* arrayIn, bool isCurvedIn);
 	// returns location
 	unsigned int addArray();
 	// preservs the order
@@ -203,13 +206,14 @@ public:
 
 	// array:
 	// returns the location of added/found point, -1 if not found and can not be added
-	int add(float posIn);
+	int add(float xIn);
 	// deletes the data/sample if m_isFixedSize is disabled
 	void del(unsigned int locationIn);
 	// clears data/sample array without any checks
 	inline void clear()
 	{
 		m_dataArray.clear();
+		dataChanged();
 	}
 	inline size_t size()
 	{
@@ -222,34 +226,104 @@ public:
 	void formatArray(bool clampIn, bool sortIn);
 
 	// get:
-	inline std::pair<float, float>* getData(unsigned int locationIn)
+	inline float* getX(unsigned int locationIn)
 	{
-		return &m_dataArray[locationIn];
+		return &m_dataArray[locationIn].m_x;
 	}
+	inline float* getY(unsigned int locationIn)
+	{
+		return &m_dataArray[locationIn].m_y;
+	}
+	inline float* getC(unsigned int locationIn)
+	{
+		return &m_dataArray[locationIn].m_c;
+	}
+	inline float* getValA(unsigned int locationIn)
+	{
+		return &m_dataArray[locationIn].m_valA;
+	}
+	inline float* getValB(unsigned int locationIn)
+	{
+		return &m_dataArray[locationIn].m_valB;
+	}
+	unsigned int getType(unsigned int locationIn);
+	unsigned int getAutomatedAttrib(unsigned int locationIn);
+
 	// returns -1 when position is not found
-	int getLocation(float posIn);
+	int getLocation(float xIn);
 	// gets the nearest data location to the position,
 	// foundOut is true when the nearest position = posIn,
 	// reurns -1 when search failed
-	int getNearestLocation(float posIn, bool* foundOut);
-	float getValueAtPositon(float posIn); // TODO
+	int getNearestLocation(float xIn, bool* foundOut);
+
+	float getValueAtPositon(float xIn); // TODO
 
 	// set:
 	// sets data array without any checks
-	inline void setDataArray(std::vector<std::pair<float, float>>* dataArrayIn)
-	{
-		m_dataArray = *dataArrayIn;
-	}
-	// sets value when m_isFixedValue is disabed
-	void setValue(unsigned int locationIn, float valueIn);
+	// inport x and y coords
+	void setDataArray(std::vector<std::pair<float, float>>* dataArrayIn, bool isCurvedIn);
+	// inport y coords
+	void setDataArray(std::vector<float>* dataArrayIn, bool isCurvedIn);
+
 	// sets position when m_isFixedPos is disabed, returns final location
-	unsigned int setPos(unsigned int locationIn, float posIn);
+	unsigned int setX(unsigned int locationIn, float xIn);
+	// sets value when m_isFixedValue is disabed
+	void setY(unsigned int locationIn, float yIn);
+	// sets value when m_isFixedValue is disabed
+	void setC(unsigned int locationIn, float cIn); //TODO
+	// sets value when m_isFixedValue is disabed
+	void setValA(unsigned int locationIn, float valueIn); //TODO
+	// sets value when m_isFixedValue is disabed
+	void setValB(unsigned int locationIn, float valueIn); //TODO
+	// sets value when m_isFixedValue is disabed
+	void setType(unsigned int locationIn, unsigned int typeIn); //TODO
+	// sets value when m_isFixedValue is disabed
+	void setAutomatedAttrib(unsigned int locationIn, unsigned int attribLocationIn); //TODO
+
 // signals: // not qt
 	// m_dataArray
 	void dataChanged();
 	// color
 	void styleChanged();
 private:
+	class PointGraphPoint
+	{
+	public:
+		inline PointGraphPoint()
+		{
+			m_x = 0.0f;
+			m_y = 0.0f;
+			m_c = 0.0f;
+			m_valA = 0.0f;
+			m_valB = 0.0f;
+			m_type = 0;
+		}
+		inline PointGraphPoint(float xIn, float yIn)
+		{
+			m_x = xIn;
+			m_y = yIn;
+			m_c = 0.0f;
+			m_valA = 0.0f;
+			m_valB = 0.0f;
+			m_type = 0;
+		}
+		inline ~PointGraphPoint()
+		{
+		}
+		// 0 - 1
+		float m_x;
+		// 0 (or -1) - 1
+		float m_y;
+		// curve, -1 - 1
+		float m_c;
+		// valueA, -1 - 1
+		float m_valA;
+		// valueB, -1 - 1
+		float m_valB;
+		// line type, 0 -
+
+		unsigned int m_type;
+	};
 	// swapping values, "slide" moves the values (between) once left or right
 	// handle m_isFixedEndPoints when using this
 	void swap(unsigned int locationAIn, unsigned int locationBIn, bool slide);
@@ -271,7 +345,6 @@ private:
 
 	// can values be less than 0
 	bool m_nonNegative;
-
 	QColor m_lineColor;
 	QColor m_activeColor;
 	QColor m_fillColor;
@@ -280,8 +353,8 @@ private:
 
 	unsigned int* m_maxLength;
 
-	// ordered array of 0 < position < max_Length, -1(or 0) < value < 1
-	std::vector<std::pair<float, float>> m_dataArray;
+	// ordered array of PointGraphPoints
+	std::vector<PointGraphPoint> m_dataArray;
 };
 
 } // namespace lmms
