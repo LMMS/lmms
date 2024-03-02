@@ -33,7 +33,7 @@
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QPushButton>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QScrollArea>
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
@@ -65,7 +65,7 @@ protected:
 		QString name = sourceModel()->data(nameIndex, Qt::DisplayRole).toString();
 		QString type = sourceModel()->data(typeIndex, Qt::DisplayRole).toString();
 
-		QRegExp nameRegExp(filterRegExp());
+		QRegularExpression nameRegExp(filterRegExp());
 		nameRegExp.setCaseSensitivity(Qt::CaseInsensitive);
 
 		bool nameFilterPassed = nameRegExp.indexIn(name) != -1;

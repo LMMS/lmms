@@ -89,7 +89,7 @@ VersionedSaveDialog::VersionedSaveDialog( QWidget *parent,
 
 bool VersionedSaveDialog::changeFileNameVersion(QString &fileName, bool increment )
 {
-	static QRegExp regexp( "[- ]\\d+(\\.\\w+)?$" );
+	static QRegularExpression regexp( "[- ]\\d+(\\.\\w+)?$" );
 
 	int idx = regexp.indexIn( fileName );
 	// For file names without extension (no ".mmpz")

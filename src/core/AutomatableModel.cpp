@@ -97,7 +97,7 @@ bool AutomatableModel::isAutomated() const
 
 bool AutomatableModel::mustQuoteName(const QString& name)
 {
-	QRegExp reg("^[A-Za-z0-9._-]+$");
+	QRegularExpression reg("^[A-Za-z0-9._-]+$");
 	return !reg.exactMatch(name);
 }
 

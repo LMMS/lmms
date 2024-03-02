@@ -126,7 +126,7 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
 
 	m_filterEdit = new QLineEdit(this);
 	connect(m_filterEdit, &QLineEdit::textChanged, this, [this](const QString &text) {
-		m_model.setFilterRegExp(QRegExp(text, Qt::CaseInsensitive));
+		m_model.setFilterRegExp(QRegularExpression(text, Qt::CaseInsensitive));
 	});
 	connect(m_filterEdit, &QLineEdit::textChanged, this, &EffectSelectDialog::updateSelection);
 	m_filterEdit->setFocus();
