@@ -10,12 +10,14 @@
 #include "Model.h"
 #include "ModelView.h"
 #include "lmms_basics.h"
+#include "AutomatableModel.h"
 
 namespace lmms
 {
 
 class PointGraphModel;
 class PointGraphDataArray;
+class FloatModel;
 
 namespace gui
 {
@@ -37,16 +39,24 @@ public:
 	// TODO: automation:
 	// TODO: add 4 new values to the nested class: curve, type, valueA, valueB (1 type is 4 value long)			Done
 	// TODO: add automation support
+	//		TODO: make FloatModel pointer array		Done
+	//		TODO: allocate FloatModels with new		Done
+	//		TODO: delete FloatModels in destructor		Done
+	//		TODO: save FloatModels (run saveSettings)
+	//		TODO: getter for the FloatModels for saving		Done
+	//		TODO: connect FloatModels connect with getter
 	// TODO: setPointAutomatedAttrib() --> changes the type value between y pos, curve, valueA, valueB			Done
-	// TODO  setPointType(unsigned int type)			Done
-	// TODO: add effector(PointGraphDataArray) int location to the PointGraphDataArray class
-	// TODO: add effector line attributes to the nested class
-	// TODO: add effects
+	// TODO: setPointType(unsigned int type)			Done
+	// TODO: add effector(PointGraphDataArray) int location to the PointGraphDataArray class			Done
+	// TODO: add effector line attributes to the nested class			Done
+	// TODO: add effect implementation
 
-	// TODO: clear array when 2. last point is deleted in the widget
+	// TODO: clear array when 2. last point is deleted in the widget		IGNORE
 	// TODO: event when a dataArray's size gets to 0
 	// TODO: ability to scale displayed coords in PointGraphView (not 0 - 100) (add scalers)
 	// TODO: check PointGraphDataArray signals
+	// TODO: journalling in PointGraphModel
+	// TODO: m_maxLenght* should be replaced with m_parent->getMaxLength()			Done
 
 	PointGraphView(QWidget * parentIn,
 		int widthIn, int heightIn,
@@ -109,7 +119,7 @@ private:
 
 } // namespace gui
 
-class LMMS_EXPORT PointGraphModel : public Model
+class LMMS_EXPORT PointGraphModel : public Model//, public JournallingObject
 {
 Q_OBJECT
 public:
@@ -148,6 +158,7 @@ public:
 	{
 		m_dataArrays.clear();
 	}
+	unsigned int getDataArrayLocation(PointGraphDataArray* dataArrayIn);
 
 	// save, load
 	//void saveSettings(QDomDocument& doc, QDomElement& element, const QString& name); //TODO
@@ -173,8 +184,9 @@ class LMMS_EXPORT PointGraphDataArray
 {
 
 public:
+	// avoid using this or run updateConnections() after initialization
 	PointGraphDataArray();
-	PointGraphDataArray(unsigned int* maxLengthIn,
+	PointGraphDataArray(
 	bool isFixedSizeIn, bool isFixedValueIn, bool isFixedPosIn, bool nonNegativeIn,
 	bool isFixedEndPointsIn, bool isSelectableIn, bool isEditableAttribIn, PointGraphModel* parentIn);
 	~PointGraphDataArray();
@@ -191,7 +203,8 @@ public:
 	void setLineColor(QColor colorIn);
 	void setActiveColor(QColor colorIn);
 	void setFillColor(QColor colorIn);
-	void setMaxLength(unsigned int* maxLengthIn);
+	// returns true if successful
+	bool setEffectorArrayLocation(unsigned int locationIn);
 
 	bool getFixedSize();
 	bool getFixedValue();
@@ -203,8 +216,11 @@ public:
 	QColor* getLineColor();
 	QColor* getActiveColor();
 	QColor* getFillColor();
+	// returns -1 if it has no effector
+	int getEffectorArrayLocation();
 
-	// array:
+
+	// array: -------------------
 	// returns the location of added/found point, -1 if not found and can not be added
 	int add(float xIn);
 	// deletes the data/sample if m_isFixedSize is disabled
@@ -225,7 +241,8 @@ public:
 	// clampIn: should clamp, sortIn: should sort
 	void formatArray(bool clampIn, bool sortIn);
 
-	// get:
+
+	// get attribute: -------------------
 	inline float* getX(unsigned int locationIn)
 	{
 		return &m_dataArray[locationIn].m_x;
@@ -248,7 +265,18 @@ public:
 	}
 	unsigned int getType(unsigned int locationIn);
 	unsigned int getAutomatedAttrib(unsigned int locationIn);
+	inline bool getEffectOnlyPoints(unsigned int locationIn)
+	{
+		return &m_dataArray[locationIn].m_effectOnlyPoints;
+	}
+	bool getEffect(unsigned int locationIn, unsigned int effectNumberIn);
+	inline FloatModel* getAutomationModel(unsigned int locationIn)
+	{
+		return m_dataArray[locationIn].m_automationModel;
+	}
 
+
+	// get: -------------------
 	// returns -1 when position is not found
 	int getLocation(float xIn);
 	// gets the nearest data location to the position,
@@ -258,27 +286,36 @@ public:
 
 	float getValueAtPositon(float xIn); // TODO
 
-	// set:
+
+	// set: -------------------
 	// sets data array without any checks
 	// inport x and y coords
 	void setDataArray(std::vector<std::pair<float, float>>* dataArrayIn, bool isCurvedIn);
 	// inport y coords
 	void setDataArray(std::vector<float>* dataArrayIn, bool isCurvedIn);
 
-	// sets position when m_isFixedPos is disabed, returns final location
+
+	// set attribute: -------------------
+	// sets position when m_isFixedPos is disabled, returns final location
 	unsigned int setX(unsigned int locationIn, float xIn);
-	// sets value when m_isFixedValue is disabed
+	// sets value when m_isFixedValue is disabled
 	void setY(unsigned int locationIn, float yIn);
-	// sets value when m_isFixedValue is disabed
-	void setC(unsigned int locationIn, float cIn); //TODO
-	// sets value when m_isFixedValue is disabed
-	void setValA(unsigned int locationIn, float valueIn); //TODO
-	// sets value when m_isFixedValue is disabed
-	void setValB(unsigned int locationIn, float valueIn); //TODO
-	// sets value when m_isFixedValue is disabed
-	void setType(unsigned int locationIn, unsigned int typeIn); //TODO
-	// sets value when m_isFixedValue is disabed
-	void setAutomatedAttrib(unsigned int locationIn, unsigned int attribLocationIn); //TODO
+	// sets value when m_isFixedValue is disabled
+	void setC(unsigned int locationIn, float cIn);
+	// sets value when m_isFixedValue is disabled
+	void setValA(unsigned int locationIn, float valueIn);
+	// sets value when m_isFixedValue is disabled
+	void setValB(unsigned int locationIn, float valueIn);
+	// sets value when m_isFixedValue is disabled
+	void setType(unsigned int locationIn, unsigned int typeIn);
+	// sets value when m_isFixedValue is disabled
+	void setAutomatedAttrib(unsigned int locationIn, unsigned int attribLocationIn);
+	void setEffectOnlyPoints(unsigned int locationIn, bool boolIn);
+	void setEffect(unsigned int locationIn, unsigned int effectNumberIn, bool boolIn);
+	// if isAutomatedIn is true then make a new FloatModel and connect it, else delete
+	// the currently used FloatModel
+	void setAutomated(unsigned int locationIn, bool isAutomatedIn); // TODO
+
 
 // signals: // not qt
 	// m_dataArray
@@ -297,6 +334,16 @@ private:
 			m_valA = 0.0f;
 			m_valB = 0.0f;
 			m_type = 0;
+
+			m_effectOnlyPoints = false;
+			m_effectAdd = true;
+			m_effectSubtract = false;
+			m_effectMultiply = false;
+			m_effectDivide = false;
+			m_effectPower = false;
+			m_effectLog = false;
+
+			m_automationModel = nullptr;
 		}
 		inline PointGraphPoint(float xIn, float yIn)
 		{
@@ -306,13 +353,27 @@ private:
 			m_valA = 0.0f;
 			m_valB = 0.0f;
 			m_type = 0;
+
+			m_effectOnlyPoints = false;
+			m_effectAdd = true;
+			m_effectSubtract = false;
+			m_effectMultiply = false;
+			m_effectDivide = false;
+			m_effectPower = false;
+			m_effectLog = false;
+
+			m_automationModel = nullptr;
 		}
 		inline ~PointGraphPoint()
 		{
+			if (m_automationModel != nullptr)
+			{
+				delete m_automationModel;
+			}
 		}
 		// 0 - 1
 		float m_x;
-		// 0 (or -1) - 1
+		// 0 (or -1) - 1, the automatin value is scaled if needed TODO
 		float m_y;
 		// curve, -1 - 1
 		float m_c;
@@ -321,8 +382,19 @@ private:
 		// valueB, -1 - 1
 		float m_valB;
 		// line type, 0 -
-
 		unsigned int m_type;
+
+		bool m_effectOnlyPoints;
+
+		bool m_effectAdd;
+		bool m_effectSubtract;
+		bool m_effectMultiply;
+		bool m_effectDivide;
+		bool m_effectPower;
+		bool m_effectLog;
+
+		// automation: connecting to floatmodels, nullptr when it isn't conntected'
+		FloatModel* m_automationModel;
 	};
 	// swapping values, "slide" moves the values (between) once left or right
 	// handle m_isFixedEndPoints when using this
@@ -351,7 +423,8 @@ private:
 
 	PointGraphModel* m_parent;
 
-	unsigned int* m_maxLength;
+	// which PointGraphDataArray can effect this one, -1 if not effected
+	int m_effectorLocation;
 
 	// ordered array of PointGraphPoints
 	std::vector<PointGraphPoint> m_dataArray;
