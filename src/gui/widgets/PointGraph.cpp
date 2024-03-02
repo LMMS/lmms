@@ -455,7 +455,7 @@ unsigned int PointGraphModel::addArray(std::vector<float>* arrayIn, bool isCurve
 
 unsigned int PointGraphModel::addArray()
 {
-	PointGraphDataArray tempArray(&m_maxLength,
+	PointGraphDataArray tempArray(
 		false, false, false, false, false, false, false, this);
 	m_dataArrays.push_back(tempArray);
 	return m_dataArrays.size() - 1;
@@ -479,12 +479,16 @@ void PointGraphModel::dataArrayStyleChanged()
 {
 	emit styleChanged();
 }
+unsigned int PointGraphModel::getDataArrayLocation(PointGraphDataArray* dataArrayIn)
+{
+	return reinterpret_cast<std::uintptr_t>(&dataArrayIn) -
+		reinterpret_cast<std::uintptr_t>(&m_dataArrays) / sizeof(PointGraphDataArray);
+}
 
 // PointGraphDataArray ------
 
 PointGraphDataArray::PointGraphDataArray()
 {
-	m_maxLength = nullptr;
 	m_isFixedSize = false;
 	m_isFixedValue = false;
 	m_isFixedPos = false;
@@ -498,14 +502,15 @@ PointGraphDataArray::PointGraphDataArray()
 	// is not enabled by default
 	m_fillColor = QColor(0, 0, 0, 0);
 
+	m_effectorLocation = -1;
+
 	m_dataArray = {};
 }
 
-PointGraphDataArray::PointGraphDataArray(unsigned int* maxLengthIn,
+PointGraphDataArray::PointGraphDataArray(
 	bool isFixedSizeIn, bool isFixedValueIn, bool isFixedPosIn, bool nonNegativeIn,
 	bool isFixedEndPointsIn, bool isSelectableIn, bool isEditableAttribIn, PointGraphModel* parentIn)
 {
-	m_maxLength = maxLengthIn;
 	m_isFixedSize = isFixedSizeIn;
 	m_isFixedValue = isFixedValueIn;
 	m_isFixedPos = isFixedPosIn;
@@ -518,6 +523,8 @@ PointGraphDataArray::PointGraphDataArray(unsigned int* maxLengthIn,
 	m_activeColor = QColor(255, 255, 255, 255);
 	// is not enabled by default
 	m_fillColor = QColor(0, 0, 0, 0);
+
+	m_effectorLocation = -1;
 
 	m_dataArray = {};
 
@@ -586,9 +593,30 @@ void PointGraphDataArray::setFillColor(QColor colorIn)
 	m_fillColor = colorIn;
 	styleChanged();
 }
-void PointGraphDataArray::setMaxLength(unsigned int* maxLengthIn)
+bool PointGraphDataArray::setEffectorArrayLocation(unsigned int locationIn)
 {
-	m_maxLength = maxLengthIn;
+	unsigned int curLocation = m_parent->getDataArrayLocation(this);
+	qDebug("setEffectorArrayLocation cur_loaction %d", curLocation);
+	int arrayLocation = locationIn;
+	bool found = false;
+	for (unsigned int i = 0; i < m_parent->getDataArraySize(); i++)
+	{
+		arrayLocation = m_parent->getDataArray(arrayLocation)->getEffectorArrayLocation();
+		if (arrayLocation == -1)
+		{
+			break;
+		}
+		else if(arrayLocation == curLocation)
+		{
+			found = true;
+			break;
+		}
+	}
+	if (found == false)
+	{
+		m_effectorLocation = locationIn;
+	}
+	return !found;
 }
 
 bool PointGraphDataArray::getFixedSize()
@@ -631,13 +659,17 @@ QColor* PointGraphDataArray::getFillColor()
 {
 	return &m_fillColor;
 }
+int PointGraphDataArray::getEffectorArrayLocation()
+{
+	return m_effectorLocation;
+}
 
 // array:
 
 int PointGraphDataArray::add(float xIn)
 {
 	int location = -1;
-	if (m_dataArray.size() < *m_maxLength)
+	if (m_dataArray.size() < m_parent->getMaxLength())
 	{
 	qDebug("add 1. success");
 		bool found = false;
@@ -996,7 +1028,67 @@ unsigned int PointGraphDataArray::getAutomatedAttrib(unsigned int locationIn)
 {
 	return m_dataArray[locationIn].m_type - getType(locationIn);
 }
-
+void PointGraphDataArray::setEffectOnlyPoints(unsigned int locationIn, bool boolIn)
+{
+	m_dataArray[locationIn].m_effectOnlyPoints = boolIn;
+}
+bool PointGraphDataArray::getEffect(unsigned int locationIn, unsigned int effectNumberIn)
+{
+	switch (effectNumberIn)
+	{
+		case 0:
+			return m_dataArray[locationIn].m_effectAdd;
+		case 1:
+			return m_dataArray[locationIn].m_effectSubtract;
+		case 2:
+			return m_dataArray[locationIn].m_effectMultiply;
+		case 3:
+			return m_dataArray[locationIn].m_effectDivide;
+		case 4:
+			return m_dataArray[locationIn].m_effectPower;
+		case 5:
+			return m_dataArray[locationIn].m_effectLog;
+	}
+}
+void PointGraphDataArray::setEffect(unsigned int locationIn, unsigned int effectNumberIn, bool boolIn)
+{
+	switch (effectNumberIn)
+	{
+		case 0:
+			m_dataArray[locationIn].m_effectAdd = boolIn;
+			break;
+		case 1:
+			m_dataArray[locationIn].m_effectSubtract = boolIn;
+			break;
+		case 2:
+			m_dataArray[locationIn].m_effectMultiply = boolIn;
+			break;
+		case 3:
+			m_dataArray[locationIn].m_effectDivide = boolIn;
+			break;
+		case 4:
+			m_dataArray[locationIn].m_effectPower = boolIn;
+			break;
+		case 5:
+			m_dataArray[locationIn].m_effectLog = boolIn;
+			break;
+	}
+}
+void PointGraphDataArray::setAutomated(unsigned int locationIn, bool isAutomatedIn)
+{
+	if (isAutomatedIn == true)
+	{
+		if (m_dataArray[locationIn].m_automationModel == nullptr)
+		{
+			m_dataArray[locationIn].m_automationModel = new FloatModel(0.0f, -1.0f, 1.0f, 0.0f, nullptr, QString(), false);
+		}
+	}
+	else
+	{
+		delete m_dataArray[locationIn].m_automationModel;
+		m_dataArray[locationIn].m_automationModel = nullptr; // is this needed? TODO
+	}
+}
 
 void PointGraphDataArray::swap(unsigned int locationAIn, unsigned int locationBIn, bool slide)
 {
