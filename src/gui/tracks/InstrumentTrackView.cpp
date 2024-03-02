@@ -397,6 +397,11 @@ QMenu * InstrumentTrackView::createMixerMenu(QString title, QString newMixerLabe
 	return mixerMenu;
 }
 
+QPixmap InstrumentTrackView::determinePixmap()
+{
+	return determinePixmap(dynamic_cast<InstrumentTrack*>(getTrack()));
+}
+
 
 QPixmap InstrumentTrackView::determinePixmap(InstrumentTrack* instrumentTrack)
 {
