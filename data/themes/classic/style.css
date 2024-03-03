@@ -524,6 +524,13 @@ QToolButton:hover {
 	color: white;
 }
 
+QToolButton:hover:checked {
+	border-top: 1px solid #343840;
+	border-bottom: 1px solid #4a515e;
+	border-radius: 2px;
+	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #292d33, stop:1 #22262c)
+}
+
 QToolButton:pressed {
 	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #969696, stop:0.5 #c9c9c9, stop:1 #969696 );
 	padding: 2px 1px 0px 1px;
