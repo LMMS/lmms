@@ -44,6 +44,8 @@ class ClapControlBase;
 namespace gui
 {
 
+class PixmapButton;
+
 //! View for one processor, ClapViewBase contains 2 of those for mono plugins
 class ClapViewInstance : public LinkedModelGroupView
 {
@@ -69,6 +71,11 @@ protected:
 	QPushButton* m_reloadPluginButton = nullptr;
 	QPushButton* m_toggleUIButton = nullptr;
 	QPushButton* m_helpButton = nullptr;
+
+	// Preset selector TODO: Make generic and move to dedicated file?
+	PixmapButton* m_prevPresetButton = nullptr;
+	PixmapButton* m_nextPresetButton = nullptr;
+	QPushButton* m_selectPresetButton = nullptr;
 
 	void toggleUI();
 	void toggleHelp(bool visible);

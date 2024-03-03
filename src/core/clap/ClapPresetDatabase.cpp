@@ -213,9 +213,23 @@ auto ClapPresetDatabase::fromClapLocation(const char* location) -> std::string
 		: std::string{PathUtil::basePrefix(PathUtil::Base::Internal)};
 }
 
+auto ClapPresetDatabase::fromClapLocation([[maybe_unused]] clap_preset_discovery_location_kind kind,
+	const char* location, const char* loadKey, std::string& ref) -> std::optional<PresetLoadData>
+{
+	if (!location && !loadKey) { return std::nullopt; }
+
+	PresetLoadData data;
+	ref = fromClapLocation(location);
+	data.location = ref;
+	data.loadKey = loadKey ? loadKey : std::string{};
+	return data;
+}
+
 auto ClapPresetDatabase::createPreset(const PresetLoadData& loadData) const -> std::optional<Preset>
 {
-	// NOTE: Any time this method is called, PresetLoadData stores a path to a preset file
+	// NOTE: Any time this method is called, PresetLoadData stores a path to a preset file (???)
+	// TODO: Should all possible presets already be discovered at the start? Is it a bug if this is ever called for CLAP??
+
 	const auto fullPath = fs::path{PathUtil::toAbsolute(loadData.location).value()} / loadData.loadKey;
 	if (std::error_code ec; !fs::is_regular_file(fullPath, ec)) { return std::nullopt; }
 
@@ -236,6 +250,10 @@ auto ClapPresetDatabase::createPreset(const PresetLoadData& loadData) const -> s
 					"\n\tLoading just the first preset instead."); // TODO: Implement this feature
 				return presets->at(0);
 			}
+			assert(presets->at(0).loadData.loadKey.empty());
+			// TODO: If it's working correctly, the preset `location` should be the full path and the `loadKey`
+			//       should be nullptr. (??? maybe not when the preset file is a container for many presets?)
+			//       (see free-audio/clap-host's PluginHost::loadNativePluginPreset() method)
 			return presets->at(0);
 		}
 
@@ -243,7 +261,7 @@ auto ClapPresetDatabase::createPreset(const PresetLoadData& loadData) const -> s
 		return std::nullopt;
 	}
 
-	return std::nullopt; // TODO: Implement this
+	return std::nullopt;
 }
 
 auto ClapPresetDatabase::Indexer::create(const clap_preset_discovery_factory& factory,
@@ -274,8 +292,8 @@ ClapPresetDatabase::Indexer::Indexer(const clap_preset_discovery_factory& factor
 	}
 	, m_provider{factory.create(&factory, &m_indexer, descriptor.id), ProviderDeleter{}}
 {
-	std::string tempMsg = "PRESET DISCOVERY PROVIDER DESCRIPTOR ID" + std::string{descriptor.id};
-	ClapLog::globalLog(CLAP_LOG_ERROR, tempMsg);
+	std::string tempMsg = "PRESET DISCOVERY PROVIDER DESCRIPTOR ID: " + std::string{descriptor.id};
+	ClapLog::globalLog(CLAP_LOG_INFO, tempMsg);
 
 	if (!m_provider)
 	{
@@ -317,6 +335,8 @@ auto ClapPresetDatabase::Indexer::clapDeclareFiletype(const clap_preset_discover
 	ft.name = filetype->name;
 	if (filetype->description) { ft.description = filetype->description; }
 	if (filetype->file_extension) { ft.extension = filetype->file_extension; }
+
+	qDebug().nospace() << "clapDeclareFiletype: name: \"" << ft.name.c_str() << "\" ext: \"" << ft.extension.c_str() << "\" desc: \"" << ft.description.c_str() << "\"";
 
 	self->m_filetypes.push_back(std::move(ft));
 	return true;
@@ -369,6 +389,8 @@ auto ClapPresetDatabase::Indexer::clapDeclareLocation(const clap_preset_discover
 
 	loc.location = fromClapLocation(location->location);
 
+	qDebug().nospace() << "clapDeclareLocation: name: \"" << loc.name.c_str() << "\" loc: \"" << loc.location.c_str() << "\"";
+
 	self->m_locations.push_back(std::move(loc));
 
 	return true;
@@ -385,6 +407,7 @@ auto ClapPresetDatabase::Indexer::clapGetExtension(const clap_preset_discovery_i
 	const char* extensionId) -> const void*
 {
 	// LMMS does not have any custom indexer extensions
+	qDebug().nospace() << "clapGetExtension: Plugin requested extension: \"" << extensionId << "\"";
 	return nullptr;
 }
 
@@ -453,7 +476,7 @@ auto ClapPresetDatabase::MetadataReceiver::clapBeginPreset(
 	preset.loadData.location = self->m_location; // references the preset map's key
 	preset.loadData.loadKey = loadKey ? loadKey : std::string{};
 
-	qDebug() << "clapBeginPreset: display name:" << preset.metadata.displayName.c_str() << "load key:" << preset.loadData.loadKey.c_str();
+	qDebug().nospace() << "clapBeginPreset: display name: \"" << preset.metadata.displayName.c_str() << "\" load key: \"" << preset.loadData.loadKey.c_str() << "\"";
 
 	// TODO
 

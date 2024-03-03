@@ -144,7 +144,8 @@ auto ClapSubPluginFeatures::logo([[maybe_unused]] const Key& key) const -> const
 
 auto ClapSubPluginFeatures::pluginInfo(const Key& key) -> const ClapPluginInfo*
 {
-	return Engine::getClapManager()->pluginInfo(key.attributes["uri"]);
+	const auto uri = key.attributes["uri"].toStdString();
+	return Engine::getClapManager()->pluginInfo(uri);
 }
 
 } // namespace lmms

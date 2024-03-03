@@ -39,8 +39,7 @@ ClapFxControls::ClapFxControls(ClapEffect* effect, const QString& uri)
 {
 	if (isValid())
 	{
-		connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged,
-			this, [this](){ ClapControlBase::reload(); });
+		connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged, this, &ClapFxControls::reload);
 	}
 }
 
@@ -48,6 +47,16 @@ void ClapFxControls::reload()
 {
 	ClapControlBase::reload();
 	emit modelChanged();
+}
+
+void ClapFxControls::prevPreset()
+{
+	ClapControlBase::prevPreset();
+}
+
+void ClapFxControls::nextPreset()
+{
+	ClapControlBase::nextPreset();
 }
 
 void ClapFxControls::saveSettings(QDomDocument& doc, QDomElement& that)

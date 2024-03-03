@@ -27,6 +27,7 @@
 #include <QPushButton>
 
 #include "ClapFxControls.h"
+#include "PixmapButton.h"
 
 namespace lmms::gui
 {
@@ -37,20 +38,29 @@ ClapFxControlDialog::ClapFxControlDialog(ClapFxControls* controls)
 {
 	if (m_reloadPluginButton)
 	{
-		connect(m_reloadPluginButton, &QPushButton::clicked,
-			this, [this](){ clapControls()->reload(); });
+		connect(m_reloadPluginButton, &QPushButton::clicked, this, [this] { clapControls()->reload(); });
 	}
 
 	if (m_toggleUIButton)
 	{
-		connect(m_toggleUIButton, &QPushButton::toggled,
-			this, [this](){ toggleUI(); });
+		connect(m_toggleUIButton, &QPushButton::toggled, this, [this] { toggleUI(); });
 	}
 
 	if (m_helpButton)
 	{
-		connect(m_helpButton, &QPushButton::toggled,
-			this, [this](bool visible){ toggleHelp(visible); });
+		connect(m_helpButton, &QPushButton::toggled, this, [this](bool visible) { toggleHelp(visible); });
+	}
+
+	if (m_prevPresetButton)
+	{
+		connect(m_prevPresetButton, &PixmapButton::clicked, this, [this] { clapControls()->prevPreset(); });
+		//connect(m_prevPresetButton, &PixmapButton::clicked, this, &ClapViewBase::update);
+	}
+
+	if (m_nextPresetButton)
+	{
+		connect(m_nextPresetButton, &PixmapButton::clicked, this, [this] { clapControls()->nextPreset(); });
+		//connect(m_nextPresetButton, &PixmapButton::clicked, this, &ClapViewBase::update);
 	}
 
 	// For Effects, modelChanged only goes to the top EffectView

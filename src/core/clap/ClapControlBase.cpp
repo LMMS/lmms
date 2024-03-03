@@ -39,7 +39,7 @@ namespace lmms
 
 ClapControlBase::ClapControlBase(Model* that, const QString& uri)
 {
-	init(that, uri);
+	init(that, uri.toStdString());
 
 #if 0
 	/*
@@ -66,7 +66,7 @@ ClapControlBase::ClapControlBase(Model* that, const QString& uri)
 #endif
 }
 
-void ClapControlBase::init(Model* that, const QString& uri)
+void ClapControlBase::init(Model* that, const std::string& uri)
 {
 	// CLAP API requires main thread for plugin loading
 	assert(ClapThreadCheck::isMainThread());
@@ -76,9 +76,7 @@ void ClapControlBase::init(Model* that, const QString& uri)
 	m_info = manager->pluginInfo(uri);
 	if (!m_info)
 	{
-		std::string msg = "No plugin found for ID '";
-		msg += uri.toStdString();
-		msg += "'";
+		std::string msg = "No plugin found for ID \"" + uri + "\"";
 		ClapLog::globalLog(CLAP_LOG_ERROR, msg);
 		return;
 	}
@@ -271,6 +269,12 @@ auto ClapControlBase::hasNoteInput() const -> bool
 		[](const auto& instance) { return instance->hasNoteInput(); });
 }
 
+auto ClapControlBase::hasPresetSupport() const -> bool
+{
+	return std::all_of(m_instances.begin(), m_instances.end(),
+		[](const auto& instance) { return instance->presetLoader().supported(); });
+}
+
 void ClapControlBase::handleMidiInputEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset)
 {
 	for (const auto& instance : m_instances)
@@ -283,8 +287,7 @@ auto ClapControlBase::loadPreset(const PresetLoadData& preset) -> bool
 {
 	for (const auto& instance : m_instances)
 	{
-		if (!instance->presetLoader().supported()) { return false; }
-		instance->presetLoader().load(preset);
+		instance->presetLoader().activatePreset(preset);
 	}
 	return true;
 }
@@ -300,6 +303,24 @@ void ClapControlBase::idle()
 	for (const auto& instance : m_instances)
 	{
 		instance->idle();
+	}
+}
+
+void ClapControlBase::nextPreset()
+{
+	ClapLog::globalLog(CLAP_LOG_ERROR, "nextPreset");
+	for (const auto& instance : m_instances)
+	{
+		instance->presetLoader().nextPreset();
+	}
+}
+
+void ClapControlBase::prevPreset()
+{
+	ClapLog::globalLog(CLAP_LOG_ERROR, "prevPreset");
+	for (const auto& instance : m_instances)
+	{
+		instance->presetLoader().prevPreset();
 	}
 }
 

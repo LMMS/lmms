@@ -29,7 +29,9 @@
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QMenu>
 #include <QPushButton>
+#include <QToolBar>
 
 #include "AudioEngine.h"
 #include "ClapControlBase.h"
@@ -42,6 +44,7 @@
 #include "GuiApplication.h"
 #include "gui_templates.h"
 #include "MainWindow.h"
+#include "PixmapButton.h"
 #include "SubWindow.h"
 
 namespace lmms::gui
@@ -119,6 +122,58 @@ ClapViewBase::ClapViewBase(QWidget* pluginWidget, ClapControlBase* ctrlBase)
 		m_toggleUIButton->setFont(pointSize<8>(m_toggleUIButton->font()));
 		btnBox->addWidget(m_toggleUIButton, 0);
 	}
+
+	if (ctrlBase->hasPresetSupport())
+	{
+		m_prevPresetButton = new PixmapButton{pluginWidget};
+		m_prevPresetButton->setCheckable(false);
+		m_prevPresetButton->setCursor(Qt::PointingHandCursor);
+		m_prevPresetButton->setActiveGraphic(embed::getIconPixmap("stepper-left-press"));
+		m_prevPresetButton->setInactiveGraphic(embed::getIconPixmap("stepper-left"));
+		m_prevPresetButton->setToolTip(QObject::tr("Previous (-)"));
+		m_prevPresetButton->setShortcut(Qt::Key_Minus);
+		m_prevPresetButton->setMinimumWidth(16);
+		m_prevPresetButton->setMaximumWidth(16);
+		m_prevPresetButton->setMinimumHeight(16);
+		m_prevPresetButton->setMaximumHeight(16);
+
+		m_nextPresetButton = new PixmapButton{pluginWidget};
+		m_nextPresetButton->setCheckable(false);
+		m_nextPresetButton->setCursor(Qt::PointingHandCursor);
+		m_nextPresetButton->setActiveGraphic(embed::getIconPixmap("stepper-right-press"));
+		m_nextPresetButton->setInactiveGraphic(embed::getIconPixmap("stepper-right"));
+		m_nextPresetButton->setToolTip(QObject::tr("Next (+)"));
+		m_nextPresetButton->setShortcut(Qt::Key_Plus);
+		m_nextPresetButton->setMinimumWidth(16);
+		m_nextPresetButton->setMaximumWidth(16);
+		m_nextPresetButton->setMinimumHeight(16);
+		m_nextPresetButton->setMaximumHeight(16);
+
+		m_selectPresetButton = new QPushButton(pluginWidget);
+		m_selectPresetButton->setCheckable(false);
+		m_selectPresetButton->setCursor(Qt::PointingHandCursor);
+		m_selectPresetButton->setIcon(embed::getIconPixmap("stepper-down"));
+
+		auto menu = new QMenu;
+		//QObject::connect(menu, &QMenu::aboutToShow, _ctl, SLOT( updateMenu() ) );
+
+ 		m_selectPresetButton->setMenu(menu);
+
+		m_selectPresetButton->setMinimumWidth(16);
+		m_selectPresetButton->setMaximumWidth(16);
+		m_selectPresetButton->setMinimumHeight(16);
+		m_selectPresetButton->setMaximumHeight(16);
+
+		auto tb = new QToolBar{pluginWidget};
+		tb->resize(100, 32); // TODO: Adjust size
+		tb->addWidget(m_prevPresetButton);
+		tb->addWidget(m_nextPresetButton);
+		tb->addWidget(m_selectPresetButton);
+		//tb->addWidget(m_openPresetButton);
+		//tb->addWidget(m_savePresetButton);
+		//tb->addWidget(m_managePluginButton);
+	}
+
 	btnBox->addStretch(1);
 
 	pluginWidget->setAcceptDrops(true);

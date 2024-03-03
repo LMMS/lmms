@@ -33,23 +33,22 @@
 #include <clap/ext/preset-load.h>
 
 #include "ClapExtension.h"
-#include "Preset.h"
+#include "PluginPresets.h"
 
 namespace lmms
 {
 
-// TODO: Inherit from PluginPresets
-class ClapPresetLoader final : public ClapExtension<clap_host_preset_load, clap_plugin_preset_load>
+class ClapPresetLoader final
+	: public ClapExtension<clap_host_preset_load, clap_plugin_preset_load>
+	, public PluginPresets
 {
 public:
-	using ClapExtension::ClapExtension;
+	ClapPresetLoader(ClapInstance* parent);
 	~ClapPresetLoader() override = default;
 
 	auto extensionId() const -> std::string_view override { return CLAP_EXT_PRESET_LOAD; }
 	auto extensionIdCompat() const -> std::string_view override { return CLAP_EXT_PRESET_LOAD_COMPAT; }
 	auto hostExt() const -> const clap_host_preset_load* override;
-
-	auto load(const PresetLoadData& preset) -> bool;
 
 private:
 	auto initImpl(const clap_host* host, const clap_plugin* plugin) noexcept -> bool override;
@@ -63,9 +62,9 @@ private:
 	static void clapLoaded(const clap_host* host, std::uint32_t locationKind,
 		const char* location, const char* loadKey);
 
-	// TODO: Make these plugin-independent? A plugin-independent preset viewer will need them.
-	std::optional<Preset> m_activePreset;
-	bool m_dirty = false; //!< Whether the active preset has been modified
+	auto activatePresetImpl(const PresetLoadData& preset) noexcept -> bool override;
+
+	auto getPresetDatabase() const -> PresetDatabase*;
 };
 
 } // namespace lmms

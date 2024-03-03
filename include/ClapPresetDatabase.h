@@ -60,6 +60,8 @@ public:
 	static auto toClapLocation(std::string_view location, std::string& ref)
 		-> std::optional<std::pair<clap_preset_discovery_location_kind, const char*>>;
 	static auto fromClapLocation(const char* location) -> std::string;
+	static auto fromClapLocation(clap_preset_discovery_location_kind kind,
+		const char* location, const char* loadKey, std::string& ref) -> std::optional<PresetLoadData>;
 
 private:
 	auto createPreset(const PresetLoadData& loadData) const -> std::optional<Preset> override;

@@ -60,6 +60,7 @@ set(LMMS_SRCS
 	core/Plugin.cpp
 	core/PluginFactory.cpp
 	core/PluginIssue.cpp
+	core/PluginPresets.cpp
 	core/PresetDatabase.cpp
 	core/PresetPreviewPlayHandle.cpp
 	core/ProjectJournal.cpp

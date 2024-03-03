@@ -29,30 +29,18 @@
 #include <cassert>
 
 #include "ClapInstance.h"
+#include "ClapManager.h"
 #include "ClapPresetDatabase.h"
+#include "Engine.h"
 #include "PathUtil.h"
 
 namespace lmms
 {
 
-auto ClapPresetLoader::load(const PresetLoadData& preset) -> bool
+ClapPresetLoader::ClapPresetLoader(ClapInstance* parent)
+	: ClapExtension{parent}
+	, PluginPresets{parent, getPresetDatabase(), parent->info().descriptor().id}
 {
-	assert(ClapThreadCheck::isMainThread());
-	if (!supported()) { return false; }
-
-	std::string temp;
-	const auto location = ClapPresetDatabase::toClapLocation(preset.location, temp);
-	if (!location) { return false; }
-
-	if (!pluginExt()->from_location(plugin(), location->first, location->second, preset.loadKey.c_str()))
-	{
-		logger().log(CLAP_LOG_ERROR, "Failed to load preset");
-		return false;
-	}
-
-	// TODO: Mark that this preset is active
-
-	return true;
 }
 
 auto ClapPresetLoader::initImpl(const clap_host* host, const clap_plugin* plugin) noexcept -> bool
@@ -74,6 +62,33 @@ auto ClapPresetLoader::checkSupported(const clap_plugin_preset_load& ext) -> boo
 	return ext.from_location;
 }
 
+auto ClapPresetLoader::activatePresetImpl(const PresetLoadData& preset) noexcept -> bool
+{
+	assert(ClapThreadCheck::isMainThread());
+	if (!supported()) { return false; }
+
+	std::string temp;
+	const auto location = ClapPresetDatabase::toClapLocation(preset.location, temp);
+	if (!location) { return false; }
+
+	if (!pluginExt()->from_location(plugin(), location->first, location->second, preset.loadKey.c_str()))
+	{
+		logger().log(CLAP_LOG_ERROR, "Failed to load preset");
+		return false;
+	}
+
+	return true;
+}
+
+auto ClapPresetLoader::getPresetDatabase() const -> PresetDatabase*
+{
+	assert(instance() && "ClapExtension was not constructed properly");
+
+	const auto mgr = Engine::getClapManager();
+	const auto id = instance()->info().descriptor().id;
+	return mgr->presetDatabase(id);
+}
+
 void ClapPresetLoader::clapOnError(const clap_host* host, std::uint32_t locationKind,
 	const char* location, const char* loadKey, std::int32_t osError, const char* msg)
 {
@@ -93,6 +108,7 @@ void ClapPresetLoader::clapLoaded(const clap_host* host, std::uint32_t locationK
 {
 	const auto h = fromHost(host);
 	if (!h) { return; }
+	auto& self = h->presetLoader();
 
 #if 1
 	const std::string text = "Loaded preset: location kind: " + std::to_string(locationKind)
@@ -102,7 +118,20 @@ void ClapPresetLoader::clapLoaded(const clap_host* host, std::uint32_t locationK
 	h->logger().log(CLAP_LOG_INFO, text);
 #endif
 
-	// TODO: Keep track of currently loaded preset
+	std::string ref;
+	const auto loadData = ClapPresetDatabase::fromClapLocation(
+		static_cast<clap_preset_discovery_location_kind>(locationKind), location, loadKey, ref);
+	if (!loadData) { return; }
+
+	const auto index = self.findPreset(*loadData);
+	if (!index)
+	{
+		// TODO: Can we assume preset always exists in `m_presets`?
+		h->logger().log(CLAP_LOG_ERROR, "Could not find preset in database");
+		return;
+	}
+
+	self.setActivePreset(*index);
 }
 
 } // namespace lmms

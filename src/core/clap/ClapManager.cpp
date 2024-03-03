@@ -186,7 +186,8 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 	if (!m_files.empty()) { return; } // Cannot unload CLAP plugins yet
 
 	m_files.clear();
-	m_uriMap.clear();
+	m_uriInfoMap.clear();
+	m_uriFileIndexMap.clear();
 	m_pluginInfo.clear();
 
 	const auto startTime = std::chrono::steady_clock::now();
@@ -231,7 +232,8 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 			for (auto& plugin : file.pluginInfo({}))
 			{
 				assert(plugin.has_value());
-				const bool added = m_uriMap.emplace(std::string{plugin->descriptor().id}, *plugin).second;
+				const auto id = std::string{plugin->descriptor().id};
+				const bool added = m_uriInfoMap.emplace(id, *plugin).second;
 				if (!added)
 				{
 					if (debugging())
@@ -247,6 +249,8 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 					plugin.reset(); // invalidate duplicate plugin
 					continue;
 				}
+
+				m_uriFileIndexMap.emplace(id, m_files.size() - 1);
 
 				m_pluginInfo.push_back(&plugin.value());
 				loadedFromThisFile = true;
@@ -285,13 +289,19 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 
 auto ClapManager::pluginInfo(const std::string& uri) const -> const ClapPluginInfo*
 {
-	const auto iter = m_uriMap.find(uri);
-	return iter != m_uriMap.end() ? &iter->second : nullptr;
+	const auto iter = m_uriInfoMap.find(uri);
+	return iter != m_uriInfoMap.end() ? &iter->second : nullptr;
 }
 
-auto ClapManager::pluginInfo(const QString& uri) const -> const ClapPluginInfo*
+auto ClapManager::presetDatabase(const std::string& uri) -> ClapPresetDatabase*
 {
-	return pluginInfo(uri.toStdString());
+	const auto iter = m_uriFileIndexMap.find(uri);
+	if (iter == m_uriFileIndexMap.end()) { return nullptr; }
+
+	assert(iter->second < m_files.size());
+	auto& file = m_files[iter->second];
+
+	return &file.presetDatabase();
 }
 
 } // namespace lmms

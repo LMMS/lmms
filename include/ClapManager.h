@@ -57,13 +57,13 @@ public:
 	auto pluginInfo() const -> auto& { return m_pluginInfo; }
 
 	//! Returns a URI-to-PluginInfo map
-	auto uriMap() const -> auto& { return m_uriMap; }
+	auto uriInfoMap() const -> auto& { return m_uriInfoMap; }
 
-	//! Return plugin info with URI `uri` or nullptr if none exists
+	//! Return plugin info for plugin with the given uri or nullptr if none exists
 	auto pluginInfo(const std::string& uri) const -> const ClapPluginInfo*;
 
-	//! Return plugin info with URI `uri` or nullptr if none exists
-	auto pluginInfo(const QString& uri) const -> const ClapPluginInfo*;
+	//! Return preset database for plugin with the given uri or nullptr if none exists
+	auto presetDatabase(const std::string& uri) -> ClapPresetDatabase*;
 
 	//! Called by Engine at LMMS startup
 	void initPlugins();
@@ -97,7 +97,8 @@ private:
 	// Non-owning plugin caches (for fast iteration/lookup)
 
 	std::vector<const ClapPluginInfo*> m_pluginInfo; //!< successfully loaded plugins
-	std::unordered_map<std::string, ClapPluginInfo> m_uriMap; //!< maps plugin URIs (IDs) to ClapPluginInfo
+	std::unordered_map<std::string, ClapPluginInfo> m_uriInfoMap; //!< maps plugin URIs (IDs) to ClapPluginInfo
+	std::unordered_map<std::string, std::size_t> m_uriFileIndexMap; //!< maps plugin URIs (IDs) to ClapFile index in `m_files`
 
 	static inline bool s_debugging = false; //!< If LMMS_CLAP_DEBUG is set, debug output will be printed
 };

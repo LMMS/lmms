@@ -46,7 +46,11 @@ class ClapFxControls : public EffectControls, public ClapControlBase
 	Q_OBJECT
 public:
 	ClapFxControls(ClapEffect* effect, const QString& uri);
+
 	void reload();
+
+	void prevPreset();
+	void nextPreset();
 
 	void saveSettings(QDomDocument& _doc, QDomElement& _parent) override;
 	void loadSettings(const QDomElement& that) override;

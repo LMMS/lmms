@@ -49,7 +49,7 @@ class Model;
  * Common base class for CLAP plugins.
  * The design of this class is based on Lv2ControlBase by Johannes Lorenz.
  * See Lv2ControlBase for more information.
-*/
+ */
 class LMMS_EXPORT ClapControlBase : public LinkedModelGroups
 {
 public:
@@ -59,8 +59,12 @@ public:
 	auto control(std::size_t idx) const -> const ClapInstance* { return m_instances[idx].get(); }
 
 	auto hasGui() const -> bool { return m_instances[0]->gui().supported(); }
+	auto hasPresetSupport() const -> bool;
 
 	void idle();
+
+	void nextPreset();
+	void prevPreset();
 
 protected:
 
@@ -73,7 +77,7 @@ protected:
 	ClapControlBase(const ClapControlBase&) = delete;
 	auto operator=(const ClapControlBase&) -> ClapControlBase& = delete;
 
-	void init(Model* that, const QString& uri);
+	void init(Model* that, const std::string& uri);
 
 	//! Must be checked after ctor or reload
 	auto isValid() const -> bool { return m_valid; }

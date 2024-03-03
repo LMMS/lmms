@@ -36,6 +36,7 @@
 #include "Engine.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
+#include "PixmapButton.h"
 #include "plugin_export.h"
 #include "StringPairDrag.h"
 
@@ -202,6 +203,20 @@ ClapInsView::ClapInsView(ClapInstrument* instrument, QWidget* parent)
 	{
 		connect(m_helpButton, &QPushButton::toggled,
 			this, [this](bool visible){ toggleHelp(visible); });
+	}
+
+	if (m_prevPresetButton)
+	{
+		connect(m_prevPresetButton, &PixmapButton::clicked, this,
+			[this] { castModel<ClapInstrument>()->prevPreset(); });
+		//connect(m_prevPresetButton, &PixmapButton::clicked, this, &ClapViewBase::update);
+	}
+
+	if (m_nextPresetButton)
+	{
+		connect(m_nextPresetButton, &PixmapButton::clicked, this,
+			[this] { castModel<ClapInstrument>()->nextPreset(); });
+		//connect(m_nextPresetButton, &PixmapButton::clicked, this, &ClapViewBase::update);
 	}
 }
 
