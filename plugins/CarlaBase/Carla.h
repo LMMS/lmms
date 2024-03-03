@@ -33,6 +33,7 @@
 #include <QCloseEvent>
 #include <QDomElement>
 #include <QMutex>
+#include <QRegularExpression>
 
 // carla/source/includes
 #include "carlabase_export.h"
@@ -90,7 +91,7 @@ public:
 	inline static bool mustQuoteName(const QString &name)
 	{
 		QRegularExpression reg("^[A-Za-z0-9._-]+$");
-		return !reg.exactMatch(name);
+		return !reg.match(name).hasMatch();
 	}
 
 	inline void loadSettings(const QDomElement& element, const QString& name = QString("value")) override

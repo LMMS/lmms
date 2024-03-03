@@ -34,6 +34,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
+#include <QRegularExpression>
 #include <QScrollArea>
 #include <QVBoxLayout>
 
@@ -126,7 +127,7 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
 
 	m_filterEdit = new QLineEdit(this);
 	connect(m_filterEdit, &QLineEdit::textChanged, this, [this](const QString &text) {
-		m_model.setFilterRegExp(QRegularExpression(text, Qt::CaseInsensitive));
+		m_model.setFilterRegularExpression(QRegularExpression(text, QRegularExpression::CaseInsensitiveOption));
 	});
 	connect(m_filterEdit, &QLineEdit::textChanged, this, &EffectSelectDialog::updateSelection);
 	m_filterEdit->setFocus();

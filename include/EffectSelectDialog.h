@@ -65,10 +65,10 @@ protected:
 		QString name = sourceModel()->data(nameIndex, Qt::DisplayRole).toString();
 		QString type = sourceModel()->data(typeIndex, Qt::DisplayRole).toString();
 
-		QRegularExpression nameRegExp(filterRegExp());
-		nameRegExp.setCaseSensitivity(Qt::CaseInsensitive);
+		QRegularExpression nameRegularExpression(filterRegularExpression());
+		nameRegularExpression.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
 
-		bool nameFilterPassed = nameRegExp.indexIn(name) != -1;
+		bool nameFilterPassed = nameRegularExpression.match(name).capturedStart() != -1;
 		bool typeFilterPassed = type.contains(m_effectTypeFilter, Qt::CaseInsensitive);
 
 		return nameFilterPassed && typeFilterPassed;

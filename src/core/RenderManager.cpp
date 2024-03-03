@@ -23,6 +23,7 @@
  */
 
 #include <QDir>
+#include <QRegularExpression>
 
 #include "RenderManager.h"
 
