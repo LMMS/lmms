@@ -214,20 +214,19 @@ auto ClapPresetDatabase::fromClapLocation(const char* location) -> std::string
 }
 
 auto ClapPresetDatabase::fromClapLocation([[maybe_unused]] clap_preset_discovery_location_kind kind,
-	const char* location, const char* loadKey, std::string& ref) -> std::optional<PresetLoadData>
+	const char* location, const char* loadKey) -> std::optional<PresetLoadData>
 {
 	if (!location && !loadKey) { return std::nullopt; }
 
-	PresetLoadData data;
-	ref = fromClapLocation(location);
-	data.location = ref;
-	data.loadKey = loadKey ? loadKey : std::string{};
-	return data;
+	return PresetLoadData {
+		fromClapLocation(location),
+		loadKey ? loadKey : std::string{}
+	};
 }
 
-auto ClapPresetDatabase::createPreset(const PresetLoadData& loadData) const -> std::optional<Preset>
+auto ClapPresetDatabase::createPreset(const Preset::LoadData& loadData) const -> std::optional<Preset>
 {
-	// NOTE: Any time this method is called, PresetLoadData stores a path to a preset file (???)
+	// NOTE: Any time this method is called, Preset::LoadData stores a path to a preset file (???)
 	// TODO: Should all possible presets already be discovered at the start? Is it a bug if this is ever called for CLAP??
 
 	const auto fullPath = fs::path{PathUtil::toAbsolute(loadData.location).value()} / loadData.loadKey;
@@ -250,7 +249,7 @@ auto ClapPresetDatabase::createPreset(const PresetLoadData& loadData) const -> s
 					"\n\tLoading just the first preset instead."); // TODO: Implement this feature
 				return presets->at(0);
 			}
-			assert(presets->at(0).loadData.loadKey.empty());
+			assert(presets->at(0).loadData().loadKey.empty());
 			// TODO: If it's working correctly, the preset `location` should be the full path and the `loadKey`
 			//       should be nullptr. (??? maybe not when the preset file is a container for many presets?)
 			//       (see free-audio/clap-host's PluginHost::loadNativePluginPreset() method)
@@ -436,7 +435,7 @@ auto ClapPresetDatabase::MetadataReceiver::query(std::string_view location, Pres
 	if (!provider) { return std::nullopt; }
 
 	std::string temp;
-	auto loc = toClapLocation(location, temp);
+	const auto loc = toClapLocation(location, temp);
 	if (!loc) { return std::nullopt; }
 
 	m_location = location;
@@ -471,12 +470,12 @@ auto ClapPresetDatabase::MetadataReceiver::clapBeginPreset(
 	if (!self) { return false; }
 
 	auto& preset = self->m_presets.emplace_back();
-	preset.metadata.displayName = name ? name : std::string{};
-	preset.metadata.flags = self->m_flags; // may be overridden by clapSetFlags()
-	preset.loadData.location = self->m_location; // references the preset map's key
-	preset.loadData.loadKey = loadKey ? loadKey : std::string{};
+	preset.metadata().displayName = name ? name : std::string{};
+	preset.metadata().flags = self->m_flags; // may be overridden by clapSetFlags()
+	preset.loadData().location = self->m_location; // references the preset map's key
+	preset.loadData().loadKey = loadKey ? loadKey : std::string{};
 
-	qDebug().nospace() << "clapBeginPreset: display name: \"" << preset.metadata.displayName.c_str() << "\" load key: \"" << preset.loadData.loadKey.c_str() << "\"";
+	qDebug().nospace() << "clapBeginPreset: display name: \"" << preset.metadata().displayName.c_str() << "\" load key: \"" << preset.loadData().loadKey.c_str() << "\"";
 
 	// TODO
 
@@ -488,7 +487,8 @@ void ClapPresetDatabase::MetadataReceiver::clapAddPluginId(
 {
 	if (!pluginId || !pluginId->abi || !pluginId->id)
 	{
-		ClapLog::globalLog(CLAP_LOG_WARNING, "Plugin called clap_preset_discovery_metadata_receiver.add_plugin_id() with invalid arguments");
+		ClapLog::globalLog(CLAP_LOG_WARNING,
+			"Plugin called clap_preset_discovery_metadata_receiver.add_plugin_id() with invalid arguments");
 		return;
 	}
 
@@ -510,7 +510,7 @@ void ClapPresetDatabase::MetadataReceiver::clapAddPluginId(
 		return;
 	}
 
-	presets.back().keys.push_back(pluginId->id);
+	presets.back().keys().push_back(pluginId->id);
 
 	qDebug().nospace() << "clapAddPluginId: pluginId: \"" << pluginId->id << "\"";
 }
@@ -535,7 +535,7 @@ void ClapPresetDatabase::MetadataReceiver::clapSetFlags(
 		return;
 	}
 
-	presets.back().metadata.flags = convertFlags(flags);
+	presets.back().metadata().flags = convertFlags(flags);
 }
 
 void ClapPresetDatabase::MetadataReceiver::clapAddCreator(
@@ -553,7 +553,7 @@ void ClapPresetDatabase::MetadataReceiver::clapAddCreator(
 		return;
 	}
 
-	presets.back().metadata.creator = creator;
+	presets.back().metadata().creator = creator;
 
 	qDebug().nospace() << "clapSetCreator: creator: \"" << creator << "\"";
 }
@@ -573,7 +573,7 @@ void ClapPresetDatabase::MetadataReceiver::clapSetDescription(
 		return;
 	}
 
-	presets.back().metadata.description = description;
+	presets.back().metadata().description = description;
 
 	qDebug().nospace() << "clapSetDescription: description: \"" << description << "\"";
 }
@@ -600,7 +600,7 @@ void ClapPresetDatabase::MetadataReceiver::clapAddFeature(
 		return;
 	}
 
-	presets.back().metadata.categories.push_back(feature);
+	presets.back().metadata().categories.push_back(feature);
 
 	qDebug().nospace() << "clapAddFeature: feature: \"" << feature << "\"";
 }

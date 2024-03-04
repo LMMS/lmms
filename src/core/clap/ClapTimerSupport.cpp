@@ -69,7 +69,8 @@ void ClapTimerSupport::killTimers()
 	m_timerIds.clear();
 }
 
-auto ClapTimerSupport::clapRegisterTimer(const clap_host* host, std::uint32_t periodMilliseconds, clap_id* timerId) -> bool
+auto ClapTimerSupport::clapRegisterTimer(const clap_host* host,
+	std::uint32_t periodMilliseconds, clap_id* timerId) -> bool
 {
 	assert(ClapThreadCheck::isMainThread());
 	const auto h = fromHost(host);

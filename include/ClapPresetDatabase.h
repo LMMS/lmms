@@ -61,10 +61,10 @@ public:
 		-> std::optional<std::pair<clap_preset_discovery_location_kind, const char*>>;
 	static auto fromClapLocation(const char* location) -> std::string;
 	static auto fromClapLocation(clap_preset_discovery_location_kind kind,
-		const char* location, const char* loadKey, std::string& ref) -> std::optional<PresetLoadData>;
+		const char* location, const char* loadKey) -> std::optional<PresetLoadData>;
 
 private:
-	auto createPreset(const PresetLoadData& loadData) const -> std::optional<Preset> override;
+	auto createPreset(const Preset::LoadData& loadData) const -> std::optional<Preset> override;
 
 	class Indexer : public NoCopyNoMove
 	{

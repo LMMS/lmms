@@ -25,6 +25,7 @@
 #ifndef LMMS_PRESET_H
 #define LMMS_PRESET_H
 
+#include <QObject>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -49,10 +50,8 @@ struct PresetLoadData
 	 * - "/my/absolute/directory"
 	 * - "preset:my_plugin/my_preset_database.txt" (depending on the plugin, it could even be a file!)
 	 * - "internal:" (for presets stored within the plugin's DSO rather than on disk)
-	 *
-	 * This is a string_view which references a key within `PresetDatabase::m_presets` in order to save space.
 	 */
-	std::string_view location;
+	std::string location;
 
 	/**
 	 * Could be a preset filename, sub-path + preset filename, file offset, or any other kind of unique ID.
@@ -93,24 +92,51 @@ struct PresetMetadata
 LMMS_DECLARE_OPERATORS_FOR_FLAGS(PresetMetadata::Flag)
 
 //! Generic preset
-struct Preset
+class Preset
 {
-	PresetMetadata metadata;
-	PresetLoadData loadData;
+public:
+	/**
+	 * Same as `PresetLoadData`, but `location` is a std::string_view that references a key
+	 * within `PresetDatabase::m_presets` in order to save space when many presets are loaded.
+	 */
+	struct LoadData
+	{
+		std::string_view location;
+		std::string loadKey;
 
-	//! Subplugin keys that support this preset
-	//!   Empty if all subplugins support the preset or if there are no subplugins
-	//std::vector<const Plugin::Descriptor::SubPluginFeatures::Key*> keys;
-	std::vector<std::string> keys;
+		friend auto operator==(const LoadData& lhs, const PresetLoadData& rhs) noexcept -> bool
+		{
+			return lhs.location == rhs.location && lhs.loadKey == rhs.loadKey;
+		}
 
-	//! TODO: Some plugins may cache preset data for faster loading; empty = uncached
-	//std::string data;
+		operator PresetLoadData() const { return {std::string{location}, loadKey}; }
+	};
+
+	auto metadata() -> auto& { return m_metadata; }
+	auto metadata() const -> auto& { return m_metadata; }
+
+	auto loadData() -> auto& { return m_loadData; }
+	auto loadData() const -> auto& { return m_loadData; }
+
+	auto keys() -> auto& { return m_keys; }
+	auto keys() const -> auto& { return m_keys; }
 
 	//! Enable std::set support
 	friend auto operator<(const Preset& a, const Preset& b) noexcept -> bool
 	{
-		return a.loadData.loadKey < b.loadData.loadKey;
+		return a.m_loadData.loadKey < b.m_loadData.loadKey;
 	}
+
+private:
+	PresetMetadata m_metadata;
+	LoadData m_loadData;
+
+	//! Subplugin keys that support this preset
+	//!   Empty if all subplugins support the preset or if there are no subplugins
+	std::vector<std::string> m_keys;
+
+	//! TODO: Some plugins may cache preset data for faster loading; empty = uncached
+	//std::string data;
 };
 
 } // namespace lmms

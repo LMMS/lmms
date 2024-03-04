@@ -117,9 +117,79 @@ void ClapControlBase::init(Model* that, const std::string& uri)
 	m_channelsPerInstance = DEFAULT_CHANNELS / m_instances.size();
 	m_valid = true;
 
-	linkAllModels();
+	m_parameters.linkAllModels();
+	m_presets.linkAllModels();
+
+	//linkAllModels();
 }
 
+auto ClapControlBase::Parameters::getGroup(std::size_t idx) -> LinkedModelGroup*
+{
+	const auto instance = m_parent->control(idx);
+	if (!instance) { return nullptr; }
+	return &instance->params();
+}
+
+auto ClapControlBase::Parameters::getGroup(std::size_t idx) const -> const LinkedModelGroup*
+{
+	const auto instance = m_parent->control(idx);
+	if (!instance) { return nullptr; }
+	return &instance->params();
+}
+
+void ClapControlBase::Presets::saveSettings(QDomDocument& doc, QDomElement& elem)
+{
+	// When saving a project file, we only want to save the active preset, not all presets
+	if (elem.ownerDocument().doctype().name() != "clonedtrack")
+	{
+		if (m_parent->hasPresetSupport())
+		{
+			for (auto& instance :  m_parent->m_instances)
+			{
+				instance->presetLoader().saveActivePreset(doc, elem);
+			}
+		}
+	}
+	else
+	{
+		LinkedModelGroups::saveSettings(doc, elem);
+	}
+}
+
+void ClapControlBase::Presets::loadSettings(const QDomElement& elem)
+{
+	// When loading a project file, we only want to load the active preset, not all presets
+	if (elem.ownerDocument().doctype().name() != "clonedtrack")
+	{
+		if (m_parent->hasPresetSupport())
+		{
+			for (auto& instance :  m_parent->m_instances)
+			{
+				instance->presetLoader().loadActivePreset(elem);
+			}
+		}
+	}
+	else
+	{
+		LinkedModelGroups::loadSettings(elem);
+	}
+}
+
+auto ClapControlBase::Presets::getGroup(std::size_t idx) -> LinkedModelGroup*
+{
+	const auto instance = m_parent->control(idx);
+	if (!instance) { return nullptr; }
+	return &instance->presetLoader();
+}
+
+auto ClapControlBase::Presets::getGroup(std::size_t idx) const -> const LinkedModelGroup*
+{
+	const auto instance = m_parent->control(idx);
+	if (!instance) { return nullptr; }
+	return &instance->presetLoader();
+}
+
+/*
 auto ClapControlBase::getGroup(std::size_t idx) -> LinkedModelGroup*
 {
 	return (idx < m_instances.size()) ? &m_instances[idx]->params() : nullptr;
@@ -129,6 +199,7 @@ auto ClapControlBase::getGroup(std::size_t idx) const -> const LinkedModelGroup*
 {
 	return (idx < m_instances.size()) ? &m_instances[idx]->params() : nullptr;
 }
+*/
 
 void ClapControlBase::copyModelsFromLmms()
 {
@@ -181,7 +252,9 @@ void ClapControlBase::saveSettings(QDomDocument& doc, QDomElement& elem)
 	if (elem.ownerDocument().doctype().name() != "clonedtrack")
 	{
 		// Saving to project file
-		LinkedModelGroups::saveSettings(doc, elem);
+		//LinkedModelGroups::saveSettings(doc, elem);
+		m_presets.saveSettings(doc, elem);
+		m_parameters.saveSettings(doc, elem);
 		return;
 	}
 
@@ -189,6 +262,7 @@ void ClapControlBase::saveSettings(QDomDocument& doc, QDomElement& elem)
 
 	if (stateSupported())
 	{
+		m_presets.saveSettings(doc, elem);
 		for (unsigned int idx = 0; idx < m_instances.size(); ++idx)
 		{
 			const auto state = m_instances[idx]->state().save();
@@ -198,7 +272,9 @@ void ClapControlBase::saveSettings(QDomDocument& doc, QDomElement& elem)
 	}
 	else
 	{
-		LinkedModelGroups::saveSettings(doc, elem);
+		//LinkedModelGroups::saveSettings(doc, elem);
+		m_presets.saveSettings(doc, elem);
+		m_parameters.saveSettings(doc, elem);
 	}
 }
 
@@ -209,7 +285,9 @@ void ClapControlBase::loadSettings(const QDomElement& elem)
 	if (elem.ownerDocument().doctype().name() != "clonedtrack")
 	{
 		// Loading from project file
-		LinkedModelGroups::loadSettings(elem);
+		//LinkedModelGroups::loadSettings(elem);
+		m_presets.loadSettings(elem);
+		m_parameters.loadSettings(elem);
 		return;
 	}
 
@@ -217,6 +295,7 @@ void ClapControlBase::loadSettings(const QDomElement& elem)
 
 	if (stateSupported())
 	{
+		m_presets.loadSettings(elem);
 		for (unsigned int idx = 0; idx < m_instances.size(); ++idx)
 		{
 			const auto state = elem.attribute("state" + QString::number(idx), "");
@@ -229,7 +308,9 @@ void ClapControlBase::loadSettings(const QDomElement& elem)
 	}
 	else
 	{
-		LinkedModelGroups::loadSettings(elem);
+		//LinkedModelGroups::loadSettings(elem);
+		m_presets.loadSettings(elem);
+		m_parameters.loadSettings(elem);
 	}
 }
 
@@ -261,6 +342,18 @@ auto ClapControlBase::controlCount() const -> std::size_t
 		res += instance->controlCount();
 	}
 	return res;
+}
+
+auto ClapControlBase::control(std::size_t idx) -> ClapInstance*
+{
+	if (idx >= m_instances.size()) { return nullptr; }
+	return m_instances[idx].get();
+}
+
+auto ClapControlBase::control(std::size_t idx) const -> const ClapInstance*
+{
+	if (idx >= m_instances.size()) { return nullptr; }
+	return m_instances[idx].get();
 }
 
 auto ClapControlBase::hasNoteInput() const -> bool

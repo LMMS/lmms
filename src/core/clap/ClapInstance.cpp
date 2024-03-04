@@ -84,6 +84,7 @@ ClapInstance::ClapInstance(Access, const ClapPluginInfo& pluginInfo, Model* pare
 	, m_midiInputBuf{s_maxMidiInputEvents}
 	, m_midiInputReader{m_midiInputBuf}
 	, m_params{parent, this, &m_evIn, &m_evOut}
+	, m_presetLoader{parent, this}
 {
 	m_process.steady_time = 0;
 	m_process.transport = ClapTransport::get();

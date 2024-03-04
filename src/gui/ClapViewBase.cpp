@@ -45,12 +45,13 @@
 #include "gui_templates.h"
 #include "MainWindow.h"
 #include "PixmapButton.h"
+#include "PresetSelector.h"
 #include "SubWindow.h"
 
 namespace lmms::gui
 {
 
-ClapViewInstance::ClapViewInstance(QWidget* parent, ClapInstance* instance, int colNum)
+ClapViewParameters::ClapViewParameters(QWidget* parent, ClapInstance* instance, int colNum)
 	: LinkedModelGroupView{parent, &instance->params(), static_cast<std::size_t>(colNum)}
 	, m_instance{instance}
 {
@@ -99,7 +100,45 @@ ClapViewInstance::ClapViewInstance(QWidget* parent, ClapInstance* instance, int 
 
 		addControl(control, param->id().data(), param->displayName().data(), false);
 	}
+}
 
+ClapViewPresets::ClapViewPresets(QWidget* parent, ClapInstance* instance, int colNum)
+	: LinkedModelGroupView{parent, &instance->presetLoader(), static_cast<std::size_t>(colNum)}
+	, m_instance{instance}
+{
+	class PresetSelectorControl : public Control
+	{
+		QWidget* m_widget;
+		PresetSelector* m_checkBox;
+		QLabel* m_label;
+
+	public:
+		void setText(const QString& text) override { m_label->setText(text); }
+		QWidget* topWidget() override { return m_widget; }
+
+		void setModel(AutomatableModel* model) override
+		{
+			m_checkBox->setModel(model->dynamicCast<IntModel>(true));
+		}
+		IntModel* model() override { return m_checkBox->model(); }
+		AutomatableModelView* modelView() override { return m_checkBox; }
+
+		PresetSelectorControl(PluginPresets* presets, QWidget* parent = nullptr)
+			: m_widget{new QWidget{parent}}
+			, m_checkBox{new PresetSelector{presets, parent}}
+			, m_label{new QLabel{m_widget}}
+		{
+			auto vbox = new QVBoxLayout(m_widget);
+			vbox->addWidget(m_checkBox);
+			vbox->addWidget(m_label);
+		}
+
+		~PresetSelectorControl() override = default;
+	};
+
+	auto control = new PresetSelectorControl{&instance->presetLoader(), parent};
+
+	addControl(control, "preset", tr("Active preset").toStdString(), false);
 }
 
 ClapViewBase::ClapViewBase(QWidget* pluginWidget, ClapControlBase* ctrlBase)
@@ -125,53 +164,8 @@ ClapViewBase::ClapViewBase(QWidget* pluginWidget, ClapControlBase* ctrlBase)
 
 	if (ctrlBase->hasPresetSupport())
 	{
-		m_prevPresetButton = new PixmapButton{pluginWidget};
-		m_prevPresetButton->setCheckable(false);
-		m_prevPresetButton->setCursor(Qt::PointingHandCursor);
-		m_prevPresetButton->setActiveGraphic(embed::getIconPixmap("stepper-left-press"));
-		m_prevPresetButton->setInactiveGraphic(embed::getIconPixmap("stepper-left"));
-		m_prevPresetButton->setToolTip(QObject::tr("Previous (-)"));
-		m_prevPresetButton->setShortcut(Qt::Key_Minus);
-		m_prevPresetButton->setMinimumWidth(16);
-		m_prevPresetButton->setMaximumWidth(16);
-		m_prevPresetButton->setMinimumHeight(16);
-		m_prevPresetButton->setMaximumHeight(16);
-
-		m_nextPresetButton = new PixmapButton{pluginWidget};
-		m_nextPresetButton->setCheckable(false);
-		m_nextPresetButton->setCursor(Qt::PointingHandCursor);
-		m_nextPresetButton->setActiveGraphic(embed::getIconPixmap("stepper-right-press"));
-		m_nextPresetButton->setInactiveGraphic(embed::getIconPixmap("stepper-right"));
-		m_nextPresetButton->setToolTip(QObject::tr("Next (+)"));
-		m_nextPresetButton->setShortcut(Qt::Key_Plus);
-		m_nextPresetButton->setMinimumWidth(16);
-		m_nextPresetButton->setMaximumWidth(16);
-		m_nextPresetButton->setMinimumHeight(16);
-		m_nextPresetButton->setMaximumHeight(16);
-
-		m_selectPresetButton = new QPushButton(pluginWidget);
-		m_selectPresetButton->setCheckable(false);
-		m_selectPresetButton->setCursor(Qt::PointingHandCursor);
-		m_selectPresetButton->setIcon(embed::getIconPixmap("stepper-down"));
-
-		auto menu = new QMenu;
-		//QObject::connect(menu, &QMenu::aboutToShow, _ctl, SLOT( updateMenu() ) );
-
- 		m_selectPresetButton->setMenu(menu);
-
-		m_selectPresetButton->setMinimumWidth(16);
-		m_selectPresetButton->setMaximumWidth(16);
-		m_selectPresetButton->setMinimumHeight(16);
-		m_selectPresetButton->setMaximumHeight(16);
-
-		auto tb = new QToolBar{pluginWidget};
-		tb->resize(100, 32); // TODO: Adjust size
-		tb->addWidget(m_prevPresetButton);
-		tb->addWidget(m_nextPresetButton);
-		tb->addWidget(m_selectPresetButton);
-		//tb->addWidget(m_openPresetButton);
-		//tb->addWidget(m_savePresetButton);
-		//tb->addWidget(m_managePluginButton);
+		m_presetsView = new ClapViewPresets{pluginWidget, ctrlBase->control(0), s_colNum};
+		grid->addWidget(m_presetsView, static_cast<int>(Rows::ButtonRow), Qt::AlignLeft);
 	}
 
 	btnBox->addStretch(1);
@@ -183,8 +177,8 @@ ClapViewBase::ClapViewBase(QWidget* pluginWidget, ClapControlBase* ctrlBase)
 		grid->addLayout(btnBox.release(), static_cast<int>(Rows::ButtonRow), 0, 1, s_colNum);
 	}
 
-	m_procView = new ClapViewInstance{pluginWidget, ctrlBase->control(0), s_colNum};
-	grid->addWidget(m_procView, static_cast<int>(Rows::ProcRow), 0);
+	m_parametersView = new ClapViewParameters{pluginWidget, ctrlBase->control(0), s_colNum};
+	grid->addWidget(m_parametersView, static_cast<int>(Rows::ParametersRow), 0);
 }
 
 
@@ -220,7 +214,11 @@ void ClapViewBase::modelChanged(ClapControlBase* ctrlBase)
 		m_toggleUIButton->setChecked(ctrlBase->hasGui());
 	}
 
-	LinkedModelGroupsView::modelChanged(ctrlBase);
+	//m_presetsView->modelChanged(&ctrlBase->presetsGroup());
+
+	// TODO: How to handle presets?
+
+	LinkedModelGroupsView::modelChanged(&ctrlBase->parametersGroup());
 }
 
 } // namespace lmms::gui

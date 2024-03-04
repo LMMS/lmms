@@ -50,13 +50,45 @@ class Model;
  * The design of this class is based on Lv2ControlBase by Johannes Lorenz.
  * See Lv2ControlBase for more information.
  */
-class LMMS_EXPORT ClapControlBase : public LinkedModelGroups
+class LMMS_EXPORT ClapControlBase //: public LinkedModelGroups
 {
 public:
 	auto pluginInfo() const -> const ClapPluginInfo* { return m_info; }
 
-	auto control(std::size_t idx) -> ClapInstance* { return m_instances[idx].get(); }
-	auto control(std::size_t idx) const -> const ClapInstance* { return m_instances[idx].get(); }
+	auto control(std::size_t idx) -> ClapInstance*;
+	auto control(std::size_t idx) const -> const ClapInstance*;
+
+	class Parameters : public LinkedModelGroups
+	{
+	public:
+		Parameters(ClapControlBase* parent) : m_parent{parent} {}
+
+		auto nodeName() const -> QString override { return "parameters"; }
+		auto getGroup(std::size_t idx) -> LinkedModelGroup* override;
+		auto getGroup(std::size_t idx) const -> const LinkedModelGroup* override;
+
+	private:
+		ClapControlBase* m_parent = nullptr;
+	};
+
+	class Presets : public LinkedModelGroups
+	{
+	public:
+		Presets(ClapControlBase* parent) : m_parent{parent} {}
+
+		auto nodeName() const -> QString override { return "presets"; }
+		void saveSettings(QDomDocument& doc, QDomElement& elem) override;
+		void loadSettings(const QDomElement& elem) override;
+
+		auto getGroup(std::size_t idx) -> LinkedModelGroup* override;
+		auto getGroup(std::size_t idx) const -> const LinkedModelGroup* override;
+
+	private:
+		ClapControlBase* m_parent = nullptr;
+	};
+
+	auto parametersGroup() -> auto& { return m_parameters; }
+	auto presetsGroup() -> auto& { return m_presets; }
 
 	auto hasGui() const -> bool { return m_instances[0]->gui().supported(); }
 	auto hasPresetSupport() const -> bool;
@@ -72,7 +104,7 @@ protected:
 	//!   this is the same pointer as this, but a different type
 	//! @param uri the CLAP URI telling this class what plugin to construct
 	ClapControlBase(Model* that, const QString& uri);
-	~ClapControlBase() override = default;
+	//~ClapControlBase() override = default;
 
 	ClapControlBase(const ClapControlBase&) = delete;
 	auto operator=(const ClapControlBase&) -> ClapControlBase& = delete;
@@ -87,8 +119,8 @@ protected:
 	/*
 	 * overrides
 	 */
-	auto getGroup(std::size_t idx) -> LinkedModelGroup* override;
-	auto getGroup(std::size_t idx) const -> const LinkedModelGroup* override;
+	//auto getGroup(std::size_t idx) -> LinkedModelGroup* override;
+	//auto getGroup(std::size_t idx) const -> const LinkedModelGroup* override;
 
 	/*
 	 * utils for the run thread
@@ -143,6 +175,9 @@ private:
 	//! If this is a mono effect, the ArrayVector will have size 2 in order to
 	//! fulfill LMMS' requirement of having stereo input and output
 	ArrayVector<std::unique_ptr<ClapInstance>, DEFAULT_CHANNELS> m_instances;
+
+	Parameters m_parameters{ this };
+	Presets m_presets{ this };
 
 	const ClapPluginInfo* m_info = nullptr;
 

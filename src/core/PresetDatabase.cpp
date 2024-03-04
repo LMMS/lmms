@@ -42,7 +42,7 @@ auto PresetDatabase::addPreset(std::string_view path) -> const Preset*
 	{
 		auto& presets = m_presets.find(loadData->location)->second;
 		auto it = std::find_if(presets.begin(), presets.end(), [&](const Preset& p) -> bool {
-			return *loadData == p.loadData;
+			return *loadData == p.loadData();
 		});
 
 		if (it != presets.end())
@@ -121,25 +121,25 @@ auto PresetDatabase::savePresetFile(const Preset& preset) -> bool
 	return false;
 }
 
-auto PresetDatabase::createPreset(const PresetLoadData& loadData) const -> std::optional<Preset>
+auto PresetDatabase::createPreset(const Preset::LoadData& loadData) const -> std::optional<Preset>
 {
 	// This is the default method - plugins should override this to provide better preset info
 
 	auto preset = Preset{};
-	preset.loadData = loadData;
+	preset.loadData() = loadData;
 
 	auto path = fs::path{loadData.loadKey};
-	preset.metadata.displayName = path.filename().string();
+	preset.metadata().displayName = path.filename().string();
 
 	return preset;
 }
 
-auto PresetDatabase::createPreset(const PresetLoadData& loadData,
+auto PresetDatabase::createPreset(const Preset::LoadData& loadData,
 	const std::vector<std::string>& keys) const -> std::optional<Preset>
 {
 	auto preset = createPreset(loadData);
 	if (!preset) { return std::nullopt; }
-	preset->keys = keys;
+	preset->keys() = keys;
 	return preset;
 }
 
@@ -150,11 +150,12 @@ auto PresetDatabase::findPresets(std::string_view key) const -> std::vector<cons
 	{
 		for (const auto& preset : mapPair.second)
 		{
-			if (preset.keys.empty())
+			if (preset.keys().empty())
 			{
 				ret.push_back(&preset);
 			}
-			else if (auto it = std::find(preset.keys.begin(), preset.keys.end(), key); it != preset.keys.end())
+			else if (auto it = std::find(preset.keys().begin(), preset.keys().end(), key);
+				it != preset.keys().end())
 			{
 				ret.push_back(&preset);
 			}
@@ -168,15 +169,15 @@ auto PresetDatabase::findPreset(const PresetLoadData& loadData, std::string_view
 	if (auto it = m_presets.find(loadData.location); it != m_presets.end())
 	{
 		auto it2 = std::find_if(it->second.begin(), it->second.end(), [&](const Preset& p) {
-			return p.loadData.loadKey == loadData.loadKey
-				&& (key.empty() || std::find(p.keys.begin(), p.keys.end(), key) != p.keys.end());
+			return p.loadData().loadKey == loadData.loadKey
+				&& (key.empty() || std::find(p.keys().begin(), p.keys().end(), key) != p.keys().end());
 		});
 		return it2 != it->second.end() ? &*it2 : nullptr; // TODO: Is it2.base() standard?
 	}
 	return nullptr;
 }
 
-auto PresetDatabase::addFile(std::string_view path) -> std::optional<PresetLoadData>
+auto PresetDatabase::addFile(std::string_view path) -> std::optional<Preset::LoadData>
 {
 	// First, create shortened path
 	const auto shortPath = PathUtil::toShortestRelative(path);
@@ -184,7 +185,7 @@ auto PresetDatabase::addFile(std::string_view path) -> std::optional<PresetLoadD
 	// Next, check full string
 	if (auto it = m_presets.find(shortPath); it != m_presets.end())
 	{
-		return PresetLoadData{it->first, ""};
+		return Preset::LoadData{it->first, ""};
 	}
 
 	// Must have at least one directory separator
@@ -202,7 +203,7 @@ auto PresetDatabase::addFile(std::string_view path) -> std::optional<PresetLoadD
 		loadKeyView.remove_prefix(pos + 1);
 		if (auto it = m_presets.find(locationView); it != m_presets.end())
 		{
-			return PresetLoadData{it->first, std::string{loadKeyView}};
+			return Preset::LoadData{it->first, std::string{loadKeyView}};
 		}
 
 		if (pos == 0) { break; }
@@ -215,14 +216,14 @@ auto PresetDatabase::addFile(std::string_view path) -> std::optional<PresetLoadD
 	{
 		if (auto it = m_presets.find(PathUtil::basePrefix(base)); it != m_presets.end())
 		{
-			return PresetLoadData{it->first, std::string{loadKey}};
+			return Preset::LoadData{it->first, std::string{loadKey}};
 		}
 	}
 
 	auto ret = m_presets.emplace(locationView, std::set<Preset>{});
 	assert(ret.second);
 
-	return PresetLoadData{ret.first->first, std::string{loadKeyView}};
+	return Preset::LoadData{ret.first->first, std::string{loadKeyView}};
 }
 
 } // namespace lmms

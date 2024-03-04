@@ -34,12 +34,15 @@
 
 class QPushButton;
 class QMdiSubWindow;
+class QWidget;
 
 namespace lmms
 {
 
 class ClapInstance;
 class ClapControlBase;
+class PluginPresets;
+class PresetSelector;
 
 namespace gui
 {
@@ -47,12 +50,24 @@ namespace gui
 class PixmapButton;
 
 //! View for one processor, ClapViewBase contains 2 of those for mono plugins
-class ClapViewInstance : public LinkedModelGroupView
+class ClapViewParameters : public LinkedModelGroupView
 {
 public:
 	//! @param colNum numbers of columns for the controls
-	ClapViewInstance(QWidget* parent, ClapInstance* ctrlBase, int colNum);
-	~ClapViewInstance() override = default;
+	ClapViewParameters(QWidget* parent, ClapInstance* instance, int colNum);
+	~ClapViewParameters() override = default;
+
+private:
+	ClapInstance* m_instance = nullptr;
+};
+
+//! View for one preset collection, ClapViewBase contains 2 of those for mono plugins
+class ClapViewPresets : public LinkedModelGroupView
+{
+public:
+	//! @param colNum numbers of columns for the controls
+	ClapViewPresets(QWidget* parent, ClapInstance* instance, int colNum);
+	~ClapViewPresets() override = default;
 
 private:
 	ClapInstance* m_instance = nullptr;
@@ -64,7 +79,7 @@ class LMMS_EXPORT ClapViewBase : public LinkedModelGroupsView
 {
 protected:
 	//! @param pluginWidget A child class which inherits QWidget
-	ClapViewBase(class QWidget* pluginWidget, ClapControlBase* ctrlBase);
+	ClapViewBase(QWidget* pluginWidget, ClapControlBase* ctrlBase);
 	~ClapViewBase();
 
 	// these widgets must be connected by child widgets
@@ -88,13 +103,37 @@ private:
 	enum class Rows
 	{
 		ButtonRow,
-		ProcRow,
+		ParametersRow,
 		LinkChannelsRow
 	};
 
-	auto getGroupView() -> LinkedModelGroupView* override { return m_procView; }
+	/*
+	class Parameters : public LinkedModelGroupsView
+	{
+	public:
+		Parameters(ClapViewParameters* view) : m_view{view} {}
+		auto getGroupView() -> LinkedModelGroupView* override { return m_view; }
+		operator QWidget*() const { return m_view; }
+	private:
+		ClapViewParameters* m_view = nullptr;
+	} m_parametersView;
 
-	ClapViewInstance* m_procView = nullptr;
+	class Presets : public LinkedModelGroupsView
+	{
+	public:
+		Presets(ClapViewPresets* view) : m_view{view} {}
+		auto getGroupView() -> LinkedModelGroupView* override { return m_view; }
+		operator QWidget*() const { return m_view; }
+	private:
+		ClapViewPresets* m_view = nullptr;
+	} m_presetsView;*/
+
+	//PresetSelector* m_presetSelector = nullptr;
+	ClapViewPresets* m_presetsView = nullptr;
+
+	auto getGroupView() -> LinkedModelGroupView* override { return m_parametersView; }
+
+	ClapViewParameters* m_parametersView = nullptr;
 
 	//! Numbers of controls per row; must be multiple of 2 for mono effects
 	static constexpr int s_colNum = 6;

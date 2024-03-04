@@ -106,13 +106,13 @@ public:
 
 protected:
 
-	//! Creates a populated Preset object from PresetLoadData.
+	//! Creates a populated Preset object from Preset::LoadData.
 	//! Plugins should override this to provide better preset metadata.
-	virtual auto createPreset(const PresetLoadData& loadData) const -> std::optional<Preset>;
+	virtual auto createPreset(const Preset::LoadData& loadData) const -> std::optional<Preset>;
 
-	//! Creates a populated Preset object from PresetLoadData and key(s).
+	//! Creates a populated Preset object from Preset::LoadData and key(s).
 	//! Plugins should override this to provide better preset metadata.
-	virtual auto createPreset(const PresetLoadData& loadData,
+	virtual auto createPreset(const Preset::LoadData& loadData,
 		const std::vector<std::string>& keys) const -> std::optional<Preset>;
 
 	/**
@@ -121,7 +121,7 @@ protected:
 	 * Checks all the combinations for splitting `path` into location and load key before adding.
 	 * TODO: Return map iterator so that `m_presets` does not need to be searched again?
 	 */
-	auto addFile(std::string_view path) -> std::optional<PresetLoadData>;
+	auto addFile(std::string_view path) -> std::optional<Preset::LoadData>;
 
 	//! Use during discover() call; The returned iterator is used to add presets at the location
 	auto addLocation(std::string_view path) -> PresetMap::iterator;

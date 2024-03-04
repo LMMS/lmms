@@ -24,6 +24,10 @@
 
 #include "PluginPresets.h"
 
+#include <QDebug>
+#include <QDomDocument>
+#include <QDomElement>
+
 #include <algorithm>
 #include <cassert>
 #include <iterator>
@@ -31,11 +35,13 @@
 namespace lmms
 {
 
-PluginPresets::PluginPresets(QObject* parent, PresetDatabase* database, std::string_view pluginKey)
-	: QObject{parent}
+PluginPresets::PluginPresets(Model* parent, PresetDatabase* database, std::string_view pluginKey)
+	//: PluginPresetsInterface{parent}
+	: LinkedModelGroup{parent}
 	, m_pluginKey{pluginKey}
 {
 	setPresetDatabase(database);
+	// TODO: Connect preset database changed signal to refreshPresetCollection()
 }
 
 auto PluginPresets::setPresetDatabase(PresetDatabase* database) -> bool
@@ -44,9 +50,54 @@ auto PluginPresets::setPresetDatabase(PresetDatabase* database) -> bool
 
 	m_database = database;
 	m_presets = database->findPresets(m_pluginKey);
+
+	m_activePresetModel.setRange(-1, m_presets.size() - 1);
+
+	emit presetCollectionChanged();
+
 	setActivePreset(std::nullopt);
+	return true;
+}
+
+auto PluginPresets::refreshPresetCollection() -> bool
+{
+	if (!m_database) { return false; }
+
+	std::optional<PresetLoadData> loadData;
+	if (m_activePreset) { loadData = m_presets.at(*m_activePreset)->loadData(); }
+
+	m_presets = m_database->findPresets(m_pluginKey);
+
+	m_activePresetModel.setRange(-1, m_presets.size() - 1);
+
+	// Find the previously active preset in the new presets vector
+	if (loadData)
+	{
+		const auto newIndex = findPreset(*loadData);
+		if (!newIndex)
+		{
+			// Failed to find preset in new vector
+			setActivePreset(std::nullopt);
+			return false;
+		}
+
+		m_activePreset = newIndex;
+		m_activePresetModel.setValue(*newIndex);
+	}
+	else
+	{
+		m_activePresetModel.setValue(-1);
+	}
+
+	emit presetCollectionChanged();
 
 	return true;
+}
+
+auto PluginPresets::activePreset() const -> const Preset*
+{
+	if (!m_activePreset) { return nullptr; }
+	return m_presets.at(*m_activePreset);
 }
 
 auto PluginPresets::activatePreset(const PresetLoadData& preset) -> bool
@@ -68,26 +119,11 @@ auto PluginPresets::activatePreset(std::size_t index) -> bool
 
 	// TODO: Check if current preset has been modified? (In case user wants to save it)
 
-	if (!activatePresetImpl(preset->loadData)) { return false; }
+	if (!activatePresetImpl(preset->loadData())) { return false; }
 
 	setActivePreset(index);
 
 	return true;
-}
-
-auto PluginPresets::presetIndex() const -> std::optional<std::size_t>
-{
-	return m_activePreset
-		? std::optional<std::size_t>{m_activePreset->second}
-		: std::nullopt;
-}
-
-auto PluginPresets::nextPreset() -> bool
-{
-	if (!m_activePreset) { return activatePreset(0); }
-
-	if (m_presets.empty()) { return false; }
-	return activatePreset((m_activePreset->second + 1) % m_presets.size());
 }
 
 auto PluginPresets::prevPreset() -> bool
@@ -95,41 +131,85 @@ auto PluginPresets::prevPreset() -> bool
 	if (!m_activePreset) { return activatePreset(0); }
 
 	if (m_presets.empty()) { return false; }
-	const auto newIndex = m_activePreset->second != 0
-		? (m_activePreset->second - 1) % m_presets.size()
+	const auto newIndex = *m_activePreset != 0
+		? (*m_activePreset - 1) % m_presets.size()
 		: m_presets.size() - 1;
 
 	return activatePreset(newIndex);
 }
 
-void PluginPresets::setActivePreset(std::optional<std::size_t> index)
+auto PluginPresets::nextPreset() -> bool
 {
-	std::optional<std::size_t> oldIndex;
-	if (m_activePreset) { oldIndex = m_activePreset->second; }
+	if (!m_activePreset) { return activatePreset(0); }
 
-	const Preset* newPreset = nullptr;
-	if (index)
+	if (m_presets.empty()) { return false; }
+	return activatePreset((*m_activePreset + 1) % m_presets.size());
+}
+
+void PluginPresets::saveActivePreset(QDomDocument& doc, QDomElement& element)
+{
+	if (auto preset = activePreset())
 	{
-		newPreset = preset(*index);
-		m_activePreset.emplace(newPreset, *index);
+		const auto& [location, loadKey] = preset->loadData();
+
+		QDomElement presetElement = doc.createElement(presetNodeName());
+		element.appendChild(presetElement);
+		presetElement.setAttribute("location", QString::fromUtf8(location.data(), location.size()));
+		presetElement.setAttribute("loadKey", QString::fromUtf8(loadKey.data(), loadKey.size()));
+	}
+}
+
+void PluginPresets::loadActivePreset(const QDomElement& element)
+{
+	QDomElement presetElement = element.firstChildElement(presetNodeName());
+	if (presetElement.isNull())
+	{
+		setActivePreset(std::nullopt);
+		return;
+	}
+
+	const auto location = presetElement.attribute("location");
+	const auto loadKey = presetElement.attribute("loadKey");
+
+	if (location.isEmpty() && loadKey.isEmpty())
+	{
+		setActivePreset(std::nullopt);
+		return;
+	}
+
+	// TODO: The needed preset may not be discovered at this point
+
+	const auto loadData = PresetLoadData{location.toStdString(), loadKey.toStdString()};
+	if (auto index = findPreset(loadData))
+	{
+		if (!activatePreset(*index))
+		{
+			qWarning() << "Failed to load preset!";
+		}
 	}
 	else
 	{
-		m_activePreset.reset();
+		qWarning() << "Failed to find preset!";
 	}
+}
 
+void PluginPresets::setActivePreset(std::optional<std::size_t> index)
+{
+	const auto oldIndex = m_activePreset;
+	m_activePreset = index;
+	m_activePresetModel.setValue(index ? *index : -1);
 	m_modified = false;
 
 	if (index != oldIndex)
 	{
-		emit activePresetChanged(newPreset);
+		emit activePresetChanged(index);
 	}
 }
 
 auto PluginPresets::findPreset(const PresetLoadData& preset) const -> std::optional<std::size_t>
 {
 	const auto it = std::find_if(m_presets.begin(), m_presets.end(), [&](const Preset* p) {
-		return p && p->loadData == preset;
+		return p && p->loadData() == preset;
 	});
 
 	if (it == m_presets.end()) { return std::nullopt; }

@@ -28,7 +28,11 @@
 #include <QObject>
 #include <memory>
 
+#include "AutomatableModel.h"
+#include "LinkedModelGroups.h"
+#include "lmms_export.h"
 #include "PresetDatabase.h"
+#include "SerializingObject.h"
 
 namespace lmms
 {
@@ -38,25 +42,27 @@ namespace gui
 	class PluginPresetsView {}; // TODO: Add later
 } // namespace gui
 
+
 /**
  * A collection of referenced plugins sourced from a PresetDatabase.
  */
-class PluginPresets : public QObject
+class LMMS_EXPORT PluginPresets
+	//: public PluginPresetsInterface
+	//, public SerializingObject
+	: public LinkedModelGroup
+	//, public IntModel // TODO: Inherit from IntModel for the active preset?
 {
 	Q_OBJECT
 public:
-	using QObject::QObject;
-	PluginPresets(QObject* parent, PresetDatabase* database,
+	PluginPresets(Model* parent, PresetDatabase* database,
 		std::string_view pluginKey = std::string_view{});
 	virtual ~PluginPresets() = default;
 
 	auto setPresetDatabase(PresetDatabase* database) -> bool;
 	auto refreshPresetCollection() -> bool;
 
+	auto activePreset() const -> const Preset*;
 	auto activatePreset(const PresetLoadData& preset) -> bool;
-
-	auto activatePreset(std::size_t index) -> bool;
-	auto presetIndex() const -> std::optional<std::size_t>;
 
 	virtual auto createView() const -> std::unique_ptr<gui::PluginPresetsView>
 	{
@@ -64,28 +70,46 @@ public:
 		return std::make_unique<gui::PluginPresetsView>();
 	}
 
+	auto activePresetModel() -> IntModel* { return &m_activePresetModel; }
+
+	/**
+	 * PluginPresetsInterface implementation
+	 */
+	auto presets() const -> const auto& { return m_presets; }
+	auto presetIndex() const { return m_activePreset; }
+	auto presetModified() const { return m_modified; }
+	auto activatePreset(std::size_t index) -> bool;
+	auto prevPreset() -> bool;
+	auto nextPreset() -> bool;
+
+	/**
+	 * SerializingObject-like functionality
+	 *
+	 * The default implementation just saves/loads the PresetLoadKey
+	 * and ignores any modifications that may have been made.
+	 */
+	virtual auto presetNodeName() const -> QString { return "preset"; } // TODO: use "preset#" for linked preset groups?
+	virtual void saveActivePreset(QDomDocument& doc, QDomElement& element);
+	virtual void loadActivePreset(const QDomElement& element);
+
 	//! Open preset dialog TODO: Move to an lmms::gui class?
 	//auto openPresetFile(std::string_view previousFile) -> const Preset*;
 
 	//! Save preset dialog TODO: Move to an lmms::gui class?
 	//auto savePresetFile(const Preset& preset) -> bool;
 
+	/**
+	 * Signals
+	 */
 signals:
-
-	void activePresetChanged(const Preset* preset);
+	void activePresetChanged(std::optional<std::size_t> index);
 	void presetCollectionChanged();
+	void presetModified();
 
 	// TODO: Should connect PresetDatabase's dataChanged() to this object's presetCollectionChanged().
 	//       This way if there are two plugin instances, and a user manually loads a new preset
 	//       in instance #1, it will be added to the preset collection that both PluginPresets share,
 	//       then presetCollectionChanged() will be called, and both objects will update their lists.
-
-public:
-
-	void presetModified();
-
-	auto nextPreset() -> bool;
-	auto prevPreset() -> bool;
 
 protected:
 	virtual auto activatePresetImpl(const PresetLoadData& preset) noexcept -> bool = 0;
@@ -96,7 +120,7 @@ protected:
 	auto preset(std::size_t index) const -> const Preset*;
 
 private:
-
+	//! The source of the plugin's presets
 	PresetDatabase* m_database = nullptr;
 
 	//! Non-empty if this is a subplugin; Used to find compatible presets in database
@@ -105,8 +129,10 @@ private:
 	//! A subset of presets from `m_database`
 	std::vector<const Preset*> m_presets;
 
-	//! Preset and `m_preset` index pair
-	std::optional<std::pair<const Preset*, std::size_t>> m_activePreset;
+	//! `m_preset` index of the active preset
+	std::optional<std::size_t> m_activePreset;
+
+	IntModel m_activePresetModel;
 
 	//! Whether the active preset has been modified
 	bool m_modified = false;

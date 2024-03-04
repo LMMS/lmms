@@ -37,9 +37,9 @@
 namespace lmms
 {
 
-ClapPresetLoader::ClapPresetLoader(ClapInstance* parent)
-	: ClapExtension{parent}
-	, PluginPresets{parent, getPresetDatabase(), parent->info().descriptor().id}
+ClapPresetLoader::ClapPresetLoader(Model* parent, ClapInstance* instance)
+	: ClapExtension{instance}
+	, PluginPresets{parent, getPresetDatabase(), instance->info().descriptor().id}
 {
 }
 
@@ -118,9 +118,8 @@ void ClapPresetLoader::clapLoaded(const clap_host* host, std::uint32_t locationK
 	h->logger().log(CLAP_LOG_INFO, text);
 #endif
 
-	std::string ref;
 	const auto loadData = ClapPresetDatabase::fromClapLocation(
-		static_cast<clap_preset_discovery_location_kind>(locationKind), location, loadKey, ref);
+		static_cast<clap_preset_discovery_location_kind>(locationKind), location, loadKey);
 	if (!loadData) { return; }
 
 	const auto index = self.findPreset(*loadData);

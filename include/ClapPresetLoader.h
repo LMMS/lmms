@@ -43,7 +43,7 @@ class ClapPresetLoader final
 	, public PluginPresets
 {
 public:
-	ClapPresetLoader(ClapInstance* parent);
+	ClapPresetLoader(Model* parent, ClapInstance* instance);
 	~ClapPresetLoader() override = default;
 
 	auto extensionId() const -> std::string_view override { return CLAP_EXT_PRESET_LOAD; }

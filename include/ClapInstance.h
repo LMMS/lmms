@@ -258,7 +258,7 @@ private:
 	ClapState m_state{ this };
 	ClapNotePorts m_notePorts{ this };
 	ClapParams m_params;
-	ClapPresetLoader m_presetLoader{ this };
+	ClapPresetLoader m_presetLoader;
 	ClapThreadCheck m_threadCheck{ this };
 	ClapTimerSupport m_timerSupport{ this };
 };
