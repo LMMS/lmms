@@ -36,7 +36,7 @@
 #include <QLineEdit>
 #include <QRegularExpression>
 #include <QScrollArea>
-#include <QtGlobal> // for version check
+// #include <QtGlobal> // for version check
 #include <QVBoxLayout>
 
 
@@ -129,7 +129,7 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
 	m_filterEdit = new QLineEdit(this);
 	connect(m_filterEdit, &QLineEdit::textChanged, this, [this](const QString &text) {
 // TODO: Cleanup when we don't support Qt5 anymore
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+#if (QT_VERSION >= 0x060000)
 		m_model.setFilterRegularExpression(QRegularExpression(text, QRegularExpression::CaseInsensitiveOption));
 #else
 		m_model.setFilterRegExp(QRegExp(text, Qt::CaseInsensitive));
