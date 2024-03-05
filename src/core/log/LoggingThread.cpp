@@ -24,7 +24,11 @@
  */
 #include "log/LoggingThread.h"
 
-#include "log/LogManager.h"
+#include "LoggingMacros.h"
+
+#ifdef SCHED_IDLE
+#include <pthread.h>
+#endif
 
 namespace lmms {
 
@@ -32,20 +36,29 @@ static const int DEFAULT_FLUSH_INTERVAL = 1000;
 
 LoggingThread::LoggingThread()
 	: m_flushInterval(DEFAULT_FLUSH_INTERVAL)
-	, m_active(false)
+	, m_active(true)
 {
 }
 
 LoggingThread::~LoggingThread()
 {
 	m_active = false;
-	m_thread->join();
+	m_thread.join();
+	LOG_TRACE("Logging thread shut down.")
 }
 
 void LoggingThread::initialize()
 {
 	m_active = true;
-	m_thread = new std::thread([this]() { run(); });
+	m_thread = std::thread{[this]() { run(); }};
+
+// Set a low priority for the logging thread if possible
+#ifdef SCHED_IDLE
+	sched_param param;
+	param.sched_priority = 0;
+	if (pthread_setschedparam(m_thread.native_handle(), SCHED_IDLE, &param))
+		LOG_WARN("Could not set idle priority for the logging thread.");
+#endif
 }
 
 LoggingThread& LoggingThread::inst()

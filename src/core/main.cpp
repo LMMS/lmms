@@ -218,23 +218,14 @@ void printHelp()
 		"  -c, --config <configfile>      Get the configuration from <configfile>\n"
 		"  -h, --help                     Show this usage information and exit.\n"
 		"  -v, --version                  Show version information and exit.\n"
-		"  --log <configuration string>   Configure a log sink to accept the log lines\n"
-		"                                 of defined verbosity level. Can be used more\n"
-		"                                 than once. \n"
-		"          Accepted formats of configuration strings are: \n"
-		"              - <sink>=<level>\n"
-		"              - <sink>#<topic>=<level>\n"
-		"          Possible sinks are:\n"
-		"              - console\n"
+		"  --log <verbosity>   Configure the logging system to log lines\n"
+		"                                 at or below the given verbosity level."
 		"          Possible log levels: \n"
 		"              - fatal\n"
 		"              - error\n"
 		"              - warning\n"
 		"              - info\n"
-		"              - debug_lo\n"
-		"              - debug_hi\n"
-		"  --no-logging-thread            Disable the logging thread, forcing all log lines\n"
-		"                                 to appear immediately. Might affect the performance.\n"
+		"              - trace\n"
 		"\nOptions if no action is given:\n"
 		"      --geometry <geometry>      Specify the size and position of\n"
 		"          the main window\n"
@@ -307,57 +298,15 @@ int noInputFileError()
 	return usageError( "No input file specified" );
 }
 
-void initializeLoggers(std::vector<std::string> configurationStrings, bool useLoggingThread)
+void initializeLogging(lmms::LogVerbosity verbosity)
 {
 	/* Initialize loggers */
 	lmms::ConsoleLogSink* consoleLogSink = new lmms::ConsoleLogSink();
 	lmms::LogManager::inst().addSink(consoleLogSink);
-
-	/* All sinks will be freed by LogManager */
-
-	for (const std::string& confString: configurationStrings)
-	{
-		std::string sinkName;
-		std::string topicStr;
-		std::string verbosityStr;
-		int posTopicOp = confString.find('#');
-		int posLevelOp = confString.find('=');
-
-		/* Allowed formats are:
-		 * sinkname=level
-		 * sinkname#topic=level
-		*/
-		if (posLevelOp != std::string::npos)
-		{
-			if (posTopicOp != std::string::npos)
-			{
-				sinkName = confString.substr(0, posTopicOp);
-				topicStr = confString.substr(posTopicOp+1,
-						posLevelOp - posTopicOp - 1);
-				verbosityStr = confString.substr(posLevelOp+1);
-			}
-			else
-			{
-				sinkName = confString.substr(0, posLevelOp);
-				verbosityStr = confString.substr(posLevelOp+1);
-
-			}
-		}
-		else
-		{
-			LOG_FATAL("Invalid log configuration string. ");
-			continue;
-		}
-
-		lmms::LogVerbosity verbosity;
-		verbosity = lmms::stringToLogVerbosity(verbosityStr);
-		lmms::LogManager::inst().setMaxVerbosity(verbosity);
-
-		if(useLoggingThread)
-		{
-			lmms::LoggingThread::inst().initialize();
-		}
-	}
+	lmms::LogManager::inst().setMaxVerbosity(verbosity);
+	lmms::LoggingThread::inst().initialize();
+	qInstallMessageHandler(qDebugToLogManagerAdapter);
+	LOG_TRACE("Logging system activated.");
 }
 
 
@@ -419,8 +368,7 @@ int main( int argc, char * * argv )
 	bool allowRoot = false;
 	bool renderLoop = false;
 	bool renderTracks = false;
-	bool useLoggingThread = true;
-	std::vector<std::string> logConfigurationStrings;
+	lmms::LogVerbosity logVerbosity = lmms::LogVerbosity::Info;
 	QString fileToLoad, fileToImport, renderOut, profilerOutputFile, configFile;
 
 	// first of two command-line parsing stages
@@ -835,15 +783,7 @@ int main( int argc, char * * argv )
 		else if (arg == "--log")
 		{
 			++i;
-			if (i == argc)
-			{
-				return usageError("No log configuration specified");
-			}
-			logConfigurationStrings.push_back(argv[i]);
-		}
-		else if (arg == "--no-logging-thread")
-		{
-			useLoggingThread = false;
+			logVerbosity = lmms::stringToLogVerbosity(argv[i]);
 		}
 		else
 		{
@@ -865,11 +805,7 @@ int main( int argc, char * * argv )
 		fileCheck( fileToImport );
 	}
 
-	initializeLoggers(logConfigurationStrings, useLoggingThread);
-
-	qInstallMessageHandler(qDebugToLogManagerAdapter);
-
-	LOG_INFO("Logging activated");
+	initializeLogging(logVerbosity);
 
 	ConfigManager::inst()->loadConfigFile(configFile);
 

@@ -38,10 +38,9 @@
 
 #define LOG_INFO_TOPIC(topic, format, ...) LOG_TOPIC(lmms::LogVerbosity::Info, topic, format, ##__VA_ARGS__)
 
-#ifdef DEBUG
-#define LOG_TRACE_TOPIC(topic, format, ...) \
-	LOG(lmms::LogVerbosity::Trace, topic, format, ##__VA_ARGS__); \
-	#else
+#ifdef LMMS_DEBUG
+#define LOG_TRACE_TOPIC(topic, format, ...) LOG_TOPIC(lmms::LogVerbosity::Trace, topic, format, ##__VA_ARGS__);
+#else
 #define LOG_TRACE_TOPIC(topic, format, ...)
 #endif
 
@@ -53,6 +52,6 @@
 
 #define LOG_INFO(format, ...) LOG_INFO_TOPIC(lmms::LogTopic::Default(), format, ##__VA_ARGS__)
 
-#define LOG_TRACE(format, ...) LOG_TRACE_TOPIC(lmms::LocTopic::Default, format, ##__VA_ARGS__);
+#define LOG_TRACE(format, ...) LOG_TRACE_TOPIC(lmms::LogTopic::Default(), format, ##__VA_ARGS__);
 
 #endif // LOGGING_MACROS_H

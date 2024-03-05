@@ -91,9 +91,6 @@ void LogManager::push(LogLine* logLine)
 		m_pendingLogLines.write(&logLine, 1);
 	}
 
-	/* If the logging thread is not used, make the log message appear immediately. */
-	if (!LoggingThread::inst().isRunning()) { flush(); }
-
 	/* In case of fatal error flush the messages immediately,
 	 * then terminate the application */
 	if (logLine->verbosity == LogVerbosity::Fatal)
@@ -148,8 +145,14 @@ static const std::vector<std::pair<std::string, LogVerbosity>> verbosityMapping
 
 LogVerbosity stringToLogVerbosity(std::string s)
 {
-	auto it
-		= std::find_if(verbosityMapping.begin(), verbosityMapping.end(), [s](const auto& p) { return p.first == s; });
+	auto it = std::find_if(
+		verbosityMapping.begin(), verbosityMapping.end(), [s](const std::pair<std::string, LogVerbosity>& p) {
+			for (int i = 0; i < s.length(); i++)
+			{
+				if (std::tolower(p.first.at(i)) != std::tolower(s.at(i))) return false;
+			}
+			return true;
+		});
 	if (it != verbosityMapping.end()) return it->second;
 	LOG_WARN("Log verbosity %s not found.", s.c_str());
 	return LogVerbosity::Info;

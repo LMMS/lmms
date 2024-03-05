@@ -39,8 +39,6 @@ public:
 
 	unsigned int flushInterval() { return m_flushInterval; }
 
-	bool isRunning() { return m_active; }
-
 	void initialize();
 
 private:
@@ -51,7 +49,7 @@ private:
 
 	unsigned int m_flushInterval;
 	bool m_active;
-	std::thread* m_thread;
+	std::thread m_thread;
 };
 
 } // namespace lmms

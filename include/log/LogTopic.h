@@ -37,13 +37,13 @@ public:
 	LogTopic(std::string name);
 	std::string name() const;
 
-	static LogTopic& Default()
+	static const LogTopic& Default()
 	{
 		static LogTopic instance("");
 		return instance;
 	}
 
-	bool operator==(const LogTopic& other) const { return this->m_name == other.m_name; }
+	bool operator!=(const LogTopic& other) const { return this->m_name != other.m_name; }
 
 private:
 	std::string m_name;

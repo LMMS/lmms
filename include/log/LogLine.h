@@ -73,15 +73,15 @@ public:
 	{
 		std::ostringstream os;
 
-		if (topic == LogTopic::Default()) { os << "(" << topic.name() << ") "; }
+		if (topic != LogTopic::Default()) { os << "(" << topic.name() << ") "; }
 
 		os << logVerbosityToString(verbosity) << ": ";
 
 		os << std::put_time(std::localtime(&timestamp), "%T");
 
-		if (fileLineNumber != 0) { os << " -" << fileName << " # " << fileLineNumber; }
+		if (fileLineNumber != 0) { os << ": " << fileName << "#" << fileLineNumber; }
 
-		os << " : " << content;
+		os << ": " << content;
 
 		return os.str();
 	}
