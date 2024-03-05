@@ -69,12 +69,15 @@ protected:
 		#if (QT_VERSION >= 0x051200)
 		QRegularExpression nameRegularExpression(filterRegularExpression());
 		nameRegularExpression.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
+		
+		bool nameFilterPassed = nameRegularExpression.match(name).capturedStart() != -1;
 		#else 
 		QRegExp nameRegularExpression(filterRegExp());
-		nameRegularExpression.setPatternOptions(Qt::CaseInsensitive);
+		nameRegularExpression.setCaseSensitivity(Qt::CaseInsensitive);
+
+		bool nameFilterPassed = nameRegularExpression.indexIn(name) != -1;
 		#endif
 
-		bool nameFilterPassed = nameRegularExpression.match(name).capturedStart() != -1;
 		bool typeFilterPassed = type.contains(m_effectTypeFilter, Qt::CaseInsensitive);
 
 		return nameFilterPassed && typeFilterPassed;
