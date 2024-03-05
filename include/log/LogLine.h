@@ -44,7 +44,7 @@ class LogLine
 {
 public:
 	LogVerbosity verbosity;
-	time_t timestamp;
+	std::chrono::system_clock::time_point timestamp;
 	std::string fileName;
 	unsigned int fileLineNumber;
 	std::string content;
@@ -59,7 +59,7 @@ public:
 		, topic(topic)
 	{
 		/* Fill the timestamp information */
-		timestamp = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+		timestamp = std::chrono::system_clock::now();
 
 		/* Check if the file name is a basename. If not, drop the directory
 		 * information */
@@ -77,7 +77,11 @@ public:
 
 		os << logVerbosityToString(verbosity) << ": ";
 
-		os << std::put_time(std::localtime(&timestamp), "%T");
+		time_t timestampT = std::chrono::system_clock::to_time_t(timestamp);
+		std::chrono::milliseconds timestampMs
+			= std::chrono::duration_cast<std::chrono::milliseconds>(timestamp.time_since_epoch());
+		os << std::put_time(std::localtime(&timestampT), "%T") << "."
+		   << (timestampMs % std::chrono::seconds(1)).count();
 
 		if (fileLineNumber != 0) { os << ": " << fileName << "#" << fileLineNumber; }
 
