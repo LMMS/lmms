@@ -36,6 +36,7 @@
 #include <QLineEdit>
 #include <QRegularExpression>
 #include <QScrollArea>
+#include <QtGlobal> // for version check
 #include <QVBoxLayout>
 
 
