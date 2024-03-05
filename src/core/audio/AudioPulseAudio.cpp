@@ -26,7 +26,7 @@
 #include <QLineEdit>
 
 #include "AudioPulseAudio.h"
-#include "Logging.h"
+#include "LoggingMacros.h"
 
 #ifdef LMMS_HAVE_PULSEAUDIO
 
@@ -38,15 +38,13 @@
 
 namespace lmms
 {
-LogTopic LT_PulseAudio("pulseaudio");
-
 
 static void stream_write_callback(pa_stream *s, size_t length, void *userdata)
 {
 	static_cast<AudioPulseAudio *>( userdata )->streamWriteCallback( s, length );
 }
 
-
+LogTopic LT_PulseAudio("PulseAudio");
 
 
 AudioPulseAudio::AudioPulseAudio( bool & _success_ful, AudioEngine*  _audioEngine ) :
@@ -139,13 +137,13 @@ static void stream_state_callback( pa_stream *s, void * userdata )
 			break;
 
 		case PA_STREAM_READY:
-			Log_Inf(LT_PulseAudio,
+			LOG_INFO_TOPIC(LT_PulseAudio,
 				"Stream successfully created" );
 			break;
 
 		case PA_STREAM_FAILED:
 		default:
-			Log_Err(LT_PulseAudio,
+			LOG_INFO_TOPIC(LT_PulseAudio,
 				"Stream error: %s\n",
 					pa_strerror(pa_context_errno(
 						pa_stream_get_context( s ) ) ) );
@@ -167,7 +165,7 @@ static void context_state_callback(pa_context *c, void *userdata)
 
 		case PA_CONTEXT_READY:
 		{
-			Log_Inf(LT_PulseAudio, "Connection established");
+			LOG_INFO_TOPIC(LT_PulseAudio, "Connection established");
 			_this->m_s = pa_stream_new( c, "lmms", &_this->m_sampleSpec,  nullptr);
 			pa_stream_set_state_callback( _this->m_s, stream_state_callback, _this );
 			pa_stream_set_write_callback( _this->m_s, stream_write_callback, _this );
@@ -201,7 +199,7 @@ static void context_state_callback(pa_context *c, void *userdata)
 
 		case PA_CONTEXT_FAILED:
 		default:
-			Log_Err(LT_PulseAudio,
+			LOG_ERR_TOPIC(LT_PulseAudio,
 				"Connection failure: %s",
 				 pa_strerror( pa_context_errno( c ) ) );
 			_this->signalConnected( false );
@@ -216,7 +214,7 @@ void AudioPulseAudio::run()
 	pa_mainloop * mainLoop = pa_mainloop_new();
 	if( !mainLoop )
 	{
-		Log_Err(LT_PulseAudio, "pa_mainloop_new() failed" );
+		LOG_ERR_TOPIC(LT_PulseAudio, "pa_mainloop_new() failed" );
 		return;
 	}
 	pa_mainloop_api * mainloop_api = pa_mainloop_get_api( mainLoop );
@@ -224,7 +222,7 @@ void AudioPulseAudio::run()
 	pa_context *context = pa_context_new( mainloop_api, "lmms" );
 	if ( context == nullptr )
 	{
-		Log_Err(LT_PulseAudio, "pa_context_new() failed" );
+		LOG_ERR_TOPIC(LT_PulseAudio, "pa_context_new() failed" );
 		return;
 	}
 

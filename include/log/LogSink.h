@@ -1,7 +1,8 @@
 /*
- * LoggingThread.h - declaration of the logging thread
+ * LogSink.h - declaration of the logging sink base class
  *
  * Copyright (c) 2020 Artur Twardowski <artur.twardowski/at/gmail/com>
+ * Copyright (c) 2024 Jonah Janzen
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -21,31 +22,22 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-#ifndef LOGGINGTHREAD_H
-#define LOGGINGTHREAD_H
 
-#include <QThread>
+#ifndef LOGSINK_H
+#define LOGSINK_H
 
-class LoggingThread: public QThread
+#include "log/LogManager.h"
+
+namespace lmms {
+
+class LogSink
 {
 public:
-	static LoggingThread& inst();
-	~LoggingThread();
-	void run() override;
-	void setFlushInterval(unsigned int interval)
-	{
-		m_flushInterval = interval;
-	}
+	virtual ~LogSink(){};
 
-	unsigned int flushInterval()
-	{
-		return m_flushInterval;
-	}
-
-private:
-	LoggingThread();
-	unsigned int m_flushInterval;
-	bool m_active;
+	virtual void log(const LogLine& line) = 0;
 };
 
-#endif // LOGGINGTHREAD_H
+} // namespace lmms
+
+#endif // LOGSINK_H

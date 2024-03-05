@@ -1,8 +1,8 @@
 /*
- * LogSink.h - declaration of the logging sink base class and enumeration
- * of supported log sinks
+ * ConsoleLogSink.h - the LogSink implementation that writes output to console.
  *
  * Copyright (c) 2020 Artur Twardowski <artur.twardowski/at/gmail/com>
+ * Copyright (c) 2024 Jonah Janzen
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -23,36 +23,23 @@
  *
  */
 
-#ifndef LOGSINK_H
-#define LOGSINK_H
+#ifndef CONSOLE_LOG_SINK_H
+#define CONSOLE_LOG_SINK_H
 
-#include "Logging.h"
+#include <iostream>
 
-enum class LogSinkType
-{
-	Console = 1, // relevant for ConsoleLogSink
-	LogFile,     // reserved for future LogFileSink
-	LogWindow    // reserved for future LogWindowSink
-};
+#include "log/LogLine.h"
+#include "log/LogSink.h"
 
-class LogSink
+namespace lmms {
+
+class ConsoleLogSink : public LogSink
 {
 public:
-	explicit LogSink(LogSinkType sinkType);
-	virtual ~LogSink();
-
-	virtual void onFlushBegin() {}
-	virtual void onFlushEnd() {}
-	virtual void onLogLine(const LogLine& line) = 0;
-
-	void setMaxVerbosity(std::string topicName, LogVerbosity verbosity);
-	void setDefaultMaxVerbosity(LogVerbosity verbosity);
-	bool canAcceptLogLine(LogTopic topic, LogVerbosity verbosity);
-
-private:
-	LogSinkType m_sinkType;
-	std::map<LogTopic, LogVerbosity> m_topicToMaxVerbosity;
-	LogVerbosity m_defaultMaxVerbosity;
+	~ConsoleLogSink() override{};
+	void log(const LogLine& line) override { std::cout << line.toString() << std::endl; }
 };
 
-#endif // LOGSINK_H
+} // namespace lmms
+
+#endif // CONSOLE_LOG_SINK_H

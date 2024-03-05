@@ -1,7 +1,9 @@
 /*
- * LoggingThread.cpp - implementation of the logging thread
+ * LogTopic.h - a class which describes a category of log messages.
+
  *
  * Copyright (c) 2020 Artur Twardowski <artur.twardowski/at/gmail/com>
+ * Copyright (c) 2024 Jonah Janzen
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -21,45 +23,32 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-#include "LoggingThread.h"
-#include "Logging.h"
 
-static const int DEFAULT_FLUSH_INTERVAL = 1000;
+#ifndef LOGTOPIC_H
+#define LOGTOPIC_H
 
-LoggingThread::LoggingThread()
-	: m_flushInterval(DEFAULT_FLUSH_INTERVAL)
-	, m_active(true)
+#include <string>
+
+namespace lmms {
+
+class LogTopic
 {
-}
+public:
+	LogTopic(std::string name);
+	std::string name() const;
 
-LoggingThread::~LoggingThread()
-{
-	m_active = false;
-	if (!wait(m_flushInterval)) {
-		terminate();
-	}
-
-	/* Forcifully flush all the messages that still are present
-	 * in the buffer - don't care about the performance, as probably
-	 * we are shutting down right now.*/
-	LogManager::inst().flush();
-}
-
-LoggingThread& LoggingThread::inst()
-{
-	static LoggingThread instance;
-	return instance;
-}
-
-void LoggingThread::run()
-{
-	while (m_active)
+	static LogTopic& Default()
 	{
-		if (!LogManager::inst().isFlushPaused())
-		{
-			LogManager::inst().flush();
-		}
-		msleep(DEFAULT_FLUSH_INTERVAL);
+		static LogTopic instance("");
+		return instance;
 	}
-	this->exit();
-}
+
+	bool operator==(LogTopic& other) const { return this->m_name == other.m_name; }
+
+private:
+	std::string m_name;
+};
+
+} // namespace lmms
+
+#endif

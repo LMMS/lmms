@@ -39,9 +39,9 @@
 #include <QPushButton>
 #include <QTextStream>
 
-#include "Logging.h"
-#include "LoggingThread.h"
-#include "ConsoleLogSink.h"
+#include "LoggingMacros.h"
+#include "log/ConsoleLogSink.h"
+#include "log/LoggingThread.h"
 
 #ifdef LMMS_BUILD_WIN32
 #include <windows.h>
@@ -142,39 +142,39 @@ inline void loadTranslation( const QString & tname,
 
 void qDebugToLogManagerAdapter(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
-	static LogTopic LT_QtInternal("qtInternal");
+	static lmms::LogTopic LT_QtInternal("qtInternal");
 
 	QByteArray localMsg = msg.toLocal8Bit();
-	LogVerbosity verbosity = LogVerbosity::Debug_Hi;
+	lmms::LogVerbosity verbosity = lmms::LogVerbosity::Trace;
 
 	switch (type) {
 	case QtFatalMsg:
-		verbosity = LogVerbosity::Fatal;
+		verbosity = lmms::LogVerbosity::Fatal;
 		break;
 
 	case QtCriticalMsg:
-		verbosity = LogVerbosity::Error;
+		verbosity = lmms::LogVerbosity::Error;
 		break;
 
 	case QtWarningMsg:
-		verbosity = LogVerbosity::Warning;
+		verbosity = lmms::LogVerbosity::Warning;
 		break;
 
 	case QtInfoMsg:
-		verbosity = LogVerbosity::Info;
+		verbosity = lmms::LogVerbosity::Info;
 		break;
 
 	case QtDebugMsg:
-		verbosity = LogVerbosity::Debug_Lo;
+		verbosity = lmms::LogVerbosity::Trace;
 		break;
 	}
 
-	LogLine* logLine = new LogLine(verbosity,
+	lmms::LogLine* logLine = new lmms::LogLine(verbosity,
 			context.file ? context.file : "",
 			context.line,
 			localMsg.constData(),
 			LT_QtInternal);
-	LogManager::inst().push(logLine);
+	lmms::LogManager::inst().push(logLine);
 
 }
 
@@ -307,12 +307,11 @@ int noInputFileError()
 	return usageError( "No input file specified" );
 }
 
-void initializeLoggers(std::vector<std::string> configurationStrings)
+void initializeLoggers(std::vector<std::string> configurationStrings, bool useLoggingThread)
 {
 	/* Initialize loggers */
-	ConsoleLogSink* consoleLogSink = new ConsoleLogSink();
-	LogManager::inst().registerCurrentThread("main");
-	LogManager::inst().addSink(consoleLogSink);
+	lmms::ConsoleLogSink* consoleLogSink = new lmms::ConsoleLogSink();
+	lmms::LogManager::inst().addSink(consoleLogSink);
 
 	/* All sinks will be freed by LogManager */
 
@@ -346,48 +345,19 @@ void initializeLoggers(std::vector<std::string> configurationStrings)
 		}
 		else
 		{
-			Log_Fatal(LT_Default, "Invalid log configuration string. "
-				"Expected operator '=' not found");
+			LOG_FATAL("Invalid log configuration string. ");
 			continue;
 		}
 
-		LogVerbosity verbosity;
-		try
-		{
-			verbosity = stringToLogVerbosity(verbosityStr);
-		}
-		catch(std::out_of_range)
-		{
-			Log_Fatal(LT_Default, "Invalid log verbosity: %s",
-				verbosityStr.c_str());
-			continue;
-		}
+		lmms::LogVerbosity verbosity;
+		verbosity = lmms::stringToLogVerbosity(verbosityStr);
+		lmms::LogManager::inst().setMaxVerbosity(verbosity);
 
-		LogSink* sink = nullptr;
-		if (sinkName == "console")
+		if(useLoggingThread)
 		{
-			sink = consoleLogSink;
+			lmms::LoggingThread::inst().initialize();
 		}
-
-		if (!sink)
-		{
-			Log_Fatal(LT_Default, "Invalid log sink: %s",
-				sinkName.c_str());
-			continue;
-		}
-
-		if (topicStr.empty())
-		{
-			sink->setDefaultMaxVerbosity(verbosity);
-		}
-		else
-		{
-			sink->setMaxVerbosity(topicStr, verbosity);
-		}
-
 	}
-
-
 }
 
 
@@ -895,17 +865,11 @@ int main( int argc, char * * argv )
 		fileCheck( fileToImport );
 	}
 
-	initializeLoggers(logConfigurationStrings);
-
-	if (useLoggingThread)
-	{
-		LoggingThread::inst().start();
-	}
-
+	initializeLoggers(logConfigurationStrings, useLoggingThread);
 
 	qInstallMessageHandler(qDebugToLogManagerAdapter);
 
-	Log_Inf(LT_Default, "Logging activated");
+	LOG_INFO("Logging activated");
 
 	ConfigManager::inst()->loadConfigFile(configFile);
 
@@ -941,7 +905,7 @@ int main( int argc, char * * argv )
 				sched_get_priority_min( SCHED_FIFO ) ) / 2;
 	if( sched_setscheduler( 0, SCHED_FIFO, &sparam ) == -1 )
 	{
-		Log_Wrn(LT_Default, "Could not set realtime priority.");
+		LOG_WARN("Could not set realtime priority.");
 	}
 #endif
 #endif // LMMS_HAVE_SCHED_H
@@ -950,7 +914,7 @@ int main( int argc, char * * argv )
 #ifdef LMMS_BUILD_WIN32
 	if( !SetPriorityClass( GetCurrentProcess(), HIGH_PRIORITY_CLASS ) )
 	{
-		Log_Wrn(LT_Default, "Could not set realtime priority.");
+		LOG_WARN("Could not set realtime priority.");
 	}
 #endif
 
@@ -960,11 +924,11 @@ int main( int argc, char * * argv )
 	sa.sa_flags = SA_SIGINFO;
 	if ( sigemptyset( &sa.sa_mask ) )
 	{
-		Log_Err(LT_Default, "Signal initialization failed");
+		LOG_ERR("Signal initialization failed");
 	}
 	if ( sigaction( SIGPIPE, &sa, nullptr ) )
 	{
-		Log_Err(LT_Default, "Signal initialization failed");
+		LOG_ERR("Signal initialization failed");
 	}
 #endif
 
@@ -977,15 +941,15 @@ int main( int argc, char * * argv )
 		Engine::init( true );
 		destroyEngine = true;
 
-		Log_Inf(LT_Default, "Loading project...");
+		LOG_INFO("Loading project...");
 		Engine::getSong()->loadProject( fileToLoad );
 		if( Engine::getSong()->isEmpty() )
 		{
-			Log_Wrn(LT_Default, "The project %s is empty, aborting!",
+			LOG_WARN("The project %s is empty, aborting!",
 				fileToLoad.toUtf8().constData() );
 			exit( EXIT_FAILURE );
 		}
-		Log_Inf(LT_Default, "Done");
+		LOG_INFO("Done");
 
 		Engine::getSong()->setExportLoop( renderLoop );
 
