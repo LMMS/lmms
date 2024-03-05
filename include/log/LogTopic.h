@@ -43,7 +43,7 @@ public:
 		return instance;
 	}
 
-	bool operator==(LogTopic& other) const { return this->m_name == other.m_name; }
+	bool operator==(const LogTopic& other) const { return this->m_name == other.m_name; }
 
 private:
 	std::string m_name;

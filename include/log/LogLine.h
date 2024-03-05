@@ -30,6 +30,7 @@
 #include <iomanip>
 
 #include "log/LogManager.h"
+#include "log/LogTopic.h"
 
 namespace lmms {
 
@@ -72,7 +73,7 @@ public:
 	{
 		std::ostringstream os;
 
-		if (topic != LogTopic::Default) { os << "(" << topic.name() << ") "; }
+		if (topic == LogTopic::Default()) { os << "(" << topic.name() << ") "; }
 
 		os << logVerbosityToString(verbosity) << ": ";
 
