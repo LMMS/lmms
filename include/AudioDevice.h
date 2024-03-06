@@ -97,8 +97,7 @@ protected:
 	// subclasses can re-implement this for being used in conjunction with
 	// processNextBuffer()
 	virtual void writeBuffer( const surroundSampleFrame * /* _buf*/,
-						const fpp_t /*_frames*/,
-						const float /*_master_gain*/ )
+						const fpp_t /*_frames*/)
 	{
 	}
 
@@ -109,7 +108,6 @@ protected:
 	// returns num of bytes in outbuf
 	int convertToS16( const surroundSampleFrame * _ab,
 						const fpp_t _frames,
-						const float _master_gain,
 						int_sample_t * _output_buffer,
 						const bool _convert_endian = false );
 

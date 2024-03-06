@@ -45,6 +45,8 @@ bool sanitize( sampleFrame * src, int frames );
 /*! \brief Add samples from src to dst */
 void add( sampleFrame* dst, const sampleFrame* src, int frames );
 
+/*! \brief Multiply samples from `dst` by `coeff` */
+void multiply(sampleFrame* dst, float coeff, int frames);
 
 /*! \brief Add samples from src multiplied by coeffSrc to dst */
 void addMultiplied( sampleFrame* dst, const sampleFrame* src, float coeffSrc, int frames );

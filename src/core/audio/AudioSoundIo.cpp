@@ -286,8 +286,6 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 	int bytesPerSample = m_outstream->bytes_per_sample;
 	int err;
 
-	const float gain = audioEngine()->masterGain();
-
 	int framesLeft = frameCountMax;
 
 	while (framesLeft > 0)
@@ -328,7 +326,6 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 
 			for (int channel = 0; channel < layout->channel_count; channel += 1)
 			{
-				float sample = gain * m_outBuf[m_outBufFrameIndex][channel];
 				memcpy(areas[channel].ptr, &sample, bytesPerSample);
 				areas[channel].ptr += areas[channel].step;
 			}
