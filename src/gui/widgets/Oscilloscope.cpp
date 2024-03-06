@@ -142,6 +142,7 @@ void Oscilloscope::paintEvent( QPaintEvent * )
 	if( m_active && !Engine::getSong()->isExporting() )
 	{
 		AudioEngine const * audioEngine = Engine::audioEngine();
+
 		float master_output = audioEngine->masterGain();
 
 		const fpp_t frames = audioEngine->framesPerPeriod();

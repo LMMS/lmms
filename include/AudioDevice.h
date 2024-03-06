@@ -96,10 +96,7 @@ public:
 protected:
 	// subclasses can re-implement this for being used in conjunction with
 	// processNextBuffer()
-	virtual void writeBuffer( const surroundSampleFrame * /* _buf*/,
-						const fpp_t /*_frames*/)
-	{
-	}
+	virtual void writeBuffer(const surroundSampleFrame* /* _buf*/, const fpp_t /*_frames*/) {}
 
 	// called by according driver for fetching new sound-data
 	fpp_t getNextBuffer( surroundSampleFrame * _ab );
