@@ -83,20 +83,23 @@ void LogManager::addSink(LogSink* sink)
 
 void LogManager::push(LogLine* logLine)
 {
-	if (m_pendingLogLines.write_space() > 1) { m_pendingLogLines.write(&logLine, 1); }
-	else if (m_pendingLogLines.write_space() == 1)
+	if (m_maxVerbosity >= logLine->verbosity)
 	{
-		flush();
-		LOG_WARN("A log queue overflow has resulted in a forced flush.");
-		m_pendingLogLines.write(&logLine, 1);
-	}
+		if (m_pendingLogLines.write_space() > 1) { m_pendingLogLines.write(&logLine, 1); }
+		else if (m_pendingLogLines.write_space() == 1)
+		{
+			flush();
+			LOG_WARN("A log queue overflow has resulted in a forced flush.");
+			m_pendingLogLines.write(&logLine, 1);
+		}
 
-	/* In case of fatal error flush the messages immediately,
-	 * then terminate the application */
-	if (logLine->verbosity == LogVerbosity::Fatal)
-	{
-		flush();
-		abort();
+		/* In case of fatal error flush the messages immediately,
+		 * then terminate the application */
+		if (logLine->verbosity == LogVerbosity::Fatal)
+		{
+			flush();
+			abort();
+		}
 	}
 }
 
@@ -123,14 +126,11 @@ void LogManager::flush()
 	for (size_t ix = 0; ix < seq.size(); ix++)
 	{
 		LogLine* logLine = seq[ix];
-		if (m_maxVerbosity >= logLine->verbosity)
+		for (LogSink* sink : m_sinks)
 		{
-			for (LogSink* sink : m_sinks)
-			{
-				sink->log(*logLine);
-			}
-			delete logLine;
+			sink->log(*logLine);
 		}
+		delete logLine;
 	}
 }
 
