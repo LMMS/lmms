@@ -304,7 +304,6 @@ void initializeLogging(lmms::LogVerbosity verbosity)
 	lmms::ConsoleLogSink* consoleLogSink = new lmms::ConsoleLogSink();
 	lmms::LogManager::inst().addSink(consoleLogSink);
 	lmms::LogManager::inst().setMaxVerbosity(verbosity);
-	lmms::LoggingThread::inst().initialize();
 	qInstallMessageHandler(qDebugToLogManagerAdapter);
 	LOG_TRACE("Logging system activated.");
 }
