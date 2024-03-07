@@ -98,7 +98,8 @@ auto ClapFile::load() -> bool
 		}
 	}
 
-	m_presetDatabase.init(m_entry.get());
+	m_presetDatabase = std::make_unique<ClapPresetDatabase>();
+	m_presetDatabase->init(m_entry.get());
 
 	return true;
 }
@@ -110,7 +111,7 @@ void ClapFile::unload() noexcept
 	// singleton is destroyed after any ClapControlBase objects.
 	// TODO: Enforce this?
 
-	m_presetDatabase.deinit();
+	m_presetDatabase.reset();
 
 	m_entry.reset();
 

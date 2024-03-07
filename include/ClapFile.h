@@ -79,7 +79,7 @@ public:
 	//! Includes plugins that failed to load
 	auto pluginCount() const { return m_pluginCount; }
 
-	auto presetDatabase() -> auto& { return m_presetDatabase; }
+	auto presetDatabase() -> ClapPresetDatabase* { return m_presetDatabase.get(); }
 
 private:
 	void unload() noexcept;
@@ -106,7 +106,7 @@ private:
 	//! Includes plugins that failed to load
 	std::uint32_t m_pluginCount = 0;
 
-	ClapPresetDatabase m_presetDatabase;
+	std::unique_ptr<ClapPresetDatabase> m_presetDatabase;
 };
 
 } // namespace lmms

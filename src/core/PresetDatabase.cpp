@@ -150,12 +150,7 @@ auto PresetDatabase::findPresets(std::string_view key) const -> std::vector<cons
 	{
 		for (const auto& preset : mapPair.second)
 		{
-			if (preset.keys().empty())
-			{
-				ret.push_back(&preset);
-			}
-			else if (auto it = std::find(preset.keys().begin(), preset.keys().end(), key);
-				it != preset.keys().end())
+			if (preset.supportsPlugin(key))
 			{
 				ret.push_back(&preset);
 			}
@@ -169,8 +164,7 @@ auto PresetDatabase::findPreset(const PresetLoadData& loadData, std::string_view
 	if (auto it = m_presets.find(loadData.location); it != m_presets.end())
 	{
 		auto it2 = std::find_if(it->second.begin(), it->second.end(), [&](const Preset& p) {
-			return p.loadData().loadKey == loadData.loadKey
-				&& (key.empty() || std::find(p.keys().begin(), p.keys().end(), key) != p.keys().end());
+			return p.loadData().loadKey == loadData.loadKey && p.supportsPlugin(key);
 		});
 		return it2 != it->second.end() ? &*it2 : nullptr; // TODO: Is it2.base() standard?
 	}

@@ -256,9 +256,9 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 				loadedFromThisFile = true;
 			}
 
-			if (loadedFromThisFile)
+			if (loadedFromThisFile && file.presetDatabase())
 			{
-				file.presetDatabase().discover();
+				file.presetDatabase()->discover();
 			}
 		}
 	}
@@ -301,7 +301,7 @@ auto ClapManager::presetDatabase(const std::string& uri) -> ClapPresetDatabase*
 	assert(iter->second < m_files.size());
 	auto& file = m_files[iter->second];
 
-	return &file.presetDatabase();
+	return file.presetDatabase();
 }
 
 } // namespace lmms

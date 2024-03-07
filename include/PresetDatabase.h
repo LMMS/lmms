@@ -42,7 +42,7 @@ namespace lmms
  * Plugins are expected to inherit this class to implement preset discovery,
  *   metadata loading, and other functionality.
  */
-class PresetDatabase //: public QObject //: public NoCopyNoMove
+class PresetDatabase : public NoCopyNoMove
 {
 public:
 	using PresetMap = std::map<std::string, std::set<Preset>, std::less<>>;

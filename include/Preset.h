@@ -121,6 +121,12 @@ public:
 	auto keys() -> auto& { return m_keys; }
 	auto keys() const -> auto& { return m_keys; }
 
+	auto supportsPlugin(std::string_view key) const -> bool
+	{
+		if (m_keys.empty()) { return true; }
+		return std::find(m_keys.begin(), m_keys.end(), key) != m_keys.end();
+	}
+
 	//! Enable std::set support
 	friend auto operator<(const Preset& a, const Preset& b) noexcept -> bool
 	{
