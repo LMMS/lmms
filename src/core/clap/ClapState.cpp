@@ -36,6 +36,31 @@
 namespace lmms
 {
 
+auto ClapState::initImpl(const clap_host* host, const clap_plugin* plugin) noexcept -> bool
+{
+	m_stateContext = static_cast<const clap_plugin_state_context*>(
+		plugin->get_extension(plugin, CLAP_EXT_STATE_CONTEXT));
+
+	if (m_stateContext && (!m_stateContext->load || !m_stateContext->save))
+	{
+		m_stateContext = nullptr;
+		logger().log(CLAP_LOG_WARNING, "State context extension is not fully implemented");
+		return true;
+	}
+
+	if (m_stateContext)
+	{
+		logger().log(CLAP_LOG_INFO, "State context extension is supported");
+	}
+
+	return true;
+}
+
+void ClapState::deinitImpl() noexcept
+{
+	m_stateContext = nullptr;
+}
+
 auto ClapState::hostExt() const -> const clap_host_state*
 {
 	static clap_host_state ext {
@@ -49,7 +74,7 @@ auto ClapState::checkSupported(const clap_plugin_state& ext) -> bool
 	return ext.load && ext.save;
 }
 
-auto ClapState::load(std::string_view base64) -> bool
+auto ClapState::load(std::string_view base64, std::uint32_t context) -> bool
 {
 	assert(ClapThreadCheck::isMainThread());
 
@@ -90,7 +115,11 @@ auto ClapState::load(std::string_view base64) -> bool
 		&IStream::clapRead
 	};
 
-	if (!pluginExt()->load(plugin(), &clapStream))
+	const auto success = m_stateContext && context != 0
+		? m_stateContext->load(plugin(), &clapStream, context)
+		: pluginExt()->load(plugin(), &clapStream);
+
+	if (!success)
 	{
 		if (auto h = fromHost(host()))
 		{
@@ -104,12 +133,12 @@ auto ClapState::load(std::string_view base64) -> bool
 	return true;
 }
 
-auto ClapState::load() -> bool
+auto ClapState::load(std::uint32_t context) -> bool
 {
-	return load(encodedState());
+	return load(encodedState(), context);
 }
 
-auto ClapState::save() -> std::optional<std::string_view>
+auto ClapState::save(std::uint32_t context) -> std::optional<std::string_view>
 {
 	assert(ClapThreadCheck::isMainThread());
 
@@ -141,7 +170,11 @@ auto ClapState::save() -> std::optional<std::string_view>
 		&OStream::clapWrite
 	};
 
-	if (!pluginExt()->save(plugin(), &clapStream))
+	const auto success = m_stateContext && context != 0
+		? m_stateContext->save(plugin(), &clapStream, context)
+		: pluginExt()->save(plugin(), &clapStream);
+
+	if (!success)
 	{
 		logger().log(CLAP_LOG_WARNING, "Plugin failed to save its state");
 		return std::nullopt;

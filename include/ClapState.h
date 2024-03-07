@@ -33,6 +33,7 @@
 #include <string>
 #include <string_view>
 #include <clap/ext/state.h>
+#include <clap/ext/state-context.h>
 
 #include "ClapExtension.h"
 
@@ -50,25 +51,44 @@ public:
 	//! Whether the plugin has indicated its state has changes that need to be saved
 	auto dirty() const { return m_dirty; }
 
-	//! Tells plugin to load the given base64-encoded state data; Returns true if successful
-	auto load(std::string_view base64) -> bool;
+	/**
+	 * Tells plugin to load the given base64-encoded state data
+	 *
+	 * The context (clap_plugin_state_context_type) is used if it's provided and the plugin supports it.
+	 * Returns true if successful
+	 */
+	auto load(std::string_view base64, std::uint32_t context = 0) -> bool;
 
-	//! Tells plugin to load state data from encodedState(); Returns true if successful
-	auto load() -> bool;
+	/**
+	 * Tells plugin to load state data from encodedState()
+	 *
+	 * The context (clap_plugin_state_context_type) is used if it's provided and the plugin supports it.
+	 * Returns true if successful
+	 */
+	auto load(std::uint32_t context = 0) -> bool;
 
-	//! Tells plugin to save its state data; Sets and returns encodedState()'s data if successful
-	auto save() -> std::optional<std::string_view>;
+	/**
+	 * Tells plugin to save its state data
+	 *
+	 * The context (clap_plugin_state_context_type) is used if it's provided and the plugin supports it.
+	 * Sets and returns encodedState()'s data if successful
+	 */
+	auto save(std::uint32_t context = 0) -> std::optional<std::string_view>;
 
 	//! Base-64 encoded state data from the last time save() was successfully called
 	auto encodedState() const -> std::string_view { return m_state; }
 
 private:
+	auto initImpl(const clap_host* host, const clap_plugin* plugin) noexcept -> bool override;
+	void deinitImpl() noexcept override;
 	auto checkSupported(const clap_plugin_state& ext) -> bool override;
 
 	/**
 	 * clap_host_state implementation
 	 */
 	static void clapMarkDirty(const clap_host* host);
+
+	const clap_plugin_state_context* m_stateContext = nullptr;
 
 	std::string m_state; //!< base64-encoded state cache
 	bool m_dirty = false;
