@@ -38,6 +38,7 @@ set(LMMS_SRCS
 	core/LfoController.cpp
 	core/LinkedModelGroups.cpp
 	core/LocklessAllocator.cpp
+	core/log/LogLine.cpp
 	core/log/LogManager.cpp
 	core/log/LoggingThread.cpp
 	core/MemoryHelper.cpp

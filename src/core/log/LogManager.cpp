@@ -61,6 +61,7 @@ LogManager::LogManager()
 {
 	m_pendingLogLines.mlock();
 	m_pendingLogLines.touch();
+	LoggingThread::inst().initialize();
 }
 
 LogManager::~LogManager()
@@ -83,40 +84,23 @@ void LogManager::addSink(LogSink* sink)
 
 void LogManager::push(LogLine* logLine)
 {
-	if (m_maxVerbosity >= logLine->verbosity)
+	if (m_maxVerbosity < logLine->verbosity) return;
+
+	if (m_pendingLogLines.write_space() > 1) { m_pendingLogLines.write(&logLine, 1); }
+	else if (m_pendingLogLines.write_space() == 1)
 	{
-		if (m_pendingLogLines.write_space() > 1) { m_pendingLogLines.write(&logLine, 1); }
-		else if (m_pendingLogLines.write_space() == 1)
-		{
-			flush();
-			LOG_WARN("A log queue overflow has resulted in a forced flush.");
-			m_pendingLogLines.write(&logLine, 1);
-		}
-
-		/* In case of fatal error flush the messages immediately,
-		 * then terminate the application */
-		if (logLine->verbosity == LogVerbosity::Fatal)
-		{
-			flush();
-			abort();
-		}
+		flush();
+		LOG_WARN("A log queue overflow has resulted in a forced flush.");
+		m_pendingLogLines.write(&logLine, 1);
 	}
-}
 
-template <typename... Args>
-void LogManager::push(LogVerbosity verbosity, std::string fileName, unsigned int fileLineNo, LogTopic topic,
-	std::string content, Args... format_args)
-{
-	// Format the log string with the provided arguments.
-	int size_s = std::snprintf(nullptr, 0, content.c_str(), format_args...) + 1; // Extra space for '\0'
-	if (size_s <= 0) { LOG_ERR("Error during log formatting."); }
-	auto size = static_cast<size_t>(size_s);
-	std::unique_ptr<char[]> buf(new char[size]);
-	std::snprintf(buf.get(), size, content.c_str(), format_args...);
-	std::string message(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
-
-	LogLine* logLine = new LogLine(verbosity, fileName, fileLineNo, message, topic);
-	push(logLine);
+	/* In case of fatal error flush the messages immediately,
+	 * then terminate the application */
+	if (logLine->verbosity == LogVerbosity::Fatal)
+	{
+		flush();
+		abort();
+	}
 }
 
 void LogManager::flush()
@@ -137,34 +121,6 @@ void LogManager::flush()
 void LogManager::setMaxVerbosity(LogVerbosity verbosity)
 {
 	m_maxVerbosity = verbosity;
-}
-
-static const std::vector<std::pair<std::string, LogVerbosity>> verbosityMapping
-	= {{"Fatal", LogVerbosity::Fatal}, {"Error", LogVerbosity::Error}, {"Warning", LogVerbosity::Warning},
-		{"Info", LogVerbosity::Info}, {"Trace", LogVerbosity::Trace}};
-
-LogVerbosity stringToLogVerbosity(std::string s)
-{
-	auto it = std::find_if(
-		verbosityMapping.begin(), verbosityMapping.end(), [s](const std::pair<std::string, LogVerbosity>& p) {
-			for (int i = 0; i < s.length(); i++)
-			{
-				if (std::tolower(p.first.at(i)) != std::tolower(s.at(i))) return false;
-			}
-			return true;
-		});
-	if (it != verbosityMapping.end()) return it->second;
-	LOG_WARN("Log verbosity %s not found.", s.c_str());
-	return LogVerbosity::Info;
-}
-
-std::string logVerbosityToString(LogVerbosity verbosity)
-{
-	auto it = std::find_if(
-		verbosityMapping.begin(), verbosityMapping.end(), [verbosity](const auto& p) { return p.second == verbosity; });
-	if (it != verbosityMapping.end()) return it->first;
-	LOG_WARN("Log verbosity %i not found.", (int)verbosity);
-	return "Info";
 }
 
 } // namespace lmms

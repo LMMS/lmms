@@ -782,7 +782,7 @@ int main( int argc, char * * argv )
 		else if (arg == "--log")
 		{
 			++i;
-			logVerbosity = lmms::stringToLogVerbosity(argv[i]);
+			logVerbosity = lmms::LogLine::stringToLogVerbosity(argv[i]);
 		}
 		else
 		{

@@ -29,31 +29,18 @@
 #include <atomic>
 #include <chrono>
 #include <map>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <vector>
 
+#include "log/LogLine.h"
 #include "log/LogTopic.h"
 #include "ringbuffer/ringbuffer.h"
 
 namespace lmms {
 
-class LogManager;
-
-enum class LogVerbosity
-{
-	Fatal,
-	Error,
-	Warning,
-	Info,
-	Trace
-};
-
-LogVerbosity stringToLogVerbosity(std::string s);
-std::string logVerbosityToString(LogVerbosity verbosity);
-
 class LogSink;
-class LogLine;
 
 class LogManager
 {
@@ -65,13 +52,30 @@ public:
 	void push(LogLine* logLine);
 	template <typename... Args>
 	void push(LogVerbosity verbosity, std::string fileName, unsigned int fileLineNumber, LogTopic topic,
-		std::string content, Args... format_args);
+		std::string content, Args... format_args)
+	{
+		if (m_maxVerbosity < verbosity) return;
+
+		// Format the log string with the provided arguments.
+		int size_s = std::snprintf(nullptr, 0, content.c_str(), format_args...) + 1; // Extra space for '\0'
+		if (size_s <= 0)
+		{
+			push(new LogLine(
+				lmms::LogVerbosity::Error, "myfile", 3, "Error formatting log message.", lmms::LogTopic::Default()));
+			return;
+		}
+		auto size = static_cast<size_t>(size_s);
+		std::unique_ptr<char[]> buf(new char[size]);
+		std::snprintf(buf.get(), size, content.c_str(), format_args...);
+		std::string message(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
+
+		LogLine* logLine = new LogLine(verbosity, fileName, fileLineNumber, message, topic);
+		push(logLine);
+	}
 
 	void flush();
 
 	void setMaxVerbosity(LogVerbosity verbosity);
-
-	std::map<LogVerbosity, std::string> LogVerbosityNames;
 
 private:
 	LogManager();

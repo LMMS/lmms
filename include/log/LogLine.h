@@ -27,9 +27,9 @@
 #ifndef LOGLINE_H
 #define LOGLINE_H
 
+#include <chrono>
 #include <iomanip>
 
-#include "log/LogManager.h"
 #include "log/LogTopic.h"
 
 namespace lmms {
@@ -39,6 +39,15 @@ namespace lmms {
 #else
 #define PATH_SEPARATOR "/"
 #endif
+
+enum class LogVerbosity
+{
+	Fatal,
+	Error,
+	Warning,
+	Info,
+	Trace
+};
 
 class LogLine
 {
@@ -51,44 +60,12 @@ public:
 	LogTopic topic;
 
 	LogLine(
-		LogVerbosity verbosity, std::string fileName, unsigned int fileLineNumber, std::string content, LogTopic topic)
-		: verbosity(verbosity)
-		, fileName(fileName)
-		, fileLineNumber(fileLineNumber)
-		, content(content)
-		, topic(topic)
-	{
-		/* Fill the timestamp information */
-		timestamp = std::chrono::system_clock::now();
+		LogVerbosity verbosity, std::string fileName, unsigned int fileLineNumber, std::string content, LogTopic topic);
 
-		/* Check if the file name is a basename. If not, drop the directory
-		 * information */
-		if (this->fileName.find(PATH_SEPARATOR) != std::string::npos)
-		{
-			this->fileName = this->fileName.substr(this->fileName.rfind(PATH_SEPARATOR) + 1);
-		}
-	}
+	std::string toString() const;
 
-	std::string toString() const
-	{
-		std::ostringstream os;
-
-		if (topic != LogTopic::Default()) { os << "(" << topic.name() << ") "; }
-
-		os << logVerbosityToString(verbosity) << ": ";
-
-		time_t timestampT = std::chrono::system_clock::to_time_t(timestamp);
-		std::chrono::milliseconds timestampMs
-			= std::chrono::duration_cast<std::chrono::milliseconds>(timestamp.time_since_epoch());
-		os << std::put_time(std::localtime(&timestampT), "%T") << "."
-		   << (timestampMs % std::chrono::seconds(1)).count();
-
-		if (fileLineNumber != 0) { os << ": " << fileName << "#" << fileLineNumber; }
-
-		os << ": " << content;
-
-		return os.str();
-	}
+	static std::string logVerbosityToString(LogVerbosity verbosity);
+	static LogVerbosity stringToLogVerbosity(std::string s);
 };
 
 } // namespace lmms
