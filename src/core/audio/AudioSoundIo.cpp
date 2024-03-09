@@ -326,6 +326,7 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 
 			for (int channel = 0; channel < layout->channel_count; channel += 1)
 			{
+				float sample = m_outBuf[m_outBufFrameIndex][channel];
 				memcpy(areas[channel].ptr, &sample, bytesPerSample);
 				areas[channel].ptr += areas[channel].step;
 			}
