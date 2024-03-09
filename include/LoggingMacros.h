@@ -29,6 +29,8 @@
 
 #include "log/LogManager.h"
 
+namespace lmms {
+
 #define NUMARGS(...) std::tuple_size<decltype(std::make_tuple(__VA_ARGS__))>::value
 
 // Format a string with the provided arguments.
@@ -82,5 +84,7 @@
 #define LOG_INFO(format, ...) LOG_INFO_TOPIC(, format, ##__VA_ARGS__)
 
 #define LOG_TRACE(format, ...) LOG_TRACE_TOPIC(, format, ##__VA_ARGS__)
+
+} // namespace lmms
 
 #endif // LOGGING_MACROS_H
