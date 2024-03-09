@@ -34,12 +34,15 @@
 
 namespace lmms {
 
+// The character used to split the __FILE__ macro to take only the file name.
 #if defined(WIN32) || defined(_WIN32)
 #define PATH_SEPARATOR "\\"
 #else
 #define PATH_SEPARATOR "/"
 #endif
 
+//! The level of detail of a log message. "Trace" produces the most detailed logs, while "Fatal" logs only fatal errors.
+//! For performance reasons, "Trace" messages are only logged in debug builds.
 enum class LogVerbosity
 {
 	Fatal,
@@ -53,16 +56,27 @@ class LogLine
 {
 public:
 	LogVerbosity verbosity;
+	//! The time at which the log line was recorded.
 	std::chrono::system_clock::time_point timestamp;
+	//! The name of the file from which the logging call originated. Usually populated by the __FILE__ macro. Useful for
+	//! debugging.
 	std::string fileName;
+	//! The line number of the file from which the logging called originated. Usually populated by the __LINE__ macro.
+	//! Useful for debugging.
 	unsigned int fileLineNumber;
+	//! The message being logged. Often formatted with positional arguments in LogManager.
 	std::string content;
+	//! The category of the log message. Can be checked in a log sink to filter log messages to only a specific
+	//! category.
 	LogTopic topic;
 
 	LogLine(
 		LogVerbosity verbosity, std::string fileName, unsigned int fileLineNumber, std::string content, LogTopic topic);
 
+	//! Generates the string representation of this log line. Presumably used in sinks.
 	std::string toString() const;
+
+	// Helper functions to convert between log verbosities and strings.
 
 	static std::string logVerbosityToString(LogVerbosity verbosity);
 	static LogVerbosity stringToLogVerbosity(std::string s);

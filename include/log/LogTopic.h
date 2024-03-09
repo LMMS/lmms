@@ -31,6 +31,8 @@
 
 namespace lmms {
 
+// A helper macro which allows for rapid caching of LogTopics after the first time they are constructed.
+// Suitable for use in realtime functions.
 #define LT(topic) \
 	([]() -> const lmms::LogTopic& { \
 		static lmms::LogTopic lt = lmms::LogTopic(topic); \
@@ -43,12 +45,14 @@ public:
 	LogTopic(std::string name);
 	std::string name() const;
 
+	// The default log topic, used when one is not specifically provided.
 	static const LogTopic& Default() { return LT(""); }
 
 	bool operator==(const LogTopic& other) const { return this->m_name == other.m_name; }
 	bool operator!=(const LogTopic& other) const { return this->m_name != other.m_name; }
 
 private:
+	//! The name of the topic, which entirely defines it.
 	std::string m_name;
 };
 

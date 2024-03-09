@@ -30,6 +30,8 @@
 
 namespace lmms {
 
+//! A class which accepts and handles messages logged by LMMS.
+//! Example uses include logging to the console or a file.
 class LogSink
 {
 public:

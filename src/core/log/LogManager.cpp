@@ -37,6 +37,7 @@
 
 namespace lmms {
 
+// The number of messages that can be stored internally before a flush is forced.
 const int LOG_BUFFER_SIZE = 1024;
 
 LogTopic::LogTopic(std::string name)
@@ -59,6 +60,7 @@ LogManager::LogManager()
 	: m_pendingLogLines(LOG_BUFFER_SIZE)
 	, m_pendingLogLinesReader(m_pendingLogLines)
 {
+	// Initialize the ringbuffer and start the logging thread.
 	m_pendingLogLines.mlock();
 	m_pendingLogLines.touch();
 	LoggingThread::inst().initialize();
@@ -71,6 +73,7 @@ LogManager::~LogManager()
 	 * we are shutting down right now.*/
 	flush();
 
+	// Clean up all log sinks.
 	for (LogSink* pSink : m_sinks)
 	{
 		delete pSink;
@@ -84,11 +87,14 @@ void LogManager::addSink(LogSink* sink)
 
 void LogManager::push(LogLine* logLine)
 {
+	// Only log messages at or below the max verbosity.
 	if (m_maxVerbosity < logLine->verbosity) return;
 
+	// Add it to the ringbuffer queue if possible; otherwise force a log flush so no messages are dropped.
 	if (m_pendingLogLines.write_space() > 1) { m_pendingLogLines.write(&logLine, 1); }
 	else if (m_pendingLogLines.write_space() == 1)
 	{
+		// This may cause performance stutters in realtime functions.
 		flush();
 		LOG_WARN("A log queue overflow has resulted in a forced flush.");
 		m_pendingLogLines.write(&logLine, 1);
@@ -105,6 +111,7 @@ void LogManager::push(LogLine* logLine)
 
 void LogManager::flush()
 {
+	// Go through all pending log messages and pass them to each log sink.
 	auto seq = m_pendingLogLinesReader.read_max(LOG_BUFFER_SIZE);
 
 	for (size_t ix = 0; ix < seq.size(); ix++)

@@ -37,18 +37,21 @@ LogLine::LogLine(
 	, content(content)
 	, topic(topic)
 {
-	/* Fill the timestamp information */
+	// Fill the timestamp information
 	timestamp = std::chrono::system_clock::now();
 
-	/* Check if the file name is a basename. If not, drop the directory
-	 * information */
+	// Check if the file name is a basename. If not, drop the directory information.
 	if (this->fileName.find(PATH_SEPARATOR) != std::string::npos)
 	{
 		this->fileName = this->fileName.substr(this->fileName.rfind(PATH_SEPARATOR) + 1);
 	}
 }
+
 std::string LogLine::toString() const
 {
+	// Formats the log line in the format:
+	// (TOPIC) VERBOSITY: HH.MM.SS.SSS: FILENAME#LINENO: MESSAGE
+
 	std::ostringstream os;
 
 	if (topic != LogTopic::Default()) { os << "(" << topic.name() << ") "; }
@@ -67,14 +70,17 @@ std::string LogLine::toString() const
 	return os.str();
 }
 
+// A mapping of strings to their log verbosity representations.
 const std::vector<std::pair<std::string, LogVerbosity>> verbosityMapping
 	= {{"Fatal", LogVerbosity::Fatal}, {"Error", LogVerbosity::Error}, {"Warning", LogVerbosity::Warning},
 		{"Info", LogVerbosity::Info}, {"Trace", LogVerbosity::Trace}};
 
 std::string LogLine::logVerbosityToString(LogVerbosity verbosity)
 {
+	// Searches the log verbosity mappings for the string representation of "verbosity".
 	auto it = std::find_if(
 		verbosityMapping.begin(), verbosityMapping.end(), [verbosity](const auto& p) { return p.second == verbosity; });
+
 	if (it != verbosityMapping.end()) return it->first;
 	LOG_WARN("Log verbosity %i not found.", (int)verbosity);
 	return "Info";
@@ -82,6 +88,8 @@ std::string LogLine::logVerbosityToString(LogVerbosity verbosity)
 
 LogVerbosity LogLine::stringToLogVerbosity(std::string s)
 {
+	// Searches the log verbosity mappings for the log verbosity represented by "s".
+	// C++ defines no case insensitive comparison for strings, so we have to iterate over each character in turn.
 	auto it = std::find_if(
 		verbosityMapping.begin(), verbosityMapping.end(), [s](const std::pair<std::string, LogVerbosity>& p) {
 			for (int i = 0; i < s.length(); i++)
@@ -90,6 +98,7 @@ LogVerbosity LogLine::stringToLogVerbosity(std::string s)
 			}
 			return true;
 		});
+
 	if (it != verbosityMapping.end()) return it->second;
 	LOG_WARN("Log verbosity %s not found.", s.c_str());
 	return LogVerbosity::Info;

@@ -139,7 +139,7 @@ inline void loadTranslation( const QString & tname,
 	}
 }
 
-
+//! A handler which intercepts all QT log messages and forwards them to LMMS' logging system.
 void qDebugToLogManagerAdapter(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
 	static lmms::LogTopic LT_QtInternal("qtInternal");

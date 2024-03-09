@@ -29,13 +29,20 @@
 #include "log/LogSink.h"
 #include "log/LoggingThread.h"
 
+// Because the logs are processed through the logging thread, there is no guarantee that they will be written
+// synchronously. This macro is called before all logging assertions in tests to ensure that the most recent messages
+// have actually been made available to sinks.
 #define FLUSH_LOGS lmms::LogManager::inst().flush()
-lmms::LogLine lastLogLine(lmms::LogVerbosity::Trace, "FileName", 5, "Test", lmms::LogTopic::Default());
+
+// The temporary buffer from which messages written by test cases can be accessed.
+lmms::LogLine lastLogLine(lmms::LogVerbosity::Trace, "", 0, "", lmms::LogTopic::Default());
 
 class LoggingTest : public QObject
 {
 	Q_OBJECT
 
+	// A log sink that just assigns each incoming log message to "lastLogLine" so the result of the log call can be
+	// analyzed from within the test case.
 	class TestLogSink : public lmms::LogSink
 	{
 	public:
@@ -45,15 +52,17 @@ class LoggingTest : public QObject
 private slots:
 	void initTestCase()
 	{
-		lmms::LogManager::inst().setMaxVerbosity(lmms::LogVerbosity::Trace);
+		// Set up the log manager.
+		// The logging thread is automatically initialized by the LogManager constructor.
 		lmms::LogManager::inst().addSink(new TestLogSink());
-		LOG_INFO("Initialized test case");
 	}
 
+	// Each log level should be properly defined and logged.
 	void testLogLevels()
 	{
 		// Fatal logs are not tested because they abort the application.
 
+		// The max verbosity is explicitly reset at the beginning of each test case to ensure deterministic behaviour.
 		lmms::LogManager::inst().setMaxVerbosity(lmms::LogVerbosity::Trace);
 
 		LOG_ERR("Err Log");
@@ -89,6 +98,7 @@ private slots:
 #endif
 	}
 
+	// Log messages should be properly filtered based on the max verbosity of the log manager.
 	void testMaxVerbosity()
 	{
 		lmms::LogManager::inst().setMaxVerbosity(lmms::LogVerbosity::Trace);
@@ -110,6 +120,7 @@ private slots:
 			"Error logs should be written when the maximum log level is \"error\".");
 	}
 
+	// General messages should be assigned the default topic, and custom log topics should be properly handled.
 	void testLogTopic()
 	{
 		lmms::LogManager::inst().setMaxVerbosity(lmms::LogVerbosity::Trace);
@@ -125,6 +136,7 @@ private slots:
 			lastLogLine.topic.name() == "Test Topic", "A message logged with a topic should be assigned that topic.");
 	}
 
+	// The log macros should output the basename of the file they are used from.
 	void testLogFileName()
 	{
 		lmms::LogManager::inst().setMaxVerbosity(lmms::LogVerbosity::Trace);
@@ -135,6 +147,7 @@ private slots:
 			lastLogLine.fileName == "LoggingTest.cpp", "Log messages should include the file they originated from.");
 	}
 
+	// Logs should be properly formatted with printf-style positional arguments.
 	void testLogFormatting()
 	{
 		lmms::LogManager::inst().setMaxVerbosity(lmms::LogVerbosity::Trace);

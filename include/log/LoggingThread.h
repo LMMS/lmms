@@ -32,6 +32,7 @@ namespace lmms {
 class LoggingThread
 {
 public:
+	//! Returns the singleton instance of LoggingThread.
 	static LoggingThread& inst();
 	~LoggingThread();
 
@@ -39,16 +40,21 @@ public:
 
 	unsigned int flushInterval() { return m_flushInterval; }
 
+	//! Must be called explicitly to start the logging thread.
 	void initialize();
 
 private:
 	LoggingThread();
+	// These are specifically un-defined so that only one instance of the singleton can exist.
 	LoggingThread(const LoggingThread& t) = delete;
+	void operator=(LoggingThread const&) = delete;
 
+	//! The function which will run asynchronously on the thread.
 	void run();
 
 	unsigned int m_flushInterval;
 	bool m_active;
+	//! The worker thread itself.
 	std::thread m_thread;
 };
 

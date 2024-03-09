@@ -1,5 +1,5 @@
 /*
- * LoggingMacros.h - macros related to LMMS' logging API.
+ * LoggingMacros.h - a collection of macros to provide straightforward access to LMMS' logging API.
  *
  * Copyright (c) 2024 Jonah Janzen
  *
@@ -27,6 +27,8 @@
 
 #include "log/LogManager.h"
 
+// This first set of macros logs messages that are assigned a specific LogTopic.
+
 #define LOG_TOPIC(verbosity, topic, format, ...) \
 	lmms::LogManager::inst().push(verbosity, __FILE__, __LINE__, LT(#topic), format, ##__VA_ARGS__)
 
@@ -38,11 +40,15 @@
 
 #define LOG_INFO_TOPIC(topic, format, ...) LOG_TOPIC(lmms::LogVerbosity::Info, topic, format, ##__VA_ARGS__)
 
+// For performance reasons, trace messages are only logged in debug builds.
 #ifdef LMMS_DEBUG
 #define LOG_TRACE_TOPIC(topic, format, ...) LOG_TOPIC(lmms::LogVerbosity::Trace, topic, format, ##__VA_ARGS__)
 #else
 #define LOG_TRACE_TOPIC(topic, format, ...)
 #endif
+
+// This group of macros logs general messages using the default topic, so that no specific topic will be written to the
+// log output.
 
 #define LOG_FATAL(format, ...) LOG_FATAL_TOPIC(, format, ##__VA_ARGS__)
 

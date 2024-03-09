@@ -36,21 +36,26 @@ static const int DEFAULT_FLUSH_INTERVAL = 1000;
 
 LoggingThread::LoggingThread()
 	: m_flushInterval(DEFAULT_FLUSH_INTERVAL)
-	, m_active(true)
+	, m_active(false)
 {
 }
 
 LoggingThread::~LoggingThread()
 {
 	m_active = false;
+	// Wait for the logging thread to finish its current loop.
 	m_thread.join();
 	LOG_TRACE("Logging thread shut down.");
 }
 
 void LoggingThread::initialize()
 {
-	m_active = true;
-	m_thread = std::thread{[this]() { run(); }};
+	if (!m_active)
+	{
+		m_active = true;
+		m_thread = std::thread{[this]() { run(); }};
+	}
+	else { LOG_WARN("Attempted to initialize logging thread for a second time."); }
 
 // Set a low priority for the logging thread if possible
 #ifdef SCHED_IDLE
@@ -59,6 +64,7 @@ void LoggingThread::initialize()
 	if (pthread_setschedparam(m_thread.native_handle(), SCHED_IDLE, &param))
 		LOG_WARN("Could not set idle priority for the logging thread.");
 #endif
+	// TODO do the same on Windows
 }
 
 LoggingThread& LoggingThread::inst()
@@ -69,6 +75,7 @@ LoggingThread& LoggingThread::inst()
 
 void LoggingThread::run()
 {
+	// While the thread is active, periodically initiate a log flush, then sleep the thread to avoid blocking.
 	while (m_active)
 	{
 		LogManager::inst().flush();

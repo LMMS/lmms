@@ -42,18 +42,29 @@ namespace lmms {
 
 class LogSink;
 
+//! A realtime safe handler for program log messages.
+//! All messages are stored within a ringbuffer until a flush is initiated either manually or by the logging thread.
+//! This ensures that no realtime-unsafe functions like printf are unintentionally called by realtime functions via a
+//! log call.
 class LogManager
 {
 public:
+	//! Returns the LogManager singleton.
 	static LogManager& inst();
 	~LogManager();
+
+	//! Registers a new log sink to which log messages will be passed. Deletion of sinks is handled internally.
 	void addSink(LogSink* sink);
 
 	void push(LogLine* logLine);
+	//! Creates a LogLine from a format string and a series of positional arguments.
+	//! Ex: push(LogVerbosity::Info, __FILE__, __LINE__, LogTopic::Default(), "My message number %i", 56)
+	// Defined in the header so that definitions can be generated when LMMS' core is linked against as a static library.
 	template <typename... Args>
 	void push(LogVerbosity verbosity, std::string fileName, unsigned int fileLineNumber, LogTopic topic,
 		std::string content, Args... format_args)
 	{
+		// Only log messages at or below the max verbosity.
 		if (m_maxVerbosity < verbosity) return;
 
 		// Format the log string with the provided arguments.
@@ -73,17 +84,21 @@ public:
 		push(logLine);
 	}
 
+	//! Write all log messages to the log sinks and reset the queue.
 	void flush();
 
 	void setMaxVerbosity(LogVerbosity verbosity);
 
 private:
 	LogManager();
+	// These are specifically un-defined so that only one instance of the singleton can exist.
 	LogManager(LogManager const&) = delete;
 	void operator=(LogManager const&) = delete;
 
 	LogVerbosity m_maxVerbosity = LogVerbosity::Info;
 	std::vector<LogSink*> m_sinks;
+
+	//! The ringbuffer storage of log messages that have not been flushed yet.
 	ringbuffer_t<LogLine*> m_pendingLogLines;
 	ringbuffer_reader_t<LogLine*> m_pendingLogLinesReader;
 };
