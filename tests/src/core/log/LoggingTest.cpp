@@ -162,10 +162,7 @@ private slots:
 		QVERIFY2(lastLogLine.content == "Test log with the number 3.65",
 			"Log messages should be formatted with properly truncated float parameters.");
 
-		// LOG_INFO("Test log with 4 parameters: %s, %i, %c, %ld", "1st", 2, '3', 100000000000LL);
-		lmms::LogManager::inst().push(lmms::LogVerbosity::Info,
-			"/home/jonah/Documents/lmms/lmms-source/tests/src/core/log/LoggingTest.cpp", 143, lmms::LogTopic::Default(),
-			"Test log with 4 parameters: %s, %i, %c, %ld", "1st", 2, '3', 100000000000LL);
+		LOG_INFO("Test log with 4 parameters: %s, %i, %c, %lld", "1st", 2, '3', 100000000000LL);
 		FLUSH_LOGS;
 		QVERIFY2(lastLogLine.content == "Test log with 4 parameters: 1st, 2, 3, 100000000000",
 			"Log messages should be formatted with multiple properly formatted parameters.");

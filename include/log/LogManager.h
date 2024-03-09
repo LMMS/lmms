@@ -59,28 +59,16 @@ public:
 	void push(LogLine* logLine);
 	//! Creates a LogLine from a format string and a series of positional arguments.
 	//! Ex: push(LogVerbosity::Info, __FILE__, __LINE__, LogTopic::Default(), "My message number %i", 56)
+	//! Only realtime safe if no formatting is performed.
 	// Defined in the header so that definitions can be generated when LMMS' core is linked against as a static library.
 	template <typename... Args>
-	void push(LogVerbosity verbosity, std::string fileName, unsigned int fileLineNumber, LogTopic topic,
-		std::string content, Args... format_args)
+	void push(
+		LogVerbosity verbosity, std::string fileName, unsigned int fileLineNumber, LogTopic topic, std::string content)
 	{
 		// Only log messages at or below the max verbosity.
 		if (m_maxVerbosity < verbosity) return;
 
-		// Format the log string with the provided arguments.
-		int size_s = std::snprintf(nullptr, 0, content.c_str(), format_args...) + 1; // Extra space for '\0'
-		if (size_s <= 0)
-		{
-			push(new LogLine(
-				lmms::LogVerbosity::Error, "myfile", 3, "Error formatting log message.", lmms::LogTopic::Default()));
-			return;
-		}
-		auto size = static_cast<size_t>(size_s);
-		std::unique_ptr<char[]> buf(new char[size]);
-		std::snprintf(buf.get(), size, content.c_str(), format_args...);
-		std::string message(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
-
-		LogLine* logLine = new LogLine(verbosity, fileName, fileLineNumber, message, topic);
+		LogLine* logLine = new LogLine(verbosity, fileName, fileLineNumber, content, topic);
 		push(logLine);
 	}
 

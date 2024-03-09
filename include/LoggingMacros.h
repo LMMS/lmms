@@ -25,12 +25,35 @@
 #ifndef LOGGING_MACROS_H
 #define LOGGING_MACROS_H
 
+#include <tuple>
+
 #include "log/LogManager.h"
+
+#define NUMARGS(...) std::tuple_size<decltype(std::make_tuple(__VA_ARGS__))>::value
+
+// Format a string with the provided arguments.
+// Not realtime safe if formatting is performed.
+#define FMT(format, ...) \
+	([&]() -> const std::string { \
+		if constexpr (!NUMARGS(__VA_ARGS__)) return format; \
+		int size_s = std::snprintf(nullptr, 0, format, ##__VA_ARGS__) + 1; /* Extra space for '\0' */ \
+		if (size_s <= 0) \
+		{ \
+			lmms::LogManager::inst().push(new lmms::LogLine( \
+				lmms::LogVerbosity::Error, "myfile", 3, "Error formatting log message.", lmms::LogTopic::Default())); \
+			return ""; \
+		} \
+		auto size = static_cast<size_t>(size_s); \
+		std::unique_ptr<char[]> buf(new char[size]); \
+		std::snprintf(buf.get(), size, format, ##__VA_ARGS__); \
+		std::string message(buf.get(), buf.get() + size - 1); /* We don't want the '\0' inside */ \
+		return message; \
+	})()
 
 // This first set of macros logs messages that are assigned a specific LogTopic.
 
 #define LOG_TOPIC(verbosity, topic, format, ...) \
-	lmms::LogManager::inst().push(verbosity, __FILE__, __LINE__, LT(#topic), format, ##__VA_ARGS__)
+	lmms::LogManager::inst().push(verbosity, __FILE__, __LINE__, LT(#topic), FMT(format, ##__VA_ARGS__))
 
 #define LOG_FATAL_TOPIC(topic, format, ...) LOG_TOPIC(lmms::LogVerbosity::Fatal, topic, format, ##__VA_ARGS__)
 
