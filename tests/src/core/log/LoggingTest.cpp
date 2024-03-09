@@ -119,8 +119,7 @@ private slots:
 		QVERIFY2(lastLogLine.topic == lmms::LogTopic::Default(),
 			"A message logged without a topic should be assigned the default topic.");
 
-		lmms::LogTopic LT_Test("Test Topic");
-		LOG_ERR_TOPIC(LT_Test, "Error log with a topic");
+		LOG_ERR_TOPIC(Test Topic, "Error log with a topic");
 		FLUSH_LOGS;
 		QVERIFY2(
 			lastLogLine.topic.name() == "Test Topic", "A message logged with a topic should be assigned that topic.");

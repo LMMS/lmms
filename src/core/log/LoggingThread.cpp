@@ -44,7 +44,7 @@ LoggingThread::~LoggingThread()
 {
 	m_active = false;
 	m_thread.join();
-	LOG_TRACE("Logging thread shut down.")
+	LOG_TRACE("Logging thread shut down.");
 }
 
 void LoggingThread::initialize()

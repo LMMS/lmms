@@ -28,7 +28,7 @@
 #include "log/LogManager.h"
 
 #define LOG_TOPIC(verbosity, topic, format, ...) \
-	lmms::LogManager::inst().push(verbosity, __FILE__, __LINE__, topic, format, ##__VA_ARGS__)
+	lmms::LogManager::inst().push(verbosity, __FILE__, __LINE__, LT(#topic), format, ##__VA_ARGS__)
 
 #define LOG_FATAL_TOPIC(topic, format, ...) LOG_TOPIC(lmms::LogVerbosity::Fatal, topic, format, ##__VA_ARGS__)
 
@@ -39,19 +39,19 @@
 #define LOG_INFO_TOPIC(topic, format, ...) LOG_TOPIC(lmms::LogVerbosity::Info, topic, format, ##__VA_ARGS__)
 
 #ifdef LMMS_DEBUG
-#define LOG_TRACE_TOPIC(topic, format, ...) LOG_TOPIC(lmms::LogVerbosity::Trace, topic, format, ##__VA_ARGS__);
+#define LOG_TRACE_TOPIC(topic, format, ...) LOG_TOPIC(lmms::LogVerbosity::Trace, topic, format, ##__VA_ARGS__)
 #else
 #define LOG_TRACE_TOPIC(topic, format, ...)
 #endif
 
-#define LOG_FATAL(format, ...) LOG_FATAL_TOPIC(lmms::LogTopic::Default(), format, ##__VA_ARGS__)
+#define LOG_FATAL(format, ...) LOG_FATAL_TOPIC(, format, ##__VA_ARGS__)
 
-#define LOG_ERR(format, ...) LOG_ERR_TOPIC(lmms::LogTopic::Default(), format, ##__VA_ARGS__)
+#define LOG_ERR(format, ...) LOG_ERR_TOPIC(, format, ##__VA_ARGS__)
 
-#define LOG_WARN(format, ...) LOG_WARN_TOPIC(lmms::LogTopic::Default(), format, ##__VA_ARGS__)
+#define LOG_WARN(format, ...) LOG_WARN_TOPIC(, format, ##__VA_ARGS__)
 
-#define LOG_INFO(format, ...) LOG_INFO_TOPIC(lmms::LogTopic::Default(), format, ##__VA_ARGS__)
+#define LOG_INFO(format, ...) LOG_INFO_TOPIC(, format, ##__VA_ARGS__)
 
-#define LOG_TRACE(format, ...) LOG_TRACE_TOPIC(lmms::LogTopic::Default(), format, ##__VA_ARGS__);
+#define LOG_TRACE(format, ...) LOG_TRACE_TOPIC(, format, ##__VA_ARGS__)
 
 #endif // LOGGING_MACROS_H

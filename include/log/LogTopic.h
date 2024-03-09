@@ -31,17 +31,19 @@
 
 namespace lmms {
 
+#define LT(topic) \
+	([]() -> const lmms::LogTopic& { \
+		static lmms::LogTopic lt = lmms::LogTopic(topic); \
+		return lt; \
+	})()
+
 class LogTopic
 {
 public:
 	LogTopic(std::string name);
 	std::string name() const;
 
-	static const LogTopic& Default()
-	{
-		static LogTopic instance("");
-		return instance;
-	}
+	static const LogTopic& Default() { return LT(""); }
 
 	bool operator==(const LogTopic& other) const { return this->m_name == other.m_name; }
 	bool operator!=(const LogTopic& other) const { return this->m_name != other.m_name; }
