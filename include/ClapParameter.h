@@ -56,6 +56,7 @@ public:
 		Undefined,
 		Bool,
 		Integer,
+		Enum,
 		Float
 	};
 
@@ -66,7 +67,7 @@ public:
 	auto id() const -> std::string_view { return m_id; }
 	auto displayName() const -> std::string_view { return m_displayName; }
 
-	auto value() const { return m_value; }
+	auto value() const -> float { return !model() ? m_value : model()->value<float>(); }
 	void setValue(double v);
 
 	auto modulation() const { return m_modulation; }
@@ -92,26 +93,9 @@ public:
 	auto info() const noexcept -> const clap_param_info& { return m_info; }
 
 	auto isBeingAdjusted() const noexcept -> bool { return m_isBeingAdjusted; }
-
-	void setIsAdjusting(bool isAdjusting)
-	{
-		if (isAdjusting && !m_isBeingAdjusted) { beginAdjust(); }
-		else if (!isAdjusting && m_isBeingAdjusted) { endAdjust(); }
-	}
-
-	void beginAdjust()
-	{
-		Q_ASSERT(!m_isBeingAdjusted);
-		m_isBeingAdjusted = true;
-		emit isBeingAdjustedChanged();
-	}
-
-	void endAdjust()
-	{
-		Q_ASSERT(m_isBeingAdjusted);
-		m_isBeingAdjusted = false;
-		emit isBeingAdjustedChanged();
-	}
+	void setIsAdjusting(bool isAdjusting);
+	void beginAdjust();
+	void endAdjust();
 
 	//! Checks if the parameter info is valid
 	static auto check(clap_param_info& info) -> bool;
@@ -123,19 +107,22 @@ signals:
 	void modulatedValueChanged();
 
 private:
-	bool m_isBeingAdjusted = false;
 	clap_param_info m_info;
-	double m_value = 0.0;
-	double m_modulation = 0.0;
-	std::unordered_map<std::int64_t, std::string> m_enumEntries;
-
-	//! An AutomatableModel is created if the param is to be shown to the user
-	std::unique_ptr<AutomatableModel> m_connectedModel;
-
-	ValueType m_valueType = ValueType::Undefined;
 
 	std::string m_id;
 	std::string m_displayName;
+
+	//! An AutomatableModel is created if the param is to be shown to the user
+	//std::unique_ptr<AutomatableModel> m_connectedModel;
+	std::unique_ptr<AutomatableModel> m_connectedModel = nullptr;
+
+	double m_value = 0.0; //!< TODO: Remove?
+	double m_modulation = 0.0;
+
+	//std::unordered_map<std::int64_t, std::string> m_enumEntries;
+
+	ValueType m_valueType = ValueType::Undefined;
+	bool m_isBeingAdjusted = false;
 };
 
 } // namespace lmms

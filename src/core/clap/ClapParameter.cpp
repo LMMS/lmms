@@ -27,6 +27,7 @@
 #ifdef LMMS_HAVE_CLAP
 
 #include <QString>
+#include <cassert>
 #include <cmath>
 
 #include "ClapInstance.h"
@@ -38,9 +39,9 @@ namespace lmms
 ClapParameter::ClapParameter(ClapParams* parent, const clap_param_info& info, double value)
 	: QObject{parent}
 	, m_info{info}
-	, m_value{value}
 	, m_id{"p" + std::to_string(m_info.id)}
 	, m_displayName{m_info.name}
+	, m_value{value}
 {
 	// Assume ClapParam::check() has already been called at this point
 
@@ -116,21 +117,26 @@ ClapParameter::ClapParameter(ClapParams* parent, const clap_param_info& info, do
 
 void ClapParameter::setValue(double v)
 {
-	if (m_value == v) { return; }
-	m_value = v;
-	/* // TODO
+	 // TODO: Use the model instead of m_value?
 	if (m_connectedModel)
 	{
+		// TODO: Use setAutomatedValue()??
 		m_connectedModel->setValue(static_cast<float>(v));
-	}*/
-	valueChanged();
+	}
+	else
+	{
+		if (m_value == v) { return; }
+		m_value = v;
+		emit valueChanged();
+	}
+
 }
 
 void ClapParameter::setModulation(double v)
 {
 	if (m_modulation == v) { return; }
 	m_modulation = v;
-	modulatedValueChanged();
+	emit modulatedValueChanged();
 }
 
 auto ClapParameter::getShortInfoString() const -> std::string
@@ -166,6 +172,26 @@ auto ClapParameter::isInfoCriticallyDifferentTo(const clap_param_info& info) con
 		| CLAP_PARAM_IS_READONLY | CLAP_PARAM_REQUIRES_PROCESS;
 	return (m_info.flags & criticalFlags) == (info.flags & criticalFlags)
 		|| m_info.min_value != m_info.min_value || m_info.max_value != m_info.max_value;
+}
+
+void ClapParameter::setIsAdjusting(bool isAdjusting)
+{
+	if (isAdjusting && !m_isBeingAdjusted) { beginAdjust(); }
+	else if (!isAdjusting && m_isBeingAdjusted) { endAdjust(); }
+}
+
+void ClapParameter::beginAdjust()
+{
+	assert(!m_isBeingAdjusted);
+	m_isBeingAdjusted = true;
+	emit isBeingAdjustedChanged();
+}
+
+void ClapParameter::endAdjust()
+{
+	assert(m_isBeingAdjusted);
+	m_isBeingAdjusted = false;
+	emit isBeingAdjustedChanged();
 }
 
 auto ClapParameter::check(clap_param_info& info) -> bool

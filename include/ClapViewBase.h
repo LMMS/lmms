@@ -42,12 +42,12 @@ namespace lmms
 class ClapInstance;
 class ClapControlBase;
 class PluginPresets;
-class PresetSelector;
 
 namespace gui
 {
 
 class PixmapButton;
+class PresetSelector;
 
 //! View for one processor, ClapViewBase contains 2 of those for mono plugins
 class ClapViewParameters : public LinkedModelGroupView
@@ -87,11 +87,6 @@ protected:
 	QPushButton* m_toggleUIButton = nullptr;
 	QPushButton* m_helpButton = nullptr;
 
-	// Preset selector TODO: Make generic and move to dedicated file?
-	PixmapButton* m_prevPresetButton = nullptr;
-	PixmapButton* m_nextPresetButton = nullptr;
-	QPushButton* m_selectPresetButton = nullptr;
-
 	void toggleUI();
 	void toggleHelp(bool visible);
 
@@ -128,8 +123,7 @@ private:
 		ClapViewPresets* m_view = nullptr;
 	} m_presetsView;*/
 
-	//PresetSelector* m_presetSelector = nullptr;
-	ClapViewPresets* m_presetsView = nullptr;
+	PresetSelector* m_presetSelector = nullptr;
 
 	auto getGroupView() -> LinkedModelGroupView* override { return m_parametersView; }
 

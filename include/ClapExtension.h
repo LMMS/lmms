@@ -46,7 +46,7 @@ namespace detail
 class ClapExtensionHelper : public NoCopyNoMove
 {
 public:
-	ClapExtensionHelper(const ClapInstance* instance)
+	ClapExtensionHelper(ClapInstance* instance)
 		: m_instance{instance}
 	{
 	}
@@ -55,13 +55,14 @@ public:
 	virtual auto extensionIdCompat() const -> std::string_view { return std::string_view{}; }
 
 	auto instance() const { return m_instance; }
+	auto instance() { return m_instance; }
 	auto logger() const -> const ClapLog&;
 
 	// TODO: Make protected?
 	static auto fromHost(const clap_host* host) -> ClapInstance*;
 
 private:
-	const ClapInstance* m_instance = nullptr;
+	ClapInstance* m_instance = nullptr;
 };
 
 } // namespace detail

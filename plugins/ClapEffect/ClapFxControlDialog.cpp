@@ -51,18 +51,6 @@ ClapFxControlDialog::ClapFxControlDialog(ClapFxControls* controls)
 		connect(m_helpButton, &QPushButton::toggled, this, [this](bool visible) { toggleHelp(visible); });
 	}
 
-	if (m_prevPresetButton)
-	{
-		connect(m_prevPresetButton, &PixmapButton::clicked, this, [this] { clapControls()->prevPreset(); });
-		//connect(m_prevPresetButton, &PixmapButton::clicked, this, &ClapViewBase::update);
-	}
-
-	if (m_nextPresetButton)
-	{
-		connect(m_nextPresetButton, &PixmapButton::clicked, this, [this] { clapControls()->nextPreset(); });
-		//connect(m_nextPresetButton, &PixmapButton::clicked, this, &ClapViewBase::update);
-	}
-
 	// For Effects, modelChanged only goes to the top EffectView
 	// We need to call it manually
 	modelChanged();

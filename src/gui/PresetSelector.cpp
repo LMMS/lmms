@@ -42,31 +42,35 @@ PresetSelector::PresetSelector(PluginPresets* presets, QWidget* parent)
 	, IntModelView{presets, parent}
 	, m_presets{presets}
 {
-	m_prevPresetButton = new PixmapButton{this};
+	m_prevPresetButton = new PixmapButton{parent};
 	m_prevPresetButton->setCheckable(false);
 	m_prevPresetButton->setCursor(Qt::PointingHandCursor);
 	m_prevPresetButton->setActiveGraphic(embed::getIconPixmap("stepper-left-press"));
 	m_prevPresetButton->setInactiveGraphic(embed::getIconPixmap("stepper-left"));
-	m_prevPresetButton->setToolTip(QObject::tr("Previous (-)"));
+	m_prevPresetButton->setToolTip(tr("Previous (-)"));
 	m_prevPresetButton->setShortcut(Qt::Key_Minus);
 	m_prevPresetButton->setMinimumWidth(16);
 	m_prevPresetButton->setMaximumWidth(16);
 	m_prevPresetButton->setMinimumHeight(16);
 	m_prevPresetButton->setMaximumHeight(16);
 
-	m_nextPresetButton = new PixmapButton{this};
+	connect(m_prevPresetButton, &PixmapButton::clicked, this, [&] { m_presets->prevPreset(); });
+
+	m_nextPresetButton = new PixmapButton{parent};
 	m_nextPresetButton->setCheckable(false);
 	m_nextPresetButton->setCursor(Qt::PointingHandCursor);
 	m_nextPresetButton->setActiveGraphic(embed::getIconPixmap("stepper-right-press"));
 	m_nextPresetButton->setInactiveGraphic(embed::getIconPixmap("stepper-right"));
-	m_nextPresetButton->setToolTip(QObject::tr("Next (+)"));
+	m_nextPresetButton->setToolTip(tr("Next (+)"));
 	m_nextPresetButton->setShortcut(Qt::Key_Plus);
 	m_nextPresetButton->setMinimumWidth(16);
 	m_nextPresetButton->setMaximumWidth(16);
 	m_nextPresetButton->setMinimumHeight(16);
 	m_nextPresetButton->setMaximumHeight(16);
 
-	m_selectPresetButton = new QPushButton(this);
+	connect(m_nextPresetButton, &PixmapButton::clicked, this, [&] { m_presets->nextPreset(); });
+
+	m_selectPresetButton = new QPushButton{parent};
 	m_selectPresetButton->setCheckable(false);
 	m_selectPresetButton->setCursor(Qt::PointingHandCursor);
 	m_selectPresetButton->setIcon(embed::getIconPixmap("stepper-down"));
@@ -81,7 +85,7 @@ PresetSelector::PresetSelector(PluginPresets* presets, QWidget* parent)
 	connect(menu, &QMenu::aboutToShow, this, &PresetSelector::updateMenu);
 	connect(m_presets, &PluginPresets::presetCollectionChanged, this, &PresetSelector::updateMenu);
 
-	auto tb = new QToolBar{this};
+	auto tb = new QToolBar{parent};
 	tb->resize(100, 32); // TODO: Adjust size
 	tb->addWidget(m_prevPresetButton);
 	tb->addWidget(m_nextPresetButton);
@@ -104,29 +108,23 @@ void PresetSelector::updateMenu()
 	for (int idx = 0; idx < static_cast<int>(presets.size()); ++idx)
 	{
 		auto presetAction = new QAction{this};
-		connect(presetAction, &QAction::triggered, this, &PresetSelector::selectPreset);
+		connect(presetAction, &QAction::triggered, this, [=] { selectPreset(idx); });
 
 		const auto name = QString::fromStdString(presets[idx]->metadata().displayName);
 		presetAction->setText(QString("%1. %2").arg(QString::number(idx + 1), name));
-		presetAction->setData(idx);
 
-		presetAction->setIcon(embed::getIconPixmap(
-			idx == m_lastPosInMenu ? "sample_file" : "edit_copy", 16, 16));
+		const auto icon = m_presets->presetIndex().value_or(-1) == idx ? "sample_file" : "edit_copy";
+		presetAction->setIcon(embed::getIconPixmap(icon, 16, 16));
 
 		menu->addAction(presetAction);
 	}
 }
 
-void PresetSelector::selectPreset()
+void PresetSelector::selectPreset(int pos)
 {
-	if (!m_presets) { return; }
+	if (!m_presets || pos < 0) { return; }
 
-	const auto action = qobject_cast<QAction*>(sender());
-	if (!action) { return; }
-
-	m_lastPosInMenu = action->data().toInt();
-	if (m_lastPosInMenu < 0) { return; }
-	m_presets->activatePreset(static_cast<std::size_t>(m_lastPosInMenu));
+	m_presets->activatePreset(static_cast<std::size_t>(pos));
 
 	// QWidget::update();
 }

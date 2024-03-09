@@ -77,7 +77,7 @@ ClapViewParameters::ClapViewParameters(QWidget* parent, ClapInstance* instance, 
 
 			// CustomTextKnob calls this lambda to update value text
 			auto customTextKnob = dynamic_cast<CustomTextKnob*>(control->modelView());
-			customTextKnob->setValueText([=]() {
+			customTextKnob->setValueText([=] {
 				return QString::fromUtf8(m_instance->params().getValueText(*param).c_str());
 			});
 
@@ -88,6 +88,8 @@ ClapViewParameters::ClapViewParameters(QWidget* parent, ClapInstance* instance, 
 		}
 
 		if (!control) { continue; }
+
+		control->setModel(param->model()); // TODO?
 
 		// This is the param name seen in the GUI
 		control->setText(QString::fromUtf8(param->displayName().data()));
@@ -164,8 +166,8 @@ ClapViewBase::ClapViewBase(QWidget* pluginWidget, ClapControlBase* ctrlBase)
 
 	if (ctrlBase->hasPresetSupport())
 	{
-		m_presetsView = new ClapViewPresets{pluginWidget, ctrlBase->control(0), s_colNum};
-		grid->addWidget(m_presetsView, static_cast<int>(Rows::ButtonRow), Qt::AlignLeft);
+		m_presetSelector = new PresetSelector{&ctrlBase->control(0)->presetLoader(), pluginWidget};
+		btnBox->addWidget(m_presetSelector, 0);
 	}
 
 	btnBox->addStretch(1);

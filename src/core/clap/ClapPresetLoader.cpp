@@ -77,7 +77,9 @@ auto ClapPresetLoader::activatePresetImpl(const PresetLoadData& preset) noexcept
 		return false;
 	}
 
-	return true;
+	if (!instance()->params().supported()) { return true; }
+
+	return instance()->params().rescan(CLAP_PARAM_RESCAN_VALUES);
 }
 
 auto ClapPresetLoader::getPresetDatabase() const -> PresetDatabase*

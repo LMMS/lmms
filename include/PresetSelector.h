@@ -50,7 +50,7 @@ public:
 
 protected slots:
 	void updateMenu();
-	void selectPreset();
+	void selectPreset(int pos);
 
 private:
 	PluginPresets* m_presets = nullptr;
