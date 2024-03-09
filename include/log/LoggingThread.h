@@ -25,7 +25,11 @@
 #ifndef LOGGINGTHREAD_H
 #define LOGGINGTHREAD_H
 
+#ifdef __MINGW32__
+#include <mingw.thread.h>
+#else
 #include <thread>
+#endif
 
 namespace lmms {
 
