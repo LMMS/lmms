@@ -319,19 +319,23 @@ void Fader::paintLevels(QPaintEvent * ev, QPainter & painter, bool linear)
 
 	int const height = baseRect.height();
 
-	int const margin = 2;
+	int const margin = 1;
 	int const distanceBetweenMeters = 2;
 
 	int const numberOfMeters = 2;
 	int const meterWidth = (baseRect.width() - 2 * margin - distanceBetweenMeters * (numberOfMeters - 1)) / numberOfMeters;
 
-	QRect leftMeterRect(margin, margin, meterWidth, height - 2 * margin);
-	QRect rightMeterRect(baseRect.width() - margin - meterWidth, margin, meterWidth, height - 2 * margin);
+	QRect leftMeterOutlineRect(margin, margin, meterWidth, height - 2 * margin);
+	QRect rightMeterOutlineRect(baseRect.width() - margin - meterWidth, margin, meterWidth, height - 2 * margin);
+
+	QMargins removedMargins(1, 1, 1, 1);
+	QRect leftMeterRect = leftMeterOutlineRect.marginsRemoved(removedMargins);
+	QRect rightMeterRect = rightMeterOutlineRect.marginsRemoved(removedMargins);
 
 	QPainterPath path;
-	qreal radius = 1;
-	path.addRoundedRect(leftMeterRect, radius, radius);
-	path.addRoundedRect(rightMeterRect, radius, radius);
+	qreal radius = 2;
+	path.addRoundedRect(leftMeterOutlineRect, radius, radius);
+	path.addRoundedRect(rightMeterOutlineRect, radius, radius);
 	painter.fillPath(path, Qt::black);
 
 	// Now clip everything to the paths of the meters
@@ -341,6 +345,13 @@ void Fader::paintLevels(QPaintEvent * ev, QPainter & painter, bool linear)
 	// Value (dbFS or linear) -> window coordinates of the widget
 	// It is for example used to determine the height of peaks, markers and to define the gradient for the levels
 	LinearMap<float> const valuesToWindowCoordinates(mappedMaxPeak, leftMeterRect.y(), mappedMinPeak, leftMeterRect.y() + leftMeterRect.height());
+
+	// This lambda takes a value (in dbFS or linear) and a rectangle and computes a rectangle
+	// that represent the value within the rectangle. It is for example used to compute the unity indicators.
+	auto const computeLevelMarkerRect = [&valuesToWindowCoordinates](QRect const & rect, float peak) -> QRect
+	{
+		return QRect(rect.x(), valuesToWindowCoordinates.map(peak), rect.width(), 1);
+	};
 
 	// This lambda takes a peak value (in dbFS or linear) and a rectangle and computes a rectangle
 	// that represent the peak value within the rectangle. It's used to compute the peak indicators
@@ -360,13 +371,13 @@ void Fader::paintLevels(QPaintEvent * ev, QPainter & painter, bool linear)
 		return result;
 	};
 
-	// Draw left and right unity lines (0 dbFS, 1.0 amplitude)
+	// Draw left and right level markers for the unity lines (0 dbFS, 1.0 amplitude)
 	if (getRenderUnityLine())
 	{
-		auto const unityRectL = computePeakRect(leftMeterRect, mappedUnity);
+		auto const unityRectL = computeLevelMarkerRect(leftMeterRect, mappedUnity);
 		painter.fillRect(unityRectL, getUnityMarker());
 
-		auto const unityRectR = computePeakRect(rightMeterRect, mappedUnity);
+		auto const unityRectR = computeLevelMarkerRect(rightMeterRect, mappedUnity);
 		painter.fillRect(unityRectR, getUnityMarker());
 	}
 
@@ -404,20 +415,34 @@ void Fader::paintLevels(QPaintEvent * ev, QPainter & painter, bool linear)
 	linearGrad.setColorAt(1, peakOk());
 
 	// Draw left levels
-	QRect leftMeterMargins = leftMeterRect.marginsRemoved(QMargins(1, 0, 1, 0));
-	painter.fillRect(computeLevelRect(leftMeterMargins, mappedPeakL), linearGrad);
+	if (mappedPeakL > mappedMinPeak)
+	{
+		QPainterPath leftMeterPath;
+		leftMeterPath.addRoundedRect(computeLevelRect(leftMeterRect, mappedPeakL), radius, radius);
+		painter.fillPath(leftMeterPath, linearGrad);
+	}
 
 	// Draw left peaks
-	auto const peakRectL = computePeakRect(leftMeterMargins, mappedPersistentPeakL);
-	painter.fillRect(peakRectL, linearGrad);
+	if (mappedPersistentPeakL > mappedMinPeak)
+	{
+		auto const peakRectL = computePeakRect(leftMeterRect, mappedPersistentPeakL);
+		painter.fillRect(peakRectL, linearGrad);
+	}
 
 	// Draw right levels
-	QRect rightMeterMargins = rightMeterRect.marginsRemoved(QMargins(1, 0, 1, 0));
-	painter.fillRect(computeLevelRect(rightMeterMargins, mappedPeakR), linearGrad);
+	if (mappedPeakR > mappedMinPeak)
+	{
+		QPainterPath rightMeterPath;
+		rightMeterPath.addRoundedRect(computeLevelRect(rightMeterRect, mappedPeakR), radius, radius);
+		painter.fillPath(rightMeterPath, linearGrad);
+	}
 
 	// Draw right peaks
-	auto const peakRectR = computePeakRect(rightMeterMargins, mappedPersistentPeakR);
-	painter.fillRect(peakRectR, linearGrad);
+	if (mappedPersistentPeakR > mappedMinPeak)
+	{
+		auto const peakRectR = computePeakRect(rightMeterRect, mappedPersistentPeakR);
+		painter.fillRect(peakRectR, linearGrad);
+	}
 
 	painter.restore();
 }
