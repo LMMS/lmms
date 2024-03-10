@@ -52,8 +52,6 @@ public:
 		return &m_lommControls;
 	}
 	
-	void clearFilterHistories();
-	
 	inline float msToCoeff(float ms)
 	{
 		return (ms == 0) ? 0 : exp(m_coeffPrecalc / ms);

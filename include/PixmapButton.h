@@ -56,6 +56,8 @@ protected:
 	void mouseReleaseEvent( QMouseEvent * _me ) override;
 	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
 
+private:
+	bool isActive() const;
 
 private:
 	QPixmap m_activePixmap;

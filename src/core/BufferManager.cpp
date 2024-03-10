@@ -28,7 +28,6 @@
 
 #include <cstring>
 
-#include "MemoryManager.h"
 
 namespace lmms
 {
@@ -43,7 +42,7 @@ void BufferManager::init( fpp_t fpp )
 
 sampleFrame * BufferManager::acquire()
 {
-	return MM_ALLOC<sampleFrame>( s_framesPerPeriod );
+	return new sampleFrame[s_framesPerPeriod];
 }
 
 void BufferManager::clear( sampleFrame *ab, const f_cnt_t frames, const f_cnt_t offset )
@@ -62,7 +61,7 @@ void BufferManager::clear( surroundSampleFrame * ab, const f_cnt_t frames,
 
 void BufferManager::release( sampleFrame * buf )
 {
-	MM_FREE( buf );
+	delete[] buf;
 }
 
 } // namespace lmms

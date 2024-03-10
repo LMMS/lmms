@@ -81,6 +81,7 @@ void LOMMEffect::changeSampleRate()
 	m_lp2.setSampleRate(m_sampleRate);
 	m_hp1.setSampleRate(m_sampleRate);
 	m_hp2.setSampleRate(m_sampleRate);
+	m_ap.setSampleRate(m_sampleRate);
 	
 	m_coeffPrecalc = -2.2f / (m_sampleRate * 0.001f);
 	m_needsUpdate = true;
@@ -97,16 +98,6 @@ void LOMMEffect::changeSampleRate()
 		}
 	}
 }
-
-void LOMMEffect::clearFilterHistories()
-{
-	m_lp1.clearHistory();
-	m_lp2.clearHistory();
-	m_hp1.clearHistory();
-	m_hp2.clearHistory();
-}
-
-
 
 
 bool LOMMEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)

@@ -32,7 +32,6 @@
 #include "AutomatableModel.h"
 #include "TempoSyncKnob.h"
 #include <samplerate.h>
-#include "MemoryManager.h"
 
 namespace lmms
 {
@@ -88,7 +87,6 @@ class WatsynView;
 
 class WatsynObject
 {
-	MM_OPERATORS
 public:
 	WatsynObject( 	float * _A1wave, float * _A2wave,
 					float * _B1wave, float * _B2wave,

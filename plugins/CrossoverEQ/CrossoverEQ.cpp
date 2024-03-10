@@ -64,16 +64,16 @@ CrossoverEQEffect::CrossoverEQEffect( Model* parent, const Descriptor::SubPlugin
 	m_hp4( m_sampleRate ),
 	m_needsUpdate( true )
 {
-	m_tmp1 = MM_ALLOC<sampleFrame>( Engine::audioEngine()->framesPerPeriod() );
-	m_tmp2 = MM_ALLOC<sampleFrame>( Engine::audioEngine()->framesPerPeriod() );
-	m_work = MM_ALLOC<sampleFrame>( Engine::audioEngine()->framesPerPeriod() );
+	m_tmp2 = new sampleFrame[Engine::audioEngine()->framesPerPeriod()];
+	m_tmp1 = new sampleFrame[Engine::audioEngine()->framesPerPeriod()];
+	m_work = new sampleFrame[Engine::audioEngine()->framesPerPeriod()];
 }
 
 CrossoverEQEffect::~CrossoverEQEffect()
 {
-	MM_FREE( m_tmp1 );
-	MM_FREE( m_tmp2 );
-	MM_FREE( m_work );
+	delete[] m_tmp1;
+	delete[] m_tmp2;
+	delete[] m_work;
 }
 
 void CrossoverEQEffect::sampleRateChanged()

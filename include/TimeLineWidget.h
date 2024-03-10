@@ -25,6 +25,10 @@
 #ifndef LMMS_GUI_TIMELINE_WIDGET_H
 #define LMMS_GUI_TIMELINE_WIDGET_H
 
+#include <array>
+
+#include <QBrush>
+#include <QSize>
 #include <QWidget>
 
 #include "Song.h"
@@ -57,10 +61,15 @@ public:
 	Q_PROPERTY( QColor inactiveLoopColor READ getInactiveLoopColor WRITE setInactiveLoopColor )
 	Q_PROPERTY( QBrush inactiveLoopBrush READ getInactiveLoopBrush WRITE setInactiveLoopBrush )
 	Q_PROPERTY( QColor inactiveLoopInnerColor READ getInactiveLoopInnerColor WRITE setInactiveLoopInnerColor )
+	Q_PROPERTY(QColor inactiveLoopHandleColor MEMBER m_inactiveLoopHandleColor)
 	Q_PROPERTY( QColor activeLoopColor READ getActiveLoopColor WRITE setActiveLoopColor )
 	Q_PROPERTY( QBrush activeLoopBrush READ getActiveLoopBrush WRITE setActiveLoopBrush )
 	Q_PROPERTY( QColor activeLoopInnerColor READ getActiveLoopInnerColor WRITE setActiveLoopInnerColor )
+	Q_PROPERTY(QColor activeLoopHandleColor MEMBER m_activeLoopHandleColor)
 	Q_PROPERTY( int loopRectangleVerticalPadding READ getLoopRectangleVerticalPadding WRITE setLoopRectangleVerticalPadding )
+	Q_PROPERTY(int loopHandleWidth MEMBER m_loopHandleWidth)
+	Q_PROPERTY(QSize mouseHotspotSelLeft READ mouseHotspotSelLeft WRITE setMouseHotspotSelLeft)
+	Q_PROPERTY(QSize mouseHotspotSelRight READ mouseHotspotSelRight WRITE setMouseHotspotSelRight)
 
 	enum class AutoScrollState
 	{
@@ -98,6 +107,28 @@ public:
 
 	inline int const & getLoopRectangleVerticalPadding() const { return m_loopRectangleVerticalPadding; }
 	inline void setLoopRectangleVerticalPadding(int const & loopRectangleVerticalPadding) { m_loopRectangleVerticalPadding = loopRectangleVerticalPadding; }
+
+	auto mouseHotspotSelLeft() const -> QSize
+	{
+		const auto point = m_cursorSelectLeft.hotSpot();
+		return QSize{point.x(), point.y()};
+	}
+
+	void setMouseHotspotSelLeft(const QSize& s)
+	{
+		m_cursorSelectLeft = QCursor{m_cursorSelectLeft.pixmap(), s.width(), s.height()};
+	}
+
+	auto mouseHotspotSelRight() const -> QSize
+	{
+		const auto point = m_cursorSelectRight.hotSpot();
+		return QSize{point.x(), point.y()};
+	}
+
+	void setMouseHotspotSelRight(const QSize& s)
+	{
+		m_cursorSelectRight = QCursor{m_cursorSelectRight.pixmap(), s.width(), s.height()};
+	}
 
 	inline Song::PlayPos & pos()
 	{
@@ -143,51 +174,64 @@ protected:
 	void mousePressEvent( QMouseEvent * _me ) override;
 	void mouseMoveEvent( QMouseEvent * _me ) override;
 	void mouseReleaseEvent( QMouseEvent * _me ) override;
-
+	void contextMenuEvent(QContextMenuEvent* event) override;
 
 private:
-	QPixmap m_posMarkerPixmap = embed::getIconPixmap("playpos_marker");
-
-	QColor m_inactiveLoopColor;
-	QBrush m_inactiveLoopBrush;
-	QColor m_inactiveLoopInnerColor;
-
-	QColor m_activeLoopColor;
-	QBrush m_activeLoopBrush;
-	QColor m_activeLoopInnerColor;
-
-	int m_loopRectangleVerticalPadding;
-
-	QColor m_barLineColor;
-	QColor m_barNumberColor;
-
-	AutoScrollState m_autoScroll;
-
-	bool m_changedPosition;
-
-	int m_xOffset;
-	int m_posMarkerX;
-	float m_ppb;
-	float m_snapSize;
-	Song::PlayPos & m_pos;
-	Timeline* m_timeline;
-	const TimePos & m_begin;
-	const Song::PlayMode m_mode;
-
-	TextFloat * m_hint;
-	int m_initalXSelect;
-
-
 	enum class Action
 	{
 		NoAction,
 		MovePositionMarker,
 		MoveLoopBegin,
 		MoveLoopEnd,
+		MoveLoop,
 		SelectSongClip,
-	} m_action;
+	};
 
-	int m_moveXOff;
+	auto getClickedTime(int xPosition) const -> TimePos;
+	auto getLoopAction(QMouseEvent* event) const -> Action;
+	auto actionCursor(Action action) const -> QCursor;
+
+	QPixmap m_posMarkerPixmap = embed::getIconPixmap("playpos_marker");
+
+	QColor m_inactiveLoopColor = QColor{52, 63, 53, 64};
+	QBrush m_inactiveLoopBrush = QColor{255, 255, 255, 32};
+	QColor m_inactiveLoopInnerColor = QColor{255, 255, 255, 32};
+	QColor m_inactiveLoopHandleColor = QColor{255, 255, 255, 32};
+
+	QColor m_activeLoopColor = QColor{52, 63, 53, 255};
+	QBrush m_activeLoopBrush = QColor{55, 141, 89};
+	QColor m_activeLoopInnerColor = QColor{74, 155, 100, 255};
+	QColor m_activeLoopHandleColor = QColor{74, 155, 100, 255};
+
+	int m_loopRectangleVerticalPadding = 1;
+	int m_loopHandleWidth = 5;
+
+	QColor m_barLineColor = QColor{192, 192, 192};
+	QColor m_barNumberColor = m_barLineColor.darker(120);
+
+	QCursor m_cursorSelectLeft = QCursor{embed::getIconPixmap("cursor_select_left"), 0, 16};
+	QCursor m_cursorSelectRight = QCursor{embed::getIconPixmap("cursor_select_right"), 32, 16};
+
+	AutoScrollState m_autoScroll = AutoScrollState::Enabled;
+
+	// Width of the unused region on the widget's left (above track labels or piano)
+	int m_xOffset;
+	float m_ppb;
+	float m_snapSize = 1.f;
+	Song::PlayPos & m_pos;
+	Timeline* m_timeline;
+	// Leftmost position visible in parent editor
+	const TimePos & m_begin;
+	const Song::PlayMode m_mode;
+	// When in MoveLoop mode we need the initial positions. Storing only the latest
+	// position allows for unquantized drag but fails when toggling quantization.
+	std::array<TimePos, 2> m_oldLoopPos;
+	TimePos m_dragStartPos;
+
+	TextFloat* m_hint = nullptr;
+	int m_initalXSelect;
+
+	Action m_action = Action::NoAction;
 };
 
 } // namespace lmms::gui

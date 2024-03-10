@@ -42,7 +42,7 @@
 #include "FileBrowser.h"
 #include "FileDialog.h"
 #include "GroupBox.h"
-#include "MixerLineLcdSpinBox.h"
+#include "MixerChannelLcdSpinBox.h"
 #include "GuiApplication.h"
 #include "gui_templates.h"
 #include "Instrument.h"
@@ -206,7 +206,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 
 	// setup spinbox for selecting Mixer-channel
-	m_mixerChannelNumber = new MixerLineLcdSpinBox( 2, nullptr, tr( "Mixer channel" ), m_itv );
+	m_mixerChannelNumber = new MixerChannelLcdSpinBox(2, nullptr, tr("Mixer channel"), m_itv);
 
 	basicControlsLayout->addWidget( m_mixerChannelNumber, 0, 6 );
 	basicControlsLayout->setAlignment( m_mixerChannelNumber, widgetAlignment );

@@ -2,51 +2,48 @@
 
 #include "embed.h"
 #include "Mixer.h"
-#include "MixerLine.h"
+#include "MixerChannelView.h"
 #include "MixerView.h"
 
 namespace lmms::gui
 {
 
-SendButtonIndicator:: SendButtonIndicator( QWidget * _parent, MixerLine * _owner,
-										   MixerView * _mv) :
-	QLabel( _parent ),
-	m_parent( _owner ),
-	m_mv( _mv )
+SendButtonIndicator:: SendButtonIndicator(QWidget* parent, MixerChannelView* owner, MixerView* mv) :
+	QLabel(parent),
+	m_parent(owner),
+	m_mv(mv)
 {
-
-	// don't do any initializing yet, because the MixerView and MixerLine
+	// don't do any initializing yet, because the MixerView and MixerChannelView
 	// that were passed to this constructor are not done with their constructors
 	// yet.
 	setPixmap(m_qpmOff);
 }
 
-void SendButtonIndicator::mousePressEvent( QMouseEvent * e )
+void SendButtonIndicator::mousePressEvent(QMouseEvent* e)
 {
-	Mixer * mix = Engine::mixer();
-	int from = m_mv->currentMixerLine()->channelIndex();
+	Mixer* mix = Engine::mixer();
+	int from = m_mv->currentMixerChannel()->channelIndex();
 	int to = m_parent->channelIndex();
-	FloatModel * sendModel = mix->channelSendModel(from, to);
-	if( sendModel == nullptr )
+	FloatModel* sendModel = mix->channelSendModel(from, to);
+	if (sendModel == nullptr)
 	{
 		// not sending. create a mixer send.
-		mix->createChannelSend( from, to );
+		mix->createChannelSend(from, to);
 	}
 	else
 	{
 		// sending. delete the mixer send.
-		mix->deleteChannelSend( from, to );
+		mix->deleteChannelSend(from, to);
 	}
 
-	m_mv->updateMixerLine(m_parent->channelIndex());
+	m_mv->updateMixerChannel(m_parent->channelIndex());
 	updateLightStatus();
 }
 
-FloatModel * SendButtonIndicator::getSendModel()
+FloatModel* SendButtonIndicator::getSendModel()
 {
-	Mixer * mix = Engine::mixer();
-	return mix->channelSendModel(
-		m_mv->currentMixerLine()->channelIndex(), m_parent->channelIndex());
+	Mixer* mix = Engine::mixer();
+	return mix->channelSendModel(m_mv->currentMixerChannel()->channelIndex(), m_parent->channelIndex());
 }
 
 void SendButtonIndicator::updateLightStatus()

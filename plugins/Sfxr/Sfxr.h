@@ -31,7 +31,6 @@
 #include "AutomatableModel.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "MemoryManager.h"
 
 namespace lmms
 {
@@ -78,7 +77,6 @@ class SfxrInstrumentView;
 
 class SfxrSynth
 {
-	MM_OPERATORS
 public:
 	SfxrSynth( const SfxrInstrument * s );
 	virtual ~SfxrSynth() = default;

@@ -25,6 +25,7 @@
 #ifndef LMMS_ENVELOPE_AND_LFO_PARAMETERS_H
 #define LMMS_ENVELOPE_AND_LFO_PARAMETERS_H
 
+#include <memory>
 #include <vector>
 
 #include "JournallingObject.h"
@@ -167,7 +168,7 @@ private:
 	sample_t * m_lfoShapeData;
 	sample_t m_random;
 	bool m_bad_lfoShapeData;
-	SampleBuffer m_userWave;
+	std::shared_ptr<const SampleBuffer> m_userWave = SampleBuffer::emptyBuffer();
 
 	enum class LfoShape
 	{
