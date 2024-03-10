@@ -17,6 +17,10 @@ if(LMMS_BUILD_WIN32)
 	)
 endif()
 
+if(MSVC)
+	target_link_options(cmt PRIVATE "/EXPORT:ladspa_descriptor")
+endif()
+
 if(NOT LMMS_BUILD_WIN32)
 	target_compile_options(cmt PRIVATE -fPIC)
 endif()

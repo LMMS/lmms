@@ -43,6 +43,10 @@ IF(NOT MSVC)
 	target_compile_options(veal PRIVATE -fexceptions -O2 -finline-functions ${INLINE_FLAGS})
 endif()
 
+if(MSVC)
+	target_link_options(veal PRIVATE "/EXPORT:ladspa_descriptor")
+endif()
+
 if(LMMS_BUILD_WIN32)
 	add_custom_command(
 		TARGET veal
