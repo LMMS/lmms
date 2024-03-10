@@ -57,6 +57,13 @@ public:
 	// TODO: check PointGraphDataArray signals
 	// TODO: journalling in PointGraphModel
 	// TODO: m_maxLenght* should be replaced with m_parent->getMaxLength()			Done
+	// TODO: setDataArray keep attributes option
+	// TODO: PointGraphDataArray shouldSaveAll and shouldSavePointAttributesOnly (for saving only editable graphs) option
+	// TODO: baked values in PointGraphPoint
+	// TODO: rename class to VectorGraph
+	// TODO: make std::vector<float> last used values
+	//		TODO: make update logic (isChanged and update only automation / effected lines)
+	// TODO: effector location (same as automation location)
 
 	PointGraphView(QWidget * parentIn,
 		int widthIn, int heightIn,
@@ -92,12 +99,23 @@ private:
 	void modelChanged() override;
 
 	std::pair<float, float> mapMousePos(int xIn, int yIn, bool nonNegativeIn);
+	// calculate curve position
+	std::pair<float, float> mapDataCurvePos(float xAIn, float yAIn, float xBIn, float yBIn, float curveIn);
+	std::pair<int, int>mapDataCurvePos(int xAIn, int yAIn, int xBIn, int yBIn, float curveIn);
 	std::pair<int, int> mapDataPos(float xIn, float yIn, bool nonNegativeIn);
 
 	float getDistance(int xAIn, int yAIn, int xBIn, int yBIn);
+	float getDistance(float xAIn, float yAIn, float xBIn, float yBIn);
 
 	std::pair<float, float> showInputDialog(); //TODO
+	// searches arrays to select
+	// clicked datapoint
 	void selectData(int mouseXIn, int mouseYIn);
+	// searches for data in a given array
+	// returns found location, when a data
+	// was found in the given distance
+	// else it returns -1
+	int searchForData(int mouseXIn, int mouseYIn, float maxDistanceIn, PointGraphDataArray* arrayIn, bool curvedIn);
 
 	bool m_mouseDown;
 	bool m_mouseDrag;
@@ -112,6 +130,7 @@ private:
 	unsigned int m_selectedLocation;
 	unsigned int m_selectedArray;
 	bool m_isSelected;
+	bool m_isCurveSelected;
 	
 	std::pair<int, int> m_lastTrackPoint;
 	std::pair<int, int> m_lastScndTrackPoint;
@@ -243,32 +262,34 @@ public:
 
 
 	// get attribute: -------------------
-	inline float* getX(unsigned int locationIn)
+	inline float getX(unsigned int locationIn)
 	{
-		return &m_dataArray[locationIn].m_x;
+		return m_dataArray[locationIn].m_x;
 	}
-	inline float* getY(unsigned int locationIn)
+	inline float getY(unsigned int locationIn)
 	{
-		return &m_dataArray[locationIn].m_y;
+		return m_dataArray[locationIn].m_y;
 	}
-	inline float* getC(unsigned int locationIn)
+	inline float getC(unsigned int locationIn)
 	{
-		return &m_dataArray[locationIn].m_c;
+		return m_dataArray[locationIn].m_c;
 	}
-	inline float* getValA(unsigned int locationIn)
+	inline float getValA(unsigned int locationIn)
 	{
-		return &m_dataArray[locationIn].m_valA;
+		return m_dataArray[locationIn].m_valA;
 	}
-	inline float* getValB(unsigned int locationIn)
+	inline float getValB(unsigned int locationIn)
 	{
-		return &m_dataArray[locationIn].m_valB;
+		return m_dataArray[locationIn].m_valB;
 	}
 	unsigned int getType(unsigned int locationIn);
-	unsigned int getAutomatedAttrib(unsigned int locationIn);
+	// returns attribLocation: 0 = y, 1 = c, 2 = valA, 3 = valB
+	unsigned int getAutomatedAttribLocation(unsigned int locationIn);
 	inline bool getEffectOnlyPoints(unsigned int locationIn)
 	{
-		return &m_dataArray[locationIn].m_effectOnlyPoints;
+		return m_dataArray[locationIn].m_effectOnlyPoints;
 	}
+	// returns if the [effectNumberIn] effect is active based on effectNumberIn
 	bool getEffect(unsigned int locationIn, unsigned int effectNumberIn);
 	inline FloatModel* getAutomationModel(unsigned int locationIn)
 	{
@@ -282,9 +303,9 @@ public:
 	// gets the nearest data location to the position,
 	// foundOut is true when the nearest position = posIn,
 	// reurns -1 when search failed
-	int getNearestLocation(float xIn, bool* foundOut);
+	int getNearestLocation(float xIn, bool* foundOut, bool* isBeforeOut);
 
-	float getValueAtPositon(float xIn); // TODO
+	float getValueAtPosition(float xIn); // TODO
 
 
 	// set: -------------------
@@ -373,15 +394,19 @@ private:
 		}
 		// 0 - 1
 		float m_x;
-		// 0 (or -1) - 1, the automatin value is scaled if needed TODO
+		// 0 (or -1) - 1, getAutomatedAttrib() -> 0
 		float m_y;
-		// curve, -1 - 1
+		// curve, -1 - 1, getAutomatedAttrib() -> 1
 		float m_c;
-		// valueA, -1 - 1
+		// valueA, -1 - 1, getAutomatedAttrib() -> 2
 		float m_valA;
-		// valueB, -1 - 1
+		// valueB, -1 - 1, getAutomatedAttrib() -> 3
 		float m_valB;
-		// line type, 0 -
+		// line type:
+		// 0 - none
+		// 1 - sine
+		// 2 - steps
+		// 3 - random
 		unsigned int m_type;
 
 		bool m_effectOnlyPoints;
@@ -399,6 +424,24 @@ private:
 	// swapping values, "slide" moves the values (between) once left or right
 	// handle m_isFixedEndPoints when using this
 	void swap(unsigned int locationAIn, unsigned int locationBIn, bool slide);
+	// applys the effect on a given value, does clamp TODO clamp
+	float processEffect(float valueIn, float effectValueIn,
+		PointGraphDataArray* effectArrayIn, unsigned int effectLocationIn, float lowerLimitIn);
+	// returns the curve value at a given x coord
+	float processCurve(float valueBeforeIn, float valueAfterIn, float curveIn, float xIn);
+	// returns a PointGraphPoint with modified attributes
+	float processAutomation(unsigned int locationIn, unsigned int attribLocationIn);
+	// line effects / types, m_type is used for this
+	// valA: amp, valB: freq, fadeOutStartIn: from what xIn value should the line type fade out
+	float processLineTypeSine(float xIn, float valAIn, float valBIn, float fadeOutStartIn);
+	//std::vector<float> processLineTypeArraySine(std::vector<float> xIn, unsigned int startIn, unsigned int endIn, float valAIn, float valBIn);
+	// valA: amp, valB: x coord, curve: width
+	float processLineTypePeak(float xIn, float valAIn, float valBIn, float curveIn, float fadeOutStartIn);
+	// y: calculate steps from, valA: y count, valB: curve
+	float processLineTypeSteps(float xIn, float yIn, float valAIn, float valBIn, float fadeOutStartIn);
+	// valA: amp, valB: random number count, curveIn: seed
+	float processLineTypeRandom(float xIn, float valAIn, float valBIn, float curveIn, float fadeOutStartIn);
+
 	// checks m_isFixedEndPoints, does not call dataChanged()
 	void formatDataArrayEndPoints();
 
