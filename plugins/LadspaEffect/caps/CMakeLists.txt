@@ -14,6 +14,10 @@ ELSE()
 	SET_TARGET_PROPERTIES(caps PROPERTIES COMPILE_FLAGS "/GL /wd4996 /wd4244")
 ENDIF()
 
+if(MSVC)
+	target_link_options(caps PRIVATE "/EXPORT:ladspa_descriptor")
+endif()
+
 IF(LMMS_BUILD_WIN32)
 	add_custom_command(
 		TARGET caps
