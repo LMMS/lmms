@@ -101,7 +101,7 @@ ControlLayout::ControlLayout(QWidget *parent, int margin, int hSpacing, int vSpa
 
 ControlLayout::~ControlLayout()
 {
-	QLayoutItem *item;
+	QLayoutItem* item = nullptr;
 	while ((item = takeAt(0))) { delete item; }
 }
 
@@ -233,7 +233,7 @@ QSize ControlLayout::minimumSize() const
 
 int ControlLayout::doLayout(const QRect &rect, bool testOnly) const
 {
-	int left, top, right, bottom;
+	int left = 0, top = 0, right = 0, bottom = 0;
 	getContentsMargins(&left, &top, &right, &bottom);
 	QRect effectiveRect = rect.adjusted(+left, +top, -right, -bottom);
 	int x = effectiveRect.x();

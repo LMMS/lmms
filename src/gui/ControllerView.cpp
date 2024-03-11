@@ -140,7 +140,7 @@ void ControllerView::deleteController()
 
 void ControllerView::renameController()
 {
-	bool ok;
+	bool ok = false;
 	auto c = castModel<Controller>();
 	QString new_name = QInputDialog::getText( this,
 			tr( "Rename controller" ),

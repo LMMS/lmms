@@ -208,7 +208,7 @@ float EqHandle::getPeakCurve( float x )
 	double Q = getResonance();
 	double A =  pow( 10, yPixelToGain( EqHandle::y(), m_heigth, m_pixelsPerUnitHeight ) / 40 );
 	double alpha = s * sinh( log( 2 ) / 2 * Q * w0 / sinf( w0 ) );
-	double a0, a1, a2, b0, b1, b2; // coeffs to calculate
+	double a0 = 0.0, a1 = 0.0, a2 = 0.0, b0 = 0.0, b1 = 0.0, b2 = 0.0; // coeffs to calculate
 
 	//calc coefficents
 	b0 =   1 + alpha * A;
@@ -245,7 +245,7 @@ float EqHandle::getHighShelfCurve( float x )
 	double s = sinf( w0 );
 	double A =  pow( 10, yPixelToGain( EqHandle::y(), m_heigth, m_pixelsPerUnitHeight ) * 0.025 );
 	double beta = sqrt( A ) / m_resonance;
-	double a0, a1, a2, b0, b1, b2; // coeffs to calculate
+	double a0 = 0.0, a1 = 0.0, a2 = 0.0, b0 = 0.0, b1 = 0.0, b2 = 0.0; // coeffs to calculate
 
 	//calc coefficents
 	b0 = A * ( ( A + 1 ) + ( A - 1 ) * c + beta * s);
@@ -281,7 +281,7 @@ float EqHandle::getLowShelfCurve( float x )
 	double s = sinf( w0 );
 	double A =  pow( 10, yPixelToGain( EqHandle::y(), m_heigth, m_pixelsPerUnitHeight ) / 40 );
 	double beta = sqrt( A ) / m_resonance;
-	double a0, a1, a2, b0, b1, b2; // coeffs to calculate
+	double a0 = 0.0, a1 = 0.0, a2 = 0.0, b0 = 0.0, b1 = 0.0, b2 = 0.0; // coeffs to calculate
 
 	//calc coefficents
 	b0 = A * ( ( A + 1 ) - ( A - 1 ) * c + beta * s );
@@ -318,7 +318,7 @@ float EqHandle::getLowCutCurve( float x )
 	double s = sinf( w0 );
 	double resonance = getResonance();
 	double alpha = s / (2 * resonance);
-	double a0, a1, a2, b0, b1, b2; // coeffs to calculate
+	double a0 = 0.0, a1 = 0.0, a2 = 0.0, b0 = 0.0, b1 = 0.0, b2 = 0.0; // coeffs to calculate
 
 	b0 = ( 1 + c ) * 0.5;
 	b1 = ( -( 1 + c ) );
@@ -361,7 +361,7 @@ float EqHandle::getHighCutCurve( float x )
 	double s = sinf( w0 );
 	double resonance = getResonance();
 	double alpha = s / (2 * resonance);
-	double a0, a1, a2, b0, b1, b2; // coeffs to calculate
+	double a0 = 0.0, a1 = 0.0, a2 = 0.0, b0 = 0.0, b1 = 0.0, b2 = 0.0; // coeffs to calculate
 
 	b0 = ( 1 - c ) * 0.5;
 	b1 = 1 - c;
@@ -569,7 +569,7 @@ void EqHandle::mouseReleaseEvent( QGraphicsSceneMouseEvent *event )
 
 void EqHandle::wheelEvent( QGraphicsSceneWheelEvent *wevent )
 {
-	float highestBandwich;
+	float highestBandwich = 0.0f;
 	if( m_type != EqHandleType::Para )
 	{
 		highestBandwich = 10;

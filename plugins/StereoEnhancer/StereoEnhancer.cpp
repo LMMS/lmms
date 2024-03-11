@@ -90,7 +90,7 @@ bool StereoEnhancerEffect::processAudioBuffer( sampleFrame * _buf,
 	// audio with this effect
 	double out_sum = 0.0;
 
-	float width;
+	float width = 0.0f;
 	int frameIndex = 0;
 
 
@@ -149,7 +149,7 @@ bool StereoEnhancerEffect::processAudioBuffer( sampleFrame * _buf,
 
 void StereoEnhancerEffect::clearMyBuffer()
 {
-	int i;
+	int i = 0;
 	for (i = 0; i < DEFAULT_BUFFER_SIZE; i++)
 	{
 		m_delayBuffer[i][0] = 0.0f;

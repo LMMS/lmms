@@ -647,7 +647,7 @@ float SaSpectrumView::ampToYPixel(float amplitude, unsigned int height)
 std::vector<std::pair<int, std::string>> SaSpectrumView::makeLogFreqTics(int low, int high)
 {
 	std::vector<std::pair<int, std::string>> result;
-	int i, j;
+	int i = 0, j = 0;
 	auto a = std::array{10, 20, 50};		// sparse series multipliers
 	auto b = std::array{14, 30, 70};		// additional (denser) series
 
@@ -691,7 +691,7 @@ std::vector<std::pair<int, std::string>> SaSpectrumView::makeLogFreqTics(int low
 std::vector<std::pair<int, std::string>> SaSpectrumView::makeLinearFreqTics(int low, int high)
 {
 	std::vector<std::pair<int, std::string>> result;
-	int i, increment;
+	int i = 0, increment = 0;
 
 	// select a suitable increment based on zoom level
 	if (high - low < 500) {increment = 50;}
@@ -724,8 +724,8 @@ std::vector<std::pair<int, std::string>> SaSpectrumView::makeLinearFreqTics(int 
 std::vector<std::pair<float, std::string>> SaSpectrumView::makeLogAmpTics(int low, int high)
 {
 	std::vector<std::pair<float, std::string>> result;
-	float i;
-	double increment;
+	float i = 0.0f;
+	double increment = 0.0f;
 
 	// Base zoom level on selected range and how close is the current height
 	// to the sizeHint() (denser scale for bigger window).
@@ -764,7 +764,7 @@ std::vector<std::pair<float, std::string>> SaSpectrumView::makeLogAmpTics(int lo
 std::vector<std::pair<float, std::string>> SaSpectrumView::makeLinearAmpTics(int low, int high)
 {
 	std::vector<std::pair<float, std::string>> result;
-	double i, nearest;
+	double i = 0.0f, nearest = 0.0f;
 
 	// make about 5 labels when window is small, 10 if it is big
 	float split = (float)height() / sizeHint().height() >= 1.5 ? 10.0 : 5.0;

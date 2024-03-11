@@ -1116,7 +1116,7 @@ void CarlaParamsView::clearKnobs()
 	}
 
 	// Remove spacers
-	QLayoutItem* item;
+	QLayoutItem* item = nullptr;
 	for (int16_t i=m_inputScrollAreaLayout->count() - 1; i > 0; i--)
 	{
 		item = m_inputScrollAreaLayout->takeAt(i);

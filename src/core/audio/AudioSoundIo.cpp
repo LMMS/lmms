@@ -70,7 +70,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 	const QString& configDeviceId = ConfigManager::inst()->value( "audiosoundio", "out_device_id" );
 	const QString& configDeviceRaw = ConfigManager::inst()->value( "audiosoundio", "out_device_raw" );
 
-	int err;
+	int err = 0;
 	int outDeviceCount = 0;
 	int backendCount = soundio_backend_count(m_soundio);
 	for (int i = 0; i < backendCount; i += 1)
@@ -215,8 +215,8 @@ AudioSoundIo::~AudioSoundIo()
 
 void AudioSoundIo::startProcessing()
 {
-	int err;
-	
+	int err = 0;
+
 	m_outBufFrameIndex = 0;
 	m_outBufFramesTotal = 0;
 	m_outBufSize = audioEngine()->framesPerPeriod();
@@ -248,8 +248,8 @@ void AudioSoundIo::startProcessing()
 
 void AudioSoundIo::stopProcessing()
 {
-	int err;
-	
+	int err = 0;
+
 	m_stopped = true;
 	if (m_outstream)
 	{
@@ -282,9 +282,9 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 {
 	if (m_stopped) {return;}
 	const struct SoundIoChannelLayout *layout = &m_outstream->layout;
-	SoundIoChannelArea *areas;
+	SoundIoChannelArea* areas = nullptr;
 	int bytesPerSample = m_outstream->bytes_per_sample;
-	int err;
+	int err = 0;
 
 	int framesLeft = frameCountMax;
 
@@ -373,7 +373,7 @@ void AudioSoundIo::setupWidget::reconnectSoundIo()
 
 	soundio_disconnect(m_soundio);
 
-	int err;
+	int err = 0;
 	int backend_index = m_backendModel.findText(configBackend);
 	if (backend_index < 0)
 	{

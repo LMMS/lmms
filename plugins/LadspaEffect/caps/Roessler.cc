@@ -50,11 +50,8 @@ Roessler::one_cycle (int frames)
 
 	sample_t * d = ports[5];
 
-	sample_t x,
-			sx = .043 * getport(1), 
-			sy = .051 * getport(2), 
-			sz = .018 * getport(3);
-	
+	sample_t x = 0.0f, sx = .043 * getport(1), sy = .051 * getport(2), sz = .018 * getport(3);
+
 	for (int i = 0; i < frames; ++i)
 	{
 		roessler.get();

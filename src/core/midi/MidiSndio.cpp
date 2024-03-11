@@ -91,10 +91,10 @@ void MidiSndio::sendByte( const unsigned char c )
 void MidiSndio::run()
 {
 	struct pollfd pfd;
-	nfds_t nfds;
-	char buf[0x100], *p;
-	size_t n;
-	int ret;
+	nfds_t nfds = 0;
+	char buf[0x100], *p = nullptr;
+	size_t n = 0;
+	int ret = 0;
 	while( m_quit == false && m_hdl )
 	{
 		nfds = mio_pollfd( m_hdl, &pfd, POLLIN );

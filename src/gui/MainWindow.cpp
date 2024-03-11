@@ -1108,7 +1108,7 @@ void MainWindow::updateViewMenu()
 	// Here we should put all look&feel -stuff from configmanager
 	// that is safe to change on the fly. There is probably some
 	// more elegant way to do this.
-	QAction *qa;
+	QAction* qa = nullptr;
 	qa = new QAction(tr( "Volume as dBFS" ), this);
 	qa->setData("displaydbfs");
 	qa->setCheckable( true );

@@ -945,7 +945,7 @@ void Song::createNewProject()
 	m_oldFileName = "";
 	setProjectFileName("");
 
-	Track * t;
+	Track* t = nullptr;
 	t = Track::create( Track::Type::Instrument, this );
 	dynamic_cast<InstrumentTrack * >( t )->loadInstrument(
 					"tripleoscillator" );

@@ -211,7 +211,7 @@ Plugin * Plugin::instantiate(const QString& pluginName, Model * parent,
 {
 	const PluginFactory::PluginInfo& pi = getPluginFactory()->pluginInfo(pluginName.toUtf8());
 
-	Plugin* inst;
+	Plugin* inst = nullptr;
 	if( pi.isNull() )
 	{
 		if (gui::getGUI() != nullptr)
@@ -226,7 +226,7 @@ Plugin * Plugin::instantiate(const QString& pluginName, Model * parent,
 	}
 	else
 	{
-		InstantiationHook instantiationHook;
+		InstantiationHook instantiationHook = nullptr;
 		if ((instantiationHook = ( InstantiationHook ) pi.library->resolve( "lmms_plugin_main" )))
 		{
 			inst = instantiationHook(parent, data);

@@ -720,10 +720,9 @@ void VestigeInstrumentView::openPreset()
 
 	if ( m_vi->m_plugin != nullptr ) {
 		m_vi->m_plugin->openPreset();
-    		bool converted;
-    		QString str = m_vi->m_plugin->currentProgramName().section("/", 0, 0);
-     		if (str != "")
-   			lastPosInMenu = str.toInt(&converted, 10) - 1;
+		bool converted = false;
+		QString str = m_vi->m_plugin->currentProgramName().section("/", 0, 0);
+		if (str != "") lastPosInMenu = str.toInt(&converted, 10) - 1;
 		QWidget::update();
 	}
 
@@ -755,10 +754,9 @@ void VestigeInstrumentView::nextProgram()
 
 	if ( m_vi->m_plugin != nullptr ) {
 		m_vi->m_plugin->rotateProgram( 1 );
-    		bool converted;
-    		QString str = m_vi->m_plugin->currentProgramName().section("/", 0, 0);
-     		if (str != "")
-   			lastPosInMenu = str.toInt(&converted, 10) - 1;
+		bool converted = false;
+		QString str = m_vi->m_plugin->currentProgramName().section("/", 0, 0);
+		if (str != "") lastPosInMenu = str.toInt(&converted, 10) - 1;
 		QWidget::update();
 	}
 }
@@ -771,10 +769,9 @@ void VestigeInstrumentView::previousProgram()
 
 	if ( m_vi->m_plugin != nullptr ) {
 		m_vi->m_plugin->rotateProgram( -1 );
-    		bool converted;
-    		QString str = m_vi->m_plugin->currentProgramName().section("/", 0, 0);
-     		if (str != "")
-   			lastPosInMenu = str.toInt(&converted, 10) - 1;
+		bool converted = false;
+		QString str = m_vi->m_plugin->currentProgramName().section("/", 0, 0);
+		if (str != "") lastPosInMenu = str.toInt(&converted, 10) - 1;
 		QWidget::update();
 	}
 }
@@ -1053,7 +1050,7 @@ void ManageVestigeInstrumentView::syncPlugin( void )
 	auto paramStr = std::array<char, 35>{};
 	QStringList s_dumpValues;
 	const QMap<QString, QString> & dump = m_vi->m_plugin->parameterDump();
-	float f_value;
+	float f_value = 0.0f;
 
 	for( int i = 0; i < m_vi->paramCount; i++ )
 	{

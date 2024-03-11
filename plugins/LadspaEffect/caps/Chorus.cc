@@ -67,7 +67,7 @@ ChorusI::one_cycle (int frames)
 		/* truncate the feedback tap to integer, better quality for less
 		 * cycles (just a bit of zipper when changing 't', but it does sound
 		 * interesting) */
-		int ti;
+		int ti = 0;
 		fistp (t, ti);
 		x -= fb * delay[ti];
 
@@ -195,7 +195,7 @@ StereoChorusI::one_cycle (int frames)
 		/* truncate the feedback tap to integer, better quality for less
 		 * cycles (just a bit of zipper when changing 't', but it does sound
 		 * interesting) */
-		int ti;
+		int ti = 0;
 		fistp (t, ti);
 		x -= fb * delay[ti];
 
@@ -424,13 +424,13 @@ StereoChorusII::one_cycle (int frames)
 		/* truncate the feedback tap to integer, better quality for less
 		 * cycles (just a bit of zipper when changing 't', but it does sound
 		 * interesting) */
-		int ti;
+		int ti = 0;
 		fistp (t, ti);
 		x -= fb * delay[ti];
 
 		delay.put (x + normal);
 
-		double m;
+		double m = 0.0;
 		m = left.lfo_lp.process (left.fractal.get());
 		sample_t l = blend * x + ff * delay.get_cubic (t + w * m);
 		m = right.lfo_lp.process (right.fractal.get());

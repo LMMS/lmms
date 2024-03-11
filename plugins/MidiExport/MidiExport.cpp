@@ -76,14 +76,14 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 	f.open(QIODevice::WriteOnly);
 	QDataStream midiout(&f);
 
-	InstrumentTrack* instTrack;
-	PatternTrack* patternTrack;
+	InstrumentTrack* instTrack = nullptr;
+	PatternTrack* patternTrack = nullptr;
 	QDomElement element;
 
 
 	int nTracks = 0;
 	auto buffer = std::array<uint8_t, BUFFER_SIZE>{};
-	uint32_t size;
+	uint32_t size = 0;
 
 	for (const Track* track : tracks) if (track->type() == Track::Type::Instrument) nTracks++;
 	for (const Track* track : patternStoreTracks) if (track->type() == Track::Type::Instrument) nTracks++;

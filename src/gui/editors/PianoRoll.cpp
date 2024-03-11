@@ -725,7 +725,7 @@ void PianoRoll::fitNoteLengths(bool fill)
 		std::sort(notes.begin(), notes.end(), [](Note* n1, Note* n2) { return n1->endPos() < n2->endPos(); });
 	}
 
-	int length;
+	int length = 0;
 	auto ref = refNotes.begin();
 	for (Note* note : notes)
 	{
@@ -788,7 +788,7 @@ void PianoRoll::loadMarkedSemiTones(const QDomElement & de)
 		QDomNode node = de.firstChild();
 		while (!node.isNull())
 		{
-			bool ok;
+			bool ok = false;
 			int key = node.toElement().attribute(
 				QString("key"), QString("-1")).toInt(&ok, 10);
 			if (ok && key >= 0)
@@ -3030,7 +3030,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 	if (hasValidMidiClip())
 	{
-		int pianoAreaHeight, partialKeyVisible, topKey, topNote;
+		int pianoAreaHeight = 0, partialKeyVisible = 0, topKey = 0, topNote = 0;
 		pianoAreaHeight = keyAreaBottom() - keyAreaTop();
 		m_pianoKeysVisible = pianoAreaHeight / m_keyLineHeight;
 		partialKeyVisible = pianoAreaHeight % m_keyLineHeight;
@@ -3077,7 +3077,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			// otherwise we add height
 			else { m_notesEditHeight += partialKeyVisible; }
 		}
-		int x, q = quantization(), tick;
+		int x = 0, q = quantization(), tick = 0;
 
 		// draw vertical quantization lines
 		// If we're over 100% zoom, we allow all quantization level grids
@@ -4246,8 +4246,8 @@ void PianoRoll::enterValue( NoteVector* nv )
 
 	if( m_noteEditMode == NoteEditMode::Volume )
 	{
-		bool ok;
-		int new_val;
+		bool ok = false;
+		int new_val = 0;
 		new_val = QInputDialog::getInt(	this, "Piano roll: note velocity",
 					tr( "Please enter a new value between %1 and %2:" ).
 						arg( MinVolume ).arg( MaxVolume ),
@@ -4265,8 +4265,8 @@ void PianoRoll::enterValue( NoteVector* nv )
 	}
 	else if( m_noteEditMode == NoteEditMode::Panning )
 	{
-		bool ok;
-		int new_val;
+		bool ok = false;
+		int new_val = 0;
 		new_val = QInputDialog::getInt(	this, "Piano roll: note panning",
 					tr( "Please enter a new value between %1 and %2:" ).
 							arg( PanningLeft ).arg( PanningRight ),

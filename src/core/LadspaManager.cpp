@@ -139,7 +139,7 @@ void LadspaManager::addPlugins(
 		LADSPA_Descriptor_Function _descriptor_func,
 						const QString & _file )
 {
-	const LADSPA_Descriptor * descriptor;
+	const LADSPA_Descriptor* descriptor = nullptr;
 
 	for( long pluginIndex = 0;
 		( descriptor = _descriptor_func( pluginIndex ) ) != nullptr;

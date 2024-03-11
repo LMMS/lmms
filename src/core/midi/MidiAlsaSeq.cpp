@@ -51,8 +51,8 @@ static QString portName( snd_seq_client_info_t * _cinfo,
 
 static QString portName( snd_seq_t * _seq, const snd_seq_addr_t * _addr )
 {
-	snd_seq_client_info_t * cinfo;
-	snd_seq_port_info_t * pinfo;
+	snd_seq_client_info_t* cinfo = nullptr;
+	snd_seq_port_info_t* pinfo = nullptr;
 
 	snd_seq_client_info_malloc( &cinfo );
 	snd_seq_port_info_malloc( &pinfo );
@@ -78,7 +78,7 @@ MidiAlsaSeq::MidiAlsaSeq() :
 	m_quit( false ),
 	m_portListUpdateTimer( this )
 {
-	int err;
+	int err = 0;
 	if( ( err = snd_seq_open( &m_seqHandle,
 					probeDevice().toLatin1().constData(),
 						SND_SEQ_OPEN_DUPLEX, 0 ) ) < 0 )
@@ -91,7 +91,7 @@ MidiAlsaSeq::MidiAlsaSeq() :
 
 
 	m_queueID = snd_seq_alloc_queue( m_seqHandle );
-	snd_seq_queue_tempo_t * tempo;
+	snd_seq_queue_tempo_t* tempo = nullptr;
 	snd_seq_queue_tempo_malloc( &tempo );
 	snd_seq_queue_tempo_set_tempo( tempo, 6000000 /
 					Engine::getSong()->getTempo() );
@@ -280,7 +280,7 @@ void MidiAlsaSeq::applyPortMode( MidiPort * _port )
 						SND_SEQ_PORT_TYPE_APPLICATION );
 				continue;
 			}
-			snd_seq_port_info_t * port_info;
+			snd_seq_port_info_t* port_info = nullptr;
 			snd_seq_port_info_malloc( &port_info );
 			snd_seq_get_port_info( m_seqHandle, m_portIDs[_port][i],
 							port_info );
@@ -315,7 +315,7 @@ void MidiAlsaSeq::applyPortName( MidiPort * _port )
 		{
 			continue;
 		}
-		snd_seq_port_info_t * port_info;
+		snd_seq_port_info_t* port_info = nullptr;
 		snd_seq_port_info_malloc( &port_info );
 		snd_seq_get_port_info( m_seqHandle, m_portIDs[_port][i],
 							port_info );
@@ -382,11 +382,11 @@ void MidiAlsaSeq::subscribeReadablePort( MidiPort * _port,
 		m_seqMutex.unlock();
 		return;
 	}
-	snd_seq_port_info_t * port_info;
+	snd_seq_port_info_t* port_info = nullptr;
 	snd_seq_port_info_malloc( &port_info );
 	snd_seq_get_port_info( m_seqHandle, m_portIDs[_port][0], port_info );
 	const snd_seq_addr_t * dest = snd_seq_port_info_get_addr( port_info );
-	snd_seq_port_subscribe_t * subs;
+	snd_seq_port_subscribe_t* subs = nullptr;
 	snd_seq_port_subscribe_malloc( &subs );
 	snd_seq_port_subscribe_set_sender( subs, &sender );
 	snd_seq_port_subscribe_set_dest( subs, dest );
@@ -432,11 +432,11 @@ void MidiAlsaSeq::subscribeWritablePort( MidiPort * _port,
 		m_seqMutex.unlock();
 		return;
 	}
-	snd_seq_port_info_t * port_info;
+	snd_seq_port_info_t* port_info = nullptr;
 	snd_seq_port_info_malloc( &port_info );
 	snd_seq_get_port_info( m_seqHandle, pid, port_info );
 	const snd_seq_addr_t * sender = snd_seq_port_info_get_addr( port_info );
-	snd_seq_port_subscribe_t * subs;
+	snd_seq_port_subscribe_t* subs = nullptr;
 	snd_seq_port_subscribe_malloc( &subs );
 	snd_seq_port_subscribe_set_sender( subs, sender );
 	snd_seq_port_subscribe_set_dest( subs, &dest );
@@ -496,7 +496,7 @@ void MidiAlsaSeq::run()
 		// while event queue is not empty
 		while( snd_seq_event_input_pending( m_seqHandle, true ) > 0 )
 		{
-			snd_seq_event_t * ev;
+			snd_seq_event_t* ev = nullptr;
 			if( snd_seq_event_input( m_seqHandle, &ev ) < 0 )
 			{
 				m_seqMutex.unlock();
@@ -638,8 +638,8 @@ void MidiAlsaSeq::updatePortList()
 	QStringList writablePorts;
 
 	// get input- and output-ports
-	snd_seq_client_info_t * cinfo;
-	snd_seq_port_info_t * pinfo;
+	snd_seq_client_info_t* cinfo = nullptr;
+	snd_seq_port_info_t* pinfo = nullptr;
 
 	snd_seq_client_info_malloc( &cinfo );
 	snd_seq_port_info_malloc( &pinfo );

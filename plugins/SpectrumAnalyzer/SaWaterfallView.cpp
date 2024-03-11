@@ -213,7 +213,7 @@ float SaWaterfallView::yPixelToTime(float position, int height)
 std::vector<std::pair<float, std::string>> SaWaterfallView::makeTimeTics()
 {
 	std::vector<std::pair<float, std::string>> result;
-	float i;
+	float i = 0.0f;
 
 	// get time value of the last line
 	float limit = yPixelToTime(m_displayBottom, m_displayHeight);

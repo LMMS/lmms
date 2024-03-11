@@ -36,7 +36,7 @@ namespace lmms
  */
 void* MemoryHelper::alignedMalloc( size_t byteNum )
 {
-	char *ptr, *ptr2, *aligned_ptr;
+	char *ptr = nullptr, *ptr2 = nullptr, *aligned_ptr = nullptr;
 	int align_mask = LMMS_ALIGN_SIZE - 1;
 
 	ptr = static_cast<char*>( malloc( byteNum + LMMS_ALIGN_SIZE + sizeof( int ) ) );

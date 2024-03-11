@@ -53,7 +53,7 @@ AudioAlsa::AudioAlsa( bool & _success_ful, AudioEngine*  _audioEngine ) :
 		"Could not avoid possible interception by PulseAudio\n" );
 	}
 
-	int err;
+	int err = 0;
 
 	if( ( err = snd_pcm_open( &m_handle,
 					probeDevice().toLatin1().constData(),
@@ -83,7 +83,7 @@ AudioAlsa::AudioAlsa( bool & _success_ful, AudioEngine*  _audioEngine ) :
 
 	// set FD_CLOEXEC flag for all file descriptors so forked processes
 	// do not inherit them
-	struct pollfd * ufds;
+	struct pollfd* ufds = nullptr;
 	int count = snd_pcm_poll_descriptors_count( m_handle );
 	ufds = new pollfd[count];
 	snd_pcm_poll_descriptors( m_handle, ufds, count );
@@ -160,7 +160,7 @@ AudioAlsa::DeviceInfoCollection AudioAlsa::getAvailableDevices()
 {
 	DeviceInfoCollection deviceInfos;
 
-	char **hints;
+	char** hints = nullptr;
 
 	/* Enumerate sound devices */
 	int err = snd_device_name_hint(-1, "pcm", (void***)&hints);
@@ -261,7 +261,7 @@ void AudioAlsa::applyQualitySettings()
 			snd_pcm_close( m_handle );
 		}
 
-		int err;
+		int err = 0;
 		if( ( err = snd_pcm_open( &m_handle,
 					probeDevice().toLatin1().constData(),
 						SND_PCM_STREAM_PLAYBACK,
@@ -370,7 +370,7 @@ void AudioAlsa::run()
 
 int AudioAlsa::setHWParams( const ch_cnt_t _channels, snd_pcm_access_t _access )
 {
-	int err, dir;
+	int err = 0, dir = 0;
 
 	// choose all parameters
 	if( ( err = snd_pcm_hw_params_any( m_handle, m_hwParams ) ) < 0 )
@@ -485,7 +485,7 @@ int AudioAlsa::setHWParams( const ch_cnt_t _channels, snd_pcm_access_t _access )
 
 int AudioAlsa::setSWParams()
 {
-	int err;
+	int err = 0;
 
 	// get the current swparams
 	if( ( err = snd_pcm_sw_params_current( m_handle, m_swParams ) ) < 0 )

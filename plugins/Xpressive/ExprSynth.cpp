@@ -322,7 +322,7 @@ struct RandomVectorSeedFunction : public exprtk::ifunction<float>
 
 	inline float operator()(const float& index,const float& seed) override
 	{
-		int irseed;
+		int irseed = 0;
 		if (seed < 0 || std::isnan(seed) || std::isinf(seed))
 		{
 			irseed=0;

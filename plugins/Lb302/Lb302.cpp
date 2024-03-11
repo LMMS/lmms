@@ -166,7 +166,7 @@ void Lb302FilterIIR2::recalc()
 
 void Lb302FilterIIR2::envRecalc()
 {
-	float k, w;
+	float k = 0.0f, w = 0.0f;
 
 	Lb302Filter::envRecalc();
 
@@ -219,8 +219,8 @@ void Lb302Filter3Pole::recalc()
 // TODO: Try using k instead of vcf_reso
 void Lb302Filter3Pole::envRecalc()
 {
-	float w,k;
-	float kfco;
+	float w = 0.0f, k = 0.0f;
+	float kfco = 0.0f;
 
 	Lb302Filter::envRecalc();
 
@@ -461,8 +461,8 @@ inline float GET_INC(float freq) {
 int Lb302Synth::process(sampleFrame *outbuf, const int size)
 {
 	const float sampleRatio = 44100.f / Engine::audioEngine()->processingSampleRate();
-	float w;
-	float samp;
+	float w = 0.0f;
+	float samp = 0.0f;
 
 	// Hold on to the current VCF, and use it throughout this period
 	Lb302Filter *filter = vcf.loadAcquire();

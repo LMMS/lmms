@@ -179,7 +179,7 @@ QString MidiJack::probeDevice()
 // we read data from jack
 void MidiJack::JackMidiRead(jack_nframes_t nframes)
 {
-	unsigned int i,b;
+	unsigned int i = 0, b = 0;
 	void* port_buf = jack_port_get_buffer(m_input_port, nframes);
 	jack_midi_event_t in_event;
 	jack_nframes_t event_index = 0;

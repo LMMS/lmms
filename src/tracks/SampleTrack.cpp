@@ -140,7 +140,7 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 		auto st = dynamic_cast<SampleClip*>(clip);
 		if( !st->isMuted() )
 		{
-			PlayHandle* handle;
+			PlayHandle* handle = nullptr;
 			if( st->isRecord() )
 			{
 				if( !Engine::getSong()->isRecording() )

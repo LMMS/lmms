@@ -212,7 +212,7 @@ inline sample_t EnvelopeAndLfoParameters::lfoShapeSample( fpp_t _frame_offset )
 	f_cnt_t frame = ( m_lfoFrame + _frame_offset ) % m_lfoOscillationFrames;
 	const float phase = frame / static_cast<float>(
 						m_lfoOscillationFrames );
-	sample_t shape_sample;
+	sample_t shape_sample = 0.0f;
 	switch( static_cast<LfoShape>(m_lfoWaveModel.value())  )
 	{
 		case LfoShape::TriangleWave:
@@ -308,7 +308,7 @@ void EnvelopeAndLfoParameters::fillLevel( float * _buf, f_cnt_t _frame,
 
 	for( fpp_t offset = 0; offset < _frames; ++offset, ++_buf, ++_frame )
 	{
-		float env_level;
+		float env_level = 0.0f;
 		if( _frame < _release_begin )
 		{
 			if( _frame < m_pahdFrames )

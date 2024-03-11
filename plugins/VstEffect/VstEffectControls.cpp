@@ -243,10 +243,9 @@ void VstEffectControls::openPreset()
 
 	if ( m_effect->m_plugin != nullptr ) {
 		m_effect->m_plugin->openPreset();
-    		bool converted;
-    		QString str = m_effect->m_plugin->currentProgramName().section("/", 0, 0);
-     		if (str != "")
-   			lastPosInMenu = str.toInt(&converted, 10) - 1;
+		bool converted = false;
+		QString str = m_effect->m_plugin->currentProgramName().section("/", 0, 0);
+		if (str != "") lastPosInMenu = str.toInt(&converted, 10) - 1;
 		//QWidget::update();
 	}
 
@@ -260,10 +259,9 @@ void VstEffectControls::rollPreset()
 
 	if ( m_effect->m_plugin != nullptr ) {
 		m_effect->m_plugin->rotateProgram( 1 );
-    		bool converted;
-    		QString str = m_effect->m_plugin->currentProgramName().section("/", 0, 0);
-     		if (str != "")
-   			lastPosInMenu = str.toInt(&converted, 10) - 1;
+		bool converted = false;
+		QString str = m_effect->m_plugin->currentProgramName().section("/", 0, 0);
+		if (str != "") lastPosInMenu = str.toInt(&converted, 10) - 1;
 		//QWidget::update();
 	}
 }
@@ -276,10 +274,9 @@ void VstEffectControls::rolrPreset()
 
 	if ( m_effect->m_plugin != nullptr ) {
 		m_effect->m_plugin->rotateProgram( -1 );
-    		bool converted;
-    		QString str = m_effect->m_plugin->currentProgramName().section("/", 0, 0);
-     		if (str != "")
-   			lastPosInMenu = str.toInt(&converted, 10) - 1;
+		bool converted = false;
+		QString str = m_effect->m_plugin->currentProgramName().section("/", 0, 0);
+		if (str != "") lastPosInMenu = str.toInt(&converted, 10) - 1;
 		//QWidget::update();
 	}
 }
@@ -452,7 +449,7 @@ void ManageVSTEffectView::syncPlugin()
 	auto paramStr = std::array<char, 35>{};
 	QStringList s_dumpValues;
 	const QMap<QString, QString> & dump = m_effect->m_plugin->parameterDump();
-	float f_value;
+	float f_value = 0.0f;
 
 	for( int i = 0; i < m_vi2->paramCount; i++ )
 	{

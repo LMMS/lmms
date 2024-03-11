@@ -110,13 +110,13 @@ sample_t BSynth::nextStringSample( float sample_length )
 		sample_realindex -= sample_length;
 	}
 
-	sample_t sample;
+	sample_t sample = 0.0f;
 
 	if (interpolation) {
 
 		// find position in shape 
-		int a = static_cast<int>(sample_realindex);	
-		int b;
+		int a = static_cast<int>(sample_realindex);
+		int b = 0;
 		if (a < (sample_length-1)) {
 			b = static_cast<int>(sample_realindex+1);
 		} else {
@@ -276,7 +276,7 @@ void BitInvader::playNote( NotePlayHandle * _n,
 {
 	if (!_n->m_pluginData)
 	{
-		float factor;
+		float factor = 0.0f;
 		if( !m_normalize.value() )
 		{
 			factor = defaultNormalizationFactor;

@@ -464,7 +464,7 @@ bool DataFile::copyResources(const QString& resourcesDir)
 				if (el.hasAttribute(*res))
 				{
 					// Get absolute path to resource
-					bool error;
+					bool error = false;
 					QString resPath = PathUtil::toAbsolute(el.attribute(*res), &error);
 					// If we are running without the project loaded (from CLI), "local:" base
 					// prefixes aren't converted, so we need to convert it ourselves
@@ -1069,7 +1069,7 @@ void DataFile::upgrade_1_0_99()
 					me.setAttribute("value", el.attribute("data"));
 					me.setAttribute("scale_type", "log");
 
-					jo_id_t id;
+					jo_id_t id = 0;
 					for(id = last_assigned_id + 1;
 						idList.contains(id); id++)
 					{
@@ -1194,7 +1194,7 @@ void DataFile::upgrade_1_2_0_rc3()
 								"pattern" );
 		for( int j = 0; !patterns.item( j ).isNull(); ++j )
 		{
-			int patternLength, steps;
+			int patternLength = 0, steps = 0;
 			QDomElement el = patterns.item( j ).toElement();
 			if( el.attribute( "len" ) != "" )
 			{
@@ -1456,7 +1456,7 @@ void DataFile::upgrade_1_3_0()
 							if(num == 4)
 							{
 								// don't modify port 4, but some other ones:
-								int zoom_port;
+								int zoom_port = 0;
 								if (plugin == "Equalizer5Band")
 									zoom_port = 36;
 								else if (plugin == "Equalizer8Band")
@@ -2008,7 +2008,7 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 	}
 	else
 	{
-		bool success;
+		bool success = false;
 		m_fileVersion = root.attribute( "version" ).toUInt( &success );
 		if( !success ) qWarning("File Version conversion failure.");
 	}

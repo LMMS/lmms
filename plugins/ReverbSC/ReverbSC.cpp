@@ -86,8 +86,8 @@ bool ReverbSCEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	const float d = dryLevel();
 	const float w = wetLevel();
 
-	SPFLOAT tmpL, tmpR;
-	SPFLOAT dcblkL, dcblkR;
+	SPFLOAT tmpL = 0.0f, tmpR = 0.0f;
+	SPFLOAT dcblkL = 0.0f, dcblkR = 0.0f;
 
 	ValueBuffer * inGainBuf = m_reverbSCControls.m_inputGainModel.valueBuffer();
 	ValueBuffer * sizeBuf = m_reverbSCControls.m_sizeModel.valueBuffer();

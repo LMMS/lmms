@@ -906,9 +906,9 @@ int main( int argc, char * * argv )
 			mb.setWindowIcon( embed::getIconPixmap( "icon_small" ) );
 			mb.setWindowFlags( Qt::WindowCloseButtonHint );
 
-			QPushButton * recover;
-			QPushButton * discard;
-			QPushButton * exit;
+			QPushButton* recover = nullptr;
+			QPushButton* discard = nullptr;
+			QPushButton* exit = nullptr;
 
 			// setting all buttons to the same roles allows us
 			// to have a custom layout

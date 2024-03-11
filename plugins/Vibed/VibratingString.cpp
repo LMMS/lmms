@@ -75,7 +75,7 @@ std::unique_ptr<VibratingString::DelayLine> VibratingString::initDelayLine(int l
 	if (len > 0)
 	{
 		dl->data = std::make_unique<sample_t[]>(len);
-		float r;
+		float r = 0.0f;
 		float offset = 0.0f;
 		for (int i = 0; i < dl->length; ++i)
 		{

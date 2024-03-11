@@ -354,8 +354,8 @@ void AudioFileProcessorWaveView::zoom(const bool out)
 	const double comp_ratio = double(qMin(d_from, d_to))
 								/ qMax(1, qMax(d_from, d_to));
 
-	f_cnt_t new_from;
-	f_cnt_t new_to;
+	f_cnt_t new_from = 0;
+	f_cnt_t new_to = 0;
 
 	if ((out && d_from < d_to) || (! out && d_to < d_from))
 	{

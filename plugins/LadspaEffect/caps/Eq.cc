@@ -210,7 +210,7 @@ Eq2x2::one_cycle (int frames)
 
 	for (int i = 0; i < 10; ++i)
 	{
-		double a;
+		double a = 0.0;
 
 		if (*ports [2 + i] == gain[i])
 			/* still same value, no gain fade */

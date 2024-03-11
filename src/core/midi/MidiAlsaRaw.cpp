@@ -39,7 +39,7 @@ MidiAlsaRaw::MidiAlsaRaw() :
 	m_outputp( &m_output ),
 	m_quit( false )
 {
-	int err;
+	int err = 0;
 	if( ( err = snd_rawmidi_open( m_inputp, m_outputp,
 					probeDevice().toLatin1().constData(),
 								0 ) ) < 0 )
@@ -131,7 +131,7 @@ void MidiAlsaRaw::run()
 			//printf( "there seems to be no active MIDI-device %d\n", ++cnt );
 			continue;
 		}
-		unsigned short revents;
+		unsigned short revents = 0;
 		if( ( err = snd_rawmidi_poll_descriptors_revents(
 				m_input, m_pfds, m_npfds, &revents ) ) < 0 )
 		{

@@ -244,7 +244,7 @@ void OpulenzInstrument::reloadEmulator() {
 
 // This shall only be called from code protected by the holy Mutex!
 void OpulenzInstrument::setVoiceVelocity(int voice, int vel) {
-	int vel_adjusted;
+	int vel_adjusted = 0;
 	// Velocity calculation, some kind of approximation
 	// Only calculate for operator 1 if in adding mode, don't want to change timbre
 	if( fm_mdl.value() == false ) {
@@ -279,7 +279,7 @@ int OpulenzInstrument::popVoice() {
 }
 // Push voice into first free slot
 int OpulenzInstrument::pushVoice(int v) {
-	int i;
+	int i = 0;
 	assert(voiceLRU[OPL2_VOICES-1]==OPL2_NO_VOICE);
 	for(i=OPL2_VOICES-1; i>0; --i) {
 		if( voiceLRU[i-1] != OPL2_NO_VOICE ) {
@@ -297,7 +297,7 @@ int OpulenzInstrument::pushVoice(int v) {
 bool OpulenzInstrument::handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset )
 {
 	emulatorMutex.lock();
-	int key, vel, voice, tmp_pb;
+	int key = 0, vel = 0, voice = 0, tmp_pb = 0;
 
 	switch(event.type()) {
         case MidiNoteOn:
@@ -504,7 +504,7 @@ void OpulenzInstrument::loadPatch(const unsigned char inst[14]) {
 }
 
 void OpulenzInstrument::tuneEqual(int center, float Hz) {
-	float tmp;
+	float tmp = 0.0f;
 	for(int n=0; n<128; ++n) {
 		tmp = Hz*pow( 2.0, ( n - center ) * ( 1.0 / 12.0 ) + pitchbend * ( 1.0 / 1200.0 ) );
 		fnums[n] = Hz2fnum( tmp );

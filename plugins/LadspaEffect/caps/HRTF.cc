@@ -79,7 +79,7 @@ HRTF::one_cycle (int frames)
 	sample_t * dl = ports[2];
 	sample_t * dr = ports[3];
 
-	double l, r;
+	double l = 0.0, r = 0.0;
 
 	for (int i = 0; i < frames; ++i)
 	{

@@ -426,7 +426,7 @@ void Lv2Proc::handleMidiInputEvent(const MidiEvent &event, const TimePos &time, 
 AutomatableModel *Lv2Proc::modelAtPort(const QString &uri)
 {
 	// unused currently
-	AutomatableModel *mod;
+	AutomatableModel* mod = nullptr;
 	auto itr = m_connectedModels.find(uri.toUtf8().data());
 	if (itr != m_connectedModels.end()) { mod = itr->second; }
 	else { mod = nullptr; }
@@ -561,7 +561,7 @@ void Lv2Proc::createPort(std::size_t portNum)
 
 	const LilvPort* lilvPort = lilv_plugin_get_port_by_index(m_plugin,
 								static_cast<uint32_t>(portNum));
-	Lv2Ports::PortBase* port;
+	Lv2Ports::PortBase* port = nullptr;
 
 	switch (meta.m_type)
 	{

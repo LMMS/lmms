@@ -320,8 +320,8 @@ void AutomationEditor::drawLine( int x0In, float y0, int x1In, float y1 )
 	auto deltay = qAbs<float>(y1 - y0);
 	int x = x0;
 	float y = y0;
-	int xstep;
-	int ystep;
+	int xstep = 0;
+	int ystep = 0;
 
 	if( deltax < AutomationClip::quantization() )
 	{
@@ -341,7 +341,7 @@ void AutomationEditor::drawLine( int x0In, float y0, int x1In, float y1 )
 		xstep = -( AutomationClip::quantization() );
 	}
 
-	float lineAdjust;
+	float lineAdjust = 0.0f;
 	if( y0 < y1 )
 	{
 		ystep = 1;
@@ -373,7 +373,7 @@ bool AutomationEditor::fineTuneValue(timeMap::iterator node, bool editingOutValu
 	if (node == m_clip->getTimeMap().end()) { return false; }
 
 	// Display dialog to edit the value
-	bool ok;
+	bool ok = false;
 	double value = QInputDialog::getDouble(
 		this,
 		tr("Edit Value"),
@@ -979,7 +979,7 @@ inline void AutomationEditor::drawCross( QPainter & p )
 inline void AutomationEditor::drawAutomationPoint(QPainter & p, timeMap::iterator it)
 {
 	int x = xCoordOfTick(POS(it));
-	int y;
+	int y = 0;
 	// Below (m_ppb * AutomationClip::quantization() / 576) is used because:
 	// 1 bar equals to 192/quantization() notes. Hence, to calculate the number of pixels
 	// per note we would have (m_ppb * 1 bar / (192/quantization()) notes per bar), or
@@ -1006,7 +1006,7 @@ inline void AutomationEditor::drawAutomationPoint(QPainter & p, timeMap::iterato
 inline void AutomationEditor::drawAutomationTangents(QPainter& p, timeMap::iterator it)
 {
 	int x = xCoordOfTick(POS(it));
-	int y, tx, ty;
+	int y = 0, tx = 0, ty = 0;
 
 	// The tangent value correlates the variation in the node value related to the increase
 	// in ticks. So to have a proportionate drawing of the tangent line, we need to find the
@@ -1101,7 +1101,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		}
 		else
 		{
-			int y;
+			int y = 0;
 			int level = (int) m_bottomLevel;
 			int printable = qMax( 1, 5 * DEFAULT_Y_DELTA
 								/ m_y_delta );
@@ -1139,7 +1139,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 	if( m_clip )
 	{
-		int tick, x, q;
+		int tick = 0, x = 0, q = 0;
 		int x_line_end = (int)( m_y_auto || m_topLevel < m_maxLevel ?
 			TOP_MARGIN :
 			grid_bottom - ( m_topLevel - m_bottomLevel ) * m_y_delta );
@@ -1187,7 +1187,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		}
 		else
 		{
-			float y;
+			float y = 0.0f;
 			for( int level = (int)m_bottomLevel; level <= m_topLevel; level++)
 			{
 				y =  yCoordOfLevel( (float)level );
@@ -1365,7 +1365,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				// the outValue of the current node). When we have nodes with linear or cubic progression
 				// the value of the end of the shape between the two nodes will be the inValue of
 				// the next node.
-				float nextValue;
+				float nextValue = 0.0f;
 				if( m_clip->progressionType() == AutomationClip::ProgressionType::Discrete )
 				{
 					nextValue = OUTVAL(it);
@@ -1524,7 +1524,7 @@ void AutomationEditor::drawLevelTick(QPainter & p, int tick, float value)
 			|| ( value < m_bottomLevel && m_bottomLevel <= 0 ) )
 	{
 		int y_start = yCoordOfLevel( value );
-		int rect_height;
+		int rect_height = 0;
 
 		if( m_y_auto )
 		{

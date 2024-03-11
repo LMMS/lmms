@@ -167,7 +167,7 @@ void AutomationClip::setTension( QString _new_tension )
 {
 	QMutexLocker m(&m_clipMutex);
 
-	bool ok;
+	bool ok = false;
 	float nt = LocaleHelper::toFloat(_new_tension, & ok);
 
 	if( ok && nt > -0.01 && nt < 1.01 )
@@ -183,7 +183,7 @@ const AutomatableModel * AutomationClip::firstObject() const
 {
 	QMutexLocker m(&m_clipMutex);
 
-	AutomatableModel* model;
+	AutomatableModel* model = nullptr;
 	if (!m_objects.empty() && (model = m_objects.front()) != nullptr)
 	{
 		return model;
@@ -1222,8 +1222,8 @@ void AutomationClip::generateTangents(timeMap::iterator it, int numToGenerate)
 			// TODO: This behavior means that a very small difference between the inValue and outValue can
 			// result in a big change in the curve. In the future, allowing the user to manually adjust
 			// the tangents would be better.
-			float inTangent;
-			float outTangent;
+			float inTangent = 0.0f;
+			float outTangent = 0.0f;
 			if (OFFSET(it) == 0)
 			{
 				inTangent = (INVAL(it + 1) - OUTVAL(it - 1)) / (POS(it + 1) - POS(it - 1));

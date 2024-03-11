@@ -204,8 +204,8 @@ void LcdFloatSpinBox::mouseDoubleClickEvent(QMouseEvent *)
 
 void LcdFloatSpinBox::enterValue()
 {
-	bool ok;
-	float newVal;
+	bool ok = false;
+	float newVal = 0.0f;
 
 	newVal = QInputDialog::getDouble(
 			this, tr("Set value"),

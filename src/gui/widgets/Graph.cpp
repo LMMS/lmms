@@ -200,11 +200,11 @@ void Graph::drawLineAt( int _x, int _y, int _lastx )
 
 	float range = minVal - maxVal;
 	float val = ( _y*range/( height()-5 ) ) + maxVal;
-	
-	int sample_begin, sample_end;
-	float lastval;
-	float val_begin, val_end;
-	
+
+	int sample_begin = 0, sample_end = 0;
+	float lastval = 0.0f;
+	float val_begin = 0.0f, val_end = 0.0f;
+
 	if (_lastx > _x)
 	{
 		sample_begin = (int)((_x) * xscale);
@@ -643,7 +643,7 @@ void graphModel::convolve(const float *convolution,
 	// store values in temporary array
 	QVector<float> temp = m_samples;
 	const int graphLength = length();
-	float sum;
+	float sum = 0.0f;
 	// make a cyclic convolution
 	for ( int i = 0; i <  graphLength; i++ )
 	{

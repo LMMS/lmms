@@ -314,7 +314,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 		// the outValue of the current node). When we have nodes with linear or cubic progression
 		// the value of the end of the shape between the two nodes will be the inValue of
 		// the next node.
-		float nextValue;
+		float nextValue = 0.0f;
 		if( m_clip->progressionType() == AutomationClip::ProgressionType::Discrete )
 		{
 			nextValue = OUTVAL(it);
@@ -328,7 +328,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 		QPointF origin = QPointF(POS(it) * ppTick, 0.0f);
 		path.moveTo( origin );
 		path.moveTo(QPointF(POS(it) * ppTick,values[0]));
-		float x;
+		float x = 0.0f;
 		for (int i = POS(it) + 1; i < POS(it + 1); i++)
 		{
 			x = i * ppTick;

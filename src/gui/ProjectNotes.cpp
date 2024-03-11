@@ -108,7 +108,7 @@ void ProjectNotes::setText( const QString & _text )
 void ProjectNotes::setupActions()
 {
 	QToolBar * tb = addToolBar( tr( "Edit Actions" ) );
-	QAction * a;
+	QAction* a = nullptr;
 
 	a = new QAction( embed::getIconPixmap( "edit_undo" ), tr( "&Undo" ),
 									this );

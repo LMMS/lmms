@@ -334,7 +334,7 @@ Plate::one_cycle (int frames)
 		normal = -normal;
 		sample_t x = s[i] + normal;
 
-		sample_t xl, xr;
+		sample_t xl = 0.0f, xr = 0.0f;
 
 		PlateStub::process (x, decay, &xl, &xr);
 
@@ -426,7 +426,7 @@ Plate2x2::one_cycle (int frames)
 		normal = -normal;
 		sample_t x = (sl[i] + sr[i] + normal) * .5;
 
-		sample_t xl, xr;
+		sample_t xl = 0.0f, xr = 0.0f;
 		PlateStub::process (x, decay, &xl, &xr);
 
 		xl = blend * xl + dry * sl[i];

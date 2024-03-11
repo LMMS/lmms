@@ -113,7 +113,7 @@ MonstroSynth::MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph ) :
 
 void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 {
-	float modtmp; // temp variable for freq modulation
+	float modtmp = 0.0f; // temp variable for freq modulation
 // macros for modulating with env/lfos
 #define modulatefreq( car, mod ) \
 		modtmp = 0.0f; \
@@ -316,32 +316,32 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	// declare working variables for for loop
 
 	// phase manipulation vars - these can be reused by all oscs
-	float leftph;
-	float rightph;
-	float pd_l;
-	float pd_r;
+	float leftph = 0.0f;
+	float rightph = 0.0f;
+	float pd_l = 0.0f;
+	float pd_r = 0.0f;
 	float len_l(0.);
 	float len_r(0.);
 
 	// osc1 vars
-	float o1l_f;
-	float o1r_f;
+	float o1l_f = 0.0f;
+	float o1r_f = 0.0f;
 	float o1l_p = m_osc1l_phase + o1lpo; // we add phase offset here so we don't have to do it every frame
 	float o1r_p = m_osc1r_phase + o1rpo; // then subtract it again after loop...
-	float o1_pw;
+	float o1_pw = 0.0f;
 
 	// osc2 vars
-	float o2l_f;
-	float o2r_f;
+	float o2l_f = 0.0f;
+	float o2r_f = 0.0f;
 	float o2l_p = m_osc2l_phase + o2lpo;
 	float o2r_p = m_osc2r_phase + o2rpo;
 
 	// osc3 vars
-	float o3l_f;
-	float o3r_f;
+	float o3l_f = 0.0f;
+	float o3r_f = 0.0f;
 	float o3l_p = m_osc3l_phase + o3lpo;
 	float o3r_p = m_osc3r_phase + o3rpo;
-	float sub;
+	float sub = 0.0f;
 
 	// render modulators: envelopes, lfos
 	updateModulators( m_env[0].data(), m_env[1].data(), m_lfo[0].data(), m_lfo[1].data(), _frames );

@@ -107,10 +107,10 @@ int precomputeWindow(float *window, unsigned int length, FFTWindow type, bool no
 	if (window == nullptr) {return -1;}
 
 	float gain = 0;
-	float a0;
-	float a1;
-	float a2;
-	float a3;
+	float a0 = 0.0f;
+	float a1 = 0.0f;
+	float a2 = 0.0f;
+	float a3 = 0.0f;
 
 	// constants taken from
 	// https://en.wikipedia.org/wiki/Window_function#AList_of_window_functions

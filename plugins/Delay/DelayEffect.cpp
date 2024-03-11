@@ -115,7 +115,7 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	{
 		m_outGain = dbfsToAmp( m_delayControls.m_outGainModel.value() );
 	}
-	int sampleLength;
+	int sampleLength = 0;
 	for( fpp_t f = 0; f < frames; ++f )
 	{
 		dryS[0] = buf[f][0];

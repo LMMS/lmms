@@ -88,7 +88,7 @@ void LadspaControlDialog::updateEffectView( LadspaControls * _ctl )
 		int col = 0;
 		BufferDataType last_port = BufferDataType::None;
 
-		QGroupBox * grouper;
+		QGroupBox* grouper = nullptr;
 		if( _ctl->m_processors > 1 )
 		{
 			grouper = new QGroupBox( tr( "Channel " ) +

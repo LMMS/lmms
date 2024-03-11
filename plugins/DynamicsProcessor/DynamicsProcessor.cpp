@@ -106,7 +106,7 @@ bool DynProcEffect::processAudioBuffer( sampleFrame * _buf,
 	int i = 0;
 
 	auto sm_peak = std::array{0.0f, 0.0f};
-	float gain;
+	float gain = 0.0f;
 
 	double out_sum = 0.0;
 	const float d = dryLevel();

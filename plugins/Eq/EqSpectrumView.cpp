@@ -228,7 +228,7 @@ void EqSpectrumView::paintEvent(QPaintEvent *event)
 	//Now we calculate the path
 	m_path = QPainterPath();
 	float *bands = m_analyser->m_bands;
-	float peak;
+	float peak = 0.0f;
 	m_path.moveTo( 0, height() );
 	m_peakSum = 0;
 	const float fallOff = 1.07;

@@ -99,7 +99,7 @@ AudioOss::AudioOss( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	// do not inherit it
 	fcntl( m_audioFD, F_SETFD, fcntl( m_audioFD, F_GETFD ) | FD_CLOEXEC );
 
-	int frag_spec;
+	int frag_spec = 0;
 	for( frag_spec = 0; static_cast<int>( 0x01 << frag_spec ) <
 		audioEngine()->framesPerPeriod() * channels() *
 							BYTES_PER_INT_SAMPLE;
@@ -115,7 +115,7 @@ AudioOss::AudioOss( bool & _success_ful, AudioEngine*  _audioEngine ) :
 		printf( "Warning: Couldn't set audio fragment size\n" );
 	}
 
-	unsigned int value;
+	unsigned int value = 0;
 	// Get a list of supported hardware formats
 	if ( ioctl( m_audioFD, SNDCTL_DSP_GETFMTS, &value ) < 0 )
 	{

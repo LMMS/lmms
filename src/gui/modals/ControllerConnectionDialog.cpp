@@ -299,7 +299,7 @@ void ControllerConnectionDialog::selectController()
 	{
 		if( m_midiControllerSpinBox->model()->value() > 0 )
 		{
-			MidiController * mc;
+			MidiController* mc = nullptr;
 			mc = m_midiController->copyToMidiController( Engine::getSong() );
 	
 			/*

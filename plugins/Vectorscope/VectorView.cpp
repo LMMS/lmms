@@ -138,8 +138,8 @@ void VectorView::paintEvent(QPaintEvent *event)
 	std::size_t frameCount = inBuffer.size();
 
 	// Draw new points on top
-	float left, right;
-	int x, y;
+	float left = 0.0f, right = 0.0f;
+	int x = 0, y = 0;
 
 	const bool logScale = m_controls->m_logarithmicModel.value();
 	const unsigned short activeSize = hq ? m_displaySize : m_displaySize / 2;

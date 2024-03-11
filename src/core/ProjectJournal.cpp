@@ -131,7 +131,7 @@ void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
 
 jo_id_t ProjectJournal::allocID( JournallingObject * _obj )
 {
-	jo_id_t id;
+	jo_id_t id = 0;
 	for( jo_id_t tid = rand(); m_joIDs.contains( id = tid % EO_ID_MSB
 							| EO_ID_MSB ); tid++ )
 	{

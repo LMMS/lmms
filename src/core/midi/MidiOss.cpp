@@ -99,7 +99,7 @@ void MidiOss::run()
 {
 	while( m_quit == false && m_midiDev.isOpen() )
 	{
-		char c;
+		char c = 0;
 		if( !m_midiDev.getChar( &c ) )
 		{
 			continue;

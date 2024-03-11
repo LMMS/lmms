@@ -69,16 +69,19 @@ float mem_t=1.0f, mem_o=1.0f, mem_n=1.0f, mem_b=1.0f, mem_tune=1.0f, mem_time=1.
 
 int DrumSynth::LongestEnv()
 {
-  long e, eon, p;
-  float l=0.f;
+	long e = 0, eon = 0, p = 0;
+	float l = 0.f;
 
-  for(e=1; e<7; e++) //3
-  {
-    eon = e - 1; if(eon>2) eon=eon-1;
-    p = 0;
-    while (envpts[e][0][p + 1] >= 0.f) p++;
-    envData[e][MAX] = envpts[e][0][p] * timestretch;
-    if(chkOn[eon]==1) if(envData[e][MAX]>l) l=envData[e][MAX];
+	for (e = 1; e < 7; e++) // 3
+	{
+		eon = e - 1;
+		if (eon > 2) eon = eon - 1;
+		p = 0;
+		while (envpts[e][0][p + 1] >= 0.f)
+			p++;
+		envData[e][MAX] = envpts[e][0][p] * timestretch;
+		if (chkOn[eon] == 1)
+			if (envData[e][MAX] > l) l = envData[e][MAX];
   }
   //l *= timestretch;
 
@@ -102,16 +105,16 @@ float DrumSynth::LoudestEnv()
 
 void DrumSynth::UpdateEnv(int e, long t)
 {
-  float endEnv, dT;
-                                                             //0.2's added
-  envData[e][NEXTT] = envpts[e][0][(long)(envData[e][PNT] + 1.f)] * timestretch; //get next point
-  if(envData[e][NEXTT] < 0) envData[e][NEXTT] = 442000 * timestretch; //if end point, hold
-  envData[e][ENV] = envpts[e][1][(long)(envData[e][PNT] + 0.f)] * 0.01f; //this level
-  endEnv = envpts[e][1][(long)(envData[e][PNT] + 1.f)] * 0.01f;          //next level
-  dT = envData[e][NEXTT] - (float)t;
-  if(dT < 1.0) dT = 1.0;
-  envData[e][dENV] = (endEnv - envData[e][ENV]) / dT;
-  envData[e][PNT] = envData[e][PNT] + 1.0f;
+	float endEnv = 0.0f, dT = 0.0f;
+	// 0.2's added
+	envData[e][NEXTT] = envpts[e][0][(long)(envData[e][PNT] + 1.f)] * timestretch; // get next point
+	if (envData[e][NEXTT] < 0) envData[e][NEXTT] = 442000 * timestretch;		   // if end point, hold
+	envData[e][ENV] = envpts[e][1][(long)(envData[e][PNT] + 0.f)] * 0.01f;		   // this level
+	endEnv = envpts[e][1][(long)(envData[e][PNT] + 1.f)] * 0.01f;				   // next level
+	dT = envData[e][NEXTT] - (float)t;
+	if (dT < 1.0) dT = 1.0;
+	envData[e][dENV] = (endEnv - envData[e][ENV]) / dT;
+	envData[e][PNT] = envData[e][PNT] + 1.0f;
 }
 
 
@@ -149,18 +152,26 @@ void DrumSynth::GetEnv(int env, const char *sec, const char *key, QString ini)
 
 float DrumSynth::waveform(float ph, int form)
 {
-  float w;
+	float w = 0.0f;
 
-  switch (form)
-  {
-     case 0: w = (float)sin(fmod(ph,TwoPi));                            break; //sine
-     case 1: w = (float)fabs(2.0f*(float)sin(fmod(0.5f*ph,TwoPi)))-1.f; break; //sine^2
-     case 2: while(ph<TwoPi) ph+=TwoPi;
-             w = 0.6366197f * (float)fmod(ph,TwoPi) - 1.f;                     //tri
-             if(w>1.f) w=2.f-w;
-             break;
-     case 3: w = ph - TwoPi * (float)(int)(ph / TwoPi);                        //saw
-             w = (0.3183098f * w) - 1.f;                                break;
+	switch (form)
+	{
+	case 0:
+		w = (float)sin(fmod(ph, TwoPi));
+		break; // sine
+	case 1:
+		w = (float)fabs(2.0f * (float)sin(fmod(0.5f * ph, TwoPi))) - 1.f;
+		break; // sine^2
+	case 2:
+		while (ph < TwoPi)
+			ph += TwoPi;
+		w = 0.6366197f * (float)fmod(ph, TwoPi) - 1.f; // tri
+		if (w > 1.f) w = 2.f - w;
+		break;
+	case 3:
+		w = ph - TwoPi * (float)(int)(ph / TwoPi); // saw
+		w = (0.3183098f * w) - 1.f;
+		break;
     default: w = (sin(fmod(ph,TwoPi))>0.0)? 1.f: -1.f;                  break; //square
   }
 
@@ -172,9 +183,9 @@ int DrumSynth::GetPrivateProfileString(const char *sec, const char *key, const c
 {
     stringstream is;
     bool inSection = false;
-    char *line;
-    char *k, *b;
-    int len = 0;
+	char* line = nullptr;
+	char *k = nullptr, *b = nullptr;
+	int len = 0;
 
     line = (char*)malloc(200);
 
@@ -271,29 +282,29 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t *&wave, int channels, sa
   int commentLen=0;
 
   //generation
-  long  Length, tpos=0, tplus, totmp, t, i, j;
+  long Length = 0, tpos = 0, tplus = 0, totmp = 0, t = 0, i = 0, j = 0;
   float x[3] = {0.f, 0.f, 0.f};
-  float MasterTune;
+  float MasterTune = 0.0f;
   constexpr float randmax = 1.f / static_cast<float>(RAND_MAX);
   constexpr float randmax2 = 2.f / static_cast<float>(RAND_MAX);
-  int   MainFilter, HighPass;
+  int MainFilter = 0, HighPass = 0;
 
-  long  NON, NT, TON, DiON, TDroop=0, DStep;
-  float a, b=0.f, c=0.f, d=0.f, g, TT=0.f, TL, NL, F1, F2;
-  float TphiStart=0.f, Tphi, TDroopRate, ddF, DAtten, DGain;
+  long NON = 0, NT = 0, TON = 0, DiON = 0, TDroop = 0, DStep = 0;
+  float a = 0.0f, b = 0.f, c = 0.f, d = 0.f, g = 0.0f, TT = 0.f, TL = 0.0f, NL = 0.0f, F1 = 0.0f, F2 = 0.0f;
+  float TphiStart = 0.f, Tphi = 0.0f, TDroopRate = 0.0f, ddF = 0.0f, DAtten = 0.0f, DGain = 0.0f;
 
-  long  BON, BON2, BFStep, BFStep2, botmp;
-  float BdF=0.f, BdF2=0.f, BPhi, BPhi2, BF, BF2, BQ, BQ2, BL, BL2;
+  long BON = 0, BON2 = 0, BFStep = 0, BFStep2 = 0, botmp = 0;
+  float BdF = 0.f, BdF2 = 0.f, BPhi = 0.0f, BPhi2 = 0.0f, BF = 0.0f, BF2 = 0.0f, BQ = 0.0f, BQ2 = 0.0f, BL = 0.0f, BL2 = 0.0f;
 
-  long  OON, OF1Sync=0, OF2Sync=0, OMode, OW1, OW2;
-  float Ophi1, Ophi2, OF1, OF2, OL, Ot=0 /*PG: init */, OBal1, OBal2, ODrive;
-  float Ocf1, Ocf2, OcF, OcQ, OcA, Oc[6][2];  //overtone cymbal mode
+  long OON = 0, OF1Sync = 0, OF2Sync = 0, OMode = 0, OW1 = 0, OW2 = 0;
+  float Ophi1 = 0.0f, Ophi2 = 0.0f, OF1 = 0.0f, OF2 = 0.0f, OL = 0.0f, Ot = 0 /*PG: init */, OBal1 = 0.0f, OBal2 = 0.0f,
+		ODrive = 0.0f;
+  float Ocf1 = 0.0f, Ocf2 = 0.0f, OcF = 0.0f, OcQ = 0.0f, OcA = 0.0f, Oc[6][2]; // overtone cymbal mode
   float Oc0=0.0f, Oc1=0.0f, Oc2=0.0f;
 
-  float MFfb, MFtmp, MFres, MFin=0.f, MFout=0.f;
-  float DownAve;
-  long  DownStart, DownEnd, jj;
-
+  float MFfb = 0.0f, MFtmp = 0.0f, MFres = 0.0f, MFin = 0.f, MFout = 0.f;
+  float DownAve = 0.0f;
+  long DownStart = 0, DownEnd = 0, jj = 0;
 
   if(wavemode==0) //semi-real-time adjustments if working in memory!!
   {

@@ -198,8 +198,8 @@ void Fader::mousePressEvent( QMouseEvent* mouseEvent )
 
 void Fader::mouseDoubleClickEvent( QMouseEvent* mouseEvent )
 {
-	bool ok;
-	float newValue;
+	bool ok = false;
+	float newValue = 0.0f;
 	// TODO: dbV handling
 	newValue = QInputDialog::getDouble( this, tr( "Set value" ),
 				tr( "Please enter a new value between %1 and %2:" ).

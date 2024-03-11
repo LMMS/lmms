@@ -256,7 +256,7 @@ void Xpressive::smooth(float smoothness,const graphModel * in,graphModel * out)
 		auto const guassian = new float[guass_size];
 		float sum = 0.0f;
 		float temp = 0.0f;
-		int i;
+		int i = 0;
 		for (i = 0; i < guass_size; i++ )
 		{
 			temp = (i - guass_center) / delta;
@@ -336,12 +336,12 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("wavegraph"));
 	m_graph->setPalette(pal);
 
-	PixmapButton * m_w1Btn;
-	PixmapButton * m_w2Btn;
-	PixmapButton * m_w3Btn;
-	PixmapButton * m_o1Btn;
-	PixmapButton * m_o2Btn;
-	PixmapButton * m_helpBtn;
+	PixmapButton* m_w1Btn = nullptr;
+	PixmapButton* m_w2Btn = nullptr;
+	PixmapButton* m_w3Btn = nullptr;
+	PixmapButton* m_o1Btn = nullptr;
+	PixmapButton* m_o2Btn = nullptr;
+	PixmapButton* m_helpBtn = nullptr;
 
 	m_w1Btn = new PixmapButton(this, nullptr);
 	m_w1Btn->move(3, ROW_BTN);
@@ -561,7 +561,7 @@ void XpressiveView::expressionChanged() {
 		ExprFront expr(text.constData(),sample_rate);
 		float t=0;
 		const float f=10,key=5,v=0.5;
-		unsigned int i;
+		unsigned int i = 0;
 		expr.add_variable("t", t);
 
 		if (m_output_expr)

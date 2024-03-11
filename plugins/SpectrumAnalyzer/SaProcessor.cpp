@@ -209,7 +209,7 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 					memset(pixel, 0, waterfallWidth() * sizeof (QRgb));
 
 					// add newest result on top
-					int target;		// pixel being constructed
+					int target = 0; // pixel being constructed
 					float accL = 0;	// accumulators for merging multiple bins
 					float accR = 0;
 					for (unsigned int i = 0; i < binCount(); i++)
@@ -362,8 +362,8 @@ void SaProcessor::setWaterfallActive(bool active)
 void SaProcessor::reallocateBuffers()
 {
 	unsigned int new_size_index = m_controls->m_blockSizeModel.value();
-	unsigned int new_in_size, new_fft_size;
-	unsigned int new_bins;
+	unsigned int new_in_size = 0, new_fft_size = 0;
+	unsigned int new_bins = 0;
 
 	// get new block sizes and bin count based on selected index
 	if (new_size_index < FFT_BLOCK_SIZES.size())

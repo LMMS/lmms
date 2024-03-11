@@ -156,7 +156,7 @@ bool AudioFileOgg::startEncoding()
 	ogg_packet header_main;
 	ogg_packet header_comments;
 	ogg_packet header_codebooks;
-	int result;
+	int result = 0;
 
 	// Build the packets
 	vorbis_analysis_headerout( &m_vd, m_comments, &header_main,

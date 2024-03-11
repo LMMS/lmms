@@ -129,7 +129,7 @@ lv2_evbuf_next(LV2_Evbuf_Iterator iter)
 
 	LV2_Evbuf* evbuf  = iter.evbuf;
 	uint32_t   offset = iter.offset;
-	uint32_t   size;
+	uint32_t size = 0;
 	size = ((LV2_Atom_Event*)
 		((char*)LV2_ATOM_CONTENTS(LV2_Atom_Sequence, &evbuf->buf.atom)
 		+ offset))->body.size;

@@ -39,7 +39,7 @@ AudioDevice::AudioDevice( const ch_cnt_t _channels, AudioEngine*  _audioEngine )
 	m_audioEngine( _audioEngine ),
 	m_buffer( new surroundSampleFrame[audioEngine()->framesPerPeriod()] )
 {
-	int error;
+	int error = 0;
 	if( ( m_srcState = src_new(
 		audioEngine()->currentQualitySettings().libsrcInterpolation(),
 				SURROUND_CHANNELS, &error ) ) == nullptr )
@@ -146,7 +146,7 @@ void AudioDevice::applyQualitySettings()
 {
 	src_delete( m_srcState );
 
-	int error;
+	int error = 0;
 	if( ( m_srcState = src_new(
 		audioEngine()->currentQualitySettings().libsrcInterpolation(),
 				SURROUND_CHANNELS, &error ) ) == nullptr )
@@ -195,7 +195,7 @@ fpp_t AudioDevice::resample( const surroundSampleFrame * _src,
 	m_srcData.data_out = _dst[0].data ();
 	m_srcData.src_ratio = (double) _dst_sr / _src_sr;
 	m_srcData.end_of_input = 0;
-	int error;
+	int error = 0;
 	if( ( error = src_process( m_srcState, &m_srcData ) ) )
 	{
 		printf( "AudioDevice::resample(): error while resampling: %s\n",
@@ -213,7 +213,7 @@ int AudioDevice::convertToS16( const surroundSampleFrame * _ab,
 {
 	if( _convert_endian )
 	{
-		int_sample_t temp;
+		int_sample_t temp = 0;
 		for( fpp_t frame = 0; frame < _frames; ++frame )
 		{
 			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )

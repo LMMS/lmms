@@ -49,7 +49,7 @@ QDataStream& operator<< ( QDataStream &out, WaveMipMap &waveMipMap )
 
 QDataStream& operator>> ( QDataStream &in, WaveMipMap &waveMipMap )
 {
-	sample_t sample;
+	sample_t sample = 0.0f;
 	for( int tbl = 0; tbl <= MAXTBL; tbl++ )
 	{
 		for( int i = 0; i < TLENS[tbl]; i++ )
@@ -67,9 +67,9 @@ void BandLimitedWave::generateWaves()
 // don't generate if they already exist
 	if( s_wavesGenerated ) return;
 
-	int i;
+	int i = 0;
 
-// set wavetable directory
+	// set wavetable directory
 	s_wavetableDir = "data:wavetables/";
 
 // set wavetable files
@@ -99,7 +99,7 @@ void BandLimitedWave::generateWaves()
 			{
 				int harm = 1;
 				double s = 0.0f;
-				double hlen;
+				double hlen = 0.0;
 				do
 				{
 					hlen = static_cast<double>( len ) / static_cast<double>( harm );
@@ -141,7 +141,7 @@ void BandLimitedWave::generateWaves()
 			{
 				int harm = 1;
 				double s = 0.0f;
-				double hlen;
+				double hlen = 0.0;
 				do
 				{
 					hlen = static_cast<double>( len ) / static_cast<double>( harm );
@@ -182,7 +182,7 @@ void BandLimitedWave::generateWaves()
 			{
 				int harm = 1;
 				double s = 0.0f;
-				double hlen;
+				double hlen = 0.0;
 				do
 				{
 					hlen = static_cast<double>( len ) / static_cast<double>( harm );

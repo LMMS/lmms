@@ -90,7 +90,7 @@ Scape::one_cycle (int frames)
 		if (period <= 1)
 		{
 			period = t2 * .5;
-			float f, q;
+			float f = 0.0f, q = 0.0f;
 
 			f = frandom2();
 			svf[0].set_f_Q (300 + 300 * f / fs, .3);
@@ -130,7 +130,7 @@ Scape::one_cycle (int frames)
 			x1 = hipass[1].process (x1);
 			x2 = hipass[2].process (x2);
 
-			sample_t x1l, x1r, x2l, x2r;
+			sample_t x1l = 0.0f, x1r = 0.0f, x2l = 0.0f, x2r = 0.0f;
 			x1l = fabs (lfo[0].get());
 			x1r = 1 - x1l;
 			x2r = fabs (lfo[1].get());

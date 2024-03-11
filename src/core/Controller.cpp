@@ -220,7 +220,7 @@ Controller * Controller::create( ControllerType _ct, Model * _parent )
 
 Controller * Controller::create( const QDomElement & _this, Model * _parent )
 {
-	Controller * c;
+	Controller* c = nullptr;
 	if( static_cast<ControllerType>(_this.attribute( "type" ).toInt()) == ControllerType::Peak )
 	{
 		c = PeakController::getControllerBySetting( _this );

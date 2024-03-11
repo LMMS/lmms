@@ -772,7 +772,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 			}
 		}
 
-		Note * cur_note;
+		Note* cur_note = nullptr;
 		while( nit != notes.end() &&
 					( cur_note = *nit )->pos() == cur_start )
 		{

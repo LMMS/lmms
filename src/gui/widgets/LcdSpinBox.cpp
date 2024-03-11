@@ -152,8 +152,8 @@ void LcdSpinBox::mouseDoubleClickEvent( QMouseEvent * )
 
 void LcdSpinBox::enterValue()
 {
-	bool ok;
-	int new_val;
+	bool ok = false;
+	int new_val = 0;
 
 	new_val = QInputDialog::getInt(
 			this, tr( "Set value" ),

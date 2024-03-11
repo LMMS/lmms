@@ -143,7 +143,7 @@ bool LinkedModelGroup::containsModel(const QString &name) const
 void LinkedModelGroups::linkAllModels()
 {
 	LinkedModelGroup* first = getGroup(0);
-	LinkedModelGroup* cur;
+	LinkedModelGroup* cur = nullptr;
 
 	for (std::size_t i = 1; (cur = getGroup(i)); ++i)
 	{
@@ -172,7 +172,7 @@ void LinkedModelGroups::saveSettings(QDomDocument& doc, QDomElement& that)
 void LinkedModelGroups::loadSettings(const QDomElement& that)
 {
 	QDomElement models = that.firstChildElement("models");
-	LinkedModelGroup* grp0;
+	LinkedModelGroup* grp0 = nullptr;
 	if (!models.isNull() && (grp0 = getGroup(0)))
 	{
 		// only load the first group, the others are linked to the first

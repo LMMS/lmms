@@ -128,17 +128,17 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 	bool ch4EnvLoop = m_parent->m_ch4EnvLooped.value();
 	
 	// processing variables for operators
-	int ch1;
-	int ch2;
-	int ch3;
-	int ch4;
-	
+	int ch1 = 0;
+	int ch2 = 0;
+	int ch3 = 0;
+	int ch4 = 0;
+
 	// levels for generators (used for dc offset compensation)
-	int ch1Level;
-	int ch2Level;
-	int ch3Level;
-	int ch4Level;
-	
+	int ch1Level = 0;
+	int ch2Level = 0;
+	int ch3Level = 0;
+	int ch4Level = 0;
+
 	int ch1SweepRate = wavelength( floorf( 120.0 / ( m_parent->m_ch1SweepRate.value() + 1 ) ) );
 	int ch2SweepRate = wavelength( floorf( 120.0 / ( m_parent->m_ch2SweepRate.value() + 1 ) ) );
 	int ch4SweepRate = wavelength( floorf( 60.0f / ( 8.0f - qAbs( m_parent->m_ch4Sweep.value() ) ) ) );

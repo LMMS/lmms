@@ -382,8 +382,8 @@ void FloatModelEditorBase::setPosition(const QPoint & p)
 
 void FloatModelEditorBase::enterValue()
 {
-	bool ok;
-	float new_val;
+	bool ok = false;
+	float new_val = 0.0f;
 
 	if (isVolumeKnob() &&
 		ConfigManager::inst()->value("app", "displaydbfs").toInt())

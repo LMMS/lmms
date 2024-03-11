@@ -90,7 +90,7 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 	speedRatio *= pitchRatio;
 	speedRatio *= Engine::audioEngine()->processingSampleRate() / static_cast<float>(m_originalSample.sampleRate());
 
-	float sliceStart, sliceEnd;
+	float sliceStart = 0.0f, sliceEnd = 0.0f;
 	if (noteIndex == 0) // full sample at base note
 	{
 		sliceStart = 0;
@@ -200,7 +200,7 @@ void SlicerT::findSlices()
 	int lastPoint = -minDist - 1; // to always store 0 first
 	float spectralFlux = 0;
 	float prevFlux = 1E-10; // small value, no divison by zero
-	float real, imag, magnitude, diff;
+	float real = 0.0f, imag = 0.0f, magnitude = 0.0f, diff = 0.0f;
 
 	for (int i = 0; i < singleChannel.size() - windowSize; i += windowSize)
 	{
