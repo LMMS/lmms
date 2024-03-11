@@ -208,10 +208,10 @@ EqSpectrumView::EqSpectrumView(EqAnalyser *b, QWidget *_parent) :
 
 void EqSpectrumView::paintEvent(QPaintEvent *event)
 {
-	const float energy =  m_analyser->getEnergy();
-	if( energy <= 0 && m_peakSum <= 0 )
+	const float energy = m_analyser->getEnergy();
+	if (energy <= 0.)
 	{		
-		//dont draw anything
+		// If there is no energy in the signal we don't need to draw anything
 		return;
 	}
 
@@ -238,7 +238,8 @@ void EqSpectrumView::paintEvent(QPaintEvent *event)
 	const float fallOff = 1.07;
 	for( int x = 0; x < MAX_BANDS; ++x, ++bands )
 	{
-		peak = ( fh * 2.0 / 3.0 * ( 20 * ( log10( *bands / energy ) ) - LOWER_Y ) / ( - LOWER_Y ) );
+		peak = *bands != 0. ? (fh * 2.0 / 3.0 * (20. * log10(*bands / energy) - LOWER_Y) / (-LOWER_Y)) : 0.;
+
 		if( peak < 0 )
 		{
 			peak = 0;

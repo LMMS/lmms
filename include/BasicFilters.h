@@ -144,7 +144,12 @@ template<ch_cnt_t CHANNELS>
 class BiQuad
 {
 public:
-	BiQuad() 
+	BiQuad() :
+		m_a1(0.),
+		m_a2(0.),
+		m_b0(0.),
+		m_b1(0.),
+		m_b2(0.)
 	{
 		clearHistory();
 	}
