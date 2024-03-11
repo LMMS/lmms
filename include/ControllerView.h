@@ -66,8 +66,12 @@ public slots:
 	void deleteController();
 	void closeControls();
 	void renameController();
+	void moveUp();
+	void moveDown();
 
 signals:
+	void moveUp(lmms::gui::ControllerView* _plugin);
+	void moveDown(lmms::gui::ControllerView* _plugin);
 	void deleteController( lmms::gui::ControllerView * _view );
 
 

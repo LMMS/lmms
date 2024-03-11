@@ -53,6 +53,7 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 {
 	this->setFrameStyle( QFrame::StyledPanel );
 	this->setFrameShadow( QFrame::Raised );
+	this->setFocusPolicy(Qt::StrongFocus);
 
 	auto vBoxLayout = new QVBoxLayout(this);
 
@@ -132,6 +133,9 @@ void ControllerView::closeControls()
 	m_show = true;
 }
 
+void ControllerView::moveUp() { emit moveUp(this); }
+
+void ControllerView::moveDown() { emit moveDown(this); }
 
 void ControllerView::deleteController()
 {
@@ -173,7 +177,11 @@ void ControllerView::modelChanged()
 
 void ControllerView::contextMenuEvent( QContextMenuEvent * )
 {
-	QPointer<CaptionMenu> contextMenu = new CaptionMenu( model()->displayName(), this );
+	Controller* c = castModel<Controller>();
+	QPointer<CaptionMenu> contextMenu = new CaptionMenu(c->name(), this);
+	contextMenu->addAction(embed::getIconPixmap("arp_up"), tr("Move &up"), this, SLOT(moveUp()));
+	contextMenu->addAction(embed::getIconPixmap("arp_down"), tr("Move &down"), this, SLOT(moveDown()));
+	contextMenu->addSeparator();
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
 						tr( "&Remove this controller" ),
 						this, SLOT(deleteController()));
