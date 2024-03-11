@@ -443,15 +443,11 @@ QString FloatModelEditorBase::displayValue() const
 		ConfigManager::inst()->value("app", "displaydbfs").toInt())
 	{
 		auto const valueToVolumeRatio = model()->getRoundedValue() / volumeRatio();
-		if (valueToVolumeRatio == 0.)
-		{
-			return m_description.trimmed() + QString(" -∞ dBFS");
-		}
-		else
-		{
-			return m_description.trimmed() + QString(" %1 dBFS").
-				arg(ampToDbfs(valueToVolumeRatio), 3, 'f', 2);
-		}
+		return m_description.trimmed() + (
+			valueToVolumeRatio == 0.
+			? QString(" -∞ dBFS")
+			: QString(" %1 dBFS").arg(ampToDbfs(valueToVolumeRatio), 3, 'f', 2)
+		);
 	}
 
 	return m_description.trimmed() + QString(" %1").
