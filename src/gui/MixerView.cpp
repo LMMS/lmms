@@ -603,10 +603,6 @@ void MixerView::updateFaders()
 {
 	Mixer * m = getMixer();
 
-	// apply master gain
-	m->mixerChannel(0)->m_peakLeft *= Engine::audioEngine()->masterGain();
-	m->mixerChannel(0)->m_peakRight *= Engine::audioEngine()->masterGain();
-
 	for (int i = 0; i < m_mixerChannelViews.size(); ++i)
 	{
 		const float opl = m_mixerChannelViews[i]->m_fader->getPeak_L();

@@ -298,15 +298,11 @@ int AudioPortAudio::process_callback(
 		const int min_len = std::min(static_cast<int>(_framesPerBuffer),
 			m_outBufSize - m_outBufPos);
 
-		float master_gain = audioEngine()->masterGain();
-
 		for( fpp_t frame = 0; frame < min_len; ++frame )
 		{
 			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 			{
-				( _outputBuffer + frame * channels() )[chnl] =
-						AudioEngine::clip( m_outBuf[frame][chnl] *
-						master_gain );
+				(_outputBuffer + frame * channels())[chnl] = AudioEngine::clip(m_outBuf[frame][chnl]);
 			}
 		}
 
