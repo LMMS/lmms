@@ -169,10 +169,10 @@ void ControllerRackView::onControllerAdded( Controller * controller )
 
 	auto controllerView = new ControllerView(controller, scrollAreaWidget);
 
-	connect(controllerView, SIGNAL(moveUp(ControllerView* )), this, 
-		SLOT(moveUp(ControllerView* )), Qt::QueuedConnection);
-	connect(controllerView, SIGNAL(moveDown(ControllerView* )), this, 
-		SLOT(moveDown(ControllerView* )), Qt::QueuedConnection);
+	connect(controllerView, SIGNAL(moveUp(lmms::gui::ControllerView* )), this, 
+		SLOT(moveUp(lmms::gui::ControllerView* )), Qt::QueuedConnection);
+	connect(controllerView, SIGNAL(moveDown(lmms::gui::ControllerView* )), this, 
+		SLOT(moveDown(lmms::gui::ControllerView* )), Qt::QueuedConnection);
 	connect( controllerView, SIGNAL(deleteController(lmms::gui::ControllerView*)),
 		 this, SLOT(deleteController(lmms::gui::ControllerView*)), Qt::QueuedConnection );
 
