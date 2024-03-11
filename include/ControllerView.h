@@ -70,8 +70,8 @@ public slots:
 	void moveDown();
 
 signals:
-	void moveUp(lmms::gui::ControllerView* _plugin);
-	void moveDown(lmms::gui::ControllerView* _plugin);
+	void moveUp(lmms::gui::ControllerView* _view);
+	void moveDown(lmms::gui::ControllerView* _view);
 	void deleteController( lmms::gui::ControllerView * _view );
 
 
