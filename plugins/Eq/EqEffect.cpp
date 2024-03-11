@@ -302,7 +302,7 @@ float EqEffect::peakBand( float minF, float maxF, EqAnalyser *fft, int sr )
 	{
 		if( bandToFreq( x ,sr) >= minF && bandToFreq( x,sr ) <= maxF )
 		{
-			h = 20 * ( log10( *b / fftEnergy ) );
+			h = 20. * ( log10( *b / fftEnergy ) );
 			peak = h > peak ? h : peak;
 		}
 	}
