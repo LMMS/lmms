@@ -186,6 +186,7 @@ namespace gui
 EqSpectrumView::EqSpectrumView(EqAnalyser *b, QWidget *_parent) :
 	QWidget( _parent ),
 	m_analyser( b ),
+	m_peakSum(0.),
 	m_periodicalUpdate( false )
 {
 	setFixedSize( 450, 200 );
