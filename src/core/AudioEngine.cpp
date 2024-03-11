@@ -434,7 +434,7 @@ void AudioEngine::renderStageMix()
 	Mixer *mixer = Engine::mixer();
 	mixer->masterMix(m_outputBufferWrite);
 
-	MixHelpers::multiply(m_outputBufferWrite, masterGain(), m_framesPerPeriod);
+	MixHelpers::multiply(m_outputBufferWrite, m_masterGain, m_framesPerPeriod);
 
 	emit nextAudioBuffer(m_outputBufferRead);
 

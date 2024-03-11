@@ -284,7 +284,7 @@ void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 			m_convertedBufSize = frames * channels()
 						* sizeof( int_sample_t );
 
-			convertToS16(m_outBuf, frames, (int_sample_t*)m_convertedBuf, m_outConvertEndian);
+			convertToS16(m_outBuf, frames, static_cast<int_sample_t*>(m_convertedBuf), m_outConvertEndian);
 		}
 		const int min_len = std::min(_len, m_convertedBufSize
 							- m_convertedBufPos);
