@@ -135,26 +135,23 @@ void ControllerRackView::deleteController( ControllerView * _view )
 
 void ControllerRackView::moveUp(ControllerView* view)
 {
-	if (view != m_controllerViews.first())
+	// cannot delete the first module
+	if (view == m_controllerViews.first()) { return; }
+	
+	int i = 0;
+	for (auto it = m_controllerViews.begin(); it != m_controllerViews.end(); ++it, ++i)
 	{
-		int i = 0;
-		for (QVector<ControllerView *>::Iterator it = m_controllerViews.begin();
-					it != m_controllerViews.end(); it++, i++)
-		{
-			if (*it == view) { break; }
-		}
-
-		ControllerView* temp = m_controllerViews[i - 1];
-
-		m_controllerViews[i - 1] = view;
-		m_controllerViews[i] = temp;
-
-		m_scrollAreaLayout->removeWidget(view);
-		m_scrollAreaLayout->insertWidget(i - 1, view);
+		if (*it == view) { break; }
 	}
+	ControllerView* temp = m_controllerViews[i - 1];
+	m_controllerViews[i - 1] = view;
+	m_controllerViews[i] = temp;
+
+	m_scrollAreaLayout->removeWidget(view);
+	m_scrollAreaLayout->insertWidget(i - 1, view);
 }
 
-void ControllerRackView::moveDown( ControllerView* view )
+void ControllerRackView::moveDown(ControllerView* view)
 {
 	if(view != m_controllerViews.last())
 	{
