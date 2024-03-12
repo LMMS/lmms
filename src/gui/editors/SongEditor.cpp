@@ -100,7 +100,7 @@ SongEditor::SongEditor( Song * song ) :
 	m_timeLine = new TimeLineWidget(m_trackHeadWidth, 32, pixelsPerBar(),
 		m_song->getPlayPos(Song::PlayMode::Song),
 		m_song->getTimeline(Song::PlayMode::Song),
-		m_currentPosition, Song::PlayMode::Song, this
+		m_currentPosition, Song::PlayMode::Song, true, this
 	);
 	connect(this, &TrackContainerView::positionChanged, m_timeLine, &TimeLineWidget::updatePosition);
 	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos& ) ),
@@ -127,8 +127,11 @@ SongEditor::SongEditor( Song * song ) :
 	// Ensure loop markers snap to same increments as clips. Zoom & proportional
 	// snap changes are handled in zoomingChanged() and toggleProportionalSnap()
 	connect(m_snappingModel, &ComboBoxModel::dataChanged,
-		[this]() { m_timeLine->setSnapSize(getSnapSize()); });
+		[this]() { m_timeLine->setSnapSize(getSnapSize() * TimePos::ticksPerBar()); });
 
+	// Ensure snap size updates when bar length changes
+	connect(m_song, &Song::timeSignatureChanged,
+		[this]() { m_timeLine->setSnapSize(getSnapSize() * TimePos::ticksPerBar()); });
 
 	// add some essential widgets to global tool-bar
 	QWidget * tb = getGUI()->mainWindow()->toolBar();
@@ -275,6 +278,7 @@ SongEditor::SongEditor( Song * song ) :
 		}
 	}
 	m_snappingModel->setInitValue( m_snappingModel->findText( "1 Bar" ) );
+	m_timeLine->setSnapSize(getSnapSize() * TimePos::ticksPerBar());
 
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
@@ -470,7 +474,7 @@ void SongEditor::setEditModeSelect()
 void SongEditor::toggleProportionalSnap()
 {
 	m_proportionalSnap = !m_proportionalSnap;
-	m_timeLine->setSnapSize(getSnapSize());
+	m_timeLine->setSnapSize(getSnapSize() * TimePos::ticksPerBar());
 }
 
 
@@ -872,7 +876,7 @@ void SongEditor::zoomingChanged()
 	m_timeLine->setPixelsPerBar(ppb);
 	realignTracks();
 	updateRubberband();
-	m_timeLine->setSnapSize(getSnapSize());
+	m_timeLine->setSnapSize(getSnapSize() * TimePos::ticksPerBar());
 
 	emit pixelsPerBarChanged(ppb);
 }

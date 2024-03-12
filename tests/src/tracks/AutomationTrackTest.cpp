@@ -61,8 +61,8 @@ private slots:
 
 		AutomationClip c(nullptr);
 		c.setProgressionType(AutomationClip::ProgressionType::Linear);
-		c.putValue(0, 0.0, false);
-		c.putValue(100, 1.0, false);
+		c.putValue(0, 0.0);
+		c.putValue(100, 1.0);
 
 		QCOMPARE(c.valueAt(0), 0.0f);
 		QCOMPARE(c.valueAt(25), 0.25f);
@@ -78,8 +78,8 @@ private slots:
 
 		AutomationClip c(nullptr);
 		c.setProgressionType(AutomationClip::ProgressionType::Discrete);
-		c.putValue(0, 0.0, false);
-		c.putValue(100, 1.0, false);
+		c.putValue(0, 0.0);
+		c.putValue(100, 1.0);
 
 		QCOMPARE(c.valueAt(0), 0.0f);
 		QCOMPARE(c.valueAt(50), 0.0f);
@@ -98,15 +98,15 @@ private slots:
 
 		AutomationClip c1(&track);
 		c1.setProgressionType(AutomationClip::ProgressionType::Linear);
-		c1.putValue(0, 0.0, false);
-		c1.putValue(10, 1.0, false);
+		c1.putValue(0, 0.0);
+		c1.putValue(10, 1.0);
 		c1.movePosition(0);
 		c1.addObject(&model);
 
 		AutomationClip c2(&track);
 		c2.setProgressionType(AutomationClip::ProgressionType::Linear);
-		c2.putValue(0, 0.0, false);
-		c2.putValue(100, 1.0, false);
+		c2.putValue(0, 0.0);
+		c2.putValue(100, 1.0);
 		c2.movePosition(100);
 		c2.addObject(&model);
 
@@ -136,8 +136,8 @@ private slots:
 		c.setProgressionType(AutomationClip::ProgressionType::Linear);
 		c.addObject(&model);
 
-		c.putValue(0, 0.0, false);
-		c.putValue(100, 1.0, false);
+		c.putValue(0, 0.0);
+		c.putValue(100, 1.0);
 
 		c.changeLength(100);
 		QCOMPARE(song->automatedValuesAt(  0)[&model], 0.0f);
@@ -160,7 +160,7 @@ private slots:
 
 		MidiClip midiClip(&instrumentTrack);
 		midiClip.changeLength(TimePos(4, 0));
-		Note* note = midiClip.addNote(Note(TimePos(4, 0)), false);
+		Note* note = midiClip.addNote(Note(TimePos(4, 0)));
 		note->createDetuning();
 
 		DetuningHelper* dh = note->detuning();
@@ -192,8 +192,8 @@ private slots:
 		FloatModel model;
 
 		c1->setProgressionType(AutomationClip::ProgressionType::Linear);
-		c1->putValue(0, 0.0, false);
-		c1->putValue(10, 1.0, false);
+		c1->putValue(0, 0.0);
+		c1->putValue(10, 1.0);
 		c1->addObject(&model);
 
 		QCOMPARE(patternStore->automatedValuesAt( 0, patternTrack.patternIndex())[&model], 0.0f);
@@ -234,8 +234,8 @@ private slots:
 		localClip.setProgressionType(AutomationClip::ProgressionType::Discrete);
 		globalClip.addObject(&model);
 		localClip.addObject(&model);
-		globalClip.putValue(0, 100.0f, false);
-		localClip.putValue(0, 50.0f, false);
+		globalClip.putValue(0, 100.0f);
+		localClip.putValue(0, 50.0f);
 
 		QCOMPARE(song->automatedValuesAt(0)[&model], 50.0f);
 	}

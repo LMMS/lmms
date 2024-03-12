@@ -266,7 +266,7 @@ public:
 		{
 			p = dynamic_cast<MidiClip*>(it->createClip(0));
 		}
-		p->addNote(n, false);
+		p->addNote(n);
 		hasNotes = true;
 	}
 
@@ -287,7 +287,7 @@ public:
 
 			Note newNote(*n);
 			newNote.setPos(n->pos(newMidiClip->startPosition()));
-			newMidiClip->addNote(newNote, false);
+			newMidiClip->addNote(newNote);
 		}
 
 		delete p;

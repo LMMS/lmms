@@ -1304,7 +1304,7 @@ void ClipView::mergeClips(QVector<ClipView*> clipvs)
 
 		for (Note* note: currentClipNotes)
 		{
-			Note* newNote = newMidiClip->addNote(*note, false);
+			Note* newNote = newMidiClip->addNote(*note);
 			TimePos originalNotePos = newNote->pos();
 			newNote->setPos(originalNotePos + (mcViewPos - earliestPos));
 		}

@@ -107,7 +107,7 @@ void Note::setLength( const TimePos & length )
 
 void Note::setPos( const TimePos & pos )
 {
-	m_pos = pos;
+	m_pos = std::max(pos, TimePos{0});
 }
 
 
@@ -137,41 +137,16 @@ void Note::setPanning( panning_t panning )
 	m_panning = p;
 }
 
-
-
-
-TimePos Note::quantized( const TimePos & m, const int qGrid )
+void Note::quantizeLength(const QuantizationGrid& grid)
 {
-	float p = ( (float) m / qGrid );
-	if( p - floorf( p ) < 0.5f )
-	{
-		return static_cast<int>( p ) * qGrid;
-	}
-	return static_cast<int>( p + 1 ) * qGrid;
+	const auto newLength = grid.quantizeDuration(length().getTicks());
+	setLength(newLength > 0 ? newLength : grid.interval());
 }
 
-
-
-
-void Note::quantizeLength( const int qGrid )
+void Note::quantizePos(const QuantizationGrid& grid)
 {
-	setLength( quantized( length(), qGrid ) );
-	if( length() == 0 )
-	{
-		setLength( qGrid );
-	}
+	setPos(grid.quantize(pos()));
 }
-
-
-
-
-void Note::quantizePos( const int qGrid )
-{
-	setPos( quantized( pos(), qGrid ) );
-}
-
-
-
 
 void Note::saveSettings( QDomDocument & doc, QDomElement & parent )
 {

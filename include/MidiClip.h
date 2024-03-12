@@ -61,7 +61,7 @@ public:
 	void updateLength();
 
 	// note management
-	Note * addNote( const Note & _new_note, const bool _quant_pos = true );
+	Note* addNote(const Note& note);
 
 	NoteVector::const_iterator removeNote(NoteVector::const_iterator it);
 	NoteVector::const_iterator removeNote(Note* note);

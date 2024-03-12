@@ -8,6 +8,7 @@ set(LMMS_TESTS
 	src/core/AutomatableModelTest.cpp
 	src/core/MathTest.cpp
 	src/core/ProjectVersionTest.cpp
+	src/core/QuantizationGridTest.cpp
 	src/core/RelativePathsTest.cpp
 	src/tracks/AutomationTrackTest.cpp
 )

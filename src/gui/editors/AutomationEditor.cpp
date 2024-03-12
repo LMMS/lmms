@@ -124,23 +124,20 @@ AutomationEditor::AutomationEditor() :
 	connect( m_tensionModel, SIGNAL(dataChanged()),
 				this, SLOT(setTension()));
 
-	for (auto q : Quantizations) {
-		m_quantizeModel.addItem(QString("1/%1").arg(q));
-	}
-
-	connect( &m_quantizeModel, SIGNAL(dataChanged()),
-					this, SLOT(setQuantization()));
-	m_quantizeModel.setValue( m_quantizeModel.findText( "1/8" ) );
-
 	// add time-line
 	m_timeLine = new TimeLineWidget(VALUES_WIDTH, 0, m_ppb,
 		Engine::getSong()->getPlayPos(Song::PlayMode::AutomationClip),
 		Engine::getSong()->getTimeline(Song::PlayMode::AutomationClip),
-		m_currentPosition, Song::PlayMode::AutomationClip, this
+		m_currentPosition, Song::PlayMode::AutomationClip, false, this
 	);
 	connect(this, &AutomationEditor::positionChanged, m_timeLine, &TimeLineWidget::updatePosition);
-	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos& ) ),
-			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
+	connect(m_timeLine, &TimeLineWidget::positionChanged, this, &AutomationEditor::updatePosition);
+
+	for (auto q : Quantizations) {
+		m_quantizeModel.addItem(QString("1/%1").arg(q));
+	}
+	connect(&m_quantizeModel, &AutomatableModel::dataChanged, this, &AutomationEditor::setQuantization);
+	m_quantizeModel.setValue(m_quantizeModel.findText("1/8"));
 
 	// init scrollbars
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
@@ -189,6 +186,11 @@ void AutomationEditor::setCurrentClip(AutomationClip * new_clip )
 	if (m_clip != nullptr)
 	{
 		connect(m_clip, SIGNAL(dataChanged()), this, SLOT(update()));
+		connect(m_clip, &Clip::positionChanged, this, [this] {
+			m_timeLine->setClipOffset(m_clip->startPosition());
+			update();
+		});
+		m_timeLine->setClipOffset(m_clip->startPosition());
 	}
 
 	emit currentClipChanged();
@@ -314,8 +316,9 @@ void AutomationEditor::leaveEvent(QEvent * e )
 
 void AutomationEditor::drawLine( int x0In, float y0, int x1In, float y1 )
 {
-	int x0 = Note::quantized( x0In, AutomationClip::quantization() );
-	int x1 = Note::quantized( x1In, AutomationClip::quantization() );
+	const auto quantization = m_timeLine->quantization();
+	const int x0 = quantization.quantize(x0In);
+	const int x1 = quantization.quantize(x1In);
 	int deltax = qAbs( x1 - x0 );
 	auto deltay = qAbs<float>(y1 - y0);
 	int x = x0;
@@ -323,22 +326,22 @@ void AutomationEditor::drawLine( int x0In, float y0, int x1In, float y1 )
 	int xstep;
 	int ystep;
 
-	if( deltax < AutomationClip::quantization() )
+	if( deltax < quantization.interval() )
 	{
 		return;
 	}
 
-	deltax /= AutomationClip::quantization();
+	deltax /= quantization.interval();
 
 	float yscale = deltay / ( deltax );
 
 	if( x0 < x1 )
 	{
-		xstep = AutomationClip::quantization();
+		xstep = quantization.interval();
 	}
 	else
 	{
-		xstep = -( AutomationClip::quantization() );
+		xstep = -quantization.interval();
 	}
 
 	float lineAdjust;
@@ -502,17 +505,16 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 					}
 					else // No shift, we are just creating/moving nodes
 					{
+						const auto quantization = m_timeLine->quantization();
+						// The TimePos of either the clicked node or a new one
+						const auto clickedPos = clickedNode == tm.end()
+							? quantization.quantize(posTicks)
+							: TimePos{POS(clickedNode)};
 						// Starts actually moving/draging the node
 						TimePos newTime = m_clip->setDragValue(
-							// The TimePos of either the clicked node or a new one
-							TimePos(
-								clickedNode == tm.end()
-								? posTicks
-								: POS(clickedNode)
-							),
+							clickedPos,
 							level,
-							clickedNode == tm.end(),
-							mouseEvent->modifiers() & Qt::ControlModifier
+							mouseEvent->modifiers() & Qt::ControlModifier ? 0 : quantization.interval()
 						);
 
 						// We need to update our iterator because we are either creating a new node
@@ -603,10 +605,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 					{
 						// We check if the quantized position of the time we clicked has a
 						// node and set its outValue
-						TimePos quantizedPos = Note::quantized(
-							TimePos(posTicks),
-							m_clip->quantization()
-						);
+						const TimePos quantizedPos = m_timeLine->quantization().quantize(TimePos(posTicks));
 
 						clickedNode = tm.find(quantizedPos);
 
@@ -781,12 +780,12 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 						m_drawLastTick = posTicks;
 						m_drawLastLevel = level;
 
-						// Updates the drag value of the moved node
+						// Update the drag value of the moved node
+						const auto quantization = m_timeLine->quantization();
 						m_clip->setDragValue(
-							TimePos(posTicks),
+							quantization.quantize(TimePos(posTicks)),
 							level,
-							true,
-							mouseEvent->modifiers() & Qt::ControlModifier
+							mouseEvent->modifiers() & Qt::ControlModifier ? 1 : quantization.interval()
 						);
 
 						Engine::getSong()->setModified();
@@ -980,12 +979,12 @@ inline void AutomationEditor::drawAutomationPoint(QPainter & p, timeMap::iterato
 {
 	int x = xCoordOfTick(POS(it));
 	int y;
-	// Below (m_ppb * AutomationClip::quantization() / 576) is used because:
+	// Below (m_ppb * quantization() / 576) is used because:
 	// 1 bar equals to 192/quantization() notes. Hence, to calculate the number of pixels
 	// per note we would have (m_ppb * 1 bar / (192/quantization()) notes per bar), or
 	// (m_ppb * quantization / 192). If we want 1/3 of the number of pixels per note we
 	// get (m_ppb * quantization() / 192*3) or (m_ppb * quantization() / 576)
-	const int outerRadius = qBound(3, (m_ppb * AutomationClip::quantization()) / 576, 5);
+	const int outerRadius = qBound(3, (m_ppb * m_timeLine->quantization().interval()) / 576, 5);
 
 	// Draw a circle for the outValue
 	y = yCoordOfLevel(OUTVAL(it));
@@ -1144,29 +1143,34 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			TOP_MARGIN :
 			grid_bottom - ( m_topLevel - m_bottomLevel ) * m_y_delta );
 
-		if( m_zoomingXModel.value() > 3 )
+		const auto quantizationInterval = m_timeLine->quantization().interval();
+		if (m_zoomingXModel.value() > 3)
 		{
 			// If we're over 100% zoom, we allow all quantization level grids
-			q = AutomationClip::quantization();
+			q = quantizationInterval;
 		}
-		else if( AutomationClip::quantization() % 3 != 0 )
+		else if (quantizationInterval % 3 != 0)
 		{
 			// If we're under 100% zoom, we allow quantization grid up to 1/24 for triplets
 			// to ensure a dense doesn't fill out the background
-			q = AutomationClip::quantization() < 8 ? 8 : AutomationClip::quantization();
+			q = quantizationInterval < 8 ? 8 : quantizationInterval;
 		}
 		else {
 			// If we're under 100% zoom, we allow quantization grid up to 1/32 for normal notes
-			q = AutomationClip::quantization() < 6 ? 6 : AutomationClip::quantization();
+			q = quantizationInterval < 6 ? 6 : quantizationInterval;
 		}
+
+		const auto barPosition = m_currentPosition + m_timeLine->barOffset();
+		const auto xCoordOfBarTick = [this, barPosition](int tick) {
+			return VALUES_WIDTH + ((tick - barPosition) * m_ppb / TimePos::ticksPerBar());
+		};
 
 		// 3 independent loops, because quantization might not divide evenly into
 		// exotic denominators (e.g. 7/11 time), which are allowed ATM.
 		// First quantization grid...
-		for( tick = m_currentPosition - m_currentPosition % q,
-				 x = xCoordOfTick( tick );
-			 x<=width();
-			 tick += q, x = xCoordOfTick( tick ) )
+		for (tick = barPosition - barPosition % q, x = xCoordOfBarTick(tick);
+			x <= width();
+			tick += q, x = xCoordOfBarTick(tick))
 		{
 			p.setPen(m_lineColor);
 			p.drawLine( x, grid_bottom, x, x_line_end );
@@ -1205,15 +1209,17 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				/ static_cast<float>( Engine::getSong()->getTimeSigModel().getDenominator() );
 		float zoomFactor = m_zoomXLevels[m_zoomingXModel.value()];
 		//the bars which disappears at the left side by scrolling
-		int leftBars = m_currentPosition * zoomFactor / TimePos::ticksPerBar();
+		const int leftBars = barPosition * zoomFactor / TimePos::ticksPerBar();
 
 		//iterates the visible bars and draw the shading on uneven bars
-		for( int x = VALUES_WIDTH, barCount = leftBars; x < width() + m_currentPosition * zoomFactor / timeSignature; x += m_ppb, ++barCount )
+		for (int x = VALUES_WIDTH, barCount = leftBars;
+			x < width() + barPosition * zoomFactor / timeSignature;
+			x += m_ppb, ++barCount)
 		{
 			if( ( barCount + leftBars )  % 2 != 0 )
 			{
 				p.fillRect(
-					x - m_currentPosition * zoomFactor / timeSignature,
+					x - barPosition * zoomFactor / timeSignature,
 					TOP_MARGIN,
 					m_ppb,
 					height() - (SCROLLBAR_SIZE + TOP_MARGIN),
@@ -1226,10 +1232,9 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		int ticksPerBeat = DefaultTicksPerBar /
 			Engine::getSong()->getTimeSigModel().getDenominator();
 
-		for( tick = m_currentPosition - m_currentPosition % ticksPerBeat,
-				 x = xCoordOfTick( tick );
-			 x<=width();
-			 tick += ticksPerBeat, x = xCoordOfTick( tick ) )
+		for (tick = barPosition - barPosition % ticksPerBeat, x = xCoordOfBarTick(tick);
+			x <= width();
+			tick += ticksPerBeat, x = xCoordOfBarTick(tick))
 		{
 			p.setPen(m_beatLineColor);
 			p.drawLine( x, grid_bottom, x, x_line_end );
@@ -1316,10 +1321,9 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		}
 
 		// and finally bars
-		for( tick = m_currentPosition - m_currentPosition % TimePos::ticksPerBar(),
-				 x = xCoordOfTick( tick );
-			 x<=width();
-			 tick += TimePos::ticksPerBar(), x = xCoordOfTick( tick ) )
+		for (tick = barPosition - barPosition % TimePos::ticksPerBar(), x = xCoordOfBarTick(tick);
+			x <= width();
+			tick += TimePos::ticksPerBar(), x = xCoordOfBarTick(tick))
 		{
 			p.setPen(m_barLineColor);
 			p.drawLine( x, grid_bottom, x, x_line_end );
@@ -1916,7 +1920,7 @@ void AutomationEditor::zoomingYChanged()
 
 void AutomationEditor::setQuantization()
 {
-	AutomationClip::setQuantization(DefaultTicksPerBar / Quantizations[m_quantizeModel.value()]);
+	m_timeLine->setSnapSize(DefaultTicksPerBar / Quantizations[m_quantizeModel.value()]);
 
 	update();
 }

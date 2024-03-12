@@ -236,7 +236,7 @@ void StepRecorder::applyStep()
 
 	for (const StepNote* stepNote : m_curStepNotes)
 	{
-		m_midiClip->addNote(stepNote->m_note, false);
+		m_midiClip->addNote(stepNote->m_note);
 	}
 
 	m_midiClip->rearrangeAllNotes();
