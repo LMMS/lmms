@@ -245,7 +245,7 @@ void VstEffectControls::openPreset()
 		m_effect->m_plugin->openPreset();
 		bool converted = false;
 		QString str = m_effect->m_plugin->currentProgramName().section("/", 0, 0);
-		if (str != "") lastPosInMenu = str.toInt(&converted, 10) - 1;
+		if (str != "") { lastPosInMenu = str.toInt(&converted, 10) - 1; }
 		//QWidget::update();
 	}
 
