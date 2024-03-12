@@ -105,12 +105,12 @@ void DrumSynth::UpdateEnv(int e, long t)
 {
 	float endEnv = 0.0f, dT = 0.0f;
 	// 0.2's added
-	envData[e][NEXTT] = envpts[e][0][(long)(envData[e][PNT] + 1.f)] * timestretch; // get next point
-	if (envData[e][NEXTT] < 0) { envData[e][NEXTT] = 442000 * timestretch; } // if end point, hold
-	envData[e][ENV] = envpts[e][1][(long)(envData[e][PNT] + 0.f)] * 0.01f;		   // this level
-	endEnv = envpts[e][1][(long)(envData[e][PNT] + 1.f)] * 0.01f;				   // next level
-	dT = envData[e][NEXTT] - (float)t;
-	if (dT < 1.0) { dT = 1.0; }
+	envData[e][NEXTT] = envpts[e][0][static_cast<long>(envData[e][PNT] + 1.f)] * timestretch; // get next point
+	if (envData[e][NEXTT] < 0) envData[e][NEXTT] = 442000 * timestretch;		   // if end point, hold
+	envData[e][ENV] = envpts[e][1][static_cast<long>(envData[e][PNT] + 0.f)] * 0.01f;		   // this level
+	endEnv = envpts[e][1][static_cast<long>(envData[e][PNT] + 1.f)] * 0.01f;				   // next level
+	dT = envData[e][NEXTT] - static_cast<float>(t);
+	if (dT < 1.0) dT = 1.0;
 	envData[e][dENV] = (endEnv - envData[e][ENV]) / dT;
 	envData[e][PNT] = envData[e][PNT] + 1.0f;
 }
@@ -155,18 +155,19 @@ float DrumSynth::waveform(float ph, int form)
 	switch (form)
 	{
 	case 0:
-		w = (float)sin(fmod(ph, TwoPi));
+		w = static_cast<float>(sin(fmod(ph, TwoPi)));
 		break; // sine
 	case 1:
-		w = (float)fabs(2.0f * (float)sin(fmod(0.5f * ph, TwoPi))) - 1.f;
+		w = static_cast<float>(fabs(2.0f * static_cast<float>(sin(fmod(0.5f * ph, TwoPi))) - 1.f));
 		break; // sine^2
 	case 2:
-		while (ph < TwoPi) { ph += TwoPi; }
-		w = 0.6366197f * (float)fmod(ph, TwoPi) - 1.f; // tri
-		if (w > 1.f) { w = 2.f - w; }
+		while (ph < TwoPi)
+			ph += TwoPi;
+		w = 0.6366197f * static_cast<float>(fmod(ph, TwoPi) - 1.f); // tri
+		if (w > 1.f) w = 2.f - w;
 		break;
 	case 3:
-		w = ph - TwoPi * (float)(int)(ph / TwoPi); // saw
+		w = ph - TwoPi * static_cast<float>(static_cast<int>(ph / TwoPi)); // saw
 		w = (0.3183098f * w) - 1.f;
 		break;
     default: w = (sin(fmod(ph,TwoPi))>0.0)? 1.f: -1.f;                  break; //square
