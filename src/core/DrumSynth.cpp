@@ -77,8 +77,7 @@ int DrumSynth::LongestEnv()
 		eon = e - 1;
 		if (eon > 2) { eon = eon - 1; }
 		p = 0;
-		while (envpts[e][0][p + 1] >= 0.f)
-			p++;
+		while (envpts[e][0][p + 1] >= 0.f) { p++; }
 		envData[e][MAX] = envpts[e][0][p] * timestretch;
 		if (chkOn[eon] == 1)
 			if (envData[e][MAX] > l) l = envData[e][MAX];
