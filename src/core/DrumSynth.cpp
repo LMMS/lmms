@@ -112,7 +112,7 @@ void DrumSynth::UpdateEnv(int e, long t)
 	envData[e][ENV] = envpts[e][1][(long)(envData[e][PNT] + 0.f)] * 0.01f;		   // this level
 	endEnv = envpts[e][1][(long)(envData[e][PNT] + 1.f)] * 0.01f;				   // next level
 	dT = envData[e][NEXTT] - (float)t;
-	if (dT < 1.0) dT = 1.0;
+	if (dT < 1.0) { dT = 1.0; }
 	envData[e][dENV] = (endEnv - envData[e][ENV]) / dT;
 	envData[e][PNT] = envData[e][PNT] + 1.0f;
 }
