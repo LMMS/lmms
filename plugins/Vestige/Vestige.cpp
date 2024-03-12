@@ -722,7 +722,7 @@ void VestigeInstrumentView::openPreset()
 		m_vi->m_plugin->openPreset();
 		bool converted = false;
 		QString str = m_vi->m_plugin->currentProgramName().section("/", 0, 0);
-		if (str != "") lastPosInMenu = str.toInt(&converted, 10) - 1;
+		if (str != "") { lastPosInMenu = str.toInt(&converted, 10) - 1; }
 		QWidget::update();
 	}
 
