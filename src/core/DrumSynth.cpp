@@ -75,7 +75,7 @@ int DrumSynth::LongestEnv()
 	for (e = 1; e < 7; e++) // 3
 	{
 		eon = e - 1;
-		if (eon > 2) eon = eon - 1;
+		if (eon > 2) { eon = eon - 1; }
 		p = 0;
 		while (envpts[e][0][p + 1] >= 0.f)
 			p++;
