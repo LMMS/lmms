@@ -320,8 +320,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	float rightph = 0.0f;
 	float pd_l = 0.0f;
 	float pd_r = 0.0f;
-	float len_l(0.);
-	float len_r(0.);
+	float len_l = 0.0f;
+	float len_r = 0.0f;
 
 	// osc1 vars
 	float o1l_f = 0.0f;
