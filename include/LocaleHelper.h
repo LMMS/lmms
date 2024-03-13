@@ -38,11 +38,10 @@ namespace lmms::LocaleHelper
 
 inline double toDouble(QString str, bool* ok = nullptr)
 {
-	bool isOkay;
-	double value;
+	bool isOkay = false;
 	QLocale c(QLocale::C);
 	c.setNumberOptions(QLocale::RejectGroupSeparator);
-	value = c.toDouble(str, &isOkay);
+	double value = c.toDouble(str, &isOkay);
 	if (!isOkay)
 	{
 		QLocale german(QLocale::German);

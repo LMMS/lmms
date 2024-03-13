@@ -47,7 +47,7 @@ int writeVarLength(uint32_t val, uint8_t *buffer)
 	byte in question is the last in the stream
 	*/
 	int size = 0;
-	uint8_t result, little_endian[4];
+	uint8_t result = 0, little_endian[4];
 	result = val & 0x7F;
 	little_endian[size++] = result;
 	val = val >> 7;
@@ -129,7 +129,7 @@ struct Event
 	
 	inline int writeToBuffer(uint8_t *buffer) const 
 	{
-		uint8_t code, fourbytes[4];
+		uint8_t code = 0, fourbytes[4];
 		int size=0;
 		switch (type) 
 		{
@@ -275,7 +275,7 @@ class MIDITrack
 		vector<Event> _events = events;
 		std::sort(_events.begin(), _events.end());
 		vector<Event>::const_iterator it;
-		uint32_t time_last = 0, tmp;
+		uint32_t time_last = 0, tmp = 0;
 		for (it = _events.begin(); it!=_events.end(); ++it)
 		{
 			Event e = *it;

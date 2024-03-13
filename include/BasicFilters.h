@@ -340,7 +340,7 @@ public:
 
 	inline sample_t update( sample_t _in0, ch_cnt_t _chnl )
 	{
-		sample_t out;
+		sample_t out = 0.0f;
 		switch( m_type )
 		{
 			case FilterType::Moog:
@@ -409,7 +409,7 @@ public:
 			case FilterType::Lowpass_SV:
 			case FilterType::Bandpass_SV:
 			{
-				float highpass;
+				float highpass = 0.0f;
 				
 				for( int i = 0; i < 2; ++i ) // 2x oversample
 				{
@@ -430,7 +430,7 @@ public:
 			
 			case FilterType::Highpass_SV:
 			{
-				float hp;
+				float hp = 0.0f;
 
 				for( int i = 0; i < 2; ++i ) // 2x oversample
 				{				
@@ -444,7 +444,7 @@ public:
 			
 			case FilterType::Notch_SV:
 			{
-				float hp1, hp2;
+				float hp1 = 0.0f, hp2 = 0.0f;
 				
 				for( int i = 0; i < 2; ++i ) // 2x oversample
 				{
@@ -469,7 +469,7 @@ public:
 
 			case FilterType::Lowpass_RC12:
 			{
-				sample_t lp, bp, hp, in;
+				sample_t lp = 0.0f, bp = 0.0f, hp = 0.0f, in = 0.0f;
 				for( int n = 4; n != 0; --n )
 				{
 					in = _in0 + m_rcbp0[_chnl] * m_rcq;
@@ -494,7 +494,7 @@ public:
 			case FilterType::Highpass_RC12:
 			case FilterType::Bandpass_RC12:
 			{
-				sample_t hp, bp, in;
+				sample_t hp = 0.0f, bp = 0.0f, in = 0.0f;
 				for( int n = 4; n != 0; --n )
 				{
 					in = _in0 + m_rcbp0[_chnl] * m_rcq;
@@ -515,7 +515,7 @@ public:
 
 			case FilterType::Lowpass_RC24:
 			{
-				sample_t lp, bp, hp, in;
+				sample_t lp = 0.0f, bp = 0.0f, hp = 0.0f, in = 0.0f;
 				for( int n = 4; n != 0; --n )
 				{
 					// first stage is as for the 12dB case...
@@ -559,7 +559,7 @@ public:
 			case FilterType::Highpass_RC24:
 			case FilterType::Bandpass_RC24:
 			{
-				sample_t hp, bp, in;
+				sample_t hp = 0.0f, bp = 0.0f, in = 0.0f;
 				for( int n = 4; n != 0; --n )
 				{
 					// first stage is as for the 12dB case...
@@ -600,7 +600,7 @@ public:
 			case FilterType::FastFormant:
 			{
 				if (std::abs(_in0) < 1.0e-10f && std::abs(m_vflast[0][_chnl]) < 1.0e-10f) { return 0.0f; } // performance hack - skip processing when the numbers get too small
-				sample_t hp, bp, in;
+				sample_t hp = 0.0f, bp = 0.0f, in = 0.0f;
 
 				out = 0;
 				const int os = m_type == FilterType::FastFormant ? 1 : 4; // no oversampling for fast formant

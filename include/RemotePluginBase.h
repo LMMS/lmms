@@ -498,7 +498,7 @@ public:
 #ifndef SYNC_WITH_SHM_FIFO
 	inline int32_t readInt()
 	{
-		int32_t i;
+		int32_t i = 0;
 		read( &i, sizeof( i ) );
 		return i;
 	}

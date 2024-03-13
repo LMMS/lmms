@@ -61,7 +61,7 @@ private:
 
 	inline int readInt( int _bytes )
 	{
-		int c, value = 0;
+		int c = 0, value = 0;
 		do
 		{
 			c = readByte();

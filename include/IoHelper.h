@@ -75,7 +75,7 @@ inline FILE* F_OPEN_UTF8(std::string const& fname, const char* mode){
 
 inline int fileToDescriptor(FILE* f, bool closeFile = true)
 {
-	int fh;
+	int fh = 0;
 	if (f == nullptr) {return -1;}
 
 #ifdef LMMS_BUILD_WIN32

@@ -101,7 +101,7 @@ public:
 	
 	void updateLFSR( bool mode )
 	{
-		uint16_t LFSRx;
+		uint16_t LFSRx = 0;
 		if( mode )
 		{
 				LFSRx = m_LFSR & ( 1 << 8 ); // get bit 13

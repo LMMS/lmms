@@ -49,8 +49,8 @@ public:
 
 	sample_t nextSample()
 	{
-		sample_t ym0;
-		sample_t ypM;
+		sample_t ym0 = 0.0f;
+		sample_t ypM = 0.0f;
 		for (int i = 0; i < m_oversample; ++i)
 		{
 			// Output at pickup position
@@ -105,8 +105,8 @@ private:
 	 */
 	void setDelayLine(DelayLine* dl, int pick, const float* values, int len, float scale, bool state)
 	{
-		float r;
-		float offset;
+		float r = 0.0f;
+		float offset = 0.0f;
 
 		if (!state)
 		{
