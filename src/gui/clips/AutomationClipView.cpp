@@ -328,10 +328,9 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 		QPointF origin = QPointF(POS(it) * ppTick, 0.0f);
 		path.moveTo( origin );
 		path.moveTo(QPointF(POS(it) * ppTick,values[0]));
-		float x = 0.0f;
 		for (int i = POS(it) + 1; i < POS(it + 1); i++)
 		{
-			x = i * ppTick;
+			float x = i * ppTick;
 			if( x > ( width() - BORDER_WIDTH ) ) break;
 			float value = values[i - POS(it)];
 			path.lineTo( QPointF( x, value ) );
