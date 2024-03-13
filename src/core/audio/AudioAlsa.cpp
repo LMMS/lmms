@@ -83,9 +83,8 @@ AudioAlsa::AudioAlsa( bool & _success_ful, AudioEngine*  _audioEngine ) :
 
 	// set FD_CLOEXEC flag for all file descriptors so forked processes
 	// do not inherit them
-	struct pollfd* ufds = nullptr;
 	int count = snd_pcm_poll_descriptors_count( m_handle );
-	ufds = new pollfd[count];
+	auto ufds = new pollfd[count];
 	snd_pcm_poll_descriptors( m_handle, ufds, count );
 	for (int i = 0; i < std::max(3, count); ++i)
 	{
