@@ -107,8 +107,8 @@ void DrumSynth::UpdateEnv(int e, long t)
 	// 0.2's added
 	envData[e][NEXTT] = envpts[e][0][static_cast<long>(envData[e][PNT] + 1.f)] * timestretch; // get next point
 	if (envData[e][NEXTT] < 0) { envData[e][NEXTT] = 442000 * timestretch; } // if end point, hold
-	envData[e][ENV] = envpts[e][1][static_cast<long>(envData[e][PNT] + 0.f)] * 0.01f;		   // this level
-	endEnv = envpts[e][1][static_cast<long>(envData[e][PNT] + 1.f)] * 0.01f;				   // next level
+	envData[e][ENV] = envpts[e][1][static_cast<long>(envData[e][PNT] + 0.f)] * 0.01f; // this level
+	endEnv = envpts[e][1][static_cast<long>(envData[e][PNT] + 1.f)] * 0.01f; // next level
 	dT = envData[e][NEXTT] - static_cast<float>(t);
 	if (dT < 1.0) { dT = 1.0; }
 	envData[e][dENV] = (endEnv - envData[e][ENV]) / dT;
