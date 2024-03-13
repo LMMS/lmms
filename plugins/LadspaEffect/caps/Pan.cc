@@ -77,7 +77,7 @@ Pan::one_cycle (int frames)
 	sample_t * dl = ports[5];
 	sample_t * dr = ports[6];
 
-	sample_t x = 0.0f, xt = 0.0f;
+	sample_t x, xt;
 
 	if (mono) for (int i = 0; i < frames; ++i)
 	{
@@ -185,7 +185,7 @@ Narrower::one_cycle (int frames)
 	sample_t * dl = ports[3];
 	sample_t * dr = ports[4];
 
-	double xl = 0.0, xr = 0.0, m = 0.0;
+	double xl, xr, m;
 	double dry = 1 - strength, wet = strength;
 
 	for (int i = 0; i < frames; ++i)

@@ -79,7 +79,7 @@ Clip::one_cycle (int frames)
 	sample_t * s = ports[0];
 
 	double g = getport (1);
-	double gf = 0.0;
+	double gf;
 	if (g == gain_db)
 		gf = 1;
 	else

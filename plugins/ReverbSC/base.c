@@ -98,8 +98,8 @@ int sp_process(sp_data *sp, void *ud, void (*callback)(sp_data *, void *))
 
 int sp_process_raw(sp_data *sp, void *ud, void (*callback)(sp_data *, void *))
 {
-	int chan = 0;
-	if(sp->len == 0) {
+    int chan;
+    if(sp->len == 0) {
         while(1) {
             callback(sp, ud);
             for (chan = 0; chan < sp->nchan; chan++) {
@@ -140,8 +140,8 @@ int sp_process_spa(sp_data *sp, void *ud, void (*callback)(sp_data *, void *))
 
 int sp_process_plot(sp_data *sp, void *ud, void (*callback)(sp_data *, void *))
 {
-	int chan = 0;
-	fprintf(stdout, "sp_out =  [ ... \n");
+    int chan;
+    fprintf(stdout, "sp_out =  [ ... \n");
     while(sp->len > 0) {
         callback(sp, ud);
         for (chan = 0; chan < sp->nchan; chan++) {

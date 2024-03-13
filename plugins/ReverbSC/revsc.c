@@ -65,8 +65,8 @@ int sp_revsc_init(sp_data *sp, sp_revsc *p)
     p->dampFact = 1.0;
     p->prv_LPFreq = 0.0;
     p->initDone = 1;
-	int i = 0, nBytes = 0;
-	for(i = 0; i < 8; i++){
+    int i, nBytes = 0;
+    for(i = 0; i < 8; i++){
         nBytes += delay_line_bytes_alloc(sp->sr, 1, i);
     }
     sp_auxdata_alloc(&p->aux, nBytes);
@@ -91,9 +91,9 @@ int sp_revsc_destroy(sp_revsc **p)
 
 static int delay_line_max_samples(SPFLOAT sr, SPFLOAT iPitchMod, int n)
 {
-	SPFLOAT maxDel = 0.0f;
+    SPFLOAT maxDel;
 
-	maxDel = reverbParams[n][0];
+    maxDel = reverbParams[n][0];
     maxDel += (reverbParams[n][1] * (SPFLOAT) iPitchMod * 1.125);
     return (int) (maxDel * sr + 16.5);
 }
@@ -108,9 +108,9 @@ static int delay_line_bytes_alloc(SPFLOAT sr, SPFLOAT iPitchMod, int n)
 
 static void next_random_lineseg(sp_revsc *p, sp_revsc_dl *lp, int n)
 {
-	SPFLOAT prvDel = 0.0f, nxtDel = 0.0f, phs_incVal = 0.0f;
+    SPFLOAT prvDel, nxtDel, phs_incVal;
 
-	/* update random seed */
+    /* update random seed */
     if (lp->seedVal < 0)
       lp->seedVal += 0x10000;
     lp->seedVal = (lp->seedVal * 15625 + 1) & 0xFFFF;
@@ -135,8 +135,8 @@ static void next_random_lineseg(sp_revsc *p, sp_revsc_dl *lp, int n)
 
 static int init_delay_line(sp_revsc *p, sp_revsc_dl *lp, int n)
 {
-	SPFLOAT readPos = 0.0f;
-	/* int     i; */
+    SPFLOAT readPos;
+    /* int     i; */
 
     /* calculate length of delay line */
     lp->bufferSize = delay_line_max_samples(p->sampleRate, 1, n);
@@ -162,13 +162,13 @@ static int init_delay_line(sp_revsc *p, sp_revsc_dl *lp, int n)
 
 int sp_revsc_compute(sp_data *sp, sp_revsc *p, SPFLOAT *in1, SPFLOAT *in2, SPFLOAT *out1, SPFLOAT *out2)
 {
-	SPFLOAT ainL = 0.0f, ainR = 0.0f, aoutL = 0.0f, aoutR = 0.0f;
-	SPFLOAT vm1 = 0.0f, v0 = 0.0f, v1 = 0.0f, v2 = 0.0f, am1 = 0.0f, a0 = 0.0f, a1 = 0.0f, a2 = 0.0f, frac = 0.0f;
-	sp_revsc_dl* lp = NULL;
-	int readPos = 0;
-	uint32_t n = 0;
-	int bufferSize = 0; /* Local copy */
-	SPFLOAT dampFact = p->dampFact;
+    SPFLOAT ainL, ainR, aoutL, aoutR;
+    SPFLOAT vm1, v0, v1, v2, am1, a0, a1, a2, frac;
+    sp_revsc_dl *lp;
+    int readPos;
+    uint32_t n;
+    int bufferSize; /* Local copy */
+    SPFLOAT dampFact = p->dampFact;
 
     if (p->initDone <= 0) return SP_NOT_OK;
 
