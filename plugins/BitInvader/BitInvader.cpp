@@ -116,13 +116,8 @@ sample_t BSynth::nextStringSample( float sample_length )
 
 		// find position in shape 
 		int a = static_cast<int>(sample_realindex);
-		int b = 0;
-		if (a < (sample_length-1)) {
-			b = static_cast<int>(sample_realindex+1);
-		} else {
-			b = 0;
-		}
-		
+		int b = a < sample_length - 1 ? static_cast<int>(sample_realindex + 1) : 0;
+
 		// Nachkommaanteil
 		const float frac = fraction( sample_realindex );
 		
