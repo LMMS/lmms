@@ -30,8 +30,8 @@
 #ifdef LMMS_HAVE_LV2
 
 #include <cstdint>
-#include <lv2/lv2plug.in/ns/ext/options/options.h>
-#include <lv2/lv2plug.in/ns/ext/urid/urid.h>
+#include <lv2/options/options.h>
+#include <lv2/urid/urid.h>
 #include <map>
 #include <memory>
 #include <set>

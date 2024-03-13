@@ -27,10 +27,10 @@
 #ifdef LMMS_HAVE_LV2
 
 #include <cmath>
-#include <lv2/lv2plug.in/ns/ext/midi/midi.h>
-#include <lv2/lv2plug.in/ns/ext/atom/atom.h>
-#include <lv2/lv2plug.in/ns/ext/resize-port/resize-port.h>
-#include <lv2/lv2plug.in/ns/ext/worker/worker.h>
+#include <lv2/midi/midi.h>
+#include <lv2/atom/atom.h>
+#include <lv2/resize-port/resize-port.h>
+#include <lv2/worker/worker.h>
 #include <QDebug>
 #include <QDomDocument>
 #include <QtGlobal>

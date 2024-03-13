@@ -27,8 +27,8 @@
 
 #ifdef LMMS_HAVE_LV2
 
-#include <lv2/lv2plug.in/ns/ext/atom/atom.h>
-#include <lv2/lv2plug.in/ns/ext/port-props/port-props.h>
+#include <lv2/atom/atom.h>
+#include <lv2/port-props/port-props.h>
 
 #include "Engine.h"
 #include "Lv2Basics.h"
