@@ -208,15 +208,14 @@ float EqHandle::getPeakCurve( float x )
 	double Q = getResonance();
 	double A =  pow( 10, yPixelToGain( EqHandle::y(), m_heigth, m_pixelsPerUnitHeight ) / 40 );
 	double alpha = s * sinh( log( 2 ) / 2 * Q * w0 / sinf( w0 ) );
-	double a0 = 0.0, a1 = 0.0, a2 = 0.0, b0 = 0.0, b1 = 0.0, b2 = 0.0; // coeffs to calculate
 
 	//calc coefficents
-	b0 =   1 + alpha * A;
-	b1 =  -2 * c;
-	b2 =   1 - alpha * A;
-	a0 =   1 + alpha / A;
-	a1 =  -2 * c;
-	a2 =   1 - alpha / A;
+	double b0 = 1 + alpha * A;
+	double b1 = -2 * c;
+	double b2 = 1 - alpha * A;
+	double a0 = 1 + alpha / A;
+	double a1 = -2 * c;
+	double a2 = 1 - alpha / A;
 
 	//normalise
 	b0 /= a0;
