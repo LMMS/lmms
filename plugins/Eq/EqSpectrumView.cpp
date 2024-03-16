@@ -209,11 +209,7 @@ EqSpectrumView::EqSpectrumView(EqAnalyser *b, QWidget *_parent) :
 void EqSpectrumView::paintEvent(QPaintEvent *event)
 {
 	const float energy = m_analyser->getEnergy();
-	if (energy <= 0.)
-	{		
-		// If there is no energy in the signal we don't need to draw anything
-		return;
-	}
+	if (energy <= 0. && m_peakSum <= 0) { return; }
 
 	const int fh = height();
 	const int LOWER_Y = -36;	// dB
