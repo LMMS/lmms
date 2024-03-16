@@ -44,12 +44,12 @@ public:
 	//		TODO: delete FloatModels in destructor		Done
 	//		TODO: save FloatModels (run saveSettings)
 	//		TODO: getter for the FloatModels for saving		Done
-	//		TODO: connect FloatModels connect with getter
+	//		TODO: connect FloatModels connect with getter		Done
 	// TODO: setPointAutomatedAttrib() --> changes the type value between y pos, curve, valueA, valueB			Done
 	// TODO: setPointType(unsigned int type)			Done
 	// TODO: add effector(PointGraphDataArray) int location to the PointGraphDataArray class			Done
 	// TODO: add effector line attributes to the nested class			Done
-	// TODO: add effect implementation
+	// TODO: add effect implementation		Done
 
 	// TODO: clear array when 2. last point is deleted in the widget		IGNORE
 	// TODO: event when a dataArray's size gets to 0
@@ -58,12 +58,17 @@ public:
 	// TODO: journalling in PointGraphModel
 	// TODO: m_maxLenght* should be replaced with m_parent->getMaxLength()			Done
 	// TODO: setDataArray keep attributes option
-	// TODO: PointGraphDataArray shouldSaveAll and shouldSavePointAttributesOnly (for saving only editable graphs) option
+	// TODO: PointGraphDataArray shouldSaveAll and shouldSavePointAttributesOnly (for saving only editable graphs) option			Done
 	// TODO: baked values in PointGraphPoint
 	// TODO: rename class to VectorGraph
-	// TODO: make std::vector<float> last used values
+	// TODO: make std::vector<float> last used values			Done
 	//		TODO: make update logic (isChanged and update only automation / effected lines)
 	// TODO: effector location (same as automation location)
+	// TODO: PointGraphView isSimplified			Done
+	// TODO: new automated color			Done
+	// TODO: context menu in gui (clear automation, connect to controller)
+	// TODO: display hints (full text) in the editing
+	// TODO: ability to edit multiple graphs using m_isLastSelectedArray
 
 	PointGraphView(QWidget * parentIn,
 		int widthIn, int heightIn,
@@ -73,14 +78,19 @@ public:
 	void setLineColor(QColor colorIn, unsigned int dataArrayLocationIn);
 	void setActiveColor(QColor colorIn, unsigned int dataArrayLocationIn);
 	void setFillColor(QColor colorIn, unsigned int dataArrayLocationIn);
+	void setAutomatedColor(QColor colorIn, unsigned int dataArrayLocationIn);
 
 	inline PointGraphModel* model()
 	{
 		return castModel<PointGraphModel>();
 	}
-	
-	// returns -2.0f at second when nothing is selected
+
+	void setIsSimplified(bool isSimplifiedIn);
+
+	// returns -1.0f at first when nothing is selected
 	std::pair<float, float> getSelectedData();
+	// returns -1 it can not return a array location
+	int getLastSelectedArray();
 	void setSelectedData(std::pair<float, float> dataIn);
 	
 signals:
@@ -92,7 +102,7 @@ protected:
 	void mousePressEvent(QMouseEvent* me) override; //TODO
 	void mouseMoveEvent(QMouseEvent* me) override; //TODO
 	void mouseReleaseEvent(QMouseEvent* me) override; //TODO
-	void mouseDoubleClickEvent(QMouseEvent* me) override;
+	void mouseDoubleClickEvent(QMouseEvent* me) override; //TODO
 protected slots:
 	void updateGraph();
 private:
@@ -103,11 +113,27 @@ private:
 	std::pair<float, float> mapDataCurvePos(float xAIn, float yAIn, float xBIn, float yBIn, float curveIn);
 	std::pair<int, int>mapDataCurvePos(int xAIn, int yAIn, int xBIn, int yBIn, float curveIn);
 	std::pair<int, int> mapDataPos(float xIn, float yIn, bool nonNegativeIn);
+	int mapInputPos(float inputValueIn, unsigned int displayLengthIn);
 
 	float getDistance(int xAIn, int yAIn, int xBIn, int yBIn);
 	float getDistance(float xAIn, float yAIn, float xBIn, float yBIn);
 
-	std::pair<float, float> showInputDialog(); //TODO
+	// returns true if the graph was clicked
+	bool isGraphPressed(int mouseYIn);
+	// returns -1 if no attribute was clicked
+	int getPressedInput(int mouseXIn, int mouseYIn, unsigned int inputCountIn);
+	// returns a float attrib value, valueOut = attrib value if it is a bool
+	float getInputAttribValue(unsigned int editingArrayLocationIn, bool* valueOut);
+	// sets the attrib to floatValueIn it it is float, else it sets the attrib to boolValueIn
+	void setInputAttribValue(unsigned int editingArrayLocationIn, float floatValueIn, bool boolValueIn);
+	// calculates the ideal text color
+	QColor getTextColorFromBaseColor(QColor baseColorIn);
+	// returns the first x char that fits in the displayedLength(in pixel)
+	// cuts the string to displayedLength(in px) size
+	QString getTextFromDisplayLength(QString textIn, unsigned int displayLengthIn);
+
+	std::pair<float, float> showCoordInputDialog();
+	float showInputDialog(float curInputValueIn);
 	// searches arrays to select
 	// clicked datapoint
 	void selectData(int mouseXIn, int mouseYIn);
@@ -126,12 +152,26 @@ private:
 
 	// radius, rx = ry
 	unsigned int m_pointSize;
+	// draw simplified lines
+	bool m_isSimplified;
 
 	unsigned int m_selectedLocation;
 	unsigned int m_selectedArray;
 	bool m_isSelected;
 	bool m_isCurveSelected;
-	
+	// if m_selectedArray was the last array selected
+	bool m_isLastSelectedArray;
+
+	unsigned int m_graphHeight;
+	unsigned int m_editingHeight;
+	// displayed attrib count
+	unsigned int m_editingInputCount;
+	unsigned int m_editingDisplayPage;
+	bool m_isEditingActive;
+	std::vector<QString> m_editingText;
+	std::vector<QString> m_editingLineEffectText;
+	std::vector<bool> m_editingInputIsFloat;
+
 	std::pair<int, int> m_lastTrackPoint;
 	std::pair<int, int> m_lastScndTrackPoint;
 };
@@ -207,34 +247,41 @@ public:
 	PointGraphDataArray();
 	PointGraphDataArray(
 	bool isFixedSizeIn, bool isFixedValueIn, bool isFixedPosIn, bool nonNegativeIn,
-	bool isFixedEndPointsIn, bool isSelectableIn, bool isEditableAttribIn, PointGraphModel* parentIn);
+	bool isFixedEndPointsIn, bool isSelectableIn, bool isEditableAttribIn, bool isAutomatableEffectableIn,
+	bool isSaveableIn, PointGraphModel* parentIn);
 	~PointGraphDataArray();
 
 	void updateConnections(PointGraphModel* parentIn);
 
-	void setFixedSize(bool valueIn);
-	void setFixedValue(bool valueIn);
-	void setFixedPos(bool valueIn);
-	void setFixedEndPoints(bool valueIn);
-	void setSelectable(bool valueIn);
-	void setEditableAttrib(bool valueIn);
+	void setIsFixedSize(bool valueIn);
+	void setIsFixedValue(bool valueIn);
+	void setIsFixedPos(bool valueIn);
+	void setIsFixedEndPoints(bool valueIn);
+	void setIsSelectable(bool valueIn);
+	void setIsEditableAttrib(bool valueIn);
+	void setIsAutomatableEffectable(bool valueIn);
+	void setIsSaveable(bool valueIn);
 	void setNonNegative(bool valueIn);
 	void setLineColor(QColor colorIn);
 	void setActiveColor(QColor colorIn);
 	void setFillColor(QColor colorIn);
+	void setAutomatedColor(QColor colorIn);
 	// returns true if successful
 	bool setEffectorArrayLocation(unsigned int locationIn);
 
-	bool getFixedSize();
-	bool getFixedValue();
-	bool getFixedPos();
-	bool getFixedEndPoints();
-	bool getSelectable();
-	bool getEditableAttrib();
+	bool getIsFixedSize();
+	bool getIsFixedValue();
+	bool getIsFixedPos();
+	bool getIsFixedEndPoints();
+	bool getIsSelectable();
+	bool getIsEditableAttrib();
+	bool getIsAutomatableEffectable();
+	bool getIsSaveable();
 	bool getNonNegative();
 	QColor* getLineColor();
 	QColor* getActiveColor();
 	QColor* getFillColor();
+	QColor* getAutomatedColor();
 	// returns -1 if it has no effector
 	int getEffectorArrayLocation();
 
@@ -282,9 +329,13 @@ public:
 	{
 		return m_dataArray[locationIn].m_valB;
 	}
-	unsigned int getType(unsigned int locationIn);
+	inline unsigned int getType(unsigned int locationIn)
+	{
+		return m_dataArray[locationIn].m_type;
+	}
 	// returns attribLocation: 0 = y, 1 = c, 2 = valA, 3 = valB
 	unsigned int getAutomatedAttribLocation(unsigned int locationIn);
+	unsigned int getEffectedAttribLocation(unsigned int locationIn);
 	inline bool getEffectOnlyPoints(unsigned int locationIn)
 	{
 		return m_dataArray[locationIn].m_effectOnlyPoints;
@@ -325,12 +376,13 @@ public:
 	void setC(unsigned int locationIn, float cIn);
 	// sets value when m_isFixedValue is disabled
 	void setValA(unsigned int locationIn, float valueIn);
-	// sets value when m_isFixedValue is disabled
+	// 
 	void setValB(unsigned int locationIn, float valueIn);
-	// sets value when m_isFixedValue is disabled
+	// 
 	void setType(unsigned int locationIn, unsigned int typeIn);
-	// sets value when m_isFixedValue is disabled
+	// 
 	void setAutomatedAttrib(unsigned int locationIn, unsigned int attribLocationIn);
+	void setEffectedAttrib(unsigned int locationIn, unsigned int attribLocationIn);
 	void setEffectOnlyPoints(unsigned int locationIn, bool boolIn);
 	void setEffect(unsigned int locationIn, unsigned int effectNumberIn, bool boolIn);
 	// if isAutomatedIn is true then make a new FloatModel and connect it, else delete
@@ -355,6 +407,7 @@ private:
 			m_valA = 0.0f;
 			m_valB = 0.0f;
 			m_type = 0;
+			m_automatedEffectedAttribLocations = 0;
 
 			m_effectOnlyPoints = false;
 			m_effectAdd = true;
@@ -363,6 +416,7 @@ private:
 			m_effectDivide = false;
 			m_effectPower = false;
 			m_effectLog = false;
+			m_effectSine = false;
 
 			m_automationModel = nullptr;
 		}
@@ -374,6 +428,7 @@ private:
 			m_valA = 0.0f;
 			m_valB = 0.0f;
 			m_type = 0;
+			m_automatedEffectedAttribLocations = 0;
 
 			m_effectOnlyPoints = false;
 			m_effectAdd = true;
@@ -382,6 +437,7 @@ private:
 			m_effectDivide = false;
 			m_effectPower = false;
 			m_effectLog = false;
+			m_effectSine = false;
 
 			m_automationModel = nullptr;
 		}
@@ -405,9 +461,16 @@ private:
 		// line type:
 		// 0 - none
 		// 1 - sine
-		// 2 - steps
-		// 3 - random
+		// 2 - sineB
+		// 3 - peak
+		// 4 - steps
+		// 5 - random
 		unsigned int m_type;
+		// the automated attrib location and
+		// the effected attrib location is
+		// stored here
+		// use getAutomatedAttrib or getEffectedAttrib to get it
+		unsigned int m_automatedEffectedAttribLocations;
 
 		bool m_effectOnlyPoints;
 
@@ -417,6 +480,7 @@ private:
 		bool m_effectDivide;
 		bool m_effectPower;
 		bool m_effectLog;
+		bool m_effectSine;
 
 		// automation: connecting to floatmodels, nullptr when it isn't conntected'
 		FloatModel* m_automationModel;
@@ -434,6 +498,8 @@ private:
 	// line effects / types, m_type is used for this
 	// valA: amp, valB: freq, fadeOutStartIn: from what xIn value should the line type fade out
 	float processLineTypeSine(float xIn, float valAIn, float valBIn, float fadeOutStartIn);
+	// curveIn: phase
+	float processLineTypeSineB(float xIn, float valAIn, float valBIn, float curveIn, float fadeOutStartIn);
 	//std::vector<float> processLineTypeArraySine(std::vector<float> xIn, unsigned int startIn, unsigned int endIn, float valAIn, float valBIn);
 	// valA: amp, valB: x coord, curve: width
 	float processLineTypePeak(float xIn, float valAIn, float valBIn, float curveIn, float fadeOutStartIn);
@@ -456,13 +522,19 @@ private:
 	// can PointGraphView select this
 	bool m_isSelectable;
 	// can PointGraphView edit the point attributes
+	// every attribute outside of x and y
 	bool m_isEditableAttrib;
+	// can the points be automated or effected
+	bool m_isAutomatableEffectable;
+	// if PointGraphDataArray is allowed to save this
+	bool m_isSaveable;
 
 	// can values be less than 0
 	bool m_nonNegative;
 	QColor m_lineColor;
 	QColor m_activeColor;
 	QColor m_fillColor;
+	QColor m_automatedColor;
 
 	PointGraphModel* m_parent;
 
@@ -471,6 +543,11 @@ private:
 
 	// ordered array of PointGraphPoints
 	std::vector<PointGraphPoint> m_dataArray;
+	
+	// baking
+	bool m_isDataChanged;
+	// array containing output final float values for optimalization
+	std::vector<float> m_bakedValues;
 };
 
 } // namespace lmms
