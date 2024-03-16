@@ -115,7 +115,7 @@ ClapPluginInfo::ClapPluginInfo(const clap_plugin_factory& factory, std::uint32_t
 	{
 		std::string msg = "Plugin '" + std::string{m_descriptor->id}
 			+ "' is not recognized as an instrument or audio effect";
-		ClapLog::globalLog(CLAP_LOG_ERROR, msg);
+		ClapLog::globalLog(CLAP_LOG_INFO, msg);
 	}
 }
 

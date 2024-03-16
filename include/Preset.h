@@ -32,7 +32,6 @@
 
 #include "Flags.h"
 #include "NoCopyNoMove.h"
-//#include "Plugin.h"
 
 namespace lmms
 {
@@ -42,25 +41,21 @@ struct PresetLoadData
 {
 	/**
 	 * A string that can be parsed by PathUtil.
-	 * Its meaning depends on the plugin, but it typically represents a preset directory.
+	 * Its meaning depends on the plugin, but it typically represents a preset file path.
 	 *
 	 * Valid examples:
-	 * - "userprojects:"
-	 * - "preset:MyPlugin/MyFavoritePresets"
-	 * - "/my/absolute/directory"
-	 * - "preset:my_plugin/my_preset_database.txt" (depending on the plugin, it could even be a file!)
+	 * - "preset:MyPlugin/MyFavoritePresets/foo.preset"
+	 * - "/my/absolute/directory/bar.ext"
+	 * - "preset:foo/preset_database.txt" (could be a container of presets, in which case `loadKey` is non-empty)
 	 * - "internal:" (for presets stored within the plugin's DSO rather than on disk)
 	 */
 	std::string location;
 
 	/**
-	 * Could be a preset filename, sub-path + preset filename, file offset, or any other kind of unique ID.
+	 * If non-empty, could be a file offset or any other kind of unique ID.
 	 * Again, it's entirely up to the plugin.
 	 */
 	std::string loadKey;
-
-	// Whether `location` and `loadKey` can be concatenated together
-	// to form a single string depends entirely on the plugin.
 
 	friend auto operator==(const PresetLoadData& lhs, const PresetLoadData& rhs) -> bool
 	{
@@ -95,23 +90,6 @@ LMMS_DECLARE_OPERATORS_FOR_FLAGS(PresetMetadata::Flag)
 class Preset
 {
 public:
-	/**
-	 * Same as `PresetLoadData`, but `location` is a std::string_view that references a key
-	 * within `PresetDatabase::m_presets` in order to save space when many presets are loaded.
-	 */
-	struct LoadData
-	{
-		std::string_view location;
-		std::string loadKey;
-
-		friend auto operator==(const LoadData& lhs, const PresetLoadData& rhs) noexcept -> bool
-		{
-			return lhs.location == rhs.location && lhs.loadKey == rhs.loadKey;
-		}
-
-		operator PresetLoadData() const { return {std::string{location}, loadKey}; }
-	};
-
 	auto metadata() -> auto& { return m_metadata; }
 	auto metadata() const -> auto& { return m_metadata; }
 
@@ -135,7 +113,7 @@ public:
 
 private:
 	PresetMetadata m_metadata;
-	LoadData m_loadData;
+	PresetLoadData m_loadData;
 
 	//! Subplugin keys that support this preset
 	//!   Empty if all subplugins support the preset or if there are no subplugins

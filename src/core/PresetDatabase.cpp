@@ -36,42 +36,32 @@
 namespace lmms
 {
 
-auto PresetDatabase::addPreset(std::string_view path) -> const Preset*
+auto PresetDatabase::discover() -> bool
 {
-	if (auto loadData = addFile(path))
+	if (!discoverSetup()) { return false; }
+	if (!discoverFiletypes(m_filetypes)) { return false; }
+
+	auto func = SetLocations{m_presets};
+	if (!discoverLocations(func)) { return false; }
+
+	bool success = false;
+	for (auto& [location, presets] : m_presets)
 	{
-		auto& presets = m_presets.find(loadData->location)->second;
-		auto it = std::find_if(presets.begin(), presets.end(), [&](const Preset& p) -> bool {
-			return *loadData == p.loadData();
-		});
-
-		if (it != presets.end())
-		{
-			qWarning() << "Preset file was already loaded";
-			return nullptr;
-		}
-
-		auto preset = createPreset(*loadData);
-		if (!preset) { return nullptr; }
-
-		const auto [iter, added] = presets.insert(std::move(*preset));
-		if (!added) { return nullptr; }
-
-		return &*iter;
+		success = discoverPresets(location, presets) || success;
 	}
-	return nullptr;
+
+	return success;
 }
 
-
-auto PresetDatabase::addLocation(std::string_view path) -> PresetMap::iterator
+auto PresetDatabase::addPresets(std::string_view path) -> std::vector<const Preset*>
 {
-	return m_presets.emplace(PathUtil::toShortestRelative(path), std::set<Preset>{}).first;
+	auto& [location, presets] = *getLocation(path);
+
+	return loadPresets(location, path, presets);
 }
-
-
 
 // TODO: Move to separate GUI-related file?
-auto PresetDatabase::openPresetFile(std::string_view previousFile) -> const Preset*
+auto PresetDatabase::openPresetFile(std::string_view previousFile) -> std::vector<const Preset*>
 {
 	auto openFileDialog = gui::FileDialog(nullptr, QObject::tr("Open audio file"));
 	auto dir = !previousFile.empty()
@@ -108,11 +98,11 @@ auto PresetDatabase::openPresetFile(std::string_view previousFile) -> const Pres
 		openFileDialog.selectFile(QFileInfo{QString::fromUtf8(previousFile.data(), previousFile.size())}.fileName());
 	}
 
-	if (openFileDialog.exec() != QDialog::Accepted) { return nullptr; }
+	if (openFileDialog.exec() != QDialog::Accepted) { return {}; }
 
-	if (openFileDialog.selectedFiles().isEmpty()) { return nullptr; }
+	if (openFileDialog.selectedFiles().isEmpty()) { return {}; }
 
-	return addPreset(openFileDialog.selectedFiles()[0].toStdString());
+	return addPresets(openFileDialog.selectedFiles()[0].toStdString());
 }
 
 auto PresetDatabase::savePresetFile(const Preset& preset) -> bool
@@ -121,26 +111,20 @@ auto PresetDatabase::savePresetFile(const Preset& preset) -> bool
 	return false;
 }
 
-auto PresetDatabase::createPreset(const Preset::LoadData& loadData) const -> std::optional<Preset>
+auto PresetDatabase::loadPresets(const Location& location, std::string_view file, std::set<Preset>& presets)
+	-> std::vector<const Preset*>
 {
-	// This is the default method - plugins should override this to provide better preset info
+	// This is the default method - plugins should override this
 
 	auto preset = Preset{};
-	preset.loadData() = loadData;
+	preset.loadData() = { std::string{file}, "" };
 
-	auto path = fs::path{loadData.loadKey};
-	preset.metadata().displayName = path.filename().string();
+	preset.metadata().displayName = fs::path{file}.filename().string();
 
-	return preset;
-}
+	auto [it, added] = presets.emplace(std::move(preset));
+	if (!added) { return {}; }
 
-auto PresetDatabase::createPreset(const Preset::LoadData& loadData,
-	const std::vector<std::string>& keys) const -> std::optional<Preset>
-{
-	auto preset = createPreset(loadData);
-	if (!preset) { return std::nullopt; }
-	preset->keys() = keys;
-	return preset;
+	return { &*it };
 }
 
 auto PresetDatabase::findPresets(std::string_view key) const -> std::vector<const Preset*>
@@ -171,53 +155,61 @@ auto PresetDatabase::findPreset(const PresetLoadData& loadData, std::string_view
 	return nullptr;
 }
 
-auto PresetDatabase::addFile(std::string_view path) -> std::optional<Preset::LoadData>
+auto PresetDatabase::getLocation(std::string_view path, bool add) -> PresetMap::iterator
 {
+	auto isSubpath = [](std::string_view path, std::string_view base) -> bool {
+		const auto mismatchPair = std::mismatch(path.begin(), path.end(), base.begin(), base.end());
+		return mismatchPair.second == base.end();
+	};
+
 	// First, create shortened path
 	const auto shortPath = PathUtil::toShortestRelative(path);
 
-	// Next, check full string
-	if (auto it = m_presets.find(shortPath); it != m_presets.end())
+	// Next, find the preset directory it belongs to (if any)
+	std::vector<PresetMap::iterator> matches;
+	for (auto it = m_presets.begin(); it != m_presets.end(); ++it)
 	{
-		return Preset::LoadData{it->first, ""};
-	}
-
-	// Must have at least one directory separator
-	auto pos = shortPath.find_last_of("/\\");
-	if (pos == std::string::npos) { return std::nullopt; } // error
-
-	// Next, split input into each possible (location, loadKey) pair starting from right end
-	auto locationView = std::string_view{shortPath};
-	auto loadKeyView = std::string_view{shortPath};
-	do
-	{
-		locationView = std::string_view{shortPath};
-		loadKeyView = std::string_view{shortPath};
-		locationView.remove_suffix(locationView.size() - pos);
-		loadKeyView.remove_prefix(pos + 1);
-		if (auto it = m_presets.find(locationView); it != m_presets.end())
+		const auto& location = it->first.location;
+		if (isSubpath(shortPath, location))
 		{
-			return Preset::LoadData{it->first, std::string{loadKeyView}};
-		}
-
-		if (pos == 0) { break; }
-		pos = shortPath.find_last_of("/\\", pos - 1);
-	} while (pos != std::string::npos);
-
-	// Did not find the file in `m_presets` - check just the PathUtil::Base
-	auto [base, loadKey] = PathUtil::parsePath(shortPath);
-	if (base != PathUtil::Base::Absolute)
-	{
-		if (auto it = m_presets.find(PathUtil::basePrefix(base)); it != m_presets.end())
-		{
-			return Preset::LoadData{it->first, std::string{loadKey}};
+			matches.push_back(it);
 		}
 	}
 
-	auto ret = m_presets.emplace(locationView, std::set<Preset>{});
-	assert(ret.second);
+	if (!matches.empty())
+	{
+		// Location already exists - return the longest (most specific) directory
+		return *std::max_element(matches.begin(), matches.end(),
+			[](PresetMap::iterator a, PresetMap::iterator b) {
+				return a->first.location.size() < b->first.location.size();
+			});
+	}
 
-	return Preset::LoadData{ret.first->first, std::string{loadKeyView}};
+	// Else, need to add new location
+	if (!add) { return m_presets.end(); }
+
+	// Use parent directory
+	const auto parentPath = fs::path{PathUtil::toAbsolute(path).value()}.parent_path().string();
+	auto newLocation = Location {
+		std::string{}, // name
+		std::string{PathUtil::toShortestRelative(parentPath)}, // directory
+		PresetMetadata::Flag::UserContent // assume unknown directories are user content
+	};
+
+	return m_presets.emplace(std::move(newLocation), std::set<Preset>{}).first;
+}
+
+void PresetDatabase::SetLocations::operator()(const std::vector<Location>& locations) const
+{
+	for (auto& location : locations)
+	{
+		m_map->emplace(location, std::set<Preset>{});
+	}
+}
+
+void PresetDatabase::SetLocations::operator()(Location location) const
+{
+	m_map->emplace(std::move(location), std::set<Preset>{});
 }
 
 } // namespace lmms

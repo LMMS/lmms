@@ -154,8 +154,14 @@ void PluginPresets::saveActivePreset(QDomDocument& doc, QDomElement& element)
 
 		QDomElement presetElement = doc.createElement(presetNodeName());
 		element.appendChild(presetElement);
+		qDebug().nospace() << "Saving active preset: location: \"" << location.data() << "\" loadKey: \""
+			<< loadKey.data() << "\"";
 		presetElement.setAttribute("location", QString::fromUtf8(location.data(), location.size()));
 		presetElement.setAttribute("loadKey", QString::fromUtf8(loadKey.data(), loadKey.size()));
+	}
+	else
+	{
+		qDebug() << "No active preset to save";
 	}
 }
 
@@ -164,6 +170,7 @@ void PluginPresets::loadActivePreset(const QDomElement& element)
 	QDomElement presetElement = element.firstChildElement(presetNodeName());
 	if (presetElement.isNull())
 	{
+		qDebug() << "Loading active preset: None found.";
 		setActivePreset(std::nullopt);
 		return;
 	}
@@ -173,9 +180,13 @@ void PluginPresets::loadActivePreset(const QDomElement& element)
 
 	if (location.isEmpty() && loadKey.isEmpty())
 	{
+		qDebug() << "Loading active preset: Active preset data empty.";
 		setActivePreset(std::nullopt);
 		return;
 	}
+
+	qDebug().nospace() << "Loading active preset: location: \"" << location.data() << "\" loadKey: \""
+			<< loadKey.data() << "\"";
 
 	// TODO: The needed preset may not be discovered at this point
 

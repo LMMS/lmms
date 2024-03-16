@@ -71,6 +71,15 @@ auto ClapPresetLoader::activatePresetImpl(const PresetLoadData& preset) noexcept
 	const auto location = ClapPresetDatabase::toClapLocation(preset.location, temp);
 	if (!location) { return false; }
 
+#if 1
+	{
+		std::string msg = "About to activate preset: kind:" + std::to_string(location->first)
+			+ "; location: \"" + std::string{location->second ? location->second : "(NULL)"}
+			+ "\"; load key: \"" + preset.loadKey + "\"";
+		logger().log(CLAP_LOG_INFO, msg);
+	}
+#endif
+
 	if (!pluginExt()->from_location(plugin(), location->first, location->second, preset.loadKey.c_str()))
 	{
 		logger().log(CLAP_LOG_ERROR, "Failed to load preset");
@@ -79,7 +88,7 @@ auto ClapPresetLoader::activatePresetImpl(const PresetLoadData& preset) noexcept
 
 	if (!instance()->params().supported()) { return true; }
 
-	return instance()->params().rescan(CLAP_PARAM_RESCAN_VALUES);
+	return instance()->params().rescan(CLAP_PARAM_RESCAN_VALUES); // TODO: Is this correct?
 }
 
 auto ClapPresetLoader::getPresetDatabase() const -> PresetDatabase*

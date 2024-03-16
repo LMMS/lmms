@@ -42,28 +42,54 @@ namespace lmms
  * Plugins are expected to inherit this class to implement preset discovery,
  *   metadata loading, and other functionality.
  */
-class PresetDatabase : public NoCopyNoMove
+class PresetDatabase
 {
 public:
-	using PresetMap = std::map<std::string, std::set<Preset>, std::less<>>;
-
 	struct Filetype
 	{
 		std::string name;
 		std::string description;
-		std::string extension;
+		std::string extension; //< without dot; if empty, any extension is supported
 	};
 
+	//! Represents a preset directory or internal location where presets can be found
+	struct Location
+	{
+		std::string name;
+		std::string location; //!< PathUtil-compatible
+		PresetMetadata::Flags flags = PresetMetadata::Flag::None;
+
+		friend auto operator==(const Location& lhs, const Location& rhs) noexcept -> bool
+		{
+			return lhs.location == rhs.location;
+		}
+
+		friend auto operator<(const Location& lhs, const Location& rhs) noexcept -> bool
+		{
+			return lhs.location < rhs.location;
+		}
+
+		friend auto operator<(std::string_view location, const Location& rhs) noexcept -> bool
+		{
+			return location < rhs.location;
+		}
+
+		friend auto operator<(const Location& lhs, std::string_view location) noexcept -> bool
+		{
+			return lhs.location < location;
+		}
+	};
+
+	using PresetMap = std::map<Location, std::set<Preset>, std::less<>>;
+
 	PresetDatabase() = default;
-	//using QObject::QObject;
-	//PresetDatabase(std::string_view key);
 	virtual ~PresetDatabase() = default;
 
 	//! Discover presets and populate database; Returns true when successful
-	virtual auto discover() -> bool = 0;
+	auto discover() -> bool;
 
-	//! Load a preset file from disk; Returns nullptr upon failure or if preset was already added
-	auto addPreset(std::string_view path) -> const Preset*;
+	//! Load a preset file from disk; Returns empty vector upon failure or if preset(s) were already added
+	auto addPresets(std::string_view path) -> std::vector<const Preset*>;
 
 	/**
 	 * Accessors
@@ -71,19 +97,16 @@ public:
 
 	auto presets() const -> auto& { return m_presets; }
 
-	auto presets(const std::string& location) const -> const std::set<Preset>&
+	auto presets(std::string_view location) const -> const std::set<Preset>*
 	{
-		return m_presets.at(location);
+		const auto it = m_presets.find(location);
+		return it != m_presets.end() ? &it->second : nullptr;
 	}
 
-	auto presets(const std::string& location) -> std::set<Preset>&
+	auto presets(std::string_view location) -> std::set<Preset>*
 	{
-		return m_presets.at(location);
-	}
-
-	auto presets(std::string_view location) -> PresetMap::iterator
-	{
-		return m_presets.find(location);
+		const auto it = m_presets.find(location);
+		return it != m_presets.end() ? &it->second : nullptr;
 	}
 
 	auto filetypes() const -> auto& { return m_filetypes; }
@@ -94,7 +117,7 @@ public:
 	auto findPreset(const PresetLoadData& loadData, std::string_view key = std::string_view{}) const -> const Preset*;
 
 	//! Open preset dialog TODO: Move to an lmms::gui class?
-	auto openPresetFile(std::string_view previousFile) -> const Preset*;
+	auto openPresetFile(std::string_view previousFile) -> std::vector<const Preset*>;
 
 	//! Save preset dialog TODO: Move to an lmms::gui class?
 	auto savePresetFile(const Preset& preset) -> bool;
@@ -106,43 +129,70 @@ public:
 
 protected:
 
-	//! Creates a populated Preset object from Preset::LoadData.
-	//! Plugins should override this to provide better preset metadata.
-	virtual auto createPreset(const Preset::LoadData& loadData) const -> std::optional<Preset>;
-
-	//! Creates a populated Preset object from Preset::LoadData and key(s).
-	//! Plugins should override this to provide better preset metadata.
-	virtual auto createPreset(const Preset::LoadData& loadData,
-		const std::vector<std::string>& keys) const -> std::optional<Preset>;
+	/**
+	 * 1st step of `discover()` - optional setup
+	 *
+	 * Return true if successful
+	 */
+	virtual auto discoverSetup() -> bool { return true; }
 
 	/**
-	 * Adds a preset file to `m_presets` if it doesn't exist, and returns the load data.
+	 * 2nd step of `discover()` - declare all supported file types
 	 *
-	 * Checks all the combinations for splitting `path` into location and load key before adding.
-	 * TODO: Return map iterator so that `m_presets` does not need to be searched again?
+	 * Return true if successful
 	 */
-	auto addFile(std::string_view path) -> std::optional<Preset::LoadData>;
+	virtual auto discoverFiletypes(std::vector<Filetype>& filetypes) -> bool = 0;
 
-	//! Use during discover() call; The returned iterator is used to add presets at the location
-	auto addLocation(std::string_view path) -> PresetMap::iterator;
-
-	//! Use during discover() call
-	void addFiletype(Filetype filetype)
+	//! Function object to make `discoverLocations()` implementation simpler and hide implementation details
+	class SetLocations
 	{
-		m_filetypes.push_back(std::move(filetype));
-	}
+	public:
+		friend class PresetDatabase;
+		void operator()(const std::vector<Location>& locations) const;
+		void operator()(Location location) const;
+	private:
+		SetLocations(PresetMap& presets) : m_map{&presets} {}
+		PresetMap* m_map = nullptr;
+	};
 
-	//! Use during discover() call
-	void setFiletypes(std::vector<Filetype> filetypes)
-	{
-		m_filetypes = std::move(filetypes);
-	}
+	/**
+	 * 3rd step of `discover()` - declare all pre-established preset locations
+	 *
+	 * Return true if successful
+	 */
+	virtual auto discoverLocations(const SetLocations& func) -> bool = 0;
+
+	/**
+	 * 4th and final step of `discover()` - populate set of presets at the given location
+	 *
+	 * Return true if successful
+	 */
+	virtual auto discoverPresets(const Location& location, std::set<Preset>& presets) -> bool = 0;
+
+	/**
+	 * Loads presets for the given location from `file`, retrieves any metadata,
+	 * and adds the new presets to `presets`. Returns all the new presets.
+	 *
+	 * Used when the user loads a new preset from disk.
+	 * May also be used by `discoverPresets()`.
+	 *
+	 * The default implementation only works for simple preset files.
+	 * Plugins that support preset containers (where multiple presets could potentially be returned
+	 * from this method) or provide additional preset metadata should reimplement this method.
+	 */
+	virtual auto loadPresets(const Location& location, std::string_view file, std::set<Preset>& presets)
+		-> std::vector<const Preset*>;
+
+	/**
+	 * Gets preset location from `m_presets` which contains `path`, optionally adding it if it doesn't exist
+	 *
+	 * Returns iterator to the `m_presets` location
+	 */
+	auto getLocation(std::string_view path, bool add = true) -> PresetMap::iterator;
 
 private:
 
-	//! Maps locations to presets.
-	//! PresetLoadData references this map's key (location), so this map must remain stable after construction.
-	//! See `PresetLoadData::location` for more info.
+	//! Maps locations to presets
 	PresetMap m_presets;
 
 	std::vector<Filetype> m_filetypes;

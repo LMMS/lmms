@@ -27,6 +27,7 @@
 #ifdef LMMS_HAVE_CLAP
 
 #include <QDebug>
+#include <QObject>
 #include <cassert>
 #include <clap/entry.h>
 
@@ -57,8 +58,13 @@ public:
 	MetadataReceiver() = delete;
 	MetadataReceiver(const Indexer& indexer);
 
-	auto query(std::string_view location, PresetMetadata::Flags flags = PresetMetadata::Flag::None)
+	//! For PLUGIN presets
+	auto query(PresetMetadata::Flags flags = PresetMetadata::Flag::None)
 		-> std::optional<std::vector<Preset>>;
+
+	//! For FILE presets; `file` is the full path of the preset file
+	auto query(std::string_view file,
+		PresetMetadata::Flags flags = PresetMetadata::Flag::None) -> std::optional<std::vector<Preset>>;
 
 	auto errorMessage() const -> auto& { return m_error; }
 
@@ -100,6 +106,7 @@ private:
 
 auto ClapPresetDatabase::init(const clap_plugin_entry* entry) -> bool
 {
+	// TODO: Move this to discoverSetup() method?
 	if (!entry) { return false; }
 
 	m_factory = static_cast<const clap_preset_discovery_factory*>(
@@ -120,11 +127,11 @@ void ClapPresetDatabase::deinit()
 	m_indexers.clear();
 }
 
-auto ClapPresetDatabase::discover() -> bool
+auto ClapPresetDatabase::discoverSetup() -> bool
 {
 	if (!m_factory)
 	{
-		// This CLAP file doesn't provide preset support
+		// This .clap file doesn't provide preset support
 		return false;
 	}
 
@@ -132,41 +139,222 @@ auto ClapPresetDatabase::discover() -> bool
 	qDebug() << "providerCount:" << providerCount;
 	if (providerCount == 0) { return false; }
 
+	bool success = false;
 	for (std::uint32_t idx = 0; idx < providerCount; ++idx)
 	{
 		if (auto indexer = Indexer::create(*m_factory, idx))
 		{
+			success = true;
 			qDebug() << "Indexer successfully created";
 			auto& indexerRef = m_indexers.emplace_back(std::move(indexer));
 			for (auto& filetype : indexerRef->filetypes())
 			{
 				m_filetypeIndexerMap[filetype.extension].push_back(indexerRef.get());
 			}
-		} else { qDebug() << "Indexer creation FAILED"; }
+		}
+		else
+		{
+			ClapLog::globalLog(CLAP_LOG_WARNING, "Failed to create preset indexer");
+		}
 	}
 
-	for (auto& indexer : m_indexers)
+	return success;
+}
+
+auto ClapPresetDatabase::discoverFiletypes(std::vector<Filetype>& filetypes) -> bool
+{
+	for (const auto& indexer : m_indexers)
 	{
-		setFiletypes(std::move(indexer->filetypes()));
-
-		qDebug() << "Iterating over locations...";
-		for (auto& location : indexer->locations())
+		for (const auto& filetype : indexer->filetypes())
 		{
-			qDebug() << "location:" << location.location.c_str();
-			qDebug() << "location name:" << location.name.c_str()
-				<< "flags:" << static_cast<int>(location.flags) << "kind:" << location.kind;
+			filetypes.push_back(filetype);
+		}
+	}
+	return true;
+}
 
-			auto& [locationRef, presets] = *addLocation(location.location);
-			auto newPresets = indexer->query(locationRef, location.flags);
+auto ClapPresetDatabase::discoverLocations(const SetLocations& func) -> bool
+{
+	for (const auto& indexer : m_indexers)
+	{
+		for (const auto& location : indexer->locations())
+		{
+			func(location);
+		}
+	}
+	return true;
+}
+
+auto ClapPresetDatabase::discoverPresets(const Location& location, std::set<Preset>& presets) -> bool
+{
+	qDebug() << "location:" << location.location.c_str();
+	qDebug() << "location name:" << location.name.c_str();
+	qDebug() << "flags:" << static_cast<int>(location.flags);
+
+	const auto preferredIndexer = getIndexerFor(location);
+
+	// Handle PLUGIN presets (internal presets)
+	if (PathUtil::baseLookup(location.location) == PathUtil::Base::Internal)
+	{
+		if (!preferredIndexer)
+		{
+			ClapLog::globalLog(CLAP_LOG_ERROR, "No known indexer supports internal presets");
+			return false;
+		}
+
+		auto newPresets = preferredIndexer->query(location.flags);
+		if (!newPresets) { return false; }
+		for (auto& preset : *newPresets)
+		{
+			presets.insert(std::move(preset));
+		}
+
+		return true;
+	}
+
+	// Presets must be FILE presets
+	const auto fullPath = PathUtil::toAbsolute(location.location).value_or("");
+	if (fullPath.empty())
+	{
+		// Shouldn't ever happen?
+		ClapLog::globalLog(CLAP_LOG_ERROR, "Failed to get absolute path for preset directory");
+		return false;
+	}
+
+	// First handle case where location is a file
+	if (std::error_code ec; fs::is_regular_file(fullPath, ec))
+	{
+		// Use preferred indexer if possible
+		if (preferredIndexer)
+		{
+			auto newPresets = preferredIndexer->query(fullPath, location.flags);
+			if (!newPresets) { return false; }
+			for (auto& preset : *newPresets)
+			{
+				presets.insert(std::move(preset));
+			}
+			return true;
+		}
+
+		// Else, just try whichever indexer works
+		bool success = false;
+		for (const auto& indexer : m_indexers)
+		{
+			auto newPresets = indexer->query(fullPath, location.flags);
 			if (!newPresets) { continue; }
+			success = true;
 			for (auto& preset : *newPresets)
 			{
 				presets.insert(std::move(preset));
 			}
 		}
+		return success;
 	}
 
-	return true;
+	// Location is a directory - need to search for preset files
+	if (std::error_code ec; !fs::is_directory(fullPath, ec))
+	{
+		ClapLog::globalLog(CLAP_LOG_WARNING, "Preset directory \"" + fullPath + "\" does not exist");
+		return false;
+	}
+
+	// TODO: Move to Indexer?
+	auto getPresets = [&](Indexer& indexer) -> bool {
+		bool success = false;
+
+		for (const auto& entry : fs::recursive_directory_iterator{fullPath})
+		{
+			const auto entryPath = entry.path().string();
+
+			// NOTE: Using is_regular_file() free function workaround due to std::experimental::filesystem
+			if (std::error_code ec; !fs::is_regular_file(entry, ec)) { continue; }
+
+			if (!indexer.filetypeSupported(entryPath)) { continue; }
+
+			auto newPresets = indexer.query(entryPath, location.flags);
+			if (!newPresets) { continue; }
+			success = true;
+			for (auto& preset : *newPresets)
+			{
+				presets.insert(std::move(preset));
+			}
+		}
+
+		return success;
+	};
+
+
+	// TODO: Use m_filetypeIndexerMap instead of preferredIndexer?
+
+	// Use preferred indexer if possible
+	if (preferredIndexer)
+	{
+		return getPresets(*preferredIndexer);
+	}
+
+	// Else, just try whichever indexer works
+	bool success = false;
+	for (const auto& indexer : m_indexers)
+	{
+		success = getPresets(*indexer) || success;
+	}
+	return success;
+}
+
+auto ClapPresetDatabase::loadPresets(const Location& location, std::string_view file,
+	std::set<Preset>& presets) -> std::vector<const Preset*>
+{
+	if (std::error_code ec; !fs::is_regular_file(file, ec)) { return {}; }
+
+	auto getPresets = [&](Indexer& indexer) -> std::vector<const Preset*> {
+		if (!indexer.filetypeSupported(file)) { return {}; }
+
+		auto newPresets = indexer.query(file, location.flags);
+		if (!newPresets) { return {}; }
+
+		std::vector<const Preset*> results;
+		for (auto& preset : *newPresets)
+		{
+			auto [it, added] = presets.emplace(std::move(preset));
+			if (added)
+			{
+				results.push_back(&*it);
+			}
+			else
+			{
+				std::string msg = "The preset \"" + it->metadata().displayName + "\" was already loaded";
+				ClapLog::globalLog(CLAP_LOG_WARNING, msg);
+			}
+		}
+		return results;
+	};
+
+	if (const auto preferredIndexer = getIndexerFor(location))
+	{
+		return getPresets(*preferredIndexer);
+	}
+
+	std::vector<const Preset*> results;
+	for (const auto& indexer : m_indexers)
+	{
+		results = getPresets(*indexer);
+		if (!results.empty()) { break; }
+	}
+
+	return results;
+}
+
+auto ClapPresetDatabase::getIndexerFor(const Location& location) const -> Indexer*
+{
+	for (const auto& indexer : m_indexers)
+	{
+		const auto& locations = indexer->locations();
+		const auto it = std::find(locations.begin(), locations.end(), location);
+		if (it == locations.end()) { return nullptr; }
+		return indexer.get(); // exact match
+	}
+
+	return nullptr;
 }
 
 auto ClapPresetDatabase::toClapLocation(std::string_view location, std::string& ref)
@@ -224,47 +412,8 @@ auto ClapPresetDatabase::fromClapLocation([[maybe_unused]] clap_preset_discovery
 	};
 }
 
-auto ClapPresetDatabase::createPreset(const Preset::LoadData& loadData) const -> std::optional<Preset>
-{
-	// NOTE: Any time this method is called, Preset::LoadData stores a path to a preset file (???)
-	// TODO: Should all possible presets already be discovered at the start? Is it a bug if this is ever called for CLAP??
-
-	const auto fullPath = fs::path{PathUtil::toAbsolute(loadData.location).value()} / loadData.loadKey;
-	if (std::error_code ec; !fs::is_regular_file(fullPath, ec)) { return std::nullopt; }
-
-	const auto extension = fullPath.extension().string();
-	auto extensionView = std::string_view{extension};
-	if (!extension.empty() && extension[0] == '.') { extensionView.remove_prefix(1); }
-
-	if (auto it = m_filetypeIndexerMap.find(extensionView); it != m_filetypeIndexerMap.end())
-	{
-		for (auto indexer : it->second)
-		{
-			auto presets = indexer->query(fullPath.c_str(), PresetMetadata::Flag::UserContent);
-			if (!presets || presets->empty()) { continue; } // Hopefully there's another indexer that will work
-			if (presets->size() > 1)
-			{
-				ClapLog::globalLog(CLAP_LOG_HOST_MISBEHAVING,
-					"Manually loading multiple presets from a single preset file is not supported yet!"
-					"\n\tLoading just the first preset instead."); // TODO: Implement this feature
-				return presets->at(0);
-			}
-			assert(presets->at(0).loadData().loadKey.empty());
-			// TODO: If it's working correctly, the preset `location` should be the full path and the `loadKey`
-			//       should be nullptr. (??? maybe not when the preset file is a container for many presets?)
-			//       (see free-audio/clap-host's PluginHost::loadNativePluginPreset() method)
-			return presets->at(0);
-		}
-
-		ClapLog::globalLog(CLAP_LOG_ERROR, "Failed to load preset");
-		return std::nullopt;
-	}
-
-	return std::nullopt;
-}
-
-auto ClapPresetDatabase::Indexer::create(const clap_preset_discovery_factory& factory,
-	std::uint32_t index) -> std::unique_ptr<Indexer>
+auto ClapPresetDatabase::Indexer::create(const clap_preset_discovery_factory& factory, std::uint32_t index)
+	-> std::unique_ptr<Indexer>
 {
 	const auto desc = factory.get_descriptor(&factory, index);
 	if (!desc || !desc->id) { return nullptr; }
@@ -315,23 +464,51 @@ ClapPresetDatabase::Indexer::Indexer(const clap_preset_discovery_factory& factor
 	}
 }
 
-auto ClapPresetDatabase::Indexer::query(std::string_view location, PresetMetadata::Flags flags)
+auto ClapPresetDatabase::Indexer::query(PresetMetadata::Flags flags)
 	-> std::optional<std::vector<Preset>>
 {
 	auto receiver = MetadataReceiver{*this};
-	return receiver.query(location, flags);
+	return receiver.query(flags);
+}
+
+auto ClapPresetDatabase::Indexer::query(std::string_view file, PresetMetadata::Flags flags)
+	-> std::optional<std::vector<Preset>>
+{
+	auto receiver = MetadataReceiver{*this};
+	return receiver.query(file, flags);
+}
+
+auto ClapPresetDatabase::Indexer::filetypeSupported(fs::path path) const -> bool
+{
+	if (m_filetypes.empty() || m_filetypes[0].extension.empty()) { return true; }
+
+	const auto extension = path.extension().string();
+	if (extension.empty()) { return false; }
+
+	auto extView = std::string_view{extension};
+	extView.remove_prefix(1); // remove dot
+	return std::find_if(m_filetypes.begin(), m_filetypes.end(),
+		[&](const Filetype& f) { return f.extension == extView; }) != m_filetypes.end();
 }
 
 auto ClapPresetDatabase::Indexer::clapDeclareFiletype(const clap_preset_discovery_indexer* indexer,
 	const clap_preset_discovery_filetype* filetype) -> bool
 {
-	if (!indexer || !indexer->indexer_data || !filetype || !filetype->name) { return false; }
+	if (!indexer || !filetype)
+	{
+		ClapLog::globalLog(CLAP_LOG_PLUGIN_MISBEHAVING, "Preset provider declared a file type incorrectly");
+		return false;
+	}
 
 	auto self = static_cast<Indexer*>(indexer->indexer_data);
-	if (!self) { return false; }
+	if (!self)
+	{
+		ClapLog::globalLog(CLAP_LOG_PLUGIN_MISBEHAVING, "Plugin modified the preset indexer's context pointer");
+		return false;
+	}
 
 	auto ft = Filetype{};
-	ft.name = filetype->name;
+	ft.name = filetype->name ? filetype->name : QObject::tr("Preset").toStdString();
 	if (filetype->description) { ft.description = filetype->description; }
 	if (filetype->file_extension) { ft.extension = filetype->file_extension; }
 
@@ -344,15 +521,18 @@ auto ClapPresetDatabase::Indexer::clapDeclareFiletype(const clap_preset_discover
 auto ClapPresetDatabase::Indexer::clapDeclareLocation(const clap_preset_discovery_indexer* indexer,
 	const clap_preset_discovery_location* location) -> bool
 {
-	if (!indexer || !indexer->indexer_data || !location) { return false; }
+	if (!indexer || !location)
+	{
+		ClapLog::globalLog(CLAP_LOG_PLUGIN_MISBEHAVING, "Preset provider declared a location incorrectly");
+		return false;
+	}
 
 	auto self = static_cast<Indexer*>(indexer->indexer_data);
-	if (!self) { return false; }
-
-	Location loc;
-	loc.flags = convertFlags(location->flags);
-	loc.kind = static_cast<clap_preset_discovery_location_kind>(location->kind);
-	loc.name = location->name ? location->name : std::string{};
+	if (!self)
+	{
+		ClapLog::globalLog(CLAP_LOG_PLUGIN_MISBEHAVING, "Plugin modified the preset indexer's context pointer");
+		return false;
+	}
 
 	switch (location->kind)
 	{
@@ -373,7 +553,8 @@ auto ClapPresetDatabase::Indexer::clapDeclareLocation(const clap_preset_discover
 				return false;
 			}
 
-			if (std::error_code ec; !fs::is_regular_file(location->location, ec) || ec)
+			// A FILE location could be a directory or a file
+			if (std::error_code ec; !fs::exists(location->location, ec))
 			{
 				std::string msg = "Preset location \"" + std::string{location->location} + "\" does not exist";
 				ClapLog::globalLog(CLAP_LOG_WARNING, msg);
@@ -386,7 +567,11 @@ auto ClapPresetDatabase::Indexer::clapDeclareLocation(const clap_preset_discover
 			return false;
 	}
 
-	loc.location = fromClapLocation(location->location);
+	auto loc = Location {
+		location->name ? location->name : std::string{},
+		fromClapLocation(location->location),
+		convertFlags(location->flags)
+	};
 
 	qDebug().nospace() << "clapDeclareLocation: name: \"" << loc.name.c_str() << "\" loc: \"" << loc.location.c_str() << "\"";
 
@@ -428,23 +613,44 @@ ClapPresetDatabase::MetadataReceiver::MetadataReceiver(const Indexer& indexer)
 {
 }
 
-auto ClapPresetDatabase::MetadataReceiver::query(std::string_view location, PresetMetadata::Flags flags)
+auto ClapPresetDatabase::MetadataReceiver::query(PresetMetadata::Flags flags)
 	-> std::optional<std::vector<Preset>>
 {
 	const auto provider = m_indexer->provider();
 	if (!provider) { return std::nullopt; }
 
-	std::string temp;
-	const auto loc = toClapLocation(location, temp);
-	if (!loc) { return std::nullopt; }
-
-	m_location = location;
+	m_location = PathUtil::basePrefix(PathUtil::Base::Internal);
 	m_flags = flags;
 	m_presets.clear();
-	if (!provider->get_metadata(provider, loc->first, loc->second, &m_receiver))
+	if (!provider->get_metadata(provider, CLAP_PRESET_DISCOVERY_LOCATION_PLUGIN, nullptr, &m_receiver))
 	{
 		std::string msg = "Failed to get metadata from the preset discovery provider";
-		if (!errorMessage().empty()) { msg += "; msg=\"" + errorMessage() + "\""; }
+		if (!errorMessage().empty()) { msg += ": " + errorMessage(); }
+		ClapLog::globalLog(CLAP_LOG_ERROR, msg.c_str());
+		return std::nullopt;
+	}
+
+	return std::move(m_presets);
+}
+
+auto ClapPresetDatabase::MetadataReceiver::query(std::string_view file,
+	PresetMetadata::Flags flags) -> std::optional<std::vector<Preset>>
+{
+	const auto provider = m_indexer->provider();
+	if (!provider) { return std::nullopt; }
+
+	/*
+	 * For preset files, PresetLoadData will usually be { file, "" },
+	 * but if the preset file contains multiple presets, it will be { file, loadKey }.
+	 */
+
+	m_location = file;
+	m_flags = flags;
+	m_presets.clear();
+	if (!provider->get_metadata(provider, CLAP_PRESET_DISCOVERY_LOCATION_FILE, file.data(), &m_receiver))
+	{
+		std::string msg = "Failed to get metadata from the preset discovery provider";
+		if (!errorMessage().empty()) { msg += ": " + errorMessage(); }
 		ClapLog::globalLog(CLAP_LOG_ERROR, msg.c_str());
 		return std::nullopt;
 	}
@@ -457,8 +663,8 @@ void ClapPresetDatabase::MetadataReceiver::clapOnError(
 {
 	if (auto self = from(receiver))
 	{
-		self->m_error = "{os_error=" + std::to_string(osError) + ", error_message=\""
-			+ (errorMessage ? errorMessage : std::string{}) + "\"}";
+		self->m_error = "{ os_error=" + std::to_string(osError) + ", error_message=\""
+			+ (errorMessage ? errorMessage : std::string{}) + "\" }";
 	}
 }
 
@@ -472,7 +678,7 @@ auto ClapPresetDatabase::MetadataReceiver::clapBeginPreset(
 	auto& preset = self->m_presets.emplace_back();
 	preset.metadata().displayName = name ? name : std::string{};
 	preset.metadata().flags = self->m_flags; // may be overridden by clapSetFlags()
-	preset.loadData().location = self->m_location; // references the preset map's key
+	preset.loadData().location = self->m_location;
 	preset.loadData().loadKey = loadKey ? loadKey : std::string{};
 
 	qDebug().nospace() << "clapBeginPreset: display name: \"" << preset.metadata().displayName.c_str() << "\" load key: \"" << preset.loadData().loadKey.c_str() << "\"";

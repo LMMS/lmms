@@ -37,6 +37,7 @@
 #include <clap/factory/preset-discovery.h>
 
 #include "ClapExtension.h"
+#include "lmms_filesystem.h"
 #include "NoCopyNoMove.h"
 #include "PresetDatabase.h"
 
@@ -53,8 +54,6 @@ public:
 	auto init(const clap_plugin_entry* entry) -> bool;
 	void deinit();
 
-	auto discover() -> bool override;
-
 	auto supported() const -> bool { return m_factory; }
 
 	static auto toClapLocation(std::string_view location, std::string& ref)
@@ -64,7 +63,13 @@ public:
 		const char* location, const char* loadKey) -> std::optional<PresetLoadData>;
 
 private:
-	auto createPreset(const Preset::LoadData& loadData) const -> std::optional<Preset> override;
+	auto discoverSetup() -> bool override;
+	auto discoverFiletypes(std::vector<Filetype>& filetypes) -> bool override;
+	auto discoverLocations(const SetLocations& func) -> bool override;
+	auto discoverPresets(const Location& location, std::set<Preset>& presets) -> bool override;
+
+	auto loadPresets(const Location& location, std::string_view file, std::set<Preset>& presets)
+		-> std::vector<const Preset*> override;
 
 	class Indexer : public NoCopyNoMove
 	{
@@ -77,19 +82,17 @@ private:
 			const clap_preset_discovery_provider_descriptor& descriptor);
 		~Indexer() = default;
 
-		auto query(std::string_view location, PresetMetadata::Flags flags = PresetMetadata::Flag::None)
+		//! For PLUGIN presets
+		auto query(PresetMetadata::Flags flags = PresetMetadata::Flag::None)
 			-> std::optional<std::vector<Preset>>;
 
-		auto provider() const -> const clap_preset_discovery_provider* { return m_provider.get(); }
+		//! For FILE presets; `file` is the full path of the preset file
+		auto query(std::string_view file,
+			PresetMetadata::Flags flags = PresetMetadata::Flag::None) -> std::optional<std::vector<Preset>>;
 
-		//! Like clap_preset_discovery_location, for storing declare_location() data
-		struct Location
-		{
-			PresetMetadata::Flags flags;
-			std::string name;
-			clap_preset_discovery_location_kind kind;
-			std::string location; //!< PathUtil-compatible
-		};
+		auto filetypeSupported(fs::path path) const -> bool;
+
+		auto provider() const -> const clap_preset_discovery_provider* { return m_provider.get(); }
 
 		auto locations() -> auto& { return m_locations; }
 		auto filetypes() -> auto& { return m_filetypes; }
@@ -118,9 +121,11 @@ private:
 		clap_preset_discovery_indexer m_indexer;
 		std::unique_ptr<const clap_preset_discovery_provider, ProviderDeleter> m_provider;
 
-		std::vector<Location> m_locations;
+		std::vector<PresetDatabase::Location> m_locations;
 		std::vector<PresetDatabase::Filetype> m_filetypes;
 	};
+
+	auto getIndexerFor(const Location& location) const -> Indexer*;
 
 	class MetadataReceiver;
 
