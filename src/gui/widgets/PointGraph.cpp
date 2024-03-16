@@ -9,6 +9,7 @@
 #include <QInputDialog>
 
 #include "PointGraph.h"
+#include "StringPairDrag.h"
 
 
 namespace lmms
@@ -31,11 +32,41 @@ PointGraphView::PointGraphView(QWidget * parentIn,
 	m_addition = false;
 
 	m_pointSize = pointSizeIn;
+	m_isSimplified = false;
 
 	m_selectedLocation = 0;
 	m_selectedArray = 0;
 	m_isSelected = false;
 	m_isCurveSelected = false;
+	m_isLastSelectedArray = false;
+
+	m_graphHeight = height();
+	m_editingHeight = 30;
+	m_editingInputCount = 4;
+	m_editingDisplayPage = 0;
+	m_isEditingActive = false;
+	m_editingText = {
+		tr("x coordinate"), tr("y coordinate"), tr("curve"), tr("1. attribute value"),
+		tr("2. attribute value"), tr("switch graph line type"), tr("switch graph automated value"),
+		tr("switch graph effected value"), tr("can only effect graph points"), tr("\"add\" effect"), tr("\"subtract\" effect"),
+		tr("\"multiply\" effect"), tr("\"divide\" effect"), tr("\"power\" effect"), tr("\"log\" effect"),
+		tr("\"sine\" effect")
+	};
+	m_editingLineEffectText = {
+		tr("none"),
+		tr("sine"),
+		tr("phase changable sine"),
+		tr("peak"),
+		tr("steps"),
+		tr("random")
+	};
+	m_editingInputIsFloat = {
+		true, true, true, true,
+		true, false, false,
+		false, false, false, false,
+		false, false, false, false,
+		false
+	};
 
 	m_lastTrackPoint.first = -1;
 	m_lastTrackPoint.second = 0;
@@ -53,7 +84,9 @@ PointGraphView::PointGraphView(QWidget * parentIn,
 }
 PointGraphView::~PointGraphView()
 {
-
+	m_editingText.clear();
+	m_editingInputIsFloat.clear();
+	m_editingLineEffectText.clear();
 }
 
 void PointGraphView::setLineColor(QColor colorIn, unsigned int dataArrayLocationIn)
@@ -80,16 +113,37 @@ void PointGraphView::setFillColor(QColor colorIn, unsigned int dataArrayLocation
 		update();
 	}
 }
+void PointGraphView::setAutomatedColor(QColor colorIn, unsigned int dataArrayLocationIn)
+{
+	if (model()->getDataArraySize() > dataArrayLocationIn)
+	{
+		model()->getDataArray(dataArrayLocationIn)->setAutomatedColor(colorIn);
+		update();
+	}
+}
+
+void PointGraphView::setIsSimplified(bool isSimplifiedIn)
+{
+	m_isSimplified = isSimplifiedIn;
+}
 
 std::pair<float, float> PointGraphView::getSelectedData()
 {
-	std::pair<float, float> output(0, -2.0f);
+	std::pair<float, float> output(-1.0f, 0.00);
 	if (m_isSelected == true)
 	{
 		output.first = model()->getDataArray(m_selectedArray)->getX(m_selectedLocation);
 		output.second = model()->getDataArray(m_selectedArray)->getY(m_selectedLocation);
 	}
 	return output;
+}
+int PointGraphView::getLastSelectedArray()
+{
+	if (m_isLastSelectedArray == true)
+	{
+		return m_selectedArray;
+	}
+	return -1;
 }
 void PointGraphView::setSelectedData(std::pair<float, float> dataIn)
 {
@@ -108,32 +162,42 @@ void PointGraphView::mousePressEvent(QMouseEvent* me)
 	// get position
 	int x = me->x();
 	int y = me->y();
-	if (me->button() == Qt::LeftButton)
+	m_addition = false;
+
+	if(me->button() == Qt::LeftButton && me->modifiers() & Qt::ControlModifier && m_isSelected == true)
 	{
-		// add
-		m_addition = true;
-		// show new inputDialog to change data if control is pressed
-		if ((me->modifiers() & Qt::ControlModifier) == true)
+			qDebug("mousePress automation started");
+		// connect to automation
+		model()->getDataArray(m_selectedArray)->setAutomated(m_selectedLocation, true);
+		FloatModel* curFloatModel = model()->getDataArray(m_selectedArray)->getAutomationModel(m_selectedLocation);
+		// check if setAutomated is failed (like when isAutomatableEffecable is not enabled)
+		if (curFloatModel != nullptr)
 		{
-			selectData(x, height() - y);
-			// if selecting was successful
-			if (m_isSelected == true)
-			{
-				// display dialog
-				std::pair<float, float> curData = showInputDialog();
-				// change data
-				setSelectedData(curData);
-			}
+			qDebug("mousePress automation sent");
+			new gui::StringPairDrag("automatable_model", QString::number(curFloatModel->id()), QPixmap(), widget());
+			me->accept();
 		}
-		else
+	}
+	else if (isGraphPressed(y) == true)
+	{
+		// try selecting the clicked point (if it is near)
+		selectData(x, m_graphHeight - y);
+
+		if (me->button() == Qt::LeftButton)
 		{
+			// add
+			m_addition = true;
+			m_mousePress = true;
+		}
+		else if (me->button() == Qt::RightButton)
+		{
+			// delete
+			m_addition = false;
 			m_mousePress = true;
 		}
 	}
-	else if (me->button() == Qt::RightButton)
+	else
 	{
-		// delete
-		m_addition = false;
 		m_mousePress = true;
 	}
 	m_mouseDown = true;
@@ -143,53 +207,98 @@ void PointGraphView::mousePressEvent(QMouseEvent* me)
 void PointGraphView::mouseMoveEvent(QMouseEvent* me)
 {
 	// get position
-	int x = me->x();
+	// the x coord is clamped because
+	// m_lastTrackPoint.first < 0 is used
+	int x = me->x() >= 0 ? me->x() : 0;
 	int y = me->y();
 
+	bool startMoving = false;
 	if (m_lastTrackPoint.first < 0)
 	{
 		m_lastTrackPoint.first = m_lastScndTrackPoint.first = x;
-		m_lastTrackPoint.second = m_lastScndTrackPoint.second = height() - y;
+		m_lastTrackPoint.second = m_lastScndTrackPoint.second = m_graphHeight - y;
 		m_mousePress = true;
 	}
-	else
+
+	if (m_mousePress == true)
 	{
-		if (m_isSelected == true)
+		float curDistance = getDistance(x, m_graphHeight - y,
+			m_lastTrackPoint.first, m_lastTrackPoint.second);
+		if (curDistance > m_pointSize)
 		{
-			if (m_isCurveSelected == false)
+			m_mousePress = false;
+			startMoving = true;
+		}
+	}
+
+	// if the mouse was moved a lot
+	if (m_mousePress == false)
+	{
+		if (isGraphPressed(m_graphHeight - m_lastScndTrackPoint.second) == true)
+		{
+			if (m_isSelected == true && m_addition == true)
 			{
-				std::pair<float, float> convertedCoords = mapMousePos(x, height() - y, model()->getDataArray(m_selectedArray)->getNonNegative());
-				convertedCoords.first = convertedCoords.first > 1.0f ? 1.0f : convertedCoords.first < -1.0f ? -1.0f : convertedCoords.first;
-				convertedCoords.second = convertedCoords.second > 1.0f ? 1.0f : convertedCoords.second < 0.0f ? 0.0f : convertedCoords.second;
-				setSelectedData(convertedCoords);
+				if (m_isCurveSelected == false)
+				{
+					std::pair<float, float> convertedCoords = mapMousePos(x, m_graphHeight - y, model()->getDataArray(m_selectedArray)->getNonNegative());
+					convertedCoords.first = convertedCoords.first > 1.0f ? 1.0f : convertedCoords.first < 0.0f ? 1.0f : convertedCoords.first;
+					convertedCoords.second = convertedCoords.second > 1.0f ? 1.0f : convertedCoords.second < -1.0f ? -1.0f : convertedCoords.second;
+					setSelectedData(convertedCoords);
+				}
+				else if (model()->getDataArray(m_selectedArray)->getIsEditableAttrib() == true)
+				{
+					std::pair<float, float> convertedCoords = mapMousePos(x - m_lastTrackPoint.first, m_graphHeight - y + m_lastTrackPoint.second,
+						model()->getDataArray(m_selectedArray)->getNonNegative());
+					float curveValue = convertedCoords.second + convertedCoords.first * 0.1f;
+					curveValue = curveValue > 1.0f ? 1.0f : curveValue < -1.0f ? -1.0f : curveValue;
+					model()->getDataArray(m_selectedArray)->setC(m_selectedLocation, curveValue);
+				}
+			}
+			else if (m_addition == false)
+			{
+				// TODO deletion
 			}
 			else
 			{
-				std::pair<float, float> convertedCoords = mapMousePos(x - m_lastTrackPoint.first, height() - y + m_lastTrackPoint.second,
-					model()->getDataArray(m_selectedArray)->getNonNegative());
-				float curveValue = convertedCoords.second + convertedCoords.first * 0.1f;
-				curveValue = curveValue > 1.0f ? 1.0f : curveValue < -1.0f ? -1.0f : curveValue;
-				model()->getDataArray(m_selectedArray)->setC(m_selectedLocation, curveValue);
+				float curDistance = getDistance(x, m_graphHeight - y,
+					m_lastTrackPoint.first, m_lastTrackPoint.second);
+				if (curDistance > m_pointSize * 2)
+				{
+					// TODO drawing
+					m_lastTrackPoint.first = x;
+					m_lastTrackPoint.second = m_graphHeight - y;
+				}
+				// else m_mousePress does not change
 			}
-			m_mousePress = false;
-		}
-		else if (m_addition == false)
-		{
-			// TODO deletion
 		}
 		else
 		{
-			float curDistance = getDistance(x, height() - y,
-				m_lastTrackPoint.first, m_lastTrackPoint.second);
-			if (curDistance > m_pointSize * 2)
+			// if editing inputs were pressed (not graph)
+			int pressLocation = getPressedInput(m_lastTrackPoint.first, m_graphHeight - m_lastScndTrackPoint.second, m_editingInputCount + 1);
+			if (pressLocation >= 0 && pressLocation < m_editingInputCount)
 			{
-				// TODO drawing
-				m_lastTrackPoint.first = x;
-				m_lastTrackPoint.second = height() - y;
+				// pressLocation should always be >= 0
+				unsigned int location = m_editingInputCount * m_editingDisplayPage + pressLocation;
+				// if the input type is a float
+				if (location < m_editingText.size() && m_editingInputIsFloat[location] == true)
+				{
+					// if the user just started to move the mouse it is pressed
+					if (startMoving == true)
+					{
+						// unused bool
+						bool isTrue = false;
+						// set m_lastScndTrackPoint.first to the current input value
+						m_lastScndTrackPoint.first = mapInputPos(getInputAttribValue(location, &isTrue), m_graphHeight);
 
-				m_mousePress = false;
+						m_lastTrackPoint.first = x;
+						m_lastTrackPoint.second = m_graphHeight - y;
+		qDebug("get last value: %d, lasttrack: %d, x: %d, y: %d, x2: %d, y2: %d, location: %d", m_lastScndTrackPoint.first, m_lastScndTrackPoint.second, x, (m_graphHeight - y), m_lastTrackPoint.first, m_lastTrackPoint.second, pressLocation);
+					}
+					std::pair<float, float> convertedCoords = mapMousePos(0, m_lastScndTrackPoint.first + static_cast<int>(m_graphHeight - y - m_lastTrackPoint.second) / 2,
+						model()->getDataArray(m_selectedArray)->getNonNegative());
+					setInputAttribValue(location, convertedCoords.second, false);
+				}
 			}
-			// else m_mousePress does not change
 		}
 	}
 }
@@ -199,42 +308,101 @@ void PointGraphView::mouseReleaseEvent(QMouseEvent* me)
 	// get position
 	int x = me->x();
 	int y = me->y();
-	if (m_mousePress == true)
+	if (isGraphPressed(m_graphHeight - y) == true)
 	{
-		// add/delete point
-		selectData(x, height() - y);
-		if (m_isSelected == false && m_addition == true)
+	qDebug("mouseMove graphPressed: %d", m_lastTrackPoint.first);
+		if (m_mousePress == true)
 		{
-			// if selection failed and addition
-			// get the first editable daraArray and add value
-			qDebug("release size: %ld", model()->getDataArraySize());
-			for(unsigned int i = 0; i < model()->getDataArraySize(); i++)
+			// add/delete point
+			if (m_isSelected == false && m_addition == true)
 			{
-				std::pair<float, float> curMouseData = mapMousePos(x, height() - y,
-					model()->getDataArray(i)->getNonNegative()); // TODO optimize
-				int location = model()->getDataArray(i)->add(curMouseData.first);
-				// if adding was successful
-				if (location >= 0)
+				// if selection failed and addition
+				// get the first editable daraArray and add value
+				qDebug("release size: %ld", model()->getDataArraySize());
+				for(unsigned int i = 0; i < model()->getDataArraySize(); i++)
 				{
-	qDebug("mouseRelease added %d", location);
-					model()->getDataArray(i)->setY(location, curMouseData.second);
-					break;
+					std::pair<float, float> curMouseData = mapMousePos(x, m_graphHeight - y,
+						model()->getDataArray(i)->getNonNegative()); // TODO optimize
+					int location = model()->getDataArray(i)->add(curMouseData.first);
+					// if adding was successful
+					if (location >= 0)
+					{
+		qDebug("mouseRelease added %d   %f,%d", location, curMouseData.second, m_graphHeight);
+						model()->getDataArray(i)->setY(location, curMouseData.second);
+						break;
+					}
 				}
 			}
+			else if (m_isSelected == true && m_addition == false)
+			{
+				// if selection was successful and deletion
+				model()->getDataArray(m_selectedArray)->del(m_selectedLocation);
+				m_isSelected = false;
+				m_isEditingActive = false;
+			}
+
+			m_mousePress = false;
 		}
-		else if (m_isSelected == true && m_addition == false)
+		else
 		{
-			// if selection was successful and deletion
-			model()->getDataArray(m_selectedArray)->del(m_selectedLocation);
-			m_isSelected = false;
+			// add/set/delete line end
+
 		}
-
-		m_mousePress = false;
 	}
-	else
+	else if (m_mousePress == true)
 	{
-		// add/set/delete line end
+	qDebug("mouseMove 7: %d", m_lastTrackPoint.first);
+		int pressLocation = getPressedInput(x, m_graphHeight - y, m_editingInputCount + 1);
+		if (pressLocation == m_editingInputCount)
+		{
+			// if the last button was pressed
 
+			// how many inputs are there
+			int editingTextCount = m_editingText.size();
+			if (m_isSelected == true)
+			{
+				if (model()->getDataArray(m_selectedLocation)->getIsEditableAttrib() == false)
+				{
+					// x, y
+					editingTextCount = 2;
+				}
+				else if (model()->getDataArray(m_selectedLocation)->getIsAutomatableEffectable() == false)
+				{
+					// x, y, curve, valA, valB, switch type
+					editingTextCount = 6;
+				}
+			}
+
+			m_editingDisplayPage++;
+			if (m_editingInputCount * m_editingDisplayPage >= editingTextCount)
+			{
+				m_editingDisplayPage = 0;
+			}
+	qDebug("mouseMove editingPage: %d", m_editingDisplayPage);
+		}
+		else if (pressLocation >= 0)
+		{
+			// pressLocation should always be >= 0
+			unsigned int location = m_editingInputCount * m_editingDisplayPage + pressLocation;
+			// setting the boolean values
+			if (location < m_editingText.size() && m_editingInputIsFloat[location] == false)
+			{
+				bool curBoolValue = true;
+				//if (location >= 5 && location <= 7)
+				//{
+				//	curBoolValue = true;
+				//}
+				//else
+				// if location is not at "set type" or "set automation location" or "set effect location"
+				// (else curBoolValue = true -> setInputAttribValue will add 1 to the attribute)
+				if (location < 5 || location > 7)
+				{
+					getInputAttribValue(location, &curBoolValue);
+					curBoolValue = !curBoolValue;
+				}
+				setInputAttribValue(location, 0.0f, curBoolValue);
+			}
+		}
 	}
 	m_addition = false;
 	m_mouseDown = false;
@@ -249,13 +417,36 @@ void PointGraphView::mouseReleaseEvent(QMouseEvent* me)
 
 void PointGraphView::mouseDoubleClickEvent(QMouseEvent * me)
 {
+	// get position
+	int x = me->x();
+	int y = me->y();
+
 	// if a data/sample is selected then show input dialog to change the data
-	if (m_isSelected == true && me->button() == Qt::LeftButton)
+	if (isGraphPressed(m_graphHeight - y) == true)
 	{
-		// display dialog
-		std::pair<float, float> curData = showInputDialog();
-		// change data
-		setSelectedData(curData);
+		if (m_isSelected == true && me->button() == Qt::LeftButton)
+		{
+			// display dialog
+			std::pair<float, float> curData = showCoordInputDialog();
+			// change data
+			setSelectedData(curData);
+		}
+	}
+	else
+	{
+		int pressLocation = getPressedInput(x, m_graphHeight - y, m_editingInputCount + 1);
+		if (pressLocation >= 0 && pressLocation != m_editingInputCount)
+		{
+			unsigned int location = m_editingInputCount * m_editingDisplayPage + pressLocation;
+			if (location < m_editingText.size() && m_editingInputIsFloat[location] == true)
+			{
+				// unused bool
+				bool isTrue = false;
+				// set m_lastScndTrackPoint.first to the current input value
+				float curValue = getInputAttribValue(location, &isTrue);
+				setInputAttribValue(location, showInputDialog(curValue), isTrue);
+			}
+		}
 	}
 }
 
@@ -263,12 +454,13 @@ void PointGraphView::paintEvent(QPaintEvent* pe)
 {
 	QPainter p(this);
 	//QPainterPath pt(); // TODO
-
 	qDebug("paintEvent");
+	m_graphHeight = m_isEditingActive == true ? height() - m_editingHeight : height();
 
+	PointGraphDataArray* dataArray = nullptr;
 	for (unsigned int i = 0; i < model()->getDataArraySize(); i++)
 	{
-		PointGraphDataArray* dataArray = model()->getDataArray(i);
+		dataArray = model()->getDataArray(i);
 		p.setPen(QPen(*dataArray->getLineColor(), 1));
 		QColor gcolor = QColor(dataArray->getLineColor()->red(), dataArray->getLineColor()->green(),
 			dataArray->getLineColor()->blue(), 100);
@@ -292,37 +484,133 @@ void PointGraphView::paintEvent(QPaintEvent* pe)
 			//}
 			// drawing lines
 	qDebug("paint size: %d", length);
-			if (dataArray->getSelectable() == true)
+			if (dataArray->getIsSelectable() == true)
 			{
 				for (unsigned int j = 0; j < length; j++)
 				{
+					//qDebug("draw: x: %f, y: %f", dataArray->getX(j), dataArray->getY(j));
 					posB = mapDataPos(dataArray->getX(j), dataArray->getY(j), dataArray->getNonNegative());
-					p.drawEllipse(posB.first - m_pointSize, height() - posB.second - m_pointSize, m_pointSize * 2, m_pointSize * 2);
+					p.drawEllipse(posB.first - m_pointSize, m_graphHeight - posB.second - m_pointSize, m_pointSize * 2, m_pointSize * 2);
 					if (j > 0)
 					{
-						std::pair<int, int> posC = mapDataCurvePos(posA.first, posA.second, posB.first, posB.second, dataArray->getC(j - 1));
-						p.drawRect(posC.first - m_pointSize / 2, height() - posC.second - m_pointSize / 2, m_pointSize, m_pointSize);
+						if (dataArray->getIsEditableAttrib() == true)
+						{
+							std::pair<int, int> posC = mapDataCurvePos(posA.first, posA.second, posB.first, posB.second, dataArray->getC(j - 1));
+							p.drawRect(posC.first - m_pointSize / 2, m_graphHeight - posC.second - m_pointSize / 2, m_pointSize, m_pointSize);
+						}
+						if (m_isSimplified == true)
+						{
+							p.drawLine(posA.first, m_graphHeight - posA.second, posB.first, m_graphHeight - posB.second);
+						}
 					}
 					posA = posB;
 				}
 			}
-			posA = mapDataPos(dataArray->getX(0), dataArray->getY(0), dataArray->getNonNegative());
-			for (unsigned int j = 0; j < width(); j++)
+			if (m_isSimplified == false)
 			{
-				//posB = mapDataPos(*dataArray->getX(j + 1), dataArray->getY(j + 1), dataArray->getNonNegative());
-				posB = mapDataPos(0, dataArray->getValueAtPosition(static_cast<float>(j) / static_cast<float>(width())), dataArray->getNonNegative());
-				//posB = dataArray->getValueAtPosition(static_cast<float>(j) / static_cast<float>(width()));
-				posB.first = j;
-	//qDebug("paint positions: x: %d, y: %d", posB.first, posB.second);
-				// x1, y1, x2, y2
-	//qDebug("paint positions: x: %d, y: %d, x2: %d, y2: %d", posA.first, posA.second, posB.first, posB.second);
-				p.drawLine(posA.first, height() - posA.second, posB.first, height() - posB.second);
-				posA = posB;
+				posA = mapDataPos(dataArray->getX(0), dataArray->getY(0), dataArray->getNonNegative());
+				for (unsigned int j = 0; j < width(); j++)
+				{
+					//posB = mapDataPos(*dataArray->getX(j + 1), dataArray->getY(j + 1), dataArray->getNonNegative());
+					posB = mapDataPos(0, dataArray->getValueAtPosition(static_cast<float>(j) / static_cast<float>(width())), dataArray->getNonNegative());
+					//posB = dataArray->getValueAtPosition(static_cast<float>(j) / static_cast<float>(width()));
+					posB.first = j;
+		//qDebug("paint positions: x: %d, y: %d", posB.first, posB.second);
+					// x1, y1, x2, y2
+		//qDebug("paint positions: x: %d, y: %d, x2: %d, y2: %d", posA.first, posA.second, posB.first, posB.second);
+					p.drawLine(posA.first, m_graphHeight - posA.second, posB.first, m_graphHeight - posB.second);
+					posA = posB;
+				}
 			}
 			//if (posA.first < width())
 			//{
 				//p.drawLine(posA.first, posA.second, width(), posA.second);
 			//}
+		}
+	}
+
+	if (m_isEditingActive == true)
+	{
+		dataArray = model()->getDataArray(m_selectedArray);
+		QColor textColor = getTextColorFromBaseColor(*dataArray->getLineColor());
+		// background of float values
+		QColor backColor(25, 25, 25, 255);
+		QColor foreColor = *dataArray->getLineColor();
+		if (dataArray->getFillColor()->alpha() > 0)
+		{
+			backColor = QColor(dataArray->getFillColor()->red() / 2, dataArray->getFillColor()->green() / 2,
+				dataArray->getFillColor()->blue() / 2, 255);
+			foreColor = *dataArray->getFillColor();
+		}
+
+		int editingTextCount = m_editingText.size();
+		if (dataArray->getIsEditableAttrib() == false)
+		{
+			// x, y
+			editingTextCount = 2;
+		}
+		else if (dataArray->getIsAutomatableEffectable() == false)
+		{
+			// x, y, curve, valA, valB, switch type
+			editingTextCount = 6;
+		}
+
+		int segmentLength = width() / (m_editingInputCount + 1);
+		// draw inputs
+		p.setPen(textColor);
+		for (unsigned int i = 0; i < m_editingInputCount; i++)
+		{
+			if (m_editingInputCount * m_editingDisplayPage + i < editingTextCount)
+			{
+				if (m_editingInputIsFloat[m_editingInputCount * m_editingDisplayPage + i] == true)
+				{
+					QColor curForeColor = foreColor;
+					// unused bool
+					bool isTrue = false;
+					float inputValue = getInputAttribValue(m_editingInputCount * m_editingDisplayPage + i, &isTrue);
+					if (dataArray->getAutomationModel(m_selectedLocation) != nullptr  && static_cast<int>(getInputAttribValue(6, &isTrue)) == i - 1)
+					{
+						curForeColor = *dataArray->getAutomatedColor();
+					}
+					else if (dataArray->getIsAutomatableEffectable() == true && static_cast<int>(getInputAttribValue(7, &isTrue)) == i - 1)
+					{
+						curForeColor = *dataArray->getActiveColor();
+					}
+					p.fillRect(i * segmentLength, m_graphHeight, segmentLength, m_editingHeight, backColor);
+					p.fillRect(i * segmentLength, m_graphHeight, mapInputPos(inputValue, segmentLength), m_editingHeight, curForeColor);
+					p.drawText(i * segmentLength, m_graphHeight + m_editingHeight / 2,
+						getTextFromDisplayLength(m_editingText[m_editingInputCount * m_editingDisplayPage + i], segmentLength));
+				}
+				else
+				{
+					QColor curForeColor = *dataArray->getFillColor();
+					bool isTrue = false;
+					// unused float
+					float inputValue = getInputAttribValue(m_editingInputCount * m_editingDisplayPage + i, &isTrue);
+					if (isTrue == true)
+					{
+						curForeColor = *dataArray->getActiveColor();
+					}
+					p.fillRect(i * segmentLength, m_graphHeight, segmentLength, m_editingHeight, curForeColor);
+					p.drawText(i * segmentLength, m_graphHeight + m_editingHeight / 2,
+						getTextFromDisplayLength(m_editingText[m_editingInputCount * m_editingDisplayPage + i], segmentLength));
+				}
+			}
+		}
+
+		// draw "next page" button
+		p.fillRect(m_editingInputCount * segmentLength, m_graphHeight, segmentLength, m_editingHeight, *dataArray->getFillColor());
+		p.setPen(textColor);
+		p.drawText(m_editingInputCount * segmentLength, m_graphHeight + m_editingHeight / 2, ">>");
+		// draw outline
+		p.setPen(*dataArray->getLineColor());
+		p.drawLine(0, m_graphHeight, width(), m_graphHeight);
+		for (unsigned int i = 1; i < m_editingInputCount + 1; i++)
+		{
+			if (m_editingInputCount * m_editingDisplayPage + i < editingTextCount || i >= m_editingInputCount)
+			{
+				p.drawLine(i * segmentLength, m_graphHeight, i * segmentLength, height());
+			}
 		}
 	}
 }
@@ -348,14 +636,14 @@ std::pair<float, float> PointGraphView::mapMousePos(int xIn, int yIn, bool nonNe
 		// mapping the position to 0 - 1, 0 - 1 using qWidget width and height
 		return std::pair<float, float>(
 			static_cast<float>(xIn / (float)width()),
-			static_cast<float>(yIn / (float)height()));
+			static_cast<float>(yIn / (float)m_graphHeight));
 	}
 	else
 	{
 		// mapping the position to 0 - 1, -1 - 1 using qWidget width and height
 		return std::pair<float, float>(
 			static_cast<float>(xIn / (float)width()),
-			static_cast<float>((yIn * 2.0f / (float)height()) - 1.0f));
+			static_cast<float>((yIn * 2.0f / (float)m_graphHeight) - 1.0f));
 	}
 }
 std::pair<int, int> PointGraphView::mapDataPos(float xIn, float yIn, bool nonNegativeIn)
@@ -365,14 +653,14 @@ std::pair<int, int> PointGraphView::mapDataPos(float xIn, float yIn, bool nonNeg
 		// mapping the point/sample positon to mouse/view position
 		return std::pair<int, int>(
 			static_cast<int>(xIn * width()),
-			static_cast<int>(yIn * height()));
+			static_cast<int>(yIn * m_graphHeight));
 	}
 	else
 	{
 		// mapping the point/sample positon to mouse/view position
 		return std::pair<int, int>(
 			static_cast<int>(xIn * width()),
-			static_cast<int>((yIn / 2.0f + 0.5f) * height()));
+			static_cast<int>((yIn / 2.0f + 0.5f) * m_graphHeight));
 	}
 }
 std::pair<float, float> PointGraphView::mapDataCurvePos(float xAIn, float yAIn, float xBIn, float yBIn, float curveIn)
@@ -387,6 +675,10 @@ std::pair<int, int> PointGraphView::mapDataCurvePos(int xAIn, int yAIn, int xBIn
 		(xAIn + xBIn) / 2,
 		yAIn + static_cast<int>((curveIn / 2.0f + 0.5f) * (yBIn - yAIn)));
 }
+int PointGraphView::mapInputPos(float inputValueIn, unsigned int displayLengthIn)
+{
+	return (inputValueIn / 2.0f + 0.5f) * displayLengthIn;
+}
 
 float PointGraphView::getDistance(int xAIn, int yAIn, int xBIn, int yBIn)
 {
@@ -397,7 +689,231 @@ float PointGraphView::getDistance(float xAIn, float yAIn, float xBIn, float yBIn
 	return std::sqrt((xAIn - xBIn) * (xAIn - xBIn) + (yAIn - yBIn) * (yAIn - yBIn));
 }
 
-std::pair<float, float> PointGraphView::showInputDialog()
+bool PointGraphView::isGraphPressed(int mouseYIn)
+{
+	if (m_isEditingActive == true && mouseYIn > m_graphHeight)
+	{
+		return false;
+	}
+	return true;
+}
+int PointGraphView::getPressedInput(int mouseXIn, int mouseYIn, unsigned int inputCountIn)
+{
+	int output = -1;
+	if (m_isEditingActive == true && mouseYIn > m_graphHeight)
+	{
+		output = mouseXIn * inputCountIn / width();
+	}
+	if (output > inputCountIn)
+	{
+		output = inputCountIn;
+qDebug("getPressedInput x location ERRROR: %d", mouseXIn);
+	}
+	return output;
+}
+float PointGraphView::getInputAttribValue(unsigned int editingArrayLocationIn, bool* valueOut)
+{
+	float output = 0.0f;
+	if (m_isSelected == true)
+	{
+		switch (editingArrayLocationIn)
+		{
+			case 0:
+				*valueOut = false;
+				output = model()->getDataArray(m_selectedArray)->getX(m_selectedLocation);
+				break;
+			case 1:
+				*valueOut = false;
+				output = model()->getDataArray(m_selectedArray)->getY(m_selectedLocation);
+				break;
+			case 2:
+				*valueOut = false;
+				output = model()->getDataArray(m_selectedArray)->getC(m_selectedLocation);
+				break;
+			case 3:
+				*valueOut = false;
+				output = model()->getDataArray(m_selectedArray)->getValA(m_selectedLocation);
+				break;
+			case 4:
+				*valueOut = false;
+				output = model()->getDataArray(m_selectedArray)->getValB(m_selectedLocation);
+				break;
+			case 5:
+				// type
+				*valueOut = false;
+				output = model()->getDataArray(m_selectedArray)->getType(m_selectedLocation);
+				break;
+			case 6:
+				// automation location
+				*valueOut = false;
+				output = model()->getDataArray(m_selectedArray)->getAutomatedAttribLocation(m_selectedLocation);
+				break;
+			case 7:
+				// effect location
+				*valueOut = false;
+				output = model()->getDataArray(m_selectedArray)->getEffectedAttribLocation(m_selectedLocation);
+				break;
+			case 8:
+				*valueOut = model()->getDataArray(m_selectedArray)->getEffectOnlyPoints(m_selectedLocation);
+				break;
+			case 9:
+				*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 0);
+				break;
+			case 10:
+				*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 1);
+				break;
+			case 11:
+				*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 2);
+				break;
+			case 12:
+				*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 3);
+				break;
+			case 13:
+				*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 4);
+				break;
+			case 14:
+				*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 5);
+				break;
+			case 15:
+				*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 6);
+				break;
+		}
+	}
+	return output;
+}
+void PointGraphView::setInputAttribValue(unsigned int editingArrayLocationIn, float floatValueIn, bool boolValueIn)
+{
+	qDebug("setInputAttribValue started");
+	if (m_isSelected == true)
+	{
+		float clampedValue = floatValueIn < -1.0f ? -1.0f : floatValueIn > 1.0f ? 1.0f : floatValueIn;
+		unsigned int clampedValueB = 0;
+		switch (editingArrayLocationIn)
+		{
+			case 0:
+				m_selectedLocation = model()->getDataArray(m_selectedArray)->setX(m_selectedLocation, clampedValue < 0.0f ? 0.0f : clampedValue);
+				break;
+			case 1:
+				model()->getDataArray(m_selectedArray)->setY(m_selectedLocation, clampedValue);
+				break;
+			case 2:
+				model()->getDataArray(m_selectedArray)->setC(m_selectedLocation, clampedValue);
+				break;
+			case 3:
+				model()->getDataArray(m_selectedArray)->setValA(m_selectedLocation, clampedValue);
+				break;
+			case 4:
+				model()->getDataArray(m_selectedArray)->setValB(m_selectedLocation, clampedValue);
+				break;
+			case 5:
+				// type
+				clampedValueB = 0;
+				if (boolValueIn == true)
+				{
+					clampedValueB = model()->getDataArray(m_selectedArray)->getType(m_selectedLocation) + 1;
+					if (clampedValueB > 5)
+					{
+						clampedValueB = 0;
+					}
+				}
+				else
+				{
+					clampedValueB = static_cast<unsigned int>((floatValueIn < 0.0f ? 0.0f : floatValueIn > 5.0f ? 5.0f : floatValueIn));
+				}
+				model()->getDataArray(m_selectedArray)->setType(m_selectedLocation, clampedValueB);
+				break;
+			case 6:
+				// automation location
+				clampedValueB = 0;
+				if (boolValueIn == true)
+				{
+					clampedValueB = model()->getDataArray(m_selectedArray)->getAutomatedAttribLocation(m_selectedLocation) + 1;
+					if (clampedValueB > 4)
+					{
+						clampedValueB = 0;
+					}
+				}
+				else
+				{
+					clampedValueB = static_cast<unsigned int>((floatValueIn < 0.0f ? 0.0f : floatValueIn > 4.0f ? 4.0f : floatValueIn));
+				}
+				model()->getDataArray(m_selectedArray)->setAutomatedAttrib(m_selectedLocation, clampedValueB);
+				break;
+			case 7:
+				// effect location
+				clampedValueB = 0;
+				if (boolValueIn == true)
+				{
+					clampedValueB = model()->getDataArray(m_selectedArray)->getEffectedAttribLocation(m_selectedLocation) + 1;
+					if (clampedValueB > 4)
+					{
+						clampedValueB = 0;
+					}
+				}
+				else
+				{
+					clampedValueB = static_cast<unsigned int>((floatValueIn < 0.0f ? 0.0f : floatValueIn > 4.0f ? 4.0f : floatValueIn));
+				}
+				model()->getDataArray(m_selectedArray)->setEffectedAttrib(m_selectedLocation, clampedValueB);
+				break;
+			case 8:
+				model()->getDataArray(m_selectedArray)->setEffectOnlyPoints(m_selectedLocation, boolValueIn);
+				break;
+			case 9:
+				model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 0, boolValueIn);
+				break;
+			case 10:
+				model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 1, boolValueIn);
+				break;
+			case 11:
+				model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 2, boolValueIn);
+				break;
+			case 12:
+				model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 3, boolValueIn);
+				break;
+			case 13:
+				model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 4, boolValueIn);
+				break;
+			case 14:
+				model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 5, boolValueIn);
+				break;
+			case 15:
+				model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 6, boolValueIn);
+				break;
+		}
+	}
+	qDebug("setInputAttribValue finished");
+}
+QColor PointGraphView::getTextColorFromBaseColor(QColor baseColorIn)
+{
+	QColor output(255, 255, 255, 255);
+	int colorSum = baseColorIn.red() + baseColorIn.green() + baseColorIn.blue();
+	if (colorSum > 382)
+	{
+		output = QColor(0, 0, 0, 255);
+	}
+	return output;
+}
+QString PointGraphView::getTextFromDisplayLength(QString textIn, unsigned int displayLengthIn)
+{
+	int charLength = 4;
+	QString output = "";
+	int targetSize = displayLengthIn / charLength < textIn.size() ? displayLengthIn / charLength : textIn.size();
+	for (unsigned int i = 0; i < targetSize; i++)
+	{
+		if (i + 3 < targetSize)
+		{
+			output = output + textIn[i];
+		}
+		else
+		{
+			output = output + QString(".");
+		}
+	}
+	return output;
+}
+
+std::pair<float, float> PointGraphView::showCoordInputDialog()
 {
 	std::pair<float, float> curData(0.0f, 0.0f);
 	if (m_isSelected == true)
@@ -407,25 +923,41 @@ std::pair<float, float> PointGraphView::showInputDialog()
 
 		// show position input dialog
 		bool ok;
-		double changedPos = QInputDialog::getDouble(this, tr("Set value"),
-			tr("Please enter a new value between 0 and ") + QString::number(100.0),
+		double changedX = QInputDialog::getDouble(this, tr("Set value"),
+			tr("Please enter a new value between 0 and 100"),
 			static_cast<double>(curData.first * 100.0f),
 			0.0, 100.0, 0, &ok);
 		if (ok == true)
 		{
-			curData.first = static_cast<float>(changedPos) / 100.0f;
+			curData.first = static_cast<float>(changedX) / 100.0f;
 		}
 
-		double changedValue = QInputDialog::getDouble(this, tr("Set value"),
+		double changedY = QInputDialog::getDouble(this, tr("Set value"),
 			tr("Please enter a new value between ") + QString::number(minValue) + tr(" and 100"),
 			static_cast<double>(curData.second * 100.0f),
 			minValue, 100.0, 2, &ok);
 		if (ok == true)
 		{
-			curData.second = static_cast<float>(changedValue) / 100.0f;
+			curData.second = static_cast<float>(changedY) / 100.0f;
 		}
 	}
 	return curData;
+}
+float PointGraphView::showInputDialog(float curInputValueIn)
+{
+	float output = 0.0f;
+
+	bool ok;
+	double changedPos = QInputDialog::getDouble(this, tr("Set value"),
+		tr("Please enter a new value between -100 and 100"),
+		static_cast<double>(curInputValueIn * 100.0f),
+		-100.0, 100.0, 0, &ok);
+	if (ok == true)
+	{
+		output = static_cast<float>(changedPos) / 100.0f;
+	}
+
+	return output;
 }
 
 void PointGraphView::selectData(int mouseXIn, int mouseYIn)
@@ -435,11 +967,12 @@ void PointGraphView::selectData(int mouseXIn, int mouseYIn)
 	m_selectedArray = 0;
 	m_isSelected = false;
 	m_isCurveSelected = false;
+	m_isEditingActive = false;
 
 	for (unsigned int i = 0; i < model()->getDataArraySize(); i++)
 	{
 		PointGraphDataArray* dataArray = model()->getDataArray(i);
-		if (dataArray->getSelectable() == true)
+		if (dataArray->getIsSelectable() == true)
 		{
 			int location = searchForData(mouseXIn, mouseYIn, static_cast<float>(m_pointSize) / width(), dataArray, false);
 			if (location > -1)
@@ -450,6 +983,7 @@ void PointGraphView::selectData(int mouseXIn, int mouseYIn)
 	qDebug("selected data location: %d, %d", location, i);
 				m_isSelected = true;
 				m_isCurveSelected = false;
+				m_isEditingActive = dataArray->getIsEditableAttrib();
 				break;
 			}
 		}
@@ -459,7 +993,7 @@ void PointGraphView::selectData(int mouseXIn, int mouseYIn)
 		for (unsigned int i = 0; i < model()->getDataArraySize(); i++)
 		{
 			PointGraphDataArray* dataArray = model()->getDataArray(i);
-			if (dataArray->getSelectable() == true)
+			if (dataArray->getIsSelectable() == true)
 			{
 				int location = searchForData(mouseXIn, mouseYIn, static_cast<float>(m_pointSize) / width(), dataArray, true);
 				if (location > -1)
@@ -470,6 +1004,7 @@ void PointGraphView::selectData(int mouseXIn, int mouseYIn)
 		qDebug("selected data curve location: %d, %d", location, i);
 					m_isSelected = true;
 					m_isCurveSelected = true;
+					m_isEditingActive = dataArray->getIsEditableAttrib();
 					break;
 				}
 			}
@@ -628,7 +1163,7 @@ unsigned int PointGraphModel::addArray(std::vector<float>* arrayIn, bool isCurve
 unsigned int PointGraphModel::addArray()
 {
 	PointGraphDataArray tempArray(
-		false, false, false, false, false, false, false, this);
+		false, false, false, false, false, false, false, false, true, this);
 	m_dataArrays.push_back(tempArray);
 	return m_dataArrays.size() - 1;
 }
@@ -667,21 +1202,27 @@ PointGraphDataArray::PointGraphDataArray()
 	m_isFixedEndPoints = false;
 	m_isSelectable = false;
 	m_isEditableAttrib = false;
+	m_isAutomatableEffectable = false;
+	m_isSaveable = false;
 	m_nonNegative = false;
 	
 	m_lineColor = QColor(200, 200, 200, 255);
 	m_activeColor = QColor(255, 255, 255, 255);
 	// is not enabled by default
 	m_fillColor = QColor(0, 0, 0, 0);
+	m_automatedColor = QColor(0, 0, 0, 0);
 
 	m_effectorLocation = -1;
 
 	m_dataArray = {};
+	m_isDataChanged = true;
+	m_bakedValues = {};
 }
 
 PointGraphDataArray::PointGraphDataArray(
 	bool isFixedSizeIn, bool isFixedValueIn, bool isFixedPosIn, bool nonNegativeIn,
-	bool isFixedEndPointsIn, bool isSelectableIn, bool isEditableAttribIn, PointGraphModel* parentIn)
+	bool isFixedEndPointsIn, bool isSelectableIn, bool isEditableAttribIn, bool isAutomatableEffectableIn,
+	bool isSaveableIn, PointGraphModel* parentIn)
 {
 	m_isFixedSize = isFixedSizeIn;
 	m_isFixedValue = isFixedValueIn;
@@ -689,6 +1230,8 @@ PointGraphDataArray::PointGraphDataArray(
 	m_isFixedEndPoints = isFixedEndPointsIn;
 	m_isSelectable = isSelectableIn;
 	m_isEditableAttrib = isEditableAttribIn;
+	m_isAutomatableEffectable = isAutomatableEffectableIn;
+	m_isSaveable = isSaveableIn;
 	m_nonNegative = nonNegativeIn;
 	
 	m_lineColor = QColor(200, 200, 200, 255);
@@ -698,7 +1241,9 @@ PointGraphDataArray::PointGraphDataArray(
 
 	m_effectorLocation = -1;
 
-	m_dataArray = {};
+	// m_dataArray = {};
+	m_isDataChanged = true;
+	// m_bakedValues = {};
 
 	updateConnections(parentIn);
 }
@@ -714,35 +1259,53 @@ void PointGraphDataArray::updateConnections(PointGraphModel* parentIn)
 	m_parent = parentIn;
 }
 
-void PointGraphDataArray::setFixedSize(bool valueIn)
+void PointGraphDataArray::setIsFixedSize(bool valueIn)
 {
 	m_isFixedSize = valueIn;
 	dataChanged();
 }
-void PointGraphDataArray::setFixedValue(bool valueIn)
+void PointGraphDataArray::setIsFixedValue(bool valueIn)
 {
 	m_isFixedValue = valueIn;
 	dataChanged();
 }
-void PointGraphDataArray::setFixedPos(bool valueIn)
+void PointGraphDataArray::setIsFixedPos(bool valueIn)
 {
 	m_isFixedPos = valueIn;
 	dataChanged();
 }
-void PointGraphDataArray::setFixedEndPoints(bool valueIn)
+void PointGraphDataArray::setIsFixedEndPoints(bool valueIn)
 {
 	m_isFixedEndPoints = valueIn;
 	formatDataArrayEndPoints();
 	dataChanged();
 }
-void PointGraphDataArray::setSelectable(bool valueIn)
+void PointGraphDataArray::setIsSelectable(bool valueIn)
 {
 	m_isSelectable = valueIn;
 	dataChanged();
 }
-void PointGraphDataArray::setEditableAttrib(bool valueIn)
+void PointGraphDataArray::setIsEditableAttrib(bool valueIn)
 {
 	m_isEditableAttrib = valueIn;
+	dataChanged();
+}
+void PointGraphDataArray::setIsAutomatableEffectable(bool valueIn)
+{
+	m_isAutomatableEffectable = valueIn;
+	if (valueIn == false)
+	{
+		setEffectorArrayLocation(-1);
+	}
+	else
+	{
+		// setEffectorArray will call dataChanged()
+		dataChanged();
+	}
+}
+void PointGraphDataArray::setIsSaveable(bool valueIn)
+{
+	m_isSaveable = valueIn;
 	dataChanged();
 }
 void PointGraphDataArray::setNonNegative(bool valueIn)
@@ -765,55 +1328,81 @@ void PointGraphDataArray::setFillColor(QColor colorIn)
 	m_fillColor = colorIn;
 	styleChanged();
 }
+void PointGraphDataArray::setAutomatedColor(QColor colorIn)
+{
+	m_automatedColor = colorIn;
+	styleChanged();
+}
 bool PointGraphDataArray::setEffectorArrayLocation(unsigned int locationIn)
 {
-	unsigned int curLocation = m_parent->getDataArrayLocation(this);
-	qDebug("setEffectorArrayLocation cur_loaction %d", curLocation);
-	int arrayLocation = locationIn;
-	bool found = false;
-	for (unsigned int i = 0; i < m_parent->getDataArraySize(); i++)
+	bool found = true;
+	if (locationIn >= 0)
 	{
-		arrayLocation = m_parent->getDataArray(arrayLocation)->getEffectorArrayLocation();
-		if (arrayLocation == -1)
+		unsigned int curLocation = m_parent->getDataArrayLocation(this);
+		qDebug("setEffectorArrayLocation cur_loaction %d", curLocation);
+		int arrayLocation = locationIn;
+		found = false;
+		for (unsigned int i = 0; i < m_parent->getDataArraySize(); i++)
 		{
-			break;
+			arrayLocation = m_parent->getDataArray(arrayLocation)->getEffectorArrayLocation();
+			if (arrayLocation == -1)
+			{
+				break;
+			}
+			else if(arrayLocation == curLocation)
+			{
+				found = true;
+				break;
+			}
 		}
-		else if(arrayLocation == curLocation)
+		if (found == false)
 		{
-			found = true;
-			break;
+			m_effectorLocation = locationIn;
+			dataChanged();
 		}
 	}
-	if (found == false)
+	else
 	{
-		m_effectorLocation = locationIn;
+		if (m_effectorLocation != -1)
+		{
+			dataChanged();
+		}
+		m_effectorLocation = -1;
 	}
 	return !found;
 }
 
-bool PointGraphDataArray::getFixedSize()
+bool PointGraphDataArray::getIsFixedSize()
 {
 	return m_isFixedSize;
 }
-bool PointGraphDataArray::getFixedValue()
+bool PointGraphDataArray::getIsFixedValue()
 {
 	return m_isFixedValue;
 }
-bool PointGraphDataArray::getFixedPos()
+bool PointGraphDataArray::getIsFixedPos()
 {
 	return m_isFixedPos;
 }
-bool PointGraphDataArray::getFixedEndPoints()
+bool PointGraphDataArray::getIsFixedEndPoints()
 {
 	return m_isFixedEndPoints;
 }
-bool PointGraphDataArray::getSelectable()
+bool PointGraphDataArray::getIsSelectable()
 {
 	return m_isSelectable;
 }
-bool PointGraphDataArray::getEditableAttrib()
+bool PointGraphDataArray::getIsEditableAttrib()
 {
 	return m_isEditableAttrib;
+}
+bool PointGraphDataArray::getIsAutomatableEffectable()
+{
+	return m_isAutomatableEffectable;
+}
+bool PointGraphDataArray::getIsSaveable()
+{
+	return m_isSaveable;
 }
 bool PointGraphDataArray::getNonNegative()
 {
@@ -830,6 +1419,10 @@ QColor* PointGraphDataArray::getActiveColor()
 QColor* PointGraphDataArray::getFillColor()
 {
 	return &m_fillColor;
+}
+QColor* PointGraphDataArray::getAutomatedColor()
+{
+	return &m_automatedColor;
 }
 int PointGraphDataArray::getEffectorArrayLocation()
 {
@@ -1026,14 +1619,14 @@ int PointGraphDataArray::getNearestLocation(float xIn, bool* foundOut, bool* isB
 		}
 	//qDebug("getNearestLocation, outputDif: %d", outputDif);
 		*foundOut = false;
-		if (mid + 1 < m_dataArray.size())
-		{
-			bool isBeforeOutB = xIn < m_dataArray[mid].m_x ? true : m_dataArray[mid + 1].m_x < xIn;
-			if (isBeforeOutB != *isBeforeOut)
-			{
-				qDebug("getNearestLocation, BEFOREBUG xIn: %f", xIn);
-			}
-		}
+		//if (mid + 1 < m_dataArray.size())
+		//{
+			//bool isBeforeOutB = xIn < m_dataArray[mid].m_x ? true : m_dataArray[mid + 1].m_x < xIn;
+			// if (isBeforeOutB != *isBeforeOut)
+			// {
+			//	qDebug("getNearestLocation, BEFOREBUG xIn: %f", xIn);
+			//}
+		//}
 		*isBeforeOut = xIn >= m_dataArray[mid + outputDif].m_x;
 		return mid + outputDif;
 	}
@@ -1122,36 +1715,43 @@ float PointGraphDataArray::getValueAtPosition(float xIn)
 		else
 		{
 			float transformedX = (xIn - m_dataArray[locationBefore].m_x) / (m_dataArray[locationAfter].m_x - m_dataArray[locationBefore].m_x);
-			// type effects TODO
+			// type effects
 			unsigned int type = getType(locationBefore);
 			float fadeOutStart = 0.95f;
 			if (type == 0)
 			{
-				output = processCurve(pointEffectYBefore, pointEffectYAfter, processAutomation(locationAfter, 1), transformedX);
+				output = processCurve(pointEffectYBefore, pointEffectYAfter, processAutomation(locationBefore, 1), transformedX);
 			}
 			else if (type == 1)
 			{
-				output = processCurve(pointEffectYBefore, pointEffectYAfter, m_dataArray[locationBefore].m_c, transformedX);
-				output = output + processLineTypeSine(transformedX, processAutomation(locationAfter, 2),
-					processAutomation(locationAfter, 3), fadeOutStart);
+				output = processCurve(pointEffectYBefore, pointEffectYAfter, processAutomation(locationBefore, 1), transformedX);
+				output = output + processLineTypeSine(transformedX, processAutomation(locationBefore, 2),
+					processAutomation(locationBefore, 3), fadeOutStart);
 			}
 			else if (type == 2)
 			{
 				output = processCurve(pointEffectYBefore, pointEffectYAfter, 0.0f, transformedX);
-				output = output + processLineTypePeak(transformedX, processAutomation(locationAfter, 2),
-					processAutomation(locationAfter, 3), processAutomation(locationAfter, 1), fadeOutStart);
+				output = output + processLineTypeSineB(transformedX, processAutomation(locationBefore, 2),
+					processAutomation(locationBefore, 3), processAutomation(locationBefore, 3), fadeOutStart);
 			}
 			else if (type == 3)
 			{
-				output = processCurve(pointEffectYBefore, pointEffectYAfter, m_dataArray[locationBefore].m_c, transformedX);
-				output = output + processLineTypeSteps(transformedX, output, processAutomation(locationAfter, 2),
-					processAutomation(locationAfter, 3), fadeOutStart);
+				output = processCurve(pointEffectYBefore, pointEffectYAfter, 0.0f, transformedX);
+				output = output + processLineTypePeak(transformedX, processAutomation(locationBefore, 2),
+					processAutomation(locationBefore, 3), processAutomation(locationBefore, 1), fadeOutStart);
 			}
 			else if (type == 4)
 			{
+				output = processCurve(pointEffectYBefore, pointEffectYAfter, processAutomation(locationBefore, 1), transformedX);
+				output = processCurve(pointEffectYBefore, pointEffectYAfter, m_dataArray[locationBefore].m_c, transformedX);
+				output = output + processLineTypeSteps(transformedX, output, processAutomation(locationBefore, 2),
+					processAutomation(locationBefore, 3), fadeOutStart);
+			}
+			else if (type == 5)
+			{
 				output = processCurve(pointEffectYBefore, pointEffectYAfter, 0.0f, transformedX);
-				output = output + processLineTypeRandom(transformedX, processAutomation(locationAfter, 2),
-					processAutomation(locationAfter, 3), processAutomation(locationAfter, 1), fadeOutStart);
+				output = output + processLineTypeRandom(transformedX, processAutomation(locationBefore, 2),
+					processAutomation(locationBefore, 3), processAutomation(locationBefore, 1), fadeOutStart);
 			}
 			//qDebug("getVALUE, value2: %f %f -  %d  %d  - %f   %f", output, xIn, locationBefore, locationAfter, transformedX, pointEffectBefore);
 			//qDebug("getVALUE, transfrmedX: %f", transformedX);
@@ -1162,7 +1762,6 @@ float PointGraphDataArray::getValueAtPosition(float xIn)
 		// and it does not only effect data points
 		if (m_effectorLocation >= 0 && tempELocation >= 0 && tempEArray->getEffectOnlyPoints(tempELocation) == true)
 		{
-			// TODO use getValueAtPosition
 			float effectValue = tempEArray->getValueAtPosition(xIn);
 			output = processEffect(output,
 				effectValue, tempEArray, tempELocation, lowerLimit);
@@ -1282,29 +1881,47 @@ void PointGraphDataArray::setValB(unsigned int locationIn, float valueIn)
 void PointGraphDataArray::setType(unsigned int locationIn, unsigned int typeIn)
 {
 	// set the type without changing the automated attribute location
-	m_dataArray[locationIn].m_type = typeIn + getAutomatedAttribLocation(locationIn);
+	m_dataArray[locationIn].m_type = typeIn;
 	dataChanged();
 }
 void PointGraphDataArray::setAutomatedAttrib(unsigned int locationIn, unsigned int attribLocationIn)
 {
-	// only 4 attributes can be automated (y, c, valA, valB)
-	attribLocationIn = attribLocationIn > 3 ? 0 : attribLocationIn;
-	// get the type and add the automated location
-	m_dataArray[locationIn].m_type = getType(locationIn) + attribLocationIn;
-	dataChanged();
+	if (m_isAutomatableEffectable == true)
+	{
+		// only 4 attributes can be automated (y, c, valA, valB)
+		attribLocationIn = attribLocationIn > 3 ? 0 : attribLocationIn;
+		// set automated location correctly (effected_location = automatedEffectedLocation % 4)
+		m_dataArray[locationIn].m_automatedEffectedAttribLocations = attribLocationIn * 4 + getEffectedAttribLocation(locationIn);
+		dataChanged();
+	}
 }
-unsigned int PointGraphDataArray::getType(unsigned int locationIn)
+void PointGraphDataArray::setEffectedAttrib(unsigned int locationIn, unsigned int attribLocationIn)
 {
-	return static_cast<unsigned int>
-		(static_cast<float>(m_dataArray[locationIn].m_type) / 4.0f);
+	if (m_isAutomatableEffectable == true)
+	{
+		// only 4 attributes can be effected (y, c, valA, valB)
+		attribLocationIn = attribLocationIn > 3 ? 0 : attribLocationIn;
+		// set effected location correctly
+		m_dataArray[locationIn].m_automatedEffectedAttribLocations = attribLocationIn + getAutomatedAttribLocation(locationIn);
+		dataChanged();
+	}
 }
 unsigned int PointGraphDataArray::getAutomatedAttribLocation(unsigned int locationIn)
 {
-	return m_dataArray[locationIn].m_type - getType(locationIn);
+	return m_dataArray[locationIn].m_automatedEffectedAttribLocations / 4;
+}
+unsigned int PointGraphDataArray::getEffectedAttribLocation(unsigned int locationIn)
+{
+	return m_dataArray[locationIn].m_automatedEffectedAttribLocations % 4;
 }
 void PointGraphDataArray::setEffectOnlyPoints(unsigned int locationIn, bool boolIn)
 {
-	m_dataArray[locationIn].m_effectOnlyPoints = boolIn;
+	if (m_isAutomatableEffectable == true)
+	{
+		m_dataArray[locationIn].m_effectOnlyPoints = boolIn;
+		// this change does not effect the output values of the dataArray
+		// so dataChanged() is not called
+	}
 }
 bool PointGraphDataArray::getEffect(unsigned int locationIn, unsigned int effectNumberIn)
 {
@@ -1312,55 +1929,74 @@ bool PointGraphDataArray::getEffect(unsigned int locationIn, unsigned int effect
 	{
 		case 0:
 			return m_dataArray[locationIn].m_effectAdd;
+			break;
 		case 1:
 			return m_dataArray[locationIn].m_effectSubtract;
+			break;
 		case 2:
 			return m_dataArray[locationIn].m_effectMultiply;
+			break;
 		case 3:
 			return m_dataArray[locationIn].m_effectDivide;
+			break;
 		case 4:
 			return m_dataArray[locationIn].m_effectPower;
+			break;
 		case 5:
 			return m_dataArray[locationIn].m_effectLog;
+			break;
+		case 6:
+			return m_dataArray[locationIn].m_effectSine;
+			break;
 	}
+	return false;
 }
 void PointGraphDataArray::setEffect(unsigned int locationIn, unsigned int effectNumberIn, bool boolIn)
 {
-	switch (effectNumberIn)
+	if (m_isAutomatableEffectable == true)
 	{
-		case 0:
-			m_dataArray[locationIn].m_effectAdd = boolIn;
-			break;
-		case 1:
-			m_dataArray[locationIn].m_effectSubtract = boolIn;
-			break;
-		case 2:
-			m_dataArray[locationIn].m_effectMultiply = boolIn;
-			break;
-		case 3:
-			m_dataArray[locationIn].m_effectDivide = boolIn;
-			break;
-		case 4:
-			m_dataArray[locationIn].m_effectPower = boolIn;
-			break;
-		case 5:
-			m_dataArray[locationIn].m_effectLog = boolIn;
-			break;
+		switch (effectNumberIn)
+		{
+			case 0:
+				m_dataArray[locationIn].m_effectAdd = boolIn;
+				break;
+			case 1:
+				m_dataArray[locationIn].m_effectSubtract = boolIn;
+				break;
+			case 2:
+				m_dataArray[locationIn].m_effectMultiply = boolIn;
+				break;
+			case 3:
+				m_dataArray[locationIn].m_effectDivide = boolIn;
+				break;
+			case 4:
+				m_dataArray[locationIn].m_effectPower = boolIn;
+				break;
+			case 5:
+				m_dataArray[locationIn].m_effectLog = boolIn;
+				break;
+			case 6:
+				m_dataArray[locationIn].m_effectSine = boolIn;
+				break;
+		}
 	}
 }
 void PointGraphDataArray::setAutomated(unsigned int locationIn, bool isAutomatedIn)
 {
-	if (isAutomatedIn == true)
+	if (m_isAutomatableEffectable == true)
 	{
-		if (m_dataArray[locationIn].m_automationModel == nullptr)
+		if (isAutomatedIn == true)
 		{
-			m_dataArray[locationIn].m_automationModel = new FloatModel(0.0f, -1.0f, 1.0f, 0.0f, nullptr, QString(), false);
+			if (m_dataArray[locationIn].m_automationModel == nullptr)
+			{
+				m_dataArray[locationIn].m_automationModel = new FloatModel(0.0f, -1.0f, 1.0f, 0.05f, nullptr, QString(), false);
+			}
 		}
-	}
-	else
-	{
-		delete m_dataArray[locationIn].m_automationModel;
-		m_dataArray[locationIn].m_automationModel = nullptr; // is this needed? TODO
+		else
+		{
+			delete m_dataArray[locationIn].m_automationModel;
+			m_dataArray[locationIn].m_automationModel = nullptr; // is this needed? TODO
+		}
 	}
 }
 
@@ -1416,6 +2052,11 @@ float PointGraphDataArray::processEffect(float valueIn, float effectValueIn,
 	PointGraphDataArray* effectArrayIn, unsigned int effectLocationIn, float lowerLimitIn)
 {
 	float output = valueIn;
+	if (effectArrayIn->getEffect(effectLocationIn, 6) == true)
+	{
+		// sine
+		output = output + std::sin(effectValueIn * 100.0f);
+	}
 	if (effectArrayIn->getEffect(effectLocationIn, 4) == true)
 	{
 		// power
@@ -1493,6 +2134,7 @@ float PointGraphDataArray::processAutomation(unsigned int locationIn, unsigned i
 		if (attribLocation = attribLocationIn)
 		{
 			output += automationModel->value();
+			// qDebug("processAutomation -> value: %f", output);
 		}
 	}
 	if (attribLocationIn == 0)
@@ -1527,10 +2169,22 @@ float PointGraphDataArray::processLineTypeSine(float xIn, float valAIn, float va
 	}
 	return output;
 }
+float PointGraphDataArray::processLineTypeSineB(float xIn, float valAIn, float valBIn, float curveIn, float fadeOutStartIn)
+{
+	// sine
+	float output = valAIn * std::sin(xIn * valBIn + curveIn * 10.0f);
+	
+	// fade out
+	if (xIn > fadeOutStartIn)
+	{
+		output = output * (1.0f - xIn) / (1.0f - fadeOutStartIn);
+	}
+	return output;
+}
 float PointGraphDataArray::processLineTypePeak(float xIn, float valAIn, float valBIn, float curveIn, float fadeOutStartIn)
 {
 	// peak
-	float output = std::pow(curveIn * 0.4f + 0.01f, std::abs(xIn - valBIn) * 10.0f) * valAIn;
+	float output = std::pow((curveIn + 1.0f) * 0.2f + 0.01f, std::abs(xIn - (valBIn + 1.0f) * 0.5f) * 10.0f) * valAIn;
 
 	// fade in
 	float fadeInEnd = 1.0f - fadeOutStartIn;
