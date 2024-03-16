@@ -108,7 +108,7 @@ FFTFilterControlDialog::FFTFilterControlDialog(FFTFilterControls* controls) :
 
 	auto curGraph = new PointGraphView(this, 300, 200, 10, 1024);
 	curGraph->setModel(&controls->m_graphModel);
-	resetButton->move(100, 240);
+	curGraph->move(100, 240);
 /*
 	auto swapInputs = new LedCheckBox("Swap inputs", this, tr("Swap inputs"), LedCheckBox::LedColor::Green);
 	swapInputs->move( 20, 275 );

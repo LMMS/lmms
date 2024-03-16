@@ -43,7 +43,14 @@ FFTFilterControls::FFTFilterControls(FFTFilterEffect* effect) :
 	m_displayFFTModel( true, this, tr("Display fft")),
 	m_graphModel(1024, this, false)
 {
-	m_graphModel.addArray();
+	unsigned int arrayLocation = m_graphModel.addArray();
+	m_graphModel.getDataArray(arrayLocation)->setIsSelectable(true);
+	m_graphModel.getDataArray(arrayLocation)->setIsEditableAttrib(true);
+	m_graphModel.getDataArray(arrayLocation)->setIsAutomatableEffectable(true);
+	m_graphModel.getDataArray(arrayLocation)->setLineColor(QColor(255, 50, 50, 255));
+	m_graphModel.getDataArray(arrayLocation)->setActiveColor(QColor(255, 0, 0, 255));
+	m_graphModel.getDataArray(arrayLocation)->setFillColor(QColor(200, 25, 25, 255));
+	m_graphModel.getDataArray(arrayLocation)->setAutomatedColor(QColor(0, 200, 255, 255));
 }
 
 
