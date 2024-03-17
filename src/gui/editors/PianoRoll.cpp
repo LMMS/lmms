@@ -3030,10 +3030,9 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 	if (hasValidMidiClip())
 	{
-		int pianoAreaHeight = 0, partialKeyVisible = 0, topKey = 0, topNote = 0;
-		pianoAreaHeight = keyAreaBottom() - keyAreaTop();
-		m_pianoKeysVisible = pianoAreaHeight / m_keyLineHeight;
-		partialKeyVisible = pianoAreaHeight % m_keyLineHeight;
+		int pianoAreaHeight = keyAreaBottom() - keyAreaTop();
+		int m_pianoKeysVisible = pianoAreaHeight / m_keyLineHeight;
+		int partialKeyVisible = pianoAreaHeight % m_keyLineHeight;
 		// check if we're below the minimum key area size
 		if (m_pianoKeysVisible * m_keyLineHeight < KEY_AREA_MIN_HEIGHT)
 		{
@@ -3058,8 +3057,8 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				PR_TOP_MARGIN - PR_BOTTOM_MARGIN;
 			partialKeyVisible = 0;
 		}
-		topKey = qBound(0, m_startKey + m_pianoKeysVisible - 1, NumKeys - 1);
-		topNote = topKey % KeysPerOctave;
+		int topKey = qBound(0, m_startKey + m_pianoKeysVisible - 1, NumKeys - 1);
+		int topNote = topKey % KeysPerOctave;
 		// if not resizing the note edit area, we can change m_notesEditHeight
 		if (m_action != Action::ResizeNoteEditArea && partialKeyVisible != 0)
 		{
@@ -4247,12 +4246,9 @@ void PianoRoll::enterValue( NoteVector* nv )
 	if( m_noteEditMode == NoteEditMode::Volume )
 	{
 		bool ok = false;
-		int new_val = 0;
-		new_val = QInputDialog::getInt(	this, "Piano roll: note velocity",
-					tr( "Please enter a new value between %1 and %2:" ).
-						arg( MinVolume ).arg( MaxVolume ),
-					(*nv)[0]->getVolume(),
-					MinVolume, MaxVolume, 1, &ok );
+		int new_val = QInputDialog::getInt(this, "Piano roll: note velocity",
+			tr("Please enter a new value between %1 and %2:").arg(MinVolume).arg(MaxVolume), (*nv)[0]->getVolume(),
+			MinVolume, MaxVolume, 1, &ok);
 
 		if( ok )
 		{
@@ -4266,12 +4262,9 @@ void PianoRoll::enterValue( NoteVector* nv )
 	else if( m_noteEditMode == NoteEditMode::Panning )
 	{
 		bool ok = false;
-		int new_val = 0;
-		new_val = QInputDialog::getInt(	this, "Piano roll: note panning",
-					tr( "Please enter a new value between %1 and %2:" ).
-							arg( PanningLeft ).arg( PanningRight ),
-						(*nv)[0]->getPanning(),
-						PanningLeft, PanningRight, 1, &ok );
+		int new_val = QInputDialog::getInt(this, "Piano roll: note panning",
+			tr("Please enter a new value between %1 and %2:").arg(PanningLeft).arg(PanningRight),
+			(*nv)[0]->getPanning(), PanningLeft, PanningRight, 1, &ok);
 
 		if( ok )
 		{
