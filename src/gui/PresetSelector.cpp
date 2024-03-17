@@ -26,9 +26,10 @@
 
 #include "PresetSelector.h"
 
+#include <QHBoxLayout>
+#include <QLabel>
 #include <QMenu>
 #include <QPushButton>
-#include <QToolBar>
 
 #include "embed.h"
 #include "PixmapButton.h"
@@ -38,11 +39,19 @@ namespace lmms::gui
 {
 
 PresetSelector::PresetSelector(PluginPresets* presets, QWidget* parent)
-	: QWidget{parent}
+	: QToolBar{parent}
 	, IntModelView{presets, parent}
 	, m_presets{presets}
 {
-	m_prevPresetButton = new PixmapButton{parent};
+	setSizePolicy({QSizePolicy::MinimumExpanding, QSizePolicy::Fixed});
+
+	m_activePreset = new QLabel{this};
+	updateActivePreset();
+
+	connect(m_presets, &PluginPresets::activePresetChanged, this, &PresetSelector::updateActivePreset);
+	connect(m_presets, &PluginPresets::activePresetModified, this, &PresetSelector::updateActivePreset);
+
+	m_prevPresetButton = new PixmapButton{this};
 	m_prevPresetButton->setCheckable(false);
 	m_prevPresetButton->setCursor(Qt::PointingHandCursor);
 	m_prevPresetButton->setActiveGraphic(embed::getIconPixmap("stepper-left-press"));
@@ -56,7 +65,7 @@ PresetSelector::PresetSelector(PluginPresets* presets, QWidget* parent)
 
 	connect(m_prevPresetButton, &PixmapButton::clicked, this, [&] { m_presets->prevPreset(); });
 
-	m_nextPresetButton = new PixmapButton{parent};
+	m_nextPresetButton = new PixmapButton{this};
 	m_nextPresetButton->setCheckable(false);
 	m_nextPresetButton->setCursor(Qt::PointingHandCursor);
 	m_nextPresetButton->setActiveGraphic(embed::getIconPixmap("stepper-right-press"));
@@ -70,7 +79,7 @@ PresetSelector::PresetSelector(PluginPresets* presets, QWidget* parent)
 
 	connect(m_nextPresetButton, &PixmapButton::clicked, this, [&] { m_presets->nextPreset(); });
 
-	m_selectPresetButton = new QPushButton{parent};
+	m_selectPresetButton = new QPushButton{this};
 	m_selectPresetButton->setCheckable(false);
 	m_selectPresetButton->setCursor(Qt::PointingHandCursor);
 	m_selectPresetButton->setIcon(embed::getIconPixmap("stepper-down"));
@@ -85,14 +94,44 @@ PresetSelector::PresetSelector(PluginPresets* presets, QWidget* parent)
 	connect(menu, &QMenu::aboutToShow, this, &PresetSelector::updateMenu);
 	connect(m_presets, &PluginPresets::presetCollectionChanged, this, &PresetSelector::updateMenu);
 
-	auto tb = new QToolBar{parent};
-	tb->resize(100, 32); // TODO: Adjust size
-	tb->addWidget(m_prevPresetButton);
-	tb->addWidget(m_nextPresetButton);
-	tb->addWidget(m_selectPresetButton);
-	//tb->addWidget(m_openPresetButton);
-	//tb->addWidget(m_savePresetButton);
-	//tb->addWidget(m_managePluginButton);
+	auto widget = new QWidget{this};
+	auto layout = new QHBoxLayout{widget};
+	layout->addWidget(m_activePreset, Qt::AlignmentFlag::AlignLeft);
+	layout->addStretch(1);
+	layout->addWidget(m_prevPresetButton, Qt::AlignmentFlag::AlignRight);
+	layout->addWidget(m_nextPresetButton);
+	layout->addWidget(m_selectPresetButton);
+	widget->setLayout(layout);
+
+	addWidget(widget);
+}
+
+auto PresetSelector::sizeHint() const -> QSize
+{
+	// See InstrumentViewFixedSize
+	return QSize{250, 32};
+}
+
+void PresetSelector::updateActivePreset()
+{
+	if (!m_presets) { return; }
+
+	const auto preset = m_presets->activePreset();
+	if (!preset)
+	{
+		m_activePreset->setText(tr("(No active preset)"));
+		return;
+	}
+
+	const auto presetIndex = m_presets->presetIndex().value() + 1;
+	const auto indexText = QString{"%1/%2"}.arg(presetIndex).arg(m_presets->presets().size());
+
+	const auto displayName = QString::fromStdString(preset->metadata().displayName);
+	const auto text = m_presets->isModified()
+		? QString{"%1: %2<b><i>*</i></b>"}.arg(indexText).arg(displayName)
+		: QString{"%1: %2"}.arg(indexText).arg(displayName);
+
+	m_activePreset->setText(text);
 }
 
 void PresetSelector::updateMenu()
@@ -100,6 +139,7 @@ void PresetSelector::updateMenu()
 	if (!m_selectPresetButton) { return; }
 
 	const auto menu = m_selectPresetButton->menu();
+	menu->setStyleSheet("QMenu { menu-scrollable: 1; }");
 	menu->clear();
 
 	if (!m_presets) { return; }
@@ -110,14 +150,25 @@ void PresetSelector::updateMenu()
 		auto presetAction = new QAction{this};
 		connect(presetAction, &QAction::triggered, this, [=] { selectPreset(idx); });
 
-		const auto name = QString::fromStdString(presets[idx]->metadata().displayName);
-		presetAction->setText(QString("%1. %2").arg(QString::number(idx + 1), name));
+		const auto isActive = m_presets->presetIndex().value_or(-1) == idx;
+		if (isActive)
+		{
+			auto font = presetAction->font();
+			font.setBold(true);
+			font.setItalic(true);
+			presetAction->setFont(font);
+		}
 
-		const auto icon = m_presets->presetIndex().value_or(-1) == idx ? "sample_file" : "edit_copy";
+		const auto name = QString::fromStdString(presets[idx]->metadata().displayName);
+		presetAction->setText(QString{"%1. %2"}.arg(QString::number(idx + 1), name));
+
+		const auto icon = isActive ? "sample_file" : "edit_copy";
 		presetAction->setIcon(embed::getIconPixmap(icon, 16, 16));
 
 		menu->addAction(presetAction);
 	}
+
+	// TODO: Scroll to active preset?
 }
 
 void PresetSelector::selectPreset(int pos)

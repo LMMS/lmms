@@ -97,6 +97,7 @@ protected:
 private:
 	enum class Rows
 	{
+		PresetRow,
 		ButtonRow,
 		ParametersRow,
 		LinkChannelsRow

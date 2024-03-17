@@ -25,11 +25,12 @@
 #ifndef LMMS_GUI_PRESET_SELECTOR_H
 #define LMMS_GUI_PRESET_SELECTOR_H
 
-#include <QWidget>
+#include <QToolBar>
 
 #include "lmms_export.h"
 #include "AutomatableModelView.h"
 
+class QLabel;
 class QPushButton;
 
 namespace lmms
@@ -42,20 +43,25 @@ namespace gui
 
 class PixmapButton;
 
-class LMMS_EXPORT PresetSelector : public QWidget, public IntModelView
+class LMMS_EXPORT PresetSelector : public QToolBar, public IntModelView
 {
 	Q_OBJECT
 public:
 	PresetSelector(PluginPresets* presets, QWidget* parent = nullptr);
 
+	auto sizeHint() const -> QSize override;
+
 protected slots:
+	void updateActivePreset();
 	void updateMenu();
 	void selectPreset(int pos);
 
 private:
+
 	PluginPresets* m_presets = nullptr;
 	int m_lastPosInMenu = 0;
 
+	QLabel* m_activePreset = nullptr;
 	PixmapButton* m_prevPresetButton = nullptr;
 	PixmapButton* m_nextPresetButton = nullptr;
 	QPushButton* m_selectPresetButton = nullptr;

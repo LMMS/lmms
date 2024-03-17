@@ -166,8 +166,10 @@ ClapViewBase::ClapViewBase(QWidget* pluginWidget, ClapControlBase* ctrlBase)
 
 	if (ctrlBase->hasPresetSupport())
 	{
+		auto presetBox = std::make_unique<QHBoxLayout>();
 		m_presetSelector = new PresetSelector{&ctrlBase->control(0)->presetLoader(), pluginWidget};
-		btnBox->addWidget(m_presetSelector, 0);
+		presetBox->addWidget(m_presetSelector, 0);
+		grid->addLayout(presetBox.release(), static_cast<int>(Rows::PresetRow), 0, 1, 1);
 	}
 
 	btnBox->addStretch(1);

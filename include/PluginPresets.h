@@ -44,7 +44,7 @@ namespace gui
 
 
 /**
- * A collection of referenced plugins sourced from a PresetDatabase.
+ * A collection of referenced presets sourced from a PresetDatabase.
  */
 class LMMS_EXPORT PluginPresets
 	//: public PluginPresetsInterface
@@ -77,7 +77,7 @@ public:
 	 */
 	auto presets() const -> const auto& { return m_presets; }
 	auto presetIndex() const { return m_activePreset; }
-	auto presetModified() const { return m_modified; }
+	auto isModified() const { return m_modified; }
 	auto activatePreset(std::size_t index) -> bool;
 	auto prevPreset() -> bool;
 	auto nextPreset() -> bool;
@@ -102,9 +102,9 @@ public:
 	 * Signals
 	 */
 signals:
-	void activePresetChanged(std::optional<std::size_t> index);
+	void activePresetChanged();
+	void activePresetModified();
 	void presetCollectionChanged();
-	void presetModified();
 
 	// TODO: Should connect PresetDatabase's dataChanged() to this object's presetCollectionChanged().
 	//       This way if there are two plugin instances, and a user manually loads a new preset

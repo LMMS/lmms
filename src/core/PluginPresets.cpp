@@ -111,8 +111,7 @@ auto PluginPresets::activatePreset(const PresetLoadData& preset) -> bool
 
 auto PluginPresets::activatePreset(std::size_t index) -> bool
 {
-	if (!m_database || m_presets.empty()) { return false; }
-	assert(index < m_presets.size());
+	if (!m_database || index >= m_presets.size()) { return false; }
 
 	const auto preset = m_presets[index];
 	assert(preset != nullptr);
@@ -213,7 +212,7 @@ void PluginPresets::setActivePreset(std::optional<std::size_t> index)
 
 	if (index != oldIndex)
 	{
-		emit activePresetChanged(index);
+		emit activePresetChanged();
 	}
 }
 
