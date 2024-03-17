@@ -108,6 +108,10 @@ public:
 	//! Enable std::set support
 	friend auto operator<(const Preset& a, const Preset& b) noexcept -> bool
 	{
+		// TODO: Better way to do this?
+		auto res = a.m_loadData.location.compare(b.m_loadData.location);
+		if (res < 0) { return true; }
+		if (res > 0) { return false; }
 		return a.m_loadData.loadKey < b.m_loadData.loadKey;
 	}
 
