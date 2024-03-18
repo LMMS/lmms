@@ -63,8 +63,6 @@ private:
 		const char* location, const char* loadKey);
 
 	auto activatePresetImpl(const PresetLoadData& preset) noexcept -> bool override;
-
-	auto getPresetDatabase() const -> PresetDatabase*;
 };
 
 } // namespace lmms

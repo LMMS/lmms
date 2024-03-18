@@ -54,6 +54,8 @@ public:
 protected slots:
 	void updateActivePreset();
 	void updateMenu();
+	void loadPreset();
+	void savePreset();
 	void selectPreset(int pos);
 
 private:
@@ -65,6 +67,8 @@ private:
 	PixmapButton* m_prevPresetButton = nullptr;
 	PixmapButton* m_nextPresetButton = nullptr;
 	QPushButton* m_selectPresetButton = nullptr;
+	PixmapButton* m_loadPresetButton = nullptr;
+	PixmapButton* m_savePresetButton = nullptr;
 };
 
 } // namespace gui

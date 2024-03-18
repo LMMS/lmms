@@ -26,7 +26,6 @@
 
 #ifdef LMMS_HAVE_CLAP
 
-#include <QDebug>
 #include <QObject>
 #include <cassert>
 #include <clap/entry.h>
@@ -52,7 +51,7 @@ namespace
 	}
 } // namespace
 
-class ClapPresetDatabase::MetadataReceiver : public NoCopyNoMove
+class ClapPresetDatabase::MetadataReceiver
 {
 public:
 	MetadataReceiver() = delete;
@@ -136,7 +135,6 @@ auto ClapPresetDatabase::discoverSetup() -> bool
 	}
 
 	const auto providerCount = m_factory->count(m_factory);
-	qDebug() << "providerCount:" << providerCount;
 	if (providerCount == 0) { return false; }
 
 	bool success = false;
@@ -145,7 +143,6 @@ auto ClapPresetDatabase::discoverSetup() -> bool
 		if (auto indexer = Indexer::create(*m_factory, idx))
 		{
 			success = true;
-			qDebug() << "Indexer successfully created";
 			auto& indexerRef = m_indexers.emplace_back(std::move(indexer));
 			for (auto& filetype : indexerRef->filetypes())
 			{
@@ -187,10 +184,6 @@ auto ClapPresetDatabase::discoverLocations(const SetLocations& func) -> bool
 
 auto ClapPresetDatabase::discoverPresets(const Location& location, std::set<Preset>& presets) -> bool
 {
-	qDebug() << "location:" << location.location.c_str();
-	qDebug() << "location name:" << location.name.c_str();
-	qDebug() << "flags:" << static_cast<int>(location.flags);
-
 	const auto preferredIndexer = getIndexerFor(location);
 
 	// Handle PLUGIN presets (internal presets)
@@ -512,8 +505,6 @@ auto ClapPresetDatabase::Indexer::clapDeclareFiletype(const clap_preset_discover
 	if (filetype->description) { ft.description = filetype->description; }
 	if (filetype->file_extension) { ft.extension = filetype->file_extension; }
 
-	qDebug().nospace() << "clapDeclareFiletype: name: \"" << ft.name.c_str() << "\" ext: \"" << ft.extension.c_str() << "\" desc: \"" << ft.description.c_str() << "\"";
-
 	self->m_filetypes.push_back(std::move(ft));
 	return true;
 }
@@ -573,8 +564,6 @@ auto ClapPresetDatabase::Indexer::clapDeclareLocation(const clap_preset_discover
 		convertFlags(location->flags)
 	};
 
-	qDebug().nospace() << "clapDeclareLocation: name: \"" << loc.name.c_str() << "\" loc: \"" << loc.location.c_str() << "\"";
-
 	self->m_locations.push_back(std::move(loc));
 
 	return true;
@@ -591,7 +580,6 @@ auto ClapPresetDatabase::Indexer::clapGetExtension(const clap_preset_discovery_i
 	const char* extensionId) -> const void*
 {
 	// LMMS does not have any custom indexer extensions
-	qDebug().nospace() << "clapGetExtension: Plugin requested extension: \"" << extensionId << "\"";
 	return nullptr;
 }
 
@@ -681,10 +669,6 @@ auto ClapPresetDatabase::MetadataReceiver::clapBeginPreset(
 	preset.loadData().location = self->m_location;
 	preset.loadData().loadKey = loadKey ? loadKey : std::string{};
 
-	qDebug().nospace() << "clapBeginPreset: display name: \"" << preset.metadata().displayName.c_str() << "\" load key: \"" << preset.loadData().loadKey.c_str() << "\"";
-
-	// TODO
-
 	return true;
 }
 
@@ -717,8 +701,6 @@ void ClapPresetDatabase::MetadataReceiver::clapAddPluginId(
 	}
 
 	presets.back().keys().push_back(pluginId->id);
-
-	qDebug().nospace() << "clapAddPluginId: pluginId: \"" << pluginId->id << "\"";
 }
 
 void ClapPresetDatabase::MetadataReceiver::clapSetSoundpackId(
@@ -760,8 +742,6 @@ void ClapPresetDatabase::MetadataReceiver::clapAddCreator(
 	}
 
 	presets.back().metadata().creator = creator;
-
-	qDebug().nospace() << "clapSetCreator: creator: \"" << creator << "\"";
 }
 
 void ClapPresetDatabase::MetadataReceiver::clapSetDescription(
@@ -780,8 +760,6 @@ void ClapPresetDatabase::MetadataReceiver::clapSetDescription(
 	}
 
 	presets.back().metadata().description = description;
-
-	qDebug().nospace() << "clapSetDescription: description: \"" << description << "\"";
 }
 
 void ClapPresetDatabase::MetadataReceiver::clapSetTimestamps(
@@ -807,8 +785,6 @@ void ClapPresetDatabase::MetadataReceiver::clapAddFeature(
 	}
 
 	presets.back().metadata().categories.push_back(feature);
-
-	qDebug().nospace() << "clapAddFeature: feature: \"" << feature << "\"";
 }
 
 void ClapPresetDatabase::MetadataReceiver::clapAddExtraInfo(

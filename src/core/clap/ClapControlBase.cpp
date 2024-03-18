@@ -139,6 +139,8 @@ auto ClapControlBase::Parameters::getGroup(std::size_t idx) const -> const Linke
 
 void ClapControlBase::Presets::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
+	ClapLog::globalLog(CLAP_LOG_DEBUG, "Saving presets");
+
 	// When saving a project file, we only want to save the active preset, not all presets
 	if (elem.ownerDocument().doctype().name() != "clonedtrack")
 	{
@@ -158,6 +160,8 @@ void ClapControlBase::Presets::saveSettings(QDomDocument& doc, QDomElement& elem
 
 void ClapControlBase::Presets::loadSettings(const QDomElement& elem)
 {
+	ClapLog::globalLog(CLAP_LOG_DEBUG, "Loading presets");
+
 	// When loading a project file, we only want to load the active preset, not all presets
 	if (elem.ownerDocument().doctype().name() != "clonedtrack")
 	{
@@ -263,9 +267,9 @@ void ClapControlBase::saveSettings(QDomDocument& doc, QDomElement& elem)
 	if (stateSupported())
 	{
 		m_presets.saveSettings(doc, elem);
-		for (unsigned int idx = 0; idx < m_instances.size(); ++idx)
+		for (unsigned int idx = 0; idx < static_cast<unsigned int>(m_instances.size()); ++idx)
 		{
-			const auto state = m_instances[idx]->state().save();
+			const auto state = m_instances[idx]->state().save(ClapState::Context::Duplicate);
 			elem.setAttribute("state" + QString::number(idx),
 				state ? QString::fromUtf8(state->data(), state->size()) : QString{});
 		}
@@ -298,8 +302,8 @@ void ClapControlBase::loadSettings(const QDomElement& elem)
 		m_presets.loadSettings(elem);
 		for (unsigned int idx = 0; idx < m_instances.size(); ++idx)
 		{
-			const auto state = elem.attribute("state" + QString::number(idx), "");
-			if (!m_instances[idx]->state().load(std::string_view{state.toStdString()})) { continue; }
+			const auto state = elem.attribute("state" + QString::number(idx), "").toStdString();
+			if (!m_instances[idx]->state().load(state, ClapState::Context::Duplicate)) { continue; }
 
 			// Parameters may have changed in the plugin;
 			// Those values need to be reflected in host

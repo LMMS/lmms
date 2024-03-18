@@ -25,13 +25,12 @@
 #ifndef LMMS_PRESET_H
 #define LMMS_PRESET_H
 
-#include <QObject>
 #include <string>
 #include <string_view>
 #include <vector>
 
 #include "Flags.h"
-#include "NoCopyNoMove.h"
+#include "lmms_export.h"
 
 namespace lmms
 {
@@ -87,7 +86,7 @@ struct PresetMetadata
 LMMS_DECLARE_OPERATORS_FOR_FLAGS(PresetMetadata::Flag)
 
 //! Generic preset
-class Preset
+class LMMS_EXPORT Preset
 {
 public:
 	auto metadata() -> auto& { return m_metadata; }
@@ -99,21 +98,10 @@ public:
 	auto keys() -> auto& { return m_keys; }
 	auto keys() const -> auto& { return m_keys; }
 
-	auto supportsPlugin(std::string_view key) const -> bool
-	{
-		if (m_keys.empty()) { return true; }
-		return std::find(m_keys.begin(), m_keys.end(), key) != m_keys.end();
-	}
+	auto supportsPlugin(std::string_view key) const -> bool;
 
 	//! Enable std::set support
-	friend auto operator<(const Preset& a, const Preset& b) noexcept -> bool
-	{
-		// TODO: Better way to do this?
-		auto res = a.m_loadData.location.compare(b.m_loadData.location);
-		if (res < 0) { return true; }
-		if (res > 0) { return false; }
-		return a.m_loadData.loadKey < b.m_loadData.loadKey;
-	}
+	friend auto operator<(const Preset& a, const Preset& b) noexcept -> bool;
 
 private:
 	PresetMetadata m_metadata;

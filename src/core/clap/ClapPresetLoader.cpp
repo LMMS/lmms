@@ -32,15 +32,19 @@
 #include "ClapManager.h"
 #include "ClapPresetDatabase.h"
 #include "Engine.h"
-#include "PathUtil.h"
 
 namespace lmms
 {
 
-ClapPresetLoader::ClapPresetLoader(Model* parent, ClapInstance* instance)
-	: ClapExtension{instance}
-	, PluginPresets{parent, getPresetDatabase(), instance->info().descriptor().id}
+ClapPresetLoader::ClapPresetLoader(Model* parent, ClapInstance* inst)
+	: ClapExtension{inst}
+	, PluginPresets{parent, nullptr, inst->info().descriptor().id}
 {
+	assert(instance() && "ClapExtension was not constructed properly");
+
+	const auto mgr = Engine::getClapManager();
+	const auto id = instance()->info().descriptor().id;
+	setPresetDatabase(mgr->presetDatabase(id));
 }
 
 auto ClapPresetLoader::initImpl(const clap_host* host, const clap_plugin* plugin) noexcept -> bool
@@ -71,7 +75,7 @@ auto ClapPresetLoader::activatePresetImpl(const PresetLoadData& preset) noexcept
 	const auto location = ClapPresetDatabase::toClapLocation(preset.location, temp);
 	if (!location) { return false; }
 
-#if 1
+#if 0
 	{
 		std::string msg = "About to activate preset: kind:" + std::to_string(location->first)
 			+ "; location: \"" + std::string{location->second ? location->second : "(NULL)"}
@@ -89,15 +93,6 @@ auto ClapPresetLoader::activatePresetImpl(const PresetLoadData& preset) noexcept
 	if (!instance()->params().supported()) { return true; }
 
 	return instance()->params().rescan(CLAP_PARAM_RESCAN_VALUES); // TODO: Is this correct?
-}
-
-auto ClapPresetLoader::getPresetDatabase() const -> PresetDatabase*
-{
-	assert(instance() && "ClapExtension was not constructed properly");
-
-	const auto mgr = Engine::getClapManager();
-	const auto id = instance()->info().descriptor().id;
-	return mgr->presetDatabase(id);
 }
 
 void ClapPresetLoader::clapOnError(const clap_host* host, std::uint32_t locationKind,
@@ -121,7 +116,7 @@ void ClapPresetLoader::clapLoaded(const clap_host* host, std::uint32_t locationK
 	if (!h) { return; }
 	auto& self = h->presetLoader();
 
-#if 1
+#if 0
 	const std::string text = "Loaded preset: location kind: " + std::to_string(locationKind)
 		+ "; location: \"" + std::string{location ? location : ""} + "\"; load key: \""
 		+ std::string{loadKey ? loadKey : ""} + "\"";

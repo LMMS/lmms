@@ -33,9 +33,10 @@
 #include <string>
 #include <string_view>
 #include <clap/ext/state.h>
-#include <clap/ext/state-context.h>
 
 #include "ClapExtension.h"
+
+struct clap_plugin_state_context;
 
 namespace lmms
 {
@@ -44,6 +45,15 @@ class ClapState final : public ClapExtension<clap_host_state, clap_plugin_state>
 {
 public:
 	using ClapExtension::ClapExtension;
+
+	//! See clap_plugin_state_context_type
+	enum class Context : std::uint32_t
+	{
+		None = 0,
+		Preset = 1,
+		Duplicate = 2,
+		Project = 3
+	};
 
 	auto extensionId() const -> std::string_view override { return CLAP_EXT_STATE; }
 	auto hostExt() const -> const clap_host_state* override;
@@ -57,7 +67,7 @@ public:
 	 * The context (clap_plugin_state_context_type) is used if it's provided and the plugin supports it.
 	 * Returns true if successful
 	 */
-	auto load(std::string_view base64, std::uint32_t context = 0) -> bool;
+	auto load(std::string_view base64, Context context = Context::None) -> bool;
 
 	/**
 	 * Tells plugin to load state data from encodedState()
@@ -65,7 +75,7 @@ public:
 	 * The context (clap_plugin_state_context_type) is used if it's provided and the plugin supports it.
 	 * Returns true if successful
 	 */
-	auto load(std::uint32_t context = 0) -> bool;
+	auto load(Context context = Context::None) -> bool;
 
 	/**
 	 * Tells plugin to save its state data
@@ -73,7 +83,7 @@ public:
 	 * The context (clap_plugin_state_context_type) is used if it's provided and the plugin supports it.
 	 * Sets and returns encodedState()'s data if successful
 	 */
-	auto save(std::uint32_t context = 0) -> std::optional<std::string_view>;
+	auto save(Context context = Context::None) -> std::optional<std::string_view>;
 
 	//! Base-64 encoded state data from the last time save() was successfully called
 	auto encodedState() const -> std::string_view { return m_state; }

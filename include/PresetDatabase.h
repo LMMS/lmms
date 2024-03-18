@@ -29,6 +29,7 @@
 #include <optional>
 #include <set>
 
+#include "lmms_export.h"
 #include "Preset.h"
 
 namespace lmms
@@ -37,12 +38,12 @@ namespace lmms
 /**
  * A plugin-specific collection of presets
  *
- * Contains all the loaded presets for a plugin, its subplugins, or a subset of its subplugins.
+ * Contains all the loaded presets for a plugin or its subplugins.
  *
  * Plugins are expected to inherit this class to implement preset discovery,
  *   metadata loading, and other functionality.
  */
-class PresetDatabase
+class LMMS_EXPORT PresetDatabase
 {
 public:
 	struct Filetype
@@ -82,46 +83,33 @@ public:
 
 	using PresetMap = std::map<Location, std::set<Preset>, std::less<>>;
 
-	PresetDatabase() = default;
+	PresetDatabase();
 	virtual ~PresetDatabase() = default;
 
 	//! Discover presets and populate database; Returns true when successful
 	auto discover() -> bool;
 
 	//! Load a preset file from disk; Returns empty vector upon failure or if preset(s) were already added
-	auto addPresets(std::string_view path) -> std::vector<const Preset*>;
+	auto loadPresets(std::string_view file) -> std::vector<const Preset*>;
 
 	/**
-	 * Accessors
+	 * Query
 	 */
-
-	auto presets() const -> auto& { return m_presets; }
-
-	auto presets(std::string_view location) const -> const std::set<Preset>*
-	{
-		const auto it = m_presets.find(location);
-		return it != m_presets.end() ? &it->second : nullptr;
-	}
-
-	auto presets(std::string_view location) -> std::set<Preset>*
-	{
-		const auto it = m_presets.find(location);
-		return it != m_presets.end() ? &it->second : nullptr;
-	}
-
-	auto filetypes() const -> auto& { return m_filetypes; }
 
 	//! Returns all presets that can be loaded by the plugin with the given subplugin key
 	auto findPresets(std::string_view key) const -> std::vector<const Preset*>;
 
 	auto findPreset(const PresetLoadData& loadData, std::string_view key = std::string_view{}) const -> const Preset*;
 
-	//! Open preset dialog TODO: Move to an lmms::gui class?
-	auto openPresetFile(std::string_view previousFile) -> std::vector<const Preset*>;
+	/**
+	 * Accessors
+	 */
 
-	//! Save preset dialog TODO: Move to an lmms::gui class?
-	auto savePresetFile(const Preset& preset) -> bool;
-
+	auto presets() const -> auto& { return m_presets; }
+	auto presets(std::string_view location) const -> const std::set<Preset>*;
+	auto presets(std::string_view location) -> std::set<Preset>*;
+	auto filetypes() const -> auto& { return m_filetypes; }
+	auto recentPresetFile() const -> std::string_view { return m_recentPresetFile; }
 
 //signal:
 	//! TODO: Need to use this
@@ -196,6 +184,8 @@ private:
 	PresetMap m_presets;
 
 	std::vector<Filetype> m_filetypes;
+
+	std::string m_recentPresetFile;
 };
 
 } // namespace lmms

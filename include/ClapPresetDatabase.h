@@ -38,7 +38,6 @@
 
 #include "ClapExtension.h"
 #include "lmms_filesystem.h"
-#include "NoCopyNoMove.h"
 #include "PresetDatabase.h"
 
 struct clap_plugin_entry;
@@ -71,7 +70,7 @@ private:
 	auto loadPresets(const Location& location, std::string_view file, std::set<Preset>& presets)
 		-> std::vector<const Preset*> override;
 
-	class Indexer : public NoCopyNoMove
+	class Indexer
 	{
 	public:
 		static auto create(const clap_preset_discovery_factory& factory, std::uint32_t index)

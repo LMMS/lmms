@@ -29,12 +29,17 @@
 #include <string>
 #include <cstring>
 #include <cassert>
+#include <clap/ext/state-context.h>
 
 #include "ClapInstance.h"
 #include "base64.h"
 
 namespace lmms
 {
+
+static_assert(static_cast<std::uint32_t>(ClapState::Context::Preset) == CLAP_STATE_CONTEXT_FOR_PRESET);
+static_assert(static_cast<std::uint32_t>(ClapState::Context::Duplicate) == CLAP_STATE_CONTEXT_FOR_DUPLICATE);
+static_assert(static_cast<std::uint32_t>(ClapState::Context::Project) == CLAP_STATE_CONTEXT_FOR_PROJECT);
 
 auto ClapState::initImpl(const clap_host* host, const clap_plugin* plugin) noexcept -> bool
 {
@@ -74,7 +79,7 @@ auto ClapState::checkSupported(const clap_plugin_state& ext) -> bool
 	return ext.load && ext.save;
 }
 
-auto ClapState::load(std::string_view base64, std::uint32_t context) -> bool
+auto ClapState::load(std::string_view base64, Context context) -> bool
 {
 	assert(ClapThreadCheck::isMainThread());
 
@@ -115,8 +120,8 @@ auto ClapState::load(std::string_view base64, std::uint32_t context) -> bool
 		&IStream::clapRead
 	};
 
-	const auto success = m_stateContext && context != 0
-		? m_stateContext->load(plugin(), &clapStream, context)
+	const auto success = m_stateContext && context != Context::None
+		? m_stateContext->load(plugin(), &clapStream, static_cast<std::uint32_t>(context))
 		: pluginExt()->load(plugin(), &clapStream);
 
 	if (!success)
@@ -133,12 +138,12 @@ auto ClapState::load(std::string_view base64, std::uint32_t context) -> bool
 	return true;
 }
 
-auto ClapState::load(std::uint32_t context) -> bool
+auto ClapState::load(Context context) -> bool
 {
 	return load(encodedState(), context);
 }
 
-auto ClapState::save(std::uint32_t context) -> std::optional<std::string_view>
+auto ClapState::save(Context context) -> std::optional<std::string_view>
 {
 	assert(ClapThreadCheck::isMainThread());
 
@@ -170,8 +175,8 @@ auto ClapState::save(std::uint32_t context) -> std::optional<std::string_view>
 		&OStream::clapWrite
 	};
 
-	const auto success = m_stateContext && context != 0
-		? m_stateContext->save(plugin(), &clapStream, context)
+	const auto success = m_stateContext && context != Context::None
+		? m_stateContext->save(plugin(), &clapStream, static_cast<std::uint32_t>(context))
 		: pluginExt()->save(plugin(), &clapStream);
 
 	if (!success)

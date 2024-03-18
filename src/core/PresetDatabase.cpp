@@ -26,15 +26,18 @@
 
 #include <algorithm>
 #include <cassert>
-#include <QDebug>
 
 #include "ConfigManager.h"
-#include "FileDialog.h"
 #include "lmms_filesystem.h"
 #include "PathUtil.h"
 
 namespace lmms
 {
+
+PresetDatabase::PresetDatabase()
+	: m_recentPresetFile{ConfigManager::inst()->userPresetsDir().toStdString()}
+{
+}
 
 auto PresetDatabase::discover() -> bool
 {
@@ -53,62 +56,12 @@ auto PresetDatabase::discover() -> bool
 	return success;
 }
 
-auto PresetDatabase::addPresets(std::string_view path) -> std::vector<const Preset*>
+auto PresetDatabase::loadPresets(std::string_view file) -> std::vector<const Preset*>
 {
-	auto& [location, presets] = *getLocation(path);
+	m_recentPresetFile = file;
 
-	return loadPresets(location, path, presets);
-}
-
-// TODO: Move to separate GUI-related file?
-auto PresetDatabase::openPresetFile(std::string_view previousFile) -> std::vector<const Preset*>
-{
-	auto openFileDialog = gui::FileDialog(nullptr, QObject::tr("Open audio file"));
-	auto dir = !previousFile.empty()
-		? PathUtil::toAbsolute(previousFile).value_or("")
-		: ConfigManager::inst()->userSamplesDir().toStdString();
-
-	// change dir to position of previously opened file
-	openFileDialog.setDirectory(QString::fromUtf8(dir.data(), dir.size()));
-	openFileDialog.setFileMode(gui::FileDialog::ExistingFiles);
-
-	// set filters
-	auto fileTypes = QStringList{};
-	auto allFileTypes = QStringList{};
-	auto nameFilters = QStringList{};
-
-	for (const auto& filetype : m_filetypes)
-	{
-		const auto name = QString::fromStdString(filetype.name);
-		const auto extension = QString::fromStdString(filetype.extension);
-		const auto displayExtension = QString{"*.%1"}.arg(extension);
-		fileTypes.append(QString{"%1 (%2)"}.arg(gui::FileDialog::tr("%1 files").arg(name), displayExtension));
-		allFileTypes.append(displayExtension);
-	}
-
-	nameFilters.append(QString{"%1 (%2)"}.arg(gui::FileDialog::tr("All preset files"), allFileTypes.join(" ")));
-	nameFilters.append(fileTypes);
-	nameFilters.append(QString("%1 (*)").arg(gui::FileDialog::tr("Other files")));
-
-	openFileDialog.setNameFilters(nameFilters);
-
-	if (!previousFile.empty())
-	{
-		// select previously opened file
-		openFileDialog.selectFile(QFileInfo{QString::fromUtf8(previousFile.data(), previousFile.size())}.fileName());
-	}
-
-	if (openFileDialog.exec() != QDialog::Accepted) { return {}; }
-
-	if (openFileDialog.selectedFiles().isEmpty()) { return {}; }
-
-	return addPresets(openFileDialog.selectedFiles()[0].toStdString());
-}
-
-auto PresetDatabase::savePresetFile(const Preset& preset) -> bool
-{
-	// [NOT IMPLEMENTED YET]
-	return false;
+	auto& [location, presets] = *getLocation(file);
+	return loadPresets(location, file, presets);
 }
 
 auto PresetDatabase::loadPresets(const Location& location, std::string_view file, std::set<Preset>& presets)
@@ -197,6 +150,18 @@ auto PresetDatabase::getLocation(std::string_view path, bool add) -> PresetMap::
 	};
 
 	return m_presets.emplace(std::move(newLocation), std::set<Preset>{}).first;
+}
+
+auto PresetDatabase::presets(std::string_view location) const -> const std::set<Preset>*
+{
+	const auto it = m_presets.find(location);
+	return it != m_presets.end() ? &it->second : nullptr;
+}
+
+auto PresetDatabase::presets(std::string_view location) -> std::set<Preset>*
+{
+	const auto it = m_presets.find(location);
+	return it != m_presets.end() ? &it->second : nullptr;
 }
 
 void PresetDatabase::SetLocations::operator()(const std::vector<Location>& locations) const

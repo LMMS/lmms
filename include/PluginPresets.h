@@ -25,6 +25,8 @@
 #ifndef LMMS_PLUGIN_PRESETS_H
 #define LMMS_PLUGIN_PRESETS_H
 
+#include <QDomDocument>
+#include <QDomElement>
 #include <QObject>
 #include <memory>
 
@@ -32,25 +34,14 @@
 #include "LinkedModelGroups.h"
 #include "lmms_export.h"
 #include "PresetDatabase.h"
-#include "SerializingObject.h"
 
 namespace lmms
 {
 
-namespace gui
-{
-	class PluginPresetsView {}; // TODO: Add later
-} // namespace gui
-
-
 /**
- * A collection of referenced presets sourced from a PresetDatabase.
+ * A collection of referenced presets sourced from a PresetDatabase
  */
-class LMMS_EXPORT PluginPresets
-	//: public PluginPresetsInterface
-	//, public SerializingObject
-	: public LinkedModelGroup
-	//, public IntModel // TODO: Inherit from IntModel for the active preset?
+class LMMS_EXPORT PluginPresets : public LinkedModelGroup
 {
 	Q_OBJECT
 public:
@@ -61,26 +52,17 @@ public:
 	auto setPresetDatabase(PresetDatabase* database) -> bool;
 	auto refreshPresetCollection() -> bool;
 
-	auto activePreset() const -> const Preset*;
 	auto activatePreset(const PresetLoadData& preset) -> bool;
-
-	virtual auto createView() const -> std::unique_ptr<gui::PluginPresetsView>
-	{
-		// TODO: Implement later
-		return std::make_unique<gui::PluginPresetsView>();
-	}
-
-	auto activePresetModel() -> IntModel* { return &m_activePresetModel; }
-
-	/**
-	 * PluginPresetsInterface implementation
-	 */
-	auto presets() const -> const auto& { return m_presets; }
-	auto presetIndex() const { return m_activePreset; }
-	auto isModified() const { return m_modified; }
 	auto activatePreset(std::size_t index) -> bool;
 	auto prevPreset() -> bool;
 	auto nextPreset() -> bool;
+
+	auto presetDatabase() const -> PresetDatabase* { return m_database; }
+	auto presets() const -> const auto& { return m_presets; }
+	auto presetIndex() const { return m_activePreset; }
+	auto isModified() const { return m_modified; }
+	auto activePreset() const -> const Preset*;
+	auto activePresetModel() -> IntModel* { return &m_activePresetModel; }
 
 	/**
 	 * SerializingObject-like functionality
@@ -91,12 +73,6 @@ public:
 	virtual auto presetNodeName() const -> QString { return "preset"; } // TODO: use "preset#" for linked preset groups?
 	virtual void saveActivePreset(QDomDocument& doc, QDomElement& element);
 	virtual void loadActivePreset(const QDomElement& element);
-
-	//! Open preset dialog TODO: Move to an lmms::gui class?
-	//auto openPresetFile(std::string_view previousFile) -> const Preset*;
-
-	//! Save preset dialog TODO: Move to an lmms::gui class?
-	//auto savePresetFile(const Preset& preset) -> bool;
 
 	/**
 	 * Signals
@@ -132,7 +108,7 @@ private:
 	//! `m_preset` index of the active preset
 	std::optional<std::size_t> m_activePreset;
 
-	IntModel m_activePresetModel;
+	IntModel m_activePresetModel; // TODO: Remove?
 
 	//! Whether the active preset has been modified
 	bool m_modified = false;

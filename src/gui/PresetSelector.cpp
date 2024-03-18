@@ -29,9 +29,12 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMenu>
+#include <QMessageBox>
 #include <QPushButton>
 
 #include "embed.h"
+#include "FileDialog.h"
+#include "PathUtil.h"
 #include "PixmapButton.h"
 #include "PluginPresets.h"
 
@@ -56,12 +59,8 @@ PresetSelector::PresetSelector(PluginPresets* presets, QWidget* parent)
 	m_prevPresetButton->setCursor(Qt::PointingHandCursor);
 	m_prevPresetButton->setActiveGraphic(embed::getIconPixmap("stepper-left-press"));
 	m_prevPresetButton->setInactiveGraphic(embed::getIconPixmap("stepper-left"));
-	m_prevPresetButton->setToolTip(tr("Previous (-)"));
-	m_prevPresetButton->setShortcut(Qt::Key_Minus);
-	m_prevPresetButton->setMinimumWidth(16);
-	m_prevPresetButton->setMaximumWidth(16);
-	m_prevPresetButton->setMinimumHeight(16);
-	m_prevPresetButton->setMaximumHeight(16);
+	m_prevPresetButton->setToolTip(tr("Previous preset"));
+	m_prevPresetButton->setFixedSize(16, 16);
 
 	connect(m_prevPresetButton, &PixmapButton::clicked, this, [&] { m_presets->prevPreset(); });
 
@@ -70,12 +69,8 @@ PresetSelector::PresetSelector(PluginPresets* presets, QWidget* parent)
 	m_nextPresetButton->setCursor(Qt::PointingHandCursor);
 	m_nextPresetButton->setActiveGraphic(embed::getIconPixmap("stepper-right-press"));
 	m_nextPresetButton->setInactiveGraphic(embed::getIconPixmap("stepper-right"));
-	m_nextPresetButton->setToolTip(tr("Next (+)"));
-	m_nextPresetButton->setShortcut(Qt::Key_Plus);
-	m_nextPresetButton->setMinimumWidth(16);
-	m_nextPresetButton->setMaximumWidth(16);
-	m_nextPresetButton->setMinimumHeight(16);
-	m_nextPresetButton->setMaximumHeight(16);
+	m_nextPresetButton->setToolTip(tr("Next preset"));
+	m_nextPresetButton->setFixedSize(16, 16);
 
 	connect(m_nextPresetButton, &PixmapButton::clicked, this, [&] { m_presets->nextPreset(); });
 
@@ -83,16 +78,33 @@ PresetSelector::PresetSelector(PluginPresets* presets, QWidget* parent)
 	m_selectPresetButton->setCheckable(false);
 	m_selectPresetButton->setCursor(Qt::PointingHandCursor);
 	m_selectPresetButton->setIcon(embed::getIconPixmap("stepper-down"));
-
+	m_selectPresetButton->setToolTip(tr("Select preset"));
 	auto menu = new QMenu{};
 	m_selectPresetButton->setMenu(menu);
-	m_selectPresetButton->setMinimumWidth(16);
-	m_selectPresetButton->setMaximumWidth(16);
-	m_selectPresetButton->setMinimumHeight(16);
-	m_selectPresetButton->setMaximumHeight(16);
+	m_selectPresetButton->setFixedSize(16, 16);
 
 	connect(menu, &QMenu::aboutToShow, this, &PresetSelector::updateMenu);
 	connect(m_presets, &PluginPresets::presetCollectionChanged, this, &PresetSelector::updateMenu);
+
+	m_loadPresetButton = new PixmapButton{this};
+	m_loadPresetButton->setCheckable(false);
+	m_loadPresetButton->setCursor(Qt::PointingHandCursor);
+	m_loadPresetButton->setActiveGraphic(embed::getIconPixmap("project_open", 21, 21));
+	m_loadPresetButton->setInactiveGraphic(embed::getIconPixmap("project_open", 21, 21));
+	m_loadPresetButton->setToolTip(tr("Load preset"));
+	m_loadPresetButton->setFixedSize(21, 21);
+
+	connect(m_loadPresetButton, &PixmapButton::clicked, this, &PresetSelector::loadPreset);
+
+	m_savePresetButton = new PixmapButton{this};
+	m_savePresetButton->setCheckable(false);
+	m_savePresetButton->setCursor(Qt::PointingHandCursor);
+	m_savePresetButton->setActiveGraphic(embed::getIconPixmap("project_save", 21, 21));
+	m_savePresetButton->setInactiveGraphic(embed::getIconPixmap("project_save", 21, 21));
+	m_savePresetButton->setToolTip(tr("Save preset"));
+	m_savePresetButton->setFixedSize(21, 21);
+
+	connect(m_savePresetButton, &PixmapButton::clicked, this, &PresetSelector::savePreset);
 
 	auto widget = new QWidget{this};
 	auto layout = new QHBoxLayout{widget};
@@ -101,6 +113,8 @@ PresetSelector::PresetSelector(PluginPresets* presets, QWidget* parent)
 	layout->addWidget(m_prevPresetButton, Qt::AlignmentFlag::AlignRight);
 	layout->addWidget(m_nextPresetButton);
 	layout->addWidget(m_selectPresetButton);
+	layout->addWidget(m_loadPresetButton);
+	layout->addWidget(m_savePresetButton);
 	widget->setLayout(layout);
 
 	addWidget(widget);
@@ -109,7 +123,7 @@ PresetSelector::PresetSelector(PluginPresets* presets, QWidget* parent)
 auto PresetSelector::sizeHint() const -> QSize
 {
 	// See InstrumentViewFixedSize
-	return QSize{250, 32};
+	return QSize{250, 24};
 }
 
 void PresetSelector::updateActivePreset()
@@ -169,6 +183,65 @@ void PresetSelector::updateMenu()
 	}
 
 	// TODO: Scroll to active preset?
+}
+
+void PresetSelector::loadPreset()
+{
+	if (!m_presets) { return; }
+
+	const auto database = m_presets->presetDatabase();
+	if (!database) { return; }
+
+	auto openFileDialog = gui::FileDialog(nullptr, QObject::tr("Open audio file"));
+
+	// Change dir to position of previously opened file
+	const auto recentFile = QString::fromUtf8(
+		database->recentPresetFile().data(), database->recentPresetFile().size());
+	openFileDialog.setDirectory(recentFile);
+	openFileDialog.setFileMode(gui::FileDialog::ExistingFiles);
+
+	// Set filters
+	auto fileTypes = QStringList{};
+	auto allFileTypes = QStringList{};
+	auto nameFilters = QStringList{};
+
+	for (const auto& filetype : database->filetypes())
+	{
+		const auto name = QString::fromStdString(filetype.name);
+		const auto extension = QString::fromStdString(filetype.extension);
+		const auto displayExtension = QString{"*.%1"}.arg(extension);
+		fileTypes.append(QString{"%1 (%2)"}.arg(gui::FileDialog::tr("%1 files").arg(name), displayExtension));
+		allFileTypes.append(displayExtension);
+	}
+
+	nameFilters.append(QString{"%1 (%2)"}.arg(gui::FileDialog::tr("All preset files"), allFileTypes.join(" ")));
+	nameFilters.append(fileTypes);
+	nameFilters.append(QString("%1 (*)").arg(gui::FileDialog::tr("Other files")));
+
+	openFileDialog.setNameFilters(nameFilters);
+
+	if (!recentFile.isEmpty())
+	{
+		// Select previously opened file
+		openFileDialog.selectFile(QFileInfo{recentFile}.fileName());
+	}
+
+	if (openFileDialog.exec() != QDialog::Accepted) { return; }
+
+	if (openFileDialog.selectedFiles().isEmpty()) { return; }
+
+	auto presets = database->loadPresets(openFileDialog.selectedFiles()[0].toStdString());
+	if (presets.empty())
+	{
+		QMessageBox::warning(this, tr("Preset load failure"),
+			tr("Failed to load preset(s) or preset(s) were already loaded"));
+	}
+}
+
+void PresetSelector::savePreset()
+{
+	// [NOT IMPLEMENTED YET]
+	QMessageBox::warning(this, tr("Save preset"), tr("This feature is not implemented yet"));
 }
 
 void PresetSelector::selectPreset(int pos)
