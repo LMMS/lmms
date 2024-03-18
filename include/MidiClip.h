@@ -63,7 +63,8 @@ public:
 	// note management
 	Note * addNote( const Note & _new_note, const bool _quant_pos = true );
 
-	void removeNote( Note * _note_to_del );
+	NoteVector::const_iterator removeNote(NoteVector::const_iterator it);
+	NoteVector::const_iterator removeNote(Note* note);
 
 	Note * noteAtStep( int _step );
 
@@ -79,7 +80,7 @@ public:
 	void setStep( int step, bool enabled );
 
 	// Split the list of notes on the given position
-	void splitNotes(NoteVector notes, TimePos pos);
+	void splitNotes(const NoteVector& notes, TimePos pos);
 
 	// clip-type stuff
 	inline Type type() const

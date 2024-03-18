@@ -72,17 +72,17 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	setBand( 6, &controls->m_highShelfActiveModel, &controls->m_highShelfFreqModel, &controls->m_highShelfResModel, &controls->m_highShelfGainModel, QColor(255 ,255, 255), tr( "High-shelf" ), &controls->m_highShelfPeakL, &controls->m_highShelfPeakR,0,0,0,0,0,0 );
 	setBand( 7, &controls->m_lpActiveModel, &controls->m_lpFreqModel, &controls->m_lpResModel, 0, QColor(255 ,255, 255), tr( "LP" ) ,0,0,0,0,0, &controls->m_lp12Model, &controls->m_lp24Model, &controls->m_lp48Model);
 
-	auto faderBg = new QPixmap(PLUGIN_NAME::getIconPixmap("faderback"));
-	auto faderLeds = new QPixmap(PLUGIN_NAME::getIconPixmap("faderleds"));
-	auto faderKnob = new QPixmap(PLUGIN_NAME::getIconPixmap("faderknob"));
+	static auto s_faderBg = PLUGIN_NAME::getIconPixmap("faderback");
+	static auto s_faderLeds = PLUGIN_NAME::getIconPixmap("faderleds");
+	static auto s_faderKnob = PLUGIN_NAME::getIconPixmap("faderknob");
 
-	auto GainFaderIn = new EqFader(&controls->m_inGainModel, tr("Input gain"), this, faderBg, faderLeds, faderKnob,
+	auto GainFaderIn = new EqFader(&controls->m_inGainModel, tr("Input gain"), this, &s_faderBg, &s_faderLeds, &s_faderKnob,
 		&controls->m_inPeakL, &controls->m_inPeakR);
 	GainFaderIn->move( 23, 295 );
 	GainFaderIn->setDisplayConversion( false );
 	GainFaderIn->setHintText( tr( "Gain" ), "dBv");
 
-	auto GainFaderOut = new EqFader(&controls->m_outGainModel, tr("Output gain"), this, faderBg, faderLeds, faderKnob,
+	auto GainFaderOut = new EqFader(&controls->m_outGainModel, tr("Output gain"), this, &s_faderBg, &s_faderLeds, &s_faderKnob,
 		&controls->m_outPeakL, &controls->m_outPeakR);
 	GainFaderOut->move( 453, 295);
 	GainFaderOut->setDisplayConversion( false );
@@ -92,8 +92,8 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	int distance = 126;
 	for( int i = 1; i < m_parameterWidget->bandCount() - 1; i++ )
 	{
-		auto gainFader = new EqFader(m_parameterWidget->getBandModels(i)->gain, tr(""), this, faderBg, faderLeds,
-			faderKnob, m_parameterWidget->getBandModels(i)->peakL, m_parameterWidget->getBandModels(i)->peakR);
+		auto gainFader = new EqFader(m_parameterWidget->getBandModels(i)->gain, tr(""), this, &s_faderBg, &s_faderLeds,
+			&s_faderKnob, m_parameterWidget->getBandModels(i)->peakL, m_parameterWidget->getBandModels(i)->peakR);
 		gainFader->move( distance, 295 );
 		distance += 44;
 		gainFader->setMinimumHeight(80);

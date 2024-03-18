@@ -1,12 +1,30 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.9)
 
+# Set the given policy to NEW. If it does not exist, it will not be set. If it
+# is already set to NEW (most likely due to predating the minimum required CMake
+# version), a developer warning is emitted indicating that the policy need no
+# longer be explicitly set.
+function(enable_policy_if_exists id)
+	if(POLICY "${id}")
+		cmake_policy(GET "${id}" current_value)
+		if(current_value STREQUAL "NEW")
+			message(AUTHOR_WARNING "${id} is now set to NEW by default, and no longer needs to be explicitly set.")
+		else()
+			cmake_policy(SET "${id}" NEW)
+		endif()
+	endif()
+endfunction()
+
+# Needed for the SWH Ladspa plugins. See below.
+enable_policy_if_exists(CMP0074) # find_package() uses <PackageName>_ROOT variables.
+# Needed for ccache support with MSVC
+enable_policy_if_exists(CMP0141) # MSVC debug information format flags are selected by an abstraction.
+
 PROJECT(lmms)
 
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
 SET(LMMS_BINARY_DIR ${CMAKE_BINARY_DIR})
 SET(LMMS_SOURCE_DIR ${CMAKE_SOURCE_DIR})
-
-# CMAKE_POLICY Section
 
 # Import of windows.h breaks min()/max()
 ADD_DEFINITIONS(-DNOMINMAX)
@@ -28,7 +46,7 @@ INCLUDE(GenerateExportHeader)
 
 STRING(TOUPPER          "${CMAKE_PROJECT_NAME}" PROJECT_NAME_UCASE)
 
-SET(PROJECT_YEAR 2020)
+SET(PROJECT_YEAR 2023)
 
 SET(PROJECT_AUTHOR      "LMMS Developers")
 SET(PROJECT_URL         "https://lmms.io")
@@ -53,6 +71,7 @@ INCLUDE(VersionInfo)
 INCLUDE(DetectMachine)
 
 OPTION(WANT_ALSA	"Include ALSA (Advanced Linux Sound Architecture) support" ON)
+OPTION(WANT_OSS 	"Include Open Sound System support" ON)
 OPTION(WANT_CALF	"Include CALF LADSPA plugins" ON)
 OPTION(WANT_CAPS	"Include C* Audio Plugin Suite (LADSPA plugins)" ON)
 OPTION(WANT_CARLA	"Include Carla plugin" ON)
@@ -70,6 +89,7 @@ OPTION(WANT_SOUNDIO	"Include libsoundio support" ON)
 OPTION(WANT_SDL		"Include SDL (Simple DirectMedia Layer) support" ON)
 OPTION(WANT_SF2		"Include SoundFont2 player plugin" ON)
 OPTION(WANT_GIG		"Include GIG player plugin" ON)
+option(WANT_SID		"Include Sid instrument" ON)
 OPTION(WANT_STK		"Include Stk (Synthesis Toolkit) support" ON)
 OPTION(WANT_SWH		"Include Steve Harris's LADSPA plugins" ON)
 OPTION(WANT_TAP		"Include Tom's Audio Processing LADSPA plugins" ON)
@@ -78,6 +98,10 @@ OPTION(WANT_VST_32	"Include 32-bit VST support" ON)
 OPTION(WANT_VST_64	"Include 64-bit VST support" ON)
 OPTION(WANT_WINMM	"Include WinMM MIDI support" OFF)
 OPTION(WANT_DEBUG_FPE	"Debug floating point exceptions" OFF)
+option(WANT_DEBUG_ASAN	"Enable AddressSanitizer" OFF)
+option(WANT_DEBUG_TSAN	"Enable ThreadSanitizer" OFF)
+option(WANT_DEBUG_MSAN	"Enable MemorySanitizer" OFF)
+option(WANT_DEBUG_UBSAN	"Enable UndefinedBehaviorSanitizer" OFF)
 OPTION(BUNDLE_QT_TRANSLATIONS	"Install Qt translation files for LMMS" OFF)
 
 
@@ -86,9 +110,11 @@ IF(LMMS_BUILD_APPLE)
 	LINK_DIRECTORIES("${APPLE_PREFIX}/lib")
 	SET(WANT_SOUNDIO OFF)
 	SET(WANT_ALSA OFF)
+	SET(WANT_OSS OFF)
 	SET(WANT_PULSEAUDIO OFF)
 	SET(WANT_VST OFF)
 	SET(STATUS_ALSA "<not supported on this platform>")
+	SET(STATUS_OSS "<not supported on this platform>")
 	SET(STATUS_PULSEAUDIO "<not supported on this platform>")
 	SET(STATUS_APPLEMIDI "OK")
 ELSE(LMMS_BUILD_APPLE)
@@ -98,6 +124,7 @@ ENDIF(LMMS_BUILD_APPLE)
 
 IF(LMMS_BUILD_WIN32)
 	SET(WANT_ALSA OFF)
+	SET(WANT_OSS OFF)
 	SET(WANT_PULSEAUDIO OFF)
 	SET(WANT_SNDIO OFF)
 	SET(WANT_SOUNDIO OFF)
@@ -105,6 +132,7 @@ IF(LMMS_BUILD_WIN32)
 	SET(BUNDLE_QT_TRANSLATIONS ON)
 	SET(LMMS_HAVE_WINMM TRUE)
 	SET(STATUS_ALSA "<not supported on this platform>")
+	SET(STATUS_OSS "<not supported on this platform>")
 	SET(STATUS_PULSEAUDIO "<not supported on this platform>")
 	SET(STATUS_SOUNDIO "<disabled in this release>")
 	SET(STATUS_SNDIO "<not supported on this platform>")
@@ -189,7 +217,14 @@ SET(QT_QTTEST_LIBRARY Qt5::Test)
 
 # check for libsndfile
 FIND_PACKAGE(SndFile REQUIRED)
-IF(NOT SNDFILE_FOUND)
+IF(SNDFILE_FOUND)
+	IF(SndFile_VERSION VERSION_GREATER_EQUAL "1.1.0")
+		SET(LMMS_HAVE_SNDFILE_MP3 TRUE)
+	ELSE()
+		MESSAGE("libsndfile version is < 1.1.0; MP3 import disabled")
+		SET(LMMS_HAVE_SNDFILE_MP3 FALSE)
+	ENDIF()
+ELSE()
 	MESSAGE(FATAL_ERROR "LMMS requires libsndfile1 and libsndfile1-dev >= 1.0.18 - please install, remove CMakeCache.txt and try again!")
 ENDIF()
 # check if we can use SFC_SET_COMPRESSION_LEVEL
@@ -199,6 +234,13 @@ CHECK_CXX_SOURCE_COMPILES(
 		int main() {SFC_SET_COMPRESSION_LEVEL;}"
 	LMMS_HAVE_SF_COMPLEVEL
 )
+
+# check for perl
+if(LMMS_BUILD_APPLE)
+	# Prefer system perl over Homebrew, MacPorts, etc
+	set(Perl_ROOT "/usr/bin")
+endif()
+find_package(Perl)
 
 IF(WANT_LV2)
 	IF(PKG_CONFIG_FOUND)
@@ -262,8 +304,12 @@ ELSE(WANT_CMT)
 ENDIF(WANT_CMT)
 
 IF(WANT_SWH)
-	SET(LMMS_HAVE_SWH TRUE)
-	SET(STATUS_SWH "OK")
+	IF(PERL_FOUND)
+		SET(LMMS_HAVE_SWH TRUE)
+		SET(STATUS_SWH "OK")
+	ELSE()
+		SET(STATUS_SWH "Skipping, perl is missing")
+	ENDIF()
 ELSE(WANT_SWH)
 	SET(STATUS_SWH "not built as requested")
 ENDIF(WANT_SWH)
@@ -328,6 +374,16 @@ IF(WANT_SDL AND NOT LMMS_HAVE_SDL2)
 		SET(SDL_LIBRARY "")
 	ENDIF()
 ENDIF()
+
+# check for Sid
+if(WANT_SID)
+	if(PERL_FOUND)
+		set(LMMS_HAVE_SID TRUE)
+		set(STATUS_SID "OK")
+	else()
+		set(STATUS_SID "not found, please install perl if you require the Sid instrument")
+	endif()
+endif()
 
 # check for Stk
 IF(WANT_STK)
@@ -395,8 +451,6 @@ IF(WANT_MP3LAME)
 		SET(STATUS_MP3LAME "OK")
 	ELSE(LAME_FOUND)
 		SET(STATUS_MP3LAME "not found, please install libmp3lame-dev (or similar)")
-		SET(LAME_LIBRARIES "")
-		SET(LAME_INCLUDE_DIRS "")
 	ENDIF(LAME_FOUND)
 ELSE(WANT_MP3LAME)
 	SET(STATUS_MP3LAME "Disabled for build")
@@ -415,13 +469,13 @@ IF(WANT_OGGVORBIS)
 ENDIF(WANT_OGGVORBIS)
 
 
-# check whether to enable OSS-support
-IF(LMMS_HAVE_SOUNDCARD_H OR LMMS_HAVE_SYS_SOUNDCARD_H)
+# check for OSS
+IF(WANT_OSS AND (LMMS_HAVE_SOUNDCARD_H OR LMMS_HAVE_SYS_SOUNDCARD_H))
 	SET(LMMS_HAVE_OSS TRUE)
 	SET(STATUS_OSS "OK")
-ELSE(LMMS_HAVE_SOUNDCARD_H OR LMMS_HAVE_SYS_SOUNDCARD_H)
+ELSEIF(WANT_OSS)
 	SET(STATUS_OSS "<not found or not supported on this platform>")
-ENDIF(LMMS_HAVE_SOUNDCARD_H OR LMMS_HAVE_SYS_SOUNDCARD_H)
+ENDIF()
 
 
 # check for ALSA
@@ -491,10 +545,14 @@ ENDIF()
 
 # check for Fluidsynth
 IF(WANT_SF2)
-	find_package(FluidSynth 1.1.0)
+	find_package(FluidSynth 1.1.7)
 	if(FluidSynth_FOUND)
 		SET(LMMS_HAVE_FLUIDSYNTH TRUE)
-		SET(STATUS_FLUIDSYNTH "OK")
+		if(FluidSynth_VERSION_STRING VERSION_GREATER_EQUAL 2)
+			set(STATUS_FLUIDSYNTH "OK")
+		else()
+			set(STATUS_FLUIDSYNTH "OK (FluidSynth version < 2: per-note panning unsupported)")
+		endif()
 	else()
 		SET(STATUS_FLUIDSYNTH "not found, libfluidsynth-dev (or similar)"
 			"is highly recommended")
@@ -605,7 +663,9 @@ else()
 	set(NOOP_COMMAND "${CMAKE_COMMAND}" "-E" "echo")
 endif()
 if(STRIP)
-	set(STRIP_COMMAND "$<IF:$<TARGET:Debug,RelWithDebInfo>,${NOOP_COMMAND},${STRIP}>")
+	# TODO CMake 3.19: Now that CONFIG generator expressions support testing for
+	# multiple configurations, combine the OR into a single CONFIG expression.
+	set(STRIP_COMMAND "$<IF:$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>,${NOOP_COMMAND},${STRIP}>")
 else()
 	set(STRIP_COMMAND "${NOOP_COMMAND}")
 endif()
@@ -641,7 +701,35 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	ELSE(WIN32)
 		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -DPIC")
 	ENDIF(WIN32)
+elseif(MSVC)
+	# Use UTF-8 as the source and execution character set
+	add_compile_options("/utf-8")
 ENDIF()
+
+# add enabled sanitizers
+function(add_sanitizer sanitizer supported_compilers want_flag status_flag)
+	if(${want_flag})
+		if(CMAKE_CXX_COMPILER_ID MATCHES "${supported_compilers}")
+			set("${status_flag}" "Enabled" PARENT_SCOPE)
+			string(REPLACE ";" " " additional_flags "${ARGN}")
+			# todo CMake 3.13: use add_compile_options/add_link_options instead
+			set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fsanitize=${sanitizer} ${additional_flags}" PARENT_SCOPE)
+			set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=${sanitizer} ${additional_flags}" PARENT_SCOPE)
+		else()
+			set("${status_flag}" "Wanted but disabled due to unsupported compiler" PARENT_SCOPE)
+		endif()
+	else()
+		set("${status_flag}" "Disabled" PARENT_SCOPE)
+	endif()
+endfunction()
+
+add_sanitizer(address "GNU|Clang|MSVC" WANT_DEBUG_ASAN STATUS_DEBUG_ASAN)
+add_sanitizer(thread "GNU|Clang" WANT_DEBUG_TSAN STATUS_DEBUG_TSAN)
+add_sanitizer(memory "Clang" WANT_DEBUG_MSAN STATUS_DEBUG_MSAN -fno-omit-frame-pointer)
+# UBSan does not link with vptr enabled due to a problem with references from PeakControllerEffect
+# not being found by PeakController
+add_sanitizer(undefined "GNU|Clang" WANT_DEBUG_UBSAN STATUS_DEBUG_UBSAN -fno-sanitize=vptr)
+
 
 # use ccache
 include(CompileCache)
@@ -711,7 +799,6 @@ ADD_CUSTOM_TARGET(uninstall
 	COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}" -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/uninstall.cmake"
 )
 
-
 #
 # display configuration information
 #
@@ -763,6 +850,7 @@ MESSAGE(
 "* ZynAddSubFX instrument      : ${STATUS_ZYN}\n"
 "* Carla Patchbay & Rack       : ${STATUS_CARLA}\n"
 "* SoundFont2 player           : ${STATUS_FLUIDSYNTH}\n"
+"* Sid instrument              : ${STATUS_SID}\n"
 "* Stk Mallets                 : ${STATUS_STK}\n"
 "* VST-instrument hoster       : ${STATUS_VST}\n"
 "* VST-effect hoster           : ${STATUS_VST}\n"
@@ -777,7 +865,11 @@ MESSAGE(
 MESSAGE(
 "Developer options\n"
 "-----------------------------------------\n"
-"* Debug FP exceptions         : ${STATUS_DEBUG_FPE}\n"
+"* Debug FP exceptions               : ${STATUS_DEBUG_FPE}\n"
+"* Debug using AddressSanitizer      : ${STATUS_DEBUG_ASAN}\n"
+"* Debug using ThreadSanitizer       : ${STATUS_DEBUG_TSAN}\n"
+"* Debug using MemorySanitizer       : ${STATUS_DEBUG_MSAN}\n"
+"* Debug using UBSanitizer           : ${STATUS_DEBUG_UBSAN}\n"
 )
 
 MESSAGE(

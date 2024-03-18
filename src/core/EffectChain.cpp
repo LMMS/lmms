@@ -25,6 +25,7 @@
 
 
 #include <QDomElement>
+#include <cassert>
 
 #include "EffectChain.h"
 #include "Effect.h"
@@ -162,6 +163,7 @@ void EffectChain::moveDown( Effect * _effect )
 	if (_effect != m_effects.back())
 	{
 		auto it = std::find(m_effects.begin(), m_effects.end(), _effect);
+		assert(it != m_effects.end());
 		std::swap(*std::next(it), *it);
 	}
 }
@@ -174,6 +176,7 @@ void EffectChain::moveUp( Effect * _effect )
 	if (_effect != m_effects.front())
 	{
 		auto it = std::find(m_effects.begin(), m_effects.end(), _effect);
+		assert(it != m_effects.end());
 		std::swap(*std::prev(it), *it);
 	}
 }

@@ -50,7 +50,6 @@ VstEffectControls::VstEffectControls( VstEffect * _eff ) :
 	EffectControls( _eff ),
 	m_effect( _eff ),
 	m_subWindow( nullptr ),
-	knobFModel( nullptr ),
 	ctrHandle( nullptr ),
 	lastPosInMenu (0),
 	m_vstGuiVisible ( true )
@@ -84,7 +83,7 @@ void VstEffectControls::loadSettings( const QDomElement & _this )
 		const QMap<QString, QString> & dump = m_effect->m_plugin->parameterDump();
 		paramCount = dump.size();
 		auto paramStr = std::array<char, 35>{};
-		knobFModel = new FloatModel *[ paramCount ];
+		knobFModel.resize(paramCount);
 		QStringList s_dumpValues;
 		for( int i = 0; i < paramCount; i++ )
 		{
@@ -131,7 +130,7 @@ void VstEffectControls::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	if( m_effect->m_plugin != nullptr )
 	{
 		m_effect->m_plugin->saveSettings( _doc, _this );
-		if (knobFModel != nullptr) {
+		if (!knobFModel.empty()) {
 			const QMap<QString, QString> & dump = m_effect->m_plugin->parameterDump();
 			paramCount = dump.size();
 			auto paramStr = std::array<char, 35>{};
@@ -376,8 +375,9 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 	vstKnobs = new CustomTextKnob *[ m_vi->paramCount ];
 
 	bool hasKnobModel = true;
-	if (m_vi->knobFModel == nullptr) {
-		m_vi->knobFModel = new FloatModel *[ m_vi->paramCount ];
+	if (m_vi->knobFModel.empty())
+	{
+		m_vi->knobFModel.resize(m_vi->paramCount);
 		hasKnobModel = false;
 	}
 
@@ -543,7 +543,7 @@ void ManageVSTEffectView::syncParameterText()
 
 ManageVSTEffectView::~ManageVSTEffectView()
 {
-	if( m_vi2->knobFModel != nullptr )
+	if (!m_vi2->knobFModel.empty())
 	{
 		for( int i = 0; i < m_vi2->paramCount; i++ )
 		{
@@ -558,11 +558,7 @@ ManageVSTEffectView::~ManageVSTEffectView()
 		vstKnobs = nullptr;
 	}
 
-	if( m_vi2->knobFModel != nullptr )
-	{
-		delete [] m_vi2->knobFModel;
-		m_vi2->knobFModel = nullptr;
-	}
+	m_vi2->knobFModel.clear();
 
 	if( m_vi2->m_scrollArea != nullptr )
 	{

@@ -40,7 +40,6 @@
 #include "lmms_basics.h"
 #include "lmms_constants.h"
 #include "interpolation.h"
-#include "MemoryManager.h"
 
 namespace lmms
 {
@@ -50,7 +49,6 @@ template<ch_cnt_t CHANNELS=DEFAULT_CHANNELS> class BasicFilters;
 template<ch_cnt_t CHANNELS>
 class LinkwitzRiley
 {
-	MM_OPERATORS
 public:
 	LinkwitzRiley( float sampleRate )
 	{
@@ -145,9 +143,13 @@ using StereoLinkwitzRiley = LinkwitzRiley<2>;
 template<ch_cnt_t CHANNELS>
 class BiQuad
 {
-	MM_OPERATORS
 public:
-	BiQuad() 
+	BiQuad() :
+		m_a1(0.),
+		m_a2(0.),
+		m_b0(0.),
+		m_b1(0.),
+		m_b2(0.)
 	{
 		clearHistory();
 	}
@@ -188,7 +190,6 @@ using StereoBiQuad = BiQuad<2>;
 template<ch_cnt_t CHANNELS>
 class OnePole
 {
-	MM_OPERATORS
 public:
 	OnePole()
 	{
@@ -222,7 +223,6 @@ using StereoOnePole = OnePole<2>;
 template<ch_cnt_t CHANNELS>
 class BasicFilters
 {
-	MM_OPERATORS
 public:
 	enum class FilterType
 	{
@@ -325,6 +325,16 @@ public:
 			m_delay2[_chnl] = 0.0f;
 			m_delay3[_chnl] = 0.0f;
 			m_delay4[_chnl] = 0.0f;
+		}
+	}
+
+	inline void setSampleRate(const sample_rate_t sampleRate)
+	{
+		m_sampleRate = sampleRate;
+		m_sampleRatio = 1.f / m_sampleRate;
+		if (m_subFilter != nullptr)
+		{
+			m_subFilter->setSampleRate(m_sampleRate);
 		}
 	}
 

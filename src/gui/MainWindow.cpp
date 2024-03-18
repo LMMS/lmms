@@ -112,34 +112,27 @@ MainWindow::MainWindow() :
 	sideBar->appendTab( new FileBrowser(
 				confMgr->userProjectsDir() + "*" +
 				confMgr->factoryProjectsDir(),
-					"*.mmp *.mmpz *.xml *.mid",
+					"*.mmp *.mmpz *.xml *.mid *.mpt",
 							tr( "My Projects" ),
 					embed::getIconPixmap( "project_file" ).transformed( QTransform().rotate( 90 ) ),
-							splitter, false, true,
+							splitter, false,
 				confMgr->userProjectsDir(),
 				confMgr->factoryProjectsDir()));
-	sideBar->appendTab( new FileBrowser(
-				confMgr->userSamplesDir() + "*" +
-				confMgr->factorySamplesDir(),
-					"*", tr( "My Samples" ),
-					embed::getIconPixmap( "sample_file" ).transformed( QTransform().rotate( 90 ) ),
-							splitter, false, true,
-					confMgr->userSamplesDir(),
-					confMgr->factorySamplesDir()));
+	sideBar->appendTab(
+		new FileBrowser(confMgr->userSamplesDir() + "*" + confMgr->factorySamplesDir(), FileItem::defaultFilters(),
+			tr("My Samples"), embed::getIconPixmap("sample_file").transformed(QTransform().rotate(90)), splitter, false,
+			confMgr->userSamplesDir(), confMgr->factorySamplesDir()));
 	sideBar->appendTab( new FileBrowser(
 				confMgr->userPresetsDir() + "*" +
 				confMgr->factoryPresetsDir(),
 					"*.xpf *.cs.xml *.xiz *.lv2",
 					tr( "My Presets" ),
 					embed::getIconPixmap( "preset_file" ).transformed( QTransform().rotate( 90 ) ),
-							splitter , false, true,
+							splitter , false,
 				confMgr->userPresetsDir(),
 				confMgr->factoryPresetsDir()));
-	sideBar->appendTab( new FileBrowser( QDir::homePath(), "*",
-							tr( "My Home" ),
-					embed::getIconPixmap( "home" ).transformed( QTransform().rotate( 90 ) ),
-							splitter, false, false ) );
-
+	sideBar->appendTab(new FileBrowser(QDir::homePath(), FileItem::defaultFilters(), tr("My Home"),
+		embed::getIconPixmap("home").transformed(QTransform().rotate(90)), splitter, false));
 
 	QStringList root_paths;
 	QString title = tr( "Root directory" );
@@ -161,9 +154,8 @@ MainWindow::MainWindow() :
 	}
 #endif
 
-	sideBar->appendTab( new FileBrowser( root_paths.join( "*" ), "*", title,
-					embed::getIconPixmap( "computer" ).transformed( QTransform().rotate( 90 ) ),
-							splitter, dirs_as_items) );
+	sideBar->appendTab(new FileBrowser(root_paths.join("*"), FileItem::defaultFilters(), title,
+		embed::getIconPixmap("computer").transformed(QTransform().rotate(90)), splitter, dirs_as_items));
 
 	m_workspace = new QMdiArea(splitter);
 
@@ -233,8 +225,6 @@ MainWindow::MainWindow() :
 
 	connect( Engine::getSong(), SIGNAL(playbackStateChanged()),
 				this, SLOT(updatePlayPauseIcons()));
-
-	connect(Engine::getSong(), SIGNAL(stopped()), SLOT(onSongStopped()));
 
 	connect(Engine::getSong(), SIGNAL(modified()), SLOT(onSongModified()));
 	connect(Engine::getSong(), SIGNAL(projectFileNameChanged()), SLOT(onProjectFileNameChanged()));
@@ -363,10 +353,12 @@ void MainWindow::finalize()
 	}
 
 	edit_menu->addSeparator();
-	edit_menu->addAction( embed::getIconPixmap( "setup_general" ),
-					tr( "Settings" ),
-					this, SLOT(showSettingsDialog()));
-	connect( edit_menu, SIGNAL(aboutToShow()), this, SLOT(updateUndoRedoButtons()));
+	edit_menu->addAction(embed::getIconPixmap("microtuner"), tr("Scales and keymaps"),
+		this, SLOT(toggleMicrotunerWin()));
+	edit_menu->addAction(embed::getIconPixmap("setup_general"), tr("Settings"),
+		this, SLOT(showSettingsDialog()));
+
+	connect(edit_menu, SIGNAL(aboutToShow()), this, SLOT(updateUndoRedoButtons()));
 
 	m_viewMenu = new QMenu( this );
 	menuBar()->addMenu( m_viewMenu )->setText( tr( "&View" ) );
@@ -485,10 +477,6 @@ void MainWindow::finalize()
 		tr("Show/hide project notes") + " (Ctrl+7)", this, SLOT(toggleProjectNotesWin()), m_toolBar);
 	project_notes_window->setShortcut( Qt::CTRL + Qt::Key_7 );
 
-	auto microtuner_window = new ToolButton(embed::getIconPixmap("microtuner"),
-		tr("Microtuner configuration") + " (Ctrl+8)", this, SLOT(toggleMicrotunerWin()), m_toolBar);
-	microtuner_window->setShortcut( Qt::CTRL + Qt::Key_8 );
-
 	m_toolBarLayout->addWidget( song_editor_window, 1, 1 );
 	m_toolBarLayout->addWidget( pattern_editor_window, 1, 2 );
 	m_toolBarLayout->addWidget( piano_roll_window, 1, 3 );
@@ -496,7 +484,6 @@ void MainWindow::finalize()
 	m_toolBarLayout->addWidget( mixer_window, 1, 5 );
 	m_toolBarLayout->addWidget( controllers_window, 1, 6 );
 	m_toolBarLayout->addWidget( project_notes_window, 1, 7 );
-	m_toolBarLayout->addWidget( microtuner_window, 1, 8 );
 	m_toolBarLayout->setColumnStretch( 100, 1 );
 
 	// setup-dialog opened before?
@@ -573,13 +560,21 @@ void MainWindow::addSpacingToToolBar( int _size )
 								7, _size );
 }
 
+
+
+
 SubWindow* MainWindow::addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags)
 {
 	// wrap the widget in our own *custom* window that patches some errors in QMdiSubWindow
 	auto win = new SubWindow(m_workspace->viewport(), windowFlags);
 	win->setAttribute(Qt::WA_DeleteOnClose);
 	win->setWidget(w);
-	if (w && w->sizeHint().isValid()) {win->resize(w->sizeHint());}
+	if (w && w->sizeHint().isValid()) {
+		auto titleBarHeight = win->titleBarHeight();
+		auto frameWidth = win->frameWidth();
+		QSize delta(2* frameWidth, titleBarHeight + frameWidth);
+		win->resize(delta + w->sizeHint());
+	}
 	m_workspace->addSubWindow(win);
 	return win;
 }
@@ -1100,10 +1095,6 @@ void MainWindow::updateViewMenu()
 			      tr( "Project Notes" ) + "\tCtrl+7",
 			      this, SLOT(toggleProjectNotesWin())
 		);
-	m_viewMenu->addAction(embed::getIconPixmap( "microtuner" ),
-			      tr( "Microtuner" ) + "\tCtrl+8",
-			      this, SLOT(toggleMicrotunerWin())
-		);
 
 	m_viewMenu->addSeparator();
 	
@@ -1610,42 +1601,6 @@ void MainWindow::onImportProject()
 		}
 
 		song->setLoadOnLaunch(false);
-	}
-}
-
-void MainWindow::onSongStopped()
-{
-	Song * song = Engine::getSong();
-	Song::PlayPos const & playPos = song->getPlayPos();
-
-	TimeLineWidget * tl = playPos.m_timeLine;
-
-	if( tl )
-	{
-		SongEditorWindow* songEditor = getGUI()->songEditor();
-		switch( tl->behaviourAtStop() )
-		{
-			case TimeLineWidget::BehaviourAtStopState::BackToZero:
-				if( songEditor && ( tl->autoScroll() == TimeLineWidget::AutoScrollState::Enabled ) )
-				{
-					songEditor->m_editor->updatePosition(0);
-				}
-				break;
-
-			case TimeLineWidget::BehaviourAtStopState::BackToStart:
-				if( tl->savedPos() >= 0 )
-				{
-					if(songEditor && ( tl->autoScroll() == TimeLineWidget::AutoScrollState::Enabled ) )
-					{
-						songEditor->m_editor->updatePosition( TimePos(tl->savedPos().getTicks() ) );
-					}
-					tl->savePos( -1 );
-				}
-				break;
-
-			case TimeLineWidget::BehaviourAtStopState::KeepStopPosition:
-				break;
-		}
 	}
 }
 

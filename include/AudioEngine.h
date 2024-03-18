@@ -25,14 +25,13 @@
 #ifndef LMMS_AUDIO_ENGINE_H
 #define LMMS_AUDIO_ENGINE_H
 
-#include <QMutex>
-
-#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
-	#include <QRecursiveMutex>
+#ifdef __MINGW32__
+#include <mingw.mutex.h>
+#else
+#include <mutex>
 #endif
 
 #include <QThread>
-#include <QWaitCondition>
 #include <samplerate.h>
 
 #include <vector>
@@ -197,6 +196,7 @@ public:
 
 	// audio-device-stuff
 
+	bool renderOnly() const { return m_renderOnly; }
 	// Returns the current audio device's name. This is not necessarily
 	// the user's preferred audio device, in case you were thinking that.
 	inline const QString & audioDevName() const
@@ -273,6 +273,11 @@ public:
 	int cpuLoad() const
 	{
 		return m_profiler.cpuLoad();
+	}
+
+	int detailLoad(const AudioEngineProfiler::DetailType type) const
+	{
+		return m_profiler.detailLoad(type);
 	}
 
 	const qualitySettings & currentQualitySettings() const
@@ -401,6 +406,10 @@ private:
 	AudioDevice * tryAudioDevices();
 	MidiClient * tryMidiClients();
 
+	void renderStageNoteSetup();
+	void renderStageInstruments();
+	void renderStageEffects();
+	void renderStageMix();
 
 	const surroundSampleFrame * renderNextBuffer();
 
@@ -409,10 +418,6 @@ private:
 	void handleMetronome();
 
 	void clearInternal();
-
-	//! Called by the audio thread to give control to other threads,
-	//! such that they can do changes in the model (like e.g. removing effects)
-	void runChangesInModel();
 
 	bool m_renderOnly;
 
@@ -443,8 +448,6 @@ private:
 	struct qualitySettings m_qualitySettings;
 	float m_masterGain;
 
-	bool m_isProcessing;
-
 	// audio device stuff
 	void doSetAudioDevice( AudioDevice *_dev );
 	AudioDevice * m_audioDev;
@@ -466,19 +469,7 @@ private:
 
 	bool m_clearSignal;
 
-	bool m_changesSignal;
-	unsigned int m_changes;
-	QMutex m_changesMutex;
-#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
-	QRecursiveMutex m_doChangesMutex;
-#else
-	QMutex m_doChangesMutex;
-#endif
-	QMutex m_waitChangesMutex;
-	QWaitCondition m_changesAudioEngineCondition;
-	QWaitCondition m_changesRequestCondition;
-
-	bool m_waitingForWrite;
+	std::mutex m_changeMutex;
 
 	friend class Engine;
 	friend class AudioEngineWorkerThread;

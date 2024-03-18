@@ -91,7 +91,7 @@ const int DefaultMiddleKey = Octave::Octave_4 + Key::C;
 const int DefaultBaseKey = Octave::Octave_4 + Key::A;
 const float DefaultBaseFreq = 440.f;
 
-const float MaxDetuning = 4 * 12.0f;
+const float MaxDetuning = 5 * 12.0f;
 
 
 
@@ -106,6 +106,16 @@ public:
 		DetuningHelper * detuning = nullptr );
 	Note( const Note & note );
 	~Note() override;
+
+	// Note types
+	enum class Type
+	{
+		Regular = 0,
+		Step
+	};
+
+	Type type() const { return m_type; }
+	inline void setType(Type t) { m_type = t; }
 
 	// used by GUI
 	inline void setSelected( const bool selected ) { m_selected = selected; }
@@ -253,6 +263,8 @@ private:
 	TimePos m_length;
 	TimePos m_pos;
 	DetuningHelper * m_detuning;
+
+	Type m_type = Type::Regular;
 };
 
 using NoteVector = std::vector<Note*>;

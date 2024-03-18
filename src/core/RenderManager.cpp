@@ -23,6 +23,7 @@
  */
 
 #include <QDir>
+#include <QRegularExpression>
 
 #include "RenderManager.h"
 
@@ -97,7 +98,7 @@ void RenderManager::renderNextTrack()
 // Render the song into individual tracks
 void RenderManager::renderTracks()
 {
-	const TrackContainer::TrackList & tl = Engine::getSong()->tracks();
+	const TrackContainer::TrackList& tl = Engine::getSong()->tracks();
 
 	// find all currently unnmuted tracks -- we want to render these.
 	for (const auto& tk : tl)
@@ -112,7 +113,7 @@ void RenderManager::renderTracks()
 		}
 	}
 
-	const TrackContainer::TrackList t2 = Engine::patternStore()->tracks();
+	const TrackContainer::TrackList& t2 = Engine::patternStore()->tracks();
 	for (const auto& tk : t2)
 	{
 		Track::Type type = tk->type();
@@ -182,7 +183,7 @@ QString RenderManager::pathForTrack(const Track *track, int num)
 {
 	QString extension = ProjectRenderer::getFileExtensionFromFormat( m_format );
 	QString name = track->name();
-	name = name.remove(QRegExp(FILENAME_FILTER));
+	name = name.remove(QRegularExpression(FILENAME_FILTER));
 	name = QString( "%1_%2%3" ).arg( num ).arg( name ).arg( extension );
 	return QDir(m_outputPath).filePath(name);
 }

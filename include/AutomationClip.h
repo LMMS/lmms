@@ -46,6 +46,7 @@ class TimePos;
 namespace gui
 {
 class AutomationClipView;
+class AutomationEditor;
 } // namespace gui
 
 
@@ -111,6 +112,13 @@ public:
 
 	void resetNodes(const int tick0, const int tick1);
 
+	/**
+	 * @brief Resets the tangents from the nodes between the given ticks
+	 * @param Int first tick of the range
+	 * @param Int second tick of the range
+	 */
+	void resetTangents(const int tick0, const int tick1);
+
 	void recordValue(TimePos time, float value);
 
 	TimePos setDragValue( const TimePos & time,
@@ -149,6 +157,17 @@ public:
 	inline bool hasAutomation() const
 	{
 		return m_timeMap.isEmpty() == false;
+	}
+
+	static bool supportsTangentEditing(ProgressionType pType)
+	{
+		// Update function if we have new progression types that support tangent editing
+		return pType == ProgressionType::CubicHermite;
+	}
+
+	inline bool canEditTangents() const
+	{
+		return supportsTangentEditing(m_progressionType);
 	}
 
 	float valueAt( const TimePos & _time ) const;
@@ -219,6 +238,9 @@ private:
 	bool m_dragging;
 	bool m_dragKeepOutValue; // Should we keep the current dragged node's outValue?
 	float m_dragOutValue; // The outValue of the dragged node's
+	bool m_dragLockedTan; // If the dragged node has it's tangents locked
+	float m_dragInTan; // The dragged node's inTangent
+	float m_dragOutTan; // The dragged node's outTangent
 
 	bool m_isRecording;
 	float m_lastRecordedValue;
@@ -230,6 +252,7 @@ private:
 
 	friend class gui::AutomationClipView;
 	friend class AutomationNode;
+	friend class gui::AutomationEditor;
 
 } ;
 
@@ -259,6 +282,11 @@ inline float INTAN(AutomationClip::TimemapIterator it)
 inline float OUTTAN(AutomationClip::TimemapIterator it)
 {
 	return it->getOutTangent();
+}
+
+inline float LOCKEDTAN(AutomationClip::TimemapIterator it)
+{
+	return it->lockedTangents();
 }
 
 inline int POS(AutomationClip::TimemapIterator it)

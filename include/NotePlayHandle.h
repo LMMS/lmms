@@ -32,7 +32,6 @@
 #include "Note.h"
 #include "PlayHandle.h"
 #include "Track.h"
-#include "MemoryManager.h"
 
 class QReadWriteLock;
 
@@ -47,7 +46,6 @@ using ConstNotePlayHandleList = QList<const NotePlayHandle*>;
 
 class LMMS_EXPORT NotePlayHandle : public PlayHandle, public Note
 {
-	MM_OPERATORS
 public:
 	void * m_pluginData;
 	std::unique_ptr<BasicFilters<>> m_filter;
@@ -107,6 +105,9 @@ public:
 	{
 		return m_unpitchedFrequency;
 	}
+
+	//! Get the current per-note detuning for this note
+	float currentDetuning() const { return m_baseDetuning->value(); }
 
 	/*! Renders one chunk using the attached instrument into the buffer */
 	void play( sampleFrame* buffer ) override;
@@ -245,7 +246,7 @@ public:
 	}
 
 	/*! Process note detuning automation */
-	void processTimePos( const TimePos& time );
+	void processTimePos(const TimePos& time, float pitchValue, bool isRecording);
 
 	/*! Updates total length (m_frames) depending on a new tempo */
 	void resize( const bpm_t newTempo );
@@ -270,7 +271,6 @@ public:
 private:
 	class BaseDetuning
 	{
-		MM_OPERATORS
 	public:
 		BaseDetuning( DetuningHelper* detuning );
 
@@ -338,7 +338,6 @@ const int NPH_CACHE_INCREMENT = 16;
 
 class NotePlayHandleManager
 {
-	MM_OPERATORS
 public:
 	static void init();
 	static NotePlayHandle * acquire( InstrumentTrack* instrumentTrack,

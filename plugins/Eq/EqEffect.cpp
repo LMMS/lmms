@@ -289,6 +289,9 @@ bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 
 float EqEffect::peakBand( float minF, float maxF, EqAnalyser *fft, int sr )
 {
+	auto const fftEnergy = fft->getEnergy();
+	if (fftEnergy == 0.) { return 0.; }
+
 	float peak = -60;
 	float *b = fft->m_bands;
 	float h = 0;
@@ -296,7 +299,7 @@ float EqEffect::peakBand( float minF, float maxF, EqAnalyser *fft, int sr )
 	{
 		if( bandToFreq( x ,sr) >= minF && bandToFreq( x,sr ) <= maxF )
 		{
-			h = 20 * ( log10( *b / fft->getEnergy() ) );
+			h = 20. * log10(*b / fftEnergy);
 			peak = h > peak ? h : peak;
 		}
 	}

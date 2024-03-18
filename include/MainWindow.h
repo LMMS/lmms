@@ -248,7 +248,6 @@ private slots:
 	void onExportProject();
 	void onExportProjectTracks();
 	void onImportProject();
-	void onSongStopped();
 	void onSongModified();
 	void onProjectFileNameChanged();
 
