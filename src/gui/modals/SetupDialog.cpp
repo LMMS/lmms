@@ -718,13 +718,16 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		m_assignableMidiDevices->setCurrentIndex(current);
 	}
 
-	counter = 0;
-	
 	// MIDI Recording tab
-	auto* midiRecordingTab = new TabWidget(tr("Behavior when recording"), midi_w);
-	addLedCheckBox(tr("Auto-quantize notes in Piano Roll"), midiRecordingTab, counter,
-		m_midiAutoQuantize, SLOT(toggleMidiAutoQuantization(bool)), false);
-	midiRecordingTab->setFixedHeight(YDelta + YDelta * counter);
+	auto* midiRecordingTab = new QGroupBox(tr("Behavior when recording"), midi_w);
+	auto* midiRecordingLayout = new QVBoxLayout(midiRecordingTab);
+	{
+		auto *box = addCheckBox(tr("Auto-quantize notes in Piano Roll"),
+								midiRecordingTab, midiRecordingLayout,
+								m_midiAutoQuantize, SLOT(toggleMidiAutoQuantization(bool)),
+								false);
+		box->setToolTip(tr("If enabled, notes will be automatically quantized when recording them from a MIDI controller. If disabled, they are always recorded at the highest possible resolution."));
+	}
 
 	// MIDI layout ordering.
 	midi_layout->addWidget(midiInterfaceBox);
