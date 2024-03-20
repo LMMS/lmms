@@ -70,7 +70,6 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 	const QString& configDeviceId = ConfigManager::inst()->value( "audiosoundio", "out_device_id" );
 	const QString& configDeviceRaw = ConfigManager::inst()->value( "audiosoundio", "out_device_raw" );
 
-	int err = 0;
 	int outDeviceCount = 0;
 	int backendCount = soundio_backend_count(m_soundio);
 	for (int i = 0; i < backendCount; i += 1)
@@ -78,7 +77,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 		SoundIoBackend backend = soundio_get_backend(m_soundio, i);
 		if (configBackend == soundio_backend_name(backend))
 		{
-			if ((err = soundio_connect_backend(m_soundio, backend)))
+			if (int err = soundio_connect_backend(m_soundio, backend); err)
 			{
 				// error occurred, leave outDeviceCount 0
 			}
@@ -99,7 +98,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 	if (outDeviceCount <= 0)
 	{
 		// try connecting to the default backend
-		if ((err = soundio_connect(m_soundio)))
+		if (int err = soundio_connect(m_soundio); err)
 		{
 			fprintf(stderr, "Unable to initialize soundio: %s\n", soundio_strerror(err));
 			return;
@@ -180,7 +179,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 	m_outstream->layout = *soundio_channel_layout_get_default(channels());
 	m_outstream->format = SoundIoFormatFloat32NE;
 
-	if ((err = soundio_outstream_open(m_outstream)))
+	if (int err = soundio_outstream_open(m_outstream); err)
 	{
 		fprintf(stderr, "Unable to initialize soundio: %s\n", soundio_strerror(err));
 		return;
