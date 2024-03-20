@@ -47,8 +47,8 @@ int writeVarLength(uint32_t val, uint8_t *buffer)
 	byte in question is the last in the stream
 	*/
 	int size = 0;
-	uint8_t result = 0, little_endian[4];
-	result = val & 0x7F;
+	uint8_t little_endian[4];
+	uint8_t result = val & 0x7F;
 	little_endian[size++] = result;
 	val = val >> 7;
 	while (val > 0)
