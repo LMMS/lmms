@@ -110,29 +110,17 @@ sample_t BSynth::nextStringSample( float sample_length )
 		sample_realindex -= sample_length;
 	}
 
-	sample_t sample = 0.0f;
-
-	if (interpolation) {
-
-		// find position in shape 
-		int a = static_cast<int>(sample_realindex);
-		int b = a < sample_length - 1 ? static_cast<int>(sample_realindex + 1) : 0;
-
-		// Nachkommaanteil
-		const float frac = fraction( sample_realindex );
-		
-		sample = linearInterpolate( sample_shape[a], sample_shape[b], frac );
-
-	} else {
-		// No interpolation
-		sample_index = static_cast<int>(sample_realindex);	
-		sample = sample_shape[sample_index];
-	}
-	
-	// progress in shape
+	const auto currentIndex = static_cast<int>(sample_realindex);
 	sample_realindex += sample_step;
 
-	return sample;
+	if (!interpolation)
+	{
+		sample_index = currentIndex;
+		return sample_shape[currentIndex];
+	}
+
+	const auto nextIndex = currentIndex < sample_length - 1 ? currentIndex + 1 : 0;
+	return linearInterpolate(sample_shape[currentIndex], sample_shape[nextIndex], fraction(currentIndex));
 }	
 
 /***********************************************************************
