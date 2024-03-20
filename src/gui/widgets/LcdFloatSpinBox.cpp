@@ -205,17 +205,10 @@ void LcdFloatSpinBox::mouseDoubleClickEvent(QMouseEvent *)
 void LcdFloatSpinBox::enterValue()
 {
 	bool ok = false;
-	float newVal = 0.0f;
 
-	newVal = QInputDialog::getDouble(
-			this, tr("Set value"),
-			tr("Please enter a new value between %1 and %2:").
-				arg(model()->minValue()).
-				arg(model()->maxValue()),
-			model()->value(),
-			model()->minValue(),
-			model()->maxValue(),
-			m_fractionDisplay.numDigits(), &ok);
+	float newVal = QInputDialog::getDouble(this, tr("Set value"),
+		tr("Please enter a new value between %1 and %2:").arg(model()->minValue()).arg(model()->maxValue()),
+		model()->value(), model()->minValue(), model()->maxValue(), m_fractionDisplay.numDigits(), &ok);
 
 	if (ok)
 	{
