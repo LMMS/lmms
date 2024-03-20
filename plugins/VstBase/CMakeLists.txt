@@ -1,7 +1,3 @@
-IF(NOT LMMS_SUPPORT_VST)
-	RETURN()
-ENDIF()
-
 INCLUDE(BuildPlugin)
 INCLUDE(ExternalProject)
 
