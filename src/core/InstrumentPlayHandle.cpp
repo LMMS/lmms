@@ -50,7 +50,6 @@ void InstrumentPlayHandle::play(sampleFrame * working_buffer)
 	bool nphsLeft = false;
 	do
 	{
-		nphsLeft = false;
 		for (const NotePlayHandle * constNotePlayHandle : nphv)
 		{
 			if (constNotePlayHandle->state() != ThreadableJob::ProcessingState::Done &&
