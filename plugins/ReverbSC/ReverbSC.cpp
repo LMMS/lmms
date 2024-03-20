@@ -86,8 +86,6 @@ bool ReverbSCEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	const float d = dryLevel();
 	const float w = wetLevel();
 
-	SPFLOAT tmpL = 0.0f, tmpR = 0.0f;
-	SPFLOAT dcblkL = 0.0f, dcblkR = 0.0f;
 
 	ValueBuffer * inGainBuf = m_reverbSCControls.m_inputGainModel.valueBuffer();
 	ValueBuffer * sizeBuf = m_reverbSCControls.m_sizeModel.valueBuffer();
@@ -96,6 +94,9 @@ bool ReverbSCEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 
 	for( fpp_t f = 0; f < frames; ++f )
 	{
+		SPFLOAT tmpL = 0.0f, tmpR = 0.0f;
+		SPFLOAT dcblkL = 0.0f, dcblkR = 0.0f;
+
 		auto s = std::array{buf[f][0], buf[f][1]};
 
 		const auto inGain
