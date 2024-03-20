@@ -178,11 +178,9 @@ int DrumSynth::GetPrivateProfileString(const char *sec, const char *key, const c
 {
     stringstream is;
     bool inSection = false;
-	char* line = nullptr;
-	char *k = nullptr, *b = nullptr;
-	int len = 0;
+	  int len = 0;
 
-    line = (char*)malloc(200);
+	  char* line = (char*)malloc(200);
 
     // Use QFile to handle unicode file name on Windows
     // Previously we used ifstream directly
@@ -207,8 +205,8 @@ int DrumSynth::GetPrivateProfileString(const char *sec, const char *key, const c
             if (line[0] == '[')
                 break;
 
-            k = strtok(line, " \t=");
-            b = strtok(nullptr, "\n\r\0");
+            char* k = strtok(line, " \t=");
+            char* b = strtok(nullptr, "\n\r\0");
 
             if (k != 0 && strcasecmp(k, key)==0) {
                 if (b==0) {
