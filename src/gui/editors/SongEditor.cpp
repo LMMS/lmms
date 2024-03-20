@@ -63,7 +63,7 @@ namespace lmms::gui
 namespace
 {
 
-constexpr int MIN_PIXELS_PER_BAR = 2;
+constexpr int MIN_PIXELS_PER_BAR = 4;
 constexpr int MAX_PIXELS_PER_BAR = 400;
 constexpr int ZOOM_STEPS = 200;
 
@@ -274,7 +274,7 @@ SongEditor::SongEditor( Song * song ) :
 			m_snappingModel->addItem(QString("1/%1 Bar").arg(1 / bars));
 		}
 	}
-	m_snappingModel->setInitValue( m_snappingModel->findText( "1 Bar" ) );
+	m_snappingModel->setInitValue( m_snappingModel->findText( "1/16 Bar" ) );
 
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
@@ -471,6 +471,8 @@ void SongEditor::toggleProportionalSnap()
 {
 	m_proportionalSnap = !m_proportionalSnap;
 	m_timeLine->setSnapSize(getSnapSize());
+
+	emit proportionalSnapChanged();
 }
 
 
