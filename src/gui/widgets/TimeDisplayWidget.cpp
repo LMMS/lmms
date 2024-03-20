@@ -88,27 +88,28 @@ void TimeDisplayWidget::updateTime()
 {
 	Song* s = Engine::getSong();
 
-	int msec = 0;
-	int tick = 0;
 	switch( m_displayMode )
 	{
 		case DisplayMode::MinutesSeconds:
-			msec = s->getMilliseconds();
+		{
+			int msec = s->getMilliseconds();
 			m_majorLCD.setValue(msec / 60000);
 			m_minorLCD.setValue((msec / 1000) % 60);
 			m_milliSecondsLCD.setValue(msec % 1000);
 			break;
-
+		}
 		case DisplayMode::BarsTicks:
-			tick = s->getPlayPos().getTicks();
+		{
+			int tick = s->getPlayPos().getTicks();
 			m_majorLCD.setValue((int)(tick / s->ticksPerBar()) + 1);
 			m_minorLCD.setValue((tick % s->ticksPerBar()) /
 						 (s->ticksPerBar() / s->getTimeSigModel().getNumerator() ) +1);
 			m_milliSecondsLCD.setValue((tick % s->ticksPerBar()) %
 							(s->ticksPerBar() / s->getTimeSigModel().getNumerator()));
 			break;
-
-		default: break;
+		}
+		default:
+			break;
 	}
 }
 
