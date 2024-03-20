@@ -49,11 +49,11 @@ QDataStream& operator<< ( QDataStream &out, WaveMipMap &waveMipMap )
 
 QDataStream& operator>> ( QDataStream &in, WaveMipMap &waveMipMap )
 {
-	sample_t sample = 0.0f;
 	for( int tbl = 0; tbl <= MAXTBL; tbl++ )
 	{
 		for( int i = 0; i < TLENS[tbl]; i++ )
 		{
+			sample_t sample = 0.0f;
 			in >> sample;
 			waveMipMap.setSampleAt( tbl, i, sample );
 		}
