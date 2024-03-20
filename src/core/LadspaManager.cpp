@@ -139,11 +139,7 @@ void LadspaManager::addPlugins(
 		LADSPA_Descriptor_Function _descriptor_func,
 						const QString & _file )
 {
-	const LADSPA_Descriptor* descriptor = nullptr;
-
-	for( long pluginIndex = 0;
-		( descriptor = _descriptor_func( pluginIndex ) ) != nullptr;
-								++pluginIndex )
+	for (long pluginIndex = 0; const auto descriptor = _descriptor_func(pluginIndex); ++pluginIndex)
 	{
 		ladspa_key_t key( _file, QString( descriptor->Label ) );
 		if( m_ladspaManagerMap.contains( key ) )
