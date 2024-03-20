@@ -725,10 +725,11 @@ void PianoRoll::fitNoteLengths(bool fill)
 		std::sort(notes.begin(), notes.end(), [](Note* n1, Note* n2) { return n1->endPos() < n2->endPos(); });
 	}
 
-	int length = 0;
 	auto ref = refNotes.begin();
 	for (Note* note : notes)
 	{
+		int length = 0;
+
 		// Fast forward to next reference note
 		while (ref != refNotes.end() && (fill ? (*ref)->pos() < note->endPos() : (*ref)->pos() <= note->pos()))
 		{
