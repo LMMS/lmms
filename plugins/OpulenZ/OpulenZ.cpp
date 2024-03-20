@@ -244,14 +244,10 @@ void OpulenzInstrument::reloadEmulator() {
 
 // This shall only be called from code protected by the holy Mutex!
 void OpulenzInstrument::setVoiceVelocity(int voice, int vel) {
-	int vel_adjusted = 0;
+	int vel_adjusted = !fm_mdl.value() ? 63 - (op1_lvl_mdl.value() * vel / 127.0) : 63 - op1_lvl_mdl.value();
+
 	// Velocity calculation, some kind of approximation
 	// Only calculate for operator 1 if in adding mode, don't want to change timbre
-	if( fm_mdl.value() == false ) {
-		vel_adjusted = 63 - ( op1_lvl_mdl.value() * vel/127.0) ;
-	} else {
-		vel_adjusted = 63 - op1_lvl_mdl.value();
-	}
 	theEmulator->write(0x40+adlib_opadd[voice],
 			   ( (int)op1_scale_mdl.value() & 0x03 << 6) +
 			   ( vel_adjusted & 0x3f ) );
