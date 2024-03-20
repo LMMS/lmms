@@ -1194,12 +1194,11 @@ void DataFile::upgrade_1_2_0_rc3()
 								"pattern" );
 		for( int j = 0; !patterns.item( j ).isNull(); ++j )
 		{
-			int patternLength = 0, steps = 0;
 			QDomElement el = patterns.item( j ).toElement();
 			if( el.attribute( "len" ) != "" )
 			{
-				patternLength = el.attribute( "len" ).toInt();
-				steps = patternLength / 12;
+				int patternLength = el.attribute( "len" ).toInt();
+				int steps = patternLength / 12;
 				el.setAttribute( "steps", steps );
 			}
 		}
