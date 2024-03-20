@@ -494,10 +494,10 @@ public:
 			case FilterType::Highpass_RC12:
 			case FilterType::Bandpass_RC12:
 			{
-				sample_t hp = 0.0f, bp = 0.0f, in = 0.0f;
+				sample_t hp = 0.0f, bp = 0.0f;
 				for( int n = 4; n != 0; --n )
 				{
-					in = _in0 + m_rcbp0[_chnl] * m_rcq;
+					sample_t in = _in0 + m_rcbp0[_chnl] * m_rcq;
 					in = std::clamp(in, -1.0f, 1.0f);
 
 					hp = m_rcc * ( m_rchp0[_chnl] + in - m_rclast0[_chnl] );
@@ -515,20 +515,20 @@ public:
 
 			case FilterType::Lowpass_RC24:
 			{
-				sample_t lp = 0.0f, bp = 0.0f, hp = 0.0f, in = 0.0f;
+				sample_t lp = 0.0f;
 				for( int n = 4; n != 0; --n )
 				{
 					// first stage is as for the 12dB case...
-					in = _in0 + m_rcbp0[_chnl] * m_rcq;
+					sample_t in = _in0 + m_rcbp0[_chnl] * m_rcq;
 					in = std::clamp(in, -1.0f, 1.0f);
 
 					lp = in * m_rcb + m_rclp0[_chnl] * m_rca;
 					lp = std::clamp(lp, -1.0f, 1.0f);
 
-					hp = m_rcc * ( m_rchp0[_chnl] + in - m_rclast0[_chnl] );
+					sample_t hp = m_rcc * ( m_rchp0[_chnl] + in - m_rclast0[_chnl] );
 					hp = std::clamp(hp, -1.0f, 1.0f);
 
-					bp = hp * m_rcb + m_rcbp0[_chnl] * m_rca;
+					sample_t bp = hp * m_rcb + m_rcbp0[_chnl] * m_rca;
 					bp = std::clamp(bp, -1.0f, 1.0f);
 
 					m_rclast0[_chnl] = in;
@@ -559,11 +559,11 @@ public:
 			case FilterType::Highpass_RC24:
 			case FilterType::Bandpass_RC24:
 			{
-				sample_t hp = 0.0f, bp = 0.0f, in = 0.0f;
+				sample_t hp = 0.0f, bp = 0.0f;
 				for( int n = 4; n != 0; --n )
 				{
 					// first stage is as for the 12dB case...
-					in = _in0 + m_rcbp0[_chnl] * m_rcq;
+					sample_t in = _in0 + m_rcbp0[_chnl] * m_rcq;
 					in = std::clamp(in, -1.0f, 1.0f);
 
 					hp = m_rcc * ( m_rchp0[_chnl] + in - m_rclast0[_chnl] );
@@ -600,20 +600,18 @@ public:
 			case FilterType::FastFormant:
 			{
 				if (std::abs(_in0) < 1.0e-10f && std::abs(m_vflast[0][_chnl]) < 1.0e-10f) { return 0.0f; } // performance hack - skip processing when the numbers get too small
-				sample_t hp = 0.0f, bp = 0.0f, in = 0.0f;
 
-				out = 0;
 				const int os = m_type == FilterType::FastFormant ? 1 : 4; // no oversampling for fast formant
 				for( int o = 0; o < os; ++o )
 				{
 					// first formant
-					in = _in0 + m_vfbp[0][_chnl] * m_vfq;
+					sample_t in = _in0 + m_vfbp[0][_chnl] * m_vfq;
 					in = std::clamp(in, -1.0f, 1.0f);
 
-					hp = m_vfc[0] * ( m_vfhp[0][_chnl] + in - m_vflast[0][_chnl] );
+					sample_t hp = m_vfc[0] * ( m_vfhp[0][_chnl] + in - m_vflast[0][_chnl] );
 					hp = std::clamp(hp, -1.0f, 1.0f);
 
-					bp = hp * m_vfb[0] + m_vfbp[0][_chnl] * m_vfa[0];
+					sample_t bp = hp * m_vfb[0] + m_vfbp[0][_chnl] * m_vfa[0];
 					bp = std::clamp(bp, -1.0f, 1.0f);
 
 					m_vflast[0][_chnl] = in;
