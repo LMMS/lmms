@@ -256,13 +256,12 @@ void Xpressive::smooth(float smoothness,const graphModel * in,graphModel * out)
 		auto const guassian = new float[guass_size];
 		float sum = 0.0f;
 		float temp = 0.0f;
-		int i = 0;
-		for (i = 0; i < guass_size; i++ )
+		for (int i = 0; i < guass_size; i++)
 		{
 			temp = (i - guass_center) / delta;
 			sum += guassian[i] = a * powf(F_E, -0.5f * temp * temp);
 		}
-		for (i = 0; i < guass_size; i++ )
+		for (int i = 0; i < guass_size; i++)
 		{
 			guassian[i] = guassian[i] / sum;
 		}
