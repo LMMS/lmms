@@ -69,14 +69,13 @@ float mem_t=1.0f, mem_o=1.0f, mem_n=1.0f, mem_b=1.0f, mem_tune=1.0f, mem_time=1.
 
 int DrumSynth::LongestEnv()
 {
-	long e = 0, eon = 0, p = 0;
 	float l = 0.f;
 
-	for (e = 1; e < 7; e++) // 3
+	for (long e = 1; e < 7; e++) // 3
 	{
-		eon = e - 1;
+		long eon = e - 1;
 		if (eon > 2) { eon = eon - 1; }
-		p = 0;
+		long p = 0;
 		while (envpts[e][0][p + 1] >= 0.f) { p++; }
 		envData[e][MAX] = envpts[e][0][p] * timestretch;
 		if (chkOn[eon] == 1 && envData[e][MAX] > l) { l = envData[e][MAX]; }
@@ -103,13 +102,12 @@ float DrumSynth::LoudestEnv()
 
 void DrumSynth::UpdateEnv(int e, long t)
 {
-	float endEnv = 0.0f, dT = 0.0f;
 	// 0.2's added
 	envData[e][NEXTT] = envpts[e][0][static_cast<long>(envData[e][PNT] + 1.f)] * timestretch; // get next point
 	if (envData[e][NEXTT] < 0) { envData[e][NEXTT] = 442000 * timestretch; } // if end point, hold
 	envData[e][ENV] = envpts[e][1][static_cast<long>(envData[e][PNT] + 0.f)] * 0.01f; // this level
-	endEnv = envpts[e][1][static_cast<long>(envData[e][PNT] + 1.f)] * 0.01f; // next level
-	dT = envData[e][NEXTT] - static_cast<float>(t);
+	float endEnv = envpts[e][1][static_cast<long>(envData[e][PNT] + 1.f)] * 0.01f; // next level
+	float dT = envData[e][NEXTT] - static_cast<float>(t);
 	if (dT < 1.0) { dT = 1.0; }
 	envData[e][dENV] = (endEnv - envData[e][ENV]) / dT;
 	envData[e][PNT] = envData[e][PNT] + 1.0f;
