@@ -55,10 +55,7 @@ AudioAlsa::AudioAlsa( bool & _success_ful, AudioEngine*  _audioEngine ) :
 
 	int err = 0;
 
-	if( ( err = snd_pcm_open( &m_handle,
-					probeDevice().toLatin1().constData(),
-						SND_PCM_STREAM_PLAYBACK,
-						0 ) ) < 0 )
+	if (int err = snd_pcm_open(&m_handle, probeDevice().toLatin1().constData(), SND_PCM_STREAM_PLAYBACK, 0); err < 0)
 	{
 		printf( "Playback open error: %s\n", snd_strerror( err ) );
 		return;
@@ -260,25 +257,21 @@ void AudioAlsa::applyQualitySettings()
 			snd_pcm_close( m_handle );
 		}
 
-		int err = 0;
-		if( ( err = snd_pcm_open( &m_handle,
-					probeDevice().toLatin1().constData(),
-						SND_PCM_STREAM_PLAYBACK,
-								0 ) ) < 0 )
+		if (int err = snd_pcm_open(&m_handle, probeDevice().toLatin1().constData(), SND_PCM_STREAM_PLAYBACK, 0);
+			err < 0)
 		{
 			printf( "Playback open error: %s\n",
 							snd_strerror( err ) );
 			return;
 		}
 
-		if( ( err = setHWParams( channels(),
-					SND_PCM_ACCESS_RW_INTERLEAVED ) ) < 0 )
+		if (int err = setHWParams(channels(), SND_PCM_ACCESS_RW_INTERLEAVED); err < 0)
 		{
 			printf( "Setting of hwparams failed: %s\n",
 							snd_strerror( err ) );
 			return;
 		}
-		if( ( err = setSWParams() ) < 0 )
+		if (int err = setSWParams(); err < 0)
 		{
 			printf( "Setting of swparams failed: %s\n",
 							snd_strerror( err ) );
@@ -369,10 +362,8 @@ void AudioAlsa::run()
 
 int AudioAlsa::setHWParams( const ch_cnt_t _channels, snd_pcm_access_t _access )
 {
-	int err = 0, dir = 0;
-
 	// choose all parameters
-	if( ( err = snd_pcm_hw_params_any( m_handle, m_hwParams ) ) < 0 )
+	if (int err = snd_pcm_hw_params_any(m_handle, m_hwParams); err < 0)
 	{
 		printf( "Broken configuration for playback: no configurations "
 				"available: %s\n", snd_strerror( err ) );
@@ -380,8 +371,7 @@ int AudioAlsa::setHWParams( const ch_cnt_t _channels, snd_pcm_access_t _access )
 	}
 
 	// set the interleaved read/write format
-	if( ( err = snd_pcm_hw_params_set_access( m_handle, m_hwParams,
-							_access ) ) < 0 )
+	if (int err = snd_pcm_hw_params_set_access(m_handle, m_hwParams, _access); err < 0)
 	{
 		printf( "Access type not available for playback: %s\n",
 							snd_strerror( err ) );
@@ -389,11 +379,9 @@ int AudioAlsa::setHWParams( const ch_cnt_t _channels, snd_pcm_access_t _access )
 	}
 
 	// set the sample format
-	if( ( snd_pcm_hw_params_set_format( m_handle, m_hwParams,
-						SND_PCM_FORMAT_S16_LE ) ) < 0 )
+	if (int err = snd_pcm_hw_params_set_format(m_handle, m_hwParams, SND_PCM_FORMAT_S16_LE); err < 0)
 	{
-		if( ( snd_pcm_hw_params_set_format( m_handle, m_hwParams,
-						SND_PCM_FORMAT_S16_BE ) ) < 0 )
+		if (int err = snd_pcm_hw_params_set_format(m_handle, m_hwParams, SND_PCM_FORMAT_S16_BE); err < 0)
 		{
 			printf( "Neither little- nor big-endian available for "
 					"playback: %s\n", snd_strerror( err ) );
@@ -407,8 +395,7 @@ int AudioAlsa::setHWParams( const ch_cnt_t _channels, snd_pcm_access_t _access )
 	}
 
 	// set the count of channels
-	if( ( err = snd_pcm_hw_params_set_channels( m_handle, m_hwParams,
-							_channels ) ) < 0 )
+	if (int err = snd_pcm_hw_params_set_channels(m_handle, m_hwParams, _channels); err < 0)
 	{
 		printf( "Channel count (%i) not available for playbacks: %s\n"
 				"(Does your soundcard not support surround?)\n",
@@ -417,11 +404,9 @@ int AudioAlsa::setHWParams( const ch_cnt_t _channels, snd_pcm_access_t _access )
 	}
 
 	// set the sample rate
-	if( ( err = snd_pcm_hw_params_set_rate( m_handle, m_hwParams,
-						sampleRate(), 0 ) ) < 0 )
+	if (int err = snd_pcm_hw_params_set_rate(m_handle, m_hwParams, sampleRate(), 0); err < 0)
 	{
-		if( ( err = snd_pcm_hw_params_set_rate( m_handle, m_hwParams,
-				audioEngine()->baseSampleRate(), 0 ) ) < 0 )
+		if (int err = snd_pcm_hw_params_set_rate(m_handle, m_hwParams, audioEngine()->baseSampleRate(), 0); err < 0)
 		{
 			printf( "Could not set sample rate: %s\n",
 							snd_strerror( err ) );
@@ -431,36 +416,29 @@ int AudioAlsa::setHWParams( const ch_cnt_t _channels, snd_pcm_access_t _access )
 
 	m_periodSize = audioEngine()->framesPerPeriod();
 	m_bufferSize = m_periodSize * 8;
-	dir = 0;
-	err = snd_pcm_hw_params_set_period_size_near( m_handle, m_hwParams,
-							&m_periodSize, &dir );
-	if( err < 0 )
+	int dir = 0;
+	if (int err = snd_pcm_hw_params_set_period_size_near(m_handle, m_hwParams, &m_periodSize, &dir); err < 0)
 	{
 		printf( "Unable to set period size %lu for playback: %s\n",
 					m_periodSize, snd_strerror( err ) );
 		return err;
 	}
 	dir = 0;
-	err = snd_pcm_hw_params_get_period_size( m_hwParams, &m_periodSize,
-									&dir );
-	if( err < 0 )
+	if (int err = snd_pcm_hw_params_get_period_size(m_hwParams, &m_periodSize, &dir); err < 0)
 	{
 		printf( "Unable to get period size for playback: %s\n",
 							snd_strerror( err ) );
 	}
 
 	dir = 0;
-	err = snd_pcm_hw_params_set_buffer_size_near( m_handle, m_hwParams,
-								&m_bufferSize );
-	if( err < 0 )
+	if (int err = snd_pcm_hw_params_set_buffer_size_near(m_handle, m_hwParams, &m_bufferSize); err < 0)
 	{
 		printf( "Unable to set buffer size %lu for playback: %s\n",
 					m_bufferSize, snd_strerror( err ) );
 		return ( err );
 	}
-	err = snd_pcm_hw_params_get_buffer_size( m_hwParams, &m_bufferSize );
 
-	if( 2 * m_periodSize > m_bufferSize )
+	if (int err = snd_pcm_hw_params_get_buffer_size(m_hwParams, &m_bufferSize); 2 * m_periodSize > m_bufferSize)
 	{
 		printf( "buffer to small, could not use\n" );
 		return ( err );
@@ -468,8 +446,7 @@ int AudioAlsa::setHWParams( const ch_cnt_t _channels, snd_pcm_access_t _access )
 
 
 	// write the parameters to device
-	err = snd_pcm_hw_params( m_handle, m_hwParams );
-	if( err < 0 )
+	if (int err = snd_pcm_hw_params(m_handle, m_hwParams); err < 0)
 	{
 		printf( "Unable to set hw params for playback: %s\n",
 							snd_strerror( err ) );
@@ -484,10 +461,8 @@ int AudioAlsa::setHWParams( const ch_cnt_t _channels, snd_pcm_access_t _access )
 
 int AudioAlsa::setSWParams()
 {
-	int err = 0;
-
 	// get the current swparams
-	if( ( err = snd_pcm_sw_params_current( m_handle, m_swParams ) ) < 0 )
+	if (int err = snd_pcm_sw_params_current(m_handle, m_swParams); err < 0)
 	{
 		printf( "Unable to determine current swparams for playback: %s"
 						"\n", snd_strerror( err ) );
@@ -495,8 +470,7 @@ int AudioAlsa::setSWParams()
 	}
 
 	// start the transfer when a period is full
-	if( ( err = snd_pcm_sw_params_set_start_threshold( m_handle,
-					m_swParams, m_periodSize ) ) < 0 )
+	if (int err = snd_pcm_sw_params_set_start_threshold(m_handle, m_swParams, m_periodSize); err < 0)
 	{
 		printf( "Unable to set start threshold mode for playback: %s\n",
 							snd_strerror( err ) );
@@ -505,8 +479,7 @@ int AudioAlsa::setSWParams()
 
 	// allow the transfer when at least m_periodSize samples can be
 	// processed
-	if( ( err = snd_pcm_sw_params_set_avail_min( m_handle, m_swParams,
-							m_periodSize ) ) < 0 )
+	if (int err = snd_pcm_sw_params_set_avail_min(m_handle, m_swParams, m_periodSize); err < 0)
 	{
 		printf( "Unable to set avail min for playback: %s\n",
 							snd_strerror( err ) );
@@ -526,7 +499,7 @@ int AudioAlsa::setSWParams()
 #endif
 
 	// write the parameters to the playback device
-	if( ( err = snd_pcm_sw_params( m_handle, m_swParams ) ) < 0 )
+	if (int err = snd_pcm_sw_params(m_handle, m_swParams); err < 0)
 	{
 		printf( "Unable to set sw params for playback: %s\n",
 							snd_strerror( err ) );
