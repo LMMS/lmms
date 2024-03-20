@@ -93,10 +93,9 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine 
 		
 	PaDeviceIndex inDevIdx = -1;
 	PaDeviceIndex outDevIdx = -1;
-	const PaDeviceInfo* di = nullptr;
 	for( int i = 0; i < Pa_GetDeviceCount(); ++i )
 	{
-		di = Pa_GetDeviceInfo( i );
+		const auto di = Pa_GetDeviceInfo(i);
 		if( di->name == device &&
 			Pa_GetHostApiInfo( di->hostApi )->name == backend )
 		{
@@ -344,10 +343,9 @@ void AudioPortAudioSetupUtil::updateBackends()
 		return;
 	}
 
-	const PaHostApiInfo* hi = nullptr;
 	for( int i = 0; i < Pa_GetHostApiCount(); ++i )
 	{
-		hi = Pa_GetHostApiInfo( i );
+		const auto hi = Pa_GetHostApiInfo(i);
 		m_backendModel.addItem( hi->name );
 	}
 
@@ -368,10 +366,9 @@ void AudioPortAudioSetupUtil::updateDevices()
 	// get active backend 
 	const QString& backend = m_backendModel.currentText();
 	int hostApi = 0;
-	const PaHostApiInfo* hi = nullptr;
 	for( int i = 0; i < Pa_GetHostApiCount(); ++i )
 	{
-		hi = Pa_GetHostApiInfo( i );
+		const auto hi = Pa_GetHostApiInfo(i);
 		if( backend == hi->name )
 		{
 			hostApi = i;
@@ -381,10 +378,9 @@ void AudioPortAudioSetupUtil::updateDevices()
 
 	// get devices for selected backend
 	m_deviceModel.clear();
-	const PaDeviceInfo* di = nullptr;
 	for( int i = 0; i < Pa_GetDeviceCount(); ++i )
 	{
-		di = Pa_GetDeviceInfo( i );
+		const auto di = Pa_GetDeviceInfo(i);
 		if( di->hostApi == hostApi )
 		{
 			m_deviceModel.addItem( di->name );
