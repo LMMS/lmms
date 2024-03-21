@@ -293,29 +293,29 @@ auto ClapInstance::init() -> bool
 		return false;
 	}
 
-	if (!m_audioPorts.init(host(), m_plugin, m_process))
+	if (!m_audioPorts.init(m_process))
 	{
 		setPluginState(PluginState::LoadedWithError);
 		return false;
 	}
 
 	// TODO: What if this is the 2nd instance of a mono plugin?
-	m_gui.init(host(), m_plugin);
+	m_gui.init();
 
-	m_notePorts.init(host(), m_plugin);
+	m_notePorts.init();
 	if (!hasNoteInput() && info().type() == Plugin::Type::Instrument)
 	{
 		logger().log(CLAP_LOG_WARNING, "Plugin is instrument but doesn't implement note ports extension");
 	}
 
-	if (!m_params.init(host(), m_plugin))
+	if (!m_params.init())
 	{
 		logger().log(CLAP_LOG_DEBUG, "Plugin does not support params extension");
 	}
 
-	m_presetLoader.init(host(), m_plugin);
-	m_state.init(host(), m_plugin);
-	m_timerSupport.init(host(), m_plugin);
+	m_presetLoader.init();
+	m_state.init();
+	m_timerSupport.init();
 
 	setPluginState(PluginState::Inactive);
 
@@ -683,9 +683,15 @@ auto ClapInstance::clapGetExtension(const clap_host* host, const char* extension
 	}
 #endif
 
+	if (h->m_pluginState == PluginState::None)
+	{
+		h->logger().log(CLAP_LOG_PLUGIN_MISBEHAVING, "Plugin may not request host extension before plugin.init()");
+		return nullptr;
+	}
+
 	const auto id = std::string_view{extensionId};
 	//if (id == CLAP_EXT_AUDIO_PORTS)   { return h->audioPorts().hostExt(); }
-	if (id == CLAP_EXT_GUI)           { return h->gui().hostExt(); }
+	//if (id == CLAP_EXT_GUI)           { return h->gui().hostExt(); }
 	if (id == CLAP_EXT_LATENCY)       { return &s_clapLatency; }
 	if (id == CLAP_EXT_LOG)           { return h->logger().hostExt(); }
 	if (id == CLAP_EXT_NOTE_PORTS)    { return h->notePorts().hostExt(); }

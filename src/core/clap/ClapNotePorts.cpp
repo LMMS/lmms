@@ -35,15 +35,15 @@
 namespace lmms
 {
 
-auto ClapNotePorts::initImpl(const clap_host* host, const clap_plugin* plugin) noexcept -> bool
+auto ClapNotePorts::initImpl() noexcept -> bool
 {
 	m_portIndex = 0;
 	m_dialect = 0;
-	clapRescan(host, CLAP_NOTE_PORTS_RESCAN_ALL);
+	clapRescan(host(), CLAP_NOTE_PORTS_RESCAN_ALL);
 	return true;
 }
 
-auto ClapNotePorts::hostExt() const -> const clap_host_note_ports*
+auto ClapNotePorts::hostExtImpl() const -> const clap_host_note_ports*
 {
 	static clap_host_note_ports ext {
 		&clapSupportedDialects,

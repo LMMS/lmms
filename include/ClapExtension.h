@@ -56,6 +56,8 @@ public:
 
 	auto instance() const { return m_instance; }
 	auto instance() { return m_instance; }
+	auto host() const -> const clap_host*;
+	auto plugin() const -> const clap_plugin*;
 	auto logger() const -> const ClapLog&;
 
 	// TODO: Make protected?
@@ -78,20 +80,18 @@ public:
 	using detail::ClapExtensionHelper::ClapExtensionHelper;
 	virtual ~ClapExtension() = default;
 
-	auto init(const clap_host* host, const clap_plugin* plugin) -> bool
+	auto init() -> bool
 	{
+		if (m_supported) { return true; }
 		if (m_pluginExt) { return false; } // already init
 
-		m_host = host;
-		m_plugin = plugin;
-
-		auto ext = static_cast<const PluginExt*>(plugin->get_extension(plugin, extensionId().data()));
+		auto ext = static_cast<const PluginExt*>(plugin()->get_extension(plugin(), extensionId().data()));
 		if (!ext)
 		{
 			// Try using compatibility ID if it exists
 			if (const auto compatId = extensionIdCompat(); !compatId.empty())
 			{
-				ext = static_cast<const PluginExt*>(plugin->get_extension(plugin, compatId.data()));
+				ext = static_cast<const PluginExt*>(plugin()->get_extension(plugin(), compatId.data()));
 			}
 		}
 
@@ -104,7 +104,7 @@ public:
 
 		m_pluginExt = ext;
 		m_supported = true;
-		if (!initImpl(host, plugin))
+		if (!initImpl())
 		{
 			m_supported = false;
 			return false;
@@ -128,12 +128,14 @@ public:
 	auto supported() const { return m_supported; }
 
 	/**
-	 * Checks whether the plugin extension implements the required
-	 *   API methods for use within LMMS. May not be all the methods.
+	 * Returns pointer to host extension.
+	 * If called during plugin.init(), will lazily initialize the extension.
 	 */
-	virtual auto checkSupported(const PluginExt& ext) -> bool = 0;
-
-	virtual auto hostExt() const -> const HostExt* = 0;
+	auto hostExt() -> const HostExt*
+	{
+		init();
+		return hostExtImpl();
+	}
 
 	//! Non-null after init() is called if plugin implements the needed interface
 	auto pluginExt() const { return m_pluginExt; }
@@ -144,19 +146,22 @@ protected:
 	 * - Only called if basic init was successful
 	 * - pluginExt() is non-null and supported() == true during this call
 	 */
-	virtual auto initImpl(const clap_host* host, const clap_plugin* plugin) noexcept -> bool { return true; }
+	virtual auto initImpl() noexcept -> bool { return true; }
 
 	/**
 	 * For additional deinitialization steps.
 	 */
 	virtual void deinitImpl() noexcept {}
 
-	auto host() const { return m_host; }
-	auto plugin() const { return m_plugin; }
+	virtual auto hostExtImpl() const -> const HostExt* = 0;
+
+	/**
+	 * Checks whether the plugin extension implements the required
+	 *   API methods for use within LMMS. May not be all the methods.
+	 */
+	virtual auto checkSupported(const PluginExt& ext) -> bool = 0;
 
 private:
-	const clap_host* m_host = nullptr;
-	const clap_plugin* m_plugin = nullptr;
 	//const HostExt* m_hostExt = nullptr;
 	const PluginExt* m_pluginExt = nullptr;
 
@@ -174,14 +179,14 @@ public:
 	using detail::ClapExtensionHelper::ClapExtensionHelper;
 	virtual ~ClapExtension() = default;
 
-	auto init(const clap_host* host) -> bool
+	auto init() -> bool
 	{
+		if (m_supported) { return true; }
 		if (m_initialized) { return false; } // already init
 		m_initialized = true;
 
-		m_host = host;
 		m_supported = true;
-		if (!initImpl(host))
+		if (!initImpl())
 		{
 			m_supported = false;
 			return false;
@@ -203,26 +208,31 @@ public:
 	*/
 	auto supported() const { return m_supported; }
 
-	virtual auto hostExt() const -> const HostExt* = 0;
+	/**
+	 * Returns pointer to host extension.
+	 * If called during plugin.init(), will lazily initialize the extension.
+	 */
+	auto hostExt() -> const HostExt*
+	{
+		init();
+		return hostExtImpl();
+	}
 
 protected:
 	/**
 	 * For any custom initialization step.
 	 * - supported() == true during this call
 	*/
-	virtual auto initImpl(const clap_host* host) noexcept -> bool { return true; }
+	virtual auto initImpl() noexcept -> bool { return true; }
 
 	/**
 	 * For additional deinitialization steps.
 	*/
 	virtual void deinitImpl() noexcept {}
 
-	auto host() const { return m_host; }
+	virtual auto hostExtImpl() const -> const HostExt* = 0;
 
 private:
-	const ClapInstance* m_instance = nullptr;
-
-	const clap_host* m_host = nullptr;
 	//const HostExt* m_hostExt = nullptr;
 
 	bool m_supported = false;

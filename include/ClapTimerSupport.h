@@ -48,12 +48,12 @@ public:
 	~ClapTimerSupport() override = default;
 
 	auto extensionId() const -> std::string_view override { return CLAP_EXT_TIMER_SUPPORT; }
-	auto hostExt() const -> const clap_host_timer_support* override;
 
 	void killTimers();
 
 private:
 	void deinitImpl() noexcept override;
+	auto hostExtImpl() const -> const clap_host_timer_support* override;
 	auto checkSupported(const clap_plugin_timer_support& ext) -> bool override;
 
 	/**

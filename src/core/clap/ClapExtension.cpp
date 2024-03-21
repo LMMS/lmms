@@ -32,6 +32,16 @@
 namespace lmms
 {
 
+auto detail::ClapExtensionHelper::host() const -> const clap_host*
+{
+	return m_instance->host();
+}
+
+auto detail::ClapExtensionHelper::plugin() const -> const clap_plugin*
+{
+	return m_instance->plugin();
+}
+
 auto detail::ClapExtensionHelper::logger() const -> const ClapLog&
 {
 	return instance()->logger();

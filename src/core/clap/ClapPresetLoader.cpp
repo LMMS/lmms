@@ -47,12 +47,7 @@ ClapPresetLoader::ClapPresetLoader(Model* parent, ClapInstance* inst)
 	setPresetDatabase(mgr->presetDatabase(id));
 }
 
-auto ClapPresetLoader::initImpl(const clap_host* host, const clap_plugin* plugin) noexcept -> bool
-{
-	return true;
-}
-
-auto ClapPresetLoader::hostExt() const -> const clap_host_preset_load*
+auto ClapPresetLoader::hostExtImpl() const -> const clap_host_preset_load*
 {
 	static clap_host_preset_load ext {
 		&clapOnError,

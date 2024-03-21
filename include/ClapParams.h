@@ -53,7 +53,6 @@ public:
 	~ClapParams() override = default;
 
 	auto extensionId() const -> std::string_view override { return CLAP_EXT_PARAMS; }
-	auto hostExt() const -> const clap_host_params* override;
 
 	auto rescan(clap_param_rescan_flags flags) -> bool;
 
@@ -79,8 +78,9 @@ signals:
 	void paramAdjusted(clap_id paramId);
 
 private:
-	auto initImpl(const clap_host* host, const clap_plugin* plugin) noexcept -> bool override;
+	auto initImpl() noexcept -> bool override;
 	void deinitImpl() noexcept override;
+	auto hostExtImpl() const -> const clap_host_params* override;
 	auto checkSupported(const clap_plugin_params& ext) -> bool override;
 
 	void setModels();

@@ -59,15 +59,15 @@ ClapGui::ClapGui(ClapInstance* instance)
 #endif
 }
 
-auto ClapGui::initImpl(const clap_host* host, const clap_plugin* plugin) noexcept -> bool
+auto ClapGui::initImpl() noexcept -> bool
 {
 	if (!m_window.api) { return false; } // unsupported host platform
 
 	m_supportsEmbed = windowSupported(*pluginExt(), false)
-		&& pluginExt()->is_api_supported(plugin, m_window.api, false);
+		&& pluginExt()->is_api_supported(plugin(), m_window.api, false);
 
 	m_supportsFloating = windowSupported(*pluginExt(), true)
-		&& pluginExt()->is_api_supported(plugin, m_window.api, true);
+		&& pluginExt()->is_api_supported(plugin(), m_window.api, true);
 
 	if (!m_supportsEmbed)
 	{
@@ -89,7 +89,7 @@ void ClapGui::deinitImpl() noexcept
 	destroy();
 }
 
-auto ClapGui::hostExt() const -> const clap_host_gui*
+auto ClapGui::hostExtImpl() const -> const clap_host_gui*
 {
 	static clap_host_gui ext {
 		&clapResizeHintsChanged,

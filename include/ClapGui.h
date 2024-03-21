@@ -46,7 +46,6 @@ public:
 	~ClapGui() { destroy(); }
 
 	auto extensionId() const -> std::string_view override { return CLAP_EXT_GUI; }
-	auto hostExt() const -> const clap_host_gui* override;
 
 	auto create() -> bool;
 	void destroy();
@@ -57,8 +56,9 @@ public:
 	auto supportsFloating() const { return m_supportsFloating; }
 
 private:
-	auto initImpl(const clap_host* host, const clap_plugin* plugin) noexcept -> bool override;
+	auto initImpl() noexcept -> bool override;
 	void deinitImpl() noexcept override;
+	auto hostExtImpl() const -> const clap_host_gui* override;
 	auto checkSupported(const clap_plugin_gui& ext) -> bool override;
 
 	static auto windowSupported(const clap_plugin_gui& ext, bool floating) -> bool;

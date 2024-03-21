@@ -42,7 +42,6 @@ public:
 	using ClapExtension::ClapExtension;
 
 	auto extensionId() const -> std::string_view override { return CLAP_EXT_NOTE_PORTS; }
-	auto hostExt() const -> const clap_host_note_ports* override;
 
 	auto portIndex() const { return m_portIndex; }
 	auto dialect() const { return m_dialect; }
@@ -50,7 +49,8 @@ public:
 	auto hasInput() const -> bool { return m_dialect != 0; }
 
 private:
-	auto initImpl(const clap_host* host, const clap_plugin* plugin) noexcept -> bool override;
+	auto initImpl() noexcept -> bool override;
+	auto hostExtImpl() const -> const clap_host_note_ports* override;
 	auto checkSupported(const clap_plugin_note_ports& ext) -> bool override;
 
 	/**

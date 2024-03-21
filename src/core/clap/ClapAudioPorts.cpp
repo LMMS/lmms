@@ -90,10 +90,12 @@ namespace
 	}
 } // namespace
 
-auto ClapAudioPorts::init(const clap_host* host, const clap_plugin* plugin, clap_process& process) noexcept -> bool
+auto ClapAudioPorts::init(clap_process& process) noexcept -> bool
 {
+	// TODO: Refactor so that regular init() method can be used (Possible lazy extension init issues)
+
 	// NOTE: I'm using this init() method instead of implementing initImpl() because I need the `process` parameter
-	if (!ClapExtension::init(host, plugin))
+	if (!ClapExtension::init())
 	{
 		logger().log(CLAP_LOG_ERROR, "Plugin does not implement the required audio port extension");
 		return false;

@@ -42,12 +42,13 @@ public:
 	using ClapExtension::ClapExtension;
 
 	auto extensionId() const -> std::string_view override { return CLAP_EXT_THREAD_CHECK; }
-	auto hostExt() const -> const clap_host_thread_check* override;
 
 	static auto isMainThread() -> bool { return clapIsMainThread(nullptr); }
 	static auto isAudioThread() -> bool { return clapIsAudioThread(nullptr); }
 
 private:
+	auto hostExtImpl() const -> const clap_host_thread_check* override;
+
 	/**
 	 * clap_host_thread_check implementation
 	 */

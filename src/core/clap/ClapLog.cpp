@@ -74,7 +74,7 @@ namespace
 	}
 } // namespace
 
-auto ClapLog::hostExt() const -> const clap_host_log*
+auto ClapLog::hostExtImpl() const -> const clap_host_log*
 {
 	static clap_host_log ext {
 		&clapLog

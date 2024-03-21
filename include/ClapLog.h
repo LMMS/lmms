@@ -43,7 +43,6 @@ public:
 	using ClapExtension::ClapExtension;
 
 	auto extensionId() const -> std::string_view override { return CLAP_EXT_LOG; }
-	auto hostExt() const -> const clap_host_log* override;
 
 	void log(clap_log_severity severity, std::string_view msg) const;
 	void log(clap_log_severity severity, const char* msg) const;
@@ -57,6 +56,8 @@ public:
 	static void plainLog(std::string_view msg);
 
 private:
+	auto hostExtImpl() const -> const clap_host_log* override;
+
 	/**
 	 * clap_host_log implementation
 	 */

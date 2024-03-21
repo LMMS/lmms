@@ -48,10 +48,9 @@ public:
 
 	auto extensionId() const -> std::string_view override { return CLAP_EXT_PRESET_LOAD; }
 	auto extensionIdCompat() const -> std::string_view override { return CLAP_EXT_PRESET_LOAD_COMPAT; }
-	auto hostExt() const -> const clap_host_preset_load* override;
 
 private:
-	auto initImpl(const clap_host* host, const clap_plugin* plugin) noexcept -> bool override;
+	auto hostExtImpl() const -> const clap_host_preset_load* override;
 	auto checkSupported(const clap_plugin_preset_load& ext) -> bool override;
 
 	/**

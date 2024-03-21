@@ -41,10 +41,10 @@ static_assert(static_cast<std::uint32_t>(ClapState::Context::Preset) == CLAP_STA
 static_assert(static_cast<std::uint32_t>(ClapState::Context::Duplicate) == CLAP_STATE_CONTEXT_FOR_DUPLICATE);
 static_assert(static_cast<std::uint32_t>(ClapState::Context::Project) == CLAP_STATE_CONTEXT_FOR_PROJECT);
 
-auto ClapState::initImpl(const clap_host* host, const clap_plugin* plugin) noexcept -> bool
+auto ClapState::initImpl() noexcept -> bool
 {
 	m_stateContext = static_cast<const clap_plugin_state_context*>(
-		plugin->get_extension(plugin, CLAP_EXT_STATE_CONTEXT));
+		plugin()->get_extension(plugin(), CLAP_EXT_STATE_CONTEXT));
 
 	if (m_stateContext && (!m_stateContext->load || !m_stateContext->save))
 	{
@@ -66,7 +66,7 @@ void ClapState::deinitImpl() noexcept
 	m_stateContext = nullptr;
 }
 
-auto ClapState::hostExt() const -> const clap_host_state*
+auto ClapState::hostExtImpl() const -> const clap_host_state*
 {
 	static clap_host_state ext {
 		&clapMarkDirty

@@ -46,7 +46,7 @@ void ClapTimerSupport::deinitImpl() noexcept
 	killTimers();
 }
 
-auto ClapTimerSupport::hostExt() const -> const clap_host_timer_support*
+auto ClapTimerSupport::hostExtImpl() const -> const clap_host_timer_support*
 {
 	static clap_host_timer_support ext {
 		&clapRegisterTimer,

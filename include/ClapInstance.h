@@ -165,7 +165,7 @@ public:
 
 	auto audioPorts() -> ClapAudioPorts& { return m_audioPorts; }
 	auto gui() -> ClapGui& { return m_gui; }
-	auto logger() const -> const ClapLog& { return m_log; }
+	auto logger() -> ClapLog& { return m_log; }
 	auto notePorts() -> ClapNotePorts& { return m_notePorts; }
 	auto params() -> ClapParams& { return m_params; }
 	auto presetLoader() -> ClapPresetLoader& { return m_presetLoader; }
@@ -255,10 +255,10 @@ private:
 	ClapAudioPorts m_audioPorts{ this };
 	ClapGui m_gui{ this };
 	ClapLog m_log{ this };
-	ClapState m_state{ this };
 	ClapNotePorts m_notePorts{ this };
 	ClapParams m_params;
 	ClapPresetLoader m_presetLoader;
+	ClapState m_state{ this };
 	ClapThreadCheck m_threadCheck{ this };
 	ClapTimerSupport m_timerSupport{ this };
 };

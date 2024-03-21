@@ -43,7 +43,7 @@ ClapParams::ClapParams(Model* parent, ClapInstance* instance,
 {
 }
 
-auto ClapParams::initImpl(const clap_host* host, const clap_plugin* plugin) noexcept -> bool
+auto ClapParams::initImpl() noexcept -> bool
 {
 	if (!rescan(CLAP_PARAM_RESCAN_ALL)) { return false; }
 	setModels();
@@ -56,7 +56,7 @@ void ClapParams::deinitImpl() noexcept
 	m_params.clear();
 }
 
-auto ClapParams::hostExt() const -> const clap_host_params*
+auto ClapParams::hostExtImpl() const -> const clap_host_params*
 {
 	static clap_host_params ext {
 		&clapRescan,
