@@ -259,16 +259,7 @@ void BitInvader::playNote( NotePlayHandle * _n,
 {
 	if (!_n->m_pluginData)
 	{
-		float factor = 0.0f;
-		if( !m_normalize.value() )
-		{
-			factor = defaultNormalizationFactor;
-		}
-		else
-		{
-			factor = m_normalizeFactor;
-		}
-
+		float factor = !m_normalize.value() ? defaultNormalizationFactor : m_normalizeFactor;
 		_n->m_pluginData = new BSynth(
 					const_cast<float*>( m_graph.samples() ),
 					_n,
