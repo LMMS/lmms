@@ -567,16 +567,7 @@ void EqHandle::mouseReleaseEvent( QGraphicsSceneMouseEvent *event )
 
 void EqHandle::wheelEvent( QGraphicsSceneWheelEvent *wevent )
 {
-	float highestBandwich = 0.0f;
-	if( m_type != EqHandleType::Para )
-	{
-		highestBandwich = 10;
-	}
-	else
-	{
-		highestBandwich = 4;
-	}
-
+	float highestBandwich = m_type != EqHandleType::Para ? 10 : 4;
 	int numDegrees = wevent->delta() / 120;
 	float numSteps = 0;
 	if( wevent->modifiers() == Qt::ControlModifier )
