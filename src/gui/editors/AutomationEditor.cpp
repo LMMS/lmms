@@ -1136,7 +1136,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 	if( m_clip )
 	{
-		int tick = 0, x = 0, q = 0;
+		int q = 0;
 		int x_line_end = (int)( m_y_auto || m_topLevel < m_maxLevel ?
 			TOP_MARGIN :
 			grid_bottom - ( m_topLevel - m_bottomLevel ) * m_y_delta );
@@ -1160,10 +1160,8 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		// 3 independent loops, because quantization might not divide evenly into
 		// exotic denominators (e.g. 7/11 time), which are allowed ATM.
 		// First quantization grid...
-		for( tick = m_currentPosition - m_currentPosition % q,
-				 x = xCoordOfTick( tick );
-			 x<=width();
-			 tick += q, x = xCoordOfTick( tick ) )
+		for (int tick = m_currentPosition - m_currentPosition % q, x = xCoordOfTick(tick); x <= width();
+			 tick += q, x = xCoordOfTick(tick))
 		{
 			p.setPen(m_lineColor);
 			p.drawLine( x, grid_bottom, x, x_line_end );
@@ -1184,10 +1182,9 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		}
 		else
 		{
-			float y = 0.0f;
 			for( int level = (int)m_bottomLevel; level <= m_topLevel; level++)
 			{
-				y =  yCoordOfLevel( (float)level );
+				float y = yCoordOfLevel(static_cast<float>(level));
 
 				p.setPen(level % 10 == 0 ? m_beatLineColor : m_lineColor);
 
@@ -1223,10 +1220,8 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		int ticksPerBeat = DefaultTicksPerBar /
 			Engine::getSong()->getTimeSigModel().getDenominator();
 
-		for( tick = m_currentPosition - m_currentPosition % ticksPerBeat,
-				 x = xCoordOfTick( tick );
-			 x<=width();
-			 tick += ticksPerBeat, x = xCoordOfTick( tick ) )
+		for (int tick = m_currentPosition - m_currentPosition % ticksPerBeat, x = xCoordOfTick(tick); x <= width();
+			 tick += ticksPerBeat, x = xCoordOfTick(tick))
 		{
 			p.setPen(m_beatLineColor);
 			p.drawLine( x, grid_bottom, x, x_line_end );
@@ -1313,10 +1308,8 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		}
 
 		// and finally bars
-		for( tick = m_currentPosition - m_currentPosition % TimePos::ticksPerBar(),
-				 x = xCoordOfTick( tick );
-			 x<=width();
-			 tick += TimePos::ticksPerBar(), x = xCoordOfTick( tick ) )
+		for (int tick = m_currentPosition - m_currentPosition % TimePos::ticksPerBar(), x = xCoordOfTick(tick);
+			 x <= width(); tick += TimePos::ticksPerBar(), x = xCoordOfTick(tick))
 		{
 			p.setPen(m_barLineColor);
 			p.drawLine( x, grid_bottom, x, x_line_end );

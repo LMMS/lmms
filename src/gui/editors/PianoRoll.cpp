@@ -3077,7 +3077,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			// otherwise we add height
 			else { m_notesEditHeight += partialKeyVisible; }
 		}
-		int x = 0, q = quantization(), tick = 0;
+		int x = 0, q = quantization();
 
 		// draw vertical quantization lines
 		// If we're over 100% zoom, we allow all quantization level grids
@@ -3095,10 +3095,8 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			);
 		};
 		p.setPen(m_lineColor);
-		for (tick = m_currentPosition - m_currentPosition % q,
-			x = xCoordOfTick(tick);
-			x <= width();
-			tick += q, x = xCoordOfTick(tick))
+		for (int tick = m_currentPosition - m_currentPosition % q, x = xCoordOfTick(tick); x <= width();
+			 tick += q, x = xCoordOfTick(tick))
 		{
 			p.drawLine(x, keyAreaTop(), x, noteEditBottom());
 		}
@@ -3294,20 +3292,16 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		int ticksPerBeat = DefaultTicksPerBar /
 			Engine::getSong()->getTimeSigModel().getDenominator();
 		p.setPen(m_beatLineColor);
-		for(tick = m_currentPosition - m_currentPosition % ticksPerBeat,
-			x = xCoordOfTick( tick );
-			x <= width();
-			tick += ticksPerBeat, x = xCoordOfTick(tick))
+		for (int tick = m_currentPosition - m_currentPosition % ticksPerBeat, x = xCoordOfTick(tick); x <= width();
+			 tick += ticksPerBeat, x = xCoordOfTick(tick))
 		{
 			p.drawLine(x, PR_TOP_MARGIN, x, noteEditBottom());
 		}
 
 		// draw vertical bar lines
 		p.setPen(m_barLineColor);
-		for(tick = m_currentPosition - m_currentPosition % TimePos::ticksPerBar(),
-			x = xCoordOfTick( tick );
-			x <= width();
-			tick += TimePos::ticksPerBar(), x = xCoordOfTick(tick))
+		for (int tick = m_currentPosition - m_currentPosition % TimePos::ticksPerBar(), x = xCoordOfTick(tick);
+			 x <= width(); tick += TimePos::ticksPerBar(), x = xCoordOfTick(tick))
 		{
 			p.drawLine(x, PR_TOP_MARGIN, x, noteEditBottom());
 		}

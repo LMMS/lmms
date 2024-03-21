@@ -214,7 +214,6 @@ AudioSoundIo::~AudioSoundIo()
 
 void AudioSoundIo::startProcessing()
 {
-	int err = 0;
 
 	m_outBufFrameIndex = 0;
 	m_outBufFramesTotal = 0;
@@ -224,7 +223,7 @@ void AudioSoundIo::startProcessing()
 
 	if (! m_outstreamStarted)
 	{
-		if ((err = soundio_outstream_start(m_outstream)))
+		if (int err = soundio_outstream_start(m_outstream))
 		{
 			fprintf(stderr, 
 				"AudioSoundIo::startProcessing() :: soundio unable to start stream: %s\n", 
@@ -236,7 +235,7 @@ void AudioSoundIo::startProcessing()
 
 	m_stopped = false;
 
-	if ((err = soundio_outstream_pause(m_outstream, false)))
+	if (int err = soundio_outstream_pause(m_outstream, false))
 	{
 		m_stopped = true;
 		fprintf(stderr, 
@@ -372,11 +371,10 @@ void AudioSoundIo::setupWidget::reconnectSoundIo()
 
 	soundio_disconnect(m_soundio);
 
-	int err = 0;
 	int backend_index = m_backendModel.findText(configBackend);
 	if (backend_index < 0)
 	{
-		if ((err = soundio_connect(m_soundio)))
+		if (int err = soundio_connect(m_soundio))
 		{
 			fprintf(stderr, "soundio: unable to connect backend: %s\n", soundio_strerror(err));
 			return;
@@ -387,11 +385,11 @@ void AudioSoundIo::setupWidget::reconnectSoundIo()
 	else
 	{
 		SoundIoBackend backend = soundio_get_backend(m_soundio, backend_index);
-		if ((err = soundio_connect_backend(m_soundio, backend)))
+		if (int err = soundio_connect_backend(m_soundio, backend))
 		{
 			fprintf(stderr, "soundio: unable to connect %s backend: %s\n",
 					soundio_backend_name(backend), soundio_strerror(err));
-			if ((err = soundio_connect(m_soundio)))
+			if (int err = soundio_connect(m_soundio))
 			{
 				fprintf(stderr, "soundio: unable to connect backend: %s\n", soundio_strerror(err));
 				return;
