@@ -94,7 +94,7 @@ void MidiSndio::run()
 	char buf[0x100];
 	while( m_quit == false && m_hdl )
 	{
-		nfds_t nfds = mio_pollfd( m_hdl, &pfd, POLLIN );
+		nfds_t nfds = mio_pollfd(m_hdl, &pfd, POLLIN);
 		int ret = poll(&pfd, nfds, 100);
 		if ( ret < 0 )
 			break;
