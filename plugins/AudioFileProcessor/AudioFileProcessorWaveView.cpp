@@ -65,7 +65,8 @@ f_cnt_t AudioFileProcessorWaveView::range() const
 	return m_to - m_from;
 }
 
-AudioFileProcessorWaveView::AudioFileProcessorWaveView(QWidget * parent, int w, int h, Sample const * buf) :
+AudioFileProcessorWaveView::AudioFileProcessorWaveView(QWidget* parent, int w, int h, Sample const* buf,
+	knob* start, knob* end, knob* loop) :
 	QWidget(parent),
 	m_sample(buf),
 	m_graph(QPixmap(w - 2 * s_padding, h - 2 * s_padding)),
@@ -74,9 +75,9 @@ AudioFileProcessorWaveView::AudioFileProcessorWaveView(QWidget * parent, int w, 
 	m_last_from(0),
 	m_last_to(0),
 	m_last_amp(0),
-	m_startKnob(0),
-	m_endKnob(0),
-	m_loopKnob(0),
+	m_startKnob(start),
+	m_endKnob(end),
+	m_loopKnob(loop),
 	m_isDragging(false),
 	m_reversed(false),
 	m_framesPlayed(0),
@@ -84,6 +85,8 @@ AudioFileProcessorWaveView::AudioFileProcessorWaveView(QWidget * parent, int w, 
 {
 	setFixedSize(w, h);
 	setMouseTracking(true);
+
+	configureKnobRelationsAndWaveViews();
 
 	updateSampleRange();
 
@@ -399,21 +402,6 @@ void AudioFileProcessorWaveView::slide(int px)
 	slideSampleByFrames(step);
 }
 
-void AudioFileProcessorWaveView::setKnobs(knob * start, knob * end, knob * loop)
-{
-	m_startKnob = start;
-	m_endKnob = end;
-	m_loopKnob = loop;
-
-	m_startKnob->setWaveView(this);
-	m_startKnob->setRelatedKnob(m_endKnob);
-
-	m_endKnob->setWaveView(this);
-	m_endKnob->setRelatedKnob(m_startKnob);
-
-	m_loopKnob->setWaveView(this);
-}
-
 void AudioFileProcessorWaveView::slideSamplePointByPx(Point point, int px)
 {
 	slideSamplePointByFrames(
@@ -509,6 +497,17 @@ void AudioFileProcessorWaveView::updateCursor(QMouseEvent * me)
 		setCursor(Qt::ClosedHandCursor);
 	else
 		setCursor(Qt::OpenHandCursor);
+}
+
+void AudioFileProcessorWaveView::configureKnobRelationsAndWaveViews()
+{
+	m_startKnob->setWaveView(this);
+	m_startKnob->setRelatedKnob(m_endKnob);
+
+	m_endKnob->setWaveView(this);
+	m_endKnob->setRelatedKnob(m_startKnob);
+
+	m_loopKnob->setWaveView(this);
 }
 
 void AudioFileProcessorWaveView::knob::slideTo(double v, bool check_bound)

@@ -61,8 +61,6 @@ public:
 	~Lv2Instrument() override;
 	void reload();
 	void onSampleRateChanged();
-	//! Must be checked after ctor or reload
-	bool isValid() const;
 
 	/*
 		load/save

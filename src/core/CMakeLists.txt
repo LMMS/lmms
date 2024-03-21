@@ -39,7 +39,6 @@ set(LMMS_SRCS
 	core/LinkedModelGroups.cpp
 	core/LocklessAllocator.cpp
 	core/MemoryHelper.cpp
-	core/MemoryManager.cpp
 	core/MeterModel.cpp
 	core/MicroTimer.cpp
 	core/Microtuner.cpp

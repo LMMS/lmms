@@ -30,7 +30,6 @@
 #include <limits>
 #include "AutomatableModel.h"
 #include "Graph.h"
-#include "MemoryManager.h"
 
 namespace lmms
 {
@@ -102,7 +101,6 @@ public:
 
 class ExprSynth
 {
-	MM_OPERATORS
 public:
 	ExprSynth(const WaveSample* gW1, const WaveSample* gW2, const WaveSample* gW3, ExprFront* exprO1, ExprFront* exprO2, NotePlayHandle* nph,
 			const sample_rate_t sample_rate, const FloatModel* pan1, const FloatModel* pan2, float rel_trans);

@@ -143,14 +143,14 @@ void Oscilloscope::paintEvent( QPaintEvent * )
 	{
 		AudioEngine const * audioEngine = Engine::audioEngine();
 
-		float master_output = audioEngine->masterGain();
+		float masterOutput = audioEngine->masterGain();
 
 		const fpp_t frames = audioEngine->framesPerPeriod();
 		AudioEngine::StereoSample peakValues = audioEngine->getPeakValues(m_buffer, frames);
 		const float max_level = qMax<float>( peakValues.left, peakValues.right );
 
 		// Set the color of the line according to the maximum level
-		float const maxLevelWithAppliedMasterGain = max_level * master_output;
+		float const maxLevelWithAppliedMasterGain = max_level * masterOutput;
 		p.setPen(QPen(determineLineColor(maxLevelWithAppliedMasterGain), 0.7));
 
 		p.setRenderHint( QPainter::Antialiasing );
@@ -158,7 +158,7 @@ void Oscilloscope::paintEvent( QPaintEvent * )
 		// now draw all that stuff
 		int w = width() - 4;
 		const qreal xd = static_cast<qreal>(w) / frames;
-		const qreal half_h = -( height() - 6 ) / 3.0 * static_cast<qreal>(master_output) - 1;
+		const qreal half_h = -(height() - 6) / 3.0 * static_cast<qreal>(masterOutput) - 1;
 		int x_base = 2;
 		const qreal y_base = height() / 2 - 0.5;
 

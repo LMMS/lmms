@@ -31,7 +31,6 @@
 #include "Sample.h"
 #include "SampleBuffer.h"
 #include "AutomatableModel.h"
-#include "MemoryManager.h"
 
 namespace lmms
 {
@@ -87,7 +86,6 @@ public slots:
 private:
 	struct handle_data
 	{
-		MM_OPERATORS
 		Sample::PlaybackState* state;
 		bool tuned;
 		std::shared_ptr<Sample> sample;

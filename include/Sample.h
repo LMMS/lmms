@@ -33,9 +33,6 @@
 #include "SampleBuffer.h"
 #include "lmms_export.h"
 
-class QPainter;
-class QRect;
-
 namespace lmms {
 class LMMS_EXPORT Sample
 {
@@ -63,17 +60,17 @@ public:
 		}
 
 		auto resampler() -> AudioResampler& { return m_resampler; }
-		auto frameIndex() const -> f_cnt_t { return m_frameIndex; }
+		auto frameIndex() const -> int { return m_frameIndex; }
 		auto varyingPitch() const -> bool { return m_varyingPitch; }
 		auto backwards() const -> bool { return m_backwards; }
 
-		void setFrameIndex(f_cnt_t frameIndex) { m_frameIndex = frameIndex; }
+		void setFrameIndex(int frameIndex) { m_frameIndex = frameIndex; }
 		void setVaryingPitch(bool varyingPitch) { m_varyingPitch = varyingPitch; }
 		void setBackwards(bool backwards) { m_backwards = backwards; }
 
 	private:
 		AudioResampler m_resampler;
-		f_cnt_t m_frameIndex = 0;
+		int m_frameIndex = 0;
 		bool m_varyingPitch = false;
 		bool m_backwards = false;
 		friend class Sample;
@@ -81,7 +78,7 @@ public:
 
 	Sample() = default;
 	Sample(const QByteArray& base64, int sampleRate = Engine::audioEngine()->processingSampleRate());
-	Sample(const sampleFrame* data, int numFrames, int sampleRate = Engine::audioEngine()->processingSampleRate());
+	Sample(const sampleFrame* data, size_t numFrames, int sampleRate = Engine::audioEngine()->processingSampleRate());
 	Sample(const Sample& other);
 	Sample(Sample&& other);
 	explicit Sample(const QString& audioFile);
@@ -90,8 +87,8 @@ public:
 	auto operator=(const Sample&) -> Sample&;
 	auto operator=(Sample&&) -> Sample&;
 
-	auto play(sampleFrame* dst, PlaybackState* state, int numFrames, float desiredFrequency = DefaultBaseFreq,
-		Loop loopMode = Loop::Off) -> bool;
+	auto play(sampleFrame* dst, PlaybackState* state, size_t numFrames, float desiredFrequency = DefaultBaseFreq,
+		Loop loopMode = Loop::Off) const -> bool;
 
 	auto sampleDuration() const -> std::chrono::milliseconds;
 	auto sampleFile() const -> const QString& { return m_buffer->audioFile(); }
@@ -120,10 +117,8 @@ public:
 	void setReversed(bool reversed) { m_reversed.store(reversed, std::memory_order_relaxed); }
 
 private:
-	void playSampleRange(PlaybackState* state, sampleFrame* dst, size_t numFrames) const;
-	void amplifySampleRange(sampleFrame* src, int numFrames) const;
-	void copyBufferForward(sampleFrame* dst, int initialPosition, int advanceAmount) const;
-	void copyBufferBackward(sampleFrame* dst, int initialPosition, int advanceAmount) const;
+	void playRaw(sampleFrame* dst, size_t numFrames, const PlaybackState* state, Loop loopMode) const;
+	void advance(PlaybackState* state, size_t advanceAmount, Loop loopMode) const;
 
 private:
 	std::shared_ptr<const SampleBuffer> m_buffer = SampleBuffer::emptyBuffer();

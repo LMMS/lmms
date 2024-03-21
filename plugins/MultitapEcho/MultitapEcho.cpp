@@ -58,7 +58,7 @@ MultitapEchoEffect::MultitapEchoEffect( Model* parent, const Descriptor::SubPlug
 	m_sampleRate( Engine::audioEngine()->processingSampleRate() ),
 	m_sampleRatio( 1.0f / m_sampleRate )
 {
-	m_work = MM_ALLOC<sampleFrame>( Engine::audioEngine()->framesPerPeriod() );
+	m_work = new sampleFrame[Engine::audioEngine()->framesPerPeriod()];
 	m_buffer.reset();
 	m_stages = static_cast<int>( m_controls.m_stages.value() );
 	updateFilters( 0, 19 );
@@ -67,7 +67,7 @@ MultitapEchoEffect::MultitapEchoEffect( Model* parent, const Descriptor::SubPlug
 
 MultitapEchoEffect::~MultitapEchoEffect()
 {
-	MM_FREE( m_work );
+	delete[] m_work;
 }
 
 

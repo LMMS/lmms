@@ -303,7 +303,7 @@ void AudioOss::run()
 			break;
 		}
 
-		int bytes = convertToS16( temp, frames, audioEngine()->masterGain(), outbuf, m_convertEndian );
+		int bytes = convertToS16(temp, frames, outbuf, m_convertEndian);
 		if( write( m_audioFD, outbuf, bytes ) != bytes )
 		{
 			break;

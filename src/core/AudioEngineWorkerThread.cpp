@@ -30,7 +30,6 @@
 
 #include "denormals.h"
 #include "AudioEngine.h"
-#include "MemoryManager.h"
 #include "ThreadableJob.h"
 
 #if __SSE__
@@ -167,7 +166,6 @@ void AudioEngineWorkerThread::startAndWaitForJobs()
 
 void AudioEngineWorkerThread::run()
 {
-	MemoryManager::ThreadGuard mmThreadGuard; Q_UNUSED(mmThreadGuard);
 	disable_denormals();
 
 	QMutex m;

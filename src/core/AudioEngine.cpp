@@ -24,6 +24,7 @@
 
 #include "AudioEngine.h"
 
+#include "MixHelpers.h"
 #include "denormals.h"
 
 #include "lmmsconfig.h"
@@ -432,6 +433,8 @@ void AudioEngine::renderStageMix()
 
 	Mixer *mixer = Engine::mixer();
 	mixer->masterMix(m_outputBufferWrite);
+
+	MixHelpers::multiply(m_outputBufferWrite, m_masterGain, m_framesPerPeriod);
 
 	emit nextAudioBuffer(m_outputBufferRead);
 
