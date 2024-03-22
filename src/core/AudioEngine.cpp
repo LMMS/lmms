@@ -565,7 +565,7 @@ void AudioEngine::clearInternal()
 
 
 
-AudioEngine::StereoSample AudioEngine::getPeakValues(sampleFrame * ab, const f_cnt_t frames) const
+sampleFrame AudioEngine::getPeakValues(sampleFrame * ab, const f_cnt_t frames) const
 {
 	sample_t peakLeft = 0.0f;
 	sample_t peakRight = 0.0f;
@@ -585,7 +585,7 @@ AudioEngine::StereoSample AudioEngine::getPeakValues(sampleFrame * ab, const f_c
 		}
 	}
 
-	return StereoSample(peakLeft, peakRight);
+	return sampleFrame{peakLeft, peakRight};
 }
 
 

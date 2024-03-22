@@ -317,13 +317,7 @@ public:
 	}
 
 
-	struct StereoSample
-	{
-		StereoSample(sample_t _left, sample_t _right) : left(_left), right(_right) {}
-		sample_t left;
-		sample_t right;
-	};
-	StereoSample getPeakValues(sampleFrame * ab, const f_cnt_t _frames) const;
+	sampleFrame getPeakValues(sampleFrame * ab, const f_cnt_t _frames) const;
 
 
 	bool criticalXRuns() const;
