@@ -372,13 +372,13 @@ void MixerView::updateMixerChannel(int index)
 }
 
 
-void MixerView::deleteChannel(int index)
+void MixerView::deleteChannel(int index, bool skip_confirm)
 {
 	// can't delete master
 	if (index == 0) return;
 
 	// if there is no user confirmation, do nothing
-	if (!confirmRemoval(index))
+	if (!skip_confirm && !confirmRemoval(index))
 	{
 		return;
 	}
@@ -590,7 +590,7 @@ void MixerView::setCurrentMixerChannel(int channel)
 
 void MixerView::clear()
 {
-	for (auto i = m_mixerChannelViews.size() - 1; i > 0; --i) { deleteChannel(i); }
+	for (auto i = m_mixerChannelViews.size() - 1; i > 0; --i) { deleteChannel(i, true); }
 	getMixer()->clearChannel(0);
 
 	refreshDisplay();
