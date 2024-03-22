@@ -112,7 +112,7 @@ private:
 	std::atomic<MidiJack*> m_midiClient;
 	std::vector<jack_port_t*> m_outputPorts;
 	jack_default_audio_sample_t** m_tempOutBufs;
-	surroundSampleFrame* m_outBuf;
+	sampleFrame* m_outBuf;
 
 	f_cnt_t m_framesDoneInCurBuf;
 	f_cnt_t m_framesToDoInCurBuf;

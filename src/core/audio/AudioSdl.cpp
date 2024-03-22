@@ -39,7 +39,7 @@ namespace lmms
 
 AudioSdl::AudioSdl( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	AudioDevice( DEFAULT_CHANNELS, _audioEngine ),
-	m_outBuf( new surroundSampleFrame[audioEngine()->framesPerPeriod()] )
+	m_outBuf( new sampleFrame[audioEngine()->framesPerPeriod()] )
 {
 	_success_ful = false;
 

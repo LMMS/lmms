@@ -85,7 +85,7 @@ std::shared_ptr<const SampleBuffer> AudioSampleRecorder::createSampleBuffer()
 	return std::make_shared<const SampleBuffer>(std::move(bigBuffer), sampleRate());
 }
 
-void AudioSampleRecorder::writeBuffer(const surroundSampleFrame* _ab, const fpp_t _frames)
+void AudioSampleRecorder::writeBuffer(const sampleFrame* _ab, const fpp_t _frames)
 {
 	auto buf = new sampleFrame[_frames];
 	for( fpp_t frame = 0; frame < _frames; ++frame )

@@ -50,7 +50,7 @@ AudioPulseAudio::AudioPulseAudio( bool & _success_ful, AudioEngine*  _audioEngin
 	AudioDevice(std::clamp<ch_cnt_t>(
 		ConfigManager::inst()->value("audiopa", "channels").toInt(),
 		DEFAULT_CHANNELS,
-		SURROUND_CHANNELS), _audioEngine),
+		DEFAULT_CHANNELS), _audioEngine),
 	m_s( nullptr ),
 	m_quit( false ),
 	m_convertEndian( false )
@@ -247,7 +247,7 @@ void AudioPulseAudio::run()
 	else
 	{
 		const fpp_t fpp = audioEngine()->framesPerPeriod();
-		auto temp = new surroundSampleFrame[fpp];
+		auto temp = new sampleFrame[fpp];
 		while( getNextBuffer( temp ) )
 		{
 		}
@@ -266,7 +266,7 @@ void AudioPulseAudio::run()
 void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 {
 	const fpp_t fpp = audioEngine()->framesPerPeriod();
-	auto temp = new surroundSampleFrame[fpp];
+	auto temp = new sampleFrame[fpp];
 	auto pcmbuf = (int_sample_t*)pa_xmalloc(fpp * channels() * sizeof(int_sample_t));
 
 	size_t fd = 0;
@@ -315,7 +315,7 @@ AudioPulseAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	form->addRow(tr("Device"), m_device);
 
 	auto m = new gui::LcdSpinBoxModel();
-	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
+	m->setRange( DEFAULT_CHANNELS, DEFAULT_CHANNELS );
 	m->setStep( 2 );
 	m->setValue( ConfigManager::inst()->value( "audiopa",
 										 "channels" ).toInt() );

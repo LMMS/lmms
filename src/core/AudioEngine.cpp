@@ -137,9 +137,9 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	// now that framesPerPeriod is fixed initialize global BufferManager
 	BufferManager::init( m_framesPerPeriod );
 
-	int outputBufferSize = m_framesPerPeriod * sizeof(surroundSampleFrame);
-	m_outputBufferRead = static_cast<surroundSampleFrame *>(MemoryHelper::alignedMalloc(outputBufferSize));
-	m_outputBufferWrite = static_cast<surroundSampleFrame *>(MemoryHelper::alignedMalloc(outputBufferSize));
+	int outputBufferSize = m_framesPerPeriod * sizeof(sampleFrame);
+	m_outputBufferRead = static_cast<sampleFrame *>(MemoryHelper::alignedMalloc(outputBufferSize));
+	m_outputBufferWrite = static_cast<sampleFrame *>(MemoryHelper::alignedMalloc(outputBufferSize));
 
 	BufferManager::clear(m_outputBufferRead, m_framesPerPeriod);
 	BufferManager::clear(m_outputBufferWrite, m_framesPerPeriod);
@@ -446,7 +446,7 @@ void AudioEngine::renderStageMix()
 
 
 
-const surroundSampleFrame *AudioEngine::renderNextBuffer()
+const sampleFrame *AudioEngine::renderNextBuffer()
 {
 	const auto lock = std::lock_guard{m_changeMutex};
 
@@ -1237,9 +1237,9 @@ void AudioEngine::fifoWriter::run()
 	const fpp_t frames = m_audioEngine->framesPerPeriod();
 	while( m_writing )
 	{
-		auto buffer = new surroundSampleFrame[frames];
-		const surroundSampleFrame * b = m_audioEngine->renderNextBuffer();
-		memcpy( buffer, b, frames * sizeof( surroundSampleFrame ) );
+		auto buffer = new sampleFrame[frames];
+		const sampleFrame * b = m_audioEngine->renderNextBuffer();
+		memcpy( buffer, b, frames * sizeof( sampleFrame ) );
 		m_fifo->write(buffer);
 	}
 

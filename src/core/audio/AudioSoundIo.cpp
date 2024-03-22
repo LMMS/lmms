@@ -43,7 +43,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 	AudioDevice(std::clamp<ch_cnt_t>(
 		ConfigManager::inst()->value("audiosoundio", "channels").toInt(),
 		DEFAULT_CHANNELS,
-		SURROUND_CHANNELS), _audioEngine)
+		DEFAULT_CHANNELS), _audioEngine)
 {
 	outSuccessful = false;
 	m_soundio = nullptr;
@@ -221,7 +221,7 @@ void AudioSoundIo::startProcessing()
 	m_outBufFramesTotal = 0;
 	m_outBufSize = audioEngine()->framesPerPeriod();
 
-	m_outBuf = new surroundSampleFrame[m_outBufSize];
+	m_outBuf = new sampleFrame[m_outBufSize];
 
 	if (! m_outstreamStarted)
 	{

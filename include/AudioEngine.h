@@ -58,7 +58,6 @@ const fpp_t DEFAULT_BUFFER_SIZE = 256;
 const int BYTES_PER_SAMPLE = sizeof( sample_t );
 const int BYTES_PER_INT_SAMPLE = sizeof( int_sample_t );
 const int BYTES_PER_FRAME = sizeof( sampleFrame );
-const int BYTES_PER_SURROUND_FRAME = sizeof( surroundSampleFrame );
 
 const float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
 
@@ -339,7 +338,7 @@ public:
 		return m_inputBufferFrames[ m_inputBufferRead ];
 	}
 
-	inline const surroundSampleFrame * nextBuffer()
+	inline const sampleFrame * nextBuffer()
 	{
 		return hasFifoWriter() ? m_fifo->read() : renderNextBuffer();
 	}
@@ -365,11 +364,11 @@ public:
 signals:
 	void qualitySettingsChanged();
 	void sampleRateChanged();
-	void nextAudioBuffer( const lmms::surroundSampleFrame * buffer );
+	void nextAudioBuffer( const lmms::sampleFrame * buffer );
 
 
 private:
-	using Fifo = FifoBuffer<surroundSampleFrame*>;
+	using Fifo = FifoBuffer<sampleFrame*>;
 
 	class fifoWriter : public QThread
 	{
@@ -386,7 +385,7 @@ private:
 
 		void run() override;
 
-		void write( surroundSampleFrame * buffer );
+		void write( sampleFrame * buffer );
 	} ;
 
 
@@ -405,7 +404,7 @@ private:
 	void renderStageEffects();
 	void renderStageMix();
 
-	const surroundSampleFrame * renderNextBuffer();
+	const sampleFrame * renderNextBuffer();
 
 	void swapBuffers();
 
@@ -425,8 +424,8 @@ private:
 	int m_inputBufferRead;
 	int m_inputBufferWrite;
 
-	surroundSampleFrame * m_outputBufferRead;
-	surroundSampleFrame * m_outputBufferWrite;
+	sampleFrame * m_outputBufferRead;
+	sampleFrame * m_outputBufferWrite;
 
 	// worker thread stuff
 	std::vector<AudioEngineWorkerThread *> m_workers;
