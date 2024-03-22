@@ -572,17 +572,10 @@ sampleFrame AudioEngine::getPeakValues(sampleFrame * ab, const f_cnt_t frames) c
 
 	for (f_cnt_t f = 0; f < frames; ++f)
 	{
-		float const absLeft = std::abs(ab[f][0]);
-		float const absRight = std::abs(ab[f][1]);
-		if (absLeft > peakLeft)
-		{
-			peakLeft = absLeft;
-		}
+		auto const & currentSample = ab[f];
 
-		if (absRight > peakRight)
-		{
-			peakRight = absRight;
-		}
+		peakLeft = std::max(std::abs(currentSample[0]), peakLeft);
+		peakRight = std::max(std::abs(currentSample[1]), peakRight);
 	}
 
 	return sampleFrame{peakLeft, peakRight};
