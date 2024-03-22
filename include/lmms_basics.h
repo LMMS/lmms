@@ -33,6 +33,9 @@
 #include <cstdint>
 #include <array>
 
+#include <cmath>
+#include <algorithm>
+
 
 namespace lmms
 {
@@ -117,8 +120,111 @@ constexpr char LADSPA_PATH_SEPERATOR =
 #endif
 
 
+class sampleFrame : public std::array<sample_t, DEFAULT_CHANNELS>
+{
+public:
+	sampleFrame() : sampleFrame(0., 0.)
+	{
+	}
 
-using         sampleFrame = std::array<sample_t,  DEFAULT_CHANNELS>;
+	sampleFrame(sample_t left, sample_t right) :
+		std::array<sample_t, DEFAULT_CHANNELS>(std::array<sample_t, DEFAULT_CHANNELS> { left, right })
+	{
+	}
+
+	sample_t & left()
+	{
+		sampleFrame & thisFrame = *this;
+		return thisFrame[0];
+	}
+
+	sample_t const & left() const
+	{
+		sampleFrame const & thisFrame = *this;
+		return thisFrame[0];
+	}
+
+	void setLeft(sample_t const & value)
+	{
+		sampleFrame & thisFrame = *this;
+		thisFrame[0] = value;
+	}
+
+	sample_t & right()
+	{
+		sampleFrame & thisFrame = *this;
+		return thisFrame[1];
+	}
+
+	sample_t const & right() const
+	{
+		sampleFrame const & thisFrame = *this;
+		return thisFrame[1];
+	}
+
+	void setRight(sample_t const & value)
+	{
+		sampleFrame & thisFrame = *this;
+		thisFrame[1] = value;
+	}
+
+	void operator+=(sampleFrame const & other)
+	{
+		auto & l = left();
+		auto & r = right();
+
+		l += other.left();
+		r += other.right();
+	}
+
+	sampleFrame operator*(float value) const
+	{
+		return sampleFrame(left() * value, right() * value);
+	}
+
+	void operator*=(float value)
+	{
+		setLeft(left() * value);
+		setRight(right() * value);
+	}
+
+	sampleFrame abs() const
+	{
+		return sampleFrame{std::abs(this->left()), std::abs(this->right())};
+	}
+
+	void max(sampleFrame const & other)
+	{
+		if (other.left() > left())
+		{
+			setLeft(other.left());
+		}
+
+		if (other.right() > right())
+		{
+			setRight(other.right());
+		}
+	}
+
+	void clamp(sample_t low, sample_t high)
+	{
+		auto & l = left();
+		l = std::clamp(l, low, high);
+
+		auto & r = right();
+		r = std::clamp(r, low, high);
+	}
+
+	bool containsInf() const
+	{
+		return std::isinf(left()) || std::isinf(right());
+	}
+
+	bool containsNaN() const
+	{
+		return std::isnan(left()) || std::isnan(right());
+	}
+};
 
 constexpr std::size_t LMMS_ALIGN_SIZE = 16;
 

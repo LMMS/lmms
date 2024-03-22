@@ -567,18 +567,14 @@ void AudioEngine::clearInternal()
 
 sampleFrame AudioEngine::getPeakValues(sampleFrame * ab, const f_cnt_t frames) const
 {
-	sample_t peakLeft = 0.0f;
-	sample_t peakRight = 0.0f;
+	sampleFrame peaks;
 
 	for (f_cnt_t f = 0; f < frames; ++f)
 	{
-		auto const & currentSample = ab[f];
-
-		peakLeft = std::max(std::abs(currentSample[0]), peakLeft);
-		peakRight = std::max(std::abs(currentSample[1]), peakRight);
+		peaks.max(ab[f].abs());
 	}
 
-	return sampleFrame{peakLeft, peakRight};
+	return peaks;
 }
 
 

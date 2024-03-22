@@ -98,33 +98,37 @@ bool sanitize( sampleFrame * src, int frames )
 	}
 
 	bool found = false;
-	for( int f = 0; f < frames; ++f )
+	for (int f = 0; f < frames; ++f)
 	{
-		for( int c = 0; c < 2; ++c )
+		auto & currentFrame = src[f];
+
+		if (currentFrame.containsInf() || currentFrame.containsNaN())
 		{
-			if( std::isinf( src[f][c] ) || std::isnan( src[f][c] ) )
-			{
-				#ifdef LMMS_DEBUG
+			#ifdef LMMS_DEBUG
 					// TODO don't use printf here
 					printf("Bad data, clearing buffer. frame: ");
-					printf("%d: value %f\n", f, src[f][c]);
-				#endif
-				for( int f = 0; f < frames; ++f )
-				{
-					for( int c = 0; c < 2; ++c )
-					{
-						src[f][c] = 0.0f;
-					}
-				}
-				found = true;
-				return found;
-			}
-			else
-			{
-				src[f][c] = std::clamp(src[f][c], -1000.0f, 1000.0f);
-			}
+					printf("%d: value %f, %f\n", f, currentFrame.left(), currentFrame.right());
+			#endif
+			found = true;
+			break;
+		}
+		else
+		{
+			// TODO What is this supposed to do? This corresponds to saying: "Pushing a signal with 60 dbFS is no problem".
+			currentFrame.clamp(sample_t(-1000.0), sample_t(1000.0));
+		}
+	};
+
+	if (found)
+	{
+		// Clear the whole buffer if a problem is found
+		for (int f = 0; f < frames; ++f)
+		{
+			auto & currentFrame = src[f];
+			currentFrame = sampleFrame();
 		}
 	}
+
 	return found;
 }
 
@@ -133,8 +137,7 @@ struct AddOp
 {
 	void operator()( sampleFrame& dst, const sampleFrame& src ) const
 	{
-		dst[0] += src[0];
-		dst[1] += src[1];
+		dst += src;
 	}
 } ;
 
@@ -151,8 +154,7 @@ struct AddMultipliedOp
 
 	void operator()( sampleFrame& dst, const sampleFrame& src ) const
 	{
-		dst[0] += src[0] * m_coeff;
-		dst[1] += src[1] * m_coeff;
+		dst += src * m_coeff;
 	}
 
 	const float m_coeff;
@@ -182,8 +184,7 @@ void multiply(sampleFrame* dst, float coeff, int frames)
 {
 	for (int i = 0; i < frames; ++i)
 	{
-		dst[i][0] *= coeff;
-		dst[i][1] *= coeff;
+		dst[i] *= coeff;
 	}
 }
 
