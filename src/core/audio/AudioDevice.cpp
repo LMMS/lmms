@@ -66,10 +66,7 @@ AudioDevice::~AudioDevice()
 void AudioDevice::processNextBuffer()
 {
 	const fpp_t frames = getNextBuffer( m_buffer );
-	if( frames )
-	{
-		writeBuffer( m_buffer, frames, audioEngine()->masterGain() );
-	}
+	if (frames) { writeBuffer(m_buffer, frames); }
 	else
 	{
 		m_inProcess = false;
@@ -211,7 +208,6 @@ fpp_t AudioDevice::resample( const surroundSampleFrame * _src,
 
 int AudioDevice::convertToS16( const surroundSampleFrame * _ab,
 								const fpp_t _frames,
-								const float _master_gain,
 								int_sample_t * _output_buffer,
 								const bool _convert_endian )
 {
@@ -222,8 +218,8 @@ int AudioDevice::convertToS16( const surroundSampleFrame * _ab,
 		{
 			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 			{
-				temp = static_cast<int_sample_t>( AudioEngine::clip( _ab[frame][chnl] * _master_gain ) * OUTPUT_SAMPLE_MULTIPLIER );
-				
+				temp = static_cast<int_sample_t>(AudioEngine::clip(_ab[frame][chnl]) * OUTPUT_SAMPLE_MULTIPLIER);
+
 				( _output_buffer + frame * channels() )[chnl] =
 						( temp & 0x00ff ) << 8 |
 						( temp & 0xff00 ) >> 8;
@@ -236,11 +232,8 @@ int AudioDevice::convertToS16( const surroundSampleFrame * _ab,
 		{
 			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 			{
-				( _output_buffer + frame * channels() )[chnl] =
-						static_cast<int_sample_t>(
-						AudioEngine::clip( _ab[frame][chnl] *
-						_master_gain ) *
-						OUTPUT_SAMPLE_MULTIPLIER );
+				(_output_buffer + frame * channels())[chnl]
+					= static_cast<int_sample_t>(AudioEngine::clip(_ab[frame][chnl]) * OUTPUT_SAMPLE_MULTIPLIER);
 			}
 		}
 	}

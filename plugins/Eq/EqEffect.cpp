@@ -290,11 +290,8 @@ bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 float EqEffect::linearPeakBand(float minF, float maxF, EqAnalyser* fft, int sr)
 {
 	auto const fftEnergy = fft->getEnergy();
-	if (fftEnergy == 0)
-	{
-		// No energy -> no signal
-		return 0;
-	}
+	if (fftEnergy == 0.) { return 0.; }
+
 
 	float peakLinear = 0.;
 

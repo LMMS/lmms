@@ -35,6 +35,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QMessageBox>
+#include <QRegularExpression>
 #include <QSaveFile>
 
 #include "base64.h"
@@ -973,8 +974,7 @@ void DataFile::upgrade_0_4_0_20080622()
 	{
 		QDomElement el = list.item( i ).toElement();
 		QString s = el.attribute( "name" );
-		s.replace( QRegExp( "^Beat/Baseline " ),
-						"Beat/Bassline " );
+		s.replace(QRegularExpression("^Beat/Baseline "), "Beat/Bassline");
 		el.setAttribute( "name", s );
 	}
 }
@@ -1109,7 +1109,7 @@ void DataFile::upgrade_1_1_91()
 	{
 		QDomElement el = list.item( i ).toElement();
 		QString s = el.attribute( "src" );
-		s.replace( QRegExp("/samples/bassloopes/"), "/samples/bassloops/" );
+		s.replace(QRegularExpression("/samples/bassloopes/"), "/samples/bassloops/");
 		el.setAttribute( "src", s );
 	}
 

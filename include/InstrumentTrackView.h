@@ -71,6 +71,8 @@ public:
 	// Create a menu for assigning/creating channels for this track
 	QMenu * createMixerMenu( QString title, QString newMixerLabel ) override;
 
+	QPixmap determinePixmap();
+
 
 protected:
 	void modelChanged() override;
@@ -93,6 +95,8 @@ private slots:
 
 	void handleConfigChange(QString cls, QString attr, QString value);
 
+private:
+	static QPixmap determinePixmap(InstrumentTrack* instrumentTrack);
 
 private:
 	InstrumentTrackWindow * m_window;

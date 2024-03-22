@@ -590,7 +590,8 @@ void MixerView::setCurrentMixerChannel(int channel)
 
 void MixerView::clear()
 {
-	getMixer()->clear();
+	for (auto i = m_mixerChannelViews.size() - 1; i > 0; --i) { deleteChannel(i); }
+	getMixer()->clearChannel(0);
 
 	refreshDisplay();
 }
@@ -601,10 +602,6 @@ void MixerView::clear()
 void MixerView::updateFaders()
 {
 	Mixer * m = getMixer();
-
-	// apply master gain
-	m->mixerChannel(0)->m_peakLeft *= Engine::audioEngine()->masterGain();
-	m->mixerChannel(0)->m_peakRight *= Engine::audioEngine()->masterGain();
 
 	for (int i = 0; i < m_mixerChannelViews.size(); ++i)
 	{

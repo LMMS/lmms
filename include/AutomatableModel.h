@@ -25,15 +25,15 @@
 #ifndef LMMS_AUTOMATABLE_MODEL_H
 #define LMMS_AUTOMATABLE_MODEL_H
 
+#include <cmath>
 #include <QMap>
 #include <QMutex>
-#include <cmath>
+#include <QRegularExpression>
 
 #include "JournallingObject.h"
 #include "Model.h"
 #include "TimePos.h"
 #include "ValueBuffer.h"
-#include "MemoryManager.h"
 #include "ModelVisitor.h"
 
 
@@ -77,7 +77,6 @@ class ControllerConnection;
 class LMMS_EXPORT AutomatableModel : public Model, public JournallingObject
 {
 	Q_OBJECT
-	MM_OPERATORS
 public:
 	using AutoModelVector = std::vector<AutomatableModel*>;
 

@@ -34,7 +34,6 @@
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "LcdSpinBox.h"
-#include "MemoryManager.h"
 
 class QLabel;
 

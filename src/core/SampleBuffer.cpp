@@ -31,7 +31,7 @@
 
 namespace lmms {
 
-SampleBuffer::SampleBuffer(const sampleFrame* data, int numFrames, int sampleRate)
+SampleBuffer::SampleBuffer(const sampleFrame* data, size_t numFrames, int sampleRate)
 	: m_data(data, data + numFrames)
 	, m_sampleRate(sampleRate)
 {

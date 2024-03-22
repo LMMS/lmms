@@ -146,8 +146,8 @@ private:
 	friend class AudioFileProcessorView;
 
 public:
-	AudioFileProcessorWaveView(QWidget* parent, int w, int h, Sample const* buf);
-	void setKnobs(knob* start, knob* end, knob* loop);
+	AudioFileProcessorWaveView(QWidget* parent, int w, int h, Sample const* buf,
+		knob* start, knob* end, knob* loop);
 
 
 	void updateSampleRange();
@@ -169,6 +169,8 @@ private:
 	void updateGraph();
 	void reverse();
 	void updateCursor(QMouseEvent* me = nullptr);
+
+	void configureKnobRelationsAndWaveViews();
 
 	static bool isCloseTo(int a, int b)
 	{
