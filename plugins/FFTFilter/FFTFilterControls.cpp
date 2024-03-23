@@ -1,8 +1,7 @@
 /*
- * AmplifierControls.cpp - controls for amplifier effect
+ * FFTFilterCotnrols.cpp - controls for FFTFilter effect
  *
- * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
- * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2024 Szeli1 </at/gmail/dot/com> TODO
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -47,10 +46,10 @@ FFTFilterControls::FFTFilterControls(FFTFilterEffect* effect) :
 	m_graphModel.getDataArray(arrayLocation)->setIsSelectable(true);
 	m_graphModel.getDataArray(arrayLocation)->setIsEditableAttrib(true);
 	m_graphModel.getDataArray(arrayLocation)->setIsAutomatableEffectable(true);
-	m_graphModel.getDataArray(arrayLocation)->setLineColor(QColor(255, 50, 50, 255));
-	m_graphModel.getDataArray(arrayLocation)->setActiveColor(QColor(255, 0, 0, 255));
-	m_graphModel.getDataArray(arrayLocation)->setFillColor(QColor(200, 25, 25, 255));
-	m_graphModel.getDataArray(arrayLocation)->setAutomatedColor(QColor(0, 200, 255, 255));
+	m_graphModel.getDataArray(arrayLocation)->setLineColor(QColor(210, 50, 50, 255));
+	m_graphModel.getDataArray(arrayLocation)->setActiveColor(QColor(255, 30, 20, 255));
+	m_graphModel.getDataArray(arrayLocation)->setFillColor(QColor(170, 25, 25, 255));
+	m_graphModel.getDataArray(arrayLocation)->setAutomatedColor(QColor(144, 107, 255, 255));
 }
 
 

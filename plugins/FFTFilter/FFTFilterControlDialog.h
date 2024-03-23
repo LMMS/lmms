@@ -1,8 +1,7 @@
 /*
- * AmplifierControlDialog.h - control dialog for amplifier effect
+ * FFTFilterControlDialog.h - control dialog for FFTFilter effect
  *
- * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
- * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2024 Szeli1 </at/gmail/dot/com> TODO
  *
  * This file is part of LMMS - https://lmms.io
  *

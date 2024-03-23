@@ -1,4 +1,26 @@
-
+/*
+ * VectorGraph.cpp - Vector graph widget, model, helper class implementation
+ *
+ * Copyright (c) 2024 Szeli1 </at/gmail/dot/com> TODO
+ *
+ * This file is part of LMMS - https://lmms.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ *
+ */
 
 #include <vector>
 #include <cmath> // sine
@@ -2357,7 +2379,7 @@ void VectorGraphDataArray::setAutomated(unsigned int locationIn, bool isAutomate
 		{
 			if (m_dataArray[locationIn].m_automationModel == nullptr)
 			{
-				m_dataArray[locationIn].m_automationModel = new FloatModel(0.0f, -1.0f, 1.0f, 0.01f, nullptr, QString(), false);
+				m_dataArray[locationIn].m_automationModel = new FloatModel(0.0f, -1.0f, 1.0f, 0.01f, m_parent, QString(), false);
 				dataChanged(locationIn);
 			}
 		}
