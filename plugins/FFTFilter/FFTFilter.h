@@ -46,11 +46,6 @@ public:
 	}
 
 private:
-	void runFFTOnBuffer(std::vector<sample_t>* inputReIn, std::vector<sample_t>* inputImIn, std::vector<sample_t> bufferIn);
-	// implementation of fft
-	void FFT(std::vector<sample_t>* inputReIn, std::vector<sample_t>* inputImIn);
-	// inverse fft
-	void IFFT(std::vector<sample_t>* inputReIn, std::vector<sample_t>* inputImIn);
 
 	inline sample_t getCurSample(unsigned int posIn)
 	{

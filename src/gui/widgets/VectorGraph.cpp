@@ -381,12 +381,12 @@ void VectorGraphView::mouseReleaseEvent(QMouseEvent* me)
 			int editingTextCount = m_editingText.size();
 			if (m_isSelected == true)
 			{
-				if (model()->getDataArray(m_selectedLocation)->getIsEditableAttrib() == false)
+				if (model()->getDataArray(m_selectedArray)->getIsEditableAttrib() == false)
 				{
 					// x, y
 					editingTextCount = 2;
 				}
-				else if (model()->getDataArray(m_selectedLocation)->getIsAutomatableEffectable() == false)
+				else if (model()->getDataArray(m_selectedArray)->getIsAutomatableEffectable() == false)
 				{
 					// x, y, curve, valA, valB, switch type
 					editingTextCount = 6;
