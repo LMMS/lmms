@@ -91,9 +91,8 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	const float sr = Engine::audioEngine()->processingSampleRate();
 	const float d = dryLevel();
 	const float w = wetLevel();
-	auto dryS = std::array<sample_t, 2>{};
-	float lPeak = 0.0;
-	float rPeak = 0.0;
+
+	sampleFrame peak;
 	float length = m_delayControls.m_delayTimeModel.value();
 	float amplitude = m_delayControls.m_lfoAmountModel.value() * sr;
 	float lfoTime = 1.0 / m_delayControls.m_lfoTimeModel.value();
@@ -116,27 +115,29 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 		m_outGain = dbfsToAmp( m_delayControls.m_outGainModel.value() );
 	}
 	int sampleLength;
-	for( fpp_t f = 0; f < frames; ++f )
+	for (fpp_t f = 0; f < frames; ++f)
 	{
-		dryS[0] = buf[f][0];
-		dryS[1] = buf[f][1];
+		auto & currentFrame = buf[f];
+		auto const dryS = currentFrame;
 
+		// Prepare delay for current sample
 		m_delay->setFeedback( *feedbackPtr );
 		m_lfo->setFrequency( *lfoTimePtr );
 		sampleLength = *lengthPtr * Engine::audioEngine()->processingSampleRate();
 		m_currentLength = sampleLength;
 		m_delay->setLength( m_currentLength + ( *amplitudePtr * ( float )m_lfo->tick() ) );
-		m_delay->tick( buf[f] );
 
-		buf[f][0] *= m_outGain;
-		buf[f][1] *= m_outGain;
+		// Process the wet signal
+		m_delay->tick( currentFrame );
+		currentFrame *= m_outGain;
 
-		lPeak = buf[f][0] > lPeak ? buf[f][0] : lPeak;
-		rPeak = buf[f][1] > rPeak ? buf[f][1] : rPeak;
+		// Calculate peak of wet signal
+		peak.max(currentFrame);
 
-		buf[f][0] = ( d * dryS[0] ) + ( w * buf[f][0] );
-		buf[f][1] = ( d * dryS[1] ) + ( w * buf[f][1] );
-		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
+		// Dry/wet mix
+		currentFrame = dryS * d + currentFrame * w;
+		
+		outSum += currentFrame.scalarProduct(currentFrame);
 
 		lengthPtr += lengthInc;
 		amplitudePtr += amplitudeInc;
@@ -144,8 +145,8 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 		feedbackPtr += feedbackInc;
 	}
 	checkGate( outSum / frames );
-	m_delayControls.m_outPeakL = lPeak;
-	m_delayControls.m_outPeakR = rPeak;
+	m_delayControls.m_outPeakL = peak.left();
+	m_delayControls.m_outPeakR = peak.right();
 
 	return isRunning();
 }
