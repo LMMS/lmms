@@ -127,6 +127,10 @@ public:
 	{
 	}
 
+	sampleFrame(sample_t value) : sampleFrame(value, value)
+	{
+	}
+
 	sampleFrame(sample_t left, sample_t right) :
 		std::array<sample_t, DEFAULT_CHANNELS>(std::array<sample_t, DEFAULT_CHANNELS> { left, right })
 	{
@@ -168,6 +172,19 @@ public:
 		thisFrame[1] = value;
 	}
 
+	sampleFrame & operator=(float v)
+	{
+		left() = v;
+		right() = v;
+
+		return *this;
+	}
+
+	sampleFrame operator+(sampleFrame const & other) const
+	{
+		return sampleFrame(left() + other.left(), right() + other.right());
+	}
+
 	void operator+=(sampleFrame const & other)
 	{
 		auto & l = left();
@@ -186,6 +203,22 @@ public:
 	{
 		setLeft(left() * value);
 		setRight(right() * value);
+	}
+
+	sampleFrame operator*(sampleFrame const & other) const
+	{
+		return sampleFrame(left() * other.left(), right() * other.right());
+	}
+
+	void operator*=(sampleFrame const & other)
+	{
+		left() *= other.left();
+		right() *= other.right();
+	}
+
+	sample_t scalarProduct(sampleFrame const & other) const
+	{
+		return left() * other.left() + right() * other.right();
 	}
 
 	sampleFrame abs() const

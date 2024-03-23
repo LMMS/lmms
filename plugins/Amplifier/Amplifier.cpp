@@ -80,14 +80,14 @@ bool AmplifierEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		const float panLeft = std::min(1.0f, 1.0f - pan);
 		const float panRight = std::min(1.0f, 1.0f + pan);
 
-		auto s = std::array{buf[f][0], buf[f][1]};
+		auto & currentFrame = buf[f];
 
-		s[0] *= volume * left * panLeft;
-		s[1] *= volume * right * panRight;
+		auto const s = currentFrame * sampleFrame(left * panLeft, right * panRight) * volume;
 
-		buf[f][0] = d * buf[f][0] + w * s[0];
-		buf[f][1] = d * buf[f][1] + w * s[1];
-		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
+		// Dry/wet mix
+		currentFrame = currentFrame * d + s * w;
+
+		outSum += currentFrame.scalarProduct(currentFrame);
 	}
 
 	checkGate(outSum / frames);
