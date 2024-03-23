@@ -120,7 +120,6 @@ SET(LMMS_SRCS
 	gui/widgets/Oscilloscope.cpp
 	gui/widgets/PeakIndicator.cpp
 	gui/widgets/PixmapButton.cpp
-	gui/widgets/PointGraph.cpp
 	gui/widgets/SimpleTextFloat.cpp
 	gui/widgets/TabBar.cpp
 	gui/widgets/TabWidget.cpp
@@ -129,6 +128,7 @@ SET(LMMS_SRCS
 	gui/widgets/TextFloat.cpp
 	gui/widgets/TimeDisplayWidget.cpp
 	gui/widgets/ToolButton.cpp
+	gui/widgets/VectorGraph.cpp
 
 	PARENT_SCOPE
 )
