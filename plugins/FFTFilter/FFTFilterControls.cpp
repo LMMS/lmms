@@ -27,7 +27,7 @@
 
 #include "FFTFilterControls.h"
 #include "FFTFilter.h"
-#include "PointGraph.h"
+#include "VectorGraph.h"
 
 namespace lmms
 {

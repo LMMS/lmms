@@ -28,7 +28,7 @@
 
 #include "EffectControls.h"
 #include "FFTFilterControlDialog.h"
-#include "PointGraph.h"
+#include "VectorGraph.h"
 
 namespace lmms
 {
@@ -75,7 +75,7 @@ private:
 	BoolModel m_displayFFTModel;
 	BoolModel m_resetModel;
 
-	PointGraphModel m_graphModel;
+	VectorGraphModel m_graphModel;
 
 	//graphModel m_filterModel;
 

@@ -33,7 +33,7 @@
 #include "LedCheckBox.h"
 #include "PixmapButton.h"
 #include "LcdSpinBox.h"
-#include "PointGraph.h"
+#include "VectorGraph.h"
 
 namespace lmms::gui
 {
@@ -106,7 +106,7 @@ FFTFilterControlDialog::FFTFilterControlDialog(FFTFilterControls* controls) :
 	resetButton->resize(13, 48);
 	resetButton->move(300, 100);
 
-	auto curGraph = new PointGraphView(this, 300, 200, 10, 1024);
+	auto curGraph = new VectorGraphView(this, 300, 200, 10, 1024);
 	curGraph->setModel(&controls->m_graphModel);
 	curGraph->move(100, 240);
 /*

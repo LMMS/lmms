@@ -9,7 +9,7 @@
 #include <QMouseEvent>
 #include <QInputDialog>
 
-#include "PointGraph.h"
+#include "VectorGraph.h"
 #include "StringPairDrag.h"
 
 
@@ -19,11 +19,11 @@ namespace lmms
 namespace gui
 {
 
-PointGraphView::PointGraphView(QWidget * parentIn,
+VectorGraphView::VectorGraphView(QWidget * parentIn,
 		int widthIn, int heightIn,
 		unsigned int pointSizeIn, unsigned int maxLengthIn) :
 		QWidget(parentIn),
-		ModelView(new PointGraphModel(maxLengthIn, nullptr, false), this)
+		ModelView(new VectorGraphModel(maxLengthIn, nullptr, false), this)
 {
 	resize(widthIn, heightIn);
 
@@ -83,14 +83,14 @@ PointGraphView::PointGraphView(QWidget * parentIn,
 	QObject::connect(gModel, SIGNAL(lengthChanged()),
 			this, SLOT(updateGraph()));
 }
-PointGraphView::~PointGraphView()
+VectorGraphView::~VectorGraphView()
 {
 	m_editingText.clear();
 	m_editingInputIsFloat.clear();
 	m_editingLineEffectText.clear();
 }
 
-void PointGraphView::setLineColor(QColor colorIn, unsigned int dataArrayLocationIn)
+void VectorGraphView::setLineColor(QColor colorIn, unsigned int dataArrayLocationIn)
 {
 	if (model()->getDataArraySize() > dataArrayLocationIn)
 	{
@@ -98,7 +98,7 @@ void PointGraphView::setLineColor(QColor colorIn, unsigned int dataArrayLocation
 		update();
 	}
 }
-void PointGraphView::setActiveColor(QColor colorIn, unsigned int dataArrayLocationIn)
+void VectorGraphView::setActiveColor(QColor colorIn, unsigned int dataArrayLocationIn)
 {
 	if (model()->getDataArraySize() > dataArrayLocationIn)
 	{
@@ -106,7 +106,7 @@ void PointGraphView::setActiveColor(QColor colorIn, unsigned int dataArrayLocati
 		update();
 	}
 }
-void PointGraphView::setFillColor(QColor colorIn, unsigned int dataArrayLocationIn)
+void VectorGraphView::setFillColor(QColor colorIn, unsigned int dataArrayLocationIn)
 {
 	if (model()->getDataArraySize() > dataArrayLocationIn)
 	{
@@ -114,7 +114,7 @@ void PointGraphView::setFillColor(QColor colorIn, unsigned int dataArrayLocation
 		update();
 	}
 }
-void PointGraphView::setAutomatedColor(QColor colorIn, unsigned int dataArrayLocationIn)
+void VectorGraphView::setAutomatedColor(QColor colorIn, unsigned int dataArrayLocationIn)
 {
 	if (model()->getDataArraySize() > dataArrayLocationIn)
 	{
@@ -123,12 +123,12 @@ void PointGraphView::setAutomatedColor(QColor colorIn, unsigned int dataArrayLoc
 	}
 }
 
-void PointGraphView::setIsSimplified(bool isSimplifiedIn)
+void VectorGraphView::setIsSimplified(bool isSimplifiedIn)
 {
 	m_isSimplified = isSimplifiedIn;
 }
 
-std::pair<float, float> PointGraphView::getSelectedData()
+std::pair<float, float> VectorGraphView::getSelectedData()
 {
 	std::pair<float, float> output(-1.0f, 0.00);
 	if (m_isSelected == true)
@@ -138,7 +138,7 @@ std::pair<float, float> PointGraphView::getSelectedData()
 	}
 	return output;
 }
-int PointGraphView::getLastSelectedArray()
+int VectorGraphView::getLastSelectedArray()
 {
 	if (m_isLastSelectedArray == true)
 	{
@@ -146,7 +146,7 @@ int PointGraphView::getLastSelectedArray()
 	}
 	return -1;
 }
-void PointGraphView::setSelectedData(std::pair<float, float> dataIn)
+void VectorGraphView::setSelectedData(std::pair<float, float> dataIn)
 {
 	if (m_isSelected == true)
 	{
@@ -158,7 +158,7 @@ void PointGraphView::setSelectedData(std::pair<float, float> dataIn)
 	}
 }
 
-void PointGraphView::mousePressEvent(QMouseEvent* me)
+void VectorGraphView::mousePressEvent(QMouseEvent* me)
 {
 	// get position
 	int x = me->x();
@@ -205,7 +205,7 @@ void PointGraphView::mousePressEvent(QMouseEvent* me)
 	qDebug("mousePressEnd ---------");
 }
 
-void PointGraphView::mouseMoveEvent(QMouseEvent* me)
+void VectorGraphView::mouseMoveEvent(QMouseEvent* me)
 {
 	// get position
 	// the x coord is clamped because
@@ -304,7 +304,7 @@ void PointGraphView::mouseMoveEvent(QMouseEvent* me)
 	}
 }
 
-void PointGraphView::mouseReleaseEvent(QMouseEvent* me)
+void VectorGraphView::mouseReleaseEvent(QMouseEvent* me)
 {
 	// get position
 	int x = me->x();
@@ -416,7 +416,7 @@ void PointGraphView::mouseReleaseEvent(QMouseEvent* me)
 	emit drawn();
 }
 
-void PointGraphView::mouseDoubleClickEvent(QMouseEvent * me)
+void VectorGraphView::mouseDoubleClickEvent(QMouseEvent * me)
 {
 	// get position
 	int x = me->x();
@@ -451,14 +451,14 @@ void PointGraphView::mouseDoubleClickEvent(QMouseEvent * me)
 	}
 }
 
-void PointGraphView::paintEvent(QPaintEvent* pe)
+void VectorGraphView::paintEvent(QPaintEvent* pe)
 {
 	QPainter p(this);
 	//QPainterPath pt(); // TODO
 	qDebug("paintEvent");
 	m_graphHeight = m_isEditingActive == true ? height() - m_editingHeight : height();
 
-	PointGraphDataArray* dataArray = nullptr;
+	VectorGraphDataArray* dataArray = nullptr;
 	for (unsigned int i = 0; i < model()->getDataArraySize(); i++)
 	{
 		dataArray = model()->getDataArray(i);
@@ -620,7 +620,7 @@ void PointGraphView::paintEvent(QPaintEvent* pe)
 	}
 }
 
-void PointGraphView::modelChanged()
+void VectorGraphView::modelChanged()
 {
 	auto gModel = model();
 	QObject::connect(gModel, SIGNAL(dataChanged()),
@@ -629,12 +629,12 @@ void PointGraphView::modelChanged()
 			this, SLOT(updateGraph()));
 }
 
-void PointGraphView::updateGraph()
+void VectorGraphView::updateGraph()
 {
 	update();
 }
 
-std::pair<float, float> PointGraphView::mapMousePos(int xIn, int yIn, bool nonNegativeIn)
+std::pair<float, float> VectorGraphView::mapMousePos(int xIn, int yIn, bool nonNegativeIn)
 {
 	if (nonNegativeIn == true)
 	{
@@ -651,7 +651,7 @@ std::pair<float, float> PointGraphView::mapMousePos(int xIn, int yIn, bool nonNe
 			static_cast<float>((yIn * 2.0f / (float)m_graphHeight) - 1.0f));
 	}
 }
-std::pair<int, int> PointGraphView::mapDataPos(float xIn, float yIn, bool nonNegativeIn)
+std::pair<int, int> VectorGraphView::mapDataPos(float xIn, float yIn, bool nonNegativeIn)
 {
 	if (nonNegativeIn == true)
 	{
@@ -668,33 +668,33 @@ std::pair<int, int> PointGraphView::mapDataPos(float xIn, float yIn, bool nonNeg
 			static_cast<int>((yIn / 2.0f + 0.5f) * m_graphHeight));
 	}
 }
-std::pair<float, float> PointGraphView::mapDataCurvePos(float xAIn, float yAIn, float xBIn, float yBIn, float curveIn)
+std::pair<float, float> VectorGraphView::mapDataCurvePos(float xAIn, float yAIn, float xBIn, float yBIn, float curveIn)
 {
 	return std::pair<float, float>(
 		(xAIn + xBIn) / 2.0f,
 		yAIn + (curveIn / 2.0f + 0.5f) * (yBIn - yAIn));
 }
-std::pair<int, int> PointGraphView::mapDataCurvePos(int xAIn, int yAIn, int xBIn, int yBIn, float curveIn)
+std::pair<int, int> VectorGraphView::mapDataCurvePos(int xAIn, int yAIn, int xBIn, int yBIn, float curveIn)
 {
 	return std::pair<int, int>(
 		(xAIn + xBIn) / 2,
 		yAIn + static_cast<int>((curveIn / 2.0f + 0.5f) * (yBIn - yAIn)));
 }
-int PointGraphView::mapInputPos(float inputValueIn, unsigned int displayLengthIn)
+int VectorGraphView::mapInputPos(float inputValueIn, unsigned int displayLengthIn)
 {
 	return (inputValueIn / 2.0f + 0.5f) * displayLengthIn;
 }
 
-float PointGraphView::getDistance(int xAIn, int yAIn, int xBIn, int yBIn)
+float VectorGraphView::getDistance(int xAIn, int yAIn, int xBIn, int yBIn)
 {
 	return std::sqrt(static_cast<float>((xAIn - xBIn) * (xAIn - xBIn) + (yAIn - yBIn) * (yAIn - yBIn)));
 }
-float PointGraphView::getDistance(float xAIn, float yAIn, float xBIn, float yBIn)
+float VectorGraphView::getDistance(float xAIn, float yAIn, float xBIn, float yBIn)
 {
 	return std::sqrt((xAIn - xBIn) * (xAIn - xBIn) + (yAIn - yBIn) * (yAIn - yBIn));
 }
 
-bool PointGraphView::isGraphPressed(int mouseYIn)
+bool VectorGraphView::isGraphPressed(int mouseYIn)
 {
 	if (m_isEditingActive == true && mouseYIn > m_graphHeight)
 	{
@@ -702,7 +702,7 @@ bool PointGraphView::isGraphPressed(int mouseYIn)
 	}
 	return true;
 }
-int PointGraphView::getPressedInput(int mouseXIn, int mouseYIn, unsigned int inputCountIn)
+int VectorGraphView::getPressedInput(int mouseXIn, int mouseYIn, unsigned int inputCountIn)
 {
 	int output = -1;
 	if (m_isEditingActive == true && mouseYIn > m_graphHeight)
@@ -716,7 +716,7 @@ qDebug("getPressedInput x location ERRROR: %d", mouseXIn);
 	}
 	return output;
 }
-float PointGraphView::getInputAttribValue(unsigned int editingArrayLocationIn, bool* valueOut)
+float VectorGraphView::getInputAttribValue(unsigned int editingArrayLocationIn, bool* valueOut)
 {
 	float output = 0.0f;
 	if (m_isSelected == true)
@@ -786,7 +786,7 @@ float PointGraphView::getInputAttribValue(unsigned int editingArrayLocationIn, b
 	}
 	return output;
 }
-void PointGraphView::setInputAttribValue(unsigned int editingArrayLocationIn, float floatValueIn, bool boolValueIn)
+void VectorGraphView::setInputAttribValue(unsigned int editingArrayLocationIn, float floatValueIn, bool boolValueIn)
 {
 	qDebug("setInputAttribValue started");
 	if (m_isSelected == true)
@@ -889,7 +889,7 @@ void PointGraphView::setInputAttribValue(unsigned int editingArrayLocationIn, fl
 	}
 	qDebug("setInputAttribValue finished");
 }
-QColor PointGraphView::getTextColorFromBaseColor(QColor baseColorIn)
+QColor VectorGraphView::getTextColorFromBaseColor(QColor baseColorIn)
 {
 	QColor output(255, 255, 255, 255);
 	int colorSum = baseColorIn.red() + baseColorIn.green() + baseColorIn.blue();
@@ -899,7 +899,7 @@ QColor PointGraphView::getTextColorFromBaseColor(QColor baseColorIn)
 	}
 	return output;
 }
-QString PointGraphView::getTextFromDisplayLength(QString textIn, unsigned int displayLengthIn)
+QString VectorGraphView::getTextFromDisplayLength(QString textIn, unsigned int displayLengthIn)
 {
 	int charLength = 4;
 	QString output = "";
@@ -918,7 +918,7 @@ QString PointGraphView::getTextFromDisplayLength(QString textIn, unsigned int di
 	return output;
 }
 
-std::pair<float, float> PointGraphView::showCoordInputDialog()
+std::pair<float, float> VectorGraphView::showCoordInputDialog()
 {
 	std::pair<float, float> curData(0.0f, 0.0f);
 	if (m_isSelected == true)
@@ -948,7 +948,7 @@ std::pair<float, float> PointGraphView::showCoordInputDialog()
 	}
 	return curData;
 }
-float PointGraphView::showInputDialog(float curInputValueIn)
+float VectorGraphView::showInputDialog(float curInputValueIn)
 {
 	float output = 0.0f;
 
@@ -965,7 +965,7 @@ float PointGraphView::showInputDialog(float curInputValueIn)
 	return output;
 }
 
-void PointGraphView::selectData(int mouseXIn, int mouseYIn)
+void VectorGraphView::selectData(int mouseXIn, int mouseYIn)
 {
 	qDebug("selectData");
 	m_selectedLocation = 0;
@@ -976,7 +976,7 @@ void PointGraphView::selectData(int mouseXIn, int mouseYIn)
 
 	for (unsigned int i = 0; i < model()->getDataArraySize(); i++)
 	{
-		PointGraphDataArray* dataArray = model()->getDataArray(i);
+		VectorGraphDataArray* dataArray = model()->getDataArray(i);
 		if (dataArray->getIsSelectable() == true)
 		{
 			int location = searchForData(mouseXIn, mouseYIn, static_cast<float>(m_pointSize) / width(), dataArray, false);
@@ -997,7 +997,7 @@ void PointGraphView::selectData(int mouseXIn, int mouseYIn)
 	{
 		for (unsigned int i = 0; i < model()->getDataArraySize(); i++)
 		{
-			PointGraphDataArray* dataArray = model()->getDataArray(i);
+			VectorGraphDataArray* dataArray = model()->getDataArray(i);
 			if (dataArray->getIsSelectable() == true)
 			{
 				int location = searchForData(mouseXIn, mouseYIn, static_cast<float>(m_pointSize) / width(), dataArray, true);
@@ -1018,7 +1018,7 @@ void PointGraphView::selectData(int mouseXIn, int mouseYIn)
 	qDebug("selectDataEnd");
 }
 
-int PointGraphView::searchForData(int mouseXIn, int mouseYIn, float maxDistanceIn, PointGraphDataArray* arrayIn, bool curvedIn)
+int VectorGraphView::searchForData(int mouseXIn, int mouseYIn, float maxDistanceIn, VectorGraphDataArray* arrayIn, bool curvedIn)
 {
 	int output = -1;
 	float maxDistance = maxDistanceIn * 2.0f;
@@ -1139,41 +1139,41 @@ int PointGraphView::searchForData(int mouseXIn, int mouseYIn, float maxDistanceI
 
 } // namespace gui
 
-PointGraphModel::PointGraphModel(unsigned int maxLengthIn, Model* parentIn, bool defaultConstructedIn) :
-	Model(parentIn, tr("PointGraphModel"), defaultConstructedIn)
+VectorGraphModel::VectorGraphModel(unsigned int maxLengthIn, Model* parentIn, bool defaultConstructedIn) :
+	Model(parentIn, tr("VectorGraphModel"), defaultConstructedIn)
 {
 	m_maxLength = maxLengthIn;
 	m_dataArrays = {};
 }
 
-PointGraphModel::~PointGraphModel()
+VectorGraphModel::~VectorGraphModel()
 {
 	m_dataArrays.clear();
 }
 
-unsigned int PointGraphModel::addArray(std::vector<std::pair<float, float>>* arrayIn, bool isCurvedIn)
+unsigned int VectorGraphModel::addArray(std::vector<std::pair<float, float>>* arrayIn, bool isCurvedIn)
 {
 	unsigned int location = addArray();
 	m_dataArrays[location].setDataArray(arrayIn, isCurvedIn);
 	return location;
 }
 
-unsigned int PointGraphModel::addArray(std::vector<float>* arrayIn, bool isCurvedIn)
+unsigned int VectorGraphModel::addArray(std::vector<float>* arrayIn, bool isCurvedIn)
 {
 	unsigned int location = addArray();
 	m_dataArrays[location].setDataArray(arrayIn, isCurvedIn);
 	return location;
 }
 
-unsigned int PointGraphModel::addArray()
+unsigned int VectorGraphModel::addArray()
 {
-	PointGraphDataArray tempArray(
+	VectorGraphDataArray tempArray(
 		false, false, false, false, false, false, false, false, true, this);
 	m_dataArrays.push_back(tempArray);
 	return m_dataArrays.size() - 1;
 }
 
-void PointGraphModel::delArray(unsigned int locationIn)
+void VectorGraphModel::delArray(unsigned int locationIn)
 {
 	for (unsigned int i = locationIn; i < m_dataArrays.size() - 1; i++)
 	{
@@ -1182,24 +1182,24 @@ void PointGraphModel::delArray(unsigned int locationIn)
 	m_dataArrays.pop_back();
 }
 
-void PointGraphModel::dataArrayChanged()
+void VectorGraphModel::dataArrayChanged()
 {
 	emit dataChanged();
 }
 
-void PointGraphModel::dataArrayStyleChanged()
+void VectorGraphModel::dataArrayStyleChanged()
 {
 	emit styleChanged();
 }
-unsigned int PointGraphModel::getDataArrayLocation(PointGraphDataArray* dataArrayIn)
+unsigned int VectorGraphModel::getDataArrayLocation(VectorGraphDataArray* dataArrayIn)
 {
 	return reinterpret_cast<std::uintptr_t>(&dataArrayIn) -
-		reinterpret_cast<std::uintptr_t>(&m_dataArrays) / sizeof(PointGraphDataArray);
+		reinterpret_cast<std::uintptr_t>(&m_dataArrays) / sizeof(VectorGraphDataArray);
 }
 
-// PointGraphDataArray ------
+// VectorGraphDataArray ------
 
-PointGraphDataArray::PointGraphDataArray()
+VectorGraphDataArray::VectorGraphDataArray()
 {
 	m_isFixedSize = false;
 	m_isFixedValue = false;
@@ -1226,10 +1226,10 @@ PointGraphDataArray::PointGraphDataArray()
 	m_needsUpdating = {};
 }
 
-PointGraphDataArray::PointGraphDataArray(
+VectorGraphDataArray::VectorGraphDataArray(
 	bool isFixedSizeIn, bool isFixedValueIn, bool isFixedPosIn, bool nonNegativeIn,
 	bool isFixedEndPointsIn, bool isSelectableIn, bool isEditableAttribIn, bool isAutomatableEffectableIn,
-	bool isSaveableIn, PointGraphModel* parentIn)
+	bool isSaveableIn, VectorGraphModel* parentIn)
 {
 	m_isFixedSize = isFixedSizeIn;
 	m_isFixedValue = isFixedValueIn;
@@ -1257,51 +1257,51 @@ PointGraphDataArray::PointGraphDataArray(
 	updateConnections(parentIn);
 }
 
-PointGraphDataArray::~PointGraphDataArray()
+VectorGraphDataArray::~VectorGraphDataArray()
 {
 	m_dataArray.clear();
 	m_bakedValues.clear();
 	m_needsUpdating.clear();
 }
 
-void PointGraphDataArray::updateConnections(PointGraphModel* parentIn)
+void VectorGraphDataArray::updateConnections(VectorGraphModel* parentIn)
 {
-	// call PointGraphModel signals without qt
+	// call VectorGraphModel signals without qt
 	m_parent = parentIn;
 }
 
-void PointGraphDataArray::setIsFixedSize(bool valueIn)
+void VectorGraphDataArray::setIsFixedSize(bool valueIn)
 {
 	m_isFixedSize = valueIn;
 	dataChanged(-1);
 }
-void PointGraphDataArray::setIsFixedValue(bool valueIn)
+void VectorGraphDataArray::setIsFixedValue(bool valueIn)
 {
 	m_isFixedValue = valueIn;
 	dataChanged(-1);
 }
-void PointGraphDataArray::setIsFixedPos(bool valueIn)
+void VectorGraphDataArray::setIsFixedPos(bool valueIn)
 {
 	m_isFixedPos = valueIn;
 	dataChanged(-1);
 }
-void PointGraphDataArray::setIsFixedEndPoints(bool valueIn)
+void VectorGraphDataArray::setIsFixedEndPoints(bool valueIn)
 {
 	m_isFixedEndPoints = valueIn;
 	formatDataArrayEndPoints();
 	dataChanged(-1);
 }
-void PointGraphDataArray::setIsSelectable(bool valueIn)
+void VectorGraphDataArray::setIsSelectable(bool valueIn)
 {
 	m_isSelectable = valueIn;
 	dataChanged(-1);
 }
-void PointGraphDataArray::setIsEditableAttrib(bool valueIn)
+void VectorGraphDataArray::setIsEditableAttrib(bool valueIn)
 {
 	m_isEditableAttrib = valueIn;
 	dataChanged(-1);
 }
-void PointGraphDataArray::setIsAutomatableEffectable(bool valueIn)
+void VectorGraphDataArray::setIsAutomatableEffectable(bool valueIn)
 {
 	m_isAutomatableEffectable = valueIn;
 	if (valueIn == false)
@@ -1314,36 +1314,36 @@ void PointGraphDataArray::setIsAutomatableEffectable(bool valueIn)
 		dataChanged(-1);
 	}
 }
-void PointGraphDataArray::setIsSaveable(bool valueIn)
+void VectorGraphDataArray::setIsSaveable(bool valueIn)
 {
 	m_isSaveable = valueIn;
 }
-void PointGraphDataArray::setNonNegative(bool valueIn)
+void VectorGraphDataArray::setNonNegative(bool valueIn)
 {
 	m_nonNegative = valueIn;
 	dataChanged(-1);
 }
-void PointGraphDataArray::setLineColor(QColor colorIn)
+void VectorGraphDataArray::setLineColor(QColor colorIn)
 {
 	m_lineColor = colorIn;
 	styleChanged();
 }
-void PointGraphDataArray::setActiveColor(QColor colorIn)
+void VectorGraphDataArray::setActiveColor(QColor colorIn)
 {
 	m_activeColor = colorIn;
 	styleChanged();
 }
-void PointGraphDataArray::setFillColor(QColor colorIn)
+void VectorGraphDataArray::setFillColor(QColor colorIn)
 {
 	m_fillColor = colorIn;
 	styleChanged();
 }
-void PointGraphDataArray::setAutomatedColor(QColor colorIn)
+void VectorGraphDataArray::setAutomatedColor(QColor colorIn)
 {
 	m_automatedColor = colorIn;
 	styleChanged();
 }
-bool PointGraphDataArray::setEffectorArrayLocation(unsigned int locationIn)
+bool VectorGraphDataArray::setEffectorArrayLocation(unsigned int locationIn)
 {
 	bool found = true;
 	if (locationIn >= 0)
@@ -1382,66 +1382,66 @@ bool PointGraphDataArray::setEffectorArrayLocation(unsigned int locationIn)
 	return !found;
 }
 
-bool PointGraphDataArray::getIsFixedSize()
+bool VectorGraphDataArray::getIsFixedSize()
 {
 	return m_isFixedSize;
 }
-bool PointGraphDataArray::getIsFixedValue()
+bool VectorGraphDataArray::getIsFixedValue()
 {
 	return m_isFixedValue;
 }
-bool PointGraphDataArray::getIsFixedPos()
+bool VectorGraphDataArray::getIsFixedPos()
 {
 	return m_isFixedPos;
 }
-bool PointGraphDataArray::getIsFixedEndPoints()
+bool VectorGraphDataArray::getIsFixedEndPoints()
 {
 	return m_isFixedEndPoints;
 }
-bool PointGraphDataArray::getIsSelectable()
+bool VectorGraphDataArray::getIsSelectable()
 {
 	return m_isSelectable;
 }
-bool PointGraphDataArray::getIsEditableAttrib()
+bool VectorGraphDataArray::getIsEditableAttrib()
 {
 	return m_isEditableAttrib;
 }
-bool PointGraphDataArray::getIsAutomatableEffectable()
+bool VectorGraphDataArray::getIsAutomatableEffectable()
 {
 	return m_isAutomatableEffectable;
 }
-bool PointGraphDataArray::getIsSaveable()
+bool VectorGraphDataArray::getIsSaveable()
 {
 	return m_isSaveable;
 }
-bool PointGraphDataArray::getNonNegative()
+bool VectorGraphDataArray::getNonNegative()
 {
 	return m_nonNegative;
 }
-QColor* PointGraphDataArray::getLineColor()
+QColor* VectorGraphDataArray::getLineColor()
 {
 	return &m_lineColor;
 }
-QColor* PointGraphDataArray::getActiveColor()
+QColor* VectorGraphDataArray::getActiveColor()
 {
 	return &m_activeColor;
 }
-QColor* PointGraphDataArray::getFillColor()
+QColor* VectorGraphDataArray::getFillColor()
 {
 	return &m_fillColor;
 }
-QColor* PointGraphDataArray::getAutomatedColor()
+QColor* VectorGraphDataArray::getAutomatedColor()
 {
 	return &m_automatedColor;
 }
-int PointGraphDataArray::getEffectorArrayLocation()
+int VectorGraphDataArray::getEffectorArrayLocation()
 {
 	return m_effectorLocation;
 }
 
 // array:
 
-int PointGraphDataArray::add(float xIn)
+int VectorGraphDataArray::add(float xIn)
 {
 	int location = -1;
 	if (m_dataArray.size() < m_parent->getMaxLength())
@@ -1469,7 +1469,7 @@ int PointGraphDataArray::add(float xIn)
 						targetLocation++;
 					}
 				}
-				m_dataArray.push_back(PointGraphPoint(xIn, 0.0f));
+				m_dataArray.push_back(VectorGraphPoint(xIn, 0.0f));
 	qDebug("add 4. success, target: %d", targetLocation);
 				swap(m_dataArray.size() - 1, targetLocation, true);
 				dataChangedVal = true;
@@ -1477,7 +1477,7 @@ int PointGraphDataArray::add(float xIn)
 			else if (m_dataArray.size() <= 0)
 			{
 	qDebug("add 5. success");
-				m_dataArray.push_back(PointGraphPoint(xIn, 0.0f));
+				m_dataArray.push_back(VectorGraphPoint(xIn, 0.0f));
 				targetLocation = 0;
 				dataChangedVal = true;
 			}
@@ -1497,7 +1497,7 @@ int PointGraphDataArray::add(float xIn)
 	return location;
 }
 
-void PointGraphDataArray::del(unsigned int locationIn)
+void VectorGraphDataArray::del(unsigned int locationIn)
 {
 	if (m_isFixedSize == false && locationIn < m_dataArray.size())
 	{
@@ -1514,7 +1514,7 @@ void PointGraphDataArray::del(unsigned int locationIn)
 }
 
 // TODO input scaleing values
-void PointGraphDataArray::formatArray(bool clampIn, bool sortIn)
+void VectorGraphDataArray::formatArray(bool clampIn, bool sortIn)
 {
 	// clamp
 	// TODO implement
@@ -1556,7 +1556,7 @@ void PointGraphDataArray::formatArray(bool clampIn, bool sortIn)
 	if (sortIn == true)
 	{
 		std::sort(m_dataArray.begin(), m_dataArray.end(),
-			[](PointGraphPoint a, PointGraphPoint b)
+			[](VectorGraphPoint a, VectorGraphPoint b)
 			{
 				return a.m_x > b.m_x;
 			});
@@ -1583,7 +1583,7 @@ void PointGraphDataArray::formatArray(bool clampIn, bool sortIn)
 	dataChanged(-1);
 }
 
-int PointGraphDataArray::getLocation(float xIn)
+int VectorGraphDataArray::getLocation(float xIn)
 {
 	bool found = false;
 	bool isBefore = false;
@@ -1595,7 +1595,7 @@ int PointGraphDataArray::getLocation(float xIn)
 	return location;
 }
 
-int PointGraphDataArray::getNearestLocation(float xIn, bool* foundOut, bool* isBeforeOut)
+int VectorGraphDataArray::getNearestLocation(float xIn, bool* foundOut, bool* isBeforeOut)
 {
 	if (m_dataArray.size() > 0)
 	{
@@ -1655,7 +1655,7 @@ int PointGraphDataArray::getNearestLocation(float xIn, bool* foundOut, bool* isB
 	return -1;
 }
 
-std::vector<float> PointGraphDataArray::getValues(unsigned int countIn)
+std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn)
 {
 	bool isChanged = false;
 	std::shared_ptr<std::vector<unsigned int>> updatingValues = std::make_shared<std::vector<unsigned int>>();
@@ -1666,7 +1666,7 @@ std::vector<float> PointGraphDataArray::getValues(unsigned int countIn)
 	qDebug("getValuesA3 finished");
 	return output;
 }
-std::vector<float> PointGraphDataArray::getValues(unsigned int countIn, bool* isChangedOut, std::shared_ptr<std::vector<unsigned int>> updatingValuesOut)
+std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn, bool* isChangedOut, std::shared_ptr<std::vector<unsigned int>> updatingValuesOut)
 {
 	bool effectorIsChanged = false;
 	std::shared_ptr<std::vector<unsigned int>> effectorUpdatingValues = std::make_shared<std::vector<unsigned int>>();
@@ -1743,7 +1743,7 @@ std::vector<float> PointGraphDataArray::getValues(unsigned int countIn, bool* is
 
 		// m_dataArray[i] location in effecor m_dataArray, next location in effecor m_dataArray,
 		std::vector<std::pair<unsigned int, unsigned int>> effectorData;
-		PointGraphDataArray* effector = nullptr;
+		VectorGraphDataArray* effector = nullptr;
 		if (m_effectorLocation >= 0)
 		{
 			effector = m_parent->getDataArray(m_effectorLocation);
@@ -2021,7 +2021,7 @@ float PointGraphDataArray::getValueAtPosition(float xIn)
 	//qDebug("getVALUE, curLocation: %d", curLocation);
 	//qDebug("getVALUE, locationAfer: %d", nextLocation);
 		// temp effecor data
-		PointGraphDataArray* effector = nullptr;
+		VectorGraphDataArray* effector = nullptr;
 		bool tempEFound = false;
 		bool tempEIsBefore = false;
 		int tempELocation = -1;
@@ -2132,25 +2132,25 @@ float PointGraphDataArray::getValueAtPosition(float xIn)
 }
 */
 
-void PointGraphDataArray::setDataArray(std::vector<std::pair<float, float>>* dataArrayIn, bool isCurvedIn)
+void VectorGraphDataArray::setDataArray(std::vector<std::pair<float, float>>* dataArrayIn, bool isCurvedIn)
 {
 	// TODO implement formatArray option
 	m_dataArray.clear();
 	for (unsigned int i = 0; i < dataArrayIn->size(); i++)
 	{
-		m_dataArray.push_back(PointGraphPoint(dataArrayIn->operator[](i).first, dataArrayIn->operator[](i).second));
+		m_dataArray.push_back(VectorGraphPoint(dataArrayIn->operator[](i).first, dataArrayIn->operator[](i).second));
 		if (isCurvedIn == true)
 		{
 			// TODO
 		}
 	}
 }
-void PointGraphDataArray::setDataArray(std::vector<float>* dataArrayIn, bool isCurvedIn)
+void VectorGraphDataArray::setDataArray(std::vector<float>* dataArrayIn, bool isCurvedIn)
 {
 	m_dataArray.clear();
 	for (unsigned int i = 0; i < dataArrayIn->size(); i++)
 	{
-		m_dataArray.push_back(PointGraphPoint((i / static_cast<float>(dataArrayIn->size())), dataArrayIn->operator[](i)));
+		m_dataArray.push_back(VectorGraphPoint((i / static_cast<float>(dataArrayIn->size())), dataArrayIn->operator[](i)));
 		if (isCurvedIn == true)
 		{
 			// TODO
@@ -2158,7 +2158,7 @@ void PointGraphDataArray::setDataArray(std::vector<float>* dataArrayIn, bool isC
 	}
 }
 
-unsigned int PointGraphDataArray::setX(unsigned int locationIn, float xIn)
+unsigned int VectorGraphDataArray::setX(unsigned int locationIn, float xIn)
 {
 	int location = locationIn;
 	if (m_isFixedPos == false && xIn <= 1.0f)
@@ -2213,7 +2213,7 @@ unsigned int PointGraphDataArray::setX(unsigned int locationIn, float xIn)
 	return location;
 }
 
-void PointGraphDataArray::setY(unsigned int locationIn, float yIn)
+void VectorGraphDataArray::setY(unsigned int locationIn, float yIn)
 {
 	if (m_isFixedValue == false)
 	{
@@ -2226,28 +2226,28 @@ void PointGraphDataArray::setY(unsigned int locationIn, float yIn)
 	}
 }
 
-void PointGraphDataArray::setC(unsigned int locationIn, float cIn)
+void VectorGraphDataArray::setC(unsigned int locationIn, float cIn)
 {
 	m_dataArray[locationIn].m_c = cIn;
 	dataChanged(locationIn);
 }
-void PointGraphDataArray::setValA(unsigned int locationIn, float valueIn)
+void VectorGraphDataArray::setValA(unsigned int locationIn, float valueIn)
 {
 	m_dataArray[locationIn].m_valA = valueIn;
 	dataChanged(locationIn);
 }
-void PointGraphDataArray::setValB(unsigned int locationIn, float valueIn)
+void VectorGraphDataArray::setValB(unsigned int locationIn, float valueIn)
 {
 	m_dataArray[locationIn].m_valB = valueIn;
 	dataChanged(locationIn);
 }
-void PointGraphDataArray::setType(unsigned int locationIn, unsigned int typeIn)
+void VectorGraphDataArray::setType(unsigned int locationIn, unsigned int typeIn)
 {
 	// set the type without changing the automated attribute location
 	m_dataArray[locationIn].m_type = typeIn;
 	dataChanged(locationIn);
 }
-void PointGraphDataArray::setAutomatedAttrib(unsigned int locationIn, unsigned int attribLocationIn)
+void VectorGraphDataArray::setAutomatedAttrib(unsigned int locationIn, unsigned int attribLocationIn)
 {
 	if (m_isAutomatableEffectable == true)
 	{
@@ -2258,7 +2258,7 @@ void PointGraphDataArray::setAutomatedAttrib(unsigned int locationIn, unsigned i
 		dataChanged(locationIn);
 	}
 }
-void PointGraphDataArray::setEffectedAttrib(unsigned int locationIn, unsigned int attribLocationIn)
+void VectorGraphDataArray::setEffectedAttrib(unsigned int locationIn, unsigned int attribLocationIn)
 {
 	if (m_isAutomatableEffectable == true)
 	{
@@ -2269,19 +2269,19 @@ void PointGraphDataArray::setEffectedAttrib(unsigned int locationIn, unsigned in
 		dataChanged(locationIn);
 	}
 }
-unsigned int PointGraphDataArray::getAutomatedAttribLocation(unsigned int locationIn)
+unsigned int VectorGraphDataArray::getAutomatedAttribLocation(unsigned int locationIn)
 {
 	return m_dataArray[locationIn].m_automatedEffectedAttribLocations / 4;
 }
-unsigned int PointGraphDataArray::getEffectedAttribLocation(unsigned int locationIn)
+unsigned int VectorGraphDataArray::getEffectedAttribLocation(unsigned int locationIn)
 {
 	return m_dataArray[locationIn].m_automatedEffectedAttribLocations % 4;
 }
-bool PointGraphDataArray::getEffectOnlyPoints(unsigned int locationIn)
+bool VectorGraphDataArray::getEffectOnlyPoints(unsigned int locationIn)
 {
 	return (m_dataArray[locationIn].m_effectOnlyPoints == true || getEffectedAttribLocation(locationIn) > 0);
 }
-void PointGraphDataArray::setEffectOnlyPoints(unsigned int locationIn, bool boolIn)
+void VectorGraphDataArray::setEffectOnlyPoints(unsigned int locationIn, bool boolIn)
 {
 	if (m_isAutomatableEffectable == true)
 	{
@@ -2294,7 +2294,7 @@ void PointGraphDataArray::setEffectOnlyPoints(unsigned int locationIn, bool bool
 		}
 	}
 }
-bool PointGraphDataArray::getEffect(unsigned int locationIn, unsigned int effectNumberIn)
+bool VectorGraphDataArray::getEffect(unsigned int locationIn, unsigned int effectNumberIn)
 {
 	switch (effectNumberIn)
 	{
@@ -2322,7 +2322,7 @@ bool PointGraphDataArray::getEffect(unsigned int locationIn, unsigned int effect
 	}
 	return false;
 }
-void PointGraphDataArray::setEffect(unsigned int locationIn, unsigned int effectNumberIn, bool boolIn)
+void VectorGraphDataArray::setEffect(unsigned int locationIn, unsigned int effectNumberIn, bool boolIn)
 {
 	if (m_isAutomatableEffectable == true)
 	{
@@ -2353,7 +2353,7 @@ void PointGraphDataArray::setEffect(unsigned int locationIn, unsigned int effect
 	}
 	dataChanged(locationIn);
 }
-bool PointGraphDataArray::getIsAutomationValueChanged(unsigned int locationIn)
+bool VectorGraphDataArray::getIsAutomationValueChanged(unsigned int locationIn)
 {
 	if (m_dataArray[locationIn].m_bufferedAutomationValue != m_dataArray[locationIn].m_automationModel->value())
 	{
@@ -2362,7 +2362,7 @@ bool PointGraphDataArray::getIsAutomationValueChanged(unsigned int locationIn)
 	}
 	return false;
 }
-void PointGraphDataArray::setAutomated(unsigned int locationIn, bool isAutomatedIn)
+void VectorGraphDataArray::setAutomated(unsigned int locationIn, bool isAutomatedIn)
 {
 	if (m_isAutomatableEffectable == true)
 	{
@@ -2384,7 +2384,7 @@ void PointGraphDataArray::setAutomated(unsigned int locationIn, bool isAutomated
 	}
 }
 
-void PointGraphDataArray::swap(unsigned int locationAIn, unsigned int locationBIn, bool slide)
+void VectorGraphDataArray::swap(unsigned int locationAIn, unsigned int locationBIn, bool slide)
 {
 	if (locationAIn != locationBIn)
 	{
@@ -2400,7 +2400,7 @@ void PointGraphDataArray::swap(unsigned int locationAIn, unsigned int locationBI
 			
 			if (locationAIn < locationBIn)
 			{
-				PointGraphPoint swap = m_dataArray[locationAIn];
+				VectorGraphPoint swap = m_dataArray[locationAIn];
 				for (unsigned int i = locationAIn; i < locationBIn; i++)
 				{
 					m_dataArray[i] = m_dataArray[i + 1];
@@ -2409,7 +2409,7 @@ void PointGraphDataArray::swap(unsigned int locationAIn, unsigned int locationBI
 			}
 			else
 			{
-				PointGraphPoint swap = m_dataArray[locationAIn];
+				VectorGraphPoint swap = m_dataArray[locationAIn];
 				for (unsigned int i = locationAIn; i > locationBIn; i--)
 				{
 					m_dataArray[i] = m_dataArray[i - 1];
@@ -2425,7 +2425,7 @@ void PointGraphDataArray::swap(unsigned int locationAIn, unsigned int locationBI
 		}
 		else
 		{
-			PointGraphPoint swap = m_dataArray[locationAIn];
+			VectorGraphPoint swap = m_dataArray[locationAIn];
 			m_dataArray[locationAIn] = m_dataArray[locationBIn];
 			m_dataArray[locationBIn] = swap;
 		}
@@ -2434,7 +2434,7 @@ void PointGraphDataArray::swap(unsigned int locationAIn, unsigned int locationBI
 		dataChanged(locationBIn);
 	}
 }
-float PointGraphDataArray::processCurve(float valueBeforeIn, float valueAfterIn, float curveIn, float xIn)
+float VectorGraphDataArray::processCurve(float valueBeforeIn, float valueAfterIn, float curveIn, float xIn)
 {
 	float absCurveIn = std::abs(curveIn);
 	float pow = curveIn < 0.0f ? 1.0f - xIn : xIn;
@@ -2457,8 +2457,8 @@ float PointGraphDataArray::processCurve(float valueBeforeIn, float valueAfterIn,
 	return output;
 }
 
-float PointGraphDataArray::processEffect(float attribValueIn, unsigned int attribLocationIn, float effectValueIn,
-	PointGraphDataArray* effectArrayIn, unsigned int effectLocationIn)
+float VectorGraphDataArray::processEffect(float attribValueIn, unsigned int attribLocationIn, float effectValueIn,
+	VectorGraphDataArray* effectArrayIn, unsigned int effectLocationIn)
 {
 	float output = attribValueIn;
 	unsigned int attribLocation = effectArrayIn->getEffectedAttribLocation(effectLocationIn);
@@ -2508,7 +2508,7 @@ float PointGraphDataArray::processEffect(float attribValueIn, unsigned int attri
 	}
 	return output;
 }
-float PointGraphDataArray::processAutomation(float attribValueIn, unsigned int locationIn, unsigned int attribLocationIn)
+float VectorGraphDataArray::processAutomation(float attribValueIn, unsigned int locationIn, unsigned int attribLocationIn)
 {
 	float output = 0.0f;
 	// if automated
@@ -2530,20 +2530,20 @@ float PointGraphDataArray::processAutomation(float attribValueIn, unsigned int l
 
 // line type effects:
 /*
-float PointGraphDataArray::processLineTypeSine(float xIn, float valAIn, float valBIn, float fadeInStartIn)
+float VectorGraphDataArray::processLineTypeSine(float xIn, float valAIn, float valBIn, float fadeInStartIn)
 {
 	return processLineTypeSineB(xIn, valAIn, valBIn, 0.0f, fadeInStartIn);
 }
 */
 // valA: amp, valB: freq, fadeInStartIn: from what xIn value should the line type fade out
-std::vector<float> PointGraphDataArray::processLineTypeArraySine(std::vector<float>* xIn, unsigned int startIn, unsigned int endIn,
+std::vector<float> VectorGraphDataArray::processLineTypeArraySine(std::vector<float>* xIn, unsigned int startIn, unsigned int endIn,
 	float valAIn, float valBIn, float fadeInStartIn)
 {
-	return PointGraphDataArray::processLineTypeArraySineB(xIn, startIn, endIn,
+	return VectorGraphDataArray::processLineTypeArraySineB(xIn, startIn, endIn,
 		valAIn, valBIn, 0.0f, fadeInStartIn);
 }
 /*
-float PointGraphDataArray::processLineTypeSineB(float xIn, float valAIn, float valBIn, float curveIn, float fadeInStartIn)
+float VectorGraphDataArray::processLineTypeSineB(float xIn, float valAIn, float valBIn, float curveIn, float fadeInStartIn)
 {
 	// sine
 	// 628.318530718f = 100.0f * 2.0f * pi
@@ -2563,7 +2563,7 @@ float PointGraphDataArray::processLineTypeSineB(float xIn, float valAIn, float v
 }
 */
 // valA: amp, valB: freq, curveIn: phase
-std::vector<float> PointGraphDataArray::processLineTypeArraySineB(std::vector<float>* xIn, unsigned int startIn, unsigned int endIn,
+std::vector<float> VectorGraphDataArray::processLineTypeArraySineB(std::vector<float>* xIn, unsigned int startIn, unsigned int endIn,
 	float valAIn, float valBIn, float curveIn, float fadeInStartIn)
 {
 	int count = static_cast<int>(endIn) - static_cast<int>(startIn);
@@ -2620,7 +2620,7 @@ std::vector<float> PointGraphDataArray::processLineTypeArraySineB(std::vector<fl
 	return output;
 }
 /*
-float PointGraphDataArray::processLineTypePeak(float xIn, float valAIn, float valBIn, float curveIn, float fadeInStartIn)
+float VectorGraphDataArray::processLineTypePeak(float xIn, float valAIn, float valBIn, float curveIn, float fadeInStartIn)
 {
 	// peak
 	float output = std::pow((curveIn + 1.0f) * 0.2f + 0.01f, std::abs(xIn - (valBIn + 1.0f) * 0.5f) * 10.0f) * valAIn;
@@ -2640,7 +2640,7 @@ float PointGraphDataArray::processLineTypePeak(float xIn, float valAIn, float va
 */
 
 // valA: amp, valB: x coord, curve: width
-std::vector<float> PointGraphDataArray::processLineTypeArrayPeak(std::vector<float>* xIn, unsigned int startIn, unsigned int endIn,
+std::vector<float> VectorGraphDataArray::processLineTypeArrayPeak(std::vector<float>* xIn, unsigned int startIn, unsigned int endIn,
 	float valAIn, float valBIn, float curveIn, float fadeInStartIn)
 {
 	int count = static_cast<int>(endIn) - static_cast<int>(startIn);
@@ -2677,7 +2677,7 @@ std::vector<float> PointGraphDataArray::processLineTypeArrayPeak(std::vector<flo
 	return output;
 }
 /*
-float PointGraphDataArray::processLineTypeSteps(float xIn, float yIn, float valAIn, float valBIn, float fadeInStartIn)
+float VectorGraphDataArray::processLineTypeSteps(float xIn, float yIn, float valAIn, float valBIn, float fadeInStartIn)
 {
 	// TODO opmtimalize
 	// step
@@ -2701,7 +2701,7 @@ float PointGraphDataArray::processLineTypeSteps(float xIn, float yIn, float valA
 }
 */
 // y: calculate steps from, valA: y count, valB: curve
-std::vector<float> PointGraphDataArray::processLineTypeArraySteps(std::vector<float>* xIn, unsigned int startIn, unsigned int endIn,
+std::vector<float> VectorGraphDataArray::processLineTypeArraySteps(std::vector<float>* xIn, unsigned int startIn, unsigned int endIn,
 	std::vector<float>* yIn, float valAIn, float valBIn, float fadeInStartIn)
 {
 	int count = static_cast<int>(endIn) - static_cast<int>(startIn);
@@ -2744,7 +2744,7 @@ std::vector<float> PointGraphDataArray::processLineTypeArraySteps(std::vector<fl
 	return output;
 }
 /*
-float PointGraphDataArray::processLineTypeRandom(float xIn, float valAIn, float valBIn, float curveIn, float fadeInStartIn)
+float VectorGraphDataArray::processLineTypeRandom(float xIn, float valAIn, float valBIn, float curveIn, float fadeInStartIn)
 {
 	// randomize
 	float blend = 50.0f + curveIn * 50.0f;
@@ -2770,7 +2770,7 @@ float PointGraphDataArray::processLineTypeRandom(float xIn, float valAIn, float 
 }
 */
 // valA: amp, valB: random number count, curveIn: seed
-std::vector<float> PointGraphDataArray::processLineTypeArrayRandom(std::vector<float>* xIn, unsigned int startIn, unsigned int endIn,
+std::vector<float> VectorGraphDataArray::processLineTypeArrayRandom(std::vector<float>* xIn, unsigned int startIn, unsigned int endIn,
 		float valAIn, float valBIn, float curveIn, float fadeInStartIn)
 {
 	int count = static_cast<int>(endIn) - static_cast<int>(startIn);
@@ -2811,9 +2811,9 @@ std::vector<float> PointGraphDataArray::processLineTypeArrayRandom(std::vector<f
 	return output;
 }
 
-void PointGraphDataArray::getUpdatingFromEffector(std::shared_ptr<std::vector<unsigned int>> updatingValuesIn)
+void VectorGraphDataArray::getUpdatingFromEffector(std::shared_ptr<std::vector<unsigned int>> updatingValuesIn)
 {
-	PointGraphDataArray* effector = m_parent->getDataArray(m_effectorLocation);
+	VectorGraphDataArray* effector = m_parent->getDataArray(m_effectorLocation);
 	for (unsigned int i = 0; i < updatingValuesIn->size(); i++)
 	{
 		if (updatingValuesIn->operator[](i) > 0)
@@ -2907,7 +2907,7 @@ void PointGraphDataArray::getUpdatingFromEffector(std::shared_ptr<std::vector<un
 		}
 	}
 }
-void PointGraphDataArray::getUpdatingFromAuromation()
+void VectorGraphDataArray::getUpdatingFromAuromation()
 {
 	// adding points with changed automation values
 	for (unsigned int i = 0; i < m_dataArray.size(); i++)
@@ -2918,7 +2918,7 @@ void PointGraphDataArray::getUpdatingFromAuromation()
 		}
 	}
 }
-void PointGraphDataArray::getUpdatingOriginals()
+void VectorGraphDataArray::getUpdatingOriginals()
 {
 	// selecting only original values
 	// TODO this might be faster if we sort before
@@ -2956,7 +2956,7 @@ void PointGraphDataArray::getUpdatingOriginals()
 	originalValues.clear();
 }
 
-void PointGraphDataArray::PointGraphDataArray::formatDataArrayEndPoints()
+void VectorGraphDataArray::formatDataArrayEndPoints()
 {
 	if (m_isFixedEndPoints == true && m_dataArray.size() > 0)
 	{
@@ -2969,7 +2969,7 @@ void PointGraphDataArray::PointGraphDataArray::formatDataArrayEndPoints()
 	}
 }
 
-void PointGraphDataArray::dataChanged(int locationIn)
+void VectorGraphDataArray::dataChanged(int locationIn)
 {
 	if (m_isDataChanged == false && locationIn >= 0)
 	{
@@ -2985,7 +2985,7 @@ void PointGraphDataArray::dataChanged(int locationIn)
 	}
 	m_parent->dataArrayChanged();
 }
-void PointGraphDataArray::styleChanged()
+void VectorGraphDataArray::styleChanged()
 {
 	m_parent->dataArrayStyleChanged();
 }

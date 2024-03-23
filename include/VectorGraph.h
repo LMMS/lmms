@@ -1,6 +1,6 @@
 
-#ifndef LMMS_GUI_POINTGRAPH_H
-#define LMMS_GUI_POINTGRAPH_H
+#ifndef LMMS_GUI_VECTORGRAPH_H
+#define LMMS_GUI_VECTORGRAPH_H
 
 #include <QPainterPath>
 #include <QWidget>
@@ -15,14 +15,14 @@
 namespace lmms
 {
 
-class PointGraphModel;
-class PointGraphDataArray;
+class VectorGraphModel;
+class VectorGraphDataArray;
 class FloatModel;
 
 namespace gui
 {
 
-class LMMS_EXPORT PointGraphView : public QWidget, public ModelView
+class LMMS_EXPORT VectorGraphView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
@@ -72,19 +72,19 @@ public:
 	// TODO: handle effector arrays when deleting VectorGraphDataArray
 	// TODO: update formatArray
 
-	PointGraphView(QWidget * parentIn,
+	VectorGraphView(QWidget * parentIn,
 		int widthIn, int heightIn,
 		unsigned int pointSizeIn, unsigned int maxLengthIn);
-	~PointGraphView();
+	~VectorGraphView();
 
 	void setLineColor(QColor colorIn, unsigned int dataArrayLocationIn);
 	void setActiveColor(QColor colorIn, unsigned int dataArrayLocationIn);
 	void setFillColor(QColor colorIn, unsigned int dataArrayLocationIn);
 	void setAutomatedColor(QColor colorIn, unsigned int dataArrayLocationIn);
 
-	inline PointGraphModel* model()
+	inline VectorGraphModel* model()
 	{
-		return castModel<PointGraphModel>();
+		return castModel<VectorGraphModel>();
 	}
 
 	void setIsSimplified(bool isSimplifiedIn);
@@ -143,7 +143,7 @@ private:
 	// returns found location, when a data
 	// was found in the given distance
 	// else it returns -1
-	int searchForData(int mouseXIn, int mouseYIn, float maxDistanceIn, PointGraphDataArray* arrayIn, bool curvedIn);
+	int searchForData(int mouseXIn, int mouseYIn, float maxDistanceIn, VectorGraphDataArray* arrayIn, bool curvedIn);
 
 	bool m_mouseDown;
 	bool m_mouseDrag;
@@ -180,18 +180,18 @@ private:
 
 } // namespace gui
 
-class LMMS_EXPORT PointGraphModel : public Model//, public JournallingObject
+class LMMS_EXPORT VectorGraphModel : public Model//, public JournallingObject
 {
 Q_OBJECT
 public:
-	PointGraphModel(unsigned int maxLengthIn, Model* parentIn, bool defaultConstructedIn);
-	~PointGraphModel();
+	VectorGraphModel(unsigned int maxLengthIn, Model* parentIn, bool defaultConstructedIn);
+	~VectorGraphModel();
 
 	inline size_t getDataArraySize()
 	{
 		return m_dataArrays.size();
 	}
-	inline PointGraphDataArray* getDataArray(unsigned int locationIn)
+	inline VectorGraphDataArray* getDataArray(unsigned int locationIn)
 	{
 		return &m_dataArrays[locationIn];
 	}
@@ -219,7 +219,7 @@ public:
 	{
 		m_dataArrays.clear();
 	}
-	unsigned int getDataArrayLocation(PointGraphDataArray* dataArrayIn);
+	unsigned int getDataArrayLocation(VectorGraphDataArray* dataArrayIn);
 
 	// save, load
 	//void saveSettings(QDomDocument& doc, QDomElement& element, const QString& name); //TODO
@@ -235,25 +235,25 @@ public slots:
 	void dataArrayChanged();
 	void dataArrayStyleChanged();
 private:
-	std::vector<PointGraphDataArray> m_dataArrays;
+	std::vector<VectorGraphDataArray> m_dataArrays;
 	unsigned int m_maxLength;
 
-	friend class gui::PointGraphView;
+	//friend class gui::VectorGraphView;
 };
 
-class LMMS_EXPORT PointGraphDataArray
+class LMMS_EXPORT VectorGraphDataArray
 {
 
 public:
 	// avoid using this or run updateConnections() after initialization
-	PointGraphDataArray();
-	PointGraphDataArray(
+	VectorGraphDataArray();
+	VectorGraphDataArray(
 	bool isFixedSizeIn, bool isFixedValueIn, bool isFixedPosIn, bool nonNegativeIn,
 	bool isFixedEndPointsIn, bool isSelectableIn, bool isEditableAttribIn, bool isAutomatableEffectableIn,
-	bool isSaveableIn, PointGraphModel* parentIn);
-	~PointGraphDataArray();
+	bool isSaveableIn, VectorGraphModel* parentIn);
+	~VectorGraphDataArray();
 
-	void updateConnections(PointGraphModel* parentIn);
+	void updateConnections(VectorGraphModel* parentIn);
 
 	void setIsFixedSize(bool valueIn);
 	void setIsFixedValue(bool valueIn);
@@ -404,10 +404,10 @@ public:
 	// color
 	void styleChanged();
 private:
-	class PointGraphPoint
+	class VectorGraphPoint
 	{
 	public:
-		inline PointGraphPoint()
+		inline VectorGraphPoint()
 		{
 			m_x = 0.0f;
 			m_y = 0.0f;
@@ -429,7 +429,7 @@ private:
 			m_bufferedAutomationValue = 0.0f;
 			m_automationModel = nullptr;
 		}
-		inline PointGraphPoint(float xIn, float yIn)
+		inline VectorGraphPoint(float xIn, float yIn)
 		{
 			m_x = xIn;
 			m_y = yIn;
@@ -451,8 +451,9 @@ private:
 			m_bufferedAutomationValue = 0.0f;
 			m_automationModel = nullptr;
 		}
-		inline ~PointGraphPoint()
+		inline ~VectorGraphPoint()
 		{
+			// TODO make safer, delete in automationTrack
 			if (m_automationModel != nullptr)
 			{
 				delete m_automationModel;
@@ -507,8 +508,8 @@ private:
 	float processCurve(float valueBeforeIn, float valueAfterIn, float curveIn, float xIn);
 	// applys the effect on a given value, does clamp
 	float processEffect(float attribValueIn, unsigned int attribLocationIn, float effectValueIn,
-		PointGraphDataArray* effectArrayIn, unsigned int effectLocationIn);
-	// returns a PointGraphPoint with modified attributes
+		VectorGraphDataArray* effectArrayIn, unsigned int effectLocationIn);
+	// returns a VectorGraphPoint with modified attributes
 	float processAutomation(float attribValueIn, unsigned int locationIn, unsigned int attribLocationIn);
 
 	// line effects / types, m_type is used for this
@@ -556,14 +557,14 @@ private:
 	bool m_isFixedPos;
 	// if true then it makes the last position coordinate 1, 1, the first point coordinate to -1 (ot 0), 0
 	bool m_isFixedEndPoints;
-	// can PointGraphView select this
+	// can VectorGraphView select this
 	bool m_isSelectable;
-	// can PointGraphView edit the point attributes
+	// can VectorGraphView edit the point attributes
 	// every attribute outside of x and y
 	bool m_isEditableAttrib;
 	// can the points be automated or effected
 	bool m_isAutomatableEffectable;
-	// if PointGraphDataArray is allowed to save this
+	// if VectorGraphDataArray is allowed to save this
 	bool m_isSaveable;
 
 	// can values be less than 0
@@ -573,13 +574,13 @@ private:
 	QColor m_fillColor;
 	QColor m_automatedColor;
 
-	PointGraphModel* m_parent;
+	VectorGraphModel* m_parent;
 
-	// which PointGraphDataArray can effect this one, -1 if not effected
+	// which VectorGraphDataArray can effect this one, -1 if not effected
 	int m_effectorLocation;
 
-	// ordered array of PointGraphPoints
-	std::vector<PointGraphPoint> m_dataArray;
+	// ordered array of VectorGraphPoints
+	std::vector<VectorGraphPoint> m_dataArray;
 	
 
 	// baking
@@ -605,4 +606,4 @@ private:
 
 } // namespace lmms
 
-#endif // LMMS_POINTGRAPH_H
+#endif // LMMS_VECTORGRAPH_H
