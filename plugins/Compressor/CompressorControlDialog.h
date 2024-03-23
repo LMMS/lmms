@@ -140,18 +140,18 @@ private:
 
 	float m_dbRange = 36;
 
-	QColor m_inVolAreaColor;
-	QColor m_inVolColor;
-	QColor m_outVolAreaColor;
-	QColor m_outVolColor;
-	QColor m_gainReductionColor;
-	QColor m_kneeColor;
-	QColor m_kneeColor2;
-	QColor m_threshColor;
-	QColor m_textColor;
-	QColor m_graphColor;
-	QColor m_resetColor;
-	QColor m_backgroundColor;
+	QColor m_inVolAreaColor = QColor(209, 216, 228, 17);
+	QColor m_inVolColor = QColor(209, 216, 228, 100);
+	QColor m_outVolAreaColor = QColor(209, 216, 228, 30);
+	QColor m_outVolColor = QColor(209, 216, 228, 240);
+	QColor m_gainReductionColor = QColor(180, 100, 100, 210);
+	QColor m_kneeColor = QColor(39, 171, 95, 255);
+	QColor m_kneeColor2 = QColor(9, 171, 160, 255);
+	QColor m_threshColor = QColor(39, 171, 95, 100);
+	QColor m_textColor = QColor(209, 216, 228, 50);
+	QColor m_graphColor = QColor(209, 216, 228, 50);
+	QColor m_resetColor = QColor(200, 100, 15, 200);
+	QColor m_backgroundColor = QColor(7, 8, 9, 255);
 
 	float m_peakAvg;
 	float m_gainAvg;
