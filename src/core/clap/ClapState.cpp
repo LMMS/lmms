@@ -115,7 +115,7 @@ auto ClapState::load(std::string_view base64, Context context) -> bool
 		std::uint64_t m_readPos = 0;
 	} stream{base64};
 
-	auto clapStream = clap_istream {
+	const auto clapStream = clap_istream {
 		&stream,
 		&IStream::clapRead
 	};
@@ -159,18 +159,21 @@ auto ClapState::save(Context context) -> std::optional<std::string_view>
 			if (!self) { return -1; } // error
 			if (size == 0) { return 0; }
 
-			auto ptr = static_cast<const char*>(buffer);
-			QString base64;
-			base64::encode(ptr, size, base64);
+			const auto ptr = static_cast<const char*>(buffer);
 
-			self->state += base64.toStdString();
+			self->state.reserve(self->state.size() + size);
+			for (std::uint64_t idx = 0; idx < size; ++idx)
+			{
+				self->state.push_back(ptr[idx]);
+			}
+
 			return size;
 		}
 
-		std::string state;
+		std::vector<char> state;
 	} stream;
 
-	auto clapStream = clap_ostream {
+	const auto clapStream = clap_ostream {
 		&stream,
 		&OStream::clapWrite
 	};
@@ -185,7 +188,10 @@ auto ClapState::save(Context context) -> std::optional<std::string_view>
 		return std::nullopt;
 	}
 
-	m_state = stream.state;
+	QString base64;
+	base64::encode(stream.state.data(), stream.state.size(), base64);
+
+	m_state = base64.toStdString();
 	m_dirty = false;
 
 	return encodedState();
@@ -200,8 +206,8 @@ void ClapState::clapMarkDirty(const clap_host* host)
 
 	if (!state.supported())
 	{
-		h->logger().log(CLAP_LOG_PLUGIN_MISBEHAVING, "Plugin called clap_host_state.set_dirty() but the plugin does not "
-			"provide a complete clap_plugin_state interface.");
+		h->logger().log(CLAP_LOG_PLUGIN_MISBEHAVING, "Plugin called clap_host_state.set_dirty()"
+			" but the plugin does not provide a complete clap_plugin_state interface.");
 		return;
 	}
 
