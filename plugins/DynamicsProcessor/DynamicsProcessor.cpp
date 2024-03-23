@@ -160,7 +160,7 @@ bool DynProcEffect::processAudioBuffer( sampleFrame * _buf,
 			m_smoothRms[i] = m_smoothRms[i] * (1-dif) + t * dif;
 			if( t > m_currentPeak[i] )
 			{
-				m_currentPeak[i] = qMin(m_currentPeak[i] * m_attCoeff, m_smoothRms[i]);
+				m_currentPeak[i] = std::min(m_currentPeak[i] * m_attCoeff, m_smoothRms[i]);
 			}
 			else
 			if( t < m_currentPeak[i] )
