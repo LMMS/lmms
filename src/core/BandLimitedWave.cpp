@@ -67,7 +67,6 @@ void BandLimitedWave::generateWaves()
 // don't generate if they already exist
 	if( s_wavesGenerated ) return;
 
-	int i = 0;
 
 	// set wavetable directory
 	s_wavetableDir = "data:wavetables/";
@@ -89,7 +88,7 @@ void BandLimitedWave::generateWaves()
 	}
 	else
 	{
-		for( i = 0; i <= MAXTBL; i++ )
+		for (int i = 0; i <= MAXTBL; i++)
 		{
 			const int len = TLENS[i];
 			//const double om = 1.0 / len;
@@ -131,7 +130,7 @@ void BandLimitedWave::generateWaves()
 	}
 	else
 	{
-		for( i = 0; i <= MAXTBL; i++ )
+		for (int i = 0; i <= MAXTBL; i++)
 		{
 			const int len = TLENS[i];
 			//const double om = 1.0 / len;
@@ -172,7 +171,7 @@ void BandLimitedWave::generateWaves()
 	}
 	else
 	{
-		for( i = 0; i <= MAXTBL; i++ )
+		for (int i = 0; i <= MAXTBL; i++)
 		{
 			const int len = TLENS[i];
 			//const double om = 1.0 / len;
@@ -215,7 +214,7 @@ void BandLimitedWave::generateWaves()
 	}
 	else
 	{
-		for( i = 0; i <= MAXTBL; i++ )
+		for (int i = 0; i <= MAXTBL; i++)
 		{
 			const int len = TLENS[i];
 

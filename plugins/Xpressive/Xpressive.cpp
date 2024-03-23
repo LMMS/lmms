@@ -553,7 +553,6 @@ void XpressiveView::expressionChanged() {
 		ExprFront expr(text.constData(),sample_rate);
 		float t=0;
 		const float f=10,key=5,v=0.5;
-		unsigned int i = 0;
 		expr.add_variable("t", t);
 
 		if (m_output_expr)
@@ -572,6 +571,7 @@ void XpressiveView::expressionChanged() {
 			expr.add_cyclic_vector("W2",e->graphW2().samples(),e->graphW2().length());
 			expr.add_cyclic_vector("W3",e->graphW3().samples(),e->graphW3().length());
 		}
+		unsigned int i = 0;
 		expr.setIntegrate(&i,sample_rate);
 		expr.add_constant("srate",sample_rate);
 

@@ -3058,7 +3058,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				PR_TOP_MARGIN - PR_BOTTOM_MARGIN;
 			partialKeyVisible = 0;
 		}
-		int topKey = qBound(0, m_startKey + m_pianoKeysVisible - 1, NumKeys - 1);
+		int topKey = std::clamp(m_startKey + m_pianoKeysVisible - 1, 0, NumKeys - 1);
 		int topNote = topKey % KeysPerOctave;
 		// if not resizing the note edit area, we can change m_notesEditHeight
 		if (m_action != Action::ResizeNoteEditArea && partialKeyVisible != 0)

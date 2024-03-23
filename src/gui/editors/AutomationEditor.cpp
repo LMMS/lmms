@@ -320,8 +320,6 @@ void AutomationEditor::drawLine( int x0In, float y0, int x1In, float y1 )
 	auto deltay = qAbs<float>(y1 - y0);
 	int x = x0;
 	float y = y0;
-	int xstep = 0;
-	int ystep = 0;
 
 	if( deltax < AutomationClip::quantization() )
 	{
@@ -332,34 +330,14 @@ void AutomationEditor::drawLine( int x0In, float y0, int x1In, float y1 )
 
 	float yscale = deltay / ( deltax );
 
-	if( x0 < x1 )
-	{
-		xstep = AutomationClip::quantization();
-	}
-	else
-	{
-		xstep = -( AutomationClip::quantization() );
-	}
+	int xstep = (x0 < x1 ? 1 : -1) * AutomationClip::quantization();
+	int ystep = y0 < y1 ? 1 : -1;
+	float lineAdjust = (y0 < y1 ? 1 : -1) * yscale;
 
-	float lineAdjust = 0.0f;
-	if( y0 < y1 )
-	{
-		ystep = 1;
-		lineAdjust = yscale;
-	}
-	else
-	{
-		ystep = -1;
-		lineAdjust = -( yscale );
-	}
-
-	int i = 0;
-	while( i < deltax )
+	for (int i = 0; i < deltax; ++i)
 	{
 		y = y0 + ( ystep * yscale * i ) + lineAdjust;
-
 		x += xstep;
-		i += 1;
 		m_clip->removeNode(TimePos(x));
 		m_clip->putValue( TimePos( x ), y );
 	}
