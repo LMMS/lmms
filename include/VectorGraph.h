@@ -60,7 +60,7 @@ public:
 	// TODO: setDataArray keep attributes option, formatArray option which runs formatArray
 	// TODO: PointGraphDataArray shouldSaveAll and shouldSavePointAttributesOnly (for saving only editable graphs) option			Done
 	// TODO: baked automation values in PointGraphPoint			Done
-	// TODO: rename class to VectorGraph
+	// TODO: rename class to VectorGraph			Done
 	// TODO: make std::vector<float> last used values			Done
 	//		TODO: make update logic (isChanged and update only automation / effected lines)			Done
 	// TODO: effector location (same as automation location)			Done
@@ -110,7 +110,7 @@ protected slots:
 private:
 	void modelChanged() override;
 
-	std::pair<float, float> mapMousePos(int xIn, int yIn, bool nonNegativeIn);
+	std::pair<float, float> mapMousePos(int xIn, int yIn);
 	// calculate curve position
 	std::pair<float, float> mapDataCurvePos(float xAIn, float yAIn, float xBIn, float yBIn, float curveIn);
 	std::pair<int, int>mapDataCurvePos(int xAIn, int yAIn, int xBIn, int yBIn, float curveIn);
