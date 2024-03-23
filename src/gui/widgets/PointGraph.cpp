@@ -1,9 +1,10 @@
 
 
 #include <vector>
-#include <cmath>
-#include <algorithm>
+#include <cmath> // sine
+#include <algorithm> // sort
 #include <cstdlib>
+#include <memory> // smartpointers
 #include <QPainter>
 #include <QMouseEvent>
 #include <QInputDialog>
@@ -509,10 +510,13 @@ void PointGraphView::paintEvent(QPaintEvent* pe)
 			if (m_isSimplified == false)
 			{
 				posA = mapDataPos(dataArray->getX(0), dataArray->getY(0), dataArray->getNonNegative());
-				for (unsigned int j = 0; j < width(); j++)
+				std::vector<float> dataArrayValues = dataArray->getValues(width());
+				qDebug("paint dataArrayValues size: %ld", dataArrayValues.size());
+				for (unsigned int j = 0; j < dataArrayValues.size(); j++)
 				{
 					//posB = mapDataPos(*dataArray->getX(j + 1), dataArray->getY(j + 1), dataArray->getNonNegative());
-					posB = mapDataPos(0, dataArray->getValueAtPosition(static_cast<float>(j) / static_cast<float>(width())), dataArray->getNonNegative());
+					//posB = mapDataPos(0, dataArray->getValueAtPosition(static_cast<float>(j) / static_cast<float>(width())), dataArray->getNonNegative());
+					posB = mapDataPos(0, dataArrayValues[j], dataArray->getNonNegative());
 					//posB = dataArray->getValueAtPosition(static_cast<float>(j) / static_cast<float>(width()));
 					posB.first = j;
 		//qDebug("paint positions: x: %d, y: %d", posB.first, posB.second);
@@ -521,6 +525,7 @@ void PointGraphView::paintEvent(QPaintEvent* pe)
 					p.drawLine(posA.first, m_graphHeight - posA.second, posB.first, m_graphHeight - posB.second);
 					posA = posB;
 				}
+				dataArrayValues.clear();
 			}
 			//if (posA.first < width())
 			//{
@@ -1116,7 +1121,7 @@ int PointGraphView::searchForData(int mouseXIn, int mouseYIn, float maxDistanceI
 						}
 						curDistance = getDistance(transformedMouse.first * 2.0f, transformedMouse.second,
 							dataX * 2.0f, dataY);
-			qDebug("search v2 full distance %d: %f  / %f     y: %f, my: %f    y:%f  size:%d", i, curDistance, maxDistance, dataY, transformedMouse.second, arrayIn->getY(i), arrayIn->size());
+			qDebug("search v2 full distance %d: %f  / %f     y: %f, my: %f    y:%f  size:%ld", i, curDistance, maxDistance, dataY, transformedMouse.second, arrayIn->getY(i), arrayIn->size());
 						if (curDistance <= maxDistance)
 						{
 							qDebug("search successful V2");
@@ -1215,8 +1220,10 @@ PointGraphDataArray::PointGraphDataArray()
 	m_effectorLocation = -1;
 
 	m_dataArray = {};
-	m_isDataChanged = true;
+	m_isDataChanged = false;
+	//m_isUpdatedNeedsUpdating = false;
 	m_bakedValues = {};
+	m_needsUpdating = {};
 }
 
 PointGraphDataArray::PointGraphDataArray(
@@ -1242,8 +1249,10 @@ PointGraphDataArray::PointGraphDataArray(
 	m_effectorLocation = -1;
 
 	// m_dataArray = {};
-	m_isDataChanged = true;
+	m_isDataChanged = false;
+	//m_isUpdatedNeedsUpdating = false;
 	// m_bakedValues = {};
+	// m_needsUpdating = {};
 
 	updateConnections(parentIn);
 }
@@ -1251,6 +1260,8 @@ PointGraphDataArray::PointGraphDataArray(
 PointGraphDataArray::~PointGraphDataArray()
 {
 	m_dataArray.clear();
+	m_bakedValues.clear();
+	m_needsUpdating.clear();
 }
 
 void PointGraphDataArray::updateConnections(PointGraphModel* parentIn)
@@ -1262,33 +1273,33 @@ void PointGraphDataArray::updateConnections(PointGraphModel* parentIn)
 void PointGraphDataArray::setIsFixedSize(bool valueIn)
 {
 	m_isFixedSize = valueIn;
-	dataChanged();
+	dataChanged(-1);
 }
 void PointGraphDataArray::setIsFixedValue(bool valueIn)
 {
 	m_isFixedValue = valueIn;
-	dataChanged();
+	dataChanged(-1);
 }
 void PointGraphDataArray::setIsFixedPos(bool valueIn)
 {
 	m_isFixedPos = valueIn;
-	dataChanged();
+	dataChanged(-1);
 }
 void PointGraphDataArray::setIsFixedEndPoints(bool valueIn)
 {
 	m_isFixedEndPoints = valueIn;
 	formatDataArrayEndPoints();
-	dataChanged();
+	dataChanged(-1);
 }
 void PointGraphDataArray::setIsSelectable(bool valueIn)
 {
 	m_isSelectable = valueIn;
-	dataChanged();
+	dataChanged(-1);
 }
 void PointGraphDataArray::setIsEditableAttrib(bool valueIn)
 {
 	m_isEditableAttrib = valueIn;
-	dataChanged();
+	dataChanged(-1);
 }
 void PointGraphDataArray::setIsAutomatableEffectable(bool valueIn)
 {
@@ -1300,18 +1311,17 @@ void PointGraphDataArray::setIsAutomatableEffectable(bool valueIn)
 	else
 	{
 		// setEffectorArray will call dataChanged()
-		dataChanged();
+		dataChanged(-1);
 	}
 }
 void PointGraphDataArray::setIsSaveable(bool valueIn)
 {
 	m_isSaveable = valueIn;
-	dataChanged();
 }
 void PointGraphDataArray::setNonNegative(bool valueIn)
 {
 	m_nonNegative = valueIn;
-	dataChanged();
+	dataChanged(-1);
 }
 void PointGraphDataArray::setLineColor(QColor colorIn)
 {
@@ -1358,16 +1368,16 @@ bool PointGraphDataArray::setEffectorArrayLocation(unsigned int locationIn)
 		if (found == false)
 		{
 			m_effectorLocation = locationIn;
-			dataChanged();
+			dataChanged(-1);
 		}
 	}
 	else
 	{
 		if (m_effectorLocation != -1)
 		{
-			dataChanged();
+			dataChanged(-1);
+			m_effectorLocation = -1;
 		}
-		m_effectorLocation = -1;
 	}
 	return !found;
 }
@@ -1480,7 +1490,7 @@ int PointGraphDataArray::add(float xIn)
 			}
 			if (dataChangedVal == true)
 			{
-				dataChanged();
+				dataChanged(-1);
 			}
 		}
 	}
@@ -1493,11 +1503,13 @@ void PointGraphDataArray::del(unsigned int locationIn)
 	{
 		swap(locationIn, m_dataArray.size() - 1, true);
 		m_dataArray.pop_back();
-		if (locationIn == 0 || locationIn == m_dataArray.size() - 1)
+		if (locationIn == 0 || locationIn == m_dataArray.size())
 		{
 			formatDataArrayEndPoints();
+			dataChanged(locationIn == 0 ? 0 : locationIn - 1);
 		}
-		dataChanged();
+		// if locationIn - 1 == -1 then update the entire m_bakedValues / m_dataArray
+		dataChanged(static_cast<int>(locationIn) - 1);
 	}
 }
 
@@ -1505,6 +1517,11 @@ void PointGraphDataArray::del(unsigned int locationIn)
 void PointGraphDataArray::formatArray(bool clampIn, bool sortIn)
 {
 	// clamp
+	// TODO implement
+	float minY = 0.0f;
+	float maxY = 0.0f;
+	float minX = 0.0f;
+	float maxX = 0.0f;
 	if (clampIn == true)
 	{
 		for (unsigned int i = 0; i < m_dataArray.size(); i++)
@@ -1546,7 +1563,8 @@ void PointGraphDataArray::formatArray(bool clampIn, bool sortIn)
 	}
 
 	// delete duplicates
-	unsigned int lastPos = 0;
+	// TODO update name
+	float lastPos = 0.0f;
 	if (m_dataArray.size() > 0)
 	{
 		lastPos = m_dataArray[0].m_x;
@@ -1562,6 +1580,7 @@ void PointGraphDataArray::formatArray(bool clampIn, bool sortIn)
 			lastPos = m_dataArray[i].m_x;
 		}
 	}
+	dataChanged(-1);
 }
 
 int PointGraphDataArray::getLocation(float xIn)
@@ -1636,142 +1655,486 @@ int PointGraphDataArray::getNearestLocation(float xIn, bool* foundOut, bool* isB
 	return -1;
 }
 
+std::vector<float> PointGraphDataArray::getValues(unsigned int countIn)
+{
+	bool isChanged = false;
+	std::shared_ptr<std::vector<unsigned int>> updatingValues = std::make_shared<std::vector<unsigned int>>();
+	qDebug("getValuesA1");
+	std::vector<float> output = getValues(countIn, &isChanged, updatingValues);
+	qDebug("getValuesA2, size: %ld", output.size());
+	updatingValues->clear();
+	qDebug("getValuesA3 finished");
+	return output;
+}
+std::vector<float> PointGraphDataArray::getValues(unsigned int countIn, bool* isChangedOut, std::shared_ptr<std::vector<unsigned int>> updatingValuesOut)
+{
+	bool effectorIsChanged = false;
+	std::shared_ptr<std::vector<unsigned int>> effectorUpdatingValues = std::make_shared<std::vector<unsigned int>>();
+	std::vector<float> effectorOutput;
+	std::vector<float> outputXLocations(countIn);
+	m_isDataChanged = true; // TODO DEBUG, delete this line
+	bool isEffected = m_effectorLocation >= 0;
+	if (isEffected == true)
+	{
+		effectorOutput = m_parent->getDataArray(m_effectorLocation)->getValues(countIn, &effectorIsChanged, effectorUpdatingValues);
+	}
+	else
+	{
+		effectorOutput.resize(countIn);
+	}
+	qDebug("getValuesB1, size: %ld", outputXLocations.size());
+
+	// updating m_needsUpdating
+	if (m_isDataChanged == false && countIn == m_bakedValues.size())
+	{
+		if (isEffected == true && effectorUpdatingValues->size() > 1)
+		{
+			// effectorUpdatingValues needs to be sorted
+			// before use (in this case it is already sorted)
+			getUpdatingFromEffector(effectorUpdatingValues);
+		}
+	qDebug("getValuesB2");
+		getUpdatingFromAuromation();
+		// sort and select only original
+		// values
+		getUpdatingOriginals();
+	qDebug("getValuesB3");
+	}
+	else
+	{
+		if (countIn != m_bakedValues.size())
+		{
+			// reseting m_bakedValues
+			m_bakedValues.resize(countIn);
+			for (unsigned int i = 0; i < m_bakedValues.size(); i++)
+			{
+				m_bakedValues[i] = 0.0f;
+			}
+		}
+		m_needsUpdating.resize(m_dataArray.size());
+		for (unsigned int i = 0; i < m_needsUpdating.size(); i++)
+		{
+			m_needsUpdating[i] = i;
+		}
+	qDebug("getValuesB4, needsUpdating size: %ld", m_needsUpdating.size());
+	}
+
+	float stepSize = 1.0f / static_cast<float>(countIn);
+	// calculating point data
+	if (m_needsUpdating.size() > 0 && m_bakedValues.size() > 0)
+	{
+		// calculating relative X locations (in lines) of the output values
+		// for later use in the line calculations
+		for (unsigned int i = 0; i < m_dataArray.size(); i++)
+		{
+			unsigned int start = static_cast<unsigned int>
+				(std::ceil(m_dataArray[i].m_x / stepSize));
+			if (i + 1 < m_dataArray.size())
+			{
+				unsigned int end = static_cast<unsigned int>
+					(std::ceil(m_dataArray[i + 1].m_x / stepSize));
+				for (unsigned int j = start; j < end; j++)
+				{
+					outputXLocations[j] = (stepSize * static_cast<float>(j) - m_dataArray[i].m_x) / (m_dataArray[i + 1].m_x - m_dataArray[i].m_x);
+		//qDebug("getValuesB outputXLocations: [%d] [%d] %f", i, j, outputXLocations[j]);
+				}
+			}
+		}
+
+		// m_dataArray[i] location in effecor m_dataArray, next location in effecor m_dataArray,
+		std::vector<std::pair<unsigned int, unsigned int>> effectorData;
+		PointGraphDataArray* effector = nullptr;
+		if (m_effectorLocation >= 0)
+		{
+			effector = m_parent->getDataArray(m_effectorLocation);
+		}
+		if (effector != nullptr)
+		{
+			effectorData.resize(m_needsUpdating.size());
+			for (unsigned int i = 0; i < m_needsUpdating.size(); i++)
+			{
+				bool found = false;
+				bool isBefore = false;
+				int curLocation = effector->getNearestLocation(getX(m_needsUpdating[i]), &found, &isBefore);
+				if (curLocation >= 0)
+				{
+					curLocation = isBefore == false ? (curLocation > 1 ? curLocation - 1 : curLocation) : curLocation;
+					// location
+					effectorData[i].first = curLocation;
+					// next location
+					effectorData[i].second = curLocation;
+					// if the location of this is the next location for before this
+					if (i > 0 && m_needsUpdating[i - 1] == m_needsUpdating[i] - 1)
+					{
+						effectorData[i - 1].second = curLocation;
+					}
+				}
+			}
+	qDebug("getValuesB5");
+			// getting the missing next location values
+			for (unsigned int i = 0; i < m_needsUpdating.size(); i++)
+			{
+				if (i + 1 < m_needsUpdating.size() && m_needsUpdating[i] + 1 < m_dataArray.size() &&
+					m_needsUpdating[i + 1] != m_needsUpdating[i] + 1)
+				{
+					bool found = false;
+					bool isBefore = false;
+					int curLocation = effector->getNearestLocation(getX(m_needsUpdating[i]), &found, &isBefore);
+					if (curLocation >= 0)
+					{
+						curLocation = isBefore == false ? (curLocation > 1 ? curLocation - 1 : curLocation) : curLocation;
+						// next location
+						effectorData[i].second = curLocation;
+					}
+				}
+			}
+		}
+	qDebug("getValuesB6");
+		// calculate final line
+		for (unsigned int i = 0; i < m_needsUpdating.size(); i++)
+		{
+			unsigned int effectYLocation = static_cast<unsigned int>
+				(std::ceil(m_dataArray[m_needsUpdating[i]].m_x / stepSize));
+			float curEffectY = effectorOutput[effectYLocation];
+			float nextEffectY = effectorOutput[effectYLocation];
+
+			float curY = m_dataArray[m_needsUpdating[i]].m_y;
+			float curC = m_dataArray[m_needsUpdating[i]].m_c;
+			float curValA = m_dataArray[m_needsUpdating[i]].m_valA;
+			float curValB = m_dataArray[m_needsUpdating[i]].m_valB;
+			// TODO run processAutomation separatly
+			if (effector != nullptr && effector->getEffectOnlyPoints(effectorData[i].first) == true)
+			{
+				curY = processAutomation(
+					processEffect(m_dataArray[m_needsUpdating[i]].m_y, 0, curEffectY, effector, effectorData[i].first),
+					m_needsUpdating[i], 0);
+				curC = processAutomation(
+					processEffect(m_dataArray[m_needsUpdating[i]].m_c, 1, curEffectY, effector, effectorData[i].first),
+					m_needsUpdating[i], 1);
+				curValA = processAutomation(
+					processEffect(m_dataArray[m_needsUpdating[i]].m_valA, 2, curEffectY, effector, effectorData[i].first),
+					m_needsUpdating[i], 2);
+				curValB = processAutomation(
+					processEffect(m_dataArray[m_needsUpdating[i]].m_valB, 3, curEffectY, effector, effectorData[i].first),
+					m_needsUpdating[i], 3);
+			}
+	qDebug("getValuesB7");
+			int start = effectYLocation;
+			int end = start;
+
+			float nextY = curY;
+
+			if (m_needsUpdating[i] + 1 < m_dataArray.size())
+			{
+				effectYLocation = static_cast<unsigned int>
+					(std::ceil(m_dataArray[m_needsUpdating[i] + 1].m_x / stepSize));
+				end = effectYLocation;
+				if (effector != nullptr && effector->getEffectOnlyPoints(effectorData[i].second) == true)
+				{
+					nextEffectY = effectorOutput[effectYLocation];
+					nextY = processAutomation(
+						processEffect(m_dataArray[m_needsUpdating[i] + 1].m_y, 0, nextEffectY, effector, effectorData[i].second),
+						m_needsUpdating[i] + 1, 0);
+				}
+				else
+				{
+					nextY = m_dataArray[m_needsUpdating[i] + 1].m_y;
+				}
+			}
+			// calculating line ends
+			if (m_needsUpdating[i] + 1 >= m_dataArray.size())
+			{
+				// if this point is at the last location in m_dataArray
+				for (int j = end; j < m_bakedValues.size(); j++)
+				{
+					m_bakedValues[j] = curY;
+				}
+			}
+			if (m_needsUpdating[i] == 0)
+			{
+				// if this point is at the 0 location in m_dataArray
+				for (int j = 0; j < start; j++)
+				{
+					m_bakedValues[j] = curY;
+				}
+			}
+
+			float fadeInStart = 0.05f;
+			unsigned int type = m_dataArray[m_needsUpdating[i]].m_type;
+	qDebug("getValuesB8 [%d] start: %d, end: %d, type: %d,      ---       %f, %f, %f, AB: %f, %f", i, start, end, type, curY, nextY, curC, curValA, curValB);
+			// calculate final updated line
+			if (type == 0)
+			{
+				// calculate curve
+				for (int j = start; j < end; j++)
+				{
+					// accessing m_dataArray[m_needsUpdating[i] + 1] should be safe bacause at the endpoint
+					// start = end (-> end is not bigger than j)
+					//float transformedX = (outputXLocations[j] - m_dataArray[m_needsUpdating[i]].m_x) / (m_dataArray[m_needsUpdating[i] + 1].m_x - m_dataArray[m_needsUpdating[i]].m_x);
+	//qDebug("getValuesB8 [%d] %f outputX", j, outputXLocations[j]);
+					m_bakedValues[j] = processCurve(curY, nextY, curC, outputXLocations[j]);
+				}
+			}
+			else if (type == 1)
+			{
+				// curve
+				for (int j = start; j < end; j++)
+				{
+					m_bakedValues[j] = processCurve(curY, nextY, curC, outputXLocations[j]);
+				}
+				// line type
+				std::vector<float> lineTypeOutput = processLineTypeArraySine(&outputXLocations, start, end, curValA, curValB, fadeInStart);
+				for (int j = start; j < end; j++)
+				{
+					m_bakedValues[j] = m_bakedValues[j] + lineTypeOutput[j - start];
+				}
+			}
+			else if (type == 2)
+			{
+				// curve
+				for (int j = start; j < end; j++)
+				{
+					m_bakedValues[j] = processCurve(curY, nextY, 0.0f, outputXLocations[j]);
+				}
+				// line type
+				std::vector<float> lineTypeOutput = processLineTypeArraySineB(&outputXLocations, start, end, curValA, curValB, curC, fadeInStart);
+				for (int j = start; j < end; j++)
+				{
+					m_bakedValues[j] = m_bakedValues[j] + lineTypeOutput[j - start];
+				}
+			}
+			else if (type == 3)
+			{
+				// curve
+				for (int j = start; j < end; j++)
+				{
+					m_bakedValues[j] = processCurve(curY, nextY, 0.0f, outputXLocations[j]);
+				}
+				// line type
+				std::vector<float> lineTypeOutput = processLineTypeArrayPeak(&outputXLocations, start, end, curValA, curValB, curC, fadeInStart);
+				for (int j = start; j < end; j++)
+				{
+					m_bakedValues[j] = m_bakedValues[j] + lineTypeOutput[j - start];
+				}
+			}
+			else if (type == 4)
+			{
+				// curve
+				for (int j = start; j < end; j++)
+				{
+					m_bakedValues[j] = processCurve(curY, nextY, curC, outputXLocations[j]);
+				}
+				// line type
+				std::vector<float> lineTypeOutput = processLineTypeArraySteps(&outputXLocations, start, end, &m_bakedValues, curValA, curValB, fadeInStart);
+				for (int j = start; j < end; j++)
+				{
+					m_bakedValues[j] = m_bakedValues[j] + lineTypeOutput[j - start];
+				}
+			}
+			else if (type == 5)
+			{
+				// curve
+				for (int j = start; j < end; j++)
+				{
+					m_bakedValues[j] = processCurve(curY, nextY, 0.0f, outputXLocations[j]);
+				}
+				// line type
+				std::vector<float> lineTypeOutput = processLineTypeArrayRandom(&outputXLocations, start, end, curValA, curValB, curC, fadeInStart);
+				for (int j = start; j < end; j++)
+				{
+					m_bakedValues[j] = m_bakedValues[j] + lineTypeOutput[j - start];
+				}
+			}
+			if (effector != nullptr && effector->getEffectOnlyPoints(effectorData[i].second) == false)
+			{
+				// process line effect
+				// if it is enabled
+				for (int j = start; j < end; j++)
+				{
+					m_bakedValues[j] = processEffect(m_bakedValues[j], 0, effectorOutput[j], effector, effectorData[i].first);
+				}
+			}
+			for (int j = start; j < end; j++)
+			{
+				if (m_bakedValues[j] > 1.0f)
+				{
+					m_bakedValues[j] = 1.0f;
+				}
+				else if (m_bakedValues[j] < -1.0f)
+				{
+					m_bakedValues[j] = -1.0f;
+				}
+			}
+		}
+		effectorData.clear();
+	}
+
+	if (m_needsUpdating.size() > 0)
+	{
+		updatingValuesOut = std::make_shared<std::vector<unsigned int>>();
+		*updatingValuesOut = m_needsUpdating;
+
+		// clearing the updated values
+		m_needsUpdating.clear();
+	}
+
+	m_isDataChanged = false;
+	effectorUpdatingValues->clear();
+	qDebug("getValuesB9");
+	return m_bakedValues;
+}
+
+// this function is hard to maintain so it is inaccessible
+/*
 float PointGraphDataArray::getValueAtPosition(float xIn)
 {
 	float output = 0.0f;
 	bool found = false;
 	bool isBefore = false;
-	int locationBefore = getNearestLocation(xIn, &found, &isBefore);
+	int curLocation = getNearestLocation(xIn, &found, &isBefore);
 	// get values of points (process effect if it effects only points)
 	// draw line
 	// process effect (if it effects lines too)
-	if (locationBefore >= 0)
+	if (curLocation >= 0)
 	{
-		// y limit for clamping
-		float lowerLimit = m_nonNegative == true ? 0.0f : -1.0f;
 		// location after should be location before + 1
-		// or it is equal to locationBefore when it is on an edge
-		locationBefore = isBefore == true ? locationBefore : locationBefore - 1;
-		int locationAfter = locationBefore + 1;
-		if (locationAfter >= m_dataArray.size())	
+		// or it is equal to curLocation when it is on an edge
+		curLocation = isBefore == true ? curLocation : curLocation - 1;
+		int nextLocation = curLocation + 1;
+		if (nextLocation >= m_dataArray.size())	
 		{
-			locationAfter = locationBefore;
+			nextLocation = curLocation;
 		}
-		if (locationBefore < 0)	
+		if (curLocation < 0)	
 		{
-			locationBefore++;
-			locationAfter = locationBefore;
+			curLocation++;
+			nextLocation = curLocation;
 		}
 
-		float pointEffectYBefore = processAutomation(locationBefore, 0);
-		float pointEffectYAfter = processAutomation(locationAfter, 0);
+		float curY = m_dataArray[curLocation].m_y;
+		float curC = m_dataArray[curLocation].m_c;
+		float curValA = m_dataArray[curLocation].m_valA;
+		float curValB = m_dataArray[curLocation].m_valB;
 
-	//qDebug("getVALUE, locationBefore1: %d", locationBefore);
-	//qDebug("getVALUE, locationAfer: %d", locationAfter);
+		float nextY = curY;
+
+	//qDebug("getVALUE, curLocation: %d", curLocation);
+	//qDebug("getVALUE, locationAfer: %d", nextLocation);
 		// temp effecor data
-		PointGraphDataArray* tempEArray = nullptr;
+		PointGraphDataArray* effector = nullptr;
 		bool tempEFound = false;
 		bool tempEIsBefore = false;
 		int tempELocation = -1;
 		// if this data array has an effector data array
 		if (m_effectorLocation >= 0)
 		{
-			tempEArray = m_parent->getDataArray(m_effectorLocation);
+			effector = m_parent->getDataArray(m_effectorLocation);
 
 			// do not change order
-			// locationAfter
-			tempELocation = tempEArray->getNearestLocation(m_dataArray[locationAfter].m_x, &tempEFound, &tempEIsBefore);
+			// because tempELocation is used somewhere else
+			// nextLocation
+			tempELocation = effector->getNearestLocation(m_dataArray[nextLocation].m_x, &tempEFound, &tempEIsBefore);
 			tempELocation = tempEIsBefore == true ? tempELocation : tempELocation > 0 ? tempELocation - 1 : tempELocation;
-			if (tempELocation >= 0 && tempEArray->getEffectOnlyPoints(tempELocation) == true)
+			if (tempELocation >= 0 && effector->getEffectOnlyPoints(tempELocation) == true)
 			{
-				float effectValue = tempEArray->getValueAtPosition(m_dataArray[locationAfter].m_x);
+				float curEffectY = effector->getValueAtPosition(m_dataArray[nextLocation].m_x);
 				// apply effects
-				pointEffectYAfter = processEffect(pointEffectYAfter,
-					effectValue, tempEArray, tempELocation, lowerLimit);
+				nextY = processAutomation(
+					processEffect(m_dataArray[nextLocation].m_y, 0, curEffectY, effector, tempELocation),
 			}
 
-			// locationBefore
-			tempELocation = tempEArray->getNearestLocation(m_dataArray[locationBefore].m_x, &tempEFound, &tempEIsBefore);
+			// curLocation
+			tempELocation = effector->getNearestLocation(m_dataArray[curLocation].m_x, &tempEFound, &tempEIsBefore);
 			tempELocation = tempEIsBefore == true ? tempELocation : tempELocation > 0 ? tempELocation - 1 : tempELocation;
 			// if the effector point can only change points
-			if (tempELocation >= 0 && tempEArray->getEffectOnlyPoints(tempELocation) == true)
+			if (tempELocation >= 0 && effector->getEffectOnlyPoints(tempELocation) == true)
 			{
-				float effectValue = tempEArray->getValueAtPosition(m_dataArray[locationBefore].m_x);
+				float curEffectY = effector->getValueAtPosition(m_dataArray[curLocation].m_x);
 				// apply effects
-				pointEffectYBefore = processEffect(pointEffectYBefore,
-					effectValue, tempEArray, tempELocation, lowerLimit);
+				curY = processAutomation(
+					processEffect(m_dataArray[curLocation].m_y, 0, curEffectY, effector, tempELocation),
+					curLocation, 0);
+				curC = processAutomation(
+					processEffect(m_dataArray[curLocation].m_c, 1, curEffectY, effector, tempELocation),
+					curLocation, 1);
+				curValA = processAutomation(
+					processEffect(m_dataArray[curLocation].m_valA, 2, curEffectY, effector, tempELocation),
+					curLocation, 2);
+				curValB = processAutomation(
+					processEffect(m_dataArray[curLocation].m_valB, 3, curEffectY, effector, tempELocation),
+					curLocation, 3);
 			}
 		}
 
 		if (found == true)
 		{
-			output = pointEffectYAfter;
+			output = nextY;
 		}
-		else if (locationAfter == locationBefore)
+		else if (nextLocation == curLocation)
 		{
 			// if the nearest point is an edge
-			output = pointEffectYBefore;
+			output = curY;
 		}
 		else
 		{
-			float transformedX = (xIn - m_dataArray[locationBefore].m_x) / (m_dataArray[locationAfter].m_x - m_dataArray[locationBefore].m_x);
+			float transformedX = (xIn - m_dataArray[curLocation].m_x) / (m_dataArray[nextLocation].m_x - m_dataArray[curLocation].m_x);
 			// type effects
-			unsigned int type = getType(locationBefore);
-			float fadeOutStart = 0.95f;
+			unsigned int type = getType(curLocation);
+			float fadeOutStart = 0.05f;
 			if (type == 0)
 			{
-				output = processCurve(pointEffectYBefore, pointEffectYAfter, processAutomation(locationBefore, 1), transformedX);
+				output = processCurve(curY, nextY, curC, curLocation, 1), transformedX);
 			}
 			else if (type == 1)
 			{
-				output = processCurve(pointEffectYBefore, pointEffectYAfter, processAutomation(locationBefore, 1), transformedX);
-				output = output + processLineTypeSine(transformedX, processAutomation(locationBefore, 2),
-					processAutomation(locationBefore, 3), fadeOutStart);
+				output = processCurve(curY, nextY, curC, transformedX);
+				output = output + processLineTypeSine(transformedX, curValA,
+					curValB, fadeOutStart);
 			}
 			else if (type == 2)
 			{
-				output = processCurve(pointEffectYBefore, pointEffectYAfter, 0.0f, transformedX);
-				output = output + processLineTypeSineB(transformedX, processAutomation(locationBefore, 2),
-					processAutomation(locationBefore, 3), processAutomation(locationBefore, 3), fadeOutStart);
+				output = processCurve(curY, nextY, 0.0f, transformedX);
+				output = output + processLineTypeSineB(transformedX, curValA,
+					curValB, processAutomation(curLocation, 3), fadeOutStart);
 			}
 			else if (type == 3)
 			{
-				output = processCurve(pointEffectYBefore, pointEffectYAfter, 0.0f, transformedX);
-				output = output + processLineTypePeak(transformedX, processAutomation(locationBefore, 2),
-					processAutomation(locationBefore, 3), processAutomation(locationBefore, 1), fadeOutStart);
+				output = processCurve(curY, nextY, 0.0f, transformedX);
+				output = output + processLineTypePeak(transformedX, curValA,
+					curValB, curC, fadeOutStart);
 			}
 			else if (type == 4)
 			{
-				output = processCurve(pointEffectYBefore, pointEffectYAfter, processAutomation(locationBefore, 1), transformedX);
-				output = processCurve(pointEffectYBefore, pointEffectYAfter, m_dataArray[locationBefore].m_c, transformedX);
-				output = output + processLineTypeSteps(transformedX, output, processAutomation(locationBefore, 2),
-					processAutomation(locationBefore, 3), fadeOutStart);
+				output = processCurve(curY, nextY, curC, transformedX);
+				output = output + processLineTypeSteps(transformedX, output, curValA,
+					curValB, fadeOutStart);
 			}
 			else if (type == 5)
 			{
-				output = processCurve(pointEffectYBefore, pointEffectYAfter, 0.0f, transformedX);
-				output = output + processLineTypeRandom(transformedX, processAutomation(locationBefore, 2),
-					processAutomation(locationBefore, 3), processAutomation(locationBefore, 1), fadeOutStart);
+				output = processCurve(curY, nextY, 0.0f, transformedX);
+				output = output + processLineTypeRandom(transformedX, curValA,
+					curValB, curC, fadeOutStart);
 			}
-			//qDebug("getVALUE, value2: %f %f -  %d  %d  - %f   %f", output, xIn, locationBefore, locationAfter, transformedX, pointEffectBefore);
+			//qDebug("getVALUE, value2: %f %f -  %d  %d  - %f   %f", output, xIn, curLocation, nextLocation, transformedX, pointEffectBefore);
 			//qDebug("getVALUE, transfrmedX: %f", transformedX);
 			//qDebug("getVALUE, x: %f", xIn);
 		}
 
 		// if this data array has an effector data array
 		// and it does not only effect data points
-		if (m_effectorLocation >= 0 && tempELocation >= 0 && tempEArray->getEffectOnlyPoints(tempELocation) == true)
+		if (m_effectorLocation >= 0 && tempELocation >= 0 && effector->getEffectOnlyPoints(tempELocation) == true)
 		{
-			float effectValue = tempEArray->getValueAtPosition(xIn);
-			output = processEffect(output,
-				effectValue, tempEArray, tempELocation, lowerLimit);
+			float curEffectY = effector->getValueAtPosition(xIn);
+			output = processEffect(output, 0, curEffectY, effector, tempELocation)
 		}
 	}
 	return output;
 }
+*/
 
 void PointGraphDataArray::setDataArray(std::vector<std::pair<float, float>>* dataArrayIn, bool isCurvedIn)
 {
+	// TODO implement formatArray option
 	m_dataArray.clear();
 	for (unsigned int i = 0; i < dataArrayIn->size(); i++)
 	{
@@ -1835,7 +2198,7 @@ unsigned int PointGraphDataArray::setX(unsigned int locationIn, float xIn)
 				m_dataArray[locationIn].m_x = xIn;
 				swap(locationIn, targetLocation, true);
 				location = targetLocation;
-				dataChanged();
+				dataChanged(location);
 			}
 			else
 			{
@@ -1858,7 +2221,7 @@ void PointGraphDataArray::setY(unsigned int locationIn, float yIn)
 			locationIn > 0) || m_isFixedEndPoints == false)
 		{
 			m_dataArray[locationIn].m_y = yIn;
-			dataChanged();
+			dataChanged(locationIn);
 		}
 	}
 }
@@ -1866,23 +2229,23 @@ void PointGraphDataArray::setY(unsigned int locationIn, float yIn)
 void PointGraphDataArray::setC(unsigned int locationIn, float cIn)
 {
 	m_dataArray[locationIn].m_c = cIn;
-	dataChanged();
+	dataChanged(locationIn);
 }
 void PointGraphDataArray::setValA(unsigned int locationIn, float valueIn)
 {
 	m_dataArray[locationIn].m_valA = valueIn;
-	dataChanged();
+	dataChanged(locationIn);
 }
 void PointGraphDataArray::setValB(unsigned int locationIn, float valueIn)
 {
 	m_dataArray[locationIn].m_valB = valueIn;
-	dataChanged();
+	dataChanged(locationIn);
 }
 void PointGraphDataArray::setType(unsigned int locationIn, unsigned int typeIn)
 {
 	// set the type without changing the automated attribute location
 	m_dataArray[locationIn].m_type = typeIn;
-	dataChanged();
+	dataChanged(locationIn);
 }
 void PointGraphDataArray::setAutomatedAttrib(unsigned int locationIn, unsigned int attribLocationIn)
 {
@@ -1892,7 +2255,7 @@ void PointGraphDataArray::setAutomatedAttrib(unsigned int locationIn, unsigned i
 		attribLocationIn = attribLocationIn > 3 ? 0 : attribLocationIn;
 		// set automated location correctly (effected_location = automatedEffectedLocation % 4)
 		m_dataArray[locationIn].m_automatedEffectedAttribLocations = attribLocationIn * 4 + getEffectedAttribLocation(locationIn);
-		dataChanged();
+		dataChanged(locationIn);
 	}
 }
 void PointGraphDataArray::setEffectedAttrib(unsigned int locationIn, unsigned int attribLocationIn)
@@ -1903,7 +2266,7 @@ void PointGraphDataArray::setEffectedAttrib(unsigned int locationIn, unsigned in
 		attribLocationIn = attribLocationIn > 3 ? 0 : attribLocationIn;
 		// set effected location correctly
 		m_dataArray[locationIn].m_automatedEffectedAttribLocations = attribLocationIn + getAutomatedAttribLocation(locationIn);
-		dataChanged();
+		dataChanged(locationIn);
 	}
 }
 unsigned int PointGraphDataArray::getAutomatedAttribLocation(unsigned int locationIn)
@@ -1914,13 +2277,21 @@ unsigned int PointGraphDataArray::getEffectedAttribLocation(unsigned int locatio
 {
 	return m_dataArray[locationIn].m_automatedEffectedAttribLocations % 4;
 }
+bool PointGraphDataArray::getEffectOnlyPoints(unsigned int locationIn)
+{
+	return (m_dataArray[locationIn].m_effectOnlyPoints == true || getEffectedAttribLocation(locationIn) > 0);
+}
 void PointGraphDataArray::setEffectOnlyPoints(unsigned int locationIn, bool boolIn)
 {
 	if (m_isAutomatableEffectable == true)
 	{
-		m_dataArray[locationIn].m_effectOnlyPoints = boolIn;
-		// this change does not effect the output values of the dataArray
-		// so dataChanged() is not called
+		if (m_dataArray[locationIn].m_effectOnlyPoints != boolIn)
+		{
+			m_dataArray[locationIn].m_effectOnlyPoints = boolIn;
+			// this change does effect the main output if this
+			// data array is an effector of an other so dataChanged() is called
+			dataChanged(locationIn);
+		}
 	}
 }
 bool PointGraphDataArray::getEffect(unsigned int locationIn, unsigned int effectNumberIn)
@@ -1980,6 +2351,16 @@ void PointGraphDataArray::setEffect(unsigned int locationIn, unsigned int effect
 				break;
 		}
 	}
+	dataChanged(locationIn);
+}
+bool PointGraphDataArray::getIsAutomationValueChanged(unsigned int locationIn)
+{
+	if (m_dataArray[locationIn].m_bufferedAutomationValue != m_dataArray[locationIn].m_automationModel->value())
+	{
+		m_dataArray[locationIn].m_bufferedAutomationValue = m_dataArray[locationIn].m_automationModel->value();
+		return true;
+	}
+	return false;
 }
 void PointGraphDataArray::setAutomated(unsigned int locationIn, bool isAutomatedIn)
 {
@@ -1989,13 +2370,16 @@ void PointGraphDataArray::setAutomated(unsigned int locationIn, bool isAutomated
 		{
 			if (m_dataArray[locationIn].m_automationModel == nullptr)
 			{
-				m_dataArray[locationIn].m_automationModel = new FloatModel(0.0f, -1.0f, 1.0f, 0.05f, nullptr, QString(), false);
+				m_dataArray[locationIn].m_automationModel = new FloatModel(0.0f, -1.0f, 1.0f, 0.01f, nullptr, QString(), false);
+				dataChanged(locationIn);
 			}
 		}
-		else
+		else if (m_dataArray[locationIn].m_automationModel != nullptr)
 		{
+			// TODO correctly deconstruct
 			delete m_dataArray[locationIn].m_automationModel;
-			m_dataArray[locationIn].m_automationModel = nullptr; // is this needed? TODO
+			m_dataArray[locationIn].m_automationModel = nullptr;
+			dataChanged(locationIn);
 		}
 	}
 }
@@ -2045,60 +2429,10 @@ void PointGraphDataArray::swap(unsigned int locationAIn, unsigned int locationBI
 			m_dataArray[locationAIn] = m_dataArray[locationBIn];
 			m_dataArray[locationBIn] = swap;
 		}
-		dataChanged();
+		dataChanged(locationAIn - 1 > 0 ? locationAIn - 1 : 0);
+		dataChanged(locationBIn - 1 > 0 ? locationBIn - 1 : 0);
+		dataChanged(locationBIn);
 	}
-}
-float PointGraphDataArray::processEffect(float valueIn, float effectValueIn,
-	PointGraphDataArray* effectArrayIn, unsigned int effectLocationIn, float lowerLimitIn)
-{
-	float output = valueIn;
-	if (effectArrayIn->getEffect(effectLocationIn, 6) == true)
-	{
-		// sine
-		output = output + std::sin(effectValueIn * 100.0f);
-	}
-	if (effectArrayIn->getEffect(effectLocationIn, 4) == true)
-	{
-		// power
-		output = std::pow(output, effectValueIn);
-	}
-	else if (effectArrayIn->getEffect(effectLocationIn, 5) == true)
-	{
-		// log
-		output = std::log(output) / std::log(effectValueIn);
-	}
-
-	if (effectArrayIn->getEffect(effectLocationIn, 2) == true)
-	{
-		// multiply
-		output = output * 5.0f * effectValueIn;
-	}
-	else if (effectArrayIn->getEffect(effectLocationIn, 3) == true)
-	{
-		output = output / 5.0f / effectValueIn;
-		// divide
-	}
-
-	if (effectArrayIn->getEffect(effectLocationIn, 0) == true)
-	{
-		// add
-		output += effectValueIn;
-	}
-	else if (effectArrayIn->getEffect(effectLocationIn, 1) == true)
-	{
-		// subtract
-		output -= effectValueIn;
-	}
-	// clamp
-	if (output  > 1.0f)
-	{
-		output = 1.0f;
-	}
-	else if (output < lowerLimitIn)
-	{
-		output = lowerLimitIn;
-	}
-	return output;
 }
 float PointGraphDataArray::processCurve(float valueBeforeIn, float valueAfterIn, float curveIn, float xIn)
 {
@@ -2123,7 +2457,58 @@ float PointGraphDataArray::processCurve(float valueBeforeIn, float valueAfterIn,
 	return output;
 }
 
-float PointGraphDataArray::processAutomation(unsigned int locationIn, unsigned int attribLocationIn)
+float PointGraphDataArray::processEffect(float attribValueIn, unsigned int attribLocationIn, float effectValueIn,
+	PointGraphDataArray* effectArrayIn, unsigned int effectLocationIn)
+{
+	float output = attribValueIn;
+	unsigned int attribLocation = effectArrayIn->getEffectedAttribLocation(effectLocationIn);
+	// effects
+	if (attribLocationIn == attribLocation)
+	{
+		if (effectArrayIn->getEffect(effectLocationIn, 6) == true)
+		{
+			// sine
+			output = output + std::sin(effectValueIn * 100.0f);
+		}
+		if (effectArrayIn->getEffect(effectLocationIn, 4) == true)
+		{
+			// power
+			output = std::pow(output, effectValueIn);
+		}
+		else if (effectArrayIn->getEffect(effectLocationIn, 5) == true)
+		{
+			// log
+			output = std::log(output) / std::log(effectValueIn);
+		}
+
+		if (effectArrayIn->getEffect(effectLocationIn, 2) == true)
+		{
+			// multiply
+			output = output * 5.0f * effectValueIn;
+		}
+		else if (effectArrayIn->getEffect(effectLocationIn, 3) == true)
+		{
+			output = output / 5.0f / effectValueIn;
+			// divide
+		}
+
+		if (effectArrayIn->getEffect(effectLocationIn, 0) == true)
+		{
+			// add
+			output += effectValueIn;
+		}
+		else if (effectArrayIn->getEffect(effectLocationIn, 1) == true)
+		{
+			// subtract
+			output -= effectValueIn;
+		}
+
+		// clamp
+		output = output < -1.0f ? -1.0f : output > 1.0f ? 1.0f : output;
+	}
+	return output;
+}
+float PointGraphDataArray::processAutomation(float attribValueIn, unsigned int locationIn, unsigned int attribLocationIn)
 {
 	float output = 0.0f;
 	// if automated
@@ -2131,75 +2516,168 @@ float PointGraphDataArray::processAutomation(unsigned int locationIn, unsigned i
 	if (automationModel != nullptr)
 	{
 		unsigned int attribLocation = getAutomatedAttribLocation(locationIn);
-		if (attribLocation = attribLocationIn)
+		if (attribLocation == attribLocationIn)
 		{
 			output += automationModel->value();
 			// qDebug("processAutomation -> value: %f", output);
 		}
 	}
-	if (attribLocationIn == 0)
-	{
-		output += m_dataArray[locationIn].m_y;
-	}
-	else if (attribLocationIn == 1)
-	{
-		output += m_dataArray[locationIn].m_c;
-	}
-	else if (attribLocationIn == 2)
-	{
-		output += m_dataArray[locationIn].m_valA;
-	}
-	else if (attribLocationIn == 3)
-	{
-		output += m_dataArray[locationIn].m_valB;
-	}
+	output += attribValueIn;
 	
 	output = output < -1.0f ? -1.0f : output > 1.0f ? 1.0f : output;
 	return output;
 }
-float PointGraphDataArray::processLineTypeSine(float xIn, float valAIn, float valBIn, float fadeOutStartIn)
+
+// line type effects:
+/*
+float PointGraphDataArray::processLineTypeSine(float xIn, float valAIn, float valBIn, float fadeInStartIn)
+{
+	return processLineTypeSineB(xIn, valAIn, valBIn, 0.0f, fadeInStartIn);
+}
+*/
+// valA: amp, valB: freq, fadeInStartIn: from what xIn value should the line type fade out
+std::vector<float> PointGraphDataArray::processLineTypeArraySine(std::vector<float>* xIn, unsigned int startIn, unsigned int endIn,
+	float valAIn, float valBIn, float fadeInStartIn)
+{
+	return PointGraphDataArray::processLineTypeArraySineB(xIn, startIn, endIn,
+		valAIn, valBIn, 0.0f, fadeInStartIn);
+}
+/*
+float PointGraphDataArray::processLineTypeSineB(float xIn, float valAIn, float valBIn, float curveIn, float fadeInStartIn)
 {
 	// sine
-	float output = valAIn * std::sin(xIn * valBIn);
+	// 628.318530718f = 100.0f * 2.0f * pi
+	float output = valAIn * std::sin(xIn * 628.318530718f * valBIn + curveIn * 100.0f);
 	
-	// fade out
-	if (xIn > fadeOutStartIn)
+	// fade in
+	if (xIn < fadeInStartIn)
 	{
-		output = output * (1.0f - xIn) / (1.0f - fadeOutStartIn);
+		output = output * xIn / fadeInStartIn;
+	}
+	// fade out
+	if (xIn > 1.0f - fadeInStartIn)
+	{
+		output = output * (1.0f - xIn) / fadeInStartIn;
 	}
 	return output;
 }
-float PointGraphDataArray::processLineTypeSineB(float xIn, float valAIn, float valBIn, float curveIn, float fadeOutStartIn)
+*/
+// valA: amp, valB: freq, curveIn: phase
+std::vector<float> PointGraphDataArray::processLineTypeArraySineB(std::vector<float>* xIn, unsigned int startIn, unsigned int endIn,
+	float valAIn, float valBIn, float curveIn, float fadeInStartIn)
 {
-	// sine
-	float output = valAIn * std::sin(xIn * valBIn + curveIn * 10.0f);
-	
-	// fade out
-	if (xIn > fadeOutStartIn)
+	int count = static_cast<int>(endIn) - static_cast<int>(startIn);
+	if (count < 0)
 	{
-		output = output * (1.0f - xIn) / (1.0f - fadeOutStartIn);
+		count = 0;
 	}
+	float valB = 0.001f + ((valBIn + 1.0f) / 2.0f) * 0.999f;
+	std::vector<float> output(count);
+	// calculating how many samples are needed to 1 complete wave
+	// we have "count" amount of samples and "valB * 100.0f" amount of waves
+	int end = static_cast<int>(std::floor(count / (valB * 100.0f)));
+	//qDebug("sineB_1, %f, %d", (count / (valB * 100.0f)), end);
+	end = end > count ? count : end + 1;
+
+	// calculate 1 wave of sine
+	for (unsigned int i = 0; i < end; i++)
+	{
+		// 628.318531f = 100.0f * 2.0f * pi
+		// (1 sine wave is 2pi long and we have 1 * 100 * valBIn waves)
+		output[i] = valAIn * std::sin(
+			xIn->operator[](startIn + i) * 628.318531f * valB + curveIn * 100.0f);
+	}
+	//qDebug("sineB_2");
+	// copy values
+	for (unsigned int i = end; i < count; i++)
+	{
+		//qDebug("sineB_2.5: i: %d, %d, %d", (i - end), end, i);
+		output[i] =	output[i - end];
+	}
+	//qDebug("sineB_3");
+	// fade in
+	for (unsigned int i = 0; i < count; i++)
+	{
+		float x = xIn->operator[](startIn + i);
+		if (x > fadeInStartIn)
+		{
+			break;
+		}
+		output[i] = output[i] * x / fadeInStartIn;
+	}
+	//qDebug("sineB_4");
+	// fade out
+	for (unsigned int i = count - 1; i >= 0; i--)
+	{
+		float x = 1.0f - xIn->operator[](startIn + i);
+		if (x > fadeInStartIn)
+		{
+			break;
+		}
+		output[i] = output[i] * x / fadeInStartIn;
+	}
+	//qDebug("sineB_5");
 	return output;
 }
-float PointGraphDataArray::processLineTypePeak(float xIn, float valAIn, float valBIn, float curveIn, float fadeOutStartIn)
+/*
+float PointGraphDataArray::processLineTypePeak(float xIn, float valAIn, float valBIn, float curveIn, float fadeInStartIn)
 {
 	// peak
 	float output = std::pow((curveIn + 1.0f) * 0.2f + 0.01f, std::abs(xIn - (valBIn + 1.0f) * 0.5f) * 10.0f) * valAIn;
 
 	// fade in
-	float fadeInEnd = 1.0f - fadeOutStartIn;
-	if (xIn < fadeInEnd)
+	if (xIn < fadeInStartIn)
 	{
-		output = output * xIn / fadeInEnd;
+		output = output * xIn / fadeInStartIn;
 	}
 	// fade out
-	if (xIn > fadeOutStartIn)
+	if (xIn > 1.0f - fadeInStartIn)
 	{
-		output = output * (1.0f - xIn) / fadeInEnd;
+		output = output * (1.0f - xIn) / fadeInStartIn;
 	}
 	return output;
 }
-float PointGraphDataArray::processLineTypeSteps(float xIn, float yIn, float valAIn, float valBIn, float fadeOutStartIn)
+*/
+
+// valA: amp, valB: x coord, curve: width
+std::vector<float> PointGraphDataArray::processLineTypeArrayPeak(std::vector<float>* xIn, unsigned int startIn, unsigned int endIn,
+	float valAIn, float valBIn, float curveIn, float fadeInStartIn)
+{
+	int count = static_cast<int>(endIn) - static_cast<int>(startIn);
+	if (count < 0)
+	{
+		count = 0;
+	}
+	std::vector<float> output(count);
+	for (unsigned int i = 0; i < count; i++)
+	{
+		output[i] = std::pow((curveIn + 1.0f) * 0.2f + 0.01f,
+			std::abs(xIn->operator[](startIn + i) - (valBIn + 1.0f) * 0.5f) * 10.0f) * valAIn;
+	}
+	// fade in
+	for (unsigned int i = 0; i < count; i++)
+	{
+		float x = xIn->operator[](startIn + i);
+		if (x > fadeInStartIn)
+		{
+			break;
+		}
+		output[i] = output[i] * x / fadeInStartIn;
+	}
+	// fade out
+	for (unsigned int i = count - 1; i >= 0; i--)
+	{
+		float x = 1.0f - xIn->operator[](startIn + i);
+		if (x > fadeInStartIn)
+		{
+			break;
+		}
+		output[i] = output[i] * x / fadeInStartIn;
+	}
+	return output;
+}
+/*
+float PointGraphDataArray::processLineTypeSteps(float xIn, float yIn, float valAIn, float valBIn, float fadeInStartIn)
 {
 	// TODO opmtimalize
 	// step
@@ -2210,19 +2688,63 @@ float PointGraphDataArray::processLineTypeSteps(float xIn, float yIn, float valA
 	float output = diff * (valBIn + 1.0f) / 2.0f + stepSize * (2.0f - (valBIn + 1.0f) / 2.0f);
 
 	// fade in
-	float fadeInEnd = 1.0f - fadeOutStartIn;
-	if (xIn < fadeInEnd)
+	if (xIn < fadeInStartIn)
 	{
-		output = output * xIn / fadeInEnd;
+		output = output * xIn / fadeInStartIn;
 	}
 	// fade out
-	if (xIn > fadeOutStartIn)
+	if (xIn > 1.0f - fadeInStartIn)
 	{
-		output = output * (1.0f - xIn) / fadeInEnd;
+		output = output * (1.0f - xIn) / fadeInStartIn;
 	}
 	return output;
 }
-float PointGraphDataArray::processLineTypeRandom(float xIn, float valAIn, float valBIn, float curveIn, float fadeOutStartIn)
+*/
+// y: calculate steps from, valA: y count, valB: curve
+std::vector<float> PointGraphDataArray::processLineTypeArraySteps(std::vector<float>* xIn, unsigned int startIn, unsigned int endIn,
+	std::vector<float>* yIn, float valAIn, float valBIn, float fadeInStartIn)
+{
+	int count = static_cast<int>(endIn) - static_cast<int>(startIn);
+	if (count < 0)
+	{
+		count = 0;
+	}
+	std::vector<float> output(count);
+
+	float stepCount = (1.0f + valAIn) / 2.0f * 19.0f + 1.0f;
+	//qDebug("stepsA - stepCount = %f", stepCount);
+	for (unsigned int i = 0; i < count; i++)
+	{
+		float y = yIn->operator[](startIn + i) + 1.0f;
+		float diff = std::round(y * stepCount) - y * stepCount;
+		float smooth = 1.0f - std::abs(diff) * (1.0f - (valBIn + 1.0f) / 2.0f) * 2.0f;
+		output[i] = diff / stepCount * smooth;
+	}
+
+	// fade in
+	for (unsigned int i = 0; i < count; i++)
+	{
+		float x = xIn->operator[](startIn + i);
+		if (x > fadeInStartIn)
+		{
+			break;
+		}
+		output[i] = output[i] * x / fadeInStartIn;
+	}
+	// fade out
+	for (unsigned int i = count - 1; i >= 0; i--)
+	{
+		float x = 1.0f - xIn->operator[](startIn + i);
+		if (x > fadeInStartIn)
+		{
+			break;
+		}
+		output[i] = output[i] * x / fadeInStartIn;
+	}
+	return output;
+}
+/*
+float PointGraphDataArray::processLineTypeRandom(float xIn, float valAIn, float valBIn, float curveIn, float fadeInStartIn)
 {
 	// randomize
 	float blend = 50.0f + curveIn * 50.0f;
@@ -2246,6 +2768,193 @@ float PointGraphDataArray::processLineTypeRandom(float xIn, float valAIn, float 
 	output = output * blend * (blend - 2.0f) * - 1.0f - rand() * (1.0f - blend) * (-1.0f - blend);
 	return output * valAIn;
 }
+*/
+// valA: amp, valB: random number count, curveIn: seed
+std::vector<float> PointGraphDataArray::processLineTypeArrayRandom(std::vector<float>* xIn, unsigned int startIn, unsigned int endIn,
+		float valAIn, float valBIn, float curveIn, float fadeInStartIn)
+{
+	int count = static_cast<int>(endIn) - static_cast<int>(startIn);
+	if (count < 0)
+	{
+		count = 0;
+	}
+	std::vector<float> output(count);
+	std::vector<float> randomValues(static_cast<int>(50.0f * (valBIn + 1.0f)) * 2);
+
+	float blend = 10.0f + curveIn * 10.0f;
+	int randomSeed = static_cast<int>(blend);
+	blend = blend - randomSeed;
+	std::srand(randomSeed);
+
+	// getting the random values
+	// generating 2 seeds and blending in between them
+	for (unsigned int i = 0; i < randomValues.size() / 2; i++)
+	{
+		randomValues[i] = std::fmod((static_cast<float>(rand()) / 10000.0f), 2.0f) - 1.0f;
+	}
+	std::srand(randomSeed + 1);
+	for (unsigned int i = randomValues.size() / 2; i < randomValues.size(); i++)
+	{
+		randomValues[i] = std::fmod((static_cast<float>(rand()) / 10000.0f), 2.0f) - 1.0f;
+	}
+
+	float size = static_cast<float>(randomValues.size() / 2);
+	for (unsigned int i = 0; i < count; i++)
+	{
+		float randomValueX = xIn->operator[](startIn + i) * size;
+		float randomValueLocation = std::floor(randomValueX);
+		output[i] = -((randomValueX - randomValueLocation) - 1.0f) * (randomValueX - randomValueLocation) * 4.0f *
+			(randomValues[static_cast<int>(randomValueLocation)] * (1.0f - blend)  + randomValues[static_cast<int>(randomValueLocation + size)] * blend) *
+			valAIn;
+	}
+
+	return output;
+}
+
+void PointGraphDataArray::getUpdatingFromEffector(std::shared_ptr<std::vector<unsigned int>> updatingValuesIn)
+{
+	PointGraphDataArray* effector = m_parent->getDataArray(m_effectorLocation);
+	for (unsigned int i = 0; i < updatingValuesIn->size(); i++)
+	{
+		if (updatingValuesIn->operator[](i) > 0)
+		{
+			// since updatingValuesIn is a sorted list, we can get the end
+			// values and update everithing between them
+			// starting value is i, end value is updatingEnd
+			unsigned int updatingEnd = i;
+			for (unsigned int j = i + 1; j < updatingValuesIn->size(); j++)
+			{
+				// we can skip 1 wide gaps because
+				// changes in Y can effect the line before j
+				if (updatingValuesIn->operator[](updatingEnd) + 2 >=
+						updatingValuesIn->operator[](j))
+				{
+					updatingEnd = j;
+				}
+				else
+				{
+					break;
+				}
+			}
+
+			bool found = false;
+			bool isBefore = false;
+			// i - 1 because changes in Y can effect the line before this
+			int locationBefore = getNearestLocation(effector->getX(updatingValuesIn->operator[](i) - 1), &found, &isBefore);
+			if (effector->getEffectOnlyPoints(updatingValuesIn->operator[](i) - 1) == true && isBefore == true)
+			{
+				// if only points are effected and the nearest point
+				// is before [i] (so it needs to be uneffected)
+				// add 1
+				locationBefore++;
+			}
+			else if (effector->getEffectOnlyPoints(updatingValuesIn->operator[](i) - 1) == false && isBefore == false)
+			{
+				// if lines are effected and the nearest point
+				// is after [i] (so the line before this is effected)
+				// subtract 1
+				// remember points control the line after them
+				locationBefore--;
+			}
+			locationBefore = locationBefore < 0 ? 0 : locationBefore > m_dataArray.size() - 1 ?
+				m_dataArray.size() - 1 : locationBefore;
+			isBefore = false;
+			int locationAfter = getNearestLocation(effector->getX(updatingValuesIn->operator[](updatingEnd)), &found, &isBefore);
+			if (isBefore == false)
+			{
+				locationAfter--;
+			}
+			// if updatingEnd is the last point in effecor, then
+			// update everithing after i - 1
+			if (updatingValuesIn->operator[](updatingEnd) + 1 > effector->size())
+			{
+				locationAfter = m_dataArray.size() - 1;
+			}
+			locationAfter = locationAfter < 0 ? 0 : locationAfter > m_dataArray.size() - 1 ?
+				m_dataArray.size() - 1 : locationAfter;
+
+			// adding the values between locationBefore, locationAfter
+			for (unsigned int j = i - 1; j <= locationAfter; j++)
+			{
+				m_needsUpdating.push_back(j);
+			}
+		}
+		else
+		{
+			// if updatingValuesIn[i] == 0
+			if (effector->size() > 1)
+			{
+				// add every value before getX(1)
+				for (unsigned int j = 0; j < m_dataArray.size(); j++)
+				{
+					if (getX(j) > effector->getX(1))
+					{
+						break;
+					}
+					m_needsUpdating.push_back(j);
+				}
+			}
+			else
+			{
+				// if there is only 1 point in effector
+				// add everithing
+				for (unsigned int j = 0; j < m_dataArray.size(); j++)
+				{
+					m_needsUpdating.push_back(j);
+				}
+
+			}
+		}
+	}
+}
+void PointGraphDataArray::getUpdatingFromAuromation()
+{
+	// adding points with changed automation values
+	for (unsigned int i = 0; i < m_dataArray.size(); i++)
+	{
+		if (getIsAutomationValueChanged(i) == true)
+		{
+			m_needsUpdating.push_back(i);
+		}
+	}
+}
+void PointGraphDataArray::getUpdatingOriginals()
+{
+	// selecting only original values
+	// TODO this might be faster if we sort before
+	std::vector<unsigned int> originalValues;
+	if (m_needsUpdating.size() > 0)
+	{
+		originalValues.push_back(m_needsUpdating[0]);
+	}
+	for (unsigned int i = 0; i < m_needsUpdating.size(); i++)
+	{
+		bool found = false;
+		for (unsigned int j = 0; j < originalValues.size(); j++)
+		{
+			if (m_needsUpdating[i] == originalValues[j])
+			{
+				found = true;
+				break;
+			}
+		}
+		if (found == false)
+		{
+			originalValues.push_back(m_needsUpdating[i]);
+		}
+	}
+
+	// sorting the array
+	// this is done because of optimalization
+	std::sort(originalValues.begin(), originalValues.end(),
+		[](unsigned int a, unsigned int b)
+		{
+			return a > b;
+		});
+
+	m_needsUpdating = originalValues;
+	originalValues.clear();
+}
 
 void PointGraphDataArray::PointGraphDataArray::formatDataArrayEndPoints()
 {
@@ -2255,11 +2964,25 @@ void PointGraphDataArray::PointGraphDataArray::formatDataArrayEndPoints()
 		m_dataArray[m_dataArray.size() - 1].m_y = 1.0f;
 		m_dataArray[0].m_x = 0;
 		m_dataArray[0].m_y = m_nonNegative == true ? 0.0f : -1.0f;
+		// dataChanged is called in functions using this function
+		// so this function does not call it
 	}
 }
 
-void PointGraphDataArray::dataChanged()
+void PointGraphDataArray::dataChanged(int locationIn)
 {
+	if (m_isDataChanged == false && locationIn >= 0)
+	{
+		m_needsUpdating.push_back(locationIn);
+		if (m_needsUpdating.size() > m_dataArray.size() * 3)
+		{
+			m_isDataChanged = true;
+		}
+	}
+	else if (locationIn < 0)
+	{
+		m_isDataChanged = true;
+	}
 	m_parent->dataArrayChanged();
 }
 void PointGraphDataArray::styleChanged()

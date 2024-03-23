@@ -32,7 +32,7 @@ public:
 	// TODO: add is selectable			Done
 	// TODO: add new setting to make the last point cord 1, 1			Done
 	// TODO: flip mouse y position			Done
-	// TODO: function to get multiple values
+	// TODO: function to get multiple values			Done
 	// TODO: rewrite comments
 	// TODO: rename functions and values
 
@@ -54,21 +54,23 @@ public:
 	// TODO: clear array when 2. last point is deleted in the widget		IGNORE
 	// TODO: event when a dataArray's size gets to 0
 	// TODO: ability to scale displayed coords in PointGraphView (not 0 - 100) (add scalers)
-	// TODO: check PointGraphDataArray signals
+	// TODO: check PointGraphDataArray signals			Done
 	// TODO: journalling in PointGraphModel
 	// TODO: m_maxLenght* should be replaced with m_parent->getMaxLength()			Done
-	// TODO: setDataArray keep attributes option
+	// TODO: setDataArray keep attributes option, formatArray option which runs formatArray
 	// TODO: PointGraphDataArray shouldSaveAll and shouldSavePointAttributesOnly (for saving only editable graphs) option			Done
-	// TODO: baked values in PointGraphPoint
+	// TODO: baked automation values in PointGraphPoint			Done
 	// TODO: rename class to VectorGraph
 	// TODO: make std::vector<float> last used values			Done
-	//		TODO: make update logic (isChanged and update only automation / effected lines)
-	// TODO: effector location (same as automation location)
+	//		TODO: make update logic (isChanged and update only automation / effected lines)			Done
+	// TODO: effector location (same as automation location)			Done
 	// TODO: PointGraphView isSimplified			Done
 	// TODO: new automated color			Done
 	// TODO: context menu in gui (clear automation, connect to controller)
 	// TODO: display hints (full text) in the editing
 	// TODO: ability to edit multiple graphs using m_isLastSelectedArray
+	// TODO: handle effector arrays when deleting VectorGraphDataArray
+	// TODO: update formatArray
 
 	PointGraphView(QWidget * parentIn,
 		int widthIn, int heightIn,
@@ -295,7 +297,7 @@ public:
 	inline void clear()
 	{
 		m_dataArray.clear();
-		dataChanged();
+		dataChanged(-1);
 	}
 	inline size_t size()
 	{
@@ -303,7 +305,7 @@ public:
 	}
 	// clamps down the values to 0 - 1, -1 - 1
 	// does check m_isFixedSize, m_isFixedValue, m_isFixedPos,
-	// sorts array, removes duplicated positions,
+	// sorts array, removes duplicated positions, calls dataChanged()
 	// clampIn: should clamp, sortIn: should sort
 	void formatArray(bool clampIn, bool sortIn);
 
@@ -336,12 +338,12 @@ public:
 	// returns attribLocation: 0 = y, 1 = c, 2 = valA, 3 = valB
 	unsigned int getAutomatedAttribLocation(unsigned int locationIn);
 	unsigned int getEffectedAttribLocation(unsigned int locationIn);
-	inline bool getEffectOnlyPoints(unsigned int locationIn)
-	{
-		return m_dataArray[locationIn].m_effectOnlyPoints;
-	}
+	// returns true when m_effectOnlyPoints is true or
+	// when getEffectedAttribLocation > 0 (y is uneffected)
+	bool getEffectOnlyPoints(unsigned int locationIn);
 	// returns if the [effectNumberIn] effect is active based on effectNumberIn
 	bool getEffect(unsigned int locationIn, unsigned int effectNumberIn);
+	bool getIsAutomationValueChanged(unsigned int locationIn);
 	inline FloatModel* getAutomationModel(unsigned int locationIn)
 	{
 		return m_dataArray[locationIn].m_automationModel;
@@ -355,13 +357,18 @@ public:
 	// foundOut is true when the nearest position = posIn,
 	// reurns -1 when search failed
 	int getNearestLocation(float xIn, bool* foundOut, bool* isBeforeOut);
+	// get changed locations
+	// std::vector<unsigned int> getUpdatingValues();
 
-	float getValueAtPosition(float xIn); // TODO
+	std::vector<float> getValues(unsigned int countIn);
+	std::vector<float> getValues(unsigned int countIn, bool* isChangedOut, std::shared_ptr<std::vector<unsigned int>> updatingValuesOut);
+	//float getValueAtPosition(float xIn); // TODO
 
 
 	// set: -------------------
 	// sets data array without any checks
 	// inport x and y coords
+	// TODO should call dataChanged
 	void setDataArray(std::vector<std::pair<float, float>>* dataArrayIn, bool isCurvedIn);
 	// inport y coords
 	void setDataArray(std::vector<float>* dataArrayIn, bool isCurvedIn);
@@ -392,7 +399,8 @@ public:
 
 // signals: // not qt
 	// m_dataArray
-	void dataChanged();
+	// if locationIn > 0 -> adds it to the
+	void dataChanged(int locationIn);
 	// color
 	void styleChanged();
 private:
@@ -418,6 +426,7 @@ private:
 			m_effectLog = false;
 			m_effectSine = false;
 
+			m_bufferedAutomationValue = 0.0f;
 			m_automationModel = nullptr;
 		}
 		inline PointGraphPoint(float xIn, float yIn)
@@ -439,6 +448,7 @@ private:
 			m_effectLog = false;
 			m_effectSine = false;
 
+			m_bufferedAutomationValue = 0.0f;
 			m_automationModel = nullptr;
 		}
 		inline ~PointGraphPoint()
@@ -472,6 +482,9 @@ private:
 		// use getAutomatedAttrib or getEffectedAttrib to get it
 		unsigned int m_automatedEffectedAttribLocations;
 
+		// if the point's line should effect only points
+		// getEffectOnlyPoints() will return true when
+		// effected attrib location > 0
 		bool m_effectOnlyPoints;
 
 		bool m_effectAdd;
@@ -482,31 +495,55 @@ private:
 		bool m_effectLog;
 		bool m_effectSine;
 
+		// stores m_automationModel->value(), used in updating
+		float m_bufferedAutomationValue;
 		// automation: connecting to floatmodels, nullptr when it isn't conntected'
 		FloatModel* m_automationModel;
 	};
 	// swapping values, "slide" moves the values (between) once left or right
 	// handle m_isFixedEndPoints when using this
 	void swap(unsigned int locationAIn, unsigned int locationBIn, bool slide);
-	// applys the effect on a given value, does clamp TODO clamp
-	float processEffect(float valueIn, float effectValueIn,
-		PointGraphDataArray* effectArrayIn, unsigned int effectLocationIn, float lowerLimitIn);
 	// returns the curve value at a given x coord
 	float processCurve(float valueBeforeIn, float valueAfterIn, float curveIn, float xIn);
+	// applys the effect on a given value, does clamp
+	float processEffect(float attribValueIn, unsigned int attribLocationIn, float effectValueIn,
+		PointGraphDataArray* effectArrayIn, unsigned int effectLocationIn);
 	// returns a PointGraphPoint with modified attributes
-	float processAutomation(unsigned int locationIn, unsigned int attribLocationIn);
+	float processAutomation(float attribValueIn, unsigned int locationIn, unsigned int attribLocationIn);
+
 	// line effects / types, m_type is used for this
-	// valA: amp, valB: freq, fadeOutStartIn: from what xIn value should the line type fade out
-	float processLineTypeSine(float xIn, float valAIn, float valBIn, float fadeOutStartIn);
+	// valA: amp, valB: freq, fadeInStartIn: from what xIn value should the line type fade out
+	//float processLineTypeSine(float xIn, float valAIn, float valBIn, float fadeInStartIn);
+	std::vector<float> processLineTypeArraySine(std::vector<float>* xIn, unsigned int startIn, unsigned int endIn,
+		float valAIn, float valBIn, float fadeInStartIn);
 	// curveIn: phase
-	float processLineTypeSineB(float xIn, float valAIn, float valBIn, float curveIn, float fadeOutStartIn);
-	//std::vector<float> processLineTypeArraySine(std::vector<float> xIn, unsigned int startIn, unsigned int endIn, float valAIn, float valBIn);
+	//float processLineTypeSineB(float xIn, float valAIn, float valBIn, float curveIn, float fadeInStartIn);
+	std::vector<float> processLineTypeArraySineB(std::vector<float>* xIn, unsigned int startIn, unsigned int endIn,
+		float valAIn, float valBIn, float curveIn, float fadeInStartIn);
 	// valA: amp, valB: x coord, curve: width
-	float processLineTypePeak(float xIn, float valAIn, float valBIn, float curveIn, float fadeOutStartIn);
+	//float processLineTypePeak(float xIn, float valAIn, float valBIn, float curveIn, float fadeInStartIn);
+	std::vector<float> processLineTypeArrayPeak(std::vector<float>* xIn, unsigned int startIn, unsigned int endIn,
+		float valAIn, float valBIn, float curveIn, float fadeInStartIn);
 	// y: calculate steps from, valA: y count, valB: curve
-	float processLineTypeSteps(float xIn, float yIn, float valAIn, float valBIn, float fadeOutStartIn);
+	//float processLineTypeSteps(float xIn, float yIn, float valAIn, float valBIn, float fadeInStartIn);
+	std::vector<float> processLineTypeArraySteps(std::vector<float>* xIn, unsigned int startIn, unsigned int endIn,
+		std::vector<float>* yIn, float valAIn, float valBIn, float fadeInStartIn);
 	// valA: amp, valB: random number count, curveIn: seed
-	float processLineTypeRandom(float xIn, float valAIn, float valBIn, float curveIn, float fadeOutStartIn);
+	//float processLineTypeRandom(float xIn, float valAIn, float valBIn, float curveIn, float fadeInStartIn);
+	std::vector<float> processLineTypeArrayRandom(std::vector<float>* xIn, unsigned int startIn, unsigned int endIn,
+		float valAIn, float valBIn, float curveIn, float fadeInStartIn);
+
+	// updating
+	// adds the points that are
+	// effected by the effector's values changing
+	// ONLY WORKS IN SORTED ARRAYS
+	void getUpdatingFromEffector(std::shared_ptr<std::vector<unsigned int>> updatingValuesIn);
+	// adds the points that are changed because their
+	// automation is changed
+	void getUpdatingFromAuromation();
+	// recalculates m_needsUpdating so
+	// every point is in there only once
+	void getUpdatingOriginals();
 
 	// checks m_isFixedEndPoints, does not call dataChanged()
 	void formatDataArrayEndPoints();
@@ -544,10 +581,26 @@ private:
 	// ordered array of PointGraphPoints
 	std::vector<PointGraphPoint> m_dataArray;
 	
+
 	// baking
+
+	// getValues() will return m_bakedValues if a line is unchanged
+	// else it will recalculate the line's values, update m_bakedValues
+	// getValues() needs to know where did lines change so it updates
+	// m_needsUpdating by running getUpdatingFromEffector()
+	// if m_isDataChanged is true, then getValues adds all the points
+	// to m_needsUpdating before running
+	// getValues() clears m_needsUpdating after it has run
+
+	// if we want to update all
 	bool m_isDataChanged;
+	// if m_needsUpdating is up to date
+	// bool m_isUpdatedNeedsUpdating;
 	// array containing output final float values for optimalization
 	std::vector<float> m_bakedValues;
+	// unsorted array of locations in m_dataArray
+	// that need to be updated
+	std::vector<unsigned int> m_needsUpdating;
 };
 
 } // namespace lmms
