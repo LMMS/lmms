@@ -56,15 +56,13 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	m_threshColor(39, 171, 95, 100),
 	m_textColor(209, 216, 228, 50),
 	m_graphColor(209, 216, 228, 50),
-	m_resetColor(200, 100, 15, 200)
+	m_resetColor(200, 100, 15, 200),
+	m_backgroundColor(7, 8, 9, 255)
 {
 	setAutoFillBackground(false);
 	setAttribute(Qt::WA_OpaquePaintEvent, true);
 	setAttribute(Qt::WA_NoSystemBackground, true);
 	
-	QPalette pal;
-	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
-	setPalette(pal);
 	setMinimumSize(MIN_COMP_SCREEN_X, MIN_COMP_SCREEN_Y);
 	resize(COMP_SCREEN_X, COMP_SCREEN_Y);
 
@@ -615,7 +613,7 @@ void CompressorControlDialog::paintEvent(QPaintEvent *event)
 	m_p.begin(this);
 
 	m_p.setCompositionMode(QPainter::CompositionMode_Source);
-	m_p.fillRect(0, 0, m_windowSizeX, m_windowSizeY, QColor("transparent"));
+	m_p.fillRect(0, 0, m_windowSizeX, m_windowSizeY, m_backgroundColor);
 	m_p.setCompositionMode(QPainter::CompositionMode_SourceOver);
 
 	m_p.drawPixmap(0, 0, m_graphPixmap);
@@ -683,7 +681,7 @@ void CompressorControlDialog::drawGraph()
 
 	// Redraw graph
 	m_p.setPen(QPen(m_graphColor, 1));
-	for (int i = 1; i < m_dbRange / COMP_GRID_SPACING + 1; ++i)
+	for (int i = 0; i < m_dbRange / COMP_GRID_SPACING + 1; ++i)
 	{
 		m_p.drawLine(0, dbfsToYPoint(-COMP_GRID_SPACING * i), m_windowSizeX, dbfsToYPoint(-COMP_GRID_SPACING * i));
 		m_p.drawLine(dbfsToXPoint(-COMP_GRID_SPACING * i), 0, dbfsToXPoint(-COMP_GRID_SPACING * i), m_kneeWindowSizeY);
