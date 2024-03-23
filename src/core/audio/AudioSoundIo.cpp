@@ -214,7 +214,6 @@ AudioSoundIo::~AudioSoundIo()
 
 void AudioSoundIo::startProcessing()
 {
-
 	m_outBufFrameIndex = 0;
 	m_outBufFramesTotal = 0;
 	m_outBufSize = audioEngine()->framesPerPeriod();
@@ -246,12 +245,10 @@ void AudioSoundIo::startProcessing()
 
 void AudioSoundIo::stopProcessing()
 {
-	int err = 0;
-
 	m_stopped = true;
 	if (m_outstream)
 	{
-		if ((err = soundio_outstream_pause(m_outstream, true)))
+		if (int err = soundio_outstream_pause(m_outstream, true))
 		{
 			fprintf(stderr, 
 				"AudioSoundIo::stopProcessing() :: pausing result error: %s\n",
@@ -282,14 +279,12 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 	const struct SoundIoChannelLayout *layout = &m_outstream->layout;
 	SoundIoChannelArea* areas = nullptr;
 	int bytesPerSample = m_outstream->bytes_per_sample;
-	int err = 0;
-
 	int framesLeft = frameCountMax;
 
 	while (framesLeft > 0)
 	{
 		int frameCount = framesLeft;
-		if ((err = soundio_outstream_begin_write(m_outstream, &areas, &frameCount)))
+		if (int err = soundio_outstream_begin_write(m_outstream, &areas, &frameCount))
 		{
 			errorCallback(err);
 			return;
@@ -331,7 +326,7 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 			m_outBufFrameIndex += 1;
 		}
 
-		if ((err = soundio_outstream_end_write(m_outstream)))
+		if (int err = soundio_outstream_end_write(m_outstream))
 		{
 			errorCallback(err);
 			return;

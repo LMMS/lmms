@@ -53,8 +53,6 @@ AudioAlsa::AudioAlsa( bool & _success_ful, AudioEngine*  _audioEngine ) :
 		"Could not avoid possible interception by PulseAudio\n" );
 	}
 
-	int err = 0;
-
 	if (int err = snd_pcm_open(&m_handle, probeDevice().toLatin1().constData(), SND_PCM_STREAM_PLAYBACK, 0); err < 0)
 	{
 		printf( "Playback open error: %s\n", snd_strerror( err ) );
@@ -64,14 +62,13 @@ AudioAlsa::AudioAlsa( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	snd_pcm_hw_params_malloc( &m_hwParams );
 	snd_pcm_sw_params_malloc( &m_swParams );
 
-	if( ( err = setHWParams( channels(),
-					SND_PCM_ACCESS_RW_INTERLEAVED ) ) < 0 )
+	if (int err = setHWParams(channels(), SND_PCM_ACCESS_RW_INTERLEAVED); err < 0)
 	{
 		printf( "Setting of hwparams failed: %s\n",
 							snd_strerror( err ) );
 		return;
 	}
-	if( ( err = setSWParams() ) < 0 )
+	if (int err = setSWParams(); err < 0)
 	{
 		printf( "Setting of swparams failed: %s\n",
 							snd_strerror( err ) );
