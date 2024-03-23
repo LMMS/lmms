@@ -156,7 +156,7 @@ bool DynProcEffect::processAudioBuffer( sampleFrame * _buf,
 		{
 			const double t = m_rms[i]->update( s[i] );
 			// smoothing "t" to filter unwanted noise
-			const double dif = qMin(std::abs(t-m_smoothRms[i])*0.1, 0.05);
+			const double dif = std::min(std::abs(t-m_smoothRms[i]) * 0.1, 0.05);
 			m_smoothRms[i] = m_smoothRms[i] * (1-dif) + t * dif;
 			if( t > m_currentPeak[i] )
 			{
