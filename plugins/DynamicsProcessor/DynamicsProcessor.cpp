@@ -165,7 +165,7 @@ bool DynProcEffect::processAudioBuffer( sampleFrame * _buf,
 			else
 			if( t < m_currentPeak[i] )
 			{
-				m_currentPeak[i] = qMax(m_currentPeak[i] * m_relCoeff, m_smoothRms[i]);
+				m_currentPeak[i] = std::max(m_currentPeak[i] * m_relCoeff, m_smoothRms[i]);
 			}
 
 			m_currentPeak[i] = qBound( DYN_NOISE_FLOOR, m_currentPeak[i], 10.0f );
