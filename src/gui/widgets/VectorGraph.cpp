@@ -241,15 +241,14 @@ void VectorGraphView::mouseMoveEvent(QMouseEvent* me)
 			{
 				if (m_isCurveSelected == false)
 				{
-					std::pair<float, float> convertedCoords = mapMousePos(x, m_graphHeight - y, model()->getDataArray(m_selectedArray)->getNonNegative());
+					std::pair<float, float> convertedCoords = mapMousePos(x, m_graphHeight - y);
 					convertedCoords.first = convertedCoords.first > 1.0f ? 1.0f : convertedCoords.first < 0.0f ? 1.0f : convertedCoords.first;
 					convertedCoords.second = convertedCoords.second > 1.0f ? 1.0f : convertedCoords.second < -1.0f ? -1.0f : convertedCoords.second;
 					setSelectedData(convertedCoords);
 				}
 				else if (model()->getDataArray(m_selectedArray)->getIsEditableAttrib() == true)
 				{
-					std::pair<float, float> convertedCoords = mapMousePos(x - m_lastTrackPoint.first, m_graphHeight - y + m_lastTrackPoint.second,
-						model()->getDataArray(m_selectedArray)->getNonNegative());
+					std::pair<float, float> convertedCoords = mapMousePos(x - m_lastTrackPoint.first, m_graphHeight - y + m_lastTrackPoint.second);
 					float curveValue = convertedCoords.second + convertedCoords.first * 0.1f;
 					curveValue = curveValue > 1.0f ? 1.0f : curveValue < -1.0f ? -1.0f : curveValue;
 					model()->getDataArray(m_selectedArray)->setC(m_selectedLocation, curveValue);
@@ -295,8 +294,7 @@ void VectorGraphView::mouseMoveEvent(QMouseEvent* me)
 						m_lastTrackPoint.second = m_graphHeight - y;
 		qDebug("get last value: %d, lasttrack: %d, x: %d, y: %d, x2: %d, y2: %d, location: %d", m_lastScndTrackPoint.first, m_lastScndTrackPoint.second, x, (m_graphHeight - y), m_lastTrackPoint.first, m_lastTrackPoint.second, pressLocation);
 					}
-					std::pair<float, float> convertedCoords = mapMousePos(0, m_lastScndTrackPoint.first + static_cast<int>(m_graphHeight - y - m_lastTrackPoint.second) / 2,
-						model()->getDataArray(m_selectedArray)->getNonNegative());
+					std::pair<float, float> convertedCoords = mapMousePos(0, m_lastScndTrackPoint.first + static_cast<int>(m_graphHeight - y - m_lastTrackPoint.second) / 2);
 					setInputAttribValue(location, convertedCoords.second, false);
 				}
 			}
@@ -322,8 +320,7 @@ void VectorGraphView::mouseReleaseEvent(QMouseEvent* me)
 				qDebug("release size: %ld", model()->getDataArraySize());
 				for(unsigned int i = 0; i < model()->getDataArraySize(); i++)
 				{
-					std::pair<float, float> curMouseData = mapMousePos(x, m_graphHeight - y,
-						model()->getDataArray(i)->getNonNegative()); // TODO optimize
+					std::pair<float, float> curMouseData = mapMousePos(x, m_graphHeight - y);
 					int location = model()->getDataArray(i)->add(curMouseData.first);
 					// if adding was successful
 					if (location >= 0)
@@ -514,8 +511,8 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 				qDebug("paint dataArrayValues size: %ld", dataArrayValues.size());
 				for (unsigned int j = 0; j < dataArrayValues.size(); j++)
 				{
-					//posB = mapDataPos(*dataArray->getX(j + 1), dataArray->getY(j + 1), dataArray->getNonNegative());
-					//posB = mapDataPos(0, dataArray->getValueAtPosition(static_cast<float>(j) / static_cast<float>(width())), dataArray->getNonNegative());
+					//posB = mapDataPos(*dataArray->getX(j + 1), dataArray->getY(j + 1));
+					//posB = mapDataPos(0, dataArray->getValueAtPosition(static_cast<float>(j) / static_cast<float>(width())));
 					posB = mapDataPos(0, dataArrayValues[j], dataArray->getNonNegative());
 					//posB = dataArray->getValueAtPosition(static_cast<float>(j) / static_cast<float>(width()));
 					posB.first = j;
@@ -634,22 +631,12 @@ void VectorGraphView::updateGraph()
 	update();
 }
 
-std::pair<float, float> VectorGraphView::mapMousePos(int xIn, int yIn, bool nonNegativeIn)
+std::pair<float, float> VectorGraphView::mapMousePos(int xIn, int yIn)
 {
-	if (nonNegativeIn == true)
-	{
-		// mapping the position to 0 - 1, 0 - 1 using qWidget width and height
-		return std::pair<float, float>(
-			static_cast<float>(xIn / (float)width()),
-			static_cast<float>(yIn / (float)m_graphHeight));
-	}
-	else
-	{
-		// mapping the position to 0 - 1, -1 - 1 using qWidget width and height
-		return std::pair<float, float>(
-			static_cast<float>(xIn / (float)width()),
-			static_cast<float>((yIn * 2.0f / (float)m_graphHeight) - 1.0f));
-	}
+	// mapping the position to 0 - 1, 0 - 1 using qWidget width and height
+	return std::pair<float, float>(
+		static_cast<float>(xIn / (float)width()),
+		static_cast<float>(yIn * 2.0f / (float)m_graphHeight) - 1.0f);
 }
 std::pair<int, int> VectorGraphView::mapDataPos(float xIn, float yIn, bool nonNegativeIn)
 {
@@ -662,10 +649,9 @@ std::pair<int, int> VectorGraphView::mapDataPos(float xIn, float yIn, bool nonNe
 	}
 	else
 	{
-		// mapping the point/sample positon to mouse/view position
 		return std::pair<int, int>(
 			static_cast<int>(xIn * width()),
-			static_cast<int>((yIn / 2.0f + 0.5f) * m_graphHeight));
+			static_cast<int>((yIn + 1.0f) * static_cast<float>(m_graphHeight) / 2.0f));
 	}
 }
 std::pair<float, float> VectorGraphView::mapDataCurvePos(float xAIn, float yAIn, float xBIn, float yBIn, float curveIn)
@@ -1024,7 +1010,7 @@ int VectorGraphView::searchForData(int mouseXIn, int mouseYIn, float maxDistance
 	float maxDistance = maxDistanceIn * 2.0f;
 	qDebug("searchData");
 
-	std::pair<float, float> transformedMouse = mapMousePos(mouseXIn, mouseYIn, arrayIn->getNonNegative());
+	std::pair<float, float> transformedMouse = mapMousePos(mouseXIn, mouseYIn);
 
 	// we dont use this bool
 	bool found = false;
@@ -1526,6 +1512,10 @@ void VectorGraphDataArray::formatArray(bool clampIn, bool sortIn)
 	{
 		for (unsigned int i = 0; i < m_dataArray.size(); i++)
 		{
+			if (m_dataArray[i].m_x < 0)
+			{
+				m_dataArray[i].m_x = 0;
+			}
 			if (m_dataArray[i].m_x > 1)
 			{
 				m_dataArray[i].m_x = 1;
@@ -1534,19 +1524,9 @@ void VectorGraphDataArray::formatArray(bool clampIn, bool sortIn)
 			{
 				m_dataArray[i].m_y = 1;
 			}
-			if (m_nonNegative == true)
+			if (m_dataArray[i].m_y < -1)
 			{
-				if (m_dataArray[i].m_y < 0)
-				{
-					m_dataArray[i].m_y = 0;
-				}
-			}
-			else
-			{
-				if (m_dataArray[i].m_y < -1)
-				{
-					m_dataArray[i].m_y = -1;
-				}
+				m_dataArray[i].m_y = -1;
 			}
 		}
 		formatDataArrayEndPoints();
@@ -1963,6 +1943,13 @@ std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn, bool* i
 				else if (m_bakedValues[j] < -1.0f)
 				{
 					m_bakedValues[j] = -1.0f;
+				}
+			}
+			if (m_nonNegative == true)
+			{
+				for (int j = start; j < end; j++)
+				{
+					m_bakedValues[j] = m_bakedValues[j] / 2.0f + 0.5f;
 				}
 			}
 		}
@@ -2963,7 +2950,7 @@ void VectorGraphDataArray::formatDataArrayEndPoints()
 		m_dataArray[m_dataArray.size() - 1].m_x = 1;
 		m_dataArray[m_dataArray.size() - 1].m_y = 1.0f;
 		m_dataArray[0].m_x = 0;
-		m_dataArray[0].m_y = m_nonNegative == true ? 0.0f : -1.0f;
+		m_dataArray[0].m_y = -1.0f;
 		// dataChanged is called in functions using this function
 		// so this function does not call it
 	}
