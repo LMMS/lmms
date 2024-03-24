@@ -103,7 +103,6 @@ private:
 	 */
 	void setDelayLine(DelayLine* dl, int pick, const float* values, int len, float scale, bool state)
 	{
-
 		if (!state)
 		{
 			for (int i = 0; i < pick; ++i)
