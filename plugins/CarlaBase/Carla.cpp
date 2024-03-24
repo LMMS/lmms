@@ -642,7 +642,7 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
     m_toggleParamsWindowButton = new QPushButton(tr("Params"), this);
     m_toggleParamsWindowButton->setIcon(embed::getIconPixmap("controller"));
     m_toggleParamsWindowButton->setCheckable(true);
-    m_toggleParamsWindowButton->setFont(pointSize(m_toggleParamsWindowButton->font(), 8));
+    m_toggleParamsWindowButton->setFont(pointSize<int>(m_toggleParamsWindowButton->font(), 8));
 #if CARLA_VERSION_HEX < CARLA_MIN_PARAM_VERSION
     m_toggleParamsWindowButton->setEnabled(false);
     m_toggleParamsWindowButton->setToolTip(tr("Available from Carla version 2.1 and up."));

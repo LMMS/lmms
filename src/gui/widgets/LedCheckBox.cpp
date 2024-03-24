@@ -116,7 +116,7 @@ void LedCheckBox::onTextUpdated()
 void LedCheckBox::paintLegacy(QPaintEvent * pe)
 {
 	QPainter p( this );
-	p.setFont(pointSize(font(), 7));
+	p.setFont(pointSize<int>(font(), 7));
 
 	p.drawPixmap(0, 0, model()->value() ? m_ledOnPixmap : m_ledOffPixmap);
 

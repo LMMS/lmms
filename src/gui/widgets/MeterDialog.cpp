@@ -84,7 +84,7 @@ MeterDialog::MeterDialog( QWidget * _parent, bool _simple ) :
 	{
 		auto den_label = new QLabel(tr("Meter Denominator"), den);
 		QFont f = den_label->font();
-		den_label->setFont(pointSize(f, 7));
+		den_label->setFont(pointSize<int>(f, 7));
 		den_layout->addSpacing( 5 );
 		den_layout->addWidget( den_label );
 	}

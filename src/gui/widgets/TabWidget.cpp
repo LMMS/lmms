@@ -70,7 +70,7 @@ TabWidget::TabWidget(const QString& caption, QWidget* parent, bool usePixmap,
 
 void TabWidget::addTab(QWidget* w, const QString& name, const char* pixmap, int idx)
 {
-	setFont(pointSize(font(), 8));
+	setFont(pointSize<int>(font(), 8));
 
 	// Append tab when position is not given
 	if (idx < 0/* || m_widgets.contains(idx) == true*/)
@@ -216,7 +216,7 @@ void TabWidget::resizeEvent(QResizeEvent*)
 void TabWidget::paintEvent(QPaintEvent* pe)
 {
 	QPainter p(this);
-	p.setFont(pointSize(font(), 7));
+	p.setFont(pointSize<int>(font(), 7));
 
 	// Draw background
 	QBrush bg_color = p.background();
@@ -232,7 +232,7 @@ void TabWidget::paintEvent(QPaintEvent* pe)
 	// Draw title, if any
 	if (!m_caption.isEmpty())
 	{
-		p.setFont(pointSize(p.font(), 8));
+		p.setFont(pointSize<int>(p.font(), 8));
 		p.setPen(tabTitleText());
 		p.drawText(5, 11, m_caption);
 	}
