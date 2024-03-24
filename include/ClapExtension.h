@@ -54,14 +54,15 @@ public:
 	virtual auto extensionId() const -> std::string_view = 0;
 	virtual auto extensionIdCompat() const -> std::string_view { return std::string_view{}; }
 
+	auto logger() const -> const ClapLog&;
+
+	static auto fromHost(const clap_host* host) -> ClapInstance*;
+
+protected:
 	auto instance() const { return m_instance; }
 	auto instance() { return m_instance; }
 	auto host() const -> const clap_host*;
 	auto plugin() const -> const clap_plugin*;
-	auto logger() const -> const ClapLog&;
-
-	// TODO: Make protected?
-	static auto fromHost(const clap_host* host) -> ClapInstance*;
 
 private:
 	ClapInstance* m_instance = nullptr;

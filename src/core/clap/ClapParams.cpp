@@ -137,11 +137,17 @@ auto ClapParams::rescan(clap_param_rescan_flags flags) -> bool
 				return false; // TODO: continue?
 			}
 
-			double value = getValue(info);
-			auto param = std::make_unique<ClapParameter>(this, info, value);
-			checkValidParamValue(*param, value);
-			m_paramMap.insert_or_assign(info.id, std::move(param));
-			needToUpdateParamsCache = true;
+			if (const auto value = getValue(info))
+			{
+				auto param = std::make_unique<ClapParameter>(this, info, *value);
+				checkValidParamValue(*param, *value);
+				m_paramMap.insert_or_assign(info.id, std::move(param));
+				needToUpdateParamsCache = true;
+			}
+			else
+			{
+				return false; // TODO: continue?
+			}
 		}
 		else
 		{
@@ -167,21 +173,27 @@ auto ClapParams::rescan(clap_param_rescan_flags flags) -> bool
 				it->second->setInfo(info);
 			}
 
-			double value = getValue(info);
-			if (it->second->value() != value)
+			if (const auto value = getValue(info))
 			{
-				if (!rescanMayValueChange(flags))
+				if (it->second->value() != *value)
 				{
-					std::string msg = "a parameter's value did change but, but the flag CLAP_PARAM_RESCAN_VALUES was not specified; "
-						"id: " + std::to_string(info.id) + ", name: " + std::string{info.name} + ", module: " + std::string{info.module};
-					logger().log(CLAP_LOG_WARNING, msg.c_str());
-					return false; // TODO: continue?
-				}
+					if (!rescanMayValueChange(flags))
+					{
+						std::string msg = "a parameter's value did change but, but the flag CLAP_PARAM_RESCAN_VALUES was not specified; "
+							"id: " + std::to_string(info.id) + ", name: " + std::string{info.name} + ", module: " + std::string{info.module};
+						logger().log(CLAP_LOG_WARNING, msg.c_str());
+						return false; // TODO: continue?
+					}
 
-				// Update param value
-				checkValidParamValue(*it->second, value);
-				it->second->setValue(value);
-				it->second->setModulation(value);
+					// Update param value
+					checkValidParamValue(*it->second, *value);
+					it->second->setValue(*value);
+					it->second->setModulation(*value);
+				}
+			}
+			else
+			{
+				return false; // TODO: continue?
 			}
 		}
 	}
@@ -413,18 +425,21 @@ auto ClapParams::checkValidParamValue(const ClapParameter& param, double value) 
 	return true;
 }
 
-auto ClapParams::getValue(const clap_param_info& info) const -> double
+auto ClapParams::getValue(const clap_param_info& info) const -> std::optional<double>
 {
-	// TODO: Return std::optional<double>?
 	assert(ClapThreadCheck::isMainThread());
 	assert(supported());
 
 	double value = 0.0;
-	if (pluginExt()->get_value(plugin(), info.id, &value)) { return value; }
+	if (!pluginExt()->get_value(plugin(), info.id, &value))
+	{
+		std::string msg = "Failed to get the parameter value. id: " + std::to_string(info.id)
+			+ ", name: " + std::string{info.name} + ", module: " + std::string{info.module};
+		logger().log(CLAP_LOG_PLUGIN_MISBEHAVING, msg);
+		return std::nullopt;
+	}
 
-	std::string msg = "failed to get the param value, id: " + std::to_string(info.id)
-		+ ", name: " + std::string{info.name} + ", module: " + std::string{info.module};
-	throw std::logic_error{msg};
+	return value;
 }
 
 auto ClapParams::getValueText(const ClapParameter& param) const -> std::string

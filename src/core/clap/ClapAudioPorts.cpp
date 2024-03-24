@@ -103,8 +103,8 @@ auto ClapAudioPorts::init(clap_process& process) noexcept -> bool
 
 	// Clear everything just to be safe
 	m_issues.clear();
-	m_audioIn.reset();
-	m_audioOut.reset();
+	m_audioIn.clear();
+	m_audioOut.clear();
 	m_audioInActive = m_audioOutActive = nullptr;
 	m_audioPortsIn.clear();
 	m_audioPortsOut.clear();
@@ -118,7 +118,7 @@ auto ClapAudioPorts::init(clap_process& process) noexcept -> bool
 
 	auto readPorts = [&](
 		std::vector<AudioPort>& audioPorts,
-		std::unique_ptr<clap_audio_buffer[]>& audioBuffers,
+		std::vector<clap_audio_buffer>& audioBuffers,
 		std::vector<ClapAudioBuffer>& rawAudioBuffers,
 		bool isInput) -> AudioPort*
 	{
@@ -239,28 +239,34 @@ auto ClapAudioPorts::init(clap_process& process) noexcept -> bool
 		}
 
 		assert(portCount == audioPorts.size());
-		audioBuffers = std::make_unique<clap_audio_buffer[]>(audioPorts.size());
+		audioBuffers.reserve(audioPorts.size());
 		for (std::uint32_t port = 0; port < audioPorts.size(); ++port)
 		{
-			const auto channelCount = audioPorts[port].info.channel_count;
-			if (channelCount <= 0) { return nullptr; }
+			auto& buffer = audioBuffers.emplace_back();
 
-			audioBuffers[port].channel_count = channelCount;
+			const auto channelCount = audioPorts[port].info.channel_count;
+			if (channelCount <= 0)
+			{
+				logger().log(CLAP_LOG_WARNING, "Audio port channel count is zero");
+				//return nullptr;
+			}
+
+			buffer.channel_count = channelCount;
 			if (isInput && port != monoPort && (port != stereoPort || stereoPort == CLAP_INVALID_ID))
 			{
 				// This input port will not be used by LMMS
 				// TODO: Will a mono port ever need to be used if a stereo port is available?
-				audioBuffers[port].constant_mask = static_cast<std::uint64_t>(-1);
+				buffer.constant_mask = static_cast<std::uint64_t>(-1);
 			}
 			else
 			{
-				audioBuffers[port].constant_mask = 0;
+				buffer.constant_mask = 0;
 			}
 
 			auto& rawBuffer = rawAudioBuffers.emplace_back(channelCount, DEFAULT_BUFFER_SIZE);
-			audioBuffers[port].data32 = rawBuffer.data();
-			audioBuffers[port].data64 = nullptr; // Not supported by LMMS
-			audioBuffers[port].latency = 0; // TODO: latency extension
+			buffer.data32 = rawBuffer.data();
+			buffer.data64 = nullptr; // Not supported by LMMS
+			buffer.latency = 0; // TODO: latency extension
 		}
 
 		if (stereoPort != CLAP_INVALID_ID)
@@ -280,7 +286,8 @@ auto ClapAudioPorts::init(clap_process& process) noexcept -> bool
 
 		// Missing a required port type that LMMS supports - i.e. an effect where the only input is surround sound
 		{
-			std::string msg = std::string{isInput ? "An input" : "An output"} + " audio port is required, but plugin has none that are usable";
+			std::string msg = std::string{isInput ? "An input" : "An output"}
+				+ " audio port is required, but plugin has none that are usable";
 			logger().log(CLAP_LOG_ERROR, msg);
 		}
 		m_issues.emplace_back(PluginIssueType::UnknownPortType); // TODO: Add better entry to PluginIssueType
@@ -293,7 +300,7 @@ auto ClapAudioPorts::init(clap_process& process) noexcept -> bool
 		return false;
 	}
 
-	process.audio_inputs = m_audioIn.get();
+	process.audio_inputs = m_audioIn.data();
 	process.audio_inputs_count = m_audioPortsIn.size();
 	m_audioInActive = m_audioPortInActive ? &m_audioIn[m_audioPortInActive->index] : nullptr;
 
@@ -303,7 +310,7 @@ auto ClapAudioPorts::init(clap_process& process) noexcept -> bool
 		return false;
 	}
 
-	process.audio_outputs = m_audioOut.get();
+	process.audio_outputs = m_audioOut.data();
 	process.audio_outputs_count = m_audioPortsOut.size();
 	m_audioOutActive = m_audioPortOutActive ? &m_audioOut[m_audioPortOutActive->index] : nullptr;
 
@@ -339,7 +346,8 @@ auto ClapAudioPorts::checkSupported(const clap_plugin_audio_ports& ext) -> bool
 	return ext.count && ext.get;
 }
 
-void ClapAudioPorts::copyBuffersFromCore(const sampleFrame* buf, unsigned firstChannel, unsigned numChannels, fpp_t frames)
+void ClapAudioPorts::copyBuffersFromCore(const sampleFrame* buf, unsigned firstChannel,
+	unsigned numChannels, fpp_t frames)
 {
 	// LMMS to CLAP
 	if (numChannels > 1)
@@ -362,7 +370,8 @@ void ClapAudioPorts::copyBuffersFromCore(const sampleFrame* buf, unsigned firstC
 	}
 }
 
-void ClapAudioPorts::copyBuffersToCore(sampleFrame* buf, unsigned firstChannel, unsigned numChannels, fpp_t frames) const
+void ClapAudioPorts::copyBuffersToCore(sampleFrame* buf, unsigned firstChannel,
+	unsigned numChannels, fpp_t frames) const
 {
 	// CLAP to LMMS
 	if (numChannels > 1)
@@ -370,18 +379,21 @@ void ClapAudioPorts::copyBuffersToCore(sampleFrame* buf, unsigned firstChannel, 
 		if (hasStereoOutput())
 		{
 			// Stereo CLAP to Stereo LMMS
-			copyBuffersPluginToHost<true>(m_audioOutActive->data32, buf, m_audioOutActive->constant_mask, firstChannel, frames);
+			copyBuffersPluginToHost<true>(m_audioOutActive->data32, buf,
+				m_audioOutActive->constant_mask, firstChannel, frames);
 		}
 		else
 		{
 			// Mono CLAP to Stereo LMMS
-			copyBuffersMonoPluginToStereoHost(m_audioOutActive->data32, buf, m_audioOutActive->constant_mask, firstChannel, frames);
+			copyBuffersMonoPluginToStereoHost(m_audioOutActive->data32, buf,
+				m_audioOutActive->constant_mask, firstChannel, frames);
 		}
 	}
 	else
 	{
 		// Mono CLAP to Mono LMMS
-		copyBuffersPluginToHost<false>(m_audioOutActive->data32, buf, m_audioOutActive->constant_mask, firstChannel, frames);
+		copyBuffersPluginToHost<false>(m_audioOutActive->data32, buf,
+			m_audioOutActive->constant_mask, firstChannel, frames);
 	}
 }
 

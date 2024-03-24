@@ -45,8 +45,10 @@ class ClapAudioBuffer
 {
 public:
 	ClapAudioBuffer(std::uint32_t channels, std::uint32_t frames)
-		: m_channels(channels), m_frames(frames)
+		: m_channels{channels}
+		, m_frames{frames}
 	{
+		if (channels == 0) { return; }
 		m_data = new float*[m_channels]();
 		for (std::uint32_t channel = 0; channel < m_channels; ++channel)
 		{
@@ -55,16 +57,16 @@ public:
 	}
 
 	ClapAudioBuffer(const ClapAudioBuffer&) = delete;
-	ClapAudioBuffer& operator=(const ClapAudioBuffer&) = delete;
+	auto operator=(const ClapAudioBuffer&) -> ClapAudioBuffer& = delete;
 
-	ClapAudioBuffer(ClapAudioBuffer&& other) noexcept :
-		m_channels(std::exchange(other.m_channels, 0)),
-		m_frames(std::exchange(other.m_frames, 0)),
-		m_data(std::exchange(other.m_data, nullptr))
+	ClapAudioBuffer(ClapAudioBuffer&& other) noexcept
+		: m_channels{std::exchange(other.m_channels, 0)}
+		, m_frames{std::exchange(other.m_frames, 0)}
+		, m_data{std::exchange(other.m_data, nullptr)}
 	{
 	}
 
-	ClapAudioBuffer& operator=(ClapAudioBuffer&& other) noexcept
+	auto operator=(ClapAudioBuffer&& other) noexcept -> ClapAudioBuffer&
 	{
 		if (this != &other)
 		{
@@ -149,7 +151,7 @@ private:
 	/**
 	 * Process-related
 	*/
-	std::unique_ptr<clap_audio_buffer_t[]> m_audioIn, m_audioOut; // TODO: Why not use a std::vector?
+	std::vector<clap_audio_buffer_t> m_audioIn, m_audioOut;
 	clap_audio_buffer_t* m_audioInActive = nullptr; //!< Pointer to m_audioIn element used by LMMS
 	clap_audio_buffer_t* m_audioOutActive = nullptr; //!< Pointer to m_audioOut element used by LMMS
 

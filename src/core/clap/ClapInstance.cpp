@@ -101,16 +101,6 @@ ClapInstance::~ClapInstance()
 
 void ClapInstance::copyModelsFromCore()
 {
-	/*
-	for (auto param : m_params)
-	{
-		if (!param || !param->model()) { continue; }
-
-		// ERROR: Cannot do this on the audio thread - doing in main thread instead
-		setParamValueByHost(*param, param->model()->value<float>());
-	}
-	*/
-
 	// TODO: Handle parameter events similar to midi input? (with ringbuffer)
 
 	if (!hasNoteInput()) { return; }
@@ -252,7 +242,7 @@ auto ClapInstance::unload() -> bool
 
 	// Deinitialize extensions
 	m_audioPorts.deinit();
-	m_gui.deinit();
+	//m_gui.deinit();
 	m_log.deinit();
 	m_notePorts.deinit();
 	m_params.deinit();
@@ -300,7 +290,7 @@ auto ClapInstance::init() -> bool
 	}
 
 	// TODO: What if this is the 2nd instance of a mono plugin?
-	m_gui.init();
+	//m_gui.init();
 
 	m_notePorts.init();
 	if (!hasNoteInput() && info().type() == Plugin::Type::Instrument)
@@ -423,7 +413,7 @@ void ClapInstance::processNote(f_cnt_t offset, std::int8_t channel, std::int16_t
 			break;
 		}
 		default:
-			assert(false); // Shouldn't ever happen
+			assert(false);
 			break;
 	}
 }
@@ -470,7 +460,7 @@ void ClapInstance::processKeyPressure(f_cnt_t offset, std::int8_t channel, std::
 			break;
 		}
 		default:
-			assert(false); // Shouldn't ever happen
+			assert(false);
 			break;
 	}
 }
@@ -675,7 +665,7 @@ auto ClapInstance::clapGetExtension(const clap_host* host, const char* extension
 	auto h = detail::ClapExtensionHelper::fromHost(host);
 	if (!h || !extensionId) { return nullptr; }
 
-#if 1
+#if 0
 	{
 		std::string msg = "Plugin requested host extension: ";
 		msg += (extensionId ? extensionId : "(NULL)");

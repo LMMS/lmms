@@ -101,11 +101,11 @@ private:
 	std::vector<Preset> m_presets; //!< Used during the call to query()
 
 	std::string m_error;
+	bool m_skip = false; //!< Used to ignore remaining metadata if the current preset is invalid
 };
 
 auto ClapPresetDatabase::init(const clap_plugin_entry* entry) -> bool
 {
-	// TODO: Move this to discoverSetup() method?
 	if (!entry) { return false; }
 
 	m_factory = static_cast<const clap_preset_discovery_factory*>(
@@ -663,6 +663,8 @@ auto ClapPresetDatabase::MetadataReceiver::clapBeginPreset(
 	auto self = from(receiver);
 	if (!self) { return false; }
 
+	self->m_skip = false;
+
 	auto& preset = self->m_presets.emplace_back();
 	preset.metadata().displayName = name ? name : std::string{};
 	preset.metadata().flags = self->m_flags; // may be overridden by clapSetFlags()
@@ -682,21 +684,24 @@ void ClapPresetDatabase::MetadataReceiver::clapAddPluginId(
 		return;
 	}
 
-	if (pluginId->abi != std::string_view{"clap"})
-	{
-		ClapLog::globalLog(CLAP_LOG_WARNING, "Preset must use the \"clap\" abi");
-		// TODO: Remove the preset?
-		return;
-	}
-
 	auto self = from(receiver);
-	if (!self) { return; }
+	if (!self || self->m_skip) { return; }
 
 	auto& presets = self->m_presets;
 	if (presets.empty())
 	{
 		ClapLog::globalLog(CLAP_LOG_PLUGIN_MISBEHAVING,
 			"Preset discovery provider called add_plugin_id() called before begin_preset()");
+		return;
+	}
+
+	if (pluginId->abi != std::string_view{"clap"})
+	{
+		ClapLog::globalLog(CLAP_LOG_WARNING, "Preset must use the \"clap\" abi");
+
+		// Remove the current preset
+		self->m_skip = true; // Skip any more metadata calls until next begin_preset()
+		presets.pop_back();
 		return;
 	}
 
@@ -713,7 +718,7 @@ void ClapPresetDatabase::MetadataReceiver::clapSetFlags(
 	const clap_preset_discovery_metadata_receiver* receiver, std::uint32_t flags)
 {
 	auto self = from(receiver);
-	if (!self) { return; }
+	if (!self || self->m_skip) { return; }
 
 	auto& presets = self->m_presets;
 	if (presets.empty())
@@ -731,7 +736,7 @@ void ClapPresetDatabase::MetadataReceiver::clapAddCreator(
 {
 	if (!creator) { return; }
 	auto self = from(receiver);
-	if (!self) { return; }
+	if (!self || self->m_skip) { return; }
 
 	auto& presets = self->m_presets;
 	if (presets.empty())
@@ -749,7 +754,7 @@ void ClapPresetDatabase::MetadataReceiver::clapSetDescription(
 {
 	if (!description) { return; }
 	auto self = from(receiver);
-	if (!self) { return; }
+	if (!self || self->m_skip) { return; }
 
 	auto& presets = self->m_presets;
 	if (presets.empty())
@@ -774,7 +779,7 @@ void ClapPresetDatabase::MetadataReceiver::clapAddFeature(
 {
 	if (!feature) { return; }
 	auto self = from(receiver);
-	if (!self) { return; }
+	if (!self || self->m_skip) { return; }
 
 	auto& presets = self->m_presets;
 	if (presets.empty())

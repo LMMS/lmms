@@ -125,7 +125,7 @@ void ClapLog::plainLog(std::string_view msg)
 void ClapLog::clapLog(const clap_host_t* host, clap_log_severity severity, const char* msg)
 {
 	// Thread-safe
-	// TODO: Specify log message origin in the log message?
+	// TODO: Specify log message origin in the log message? (host vs. plugin)
 	auto h = fromHost(host);
 	if (!h) { return; }
 	h->logger().log(severity, msg);

@@ -47,7 +47,7 @@ ClapParameter::ClapParameter(ClapParams* parent, const clap_param_info& info, do
 
 #if 0
 	{
-		std::string msg = "param --- id: '";
+		std::string msg = "Parameter --- id: '";
 		msg += info.id;
 		msg += "'; name: '";
 		msg += info.name;
@@ -198,14 +198,14 @@ auto ClapParameter::check(clap_param_info& info) -> bool
 {
 	if (info.min_value > info.max_value)
 	{
-		ClapLog::globalLog(CLAP_LOG_PLUGIN_MISBEHAVING, "param --- min value > max value");
+		ClapLog::globalLog(CLAP_LOG_PLUGIN_MISBEHAVING, "Parameter's min value is greater than its max value");
 		// TODO: Use PluginIssueType::MinGreaterMax ??
 		return false;
 	}
 
 	if (info.default_value > info.max_value || info.default_value < info.min_value)
 	{
-		std::string msg = "param --- default value is out of range\ndefault: " + std::to_string(info.default_value)
+		std::string msg = "Parameter's default value is out of range\ndefault: " + std::to_string(info.default_value)
 			+ "; min: " + std::to_string(info.min_value) + "; max: " + std::to_string(info.max_value);
 		ClapLog::globalLog(CLAP_LOG_PLUGIN_MISBEHAVING, msg);
 

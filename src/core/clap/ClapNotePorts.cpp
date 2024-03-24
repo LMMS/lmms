@@ -83,9 +83,8 @@ void ClapNotePorts::clapRescan(const clap_host* host, std::uint32_t flags)
 		 * This may not be very useful in practice.
 		 *
 		 * Highest to lowest priority:
-		 *   - CLAP preferred + MIDI (and CLAP) supported
-		 *   - MIDI preferred + CLAP (and MIDI) supported
-		 *   - Other preferred + CLAP and MIDI supported
+		 *   - CLAP preferred
+		 *   - MIDI preferred
 		 *   - CLAP supported
 		 *   - MIDI supported
 		 *   - (no note input support)
@@ -94,32 +93,25 @@ void ClapNotePorts::clapRescan(const clap_host* host, std::uint32_t flags)
 		{
 		public:
 			using IndexDialectPair = std::pair<std::uint16_t, std::uint32_t>;
-			auto check(std::uint16_t index, const clap_note_port_info& info)
+			void check(std::uint16_t index, const clap_note_port_info& info)
 			{
-				// TODO: Check for CLAP_NOTE_DIALECT_MIDI_MPE too
-				// MIDI preferred + CLAP (and MIDI) supported
-				if (info.preferred_dialect == CLAP_NOTE_DIALECT_MIDI && (info.supported_dialects & CLAP_NOTE_DIALECT_CLAP))
+				// #2 priority: MIDI preferred
+				if (info.preferred_dialect == CLAP_NOTE_DIALECT_MIDI)
 				{
 					m_cache[0] = { index, CLAP_NOTE_DIALECT_MIDI };
 					m_best = std::min(0u, m_best);
 				}
-				// CLAP and MIDI supported
-				else if ((info.supported_dialects & CLAP_NOTE_DIALECT_CLAP) && (info.supported_dialects & CLAP_NOTE_DIALECT_MIDI))
+				// #3 priority: CLAP supported
+				else if (info.supported_dialects & CLAP_NOTE_DIALECT_CLAP)
 				{
 					m_cache[1] = { index, CLAP_NOTE_DIALECT_CLAP };
 					m_best = std::min(1u, m_best);
 				}
-				// CLAP supported
-				else if (info.supported_dialects & CLAP_NOTE_DIALECT_CLAP)
-				{
-					m_cache[2] = { index, CLAP_NOTE_DIALECT_CLAP };
-					m_best = std::min(2u, m_best);
-				}
-				// MIDI supported
+				// #4 priority: MIDI supported
 				else if (info.supported_dialects & CLAP_NOTE_DIALECT_MIDI)
 				{
-					m_cache[3] = { index, CLAP_NOTE_DIALECT_MIDI };
-					m_best = std::min(3u, m_best);
+					m_cache[2] = { index, CLAP_NOTE_DIALECT_MIDI };
+					m_best = std::min(2u, m_best);
 				}
 			}
 			auto getBest() -> IndexDialectPair
@@ -132,7 +124,7 @@ void ClapNotePorts::clapRescan(const clap_host* host, std::uint32_t flags)
 				return m_cache[m_best];
 			}
 		private:
-			std::array<IndexDialectPair, 4> m_cache; // priority 2 thru 5
+			std::array<IndexDialectPair, 3> m_cache; // priority 2 thru 4
 			unsigned m_best = static_cast<unsigned>(m_cache.size()); // best port seen so far
 		} priorityHelper;
 
@@ -155,8 +147,8 @@ void ClapNotePorts::clapRescan(const clap_host* host, std::uint32_t flags)
 				continue;
 			}
 
-			// Check for #1 priority option: CLAP preferred + MIDI (and CLAP) supported
-			if (info.preferred_dialect == CLAP_NOTE_DIALECT_CLAP && (info.supported_dialects & CLAP_NOTE_DIALECT_MIDI))
+			// Check for #1 priority option: CLAP preferred
+			if (info.preferred_dialect == CLAP_NOTE_DIALECT_CLAP)
 			{
 				notePorts.m_portIndex = idx;
 				notePorts.m_dialect = CLAP_NOTE_DIALECT_CLAP;

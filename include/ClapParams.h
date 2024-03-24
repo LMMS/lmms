@@ -29,8 +29,9 @@
 
 #ifdef LMMS_HAVE_CLAP
 
-#include <vector>
+#include <optional>
 #include <unordered_map>
+#include <vector>
 #include <clap/ext/params.h>
 #include <clap/helpers/event-list.hh>
 #include <clap/helpers/reducing-param-queue.hh>
@@ -65,7 +66,7 @@ public:
 	void handlePluginOutputEvent(const clap_event_param_gesture* event, bool gestureBegin);
 	void handlePluginOutputEvent(const clap_event_param_value* event);
 
-	auto getValue(const clap_param_info& info) const -> double;
+	auto getValue(const clap_param_info& info) const -> std::optional<double>;
 	auto getValueText(const ClapParameter& param) const -> std::string;
 
 	auto parameters() const -> const std::vector<ClapParameter*>& { return m_params; }
