@@ -275,7 +275,7 @@ class MIDITrack
 		vector<Event> _events = events;
 		std::sort(_events.begin(), _events.end());
 		vector<Event>::const_iterator it;
-		uint32_t time_last = 0, tmp = 0;
+		uint32_t time_last = 0;
 		for (it = _events.begin(); it!=_events.end(); ++it)
 		{
 			Event e = *it;
@@ -283,7 +283,7 @@ class MIDITrack
 				printf("error: e.time=%d  time_last=%d\n", e.time, time_last);
 				assert(false);
 			}
-			tmp = e.time;
+			uint32_t tmp = e.time;
 			e.time -= time_last;
 			time_last = tmp;
 			start += e.writeToBuffer(buffer+start);
