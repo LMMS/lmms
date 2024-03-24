@@ -31,37 +31,31 @@
 #include <QFont>
 #include <QDesktopWidget>
 
+// TODO: cleanup for qt6
+#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
+	#include <QScreen>
+#else
+	#include <QGuiApplication>
+#endif
+
 namespace lmms
 {
 
 
 // return DPI-independent font-size - font with returned font-size has always
 // the same size in pixels
-template<int SIZE>
-inline QFont pointSize( QFont _f )
+inline QFont pointSize(QFont _f, int SIZE)
 {
-	static const float DPI = 96;
-#ifdef LMMS_BUILD_WIN32
-	_f.setPointSizeF( ((float) SIZE+0.5f) * DPI /
-			QApplication::desktop()->logicalDpiY() );
-#else
-	_f.setPointSizeF( (float) SIZE * DPI /
-			QApplication::desktop()->logicalDpiY() );
-#endif
+	_f.setPointSizeF((int)(((float)SIZE + 0.5f) * 96 / 
+		QGuiApplication::primaryScreen()->logicalDotsPerInchY()));
 	return( _f );
 }
 
 
 inline QFont pointSizeF( QFont _f, float SIZE )
 {
-	static const float DPI = 96;
-#ifdef LMMS_BUILD_WIN32
-	_f.setPointSizeF( (SIZE+0.5f) * DPI /
-			QApplication::desktop()->logicalDpiY() );
-#else
-	_f.setPointSizeF( SIZE * DPI /
-			QApplication::desktop()->logicalDpiY() );
-#endif
+	_f.setPointSizeF((SIZE+0.5f) * 96 /
+			QGuiApplication::primaryScreen()->logicalDotsPerInchY());
 	return( _f );
 }
 

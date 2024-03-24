@@ -90,7 +90,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	{
 		auto ctls_btn = new QPushButton(tr("Controls"), this);
 		QFont f = ctls_btn->font();
-		ctls_btn->setFont( pointSize<8>( f ) );
+		ctls_btn->setFont(pointSize(f, 8));
 		ctls_btn->setGeometry( 150, 14, 50, 20 );
 		connect( ctls_btn, SIGNAL(clicked()),
 					this, SLOT(editControls()));

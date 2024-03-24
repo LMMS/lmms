@@ -340,7 +340,7 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 	// draw LFO-graph
 	p.drawPixmap(LFO_GRAPH_X, LFO_GRAPH_Y, m_lfoGraph);
 
-	p.setFont( pointSize<8>( p.font() ) );
+	p.setFont(pointSize(p.font(), 8));
 
 	const float gray_amount = 1.0f - fabsf( m_amountKnob->value<float>() );
 
