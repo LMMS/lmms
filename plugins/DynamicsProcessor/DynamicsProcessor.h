@@ -27,8 +27,11 @@
 #ifndef DYNPROC_H
 #define DYNPROC_H
 
+#include <array>
+
 #include "Effect.h"
 #include "DynamicsProcessorControls.h"
+#include "RmsHelper.h"
 
 namespace lmms
 {
@@ -64,7 +67,7 @@ private:
 	
 	bool m_needsUpdate;
 	
-	RmsHelper * m_rms [2];
+	std::array<RmsHelper, 2> m_rms;
 	std::array<double, 2> m_smoothRms;
 
 	friend class DynProcControls;

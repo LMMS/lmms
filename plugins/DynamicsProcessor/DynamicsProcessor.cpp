@@ -23,6 +23,7 @@
  *
  */
 
+#include <array>
 
 #include "DynamicsProcessor.h"
 #include "lmms_math.h"
@@ -61,13 +62,14 @@ const double DNF_LOG = 5.0;
 DynProcEffect::DynProcEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
 	Effect( &dynamicsprocessor_plugin_descriptor, _parent, _key ),
-	m_dpControls( this )
+	m_dpControls( this ),
+	m_rms{
+		(257 * Engine::audioEngine()->processingSampleRate() / 44100),
+		(256 * Engine::audioEngine()->processingSampleRate() / 44100)
+	},
+	m_smoothRms{0, 0}
 {
 	m_currentPeak[0] = m_currentPeak[1] = DYN_NOISE_FLOOR;
-	m_rms[0] = new RmsHelper(256 * Engine::audioEngine()->processingSampleRate() / 44100);
-	m_rms[1] = new RmsHelper(256 * Engine::audioEngine()->processingSampleRate() / 44100);
-	m_smoothRms[0] = 0;
-	m_smoothRms[1] = 0;
 	calcAttack();
 	calcRelease();
 }
@@ -77,8 +79,6 @@ DynProcEffect::DynProcEffect( Model * _parent,
 
 DynProcEffect::~DynProcEffect()
 {
-	delete m_rms[0];
-	delete m_rms[1];
 }
 
 
@@ -125,8 +125,8 @@ bool DynProcEffect::processAudioBuffer( sampleFrame * _buf,
 
 	if( m_needsUpdate )
 	{
-		m_rms[0]->setSize(256 * Engine::audioEngine()->processingSampleRate() / 44100);
-		m_rms[1]->setSize(256 * Engine::audioEngine()->processingSampleRate() / 44100);
+		m_rms[0].setSize(256 * Engine::audioEngine()->processingSampleRate() / 44100);
+		m_rms[1].setSize(256 * Engine::audioEngine()->processingSampleRate() / 44100);
 		calcAttack();
 		calcRelease();
 		m_needsUpdate = false;
@@ -154,10 +154,10 @@ bool DynProcEffect::processAudioBuffer( sampleFrame * _buf,
 // update peak values
 		for ( i=0; i <= 1; i++ )
 		{
-			const double t = m_rms[i]->update( s[i] );
+			const double t = m_rms[i].update(s[i]);
 			// smoothing "t" to filter unwanted noise
-			const double dif = std::min(std::abs(t-m_smoothRms[i]) * 0.1, 0.05);
-			m_smoothRms[i] = m_smoothRms[i] * (1 - dif) + t * dif;
+			const double diff = std::min(std::abs(t - m_smoothRms[i]) * 0.1, 0.05);
+			m_smoothRms[i] = m_smoothRms[i] * (1 - diff) + t * diff;
 			if( t > m_currentPeak[i] )
 			{
 				m_currentPeak[i] = std::min(m_currentPeak[i] * m_attCoeff, m_smoothRms[i]);
