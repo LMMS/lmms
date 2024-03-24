@@ -27,14 +27,14 @@
 
 #include "lmmsconfig.h"
 
+#include <algorithm>
 #include <QApplication>
 #include <QFont>
+#include <QGuiApplication>
 
-// TODO: cleanup for qt6
+// TODO: remove once qt5 support is dropped
 #if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
 	#include <QScreen>
-#else
-	#include <QGuiApplication>
 #endif
 
 namespace lmms
