@@ -367,8 +367,9 @@ void SaProcessor::reallocateBuffers()
 	// get new block sizes and bin count based on selected index
 	const unsigned int new_size_index = m_controls->m_blockSizeModel.value();
 
-	const unsigned int new_in_size
-		= new_size_index < FFT_BLOCK_SIZES.size() ? FFT_BLOCK_SIZES[new_size_index] : FFT_BLOCK_SIZES.back();
+	const unsigned int new_in_size = new_size_index < FFT_BLOCK_SIZES.size()
+		? FFT_BLOCK_SIZES[new_size_index]
+		: FFT_BLOCK_SIZES.back();
 
 	const unsigned int new_fft_size = new_size_index + m_zeroPadFactor < FFT_BLOCK_SIZES.size()
 		? FFT_BLOCK_SIZES[new_size_index + m_zeroPadFactor]
