@@ -90,7 +90,7 @@ TabButton * TabBar::addTab( QWidget * _w, const QString & _text, int _id,
 		_w->setFixedSize( _w->parentWidget()->size() );
 	}
 
-	b->setFont(pointSize(b->font(), 8));
+	b->setFont(pointSize<int>(b->font(), 8));
 
 	return( b );
 }

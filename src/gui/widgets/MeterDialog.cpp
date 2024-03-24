@@ -60,7 +60,7 @@ MeterDialog::MeterDialog( QWidget * _parent, bool _simple ) :
 	{
 		auto num_label = new QLabel(tr("Meter Numerator"), num);
 		QFont f = num_label->font();
-		num_label->setFont(pointSize(f, 7));
+		num_label->setFont(pointSize<int>(f, 7));
 		num_layout->addSpacing( 5 );
 		num_layout->addWidget( num_label );
 	}

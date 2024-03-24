@@ -94,7 +94,7 @@ void LedCheckBox::initUi( LedColor _color )
 
 	if (m_legacyMode)
 	{
-		setFont(pointSize(font(), 7));
+		setFont(pointSize<int>(font(), 7));
 	}
 
 	setText( m_text );

@@ -58,7 +58,7 @@ TabWidget::TabWidget(const QString& caption, QWidget* parent, bool usePixmap,
 
 	m_tabheight = caption.isEmpty() ? m_tabbarHeight - 3 : m_tabbarHeight - 4;
 
-	setFont(pointSize(font(), 8));
+	setFont(pointSize<int>(font(), 8));
 
 	setAutoFillBackground(true);
 	QColor bg_color = QApplication::palette().color(QPalette::Active, QPalette::Window).darker(132);
