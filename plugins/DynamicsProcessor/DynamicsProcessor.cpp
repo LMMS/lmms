@@ -62,7 +62,7 @@ const double DNF_LOG = 5.0;
 DynProcEffect::DynProcEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
 	Effect( &dynamicsprocessor_plugin_descriptor, _parent, _key ),
-	m_dpControls( this ),
+	m_dpControls(this),
 	m_rms{
 		(257 * Engine::audioEngine()->processingSampleRate() / 44100),
 		(256 * Engine::audioEngine()->processingSampleRate() / 44100)
