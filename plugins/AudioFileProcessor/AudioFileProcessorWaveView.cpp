@@ -357,13 +357,13 @@ void AudioFileProcessorWaveView::zoom(const bool out)
 	const auto boundedFrom = std::clamp(m_from + step_from, 0, start);
 	const auto boundedTo = std::clamp(m_to + step_to, end, frames);
 
-	const auto newFrom = (out && d_from < d_to) || (!out && d_to < d_from)
-		? boundedFrom
-		: std::clamp(m_from + step_from * static_cast<f_cnt_t>(boundedTo == m_to ? 1 : comp_ratio), 0, start);
+	const auto toStep = static_cast<f_cnt_t>(step_from * (boundedTo == m_to ? 1 : comp_ratio));
+	const auto newFrom
+		= (out && d_from < d_to) || (!out && d_to < d_from) ? boundedFrom : std::clamp(m_from + toStep, 0, start);
 
-	const auto newTo = (out && d_from < d_to) || (!out && d_to < d_from)
-		? std::clamp(m_to + static_cast<f_cnt_t>(step_to * (boundedFrom == m_from ? 1 : comp_ratio)), end, frames)
-		: boundedTo;
+	const auto fromStep = static_cast<f_cnt_t>(step_to * (boundedFrom == m_from ? 1 : comp_ratio));
+	const auto newTo
+		= (out && d_from < d_to) || (!out && d_to < d_from) ? std::clamp(m_to + fromStep, end, frames) : boundedTo;
 
 	if (static_cast<double>(newTo - newFrom) / m_sample->sampleRate() > 0.05)
 	{
