@@ -37,7 +37,7 @@
 
 class QPushButton;
 class QMdiSubWindow;
-
+class QLabel;
 namespace lmms
 {
 
@@ -64,9 +64,25 @@ private:
 };
 
 
+
+
+class HelpWindowEventFilter : public QObject
+{
+	Q_OBJECT
+	class Lv2ViewBase* const m_viewBase;
+protected:
+	bool eventFilter(QObject* obj, QEvent* event) override;
+public:
+	HelpWindowEventFilter(class Lv2ViewBase* viewBase);
+};
+
+
+
+
 //! Base class for view for one Lv2 plugin
 class LMMS_EXPORT Lv2ViewBase : public LinkedModelGroupsView
 {
+	friend class HelpWindowEventFilter;
 protected:
 	//! @param pluginWidget A child class which inherits QWidget
 	Lv2ViewBase(class QWidget *pluginWidget, Lv2ControlBase *ctrlBase);
@@ -79,6 +95,7 @@ protected:
 
 	void toggleUI();
 	void toggleHelp(bool visible);
+	void closeHelpWindow();
 
 	// to be called by child virtuals
 	//! Reconnect models if model changed
@@ -94,12 +111,14 @@ private:
 
 	static AutoLilvNode uri(const char *uriStr);
 	LinkedModelGroupView* getGroupView() override { return m_procView; }
+	void onHelpWindowClosed();
 
 	Lv2ViewProc* m_procView;
 
 	//! Numbers of controls per row; must be multiple of 2 for mono effects
 	const int m_colNum = 6;
 	QMdiSubWindow* m_helpWindow = nullptr;
+	HelpWindowEventFilter m_helpWindowEventFilter;
 };
 
 

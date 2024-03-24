@@ -25,6 +25,7 @@
 #ifndef LMMS_GUI_CLIP_VIEW_H
 #define LMMS_GUI_CLIP_VIEW_H
 
+#include <optional>
 
 #include <QVector>
 
@@ -184,6 +185,7 @@ protected:
 
 	virtual void paintTextLabel(QString const & text, QPainter & painter);
 
+	auto hasCustomColor() const -> bool;
 
 protected slots:
 	void updateLength();
@@ -241,7 +243,7 @@ private:
 	bool mouseMovedDistance( QMouseEvent * me, int distance );
 	TimePos draggedClipPos( QMouseEvent * me );
 	int knifeMarkerPos( QMouseEvent * me );
-	void setColor(const QColor* color);
+	void setColor(const std::optional<QColor>& color);
 	//! Return true iff the clip could be split. Currently only implemented for samples
 	virtual bool splitClip( const TimePos pos ){ return false; };
 	void updateCursor(QMouseEvent * me);

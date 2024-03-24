@@ -320,8 +320,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	float rightph;
 	float pd_l;
 	float pd_r;
-	float len_l;
-	float len_r;
+	float len_l(0.);
+	float len_r(0.);
 
 	// osc1 vars
 	float o1l_f;
@@ -503,12 +503,27 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		if( pd_r > 0.5 ) pd_r = 1.0 - pd_r;
 
 		// multi-wave DC Oscillator
-		len_l = BandLimitedWave::pdToLen( pd_l );
-		len_r = BandLimitedWave::pdToLen( pd_r );
-		if( m_counter2l > 0 ) { len_l /= m_counter2l; m_counter2l--; }
-		if( m_counter2r > 0 ) { len_r /= m_counter2r; m_counter2r--; }
-		sample_t O2L = oscillate( o2w, leftph, len_l );
-		sample_t O2R = oscillate( o2w, rightph, len_r );
+		sample_t O2L = 0.;
+		if (pd_l != 0.)
+		{
+			len_l = BandLimitedWave::pdToLen(pd_l);
+			if (m_counter2l > 0)
+			{
+				len_l /= m_counter2l; m_counter2l--;
+			}
+			O2L = oscillate(o2w, leftph, len_l);
+		}
+		
+		sample_t O2R = 0.;
+		if (len_r != 0.)
+		{
+			len_r = BandLimitedWave::pdToLen(pd_r);
+			if (m_counter2r > 0)
+			{
+				len_r /= m_counter2r; m_counter2r--;
+			}
+			O2R = oscillate(o2w, rightph, len_r);
+		}
 
 		// modulate volume
 		O2L *= o2lv;
@@ -568,17 +583,40 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		if( pd_r > 0.5 ) pd_r = 1.0 - pd_r;
 
 		// multi-wave DC Oscillator
-		len_l = BandLimitedWave::pdToLen( pd_l );
-		len_r = BandLimitedWave::pdToLen( pd_r );
-		if( m_counter3l > 0 ) { len_l /= m_counter3l; m_counter3l--; }
-		if( m_counter3r > 0 ) { len_r /= m_counter3r; m_counter3r--; }
-		//  sub-osc 1
-		sample_t O3AL = oscillate( o3w1, leftph, len_l );
-		sample_t O3AR = oscillate( o3w1, rightph, len_r );
+		sample_t O3AL = 0.;
+		sample_t O3AR = 0.;
 
 		// multi-wave DC Oscillator, sub-osc 2
-		sample_t O3BL = oscillate( o3w2, leftph, len_l );
-		sample_t O3BR = oscillate( o3w2, rightph, len_r );
+		sample_t O3BL = 0.;
+		sample_t O3BR = 0.;
+
+		if (pd_l != 0.)
+		{
+			len_l = BandLimitedWave::pdToLen(pd_l);
+			if (m_counter3l > 0)
+			{
+				len_l /= m_counter3l; m_counter3l--;
+			}
+			//  sub-osc 1
+			O3AL = oscillate(o3w1, leftph, len_l);
+
+			// multi-wave DC Oscillator, sub-osc 2
+			O3BL = oscillate(o3w2, leftph, len_l);
+		}
+
+		if (pd_r != 0.)
+		{
+			len_r = BandLimitedWave::pdToLen(pd_r);
+			if (m_counter3r > 0)
+			{
+				len_r /= m_counter3r; m_counter3r--;
+			}
+			//  sub-osc 1
+			O3AR = oscillate(o3w1, rightph, len_r);
+
+			// multi-wave DC Oscillator, sub-osc 2
+			O3BR = oscillate(o3w2, rightph, len_r);
+		}
 
 		// calc and modulate sub
 		sub = o3sub;

@@ -72,4 +72,13 @@ void Lv2FxControlDialog::modelChanged()
 }
 
 
+
+
+void Lv2FxControlDialog::hideEvent(QHideEvent *event)
+{
+	closeHelpWindow();
+	QWidget::hideEvent(event);
+}
+
+
 } // namespace lmms::gui

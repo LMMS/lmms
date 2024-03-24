@@ -25,6 +25,7 @@
 
 #include "MidiClip.h"
 
+#include <algorithm>
 #include <QDomElement>
 
 #include "GuiApplication.h"
@@ -37,13 +38,6 @@
 
 namespace lmms
 {
-
-QPixmap * gui::MidiClipView::s_stepBtnOn0 = nullptr;
-QPixmap * gui::MidiClipView::s_stepBtnOn200 = nullptr;
-QPixmap * gui::MidiClipView::s_stepBtnOff = nullptr;
-QPixmap * gui::MidiClipView::s_stepBtnOffLight = nullptr;
-
-
 
 MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
 	Clip( _instrument_track ),
@@ -174,19 +168,18 @@ TimePos MidiClip::beatClipLength() const
 
 	for (const auto& note : m_notes)
 	{
-		if (note->length() < 0)
+		if (note->type() == Note::Type::Step)
 		{
 			max_length = std::max<tick_t>(max_length, note->pos() + 1);
 		}
 	}
 
-	if( m_steps != TimePos::stepsPerBar() )
+	if (m_steps != TimePos::stepsPerBar())
 	{
-		max_length = m_steps * TimePos::ticksPerBar() /
-						TimePos::stepsPerBar();
+		max_length = m_steps * TimePos::ticksPerBar() / TimePos::stepsPerBar();
 	}
 
-	return TimePos( max_length ).nextFullBar() * TimePos::ticksPerBar();
+	return TimePos{max_length}.nextFullBar() * TimePos::ticksPerBar();
 }
 
 
@@ -215,16 +208,30 @@ Note * MidiClip::addNote( const Note & _new_note, const bool _quant_pos )
 
 
 
-void MidiClip::removeNote( Note * _note_to_del )
+NoteVector::const_iterator MidiClip::removeNote(NoteVector::const_iterator it)
+{
+	instrumentTrack()->lock();
+	delete *it;
+	auto new_it = m_notes.erase(it);
+	instrumentTrack()->unlock();
+
+	checkType();
+	updateLength();
+
+	emit dataChanged();
+	return new_it;
+}
+
+NoteVector::const_iterator MidiClip::removeNote(Note* note)
 {
 	instrumentTrack()->lock();
 
-	m_notes.erase(std::remove_if(m_notes.begin(), m_notes.end(), [&](Note* note)
+	auto it = std::find(m_notes.begin(), m_notes.end(), note);
+	if (it != m_notes.end())
 	{
-		auto shouldRemove = note == _note_to_del;
-		if (shouldRemove) { delete note; }
-		return shouldRemove;
-	}), m_notes.end());
+		delete *it;
+		it = m_notes.erase(it);
+	}
 
 	instrumentTrack()->unlock();
 
@@ -232,16 +239,17 @@ void MidiClip::removeNote( Note * _note_to_del )
 	updateLength();
 
 	emit dataChanged();
+	return it;
 }
 
 
-// returns a pointer to the note at specified step, or NULL if note doesn't exist
-
-Note * MidiClip::noteAtStep( int _step )
+// Returns a pointer to the note at specified step, or nullptr if note doesn't exist
+Note * MidiClip::noteAtStep(int step)
 {
 	for (const auto& note : m_notes)
 	{
-		if (note->pos() == TimePos::stepPosition(_step) && note->length() < 0)
+		if (note->pos() == TimePos::stepPosition(step)
+			&& note->type() == Note::Type::Step)
 		{
 			return note;
 		}
@@ -278,8 +286,10 @@ void MidiClip::clearNotes()
 
 Note * MidiClip::addStepNote( int step )
 {
-	return addNote( Note( TimePos( -DefaultTicksPerBar ),
-				TimePos::stepPosition( step ) ), false );
+	Note stepNote = Note(TimePos(DefaultTicksPerBar / 16), TimePos::stepPosition(step));
+	stepNote.setType(Note::Type::Step);
+
+	return addNote(stepNote, false);
 }
 
 
@@ -351,15 +361,10 @@ void MidiClip::setType( Type _new_clip_type )
 
 void MidiClip::checkType()
 {
-	for (auto& note : m_notes)
-	{
-		if (note->length() > 0)
-		{
-			setType(Type::MelodyClip);
-			return;
-		}
-	}
-	setType( Type::BeatClip );
+	// If all notes are StepNotes, we have a BeatClip
+	const auto beatClip = std::all_of(m_notes.begin(), m_notes.end(), [](auto note) { return note->type() == Note::Type::Step; });
+
+	setType(beatClip ? Type::BeatClip : Type::MelodyClip);
 }
 
 
@@ -370,9 +375,9 @@ void MidiClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "type", static_cast<int>(m_clipType) );
 	_this.setAttribute( "name", name() );
 	
-	if( usesCustomClipColor() )
+	if (const auto& c = color())
 	{
-		_this.setAttribute( "color", color().name() );
+		_this.setAttribute("color", c->name());
 	}
 	// as the target of copied/dragged MIDI clip is always an existing
 	// MIDI clip, we must not store actual position, instead we store -1
@@ -404,17 +409,12 @@ void MidiClip::loadSettings( const QDomElement & _this )
 	m_clipType = static_cast<Type>( _this.attribute( "type"
 								).toInt() );
 	setName( _this.attribute( "name" ) );
-	
-	if( _this.hasAttribute( "color" ) )
+
+	if (_this.hasAttribute("color"))
 	{
-		useCustomClipColor( true );
-		setColor( _this.attribute( "color" ) );
+		setColor(QColor{_this.attribute("color")});
 	}
-	else
-	{
-		useCustomClipColor(false);
-	}
-	
+
 	if( _this.attribute( "pos" ).toInt() >= 0 )
 	{
 		movePosition( _this.attribute( "pos" ).toInt() );

@@ -52,9 +52,11 @@ Effect::Effect( const Plugin::Descriptor * _desc,
 	m_autoQuitModel( 1.0f, 1.0f, 8000.0f, 100.0f, 1.0f, this, tr( "Decay" ) ),
 	m_autoQuitDisabled( false )
 {
+	m_wetDryModel.setCenterValue(0);
+
 	m_srcState[0] = m_srcState[1] = nullptr;
 	reinitSRC();
-	
+
 	if( ConfigManager::inst()->value( "ui", "disableautoquit").toInt() )
 	{
 		m_autoQuitDisabled = true;

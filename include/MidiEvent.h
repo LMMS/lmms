@@ -212,7 +212,7 @@ private:
 		int32_t m_sysExDataLen;	// len of m_sysExData
 	} m_data;
 
-	const char* m_sysExData;
+	[[maybe_unused]] const char* m_sysExData;
 	const void* m_sourcePort;
 
 	// Stores the source of the MidiEvent: Internal or External (hardware controllers).

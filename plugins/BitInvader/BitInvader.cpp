@@ -153,8 +153,8 @@ BitInvader::BitInvader( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &bitinvader_plugin_descriptor ),
 	m_sampleLength(wavetableSize, 4, wavetableSize, 1, this, tr("Sample length")),
 	m_graph(-1.0f, 1.0f, wavetableSize, this),
-	m_interpolation( false, this ),
-	m_normalize( false, this )
+	m_interpolation(false, this, tr("Interpolation")),
+	m_normalize(false, this, tr("Normalize"))
 {
 	m_graph.setWaveToSine();
 	lengthChanged();

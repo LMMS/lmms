@@ -46,7 +46,7 @@
 #include "Knob.h"
 #include "NotePlayHandle.h"
 #include "PathUtil.h"
-#include "SampleBuffer.h"
+#include "Sample.h"
 #include "Song.h"
 
 #include "PatchesDialog.h"
@@ -437,7 +437,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 				if (sample.region->PitchTrack == true) { freq_factor *= sample.freqFactor; }
 
 				// We need a bit of margin so we don't get glitching
-				samples = frames / freq_factor + MARGIN[m_interpolation];
+				samples = frames / freq_factor + Sample::s_interpolationMargins[m_interpolation];
 			}
 
 			// Load this note's data

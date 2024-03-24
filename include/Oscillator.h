@@ -28,7 +28,9 @@
 
 #include <cassert>
 #include <fftw3.h>
+#include <memory>
 #include <cstdlib>
+#include "interpolation.h"
 
 #include "Engine.h"
 #include "lmms_constants.h"
@@ -46,7 +48,6 @@ class IntModel;
 
 class LMMS_EXPORT Oscillator
 {
-	MM_OPERATORS
 public:
 	enum class WaveShape
 	{
@@ -91,16 +92,21 @@ public:
 
 	static void waveTableInit();
 	static void destroyFFTPlans();
-	static void generateAntiAliasUserWaveTable(SampleBuffer* sampleBuffer);
+	static std::unique_ptr<OscillatorConstants::waveform_t> generateAntiAliasUserWaveTable(const SampleBuffer* sampleBuffer);
 
 	inline void setUseWaveTable(bool n)
 	{
 		m_useWaveTable = n;
 	}
 
-	inline void setUserWave( const SampleBuffer * _wave )
+	void setUserWave(std::shared_ptr<const SampleBuffer> _wave)
 	{
 		m_userWave = _wave;
+	}
+
+	void setUserAntiAliasWaveTable(std::shared_ptr<const OscillatorConstants::waveform_t> waveform)
+	{
+		m_userAntiAliasWaveTable = waveform;
 	}
 
 	void update(sampleFrame* ab, const fpp_t frames, const ch_cnt_t chnl, bool modulator = false);
@@ -164,9 +170,18 @@ public:
 		return 1.0f - fast_rand() * 2.0f / FAST_RAND_MAX;
 	}
 
-	inline sample_t userWaveSample( const float _sample ) const
+	static sample_t userWaveSample(const SampleBuffer* buffer, const float sample)
 	{
-		return m_userWave->userWaveSample( _sample );
+		if (buffer == nullptr || buffer->size() == 0) { return 0; }
+		const auto frames = buffer->size();
+		const auto frame = sample * frames;
+		auto f1 = static_cast<f_cnt_t>(frame) % frames;
+		if (f1 < 0)
+		{
+			f1 += frames;
+		}
+
+		return linearInterpolate(buffer->data()[f1][0], buffer->data()[(f1 + 1) % frames][0], fraction(frame));
 	}
 
 	struct wtSampleControl {
@@ -203,7 +218,7 @@ public:
 				table[control.band][control.f2], fraction(control.frame));
 	}
 
-	inline sample_t wtSample(const std::unique_ptr<OscillatorConstants::waveform_t>& table, const float sample) const
+	sample_t wtSample(const OscillatorConstants::waveform_t* table, const float sample) const
 	{
 		assert(table != nullptr);
 		wtSampleControl control = getWtSampleControl(sample);
@@ -247,7 +262,8 @@ private:
 	Oscillator * m_subOsc;
 	float m_phaseOffset;
 	float m_phase;
-	const SampleBuffer * m_userWave;
+	std::shared_ptr<const SampleBuffer> m_userWave = SampleBuffer::emptyBuffer();
+	std::shared_ptr<const OscillatorConstants::waveform_t> m_userAntiAliasWaveTable;
 	bool m_useWaveTable;
 	// There are many update*() variants; the modulator flag is stored as a member variable to avoid
 	// adding more explicit parameters to all of them. Can be converted to a parameter if needed.
