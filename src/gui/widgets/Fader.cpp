@@ -49,6 +49,7 @@
 #include <QInputDialog>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPainterPath>
 
 #include "lmms_math.h"
 #include "embed.h"
@@ -61,74 +62,49 @@ namespace lmms::gui
 
 SimpleTextFloat * Fader::s_textFloat = nullptr;
 
-Fader::Fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
-	QWidget( _parent ),
-	FloatModelView( _model, this ),
-	m_fPeakValue_L( 0.0 ),
-	m_fPeakValue_R( 0.0 ),
-	m_persistentPeak_L( 0.0 ),
-	m_persistentPeak_R( 0.0 ),
-	m_fMinPeak( 0.01f ),
-	m_fMaxPeak( 1.1 ),
-	m_back(embed::getIconPixmap("fader_background")),
-	m_leds(embed::getIconPixmap("fader_leds")),
+Fader::Fader(FloatModel* model, const QString& name, QWidget* parent) :
+	QWidget(parent),
+	FloatModelView(model, this),
+	m_fPeakValue_L(0.0),
+	m_fPeakValue_R(0.0),
+	m_persistentPeak_L(0.0),
+	m_persistentPeak_R(0.0),
+	m_fMinPeak(dbfsToAmp(-42)),
+	m_fMaxPeak(dbfsToAmp(9)),
 	m_knob(embed::getIconPixmap("fader_knob")),
-	m_levelsDisplayedInDBFS(false),
-	m_moveStartPoint( -1 ),
-	m_startValue( 0 ),
-	m_peakGreen( 0, 0, 0 ),
-	m_peakRed( 0, 0, 0 ),
-	m_peakYellow( 0, 0, 0 )
+	m_levelsDisplayedInDBFS(true),
+	m_moveStartPoint(-1),
+	m_startValue(0),
+	m_peakOk(10, 212, 92),
+	m_peakClip(193, 32, 56),
+	m_peakWarn(214, 236, 82),
+	m_unityMarker(63, 63, 63, 255),
+	m_renderUnityLine(true)
 {
 	if( s_textFloat == nullptr )
 	{
 		s_textFloat = new SimpleTextFloat;
 	}
 
-	init(_model, _name);
+	setWindowTitle( name );
+	setAttribute( Qt::WA_OpaquePaintEvent, false );
+	// For now resize the widget to the size of the previous background image "fader_background.png" as it was found in the classic and default theme
+	QSize minimumSize(23, 116);
+	setMinimumSize(minimumSize);
+	resize(minimumSize);
+	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+	setModel( model );
+	setHintText( "Volume:","%");
 
 	m_conversionFactor = 100.0;
 }
 
 
-Fader::Fader( FloatModel * model, const QString & name, QWidget * parent, QPixmap * back, QPixmap * leds, QPixmap * knob ) :
-	QWidget( parent ),
-	FloatModelView( model, this ),
-	m_fPeakValue_L( 0.0 ),
-	m_fPeakValue_R( 0.0 ),
-	m_persistentPeak_L( 0.0 ),
-	m_persistentPeak_R( 0.0 ),
-	m_fMinPeak( 0.01f ),
-	m_fMaxPeak( 1.1 ),
-	m_back(*back),
-	m_leds(*leds),
-	m_knob(*knob),
-	m_levelsDisplayedInDBFS(false),
-	m_moveStartPoint( -1 ),
-	m_startValue( 0 ),
-	m_peakGreen( 0, 0, 0 ),
-	m_peakRed( 0, 0, 0 )
+Fader::Fader(FloatModel* model, const QString& name, QWidget* parent, const QPixmap& knob) :
+	Fader(model, name, parent)
 {
-	if( s_textFloat == nullptr )
-	{
-		s_textFloat = new SimpleTextFloat;
-	}
-
-	init(model, name);
+	m_knob = knob;
 }
-
-void Fader::init(FloatModel * model, QString const & name)
-{
-	setWindowTitle( name );
-	setAttribute( Qt::WA_OpaquePaintEvent, false );
-	QSize backgroundSize = m_back.size();
-	setMinimumSize( backgroundSize );
-	setMaximumSize( backgroundSize );
-	resize( backgroundSize );
-	setModel( model );
-	setHintText( "Volume:","%");
-}
-
 
 
 void Fader::contextMenuEvent( QContextMenuEvent * _ev )
@@ -255,19 +231,12 @@ void Fader::wheelEvent ( QWheelEvent *ev )
 ///
 void Fader::setPeak( float fPeak, float &targetPeak, float &persistentPeak, QElapsedTimer &lastPeakTimer )
 {
-	if( fPeak <  m_fMinPeak )
-	{
-		fPeak = m_fMinPeak;
-	}
-	else if( fPeak > m_fMaxPeak )
-	{
-		fPeak = m_fMaxPeak;
-	}
+	fPeak = std::clamp(fPeak, m_fMinPeak, m_fMaxPeak);
 
-	if( targetPeak != fPeak)
+	if (targetPeak != fPeak)
 	{
 		targetPeak = fPeak;
-		if( targetPeak >= persistentPeak )
+		if (targetPeak >= persistentPeak)
 		{
 			persistentPeak = targetPeak;
 			lastPeakTimer.restart();
@@ -275,7 +244,7 @@ void Fader::setPeak( float fPeak, float &targetPeak, float &persistentPeak, QEla
 		update();
 	}
 
-	if( persistentPeak > 0 && lastPeakTimer.elapsed() > 1500 )
+	if (persistentPeak > 0 && lastPeakTimer.elapsed() > 1500)
 	{
 		persistentPeak = qMax<float>( 0, persistentPeak-0.05 );
 		update();
@@ -315,154 +284,207 @@ void Fader::updateTextFloat()
 }
 
 
-inline int Fader::calculateDisplayPeak( float fPeak )
-{
-	int peak = static_cast<int>(m_back.height() - (fPeak / (m_fMaxPeak - m_fMinPeak)) * m_back.height());
-
-	return qMin(peak, m_back.height());
-}
-
-
 void Fader::paintEvent( QPaintEvent * ev)
 {
 	QPainter painter(this);
 
-	// Draw the background
-	painter.drawPixmap(ev->rect(), m_back, ev->rect());
-
 	// Draw the levels with peaks
-	if (getLevelsDisplayedInDBFS())
-	{
-		paintDBFSLevels(ev, painter);
-	}
-	else
-	{
-		paintLinearLevels(ev, painter);
-	}
+	// TODO LMMS Compressor, EQ and Delay still use linear displays...
+	paintLevels(ev, painter, !getLevelsDisplayedInDBFS());
 
 	// Draw the knob
-	painter.drawPixmap(0, knobPosY() - m_knob.height(), m_knob);
+	painter.drawPixmap((width() - m_knob.width()) / 2, knobPosY() - m_knob.height(), m_knob);
 }
 
-void Fader::paintDBFSLevels(QPaintEvent * ev, QPainter & painter)
+void Fader::paintLevels(QPaintEvent * ev, QPainter & painter, bool linear)
 {
-	int height = m_back.height();
-	int width = m_back.width() / 2;
-	int center = m_back.width() - width;
+	std::function<float(float value)> mapper = [this](float value) { return ampToDbfs(qMax<float>(0.0001, value)); };
 
-	float const maxDB(ampToDbfs(m_fMaxPeak));
-	float const minDB(ampToDbfs(m_fMinPeak));
+	if (linear)
+	{
+		mapper = [this](float value) { return value; };
+	}
 
-	// We will need to divide by the span between min and max several times. It's more
-	// efficient to calculate the reciprocal once and then to multiply.
-	float const fullSpanReciprocal = 1 / (maxDB - minDB);
+	float const mappedMinPeak(mapper(m_fMinPeak));
+	float const mappedMaxPeak(mapper(m_fMaxPeak));
+	float const mappedPeakL(mapper(m_fPeakValue_L));
+	float const mappedPeakR(mapper(m_fPeakValue_R));
+	float const mappedPersistentPeakL(mapper(m_persistentPeak_L));
+	float const mappedPersistentPeakR(mapper(m_persistentPeak_R));
+	float const mappedUnity(mapper(1.f));
 
+	painter.save();
+
+	QRect const baseRect = rect();
+
+	int const height = baseRect.height();
+
+	int const margin = 1;
+	int const distanceBetweenMeters = 2;
+
+	int const numberOfMeters = 2;
+	int const meterWidth = (baseRect.width() - 2 * margin - distanceBetweenMeters * (numberOfMeters - 1)) / numberOfMeters;
+
+	QRect leftMeterOutlineRect(margin, margin, meterWidth, height - 2 * margin);
+	QRect rightMeterOutlineRect(baseRect.width() - margin - meterWidth, margin, meterWidth, height - 2 * margin);
+
+	QMargins removedMargins(1, 1, 1, 1);
+	QRect leftMeterRect = leftMeterOutlineRect.marginsRemoved(removedMargins);
+	QRect rightMeterRect = rightMeterOutlineRect.marginsRemoved(removedMargins);
+
+	QPainterPath path;
+	qreal radius = 2;
+	path.addRoundedRect(leftMeterOutlineRect, radius, radius);
+	path.addRoundedRect(rightMeterOutlineRect, radius, radius);
+	painter.fillPath(path, Qt::black);
+
+	// Now clip everything to the paths of the meters
+	painter.setClipPath(path);
+
+	// This linear map performs the following mapping:
+	// Value (dbFS or linear) -> window coordinates of the widget
+	// It is for example used to determine the height of peaks, markers and to define the gradient for the levels
+	LinearMap<float> const valuesToWindowCoordinates(mappedMaxPeak, leftMeterRect.y(), mappedMinPeak, leftMeterRect.y() + leftMeterRect.height());
+
+	// This lambda takes a value (in dbFS or linear) and a rectangle and computes a rectangle
+	// that represent the value within the rectangle. It is for example used to compute the unity indicators.
+	auto const computeLevelMarkerRect = [&valuesToWindowCoordinates](QRect const & rect, float peak) -> QRect
+	{
+		return QRect(rect.x(), valuesToWindowCoordinates.map(peak), rect.width(), 1);
+	};
+
+	// This lambda takes a peak value (in dbFS or linear) and a rectangle and computes a rectangle
+	// that represent the peak value within the rectangle. It's used to compute the peak indicators
+	// which "dance" on top of the level meters.
+	auto const computePeakRect = [&valuesToWindowCoordinates](QRect const & rect, float peak) -> QRect
+	{
+		return QRect(rect.x(), valuesToWindowCoordinates.map(peak), rect.width(), 1);
+	};
+
+	// This lambda takes a peak value (in dbFS or linear) and a rectangle and returns an adjusted copy of the
+	// rectangle that represents the peak value. It is used to compute the level meters themselves.
+	auto const computeLevelRect = [&valuesToWindowCoordinates](QRect const & rect, float peak) -> QRect
+	{
+		QRect result(rect);
+		result.setTop(valuesToWindowCoordinates.map(peak));
+
+		return result;
+	};
+
+	// Draw left and right level markers for the unity lines (0 dbFS, 1.0 amplitude)
+	if (getRenderUnityLine())
+	{
+		auto const unityRectL = computeLevelMarkerRect(leftMeterRect, mappedUnity);
+		painter.fillRect(unityRectL, getUnityMarker());
+
+		auto const unityRectR = computeLevelMarkerRect(rightMeterRect, mappedUnity);
+		painter.fillRect(unityRectR, getUnityMarker());
+	}
+
+	// These values define where the gradient changes values, i.e. the ranges
+	// for clipping, warning and ok.
+	// Please ensure that "clip starts" is the maximum value and that "ok ends"
+	// is the minimum value and that all other values lie inbetween. Otherwise
+	// there will be warnings when the gradient is defined.
+	float const mappedClipStarts(mapper(dbfsToAmp(0.f)));
+	float const mappedWarnEnd(mapper(dbfsToAmp(-0.01)));
+	float const mappedWarnStart(mapper(dbfsToAmp(-6.f)));
+	float const mappedOkEnd(mapper(dbfsToAmp(-12.f)));
+
+	// Prepare the gradient for the meters
+	//
+	// The idea is the following. We want to be able to render arbitrary ranges of min and max values.
+	// Therefore we first compute the start and end point of the gradient in window coordinates.
+	// The gradient is assumed to start with the clip color and to end with the ok color with warning values in between.
+	// We know the min and max peaks that map to a rectangle where we draw the levels. We can use the values of the min and max peaks
+	// as well as the Y-coordinates of the rectangle to compute a map which will give us the coordinates of the value where the clipping
+	// starts and where the ok area end. These coordinates are used to initialize the gradient. Please note that the gradient might thus
+	// extend the rectangle into which we paint.
+	float clipStartYCoord = valuesToWindowCoordinates.map(mappedClipStarts);
+	float okEndYCoord = valuesToWindowCoordinates.map(mappedOkEnd);
+
+	QLinearGradient linearGrad(0, clipStartYCoord, 0, okEndYCoord);
+
+	// We already know for the gradient that the clip color will be at 0 and that the ok color is at 1.
+	// What's left to do is to map the inbetween values into the interval [0,1].
+	LinearMap<float> const mapBetweenClipAndOk(mappedClipStarts, 0.f, mappedOkEnd, 1.f);
+
+	linearGrad.setColorAt(0, peakClip());
+	linearGrad.setColorAt(mapBetweenClipAndOk.map(mappedWarnEnd), peakWarn());
+	linearGrad.setColorAt(mapBetweenClipAndOk.map(mappedWarnStart), peakWarn());
+	linearGrad.setColorAt(1, peakOk());
 
 	// Draw left levels
-	float const leftSpan = ampToDbfs(qMax<float>(0.0001, m_fPeakValue_L)) - minDB;
-	int peak_L = height * leftSpan * fullSpanReciprocal;
-	QRect drawRectL( 0, height - peak_L, width, peak_L ); // Source and target are identical
-	painter.drawPixmap(drawRectL, m_leds, drawRectL);
-
-	float const persistentLeftPeakDBFS = ampToDbfs(qMax<float>(0.0001, m_persistentPeak_L));
-	int persistentPeak_L = height * (1 - (persistentLeftPeakDBFS - minDB) * fullSpanReciprocal);
-	// the LED's have a  4px padding and we don't want the peaks
-	// to draw on the fader background
-	if( persistentPeak_L <= 4 )
+	if (mappedPeakL > mappedMinPeak)
 	{
-		persistentPeak_L = 4;
-	}
-	if( persistentLeftPeakDBFS > minDB )
-	{
-		QColor const & peakColor = clips(m_persistentPeak_L) ? peakRed() :
-			persistentLeftPeakDBFS >= -6 ? peakYellow() : peakGreen();
-		painter.fillRect( QRect( 2, persistentPeak_L, 7, 1 ), peakColor );
+		QPainterPath leftMeterPath;
+		leftMeterPath.addRoundedRect(computeLevelRect(leftMeterRect, mappedPeakL), radius, radius);
+		painter.fillPath(leftMeterPath, linearGrad);
 	}
 
+	// Draw left peaks
+	if (mappedPersistentPeakL > mappedMinPeak)
+	{
+		auto const peakRectL = computePeakRect(leftMeterRect, mappedPersistentPeakL);
+		painter.fillRect(peakRectL, linearGrad);
+	}
 
 	// Draw right levels
-	float const rightSpan = ampToDbfs(qMax<float>(0.0001, m_fPeakValue_R)) - minDB;
-	int peak_R = height * rightSpan * fullSpanReciprocal;
-	QRect const drawRectR( center, height - peak_R, width, peak_R ); // Source and target are identical
-	painter.drawPixmap(drawRectR, m_leds, drawRectR);
-
-	float const persistentRightPeakDBFS = ampToDbfs(qMax<float>(0.0001, m_persistentPeak_R));
-	int persistentPeak_R = height * (1 - (persistentRightPeakDBFS - minDB) * fullSpanReciprocal);
-	// the LED's have a  4px padding and we don't want the peaks
-	// to draw on the fader background
-	if( persistentPeak_R <= 4 )
+	if (mappedPeakR > mappedMinPeak)
 	{
-		persistentPeak_R = 4;
-	}
-	if( persistentRightPeakDBFS > minDB )
-	{
-		QColor const & peakColor = clips(m_persistentPeak_R) ? peakRed() :
-			persistentRightPeakDBFS >= -6 ? peakYellow() : peakGreen();
-		painter.fillRect( QRect( 14, persistentPeak_R, 7, 1 ), peakColor );
-	}
-}
-
-void Fader::paintLinearLevels(QPaintEvent * ev, QPainter & painter)
-{
-	// peak leds
-	//float fRange = abs( m_fMaxPeak ) + abs( m_fMinPeak );
-
-	int height = m_back.height();
-	int width = m_back.width() / 2;
-	int center = m_back.width() - width;
-
-	int peak_L = calculateDisplayPeak( m_fPeakValue_L - m_fMinPeak );
-	int persistentPeak_L = qMax<int>( 3, calculateDisplayPeak( m_persistentPeak_L - m_fMinPeak ) );
-	painter.drawPixmap(QRect(0, peak_L, width, height - peak_L), m_leds, QRect(0, peak_L, width, height - peak_L));
-
-	if( m_persistentPeak_L > 0.05 )
-	{
-		painter.fillRect( QRect( 2, persistentPeak_L, 7, 1 ), ( m_persistentPeak_L < 1.0 )
-			? peakGreen()
-			: peakRed() );
+		QPainterPath rightMeterPath;
+		rightMeterPath.addRoundedRect(computeLevelRect(rightMeterRect, mappedPeakR), radius, radius);
+		painter.fillPath(rightMeterPath, linearGrad);
 	}
 
-	int peak_R = calculateDisplayPeak( m_fPeakValue_R - m_fMinPeak );
-	int persistentPeak_R = qMax<int>( 3, calculateDisplayPeak( m_persistentPeak_R - m_fMinPeak ) );
-	painter.drawPixmap(QRect(center, peak_R, width, height - peak_R), m_leds, QRect(center, peak_R, width, height - peak_R));
-
-	if( m_persistentPeak_R > 0.05 )
+	// Draw right peaks
+	if (mappedPersistentPeakR > mappedMinPeak)
 	{
-		painter.fillRect( QRect( 14, persistentPeak_R, 7, 1 ), ( m_persistentPeak_R < 1.0 )
-			? peakGreen()
-			: peakRed() );
+		auto const peakRectR = computePeakRect(rightMeterRect, mappedPersistentPeakR);
+		painter.fillRect(peakRectR, linearGrad);
 	}
+
+	painter.restore();
 }
 
-
-QColor const & Fader::peakGreen() const
+QColor const & Fader::peakOk() const
 {
-	return m_peakGreen;
+	return m_peakOk;
 }
 
-QColor const & Fader::peakRed() const
+QColor const & Fader::peakClip() const
 {
-	return m_peakRed;
+	return m_peakClip;
 }
 
-QColor const & Fader::peakYellow() const
+QColor const & Fader::peakWarn() const
 {
-	return m_peakYellow;
+	return m_peakWarn;
 }
 
-void Fader::setPeakGreen( const QColor & c )
+void Fader::setPeakOk(const QColor& c)
 {
-	m_peakGreen = c;
+	m_peakOk = c;
 }
 
-void Fader::setPeakRed( const QColor & c )
+void Fader::setPeakClip(const QColor& c)
 {
-	m_peakRed = c;
+	m_peakClip = c;
 }
 
-void Fader::setPeakYellow( const QColor & c )
+void Fader::setPeakWarn(const QColor& c)
 {
-	m_peakYellow = c;
+	m_peakWarn = c;
+}
+
+QColor const & Fader::getUnityMarker() const
+{
+	return m_unityMarker;
+}
+
+void Fader::setUnityMarker(const QColor& c)
+{
+	m_unityMarker = c;
 }
 
 

@@ -32,6 +32,7 @@
 
 #include "lmms_constants.h"
 #include "lmmsconfig.h"
+#include <cassert>
 
 namespace lmms
 {
@@ -352,6 +353,28 @@ static inline int numDigitsAsInt(float f)
 	return digits;
 }
 
+template <typename T>
+class LinearMap
+{
+public:
+	LinearMap(T x1, T y1, T x2, T y2)
+	{
+		T const dx = x2 - x1;
+		assert (dx != T(0));
+
+		m_a = (y2 - y1) / dx;
+		m_b = y1 - m_a * x1;
+	}
+
+	T map(T x) const
+	{
+		return m_a * x + m_b;
+	}
+
+private:
+	T m_a;
+	T m_b;
+};
 
 } // namespace lmms
 
