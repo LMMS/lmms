@@ -110,17 +110,18 @@ sample_t BSynth::nextStringSample( float sample_length )
 		sample_realindex -= sample_length;
 	}
 
+	const auto currentRealIndex = sample_realindex;
 	const auto currentIndex = static_cast<int>(sample_realindex);
 	sample_realindex += sample_step;
 
 	if (!interpolation)
 	{
 		sample_index = currentIndex;
-		return sample_shape[currentIndex];
+		return sample_shape[sample_index];
 	}
 
 	const auto nextIndex = currentIndex < sample_length - 1 ? currentIndex + 1 : 0;
-	return linearInterpolate(sample_shape[currentIndex], sample_shape[nextIndex], fraction(currentIndex));
+	return linearInterpolate(sample_shape[currentIndex], sample_shape[nextIndex], fraction(currentRealIndex));
 }	
 
 /***********************************************************************
