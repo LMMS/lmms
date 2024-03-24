@@ -44,14 +44,13 @@ namespace lmms
 
 // return DPI-independent font-size - font with returned font-size has always
 // the same size in pixels
-template<typename T>
-inline QFont pointSize(QFont _f, T SIZE)
+inline QFont pointSize(QFont _f, float SIZE)
 {
 	// to calculate DPI of a screen to make it HiDPI ready
 	qreal devicePixelRatio = QGuiApplication::primaryScreen()->devicePixelRatio();
     qreal scaleFactor = devicePixelRatio > 1.0 ? devicePixelRatio : 1.0; // Ensure scaleFactor is at least 1.0
 
-	_f.setPointSizeF((float)SIZE * scaleFactor);
+	_f.setPointSizeF(SIZE * scaleFactor);
 	return( _f );
 }
 
