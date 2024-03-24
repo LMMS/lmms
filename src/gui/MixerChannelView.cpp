@@ -277,6 +277,7 @@ namespace lmms::gui
         m_muteButton->setModel(&mixerChannel->m_muteModel);
         m_soloButton->setModel(&mixerChannel->m_soloModel);
         m_effectRackView->setModel(&mixerChannel->m_fxChain);
+        m_channelNumberLcd->setValue(index);
         m_channelIndex = index;
     }
 
