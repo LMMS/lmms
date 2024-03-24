@@ -77,8 +77,7 @@ public:
 	void updateMixerChannel(int index);
 
 	// notify the view that a mixer channel was deleted
-	void deleteChannel(int index, bool skip_confirm = false);
-	bool confirmRemoval(int index);
+	void deleteChannel(int index);
 
 	// delete all unused channels
 	void deleteUnusedChannels();

@@ -23,9 +23,7 @@
  */
 
 
-#include <QCheckBox>
 #include <QLayout>
-#include <QMessageBox>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QStyle>
@@ -372,16 +370,10 @@ void MixerView::updateMixerChannel(int index)
 }
 
 
-void MixerView::deleteChannel(int index, bool skip_confirm)
+void MixerView::deleteChannel(int index)
 {
 	// can't delete master
 	if (index == 0) return;
-
-	// if there is no user confirmation, do nothing
-	if (!skip_confirm && !confirmRemoval(index))
-	{
-		return;
-	}
 
 	// Disconnect from the solo/mute models of the channel we are about to delete
 	disconnectFromSoloAndMute(index);
@@ -420,47 +412,6 @@ void MixerView::deleteChannel(int index, bool skip_confirm)
 
 	updateMaxChannelSelector();
 }
-
-bool MixerView::confirmRemoval(int index)
-{
-	// if config variable is set to false, there is no need for user confirmation
-	bool needConfirm = ConfigManager::inst()->value("ui", "mixerchanneldeletionwarning", "1").toInt();
-	if (!needConfirm) { return true; }
-
-	Mixer* mix = getMixer();
-
-	if (!mix->isChannelInUse(index))
-	{
-		// is the channel is not in use, there is no need for user confirmation
-		return true;
-	}
-
-	QString messageRemoveTrack = tr("This Mixer Channel is being used.\n"
-									"Are you sure you want to remove this channel?\n\n"
-									"Warning: This operation can not be undone.");
-
-	QString messageTitleRemoveTrack = tr("Confirm removal");
-	QString askAgainText = tr("Don't ask again");
-	auto askAgainCheckBox = new QCheckBox(askAgainText, nullptr);
-	connect(askAgainCheckBox, &QCheckBox::stateChanged, [](int state) {
-		// Invert button state, if it's checked we *shouldn't* ask again
-		ConfigManager::inst()->setValue("ui", "mixerchanneldeletionwarning", state ? "0" : "1");
-	});
-
-	QMessageBox mb(this);
-	mb.setText(messageRemoveTrack);
-	mb.setWindowTitle(messageTitleRemoveTrack);
-	mb.setIcon(QMessageBox::Warning);
-	mb.addButton(QMessageBox::Cancel);
-	mb.addButton(QMessageBox::Ok);
-	mb.setCheckBox(askAgainCheckBox);
-	mb.setDefaultButton(QMessageBox::Cancel);
-
-	int answer = mb.exec();
-
-	return answer == QMessageBox::Ok;
-}
-
 
 void MixerView::deleteUnusedChannels()
 {
@@ -590,7 +541,7 @@ void MixerView::setCurrentMixerChannel(int channel)
 
 void MixerView::clear()
 {
-	for (auto i = m_mixerChannelViews.size() - 1; i > 0; --i) { deleteChannel(i, true); }
+	for (auto i = m_mixerChannelViews.size() - 1; i > 0; --i) { deleteChannel(i); }
 	getMixer()->clearChannel(0);
 
 	refreshDisplay();
