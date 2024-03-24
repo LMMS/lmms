@@ -177,7 +177,7 @@ void Oscilloscope::paintEvent( QPaintEvent * )
 	else
 	{
 		p.setPen( QColor( 192, 192, 192 ) );
-		p.setFont( pointSize<7>( p.font() ) );
+		p.setFont(pointSize<int>(p.font(), 7));
 		p.drawText( 6, height()-5, tr( "Click to enable" ) );
 	}
 }

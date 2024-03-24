@@ -548,7 +548,7 @@ void PatmanView::updateFilename()
  	m_displayFilename = "";
 	int idx = m_pi->m_patchFile.length();
 
-	QFontMetrics fm( pointSize<8>( font() ) );
+	QFontMetrics fm(pointSize<int>(font(), 8));
 
 	// simple algorithm for creating a text from the filename that
 	// matches in the white rectangle
@@ -618,7 +618,7 @@ void PatmanView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
-	p.setFont( pointSize<8>( font() ) );
+	p.setFont(pointSize<int>(font() ,8));
 	p.drawText( 8, 116, 235, 16,
 			Qt::AlignLeft | Qt::TextSingleLine | Qt::AlignVCenter,
 			m_displayFilename );

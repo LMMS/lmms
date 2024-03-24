@@ -49,7 +49,7 @@ ComboBox::ComboBox( QWidget * _parent, const QString & _name ) :
 {
 	setFixedHeight( ComboBox::DEFAULT_HEIGHT );
 
-	setFont( pointSize<9>( font() ) );
+	setFont(pointSize<int>(font(), 9));
 
 	connect( &m_menu, SIGNAL(triggered(QAction*)),
 				this, SLOT(setItem(QAction*)));
