@@ -181,11 +181,11 @@ float DrumSynth::waveform(float ph, int form)
 
 int DrumSynth::GetPrivateProfileString(const char *sec, const char *key, const char *def, char *buffer, int size, QString file)
 {
-    stringstream is;
-    bool inSection = false;
-	  int len = 0;
+	stringstream is;
+	bool inSection = false;
+	int len = 0;
 
-	  char* line = (char*)malloc(200);
+	char* line = static_cast<char*>(malloc(200));
 
     // Use QFile to handle unicode file name on Windows
     // Previously we used ifstream directly
