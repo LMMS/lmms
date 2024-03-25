@@ -36,6 +36,11 @@
 #include "ColorChooser.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
+#include "ExportProjectDialog.h"
+#include "FileDialog.h"
+#include "ProjectRenderer.h"
+#include "SampleClip.h"
+#include "TimePos.h"
 #include "embed.h"
 #include "Engine.h"
 #include "gui_templates.h"
@@ -250,7 +255,46 @@ void TrackOperationsWidget::clearTrack()
 	t->unlock();
 }
 
+/*! \brief Export this track to an audio file and add it to the project */
+void TrackOperationsWidget::bounceTrack()
+{
+	// TODO: Considering creating new projects in their own folders to have a dedicated place to store samples like
+	// these, removing the need for `FileDialog`
+	auto dialog = FileDialog{this};
+	dialog.setFileMode(FileDialog::AnyFile);
+	dialog.setAcceptMode(FileDialog::AcceptSave);
+	dialog.setDirectory(ConfigManager::inst()->userProjectsDir());
+	dialog.setNameFilters(ProjectRenderer::availableDescriptions());
+	dialog.setWindowTitle(tr("Select file to bounce track to..."));
 
+	const auto defaultExtension = ProjectRenderer::fileEncodeDevices[0].m_extension;
+	dialog.setDefaultSuffix(defaultExtension);
+
+	auto track = m_trackView->getTrack();
+	const auto projectName = Engine::getSong()->projectFileName().split('.')[0];
+	const auto fileNamePrefix = projectName.isEmpty() ? "" : projectName + "_";
+	dialog.selectFile(fileNamePrefix + track->name() + defaultExtension);
+
+	if (dialog.exec() == QDialog::Accepted && !dialog.selectedFiles().isEmpty() && !dialog.selectedFiles()[0].isEmpty())
+	{
+		const auto bounceDestination = dialog.selectedFiles()[0];
+		auto exportDialog = ExportProjectDialog{bounceDestination, false, m_trackView->getTrack(), this};
+
+		if (exportDialog.exec() == QDialog::Accepted)
+		{
+			auto guard = Engine::audioEngine()->requestChangesGuard();
+			auto containerView = m_trackView->trackContainerView();
+
+			auto bouncedTrack = Track::create(Track::Type::Sample, containerView->model());
+			auto bouncedClip = static_cast<SampleClip*>(bouncedTrack->createClip(TimePos{}));
+			bouncedClip->setSampleFile(bounceDestination);
+			track->setMuted(true);
+
+			auto bouncedTrackView = containerView->createTrackView(bouncedTrack);
+			containerView->moveTrackView(bouncedTrackView, containerView->trackViews().indexOf(m_trackView));
+		}
+	}
+}
 
 /*! \brief Remove this track from the track list
  *
@@ -328,6 +372,12 @@ void TrackOperationsWidget::updateMenu()
 	{
 		toMenu->addAction( tr( "Clear this track" ), this, SLOT(clearTrack()));
 	}
+
+	if (!dynamic_cast<AutomationTrackView*>(m_trackView))
+	{
+		toMenu->addAction(tr("Bounce this track"), this, &TrackOperationsWidget::bounceTrack);
+	}
+
 	if (QMenu *mixerMenu = m_trackView->createMixerMenu(tr("Channel %1: %2"), tr("Assign to new Mixer Channel")))
 	{
 		toMenu->addMenu(mixerMenu);
