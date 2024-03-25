@@ -28,10 +28,11 @@
 #include <QCheckBox>
 #include <QDir>
 #include <QMutex>
-#include "embed.h"
-
-#include "FileBrowserSearcher.h"
 #include <QProgressBar>
+#include <memory>
+
+#include "FileSearch.h"
+#include "embed.h"
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 	#include <QRecursiveMutex>
@@ -105,16 +106,17 @@ private:
 	void saveDirectoriesStates();
 	void restoreDirectoriesStates();
 
-	void buildSearchTree();
+	void foundSearchMatch(FileSearch* search, const QString& match);
+	void searchCompleted(FileSearch* search);
 	void onSearch(const QString& filter);
-	void toggleSearch(bool on);
+	void displaySearch(bool on);
 
 	FileBrowserTreeWidget * m_fileBrowserTreeWidget;
 	FileBrowserTreeWidget * m_searchTreeWidget;
 
 	QLineEdit * m_filterEdit;
 
-	std::shared_ptr<FileBrowserSearcher::SearchFuture> m_currentSearch;
+	std::shared_ptr<FileSearch> m_currentSearch;
 	QProgressBar* m_searchIndicator = nullptr;
 
 	QString m_directories; //!< Directories to search, split with '*'
