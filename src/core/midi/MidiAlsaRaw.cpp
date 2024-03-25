@@ -156,10 +156,7 @@ void MidiAlsaRaw::run()
 		else if (err == 0) { continue; }
 		else
 		{
-			for (int i = 0; i < err; ++i)
-			{
-				parseData(buf[i]);
-			}
+			for (int i = 0; i < err; ++i) { parseData(buf[i]); }
 		}
 	}
 
