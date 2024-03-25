@@ -254,7 +254,58 @@ int main( int argc, char * * argv )
 {
 	using namespace lmms;
 
-#ifdef LMMS_DEBUG_FPE
+	bool coreOnly = false;
+	bool fullscreen = true;
+	bool exitAfterImport = false;
+	bool allowRoot = false;
+	bool renderLoop = false;
+	bool renderTracks = false;
+	QString fileToLoad, fileToImport, renderOut, profilerOutputFile, configFile;
+
+	// first of two command-line parsing stages
+	for (int i = 1; i < argc; ++i)
+	{
+		QString arg = argv[i];
+
+		if (arg == "--help" || arg == "-h")
+		{
+			printHelp();
+			return EXIT_SUCCESS;
+		}
+		else if (arg == "--version" || arg == "-v")
+		{
+			printVersion(argv[0]);
+			return EXIT_SUCCESS;
+		}
+		else if (arg == "render" || arg == "--render" || arg == "-r" )
+		{
+			coreOnly = true;
+		}
+		else if (arg == "rendertracks" || arg == "--rendertracks")
+		{
+			coreOnly = true;
+			renderTracks = true;
+		}
+		else if (arg == "--allowroot")
+		{
+			allowRoot = true;
+		}
+		else if (arg == "--geometry" || arg == "-geometry")
+		{
+			if (arg == "--geometry")
+			{
+				// Delete the first "-" so Qt recognize the option
+				strcpy(argv[i], "-geometry");
+			}
+			// option -geometry is filtered by Qt later,
+			// so we need to check its presence now to
+			// determine, if the application should run in
+			// fullscreen mode (default, no -geometry given).
+			fullscreen = false;
+		}
+	}
+
+	#ifdef LMMS_DEBUG_FPE
 	// Enable exceptions for certain floating point results
 	// FE_UNDERFLOW is disabled for the time being
 	feenableexcept( FE_INVALID   |
@@ -302,49 +353,6 @@ int main( int argc, char * * argv )
 
 	disable_denormals();
 
-	bool coreOnly = false;
-	bool fullscreen = true;
-	bool exitAfterImport = false;
-	bool allowRoot = false;
-	bool renderLoop = false;
-	bool renderTracks = false;
-	QString fileToLoad, fileToImport, renderOut, profilerOutputFile, configFile;
-
-	// first of two command-line parsing stages
-	for( int i = 1; i < argc; ++i )
-	{
-		QString arg = argv[i];
-
-		if( arg == "--help"    || arg == "-h" ||
-		    arg == "--version" || arg == "-v" ||
-		    arg == "render" || arg == "--render" || arg == "-r" )
-		{
-			coreOnly = true;
-		}
-		else if( arg == "rendertracks" || arg == "--rendertracks" )
-		{
-			coreOnly = true;
-			renderTracks = true;
-		}
-		else if( arg == "--allowroot" )
-		{
-			allowRoot = true;
-		}
-		else if( arg == "--geometry" || arg == "-geometry")
-		{
-			if( arg == "--geometry" )
-			{
-				// Delete the first "-" so Qt recognize the option
-				strcpy(argv[i], "-geometry");
-			}
-			// option -geometry is filtered by Qt later,
-			// so we need to check its presence now to
-			// determine, if the application should run in
-			// fullscreen mode (default, no -geometry given).
-			fullscreen = false;
-		}
-	}
-
 #if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_HAIKU)
 	if ( ( getuid() == 0 || geteuid() == 0 ) && !allowRoot )
 	{
@@ -372,17 +380,7 @@ int main( int argc, char * * argv )
 	{
 		QString arg = argv[i];
 
-		if( arg == "--version" || arg == "-v" )
-		{
-			printVersion( argv[0] );
-			return EXIT_SUCCESS;
-		}
-		else if( arg == "--help" || arg  == "-h" )
-		{
-			printHelp();
-			return EXIT_SUCCESS;
-		}
-		else if( arg == "upgrade" || arg == "--upgrade" || arg  == "-u")
+		if (arg == "upgrade" || arg == "--upgrade" || arg  == "-u")
 		{
 			++i;
 
