@@ -365,11 +365,11 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_o2Btn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("o2_inactive"));
 	m_o2Btn->setToolTip(tr("Select output O2"));
 
-	auto helpBtn = new PixmapButton(this, nullptr);
-	helpBtn->move(133, ROW_BTN);
-	helpBtn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("help_active"));
-	helpBtn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("help_inactive"));
-	helpBtn->setToolTip(tr("Open help window"));
+	m_helpBtn = new PixmapButton(this, nullptr);
+	m_helpBtn->move(133, ROW_BTN);
+	m_helpBtn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("help_active"));
+	m_helpBtn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("help_inactive"));
+	m_helpBtn->setToolTip(tr("Open help window"));
 
 	m_selectedGraphGroup = new automatableButtonGroup(this);
 	m_selectedGraphGroup->addButton(m_w1Btn);
@@ -511,7 +511,7 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	connect(m_whiteNoiseWaveBtn, SIGNAL(clicked()), this,
 			SLOT(noiseWaveClicked()));
 	connect(m_usrWaveBtn, SIGNAL(clicked()), this, SLOT(usrWaveClicked()));
-	connect(helpBtn, SIGNAL(clicked()), this, SLOT(helpClicked()));
+	connect(m_helpBtn, SIGNAL(clicked()), this, SLOT(helpClicked()));
 
 	connect(m_w1Btn, SIGNAL(clicked()), this, SLOT(updateLayout()));
 	connect(m_w2Btn, SIGNAL(clicked()), this, SLOT(updateLayout()));
