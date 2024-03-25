@@ -96,6 +96,8 @@ public:
 	// TODO: update formatArray
 	// TODO: licensing email TODO
 
+	// TODO: check selectedLocation, selectedArray, isSelected, isLastSelectedArray usage
+
 	VectorGraphView(QWidget * parentIn,
 		int widthIn, int heightIn,
 		unsigned int pointSizeIn, unsigned int maxLengthIn);
@@ -144,8 +146,12 @@ private:
 	float getDistance(int xAIn, int yAIn, int xBIn, int yBIn);
 	float getDistance(float xAIn, float yAIn, float xBIn, float yBIn);
 
+	bool addPoint(unsigned int locationIn, int mouseXIn, int mouseYIn);
+
 	// returns true if the graph was clicked
-	bool isGraphPressed(int mouseYIn);
+	bool isGraphPressed(int mouseXIn, int mouseYIn);
+	// returns true if the editing window was clicked while in editing mode
+	bool isEditingWindowPressed(int mouseYIn);
 	// returns -1 if no attribute was clicked
 	int getPressedInput(int mouseXIn, int mouseYIn, unsigned int inputCountIn);
 	// returns a float attrib value, valueOut = attrib value if it is a bool
@@ -181,6 +187,10 @@ private:
 	// draw simplified lines
 	bool m_isSimplified;
 
+	// if m_isLastSelectedArray == true then
+	// m_selectedArray can be used
+	// else if m_isSelected == false then
+	// m_selectedLocation amd m_selectedArray should not be used
 	unsigned int m_selectedLocation;
 	unsigned int m_selectedArray;
 	bool m_isSelected;
@@ -225,6 +235,7 @@ public:
 	}
 	inline void setMaxLength(unsigned int maxLengthIn)
 	{
+		// TODO run formatArray on all the dataArrays
 		if (m_maxLength != maxLengthIn)
 		{
 			m_maxLength = maxLengthIn;
@@ -243,7 +254,8 @@ public:
 	{
 		m_dataArrays.clear();
 	}
-	unsigned int getDataArrayLocation(VectorGraphDataArray* dataArrayIn);
+	int getDataArrayLocationFromId(int idIn);
+	int getDataArrayNewId();
 
 	// save, load
 	//void saveSettings(QDomDocument& doc, QDomElement& element, const QString& name); //TODO
@@ -274,7 +286,7 @@ public:
 	VectorGraphDataArray(
 	bool isFixedSizeIn, bool isFixedValueIn, bool isFixedPosIn, bool nonNegativeIn,
 	bool isFixedEndPointsIn, bool isSelectableIn, bool isEditableAttribIn, bool isAutomatableEffectableIn,
-	bool isSaveableIn, VectorGraphModel* parentIn);
+	bool isSaveableIn, VectorGraphModel* parentIn, int idIn);
 	~VectorGraphDataArray();
 
 	void updateConnections(VectorGraphModel* parentIn);
@@ -293,7 +305,8 @@ public:
 	void setFillColor(QColor colorIn);
 	void setAutomatedColor(QColor colorIn);
 	// returns true if successful
-	bool setEffectorArrayLocation(unsigned int locationIn);
+
+	bool setEffectorArrayLocation(int locationIn);
 
 	bool getIsFixedSize();
 	bool getIsFixedValue();
@@ -309,7 +322,9 @@ public:
 	QColor* getFillColor();
 	QColor* getAutomatedColor();
 	// returns -1 if it has no effector
+
 	int getEffectorArrayLocation();
+	int getId();
 
 
 	// array: -------------------
@@ -599,6 +614,8 @@ private:
 	QColor m_automatedColor;
 
 	VectorGraphModel* m_parent;
+	// simple id system for setEffectorArrayLocation
+	int m_id;
 
 	// which VectorGraphDataArray can effect this one, -1 if not effected
 	int m_effectorLocation;
