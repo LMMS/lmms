@@ -404,6 +404,9 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 		}
 	}
 
+	std::array<sampleFrame, 512> sampleData;
+	std::array<sampleFrame, 512> convertBuf;
+
 	// Fill buffer with portions of the note samples
 	for (auto& note : m_notes)
 	{
@@ -440,8 +443,8 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 				samples = frames / freq_factor + Sample::s_interpolationMargins[m_interpolation];
 			}
 
+			if (samples > 512) { printf("ACK\n"); throw std::runtime_error("buffer size not large enough"); }
 			// Load this note's data
-			sampleFrame sampleData[samples];
 			loadSample(sample, sampleData, samples);
 
 			// Apply ADSR using a copy so if we don't use these samples when
@@ -458,10 +461,8 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			// Output the data resampling if needed
 			if( resample == true )
 			{
-				sampleFrame convertBuf[frames];
-
 				// Only output if resampling is successful (note that "used" is output)
-				if (sample.convertSampleRate(*sampleData, *convertBuf, samples, frames, freq_factor, used))
+				if (sample.convertSampleRate(sampleData, convertBuf, samples, frames, freq_factor, used))
 				{
 					for( f_cnt_t i = 0; i < frames; ++i )
 					{
@@ -499,12 +500,9 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 
 
 
-void GigInstrument::loadSample( GigSample& sample, sampleFrame* sampleData, f_cnt_t samples )
+void GigInstrument::loadSample(GigSample& sample, std::array<sampleFrame, 512>& sampleData, f_cnt_t samples)
 {
-	if( sampleData == nullptr || samples < 1 )
-	{
-		return;
-	}
+	if (samples < 1) { return; }
 
 	// Determine if we need to loop part of this sample
 	bool loop = false;
@@ -527,7 +525,8 @@ void GigInstrument::loadSample( GigSample& sample, sampleFrame* sampleData, f_cn
 	}
 
 	unsigned long allocationsize = samples * sample.sample->FrameSize;
-	int8_t buffer[allocationsize];
+	if (allocationsize > 1024) { printf("ACK2\n"); throw std::runtime_error("buffer not large enough"); }
+	std::array<int8_t, 1024> buffer;
 
 	// Load the sample in different ways depending on if we're looping or not
 	if( loop == true && ( sample.pos >= loopStart || sample.pos + samples > loopStart ) )
@@ -572,14 +571,14 @@ void GigInstrument::loadSample( GigSample& sample, sampleFrame* sampleData, f_cn
 	{
 		sample.sample->SetPos( sample.pos );
 
-		unsigned long size = sample.sample->Read( &buffer, samples ) * sample.sample->FrameSize;
-		std::memset( (int8_t*) &buffer + size, 0, allocationsize - size );
+		unsigned long size = sample.sample->Read( &buffer.data()[0], samples ) * sample.sample->FrameSize;
+		std::memset( (int8_t*) &buffer.data()[0] + size, 0, allocationsize - size );
 	}
 
 	// Convert from 16 or 24 bit into 32-bit float
 	if( sample.sample->BitDepth == 24 ) // 24 bit
 	{
-		auto pInt = reinterpret_cast<uint8_t*>(&buffer);
+		auto pInt = reinterpret_cast<uint8_t*>(&buffer.data()[0]);
 
 		for( f_cnt_t i = 0; i < samples; ++i )
 		{
@@ -611,7 +610,7 @@ void GigInstrument::loadSample( GigSample& sample, sampleFrame* sampleData, f_cn
 	}
 	else // 16 bit
 	{
-		auto pInt = reinterpret_cast<int16_t*>(&buffer);
+		auto pInt = reinterpret_cast<int16_t*>(&buffer.data()[0]);
 
 		for( f_cnt_t i = 0; i < samples; ++i )
 		{
@@ -1182,7 +1181,7 @@ void GigSample::updateSampleRate()
 
 
 
-bool GigSample::convertSampleRate( sampleFrame & oldBuf, sampleFrame & newBuf,
+bool GigSample::convertSampleRate(std::array<sampleFrame, 512>& oldBuf, std::array<sampleFrame, 512>& newBuf,
 		f_cnt_t oldSize, f_cnt_t newSize, float freq_factor, f_cnt_t& used )
 {
 	if( srcState == nullptr )
@@ -1191,8 +1190,8 @@ bool GigSample::convertSampleRate( sampleFrame & oldBuf, sampleFrame & newBuf,
 	}
 
 	SRC_DATA src_data;
-	src_data.data_in = &oldBuf[0];
-	src_data.data_out = &newBuf[0];
+	src_data.data_in = reinterpret_cast<const float*>(oldBuf.data());
+	src_data.data_out = reinterpret_cast<float*>(newBuf.data());
 	src_data.input_frames = oldSize;
 	src_data.output_frames = newSize;
 	src_data.src_ratio = freq_factor;
