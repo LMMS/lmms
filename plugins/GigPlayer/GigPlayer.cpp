@@ -404,8 +404,8 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 		}
 	}
 
-	std::array<sampleFrame, 512> sampleData;
-	std::array<sampleFrame, 512> convertBuf;
+	std::array<sampleFrame, 1024> sampleData;
+	std::array<sampleFrame, 1024> convertBuf;
 
 	// Fill buffer with portions of the note samples
 	for (auto& note : m_notes)
@@ -500,7 +500,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 
 
 
-void GigInstrument::loadSample(GigSample& sample, std::array<sampleFrame, 512>& sampleData, f_cnt_t samples)
+void GigInstrument::loadSample(GigSample& sample, std::array<sampleFrame, 1024>& sampleData, f_cnt_t samples)
 {
 	if (samples < 1) { return; }
 
@@ -525,8 +525,12 @@ void GigInstrument::loadSample(GigSample& sample, std::array<sampleFrame, 512>& 
 	}
 
 	unsigned long allocationsize = samples * sample.sample->FrameSize;
-	if (allocationsize > 1024) { printf("ACK2\n"); throw std::runtime_error("buffer not large enough"); }
-	std::array<int8_t, 1024> buffer;
+	if (allocationsize > 4096)
+	{
+		printf("GigPlayer sample buffer not large enough\n");
+		throw std::runtime_error("GigPlayer sample buffer not large enough");
+	}
+	std::array<int8_t, 4096> buffer;
 
 	// Load the sample in different ways depending on if we're looping or not
 	if( loop == true && ( sample.pos >= loopStart || sample.pos + samples > loopStart ) )
@@ -1181,7 +1185,7 @@ void GigSample::updateSampleRate()
 
 
 
-bool GigSample::convertSampleRate(std::array<sampleFrame, 512>& oldBuf, std::array<sampleFrame, 512>& newBuf,
+bool GigSample::convertSampleRate(std::array<sampleFrame, 1024>& oldBuf, std::array<sampleFrame, 1024>& newBuf,
 		f_cnt_t oldSize, f_cnt_t newSize, float freq_factor, f_cnt_t& used )
 {
 	if( srcState == nullptr )
