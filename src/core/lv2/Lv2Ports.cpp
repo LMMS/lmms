@@ -152,7 +152,7 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 
 		bool isToggle = m_vis == Vis::Toggled;
 
-		LilvNode *defN = nullptr, *minN = nullptr, *maxN = nullptr;
+		LilvNode * defN, * minN = nullptr, * maxN = nullptr;
 		lilv_port_get_range(plugin, lilvPort, &defN,
 				isToggle ? nullptr : &minN,
 				isToggle ? nullptr : &maxN);

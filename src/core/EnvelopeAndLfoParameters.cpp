@@ -308,7 +308,7 @@ void EnvelopeAndLfoParameters::fillLevel( float * _buf, f_cnt_t _frame,
 
 	for( fpp_t offset = 0; offset < _frames; ++offset, ++_buf, ++_frame )
 	{
-		float env_level = 0.0f;
+		float env_level;
 		if( _frame < _release_begin )
 		{
 			if( _frame < m_pahdFrames )

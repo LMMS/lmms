@@ -274,21 +274,21 @@ PatmanInstrument::LoadError PatmanInstrument::loadPatch(
 
 		// skip wave name, fractions
 		SKIP_BYTES( 7 + 1 );
-		unsigned data_length = 0;
+		unsigned data_length;
 		READ_LONG( data_length );
-		unsigned loop_start = 0;
+		unsigned loop_start;
 		READ_LONG( loop_start );
-		unsigned loop_end = 0;
+		unsigned loop_end;
 		READ_LONG( loop_end );
-		unsigned sample_rate = 0;
+		unsigned sample_rate;
 		READ_SHORT( sample_rate );
 		// skip low_freq, high_freq
 		SKIP_BYTES( 4 + 4 );
-		unsigned root_freq = 0;
+		unsigned root_freq;
 		READ_LONG( root_freq );
 		// skip tuning, panning, envelope, tremolo, vibrato
 		SKIP_BYTES( 2 + 1 + 12 + 3 + 3 );
-		unsigned char modes = 0;
+		unsigned char modes;
 		if ( fread( &modes, 1, 1, fd ) != 1 )
 		{
 			fclose( fd );
@@ -297,15 +297,15 @@ PatmanInstrument::LoadError PatmanInstrument::loadPatch(
 		// skip scale frequency, scale factor, reserved space
 		SKIP_BYTES( 2 + 2 + 36 );
 
-		f_cnt_t frames = 0;
-		sample_t* wave_samples = nullptr;
+		f_cnt_t frames;
+		sample_t* wave_samples;
 		if( modes & MODES_16BIT )
 		{
 			frames = data_length >> 1;
 			wave_samples = new sample_t[frames];
 			for( f_cnt_t frame = 0; frame < frames; ++frame )
 			{
-				short sample = 0;
+				short sample;
 				if ( fread( &sample, 2, 1, fd ) != 1 )
 				{
 					delete[] wave_samples;
@@ -329,7 +329,7 @@ PatmanInstrument::LoadError PatmanInstrument::loadPatch(
 			wave_samples = new sample_t[frames];
 			for( f_cnt_t frame = 0; frame < frames; ++frame )
 			{
-				char sample = 0;
+				char sample;
 				if ( fread( &sample, 1, 1, fd ) != 1 )
 				{
 					delete[] wave_samples;

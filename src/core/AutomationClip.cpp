@@ -167,7 +167,7 @@ void AutomationClip::setTension( QString _new_tension )
 {
 	QMutexLocker m(&m_clipMutex);
 
-	bool ok = false;
+	bool ok;
 	float nt = LocaleHelper::toFloat(_new_tension, & ok);
 
 	if( ok && nt > -0.01 && nt < 1.01 )
@@ -183,7 +183,7 @@ const AutomatableModel * AutomationClip::firstObject() const
 {
 	QMutexLocker m(&m_clipMutex);
 
-	AutomatableModel* model = nullptr;
+	AutomatableModel* model;
 	if (!m_objects.empty() && (model = m_objects.front()) != nullptr)
 	{
 		return model;

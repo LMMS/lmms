@@ -90,7 +90,7 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 	speedRatio *= pitchRatio;
 	speedRatio *= Engine::audioEngine()->processingSampleRate() / static_cast<float>(m_originalSample.sampleRate());
 
-	float sliceStart = 0.0f, sliceEnd = 0.0f;
+	float sliceStart, sliceEnd;
 	if (noteIndex == 0) // full sample at base note
 	{
 		sliceStart = 0;

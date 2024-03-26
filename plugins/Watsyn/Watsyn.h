@@ -189,7 +189,7 @@ private:
 	// memcpy utilizing libsamplerate (src) for sinc interpolation
 	inline void srccpy( float * _dst, float * _src )
 	{
-		int err = 0;
+		int err;
 		const int margin = 64;
 		
 		// copy to temp array
@@ -206,7 +206,8 @@ private:
 		src_data.output_frames = WAVELEN;
 		src_data.src_ratio = static_cast<double>( WAVERATIO );
 		src_data.end_of_input = 0;
-		if (int err = src_process(src_state, &src_data)) { qDebug("Watsyn SRC error: %s", src_strerror(err)); }
+		err = src_process( src_state, &src_data ); 
+		if( err ) { qDebug( "Watsyn SRC error: %s", src_strerror( err ) ); }
 		src_delete( src_state );
 	}
 

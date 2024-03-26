@@ -211,7 +211,7 @@ Plugin * Plugin::instantiate(const QString& pluginName, Model * parent,
 {
 	const PluginFactory::PluginInfo& pi = getPluginFactory()->pluginInfo(pluginName.toUtf8());
 
-	Plugin* inst = nullptr;
+	Plugin* inst;
 	if( pi.isNull() )
 	{
 		if (gui::getGUI() != nullptr)

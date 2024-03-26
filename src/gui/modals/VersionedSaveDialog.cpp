@@ -109,7 +109,7 @@ bool VersionedSaveDialog::changeFileNameVersion(QString &fileName, bool incremen
 	{
 		// Find current version number
 		QString number = fileName.mid( idx+1, insertIndex - idx - 1 );
-		bool ok = false;
+		bool ok;
 		ushort version = number.toUShort( &ok );
 		Q_ASSERT( ok );
 

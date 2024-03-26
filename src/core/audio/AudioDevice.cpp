@@ -39,7 +39,7 @@ AudioDevice::AudioDevice( const ch_cnt_t _channels, AudioEngine*  _audioEngine )
 	m_audioEngine( _audioEngine ),
 	m_buffer( new surroundSampleFrame[audioEngine()->framesPerPeriod()] )
 {
-	int error = 0;
+	int error;
 	if( ( m_srcState = src_new(
 		audioEngine()->currentQualitySettings().libsrcInterpolation(),
 				SURROUND_CHANNELS, &error ) ) == nullptr )
@@ -146,7 +146,7 @@ void AudioDevice::applyQualitySettings()
 {
 	src_delete( m_srcState );
 
-	int error = 0;
+	int error;
 	if( ( m_srcState = src_new(
 		audioEngine()->currentQualitySettings().libsrcInterpolation(),
 				SURROUND_CHANNELS, &error ) ) == nullptr )

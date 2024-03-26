@@ -152,10 +152,18 @@ void LcdSpinBox::mouseDoubleClickEvent( QMouseEvent * )
 
 void LcdSpinBox::enterValue()
 {
-	bool ok = false;
-	int new_val = QInputDialog::getInt(this, tr("Set value"),
-		tr("Please enter a new value between %1 and %2:").arg(model()->minValue()).arg(model()->maxValue()),
-		model()->value(), model()->minValue(), model()->maxValue(), model()->step<int>(), &ok);
+	bool ok;
+	int new_val;
+
+	new_val = QInputDialog::getInt(
+			this, tr( "Set value" ),
+			tr( "Please enter a new value between %1 and %2:" ).
+			arg( model()->minValue() ).
+			arg( model()->maxValue() ),
+			model()->value(),
+			model()->minValue(),
+			model()->maxValue(),
+			model()->step<int>(), &ok );
 
 	if( ok )
 	{

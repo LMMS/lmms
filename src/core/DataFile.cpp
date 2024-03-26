@@ -464,7 +464,7 @@ bool DataFile::copyResources(const QString& resourcesDir)
 				if (el.hasAttribute(*res))
 				{
 					// Get absolute path to resource
-					bool error = false;
+					bool error;
 					QString resPath = PathUtil::toAbsolute(el.attribute(*res), &error);
 					// If we are running without the project loaded (from CLI), "local:" base
 					// prefixes aren't converted, so we need to convert it ourselves
@@ -1069,7 +1069,7 @@ void DataFile::upgrade_1_0_99()
 					me.setAttribute("value", el.attribute("data"));
 					me.setAttribute("scale_type", "log");
 
-					jo_id_t id = 0;
+					jo_id_t id;
 					for(id = last_assigned_id + 1;
 						idList.contains(id); id++)
 					{
@@ -2007,7 +2007,7 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 	}
 	else
 	{
-		bool success = false;
+		bool success;
 		m_fileVersion = root.attribute( "version" ).toUInt( &success );
 		if( !success ) qWarning("File Version conversion failure.");
 	}

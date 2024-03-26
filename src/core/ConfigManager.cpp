@@ -408,7 +408,7 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 	if(cfg_file.open(QIODevice::ReadOnly))
 	{
 		QString errorString;
-		int errorLine = 0, errorCol = 0;
+		int errorLine, errorCol;
 		if(dom_tree.setContent(&cfg_file, false, &errorString, &errorLine, &errorCol))
 		{
 			// get the head information from the DOM
@@ -428,7 +428,7 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 			}
 			else
 			{
-				bool success = false;
+				bool success;
 				m_configVersion = root.attribute("configversion").toUInt(&success);
 				if( !success ) qWarning("Config Version conversion failure.");
 			}

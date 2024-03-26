@@ -148,7 +148,7 @@ LV2_Worker_Status Lv2Worker::respond(uint32_t size, const void* data)
 void Lv2Worker::workerFunc()
 {
 	std::vector<char> buf;
-	uint32_t size = 0;
+	uint32_t size;
 	while (true) {
 		m_sem.wait();
 		if (m_exit) { break; }
@@ -209,7 +209,7 @@ LV2_Worker_Status Lv2Worker::scheduleWork(uint32_t size, const void *data)
 void Lv2Worker::emitResponses()
 {
 	std::size_t read_space = m_responsesReader.read_space();
-	uint32_t size = 0;
+	uint32_t size;
 	while (read_space > sizeof(size))
 	{
 		assert(m_handle);

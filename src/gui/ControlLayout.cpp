@@ -232,7 +232,7 @@ QSize ControlLayout::minimumSize() const
 
 int ControlLayout::doLayout(const QRect &rect, bool testOnly) const
 {
-	int left = 0, top = 0, right = 0, bottom = 0;
+	int left, top, right, bottom;
 	getContentsMargins(&left, &top, &right, &bottom);
 	QRect effectiveRect = rect.adjusted(+left, +top, -right, -bottom);
 	int x = effectiveRect.x();

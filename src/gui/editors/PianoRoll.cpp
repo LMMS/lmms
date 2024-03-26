@@ -725,11 +725,10 @@ void PianoRoll::fitNoteLengths(bool fill)
 		std::sort(notes.begin(), notes.end(), [](Note* n1, Note* n2) { return n1->endPos() < n2->endPos(); });
 	}
 
+	int length;
 	auto ref = refNotes.begin();
 	for (Note* note : notes)
 	{
-		int length = 0;
-
 		// Fast forward to next reference note
 		while (ref != refNotes.end() && (fill ? (*ref)->pos() < note->endPos() : (*ref)->pos() <= note->pos()))
 		{
@@ -789,7 +788,7 @@ void PianoRoll::loadMarkedSemiTones(const QDomElement & de)
 		QDomNode node = de.firstChild();
 		while (!node.isNull())
 		{
-			bool ok = false;
+			bool ok;
 			int key = node.toElement().attribute(
 				QString("key"), QString("-1")).toInt(&ok, 10);
 			if (ok && key >= 0)
@@ -3077,7 +3076,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			// otherwise we add height
 			else { m_notesEditHeight += partialKeyVisible; }
 		}
-		int x = 0, q = quantization();
+		int x, q = quantization(), tick;
 
 		// draw vertical quantization lines
 		// If we're over 100% zoom, we allow all quantization level grids
@@ -3095,8 +3094,10 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			);
 		};
 		p.setPen(m_lineColor);
-		for (int tick = m_currentPosition - m_currentPosition % q, x = xCoordOfTick(tick); x <= width();
-			 tick += q, x = xCoordOfTick(tick))
+		for (tick = m_currentPosition - m_currentPosition % q,
+			x = xCoordOfTick(tick);
+			x <= width();
+			tick += q, x = xCoordOfTick(tick))
 		{
 			p.drawLine(x, keyAreaTop(), x, noteEditBottom());
 		}
@@ -3292,16 +3293,20 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		int ticksPerBeat = DefaultTicksPerBar /
 			Engine::getSong()->getTimeSigModel().getDenominator();
 		p.setPen(m_beatLineColor);
-		for (int tick = m_currentPosition - m_currentPosition % ticksPerBeat, x = xCoordOfTick(tick); x <= width();
-			 tick += ticksPerBeat, x = xCoordOfTick(tick))
+		for(tick = m_currentPosition - m_currentPosition % ticksPerBeat,
+			x = xCoordOfTick( tick );
+			x <= width();
+			tick += ticksPerBeat, x = xCoordOfTick(tick))
 		{
 			p.drawLine(x, PR_TOP_MARGIN, x, noteEditBottom());
 		}
 
 		// draw vertical bar lines
 		p.setPen(m_barLineColor);
-		for (int tick = m_currentPosition - m_currentPosition % TimePos::ticksPerBar(), x = xCoordOfTick(tick);
-			 x <= width(); tick += TimePos::ticksPerBar(), x = xCoordOfTick(tick))
+		for(tick = m_currentPosition - m_currentPosition % TimePos::ticksPerBar(),
+			x = xCoordOfTick( tick );
+			x <= width();
+			tick += TimePos::ticksPerBar(), x = xCoordOfTick(tick))
 		{
 			p.drawLine(x, PR_TOP_MARGIN, x, noteEditBottom());
 		}
@@ -4240,10 +4245,13 @@ void PianoRoll::enterValue( NoteVector* nv )
 
 	if( m_noteEditMode == NoteEditMode::Volume )
 	{
-		bool ok = false;
-		int new_val = QInputDialog::getInt(this, "Piano roll: note velocity",
-			tr("Please enter a new value between %1 and %2:").arg(MinVolume).arg(MaxVolume), (*nv)[0]->getVolume(),
-			MinVolume, MaxVolume, 1, &ok);
+		bool ok;
+		int new_val;
+		new_val = QInputDialog::getInt(	this, "Piano roll: note velocity",
+					tr( "Please enter a new value between %1 and %2:" ).
+						arg( MinVolume ).arg( MaxVolume ),
+					(*nv)[0]->getVolume(),
+					MinVolume, MaxVolume, 1, &ok );
 
 		if( ok )
 		{
@@ -4256,10 +4264,13 @@ void PianoRoll::enterValue( NoteVector* nv )
 	}
 	else if( m_noteEditMode == NoteEditMode::Panning )
 	{
-		bool ok = false;
-		int new_val = QInputDialog::getInt(this, "Piano roll: note panning",
-			tr("Please enter a new value between %1 and %2:").arg(PanningLeft).arg(PanningRight),
-			(*nv)[0]->getPanning(), PanningLeft, PanningRight, 1, &ok);
+		bool ok;
+		int new_val;
+		new_val = QInputDialog::getInt(	this, "Piano roll: note panning",
+					tr( "Please enter a new value between %1 and %2:" ).
+							arg( PanningLeft ).arg( PanningRight ),
+						(*nv)[0]->getPanning(),
+						PanningLeft, PanningRight, 1, &ok );
 
 		if( ok )
 		{

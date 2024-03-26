@@ -277,7 +277,7 @@ int OpulenzInstrument::popVoice() {
 }
 // Push voice into first free slot
 int OpulenzInstrument::pushVoice(int v) {
-	int i = 0;
+	int i;
 	assert(voiceLRU[OPL2_VOICES-1]==OPL2_NO_VOICE);
 	for(i=OPL2_VOICES-1; i>0; --i) {
 		if( voiceLRU[i-1] != OPL2_NO_VOICE ) {

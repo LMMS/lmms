@@ -161,7 +161,7 @@ Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
 
 #if FLUIDSYNTH_VERSION_MAJOR >= 2
 	// Get the default values from the setting
-	double settingVal = 0.0;
+	double settingVal;
 
 	fluid_settings_getnum_default(m_settings, "synth.reverb.room-size", &settingVal);
 	m_reverbRoomSize.setInitValue(settingVal);
@@ -571,7 +571,7 @@ void Sf2Instrument::updateTuning()
 
 void Sf2Instrument::reloadSynth()
 {
-	double tempRate = 0.0;
+	double tempRate;
 
 	// Set & get, returns the true sample rate
 	fluid_settings_setnum( m_settings, (char *) "synth.sample-rate", Engine::audioEngine()->processingSampleRate() );
@@ -623,7 +623,7 @@ void Sf2Instrument::reloadSynth()
 		{
 			src_delete( m_srcState );
 		}
-		int error = 0;
+		int error;
 		m_srcState = src_new( Engine::audioEngine()->currentQualitySettings().libsrcInterpolation(), DEFAULT_CHANNELS, &error );
 		if( m_srcState == nullptr || error )
 		{

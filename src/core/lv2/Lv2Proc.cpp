@@ -557,7 +557,7 @@ void Lv2Proc::createPort(std::size_t portNum)
 
 	const LilvPort* lilvPort = lilv_plugin_get_port_by_index(m_plugin,
 								static_cast<uint32_t>(portNum));
-	Lv2Ports::PortBase* port = nullptr;
+	Lv2Ports::PortBase* port;
 
 	switch (meta.m_type)
 	{

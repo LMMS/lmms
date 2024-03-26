@@ -118,7 +118,7 @@ float InstrumentSoundShaping::volumeLevel( NotePlayHandle* n, const f_cnt_t fram
 		envReleaseBegin += Engine::audioEngine()->framesPerPeriod();
 	}
 
-	float level = 0.0f;
+	float level;
 	m_envLfoParameters[static_cast<std::size_t>(Target::Volume)]->fillLevel( &level, frame, envReleaseBegin, 1 );
 
 	return level;

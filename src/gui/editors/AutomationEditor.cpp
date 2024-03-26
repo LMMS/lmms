@@ -351,7 +351,7 @@ bool AutomationEditor::fineTuneValue(timeMap::iterator node, bool editingOutValu
 	if (node == m_clip->getTimeMap().end()) { return false; }
 
 	// Display dialog to edit the value
-	bool ok = false;
+	bool ok;
 	double value = QInputDialog::getDouble(
 		this,
 		tr("Edit Value"),

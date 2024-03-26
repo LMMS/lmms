@@ -38,7 +38,7 @@ namespace lmms::LocaleHelper
 
 inline double toDouble(QString str, bool* ok = nullptr)
 {
-	bool isOkay = false;
+	bool isOkay;
 	QLocale c(QLocale::C);
 	c.setNumberOptions(QLocale::RejectGroupSeparator);
 	double value = c.toDouble(str, &isOkay);

@@ -55,7 +55,7 @@ namespace {
 template<typename F>
 int retryWhileInterrupted(F&& function) noexcept(std::is_nothrow_invocable_v<F>)
 {
-	int result = 0;
+	int result;
 	do
 	{
 		result = function();
