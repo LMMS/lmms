@@ -221,8 +221,9 @@ Controller * Controller::create( ControllerType _ct, Model * _parent )
 Controller * Controller::create( const QDomElement & _this, Model * _parent )
 {
 	const auto controllerType = static_cast<ControllerType>(_this.attribute("type").toInt());
-	auto controller = controllerType == ControllerType::Peak ? PeakController::getControllerBySetting(_this)
-															 : create(controllerType, _parent);
+	auto controller = controllerType == ControllerType::Peak
+		? PeakController::getControllerBySetting(_this)
+		: create(controllerType, _parent);
 	if (controller) { controller->restoreState(_this); }
 	return controller;
 }
