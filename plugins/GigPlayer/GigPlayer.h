@@ -158,7 +158,7 @@ public:
 
 	// Needed since libsamplerate stores data internally between calls
 	void updateSampleRate();
-	bool convertSampleRate(std::array<sampleFrame, 512>& oldBuf, std::array<sampleFrame, 512>& newBuf,
+	bool convertSampleRate(std::array<sampleFrame, 1024>& oldBuf, std::array<sampleFrame, 1024>& newBuf,
 		f_cnt_t oldSize, f_cnt_t newSize, float freq_factor, f_cnt_t& used );
 
 	gig::Sample * sample;
@@ -313,7 +313,7 @@ private:
 	Dimension getDimensions( gig::Region * pRegion, int velocity, bool release );
 
 	// Load sample data from the Gig file, looping the sample where needed
-	void loadSample(GigSample& sample, std::array<sampleFrame, 512>& sampleData, f_cnt_t samples);
+	void loadSample(GigSample& sample, std::array<sampleFrame, 1024>& sampleData, f_cnt_t samples);
 	f_cnt_t getLoopedIndex( f_cnt_t index, f_cnt_t startf, f_cnt_t endf ) const;
 	f_cnt_t getPingPongIndex( f_cnt_t index, f_cnt_t startf, f_cnt_t endf ) const;
 
