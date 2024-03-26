@@ -64,8 +64,8 @@ DynProcEffect::DynProcEffect( Model * _parent,
 	Effect( &dynamicsprocessor_plugin_descriptor, _parent, _key ),
 	m_dpControls(this),
 	m_rms{
-		(256 * Engine::audioEngine()->processingSampleRate() / 44100),
-		(256 * Engine::audioEngine()->processingSampleRate() / 44100)
+		(256 * static_cast<int>(Engine::audioEngine()->processingSampleRate()) / 44100),
+		(256 * static_cast<int>(Engine::audioEngine()->processingSampleRate()) / 44100)
 	},
 	m_smoothRms{0, 0}
 {
@@ -75,11 +75,6 @@ DynProcEffect::DynProcEffect( Model * _parent,
 }
 
 
-
-
-DynProcEffect::~DynProcEffect()
-{
-}
 
 
 inline void DynProcEffect::calcAttack()
