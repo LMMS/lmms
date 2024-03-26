@@ -1310,6 +1310,12 @@ void VectorGraphModel::dataArrayChanged()
 {
 	emit dataChanged();
 }
+void VectorGraphModel::dataArrayClearedEvent(int idIn)
+{
+	// TODO needs testing
+	int location = getDataArrayLocationFromId(idIn);
+	emit clearedEvent(location);
+}
 
 void VectorGraphModel::dataArrayStyleChanged()
 {
@@ -1317,6 +1323,7 @@ void VectorGraphModel::dataArrayStyleChanged()
 }
 int VectorGraphModel::getDataArrayLocationFromId(int idIn)
 {
+	// TODO needs testing
 	int output = -1;
 	if (idIn >= 0)
 	{
@@ -1672,6 +1679,11 @@ void VectorGraphDataArray::del(unsigned int locationIn)
 			formatDataArrayEndPoints();
 			dataChanged(locationIn == 0 ? 0 : locationIn - 1);
 		}
+		// calling clearedEvent
+		if (m_dataArray.size() == 0)
+		{
+			clearedEvent();
+		}
 		// if locationIn - 1 == -1 then update the entire m_bakedValues / m_dataArray
 		dataChanged(static_cast<int>(locationIn) - 1);
 	}
@@ -1722,7 +1734,7 @@ void VectorGraphDataArray::formatArray(bool clampIn, bool sortIn)
 
 	// delete duplicates
 	// TODO update name
-	float lastPos = 0.0f;
+	float lastPos = -1.0f;
 	if (m_dataArray.size() > 0)
 	{
 		lastPos = m_dataArray[0].m_x;
@@ -1738,6 +1750,8 @@ void VectorGraphDataArray::formatArray(bool clampIn, bool sortIn)
 			lastPos = m_dataArray[i].m_x;
 		}
 	}
+	// calling clearedEvent is not needed
+	// because all of the values can not be cleared here
 	dataChanged(-1);
 }
 
@@ -2310,8 +2324,13 @@ float PointGraphDataArray::getValueAtPosition(float xIn)
 
 void VectorGraphDataArray::setDataArray(std::vector<std::pair<float, float>>* dataArrayIn, bool isCurvedIn)
 {
+	// TODO test
 	// TODO implement formatArray option
-	m_dataArray.clear();
+	m_dataArray.resize(dataArrayIn->size());
+	if (m_dataArray.size() == 0)
+	{
+		clearedEvent();
+	}
 	for (unsigned int i = 0; i < dataArrayIn->size(); i++)
 	{
 		m_dataArray.push_back(VectorGraphPoint(dataArrayIn->operator[](i).first, dataArrayIn->operator[](i).second));
@@ -2323,15 +2342,15 @@ void VectorGraphDataArray::setDataArray(std::vector<std::pair<float, float>>* da
 }
 void VectorGraphDataArray::setDataArray(std::vector<float>* dataArrayIn, bool isCurvedIn)
 {
-	m_dataArray.clear();
+	// TODO test
+	std::vector<std::pair<float, float>> convertedDataArray(dataArrayIn->size());
+	float stepSize = 1.0f / static_cast<float>(convertedDataArray.size());
 	for (unsigned int i = 0; i < dataArrayIn->size(); i++)
 	{
-		m_dataArray.push_back(VectorGraphPoint((i / static_cast<float>(dataArrayIn->size())), dataArrayIn->operator[](i)));
-		if (isCurvedIn == true)
-		{
-			// TODO
-		}
+		convertedDataArray[i].first = i * stepSize;
+		convertedDataArray[i].second = dataArrayIn->operator[](i);
 	}
+	setDataArray(&convertedDataArray, isCurvedIn);
 }
 
 unsigned int VectorGraphDataArray::setX(unsigned int locationIn, float xIn)
@@ -3160,6 +3179,10 @@ void VectorGraphDataArray::dataChanged(int locationIn)
 		m_isDataChanged = true;
 	}
 	m_parent->dataArrayChanged();
+}
+void VectorGraphDataArray::clearedEvent()
+{
+	m_parent->dataArrayClearedEvent(m_id);
 }
 void VectorGraphDataArray::styleChanged()
 {

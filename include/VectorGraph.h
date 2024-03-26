@@ -254,6 +254,7 @@ public:
 	{
 		m_dataArrays.clear();
 	}
+	// if the id is not found then it will return 0
 	int getDataArrayLocationFromId(int idIn);
 	int getDataArrayNewId();
 
@@ -263,12 +264,17 @@ public:
 signals:
 	// data changed inside m_dataArray or m_maxLength changed
 	void dataChanged();
+	// signals when a dataArray gets to 0 element
+	// locationIn is the location of the dataArray
+	// locationIn can be -1
+	void clearedEvent(int locationIn);
 	// style changed inside m_dataArray
 	void styleChanged();
 	// m_dataArrays length changed
 	void lengthChanged();
 public slots:
 	void dataArrayChanged();
+	void dataArrayClearedEvent(int idIn);
 	void dataArrayStyleChanged();
 private:
 	std::vector<VectorGraphDataArray> m_dataArrays;
@@ -336,6 +342,7 @@ public:
 	inline void clear()
 	{
 		m_dataArray.clear();
+		clearedEvent();
 		dataChanged(-1);
 	}
 	inline size_t size()
@@ -440,6 +447,7 @@ public:
 	// m_dataArray
 	// if locationIn > 0 -> adds it to the
 	void dataChanged(int locationIn);
+	void clearedEvent();
 	// color
 	void styleChanged();
 private:
