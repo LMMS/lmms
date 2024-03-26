@@ -72,6 +72,8 @@ public:
 	auto parameters() const -> const std::vector<ClapParameter*>& { return m_params; }
 	auto flushScheduled() const { return m_scheduleFlush; }
 
+	auto automatableCount() const { return m_automatableCount; }
+
 signals:
 	//! Called when CLAP plugin changes params and LMMS core needs to update
 	void paramsChanged();
@@ -142,6 +144,8 @@ private:
 	std::unordered_map<clap_id, bool> m_isAdjustingParameter;
 
 	bool m_scheduleFlush = false;
+
+	std::size_t m_automatableCount = 0;
 
 	static constexpr bool s_provideCookie = true;
 };

@@ -47,6 +47,7 @@
 #include "ClapTimerSupport.h"
 #include "MidiEvent.h"
 #include "Plugin.h"
+#include "SerializingObject.h"
 #include "TimePos.h"
 #include "../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
 #include "lmms_export.h"
@@ -62,7 +63,9 @@ namespace lmms
  * For stereo plugins, there is a single stereo ClapInstance,
  * but for mono plugins, a linked ClapInstance pair is used.
  */
-class LMMS_EXPORT ClapInstance final : public QObject
+class LMMS_EXPORT ClapInstance final
+	: public QObject
+	, public SerializingObject
 {
 	Q_OBJECT;
 
@@ -80,7 +83,7 @@ public:
 	};
 
 	//! Creates and starts a plugin, returning nullptr if an error occurred
-	static auto create(const ClapPluginInfo& pluginInfo, Model* parent) -> std::unique_ptr<ClapInstance>;
+	static auto create(const std::string& pluginId, Model* parent) -> std::unique_ptr<ClapInstance>;
 
 	ClapInstance() = delete;
 	ClapInstance(Access, const ClapPluginInfo& pluginInfo, Model* parent);
@@ -121,6 +124,15 @@ public:
 
 	auto controlCount() const -> std::size_t;
 	auto hasNoteInput() const -> bool;
+
+
+	/**
+	 * SerializingObject implementation
+	 */
+	static constexpr std::string_view ClapNodeName = "clapcontrols";
+	void saveSettings(QDomDocument& doc, QDomElement& elem) override;
+	void loadSettings(const QDomElement& elem) override;
+	auto nodeName() const -> QString override { return ClapNodeName.data(); }
 
 	/**
 	 * Info

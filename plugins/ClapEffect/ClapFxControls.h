@@ -25,7 +25,9 @@
 #ifndef LMMS_CLAP_FX_CONTROLS_H
 #define LMMS_CLAP_FX_CONTROLS_H
 
-#include "ClapControlBase.h"
+#include <QTimer>
+
+#include "ClapInstance.h"
 #include "EffectControls.h"
 
 namespace lmms
@@ -41,23 +43,19 @@ class ClapFxControlDialog;
 } // namespace gui
 
 
-class ClapFxControls : public EffectControls, public ClapControlBase
+class ClapFxControls : public EffectControls
 {
 	Q_OBJECT
 public:
-	ClapFxControls(ClapEffect* effect, const QString& uri);
+	ClapFxControls(ClapEffect* effect, const std::string& uri);
+
+	auto isValid() const -> bool;
 
 	void reload();
 
-	void prevPreset();
-	void nextPreset();
-
-	void saveSettings(QDomDocument& _doc, QDomElement& _parent) override;
-	void loadSettings(const QDomElement& that) override;
-	auto nodeName() const -> QString override
-	{
-		return ClapControlBase::nodeName();
-	}
+	void saveSettings(QDomDocument& doc, QDomElement& elem) override;
+	void loadSettings(const QDomElement& elem) override;
+	auto nodeName() const -> QString override { return ClapInstance::ClapNodeName.data(); }
 
 	auto controlCount() -> int override;
 	auto createView() -> gui::EffectControlDialog* override;
@@ -69,8 +67,9 @@ private slots:
 	void changeControl();
 
 private:
-	//auto settingsType() -> DataFile::Type override;
-	//void setNameFromFile(const QString& name) override;
+	std::unique_ptr<ClapInstance> m_instance;
+
+	QTimer m_idleTimer;
 
 	friend class gui::ClapFxControlDialog;
 	friend class ClapEffect;

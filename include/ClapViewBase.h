@@ -75,24 +75,23 @@ private:
 
 
 //! Base class for view for one CLAP plugin
-class LMMS_EXPORT ClapViewBase : public LinkedModelGroupsView
+class LMMS_EXPORT ClapViewBase //: public LinkedModelGroupsView
 {
 protected:
 	//! @param pluginWidget A child class which inherits QWidget
-	ClapViewBase(QWidget* pluginWidget, ClapControlBase* ctrlBase);
+	ClapViewBase(QWidget* pluginWidget, ClapInstance* instance);
 	~ClapViewBase();
 
 	// these widgets must be connected by child widgets
 	QPushButton* m_reloadPluginButton = nullptr;
 	QPushButton* m_toggleUIButton = nullptr;
-	QPushButton* m_helpButton = nullptr;
 
 	void toggleUI();
 	void toggleHelp(bool visible);
 
 	// to be called by child virtuals
 	//! Reconnect models if model changed
-	void modelChanged(ClapControlBase* ctrlBase);
+	void modelChanged(ClapInstance* instance);
 
 private:
 	enum class Rows
@@ -126,7 +125,7 @@ private:
 
 	PresetSelector* m_presetSelector = nullptr;
 
-	auto getGroupView() -> LinkedModelGroupView* override { return m_parametersView; }
+	//auto getGroupView() -> LinkedModelGroupView* override { return m_parametersView; }
 
 	ClapViewParameters* m_parametersView = nullptr;
 

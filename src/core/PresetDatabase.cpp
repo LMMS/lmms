@@ -108,6 +108,21 @@ auto PresetDatabase::findPreset(const PresetLoadData& loadData, std::string_view
 	return nullptr;
 }
 
+auto PresetDatabase::findOrLoadPresets(std::string_view file) -> std::vector<const Preset*>
+{
+	m_recentPresetFile = file;
+
+	auto& [location, presets] = *getLocation(file);
+	loadPresets(location, file, presets);
+
+	std::vector<const Preset*> results;
+	for (const auto& preset : presets)
+	{
+		results.push_back(&preset);
+	}
+	return results;
+}
+
 auto PresetDatabase::getLocation(std::string_view path, bool add) -> PresetMap::iterator
 {
 	auto isSubpath = [](std::string_view path, std::string_view base) -> bool {

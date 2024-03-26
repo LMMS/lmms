@@ -34,7 +34,6 @@
 #include <QToolBar>
 
 #include "AudioEngine.h"
-#include "ClapControlBase.h"
 #include "ClapInstance.h"
 #include "ClapManager.h"
 #include "Controls.h"
@@ -43,6 +42,7 @@
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "gui_templates.h"
+#include "lmms_math.h"
 #include "MainWindow.h"
 #include "PixmapButton.h"
 #include "PresetSelector.h"
@@ -67,9 +67,23 @@ ClapViewParameters::ClapViewParameters(QWidget* parent, ClapInstance* instance, 
 			control = new CheckControl{this};
 			break;
 		case ClapParameter::ValueType::Integer:
+		{
 			// TODO: What if more digits are needed? Lv2 uses KnobControl in this case.
-			control = new LcdControl{(param->info().max_value <= 9.0) ? 1 : 2, this};
+
+			const int digits = std::max(
+				numDigitsAsInt(param->info().min_value),
+				numDigitsAsInt(param->info().max_value));
+
+			if (digits < 3)
+			{
+				control = new LcdControl{digits, this};
+			}
+			else
+			{
+				control = new KnobControl{this};
+			}
 			break;
+		}
 		// TODO: Add support for enum controls
 		case ClapParameter::ValueType::Float:
 		{
@@ -143,7 +157,7 @@ ClapViewPresets::ClapViewPresets(QWidget* parent, ClapInstance* instance, int co
 	addControl(control, "preset", tr("Active preset").toStdString(), false);
 }
 
-ClapViewBase::ClapViewBase(QWidget* pluginWidget, ClapControlBase* ctrlBase)
+ClapViewBase::ClapViewBase(QWidget* pluginWidget, ClapInstance* instance)
 {
 	auto grid = new QGridLayout{pluginWidget};
 
@@ -154,7 +168,7 @@ ClapViewBase::ClapViewBase(QWidget* pluginWidget, ClapControlBase* ctrlBase)
 		btnBox->addWidget(m_reloadPluginButton, 0);
 	}
 
-	if (ctrlBase->hasGui())
+	if (instance->gui().supported())
 	{
 		m_toggleUIButton = new QPushButton{QObject::tr("Show GUI"), pluginWidget};
 		m_toggleUIButton->setCheckable(true);
@@ -164,10 +178,10 @@ ClapViewBase::ClapViewBase(QWidget* pluginWidget, ClapControlBase* ctrlBase)
 		btnBox->addWidget(m_toggleUIButton, 0);
 	}
 
-	if (ctrlBase->hasPresetSupport())
+	if (instance->presetLoader().supported())
 	{
 		auto presetBox = std::make_unique<QHBoxLayout>();
-		m_presetSelector = new PresetSelector{&ctrlBase->control(0)->presetLoader(), pluginWidget};
+		m_presetSelector = new PresetSelector{&instance->presetLoader(), pluginWidget};
 		presetBox->addWidget(m_presetSelector, 0);
 		grid->addLayout(presetBox.release(), static_cast<int>(Rows::PresetRow), 0, 1, 1);
 	}
@@ -176,12 +190,12 @@ ClapViewBase::ClapViewBase(QWidget* pluginWidget, ClapControlBase* ctrlBase)
 
 	pluginWidget->setAcceptDrops(true);
 
-	if (m_reloadPluginButton || m_toggleUIButton || m_helpButton)
+	if (m_reloadPluginButton || m_toggleUIButton)
 	{
 		grid->addLayout(btnBox.release(), static_cast<int>(Rows::ButtonRow), 0, 1, s_colNum);
 	}
 
-	m_parametersView = new ClapViewParameters{pluginWidget, ctrlBase->control(0), s_colNum};
+	m_parametersView = new ClapViewParameters{pluginWidget, instance, s_colNum};
 	grid->addWidget(m_parametersView, static_cast<int>(Rows::ParametersRow), 0);
 }
 
@@ -195,34 +209,19 @@ void ClapViewBase::toggleUI()
 {
 }
 
-void ClapViewBase::toggleHelp(bool visible)
-{
-	if (!m_helpWindow) { return; }
-
-	if (visible)
-	{
-		m_helpWindow->show();
-		m_helpWindow->raise();
-	}
-	else
-	{
-		m_helpWindow->hide();
-	}
-}
-
-void ClapViewBase::modelChanged(ClapControlBase* ctrlBase)
+void ClapViewBase::modelChanged(ClapInstance* instance)
 {
 	// reconnect models
 	if (m_toggleUIButton)
 	{
-		m_toggleUIButton->setChecked(ctrlBase->hasGui());
+		m_toggleUIButton->setChecked(instance->gui().supported());
 	}
 
 	//m_presetsView->modelChanged(&ctrlBase->presetsGroup());
 
 	// TODO: How to handle presets?
 
-	LinkedModelGroupsView::modelChanged(&ctrlBase->parametersGroup());
+	//LinkedModelGroupsView::modelChanged(&ctrlBase->parametersGroup());
 }
 
 } // namespace lmms::gui

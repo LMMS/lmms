@@ -101,6 +101,9 @@ public:
 
 	auto findPreset(const PresetLoadData& loadData, std::string_view key = std::string_view{}) const -> const Preset*;
 
+	//! Returns all presets from the given file, loading them if needed. Returns empty vector upon failure.
+	auto findOrLoadPresets(std::string_view file) -> std::vector<const Preset*>;
+
 	/**
 	 * Accessors
 	 */

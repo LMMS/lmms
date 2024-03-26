@@ -28,15 +28,12 @@
 #include <QString>
 #include <QTimer>
 
-#include "ClapControlBase.h"
+#include "ClapInstance.h"
 #include "ClapViewBase.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Note.h"
 
-// whether to use MIDI vs playHandle
-// currently only MIDI works
-#define CLAP_INSTRUMENT_USE_MIDI
 
 namespace lmms
 {
@@ -48,70 +45,59 @@ class ClapInsView;
 
 } // namespace gui
 
-class ClapInstrument : public Instrument, public ClapControlBase
+class ClapInstrument : public Instrument //, public ClapControlBase
 {
 	Q_OBJECT
-
-signals:
-	void modelChanged();
 
 public:
 	ClapInstrument(InstrumentTrack* track, Descriptor::SubPluginFeatures::Key* key);
 	~ClapInstrument() override;
 
-	void reload();
-	void onSampleRateChanged();
-
 	//! Must be checked after ctor or reload
 	auto isValid() const -> bool;
+
+	void reload();
+	void onSampleRateChanged(); //!< TODO: This should be a virtual method in Plugin that can be overridden
 
 	/*
 	 * Load/Save
 	 */
 	void saveSettings(QDomDocument& doc, QDomElement& that) override;
 	void loadSettings(const QDomElement& that) override;
+	auto nodeName() const -> QString override { return ClapInstance::ClapNodeName.data(); }
+
 	void loadFile(const QString& file) override;
 
 	/*
 	 * Realtime funcs
 	 */
-	auto hasNoteInput() const -> bool override { return ClapControlBase::hasNoteInput(); }
-
-#ifdef CLAP_INSTRUMENT_USE_MIDI
-	auto handleMidiEvent(const MidiEvent& event, const TimePos& time = TimePos{}, f_cnt_t offset = 0) -> bool override;
-#else
-	void playNote(NotePlayHandle* nph, sampleFrame*) override;
-#endif
-
-	void play(sampleFrame* buf) override;
+	auto hasNoteInput() const -> bool override;
+	auto handleMidiEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset) -> bool override;
+	void play(sampleFrame* buffer) override;
 
 	/*
 	 * Misc
 	 */
 	auto flags() const -> Flags override
 	{
-#ifdef CLAP_INSTRUMENT_USE_MIDI
 		return Flag::IsSingleStreamed | Flag::IsMidiBased;
-#else
-		return Flag::IsSingleStreamed;
-#endif
 	}
 
 	auto instantiateView(QWidget* parent) -> gui::PluginView* override;
+
+signals:
+	void modelChanged();
 
 private slots:
 	void updatePitchRange();
 
 private:
-	auto nodeName() const -> QString override;
-
 	void clearRunningNotes();
 
-#ifdef CLAP_INSTRUMENT_USE_MIDI
-	std::array<int, NumKeys> m_runningNotes{};
-#endif
-
+	std::unique_ptr<ClapInstance> m_instance;
 	QTimer m_idleTimer;
+
+	std::array<int, NumKeys> m_runningNotes{}; // TODO: Move to Instrument class
 
 	friend class gui::ClapInsView;
 };

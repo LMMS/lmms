@@ -50,11 +50,9 @@ public:
 	auto clapControls() const -> const ClapFxControls* { return &m_controls; }
 
 private:
-
 	ClapFxControls m_controls;
-	std::vector<sampleFrame> m_tempOutputSamples;
 
-	QTimer m_idleTimer;
+	std::vector<sampleFrame> m_tempOutputSamples;
 };
 
 } // namespace lmms

@@ -34,7 +34,7 @@ namespace lmms::gui
 
 ClapFxControlDialog::ClapFxControlDialog(ClapFxControls* controls)
 	: EffectControlDialog{controls}
-	, ClapViewBase{this, controls}
+	, ClapViewBase{this, controls->m_instance.get()}
 {
 	if (m_reloadPluginButton)
 	{
@@ -44,11 +44,6 @@ ClapFxControlDialog::ClapFxControlDialog(ClapFxControls* controls)
 	if (m_toggleUIButton)
 	{
 		connect(m_toggleUIButton, &QPushButton::toggled, this, [this] { toggleUI(); });
-	}
-
-	if (m_helpButton)
-	{
-		connect(m_helpButton, &QPushButton::toggled, this, [this](bool visible) { toggleHelp(visible); });
 	}
 
 	// For Effects, modelChanged only goes to the top EffectView
@@ -63,8 +58,8 @@ auto ClapFxControlDialog::clapControls() -> ClapFxControls*
 
 void ClapFxControlDialog::modelChanged()
 {
-	ClapViewBase::modelChanged(clapControls());
-	connect(clapControls(), &ClapFxControls::modelChanged, this, [this](){ this->modelChanged();} );
+	ClapViewBase::modelChanged(clapControls()->m_instance.get());
+	connect(clapControls(), &ClapFxControls::modelChanged, this, [this] { this->modelChanged(); } );
 }
 
 } // namespace lmms::gui

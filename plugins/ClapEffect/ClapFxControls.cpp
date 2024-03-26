@@ -28,55 +28,58 @@
 
 #include "ClapEffect.h"
 #include "ClapFxControlDialog.h"
+#include "ClapInstance.h"
 #include "Engine.h"
 
 namespace lmms
 {
 
-ClapFxControls::ClapFxControls(ClapEffect* effect, const QString& uri)
+ClapFxControls::ClapFxControls(ClapEffect* effect, const std::string& pluginId)
 	: EffectControls{effect}
-	, ClapControlBase{this, uri}
+	, m_instance{ClapInstance::create(pluginId, this)}
+	, m_idleTimer{this}
 {
 	if (isValid())
 	{
 		connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged, this, &ClapFxControls::reload);
+		connect(&m_idleTimer, &QTimer::timeout, m_instance.get(), &ClapInstance::idle);
+		m_idleTimer.start(1000 / 30);
 	}
+}
+
+auto ClapFxControls::isValid() const -> bool
+{
+	return m_instance != nullptr
+		&& m_instance->isValid();
 }
 
 void ClapFxControls::reload()
 {
-	ClapControlBase::reload();
+	if (m_instance) { m_instance->restart(); }
+
 	emit modelChanged();
 }
 
-void ClapFxControls::prevPreset()
+void ClapFxControls::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
-	ClapControlBase::prevPreset();
+	if (!m_instance) { return; }
+	m_instance->saveSettings(doc, elem);
 }
 
-void ClapFxControls::nextPreset()
+void ClapFxControls::loadSettings(const QDomElement& elem)
 {
-	ClapControlBase::nextPreset();
-}
-
-void ClapFxControls::saveSettings(QDomDocument& doc, QDomElement& that)
-{
-	ClapControlBase::saveSettings(doc, that);
-}
-
-void ClapFxControls::loadSettings(const QDomElement& that)
-{
-	ClapControlBase::loadSettings(that);
+	if (!m_instance) { return; }
+	m_instance->loadSettings(elem);
 }
 
 auto ClapFxControls::controlCount() -> int
 {
-	return static_cast<int>(ClapControlBase::controlCount());
+	return m_instance ? m_instance->params().automatableCount() : 0;
 }
 
 auto ClapFxControls::createView() -> gui::EffectControlDialog*
 {
-	return new gui::ClapFxControlDialog(this);
+	return new gui::ClapFxControlDialog{this};
 }
 
 void ClapFxControls::changeControl()
@@ -84,18 +87,5 @@ void ClapFxControls::changeControl()
 	// TODO
 	//	engine::getSong()->setModified();
 }
-
-/*
-auto ClapFxControls::settingsType() -> DataFile::Type
-{
-	return DataFile::Type::EffectSettings;
-}
-
-void ClapFxControls::setNameFromFile(const QString& name)
-{
-	effect()->setDisplayName(name);
-}
-*/
-
 
 } // namespace lmms

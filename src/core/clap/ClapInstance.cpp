@@ -57,13 +57,32 @@ struct MidiInputEvent
 	f_cnt_t offset;
 };
 
-auto ClapInstance::create(const ClapPluginInfo& pluginInfo, Model* parent) -> std::unique_ptr<ClapInstance>
+auto ClapInstance::create(const std::string& pluginId, Model* parent) -> std::unique_ptr<ClapInstance>
 {
-	if (auto instance = std::make_unique<ClapInstance>(Access{}, pluginInfo, parent); instance->start())
+	// CLAP API requires main thread for plugin loading
+	assert(ClapThreadCheck::isMainThread());
+
+	const auto manager = Engine::getClapManager();
+	const auto info = manager->pluginInfo(pluginId);
+	if (!info)
 	{
-		return instance;
+		std::string msg = "No plugin found for ID \"" + pluginId + "\"";
+		ClapLog::globalLog(CLAP_LOG_ERROR, msg);
+		return nullptr;
 	}
-	return nullptr;
+
+	ClapTransport::update();
+
+	ClapLog::globalLog(CLAP_LOG_DEBUG, "Creating CLAP instance");
+
+	auto instance = std::make_unique<ClapInstance>(Access{}, *info, parent);
+	if (!instance->start())
+	{
+		ClapLog::globalLog(CLAP_LOG_ERROR, "Failed instantiating CLAP instance");
+		return nullptr;
+	}
+
+	return instance;
 }
 
 ClapInstance::ClapInstance(Access, const ClapPluginInfo& pluginInfo, Model* parent)
@@ -170,6 +189,44 @@ auto ClapInstance::controlCount() const -> std::size_t
 auto ClapInstance::hasNoteInput() const -> bool
 {
 	return m_notePorts.hasInput();
+}
+
+void ClapInstance::saveSettings(QDomDocument& doc, QDomElement& elem)
+{
+	elem.setAttribute("version", "0");
+
+	// The CLAP standard strongly recommends using the state extension
+	//     instead of manually saving parameter values
+	if (!state().supported()) { return; }
+
+	// TODO: Integrate save/load context into LMMS better
+	const auto context = elem.ownerDocument().doctype().name() == "clonedtrack"
+		? ClapState::Context::Duplicate
+		: ClapState::Context::Project;
+
+	const auto savedState = state().save(context).value_or("");
+	elem.setAttribute("state", QString::fromUtf8(savedState.data(), savedState.size()));
+}
+
+void ClapInstance::loadSettings(const QDomElement& elem)
+{
+	[[maybe_unused]] const auto version = elem.attribute("version", "0").toInt();
+
+	// The CLAP standard strongly recommends using the state extension
+	//     instead of manually saving parameter values
+	if (!state().supported()) { return; }
+
+	// TODO: Integrate save/load context into LMMS better
+	const auto context = elem.ownerDocument().doctype().name() == "clonedtrack"
+		? ClapState::Context::Duplicate
+		: ClapState::Context::Project;
+
+	const auto savedState = elem.attribute("state", "").toStdString();
+	if (!state().load(savedState, context)) { return; }
+
+	// Parameters may have changed in the plugin;
+	// Those values need to be reflected in host
+	params().rescan(CLAP_PARAM_RESCAN_VALUES); // TODO: Is this correct?
 }
 
 void ClapInstance::destroy()

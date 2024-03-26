@@ -27,6 +27,7 @@
 #include <QApplication>
 #include <memory>
 
+#include "ClapInstance.h"
 #include "ClapSubPluginFeatures.h"
 #include "embed.h"
 #include "plugin_export.h"
@@ -51,34 +52,43 @@ Plugin::Descriptor PLUGIN_EXPORT clapeffect_plugin_descriptor =
 	new ClapSubPluginFeatures(Plugin::Type::Effect)
 };
 
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data)
+{
+	using KeyType = Plugin::Descriptor::SubPluginFeatures::Key;
+	auto effect = std::make_unique<ClapEffect>(parent, static_cast<const KeyType*>(data));
+	if (!effect || !effect->isValid()) { return nullptr; }
+	return effect.release();
 }
+
+} // extern "C"
 
 
 ClapEffect::ClapEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key)
 	: Effect{&clapeffect_plugin_descriptor, parent, key}
-	, m_controls{this, key->attributes["uri"]}
+	, m_controls{this, key->attributes["uri"].toStdString()}
 	, m_tempOutputSamples(Engine::audioEngine()->framesPerPeriod())
-	, m_idleTimer{this}
 {
-	m_idleTimer.moveToThread(QApplication::instance()->thread());
-	connect(&m_idleTimer, &QTimer::timeout, this, [this](){ m_controls.idle(); });
-	m_idleTimer.start(1000 / 30);
+	connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged, this,
+		[&] { m_tempOutputSamples.reserve(Engine::audioEngine()->framesPerPeriod()); });
 }
 
 bool ClapEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 {
-	if (!isEnabled() || !isRunning()) { return false; }
-	Q_ASSERT(frames <= static_cast<fpp_t>(m_tempOutputSamples.size()));
+	ClapInstance* instance = m_controls.m_instance.get();
 
-	m_controls.copyBuffersFromLmms(buf, frames);
-	m_controls.copyModelsFromLmms();
+	if (!isEnabled() || !isRunning() || !instance) { return false; }
+	assert(frames <= static_cast<fpp_t>(m_tempOutputSamples.size()));
 
-	// m_pluginMutex.lock();
-	m_controls.run(frames);
-	// m_pluginMutex.unlock();
+	instance->audioPorts().copyBuffersFromCore(buf, frames);
+	instance->copyModelsFromCore();
 
-	m_controls.copyModelsToLmms();
-	m_controls.copyBuffersToLmms(m_tempOutputSamples.data(), frames);
+	instance->run(frames);
+
+	instance->copyModelsToCore();
+	instance->audioPorts().copyBuffersToCore(m_tempOutputSamples.data(), frames);
+
+	// TODO: For LeftOnly or RightOnly configurations, one channel of m_tempOutputSamples will be undefined
+	// TODO: Need to save mono config state
 
 	double outSum = 0.0;
 	bool corrupt = wetLevel() < 0.f; // #3261 - if wet < 0, bash wet := 0, dry := 1
@@ -96,21 +106,5 @@ bool ClapEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 	return isRunning();
 }
-
-
-extern "C"
-{
-
-// necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data)
-{
-	using KeyType = Plugin::Descriptor::SubPluginFeatures::Key;
-	auto effect = std::make_unique<ClapEffect>(parent, static_cast<const KeyType*>(data));
-	if (!effect || !effect->isValid()) { return nullptr; }
-	return effect.release();
-}
-
-}
-
 
 } // namespace lmms

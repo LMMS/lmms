@@ -90,6 +90,17 @@ namespace
 	}
 } // namespace
 
+ClapAudioPorts::ClapAudioPorts(ClapInstance* parent)
+	: ClapExtension{parent}
+	, MonoPluginConfiguration{parent}
+{
+}
+
+ClapAudioPorts::~ClapAudioPorts()
+{
+	deinit();
+}
+
 auto ClapAudioPorts::init(clap_process& process) noexcept -> bool
 {
 	// TODO: Refactor so that regular init() method can be used (Possible lazy extension init issues)
@@ -116,6 +127,9 @@ auto ClapAudioPorts::init(clap_process& process) noexcept -> bool
 	const bool needInputPort = instance()->info().type() != Plugin::Type::Instrument;
 	constexpr bool needOutputPort = true;
 
+	bool hasStereoInput = false;
+	bool hasStereoOutput = false;
+
 	auto readPorts = [&](
 		std::vector<AudioPort>& audioPorts,
 		std::vector<clap_audio_buffer>& audioBuffers,
@@ -138,14 +152,14 @@ auto ClapAudioPorts::init(clap_process& process) noexcept -> bool
 
 		if (isInput)
 		{
-			m_hasStereoInput = false; // initialize
+			hasStereoInput = false; // initialize
 
 			//if (portCount == 0 && m_pluginInfo->getType() == Plugin::PluginTypes::Effect)
 			//	m_issues.emplace_back( ... );
 		}
 		else
 		{
-			m_hasStereoOutput = false; // initialize
+			hasStereoOutput = false; // initialize
 
 			if (portCount == 0 && needOutputPort)
 			{
@@ -271,7 +285,7 @@ auto ClapAudioPorts::init(clap_process& process) noexcept -> bool
 
 		if (stereoPort != CLAP_INVALID_ID)
 		{
-			if (isInput) { m_hasStereoInput = true; } else { m_hasStereoOutput = true; }
+			if (isInput) { hasStereoInput = true; } else { hasStereoOutput = true; }
 			auto port = &audioPorts[stereoPort];
 			port->used = true;
 			return port;
@@ -314,13 +328,24 @@ auto ClapAudioPorts::init(clap_process& process) noexcept -> bool
 	process.audio_outputs_count = m_audioPortsOut.size();
 	m_audioOutActive = m_audioPortOutActive ? &m_audioOut[m_audioPortOutActive->index] : nullptr;
 
+	if (hasStereoInput)
+	{
+		if (hasStereoOutput) { setPluginType(MonoPluginConfiguration::PluginType::StereoInOut); }
+		else { setPluginType(MonoPluginConfiguration::PluginType::StereoInMonoOut); }
+	}
+	else
+	{
+		if (hasStereoOutput) { setPluginType(MonoPluginConfiguration::PluginType::MonoInStereoOut); }
+		else { setPluginType(MonoPluginConfiguration::PluginType::MonoInOut); }
+	}
+
 	if (needInputPort)
 	{
-		if (!hasStereoInput() && m_audioPortInActive->type != AudioPortType::Mono)
+		if (!hasStereoInput && m_audioPortInActive->type != AudioPortType::Mono)
 		{
 			return false;
 		}
-		if (hasStereoInput() && m_audioPortInActive->type != AudioPortType::Stereo)
+		if (hasStereoInput && m_audioPortInActive->type != AudioPortType::Stereo)
 		{
 			return false;
 		}
@@ -328,11 +353,11 @@ auto ClapAudioPorts::init(clap_process& process) noexcept -> bool
 
 	if (needOutputPort)
 	{
-		if (!hasStereoOutput() && m_audioPortOutActive->type != AudioPortType::Mono)
+		if (!hasStereoOutput && m_audioPortOutActive->type != AudioPortType::Mono)
 		{
 			return false;
 		}
-		if (hasStereoOutput() && m_audioPortOutActive->type != AudioPortType::Stereo)
+		if (hasStereoOutput && m_audioPortOutActive->type != AudioPortType::Stereo)
 		{
 			return false;
 		}
@@ -346,54 +371,53 @@ auto ClapAudioPorts::checkSupported(const clap_plugin_audio_ports& ext) -> bool
 	return ext.count && ext.get;
 }
 
-void ClapAudioPorts::copyBuffersFromCore(const sampleFrame* buf, unsigned firstChannel,
-	unsigned numChannels, fpp_t frames)
+void ClapAudioPorts::copyBuffersFromCore(const sampleFrame* buffer, fpp_t frames)
 {
-	// LMMS to CLAP
-	if (numChannels > 1)
+	switch (monoConfig<true>())
 	{
-		if (hasStereoInput())
-		{
-			// Stereo LMMS to Stereo CLAP
-			copyBuffersHostToPlugin<true>(buf, m_audioInActive->data32, firstChannel, frames);
-		}
-		else
-		{
-			// Stereo LMMS to Mono CLAP
-			copyBuffersStereoHostToMonoPlugin(buf, m_audioInActive->data32, firstChannel, frames);
-		}
-	}
-	else
-	{
-		// Mono LMMS to Mono CLAP
-		copyBuffersHostToPlugin<false>(buf, m_audioInActive->data32, firstChannel, frames);
+		case MonoPluginConfiguration::Config::Stereo:
+			// LMMS stereo to CLAP stereo input
+			copyBuffersHostToPlugin<true>(buffer, m_audioInActive->data32, 0, frames);
+			break;
+		case MonoPluginConfiguration::Config::MonoMix:
+			// LMMS stereo downmix to mono for CLAP mono input
+			copyBuffersStereoHostToMonoPlugin(buffer, m_audioInActive->data32, 0, frames);
+			break;
+		case MonoPluginConfiguration::Config::LeftOnly:
+			// LMMS left channel to CLAP mono input; LMMS right channel bypassed
+			copyBuffersHostToPlugin<false>(buffer, m_audioInActive->data32, 0, frames);
+			break;
+		case MonoPluginConfiguration::Config::RightOnly:
+			// LMMS right channel to CLAP mono input; LMMS left channel bypassed
+			copyBuffersHostToPlugin<false>(buffer, m_audioInActive->data32, 1, frames);
+			break;
 	}
 }
 
-void ClapAudioPorts::copyBuffersToCore(sampleFrame* buf, unsigned firstChannel,
-	unsigned numChannels, fpp_t frames) const
+void ClapAudioPorts::copyBuffersToCore(sampleFrame* buffer, fpp_t frames) const
 {
-	// CLAP to LMMS
-	if (numChannels > 1)
+	switch (monoConfig<false>())
 	{
-		if (hasStereoOutput())
-		{
-			// Stereo CLAP to Stereo LMMS
-			copyBuffersPluginToHost<true>(m_audioOutActive->data32, buf,
-				m_audioOutActive->constant_mask, firstChannel, frames);
-		}
-		else
-		{
-			// Mono CLAP to Stereo LMMS
-			copyBuffersMonoPluginToStereoHost(m_audioOutActive->data32, buf,
-				m_audioOutActive->constant_mask, firstChannel, frames);
-		}
-	}
-	else
-	{
-		// Mono CLAP to Mono LMMS
-		copyBuffersPluginToHost<false>(m_audioOutActive->data32, buf,
-			m_audioOutActive->constant_mask, firstChannel, frames);
+		case MonoPluginConfiguration::Config::Stereo:
+			// CLAP stereo output to LMMS stereo
+			copyBuffersPluginToHost<true>(m_audioOutActive->data32, buffer,
+				m_audioOutActive->constant_mask, 0, frames);
+			break;
+		case MonoPluginConfiguration::Config::MonoMix:
+			// CLAP mono output upmix to stereo for LMMS stereo
+			copyBuffersMonoPluginToStereoHost(m_audioOutActive->data32, buffer,
+				m_audioOutActive->constant_mask, 0, frames);
+			break;
+		case MonoPluginConfiguration::Config::LeftOnly:
+			// CLAP mono output to LMMS left channel
+			copyBuffersPluginToHost<false>(m_audioOutActive->data32, buffer,
+				m_audioOutActive->constant_mask, 0, frames);
+			break;
+		case MonoPluginConfiguration::Config::RightOnly:
+			// CLAP mono output to LMMS right channel
+			copyBuffersPluginToHost<false>(m_audioOutActive->data32, buffer,
+				m_audioOutActive->constant_mask, 1, frames);
+			break;
 	}
 }
 

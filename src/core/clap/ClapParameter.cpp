@@ -69,7 +69,7 @@ ClapParameter::ClapParameter(ClapParams* parent, const clap_param_info& info, do
 		//value = std::clamp(value, m_info.min_value, m_info.max_value);
 	}
 
-	const auto name = QString::fromUtf8(displayName().data());
+	const auto name = QString::fromUtf8(displayName().data(), displayName().size());
 
 	if ((flags & CLAP_PARAM_IS_STEPPED) || (flags & CLAP_PARAM_IS_BYPASS))
 	{

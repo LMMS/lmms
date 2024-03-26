@@ -46,6 +46,7 @@ set(LMMS_SRCS
 	core/MixHelpers.cpp
 	core/Model.cpp
 	core/ModelVisitor.cpp
+	core/MonoPluginConfiguration.cpp
 	core/Note.cpp
 	core/NotePlayHandle.cpp
 	core/Oscillator.cpp
@@ -110,7 +111,6 @@ set(LMMS_SRCS
 	core/audio/AudioSdl.cpp
 
 	core/clap/ClapAudioPorts.cpp
-	core/clap/ClapControlBase.cpp
 	core/clap/ClapExtension.cpp
 	core/clap/ClapFile.cpp
 	core/clap/ClapGui.cpp

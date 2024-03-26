@@ -34,6 +34,7 @@
 #include <clap/ext/audio-ports.h>
 
 #include "ClapExtension.h"
+#include "MonoPluginConfiguration.h"
 #include "PluginIssue.h"
 #include "lmms_basics.h"
 
@@ -100,51 +101,24 @@ private:
 	float** m_data = nullptr;
 };
 
-class ClapAudioPorts final : public ClapExtension<clap_host_audio_ports, clap_plugin_audio_ports>
+class ClapAudioPorts final
+	: public ClapExtension<clap_host_audio_ports, clap_plugin_audio_ports>
+	, public MonoPluginConfiguration
 {
 public:
-	using ClapExtension::ClapExtension;
-	~ClapAudioPorts() override { deinit(); }
+	ClapAudioPorts(ClapInstance* parent);
+	~ClapAudioPorts() override;
 
 	auto init(clap_process& process) noexcept -> bool;
 
 	auto extensionId() const -> std::string_view override { return CLAP_EXT_AUDIO_PORTS; }
 
-	auto hasStereoInput() const { return m_hasStereoInput; } //!< Can call after init()
-	auto hasStereoOutput() const { return m_hasStereoOutput; } //!< Can call after init()
-
-	/**
-	 * Copy buffer passed by the core into our ports
-	 * @param buf buffer of sample frames, each sample frame is something like
-	 *   a `float[<number-of-procs> * <channels per proc>]` array.
-	 * @param firstChannel The offset for @p buf where we have to read our
-	 *   first channel.
-	 *   This marks the first sample in each sample frame where we read from.
-	 *   If we are the 2nd of 2 mono procs, this can be greater than 0.
-	 * @param numChannels Number of channels we must read from @param buf (starting at
-	 *   @p offset)
-	 */
-	void copyBuffersFromCore(const sampleFrame* buf, unsigned firstChannel, unsigned numChannels, fpp_t frames);
-
-	/**
-	 * Copy our ports into buffers passed by the core
-	 * @param buf buffer of sample frames, each sample frame is something like
-	 *   a `float[<number-of-procs> * <channels per proc>]` array.
-	 * @param firstChannel The offset for @p buf where we have to write our
-	 *   first channel.
-	 *   This marks the first sample in each sample frame where we write to.
-	 *   If we are the 2nd of 2 mono procs, this can be greater than 0.
-	 * @param numChannels Number of channels we must write to @param buf (starting at
-	 *   @p offset)
-	 */
-	void copyBuffersToCore(sampleFrame* buf, unsigned firstChannel, unsigned numChannels, fpp_t frames) const;
+	void copyBuffersFromCore(const sampleFrame* buffer, fpp_t frames);
+	void copyBuffersToCore(sampleFrame* buffer, fpp_t frames) const;
 
 private:
 	auto hostExtImpl() const -> const clap_host_audio_ports* override { return nullptr; } // not impl for host yet
 	auto checkSupported(const clap_plugin_audio_ports& ext) -> bool override;
-
-	bool m_hasStereoInput = false;
-	bool m_hasStereoOutput = false;
 
 	std::vector<PluginIssue> m_issues;
 
