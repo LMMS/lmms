@@ -123,7 +123,7 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 
 		m_delay->setFeedback( *feedbackPtr );
 		m_lfo->setFrequency( *lfoTimePtr );
-		m_currentLength = *lengthPtr * Engine::audioEngine()->processingSampleRate();
+		m_currentLength = static_cast<int>(*lengthPtr * Engine::audioEngine()->processingSampleRate());
 		m_delay->setLength( m_currentLength + ( *amplitudePtr * ( float )m_lfo->tick() ) );
 		m_delay->tick( buf[f] );
 
