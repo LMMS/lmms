@@ -77,7 +77,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 		SoundIoBackend backend = soundio_get_backend(m_soundio, i);
 		if (configBackend == soundio_backend_name(backend))
 		{
-			if (int err = soundio_connect_backend(m_soundio, backend); !err)
+			if (!soundio_connect_backend(m_soundio, backend))
 			{
 				soundio_flush_events(m_soundio);
 				if (m_disconnectErr)
