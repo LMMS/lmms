@@ -56,7 +56,7 @@ Plugin::Descriptor PLUGIN_EXPORT dynamicsprocessor_plugin_descriptor =
 }
 
 const float DYN_NOISE_FLOOR = 0.00001f; // -100dBFS noise floor
-const double DNF_LOG = 5.0;
+const double DNF_LOG = -1.0;
 
 DynProcEffect::DynProcEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
@@ -82,12 +82,12 @@ DynProcEffect::~DynProcEffect()
 
 inline void DynProcEffect::calcAttack()
 {
-	m_attCoeff = std::pow(10.f, ( DNF_LOG / ( m_dpControls.m_attackModel.value() * 0.001 ) ) / Engine::audioEngine()->processingSampleRate() );
+	m_attCoeff = std::exp((DNF_LOG / (m_dpControls.m_attackModel.value() * 0.001)) / Engine::audioEngine()->processingSampleRate());
 }
 
 inline void DynProcEffect::calcRelease()
 {
-	m_relCoeff = std::pow(10.f, ( -DNF_LOG / ( m_dpControls.m_releaseModel.value() * 0.001 ) ) / Engine::audioEngine()->processingSampleRate() );
+	m_relCoeff = std::exp((DNF_LOG / (m_dpControls.m_releaseModel.value() * 0.001)) / Engine::audioEngine()->processingSampleRate());
 }
 
 
@@ -155,15 +155,15 @@ bool DynProcEffect::processAudioBuffer( sampleFrame * _buf,
 			const double t = m_rms[i]->update( s[i] );
 			if( t > m_currentPeak[i] )
 			{
-				m_currentPeak[i] = qMin( m_currentPeak[i] * m_attCoeff, t );
+				m_currentPeak[i] = m_currentPeak[i] * m_attCoeff + (1 - m_attCoeff) * t;
 			}
 			else
 			if( t < m_currentPeak[i] )
 			{
-				m_currentPeak[i] = qMax( m_currentPeak[i] * m_relCoeff, t );
+				m_currentPeak[i] = m_currentPeak[i] * m_relCoeff + (1 - m_relCoeff) * t;
 			}
 
-			m_currentPeak[i] = qBound( DYN_NOISE_FLOOR, m_currentPeak[i], 10.0f );
+			m_currentPeak[i] = qMax(DYN_NOISE_FLOOR, m_currentPeak[i]);
 		}
 
 // account for stereo mode
