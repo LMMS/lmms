@@ -201,14 +201,15 @@ void Graph::drawLineAt( int _x, int _y, int _lastx )
 	float range = minVal - maxVal;
 	float val = ( _y*range/( height()-5 ) ) + maxVal;
 
-	const auto sampleBegin = static_cast<int>((_lastx > _x ? _x : _lastx) * xscale);
-	const auto sampleEnd = static_cast<int>(std::ceil((_lastx > _x ? _lastx : _x) + 1 * xscale));
+	const auto pastX = _lastx > _x;
+	const auto sampleBegin = static_cast<int>((pastX ? _x : _lastx) * xscale);
+	const auto sampleEnd = static_cast<int>(std::ceil((pastX ? _lastx : _x) + 1 * xscale));
 
-	const auto lastVal = model()->m_samples[static_cast<int>(_lastx > _x ? sampleEnd - 1 : sampleBegin)];
+	const auto lastVal = model()->m_samples[static_cast<int>(pastX ? sampleEnd - 1 : sampleBegin)];
 	const auto lineLen = sampleEnd - sampleBegin;
 
-	const auto valBegin = _lastx > _x || lineLen == 1 ? val : lastVal;
-	const auto valEnd = _lastx > _x ? lastVal : val;
+	const auto valBegin = pastX || lineLen == 1 ? val : lastVal;
+	const auto valEnd = pastX ? lastVal : val;
 
 	//int xstep = _x > _lastx ? -1 : 1;
 	float ystep = (valEnd - valBegin) / lineLen;
