@@ -203,7 +203,7 @@ void Graph::drawLineAt( int _x, int _y, int _lastx )
 
 	const auto pastX = _lastx > _x;
 	const auto sampleBegin = static_cast<int>((pastX ? _x : _lastx) * xscale);
-	const auto sampleEnd = static_cast<int>(std::ceil((pastX ? _lastx : _x) + 1 * xscale));
+	const auto sampleEnd = static_cast<int>(std::ceil(((pastX ? _lastx : _x) + 1) * xscale));
 
 	const auto lastVal = model()->m_samples[static_cast<int>(pastX ? sampleEnd - 1 : sampleBegin)];
 	const auto lineLen = sampleEnd - sampleBegin;
