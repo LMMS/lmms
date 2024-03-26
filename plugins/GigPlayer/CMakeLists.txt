@@ -11,12 +11,10 @@ if(LMMS_HAVE_GIG)
 		add_compile_options("-Wno-deprecated")
 	endif(LMMS_BUILD_WIN32)
 
-	link_directories(${GIG_LIBRARY_DIRS})
-	link_libraries(${GIG_LIBRARIES})
 	build_plugin(gigplayer
 		GigPlayer.cpp GigPlayer.h PatchesDialog.cpp PatchesDialog.h PatchesDialog.ui
 		MOCFILES GigPlayer.h PatchesDialog.h
 		EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.png"
 	)
-	target_link_libraries(gigplayer SampleRate::samplerate)
+	target_link_libraries(gigplayer SampleRate::samplerate libgig::libgig)
 endif(LMMS_HAVE_GIG)
