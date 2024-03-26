@@ -332,7 +332,7 @@ void AutomationEditor::drawLine( int x0In, float y0, int x1In, float y1 )
 
 	int xstep = (x0 < x1 ? 1 : -1) * AutomationClip::quantization();
 	int ystep = y0 < y1 ? 1 : -1;
-	float lineAdjust = (y0 < y1 ? 1 : -1) * yscale;
+	float lineAdjust = ystep * yscale;
 
 	for (int i = 0; i < deltax; ++i)
 	{
