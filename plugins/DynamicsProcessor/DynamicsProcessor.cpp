@@ -163,7 +163,7 @@ bool DynProcEffect::processAudioBuffer( sampleFrame * _buf,
 				m_currentPeak[i] = m_currentPeak[i] * m_relCoeff + (1 - m_relCoeff) * t;
 			}
 
-			m_currentPeak[i] = qMax(DYN_NOISE_FLOOR, m_currentPeak[i]);
+			m_currentPeak[i] = std::max(DYN_NOISE_FLOOR, m_currentPeak[i]);
 		}
 
 // account for stereo mode
