@@ -85,12 +85,14 @@ private:
 	Knob * m_arpRangeKnob;
 	Knob * m_arpRepeatsKnob;
 	Knob * m_arpCycleKnob;
+	Knob * m_arpRandShapeKnob;
 	Knob * m_arpSkipKnob;
 	Knob * m_arpMissKnob;
 	TempoSyncKnob * m_arpTimeKnob;
 	Knob * m_arpGateKnob;
 
 	ComboBox * m_arpDirectionComboBox;
+	ComboBox * m_arpRandomComboBox;
 	ComboBox * m_arpModeComboBox;
 
 } ;
