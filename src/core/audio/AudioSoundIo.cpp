@@ -94,7 +94,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 	if (outDeviceCount <= 0)
 	{
 		// try connecting to the default backend
-		if (int err = soundio_connect(m_soundio); err)
+		if (int err = soundio_connect(m_soundio))
 		{
 			fprintf(stderr, "Unable to initialize soundio: %s\n", soundio_strerror(err));
 			return;
@@ -175,7 +175,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 	m_outstream->layout = *soundio_channel_layout_get_default(channels());
 	m_outstream->format = SoundIoFormatFloat32NE;
 
-	if (int err = soundio_outstream_open(m_outstream); err)
+	if (int err = soundio_outstream_open(m_outstream))
 	{
 		fprintf(stderr, "Unable to initialize soundio: %s\n", soundio_strerror(err));
 		return;
