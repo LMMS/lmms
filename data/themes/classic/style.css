@@ -203,7 +203,9 @@ lmms--gui--GroupBox {
 lmms--gui--Oscilloscope {
 	background: none;
 	border: none;
-	qproperty-normalColor: rgb(71, 253, 133);
+	qproperty-leftChannelColor: rgb(71, 253, 133);
+	qproperty-rightChannelColor: rgb(238, 253, 71);
+	qproperty-otherChannelsColor: rgb(71, 235, 253);
 	qproperty-clippingColor: rgb(255, 64, 64);
 }
 
