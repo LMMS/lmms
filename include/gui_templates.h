@@ -37,7 +37,7 @@
 	#include <QScreen>
 #endif
 
-namespace lmms
+namespace lmms::gui
 {
 
 
@@ -54,6 +54,6 @@ inline QFont pointSize(QFont fontPointer, float fontSize)
 }
 
 
-} // namespace lmms
+} // namespace lmms::gui
 
 #endif // LMMS_GUI_TEMPLATES_H
