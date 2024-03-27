@@ -900,19 +900,6 @@ namespace gui
 {
 
 
-class gigKnob : public Knob
-{
-public:
-	gigKnob( QWidget * _parent ) :
-			Knob( KnobType::Bright26, _parent )
-	{
-		setFixedSize( 31, 38 );
-	}
-} ;
-
-
-
-
 GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _parent ) :
         InstrumentViewFixedSize( _instrument, _parent )
 {
@@ -938,17 +925,17 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 	m_patchDialogButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "patches_on" ) );
 	m_patchDialogButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "patches_off" ) );
 	m_patchDialogButton->setEnabled( false );
-	m_patchDialogButton->move( 223, 94 );
+	m_patchDialogButton->move(223, 92);
 
 	connect( m_patchDialogButton, SIGNAL( clicked() ), this, SLOT( showPatchDialog() ) );
 
 	m_patchDialogButton->setToolTip(tr("Choose patch"));
 
 	// LCDs
-	m_bankNumLcd = new LcdSpinBox( 3, "21pink", this );
+	m_bankNumLcd = new LcdSpinBox(3, "19green", this);
 	m_bankNumLcd->move( 111, 150 );
 
-	m_patchNumLcd = new LcdSpinBox( 3, "21pink", this );
+	m_patchNumLcd = new LcdSpinBox(3, "19green", this);
 	m_patchNumLcd->move( 161, 150 );
 
 	// Next row
@@ -958,9 +945,9 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 	m_patchLabel->setGeometry( 61, 94, 156, 14 );
 
 	// Gain
-	m_gainKnob = new gigKnob( this );
+	m_gainKnob = new Knob(this);
 	m_gainKnob->setHintText( tr( "Gain:" ) + " ", "" );
-	m_gainKnob->move( 32, 140 );
+	m_gainKnob->move(32, 150);
 
 	setAutoFillBackground( true );
 	QPalette pal;
