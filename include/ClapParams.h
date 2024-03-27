@@ -29,6 +29,7 @@
 
 #ifdef LMMS_HAVE_CLAP
 
+#include <QObject>
 #include <optional>
 #include <unordered_map>
 #include <vector>
@@ -38,13 +39,12 @@
 
 #include "ClapExtension.h"
 #include "ClapParameter.h"
-#include "LinkedModelGroups.h"
 
 namespace lmms
 {
 
 class ClapParams final
-	: public LinkedModelGroup
+	: public QObject
 	, public ClapExtension<clap_host_params, clap_plugin_params>
 {
 	Q_OBJECT

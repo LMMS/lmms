@@ -79,7 +79,7 @@ ClapParameter::ClapParameter(ClapParams* parent, const clap_param_info& info, do
 
 		if (minVal == 0 && maxVal == 1)
 		{
-			m_connectedModel = std::make_unique<BoolModel>(valueInt, parent, name);
+			m_connectedModel = std::make_unique<BoolModel>(valueInt, nullptr, name);
 			m_valueType = ValueType::Bool;
 		}
 		else
@@ -89,9 +89,8 @@ ClapParameter::ClapParameter(ClapParams* parent, const clap_param_info& info, do
 				parent->logger().log(CLAP_LOG_PLUGIN_MISBEHAVING, "Bypass parameter doesn't have range [0, 1]");
 			}
 
-			m_connectedModel = std::make_unique<IntModel>(valueInt, minVal, maxVal, parent, name);
-			// TODO: Use CLAP_PARAM_IS_ENUM
-			m_valueType = ValueType::Integer;
+			m_connectedModel = std::make_unique<IntModel>(valueInt, minVal, maxVal, nullptr, name);
+			m_valueType = (flags & CLAP_PARAM_IS_ENUM) ? ValueType::Enum : ValueType::Integer;
 		}
 	}
 	else
@@ -109,7 +108,7 @@ ClapParameter::ClapParameter(ClapParams* parent, const clap_param_info& info, do
 			static_cast<float>(m_info.min_value),
 			static_cast<float>(m_info.max_value),
 			static_cast<float>(stepSize),
-			parent, name);
+			nullptr, name);
 
 		m_valueType = ValueType::Float;
 	}

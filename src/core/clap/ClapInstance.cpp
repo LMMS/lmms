@@ -183,7 +183,7 @@ void ClapInstance::handleMidiInputEvent(const MidiEvent& event, const TimePos& t
 
 auto ClapInstance::controlCount() const -> std::size_t
 {
-	return m_params.modelNum();
+	return m_params.automatableCount(); // TODO: + 1 control if mono config != StereoInOut?
 }
 
 auto ClapInstance::hasNoteInput() const -> bool

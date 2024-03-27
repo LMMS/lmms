@@ -36,7 +36,7 @@
 #include "AudioEngine.h"
 #include "ClapInstance.h"
 #include "ClapManager.h"
-#include "Controls.h"
+#include "ControlLayout.h"
 #include "CustomTextKnob.h"
 #include "embed.h"
 #include "Engine.h"
@@ -52,42 +52,58 @@ namespace lmms::gui
 {
 
 ClapViewParameters::ClapViewParameters(QWidget* parent, ClapInstance* instance, int colNum)
-	: LinkedModelGroupView{parent, &instance->params(), static_cast<std::size_t>(colNum)}
+	: QWidget{parent}
 	, m_instance{instance}
+	, m_layout{new ControlLayout{this}}
 {
+	setFocusPolicy(Qt::StrongFocus);
+
+	auto addControl = [&](std::unique_ptr<Control> ctrl, std::string_view display) {
+		if (!ctrl) { return; }
+
+		auto box = new QWidget{this};
+		auto boxLayout = new QHBoxLayout{box};
+		boxLayout->addWidget(ctrl->topWidget());
+
+		// Required, so the Layout knows how to sort/filter widgets by string
+		box->setObjectName(QString::fromUtf8(display.data(), display.size()));
+		m_layout->addWidget(box);
+
+		m_widgets.push_back(std::move(ctrl));
+	};
+
 	for (auto param : m_instance->params().parameters())
 	{
 		if (!param || !param->model()) { continue; }
 
-		Control* control = nullptr;
+		std::unique_ptr<Control> control;
 
 		switch (param->valueType())
 		{
 		case ClapParameter::ValueType::Bool:
-			control = new CheckControl{this};
+			control = std::make_unique<CheckControl>();
 			break;
-		case ClapParameter::ValueType::Integer:
+		case ClapParameter::ValueType::Integer: [[fallthrough]];
+		case ClapParameter::ValueType::Enum:
 		{
-			// TODO: What if more digits are needed? Lv2 uses KnobControl in this case.
-
 			const int digits = std::max(
 				numDigitsAsInt(param->info().min_value),
 				numDigitsAsInt(param->info().max_value));
 
 			if (digits < 3)
 			{
-				control = new LcdControl{digits, this};
+				control = std::make_unique<LcdControl>(digits);
 			}
 			else
 			{
-				control = new KnobControl{this};
+				control = std::make_unique<KnobControl>();
 			}
 			break;
 		}
 		// TODO: Add support for enum controls
 		case ClapParameter::ValueType::Float:
 		{
-			control = new CustomTextKnobControl{this};
+			control = std::make_unique<CustomTextKnobControl>();
 
 			// CustomTextKnob calls this lambda to update value text
 			auto customTextKnob = dynamic_cast<CustomTextKnob*>(control->modelView());
@@ -114,47 +130,8 @@ ClapViewParameters::ClapViewParameters(QWidget* parent, ClapInstance* instance, 
 			control->topWidget()->setToolTip(QString::fromUtf8(param->info().module));
 		}
 
-		addControl(control, param->id().data(), param->displayName().data(), false);
+		addControl(std::move(control), param->displayName());
 	}
-}
-
-ClapViewPresets::ClapViewPresets(QWidget* parent, ClapInstance* instance, int colNum)
-	: LinkedModelGroupView{parent, &instance->presetLoader(), static_cast<std::size_t>(colNum)}
-	, m_instance{instance}
-{
-	class PresetSelectorControl : public Control
-	{
-		QWidget* m_widget;
-		PresetSelector* m_checkBox;
-		QLabel* m_label;
-
-	public:
-		void setText(const QString& text) override { m_label->setText(text); }
-		QWidget* topWidget() override { return m_widget; }
-
-		void setModel(AutomatableModel* model) override
-		{
-			m_checkBox->setModel(model->dynamicCast<IntModel>(true));
-		}
-		IntModel* model() override { return m_checkBox->model(); }
-		AutomatableModelView* modelView() override { return m_checkBox; }
-
-		PresetSelectorControl(PluginPresets* presets, QWidget* parent = nullptr)
-			: m_widget{new QWidget{parent}}
-			, m_checkBox{new PresetSelector{presets, parent}}
-			, m_label{new QLabel{m_widget}}
-		{
-			auto vbox = new QVBoxLayout(m_widget);
-			vbox->addWidget(m_checkBox);
-			vbox->addWidget(m_label);
-		}
-
-		~PresetSelectorControl() override = default;
-	};
-
-	auto control = new PresetSelectorControl{&instance->presetLoader(), parent};
-
-	addControl(control, "preset", tr("Active preset").toStdString(), false);
 }
 
 ClapViewBase::ClapViewBase(QWidget* pluginWidget, ClapInstance* instance)
@@ -220,8 +197,6 @@ void ClapViewBase::modelChanged(ClapInstance* instance)
 	//m_presetsView->modelChanged(&ctrlBase->presetsGroup());
 
 	// TODO: How to handle presets?
-
-	//LinkedModelGroupsView::modelChanged(&ctrlBase->parametersGroup());
 }
 
 } // namespace lmms::gui

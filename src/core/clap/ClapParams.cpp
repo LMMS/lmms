@@ -36,7 +36,7 @@ namespace lmms
 
 ClapParams::ClapParams(Model* parent, ClapInstance* instance,
 	clap::helpers::EventList* eventsIn, clap::helpers::EventList* eventsOut)
-	: LinkedModelGroup{parent}
+	: QObject{parent}
 	, ClapExtension{instance}
 	, m_evIn{eventsIn}
 	, m_evOut{eventsOut}
@@ -115,9 +115,9 @@ auto ClapParams::rescan(clap_param_rescan_flags flags) -> bool
 
 		auto it = m_paramMap.find(info.id);
 
-		// Check that the parameter is not declared twice
-		if (paramIds.count(info.id) > 0)
+		if (!paramIds.insert(info.id).second)
 		{
+			// Parameter was declared twice
 			assert(it != m_paramMap.end());
 			std::string msg = "the parameter with id: " + std::to_string(info.id) + " was declared twice.\n"
 				" 1. name: " + std::string{it->second->info().name} + ", module: " + std::string{it->second->info().module} + "\n"
@@ -125,7 +125,6 @@ auto ClapParams::rescan(clap_param_rescan_flags flags) -> bool
 			logger().log(CLAP_LOG_WARNING, msg.c_str());
 			return false; // TODO: continue?
 		}
-		paramIds.insert(info.id);
 
 		if (it == m_paramMap.end())
 		{
@@ -219,11 +218,13 @@ auto ClapParams::rescan(clap_param_rescan_flags flags) -> bool
 
 	if (needToUpdateParamsCache)
 	{
+		m_automatableCount = 0;
 		m_params.resize(m_paramMap.size());
 		int idx = 0;
 		for (const auto& elem : m_paramMap)
 		{
 			m_params[idx] = elem.second.get();
+			if (m_params[idx]->model() != nullptr) { ++m_automatableCount; }
 			++idx;
 		}
 	}
@@ -392,13 +393,11 @@ void ClapParams::handlePluginOutputEvent(const clap_event_param_value* event)
 
 void ClapParams::setModels()
 {
-	LinkedModelGroup::clearModels();
 	for (auto param : m_params)
 	{
 		if (param && param->model())
 		{
 			const auto uri = QString::fromUtf8(param->id().data());
-			LinkedModelGroup::addModel(param->model(), uri);
 
 			// Tell plugin when param value changes in host
 			auto updateParam = [this, param]() {

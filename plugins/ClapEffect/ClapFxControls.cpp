@@ -74,7 +74,7 @@ void ClapFxControls::loadSettings(const QDomElement& elem)
 
 auto ClapFxControls::controlCount() -> int
 {
-	return m_instance ? m_instance->params().automatableCount() : 0;
+	return m_instance ? m_instance->controlCount() : 0;
 }
 
 auto ClapFxControls::createView() -> gui::EffectControlDialog*
