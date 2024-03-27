@@ -690,7 +690,7 @@ std::vector<std::pair<int, std::string>> SaSpectrumView::makeLogFreqTics(int low
 std::vector<std::pair<int, std::string>> SaSpectrumView::makeLinearFreqTics(int low, int high)
 {
 	std::vector<std::pair<int, std::string>> result;
-	int increment = 0;
+	int increment;
 
 	// select a suitable increment based on zoom level
 	if (high - low < 500) {increment = 50;}
@@ -723,7 +723,7 @@ std::vector<std::pair<int, std::string>> SaSpectrumView::makeLinearFreqTics(int 
 std::vector<std::pair<float, std::string>> SaSpectrumView::makeLogAmpTics(int low, int high)
 {
 	std::vector<std::pair<float, std::string>> result;
-	double increment = 0.0f;
+	double increment;
 
 	// Base zoom level on selected range and how close is the current height
 	// to the sizeHint() (denser scale for bigger window).

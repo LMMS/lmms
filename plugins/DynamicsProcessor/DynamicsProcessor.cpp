@@ -195,21 +195,10 @@ bool DynProcEffect::processAudioBuffer( sampleFrame * _buf,
 
 			if( sm_peak[i] > DYN_NOISE_FLOOR )
 			{
-				float gain = 0.0f;
-				if ( lookup < 1 )
-				{
-					gain = frac * samples[0];
-				}
-				else
-				if ( lookup < 200 )
-				{
-					gain = linearInterpolate( samples[ lookup - 1 ],
-							samples[ lookup ], frac );
-				}
-				else
-				{
-					gain = samples[199];
-				};
+				float gain;
+				if (lookup < 1) { gain = frac * samples[0]; }
+				else if (lookup < 200) { gain = linearInterpolate(samples[lookup - 1], samples[lookup], frac); }
+				else { gain = samples[199]; }
 
 				s[i] *= gain;
 				s[i] /= sm_peak[i];

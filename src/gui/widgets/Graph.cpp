@@ -200,29 +200,48 @@ void Graph::drawLineAt( int _x, int _y, int _lastx )
 
 	float range = minVal - maxVal;
 	float val = ( _y*range/( height()-5 ) ) + maxVal;
+	
+	int sample_begin, sample_end;
+	float lastval;
+	float val_begin, val_end;
+	
+	if (_lastx > _x)
+	{
+		sample_begin = (int)((_x) * xscale);
+		sample_end = (int)ceil((_lastx+1) * xscale);
+		lastval = model() -> m_samples[ (int)( sample_end - 1 ) ];
+		val_begin = val;
+		val_end = lastval;
 
-	const auto pastX = _lastx > _x;
-	const auto sampleBegin = static_cast<int>((pastX ? _x : _lastx) * xscale);
-	const auto sampleEnd = static_cast<int>(std::ceil(((pastX ? _lastx : _x) + 1) * xscale));
-
-	const auto lastVal = model()->m_samples[static_cast<int>(pastX ? sampleEnd - 1 : sampleBegin)];
-	const auto lineLen = sampleEnd - sampleBegin;
-
-	const auto valBegin = pastX || lineLen == 1 ? val : lastVal;
-	const auto valEnd = pastX ? lastVal : val;
-
+	}
+	else
+	{
+		sample_begin = (int)(_lastx * xscale);
+		sample_end =  (int)ceil((_x+1) * xscale);
+		lastval = model() -> m_samples[ (int)( sample_begin ) ];
+		val_begin = lastval;
+		val_end = val;
+		
+	}
+	
+	// calculate line drawing variables
+	int linelen = sample_end - sample_begin;
+	if (linelen == 1)
+	{
+		val_begin = val;
+	}
 	//int xstep = _x > _lastx ? -1 : 1;
-	float ystep = (valEnd - valBegin) / lineLen;
+	float ystep = ( val_end - val_begin ) / linelen;
 
 	// draw a line
-	for (int i = 0; i < lineLen; i++)
+	for ( int i = 0 ; i < linelen; i++ )
 	{
-		model()->drawSampleAt(sampleBegin + i, valBegin + i * ystep);
+		model()->drawSampleAt( sample_begin + i , val_begin + ((i ) * ystep));
 	}
 
 	// We've changed [sample_end, sample_begin)
 	// However, samplesChanged expects two end points
-	model()->samplesChanged(sampleBegin, sampleEnd - 1);
+	model()->samplesChanged(sample_begin, sample_end - 1);
 }
 
 void Graph::changeSampleAt( int _x, int _y )

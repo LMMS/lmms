@@ -110,8 +110,8 @@ bool FlangerEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 	auto dryS = std::array<sample_t, 2>{};
 	for( fpp_t f = 0; f < frames; ++f )
 	{
-		float leftLfo = 0.0f;
-		float rightLfo = 0.0f;
+		float leftLfo;
+		float rightLfo;
 
 		buf[f][0] += m_noise->tick() * noise;
 		buf[f][1] += m_noise->tick() * noise;

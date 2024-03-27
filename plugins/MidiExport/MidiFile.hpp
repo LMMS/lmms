@@ -25,6 +25,7 @@
 #include <set>
 #include <algorithm>
 #include <assert.h>
+#include <array>
 
 using std::string;
 using std::vector;
@@ -129,31 +130,37 @@ struct Event
 	
 	inline int writeToBuffer(uint8_t *buffer) const 
 	{
-		uint8_t code = 0, fourbytes[4];
-		int size=0;
-		switch (type) 
+		int size = 0;
+		switch (type)
 		{
 			case NOTE_ON:
-				code = 0x9 << 4 | channel;
+			{
+				uint8_t code = 0x9 << 4 | channel;
 				size += writeVarLength(time, buffer+size);
 				buffer[size++] = code;
 				buffer[size++] = pitch;
 				buffer[size++] = volume;
 				break;
+			}
 			case NOTE_OFF:
-				code = 0x8 << 4 | channel;
+			{
+				uint8_t code = 0x8 << 4 | channel;
 				size += writeVarLength(time, buffer+size);
 				buffer[size++] = code;
 				buffer[size++] = pitch;
 				buffer[size++] = volume;
 				break;
+			}
 			case TEMPO:
-				code = 0xFF;
+			{
+				uint8_t code = 0xFF;
 				size += writeVarLength(time, buffer+size);
 				buffer[size++] = code;
 				buffer[size++] = 0x51;
 				buffer[size++] = 0x03;
-				writeBigEndian4(int(60000000.0 / tempo), fourbytes);
+
+				std::array<uint8_t, 4> fourbytes;
+				writeBigEndian4(int(60000000.0 / tempo), fourbytes.data());
 				
 				//printf("tempo of %x translates to ", tempo);
 				/*
@@ -164,23 +171,27 @@ struct Event
 				buffer[size++] = fourbytes[2];
 				buffer[size++] = fourbytes[3];
 				break;
+			}
 			case PROG_CHANGE:
-				code = 0xC << 4 | channel;
+			{
+				uint8_t code = 0xC << 4 | channel;
 				size += writeVarLength(time, buffer+size);
 				buffer[size++] = code;
 				buffer[size++] = programNumber;
 				break;
+			}
 			case TRACK_NAME:
+			{
 				size += writeVarLength(time, buffer+size);
 				buffer[size++] = 0xFF;
 				buffer[size++] = 0x03;
 				size += writeVarLength(trackName.size(), buffer+size);
 				trackName.copy((char *)(&buffer[size]), trackName.size());
 				size += trackName.size();
-//				 buffer[size++] = '\0';
-//				 buffer[size++] = '\0';
-				
 				break;
+				//				 buffer[size++] = '\0';
+				//				 buffer[size++] = '\0';
+			}
 		}
 		return size;
 	} // writeEventsToBuffer

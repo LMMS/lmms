@@ -53,7 +53,7 @@ QDataStream& operator>> ( QDataStream &in, WaveMipMap &waveMipMap )
 	{
 		for( int i = 0; i < TLENS[tbl]; i++ )
 		{
-			sample_t sample = 0.0f;
+			sample_t sample;
 			in >> sample;
 			waveMipMap.setSampleAt( tbl, i, sample );
 		}
@@ -98,7 +98,7 @@ void BandLimitedWave::generateWaves()
 			{
 				int harm = 1;
 				double s = 0.0f;
-				double hlen = 0.0;
+				double hlen;
 				do
 				{
 					hlen = static_cast<double>( len ) / static_cast<double>( harm );
@@ -140,7 +140,7 @@ void BandLimitedWave::generateWaves()
 			{
 				int harm = 1;
 				double s = 0.0f;
-				double hlen = 0.0;
+				double hlen;
 				do
 				{
 					hlen = static_cast<double>( len ) / static_cast<double>( harm );
@@ -181,7 +181,7 @@ void BandLimitedWave::generateWaves()
 			{
 				int harm = 1;
 				double s = 0.0f;
-				double hlen = 0.0;
+				double hlen;
 				do
 				{
 					hlen = static_cast<double>( len ) / static_cast<double>( harm );

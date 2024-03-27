@@ -106,7 +106,7 @@ void CompressorEffect::calcAutoMakeup()
 {
 	// Formulas using the compressor's Threshold, Ratio, and Knee values to estimate a good makeup gain value
 
-	float tempGainResult = 0.0f;
+	float tempGainResult;
 	if (-m_thresholdVal < m_kneeVal)
 	{
 		const float temp = -m_thresholdVal + m_kneeVal;
