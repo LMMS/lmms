@@ -371,7 +371,7 @@ void SaProcessor::reallocateBuffers()
 		? FFT_BLOCK_SIZES[new_size_index]
 		: FFT_BLOCK_SIZES.back();
 
-	const unsigned int new_fft_size = new_size_index + m_zeroPadFactor < FFT_BLOCK_SIZES.size()
+	const unsigned int new_fft_size = (new_size_index + m_zeroPadFactor < FFT_BLOCK_SIZES.size())
 		? FFT_BLOCK_SIZES[new_size_index + m_zeroPadFactor]
 		: FFT_BLOCK_SIZES.back();
 
