@@ -28,7 +28,7 @@
 #include <QGroupBox>
 #include <QImageReader>
 #include <QLabel>
-#include <QLayout>
+#include <QFormLayout>
 #include <QLineEdit>
 #include <QScrollArea>
 
@@ -468,10 +468,18 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	// Audio interface group
 	QGroupBox * audioInterfaceBox = new QGroupBox(tr("Audio interface"), audio_w);
-	QVBoxLayout * audioInterfaceLayout = new QVBoxLayout(audioInterfaceBox);
+	QFormLayout * audioInterfaceLayout = new QFormLayout(audioInterfaceBox);
 
+	QLabel * audioBackendLabel = new QLabel(audioInterfaceBox);
+	audioBackendLabel->setText(tr("Backend"));
 	m_audioInterfaces = new QComboBox(audioInterfaceBox);
-	audioInterfaceLayout->addWidget(m_audioInterfaces);
+	audioInterfaceLayout->addRow(audioBackendLabel,m_audioInterfaces);
+
+	QLabel * sampleRateLabel = new QLabel(audioInterfaceBox);
+	sampleRateLabel->setText(tr("Sample rate"));
+	m_sampleRate = new QComboBox(audioInterfaceBox);
+	audioInterfaceLayout->addRow(sampleRateLabel,m_sampleRate);
+	updateSampleRates();
 
 	// Ifaces-settings-widget.
 	auto as_w = new QWidget(audio_w);
@@ -959,6 +967,8 @@ void SetupDialog::accept()
 					QString::number(m_NaNHandler));
 	ConfigManager::inst()->setValue("audioengine", "hqaudio",
 					QString::number(m_hqAudioDev));
+	ConfigManager::inst()->setValue("audioengine", "samplerate",
+					m_sampleRate->currentText());
 	ConfigManager::inst()->setValue("audioengine", "framesperaudiobuffer",
 					QString::number(m_bufferSize));
 	ConfigManager::inst()->setValue("audioengine", "mididev",
@@ -1180,6 +1190,8 @@ void SetupDialog::audioInterfaceChanged(const QString & iface)
 	}
 
 	m_audioIfaceSetupWidgets[m_audioIfaceNames[iface]]->show();
+
+	updateSampleRates();
 }
 
 
@@ -1237,6 +1249,22 @@ void SetupDialog::setBufferSize(int value)
 void SetupDialog::resetBufferSize()
 {
 	setBufferSize(DEFAULT_BUFFER_SIZE / BUFFERSIZE_RESOLUTION);
+}
+
+void SetupDialog::updateSampleRates()
+{
+	m_sampleRate->clear();
+	if (m_audioInterfaces->currentText() == AudioJack::name())
+	{
+		m_sampleRate->setDisabled(true);
+	}
+	else
+	{
+		// TODO: Dynamically get available sample rates from backend
+		m_sampleRate->addItems({"44100","48000","88200","96000","176400","192000"});
+		m_sampleRate->setCurrentText(QString::number(Engine::audioEngine()->outputSampleRate()));
+		m_sampleRate->setDisabled(false);
+	}
 }
 
 
