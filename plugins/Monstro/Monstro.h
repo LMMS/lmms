@@ -177,7 +177,7 @@ public:
 	MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph );
 	virtual ~MonstroSynth() = default;
 
-	void renderOutput( fpp_t _frames, sampleFrame * _buf );
+	void renderOutput( fpp_t _frames, SampleFrame * _buf );
 
 private:
 
@@ -357,7 +357,7 @@ public:
 	~MonstroInstrument() override = default;
 
 	void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer ) override;
+						SampleFrame * _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 	void saveSettings( QDomDocument & _doc,

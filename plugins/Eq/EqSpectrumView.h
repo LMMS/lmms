@@ -44,7 +44,7 @@ public:
 	bool getInProgress();
 	void clear();
 
-	void analyze( sampleFrame *buf, const fpp_t frames );
+	void analyze( SampleFrame *buf, const fpp_t frames );
 
 	float getEnergy() const;
 	int getSampleRate() const;

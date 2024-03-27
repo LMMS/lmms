@@ -100,7 +100,7 @@ void LOMMEffect::changeSampleRate()
 }
 
 
-bool LOMMEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
+bool LOMMEffect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
 {
 	if (!isEnabled() || !isRunning())
 	{

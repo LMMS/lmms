@@ -82,7 +82,7 @@ public:
 	virtual ~SfxrSynth() = default;
 
 	void resetSample( bool restart );
-	void update( sampleFrame * buffer, const int32_t frameNum );
+	void update( SampleFrame * buffer, const int32_t frameNum );
 
 	bool isPlaying() const;
 
@@ -177,7 +177,7 @@ public:
 	SfxrInstrument(InstrumentTrack * _instrument_track );
 	~SfxrInstrument() override = default;
 
-	void playNote( NotePlayHandle * _n, sampleFrame * _working_buffer ) override;
+	void playNote( NotePlayHandle * _n, SampleFrame * _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 	void saveSettings( QDomDocument & _doc,

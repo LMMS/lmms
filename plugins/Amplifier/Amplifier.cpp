@@ -57,7 +57,7 @@ AmplifierEffect::AmplifierEffect(Model* parent, const Descriptor::SubPluginFeatu
 }
 
 
-bool AmplifierEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
+bool AmplifierEffect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
 {
 	if (!isEnabled() || !isRunning()) { return false ; }
 
@@ -82,7 +82,7 @@ bool AmplifierEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 		auto& currentFrame = buf[f];
 
-		const auto s = currentFrame * sampleFrame(left * panLeft, right * panRight) * volume;
+		const auto s = currentFrame * SampleFrame(left * panLeft, right * panRight) * volume;
 
 		// Dry/wet mix
 		currentFrame = currentFrame * d + s * w;

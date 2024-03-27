@@ -49,7 +49,7 @@ public:
 
 	~DummyInstrument() override = default;
 
-	void playNote( NotePlayHandle *, sampleFrame * buffer ) override
+	void playNote( NotePlayHandle *, SampleFrame * buffer ) override
 	{
 		zeroSampleFrames(buffer, Engine::audioEngine()->framesPerPeriod());
 	}

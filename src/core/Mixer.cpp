@@ -64,7 +64,7 @@ MixerChannel::MixerChannel( int idx, Model * _parent ) :
 	m_stillRunning( false ),
 	m_peakLeft( 0.0f ),
 	m_peakRight( 0.0f ),
-	m_buffer( new sampleFrame[Engine::audioEngine()->framesPerPeriod()] ),
+	m_buffer( new SampleFrame[Engine::audioEngine()->framesPerPeriod()] ),
 	m_muteModel( false, _parent ),
 	m_soloModel( false, _parent ),
 	m_volumeModel( 1.0, 0.0, 2.0, 0.001, _parent ),
@@ -134,7 +134,7 @@ void MixerChannel::doProcessing()
 				ValueBuffer * volBuf = sender->m_volumeModel.valueBuffer();
 
 				// mix it's output with this one's output
-				sampleFrame * ch_buf = sender->m_buffer;
+				SampleFrame * ch_buf = sender->m_buffer;
 
 				// use sample-exact mixing if sample-exact values are available
 				if( ! volBuf && ! sendBuf ) // neither volume nor send has sample-exact data...
@@ -171,7 +171,7 @@ void MixerChannel::doProcessing()
 
 		m_stillRunning = m_fxChain.processAudioBuffer( m_buffer, fpp, m_hasInput );
 
-		sampleFrame peakSamples = Engine::audioEngine()->getPeakValues(m_buffer, fpp);
+		SampleFrame peakSamples = Engine::audioEngine()->getPeakValues(m_buffer, fpp);
 		m_peakLeft = std::max(m_peakLeft, peakSamples[0] * v);
 		m_peakRight = std::max(m_peakRight, peakSamples[1] * v);
 	}
@@ -596,7 +596,7 @@ FloatModel * Mixer::channelSendModel( mix_ch_t fromChannel, mix_ch_t toChannel )
 
 
 
-void Mixer::mixToChannel( const sampleFrame * _buf, mix_ch_t _ch )
+void Mixer::mixToChannel( const SampleFrame * _buf, mix_ch_t _ch )
 {
 	if( m_mixerChannels[_ch]->m_muteModel.value() == false )
 	{
@@ -618,7 +618,7 @@ void Mixer::prepareMasterMix()
 
 
 
-void Mixer::masterMix( sampleFrame * _buf )
+void Mixer::masterMix( SampleFrame * _buf )
 {
 	const int fpp = Engine::audioEngine()->framesPerPeriod();
 

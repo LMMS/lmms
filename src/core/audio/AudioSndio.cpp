@@ -141,7 +141,7 @@ void AudioSndio::stopProcessing()
 
 void AudioSndio::run()
 {
-	sampleFrame* temp = new sampleFrame[audioEngine()->framesPerPeriod()];
+	SampleFrame* temp = new SampleFrame[audioEngine()->framesPerPeriod()];
 	int_sample_t * outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];
 
 	while( true )

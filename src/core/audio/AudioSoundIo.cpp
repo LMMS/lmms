@@ -213,7 +213,7 @@ void AudioSoundIo::startProcessing()
 	m_outBufFramesTotal = 0;
 	m_outBufSize = audioEngine()->framesPerPeriod();
 
-	m_outBuf = new sampleFrame[m_outBufSize];
+	m_outBuf = new SampleFrame[m_outBufSize];
 
 	if (! m_outstreamStarted)
 	{

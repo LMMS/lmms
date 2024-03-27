@@ -92,14 +92,14 @@ public:
 protected:
 	// subclasses can re-implement this for being used in conjunction with
 	// processNextBuffer()
-	virtual void writeBuffer(const sampleFrame* /* _buf*/, const fpp_t /*_frames*/) {}
+	virtual void writeBuffer(const SampleFrame* /* _buf*/, const fpp_t /*_frames*/) {}
 
 	// called by according driver for fetching new sound-data
-	fpp_t getNextBuffer(sampleFrame* _ab);
+	fpp_t getNextBuffer(SampleFrame* _ab);
 
 	// convert a given audio-buffer to a buffer in signed 16-bit samples
 	// returns num of bytes in outbuf
-	int convertToS16(const sampleFrame* _ab,
+	int convertToS16(const SampleFrame* _ab,
 						const fpp_t _frames,
 						int_sample_t * _output_buffer,
 						const bool _convert_endian = false );
@@ -133,7 +133,7 @@ private:
 
 	QMutex m_devMutex;
 
-	sampleFrame* m_buffer;
+	SampleFrame* m_buffer;
 
 };
 

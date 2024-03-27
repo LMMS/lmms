@@ -96,7 +96,7 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	{
 		m_inputBufferFrames[i] = 0;
 		m_inputBufferSize[i] = DEFAULT_BUFFER_SIZE * 100;
-		m_inputBuffer[i] = new sampleFrame[ DEFAULT_BUFFER_SIZE * 100 ];
+		m_inputBuffer[i] = new SampleFrame[ DEFAULT_BUFFER_SIZE * 100 ];
 		BufferManager::clear( m_inputBuffer[i], m_inputBufferSize[i] );
 	}
 
@@ -137,9 +137,9 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	// now that framesPerPeriod is fixed initialize global BufferManager
 	BufferManager::init( m_framesPerPeriod );
 
-	int outputBufferSize = m_framesPerPeriod * sizeof(sampleFrame);
-	m_outputBufferRead = static_cast<sampleFrame*>(MemoryHelper::alignedMalloc(outputBufferSize));
-	m_outputBufferWrite = static_cast<sampleFrame*>(MemoryHelper::alignedMalloc(outputBufferSize));
+	int outputBufferSize = m_framesPerPeriod * sizeof(SampleFrame);
+	m_outputBufferRead = static_cast<SampleFrame*>(MemoryHelper::alignedMalloc(outputBufferSize));
+	m_outputBufferWrite = static_cast<SampleFrame*>(MemoryHelper::alignedMalloc(outputBufferSize));
 
 	BufferManager::clear(m_outputBufferRead, m_framesPerPeriod);
 	BufferManager::clear(m_outputBufferWrite, m_framesPerPeriod);
@@ -285,19 +285,19 @@ bool AudioEngine::criticalXRuns() const
 
 
 
-void AudioEngine::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
+void AudioEngine::pushInputFrames( SampleFrame * _ab, const f_cnt_t _frames )
 {
 	requestChangeInModel();
 
 	f_cnt_t frames = m_inputBufferFrames[ m_inputBufferWrite ];
 	int size = m_inputBufferSize[ m_inputBufferWrite ];
-	sampleFrame * buf = m_inputBuffer[ m_inputBufferWrite ];
+	SampleFrame * buf = m_inputBuffer[ m_inputBufferWrite ];
 
 	if( frames + _frames > size )
 	{
 		size = std::max(size * 2, frames + _frames);
-		auto ab = new sampleFrame[size];
-		memcpy( ab, buf, frames * sizeof( sampleFrame ) );
+		auto ab = new SampleFrame[size];
+		memcpy( ab, buf, frames * sizeof( SampleFrame ) );
 		delete [] buf;
 
 		m_inputBufferSize[ m_inputBufferWrite ] = size;
@@ -306,7 +306,7 @@ void AudioEngine::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
 		buf = ab;
 	}
 
-	memcpy( &buf[ frames ], _ab, _frames * sizeof( sampleFrame ) );
+	memcpy( &buf[ frames ], _ab, _frames * sizeof( SampleFrame ) );
 	m_inputBufferFrames[ m_inputBufferWrite ] += _frames;
 
 	doneChangeInModel();
@@ -435,7 +435,7 @@ void AudioEngine::renderStageMix()
 
 
 
-const sampleFrame* AudioEngine::renderNextBuffer()
+const SampleFrame* AudioEngine::renderNextBuffer()
 {
 	const auto lock = std::lock_guard{m_changeMutex};
 
@@ -554,9 +554,9 @@ void AudioEngine::clearInternal()
 
 
 
-sampleFrame AudioEngine::getPeakValues(sampleFrame* ab, const f_cnt_t frames) const
+SampleFrame AudioEngine::getPeakValues(SampleFrame* ab, const f_cnt_t frames) const
 {
-	sampleFrame peaks;
+	SampleFrame peaks;
 
 	for (f_cnt_t f = 0; f < frames; ++f)
 	{
@@ -1221,9 +1221,9 @@ void AudioEngine::fifoWriter::run()
 	const fpp_t frames = m_audioEngine->framesPerPeriod();
 	while( m_writing )
 	{
-		auto buffer = new sampleFrame[frames];
-		const sampleFrame* b = m_audioEngine->renderNextBuffer();
-		memcpy(buffer, b, frames * sizeof(sampleFrame));
+		auto buffer = new SampleFrame[frames];
+		const SampleFrame* b = m_audioEngine->renderNextBuffer();
+		memcpy(buffer, b, frames * sizeof(SampleFrame));
 		m_fifo->write(buffer);
 	}
 

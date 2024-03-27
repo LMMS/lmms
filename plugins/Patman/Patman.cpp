@@ -134,7 +134,7 @@ QString PatmanInstrument::nodeName() const
 
 
 void PatmanInstrument::playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer )
+						SampleFrame * _working_buffer )
 {
 	if( m_patchFile == "" )
 	{
@@ -342,7 +342,7 @@ PatmanInstrument::LoadError PatmanInstrument::loadPatch(
 			}
 		}
 
-		auto data = new sampleFrame[frames];
+		auto data = new SampleFrame[frames];
 
 		for( f_cnt_t frame = 0; frame < frames; ++frame )
 		{

@@ -735,7 +735,7 @@ ExprSynth::~ExprSynth()
 	}
 }
 
-void ExprSynth::renderOutput(fpp_t frames, sampleFrame *buf)
+void ExprSynth::renderOutput(fpp_t frames, SampleFrame *buf)
 {
 	try
 	{

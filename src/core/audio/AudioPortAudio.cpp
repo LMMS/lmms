@@ -67,7 +67,7 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine 
 		DEFAULT_CHANNELS), _audioEngine),
 	m_paStream( nullptr ),
 	m_wasPAInitError( false ),
-	m_outBuf(new sampleFrame[audioEngine()->framesPerPeriod()]),
+	m_outBuf(new SampleFrame[audioEngine()->framesPerPeriod()]),
 	m_outBufPos( 0 )
 {
 	_success_ful = false;
@@ -236,7 +236,7 @@ int AudioPortAudio::process_callback(
 {
 	if( supportsCapture() )
 	{
-		audioEngine()->pushInputFrames( (sampleFrame*)_inputBuffer, _framesPerBuffer );
+		audioEngine()->pushInputFrames( (SampleFrame*)_inputBuffer, _framesPerBuffer );
 	}
 
 	if( m_stopped )

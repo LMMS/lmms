@@ -37,12 +37,12 @@ class LMMS_EXPORT BufferManager
 {
 public:
 	static void init( fpp_t fpp );
-	static sampleFrame * acquire();
+	static SampleFrame * acquire();
 	// audio-buffer-mgm
-	static void clear( sampleFrame * ab, const f_cnt_t frames,
+	static void clear( SampleFrame * ab, const f_cnt_t frames,
 						const f_cnt_t offset = 0 );
 
-	static void release( sampleFrame * buf );
+	static void release( SampleFrame * buf );
 
 private:
 	static fpp_t s_framesPerPeriod;

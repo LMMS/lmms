@@ -265,7 +265,7 @@ void LocalZynAddSubFx::processMidiEvent( const MidiEvent& event )
 
 
 
-void LocalZynAddSubFx::processAudio( sampleFrame * _out )
+void LocalZynAddSubFx::processAudio( SampleFrame * _out )
 {
 #ifdef _MSC_VER
 	const auto outputl = static_cast<float*>(_alloca(synth->buffersize * sizeof(float)));

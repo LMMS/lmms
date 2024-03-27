@@ -37,7 +37,7 @@ AudioDevice::AudioDevice( const ch_cnt_t _channels, AudioEngine*  _audioEngine )
 	m_sampleRate( _audioEngine->outputSampleRate() ),
 	m_channels( _channels ),
 	m_audioEngine( _audioEngine ),
-	m_buffer(new sampleFrame[audioEngine()->framesPerPeriod()])
+	m_buffer(new SampleFrame[audioEngine()->framesPerPeriod()])
 {
 }
 
@@ -64,14 +64,14 @@ void AudioDevice::processNextBuffer()
 	}
 }
 
-fpp_t AudioDevice::getNextBuffer(sampleFrame* _ab)
+fpp_t AudioDevice::getNextBuffer(SampleFrame* _ab)
 {
 	fpp_t frames = audioEngine()->framesPerPeriod();
-	const sampleFrame* b = audioEngine()->nextBuffer();
+	const SampleFrame* b = audioEngine()->nextBuffer();
 
 	if (!b) { return 0; }
 
-	memcpy(_ab, b, frames * sizeof(sampleFrame));
+	memcpy(_ab, b, frames * sizeof(SampleFrame));
 
 	if (audioEngine()->hasFifoWriter()) { delete[] b; }
 	return frames;
@@ -127,7 +127,7 @@ void AudioDevice::renamePort( AudioPort * )
 {
 }
 
-int AudioDevice::convertToS16(const sampleFrame* _ab,
+int AudioDevice::convertToS16(const SampleFrame* _ab,
 								const fpp_t _frames,
 								int_sample_t * _output_buffer,
 								const bool _convert_endian )

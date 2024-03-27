@@ -43,7 +43,7 @@ class VectorView : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit VectorView(VecControls *controls, LocklessRingBuffer<sampleFrame> *inputBuffer, unsigned short displaySize, QWidget *parent = 0);
+	explicit VectorView(VecControls *controls, LocklessRingBuffer<SampleFrame> *inputBuffer, unsigned short displaySize, QWidget *parent = 0);
 	~VectorView() override = default;
 
 	QSize sizeHint() const override {return QSize(300, 300);}
@@ -59,8 +59,8 @@ private slots:
 private:
 	VecControls *m_controls;
 
-	LocklessRingBuffer<sampleFrame> *m_inputBuffer;
-	LocklessRingBufferReader<sampleFrame> m_bufferReader;
+	LocklessRingBuffer<SampleFrame> *m_inputBuffer;
+	LocklessRingBufferReader<SampleFrame> m_bufferReader;
 
 	std::vector<uchar> m_displayBuffer;
 	const unsigned short m_displaySize;

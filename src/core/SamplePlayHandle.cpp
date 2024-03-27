@@ -85,7 +85,7 @@ SamplePlayHandle::~SamplePlayHandle()
 
 
 
-void SamplePlayHandle::play( sampleFrame * buffer )
+void SamplePlayHandle::play( SampleFrame * buffer )
 {
 	const fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
 	//play( 0, _try_parallelizing );
@@ -95,7 +95,7 @@ void SamplePlayHandle::play( sampleFrame * buffer )
 		return;
 	}
 
-	sampleFrame * workingBuffer = buffer;
+	SampleFrame * workingBuffer = buffer;
 	f_cnt_t frames = fpp;
 
 	// apply offset for the first period

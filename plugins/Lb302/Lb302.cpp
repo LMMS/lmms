@@ -462,7 +462,7 @@ inline float GET_INC(float freq) {
 	return freq/Engine::audioEngine()->outputSampleRate();  // TODO: Use actual sampling rate.
 }
 
-int Lb302Synth::process(sampleFrame *outbuf, const int size)
+int Lb302Synth::process(SampleFrame *outbuf, const int size)
 {
 	const float sampleRatio = 44100.f / Engine::audioEngine()->outputSampleRate();
 
@@ -732,7 +732,7 @@ void Lb302Synth::initSlide()
 }
 
 
-void Lb302Synth::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
+void Lb302Synth::playNote( NotePlayHandle * _n, SampleFrame * _working_buffer )
 {
 	if( _n->isMasterNote() || ( _n->hasParent() && _n->isReleased() ) )
 	{
@@ -791,7 +791,7 @@ void Lb302Synth::processNote( NotePlayHandle * _n )
 
 
 
-void Lb302Synth::play( sampleFrame * _working_buffer )
+void Lb302Synth::play( SampleFrame * _working_buffer )
 {
 	m_notesMutex.lock();
 	while( ! m_notes.isEmpty() )

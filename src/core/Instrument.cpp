@@ -45,7 +45,7 @@ Instrument::Instrument(InstrumentTrack * _instrument_track,
 {
 }
 
-void Instrument::play( sampleFrame * )
+void Instrument::play( SampleFrame * )
 {
 }
 
@@ -89,7 +89,7 @@ bool Instrument::isFromTrack( const Track * _track ) const
 }
 
 // helper function for Instrument::applyFadeIn
-static int countZeroCrossings(sampleFrame *buf, fpp_t start, fpp_t frames)
+static int countZeroCrossings(SampleFrame *buf, fpp_t start, fpp_t frames)
 {
 	// zero point crossing counts of all channels
 	auto zeroCrossings = std::array<int, DEFAULT_CHANNELS>{};
@@ -128,7 +128,7 @@ fpp_t getFadeInLength(float maxLength, fpp_t frames, int zeroCrossings)
 }
 
 
-void Instrument::applyFadeIn(sampleFrame * buf, NotePlayHandle * n)
+void Instrument::applyFadeIn(SampleFrame * buf, NotePlayHandle * n)
 {
 	const static float MAX_FADE_IN_LENGTH = 85.0;
 	f_cnt_t total = n->totalFramesPlayed();
@@ -179,7 +179,7 @@ void Instrument::applyFadeIn(sampleFrame * buf, NotePlayHandle * n)
 	}
 }
 
-void Instrument::applyRelease( sampleFrame * buf, const NotePlayHandle * _n )
+void Instrument::applyRelease( SampleFrame * buf, const NotePlayHandle * _n )
 {
 	const auto fpp = Engine::audioEngine()->framesPerPeriod();
 	const auto releaseFrames = desiredReleaseFrames();

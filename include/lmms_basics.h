@@ -120,18 +120,18 @@ constexpr char LADSPA_PATH_SEPERATOR =
 #endif
 
 
-class sampleFrame
+class SampleFrame
 {
 public:
-	sampleFrame() : sampleFrame(0., 0.)
+	SampleFrame() : SampleFrame(0., 0.)
 	{
 	}
 
-	sampleFrame(sample_t value) : sampleFrame(value, value)
+	SampleFrame(sample_t value) : SampleFrame(value, value)
 	{
 	}
 
-	sampleFrame(sample_t left, sample_t right) :
+	SampleFrame(sample_t left, sample_t right) :
 		m_samples({ left, right })
 	{
 	}
@@ -186,7 +186,7 @@ public:
 		return m_samples[index];
 	}
 
-	sampleFrame& operator=(float v)
+	SampleFrame& operator=(float v)
 	{
 		left() = v;
 		right() = v;
@@ -194,12 +194,12 @@ public:
 		return *this;
 	}
 
-	sampleFrame operator+(const sampleFrame& other) const
+	SampleFrame operator+(const SampleFrame& other) const
 	{
-		return sampleFrame(left() + other.left(), right() + other.right());
+		return SampleFrame(left() + other.left(), right() + other.right());
 	}
 
-	void operator+=(const sampleFrame& other)
+	void operator+=(const SampleFrame& other)
 	{
 		auto & l = left();
 		auto & r = right();
@@ -208,9 +208,9 @@ public:
 		r += other.right();
 	}
 
-	sampleFrame operator*(float value) const
+	SampleFrame operator*(float value) const
 	{
-		return sampleFrame(left() * value, right() * value);
+		return SampleFrame(left() * value, right() * value);
 	}
 
 	void operator*=(float value)
@@ -219,28 +219,28 @@ public:
 		setRight(right() * value);
 	}
 
-	sampleFrame operator*(const sampleFrame& other) const
+	SampleFrame operator*(const SampleFrame& other) const
 	{
-		return sampleFrame(left() * other.left(), right() * other.right());
+		return SampleFrame(left() * other.left(), right() * other.right());
 	}
 
-	void operator*=(const sampleFrame& other)
+	void operator*=(const SampleFrame& other)
 	{
 		left() *= other.left();
 		right() *= other.right();
 	}
 
-	sample_t scalarProduct(const sampleFrame& other) const
+	sample_t scalarProduct(const SampleFrame& other) const
 	{
 		return left() * other.left() + right() * other.right();
 	}
 
-	sampleFrame abs() const
+	SampleFrame abs() const
 	{
-		return sampleFrame{std::abs(this->left()), std::abs(this->right())};
+		return SampleFrame{std::abs(this->left()), std::abs(this->right())};
 	}
 
-	void max(const sampleFrame& other)
+	void max(const SampleFrame& other)
 	{
 		if (other.left() > left())
 		{
@@ -281,18 +281,18 @@ private:
 	std::array<sample_t, DEFAULT_CHANNELS> m_samples;
 };
 
-inline void zeroSampleFrames(sampleFrame* buffer, fpp_t frames)
+inline void zeroSampleFrames(SampleFrame* buffer, fpp_t frames)
 {
 	// The equivalent of the following operation which yields compiler warnings
-	// memset(buffer, 0, sizeof(sampleFrame) * frames);
+	// memset(buffer, 0, sizeof(SampleFrame) * frames);
 
 	for (fpp_t i = 0; i < frames; ++i)
 	{
-		buffer[i] = sampleFrame();
+		buffer[i] = SampleFrame();
 	}
 }
 
-inline void copyToSampleFrames(sampleFrame* target, const float* source, fpp_t frames)
+inline void copyToSampleFrames(SampleFrame* target, const float* source, fpp_t frames)
 {
 	for (fpp_t i = 0; i < frames; ++i)
 	{
@@ -301,7 +301,7 @@ inline void copyToSampleFrames(sampleFrame* target, const float* source, fpp_t f
 	}
 }
 
-inline void copyFromSampleFrames(float* target, const sampleFrame* source, fpp_t frames)
+inline void copyFromSampleFrames(float* target, const SampleFrame* source, fpp_t frames)
 {
 	for (fpp_t i = 0; i < frames; ++i)
 	{

@@ -118,9 +118,9 @@ protected:
 	void copyModelsToLmms() const;
 
 	//! Copy buffer passed by LMMS into our ports
-	void copyBuffersFromLmms(const sampleFrame *buf, fpp_t frames);
+	void copyBuffersFromLmms(const SampleFrame *buf, fpp_t frames);
 	//! Copy our ports into buffers passed by LMMS
-	void copyBuffersToLmms(sampleFrame *buf, fpp_t frames) const;
+	void copyBuffersToLmms(SampleFrame *buf, fpp_t frames) const;
 	//! Run the Lv2 plugin instance for @param frames frames
 	void run(fpp_t frames);
 

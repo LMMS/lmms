@@ -81,7 +81,7 @@ DelayEffect::~DelayEffect()
 
 
 
-bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
+bool DelayEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 {
 	if( !isEnabled() || !isRunning () )
 	{
@@ -92,7 +92,7 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	const float d = dryLevel();
 	const float w = wetLevel();
 
-	sampleFrame peak;
+	SampleFrame peak;
 	float length = m_delayControls.m_delayTimeModel.value();
 	float amplitude = m_delayControls.m_lfoAmountModel.value() * sr;
 	float lfoTime = 1.0 / m_delayControls.m_lfoTimeModel.value();

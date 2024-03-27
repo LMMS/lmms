@@ -59,7 +59,7 @@ public:
 
 	void processMidiEvent( const MidiEvent& event );
 
-	void processAudio( sampleFrame * _out );
+	void processAudio( SampleFrame * _out );
 
 	inline Master * master()
 	{

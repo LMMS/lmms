@@ -242,7 +242,7 @@ void AudioAlsa::stopProcessing()
 
 void AudioAlsa::run()
 {
-	auto temp = new sampleFrame[audioEngine()->framesPerPeriod()];
+	auto temp = new SampleFrame[audioEngine()->framesPerPeriod()];
 	auto outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];
 	auto pcmbuf = new int_sample_t[m_periodSize * channels()];
 

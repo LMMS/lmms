@@ -75,7 +75,7 @@ EqAnalyser::~EqAnalyser()
 
 
 
-void EqAnalyser::analyze( sampleFrame *buf, const fpp_t frames )
+void EqAnalyser::analyze( SampleFrame *buf, const fpp_t frames )
 {
 	//only analyse if the view is visible
 	if ( m_active )

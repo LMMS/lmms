@@ -495,7 +495,7 @@ void CarlaInstrument::loadSettings(const QDomElement& elem)
 #endif
 }
 
-void CarlaInstrument::play(sampleFrame* workingBuffer)
+void CarlaInstrument::play(SampleFrame* workingBuffer)
 {
     const uint bufsize = Engine::audioEngine()->framesPerPeriod();
 

@@ -179,7 +179,7 @@ bool AudioFileOgg::startEncoding()
 	return true;
 }
 
-void AudioFileOgg::writeBuffer(const sampleFrame* _ab, const fpp_t _frames)
+void AudioFileOgg::writeBuffer(const SampleFrame* _ab, const fpp_t _frames)
 {
 	int eos = 0;
 

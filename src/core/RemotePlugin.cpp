@@ -325,7 +325,7 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 
 
 
-bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf )
+bool RemotePlugin::process( const SampleFrame * _in_buf, SampleFrame * _out_buf )
 {
 	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 
@@ -381,7 +381,7 @@ bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf 
 		}
 		else
 		{
-			auto o = (sampleFrame*)m_audioBuffer.get();
+			auto o = (SampleFrame*)m_audioBuffer.get();
 			for( ch_cnt_t ch = 0; ch < inputs; ++ch )
 			{
 				for( fpp_t frame = 0; frame < frames; ++frame )
@@ -424,7 +424,7 @@ bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf 
 	}
 	else
 	{
-		auto o = (sampleFrame*)(m_audioBuffer.get() + m_inputCount * frames);
+		auto o = (SampleFrame*)(m_audioBuffer.get() + m_inputCount * frames);
 		// clear buffer, if plugin didn't fill up both channels
 		BufferManager::clear( _out_buf, frames );
 
