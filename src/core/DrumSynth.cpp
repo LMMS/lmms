@@ -148,7 +148,7 @@ void DrumSynth::GetEnv(int env, const char *sec, const char *key, QString ini)
 
 float DrumSynth::waveform(float ph, int form)
 {
-	float w = 0.0f;
+	float w;
 
 	switch (form)
 	{
@@ -277,29 +277,29 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t *&wave, int channels, sa
   int commentLen=0;
 
   //generation
-  long Length = 0, tpos = 0, tplus = 0, totmp = 0, t = 0, i = 0, j = 0;
+  long  Length, tpos=0, tplus, totmp, t, i, j;
   float x[3] = {0.f, 0.f, 0.f};
-  float MasterTune = 0.0f;
+  float MasterTune;
   constexpr float randmax = 1.f / static_cast<float>(RAND_MAX);
   constexpr float randmax2 = 2.f / static_cast<float>(RAND_MAX);
-  int MainFilter = 0, HighPass = 0;
+  int   MainFilter, HighPass;
 
-  long NON = 0, NT = 0, TON = 0, DiON = 0, TDroop = 0, DStep = 0;
-  float a = 0.0f, b = 0.f, c = 0.f, d = 0.f, g = 0.0f, TT = 0.f, TL = 0.0f, NL = 0.0f, F1 = 0.0f, F2 = 0.0f;
-  float TphiStart = 0.f, Tphi = 0.0f, TDroopRate = 0.0f, ddF = 0.0f, DAtten = 0.0f, DGain = 0.0f;
+  long  NON, NT, TON, DiON, TDroop=0, DStep;
+  float a, b=0.f, c=0.f, d=0.f, g, TT=0.f, TL, NL, F1, F2;
+  float TphiStart=0.f, Tphi, TDroopRate, ddF, DAtten, DGain;
 
-  long BON = 0, BON2 = 0, BFStep = 0, BFStep2 = 0, botmp = 0;
-  float BdF = 0.f, BdF2 = 0.f, BPhi = 0.0f, BPhi2 = 0.0f, BF = 0.0f, BF2 = 0.0f, BQ = 0.0f, BQ2 = 0.0f, BL = 0.0f, BL2 = 0.0f;
+  long  BON, BON2, BFStep, BFStep2, botmp;
+  float BdF=0.f, BdF2=0.f, BPhi, BPhi2, BF, BF2, BQ, BQ2, BL, BL2;
 
-  long OON = 0, OF1Sync = 0, OF2Sync = 0, OMode = 0, OW1 = 0, OW2 = 0;
-  float Ophi1 = 0.0f, Ophi2 = 0.0f, OF1 = 0.0f, OF2 = 0.0f, OL = 0.0f, Ot = 0 /*PG: init */, OBal1 = 0.0f, OBal2 = 0.0f,
-		ODrive = 0.0f;
-  float Ocf1 = 0.0f, Ocf2 = 0.0f, OcF = 0.0f, OcQ = 0.0f, OcA = 0.0f, Oc[6][2]; // overtone cymbal mode
+  long  OON, OF1Sync=0, OF2Sync=0, OMode, OW1, OW2;
+  float Ophi1, Ophi2, OF1, OF2, OL, Ot=0 /*PG: init */, OBal1, OBal2, ODrive;
+  float Ocf1, Ocf2, OcF, OcQ, OcA, Oc[6][2];  //overtone cymbal mode
   float Oc0=0.0f, Oc1=0.0f, Oc2=0.0f;
 
-  float MFfb = 0.0f, MFtmp = 0.0f, MFres = 0.0f, MFin = 0.f, MFout = 0.f;
-  float DownAve = 0.0f;
-  long DownStart = 0, DownEnd = 0, jj = 0;
+  float MFfb, MFtmp, MFres, MFin=0.f, MFout=0.f;
+  float DownAve;
+  long  DownStart, DownEnd, jj;
+
 
   if(wavemode==0) //semi-real-time adjustments if working in memory!!
   {

@@ -413,7 +413,7 @@ int AudioAlsa::setHWParams( const ch_cnt_t _channels, snd_pcm_access_t _access )
 
 	m_periodSize = audioEngine()->framesPerPeriod();
 	m_bufferSize = m_periodSize * 8;
-	int dir = 0;
+	int dir;
 	if (int err = snd_pcm_hw_params_set_period_size_near(m_handle, m_hwParams, &m_periodSize, &dir); err < 0)
 	{
 		printf( "Unable to set period size %lu for playback: %s\n",

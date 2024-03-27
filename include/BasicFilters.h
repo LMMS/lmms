@@ -340,7 +340,7 @@ public:
 
 	inline sample_t update( sample_t _in0, ch_cnt_t _chnl )
 	{
-		sample_t out;
+		sample_t out = 0.0f;
 		switch( m_type )
 		{
 			case FilterType::Moog:
@@ -375,7 +375,6 @@ public:
 			// input signal is linear-interpolated after oversampling, output signal is averaged from oversampled outputs
 			case FilterType::Tripole:
 			{
-				out = 0.0f;
 				float ip = 0.0f;
 				for( int i = 0; i < 4; ++i )
 				{

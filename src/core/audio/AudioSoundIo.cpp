@@ -273,7 +273,7 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 {
 	if (m_stopped) {return;}
 	const struct SoundIoChannelLayout *layout = &m_outstream->layout;
-	SoundIoChannelArea* areas = nullptr;
+	SoundIoChannelArea* areas;
 	int bytesPerSample = m_outstream->bytes_per_sample;
 	int framesLeft = frameCountMax;
 

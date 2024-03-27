@@ -212,7 +212,7 @@ inline sample_t EnvelopeAndLfoParameters::lfoShapeSample( fpp_t _frame_offset )
 	f_cnt_t frame = ( m_lfoFrame + _frame_offset ) % m_lfoOscillationFrames;
 	const float phase = frame / static_cast<float>(
 						m_lfoOscillationFrames );
-	sample_t shape_sample = 0.0f;
+	sample_t shape_sample;
 	switch( static_cast<LfoShape>(m_lfoWaveModel.value())  )
 	{
 		case LfoShape::TriangleWave:

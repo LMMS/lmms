@@ -183,7 +183,7 @@ void Effect::reinitSRC()
 		{
 			src_delete(state);
 		}
-		int error = 0;
+		int error;
 		const int currentInterpolation = Engine::audioEngine()->currentQualitySettings().libsrcInterpolation();
 		if((state = src_new(currentInterpolation, DEFAULT_CHANNELS, &error)) == nullptr)
 		{

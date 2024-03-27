@@ -1114,7 +1114,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 	if( m_clip )
 	{
-		int q = 0;
+		int q;
 		int x_line_end = (int)( m_y_auto || m_topLevel < m_maxLevel ?
 			TOP_MARGIN :
 			grid_bottom - ( m_topLevel - m_bottomLevel ) * m_y_delta );
@@ -1485,25 +1485,11 @@ void AutomationEditor::drawLevelTick(QPainter & p, int tick, float value)
 			|| ( value > m_topLevel && m_topLevel >= 0 )
 			|| ( value < m_bottomLevel && m_bottomLevel <= 0 ) )
 	{
-		int y_start = yCoordOfLevel( value );
-		int rect_height = 0;
-
-		if( m_y_auto )
-		{
-			int y_end = (int)( grid_bottom
-						+ ( grid_bottom - TOP_MARGIN )
-						* m_minLevel
-						/ ( m_maxLevel - m_minLevel ) );
-
-			rect_height = y_end - y_start;
-		}
-		else
-		{
-			rect_height = (int)( value * m_y_delta );
-		}
+		const int y_start = yCoordOfLevel(value);
+		const int y_end = grid_bottom + (grid_bottom - TOP_MARGIN) * m_minLevel / (m_maxLevel - m_minLevel);
+		const int rect_height = m_y_auto ? y_end - y_start : value * m_y_delta;
 
 		QBrush currentColor = m_graphColor;
-
 		p.fillRect( x, y_start, rect_width, rect_height, currentColor );
 	}
 #ifdef LMMS_DEBUG
