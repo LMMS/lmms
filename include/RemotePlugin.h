@@ -37,6 +37,7 @@ namespace lmms
 
 
 class RemotePlugin;
+class SampleFrame;
 
 class ProcessWatcher : public QThread
 {

@@ -36,6 +36,7 @@
 #endif
 
 #include "MidiEvent.h"
+#include "SampleFrame.h"
 
 #include "zynaddsubfx/src/Nio/NulEngine.h"
 #include "zynaddsubfx/src/Misc/Master.h"

@@ -31,6 +31,8 @@
 namespace lmms
 {
 
+class SampleFrame;
+
 class StereoDelay
 {
 public:

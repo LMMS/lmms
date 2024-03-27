@@ -37,6 +37,7 @@
 #include <vector>
 
 #include "lmms_basics.h"
+#include "SampleFrame.h"
 #include "LocklessList.h"
 #include "FifoBuffer.h"
 #include "AudioEngineProfiler.h"

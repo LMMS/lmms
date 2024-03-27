@@ -31,6 +31,7 @@
 #include "EffectView.h"
 
 #include "ConfigManager.h"
+#include "SampleFrame.h"
 
 namespace lmms
 {

@@ -25,6 +25,8 @@
 
 #include "AudioFileMP3.h"
 
+#include "SampleFrame.h"
+
 #ifdef LMMS_HAVE_MP3LAME
 
 

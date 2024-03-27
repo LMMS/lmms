@@ -43,7 +43,7 @@ template<class T>
 class LocklessRingBuffer;
 
 class SaControls;
-
+class SampleFrame;
 
 
 //! Receives audio data, runs FFT analysis and stores the result.

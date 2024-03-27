@@ -32,6 +32,7 @@
 namespace lmms
 {
 
+class SampleFrame;
 
 const int MAX_BANDS = 2048;
 class EqAnalyser

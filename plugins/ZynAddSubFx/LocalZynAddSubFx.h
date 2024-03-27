@@ -34,10 +34,12 @@ namespace lmms
 {
 
 class MidiEvent;
+class SampleFrame;
 
 
 class LocalZynAddSubFx
 {
+
 public:
 	LocalZynAddSubFx();
 	~LocalZynAddSubFx();

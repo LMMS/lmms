@@ -37,6 +37,7 @@ namespace lmms
 
 class ExprFrontData;
 class NotePlayHandle;
+class SampleFrame;
 
 namespace gui
 {

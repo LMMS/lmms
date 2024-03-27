@@ -37,6 +37,7 @@ namespace lmms
 
 class AudioEngine;
 class AudioPort;
+class SampleFrame;
 
 
 class AudioDevice

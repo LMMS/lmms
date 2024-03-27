@@ -34,6 +34,7 @@
 #include "interpolation.h"
 #include "lmms_math.h"
 #include "NotePlayHandle.h"
+#include "SampleFrame.h"
 
 
 #include "exprtk.hpp"

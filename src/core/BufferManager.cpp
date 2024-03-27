@@ -26,6 +26,8 @@
 
 #include "BufferManager.h"
 
+#include "SampleFrame.h"
+
 #include <cstring>
 
 

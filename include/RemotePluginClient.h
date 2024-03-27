@@ -44,6 +44,8 @@
 namespace lmms
 {
 
+class SampleFrame;
+
 class RemotePluginClient : public RemotePluginBase
 {
 public:

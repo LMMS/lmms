@@ -35,6 +35,7 @@
 namespace lmms
 {
 
+class SampleFrame;
 
 /** \brief A basic LMMS ring buffer for single-thread use. For thread and realtime safe alternative see LocklessRingBuffer.
 */

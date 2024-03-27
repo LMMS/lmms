@@ -34,6 +34,7 @@ namespace lmms
 class InstrumentTrack;
 class EnvelopeAndLfoParameters;
 class NotePlayHandle;
+class SampleFrame;
 
 namespace gui
 {

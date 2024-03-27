@@ -32,6 +32,7 @@
 #include <QtGlobal>
 
 #include "ValueBuffer.h"
+#include "SampleFrame.h"
 
 
 

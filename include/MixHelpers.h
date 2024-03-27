@@ -31,6 +31,8 @@ namespace lmms
 {
 
 class ValueBuffer;
+class SampleFrame;
+
 namespace MixHelpers
 {
 

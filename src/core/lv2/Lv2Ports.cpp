@@ -34,6 +34,7 @@
 #include "Lv2Basics.h"
 #include "Lv2Manager.h"
 #include "Lv2Evbuf.h"
+#include "SampleFrame.h"
 
 
 namespace lmms::Lv2Ports

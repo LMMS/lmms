@@ -41,6 +41,7 @@
 namespace lmms
 {
 
+class SampleFrame;
 
 struct ConnectPortVisitor;
 using LV2_Evbuf = struct LV2_Evbuf_Impl;

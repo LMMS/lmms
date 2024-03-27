@@ -32,6 +32,7 @@
 namespace lmms
 {
 
+class SampleFrame;
 
 class LMMS_EXPORT BufferManager
 {

@@ -34,6 +34,7 @@ namespace lmms
 {
 
 class Effect;
+class SampleFrame;
 
 namespace gui
 {

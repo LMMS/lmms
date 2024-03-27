@@ -48,6 +48,7 @@ namespace lmms
 {
 
 class PluginIssue;
+class SampleFrame;
 
 // forward declare port structs/enums
 namespace Lv2Ports

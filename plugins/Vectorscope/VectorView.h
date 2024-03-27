@@ -30,6 +30,7 @@
 namespace lmms
 {
 class VecControls;
+class SampleFrame;
 }
 
 //#define VEC_DEBUG
