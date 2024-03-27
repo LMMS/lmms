@@ -37,12 +37,12 @@ AudioDevice::AudioDevice( const ch_cnt_t _channels, AudioEngine*  _audioEngine )
 	m_sampleRate( _audioEngine->processingSampleRate() ),
 	m_channels( _channels ),
 	m_audioEngine( _audioEngine ),
-	m_buffer( new sampleFrame[audioEngine()->framesPerPeriod()] )
+	m_buffer(new sampleFrame[audioEngine()->framesPerPeriod()])
 {
 	int error;
 	if( ( m_srcState = src_new(
 		audioEngine()->currentQualitySettings().libsrcInterpolation(),
-				DEFAULT_CHANNELS, &error ) ) == nullptr )
+				DEFAULT_CHANNELS, &error)) == nullptr)
 	{
 		printf( "Error: src_new() failed in audio_device.cpp!\n" );
 	}
@@ -76,10 +76,10 @@ void AudioDevice::processNextBuffer()
 
 
 
-fpp_t AudioDevice::getNextBuffer( sampleFrame * _ab )
+fpp_t AudioDevice::getNextBuffer(sampleFrame* _ab)
 {
 	fpp_t frames = audioEngine()->framesPerPeriod();
-	const sampleFrame * b = audioEngine()->nextBuffer();
+	const sampleFrame* b = audioEngine()->nextBuffer();
 	if( !b )
 	{
 		return 0;
@@ -95,7 +95,7 @@ fpp_t AudioDevice::getNextBuffer( sampleFrame * _ab )
 	}
 	else
 	{
-		memcpy( _ab, b, frames * sizeof( sampleFrame ) );
+		memcpy(_ab, b, frames * sizeof(sampleFrame));
 	}
 
 	// release lock
@@ -149,7 +149,7 @@ void AudioDevice::applyQualitySettings()
 	int error;
 	if( ( m_srcState = src_new(
 		audioEngine()->currentQualitySettings().libsrcInterpolation(),
-				DEFAULT_CHANNELS, &error ) ) == nullptr )
+				DEFAULT_CHANNELS, &error)) == nullptr)
 	{
 		printf( "Error: src_new() failed in audio_device.cpp!\n" );
 	}
@@ -179,9 +179,9 @@ void AudioDevice::renamePort( AudioPort * )
 
 
 
-fpp_t AudioDevice::resample( const sampleFrame * _src,
+fpp_t AudioDevice::resample(const sampleFrame* _src,
 						const fpp_t _frames,
-						sampleFrame * _dst,
+						sampleFrame* _dst,
 						const sample_rate_t _src_sr,
 						const sample_rate_t _dst_sr )
 {
@@ -206,7 +206,7 @@ fpp_t AudioDevice::resample( const sampleFrame * _src,
 
 
 
-int AudioDevice::convertToS16( const sampleFrame * _ab,
+int AudioDevice::convertToS16(const sampleFrame* _ab,
 								const fpp_t _frames,
 								int_sample_t * _output_buffer,
 								const bool _convert_endian )

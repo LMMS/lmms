@@ -73,12 +73,12 @@ Oscilloscope::~Oscilloscope()
 
 
 
-void Oscilloscope::updateAudioBuffer( const sampleFrame * buffer )
+void Oscilloscope::updateAudioBuffer(const sampleFrame* buffer)
 {
 	if( !Engine::getSong()->isExporting() )
 	{
 		const fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
-		memcpy( m_buffer, buffer, sizeof( sampleFrame ) * fpp );
+		memcpy(m_buffer, buffer, sizeof(sampleFrame) * fpp);
 	}
 }
 
@@ -95,7 +95,7 @@ void Oscilloscope::setActive( bool _active )
 					this, SLOT(update()));
 		connect( Engine::audioEngine(),
 			SIGNAL(nextAudioBuffer(const lmms::sampleFrame*)),
-			this, SLOT(updateAudioBuffer(const lmms::sampleFrame*)) );
+			this, SLOT(updateAudioBuffer(const lmms::sampleFrame*)));
 	}
 	else
 	{
@@ -103,8 +103,8 @@ void Oscilloscope::setActive( bool _active )
 					SIGNAL(periodicUpdate()),
 					this, SLOT(update()));
 		disconnect( Engine::audioEngine(),
-			SIGNAL( nextAudioBuffer( const lmms::sampleFrame* ) ),
-			this, SLOT( updateAudioBuffer( const lmms::sampleFrame* ) ) );
+			SIGNAL(nextAudioBuffer(const lmms::sampleFrame*)),
+			this, SLOT(updateAudioBuffer(const lmms::sampleFrame*)));
 		// we have to update (remove last waves),
 		// because timer doesn't do that anymore
 		update();

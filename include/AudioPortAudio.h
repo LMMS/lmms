@@ -151,7 +151,7 @@ private:
 
 	bool m_wasPAInitError;
 
-	sampleFrame * m_outBuf;
+	sampleFrame* m_outBuf;
 	int m_outBufPos;
 	int m_outBufSize;
 

@@ -100,7 +100,7 @@ bool sanitize( sampleFrame * src, int frames )
 	bool found = false;
 	for (int f = 0; f < frames; ++f)
 	{
-		auto & currentFrame = src[f];
+		auto& currentFrame = src[f];
 
 		if (currentFrame.containsInf() || currentFrame.containsNaN())
 		{

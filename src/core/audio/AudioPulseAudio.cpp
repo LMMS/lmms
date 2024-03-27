@@ -315,7 +315,7 @@ AudioPulseAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	form->addRow(tr("Device"), m_device);
 
 	auto m = new gui::LcdSpinBoxModel();
-	m->setRange( DEFAULT_CHANNELS, DEFAULT_CHANNELS );
+	m->setRange(DEFAULT_CHANNELS, DEFAULT_CHANNELS);
 	m->setStep( 2 );
 	m->setValue( ConfigManager::inst()->value( "audiopa",
 										 "channels" ).toInt() );

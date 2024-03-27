@@ -117,8 +117,8 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	int sampleLength;
 	for (fpp_t f = 0; f < frames; ++f)
 	{
-		auto & currentFrame = buf[f];
-		auto const dryS = currentFrame;
+		auto& currentFrame = buf[f];
+		const auto dryS = currentFrame;
 
 		// Prepare delay for current sample
 		m_delay->setFeedback( *feedbackPtr );

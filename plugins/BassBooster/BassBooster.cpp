@@ -93,7 +93,7 @@ bool BassBoosterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 
 	for (fpp_t f = 0; f < frames; ++f)
 	{
-		auto & currentFrame = buf[f];
+		auto& currentFrame = buf[f];
 
 		// Process copy of current sample frame
 		m_bbFX.setGain(gainBuffer ? gainBuffer->value(f) : const_gain);

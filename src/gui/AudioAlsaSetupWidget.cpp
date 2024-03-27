@@ -71,7 +71,7 @@ AudioAlsaSetupWidget::AudioAlsaSetupWidget( QWidget * _parent ) :
 	form->addRow(tr("Device"), m_deviceComboBox);
 
 	auto m = new LcdSpinBoxModel(/* this */);
-	m->setRange( DEFAULT_CHANNELS, DEFAULT_CHANNELS );
+	m->setRange(DEFAULT_CHANNELS, DEFAULT_CHANNELS);
 	m->setStep( 2 );
 	m->setValue( ConfigManager::inst()->value( "audioalsa",
 							"channels" ).toInt() );

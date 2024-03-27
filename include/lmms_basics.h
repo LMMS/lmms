@@ -136,57 +136,57 @@ public:
 	{
 	}
 
-	sample_t * data()
+	sample_t* data()
 	{
 		return m_samples.data();
 	}
 
-	sample_t const * data() const
+	const sample_t* data() const
 	{
 		return m_samples.data();
 	}
 
-	sample_t & left()
+	sample_t& left()
 	{
 		return m_samples[0];
 	}
 
-	sample_t const & left() const
+	const sample_t& left() const
 	{
 		return m_samples[0];
 	}
 
-	void setLeft(sample_t const & value)
+	void setLeft(const sample_t& value)
 	{
 		m_samples[0] = value;
 	}
 
-	sample_t & right()
+	sample_t& right()
 	{
 		return m_samples[1];
 	}
 
-	sample_t const & right() const
+	const sample_t& right() const
 	{
 		return m_samples[1];
 	}
 
-	void setRight(sample_t const & value)
+	void setRight(const sample_t& value)
 	{
 		m_samples[1] = value;
 	}
 
-	sample_t & operator[](size_t index)
+	sample_t& operator[](size_t index)
 	{
 		return m_samples[index];
 	}
 
-	sample_t const & operator[](size_t index) const
+	const sample_t& operator[](size_t index) const
 	{
 		return m_samples[index];
 	}
 
-	sampleFrame & operator=(float v)
+	sampleFrame& operator=(float v)
 	{
 		left() = v;
 		right() = v;
@@ -194,12 +194,12 @@ public:
 		return *this;
 	}
 
-	sampleFrame operator+(sampleFrame const & other) const
+	sampleFrame operator+(const sampleFrame& other) const
 	{
 		return sampleFrame(left() + other.left(), right() + other.right());
 	}
 
-	void operator+=(sampleFrame const & other)
+	void operator+=(const sampleFrame& other)
 	{
 		auto & l = left();
 		auto & r = right();
@@ -219,18 +219,18 @@ public:
 		setRight(right() * value);
 	}
 
-	sampleFrame operator*(sampleFrame const & other) const
+	sampleFrame operator*(const sampleFrame& other) const
 	{
 		return sampleFrame(left() * other.left(), right() * other.right());
 	}
 
-	void operator*=(sampleFrame const & other)
+	void operator*=(const sampleFrame& other)
 	{
 		left() *= other.left();
 		right() *= other.right();
 	}
 
-	sample_t scalarProduct(sampleFrame const & other) const
+	sample_t scalarProduct(const sampleFrame& other) const
 	{
 		return left() * other.left() + right() * other.right();
 	}
@@ -240,7 +240,7 @@ public:
 		return sampleFrame{std::abs(this->left()), std::abs(this->right())};
 	}
 
-	void max(sampleFrame const & other)
+	void max(const sampleFrame& other)
 	{
 		if (other.left() > left())
 		{

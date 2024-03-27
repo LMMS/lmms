@@ -316,7 +316,7 @@ public:
 	}
 
 
-	sampleFrame getPeakValues(sampleFrame * ab, const f_cnt_t _frames) const;
+	sampleFrame getPeakValues(sampleFrame* ab, const f_cnt_t _frames) const;
 
 
 	bool criticalXRuns() const;
@@ -338,7 +338,7 @@ public:
 		return m_inputBufferFrames[ m_inputBufferRead ];
 	}
 
-	inline const sampleFrame * nextBuffer()
+	inline const sampleFrame* nextBuffer()
 	{
 		return hasFifoWriter() ? m_fifo->read() : renderNextBuffer();
 	}
@@ -364,7 +364,7 @@ public:
 signals:
 	void qualitySettingsChanged();
 	void sampleRateChanged();
-	void nextAudioBuffer( const lmms::sampleFrame * buffer );
+	void nextAudioBuffer(const lmms::sampleFrame* buffer);
 
 
 private:
@@ -385,7 +385,7 @@ private:
 
 		void run() override;
 
-		void write( sampleFrame * buffer );
+		void write(sampleFrame* buffer);
 	} ;
 
 
@@ -404,7 +404,7 @@ private:
 	void renderStageEffects();
 	void renderStageMix();
 
-	const sampleFrame * renderNextBuffer();
+	const sampleFrame* renderNextBuffer();
 
 	void swapBuffers();
 
@@ -424,8 +424,8 @@ private:
 	int m_inputBufferRead;
 	int m_inputBufferWrite;
 
-	sampleFrame * m_outputBufferRead;
-	sampleFrame * m_outputBufferWrite;
+	sampleFrame* m_outputBufferRead;
+	sampleFrame* m_outputBufferWrite;
 
 	// worker thread stuff
 	std::vector<AudioEngineWorkerThread *> m_workers;

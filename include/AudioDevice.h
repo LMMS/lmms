@@ -99,11 +99,11 @@ protected:
 	virtual void writeBuffer(const sampleFrame* /* _buf*/, const fpp_t /*_frames*/) {}
 
 	// called by according driver for fetching new sound-data
-	fpp_t getNextBuffer( sampleFrame * _ab );
+	fpp_t getNextBuffer(sampleFrame* _ab);
 
 	// convert a given audio-buffer to a buffer in signed 16-bit samples
 	// returns num of bytes in outbuf
-	int convertToS16( const sampleFrame * _ab,
+	int convertToS16(const sampleFrame* _ab,
 						const fpp_t _frames,
 						int_sample_t * _output_buffer,
 						const bool _convert_endian = false );
@@ -113,9 +113,9 @@ protected:
 							const fpp_t _frames );
 
 	// resample given buffer from samplerate _src_sr to samplerate _dst_sr
-	fpp_t resample( const sampleFrame * _src,
+	fpp_t resample(const sampleFrame* _src,
 					const fpp_t _frames,
-					sampleFrame * _dst,
+					sampleFrame* _dst,
 					const sample_rate_t _src_sr,
 					const sample_rate_t _dst_sr );
 
@@ -149,7 +149,7 @@ private:
 	SRC_DATA m_srcData;
 	SRC_STATE * m_srcState;
 
-	sampleFrame * m_buffer;
+	sampleFrame* m_buffer;
 
 };
 
