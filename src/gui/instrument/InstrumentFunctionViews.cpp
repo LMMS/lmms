@@ -57,7 +57,7 @@ InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( Instrume
 	mainLayout->setVerticalSpacing( 1 );
 
 	auto chordLabel = new QLabel(tr("Chord:"));
-	chordLabel->setFont( pointSize<8>( chordLabel->font() ) );
+	chordLabel->setFont(pointSize(chordLabel->font(), 8));
 
 	m_chordRangeKnob->setLabel( tr( "RANGE" ) );
 	m_chordRangeKnob->setHintText( tr( "Chord range:" ), " " + tr( "octave(s)" ) );
@@ -146,13 +146,13 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	m_arpGateKnob->setHintText( tr( "Arpeggio gate:" ), tr( "%" ) );
 
 	auto arpChordLabel = new QLabel(tr("Chord:"));
-	arpChordLabel->setFont( pointSize<8>( arpChordLabel->font() ) );
+	arpChordLabel->setFont(pointSize(arpChordLabel->font(), 8));
 
 	auto arpDirectionLabel = new QLabel(tr("Direction:"));
-	arpDirectionLabel->setFont( pointSize<8>( arpDirectionLabel->font() ) );
+	arpDirectionLabel->setFont(pointSize(arpDirectionLabel->font(), 8));
 
 	auto arpModeLabel = new QLabel(tr("Mode:"));
-	arpModeLabel->setFont( pointSize<8>( arpModeLabel->font() ) );
+	arpModeLabel->setFont(pointSize(arpModeLabel->font(), 8));
 
 	mainLayout->addWidget( arpChordLabel, 0, 0 );
 	mainLayout->addWidget( m_arpComboBox, 1, 0 );

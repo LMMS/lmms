@@ -37,7 +37,6 @@
 #include "LcdSpinBox.h"
 #include "MainWindow.h"
 #include "MidiJack.h"
-#include "gui_templates.h"
 
 namespace lmms
 {

@@ -29,6 +29,7 @@
 #include "MixerChannelView.h"
 #include "MixerView.h"
 #include "Song.h"
+#include "ConfigManager.h"
 
 #include "gui_templates.h"
 #include "lmms_math.h"
@@ -38,6 +39,8 @@
 #include <QMenu>
 #include <QPainter>
 #include <QFont>
+#include <QMessageBox>
+#include <QCheckBox>
 
 #include <cassert>
 
@@ -73,7 +76,7 @@ namespace lmms::gui
 
         m_renameLineEdit = new QLineEdit{mixerName, nullptr};
         m_renameLineEdit->setFixedWidth(65);
-        m_renameLineEdit->setFont(pointSizeF(font(), 7.5f));
+        m_renameLineEdit->setFont(pointSize(font(), 7.5f));
         m_renameLineEdit->setReadOnly(true);
         m_renameLineEdit->installEventFilter(this);
 
@@ -277,6 +280,7 @@ namespace lmms::gui
         m_muteButton->setModel(&mixerChannel->m_muteModel);
         m_soloButton->setModel(&mixerChannel->m_soloModel);
         m_effectRackView->setModel(&mixerChannel->m_fxChain);
+        m_channelNumberLcd->setValue(index);
         m_channelIndex = index;
     }
 
@@ -411,8 +415,44 @@ namespace lmms::gui
         update();
     }
 
+	bool MixerChannelView::confirmRemoval(int index)
+	{
+		// if config variable is set to false, there is no need for user confirmation
+		bool needConfirm = ConfigManager::inst()->value("ui", "mixerchanneldeletionwarning", "1").toInt();
+		if (!needConfirm) { return true; }
+
+		// is the channel is not in use, there is no need for user confirmation
+		if (!getGUI()->mixerView()->getMixer()->isChannelInUse(index)) { return true; }
+
+		QString messageRemoveTrack = tr("This Mixer Channel is being used.\n"
+										"Are you sure you want to remove this channel?\n\n"
+										"Warning: This operation can not be undone.");
+
+		QString messageTitleRemoveTrack = tr("Confirm removal");
+		QString askAgainText = tr("Don't ask again");
+		auto askAgainCheckBox = new QCheckBox(askAgainText, nullptr);
+		connect(askAgainCheckBox, &QCheckBox::stateChanged, [](int state) {
+			// Invert button state, if it's checked we *shouldn't* ask again
+			ConfigManager::inst()->setValue("ui", "mixerchanneldeletionwarning", state ? "0" : "1");
+		});
+
+		QMessageBox mb(this);
+		mb.setText(messageRemoveTrack);
+		mb.setWindowTitle(messageTitleRemoveTrack);
+		mb.setIcon(QMessageBox::Warning);
+		mb.addButton(QMessageBox::Cancel);
+		mb.addButton(QMessageBox::Ok);
+		mb.setCheckBox(askAgainCheckBox);
+		mb.setDefaultButton(QMessageBox::Cancel);
+
+		int answer = mb.exec();
+
+		return answer == QMessageBox::Ok;
+	}
+
     void MixerChannelView::removeChannel()
     {
+		if (!confirmRemoval(m_channelIndex)) { return; }
         auto mix = getGUI()->mixerView();
         mix->deleteChannel(m_channelIndex);
     }
