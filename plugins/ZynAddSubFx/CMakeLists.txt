@@ -29,7 +29,7 @@ if(NOT MSVC)
 endif()
 
 IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND NOT "${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS "6.0.0")
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-misleading-indentation")
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-misleading-indentation -Wno-format-truncation")
 ENDIF()
 
 IF(MINGW_PREFIX)
