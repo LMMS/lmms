@@ -2334,7 +2334,12 @@ void VectorGraphDataArray::setAutomatedAttrib(unsigned int locationIn, unsigned 
 		attribLocationIn = attribLocationIn > 3 ? 0 : attribLocationIn;
 		// set automated location correctly (effected_location = automatedEffectedLocation % 4)
 		m_dataArray[locationIn].m_automatedEffectedAttribLocations = attribLocationIn * 4 + getEffectedAttribLocation(locationIn);
+
 		getUpdatingFromPoint(locationIn);
+		// the line before this can get added
+		// in getUpdatingFromAutomation
+		// so the point before this is not updated here
+
 		dataChanged();
 	}
 }
@@ -2346,7 +2351,14 @@ void VectorGraphDataArray::setEffectedAttrib(unsigned int locationIn, unsigned i
 		attribLocationIn = attribLocationIn > 3 ? 0 : attribLocationIn;
 		// set effected location correctly
 		m_dataArray[locationIn].m_automatedEffectedAttribLocations = attribLocationIn + getAutomatedAttribLocation(locationIn);
+
 		getUpdatingFromPoint(locationIn);
+		// if the current point can effect line before it
+		// update the point before it
+		if (getEffectOnlyPoints(locationIn) == false && locationIn > 0)
+		{
+			getUpdatingFromPoint(locationIn - 1);
+		}
 		dataChanged();
 	}
 }
@@ -2368,10 +2380,22 @@ void VectorGraphDataArray::setEffectOnlyPoints(unsigned int locationIn, bool boo
 	{
 		if (m_dataArray[locationIn].m_effectOnlyPoints != boolIn)
 		{
+			// getEffectOnlyPoints does not return m_effecteOnlyPoints
+			bool dataChangedValue = getEffectOnlyPoints(locationIn);
 			m_dataArray[locationIn].m_effectOnlyPoints = boolIn;
 			// this change does effect the main output if this
-			// data array is an effector of an other so dataChanged() is called
-			getUpdatingFromPoint(locationIn);
+			// data array is an effector of an other so dataChanged() 
+			// and getUpdatingFromPoint is called
+			if (dataChangedValue != getEffectOnlyPoints(locationIn))
+			{
+				getUpdatingFromPoint(locationIn);
+				// if the current point can effect line before it
+				// update the point before it
+				if (getEffectOnlyPoints(locationIn) == false && locationIn > 0)
+				{
+					getUpdatingFromPoint(locationIn - 1);
+				}
+			}
 			dataChanged();
 		}
 	}
@@ -2434,6 +2458,12 @@ void VectorGraphDataArray::setEffect(unsigned int locationIn, unsigned int effec
 		}
 	}
 	getUpdatingFromPoint(locationIn);
+	// if the current point can effect line before it
+	// update the point before it
+	if (getEffectOnlyPoints(locationIn) == false && locationIn > 0)
+	{
+		getUpdatingFromPoint(locationIn - 1);
+	}
 	dataChanged();
 }
 bool VectorGraphDataArray::getIsAutomationValueChanged(unsigned int locationIn)

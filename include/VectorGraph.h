@@ -389,6 +389,7 @@ public:
 	unsigned int getEffectedAttribLocation(unsigned int locationIn);
 	// returns true when m_effectOnlyPoints is true or
 	// when getEffectedAttribLocation > 0 (y is uneffected)
+	// -> when the current point CAN effect lines before it
 	bool getEffectOnlyPoints(unsigned int locationIn);
 	// returns if the [effectNumberIn] effect is active based on effectNumberIn
 	bool getEffect(unsigned int locationIn, unsigned int effectNumberIn);
