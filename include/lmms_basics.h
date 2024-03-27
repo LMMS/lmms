@@ -120,7 +120,7 @@ constexpr char LADSPA_PATH_SEPERATOR =
 #endif
 
 
-class sampleFrame : public std::array<sample_t, DEFAULT_CHANNELS>
+class sampleFrame
 {
 public:
 	sampleFrame() : sampleFrame(0., 0.)
@@ -132,44 +132,58 @@ public:
 	}
 
 	sampleFrame(sample_t left, sample_t right) :
-		std::array<sample_t, DEFAULT_CHANNELS>(std::array<sample_t, DEFAULT_CHANNELS> { left, right })
+		m_samples({ left, right })
 	{
+	}
+
+	sample_t * data()
+	{
+		return m_samples.data();
+	}
+
+	sample_t const * data() const
+	{
+		return m_samples.data();
 	}
 
 	sample_t & left()
 	{
-		sampleFrame & thisFrame = *this;
-		return thisFrame[0];
+		return m_samples[0];
 	}
 
 	sample_t const & left() const
 	{
-		sampleFrame const & thisFrame = *this;
-		return thisFrame[0];
+		return m_samples[0];
 	}
 
 	void setLeft(sample_t const & value)
 	{
-		sampleFrame & thisFrame = *this;
-		thisFrame[0] = value;
+		m_samples[0] = value;
 	}
 
 	sample_t & right()
 	{
-		sampleFrame & thisFrame = *this;
-		return thisFrame[1];
+		return m_samples[1];
 	}
 
 	sample_t const & right() const
 	{
-		sampleFrame const & thisFrame = *this;
-		return thisFrame[1];
+		return m_samples[1];
 	}
 
 	void setRight(sample_t const & value)
 	{
-		sampleFrame & thisFrame = *this;
-		thisFrame[1] = value;
+		m_samples[1] = value;
+	}
+
+	sample_t & operator[](size_t index)
+	{
+		return m_samples[index];
+	}
+
+	sample_t const & operator[](size_t index) const
+	{
+		return m_samples[index];
 	}
 
 	sampleFrame & operator=(float v)
@@ -239,6 +253,11 @@ public:
 		}
 	}
 
+	sample_t average() const
+	{
+		return (left() + right()) / 2;
+	}
+
 	void clamp(sample_t low, sample_t high)
 	{
 		auto & l = left();
@@ -257,6 +276,9 @@ public:
 	{
 		return std::isnan(left()) || std::isnan(right());
 	}
+
+private:
+	std::array<sample_t, DEFAULT_CHANNELS> m_samples;
 };
 
 constexpr std::size_t LMMS_ALIGN_SIZE = 16;
