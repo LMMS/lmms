@@ -38,7 +38,7 @@ class LMMS_EXPORT ValueBuffer : public std::vector<float>
 {
 public:
 	ValueBuffer() = default;
-	ValueBuffer(int length);
+	ValueBuffer(unsigned int length);
 
 	void fill(float value);
 
@@ -47,7 +47,7 @@ public:
 	const float * values() const;
 	float * values();
 	
-	int length() const;
+	unsigned int length() const;
 
 	void interpolate(float start, float end);
 };
