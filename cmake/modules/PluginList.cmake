@@ -55,6 +55,7 @@ SET(LMMS_PLUGIN_LIST
 	FreeBoy
 	Patman
 	PeakControllerEffect
+	Phaser
 	GigPlayer
 	ReverbSC
 	Sf2Player
