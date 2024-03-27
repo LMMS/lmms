@@ -97,6 +97,8 @@ public:
 	// TODO: licensing email TODO
 
 	// TODO: check selectedLocation, selectedArray, isSelected, isLastSelectedArray usage
+	// TODO: finish gui, hint texts, context menu
+	// TODO: separate big functions
 
 	VectorGraphView(QWidget * parentIn,
 		int widthIn, int heightIn,
@@ -343,7 +345,8 @@ public:
 	{
 		m_dataArray.clear();
 		clearedEvent();
-		dataChanged(-1);
+		getUpdatingFromPoint(-1);
+		dataChanged();
 	}
 	inline size_t size()
 	{
@@ -444,9 +447,8 @@ public:
 
 
 // signals: // not qt
-	// m_dataArray
-	// if locationIn > 0 -> adds it to the
-	void dataChanged(int locationIn);
+	void dataChanged();
+	// runs when m_dataArray.size() gets to 0
 	void clearedEvent();
 	// color
 	void styleChanged();
@@ -586,10 +588,15 @@ private:
 	// effected by the effector's values changing
 	// ONLY WORKS IN SORTED ARRAYS
 	void getUpdatingFromEffector(std::shared_ptr<std::vector<unsigned int>> updatingValuesIn);
+	// if locationIn > 0 -> adds the location to m_needsUpdating
+	// else it will update the whole m_dataArray and m_bakedValues
+	// changes in the size of m_dataArray (addtition, deletion, ect.)
+	// needs to cause a full update
+	void getUpdatingFromPoint(int locationIn);
 	// adds the points that are changed because their
 	// automation is changed
-	void getUpdatingFromAuromation();
-	// recalculates m_needsUpdating so
+	void getUpdatingFromAutomation();
+	// recalculates and sorts m_needsUpdating so
 	// every point is in there only once
 	void getUpdatingOriginals();
 
@@ -641,6 +648,8 @@ private:
 	// if m_isDataChanged is true, then getValues adds all the points
 	// to m_needsUpdating before running
 	// getValues() clears m_needsUpdating after it has run
+	// every change is only applyed to the point's line (line started by the point)
+	// changes in y will cause multiple points to update
 
 	// if we want to update all
 	bool m_isDataChanged;
