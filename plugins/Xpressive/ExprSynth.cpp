@@ -322,14 +322,8 @@ struct RandomVectorSeedFunction : public exprtk::ifunction<float>
 
 	inline float operator()(const float& index,const float& seed) override
 	{
-		int irseed;
-		if (seed < 0 || std::isnan(seed) || std::isinf(seed))
-		{
-			irseed=0;
-		}
-		else
-			irseed=(int)seed;
-		return randv(index,irseed);
+		const int irseed = seed < 0 || std::isnan(seed) || std::isinf(seed) ? 0 : static_cast<int>(seed);
+		return randv(index, irseed);
 	}
 
 	static const int data_size=sizeof(random_data)/sizeof(int);

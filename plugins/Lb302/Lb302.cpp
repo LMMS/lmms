@@ -166,12 +166,10 @@ void Lb302FilterIIR2::recalc()
 
 void Lb302FilterIIR2::envRecalc()
 {
-	float k, w;
-
 	Lb302Filter::envRecalc();
 
-	w = vcf_e0 + vcf_c0;          // e0 is adjusted for Hz and doesn't need ENVINC
-	k = exp(-w/vcf_rescoeff);     // Does this mean c0 is inheritantly?
+	float w = vcf_e0 + vcf_c0;          // e0 is adjusted for Hz and doesn't need ENVINC
+	float k = exp(-w/vcf_rescoeff);     // Does this mean c0 is inheritantly?
 
 	vcf_a = 2.0*cos(2.0*w) * k;
 	vcf_b = -k*k;
@@ -219,18 +217,15 @@ void Lb302Filter3Pole::recalc()
 // TODO: Try using k instead of vcf_reso
 void Lb302Filter3Pole::envRecalc()
 {
-	float w,k;
-	float kfco;
-
 	Lb302Filter::envRecalc();
 
 	// e0 is adjusted for Hz and doesn't need ENVINC
-	w = vcf_e0 + vcf_c0;
-	k = (fs->cutoff > 0.975)?0.975:fs->cutoff;
+	float w = vcf_e0 + vcf_c0;
+	float k = (fs->cutoff > 0.975)?0.975:fs->cutoff;
     // sampleRateCutoff should not be changed to anything dynamic that is outside the
     // scope of LB302 (like e.g. the audio engine's sample rate) as this changes the filter's cutoff
     // behavior without any modification to its controls.
-	kfco = 50.f + (k)*((2300.f-1600.f*(fs->envmod))+(w) *
+	float kfco = 50.f + (k)*((2300.f-1600.f*(fs->envmod))+(w) *
 	                   (700.f+1500.f*(k)+(1500.f+(k)*(sampleRateCutoff/2.f-6000.f)) *
 	                   (fs->envmod)) );
 	//+iacc*(.3+.7*kfco*kenvmod)*kaccent*kaccurve*2000
@@ -461,8 +456,6 @@ inline float GET_INC(float freq) {
 int Lb302Synth::process(sampleFrame *outbuf, const int size)
 {
 	const float sampleRatio = 44100.f / Engine::audioEngine()->processingSampleRate();
-	float w;
-	float samp;
 
 	// Hold on to the current VCF, and use it throughout this period
 	Lb302Filter *filter = vcf.loadAcquire();
@@ -566,7 +559,7 @@ int Lb302Synth::process(sampleFrame *outbuf, const int size)
 					vco_k = -0.5 ;
 				}
 				else if (vco_k>0.5) {
-					w = 2.0*(vco_k-0.5)-1.0;
+					float w = 2.0 * (vco_k - 0.5) - 1.0;
 					vco_k = 0.5 - sqrtf(1.0-(w*w));
 				}
 				vco_k *= 2.0;  // MOOG wave gets filtered away
@@ -610,7 +603,7 @@ int Lb302Synth::process(sampleFrame *outbuf, const int size)
 #ifdef LB_FILTERED
 		//samp = vcf->process(vco_k)*2.0*vca_a;
 		//samp = vcf->process(vco_k)*2.0;
-		samp = filter->process(vco_k) * vca_a;
+		float samp = filter->process(vco_k) * vca_a;
 		//printf("%f %d\n", vco_c, sample_cnt);
 
 

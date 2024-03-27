@@ -75,12 +75,10 @@ std::unique_ptr<VibratingString::DelayLine> VibratingString::initDelayLine(int l
 	if (len > 0)
 	{
 		dl->data = std::make_unique<sample_t[]>(len);
-		float r;
-		float offset = 0.0f;
 		for (int i = 0; i < dl->length; ++i)
 		{
-			r = static_cast<float>(std::rand()) / RAND_MAX;
-			offset = (m_randomize / 2.0f - m_randomize) * r;
+			float r = static_cast<float>(std::rand()) / RAND_MAX;
+			float offset = (m_randomize / 2.0f - m_randomize) * r;
 			dl->data[i] = offset;
 		}
 	}

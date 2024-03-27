@@ -69,16 +69,16 @@ float mem_t=1.0f, mem_o=1.0f, mem_n=1.0f, mem_b=1.0f, mem_tune=1.0f, mem_time=1.
 
 int DrumSynth::LongestEnv()
 {
-  long e, eon, p;
-  float l=0.f;
+	float l = 0.f;
 
-  for(e=1; e<7; e++) //3
-  {
-    eon = e - 1; if(eon>2) eon=eon-1;
-    p = 0;
-    while (envpts[e][0][p + 1] >= 0.f) p++;
-    envData[e][MAX] = envpts[e][0][p] * timestretch;
-    if(chkOn[eon]==1) if(envData[e][MAX]>l) l=envData[e][MAX];
+	for (long e = 1; e < 7; e++) // 3
+	{
+		long eon = e - 1;
+		if (eon > 2) { eon = eon - 1; }
+		long p = 0;
+		while (envpts[e][0][p + 1] >= 0.f) { p++; }
+		envData[e][MAX] = envpts[e][0][p] * timestretch;
+		if (chkOn[eon] == 1 && envData[e][MAX] > l) { l = envData[e][MAX]; }
   }
   //l *= timestretch;
 
@@ -102,16 +102,15 @@ float DrumSynth::LoudestEnv()
 
 void DrumSynth::UpdateEnv(int e, long t)
 {
-  float endEnv, dT;
-                                                             //0.2's added
-  envData[e][NEXTT] = envpts[e][0][(long)(envData[e][PNT] + 1.f)] * timestretch; //get next point
-  if(envData[e][NEXTT] < 0) envData[e][NEXTT] = 442000 * timestretch; //if end point, hold
-  envData[e][ENV] = envpts[e][1][(long)(envData[e][PNT] + 0.f)] * 0.01f; //this level
-  endEnv = envpts[e][1][(long)(envData[e][PNT] + 1.f)] * 0.01f;          //next level
-  dT = envData[e][NEXTT] - (float)t;
-  if(dT < 1.0) dT = 1.0;
-  envData[e][dENV] = (endEnv - envData[e][ENV]) / dT;
-  envData[e][PNT] = envData[e][PNT] + 1.0f;
+	// 0.2's added
+	envData[e][NEXTT] = envpts[e][0][static_cast<long>(envData[e][PNT] + 1.f)] * timestretch; // get next point
+	if (envData[e][NEXTT] < 0) { envData[e][NEXTT] = 442000 * timestretch; } // if end point, hold
+	envData[e][ENV] = envpts[e][1][static_cast<long>(envData[e][PNT] + 0.f)] * 0.01f; // this level
+	float endEnv = envpts[e][1][static_cast<long>(envData[e][PNT] + 1.f)] * 0.01f; // next level
+	float dT = envData[e][NEXTT] - static_cast<float>(t);
+	if (dT < 1.0) { dT = 1.0; }
+	envData[e][dENV] = (endEnv - envData[e][ENV]) / dT;
+	envData[e][PNT] = envData[e][PNT] + 1.0f;
 }
 
 
@@ -149,34 +148,41 @@ void DrumSynth::GetEnv(int env, const char *sec, const char *key, QString ini)
 
 float DrumSynth::waveform(float ph, int form)
 {
-  float w;
+	float w;
 
-  switch (form)
-  {
-     case 0: w = (float)sin(fmod(ph,TwoPi));                            break; //sine
-     case 1: w = (float)fabs(2.0f*(float)sin(fmod(0.5f*ph,TwoPi)))-1.f; break; //sine^2
-     case 2: while(ph<TwoPi) ph+=TwoPi;
-             w = 0.6366197f * (float)fmod(ph,TwoPi) - 1.f;                     //tri
-             if(w>1.f) w=2.f-w;
-             break;
-     case 3: w = ph - TwoPi * (float)(int)(ph / TwoPi);                        //saw
-             w = (0.3183098f * w) - 1.f;                                break;
-    default: w = (sin(fmod(ph,TwoPi))>0.0)? 1.f: -1.f;                  break; //square
-  }
+	switch (form)
+	{
+	case 0:
+		w = static_cast<float>(sin(fmod(ph, TwoPi)));
+		break; // sine
+	case 1:
+		w = static_cast<float>(fabs(2.0f * static_cast<float>(sin(fmod(0.5f * ph, TwoPi))) - 1.f));
+		break; // sine^2
+	case 2:
+		while (ph < TwoPi) { ph += TwoPi; }
+		w = 0.6366197f * static_cast<float>(fmod(ph, TwoPi) - 1.f); // tri
+		if (w > 1.f) { w = 2.f - w; }
+		break;
+	case 3:
+		w = ph - TwoPi * static_cast<float>(static_cast<int>(ph / TwoPi)); // saw
+		w = (0.3183098f * w) - 1.f;
+		break;
+	default:
+		w = (sin(fmod(ph, TwoPi)) > 0.0) ? 1.f : -1.f;
+		break; // square
+	}
 
-  return w;
+	return w;
 }
 
 
 int DrumSynth::GetPrivateProfileString(const char *sec, const char *key, const char *def, char *buffer, int size, QString file)
 {
-    stringstream is;
-    bool inSection = false;
-    char *line;
-    char *k, *b;
-    int len = 0;
+	stringstream is;
+	bool inSection = false;
+	int len = 0;
 
-    line = (char*)malloc(200);
+	char* line = static_cast<char*>(malloc(200));
 
     // Use QFile to handle unicode file name on Windows
     // Previously we used ifstream directly
@@ -201,8 +207,8 @@ int DrumSynth::GetPrivateProfileString(const char *sec, const char *key, const c
             if (line[0] == '[')
                 break;
 
-            k = strtok(line, " \t=");
-            b = strtok(nullptr, "\n\r\0");
+            char* k = strtok(line, " \t=");
+            char* b = strtok(nullptr, "\n\r\0");
 
             if (k != 0 && strcasecmp(k, key)==0) {
                 if (b==0) {

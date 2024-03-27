@@ -90,10 +90,6 @@ bool StereoEnhancerEffect::processAudioBuffer( sampleFrame * _buf,
 	// audio with this effect
 	double out_sum = 0.0;
 
-	float width;
-	int frameIndex = 0;
-
-
 	if( !isEnabled() || !isRunning() )
 	{
 		return( false );
@@ -110,10 +106,10 @@ bool StereoEnhancerEffect::processAudioBuffer( sampleFrame * _buf,
 		m_delayBuffer[m_currFrame][1] = _buf[f][1];
 
 		// Get the width knob value from the Stereo Enhancer effect
-		width = m_seFX.wideCoeff();
+		float width = m_seFX.wideCoeff();
 
 		// Calculate the correct sample frame for processing
-		frameIndex = m_currFrame - width;
+		int frameIndex = m_currFrame - width;
 
 		if( frameIndex < 0 )
 		{
@@ -149,8 +145,7 @@ bool StereoEnhancerEffect::processAudioBuffer( sampleFrame * _buf,
 
 void StereoEnhancerEffect::clearMyBuffer()
 {
-	int i;
-	for (i = 0; i < DEFAULT_BUFFER_SIZE; i++)
+	for (int i = 0; i < DEFAULT_BUFFER_SIZE; i++)
 	{
 		m_delayBuffer[i][0] = 0.0f;
 		m_delayBuffer[i][1] = 0.0f;

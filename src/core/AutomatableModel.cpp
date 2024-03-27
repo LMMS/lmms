@@ -613,10 +613,9 @@ ValueBuffer * AutomatableModel::valueBuffer()
 
 	float val = m_value; // make sure our m_value doesn't change midway
 
-	ValueBuffer * vb;
 	if (m_controllerConnection && m_useControllerValue && m_controllerConnection->getController()->isSampleExact())
 	{
-		vb = m_controllerConnection->valueBuffer();
+		auto vb = m_controllerConnection->valueBuffer();
 		if( vb )
 		{
 			float * values = vb->values();
@@ -656,7 +655,7 @@ ValueBuffer * AutomatableModel::valueBuffer()
 		if (lm && lm->controllerConnection() && lm->useControllerValue() &&
 				lm->controllerConnection()->getController()->isSampleExact())
 		{
-			vb = lm->valueBuffer();
+			auto vb = lm->valueBuffer();
 			float * values = vb->values();
 			float * nvalues = m_valueBuffer.values();
 			for (int i = 0; i < vb->length(); i++)

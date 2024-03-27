@@ -299,9 +299,8 @@ void ControllerConnectionDialog::selectController()
 	{
 		if( m_midiControllerSpinBox->model()->value() > 0 )
 		{
-			MidiController * mc;
-			mc = m_midiController->copyToMidiController( Engine::getSong() );
-	
+			auto mc = m_midiController->copyToMidiController(Engine::getSong());
+
 			/*
 			if( m_targetModel->getTrack() && 
 					!m_targetModel->getTrack()->displayName().isEmpty() )

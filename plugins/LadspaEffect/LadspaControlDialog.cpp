@@ -88,17 +88,9 @@ void LadspaControlDialog::updateEffectView( LadspaControls * _ctl )
 		int col = 0;
 		BufferDataType last_port = BufferDataType::None;
 
-		QGroupBox * grouper;
-		if( _ctl->m_processors > 1 )
-		{
-			grouper = new QGroupBox( tr( "Channel " ) +
-						QString::number( proc + 1 ),
-								this );
-		}
-		else
-		{
-			grouper = new QGroupBox( this );
-		}
+		auto grouper = _ctl->m_processors > 1
+			? new QGroupBox(tr("Channel ") + QString::number(proc + 1), this)
+			: new QGroupBox(this);
 
 		auto gl = new QGridLayout(grouper);
 		grouper->setLayout( gl );

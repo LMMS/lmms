@@ -774,17 +774,9 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 
 void SongEditor::updatePosition( const TimePos & t )
 {
-	int widgetWidth, trackOpWidth;
-	if( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
-	{
-		widgetWidth = DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT;
-		trackOpWidth = TRACK_OP_WIDTH_COMPACT;
-	}
-	else
-	{
-		widgetWidth = DEFAULT_SETTINGS_WIDGET_WIDTH;
-		trackOpWidth = TRACK_OP_WIDTH;
-	}
+	const bool compactTrackButtons = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt();
+	const auto widgetWidth = compactTrackButtons ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT : DEFAULT_SETTINGS_WIDGET_WIDTH;
+	const auto trackOpWidth = compactTrackButtons ? TRACK_OP_WIDTH_COMPACT : TRACK_OP_WIDTH;
 
 	if( ( m_song->isPlaying() && m_song->m_playMode == Song::PlayMode::Song
 		  && m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Enabled) ||

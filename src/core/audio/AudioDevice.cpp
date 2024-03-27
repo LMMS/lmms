@@ -195,8 +195,7 @@ fpp_t AudioDevice::resample( const surroundSampleFrame * _src,
 	m_srcData.data_out = _dst[0].data ();
 	m_srcData.src_ratio = (double) _dst_sr / _src_sr;
 	m_srcData.end_of_input = 0;
-	int error;
-	if( ( error = src_process( m_srcState, &m_srcData ) ) )
+	if (int error = src_process(m_srcState, &m_srcData))
 	{
 		printf( "AudioDevice::resample(): error while resampling: %s\n",
 							src_strerror( error ) );
@@ -213,12 +212,11 @@ int AudioDevice::convertToS16( const surroundSampleFrame * _ab,
 {
 	if( _convert_endian )
 	{
-		int_sample_t temp;
 		for( fpp_t frame = 0; frame < _frames; ++frame )
 		{
 			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 			{
-				temp = static_cast<int_sample_t>(AudioEngine::clip(_ab[frame][chnl]) * OUTPUT_SAMPLE_MULTIPLIER);
+				auto temp = static_cast<int_sample_t>(AudioEngine::clip(_ab[frame][chnl]) * OUTPUT_SAMPLE_MULTIPLIER);
 
 				( _output_buffer + frame * channels() )[chnl] =
 						( temp & 0x00ff ) << 8 |
