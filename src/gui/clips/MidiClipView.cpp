@@ -456,20 +456,16 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	// Beat clip paint event (on BB Editor)
 	if (beatClip && displayPattern)
 	{
-		QPixmap stepon0;
-		QPixmap stepon200;
-		QPixmap stepoff;
-		QPixmap stepoffl;
 		const int steps = std::max(1, m_clip->m_steps);
 		const int w = width() - 2 * BORDER_WIDTH;
 
 		// scale step graphics to fit the beat clip length
 		int const stepWidth = w / steps;
-		int const stepHeight = rect().height();
-		stepon0 = embed::getIconPixmap("step_btn_on_0", stepWidth, stepHeight);
-		stepon200 = embed::getIconPixmap("step_btn_on_200", stepWidth, stepHeight);
-		stepoff = embed::getIconPixmap("step_btn_off", stepWidth, stepHeight);
-		stepoffl = embed::getIconPixmap("step_btn_off_light", stepWidth, stepHeight);
+		int const stepHeight = std::max(24, rect().height() - 2 * BeatStepButtonOffset);
+		QPixmap const stepon0 = embed::getIconPixmap("step_btn_on_0", stepWidth, stepHeight);
+		QPixmap const stepon200 = embed::getIconPixmap("step_btn_on_200", stepWidth, stepHeight);
+		QPixmap const stepoff = embed::getIconPixmap("step_btn_off", stepWidth, stepHeight);
+		QPixmap const stepoffl = embed::getIconPixmap("step_btn_off_light", stepWidth, stepHeight);
 
 		for (int it = 0; it < steps; it++)	// go through all the steps in the beat clip
 		{
