@@ -6,7 +6,7 @@ namespace lmms
 {
 
 
-ValueBuffer::ValueBuffer(unsigned int length)
+ValueBuffer::ValueBuffer(size_t length)
 	: std::vector<float>(length)
 {}
 
@@ -30,9 +30,9 @@ float *ValueBuffer::values()
 	return data();
 }
  
-unsigned int ValueBuffer::length() const
+size_t ValueBuffer::length() const
 {
-	return size();
+	return this->size();
 }
 
 void ValueBuffer::interpolate(float start, float end_)
