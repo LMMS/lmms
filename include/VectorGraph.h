@@ -137,6 +137,9 @@ protected:
 protected slots:
 	void updateGraph();
 private:
+	void paintGraph(QPainter* pIn, unsigned int locationIn);
+	void paintEditing(QPainter* pIn);
+
 	void modelChanged() override;
 
 	std::pair<float, float> mapMousePos(int xIn, int yIn);
@@ -613,6 +616,9 @@ private:
 	// recalculates and sorts m_needsUpdating so
 	// every point is in there only once
 	void getUpdatingOriginals();
+	void getValuesLocations(VectorGraphDataArray* effectorIn, std::vector<std::pair<unsigned int, unsigned int>>* effectorDataOut);
+	void getValuesUpdateLines(VectorGraphDataArray* effectorIn, std::vector<float>* effectorOutputIn,
+		std::vector<float>* outputXLocationsIn, std::vector<std::pair<unsigned int, unsigned int>>* effectorDataIn, unsigned int iIn, float stepSizeIn);
 
 	// checks m_isFixedEndPoints, does not call dataChanged()
 	void formatDataArrayEndPoints();
