@@ -425,12 +425,8 @@ void Lv2Proc::handleMidiInputEvent(const MidiEvent &event, const TimePos &time, 
 
 AutomatableModel *Lv2Proc::modelAtPort(const QString &uri)
 {
-	// unused currently
-	AutomatableModel *mod;
-	auto itr = m_connectedModels.find(uri.toUtf8().data());
-	if (itr != m_connectedModels.end()) { mod = itr->second; }
-	else { mod = nullptr; }
-	return mod;
+	const auto itr = m_connectedModels.find(uri.toUtf8().data());
+	return itr != m_connectedModels.end() ? itr->second : nullptr;
 }
 
 
