@@ -57,6 +57,7 @@ VectorGraphView::VectorGraphView(QWidget * parentIn,
 
 	m_pointSize = pointSizeIn;
 	m_isSimplified = false;
+	m_useGetLastValues = false;
 
 	m_selectedLocation = 0;
 	m_selectedArray = 0;
@@ -99,12 +100,7 @@ VectorGraphView::VectorGraphView(QWidget * parentIn,
 
 	setCursor(Qt::CrossCursor);
 
-	auto gModel = model();
-
-	QObject::connect(gModel, SIGNAL(dataChanged()),
-			this, SLOT(updateGraph()));
-	QObject::connect(gModel, SIGNAL(lengthChanged()),
-			this, SLOT(updateGraph()));
+	modelChanged();
 }
 VectorGraphView::~VectorGraphView()
 {
@@ -179,6 +175,10 @@ void VectorGraphView::setSelectedData(std::pair<float, float> dataIn)
 		m_selectedLocation = model()->getDataArray(m_selectedArray)->setX(m_selectedLocation, dataIn.first);
 		qDebug("set position done");
 	}
+}
+void VectorGraphView::useGetLastValues()
+{
+	m_useGetLastValues = true;
 }
 
 void VectorGraphView::mousePressEvent(QMouseEvent* me)
@@ -573,7 +573,17 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 			if (m_isSimplified == false)
 			{
 				posA = mapDataPos(dataArray->getX(0), dataArray->getY(0), dataArray->getNonNegative());
-				std::vector<float> dataArrayValues = dataArray->getValues(width());
+
+				std::vector<float> dataArrayValues;
+				if (m_useGetLastValues == true)
+				{
+					dataArrayValues = dataArray->getLastValues();
+				}
+				else
+				{
+					dataArrayValues = dataArray->getValues(width());
+				}
+
 				qDebug("paint dataArrayValues size: %ld", dataArrayValues.size());
 				for (unsigned int j = 0; j < dataArrayValues.size(); j++)
 				{
@@ -585,7 +595,7 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 		//qDebug("paint positions: x: %d, y: %d", posB.first, posB.second);
 					// x1, y1, x2, y2
 		//qDebug("paint positions: x: %d, y: %d, x2: %d, y2: %d", posA.first, posA.second, posB.first, posB.second);
-					if (j > 0)
+					if (j > 0 && posA.first != posB.first)
 					{
 						p.drawLine(posA.first, m_graphHeight - posA.second, posB.first, m_graphHeight - posB.second);
 					}
@@ -685,7 +695,10 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 			}
 		}
 	}
+
+	m_useGetLastValues = false;
 	qDebug("paint event end");
+	emit drawn();
 }
 
 void VectorGraphView::modelChanged()
@@ -2181,6 +2194,10 @@ std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn, bool* i
 	m_isDataChanged = false;
 	effectorUpdatingValues->clear();
 	qDebug("getValuesB9");
+	return m_bakedValues;
+}
+std::vector<float> VectorGraphDataArray::getLastValues()
+{
 	return m_bakedValues;
 }
 
