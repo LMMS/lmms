@@ -117,7 +117,7 @@ AudioEngine::AudioEngine(bool renderOnly) :
 		{
 			ConfigManager::inst()->setValue("audioengine",
 						"framesperaudiobuffer",
-						QString::number DEFAULT_BUFFER_SIZE));
+						QString::number(DEFAULT_BUFFER_SIZE));
 
 			m_framesPerPeriod = DEFAULT_BUFFER_SIZE;
 		}
