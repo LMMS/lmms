@@ -32,7 +32,6 @@
 #include "Engine.h"
 #include "debug.h"
 #include "ConfigManager.h"
-#include "gui_templates.h"
 #include "ComboBox.h"
 #include "AudioEngine.h"
 
