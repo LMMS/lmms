@@ -144,8 +144,6 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 			workingBuffer[i + offset][1] *= fadeValue;
 		}
 
-		instrumentTrack()->processAudioBuffer(workingBuffer, frames + offset, handle);
-
 		emit isPlaying(noteDone, sliceStart, sliceEnd);
 	}
 	else { emit isPlaying(-1, 0, 0); }
