@@ -482,6 +482,8 @@ private:
 			m_effectPower = false;
 			m_effectLog = false;
 			m_effectSine = false;
+			m_effectClampLower = false;
+			m_effectClampUpper = false;
 
 			m_bufferedAutomationValue = 0.0f;
 			m_automationModel = nullptr;
@@ -504,6 +506,8 @@ private:
 			m_effectPower = false;
 			m_effectLog = false;
 			m_effectSine = false;
+			m_effectClampLower = false;
+			m_effectClampUpper = false;
 
 			m_bufferedAutomationValue = 0.0f;
 			m_automationModel = nullptr;
@@ -552,6 +556,8 @@ private:
 		bool m_effectPower;
 		bool m_effectLog;
 		bool m_effectSine;
+		bool m_effectClampLower;
+		bool m_effectClampUpper;
 
 		// stores m_automationModel->value(), used in updating
 		float m_bufferedAutomationValue;
