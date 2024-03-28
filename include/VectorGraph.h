@@ -123,6 +123,7 @@ public:
 	int getLastSelectedArray();
 	void setSelectedData(std::pair<float, float> dataIn);
 	
+	void useGetLastValues();
 signals:
 	inline void drawn();
 protected:
@@ -188,6 +189,9 @@ private:
 	unsigned int m_pointSize;
 	// draw simplified lines
 	bool m_isSimplified;
+	// for 1 draw, it will use the VectorGraphDataArray
+	// m_bakedValues without calling GetValues()
+	bool m_useGetLastValues;
 
 	// if m_isLastSelectedArray == true then
 	// m_selectedArray can be used
@@ -410,9 +414,12 @@ public:
 	// get changed locations
 	// std::vector<unsigned int> getUpdatingValues();
 
+	// returns the latest updated graph values
+	// countIn is the retuned vector's size
 	std::vector<float> getValues(unsigned int countIn);
 	std::vector<float> getValues(unsigned int countIn, bool* isChangedOut, std::shared_ptr<std::vector<unsigned int>> updatingValuesOut);
-	//float getValueAtPosition(float xIn); // TODO
+	// returns m_bakedValues without updating
+	std::vector<float> getLastValues();
 
 
 	// set: -------------------
