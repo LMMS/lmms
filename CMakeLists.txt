@@ -209,7 +209,6 @@ IF(LMMS_BUILD_LINUX AND WANT_VST)
 ENDIF()
 
 # Resolve Qt5::qmake to full path for use in packaging scripts
-MESSAGE(STATUS "QT DIR ${QTDIR}")
 IF(WANT_QT6)
 	FIND_PROGRAM(QT_QMAKE_EXECUTABLE NAME qmake.exe
 		PATHS "${CMAKE_PREFIX_PATH}/bin" /opt/Qt5) # TODO: add more paths here
