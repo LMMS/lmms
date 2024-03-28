@@ -34,9 +34,10 @@
 #include <clap/ext/audio-ports.h>
 
 #include "ClapExtension.h"
-#include "PluginPortConfig.h"
-#include "PluginIssue.h"
 #include "lmms_basics.h"
+#include "lmms_export.h"
+#include "PluginIssue.h"
+#include "PluginPortConfig.h"
 
 namespace lmms
 {
@@ -101,7 +102,7 @@ private:
 	float** m_data = nullptr;
 };
 
-class ClapAudioPorts final
+class LMMS_EXPORT ClapAudioPorts final
 	: public ClapExtension<clap_host_audio_ports, clap_plugin_audio_ports>
 	, public PluginPortConfig
 {
@@ -120,7 +121,7 @@ private:
 	auto hostExtImpl() const -> const clap_host_audio_ports* override { return nullptr; } // not impl for host yet
 	auto checkSupported(const clap_plugin_audio_ports& ext) -> bool override;
 
-	std::vector<PluginIssue> m_issues;
+	std::vector<PluginIssue> m_issues; // TODO: Remove?
 
 	/**
 	 * Process-related
