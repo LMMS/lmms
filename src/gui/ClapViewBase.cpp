@@ -45,6 +45,7 @@
 #include "lmms_math.h"
 #include "MainWindow.h"
 #include "PixmapButton.h"
+#include "PluginPortConfigSelector.h"
 #include "PresetSelector.h"
 #include "SubWindow.h"
 
@@ -142,7 +143,7 @@ ClapViewBase::ClapViewBase(QWidget* pluginWidget, ClapInstance* instance)
 	if (ClapManager::debugging())
 	{
 		m_reloadPluginButton = new QPushButton{QObject::tr("Reload Plugin"), pluginWidget};
-		btnBox->addWidget(m_reloadPluginButton, 0);
+		btnBox->addWidget(m_reloadPluginButton);
 	}
 
 	if (instance->gui().supported())
@@ -152,22 +153,28 @@ ClapViewBase::ClapViewBase(QWidget* pluginWidget, ClapInstance* instance)
 		m_toggleUIButton->setChecked(false);
 		m_toggleUIButton->setIcon(embed::getIconPixmap("zoom"));
 		m_toggleUIButton->setFont(pointSize<8>(m_toggleUIButton->font()));
-		btnBox->addWidget(m_toggleUIButton, 0);
+		btnBox->addWidget(m_toggleUIButton);
 	}
 
 	if (instance->presetLoader().supported())
 	{
 		auto presetBox = std::make_unique<QHBoxLayout>();
 		m_presetSelector = new PresetSelector{&instance->presetLoader(), pluginWidget};
-		presetBox->addWidget(m_presetSelector, 0);
+		presetBox->addWidget(m_presetSelector);
 		grid->addLayout(presetBox.release(), static_cast<int>(Rows::PresetRow), 0, 1, 1);
 	}
 
 	btnBox->addStretch(1);
 
+	if (instance->audioPorts().hasMonoPort())
+	{
+		m_portConfigSelector = new PluginPortConfigSelector{&instance->audioPorts(), pluginWidget};
+		btnBox->addWidget(m_portConfigSelector);
+	}
+
 	pluginWidget->setAcceptDrops(true);
 
-	if (m_reloadPluginButton || m_toggleUIButton)
+	if (m_reloadPluginButton || m_toggleUIButton || m_portConfigSelector)
 	{
 		grid->addLayout(btnBox.release(), static_cast<int>(Rows::ButtonRow), 0, 1, s_colNum);
 	}

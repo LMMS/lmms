@@ -39,6 +39,28 @@ PluginPortConfig::PluginPortConfig(PortType in, PortType out, QObject* parent)
 {
 }
 
+auto PluginPortConfig::hasMonoPort() const -> bool
+{
+	return m_inPort == PortType::Mono || m_outPort == PortType::Mono;
+}
+
+auto PluginPortConfig::monoPluginType() const -> MonoPluginType
+{
+	if (m_inPort == PortType::Mono)
+	{
+		if (m_outPort == PortType::Mono)
+		{
+			return MonoPluginType::Both;
+		}
+		return MonoPluginType::Input;
+	}
+	else if (m_outPort == PortType::Mono)
+	{
+		return MonoPluginType::Output;
+	}
+	return MonoPluginType::None;
+}
+
 void PluginPortConfig::setPortType(PortType in, PortType out)
 {
 	if (in == PortType::None && out == PortType::None) { return; }
@@ -57,6 +79,8 @@ void PluginPortConfig::setPortType(PortType in, PortType out)
 		m_config.setRange(0, 2);
 		m_config.setValue(static_cast<int>(Config::MonoMix));
 	}
+
+	emit portsChanged();
 }
 
 auto PluginPortConfig::setPortConfig(Config config) -> bool

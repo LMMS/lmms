@@ -56,12 +56,8 @@ namespace lmms
 {
 
 /**
- * ClapInstance is a CLAP instrument/effect processor which
- * provides basic CLAP functionality plus multiple CLAP extensions.
- *
- * Every ClapInstance is owned by a ClapControlBase object.
- * For stereo plugins, there is a single stereo ClapInstance,
- * but for mono plugins, a linked ClapInstance pair is used.
+ * ClapInstance is a CLAP instrument/effect processor which provides
+ * basic CLAP functionality plus support for multiple CLAP extensions.
  */
 class LMMS_EXPORT ClapInstance final
 	: public QObject

@@ -42,14 +42,13 @@ namespace lmms
 {
 
 class ClapInstance;
-class ClapControlBase;
-class PluginPresets;
 
 namespace gui
 {
 
 class ControlLayout;
 class PixmapButton;
+class PluginPortConfigSelector;
 class PresetSelector;
 
 class ClapViewParameters : public QWidget
@@ -94,6 +93,7 @@ private:
 	};
 
 	PresetSelector* m_presetSelector = nullptr;
+	PluginPortConfigSelector* m_portConfigSelector = nullptr;
 	ClapViewParameters* m_parametersView = nullptr;
 
 	static constexpr int s_colNum = 6; //!< controls per row

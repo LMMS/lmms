@@ -59,6 +59,14 @@ public:
 		Stereo
 	};
 
+	enum class MonoPluginType
+	{
+		None,
+		Input,
+		Output,
+		Both
+	};
+
 	using QObject::QObject;
 	PluginPortConfig(PortType in, PortType out, QObject* parent = nullptr);
 
@@ -99,6 +107,10 @@ public:
 		}
 	}
 
+	auto hasMonoPort() const -> bool;
+	auto monoPluginType() const -> MonoPluginType;
+	auto model() -> IntModel* { return &m_config; }
+
 	/**
 	 * Setters
 	 */
@@ -113,7 +125,7 @@ public:
 	auto nodeName() const -> QString override { return "portconfig"; }
 
 signals:
-	void configurationChanged();
+	void portsChanged();
 
 private:
 	PortType m_inPort = PortType::None;

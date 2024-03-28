@@ -22,7 +22,7 @@
  *
  */
 
-// TODO: Use this for VST instruments/effects
+// TODO: Use this for LV2 and VST presets
 
 #include "PresetSelector.h"
 

@@ -108,7 +108,7 @@ void ClapFile::unload() noexcept
 {
 	// NOTE: Need to destroy any plugin instances from this .clap file before
 	// calling this method. This should be okay as long as the ClapManager
-	// singleton is destroyed after any ClapControlBase objects.
+	// singleton is destroyed after any Instrument/Effect objects.
 	// TODO: Enforce this?
 
 	m_presetDatabase.reset();

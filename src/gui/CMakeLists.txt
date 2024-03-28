@@ -33,6 +33,7 @@ SET(LMMS_SRCS
 	gui/ModelView.cpp
 	gui/PeakControllerDialog.cpp
 	gui/PluginBrowser.cpp
+	gui/PluginPortConfigSelector.cpp
 	gui/PresetSelector.cpp
 	gui/ProjectNotes.cpp
 	gui/RowTableView.cpp

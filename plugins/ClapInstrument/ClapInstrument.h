@@ -45,7 +45,7 @@ class ClapInsView;
 
 } // namespace gui
 
-class ClapInstrument : public Instrument //, public ClapControlBase
+class ClapInstrument : public Instrument
 {
 	Q_OBJECT
 
