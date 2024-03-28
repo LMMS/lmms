@@ -34,7 +34,7 @@
 #include <clap/ext/audio-ports.h>
 
 #include "ClapExtension.h"
-#include "MonoPluginConfiguration.h"
+#include "PluginPortConfig.h"
 #include "PluginIssue.h"
 #include "lmms_basics.h"
 
@@ -103,7 +103,7 @@ private:
 
 class ClapAudioPorts final
 	: public ClapExtension<clap_host_audio_ports, clap_plugin_audio_ports>
-	, public MonoPluginConfiguration
+	, public PluginPortConfig
 {
 public:
 	ClapAudioPorts(ClapInstance* parent);
@@ -146,7 +146,7 @@ private:
 		clap_audio_port_info info{};
 		std::uint32_t index = 0; //!< Index on plugin side, not m_audioPorts***
 		bool isInput = false;
-		AudioPortType type = AudioPortType::Unsupported;
+		PluginPortConfig::PortType type = PluginPortConfig::PortType::None; // None = unsupported
 		bool used = false; //!< In use by LMMS
 	};
 

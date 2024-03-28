@@ -183,7 +183,7 @@ void ClapInstance::handleMidiInputEvent(const MidiEvent& event, const TimePos& t
 
 auto ClapInstance::controlCount() const -> std::size_t
 {
-	return m_params.automatableCount(); // TODO: + 1 control if mono config != StereoInOut?
+	return m_params.automatableCount(); // TODO: + 1 control if port config != Stereo?
 }
 
 auto ClapInstance::hasNoteInput() const -> bool
@@ -194,6 +194,8 @@ auto ClapInstance::hasNoteInput() const -> bool
 void ClapInstance::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
 	elem.setAttribute("version", "0");
+
+	audioPorts().saveSettings(doc, elem);
 
 	// The CLAP standard strongly recommends using the state extension
 	//     instead of manually saving parameter values
@@ -211,6 +213,8 @@ void ClapInstance::saveSettings(QDomDocument& doc, QDomElement& elem)
 void ClapInstance::loadSettings(const QDomElement& elem)
 {
 	[[maybe_unused]] const auto version = elem.attribute("version", "0").toInt();
+
+	audioPorts().loadSettings(elem);
 
 	// The CLAP standard strongly recommends using the state extension
 	//     instead of manually saving parameter values
@@ -499,8 +503,7 @@ void ClapInstance::processKeyPressure(f_cnt_t offset, std::int8_t channel, std::
 			m_evIn.push(&ev.header);
 			break;
 		}
-		case CLAP_NOTE_DIALECT_MIDI: [[fallthrough]];
-		case CLAP_NOTE_DIALECT_MIDI_MPE:
+		case CLAP_NOTE_DIALECT_MIDI:
 		{
 			clap_event_midi ev;
 			ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;

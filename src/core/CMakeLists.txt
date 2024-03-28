@@ -46,7 +46,6 @@ set(LMMS_SRCS
 	core/MixHelpers.cpp
 	core/Model.cpp
 	core/ModelVisitor.cpp
-	core/MonoPluginConfiguration.cpp
 	core/Note.cpp
 	core/NotePlayHandle.cpp
 	core/Oscillator.cpp
@@ -60,6 +59,7 @@ set(LMMS_SRCS
 	core/Plugin.cpp
 	core/PluginFactory.cpp
 	core/PluginIssue.cpp
+	core/PluginPortConfig.cpp
 	core/PluginPresets.cpp
 	core/Preset.cpp
 	core/PresetDatabase.cpp

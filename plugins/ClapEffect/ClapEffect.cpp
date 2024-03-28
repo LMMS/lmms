@@ -87,17 +87,26 @@ bool ClapEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	instance->copyModelsToCore();
 	instance->audioPorts().copyBuffersToCore(m_tempOutputSamples.data(), frames);
 
-	// TODO: For LeftOnly or RightOnly configurations, one channel of m_tempOutputSamples will be undefined
-	// TODO: Need to save mono config state
+	sampleFrame* leftSamples = m_tempOutputSamples.data();
+	sampleFrame* rightSamples = m_tempOutputSamples.data();
+	switch (instance->audioPorts().portConfig<false>())
+	{
+		case PluginPortConfig::Config::LeftOnly:
+			rightSamples = buf; break;
+		case PluginPortConfig::Config::RightOnly:
+			leftSamples = buf; break;
+		default: break;
+	}
 
 	double outSum = 0.0;
 	bool corrupt = wetLevel() < 0.f; // #3261 - if wet < 0, bash wet := 0, dry := 1
 	const float dry = corrupt ? 1.f : dryLevel();
 	const float wet = corrupt ? 0.f : wetLevel();
+
 	for (fpp_t f = 0; f < frames; ++f)
 	{
-		buf[f][0] = dry * buf[f][0] + wet * m_tempOutputSamples[f][0];
-		buf[f][1] = dry * buf[f][1] + wet * m_tempOutputSamples[f][1];
+		buf[f][0] = dry * buf[f][0] + wet * leftSamples[f][0];
+		buf[f][1] = dry * buf[f][1] + wet * rightSamples[f][1];
 		auto left = static_cast<double>(buf[f][0]);
 		auto right = static_cast<double>(buf[f][1]);
 		outSum += left * left + right * right;
