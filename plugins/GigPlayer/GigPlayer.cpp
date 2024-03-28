@@ -443,7 +443,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 				samples = frames / freq_factor + Sample::s_interpolationMargins[m_interpolation];
 			}
 
-			if (samples > 512) { printf("ACK\n"); throw std::runtime_error("buffer size not large enough"); }
+			if (samples > 1024) { printf("ACK\n"); throw std::runtime_error("buffer size not large enough"); }
 			// Load this note's data
 			loadSample(sample, sampleData, samples);
 
