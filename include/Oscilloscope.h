@@ -67,7 +67,7 @@ protected:
 
 
 protected slots:
-	void updateAudioBuffer( const lmms::surroundSampleFrame * buffer );
+	void updateAudioBuffer(const lmms::sampleFrame* buffer);
 
 private:
 	bool clips(float level) const;

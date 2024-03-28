@@ -80,6 +80,17 @@ namespace lmms::DspEffectLibrary
 		{
 		}
 
+		void setGain(float gain)
+		{
+			leftFX().setGain(gain);
+			rightFX().setGain(gain);
+		}
+
+		void nextSample(sampleFrame & in)
+		{
+			nextSample(in.left(), in.right());
+		}
+
 		void nextSample( sample_t& inLeft, sample_t& inRight )
 		{
 			inLeft = m_leftFX.nextSample( inLeft );

@@ -33,6 +33,9 @@
 #include <cstdint>
 #include <array>
 
+#include <cmath>
+#include <algorithm>
+
 
 namespace lmms
 {
@@ -48,7 +51,7 @@ using int_sample_t = int16_t; // 16-bit-int-sample
 using sample_rate_t = uint32_t; // sample-rate
 using fpp_t = int16_t;			// frames per period (0-16384)
 using f_cnt_t = int32_t;		// standard frame-count
-using ch_cnt_t = uint8_t;		// channel-count (0-SURROUND_CHANNELS)
+using ch_cnt_t = uint8_t;		// channel-count (0-DEFAULT_CHANNELS)
 using bpm_t = uint16_t;			// tempo (MIN_BPM to MAX_BPM)
 using bitrate_t = uint16_t;		// bitrate in kbps
 using mix_ch_t = uint16_t;		// Mixer-channel (0 to MAX_CHANNEL)
@@ -109,14 +112,6 @@ inline bool typeInfo<float>::isEqual( float x, float y )
 
 constexpr ch_cnt_t DEFAULT_CHANNELS = 2;
 
-constexpr ch_cnt_t SURROUND_CHANNELS =
-#define LMMS_DISABLE_SURROUND
-#ifndef LMMS_DISABLE_SURROUND
-				4;
-#else
-				2;
-#endif
-
 constexpr char LADSPA_PATH_SEPERATOR =
 #ifdef LMMS_BUILD_WIN32
 ';';
@@ -125,9 +120,167 @@ constexpr char LADSPA_PATH_SEPERATOR =
 #endif
 
 
+class sampleFrame
+{
+public:
+	sampleFrame() : sampleFrame(0., 0.)
+	{
+	}
 
-using         sampleFrame = std::array<sample_t,  DEFAULT_CHANNELS>;
-using surroundSampleFrame = std::array<sample_t, SURROUND_CHANNELS>;
+	sampleFrame(sample_t value) : sampleFrame(value, value)
+	{
+	}
+
+	sampleFrame(sample_t left, sample_t right) :
+		m_samples({ left, right })
+	{
+	}
+
+	sample_t* data()
+	{
+		return m_samples.data();
+	}
+
+	const sample_t* data() const
+	{
+		return m_samples.data();
+	}
+
+	sample_t& left()
+	{
+		return m_samples[0];
+	}
+
+	const sample_t& left() const
+	{
+		return m_samples[0];
+	}
+
+	void setLeft(const sample_t& value)
+	{
+		m_samples[0] = value;
+	}
+
+	sample_t& right()
+	{
+		return m_samples[1];
+	}
+
+	const sample_t& right() const
+	{
+		return m_samples[1];
+	}
+
+	void setRight(const sample_t& value)
+	{
+		m_samples[1] = value;
+	}
+
+	sample_t& operator[](size_t index)
+	{
+		return m_samples[index];
+	}
+
+	const sample_t& operator[](size_t index) const
+	{
+		return m_samples[index];
+	}
+
+	sampleFrame& operator=(float v)
+	{
+		left() = v;
+		right() = v;
+
+		return *this;
+	}
+
+	sampleFrame operator+(const sampleFrame& other) const
+	{
+		return sampleFrame(left() + other.left(), right() + other.right());
+	}
+
+	void operator+=(const sampleFrame& other)
+	{
+		auto & l = left();
+		auto & r = right();
+
+		l += other.left();
+		r += other.right();
+	}
+
+	sampleFrame operator*(float value) const
+	{
+		return sampleFrame(left() * value, right() * value);
+	}
+
+	void operator*=(float value)
+	{
+		setLeft(left() * value);
+		setRight(right() * value);
+	}
+
+	sampleFrame operator*(const sampleFrame& other) const
+	{
+		return sampleFrame(left() * other.left(), right() * other.right());
+	}
+
+	void operator*=(const sampleFrame& other)
+	{
+		left() *= other.left();
+		right() *= other.right();
+	}
+
+	sample_t scalarProduct(const sampleFrame& other) const
+	{
+		return left() * other.left() + right() * other.right();
+	}
+
+	sampleFrame abs() const
+	{
+		return sampleFrame{std::abs(this->left()), std::abs(this->right())};
+	}
+
+	void max(const sampleFrame& other)
+	{
+		if (other.left() > left())
+		{
+			setLeft(other.left());
+		}
+
+		if (other.right() > right())
+		{
+			setRight(other.right());
+		}
+	}
+
+	sample_t average() const
+	{
+		return (left() + right()) / 2;
+	}
+
+	void clamp(sample_t low, sample_t high)
+	{
+		auto & l = left();
+		l = std::clamp(l, low, high);
+
+		auto & r = right();
+		r = std::clamp(r, low, high);
+	}
+
+	bool containsInf() const
+	{
+		return std::isinf(left()) || std::isinf(right());
+	}
+
+	bool containsNaN() const
+	{
+		return std::isnan(left()) || std::isnan(right());
+	}
+
+private:
+	std::array<sample_t, DEFAULT_CHANNELS> m_samples;
+};
+
 constexpr std::size_t LMMS_ALIGN_SIZE = 16;
 
 
