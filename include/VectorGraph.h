@@ -28,6 +28,7 @@
 #include <QPainterPath>
 #include <QWidget>
 #include <QCursor>
+#include <QMenu>
 #include <vector>
 
 #include "Model.h"
@@ -136,12 +137,17 @@ protected:
 	void mouseDoubleClickEvent(QMouseEvent* me) override; //TODO
 protected slots:
 	void updateGraph();
+
+	void execConnectionDialog();
+	void removeAutomation();
+	void removeController();
 private:
 	void paintGraph(QPainter* pIn, unsigned int locationIn);
 	void paintEditing(QPainter* pIn);
 
 	void modelChanged() override;
 
+	// utility
 	std::pair<float, float> mapMousePos(int xIn, int yIn);
 	// calculate curve position
 	std::pair<float, float> mapDataCurvePos(float xAIn, float yAIn, float xBIn, float yBIn, float curveIn);
@@ -154,10 +160,12 @@ private:
 
 	bool addPoint(unsigned int locationIn, int mouseXIn, int mouseYIn);
 
+	// editing
 	// returns true if the graph was clicked
 	bool isGraphPressed(int mouseXIn, int mouseYIn);
 	// returns true if the editing window was clicked while in editing mode
 	bool isEditingWindowPressed(int mouseYIn);
+	void processEditingWindowPressed(int mouseXIn, int mouseYIn, bool isDraggingIn, bool startMovingIn, int xIn, int yIn);
 	// returns -1 if no attribute was clicked
 	int getPressedInput(int mouseXIn, int mouseYIn, unsigned int inputCountIn);
 	// returns a float attrib value, valueOut = attrib value if it is a bool
@@ -169,9 +177,13 @@ private:
 	// returns the first x char that fits in the displayedLength(in pixel)
 	// cuts the string to displayedLength(in px) size
 	QString getTextFromDisplayLength(QString textIn, unsigned int displayLengthIn);
+	void addDefaultActions(QMenu* menu);
 
+	// inputDialog
 	std::pair<float, float> showCoordInputDialog();
 	float showInputDialog(float curInputValueIn);
+
+	// selection
 	// searches arrays to select
 	// clicked datapoint
 	void selectData(int mouseXIn, int mouseYIn);
