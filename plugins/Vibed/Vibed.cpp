@@ -33,7 +33,6 @@
 #include "InstrumentTrack.h"
 #include "NotePlayHandle.h"
 #include "VibratingString.h"
-#include "MemoryManager.h"
 #include "base64.h"
 #include "CaptionMenu.h"
 #include "volume.h"
@@ -67,7 +66,6 @@ Plugin::Descriptor PLUGIN_EXPORT vibedstrings_plugin_descriptor =
 
 class Vibed::StringContainer
 {
-	MM_OPERATORS
 public:
 	StringContainer(float pitch, sample_rate_t sampleRate, int bufferLength) :
 		m_pitch(pitch), m_sampleRate(sampleRate), m_bufferLength(bufferLength) {}

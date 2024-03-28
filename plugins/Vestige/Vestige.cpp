@@ -485,21 +485,11 @@ gui::PluginView * VestigeInstrument::instantiateView( QWidget * _parent )
 namespace gui
 {
 
-QPixmap * VestigeInstrumentView::s_artwork = nullptr;
-QPixmap * ManageVestigeInstrumentView::s_artwork = nullptr;
-
-
 VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 							QWidget * _parent ) :
 	InstrumentViewFixedSize( _instrument, _parent ),
 	lastPosInMenu (0)
 {
-	if( s_artwork == nullptr )
-	{
-		s_artwork = new QPixmap( PLUGIN_NAME::getIconPixmap(
-								"artwork" ) );
-	}
-
 	m_openPluginButton = new PixmapButton( this, "" );
 	m_openPluginButton->setCheckable( false );
 	m_openPluginButton->setCursor( Qt::PointingHandCursor );
@@ -597,7 +587,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_toggleGUIButton = new QPushButton( tr( "Show/hide GUI" ), this );
 	m_toggleGUIButton->setGeometry( 20, 130, 200, 24 );
 	m_toggleGUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
-	m_toggleGUIButton->setFont( pointSize<8>( m_toggleGUIButton->font() ) );
+	m_toggleGUIButton->setFont(pointSize(m_toggleGUIButton->font(), 8));
 	connect( m_toggleGUIButton, SIGNAL( clicked() ), this,
 							SLOT( toggleGUI() ) );
 
@@ -606,7 +596,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 		this);
 	note_off_all_btn->setGeometry( 20, 160, 200, 24 );
 	note_off_all_btn->setIcon( embed::getIconPixmap( "stop" ) );
-	note_off_all_btn->setFont( pointSize<8>( note_off_all_btn->font() ) );
+	note_off_all_btn->setFont(pointSize(note_off_all_btn->font(), 8));
 	connect( note_off_all_btn, SIGNAL( clicked() ), this,
 							SLOT( noteOffAll() ) );
 
@@ -881,7 +871,8 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
-	p.drawPixmap( 0, 0, *s_artwork );
+	static auto s_artwork = PLUGIN_NAME::getIconPixmap("artwork");
+	p.drawPixmap(0, 0, s_artwork);
 
 	QString plugin_name = ( m_vi->m_plugin != nullptr ) ?
 				m_vi->m_plugin->name()/* + QString::number(
@@ -890,7 +881,7 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 				tr( "No VST plugin loaded" );
 	QFont f = p.font();
 	f.setBold( true );
-	p.setFont( pointSize<10>( f ) );
+	p.setFont(pointSize(f, 10));
 	p.setPen( QColor( 255, 255, 255 ) );
 	p.drawText( 10, 100, plugin_name );
 
@@ -902,7 +893,7 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 	{
 		p.setPen( QColor( 0, 0, 0 ) );
 		f.setBold( false );
-		p.setFont( pointSize<8>( f ) );
+		p.setFont(pointSize(f, 8));
 		p.drawText( 10, 114, tr( "by " ) +
 					m_vi->m_plugin->vendorString() );
 		p.setPen( QColor( 255, 255, 255 ) );

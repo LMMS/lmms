@@ -38,11 +38,8 @@ Lv2FxControls::Lv2FxControls(class Lv2Effect *effect, const QString& uri) :
 	EffectControls(effect),
 	Lv2ControlBase(this, uri)
 {
-	if (isValid())
-	{
-		connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged,
-			this, [this](){onSampleRateChanged();});
-	}
+	connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged,
+		this, &Lv2FxControls::onSampleRateChanged);
 }
 
 

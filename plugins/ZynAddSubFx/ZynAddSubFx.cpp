@@ -311,7 +311,7 @@ void ZynAddSubFxInstrument::loadFile( const QString & _file )
 		m_pluginMutex.unlock();
 	}
 
-	instrumentTrack()->setName( QFileInfo( _file ).baseName().replace( QRegExp( "^[0-9]{4}-" ), QString() ) );
+	instrumentTrack()->setName(QFileInfo(_file).baseName().replace(QRegularExpression("^[0-9]{4}-"), QString()));
 
 	m_modifiedControllers.clear();
 
@@ -541,7 +541,7 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 	m_toggleUIButton->setCheckable( true );
 	m_toggleUIButton->setChecked( false );
 	m_toggleUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
-	m_toggleUIButton->setFont( pointSize<8>( m_toggleUIButton->font() ) );
+	m_toggleUIButton->setFont(pointSize(m_toggleUIButton->font(), 8));
 	connect( m_toggleUIButton, SIGNAL( toggled( bool ) ), this,
 							SLOT( toggleUI() ) );
 

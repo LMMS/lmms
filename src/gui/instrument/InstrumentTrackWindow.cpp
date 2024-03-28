@@ -42,7 +42,7 @@
 #include "FileBrowser.h"
 #include "FileDialog.h"
 #include "GroupBox.h"
-#include "MixerLineLcdSpinBox.h"
+#include "MixerChannelLcdSpinBox.h"
 #include "GuiApplication.h"
 #include "gui_templates.h"
 #include "Instrument.h"
@@ -107,7 +107,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 	// setup line edit for changing instrument track name
 	m_nameLineEdit = new QLineEdit;
-	m_nameLineEdit->setFont( pointSize<9>( m_nameLineEdit->font() ) );
+	m_nameLineEdit->setFont(pointSize(m_nameLineEdit->font(), 9));
 	connect( m_nameLineEdit, SIGNAL( textChanged( const QString& ) ),
 				this, SLOT( textChanged( const QString& ) ) );
 
@@ -206,7 +206,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 
 	// setup spinbox for selecting Mixer-channel
-	m_mixerChannelNumber = new MixerLineLcdSpinBox( 2, nullptr, tr( "Mixer channel" ), m_itv );
+	m_mixerChannelNumber = new MixerChannelLcdSpinBox(2, nullptr, tr("Mixer channel"), m_itv);
 
 	basicControlsLayout->addWidget( m_mixerChannelNumber, 0, 6 );
 	basicControlsLayout->setAlignment( m_mixerChannelNumber, widgetAlignment );
@@ -420,7 +420,7 @@ void InstrumentTrackWindow::saveSettingsBtnClicked()
 	sfd.setDirectory(presetRoot + m_track->instrumentName());
 	sfd.setFileMode( FileDialog::AnyFile );
 	QString fname = m_track->name();
-	sfd.selectFile(fname.remove(QRegExp(FILENAME_FILTER)));
+	sfd.selectFile(fname.remove(QRegularExpression(FILENAME_FILTER)));
 	sfd.setDefaultSuffix( "xpf");
 
 	if( sfd.exec() == QDialog::Accepted &&

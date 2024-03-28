@@ -320,8 +320,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	float rightph;
 	float pd_l;
 	float pd_r;
-	float len_l;
-	float len_r;
+	float len_l(0.);
+	float len_r(0.);
 
 	// osc1 vars
 	float o1l_f;
@@ -503,12 +503,27 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		if( pd_r > 0.5 ) pd_r = 1.0 - pd_r;
 
 		// multi-wave DC Oscillator
-		len_l = BandLimitedWave::pdToLen( pd_l );
-		len_r = BandLimitedWave::pdToLen( pd_r );
-		if( m_counter2l > 0 ) { len_l /= m_counter2l; m_counter2l--; }
-		if( m_counter2r > 0 ) { len_r /= m_counter2r; m_counter2r--; }
-		sample_t O2L = oscillate( o2w, leftph, len_l );
-		sample_t O2R = oscillate( o2w, rightph, len_r );
+		sample_t O2L = 0.;
+		if (pd_l != 0.)
+		{
+			len_l = BandLimitedWave::pdToLen(pd_l);
+			if (m_counter2l > 0)
+			{
+				len_l /= m_counter2l; m_counter2l--;
+			}
+			O2L = oscillate(o2w, leftph, len_l);
+		}
+		
+		sample_t O2R = 0.;
+		if (len_r != 0.)
+		{
+			len_r = BandLimitedWave::pdToLen(pd_r);
+			if (m_counter2r > 0)
+			{
+				len_r /= m_counter2r; m_counter2r--;
+			}
+			O2R = oscillate(o2w, rightph, len_r);
+		}
 
 		// modulate volume
 		O2L *= o2lv;
@@ -568,17 +583,40 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		if( pd_r > 0.5 ) pd_r = 1.0 - pd_r;
 
 		// multi-wave DC Oscillator
-		len_l = BandLimitedWave::pdToLen( pd_l );
-		len_r = BandLimitedWave::pdToLen( pd_r );
-		if( m_counter3l > 0 ) { len_l /= m_counter3l; m_counter3l--; }
-		if( m_counter3r > 0 ) { len_r /= m_counter3r; m_counter3r--; }
-		//  sub-osc 1
-		sample_t O3AL = oscillate( o3w1, leftph, len_l );
-		sample_t O3AR = oscillate( o3w1, rightph, len_r );
+		sample_t O3AL = 0.;
+		sample_t O3AR = 0.;
 
 		// multi-wave DC Oscillator, sub-osc 2
-		sample_t O3BL = oscillate( o3w2, leftph, len_l );
-		sample_t O3BR = oscillate( o3w2, rightph, len_r );
+		sample_t O3BL = 0.;
+		sample_t O3BR = 0.;
+
+		if (pd_l != 0.)
+		{
+			len_l = BandLimitedWave::pdToLen(pd_l);
+			if (m_counter3l > 0)
+			{
+				len_l /= m_counter3l; m_counter3l--;
+			}
+			//  sub-osc 1
+			O3AL = oscillate(o3w1, leftph, len_l);
+
+			// multi-wave DC Oscillator, sub-osc 2
+			O3BL = oscillate(o3w2, leftph, len_l);
+		}
+
+		if (pd_r != 0.)
+		{
+			len_r = BandLimitedWave::pdToLen(pd_r);
+			if (m_counter3r > 0)
+			{
+				len_r /= m_counter3r; m_counter3r--;
+			}
+			//  sub-osc 1
+			O3AR = oscillate(o3w1, rightph, len_r);
+
+			// multi-wave DC Oscillator, sub-osc 2
+			O3BR = oscillate(o3w2, rightph, len_r);
+		}
 
 		// calc and modulate sub
 		sub = o3sub;
@@ -1656,7 +1694,7 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 
 	m_osc2WaveBox = new ComboBox( view );
 	m_osc2WaveBox -> setGeometry( 204, O2ROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
-	m_osc2WaveBox->setFont( pointSize<8>( m_osc2WaveBox->font() ) );
+	m_osc2WaveBox->setFont(pointSize(m_osc2WaveBox->font(), 8));
 
 	maketinyled( m_osc2SyncHButton, 212, O2ROW - 3, tr( "Hard sync oscillator 2" ) )
 	maketinyled( m_osc2SyncRButton, 191, O2ROW - 3, tr( "Reverse sync oscillator 2" ) )
@@ -1671,18 +1709,18 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 
 	m_osc3Wave1Box = new ComboBox( view );
 	m_osc3Wave1Box -> setGeometry( 160, O3ROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
-	m_osc3Wave1Box->setFont( pointSize<8>( m_osc3Wave1Box->font() ) );
+	m_osc3Wave1Box->setFont(pointSize(m_osc3Wave1Box->font(), 8));
 
 	m_osc3Wave2Box = new ComboBox( view );
 	m_osc3Wave2Box -> setGeometry( 204, O3ROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
-	m_osc3Wave2Box->setFont( pointSize<8>( m_osc3Wave2Box->font() ) );
+	m_osc3Wave2Box->setFont(pointSize(m_osc3Wave2Box->font(), 8));
 
 	maketinyled( m_osc3SyncHButton, 212, O3ROW - 3, tr( "Hard sync oscillator 3" ) )
 	maketinyled( m_osc3SyncRButton, 191, O3ROW - 3, tr( "Reverse sync oscillator 3" ) )
 
 	m_lfo1WaveBox = new ComboBox( view );
 	m_lfo1WaveBox -> setGeometry( 2, LFOROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
-	m_lfo1WaveBox->setFont( pointSize<8>( m_lfo1WaveBox->font() ) );
+	m_lfo1WaveBox->setFont(pointSize(m_lfo1WaveBox->font(), 8));
 
 	maketsknob( m_lfo1AttKnob, LFOCOL1, LFOROW, tr( "Attack" ), " ms", "lfoKnob" )
 	maketsknob( m_lfo1RateKnob, LFOCOL2, LFOROW, tr( "Rate" ), " ms", "lfoKnob" )
@@ -1690,7 +1728,7 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 
 	m_lfo2WaveBox = new ComboBox( view );
 	m_lfo2WaveBox -> setGeometry( 127, LFOROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
-	m_lfo2WaveBox->setFont( pointSize<8>( m_lfo2WaveBox->font() ) );
+	m_lfo2WaveBox->setFont(pointSize(m_lfo2WaveBox->font(), 8));
 
 	maketsknob(m_lfo2AttKnob, LFOCOL4, LFOROW, tr("Attack"), " ms", "lfoKnob")
 	maketsknob(m_lfo2RateKnob, LFOCOL5, LFOROW, tr("Rate"), " ms", "lfoKnob")

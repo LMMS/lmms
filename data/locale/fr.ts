@@ -5618,62 +5618,62 @@ Veuillez vous assurez que vous avez les droits d&apos;écriture sur le fichier e
     </message>
 </context>
 <context>
-    <name>MixerLine</name>
+    <name>MixerChannelView</name>
     <message>
-        <location filename="../../src/gui/MixerLine.cpp" line="86"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="86"/>
         <source>Channel send amount</source>
         <translation>Quantité de signal envoyé du canal</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerLine.cpp" line="242"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="242"/>
         <source>Move &amp;left</source>
         <translation>Déplacer à &amp;gauche</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerLine.cpp" line="243"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="243"/>
         <source>Move &amp;right</source>
         <translation>Déplacer à &amp;droite</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerLine.cpp" line="245"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="245"/>
         <source>Rename &amp;channel</source>
         <translation>&amp;Renommer le canal</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerLine.cpp" line="250"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="250"/>
         <source>R&amp;emove channel</source>
         <translation>&amp;Supprimer le canal</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerLine.cpp" line="253"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="253"/>
         <source>Remove &amp;unused channels</source>
         <translation>Supprimer les canaux &amp;inutilisés</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerLine.cpp" line="255"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="255"/>
         <source>Set channel color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/MixerLine.cpp" line="256"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="256"/>
         <source>Remove channel color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/MixerLine.cpp" line="257"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="257"/>
         <source>Pick random channel color</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
-    <name>MixerLineLcdSpinBox</name>
+    <name>MixerChannelLcdSpinBox</name>
     <message>
-        <location filename="../../src/gui/widgets/MixerLineLcdSpinBox.cpp" line="58"/>
+        <location filename="../../src/gui/widgets/MixerChannelLcdSpinBox.cpp" line="58"/>
         <source>Assign to:</source>
         <translation>Assigner à :</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/MixerLineLcdSpinBox.cpp" line="58"/>
+        <location filename="../../src/gui/widgets/MixerChannelLcdSpinBox.cpp" line="58"/>
         <source>New mixer Channel</source>
         <translation>Nouveau canal d&apos;effet</translation>
     </message>

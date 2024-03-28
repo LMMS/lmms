@@ -29,7 +29,6 @@
 #include <QString>
 #include <QMutex>
 
-#include "MemoryManager.h"
 #include "PlayHandle.h"
 
 namespace lmms
@@ -41,7 +40,6 @@ class BoolModel;
 
 class AudioPort : public ThreadableJob
 {
-	MM_OPERATORS
 public:
 	AudioPort( const QString & _name, bool _has_effect_chain = true,
 		FloatModel * volumeModel = nullptr, FloatModel * panningModel = nullptr,

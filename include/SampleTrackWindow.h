@@ -38,7 +38,7 @@ namespace lmms::gui
 
 class EffectRackView;
 class Knob;
-class MixerLineLcdSpinBox;
+class MixerChannelLcdSpinBox;
 class SampleTrackView;
 
 
@@ -90,7 +90,7 @@ private:
 	QLineEdit * m_nameLineEdit;
 	Knob * m_volumeKnob;
 	Knob * m_panningKnob;
-	MixerLineLcdSpinBox * m_mixerChannelNumber;
+	MixerChannelLcdSpinBox * m_mixerChannelNumber;
 
 	EffectRackView * m_effectRack;
 } ;

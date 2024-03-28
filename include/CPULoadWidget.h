@@ -68,7 +68,7 @@ private:
 
 	QTimer m_updateTimer;
 
-	int m_stepSize;
+	int m_stepSize = 1;
 
 } ;
 

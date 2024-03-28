@@ -185,12 +185,7 @@ bool AudioFileOgg::startEncoding()
 	return true;
 }
 
-
-
-
-void AudioFileOgg::writeBuffer( const surroundSampleFrame * _ab,
-						const fpp_t _frames,
-						const float _master_gain )
+void AudioFileOgg::writeBuffer(const surroundSampleFrame* _ab, const fpp_t _frames)
 {
 	int eos = 0;
 
@@ -201,7 +196,7 @@ void AudioFileOgg::writeBuffer( const surroundSampleFrame * _ab,
 	{
 		for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 		{
-			buffer[chnl][frame] = _ab[frame][chnl] * _master_gain;
+			buffer[chnl][frame] = _ab[frame][chnl];
 		}
 	}
 
@@ -258,7 +253,7 @@ void AudioFileOgg::finishEncoding()
 	if( m_ok )
 	{
 		// just for flushing buffers...
-		writeBuffer( nullptr, 0, 0.0f );
+		writeBuffer(nullptr, 0);
 
 		// clean up
 		ogg_stream_clear( &m_os );

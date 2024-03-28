@@ -24,7 +24,6 @@
  */
 
 #include "MidiPortMenu.h"
-#include "gui_templates.h"
 
 namespace lmms::gui
 {
@@ -34,7 +33,6 @@ MidiPortMenu::MidiPortMenu( MidiPort::Mode _mode ) :
 	ModelView( nullptr, this ),
 	m_mode( _mode )
 {
-	setFont( pointSize<9>( font() ) );
 	connect( this, SIGNAL(triggered(QAction*)),
 			this, SLOT(activatedPort(QAction*)));
 }

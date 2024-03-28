@@ -89,7 +89,7 @@ bool AudioFileFlac::startEncoding()
 	return true;
 }
 
-void AudioFileFlac::writeBuffer(surroundSampleFrame const* _ab, fpp_t const frames, float master_gain)
+void AudioFileFlac::writeBuffer(surroundSampleFrame const* _ab, fpp_t const frames)
 {
 	OutputSettings::BitDepth depth = getOutputSettings().getBitDepth();
 	float clipvalue = std::nextafterf( -1.0f, 0.0f );
@@ -104,7 +104,7 @@ void AudioFileFlac::writeBuffer(surroundSampleFrame const* _ab, fpp_t const fram
 				// Clip the negative side to just above -1.0 in order to prevent it from changing sign
 				// Upstream issue: https://github.com/erikd/libsndfile/issues/309
 				// When this commit is reverted libsndfile-1.0.29 must be made a requirement for FLAC
-				buf[frame*channels() + channel] = std::max(clipvalue, _ab[frame][channel] * master_gain);
+				buf[frame*channels() + channel] = std::max(clipvalue, _ab[frame][channel]);
 			}
 		}
 		sf_writef_float(m_sf, static_cast<float*>(buf.data()), frames);
@@ -112,7 +112,7 @@ void AudioFileFlac::writeBuffer(surroundSampleFrame const* _ab, fpp_t const fram
 	else // integer PCM encoding
 	{
 		auto buf = std::vector<int_sample_t>(frames * channels());
-		convertToS16(_ab, frames, master_gain, buf.data(), !isLittleEndian());
+		convertToS16(_ab, frames, buf.data(), !isLittleEndian());
 		sf_writef_short(m_sf, static_cast<short*>(buf.data()), frames);
 	}
 

@@ -44,7 +44,7 @@ TabBar::TabBar( QWidget * _parent, QBoxLayout::Direction _dir ) :
 }
 
 TabButton * TabBar::addTab( QWidget * _w, const QString & _text, int _id,
-				bool _add_stretch, bool _text_is_tooltip )
+				bool _add_stretch, bool _text_is_tooltip, bool fixWidgetToParentSize )
 {
 	// already tab with id?
 	if( m_tabs.contains( _id ) )
@@ -83,12 +83,14 @@ TabButton * TabBar::addTab( QWidget * _w, const QString & _text, int _id,
 		m_layout->addStretch();
 	}
 
+	if (fixWidgetToParentSize)
+	{
+		// we assume, parent-widget is a widget acting as widget-stack so all
+		// widgets have the same size and only the one on the top is visible
+		_w->setFixedSize( _w->parentWidget()->size() );
+	}
 
-	// we assume, parent-widget is a widget acting as widget-stack so all
-	// widgets have the same size and only the one on the top is visible
-	_w->setFixedSize( _w->parentWidget()->size() );
-
-	b->setFont( pointSize<8>( b->font() ) );
+	b->setFont(pointSize(b->font(), 8));
 
 	return( b );
 }
