@@ -24,6 +24,7 @@
  */
 
 #include "MidiPortMenu.h"
+#include "gui_templates.h"
 
 namespace lmms::gui
 {

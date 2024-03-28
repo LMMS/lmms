@@ -35,6 +35,7 @@
 #include "LcdSpinBox.h"
 #include "AudioEngine.h"
 #include "Engine.h"
+#include "gui_templates.h"
 
 #include "ConfigManager.h"
 

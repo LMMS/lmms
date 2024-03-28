@@ -94,7 +94,7 @@ void LedCheckBox::initUi( LedColor _color )
 
 	if (m_legacyMode)
 	{
-		setFont(pointSize<int>(font(), 7));
+		setFont( pointSize<7>( font() ) );
 	}
 
 	setText( m_text );
@@ -116,7 +116,7 @@ void LedCheckBox::onTextUpdated()
 void LedCheckBox::paintLegacy(QPaintEvent * pe)
 {
 	QPainter p( this );
-	p.setFont(pointSize<int>(font(), 7));
+	p.setFont( pointSize<7>( font() ) );
 
 	p.drawPixmap(0, 0, model()->value() ? m_ledOnPixmap : m_ledOffPixmap);
 

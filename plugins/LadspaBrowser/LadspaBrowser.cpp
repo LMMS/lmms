@@ -172,7 +172,7 @@ QWidget * LadspaBrowserView::createTab( QWidget * _parent, const QString & _txt,
 	auto title = new QLabel(type + _txt, tab);
 	QFont f = title->font();
 	f.setBold( true );
-	title->setFont(pointSize<int>(f, 12));
+	title->setFont( pointSize<12>( f ) );
 
 	layout->addSpacing( 5 );
 	layout->addWidget( title );

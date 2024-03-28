@@ -34,6 +34,7 @@
 #include "LcdSpinBox.h"
 #include "AudioEngine.h"
 #include "Engine.h"
+#include "gui_templates.h"
 
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>

@@ -37,6 +37,7 @@
 #include "embed.h"
 #include "Engine.h"
 #include "FileDialog.h"
+#include "gui_templates.h"
 #include "MainWindow.h"
 #include "MidiSetupWidget.h"
 #include "ProjectJournal.h"

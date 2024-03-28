@@ -33,6 +33,7 @@
 
 #include "EffectRackView.h"
 #include "embed.h"
+#include "gui_templates.h"
 #include "GuiApplication.h"
 #include "Knob.h"
 #include "MainWindow.h"

@@ -38,6 +38,7 @@
 #include "DataFile.h"
 #include "embed.h"
 #include "Engine.h"
+#include "gui_templates.h"
 #include "InstrumentTrackView.h"
 #include "PixmapButton.h"
 #include "Song.h"

@@ -32,6 +32,7 @@
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"
+#include "gui_templates.h"
 
 namespace lmms
 {

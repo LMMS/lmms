@@ -807,7 +807,7 @@ void PianoView::paintEvent( QPaintEvent * )
 	QPainter p( this );
 
 	// set smaller font for printing number of every octave
-	p.setFont(pointSize<int>(p.font(), LABEL_TEXT_SIZE));
+	p.setFont( pointSize<LABEL_TEXT_SIZE>( p.font() ) );
 
 
 	// draw bar above the keyboard (there will be the labels
