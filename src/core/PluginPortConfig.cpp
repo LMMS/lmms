@@ -27,15 +27,24 @@
 
 #include <QDomDocument>
 #include <QDomElement>
+#include <cassert>
+
+#include "Model.h"
 
 namespace lmms
 {
 
-PluginPortConfig::PluginPortConfig(PortType in, PortType out, QObject* parent)
+PluginPortConfig::PluginPortConfig(Model* parent)
+	: QObject{parent}
+	, m_config{parent, tr("L/R channel configuration")}
+{
+}
+
+PluginPortConfig::PluginPortConfig(PortType in, PortType out, Model* parent)
 	: QObject{parent}
 	, m_inPort{in}
 	, m_outPort{out}
-	, m_config{0, 0, 2, nullptr, tr("Audio channel configuration")}
+	, m_config{parent, tr("L/R channel configuration")}
 {
 }
 
@@ -69,16 +78,7 @@ void PluginPortConfig::setPortType(PortType in, PortType out)
 	m_inPort = in;
 	m_outPort = out;
 
-	if (m_inPort != PortType::Mono && m_outPort != PortType::Mono)
-	{
-		m_config.setRange(0, 0);
-		m_config.setValue(0);
-	}
-	else
-	{
-		m_config.setRange(0, 2);
-		m_config.setValue(static_cast<int>(Config::MonoMix));
-	}
+	updateOptions();
 
 	emit portsChanged();
 }
@@ -115,6 +115,77 @@ void PluginPortConfig::loadSettings(const QDomElement& elem)
 	//const auto inPort = static_cast<PortType>(elem.attribute("in", "0").toInt());
 	//const auto outPort = static_cast<PortType>(elem.attribute("out", "0").toInt());
 	m_config.loadSettings(elem, "config");
+}
+
+void PluginPortConfig::updateOptions()
+{
+	m_config.clear();
+
+	const auto monoType = monoPluginType();
+	if (monoType == PluginPortConfig::MonoPluginType::None)
+	{
+		m_config.addItem(tr("Stereo"));
+		return;
+	}
+
+	const auto hasInputPort = inputPortType() != PluginPortConfig::PortType::None;
+	const auto hasOutputPort = outputPortType() != PluginPortConfig::PortType::None;
+
+	// 1. Mono mix
+	QString itemText;
+	switch (monoType)
+	{
+		case PluginPortConfig::MonoPluginType::Input:
+			itemText = tr("Downmix to mono"); break;
+		case PluginPortConfig::MonoPluginType::Output:
+			itemText = tr("Upmix to stereo"); break;
+		case PluginPortConfig::MonoPluginType::Both:
+			itemText = tr("Mono mix"); break;
+		default: break;
+	}
+	m_config.addItem(itemText);
+
+	// 2. Left only
+	itemText = QString{};
+	switch (monoType)
+	{
+		case PluginPortConfig::MonoPluginType::Input:
+			itemText = hasOutputPort
+				? tr("L in (R bypass)")
+				: tr("Left in");
+			break;
+		case PluginPortConfig::MonoPluginType::Output:
+			itemText = hasInputPort
+				? tr("L out (R bypass)")
+				: tr("Left only");
+			break;
+		case PluginPortConfig::MonoPluginType::Both:
+			itemText = tr("L only (R bypass)");
+			break;
+		default: break;
+	}
+	m_config.addItem(itemText);
+
+	// 3. Right only
+	itemText = QString{};
+	switch (monoType)
+	{
+		case PluginPortConfig::MonoPluginType::Input:
+			itemText = hasOutputPort
+				? tr("R in (L bypass)")
+				: tr("Right in");
+			break;
+		case PluginPortConfig::MonoPluginType::Output:
+			itemText = hasInputPort
+				? tr("R out (L bypass)")
+				: tr("Right only");
+			break;
+		case PluginPortConfig::MonoPluginType::Both:
+			itemText = tr("R only (L bypass)");
+			break;
+		default: break;
+	}
+	m_config.addItem(itemText);
 }
 
 } // namespace lmms

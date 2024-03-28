@@ -92,7 +92,7 @@ namespace
 
 ClapAudioPorts::ClapAudioPorts(ClapInstance* parent)
 	: ClapExtension{parent}
-	, PluginPortConfig{parent}
+	, PluginPortConfig{parent->parent()}
 {
 }
 

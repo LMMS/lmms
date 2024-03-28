@@ -90,6 +90,8 @@ public:
 	auto operator=(const ClapInstance&) -> ClapInstance& = delete;
 	auto operator=(ClapInstance&&) noexcept -> ClapInstance& = delete;
 
+	auto parent() const -> Model* { return dynamic_cast<Model*>(QObject::parent()); }
+
 	enum class PluginState
 	{
 		None, // Plugin hasn't been created yet or failed to load (NoneWithError)

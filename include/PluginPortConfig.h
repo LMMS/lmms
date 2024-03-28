@@ -28,7 +28,7 @@
 
 #include <QObject>
 
-#include "AutomatableModel.h"
+#include "ComboBoxModel.h"
 #include "lmms_export.h"
 #include "SerializingObject.h"
 
@@ -67,8 +67,8 @@ public:
 		Both
 	};
 
-	using QObject::QObject;
-	PluginPortConfig(PortType in, PortType out, QObject* parent = nullptr);
+	PluginPortConfig(Model* parent = nullptr);
+	PluginPortConfig(PortType in, PortType out, Model* parent = nullptr);
 
 	/**
 	 * Getters
@@ -109,7 +109,7 @@ public:
 
 	auto hasMonoPort() const -> bool;
 	auto monoPluginType() const -> MonoPluginType;
-	auto model() -> IntModel* { return &m_config; }
+	auto model() -> ComboBoxModel* { return &m_config; }
 
 	/**
 	 * Setters
@@ -128,11 +128,13 @@ signals:
 	void portsChanged();
 
 private:
+	void updateOptions();
+
 	PortType m_inPort = PortType::None;
 	PortType m_outPort = PortType::None;
 
 	//! Value is 0..2, which represents { MonoMix, LeftOnly, RightOnly } for non-Stereo plugins
-	IntModel m_config;
+	ComboBoxModel m_config;
 };
 
 } // namespace lmms

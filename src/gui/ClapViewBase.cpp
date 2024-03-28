@@ -36,6 +36,7 @@
 #include "AudioEngine.h"
 #include "ClapInstance.h"
 #include "ClapManager.h"
+#include "ComboBox.h"
 #include "ControlLayout.h"
 #include "CustomTextKnob.h"
 #include "embed.h"
@@ -45,7 +46,6 @@
 #include "lmms_math.h"
 #include "MainWindow.h"
 #include "PixmapButton.h"
-#include "PluginPortConfigSelector.h"
 #include "PresetSelector.h"
 #include "SubWindow.h"
 
@@ -137,6 +137,7 @@ ClapViewParameters::ClapViewParameters(QWidget* parent, ClapInstance* instance, 
 
 ClapViewBase::ClapViewBase(QWidget* pluginWidget, ClapInstance* instance)
 {
+	constexpr int controlsPerRow = 6;
 	auto grid = new QGridLayout{pluginWidget};
 
 	auto btnBox = std::make_unique<QHBoxLayout>();
@@ -164,22 +165,53 @@ ClapViewBase::ClapViewBase(QWidget* pluginWidget, ClapInstance* instance)
 		grid->addLayout(presetBox.release(), static_cast<int>(Rows::PresetRow), 0, 1, 1);
 	}
 
-	btnBox->addStretch(1);
-
 	if (instance->audioPorts().hasMonoPort())
 	{
-		m_portConfigSelector = new PluginPortConfigSelector{&instance->audioPorts(), pluginWidget};
-		btnBox->addWidget(m_portConfigSelector);
+		m_portConfig = new ComboBox{pluginWidget};
+		m_portConfig->setFixedSize(128, ComboBox::DEFAULT_HEIGHT);
+
+		QString inputType;
+		switch (instance->audioPorts().inputPortType())
+		{
+			case PluginPortConfig::PortType::None: break;
+			case PluginPortConfig::PortType::Mono:
+				inputType += QObject::tr("mono in"); break;
+			case PluginPortConfig::PortType::Stereo:
+				inputType += QObject::tr("stereo in"); break;
+			default: break;
+		}
+
+		QString outputType;
+		switch (instance->audioPorts().outputPortType())
+		{
+			case PluginPortConfig::PortType::None: break;
+			case PluginPortConfig::PortType::Mono:
+				outputType += QObject::tr("mono out"); break;
+			case PluginPortConfig::PortType::Stereo:
+				outputType += QObject::tr("stereo out"); break;
+			default: break;
+		}
+
+		QString pluginType;
+		if (inputType.isEmpty()) { pluginType = outputType; }
+		else if (outputType.isEmpty()) { pluginType = inputType; }
+		else { pluginType = QString{"%1, %2"}.arg(inputType, outputType); }
+
+		m_portConfig->setToolTip(QObject::tr("L/R channel config for %1 plugin").arg(pluginType));
+		m_portConfig->setModel(instance->audioPorts().model());
+		btnBox->addWidget(m_portConfig);
 	}
+
+	btnBox->addStretch(1);
 
 	pluginWidget->setAcceptDrops(true);
 
-	if (m_reloadPluginButton || m_toggleUIButton || m_portConfigSelector)
+	if (m_reloadPluginButton || m_toggleUIButton || m_portConfig)
 	{
-		grid->addLayout(btnBox.release(), static_cast<int>(Rows::ButtonRow), 0, 1, s_colNum);
+		grid->addLayout(btnBox.release(), static_cast<int>(Rows::ButtonRow), 0, 1, controlsPerRow);
 	}
 
-	m_parametersView = new ClapViewParameters{pluginWidget, instance, s_colNum};
+	m_parametersView = new ClapViewParameters{pluginWidget, instance, controlsPerRow};
 	grid->addWidget(m_parametersView, static_cast<int>(Rows::ParametersRow), 0);
 }
 
