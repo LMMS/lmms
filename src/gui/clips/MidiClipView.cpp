@@ -243,57 +243,59 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 
 
 
-void MidiClipView::mousePressEvent( QMouseEvent * _me )
+void MidiClipView::mousePressEvent(QMouseEvent * _me)
 {
-	bool displayPattern = fixedClips() || (pixelsPerBar() >= 96 && m_legacySEPattern);
-	if (_me->button() == Qt::LeftButton && m_clip->m_clipType == MidiClip::Type::BeatClip && displayPattern
-		&& _me->y() > BeatStepButtonOffset && _me->y() < BeatStepButtonOffset + m_stepBtnOff.height())
+	int const x = _me->x();
+	int const y = _me->y();
 
-	// when mouse button is pressed in pattern mode
+	bool const displayPattern = fixedClips() || (pixelsPerBar() >= 96 && m_legacySEPattern);
+	bool const isBeatClip = m_clip->m_clipType == MidiClip::Type::BeatClip;
+	bool const mouseClickedWithinHeight = BeatStepButtonOffset < y && y < rect().height() - BeatStepButtonOffset;
 
+	if (_me->button() == Qt::LeftButton && isBeatClip && displayPattern && mouseClickedWithinHeight)
 	{
-//	get the step number that was clicked on and
-//	do calculations in floats to prevent rounding errors...
-		float tmp = ( ( float(_me->x()) - BORDER_WIDTH ) *
-				float( m_clip -> m_steps ) ) / float(width() - BORDER_WIDTH*2);
+		// Left mouse button pressed in pattern mode
 
-		int step = int( tmp );
+		// Get the step number that was clicked on. Do calculations in floats to prevent rounding errors.
+		float const tmp = ((float(x) - BORDER_WIDTH) * float(m_clip->m_steps)) / float(width() - BORDER_WIDTH * 2);
 
-//	debugging to ensure we get the correct step...
-//		qDebug( "Step (%f) %d", tmp, step );
+		int const step(tmp);
 
-		if( step >= m_clip->m_steps )
+		//	debugging to ensure we get the correct step...
+		//		qDebug( "Step (%f) %d", tmp, step );
+
+		if (step >= m_clip->m_steps)
 		{
-			qDebug( "Something went wrong in clip.cpp: step %d doesn't exist in clip!", step );
+			qDebug("Something went wrong in clip.cpp: step %d doesn't exist in clip!", step);
 			return;
 		}
 
-		Note * n = m_clip->noteAtStep( step );
+		Note* n = m_clip->noteAtStep(step);
 
-		if( n == nullptr )
+		if (n == nullptr)
 		{
-			m_clip->addStepNote( step );
+			m_clip->addStepNote(step);
 		}
 		else // note at step found
 		{
 			m_clip->addJournalCheckPoint();
-			m_clip->setStep( step, false );
+			m_clip->setStep(step, false);
 		}
 
 		Engine::getSong()->setModified();
+
 		update();
 
-		if( getGUI()->pianoRoll()->currentMidiClip() == m_clip )
+		auto * pianoRoll = getGUI()->pianoRoll();
+		if (pianoRoll->currentMidiClip() == m_clip)
 		{
-			getGUI()->pianoRoll()->update();
+			pianoRoll->update();
 		}
 	}
 	else
-
-	// if not in pattern mode, let parent class handle the event
-
 	{
-		ClipView::mousePressEvent( _me );
+		// if not in pattern mode, let parent class handle the event
+		ClipView::mousePressEvent(_me);
 	}
 }
 
