@@ -464,14 +464,12 @@ void MidiClipView::paintEvent( QPaintEvent * )
 		const int w = width() - 2 * BORDER_WIDTH;
 
 		// scale step graphics to fit the beat clip length
-		stepon0
-			= m_stepBtnOn0.scaled(w / steps, m_stepBtnOn0.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-		stepon200 = m_stepBtnOn200.scaled(
-			w / steps, m_stepBtnOn200.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-		stepoff
-			= m_stepBtnOff.scaled(w / steps, m_stepBtnOff.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-		stepoffl = m_stepBtnOffLight.scaled(
-			w / steps, m_stepBtnOffLight.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+		int const stepWidth = w / steps;
+		int const stepHeight = rect().height();
+		stepon0 = embed::getIconPixmap("step_btn_on_0", stepWidth, stepHeight);
+		stepon200 = embed::getIconPixmap("step_btn_on_200", stepWidth, stepHeight);
+		stepoff = embed::getIconPixmap("step_btn_off", stepWidth, stepHeight);
+		stepoffl = embed::getIconPixmap("step_btn_off_light", stepWidth, stepHeight);
 
 		for (int it = 0; it < steps; it++)	// go through all the steps in the beat clip
 		{
