@@ -75,7 +75,7 @@ VectorGraphView::VectorGraphView(QWidget * parentIn,
 		tr("2. attribute value"), tr("switch graph line type"), tr("switch graph automated value"),
 		tr("switch graph effected value"), tr("can only effect graph points"), tr("\"add\" effect"), tr("\"subtract\" effect"),
 		tr("\"multiply\" effect"), tr("\"divide\" effect"), tr("\"power\" effect"), tr("\"log\" effect"),
-		tr("\"sine\" effect")
+		tr("\"sine\" effect"), tr("\"clamp lower\" effect"), tr("\"clamp upper\" effect")
 	};
 	m_editingLineEffectText = {
 		tr("none"),
@@ -90,7 +90,7 @@ VectorGraphView::VectorGraphView(QWidget * parentIn,
 		true, false, false,
 		false, false, false, false,
 		false, false, false, false,
-		false
+		false, false, false
 	};
 
 	m_lastTrackPoint.first = -1;
@@ -891,6 +891,12 @@ float VectorGraphView::getInputAttribValue(unsigned int editingArrayLocationIn, 
 			case 15:
 				*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 6);
 				break;
+			case 16:
+				*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 7);
+				break;
+			case 17:
+				*valueOut = model()->getDataArray(m_selectedArray)->getEffect(m_selectedLocation, 8);
+				break;
 		}
 	}
 	return output;
@@ -993,6 +999,12 @@ void VectorGraphView::setInputAttribValue(unsigned int editingArrayLocationIn, f
 				break;
 			case 15:
 				model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 6, boolValueIn);
+				break;
+			case 16:
+				model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 7, boolValueIn);
+				break;
+			case 17:
+				model()->getDataArray(m_selectedArray)->setEffect(m_selectedLocation, 8, boolValueIn);
 				break;
 		}
 	}
@@ -2442,6 +2454,12 @@ bool VectorGraphDataArray::getEffect(unsigned int locationIn, unsigned int effec
 		case 6:
 			return m_dataArray[locationIn].m_effectSine;
 			break;
+		case 7:
+			return m_dataArray[locationIn].m_effectClampLower;
+			break;
+		case 8:
+			return m_dataArray[locationIn].m_effectClampUpper;
+			break;
 	}
 	return false;
 }
@@ -2471,6 +2489,12 @@ void VectorGraphDataArray::setEffect(unsigned int locationIn, unsigned int effec
 				break;
 			case 6:
 				m_dataArray[locationIn].m_effectSine = boolIn;
+				break;
+			case 7:
+				m_dataArray[locationIn].m_effectClampLower = boolIn;
+				break;
+			case 8:
+				m_dataArray[locationIn].m_effectClampUpper = boolIn;
 				break;
 		}
 	}
@@ -2636,6 +2660,17 @@ float VectorGraphDataArray::processEffect(float attribValueIn, unsigned int attr
 		{
 			// subtract
 			output -= effectValueIn;
+		}
+
+		if (effectArrayIn->getEffect(effectLocationIn, 7) == true)
+		{
+			// clamp lower
+			output = std::max(effectValueIn, output);
+		}
+		else if (effectArrayIn->getEffect(effectLocationIn, 8) == true)
+		{
+			// clamp upper
+			output = std::min(effectValueIn, output);
 		}
 
 		// clamp
