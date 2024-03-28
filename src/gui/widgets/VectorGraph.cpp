@@ -30,10 +30,18 @@
 #include <memory> // smartpointers
 #include <QPainter>
 #include <QMouseEvent>
-#include <QInputDialog>
+#include <QInputDialog> // showInputDialog()
+#include <QMenu> // context menu
 
 #include "VectorGraph.h"
 #include "StringPairDrag.h"
+#include "CaptionMenu.h" // context menu
+#include "embed.h" // context menu
+#include "MainWindow.h" // getGUI
+#include "GuiApplication.h" // getGUI
+#include "AutomatableModel.h"
+#include "ControllerConnectionDialog.h"
+#include "ControllerConnection.h"
 
 
 namespace lmms
@@ -187,6 +195,7 @@ void VectorGraphView::mousePressEvent(QMouseEvent* me)
 	int x = me->x();
 	int y = me->y();
 	m_addition = false;
+	m_mousePress = false;
 
 	if(me->button() == Qt::LeftButton && me->modifiers() & Qt::ControlModifier && m_isSelected == true)
 	{
@@ -202,11 +211,8 @@ void VectorGraphView::mousePressEvent(QMouseEvent* me)
 			me->accept();
 		}
 	}
-	else if (isGraphPressed(x, m_graphHeight - y) == true)
+	else
 	{
-		// try selecting the clicked point (if it is near)
-		selectData(x, m_graphHeight - y);
-
 		if (me->button() == Qt::LeftButton)
 		{
 			// add
@@ -219,11 +225,13 @@ void VectorGraphView::mousePressEvent(QMouseEvent* me)
 			m_addition = false;
 			m_mousePress = true;
 		}
+		if (isGraphPressed(x, m_graphHeight - y) == true)
+		{
+			// try selecting the clicked point (if it is near)
+			selectData(x, m_graphHeight - y);
+		}
 	}
-	else
-	{
-		m_mousePress = true;
-	}
+
 	m_mouseDown = true;
 	qDebug("mousePressEnd ---------");
 }
@@ -296,32 +304,7 @@ void VectorGraphView::mouseMoveEvent(QMouseEvent* me)
 		}
 		else if (isEditingWindowPressed(m_lastScndTrackPoint.second) == true)
 		{
-			// if editing inputs were pressed (not graph)
-			int pressLocation = getPressedInput(m_lastTrackPoint.first, m_graphHeight - m_lastScndTrackPoint.second, m_editingInputCount + 1);
-			if (pressLocation >= 0 && pressLocation < m_editingInputCount)
-			{
-				// pressLocation should always be bigger than -1
-				// if the editing window was pressed
-				unsigned int location = m_editingInputCount * m_editingDisplayPage + pressLocation;
-				// if the input type is a float
-				if (location < m_editingText.size() && m_editingInputIsFloat[location] == true)
-				{
-					// if the user just started to move the mouse it is pressed
-					if (startMoving == true)
-					{
-						// unused bool
-						bool isTrue = false;
-						// set m_lastScndTrackPoint.first to the current input value
-						m_lastScndTrackPoint.first = mapInputPos(getInputAttribValue(location, &isTrue), m_graphHeight);
-
-						m_lastTrackPoint.first = x;
-						m_lastTrackPoint.second = m_graphHeight - y;
-		qDebug("get last value: %d, lasttrack: %d, x: %d, y: %d, x2: %d, y2: %d, location: %d", m_lastScndTrackPoint.first, m_lastScndTrackPoint.second, x, (m_graphHeight - y), m_lastTrackPoint.first, m_lastTrackPoint.second, pressLocation);
-					}
-					std::pair<float, float> convertedCoords = mapMousePos(0, m_lastScndTrackPoint.first + static_cast<int>(m_graphHeight - y - m_lastTrackPoint.second) / 2);
-					setInputAttribValue(location, convertedCoords.second, false);
-				}
-			}
+			processEditingWindowPressed(m_lastTrackPoint.first, m_graphHeight - m_lastScndTrackPoint.second, true, startMoving, x, m_graphHeight - y);
 		}
 	}
 }
@@ -379,57 +362,7 @@ void VectorGraphView::mouseReleaseEvent(QMouseEvent* me)
 	}
 	else if (m_mousePress == true && isEditingWindowPressed(m_graphHeight - y) == true)
 	{
-	qDebug("mouseMove 7: %d", m_lastTrackPoint.first);
-		int pressLocation = getPressedInput(x, m_graphHeight - y, m_editingInputCount + 1);
-		if (pressLocation == m_editingInputCount)
-		{
-			// if the last button was pressed
-
-			// how many inputs are there
-			int editingTextCount = m_editingText.size();
-			if (m_isSelected == true)
-			{
-				if (model()->getDataArray(m_selectedArray)->getIsEditableAttrib() == false)
-				{
-					// x, y
-					editingTextCount = 2;
-				}
-				else if (model()->getDataArray(m_selectedArray)->getIsAutomatableEffectable() == false)
-				{
-					// x, y, curve, valA, valB, switch type
-					editingTextCount = 6;
-				}
-			}
-
-			m_editingDisplayPage++;
-			if (m_editingInputCount * m_editingDisplayPage >= editingTextCount)
-			{
-				m_editingDisplayPage = 0;
-			}
-	qDebug("mouseMove editingPage: %d", m_editingDisplayPage);
-		}
-		else if (pressLocation >= 0)
-		{
-			unsigned int location = m_editingInputCount * m_editingDisplayPage + pressLocation;
-			// setting the boolean values
-			if (location < m_editingText.size() && m_editingInputIsFloat[location] == false)
-			{
-				bool curBoolValue = true;
-				//if (location >= 5 && location <= 7)
-				//{
-				//	curBoolValue = true;
-				//}
-				//else
-				// if location is not at "set type" or "set automation location" or "set effect location"
-				// (else curBoolValue = true -> setInputAttribValue will add 1 to the attribute)
-				if (location < 5 || location > 7)
-				{
-					getInputAttribValue(location, &curBoolValue);
-					curBoolValue = !curBoolValue;
-				}
-				setInputAttribValue(location, 0.0f, curBoolValue);
-			}
-		}
+		processEditingWindowPressed(x, m_graphHeight - y, false, false, 0, 0);
 	}
 	else
 	{
@@ -531,18 +464,7 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 	VectorGraphDataArray* dataArray = nullptr;
 	for (unsigned int i = 0; i < model()->getDataArraySize(); i++)
 	{
-
-		// if first data/sample > 0, draw a line to the first data/sample from 0
-		//if (posA.first > 0)
-		//{
-			//p.drawLine(0, posA.second, posA.first, posA.second);
-		//}
-		// drawing lines
 		paintGraph(&p, i);
-		//if (posA.first < width())
-		//{
-			//p.drawLine(posA.first, posA.second, width(), posA.second);
-		//}
 	}
 
 	paintEditing(&p);
@@ -678,8 +600,7 @@ void VectorGraphView::paintEditing(QPainter* pIn)
 				{
 					QColor curForeColor = *dataArray->getFillColor();
 					bool isTrue = false;
-					// unused float
-					float inputValue = getInputAttribValue(m_editingInputCount * m_editingDisplayPage + i, &isTrue);
+					getInputAttribValue(m_editingInputCount * m_editingDisplayPage + i, &isTrue);
 					if (isTrue == true)
 					{
 						curForeColor = *dataArray->getActiveColor();
@@ -722,13 +643,64 @@ void VectorGraphView::updateGraph()
 {
 	update();
 }
+void VectorGraphView::execConnectionDialog()
+{
+	if (m_isSelected == true)
+	{
+		model()->getDataArray(m_selectedArray)->setAutomated(m_selectedLocation, true);
+		FloatModel* curAutomationModel = model()->getDataArray(m_selectedArray)->getAutomationModel(m_selectedLocation);
+		gui::ControllerConnectionDialog dialog(getGUI()->mainWindow(), curAutomationModel);
+
+		if (dialog.exec() == 1)
+		{
+			// Actually chose something
+			if (curAutomationModel != nullptr && dialog.chosenController() != nullptr)
+			{
+				// Update
+				if (curAutomationModel->controllerConnection() != nullptr)
+				{
+					curAutomationModel->controllerConnection()->setController(dialog.chosenController());
+				}
+				else
+				{
+					// New
+					auto cc = new ControllerConnection(dialog.chosenController());
+					curAutomationModel->setControllerConnection(cc);
+				}
+			}
+			else
+			{
+				// no controller, so delete existing connection
+				removeController();
+			}
+		}
+		else
+		{
+			// did not return 1 -> delete the created floatModel
+			removeController();
+		}
+	}
+}
+void VectorGraphView::removeAutomation()
+{
+	if (m_isSelected == true)
+	{
+		// deleting the floatmodel will delete the connecitons
+		model()->getDataArray(m_selectedArray)->setAutomated(m_selectedLocation, false);
+	}
+}
+void VectorGraphView::removeController()
+{
+	removeAutomation();
+}
 
 std::pair<float, float> VectorGraphView::mapMousePos(int xIn, int yIn)
 {
-	// mapping the position to 0 - 1, 0 - 1 using qWidget width and height
+	// mapping the position to 0 - 1, -1 - 1 using qWidget width and height
+	qDebug("map mouse pos y: %d", yIn);
 	return std::pair<float, float>(
 		static_cast<float>(xIn / (float)width()),
-		static_cast<float>(yIn * 2.0f / (float)m_graphHeight) - 1.0f);
+		static_cast<float>(yIn) * 2.0f / static_cast<float>(m_graphHeight) - 1.0f);
 }
 std::pair<int, int> VectorGraphView::mapDataPos(float xIn, float yIn, bool nonNegativeIn)
 {
@@ -818,6 +790,91 @@ bool VectorGraphView::isEditingWindowPressed(int mouseYIn)
 		output = true;
 	}
 	return output;
+}
+void VectorGraphView::processEditingWindowPressed(int mouseXIn, int mouseYIn, bool isDraggingIn, bool startMovingIn, int xIn, int yIn)
+{
+	qDebug("mouseMove 7: %d", m_lastTrackPoint.first);
+	if (m_isEditingActive == true)
+	{
+		int pressLocation = getPressedInput(mouseXIn, m_graphHeight - mouseYIn, m_editingInputCount + 1);
+		int location = m_editingInputCount * m_editingDisplayPage + pressLocation;
+		if (isDraggingIn == false && pressLocation == m_editingInputCount)
+		{
+			// if the last button was pressed
+
+			// how many inputs are there
+			int editingTextCount = m_editingText.size();
+			if (m_isSelected == true)
+			{
+				if (model()->getDataArray(m_selectedArray)->getIsEditableAttrib() == false)
+				{
+					// x, y
+					editingTextCount = 2;
+				}
+				else if (model()->getDataArray(m_selectedArray)->getIsAutomatableEffectable() == false)
+				{
+					// x, y, curve, valA, valB, switch type
+					editingTextCount = 6;
+				}
+			}
+
+			m_editingDisplayPage++;
+			if (m_editingInputCount * m_editingDisplayPage >= editingTextCount)
+			{
+				m_editingDisplayPage = 0;
+			}
+			qDebug("mouseRelease editingPage: %d", m_editingDisplayPage);
+		}
+		else if (pressLocation >= 0 && location < m_editingText.size())
+		{
+			// pressLocation should always be bigger than -1
+			// if the editing window was pressed
+
+			if (m_addition == false)
+			{
+				// if the right mouse button was pressed
+				// show context menu
+				CaptionMenu contextMenu(model()->displayName());
+				addDefaultActions(&contextMenu);
+				contextMenu.exec(QCursor::pos());
+			}
+			else if (isDraggingIn == false && m_editingInputIsFloat[location] == false)
+			{
+				// if the input type is a bool
+
+				bool curBoolValue = true;
+				// if location is not at "set type" or "set automation location" or "set effect location"
+				// (else curBoolValue = true -> setInputAttribValue will add 1 to the attribute)
+				if (location < 5 || location > 7)
+				{
+					getInputAttribValue(location, &curBoolValue);
+					curBoolValue = !curBoolValue;
+				}
+				setInputAttribValue(location, 0.0f, curBoolValue);
+			}
+			else if (isDraggingIn == true && m_editingInputIsFloat[location] == true)
+			{
+				// if the input type is a float
+
+				// if the user just started to move the mouse it is pressed
+				if (startMovingIn == true)
+				{
+					// unused bool
+					bool isTrue = false;
+					// set m_lastScndTrackPoint.first to the current input value
+					m_lastScndTrackPoint.first = mapInputPos(getInputAttribValue(location, &isTrue), m_graphHeight);
+
+					m_lastTrackPoint.first = xIn;
+					m_lastTrackPoint.second = yIn;
+	qDebug("get last value: %d, lasttrack: %d, x: %d, y: %d, x2: %d, y2: %d, location: %d", m_lastScndTrackPoint.first, m_lastScndTrackPoint.second, xIn, (yIn), m_lastTrackPoint.first, m_lastTrackPoint.second, pressLocation);
+				}
+				std::pair<float, float> convertedCoords = mapMousePos(0,
+					m_lastScndTrackPoint.first + static_cast<int>(yIn - m_lastTrackPoint.second) / 2);
+				qDebug("dragging ... %d, %f", (m_lastScndTrackPoint.first + static_cast<int>(yIn - m_lastTrackPoint.second) / 2), convertedCoords.second);
+				setInputAttribValue(location, convertedCoords.second, false);
+			}
+		}
+	}
 }
 int VectorGraphView::getPressedInput(int mouseXIn, int mouseYIn, unsigned int inputCountIn)
 {
@@ -1045,6 +1102,41 @@ QString VectorGraphView::getTextFromDisplayLength(QString textIn, unsigned int d
 		}
 	}
 	return output;
+}
+void VectorGraphView::addDefaultActions(QMenu* menu)
+{
+	menu->addAction(embed::getIconPixmap("reload"),
+		tr("remove automation"),
+		this, SLOT(removeAutomation()));
+	menu->addSeparator();
+
+	model()->getDataArray(m_selectedArray)->setAutomated(m_selectedLocation, true);
+	FloatModel* curAutomationModel = model()->getDataArray(m_selectedArray)->getAutomationModel(m_selectedLocation);
+	QString controllerTxt;
+
+	menu->addAction(embed::getIconPixmap("controller"),
+		tr("Connect to controller..."),
+		this, SLOT(execConnectionDialog()));
+	if(curAutomationModel != nullptr && curAutomationModel->controllerConnection() != nullptr)
+	{
+		
+		Controller* cont = curAutomationModel->controllerConnection()->getController();
+		if(cont)
+		{
+			controllerTxt = AutomatableModel::tr( "Connected to %1" ).arg( cont->name() );
+		}
+		else
+		{
+			controllerTxt = AutomatableModel::tr( "Connected to controller" );
+		}
+
+
+		QMenu* contMenu = menu->addMenu(embed::getIconPixmap("controller"), controllerTxt);
+
+		contMenu->addAction(embed::getIconPixmap("cancel"),
+			tr("Remove connection"),
+			this, SLOT(removeConnection()));
+	}
 }
 
 std::pair<float, float> VectorGraphView::showCoordInputDialog()
@@ -2857,7 +2949,7 @@ void VectorGraphDataArray::getUpdatingFromAutomation()
 	{
 		if (getIsAutomationValueChanged(i) == true)
 		{
-			qDebug("getUpdatingFromAutomation: %d", i);
+			qDebug("getUpdatingFromAutomation: %d, attrib location: %d", i, getAutomatedAttribLocation(i));
 			m_needsUpdating.push_back(i);
 			// if the automatable value effects the y (so the position)
 			// so the point before this is updated too
@@ -3010,16 +3102,12 @@ qDebug("getValuesD7");
 		effectYLocation = static_cast<unsigned int>
 			(std::ceil(m_dataArray[m_needsUpdating[iIn] + 1].m_x / stepSizeIn));
 		end = effectYLocation;
+		nextY = processAutomation(m_dataArray[m_needsUpdating[iIn] + 1].m_y, m_needsUpdating[iIn] + 1, 0);
+
 		if (effectorIn != nullptr && effectorIn->getEffectOnlyPoints(effectorDataIn->operator[](iIn).second) == true)
 		{
 			nextEffectY = effectorOutputIn->operator[](effectYLocation);
-			nextY = processAutomation(
-				processEffect(m_dataArray[m_needsUpdating[iIn] + 1].m_y, 0, nextEffectY, effectorIn, effectorDataIn->operator[](iIn).second),
-				m_needsUpdating[iIn] + 1, 0);
-		}
-		else
-		{
-			nextY = m_dataArray[m_needsUpdating[iIn] + 1].m_y;
+			nextY = processEffect(nextY, 0, nextEffectY, effectorIn, effectorDataIn->operator[](iIn).second);
 		}
 	}
 	// calculating line ends
