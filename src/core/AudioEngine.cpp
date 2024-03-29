@@ -202,7 +202,8 @@ void AudioEngine::initDevices()
 		m_audioDevName = AudioDummy::name();
 		m_midiClient = new MidiDummy;
 		m_midiClientName = MidiDummy::name();
-	} else
+	}
+	else
 	{
 		m_audioDev = tryAudioDevices();
 		m_midiClient = tryMidiClients();
@@ -1066,8 +1067,8 @@ AudioDevice * AudioEngine::tryAudioDevices()
 
 
 	// add more device-classes here...
-	//dev = new audioXXXX( SAMPLE_RATES[m_qualityLevel], success_ful, this );
-	//if( sucess_ful )
+	//dev = new audioXXXX(SAMPLE_RATES[m_qualityLevel], success_ful, this);
+	//if (sucess_ful)
 	//{
 	//	return dev;
 	//}
@@ -1165,7 +1166,7 @@ MidiClient * AudioEngine::tryMidiClients()
 	if (client_name == MidiWinMM::name() || client_name == "")
 	{
 		MidiWinMM * mwmm = new MidiWinMM;
-//		if ( moss->isRunning() )
+//		if (moss->isRunning())
 		{
 			m_midiClientName = MidiWinMM::name();
 			return mwmm;
