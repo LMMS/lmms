@@ -26,8 +26,6 @@
 
 #include "ComboBox.h"
 
-#include <QApplication>
-#include <QDesktopWidget>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QStyleOptionFrame>
@@ -116,15 +114,17 @@ void ComboBox::mousePressEvent( QMouseEvent* event )
 				a->setData( i );
 			}
 
-			QPoint gpos = mapToGlobal( QPoint( 0, height() ) );
-			if( gpos.y() + m_menu.sizeHint().height() < qApp->desktop()->height() )
+			QPoint gpos = mapToGlobal(QPoint(0, height()));
+			bool const menuCanBeFullyShown = screen()->geometry().contains(QRect(gpos, m_menu.sizeHint()));
+			if (menuCanBeFullyShown)
 			{
-				m_menu.exec( gpos );
+				m_menu.exec(gpos);
 			}
 			else
 			{
-				m_menu.exec( mapToGlobal( QPoint( width(), 0 ) ) );
+				m_menu.exec(mapToGlobal(QPoint(width(), 0)));
 			}
+
 			m_pressed = false;
 			update();
 		}
