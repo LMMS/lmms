@@ -1053,7 +1053,6 @@ void ManageVestigeInstrumentView::syncPlugin( void )
 	auto paramStr = std::array<char, 35>{};
 	QStringList s_dumpValues;
 	const QMap<QString, QString> & dump = m_vi->m_plugin->parameterDump();
-	float f_value;
 
 	for( int i = 0; i < m_vi->paramCount; i++ )
 	{
@@ -1063,7 +1062,7 @@ void ManageVestigeInstrumentView::syncPlugin( void )
 		{
 			sprintf(paramStr.data(), "param%d", i);
     		s_dumpValues = dump[paramStr.data()].split(":");
-			f_value = LocaleHelper::toFloat(s_dumpValues.at(2));
+			float f_value = LocaleHelper::toFloat(s_dumpValues.at(2));
 			m_vi->knobFModel[ i ]->setAutomatedValue( f_value );
 			m_vi->knobFModel[ i ]->setInitValue( f_value );
 		}

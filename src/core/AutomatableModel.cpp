@@ -613,11 +613,11 @@ std::vector<float> * AutomatableModel::valueBuffer()
 	}
 
 	float val = m_value; // make sure our m_value doesn't change midway
-
+  
 	std::vector<float> * vb;
 	if (m_controllerConnection && m_useControllerValue && m_controllerConnection->getController()->isSampleExact())
 	{
-		vb = m_controllerConnection->valueBuffer();
+		auto vb = m_controllerConnection->valueBuffer();
 		if( vb )
 		{
 			float * values = vb->data();
