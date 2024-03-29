@@ -123,12 +123,7 @@ LadspaManagerDescription * LadspaManager::getDescription(
 						const ladspa_key_t & _plugin )
 {
 	auto const it = m_ladspaManagerMap.find(_plugin);
-	if (it != m_ladspaManagerMap.end())
-	{
-		return *it;
-	}
-
-	return nullptr;
+	return it != m_ladspaManagerMap.end() ? *it : nullptr;
 }
 
 
@@ -528,8 +523,7 @@ bool LadspaManager::isEnum( const ladspa_key_t & _plugin, uint32_t _port )
 		LADSPA_PortRangeHintDescriptor hintDescriptor =
 			desc->PortRangeHints[_port].HintDescriptor;
 		// This is an LMMS extension to ladspa
-		return(LADSPA_IS_HINT_INTEGER(hintDescriptor) &&
-			LADSPA_IS_HINT_TOGGLED(hintDescriptor));
+		return LADSPA_IS_HINT_INTEGER(hintDescriptor) && LADSPA_IS_HINT_TOGGLED(hintDescriptor);
 	}
 
 	return false;
@@ -563,10 +557,10 @@ const LADSPA_Descriptor * LadspaManager::getDescriptor(const ladspa_key_t & _plu
 	auto const it = m_ladspaManagerMap.find(_plugin);
 	if (it != m_ladspaManagerMap.end())
 	{
-		auto const p = *it;
+		auto const plugin = *it;
 
-		LADSPA_Descriptor_Function descriptorFunction = p->descriptorFunction;
-		const LADSPA_Descriptor * descriptor = descriptorFunction(p->index);
+		LADSPA_Descriptor_Function descriptorFunction = plugin->descriptorFunction;
+		const LADSPA_Descriptor* descriptor = descriptorFunction(plugin->index);
 
 		return descriptor;
 	}
