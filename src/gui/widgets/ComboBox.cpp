@@ -29,9 +29,9 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QStyleOptionFrame>
+#include <QScreen>
 
 #include "CaptionMenu.h"
-#include "embed.h"
 #include "gui_templates.h"
 
 namespace lmms::gui
