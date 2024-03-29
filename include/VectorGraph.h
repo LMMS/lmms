@@ -413,10 +413,7 @@ public:
 	// returns if the [effectNumberIn] effect is active based on effectNumberIn
 	bool getEffect(unsigned int locationIn, unsigned int effectNumberIn);
 	bool getIsAutomationValueChanged(unsigned int locationIn);
-	inline FloatModel* getAutomationModel(unsigned int locationIn)
-	{
-		return m_dataArray[locationIn].m_automationModel;
-	}
+	inline FloatModel* getAutomationModel(unsigned int locationIn);
 
 
 	// get: -------------------
@@ -501,7 +498,7 @@ private:
 			m_effectClampUpper = false;
 
 			m_bufferedAutomationValue = 0.0f;
-			m_automationModel = nullptr;
+			m_automationModel = -1;
 		}
 		inline VectorGraphPoint(float xIn, float yIn)
 		{
@@ -525,15 +522,10 @@ private:
 			m_effectClampUpper = false;
 
 			m_bufferedAutomationValue = 0.0f;
-			m_automationModel = nullptr;
+			m_automationModel = -1;
 		}
 		inline ~VectorGraphPoint()
 		{
-			// TODO make safer, delete in automationTrack
-			if (m_automationModel != nullptr)
-			{
-				delete m_automationModel;
-			}
 		}
 		// 0 - 1
 		float m_x;
@@ -576,8 +568,8 @@ private:
 
 		// stores m_automationModel->value(), used in updating
 		float m_bufferedAutomationValue;
-		// automation: connecting to floatmodels, nullptr when it isn't conntected'
-		FloatModel* m_automationModel;
+		// automation: connecting to floatmodels, -1 when it isn't conntected'
+		int m_automationModel;
 	};
 	// swapping values, "slide" moves the values (between) once left or right
 	// handle m_isFixedEndPoints when using this
@@ -685,13 +677,15 @@ private:
 
 	// if we want to update all
 	bool m_isDataChanged;
-	// if m_needsUpdating is up to date
-	// bool m_isUpdatedNeedsUpdating;
 	// array containing output final float values for optimalization
 	std::vector<float> m_bakedValues;
 	// unsorted array of locations in m_dataArray
 	// that need to be updated
 	std::vector<unsigned int> m_needsUpdating;
+
+	// this stores all the FloatModels
+	// used for automation
+	std::vector<FloatModel*> m_automationModelArray;
 };
 
 } // namespace lmms
