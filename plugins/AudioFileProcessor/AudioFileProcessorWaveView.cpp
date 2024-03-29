@@ -273,7 +273,7 @@ void AudioFileProcessorWaveView::paintEvent(QPaintEvent * pe)
 	p.fillRect(s_padding, s_padding, m_graph.width(), 14, g);
 
 	p.setPen(QColor(255, 255, 255));
-	p.setFont(pointSize<8>(font()));
+	p.setFont(pointSize(font(), 8));
 
 	QString length_text;
 	const int length = m_sample->sampleDuration().count();
@@ -354,32 +354,21 @@ void AudioFileProcessorWaveView::zoom(const bool out)
 	const double comp_ratio = double(qMin(d_from, d_to))
 								/ qMax(1, qMax(d_from, d_to));
 
-	f_cnt_t new_from;
-	f_cnt_t new_to;
+	const auto boundedFrom = std::clamp(m_from + step_from, 0, start);
+	const auto boundedTo = std::clamp(m_to + step_to, end, frames);
 
-	if ((out && d_from < d_to) || (! out && d_to < d_from))
-	{
-		new_from = qBound(0, m_from + step_from, start);
-		new_to = qBound(
-			end,
-			m_to + f_cnt_t(step_to * (new_from == m_from ? 1 : comp_ratio)),
-			frames
-		);
-	}
-	else
-	{
-		new_to = qBound(end, m_to + step_to, frames);
-		new_from = qBound(
-			0,
-			m_from + f_cnt_t(step_from * (new_to == m_to ? 1 : comp_ratio)),
-			start
-		);
-	}
+	const auto toStep = static_cast<f_cnt_t>(step_from * (boundedTo == m_to ? 1 : comp_ratio));
+	const auto newFrom
+		= (out && d_from < d_to) || (!out && d_to < d_from) ? boundedFrom : std::clamp(m_from + toStep, 0, start);
 
-	if (static_cast<double>(new_to - new_from) / m_sample->sampleRate() > 0.05)
+	const auto fromStep = static_cast<f_cnt_t>(step_to * (boundedFrom == m_from ? 1 : comp_ratio));
+	const auto newTo
+		= (out && d_from < d_to) || (!out && d_to < d_from) ? std::clamp(m_to + fromStep, end, frames) : boundedTo;
+
+	if (static_cast<double>(newTo - newFrom) / m_sample->sampleRate() > 0.05)
 	{
-		setFrom(new_from);
-		setTo(new_to);
+		setFrom(newFrom);
+		setTo(newTo);
 	}
 }
 

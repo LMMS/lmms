@@ -76,21 +76,18 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 	f.open(QIODevice::WriteOnly);
 	QDataStream midiout(&f);
 
-	InstrumentTrack* instTrack;
-	PatternTrack* patternTrack;
 	QDomElement element;
 
 
 	int nTracks = 0;
 	auto buffer = std::array<uint8_t, BUFFER_SIZE>{};
-	uint32_t size;
 
 	for (const Track* track : tracks) if (track->type() == Track::Type::Instrument) nTracks++;
 	for (const Track* track : patternStoreTracks) if (track->type() == Track::Type::Instrument) nTracks++;
 
 	// midi header
 	MidiFile::MIDIHeader header(nTracks);
-	size = header.writeToBuffer(buffer.data());
+	uint32_t size = header.writeToBuffer(buffer.data());
 	midiout.writeRawData((char *)buffer.data(), size);
 
 	std::vector<std::vector<std::pair<int,int>>> plists;
@@ -108,7 +105,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 			//mtrack.addProgramChange(0, 0);
 			mtrack.addTempo(tempo, 0);
 
-			instTrack = dynamic_cast<InstrumentTrack *>(track);
+			auto instTrack = dynamic_cast<InstrumentTrack *>(track);
 			element = instTrack->saveState(dataFile, dataFile.content());
 
 			int base_pitch = 0;
@@ -146,7 +143,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 
 		if (track->type() == Track::Type::Pattern)
 		{
-			patternTrack = dynamic_cast<PatternTrack*>(track);
+			auto patternTrack = dynamic_cast<PatternTrack*>(track);
 			element = patternTrack->saveState(dataFile, dataFile.content());
 
 			std::vector<std::pair<int,int>> plist;
@@ -184,7 +181,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 		//mtrack.addProgramChange(0, 0);
 		mtrack.addTempo(tempo, 0);
 
-		instTrack = dynamic_cast<InstrumentTrack *>(track);
+		auto instTrack = dynamic_cast<InstrumentTrack *>(track);
 		element = instTrack->saveState(dataFile, dataFile.content());
 
 		int base_pitch = 0;
