@@ -114,7 +114,7 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	{
 		m_outGain = dbfsToAmp( m_delayControls.m_outGainModel.value() );
 	}
-	int sampleLength;
+
 	for (fpp_t f = 0; f < frames; ++f)
 	{
 		auto& currentFrame = buf[f];
@@ -123,8 +123,7 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 		// Prepare delay for current sample
 		m_delay->setFeedback( *feedbackPtr );
 		m_lfo->setFrequency( *lfoTimePtr );
-		sampleLength = *lengthPtr * Engine::audioEngine()->processingSampleRate();
-		m_currentLength = sampleLength;
+		m_currentLength = static_cast<int>(*lengthPtr * Engine::audioEngine()->processingSampleRate());
 		m_delay->setLength( m_currentLength + ( *amplitudePtr * ( float )m_lfo->tick() ) );
 
 		// Process the wet signal
