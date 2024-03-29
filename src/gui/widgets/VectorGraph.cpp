@@ -1496,11 +1496,11 @@ VectorGraphDataArray::VectorGraphDataArray()
 
 	m_effectorLocation = -1;
 
-	//m_dataArray = {};
+	// m_dataArray
 	m_isDataChanged = false;
-	//m_isUpdatedNeedsUpdating = false;
-	//m_bakedValues = {};
-	//m_needsUpdating = {};
+	// m_bakedValues;
+	// m_needsUpdating;
+	// m_automationModelArray;
 
 	m_id = -1;
 }
@@ -1527,11 +1527,11 @@ VectorGraphDataArray::VectorGraphDataArray(
 
 	m_effectorLocation = -1;
 
-	// m_dataArray = {};
+	// m_dataArray;
 	m_isDataChanged = false;
-	//m_isUpdatedNeedsUpdating = false;
-	// m_bakedValues = {};
-	// m_needsUpdating = {};
+	// m_bakedValues;
+	// m_needsUpdating;
+	// m_automationModelArray;
 
 	m_id = idIn;
 	updateConnections(parentIn);
@@ -1542,6 +1542,12 @@ VectorGraphDataArray::~VectorGraphDataArray()
 	m_dataArray.clear();
 	m_bakedValues.clear();
 	m_needsUpdating.clear();
+
+	for (unsigned int i = 0; i < m_automationModelArray.size(); i++)
+	{
+		delete m_automationModelArray[i];
+	}
+	m_automationModelArray.clear();
 }
 
 void VectorGraphDataArray::updateConnections(VectorGraphModel* parentIn)
@@ -2390,10 +2396,10 @@ void VectorGraphDataArray::setEffect(unsigned int locationIn, unsigned int effec
 }
 bool VectorGraphDataArray::getIsAutomationValueChanged(unsigned int locationIn)
 {
-	if (m_dataArray[locationIn].m_automationModel != nullptr &&
-		m_dataArray[locationIn].m_bufferedAutomationValue != m_dataArray[locationIn].m_automationModel->value())
+	if (getAutomationModel(locationIn) != nullptr &&
+		m_dataArray[locationIn].m_bufferedAutomationValue != getAutomationModel(locationIn)->value())
 	{
-		m_dataArray[locationIn].m_bufferedAutomationValue = m_dataArray[locationIn].m_automationModel->value();
+		m_dataArray[locationIn].m_bufferedAutomationValue = getAutomationModel(locationIn)->value();
 		return true;
 	}
 	return false;
@@ -2404,22 +2410,47 @@ void VectorGraphDataArray::setAutomated(unsigned int locationIn, bool isAutomate
 	{
 		if (isAutomatedIn == true)
 		{
-			if (m_dataArray[locationIn].m_automationModel == nullptr)
+			if (m_dataArray[locationIn].m_automationModel == -1)
 			{
-				m_dataArray[locationIn].m_automationModel = new FloatModel(0.0f, -1.0f, 1.0f, 0.01f, m_parent, QString(), false);
+				m_automationModelArray.push_back(new FloatModel(0.0f, -1.0f, 1.0f, 0.01f, m_parent, QString(), false));
+				m_dataArray[locationIn].m_automationModel = m_automationModelArray.size() - 1;
 				getUpdatingFromPoint(locationIn);
 				dataChanged();
 			}
 		}
-		else if (m_dataArray[locationIn].m_automationModel != nullptr)
+		else if (m_dataArray[locationIn].m_automationModel != -1)
 		{
 			// TODO correctly deconstruct
-			delete m_dataArray[locationIn].m_automationModel;
-			m_dataArray[locationIn].m_automationModel = nullptr;
+			FloatModel* swap = m_automationModelArray[m_dataArray[locationIn].m_automationModel];
+			// copy the last FloatModel* to the current location
+			m_automationModelArray[m_dataArray[locationIn].m_automationModel] =
+				m_automationModelArray[m_automationModelArray.size() - 1];
+			m_automationModelArray.pop_back();
+
+			// replace all last m_automationModel-s to the currently deleted m_automationModel
+			for (unsigned int i = 0; i < m_dataArray.size(); i++)
+			{
+				if (m_dataArray[i].m_automationModel == m_automationModelArray.size())
+				{
+					m_dataArray[i].m_automationModel = m_dataArray[locationIn].m_automationModel;
+					// we dont break for safety
+				}
+			}
+			m_dataArray[locationIn].m_automationModel = -1;
+			delete swap;
+
 			getUpdatingFromPoint(locationIn);
 			dataChanged();
 		}
 	}
+}
+FloatModel* VectorGraphDataArray::getAutomationModel(unsigned int locationIn)
+{
+	if (m_dataArray[locationIn].m_automationModel != -1)
+	{
+		return m_automationModelArray[m_dataArray[locationIn].m_automationModel];
+	}
+	return nullptr;
 }
 
 void VectorGraphDataArray::swap(unsigned int locationAIn, unsigned int locationBIn, bool slide)
