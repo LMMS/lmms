@@ -53,6 +53,7 @@ public:
 
 private:
 	void deinitImpl() noexcept override;
+	//auto delayInit() const noexcept -> bool override { return false; }
 	auto hostExtImpl() const -> const clap_host_timer_support* override;
 	auto checkSupported(const clap_plugin_timer_support& ext) -> bool override;
 

@@ -55,7 +55,7 @@ ClapParameter::ClapParameter(ClapParams* parent, const clap_param_info& info, do
 		msg += info.module;
 		msg += "'; flags: ";
 		msg += std::to_string(info.flags);
-		parent->logger()->log(CLAP_LOG_DEBUG, msg);
+		parent->logger().log(CLAP_LOG_DEBUG, msg);
 	}
 #endif
 

@@ -332,7 +332,29 @@ auto ClapInstance::init() -> bool
 
 	if (m_pluginState != PluginState::Loaded) { return false; }
 
-	if (!m_plugin->init(m_plugin))
+	m_audioPorts.beginPluginInit();
+	m_gui.beginPluginInit();
+	m_log.beginPluginInit();
+	m_notePorts.beginPluginInit();
+	m_params.beginPluginInit();
+	m_presetLoader.beginPluginInit();
+	m_state.beginPluginInit();
+	m_threadCheck.beginPluginInit();
+	m_timerSupport.beginPluginInit();
+
+	const bool success = m_plugin->init(m_plugin);
+
+	m_audioPorts.endPluginInit();
+	m_gui.endPluginInit();
+	m_log.endPluginInit();
+	m_notePorts.endPluginInit();
+	m_params.endPluginInit();
+	m_presetLoader.endPluginInit();
+	m_state.endPluginInit();
+	m_threadCheck.endPluginInit();
+	m_timerSupport.endPluginInit();
+
+	if (!success)
 	{
 		{
 			std::string msg = "Could not init the plugin with id: " + std::string{info().descriptor().id};

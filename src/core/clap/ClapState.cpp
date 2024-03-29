@@ -199,10 +199,14 @@ auto ClapState::save(Context context) -> std::optional<std::string_view>
 
 void ClapState::clapMarkDirty(const clap_host* host)
 {
-	assert(ClapThreadCheck::isMainThread());
 	auto h = fromHost(host);
 	if (!h) { return; }
 	auto& state = h->state();
+
+	if (!ClapThreadCheck::isMainThread())
+	{
+		h->logger().log(CLAP_LOG_PLUGIN_MISBEHAVING, "Called state.mark_dirty() from wrong thread");
+	}
 
 	if (!state.supported())
 	{

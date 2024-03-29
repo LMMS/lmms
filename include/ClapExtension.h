@@ -54,18 +54,52 @@ public:
 	virtual auto extensionId() const -> std::string_view = 0;
 	virtual auto extensionIdCompat() const -> std::string_view { return std::string_view{}; }
 
+	void beginPluginInit() { m_inPluginInit = true; }
+	void endPluginInit() { m_inPluginInit = false; }
 	auto logger() const -> const ClapLog&;
 
 	static auto fromHost(const clap_host* host) -> ClapInstance*;
 
 protected:
+	enum class State
+	{
+		Uninit,
+		PartialInit,
+		FullInit,
+		Unsupported
+	};
+
 	auto instance() const { return m_instance; }
 	auto instance() { return m_instance; }
 	auto host() const -> const clap_host*;
 	auto plugin() const -> const clap_plugin*;
 
+	/**
+	 * For additional initialization steps.
+	 * - Only called if basic init was successful
+	 * - By default, will not be called during plugin->init()
+	 *     unless `delayInit()` returns false
+	 * - supported() == true during this call,
+	 *     and (if applicable) pluginExt() is non-null
+	 */
+	virtual auto initImpl() noexcept -> bool { return true; }
+
+	/**
+	 * For additional deinitialization steps.
+	 */
+	virtual void deinitImpl() noexcept {}
+
+	/**
+	 * Whether `initImpl()` is postponed until after plugin->init()
+	 */
+	virtual auto delayInit() const noexcept -> bool { return true; }
+
+	//! Whether the plugin is calling into the host during plugin->init()
+	auto inPluginInit() const { return m_inPluginInit; }
+
 private:
 	ClapInstance* m_instance = nullptr;
+	bool m_inPluginInit = false;
 };
 
 } // namespace detail
@@ -83,42 +117,61 @@ public:
 
 	auto init() -> bool
 	{
-		if (m_supported) { return true; }
-		if (m_pluginExt) { return false; } // already init
-
-		auto ext = static_cast<const PluginExt*>(plugin()->get_extension(plugin(), extensionId().data()));
-		if (!ext)
+		switch (m_state)
 		{
-			// Try using compatibility ID if it exists
-			if (const auto compatId = extensionIdCompat(); !compatId.empty())
+			case State::Uninit:
 			{
-				ext = static_cast<const PluginExt*>(plugin()->get_extension(plugin(), compatId.data()));
+				auto ext = static_cast<const PluginExt*>(plugin()->get_extension(plugin(), extensionId().data()));
+				if (!ext)
+				{
+					// Try using compatibility ID if it exists
+					if (const auto compatId = extensionIdCompat(); !compatId.empty())
+					{
+						ext = static_cast<const PluginExt*>(plugin()->get_extension(plugin(), compatId.data()));
+					}
+				}
+
+				if (!ext || !checkSupported(*ext))
+				{
+					m_pluginExt = nullptr;
+					m_state = State::Unsupported;
+					return false;
+				}
+
+				m_pluginExt = ext;
+				m_state = State::PartialInit;
+				if ((!delayInit() || !inPluginInit()) && !initImpl())
+				{
+					m_state = State::Unsupported;
+					return false;
+				}
+
+				m_state = delayInit() ? State::PartialInit : State::FullInit;
+
+				return true;
 			}
+			case State::PartialInit:
+			{
+				if (inPluginInit()) { return false; }
+				if (!initImpl())
+				{
+					m_state = State::Unsupported;
+					return false;
+				}
+				m_state = State::FullInit;
+				return true;
+			}
+			case State::FullInit:    return true;
+			case State::Unsupported: return false;
+			default:                 return false;
 		}
-
-		if (!ext || !checkSupported(*ext))
-		{
-			m_pluginExt = nullptr;
-			m_supported = false;
-			return false;
-		}
-
-		m_pluginExt = ext;
-		m_supported = true;
-		if (!initImpl())
-		{
-			m_supported = false;
-			return false;
-		}
-
-		return true;
 	}
 
 	void deinit()
 	{
 		deinitImpl();
 		m_pluginExt = nullptr;
-		m_supported = false;
+		m_state = State::Uninit;
 	}
 
 	/**
@@ -126,7 +179,10 @@ public:
 	 *   and passes any additional checks from initImpl().
 	 * Do not use before init().
 	 */
-	auto supported() const { return m_supported; }
+	auto supported() const
+	{
+		return m_state == State::PartialInit || m_state == State::FullInit;
+	}
 
 	/**
 	 * Returns pointer to host extension.
@@ -142,18 +198,6 @@ public:
 	auto pluginExt() const { return m_pluginExt; }
 
 protected:
-	/**
-	 * For additional initialization steps.
-	 * - Only called if basic init was successful
-	 * - pluginExt() is non-null and supported() == true during this call
-	 */
-	virtual auto initImpl() noexcept -> bool { return true; }
-
-	/**
-	 * For additional deinitialization steps.
-	 */
-	virtual void deinitImpl() noexcept {}
-
 	virtual auto hostExtImpl() const -> const HostExt* = 0;
 
 	/**
@@ -166,7 +210,8 @@ private:
 	//const HostExt* m_hostExt = nullptr;
 	const PluginExt* m_pluginExt = nullptr;
 
-	bool m_supported = false;
+	using State = detail::ClapExtensionHelper::State;
+	State m_state = State::Uninit;
 };
 
 
@@ -182,32 +227,51 @@ public:
 
 	auto init() -> bool
 	{
-		if (m_supported) { return true; }
-		if (m_initialized) { return false; } // already init
-		m_initialized = true;
-
-		m_supported = true;
-		if (!initImpl())
+		switch (m_state)
 		{
-			m_supported = false;
-			return false;
-		}
+			case State::Uninit:
+			{
+				m_state = State::PartialInit;
+				if ((!delayInit() || !inPluginInit()) && !initImpl())
+				{
+					m_state = State::Unsupported;
+					return false;
+				}
 
-		return true;
+				m_state = delayInit() ? State::PartialInit : State::FullInit;
+				return true;
+			}
+			case State::PartialInit:
+			{
+				if (inPluginInit()) { return false; }
+				if (!initImpl())
+				{
+					m_state = State::Unsupported;
+					return false;
+				}
+				m_state = State::FullInit;
+				return true;
+			}
+			case State::FullInit:    return true;
+			case State::Unsupported: return false;
+			default:                 return false;
+		}
 	}
 
 	void deinit()
 	{
 		deinitImpl();
-		m_initialized = false;
-		m_supported = false;
+		m_state = State::Uninit;
 	}
 
 	/**
 	 * Returns whether initImpl() was successful.
 	 * Do not use before init().
 	*/
-	auto supported() const { return m_supported; }
+	auto supported() const
+	{
+		return m_state == State::PartialInit || m_state == State::FullInit;
+	}
 
 	/**
 	 * Returns pointer to host extension.
@@ -220,24 +284,13 @@ public:
 	}
 
 protected:
-	/**
-	 * For any custom initialization step.
-	 * - supported() == true during this call
-	*/
-	virtual auto initImpl() noexcept -> bool { return true; }
-
-	/**
-	 * For additional deinitialization steps.
-	*/
-	virtual void deinitImpl() noexcept {}
-
 	virtual auto hostExtImpl() const -> const HostExt* = 0;
 
 private:
 	//const HostExt* m_hostExt = nullptr;
 
-	bool m_supported = false;
-	bool m_initialized = false;
+	using State = detail::ClapExtensionHelper::State;
+	State m_state = State::Uninit;
 };
 
 } // namespace lmms
