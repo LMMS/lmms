@@ -888,7 +888,7 @@ MESSAGE(
 "* Debug using ThreadSanitizer       : ${STATUS_DEBUG_TSAN}\n"
 "* Debug using MemorySanitizer       : ${STATUS_DEBUG_MSAN}\n"
 "* Debug using UBSanitizer           : ${STATUS_DEBUG_UBSAN}\n"
-"* Experimental Qt6 support 		 : ${STATUS_QT6}\n"
+"* Experimental Qt6 support          : ${STATUS_QT6}\n"
 )
 
 MESSAGE(
