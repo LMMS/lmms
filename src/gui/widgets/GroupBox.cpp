@@ -111,7 +111,7 @@ void GroupBox::paintEvent( QPaintEvent * pe )
 
 	// draw text
 	p.setPen( palette().color( QPalette::Active, QPalette::Text ) );
-	p.setFont( pointSize<8>( font() ) );
+	p.setFont(pointSize(font(), 8));
 
 	int const captionX = ledButtonShown() ? 22 : 6;
 	p.drawText(captionX, m_titleBarHeight, m_caption);

@@ -207,7 +207,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	m_lfoWaveBtnGrp->addButton( random_lfo_btn );
 
 	m_x100Cb = new LedCheckBox( tr( "FREQ x 100" ), this );
-	m_x100Cb->setFont( pointSizeF( m_x100Cb->font(), 6.5 ) );
+	m_x100Cb->setFont(pointSize(m_x100Cb->font(), 6.5));
 	m_x100Cb->move( LFO_PREDELAY_KNOB_X, LFO_GRAPH_Y + 36 );
 	m_x100Cb->setToolTip(tr("Multiply LFO frequency by 100"));
 
@@ -215,7 +215,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	m_controlEnvAmountCb = new LedCheckBox( tr( "MODULATE ENV AMOUNT" ),
 			this );
 	m_controlEnvAmountCb->move( LFO_PREDELAY_KNOB_X, LFO_GRAPH_Y + 54 );
-	m_controlEnvAmountCb->setFont( pointSizeF( m_controlEnvAmountCb->font(), 6.5 ) );
+	m_controlEnvAmountCb->setFont(pointSize(m_controlEnvAmountCb->font(), 6.5));
 	m_controlEnvAmountCb->setToolTip(
 				tr( "Control envelope amount by this LFO" ) );
 
@@ -340,7 +340,7 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 	// draw LFO-graph
 	p.drawPixmap(LFO_GRAPH_X, LFO_GRAPH_Y, m_lfoGraph);
 
-	p.setFont( pointSize<8>( p.font() ) );
+	p.setFont(pointSize(p.font(), 8));
 
 	const float gray_amount = 1.0f - fabsf( m_amountKnob->value<float>() );
 
