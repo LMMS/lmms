@@ -918,7 +918,7 @@ void AutomationClip::loadSettings(const QDomElement & _this)
 			m_idsToResolve.push_back(element.attribute("id").toInt());
 		}
 	}
-	
+
 	if (_this.hasAttribute("color"))
 	{
 		setColor(QColor{_this.attribute("color")});
