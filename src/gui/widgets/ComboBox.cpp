@@ -34,7 +34,6 @@
 #include "CaptionMenu.h"
 #include "gui_templates.h"
 
-// TODO Remove once Qt5 support is dropped (#6614)
 #define QT_SUPPORTS_WIDGET_SCREEN (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 #if !QT_SUPPORTS_WIDGET_SCREEN
 #include <QApplication>
