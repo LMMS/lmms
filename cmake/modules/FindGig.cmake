@@ -7,13 +7,13 @@
 include(ImportedTargetHelpers)
 
 find_package_config_mode_with_fallback(gig libgig::libgig
-	LIBRARY_NAMES "libgig"
+	LIBRARY_NAMES "gig"
 	INCLUDE_NAMES "libgig/gig.h"
-	PKG_CONFIG Gig
+	PKG_CONFIG gig
 	PREFIX Gig
 )
 
-DETERMINE_VERSION_FROM_SOURCE(Gig_VERSION libgig::libgig [[
+determine_version_from_source(Gig_VERSION libgig::libgig [[
 	#include <iostream>
 	#include <libgig/gig.h>
 
