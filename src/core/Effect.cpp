@@ -210,8 +210,8 @@ void Effect::resample( int _i, const sampleFrame * _src_buf,
 	m_srcData[_i].data_out = _dst_buf[0].data ();
 	m_srcData[_i].src_ratio = (double) _dst_sr / _src_sr;
 	m_srcData[_i].end_of_input = 0;
-	int error;
-	if( ( error = src_process( m_srcState[_i], &m_srcData[_i] ) ) )
+
+	if (int error = src_process(m_srcState[_i], &m_srcData[_i]))
 	{
 		qFatal( "Effect::resample(): error while resampling: %s\n",
 							src_strerror( error ) );

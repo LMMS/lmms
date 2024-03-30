@@ -39,10 +39,7 @@ MidiAlsaRaw::MidiAlsaRaw() :
 	m_outputp( &m_output ),
 	m_quit( false )
 {
-	int err;
-	if( ( err = snd_rawmidi_open( m_inputp, m_outputp,
-					probeDevice().toLatin1().constData(),
-								0 ) ) < 0 )
+	if (int err = snd_rawmidi_open(m_inputp, m_outputp, probeDevice().toLatin1().constData(), 0); err < 0)
 	{
 		printf( "cannot open MIDI-device: %s\n", snd_strerror( err ) );
 		return;
@@ -111,29 +108,27 @@ void MidiAlsaRaw::run()
 	{
 		msleep( 5 );	// must do that, otherwise this thread takes
 				// too much CPU-time, even with LowPriority...
-		int err = poll( m_pfds, m_npfds, 10000 );
-		if( err < 0 && errno == EINTR )
+		if (int err = poll(m_pfds, m_npfds, 10000); err < 0 && errno == EINTR)
 		{
 			printf( "MidiAlsaRaw::run(): Got EINTR while "
 				"polling. Will stop polling MIDI-events from "
 				"MIDI-port.\n" );
 			break;
 		}
-		if( err < 0 )
+		else if (err < 0)
 		{
 			printf( "poll failed: %s\nWill stop polling "
 				"MIDI-events from MIDI-port.\n",
 							strerror( errno ) );
 			break;
 		}
-		if( err == 0 )
+		else if (err == 0)
 		{
 			//printf( "there seems to be no active MIDI-device %d\n", ++cnt );
 			continue;
 		}
-		unsigned short revents;
-		if( ( err = snd_rawmidi_poll_descriptors_revents(
-				m_input, m_pfds, m_npfds, &revents ) ) < 0 )
+		unsigned short revents = 0;
+		if (int err = snd_rawmidi_poll_descriptors_revents(m_input, m_pfds, m_npfds, &revents); err < 0)
 		{
 			printf( "cannot get poll events: %s\nWill stop polling "
 				"MIDI-events from MIDI-port.\n",
@@ -149,25 +144,19 @@ void MidiAlsaRaw::run()
 		{
 			continue;
 		}
-		err = snd_rawmidi_read(m_input, buf.data(), buf.size());
-		if( err == -EAGAIN )
-		{
-			continue;
-		}
-		if( err < 0 )
+
+		if (int err = snd_rawmidi_read(m_input, buf.data(), buf.size()); err == -EAGAIN) { continue; }
+		else if (err < 0)
 		{
 			printf( "cannot read from port \"%s\": %s\nWill stop "
 				"polling MIDI-events from MIDI-port.\n",
 				/*port_name*/"default", snd_strerror( err ) );
 			break;
 		}
-		if( err == 0 )
+		else if (err == 0) { continue; }
+		else
 		{
-			continue;
-		}
-		for( int i = 0; i < err; ++i )
-		{
-			parseData( buf[i] );
+			for (int i = 0; i < err; ++i) { parseData(buf[i]); }
 		}
 	}
 

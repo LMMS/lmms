@@ -772,17 +772,17 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 			}
 		}
 
-		Note * cur_note;
-		while( nit != notes.end() &&
-					( cur_note = *nit )->pos() == cur_start )
+		while (nit != notes.end() && (*nit)->pos() == cur_start)
 		{
+			const auto currentNote = *nit;
+
 			// If the note is a Step Note, frames will be 0 so the NotePlayHandle
 			// plays for the whole length of the sample
-			const auto note_frames = cur_note->type() == Note::Type::Step
+			const auto noteFrames = currentNote->type() == Note::Type::Step
 				? 0
-				: cur_note->length().frames(frames_per_tick);
+				: currentNote->length().frames(frames_per_tick);
 
-			NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire( this, _offset, note_frames, *cur_note );
+			NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire(this, _offset, noteFrames, *currentNote);
 			notePlayHandle->setPatternTrack(pattern_track);
 			// are we playing global song?
 			if( _clip_num < 0 )
