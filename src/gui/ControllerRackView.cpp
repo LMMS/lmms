@@ -24,6 +24,7 @@
  */
 
 #include <QApplication>
+#include <QAction>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QMessageBox>
@@ -132,6 +133,33 @@ void ControllerRackView::deleteController( ControllerView * _view )
 	song->removeController( c );
 }
 
+void ControllerRackView::moveUp(ControllerView* view)
+{
+	// cannot delete the first module
+	if (view == m_controllerViews.first()) { return; }
+	
+	int i = 0;
+	for (auto it = m_controllerViews.begin(); it != m_controllerViews.end(); ++it, ++i)
+	{
+		if (*it == view) { break; }
+	}
+	ControllerView* temp = m_controllerViews[i - 1];
+	m_controllerViews[i - 1] = view;
+	m_controllerViews[i] = temp;
+
+	m_scrollAreaLayout->removeWidget(view);
+	m_scrollAreaLayout->insertWidget(i - 1, view);
+}
+
+void ControllerRackView::moveDown(ControllerView* view)
+{
+	if(view != m_controllerViews.last())
+	{
+		// moving next controller up is the same
+		moveUp(*(std::find(m_controllerViews.begin(), m_controllerViews.end(), view) + 1));
+	}
+}
+
 
 
 
@@ -141,8 +169,25 @@ void ControllerRackView::onControllerAdded( Controller * controller )
 
 	auto controllerView = new ControllerView(controller, scrollAreaWidget);
 
+	connect(controllerView, SIGNAL(moveUp(lmms::gui::ControllerView* )), this, 
+		SLOT(moveUp(lmms::gui::ControllerView* )), Qt::QueuedConnection);
+	connect(controllerView, SIGNAL(moveDown(lmms::gui::ControllerView* )), this, 
+		SLOT(moveDown(lmms::gui::ControllerView* )), Qt::QueuedConnection);
 	connect( controllerView, SIGNAL(deleteController(lmms::gui::ControllerView*)),
 		 this, SLOT(deleteController(lmms::gui::ControllerView*)), Qt::QueuedConnection );
+
+	QAction* moveUpAction = new QAction(controllerView);
+	moveUpAction->setShortcut(Qt::Key_Up | Qt::AltModifier);
+	moveUpAction->setShortcutContext(Qt::WidgetShortcut);
+	connect(moveUpAction, SIGNAL(triggered()), controllerView, SLOT(moveUp()));
+	controllerView->addAction( moveUpAction );
+
+	QAction* moveDownAction = new QAction(controllerView);
+	moveDownAction->setShortcut(Qt::Key_Down | Qt::AltModifier);
+	moveDownAction->setShortcutContext(Qt::WidgetShortcut);
+	connect(moveDownAction, SIGNAL(triggered()), controllerView, SLOT(moveDown()));
+	controllerView->addAction(moveDownAction);
+
 
 	m_controllerViews.append( controllerView );
 	m_scrollAreaLayout->insertWidget( m_nextIndex, controllerView );

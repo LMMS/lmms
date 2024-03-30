@@ -24,6 +24,7 @@
  */
 
 #include <QApplication>
+#include <QAction>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QVBoxLayout>
@@ -177,6 +178,19 @@ void EffectRackView::update()
 			connect( view, SIGNAL(deletePlugin(lmms::gui::EffectView*)),
 				this, SLOT(deletePlugin(lmms::gui::EffectView*)),
 							Qt::QueuedConnection );
+
+			QAction* moveUpAction = new QAction(view);
+			moveUpAction->setShortcut(Qt::Key_Up | Qt::AltModifier);
+			moveUpAction->setShortcutContext(Qt::WidgetShortcut);
+			connect(moveUpAction, SIGNAL(triggered()), view, SLOT(moveUp()));
+			view->addAction(moveUpAction);
+
+			QAction* moveDownAction = new QAction(view);
+			moveDownAction->setShortcut(Qt::Key_Down | Qt::AltModifier);
+			moveDownAction->setShortcutContext(Qt::WidgetShortcut);
+			connect(moveDownAction, SIGNAL(triggered()), view, SLOT(moveDown()));
+			view->addAction(moveDownAction);
+
 			view->show();
 			m_effectViews.append( view );
 			if( i < view_map.size() )

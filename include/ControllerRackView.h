@@ -66,6 +66,8 @@ public:
 
 public slots:
 	void deleteController( lmms::gui::ControllerView * _view );
+	void moveUp(lmms::gui::ControllerView* _view);
+	void moveDown(lmms::gui::ControllerView* _view);
 	void onControllerAdded( lmms::Controller * );
 	void onControllerRemoved( lmms::Controller * );
 
