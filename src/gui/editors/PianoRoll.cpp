@@ -3031,7 +3031,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	if (hasValidMidiClip())
 	{
 		int pianoAreaHeight = keyAreaBottom() - keyAreaTop();
-		int m_pianoKeysVisible = pianoAreaHeight / m_keyLineHeight;
+		m_pianoKeysVisible = pianoAreaHeight / m_keyLineHeight;
 		int partialKeyVisible = pianoAreaHeight % m_keyLineHeight;
 		// check if we're below the minimum key area size
 		if (m_pianoKeysVisible * m_keyLineHeight < KEY_AREA_MIN_HEIGHT)
