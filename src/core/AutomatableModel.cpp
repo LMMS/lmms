@@ -620,8 +620,8 @@ ValueBuffer * AutomatableModel::valueBuffer()
 	{
 
 		auto vb = m_controllerConnection->valueBuffer();
-		if (vb)
 
+		if (vb)
 		{
 			float * values = vb->values();
 			float * nvalues = m_valueBuffer.values();
