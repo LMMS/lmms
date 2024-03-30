@@ -103,6 +103,7 @@ option(WANT_DEBUG_TSAN	"Enable ThreadSanitizer" OFF)
 option(WANT_DEBUG_MSAN	"Enable MemorySanitizer" OFF)
 option(WANT_DEBUG_UBSAN	"Enable UndefinedBehaviorSanitizer" OFF)
 OPTION(BUNDLE_QT_TRANSLATIONS	"Install Qt translation files for LMMS" OFF)
+option(WANT_QT6 "Build with experimental Qt6 support" OFF)
 
 
 IF(LMMS_BUILD_APPLE)
@@ -181,8 +182,10 @@ IF(WANT_QT6)
 	SET(QT_VERSION_MAJOR 6)
 	SET(WANT_VST OFF)
 	MESSAGE("VSTs not supported with Qt 6")
+	SET(STATUS_QT6 "ENABLED")
 ELSE()
 	SET(QT_VERSION_MAJOR 5)
+	SET(STATUS_QT6 "NOT ENABLED")
 ENDIF()
 
 FIND_PACKAGE(Qt${QT_VERSION_MAJOR} COMPONENTS Core Gui Widgets Xml REQUIRED)
@@ -211,7 +214,7 @@ ENDIF()
 # Resolve Qt5::qmake to full path for use in packaging scripts
 IF(WANT_QT6)
 	FIND_PROGRAM(QT_QMAKE_EXECUTABLE NAME qmake.exe
-		PATHS "${CMAKE_PREFIX_PATH}/bin" /opt/Qt5) # TODO: add more paths here
+		PATHS "${CMAKE_PREFIX_PATH}/bin" /opt/Qt6/bin) # TODO: add more paths here
 ELSE()
 	GET_TARGET_PROPERTY(QT_QMAKE_EXECUTABLE "${Qt5Core_QMAKE_EXECUTABLE}" IMPORTED_LOCATION)
 ENDIF()
@@ -885,6 +888,7 @@ MESSAGE(
 "* Debug using ThreadSanitizer       : ${STATUS_DEBUG_TSAN}\n"
 "* Debug using MemorySanitizer       : ${STATUS_DEBUG_MSAN}\n"
 "* Debug using UBSanitizer           : ${STATUS_DEBUG_UBSAN}\n"
+"* Experimental Qt6 support 		 : ${STATUS_QT6}\n"
 )
 
 MESSAGE(
