@@ -333,7 +333,7 @@ public:
 	void setAutomatedColor(QColor colorIn);
 	// returns true if successful
 
-	bool setEffectorArrayLocation(int locationIn);
+	bool setEffectorArrayLocation(int locationIn, bool callDataChangedIn);
 
 	bool getIsFixedSize();
 	bool getIsFixedValue();

@@ -1427,15 +1427,34 @@ unsigned int VectorGraphModel::addArray()
 void VectorGraphModel::delArray(unsigned int locationIn)
 {
 	// TODO test
+	std::vector<int> effectorArrayLocations(m_dataArrays.size());
 	for (unsigned int i = locationIn; i < m_dataArrays.size() - 1; i++)
 	{
 		if (m_dataArrays[i].getEffectorArrayLocation() == locationIn)
 		{
-			m_dataArrays[i].setEffectorArrayLocation(-1);
+			m_dataArrays[i].setEffectorArrayLocation(-1, false);
 		}
 		m_dataArrays[i] = m_dataArrays[i + 1];
 	}
 	m_dataArrays.pop_back();
+	// reset effector locations to the correct locations
+	for (unsigned int i = 0; i < m_dataArrays.size(); i++)
+	{
+		effectorArrayLocations[i] = m_dataArrays[i].getEffectorArrayLocation();
+		if (effectorArrayLocations[i] >= locationIn)
+		{
+			effectorArrayLocations[i]--;
+		}
+		// effectorLocations are cleared to avoid the
+		// dataArrays detecting loops and then not setting
+		m_dataArrays[i].setEffectorArrayLocation(-1, false);
+	}
+	// setting updated locations
+	for (unsigned int i = 0; i < m_dataArrays.size(); i++)
+	{
+		m_dataArrays[i].setEffectorArrayLocation(effectorArrayLocations[i], false);
+	}
+	emit dataChanged();
 }
 
 void VectorGraphModel::dataArrayChanged()
@@ -1572,7 +1591,7 @@ void VectorGraphDataArray::updateConnections(VectorGraphModel* parentIn)
 	m_parent = parentIn;
 	m_id = m_parent->getDataArrayNewId();
 	// reseting effectors
-	setEffectorArrayLocation(-1);
+	setEffectorArrayLocation(-1, true);
 }
 
 void VectorGraphDataArray::setIsFixedSize(bool valueIn)
@@ -1617,11 +1636,11 @@ void VectorGraphDataArray::setIsAutomatableEffectable(bool valueIn)
 	m_isAutomatableEffectable = valueIn;
 	if (valueIn == false)
 	{
-		setEffectorArrayLocation(-1);
+		// setEffectorArray will call dataChanged()
+		setEffectorArrayLocation(-1, true);
 	}
 	else
 	{
-		// setEffectorArray will call dataChanged()
 		getUpdatingFromPoint(-1);
 		dataChanged();
 	}
@@ -1656,7 +1675,7 @@ void VectorGraphDataArray::setAutomatedColor(QColor colorIn)
 	m_automatedColor = colorIn;
 	styleChanged();
 }
-bool VectorGraphDataArray::setEffectorArrayLocation(int locationIn)
+bool VectorGraphDataArray::setEffectorArrayLocation(int locationIn, bool callDataChangedIn)
 {
 	qDebug("setEffectorArrayLocation start");
 	bool found = true;
@@ -1687,7 +1706,10 @@ bool VectorGraphDataArray::setEffectorArrayLocation(int locationIn)
 		{
 			m_effectorLocation = locationIn;
 			getUpdatingFromPoint(-1);
-			dataChanged();
+			if (callDataChangedIn == true)
+			{
+				dataChanged();
+			}
 		}
 	}
 	else
@@ -1696,7 +1718,10 @@ bool VectorGraphDataArray::setEffectorArrayLocation(int locationIn)
 		{
 			m_effectorLocation = -1;
 			getUpdatingFromPoint(-1);
-			dataChanged();
+			if (callDataChangedIn == true)
+			{
+				dataChanged();
+			}
 		}
 	}
 	return !found;
