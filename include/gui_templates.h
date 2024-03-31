@@ -32,27 +32,15 @@
 #include <QFont>
 #include <QGuiApplication>
 
-// TODO: remove once qt5 support is dropped
-#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
-	#include <QScreen>
-#endif
-
 namespace lmms::gui
 {
 
-
-// return DPI-independent font-size - font with returned font-size has always
-// the same size in pixels
-inline QFont pointSize(QFont fontPointer, float fontSize)
+// Convenience method to set the font size in pixels
+inline QFont pointSize(QFont fontPointer, int fontSize)
 {
-	// to calculate DPI of a screen to make it HiDPI ready
-	qreal devicePixelRatio = QGuiApplication::primaryScreen()->devicePixelRatio();
-    qreal scaleFactor = std::max(devicePixelRatio, 1.0); // Ensure scaleFactor is at least 1.0
-
-	fontPointer.setPointSizeF(fontSize * scaleFactor);
+	fontPointer.setPixelSize(fontSize);
 	return fontPointer;
 }
-
 
 } // namespace lmms::gui
 
