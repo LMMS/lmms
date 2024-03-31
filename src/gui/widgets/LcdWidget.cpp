@@ -203,7 +203,7 @@ void LcdWidget::paintEvent( QPaintEvent* )
 	// Label
 	if( !m_label.isEmpty() )
 	{
-		p.setFont(adjustedToPixelSize(p.font(), 6.5f));
+		p.setFont(adjustedToPixelSize(p.font(), 10));
 		p.setPen( textShadowColor() );
 		p.drawText(width() / 2 -
 				horizontalAdvance(p.fontMetrics(), m_label) / 2 + 1,
@@ -255,7 +255,7 @@ void LcdWidget::updateSize()
 		setFixedSize(
 			qMax<int>(
 				m_cellWidth * m_numDigits + marginX1 + marginX2,
-				horizontalAdvance(QFontMetrics(adjustedToPixelSize(font(), 6.5f)), m_label)
+				horizontalAdvance(QFontMetrics(adjustedToPixelSize(font(), 10)), m_label)
 			),
 			m_cellHeight + (2 * marginY) + 9
 		);
