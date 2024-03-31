@@ -3598,9 +3598,9 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	}
 	else
 	{
-		QFont f = p.font();
-		f.setBold( true );
-		p.setFont(adjustedToPixelSize(f, 14));
+		QFont f = font();
+		f.setBold(true);
+		p.setFont(f);
 		p.setPen( QApplication::palette().color( QPalette::Active,
 							QPalette::BrightText ) );
 		p.drawText(m_whiteKeyWidth + 20, PR_TOP_MARGIN + 40,
