@@ -62,7 +62,8 @@ FFTFilterControls::FFTFilterControls(FFTFilterEffect* effect) :
 	m_graphModel.getDataArray(arrayLocationB)->setAutomatedColor(QColor(10, 50, 255, 255));
 
 	// effectors:
-	m_graphModel.getDataArray(arrayLocation)->setEffectorArrayLocation(arrayLocationB);
+	// true -> m_graphModel will call update() -> paintEvent()
+	m_graphModel.getDataArray(arrayLocation)->setEffectorArrayLocation(arrayLocationB, true);
 }
 
 
