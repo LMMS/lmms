@@ -118,10 +118,12 @@ bool FFTFilterEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			graphInput[i] = graphInput[i] / static_cast<float>(avgCount);
 		}
 		// DEBUG
+		/*
 		for (unsigned int i = 0; i < FFTSpectrumOutput.size(); i++)
 		{
 			qDebug("FFTFilterEffect: [%d], %f", i, FFTSpectrumOutput[i]);
 		}
+		*/
 		//m_filterControls.setGraph(&graphInput);
 	}
 	//std::vector<float>* output;
@@ -131,9 +133,10 @@ bool FFTFilterEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	//}
 	//std::vector<float> testVector = {0.0f, 0.3f, 0.5f, -0.5f, 0.2f};
 	//std::vector<float> testVector = {0.0f, 1.3f, 0.5f, -2.5f, 0.2f};
+	std::vector<float> testVector = {0.0f, 0.1f, 0.5f, 0.7f, 0.5f, 0.2f, 0.1f, -1.0f, -0.1f, -0.1f, 0.2f};
 
 
-	//m_filterControls.setGraph(&testVector);
+	m_filterControls.setGraph(&testVector);
 
 	/*
 	const ValueBuffer* volumeBuf = m_filterControls.m_volumeModel.valueBuffer();
