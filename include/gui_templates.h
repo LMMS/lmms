@@ -25,12 +25,8 @@
 #ifndef LMMS_GUI_TEMPLATES_H
 #define LMMS_GUI_TEMPLATES_H
 
-#include "lmmsconfig.h"
-
-#include <algorithm>
 #include <QApplication>
 #include <QFont>
-#include <QGuiApplication>
 
 namespace lmms::gui
 {
