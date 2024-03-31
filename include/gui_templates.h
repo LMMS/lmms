@@ -36,7 +36,7 @@ namespace lmms::gui
 {
 
 // Convenience method to set the font size in pixels
-inline QFont pointSize(QFont fontPointer, int fontSize)
+inline QFont adjustedToPixelSize(QFont fontPointer, int fontSize)
 {
 	fontPointer.setPixelSize(fontSize);
 	return fontPointer;

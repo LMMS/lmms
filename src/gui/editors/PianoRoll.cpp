@@ -3337,7 +3337,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	// display note editing info
 	//QFont f = p.font();
 	f.setBold( false );
-	p.setFont(pointSize(f, 10));
+	p.setFont(adjustedToPixelSize(f, 10));
 	p.setPen(m_noteModeColor);
 	p.drawText( QRect( 0, keyAreaBottom(),
 					  m_whiteKeyWidth, noteEditBottom() - keyAreaBottom()),
@@ -3600,7 +3600,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	{
 		QFont f = p.font();
 		f.setBold( true );
-		p.setFont(pointSize(f, 14));
+		p.setFont(adjustedToPixelSize(f, 14));
 		p.setPen( QApplication::palette().color( QPalette::Active,
 							QPalette::BrightText ) );
 		p.drawText(m_whiteKeyWidth + 20, PR_TOP_MARGIN + 40,
