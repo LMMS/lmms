@@ -264,9 +264,9 @@ public:
 		}
 	}
 	// returns location
-	unsigned int addArray(std::vector<std::pair<float, float>>* arrayIn, bool isCurvedIn);
+	unsigned int addArray(std::vector<std::pair<float, float>>* arrayIn, bool isCurvedIn, bool clearIn, bool clampIn, bool rescaleIn, bool sortIn, bool callDataChangedIn);
 	// returns location
-	unsigned int addArray(std::vector<float>* arrayIn, bool isCurvedIn);
+	unsigned int addArray(std::vector<float>* arrayIn, bool isCurvedIn, bool clearIn, bool clampIn, bool rescaleIn, bool callDataChangedIn);
 	// returns location
 	unsigned int addArray();
 	// preservs the order
@@ -375,7 +375,7 @@ public:
 	// does check m_isFixedSize, m_isFixedValue, m_isFixedPos,
 	// sorts array, removes duplicated positions, calls dataChanged()
 	// clampIn: should clamp, sortIn: should sort
-	void formatArray(bool clampIn, bool sortIn);
+	void formatArray(std::vector<std::pair<float, float>>* dataArrayIn, bool clampIn, bool rescaleIn, bool sortIn, bool callDataChangedIn);
 
 
 	// get attribute: -------------------
@@ -438,9 +438,9 @@ public:
 	// sets data array without any checks
 	// inport x and y coords
 	// TODO should call dataChanged
-	void setDataArray(std::vector<std::pair<float, float>>* dataArrayIn, bool isCurvedIn);
+	void setDataArray(std::vector<std::pair<float, float>>* dataArrayIn, bool isCurvedIn, bool clearIn, bool clampIn, bool rescaleIn, bool sortIn, bool callDataChangedIn);
 	// inport y coords
-	void setDataArray(std::vector<float>* dataArrayIn, bool isCurvedIn);
+	void setDataArray(std::vector<float>* dataArrayIn, bool isCurvedIn, bool clearIn, bool clampIn, bool rescaleIn, bool callDataChangedIn);
 
 
 	// set attribute: -------------------
