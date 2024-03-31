@@ -126,7 +126,7 @@ public:
 	
 	void useGetLastValues();
 signals:
-	inline void drawn();
+	void drawn();
 protected:
 	void paintEvent(QPaintEvent* pe) override; //TODO
 	//void dropEvent(QDropEvent* de) override; //ignore

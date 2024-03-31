@@ -464,7 +464,6 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 	p.drawLine(0, 0, 0, height() - 1);
 
 
-	VectorGraphDataArray* dataArray = nullptr;
 	for (unsigned int i = 0; i < model()->getDataArraySize(); i++)
 	{
 		paintGraph(&p, i);
@@ -1427,8 +1426,13 @@ unsigned int VectorGraphModel::addArray()
 
 void VectorGraphModel::delArray(unsigned int locationIn)
 {
+	// TODO test
 	for (unsigned int i = locationIn; i < m_dataArrays.size() - 1; i++)
 	{
+		if (m_dataArrays[i].getEffectorArrayLocation() == locationIn)
+		{
+			m_dataArrays[i].setEffectorArrayLocation(-1);
+		}
 		m_dataArrays[i] = m_dataArrays[i + 1];
 	}
 	m_dataArrays.pop_back();
@@ -1690,9 +1694,9 @@ bool VectorGraphDataArray::setEffectorArrayLocation(int locationIn)
 	{
 		if (m_effectorLocation != -1)
 		{
+			m_effectorLocation = -1;
 			getUpdatingFromPoint(-1);
 			dataChanged();
-			m_effectorLocation = -1;
 		}
 	}
 	return !found;
