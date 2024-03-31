@@ -25,7 +25,7 @@
 
 #include "TabBar.h"
 #include "TabButton.h"
-#include "gui_templates.h"
+// #include "gui_templates.h"
 
 
 namespace lmms::gui
@@ -90,7 +90,10 @@ TabButton * TabBar::addTab( QWidget * _w, const QString & _text, int _id,
 		_w->setFixedSize( _w->parentWidget()->size() );
 	}
 
-	b->setFont(pointSize(b->font(), 8));
+	// b->setFont(pointSize(b->font(), 8));
+	QFont f = b->font();
+	f.setPointSize(8);
+	b->setFont(f);
 
 	return( b );
 }

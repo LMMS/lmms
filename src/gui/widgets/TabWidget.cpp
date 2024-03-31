@@ -25,6 +25,7 @@
 
 #include "TabWidget.h"
 
+#include <QFont>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPixmap>
@@ -33,7 +34,7 @@
 
 #include "DeprecationHelper.h"
 #include "embed.h"
-#include "gui_templates.h"
+// #include "gui_templates.h"
 
 namespace lmms::gui
 {
@@ -58,7 +59,10 @@ TabWidget::TabWidget(const QString& caption, QWidget* parent, bool usePixmap,
 
 	m_tabheight = caption.isEmpty() ? m_tabbarHeight - 3 : m_tabbarHeight - 4;
 
-	setFont(pointSize(font(), 8));
+	// setFont(pointSize(font(), 8));
+	QFont f = this->font();
+	f.setPointSize(8);
+	this->setFont(f);
 
 	setAutoFillBackground(true);
 	QColor bg_color = QApplication::palette().color(QPalette::Active, QPalette::Window).darker(132);
@@ -70,7 +74,10 @@ TabWidget::TabWidget(const QString& caption, QWidget* parent, bool usePixmap,
 
 void TabWidget::addTab(QWidget* w, const QString& name, const char* pixmap, int idx)
 {
-	setFont(pointSize(font(), 8));
+	// setFont(pointSize(font(), 8));
+	QFont f = this->font();
+	f.setPointSize(8);
+	this->setFont(f);
 
 	// Append tab when position is not given
 	if (idx < 0/* || m_widgets.contains(idx) == true*/)
@@ -216,7 +223,10 @@ void TabWidget::resizeEvent(QResizeEvent*)
 void TabWidget::paintEvent(QPaintEvent* pe)
 {
 	QPainter p(this);
-	p.setFont(pointSize(font(), 7));
+	// p.setFont(pointSize(font(), 7));
+	QFont f = p.font();
+	f.setPointSize(7);
+	p.setFont(f);
 
 	// Draw background
 	QBrush bg_color = p.background();
@@ -232,7 +242,9 @@ void TabWidget::paintEvent(QPaintEvent* pe)
 	// Draw title, if any
 	if (!m_caption.isEmpty())
 	{
-		p.setFont(pointSize(p.font(), 8));
+		// p.setFont(pointSize(p.font(), 8));
+		f.setPointSize(8);
+		p.setFont(f);
 		p.setPen(tabTitleText());
 		p.drawText(5, 11, m_caption);
 	}

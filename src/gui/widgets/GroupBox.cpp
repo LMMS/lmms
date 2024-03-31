@@ -31,7 +31,7 @@
 
 #include "GroupBox.h"
 #include "embed.h"
-#include "gui_templates.h"
+// #include "gui_templates.h"
 
 
 namespace lmms::gui
@@ -98,6 +98,7 @@ void GroupBox::mousePressEvent( QMouseEvent * _me )
 void GroupBox::paintEvent( QPaintEvent * pe )
 {
 	QPainter p( this );
+	QFont f = p.font();
 
 	// Draw background
 	p.fillRect( 0, 0, width() - 1, height() - 1, p.background() );
@@ -111,8 +112,10 @@ void GroupBox::paintEvent( QPaintEvent * pe )
 
 	// draw text
 	p.setPen( palette().color( QPalette::Active, QPalette::Text ) );
-	p.setFont(pointSize(font(), 8));
-
+	// p.setFont(pointSize(font(), 8));
+	f.setPointSize(8);
+	p.setFont(f);
+	
 	int const captionX = ledButtonShown() ? 22 : 6;
 	p.drawText(captionX, m_titleBarHeight, m_caption);
 }

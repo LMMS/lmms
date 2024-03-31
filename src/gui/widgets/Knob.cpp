@@ -33,7 +33,7 @@
 #include "lmms_math.h"
 #include "DeprecationHelper.h"
 #include "embed.h"
-#include "gui_templates.h"
+// #include "gui_templates.h"
 
 
 namespace lmms::gui
@@ -453,13 +453,16 @@ void Knob::drawKnob( QPainter * _p )
 void Knob::paintEvent( QPaintEvent * _me )
 {
 	QPainter p( this );
+	QFont f = p.font();
+	f.setPointSizeF(6.5f);
 
 	drawKnob( &p );
 	if( !m_label.isEmpty() )
 	{
 		if (!m_isHtmlLabel)
 		{
-			p.setFont(pointSize(p.font(), 6.5f));
+			//p.setFont(pointSize(p.font(), 6.5f));
+			p.setFont(f);
 			p.setPen(textColor());
 			p.drawText(width() / 2 -
 				horizontalAdvance(p.fontMetrics(), m_label) / 2,
@@ -467,7 +470,8 @@ void Knob::paintEvent( QPaintEvent * _me )
 		}
 		else
 		{
-			m_tdRenderer->setDefaultFont(pointSize(p.font(), 6.5f));
+			// m_tdRenderer->setDefaultFont(pointSize(p.font(), 6.5f));
+			m_tdRenderer->setDefaultFont(f);
 			p.translate((width() - m_tdRenderer->idealWidth()) / 2, (height() - m_tdRenderer->pageSize().height()) / 2);
 			m_tdRenderer->drawContents(&p);
 		}

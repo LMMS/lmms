@@ -31,7 +31,7 @@
 #include "LcdWidget.h"
 #include "DeprecationHelper.h"
 #include "embed.h"
-#include "gui_templates.h"
+// #include "gui_templates.h"
 
 
 namespace lmms::gui
@@ -203,7 +203,10 @@ void LcdWidget::paintEvent( QPaintEvent* )
 	// Label
 	if( !m_label.isEmpty() )
 	{
-		p.setFont(pointSize(p.font(), 6.5f));
+		// p.setFont(pointSize(p.font(), 6.5f));
+		QFont f = p.font();
+		f.setPointSizeF(6.5f);
+		p.setFont(f);
 		p.setPen( textShadowColor() );
 		p.drawText(width() / 2 -
 				horizontalAdvance(p.fontMetrics(), m_label) / 2 + 1,
@@ -252,10 +255,12 @@ void LcdWidget::updateSize()
 	}
 	else
 	{
+		QFont f = font();
+		f.setPointSizeF(6.5f);
 		setFixedSize(
 			qMax<int>(
 				m_cellWidth * m_numDigits + marginX1 + marginX2,
-				horizontalAdvance(QFontMetrics(pointSize(font(), 6.5f)), m_label)
+				horizontalAdvance(QFontMetrics(f), m_label)
 			),
 			m_cellHeight + (2 * marginY) + 9
 		);

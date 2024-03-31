@@ -23,13 +23,14 @@
  */
 
 
+#include <QFont>
 #include <QFontMetrics>
 #include <QPainter>
 
 #include "LedCheckBox.h"
 #include "DeprecationHelper.h"
 #include "embed.h"
-#include "gui_templates.h"
+// #include "gui_templates.h"
 
 namespace lmms::gui
 {
@@ -92,7 +93,12 @@ void LedCheckBox::initUi( LedColor _color )
 	m_ledOnPixmap = embed::getIconPixmap(names[static_cast<std::size_t>(_color)].toUtf8().constData());
 	m_ledOffPixmap = embed::getIconPixmap("led_off");
 
-	if (m_legacyMode){ setFont(pointSize(font(), 7)); }
+	if (m_legacyMode){
+		// setFont(pointSize(font(), 7));
+		QFont f = font();
+		f.setPointSize(7);
+		setFont(f);
+	}
 
 	setText( m_text );
 }
@@ -113,7 +119,10 @@ void LedCheckBox::onTextUpdated()
 void LedCheckBox::paintLegacy(QPaintEvent * pe)
 {
 	QPainter p( this );
-	p.setFont(pointSize(font(), 7));
+	QFont f = p.font();
+	f.setPointSize(7);
+	p.setFont(f);
+	// p.setFont(pointSize(font(), 7));
 
 	p.drawPixmap(0, 0, model()->value() ? m_ledOnPixmap : m_ledOffPixmap);
 

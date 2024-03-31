@@ -33,7 +33,7 @@
 #include "ComboBox.h"
 #include "GroupBox.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
+// #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "LedCheckBox.h"
 #include "MainWindow.h"
@@ -60,7 +60,10 @@ InstrumentTuningView::InstrumentTuningView(InstrumentTrack *it, QWidget *parent)
 
 	auto tlabel = new QLabel(tr("Enables the use of global transposition"));
 	tlabel->setWordWrap(true);
-	tlabel->setFont(pointSize(tlabel->font(), 8));
+	// tlabel->setFont(pointSize(tlabel->font(), 8));
+	QFont f = tlabel->font();
+	f.setPointSize(8);
+	tlabel->setFont(f);
 	masterPitchLayout->addWidget(tlabel);
 
 	// Microtuner settings

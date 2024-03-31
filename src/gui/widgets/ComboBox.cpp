@@ -32,7 +32,7 @@
 #include <QScreen>
 
 #include "CaptionMenu.h"
-#include "gui_templates.h"
+// #include "gui_templates.h"
 
 #define QT_SUPPORTS_WIDGET_SCREEN (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 #if !QT_SUPPORTS_WIDGET_SCREEN
@@ -53,7 +53,10 @@ ComboBox::ComboBox( QWidget * _parent, const QString & _name ) :
 {
 	setFixedHeight( ComboBox::DEFAULT_HEIGHT );
 
-	setFont(pointSize(font(), 9));
+	// setFont(pointSize(font(), 9));
+	QFont f = font();
+	f.setPointSize(9);
+	setFont(f);
 
 	connect( &m_menu, SIGNAL(triggered(QAction*)),
 				this, SLOT(setItem(QAction*)));

@@ -50,7 +50,7 @@
 #include "CaptionMenu.h"
 #include "embed.h"
 #include "Engine.h"
-#include "gui_templates.h"
+// #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "Song.h"
 #include "StringPairDrag.h"
@@ -805,10 +805,12 @@ IntModel* PianoView::getNearestMarker(int key, QString* title)
 void PianoView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
+	QFont f = p.font();
 
 	// set smaller font for printing number of every octave
-	p.setFont(pointSize(p.font(), LABEL_TEXT_SIZE));
-
+	// p.setFont(pointSize(p.font(), LABEL_TEXT_SIZE));
+	f.setPointSize(LABEL_TEXT_SIZE);
+	p.setFont(f);
 
 	// draw bar above the keyboard (there will be the labels
 	// for all C's)

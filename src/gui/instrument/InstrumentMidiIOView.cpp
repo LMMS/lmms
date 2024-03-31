@@ -33,7 +33,7 @@
 #include "Engine.h"
 #include "embed.h"
 #include "GroupBox.h"
-#include "gui_templates.h"
+// #include "gui_templates.h"
 #include "LcdSpinBox.h"
 #include "MidiClient.h"
 
@@ -155,7 +155,10 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	auto baseVelocityHelp
 		= new QLabel(tr("Specify the velocity normalization base for MIDI-based instruments at 100% note velocity."));
 	baseVelocityHelp->setWordWrap( true );
-    baseVelocityHelp->setFont(pointSize(baseVelocityHelp->font(), 8));
+    // baseVelocityHelp->setFont(pointSize(baseVelocityHelp->font(), 8));
+	QFont f = baseVelocityHelp->font();
+	f.setPointSize(8);
+	baseVelocityHelp->setFont(f);
 
 	baseVelocityLayout->addWidget( baseVelocityHelp );
 

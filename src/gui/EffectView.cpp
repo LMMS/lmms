@@ -34,7 +34,7 @@
 #include "CaptionMenu.h"
 #include "embed.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
+// #include "gui_templates.h"
 #include "Knob.h"
 #include "LedCheckBox.h"
 #include "MainWindow.h"
@@ -90,7 +90,8 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	{
 		auto ctls_btn = new QPushButton(tr("Controls"), this);
 		QFont f = ctls_btn->font();
-		ctls_btn->setFont(pointSize(f, 8));
+		// ctls_btn->setFont(pointSize(f, 8));
+		f.setPointSize(8);
 		ctls_btn->setGeometry( 150, 14, 50, 20 );
 		connect( ctls_btn, SIGNAL(clicked()),
 					this, SLOT(editControls()));
@@ -257,7 +258,9 @@ void EffectView::paintEvent( QPaintEvent * )
 	QPainter p( this );
 	p.drawPixmap( 0, 0, m_bg );
 
-	QFont f = pointSize(font(), 7.5f);
+	QFont f = font();
+	// QFont f = pointSize(font(), 7.5f);
+	f.setPointSizeF(7.5f);
 	f.setBold( true );
 	p.setFont( f );
 

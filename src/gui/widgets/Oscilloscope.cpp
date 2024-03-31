@@ -28,7 +28,7 @@
 
 #include "Oscilloscope.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
+// #include "gui_templates.h"
 #include "MainWindow.h"
 #include "AudioEngine.h"
 #include "Engine.h"
@@ -203,7 +203,10 @@ void Oscilloscope::paintEvent( QPaintEvent * )
 	else
 	{
 		p.setPen( QColor( 192, 192, 192 ) );
-		p.setFont(pointSize(p.font(), 7));
+		// p.setFont(pointSize(p.font(), 7));
+		QFont f = p.font();
+		f.setPointSize(7);
+		p.setFont(f);
 		p.drawText( 6, height()-5, tr( "Click to enable" ) );
 	}
 }
