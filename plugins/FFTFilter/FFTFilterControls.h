@@ -56,7 +56,9 @@ public:
 	{
 		return new gui::FFTFilterControlDialog(this);
 	}
-	int controlCount() override { return 6; }
+	int controlCount() override { return 8; }
+
+	void setGraph(std::vector<float>* dataArrayIn);
 
 private slots:
 	void resetClicked();

@@ -25,9 +25,11 @@
 #include <cmath>
 
 #include "FFTFilter.h"
+#include "FFTProcessor.h"
 
 #include "embed.h"
 #include "plugin_export.h"
+#include "fft_helpers.h"
 
 namespace lmms
 {
@@ -53,18 +55,85 @@ Plugin::Descriptor PLUGIN_EXPORT FFTFilter_plugin_descriptor =
 
 FFTFilterEffect::FFTFilterEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
 	Effect(&FFTFilter_plugin_descriptor, parent, key),
-	m_filterControls(this)
+	m_filterControls(this),
+	m_FFTProcessor(2048, true, FFTWindow::Rectangular),
+	m_inputBuffer(4 * 2048)
 {
+	m_FFTProcessor.threadedStartThread(&m_inputBuffer, 0, true, false);
 }
-
+FFTFilterEffect::~FFTFilterEffect()
+{
+	qDebug("FFTFilterEffect destrc 0");
+	m_inputBuffer.wakeAll();
+	//m_FFTProcessor.~FFTProcessor();
+	//m_FFTProcessor.terminate();
+	qDebug("FFTFilterEffect destrc 1");
+}
 
 bool FFTFilterEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 {
 	if (!isEnabled() || !isRunning()) { return false ; }
 
-	double outSum = 0.0;
-	const float d = dryLevel();
-	const float w = wetLevel();
+	if (isNoneInput(buf, frames, 0.05f) == true)
+	{
+		//qDebug("FFTFilterEffect return false");
+		return false;
+	}
+
+
+	qDebug("FFTFilterEffect write");
+
+	m_inputBuffer.write(buf, frames, true);
+
+	qDebug("FFTFilterEffect analyze");
+
+	//m_FFTProcessor.analyze(&m_inputBuffer, &target);
+	if (m_FFTProcessor.getOutputSpectrumChanged() == true)
+	{
+		std::vector<float> FFTSpectrumOutput = m_FFTProcessor.getNormSpectrum();
+		std::vector<float> graphInput(20);
+		float avgY = 0;
+		int avgCount = FFTSpectrumOutput.size() / graphInput.size();
+		if (avgCount <= 0)
+		{
+			avgCount = 1;
+		}
+		int j = 0;
+		for (unsigned int i = 0; i < FFTSpectrumOutput.size(); i++)
+		{
+			avgY = FFTSpectrumOutput[i];
+			if (i + 1 > (j + 1) * avgCount)
+			{
+				graphInput[j] = avgY;
+				j++;
+				if (j >= graphInput.size())
+				{
+					break;
+				}
+				avgY = 0;
+			}
+		}
+		for (unsigned int i = 0; i < graphInput.size(); i++)
+		{
+			graphInput[i] = graphInput[i] / static_cast<float>(avgCount);
+		}
+		// DEBUG
+		for (unsigned int i = 0; i < FFTSpectrumOutput.size(); i++)
+		{
+			qDebug("FFTFilterEffect: [%d], %f", i, FFTSpectrumOutput[i]);
+		}
+		//m_filterControls.setGraph(&graphInput);
+	}
+	//std::vector<float>* output;
+	//for (unsigned int i = 0; i < output->size(); i++)
+	//{
+		//qDebug("FFTFilterEffect: [%d], %f", i, output->operator[](i));
+	//}
+	//std::vector<float> testVector = {0.0f, 0.3f, 0.5f, -0.5f, 0.2f};
+	//std::vector<float> testVector = {0.0f, 1.3f, 0.5f, -2.5f, 0.2f};
+
+
+	//m_filterControls.setGraph(&testVector);
 
 	/*
 	const ValueBuffer* volumeBuf = m_filterControls.m_volumeModel.valueBuffer();
@@ -93,9 +162,29 @@ bool FFTFilterEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	}
 	*/
 
-	checkGate(outSum / frames);
+	//checkGate(outSum / frames);
 
 	return isRunning();
+}
+
+bool FFTFilterEffect::isNoneInput(sampleFrame* bufferIn, const fpp_t framesIn, const float cutOffIn)
+{
+	bool output = true;
+	//qDebug("FFTFilterEffect check none input");
+	for (unsigned int i = 0; i < cutOffIn; i++)
+	{
+		if (std::abs(bufferIn[i][0]) > cutOffIn)
+		{
+			output = false;
+			break;
+		}
+		else if (std::abs(bufferIn[i][1]) > cutOffIn)
+		{
+			output = false;
+			break;
+		}
+	}
+	return output;
 }
 
 extern "C"

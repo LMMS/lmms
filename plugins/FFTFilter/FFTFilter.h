@@ -25,10 +25,12 @@
 #ifndef LMMS_FFTFILTER_H
 #define LMMS_FFTFILTER_H
 
-#include "vector"
+#include <vector>
 
 #include "Effect.h"
 #include "FFTFilterControls.h"
+#include "FFTProcessor.h"
+#include "LocklessRingBuffer.h"
 
 namespace lmms
 {
@@ -37,7 +39,7 @@ class FFTFilterEffect : public Effect
 {
 public:
 	FFTFilterEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
-	~FFTFilterEffect() override = default;
+	~FFTFilterEffect() override;
 	bool processAudioBuffer(sampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls* controls() override
@@ -47,6 +49,8 @@ public:
 
 private:
 
+	bool isNoneInput(sampleFrame* bufferIn, const fpp_t framesIn, const float cutOffIn);
+	/*
 	inline sample_t getCurSample(unsigned int posIn)
 	{
 		if (m_useSecondBufferOut == true)
@@ -69,14 +73,16 @@ private:
 			m_bufferB[posIn] = sampleIn;
 		}
 	}
+*/
 
 	FFTFilterControls m_filterControls;
+	FFTProcessor m_FFTProcessor;
 
-	std::vector<sample_t> m_bufferA;
-	std::vector<sample_t> m_bufferB;
-	bool m_useSecondBufferOut;
+	//std::vector<sample_t> m_bufferA;
+	//std::vector<sample_t> m_bufferB;
+	//bool m_useSecondBufferOut;
 
-	std::vector<float> m_FFTFilterData;
+	LocklessRingBuffer<sampleFrame> m_inputBuffer;
 
 
 	friend class FFTFilterControls;
