@@ -33,6 +33,9 @@
 #include <QInputDialog> // showInputDialog()
 #include <QMenu> // context menu
 
+
+#include <iostream>
+
 #include "VectorGraph.h"
 #include "StringPairDrag.h"
 #include "CaptionMenu.h" // context menu
@@ -112,9 +115,13 @@ VectorGraphView::VectorGraphView(QWidget * parentIn,
 }
 VectorGraphView::~VectorGraphView()
 {
+	std::cout<<"count 5";
+	qDebug("VectorGraphView dstc");
 	m_editingText.clear();
 	m_editingInputIsFloat.clear();
 	m_editingLineEffectText.clear();
+	qDebug("VectorGraphView dstc end");
+	std::cout<<"count 6";
 }
 
 void VectorGraphView::setLineColor(QColor colorIn, unsigned int dataArrayLocationIn)
@@ -1393,20 +1400,25 @@ VectorGraphModel::VectorGraphModel(unsigned int maxLengthIn, Model* parentIn, bo
 
 VectorGraphModel::~VectorGraphModel()
 {
+	std::cout<<"count 1";
+	qDebug("VectorGraphModel dstc");
 	m_dataArrays.clear();
+
+	std::cout<<"count 2";
+	qDebug("VectorGraphModel dstc end");
 }
 
-unsigned int VectorGraphModel::addArray(std::vector<std::pair<float, float>>* arrayIn, bool isCurvedIn)
+unsigned int VectorGraphModel::addArray(std::vector<std::pair<float, float>>* arrayIn, bool isCurvedIn, bool clearIn, bool clampIn, bool rescaleIn, bool sortIn, bool callDataChangedIn)
 {
 	unsigned int location = addArray();
-	m_dataArrays[location].setDataArray(arrayIn, isCurvedIn);
+	m_dataArrays[location].setDataArray(arrayIn, isCurvedIn, clearIn, clampIn, rescaleIn, sortIn, callDataChangedIn);
 	return location;
 }
 
-unsigned int VectorGraphModel::addArray(std::vector<float>* arrayIn, bool isCurvedIn)
+unsigned int VectorGraphModel::addArray(std::vector<float>* arrayIn, bool isCurvedIn, bool clearIn, bool clampIn, bool rescaleIn, bool callDataChangedIn)
 {
 	unsigned int location = addArray();
-	m_dataArrays[location].setDataArray(arrayIn, isCurvedIn);
+	m_dataArrays[location].setDataArray(arrayIn, isCurvedIn, clearIn, clampIn, rescaleIn, callDataChangedIn);
 	return location;
 }
 
@@ -1539,15 +1551,23 @@ VectorGraphDataArray::VectorGraphDataArray(
 
 VectorGraphDataArray::~VectorGraphDataArray()
 {
+	std::cout<<"count 3";
+	qDebug("VectorGraphDataArray dstc");
 	m_dataArray.clear();
 	m_bakedValues.clear();
 	m_needsUpdating.clear();
 
 	for (unsigned int i = 0; i < m_automationModelArray.size(); i++)
 	{
-		delete m_automationModelArray[i];
+		if (m_automationModelArray[i] != nullptr)
+		{
+			delete m_automationModelArray[i];
+		}
 	}
 	m_automationModelArray.clear();
+
+	std::cout<<"count 4";
+	qDebug("VectorGraphDataArray dstc end");
 }
 
 void VectorGraphDataArray::updateConnections(VectorGraphModel* parentIn)
@@ -1833,33 +1853,75 @@ void VectorGraphDataArray::del(unsigned int locationIn)
 }
 
 // TODO input scaleing values
-void VectorGraphDataArray::formatArray(bool clampIn, bool sortIn)
+void VectorGraphDataArray::formatArray(std::vector<std::pair<float, float>>* dataArrayIn, bool clampIn, bool rescaleIn, bool sortIn, bool callDataChangedIn)
 {
-	// clamp
-	// TODO implement
-	float minY = 0.0f;
-	float maxY = 0.0f;
-	float minX = 0.0f;
-	float maxX = 0.0f;
-	if (clampIn == true)
+	if (rescaleIn == true)
 	{
-		for (unsigned int i = 0; i < m_dataArray.size(); i++)
+		// scale
+		float minX = 0.0f;
+		float maxX = 1.0f;
+		float minY = -1.0f;
+		float maxY = 1.0f;
+		for (unsigned int i = 0; i < dataArrayIn->size(); i++)
 		{
-			if (m_dataArray[i].m_x < 0)
+			if (dataArrayIn->operator[](i).first < minX)
 			{
-				m_dataArray[i].m_x = 0;
+				minX = dataArrayIn->operator[](i).first;
 			}
-			if (m_dataArray[i].m_x > 1)
+			if (dataArrayIn->operator[](i).first > maxX)
 			{
-				m_dataArray[i].m_x = 1;
+				maxX = dataArrayIn->operator[](i).first;
 			}
-			if (m_dataArray[i].m_y > 1)
+			if (dataArrayIn->operator[](i).second < minY)
 			{
-				m_dataArray[i].m_y = 1;
+				minY = dataArrayIn->operator[](i).second;
 			}
-			if (m_dataArray[i].m_y < -1)
+			if (dataArrayIn->operator[](i).second > maxY)
 			{
-				m_dataArray[i].m_y = -1;
+				maxY = dataArrayIn->operator[](i).second;
+			}
+		}
+		//qDebug("formatArray 1: minx: %f maxx: %f miny: %f maxy: %f", minX, maxX, minY, maxY);
+		maxX = (maxX - minX);
+		minX = -minX;
+		maxY = (maxY - minY) * 0.5f;
+		minY = -minY;
+		//qDebug("formatArray 2: minx: %f maxx: %f miny: %f maxy: %f", minX, maxX, minY, maxY);
+		if (minX != 0.0f || maxX != 1.0f)
+		{
+			for (unsigned int i = 0; i < dataArrayIn->size(); i++)
+			{
+				dataArrayIn->operator[](i).first = (dataArrayIn->operator[](i).first + minX) / maxX;
+			}
+		}
+		if (minY != -1.0f || maxY != 1.0f)
+		{
+			for (unsigned int i = 0; i < dataArrayIn->size(); i++)
+			{
+				dataArrayIn->operator[](i).second = (dataArrayIn->operator[](i).second + minY) / maxY - 1.0f;
+			}
+		}
+	}
+	if (clampIn == true || rescaleIn == true)
+	{
+		// clamp
+		for (unsigned int i = 0; i < dataArrayIn->size(); i++)
+		{
+			if (dataArrayIn->operator[](i).first < 0.0f)
+			{
+				dataArrayIn->operator[](i).first = 0.0f;
+			}
+			if (dataArrayIn->operator[](i).first > 1.0f)
+			{
+				dataArrayIn->operator[](i).first = 1.0f;
+			}
+			if (dataArrayIn->operator[](i).second < -1.0f)
+			{
+				dataArrayIn->operator[](i).second = -1.0f;
+			}
+			if (dataArrayIn->operator[](i).second > 1.0f)
+			{
+				dataArrayIn->operator[](i).second = 1.0f;
 			}
 		}
 		formatDataArrayEndPoints();
@@ -1868,35 +1930,37 @@ void VectorGraphDataArray::formatArray(bool clampIn, bool sortIn)
 	// sort
 	if (sortIn == true)
 	{
-		std::sort(m_dataArray.begin(), m_dataArray.end(),
-			[](VectorGraphPoint a, VectorGraphPoint b)
+		std::sort(dataArrayIn->begin(), dataArrayIn->end(),
+			[](std::pair<float, float> a, std::pair<float, float> b)
 			{
-				return a.m_x > b.m_x;
+				return a.first < b.first;
 			});
 	}
 
 	// delete duplicates
-	// TODO update name
 	float lastPos = -1.0f;
-	if (m_dataArray.size() > 0)
+	if (dataArrayIn->size() > 0)
 	{
-		lastPos = m_dataArray[0].m_x;
+		lastPos = dataArrayIn->operator[](0).first;
 	}
-	for (unsigned int i = 1; i < m_dataArray.size(); i++)
+	for (unsigned int i = 1; i < dataArrayIn->size(); i++)
 	{
-		if (m_dataArray[i].m_x == lastPos)
+		if (dataArrayIn->operator[](i).first == lastPos)
 		{
 			del(i);
 		}
 		else
 		{
-			lastPos = m_dataArray[i].m_x;
+			lastPos = dataArrayIn->operator[](i).first;
 		}
 	}
 	// calling clearedEvent is not needed
 	// because all of the values can not be cleared here
 	getUpdatingFromPoint(-1);
-	dataChanged();
+	if (callDataChangedIn == true)
+	{
+		dataChanged();
+	}
 }
 
 int VectorGraphDataArray::getLocation(float xIn)
@@ -2100,28 +2164,48 @@ std::vector<float> VectorGraphDataArray::getLastValues()
 	return m_bakedValues;
 }
 
-void VectorGraphDataArray::setDataArray(std::vector<std::pair<float, float>>* dataArrayIn, bool isCurvedIn)
+void VectorGraphDataArray::setDataArray(std::vector<std::pair<float, float>>* dataArrayIn,
+	bool isCurvedIn, bool clearIn, bool clampIn, bool rescaleIn, bool sortIn, bool callDataChangedIn)
 {
-	// TODO test
-	// TODO implement formatArray option
+	qDebug("setDataArray size: %ld", dataArrayIn->size());
+	if (clearIn == true)
+	{
+		m_dataArray.clear();
+	}
 	m_dataArray.resize(dataArrayIn->size());
 	if (m_dataArray.size() == 0)
 	{
 		clearedEvent();
 	}
-	for (unsigned int i = 0; i < dataArrayIn->size(); i++)
+	if (clampIn == true || rescaleIn == true || sortIn == true)
 	{
-		m_dataArray.push_back(VectorGraphPoint(dataArrayIn->operator[](i).first, dataArrayIn->operator[](i).second));
-		if (isCurvedIn == true)
+		qDebug("setDataArray format");
+		formatArray(dataArrayIn, clampIn, rescaleIn, sortIn, false);
+	}
+	for (unsigned int i = 0; i < m_dataArray.size(); i++)
+	{
+		qDebug("setDataArray 1, x: %f, y: %f", dataArrayIn->operator[](i).first, dataArrayIn->operator[](i).second);
+		m_dataArray[i].m_x = dataArrayIn->operator[](i).first;
+		m_dataArray[i].m_y = dataArrayIn->operator[](i).second;
+		if (isCurvedIn == true && i > 0)
 		{
+			float diff = m_dataArray[i - 1].m_x - m_dataArray[i].m_x;
+			diff = diff * diff * diff;
+			diff = std::clamp(diff, -1.0f, 1.0f);
+			m_dataArray[i - 1].m_c = diff;
 			// TODO
 		}
 	}
 	// the whole m_dataArray needs to be updated
 	getUpdatingFromPoint(-1);
-	dataChanged();
+	if (callDataChangedIn == true)
+	{
+		dataChanged();
+	}
+	qDebug("setDataArray end");
 }
-void VectorGraphDataArray::setDataArray(std::vector<float>* dataArrayIn, bool isCurvedIn)
+void VectorGraphDataArray::setDataArray(std::vector<float>* dataArrayIn,
+	bool isCurvedIn, bool clearIn, bool clampIn, bool rescaleIn, bool callDataChangedIn)
 {
 	// TODO test
 	std::vector<std::pair<float, float>> convertedDataArray(dataArrayIn->size());
@@ -2131,7 +2215,7 @@ void VectorGraphDataArray::setDataArray(std::vector<float>* dataArrayIn, bool is
 		convertedDataArray[i].first = i * stepSize;
 		convertedDataArray[i].second = dataArrayIn->operator[](i);
 	}
-	setDataArray(&convertedDataArray, isCurvedIn);
+	setDataArray(&convertedDataArray, isCurvedIn, clearIn, clampIn, rescaleIn, false, callDataChangedIn);
 }
 
 unsigned int VectorGraphDataArray::setX(unsigned int locationIn, float xIn)
@@ -2406,10 +2490,12 @@ bool VectorGraphDataArray::getIsAutomationValueChanged(unsigned int locationIn)
 }
 void VectorGraphDataArray::setAutomated(unsigned int locationIn, bool isAutomatedIn)
 {
+	qDebug("setAutomated start");
 	if (m_isAutomatableEffectable == true)
 	{
 		if (isAutomatedIn == true)
 		{
+			qDebug("setAutomated make");
 			if (m_dataArray[locationIn].m_automationModel == -1)
 			{
 				m_automationModelArray.push_back(new FloatModel(0.0f, -1.0f, 1.0f, 0.01f, m_parent, QString(), false));
@@ -2420,6 +2506,7 @@ void VectorGraphDataArray::setAutomated(unsigned int locationIn, bool isAutomate
 		}
 		else if (m_dataArray[locationIn].m_automationModel != -1)
 		{
+			qDebug("setAutomated delete");
 			// TODO correctly deconstruct
 			FloatModel* swap = m_automationModelArray[m_dataArray[locationIn].m_automationModel];
 			// copy the last FloatModel* to the current location
@@ -2437,12 +2524,17 @@ void VectorGraphDataArray::setAutomated(unsigned int locationIn, bool isAutomate
 				}
 			}
 			m_dataArray[locationIn].m_automationModel = -1;
-			delete swap;
+			if (swap != nullptr)
+			{
+				delete swap;
+				swap = nullptr;
+			}
 
 			getUpdatingFromPoint(locationIn);
 			dataChanged();
 		}
 	}
+	qDebug("setAutomated end");
 }
 FloatModel* VectorGraphDataArray::getAutomationModel(unsigned int locationIn)
 {
