@@ -134,7 +134,6 @@ AudioFileProcessorView::AudioFileProcessorView(Instrument* instrument,
 // interpolation selector
 	m_interpBox = new ComboBox(this);
 	m_interpBox->setGeometry(142, 62, 82, ComboBox::DEFAULT_HEIGHT);
-	m_interpBox->setFont(adjustedToPixelSize(m_interpBox->font(), 8));
 
 // wavegraph
 	m_waveView = 0;

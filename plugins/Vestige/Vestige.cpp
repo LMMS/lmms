@@ -583,11 +583,12 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 
 	m_selPresetButton->setMenu(menu);
 
+	constexpr int buttonFontSize = 12;
 
 	m_toggleGUIButton = new QPushButton( tr( "Show/hide GUI" ), this );
 	m_toggleGUIButton->setGeometry( 20, 130, 200, 24 );
 	m_toggleGUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
-	m_toggleGUIButton->setFont(adjustedToPixelSize(m_toggleGUIButton->font(), 8));
+	m_toggleGUIButton->setFont(adjustedToPixelSize(m_toggleGUIButton->font(), buttonFontSize));
 	connect( m_toggleGUIButton, SIGNAL( clicked() ), this,
 							SLOT( toggleGUI() ) );
 
@@ -596,7 +597,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 		this);
 	note_off_all_btn->setGeometry( 20, 160, 200, 24 );
 	note_off_all_btn->setIcon( embed::getIconPixmap( "stop" ) );
-	note_off_all_btn->setFont(adjustedToPixelSize(note_off_all_btn->font(), 8));
+	note_off_all_btn->setFont(adjustedToPixelSize(note_off_all_btn->font(), buttonFontSize));
 	connect( note_off_all_btn, SIGNAL( clicked() ), this,
 							SLOT( noteOffAll() ) );
 
