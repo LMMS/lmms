@@ -34,8 +34,6 @@
 #include <QMenu> // context menu
 
 
-#include <iostream>
-
 #include "VectorGraph.h"
 #include "StringPairDrag.h"
 #include "CaptionMenu.h" // context menu
@@ -115,13 +113,11 @@ VectorGraphView::VectorGraphView(QWidget * parentIn,
 }
 VectorGraphView::~VectorGraphView()
 {
-	std::cout<<"count 5";
 	qDebug("VectorGraphView dstc");
 	m_editingText.clear();
 	m_editingInputIsFloat.clear();
 	m_editingLineEffectText.clear();
 	qDebug("VectorGraphView dstc end");
-	std::cout<<"count 6";
 }
 
 void VectorGraphView::setLineColor(QColor colorIn, unsigned int dataArrayLocationIn)
@@ -1400,11 +1396,9 @@ VectorGraphModel::VectorGraphModel(unsigned int maxLengthIn, Model* parentIn, bo
 
 VectorGraphModel::~VectorGraphModel()
 {
-	std::cout<<"count 1";
 	qDebug("VectorGraphModel dstc");
 	m_dataArrays.clear();
 
-	std::cout<<"count 2";
 	qDebug("VectorGraphModel dstc end");
 }
 
@@ -1551,7 +1545,6 @@ VectorGraphDataArray::VectorGraphDataArray(
 
 VectorGraphDataArray::~VectorGraphDataArray()
 {
-	std::cout<<"count 3";
 	qDebug("VectorGraphDataArray dstc");
 	m_dataArray.clear();
 	m_bakedValues.clear();
@@ -1566,7 +1559,6 @@ VectorGraphDataArray::~VectorGraphDataArray()
 	}
 	m_automationModelArray.clear();
 
-	std::cout<<"count 4";
 	qDebug("VectorGraphDataArray dstc end");
 }
 
@@ -2179,21 +2171,38 @@ void VectorGraphDataArray::setDataArray(std::vector<std::pair<float, float>>* da
 	}
 	if (clampIn == true || rescaleIn == true || sortIn == true)
 	{
-		qDebug("setDataArray format");
 		formatArray(dataArrayIn, clampIn, rescaleIn, sortIn, false);
 	}
+	bool noneBefore = true;
+	bool isNegativeBefore = false;
 	for (unsigned int i = 0; i < m_dataArray.size(); i++)
 	{
-		qDebug("setDataArray 1, x: %f, y: %f", dataArrayIn->operator[](i).first, dataArrayIn->operator[](i).second);
+		//qDebug("setDataArray 1, x: %f, y: %f", dataArrayIn->operator[](i).first, dataArrayIn->operator[](i).second);
 		m_dataArray[i].m_x = dataArrayIn->operator[](i).first;
 		m_dataArray[i].m_y = dataArrayIn->operator[](i).second;
 		if (isCurvedIn == true && i > 0)
 		{
-			float diff = m_dataArray[i - 1].m_x - m_dataArray[i].m_x;
-			diff = diff * diff * diff;
-			diff = std::clamp(diff, -1.0f, 1.0f);
+			// TODO take in to account x coords
+			float diff = m_dataArray[i - 1].m_y - m_dataArray[i].m_y;
+			// if before is bigger than after
+			bool isNegative = diff >= 0;
+			float direction = 0;
+			if (noneBefore == true)
+			{
+				direction = isNegative == true ? 1.0f : -1.0f;
+			}
+			else
+			{
+				direction = isNegative == isNegativeBefore ? 1.0f : isNegative == true ? -1.0f : 1.0f;
+			}
+
+			diff = diff * diff * 10.0f * direction;
+			diff = std::clamp(diff, -0.7f, 0.7f);
 			m_dataArray[i - 1].m_c = diff;
-			// TODO
+
+			noneBefore = diff < 0.1f && diff > -0.1f;
+			isNegativeBefore = isNegative;
+			//qDebug("setDataArray curve: %f", m_dataArray[i].m_c);
 		}
 	}
 	// the whole m_dataArray needs to be updated
@@ -2202,7 +2211,6 @@ void VectorGraphDataArray::setDataArray(std::vector<std::pair<float, float>>* da
 	{
 		dataChanged();
 	}
-	qDebug("setDataArray end");
 }
 void VectorGraphDataArray::setDataArray(std::vector<float>* dataArrayIn,
 	bool isCurvedIn, bool clearIn, bool clampIn, bool rescaleIn, bool callDataChangedIn)
