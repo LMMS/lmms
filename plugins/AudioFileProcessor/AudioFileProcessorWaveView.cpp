@@ -25,7 +25,7 @@
 #include "AudioFileProcessorWaveView.h"
 
 #include "ConfigManager.h"
-#include "gui_templates.h"
+// #include "gui_templates.h"
 #include "SampleWaveform.h"
 
 #include <QPainter>
@@ -273,7 +273,9 @@ void AudioFileProcessorWaveView::paintEvent(QPaintEvent * pe)
 	p.fillRect(s_padding, s_padding, m_graph.width(), 14, g);
 
 	p.setPen(QColor(255, 255, 255));
-	p.setFont(pointSize(font(), 8));
+	// p.setFont(pointSize(font(), 8));
+	p.setFont(font());
+	font.setPointSize(8);
 
 	QString length_text;
 	const int length = m_sample->sampleDuration().count();

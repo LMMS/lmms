@@ -31,7 +31,7 @@
 #include "Song.h"
 #include "ConfigManager.h"
 
-#include "gui_templates.h"
+// #include "gui_templates.h"
 #include "lmms_math.h"
 
 #include <QGraphicsProxyWidget>
@@ -76,7 +76,10 @@ namespace lmms::gui
 
         m_renameLineEdit = new QLineEdit{mixerName, nullptr};
         m_renameLineEdit->setFixedWidth(65);
-        m_renameLineEdit->setFont(pointSize(font(), 7.5f));
+        //m_renameLineEdit->setFont(pointSize(font(), 7.5f));
+        QFont newFont = font();
+        newFont.setPointSizeF(7.5f);
+        m_renameLineEdit->setFont(newFont);
         m_renameLineEdit->setReadOnly(true);
         m_renameLineEdit->installEventFilter(this);
 

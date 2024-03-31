@@ -46,7 +46,7 @@
 #include "Engine.h"
 #include "FileDialog.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
+// #include "gui_templates.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "LocaleHelper.h"
@@ -587,7 +587,8 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_toggleGUIButton = new QPushButton( tr( "Show/hide GUI" ), this );
 	m_toggleGUIButton->setGeometry( 20, 130, 200, 24 );
 	m_toggleGUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
-	m_toggleGUIButton->setFont(pointSize(m_toggleGUIButton->font(), 8));
+	// m_toggleGUIButton->setFont(pointSize(m_toggleGUIButton->font(), 8));
+	m_toggleGUIButton->setPointSize(8);
 	connect( m_toggleGUIButton, SIGNAL( clicked() ), this,
 							SLOT( toggleGUI() ) );
 
@@ -596,7 +597,8 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 		this);
 	note_off_all_btn->setGeometry( 20, 160, 200, 24 );
 	note_off_all_btn->setIcon( embed::getIconPixmap( "stop" ) );
-	note_off_all_btn->setFont(pointSize(note_off_all_btn->font(), 8));
+	// note_off_all_btn->setFont(pointSize(note_off_all_btn->font(), 8));
+	note_off_all_btn->font()->setPointSize(8);
 	connect( note_off_all_btn, SIGNAL( clicked() ), this,
 							SLOT( noteOffAll() ) );
 
@@ -881,7 +883,8 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 				tr( "No VST plugin loaded" );
 	QFont f = p.font();
 	f.setBold( true );
-	p.setFont(pointSize(f, 10));
+	// p.setFont(pointSize(f, 10));
+	p.setPointSize(10);
 	p.setPen( QColor( 255, 255, 255 ) );
 	p.drawText( 10, 100, plugin_name );
 
@@ -893,7 +896,8 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 	{
 		p.setPen( QColor( 0, 0, 0 ) );
 		f.setBold( false );
-		p.setFont(pointSize(f, 8));
+		// p.setFont(pointSize(f, 8));
+		p.setPointSize(8);
 		p.drawText( 10, 114, tr( "by " ) +
 					m_vi->m_plugin->vendorString() );
 		p.setPen( QColor( 255, 255, 255 ) );

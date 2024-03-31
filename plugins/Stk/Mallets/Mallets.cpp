@@ -37,7 +37,7 @@
 #include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "Engine.h"
-#include "gui_templates.h"
+// #include "gui_templates.h"
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
 
@@ -450,7 +450,8 @@ MalletsInstrumentView::MalletsInstrumentView( MalletsInstrument * _instrument,
 
 	m_presetsCombo = new ComboBox( this, tr( "Instrument" ) );
 	m_presetsCombo->setGeometry( 140, 50, 99, ComboBox::DEFAULT_HEIGHT );
-	m_presetsCombo->setFont(pointSize(m_presetsCombo->font(), 8));
+	// m_presetsCombo->setFont(pointSize(m_presetsCombo->font(), 8));
+	m_presetsCombo->font()->setPointSize(8);
 	
 	connect( &_instrument->m_presetsModel, SIGNAL( dataChanged() ),
 		 this, SLOT( changePreset() ) );

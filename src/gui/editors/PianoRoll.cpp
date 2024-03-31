@@ -59,7 +59,7 @@
 #include "DetuningHelper.h"
 #include "embed.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
+// #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
 #include "MidiClip.h"
@@ -3335,9 +3335,10 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			m_whiteKeyWidth, noteEditBottom() - keyAreaBottom()), bgColor);
 
 	// display note editing info
-	//QFont f = p.font();
+	QFont f = p.font();
 	f.setBold( false );
-	p.setFont(pointSize(f, 10));
+	// p.setFont(pointSize(f, 10));
+	f.setPointSize(10);
 	p.setPen(m_noteModeColor);
 	p.drawText( QRect( 0, keyAreaBottom(),
 					  m_whiteKeyWidth, noteEditBottom() - keyAreaBottom()),
@@ -3600,7 +3601,8 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	{
 		QFont f = p.font();
 		f.setBold( true );
-		p.setFont(pointSize(f, 14));
+		// p.setFont(pointSize(f, 14));
+		f.setPointSize(14);
 		p.setPen( QApplication::palette().color( QPalette::Active,
 							QPalette::BrightText ) );
 		p.drawText(m_whiteKeyWidth + 20, PR_TOP_MARGIN + 40,
