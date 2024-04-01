@@ -43,7 +43,7 @@ Plugin::Descriptor PLUGIN_EXPORT dualfilter_plugin_descriptor =
 	QT_TRANSLATE_NOOP( "PluginBrowser", "A Dual filter plugin" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
@@ -90,12 +90,12 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 
     if( m_dfControls.m_filter1Model.isValueChanged() || m_filter1changed )
 	{
-		m_filter1->setFilterType( m_dfControls.m_filter1Model.value() );
+		m_filter1->setFilterType( static_cast<BasicFilters<2>::FilterType>(m_dfControls.m_filter1Model.value()) );
 		m_filter1changed = true;
 	}
     if( m_dfControls.m_filter2Model.isValueChanged() || m_filter2changed )
 	{
-		m_filter2->setFilterType( m_dfControls.m_filter2Model.value() );
+		m_filter2->setFilterType( static_cast<BasicFilters<2>::FilterType>(m_dfControls.m_filter2Model.value()) );
 		m_filter2changed = true;
 	}
 

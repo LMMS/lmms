@@ -77,16 +77,16 @@ InstrumentSoundShapingView::InstrumentSoundShapingView( QWidget * _parent ) :
 
 	m_filterComboBox = new ComboBox( m_filterGroupBox );
 	m_filterComboBox->setGeometry( 14, 22, 120, ComboBox::DEFAULT_HEIGHT );
-	m_filterComboBox->setFont( pointSize<8>( m_filterComboBox->font() ) );
+	m_filterComboBox->setFont(pointSize(m_filterComboBox->font(), 8));
 
 
-	m_filterCutKnob = new Knob( knobBright_26, m_filterGroupBox );
+	m_filterCutKnob = new Knob( KnobType::Bright26, m_filterGroupBox );
 	m_filterCutKnob->setLabel( tr( "FREQ" ) );
 	m_filterCutKnob->move( 140, 18 );
 	m_filterCutKnob->setHintText( tr( "Cutoff frequency:" ), " " + tr( "Hz" ) );
 
 
-	m_filterResKnob = new Knob( knobBright_26, m_filterGroupBox );
+	m_filterResKnob = new Knob( KnobType::Bright26, m_filterGroupBox );
 	m_filterResKnob->setLabel( tr( "Q/RESO" ) );
 	m_filterResKnob->move( 196, 18 );
 	m_filterResKnob->setHintText( tr( "Q/Resonance:" ), "" );
@@ -94,7 +94,7 @@ InstrumentSoundShapingView::InstrumentSoundShapingView( QWidget * _parent ) :
 
 	m_singleStreamInfoLabel = new QLabel( tr( "Envelopes, LFOs and filters are not supported by the current instrument." ), this );
 	m_singleStreamInfoLabel->setWordWrap( true );
-	m_singleStreamInfoLabel->setFont( pointSize<8>( m_singleStreamInfoLabel->font() ) );
+	m_singleStreamInfoLabel->setFont(pointSize(m_singleStreamInfoLabel->font(), 8));
 
 	m_singleStreamInfoLabel->setGeometry( TARGETS_TABWIDGET_X,
 						TARGETS_TABWIDGET_Y,

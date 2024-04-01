@@ -34,7 +34,6 @@
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "LcdSpinBox.h"
-#include "MemoryManager.h"
 
 class QLabel;
 
@@ -88,7 +87,7 @@ public:
 
 	Flags flags() const override
 	{
-		return IsSingleStreamed;
+		return Flag::IsSingleStreamed;
 	}
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
@@ -114,16 +113,12 @@ public slots:
 	void updateTuning();
 
 private:
-	static QMutex s_fontsMutex;
-	static QMap<QString, Sf2Font*> s_fonts;
-	static int (* s_origFree)( fluid_sfont_t * );
-
 	SRC_STATE * m_srcState;
 
 	fluid_settings_t* m_settings;
 	fluid_synth_t* m_synth;
 
-	Sf2Font* m_font;
+	fluid_sfont_t* m_font;
 
 	int m_fontId;
 	QString m_filename;
@@ -175,22 +170,6 @@ signals:
 	void patchChanged();
 
 } ;
-
-
-
-// A soundfont in our font-map
-class Sf2Font
-{
-	MM_OPERATORS
-public:
-	Sf2Font( fluid_sfont_t * f ) :
-		fluidFont( f ),
-		refCount( 1 )
-	{};
-
-	fluid_sfont_t * fluidFont;
-	int refCount;
-};
 
 
 namespace gui

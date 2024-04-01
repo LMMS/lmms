@@ -60,7 +60,7 @@ MeterDialog::MeterDialog( QWidget * _parent, bool _simple ) :
 	{
 		auto num_label = new QLabel(tr("Meter Numerator"), num);
 		QFont f = num_label->font();
-		num_label->setFont( pointSize<7>( f ) );
+		num_label->setFont(pointSize(f, 7));
 		num_layout->addSpacing( 5 );
 		num_layout->addWidget( num_label );
 	}
@@ -84,7 +84,7 @@ MeterDialog::MeterDialog( QWidget * _parent, bool _simple ) :
 	{
 		auto den_label = new QLabel(tr("Meter Denominator"), den);
 		QFont f = den_label->font();
-		den_label->setFont( pointSize<7>( f ) );
+		den_label->setFont(pointSize(f, 7));
 		den_layout->addSpacing( 5 );
 		den_layout->addWidget( den_label );
 	}

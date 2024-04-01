@@ -40,7 +40,7 @@ Plugin::Descriptor PLUGIN_EXPORT dispersion_plugin_descriptor =
 	QT_TRANSLATE_NOOP("PluginBrowser", "An all-pass filter allowing for extremely high orders."),
 	"Lost Robot <r94231/at/gmail/dot/com>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr

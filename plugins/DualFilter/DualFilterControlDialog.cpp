@@ -36,7 +36,7 @@ namespace lmms::gui
 
 
 #define makeknob( name, x, y, model, label, hint, unit ) 	\
-	Knob * name = new Knob( knobBright_26, this); 			\
+	Knob * name = new Knob( KnobType::Bright26, this); 			\
 	(name) -> move( x, y );									\
 	(name) ->setModel( &controls-> model );					\
 	(name) ->setLabel( label );							\
@@ -64,8 +64,8 @@ DualFilterControlDialog::DualFilterControlDialog( DualFilterControls* controls )
 	gain1Knob-> setVolumeKnob( true );
 	gain2Knob-> setVolumeKnob( true );
 
-	auto enabled1Toggle = new LedCheckBox("", this, tr("Filter 1 enabled"), LedCheckBox::Green);
-	auto enabled2Toggle = new LedCheckBox("", this, tr("Filter 2 enabled"), LedCheckBox::Green);
+	auto enabled1Toggle = new LedCheckBox("", this, tr("Filter 1 enabled"), LedCheckBox::LedColor::Green);
+	auto enabled2Toggle = new LedCheckBox("", this, tr("Filter 2 enabled"), LedCheckBox::LedColor::Green);
 
 	enabled1Toggle -> move( 12, 11 );
 	enabled1Toggle -> setModel( &controls -> m_enabled1Model );
@@ -76,12 +76,12 @@ DualFilterControlDialog::DualFilterControlDialog( DualFilterControls* controls )
 
 	auto m_filter1ComboBox = new ComboBox(this);
 	m_filter1ComboBox->setGeometry( 19, 70, 137, ComboBox::DEFAULT_HEIGHT );
-	m_filter1ComboBox->setFont( pointSize<8>( m_filter1ComboBox->font() ) );
+	m_filter1ComboBox->setFont(pointSize(m_filter1ComboBox->font(), 8));
 	m_filter1ComboBox->setModel( &controls->m_filter1Model );
 
 	auto m_filter2ComboBox = new ComboBox(this);
 	m_filter2ComboBox->setGeometry( 217, 70, 137, ComboBox::DEFAULT_HEIGHT );
-	m_filter2ComboBox->setFont( pointSize<8>( m_filter2ComboBox->font() ) );
+	m_filter2ComboBox->setFont(pointSize(m_filter2ComboBox->font(), 8));
 	m_filter2ComboBox->setModel( &controls->m_filter2Model );
 }
 

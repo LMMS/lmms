@@ -45,7 +45,7 @@ Plugin::Descriptor PLUGIN_EXPORT flanger_plugin_descriptor =
 	QT_TRANSLATE_NOOP( "PluginBrowser", "A native flanger plugin" ),
 	"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,
@@ -108,10 +108,11 @@ bool FlangerEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 	m_lDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
 	m_rDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
 	auto dryS = std::array<sample_t, 2>{};
-	float leftLfo;
-	float rightLfo;
 	for( fpp_t f = 0; f < frames; ++f )
 	{
+		float leftLfo;
+		float rightLfo;
+
 		buf[f][0] += m_noise->tick() * noise;
 		buf[f][1] += m_noise->tick() * noise;
 		dryS[0] = buf[f][0];

@@ -47,7 +47,7 @@ private:
 	static QString pluginName(const LilvPlugin *plug);
 
 public:
-	Lv2SubPluginFeatures(Plugin::PluginTypes type);
+	Lv2SubPluginFeatures(Plugin::Type type);
 
 	void fillDescriptionWidget(
 		QWidget *parent, const Key *k) const override;

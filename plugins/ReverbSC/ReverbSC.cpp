@@ -42,7 +42,7 @@ Plugin::Descriptor PLUGIN_EXPORT reverbsc_plugin_descriptor =
 	QT_TRANSLATE_NOOP( "PluginBrowser", "Reverb algorithm by Sean Costello" ),
 	"Paul Batchelor",
 	0x0123,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,

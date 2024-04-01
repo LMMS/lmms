@@ -101,8 +101,7 @@ ControlLayout::ControlLayout(QWidget *parent, int margin, int hSpacing, int vSpa
 
 ControlLayout::~ControlLayout()
 {
-	QLayoutItem *item;
-	while ((item = takeAt(0))) { delete item; }
+	while (auto item = takeAt(0)) { delete item; }
 }
 
 void ControlLayout::onTextChanged(const QString&)
@@ -258,8 +257,8 @@ int ControlLayout::doLayout(const QRect &rect, bool testOnly) const
 				if (first)
 				{
 					// for the search bar, only show it if there are at least
-					// two control widgets (i.e. at least 3 widgets)
-					if (m_itemMap.size() > 2) { wid->show(); }
+					// five control widgets (i.e. at least 6 widgets)
+					if (m_itemMap.size() > 5) { wid->show(); }
 					else { wid->hide(); }
 				}
 				else { wid->show(); }

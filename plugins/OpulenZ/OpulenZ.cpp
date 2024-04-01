@@ -73,7 +73,7 @@ Plugin::Descriptor PLUGIN_EXPORT opulenz_plugin_descriptor =
 			   "2-operator FM Synth" ),
         "Raine M. Ekman <raine/at/iki/fi>",
         0x0100,
-        Plugin::Instrument,
+        Plugin::Type::Instrument,
         new PluginPixmapLoader( "logo" ),
         "sbi",
         nullptr,
@@ -222,8 +222,8 @@ OpulenzInstrument::OpulenzInstrument( InstrumentTrack * _instrument_track ) :
 OpulenzInstrument::~OpulenzInstrument() {
 	delete theEmulator;
 	Engine::audioEngine()->removePlayHandlesOfTypes( instrumentTrack(),
-				PlayHandle::TypeNotePlayHandle
-				| PlayHandle::TypeInstrumentPlayHandle );
+				PlayHandle::Type::NotePlayHandle
+				| PlayHandle::Type::InstrumentPlayHandle );
 	delete [] renderbuffer;
 }
 
@@ -244,14 +244,12 @@ void OpulenzInstrument::reloadEmulator() {
 
 // This shall only be called from code protected by the holy Mutex!
 void OpulenzInstrument::setVoiceVelocity(int voice, int vel) {
-	int vel_adjusted;
+	int vel_adjusted = !fm_mdl.value()
+		? 63 - (op1_lvl_mdl.value() * vel / 127.0)
+		: 63 - op1_lvl_mdl.value();
+
 	// Velocity calculation, some kind of approximation
 	// Only calculate for operator 1 if in adding mode, don't want to change timbre
-	if( fm_mdl.value() == false ) {
-		vel_adjusted = 63 - ( op1_lvl_mdl.value() * vel/127.0) ;
-	} else {
-		vel_adjusted = 63 - op1_lvl_mdl.value();
-	}
 	theEmulator->write(0x40+adlib_opadd[voice],
 			   ( (int)op1_scale_mdl.value() & 0x03 << 6) +
 			   ( vel_adjusted & 0x3f ) );
@@ -297,66 +295,60 @@ int OpulenzInstrument::pushVoice(int v) {
 bool OpulenzInstrument::handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset )
 {
 	emulatorMutex.lock();
-	int key, vel, voice, tmp_pb;
 
-	switch(event.type()) {
-        case MidiNoteOn:
-		key = event.key();
-		vel = event.velocity();
-
-		voice = popVoice();
-		if( voice != OPL2_NO_VOICE ) {
+	int key = event.key();
+	int vel = event.velocity();
+	switch (event.type())
+	{
+	case MidiNoteOn:
+		if (int voice = popVoice(); voice != OPL2_NO_VOICE)
+		{
 			// Turn voice on, NB! the frequencies are straight by voice number,
 			// not by the adlib_opadd table!
-			theEmulator->write(0xA0+voice, fnums[key] & 0xff);
-			theEmulator->write(0xB0+voice, 32 + ((fnums[key] & 0x1f00) >> 8) );
+			theEmulator->write(0xA0 + voice, fnums[key] & 0xff);
+			theEmulator->write(0xB0 + voice, 32 + ((fnums[key] & 0x1f00) >> 8));
 			setVoiceVelocity(voice, vel);
 			voiceNote[voice] = key;
 			velocities[key] = vel;
 		}
-                break;
-        case MidiNoteOff:
-                key = event.key();
-                for(voice=0; voice<OPL2_VOICES; ++voice) {
-                        if( voiceNote[voice] == key ) {
-                                theEmulator->write(0xA0+voice, fnums[key] & 0xff);
-                                theEmulator->write(0xB0+voice, (fnums[key] & 0x1f00) >> 8 );
-                                voiceNote[voice] |= OPL2_VOICE_FREE;
+		break;
+	case MidiNoteOff:
+		for (int voice = 0; voice < OPL2_VOICES; ++voice)
+		{
+			if (voiceNote[voice] == key)
+			{
+				theEmulator->write(0xA0 + voice, fnums[key] & 0xff);
+				theEmulator->write(0xB0 + voice, (fnums[key] & 0x1f00) >> 8);
+				voiceNote[voice] |= OPL2_VOICE_FREE;
 				pushVoice(voice);
-                        }
-                }
-		velocities[key] = 0;
-                break;
-        case MidiKeyPressure:
-                key = event.key();
-                vel = event.velocity();
-		if( velocities[key] != 0) {
-			velocities[key] = vel;
-		}
-		for(voice=0; voice<OPL2_VOICES; ++voice) {
-			if(voiceNote[voice] == key) {
-				setVoiceVelocity(voice, vel);
 			}
 		}
-                break;
-        case MidiPitchBend:
+		velocities[key] = 0;
+		break;
+	case MidiKeyPressure:
+		if (velocities[key] != 0) { velocities[key] = vel; }
+		for (int voice = 0; voice < OPL2_VOICES; ++voice)
+		{
+			if (voiceNote[voice] == key) { setVoiceVelocity(voice, vel); }
+		}
+		break;
+	case MidiPitchBend:
 		// Update fnumber table
-
 		// Neutral = 8192, full downbend = 0, full upbend = 16383
-		tmp_pb = ( event.pitchBend()-8192 ) * pitchBendRange / 8192;
-
-		if( tmp_pb != pitchbend ) {
+		if (int tmp_pb = (event.pitchBend() - 8192) * pitchBendRange / 8192; tmp_pb != pitchbend)
+		{
 			pitchbend = tmp_pb;
 			tuneEqual(69, 440.0);
 		}
 		// Update pitch of all voices (also released ones)
-		for( int v=0; v<OPL2_VOICES; ++v ) {
-			int vn = (voiceNote[v] & ~OPL2_VOICE_FREE); // remove the flag bit
+		for (int v = 0; v < OPL2_VOICES; ++v)
+		{
+			int vn = (voiceNote[v] & ~OPL2_VOICE_FREE);			 // remove the flag bit
 			int playing = (voiceNote[v] & OPL2_VOICE_FREE) == 0; // just the flag bit
-			theEmulator->write(0xA0+v, fnums[vn] & 0xff);
-			theEmulator->write(0xB0+v, (playing ? 32 : 0) + ((fnums[vn] & 0x1f00) >> 8) );
-                }
-                break;
+			theEmulator->write(0xA0 + v, fnums[vn] & 0xff);
+			theEmulator->write(0xB0 + v, (playing ? 32 : 0) + ((fnums[vn] & 0x1f00) >> 8));
+		}
+		break;
 	case MidiControlChange:
 		switch (event.controllerNumber()) {
 		case MidiControllerRegisteredParameterNumberLSB:
@@ -382,7 +374,7 @@ bool OpulenzInstrument::handleMidiEvent( const MidiEvent& event, const TimePos& 
                 printf("Midi event type %d\n",event.type());
 #endif
 		break;
-        }
+		}
 	emulatorMutex.unlock();
 	return true;
 }
@@ -412,10 +404,6 @@ void OpulenzInstrument::play( sampleFrame * _working_buffer )
                 }
 	}
 	emulatorMutex.unlock();
-
-	// Throw the data to the track...
-	instrumentTrack()->processAudioBuffer( _working_buffer, frameCount, nullptr );
-
 }
 
 
@@ -508,9 +496,8 @@ void OpulenzInstrument::loadPatch(const unsigned char inst[14]) {
 }
 
 void OpulenzInstrument::tuneEqual(int center, float Hz) {
-	float tmp;
 	for(int n=0; n<128; ++n) {
-		tmp = Hz*pow( 2.0, ( n - center ) * ( 1.0 / 12.0 ) + pitchbend * ( 1.0 / 1200.0 ) );
+		float tmp = Hz * pow(2.0, (n - center) * (1.0 / 12.0) + pitchbend * (1.0 / 1200.0));
 		fnums[n] = Hz2fnum( tmp );
 	}
 }
@@ -686,7 +673,7 @@ OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
 {
 
 #define KNOB_GEN(knobname, hinttext, hintunit,xpos,ypos) \
-	knobname = new Knob( knobStyled, this );\
+	knobname = new Knob( KnobType::Styled, this );\
 	knobname->setHintText( tr(hinttext), hintunit );\
 	knobname->setFixedSize(22,22);\
 	knobname->setCenterPointX(11.0);\

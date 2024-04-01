@@ -61,8 +61,6 @@ public:
 	~Lv2Instrument() override;
 	void reload();
 	void onSampleRateChanged();
-	//! Must be checked after ctor or reload
-	bool isValid() const;
 
 	/*
 		load/save
@@ -89,9 +87,9 @@ public:
 	Flags flags() const override
 	{
 #ifdef LV2_INSTRUMENT_USE_MIDI
-		return IsSingleStreamed | IsMidiBased;
+		return Flag::IsSingleStreamed | Flag::IsMidiBased;
 #else
-		return IsSingleStreamed;
+		return Flag::IsSingleStreamed;
 #endif
 	}
 	gui::PluginView* instantiateView(QWidget *parent) override;
@@ -124,6 +122,7 @@ public:
 protected:
 	void dragEnterEvent(QDragEnterEvent *_dee) override;
 	void dropEvent(QDropEvent *_de) override;
+	void hideEvent(QHideEvent* event) override;
 
 private:
 	void modelChanged() override;

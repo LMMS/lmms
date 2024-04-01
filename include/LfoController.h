@@ -86,7 +86,8 @@ protected:
 	sample_t (*m_sampleFunction)( const float );
 
 private:
-	SampleBuffer * m_userDefSampleBuffer;
+	float m_heldSample;
+	std::shared_ptr<const SampleBuffer> m_userDefSampleBuffer = SampleBuffer::emptyBuffer();
 
 protected slots:
 	void updatePhase();

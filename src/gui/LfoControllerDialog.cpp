@@ -31,6 +31,7 @@
 #include "Knob.h"
 #include "TempoSyncKnob.h"
 #include "PixmapButton.h"
+#include "SampleLoader.h"
 
 namespace lmms::gui
 {
@@ -61,22 +62,22 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
 	setFixedSize( 240, 58 );
 	
-	m_baseKnob = new Knob( knobBright_26, this );
+	m_baseKnob = new Knob( KnobType::Bright26, this );
 	m_baseKnob->setLabel( tr( "BASE" ) );
 	m_baseKnob->move( CD_LFO_BASE_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_baseKnob->setHintText( tr( "Base:" ), "" );
 
-	m_speedKnob = new TempoSyncKnob( knobBright_26, this );
+	m_speedKnob = new TempoSyncKnob( KnobType::Bright26, this );
 	m_speedKnob->setLabel( tr( "FREQ" ) );
 	m_speedKnob->move( CD_LFO_SPEED_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_speedKnob->setHintText( tr( "LFO frequency:" ), "" );
 
-	m_amountKnob = new Knob( knobBright_26, this );
+	m_amountKnob = new Knob( KnobType::Bright26, this );
 	m_amountKnob->setLabel( tr( "AMNT" ) );
 	m_amountKnob->move( CD_LFO_AMOUNT_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_amountKnob->setHintText( tr( "Modulation amount:" ), "" );
 
-	m_phaseKnob = new Knob( knobBright_26, this );
+	m_phaseKnob = new Knob( KnobType::Bright26, this );
 	m_phaseKnob->setLabel( tr( "PHS" ) );
 	m_phaseKnob->move( CD_LFO_PHASE_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_phaseKnob->setHintText( tr( "Phase offset:" ) , "" + tr( " degrees" ) );
@@ -210,14 +211,14 @@ LfoControllerDialog::~LfoControllerDialog()
 
 void LfoControllerDialog::askUserDefWave()
 {
-	SampleBuffer * sampleBuffer = dynamic_cast<LfoController*>(this->model())->
-									m_userDefSampleBuffer;
-	QString fileName = sampleBuffer->openAndSetWaveformFile();
-	if( fileName.isEmpty() == false )
-	{
-		// TODO:
-		m_userWaveBtn->setToolTip(sampleBuffer->audioFile());
-	}
+	const auto fileName = SampleLoader::openWaveformFile();
+	if (fileName.isEmpty()) { return; }
+
+	auto lfoModel = dynamic_cast<LfoController*>(model());
+	auto& buffer = lfoModel->m_userDefSampleBuffer;
+	buffer = SampleLoader::createBufferFromFile(fileName);
+
+	m_userWaveBtn->setToolTip(buffer->audioFile());
 }
 
 

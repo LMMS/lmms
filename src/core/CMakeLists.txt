@@ -4,6 +4,7 @@ set(LMMS_SRCS
 	core/AudioEngine.cpp
 	core/AudioEngineProfiler.cpp
 	core/AudioEngineWorkerThread.cpp
+	core/AudioResampler.cpp
 	core/AutomatableModel.cpp
 	core/AutomationClip.cpp
 	core/AutomationNode.cpp
@@ -38,7 +39,6 @@ set(LMMS_SRCS
 	core/LinkedModelGroups.cpp
 	core/LocklessAllocator.cpp
 	core/MemoryHelper.cpp
-	core/MemoryManager.cpp
 	core/MeterModel.cpp
 	core/MicroTimer.cpp
 	core/Microtuner.cpp
@@ -65,18 +65,24 @@ set(LMMS_SRCS
 	core/RemotePlugin.cpp
 	core/RenderManager.cpp
 	core/RingBuffer.cpp
+	core/Sample.cpp
 	core/SampleBuffer.cpp
 	core/SampleClip.cpp
+	core/SampleDecoder.cpp
 	core/SamplePlayHandle.cpp
 	core/SampleRecordHandle.cpp
 	core/Scale.cpp
+	core/LmmsSemaphore.cpp
 	core/SerializingObject.cpp
 	core/Song.cpp
 	core/TempoSyncKnobModel.cpp
+	core/Timeline.cpp
 	core/TimePos.cpp
 	core/ToolPlugin.cpp
 	core/Track.cpp
 	core/TrackContainer.cpp
+	core/UpgradeExtendedNoteRange.h
+	core/UpgradeExtendedNoteRange.cpp
 	core/Clip.cpp
 	core/ValueBuffer.cpp
 	core/VstSyncController.cpp
@@ -110,6 +116,7 @@ set(LMMS_SRCS
 	core/lv2/Lv2SubPluginFeatures.cpp
 	core/lv2/Lv2UridCache.cpp
 	core/lv2/Lv2UridMap.cpp
+	core/lv2/Lv2Worker.cpp
 
 	core/midi/MidiAlsaRaw.cpp
 	core/midi/MidiAlsaSeq.cpp

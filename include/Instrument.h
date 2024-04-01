@@ -27,9 +27,10 @@
 #define LMMS_INSTRUMENT_H
 
 #include <QString>
+
+#include "Flags.h"
 #include "lmms_export.h"
 #include "lmms_basics.h"
-#include "MemoryManager.h"
 #include "Plugin.h"
 #include "TimePos.h"
 
@@ -45,9 +46,8 @@ class Track;
 
 class LMMS_EXPORT Instrument : public Plugin
 {
-	MM_OPERATORS
 public:
-	enum Flag
+	enum class Flag
 	{
 		NoFlags = 0x00,
 		IsSingleStreamed = 0x01,	/*! Instrument provides a single audio stream for all notes */
@@ -55,7 +55,7 @@ public:
 		IsNotBendable = 0x04,		/*! Instrument can't react to pitch bend changes */
 	};
 
-	Q_DECLARE_FLAGS(Flags, Flag);
+	using Flags = lmms::Flags<Flag>;
 
 	Instrument(InstrumentTrack * _instrument_track,
 			const Descriptor * _descriptor,
@@ -102,7 +102,7 @@ public:
 
 	virtual Flags flags() const
 	{
-		return NoFlags;
+		return Flag::NoFlags;
 	}
 
 	// sub-classes can re-implement this for receiving all incoming
@@ -149,7 +149,7 @@ private:
 } ;
 
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(Instrument::Flags)
+LMMS_DECLARE_OPERATORS_FOR_FLAGS(Instrument::Flag)
 
 
 } // namespace lmms
