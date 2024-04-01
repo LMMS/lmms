@@ -45,7 +45,7 @@ class FloatModel;
 
 namespace gui
 {
-
+// class SimpleTextFloat; TODO
 class LMMS_EXPORT VectorGraphView : public QWidget, public ModelView
 {
 	Q_OBJECT
@@ -165,7 +165,7 @@ private:
 	bool isGraphPressed(int mouseXIn, int mouseYIn);
 	// returns true if the editing window was clicked while in editing mode
 	bool isEditingWindowPressed(int mouseYIn);
-	void processEditingWindowPressed(int mouseXIn, int mouseYIn, bool isDraggingIn, bool startMovingIn, int xIn, int yIn);
+	void processEditingWindowPressed(int mouseXIn, int mouseYIn, bool isDraggingIn, bool startMovingIn, int curXIn, int curYIn);
 	// returns -1 if no attribute was clicked
 	int getPressedInput(int mouseXIn, int mouseYIn, unsigned int inputCountIn);
 	// returns a float attrib value, valueOut = attrib value if it is a bool
@@ -177,7 +177,7 @@ private:
 	// returns the first x char that fits in the displayedLength(in pixel)
 	// cuts the string to displayedLength(in px) size
 	QString getTextFromDisplayLength(QString textIn, unsigned int displayLengthIn);
-	void addDefaultActions(QMenu* menu);
+	void addDefaultActions(QMenu* menu, QString controlDisplayTextIn);
 
 	// inputDialog
 	std::pair<float, float> showCoordInputDialog();
