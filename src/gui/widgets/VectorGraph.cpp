@@ -312,15 +312,56 @@ void VectorGraphView::mouseMoveEvent(QMouseEvent* me)
 			}
 			else if (m_addition == false)
 			{
+				float curDistance = getDistance(x, m_graphHeight - y,
+					m_lastTrackPoint.first, m_lastTrackPoint.second);
+				if (curDistance > m_pointSize)
+				{
+					m_lastTrackPoint.first = x;
+					m_lastTrackPoint.second = m_graphHeight - y;
+					selectData(x, m_graphHeight - y);
+					if (m_isSelected == true)
+					{
+						model()->getDataArray(m_selectedArray)->del(m_selectedLocation);
+						m_isSelected = false;
+						m_isEditingActive = false;
+					}
+				}
 				// TODO deletion
 			}
 			else
 			{
+				if (startMoving == true && m_isLastSelectedArray == true)
+				{
+					// trying to add to the last selected array
+					addPoint(m_selectedArray, x, m_graphHeight - y);
+				}
 				float curDistance = getDistance(x, m_graphHeight - y,
 					m_lastTrackPoint.first, m_lastTrackPoint.second);
-				if (curDistance > m_pointSize * 2)
+				if (curDistance > m_pointSize)
 				{
-					// TODO drawing
+					// calculating angle
+					// getting the angle between (lastScndTrackPoint and lastTrackPoint)
+					// and (lastTrackPoint and x and y)
+					float curAngle = static_cast<float>(
+						(m_lastTrackPoint.second - m_lastScndTrackPoint.second) *
+						(m_graphHeight - y - m_lastTrackPoint.second) + 
+						(m_lastTrackPoint.first - m_lastScndTrackPoint.first) *
+						(x - m_lastTrackPoint.first));
+					curAngle = std::acos(curAngle / curDistance /
+						getDistance(m_lastScndTrackPoint.first, m_lastScndTrackPoint.second,
+						m_lastTrackPoint.first, m_lastTrackPoint.second));
+					// if the angle difference is bigger than 0.3 rad
+					if (std::abs(curAngle) * curDistance * curDistance / static_cast<float>(m_pointSize * m_pointSize) > 0.3f)
+					{
+						m_lastScndTrackPoint.first = m_lastTrackPoint.first;
+						m_lastScndTrackPoint.second = m_lastTrackPoint.second;
+						
+						if (m_isLastSelectedArray == true)
+						{
+							// trying to add to the last selected array
+							addPoint(m_selectedArray, x, m_graphHeight - y);
+						}
+					}
 					m_lastTrackPoint.first = x;
 					m_lastTrackPoint.second = m_graphHeight - y;
 				}
@@ -361,9 +402,11 @@ void VectorGraphView::mouseReleaseEvent(QMouseEvent* me)
 					// trying to add to all the selected arrays
 					for(unsigned int i = 0; i < model()->getDataArraySize(); i++)
 					{
-						success = addPoint(m_selectedArray, x, m_graphHeight - y);
+						success = addPoint(i, x, m_graphHeight - y);
 						if (success == true)
 						{
+							m_selectedArray = i;
+							m_isLastSelectedArray = true;
 							break;
 						}
 					}
@@ -378,11 +421,6 @@ void VectorGraphView::mouseReleaseEvent(QMouseEvent* me)
 			}
 
 			m_mousePress = false;
-		}
-		else
-		{
-			// add/set/delete line end
-
 		}
 	}
 	else if (m_mousePress == true && isControlWindowPressed(m_graphHeight - y) == true)
