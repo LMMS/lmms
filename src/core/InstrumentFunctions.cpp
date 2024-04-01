@@ -470,7 +470,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		// If ArpDirection::Down or ArpDirection::DownAndUp, invert the final range.
 		if (dir == ArpDirection::Down || dir == ArpDirection::DownAndUp)
 		{
-			cur_arp_idx = static_cast<int>(range) - cur_arp_idx - 1;
+			cur_arp_idx = static_cast<int>(range / m_arpRepeatsModel.value()) - cur_arp_idx - 1;
 		}
 
 		// now calculate final key for our arp-note
