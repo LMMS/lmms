@@ -78,9 +78,12 @@ void LcdWidget::setValue(int value)
 		}
 	}
 
-	m_display = s;
+	if (m_display != s)
+	{
+		m_display = s;
 
-	update();
+		update();
+	}
 }
 
 void LcdWidget::setValue(float value)
