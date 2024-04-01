@@ -48,7 +48,7 @@ FFTFilterControls::FFTFilterControls(FFTFilterEffect* effect) :
 	m_graphModel.getDataArray(arrayLocation)->setIsAutomatableEffectable(true);
 	m_graphModel.getDataArray(arrayLocation)->setLineColor(QColor(210, 50, 50, 255));
 	m_graphModel.getDataArray(arrayLocation)->setActiveColor(QColor(255, 30, 20, 255));
-	m_graphModel.getDataArray(arrayLocation)->setFillColor(QColor(170, 25, 25, 255));
+	m_graphModel.getDataArray(arrayLocation)->setFillColor(QColor(170, 25, 25, 40));
 	m_graphModel.getDataArray(arrayLocation)->setAutomatedColor(QColor(144, 107, 255, 255));
 
 	unsigned int arrayLocationB = m_graphModel.addArray();
@@ -57,8 +57,7 @@ FFTFilterControls::FFTFilterControls(FFTFilterEffect* effect) :
 	m_graphModel.getDataArray(arrayLocationB)->setIsAutomatableEffectable(true);
 	m_graphModel.getDataArray(arrayLocationB)->setLineColor(QColor(10, 50, 210, 255));
 	m_graphModel.getDataArray(arrayLocationB)->setActiveColor(QColor(70, 170, 255, 255));
-	m_graphModel.getDataArray(arrayLocationB)->setFillColor(QColor(70, 100, 180, 255));
-	m_graphModel.getDataArray(arrayLocationB)->setAutomatedColor(QColor(10, 50, 255, 255));
+	m_graphModel.getDataArray(arrayLocationB)->setFillColor(QColor(70, 100, 180, 40));
 	m_graphModel.getDataArray(arrayLocationB)->setAutomatedColor(QColor(10, 50, 255, 255));
 
 	// effectors:

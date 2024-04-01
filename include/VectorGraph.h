@@ -80,7 +80,7 @@ public:
 	// TODO: ability to scale displayed coords in PointGraphView (not 0 - 100) (add scalers)
 	// TODO: check PointGraphDataArray signals			Done
 	// TODO: journalling in PointGraphModel
-	// TODO: m_maxLenght* should be replaced with m_parent->getMaxLength()			Done
+	// TODO: m_maxLength* should be replaced with m_parent->getMaxLength()			Done
 	// TODO: setDataArray keep attributes option, formatArray option which runs formatArray
 	// TODO: PointGraphDataArray shouldSaveAll and shouldSavePointAttributesOnly (for saving only editable graphs) option			Done
 	// TODO: baked automation values in PointGraphPoint			Done
@@ -123,6 +123,7 @@ public:
 	// returns -1 it can not return a array location
 	int getLastSelectedArray();
 	void setSelectedData(std::pair<float, float> dataIn);
+	void setBackground(const QPixmap backgoundIn);
 	
 	void useGetLastValues();
 signals:
@@ -174,6 +175,8 @@ private:
 	void setInputAttribValue(unsigned int controlArrayLocationIn, float floatValueIn, bool boolValueIn);
 	// calculates the ideal text color
 	QColor getTextColorFromBaseColor(QColor baseColorIn);
+	// calculates a replacement fill color
+	QColor getFillColorFromBaseColor(QColor baseColorIn);
 	// returns the first x char that fits in the displayedLength(in pixel)
 	// cuts the string to displayedLength(in px) size
 	QString getTextFromDisplayLength(QString textIn, unsigned int displayLengthIn);
@@ -202,8 +205,10 @@ private:
 
 	// radius, rx = ry
 	unsigned int m_pointSize;
+	unsigned int m_fontSize;
 	// draw simplified lines
 	bool m_isSimplified;
+	QPixmap m_background;
 	// for 1 draw, it will use the VectorGraphDataArray
 	// m_bakedValues without calling GetValues()
 	bool m_useGetLastValues;
@@ -429,6 +434,7 @@ public:
 	// returns the latest updated graph values
 	// countIn is the retuned vector's size
 	std::vector<float> getValues(unsigned int countIn);
+	//std::vector<float> getValues(unsigned int countIn, bool* isChangedOut);
 	std::vector<float> getValues(unsigned int countIn, bool* isChangedOut, std::shared_ptr<std::vector<unsigned int>> updatingValuesOut);
 	// returns m_bakedValues without updating
 	std::vector<float> getLastValues();

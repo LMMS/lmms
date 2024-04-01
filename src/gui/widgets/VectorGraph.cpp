@@ -29,6 +29,7 @@
 #include <cstdint> // unintptr_t
 #include <memory> // smartpointers
 #include <QPainter>
+#include <QPainterPath>
 #include <QMouseEvent>
 #include <QInputDialog> // showInputDialog()
 #include <QMenu> // context menu
@@ -65,7 +66,9 @@ VectorGraphView::VectorGraphView(QWidget * parentIn,
 	m_addition = false;
 
 	m_pointSize = pointSizeIn;
+	m_fontSize = 12;
 	m_isSimplified = false;
+	//m_background;
 	m_useGetLastValues = false;
 
 	m_selectedLocation = 0;
@@ -187,6 +190,10 @@ void VectorGraphView::setSelectedData(std::pair<float, float> dataIn)
 		qDebug("set position done");
 	}
 }
+void VectorGraphView::setBackground(const QPixmap backgroundIn)
+{
+	m_background = backgroundIn;
+}
 void VectorGraphView::useGetLastValues()
 {
 	m_useGetLastValues = true;
@@ -232,6 +239,21 @@ void VectorGraphView::mousePressEvent(QMouseEvent* me)
 		{
 			// try selecting the clicked point (if it is near)
 			selectData(x, m_graphHeight - y);
+			// avoid triggering editing window while deleting
+			// points are only added when
+			// m_isSelected == false -> m_isEditingActive = false
+			if (m_isSelected == true && m_addition == false)
+			{
+				m_isEditingActive = false;
+			}
+			if (m_isSelected == true)
+			{
+				setCursor(Qt::ArrowCursor);
+			}
+			else
+			{
+				setCursor(Qt::CrossCursor);
+			}
 		}
 	}
 
@@ -453,9 +475,24 @@ void VectorGraphView::mouseDoubleClickEvent(QMouseEvent * me)
 void VectorGraphView::paintEvent(QPaintEvent* pe)
 {
 	QPainter p(this);
-	//QPainterPath pt(); // TODO
+	p.setRenderHint(QPainter::Antialiasing, true);
+
 	qDebug("paintEvent");
 	m_graphHeight = m_isEditingActive == true ? height() - m_controlHeight : height();
+
+	if (m_isEditingActive == true)
+	{
+		qDebug("paintEvent editing active");
+	}
+	else
+	{
+		qDebug("paintEvent editing not active");
+	}
+
+	if (m_background.isNull() == false)
+	{
+		p.drawPixmap(0, 0, m_background);
+	}
 
 	p.setPen(QPen(QColor(127, 127, 127, 255), 1));
 	p.drawLine(0, 0, width() - 1, 0);
@@ -482,36 +519,19 @@ void VectorGraphView::paintGraph(QPainter* pIn, unsigned int locationIn)
 	unsigned int length = dataArray->size();
 	if (length > 0)
 	{
-		pIn->setPen(QPen(*dataArray->getLineColor(), 1));
+		pIn->setPen(QPen(*dataArray->getLineColor(), 2));
+		pIn->setBrush(QBrush(*dataArray->getLineColor(), Qt::NoBrush));
 
 
 		std::pair<int, int> posA(0, 0);
 		std::pair<int, int> posB(0, 0);
-		if (dataArray->getIsSelectable() == true)
-		{
-			for (unsigned int j = 0; j < length; j++)
-			{
-				//qDebug("draw: x: %f, y: %f", dataArray->getX(j), dataArray->getY(j));
-				posB = mapDataPos(dataArray->getX(j), dataArray->getY(j), dataArray->getNonNegative());
-				pIn->drawEllipse(posB.first - m_pointSize, m_graphHeight - posB.second - m_pointSize, m_pointSize * 2, m_pointSize * 2);
-				if (j > 0)
-				{
-					if (dataArray->getIsEditableAttrib() == true)
-					{
-						std::pair<int, int> posC = mapDataCurvePos(posA.first, posA.second, posB.first, posB.second, dataArray->getC(j - 1));
-						pIn->drawRect(posC.first - m_pointSize / 2, m_graphHeight - posC.second - m_pointSize / 2, m_pointSize, m_pointSize);
-					}
-					if (m_isSimplified == true)
-					{
-						pIn->drawLine(posA.first, m_graphHeight - posA.second, posB.first, m_graphHeight - posB.second);
-					}
-				}
-				posA = posB;
-			}
-		}
+		std::pair<int, int> startPos(mapDataPos(0.0f, dataArray->getY(0), dataArray->getNonNegative()));
+		// draw line
 		if (m_isSimplified == false)
 		{
-			posA = mapDataPos(dataArray->getX(0), dataArray->getY(0), dataArray->getNonNegative());
+			QPainterPath pt;
+			posA = startPos;
+			pt.moveTo(startPos.first + 1, m_graphHeight - startPos.second);
 
 			std::vector<float> dataArrayValues;
 			if (m_useGetLastValues == true)
@@ -526,37 +546,115 @@ void VectorGraphView::paintGraph(QPainter* pIn, unsigned int locationIn)
 			qDebug("paint dataArrayValues size: %ld", dataArrayValues.size());
 			for (unsigned int j = 0; j < dataArrayValues.size(); j++)
 			{
-				//posB = mapDataPos(*dataArray->getX(j + 1), dataArray->getY(j + 1));
-				//posB = mapDataPos(0, dataArray->getValueAtPosition(static_cast<float>(j) / static_cast<float>(width())));
 				posB = mapDataPos(0, dataArrayValues[j], dataArray->getNonNegative());
-				//posB = dataArray->getValueAtPosition(static_cast<float>(j) / static_cast<float>(width()));
 				posB.first = j;
-	//qDebug("paint positions: x: %d, y: %d", posB.first, posB.second);
-				// x1, y1, x2, y2
-	//qDebug("paint positions: x: %d, y: %d, x2: %d, y2: %d", posA.first, posA.second, posB.first, posB.second);
-				if (j > 0 && posA.first != posB.first)
+	
+				if (posA.first != posB.first)
+				{
+					pt.lineTo(j, m_graphHeight - posB.second);
+					// pt replaces drawing with path
+					//pIn->drawLine(posA.first, m_graphHeight - posA.second, posB.first, m_graphHeight - posB.second);
+				}
+				posA = posB;
+			}
+
+			// final draw line, fill
+			if (dataArray->getFillColor()->alpha() > 0)
+			{
+				// getting the line for
+				// drawing later
+				QPainterPath ptline(pt);
+				pt.lineTo(width() - 1, posB.second);
+				pt.lineTo(width() - 1, m_graphHeight - 1);
+				pt.lineTo(startPos.first + 1, m_graphHeight - 1);
+				pt.lineTo(startPos.first + 1, startPos.second);
+				// draw fill
+				pIn->fillPath(pt, QBrush(*dataArray->getFillColor()));
+				// draw line
+				pIn->drawPath(ptline);
+			}
+			else
+			{
+				pIn->drawPath(pt);
+			}
+		}
+
+		// draw points
+		if (dataArray->getIsSelectable() == true || m_isSimplified == true)
+		{
+			posA = startPos;
+
+			QColor automatedFillColor(getFillColorFromBaseColor(*dataArray->getAutomatedColor()));
+			bool drawPoints = dataArray->getIsSelectable() && width() / length > m_pointSize * 2;
+			bool resetColor = false;
+			for (unsigned int j = 0; j < length; j++)
+			{
+				posB = mapDataPos(dataArray->getX(j), dataArray->getY(j), dataArray->getNonNegative());
+				// draw point
+				if (drawPoints == true)
+				{
+					// set point color
+					if (dataArray->getAutomationModel(j) != nullptr)
+					{
+						// if automated
+						pIn->setPen(QPen(*dataArray->getAutomatedColor(), 2));
+						pIn->setBrush(QBrush(automatedFillColor, Qt::SolidPattern));
+						resetColor = true;
+					}
+					else if (m_isSelected == true && m_selectedArray == locationIn && m_selectedLocation == j)
+					{
+						// if selected
+						pIn->setBrush(QBrush(*dataArray->getFillColor(), Qt::SolidPattern));
+						resetColor = true;
+					}
+
+					pIn->drawEllipse(posB.first - m_pointSize, m_graphHeight - posB.second - m_pointSize, m_pointSize * 2, m_pointSize * 2);
+
+					// reset point color
+					if (resetColor == true)
+					{
+						pIn->setPen(QPen(*dataArray->getLineColor(), 2));
+						pIn->setBrush(Qt::NoBrush);
+						resetColor = false;
+					}
+
+					if (j > 0)
+					{
+						if (dataArray->getIsEditableAttrib() == true)
+						{
+							std::pair<int, int> posC = mapDataCurvePos(posA.first, posA.second, posB.first, posB.second, dataArray->getC(j - 1));
+							pIn->drawRect(posC.first - m_pointSize / 2, m_graphHeight - posC.second - m_pointSize / 2, m_pointSize, m_pointSize);
+						}
+					}
+				}
+
+				// draw simplified line
+				if (m_isSimplified == true)
 				{
 					pIn->drawLine(posA.first, m_graphHeight - posA.second, posB.first, m_graphHeight - posB.second);
 				}
 				posA = posB;
 			}
-			dataArrayValues.clear();
+		}
+		// draw last simplified line
+		if (m_isSimplified == true)
+		{
+			pIn->drawLine(posB.first, m_graphHeight - posB.second, width(), m_graphHeight - posB.second);
 		}
 	}
 }
 void VectorGraphView::paintEditing(QPainter* pIn)
 {
+	pIn->setFont(QFont("Arial", m_fontSize));
 	if (m_isEditingActive == true)
 	{
 		VectorGraphDataArray* dataArray = model()->getDataArray(m_selectedArray);
 		QColor textColor = getTextColorFromBaseColor(*dataArray->getLineColor());
 		// background of float values
-		QColor backColor(25, 25, 25, 255);
+		QColor backColor(getFillColorFromBaseColor(*dataArray->getFillColor()));
 		QColor foreColor = *dataArray->getLineColor();
 		if (dataArray->getFillColor()->alpha() > 0)
 		{
-			backColor = QColor(dataArray->getFillColor()->red() / 2, dataArray->getFillColor()->green() / 2,
-				dataArray->getFillColor()->blue() / 2, 255);
 			foreColor = *dataArray->getFillColor();
 		}
 
@@ -574,42 +672,46 @@ void VectorGraphView::paintEditing(QPainter* pIn)
 
 		int segmentLength = width() / (m_controlDisplayCount + 1);
 		// draw inputs
-		pIn->setPen(textColor);
+		pIn->setPen(QPen(textColor, 1));
 		for (unsigned int i = 0; i < m_controlDisplayCount; i++)
 		{
-			if (m_controlDisplayCount * m_controlDisplayPage + i < controlTextCount)
+			int controlLocation = m_controlDisplayCount * m_controlDisplayPage + i;
+			if (controlLocation < controlTextCount)
 			{
-				if (m_controlIsFloat[m_controlDisplayCount * m_controlDisplayPage + i] == true)
+				if (m_controlIsFloat[controlLocation] == true)
 				{
+					QColor curBackColor = backColor;
 					QColor curForeColor = foreColor;
 					// unused bool
 					bool isTrue = false;
-					float inputValue = getInputAttribValue(m_controlDisplayCount * m_controlDisplayPage + i, &isTrue);
-					if (dataArray->getAutomationModel(m_selectedLocation) != nullptr  && static_cast<int>(getInputAttribValue(6, &isTrue)) == i - 1)
+					float inputValue = getInputAttribValue(controlLocation, &isTrue);
+					if (dataArray->getAutomationModel(m_selectedLocation) != nullptr  && static_cast<int>(getInputAttribValue(6, &isTrue)) == controlLocation - 1)
 					{
 						curForeColor = *dataArray->getAutomatedColor();
+						curBackColor = getFillColorFromBaseColor(curForeColor);
 					}
-					else if (dataArray->getIsAutomatableEffectable() == true && static_cast<int>(getInputAttribValue(7, &isTrue)) == i - 1)
+					else if (dataArray->getIsAutomatableEffectable() == true && static_cast<int>(getInputAttribValue(7, &isTrue)) == controlLocation - 1)
 					{
 						curForeColor = *dataArray->getActiveColor();
+						curBackColor = getFillColorFromBaseColor(curForeColor);
 					}
-					pIn->fillRect(i * segmentLength, m_graphHeight, segmentLength, m_controlHeight, backColor);
+					pIn->fillRect(i * segmentLength, m_graphHeight, segmentLength, m_controlHeight, curBackColor);
 					pIn->fillRect(i * segmentLength, m_graphHeight, mapInputPos(inputValue, segmentLength), m_controlHeight, curForeColor);
-					pIn->drawText(i * segmentLength, m_graphHeight + m_controlHeight / 2,
-						getTextFromDisplayLength(m_controlText[m_controlDisplayCount * m_controlDisplayPage + i], segmentLength));
+					pIn->drawText(i * segmentLength, m_graphHeight + (m_controlHeight - m_fontSize) / 2 + m_fontSize,
+						getTextFromDisplayLength(m_controlText[controlLocation], segmentLength));
 				}
 				else
 				{
 					QColor curForeColor = *dataArray->getFillColor();
 					bool isTrue = false;
-					getInputAttribValue(m_controlDisplayCount * m_controlDisplayPage + i, &isTrue);
+					getInputAttribValue(controlLocation, &isTrue);
 					if (isTrue == true)
 					{
 						curForeColor = *dataArray->getActiveColor();
 					}
 					pIn->fillRect(i * segmentLength, m_graphHeight, segmentLength, m_controlHeight, curForeColor);
-					pIn->drawText(i * segmentLength, m_graphHeight + m_controlHeight / 2,
-						getTextFromDisplayLength(m_controlText[m_controlDisplayCount * m_controlDisplayPage + i], segmentLength));
+					pIn->drawText(i * segmentLength, m_graphHeight + (m_controlHeight - m_fontSize) / 2 + m_fontSize,
+						getTextFromDisplayLength(m_controlText[controlLocation], segmentLength));
 				}
 			}
 		}
@@ -617,10 +719,11 @@ void VectorGraphView::paintEditing(QPainter* pIn)
 		// draw "next page" button
 		pIn->fillRect(m_controlDisplayCount * segmentLength, m_graphHeight, segmentLength, m_controlHeight, *dataArray->getFillColor());
 		pIn->setPen(textColor);
-		pIn->drawText(m_controlDisplayCount * segmentLength, m_graphHeight + m_controlHeight / 2, ">>");
-		// draw outline
+		pIn->drawText(m_controlDisplayCount * segmentLength, m_graphHeight + (m_controlHeight - m_fontSize) / 2 + m_fontSize, ">>");
+		// draw selected array display outline
 		pIn->setPen(*dataArray->getLineColor());
 		pIn->drawRect(0, 0, m_controlHeight, m_controlHeight);
+		// draw outline
 		pIn->drawLine(0, m_graphHeight, width(), m_graphHeight);
 		for (unsigned int i = 1; i < m_controlDisplayCount + 1; i++)
 		{
@@ -629,6 +732,12 @@ void VectorGraphView::paintEditing(QPainter* pIn)
 				pIn->drawLine(i * segmentLength, m_graphHeight, i * segmentLength, height());
 			}
 		}
+	}
+	if (m_isLastSelectedArray == true)
+	{
+		// draw selected array number
+		pIn->setPen(QPen(QColor(127, 127, 127, 255), 2));
+		pIn->drawText(2, (m_controlHeight - m_fontSize) / 2 + m_fontSize, QString::number(m_selectedArray));
 	}
 }
 
@@ -767,6 +876,14 @@ bool VectorGraphView::isGraphPressed(int mouseXIn, int mouseYIn)
 	bool output = true;
 	// mouseYIn is calculated like this:
 	// m_graphHeight - y
+	if (m_isEditingActive == true)
+	{
+		qDebug("isGraphPressed editing active");
+	}
+	else
+	{
+		qDebug("isGraphPressed editing not active");
+	}
 	if (m_isEditingActive == true && m_graphHeight - mouseYIn < m_controlHeight && mouseXIn < m_controlHeight)
 	{
 		// if switch selected data array was pressed
@@ -795,6 +912,8 @@ bool VectorGraphView::isControlWindowPressed(int mouseYIn)
 }
 void VectorGraphView::processControlWindowPressed(int mouseXIn, int mouseYIn, bool isDraggingIn, bool startMovingIn, int curXIn, int curYIn)
 {
+	setCursor(Qt::ArrowCursor);
+
 	qDebug("mouseMove 7: %d", m_lastTrackPoint.first);
 	if (m_isEditingActive == true)
 	{
@@ -1092,27 +1211,70 @@ QColor VectorGraphView::getTextColorFromBaseColor(QColor baseColorIn)
 {
 	QColor output(255, 255, 255, 255);
 	int colorSum = baseColorIn.red() + baseColorIn.green() + baseColorIn.blue();
+	// > 127 * 3
 	if (colorSum > 382)
 	{
 		output = QColor(0, 0, 0, 255);
 	}
 	return output;
 }
+QColor VectorGraphView::getFillColorFromBaseColor(QColor baseColorIn)
+{
+	QColor output;
+	int colorSum = baseColorIn.red() + baseColorIn.green() + baseColorIn.blue();
+	int brighten = 0;
+	int alpha = baseColorIn.alpha();
+	if (alpha == 0)
+	{
+		alpha = 255;
+	}
+	if (std::abs(colorSum - 382) > 191)
+	{
+		brighten = 45;
+	}
+	//qDebug("getFillColorFromBaseColor r: %d, g: %d, b: %d", baseColorIn.red(), baseColorIn.green(), baseColorIn.blue());
+	// > 127 * 3
+	if (colorSum > 382)
+	{
+		// (red * 0.6f + avg * 0.4f / 3.0f) * 0.7
+		//qDebug("getFillColorFromBaseColor bigger, %d", brighten);
+		output = QColor(static_cast<int>(static_cast<float>(baseColorIn.red()) * 0.42f + colorSum * 0.09f) - brighten,
+			static_cast<int>(static_cast<float>(baseColorIn.green()) * 0.42f + colorSum * 0.09f) - brighten,
+			static_cast<int>(static_cast<float>(baseColorIn.blue()) * 0.42f + colorSum * 0.09f) - brighten, 255);
+	}
+	else
+	{
+		// (red * 0.6f + avg * 0.4f / 3.0f) * 1.3
+		output = QColor(static_cast<int>(static_cast<float>(baseColorIn.red()) * 0.78f + colorSum * 0.17f) + brighten,
+			static_cast<int>(static_cast<float>(baseColorIn.green()) * 0.78f + colorSum * 0.17f) + brighten,
+			static_cast<int>(static_cast<float>(baseColorIn.blue()) * 0.78f + colorSum * 0.17f) + brighten, 255);
+	}
+		//qDebug("getFillColorFromBaseColor r: %d, g: %d, b: %d", output.red(), output.green(), output.blue());
+	return output;
+}
 QString VectorGraphView::getTextFromDisplayLength(QString textIn, unsigned int displayLengthIn)
 {
-	int charLength = 4;
+	// estimating text length
+	int charLength = static_cast<int>(m_fontSize * 0.65f);
 	QString output = "";
 	int targetSize = displayLengthIn / charLength < textIn.size() ? displayLengthIn / charLength : textIn.size();
-	for (unsigned int i = 0; i < targetSize; i++)
+	if (targetSize != textIn.size())
 	{
-		if (i + 3 < targetSize)
+		for (unsigned int i = 0; i < targetSize; i++)
 		{
-			output = output + textIn[i];
+			if (i + 2 < targetSize)
+			{
+				output = output + textIn[i];
+			}
+			else
+			{
+				output = output + QString(".");
+			}
 		}
-		else
-		{
-			output = output + QString(".");
-		}
+	}
+	else
+	{
+		output = textIn;
 	}
 	return output;
 }
@@ -1245,6 +1407,7 @@ void VectorGraphView::selectData(int mouseXIn, int mouseYIn)
 		//qDebug("selected data location: %d, %d", location, i);
 					m_isSelected = true;
 					m_isCurveSelected = false;
+					m_isLastSelectedArray = true;
 					m_isEditingActive = dataArray->getIsEditableAttrib();
 					break;
 				}
@@ -1266,6 +1429,7 @@ void VectorGraphView::selectData(int mouseXIn, int mouseYIn)
 			//qDebug("selected data curve location: %d, %d", location, i);
 						m_isSelected = true;
 						m_isCurveSelected = true;
+						m_isLastSelectedArray = true;
 						m_isEditingActive = dataArray->getIsEditableAttrib();
 						break;
 					}
