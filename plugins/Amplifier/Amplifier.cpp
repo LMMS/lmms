@@ -28,7 +28,7 @@
 #include "embed.h"
 #include "plugin_export.h"
 
-#include <bits/stdc++.h> 
+#include <cmath>
 
 namespace lmms
 {
@@ -74,10 +74,10 @@ bool AmplifierEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 	for (size_t f = 0; f < frames; ++f)
 	{
-		const float volume = (volumeBuf ? volumeBuf->at(std::clamp(f,(size_t) 0, volumeBuf->size())) : m_ampControls.m_volumeModel.value()) * 0.01f;
-		const float pan = (panBuf ? panBuf->at(std::clamp(f, (size_t)0, panBuf->size())) : m_ampControls.m_panModel.value()) * 0.01f;
-		const float left = (leftBuf ? leftBuf->at(std::clamp(f,(size_t) 0, leftBuf->size())) : m_ampControls.m_leftModel.value()) * 0.01f;
-		const float right = (rightBuf ? rightBuf->at(std::clamp(f, (size_t) 0, rightBuf->size())) : m_ampControls.m_rightModel.value()) * 0.01f;
+		const float volume = (volumeBuf ? volumeBuf->at(std::clamp<std::size_t>(f, 0, volumeBuf->size())) : m_ampControls.m_volumeModel.value()) * 0.01f;
+		const float pan = (panBuf ? panBuf->at(std::clamp<std::size_t>(f, 0, panBuf->size())) : m_ampControls.m_panModel.value()) * 0.01f;
+		const float left = (leftBuf ? leftBuf->at(std::clamp<std::size_t>(f, 0, leftBuf->size())) : m_ampControls.m_leftModel.value()) * 0.01f;
+		const float right = (rightBuf ? rightBuf->at(std::clamp<std::size_t>(f, 0, rightBuf->size())) : m_ampControls.m_rightModel.value()) * 0.01f;
 
 		const float panLeft = std::min(1.0f, 1.0f - pan);
 		const float panRight = std::min(1.0f, 1.0f + pan);
