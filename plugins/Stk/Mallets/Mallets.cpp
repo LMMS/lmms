@@ -450,7 +450,7 @@ MalletsInstrumentView::MalletsInstrumentView( MalletsInstrument * _instrument,
 
 	m_presetsCombo = new ComboBox( this, tr( "Instrument" ) );
 	m_presetsCombo->setGeometry( 140, 50, 99, ComboBox::DEFAULT_HEIGHT );
-	m_presetsCombo->setFont( pointSize<8>( m_presetsCombo->font() ) );
+	m_presetsCombo->setFont(pointSize(m_presetsCombo->font(), 8));
 	
 	connect( &_instrument->m_presetsModel, SIGNAL( dataChanged() ),
 		 this, SLOT( changePreset() ) );

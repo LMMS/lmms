@@ -91,24 +91,25 @@ void TimeDisplayWidget::updateTime()
 	switch( m_displayMode )
 	{
 		case DisplayMode::MinutesSeconds:
-			int msec;
-			msec = s->getMilliseconds();
+		{
+			int msec = s->getMilliseconds();
 			m_majorLCD.setValue(msec / 60000);
 			m_minorLCD.setValue((msec / 1000) % 60);
 			m_milliSecondsLCD.setValue(msec % 1000);
 			break;
-
+		}
 		case DisplayMode::BarsTicks:
-			int tick;
-			tick = s->getPlayPos().getTicks();
+		{
+			int tick = s->getPlayPos().getTicks();
 			m_majorLCD.setValue((int)(tick / s->ticksPerBar()) + 1);
 			m_minorLCD.setValue((tick % s->ticksPerBar()) /
 						 (s->ticksPerBar() / s->getTimeSigModel().getNumerator() ) +1);
 			m_milliSecondsLCD.setValue((tick % s->ticksPerBar()) %
 							(s->ticksPerBar() / s->getTimeSigModel().getNumerator()));
 			break;
-
-		default: break;
+		}
+		default:
+			break;
 	}
 }
 
