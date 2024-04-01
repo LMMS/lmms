@@ -29,7 +29,6 @@
 #include "Knob.h"
 #include "LedCheckBox.h"
 #include "ComboBox.h"
-#include "gui_templates.h"
 
 namespace lmms::gui
 {

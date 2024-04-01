@@ -44,7 +44,6 @@
 #include "GroupBox.h"
 #include "MixerChannelLcdSpinBox.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
 #include "Instrument.h"
 #include "InstrumentFunctions.h"
 #include "InstrumentFunctionViews.h"

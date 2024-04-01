@@ -30,7 +30,6 @@
 
 #include "MeterDialog.h"
 #include "MeterModel.h"
-#include "gui_templates.h"
 #include "LcdSpinBox.h"
 
 namespace lmms::gui

@@ -32,7 +32,6 @@
 #include <QLabel>
 
 
-#include "gui_templates.h"
 #include "LadspaDescription.h"
 #include "LadspaPortDialog.h"
 #include "TabBar.h"

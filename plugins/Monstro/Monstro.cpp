@@ -30,7 +30,6 @@
 #include "ComboBox.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
-#include "gui_templates.h"
 #include "lmms_math.h"
 #include "interpolation.h"
 
