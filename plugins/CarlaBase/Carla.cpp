@@ -504,7 +504,7 @@ void CarlaInstrument::play(sampleFrame* workingBuffer)
 {
     const uint bufsize = Engine::audioEngine()->framesPerPeriod();
 
-    std::memset(workingBuffer, 0, sizeof(sample_t)*bufsize*DEFAULT_CHANNELS);
+	zeroSampleFrames(workingBuffer, bufsize);
 
     if (fHandle == nullptr)
     {

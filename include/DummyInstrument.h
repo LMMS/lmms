@@ -51,8 +51,7 @@ public:
 
 	void playNote( NotePlayHandle *, sampleFrame * buffer ) override
 	{
-		memset( buffer, 0, sizeof( sampleFrame ) *
-			Engine::audioEngine()->framesPerPeriod() );
+		zeroSampleFrames(buffer, Engine::audioEngine()->framesPerPeriod());
 	}
 
 	void saveSettings( QDomDocument &, QDomElement & ) override

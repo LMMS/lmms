@@ -139,7 +139,7 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	
 	m_needsUpdate = false;
 	
-	memset( m_work, 0, sizeof( sampleFrame ) * frames );
+	zeroSampleFrames(m_work, frames);
 	
 	// run temp bands
 	for( int f = 0; f < frames; ++f )

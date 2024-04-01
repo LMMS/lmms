@@ -160,7 +160,7 @@ void PatmanInstrument::playNote( NotePlayHandle * _n,
 	}
 	else
 	{
-		memset( _working_buffer, 0, ( frames + offset ) * sizeof( sampleFrame ) );
+		zeroSampleFrames(_working_buffer, frames + offset);
 	}
 }
 

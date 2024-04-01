@@ -281,6 +281,16 @@ private:
 	std::array<sample_t, DEFAULT_CHANNELS> m_samples;
 };
 
+inline void zeroSampleFrames(sampleFrame* buffer, fpp_t frames)
+{
+	//memset(buffer, 0, sizeof( sampleFrame ) * frames);
+
+	for (fpp_t i = 0; i < frames; ++i)
+	{
+		buffer[i] = sampleFrame();
+	}
+}
+
 constexpr std::size_t LMMS_ALIGN_SIZE = 16;
 
 

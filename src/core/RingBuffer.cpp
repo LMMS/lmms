@@ -38,7 +38,7 @@ RingBuffer::RingBuffer( f_cnt_t size ) :
 	m_size( size + m_fpp )
 {
 	m_buffer = new sampleFrame[ m_size ];
-	memset( m_buffer, 0, m_size * sizeof( sampleFrame ) );
+	zeroSampleFrames(m_buffer, m_size);
 	m_position = 0;
 }
 
@@ -49,7 +49,7 @@ RingBuffer::RingBuffer( float size ) :
 {
 	m_size = msToFrames( size ) + m_fpp;
 	m_buffer = new sampleFrame[ m_size ];
-	memset( m_buffer, 0, m_size * sizeof( sampleFrame ) );
+	zeroSampleFrames(m_buffer, m_size);
 	m_position = 0;
 	setSamplerateAware( true );
 	//qDebug( "m_size %d, m_position %d", m_size, m_position );
@@ -64,7 +64,7 @@ RingBuffer::~RingBuffer()
 
 void RingBuffer::reset()
 {
-	memset( m_buffer, 0, m_size * sizeof( sampleFrame ) );
+	zeroSampleFrames(m_buffer, m_size);
 	m_position = 0;
 }
 
@@ -75,7 +75,7 @@ void RingBuffer::changeSize( f_cnt_t size )
 	sampleFrame * tmp = m_buffer;
 	m_size = size;
 	m_buffer = new sampleFrame[ m_size ];
-	memset( m_buffer, 0, m_size * sizeof( sampleFrame ) );
+	zeroSampleFrames(m_buffer, m_size);
 	m_position = 0;
 	delete[] tmp;
 }
@@ -123,7 +123,7 @@ void RingBuffer::pop( sampleFrame * dst )
 	if( m_position + m_fpp <= m_size ) // we won't go over the edge so we can just memcpy here
 	{
 		memcpy( dst, & m_buffer [ m_position ], m_fpp * sizeof( sampleFrame ) );
-		memset( & m_buffer[m_position], 0, m_fpp * sizeof( sampleFrame ) );
+		zeroSampleFrames(&m_buffer[m_position], m_fpp);
 	}
 	else
 	{
@@ -131,10 +131,10 @@ void RingBuffer::pop( sampleFrame * dst )
 		f_cnt_t second = m_fpp - first;
 		
 		memcpy( dst, & m_buffer [ m_position ], first * sizeof( sampleFrame ) );
-		memset( & m_buffer [m_position], 0, first * sizeof( sampleFrame ) );
+		zeroSampleFrames(&m_buffer[m_position], first);
 		
 		memcpy( & dst [first], m_buffer, second * sizeof( sampleFrame ) );
-		memset( m_buffer, 0, second * sizeof( sampleFrame ) );
+		zeroSampleFrames(m_buffer, second);
 	}
 	
 	m_position = ( m_position + m_fpp ) % m_size;
@@ -312,7 +312,7 @@ void RingBuffer::updateSamplerate()
 	m_samplerate = Engine::audioEngine()->processingSampleRate();
 	delete[] m_buffer;
 	m_buffer = new sampleFrame[ m_size ];
-	memset( m_buffer, 0, m_size * sizeof( sampleFrame ) );
+	zeroSampleFrames(m_buffer, m_size);
 	m_position = 0;
 }
 

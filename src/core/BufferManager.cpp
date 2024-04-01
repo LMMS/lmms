@@ -47,7 +47,7 @@ sampleFrame * BufferManager::acquire()
 
 void BufferManager::clear( sampleFrame *ab, const f_cnt_t frames, const f_cnt_t offset )
 {
-	memset( ab + offset, 0, sizeof( *ab ) * frames );
+	zeroSampleFrames(ab + offset, frames);
 }
 
 
