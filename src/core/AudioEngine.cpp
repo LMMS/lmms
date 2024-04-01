@@ -792,7 +792,7 @@ void AudioEngine::removePlayHandlesOfTypes(Track * track, PlayHandle::Types type
 			{
 				NotePlayHandleManager::release((NotePlayHandle*) *it);
 			}
-			else delete *it;
+			else { delete *it; }
 			it = m_playHandles.erase(it);
 		}
 		else
