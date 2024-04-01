@@ -38,7 +38,7 @@
 #include "StringPairDrag.h"
 #include "CaptionMenu.h" // context menu
 #include "embed.h" // context menu
-#include "MainWindow.h" // getGUI
+#include "MainWindow.h" // getting main window for context menu
 #include "GuiApplication.h" // getGUI
 #include "AutomatableModel.h"
 #include "ControllerConnectionDialog.h"
@@ -793,7 +793,7 @@ bool VectorGraphView::isEditingWindowPressed(int mouseYIn)
 	}
 	return output;
 }
-void VectorGraphView::processEditingWindowPressed(int mouseXIn, int mouseYIn, bool isDraggingIn, bool startMovingIn, int xIn, int yIn)
+void VectorGraphView::processEditingWindowPressed(int mouseXIn, int mouseYIn, bool isDraggingIn, bool startMovingIn, int curXIn, int curYIn)
 {
 	qDebug("mouseMove 7: %d", m_lastTrackPoint.first);
 	if (m_isEditingActive == true)
@@ -835,9 +835,20 @@ void VectorGraphView::processEditingWindowPressed(int mouseXIn, int mouseYIn, bo
 			if (m_addition == false)
 			{
 				// if the right mouse button was pressed
+				// get context menu input text
+				QString controlDisplayText = m_editingText[location];
+				if (location == 5)
+				{
+					bool isTrue = false;
+					int typeVal = static_cast<int>(getInputAttribValue(location, &isTrue));
+					if (typeVal < m_editingLineEffectText.size())
+					{
+						controlDisplayText = controlDisplayText + QString(" (") + m_editingLineEffectText[typeVal] + QString(")");
+					}
+				}
 				// show context menu
-				CaptionMenu contextMenu(model()->displayName());
-				addDefaultActions(&contextMenu);
+				CaptionMenu contextMenu(model()->displayName() + QString(" - ") + controlDisplayText);
+				addDefaultActions(&contextMenu, QString("(") + m_editingText[location] + QString(")"));
 				contextMenu.exec(QCursor::pos());
 			}
 			else if (isDraggingIn == false && m_editingInputIsFloat[location] == false)
@@ -866,13 +877,13 @@ void VectorGraphView::processEditingWindowPressed(int mouseXIn, int mouseYIn, bo
 					// set m_lastScndTrackPoint.first to the current input value
 					m_lastScndTrackPoint.first = mapInputPos(getInputAttribValue(location, &isTrue), m_graphHeight);
 
-					m_lastTrackPoint.first = xIn;
-					m_lastTrackPoint.second = yIn;
-	qDebug("get last value: %d, lasttrack: %d, x: %d, y: %d, x2: %d, y2: %d, location: %d", m_lastScndTrackPoint.first, m_lastScndTrackPoint.second, xIn, (yIn), m_lastTrackPoint.first, m_lastTrackPoint.second, pressLocation);
+					m_lastTrackPoint.first = curXIn;
+					m_lastTrackPoint.second = curYIn;
+	qDebug("get last value: %d, lasttrack: %d, x: %d, y: %d, x2: %d, y2: %d, location: %d", m_lastScndTrackPoint.first, m_lastScndTrackPoint.second, curXIn, (curYIn), m_lastTrackPoint.first, m_lastTrackPoint.second, pressLocation);
 				}
 				std::pair<float, float> convertedCoords = mapMousePos(0,
-					m_lastScndTrackPoint.first + static_cast<int>(yIn - m_lastTrackPoint.second) / 2);
-				qDebug("dragging ... %d, %f", (m_lastScndTrackPoint.first + static_cast<int>(yIn - m_lastTrackPoint.second) / 2), convertedCoords.second);
+					m_lastScndTrackPoint.first + static_cast<int>(curYIn - m_lastTrackPoint.second) / 2);
+				qDebug("dragging ... %d, %f", (m_lastScndTrackPoint.first + static_cast<int>(curYIn - m_lastTrackPoint.second) / 2), convertedCoords.second);
 				setInputAttribValue(location, convertedCoords.second, false);
 			}
 		}
@@ -1105,10 +1116,10 @@ QString VectorGraphView::getTextFromDisplayLength(QString textIn, unsigned int d
 	}
 	return output;
 }
-void VectorGraphView::addDefaultActions(QMenu* menu)
+void VectorGraphView::addDefaultActions(QMenu* menu, QString controlDisplayTextIn)
 {
 	menu->addAction(embed::getIconPixmap("reload"),
-		tr("remove automation"),
+		controlDisplayTextIn + tr(" remove automation") ,
 		this, SLOT(removeAutomation()));
 	menu->addSeparator();
 
