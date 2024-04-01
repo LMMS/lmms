@@ -75,18 +75,18 @@ VectorGraphView::VectorGraphView(QWidget * parentIn,
 	m_isLastSelectedArray = false;
 
 	m_graphHeight = height();
-	m_editingHeight = 30;
-	m_editingInputCount = 4;
-	m_editingDisplayPage = 0;
+	m_controlHeight = 30;
+	m_controlDisplayCount = 4;
+	m_controlDisplayPage = 0;
 	m_isEditingActive = false;
-	m_editingText = {
+	m_controlText = {
 		tr("x coordinate"), tr("y coordinate"), tr("curve"), tr("1. attribute value"),
 		tr("2. attribute value"), tr("switch graph line type"), tr("switch graph automated value"),
 		tr("switch graph effected value"), tr("can only effect graph points"), tr("\"add\" effect"), tr("\"subtract\" effect"),
 		tr("\"multiply\" effect"), tr("\"divide\" effect"), tr("\"power\" effect"), tr("\"log\" effect"),
 		tr("\"sine\" effect"), tr("\"clamp lower\" effect"), tr("\"clamp upper\" effect")
 	};
-	m_editingLineEffectText = {
+	m_controlLineEffectText = {
 		tr("none"),
 		tr("sine"),
 		tr("phase changable sine"),
@@ -94,7 +94,7 @@ VectorGraphView::VectorGraphView(QWidget * parentIn,
 		tr("steps"),
 		tr("random")
 	};
-	m_editingInputIsFloat = {
+	m_controlIsFloat = {
 		true, true, true, true,
 		true, false, false,
 		false, false, false, false,
@@ -114,9 +114,9 @@ VectorGraphView::VectorGraphView(QWidget * parentIn,
 VectorGraphView::~VectorGraphView()
 {
 	qDebug("VectorGraphView dstc");
-	m_editingText.clear();
-	m_editingInputIsFloat.clear();
-	m_editingLineEffectText.clear();
+	m_controlText.clear();
+	m_controlIsFloat.clear();
+	m_controlLineEffectText.clear();
 	qDebug("VectorGraphView dstc end");
 }
 
@@ -305,9 +305,9 @@ void VectorGraphView::mouseMoveEvent(QMouseEvent* me)
 				// else m_mousePress does not change
 			}
 		}
-		else if (isEditingWindowPressed(m_lastScndTrackPoint.second) == true)
+		else if (isControlWindowPressed(m_lastScndTrackPoint.second) == true)
 		{
-			processEditingWindowPressed(m_lastTrackPoint.first, m_graphHeight - m_lastScndTrackPoint.second, true, startMoving, x, m_graphHeight - y);
+			processControlWindowPressed(m_lastTrackPoint.first, m_graphHeight - m_lastScndTrackPoint.second, true, startMoving, x, m_graphHeight - y);
 		}
 	}
 }
@@ -363,9 +363,9 @@ void VectorGraphView::mouseReleaseEvent(QMouseEvent* me)
 
 		}
 	}
-	else if (m_mousePress == true && isEditingWindowPressed(m_graphHeight - y) == true)
+	else if (m_mousePress == true && isControlWindowPressed(m_graphHeight - y) == true)
 	{
-		processEditingWindowPressed(x, m_graphHeight - y, false, false, 0, 0);
+		processControlWindowPressed(x, m_graphHeight - y, false, false, 0, 0);
 	}
 	else
 	{
@@ -432,13 +432,13 @@ void VectorGraphView::mouseDoubleClickEvent(QMouseEvent * me)
 			setSelectedData(curData);
 		}
 	}
-	else if (isEditingWindowPressed(m_graphHeight - y) == true)
+	else if (isControlWindowPressed(m_graphHeight - y) == true)
 	{
-		int pressLocation = getPressedInput(x, m_graphHeight - y, m_editingInputCount + 1);
-		if (pressLocation >= 0 && pressLocation != m_editingInputCount)
+		int pressLocation = getPressedInput(x, m_graphHeight - y, m_controlDisplayCount + 1);
+		if (pressLocation >= 0 && pressLocation != m_controlDisplayCount)
 		{
-			unsigned int location = m_editingInputCount * m_editingDisplayPage + pressLocation;
-			if (location < m_editingText.size() && m_editingInputIsFloat[location] == true)
+			unsigned int location = m_controlDisplayCount * m_controlDisplayPage + pressLocation;
+			if (location < m_controlText.size() && m_controlIsFloat[location] == true)
 			{
 				// unused bool
 				bool isTrue = false;
@@ -455,7 +455,7 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 	QPainter p(this);
 	//QPainterPath pt(); // TODO
 	qDebug("paintEvent");
-	m_graphHeight = m_isEditingActive == true ? height() - m_editingHeight : height();
+	m_graphHeight = m_isEditingActive == true ? height() - m_controlHeight : height();
 
 	p.setPen(QPen(QColor(127, 127, 127, 255), 1));
 	p.drawLine(0, 0, width() - 1, 0);
@@ -560,31 +560,31 @@ void VectorGraphView::paintEditing(QPainter* pIn)
 			foreColor = *dataArray->getFillColor();
 		}
 
-		int editingTextCount = m_editingText.size();
+		int controlTextCount = m_controlText.size();
 		if (dataArray->getIsEditableAttrib() == false)
 		{
 			// x, y
-			editingTextCount = 2;
+			controlTextCount = 2;
 		}
 		else if (dataArray->getIsAutomatableEffectable() == false)
 		{
 			// x, y, curve, valA, valB, switch type
-			editingTextCount = 6;
+			controlTextCount = 6;
 		}
 
-		int segmentLength = width() / (m_editingInputCount + 1);
+		int segmentLength = width() / (m_controlDisplayCount + 1);
 		// draw inputs
 		pIn->setPen(textColor);
-		for (unsigned int i = 0; i < m_editingInputCount; i++)
+		for (unsigned int i = 0; i < m_controlDisplayCount; i++)
 		{
-			if (m_editingInputCount * m_editingDisplayPage + i < editingTextCount)
+			if (m_controlDisplayCount * m_controlDisplayPage + i < controlTextCount)
 			{
-				if (m_editingInputIsFloat[m_editingInputCount * m_editingDisplayPage + i] == true)
+				if (m_controlIsFloat[m_controlDisplayCount * m_controlDisplayPage + i] == true)
 				{
 					QColor curForeColor = foreColor;
 					// unused bool
 					bool isTrue = false;
-					float inputValue = getInputAttribValue(m_editingInputCount * m_editingDisplayPage + i, &isTrue);
+					float inputValue = getInputAttribValue(m_controlDisplayCount * m_controlDisplayPage + i, &isTrue);
 					if (dataArray->getAutomationModel(m_selectedLocation) != nullptr  && static_cast<int>(getInputAttribValue(6, &isTrue)) == i - 1)
 					{
 						curForeColor = *dataArray->getAutomatedColor();
@@ -593,38 +593,38 @@ void VectorGraphView::paintEditing(QPainter* pIn)
 					{
 						curForeColor = *dataArray->getActiveColor();
 					}
-					pIn->fillRect(i * segmentLength, m_graphHeight, segmentLength, m_editingHeight, backColor);
-					pIn->fillRect(i * segmentLength, m_graphHeight, mapInputPos(inputValue, segmentLength), m_editingHeight, curForeColor);
-					pIn->drawText(i * segmentLength, m_graphHeight + m_editingHeight / 2,
-						getTextFromDisplayLength(m_editingText[m_editingInputCount * m_editingDisplayPage + i], segmentLength));
+					pIn->fillRect(i * segmentLength, m_graphHeight, segmentLength, m_controlHeight, backColor);
+					pIn->fillRect(i * segmentLength, m_graphHeight, mapInputPos(inputValue, segmentLength), m_controlHeight, curForeColor);
+					pIn->drawText(i * segmentLength, m_graphHeight + m_controlHeight / 2,
+						getTextFromDisplayLength(m_controlText[m_controlDisplayCount * m_controlDisplayPage + i], segmentLength));
 				}
 				else
 				{
 					QColor curForeColor = *dataArray->getFillColor();
 					bool isTrue = false;
-					getInputAttribValue(m_editingInputCount * m_editingDisplayPage + i, &isTrue);
+					getInputAttribValue(m_controlDisplayCount * m_controlDisplayPage + i, &isTrue);
 					if (isTrue == true)
 					{
 						curForeColor = *dataArray->getActiveColor();
 					}
-					pIn->fillRect(i * segmentLength, m_graphHeight, segmentLength, m_editingHeight, curForeColor);
-					pIn->drawText(i * segmentLength, m_graphHeight + m_editingHeight / 2,
-						getTextFromDisplayLength(m_editingText[m_editingInputCount * m_editingDisplayPage + i], segmentLength));
+					pIn->fillRect(i * segmentLength, m_graphHeight, segmentLength, m_controlHeight, curForeColor);
+					pIn->drawText(i * segmentLength, m_graphHeight + m_controlHeight / 2,
+						getTextFromDisplayLength(m_controlText[m_controlDisplayCount * m_controlDisplayPage + i], segmentLength));
 				}
 			}
 		}
 
 		// draw "next page" button
-		pIn->fillRect(m_editingInputCount * segmentLength, m_graphHeight, segmentLength, m_editingHeight, *dataArray->getFillColor());
+		pIn->fillRect(m_controlDisplayCount * segmentLength, m_graphHeight, segmentLength, m_controlHeight, *dataArray->getFillColor());
 		pIn->setPen(textColor);
-		pIn->drawText(m_editingInputCount * segmentLength, m_graphHeight + m_editingHeight / 2, ">>");
+		pIn->drawText(m_controlDisplayCount * segmentLength, m_graphHeight + m_controlHeight / 2, ">>");
 		// draw outline
 		pIn->setPen(*dataArray->getLineColor());
-		pIn->drawRect(0, 0, m_editingHeight, m_editingHeight);
+		pIn->drawRect(0, 0, m_controlHeight, m_controlHeight);
 		pIn->drawLine(0, m_graphHeight, width(), m_graphHeight);
-		for (unsigned int i = 1; i < m_editingInputCount + 1; i++)
+		for (unsigned int i = 1; i < m_controlDisplayCount + 1; i++)
 		{
-			if (m_editingInputCount * m_editingDisplayPage + i < editingTextCount || i >= m_editingInputCount)
+			if (m_controlDisplayCount * m_controlDisplayPage + i < controlTextCount || i >= m_controlDisplayCount)
 			{
 				pIn->drawLine(i * segmentLength, m_graphHeight, i * segmentLength, height());
 			}
@@ -767,91 +767,91 @@ bool VectorGraphView::isGraphPressed(int mouseXIn, int mouseYIn)
 	bool output = true;
 	// mouseYIn is calculated like this:
 	// m_graphHeight - y
-	if (m_isEditingActive == true && m_graphHeight - mouseYIn < m_editingHeight && mouseXIn < m_editingHeight)
+	if (m_isEditingActive == true && m_graphHeight - mouseYIn < m_controlHeight && mouseXIn < m_controlHeight)
 	{
 		// if switch selected data array was pressed
 		qDebug("isGraphPressed switch selected dataArray");
 		output = false;
 	}
-	else if (isEditingWindowPressed(mouseYIn) == true)
+	else if (isControlWindowPressed(mouseYIn) == true)
 	{
-		// if the editing window was pressed
+		// if the control window was pressed
 		output = false;
 	}
 		qDebug("isGraphPressed end");
 	return output;
 }
-bool VectorGraphView::isEditingWindowPressed(int mouseYIn)
+bool VectorGraphView::isControlWindowPressed(int mouseYIn)
 {
 	bool output = false;
 	// mouseYIn is calculated like this:
 	// m_graphHeight - y
 	if (m_isEditingActive == true && mouseYIn <= 0)
 	{
-		qDebug("isGraphPressed editing window was pressed");
+		qDebug("isGraphPressed control window was pressed");
 		output = true;
 	}
 	return output;
 }
-void VectorGraphView::processEditingWindowPressed(int mouseXIn, int mouseYIn, bool isDraggingIn, bool startMovingIn, int curXIn, int curYIn)
+void VectorGraphView::processControlWindowPressed(int mouseXIn, int mouseYIn, bool isDraggingIn, bool startMovingIn, int curXIn, int curYIn)
 {
 	qDebug("mouseMove 7: %d", m_lastTrackPoint.first);
 	if (m_isEditingActive == true)
 	{
-		int pressLocation = getPressedInput(mouseXIn, m_graphHeight - mouseYIn, m_editingInputCount + 1);
-		int location = m_editingInputCount * m_editingDisplayPage + pressLocation;
-		if (isDraggingIn == false && pressLocation == m_editingInputCount)
+		int pressLocation = getPressedInput(mouseXIn, m_graphHeight - mouseYIn, m_controlDisplayCount + 1);
+		int location = m_controlDisplayCount * m_controlDisplayPage + pressLocation;
+		if (isDraggingIn == false && pressLocation == m_controlDisplayCount)
 		{
 			// if the last button was pressed
 
 			// how many inputs are there
-			int editingTextCount = m_editingText.size();
+			int controlTextCount = m_controlText.size();
 			if (m_isSelected == true)
 			{
 				if (model()->getDataArray(m_selectedArray)->getIsEditableAttrib() == false)
 				{
 					// x, y
-					editingTextCount = 2;
+					controlTextCount = 2;
 				}
 				else if (model()->getDataArray(m_selectedArray)->getIsAutomatableEffectable() == false)
 				{
 					// x, y, curve, valA, valB, switch type
-					editingTextCount = 6;
+					controlTextCount = 6;
 				}
 			}
 
-			m_editingDisplayPage++;
-			if (m_editingInputCount * m_editingDisplayPage >= editingTextCount)
+			m_controlDisplayPage++;
+			if (m_controlDisplayCount * m_controlDisplayPage >= controlTextCount)
 			{
-				m_editingDisplayPage = 0;
+				m_controlDisplayPage = 0;
 			}
-			qDebug("mouseRelease editingPage: %d", m_editingDisplayPage);
+			qDebug("mouseRelease controlPage: %d", m_controlDisplayPage);
 		}
-		else if (pressLocation >= 0 && location < m_editingText.size())
+		else if (pressLocation >= 0 && location < m_controlText.size())
 		{
 			// pressLocation should always be bigger than -1
-			// if the editing window was pressed
+			// if the control window was pressed
 
 			if (m_addition == false)
 			{
 				// if the right mouse button was pressed
 				// get context menu input text
-				QString controlDisplayText = m_editingText[location];
+				QString controlDisplayText = m_controlText[location];
 				if (location == 5)
 				{
 					bool isTrue = false;
 					int typeVal = static_cast<int>(getInputAttribValue(location, &isTrue));
-					if (typeVal < m_editingLineEffectText.size())
+					if (typeVal < m_controlLineEffectText.size())
 					{
-						controlDisplayText = controlDisplayText + QString(" (") + m_editingLineEffectText[typeVal] + QString(")");
+						controlDisplayText = controlDisplayText + QString(" (") + m_controlLineEffectText[typeVal] + QString(")");
 					}
 				}
 				// show context menu
 				CaptionMenu contextMenu(model()->displayName() + QString(" - ") + controlDisplayText);
-				addDefaultActions(&contextMenu, QString("(") + m_editingText[location] + QString(")"));
+				addDefaultActions(&contextMenu, QString("(") + m_controlText[location] + QString(")"));
 				contextMenu.exec(QCursor::pos());
 			}
-			else if (isDraggingIn == false && m_editingInputIsFloat[location] == false)
+			else if (isDraggingIn == false && m_controlIsFloat[location] == false)
 			{
 				// if the input type is a bool
 
@@ -865,7 +865,7 @@ void VectorGraphView::processEditingWindowPressed(int mouseXIn, int mouseYIn, bo
 				}
 				setInputAttribValue(location, 0.0f, curBoolValue);
 			}
-			else if (isDraggingIn == true && m_editingInputIsFloat[location] == true)
+			else if (isDraggingIn == true && m_controlIsFloat[location] == true)
 			{
 				// if the input type is a float
 
@@ -903,12 +903,12 @@ qDebug("getPressedInput x location ERRROR: %d", mouseXIn);
 	}
 	return output;
 }
-float VectorGraphView::getInputAttribValue(unsigned int editingArrayLocationIn, bool* valueOut)
+float VectorGraphView::getInputAttribValue(unsigned int controlArrayLocationIn, bool* valueOut)
 {
 	float output = 0.0f;
 	if (m_isSelected == true)
 	{
-		switch (editingArrayLocationIn)
+		switch (controlArrayLocationIn)
 		{
 			case 0:
 				*valueOut = false;
@@ -979,14 +979,14 @@ float VectorGraphView::getInputAttribValue(unsigned int editingArrayLocationIn, 
 	}
 	return output;
 }
-void VectorGraphView::setInputAttribValue(unsigned int editingArrayLocationIn, float floatValueIn, bool boolValueIn)
+void VectorGraphView::setInputAttribValue(unsigned int controlArrayLocationIn, float floatValueIn, bool boolValueIn)
 {
 	qDebug("setInputAttribValue started");
 	if (m_isSelected == true)
 	{
 		float clampedValue = floatValueIn < -1.0f ? -1.0f : floatValueIn > 1.0f ? 1.0f : floatValueIn;
 		unsigned int clampedValueB = 0;
-		switch (editingArrayLocationIn)
+		switch (controlArrayLocationIn)
 		{
 			case 0:
 				m_selectedLocation = model()->getDataArray(m_selectedArray)->setX(m_selectedLocation, clampedValue < 0.0f ? 0.0f : clampedValue);
