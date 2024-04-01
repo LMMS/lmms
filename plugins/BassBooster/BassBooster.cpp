@@ -91,12 +91,12 @@ bool BassBoosterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	const float d = dryLevel();
 	const float w = wetLevel();
 
-	for( fpp_t f = 0; f < frames; ++f )
+	for( size_t f = 0; f < frames; ++f )
 	{
 		float gain = const_gain;
 		if (gainBuffer) {
 			//process period using sample exact data
-			gain = gainBuffer->at( f % gainBuffer->size() );
+			gain = gainBuffer->at(std::clamp(f, (size_t) 0, gainBuffer->size()));
 		}
 		//float gain = gainBuffer ? gainBuffer[f] : gain;
 		m_bbFX.leftFX().setGain( gain );
