@@ -160,18 +160,18 @@ private:
 
 	bool addPoint(unsigned int locationIn, int mouseXIn, int mouseYIn);
 
-	// editing
+	// editing menu / controls
 	// returns true if the graph was clicked
 	bool isGraphPressed(int mouseXIn, int mouseYIn);
-	// returns true if the editing window was clicked while in editing mode
-	bool isEditingWindowPressed(int mouseYIn);
-	void processEditingWindowPressed(int mouseXIn, int mouseYIn, bool isDraggingIn, bool startMovingIn, int curXIn, int curYIn);
+	// returns true if the control window was clicked while in editing mode
+	bool isControlWindowPressed(int mouseYIn);
+	void processControlWindowPressed(int mouseXIn, int mouseYIn, bool isDraggingIn, bool startMovingIn, int curXIn, int curYIn);
 	// returns -1 if no attribute was clicked
 	int getPressedInput(int mouseXIn, int mouseYIn, unsigned int inputCountIn);
 	// returns a float attrib value, valueOut = attrib value if it is a bool
-	float getInputAttribValue(unsigned int editingArrayLocationIn, bool* valueOut);
+	float getInputAttribValue(unsigned int controlArrayLocationIn, bool* valueOut);
 	// sets the attrib to floatValueIn it it is float, else it sets the attrib to boolValueIn
-	void setInputAttribValue(unsigned int editingArrayLocationIn, float floatValueIn, bool boolValueIn);
+	void setInputAttribValue(unsigned int controlArrayLocationIn, float floatValueIn, bool boolValueIn);
 	// calculates the ideal text color
 	QColor getTextColorFromBaseColor(QColor baseColorIn);
 	// returns the first x char that fits in the displayedLength(in pixel)
@@ -220,14 +220,14 @@ private:
 	bool m_isLastSelectedArray;
 
 	unsigned int m_graphHeight;
-	unsigned int m_editingHeight;
+	unsigned int m_controlHeight;
 	// displayed attrib count
-	unsigned int m_editingInputCount;
-	unsigned int m_editingDisplayPage;
+	unsigned int m_controlDisplayCount;
+	unsigned int m_controlDisplayPage;
 	bool m_isEditingActive;
-	std::vector<QString> m_editingText;
-	std::vector<QString> m_editingLineEffectText;
-	std::vector<bool> m_editingInputIsFloat;
+	std::vector<QString> m_controlText;
+	std::vector<QString> m_controlLineEffectText;
+	std::vector<bool> m_controlIsFloat;
 
 	std::pair<int, int> m_lastTrackPoint;
 	std::pair<int, int> m_lastScndTrackPoint;
