@@ -72,7 +72,7 @@ int DrumSynth::LongestEnv()
 	long e, eon, p;
 	float l = 0.f;
 
-	for (e = 1; e < 7; e++) //3
+	for (long e = 1; e < 7; e++) // 3
 	{
 		eon = e - 1;
 		if (eon > 2)
@@ -182,23 +182,23 @@ float DrumSynth::waveform(float ph, int form)
 	switch (form)
 	{
 		case 0:
-			w = (float)sin(fmod(ph, TwoPi));
-			break; //sine
+			w = static_cast<float>(sin(fmod(ph, TwoPi)));
+			break; // sine
 		case 1:
-			w = (float)fabs(2.0f*(float)sin(fmod(0.5f*ph, TwoPi))) - 1.f;
-			break; //sine^2
+			w = static_cast<float>(fabs(2.0f * static_cast<float>(sin(fmod(0.5f * ph, TwoPi))) - 1.f));
+			break; // sine^2
 		case 2:
-			while (ph < TwoPi) { ph+=TwoPi; }
-			w = 0.6366197f * (float)fmod(ph, TwoPi) - 1.f;   //tri
+			while (ph < TwoPi) { ph += TwoPi; }
+			w = 0.6366197f * (float)fmod(ph, TwoPi) - 1.f;   // tri
 			if (w > 1.f) { w = 2.f - w; }
 			break;
 		case 3:
-			w = ph - TwoPi * (float)(int)(ph / TwoPi);      //saw
+			w = ph - TwoPi * static_cast<float>(static_cast<int>(ph / TwoPi)); // saw
 			w = (0.3183098f * w) - 1.f;
 			break;
 		default:
-			w = (sin(fmod(ph, TwoPi)) > 0.0)? 1.f: -1.f;
-			break; //square
+			w = (sin(fmod(ph, TwoPi)) > 0.0) ? 1.f : -1.f;
+			break; // square
 	}
 
 	return w;
