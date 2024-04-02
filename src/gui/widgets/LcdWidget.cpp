@@ -78,20 +78,26 @@ void LcdWidget::setValue(int value)
 		}
 	}
 
-	m_display = s;
+	if (m_display != s)
+	{
+		m_display = s;
 
-	update();
+		update();
+	}
 }
 
 void LcdWidget::setValue(float value)
 {
-	if (value < 0 && value > -1)
+	if (-1 < value && value < 0)
 	{
 		QString s = QString::number(static_cast<int>(value));
 		s.prepend('-');
 		
-		m_display = s;
-		update();
+		if (m_display != s)
+		{
+			m_display = s;
+			update();
+		}
 	}
 	else
 	{

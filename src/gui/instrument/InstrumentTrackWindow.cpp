@@ -93,12 +93,8 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	vlayout->setContentsMargins(0, 0, 0, 0);
 	vlayout->setSpacing( 0 );
 
-	auto generalSettingsWidget = new TabWidget(tr("GENERAL SETTINGS"), this);
-
+	auto generalSettingsWidget = new QWidget(this);
 	auto generalSettingsLayout = new QVBoxLayout(generalSettingsWidget);
-
-	generalSettingsLayout->setContentsMargins( 8, 18, 8, 8 );
-	generalSettingsLayout->setSpacing( 6 );
 
 	auto nameAndChangeTrackWidget = new QWidget(generalSettingsWidget);
 	auto nameAndChangeTrackLayout = new QHBoxLayout(nameAndChangeTrackWidget);
