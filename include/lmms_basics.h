@@ -283,7 +283,8 @@ private:
 
 inline void zeroSampleFrames(sampleFrame* buffer, fpp_t frames)
 {
-	//memset(buffer, 0, sizeof( sampleFrame ) * frames);
+	// The equivalent of the following operation which yields compiler warnings
+	// memset(buffer, 0, sizeof(sampleFrame) * frames);
 
 	for (fpp_t i = 0; i < frames; ++i)
 	{
