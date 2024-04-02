@@ -1040,7 +1040,6 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	QBrush bgColor = p.background();
 	p.fillRect( 0, 0, width(), height(), bgColor );
 
-	// set font-size to 8
 	p.setFont(adjustedToPixelSize(p.font(), 10));
 
 	int grid_height = height() - TOP_MARGIN - SCROLLBAR_SIZE;
