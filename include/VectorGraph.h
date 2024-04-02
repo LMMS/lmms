@@ -577,6 +577,9 @@ private:
 		// automation: connecting to floatmodels, -1 when it isn't conntected'
 		int m_automationModel;
 	};
+	// deletes the point's automation model
+	// locationIn = point location
+	void delAutomationModel(unsigned int modelLocationIn, bool callDataChangedIn);
 	// swapping values, "slide" moves the values (between) once left or right
 	// handle m_isFixedEndPoints when using this
 	void swap(unsigned int locationAIn, unsigned int locationBIn, bool slide);

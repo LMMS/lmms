@@ -318,6 +318,7 @@ void VectorGraphView::mouseMoveEvent(QMouseEvent* me)
 				{
 					m_lastTrackPoint.first = x;
 					m_lastTrackPoint.second = m_graphHeight - y;
+					m_isSelected = false;
 					selectData(x, m_graphHeight - y);
 					if (m_isSelected == true)
 					{
@@ -326,7 +327,6 @@ void VectorGraphView::mouseMoveEvent(QMouseEvent* me)
 						m_isEditingActive = false;
 					}
 				}
-				// TODO deletion
 			}
 			else
 			{
@@ -517,15 +517,6 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 
 	qDebug("paintEvent");
 	m_graphHeight = m_isEditingActive == true ? height() - m_controlHeight : height();
-
-	if (m_isEditingActive == true)
-	{
-		qDebug("paintEvent editing active");
-	}
-	else
-	{
-		qDebug("paintEvent editing not active");
-	}
 
 	if (m_background.isNull() == false)
 	{
@@ -846,7 +837,6 @@ void VectorGraphView::removeController()
 std::pair<float, float> VectorGraphView::mapMousePos(int xIn, int yIn)
 {
 	// mapping the position to 0 - 1, -1 - 1 using qWidget width and height
-	qDebug("map mouse pos y: %d", yIn);
 	return std::pair<float, float>(
 		static_cast<float>(xIn / (float)width()),
 		static_cast<float>(yIn) * 2.0f / static_cast<float>(m_graphHeight) - 1.0f);
@@ -914,18 +904,10 @@ bool VectorGraphView::isGraphPressed(int mouseXIn, int mouseYIn)
 	bool output = true;
 	// mouseYIn is calculated like this:
 	// m_graphHeight - y
-	if (m_isEditingActive == true)
-	{
-		qDebug("isGraphPressed editing active");
-	}
-	else
-	{
-		qDebug("isGraphPressed editing not active");
-	}
 	if (m_isEditingActive == true && m_graphHeight - mouseYIn < m_controlHeight && mouseXIn < m_controlHeight)
 	{
 		// if switch selected data array was pressed
-		qDebug("isGraphPressed switch selected dataArray");
+		//qDebug("isGraphPressed switch selected dataArray");
 		output = false;
 	}
 	else if (isControlWindowPressed(mouseYIn) == true)
@@ -933,7 +915,7 @@ bool VectorGraphView::isGraphPressed(int mouseXIn, int mouseYIn)
 		// if the control window was pressed
 		output = false;
 	}
-		qDebug("isGraphPressed end");
+		//qDebug("isGraphPressed end");
 	return output;
 }
 bool VectorGraphView::isControlWindowPressed(int mouseYIn)
@@ -943,7 +925,7 @@ bool VectorGraphView::isControlWindowPressed(int mouseYIn)
 	// m_graphHeight - y
 	if (m_isEditingActive == true && mouseYIn <= 0)
 	{
-		qDebug("isGraphPressed control window was pressed");
+		//qDebug("isGraphPressed control window was pressed");
 		output = true;
 	}
 	return output;
@@ -2068,6 +2050,10 @@ void VectorGraphDataArray::del(unsigned int locationIn)
 {
 	if (m_isFixedSize == false && locationIn < m_dataArray.size())
 	{
+		// deleting the points automationModel
+		delAutomationModel(m_dataArray[locationIn].m_automationModel, true);
+		// swapping the point to the last location
+		// in m_dataArray
 		swap(locationIn, m_dataArray.size() - 1, true);
 		m_dataArray.pop_back();
 		if (locationIn == 0 || locationIn == m_dataArray.size())
@@ -2754,34 +2740,13 @@ void VectorGraphDataArray::setAutomated(unsigned int locationIn, bool isAutomate
 				dataChanged();
 			}
 		}
-		else if (m_dataArray[locationIn].m_automationModel != -1)
+		else
 		{
 			qDebug("setAutomated delete");
-			// TODO correctly deconstruct
-			FloatModel* swap = m_automationModelArray[m_dataArray[locationIn].m_automationModel];
-			// copy the last FloatModel* to the current location
-			m_automationModelArray[m_dataArray[locationIn].m_automationModel] =
-				m_automationModelArray[m_automationModelArray.size() - 1];
-			m_automationModelArray.pop_back();
 
-			// replace all last m_automationModel-s to the currently deleted m_automationModel
-			for (unsigned int i = 0; i < m_dataArray.size(); i++)
-			{
-				if (m_dataArray[i].m_automationModel == m_automationModelArray.size())
-				{
-					m_dataArray[i].m_automationModel = m_dataArray[locationIn].m_automationModel;
-					// we dont break for safety
-				}
-			}
-			m_dataArray[locationIn].m_automationModel = -1;
-			if (swap != nullptr)
-			{
-				delete swap;
-				swap = nullptr;
-			}
-
-			getUpdatingFromPoint(locationIn);
-			dataChanged();
+			// dataChanged() is called in this function
+			// this function check if the current point has an automationModel
+			delAutomationModel(m_dataArray[locationIn].m_automationModel, true);
 		}
 	}
 	qDebug("setAutomated end");
@@ -2793,6 +2758,46 @@ FloatModel* VectorGraphDataArray::getAutomationModel(unsigned int locationIn)
 		return m_automationModelArray[m_dataArray[locationIn].m_automationModel];
 	}
 	return nullptr;
+}
+void VectorGraphDataArray::delAutomationModel(unsigned int modelLocationIn, bool callDataChangedIn)
+{
+	if (modelLocationIn != -1)
+	{
+		FloatModel* curModel = m_automationModelArray[modelLocationIn];
+
+		// copy the last FloatModel* to the current location
+		m_automationModelArray[modelLocationIn] =
+			m_automationModelArray[m_automationModelArray.size() - 1];
+
+		m_automationModelArray.pop_back();
+
+		// replace all m_auttomationModel-s in the current copyed location with -1
+		// replace all last m_automationModel-s to the currently copyed location
+		// there should be only 2 points changed but because of safety
+		// all of them are checked
+		for (unsigned int i = 0; i < m_dataArray.size(); i++)
+		{
+			if (m_dataArray[i].m_automationModel == modelLocationIn)
+			{
+				m_dataArray[i].m_automationModel = -1;
+				getUpdatingFromPoint(i);
+			}
+			if (m_dataArray[i].m_automationModel == m_automationModelArray.size())
+			{
+				m_dataArray[i].m_automationModel = modelLocationIn;
+			}
+		}
+		if (curModel != nullptr)
+		{
+			delete curModel;
+			curModel = nullptr;
+		}
+
+		if (callDataChangedIn == true)
+		{
+			dataChanged();
+		}
+	}
 }
 
 void VectorGraphDataArray::swap(unsigned int locationAIn, unsigned int locationBIn, bool slide)
