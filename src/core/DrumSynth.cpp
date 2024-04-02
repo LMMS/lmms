@@ -189,7 +189,7 @@ float DrumSynth::waveform(float ph, int form)
 			break; // sine^2
 		case 2:
 			while (ph < TwoPi) { ph += TwoPi; }
-			w = 0.6366197f * (float)fmod(ph, TwoPi) - 1.f;   // tri
+			w = 0.6366197f * static_cast<float>(fmod(ph, TwoPi) - 1.f); // tri
 			if (w > 1.f) { w = 2.f - w; }
 			break;
 		case 3:
