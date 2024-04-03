@@ -44,6 +44,9 @@
 #include "AutomatableModel.h"
 #include "ControllerConnectionDialog.h"
 #include "ControllerConnection.h"
+#include "ProjectJournal.h"
+#include "JournallingObject.h"
+#include "base64.h"
 
 
 namespace lmms
@@ -1696,6 +1699,130 @@ int VectorGraphModel::getDataArrayNewId()
 	maxId++;
 	return maxId;
 }
+//void VectorGraphModel::saveSettings(QDomDocument& doc, QDomElement& element, const QString& name)
+void VectorGraphModel::saveSettings(QDomDocument& doc, QDomElement& element)
+{
+	qDebug("saveSettings");
+
+	//bool mustQuote = mustQuoteName(name);
+	//QDomElement me = doc.createElement(QString("VectorGraphModel") : name );
+	QDomElement me = doc.createElement(QString("VectorGraphModel"));
+	me.setAttribute("DataArrayCount", static_cast<unsigned int>(m_dataArrays.size()));
+	for (unsigned int i = 0; i < m_dataArrays.size(); i++)
+	{
+		// getting rid of nullptr FloatMdoels
+		// (there should be 0)
+		for (unsigned int j = 0; j < m_dataArrays[i].size(); j++)
+		{
+			if (m_dataArrays[i].getAutomationModel(j) == nullptr)
+			{
+				m_dataArrays[i].setAutomated(j, false);
+			}
+		}
+
+		QString readLocation = "a" + QString::number(i) + "-";
+		std::vector<FloatModel*>* automationModels = m_dataArrays[i].getAutomationModelArray();
+		bool isSaveable = m_dataArrays[i].getIsSaveable();
+		me.setAttribute(readLocation + "DataArraySize", isSaveable == true ? static_cast<unsigned int>(m_dataArrays[i].size()) : 0);
+		me.setAttribute(readLocation + "AutomationSize", isSaveable == true ? static_cast<unsigned int>(automationModels->size()) : 0);
+
+		if (isSaveable == true && m_dataArrays[i].size() > 0)
+		{
+			// saving the DataArray
+			me.setAttribute(readLocation + "DataArray", m_dataArrays[i].getSavedDataArray());
+
+			// saving the FloatModels
+			for (unsigned int j = 0; j < automationModels->size(); j++)
+			{
+				QString readLocationB = QString::number(j) + "-";
+				automationModels->operator[](j)->saveSettings(doc, me, readLocation + readLocationB + "AutomationModel");
+			}
+		}
+	}
+	element.appendChild(me);
+
+	//me.setAttribute("id", ProjectJournal::idToSave( id() ) );
+	//me.setAttribute("value", m_value );
+	//me.setAttribute( "scale_type", m_scaleType == ScaleType::Logarithmic ? "log" : "linear" );
+
+	//QString sampleString;
+	//base64::encode( (const char *)m_wavegraphModel.samples(),
+		//m_wavegraphModel.length() * sizeof(float), sampleString );
+	//_this.setAttribute( "waveShape", sampleString );
+
+}
+//void VectorGraphModel::loadSettings(const QDomElement& element, const QString& name)
+void VectorGraphModel::loadSettings(const QDomElement& element)
+{
+	QDomNode node = element.namedItem("VectorGraphModel");
+	qDebug("loadSettings");
+	/*
+	if (node.hasAttributes("DataArrayCount") == true)
+	{
+		qDebug("loadSettings 2");
+		unsigned int loadSize = node.attributes("DataArrayCount").toInt();
+		for (unsigned int i = 0; i < loadSize; i++)
+		{
+			qDebug("loadSettings 3");
+			QString readLocation = "a" + QString::number(i) + "-";
+			if (i < m_dataArrays.size() && node.hasAttribute(readLocation + "DataArraySize") == true)
+			{
+				unsigned int dataArraySize = node.attributes(readLocation + "DataArraySize").toInt();
+				unsigned int automationSize = node.attributes(readLocation + "AutomationSize").toInt();
+				// load m_dataArray
+				if (dataArraySize > 0)
+				{
+					qDebug("loadSettings 4");
+					m_dataArrays[i].loadDataArray(node.attributes(readLocation + "DataArray"), dataArraySize);
+				}
+
+				// load automationModelDataArray
+				std::vector<FloatModel*>* automationModels = m_dataArrays[i].getAutomationModelArray();
+				for (unsigned int j = 0; j < automationSize; j++)
+				{
+					qDebug("loadSettings 5");
+					QString readLocationB = QString::number(j) + "-";
+					FloatModel* curModel = new FloatModel(0.0f, -1.0f, 1.0f, 0.01f, this, QString(), false);
+					curModel->loadSettings(element, readLocation + readLocationB + "AutomationModel");
+					automationModels->push_back(curModel);
+				}
+			}
+			else
+			{
+				break;
+			}
+		}
+		*/
+		/*
+		if( nodeElement.hasAttribute( "scale_type" ) )
+		{
+			if( nodeElement.attribute( "scale_type" ) == "linear" )
+			{
+				setScaleType( ScaleType::Linear );
+			}
+			else if( nodeElement.attribute( "scale_type" ) == "log" )
+			{
+				setScaleType( ScaleType::Logarithmic );
+			}
+		}
+		*/
+	//}
+}
+/*
+int VectorGraphModel::readLoc(unsigned int startIn, QString dataIn)
+{
+	int output = -1;
+	for (unsigned int i = startIn; i < dataIn.size(); i++)
+	{
+		if (dataIn[i] == QString("-"))
+		{
+			output = dataIn.left(i - 1).toInt();
+			break;
+		}
+	}
+	return output;
+}
+*/
 
 // VectorGraphDataArray ------
 
@@ -2749,6 +2876,44 @@ FloatModel* VectorGraphDataArray::getAutomationModel(unsigned int locationIn)
 	}
 	return nullptr;
 }
+
+// protected:
+std::vector<FloatModel*>* VectorGraphDataArray::getAutomationModelArray()
+{
+	return &m_automationModelArray;
+}
+QString VectorGraphDataArray::getSavedDataArray()
+{
+		QString output;
+		base64::encode((const char *)(&m_dataArray),
+			m_dataArray.size() * sizeof(VectorGraphPoint), output);
+		return output;
+}
+void VectorGraphDataArray::loadDataArray(QString dataIn, unsigned int sizeIn)
+{
+	qDebug("loadDatatArray start");
+//qDebug().nospace() << "loadDataArray: " << qPrintable(dataIn) << "  end";
+	int size = 0;
+	char* dst = 0;
+	base64::decode(dataIn, &dst, &size);
+
+	size = size > sizeIn ? sizeIn : size;
+	m_dataArray.resize(size);
+
+	VectorGraphPoint* points = (VectorGraphPoint*)dst;
+	std::copy(points, points + size, m_dataArray.begin());
+	/*
+	for (unsigned int i = 0; i < size; i++)
+	{
+		m_dataArray[i] = ((VectorGraphPoint*)dst)[i];
+	}
+	*/
+
+	delete[] dst;
+	qDebug("loadDatatArray end");
+}
+
+// private:
 void VectorGraphDataArray::delAutomationModel(unsigned int modelLocationIn, bool callDataChangedIn)
 {
 	if (modelLocationIn != -1)
