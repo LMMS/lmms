@@ -224,7 +224,7 @@ int DrumSynth::GetPrivateProfileString(
 				}
 				else
 				{
-					k = (char*)(b + strlen(b) - 1);
+					k = static_cast<char*>(b + strlen(b) - 1);
 					while ((k >= b) && (*k == ' ' || *k == '\t'))
 					{
 						--k;
