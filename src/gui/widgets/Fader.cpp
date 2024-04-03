@@ -305,30 +305,30 @@ void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)
 		mapper = [this](float value) { return value; };
 	}
 
-	float const mappedMinPeak(mapper(m_fMinPeak));
-	float const mappedMaxPeak(mapper(m_fMaxPeak));
-	float const mappedPeakL(mapper(m_fPeakValue_L));
-	float const mappedPeakR(mapper(m_fPeakValue_R));
-	float const mappedPersistentPeakL(mapper(m_persistentPeak_L));
-	float const mappedPersistentPeakR(mapper(m_persistentPeak_R));
-	float const mappedUnity(mapper(1.f));
+	const float mappedMinPeak(mapper(m_fMinPeak));
+	const float mappedMaxPeak(mapper(m_fMaxPeak));
+	const float mappedPeakL(mapper(m_fPeakValue_L));
+	const float mappedPeakR(mapper(m_fPeakValue_R));
+	const float mappedPersistentPeakL(mapper(m_persistentPeak_L));
+	const float mappedPersistentPeakR(mapper(m_persistentPeak_R));
+	const float mappedUnity(mapper(1.f));
 
 	painter.save();
 
-	QRect const baseRect = rect();
+	const QRect baseRect = rect();
 
-	int const height = baseRect.height();
+	const int height = baseRect.height();
 
-	int const margin = 1;
-	int const distanceBetweenMeters = 2;
+	const int margin = 1;
+	const int distanceBetweenMeters = 2;
 
-	int const numberOfMeters = 2;
+	const int numberOfMeters = 2;
 
 	// Compute the width of a single meter by removing the margins and the space between meters
-	int const leftAndRightMargin = 2 * margin;
-	int const pixelsBetweenAllMeters = distanceBetweenMeters * (numberOfMeters - 1);
-	int const remainingPixelsForMeters = baseRect.width() - leftAndRightMargin - pixelsBetweenAllMeters;
-	int const meterWidth = remainingPixelsForMeters / numberOfMeters;
+	const int leftAndRightMargin = 2 * margin;
+	const int pixelsBetweenAllMeters = distanceBetweenMeters * (numberOfMeters - 1);
+	const int remainingPixelsForMeters = baseRect.width() - leftAndRightMargin - pixelsBetweenAllMeters;
+	const int meterWidth = remainingPixelsForMeters / numberOfMeters;
 
 	QRect leftMeterOutlineRect(margin, margin, meterWidth, height - 2 * margin);
 	QRect rightMeterOutlineRect(baseRect.width() - margin - meterWidth, margin, meterWidth, height - 2 * margin);
@@ -349,11 +349,11 @@ void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)
 	// This linear map performs the following mapping:
 	// Value (dbFS or linear) -> window coordinates of the widget
 	// It is for example used to determine the height of peaks, markers and to define the gradient for the levels
-	LinearMap<float> const valuesToWindowCoordinates(mappedMaxPeak, leftMeterRect.y(), mappedMinPeak, leftMeterRect.y() + leftMeterRect.height());
+	const LinearMap<float> valuesToWindowCoordinates(mappedMaxPeak, leftMeterRect.y(), mappedMinPeak, leftMeterRect.y() + leftMeterRect.height());
 
 	// This lambda takes a value (in dbFS or linear) and a rectangle and computes a rectangle
 	// that represent the value within the rectangle. It is for example used to compute the unity indicators.
-	auto const computeLevelMarkerRect = [&valuesToWindowCoordinates](QRect const & rect, float peak) -> QRect
+	const auto computeLevelMarkerRect = [&valuesToWindowCoordinates](const QRect & rect, float peak) -> QRect
 	{
 		return QRect(rect.x(), valuesToWindowCoordinates.map(peak), rect.width(), 1);
 	};
@@ -361,14 +361,14 @@ void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)
 	// This lambda takes a peak value (in dbFS or linear) and a rectangle and computes a rectangle
 	// that represent the peak value within the rectangle. It's used to compute the peak indicators
 	// which "dance" on top of the level meters.
-	auto const computePeakRect = [&valuesToWindowCoordinates](QRect const & rect, float peak) -> QRect
+	const auto computePeakRect = [&valuesToWindowCoordinates](const QRect & rect, float peak) -> QRect
 	{
 		return QRect(rect.x(), valuesToWindowCoordinates.map(peak), rect.width(), 1);
 	};
 
 	// This lambda takes a peak value (in dbFS or linear) and a rectangle and returns an adjusted copy of the
 	// rectangle that represents the peak value. It is used to compute the level meters themselves.
-	auto const computeLevelRect = [&valuesToWindowCoordinates](QRect const & rect, float peak) -> QRect
+	const auto computeLevelRect = [&valuesToWindowCoordinates](const QRect & rect, float peak) -> QRect
 	{
 		QRect result(rect);
 		result.setTop(valuesToWindowCoordinates.map(peak));
@@ -379,10 +379,10 @@ void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)
 	// Draw left and right level markers for the unity lines (0 dbFS, 1.0 amplitude)
 	if (getRenderUnityLine())
 	{
-		auto const unityRectL = computeLevelMarkerRect(leftMeterRect, mappedUnity);
+		const auto unityRectL = computeLevelMarkerRect(leftMeterRect, mappedUnity);
 		painter.fillRect(unityRectL, getUnityMarker());
 
-		auto const unityRectR = computeLevelMarkerRect(rightMeterRect, mappedUnity);
+		const auto unityRectR = computeLevelMarkerRect(rightMeterRect, mappedUnity);
 		painter.fillRect(unityRectR, getUnityMarker());
 	}
 
@@ -391,10 +391,10 @@ void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)
 	// Please ensure that "clip starts" is the maximum value and that "ok ends"
 	// is the minimum value and that all other values lie inbetween. Otherwise
 	// there will be warnings when the gradient is defined.
-	float const mappedClipStarts(mapper(dbfsToAmp(0.f)));
-	float const mappedWarnEnd(mapper(dbfsToAmp(-0.01)));
-	float const mappedWarnStart(mapper(dbfsToAmp(-6.f)));
-	float const mappedOkEnd(mapper(dbfsToAmp(-12.f)));
+	const float mappedClipStarts(mapper(dbfsToAmp(0.f)));
+	const float mappedWarnEnd(mapper(dbfsToAmp(-0.01)));
+	const float mappedWarnStart(mapper(dbfsToAmp(-6.f)));
+	const float mappedOkEnd(mapper(dbfsToAmp(-12.f)));
 
 	// Prepare the gradient for the meters
 	//
@@ -412,7 +412,7 @@ void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)
 
 	// We already know for the gradient that the clip color will be at 0 and that the ok color is at 1.
 	// What's left to do is to map the inbetween values into the interval [0,1].
-	LinearMap<float> const mapBetweenClipAndOk(mappedClipStarts, 0.f, mappedOkEnd, 1.f);
+	const LinearMap<float> mapBetweenClipAndOk(mappedClipStarts, 0.f, mappedOkEnd, 1.f);
 
 	linearGrad.setColorAt(0, peakClip());
 	linearGrad.setColorAt(mapBetweenClipAndOk.map(mappedWarnEnd), peakWarn());
@@ -430,7 +430,7 @@ void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)
 	// Draw left peaks
 	if (mappedPersistentPeakL > mappedMinPeak)
 	{
-		auto const peakRectL = computePeakRect(leftMeterRect, mappedPersistentPeakL);
+		const auto peakRectL = computePeakRect(leftMeterRect, mappedPersistentPeakL);
 		painter.fillRect(peakRectL, linearGrad);
 	}
 
@@ -445,7 +445,7 @@ void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)
 	// Draw right peaks
 	if (mappedPersistentPeakR > mappedMinPeak)
 	{
-		auto const peakRectR = computePeakRect(rightMeterRect, mappedPersistentPeakR);
+		const auto peakRectR = computePeakRect(rightMeterRect, mappedPersistentPeakR);
 		painter.fillRect(peakRectR, linearGrad);
 	}
 
