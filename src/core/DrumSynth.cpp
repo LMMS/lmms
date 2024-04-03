@@ -498,8 +498,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 	if (DiON == 1)
 	{
 		DAtten = DGain * static_cast<short>(LoudestEnv());
-		if (DAtten > 32700) { clippoint = 32700; }
-		else { clippoint = static_cast<short>(DAtten); }
+		clippoint = DAtten > 32700 ? 32700 : static_cast<short>(DAtten);
 		DAtten = static_cast<float>(std::pow(2.0, 2.0 * GetPrivateProfileInt(sec, "Bits", 0, dsfile)));
 		DGain = DAtten * DGain
 			* static_cast<float>(std::pow(10.0, 0.05 * GetPrivateProfileInt(sec, "Clipping", 0, dsfile)));
