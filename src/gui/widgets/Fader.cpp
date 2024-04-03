@@ -289,8 +289,7 @@ void Fader::paintEvent( QPaintEvent * ev)
 	QPainter painter(this);
 
 	// Draw the levels with peaks
-	// TODO LMMS Compressor, EQ and Delay still use linear displays...
-	paintLevels(ev, painter, !getLevelsDisplayedInDBFS());
+	paintLevels(ev, painter, !m_levelsDisplayedInDBFS);
 
 	// Draw the knob
 	painter.drawPixmap((width() - m_knob.width()) / 2, knobPosY() - m_knob.height(), m_knob);
@@ -380,10 +379,10 @@ void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)
 	if (getRenderUnityLine())
 	{
 		const auto unityRectL = computeLevelMarkerRect(leftMeterRect, mappedUnity);
-		painter.fillRect(unityRectL, getUnityMarker());
+		painter.fillRect(unityRectL, m_unityMarker);
 
 		const auto unityRectR = computeLevelMarkerRect(rightMeterRect, mappedUnity);
-		painter.fillRect(unityRectR, getUnityMarker());
+		painter.fillRect(unityRectR, m_unityMarker);
 	}
 
 	// These values define where the gradient changes values, i.e. the ranges
@@ -414,10 +413,10 @@ void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)
 	// What's left to do is to map the inbetween values into the interval [0,1].
 	const LinearMap<float> mapBetweenClipAndOk(mappedClipStarts, 0.f, mappedOkEnd, 1.f);
 
-	linearGrad.setColorAt(0, peakClip());
-	linearGrad.setColorAt(mapBetweenClipAndOk.map(mappedWarnEnd), peakWarn());
-	linearGrad.setColorAt(mapBetweenClipAndOk.map(mappedWarnStart), peakWarn());
-	linearGrad.setColorAt(1, peakOk());
+	linearGrad.setColorAt(0, m_peakClip);
+	linearGrad.setColorAt(mapBetweenClipAndOk.map(mappedWarnEnd), m_peakWarn);
+	linearGrad.setColorAt(mapBetweenClipAndOk.map(mappedWarnStart), m_peakWarn);
+	linearGrad.setColorAt(1, m_peakOk);
 
 	// Draw left levels
 	if (mappedPeakL > mappedMinPeak)
@@ -451,46 +450,5 @@ void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)
 
 	painter.restore();
 }
-
-QColor const & Fader::peakOk() const
-{
-	return m_peakOk;
-}
-
-QColor const & Fader::peakClip() const
-{
-	return m_peakClip;
-}
-
-QColor const & Fader::peakWarn() const
-{
-	return m_peakWarn;
-}
-
-void Fader::setPeakOk(const QColor& c)
-{
-	m_peakOk = c;
-}
-
-void Fader::setPeakClip(const QColor& c)
-{
-	m_peakClip = c;
-}
-
-void Fader::setPeakWarn(const QColor& c)
-{
-	m_peakWarn = c;
-}
-
-QColor const & Fader::getUnityMarker() const
-{
-	return m_unityMarker;
-}
-
-void Fader::setUnityMarker(const QColor& c)
-{
-	m_unityMarker = c;
-}
-
 
 } // namespace lmms::gui

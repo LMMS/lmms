@@ -66,12 +66,12 @@ class LMMS_EXPORT Fader : public QWidget, public FloatModelView
 {
 	Q_OBJECT
 public:
-	Q_PROPERTY(QColor peakOk READ peakOk WRITE setPeakOk)
-	Q_PROPERTY(QColor peakClip READ peakClip WRITE setPeakClip)
-	Q_PROPERTY(QColor peakWarn READ peakWarn WRITE setPeakWarn)
-	Q_PROPERTY(bool levelsDisplayedInDBFS READ getLevelsDisplayedInDBFS WRITE setLevelsDisplayedInDBFS)
+	Q_PROPERTY(QColor peakOk MEMBER m_peakOk)
+	Q_PROPERTY(QColor peakClip MEMBER m_peakClip)
+	Q_PROPERTY(QColor peakWarn MEMBER m_peakWarn)
+	Q_PROPERTY(bool levelsDisplayedInDBFS MEMBER m_levelsDisplayedInDBFS)
 	Q_PROPERTY(bool renderUnityLine READ getRenderUnityLine WRITE setRenderUnityLine)
-	Q_PROPERTY(QColor unityMarker READ getUnityMarker WRITE setUnityMarker)
+	Q_PROPERTY(QColor unityMarker MEMBER m_unityMarker)
 
 	Fader(FloatModel* model, const QString& name, QWidget* parent);
 	Fader(FloatModel* model, const QString& name, QWidget* parent, const QPixmap& knob);
@@ -88,21 +88,6 @@ public:
 
 	inline float getMaxPeak() const { return m_fMaxPeak; }
 	inline void setMaxPeak(float maxPeak) { m_fMaxPeak = maxPeak; }
-
-	QColor const & peakOk() const;
-	void setPeakOk(const QColor& c);
-
-	QColor const & peakClip() const;
-	void setPeakClip(const QColor& c);
-
-	QColor const & peakWarn() const;
-	void setPeakWarn(const QColor& c);
-
-	QColor const & getUnityMarker() const;
-	void setUnityMarker(const QColor& c);
-
-	inline bool getLevelsDisplayedInDBFS() const { return m_levelsDisplayedInDBFS; }
-	inline void setLevelsDisplayedInDBFS(bool value = true) { m_levelsDisplayedInDBFS = value; }
 
 	inline bool getRenderUnityLine() const { return m_renderUnityLine; }
 	inline void setRenderUnityLine(bool value = true) { m_renderUnityLine = value; }
