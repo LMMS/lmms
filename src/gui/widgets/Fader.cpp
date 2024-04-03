@@ -60,13 +60,13 @@
 namespace lmms::gui
 {
 
-SimpleTextFloat * Fader::s_textFloat = nullptr;
+SimpleTextFloat* Fader::s_textFloat = nullptr;
 
 Fader::Fader(FloatModel* model, const QString& name, QWidget* parent) :
 	QWidget(parent),
 	FloatModelView(model, this)
 {
-	if( s_textFloat == nullptr )
+	if (s_textFloat == nullptr)
 	{
 		s_textFloat = new SimpleTextFloat;
 	}
@@ -92,28 +92,28 @@ Fader::Fader(FloatModel* model, const QString& name, QWidget* parent, const QPix
 }
 
 
-void Fader::contextMenuEvent( QContextMenuEvent * _ev )
+void Fader::contextMenuEvent(QContextMenuEvent* ev)
 {
-	CaptionMenu contextMenu( windowTitle() );
-	addDefaultActions( &contextMenu );
-	contextMenu.exec( QCursor::pos() );
-	_ev->accept();
+	CaptionMenu contextMenu(windowTitle());
+	addDefaultActions(&contextMenu);
+	contextMenu.exec(QCursor::pos());
+	ev->accept();
 }
 
 
 
 
-void Fader::mouseMoveEvent( QMouseEvent *mouseEvent )
+void Fader::mouseMoveEvent(QMouseEvent* mouseEvent)
 {
-	if( m_moveStartPoint >= 0 )
+	if (m_moveStartPoint >= 0)
 	{
 		int dy = m_moveStartPoint - mouseEvent->globalY();
 
 		float delta = dy * (model()->maxValue() - model()->minValue()) / (float)(height() - (m_knob).height());
 
 		const auto step = model()->step<float>();
-		float newValue = static_cast<float>( static_cast<int>( ( m_startValue + delta ) / step + 0.5 ) ) * step;
-		model()->setValue( newValue );
+		float newValue = static_cast<float>(static_cast<int>((m_startValue + delta) / step + 0.5)) * step;
+		model()->setValue(newValue);
 
 		updateTextFloat();
 	}
@@ -122,16 +122,16 @@ void Fader::mouseMoveEvent( QMouseEvent *mouseEvent )
 
 
 
-void Fader::mousePressEvent( QMouseEvent* mouseEvent )
+void Fader::mousePressEvent(QMouseEvent* mouseEvent)
 {
-	if( mouseEvent->button() == Qt::LeftButton &&
-			! ( mouseEvent->modifiers() & Qt::ControlModifier ) )
+	if (mouseEvent->button() == Qt::LeftButton &&
+			!(mouseEvent->modifiers() & Qt::ControlModifier))
 	{
-		AutomatableModel *thisModel = model();
-		if( thisModel )
+		AutomatableModel* thisModel = model();
+		if (thisModel)
 		{
 			thisModel->addJournalCheckPoint();
-			thisModel->saveJournallingState( false );
+			thisModel->saveJournallingState(false);
 		}
 
 		if (mouseEvent->y() >= knobPosY() - (m_knob).height() && mouseEvent->y() < knobPosY())
@@ -151,39 +151,39 @@ void Fader::mousePressEvent( QMouseEvent* mouseEvent )
 	}
 	else
 	{
-		AutomatableModelView::mousePressEvent( mouseEvent );
+		AutomatableModelView::mousePressEvent(mouseEvent);
 	}
 }
 
 
 
-void Fader::mouseDoubleClickEvent( QMouseEvent* mouseEvent )
+void Fader::mouseDoubleClickEvent(QMouseEvent* mouseEvent)
 {
 	bool ok;
 	float newValue;
 	// TODO: dbV handling
-	newValue = QInputDialog::getDouble( this, tr( "Set value" ),
-				tr( "Please enter a new value between %1 and %2:" ).
-						arg( model()->minValue() * m_conversionFactor ).
-						arg( model()->maxValue() * m_conversionFactor ),
+	newValue = QInputDialog::getDouble(this, tr("Set value"),
+				tr("Please enter a new value between %1 and %2:").
+						arg(model()->minValue() * m_conversionFactor).
+						arg(model()->maxValue() * m_conversionFactor),
 					model()->getRoundedValue() * m_conversionFactor,
 					model()->minValue() * m_conversionFactor,
-					model()->maxValue() * m_conversionFactor, model()->getDigitCount(), &ok ) / m_conversionFactor;
+					model()->maxValue() * m_conversionFactor, model()->getDigitCount(), &ok) / m_conversionFactor;
 
-	if( ok )
+	if (ok)
 	{
-		model()->setValue( newValue );
+		model()->setValue(newValue);
 	}
 }
 
 
 
-void Fader::mouseReleaseEvent( QMouseEvent * mouseEvent )
+void Fader::mouseReleaseEvent(QMouseEvent* mouseEvent)
 {
-	if( mouseEvent && mouseEvent->button() == Qt::LeftButton )
+	if (mouseEvent && mouseEvent->button() == Qt::LeftButton)
 	{
-		AutomatableModel *thisModel = model();
-		if( thisModel )
+		AutomatableModel* thisModel = model();
+		if (thisModel)
 		{
 			thisModel->restoreJournallingState();
 		}
@@ -193,20 +193,20 @@ void Fader::mouseReleaseEvent( QMouseEvent * mouseEvent )
 }
 
 
-void Fader::wheelEvent ( QWheelEvent *ev )
+void Fader::wheelEvent (QWheelEvent* ev)
 {
 	ev->accept();
 
 	if (ev->angleDelta().y() > 0)
 	{
-		model()->incValue( 1 );
+		model()->incValue(1);
 	}
 	else
 	{
-		model()->incValue( -1 );
+		model()->incValue(-1);
 	}
 	updateTextFloat();
-	s_textFloat->setVisibilityTimeOut( 1000 );
+	s_textFloat->setVisibilityTimeOut(1000);
 }
 
 
@@ -214,7 +214,7 @@ void Fader::wheelEvent ( QWheelEvent *ev )
 ///
 /// Set peak value (0.0 .. 1.0)
 ///
-void Fader::setPeak( float fPeak, float &targetPeak, float &persistentPeak, QElapsedTimer &lastPeakTimer )
+void Fader::setPeak(float fPeak, float& targetPeak, float& persistentPeak, QElapsedTimer& lastPeakTimer)
 {
 	fPeak = std::clamp(fPeak, m_fMinPeak, m_fMaxPeak);
 
@@ -231,23 +231,23 @@ void Fader::setPeak( float fPeak, float &targetPeak, float &persistentPeak, QEla
 
 	if (persistentPeak > 0 && lastPeakTimer.elapsed() > 1500)
 	{
-		persistentPeak = qMax<float>( 0, persistentPeak-0.05 );
+		persistentPeak = qMax<float>(0, persistentPeak-0.05);
 		update();
 	}
 }
 
 
 
-void Fader::setPeak_L( float fPeak )
+void Fader::setPeak_L(float fPeak)
 {
-	setPeak( fPeak, m_fPeakValue_L, m_persistentPeak_L, m_lastPeakTimer_L );
+	setPeak(fPeak, m_fPeakValue_L, m_persistentPeak_L, m_lastPeakTimer_L);
 }
 
 
 
-void Fader::setPeak_R( float fPeak )
+void Fader::setPeak_R(float fPeak)
 {
-	setPeak( fPeak, m_fPeakValue_R, m_persistentPeak_R, m_lastPeakTimer_R );
+	setPeak(fPeak, m_fPeakValue_R, m_persistentPeak_R, m_lastPeakTimer_R);
 }
 
 
@@ -255,21 +255,21 @@ void Fader::setPeak_R( float fPeak )
 // update tooltip showing value and adjust position while changing fader value
 void Fader::updateTextFloat()
 {
-	if( ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() && m_conversionFactor == 100.0 )
+	if (ConfigManager::inst()->value("app", "displaydbfs").toInt() && m_conversionFactor == 100.0)
 	{
-		s_textFloat->setText( QString("Volume: %1 dBFS").
-				arg( ampToDbfs( model()->value() ), 3, 'f', 2 ) );
+		s_textFloat->setText(QString("Volume: %1 dBFS").
+				arg(ampToDbfs(model()->value()), 3, 'f', 2));
 	}
 	else
 	{
-		s_textFloat->setText( m_description + " " + QString("%1 ").arg( model()->value() * m_conversionFactor ) + " " + m_unit );
+		s_textFloat->setText(m_description + " " + QString("%1 ").arg(model()->value() * m_conversionFactor) + " " + m_unit);
 	}
 
 	s_textFloat->moveGlobal(this, QPoint(width() + 2, knobPosY() - s_textFloat->height() / 2));
 }
 
 
-void Fader::paintEvent( QPaintEvent * ev)
+void Fader::paintEvent(QPaintEvent* ev)
 {
 	QPainter painter(this);
 
@@ -337,7 +337,7 @@ void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)
 
 	// This lambda takes a value (in dbFS or linear) and a rectangle and computes a rectangle
 	// that represent the value within the rectangle. It is for example used to compute the unity indicators.
-	const auto computeLevelMarkerRect = [&valuesToWindowCoordinates](const QRect & rect, float peak) -> QRect
+	const auto computeLevelMarkerRect = [&valuesToWindowCoordinates](const QRect& rect, float peak) -> QRect
 	{
 		return QRect(rect.x(), valuesToWindowCoordinates.map(peak), rect.width(), 1);
 	};
@@ -345,14 +345,14 @@ void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)
 	// This lambda takes a peak value (in dbFS or linear) and a rectangle and computes a rectangle
 	// that represent the peak value within the rectangle. It's used to compute the peak indicators
 	// which "dance" on top of the level meters.
-	const auto computePeakRect = [&valuesToWindowCoordinates](const QRect & rect, float peak) -> QRect
+	const auto computePeakRect = [&valuesToWindowCoordinates](const QRect& rect, float peak) -> QRect
 	{
 		return QRect(rect.x(), valuesToWindowCoordinates.map(peak), rect.width(), 1);
 	};
 
 	// This lambda takes a peak value (in dbFS or linear) and a rectangle and returns an adjusted copy of the
 	// rectangle that represents the peak value. It is used to compute the level meters themselves.
-	const auto computeLevelRect = [&valuesToWindowCoordinates](const QRect & rect, float peak) -> QRect
+	const auto computeLevelRect = [&valuesToWindowCoordinates](const QRect& rect, float peak) -> QRect
 	{
 		QRect result(rect);
 		result.setTop(valuesToWindowCoordinates.map(peak));

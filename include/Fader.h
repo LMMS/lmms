@@ -78,10 +78,10 @@ public:
 	Fader(FloatModel* model, const QString& name, QWidget* parent, const QPixmap& knob);
 	~Fader() override = default;
 
-	void setPeak_L( float fPeak );
+	void setPeak_L(float fPeak);
 	float getPeak_L() {	return m_fPeakValue_L;	}
 
-	void setPeak_R( float fPeak );
+	void setPeak_R(float fPeak);
 	float getPeak_R() {	return m_fPeakValue_R;	}
 
 	inline float getMinPeak() const { return m_fMinPeak; }
@@ -93,28 +93,28 @@ public:
 	inline bool getRenderUnityLine() const { return m_renderUnityLine; }
 	inline void setRenderUnityLine(bool value = true) { m_renderUnityLine = value; }
 
-	void setDisplayConversion( bool b )
+	void setDisplayConversion(bool b)
 	{
 		m_conversionFactor = b ? 100.0 : 1.0;
 	}
 
-	inline void setHintText( const QString & _txt_before,
-						const QString & _txt_after )
+	inline void setHintText(const QString& txt_before,
+						const QString& txt_after)
 	{
-		setDescription( _txt_before );
-		setUnit( _txt_after );
+		setDescription(txt_before);
+		setUnit(txt_after);
 	}
 
 private:
-	void contextMenuEvent( QContextMenuEvent * _me ) override;
-	void mousePressEvent( QMouseEvent *ev ) override;
-	void mouseDoubleClickEvent( QMouseEvent* mouseEvent ) override;
-	void mouseMoveEvent( QMouseEvent *ev ) override;
-	void mouseReleaseEvent( QMouseEvent * _me ) override;
-	void wheelEvent( QWheelEvent *ev ) override;
-	void paintEvent( QPaintEvent *ev ) override;
+	void contextMenuEvent(QContextMenuEvent* me) override;
+	void mousePressEvent(QMouseEvent* ev) override;
+	void mouseDoubleClickEvent(QMouseEvent* mouseEvent) override;
+	void mouseMoveEvent(QMouseEvent* ev) override;
+	void mouseReleaseEvent(QMouseEvent* me) override;
+	void wheelEvent(QWheelEvent* ev) override;
+	void paintEvent(QPaintEvent* ev) override;
 
-	void paintLevels(QPaintEvent *ev, QPainter & painter, bool linear = false);
+	void paintLevels(QPaintEvent* ev, QPainter& painter, bool linear = false);
 
 	int knobPosY() const
 	{
@@ -124,7 +124,7 @@ private:
 		return height() - ((height() - m_knob.height()) * (realVal / fRange));
 	}
 
-	void setPeak( float fPeak, float &targetPeak, float &persistentPeak, QElapsedTimer &lastPeakTimer );
+	void setPeak(float fPeak, float& targetPeak, float& persistentPeak, QElapsedTimer& lastPeakTimer);
 
 	void updateTextFloat();
 
@@ -147,7 +147,7 @@ private:
 	int m_moveStartPoint {-1};
 	float m_startValue {0.};
 
-	static SimpleTextFloat * s_textFloat;
+	static SimpleTextFloat* s_textFloat;
 
 	QColor m_peakOk {10, 212, 92};
 	QColor m_peakClip {193, 32, 56};
