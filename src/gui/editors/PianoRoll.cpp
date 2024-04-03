@@ -3030,10 +3030,9 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 	if (hasValidMidiClip())
 	{
-		int pianoAreaHeight, partialKeyVisible, topKey, topNote;
-		pianoAreaHeight = keyAreaBottom() - keyAreaTop();
+		int pianoAreaHeight = keyAreaBottom() - keyAreaTop();
 		m_pianoKeysVisible = pianoAreaHeight / m_keyLineHeight;
-		partialKeyVisible = pianoAreaHeight % m_keyLineHeight;
+		int partialKeyVisible = pianoAreaHeight % m_keyLineHeight;
 		// check if we're below the minimum key area size
 		if (m_pianoKeysVisible * m_keyLineHeight < KEY_AREA_MIN_HEIGHT)
 		{
@@ -3058,8 +3057,8 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				PR_TOP_MARGIN - PR_BOTTOM_MARGIN;
 			partialKeyVisible = 0;
 		}
-		topKey = qBound(0, m_startKey + m_pianoKeysVisible - 1, NumKeys - 1);
-		topNote = topKey % KeysPerOctave;
+		int topKey = std::clamp(m_startKey + m_pianoKeysVisible - 1, 0, NumKeys - 1);
+		int topNote = topKey % KeysPerOctave;
 		// if not resizing the note edit area, we can change m_notesEditHeight
 		if (m_action != Action::ResizeNoteEditArea && partialKeyVisible != 0)
 		{
@@ -3338,7 +3337,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	// display note editing info
 	//QFont f = p.font();
 	f.setBold( false );
-	p.setFont( pointSize<10>( f ) );
+	p.setFont(pointSize(f, 10));
 	p.setPen(m_noteModeColor);
 	p.drawText( QRect( 0, keyAreaBottom(),
 					  m_whiteKeyWidth, noteEditBottom() - keyAreaBottom()),
@@ -3601,7 +3600,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	{
 		QFont f = p.font();
 		f.setBold( true );
-		p.setFont( pointSize<14>( f ) );
+		p.setFont(pointSize(f, 14));
 		p.setPen( QApplication::palette().color( QPalette::Active,
 							QPalette::BrightText ) );
 		p.drawText(m_whiteKeyWidth + 20, PR_TOP_MARGIN + 40,

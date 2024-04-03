@@ -104,6 +104,7 @@ namespace lmms::gui
         void moveChannelRight();
 
     private:
+        bool confirmRemoval(int index);
         QString elideName(const QString& name);
         MixerChannel* mixerChannel() const;
         auto isMasterChannel() const -> bool { return m_channelIndex == 0; }
