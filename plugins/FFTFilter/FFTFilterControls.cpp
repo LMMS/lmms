@@ -46,6 +46,7 @@ FFTFilterControls::FFTFilterControls(FFTFilterEffect* effect) :
 	m_graphModel.getDataArray(arrayLocation)->setIsSelectable(true);
 	m_graphModel.getDataArray(arrayLocation)->setIsEditableAttrib(true);
 	m_graphModel.getDataArray(arrayLocation)->setIsAutomatableEffectable(true);
+	m_graphModel.getDataArray(arrayLocation)->setIsSaveable(true);
 	m_graphModel.getDataArray(arrayLocation)->setLineColor(QColor(210, 50, 50, 255));
 	m_graphModel.getDataArray(arrayLocation)->setActiveColor(QColor(255, 30, 20, 255));
 	m_graphModel.getDataArray(arrayLocation)->setFillColor(QColor(170, 25, 25, 40));
@@ -73,6 +74,9 @@ void FFTFilterControls::loadSettings(const QDomElement& parent)
 	m_effectControlModel.loadSettings(parent, "effectcontrol");
 	m_bufferModel.loadSettings(parent, "buffer");
 	m_displayFFTModel.loadSettings(parent, "display");
+	
+
+	m_graphModel.loadSettings(parent); 
 }
 
 
@@ -83,6 +87,8 @@ void FFTFilterControls::saveSettings(QDomDocument& doc, QDomElement& parent)
 	m_effectControlModel.saveSettings(doc, parent, "effectcontrol"); 
 	m_bufferModel.saveSettings(doc, parent, "buffer"); 
 	m_displayFFTModel.saveSettings(doc, parent, "display"); 
+
+	m_graphModel.saveSettings(doc, parent); 
 }
 
 void FFTFilterControls::resetClicked()

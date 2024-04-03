@@ -35,6 +35,7 @@
 #include "ModelView.h"
 #include "lmms_basics.h"
 #include "AutomatableModel.h"
+#include "JournallingObject.h"
 
 namespace lmms
 {
@@ -240,7 +241,7 @@ private:
 
 } // namespace gui
 
-class LMMS_EXPORT VectorGraphModel : public Model//, public JournallingObject
+class LMMS_EXPORT VectorGraphModel : public Model, public JournallingObject
 {
 Q_OBJECT
 public:
@@ -285,8 +286,16 @@ public:
 	int getDataArrayNewId();
 
 	// save, load
-	//void saveSettings(QDomDocument& doc, QDomElement& element, const QString& name); //TODO
-	//void loadSettings(const QDomElement& element, const QString& name); //TODO
+	QString nodeName() const override
+	{
+		return "VectorGraphModel";
+	}
+	//virtual void saveSettings(QDomDocument& doc, QDomElement& element, const QString& name); //TODO
+	//virtual void loadSettings(const QDomElement& element, const QString& name); //TODO
+	virtual void saveSettings(QDomDocument& doc, QDomElement& element);
+	virtual void loadSettings(const QDomElement& element);
+	// read locations from saved data attributes
+	//int readLoc(unsigned int startIn, QString dataIn);
 signals:
 	// data changed inside m_dataArray or m_maxLength changed
 	void dataChanged();
@@ -428,8 +437,7 @@ public:
 	// foundOut is true when the nearest position = posIn,
 	// reurns -1 when search failed
 	int getNearestLocation(float xIn, bool* foundOut, bool* isBeforeOut);
-	// get changed locations
-	// std::vector<unsigned int> getUpdatingValues();
+
 
 	// returns the latest updated graph values
 	// countIn is the retuned vector's size
@@ -478,6 +486,11 @@ public:
 	void clearedEvent();
 	// color
 	void styleChanged();
+protected:
+	// returns m_automationModelArray
+	std::vector<FloatModel*>* getAutomationModelArray();
+	QString getSavedDataArray();
+	void loadDataArray(QString dataIn, unsigned int sizeIn);
 private:
 	class VectorGraphPoint
 	{
@@ -695,6 +708,9 @@ private:
 	// this stores all the FloatModels
 	// used for automation
 	std::vector<FloatModel*> m_automationModelArray;
+
+	// used for saving
+	friend class lmms::VectorGraphModel;
 };
 
 } // namespace lmms
