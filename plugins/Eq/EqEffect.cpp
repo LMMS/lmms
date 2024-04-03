@@ -311,7 +311,7 @@ float EqEffect::linearPeakBand(float minF, float maxF, EqAnalyser* fft, int sr)
 
 void EqEffect::setBandPeaks( EqAnalyser *fft, int samplerate )
 {
-	auto computePeakBand = [this, fft, samplerate](FloatModel const & freqModel, FloatModel const & bwModel)
+	auto computePeakBand = [&](const FloatModel& freqModel, const FloatModel& bwModel)
 	{
 		float const freq = freqModel.value();
 		float const bw = bwModel.value();
@@ -320,10 +320,8 @@ void EqEffect::setBandPeaks( EqAnalyser *fft, int samplerate )
 	};
 
 	m_eqControls.m_lowShelfPeakR = m_eqControls.m_lowShelfPeakL =
-			linearPeakBand(m_eqControls.m_lowShelfFreqModel.value()
-					  * (1 - m_eqControls.m_lowShelfResModel.value() * 0.5),
-					  m_eqControls.m_lowShelfFreqModel.value(),
-					  fft , samplerate);
+		linearPeakBand(m_eqControls.m_lowShelfFreqModel.value() * (1 - m_eqControls.m_lowShelfResModel.value() * 0.5),
+			m_eqControls.m_lowShelfFreqModel.value(), fft , samplerate);
 
 	m_eqControls.m_para1PeakL = m_eqControls.m_para1PeakR =
 		computePeakBand(m_eqControls.m_para1FreqModel, m_eqControls.m_para1BwModel);
@@ -338,10 +336,9 @@ void EqEffect::setBandPeaks( EqAnalyser *fft, int samplerate )
 		computePeakBand(m_eqControls.m_para4FreqModel, m_eqControls.m_para4BwModel);
 
 	m_eqControls.m_highShelfPeakL = m_eqControls.m_highShelfPeakR =
-			linearPeakBand(m_eqControls.m_highShelfFreqModel.value(),
-					  m_eqControls.m_highShelfFreqModel.value()
-					  * (1 + m_eqControls.m_highShelfResModel.value() * 0.5),
-					  fft, samplerate);
+		linearPeakBand(m_eqControls.m_highShelfFreqModel.value(),
+			m_eqControls.m_highShelfFreqModel.value() * (1 + m_eqControls.m_highShelfResModel.value() * 0.5),
+			fft, samplerate);
 }
 
 extern "C"
