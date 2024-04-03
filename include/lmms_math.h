@@ -270,7 +270,7 @@ static inline float safeDbfsToAmp( float dbfs )
 //! @brief Converts linear amplitude (>0-1.0) to dBFS scale. 
 //! @param amp Linear amplitude, where 1.0 = 0dBFS. ** Must be larger than zero! **
 //! @return Amplitude in dBFS. 
-constexpr float ampToDbfs(float amp)
+static inline float ampToDbfs(float amp)
 {
 	return log10f(amp) * 20.0f;
 }
@@ -279,7 +279,7 @@ constexpr float ampToDbfs(float amp)
 //! @brief Converts dBFS-scale to linear amplitude with 0dBFS = 1.0
 //! @param dbfs The dBFS value to convert. ** Must be a real number - not inf/nan! **
 //! @return Linear amplitude
-constexpr float dbfsToAmp(float dbfs)
+static inline float dbfsToAmp(float dbfs)
 {
 	return std::pow(10.f, dbfs * 0.05f);
 }
