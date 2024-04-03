@@ -64,22 +64,7 @@ SimpleTextFloat * Fader::s_textFloat = nullptr;
 
 Fader::Fader(FloatModel* model, const QString& name, QWidget* parent) :
 	QWidget(parent),
-	FloatModelView(model, this),
-	m_fPeakValue_L(0.0),
-	m_fPeakValue_R(0.0),
-	m_persistentPeak_L(0.0),
-	m_persistentPeak_R(0.0),
-	m_fMinPeak(dbfsToAmp(-42)),
-	m_fMaxPeak(dbfsToAmp(9)),
-	m_knob(embed::getIconPixmap("fader_knob")),
-	m_levelsDisplayedInDBFS(true),
-	m_moveStartPoint(-1),
-	m_startValue(0),
-	m_peakOk(10, 212, 92),
-	m_peakClip(193, 32, 56),
-	m_peakWarn(214, 236, 82),
-	m_unityMarker(63, 63, 63, 255),
-	m_renderUnityLine(true)
+	FloatModelView(model, this)
 {
 	if( s_textFloat == nullptr )
 	{
@@ -89,7 +74,7 @@ Fader::Fader(FloatModel* model, const QString& name, QWidget* parent) :
 	setWindowTitle(name);
 	setAttribute(Qt::WA_OpaquePaintEvent, false);
 	// For now resize the widget to the size of the previous background image "fader_background.png" as it was found in the classic and default theme
-	QSize minimumSize(23, 116);
+	constexpr QSize minimumSize(23, 116);
 	setMinimumSize(minimumSize);
 	resize(minimumSize);
 	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);

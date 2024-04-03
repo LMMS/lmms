@@ -54,6 +54,7 @@
 
 #include "AutomatableModelView.h"
 #include "embed.h"
+#include "lmms_math.h"
 
 
 namespace lmms::gui
@@ -129,31 +130,31 @@ private:
 
 	// Private members
 private:
-	float m_fPeakValue_L;
-	float m_fPeakValue_R;
-	float m_persistentPeak_L;
-	float m_persistentPeak_R;
-	float m_fMinPeak;
-	float m_fMaxPeak;
+	float m_fPeakValue_L {0.};
+	float m_fPeakValue_R {0.};
+	float m_persistentPeak_L {0.};
+	float m_persistentPeak_R {0.};
+	float m_fMinPeak {dbfsToAmp(-42)};
+	float m_fMaxPeak {dbfsToAmp(9)};
 
 	QElapsedTimer m_lastPeakTimer_L;
 	QElapsedTimer m_lastPeakTimer_R;
 
-	QPixmap m_knob;
+	QPixmap m_knob {embed::getIconPixmap("fader_knob")};
 
-	bool m_levelsDisplayedInDBFS;
+	bool m_levelsDisplayedInDBFS {true};
 
-	int m_moveStartPoint;
-	float m_startValue;
+	int m_moveStartPoint {-1};
+	float m_startValue {0.};
 
 	static SimpleTextFloat * s_textFloat;
 
-	QColor m_peakOk;
-	QColor m_peakClip;
-	QColor m_peakWarn;
-	QColor m_unityMarker;
+	QColor m_peakOk {10, 212, 92};
+	QColor m_peakClip {193, 32, 56};
+	QColor m_peakWarn {214, 236, 82};
+	QColor m_unityMarker {63, 63, 63, 255};
 
-	bool m_renderUnityLine;
+	bool m_renderUnityLine {true};
 } ;
 
 
