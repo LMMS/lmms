@@ -86,15 +86,15 @@ Fader::Fader(FloatModel* model, const QString& name, QWidget* parent) :
 		s_textFloat = new SimpleTextFloat;
 	}
 
-	setWindowTitle( name );
-	setAttribute( Qt::WA_OpaquePaintEvent, false );
+	setWindowTitle(name);
+	setAttribute(Qt::WA_OpaquePaintEvent, false);
 	// For now resize the widget to the size of the previous background image "fader_background.png" as it was found in the classic and default theme
 	QSize minimumSize(23, 116);
 	setMinimumSize(minimumSize);
 	resize(minimumSize);
 	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-	setModel( model );
-	setHintText( "Volume:","%");
+	setModel(model);
+	setHintText("Volume:", "%");
 
 	m_conversionFactor = 100.0;
 }
@@ -296,7 +296,7 @@ void Fader::paintEvent( QPaintEvent * ev)
 	painter.drawPixmap((width() - m_knob.width()) / 2, knobPosY() - m_knob.height(), m_knob);
 }
 
-void Fader::paintLevels(QPaintEvent * ev, QPainter & painter, bool linear)
+void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)
 {
 	std::function<float(float value)> mapper = [this](float value) { return ampToDbfs(qMax<float>(0.0001, value)); };
 
@@ -323,7 +323,12 @@ void Fader::paintLevels(QPaintEvent * ev, QPainter & painter, bool linear)
 	int const distanceBetweenMeters = 2;
 
 	int const numberOfMeters = 2;
-	int const meterWidth = (baseRect.width() - 2 * margin - distanceBetweenMeters * (numberOfMeters - 1)) / numberOfMeters;
+
+	// Compute the width of a single meter by removing the margins and the space between meters
+	int const leftAndRightMargin = 2 * margin;
+	int const pixelsBetweenAllMeters = distanceBetweenMeters * (numberOfMeters - 1);
+	int const remainingPixelsForMeters = baseRect.width() - leftAndRightMargin - pixelsBetweenAllMeters;
+	int const meterWidth = remainingPixelsForMeters / numberOfMeters;
 
 	QRect leftMeterOutlineRect(margin, margin, meterWidth, height - 2 * margin);
 	QRect rightMeterOutlineRect(baseRect.width() - margin - meterWidth, margin, meterWidth, height - 2 * margin);
