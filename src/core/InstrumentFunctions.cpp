@@ -1,7 +1,8 @@
 /*
  * InstrumentFunctions.cpp - models for instrument-function-tab
  *
- * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2022 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2014-2022 Oskar Wallgren <oskar.wallgren13/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -303,12 +304,15 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 	m_arpRangeModel( 1.0f, 1.0f, 9.0f, 1.0f, this, tr( "Arpeggio range" ) ),
 	m_arpRepeatsModel( 1.0f, 1.0f, 8.0f, 1.0f, this, tr( "Note repeats" ) ),
 	m_arpCycleModel( 0.0f, 0.0f, 6.0f, 1.0f, this, tr( "Cycle steps" ) ),
+	m_arpRandShapeModel( 0.0f, -10.0f, 10.0f, 1.0f, this, tr( "Rand shape" ) ),
 	m_arpSkipModel( 0.0f, 0.0f, 100.0f, 1.0f, this, tr( "Skip rate" ) ),
 	m_arpMissModel( 0.0f, 0.0f, 100.0f, 1.0f, this, tr( "Miss rate" ) ),
 	m_arpTimeModel( 200.0f, 25.0f, 2000.0f, 1.0f, 2000, this, tr( "Arpeggio time" ) ),
 	m_arpGateModel( 100.0f, 1.0f, 200.0f, 1.0f, this, tr( "Arpeggio gate" ) ),
 	m_arpDirectionModel( this, tr( "Arpeggio direction" ) ),
-	m_arpModeModel( this, tr( "Arpeggio mode" ) )
+	m_arpRandomModel( this, tr( "Random distribution" ) ),
+	m_arpModeModel( this, tr( "Arpeggio mode" ) ),
+	m_lastRandomNote(0)
 {
 	const InstrumentFunctionNoteStacking::ChordTable & chord_table = InstrumentFunctionNoteStacking::ChordTable::getInstance();
 	for (auto& chord : chord_table.chords())
@@ -323,12 +327,44 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 	m_arpDirectionModel.addItem( tr( "Random" ), std::make_unique<PixmapLoader>( "arp_random" ) );
 	m_arpDirectionModel.setInitValue( static_cast<float>(ArpDirection::Up) );
 
+	m_arpRandomModel.addItem(tr("Base"), std::make_unique<PixmapLoader>("arp_random"));
+	m_arpRandomModel.addItem(tr("Exponential"), std::make_unique<PixmapLoader>("arp_random"));
+	m_arpRandomModel.addItem(tr("Normal"), std::make_unique<PixmapLoader>("filter_bp"));
+	m_arpRandomModel.addItem(tr("Chase"), std::make_unique<PixmapLoader>("white_noise_wave_active"));
+
 	m_arpModeModel.addItem( tr( "Free" ), std::make_unique<PixmapLoader>( "arp_free" ) );
 	m_arpModeModel.addItem( tr( "Sort" ), std::make_unique<PixmapLoader>( "arp_sort" ) );
 	m_arpModeModel.addItem( tr( "Sync" ), std::make_unique<PixmapLoader>( "arp_sync" ) );
+
+	connect( &m_arpModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateNoteRange() ), Qt::DirectConnection );
+	connect( &m_arpRangeModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateNoteRange() ), Qt::DirectConnection );
 }
 
 
+
+
+void InstrumentFunctionArpeggio::updateNoteRange()
+{
+	bool sticky = false;
+	if( m_arpCycleModel.value() && m_arpCycleModel.value() ==  m_arpCycleModel.maxValue() )
+	{
+		sticky = true;
+	}
+
+	const InstrumentFunctionNoteStacking::ChordTable & chord_table =
+				InstrumentFunctionNoteStacking::ChordTable::getInstance();
+	const int cur_chord_size = chord_table.chords()[m_arpModel.value()].size();
+	float noteRange = m_arpRangeModel.value() * cur_chord_size;
+
+	m_arpCycleModel.setRange( 0.0f, noteRange - 1 );
+
+	if( sticky )
+	{
+		m_arpCycleModel.setValue( m_arpCycleModel.maxValue() );
+	}
+}
 
 
 
@@ -365,7 +401,8 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 
 	const InstrumentFunctionNoteStacking::ChordTable & chord_table = InstrumentFunctionNoteStacking::ChordTable::getInstance();
 	const int cur_chord_size = chord_table.chords()[selected_arp].size();
-	const int range = static_cast<int>(cur_chord_size * m_arpRangeModel.value() * m_arpRepeatsModel.value());
+	const int repeats = m_arpRepeatsModel.value();
+	const int range = static_cast<int>(cur_chord_size * m_arpRangeModel.value() * repeats);
 	const int total_range = range * cnphv.size();
 
 	// number of frames that every note should be played
@@ -407,9 +444,9 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		}
 
 		// Skip notes randomly
-		if( m_arpSkipModel.value() )
+		if (m_arpSkipModel.value())
 		{
-			if (100 * static_cast<float>(rand()) / (static_cast<float>(RAND_MAX) + 1.0f) < m_arpSkipModel.value())
+			if (fastRandf(100.0f) < m_arpSkipModel.value())
 			{
 				// update counters
 				frames_processed += arp_frames;
@@ -423,9 +460,9 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		// Miss notes randomly. We intercept int dir and abuse it
 		// after need.  :)
 
-		if( m_arpMissModel.value() )
+		if (m_arpMissModel.value())
 		{
-			if (100 * static_cast<float>(rand()) / (static_cast<float>(RAND_MAX) + 1.0f) < m_arpMissModel.value())
+			if (fastRandf(100.0f) < m_arpMissModel.value())
 			{
 				dir = ArpDirection::Random;
 			}
@@ -433,56 +470,91 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 
 		int cur_arp_idx = 0;
 		// process according to arpeggio-direction...
-		if( dir == ArpDirection::Up )
+		if(dir == ArpDirection::Up || dir == ArpDirection::Down)
 		{
 			cur_arp_idx = ( cur_frame / arp_frames ) % range;
+			cur_arp_idx /= repeats;
+			if( m_arpCycleModel.value() )
+			{
+				cur_arp_idx *= m_arpCycleModel.value() + 1;
+				cur_arp_idx %= ( range / repeats );
+			}
+			// If direction is ArpDirection::Down the result is inverted
+			if( dir == ArpDirection::Down ){ cur_arp_idx = (range/repeats) - cur_arp_idx - 1; }
 		}
-		else if( dir == ArpDirection::Down )
-		{
-			cur_arp_idx = range - ( cur_frame / arp_frames ) %
-								range - 1;
-		}
-		else if( dir == ArpDirection::UpAndDown && range > 1 )
+		else if( (dir == ArpDirection::UpAndDown || dir == ArpDirection::DownAndUp) && range > 1 )
 		{
 			// imagine, we had to play the arp once up and then
 			// once down -> makes 2 * range possible notes...
 			// because we don't play the lower and upper notes
 			// twice, we have to subtract 2
-			cur_arp_idx = ( cur_frame / arp_frames ) % ( range * 2 - 2 );
-			// if greater than range, we have to play down...
-			// looks like the code for arp_dir==DOWN... :)
-			if( cur_arp_idx >= range )
+			cur_arp_idx = ( cur_frame / arp_frames ) % ( range * 2 - 2 * repeats );
+			cur_arp_idx /= repeats;
+			if( m_arpCycleModel.value() )
 			{
-				cur_arp_idx = range - cur_arp_idx % ( range - 1 ) - 1;
+				cur_arp_idx *= m_arpCycleModel.value() + 1;
+				cur_arp_idx %= ( range / repeats );
 			}
-		}
-		else if( dir == ArpDirection::DownAndUp && range > 1 )
-		{
-			// copied from ArpDirection::UpAndDown above
-			cur_arp_idx = ( cur_frame / arp_frames ) % ( range * 2 - 2 );
+
 			// if greater than range, we have to play down...
-			// looks like the code for arp_dir==DOWN... :)
-			if( cur_arp_idx >= range )
+			if( cur_arp_idx >= range / repeats )
 			{
-				cur_arp_idx = range - cur_arp_idx % ( range - 1 ) - 1;
+				cur_arp_idx = range - cur_arp_idx % ( range - 1 ) - repeats;
 			}
-			// inverts direction
-			cur_arp_idx = range - cur_arp_idx - 1;
+			// If direction is ArpDirDownUp the result is inverted
+			if( dir == ArpDirection::DownAndUp ){ cur_arp_idx = (range/repeats) - cur_arp_idx - 1; }
 		}
-		else if( dir == ArpDirection::Random )
+		else if(dir == ArpDirection::Random)
 		{
-			// just pick a random chord-index
-			cur_arp_idx = (int)( range * ( (float) rand() / (float) RAND_MAX ) );
-		}
+			int randomness = m_arpRandomModel.value();
+			int randRange = range / repeats;
 
-		// Divide cur_arp_idx with wanted repeats. The repeat feature will not affect random notes.
-		cur_arp_idx = static_cast<int>(cur_arp_idx / m_arpRepeatsModel.value());
+			float shape = m_arpRandShapeModel.value();
+			bool isNeg = shape < 0.0f;
+			shape = std::fabs(shape);
+			shape = shape < 1.0f ? 1.0f : shape;
+			float randNumber = 0.0f;
+			if (randomness == ArpRandomBase) // Exponential response (default)
+			{
+				cur_arp_idx = fast_rand() % randRange;
+			}
+			else if (randomness == ArpRandomExp) // Exponential response (default)
+			{
+				randNumber = fastRandf(1.0f);
+				cur_arp_idx = static_cast<int>(randRange * std::pow(randNumber, shape));
+				if (!isNeg){ cur_arp_idx = randRange - cur_arp_idx - 1; }
+			}
+			else if (randomness == ArpRandomNormal) // Normal distribution/inverted normal distribution
+			{
+				for (int count = 0; count < static_cast<int>(shape); count++)
+				{
+					randNumber += fastRandf(1.0f);
+				}
+				randNumber /= shape;
 
-		// Cycle notes
-		if( m_arpCycleModel.value() && dir != ArpDirection::Random )
-		{
-			cur_arp_idx *= m_arpCycleModel.value() + 1;
-			cur_arp_idx %= static_cast<int>( range / m_arpRepeatsModel.value() );
+				if (isNeg){ randNumber += randNumber > 0.5f ? -0.5f : 0.5f; }
+
+				cur_arp_idx = static_cast<int>(randNumber * randRange);
+			}
+			else if (randomness == ArpRandomChase) // Chase - Brownian motion
+			{
+				randNumber = fastRandf(1.0f);
+				float shape2 = fabs(m_arpRandShapeModel.value());
+				int change = static_cast<int>(shape2 - std::round(2 * shape2 * randNumber));
+				cur_arp_idx = m_lastRandomNote + change;
+				if (!isNeg)
+				{
+					// cur_arp_idx = std::clamp(cur_arp_idx, 0, range - 1); // gnu++17
+					cur_arp_idx = std::min(cur_arp_idx, randRange - 1);
+					cur_arp_idx = std::max(cur_arp_idx, 0);
+				}
+				else
+				{
+					cur_arp_idx += cur_arp_idx < 0 ? randRange : 0;
+					cur_arp_idx -= cur_arp_idx > randRange - 1 ? randRange : 0;
+				}
+				m_lastRandomNote = cur_arp_idx;
+			}
 		}
 
 		// now calculate final key for our arp-note
@@ -526,11 +598,13 @@ void InstrumentFunctionArpeggio::saveSettings( QDomDocument & _doc, QDomElement 
 	m_arpRangeModel.saveSettings( _doc, _this, "arprange" );
 	m_arpRepeatsModel.saveSettings( _doc, _this, "arprepeats" );
 	m_arpCycleModel.saveSettings( _doc, _this, "arpcycle" );
+	m_arpRandShapeModel.saveSettings( _doc, _this, "arprandshape" );
 	m_arpSkipModel.saveSettings( _doc, _this, "arpskip" );
 	m_arpMissModel.saveSettings( _doc, _this, "arpmiss" );
 	m_arpTimeModel.saveSettings( _doc, _this, "arptime" );
 	m_arpGateModel.saveSettings( _doc, _this, "arpgate" );
 	m_arpDirectionModel.saveSettings( _doc, _this, "arpdir" );
+	m_arpRandomModel.saveSettings( _doc, _this, "arprand" );
 	m_arpModeModel.saveSettings( _doc, _this, "arpmode" );
 }
 
@@ -544,11 +618,13 @@ void InstrumentFunctionArpeggio::loadSettings( const QDomElement & _this )
 	m_arpRangeModel.loadSettings( _this, "arprange" );
 	m_arpRepeatsModel.loadSettings( _this, "arprepeats" );
 	m_arpCycleModel.loadSettings( _this, "arpcycle" );
+	m_arpRandShapeModel.loadSettings( _this, "arprandshape" );
 	m_arpSkipModel.loadSettings( _this, "arpskip" );
 	m_arpMissModel.loadSettings( _this, "arpmiss" );
 	m_arpTimeModel.loadSettings( _this, "arptime" );
 	m_arpGateModel.loadSettings( _this, "arpgate" );
 	m_arpDirectionModel.loadSettings( _this, "arpdir" );
+	m_arpRandomModel.loadSettings( _this, "arprand" );
 	m_arpModeModel.loadSettings( _this, "arpmode" );
 }
 
