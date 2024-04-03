@@ -160,17 +160,16 @@ void Fader::mousePressEvent(QMouseEvent* mouseEvent)
 void Fader::mouseDoubleClickEvent(QMouseEvent* mouseEvent)
 {
 	bool ok;
-	// TODO: dbV handling
+	// TODO: dbFS handling
 	auto minv = model()->minValue() * m_conversionFactor;
 	auto maxv = model()->maxValue() * m_conversionFactor;
-	float newValue = QInputDialog::getDouble(this, tr("Set value"),
+	float enteredValue = QInputDialog::getDouble(this, tr("Set value"),
 						 tr("Please enter a new value between %1 and %2:").arg(minv).arg(maxv),
-						 model()->getRoundedValue() * m_conversionFactor, minv, maxv, model()->getDigitCount(), &ok)
-		/ m_conversionFactor;
+						 model()->getRoundedValue() * m_conversionFactor, minv, maxv, model()->getDigitCount(), &ok);
 
 	if (ok)
 	{
-		model()->setValue(newValue);
+		model()->setValue(enteredValue / m_conversionFactor);
 	}
 }
 
