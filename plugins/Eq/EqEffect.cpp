@@ -311,45 +311,37 @@ float EqEffect::linearPeakBand(float minF, float maxF, EqAnalyser* fft, int sr)
 
 void EqEffect::setBandPeaks( EqAnalyser *fft, int samplerate )
 {
+	auto computePeakBand = [this, fft, samplerate](FloatModel const & freqModel, FloatModel const & bwModel)
+	{
+		float const freq = freqModel.value();
+		float const bw = bwModel.value();
+
+		return linearPeakBand(freq * (1 - bw * 0.5), freq * (1 + bw * 0.5), fft, samplerate);
+	};
+
 	m_eqControls.m_lowShelfPeakR = m_eqControls.m_lowShelfPeakL =
-			linearPeakBand( m_eqControls.m_lowShelfFreqModel.value()
-					  * ( 1 - m_eqControls.m_lowShelfResModel.value() * 0.5 ),
+			linearPeakBand(m_eqControls.m_lowShelfFreqModel.value()
+					  * (1 - m_eqControls.m_lowShelfResModel.value() * 0.5),
 					  m_eqControls.m_lowShelfFreqModel.value(),
-					  fft , samplerate );
+					  fft , samplerate);
 
 	m_eqControls.m_para1PeakL = m_eqControls.m_para1PeakR =
-			linearPeakBand( m_eqControls.m_para1FreqModel.value()
-					  * ( 1 - m_eqControls.m_para1BwModel.value() * 0.5 ),
-					  m_eqControls.m_para1FreqModel.value()
-					  * ( 1 + m_eqControls.m_para1BwModel.value() * 0.5 ),
-					  fft , samplerate );
+		computePeakBand(m_eqControls.m_para1FreqModel, m_eqControls.m_para1BwModel);
 
 	m_eqControls.m_para2PeakL = m_eqControls.m_para2PeakR =
-			linearPeakBand( m_eqControls.m_para2FreqModel.value()
-					  * ( 1 - m_eqControls.m_para2BwModel.value() * 0.5 ),
-					  m_eqControls.m_para2FreqModel.value()
-					  * ( 1 + m_eqControls.m_para2BwModel.value() * 0.5 ),
-					  fft , samplerate );
+		computePeakBand(m_eqControls.m_para2FreqModel, m_eqControls.m_para2BwModel);
 
 	m_eqControls.m_para3PeakL = m_eqControls.m_para3PeakR =
-			linearPeakBand( m_eqControls.m_para3FreqModel.value()
-					  * ( 1 - m_eqControls.m_para3BwModel.value() * 0.5 ),
-					  m_eqControls.m_para3FreqModel.value()
-					  * ( 1 + m_eqControls.m_para3BwModel.value() * 0.5 ),
-					  fft , samplerate );
+		computePeakBand(m_eqControls.m_para3FreqModel, m_eqControls.m_para3BwModel);
 
 	m_eqControls.m_para4PeakL = m_eqControls.m_para4PeakR =
-			linearPeakBand( m_eqControls.m_para4FreqModel.value()
-					  * ( 1 - m_eqControls.m_para4BwModel.value() * 0.5 ),
-					  m_eqControls.m_para4FreqModel.value()
-					  * ( 1 + m_eqControls.m_para4BwModel.value() * 0.5 ),
-					  fft , samplerate );
+		computePeakBand(m_eqControls.m_para4FreqModel, m_eqControls.m_para4BwModel);
 
 	m_eqControls.m_highShelfPeakL = m_eqControls.m_highShelfPeakR =
-			linearPeakBand( m_eqControls.m_highShelfFreqModel.value(),
+			linearPeakBand(m_eqControls.m_highShelfFreqModel.value(),
 					  m_eqControls.m_highShelfFreqModel.value()
-					  * ( 1 + m_eqControls.m_highShelfResModel.value() * 0.5 ),
-					  fft, samplerate );
+					  * (1 + m_eqControls.m_highShelfResModel.value() * 0.5),
+					  fft, samplerate);
 }
 
 extern "C"
