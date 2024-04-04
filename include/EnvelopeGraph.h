@@ -56,7 +56,7 @@ private:
 private:
 	QPixmap m_envGraph = embed::getIconPixmap("envelope_graph");
 
-	EnvelopeAndLfoParameters* m_params;
+	EnvelopeAndLfoParameters* m_params = nullptr;
 };
 
 } // namespace gui
