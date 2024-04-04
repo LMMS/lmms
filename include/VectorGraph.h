@@ -290,8 +290,8 @@ public:
 	{
 		return "VectorGraphModel";
 	}
-	//virtual void saveSettings(QDomDocument& doc, QDomElement& element, const QString& name); //TODO
-	//virtual void loadSettings(const QDomElement& element, const QString& name); //TODO
+	virtual void saveSettings(QDomDocument& doc, QDomElement& element, const QString& name); //TODO
+	virtual void loadSettings(const QDomElement& element, const QString& name); //TODO
 	virtual void saveSettings(QDomDocument& doc, QDomElement& element);
 	virtual void loadSettings(const QDomElement& element);
 	// read locations from saved data attributes
