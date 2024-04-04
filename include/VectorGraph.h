@@ -144,7 +144,7 @@ protected slots:
 	void removeAutomation();
 	void removeController();
 private:
-	void paintGraph(QPainter* pIn, unsigned int locationIn);
+	void paintGraph(QPainter* pIn, unsigned int locationIn, std::vector<int>* alreadyUpdatedDataArraysIn);
 	void paintEditing(QPainter* pIn);
 
 	void modelChanged() override;
@@ -290,8 +290,8 @@ public:
 	{
 		return "VectorGraphModel";
 	}
-	virtual void saveSettings(QDomDocument& doc, QDomElement& element, const QString& name); //TODO
-	virtual void loadSettings(const QDomElement& element, const QString& name); //TODO
+	virtual void saveSettings(QDomDocument& doc, QDomElement& element, const QString& name);
+	virtual void loadSettings(const QDomElement& element, const QString& name);
 	virtual void saveSettings(QDomDocument& doc, QDomElement& element);
 	virtual void loadSettings(const QDomElement& element);
 	// read locations from saved data attributes
@@ -446,6 +446,7 @@ public:
 	std::vector<float> getValues(unsigned int countIn, bool* isChangedOut, std::shared_ptr<std::vector<unsigned int>> updatingValuesOut);
 	// returns m_bakedValues without updating
 	std::vector<float> getLastValues();
+	std::vector<int> getEffectorArrayLocations();
 
 
 	// set: -------------------
@@ -506,7 +507,7 @@ private:
 			m_automatedEffectedAttribLocations = 0;
 
 			m_effectOnlyPoints = false;
-			m_effectAdd = true;
+			m_effectAdd = false;
 			m_effectSubtract = false;
 			m_effectMultiply = false;
 			m_effectDivide = false;
@@ -530,7 +531,7 @@ private:
 			m_automatedEffectedAttribLocations = 0;
 
 			m_effectOnlyPoints = false;
-			m_effectAdd = true;
+			m_effectAdd = false;
 			m_effectSubtract = false;
 			m_effectMultiply = false;
 			m_effectDivide = false;
