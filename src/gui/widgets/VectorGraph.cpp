@@ -1734,6 +1734,7 @@ void VectorGraphModel::saveSettings(QDomDocument& doc, QDomElement& element)
 			// saving the FloatModels
 			for (unsigned int j = 0; j < automationModels->size(); j++)
 			{
+				qDebug("saveSettings saved automatinModel %d, %d", i, j);
 				QString readLocationB = QString::number(j) + "-";
 				automationModels->operator[](j)->saveSettings(doc, me, readLocation + readLocationB + "AutomationModel");
 			}
@@ -1755,25 +1756,47 @@ void VectorGraphModel::saveSettings(QDomDocument& doc, QDomElement& element)
 void VectorGraphModel::loadSettings(const QDomElement& element)
 {
 	QDomNode node = element.namedItem("VectorGraphModel");
-	qDebug("loadSettings");
+
 	/*
-	if (node.hasAttributes("DataArrayCount") == true)
+	if(node.isNull() ||
+		node.isElement() &&
+		node.toElement().hasAttribute("VectorGraphModel") &&
+		node.toElement().attribute("VectorGraphModel") != name)
+	{
+		for(QDomElement othernode = element.firstChildElement();
+			!othernode.isNull();
+			othernode = othernode.nextSiblingElement())
+		{
+			if((!othernode.hasAttribute("VectorGraphModel") &&
+				othernode.nodeName() == name) ||
+				othernode.attribute("VectorGraphModel") == name)
+			{
+				node = othernode;
+				break;
+			}
+		}
+	}
+	*/
+
+	QDomElement curElement = node.toElement();
+	qDebug("loadSettings");
+	if (curElement.hasAttribute("DataArrayCount") == true)
 	{
 		qDebug("loadSettings 2");
-		unsigned int loadSize = node.attributes("DataArrayCount").toInt();
+		unsigned int loadSize = curElement.attribute("DataArrayCount").toInt();
 		for (unsigned int i = 0; i < loadSize; i++)
 		{
 			qDebug("loadSettings 3");
 			QString readLocation = "a" + QString::number(i) + "-";
-			if (i < m_dataArrays.size() && node.hasAttribute(readLocation + "DataArraySize") == true)
+			if (i < m_dataArrays.size() && curElement.hasAttribute(readLocation + "DataArraySize") == true)
 			{
-				unsigned int dataArraySize = node.attributes(readLocation + "DataArraySize").toInt();
-				unsigned int automationSize = node.attributes(readLocation + "AutomationSize").toInt();
+				unsigned int dataArraySize = curElement.attribute(readLocation + "DataArraySize").toInt();
+				unsigned int automationSize = curElement.attribute(readLocation + "AutomationSize").toInt();
 				// load m_dataArray
 				if (dataArraySize > 0)
 				{
 					qDebug("loadSettings 4");
-					m_dataArrays[i].loadDataArray(node.attributes(readLocation + "DataArray"), dataArraySize);
+					m_dataArrays[i].loadDataArray(curElement.attribute(readLocation + "DataArray"), dataArraySize);
 				}
 
 				// load automationModelDataArray
@@ -1783,8 +1806,9 @@ void VectorGraphModel::loadSettings(const QDomElement& element)
 					qDebug("loadSettings 5");
 					QString readLocationB = QString::number(j) + "-";
 					FloatModel* curModel = new FloatModel(0.0f, -1.0f, 1.0f, 0.01f, this, QString(), false);
-					curModel->loadSettings(element, readLocation + readLocationB + "AutomationModel");
+					curModel->loadSettings(curElement, readLocation + readLocationB + "AutomationModel");
 					automationModels->push_back(curModel);
+					qDebug("loaded automatinModel %d, %d, size: %ld", i, j, automationModels->size());
 				}
 			}
 			else
@@ -1792,7 +1816,6 @@ void VectorGraphModel::loadSettings(const QDomElement& element)
 				break;
 			}
 		}
-		*/
 		/*
 		if( nodeElement.hasAttribute( "scale_type" ) )
 		{
@@ -1806,7 +1829,7 @@ void VectorGraphModel::loadSettings(const QDomElement& element)
 			}
 		}
 		*/
-	//}
+	}
 }
 /*
 int VectorGraphModel::readLoc(unsigned int startIn, QString dataIn)
@@ -2390,7 +2413,6 @@ std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn, bool* i
 	std::shared_ptr<std::vector<unsigned int>> effectorUpdatingValues = std::make_shared<std::vector<unsigned int>>();
 	std::vector<float> effectorOutput;
 	std::vector<float> outputXLocations(countIn);
-	//m_isDataChanged = true; // TODO DEBUG, delete this line
 	bool isEffected = m_effectorLocation >= 0;
 	if (isEffected == true)
 	{
@@ -2885,29 +2907,27 @@ std::vector<FloatModel*>* VectorGraphDataArray::getAutomationModelArray()
 QString VectorGraphDataArray::getSavedDataArray()
 {
 		QString output;
-		base64::encode((const char *)(&m_dataArray),
+		base64::encode((const char *)(m_dataArray.data()),
 			m_dataArray.size() * sizeof(VectorGraphPoint), output);
 		return output;
 }
 void VectorGraphDataArray::loadDataArray(QString dataIn, unsigned int sizeIn)
 {
 	qDebug("loadDatatArray start");
-//qDebug().nospace() << "loadDataArray: " << qPrintable(dataIn) << "  end";
 	int size = 0;
 	char* dst = 0;
 	base64::decode(dataIn, &dst, &size);
 
-	size = size > sizeIn ? sizeIn : size;
-	m_dataArray.resize(size);
-
-	VectorGraphPoint* points = (VectorGraphPoint*)dst;
-	std::copy(points, points + size, m_dataArray.begin());
-	/*
-	for (unsigned int i = 0; i < size; i++)
+	if (size == sizeIn * sizeof(VectorGraphPoint))
 	{
-		m_dataArray[i] = ((VectorGraphPoint*)dst)[i];
+		m_dataArray.resize(sizeIn);
+
+		VectorGraphPoint* points = (VectorGraphPoint*)dst;
+		for (unsigned int i = 0; i < sizeIn; i++)
+		{
+			m_dataArray[i] = points[i];
+		}
 	}
-	*/
 
 	delete[] dst;
 	qDebug("loadDatatArray end");
