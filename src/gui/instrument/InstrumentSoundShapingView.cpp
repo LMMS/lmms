@@ -52,7 +52,7 @@ InstrumentSoundShapingView::InstrumentSoundShapingView(QWidget* parent) :
 	{
 		m_envLfoViews[i] = new EnvelopeAndLfoView(m_targetsTabWidget);
 		m_targetsTabWidget->addTab(m_envLfoViews[i],
-						tr(InstrumentSoundShaping::targetNames[i][0]), nullptr);
+			tr(InstrumentSoundShaping::targetNames[i][0]), nullptr);
 	}
 
 	mainLayout->addWidget(m_targetsTabWidget, 1);

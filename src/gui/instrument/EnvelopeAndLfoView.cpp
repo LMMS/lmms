@@ -54,7 +54,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 	m_params(nullptr)
 {
 	// Helper lambdas for consistent repeated buiding of certain widgets
-	auto buildKnob = [&](const QString & label, const QString& hintText)
+	auto buildKnob = [&](const QString& label, const QString& hintText)
 	{
 		auto knob = new Knob(KnobType::Bright26, this);
 		knob->setLabel(label);
@@ -138,8 +138,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 	auto random_lfo_btn = buildPixmapButton("random_wave_active", "random_wave_inactive");
 	m_userLfoBtn = buildPixmapButton("usr_wave_active", "usr_wave_inactive");
 
-	connect( m_userLfoBtn, SIGNAL(toggled(bool)),
-				this, SLOT(lfoUserWaveChanged()));
+	connect(m_userLfoBtn, SIGNAL(toggled(bool)), this, SLOT(lfoUserWaveChanged()));
 
 	typesLayout->addWidget(sin_lfo_btn);
 	typesLayout->addWidget(triangle_lfo_btn);
@@ -149,12 +148,12 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 	typesLayout->addWidget(m_userLfoBtn);
 
 	m_lfoWaveBtnGrp = new automatableButtonGroup(this);
-	m_lfoWaveBtnGrp->addButton( sin_lfo_btn );
-	m_lfoWaveBtnGrp->addButton( triangle_lfo_btn );
-	m_lfoWaveBtnGrp->addButton( saw_lfo_btn );
-	m_lfoWaveBtnGrp->addButton( sqr_lfo_btn );
-	m_lfoWaveBtnGrp->addButton( m_userLfoBtn );
-	m_lfoWaveBtnGrp->addButton( random_lfo_btn );
+	m_lfoWaveBtnGrp->addButton(sin_lfo_btn);
+	m_lfoWaveBtnGrp->addButton(triangle_lfo_btn);
+	m_lfoWaveBtnGrp->addButton(saw_lfo_btn);
+	m_lfoWaveBtnGrp->addButton(sqr_lfo_btn);
+	m_lfoWaveBtnGrp->addButton(m_userLfoBtn);
+	m_lfoWaveBtnGrp->addButton(random_lfo_btn);
 
 	QVBoxLayout* knobsAndCheckBoxesLayout  = new QVBoxLayout();
 	lfoLayout->addLayout(knobsAndCheckBoxesLayout);
@@ -168,9 +167,9 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 	m_lfoAttackKnob = buildKnob(tr("ATT"), tr("Attack:"));
 	lfoKnobsLayout->addWidget(m_lfoAttackKnob);
 
-	m_lfoSpeedKnob = new TempoSyncKnob( KnobType::Bright26, this );
-	m_lfoSpeedKnob->setLabel( tr("SPD") );
-	m_lfoSpeedKnob->setHintText( tr("Frequency:"), "");
+	m_lfoSpeedKnob = new TempoSyncKnob(KnobType::Bright26, this);
+	m_lfoSpeedKnob->setLabel(tr("SPD"));
+	m_lfoSpeedKnob->setHintText(tr("Frequency:"), "");
 	lfoKnobsLayout->addWidget(m_lfoSpeedKnob);
 
 	m_lfoAmountKnob = buildKnob(tr("AMT"), tr("Modulation amount:"));
@@ -179,15 +178,15 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 	QVBoxLayout* checkBoxesLayout = new QVBoxLayout();
 	knobsAndCheckBoxesLayout->addLayout(checkBoxesLayout);
 
-	m_x100Cb = new LedCheckBox( tr("FREQ x 100"), this );
+	m_x100Cb = new LedCheckBox(tr("FREQ x 100"), this);
 	m_x100Cb->setToolTip(tr("Multiply LFO frequency by 100"));
 	checkBoxesLayout->addWidget(m_x100Cb);
 
 	m_controlEnvAmountCb = new LedCheckBox(tr("MOD ENV AMOUNT"), this);
-	m_controlEnvAmountCb->setToolTip( tr("Control envelope amount by this LFO") );
+	m_controlEnvAmountCb->setToolTip(tr("Control envelope amount by this LFO"));
 	checkBoxesLayout->addWidget(m_controlEnvAmountCb);
 
-	setAcceptDrops( true );
+	setAcceptDrops(true);
 }
 
 

@@ -70,11 +70,8 @@ void LfoGraph::paintEvent(QPaintEvent*)
 	// Draw the graph background
 	p.drawPixmap(rect(), m_lfoGraph);
 
-	const auto * params = castModel<EnvelopeAndLfoParameters>();
-	if (!params)
-	{
-		return;
-	}
+	const auto* params = castModel<EnvelopeAndLfoParameters>();
+	if (!params) { return; }
 
 	const float amount = params->getLfoAmountModel().value();
 	const float lfoSpeed = params->getLfoSpeedModel().value();
@@ -89,19 +86,19 @@ void LfoGraph::paintEvent(QPaintEvent*)
 	int graph_x_base = 2;
 	int graph_y_base = 3 + LFO_GRAPH_H / 2;
 
-	const float frames_for_graph = SECS_PER_LFO_OSCILLATION *
-				Engine::audioEngine()->baseSampleRate() / 10;
+	const float frames_for_graph =
+		SECS_PER_LFO_OSCILLATION * Engine::audioEngine()->baseSampleRate() / 10;
 
 	const float gray = 1.0 - fabsf(amount);
-	const QColor penColor(static_cast<int>(96 * gray), static_cast<int>(255 - 159 * gray), static_cast<int>(128 - 32 * gray));
+	const auto red = static_cast<int>(96 * gray);
+	const auto green = static_cast<int>(255 - 159 * gray);
+	const auto blue = static_cast<int>(128 - 32 * gray);
+	const QColor penColor(red, green, blue);
 	p.setPen(QPen(penColor, 1.5));
 
 	float osc_frames = oscillationFrames;
 
-	if (x100)
-	{
-		osc_frames *= 100.0f;
-	}
+	if (x100) { osc_frames *= 100.0f; }
 
 	float old_y = 0;
 	for (int x = 0; x <= LFO_GRAPH_W; ++x)
@@ -163,14 +160,8 @@ void LfoGraph::toggleAmountModel()
 {
 	auto* params = castModel<EnvelopeAndLfoParameters>();
 	auto& lfoAmountModel = params->getLfoAmountModel();
-	if (lfoAmountModel.value() < 1.0)
-	{
-		lfoAmountModel.setValue(1.0);
-	}
-	else
-	{
-		lfoAmountModel.setValue(0.0);
-	}
+
+	lfoAmountModel.setValue(lfoAmountModel.value() < 1.0 ? 1.0 : 0.0);
 }
 
 } // namespace gui

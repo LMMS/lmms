@@ -58,7 +58,7 @@ private:
 private:
 	QPixmap m_lfoGraph = embed::getIconPixmap("lfo_graph");
 
-	EnvelopeAndLfoParameters * m_params;
+	EnvelopeAndLfoParameters* m_params;
 
 	float m_randomGraph {0.};
 };
