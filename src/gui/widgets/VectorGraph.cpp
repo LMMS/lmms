@@ -1699,14 +1699,19 @@ int VectorGraphModel::getDataArrayNewId()
 	maxId++;
 	return maxId;
 }
-//void VectorGraphModel::saveSettings(QDomDocument& doc, QDomElement& element, const QString& name)
-void VectorGraphModel::saveSettings(QDomDocument& doc, QDomElement& element)
+void VectorGraphModel::saveSettings(QDomDocument& doc, QDomElement& element, const QString& name)
 {
 	qDebug("saveSettings");
 
 	//bool mustQuote = mustQuoteName(name);
 	//QDomElement me = doc.createElement(QString("VectorGraphModel") : name );
-	QDomElement me = doc.createElement(QString("VectorGraphModel"));
+	QString saveName("VectorGraphModel");
+	if (name.size() > 0)
+	{
+		saveName = name;
+	}
+
+	QDomElement me = doc.createElement(saveName);
 	me.setAttribute("DataArrayCount", static_cast<unsigned int>(m_dataArrays.size()));
 	for (unsigned int i = 0; i < m_dataArrays.size(); i++)
 	{
@@ -1752,31 +1757,30 @@ void VectorGraphModel::saveSettings(QDomDocument& doc, QDomElement& element)
 	//_this.setAttribute( "waveShape", sampleString );
 
 }
-//void VectorGraphModel::loadSettings(const QDomElement& element, const QString& name)
-void VectorGraphModel::loadSettings(const QDomElement& element)
+void VectorGraphModel::loadSettings(const QDomElement& element, const QString& name)
 {
-	QDomNode node = element.namedItem("VectorGraphModel");
+	QString loadName("VectorGraphModel");
+	if (name.size() > 0)
+	{
+		loadName = name;
+	}
 
-	/*
-	if(node.isNull() ||
-		node.isElement() &&
-		node.toElement().hasAttribute("VectorGraphModel") &&
-		node.toElement().attribute("VectorGraphModel") != name)
+	QDomNode node = element.namedItem(loadName);
+
+	if(node.isNull() == true)
 	{
 		for(QDomElement othernode = element.firstChildElement();
 			!othernode.isNull();
 			othernode = othernode.nextSiblingElement())
 		{
-			if((!othernode.hasAttribute("VectorGraphModel") &&
-				othernode.nodeName() == name) ||
-				othernode.attribute("VectorGraphModel") == name)
+			if((!othernode.hasAttribute("DataArrayCount") &&
+				othernode.nodeName() == loadName))
 			{
 				node = othernode;
 				break;
 			}
 		}
 	}
-	*/
 
 	QDomElement curElement = node.toElement();
 	qDebug("loadSettings");
@@ -1830,6 +1834,14 @@ void VectorGraphModel::loadSettings(const QDomElement& element)
 		}
 		*/
 	}
+}
+void VectorGraphModel::saveSettings(QDomDocument& doc, QDomElement& element)
+{
+	saveSettings(doc, element, QString(""));
+}
+void VectorGraphModel::loadSettings(const QDomElement& element)
+{
+	loadSettings(element, QString(""));
 }
 /*
 int VectorGraphModel::readLoc(unsigned int startIn, QString dataIn)
