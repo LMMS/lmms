@@ -114,6 +114,15 @@ public:
 		return m_rFrames;
 	}
 
+	const FloatModel& getPredelayModel() const { return m_predelayModel; }
+	const FloatModel& getAttackModel() const { return m_attackModel; }
+	const FloatModel& getHoldModel() const { return m_holdModel; }
+	const FloatModel& getDecayModel() const { return m_decayModel; }
+	const FloatModel& getSustainModel() const { return m_sustainModel; }
+	const FloatModel& getReleaseModel() const { return m_releaseModel; }
+	const FloatModel& getAmountModel() const { return m_amountModel; }
+	FloatModel& getAmountModel() { return m_amountModel; }
+
 
 public slots:
 	void updateSampleVars();

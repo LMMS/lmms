@@ -27,6 +27,7 @@
 #include <QPainter>
 
 #include "EnvelopeAndLfoView.h"
+#include "EnvelopeGraph.h"
 #include "EnvelopeAndLfoParameters.h"
 #include "SampleLoader.h"
 #include "embed.h"
@@ -68,8 +69,6 @@ const int SUSTAIN_KNOB_X = DECAY_KNOB_X+KNOB_X_SPACING;
 const int RELEASE_KNOB_X = SUSTAIN_KNOB_X+KNOB_X_SPACING;
 const int AMOUNT_KNOB_X = RELEASE_KNOB_X+KNOB_X_SPACING;
 
-const int TIME_UNIT_WIDTH = 40;
-
 const int LFO_GRAPH_X = 6;
 const int LFO_GRAPH_Y = ENV_KNOBS_LBL_Y+14;
 const int LFO_KNOB_Y = LFO_GRAPH_Y-2;
@@ -85,6 +84,8 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	ModelView( nullptr, this ),
 	m_params( nullptr )
 {
+	m_envelopeGraph = new EnvelopeGraph(this);
+	m_envelopeGraph->move(ENV_GRAPH_X, ENV_GRAPH_Y);
 
 	m_predelayKnob = new Knob( KnobType::Bright26, this );
 	m_predelayKnob->setLabel( tr( "DEL" ) );
@@ -221,7 +222,6 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 
 
 	setAcceptDrops( true );
-
 }
 
 
@@ -238,6 +238,7 @@ EnvelopeAndLfoView::~EnvelopeAndLfoView()
 void EnvelopeAndLfoView::modelChanged()
 {
 	m_params = castModel<EnvelopeAndLfoParameters>();
+	m_envelopeGraph->setModel(m_params);
 	m_predelayKnob->setModel( &m_params->m_predelayModel );
 	m_attackKnob->setModel( &m_params->m_attackModel );
 	m_holdKnob->setModel( &m_params->m_holdModel );
@@ -264,18 +265,7 @@ void EnvelopeAndLfoView::mousePressEvent( QMouseEvent * _me )
 		return;
 	}
 
-	if (QRect(ENV_GRAPH_X, ENV_GRAPH_Y, m_envGraph.width(), m_envGraph.height()).contains(_me->pos()))
-	{
-		if( m_params->m_amountModel.value() < 1.0f )
-		{
-			m_params->m_amountModel.setValue( 1.0f );
-		}
-		else
-		{
-			m_params->m_amountModel.setValue( 0.0f );
-		}
-	}
-	else if (QRect(LFO_GRAPH_X, LFO_GRAPH_Y, m_lfoGraph.width(), m_lfoGraph.height()).contains(_me->pos()))
+	if (QRect(LFO_GRAPH_X, LFO_GRAPH_Y, m_lfoGraph.width(), m_lfoGraph.height()).contains(_me->pos()))
 	{
 		if( m_params->m_lfoAmountModel.value() < 1.0f )
 		{
@@ -335,76 +325,10 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 	QPainter p( this );
 	p.setRenderHint( QPainter::Antialiasing );
 
-	// draw envelope-graph
-	p.drawPixmap(ENV_GRAPH_X, ENV_GRAPH_Y, m_envGraph);
 	// draw LFO-graph
 	p.drawPixmap(LFO_GRAPH_X, LFO_GRAPH_Y, m_lfoGraph);
 
 	p.setFont(pointSize(p.font(), 8));
-
-	const float gray_amount = 1.0f - fabsf( m_amountKnob->value<float>() );
-
-	p.setPen( QPen( QColor( static_cast<int>( 96 * gray_amount ),
-				static_cast<int>( 255 - 159 * gray_amount ),
-				static_cast<int>( 128 - 32 * gray_amount ) ),
-									2 ) );
-
-	const QColor end_points_color( 0x99, 0xAF, 0xFF );
-	const QColor end_points_bg_color( 0, 0, 2 );
-
-	const int y_base = ENV_GRAPH_Y + m_envGraph.height() - 3;
-	const int avail_height = m_envGraph.height() - 6;
-	
-	int x1 = static_cast<int>( m_predelayKnob->value<float>() * TIME_UNIT_WIDTH );
-	int x2 = x1 + static_cast<int>( m_attackKnob->value<float>() * TIME_UNIT_WIDTH );
-	int x3 = x2 + static_cast<int>( m_holdKnob->value<float>() * TIME_UNIT_WIDTH );
-	int x4 = x3 + static_cast<int>( ( m_decayKnob->value<float>() *
-						( 1 - m_sustainKnob->value<float>() ) ) * TIME_UNIT_WIDTH );
-	int x5 = x4 + static_cast<int>( m_releaseKnob->value<float>() * TIME_UNIT_WIDTH );
-
-	if( x5 > 174 )
-	{
-		x1 = ( x1 * 174 ) / x5;
-		x2 = ( x2 * 174 ) / x5;
-		x3 = ( x3 * 174 ) / x5;
-		x4 = ( x4 * 174 ) / x5;
-		x5 = ( x5 * 174 ) / x5;
-	}
-	x1 += ENV_GRAPH_X + 2;
-	x2 += ENV_GRAPH_X + 2;
-	x3 += ENV_GRAPH_X + 2;
-	x4 += ENV_GRAPH_X + 2;
-	x5 += ENV_GRAPH_X + 2;
-
-	p.drawLine( x1, y_base, x2, y_base - avail_height );
-	p.fillRect( x1 - 1, y_base - 2, 4, 4, end_points_bg_color );
-	p.fillRect( x1, y_base - 1, 2, 2, end_points_color );
-
-	p.drawLine( x2, y_base - avail_height, x3, y_base - avail_height );
-	p.fillRect( x2 - 1, y_base - 2 - avail_height, 4, 4,
-							end_points_bg_color );
-	p.fillRect( x2, y_base - 1 - avail_height, 2, 2, end_points_color );
-
-	p.drawLine( x3, y_base-avail_height, x4, static_cast<int>( y_base -
-								avail_height +
-				( 1 - m_sustainKnob->value<float>() ) * avail_height ) );
-	p.fillRect( x3 - 1, y_base - 2 - avail_height, 4, 4,
-							end_points_bg_color );
-	p.fillRect( x3, y_base - 1 - avail_height, 2, 2, end_points_color );
-	
-	p.drawLine( x4, static_cast<int>( y_base - avail_height +
-						( 1 - m_sustainKnob->value<float>() ) *
-						avail_height ), x5, y_base );
-	p.fillRect( x4 - 1, static_cast<int>( y_base - avail_height +
-						( 1 - m_sustainKnob->value<float>() ) *
-						avail_height ) - 2, 4, 4,
-							end_points_bg_color );
-	p.fillRect( x4, static_cast<int>( y_base - avail_height +
-						( 1 - m_sustainKnob->value<float>() ) *
-						avail_height ) - 1, 2, 2,
-							end_points_color );
-	p.fillRect( x5 - 1, y_base - 2, 4, 4, end_points_bg_color );
-	p.fillRect( x5, y_base - 1, 2, 2, end_points_color );
 
 	int LFO_GRAPH_W = m_lfoGraph.width() - 3;	// subtract border
 	int LFO_GRAPH_H = m_lfoGraph.height() - 6;	// subtract border

@@ -62,6 +62,7 @@ SET(LMMS_SRCS
 	gui/editors/TrackContainerView.cpp
 
 	gui/instrument/EnvelopeAndLfoView.cpp
+	gui/instrument/EnvelopeGraph.cpp
 	gui/instrument/InstrumentFunctionViews.cpp
 	gui/instrument/InstrumentMidiIOView.cpp
 	gui/instrument/InstrumentTuningView.cpp

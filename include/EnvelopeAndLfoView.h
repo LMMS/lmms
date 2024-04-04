@@ -47,6 +47,7 @@ class Knob;
 class LedCheckBox;
 class PixmapButton;
 class TempoSyncKnob;
+class EnvelopeGraph;
 
 
 
@@ -72,13 +73,13 @@ protected slots:
 
 
 private:
-	QPixmap m_envGraph = embed::getIconPixmap("envelope_graph");
 	QPixmap m_lfoGraph = embed::getIconPixmap("lfo_graph");
 
 	EnvelopeAndLfoParameters * m_params;
 
 
 	// envelope stuff
+	EnvelopeGraph* m_envelopeGraph;
 	Knob * m_predelayKnob;
 	Knob * m_attackKnob;
 	Knob * m_holdKnob;
