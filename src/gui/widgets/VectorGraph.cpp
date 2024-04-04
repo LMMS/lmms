@@ -532,10 +532,11 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 	p.drawLine(0, height() - 1, width() - 1, height() - 1);
 	p.drawLine(0, 0, 0, height() - 1);
 
+	std::vector<int> alreadyUpdatedDataArrays;
 
 	for (unsigned int i = 0; i < model()->getDataArraySize(); i++)
 	{
-		paintGraph(&p, i);
+		paintGraph(&p, i, &alreadyUpdatedDataArrays);
 	}
 
 	paintEditing(&p);
@@ -545,7 +546,7 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 	emit drawn();
 }
 
-void VectorGraphView::paintGraph(QPainter* pIn, unsigned int locationIn)
+void VectorGraphView::paintGraph(QPainter* pIn, unsigned int locationIn, std::vector<int>* alreadyUpdatedDataArraysIn)
 {
 	VectorGraphDataArray* dataArray = model()->getDataArray(locationIn);
 	unsigned int length = dataArray->size();
@@ -553,7 +554,6 @@ void VectorGraphView::paintGraph(QPainter* pIn, unsigned int locationIn)
 	{
 		pIn->setPen(QPen(*dataArray->getLineColor(), 2));
 		pIn->setBrush(QBrush(*dataArray->getLineColor(), Qt::NoBrush));
-
 
 		std::pair<int, int> posA(0, 0);
 		std::pair<int, int> posB(0, 0);
@@ -572,7 +572,31 @@ void VectorGraphView::paintGraph(QPainter* pIn, unsigned int locationIn)
 			}
 			else
 			{
-				dataArrayValues = dataArray->getValues(width());
+				// getting most updated dataArray values
+				// if this dataArray has not been updated by
+				// an other dataArray while paintEvent is happening
+				bool found = false;
+				for (unsigned int j = 0; j < alreadyUpdatedDataArraysIn->size(); j++)
+				{
+					if (locationIn == alreadyUpdatedDataArraysIn->operator[](j))
+					{
+						found = true;
+						break;
+					}
+				}
+				if (found == false)
+				{
+					dataArrayValues = dataArray->getValues(width());
+					std::vector<int> updatedArrays = dataArray->getEffectorArrayLocations();
+					for (unsigned int j = 0; j < updatedArrays.size(); j++)
+					{
+						alreadyUpdatedDataArraysIn->push_back(updatedArrays[j]);
+					}
+				}
+				else
+				{
+					dataArrayValues = dataArray->getLastValues();
+				}
 			}
 
 			qDebug("paint dataArrayValues size: %ld", dataArrayValues.size());
@@ -1746,16 +1770,6 @@ void VectorGraphModel::saveSettings(QDomDocument& doc, QDomElement& element, con
 		}
 	}
 	element.appendChild(me);
-
-	//me.setAttribute("id", ProjectJournal::idToSave( id() ) );
-	//me.setAttribute("value", m_value );
-	//me.setAttribute( "scale_type", m_scaleType == ScaleType::Logarithmic ? "log" : "linear" );
-
-	//QString sampleString;
-	//base64::encode( (const char *)m_wavegraphModel.samples(),
-		//m_wavegraphModel.length() * sizeof(float), sampleString );
-	//_this.setAttribute( "waveShape", sampleString );
-
 }
 void VectorGraphModel::loadSettings(const QDomElement& element, const QString& name)
 {
@@ -1820,19 +1834,6 @@ void VectorGraphModel::loadSettings(const QDomElement& element, const QString& n
 				break;
 			}
 		}
-		/*
-		if( nodeElement.hasAttribute( "scale_type" ) )
-		{
-			if( nodeElement.attribute( "scale_type" ) == "linear" )
-			{
-				setScaleType( ScaleType::Linear );
-			}
-			else if( nodeElement.attribute( "scale_type" ) == "log" )
-			{
-				setScaleType( ScaleType::Logarithmic );
-			}
-		}
-		*/
 	}
 }
 void VectorGraphModel::saveSettings(QDomDocument& doc, QDomElement& element)
@@ -2534,6 +2535,24 @@ std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn, bool* i
 std::vector<float> VectorGraphDataArray::getLastValues()
 {
 	return m_bakedValues;
+}
+std::vector<int> VectorGraphDataArray::getEffectorArrayLocations()
+{
+	std::vector<int> output;
+	int currentLocation = m_effectorLocation;
+	for (unsigned int i = 0; i < m_parent->getDataArraySize(); i++)
+	{
+		if (currentLocation == -1)
+		{
+			break;
+		}
+		else
+		{
+			output.push_back(m_effectorLocation);
+			currentLocation = m_parent->getDataArray(currentLocation)->getEffectorArrayLocation();
+		}
+	}
+	return output;
 }
 
 void VectorGraphDataArray::setDataArray(std::vector<std::pair<float, float>>* dataArrayIn,
@@ -3387,10 +3406,12 @@ std::vector<float> VectorGraphDataArray::processLineTypeArrayRandom(std::vector<
 void VectorGraphDataArray::getUpdatingFromEffector(std::shared_ptr<std::vector<unsigned int>> updatingValuesIn)
 {
 	// Debug testing
+	/*
 	for (unsigned int i = 0; i < updatingValuesIn->size(); i++)
 	{
 		qDebug("getUpdatingFromEffector #1: [%d] -> %d", i, updatingValuesIn->operator[](i));
 	}
+	*/
 	VectorGraphDataArray* effector = m_parent->getDataArray(m_effectorLocation);
 	for (unsigned int i = 0; i < updatingValuesIn->size(); i++)
 	{
