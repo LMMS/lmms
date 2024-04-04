@@ -25,11 +25,12 @@
 #ifndef LMMS_GUI_VECTORGRAPH_H
 #define LMMS_GUI_VECTORGRAPH_H
 
+#include <memory> // smartpointers
+#include <vector>
 #include <QPainterPath>
 #include <QWidget>
 #include <QCursor>
 #include <QMenu>
-#include <vector>
 
 #include "Model.h"
 #include "ModelView.h"

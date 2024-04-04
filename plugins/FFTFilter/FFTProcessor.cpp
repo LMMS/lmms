@@ -26,8 +26,8 @@ FFTProcessor::FFTProcessor(unsigned int bufferSizeIn, bool isThreadedIn, FFTWind
 	m_terminate = true;
 	m_frameFillLoc = 0;
 
-	m_samplesIn.resize(outputSize());
-	m_normSpectrum.resize(outputSize());
+	m_samplesIn.resize(m_blockSize);
+	m_normSpectrum.resize(outputSize(m_blockSize));
 
 	m_in = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * m_blockSize);
 	m_out = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * m_blockSize);
@@ -95,7 +95,7 @@ void FFTProcessor::threadedStartThread(LocklessRingBuffer<sampleFrame>* ringBuff
 		qDebug("analyze threaded  thread init");
 		m_terminate = false;
 		unsigned int blockSize = m_blockSize;
-		m_FFTThread = std::thread(FFTProcessor::threadedAnalyze, &m_terminate, &m_plan, m_out, &m_outputSpectrumChanged, &m_outputSamplesChanged,
+		m_FFTThread = std::thread(FFTProcessor::threadedAnalyze, &m_terminate, &m_plan, m_out, &m_samplesIn, &m_outputSpectrumChanged, &m_outputSamplesChanged,
 			ringBufferIn, sampLocIn, blockSize, &m_normSpectrum, &m_outputAccess);
 		qDebug("analyze threaded  thread running");
 	}
@@ -122,13 +122,14 @@ bool FFTProcessor::getOutputSamplesChanged()
 }
 
 
-void FFTProcessor::threadedAnalyze(std::atomic<bool>* terminateIn, fftwf_plan* planIn, fftwf_complex* complexIn, std::atomic<bool>* spectrumChangedOut, std::atomic<bool>* samplesChangedOut,
+void FFTProcessor::threadedAnalyze(std::atomic<bool>* terminateIn, fftwf_plan* planIn, fftwf_complex* complexIn, std::vector<float>* samplesIn, std::atomic<bool>* spectrumChangedOut, std::atomic<bool>* samplesChangedOut,
 	LocklessRingBuffer<sampleFrame>* ringBufferIn, unsigned int sampLocIn, unsigned int blockSizeIn,
 	std::vector<float>* spectrumOut, std::mutex* outputAccessIn)
 {
 	LocklessRingBufferReader<sampleFrame> reader(*ringBufferIn);
 	
-	std::vector<float> samples(blockSizeIn);
+	//std::vector<float> samples(blockSizeIn);
+	std::vector<float> absSpectrum(blockSizeIn);
 	std::vector<float> outputSpectrum(blockSizeIn);
 	fpp_t frameFillLoc = 0;
 
@@ -140,7 +141,7 @@ void FFTProcessor::threadedAnalyze(std::atomic<bool>* terminateIn, fftwf_plan* p
 			reader.waitForData();
 		}
 
-		auto bufferIn = reader.read_max(ringBufferIn->capacity() / 4);
+		auto bufferIn = reader.read_max(ringBufferIn->capacity());
 		size_t frameCount = bufferIn.size();
 
 		fpp_t frameIn = 0;
@@ -151,7 +152,7 @@ void FFTProcessor::threadedAnalyze(std::atomic<bool>* terminateIn, fftwf_plan* p
 			while (frameIn < frameCount && frameFillLoc < blockSizeIn)
 			{
 			//qDebug("analyzeB 2");
-				samples[frameFillLoc] = bufferIn[frameIn][sampLocIn];
+				samplesIn->operator[](frameFillLoc) = bufferIn[frameIn][sampLocIn];
 				frameIn++;
 				frameFillLoc++;
 			}
@@ -175,11 +176,22 @@ void FFTProcessor::threadedAnalyze(std::atomic<bool>* terminateIn, fftwf_plan* p
 
 			fftwf_execute(*planIn);
 
-			absspec(complexIn, outputSpectrum.data(), (blockSizeIn / 2 + 1));
-			normalize(outputSpectrum, outputSpectrum, blockSizeIn);
+
+			absspec(complexIn, absSpectrum.data(), outputSize(blockSizeIn));
+			normalize(absSpectrum, outputSpectrum, blockSizeIn);
+
+			/*
+			for (unsigned int i = 0; i < blockSizeIn; i++)
+			{
+				qDebug("[%d] %f, %f, %f, - %f, %f", i, complexIn[i][0], complexIn[i][1], samplesIn->operator[](i), absSpectrum[i], outputSpectrum[i]);
+			}
+			*/
 
 			outputAccessIn->lock();
-			*spectrumOut = outputSpectrum;
+			for (unsigned int i = 0; i < outputSize(blockSizeIn); i++)
+			{
+				spectrumOut->operator[](i) = outputSpectrum[i];
+			}
 			outputAccessIn->unlock();
 			*spectrumChangedOut = true;
 		}
@@ -211,9 +223,9 @@ void FFTProcessor::rebuildWindow(FFTWindow FFTWindowIn)
 
 // TODO multithread
 
-unsigned int FFTProcessor::outputSize()
+unsigned int FFTProcessor::outputSize(unsigned int blockSizeIn)
 {
-	return m_blockSize / 2 + 1;
+	return blockSizeIn / 2 + 1;
 }
 
 } // namespace lmms

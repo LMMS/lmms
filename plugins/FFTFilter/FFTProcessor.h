@@ -66,11 +66,11 @@ public:
 
 	void rebuildWindow(FFTWindow FFTWindowIn);
 
-	unsigned int outputSize();
+	static unsigned int outputSize(unsigned int blockSizeIn);
 
 
 private:
-	static void threadedAnalyze(std::atomic<bool>* terminateIn, fftwf_plan* planIn, fftwf_complex* complexIn, std::atomic<bool>* spectrumChangedOut, std::atomic<bool>* samplesChangedOut,
+	static void threadedAnalyze(std::atomic<bool>* terminateIn, fftwf_plan* planIn, fftwf_complex* complexIn, std::vector<float>* samplesIn, std::atomic<bool>* spectrumChangedOut, std::atomic<bool>* samplesChangedOut,
 	LocklessRingBuffer<sampleFrame>* ringBufferIn, unsigned int sampLocIn, unsigned int blockSizeIn,
 	std::vector<float>* spectrumOut, std::mutex* outputAccessIn);
 

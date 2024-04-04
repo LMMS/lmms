@@ -3015,10 +3015,12 @@ void VectorGraphDataArray::swap(unsigned int locationAIn, unsigned int locationB
 			qDebug("swap:    -------");
 			qDebug("first.: %d, second.: %d", locationAIn, locationBIn);
 			
+			/*
 			for (unsigned int i = 0; i < m_dataArray.size(); i++)
 			{
 				qDebug("   - i: %d  -  x: %f", i, m_dataArray[i].m_x);
 			}
+			*/
 			
 			if (locationAIn < locationBIn)
 			{
@@ -3039,11 +3041,13 @@ void VectorGraphDataArray::swap(unsigned int locationAIn, unsigned int locationB
 				m_dataArray[locationBIn] = swap;
 			}
 			
+			/*
 			qDebug(" --------- ");
 			for (unsigned int i = 0; i < m_dataArray.size(); i++)
 			{
 				qDebug("   - i: %d  -  x: %f", i, m_dataArray[i].m_x);
 			}
+			*/
 		}
 		else
 		{
@@ -3209,7 +3213,14 @@ std::vector<float> VectorGraphDataArray::processLineTypeArraySineB(std::vector<f
 	// we have "count" amount of samples and "valB * 100.0f" amount of waves
 	int end = static_cast<int>(std::floor(count / (valB * 100.0f)));
 	//qDebug("sineB_1, %f, %d", (count / (valB * 100.0f)), end);
-	end = end > count ? count : end + 1;
+	if (count <= 0)
+	{
+		end = 0;
+	}
+	else
+	{
+		end = end > count ? count : end + 1;
+	}
 
 	// calculate 1 wave of sine
 	for (unsigned int i = 0; i < end; i++)
