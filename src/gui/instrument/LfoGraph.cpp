@@ -151,10 +151,12 @@ void LfoGraph::paintEvent(QPaintEvent*)
 
 	// Draw the info text
 	int ms_per_osc = static_cast<int>(SECS_PER_LFO_OSCILLATION * lfoSpeed * 1000.0);
-	p.setFont(pointSize(p.font(), 8));
+
+	QFont f = p.font();
+	f.setPixelSize(height() * 0.2);
+	p.setFont(f);
 	p.setPen(QColor(201, 201, 225));
-	p.drawText(4, m_lfoGraph.height() - 6, tr("ms/LFO:"));
-	p.drawText(52, m_lfoGraph.height() - 6, QString::number(ms_per_osc));
+	p.drawText(4, m_lfoGraph.height() - 6, tr("%1 ms/LFO").arg(ms_per_osc));
 }
 
 void LfoGraph::toggleAmountModel()
