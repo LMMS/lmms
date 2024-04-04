@@ -95,13 +95,13 @@ void FFTFilterControls::resetClicked()
 {
 
 }
-void FFTFilterControls::setGraph(std::vector<float>* dataArrayIn)
+void FFTFilterControls::setGraph(std::vector<std::pair<float, float>>* dataArrayIn)
 {
 	if (1 < m_graphModel.getDataArraySize())
 	{
 		qDebug("set graph");
-		// void setDataArray(std::vector<float>* dataArrayIn, bool isCurvedIn, bool clearIn, bool clampIn, bool rescaleIn, bool callDataChangedIn);
-		m_graphModel.getDataArray(1)->setDataArray(dataArrayIn, true, false, true, false, true);
+		// void setDataArray(std::vector<std::pair<float, float>>* dataArrayIn, bool isCurvedIn, bool clearIn, bool clampIn, bool rescaleIn, bool sortIn, bool callDataChangedIn);
+		m_graphModel.getDataArray(1)->setDataArray(dataArrayIn, true, false, false, true, false, true);
 	}
 }
 

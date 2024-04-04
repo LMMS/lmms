@@ -50,33 +50,17 @@ public:
 private:
 
 	bool isNoneInput(sampleFrame* bufferIn, const fpp_t framesIn, const float cutOffIn);
-	/*
-	inline sample_t getCurSample(unsigned int posIn)
-	{
-		if (m_useSecondBufferOut == true)
-		{
-			return m_bufferB[posIn];
-		}
-		else
-		{
-			return m_bufferA[posIn];
-		}
-	}
-	inline void setCurSample(unsigned int posIn, sample_t sampleIn)
-	{
-		if (m_useSecondBufferOut == true)
-		{
-			m_bufferA[posIn] = sampleIn;
-		}
-		else
-		{
-			m_bufferB[posIn] = sampleIn;
-		}
-	}
-*/
+
+	void updateBufferSize(unsigned int newBufferSizeIn);
+
+	void updateSampleRate();
+	void updateGraphXArray(unsigned int sizeIn);
+	float getTransformedX(unsigned int locationIn, unsigned int sizeIn);
+
 
 	FFTFilterControls m_filterControls;
 	FFTProcessor m_FFTProcessor;
+
 
 	//std::vector<sample_t> m_bufferA;
 	//std::vector<sample_t> m_bufferB;
@@ -84,6 +68,10 @@ private:
 
 	LocklessRingBuffer<sampleFrame> m_inputBuffer;
 
+	std::vector<float> graphXArray;
+	unsigned int m_sampleRate;
+
+	unsigned int m_bufferSize;
 
 	friend class FFTFilterControls;
 };

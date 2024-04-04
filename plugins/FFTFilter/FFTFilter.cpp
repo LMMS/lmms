@@ -30,6 +30,7 @@
 #include "embed.h"
 #include "plugin_export.h"
 #include "fft_helpers.h"
+#include "lmms_constants.h"
 
 namespace lmms
 {
@@ -57,9 +58,13 @@ FFTFilterEffect::FFTFilterEffect(Model* parent, const Descriptor::SubPluginFeatu
 	Effect(&FFTFilter_plugin_descriptor, parent, key),
 	m_filterControls(this),
 	m_FFTProcessor(2048, true, FFTWindow::Rectangular),
-	m_inputBuffer(4 * 2048)
+	m_inputBuffer(2048)
 {
 	m_FFTProcessor.threadedStartThread(&m_inputBuffer, 0, true, false);
+	
+	//std::vector<float> graphXArray;
+	//m_sampleRate;
+	updateSampleRate();
 }
 FFTFilterEffect::~FFTFilterEffect()
 {
@@ -91,40 +96,58 @@ bool FFTFilterEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	if (m_FFTProcessor.getOutputSpectrumChanged() == true)
 	{
 		std::vector<float> FFTSpectrumOutput = m_FFTProcessor.getNormSpectrum();
-		std::vector<float> graphInput(20);
+		
+		std::vector<std::pair<float, float>> graphInput(80);
+		if (graphInput.size() != graphXArray.size())
+		{
+			updateGraphXArray(graphInput.size());
+		}
+
 		float avgY = 0;
-		int avgCount = FFTSpectrumOutput.size() / graphInput.size();
+		int avgCount = 5;//FFTSpectrumOutput.size() / graphInput.size();
 		if (avgCount <= 0)
 		{
 			avgCount = 1;
 		}
+		int avgSum = 0;
 		int j = 0;
 		for (unsigned int i = 0; i < FFTSpectrumOutput.size(); i++)
 		{
-			avgY = FFTSpectrumOutput[i];
-			if (i + 1 > (j + 1) * avgCount)
+			avgY = avgY + FFTSpectrumOutput[i];
+			if (i + 1 > avgSum + avgCount)
 			{
-				graphInput[j] = avgY;
+				graphInput[j].second = avgY / static_cast<float>(avgCount);
 				j++;
 				if (j >= graphInput.size())
 				{
 					break;
 				}
 				avgY = 0;
+				avgSum = avgSum + avgCount;
+				avgCount = static_cast<float>(avgCount * 1.4f);
 			}
 		}
+		// log_10(100) = 2  -> 10^2 = 100
 		for (unsigned int i = 0; i < graphInput.size(); i++)
 		{
-			graphInput[i] = graphInput[i] / static_cast<float>(avgCount);
+			graphInput[i].second = FFTSpectrumOutput[i];
+			graphInput[i].first = graphXArray[i];
 		}
 		// DEBUG
+		
 		/*
 		for (unsigned int i = 0; i < FFTSpectrumOutput.size(); i++)
 		{
 			qDebug("FFTFilterEffect: [%d], %f", i, FFTSpectrumOutput[i]);
 		}
 		*/
-		//m_filterControls.setGraph(&graphInput);
+		
+		m_filterControls.setGraph(&graphInput);
+
+		// bin to freq
+		//return getNyquistFreq() * bin_index / binCount();
+		//return getSampleRate() / 2.0f;
+		//return (getSampleRate() / 2.0f) * x / binCount();
 	}
 	//std::vector<float>* output;
 	//for (unsigned int i = 0; i < output->size(); i++)
@@ -133,10 +156,10 @@ bool FFTFilterEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	//}
 	//std::vector<float> testVector = {0.0f, 0.3f, 0.5f, -0.5f, 0.2f};
 	//std::vector<float> testVector = {0.0f, 1.3f, 0.5f, -2.5f, 0.2f};
-	std::vector<float> testVector = {0.0f, 0.1f, 0.5f, 0.7f, 0.5f, 0.2f, 0.1f, -1.0f, -0.1f, -0.1f, 0.2f};
+	//std::vector<float> testVector = {0.0f, 0.1f, 0.5f, 0.7f, 0.5f, 0.2f, 0.1f, -1.0f, -0.1f, -0.1f, 0.2f};
 
 
-	m_filterControls.setGraph(&testVector);
+	//m_filterControls.setGraph(&testVector);
 
 	/*
 	const ValueBuffer* volumeBuf = m_filterControls.m_volumeModel.valueBuffer();
@@ -188,6 +211,45 @@ bool FFTFilterEffect::isNoneInput(sampleFrame* bufferIn, const fpp_t framesIn, c
 		}
 	}
 	return output;
+}
+void FFTFilterEffect::updateBufferSize(unsigned int newBufferSizeIn)
+{
+	m_bufferSize = newBufferSizeIn;
+	// TODO
+}
+
+void FFTFilterEffect::updateSampleRate()
+{
+	m_sampleRate = Engine::audioEngine()->processingSampleRate();
+}
+void FFTFilterEffect::updateGraphXArray(unsigned int sizeIn)
+{
+	updateSampleRate();
+	graphXArray.resize(sizeIn);
+	for (unsigned int i = 0; i < graphXArray.size(); i++)
+	{
+		graphXArray[i] = getTransformedX(i, graphXArray.size());
+		qDebug("updateGraphXArray [%d] %f", i, graphXArray[i]);
+	}
+}
+float FFTFilterEffect::getTransformedX(unsigned int locationIn, unsigned int sizeIn)
+{
+	float freq = (m_sampleRate / 2.0f) * locationIn / sizeIn;
+		// bin to freq
+		//return getNyquistFreq() * bin_index / binCount();
+		//return getSampleRate() / 2.0f;
+		//return (getSampleRate() / 2.0f) * x / binCount();
+
+	float min = std::log10(FRANGE_AUDIBLE_START);
+	float range = std::log10(FRANGE_AUDIBLE_END) - min;
+	freq = (log10(freq) - min) / range;
+
+	/*
+	float min = FRANGE_AUDIBLE_START;
+	float range = FRANGE_AUDIBLE_END - min;
+	freq = (freq - min) / range;
+	*/
+	return freq > 0.0f ? freq : 0.0f;
 }
 
 extern "C"
