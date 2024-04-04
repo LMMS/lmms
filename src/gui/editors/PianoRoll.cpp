@@ -59,7 +59,6 @@
 #include "DetuningHelper.h"
 #include "embed.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
 #include "MidiClip.h"
