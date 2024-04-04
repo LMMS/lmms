@@ -69,6 +69,7 @@ SET(LMMS_SRCS
 	gui/instrument/InstrumentSoundShapingView.cpp
 	gui/instrument/InstrumentTrackWindow.cpp
 	gui/instrument/InstrumentView.cpp
+	gui/instrument/LfoGraph.cpp
 	gui/instrument/PianoView.cpp
 
 	gui/menus/MidiPortMenu.cpp
