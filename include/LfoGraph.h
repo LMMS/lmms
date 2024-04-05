@@ -1,5 +1,5 @@
 /*
- * EnvelopeGraph.h - Displays LFO graphs
+ * LfoGraph.h - Displays LFO graphs
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2024-     Michael Gregorius
@@ -22,8 +22,6 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-
-#pragma once
 
 #ifndef LMMS_GUI_LFO_GRAPH_H
 #define LMMS_GUI_LFO_GRAPH_H
@@ -58,7 +56,7 @@ private:
 private:
 	QPixmap m_lfoGraph = embed::getIconPixmap("lfo_graph");
 
-	EnvelopeAndLfoParameters* m_params;
+	EnvelopeAndLfoParameters* m_params = nullptr;
 
 	float m_randomGraph {0.};
 };

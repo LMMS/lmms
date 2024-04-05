@@ -1,5 +1,5 @@
 /*
- * EnvelopeGraph.cpp - Displays LFO graphs
+ * LfoGraph.cpp - Displays LFO graphs
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2024-     Michael Gregorius
@@ -23,10 +23,10 @@
  *
  */
 
+#include "LfoGraph.h"
+
 #include <QMouseEvent>
 #include <QPainter>
-
-#include "LfoGraph.h"
 
 #include "EnvelopeAndLfoParameters.h"
 #include "Oscillator.h"
@@ -43,8 +43,7 @@ namespace gui
 
 LfoGraph::LfoGraph(QWidget* parent) :
 	QWidget(parent),
-	ModelView(nullptr, this),
-	m_params(nullptr)
+	ModelView(nullptr, this)
 {
 	setFixedSize(m_lfoGraph.size());
 }
@@ -64,7 +63,7 @@ void LfoGraph::mousePressEvent(QMouseEvent* me)
 
 void LfoGraph::paintEvent(QPaintEvent*)
 {
-	QPainter p(this);
+	QPainter p{this};
 	p.setRenderHint(QPainter::Antialiasing);
 
 	// Draw the graph background

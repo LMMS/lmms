@@ -22,10 +22,11 @@
  *
  */
 
+#include "InstrumentSoundShapingView.h"
+
 #include <QLabel>
 #include <QBoxLayout>
 
-#include "InstrumentSoundShapingView.h"
 #include "EnvelopeAndLfoParameters.h"
 #include "EnvelopeAndLfoView.h"
 #include "ComboBox.h"
@@ -40,8 +41,7 @@ namespace lmms::gui
 
 InstrumentSoundShapingView::InstrumentSoundShapingView(QWidget* parent) :
 	QWidget(parent),
-	ModelView(nullptr, this),
-	m_ss(nullptr)
+	ModelView(nullptr, this)
 {
 	QVBoxLayout* mainLayout = new QVBoxLayout(this);
 	mainLayout->setContentsMargins(5, 5, 5, 5);

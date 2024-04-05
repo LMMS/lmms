@@ -56,7 +56,7 @@ private:
 	void modelChanged() override;
 
 
-	InstrumentSoundShaping * m_ss;
+	InstrumentSoundShaping * m_ss = nullptr;
 	TabWidget * m_targetsTabWidget;
 	EnvelopeAndLfoView * m_envLfoViews[InstrumentSoundShaping::NumTargets];
 

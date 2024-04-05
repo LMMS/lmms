@@ -23,8 +23,6 @@
  *
  */
 
-#pragma once
-
 #ifndef LMMS_GUI_ENVELOPE_GRAPH_H
 #define LMMS_GUI_ENVELOPE_GRAPH_H
 
