@@ -153,7 +153,7 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	baseVelocityLayout->setSpacing( 6 );
 
 	m_baseVelocitySpinBox = new LcdSpinBox( 3, baseVelocityGroupBox );
-	m_baseVelocitySpinBox->setLabel( tr( "MIDI VELOCITY" ) );
+	m_baseVelocitySpinBox->setLabel(tr("MIDI VELOCITY"));
 	m_baseVelocitySpinBox->setToolTip(tr("MIDI notes at this velocity correspond to 100% note velocity."));
 	baseVelocityLayout->addWidget( m_baseVelocitySpinBox );
 
