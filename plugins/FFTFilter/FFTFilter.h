@@ -56,6 +56,7 @@ private:
 	void updateSampleRate();
 	void updateGraphXArray(unsigned int sizeIn);
 	float getTransformedX(unsigned int locationIn, unsigned int sizeIn);
+	float amplifyY(float yIn, float powerIn);
 
 
 	FFTFilterControls m_filterControls;
@@ -69,6 +70,7 @@ private:
 	LocklessRingBuffer<sampleFrame> m_inputBuffer;
 
 	std::vector<float> graphXArray;
+	float graphXArraySum;
 	unsigned int m_sampleRate;
 
 	unsigned int m_bufferSize;

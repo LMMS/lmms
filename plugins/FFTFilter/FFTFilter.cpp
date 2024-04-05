@@ -79,7 +79,7 @@ bool FFTFilterEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 {
 	if (!isEnabled() || !isRunning()) { return false ; }
 
-	if (isNoneInput(buf, frames, 0.05f) == true)
+	if (isNoneInput(buf, frames, 0.01f) == true)
 	{
 		//qDebug("FFTFilterEffect return false");
 		return false;
@@ -104,33 +104,34 @@ bool FFTFilterEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		}
 
 		float avgY = 0;
-		int avgCount = 5;//FFTSpectrumOutput.size() / graphInput.size();
+		int avgCount = 0;//FFTSpectrumOutput.size() / graphInput.size();
 		if (avgCount <= 0)
 		{
 			avgCount = 1;
 		}
-		int avgSum = 0;
+		float avgSum = 0;
 		int j = 0;
 		for (unsigned int i = 0; i < FFTSpectrumOutput.size(); i++)
 		{
 			avgY = avgY + FFTSpectrumOutput[i];
-			if (i + 1 > avgSum + avgCount)
+			avgCount++;
+			if (i + 1 > avgSum + graphXArray[j] * FFTSpectrumOutput.size() / graphXArraySum)
 			{
-				graphInput[j].second = avgY / static_cast<float>(avgCount);
-				j++;
+				graphInput[j].second = amplifyY(avgY / static_cast<float>(avgCount), avgCount + 1.0f);
+				qDebug("FFTFiterEffect i: %d, %f", i, graphInput[j].second);
 				if (j >= graphInput.size())
 				{
 					break;
 				}
 				avgY = 0;
-				avgSum = avgSum + avgCount;
-				avgCount = static_cast<float>(avgCount * 1.4f);
+				avgSum = avgSum + graphXArray[j] * FFTSpectrumOutput.size() / graphXArraySum;
+				avgCount = 0;
+				j++;
 			}
 		}
 		// log_10(100) = 2  -> 10^2 = 100
 		for (unsigned int i = 0; i < graphInput.size(); i++)
 		{
-			graphInput[i].second = FFTSpectrumOutput[i];
 			graphInput[i].first = graphXArray[i];
 		}
 		// DEBUG
@@ -226,9 +227,11 @@ void FFTFilterEffect::updateGraphXArray(unsigned int sizeIn)
 {
 	updateSampleRate();
 	graphXArray.resize(sizeIn);
+	graphXArraySum = 0.0f;
 	for (unsigned int i = 0; i < graphXArray.size(); i++)
 	{
 		graphXArray[i] = getTransformedX(i, graphXArray.size());
+		graphXArraySum += graphXArray[i];
 		qDebug("updateGraphXArray [%d] %f", i, graphXArray[i]);
 	}
 }
@@ -250,6 +253,12 @@ float FFTFilterEffect::getTransformedX(unsigned int locationIn, unsigned int siz
 	freq = (freq - min) / range;
 	*/
 	return freq > 0.0f ? freq : 0.0f;
+}
+float FFTFilterEffect::amplifyY(float yIn, float powerIn)
+{
+	float power = std::max(powerIn, 2.0f);
+	return -std::pow(power, -yIn * power) + 1.0f;
+	//return -std::pow(std::abs(yIn - 1.0f), 3.0f) + 1.0f;
 }
 
 extern "C"
