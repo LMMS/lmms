@@ -22,9 +22,11 @@
  *
  */
 
-#include <QLabel>
-
 #include "InstrumentSoundShapingView.h"
+
+#include <QLabel>
+#include <QBoxLayout>
+
 #include "EnvelopeAndLfoParameters.h"
 #include "EnvelopeAndLfoView.h"
 #include "ComboBox.h"
@@ -37,69 +39,54 @@
 namespace lmms::gui
 {
 
-const int TARGETS_TABWIDGET_X = 4;
-const int TARGETS_TABWIDGET_Y = 5;
-const int TARGETS_TABWIDGET_WIDTH = 242;
-const int TARGETS_TABWIDGET_HEIGTH = 175;
-
-const int FILTER_GROUPBOX_X = TARGETS_TABWIDGET_X;
-const int FILTER_GROUPBOX_Y = TARGETS_TABWIDGET_Y+TARGETS_TABWIDGET_HEIGTH+5;
-const int FILTER_GROUPBOX_WIDTH = TARGETS_TABWIDGET_WIDTH;
-const int FILTER_GROUPBOX_HEIGHT = 245-FILTER_GROUPBOX_Y;
-
-
-
-InstrumentSoundShapingView::InstrumentSoundShapingView( QWidget * _parent ) :
-	QWidget( _parent ),
-	ModelView( nullptr, this ),
-	m_ss( nullptr )
+InstrumentSoundShapingView::InstrumentSoundShapingView(QWidget* parent) :
+	QWidget(parent),
+	ModelView(nullptr, this)
 {
-	m_targetsTabWidget = new TabWidget( tr( "TARGET" ), this );
-	m_targetsTabWidget->setGeometry( TARGETS_TABWIDGET_X,
-						TARGETS_TABWIDGET_Y,
-						TARGETS_TABWIDGET_WIDTH,
-						TARGETS_TABWIDGET_HEIGTH );
+	QVBoxLayout* mainLayout = new QVBoxLayout(this);
+	mainLayout->setContentsMargins(5, 5, 5, 5);
 
-	for( int i = 0; i < InstrumentSoundShaping::NumTargets; ++i )
+	m_targetsTabWidget = new TabWidget(tr("TARGET"), this);
+
+	for (int i = 0; i < InstrumentSoundShaping::NumTargets; ++i)
 	{
-		m_envLfoViews[i] = new EnvelopeAndLfoView( m_targetsTabWidget );
-		m_targetsTabWidget->addTab( m_envLfoViews[i],
-						tr( InstrumentSoundShaping::targetNames[i][0] ), 
-                                                nullptr );
+		m_envLfoViews[i] = new EnvelopeAndLfoView(m_targetsTabWidget);
+		m_targetsTabWidget->addTab(m_envLfoViews[i],
+			tr(InstrumentSoundShaping::targetNames[i][0]), nullptr);
 	}
 
-
-	m_filterGroupBox = new GroupBox( tr( "FILTER" ), this );
-	m_filterGroupBox->setGeometry( FILTER_GROUPBOX_X, FILTER_GROUPBOX_Y,
-						FILTER_GROUPBOX_WIDTH,
-						FILTER_GROUPBOX_HEIGHT );
+	mainLayout->addWidget(m_targetsTabWidget, 1);
 
 
-	m_filterComboBox = new ComboBox( m_filterGroupBox );
-	m_filterComboBox->setGeometry( 14, 22, 120, ComboBox::DEFAULT_HEIGHT );
+	m_filterGroupBox = new GroupBox(tr("FILTER"), this);
+	QHBoxLayout* filterLayout = new QHBoxLayout(m_filterGroupBox);
+	QMargins filterMargins = filterLayout->contentsMargins();
+	filterMargins.setTop(18);
+	filterLayout->setContentsMargins(filterMargins);
+
+	m_filterComboBox = new ComboBox(m_filterGroupBox);
+	filterLayout->addWidget(m_filterComboBox);
+
+	m_filterCutKnob = new Knob(KnobType::Bright26, m_filterGroupBox);
+	m_filterCutKnob->setLabel(tr("FREQ"));
+	m_filterCutKnob->setHintText(tr("Cutoff frequency:"), " " + tr("Hz"));
+	filterLayout->addWidget(m_filterCutKnob);
+
+	m_filterResKnob = new Knob(KnobType::Bright26, m_filterGroupBox);
+	m_filterResKnob->setLabel(tr("Q/RESO"));
+	m_filterResKnob->setHintText(tr("Q/Resonance:"), "");
+	filterLayout->addWidget(m_filterResKnob);
+
+	mainLayout->addWidget(m_filterGroupBox);
 
 
-	m_filterCutKnob = new Knob( KnobType::Bright26, m_filterGroupBox );
-	m_filterCutKnob->setLabel( tr( "FREQ" ) );
-	m_filterCutKnob->move( 140, 18 );
-	m_filterCutKnob->setHintText( tr( "Cutoff frequency:" ), " " + tr( "Hz" ) );
-
-
-	m_filterResKnob = new Knob( KnobType::Bright26, m_filterGroupBox );
-	m_filterResKnob->setLabel( tr( "Q/RESO" ) );
-	m_filterResKnob->move( 196, 18 );
-	m_filterResKnob->setHintText( tr( "Q/Resonance:" ), "" );
-
-
-	m_singleStreamInfoLabel = new QLabel( tr( "Envelopes, LFOs and filters are not supported by the current instrument." ), this );
-	m_singleStreamInfoLabel->setWordWrap( true );
+	m_singleStreamInfoLabel = new QLabel(tr("Envelopes, LFOs and filters are not supported by the current instrument."), this);
+	m_singleStreamInfoLabel->setWordWrap(true);
 	// TODO Could also be rendered in system font size...
 	m_singleStreamInfoLabel->setFont(adjustedToPixelSize(m_singleStreamInfoLabel->font(), 10));
+	m_singleStreamInfoLabel->setFixedWidth(242);
 
-	m_singleStreamInfoLabel->setGeometry( TARGETS_TABWIDGET_X,
-						TARGETS_TABWIDGET_Y,
-						TARGETS_TABWIDGET_WIDTH,
-						TARGETS_TABWIDGET_HEIGTH );
+	mainLayout->addWidget(m_singleStreamInfoLabel, 0, Qt::AlignTop);
 }
 
 
