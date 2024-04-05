@@ -1,9 +1,8 @@
 /*
- * CrossoverEQControlDialog.h - A native 4-band Crossover Equalizer 
- * good for simulating tonestacks or simple peakless (flat-band) equalization
+ * EnvelopeGraph.h - Displays envelope graphs
  *
- * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
- * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2024-     Michael Gregorius
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -24,32 +23,44 @@
  *
  */
 
-#ifndef CROSSOVEREQ_CONTROL_DIALOG_H
-#define CROSSOVEREQ_CONTROL_DIALOG_H
+#ifndef LMMS_GUI_ENVELOPE_GRAPH_H
+#define LMMS_GUI_ENVELOPE_GRAPH_H
 
-#include "EffectControlDialog.h"
+#include <QWidget>
+
+#include "ModelView.h"
+#include "embed.h"
 
 namespace lmms
 {
 
-
-class CrossoverEQControls;
-
+class EnvelopeAndLfoParameters;
 
 namespace gui
 {
 
-class CrossoverEQControlDialog : public EffectControlDialog
+class EnvelopeGraph : public QWidget, public ModelView
 {
-	Q_OBJECT
 public:
-	CrossoverEQControlDialog( CrossoverEQControls * controls );
-	~CrossoverEQControlDialog() override = default;
-};
+	EnvelopeGraph(QWidget* parent);
 
+protected:
+	void modelChanged() override;
+
+	void mousePressEvent(QMouseEvent* me) override;
+	void paintEvent(QPaintEvent* pe) override;
+
+private:
+	void toggleAmountModel();
+
+private:
+	QPixmap m_envGraph = embed::getIconPixmap("envelope_graph");
+
+	EnvelopeAndLfoParameters* m_params;
+};
 
 } // namespace gui
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_ENVELOPE_GRAPH_H

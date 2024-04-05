@@ -1,0 +1,31 @@
+# yamllint disable-file rule:line-length
+name: Feature Request
+description: Suggest an idea for the project
+labels:
+  - "enhancement"
+body:
+  - type: textarea
+    id: enhancement-summary
+    attributes:
+      label: Enhancement Summary
+      description: |
+        - Briefly describe the enhancement.
+        - Explain why you believe the proposed enhancement to be a good idea, and (if applicable) how it helps overcome a limitation of LMMS you are currently facing.
+    validations:
+      required: true
+  - type: textarea
+    id: mockup
+    attributes:
+      label: Implementation Details / Mockup
+      description: |
+        - Explain how you believe this enhancement should be implemented.
+        - If your proposal encompasses changes to the user interface, include diagrams displaying your intent.
+    validations:
+      required: true
+  - type: checkboxes
+    id: search-for-existing
+    attributes:
+      label: Please search the issue tracker for existing feature requests before submitting your own.
+      options:
+        - label: I have searched all existing issues and confirmed that this is not a duplicate.
+          required: true

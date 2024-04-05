@@ -49,11 +49,11 @@ QDataStream& operator<< ( QDataStream &out, WaveMipMap &waveMipMap )
 
 QDataStream& operator>> ( QDataStream &in, WaveMipMap &waveMipMap )
 {
-	sample_t sample;
 	for( int tbl = 0; tbl <= MAXTBL; tbl++ )
 	{
 		for( int i = 0; i < TLENS[tbl]; i++ )
 		{
+			sample_t sample;
 			in >> sample;
 			waveMipMap.setSampleAt( tbl, i, sample );
 		}
@@ -67,9 +67,8 @@ void BandLimitedWave::generateWaves()
 // don't generate if they already exist
 	if( s_wavesGenerated ) return;
 
-	int i;
 
-// set wavetable directory
+	// set wavetable directory
 	s_wavetableDir = "data:wavetables/";
 
 // set wavetable files
@@ -89,7 +88,7 @@ void BandLimitedWave::generateWaves()
 	}
 	else
 	{
-		for( i = 0; i <= MAXTBL; i++ )
+		for (int i = 0; i <= MAXTBL; i++)
 		{
 			const int len = TLENS[i];
 			//const double om = 1.0 / len;
@@ -131,7 +130,7 @@ void BandLimitedWave::generateWaves()
 	}
 	else
 	{
-		for( i = 0; i <= MAXTBL; i++ )
+		for (int i = 0; i <= MAXTBL; i++)
 		{
 			const int len = TLENS[i];
 			//const double om = 1.0 / len;
@@ -172,7 +171,7 @@ void BandLimitedWave::generateWaves()
 	}
 	else
 	{
-		for( i = 0; i <= MAXTBL; i++ )
+		for (int i = 0; i <= MAXTBL; i++)
 		{
 			const int len = TLENS[i];
 			//const double om = 1.0 / len;
@@ -215,7 +214,7 @@ void BandLimitedWave::generateWaves()
 	}
 	else
 	{
-		for( i = 0; i <= MAXTBL; i++ )
+		for (int i = 0; i <= MAXTBL; i++)
 		{
 			const int len = TLENS[i];
 

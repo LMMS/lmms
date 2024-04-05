@@ -583,11 +583,12 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 
 	m_selPresetButton->setMenu(menu);
 
+	constexpr int buttonFontSize = 12;
 
 	m_toggleGUIButton = new QPushButton( tr( "Show/hide GUI" ), this );
 	m_toggleGUIButton->setGeometry( 20, 130, 200, 24 );
 	m_toggleGUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
-	m_toggleGUIButton->setFont( pointSize<8>( m_toggleGUIButton->font() ) );
+	m_toggleGUIButton->setFont(adjustedToPixelSize(m_toggleGUIButton->font(), buttonFontSize));
 	connect( m_toggleGUIButton, SIGNAL( clicked() ), this,
 							SLOT( toggleGUI() ) );
 
@@ -596,7 +597,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 		this);
 	note_off_all_btn->setGeometry( 20, 160, 200, 24 );
 	note_off_all_btn->setIcon( embed::getIconPixmap( "stop" ) );
-	note_off_all_btn->setFont( pointSize<8>( note_off_all_btn->font() ) );
+	note_off_all_btn->setFont(adjustedToPixelSize(note_off_all_btn->font(), buttonFontSize));
 	connect( note_off_all_btn, SIGNAL( clicked() ), this,
 							SLOT( noteOffAll() ) );
 
@@ -881,7 +882,7 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 				tr( "No VST plugin loaded" );
 	QFont f = p.font();
 	f.setBold( true );
-	p.setFont( pointSize<10>( f ) );
+	p.setFont(adjustedToPixelSize(f, 10));
 	p.setPen( QColor( 255, 255, 255 ) );
 	p.drawText( 10, 100, plugin_name );
 
@@ -893,7 +894,7 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 	{
 		p.setPen( QColor( 0, 0, 0 ) );
 		f.setBold( false );
-		p.setFont( pointSize<8>( f ) );
+		p.setFont(adjustedToPixelSize(f, 8));
 		p.drawText( 10, 114, tr( "by " ) +
 					m_vi->m_plugin->vendorString() );
 		p.setPen( QColor( 255, 255, 255 ) );
@@ -1053,7 +1054,6 @@ void ManageVestigeInstrumentView::syncPlugin( void )
 	auto paramStr = std::array<char, 35>{};
 	QStringList s_dumpValues;
 	const QMap<QString, QString> & dump = m_vi->m_plugin->parameterDump();
-	float f_value;
 
 	for( int i = 0; i < m_vi->paramCount; i++ )
 	{
@@ -1063,7 +1063,7 @@ void ManageVestigeInstrumentView::syncPlugin( void )
 		{
 			sprintf(paramStr.data(), "param%d", i);
     		s_dumpValues = dump[paramStr.data()].split(":");
-			f_value = LocaleHelper::toFloat(s_dumpValues.at(2));
+			float f_value = LocaleHelper::toFloat(s_dumpValues.at(2));
 			m_vi->knobFModel[ i ]->setAutomatedValue( f_value );
 			m_vi->knobFModel[ i ]->setInitValue( f_value );
 		}

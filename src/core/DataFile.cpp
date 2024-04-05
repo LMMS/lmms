@@ -35,6 +35,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QMessageBox>
+#include <QRegularExpression>
 #include <QSaveFile>
 
 #include "base64.h"
@@ -973,8 +974,7 @@ void DataFile::upgrade_0_4_0_20080622()
 	{
 		QDomElement el = list.item( i ).toElement();
 		QString s = el.attribute( "name" );
-		s.replace( QRegExp( "^Beat/Baseline " ),
-						"Beat/Bassline " );
+		s.replace(QRegularExpression("^Beat/Baseline "), "Beat/Bassline");
 		el.setAttribute( "name", s );
 	}
 }
@@ -1109,7 +1109,7 @@ void DataFile::upgrade_1_1_91()
 	{
 		QDomElement el = list.item( i ).toElement();
 		QString s = el.attribute( "src" );
-		s.replace( QRegExp("/samples/bassloopes/"), "/samples/bassloops/" );
+		s.replace(QRegularExpression("/samples/bassloopes/"), "/samples/bassloops/");
 		el.setAttribute( "src", s );
 	}
 
@@ -1194,12 +1194,11 @@ void DataFile::upgrade_1_2_0_rc3()
 								"pattern" );
 		for( int j = 0; !patterns.item( j ).isNull(); ++j )
 		{
-			int patternLength, steps;
 			QDomElement el = patterns.item( j ).toElement();
 			if( el.attribute( "len" ) != "" )
 			{
-				patternLength = el.attribute( "len" ).toInt();
-				steps = patternLength / 12;
+				int patternLength = el.attribute( "len" ).toInt();
+				int steps = patternLength / 12;
 				el.setAttribute( "steps", steps );
 			}
 		}
@@ -1456,7 +1455,7 @@ void DataFile::upgrade_1_3_0()
 							if(num == 4)
 							{
 								// don't modify port 4, but some other ones:
-								int zoom_port;
+								int zoom_port = 0;
 								if (plugin == "Equalizer5Band")
 									zoom_port = 36;
 								else if (plugin == "Equalizer8Band")

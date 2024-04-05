@@ -40,7 +40,6 @@
 #include "DataFile.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
-#include "gui_templates.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "RemoteZynAddSubFx.h"
@@ -311,7 +310,7 @@ void ZynAddSubFxInstrument::loadFile( const QString & _file )
 		m_pluginMutex.unlock();
 	}
 
-	instrumentTrack()->setName( QFileInfo( _file ).baseName().replace( QRegExp( "^[0-9]{4}-" ), QString() ) );
+	instrumentTrack()->setName(QFileInfo(_file).baseName().replace(QRegularExpression("^[0-9]{4}-"), QString()));
 
 	m_modifiedControllers.clear();
 
@@ -541,7 +540,10 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 	m_toggleUIButton->setCheckable( true );
 	m_toggleUIButton->setChecked( false );
 	m_toggleUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
-	m_toggleUIButton->setFont( pointSize<8>( m_toggleUIButton->font() ) );
+	QFont f = m_toggleUIButton->font();
+	f.setPointSizeF(12);
+	m_toggleUIButton->setFont(f);
+
 	connect( m_toggleUIButton, SIGNAL( toggled( bool ) ), this,
 							SLOT( toggleUI() ) );
 

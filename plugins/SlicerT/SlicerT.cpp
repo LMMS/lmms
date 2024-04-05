@@ -144,8 +144,6 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 			workingBuffer[i + offset][1] *= fadeValue;
 		}
 
-		instrumentTrack()->processAudioBuffer(workingBuffer, frames + offset, handle);
-
 		emit isPlaying(noteDone, sliceStart, sliceEnd);
 	}
 	else { emit isPlaying(-1, 0, 0); }
@@ -200,7 +198,6 @@ void SlicerT::findSlices()
 	int lastPoint = -minDist - 1; // to always store 0 first
 	float spectralFlux = 0;
 	float prevFlux = 1E-10; // small value, no divison by zero
-	float real, imag, magnitude, diff;
 
 	for (int i = 0; i < singleChannel.size() - windowSize; i += windowSize)
 	{
@@ -211,12 +208,12 @@ void SlicerT::findSlices()
 		// calculate spectral flux in regard to last window
 		for (int j = 0; j < windowSize / 2; j++) // only use niquistic frequencies
 		{
-			real = fftOut[j][0];
-			imag = fftOut[j][1];
-			magnitude = std::sqrt(real * real + imag * imag);
+			float real = fftOut[j][0];
+			float imag = fftOut[j][1];
+			float magnitude = std::sqrt(real * real + imag * imag);
 
 			// using L2-norm (euclidean distance)
-			diff = std::sqrt(std::pow(magnitude - prevMags[j], 2));
+			float diff = std::sqrt(std::pow(magnitude - prevMags[j], 2));
 			spectralFlux += diff;
 
 			prevMags[j] = magnitude;

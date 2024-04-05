@@ -30,6 +30,7 @@
 
 #include "ConfigManager.h"
 #include "embed.h"
+#include "InstrumentTrackView.h"
 #include "RenameDialog.h"
 #include "TrackRenameLineEdit.h"
 #include "TrackView.h"
@@ -178,6 +179,16 @@ void TrackLabelButton::mouseReleaseEvent( QMouseEvent *_me )
 }
 
 
+void TrackLabelButton::paintEvent(QPaintEvent* pe)
+{
+	InstrumentTrackView* instrumentTrackView = dynamic_cast<InstrumentTrackView*>(m_trackView);
+	if (instrumentTrackView)
+	{
+		setIcon(instrumentTrackView->determinePixmap());
+	}
+
+	QToolButton::paintEvent(pe);
+}
 
 
 void TrackLabelButton::resizeEvent(QResizeEvent *_re)
