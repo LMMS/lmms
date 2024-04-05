@@ -2797,7 +2797,7 @@ void VectorGraphDataArray::setEffectOnlyPoints(unsigned int locationIn, bool boo
 				getUpdatingFromPoint(locationIn);
 				// if the current point can effect line before it
 				// update the point before it
-				if (getEffectOnlyPoints(locationIn) == false && locationIn > 0)
+				if (getEffectedAttribLocation(locationIn) <= 0&& locationIn > 0)
 				{
 					getUpdatingFromPoint(locationIn - 1);
 				}
@@ -3082,58 +3082,58 @@ float VectorGraphDataArray::processCurve(float valueBeforeIn, float valueAfterIn
 	return output;
 }
 
-float VectorGraphDataArray::processEffect(float attribValueIn, unsigned int attribLocationIn, float effectValueIn,
-	VectorGraphDataArray* effectArrayIn, unsigned int effectLocationIn)
+float VectorGraphDataArray::processEffect(unsigned int locationIn, float attribValueIn,
+	unsigned int attribLocationIn, float effectValueIn)
 {
 	float output = attribValueIn;
-	unsigned int attribLocation = effectArrayIn->getEffectedAttribLocation(effectLocationIn);
+	unsigned int attribLocation = getEffectedAttribLocation(locationIn);
 	// effects
 	if (attribLocationIn == attribLocation)
 	{
-		if (effectArrayIn->getEffect(effectLocationIn, 6) == true)
+		if (getEffect(locationIn, 6) == true)
 		{
 			// sine
 			output = output + std::sin(effectValueIn * 100.0f);
 		}
-		if (effectArrayIn->getEffect(effectLocationIn, 4) == true)
+		if (getEffect(locationIn, 4) == true)
 		{
 			// power
 			output = std::pow(output, effectValueIn);
 		}
-		else if (effectArrayIn->getEffect(effectLocationIn, 5) == true)
+		else if (getEffect(locationIn, 5) == true)
 		{
 			// log
 			output = std::log(output) / std::log(effectValueIn);
 		}
 
-		if (effectArrayIn->getEffect(effectLocationIn, 2) == true)
+		if (getEffect(locationIn, 2) == true)
 		{
 			// multiply
 			output = output * 5.0f * effectValueIn;
 		}
-		else if (effectArrayIn->getEffect(effectLocationIn, 3) == true)
+		else if (getEffect(locationIn, 3) == true)
 		{
 			output = output / 5.0f / effectValueIn;
 			// divide
 		}
 
-		if (effectArrayIn->getEffect(effectLocationIn, 0) == true)
+		if (getEffect(locationIn, 0) == true)
 		{
 			// add
 			output += effectValueIn;
 		}
-		else if (effectArrayIn->getEffect(effectLocationIn, 1) == true)
+		else if (getEffect(locationIn, 1) == true)
 		{
 			// subtract
 			output -= effectValueIn;
 		}
 
-		if (effectArrayIn->getEffect(effectLocationIn, 7) == true)
+		if (getEffect(locationIn, 7) == true)
 		{
 			// clamp lower
 			output = std::max(effectValueIn, output);
 		}
-		else if (effectArrayIn->getEffect(effectLocationIn, 8) == true)
+		else if (getEffect(locationIn, 8) == true)
 		{
 			// clamp upper
 			output = std::min(effectValueIn, output);
@@ -3684,13 +3684,13 @@ void VectorGraphDataArray::getValuesUpdateLines(VectorGraphDataArray* effectorIn
 	float curValA = processAutomation(m_dataArray[m_needsUpdating[iIn]].m_valA, m_needsUpdating[iIn], 2);
 	float curValB = processAutomation(m_dataArray[m_needsUpdating[iIn]].m_valB, m_needsUpdating[iIn], 3);
 qDebug("getValuesD6.3, effectorDataInSize: %ld", effectorDataIn->size());
-	if (effectorIn != nullptr && effectorIn->getEffectOnlyPoints(effectorDataIn->operator[](iIn).first) == true)
+	if (effectorIn != nullptr && getEffectOnlyPoints(m_needsUpdating[iIn]) == true)
 	{
 qDebug("getValuesD6.5");
-		curY = processEffect(curY, 0, curEffectY, effectorIn, effectorDataIn->operator[](iIn).first);
-		curC = processEffect(curC, 1, curEffectY, effectorIn, effectorDataIn->operator[](iIn).first);
-		curValA = processEffect(curValA, 2, curEffectY, effectorIn, effectorDataIn->operator[](iIn).first);
-		curValB = processEffect(curValB, 3, curEffectY, effectorIn, effectorDataIn->operator[](iIn).first);
+		curY = processEffect(m_needsUpdating[iIn], curY, 0, curEffectY);
+		curC = processEffect(m_needsUpdating[iIn], curC, 1, curEffectY);
+		curValA = processEffect(m_needsUpdating[iIn], curValA, 2, curEffectY);
+		curValB = processEffect(m_needsUpdating[iIn], curValB, 3, curEffectY);
 	}
 qDebug("getValuesD7");
 	int start = effectYLocation;
@@ -3705,14 +3705,15 @@ qDebug("getValuesD7");
 		end = effectYLocation;
 		nextY = processAutomation(m_dataArray[m_needsUpdating[iIn] + 1].m_y, m_needsUpdating[iIn] + 1, 0);
 
-		// if the effector point effecting the current point can only effect points (and not lines)
-		// and the effector point effecting the next point can only effect points
+		// if the current point can only be effected (and not its line)
+		// and the next point can only be effected
 		// this is done to avoid adding effectorOutputIn to the line and to the next point (line's end point) at the same time
-		if (effectorIn != nullptr && effectorIn->getEffectOnlyPoints(effectorDataIn->operator[](iIn).first) == true &&
-			effectorIn->getEffectOnlyPoints(effectorDataIn->operator[](iIn).second) == true)
+		if (effectorIn != nullptr && getEffectOnlyPoints(m_needsUpdating[iIn] + 1) == true &&
+			((getEffectOnlyPoints(m_needsUpdating[iIn]) == true && isEffectedPoint(m_needsUpdating[iIn]) == true) ||
+			isEffectedPoint(m_needsUpdating[iIn]) == false))
 		{
 			nextEffectY = effectorOutputIn->operator[](effectYLocation);
-			nextY = processEffect(nextY, 0, nextEffectY, effectorIn, effectorDataIn->operator[](iIn).second);
+			nextY = processEffect(m_needsUpdating[iIn] + 1, nextY, 0, nextEffectY);
 		}
 	}
 	// calculating line ends
@@ -3816,7 +3817,7 @@ qDebug("getValuesD8 [%d] start: %d, end: %d, type: %d,      ---       %f, %f, %f
 			m_bakedValues[j] = m_bakedValues[j] + lineTypeOutput[j - start];
 		}
 	}
-	if (effectorIn != nullptr && effectorIn->getEffectOnlyPoints(effectorDataIn->operator[](iIn).first) == false)
+	if (effectorIn != nullptr && getEffectOnlyPoints(m_needsUpdating[iIn]) == false)
 	{
 		int startB = iIn == 0 ? 0 : start;
 		int endB = iIn >= m_dataArray.size() - 1 ? m_bakedValues.size() : end;
@@ -3824,7 +3825,7 @@ qDebug("getValuesD8 [%d] start: %d, end: %d, type: %d,      ---       %f, %f, %f
 		// if it is enabled
 		for (int j = startB; j < endB; j++)
 		{
-			m_bakedValues[j] = processEffect(m_bakedValues[j], 0, effectorOutputIn->operator[](j), effectorIn, effectorDataIn->operator[](iIn).first);
+			m_bakedValues[j] = processEffect(m_needsUpdating[iIn], m_bakedValues[j], 0, effectorOutputIn->operator[](j));
 		}
 	}
 	// clamp
@@ -3848,6 +3849,19 @@ qDebug("getValuesD8 [%d] start: %d, end: %d, type: %d,      ---       %f, %f, %f
 	}
 }
 
+bool VectorGraphDataArray::isEffectedPoint(unsigned int locationIn)
+{
+	bool output = false;
+	for (unsigned int i = 0; i <= 8; i++)
+	{
+		if (getEffect(locationIn, i) == true)
+		{
+			output = true;
+			break;
+		}
+	}
+	return output;
+}
 void VectorGraphDataArray::formatDataArrayEndPoints()
 {
 	if (m_isFixedEndPoints == true && m_dataArray.size() > 0)

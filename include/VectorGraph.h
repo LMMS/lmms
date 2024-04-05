@@ -601,8 +601,7 @@ private:
 	// returns the curve value at a given x coord
 	float processCurve(float valueBeforeIn, float valueAfterIn, float curveIn, float xIn);
 	// applys the effect on a given value, does clamp
-	float processEffect(float attribValueIn, unsigned int attribLocationIn, float effectValueIn,
-		VectorGraphDataArray* effectArrayIn, unsigned int effectLocationIn);
+	float processEffect(unsigned int locationIn, float attribValueIn, unsigned int attribLocationIn, float effectValueIn);
 	// returns a VectorGraphPoint with modified attributes
 	float processAutomation(float attribValueIn, unsigned int locationIn, unsigned int attribLocationIn);
 
@@ -647,6 +646,7 @@ private:
 	void getValuesLocations(VectorGraphDataArray* effectorIn, std::vector<std::pair<unsigned int, unsigned int>>* effectorDataOut);
 	void getValuesUpdateLines(VectorGraphDataArray* effectorIn, std::vector<float>* effectorOutputIn,
 		std::vector<float>* outputXLocationsIn, std::vector<std::pair<unsigned int, unsigned int>>* effectorDataIn, unsigned int iIn, float stepSizeIn);
+	bool isEffectedPoint(unsigned int locationIn);
 
 	// checks m_isFixedEndPoints, does not call dataChanged()
 	void formatDataArrayEndPoints();
