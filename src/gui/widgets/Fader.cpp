@@ -254,8 +254,17 @@ void Fader::updateTextFloat()
 {
 	if (ConfigManager::inst()->value("app", "displaydbfs").toInt() && m_conversionFactor == 100.0)
 	{
-		s_textFloat->setText(QString("Volume: %1 dBFS").
-				arg(ampToDbfs(model()->value()), 3, 'f', 2));
+		QString label(tr("Volume: %1 dBFS"));
+
+		auto const modelValue = model()->value();
+		if (modelValue <= 0.)
+		{
+			s_textFloat->setText(label.arg("-∞"));
+		}
+		else
+		{
+			s_textFloat->setText(label.arg(ampToDbfs(modelValue), 3, 'f', 2));
+		}
 	}
 	else
 	{
