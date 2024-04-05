@@ -694,9 +694,9 @@ lmms--gui--MixerChannelView QGraphicsView {
 
 /* persistent peak markers for fx peak meters */
 lmms--gui--Fader {
-	qproperty-peakGreen: #0ad45c;
-	qproperty-peakYellow: #d6ec52;
-	qproperty-peakRed: #c12038;
+	qproperty-peakOk: #0ad45c;
+	qproperty-peakWarn: #d6ec52;
+	qproperty-peakClip: #c12038;
 }
 
 lmms--gui--TimeLineWidget {

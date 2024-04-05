@@ -122,9 +122,6 @@ namespace lmms::gui
         soloMuteLayout->addWidget(m_muteButton, 0, Qt::AlignHCenter);
 
         m_fader = new Fader{&mixerChannel->m_volumeModel, tr("Fader %1").arg(channelIndex), this};
-        m_fader->setLevelsDisplayedInDBFS();
-        m_fader->setMinPeak(dbfsToAmp(-42));
-        m_fader->setMaxPeak(dbfsToAmp(9));
 
         m_effectRackView = new EffectRackView{&mixerChannel->m_fxChain, mixerView->m_racksWidget};
         m_effectRackView->setFixedWidth(EffectRackView::DEFAULT_WIDTH);
