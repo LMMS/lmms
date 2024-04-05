@@ -70,10 +70,7 @@ void EnvelopeGraph::modelChanged()
 
 void EnvelopeGraph::mousePressEvent(QMouseEvent* me)
 {
-	if (me->button() == Qt::LeftButton)
-	{
-		toggleAmountModel();
-	}
+	if (me->button() == Qt::LeftButton) { toggleAmountModel(); }
 }
 
 void EnvelopeGraph::paintEvent(QPaintEvent*)
