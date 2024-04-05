@@ -643,9 +643,9 @@ private:
 	// recalculates and sorts m_needsUpdating so
 	// every point is in there only once
 	void getUpdatingOriginals();
-	void getValuesLocations(VectorGraphDataArray* effectorIn, std::vector<std::pair<unsigned int, unsigned int>>* effectorDataOut);
+	//void getValuesLocations(VectorGraphDataArray* effectorIn, std::vector<std::pair<unsigned int, unsigned int>>* effectorDataOut);
 	void getValuesUpdateLines(VectorGraphDataArray* effectorIn, std::vector<float>* effectorOutputIn,
-		std::vector<float>* outputXLocationsIn, std::vector<std::pair<unsigned int, unsigned int>>* effectorDataIn, unsigned int iIn, float stepSizeIn);
+		std::vector<float>* outputXLocationsIn, unsigned int iIn, float stepSizeIn);
 	bool isEffectedPoint(unsigned int locationIn);
 
 	// checks m_isFixedEndPoints, does not call dataChanged()
