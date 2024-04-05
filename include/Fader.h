@@ -119,13 +119,8 @@ private:
 
 	void paintLevels(QPaintEvent* ev, QPainter& painter, bool linear = false);
 
-	int knobPosY() const
-	{
-		float fRange = model()->maxValue() - model()->minValue();
-		float realVal = model()->value() - model()->minValue();
-
-		return height() - ((height() - m_knob.height()) * (realVal / fRange));
-	}
+	int calculateKnobPosYFromModel() const;
+	void setVolumeByLocalPixelValue(int y);
 
 	void setPeak(float fPeak, float& targetPeak, float& persistentPeak, QElapsedTimer& lastPeakTimer);
 
@@ -147,8 +142,8 @@ private:
 
 	bool m_levelsDisplayedInDBFS {true};
 
-	int m_moveStartPoint {-1};
-	float m_startValue {0.};
+	// The dbFS amount after which we drop down to -inf dbFS
+	float const m_faderMinDb {-60.};
 
 	static SimpleTextFloat* s_textFloat;
 

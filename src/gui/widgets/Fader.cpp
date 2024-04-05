@@ -105,18 +105,13 @@ void Fader::contextMenuEvent(QContextMenuEvent* ev)
 
 void Fader::mouseMoveEvent(QMouseEvent* mouseEvent)
 {
-	if (m_moveStartPoint >= 0)
-	{
-		int dy = m_moveStartPoint - mouseEvent->globalY();
+	const int localY = mouseEvent->y();
 
-		float delta = dy * (model()->maxValue() - model()->minValue()) / (float)(height() - (m_knob).height());
+	setVolumeByLocalPixelValue(localY);
 
-		const auto step = model()->step<float>();
-		float newValue = static_cast<float>(static_cast<int>((m_startValue + delta) / step + 0.5)) * step;
-		model()->setValue(newValue);
+	updateTextFloat();
 
-		updateTextFloat();
-	}
+	mouseEvent->accept();
 }
 
 
@@ -134,20 +129,13 @@ void Fader::mousePressEvent(QMouseEvent* mouseEvent)
 			thisModel->saveJournallingState(false);
 		}
 
-		if (mouseEvent->y() >= knobPosY() - (m_knob).height() && mouseEvent->y() < knobPosY())
-		{
-			updateTextFloat();
-			s_textFloat->show();
+		const int localY = mouseEvent->y();
+		setVolumeByLocalPixelValue(localY);
 
-			m_moveStartPoint = mouseEvent->globalY();
-			m_startValue = model()->value();
+		updateTextFloat();
+		s_textFloat->show();
 
-			mouseEvent->accept();
-		}
-		else
-		{
-			m_moveStartPoint = -1;
-		}
+		mouseEvent->accept();
 	}
 	else
 	{
@@ -200,6 +188,64 @@ void Fader::wheelEvent (QWheelEvent* ev)
 	s_textFloat->setVisibilityTimeOut(1000);
 }
 
+
+int Fader::calculateKnobPosYFromModel() const
+{
+	// This method calculates the pixel position where the lower end of
+	// the fader knob should be for the amplification value in the model.
+	//
+	// The following assumes that the model describes an amplification,
+	// i.e. that values are in [0, max] and that 1 is unity, i.e. 0 dbFS.
+
+	auto const minV = model()->minValue();
+	auto const maxV = model()->maxValue();
+	auto const value = model()->value();
+
+	auto const distanceToMin = value - minV;
+
+	// Prevent dbFS calculations with zero or negative values
+	if (distanceToMin <= 0)
+	{
+		return height();
+	}
+	else
+	{
+		auto const maxDb = ampToDbfs(maxV);
+
+		// Make sure that we do not get values less that the minimum fader dbFS
+		// for the calculations that will follow.
+		auto const actualDb = std::max(m_faderMinDb, ampToDbfs(value));
+
+		auto const ratio = (actualDb - m_faderMinDb) / (maxDb - m_faderMinDb);
+
+		// This returns results between:
+		// * m_knob.height()  for a ratio of 1
+		// * height()         for a ratio of 0
+		return height() - (height() - m_knob.height()) * ratio;
+	}
+}
+
+
+void Fader::setVolumeByLocalPixelValue(int y)
+{
+	// The y parameter gives us where the mouse click went.
+	// Assume that the middle of the fader should go there.
+	int const lowerFaderKnob = y + (m_knob.height() / 2);
+
+	auto* m = model();
+	float const maxDb = ampToDbfs(m->maxValue());
+
+	LinearMap<float> map(float(m_knob.height()), maxDb, float(height()), m_faderMinDb);
+
+	float const dbValue = map.map(lowerFaderKnob);
+
+	// Pull everything that's quieter than the minimum fader dbFS value down to 0 amplification.
+	// Otherwise compute the amplification value from the mapped dbFS value but make sure that we
+	// do not exceed the maximum dbValue of the model
+	float ampValue = dbValue < m_faderMinDb ? 0. : dbfsToAmp(std::min(maxDb, dbValue));
+
+	model()->setValue(ampValue);
+}
 
 
 ///
@@ -265,7 +311,7 @@ void Fader::updateTextFloat()
 		s_textFloat->setText(m_description + " " + QString("%1 ").arg(model()->value() * m_conversionFactor) + " " + m_unit);
 	}
 
-	s_textFloat->moveGlobal(this, QPoint(width() + 2, knobPosY() - s_textFloat->height() / 2));
+	s_textFloat->moveGlobal(this, QPoint(width() + 2, calculateKnobPosYFromModel() - s_textFloat->height() / 2));
 }
 
 
@@ -277,7 +323,7 @@ void Fader::paintEvent(QPaintEvent* ev)
 	paintLevels(ev, painter, !m_levelsDisplayedInDBFS);
 
 	// Draw the knob
-	painter.drawPixmap((width() - m_knob.width()) / 2, knobPosY() - m_knob.height(), m_knob);
+	painter.drawPixmap((width() - m_knob.width()) / 2, calculateKnobPosYFromModel() - m_knob.height(), m_knob);
 }
 
 void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)
