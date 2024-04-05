@@ -2437,11 +2437,25 @@ std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn, bool* i
 	}
 	qDebug("getValuesB1, size: %ld    - id: %d", outputXLocations.size(), m_id);
 
-	m_isDataChanged = m_isDataChanged || effectorIsChanged;
+	// deciding if the whole dataArray should be updated
+	// if the whole effectorArray was updated
+	int effectedCount = 0;
+	if (effectorIsChanged == true)
+	{
+		for (unsigned int i = 0; i < m_dataArray.size(); i++)
+		{
+			effectedCount += isEffectedPoint(i) == true? 1 : 0;
+		}
+		if (effectedCount > m_dataArray.size() / 2)
+		{
+			m_isDataChanged = m_isDataChanged || effectorIsChanged;
+		}
+	}
+
 	// updating m_needsUpdating
 	if (m_isDataChanged == false && countIn == m_bakedValues.size())
 	{
-		if (isEffected == true && effectorUpdatingValues->size() > 0)
+		if (isEffected == true && effectorUpdatingValues->size() > 0 && effectedCount > 0)
 		{
 			// effectorUpdatingValues needs to be sorted
 			// before use (in this case it is already sorted)
@@ -2496,26 +2510,28 @@ std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn, bool* i
 		}
 
 		// m_dataArray[i] location in effecor m_dataArray, next location in effecor m_dataArray,
-		std::vector<std::pair<unsigned int, unsigned int>> effectorData;
+		//std::vector<std::pair<unsigned int, unsigned int>> effectorData;
 		VectorGraphDataArray* effector = nullptr;
 		if (m_effectorLocation >= 0 && m_parent->getDataArray(m_effectorLocation)->size() > 0)
 		{
 			effector = m_parent->getDataArray(m_effectorLocation);
 		}
 
-		getValuesLocations(effector, &effectorData);
+		//getValuesLocations(effector, &effectorData);
+		/*
 		for (unsigned int j = 0; j < effectorData.size(); j++)
 		{
 			qDebug("getValuesB6.4, [%d] %d, %d", j, effectorData[j].first, effectorData[j].second);
 		}
+		*/
 		qDebug("getValuesB6, updatingsize: %ld", m_needsUpdating.size());
 
 		// calculate final lines
 		for (unsigned int i = 0; i < m_needsUpdating.size(); i++)
 		{
-			getValuesUpdateLines(effector, &effectorOutput, &outputXLocations, &effectorData, i, stepSize);
+			getValuesUpdateLines(effector, &effectorOutput, &outputXLocations, i, stepSize);
 		}
-		effectorData.clear();
+		//effectorData.clear();
 	}
 
 	*isChangedOut = m_isDataChanged;
@@ -3510,8 +3526,11 @@ void VectorGraphDataArray::getUpdatingFromEffector(std::shared_ptr<std::vector<u
 		// adding the values between locationBefore, locationAfter
 		for (unsigned int j = locationBefore; j <= locationAfter; j++)
 		{
-			qDebug("getUpdatingFromEffector: [%d] -> %d", i, j);
-			m_needsUpdating.push_back(j);
+			if (isEffectedPoint(j) == true)
+			{
+				qDebug("getUpdatingFromEffector: [%d] -> %d", i, j);
+				m_needsUpdating.push_back(j);
+			}
 		}
 		if (i < updatingEnd)
 		{
@@ -3615,6 +3634,7 @@ void VectorGraphDataArray::getUpdatingOriginals()
 	}
 	originalValues.clear();
 }
+/*
 void VectorGraphDataArray::getValuesLocations(VectorGraphDataArray* effectorIn, std::vector<std::pair<unsigned int, unsigned int>>* effectorDataOut)
 {
 	if (effectorIn != nullptr)
@@ -3669,8 +3689,9 @@ qDebug("getValuesC5.3, [%d] set after to: %d", i, curLocation);
 		}
 	}
 }
+*/
 void VectorGraphDataArray::getValuesUpdateLines(VectorGraphDataArray* effectorIn, std::vector<float>* effectorOutputIn,
-	std::vector<float>* outputXLocationsIn, std::vector<std::pair<unsigned int, unsigned int>>* effectorDataIn, unsigned int iIn, float stepSizeIn)
+	std::vector<float>* outputXLocationsIn, unsigned int iIn, float stepSizeIn)
 {
 	qDebug("getValuesD6.1  m_needsUpdating[%d]: %d", iIn, m_needsUpdating[iIn]);
 	unsigned int effectYLocation = static_cast<unsigned int>
@@ -3683,7 +3704,6 @@ void VectorGraphDataArray::getValuesUpdateLines(VectorGraphDataArray* effectorIn
 	float curC = processAutomation(m_dataArray[m_needsUpdating[iIn]].m_c, m_needsUpdating[iIn], 1);
 	float curValA = processAutomation(m_dataArray[m_needsUpdating[iIn]].m_valA, m_needsUpdating[iIn], 2);
 	float curValB = processAutomation(m_dataArray[m_needsUpdating[iIn]].m_valB, m_needsUpdating[iIn], 3);
-qDebug("getValuesD6.3, effectorDataInSize: %ld", effectorDataIn->size());
 	if (effectorIn != nullptr && getEffectOnlyPoints(m_needsUpdating[iIn]) == true)
 	{
 qDebug("getValuesD6.5");
