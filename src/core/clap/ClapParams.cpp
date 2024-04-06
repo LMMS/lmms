@@ -82,7 +82,8 @@ auto ClapParams::rescan(clap_param_rescan_flags flags) -> bool
 	// 1. It is forbidden to use CLAP_PARAM_RESCAN_ALL if the plugin is active
 	if (instance()->isActive() && (flags & CLAP_PARAM_RESCAN_ALL))
 	{
-		logger().log(CLAP_LOG_WARNING, "clap_host_params.recan(CLAP_PARAM_RESCAN_ALL) was called while the plugin is active");
+		logger().log(CLAP_LOG_WARNING, "clap_host_params.recan(CLAP_PARAM_RESCAN_ALL) "
+			"was called while the plugin is active");
 		return false;
 	}
 
@@ -120,7 +121,8 @@ auto ClapParams::rescan(clap_param_rescan_flags flags) -> bool
 			// Parameter was declared twice
 			assert(it != m_paramMap.end());
 			std::string msg = "the parameter with id: " + std::to_string(info.id) + " was declared twice.\n"
-				" 1. name: " + std::string{it->second->info().name} + ", module: " + std::string{it->second->info().module} + "\n"
+				" 1. name: " + std::string{it->second->info().name} + ", module: "
+				+ std::string{it->second->info().module} + "\n"
 				" 2. name: " + std::string{info.name} + ", module: " + std::string{info.module};
 			logger().log(CLAP_LOG_WARNING, msg.c_str());
 			return false; // TODO: continue?
@@ -130,8 +132,9 @@ auto ClapParams::rescan(clap_param_rescan_flags flags) -> bool
 		{
 			if (!(flags & CLAP_PARAM_RESCAN_ALL))
 			{
-				std::string msg = "A new parameter was declared, but the flag CLAP_PARAM_RESCAN_ALL was not specified; "
-					"id: " + std::to_string(info.id) + ", name: " + std::string{info.name} + ", module: " + std::string{info.module};
+				std::string msg = "A new parameter was declared, but the flag CLAP_PARAM_RESCAN_ALL "
+					"was not specified; id: " + std::to_string(info.id)
+					+ ", name: " + std::string{info.name} + ", module: " + std::string{info.module};
 				logger().log(CLAP_LOG_WARNING, msg.c_str());
 				return false; // TODO: continue?
 			}
@@ -155,16 +158,18 @@ auto ClapParams::rescan(clap_param_rescan_flags flags) -> bool
 			{
 				if (!rescanMayInfoChange(flags))
 				{
-					std::string msg = "a parameter's info did change, but the flag CLAP_PARAM_RESCAN_INFO was not specified; "
-						"id: " + std::to_string(info.id) + ", name: " + std::string{info.name} + ", module: " + std::string{info.module};
+					std::string msg = "a parameter's info did change, but the flag CLAP_PARAM_RESCAN_INFO "
+						"was not specified; id: " + std::to_string(info.id)
+						+ ", name: " + std::string{info.name} + ", module: " + std::string{info.module};
 					logger().log(CLAP_LOG_WARNING, msg.c_str());
 					return false; // TODO: continue?
 				}
 
 				if (!(flags & CLAP_PARAM_RESCAN_ALL) && !it->second->isInfoCriticallyDifferentTo(info))
 				{
-					std::string msg = "a parameter's info has critical changes, but the flag CLAP_PARAM_RESCAN_ALL was not specified; "
-						"id: " + std::to_string(info.id) + ", name: " + std::string{info.name} + ", module: " + std::string{info.module};
+					std::string msg = "a parameter's info has critical changes, but the flag CLAP_PARAM_RESCAN_ALL "
+						"was not specified; id: " + std::to_string(info.id)
+						+ ", name: " + std::string{info.name} + ", module: " + std::string{info.module};
 					logger().log(CLAP_LOG_WARNING, msg.c_str());
 					return false; // TODO: continue?
 				}
@@ -178,8 +183,9 @@ auto ClapParams::rescan(clap_param_rescan_flags flags) -> bool
 				{
 					if (!rescanMayValueChange(flags))
 					{
-						std::string msg = "a parameter's value did change but, but the flag CLAP_PARAM_RESCAN_VALUES was not specified; "
-							"id: " + std::to_string(info.id) + ", name: " + std::string{info.name} + ", module: " + std::string{info.module};
+						std::string msg = "a parameter's value did change but, but the flag "
+							"CLAP_PARAM_RESCAN_VALUES was not specified; id: " + std::to_string(info.id)
+							+ ", name: " + std::string{info.name} + ", module: " + std::string{info.module};
 						logger().log(CLAP_LOG_WARNING, msg.c_str());
 						return false; // TODO: continue?
 					}
@@ -205,8 +211,10 @@ auto ClapParams::rescan(clap_param_rescan_flags flags) -> bool
 			if (!(flags & CLAP_PARAM_RESCAN_ALL))
 			{
 				const auto& info = it->second->info();
-				std::string msg = "a parameter was removed, but the flag CLAP_PARAM_RESCAN_ALL was not specified; "
-					"id: " + std::to_string(info.id) + ", name: " + std::string{info.name} + ", module: " + std::string{info.module};
+				std::string msg = "a parameter was removed, but the flag CLAP_PARAM_RESCAN_ALL "
+					"was not specified; id: " + std::to_string(info.id)
+					+ ", name: " + std::string{info.name}
+					+ ", module: " + std::string{info.module};
 				logger().log(CLAP_LOG_WARNING, msg.c_str());
 				return false;
 			}
@@ -245,7 +253,8 @@ void ClapParams::idle()
 			const auto it = m_paramMap.find(paramId);
 			if (it == m_paramMap.end())
 			{
-				std::string msg = "Plugin produced a CLAP_EVENT_PARAM_SET with an unknown param id: " + std::to_string(paramId);
+				std::string msg = "Plugin produced a CLAP_EVENT_PARAM_SET with an unknown param id: "
+					+ std::to_string(paramId);
 				logger().log(CLAP_LOG_WARNING, msg.c_str());
 				return;
 			}
@@ -268,6 +277,38 @@ void ClapParams::processEnd()
 	m_pluginToHostValueQueue.producerDone();
 }
 
+void ClapParams::saveParamConnections(QDomDocument& doc, QDomElement& elem)
+{
+	auto models = doc.createElement("automated_models");
+	elem.appendChild(models);
+
+	for (auto& param : m_params)
+	{
+		assert(param != nullptr);
+		const auto model = param->model();
+		if (!model || !model->isAutomatedOrControlled()) { continue; }
+
+		// TODO: Add method to AutomatableModel which only saves automation / controls?
+		model->saveSettings(doc, models, QString::fromUtf8(param->id().data(), param->id().size()));
+	}
+}
+
+void ClapParams::loadParamConnections(const QDomElement& elem)
+{
+	auto models = elem.firstChildElement("automated_models");
+	if (models.isNull()) { return; }
+
+	for (auto& param : m_params)
+	{
+		assert(param != nullptr);
+		const auto model = param->model();
+		if (!model) { continue; }
+
+		// TODO: Add method to AutomatableModel which only loads automation / controls?
+		model->loadSettings(models, QString::fromUtf8(param->id().data(), param->id().size()));
+	}
+}
+
 void ClapParams::flushOnMainThread()
 {
 	assert(ClapThreadCheck::isMainThread());
@@ -275,7 +316,8 @@ void ClapParams::flushOnMainThread()
 
 	if (!supported())
 	{
-		logger().log(CLAP_LOG_WARNING, "Attempted to flush parameters on main thread, but plugin does not support params extension");
+		logger().log(CLAP_LOG_WARNING, "Attempted to flush parameters on main thread, "
+			"but plugin does not support params extension");
 		return;
 	}
 
@@ -395,21 +437,20 @@ void ClapParams::setModels()
 {
 	for (auto param : m_params)
 	{
-		if (param && param->model())
-		{
-			const auto uri = QString::fromUtf8(param->id().data());
+		if (!param || !param->model()) { continue; }
 
-			// Tell plugin when param value changes in host
-			auto updateParam = [this, param]() {
-				setParamValueByHost(*param, param->model()->value<float>());
-			};
+		const auto uri = QString::fromUtf8(param->id().data());
 
-			// This is used for updating input parameters instead of copyModelsFromCore()
-			connect(param->model(), &Model::dataChanged, this, updateParam);
+		// Tell plugin when param value changes in host
+		auto updateParam = [this, param]() {
+			setParamValueByHost(*param, param->model()->value<float>());
+		};
 
-			// Initially assign model value to param value
-			updateParam();
-		}
+		// This is used for updating input parameters instead of copyModelsFromCore()
+		connect(param->model(), &Model::dataChanged, this, updateParam);
+
+		// Initially assign model value to param value
+		updateParam();
 	}
 }
 

@@ -60,6 +60,9 @@ public:
 	void idle();
 	void processEnd();
 
+	void saveParamConnections(QDomDocument& doc, QDomElement& elem);
+	void loadParamConnections(const QDomElement& elem);
+
 	void flushOnMainThread();
 	void generatePluginInputEvents();
 	void handlePluginOutputEvents();

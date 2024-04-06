@@ -162,9 +162,8 @@ public:
 	/*
 		Load/Save
 	*/
-	virtual QString nodeName() const { return "models"; }
-	virtual void saveSettings(class QDomDocument& doc, class QDomElement& that);
-	virtual void loadSettings(const class QDomElement& that);
+	void saveSettings(class QDomDocument& doc, class QDomElement& that);
+	void loadSettings(const class QDomElement& that);
 
 	/*
 		General

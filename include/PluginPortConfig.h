@@ -122,7 +122,7 @@ public:
 	 */
 	void saveSettings(QDomDocument& doc, QDomElement& elem) override;
 	void loadSettings(const QDomElement& elem) override;
-	auto nodeName() const -> QString override { return "portconfig"; }
+	auto nodeName() const -> QString override { return "port_config"; }
 
 signals:
 	void portsChanged();

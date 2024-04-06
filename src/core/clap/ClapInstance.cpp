@@ -42,8 +42,8 @@
 #include "ClapManager.h"
 #include "ClapTransport.h"
 #include "Engine.h"
-#include "MidiEvent.h"
 #include "lmmsversion.h"
+#include "MidiEvent.h"
 
 namespace lmms
 {
@@ -196,6 +196,7 @@ void ClapInstance::saveSettings(QDomDocument& doc, QDomElement& elem)
 	elem.setAttribute("version", "0");
 
 	audioPorts().saveSettings(doc, elem);
+	params().saveParamConnections(doc, elem);
 
 	// The CLAP standard strongly recommends using the state extension
 	//     instead of manually saving parameter values
@@ -215,6 +216,7 @@ void ClapInstance::loadSettings(const QDomElement& elem)
 	[[maybe_unused]] const auto version = elem.attribute("version", "0").toInt();
 
 	audioPorts().loadSettings(elem);
+	params().loadParamConnections(elem);
 
 	// The CLAP standard strongly recommends using the state extension
 	//     instead of manually saving parameter values
@@ -796,6 +798,8 @@ void ClapInstance::clapRequestRestart(const clap_host* host)
 	auto h = detail::ClapExtensionHelper::fromHost(host);
 	if (!h) { return; }
 	h->m_scheduleRestart = true;
+	h->logger().log(CLAP_LOG_DEBUG, ClapThreadCheck::isAudioThread()
+		? "Req. restart on Audio thread" : "Req. restart on Main thread");
 }
 
 void ClapInstance::clapLatencyChanged([[maybe_unused]] const clap_host* host)

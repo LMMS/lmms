@@ -140,12 +140,14 @@ void ClapParameter::setModulation(double v)
 
 auto ClapParameter::getShortInfoString() const -> std::string
 {
-	return "id: " + std::to_string(m_info.id) + ", name: '" + std::string{m_info.name} + "', module: '" + std::string{m_info.module} + "'";
+	return "id: " + std::to_string(m_info.id) + ", name: '" + std::string{m_info.name}
+		+ "', module: '" + std::string{m_info.module} + "'";
 }
 
 auto ClapParameter::getInfoString() const -> std::string
 {
-	return getShortInfoString() + ", min: " + std::to_string(m_info.min_value) + ", max: " + std::to_string(m_info.max_value);
+	return getShortInfoString() + ", min: " + std::to_string(m_info.min_value)
+		+ ", max: " + std::to_string(m_info.max_value);
 }
 
 auto ClapParameter::isInfoEqualTo(const clap_param_info& info) const -> bool

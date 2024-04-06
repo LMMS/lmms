@@ -372,22 +372,18 @@ void ClapAudioPorts::copyBuffersFromCore(const sampleFrame* buffer, fpp_t frames
 			break;
 		case PluginPortConfig::Config::Stereo:
 			// LMMS stereo to CLAP stereo input
-			//logger().log(CLAP_LOG_DEBUG, "LMMS stereo to CLAP stereo input");
 			copyBuffersHostToPlugin<true>(buffer, m_audioInActive->data32, 0, frames);
 			break;
 		case PluginPortConfig::Config::MonoMix:
 			// LMMS stereo downmix to mono for CLAP mono input
-			//logger().log(CLAP_LOG_DEBUG, "LMMS stereo downmix to mono for CLAP mono input");
 			copyBuffersStereoHostToMonoPlugin(buffer, m_audioInActive->data32, 0, frames);
 			break;
 		case PluginPortConfig::Config::LeftOnly:
 			// LMMS left channel to CLAP mono input; LMMS right channel bypassed
-			//logger().log(CLAP_LOG_DEBUG, "LMMS left channel to CLAP mono input; LMMS right channel bypassed");
 			copyBuffersHostToPlugin<false>(buffer, m_audioInActive->data32, 0, frames);
 			break;
 		case PluginPortConfig::Config::RightOnly:
 			// LMMS right channel to CLAP mono input; LMMS left channel bypassed
-			//logger().log(CLAP_LOG_DEBUG, "LMMS right channel to CLAP mono input; LMMS left channel bypassed");
 			copyBuffersHostToPlugin<false>(buffer, m_audioInActive->data32, 1, frames);
 			break;
 	}
@@ -401,25 +397,21 @@ void ClapAudioPorts::copyBuffersToCore(sampleFrame* buffer, fpp_t frames) const
 			break;
 		case PluginPortConfig::Config::Stereo:
 			// CLAP stereo output to LMMS stereo
-			//logger().log(CLAP_LOG_DEBUG, "CLAP stereo output to LMMS stereo");
 			copyBuffersPluginToHost<true>(m_audioOutActive->data32, buffer,
 				m_audioOutActive->constant_mask, 0, frames);
 			break;
 		case PluginPortConfig::Config::MonoMix:
 			// CLAP mono output upmix to stereo for LMMS stereo
-			//logger().log(CLAP_LOG_DEBUG, "CLAP mono output upmix to stereo for LMMS stereo");
 			copyBuffersMonoPluginToStereoHost(m_audioOutActive->data32, buffer,
 				m_audioOutActive->constant_mask, 0, frames);
 			break;
 		case PluginPortConfig::Config::LeftOnly:
 			// CLAP mono output to LMMS left channel
-			//logger().log(CLAP_LOG_DEBUG, "CLAP mono output to LMMS left channel");
 			copyBuffersPluginToHost<false>(m_audioOutActive->data32, buffer,
 				m_audioOutActive->constant_mask, 0, frames);
 			break;
 		case PluginPortConfig::Config::RightOnly:
 			// CLAP mono output to LMMS right channel
-			//logger().log(CLAP_LOG_DEBUG, "CLAP mono output to LMMS right channel");
 			copyBuffersPluginToHost<false>(m_audioOutActive->data32, buffer,
 				m_audioOutActive->constant_mask, 1, frames);
 			break;

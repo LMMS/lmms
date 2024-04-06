@@ -159,7 +159,7 @@ void LinkedModelGroups::saveSettings(QDomDocument& doc, QDomElement& that)
 	LinkedModelGroup* grp0 = getGroup(0);
 	if (grp0)
 	{
-		QDomElement models = doc.createElement(nodeName());
+		QDomElement models = doc.createElement("models");
 		that.appendChild(models);
 		grp0->saveValues(doc, models);
 	}
@@ -171,7 +171,7 @@ void LinkedModelGroups::saveSettings(QDomDocument& doc, QDomElement& that)
 
 void LinkedModelGroups::loadSettings(const QDomElement& that)
 {
-	QDomElement models = that.firstChildElement(nodeName());
+	QDomElement models = that.firstChildElement("models");
 	LinkedModelGroup* grp0;
 	if (!models.isNull() && (grp0 = getGroup(0)))
 	{
