@@ -1623,20 +1623,6 @@ VectorGraphModel::~VectorGraphModel()
 	qDebug("VectorGraphModel dstc end");
 }
 
-unsigned int VectorGraphModel::addArray(std::vector<std::pair<float, float>>* arrayIn, bool isCurvedIn, bool clearIn, bool clampIn, bool rescaleIn, bool sortIn, bool callDataChangedIn)
-{
-	unsigned int location = addArray();
-	m_dataArrays[location].setDataArray(arrayIn, isCurvedIn, clearIn, clampIn, rescaleIn, sortIn, callDataChangedIn);
-	return location;
-}
-
-unsigned int VectorGraphModel::addArray(std::vector<float>* arrayIn, bool isCurvedIn, bool clearIn, bool clampIn, bool rescaleIn, bool callDataChangedIn)
-{
-	unsigned int location = addArray();
-	m_dataArrays[location].setDataArray(arrayIn, isCurvedIn, clearIn, clampIn, rescaleIn, callDataChangedIn);
-	return location;
-}
-
 unsigned int VectorGraphModel::addArray()
 {
 	VectorGraphDataArray tempArray(
@@ -1648,14 +1634,11 @@ unsigned int VectorGraphModel::addArray()
 
 void VectorGraphModel::delArray(unsigned int locationIn)
 {
-	// TODO test
+	qDebug("delArray");
 	std::vector<int> effectorArrayLocations(m_dataArrays.size());
 	for (unsigned int i = locationIn; i < m_dataArrays.size() - 1; i++)
 	{
-		if (m_dataArrays[i].getEffectorArrayLocation() == locationIn)
-		{
-			m_dataArrays[i].setEffectorArrayLocation(-1, false);
-		}
+		//qDebug("copyed [%d] to [%d]", i + 1, i);
 		m_dataArrays[i] = m_dataArrays[i + 1];
 	}
 	m_dataArrays.pop_back();
@@ -1663,7 +1646,11 @@ void VectorGraphModel::delArray(unsigned int locationIn)
 	for (unsigned int i = 0; i < m_dataArrays.size(); i++)
 	{
 		effectorArrayLocations[i] = m_dataArrays[i].getEffectorArrayLocation();
-		if (effectorArrayLocations[i] >= locationIn)
+		if (m_dataArrays[i].getEffectorArrayLocation() == static_cast<int>(locationIn))
+		{
+			effectorArrayLocations[i] = -1;
+		}
+		else if (effectorArrayLocations[i] >= static_cast<int>(locationIn))
 		{
 			effectorArrayLocations[i]--;
 		}
@@ -1674,6 +1661,7 @@ void VectorGraphModel::delArray(unsigned int locationIn)
 	// setting updated locations
 	for (unsigned int i = 0; i < m_dataArrays.size(); i++)
 	{
+		//qDebug("delArray end: set effector location: [%d], %d", i, effectorArrayLocations[i]);
 		m_dataArrays[i].setEffectorArrayLocation(effectorArrayLocations[i], false);
 	}
 	emit dataChanged();

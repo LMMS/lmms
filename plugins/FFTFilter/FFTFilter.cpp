@@ -57,7 +57,7 @@ Plugin::Descriptor PLUGIN_EXPORT FFTFilter_plugin_descriptor =
 FFTFilterEffect::FFTFilterEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
 	Effect(&FFTFilter_plugin_descriptor, parent, key),
 	m_filterControls(this),
-	m_FFTProcessor(2048, true, FFTWindow::Rectangular),
+	m_FFTProcessor(2048, false, FFTWindow::Rectangular),
 	m_inputBuffer(2048),
 	m_outSampleBufferA(2048),
 	m_outSampleBufferB(2048),
@@ -66,7 +66,7 @@ FFTFilterEffect::FFTFilterEffect(Model* parent, const Descriptor::SubPluginFeatu
 	m_complexMultiplier(2048, 1)
 {
 	//m_FFTProcessor.setComplexMultiplier(&m_complexMultiplier);
-	m_FFTProcessor.threadedStartThread(&m_inputBuffer, 0, true, false);
+	//m_FFTProcessor.threadedStartThread(&m_inputBuffer, 0, true, false);
 	
 	//std::vector<float> graphXArray;
 	//m_sampleRate;
@@ -117,7 +117,7 @@ bool FFTFilterEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	}
 	if (m_FFTProcessor.getOutputSpectrumChanged() == true)
 	{
-		std::vector<float> FFTSpectrumOutput = m_FFTProcessor.getNormSpectrum();
+		std::vector<float> FFTSpectrumOutput;// = m_FFTProcessor.getNormSpectrum();
 		
 		std::vector<std::pair<float, float>> graphInput(80);
 		if (graphInput.size() != graphXArray.size())
