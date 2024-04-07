@@ -1686,7 +1686,6 @@ void VectorGraphModel::dataArrayStyleChanged()
 }
 int VectorGraphModel::getDataArrayLocationFromId(int idIn)
 {
-	// TODO needs testing
 	int output = -1;
 	if (idIn >= 0)
 	{
@@ -2225,7 +2224,6 @@ void VectorGraphDataArray::del(unsigned int locationIn)
 	}
 }
 
-// TODO input scaleing values
 void VectorGraphDataArray::formatArray(std::vector<std::pair<float, float>>* dataArrayIn, bool clampIn, bool rescaleIn, bool sortIn, bool callDataChangedIn)
 {
 	if (rescaleIn == true)
@@ -2658,7 +2656,6 @@ unsigned int VectorGraphDataArray::setX(unsigned int locationIn, float xIn)
 			// if getNearestLocation returned a value
 			if (location >= 0)
 			{
-				// slide the new data if the closest data pos is bigger TODO test ifs
 	qDebug("set 3. success, location: %d", targetLocation);
 				if (location < locationIn && isBefore == true)
 				{
