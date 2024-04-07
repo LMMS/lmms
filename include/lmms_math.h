@@ -27,6 +27,7 @@
 
 #include <QtGlobal>
 #include <algorithm>
+#include <cassert>
 #include <cmath>
 #include <cstdint>
 #include <functional>
@@ -270,18 +271,18 @@ static inline float safeDbfsToAmp( float dbfs )
 //! @brief Converts linear amplitude (>0-1.0) to dBFS scale. 
 //! @param amp Linear amplitude, where 1.0 = 0dBFS. ** Must be larger than zero! **
 //! @return Amplitude in dBFS. 
-static inline float ampToDbfs( float amp )
+static inline float ampToDbfs(float amp)
 {
-	return log10f( amp ) * 20.0f;
+	return log10f(amp) * 20.0f;
 }
 
 
 //! @brief Converts dBFS-scale to linear amplitude with 0dBFS = 1.0
 //! @param dbfs The dBFS value to convert. ** Must be a real number - not inf/nan! **
 //! @return Linear amplitude
-static inline float dbfsToAmp( float dbfs )
+static inline float dbfsToAmp(float dbfs)
 {
-	return std::pow(10.f, dbfs * 0.05f );
+	return std::pow(10.f, dbfs * 0.05f);
 }
 
 
@@ -359,6 +360,29 @@ inline void hashCombine(std::size_t& seed, const T& val) noexcept
 {
 	seed ^= std::hash<T>{}(val) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
 }
+
+template <typename T>
+class LinearMap
+{
+public:
+	LinearMap(T x1, T y1, T x2, T y2)
+	{
+		T const dx = x2 - x1;
+		assert (dx != T(0));
+
+		m_a = (y2 - y1) / dx;
+		m_b = y1 - m_a * x1;
+	}
+
+	T map(T x) const
+	{
+		return m_a * x + m_b;
+	}
+
+private:
+	T m_a;
+	T m_b;
+};
 
 } // namespace lmms
 

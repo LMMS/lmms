@@ -25,7 +25,6 @@
 
 #include "TabBar.h"
 #include "TabButton.h"
-#include "gui_templates.h"
 
 
 namespace lmms::gui
@@ -89,8 +88,6 @@ TabButton * TabBar::addTab( QWidget * _w, const QString & _text, int _id,
 		// widgets have the same size and only the one on the top is visible
 		_w->setFixedSize( _w->parentWidget()->size() );
 	}
-
-	b->setFont( pointSize<8>( b->font() ) );
 
 	return( b );
 }

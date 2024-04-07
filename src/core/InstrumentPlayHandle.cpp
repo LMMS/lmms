@@ -46,24 +46,22 @@ void InstrumentPlayHandle::play(sampleFrame * working_buffer)
 
 	// ensure that all our nph's have been processed first
 	auto nphv = NotePlayHandle::nphsOfInstrumentTrack(instrumentTrack, true);
-	
+
 	bool nphsLeft;
 	do
 	{
 		nphsLeft = false;
-		for (const NotePlayHandle * constNotePlayHandle : nphv)
+		for (const auto& handle : nphv)
 		{
-			if (constNotePlayHandle->state() != ThreadableJob::ProcessingState::Done &&
-				!constNotePlayHandle->isFinished())
+			if (handle->state() != ThreadableJob::ProcessingState::Done && !handle->isFinished())
 			{
 				nphsLeft = true;
-				NotePlayHandle * notePlayHandle = const_cast<NotePlayHandle *>(constNotePlayHandle);
-				notePlayHandle->process();
+				const_cast<NotePlayHandle*>(handle)->process();
 			}
 		}
 	}
 	while (nphsLeft);
-	
+
 	m_instrument->play(working_buffer);
 
 	// Process the audio buffer that the instrument has just worked on...

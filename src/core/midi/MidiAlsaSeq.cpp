@@ -78,10 +78,7 @@ MidiAlsaSeq::MidiAlsaSeq() :
 	m_quit( false ),
 	m_portListUpdateTimer( this )
 {
-	int err;
-	if( ( err = snd_seq_open( &m_seqHandle,
-					probeDevice().toLatin1().constData(),
-						SND_SEQ_OPEN_DUPLEX, 0 ) ) < 0 )
+	if (int err = snd_seq_open(&m_seqHandle, probeDevice().toLatin1().constData(), SND_SEQ_OPEN_DUPLEX, 0); err < 0)
 	{
 		fprintf( stderr, "cannot open sequencer: %s\n",
 							snd_strerror( err ) );

@@ -92,7 +92,7 @@ IF(WIN32)
 	endif()
 ELSE()
 	# Detect target architecture based on compiler target triple e.g. "x86_64-pc-linux"
-	EXEC_PROGRAM( ${CMAKE_C_COMPILER} ARGS "-dumpmachine ${CMAKE_C_FLAGS}" OUTPUT_VARIABLE Machine )
+	execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpmachine ${CMAKE_C_FLAGS} OUTPUT_VARIABLE Machine)
 	MESSAGE("Machine: ${Machine}")
 	STRING(REGEX MATCH "i.86" IS_X86 "${Machine}")
 	STRING(REGEX MATCH "86_64|amd64" IS_X86_64 "${Machine}")
