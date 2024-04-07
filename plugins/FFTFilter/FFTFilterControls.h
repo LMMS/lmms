@@ -58,6 +58,7 @@ public:
 	}
 	int controlCount() override { return 8; }
 
+	std::vector<float> getGraph(unsigned int sizeIn);
 	void setGraph(std::vector<std::pair<float, float>>* dataArrayIn);
 
 private slots:

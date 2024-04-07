@@ -76,7 +76,7 @@ void FFTFilterControls::loadSettings(const QDomElement& parent)
 	m_displayFFTModel.loadSettings(parent, "display");
 	
 
-	m_graphModel.loadSettings(parent); 
+	m_graphModel.loadSettings(parent, "VectorGraph"); 
 }
 
 
@@ -88,18 +88,29 @@ void FFTFilterControls::saveSettings(QDomDocument& doc, QDomElement& parent)
 	m_bufferModel.saveSettings(doc, parent, "buffer"); 
 	m_displayFFTModel.saveSettings(doc, parent, "display"); 
 
-	m_graphModel.saveSettings(doc, parent); 
+	m_graphModel.saveSettings(doc, parent, "VectorGraph"); 
 }
 
 void FFTFilterControls::resetClicked()
 {
 
 }
+
+std::vector<float> FFTFilterControls::getGraph(unsigned int sizeIn)
+{
+	std::vector<float> output;
+	if (0 < m_graphModel.getDataArraySize())
+	{
+		qDebug("FFTFilterControls: get graph");
+		output = m_graphModel.getDataArray(0)->getValues(sizeIn);
+	}
+	return output;
+}
 void FFTFilterControls::setGraph(std::vector<std::pair<float, float>>* dataArrayIn)
 {
 	if (1 < m_graphModel.getDataArraySize())
 	{
-		qDebug("set graph");
+		qDebug("FFTFilterControls: set graph");
 		// void setDataArray(std::vector<std::pair<float, float>>* dataArrayIn, bool isCurvedIn, bool clearIn, bool clampIn, bool rescaleIn, bool sortIn, bool callDataChangedIn);
 		m_graphModel.getDataArray(1)->setDataArray(dataArrayIn, true, false, false, true, false, true);
 	}

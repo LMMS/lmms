@@ -58,6 +58,8 @@ private:
 	float getTransformedX(unsigned int locationIn, unsigned int sizeIn);
 	float amplifyY(float yIn, float powerIn);
 
+	void setOutputSamples(sampleFrame* sampleStartIn, unsigned int sizeIn);
+	void updateSampleArray(std::vector<float>* newSamplesIn, unsigned int sampleLocIn);
 
 	FFTFilterControls m_filterControls;
 	FFTProcessor m_FFTProcessor;
@@ -69,11 +71,20 @@ private:
 
 	LocklessRingBuffer<sampleFrame> m_inputBuffer;
 
+	std::vector<sampleFrame> m_outSampleBufferA;
+	std::vector<sampleFrame> m_outSampleBufferB;
+	unsigned int m_outSampleUsedUp;
+	bool m_outSampleBufferAUsed;
+
 	std::vector<float> graphXArray;
 	float graphXArraySum;
 	unsigned int m_sampleRate;
 
 	unsigned int m_bufferSize;
+
+	sampleFrame debugLastSample;
+
+	std::vector<float> m_complexMultiplier;
 
 	friend class FFTFilterControls;
 };
