@@ -263,7 +263,6 @@ public:
 	}
 	inline void setMaxLength(unsigned int maxLengthIn)
 	{
-		// TODO run formatArray on all the dataArrays
 		if (m_maxLength != maxLengthIn)
 		{
 			m_maxLength = maxLengthIn;
@@ -322,7 +321,7 @@ public:
 	// avoid using this or run updateConnections() after initialization
 	VectorGraphDataArray();
 	VectorGraphDataArray(
-	bool isFixedSizeIn, bool isFixedXIn, bool isFixedYIn, bool nonNegativeIn,
+	bool isFixedSizeIn, bool isFixedXIn, bool isFixedYIn, bool isNonNegativeIn,
 	bool isFixedEndPointsIn, bool isSelectableIn, bool isEditableAttribIn, bool isAutomatableEffectableIn,
 	bool isSaveableIn, VectorGraphModel* parentIn, int idIn);
 	~VectorGraphDataArray();
@@ -337,7 +336,7 @@ public:
 	void setIsEditableAttrib(bool valueIn);
 	void setIsAutomatableEffectable(bool valueIn);
 	void setIsSaveable(bool valueIn);
-	void setNonNegative(bool valueIn);
+	void setIsNonNegative(bool valueIn);
 	void setLineColor(QColor colorIn);
 	void setActiveColor(QColor colorIn);
 	void setFillColor(QColor colorIn);
@@ -354,7 +353,7 @@ public:
 	bool getIsEditableAttrib();
 	bool getIsAutomatableEffectable();
 	bool getIsSaveable();
-	bool getNonNegative();
+	bool getIsNonNegative();
 	QColor* getLineColor();
 	QColor* getActiveColor();
 	QColor* getFillColor();
@@ -664,9 +663,9 @@ private:
 	bool m_isAutomatableEffectable;
 	// if VectorGraphDataArray is allowed to save this
 	bool m_isSaveable;
-
 	// can values be less than 0
-	bool m_nonNegative;
+	bool m_isNonNegative;
+
 	QColor m_lineColor;
 	QColor m_activeColor;
 	QColor m_fillColor;
