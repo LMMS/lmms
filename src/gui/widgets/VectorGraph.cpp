@@ -1854,8 +1854,8 @@ int VectorGraphModel::readLoc(unsigned int startIn, QString dataIn)
 VectorGraphDataArray::VectorGraphDataArray()
 {
 	m_isFixedSize = false;
-	m_isFixedValue = false;
-	m_isFixedPos = false;
+	m_isFixedY = false;
+	m_isFixedX = false;
 	m_isFixedEndPoints = false;
 	m_isSelectable = false;
 	m_isEditableAttrib = false;
@@ -1881,13 +1881,13 @@ VectorGraphDataArray::VectorGraphDataArray()
 }
 
 VectorGraphDataArray::VectorGraphDataArray(
-	bool isFixedSizeIn, bool isFixedValueIn, bool isFixedPosIn, bool nonNegativeIn,
+	bool isFixedSizeIn, bool isFixedXIn, bool isFixedYIn, bool nonNegativeIn,
 	bool isFixedEndPointsIn, bool isSelectableIn, bool isEditableAttribIn, bool isAutomatableEffectableIn,
 	bool isSaveableIn, VectorGraphModel* parentIn, int idIn)
 {
 	m_isFixedSize = isFixedSizeIn;
-	m_isFixedValue = isFixedValueIn;
-	m_isFixedPos = isFixedPosIn;
+	m_isFixedY = isFixedXIn;
+	m_isFixedX = isFixedYIn;
 	m_isFixedEndPoints = isFixedEndPointsIn;
 	m_isSelectable = isSelectableIn;
 	m_isEditableAttrib = isEditableAttribIn;
@@ -1946,15 +1946,15 @@ void VectorGraphDataArray::setIsFixedSize(bool valueIn)
 	getUpdatingFromPoint(-1);
 	dataChanged();
 }
-void VectorGraphDataArray::setIsFixedValue(bool valueIn)
+void VectorGraphDataArray::setIsFixedX(bool valueIn)
 {
-	m_isFixedValue = valueIn;
+	m_isFixedX = valueIn;
 	getUpdatingFromPoint(-1);
 	dataChanged();
 }
-void VectorGraphDataArray::setIsFixedPos(bool valueIn)
+void VectorGraphDataArray::setIsFixedY(bool valueIn)
 {
-	m_isFixedPos = valueIn;
+	m_isFixedY = valueIn;
 	getUpdatingFromPoint(-1);
 	dataChanged();
 }
@@ -2077,13 +2077,13 @@ bool VectorGraphDataArray::getIsFixedSize()
 {
 	return m_isFixedSize;
 }
-bool VectorGraphDataArray::getIsFixedValue()
+bool VectorGraphDataArray::getIsFixedX()
 {
-	return m_isFixedValue;
+	return m_isFixedX;
 }
-bool VectorGraphDataArray::getIsFixedPos()
+bool VectorGraphDataArray::getIsFixedY()
 {
-	return m_isFixedPos;
+	return m_isFixedY;
 }
 bool VectorGraphDataArray::getIsFixedEndPoints()
 {
@@ -2140,13 +2140,13 @@ int VectorGraphDataArray::getId()
 int VectorGraphDataArray::add(float xIn)
 {
 	int location = -1;
-	if (m_dataArray.size() < m_parent->getMaxLength())
+	if (m_isFixedSize == false && m_dataArray.size() < m_parent->getMaxLength())
 	{
 	qDebug("add 1. success");
 		bool found = false;
 		bool isBefore = false;
 		location = getNearestLocation(xIn, &found, &isBefore);
-		if (found == false && m_isFixedSize == false)
+		if (found == false)
 		{
 	qDebug("add 2. success, nearest: %d", location);
 			int targetLocation = -1;
@@ -2639,7 +2639,7 @@ void VectorGraphDataArray::setDataArray(std::vector<float>* dataArrayIn,
 unsigned int VectorGraphDataArray::setX(unsigned int locationIn, float xIn)
 {
 	int location = locationIn;
-	if (m_isFixedPos == false && xIn <= 1.0f)
+	if (m_isFixedX == false && xIn <= 1.0f)
 	{
 		bool found = false;
 		bool isBefore = false;
@@ -2701,52 +2701,67 @@ unsigned int VectorGraphDataArray::setX(unsigned int locationIn, float xIn)
 
 void VectorGraphDataArray::setY(unsigned int locationIn, float yIn)
 {
-	if (m_isFixedValue == false)
+	if (m_isFixedY == false)
 	{
-		if ((m_isFixedEndPoints == true && locationIn < m_dataArray.size() - 1 &&
-			locationIn > 0) || m_isFixedEndPoints == false)
+		m_dataArray[locationIn].m_y = yIn;
+		getUpdatingFromPoint(locationIn);
+		// changes in the position can change lines before
+		// so the point before this is updated
+		if (locationIn > 0)
 		{
-			m_dataArray[locationIn].m_y = yIn;
-			getUpdatingFromPoint(locationIn);
-			// changes in the position can change lines before
-			// so the point before this is updated
-			if (locationIn > 0)
-			{
-				getUpdatingFromPoint(locationIn - 1);
-			}
-			dataChanged();
+			getUpdatingFromPoint(locationIn - 1);
 		}
+		if (m_isFixedEndPoints == true &&
+			(locationIn <= 0 || locationIn >= m_dataArray.size() - 1))
+		{
+			formatDataArrayEndPoints();
+			getUpdatingFromPoint(0);
+			getUpdatingFromPoint(m_dataArray.size() - 1);
+		}
+		dataChanged();
 	}
 }
 
 void VectorGraphDataArray::setC(unsigned int locationIn, float cIn)
 {
-	m_dataArray[locationIn].m_c = cIn;
-	getUpdatingFromPoint(locationIn);
-	dataChanged();
+	if (m_isEditableAttrib == true)
+	{
+		m_dataArray[locationIn].m_c = cIn;
+		getUpdatingFromPoint(locationIn);
+		dataChanged();
+	}
 }
 void VectorGraphDataArray::setValA(unsigned int locationIn, float valueIn)
 {
-	m_dataArray[locationIn].m_valA = valueIn;
-	getUpdatingFromPoint(locationIn);
-	dataChanged();
+	if (m_isEditableAttrib == true)
+	{
+		m_dataArray[locationIn].m_valA = valueIn;
+		getUpdatingFromPoint(locationIn);
+		dataChanged();
+	}
 }
 void VectorGraphDataArray::setValB(unsigned int locationIn, float valueIn)
 {
-	m_dataArray[locationIn].m_valB = valueIn;
-	getUpdatingFromPoint(locationIn);
-	dataChanged();
+	if (m_isEditableAttrib == true)
+	{
+		m_dataArray[locationIn].m_valB = valueIn;
+		getUpdatingFromPoint(locationIn);
+		dataChanged();
+	}
 }
 void VectorGraphDataArray::setType(unsigned int locationIn, unsigned int typeIn)
 {
-	// set the type without changing the automated attribute location
-	m_dataArray[locationIn].m_type = typeIn;
-	getUpdatingFromPoint(locationIn);
-	dataChanged();
+	if (m_isEditableAttrib == true)
+	{
+		// set the type without changing the automated attribute location
+		m_dataArray[locationIn].m_type = typeIn;
+		getUpdatingFromPoint(locationIn);
+		dataChanged();
+	}
 }
 void VectorGraphDataArray::setAutomatedAttrib(unsigned int locationIn, unsigned int attribLocationIn)
 {
-	if (m_isAutomatableEffectable == true)
+	if (m_isAutomatableEffectable == true && m_isEditableAttrib == true)
 	{
 		// clamp only 4 attributes can be automated (y, c, valA, valB)
 		attribLocationIn = attribLocationIn > 3 ? 0 : attribLocationIn;
@@ -2763,7 +2778,7 @@ void VectorGraphDataArray::setAutomatedAttrib(unsigned int locationIn, unsigned 
 }
 void VectorGraphDataArray::setEffectedAttrib(unsigned int locationIn, unsigned int attribLocationIn)
 {
-	if (m_isAutomatableEffectable == true)
+	if (m_isAutomatableEffectable == true && m_isEditableAttrib == true)
 	{
 		// clamp only 4 attributes can be automated (y, c, valA, valB)
 		attribLocationIn = attribLocationIn > 3 ? 0 : attribLocationIn;
@@ -2794,7 +2809,7 @@ bool VectorGraphDataArray::getEffectOnlyPoints(unsigned int locationIn)
 }
 void VectorGraphDataArray::setEffectOnlyPoints(unsigned int locationIn, bool boolIn)
 {
-	if (m_isAutomatableEffectable == true)
+	if (m_isAutomatableEffectable == true && m_isEditableAttrib == true)
 	{
 		if (m_dataArray[locationIn].m_effectOnlyPoints != boolIn)
 		{
@@ -2854,7 +2869,7 @@ bool VectorGraphDataArray::getEffect(unsigned int locationIn, unsigned int effec
 }
 void VectorGraphDataArray::setEffect(unsigned int locationIn, unsigned int effectNumberIn, bool boolIn)
 {
-	if (m_isAutomatableEffectable == true)
+	if (m_isAutomatableEffectable == true && m_isEditableAttrib == true)
 	{
 		switch (effectNumberIn)
 		{
@@ -2886,15 +2901,15 @@ void VectorGraphDataArray::setEffect(unsigned int locationIn, unsigned int effec
 				m_dataArray[locationIn].m_effectClampUpper = boolIn;
 				break;
 		}
+		getUpdatingFromPoint(locationIn);
+		// if the current point can effect line before it
+		// update the point before it
+		if (getEffectOnlyPoints(locationIn) == false && locationIn > 0)
+		{
+			getUpdatingFromPoint(locationIn - 1);
+		}
+		dataChanged();
 	}
-	getUpdatingFromPoint(locationIn);
-	// if the current point can effect line before it
-	// update the point before it
-	if (getEffectOnlyPoints(locationIn) == false && locationIn > 0)
-	{
-		getUpdatingFromPoint(locationIn - 1);
-	}
-	dataChanged();
 }
 bool VectorGraphDataArray::getIsAutomationValueChanged(unsigned int locationIn)
 {

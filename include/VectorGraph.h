@@ -322,7 +322,7 @@ public:
 	// avoid using this or run updateConnections() after initialization
 	VectorGraphDataArray();
 	VectorGraphDataArray(
-	bool isFixedSizeIn, bool isFixedValueIn, bool isFixedPosIn, bool nonNegativeIn,
+	bool isFixedSizeIn, bool isFixedXIn, bool isFixedYIn, bool nonNegativeIn,
 	bool isFixedEndPointsIn, bool isSelectableIn, bool isEditableAttribIn, bool isAutomatableEffectableIn,
 	bool isSaveableIn, VectorGraphModel* parentIn, int idIn);
 	~VectorGraphDataArray();
@@ -330,8 +330,8 @@ public:
 	void updateConnections(VectorGraphModel* parentIn);
 
 	void setIsFixedSize(bool valueIn);
-	void setIsFixedValue(bool valueIn);
-	void setIsFixedPos(bool valueIn);
+	void setIsFixedX(bool valueIn);
+	void setIsFixedY(bool valueIn);
 	void setIsFixedEndPoints(bool valueIn);
 	void setIsSelectable(bool valueIn);
 	void setIsEditableAttrib(bool valueIn);
@@ -347,8 +347,8 @@ public:
 	bool setEffectorArrayLocation(int locationIn, bool callDataChangedIn);
 
 	bool getIsFixedSize();
-	bool getIsFixedValue();
-	bool getIsFixedPos();
+	bool getIsFixedX();
+	bool getIsFixedY();
 	bool getIsFixedEndPoints();
 	bool getIsSelectable();
 	bool getIsEditableAttrib();
@@ -647,18 +647,20 @@ private:
 
 	// can new data be added or removed
 	bool m_isFixedSize;
-	// can the values be changed
-	bool m_isFixedValue;
 	// can the positions be changed
-	bool m_isFixedPos;
+	bool m_isFixedX;
+	// can the values be changed
+	bool m_isFixedY;
 	// if true then it makes the last position coordinate 1, 1, the first point coordinate to -1 (ot 0), 0
 	bool m_isFixedEndPoints;
 	// can VectorGraphView select this
 	bool m_isSelectable;
-	// can VectorGraphView edit the point attributes
+	// can the point attributes be edited
 	// every attribute outside of x and y
+	// automation can be changed
 	bool m_isEditableAttrib;
 	// can the points be automated or effected
+	// (can these settings be changed)
 	bool m_isAutomatableEffectable;
 	// if VectorGraphDataArray is allowed to save this
 	bool m_isSaveable;
