@@ -27,7 +27,6 @@
 #include <algorithm> // sort
 #include <cstdlib> // rand
 #include <cstdint> // unintptr_t
-#include <memory> // smartpointers
 #include <QPainter>
 #include <QPainterPath>
 #include <QMouseEvent>
@@ -603,11 +602,11 @@ void VectorGraphView::paintGraph(QPainter* pIn, unsigned int locationIn, std::ve
 			for (unsigned int j = 0; j < dataArrayValues.size(); j++)
 			{
 				posB = mapDataPos(0, dataArrayValues[j], dataArray->getNonNegative());
-				posB.first = j;
+				posB.first = static_cast<int>((j * width()) / static_cast<float>(dataArrayValues.size()));
 	
 				if (posA.first != posB.first)
 				{
-					pt.lineTo(j, m_graphHeight - posB.second);
+					pt.lineTo(posB.first, m_graphHeight - posB.second);
 					// pt replaces drawing with path
 					//pIn->drawLine(posA.first, m_graphHeight - posA.second, posB.first, m_graphHeight - posB.second);
 				}
@@ -914,6 +913,8 @@ bool VectorGraphView::addPoint(unsigned int locationIn, int mouseXIn, int mouseY
 {
 	bool output = false;
 	std::pair<float, float> curMouseCoords = mapMousePos(mouseXIn, mouseYIn);
+	curMouseCoords.first = std::clamp(curMouseCoords.first, 0.0f, 1.0f);
+	curMouseCoords.second = std::clamp(curMouseCoords.second, -1.0f, 1.0f);
 	int location = model()->getDataArray(locationIn)->add(curMouseCoords.first);
 	// if adding was successful
 	if (location >= 0)
@@ -2411,25 +2412,26 @@ int VectorGraphDataArray::getNearestLocation(float xIn, bool* foundOut, bool* is
 
 std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn)
 {
-	bool isChanged = false;
-	std::shared_ptr<std::vector<unsigned int>> updatingValues = std::make_shared<std::vector<unsigned int>>();
+	//std::shared_ptr<std::vector<unsigned int>> updatingValues = std::make_shared<std::vector<unsigned int>>();
+	//std::shared_ptr<std::vector<unsigned int>> updatingValues = std::make_shared<std::vector<unsigned int>>();
 	qDebug("getValuesA1");
-	std::vector<float> output = getValues(countIn, &isChanged, updatingValues);
+	std::vector<float> output = getValues(countIn, nullptr, nullptr);
 	qDebug("getValuesA2, size: %ld", output.size());
-	updatingValues->clear();
 	qDebug("getValuesA3 finished");
 	return output;
 }
-std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn, bool* isChangedOut, std::shared_ptr<std::vector<unsigned int>> updatingValuesOut)
+//std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn, bool* isChangedOut, std::shared_ptr<std::vector<unsigned int>> updatingValuesOut)
+std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn, bool* isChangedOut, std::vector<unsigned int>* updatingValuesOut)
 {
 	bool effectorIsChanged = false;
-	std::shared_ptr<std::vector<unsigned int>> effectorUpdatingValues = std::make_shared<std::vector<unsigned int>>();
+	//std::shared_ptr<std::vector<unsigned int>> effectorUpdatingValues = std::make_shared<std::vector<unsigned int>>();
+	std::vector<unsigned int> effectorUpdatingValues;
 	std::vector<float> effectorOutput;
 	std::vector<float> outputXLocations(countIn);
 	bool isEffected = m_effectorLocation >= 0;
 	if (isEffected == true)
 	{
-		effectorOutput = m_parent->getDataArray(m_effectorLocation)->getValues(countIn, &effectorIsChanged, effectorUpdatingValues);
+		effectorOutput = m_parent->getDataArray(m_effectorLocation)->getValues(countIn, &effectorIsChanged, &effectorUpdatingValues);
 	}
 	else
 	{
@@ -2455,11 +2457,11 @@ std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn, bool* i
 	// updating m_needsUpdating
 	if (m_isDataChanged == false && countIn == m_bakedValues.size())
 	{
-		if (isEffected == true && effectorUpdatingValues->size() > 0 && effectedCount > 0)
+		if (isEffected == true && effectorUpdatingValues.size() > 0 && effectedCount > 0)
 		{
 			// effectorUpdatingValues needs to be sorted
 			// before use (in this case it is already sorted)
-			getUpdatingFromEffector(effectorUpdatingValues);
+			getUpdatingFromEffector(&effectorUpdatingValues);
 		}
 	qDebug("getValuesB2");
 		getUpdatingFromAutomation();
@@ -2534,17 +2536,23 @@ std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn, bool* i
 		//effectorData.clear();
 	}
 
-	*isChangedOut = m_isDataChanged;
+	if (isChangedOut != nullptr)
+	{
+		*isChangedOut = m_isDataChanged;
+	}
 	if (m_needsUpdating.size() > 0)
 	{
-		*updatingValuesOut = m_needsUpdating;
+		if (updatingValuesOut != nullptr)
+		{
+			*updatingValuesOut = m_needsUpdating;
+		}
 
 		// clearing the updated values
 		m_needsUpdating.clear();
 	}
 
 	m_isDataChanged = false;
-	effectorUpdatingValues->clear();
+	//effectorUpdatingValues->clear();
 	qDebug("getValuesB9");
 	return m_bakedValues;
 }
@@ -3430,7 +3438,7 @@ std::vector<float> VectorGraphDataArray::processLineTypeArrayRandom(std::vector<
 	return output;
 }
 
-void VectorGraphDataArray::getUpdatingFromEffector(std::shared_ptr<std::vector<unsigned int>> updatingValuesIn)
+void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* updatingValuesIn)
 {
 	// Debug testing
 	/*
