@@ -433,9 +433,6 @@ ClapPresetDatabase::Indexer::Indexer(const clap_preset_discovery_factory& factor
 	}
 	, m_provider{factory.create(&factory, &m_indexer, descriptor.id), ProviderDeleter{}}
 {
-	std::string tempMsg = "PRESET DISCOVERY PROVIDER DESCRIPTOR ID: " + std::string{descriptor.id};
-	ClapLog::globalLog(CLAP_LOG_INFO, tempMsg);
-
 	if (!m_provider)
 	{
 		ClapLog::globalLog(CLAP_LOG_ERROR, "Failed to create preset discovery provider");

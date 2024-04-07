@@ -153,7 +153,7 @@ ClapViewBase::ClapViewBase(QWidget* pluginWidget, ClapInstance* instance)
 		m_toggleUIButton->setCheckable(true);
 		m_toggleUIButton->setChecked(false);
 		m_toggleUIButton->setIcon(embed::getIconPixmap("zoom"));
-		m_toggleUIButton->setFont(pointSize<8>(m_toggleUIButton->font()));
+		m_toggleUIButton->setFont(adjustedToPixelSize(m_toggleUIButton->font(), 8));
 		btnBox->addWidget(m_toggleUIButton);
 	}
 
