@@ -59,20 +59,23 @@ public:
 
 	// getters
 	std::vector<float> getNormSpectrum();
+	std::vector<float> getSample();
 	bool getOutputSpectrumChanged();
 	bool getOutputSamplesChanged();
+	void setComplexMultiplier(std::vector<float>* complexMultiplierIn);
 
 	void reverse(std::vector<float> processedDataIn);
 
 	void rebuildWindow(FFTWindow FFTWindowIn);
 
-	static unsigned int outputSize(unsigned int blockSizeIn);
+	static unsigned int binCount(unsigned int blockSizeIn);
 
 
 private:
-	static void threadedAnalyze(std::atomic<bool>* terminateIn, fftwf_plan* planIn, fftwf_complex* complexIn, std::vector<float>* samplesIn, std::atomic<bool>* spectrumChangedOut, std::atomic<bool>* samplesChangedOut,
-	LocklessRingBuffer<sampleFrame>* ringBufferIn, unsigned int sampLocIn, unsigned int blockSizeIn,
-	std::vector<float>* spectrumOut, std::mutex* outputAccessIn);
+	static void threadedAnalyze(std::atomic<bool>* terminateIn, fftwf_plan* planIn, fftwf_plan* inversePlanIn, fftwf_complex* complexIn, std::vector<float>* samplesIn, std::vector<float>* samplesOut,
+		std::atomic<bool>* spectrumChangedOut, std::atomic<bool>* samplesChangedOut,
+		LocklessRingBuffer<sampleFrame>* ringBufferIn, std::vector<float>* complexMultiplierIn, unsigned int sampLocIn, unsigned int blockSizeIn,
+		std::vector<float>* spectrumOut, std::mutex* outputAccessIn);
 
 	// Thread:
 	// terminates the thread
@@ -89,7 +92,6 @@ private:
 	unsigned int m_frameFillLoc;
 
 	// fft
-	fftwf_complex* m_in;
 	fftwf_complex* m_out;
 
 	fftwf_plan m_plan;
@@ -98,9 +100,10 @@ private:
 	std::atomic<unsigned int> m_blockSize;
 
 	std::vector<float> m_samplesIn;
+	std::vector<float> m_samplesOut;
 	std::vector<float> m_normSpectrum;
 
-	std::vector<float> m_absSpectrumOut;
+	std::vector<float> m_complexMultiplier;
 
 	std::vector<float> m_fftWindow;
 	FFTWindow m_FFTWindowType;

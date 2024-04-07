@@ -58,8 +58,14 @@ FFTFilterEffect::FFTFilterEffect(Model* parent, const Descriptor::SubPluginFeatu
 	Effect(&FFTFilter_plugin_descriptor, parent, key),
 	m_filterControls(this),
 	m_FFTProcessor(2048, true, FFTWindow::Rectangular),
-	m_inputBuffer(2048)
+	m_inputBuffer(2048),
+	m_outSampleBufferA(2048),
+	m_outSampleBufferB(2048),
+	m_outSampleUsedUp(0),
+	m_outSampleBufferAUsed(false),
+	m_complexMultiplier(2048, 1)
 {
+	//m_FFTProcessor.setComplexMultiplier(&m_complexMultiplier);
 	m_FFTProcessor.threadedStartThread(&m_inputBuffer, 0, true, false);
 	
 	//std::vector<float> graphXArray;
@@ -77,22 +83,38 @@ FFTFilterEffect::~FFTFilterEffect()
 
 bool FFTFilterEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 {
-	if (!isEnabled() || !isRunning()) { return false ; }
+	bool processed = false;
+	//if (!isEnabled() || !isRunning()) { return false ; }
+	if (isEnabled() && isRunning())
+	{
+
 
 	if (isNoneInput(buf, frames, 0.01f) == true)
 	{
 		//qDebug("FFTFilterEffect return false");
 		return false;
 	}
+	else
+	{
 
 
 	qDebug("FFTFilterEffect write");
+
+	//m_complexMultiplier = m_filterControls.getGraph(2048);
+	//m_FFTProcessor.setComplexMultiplier(&m_complexMultiplier);
 
 	m_inputBuffer.write(buf, frames, true);
 
 	qDebug("FFTFilterEffect analyze");
 
 	//m_FFTProcessor.analyze(&m_inputBuffer, &target);
+
+	if (m_FFTProcessor.getOutputSamplesChanged() == true)
+	{
+		//std::vector<float> samples = m_FFTProcessor.getSample();
+		//updateSampleArray(&samples, 0);
+		//updateSampleArray(&samples, 1);
+	}
 	if (m_FFTProcessor.getOutputSpectrumChanged() == true)
 	{
 		std::vector<float> FFTSpectrumOutput = m_FFTProcessor.getNormSpectrum();
@@ -118,7 +140,7 @@ bool FFTFilterEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			if (i + 1 > avgSum + graphXArray[j] * FFTSpectrumOutput.size() / graphXArraySum)
 			{
 				graphInput[j].second = amplifyY(avgY / static_cast<float>(avgCount), avgCount + 1.0f);
-				qDebug("FFTFiterEffect i: %d, %f", i, graphInput[j].second);
+				//qDebug("FFTFiterEffect i: %d, %f", i, graphInput[j].second);
 				if (j >= graphInput.size())
 				{
 					break;
@@ -191,6 +213,30 @@ bool FFTFilterEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 	//checkGate(outSum / frames);
 
+	} // isNoneInput
+	} // enabled && isRunning
+	//setOutputSamples(buf, frames);
+
+	float cutOff = 0.003f;
+	/*
+	for (unsigned int i = 0; i < frames; i++)
+	{
+		qDebug("FFTFilter processAtudioBuffer [%d] %f", i, buf[i][0]);
+		if (i > 0 && std::abs(buf[i - 1][0] - buf[i][0]) > cutOff)
+		{
+			qDebug("setOutputSamples BAD OUTPUT");
+			int* debugval = nullptr;
+			*debugval = 3;
+		}
+		else if (std::abs(debugLastSample[0] - buf[i][0]) > cutOff)
+		{
+			qDebug("setOutputSamples BAD OUTPUT 2 --------");
+			int* debugval = nullptr;
+			*debugval = 3;
+		}
+	}
+	*/
+	//debugLastSample = buf[frames - 1];
 	return isRunning();
 }
 
@@ -232,7 +278,7 @@ void FFTFilterEffect::updateGraphXArray(unsigned int sizeIn)
 	{
 		graphXArray[i] = getTransformedX(i, graphXArray.size());
 		graphXArraySum += graphXArray[i];
-		qDebug("updateGraphXArray [%d] %f", i, graphXArray[i]);
+		//qDebug("updateGraphXArray [%d] %f", i, graphXArray[i]);
 	}
 }
 float FFTFilterEffect::getTransformedX(unsigned int locationIn, unsigned int sizeIn)
@@ -259,6 +305,68 @@ float FFTFilterEffect::amplifyY(float yIn, float powerIn)
 	float power = std::max(powerIn, 2.0f);
 	return -std::pow(power, -yIn * power) + 1.0f;
 	//return -std::pow(std::abs(yIn - 1.0f), 3.0f) + 1.0f;
+}
+void FFTFilterEffect::setOutputSamples(sampleFrame* sampleStartIn, unsigned int sizeIn)
+{
+	std::vector<sampleFrame>* curOutBuffer = m_outSampleBufferAUsed == true ? &m_outSampleBufferA : &m_outSampleBufferB;
+	unsigned int size = curOutBuffer->size() <= m_outSampleUsedUp + sizeIn ? curOutBuffer->size() - m_outSampleUsedUp: sizeIn;
+	for (unsigned int i = 0; i < size; i++)
+	{
+		sampleStartIn[i] = curOutBuffer->operator[](m_outSampleUsedUp + i);
+		//qDebug("setOutputSamples [%d] %f", m_outSampleUsedUp + i, sampleStartIn[i][0]);
+	}
+	m_outSampleUsedUp += size;
+	if (size != sizeIn)
+	{
+		qDebug("setOutputSamples  Switched!!");
+		m_outSampleBufferAUsed = !m_outSampleBufferAUsed;
+		m_outSampleUsedUp = 0;
+		std::vector<sampleFrame>* curOutBuffer = m_outSampleBufferAUsed == true ? &m_outSampleBufferA : &m_outSampleBufferB;
+		size = curOutBuffer->size() <= m_outSampleUsedUp + sizeIn ? curOutBuffer->size() - m_outSampleUsedUp : sizeIn;
+		for (unsigned int i = 0; i < size; i++)
+		{
+			sampleStartIn[i] = curOutBuffer->operator[](i);
+			//qDebug("setOutputSamples [%d] %f", m_outSampleUsedUp + i, sampleStartIn[i][0]);
+		}
+		m_outSampleUsedUp += size;
+
+		for (unsigned int i = 0; i < curOutBuffer->size(); i++)
+		{
+			//qDebug("setOutputSamples sv [%d] %f", i, curOutBuffer->operator[](i)[0]);
+		}
+	}
+
+	/*
+	for (unsigned int i = 0; i < sizeIn; i++)
+	{
+		qDebug("setOutputSamples [%d] %f", i, sampleStartIn[i][0]);
+		if (i > 0 && std::abs(sampleStartIn[i - 1][0] - sampleStartIn[i][0]) > 0.003f)
+		{
+			qDebug("setOutputSamples BAD OUTPUT");
+		}
+	}
+	*/
+}
+void FFTFilterEffect::updateSampleArray(std::vector<float>* newSamplesIn, unsigned int sampleLocIn)
+{
+	if (m_outSampleBufferAUsed == true)
+	{
+		unsigned int size = m_outSampleBufferB.size() < newSamplesIn->size() ? m_outSampleBufferB.size() : newSamplesIn->size();
+		qDebug("FFTFilter updateSampleArray size: %d, sampLoc: %d", size, sampleLocIn);
+		for (unsigned int i = 0; i < size; i++)
+		{
+			m_outSampleBufferB[i][sampleLocIn] = newSamplesIn->operator[](i);
+		}
+	}
+	else
+	{
+		unsigned int size = m_outSampleBufferA.size() < newSamplesIn->size() ? m_outSampleBufferA.size() : newSamplesIn->size();
+		qDebug("FFTFilter updateSampleArray size: %d, sampLoc: %d", size, sampleLocIn);
+		for (unsigned int i = 0; i < size; i++)
+		{
+			m_outSampleBufferA[i][sampleLocIn] = newSamplesIn->operator[](i);
+		}
+	}
 }
 
 extern "C"
