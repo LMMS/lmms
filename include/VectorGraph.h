@@ -443,8 +443,7 @@ public:
 	// returns the latest updated graph values
 	// countIn is the retuned vector's size
 	std::vector<float> getValues(unsigned int countIn);
-	//std::vector<float> getValues(unsigned int countIn, bool* isChangedOut);
-	std::vector<float> getValues(unsigned int countIn, bool* isChangedOut, std::shared_ptr<std::vector<unsigned int>> updatingValuesOut);
+	std::vector<float> getValues(unsigned int countIn, bool* isChangedOut, std::vector<unsigned int>* updatingValuesOut);
 	// returns m_bakedValues without updating
 	std::vector<float> getLastValues();
 	std::vector<int> getEffectorArrayLocations();
@@ -631,7 +630,7 @@ private:
 	// adds the points that are
 	// effected by the effector's values changing
 	// ONLY WORKS IN SORTED ARRAYS
-	void getUpdatingFromEffector(std::shared_ptr<std::vector<unsigned int>> updatingValuesIn);
+	void getUpdatingFromEffector(std::vector<unsigned int>* updatingValuesIn);
 	// if locationIn > 0 -> adds the location to m_needsUpdating
 	// else it will update the whole m_dataArray and m_bakedValues
 	// changes in the size of m_dataArray (addtition, deletion, ect.)
