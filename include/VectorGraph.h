@@ -25,7 +25,6 @@
 #ifndef LMMS_GUI_VECTORGRAPH_H
 #define LMMS_GUI_VECTORGRAPH_H
 
-#include <memory> // smartpointers
 #include <vector>
 #include <QPainterPath>
 #include <QWidget>
@@ -47,62 +46,10 @@ class FloatModel;
 
 namespace gui
 {
-// class SimpleTextFloat; TODO
 class LMMS_EXPORT VectorGraphView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
-	// TODO: remove styles			Done
-	// TODO: change x unsigned int to float			Done
-	// TODO: make a new class inside PointGraphDataArray to store the point data			Done
-	// TODO: add is selectable			Done
-	// TODO: add new setting to make the last point cord 1, 1			Done
-	// TODO: flip mouse y position			Done
-	// TODO: function to get multiple values			Done
-	// TODO: rewrite comments
-	// TODO: rename functions and values
-
-	// TODO: automation:
-	// TODO: add 4 new values to the nested class: curve, type, valueA, valueB (1 type is 4 value long)			Done
-	// TODO: add automation support
-	//		TODO: make FloatModel pointer array		Done
-	//		TODO: allocate FloatModels with new		Done
-	//		TODO: delete FloatModels in destructor		Done
-	//		TODO: save FloatModels (run saveSettings)
-	//		TODO: getter for the FloatModels for saving		Done
-	//		TODO: connect FloatModels connect with getter		Done
-	// TODO: setPointAutomatedAttrib() --> changes the type value between y pos, curve, valueA, valueB			Done
-	// TODO: setPointType(unsigned int type)			Done
-	// TODO: add effector(PointGraphDataArray) int location to the PointGraphDataArray class			Done
-	// TODO: add effector line attributes to the nested class			Done
-	// TODO: add effect implementation		Done
-
-	// TODO: clear array when 2. last point is deleted in the widget		IGNORE
-	// TODO: event when a dataArray's size gets to 0
-	// TODO: ability to scale displayed coords in PointGraphView (not 0 - 100) (add scalers)
-	// TODO: check PointGraphDataArray signals			Done
-	// TODO: journalling in PointGraphModel
-	// TODO: m_maxLength* should be replaced with m_parent->getMaxLength()			Done
-	// TODO: setDataArray keep attributes option, formatArray option which runs formatArray
-	// TODO: PointGraphDataArray shouldSaveAll and shouldSavePointAttributesOnly (for saving only editable graphs) option			Done
-	// TODO: baked automation values in PointGraphPoint			Done
-	// TODO: rename class to VectorGraph			Done
-	// TODO: make std::vector<float> last used values			Done
-	//		TODO: make update logic (isChanged and update only automation / effected lines)			Done
-	// TODO: effector location (same as automation location)			Done
-	// TODO: PointGraphView isSimplified			Done
-	// TODO: new automated color			Done
-	// TODO: context menu in gui (clear automation, connect to controller)
-	// TODO: display hints (full text) in the editing
-	// TODO: ability to edit multiple graphs using m_isLastSelectedArray
-	// TODO: handle effector arrays when deleting VectorGraphDataArray
-	// TODO: update formatArray
-	// TODO: licensing email TODO
-
-	// TODO: check selectedLocation, selectedArray, isSelected, isLastSelectedArray usage
-	// TODO: finish gui, hint texts, context menu
-	// TODO: separate big functions
-
 	VectorGraphView(QWidget * parentIn,
 		int widthIn, int heightIn,
 		unsigned int pointSizeIn, unsigned int maxLengthIn);
@@ -131,13 +78,11 @@ public:
 signals:
 	void drawn();
 protected:
-	void paintEvent(QPaintEvent* pe) override; //TODO
-	//void dropEvent(QDropEvent* de) override; //ignore
-	//void dragEnterEvent(QDragEnterEvent* dee) override; //ignore
-	void mousePressEvent(QMouseEvent* me) override; //TODO
-	void mouseMoveEvent(QMouseEvent* me) override; //TODO
-	void mouseReleaseEvent(QMouseEvent* me) override; //TODO
-	void mouseDoubleClickEvent(QMouseEvent* me) override; //TODO
+	void paintEvent(QPaintEvent* pe) override;
+	void mousePressEvent(QMouseEvent* me) override;
+	void mouseMoveEvent(QMouseEvent* me) override;
+	void mouseReleaseEvent(QMouseEvent* me) override;
+	void mouseDoubleClickEvent(QMouseEvent* me) override;
 protected slots:
 	void updateGraph();
 
@@ -472,7 +417,7 @@ public:
 	void setEffect(unsigned int locationIn, unsigned int effectNumberIn, bool boolIn);
 	// if isAutomatedIn is true then make a new FloatModel and connect it, else delete
 	// the currently used FloatModel
-	void setAutomated(unsigned int locationIn, bool isAutomatedIn); // TODO
+	void setAutomated(unsigned int locationIn, bool isAutomatedIn);
 
 
 // signals: // not qt
