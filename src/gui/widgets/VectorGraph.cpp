@@ -556,7 +556,7 @@ void VectorGraphView::paintGraph(QPainter* pIn, unsigned int locationIn, std::ve
 
 		std::pair<int, int> posA(0, 0);
 		std::pair<int, int> posB(0, 0);
-		std::pair<int, int> startPos(mapDataPos(0.0f, dataArray->getY(0), dataArray->getNonNegative()));
+		std::pair<int, int> startPos(mapDataPos(0.0f, dataArray->getY(0), false));
 		// draw line
 		if (m_isSimplified == false)
 		{
@@ -601,7 +601,9 @@ void VectorGraphView::paintGraph(QPainter* pIn, unsigned int locationIn, std::ve
 			qDebug("paint dataArrayValues size: %ld", dataArrayValues.size());
 			for (unsigned int j = 0; j < dataArrayValues.size(); j++)
 			{
-				posB = mapDataPos(0, dataArrayValues[j], dataArray->getNonNegative());
+				// if nonNegative then only the dataArray output (getDataValues)
+				// is bigger than 0 so it matters only here
+				posB = mapDataPos(0, dataArrayValues[j], dataArray->getIsNonNegative());
 				posB.first = static_cast<int>((j * width()) / static_cast<float>(dataArrayValues.size()));
 	
 				if (posA.first != posB.first)
@@ -644,7 +646,7 @@ void VectorGraphView::paintGraph(QPainter* pIn, unsigned int locationIn, std::ve
 			bool resetColor = false;
 			for (unsigned int j = 0; j < length; j++)
 			{
-				posB = mapDataPos(dataArray->getX(j), dataArray->getY(j), dataArray->getNonNegative());
+				posB = mapDataPos(dataArray->getX(j), dataArray->getY(j), false);
 				// draw point
 				if (drawPoints == true)
 				{
@@ -1425,7 +1427,7 @@ void VectorGraphView::selectData(int mouseXIn, int mouseYIn)
 			// m_selectedArray
 			m_isSelected = true;
 			m_isCurveSelected = false;
-			m_isEditingActive = dataArray->getIsEditableAttrib();
+			m_isEditingActive = true;
 		}
 	}
 
@@ -1455,7 +1457,7 @@ void VectorGraphView::selectData(int mouseXIn, int mouseYIn)
 					m_isSelected = true;
 					m_isCurveSelected = false;
 					m_isLastSelectedArray = true;
-					m_isEditingActive = dataArray->getIsEditableAttrib();
+					m_isEditingActive = true;
 					break;
 				}
 			}
@@ -1477,7 +1479,7 @@ void VectorGraphView::selectData(int mouseXIn, int mouseYIn)
 						m_isSelected = true;
 						m_isCurveSelected = true;
 						m_isLastSelectedArray = true;
-						m_isEditingActive = dataArray->getIsEditableAttrib();
+						m_isEditingActive = true;
 						break;
 					}
 				}
@@ -1861,7 +1863,7 @@ VectorGraphDataArray::VectorGraphDataArray()
 	m_isEditableAttrib = false;
 	m_isAutomatableEffectable = false;
 	m_isSaveable = false;
-	m_nonNegative = false;
+	m_isNonNegative = false;
 	
 	m_lineColor = QColor(200, 200, 200, 255);
 	m_activeColor = QColor(255, 255, 255, 255);
@@ -1881,7 +1883,7 @@ VectorGraphDataArray::VectorGraphDataArray()
 }
 
 VectorGraphDataArray::VectorGraphDataArray(
-	bool isFixedSizeIn, bool isFixedXIn, bool isFixedYIn, bool nonNegativeIn,
+	bool isFixedSizeIn, bool isFixedXIn, bool isFixedYIn, bool isNonNegativeIn,
 	bool isFixedEndPointsIn, bool isSelectableIn, bool isEditableAttribIn, bool isAutomatableEffectableIn,
 	bool isSaveableIn, VectorGraphModel* parentIn, int idIn)
 {
@@ -1893,7 +1895,7 @@ VectorGraphDataArray::VectorGraphDataArray(
 	m_isEditableAttrib = isEditableAttribIn;
 	m_isAutomatableEffectable = isAutomatableEffectableIn;
 	m_isSaveable = isSaveableIn;
-	m_nonNegative = nonNegativeIn;
+	m_isNonNegative = isNonNegativeIn;
 	
 	m_lineColor = QColor(200, 200, 200, 255);
 	m_activeColor = QColor(255, 255, 255, 255);
@@ -1995,9 +1997,9 @@ void VectorGraphDataArray::setIsSaveable(bool valueIn)
 {
 	m_isSaveable = valueIn;
 }
-void VectorGraphDataArray::setNonNegative(bool valueIn)
+void VectorGraphDataArray::setIsNonNegative(bool valueIn)
 {
-	m_nonNegative = valueIn;
+	m_isNonNegative = valueIn;
 	getUpdatingFromPoint(-1);
 	dataChanged();
 }
@@ -2105,9 +2107,9 @@ bool VectorGraphDataArray::getIsSaveable()
 {
 	return m_isSaveable;
 }
-bool VectorGraphDataArray::getNonNegative()
+bool VectorGraphDataArray::getIsNonNegative()
 {
-	return m_nonNegative;
+	return m_isNonNegative;
 }
 QColor* VectorGraphDataArray::getLineColor()
 {
@@ -3871,9 +3873,11 @@ qDebug("getValuesD8 [%d] start: %d, end: %d, type: %d,      ---       %f, %f, %f
 			m_bakedValues[j] = -1.0f;
 		}
 	}
-	if (m_nonNegative == true)
+	if (m_isNonNegative == true)
 	{
-		for (int j = start; j < end; j++)
+		int startB = iIn == 0 ? 0 : start;
+		int endB = iIn >= m_dataArray.size() - 1 ? m_bakedValues.size() : end;
+		for (int j = startB; j < endB; j++)
 		{
 			m_bakedValues[j] = m_bakedValues[j] / 2.0f + 0.5f;
 		}
