@@ -27,6 +27,7 @@
 
 #include <QMouseEvent>
 #include <QPainter>
+#include <QMenu>
 
 #include "EnvelopeAndLfoParameters.h"
 #include "lmms_math.h"
@@ -73,6 +74,36 @@ void EnvelopeGraph::mousePressEvent(QMouseEvent* me)
 	if (me->button() == Qt::LeftButton) { toggleAmountModel(); }
 }
 
+void EnvelopeGraph::contextMenuEvent(QContextMenuEvent* event)
+{
+	QMenu menu(this);
+	QMenu* scalingMenu = menu.addMenu(tr("Scaling"));
+	scalingMenu->setToolTipsVisible(true);
+
+	auto switchTo = [&](ScalingMode scaling)
+	{
+		if (m_scaling != scaling)
+		{
+			m_scaling = scaling;
+			update();
+		}
+	};
+
+	auto addScalingEntry = [scalingMenu, &switchTo, this](const QString& text, const QString& toolTip, ScalingMode scaling)
+	{
+		QAction* action = scalingMenu->addAction(text, [&switchTo, scaling]() { switchTo(scaling); });
+		action->setCheckable(true);
+		action->setChecked(m_scaling == scaling);
+		action->setToolTip(toolTip);
+	};
+	
+	addScalingEntry(tr("Dynamic"), tr("Uses absolute spacings but switches to relative spacing if it's running out of space"), ScalingMode::Dynamic);
+	addScalingEntry(tr("Absolute"), tr("Provides enough potential space for each segment but does not scale"), ScalingMode::Absolute);
+	addScalingEntry(tr("Relative"), tr("Always uses all of the available space to display the envelope graph"), ScalingMode::Relative);
+
+    menu.exec(event->globalPos());
+}
+
 void EnvelopeGraph::paintEvent(QPaintEvent*)
 {
 	QPainter p{this};
@@ -107,9 +138,67 @@ void EnvelopeGraph::paintEvent(QPaintEvent*)
 
 	// The margin to the left and right so that we do not clip too much of the lines and markers
 	const float margin = 2.0;
-	// This is the maximum width that each of the five segments (DAHDR) can occupy so that
-	// they always fit on the screen with maximum settings.
-	const float maximumSegmentWidth = (width() - margin * 2) / 5.;
+	const float availableWidth = width() - margin * 2;
+
+	// Now determine the maximum width for one segment according to the scaling setting.
+	// The different scalings use different means to compute the maximum available width per segment.
+	const auto computeMaximumSegmentWidthAbsolute = [&]() -> float
+	{
+		return availableWidth / 5.;
+	};
+
+	const auto computeMaximumSegmentWidthRelative = [&]() -> float
+	{
+		const float sumOfSegments = predelayPercentage + attackPercentage + holdPercentage + decayPercentage + releasePercentage;
+
+		if (sumOfSegments != 0.)
+		{
+			return availableWidth / sumOfSegments;
+		}
+		else
+		{
+			return computeMaximumSegmentWidthAbsolute();
+		}
+	};
+
+	const auto computeMaximumSegmentWidthDynamic = [&]() -> float
+	{
+		const float sumOfSegments = predelayPercentage + attackPercentage + holdPercentage + decayPercentage + releasePercentage;
+
+		float preliminarySegmentWidth = 80. / 182. * availableWidth;
+		
+		const float neededWidth = sumOfSegments * preliminarySegmentWidth;
+		
+		if (neededWidth > availableWidth && sumOfSegments != 0.)
+		{
+			return computeMaximumSegmentWidthRelative();
+		}
+		else
+		{
+			return preliminarySegmentWidth;
+		}
+	};
+
+	// This is the maximum width that each of the five segments (DAHDR) can occupy.
+	float maximumSegmentWidth;
+
+	switch (m_scaling)
+	{
+		case ScalingMode::Absolute:
+			maximumSegmentWidth = computeMaximumSegmentWidthAbsolute();
+			break;
+		case ScalingMode::Relative:
+		{
+			maximumSegmentWidth = computeMaximumSegmentWidthRelative();
+			break;
+		}
+		case ScalingMode::Dynamic:
+		default:
+		{
+			maximumSegmentWidth = computeMaximumSegmentWidthDynamic();
+			break;
+		}
+	}
 
 	// Compute the actual widths that the segments occupy and add them to the
 	// previous x coordinates starting at the margin.

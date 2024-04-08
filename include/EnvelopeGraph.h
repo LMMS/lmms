@@ -42,13 +42,22 @@ namespace gui
 class EnvelopeGraph : public QWidget, public ModelView
 {
 public:
+	enum class ScalingMode
+	{
+		Dynamic,
+		Absolute,
+		Relative
+	};
+
+public:
 	EnvelopeGraph(QWidget* parent);
 
 protected:
 	void modelChanged() override;
 
-	void mousePressEvent(QMouseEvent* me) override;
-	void paintEvent(QPaintEvent* pe) override;
+	void mousePressEvent(QMouseEvent*) override;
+	void contextMenuEvent(QContextMenuEvent*) override;
+	void paintEvent(QPaintEvent*) override;
 
 private:
 	void toggleAmountModel();
@@ -57,6 +66,8 @@ private:
 	QPixmap m_envGraph = embed::getIconPixmap("envelope_graph");
 
 	EnvelopeAndLfoParameters* m_params = nullptr;
+
+	ScalingMode m_scaling = ScalingMode::Dynamic;
 };
 
 } // namespace gui
