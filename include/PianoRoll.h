@@ -376,6 +376,7 @@ private:
 
 	TimePos m_currentPosition;
 	bool m_recording;
+	bool m_doAutoQuantization{false};
 	QList<Note> m_recordingNotes;
 
 	Note * m_currentNote;
