@@ -31,6 +31,7 @@
 
 #include "EnvelopeAndLfoParameters.h"
 #include "lmms_math.h"
+#include "ColorHelper.h"
 
 #include <cmath>
 
@@ -40,22 +41,6 @@ namespace lmms
 
 namespace gui
 {
-
-static QColor interpolateInRgb(const QColor& a, const QColor& b, float t)
-{
-	qreal ar, ag, ab, aa;
-	a.getRgbF(&ar, &ag, &ab, &aa);
-
-	qreal br, bg, bb, ba;
-	b.getRgbF(&br, &bg, &bb, &ba);
-
-	const float interH = lerp(ar, br, t);
-	const float interS = lerp(ag, bg, t);
-	const float interV = lerp(ab, bb, t);
-	const float interA = lerp(aa, ba, t);
-
-	return QColor::fromRgbF(interH, interS, interV, interA);
-}
 
 EnvelopeGraph::EnvelopeGraph(QWidget* parent) :
 	QWidget(parent),
@@ -226,7 +211,7 @@ void EnvelopeGraph::paintEvent(QPaintEvent*)
 	const float absAmount = std::abs(amount);
 	const QColor noAmountColor{96, 91, 96};
 	const QColor fullAmountColor{0, 255, 128};
-	const QColor lineColor{interpolateInRgb(noAmountColor, fullAmountColor, absAmount)};
+	const QColor lineColor{ColorHelper::interpolateInRgb(noAmountColor, fullAmountColor, absAmount)};
 
 	// Determine the line width so that it scales with the widget
 	// Use the minimum value of the current width and height to compute it.
