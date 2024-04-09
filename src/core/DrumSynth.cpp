@@ -94,12 +94,9 @@ float DrumSynth::LoudestEnv()
 
 	while (i < 5) // 2
 	{
-		if (chkOn[i] == 1)
+		if ((chkOn[i] == 1) && (sliLev[i] > loudest))
 		{
-			if (sliLev[i] > loudest)
-			{
-				loudest = static_cast<float>(sliLev[i]);
-			}
+			loudest = static_cast<float>(sliLev[i]);
 		}
 		i++;
 	}
@@ -368,8 +365,11 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 	strcpy(sec, "General");
 	GetPrivateProfileString(sec, "Version", "", ver, sizeof(ver), dsfile);
 	ver[9] = 0;
-	if (strcasecmp(ver, "DrumSynth") != 0) { return 0; } // input fail
-	if (ver[11] != '1' && ver[11] != '2') { return 0; }	 // version fail
+	if ((strcasecmp(ver, "DrumSynth") != 0) // input fail
+		|| (ver[11] != '1' && ver[11] != '2'))  // version fail
+	{
+		return 0;
+	}
 
 	// read master parameters
 	GetPrivateProfileString(sec, "Comment", "", comment, sizeof(comment), dsfile);
@@ -936,9 +936,18 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 
 		for (j = 0; j < 1200; j++) // clipping + output
 		{
-			if (DF[j] > clippoint) { wave[wavewords++] = clippoint; }
-			else if (DF[j] < -clippoint) { wave[wavewords++] = -clippoint; }
-			else { wave[wavewords++] = static_cast<short>(DF[j]); }
+			if (DF[j] > clippoint)
+			{
+				wave[wavewords++] = clippoint;
+			}
+			else if (DF[j] < -clippoint)
+			{
+				wave[wavewords++] = -clippoint;
+			}
+			else
+			{
+				wave[wavewords++] = static_cast<short>(DF[j]);
+			}
 
 			for (int c = 1; c < channels; c++)
 			{
