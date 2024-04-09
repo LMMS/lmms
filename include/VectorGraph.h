@@ -454,6 +454,9 @@ public:
 protected:
 	// returns m_automationModelArray
 	std::vector<FloatModel*>* getAutomationModelArray();
+	// delete automationModels in m_automationModelArray
+	// that are not used by points (there should be 0 cases like this)
+	void delUnusedAutomation();
 	QString getSavedDataArray();
 	void loadDataArray(QString dataIn, unsigned int sizeIn);
 private:

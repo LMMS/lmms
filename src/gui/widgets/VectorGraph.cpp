@@ -1739,6 +1739,9 @@ void VectorGraphModel::saveSettings(QDomDocument& doc, QDomElement& element, con
 				m_dataArrays[i].setAutomated(j, false);
 			}
 		}
+		// delete automation that is in the automationModelArray
+		// but not used by a point (there should be 0 cases like this)
+		m_dataArrays[i].delUnusedAutomation();
 
 		// getting the start of the attribute name
 		QString readLocation = "a" + QString::number(i) + "-";
@@ -2973,6 +2976,41 @@ FloatModel* VectorGraphDataArray::getAutomationModel(unsigned int locationIn)
 std::vector<FloatModel*>* VectorGraphDataArray::getAutomationModelArray()
 {
 	return &m_automationModelArray;
+}
+void VectorGraphDataArray::delUnusedAutomation()
+{
+	bool dataChangedVal = false;
+	std::vector<int> usedAutomation;
+	for (unsigned int i = 0; i < m_dataArray.size(); i++)
+	{
+		if (m_dataArray[i].m_automationModel != -1)
+		{
+			usedAutomation.push_back(m_dataArray[i].m_automationModel);
+		}
+	}
+	for	(unsigned int i = 0; i < m_automationModelArray.size(); i++)
+	{
+		bool found = false;
+		for	(unsigned int j = 0; j < usedAutomation.size(); j++)
+		{
+			if (i == usedAutomation[j])
+			{
+				found = true;
+				break;
+			}
+		}
+		if (found == false)
+		{
+			dataChangedVal = true;
+			delAutomationModel(i, false);
+		}
+	}
+
+	// getUpdatingFromPoint() is called in delAutomationModel()
+	if (dataChangedVal == true)
+	{
+		dataChanged();
+	}
 }
 QString VectorGraphDataArray::getSavedDataArray()
 {
