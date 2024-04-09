@@ -82,9 +82,18 @@ void EnvelopeGraph::contextMenuEvent(QContextMenuEvent* event)
 		action->setToolTip(toolTip);
 	};
 	
-	addScalingEntry(tr("Dynamic"), tr("Uses absolute spacings but switches to relative spacing if it's running out of space"), ScalingMode::Dynamic);
-	addScalingEntry(tr("Absolute"), tr("Provides enough potential space for each segment but does not scale"), ScalingMode::Absolute);
-	addScalingEntry(tr("Relative"), tr("Always uses all of the available space to display the envelope graph"), ScalingMode::Relative);
+	addScalingEntry(
+		tr("Dynamic"),
+		tr("Uses absolute spacings but switches to relative spacing if it's running out of space"),
+		ScalingMode::Dynamic);
+	addScalingEntry(
+		tr("Absolute"),
+		tr("Provides enough potential space for each segment but does not scale"),
+		ScalingMode::Absolute);
+	addScalingEntry(
+		tr("Relative"),
+		tr("Always uses all of the available space to display the envelope graph"),
+		ScalingMode::Relative);
 
     menu.exec(event->globalPos());
 }
@@ -158,10 +167,8 @@ void EnvelopeGraph::paintEvent(QPaintEvent*)
 		{
 			return computeMaximumSegmentWidthRelative();
 		}
-		else
-		{
-			return preliminarySegmentWidth;
-		}
+
+		return preliminarySegmentWidth;
 	};
 
 	// This is the maximum width that each of the five segments (DAHDR) can occupy.
@@ -173,16 +180,12 @@ void EnvelopeGraph::paintEvent(QPaintEvent*)
 			maximumSegmentWidth = computeMaximumSegmentWidthAbsolute();
 			break;
 		case ScalingMode::Relative:
-		{
 			maximumSegmentWidth = computeMaximumSegmentWidthRelative();
 			break;
-		}
 		case ScalingMode::Dynamic:
 		default:
-		{
 			maximumSegmentWidth = computeMaximumSegmentWidthDynamic();
 			break;
-		}
 	}
 
 	// Compute the actual widths that the segments occupy and add them to the
@@ -238,10 +241,10 @@ void EnvelopeGraph::paintEvent(QPaintEvent*)
 	const qreal baseRectSize = lineWidth * 3;
 	const QSizeF rectSize{baseRectSize, baseRectSize};
 
-	auto drawMarker = [&](const QPointF & point)
+	auto drawMarker = [&](const QPointF& point)
 	{
 		// Create a rectangle that has the given point at its center
-		QRectF bgRect{point + QPointF(-baseRectSize/2, -baseRectSize/2), rectSize};
+		QRectF bgRect{point + QPointF(-baseRectSize / 2, -baseRectSize / 2), rectSize};
 		p.drawEllipse(bgRect);
 	};
 
