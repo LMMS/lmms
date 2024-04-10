@@ -1,8 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.9)
 
-SET(CMAKE_CXX_STANDARD 17)
-SET(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 # Set the given policy to NEW. If it does not exist, it will not be set. If it
 # is already set to NEW (most likely due to predating the minimum required CMake
 # version), a developer warning is emitted indicating that the policy need no
@@ -156,6 +153,8 @@ IF(LMMS_BUILD_MSYS AND CMAKE_BUILD_TYPE STREQUAL "Debug")
 	SET(STATUS_STK "not built as requested")
 ENDIF()
 
+SET(CMAKE_CXX_STANDARD 17)
+SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 CHECK_INCLUDE_FILES(pthread.h LMMS_HAVE_PTHREAD_H)
 CHECK_INCLUDE_FILES(semaphore.h LMMS_HAVE_SEMAPHORE_H)
