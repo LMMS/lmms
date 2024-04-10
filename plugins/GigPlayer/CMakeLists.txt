@@ -3,6 +3,7 @@ if(LMMS_HAVE_GIG)
 	INCLUDE_DIRECTORIES(${GIG_INCLUDE_DIRS})
 	SET(CMAKE_AUTOUIC ON)
 
+	# FIXME: Make sure we build globally with exceptions enabled and we can remove this
 	# Required for not crashing loading files with libgig
 	add_compile_options("-fexceptions")
 

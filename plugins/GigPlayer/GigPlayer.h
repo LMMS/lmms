@@ -39,7 +39,8 @@
 #include "LcdSpinBox.h"
 #include "LedCheckBox.h"
 #include "libgig/gig.h"
-#include <array>
+#include <vector>
+#include <list>
 
 
 class QLabel;
@@ -158,7 +159,7 @@ public:
 
 	// Needed since libsamplerate stores data internally between calls
 	void updateSampleRate();
-	bool convertSampleRate(std::array<sampleFrame, 1024>& oldBuf, std::array<sampleFrame, 1024>& newBuf,
+	bool convertSampleRate(std::vector<sampleFrame>& oldBuf, std::vector<sampleFrame>& newBuf,
 		f_cnt_t oldSize, f_cnt_t newSize, float freq_factor, f_cnt_t& used );
 
 	gig::Sample * sample;
@@ -167,12 +168,12 @@ public:
 	ADSR adsr;
 
 	// The position in sample
-	f_cnt_t pos;
+	gig::file_offset_t pos;
 
 	// Whether to change the pitch of the samples, e.g. if there's only one
 	// sample per octave and you want that sample pitch shifted for the rest of
 	// the notes in the octave, this will be true
-	bool pitchtrack;
+	//bool pitchtrack;
 
 	// Used to convert sample rates
 	int interpolation;
@@ -214,7 +215,7 @@ public:
 	bool isRelease; // Whether this is a release sample, changes when we delete it
 	GigState state;
 	float frequency;
-	QList<GigSample> samples;
+	std::list<GigSample> samples;
 
 	// Used to determine which note should be released on key up
 	//
@@ -295,7 +296,7 @@ private:
 	int m_interpolation;
 
 	// List of all the currently playing notes
-	QList<GigNote> m_notes;
+	std::list<GigNote> m_notes;
 
 	// Used when determining which samples to use
 	uint32_t m_RandomSeed;
@@ -313,9 +314,9 @@ private:
 	Dimension getDimensions( gig::Region * pRegion, int velocity, bool release );
 
 	// Load sample data from the Gig file, looping the sample where needed
-	void loadSample(GigSample& sample, std::array<sampleFrame, 1024>& sampleData, f_cnt_t samples);
-	f_cnt_t getLoopedIndex( f_cnt_t index, f_cnt_t startf, f_cnt_t endf ) const;
-	f_cnt_t getPingPongIndex( f_cnt_t index, f_cnt_t startf, f_cnt_t endf ) const;
+	void loadSample(GigSample& sample, std::vector<sampleFrame>& sampleData, gig::file_offset_t samples);
+	gig::file_offset_t getLoopedIndex(gig::file_offset_t index, gig::file_offset_t startf, gig::file_offset_t endf) const;
+	gig::file_offset_t getPingPongIndex(gig::file_offset_t index, gig::file_offset_t startf, gig::file_offset_t endf) const;
 
 	// Add the desired samples to the note, either normal samples or release
 	// samples
