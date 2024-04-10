@@ -47,7 +47,7 @@
        <item>
         <widget class="QLabel" name="versionLabel">
          <property name="text">
-          <string>Version %1 (%2/%3, Qt %4, %5, %6).</string>
+          <string>Version %1 (%2/%3, Qt %4, %5).</string>
          </property>
         </widget>
        </item>
