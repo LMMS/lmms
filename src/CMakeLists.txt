@@ -117,7 +117,7 @@ TARGET_INCLUDE_DIRECTORIES(lmms
 
 # Building with qt 6 fails with msvc
 IF(MSVC)
-	TARGET_COMPILE_OPTIONS(lmmsobjs PUBLIC "/Zc:__cplusplus /permissive-")
+	TARGET_COMPILE_OPTIONS(lmmsobjs PUBLIC "/Zc:__cplusplus" "/permissive-")
 ENDIF()
 
 # CMake doesn't define target_EXPORTS for OBJECT libraries.
