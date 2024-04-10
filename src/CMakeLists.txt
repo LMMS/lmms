@@ -115,6 +115,11 @@ TARGET_INCLUDE_DIRECTORIES(lmms
 	PUBLIC ${CMAKE_CURRENT_BINARY_DIR}
 )
 
+# Building with qt 6 fails with msvc
+IF(MSVC)
+	TARGET_COMPILE_OPTIONS(lmms PUBLIC "/Zc:__cplusplus")
+ENDIF()
+
 # CMake doesn't define target_EXPORTS for OBJECT libraries.
 # See the documentation of DEFINE_SYMBOL for details.
 # Also add LMMS_STATIC_DEFINE for targets linking against it.
