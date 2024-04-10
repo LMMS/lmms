@@ -273,7 +273,7 @@ void AudioFileProcessorWaveView::paintEvent(QPaintEvent * pe)
 	p.fillRect(s_padding, s_padding, m_graph.width(), 14, g);
 
 	p.setPen(QColor(255, 255, 255));
-	p.setFont(pointSize(font(), 8));
+	p.setFont(adjustedToPixelSize(font(), 8));
 
 	QString length_text;
 	const int length = m_sample->sampleDuration().count();
