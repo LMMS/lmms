@@ -145,14 +145,9 @@ void EnvelopeGraph::paintEvent(QPaintEvent*)
 	{
 		const float sumOfSegments = predelayPercentage + attackPercentage + holdPercentage + decayPercentage + releasePercentage;
 
-		if (sumOfSegments != 0.)
-		{
-			return availableWidth / sumOfSegments;
-		}
-		else
-		{
-			return computeMaximumSegmentWidthAbsolute();
-		}
+		return sumOfSegments != 0.
+				? availableWidth / sumOfSegments
+				: computeMaximumSegmentWidthAbsolute();
 	};
 
 	const auto computeMaximumSegmentWidthDynamic = [&]() -> float
@@ -207,7 +202,6 @@ void EnvelopeGraph::paintEvent(QPaintEvent*)
 	const QPointF decayPoint{decayX, yTop + (1 - sustain) * availableHeight};
 	const QPointF releasePoint{releaseX, yBase};
 
-
 	// Now that we have all points we can draw the lines
 
 	// Compute the color of the lines based on the amount of the envelope
@@ -225,7 +219,6 @@ void EnvelopeGraph::paintEvent(QPaintEvent*)
 	QPolygonF linePoly;
 	linePoly << predelayPoint << attackPoint << holdPoint << decayPoint << releasePoint;
 	p.drawPolyline(linePoly);
-
 
 	// Now draw all marker on top of the lines
 	const QColor markerFillColor{153, 175, 255};
