@@ -212,7 +212,7 @@ IF(LMMS_BUILD_LINUX AND WANT_VST)
     LIST(APPEND QT_LIBRARIES Qt5::X11Extras)
 ENDIF()
 
-# Resolve Qt5::qmake to full path for use in packaging scripts
+# Resolve qmake to full path for use in packaging scripts
 IF(WANT_QT6)
 	FIND_PROGRAM(QT_QMAKE_EXECUTABLE NAME qmake.exe
 		PATHS "${CMAKE_PREFIX_PATH}/bin" /opt/Qt6/bin) # TODO: add more paths here

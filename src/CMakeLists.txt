@@ -122,7 +122,7 @@ TARGET_INCLUDE_DIRECTORIES(lmms
 	PUBLIC ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-# Building with qt 6 fails with msvc
+# Workaround for a build fail on MSVC with Qt 6
 IF(MSVC)
 	TARGET_COMPILE_OPTIONS(lmmsobjs PUBLIC "/Zc:__cplusplus" "/permissive-")
 ENDIF()
