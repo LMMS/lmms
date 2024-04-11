@@ -81,7 +81,7 @@ protected:
 	void paintEvent(QPaintEvent * me) override;
 	void wheelEvent(QWheelEvent * me) override;
 
-	void enterEvent(QEvent *event) override;
+	void enterEvent(QEnterEvent *event) override;
 	void leaveEvent(QEvent *event) override;
 
 	virtual float getValue(const QPoint & p);

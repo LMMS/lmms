@@ -37,7 +37,7 @@ QPixmap getIconPixmap(const QString& pixmapName,
 	QString cacheName;
 	if (width > 0 && height > 0)
 	{
-		cacheName = QString("%1_%2_%3").arg(pixmapName, width, height);
+		cacheName = QString("%1_%2_%3").arg(pixmapName).arg(width).arg(height);
 	}
 	else
 	{

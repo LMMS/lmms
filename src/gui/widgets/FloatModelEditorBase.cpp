@@ -233,7 +233,7 @@ void FloatModelEditorBase::mouseReleaseEvent(QMouseEvent* event)
 }
 
 
-void FloatModelEditorBase::enterEvent(QEvent *event)
+void FloatModelEditorBase::enterEvent(QEnterEvent *event)
 {
 	showTextFloat(700, 2000);
 }

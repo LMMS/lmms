@@ -66,7 +66,7 @@ public:
 	void openInNewInstrumentTrack(QString value);
 
 protected:
-	void enterEvent( QEvent * _e ) override;
+	void enterEvent( QEnterEvent * _e ) override;
 	void leaveEvent( QEvent * _e ) override;
 	void mousePressEvent( QMouseEvent * _me ) override;
 	void paintEvent( QPaintEvent * _pe ) override;

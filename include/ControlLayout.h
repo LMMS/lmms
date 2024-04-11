@@ -126,7 +126,7 @@ private slots:
 private:
 	int doLayout(const QRect &rect, bool testOnly) const;
 	int smartSpacing(QStyle::PixelMetric pm) const;
-	QMap<QString, QLayoutItem *>::const_iterator pairAt(int index) const;
+	QMultiMap<QString, QLayoutItem *>::const_iterator pairAt(int index) const;
 
 	QMultiMap<QString, QLayoutItem *> m_itemMap;
 	int m_hSpace;
