@@ -210,10 +210,7 @@ set_target_properties(lmms PROPERTIES
 	WIN32_EXECUTABLE $<NOT:$<CONFIG:DEBUG>>
 )
 
-set_target_properties(lmmsobjs PROPERTIES
-	AUTOUIC_SEARCH_PATHS
-	"gui/modals"
-)
+set_target_properties(lmmsobjs PROPERTIES AUTOUIC_SEARCH_PATHS "gui/modals")
 
 IF(LMMS_BUILD_MSYS)
 	# ENABLE_EXPORTS property has no effect in some MSYS2 configurations.
