@@ -212,7 +212,7 @@ set_target_properties(lmms PROPERTIES
 
 set_target_properties(lmmsobjs PROPERTIES
 	AUTOUIC_SEARCH_PATHS
-	"{CMAKE_CURRENT_SOURCE_DIR}/gui/modals"
+	"gui/modals"
 )
 
 IF(LMMS_BUILD_MSYS)
