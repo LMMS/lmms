@@ -210,6 +210,11 @@ set_target_properties(lmms PROPERTIES
 	WIN32_EXECUTABLE $<NOT:$<CONFIG:DEBUG>>
 )
 
+set_target_properties(lmmsobjs PROPERTIES
+	AUTOUIC_SEARCH_PATHS
+	"{CMAKE_CURRENT_SOURCE_DIR}/gui/modals"
+)
+
 IF(LMMS_BUILD_MSYS)
 	# ENABLE_EXPORTS property has no effect in some MSYS2 configurations.
 	# Add the linker flag manually to create liblmms.dll.a import library
