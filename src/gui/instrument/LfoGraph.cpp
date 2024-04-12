@@ -151,13 +151,13 @@ void LfoGraph::paintEvent(QPaintEvent*)
 	p.drawPolyline(polyLine);
 
 	// Draw the info text
-	int msPerOsc = static_cast<int>(SECS_PER_LFO_OSCILLATION * lfoSpeed * 1000.f);
+	const float hertz = 1. / (SECS_PER_LFO_OSCILLATION * lfoSpeed);
 
 	QFont f = p.font();
 	f.setPixelSize(height() * 0.2);
 	p.setFont(f);
 	p.setPen(QColor(201, 201, 225));
-	p.drawText(4, height() - 6, tr("%1 ms/LFO").arg(msPerOsc));
+	p.drawText(4, height() - 6, tr("%1 Hz").arg(hertz, 0, 'f', 3));
 }
 
 void LfoGraph::toggleAmountModel()
