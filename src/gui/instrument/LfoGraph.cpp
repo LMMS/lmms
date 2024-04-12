@@ -150,7 +150,16 @@ void LfoGraph::paintEvent(QPaintEvent*)
 
 	p.drawPolyline(polyLine);
 
-	// Draw the info text
+	drawInfoText(*params);
+}
+
+void LfoGraph::drawInfoText(const EnvelopeAndLfoParameters& params)
+{
+	QPainter p(this);
+
+	const float lfoSpeed = params.getLfoSpeedModel().value();
+	const bool x100 = params.getX100Model().value();
+
 	const float hertz = 1. / (SECS_PER_LFO_OSCILLATION * lfoSpeed) * (x100 ? 100. : 1.);
 	const auto infoText = tr("%1 Hz").arg(hertz, 0, 'f', 3);
 

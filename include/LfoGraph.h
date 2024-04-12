@@ -49,6 +49,7 @@ protected:
 	void paintEvent(QPaintEvent* pe) override;
 
 private:
+	void drawInfoText(const EnvelopeAndLfoParameters&);
 	void toggleAmountModel();
 
 private:
