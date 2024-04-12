@@ -45,8 +45,6 @@ public:
 	LfoGraph(QWidget* parent);
 
 protected:
-	void modelChanged() override;
-
 	void mousePressEvent(QMouseEvent* me) override;
 	void paintEvent(QPaintEvent* pe) override;
 
@@ -55,8 +53,6 @@ private:
 
 private:
 	QPixmap m_lfoGraph = embed::getIconPixmap("lfo_graph");
-
-	EnvelopeAndLfoParameters* m_params = nullptr;
 
 	float m_randomGraph {0.};
 };
