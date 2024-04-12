@@ -152,12 +152,26 @@ void LfoGraph::paintEvent(QPaintEvent*)
 
 	// Draw the info text
 	const float hertz = 1. / (SECS_PER_LFO_OSCILLATION * lfoSpeed) * (x100 ? 100. : 1.);
+	const auto infoText = tr("%1 Hz").arg(hertz, 0, 'f', 3);
 
+	// First configure the font so that we get correct results for the font metrics used below
 	QFont f = p.font();
 	f.setPixelSize(height() * 0.2);
 	p.setFont(f);
+
+	// This is the position where the text and its rectangle will be rendered
+	const QPoint textPosition(4, height() - 6);
+
+	// Draw a slightly transparent black rectangle underneath the text to keep it legible
+	const QFontMetrics fontMetrics(f);
+	// This gives the bounding rectangle if the text was rendered at the origin ...
+	const auto boundingRect = fontMetrics.boundingRect(infoText);
+	// ... so we translate it to the actual position where the text will be rendered.
+	p.fillRect(boundingRect.translated(textPosition), QColor{0, 0, 0, 192});
+
+	// Now draw the actual info text
 	p.setPen(QColor(201, 201, 225));
-	p.drawText(4, height() - 6, tr("%1 Hz").arg(hertz, 0, 'f', 3));
+	p.drawText(textPosition, infoText);
 }
 
 void LfoGraph::toggleAmountModel()
