@@ -151,7 +151,7 @@ void LfoGraph::paintEvent(QPaintEvent*)
 	p.drawPolyline(polyLine);
 
 	// Draw the info text
-	const float hertz = 1. / (SECS_PER_LFO_OSCILLATION * lfoSpeed);
+	const float hertz = 1. / (SECS_PER_LFO_OSCILLATION * lfoSpeed) * (x100 ? 100. : 1.);
 
 	QFont f = p.font();
 	f.setPixelSize(height() * 0.2);
