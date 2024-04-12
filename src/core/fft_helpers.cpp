@@ -26,7 +26,10 @@
 
 #include "fft_helpers.h"
 
+#include <iostream>
+
 #include <cmath>
+#include <vector>
 #include "lmms_constants.h"
 
 namespace lmms
@@ -176,6 +179,95 @@ int absspec(const fftwf_complex *complex_buffer, float *absspec_buffer, unsigned
 	}
 
 	return 0;
+}
+
+
+/* TODO
+ * Take care that - compl_len is not bigger than complex_buffer!
+ *                - absspec buffer is big enough!
+ *
+ * return 0 on success, else -1
+ */
+int getPhase(const fftwf_complex *complex_buffer, float *phaseBufferOut, unsigned int compl_length)
+{
+	if (complex_buffer == nullptr || phaseBufferOut == nullptr) {return -1;}
+	if (compl_length == 0) {return -1;}
+
+	for (unsigned int i = 0; i < compl_length; i++)
+	{
+		phaseBufferOut[i] = std::atan(complex_buffer[i][1] / complex_buffer[i][0]);
+	}
+
+	return 0;
+}
+
+
+/* TODO
+ * Take care that - compl_len is not bigger than complex_buffer!
+ *                - absspec buffer is big enough!
+ *
+ * return 0 on success, else -1
+ */
+int inverseAbsspec(fftwf_complex *complex_buffer, const float *absspec_buffer, const float *phaseBufferIn,
+	unsigned int sampleRateIn, unsigned int compl_length)
+{
+	if (complex_buffer == nullptr || absspec_buffer == nullptr || phaseBufferIn == nullptr) {return -1;}
+	if (compl_length == 0) {return -1;}
+	/*
+	for a complex number $c$ of magnitude $m$ and phase offset $\theta$
+	[
+	c = me^{j(2\pi f + \theta)} = m\cos(2\pi f + \theta) + jm\sin(2\pi f + \theta)
+	] 
+	*/
+	// 2 / pi
+	float twoDivPi = 1.570796327f;
+	for (unsigned int i = 0; i < compl_length; i++)
+	{
+		float curFreq = getFreq(i, sampleRateIn, compl_length);
+		//std::cout << "inverseAbsspec i: " << i << " freq: " << curFreq << " amp: " << absspec_buffer[i] << " phase: " << phaseBufferIn[i] << std::endl;
+		//complex_buffer[i][0] = absspec_buffer[i] / std::cos(twoDivPi * curFreq + phaseBufferIn[i]);
+		//complex_buffer[i][1] = absspec_buffer[i] / std::sin(twoDivPi * curFreq + phaseBufferIn[i]);
+		//complex_buffer[i][0] = std::pow(absspec_buffer[i] * 2.718281828f, twoDivPi * curFreq + phaseBufferIn[i]);
+		//complex_buffer[i][1] = std::pow(absspec_buffer[i] * 2.718281828f, twoDivPi * curFreq + phaseBufferIn[i]);
+		//complex_buffer[i][0] = absspec_buffer[i] * std::cos(twoDivPi * curFreq + phaseBufferIn[i]);
+		//complex_buffer[i][1] = absspec_buffer[i] * std::sin(twoDivPi * curFreq + phaseBufferIn[i]);
+		complex_buffer[i][0] = absspec_buffer[i] * std::cos(phaseBufferIn[i]);
+		complex_buffer[i][1] = absspec_buffer[i] * std::sin(phaseBufferIn[i]);
+	}
+	return 0;
+}
+int inverseAbsspec(fftwf_complex *complex_buffer, const float *absspec_buffer, unsigned int sampleRateIn, unsigned int compl_length)
+{
+	if (complex_buffer == nullptr || absspec_buffer == nullptr) {return -1;}
+	if (compl_length == 0) {return -1;}
+
+	std::vector<float> phaseInput(compl_length);
+	getPhase(complex_buffer, phaseInput.data(), compl_length);
+	return inverseAbsspec(complex_buffer, absspec_buffer, phaseInput.data(), sampleRateIn, compl_length);
+}
+
+
+/* TODO
+ * Take care that - compl_len is not bigger than complex_buffer!
+ *                - absspec buffer is big enough!
+ *
+ * return 0 on success, else -1
+ */
+int getFreq(float *freqBufferOut, unsigned int sampleRateIn, unsigned int compl_length)
+{
+	if (freqBufferOut == nullptr) {return -1;}
+	if (compl_length == 0) {return -1;}
+
+	for (unsigned int i = 0; i < compl_length; i++)
+	{
+		freqBufferOut[i] = getFreq(i, sampleRateIn, compl_length);
+	}
+
+	return 0;
+}
+float getFreq(unsigned int locationIn, unsigned int sampleRateIn, unsigned int compl_length)
+{
+	return locationIn * sampleRateIn / static_cast<float>(compl_length) / 2.0f;
 }
 
 

@@ -96,6 +96,36 @@ int LMMS_EXPORT absspec(const fftwf_complex *complex_buffer, float *absspec_buff
 						unsigned int compl_length);
 
 
+/**	TODO
+ *	Take care that - compl_len is not bigger than complex_buffer!
+ *				   - absspec buffer is big enough!
+ *
+ *	@return 0 on success, else -1
+ */
+int LMMS_EXPORT getPhase(const fftwf_complex *complex_buffer, float *phaseBufferOut, unsigned int compl_length);
+
+
+/**	TODO
+ *	Take care that - compl_len is not bigger than complex_buffer!
+ *				   - absspec buffer is big enough!
+ *
+ *	@return 0 on success, else -1
+ */
+int LMMS_EXPORT inverseAbsspec(fftwf_complex *complex_buffer, const float *absspec_buffer, const float *phaseBufferIn,
+	unsigned int sampleRateIn, unsigned int compl_length);
+int LMMS_EXPORT inverseAbsspec(fftwf_complex *complex_buffer, const float *absspec_buffer, unsigned int sampleRateIn, unsigned int compl_length);
+
+
+/**	TODO
+ *	Take care that - compl_len is not bigger than complex_buffer!
+ *				   - absspec buffer is big enough!
+ *
+ *	@return 0 on success, else -1
+ */
+int LMMS_EXPORT getFreq(float *freqBufferOut, unsigned int sampleRateIn, unsigned int compl_length);
+float LMMS_EXPORT getFreq(unsigned int locationIn, unsigned int sampleRateIn, unsigned int compl_length);
+
+
 /**	Build fewer subbands from many absolute spectrum values.
  *	Take care that - compressedbands[] array num_new elements long
  *				   - num_old > num_new
