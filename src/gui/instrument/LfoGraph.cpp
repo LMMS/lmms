@@ -96,7 +96,7 @@ void LfoGraph::paintEvent(QPaintEvent*)
 	{
 		float value = 0.0;
 		float currentSample = x * framesForGraph / lfoGraphWidth;
-		const f_cnt_t sampleAsFrameCount = static_cast<f_cnt_t>(currentSample);
+		const auto sampleAsFrameCount = static_cast<f_cnt_t>(currentSample);
 		if (sampleAsFrameCount > predelayFrames)
 		{
 			const float phase = (currentSample -= predelayFrames) / oscFrames;
