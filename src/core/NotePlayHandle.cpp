@@ -53,7 +53,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 								NotePlayHandle *parent,
 								int midiEventChannel,
 								Origin origin ) :
-	PlayHandle( Type::NotePlayHandle, _offset ),
+	PlayHandle( PlayHandle::Type::NotePlayHandle, _offset ),
 	Note( n.length(), n.pos(), n.key(), n.getVolume(), n.getPanning(), n.detuning() ),
 	m_pluginData( nullptr ),
 	m_instrumentTrack( instrumentTrack ),
@@ -610,9 +610,9 @@ int NotePlayHandleManager::s_size;
 
 void NotePlayHandleManager::init()
 {
-	s_available = MM_ALLOC<NotePlayHandle*>( INITIAL_NPH_CACHE );
+	s_available = new NotePlayHandle*[INITIAL_NPH_CACHE];
 
-	auto n = MM_ALLOC<NotePlayHandle>(INITIAL_NPH_CACHE);
+	auto n = static_cast<NotePlayHandle *>(std::malloc(sizeof(NotePlayHandle) * INITIAL_NPH_CACHE));
 
 	for( int i=0; i < INITIAL_NPH_CACHE; ++i )
 	{
@@ -655,11 +655,11 @@ void NotePlayHandleManager::release( NotePlayHandle * nph )
 void NotePlayHandleManager::extend( int c )
 {
 	s_size += c;
-	auto tmp = MM_ALLOC<NotePlayHandle*>(s_size);
-	MM_FREE( s_available );
+	auto tmp = new NotePlayHandle*[s_size];
+	delete[] s_available;
 	s_available = tmp;
 
-	auto n = MM_ALLOC<NotePlayHandle>(c);
+	auto n = static_cast<NotePlayHandle *>(std::malloc(sizeof(NotePlayHandle) * c));
 
 	for( int i=0; i < c; ++i )
 	{
@@ -670,7 +670,7 @@ void NotePlayHandleManager::extend( int c )
 
 void NotePlayHandleManager::free()
 {
-	MM_FREE(s_available);
+	delete[] s_available;
 }
 
 

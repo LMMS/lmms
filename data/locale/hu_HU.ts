@@ -5339,62 +5339,62 @@ Ellenőrizd, hogy rendelkezel-e a szükséges engedélyekkel és próbáld újra
     </message>
 </context>
 <context>
-    <name>MixerLine</name>
+    <name>MixerChannelView</name>
     <message>
-        <location filename="../../src/gui/MixerLine.cpp" line="86"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="86"/>
         <source>Channel send amount</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/MixerLine.cpp" line="242"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="242"/>
         <source>Move &amp;left</source>
         <translation>Mozgatás &amp;balra</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerLine.cpp" line="243"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="243"/>
         <source>Move &amp;right</source>
         <translation>Mozgatás &amp;jobbra</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerLine.cpp" line="245"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="245"/>
         <source>Rename &amp;channel</source>
         <translation>Csatorna át&amp;nevezése</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerLine.cpp" line="250"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="250"/>
         <source>R&amp;emove channel</source>
         <translation>Csatorna &amp;eltávolítása</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerLine.cpp" line="253"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="253"/>
         <source>Remove &amp;unused channels</source>
         <translation>&amp;Nem használt csatornák eltávolítása</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerLine.cpp" line="255"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="255"/>
         <source>Set channel color</source>
         <translation>Szín módosítása</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerLine.cpp" line="256"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="256"/>
         <source>Remove channel color</source>
         <translation>Szín eltávolítása</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerLine.cpp" line="257"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="257"/>
         <source>Pick random channel color</source>
         <translation>Véletlenszerű szín</translation>
     </message>
 </context>
 <context>
-    <name>MixerLineLcdSpinBox</name>
+    <name>MixerChannelLcdSpinBox</name>
     <message>
-        <location filename="../../src/gui/widgets/MixerLineLcdSpinBox.cpp" line="58"/>
+        <location filename="../../src/gui/widgets/MixerChannelLcdSpinBox.cpp" line="58"/>
         <source>Assign to:</source>
         <translation>Hozzárendelés:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/MixerLineLcdSpinBox.cpp" line="58"/>
+        <location filename="../../src/gui/widgets/MixerChannelLcdSpinBox.cpp" line="58"/>
         <source>New mixer Channel</source>
         <translation>Új csatorna</translation>
     </message>

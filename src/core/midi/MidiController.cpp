@@ -74,11 +74,11 @@ void MidiController::updateName()
 
 void MidiController::processInEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset)
 {
-	unsigned char controllerNum;
 	switch(event.type())
 	{
 		case MidiControlChange:
-			controllerNum = event.controllerNumber();
+		{
+			unsigned char controllerNum = event.controllerNumber();
 
 			if (m_midiPort.inputController() == controllerNum &&
 				(m_midiPort.inputChannel() == event.channel() + 1 || m_midiPort.inputChannel() == 0))
@@ -89,7 +89,7 @@ void MidiController::processInEvent(const MidiEvent& event, const TimePos& time,
 				emit valueChanged();
 			}
 			break;
-
+		}
 		default:
 			// Don't care - maybe add special cases for pitch and mod later
 			break;

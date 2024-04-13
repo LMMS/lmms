@@ -48,8 +48,8 @@ public:
 		m_value{value}
 	{}
 
-	constexpr auto testAll(Flags flags) const -> bool { return *this & flags == flags; }
-	constexpr auto testAny(Flags flags) const -> bool { return *this & flags != Flags{}; }
+	constexpr auto testAll(Flags flags) const -> bool { return (*this & flags) == flags; }
+	constexpr auto testAny(Flags flags) const -> bool { return (*this & flags) != Flags{}; }
 	constexpr auto testFlag(EnumType flag) const -> bool { return static_cast<bool>(*this & flag); }
 
 	constexpr auto operator~() const -> Flags { return Flags{~m_value}; }

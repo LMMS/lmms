@@ -65,6 +65,7 @@ QRectF EqHandle::boundingRect() const
 
 float EqHandle::freqToXPixel( float freq , int w )
 {
+	if (typeInfo<float>::isEqual(freq, 0.0f)) { return 0.0f; }
 	float min = log10f( 20 );
 	float max = log10f( 20000 );
 	float range = max - min;
@@ -207,15 +208,14 @@ float EqHandle::getPeakCurve( float x )
 	double Q = getResonance();
 	double A =  pow( 10, yPixelToGain( EqHandle::y(), m_heigth, m_pixelsPerUnitHeight ) / 40 );
 	double alpha = s * sinh( log( 2 ) / 2 * Q * w0 / sinf( w0 ) );
-	double a0, a1, a2, b0, b1, b2; // coeffs to calculate
 
 	//calc coefficents
-	b0 =   1 + alpha * A;
-	b1 =  -2 * c;
-	b2 =   1 - alpha * A;
-	a0 =   1 + alpha / A;
-	a1 =  -2 * c;
-	a2 =   1 - alpha / A;
+	double b0 = 1 + alpha * A;
+	double b1 = -2 * c;
+	double b2 = 1 - alpha * A;
+	double a0 = 1 + alpha / A;
+	double a1 = -2 * c;
+	double a2 = 1 - alpha / A;
 
 	//normalise
 	b0 /= a0;
@@ -244,15 +244,15 @@ float EqHandle::getHighShelfCurve( float x )
 	double s = sinf( w0 );
 	double A =  pow( 10, yPixelToGain( EqHandle::y(), m_heigth, m_pixelsPerUnitHeight ) * 0.025 );
 	double beta = sqrt( A ) / m_resonance;
-	double a0, a1, a2, b0, b1, b2; // coeffs to calculate
 
 	//calc coefficents
-	b0 = A * ( ( A + 1 ) + ( A - 1 ) * c + beta * s);
-	b1 = -2 * A * ( ( A - 1 ) + ( A + 1 ) * c );
-	b2 = A * ( ( A + 1 ) + ( A - 1 ) * c - beta * s);
-	a0 = ( A + 1 ) - ( A - 1 ) * c + beta * s;
-	a1 = 2 * ( ( A - 1 ) - ( A + 1 ) * c );
-	a2 = ( A + 1 ) - ( A - 1 ) * c - beta * s;
+	double b0 = A * ((A + 1) + (A - 1) * c + beta * s);
+	double b1 = -2 * A * ((A - 1) + (A + 1) * c);
+	double b2 = A * ((A + 1) + (A - 1) * c - beta * s);
+	double a0 = (A + 1) - (A - 1) * c + beta * s;
+	double a1 = 2 * ((A - 1) - (A + 1) * c);
+	double a2 = (A + 1) - (A - 1) * c - beta * s;
+
 	//normalise
 	b0 /= a0;
 	b1 /= a0;
@@ -280,15 +280,14 @@ float EqHandle::getLowShelfCurve( float x )
 	double s = sinf( w0 );
 	double A =  pow( 10, yPixelToGain( EqHandle::y(), m_heigth, m_pixelsPerUnitHeight ) / 40 );
 	double beta = sqrt( A ) / m_resonance;
-	double a0, a1, a2, b0, b1, b2; // coeffs to calculate
 
 	//calc coefficents
-	b0 = A * ( ( A + 1 ) - ( A - 1 ) * c + beta * s );
-	b1 = 2  * A * ( ( A - 1 ) - ( A + 1 ) * c ) ;
-	b2 = A * ( ( A + 1 ) - ( A - 1 ) * c - beta * s);
-	a0 = ( A + 1 ) + ( A - 1 ) * c + beta * s;
-	a1 = -2 * ( ( A - 1 ) + ( A + 1 ) * c );
-	a2 = ( A + 1 ) + ( A - 1) * c - beta * s;
+	double b0 = A * ((A + 1) - (A - 1) * c + beta * s);
+	double b1 = 2 * A * ((A - 1) - (A + 1) * c);
+	double b2 = A * ((A + 1) - (A - 1) * c - beta * s);
+	double a0 = (A + 1) + (A - 1) * c + beta * s;
+	double a1 = -2 * ((A - 1) + (A + 1) * c);
+	double a2 = (A + 1) + (A - 1) * c - beta * s;
 
 	//normalise
 	b0 /= a0;
@@ -317,14 +316,14 @@ float EqHandle::getLowCutCurve( float x )
 	double s = sinf( w0 );
 	double resonance = getResonance();
 	double alpha = s / (2 * resonance);
-	double a0, a1, a2, b0, b1, b2; // coeffs to calculate
 
-	b0 = ( 1 + c ) * 0.5;
-	b1 = ( -( 1 + c ) );
-	b2 = ( 1 + c ) * 0.5;
-	a0 = 1 + alpha;
-	a1 = ( -2 * c );
-	a2 = 1 - alpha;
+	double b0 = (1 + c) * 0.5;
+	double b1 = (-(1 + c));
+	double b2 = (1 + c) * 0.5;
+	double a0 = 1 + alpha;
+	double a1 = (-2 * c);
+	double a2 = 1 - alpha;
+
 	//normalise
 	b0 /= a0;
 	b1 /= a0;
@@ -360,14 +359,14 @@ float EqHandle::getHighCutCurve( float x )
 	double s = sinf( w0 );
 	double resonance = getResonance();
 	double alpha = s / (2 * resonance);
-	double a0, a1, a2, b0, b1, b2; // coeffs to calculate
 
-	b0 = ( 1 - c ) * 0.5;
-	b1 = 1 - c;
-	b2 = ( 1 - c ) * 0.5;
-	a0 = 1 + alpha;
-	a1 = -2 * c;
-	a2 = 1 - alpha;
+	double b0 = (1 - c) * 0.5;
+	double b1 = 1 - c;
+	double b2 = (1 - c) * 0.5;
+	double a0 = 1 + alpha;
+	double a1 = -2 * c;
+	double a2 = 1 - alpha;
+
 	//normalise
 	b0 /= a0;
 	b1 /= a0;
@@ -568,16 +567,7 @@ void EqHandle::mouseReleaseEvent( QGraphicsSceneMouseEvent *event )
 
 void EqHandle::wheelEvent( QGraphicsSceneWheelEvent *wevent )
 {
-	float highestBandwich;
-	if( m_type != EqHandleType::Para )
-	{
-		highestBandwich = 10;
-	}
-	else
-	{
-		highestBandwich = 4;
-	}
-
+	float highestBandwich = m_type != EqHandleType::Para ? 10 : 4;
 	int numDegrees = wevent->delta() / 120;
 	float numSteps = 0;
 	if( wevent->modifiers() == Qt::ControlModifier )
@@ -739,14 +729,18 @@ void EqCurve::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, 
 		}
 		//compute a QPainterPath
 		m_curve = QPainterPath();
-		for ( int x = 0; x < m_width ; x++ )
+		//only draw the EQ curve if there are any activeHandles
+		if (activeHandles != 0)
 		{
-			mainCurve[x] = ( ( mainCurve[x] / activeHandles ) ) - ( m_heigth/2 );
-			if ( x==0 )
+			for (int x = 0; x < m_width; x++)
 			{
-				m_curve.moveTo( x, mainCurve[x] );
+				mainCurve[x] = ((mainCurve[x] / activeHandles)) - (m_heigth / 2);
+				if (x == 0)
+				{
+					m_curve.moveTo(x, mainCurve[x]);
+				}
+				m_curve.lineTo(x, mainCurve[x]);
 			}
-			m_curve.lineTo( x, mainCurve[x] );
 		}
 		//we cache the curve painting in a pixmap for saving cpu
 		QPixmap cacheMap( boundingRect().size().toSize() );

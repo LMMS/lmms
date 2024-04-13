@@ -31,7 +31,6 @@
 #include "AudioEngine.h"
 #include "AutomatableModel.h"
 #include "TempoSyncKnobModel.h"
-#include "MemoryManager.h"
 
 namespace lmms
 {
@@ -49,7 +48,6 @@ class EffectView;
 
 class LMMS_EXPORT Effect : public Plugin
 {
-	MM_OPERATORS
 	Q_OBJECT
 public:
 	Effect( const Plugin::Descriptor * _desc,
@@ -156,6 +154,11 @@ public:
 	inline void setDontRun( bool _state )
 	{
 		m_noRun = _state;
+	}
+	
+	inline TempoSyncKnobModel* autoQuitModel()
+	{
+		return &m_autoQuitModel;
 	}
 
 	EffectChain * effectChain() const

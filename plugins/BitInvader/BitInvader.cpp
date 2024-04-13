@@ -110,34 +110,18 @@ sample_t BSynth::nextStringSample( float sample_length )
 		sample_realindex -= sample_length;
 	}
 
-	sample_t sample;
-
-	if (interpolation) {
-
-		// find position in shape 
-		int a = static_cast<int>(sample_realindex);	
-		int b;
-		if (a < (sample_length-1)) {
-			b = static_cast<int>(sample_realindex+1);
-		} else {
-			b = 0;
-		}
-		
-		// Nachkommaanteil
-		const float frac = fraction( sample_realindex );
-		
-		sample = linearInterpolate( sample_shape[a], sample_shape[b], frac );
-
-	} else {
-		// No interpolation
-		sample_index = static_cast<int>(sample_realindex);	
-		sample = sample_shape[sample_index];
-	}
-	
-	// progress in shape
+	const auto currentRealIndex = sample_realindex;
+	const auto currentIndex = static_cast<int>(sample_realindex);
 	sample_realindex += sample_step;
 
-	return sample;
+	if (!interpolation)
+	{
+		sample_index = currentIndex;
+		return sample_shape[sample_index];
+	}
+
+	const auto nextIndex = currentIndex < sample_length - 1 ? currentIndex + 1 : 0;
+	return linearInterpolate(sample_shape[currentIndex], sample_shape[nextIndex], fraction(currentRealIndex));
 }	
 
 /***********************************************************************
@@ -153,8 +137,8 @@ BitInvader::BitInvader( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &bitinvader_plugin_descriptor ),
 	m_sampleLength(wavetableSize, 4, wavetableSize, 1, this, tr("Sample length")),
 	m_graph(-1.0f, 1.0f, wavetableSize, this),
-	m_interpolation( false, this ),
-	m_normalize( false, this )
+	m_interpolation(false, this, tr("Interpolation")),
+	m_normalize(false, this, tr("Normalize"))
 {
 	m_graph.setWaveToSine();
 	lengthChanged();
@@ -276,16 +260,7 @@ void BitInvader::playNote( NotePlayHandle * _n,
 {
 	if (!_n->m_pluginData)
 	{
-		float factor;
-		if( !m_normalize.value() )
-		{
-			factor = defaultNormalizationFactor;
-		}
-		else
-		{
-			factor = m_normalizeFactor;
-		}
-
+		float factor = !m_normalize.value() ? defaultNormalizationFactor : m_normalizeFactor;
 		_n->m_pluginData = new BSynth(
 					const_cast<float*>( m_graph.samples() ),
 					_n,

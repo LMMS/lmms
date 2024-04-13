@@ -97,14 +97,12 @@ SongEditor::SongEditor( Song * song ) :
 	m_zoomingModel->setParent(this);
 	m_snappingModel->setParent(this);
 
-	m_timeLine = new TimeLineWidget( m_trackHeadWidth, 32,
-					pixelsPerBar(),
-					m_song->getPlayPos(Song::PlayMode::Song),
-					m_currentPosition,
-					Song::PlayMode::Song, this );
-	connect( this, SIGNAL( positionChanged( const lmms::TimePos& ) ),
-				m_song->getPlayPos(Song::PlayMode::Song).m_timeLine,
-			SLOT( updatePosition( const lmms::TimePos& ) ) );
+	m_timeLine = new TimeLineWidget(m_trackHeadWidth, 32, pixelsPerBar(),
+		m_song->getPlayPos(Song::PlayMode::Song),
+		m_song->getTimeline(Song::PlayMode::Song),
+		m_currentPosition, Song::PlayMode::Song, this
+	);
+	connect(this, &TrackContainerView::positionChanged, m_timeLine, &TimeLineWidget::updatePosition);
 	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos& ) ),
 			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
 	connect( m_timeLine, SIGNAL(regionSelectedFromPixels(int,int)),
@@ -560,7 +558,7 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		m_leftRightScroll->setValue(m_leftRightScroll->value() + bar - newBar);
 
 		// update timeline
-		m_song->getPlayPos(Song::PlayMode::Song).m_timeLine->setPixelsPerBar(pixelsPerBar());
+		m_timeLine->setPixelsPerBar(pixelsPerBar());
 		// and make sure, all Clip's are resized and relocated
 		realignTracks();
 	}
@@ -776,17 +774,9 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 
 void SongEditor::updatePosition( const TimePos & t )
 {
-	int widgetWidth, trackOpWidth;
-	if( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
-	{
-		widgetWidth = DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT;
-		trackOpWidth = TRACK_OP_WIDTH_COMPACT;
-	}
-	else
-	{
-		widgetWidth = DEFAULT_SETTINGS_WIDGET_WIDTH;
-		trackOpWidth = TRACK_OP_WIDTH;
-	}
+	const bool compactTrackButtons = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt();
+	const auto widgetWidth = compactTrackButtons ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT : DEFAULT_SETTINGS_WIDGET_WIDTH;
+	const auto trackOpWidth = compactTrackButtons ? TRACK_OP_WIDTH_COMPACT : TRACK_OP_WIDTH;
 
 	if( ( m_song->isPlaying() && m_song->m_playMode == Song::PlayMode::Song
 		  && m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Enabled) ||
@@ -808,8 +798,7 @@ void SongEditor::updatePosition( const TimePos & t )
 		m_scrollBack = false;
 	}
 
-	const int x = m_song->getPlayPos(Song::PlayMode::Song).m_timeLine->
-							markerX( t ) + 8;
+	const int x = m_timeLine->markerX(t);
 	if( x >= trackOpWidth + widgetWidth -1 )
 	{
 		m_positionLine->show();
@@ -872,7 +861,7 @@ void SongEditor::zoomingChanged()
 	int ppb = calculatePixelsPerBar();
 	setPixelsPerBar(ppb);
 
-	m_song->getPlayPos(Song::PlayMode::Song).m_timeLine->setPixelsPerBar(ppb);
+	m_timeLine->setPixelsPerBar(ppb);
 	realignTracks();
 	updateRubberband();
 	m_timeLine->setSnapSize(getSnapSize());

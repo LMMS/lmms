@@ -24,10 +24,10 @@
 
 #include "ArrayVector.h"
 
+#include <QObject>
+#include <QtTest/QtTest>
 #include <array>
 #include <iterator>
-
-#include "QTestSuite.h"
 
 using lmms::ArrayVector;
 
@@ -59,10 +59,9 @@ struct DestructorCheck
 	bool* destructed;
 };
 
-class ArrayVectorTest : QTestSuite
+class ArrayVectorTest : public QObject
 {
 	Q_OBJECT
-
 private slots:
 	void defaultConstructorTest()
 	{
@@ -826,6 +825,7 @@ private slots:
 		QVERIFY(!(e != v));
 		QVERIFY(g != v);
 	}
-} ArrayVectorTests;
+};
 
+QTEST_GUILESS_MAIN(ArrayVectorTest)
 #include "ArrayVectorTest.moc"

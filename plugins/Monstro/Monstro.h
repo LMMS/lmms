@@ -173,7 +173,6 @@ class ComboBox;
 
 class MonstroSynth
 {
-	MM_OPERATORS
 public:
 	MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph );
 	virtual ~MonstroSynth() = default;

@@ -30,12 +30,12 @@
 
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
-#include "LedCheckBox.h"
 #include "lmmsconfig.h"
 #include "MidiClient.h"
 #include "MidiSetupWidget.h"
 
 
+class QCheckBox;
 class QComboBox;
 class QLabel;
 class QLineEdit;
@@ -86,6 +86,7 @@ private slots:
 	void toggleMMPZ(bool enabled);
 	void toggleDisableBackup(bool enabled);
 	void toggleOpenLastProject(bool enabled);
+	void loopMarkerModeChanged();
 	void setLanguage(int lang);
 
 	// Performance settings widget.
@@ -108,6 +109,7 @@ private slots:
 
 	// MIDI settings widget.
 	void midiInterfaceChanged(const QString & driver);
+	void toggleMidiAutoQuantization(bool enabled);
 
 	// Paths settings widget.
 	void openWorkingDir();
@@ -147,6 +149,8 @@ private:
 	bool m_MMPZ;
 	bool m_disableBackup;
 	bool m_openLastProject;
+	QString m_loopMarkerMode;
+	QComboBox* m_loopMarkerComboBox;
 	QString m_lang;
 	QStringList m_languages;
 
@@ -156,14 +160,14 @@ private:
 	bool m_enableRunningAutoSave;
 	QSlider * m_saveIntervalSlider;
 	QLabel * m_saveIntervalLbl;
-	LedCheckBox * m_autoSave;
-	LedCheckBox * m_runningAutoSave;
+	QCheckBox * m_autoSave;
+	QCheckBox * m_runningAutoSave;
 	bool m_smoothScroll;
 	bool m_animateAFP;
 	QLabel * m_vstEmbedLbl;
 	QComboBox* m_vstEmbedComboBox;
 	QString m_vstEmbedMethod;
-	LedCheckBox * m_vstAlwaysOnTopCheckBox;
+	QCheckBox * m_vstAlwaysOnTopCheckBox;
 	bool m_vstAlwaysOnTop;
 	bool m_disableAutoQuit;
 
@@ -187,6 +191,7 @@ private:
 	MswMap m_midiIfaceSetupWidgets;
 	trMap m_midiIfaceNames;
 	QComboBox * m_assignableMidiDevices;
+	bool m_midiAutoQuantize;
 
 	// Paths settings widgets.
 	QString m_workingDir;
