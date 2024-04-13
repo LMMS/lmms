@@ -72,10 +72,10 @@ public:
 
 
 private:
-	static void threadedAnalyze(std::atomic<bool>* terminateIn, fftwf_plan* planIn, fftwf_plan* inversePlanIn, fftwf_complex* complexIn, std::vector<float>* samplesIn, std::vector<float>* samplesOut,
-		std::atomic<bool>* spectrumChangedOut, std::atomic<bool>* samplesChangedOut,
-		LocklessRingBuffer<sampleFrame>* ringBufferIn, std::vector<float>* complexMultiplierIn, unsigned int sampLocIn, unsigned int blockSizeIn,
-		std::vector<float>* spectrumOut, std::mutex* outputAccessIn);
+	static void threadedAnalyze(std::atomic<bool>* terminateIn, std::vector<float>* samplesInB, std::vector<float>* samplesOutB,
+	std::atomic<bool>* spectrumChangedOut, std::atomic<bool>* samplesChangedOut,
+	LocklessRingBuffer<sampleFrame>* ringBufferIn, std::vector<float>* filterSpectrumIn, unsigned int sampLocIn, unsigned int blockSizeIn,
+	std::vector<float>* spectrumOut, std::mutex* outputAccessIn);
 
 	// Thread:
 	// terminates the thread
@@ -92,10 +92,10 @@ private:
 	unsigned int m_frameFillLoc;
 
 	// fft
-	fftwf_complex* m_out;
+	//fftwf_complex* m_out;
 
-	fftwf_plan m_plan;
-	fftwf_plan m_iplan; //inverse
+	//fftwf_plan m_plan;
+	//fftwf_plan m_iplan; //inverse
 
 	std::atomic<unsigned int> m_blockSize;
 
@@ -105,7 +105,7 @@ private:
 
 	std::vector<float> m_complexMultiplier;
 
-	std::vector<float> m_fftWindow;
+	//std::vector<float> m_fftWindow;
 	FFTWindow m_FFTWindowType;
 };
 
