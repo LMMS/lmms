@@ -99,7 +99,8 @@ void LfoGraph::paintEvent(QPaintEvent*)
 		const auto sampleAsFrameCount = static_cast<f_cnt_t>(currentSample);
 		if (sampleAsFrameCount > predelayFrames)
 		{
-			const float phase = (currentSample -= predelayFrames) / oscFrames;
+			currentSample -= predelayFrames;
+			const float phase = currentSample / oscFrames;
 
 			const auto lfoShape = static_cast<EnvelopeAndLfoParameters::LfoShape>(lfoWaveModel);
 			switch (lfoShape)
