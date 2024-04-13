@@ -13,6 +13,7 @@ QMdiArea {
 
 QPushButton:focus{
 	border: 2px solid #000;
+	background-color: #c9c9c9;
 }
 
 lmms--gui--Knob {
