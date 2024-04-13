@@ -231,14 +231,14 @@ int inverseAbsspec(fftwf_complex *complex_buffer, const float *absspec_buffer, c
 		//complex_buffer[i][1] = std::pow(absspec_buffer[i] * 2.718281828f, twoDivPi * curFreq + phaseBufferIn[i]);
 		//complex_buffer[i][0] = absspec_buffer[i] * std::cos(twoDivPi * curFreq + phaseBufferIn[i]);
 		//complex_buffer[i][1] = absspec_buffer[i] * std::sin(twoDivPi * curFreq + phaseBufferIn[i]);
-		complex_buffer[i][0] = absspec_buffer[i] * std::cos(phaseBufferIn[i]);
-		complex_buffer[i][1] = absspec_buffer[i] * std::sin(phaseBufferIn[i]);
+		//complex_buffer[i][0] = absspec_buffer[i] * std::cos(phaseBufferIn[i]);
+		//complex_buffer[i][1] = absspec_buffer[i] * std::sin(phaseBufferIn[i]);
 		
 		//complex_buffer[i][0] = absspec_buffer[i] * 2.718281828f;
 		//complex_buffer[i][1] = absspec_buffer[i] * std::pow(2.718281828f, phaseBufferIn[i]);
 		//complex_buffer[i][1] = absspec_buffer[i] * std::pow(2.718281828f, twoDivPi * curFreq + phaseBufferIn[i]);
-		//complex_buffer[i][0] = absspec_buffer[i] * std::cos(twoDivPi * curFreq / phaseBufferIn[i]);
-		//complex_buffer[i][1] = absspec_buffer[i] * std::sin(twoDivPi * curFreq / phaseBufferIn[i]);
+		complex_buffer[i][0] = absspec_buffer[i] * std::acos(twoDivPi * curFreq / phaseBufferIn[i]);
+		complex_buffer[i][1] = absspec_buffer[i] * std::asin(twoDivPi * curFreq / phaseBufferIn[i]);
 	}
 	return 0;
 }
