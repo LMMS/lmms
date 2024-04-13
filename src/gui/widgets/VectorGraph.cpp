@@ -241,8 +241,9 @@ void VectorGraphView::mousePressEvent(QMouseEvent* me)
 			// try selecting the clicked point (if it is near)
 			selectData(x, m_graphHeight - y);
 			// avoid triggering editing window while deleting
-			// points are only added when
-			// m_isSelected == false -> m_isEditingActive = false
+			// points are only deleted when
+			// m_isSelected == true -> m_isEditingActive = true
+			// so m_isEditingActive is set to false
 			if (m_isSelected == true && m_addition == false)
 			{
 				m_isEditingActive = false;
@@ -384,55 +385,51 @@ void VectorGraphView::mouseReleaseEvent(QMouseEvent* me)
 	// get position
 	int x = me->x();
 	int y = me->y();
-	if (isGraphPressed(x, m_graphHeight - y) == true)
+	// if did not drag and graph is pressed
+	if (m_mousePress == true && isGraphPressed(x, m_graphHeight - y) == true)
 	{
 	qDebug("mouseMove graphPressed: %d", m_lastTrackPoint.first);
-		// if did not drag
-		if (m_mousePress == true)
+		// add/delete point
+		if (m_isSelected == false && m_addition == true)
 		{
-			// add/delete point
-			if (m_isSelected == false && m_addition == true)
+			// if selection failed and addition
+			// get the first editable daraArray and add value
+			qDebug("release size: %ld", model()->getDataArraySize());
+			bool success = false;
+			if (m_isLastSelectedArray == true)
 			{
-				// if selection failed and addition
-				// get the first editable daraArray and add value
-				qDebug("release size: %ld", model()->getDataArraySize());
-				bool success = false;
-				if (m_isLastSelectedArray == true)
+				// trying to add to the last selected array
+				success = addPoint(m_selectedArray, x, m_graphHeight - y);
+			}
+			if (success == false)
+			{
+				// trying to add to all the selected arrays
+				for(unsigned int i = 0; i < model()->getDataArraySize(); i++)
 				{
-					// trying to add to the last selected array
-					success = addPoint(m_selectedArray, x, m_graphHeight - y);
-				}
-				if (success == false)
-				{
-					// trying to add to all the selected arrays
-					for(unsigned int i = 0; i < model()->getDataArraySize(); i++)
+					success = addPoint(i, x, m_graphHeight - y);
+					if (success == true)
 					{
-						success = addPoint(i, x, m_graphHeight - y);
-						if (success == true)
-						{
-							m_selectedArray = i;
-							m_isLastSelectedArray = true;
-							break;
-						}
+						m_selectedArray = i;
+						m_isLastSelectedArray = true;
+						break;
 					}
 				}
 			}
-			else if (m_isSelected == true && m_addition == false)
-			{
-				// if selection was successful -> deletion
-				model()->getDataArray(m_selectedArray)->del(m_selectedLocation);
-				m_isSelected = false;
-				m_isEditingActive = false;
-			}
-
-			m_mousePress = false;
+		}
+		else if (m_isSelected == true && m_addition == false)
+		{
+			// if selection was successful -> deletion
+			model()->getDataArray(m_selectedArray)->del(m_selectedLocation);
+			m_isSelected = false;
+			m_isEditingActive = false;
 		}
 	}
 	else if (m_mousePress == true && isControlWindowPressed(m_graphHeight - y) == true)
 	{
+		qDebug("Mouse Release event try running processControlWindowPressed");
 		processControlWindowPressed(x, m_graphHeight - y, false, false, 0, 0);
 	}
-	else
+	else if (isGraphPressed(x, m_graphHeight - y) == false)
 	{
 qDebug("mouseRelease 8, select new array, m_selectedArray: %d", m_selectedArray);
 		// if the "switch graph" button was pressed in editing mode
@@ -469,9 +466,11 @@ qDebug("mouseRelease 8, select new array, m_selectedArray: %d", m_selectedArray)
 		}
 		//qDebug("mouseRelease select new array final:", m_selectedArray);
 	}
+	m_mousePress = false;
 	m_addition = false;
 	// reset trackpoint
 	m_lastTrackPoint.first = -1;
+	updateGraph();
 	qDebug("mouseReleaseEnd");
 }
 
