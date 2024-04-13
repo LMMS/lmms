@@ -41,7 +41,7 @@ QMdiArea {
 }
 
 QPushButton:focus {
-	border: 1px solid lightgreen;
+	border: 1px solid #d1d8e4;
 	border-radius: 4px;
 }
 
@@ -283,33 +283,33 @@ QScrollBar::add-page:vertical:pressed, QScrollBar::sub-page:vertical:pressed {
 /* scrollbar: handles (sliders) */
 
 QScrollBar::handle:horizontal {
-	background: rgb(183, 217, 195);
+	background: #d1d8e4;
 	border: none;
 	border-radius: 4px;
 	min-width: 24px;
 }
 
 QScrollBar::handle:horizontal:hover {
-	background: #cff3e4;
+	background: #1de276;
 }
 
 QScrollBar::handle:horizontal:pressed {
-	border: 1px solid #557165;
+	border: 2px solid #d1d8e4;
 }
 
 QScrollBar::handle:vertical {
-	background: rgb(183, 217, 195);
+	background: #d1d8e4;
 	border: none;
 	border-radius: 4px;
 	min-height: 24px;
 }
 
 QScrollBar::handle:vertical:hover {
-	background: #cff3e4;
+	background: #1de276;
 }
 
 QScrollBar::handle:vertical:pressed {
-	border: 1px solid #557165;
+	border: 2px solid #d1d8e4;
 }
 
 QScrollBar::handle:horizontal:disabled, QScrollBar::handle:vertical:disabled  {
