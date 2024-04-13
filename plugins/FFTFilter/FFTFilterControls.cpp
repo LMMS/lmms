@@ -42,11 +42,27 @@ FFTFilterControls::FFTFilterControls(FFTFilterEffect* effect) :
 	m_displayFFTModel( true, this, tr("Display fft")),
 	m_graphModel(1024, this, false)
 {
+	/*
+	void setIsFixedSize(bool valueIn);
+	void setIsFixedX(bool valueIn);
+	void setIsFixedY(bool valueIn);
+	void setIsFixedEndPoints(bool valueIn);
+	void setIsSelectable(bool valueIn);
+	void setIsEditableAttrib(bool valueIn);
+	void setIsAutomatableEffectable(bool valueIn);
+	void setIsSaveable(bool valueIn);
+	void setNonNegative(bool valueIn);
+	*/
 	unsigned int arrayLocation = m_graphModel.addArray();
+	//m_graphModel.getDataArray(arrayLocation)->setIsFixedSize(true);
+	//m_graphModel.getDataArray(arrayLocation)->setIsFixedX(true);
+	//m_graphModel.getDataArray(arrayLocation)->setIsFixedY(true);
+	//m_graphModel.getDataArray(arrayLocation)->setIsFixedEndPoints(true);
 	m_graphModel.getDataArray(arrayLocation)->setIsSelectable(true);
 	m_graphModel.getDataArray(arrayLocation)->setIsEditableAttrib(true);
 	m_graphModel.getDataArray(arrayLocation)->setIsAutomatableEffectable(true);
 	m_graphModel.getDataArray(arrayLocation)->setIsSaveable(true);
+	//m_graphModel.getDataArray(arrayLocation)->setIsNonNegative(true);
 	m_graphModel.getDataArray(arrayLocation)->setLineColor(QColor(210, 50, 50, 255));
 	m_graphModel.getDataArray(arrayLocation)->setActiveColor(QColor(255, 30, 20, 255));
 	m_graphModel.getDataArray(arrayLocation)->setFillColor(QColor(170, 25, 25, 40));
@@ -112,7 +128,7 @@ void FFTFilterControls::setGraph(std::vector<std::pair<float, float>>* dataArray
 	{
 		qDebug("FFTFilterControls: set graph");
 		// void setDataArray(std::vector<std::pair<float, float>>* dataArrayIn, bool isCurvedIn, bool clearIn, bool clampIn, bool rescaleIn, bool sortIn, bool callDataChangedIn);
-		m_graphModel.getDataArray(1)->setDataArray(dataArrayIn, true, false, false, true, false, true);
+		m_graphModel.getDataArray(1)->setDataArray(dataArrayIn, true, false, false, true, false, false);
 	}
 }
 
