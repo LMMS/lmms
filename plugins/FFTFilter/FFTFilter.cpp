@@ -57,16 +57,16 @@ Plugin::Descriptor PLUGIN_EXPORT FFTFilter_plugin_descriptor =
 FFTFilterEffect::FFTFilterEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
 	Effect(&FFTFilter_plugin_descriptor, parent, key),
 	m_filterControls(this),
-	m_FFTProcessor(2048, false, FFTWindow::Rectangular),
-	m_inputBuffer(2048),
+	m_FFTProcessor(2048, true, FFTWindow::Rectangular),
+	m_inputBuffer(2048 * 2),
 	m_outSampleBufferA(2048),
 	m_outSampleBufferB(2048),
 	m_outSampleUsedUp(0),
 	m_outSampleBufferAUsed(false),
 	m_complexMultiplier(2048, 1)
 {
-	//m_FFTProcessor.setComplexMultiplier(&m_complexMultiplier);
-	//m_FFTProcessor.threadedStartThread(&m_inputBuffer, 0, true, false);
+	m_FFTProcessor.setComplexMultiplier(&m_complexMultiplier);
+	m_FFTProcessor.threadedStartThread(&m_inputBuffer, 0, true, false);
 	
 	//std::vector<float> graphXArray;
 	//m_sampleRate;
@@ -100,8 +100,8 @@ bool FFTFilterEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 	qDebug("FFTFilterEffect write");
 
-	//m_complexMultiplier = m_filterControls.getGraph(2048);
-	//m_FFTProcessor.setComplexMultiplier(&m_complexMultiplier);
+	m_complexMultiplier = m_filterControls.getGraph(2048);
+	m_FFTProcessor.setComplexMultiplier(&m_complexMultiplier);
 
 	m_inputBuffer.write(buf, frames, true);
 
@@ -111,13 +111,15 @@ bool FFTFilterEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 	if (m_FFTProcessor.getOutputSamplesChanged() == true)
 	{
-		//std::vector<float> samples = m_FFTProcessor.getSample();
-		//updateSampleArray(&samples, 0);
-		//updateSampleArray(&samples, 1);
+		qDebug("FFTFilterEffect get samples");
+		std::vector<float> samples = m_FFTProcessor.getSample();
+		updateSampleArray(&samples, 0);
+		updateSampleArray(&samples, 1);
+		qDebug("FFTFilterEffect get samples end");
 	}
 	if (m_FFTProcessor.getOutputSpectrumChanged() == true)
 	{
-		std::vector<float> FFTSpectrumOutput;// = m_FFTProcessor.getNormSpectrum();
+		std::vector<float> FFTSpectrumOutput = m_FFTProcessor.getNormSpectrum();
 		
 		std::vector<std::pair<float, float>> graphInput(80);
 		if (graphInput.size() != graphXArray.size())
@@ -165,7 +167,7 @@ bool FFTFilterEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		}
 		*/
 		
-		m_filterControls.setGraph(&graphInput);
+		//m_filterControls.setGraph(&graphInput);
 
 		// bin to freq
 		//return getNyquistFreq() * bin_index / binCount();
@@ -215,7 +217,7 @@ bool FFTFilterEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 	} // isNoneInput
 	} // enabled && isRunning
-	//setOutputSamples(buf, frames);
+	setOutputSamples(buf, frames);
 
 	float cutOff = 0.003f;
 	/*
