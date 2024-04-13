@@ -474,32 +474,20 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		{
 			cur_arp_idx = (cur_frame / arp_frames) % (range + sortOffset);
 		}
-		else if ((dir == ArpDirection::UpAndDown || dir == ArpDirection::DownAndUp) && range > 1)
+		else if ((dir == ArpDirection::UpAndDown || dir == ArpDirection::DownAndUp) &&
+			(range + sortOffset) > 1)
 		{
 			// imagine, we had to play the arp once up and then
 			// once down -> makes 2 * range possible notes...
 			// because we don't play the lower and upper notes
 			// twice, we have to subtract 2
-			cur_arp_idx = (cur_frame / arp_frames) % (range * 2 - (2 * static_cast<int>(m_arpRepeatsModel.value())));
+			cur_arp_idx = (cur_frame / arp_frames) % ((range + sortOffset) * 2 - (2 * static_cast<int>(m_arpRepeatsModel.value())));
 			// if greater than range, we have to play down...
 			// looks like the code for arp_dir==DOWN... :)
-			if (cur_arp_idx >= range)
+			if (cur_arp_idx >= (range + sortOffset))
 			{
-				cur_arp_idx = range - cur_arp_idx % (range - 1) - static_cast<int>(m_arpRepeatsModel.value());
+				cur_arp_idx = (range + sortOffset) - cur_arp_idx % (range + sortOffset - 1) - static_cast<int>(m_arpRepeatsModel.value());
 			}
-		}
-		else if (dir == ArpDirection::DownAndUp && (range + sortOffset) > 1)
-		{
-			// copied from ArpDirection::UpAndDown above
-			cur_arp_idx = (cur_frame / arp_frames) % ((range + sortOffset) * 2 - 2);
-			// if greater than range, we have to play down...
-			// looks like the code for arp_dir==DOWN... :)
-			if (cur_arp_idx >= range + sortOffset)
-			{
-				cur_arp_idx = range + sortOffset - cur_arp_idx % (range + sortOffset - 1) - 1;
-			}
-			// inverts direction
-			cur_arp_idx = range + sortOffset - cur_arp_idx - 1;
 		}
 		else if( dir == ArpDirection::Random )
 		{
@@ -520,7 +508,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		// If ArpDirection::Down or ArpDirection::DownAndUp, invert the final range.
 		if (dir == ArpDirection::Down || dir == ArpDirection::DownAndUp)
 		{
-			cur_arp_idx = static_cast<int>(range / m_arpRepeatsModel.value()) - cur_arp_idx - 1;
+			cur_arp_idx = static_cast<int>((range + sortOffset) / m_arpRepeatsModel.value()) - cur_arp_idx - 1;
 		}
 
 		// now calculate final key for our arp-note
@@ -532,12 +520,13 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		}
 		else
 		{
-			// if we are sorting, we allready have the base note key and the chord key
+			// if we are sorting, we already have the base note key and the chord key
 			sub_note_key = noteKeysArray[cur_arp_idx % total_chord_size] + (cur_arp_idx / total_chord_size) *
 							KeysPerOctave;
+			// limiting the played key so it does not get out of NumKeys range
 			if (sub_note_key >= NumKeys)
 			{
-				sub_note_key = NumKeys-1;
+				sub_note_key = NumKeys - 1;
 			}
 		}
 
