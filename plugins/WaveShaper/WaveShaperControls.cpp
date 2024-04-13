@@ -27,6 +27,8 @@
 #include <vector>
 #include <QDomElement>
 
+#include <iostream>
+
 #include "WaveShaperControls.h"
 #include "WaveShaper.h"
 #include "VectorGraph.h"
@@ -80,7 +82,7 @@ WaveShaperControls::WaveShaperControls( WaveShaperEffect * _eff ) :
 	setDefaultShape();
 
 	connect(&m_vectorGraphModel, SIGNAL(dataChanged()),
-			this, SLOT(vectorGraphChanged()));
+			this, SLOT(vectoGraphChanged()));
 }
 
 
@@ -128,6 +130,7 @@ std::vector<float> WaveShaperControls::getGraphSamples()
 	{
 		std::vector<float> output = m_vectorGraphModel.getDataArray(0)->getValues(200);
 		m_vectorGraphModel.dataChanged();
+		return output;
 	}
 	else
 	{
