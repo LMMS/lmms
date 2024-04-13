@@ -480,12 +480,12 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 			// once down -> makes 2 * range possible notes...
 			// because we don't play the lower and upper notes
 			// twice, we have to subtract 2
-			cur_arp_idx = (cur_frame / arp_frames) % ((range + sortOffset) * 2 - 2);
+			cur_arp_idx = (cur_frame / arp_frames) % (range * 2 - (2 * static_cast<int>(m_arpRepeatsModel.value())));
 			// if greater than range, we have to play down...
 			// looks like the code for arp_dir==DOWN... :)
-			if (cur_arp_idx >= range + sortOffset)
+			if (cur_arp_idx >= range)
 			{
-				cur_arp_idx = range + sortOffset - cur_arp_idx % (range + sortOffset - 1) - 1;
+				cur_arp_idx = range - cur_arp_idx % (range - 1) - static_cast<int>(m_arpRepeatsModel.value());
 			}
 		}
 		else if (dir == ArpDirection::DownAndUp && (range + sortOffset) > 1)
