@@ -24,12 +24,12 @@
  */
 
 
+#include <vector>
 #include <QDomElement>
 
 #include "WaveShaperControls.h"
 #include "WaveShaper.h"
-#include "base64.h"
-#include "Graph.h"
+#include "VectorGraph.h"
 #include "Engine.h"
 #include "Song.h"
 
@@ -44,13 +44,43 @@ WaveShaperControls::WaveShaperControls( WaveShaperEffect * _eff ) :
 	m_effect( _eff ),
 	m_inputModel( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Input gain" ) ),
 	m_outputModel( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Output gain" ) ),
-	m_wavegraphModel( 0.0f, 1.0f, 200, this ),
+	m_vectorGraphModel(1024, this, false),
 	m_clipModel( false, this )
 {
-	connect( &m_wavegraphModel, SIGNAL( samplesChanged( int, int ) ),
-			this, SLOT( samplesChanged( int, int ) ) );
 
+	unsigned int arrayLocation = m_vectorGraphModel.addArray();
+	//m_vectorGraphModel.getDataArray(arrayLocation)->setIsFixedSize(true);
+	//m_vectorGraphModel.getDataArray(arrayLocation)->setIsFixedX(true);
+	//m_vectorGraphModel.getDataArray(arrayLocation)->setIsFixedY(true);
+	//m_vectorGraphModel.getDataArray(arrayLocation)->setIsFixedEndPoints(true);
+	m_vectorGraphModel.getDataArray(arrayLocation)->setIsSelectable(true);
+	m_vectorGraphModel.getDataArray(arrayLocation)->setIsEditableAttrib(true);
+	m_vectorGraphModel.getDataArray(arrayLocation)->setIsAutomatableEffectable(true);
+	m_vectorGraphModel.getDataArray(arrayLocation)->setIsSaveable(true);
+	m_vectorGraphModel.getDataArray(arrayLocation)->setIsNonNegative(true);
+	m_vectorGraphModel.getDataArray(arrayLocation)->setLineColor(QColor(210, 50, 50, 255));
+	m_vectorGraphModel.getDataArray(arrayLocation)->setActiveColor(QColor(255, 30, 20, 255));
+	m_vectorGraphModel.getDataArray(arrayLocation)->setFillColor(QColor(170, 25, 25, 40));
+	m_vectorGraphModel.getDataArray(arrayLocation)->setAutomatedColor(QColor(144, 107, 255, 255));
+
+	unsigned int arrayLocationB = m_vectorGraphModel.addArray();
+	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsSelectable(true);
+	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsEditableAttrib(true);
+	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsAutomatableEffectable(true);
+	m_vectorGraphModel.getDataArray(arrayLocation)->setIsSaveable(true);
+	m_vectorGraphModel.getDataArray(arrayLocation)->setIsNonNegative(true);
+	m_vectorGraphModel.getDataArray(arrayLocationB)->setLineColor(QColor(10, 50, 210, 255));
+	m_vectorGraphModel.getDataArray(arrayLocationB)->setActiveColor(QColor(70, 170, 255, 255));
+	m_vectorGraphModel.getDataArray(arrayLocationB)->setFillColor(QColor(70, 100, 180, 40));
+	m_vectorGraphModel.getDataArray(arrayLocationB)->setAutomatedColor(QColor(10, 50, 255, 255));
+
+	// connect VectorGraphDataArrays so the 2. will be able to effect the 1.:
+	m_vectorGraphModel.getDataArray(arrayLocation)->setEffectorArrayLocation(arrayLocationB, true);
+	// draw default shape
 	setDefaultShape();
+
+	connect(&m_vectorGraphModel, SIGNAL(dataChanged()),
+			this, SLOT(vectorGraphChanged()));
 }
 
 
@@ -72,14 +102,8 @@ void WaveShaperControls::loadSettings( const QDomElement & _this )
 
 	m_clipModel.loadSettings( _this, "clipInput" );
 
-//load waveshape
-	int size = 0;
-	char * dst = 0;
-	base64::decode( _this.attribute( "waveShape"), &dst, &size );
-
-	m_wavegraphModel.setSamples( (float*) dst );
-	delete[] dst;
-
+	// loading VectorGraph
+	m_vectorGraphModel.loadSettings(_this, "VectorGraph"); 
 }
 
 
@@ -94,56 +118,83 @@ void WaveShaperControls::saveSettings( QDomDocument & _doc,
 
 	m_clipModel.saveSettings( _doc, _this, "clipInput" );
 
-//save waveshape
-	QString sampleString;
-	base64::encode( (const char *)m_wavegraphModel.samples(),
-		m_wavegraphModel.length() * sizeof(float), sampleString );
-	_this.setAttribute( "waveShape", sampleString );
-
+	// saving VectorGraph
+	m_vectorGraphModel.saveSettings(_doc, _this, "VectorGraph"); 
 }
 
+std::vector<float> WaveShaperControls::getGraphSamples()
+{
+	if (m_vectorGraphModel.getDataArraySize() > 0)
+	{
+		std::vector<float> output = m_vectorGraphModel.getDataArray(0)->getValues(200);
+		m_vectorGraphModel.dataChanged();
+	}
+	else
+	{
+		return std::vector<float>(200);
+	}
+}
 
 void WaveShaperControls::setDefaultShape()
 {
-	auto shp = std::array<float, 200>{};
-	for ( int i = 0; i<200; i++)
+	for (unsigned int i = 0; i < m_vectorGraphModel.getDataArraySize(); i++)
 	{
-		shp[i] = ((float)i + 1.0f) / 200.0f;
+		// clearing the VectorGraphDataArray-s insied VectorGraphModel
+		m_vectorGraphModel.getDataArray(i)->clear();
 	}
 
-	m_wavegraphModel.setLength( 200 );
-	m_wavegraphModel.setSamples( (float*)&shp );
+	if (m_vectorGraphModel.getDataArraySize() > 0)
+	{
+		int addedLocation = m_vectorGraphModel.getDataArray(0)->add(0.0f);
+		if (addedLocation >= 0)
+		{
+			m_vectorGraphModel.getDataArray(0)->setY(addedLocation, -1.0f);
+		}
+
+		addedLocation = m_vectorGraphModel.getDataArray(0)->add(1.0f);
+		if (addedLocation >= 0)
+		{
+			m_vectorGraphModel.getDataArray(0)->setY(addedLocation, 1.0f);
+		}
+	}
 }
 
 void WaveShaperControls::resetClicked()
 {
-	setDefaultShape();
 	Engine::getSong()->setModified();
 }
 
 void WaveShaperControls::smoothClicked()
 {
-	m_wavegraphModel.smoothNonCyclic();
+	//m_wavegraphModel.smoothNonCyclic();
 	Engine::getSong()->setModified();
 }
 
 void WaveShaperControls::addOneClicked()
 {
+	/*
 	for( int i=0; i<200; i++ )
 	{
 		m_wavegraphModel.setSampleAt( i, qBound( 0.0f, m_wavegraphModel.samples()[i] * onedB, 1.0f ) );
 	}
+	*/
 	Engine::getSong()->setModified();
 }
 
 void WaveShaperControls::subOneClicked()
 {
+	/*
 	for( int i=0; i<200; i++ )
 	{
 		m_wavegraphModel.setSampleAt( i, qBound( 0.0f, m_wavegraphModel.samples()[i] / onedB, 1.0f ) );
 	}
+	*/
 	Engine::getSong()->setModified();
 }
 
+void WaveShaperControls::vectoGraphChanged()
+{
+	Engine::getSong()->setModified();
+}
 
 } // namespace lmms

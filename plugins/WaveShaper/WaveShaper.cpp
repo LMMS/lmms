@@ -28,8 +28,11 @@
 #include "lmms_math.h"
 #include "embed.h"
 #include "interpolation.h"
+#include "VectorGraph.h"
 
 #include "plugin_export.h"
+
+#include <vector>
 
 namespace lmms
 {
@@ -75,7 +78,8 @@ Effect::ProcessStatus WaveShaperEffect::processImpl(SampleFrame* buf, const fpp_
 	const float w = wetLevel();
 	float input = m_wsControls.m_inputModel.value();
 	float output = m_wsControls.m_outputModel.value();
-	const float * samples = m_wsControls.m_wavegraphModel.samples();
+	std::vector<float> graphSamples = m_wsControls.m_vectorGraphModel.getDataArray(0)->getValues(200);
+	//const float * samples = m_wsControls.m_wavegraphModel.samples();
 	const bool clip = m_wsControls.m_clipModel.value();
 
 	ValueBuffer *inputBuffer = m_wsControls.m_inputModel.valueBuffer();
@@ -112,17 +116,17 @@ Effect::ProcessStatus WaveShaperEffect::processImpl(SampleFrame* buf, const fpp_
 
 			if( lookup < 1 )
 			{
-				s[i] = frac * samples[0] * posneg;
+				s[i] = frac * graphSamples[0] * posneg;
 			}
 			else if( lookup < 200 )
 			{
-				s[i] = linearInterpolate( samples[ lookup - 1 ],
-						samples[ lookup ], frac )
+				s[i] = linearInterpolate(graphSamples[lookup - 1],
+						graphSamples[lookup], frac)
 						* posneg;
 			}
 			else
 			{
-				s[i] *= samples[199];
+				s[i] *= graphSamples[199];
 			}
 		}
 
