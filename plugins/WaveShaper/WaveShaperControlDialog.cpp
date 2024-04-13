@@ -29,6 +29,7 @@
 #include "WaveShaperControls.h"
 #include "embed.h"
 #include "Graph.h"
+#include "VectorGraph.h"
 #include "Knob.h"
 #include "PixmapButton.h"
 #include "LedCheckBox.h"
@@ -48,6 +49,11 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 	setPalette( pal );
 	setFixedSize( 224, 274 );
 
+	auto curGraph = new VectorGraphView(this, 204, 205, 10, 1024);
+	curGraph->setModel(&_controls->m_vectorGraphModel);
+	curGraph->move(10, 6);
+
+	/*
 	auto waveGraph = new Graph(this, Graph::Style::LinearNonCyclic, 204, 205);
 	waveGraph -> move( 10, 6 );
 	waveGraph -> setModel( &_controls -> m_wavegraphModel );
@@ -58,6 +64,7 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 	waveGraph->setPalette( pal );
 	waveGraph->setGraphColor( QColor( 85, 204, 145 ) );
 	waveGraph -> setMaximumSize( 204, 205 );
+	*/
 
 	auto inputKnob = new Knob(KnobType::Bright26, this);
 	inputKnob -> setVolumeKnob( true );

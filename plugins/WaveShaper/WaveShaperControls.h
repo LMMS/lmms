@@ -26,9 +26,11 @@
 #ifndef WAVESHAPER_CONTROLS_H
 #define WAVESHAPER_CONTROLS_H
 
+#include <vector>
+
 #include "EffectControls.h"
 #include "WaveShaperControlDialog.h"
-#include "Graph.h"
+#include "VectorGraph.h"
 
 namespace lmms
 {
@@ -63,6 +65,7 @@ public:
 		return( new gui::WaveShaperControlDialog( this ) );
 	}
 
+	std::vector<float> getGraphSamples();
 
 private slots:
 	void samplesChanged( int, int );
@@ -73,11 +76,14 @@ private slots:
 	void addOneClicked();
 	void subOneClicked();
 
+	void vectoGraphChanged();
+
 private:
 	WaveShaperEffect * m_effect;
 	FloatModel m_inputModel;
 	FloatModel m_outputModel;
-	graphModel m_wavegraphModel;
+	//graphModel m_wavegraphModel;
+	VectorGraphModel m_vectorGraphModel;
 	BoolModel  m_clipModel;
 
 	friend class gui::WaveShaperControlDialog;

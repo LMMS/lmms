@@ -27,6 +27,7 @@
 #define _WAVESHAPER_CONTROL_DIALOG_H
 
 #include "EffectControlDialog.h"
+#include "VectorGraph.h"
 
 namespace lmms
 {
