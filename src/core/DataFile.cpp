@@ -1687,21 +1687,20 @@ void DataFile::upgrade_noteTypes()
 
 void DataFile::upgrade_fixCMTDelays()
 {
-	QMap<QString, QString> nameMap;
+	static QMap<QString, QString> nameMap;
 	nameMap["delay_0,01s"] = "delay_0.01s";
 	nameMap["delay_0,1s"] = "delay_0.1s";
 	nameMap["fbdelay_0,01s"] = "fbdelay_0.01s";
 	nameMap["fbdelay_0,1s"] = "fbdelay_0.1s";
 
 	const auto effects = elementsByTagName("effect");
-	bool generalInfoPrinted = false;
 
 	for (int i = 0; i < effects.size(); ++i)
 	{
 		auto effect = effects.item(i).toElement();
 
 		// We are only interested in LADSPA plugins
-		if (effect.attribute("name") != "ladspaeffect") continue;
+		if (effect.attribute("name") != "ladspaeffect") { continue; }
 
 		// Fetch all attributes (LMMS) beneath the LADSPA effect so that we can check the value of the plugin attribute (XML)
 		auto attributes = effect.elementsByTagName("attribute");
@@ -1713,15 +1712,9 @@ void DataFile::upgrade_fixCMTDelays()
 			{
 				const auto attributeValue = attribute.attribute("value");
 
-				QMap<QString, QString>::const_iterator it = nameMap.find(attributeValue);
+				const QMap<QString, QString>::const_iterator it = nameMap.find(attributeValue);
 				if (it != nameMap.end())
 				{
-					if (!generalInfoPrinted)
-					{
-						qInfo() << "Performing data upgrade for CMT delay(s). See LMMS issue #5167 for more details.";
-						generalInfoPrinted = true;
-					}
-					qInfo() << "Replacing" << attributeValue << "with" << *it;
 					attribute.setAttribute("value", *it);
 				}
 			}
