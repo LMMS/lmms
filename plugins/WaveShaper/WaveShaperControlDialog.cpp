@@ -51,6 +51,7 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 
 	auto curGraph = new VectorGraphView(this, 204, 205, 10, 1024);
 	curGraph->setModel(&_controls->m_vectorGraphModel);
+	curGraph->setBackground(PLUGIN_NAME::getIconPixmap("wavegraph"));
 	curGraph->move(10, 6);
 
 	/*
