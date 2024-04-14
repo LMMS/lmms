@@ -99,11 +99,11 @@ class ControlLayout : public QLayout
 	Q_OBJECT
 
 #if (QT_VERSION > QT_VERSION_CHECK(6, 0, 0))
-	typedef QMultiMap<QString, QLayoutItem *> ControlLayoutMap;
-	typedef QMultiMapIterator<QString, QLayoutItem *> ControlLayoutMapIterator;
+	using ControlLayoutMap = QMultiMap<QString, QLayoutItem *>;
+	using ControlLayoutMapIterator = QMultiMapIterator<QString, QLayoutItem *>;
 #else
-	typedef QMap<QString, QLayoutItem*> ControlLayoutMap;
-	typedef QMapIterator<QString, QLayoutItem*> ControlLayoutMapIterator;
+	using ControlLayoutMap = QMap<QString, QLayoutItem*>;
+	using ControlLayoutMapIterator = QMapIterator<QString, QLayoutItem*>;
 #endif
 
 public:
