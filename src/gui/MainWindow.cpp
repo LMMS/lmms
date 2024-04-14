@@ -397,10 +397,7 @@ void MainWindow::finalize()
 							this, SLOT(help()));
 	}
 
-// Prevent dangling separator at end of menu per https://bugreports.qt.io/browse/QTBUG-40071
-#ifndef LMMS_BUILD_APPLE
 	help_menu->addSeparator();
-#endif
 	help_menu->addAction( embed::getIconPixmap( "icon_small" ), tr( "About" ),
 				  this, SLOT(aboutLMMS()));
 
