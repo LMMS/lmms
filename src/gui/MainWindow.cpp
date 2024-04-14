@@ -324,10 +324,7 @@ void MainWindow::finalize()
 					SLOT(onExportProjectMidi()),
 					Qt::CTRL + Qt::Key_M );
 
-// Prevent dangling separator at end of menu per https://bugreports.qt.io/browse/QTBUG-40071
-#ifndef LMMS_BUILD_APPLE
 	project_menu->addSeparator();
-#endif
 	project_menu->addAction( embed::getIconPixmap( "exit" ), tr( "&Quit" ),
 					qApp, SLOT(closeAllWindows()),
 					Qt::CTRL + Qt::Key_Q );
