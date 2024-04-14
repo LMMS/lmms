@@ -290,7 +290,7 @@ QScrollBar::handle:horizontal {
 }
 
 QScrollBar::handle:horizontal:hover {
-	border: 2px solid #000000;
+	/* border: 2px solid #000000; */
 }
 
 QScrollBar::handle:horizontal:pressed {
@@ -305,7 +305,7 @@ QScrollBar::handle:vertical {
 }
 
 QScrollBar::handle:vertical:hover {
-	border: 2px solid #000000;
+	/* border: 2px solid #000000; */
 }
 
 QScrollBar::handle:vertical:pressed {
