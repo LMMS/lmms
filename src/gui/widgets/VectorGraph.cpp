@@ -470,7 +470,7 @@ qDebug("mouseRelease 8, select new array, m_selectedArray: %d", m_selectedArray)
 	m_addition = false;
 	// reset trackpoint
 	m_lastTrackPoint.first = -1;
-	updateGraph();
+	updateGraph(false);
 	qDebug("mouseReleaseEnd");
 }
 
@@ -800,14 +800,19 @@ void VectorGraphView::paintEditing(QPainter* pIn)
 void VectorGraphView::modelChanged()
 {
 	auto gModel = model();
-	QObject::connect(gModel, SIGNAL(dataChanged()),
-			this, SLOT(updateGraph()));
-	QObject::connect(gModel, SIGNAL(lengthChanged()),
+	QObject::connect(gModel, SIGNAL(updateGraphView(bool)),
+			this, SLOT(updateGraph(bool)));
+	QObject::connect(gModel, SIGNAL(styleChanged()),
 			this, SLOT(updateGraph()));
 }
 
 void VectorGraphView::updateGraph()
 {
+	update();
+}
+void VectorGraphView::updateGraph(bool shouldUseGetLastValuesIn)
+{
+	m_useGetLastValues = shouldUseGetLastValuesIn;
 	update();
 }
 void VectorGraphView::execConnectionDialog()
@@ -1632,6 +1637,7 @@ unsigned int VectorGraphModel::addArray()
 		false, false, false, false, false, false, false,
 		false, true, this, getDataArrayNewId());
 	m_dataArrays.push_back(tempArray);
+	emit dataChanged();
 	return m_dataArrays.size() - 1;
 }
 
@@ -1668,17 +1674,26 @@ void VectorGraphModel::delArray(unsigned int locationIn)
 		m_dataArrays[i].setEffectorArrayLocation(effectorArrayLocations[i], false);
 	}
 	emit dataChanged();
+	emit updateGraphView(false);
 }
 
 void VectorGraphModel::dataArrayChanged()
 {
 	emit dataChanged();
+	emit updateGraphView(false);
+}
+void VectorGraphModel::updateGraphModel(bool shouldUseGetLastValuesIn)
+{
+	// connects to external update signal
+	emit updateGraphView(shouldUseGetLastValuesIn);
 }
 void VectorGraphModel::dataArrayClearedEvent(int idIn)
 {
 	// TODO needs testing
 	int location = getDataArrayLocationFromId(idIn);
 	emit clearedEvent(location);
+	emit dataChanged();
+	emit updateGraphView(false);
 }
 
 void VectorGraphModel::dataArrayStyleChanged()
@@ -2440,6 +2455,8 @@ std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn, bool* i
 	}
 	qDebug("getValuesB1, size: %ld    - id: %d", outputXLocations.size(), m_id);
 
+	m_isDataChanged = m_isDataChanged || countIn != m_bakedValues.size();
+
 	// deciding if the whole dataArray should be updated
 	// if the whole effectorDataArray was updated
 	int effectedCount = 0;
@@ -2475,12 +2492,7 @@ std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn, bool* i
 	{
 		if (countIn != m_bakedValues.size())
 		{
-			// reseting m_bakedValues
 			m_bakedValues.resize(countIn);
-			for (unsigned int i = 0; i < m_bakedValues.size(); i++)
-			{
-				m_bakedValues[i] = 0.0f;
-			}
 		}
 		m_needsUpdating.resize(m_dataArray.size());
 		for (unsigned int i = 0; i < m_needsUpdating.size(); i++)

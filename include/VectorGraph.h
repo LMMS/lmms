@@ -94,6 +94,7 @@ protected:
 	void mouseDoubleClickEvent(QMouseEvent* me) override;
 protected slots:
 	void updateGraph();
+	void updateGraph(bool shouldUseGetLastValuesIn);
 
 	void execConnectionDialog();
 	void removeAutomation();
@@ -225,6 +226,7 @@ public:
 		{
 			m_maxLength = maxLengthIn;
 			emit dataChanged();
+			emit updateGraphView(false);
 		}
 	}
 	// returns added VectorGraphDataArray location
@@ -235,6 +237,8 @@ public:
 	inline void clearArray()
 	{
 		m_dataArrays.clear();
+		emit dataChanged();
+		emit updateGraphView(false);
 	}
 	// if the id is not found then it will return 0
 	int getDataArrayLocationFromId(int idIn);
@@ -254,16 +258,16 @@ public:
 signals:
 	// point changed inside VectorGraphDataArray m_dataArray or m_maxLength changed
 	void dataChanged();
+	void updateGraphView(bool shouldUseGetLastValuesIn);
 	// signals when a dataArray gets to 0 element size
 	// locationIn is the location of the VectorGraphDataArray
 	// locationIn can be -1
 	void clearedEvent(int locationIn);
 	// style changed inside m_dataArray
 	void styleChanged();
-	// m_dataArrays length changed
-	void lengthChanged();
 public slots:
 	void dataArrayChanged();
+	void updateGraphModel(bool shouldUseGetLastValuesIn);
 	void dataArrayClearedEvent(int idIn);
 	void dataArrayStyleChanged();
 private:
