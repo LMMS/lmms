@@ -26,6 +26,7 @@
 #define LMMS_GUI_VECTORGRAPH_H
 
 #include <vector>
+#include <mutex>
 #include <QPainterPath>
 #include <QWidget>
 #include <QCursor>
@@ -255,6 +256,8 @@ public:
 	virtual void loadSettings(const QDomElement& element);
 	// read locations from saved data attributes unused but implemeted
 	//int readLoc(unsigned int startIn, QString dataIn);
+	void lockGetValuesAccess();
+	void unlockGetValuesAccess();
 signals:
 	// point changed inside VectorGraphDataArray m_dataArray or m_maxLength changed
 	void dataChanged();
@@ -274,6 +277,9 @@ private:
 	std::vector<VectorGraphDataArray> m_dataArrays;
 	unsigned int m_maxLength;
 
+	// block threads that want to access
+	// a dataArray's getValues() at the same time
+	std::mutex m_getValuesAccess;
 	//friend class gui::VectorGraphView;
 };
 
@@ -406,7 +412,6 @@ public:
 	// returns the latest updated graph values
 	// countIn is the retuned vector's size
 	std::vector<float> getValues(unsigned int countIn);
-	std::vector<float> getValues(unsigned int countIn, bool* isChangedOut, std::vector<unsigned int>* updatingValuesOut);
 	// returns m_bakedValues without updating
 	std::vector<float> getLastValues();
 	std::vector<int> getEffectorArrayLocations();
@@ -613,6 +618,9 @@ private:
 	// recalculates and sorts m_needsUpdating so
 	// every point is in there only once
 	void getUpdatingOriginals();
+
+	// real getValues processing
+	std::vector<float> getValues(unsigned int countIn, bool* isChangedOut, std::vector<unsigned int>* updatingValuesOut);
 	// gets every m_needsUpdating point's line's start and end effector point's location in the effector dataArray
 	// .first = start, .second = line end location (effector dataArray)
 	//void getValuesLocations(VectorGraphDataArray* effectorIn, std::vector<std::pair<unsigned int, unsigned int>>* effectorDataOut);

@@ -27,6 +27,7 @@
 #include <algorithm> // sort
 #include <cstdlib> // rand
 #include <cstdint> // unintptr_t
+#include <mutex> // locking when getValues
 #include <QPainter>
 #include <QPainterPath>
 #include <QMouseEvent>
@@ -481,6 +482,7 @@ void VectorGraphView::mouseDoubleClickEvent(QMouseEvent * me)
 	int y = me->y();
 
 	// if a data/sample is selected then show input dialog to change the data
+	qDebug("mouseDoubleClickEvent");
 	if (isGraphPressed(x, m_graphHeight - y) == true)
 	{
 		if (m_isSelected == true && me->button() == Qt::LeftButton)
@@ -493,6 +495,7 @@ void VectorGraphView::mouseDoubleClickEvent(QMouseEvent * me)
 	}
 	else if (isControlWindowPressed(m_graphHeight - y) == true)
 	{
+		m_mousePress = true;
 		int pressLocation = getPressedControlInput(x, m_graphHeight - y, m_controlDisplayCount + 1);
 		if (pressLocation >= 0 && pressLocation != m_controlDisplayCount)
 		{
@@ -1847,6 +1850,14 @@ void VectorGraphModel::loadSettings(const QDomElement& element, const QString& n
 		}
 	}
 }
+void VectorGraphModel::lockGetValuesAccess()
+{
+	m_getValuesAccess.lock();
+}
+void VectorGraphModel::unlockGetValuesAccess()
+{
+	m_getValuesAccess.unlock();
+}
 void VectorGraphModel::saveSettings(QDomDocument& doc, QDomElement& element)
 {
 	saveSettings(doc, element, QString(""));
@@ -2428,146 +2439,13 @@ int VectorGraphDataArray::getNearestLocation(float xIn, bool* foundOut, bool* is
 
 std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn)
 {
-	//std::shared_ptr<std::vector<unsigned int>> updatingValues = std::make_shared<std::vector<unsigned int>>();
-	//std::shared_ptr<std::vector<unsigned int>> updatingValues = std::make_shared<std::vector<unsigned int>>();
 	qDebug("getValuesA1");
+	m_parent->lockGetValuesAccess();
 	std::vector<float> output = getValues(countIn, nullptr, nullptr);
+	m_parent->unlockGetValuesAccess();
 	qDebug("getValuesA2, size: %ld", output.size());
 	qDebug("getValuesA3 finished");
 	return output;
-}
-//std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn, bool* isChangedOut, std::shared_ptr<std::vector<unsigned int>> updatingValuesOut)
-std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn, bool* isChangedOut, std::vector<unsigned int>* updatingValuesOut)
-{
-	bool effectorIsChanged = false;
-	//std::shared_ptr<std::vector<unsigned int>> effectorUpdatingValues = std::make_shared<std::vector<unsigned int>>();
-	std::vector<unsigned int> effectorUpdatingValues;
-	std::vector<float> effectorOutput;
-	std::vector<float> outputXLocations(countIn);
-	bool isEffected = m_effectorLocation >= 0;
-	if (isEffected == true)
-	{
-		effectorOutput = m_parent->getDataArray(m_effectorLocation)->getValues(countIn, &effectorIsChanged, &effectorUpdatingValues);
-	}
-	else
-	{
-		effectorOutput.resize(countIn);
-	}
-	qDebug("getValuesB1, size: %ld    - id: %d", outputXLocations.size(), m_id);
-
-	m_isDataChanged = m_isDataChanged || countIn != m_bakedValues.size();
-
-	// deciding if the whole dataArray should be updated
-	// if the whole effectorDataArray was updated
-	int effectedCount = 0;
-	if (effectorIsChanged == true)
-	{
-		for (unsigned int i = 0; i < m_dataArray.size(); i++)
-		{
-			effectedCount += isEffectedPoint(i) == true? 1 : 0;
-		}
-		if (effectedCount > m_dataArray.size() / 2)
-		{
-			m_isDataChanged = m_isDataChanged || effectorIsChanged;
-		}
-	}
-
-	// updating m_needsUpdating
-	if (m_isDataChanged == false && countIn == m_bakedValues.size())
-	{
-		if (isEffected == true && effectorUpdatingValues.size() > 0 && effectedCount > 0)
-		{
-			// effectorUpdatingValues needs to be sorted
-			// before use (in this case it is already sorted)
-			getUpdatingFromEffector(&effectorUpdatingValues);
-		}
-	qDebug("getValuesB2");
-		getUpdatingFromAutomation();
-		// sort and select only original
-		// values
-		getUpdatingOriginals();
-	qDebug("getValuesB3");
-	}
-	else
-	{
-		if (countIn != m_bakedValues.size())
-		{
-			m_bakedValues.resize(countIn);
-		}
-		m_needsUpdating.resize(m_dataArray.size());
-		for (unsigned int i = 0; i < m_needsUpdating.size(); i++)
-		{
-			m_needsUpdating[i] = i;
-		}
-		qDebug("getValuesB4, needsUpdating size: %ld", m_needsUpdating.size());
-	}
-
-	float stepSize = 1.0f / static_cast<float>(countIn);
-	// calculating point data and lines
-	if (m_needsUpdating.size() > 0 && m_bakedValues.size() > 0)
-	{
-		// calculating relative X locations (in lines) of the output values
-		// for later use in the line calculations
-		for (unsigned int i = 0; i < m_dataArray.size(); i++)
-		{
-			unsigned int start = static_cast<unsigned int>
-				(std::ceil(m_dataArray[i].m_x / stepSize));
-			if (i + 1 < m_dataArray.size())
-			{
-				unsigned int end = static_cast<unsigned int>
-					(std::ceil(m_dataArray[i + 1].m_x / stepSize));
-				for (unsigned int j = start; j < end; j++)
-				{
-					outputXLocations[j] = (stepSize * static_cast<float>(j) - m_dataArray[i].m_x) / (m_dataArray[i + 1].m_x - m_dataArray[i].m_x);
-					//qDebug("getValuesB outputXLocations: [%d] [%d] %f", i, j, outputXLocations[j]);
-				}
-			}
-		}
-		// getting effectorDataArray pointer
-		VectorGraphDataArray* effector = nullptr;
-		if (m_effectorLocation >= 0 && m_parent->getDataArray(m_effectorLocation)->size() > 0)
-		{
-			effector = m_parent->getDataArray(m_effectorLocation);
-		}
-
-		// m_dataArray[i] location in effecor m_dataArray, next location in effecor m_dataArray,
-		//std::vector<std::pair<unsigned int, unsigned int>> effectorData;
-		//getValuesLocations(effector, &effectorData);
-		/*
-		for (unsigned int j = 0; j < effectorData.size(); j++)
-		{
-			qDebug("getValuesB6.4, [%d] %d, %d", j, effectorData[j].first, effectorData[j].second);
-		}
-		*/
-		qDebug("getValuesB6, updatingsize: %ld", m_needsUpdating.size());
-
-		// calculate final lines
-		for (unsigned int i = 0; i < m_needsUpdating.size(); i++)
-		{
-			getValuesUpdateLines(effector, &effectorOutput, &outputXLocations, i, stepSize);
-		}
-		//effectorData.clear();
-	}
-
-	// setting outputs
-	if (isChangedOut != nullptr)
-	{
-		*isChangedOut = m_isDataChanged;
-	}
-	if (m_needsUpdating.size() > 0)
-	{
-		if (updatingValuesOut != nullptr)
-		{
-			*updatingValuesOut = m_needsUpdating;
-		}
-
-		// clearing the updated values
-		m_needsUpdating.clear();
-	}
-
-	m_isDataChanged = false;
-	qDebug("getValuesB9");
-	return m_bakedValues;
 }
 std::vector<float> VectorGraphDataArray::getLastValues()
 {
@@ -3186,12 +3064,12 @@ float VectorGraphDataArray::processEffect(unsigned int locationIn, float attribV
 			// sine
 			output = output + std::sin(effectValueIn * 100.0f);
 		}
-		if (getEffect(locationIn, 4) == true)
+		if (getEffect(locationIn, 4) == true && output > 0.0f)
 		{
 			// power
 			output = std::pow(output, effectValueIn);
 		}
-		else if (getEffect(locationIn, 5) == true)
+		else if (getEffect(locationIn, 5) == true && output > 0.0f && effectValueIn != 0.0f)
 		{
 			// log
 			output = std::log(output) / std::log(effectValueIn);
@@ -3202,10 +3080,10 @@ float VectorGraphDataArray::processEffect(unsigned int locationIn, float attribV
 			// multiply
 			output = output * 5.0f * effectValueIn;
 		}
-		else if (getEffect(locationIn, 3) == true)
+		else if (getEffect(locationIn, 3) == true && effectValueIn != 0.0f)
 		{
-			output = output / 5.0f / effectValueIn;
 			// divide
+			output = output / 5.0f / effectValueIn;
 		}
 
 		if (getEffect(locationIn, 0) == true)
@@ -3493,14 +3371,18 @@ std::vector<float> VectorGraphDataArray::processLineTypeArrayRandom(std::vector<
 	}
 
 	// blending
-	float size = static_cast<float>(randomValues.size() / 2);
-	for (unsigned int i = 0; i < count; i++)
+	if (randomValues.size() > 0)
 	{
-		float randomValueX = xIn->operator[](startIn + i) * size;
-		float randomValueLocation = std::floor(randomValueX);
-		output[i] = -((randomValueX - randomValueLocation) - 1.0f) * (randomValueX - randomValueLocation) * 4.0f *
-			(randomValues[static_cast<int>(randomValueLocation)] * (1.0f - blend)  + randomValues[static_cast<int>(randomValueLocation + size)] * blend) *
-			valAIn;
+		// real size
+		float size = static_cast<float>(randomValues.size() / 2);
+		for (unsigned int i = 0; i < count; i++)
+		{
+			float randomValueX = xIn->operator[](startIn + i) * size;
+			float randomValueLocation = std::floor(randomValueX);
+			output[i] = -((randomValueX - randomValueLocation) - 1.0f) * (randomValueX - randomValueLocation) * 4.0f *
+				(randomValues[static_cast<int>(randomValueLocation)] * (1.0f - blend)  + randomValues[static_cast<int>(randomValueLocation + size)] * blend) *
+				valAIn;
+		}
 	}
 
 	return output;
@@ -3545,21 +3427,14 @@ void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* up
 		bool isBefore = false;
 		int locationBefore = getNearestLocation(effector->getX(updatingValuesIn->operator[](i)), &found, &isBefore);
 		qDebug("getUpdatingFromEffector getNearestLocation before: %d, i: %d", locationBefore, i);
-		if (effector->getEffectOnlyPoints(updatingValuesIn->operator[](i)) == true && isBefore == true)
-		{
-			qDebug("getUpdatingFromEffector locationBefore = %d + 1", locationBefore);
-			// if only points are effected and the nearest point
-			// is before [i] (so it needs to be uneffected)
-			// add 1
-			locationBefore++;
-		}
-		else if (effector->getEffectOnlyPoints(updatingValuesIn->operator[](i)) == false && isBefore == false)
+		if (isBefore == false && locationBefore >= 0 && getEffectOnlyPoints(locationBefore) == true)
 		{
 			qDebug("getUpdatingFromEffector locationBefore = %d - 1", locationBefore);
-			// if lines are effected and the nearest point
-			// is after [i] (so the line and the point before this is effected)
-			// subtract 1
+			// lines before could be effected eaven if the current nearest point
+			// can only be effected (its line can not be effected)
+			// so subtract 1
 			// remember points control the line after (connected to) them
+			// but in this case changes in the points position can effect the line before it
 			locationBefore--;
 		}
 		// clamp
@@ -3703,6 +3578,139 @@ void VectorGraphDataArray::getUpdatingOriginals()
 		qDebug("getUpatingOriginals final: [%d] -> %d", i, m_needsUpdating[i]);
 	}
 	*/
+}
+std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn, bool* isChangedOut, std::vector<unsigned int>* updatingValuesOut)
+{
+	bool effectorIsChanged = false;
+	//std::shared_ptr<std::vector<unsigned int>> effectorUpdatingValues = std::make_shared<std::vector<unsigned int>>();
+	std::vector<unsigned int> effectorUpdatingValues;
+	std::vector<float> effectorOutput;
+	std::vector<float> outputXLocations(countIn);
+	bool isEffected = m_effectorLocation >= 0;
+	if (isEffected == true)
+	{
+		effectorOutput = m_parent->getDataArray(m_effectorLocation)->getValues(countIn, &effectorIsChanged, &effectorUpdatingValues);
+	}
+	else
+	{
+		effectorOutput.resize(countIn);
+	}
+	qDebug("getValuesB1, size: %ld    - id: %d", outputXLocations.size(), m_id);
+
+	m_isDataChanged = m_isDataChanged || countIn != m_bakedValues.size();
+
+	// deciding if the whole dataArray should be updated
+	// if the whole effectorDataArray was updated
+	int effectedCount = 0;
+	if (effectorIsChanged == true)
+	{
+		for (unsigned int i = 0; i < m_dataArray.size(); i++)
+		{
+			effectedCount += isEffectedPoint(i) == true? 1 : 0;
+		}
+		if (effectedCount > m_dataArray.size() / 2)
+		{
+			m_isDataChanged = m_isDataChanged || effectorIsChanged;
+		}
+	}
+
+	// updating m_needsUpdating
+	if (m_isDataChanged == false && countIn == m_bakedValues.size())
+	{
+		if (isEffected == true && effectorUpdatingValues.size() > 0 &&
+			(effectorIsChanged == false || effectedCount > 0))
+		{
+			// effectorUpdatingValues needs to be sorted
+			// before use (in this case it is already sorted)
+			getUpdatingFromEffector(&effectorUpdatingValues);
+		}
+	qDebug("getValuesB2");
+		getUpdatingFromAutomation();
+		// sort and select only original
+		// values
+		getUpdatingOriginals();
+	qDebug("getValuesB3");
+	}
+	else
+	{
+		if (countIn != m_bakedValues.size())
+		{
+			m_bakedValues.resize(countIn);
+		}
+		m_needsUpdating.resize(m_dataArray.size());
+		for (unsigned int i = 0; i < m_needsUpdating.size(); i++)
+		{
+			m_needsUpdating[i] = i;
+		}
+		qDebug("getValuesB4, needsUpdating size: %ld", m_needsUpdating.size());
+	}
+
+	float stepSize = 1.0f / static_cast<float>(countIn);
+	// calculating point data and lines
+	if (m_needsUpdating.size() > 0 && m_bakedValues.size() > 0)
+	{
+		// calculating relative X locations (in lines) of the output values
+		// for later use in the line calculations
+		for (unsigned int i = 0; i < m_dataArray.size(); i++)
+		{
+			unsigned int start = static_cast<unsigned int>
+				(std::ceil(m_dataArray[i].m_x / stepSize));
+			if (i + 1 < m_dataArray.size())
+			{
+				unsigned int end = static_cast<unsigned int>
+					(std::ceil(m_dataArray[i + 1].m_x / stepSize));
+				for (unsigned int j = start; j < end; j++)
+				{
+					outputXLocations[j] = (stepSize * static_cast<float>(j) - m_dataArray[i].m_x) / (m_dataArray[i + 1].m_x - m_dataArray[i].m_x);
+					//qDebug("getValuesB outputXLocations: [%d] [%d] %f", i, j, outputXLocations[j]);
+				}
+			}
+		}
+		// getting effectorDataArray pointer
+		VectorGraphDataArray* effector = nullptr;
+		if (m_effectorLocation >= 0 && m_parent->getDataArray(m_effectorLocation)->size() > 0)
+		{
+			effector = m_parent->getDataArray(m_effectorLocation);
+		}
+
+		// m_dataArray[i] location in effecor m_dataArray, next location in effecor m_dataArray,
+		//std::vector<std::pair<unsigned int, unsigned int>> effectorData;
+		//getValuesLocations(effector, &effectorData);
+		/*
+		for (unsigned int j = 0; j < effectorData.size(); j++)
+		{
+			qDebug("getValuesB6.4, [%d] %d, %d", j, effectorData[j].first, effectorData[j].second);
+		}
+		*/
+		qDebug("getValuesB6, updatingsize: %ld", m_needsUpdating.size());
+
+		// calculate final lines
+		for (unsigned int i = 0; i < m_needsUpdating.size(); i++)
+		{
+			getValuesUpdateLines(effector, &effectorOutput, &outputXLocations, i, stepSize);
+		}
+		//effectorData.clear();
+	}
+
+	// setting outputs
+	if (isChangedOut != nullptr)
+	{
+		*isChangedOut = m_isDataChanged;
+	}
+	if (m_needsUpdating.size() > 0)
+	{
+		if (updatingValuesOut != nullptr)
+		{
+			*updatingValuesOut = m_needsUpdating;
+		}
+
+		// clearing the updated values
+		m_needsUpdating.clear();
+	}
+
+	m_isDataChanged = false;
+	qDebug("getValuesB9");
+	return m_bakedValues;
 }
 // unused function, might be useful later
 /*
@@ -3913,10 +3921,11 @@ qDebug("getValuesD8 [%d] start: %d, end: %d, type: %d,      ---       %f, %f, %f
 	}
 	if (effectorIn != nullptr && getEffectOnlyPoints(m_needsUpdating[iIn]) == false)
 	{
-		int startB = iIn == 0 ? 0 : start;
-		int endB = iIn >= m_dataArray.size() - 1 ? m_bakedValues.size() : end;
+		int startB = m_needsUpdating[iIn] == 0 ? 0 : start;
+		int endB = m_needsUpdating[iIn] >= m_dataArray.size() - 1 ? m_bakedValues.size() : end;
 		// process line effect
 		// if it is enabled
+		qDebug("getValues run prucessEffect run prucessEffect run prucessEffect run prucessEffect");
 		for (int j = startB; j < endB; j++)
 		{
 			m_bakedValues[j] = processEffect(m_needsUpdating[iIn], m_bakedValues[j], 0, effectorOutputIn->operator[](j));
@@ -3936,8 +3945,8 @@ qDebug("getValuesD8 [%d] start: %d, end: %d, type: %d,      ---       %f, %f, %f
 	}
 	if (m_isNonNegative == true)
 	{
-		int startB = iIn == 0 ? 0 : start;
-		int endB = iIn >= m_dataArray.size() - 1 ? m_bakedValues.size() : end;
+		int startB = m_needsUpdating[iIn] == 0 ? 0 : start;
+		int endB = m_needsUpdating[iIn] >= m_dataArray.size() - 1 ? m_bakedValues.size() : end;
 		for (int j = startB; j < endB; j++)
 		{
 			m_bakedValues[j] = m_bakedValues[j] / 2.0f + 0.5f;
