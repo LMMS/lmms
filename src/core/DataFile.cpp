@@ -1687,11 +1687,12 @@ void DataFile::upgrade_noteTypes()
 
 void DataFile::upgrade_fixCMTDelays()
 {
-	static QMap<QString, QString> nameMap;
-	nameMap["delay_0,01s"] = "delay_0.01s";
-	nameMap["delay_0,1s"] = "delay_0.1s";
-	nameMap["fbdelay_0,01s"] = "fbdelay_0.01s";
-	nameMap["fbdelay_0,1s"] = "fbdelay_0.1s";
+	static const QMap<QString, QString> nameMap {
+		{ "delay_0,01s", "delay_0.01s" },
+		{ "delay_0,1s", "delay_0.1s" },
+		{ "fbdelay_0,01s", "fbdelay_0.01s" },
+		{ "fbdelay_0,1s", "fbdelay_0.1s" }
+	};
 
 	const auto effects = elementsByTagName("effect");
 
@@ -1712,8 +1713,8 @@ void DataFile::upgrade_fixCMTDelays()
 			{
 				const auto attributeValue = attribute.attribute("value");
 
-				const QMap<QString, QString>::const_iterator it = nameMap.find(attributeValue);
-				if (it != nameMap.end())
+				const auto it = nameMap.constFind(attributeValue);
+				if (it != nameMap.constEnd())
 				{
 					attribute.setAttribute("value", *it);
 				}
