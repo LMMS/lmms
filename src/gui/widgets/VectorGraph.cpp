@@ -682,7 +682,8 @@ void VectorGraphView::paintGraph(QPainter* pIn, unsigned int locationIn, std::ve
 						if (dataArray->getIsEditableAttrib() == true)
 						{
 							std::pair<int, int> posC = mapDataCurvePos(posA.first, posA.second, posB.first, posB.second, dataArray->getC(j - 1));
-							pIn->drawRect(posC.first - m_pointSize / 2, m_graphHeight - posC.second - m_pointSize / 2, m_pointSize, m_pointSize);
+							pIn->drawRect(posC.first - m_pointSize / 4 - m_pointSize / 2,
+								m_graphHeight - posC.second - m_pointSize / 4 - m_pointSize / 2, m_pointSize, m_pointSize);
 						}
 					}
 				}
