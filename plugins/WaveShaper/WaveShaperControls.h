@@ -70,13 +70,7 @@ public:
 
 
 private slots:
-	void samplesChanged( int, int );
-
 	void resetClicked();
-	void smoothClicked();
-
-	void addOneClicked();
-	void subOneClicked();
 
 	void vectorGraphChanged();
 signals:

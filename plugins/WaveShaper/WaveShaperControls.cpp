@@ -70,7 +70,6 @@ WaveShaperControls::WaveShaperControls( WaveShaperEffect * _eff ) :
 	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsEditableAttrib(true);
 	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsAutomatableEffectable(true);
 	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsSaveable(true);
-	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsNonNegative(true);
 	m_vectorGraphModel.getDataArray(arrayLocationB)->setLineColor(QColor(10, 50, 210, 255));
 	m_vectorGraphModel.getDataArray(arrayLocationB)->setActiveColor(QColor(70, 170, 255, 255));
 	m_vectorGraphModel.getDataArray(arrayLocationB)->setFillColor(QColor(70, 100, 180, 40));
@@ -86,16 +85,6 @@ WaveShaperControls::WaveShaperControls( WaveShaperEffect * _eff ) :
 	connect(this, SIGNAL(vectorGraphUpdateView(bool)),
 			&m_vectorGraphModel, SLOT(updateGraphModel(bool)));
 }
-
-
-
-
-void WaveShaperControls::samplesChanged( int _begin, int _end)
-{
-	Engine::getSong()->setModified();
-}
-
-
 
 
 void WaveShaperControls::loadSettings( const QDomElement & _this )
@@ -148,7 +137,7 @@ void WaveShaperControls::setDefaultShape()
 		m_vectorGraphModel.getDataArray(i)->clear();
 	}
 
-	if (m_vectorGraphModel.getDataArraySize() > 0)
+	if (m_vectorGraphModel.getDataArraySize() > 1)
 	{
 		int addedLocation = m_vectorGraphModel.getDataArray(0)->add(0.0f);
 		if (addedLocation >= 0)
@@ -161,39 +150,18 @@ void WaveShaperControls::setDefaultShape()
 		{
 			m_vectorGraphModel.getDataArray(0)->setY(addedLocation, 1.0f);
 		}
+
+		addedLocation = m_vectorGraphModel.getDataArray(1)->add(0.5f);
+		if (addedLocation >= 0)
+		{
+			m_vectorGraphModel.getDataArray(1)->setY(addedLocation, -1.0f);
+		}
 	}
 }
 
 void WaveShaperControls::resetClicked()
 {
-	Engine::getSong()->setModified();
-}
-
-void WaveShaperControls::smoothClicked()
-{
-	//m_wavegraphModel.smoothNonCyclic();
-	Engine::getSong()->setModified();
-}
-
-void WaveShaperControls::addOneClicked()
-{
-	/*
-	for( int i=0; i<200; i++ )
-	{
-		m_wavegraphModel.setSampleAt( i, qBound( 0.0f, m_wavegraphModel.samples()[i] * onedB, 1.0f ) );
-	}
-	*/
-	Engine::getSong()->setModified();
-}
-
-void WaveShaperControls::subOneClicked()
-{
-	/*
-	for( int i=0; i<200; i++ )
-	{
-		m_wavegraphModel.setSampleAt( i, qBound( 0.0f, m_wavegraphModel.samples()[i] / onedB, 1.0f ) );
-	}
-	*/
+	setDefaultShape();
 	Engine::getSong()->setModified();
 }
 
