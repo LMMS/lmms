@@ -69,12 +69,12 @@ WaveShaperControls::WaveShaperControls( WaveShaperEffect * _eff ) :
 	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsSelectable(true);
 	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsEditableAttrib(true);
 	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsAutomatableEffectable(true);
-	m_vectorGraphModel.getDataArray(arrayLocation)->setIsSaveable(true);
-	m_vectorGraphModel.getDataArray(arrayLocation)->setIsNonNegative(true);
+	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsSaveable(true);
+	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsNonNegative(true);
 	m_vectorGraphModel.getDataArray(arrayLocationB)->setLineColor(QColor(10, 50, 210, 255));
 	m_vectorGraphModel.getDataArray(arrayLocationB)->setActiveColor(QColor(70, 170, 255, 255));
 	m_vectorGraphModel.getDataArray(arrayLocationB)->setFillColor(QColor(70, 100, 180, 40));
-	m_vectorGraphModel.getDataArray(arrayLocationB)->setAutomatedColor(QColor(10, 50, 255, 255));
+	m_vectorGraphModel.getDataArray(arrayLocationB)->setAutomatedColor(QColor(144, 107, 255, 255));
 
 	// connect VectorGraphDataArrays so the 2. will be able to effect the 1.:
 	m_vectorGraphModel.getDataArray(arrayLocation)->setEffectorArrayLocation(arrayLocationB, true);
@@ -82,7 +82,9 @@ WaveShaperControls::WaveShaperControls( WaveShaperEffect * _eff ) :
 	setDefaultShape();
 
 	connect(&m_vectorGraphModel, SIGNAL(dataChanged()),
-			this, SLOT(vectoGraphChanged()));
+			this, SLOT(vectorGraphChanged()));
+	connect(this, SIGNAL(vectorGraphUpdateView(bool)),
+			&m_vectorGraphModel, SLOT(updateGraphModel(bool)));
 }
 
 
@@ -129,7 +131,7 @@ std::vector<float> WaveShaperControls::getGraphSamples()
 	if (m_vectorGraphModel.getDataArraySize() > 0)
 	{
 		std::vector<float> output = m_vectorGraphModel.getDataArray(0)->getValues(200);
-		m_vectorGraphModel.dataChanged();
+		emit vectorGraphUpdateView(true);
 		return output;
 	}
 	else
@@ -195,7 +197,7 @@ void WaveShaperControls::subOneClicked()
 	Engine::getSong()->setModified();
 }
 
-void WaveShaperControls::vectoGraphChanged()
+void WaveShaperControls::vectorGraphChanged()
 {
 	Engine::getSong()->setModified();
 }

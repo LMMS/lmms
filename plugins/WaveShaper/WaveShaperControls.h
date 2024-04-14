@@ -67,6 +67,8 @@ public:
 
 	std::vector<float> getGraphSamples();
 
+
+
 private slots:
 	void samplesChanged( int, int );
 
@@ -76,8 +78,12 @@ private slots:
 	void addOneClicked();
 	void subOneClicked();
 
-	void vectoGraphChanged();
-
+	void vectorGraphChanged();
+signals:
+	// connected to dataArrayChanged()
+	// shouldUseGetLastValuesIn: when the graph is redrawn
+	// should it use the last updated values instead of updating again
+	void vectorGraphUpdateView(bool shouldUseGetLastValuesIn);
 private:
 	WaveShaperEffect * m_effect;
 	FloatModel m_inputModel;
