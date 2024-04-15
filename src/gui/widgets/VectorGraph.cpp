@@ -55,9 +55,8 @@ namespace lmms
 namespace gui
 {
 
-VectorGraphView::VectorGraphView(QWidget * parentIn,
-		int widthIn, int heightIn,
-		unsigned int pointSizeIn, unsigned int maxLengthIn) :
+VectorGraphView::VectorGraphView(QWidget * parentIn, int widthIn, int heightIn,
+		unsigned int pointSizeIn, unsigned int maxLengthIn, bool shouldApplyDefaultVectorGraphColorsIn) :
 		QWidget(parentIn),
 		ModelView(new VectorGraphModel(maxLengthIn, nullptr, false), this)
 {
@@ -114,6 +113,10 @@ VectorGraphView::VectorGraphView(QWidget * parentIn,
 	setCursor(Qt::CrossCursor);
 
 	modelChanged();
+	if (shouldApplyDefaultVectorGraphColorsIn == true)
+	{
+		applyDefaultColors();
+	}
 }
 VectorGraphView::~VectorGraphView()
 {
@@ -129,7 +132,7 @@ void VectorGraphView::setLineColor(QColor colorIn, unsigned int dataArrayLocatio
 	if (model()->getDataArraySize() > dataArrayLocationIn)
 	{
 		model()->getDataArray(dataArrayLocationIn)->setLineColor(colorIn);
-		update();
+		updateGraph();
 	}
 }
 void VectorGraphView::setActiveColor(QColor colorIn, unsigned int dataArrayLocationIn)
@@ -137,7 +140,7 @@ void VectorGraphView::setActiveColor(QColor colorIn, unsigned int dataArrayLocat
 	if (model()->getDataArraySize() > dataArrayLocationIn)
 	{
 		model()->getDataArray(dataArrayLocationIn)->setActiveColor(colorIn);
-		update();
+		updateGraph();
 	}
 }
 void VectorGraphView::setFillColor(QColor colorIn, unsigned int dataArrayLocationIn)
@@ -145,7 +148,7 @@ void VectorGraphView::setFillColor(QColor colorIn, unsigned int dataArrayLocatio
 	if (model()->getDataArraySize() > dataArrayLocationIn)
 	{
 		model()->getDataArray(dataArrayLocationIn)->setFillColor(colorIn);
-		update();
+		updateGraph();
 	}
 }
 void VectorGraphView::setAutomatedColor(QColor colorIn, unsigned int dataArrayLocationIn)
@@ -153,7 +156,25 @@ void VectorGraphView::setAutomatedColor(QColor colorIn, unsigned int dataArrayLo
 	if (model()->getDataArraySize() > dataArrayLocationIn)
 	{
 		model()->getDataArray(dataArrayLocationIn)->setAutomatedColor(colorIn);
-		update();
+		updateGraph();
+	}
+}
+void VectorGraphView::applyDefaultColors()
+{
+	unsigned int size = model()->getDataArraySize();
+	if (size > 0)
+	{
+		setLineColor(m_vectorGraphDefaultLineColor, 0);
+		setActiveColor(m_vectorGraphDefaultActiveColor, 0);
+		setFillColor(m_vectorGraphDefaultFillColor, 0);
+		setAutomatedColor(m_vectorGraphDefaultAutomatedColor, 0);
+		if (size > 1)
+		{
+			setLineColor(m_vectorGraphSecondaryLineColor, 1);
+			setActiveColor(m_vectorGraphSecondaryActiveColor, 1);
+			setFillColor(m_vectorGraphSecondaryFillColor, 1);
+			setAutomatedColor(m_vectorGraphDefaultAutomatedColor, 1);
+		}
 	}
 }
 
