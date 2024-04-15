@@ -49,9 +49,10 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 	setPalette( pal );
 	setFixedSize( 224, 274 );
 
-	auto curGraph = new VectorGraphView(this, 204, 205, 10, 1024);
+	auto curGraph = new VectorGraphView(this, 204, 205, 10, 1024, false);
 	curGraph->setModel(&_controls->m_vectorGraphModel);
 	curGraph->setBackground(PLUGIN_NAME::getIconPixmap("wavegraph"));
+	curGraph->applyDefaultColors();
 	curGraph->move(10, 6);
 
 	auto inputKnob = new Knob(KnobType::Bright26, this);
