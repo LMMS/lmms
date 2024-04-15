@@ -164,6 +164,7 @@ void VectorGraphView::applyDefaultColors()
 	unsigned int size = model()->getDataArraySize();
 	if (size > 0)
 	{
+		qDebug("applyDefaultColors lineColor: %d, %d, %d, %d", m_vectorGraphDefaultLineColor.red(), m_vectorGraphDefaultLineColor.green(), m_vectorGraphDefaultLineColor.blue(), m_vectorGraphDefaultLineColor.alpha());
 		setLineColor(m_vectorGraphDefaultLineColor, 0);
 		setActiveColor(m_vectorGraphDefaultActiveColor, 0);
 		setFillColor(m_vectorGraphDefaultFillColor, 0);
