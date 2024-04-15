@@ -50,16 +50,24 @@ namespace gui
 class LMMS_EXPORT VectorGraphView : public QWidget, public ModelView
 {
 	Q_OBJECT
+	// set default VectorGraph css colors and styles
+	Q_PROPERTY(QColor vectorGraphDefaultAutomatedColor MEMBER m_vectorGraphDefaultAutomatedColor)
+	Q_PROPERTY(QColor vectorGraphDefaultLineColor MEMBER m_vectorGraphDefaultLineColor)
+	Q_PROPERTY(QColor vectorGraphDefaultActiveColor MEMBER m_vectorGraphDefaultActiveColor)
+	Q_PROPERTY(QColor vectorGraphDefaultFillColor MEMBER m_vectorGraphDefaultFillColor)
+	Q_PROPERTY(QColor vectorGraphSecondaryLineColor MEMBER m_vectorGraphSecondaryLineColor)
+	Q_PROPERTY(QColor vectorGraphSecondaryActiveColor MEMBER m_vectorGraphSecondaryActiveColor)
+	Q_PROPERTY(QColor vectorGraphSecondaryFillColor MEMBER m_vectorGraphSecondaryFillColor)
 public:
-	VectorGraphView(QWidget * parentIn,
-		int widthIn, int heightIn,
-		unsigned int pointSizeIn, unsigned int maxLengthIn);
+	VectorGraphView(QWidget * parentIn, int widthIn, int heightIn,
+		unsigned int pointSizeIn, unsigned int maxLengthIn, bool shouldApplyDefaultVectorGraphColorsIn);
 	~VectorGraphView();
 
 	void setLineColor(QColor colorIn, unsigned int dataArrayLocationIn);
 	void setActiveColor(QColor colorIn, unsigned int dataArrayLocationIn);
 	void setFillColor(QColor colorIn, unsigned int dataArrayLocationIn);
 	void setAutomatedColor(QColor colorIn, unsigned int dataArrayLocationIn);
+	void applyDefaultColors();
 
 	inline VectorGraphModel* model()
 	{
@@ -198,6 +206,18 @@ private:
 
 	std::pair<int, int> m_lastTrackPoint;
 	std::pair<int, int> m_lastScndTrackPoint;
+
+	
+	// default VectorGraphDataArray colors
+	// applyed in constructor
+	QColor m_vectorGraphDefaultAutomatedColor;
+
+	QColor m_vectorGraphDefaultLineColor;
+	QColor m_vectorGraphDefaultActiveColor;
+	QColor m_vectorGraphDefaultFillColor;
+	QColor m_vectorGraphSecondaryLineColor;
+	QColor m_vectorGraphSecondaryActiveColor;
+	QColor m_vectorGraphSecondaryFillColor;
 };
 
 } // namespace gui
@@ -280,7 +300,6 @@ private:
 	// block threads that want to access
 	// a dataArray's getValues() at the same time
 	std::mutex m_getValuesAccess;
-	//friend class gui::VectorGraphView;
 };
 
 class LMMS_EXPORT VectorGraphDataArray

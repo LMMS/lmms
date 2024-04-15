@@ -51,6 +51,16 @@ lmms--gui--Knob {
 	qproperty-arcInactiveColor: rgba(120, 120, 120, 70);
 }
 
+lmms--gui--VectorGraph {
+	qproperty-vectorGraphDefaultAutomatedColor: rgba(69,42,153,180);
+	qproperty-vectorGraphDefaultLineColor: rgba(120, 120, 120, 255);
+	qproperty-vectorGraphDefaultActiveColor: rgba(120, 120, 120, 255);
+	qproperty-vectorGraphDefaultFillColor: rgba(120, 120, 120, 255);
+	qproperty-vectorGraphSecondaryLineColor: rgba(120, 120, 120, 255);
+	qproperty-vectorGraphSecondaryActiveColor: rgba(120, 120, 120, 255);
+	qproperty-vectorGraphSecondaryFillColor: rgba(120, 120, 120, 255);
+}
+
 lmms--gui--AutomationEditor {
 	color: #ffffff;
 	background-color: #141616;
