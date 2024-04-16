@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef REMOTE_PLUGIN_H
-#define REMOTE_PLUGIN_H
+#ifndef LMMS_REMOTE_PLUGIN_H
+#define LMMS_REMOTE_PLUGIN_H
 
 #include "RemotePluginBase.h"
 #include "SharedMemory.h"
@@ -197,4 +197,4 @@ LMMS_EXPORT inline std::string QSTR_TO_STDSTR(QString const& qstr)
 
 } // namespace lmms
 
-#endif // REMOTE_PLUGIN_H
+#endif // LMMS_REMOTE_PLUGIN_H

@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_ENGINE_WORKER_THREAD_H
-#define AUDIO_ENGINE_WORKER_THREAD_H
+#ifndef LMMS_AUDIO_ENGINE_WORKER_THREAD_H
+#define LMMS_AUDIO_ENGINE_WORKER_THREAD_H
 
 #include <QThread>
 
@@ -45,7 +45,7 @@ public:
 	class JobQueue
 	{
 	public:
-		enum OperationMode
+		enum class OperationMode
 		{
 			Static,	// no jobs added while processing queue
 			Dynamic	// jobs can be added while processing queue
@@ -57,7 +57,7 @@ public:
 			m_items(),
 			m_writeIndex( 0 ),
 			m_itemsDone( 0 ),
-			m_opMode( Static )
+			m_opMode( OperationMode::Static )
 		{
 			std::fill(m_items, m_items + JOB_QUEUE_SIZE, nullptr);
 		}
@@ -83,7 +83,7 @@ public:
 	virtual void quit();
 
 	static void resetJobQueue( JobQueue::OperationMode _opMode =
-													JobQueue::Static )
+													JobQueue::OperationMode::Static )
 	{
 		globalJobQueue.reset( _opMode );
 	}
@@ -97,12 +97,12 @@ public:
 	// to ThreadableJob objects
 	template<typename T>
 	static void fillJobQueue( const T & _vec,
-							JobQueue::OperationMode _opMode = JobQueue::Static )
+							JobQueue::OperationMode _opMode = JobQueue::OperationMode::Static )
 	{
 		resetJobQueue( _opMode );
-		for( typename T::ConstIterator it = _vec.begin(); it != _vec.end(); ++it )
+		for (const auto& job : _vec)
 		{
-			addJob( *it );
+			addJob(job);
 		}
 	}
 
@@ -121,4 +121,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AUDIO_ENGINE_WORKER_THREAD_H

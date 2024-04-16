@@ -22,16 +22,17 @@
  *
  */
 
-
 #ifndef LMMS_MATH_H
 #define LMMS_MATH_H
 
+#include <QtGlobal>
+#include <algorithm>
+#include <cmath>
 #include <cstdint>
+
 #include "lmms_constants.h"
 #include "lmmsconfig.h"
-#include <QtGlobal>
-
-#include <cmath>
+#include <cassert>
 
 namespace lmms
 {
@@ -215,7 +216,7 @@ static inline float logToLinearScale( float min, float max, float value )
 {
 	if( min < 0 )
 	{
-		const float mmax = qMax( qAbs( min ), qAbs( max ) );
+		const float mmax = std::max(std::abs(min), std::abs(max));
 		const float val = value * ( max - min ) + min;
 		float result = signedPowf( val / mmax, F_E ) * mmax;
 		return std::isnan( result ) ? 0 : result;
@@ -229,11 +230,11 @@ static inline float logToLinearScale( float min, float max, float value )
 static inline float linearToLogScale( float min, float max, float value )
 {
 	static const float EXP = 1.0f / F_E;
-	const float valueLimited = qBound( min, value, max);
+	const float valueLimited = std::clamp(value, min, max);
 	const float val = ( valueLimited - min ) / ( max - min );
 	if( min < 0 )
 	{
-		const float mmax = qMax( qAbs( min ), qAbs( max ) );
+		const float mmax = std::max(std::abs(min), std::abs(max));
 		float result = signedPowf( valueLimited / mmax, EXP ) * mmax;
 		return std::isnan( result ) ? 0 : result;
 	}
@@ -269,18 +270,18 @@ static inline float safeDbfsToAmp( float dbfs )
 //! @brief Converts linear amplitude (>0-1.0) to dBFS scale. 
 //! @param amp Linear amplitude, where 1.0 = 0dBFS. ** Must be larger than zero! **
 //! @return Amplitude in dBFS. 
-static inline float ampToDbfs( float amp )
+static inline float ampToDbfs(float amp)
 {
-	return log10f( amp ) * 20.0f;
+	return log10f(amp) * 20.0f;
 }
 
 
 //! @brief Converts dBFS-scale to linear amplitude with 0dBFS = 1.0
 //! @param dbfs The dBFS value to convert. ** Must be a real number - not inf/nan! **
 //! @return Linear amplitude
-static inline float dbfsToAmp( float dbfs )
+static inline float dbfsToAmp(float dbfs)
 {
-	return std::pow(10.f, dbfs * 0.05f );
+	return std::pow(10.f, dbfs * 0.05f);
 }
 
 
@@ -316,17 +317,72 @@ static inline float fastSqrt( float n )
 template<class T>
 static inline T absMax( T a, T b )
 {
-	return qAbs<T>(a) > qAbs<T>(b) ? a : b;
+	return std::abs(a) > std::abs(b) ? a : b;
 }
 
 //! returns value nearest to zero
 template<class T>
 static inline T absMin( T a, T b )
 {
-	return qAbs<T>(a) < qAbs<T>(b) ? a : b;
+	return std::abs(a) < std::abs(b) ? a : b;
 }
 
+//! Returns the linear interpolation of the two values
+template<class T, class F>
+constexpr T lerp(T a, T b, F t)
+{
+	return (1. - t) * a + t * b;
+}
+
+// @brief Calculate number of digits which LcdSpinBox would show for a given number
+// @note Once we upgrade to C++20, we could probably use std::formatted_size
+static inline int numDigitsAsInt(float f)
+{
+	// use rounding:
+	// LcdSpinBox sometimes uses roundf(), sometimes cast rounding
+	// we use rounding to be on the "safe side"
+	const float rounded = roundf(f);
+	int asInt = static_cast<int>(rounded);
+	int digits = 1; // always at least 1
+	if(asInt < 0)
+	{
+		++digits;
+		asInt = -asInt;
+	}
+	// "asInt" is positive from now
+	int32_t power = 1;
+	for(int32_t i = 1; i<10; ++i)
+	{
+		power *= 10;
+		if(static_cast<int32_t>(asInt) >= power) { ++digits; } // 2 digits for >=10, 3 for >=100
+		else { break; }
+	}
+	return digits;
+}
+
+template <typename T>
+class LinearMap
+{
+public:
+	LinearMap(T x1, T y1, T x2, T y2)
+	{
+		T const dx = x2 - x1;
+		assert (dx != T(0));
+
+		m_a = (y2 - y1) / dx;
+		m_b = y1 - m_a * x1;
+	}
+
+	T map(T x) const
+	{
+		return m_a * x + m_b;
+	}
+
+private:
+	T m_a;
+	T m_b;
+};
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_MATH_H

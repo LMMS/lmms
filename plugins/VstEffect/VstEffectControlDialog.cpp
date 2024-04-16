@@ -48,6 +48,16 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 	m_plugin( nullptr ),
 	tbLabel( nullptr )
 {
+#if QT_VERSION < 0x50C00
+	// Workaround for a bug in Qt versions below 5.12,
+	// where argument-dependent-lookup fails for QFlags operators
+	// declared inside a namepsace.
+	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
+	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
+
+	using ::operator|;
+#endif
+
 	auto l = new QGridLayout(this);
 	l->setContentsMargins( 10, 10, 10, 10 );
 	l->setVerticalSpacing( 2 );
@@ -236,7 +246,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		tb->addWidget(space1);
 
 		tbLabel = new QLabel( tr( "Effect by: " ), this );
-		tbLabel->setFont( pointSize<7>( f ) );
+		tbLabel->setFont(adjustedToPixelSize(f, 7));
 		tbLabel->setTextFormat(Qt::RichText);
 		tbLabel->setAlignment( Qt::AlignTop | Qt::AlignLeft );
 		tb->addWidget( tbLabel );

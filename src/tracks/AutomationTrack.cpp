@@ -34,7 +34,7 @@ namespace lmms
 
 
 AutomationTrack::AutomationTrack( TrackContainer* tc, bool _hidden ) :
-	Track( _hidden ? HiddenAutomationTrack : Track::AutomationTrack, tc )
+	Track( _hidden ? Type::HiddenAutomation : Type::Automation, tc )
 {
 	setName( tr( "Automation track" ) );
 }
@@ -77,7 +77,7 @@ void AutomationTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 void AutomationTrack::loadTrackSpecificSettings( const QDomElement & _this )
 {
 	// just in case something somehow wrent wrong...
-	if( type() == HiddenAutomationTrack )
+	if( type() == Type::HiddenAutomation )
 	{
 		setMuted( false );
 	}

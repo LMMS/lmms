@@ -42,7 +42,7 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 	ModelView( nullptr, this )
 {
 	auto mainLayout = new QVBoxLayout(this);
-	mainLayout->setMargin( 5 );
+	mainLayout->setContentsMargins(5, 5, 5, 5);
 
 	m_effectsGroupBox = new GroupBox( tr( "EFFECTS CHAIN" ) );
 	mainLayout->addWidget( m_effectsGroupBox );

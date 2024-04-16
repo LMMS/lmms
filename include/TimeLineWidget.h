@@ -22,17 +22,27 @@
  *
  */
 
+#ifndef LMMS_GUI_TIMELINE_WIDGET_H
+#define LMMS_GUI_TIMELINE_WIDGET_H
 
-#ifndef TIMELINE_H
-#define TIMELINE_H
+#include <array>
 
+#include <QBrush>
+#include <QSize>
 #include <QWidget>
 
 #include "Song.h"
+#include "embed.h"
 
 
 class QPixmap;
 class QToolBar;
+
+namespace lmms {
+
+class Timeline;
+
+} // namespace lmms
 
 namespace lmms::gui
 {
@@ -42,7 +52,7 @@ class TextFloat;
 class SongEditor;
 
 
-class TimeLineWidget : public QWidget, public JournallingObject
+class TimeLineWidget : public QWidget
 {
 	Q_OBJECT
 public:
@@ -51,33 +61,24 @@ public:
 	Q_PROPERTY( QColor inactiveLoopColor READ getInactiveLoopColor WRITE setInactiveLoopColor )
 	Q_PROPERTY( QBrush inactiveLoopBrush READ getInactiveLoopBrush WRITE setInactiveLoopBrush )
 	Q_PROPERTY( QColor inactiveLoopInnerColor READ getInactiveLoopInnerColor WRITE setInactiveLoopInnerColor )
+	Q_PROPERTY(QColor inactiveLoopHandleColor MEMBER m_inactiveLoopHandleColor)
 	Q_PROPERTY( QColor activeLoopColor READ getActiveLoopColor WRITE setActiveLoopColor )
 	Q_PROPERTY( QBrush activeLoopBrush READ getActiveLoopBrush WRITE setActiveLoopBrush )
 	Q_PROPERTY( QColor activeLoopInnerColor READ getActiveLoopInnerColor WRITE setActiveLoopInnerColor )
+	Q_PROPERTY(QColor activeLoopHandleColor MEMBER m_activeLoopHandleColor)
 	Q_PROPERTY( int loopRectangleVerticalPadding READ getLoopRectangleVerticalPadding WRITE setLoopRectangleVerticalPadding )
+	Q_PROPERTY(int loopHandleWidth MEMBER m_loopHandleWidth)
+	Q_PROPERTY(QSize mouseHotspotSelLeft READ mouseHotspotSelLeft WRITE setMouseHotspotSelLeft)
+	Q_PROPERTY(QSize mouseHotspotSelRight READ mouseHotspotSelRight WRITE setMouseHotspotSelRight)
 
-	enum AutoScrollStates
+	enum class AutoScrollState
 	{
-		AutoScrollEnabled,
-		AutoScrollDisabled
-	} ;
+		Enabled,
+		Disabled
+	};
 
-	enum LoopPointStates
-	{
-		LoopPointsDisabled,
-		LoopPointsEnabled
-	} ;
-
-	enum BehaviourAtStopStates
-	{
-		BackToZero,
-		BackToStart,
-		KeepStopPosition
-	} ;
-
-
-	TimeLineWidget(int xoff, int yoff, float ppb, Song::PlayPos & pos,
-				const TimePos & begin, Song::PlayModes mode, QWidget * parent);
+	TimeLineWidget(int xoff, int yoff, float ppb, Song::PlayPos& pos, Timeline& timeline,
+				const TimePos& begin, Song::PlayMode mode, QWidget* parent);
 	~TimeLineWidget() override;
 
 	inline QColor const & getBarLineColor() const { return m_barLineColor; }
@@ -107,45 +108,36 @@ public:
 	inline int const & getLoopRectangleVerticalPadding() const { return m_loopRectangleVerticalPadding; }
 	inline void setLoopRectangleVerticalPadding(int const & loopRectangleVerticalPadding) { m_loopRectangleVerticalPadding = loopRectangleVerticalPadding; }
 
+	auto mouseHotspotSelLeft() const -> QSize
+	{
+		const auto point = m_cursorSelectLeft.hotSpot();
+		return QSize{point.x(), point.y()};
+	}
+
+	void setMouseHotspotSelLeft(const QSize& s)
+	{
+		m_cursorSelectLeft = QCursor{m_cursorSelectLeft.pixmap(), s.width(), s.height()};
+	}
+
+	auto mouseHotspotSelRight() const -> QSize
+	{
+		const auto point = m_cursorSelectRight.hotSpot();
+		return QSize{point.x(), point.y()};
+	}
+
+	void setMouseHotspotSelRight(const QSize& s)
+	{
+		m_cursorSelectRight = QCursor{m_cursorSelectRight.pixmap(), s.width(), s.height()};
+	}
+
 	inline Song::PlayPos & pos()
 	{
 		return( m_pos );
 	}
 
-	AutoScrollStates autoScroll() const
+	AutoScrollState autoScroll() const
 	{
 		return m_autoScroll;
-	}
-
-	BehaviourAtStopStates behaviourAtStop() const
-	{
-		return m_behaviourAtStop;
-	}
-
-	bool loopPointsEnabled() const
-	{
-		return m_loopPoints == LoopPointsEnabled;
-	}
-
-	inline const TimePos & loopBegin() const
-	{
-		return ( m_loopPos[0] < m_loopPos[1] ) ?
-						m_loopPos[0] : m_loopPos[1];
-	}
-
-	inline const TimePos & loopEnd() const
-	{
-		return ( m_loopPos[0] > m_loopPos[1] ) ?
-						m_loopPos[0] : m_loopPos[1];
-	}
-
-	inline void savePos( const TimePos & pos )
-	{
-		m_savedPos = pos;
-	}
-	inline const TimePos & savedPos() const
-	{
-		return m_savedPos;
 	}
 
 	inline void setPixelsPerBar( float ppb )
@@ -158,14 +150,6 @@ public:
 
 	void addToolButtons(QToolBar* _tool_bar );
 
-
-	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
-	void loadSettings( const QDomElement & _this ) override;
-	inline QString nodeName() const override
-	{
-		return "timeline";
-	}
-
 	inline int markerX( const TimePos & _t ) const
 	{
 		return m_xOffset + static_cast<int>( ( _t - m_begin ) *
@@ -173,93 +157,83 @@ public:
 	}
 
 signals:
-
+	void positionChanged(const lmms::TimePos& postion);
 	void regionSelectedFromPixels( int, int );
 	void selectionFinished();
 
-
 public slots:
-	void updatePosition( const lmms::TimePos & );
-	void updatePosition()
-	{
-		updatePosition( TimePos() );
-	}
+	void updatePosition();
 	void setSnapSize( const float snapSize )
 	{
 		m_snapSize = snapSize;
 	}
 	void toggleAutoScroll( int _n );
-	void toggleLoopPoints( int _n );
-	void toggleBehaviourAtStop( int _n );
-
 
 protected:
 	void paintEvent( QPaintEvent * _pe ) override;
 	void mousePressEvent( QMouseEvent * _me ) override;
 	void mouseMoveEvent( QMouseEvent * _me ) override;
 	void mouseReleaseEvent( QMouseEvent * _me ) override;
-
+	void contextMenuEvent(QContextMenuEvent* event) override;
 
 private:
-	static QPixmap * s_posMarkerPixmap;
-
-	QColor m_inactiveLoopColor;
-	QBrush m_inactiveLoopBrush;
-	QColor m_inactiveLoopInnerColor;
-
-	QColor m_activeLoopColor;
-	QBrush m_activeLoopBrush;
-	QColor m_activeLoopInnerColor;
-
-	int m_loopRectangleVerticalPadding;
-
-	QColor m_barLineColor;
-	QColor m_barNumberColor;
-
-	AutoScrollStates m_autoScroll;
-	LoopPointStates m_loopPoints;
-	BehaviourAtStopStates m_behaviourAtStop;
-
-	bool m_changedPosition;
-
-	int m_xOffset;
-	int m_posMarkerX;
-	float m_ppb;
-	float m_snapSize;
-	Song::PlayPos & m_pos;
-	const TimePos & m_begin;
-	const Song::PlayModes m_mode;
-	TimePos m_loopPos[2];
-
-	TimePos m_savedPos;
-
-
-	TextFloat * m_hint;
-	int m_initalXSelect;
-
-
-	enum actions
+	enum class Action
 	{
 		NoAction,
 		MovePositionMarker,
 		MoveLoopBegin,
 		MoveLoopEnd,
+		MoveLoop,
 		SelectSongClip,
-	} m_action;
+	};
 
-	int m_moveXOff;
+	auto getClickedTime(int xPosition) const -> TimePos;
+	auto getLoopAction(QMouseEvent* event) const -> Action;
+	auto actionCursor(Action action) const -> QCursor;
 
+	QPixmap m_posMarkerPixmap = embed::getIconPixmap("playpos_marker");
 
-signals:
-	void positionChanged( const lmms::TimePos & _t );
-	void loopPointStateLoaded( int _n );
-	void positionMarkerMoved();
-	void loadBehaviourAtStop( int _n );
+	QColor m_inactiveLoopColor = QColor{52, 63, 53, 64};
+	QBrush m_inactiveLoopBrush = QColor{255, 255, 255, 32};
+	QColor m_inactiveLoopInnerColor = QColor{255, 255, 255, 32};
+	QColor m_inactiveLoopHandleColor = QColor{255, 255, 255, 32};
 
-} ;
+	QColor m_activeLoopColor = QColor{52, 63, 53, 255};
+	QBrush m_activeLoopBrush = QColor{55, 141, 89};
+	QColor m_activeLoopInnerColor = QColor{74, 155, 100, 255};
+	QColor m_activeLoopHandleColor = QColor{74, 155, 100, 255};
 
+	int m_loopRectangleVerticalPadding = 1;
+	int m_loopHandleWidth = 5;
 
+	QColor m_barLineColor = QColor{192, 192, 192};
+	QColor m_barNumberColor = m_barLineColor.darker(120);
+
+	QCursor m_cursorSelectLeft = QCursor{embed::getIconPixmap("cursor_select_left"), 0, 16};
+	QCursor m_cursorSelectRight = QCursor{embed::getIconPixmap("cursor_select_right"), 32, 16};
+
+	AutoScrollState m_autoScroll = AutoScrollState::Enabled;
+
+	// Width of the unused region on the widget's left (above track labels or piano)
+	int m_xOffset;
+	float m_ppb;
+	float m_snapSize = 1.f;
+	Song::PlayPos & m_pos;
+	Timeline* m_timeline;
+	// Leftmost position visible in parent editor
+	const TimePos & m_begin;
+	const Song::PlayMode m_mode;
+	// When in MoveLoop mode we need the initial positions. Storing only the latest
+	// position allows for unquantized drag but fails when toggling quantization.
+	std::array<TimePos, 2> m_oldLoopPos;
+	TimePos m_dragStartPos;
+
+	TextFloat* m_hint = nullptr;
+	int m_initalXSelect;
+
+	Action m_action = Action::NoAction;
+};
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_TIMELINE_WIDGET_H

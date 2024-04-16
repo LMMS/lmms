@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef PIANO_H
-#define PIANO_H
+#ifndef LMMS_PIANO_H
+#define LMMS_PIANO_H
 
 #include "Note.h"
 #include "Model.h"
@@ -38,10 +38,10 @@ class MidiEventProcessor;
 class Piano final : public Model
 {
 public:
-	enum KeyTypes
+	enum class KeyType
 	{
-		WhiteKey,
-		BlackKey
+		White,
+		Black
 	} ;
 
 	Piano(InstrumentTrack* track);
@@ -89,5 +89,4 @@ private:
 
 } // namespace lmms
 
-#endif
-
+#endif // LMMS_PIANO_H

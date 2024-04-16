@@ -45,7 +45,7 @@ namespace lmms
 
 
 SampleTrack::SampleTrack(TrackContainer* tc) :
-	Track(Track::SampleTrack, tc),
+	Track(Track::Type::Sample, tc),
 	m_volumeModel(DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr("Volume")),
 	m_panningModel(DefaultPanning, PanningLeft, PanningRight, 0.1f, this, tr("Panning")),
 	m_mixerChannelModel(0, 0, 0, this, tr("Mixer channel")),
@@ -64,7 +64,7 @@ SampleTrack::SampleTrack(TrackContainer* tc) :
 
 SampleTrack::~SampleTrack()
 {
-	Engine::audioEngine()->removePlayHandlesOfTypes( this, PlayHandle::TypeSamplePlayHandle );
+	Engine::audioEngine()->removePlayHandlesOfTypes( this, PlayHandle::Type::SamplePlayHandle );
 }
 
 
@@ -108,10 +108,10 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 			{
 				if( sClip->isPlaying() == false && _start >= (sClip->startPosition() + sClip->startTimeOffset()) )
 				{
-					auto bufferFramesPerTick = Engine::framesPerTick (sClip->sampleBuffer ()->sampleRate ());
+					auto bufferFramesPerTick = Engine::framesPerTick(sClip->sample().sampleRate());
 					f_cnt_t sampleStart = bufferFramesPerTick * ( _start - sClip->startPosition() - sClip->startTimeOffset() );
 					f_cnt_t clipFrameLength = bufferFramesPerTick * ( sClip->endPosition() - sClip->startPosition() - sClip->startTimeOffset() );
-					f_cnt_t sampleBufferLength = sClip->sampleBuffer()->frames();
+					f_cnt_t sampleBufferLength = sClip->sample().sampleSize();
 					//if the Clip smaller than the sample length we play only until Clip end
 					//else we play the sample to the end but nothing more
 					f_cnt_t samplePlayLength = clipFrameLength > sampleBufferLength ? sampleBufferLength : clipFrameLength;
@@ -229,7 +229,7 @@ void SampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 
 void SampleTrack::updateClips()
 {
-	Engine::audioEngine()->removePlayHandlesOfTypes( this, PlayHandle::TypeSamplePlayHandle );
+	Engine::audioEngine()->removePlayHandlesOfTypes( this, PlayHandle::Type::SamplePlayHandle );
 	setPlayingClips( false );
 }
 

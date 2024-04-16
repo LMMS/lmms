@@ -72,7 +72,7 @@ public:
 
 	virtual Flags flags() const
 	{
-		return IsSingleStreamed | IsMidiBased;
+		return Flag::IsSingleStreamed | Flag::IsMidiBased;
 	}
 
 	virtual bool handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0 );
@@ -131,8 +131,6 @@ protected:
 
 
 private:
-	static QPixmap * s_artwork;
-
 	VestigeInstrument * m_vi;
 
 	QWidget *widget;
@@ -175,7 +173,6 @@ protected:
 private:
 	virtual void modelChanged();
 
-	static QPixmap * s_artwork;
 
 	VestigeInstrument * m_vi;
 

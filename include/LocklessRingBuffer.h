@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LOCKLESSRINGBUFFER_H
-#define LOCKLESSRINGBUFFER_H
+#ifndef LMMS_LOCKLESS_RING_BUFFER_H
+#define LMMS_LOCKLESS_RING_BUFFER_H
 
 #include <QMutex>
 #include <QWaitCondition>
@@ -51,13 +51,14 @@ public:
 	std::size_t capacity() const {return m_buffer.maximum_eventual_write_space();}
 	std::size_t free() const {return m_buffer.write_space();}
 	void wakeAll() {m_notifier.wakeAll();}
-	std::size_t write(const sampleFrame *src, std::size_t cnt, bool notify = false)
+	std::size_t write(const T *src, std::size_t cnt, bool notify = false)
 	{
 		std::size_t written = LocklessRingBuffer<T>::m_buffer.write(src, cnt);
 		// Let all waiting readers know new data are available.
 		if (notify) {LocklessRingBuffer<T>::m_notifier.wakeAll();}
 		return written;
 	}
+	void mlock() { m_buffer.mlock(); }
 
 protected:
 	ringbuffer_t<T> m_buffer;
@@ -89,4 +90,4 @@ private:
 
 } // namespace lmms
 
-#endif //LOCKLESSRINGBUFFER_H
+#endif // LMMS_LOCKLESS_RING_BUFFER_H

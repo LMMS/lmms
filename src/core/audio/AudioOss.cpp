@@ -27,14 +27,13 @@
 #ifdef LMMS_HAVE_OSS
 
 #include <QFileInfo>
-#include <QLabel>
+#include <QFormLayout>
 #include <QLineEdit>
 
 #include "endian_handling.h"
 #include "LcdSpinBox.h"
 #include "AudioEngine.h"
 #include "Engine.h"
-#include "gui_templates.h"
 
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>
@@ -70,10 +69,10 @@ static const QString PATH_DEV_DSP =
 
 
 AudioOss::AudioOss( bool & _success_ful, AudioEngine*  _audioEngine ) :
-	AudioDevice( qBound<ch_cnt_t>(
+	AudioDevice(std::clamp<ch_cnt_t>(
+		ConfigManager::inst()->value("audiooss", "channels").toInt(),
 		DEFAULT_CHANNELS,
-		ConfigManager::inst()->value( "audiooss", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _audioEngine ),
+		SURROUND_CHANNELS), _audioEngine),
 	m_convertEndian( false )
 {
 	_success_ful = false;
@@ -303,7 +302,7 @@ void AudioOss::run()
 			break;
 		}
 
-		int bytes = convertToS16( temp, frames, audioEngine()->masterGain(), outbuf, m_convertEndian );
+		int bytes = convertToS16(temp, frames, outbuf, m_convertEndian);
 		if( write( m_audioFD, outbuf, bytes ) != bytes )
 		{
 			break;
@@ -320,12 +319,11 @@ void AudioOss::run()
 AudioOss::setupWidget::setupWidget( QWidget * _parent ) :
 	AudioDeviceSetupWidget( AudioOss::name(), _parent )
 {
-	m_device = new QLineEdit( probeDevice(), this );
-	m_device->setGeometry( 10, 20, 160, 20 );
+	QFormLayout * form = new QFormLayout(this);
 
-	auto dev_lbl = new QLabel(tr("Device"), this);
-	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
-	dev_lbl->setGeometry( 10, 40, 160, 10 );
+	m_device = new QLineEdit( probeDevice(), this );
+
+	form->addRow(tr("Device"), m_device);
 
 	auto m = new gui::LcdSpinBoxModel(/* this */);
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
@@ -335,9 +333,8 @@ AudioOss::setupWidget::setupWidget( QWidget * _parent ) :
 
 	m_channels = new gui::LcdSpinBox( 1, this );
 	m_channels->setModel( m );
-	m_channels->setLabel( tr( "Channels" ) );
-	m_channels->move( 180, 20 );
 
+	form->addRow(tr("Channels"), m_channels);
 }
 
 

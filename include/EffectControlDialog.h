@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef EFFECT_CONTROL_DIALOG_H
-#define EFFECT_CONTROL_DIALOG_H
+#ifndef LMMS_GUI_EFFECT_CONTROL_DIALOG_H
+#define LMMS_GUI_EFFECT_CONTROL_DIALOG_H
 
 #include <QWidget>
 
@@ -64,4 +64,4 @@ protected:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_EFFECT_CONTROL_DIALOG_H

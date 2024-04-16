@@ -22,10 +22,8 @@
  *
  */
 
-
-
-#ifndef TRACK_VIEW_H
-#define TRACK_VIEW_H
+#ifndef LMMS_GUI_TRACK_VIEW_H
+#define LMMS_GUI_TRACK_VIEW_H
 
 #include <QWidget>
 
@@ -33,7 +31,6 @@
 #include "ModelView.h"
 #include "TrackContentWidget.h"
 #include "TrackOperationsWidget.h"
-
 
 class QMenu;
 
@@ -51,11 +48,11 @@ class FadeButton;
 class TrackContainerView;
 
 
-const int DEFAULT_SETTINGS_WIDGET_WIDTH = 224;
+const int DEFAULT_SETTINGS_WIDGET_WIDTH = 256;
 const int TRACK_OP_WIDTH = 78;
 // This shaves 150-ish pixels off track buttons,
 // ruled from config: ui.compacttrackbuttons
-const int DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT = 96;
+const int DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT = 128;
 const int TRACK_OP_WIDTH_COMPACT = 62;
 
 
@@ -98,7 +95,7 @@ public:
 
 	bool isMovingTrack() const
 	{
-		return m_action == MoveTrack;
+		return m_action == Action::Move;
 	}
 
 	virtual void update();
@@ -137,16 +134,19 @@ protected:
 	void mousePressEvent( QMouseEvent * me ) override;
 	void mouseMoveEvent( QMouseEvent * me ) override;
 	void mouseReleaseEvent( QMouseEvent * me ) override;
+	void wheelEvent(QWheelEvent* we) override;
 	void paintEvent( QPaintEvent * pe ) override;
 	void resizeEvent( QResizeEvent * re ) override;
 
+private:
+	void resizeToHeight(int height);
 
 private:
-	enum Actions
+	enum class Action
 	{
-		NoAction,
-		MoveTrack,
-		ResizeTrack
+		None,
+		Move,
+		Resize
 	} ;
 
 	Track * m_track;
@@ -156,7 +156,7 @@ private:
 	QWidget m_trackSettingsWidget;
 	TrackContentWidget m_trackContentWidget;
 
-	Actions m_action;
+	Action m_action;
 
 	virtual FadeButton * getActivityIndicator()
 	{
@@ -179,4 +179,4 @@ private slots:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_TRACK_VIEW_H

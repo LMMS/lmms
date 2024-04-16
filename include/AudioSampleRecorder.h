@@ -23,11 +23,12 @@
  *
  */
 
-#ifndef AUDIO_SAMPLE_RECORDER_H
-#define AUDIO_SAMPLE_RECORDER_H
+#ifndef LMMS_AUDIO_SAMPLE_RECORDER_H
+#define LMMS_AUDIO_SAMPLE_RECORDER_H
 
 #include <QList>
 #include <QPair>
+#include <memory>
 
 #include "AudioDevice.h"
 
@@ -44,13 +45,10 @@ public:
 	~AudioSampleRecorder() override;
 
 	f_cnt_t framesRecorded() const;
-	void createSampleBuffer( SampleBuffer** sampleBuffer );
-
+	std::shared_ptr<const SampleBuffer> createSampleBuffer();
 
 private:
-	void writeBuffer( const surroundSampleFrame * _ab,
-						const fpp_t _frames,
-						const float _master_gain ) override;
+	void writeBuffer(const surroundSampleFrame* _ab, const fpp_t _frames) override;
 
 	using BufferList = QList<QPair<sampleFrame*, fpp_t>>;
 	BufferList m_buffers;
@@ -59,4 +57,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AUDIO_SAMPLE_RECORDER_H

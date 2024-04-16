@@ -64,13 +64,13 @@ bool AudioFileWave::startEncoding()
 
 	switch( getOutputSettings().getBitDepth() )
 	{
-	case OutputSettings::Depth_32Bit:
+	case OutputSettings::BitDepth::Depth32Bit:
 		m_si.format |= SF_FORMAT_FLOAT;
 		break;
-	case OutputSettings::Depth_24Bit:
+	case OutputSettings::BitDepth::Depth24Bit:
 		m_si.format |= SF_FORMAT_PCM_24;
 		break;
-	case OutputSettings::Depth_16Bit:
+	case OutputSettings::BitDepth::Depth16Bit:
 	default:
 		m_si.format |= SF_FORMAT_PCM_16;
 		break;
@@ -93,24 +93,18 @@ bool AudioFileWave::startEncoding()
 	return true;
 }
 
-
-
-
-void AudioFileWave::writeBuffer( const surroundSampleFrame * _ab,
-						const fpp_t _frames,
-						const float _master_gain )
+void AudioFileWave::writeBuffer(const surroundSampleFrame* _ab, const fpp_t _frames)
 {
 	OutputSettings::BitDepth bitDepth = getOutputSettings().getBitDepth();
 
-	if( bitDepth == OutputSettings::Depth_32Bit || bitDepth == OutputSettings::Depth_24Bit )
+	if( bitDepth == OutputSettings::BitDepth::Depth32Bit || bitDepth == OutputSettings::BitDepth::Depth24Bit )
 	{
 		auto buf = new float[_frames * channels()];
 		for( fpp_t frame = 0; frame < _frames; ++frame )
 		{
 			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 			{
-				buf[frame*channels()+chnl] = _ab[frame][chnl] *
-								_master_gain;
+				buf[frame * channels() + chnl] = _ab[frame][chnl];
 			}
 		}
 		sf_writef_float( m_sf, buf, _frames );
@@ -119,8 +113,7 @@ void AudioFileWave::writeBuffer( const surroundSampleFrame * _ab,
 	else
 	{
 		auto buf = new int_sample_t[_frames * channels()];
-		convertToS16( _ab, _frames, _master_gain, buf,
-							!isLittleEndian() );
+		convertToS16(_ab, _frames, buf, !isLittleEndian());
 
 		sf_writef_short( m_sf, buf, _frames );
 		delete[] buf;

@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef CONTROLLER_RACK_VIEW_H
-#define CONTROLLER_RACK_VIEW_H
+#ifndef LMMS_GUI_CONTROLLER_RACK_VIEW_H
+#define LMMS_GUI_CONTROLLER_RACK_VIEW_H
 
 #include <QWidget>
 #include <QCloseEvent>
@@ -92,4 +92,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_CONTROLLER_RACK_VIEW_H

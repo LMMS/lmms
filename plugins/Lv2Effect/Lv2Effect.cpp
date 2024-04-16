@@ -1,7 +1,7 @@
 /*
  * Lv2Effect.cpp - implementation of LV2 effect
  *
- * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -24,6 +24,7 @@
 
 #include "Lv2Effect.h"
 
+#include <QDebug>
 
 #include "Lv2SubPluginFeatures.h"
 
@@ -46,10 +47,10 @@ Plugin::Descriptor PLUGIN_EXPORT lv2effect_plugin_descriptor =
 		"plugin for using arbitrary LV2-effects inside LMMS."),
 	"Johannes Lorenz <jlsf2013$$$users.sourceforge.net, $$$=@>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
-	new Lv2SubPluginFeatures(Plugin::Effect)
+	new Lv2SubPluginFeatures(Plugin::Type::Effect)
 };
 
 }
@@ -109,9 +110,12 @@ extern "C"
 PLUGIN_EXPORT Plugin *lmms_plugin_main(Model *_parent, void *_data)
 {
 	using KeyType = Plugin::Descriptor::SubPluginFeatures::Key;
-	auto eff = new Lv2Effect(_parent, static_cast<const KeyType*>(_data));
-	if (!eff->isValid()) { delete eff; eff = nullptr; }
-	return eff;
+	try {
+		return new Lv2Effect(_parent, static_cast<const KeyType*>(_data));
+	} catch (const std::runtime_error& e) {
+		qCritical() << e.what();
+		return nullptr;
+	}
 }
 
 }

@@ -23,15 +23,14 @@
  *
  */
 
-#ifndef EFFECT_H
-#define EFFECT_H
+#ifndef LMMS_EFFECT_H
+#define LMMS_EFFECT_H
 
 #include "Plugin.h"
 #include "Engine.h"
 #include "AudioEngine.h"
 #include "AutomatableModel.h"
 #include "TempoSyncKnobModel.h"
-#include "MemoryManager.h"
 
 namespace lmms
 {
@@ -49,7 +48,6 @@ class EffectView;
 
 class LMMS_EXPORT Effect : public Plugin
 {
-	MM_OPERATORS
 	Q_OBJECT
 public:
 	Effect( const Plugin::Descriptor * _desc,
@@ -157,6 +155,11 @@ public:
 	{
 		m_noRun = _state;
 	}
+	
+	inline TempoSyncKnobModel* autoQuitModel()
+	{
+		return &m_autoQuitModel;
+	}
 
 	EffectChain * effectChain() const
 	{
@@ -241,4 +244,4 @@ using EffectKeyList = Effect::Descriptor::SubPluginFeatures::KeyList;
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_EFFECT_H

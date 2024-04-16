@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef AUDIO_FILE_MP3_H
-#define AUDIO_FILE_MP3_H
+#ifndef LMMS_AUDIO_FILE_MP3_H
+#define LMMS_AUDIO_FILE_MP3_H
 
 #include "lmmsconfig.h"
 
@@ -58,9 +58,7 @@ public:
 	}
 
 protected:
-	void writeBuffer( const surroundSampleFrame * /* _buf*/,
-				  const fpp_t /*_frames*/,
-				  const float /*_master_gain*/ ) override;
+	void writeBuffer(const surroundSampleFrame* /* _buf*/, const fpp_t /*_frames*/) override;
 
 private:
 	void flushRemainingBuffers();
@@ -75,4 +73,4 @@ private:
 
 #endif // LMMS_HAVE_MP3LAME
 
-#endif
+#endif // LMMS_AUDIO_FILE_MP3_H

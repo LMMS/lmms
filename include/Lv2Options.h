@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LV2OPTIONS_H
-#define LV2OPTIONS_H
+#ifndef LMMS_LV2_OPTIONS_H
+#define LMMS_LV2_OPTIONS_H
 
 #include "lmmsconfig.h"
 
@@ -84,6 +84,8 @@ public:
 		return m_options.data();
 	}
 
+	void clear();
+
 private:
 	//! Initialize an option internally
 	void initOption(LV2_URID key,
@@ -107,4 +109,4 @@ private:
 
 #endif // LMMS_HAVE_LV2
 
-#endif // LV2OPTIONS_H
+#endif // LMMS_LV2_OPTIONS_H

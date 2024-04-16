@@ -22,14 +22,13 @@
  *
  */
 
-#ifndef AUDIO_PORT_H
-#define AUDIO_PORT_H
+#ifndef LMMS_AUDIO_PORT_H
+#define LMMS_AUDIO_PORT_H
 
 #include <memory>
 #include <QString>
 #include <QMutex>
 
-#include "MemoryManager.h"
 #include "PlayHandle.h"
 
 namespace lmms
@@ -41,7 +40,6 @@ class BoolModel;
 
 class AudioPort : public ThreadableJob
 {
-	MM_OPERATORS
 public:
 	AudioPort( const QString & _name, bool _has_effect_chain = true,
 		FloatModel * volumeModel = nullptr, FloatModel * panningModel = nullptr,
@@ -138,4 +136,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AUDIO_PORT_H

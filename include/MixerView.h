@@ -2,7 +2,7 @@
  * MixerView.h - effect-mixer-view for LMMS
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -22,14 +22,15 @@
  *
  */
 
-#ifndef MIXER_VIEW_H
-#define MIXER_VIEW_H
+#ifndef LMMS_GUI_MIXER_VIEW_H
+#define LMMS_GUI_MIXER_VIEW_H
 
 #include <QWidget>
 #include <QHBoxLayout>
 #include <QStackedLayout>
 #include <QScrollArea>
 
+#include "MixerChannelView.h"
 #include "ModelView.h"
 #include "Engine.h"
 #include "Fader.h"
@@ -37,61 +38,43 @@
 #include "embed.h"
 #include "EffectRackView.h"
 
-class QButtonGroup;
-
+namespace lmms
+{
+	class Mixer;
+}
 
 namespace lmms::gui
 {
-
-class MixerLine;
-
 class LMMS_EXPORT MixerView : public QWidget, public ModelView,
 					public SerializingObjectHook
 {
 	Q_OBJECT
 public:
-	class MixerChannelView
+	MixerView(Mixer* mixer);
+	void keyPressEvent(QKeyEvent* e) override;
+
+	void saveSettings(QDomDocument& doc, QDomElement& domElement) override;
+	void loadSettings(const QDomElement& domElement) override;
+
+	inline MixerChannelView* currentMixerChannel()
 	{
-	public:
-		MixerChannelView(QWidget * _parent, MixerView * _mv, int _chIndex );
-
-		void setChannelIndex( int index );
-
-		MixerLine * m_mixerLine;
-		PixmapButton * m_muteBtn;
-		PixmapButton * m_soloBtn;
-		Fader * m_fader;
-		EffectRackView * m_rackView;
-	};
-
-
-	MixerView();
-	~MixerView() override;
-
-	void keyPressEvent(QKeyEvent * e) override;
-
-	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
-	void loadSettings( const QDomElement & _this ) override;
-
-	inline MixerLine * currentMixerLine()
-	{
-		return m_currentMixerLine;
+		return m_currentMixerChannel;
 	}
 
-	inline MixerChannelView * channelView(int index)
+	inline MixerChannelView* channelView(int index)
 	{
 		return m_mixerChannelViews[index];
 	}
 
 
-	void setCurrentMixerLine( MixerLine * _line );
-	void setCurrentMixerLine( int _line );
+	void setCurrentMixerChannel(MixerChannelView* channel);
+	void setCurrentMixerChannel(int channel);
 
 	void clear();
 
 
 	// display the send button and knob correctly
-	void updateMixerLine(int index);
+	void updateMixerChannel(int index);
 
 	// notify the view that a mixer channel was deleted
 	void deleteChannel(int index);
@@ -114,29 +97,40 @@ public slots:
 	int addNewChannel();
 
 protected:
-	void closeEvent( QCloseEvent * _ce ) override;
-	
+	void closeEvent(QCloseEvent* ce) override;
+
 private slots:
 	void updateFaders();
+	// TODO This should be improved. Currently the solo and mute models are connected via
+	// the MixerChannelView's constructor with the MixerView. It would already be an improvement
+	// if the MixerView connected itself to each new MixerChannel that it creates/handles.
 	void toggledSolo();
+	void toggledMute();
 
 private:
-	QVector<MixerChannelView *> m_mixerChannelViews;
+	Mixer* getMixer() const;
+	void updateAllMixerChannels();
+	void connectToSoloAndMute(int channelIndex);
+	void disconnectFromSoloAndMute(int channelIndex);
 
-	MixerLine * m_currentMixerLine;
+private:
+	QVector<MixerChannelView*> m_mixerChannelViews;
 
-	QScrollArea * channelArea;
-	QHBoxLayout * chLayout;
-	QWidget * m_channelAreaWidget;
-	QStackedLayout * m_racksLayout;
-	QWidget * m_racksWidget;
+	MixerChannelView* m_currentMixerChannel;
+
+	QScrollArea* channelArea;
+	QHBoxLayout* chLayout;
+	QWidget* m_channelAreaWidget;
+	QStackedLayout* m_racksLayout;
+	QWidget* m_racksWidget;
+	Mixer* m_mixer;
 
 	void updateMaxChannelSelector();
-	
+
 	friend class MixerChannelView;
 } ;
 
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_MIXER_VIEW_H

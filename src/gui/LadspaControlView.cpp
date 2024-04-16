@@ -43,7 +43,7 @@ LadspaControlView::LadspaControlView( QWidget * _parent,
 	m_ctl( _ctl )
 {
 	auto layout = new QHBoxLayout(this);
-	layout->setMargin( 0 );
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing( 0 );
 
 	LedCheckBox * link = nullptr;
@@ -60,9 +60,9 @@ LadspaControlView::LadspaControlView( QWidget * _parent,
 
 	switch( m_ctl->port()->data_type )
 	{
-		case TOGGLED:
+		case BufferDataType::Toggled:
 		{
-			auto toggle = new LedCheckBox(m_ctl->port()->name, this, QString(), LedCheckBox::Green);
+			auto toggle = new LedCheckBox(m_ctl->port()->name, this, QString(), LedCheckBox::LedColor::Green);
 			toggle->setModel( m_ctl->toggledModel() );
 			layout->addWidget( toggle );
 			if( link != nullptr )
@@ -78,14 +78,14 @@ LadspaControlView::LadspaControlView( QWidget * _parent,
 			break;
 		}
 
-		case INTEGER:
-		case ENUM:
-		case FLOATING:
-			knb = new Knob( knobBright_26, this, m_ctl->port()->name );
+		case BufferDataType::Integer:
+		case BufferDataType::Enum:
+		case BufferDataType::Floating:
+			knb = new Knob( KnobType::Bright26, this, m_ctl->port()->name );
 			break;
 
-		case TIME:
-			knb = new TempoSyncKnob( knobBright_26, this, m_ctl->port()->name );
+		case BufferDataType::Time:
+			knb = new TempoSyncKnob( KnobType::Bright26, this, m_ctl->port()->name );
 			break;
 
 		default:
@@ -94,7 +94,7 @@ LadspaControlView::LadspaControlView( QWidget * _parent,
 
 	if( knb != nullptr )
 	{
-		if( m_ctl->port()->data_type != TIME )
+		if( m_ctl->port()->data_type != BufferDataType::Time )
 		{
 			knb->setModel( m_ctl->knobModel() );
 		}

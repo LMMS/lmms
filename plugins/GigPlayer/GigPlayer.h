@@ -38,7 +38,6 @@
 #include "Knob.h"
 #include "LcdSpinBox.h"
 #include "LedCheckBox.h"
-#include "MemoryManager.h"
 #include "gig.h"
 
 
@@ -187,7 +186,7 @@ public:
 
 
 // What portion of a note are we in?
-enum GigState
+enum class GigState
 {
 	// We just pressed the key
 	KeyDown,
@@ -224,7 +223,7 @@ public:
 
 	GigNote( int midiNote, int velocity, float frequency, GIGPluginData * handle )
 		: midiNote( midiNote ), velocity( velocity ),
-		  release( false ), isRelease( false ), state( KeyDown ),
+		  release( false ), isRelease( false ), state( GigState::KeyDown ),
 		  frequency( frequency ), handle( handle )
 	{
 	}
@@ -236,7 +235,6 @@ public:
 class GigInstrument : public Instrument
 {
 	Q_OBJECT
-	MM_OPERATORS
 
 	mapPropertyFromModel( int, getBank, setBank, m_bankNum );
 	mapPropertyFromModel( int, getPatch, setPatch, m_patchNum );
@@ -268,7 +266,7 @@ public:
 
 	Flags flags() const override
 	{
-		return IsSingleStreamed|IsNotBendable;
+		return Flag::IsSingleStreamed | Flag::IsNotBendable;
 	}
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;

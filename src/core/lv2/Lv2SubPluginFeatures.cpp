@@ -3,7 +3,7 @@
  *                            Plugin::Descriptor::SubPluginFeatures for
  *                            hosting LV2 plugins
  *
- * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -59,7 +59,7 @@ QString Lv2SubPluginFeatures::pluginName(const LilvPlugin *plug)
 
 
 
-Lv2SubPluginFeatures::Lv2SubPluginFeatures(Plugin::PluginTypes type) :
+Lv2SubPluginFeatures::Lv2SubPluginFeatures(Plugin::Type type) :
 	SubPluginFeatures(type)
 {
 }
@@ -81,7 +81,7 @@ void Lv2SubPluginFeatures::fillDescriptionWidget(QWidget *parent,
 
 	auto maker = new QWidget(parent);
 	auto l = new QHBoxLayout(maker);
-	l->setMargin(0);
+	l->setContentsMargins(0, 0, 0, 0);
 	l->setSpacing(0);
 
 	auto maker_label = new QLabel(maker);
@@ -98,7 +98,7 @@ void Lv2SubPluginFeatures::fillDescriptionWidget(QWidget *parent,
 
 	auto copyright = new QWidget(parent);
 	l = new QHBoxLayout(copyright);
-	l->setMargin(0);
+	l->setContentsMargins(0, 0, 0, 0);
 	l->setSpacing(0);
 	copyright->setMinimumWidth(parent->minimumWidth());
 

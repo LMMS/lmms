@@ -1,5 +1,5 @@
 /*
- * lv2_evbuf.h - Lv2 event buffer definitions
+ * Lv2Evbuf.h - Lv2 event buffer definitions
  *
  * Copyright (c) 2019-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
@@ -30,8 +30,8 @@
  * match the LMMS coding conventions.
  */
 
-#ifndef LV2_EVBUF_H
-#define LV2_EVBUF_H
+#ifndef LMMS_LV2_EVBUF_H
+#define LMMS_LV2_EVBUF_H
 
 #include "lmmsconfig.h"
 
@@ -155,4 +155,4 @@ lv2_evbuf_write(	LV2_Evbuf_Iterator* iter,
 
 #endif // LMMS_HAVE_LV2
 
-#endif // LV2_EVBUF_H
+#endif // LMMS_LV2_EVBUF_H

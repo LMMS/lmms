@@ -127,7 +127,7 @@ struct ERect
 
 using namespace std;
 
-static lmms::VstHostLanguages hlang = lmms::LanguageEnglish;
+static lmms::VstHostLanguage hlang = lmms::VstHostLanguage::English;
 
 static bool EMBED = false;
 static bool EMBED_X11 = false;
@@ -390,7 +390,7 @@ public:
 #endif
 
 private:
-	enum GuiThreadMessages
+	enum class GuiThreadMessage
 	{
 		None,
 		ProcessPluginMessage,
@@ -628,7 +628,7 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			break;
 
 		case IdVstSetLanguage:
-			hlang = static_cast<VstHostLanguages>( _m.getInt() );
+			hlang = static_cast<VstHostLanguage>( _m.getInt() );
 			break;
 
 		case IdVstGetParameterDump:
@@ -1763,7 +1763,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			// call application idle routine (this will
 			// call effEditIdle for all open editors too)
 #ifndef NATIVE_LINUX_VST
-			PostMessage( __MessageHwnd, WM_USER, GiveIdle, 0 );
+			PostMessage( __MessageHwnd, WM_USER, static_cast<WPARAM>(GuiThreadMessage::GiveIdle), 0 );
 #else
 			__plugin->sendX11Idle();
 #endif
@@ -2066,7 +2066,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 
 		case audioMasterGetLanguage:
 			SHOW_CALLBACK( "amc: audioMasterGetLanguage\n" );
-			return hlang;
+			return static_cast<std::intptr_t>(hlang);
 
 		case audioMasterGetDirectory:
 			SHOW_CALLBACK( "amc: audioMasterGetDirectory\n" );
@@ -2077,7 +2077,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			SHOW_CALLBACK( "amc: audioMasterUpdateDisplay\n" );
 			// something has changed, update 'multi-fx' display
 #ifndef NATIVE_LINUX_VST
-			PostMessage( __MessageHwnd, WM_USER, GiveIdle, 0 );
+			PostMessage( __MessageHwnd, WM_USER, static_cast<WPARAM>(GuiThreadMessage::GiveIdle), 0 );
 #else
 			__plugin->sendX11Idle();
 #endif
@@ -2234,7 +2234,7 @@ void * RemoteVstPlugin::processingThread(void * _param)
 #ifndef NATIVE_LINUX_VST
 			PostMessage( __MessageHwnd,
 					WM_USER,
-					ProcessPluginMessage,
+					static_cast<WPARAM>(GuiThreadMessage::ProcessPluginMessage),
 					(LPARAM) new message( m ) );
 #else
 		_this->queueMessage( m );
@@ -2244,7 +2244,7 @@ void * RemoteVstPlugin::processingThread(void * _param)
 
 	// notify GUI thread about shutdown
 #ifndef NATIVE_LINUX_VST
-	PostMessage( __MessageHwnd, WM_USER, ClosePlugin, 0 );
+	PostMessage( __MessageHwnd, WM_USER, static_cast<WPARAM>(GuiThreadMessage::ClosePlugin), 0 );
 
 	return 0;
 #else
@@ -2349,9 +2349,9 @@ LRESULT CALLBACK RemoteVstPlugin::wndProc( HWND hwnd, UINT uMsg,
 	}
 	else if( uMsg == WM_USER )
 	{
-		switch( wParam )
+		switch( static_cast<GuiThreadMessage>(wParam) )
 		{
-			case ProcessPluginMessage:
+			case GuiThreadMessage::ProcessPluginMessage:
 			{
 				message * m = (message *) lParam;
 				__plugin->queueMessage( *m );
@@ -2363,11 +2363,11 @@ LRESULT CALLBACK RemoteVstPlugin::wndProc( HWND hwnd, UINT uMsg,
 				return 0;
 			}
 
-			case GiveIdle:
+			case GuiThreadMessage::GiveIdle:
 				__plugin->idle();
 				return 0;
 
-			case ClosePlugin:
+			case GuiThreadMessage::ClosePlugin:
 				PostQuitMessage(0);
 				return 0;
 

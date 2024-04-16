@@ -33,6 +33,7 @@ SET(LMMS_PLUGIN_LIST
 	Compressor
 	CrossoverEQ
 	Delay
+	Dispersion
 	DualFilter
 	DynamicsProcessor
 	Eq
@@ -40,6 +41,7 @@ SET(LMMS_PLUGIN_LIST
 	HydrogenImport
 	LadspaBrowser
 	LadspaEffect
+	LOMM
 	Lv2Effect
 	Lv2Instrument
 	Lb302
@@ -58,10 +60,12 @@ SET(LMMS_PLUGIN_LIST
 	Sf2Player
 	Sfxr
 	Sid
+	SlicerT
 	SpectrumAnalyzer
 	StereoEnhancer
 	StereoMatrix
 	Stk
+	TapTempo
 	VstBase
 	Vestige
 	VstEffect

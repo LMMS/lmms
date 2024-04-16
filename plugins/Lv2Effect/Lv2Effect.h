@@ -1,7 +1,7 @@
 /*
  * Lv2Effect.h - implementation of LV2 effect
  *
- * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -41,8 +41,6 @@ public:
 		initialization
 	*/
 	Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key* _key);
-	//! Must be checked after ctor or reload
-	bool isValid() const { return m_controls.isValid(); }
 
 	bool processAudioBuffer( sampleFrame* buf, const fpp_t frames ) override;
 	EffectControls* controls() override { return &m_controls; }

@@ -58,7 +58,7 @@ void GrooveExperiments::init()
 	Song* s = Engine::getSong();
 	connect(s, SIGNAL(projectLoaded()), this, SLOT(update()));
 	connect(s, SIGNAL(lengthChanged(int)), this, SLOT(update()));
-	connect(s, SIGNAL(tempoChanged(bpm_t)), this, SLOT(update()));
+	connect(s, SIGNAL(tempoChanged(lmms::bpm_t)), this, SLOT(update()));
 	connect(s, SIGNAL(timeSignatureChanged(int, int)), this, SLOT(update()));
 
 }

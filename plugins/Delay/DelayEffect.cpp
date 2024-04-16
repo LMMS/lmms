@@ -44,7 +44,7 @@ Plugin::Descriptor PLUGIN_EXPORT delay_plugin_descriptor =
 	QT_TRANSLATE_NOOP( "PluginBrowser", "A native delay plugin" ),
 	"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,
@@ -115,7 +115,7 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	{
 		m_outGain = dbfsToAmp( m_delayControls.m_outGainModel.value() );
 	}
-	int sampleLength;
+
 	for( fpp_t f = 0; f < frames; ++f )
 	{
 		dryS[0] = buf[f][0];
@@ -123,8 +123,7 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 
 		m_delay->setFeedback( *feedbackPtr );
 		m_lfo->setFrequency( *lfoTimePtr );
-		sampleLength = *lengthPtr * Engine::audioEngine()->processingSampleRate();
-		m_currentLength = sampleLength;
+		m_currentLength = static_cast<int>(*lengthPtr * Engine::audioEngine()->processingSampleRate());
 		m_delay->setLength( m_currentLength + ( *amplitudePtr * ( float )m_lfo->tick() ) );
 		m_delay->tick( buf[f] );
 
