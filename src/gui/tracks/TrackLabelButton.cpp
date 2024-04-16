@@ -186,25 +186,25 @@ void TrackLabelButton::paintEvent(QPaintEvent* pe)
 	if (m_trackView->getTrack()->type() == Track::Type::Instrument)
 	{
 		auto it = dynamic_cast<InstrumentTrack*>(m_trackView->getTrack());
-		const PixmapLoader * pl;
+		const PixmapLoader* pl;
 		auto get_logo = [](InstrumentTrack* it) -> const PixmapLoader*
 		{
 			return it->instrument()->key().isValid()
 				? it->instrument()->key().logo()
 				: it->instrument()->descriptor()->logo;
 		};
-		if( it && it->instrument() &&
+		if (it && it->instrument() &&
 			it->instrument()->descriptor() &&
-			( pl = get_logo(it) ) )
+			(pl = get_logo(it)))
 		{
-			if( pl->pixmapName() != m_iconName )
+			if (pl->pixmapName() != m_iconName)
 			{
 				m_iconName = pl->pixmapName();
-				setIcon( pl->pixmap() );
+				setIcon(pl->pixmap());
 			}
 		}
 	}
-	QToolButton::paintEvent( pe );
+	QToolButton::paintEvent(pe);
 }
 
 
