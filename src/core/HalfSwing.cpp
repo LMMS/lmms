@@ -156,8 +156,7 @@ HalfSwingView::HalfSwingView(HalfSwing* halfSwing, QWidget* parent) :
 
 	m_swing = halfSwing;
 
-	connect(m_slider, SIGNAL(sliderMoved()), this, SLOT(valueChanged()));
-	connect(m_sliderModel, SIGNAL(dataChanged()), this, SLOT(modelChanged()));
+	connect(m_sliderModel, SIGNAL(dataChanged()), this, SLOT(valueChanged()));
 }
 
 HalfSwingView::~HalfSwingView()
@@ -167,11 +166,6 @@ HalfSwingView::~HalfSwingView()
 }
 
 void HalfSwingView::valueChanged()
-{
-	m_swing->setAmount(m_sliderModel->value());
-}
-
-void HalfSwingView::modelChanged()
 {
 	m_swing->setAmount(m_sliderModel->value());
 }

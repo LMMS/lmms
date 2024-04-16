@@ -80,7 +80,6 @@ public:
 
 public slots:
 	void valueChanged();
-	void modelChanged();
 
 private:
 	HydrogenSwing* m_swing;

@@ -78,7 +78,6 @@ public:
 
 public slots:
 	void valueChanged();
-	void modelChanged();
 
 private:
 	HalfSwing* m_swing;

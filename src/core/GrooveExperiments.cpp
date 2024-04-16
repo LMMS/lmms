@@ -148,8 +148,7 @@ GrooveExperimentsView::GrooveExperimentsView(GrooveExperiments* groove, QWidget*
 
 	m_groove = groove;
 
-	connect(m_slider, SIGNAL(sliderMoved()), this, SLOT(valueChanged()));
-	connect(m_sliderModel, SIGNAL(dataChanged()), this, SLOT(modelChanged()));
+	connect(m_sliderModel, SIGNAL(dataChanged()), this, SLOT(valueChanged()));
 }
 
 GrooveExperimentsView::~GrooveExperimentsView()
@@ -159,11 +158,6 @@ GrooveExperimentsView::~GrooveExperimentsView()
 }
 
 void GrooveExperimentsView::valueChanged()
-{
-	m_groove->setAmount(m_sliderModel->value());
-}
-
-void GrooveExperimentsView::modelChanged()
 {
 	m_groove->setAmount(m_sliderModel->value());
 }

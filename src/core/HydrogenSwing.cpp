@@ -159,8 +159,7 @@ HydrogenSwingView::HydrogenSwingView(HydrogenSwing* swing, QWidget* parent) :
 
 	m_swing = swing;
 
-	connect(m_slider, SIGNAL(sliderMoved()), this, SLOT(valueChanged()));
-	connect(m_sliderModel, SIGNAL(dataChanged()), this, SLOT(modelChanged()));
+	connect(m_sliderModel, SIGNAL(dataChanged()), this, SLOT(valueChanged()));
 }
 
 HydrogenSwingView::~HydrogenSwingView()
@@ -170,11 +169,6 @@ HydrogenSwingView::~HydrogenSwingView()
 }
 
 void HydrogenSwingView::valueChanged()
-{
-	m_swing->setAmount(m_sliderModel->value());
-}
-
-void HydrogenSwingView::modelChanged()
 {
 	m_swing->setAmount(m_sliderModel->value());
 }
