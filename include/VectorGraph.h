@@ -1,7 +1,7 @@
 /*
  * VecorGraph.h - Vector graph widget and model implementation
  *
- * Copyright (c) 2024 Szeli1 </at/gmail/dot/com> TODO
+ * Copyright (c) 2024 szeli1 </at/gmail/dot/com> TODO
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -51,14 +51,15 @@ class LMMS_EXPORT VectorGraphView : public QWidget, public ModelView
 {
 	Q_OBJECT
 	// set default VectorGraph css colors and styles
-	Q_PROPERTY(QColor vectorGraphDefaultAutomatedColor MEMBER m_vectorGraphDefaultAutomatedColor)
-	Q_PROPERTY(QColor vectorGraphDefaultLineColor MEMBER m_vectorGraphDefaultLineColor)
-	Q_PROPERTY(QColor vectorGraphDefaultActiveColor MEMBER m_vectorGraphDefaultActiveColor)
-	Q_PROPERTY(QColor vectorGraphDefaultFillColor MEMBER m_vectorGraphDefaultFillColor)
-	Q_PROPERTY(QColor vectorGraphSecondaryLineColor MEMBER m_vectorGraphSecondaryLineColor)
-	Q_PROPERTY(QColor vectorGraphSecondaryActiveColor MEMBER m_vectorGraphSecondaryActiveColor)
-	Q_PROPERTY(QColor vectorGraphSecondaryFillColor MEMBER m_vectorGraphSecondaryFillColor)
+	Q_PROPERTY(QColor vectorGraphDefaultAutomatedColor MEMBER m_vectorGraphDefaultAutomatedColor NOTIFY changedDefaultColors)
+	Q_PROPERTY(QColor vectorGraphDefaultLineColor MEMBER m_vectorGraphDefaultLineColor NOTIFY changedDefaultColors)
+	Q_PROPERTY(QColor vectorGraphDefaultActiveColor MEMBER m_vectorGraphDefaultActiveColor NOTIFY changedDefaultColors)
+	Q_PROPERTY(QColor vectorGraphDefaultFillColor MEMBER m_vectorGraphDefaultFillColor NOTIFY changedDefaultColors)
+	Q_PROPERTY(QColor vectorGraphSecondaryLineColor MEMBER m_vectorGraphSecondaryLineColor NOTIFY changedDefaultColors)
+	Q_PROPERTY(QColor vectorGraphSecondaryActiveColor MEMBER m_vectorGraphSecondaryActiveColor NOTIFY changedDefaultColors)
+	Q_PROPERTY(QColor vectorGraphSecondaryFillColor MEMBER m_vectorGraphSecondaryFillColor NOTIFY changedDefaultColors)
 public:
+
 	VectorGraphView(QWidget * parentIn, int widthIn, int heightIn,
 		unsigned int pointSizeIn, unsigned int maxLengthIn, bool shouldApplyDefaultVectorGraphColorsIn);
 	~VectorGraphView();
@@ -95,6 +96,7 @@ public:
 signals:
 	// emited after paintEvent
 	void drawn();
+	void changedDefaultColors();
 protected:
 	void paintEvent(QPaintEvent* pe) override;
 	void mousePressEvent(QMouseEvent* me) override;
@@ -104,6 +106,7 @@ protected:
 protected slots:
 	void updateGraph();
 	void updateGraph(bool shouldUseGetLastValuesIn);
+	void updateDefaultColors();
 
 	void execConnectionDialog();
 	void removeAutomation();
@@ -178,6 +181,8 @@ private:
 	unsigned int m_fontSize;
 	// draw simplified lines
 	bool m_isSimplified;
+	// true when applyDefaultColors is called, used when defaultColors are loading
+	bool m_isDefaultColorsApplyed;
 	QPixmap m_background;
 	// for 1 draw, it will use the VectorGraphDataArray
 	// m_bakedValues without calling GetValues()
