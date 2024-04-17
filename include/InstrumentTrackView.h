@@ -71,8 +71,6 @@ public:
 	// Create a menu for assigning/creating channels for this track
 	QMenu * createMixerMenu( QString title, QString newMixerLabel ) override;
 
-	QPixmap determinePixmap();
-
 
 protected:
 	void modelChanged() override;
