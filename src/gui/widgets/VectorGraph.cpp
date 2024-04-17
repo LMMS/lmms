@@ -1,7 +1,7 @@
 /*
  * VectorGraph.cpp - Vector graph widget, model, helper class implementation
  *
- * Copyright (c) 2024 Szeli1 </at/gmail/dot/com> TODO
+ * Copyright (c) 2024 szeli1 </at/gmail/dot/com> TODO
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -68,6 +68,7 @@ VectorGraphView::VectorGraphView(QWidget * parentIn, int widthIn, int heightIn,
 	m_pointSize = pointSizeIn;
 	m_fontSize = 12;
 	m_isSimplified = false;
+	m_isDefaultColorsApplyed = false;
 	//m_background;
 	m_useGetLastValues = false;
 
@@ -113,6 +114,11 @@ VectorGraphView::VectorGraphView(QWidget * parentIn, int widthIn, int heightIn,
 	setCursor(Qt::CrossCursor);
 
 	modelChanged();
+
+	// connect default loading of default colors to applyDefaultColors
+	QObject::connect(this, SIGNAL(changedDefaultColors()),
+			this, SLOT(updateDefaultColors()));
+
 	if (shouldApplyDefaultVectorGraphColorsIn == true)
 	{
 		applyDefaultColors();
@@ -161,6 +167,7 @@ void VectorGraphView::setAutomatedColor(QColor colorIn, unsigned int dataArrayLo
 }
 void VectorGraphView::applyDefaultColors()
 {
+	m_isDefaultColorsApplyed = true;
 	unsigned int size = model()->getDataArraySize();
 	if (size > 0)
 	{
@@ -840,6 +847,13 @@ void VectorGraphView::updateGraph(bool shouldUseGetLastValuesIn)
 {
 	m_useGetLastValues = shouldUseGetLastValuesIn;
 	update();
+}
+void VectorGraphView::updateDefaultColors()
+{
+	if (m_isDefaultColorsApplyed == true)
+	{
+		applyDefaultColors();
+	}
 }
 void VectorGraphView::execConnectionDialog()
 {
