@@ -58,7 +58,8 @@ void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const Q
 	
 	const size_t STEP_SIZE = std::max<size_t>(framesPerPixel / MAX_FRAMES_PER_PIXEL, 1);
 	
-	for (size_t pixelIndex = 0; pixelIndex < numPixels; pixelIndex++) {
+	for (size_t pixelIndex = 0; pixelIndex < numPixels; pixelIndex++) 
+	{
 		
 		const auto i = pixelIndex * maxFrames / numPixels;
 		size_t frameIndex = !parameters.reversed ? i : maxFrames - i;
@@ -81,11 +82,8 @@ void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const Q
 			frameIndex += STEP_SIZE;
 		}
 		
-		const auto lengthY1 = max * scaling_factor;
-		const auto lengthY2 = min * scaling_factor;
-		
-		const auto lineY1 = centerY - lengthY1;
-		const auto lineY2 = centerY - lengthY2;
+		const auto lineY1 = centerY - max * scaling_factor;
+		const auto lineY2 = centerY - min * scaling_factor;
 		const auto lineX = pixelIndex + x;
 		painter.drawLine(lineX, lineY1, lineX, lineY2);
 		
