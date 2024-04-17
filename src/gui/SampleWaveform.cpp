@@ -60,7 +60,6 @@ void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const Q
 	
 	for (size_t pixelIndex = 0; pixelIndex < numPixels; pixelIndex++) 
 	{
-		
 		const auto i = pixelIndex * maxFrames / numPixels;
 		size_t frameIndex = !parameters.reversed ? i : maxFrames - i;
 		const auto frameIndex_bound = std::min(maxFrames, frameIndex + framesPerPixel);
