@@ -58,6 +58,8 @@ class LMMS_EXPORT VectorGraphView : public QWidget, public ModelView
 	Q_PROPERTY(QColor vectorGraphSecondaryLineColor MEMBER m_vectorGraphSecondaryLineColor NOTIFY changedDefaultColors)
 	Q_PROPERTY(QColor vectorGraphSecondaryActiveColor MEMBER m_vectorGraphSecondaryActiveColor NOTIFY changedDefaultColors)
 	Q_PROPERTY(QColor vectorGraphSecondaryFillColor MEMBER m_vectorGraphSecondaryFillColor NOTIFY changedDefaultColors)
+
+	Q_PROPERTY(int fontSize MEMBER m_fontSize)
 public:
 
 	VectorGraphView(QWidget * parentIn, int widthIn, int heightIn,
