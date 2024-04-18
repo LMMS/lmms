@@ -68,7 +68,6 @@ auto retryWhileInterrupted(F&& function, std::invoke_result_t<F> error = -1)
 	}
 }
 
-using OpenSemaphore = UniqueNullableResource<sem_t*, SEM_FAILED, sem_close>;
 using UniqueSemaphore = UniqueNullableResource<const char*, nullptr, sem_unlink>;
 
 } // namespace
@@ -82,7 +81,7 @@ public:
 			return sem_open(m_key.c_str(), O_CREAT | O_EXCL, 0600, value);
 		}, SEM_FAILED)}
 	{
-		if (!m_sem) { throwSystemError("SystemSemaphoreImpl: sem_open() failed"); }
+		if (m_sem == SEM_FAILED) { throwSystemError("SystemSemaphoreImpl: sem_open() failed"); }
 		m_ownedSemaphore.reset(m_key.c_str());
 	}
 
@@ -92,21 +91,29 @@ public:
 			return sem_open(m_key.c_str(), 0);
 		}, SEM_FAILED)}
 	{
-		if (!m_sem) { throwSystemError("SystemSemaphoreImpl: sem_open() failed"); }
+		if (m_sem == SEM_FAILED) { throwSystemError("SystemSemaphoreImpl: sem_open() failed"); }
+	}
+
+	~SystemSemaphoreImpl()
+	{
+		// We can't use `UniqueNullableResource` for `m_sem`, as the null value
+		// (`SEM_FAILED`) is not a constant expression on macOS (it's defined as
+		// `(sem_t*) -1`), so can't be used as a template parameter.
+		sem_close(m_sem);
 	}
 
 	auto acquire() noexcept -> bool
 	{
 		return retryWhileInterrupted([&]() noexcept {
-			return sem_wait(m_sem.get());
+			return sem_wait(m_sem);
 		}) == 0;
 	}
 
-	auto release() noexcept -> bool { return sem_post(m_sem.get()) == 0; }
+	auto release() noexcept -> bool { return sem_post(m_sem) == 0; }
 
 private:
 	std::string m_key;
-	OpenSemaphore m_sem;
+	sem_t* m_sem;
 	UniqueSemaphore m_ownedSemaphore;
 };
 
