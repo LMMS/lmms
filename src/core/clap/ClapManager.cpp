@@ -192,20 +192,22 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 
 	const auto startTime = std::chrono::steady_clock::now();
 
-	// Search `searchPaths` for files with ".clap" extension
+	// Search `searchPaths` for files (or macOS bundles) with ".clap" extension
 	int totalClapFiles = 0;
 	int totalPlugins = 0;
 	for (const auto& path : searchPaths)
 	{
 		for (const auto& entry : fs::recursive_directory_iterator{path})
 		{
-			auto& entryPath = entry.path();
-			std::error_code ec;
-			// NOTE: Using is_regular_file() free function workaround due to std::experimental::filesystem
-			if (!fs::is_regular_file(entry, ec) || entryPath.extension() != ".clap")
-			{
-				continue;
-			}
+			const auto& entryPath = entry.path();
+
+#if defined(LMMS_BUILD_APPLE)
+			// NOTE: macOS uses a bundle rather than a regular file
+			if (std::error_code ec; !fs::is_directory(entryPath, ec)) { continue; }
+#else
+			if (std::error_code ec; !fs::is_regular_file(entryPath, ec)) { continue; }
+#endif
+			if (entryPath.extension() != ".clap") { continue; }
 
 			++totalClapFiles;
 
