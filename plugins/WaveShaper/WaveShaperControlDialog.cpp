@@ -52,7 +52,13 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 	auto curGraph = new VectorGraphView(this, 204, 205, 10, 1024, false);
 	curGraph->setModel(&_controls->m_vectorGraphModel);
 	curGraph->setBackground(PLUGIN_NAME::getIconPixmap("wavegraph"));
+	// this can cause problems with custom colors
 	curGraph->applyDefaultColors();
+	// custom colors can be set this way (but this garph uses applyDefaultColros()):
+	//curGraph->setLineColor(QColor(210, 50, 50, 255), arrayLocation);
+	//curGraph->setActiveColor(QColor(210, 50, 50, 255), arrayLocation);
+	//curGraph->setFillColor(QColor(210, 50, 50, 255), arrayLocation);
+	//curGraph->setAutomatedColor(QColor(210, 50, 50, 255), arrayLocation);
 	curGraph->move(10, 6);
 
 	auto inputKnob = new Knob(KnobType::Bright26, this);

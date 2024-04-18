@@ -78,8 +78,9 @@ Effect::ProcessStatus WaveShaperEffect::processImpl(SampleFrame* buf, const fpp_
 	const float w = wetLevel();
 	float input = m_wsControls.m_inputModel.value();
 	float output = m_wsControls.m_outputModel.value();
+	// getting the current graph samples (size: 200)
+	// getting the graph samples this often can cause lagg with bigger sample count (if automated or effected)
 	std::vector<float> graphSamples = m_wsControls.getGraphSamples();
-	//const float * samples = m_wsControls.m_wavegraphModel.samples();
 	const bool clip = m_wsControls.m_clipModel.value();
 
 	ValueBuffer *inputBuffer = m_wsControls.m_inputModel.valueBuffer();

@@ -50,6 +50,12 @@ WaveShaperControls::WaveShaperControls( WaveShaperEffect * _eff ) :
 	m_clipModel( false, this )
 {
 
+	unsigned int arrayLocationB = m_vectorGraphModel.addArray();
+	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsSelectable(true);
+	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsEditableAttrib(true);
+	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsAutomatableEffectable(true);
+	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsSaveable(true);
+
 	unsigned int arrayLocation = m_vectorGraphModel.addArray();
 	//m_vectorGraphModel.getDataArray(arrayLocation)->setIsFixedSize(true);
 	//m_vectorGraphModel.getDataArray(arrayLocation)->setIsFixedX(true);
@@ -60,22 +66,8 @@ WaveShaperControls::WaveShaperControls( WaveShaperEffect * _eff ) :
 	m_vectorGraphModel.getDataArray(arrayLocation)->setIsAutomatableEffectable(true);
 	m_vectorGraphModel.getDataArray(arrayLocation)->setIsSaveable(true);
 	m_vectorGraphModel.getDataArray(arrayLocation)->setIsNonNegative(true);
-	m_vectorGraphModel.getDataArray(arrayLocation)->setLineColor(QColor(210, 50, 50, 255));
-	m_vectorGraphModel.getDataArray(arrayLocation)->setActiveColor(QColor(255, 30, 20, 255));
-	m_vectorGraphModel.getDataArray(arrayLocation)->setFillColor(QColor(170, 25, 25, 40));
-	m_vectorGraphModel.getDataArray(arrayLocation)->setAutomatedColor(QColor(144, 107, 255, 255));
 
-	unsigned int arrayLocationB = m_vectorGraphModel.addArray();
-	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsSelectable(true);
-	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsEditableAttrib(true);
-	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsAutomatableEffectable(true);
-	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsSaveable(true);
-	m_vectorGraphModel.getDataArray(arrayLocationB)->setLineColor(QColor(10, 50, 210, 255));
-	m_vectorGraphModel.getDataArray(arrayLocationB)->setActiveColor(QColor(70, 170, 255, 255));
-	m_vectorGraphModel.getDataArray(arrayLocationB)->setFillColor(QColor(70, 100, 180, 40));
-	m_vectorGraphModel.getDataArray(arrayLocationB)->setAutomatedColor(QColor(144, 107, 255, 255));
-
-	// connect VectorGraphDataArrays so the 2. will be able to effect the 1.:
+	// connect VectorGraphDataArrays so the 1. VectorGraphDataArray will be able to effect the 2.:
 	m_vectorGraphModel.getDataArray(arrayLocation)->setEffectorArrayLocation(arrayLocationB, true);
 	// draw default shape
 	setDefaultShape();
@@ -117,9 +109,10 @@ void WaveShaperControls::saveSettings( QDomDocument & _doc,
 
 std::vector<float> WaveShaperControls::getGraphSamples()
 {
-	if (m_vectorGraphModel.getDataArraySize() > 0)
+	if (m_vectorGraphModel.getDataArraySize() > 1)
 	{
-		std::vector<float> output = m_vectorGraphModel.getDataArray(0)->getValues(200);
+		// get 200 samples from the 1. VectorGraphDataArray
+		std::vector<float> output = m_vectorGraphModel.getDataArray(1)->getValues(200);
 		emit vectorGraphUpdateView(true);
 		return output;
 	}
@@ -139,22 +132,22 @@ void WaveShaperControls::setDefaultShape()
 
 	if (m_vectorGraphModel.getDataArraySize() > 1)
 	{
-		int addedLocation = m_vectorGraphModel.getDataArray(0)->add(0.0f);
-		if (addedLocation >= 0)
-		{
-			m_vectorGraphModel.getDataArray(0)->setY(addedLocation, -1.0f);
-		}
-
-		addedLocation = m_vectorGraphModel.getDataArray(0)->add(1.0f);
-		if (addedLocation >= 0)
-		{
-			m_vectorGraphModel.getDataArray(0)->setY(addedLocation, 1.0f);
-		}
-
-		addedLocation = m_vectorGraphModel.getDataArray(1)->add(0.5f);
+		int addedLocation = m_vectorGraphModel.getDataArray(1)->add(0.0f);
 		if (addedLocation >= 0)
 		{
 			m_vectorGraphModel.getDataArray(1)->setY(addedLocation, -1.0f);
+		}
+
+		addedLocation = m_vectorGraphModel.getDataArray(1)->add(1.0f);
+		if (addedLocation >= 0)
+		{
+			m_vectorGraphModel.getDataArray(1)->setY(addedLocation, 1.0f);
+		}
+
+		addedLocation = m_vectorGraphModel.getDataArray(0)->add(0.5f);
+		if (addedLocation >= 0)
+		{
+			m_vectorGraphModel.getDataArray(0)->setY(addedLocation, -1.0f);
 		}
 	}
 }
