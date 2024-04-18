@@ -35,7 +35,7 @@
 #	include <unistd.h>
 #endif
 
-#if _POSIX_SEMAPHORES > 0 && !defined(__MINGW32__)
+#if (_POSIX_SEMAPHORES > 0 && !defined(__MINGW32__)) || defined(LMMS_BUILD_APPLE)
 #	include <fcntl.h>
 #	include <semaphore.h>
 #elif defined(LMMS_BUILD_WIN32)
@@ -48,7 +48,7 @@ namespace lmms {
 
 namespace detail {
 
-#if _POSIX_SEMAPHORES > 0 && !defined(__MINGW32__)
+#if (_POSIX_SEMAPHORES > 0 && !defined(__MINGW32__)) || defined(LMMS_BUILD_APPLE)
 
 namespace {
 

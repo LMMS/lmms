@@ -33,7 +33,7 @@
 #	include <unistd.h>
 #endif
 
-#if _POSIX_SHARED_MEMORY_OBJECTS > 0
+#if _POSIX_SHARED_MEMORY_OBJECTS > 0 || defined(LMMS_BUILD_APPLE)
 #	include <sys/mman.h>
 #	include <sys/stat.h>
 #	include <fcntl.h>
@@ -45,7 +45,7 @@
 
 namespace lmms::detail {
 
-#if _POSIX_SHARED_MEMORY_OBJECTS > 0
+#if _POSIX_SHARED_MEMORY_OBJECTS > 0 || defined(LMMS_BUILD_APPLE)
 
 namespace {
 
