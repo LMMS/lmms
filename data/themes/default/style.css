@@ -52,13 +52,13 @@ lmms--gui--Knob {
 }
 
 lmms--gui--VectorGraphView {
-	qproperty-vectorGraphDefaultAutomatedColor: rgba(69, 42, 153, 180);
-	qproperty-vectorGraphDefaultLineColor: rgb(55, 10, 250);
-	qproperty-vectorGraphDefaultActiveColor: #452a99;
-	qproperty-vectorGraphDefaultFillColor: #452a99;
-	qproperty-vectorGraphSecondaryLineColor: rgba(120, 120, 120, 255);
-	qproperty-vectorGraphSecondaryActiveColor: rgba(120, 120, 120, 255);
-	qproperty-vectorGraphSecondaryFillColor: rgba(120, 120, 120, 255);
+	qproperty-vectorGraphDefaultAutomatedColor: rgba(74, 59, 186, 200);
+	qproperty-vectorGraphDefaultLineColor: rgba(11, 213, 86, 255);
+	qproperty-vectorGraphDefaultActiveColor: rgba(29, 226, 118, 255);
+	qproperty-vectorGraphDefaultFillColor: rgba(23, 121, 59, 100);
+	qproperty-vectorGraphSecondaryLineColor: rgba(209, 216, 228, 255);
+	qproperty-vectorGraphSecondaryActiveColor: rgba(255, 255, 255, 255);
+	qproperty-vectorGraphSecondaryFillColor: rgba(209, 216, 228, 100);
 }
 
 lmms--gui--AutomationEditor {
