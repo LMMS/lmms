@@ -78,7 +78,7 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 	outputKnob->setHintText( tr( "Output gain:" ), "" );
 
 	auto resetButton = new PixmapButton(this, tr("Reset wavegraph"));
-	resetButton -> move( 142, 225 );
+	resetButton -> move(142, 225);
 	resetButton -> resize( 13, 46 );
 	resetButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "reset_active" ) );
 	resetButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "reset_inactive" ) );

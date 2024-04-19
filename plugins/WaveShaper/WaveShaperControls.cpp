@@ -72,10 +72,8 @@ WaveShaperControls::WaveShaperControls( WaveShaperEffect * _eff ) :
 	// draw default shape
 	setDefaultShape();
 
-	connect(&m_vectorGraphModel, SIGNAL(dataChanged()),
-			this, SLOT(vectorGraphChanged()));
-	connect(this, SIGNAL(vectorGraphUpdateView(bool)),
-			&m_vectorGraphModel, SLOT(updateGraphModel(bool)));
+	connect(&m_vectorGraphModel, SIGNAL(dataChanged()), this, SLOT(vectorGraphChanged()));
+	connect(this, SIGNAL(vectorGraphUpdateView(bool)), &m_vectorGraphModel, SLOT(updateGraphModel(bool)));
 }
 
 
