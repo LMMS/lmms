@@ -65,7 +65,7 @@ public:
 		return( new gui::WaveShaperControlDialog( this ) );
 	}
 
-	std::vector<float> getGraphSamples();
+	std::vector<float>* getGraphSamples();
 
 
 
@@ -89,6 +89,7 @@ private:
 	friend class gui::WaveShaperControlDialog;
 	friend class WaveShaperEffect;
 
+	std::vector<float> m_vectorGraphSampleBuffer;
 } ;
 
 

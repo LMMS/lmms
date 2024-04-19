@@ -80,7 +80,7 @@ Effect::ProcessStatus WaveShaperEffect::processImpl(SampleFrame* buf, const fpp_
 	float output = m_wsControls.m_outputModel.value();
 	// getting the current graph samples (size: 200)
 	// getting the graph samples this often can cause lagg with bigger sample count (if automated or effected)
-	std::vector<float> graphSamples = m_wsControls.getGraphSamples();
+	std::vector<float>* graphSamples = m_wsControls.getGraphSamples();
 	const bool clip = m_wsControls.m_clipModel.value();
 
 	ValueBuffer *inputBuffer = m_wsControls.m_inputModel.valueBuffer();
@@ -117,17 +117,17 @@ Effect::ProcessStatus WaveShaperEffect::processImpl(SampleFrame* buf, const fpp_
 
 			if( lookup < 1 )
 			{
-				s[i] = frac * graphSamples[0] * posneg;
+				s[i] = frac * graphSamples->operator[](0) * posneg;
 			}
 			else if( lookup < 200 )
 			{
-				s[i] = linearInterpolate(graphSamples[lookup - 1],
-						graphSamples[lookup], frac)
+				s[i] = linearInterpolate(graphSamples->operator[](lookup - 1),
+						graphSamples->operator[](lookup), frac)
 						* posneg;
 			}
 			else
 			{
-				s[i] *= graphSamples[199];
+				s[i] *= graphSamples->operator[](199);
 			}
 		}
 
