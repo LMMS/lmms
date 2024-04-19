@@ -27,7 +27,6 @@
 #include "WaveShaper.h"
 #include "lmms_math.h"
 #include "embed.h"
-#include "interpolation.h"
 #include "VectorGraph.h"
 
 #include "plugin_export.h"
@@ -80,7 +79,7 @@ Effect::ProcessStatus WaveShaperEffect::processImpl(SampleFrame* buf, const fpp_
 	float output = m_wsControls.m_outputModel.value();
 	// getting the current graph samples (size: 200)
 	// getting the graph samples this often can cause lagg with bigger sample count (if automated or effected)
-	std::vector<float> graphSamples = m_wsControls.getGraphSamples();
+	std::vector<float>* graphSamples = m_wsControls.getGraphSamples();
 	const bool clip = m_wsControls.m_clipModel.value();
 
 	ValueBuffer *inputBuffer = m_wsControls.m_inputModel.valueBuffer();
@@ -117,21 +116,15 @@ Effect::ProcessStatus WaveShaperEffect::processImpl(SampleFrame* buf, const fpp_
 
 			if( lookup < 1 )
 			{
-				s[i] = frac * graphSamples[0] * posneg;
+				s[i] = frac * graphSamples->operator[](0) * posneg;
 			}
 			else if( lookup < 200 )
 			{
-<<<<<<< HEAD
-				s[i] = std::lerp(samples[lookup - 1], samples[lookup], frac) * posneg;
-=======
-				s[i] = linearInterpolate(graphSamples[lookup - 1],
-						graphSamples[lookup], frac)
-						* posneg;
->>>>>>> 35697dafd (WaveShaper_experimental_VectorGraph_implementation)
+				s[i] = std::lerp((*graphSamples)[lookup - 1], (*graphSamples)[lookup], frac) * posneg;
 			}
 			else
 			{
-				s[i] *= graphSamples[199];
+				s[i] *= graphSamples->operator[](199);
 			}
 		}
 

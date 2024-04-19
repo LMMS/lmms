@@ -47,7 +47,8 @@ WaveShaperControls::WaveShaperControls( WaveShaperEffect * _eff ) :
 	m_inputModel( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Input gain" ) ),
 	m_outputModel( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Output gain" ) ),
 	m_vectorGraphModel(1024, this, false),
-	m_clipModel( false, this )
+	m_clipModel( false, this ),
+	m_vectorGraphSampleBuffer(200)
 {
 
 	unsigned int arrayLocationB = m_vectorGraphModel.addArray();
@@ -107,19 +108,15 @@ void WaveShaperControls::saveSettings( QDomDocument & _doc,
 	m_vectorGraphModel.saveSettings(_doc, _this, "VectorGraph"); 
 }
 
-std::vector<float> WaveShaperControls::getGraphSamples()
+std::vector<float>* WaveShaperControls::getGraphSamples()
 {
 	if (m_vectorGraphModel.getDataArraySize() > 1)
 	{
-		// get 200 samples from the 1. VectorGraphDataArray
-		std::vector<float> output = m_vectorGraphModel.getDataArray(1)->getValues(200);
+		// get m_vectorGraphSampleBuffer.size (200) samples from the 1. VectorGraphDataArray
+		m_vectorGraphSampleBuffer = m_vectorGraphModel.getDataArray(1)->getValues(m_vectorGraphSampleBuffer.size());
 		emit vectorGraphUpdateView(true);
-		return output;
 	}
-	else
-	{
-		return std::vector<float>(200);
-	}
+	return &m_vectorGraphSampleBuffer;
 }
 
 void WaveShaperControls::setDefaultShape()
