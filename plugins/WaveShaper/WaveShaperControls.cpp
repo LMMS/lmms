@@ -85,6 +85,8 @@ void WaveShaperControls::loadSettings( const QDomElement & _this )
 
 	m_clipModel.loadSettings( _this, "clipInput" );
 
+	// if this is an old save that still has
+	// a normal graph saved
 	if (_this.hasAttribute("waveShape") == true)
 	{
 		if (m_vectorGraphModel.getDataArraySize() > 1)
@@ -95,7 +97,7 @@ void WaveShaperControls::loadSettings( const QDomElement & _this )
 			float* graphSampleArray = (float*)dst;
 
 			// loading old graph data into new vectorGraph
-			m_vectorGraphModel.getDataArray(1)->setDataArray(graphSampleArray, 200, false, false, false, true, true);
+			m_vectorGraphModel.getDataArray(1)->setDataArray(graphSampleArray, 200, false, false, false, false, true);
 
 			delete[] dst;
 		}
