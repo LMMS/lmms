@@ -54,11 +54,10 @@ namespace lmms
 
 namespace gui
 {
-
-VectorGraphView::VectorGraphView(QWidget * parentIn, int widthIn, int heightIn,
-		unsigned int pointSizeIn, unsigned int maxLengthIn, bool shouldApplyDefaultVectorGraphColorsIn) :
+VectorGraphView::VectorGraphView(QWidget * parentIn, int widthIn, int heightIn, unsigned int pointSizeIn,
+	unsigned int controlHeightIn, unsigned int controlDisplayCountIn, bool shouldApplyDefaultVectorGraphColorsIn) :
 		QWidget(parentIn),
-		ModelView(new VectorGraphModel(maxLengthIn, nullptr, false), this)
+		ModelView(new VectorGraphModel(2048, nullptr, false), this)
 {
 	resize(widthIn, heightIn);
 
@@ -80,8 +79,8 @@ VectorGraphView::VectorGraphView(QWidget * parentIn, int widthIn, int heightIn,
 	m_isLastSelectedArray = false;
 
 	m_graphHeight = height();
-	m_controlHeight = 30;
-	m_controlDisplayCount = 4;
+	m_controlHeight = controlHeightIn;
+	m_controlDisplayCount = controlDisplayCountIn;
 	m_controlDisplayPage = 0;
 	m_isEditingActive = false;
 	m_controlText = {
@@ -116,9 +115,9 @@ VectorGraphView::VectorGraphView(QWidget * parentIn, int widthIn, int heightIn,
 
 	modelChanged();
 
-	// connect default loading of default colors to applyDefaultColors
+	// connect loading of default colors to applyDefaultColors
 	QObject::connect(this, &VectorGraphView::changedDefaultColors,
-		this, vectorGraphView::updateDefaultColors);
+		this, &VectorGraphView::updateDefaultColors);
 
 	if (shouldApplyDefaultVectorGraphColorsIn == true)
 	{
@@ -680,6 +679,8 @@ void VectorGraphView::paintGraph(QPainter* pIn, unsigned int locationIn, std::ve
 		{
 			posA = startPos;
 
+			int squareSize = m_pointSize;
+
 			QColor automatedFillColor(getFillColorFromBaseColor(*dataArray->getAutomatedColor()));
 			bool drawPoints = dataArray->getIsSelectable() && width() / length > m_pointSize * 2;
 			bool resetColor = false;
@@ -719,8 +720,8 @@ void VectorGraphView::paintGraph(QPainter* pIn, unsigned int locationIn, std::ve
 						if (dataArray->getIsEditableAttrib() == true)
 						{
 							std::pair<int, int> posC = mapDataCurvePos(posA.first, posA.second, posB.first, posB.second, dataArray->getC(j - 1));
-							pIn->drawRect(posC.first - m_pointSize / 4 - m_pointSize / 2,
-								m_graphHeight - posC.second - m_pointSize / 4 - m_pointSize / 2, m_pointSize, m_pointSize);
+							pIn->drawRect(posC.first - squareSize / 2,
+								m_graphHeight - posC.second - squareSize / 2, squareSize, squareSize);
 						}
 					}
 				}
@@ -937,7 +938,7 @@ std::pair<int, int> VectorGraphView::mapDataPos(float xIn, float yIn, bool isNon
 			static_cast<int>((yIn + 1.0f) * static_cast<float>(m_graphHeight) / 2.0f));
 	}
 }
-std::pair<float, float> VectorGraphView::mapDataCurvePos(float xAIn, float yAIn, float xBIn, float yBIn, float curveIn)
+std::pair<float, float> VectorGraphView::mapDataCurvePosF(float xAIn, float yAIn, float xBIn, float yBIn, float curveIn)
 {
 	return std::pair<float, float>(
 		(xAIn + xBIn) / 2.0f,
@@ -1575,7 +1576,7 @@ int VectorGraphView::searchForData(int mouseXIn, int mouseYIn, float maxDistance
 			}
 			if (location - curvedBefore < arrayIn->size()  - 1)
 			{
-				std::pair<float, float> curvedDataCoords = mapDataCurvePos(
+				std::pair<float, float> curvedDataCoords = mapDataCurvePosF(
 					arrayIn->getX(location - curvedBefore), arrayIn->getY(location - curvedBefore),
 					arrayIn->getX(location - curvedBefore + 1), arrayIn->getY(location - curvedBefore + 1),
 					arrayIn->getC(location - curvedBefore));
@@ -1637,7 +1638,7 @@ int VectorGraphView::searchForData(int mouseXIn, int mouseYIn, float maxDistance
 						{
 							if (arrayIn->size() - 1 > i)
 							{
-								std::pair<float, float> curvedDataCoords = mapDataCurvePos(
+								std::pair<float, float> curvedDataCoords = mapDataCurvePosF(
 									arrayIn->getX(i), arrayIn->getY(i), arrayIn->getX(i + 1), arrayIn->getY(i + 1),
 									arrayIn->getC(i));
 								dataX = curvedDataCoords.first;
