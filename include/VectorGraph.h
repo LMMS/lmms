@@ -457,6 +457,7 @@ public:
 	// callDataChangedIn -> call dataChanged() after -> paintEvent()
 	void setDataArray(std::vector<std::pair<float, float>>* dataArrayIn, bool isCurvedIn, bool clearIn, bool clampIn, bool rescaleIn, bool sortIn, bool callDataChangedIn);
 	void setDataArray(std::vector<float>* dataArrayIn, bool isCurvedIn, bool clearIn, bool clampIn, bool rescaleIn, bool callDataChangedIn);
+	void setDataArray(float* dataArrayIn, unsigned int sizeIn, bool isCurvedIn, bool clearIn, bool clampIn, bool rescaleIn, bool callDataChangedIn);
 
 
 	// set attribute: -------------------
