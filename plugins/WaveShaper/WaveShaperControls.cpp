@@ -27,13 +27,12 @@
 #include <vector>
 #include <QDomElement>
 
-#include <iostream>
-
 #include "WaveShaperControls.h"
 #include "WaveShaper.h"
 #include "VectorGraph.h"
 #include "Engine.h"
 #include "Song.h"
+#include "base64.h"
 
 namespace lmms
 {
@@ -88,8 +87,26 @@ void WaveShaperControls::loadSettings( const QDomElement & _this )
 
 	m_clipModel.loadSettings( _this, "clipInput" );
 
-	// loading VectorGraph
-	m_vectorGraphModel.loadSettings(_this, "VectorGraph"); 
+	if (_this.hasAttribute("waveShape") == true)
+	{
+		if (m_vectorGraphModel.getDataArraySize() > 1)
+		{
+			int size = 0;
+			char * dst = 0;
+			base64::decode(_this.attribute("waveShape"), &dst, &size);
+			float* graphSampleArray = (float*)dst;
+
+			// loading old graph data into new vectorGraph
+			m_vectorGraphModel.getDataArray(1)->setDataArray(graphSampleArray, 200, false, false, false, true, true);
+
+			delete[] dst;
+		}
+	}
+	else
+	{
+		// loading VectorGraph
+		m_vectorGraphModel.loadSettings(_this, "VectorGraph1");
+	}
 }
 
 
@@ -105,7 +122,7 @@ void WaveShaperControls::saveSettings( QDomDocument & _doc,
 	m_clipModel.saveSettings( _doc, _this, "clipInput" );
 
 	// saving VectorGraph
-	m_vectorGraphModel.saveSettings(_doc, _this, "VectorGraph"); 
+	m_vectorGraphModel.saveSettings(_doc, _this, "VectorGraph1"); 
 }
 
 std::vector<float>* WaveShaperControls::getGraphSamples()
