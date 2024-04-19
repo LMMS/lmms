@@ -285,6 +285,8 @@ public:
 	//int readLoc(unsigned int startIn, QString dataIn);
 	void lockGetValuesAccess();
 	void unlockGetValuesAccess();
+	void lockBakedValuesAccess();
+	void unlockBakedValuesAccess();
 signals:
 	// point changed inside VectorGraphDataArray m_dataArray or m_maxLength changed
 	void dataChanged();
@@ -307,6 +309,7 @@ private:
 	// block threads that want to access
 	// a dataArray's getValues() at the same time
 	std::mutex m_getValuesAccess;
+	std::mutex m_bakedValuesAccess;
 };
 
 class LMMS_EXPORT VectorGraphDataArray
@@ -439,7 +442,7 @@ public:
 	// countIn is the retuned vector's size
 	std::vector<float> getValues(unsigned int countIn);
 	// returns m_bakedValues without updating
-	std::vector<float> getLastValues();
+	void getLastValues(std::vector<float>* copyBufferOut);
 	std::vector<int> getEffectorArrayLocations();
 
 
@@ -711,6 +714,8 @@ private:
 	bool m_isDataChanged;
 	// array containing output final float values for optimalization
 	std::vector<float> m_bakedValues;
+	// used for updating m_bakedValues fast
+	std::vector<float> m_updatingBakedValues;
 	// unsorted array of locations in m_dataArray
 	// that need to be updated
 	// sorted in getUpdatingOriginals() because some functions need this to be sorted

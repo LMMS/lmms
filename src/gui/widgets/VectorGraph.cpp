@@ -606,7 +606,7 @@ void VectorGraphView::paintGraph(QPainter* pIn, unsigned int locationIn, std::ve
 			std::vector<float> dataArrayValues;
 			if (m_useGetLastValues == true)
 			{
-				dataArrayValues = dataArray->getLastValues();
+				dataArray->getLastValues(&dataArrayValues);
 			}
 			else
 			{
@@ -633,7 +633,7 @@ void VectorGraphView::paintGraph(QPainter* pIn, unsigned int locationIn, std::ve
 				}
 				else
 				{
-					dataArrayValues = dataArray->getLastValues();
+					dataArray->getLastValues(&dataArrayValues);
 				}
 			}
 
@@ -1668,7 +1668,7 @@ VectorGraphModel::VectorGraphModel(unsigned int maxLengthIn, Model* parentIn, bo
 	Model(parentIn, tr("VectorGraphModel"), defaultConstructedIn)
 {
 	m_maxLength = maxLengthIn;
-	m_dataArrays = {};
+	//m_dataArrays
 }
 
 VectorGraphModel::~VectorGraphModel()
@@ -1903,6 +1903,14 @@ void VectorGraphModel::unlockGetValuesAccess()
 {
 	m_getValuesAccess.unlock();
 }
+void VectorGraphModel::lockBakedValuesAccess()
+{
+	m_bakedValuesAccess.lock();
+}
+void VectorGraphModel::unlockBakedValuesAccess()
+{
+	m_bakedValuesAccess.unlock();
+}
 void VectorGraphModel::saveSettings(QDomDocument& doc, QDomElement& element)
 {
 	saveSettings(doc, element, QString(""));
@@ -1953,6 +1961,7 @@ VectorGraphDataArray::VectorGraphDataArray()
 	// m_dataArray
 	m_isDataChanged = false;
 	// m_bakedValues;
+	// m_updatingBakedValues
 	// m_needsUpdating;
 	// m_automationModelArray;
 
@@ -1985,6 +1994,7 @@ VectorGraphDataArray::VectorGraphDataArray(
 	// m_dataArray;
 	m_isDataChanged = false;
 	// m_bakedValues;
+	// m_updatingBakedValues
 	// m_needsUpdating;
 	// m_automationModelArray;
 
@@ -1995,9 +2005,9 @@ VectorGraphDataArray::VectorGraphDataArray(
 VectorGraphDataArray::~VectorGraphDataArray()
 {
 	qDebug("VectorGraphDataArray dstc");
-	m_dataArray.clear();
-	m_bakedValues.clear();
-	m_needsUpdating.clear();
+	//m_dataArray.clear();
+	//m_bakedValues.clear();
+	//m_needsUpdating.clear();
 
 	for (unsigned int i = 0; i < m_automationModelArray.size(); i++)
 	{
@@ -2492,9 +2502,11 @@ std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn)
 	qDebug("getValuesA3 finished");
 	return output;
 }
-std::vector<float> VectorGraphDataArray::getLastValues()
+void VectorGraphDataArray::getLastValues(std::vector<float>* copyBufferOut)
 {
-	return m_bakedValues;
+	m_parent->lockBakedValuesAccess();
+	*copyBufferOut = m_bakedValues;
+	m_parent->unlockBakedValuesAccess();
 }
 std::vector<int> VectorGraphDataArray::getEffectorArrayLocations()
 {
@@ -3636,13 +3648,9 @@ std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn, bool* i
 	{
 		effectorOutput = m_parent->getDataArray(m_effectorLocation)->getValues(countIn, &effectorIsChanged, &effectorUpdatingValues);
 	}
-	else
-	{
-		effectorOutput.resize(countIn);
-	}
 	qDebug("getValuesB1, size: %ld    - id: %d", outputXLocations.size(), m_id);
 
-	m_isDataChanged = m_isDataChanged || countIn != m_bakedValues.size();
+	m_isDataChanged = m_isDataChanged || countIn != m_updatingBakedValues.size();
 
 	// deciding if the whole dataArray should be updated
 	// if the whole effectorDataArray was updated
@@ -3660,7 +3668,7 @@ std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn, bool* i
 	}
 
 	// updating m_needsUpdating
-	if (m_isDataChanged == false && countIn == m_bakedValues.size())
+	if (m_isDataChanged == false && countIn == m_updatingBakedValues.size())
 	{
 		if (isEffected == true && effectorUpdatingValues.size() > 0 &&
 			(effectorIsChanged == false || effectedCount > 0))
@@ -3678,9 +3686,15 @@ std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn, bool* i
 	}
 	else
 	{
+		m_parent->lockBakedValuesAccess();
 		if (countIn != m_bakedValues.size())
 		{
 			m_bakedValues.resize(countIn);
+		}
+		m_parent->unlockBakedValuesAccess();
+		if (countIn != m_updatingBakedValues.size())
+		{
+			m_updatingBakedValues.resize(countIn);
 		}
 		m_needsUpdating.resize(m_dataArray.size());
 		for (unsigned int i = 0; i < m_needsUpdating.size(); i++)
@@ -3692,10 +3706,13 @@ std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn, bool* i
 
 	float stepSize = 1.0f / static_cast<float>(countIn);
 	// calculating point data and lines
-	if (m_needsUpdating.size() > 0 && m_bakedValues.size() > 0)
+	if (m_needsUpdating.size() > 0 && m_updatingBakedValues.size() > 0)
 	{
+		effectorOutput.resize(countIn);
 		// calculating relative X locations (in lines) of the output values
 		// for later use in the line calculations
+		// outputXLocations[sample_location] is equal to 0.0f if it is at the start of a line,
+		// it is equal to 1.0f if it is at the end of a line
 		for (unsigned int i = 0; i < m_dataArray.size(); i++)
 		{
 			unsigned int start = static_cast<unsigned int>
@@ -3734,7 +3751,10 @@ std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn, bool* i
 		{
 			getValuesUpdateLines(effector, &effectorOutput, &outputXLocations, i, stepSize);
 		}
-		//effectorData.clear();
+
+		m_parent->lockBakedValuesAccess();
+		m_bakedValues = m_updatingBakedValues;
+		m_parent->unlockBakedValuesAccess();
 	}
 
 	// setting outputs
@@ -3866,9 +3886,9 @@ void VectorGraphDataArray::getValuesUpdateLines(VectorGraphDataArray* effectorIn
 	if (m_needsUpdating[iIn] + 1 >= m_dataArray.size())
 	{
 		// if this point is at the last location in m_dataArray
-		for (int j = end; j < m_bakedValues.size(); j++)
+		for (int j = end; j < m_updatingBakedValues.size(); j++)
 		{
-			m_bakedValues[j] = curY;
+			m_updatingBakedValues[j] = curY;
 		}
 	}
 	if (m_needsUpdating[iIn] == 0)
@@ -3876,7 +3896,7 @@ void VectorGraphDataArray::getValuesUpdateLines(VectorGraphDataArray* effectorIn
 		// if this point is at the 0 location in m_dataArray
 		for (int j = 0; j < start; j++)
 		{
-			m_bakedValues[j] = curY;
+			m_updatingBakedValues[j] = curY;
 		}
 	}
 
@@ -3890,7 +3910,7 @@ qDebug("getValuesD8 [%d] start: %d, end: %d, type: %d,      ---       %f, %f, %f
 		// calculate curve
 		for (int j = start; j < end; j++)
 		{
-			m_bakedValues[j] = processCurve(curY, nextY, curC, outputXLocationsIn->operator[](j));
+			m_updatingBakedValues[j] = processCurve(curY, nextY, curC, outputXLocationsIn->operator[](j));
 		}
 		// no line type
 	}
@@ -3899,13 +3919,13 @@ qDebug("getValuesD8 [%d] start: %d, end: %d, type: %d,      ---       %f, %f, %f
 		// curve
 		for (int j = start; j < end; j++)
 		{
-			m_bakedValues[j] = processCurve(curY, nextY, curC, outputXLocationsIn->operator[](j));
+			m_updatingBakedValues[j] = processCurve(curY, nextY, curC, outputXLocationsIn->operator[](j));
 		}
 		// line type
 		std::vector<float> lineTypeOutput = processLineTypeArraySine(outputXLocationsIn, start, end, curValA, curValB, fadeInStart);
 		for (int j = start; j < end; j++)
 		{
-			m_bakedValues[j] = m_bakedValues[j] + lineTypeOutput[j - start];
+			m_updatingBakedValues[j] = m_updatingBakedValues[j] + lineTypeOutput[j - start];
 		}
 	}
 	else if (type == 2)
@@ -3913,13 +3933,13 @@ qDebug("getValuesD8 [%d] start: %d, end: %d, type: %d,      ---       %f, %f, %f
 		// curve
 		for (int j = start; j < end; j++)
 		{
-			m_bakedValues[j] = processCurve(curY, nextY, 0.0f, outputXLocationsIn->operator[](j));
+			m_updatingBakedValues[j] = processCurve(curY, nextY, 0.0f, outputXLocationsIn->operator[](j));
 		}
 		// line type
 		std::vector<float> lineTypeOutput = processLineTypeArraySineB(outputXLocationsIn, start, end, curValA, curValB, curC, fadeInStart);
 		for (int j = start; j < end; j++)
 		{
-			m_bakedValues[j] = m_bakedValues[j] + lineTypeOutput[j - start];
+			m_updatingBakedValues[j] = m_updatingBakedValues[j] + lineTypeOutput[j - start];
 		}
 	}
 	else if (type == 3)
@@ -3927,13 +3947,13 @@ qDebug("getValuesD8 [%d] start: %d, end: %d, type: %d,      ---       %f, %f, %f
 		// curve
 		for (int j = start; j < end; j++)
 		{
-			m_bakedValues[j] = processCurve(curY, nextY, 0.0f, outputXLocationsIn->operator[](j));
+			m_updatingBakedValues[j] = processCurve(curY, nextY, 0.0f, outputXLocationsIn->operator[](j));
 		}
 		// line type
 		std::vector<float> lineTypeOutput = processLineTypeArrayPeak(outputXLocationsIn, start, end, curValA, curValB, curC, fadeInStart);
 		for (int j = start; j < end; j++)
 		{
-			m_bakedValues[j] = m_bakedValues[j] + lineTypeOutput[j - start];
+			m_updatingBakedValues[j] = m_updatingBakedValues[j] + lineTypeOutput[j - start];
 		}
 	}
 	else if (type == 4)
@@ -3941,13 +3961,13 @@ qDebug("getValuesD8 [%d] start: %d, end: %d, type: %d,      ---       %f, %f, %f
 		// curve
 		for (int j = start; j < end; j++)
 		{
-			m_bakedValues[j] = processCurve(curY, nextY, curC, outputXLocationsIn->operator[](j));
+			m_updatingBakedValues[j] = processCurve(curY, nextY, curC, outputXLocationsIn->operator[](j));
 		}
 		// line type
-		std::vector<float> lineTypeOutput = processLineTypeArraySteps(outputXLocationsIn, start, end, &m_bakedValues, curValA, curValB, fadeInStart);
+		std::vector<float> lineTypeOutput = processLineTypeArraySteps(outputXLocationsIn, start, end, &m_updatingBakedValues, curValA, curValB, fadeInStart);
 		for (int j = start; j < end; j++)
 		{
-			m_bakedValues[j] = m_bakedValues[j] + lineTypeOutput[j - start];
+			m_updatingBakedValues[j] = m_updatingBakedValues[j] + lineTypeOutput[j - start];
 		}
 	}
 	else if (type == 5)
@@ -3955,46 +3975,46 @@ qDebug("getValuesD8 [%d] start: %d, end: %d, type: %d,      ---       %f, %f, %f
 		// curve
 		for (int j = start; j < end; j++)
 		{
-			m_bakedValues[j] = processCurve(curY, nextY, 0.0f, outputXLocationsIn->operator[](j));
+			m_updatingBakedValues[j] = processCurve(curY, nextY, 0.0f, outputXLocationsIn->operator[](j));
 		}
 		// line type
 		std::vector<float> lineTypeOutput = processLineTypeArrayRandom(outputXLocationsIn, start, end, curValA, curValB, curC, fadeInStart);
 		for (int j = start; j < end; j++)
 		{
-			m_bakedValues[j] = m_bakedValues[j] + lineTypeOutput[j - start];
+			m_updatingBakedValues[j] = m_updatingBakedValues[j] + lineTypeOutput[j - start];
 		}
 	}
 	if (effectorIn != nullptr && getEffectOnlyPoints(m_needsUpdating[iIn]) == false)
 	{
 		int startB = m_needsUpdating[iIn] == 0 ? 0 : start;
-		int endB = m_needsUpdating[iIn] >= m_dataArray.size() - 1 ? m_bakedValues.size() : end;
+		int endB = m_needsUpdating[iIn] >= m_dataArray.size() - 1 ? m_updatingBakedValues.size() : end;
 		// process line effect
 		// if it is enabled
 		qDebug("getValues run prucessEffect run prucessEffect run prucessEffect run prucessEffect");
 		for (int j = startB; j < endB; j++)
 		{
-			m_bakedValues[j] = processEffect(m_needsUpdating[iIn], m_bakedValues[j], 0, effectorOutputIn->operator[](j));
+			m_updatingBakedValues[j] = processEffect(m_needsUpdating[iIn], m_updatingBakedValues[j], 0, effectorOutputIn->operator[](j));
 		}
 	}
 	// clamp
 	for (int j = start; j < end; j++)
 	{
-		if (m_bakedValues[j] > 1.0f)
+		if (m_updatingBakedValues[j] > 1.0f)
 		{
-			m_bakedValues[j] = 1.0f;
+			m_updatingBakedValues[j] = 1.0f;
 		}
-		else if (m_bakedValues[j] < -1.0f)
+		else if (m_updatingBakedValues[j] < -1.0f)
 		{
-			m_bakedValues[j] = -1.0f;
+			m_updatingBakedValues[j] = -1.0f;
 		}
 	}
 	if (m_isNonNegative == true)
 	{
 		int startB = m_needsUpdating[iIn] == 0 ? 0 : start;
-		int endB = m_needsUpdating[iIn] >= m_dataArray.size() - 1 ? m_bakedValues.size() : end;
+		int endB = m_needsUpdating[iIn] >= m_dataArray.size() - 1 ? m_updatingBakedValues.size() : end;
 		for (int j = startB; j < endB; j++)
 		{
-			m_bakedValues[j] = m_bakedValues[j] / 2.0f + 0.5f;
+			m_updatingBakedValues[j] = m_updatingBakedValues[j] / 2.0f + 0.5f;
 		}
 	}
 }
