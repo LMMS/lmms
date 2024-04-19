@@ -117,8 +117,8 @@ VectorGraphView::VectorGraphView(QWidget * parentIn, int widthIn, int heightIn,
 	modelChanged();
 
 	// connect default loading of default colors to applyDefaultColors
-	QObject::connect(this, SIGNAL(changedDefaultColors()),
-			this, SLOT(updateDefaultColors()));
+	QObject::connect(this, &VectorGraphView::changedDefaultColors,
+		this, vectorGraphView::updateDefaultColors);
 
 	if (shouldApplyDefaultVectorGraphColorsIn == true)
 	{
@@ -958,7 +958,7 @@ float VectorGraphView::getDistance(int xAIn, int yAIn, int xBIn, int yBIn)
 {
 	return std::sqrt(static_cast<float>((xAIn - xBIn) * (xAIn - xBIn) + (yAIn - yBIn) * (yAIn - yBIn)));
 }
-float VectorGraphView::getDistance(float xAIn, float yAIn, float xBIn, float yBIn)
+float VectorGraphView::getDistanceF(float xAIn, float yAIn, float xBIn, float yBIn)
 {
 	return std::sqrt((xAIn - xBIn) * (xAIn - xBIn) + (yAIn - yBIn) * (yAIn - yBIn));
 }
@@ -1588,7 +1588,7 @@ int VectorGraphView::searchForData(int mouseXIn, int mouseYIn, float maxDistance
 		if (std::abs(dataX - transformedMouse.first) <= maxDistance)
 		{
 			// calculate real distance (x and y)
-			float curDistance = getDistance(transformedMouse.first * 2.0f, transformedMouse.second,
+			float curDistance = getDistanceF(transformedMouse.first * 2.0f, transformedMouse.second,
 				dataX * 2.0f, dataY);
 
 			//qDebug("selected full distance: %f  (%d, %d)", curDistance, location, (location - curvedBefore));
@@ -1644,7 +1644,7 @@ int VectorGraphView::searchForData(int mouseXIn, int mouseYIn, float maxDistance
 								dataY = curvedDataCoords.second;
 							}
 						}
-						curDistance = getDistance(transformedMouse.first * 2.0f, transformedMouse.second,
+						curDistance = getDistanceF(transformedMouse.first * 2.0f, transformedMouse.second,
 							dataX * 2.0f, dataY);
 			//qDebug("search v2 full distance %d: %f  / %f     y: %f, my: %f    y:%f  size:%ld", i, curDistance, maxDistance, dataY, transformedMouse.second, arrayIn->getY(i), arrayIn->size());
 						if (curDistance <= maxDistance)

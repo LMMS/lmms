@@ -132,7 +132,7 @@ private:
 	int mapControlInputX(float inputValueIn, unsigned int displayLengthIn);
 
 	float getDistance(int xAIn, int yAIn, int xBIn, int yBIn);
-	float getDistance(float xAIn, float yAIn, float xBIn, float yBIn);
+	float getDistanceF(float xAIn, float yAIn, float xBIn, float yBIn);
 
 	// adds point to the selected VectorGraphDataArray
 	bool addPoint(unsigned int locationIn, int mouseXIn, int mouseYIn);
