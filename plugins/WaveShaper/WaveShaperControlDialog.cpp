@@ -49,7 +49,7 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 	setPalette( pal );
 	setFixedSize( 224, 274 );
 
-	auto curGraph = new VectorGraphView(this, 204, 205, 10, 1024, false);
+	auto curGraph = new VectorGraphView(this, 204, 205, 10, 30, 3, false);
 	curGraph->setModel(&_controls->m_vectorGraphModel);
 	curGraph->setBackground(PLUGIN_NAME::getIconPixmap("wavegraph"));
 	// this can cause problems with custom colors
