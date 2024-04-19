@@ -114,7 +114,7 @@ protected slots:
 	void removeAutomation();
 	void removeController();
 private:
-	void paintGraph(QPainter* pIn, unsigned int locationIn, std::vector<int>* alreadyUpdatedDataArraysIn);
+	void paintGraph(QPainter* pIn, unsigned int locationIn, std::vector<float>* sampleBufferIn, bool shouldUseGetLastValuesIn);
 	void paintEditing(QPainter* pIn);
 
 	void modelChanged() override;

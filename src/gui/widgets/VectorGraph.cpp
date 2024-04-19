@@ -569,11 +569,58 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 	p.drawLine(0, height() - 1, width() - 1, height() - 1);
 	p.drawLine(0, 0, 0, height() - 1);
 
-	std::vector<int> alreadyUpdatedDataArrays;
+	std::vector<int> effectArrays;
+	std::vector<float> sampleBuffer;
 
+	// getting arrays that effect other arrays
 	for (unsigned int i = 0; i < model()->getDataArraySize(); i++)
 	{
-		paintGraph(&p, i, &alreadyUpdatedDataArrays);
+		// getting the current array's effector array
+		int curArrayEffector = model()->getDataArray(i)->getEffectorArrayLocation();
+
+		if (curArrayEffector != -1)
+		{
+			bool found = false;
+			// checking if it is already in the list
+			for (unsigned int k = 0; k < effectArrays.size(); k++)
+			{
+				if (curArrayEffector == effectArrays[k])
+				{
+					found = true;
+					break;
+				}
+			}
+			if (found == false)
+			{
+				effectArrays.push_back(curArrayEffector);
+			}
+		}
+	}
+
+	// updating arrays that do not effect other arrays first
+	for (unsigned int i = 0; i < model()->getDataArraySize(); i++)
+	{
+		bool found = false;
+		for (unsigned int j = 0; j < effectArrays.size(); j++)
+		{
+			if (i == effectArrays[j])
+			{
+				found = true;
+				break;
+			}
+		}
+		if (found == false)
+		{
+			paintGraph(&p, i, &sampleBuffer, false);
+		}
+	}
+
+	// updating arrays that effect other arrays
+	// without calling getValues() for optimization
+	// (they were updated during the previous step)
+	for (unsigned int i = 0; i < effectArrays.size(); i++)
+	{
+		paintGraph(&p, i, &sampleBuffer, true);
 	}
 
 	paintEditing(&p);
@@ -583,7 +630,7 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 	emit drawn();
 }
 
-void VectorGraphView::paintGraph(QPainter* pIn, unsigned int locationIn, std::vector<int>* alreadyUpdatedDataArraysIn)
+void VectorGraphView::paintGraph(QPainter* pIn, unsigned int locationIn, std::vector<float>* sampleBufferIn, bool shouldUseGetLastValuesIn)
 {
 	VectorGraphDataArray* dataArray = model()->getDataArray(locationIn);
 	unsigned int length = dataArray->size();
@@ -602,47 +649,23 @@ void VectorGraphView::paintGraph(QPainter* pIn, unsigned int locationIn, std::ve
 			posA = startPos;
 			pt.moveTo(startPos.first + 1, m_graphHeight - startPos.second);
 
-			std::vector<float> dataArrayValues;
-			if (m_useGetLastValues == true)
+			if (m_useGetLastValues == true || shouldUseGetLastValuesIn == true)
 			{
-				dataArray->getLastValues(&dataArrayValues);
+				qDebug("paintEvent getLastValues2 [%d]", locationIn);
+				dataArray->getLastValues(sampleBufferIn);
 			}
 			else
 			{
-				// getting most updated dataArray values
-				// if this dataArray has not been updated by
-				// an other dataArray while paintEvent is happening
-				bool found = false;
-				for (unsigned int j = 0; j < alreadyUpdatedDataArraysIn->size(); j++)
-				{
-					if (locationIn == alreadyUpdatedDataArraysIn->operator[](j))
-					{
-						found = true;
-						break;
-					}
-				}
-				if (found == false)
-				{
-					dataArrayValues = dataArray->getValues(width());
-					std::vector<int> updatedArrays = dataArray->getEffectorArrayLocations();
-					for (unsigned int j = 0; j < updatedArrays.size(); j++)
-					{
-						alreadyUpdatedDataArraysIn->push_back(updatedArrays[j]);
-					}
-				}
-				else
-				{
-					dataArray->getLastValues(&dataArrayValues);
-				}
+				*sampleBufferIn = dataArray->getValues(width());
 			}
 
-			qDebug("paint dataArrayValues size: %ld", dataArrayValues.size());
-			for (unsigned int j = 0; j < dataArrayValues.size(); j++)
+			qDebug("paint sampleBufferIn size: %ld", sampleBufferIn->size());
+			for (unsigned int j = 0; j < sampleBufferIn->size(); j++)
 			{
 				// if nonNegative then only the dataArray output (getDataValues)
 				// is bigger than 0 so it matters only here
-				posB = mapDataPos(0, dataArrayValues[j], dataArray->getIsNonNegative());
-				posB.first = static_cast<int>((j * width()) / static_cast<float>(dataArrayValues.size()));
+				posB = mapDataPos(0, sampleBufferIn->operator[](j), dataArray->getIsNonNegative());
+				posB.first = static_cast<int>((j * width()) / static_cast<float>(sampleBufferIn->size()));
 	
 				if (posA.first != posB.first)
 				{
@@ -3721,7 +3744,11 @@ std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn, bool* i
 	// calculating point data and lines
 	if (m_needsUpdating.size() > 0 && m_updatingBakedValues.size() > 0)
 	{
-		effectorOutput.resize(countIn);
+		if (effectorOutput.size() != countIn)
+		{
+			effectorOutput.resize(countIn);
+		}
+		
 		// calculating relative X locations (in lines) of the output values
 		// for later use in the line calculations
 		// outputXLocations[sample_location] is equal to 0.0f if it is at the start of a line,
