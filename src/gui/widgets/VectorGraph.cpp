@@ -2597,6 +2597,18 @@ void VectorGraphDataArray::setDataArray(std::vector<float>* dataArrayIn,
 	}
 	setDataArray(&convertedDataArray, isCurvedIn, clearIn, clampIn, rescaleIn, false, callDataChangedIn);
 }
+void VectorGraphDataArray::setDataArray(float* dataArrayIn, unsigned int sizeIn,
+	bool isCurvedIn, bool clearIn, bool clampIn, bool rescaleIn, bool callDataChangedIn)
+{
+	std::vector<std::pair<float, float>> convertedDataArray(sizeIn);
+	float stepSize = 1.0f / static_cast<float>(sizeIn);
+	for (unsigned int i = 0; i < sizeIn; i++)
+	{
+		convertedDataArray[i].first = i * stepSize;
+		convertedDataArray[i].second = dataArrayIn[i];
+	}
+	setDataArray(&convertedDataArray, isCurvedIn, clearIn, clampIn, rescaleIn, false, callDataChangedIn);
+}
 
 unsigned int VectorGraphDataArray::setX(unsigned int locationIn, float xIn)
 {
