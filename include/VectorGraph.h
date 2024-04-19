@@ -62,8 +62,8 @@ class LMMS_EXPORT VectorGraphView : public QWidget, public ModelView
 	Q_PROPERTY(int fontSize MEMBER m_fontSize)
 public:
 
-	VectorGraphView(QWidget * parentIn, int widthIn, int heightIn,
-		unsigned int pointSizeIn, unsigned int maxLengthIn, bool shouldApplyDefaultVectorGraphColorsIn);
+	VectorGraphView(QWidget * parentIn, int widthIn, int heightIn, unsigned int pointSizeIn,
+		unsigned int controlHeightIn, unsigned int controlDisplayCountIn, bool shouldApplyDefaultVectorGraphColorsIn);
 	~VectorGraphView();
 
 	void setLineColor(QColor colorIn, unsigned int dataArrayLocationIn);
@@ -123,7 +123,7 @@ private:
 	// calculate graph coords from screen space coords
 	std::pair<float, float> mapMousePos(int xIn, int yIn);
 	// calculate gui curve point's position
-	std::pair<float, float> mapDataCurvePos(float xAIn, float yAIn, float xBIn, float yBIn, float curveIn);
+	std::pair<float, float> mapDataCurvePosF(float xAIn, float yAIn, float xBIn, float yBIn, float curveIn);
 	std::pair<int, int>mapDataCurvePos(int xAIn, int yAIn, int xBIn, int yBIn, float curveIn);
 	// calculate screen space coords from graph coords
 	// isNonNegativeIn can only be true when graph line / getValues() is mapped
