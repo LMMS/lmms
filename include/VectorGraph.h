@@ -26,11 +26,11 @@
 #define LMMS_GUI_VECTORGRAPH_H
 
 #include <vector>
-#include <mutex>
 #include <QPainterPath>
 #include <QWidget>
 #include <QCursor>
 #include <QMenu>
+#include <QMutex>
 
 #include "Model.h"
 #include "ModelView.h"
@@ -308,8 +308,8 @@ private:
 
 	// block threads that want to access
 	// a dataArray's getSamples() at the same time
-	std::mutex m_getSamplesAccess;
-	std::mutex m_bakedSamplesAccess;
+	QMutex m_getSamplesAccess;
+	QMutex m_bakedSamplesAccess;
 };
 
 class LMMS_EXPORT VectorGraphDataArray

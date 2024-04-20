@@ -27,12 +27,12 @@
 #include <algorithm> // sort
 #include <cstdlib> // rand
 #include <cstdint> // unintptr_t
-#include <mutex> // locking when getSamples
 #include <QPainter>
 #include <QPainterPath>
 #include <QMouseEvent>
 #include <QInputDialog> // showInputDialog()
 #include <QMenu> // context menu
+#include <QMutex> // locking when getSamples
 
 
 #include "VectorGraph.h"
@@ -216,7 +216,7 @@ void VectorGraphView::setSelectedData(std::pair<float, float> dataIn)
 		model()->getDataArray(m_selectedArray)->setY(m_selectedLocation, dataIn.second);
 		qDebug("set value done");
 		m_selectedLocation = model()->getDataArray(m_selectedArray)->setX(m_selectedLocation, dataIn.first);
-		qDebug("set position done");
+		qDebug("set position done (%f)", dataIn.first);
 	}
 }
 void VectorGraphView::setBackground(const QPixmap backgroundIn)
@@ -2497,7 +2497,7 @@ int VectorGraphDataArray::getNearestLocation(float xIn, bool* foundOut, bool* is
 			//*isBeforeOut = false;
 		}
 	//qDebug("getNearestLocation, outputDif: %d", outputDif);
-		*foundOut = false;
+		*foundOut = xIn == m_dataArray[mid + outputDif].m_x;
 		*isBeforeOut = xIn >= m_dataArray[mid + outputDif].m_x;
 		return mid + outputDif;
 	}
