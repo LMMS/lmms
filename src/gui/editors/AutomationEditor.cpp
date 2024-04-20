@@ -429,13 +429,15 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 		}
 	};
 
+	const auto pos = position(mouseEvent);
+
 	// If we clicked inside the AutomationEditor viewport (where the nodes are represented)
-	if (mouseEvent->y() > TOP_MARGIN && mouseEvent->x() >= VALUES_WIDTH)
+	if (pos.y() > TOP_MARGIN && pos.x() >= VALUES_WIDTH)
 	{
-		float level = getLevel( mouseEvent->y() );
+		float level = getLevel(pos.y());
 
 		// Get the viewport X
-		int x = mouseEvent->x() - VALUES_WIDTH;
+		int x = pos.x() - VALUES_WIDTH;
 
 		// Get tick in which the user clicked
 		int posTicks = (x * TimePos::ticksPerBar() / m_ppb) + m_currentPosition;
@@ -454,7 +456,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 			|| (m_editMode == EditMode::Erase && m_mouseDownRight)
 		);
 
-		timeMap::iterator clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y(), editingOutValue);
+		timeMap::iterator clickedNode = getNodeAt(pos.x(), pos.y(), editingOutValue);
 
 		switch (m_editMode)
 		{
@@ -623,7 +625,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 				m_clip->addJournalCheckPoint();
 
 				// Gets the closest node to the mouse click
-				timeMap::iterator node = getClosestNode(mouseEvent->x());
+				timeMap::iterator node = getClosestNode(pos.x());
 
 				// Starts dragging a tangent
 				if (m_mouseDownLeft && node != tm.end())
@@ -664,14 +666,16 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 
 void AutomationEditor::mouseDoubleClickEvent(QMouseEvent * mouseEvent)
 {
+	const auto pos = position(mouseEvent);
+
 	if (!validClip()) { return; }
 
 	// If we double clicked outside the AutomationEditor viewport return
-	if (mouseEvent->y() <= TOP_MARGIN || mouseEvent->x() < VALUES_WIDTH) { return; }
+	if (pos.y() <= TOP_MARGIN || pos.x() < VALUES_WIDTH) { return; }
 
 	// Are we fine tuning the inValue or outValue?
 	const bool isOutVal = (m_editMode == EditMode::DrawOutValues);
-	timeMap::iterator clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y(), isOutVal);
+	timeMap::iterator clickedNode = getNodeAt(pos.x(), pos.y(), isOutVal);
 
 	switch (m_editMode)
 	{
@@ -729,12 +733,14 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 		return;
 	}
 
+	const auto pos = position(mouseEvent);
+
 	// If the mouse y position is inside the Automation Editor viewport
-	if (mouseEvent->y() > TOP_MARGIN)
+	if (pos.y() > TOP_MARGIN)
 	{
-		float level = getLevel(mouseEvent->y());
+		float level = getLevel(pos.y());
 		// Get the viewport X position where the mouse is at
-		int x = mouseEvent->x() - VALUES_WIDTH;
+		int x = pos.x() - VALUES_WIDTH;
 
 		// Get the X position in ticks
 		int posTicks = (x * TimePos::ticksPerBar() / m_ppb) + m_currentPosition;
@@ -883,8 +889,8 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 						? yCoordOfLevel(OUTVAL(it))
 						: yCoordOfLevel(INVAL(it));
 					float dy = m_draggedOutTangent
-						? y - mouseEvent->y()
-						: mouseEvent->y() - y;
+						? y - pos.y()
+						: pos.y() - y;
 					float dx = std::abs(posTicks - POS(it));
 					float newTangent = dy / std::max(dx, 1.0f);
 
