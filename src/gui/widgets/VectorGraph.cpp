@@ -171,24 +171,16 @@ void VectorGraphView::applyDefaultColors()
 	unsigned int size = model()->getDataArraySize();
 	if (size > 0)
 	{
+		setLineColor(m_vectorGraphDefaultLineColor, 0);
+		setActiveColor(m_vectorGraphDefaultActiveColor, 0);
+		setFillColor(m_vectorGraphDefaultFillColor, 0);
+		setAutomatedColor(m_vectorGraphDefaultAutomatedColor, 0);
 		if (size > 1)
 		{
-			setLineColor(m_vectorGraphSecondaryLineColor, 0);
-			setActiveColor(m_vectorGraphSecondaryActiveColor, 0);
-			setFillColor(m_vectorGraphSecondaryFillColor, 0);
-			setAutomatedColor(m_vectorGraphDefaultAutomatedColor, 0);
-
-			setLineColor(m_vectorGraphDefaultLineColor, 1);
-			setActiveColor(m_vectorGraphDefaultActiveColor, 1);
-			setFillColor(m_vectorGraphDefaultFillColor, 1);
+			setLineColor(m_vectorGraphSecondaryLineColor, 1);
+			setActiveColor(m_vectorGraphSecondaryActiveColor, 1);
+			setFillColor(m_vectorGraphSecondaryFillColor, 1);
 			setAutomatedColor(m_vectorGraphDefaultAutomatedColor, 1);
-		}
-		else
-		{
-			setLineColor(m_vectorGraphDefaultLineColor, 0);
-			setActiveColor(m_vectorGraphDefaultActiveColor, 0);
-			setFillColor(m_vectorGraphDefaultFillColor, 0);
-			setAutomatedColor(m_vectorGraphDefaultAutomatedColor, 0);
 		}
 	}
 }
