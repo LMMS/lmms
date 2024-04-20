@@ -49,13 +49,6 @@ WaveShaperControls::WaveShaperControls( WaveShaperEffect * _eff ) :
 	m_clipModel( false, this ),
 	m_vectorGraphSampleBuffer(200)
 {
-
-	unsigned int arrayLocationB = m_vectorGraphModel.addArray();
-	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsSelectable(true);
-	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsEditableAttrib(true);
-	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsAutomatableEffectable(true);
-	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsSaveable(true);
-
 	unsigned int arrayLocation = m_vectorGraphModel.addArray();
 	//m_vectorGraphModel.getDataArray(arrayLocation)->setIsFixedSize(true);
 	//m_vectorGraphModel.getDataArray(arrayLocation)->setIsFixedX(true);
@@ -67,7 +60,13 @@ WaveShaperControls::WaveShaperControls( WaveShaperEffect * _eff ) :
 	m_vectorGraphModel.getDataArray(arrayLocation)->setIsSaveable(true);
 	m_vectorGraphModel.getDataArray(arrayLocation)->setIsNonNegative(true);
 
-	// connect VectorGraphDataArrays so the 1. VectorGraphDataArray will be able to effect the 2.:
+	unsigned int arrayLocationB = m_vectorGraphModel.addArray();
+	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsSelectable(true);
+	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsEditableAttrib(true);
+	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsAutomatableEffectable(true);
+	m_vectorGraphModel.getDataArray(arrayLocationB)->setIsSaveable(true);
+
+	// connect VectorGraphDataArrays so the 2. VectorGraphDataArray will be able to effect the 1.:
 	m_vectorGraphModel.getDataArray(arrayLocation)->setEffectorArrayLocation(arrayLocationB, true);
 	// draw default shape
 	setDefaultShape();
@@ -127,10 +126,10 @@ void WaveShaperControls::saveSettings( QDomDocument & _doc,
 
 std::vector<float>* WaveShaperControls::getGraphSamples()
 {
-	if (m_vectorGraphModel.getDataArraySize() > 1)
+	if (m_vectorGraphModel.getDataArraySize() > 0)
 	{
 		// get m_vectorGraphSampleBuffer.size (200) samples from the 1. VectorGraphDataArray
-		m_vectorGraphSampleBuffer = m_vectorGraphModel.getDataArray(1)->getValues(m_vectorGraphSampleBuffer.size());
+		m_vectorGraphModel.getDataArray(0)->getSamples(m_vectorGraphSampleBuffer.size(), &m_vectorGraphSampleBuffer);
 		emit vectorGraphUpdateView(true);
 	}
 	return &m_vectorGraphSampleBuffer;
@@ -146,22 +145,22 @@ void WaveShaperControls::setDefaultShape()
 
 	if (m_vectorGraphModel.getDataArraySize() > 1)
 	{
-		int addedLocation = m_vectorGraphModel.getDataArray(1)->add(0.0f);
-		if (addedLocation >= 0)
-		{
-			m_vectorGraphModel.getDataArray(1)->setY(addedLocation, -1.0f);
-		}
-
-		addedLocation = m_vectorGraphModel.getDataArray(1)->add(1.0f);
-		if (addedLocation >= 0)
-		{
-			m_vectorGraphModel.getDataArray(1)->setY(addedLocation, 1.0f);
-		}
-
-		addedLocation = m_vectorGraphModel.getDataArray(0)->add(0.5f);
+		int addedLocation = m_vectorGraphModel.getDataArray(0)->add(0.0f);
 		if (addedLocation >= 0)
 		{
 			m_vectorGraphModel.getDataArray(0)->setY(addedLocation, -1.0f);
+		}
+
+		addedLocation = m_vectorGraphModel.getDataArray(0)->add(1.0f);
+		if (addedLocation >= 0)
+		{
+			m_vectorGraphModel.getDataArray(0)->setY(addedLocation, 1.0f);
+		}
+
+		addedLocation = m_vectorGraphModel.getDataArray(1)->add(0.5f);
+		if (addedLocation >= 0)
+		{
+			m_vectorGraphModel.getDataArray(1)->setY(addedLocation, -1.0f);
 		}
 	}
 }
