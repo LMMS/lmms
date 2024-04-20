@@ -77,7 +77,7 @@ signals:
 	// connected to dataArrayChanged()
 	// shouldUseGetLastValuesIn: when the graph is redrawn
 	// should it use the last updated values instead of updating again
-	void vectorGraphUpdateView(bool shouldUseGetLastValuesIn);
+	void vectorGraphUpdateView(bool shouldUseGetLastValues);
 private:
 	WaveShaperEffect * m_effect;
 	FloatModel m_inputModel;
