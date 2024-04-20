@@ -1313,11 +1313,13 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		if( time_map.size() > 0 )
 		{
 			timeMap::iterator it = time_map.begin();
-			while( it+1 != time_map.end() )
+			while (std::next(it) != time_map.end())
 			{
 				// skip this section if it occurs completely before the
 				// visible area
-				int next_x = xCoordOfTick(POS(it+1));
+				const auto nit = std::next(it);
+
+				int next_x = xCoordOfTick(POS(nit));
 				if( next_x < 0 )
 				{
 					++it;
@@ -1340,17 +1342,17 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				// the next node.
 				float nextValue = m_clip->progressionType() == AutomationClip::ProgressionType::Discrete
 					? OUTVAL(it)
-					: INVAL(it + 1);
+					: INVAL(nit);
 
 				p.setRenderHints( QPainter::Antialiasing, true );
 				QPainterPath path;
 				path.moveTo(QPointF(xCoordOfTick(POS(it)), yCoordOfLevel(0)));
-				for (int i = 0; i < POS(it + 1) - POS(it); i++)
+				for (int i = 0; i < POS(nit) - POS(it); i++)
 				{
 					path.lineTo(QPointF(xCoordOfTick(POS(it) + i), yCoordOfLevel(values[i])));
 				}
-				path.lineTo(QPointF(xCoordOfTick(POS(it + 1)), yCoordOfLevel(nextValue)));
-				path.lineTo(QPointF(xCoordOfTick(POS(it + 1)), yCoordOfLevel(0)));
+				path.lineTo(QPointF(xCoordOfTick(POS(nit)), yCoordOfLevel(nextValue)));
+				path.lineTo(QPointF(xCoordOfTick(POS(nit)), yCoordOfLevel(0)));
 				path.lineTo(QPointF(xCoordOfTick(POS(it)), yCoordOfLevel(0)));
 				p.fillPath(path, m_graphColor);
 				p.setRenderHints( QPainter::Antialiasing, false );

@@ -1103,7 +1103,10 @@ void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 		{
 			// Previous node values (based on outValue). We just calculate
 			// the y level because the x will be the same as old_x.
-			const float pre_level = OUTVAL(it - 1);
+			const auto pit = std::prev(it);
+			const auto nit = std::next(it);
+
+			const float pre_level = OUTVAL(pit);
 			int pre_y = middle_y - pre_level * m_keyLineHeight;
 
 			// Draws the line representing the discrete jump if there's one
@@ -1128,7 +1131,7 @@ void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 
 			// If we are in the last node and there's a discrete jump, we draw a
 			// vertical line representing it
-			if ((it + 1) == map.end())
+			if (nit == map.end())
 			{
 				const float last_level = OUTVAL(it);
 				if (cur_level != last_level)
