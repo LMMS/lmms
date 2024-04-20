@@ -39,7 +39,7 @@ void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const Q
 
 	const auto numPixels = std::min<size_t>(parameters.size, width);
 
-	const auto scaling_factor = 
+	const auto scalingFactor = 
 		halfHeight * parameters.amplification 
 		/ static_cast<float>(parameters.buffer[0].size())
 	;
@@ -49,26 +49,21 @@ void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const Q
 	const auto color = painter.pen().color();
 	const auto rmsColor = color.lighter(123);
 	
-	// Cap at this many frames per pixel index.
-	constexpr size_t MAX_FRAMES_PER_PIXEL = 16;
+	constexpr size_t maxFramesPerPixel = 16;
 	
-	constexpr float MAX_FRAMES_PER_PIXEL_RECIP = 
-		1.0 / static_cast<float>(MAX_FRAMES_PER_PIXEL)
-	;
-	
-	const size_t STEP_SIZE = std::max<size_t>(framesPerPixel / MAX_FRAMES_PER_PIXEL, 1);
+	const size_t frameStepSize = std::max<size_t>(framesPerPixel / maxFramesPerPixel, 1);
 	
 	for (size_t pixelIndex = 0; pixelIndex < numPixels; pixelIndex++) 
 	{
 		const auto i = pixelIndex * maxFrames / numPixels;
 		size_t frameIndex = !parameters.reversed ? i : maxFrames - i;
-		const auto frameIndex_bound = std::min(maxFrames, frameIndex + framesPerPixel);
+		const auto frameIndexBound = std::min(maxFrames, frameIndex + framesPerPixel);
 		
 		float max = -100.0;
 		float min =  100.0;
 		float squared = 0.0;
 		
-		while (frameIndex < frameIndex_bound)
+		while (frameIndex < frameIndexBound)
 		{
 			const auto& frame = parameters.buffer[frameIndex];
 			const auto value = std::accumulate(frame.begin(), frame.end(), 0.0f);
@@ -78,20 +73,20 @@ void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const Q
 			
 			squared += value * value;
 			
-			frameIndex += STEP_SIZE;
+			frameIndex += frameStepSize;
 		}
 		
-		const auto lineY1 = centerY - max * scaling_factor;
-		const auto lineY2 = centerY - min * scaling_factor;
+		const auto lineY1 = centerY - max * scalingFactor;
+		const auto lineY2 = centerY - min * scalingFactor;
 		const auto lineX = pixelIndex + x;
 		painter.drawLine(lineX, lineY1, lineX, lineY2);
 		
-		const auto rms = std::sqrt(squared * MAX_FRAMES_PER_PIXEL_RECIP);
+		const auto rms = std::sqrt(squared / maxFramesPerPixel);
 		const auto maxRMS = std::clamp(rms, min, max);
 		const auto minRMS = std::clamp(-rms, min, max);
 
-		const auto rmsLineY1 = centerY - maxRMS * scaling_factor;
-		const auto rmsLineY2 = centerY - minRMS * scaling_factor;
+		const auto rmsLineY1 = centerY - maxRMS * scalingFactor;
+		const auto rmsLineY2 = centerY - minRMS * scalingFactor;
 
 		painter.setPen(rmsColor);
 		painter.drawLine(lineX, rmsLineY1, lineX, rmsLineY2);
