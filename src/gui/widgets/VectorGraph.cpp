@@ -184,6 +184,21 @@ void VectorGraphView::applyDefaultColors()
 		}
 	}
 }
+void VectorGraphView::setPointSize(unsigned int pointSizeIn)
+{
+	m_pointSize = pointSizeIn;
+	updateGraph();
+}
+void VectorGraphView::setControlHeight(unsigned int controlHeightIn)
+{
+	m_controlHeight = controlHeightIn;
+	updateGraph();
+}
+void VectorGraphView::setControlDisplayCount(unsigned int controlDisplayCountIn)
+{
+	m_controlDisplayCount = controlDisplayCountIn;
+	updateGraph();
+}
 
 void VectorGraphView::setIsSimplified(bool isSimplifiedIn)
 {

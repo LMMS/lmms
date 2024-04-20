@@ -71,6 +71,9 @@ public:
 	void setFillColor(QColor colorIn, unsigned int dataArrayLocationIn);
 	void setAutomatedColor(QColor colorIn, unsigned int dataArrayLocationIn);
 	void applyDefaultColors();
+	void setPointSize(unsigned int pointSizeIn);
+	void setControlHeight(unsigned int controlHeightIn);
+	void setControlDisplayCount(unsigned int controlDisplayCountIn);
 
 	inline VectorGraphModel* model()
 	{
