@@ -70,7 +70,7 @@ VectorGraphView::VectorGraphView(QWidget * parentIn, int widthIn, int heightIn, 
 	m_isSimplified = false;
 	m_isDefaultColorsApplyed = false;
 	//m_background;
-	m_useGetLastValues = false;
+	m_useGetLastSamples = false;
 
 	m_selectedLocation = 0;
 	m_selectedArray = 0;
@@ -231,9 +231,9 @@ void VectorGraphView::setBackground(const QPixmap backgroundIn)
 {
 	m_background = backgroundIn;
 }
-void VectorGraphView::useGetLastValues()
+void VectorGraphView::useGetLastSamples()
 {
-	m_useGetLastValues = true;
+	m_useGetLastSamples = true;
 }
 
 void VectorGraphView::mousePressEvent(QMouseEvent* me)
@@ -616,7 +616,7 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 	}
 
 	// updating arrays that effect other arrays
-	// without calling getValues() for optimization
+	// without calling getSamples() for optimization
 	// (they were updated during the previous step)
 	for (unsigned int i = 0; i < effectArrays.size(); i++)
 	{
@@ -625,12 +625,12 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 
 	paintEditing(&p);
 
-	m_useGetLastValues = false;
+	m_useGetLastSamples = false;
 	qDebug("paint event end");
 	emit drawn();
 }
 
-void VectorGraphView::paintGraph(QPainter* pIn, unsigned int locationIn, std::vector<float>* sampleBufferIn, bool shouldUseGetLastValuesIn)
+void VectorGraphView::paintGraph(QPainter* pIn, unsigned int locationIn, std::vector<float>* sampleBufferIn, bool shouldUseGetLastSamplesIn)
 {
 	VectorGraphDataArray* dataArray = model()->getDataArray(locationIn);
 	unsigned int length = dataArray->size();
@@ -649,14 +649,14 @@ void VectorGraphView::paintGraph(QPainter* pIn, unsigned int locationIn, std::ve
 			posA = startPos;
 			pt.moveTo(startPos.first + 1, m_graphHeight - startPos.second);
 
-			if (m_useGetLastValues == true || shouldUseGetLastValuesIn == true)
+			if (m_useGetLastSamples == true || shouldUseGetLastSamplesIn == true)
 			{
-				qDebug("paintEvent getLastValues2 [%d]", locationIn);
-				dataArray->getLastValues(sampleBufferIn);
+				qDebug("paintEvent SamplestValues2 [%d]", locationIn);
+				dataArray->getLastSamples(sampleBufferIn);
 			}
 			else
 			{
-				*sampleBufferIn = dataArray->getValues(width());
+				dataArray->getSamples(width(), sampleBufferIn);
 			}
 
 			qDebug("paint sampleBufferIn size: %ld", sampleBufferIn->size());
@@ -875,9 +875,9 @@ void VectorGraphView::updateGraph()
 {
 	update();
 }
-void VectorGraphView::updateGraph(bool shouldUseGetLastValuesIn)
+void VectorGraphView::updateGraph(bool shouldUseGetLastSamplesIn)
 {
-	m_useGetLastValues = shouldUseGetLastValuesIn;
+	m_useGetLastSamples = shouldUseGetLastSamplesIn;
 	update();
 }
 void VectorGraphView::updateDefaultColors()
@@ -1754,10 +1754,10 @@ void VectorGraphModel::dataArrayChanged()
 	emit dataChanged();
 	emit updateGraphView(false);
 }
-void VectorGraphModel::updateGraphModel(bool shouldUseGetLastValuesIn)
+void VectorGraphModel::updateGraphModel(bool shouldUseGetLastSamplesIn)
 {
 	// connects to external update signal
-	emit updateGraphView(shouldUseGetLastValuesIn);
+	emit updateGraphView(shouldUseGetLastSamplesIn);
 }
 void VectorGraphModel::dataArrayClearedEvent(int idIn)
 {
@@ -1919,13 +1919,13 @@ void VectorGraphModel::loadSettings(const QDomElement& element, const QString& n
 		}
 	}
 }
-void VectorGraphModel::lockGetValuesAccess()
+void VectorGraphModel::lockGetSamplesAccess()
 {
-	m_getValuesAccess.lock();
+	m_getSamplesAccess.lock();
 }
-void VectorGraphModel::unlockGetValuesAccess()
+void VectorGraphModel::unlockGetSamplesAccess()
 {
-	m_getValuesAccess.unlock();
+	m_getSamplesAccess.unlock();
 }
 void VectorGraphModel::lockBakedValuesAccess()
 {
@@ -2516,20 +2516,18 @@ int VectorGraphDataArray::getNearestLocation(float xIn, bool* foundOut, bool* is
 	return -1;
 }
 
-std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn)
+void VectorGraphDataArray::getSamples(unsigned int countIn, std::vector<float>* sampleBufferOut)
 {
 	qDebug("getValuesA1");
-	m_parent->lockGetValuesAccess();
-	std::vector<float> output = getValues(countIn, nullptr, nullptr);
-	m_parent->unlockGetValuesAccess();
-	qDebug("getValuesA2, size: %ld", output.size());
+	m_parent->lockGetSamplesAccess();
+	getSamples(countIn, nullptr, nullptr, sampleBufferOut);
+	m_parent->unlockGetSamplesAccess();
 	qDebug("getValuesA3 finished");
-	return output;
 }
-void VectorGraphDataArray::getLastValues(std::vector<float>* copyBufferOut)
+void VectorGraphDataArray::getLastSamples(std::vector<float>* sampleBufferOut)
 {
 	m_parent->lockBakedValuesAccess();
-	*copyBufferOut = m_bakedValues;
+	*sampleBufferOut = m_bakedValues;
 	m_parent->unlockBakedValuesAccess();
 }
 std::vector<int> VectorGraphDataArray::getEffectorArrayLocations()
@@ -3645,7 +3643,7 @@ void VectorGraphDataArray::getUpdatingOriginals()
 
 	// sorting the array
 	// this is done to optimize the functions that use
-	// m_needsUpdating in getValues()
+	// m_needsUpdating in getSamples()
 	std::sort(originalValues.begin(), originalValues.end(),
 		[](unsigned int a, unsigned int b)
 		{
@@ -3672,7 +3670,7 @@ void VectorGraphDataArray::getUpdatingOriginals()
 	}
 	*/
 }
-std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn, bool* isChangedOut, std::vector<unsigned int>* updatingValuesOut)
+void VectorGraphDataArray::getSamples(unsigned int countIn, bool* isChangedOut, std::vector<unsigned int>* updatingValuesOut, std::vector<float>* sampleBufferOut)
 {
 	bool effectorIsChanged = false;
 	//std::shared_ptr<std::vector<unsigned int>> effectorUpdatingValues = std::make_shared<std::vector<unsigned int>>();
@@ -3682,7 +3680,7 @@ std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn, bool* i
 	bool isEffected = m_effectorLocation >= 0;
 	if (isEffected == true)
 	{
-		effectorOutput = m_parent->getDataArray(m_effectorLocation)->getValues(countIn, &effectorIsChanged, &effectorUpdatingValues);
+		m_parent->getDataArray(m_effectorLocation)->getSamples(countIn, &effectorIsChanged, &effectorUpdatingValues, &effectorOutput);
 	}
 	qDebug("getValuesB1, size: %ld    - id: %d", outputXLocations.size(), m_id);
 
@@ -3789,7 +3787,7 @@ std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn, bool* i
 		// calculate final lines
 		for (unsigned int i = 0; i < m_needsUpdating.size(); i++)
 		{
-			getValuesUpdateLines(effector, &effectorOutput, &outputXLocations, i, stepSize);
+			getSamplesUpdateLines(effector, &effectorOutput, &outputXLocations, i, stepSize);
 		}
 
 		m_parent->lockBakedValuesAccess();
@@ -3812,10 +3810,15 @@ std::vector<float> VectorGraphDataArray::getValues(unsigned int countIn, bool* i
 		// clearing the updated values
 		m_needsUpdating.clear();
 	}
+	if (sampleBufferOut != nullptr)
+	{
+		m_parent->lockBakedValuesAccess();
+		*sampleBufferOut = m_bakedValues;
+		m_parent->unlockBakedValuesAccess();
+	}
 
 	m_isDataChanged = false;
 	qDebug("getValuesB9");
-	return m_bakedValues;
 }
 // unused function, might be useful later
 /*
@@ -3874,7 +3877,7 @@ qDebug("getValuesC5.3, [%d] set after to: %d", i, curLocation);
 	}
 }
 */
-void VectorGraphDataArray::getValuesUpdateLines(VectorGraphDataArray* effectorIn, std::vector<float>* effectorOutputIn,
+void VectorGraphDataArray::getSamplesUpdateLines(VectorGraphDataArray* effectorIn, std::vector<float>* effectorOutputIn,
 	std::vector<float>* outputXLocationsIn, unsigned int iIn, float stepSizeIn)
 {
 	qDebug("getValuesD6.1  m_needsUpdating[%d]: %d", iIn, m_needsUpdating[iIn]);

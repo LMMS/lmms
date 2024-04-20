@@ -77,7 +77,7 @@ public:
 		return castModel<VectorGraphModel>();
 	}
 
-	// draws estimated line, does not call getValues()
+	// draws estimated line, does not call getSamples()
 	// does not fill graphs with VectorGraphDataArray FillColor
 	void setIsSimplified(bool isSimplifiedIn);
 
@@ -91,10 +91,10 @@ public:
 	void setBackground(const QPixmap backgoundIn);
 	
 	// if this function is called
-	// paintEvent will not call getValues() (optimization)
-	// insted calls getLastValues
+	// paintEvent will not call getSamples() (optimization)
+	// insted calls getLastSamples
 	// resets after every paint event
-	void useGetLastValues();
+	void useGetLastSamples();
 signals:
 	// emited after paintEvent
 	void drawn();
@@ -107,14 +107,14 @@ protected:
 	void mouseDoubleClickEvent(QMouseEvent* me) override;
 protected slots:
 	void updateGraph();
-	void updateGraph(bool shouldUseGetLastValuesIn);
+	void updateGraph(bool shouldUseGetLastSamplesIn);
 	void updateDefaultColors();
 
 	void execConnectionDialog();
 	void removeAutomation();
 	void removeController();
 private:
-	void paintGraph(QPainter* pIn, unsigned int locationIn, std::vector<float>* sampleBufferIn, bool shouldUseGetLastValuesIn);
+	void paintGraph(QPainter* pIn, unsigned int locationIn, std::vector<float>* sampleBufferIn, bool shouldUseGetLastSamplesIn);
 	void paintEditing(QPainter* pIn);
 
 	void modelChanged() override;
@@ -126,7 +126,7 @@ private:
 	std::pair<float, float> mapDataCurvePosF(float xAIn, float yAIn, float xBIn, float yBIn, float curveIn);
 	std::pair<int, int>mapDataCurvePos(int xAIn, int yAIn, int xBIn, int yBIn, float curveIn);
 	// calculate screen space coords from graph coords
-	// isNonNegativeIn can only be true when graph line / getValues() is mapped
+	// isNonNegativeIn can only be true when graph line / getSamples() is mapped
 	std::pair<int, int> mapDataPos(float xIn, float yIn, bool isNonNegativeIn);
 	// map where each Control is displayed when m_isEdtitingActive is true
 	int mapControlInputX(float inputValueIn, unsigned int displayLengthIn);
@@ -187,8 +187,8 @@ private:
 	bool m_isDefaultColorsApplyed;
 	QPixmap m_background;
 	// for 1 draw, it will use the VectorGraphDataArray
-	// m_bakedValues without calling GetValues()
-	bool m_useGetLastValues;
+	// m_bakedValues without calling getSamples()
+	bool m_useGetLastSamples;
 
 	// if m_isLastSelectedArray == true then
 	// m_selectedArray can be used
@@ -283,14 +283,14 @@ public:
 	virtual void loadSettings(const QDomElement& element);
 	// read locations from saved data attributes unused but implemeted
 	//int readLoc(unsigned int startIn, QString dataIn);
-	void lockGetValuesAccess();
-	void unlockGetValuesAccess();
+	void lockGetSamplesAccess();
+	void unlockGetSamplesAccess();
 	void lockBakedValuesAccess();
 	void unlockBakedValuesAccess();
 signals:
 	// point changed inside VectorGraphDataArray m_dataArray or m_maxLength changed
 	void dataChanged();
-	void updateGraphView(bool shouldUseGetLastValuesIn);
+	void updateGraphView(bool shouldUseGetLastSamplesIn);
 	// signals when a dataArray gets to 0 element size
 	// locationIn is the location of the VectorGraphDataArray
 	// locationIn can be -1
@@ -299,7 +299,7 @@ signals:
 	void styleChanged();
 public slots:
 	void dataArrayChanged();
-	void updateGraphModel(bool shouldUseGetLastValuesIn);
+	void updateGraphModel(bool shouldUseGetLastSamplesIn);
 	void dataArrayClearedEvent(int idIn);
 	void dataArrayStyleChanged();
 private:
@@ -307,8 +307,8 @@ private:
 	unsigned int m_maxLength;
 
 	// block threads that want to access
-	// a dataArray's getValues() at the same time
-	std::mutex m_getValuesAccess;
+	// a dataArray's getSamples() at the same time
+	std::mutex m_getSamplesAccess;
 	std::mutex m_bakedValuesAccess;
 };
 
@@ -440,9 +440,9 @@ public:
 
 	// returns the latest updated graph values
 	// countIn is the retuned vector's size
-	std::vector<float> getValues(unsigned int countIn);
+	void getSamples(unsigned int countIn, std::vector<float>* sampleBufferOut);
 	// returns m_bakedValues without updating
-	void getLastValues(std::vector<float>* copyBufferOut);
+	void getLastSamples(std::vector<float>* sampleBufferOut);
 	std::vector<int> getEffectorArrayLocations();
 
 
@@ -649,12 +649,12 @@ private:
 	// every point is in there only once
 	void getUpdatingOriginals();
 
-	// real getValues processing
-	std::vector<float> getValues(unsigned int countIn, bool* isChangedOut, std::vector<unsigned int>* updatingValuesOut);
+	// real getSamples processing
+	void getSamples(unsigned int countIn, bool* isChangedOut, std::vector<unsigned int>* updatingValuesOut, std::vector<float>* sampleBufferOut);
 	// gets every m_needsUpdating point's line's start and end effector point's location in the effector dataArray
 	// .first = start, .second = line end location (effector dataArray)
-	//void getValuesLocations(VectorGraphDataArray* effectorIn, std::vector<std::pair<unsigned int, unsigned int>>* effectorDataOut);
-	void getValuesUpdateLines(VectorGraphDataArray* effectorIn, std::vector<float>* effectorOutputIn,
+	//void getSamplesLocations(VectorGraphDataArray* effectorIn, std::vector<std::pair<unsigned int, unsigned int>>* effectorDataOut);
+	void getSamplesUpdateLines(VectorGraphDataArray* effectorIn, std::vector<float>* effectorOutputIn,
 		std::vector<float>* outputXLocationsIn, unsigned int iIn, float stepSizeIn);
 	bool isEffectedPoint(unsigned int locationIn);
 
@@ -701,17 +701,17 @@ private:
 
 	// baking
 
-	// getValues() will return m_bakedValues if a line is unchanged
+	// getSamples() will return m_bakedValues if a line is unchanged
 	// else it will recalculate the line's values, update m_bakedValues
-	// getValues() needs to know where did lines change so it updates
+	// getSamples() needs to know where did lines change so it updates
 	// m_needsUpdating by running getUpdatingFromEffector()
-	// if m_isDataChanged is true, then getValues adds all the points
+	// if m_isDataChanged is true, then getSamples adds all the points
 	// to m_needsUpdating before running
-	// getValues() clears m_needsUpdating after it has run
+	// getSamples() clears m_needsUpdating after it has run
 	// every change is only applyed to the point's line (line started by the point)
 	// changes in position will cause multiple points to update
 
-	// if we want to update all (the full line in getValues())
+	// if we want to update all (the full line in getSamples())
 	bool m_isDataChanged;
 	// array containing output final float values for optimalization
 	std::vector<float> m_bakedValues;
