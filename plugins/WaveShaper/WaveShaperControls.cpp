@@ -50,10 +50,7 @@ WaveShaperControls::WaveShaperControls( WaveShaperEffect * _eff ) :
 	m_vectorGraphSampleBuffer(200)
 {
 	unsigned int arrayLocation = m_vectorGraphModel.addArray();
-	//m_vectorGraphModel.getDataArray(arrayLocation)->setIsFixedSize(true);
-	//m_vectorGraphModel.getDataArray(arrayLocation)->setIsFixedX(true);
-	//m_vectorGraphModel.getDataArray(arrayLocation)->setIsFixedY(true);
-	//m_vectorGraphModel.getDataArray(arrayLocation)->setIsFixedEndPoints(true);
+	// see other settings avalible for VectorGraphDataArray in VectorGraph.h
 	m_vectorGraphModel.getDataArray(arrayLocation)->setIsSelectable(true);
 	m_vectorGraphModel.getDataArray(arrayLocation)->setIsEditableAttrib(true);
 	m_vectorGraphModel.getDataArray(arrayLocation)->setIsAutomatableEffectable(true);
