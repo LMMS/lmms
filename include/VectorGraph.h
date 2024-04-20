@@ -187,7 +187,7 @@ private:
 	bool m_isDefaultColorsApplyed;
 	QPixmap m_background;
 	// for 1 draw, it will use the VectorGraphDataArray
-	// m_bakedValues without calling getSamples()
+	// m_bakedSamples without calling getSamples()
 	bool m_useGetLastSamples;
 
 	// if m_isLastSelectedArray == true then
@@ -285,8 +285,8 @@ public:
 	//int readLoc(unsigned int startIn, QString dataIn);
 	void lockGetSamplesAccess();
 	void unlockGetSamplesAccess();
-	void lockBakedValuesAccess();
-	void unlockBakedValuesAccess();
+	void lockBakedSamplesAccess();
+	void unlockBakedSamplesAccess();
 signals:
 	// point changed inside VectorGraphDataArray m_dataArray or m_maxLength changed
 	void dataChanged();
@@ -309,7 +309,7 @@ private:
 	// block threads that want to access
 	// a dataArray's getSamples() at the same time
 	std::mutex m_getSamplesAccess;
-	std::mutex m_bakedValuesAccess;
+	std::mutex m_bakedSamplesAccess;
 };
 
 class LMMS_EXPORT VectorGraphDataArray
@@ -441,7 +441,7 @@ public:
 	// returns the latest updated graph values
 	// countIn is the retuned vector's size
 	void getSamples(unsigned int countIn, std::vector<float>* sampleBufferOut);
-	// returns m_bakedValues without updating
+	// returns m_bakedSamples without updating
 	void getLastSamples(std::vector<float>* sampleBufferOut);
 	std::vector<int> getEffectorArrayLocations();
 
@@ -638,7 +638,7 @@ private:
 	// ONLY WORKS IN SORTED ARRAYS
 	void getUpdatingFromEffector(std::vector<unsigned int>* updatingValuesIn);
 	// if locationIn >= 0 -> adds the location to m_needsUpdating
-	// else it will update the whole m_dataArray and m_bakedValues
+	// else it will update the whole m_dataArray and m_bakedSamples
 	// changes in the size of m_dataArray (addtition, deletion, ect.)
 	// should to cause a full update
 	void getUpdatingFromPoint(int locationIn);
@@ -701,8 +701,8 @@ private:
 
 	// baking
 
-	// getSamples() will return m_bakedValues if a line is unchanged
-	// else it will recalculate the line's values, update m_bakedValues
+	// getSamples() will return m_bakedSamples if a line is unchanged
+	// else it will recalculate the line's values, update m_bakedSamples
 	// getSamples() needs to know where did lines change so it updates
 	// m_needsUpdating by running getUpdatingFromEffector()
 	// if m_isDataChanged is true, then getSamples adds all the points
@@ -714,9 +714,9 @@ private:
 	// if we want to update all (the full line in getSamples())
 	bool m_isDataChanged;
 	// array containing output final float values for optimalization
-	std::vector<float> m_bakedValues;
-	// used for updating m_bakedValues fast
-	std::vector<float> m_updatingBakedValues;
+	std::vector<float> m_bakedSamples;
+	// used for updating m_bakedSamples fast
+	std::vector<float> m_updatingBakedSamples;
 	// unsorted array of locations in m_dataArray
 	// that need to be updated
 	// sorted in getUpdatingOriginals() because some functions need this to be sorted
