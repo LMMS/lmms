@@ -1102,7 +1102,7 @@ void VectorGraphView::processControlWindowPressed(int mouseXIn, int mouseYIn, bo
 				}
 				// show context menu
 				CaptionMenu contextMenu(model()->displayName() + QString(" - ") + controlDisplayText);
-				addDefaultActions(&contextMenu, QString("(") + m_controlText[location] + QString(")"));
+				addDefaultActions(&contextMenu, m_controlText[location]);
 				contextMenu.exec(QCursor::pos());
 			}
 			else if (isDraggingIn == false && m_controlIsFloat[location] == false)
@@ -1415,7 +1415,10 @@ void VectorGraphView::addDefaultActions(QMenu* menu, QString controlDisplayTextI
 {
 	// context menu settings
 	menu->addAction(embed::getIconPixmap("reload"),
-		controlDisplayTextIn + tr(" remove automation") ,
+		tr("name: ") + controlDisplayTextIn,
+		this, SLOT(updateGraph()));
+	menu->addAction(embed::getIconPixmap("reload"),
+		tr("remove automation"),
 		this, SLOT(removeAutomation()));
 	menu->addSeparator();
 
