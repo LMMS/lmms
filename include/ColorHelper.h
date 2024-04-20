@@ -1,8 +1,6 @@
-/*
- * LfoGraph.h - Displays LFO graphs
+/* ColorHelper.h - Helper methods for color related algorithms, etc.
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * Copyright (c) 2024-     Michael Gregorius
+ * Copyright (c) 2024- Michael Gregorius
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -23,43 +21,34 @@
  *
  */
 
-#ifndef LMMS_GUI_LFO_GRAPH_H
-#define LMMS_GUI_LFO_GRAPH_H
+#ifndef LMMS_GUI_COLOR_HELPER_H
+#define LMMS_GUI_COLOR_HELPER_H
 
-#include <QWidget>
+#include <QColor>
 
-#include "ModelView.h"
-#include "embed.h"
-
-namespace lmms
+namespace lmms::gui
 {
 
-class EnvelopeAndLfoParameters;
-
-namespace gui
-{
-
-class LfoGraph : public QWidget, public ModelView
+class ColorHelper
 {
 public:
-	LfoGraph(QWidget* parent);
+	static QColor interpolateInRgb(const QColor& a, const QColor& b, float t)
+	{
+		qreal ar, ag, ab, aa;
+		a.getRgbF(&ar, &ag, &ab, &aa);
 
-protected:
-	void mousePressEvent(QMouseEvent* me) override;
-	void paintEvent(QPaintEvent* pe) override;
+		qreal br, bg, bb, ba;
+		b.getRgbF(&br, &bg, &bb, &ba);
 
-private:
-	void drawInfoText(const EnvelopeAndLfoParameters&);
-	void toggleAmountModel();
+		const float interH = lerp(ar, br, t);
+		const float interS = lerp(ag, bg, t);
+		const float interV = lerp(ab, bb, t);
+		const float interA = lerp(aa, ba, t);
 
-private:
-	QPixmap m_lfoGraph = embed::getIconPixmap("lfo_graph");
-
-	float m_randomGraph {0.};
+		return QColor::fromRgbF(interH, interS, interV, interA);
+	}
 };
 
-} // namespace gui
+} // namespace lmms::gui
 
-} // namespace lmms
-
-#endif // LMMS_GUI_LFO_GRAPH_H
+#endif // LMMS_GUI_COLOR_HELPER_H

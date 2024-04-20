@@ -327,6 +327,13 @@ static inline T absMin( T a, T b )
 	return std::abs(a) < std::abs(b) ? a : b;
 }
 
+//! Returns the linear interpolation of the two values
+template<class T, class F>
+constexpr T lerp(T a, T b, F t)
+{
+	return (1. - t) * a + t * b;
+}
+
 // @brief Calculate number of digits which LcdSpinBox would show for a given number
 // @note Once we upgrade to C++20, we could probably use std::formatted_size
 static inline int numDigitsAsInt(float f)

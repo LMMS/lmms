@@ -47,13 +47,6 @@ ELSEIF(LMMS_BUILD_WIN64 AND MSVC)
 
 	INSTALL_EXTERNAL_PROJECT(RemoteVstPlugin32)
 ELSEIF(LMMS_BUILD_LINUX)
-	# Use winegcc
-	INCLUDE(CheckWineGcc)
-	CheckWineGcc(32 "${WINEGCC}" WINEGCC_WORKING)
-	IF(NOT WINEGCC_WORKING)
-		MESSAGE(WARNING "winegcc fails to compile 32-bit binaries, please make sure you have 32-bit GCC libraries")
-		RETURN()
-	ENDIF()
 	ExternalProject_Add(RemoteVstPlugin32
 		"${EXTERNALPROJECT_ARGS}"
 		CMAKE_ARGS
@@ -63,7 +56,6 @@ ELSEIF(LMMS_BUILD_LINUX)
 	)
 
 	INSTALL(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/../32/RemoteVstPlugin32" "${CMAKE_CURRENT_BINARY_DIR}/../32/RemoteVstPlugin32.exe.so" DESTINATION "${PLUGIN_DIR}/32")
-
 ELSEIF(CMAKE_TOOLCHAIN_FILE_32)
 	ExternalProject_Add(RemoteVstPlugin32
 		"${EXTERNALPROJECT_ARGS}"

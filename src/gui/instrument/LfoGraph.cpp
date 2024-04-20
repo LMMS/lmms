@@ -30,6 +30,7 @@
 
 #include "EnvelopeAndLfoParameters.h"
 #include "Oscillator.h"
+#include "ColorHelper.h"
 
 #include "gui_templates.h"
 
@@ -45,12 +46,7 @@ LfoGraph::LfoGraph(QWidget* parent) :
 	QWidget(parent),
 	ModelView(nullptr, this)
 {
-	setFixedSize(m_lfoGraph.size());
-}
-
-void LfoGraph::modelChanged()
-{
-	m_params = castModel<EnvelopeAndLfoParameters>();
+	setMinimumSize(m_lfoGraph.size());
 }
 
 void LfoGraph::mousePressEvent(QMouseEvent* me)
@@ -78,81 +74,114 @@ void LfoGraph::paintEvent(QPaintEvent*)
 	const f_cnt_t attackFrames = params->getLfoAttackFrames();
 	const f_cnt_t oscillationFrames = params->getLfoOscillationFrames();
 	const bool x100 = params->getX100Model().value();
-	const int waveModel = params->getLfoWaveModel().value();
+	const int lfoWaveModel = params->getLfoWaveModel().value();
+	const auto * userWave = params->getLfoUserWave().get();
 
-	int LFO_GRAPH_W = m_lfoGraph.width() - 3;	// subtract border
-	int LFO_GRAPH_H = m_lfoGraph.height() - 6;	// subtract border
-	int graph_x_base = 2;
-	int graph_y_base = 3 + LFO_GRAPH_H / 2;
+	const int margin = 3;
+	const int lfoGraphWidth = width() - margin; // subtract margin
+	const int lfoGraphHeight = height() - 2 * margin; // subtract margin
+	int graphBaseX = 2;
+	int graphBaseY = margin + lfoGraphHeight / 2;
 
-	const float frames_for_graph =
+	const float framesForGraph =
 		SECS_PER_LFO_OSCILLATION * Engine::audioEngine()->baseSampleRate() / 10;
 
-	const float gray = 1.0 - fabsf(amount);
-	const auto red = static_cast<int>(96 * gray);
-	const auto green = static_cast<int>(255 - 159 * gray);
-	const auto blue = static_cast<int>(128 - 32 * gray);
-	const QColor penColor(red, green, blue);
-	p.setPen(QPen(penColor, 1.5));
+	float oscFrames = oscillationFrames * (x100 ? 100. : 1.);
 
-	float osc_frames = oscillationFrames;
+	QPolygonF polyLine;
+	polyLine << QPointF(graphBaseX - 1, graphBaseY);
 
-	if (x100) { osc_frames *= 100.0f; }
-
-	float old_y = 0;
-	for (int x = 0; x <= LFO_GRAPH_W; ++x)
+	// Collect the points for the poly line by sampling the LFO according to its shape
+	for (int x = 0; x <= lfoGraphWidth; ++x)
 	{
-		float val = 0.0;
-		float cur_sample = x * frames_for_graph / LFO_GRAPH_W;
-		if (static_cast<f_cnt_t>(cur_sample) > predelayFrames)
+		float value = 0.0;
+		float currentSample = x * framesForGraph / lfoGraphWidth;
+		const auto sampleAsFrameCount = static_cast<f_cnt_t>(currentSample);
+		if (sampleAsFrameCount > predelayFrames)
 		{
-			float phase = (cur_sample -= predelayFrames) / osc_frames;
-			switch (static_cast<EnvelopeAndLfoParameters::LfoShape>(waveModel))
+			currentSample -= predelayFrames;
+			const float phase = currentSample / oscFrames;
+
+			const auto lfoShape = static_cast<EnvelopeAndLfoParameters::LfoShape>(lfoWaveModel);
+			switch (lfoShape)
 			{
 				case EnvelopeAndLfoParameters::LfoShape::SineWave:
 				default:
-					val = Oscillator::sinSample(phase);
+					value = Oscillator::sinSample(phase);
 					break;
 				case EnvelopeAndLfoParameters::LfoShape::TriangleWave:
-					val = Oscillator::triangleSample(phase);
+					value = Oscillator::triangleSample(phase);
 					break;
 				case EnvelopeAndLfoParameters::LfoShape::SawWave:
-					val = Oscillator::sawSample(phase);
+					value = Oscillator::sawSample(phase);
 					break;
 				case EnvelopeAndLfoParameters::LfoShape::SquareWave:
-					val = Oscillator::squareSample(phase);
+					value = Oscillator::squareSample(phase);
 					break;
 				case EnvelopeAndLfoParameters::LfoShape::RandomWave:
 					if (x % (int)(900 * lfoSpeed + 1) == 0)
 					{
 						m_randomGraph = Oscillator::noiseSample(0.0);
 					}
-					val = m_randomGraph;
+					value = m_randomGraph;
 					break;
 				case EnvelopeAndLfoParameters::LfoShape::UserDefinedWave:
-					val = Oscillator::userWaveSample(m_params->getLfoUserWave().get(), phase);
+					value = Oscillator::userWaveSample(userWave, phase);
 					break;
 			}
 
-			if (static_cast<f_cnt_t>(cur_sample) <= attackFrames)
+			if (sampleAsFrameCount <= attackFrames)
 			{
-				val *= cur_sample / attackFrames;
+				value *= currentSample / attackFrames;
 			}
 		}
 
-		float cur_y = -LFO_GRAPH_H / 2.0f * val;
-		p.drawLine(QLineF(graph_x_base + x - 1, graph_y_base + old_y, graph_x_base + x, graph_y_base + cur_y));
-		old_y = cur_y;
+		const float currentY = -lfoGraphHeight / 2.0f * value;
+
+		polyLine << QPointF(graphBaseX + x, graphBaseY + currentY);
 	}
 
-	// Draw the info text
-	int ms_per_osc = static_cast<int>(SECS_PER_LFO_OSCILLATION * lfoSpeed * 1000.0);
+	// Compute the color of the lines based on the amount of the LFO
+	const float absAmount = std::abs(amount);
+	const QColor noAmountColor{96, 91, 96};
+	const QColor fullAmountColor{0, 255, 128};
+	const QColor lineColor{ColorHelper::interpolateInRgb(noAmountColor, fullAmountColor, absAmount)};
 
+	p.setPen(QPen(lineColor, 1.5));
+
+	p.drawPolyline(polyLine);
+
+	drawInfoText(*params);
+}
+
+void LfoGraph::drawInfoText(const EnvelopeAndLfoParameters& params)
+{
+	QPainter p(this);
+
+	const float lfoSpeed = params.getLfoSpeedModel().value();
+	const bool x100 = params.getX100Model().value();
+
+	const float hertz = 1. / (SECS_PER_LFO_OSCILLATION * lfoSpeed) * (x100 ? 100. : 1.);
+	const auto infoText = tr("%1 Hz").arg(hertz, 0, 'f', 3);
+
+	// First configure the font so that we get correct results for the font metrics used below
 	QFont f = p.font();
 	f.setPixelSize(height() * 0.2);
 	p.setFont(f);
+
+	// This is the position where the text and its rectangle will be rendered
+	const QPoint textPosition(4, height() - 6);
+
+	// Draw a slightly transparent black rectangle underneath the text to keep it legible
+	const QFontMetrics fontMetrics(f);
+	// This gives the bounding rectangle if the text was rendered at the origin ...
+	const auto boundingRect = fontMetrics.boundingRect(infoText);
+	// ... so we translate it to the actual position where the text will be rendered.
+	p.fillRect(boundingRect.translated(textPosition), QColor{0, 0, 0, 192});
+
+	// Now draw the actual info text
 	p.setPen(QColor(201, 201, 225));
-	p.drawText(4, m_lfoGraph.height() - 6, tr("%1 ms/LFO").arg(ms_per_osc));
+	p.drawText(textPosition, infoText);
 }
 
 void LfoGraph::toggleAmountModel()
