@@ -29,7 +29,6 @@
 #include <cmath>
 #include <QObject>
 #include "lmms_basics.h"
-#include "lmms_export.h"
 
 
 namespace lmms
@@ -38,7 +37,7 @@ namespace lmms
 
 /** \brief A basic LMMS ring buffer for single-thread use. For thread and realtime safe alternative see LocklessRingBuffer.
 */
-class LMMS_EXPORT RingBuffer : public QObject
+class RingBuffer : public QObject
 {
 	Q_OBJECT
 public:
