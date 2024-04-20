@@ -572,19 +572,41 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 	std::vector<int> effectArrays;
 	std::vector<float> sampleBuffer;
 
-	// getting arrays that effect other arrays
-	for (unsigned int i = 0; i < model()->getDataArraySize(); i++)
+	// updating the VectorGraphDataArray samples before draw
+	if (m_useGetLastSamples == false)
 	{
-		// getting the current array's effector array
-		int curArrayEffector = model()->getDataArray(i)->getEffectorArrayLocation();
+		// getting arrays that effect other arrays
+		for (unsigned int i = 0; i < model()->getDataArraySize(); i++)
+		{
+			// getting the current array's effector array
+			int curArrayEffector = model()->getDataArray(i)->getEffectorArrayLocation();
 
-		if (curArrayEffector != -1)
+			if (curArrayEffector != -1)
+			{
+				bool found = false;
+				// checking if it is already in the list
+				for (unsigned int k = 0; k < effectArrays.size(); k++)
+				{
+					if (curArrayEffector == effectArrays[k])
+					{
+						found = true;
+						break;
+					}
+				}
+				if (found == false)
+				{
+					effectArrays.push_back(curArrayEffector);
+				}
+			}
+		}
+
+		// updating arrays that do not effect other arrays first
+		for (unsigned int i = 0; i < model()->getDataArraySize(); i++)
 		{
 			bool found = false;
-			// checking if it is already in the list
-			for (unsigned int k = 0; k < effectArrays.size(); k++)
+			for (unsigned int j = 0; j < effectArrays.size(); j++)
 			{
-				if (curArrayEffector == effectArrays[k])
+				if (i == effectArrays[j])
 				{
 					found = true;
 					break;
@@ -592,35 +614,20 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 			}
 			if (found == false)
 			{
-				effectArrays.push_back(curArrayEffector);
+				// this updates the array and its effector arrays
+				// with width() sample count
+				model()->getDataArray(i)->getSamples(width(), nullptr);
 			}
 		}
 	}
 
-	// updating arrays that do not effect other arrays first
-	for (unsigned int i = 0; i < model()->getDataArraySize(); i++)
+	// draw the updated VectorGraphDataArray samples in order
+	// sometimes an other getSamples() call elsewhere can
+	// change the sample count between updating and drawing
+	// causing badly drawn output (if sample count is low)
+	for (int i = model()->getDataArraySize() - 1; i >= 0; i--)
 	{
-		bool found = false;
-		for (unsigned int j = 0; j < effectArrays.size(); j++)
-		{
-			if (i == effectArrays[j])
-			{
-				found = true;
-				break;
-			}
-		}
-		if (found == false)
-		{
-			paintGraph(&p, i, &sampleBuffer, false);
-		}
-	}
-
-	// updating arrays that effect other arrays
-	// without calling getSamples() for optimization
-	// (they were updated during the previous step)
-	for (unsigned int i = 0; i < effectArrays.size(); i++)
-	{
-		paintGraph(&p, i, &sampleBuffer, true);
+		paintGraph(&p, i, &sampleBuffer);
 	}
 
 	paintEditing(&p);
@@ -630,7 +637,7 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 	emit drawn();
 }
 
-void VectorGraphView::paintGraph(QPainter* pIn, unsigned int locationIn, std::vector<float>* sampleBufferIn, bool shouldUseGetLastSamplesIn)
+void VectorGraphView::paintGraph(QPainter* pIn, unsigned int locationIn, std::vector<float>* sampleBufferIn)
 {
 	VectorGraphDataArray* dataArray = model()->getDataArray(locationIn);
 	unsigned int length = dataArray->size();
@@ -649,15 +656,7 @@ void VectorGraphView::paintGraph(QPainter* pIn, unsigned int locationIn, std::ve
 			posA = startPos;
 			pt.moveTo(startPos.first + 1, m_graphHeight - startPos.second);
 
-			if (m_useGetLastSamples == true || shouldUseGetLastSamplesIn == true)
-			{
-				qDebug("paintEvent SamplestValues2 [%d]", locationIn);
-				dataArray->getLastSamples(sampleBufferIn);
-			}
-			else
-			{
-				dataArray->getSamples(width(), sampleBufferIn);
-			}
+			dataArray->getLastSamples(sampleBufferIn);
 
 			qDebug("paint sampleBufferIn size: %ld", sampleBufferIn->size());
 			for (unsigned int j = 0; j < sampleBufferIn->size(); j++)
