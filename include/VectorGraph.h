@@ -62,18 +62,18 @@ class LMMS_EXPORT VectorGraphView : public QWidget, public ModelView
 	Q_PROPERTY(int fontSize MEMBER m_fontSize)
 public:
 
-	VectorGraphView(QWidget * parentIn, int widthIn, int heightIn, unsigned int pointSizeIn,
-		unsigned int controlHeightIn, unsigned int controlDisplayCountIn, bool shouldApplyDefaultVectorGraphColorsIn);
+	VectorGraphView(QWidget * parent, int widthIn, int heightIn, unsigned int pointSize,
+		unsigned int controlHeight, unsigned int controlDisplayCount, bool shouldApplyDefaultVectorGraphColors);
 	~VectorGraphView();
 
-	void setLineColor(QColor colorIn, unsigned int dataArrayLocationIn);
-	void setActiveColor(QColor colorIn, unsigned int dataArrayLocationIn);
-	void setFillColor(QColor colorIn, unsigned int dataArrayLocationIn);
-	void setAutomatedColor(QColor colorIn, unsigned int dataArrayLocationIn);
+	void setLineColor(QColor color, unsigned int dataArrayLocation);
+	void setActiveColor(QColor color, unsigned int dataArrayLocation);
+	void setFillColor(QColor color, unsigned int dataArrayLocation);
+	void setAutomatedColor(QColor color, unsigned int dataArrayLocation);
 	void applyDefaultColors();
-	void setPointSize(unsigned int pointSizeIn);
-	void setControlHeight(unsigned int controlHeightIn);
-	void setControlDisplayCount(unsigned int controlDisplayCountIn);
+	void setPointSize(unsigned int pointSize);
+	void setControlHeight(unsigned int controlHeight);
+	void setControlDisplayCount(unsigned int controlDisplayCount);
 
 	inline VectorGraphModel* model()
 	{
@@ -82,16 +82,16 @@ public:
 
 	// draws estimated line, does not call getSamples()
 	// does not fill graphs with VectorGraphDataArray FillColor
-	void setIsSimplified(bool isSimplifiedIn);
+	void setIsSimplified(bool isSimplified);
 
 	// returns -1.0f at .first when nothing is selected
 	std::pair<float, float> getSelectedData();
 	// returns -1 it can not return an array location
 	int getLastSelectedArray();
 	// sets the position of the currently selected point
-	void setSelectedData(std::pair<float, float> dataIn);
+	void setSelectedData(std::pair<float, float> data);
 	// sets the background pixmap
-	void setBackground(const QPixmap backgoundIn);
+	void setBackground(const QPixmap backgound);
 	
 	// if this function is called
 	// paintEvent will not call getSamples() (optimization)
@@ -110,71 +110,71 @@ protected:
 	void mouseDoubleClickEvent(QMouseEvent* me) override;
 protected slots:
 	void updateGraph();
-	void updateGraph(bool shouldUseGetLastSamplesIn);
+	void updateGraph(bool shouldUseGetLastSamples);
 	void updateDefaultColors();
 
 	void execConnectionDialog();
 	void removeAutomation();
 	void removeController();
 private:
-	void paintGraph(QPainter* pIn, unsigned int locationIn, std::vector<float>* sampleBufferIn);
-	void paintEditing(QPainter* pIn);
+	void paintGraph(QPainter* p, unsigned int arrayLocation, std::vector<float>* sampleBuffer);
+	void paintEditing(QPainter* p);
 
 	void modelChanged() override;
 
 	// utility
 	// calculate graph coords from screen space coords
-	std::pair<float, float> mapMousePos(int xIn, int yIn);
+	std::pair<float, float> mapMousePos(int x, int y);
 	// calculate gui curve point's position
-	std::pair<float, float> mapDataCurvePosF(float xAIn, float yAIn, float xBIn, float yBIn, float curveIn);
-	std::pair<int, int>mapDataCurvePos(int xAIn, int yAIn, int xBIn, int yBIn, float curveIn);
+	std::pair<float, float> mapDataCurvePosF(float xA, float yA, float xB, float yB, float curve);
+	std::pair<int, int>mapDataCurvePos(int xA, int yA, int xB, int yB, float curve);
 	// calculate screen space coords from graph coords
-	// isNonNegativeIn can only be true when graph line / getSamples() is mapped
-	std::pair<int, int> mapDataPos(float xIn, float yIn, bool isNonNegativeIn);
+	// isNonNegative can only be true when graph line / getSamples() is mapped
+	std::pair<int, int> mapDataPos(float x, float y, bool isNonNegative);
 	// map where each Control is displayed when m_isEdtitingActive is true
-	int mapControlInputX(float inputValueIn, unsigned int displayLengthIn);
+	int mapControlInputX(float inputValue, unsigned int displayLength);
 
-	float getDistance(int xAIn, int yAIn, int xBIn, int yBIn);
-	float getDistanceF(float xAIn, float yAIn, float xBIn, float yBIn);
+	float getDistance(int xA, int yA, int xB, int yB);
+	float getDistanceF(float xA, float yA, float xB, float yB);
 
 	// adds point to the selected VectorGraphDataArray
-	bool addPoint(unsigned int locationIn, int mouseXIn, int mouseYIn);
+	bool addPoint(unsigned int arrayLocation, int mouseX, int mouseY);
 
 	// editing menu / controls
 	// returns true if the graph was clicked
-	bool isGraphPressed(int mouseXIn, int mouseYIn);
+	bool isGraphPressed(int mouseX, int mouseY);
 	// returns true if the control window was clicked while in editing mode
-	bool isControlWindowPressed(int mouseYIn);
-	void processControlWindowPressed(int mouseXIn, int mouseYIn, bool isDraggingIn, bool startMovingIn, int curXIn, int curYIn);
+	bool isControlWindowPressed(int mouseY);
+	void processControlWindowPressed(int mouseX, int mouseY, bool isDragging, bool startMoving, int curX, int curY);
 	// returns -1 if no control / input was clicked
-	// returns displayed absolute control / input location based on inputCountIn
-	int getPressedControlInput(int mouseXIn, int mouseYIn, unsigned int inputCountIn);
+	// returns displayed absolute control / input location based on inputCount
+	int getPressedControlInput(int mouseX, int mouseY, unsigned int controlCount);
 	// returns a float attrib value, valueOut = attrib value if it is a bool
-	float getInputAttribValue(unsigned int controlArrayLocationIn, bool* valueOut);
-	// sets the selected point's attrib to floatValueIn it it is float, else it sets the attrib to boolValueIn
-	void setInputAttribValue(unsigned int controlArrayLocationIn, float floatValueIn, bool boolValueIn);
+	float getInputAttribValue(unsigned int controlArrayLocation, bool* valueOut);
+	// sets the selected point's attrib to floatValue it it is float, else it sets the attrib to boolValue
+	void setInputAttribValue(unsigned int controlArrayLocation, float floatValue, bool boolValue);
 	// calculates the ideal text color
-	QColor getTextColorFromBaseColor(QColor baseColorIn);
+	QColor getTextColorFromBaseColor(QColor baseColor);
 	// calculates a replacement background fill color
-	QColor getFillColorFromBaseColor(QColor baseColorIn);
+	QColor getFillColorFromBaseColor(QColor baseColor);
 	// cuts the string to displayedLength(in px) size (estimated)
-	QString getTextFromDisplayLength(QString textIn, unsigned int displayLengthIn);
+	QString getTextFromDisplayLength(QString text, unsigned int displayLength);
 	// context menu actions
-	void addDefaultActions(QMenu* menu, QString controlDisplayTextIn);
+	void addDefaultActions(QMenu* menu, QString controlDisplayText);
 
 	// inputDialog
 	std::pair<float, float> showCoordInputDialog();
-	float showInputDialog(float curInputValueIn);
+	float showInputDialog(float curInputValue);
 
 	// selection
 	// searches VectorGraphDataArray-s to select
 	// near clicked location
-	void selectData(int mouseXIn, int mouseYIn);
+	void selectData(int mouseX, int mouseY);
 	// searches for point in a given VectorGraphDataArray
 	// returns found location, when a point
 	// was found in the given distance
 	// else it returns -1
-	int searchForData(int mouseXIn, int mouseYIn, float maxDistanceIn, VectorGraphDataArray* arrayIn, bool curvedIn);
+	int searchForData(int mouseX, int mouseY, float maxDistance, VectorGraphDataArray* dataArray, bool isCurved);
 
 	// if the mouse is not moved
 	bool m_mousePress;
@@ -236,35 +236,35 @@ class LMMS_EXPORT VectorGraphModel : public Model, public JournallingObject
 {
 Q_OBJECT
 public:
-	VectorGraphModel(unsigned int maxLengthIn, Model* parentIn, bool defaultConstructedIn);
+	VectorGraphModel(unsigned int arrayMaxLength, Model* parentIn, bool defaultConstructed);
 	~VectorGraphModel();
 
 	inline size_t getDataArraySize()
 	{
 		return m_dataArrays.size();
 	}
-	inline VectorGraphDataArray* getDataArray(unsigned int locationIn)
+	inline VectorGraphDataArray* getDataArray(unsigned int arrayLocation)
 	{
-		return &m_dataArrays[locationIn];
+		return &m_dataArrays[arrayLocation];
 	}
 	inline unsigned int getMaxLength()
 	{
 		return m_maxLength;
 	}
-	inline void setMaxLength(unsigned int maxLengthIn)
+	inline void setMaxLength(unsigned int arrayMaxLength)
 	{
-		if (m_maxLength != maxLengthIn)
+		if (m_maxLength != arrayMaxLength)
 		{
-			m_maxLength = maxLengthIn;
+			m_maxLength = arrayMaxLength;
 			emit dataChanged();
 			emit updateGraphView(false);
 		}
 	}
 	// returns added VectorGraphDataArray location
 	unsigned int addArray();
-	// deletes VectorGraphDataArray at locationIn
+	// deletes VectorGraphDataArray at arrayLocation
 	// preservs the order
-	void delArray(unsigned int locationIn);
+	void delArray(unsigned int arrayLocation);
 	inline void clearArray()
 	{
 		m_dataArrays.clear();
@@ -272,7 +272,7 @@ public:
 		emit updateGraphView(false);
 	}
 	// if the id is not found then it will return 0
-	int getDataArrayLocationFromId(int idIn);
+	int getDataArrayLocationFromId(int arrayId);
 	int getDataArrayNewId();
 
 	// save, load
@@ -285,7 +285,7 @@ public:
 	virtual void saveSettings(QDomDocument& doc, QDomElement& element);
 	virtual void loadSettings(const QDomElement& element);
 	// read locations from saved data attributes unused but implemeted
-	//int readLoc(unsigned int startIn, QString dataIn);
+	//int readLoc(unsigned int start, QString data);
 	void lockGetSamplesAccess();
 	void unlockGetSamplesAccess();
 	void lockBakedSamplesAccess();
@@ -293,17 +293,17 @@ public:
 signals:
 	// point changed inside VectorGraphDataArray m_dataArray or m_maxLength changed
 	void dataChanged();
-	void updateGraphView(bool shouldUseGetLastSamplesIn);
+	void updateGraphView(bool shouldUseGetLastSamples);
 	// signals when a dataArray gets to 0 element size
-	// locationIn is the location of the VectorGraphDataArray
-	// locationIn can be -1
-	void clearedEvent(int locationIn);
+	// arrayLocation is the location of the VectorGraphDataArray
+	// arrayLocation can be -1
+	void clearedEvent(int arrayLocation);
 	// style changed inside m_dataArray
 	void styleChanged();
 public slots:
 	void dataArrayChanged();
-	void updateGraphModel(bool shouldUseGetLastSamplesIn);
-	void dataArrayClearedEvent(int idIn);
+	void updateGraphModel(bool shouldUseGetLastSamples);
+	void dataArrayClearedEvent(int arrayId);
 	void dataArrayStyleChanged();
 private:
 	std::vector<VectorGraphDataArray> m_dataArrays;
@@ -322,31 +322,31 @@ public:
 	// avoid using this or run updateConnections() after initialization
 	VectorGraphDataArray();
 	VectorGraphDataArray(
-	bool isFixedSizeIn, bool isFixedXIn, bool isFixedYIn, bool isNonNegativeIn,
-	bool isFixedEndPointsIn, bool isSelectableIn, bool isEditableAttribIn, bool isAutomatableEffectableIn,
-	bool isSaveableIn, VectorGraphModel* parentIn, int idIn);
+	bool isFixedSize, bool isFixedX, bool isFixedY, bool isNonNegative,
+	bool isFixedEndPoints, bool isSelectable, bool isEditableAttrib, bool isAutomatableEffectable,
+	bool isSaveable, VectorGraphModel* parentIn, int arrayId);
 	~VectorGraphDataArray();
 
 	void updateConnections(VectorGraphModel* parentIn);
 
 	// see descriptions in privete
-	void setIsFixedSize(bool valueIn);
-	void setIsFixedX(bool valueIn);
-	void setIsFixedY(bool valueIn);
-	void setIsFixedEndPoints(bool valueIn);
-	void setIsSelectable(bool valueIn);
-	void setIsEditableAttrib(bool valueIn);
-	void setIsAutomatableEffectable(bool valueIn);
-	void setIsSaveable(bool valueIn);
-	void setIsNonNegative(bool valueIn);
-	void setLineColor(QColor colorIn);
-	void setActiveColor(QColor colorIn);
-	void setFillColor(QColor colorIn);
-	void setAutomatedColor(QColor colorIn);
+	void setIsFixedSize(bool bValue);
+	void setIsFixedX(bool bValue);
+	void setIsFixedY(bool bValue);
+	void setIsFixedEndPoints(bool bValue);
+	void setIsSelectable(bool bValue);
+	void setIsEditableAttrib(bool bValue);
+	void setIsAutomatableEffectable(bool bValue);
+	void setIsSaveable(bool bValue);
+	void setIsNonNegative(bool bValue);
+	void setLineColor(QColor color);
+	void setActiveColor(QColor color);
+	void setFillColor(QColor color);
+	void setAutomatedColor(QColor color);
 
 	// returns true if successful
-	// if callDataChangedIn then it will call dataChanged() --> paintEvent()
-	bool setEffectorArrayLocation(int locationIn, bool callDataChangedIn);
+	// if callDataChanged then it will call dataChanged() --> paintEvent()
+	bool setEffectorArrayLocation(int arrayLocation, bool callDataChanged);
 
 	bool getIsFixedSize();
 	bool getIsFixedX();
@@ -369,9 +369,9 @@ public:
 
 	// array: -------------------
 	// returns the location of added/found point, -1 if not found or can not be added
-	int add(float xIn);
-	// deletes the point in locationIn location if m_isFixedSize is disabled
-	void del(unsigned int locationIn);
+	int add(float newX);
+	// deletes the point in pointLocation location if m_isFixedSize is disabled
+	void del(unsigned int pointLocation);
 	// clears m_dataArray without any checks
 	inline void clear()
 	{
@@ -387,63 +387,63 @@ public:
 		return m_dataArray.size();
 	}
 	// clamps down the values to 0 - 1, -1 - 1
-	// sorts array, removes duplicated positions, calls dataChanged() if callDataChangedIn
-	// clampIn: should clamp, sortIn: should sort
-	void formatArray(std::vector<std::pair<float, float>>* dataArrayIn, bool clampIn, bool rescaleIn, bool sortIn, bool callDataChangedIn);
+	// sorts array, removes duplicated positions, calls dataChanged() if callDataChanged
+	// clamp: should clamp, sort: should sort
+	void formatArray(std::vector<std::pair<float, float>>* dataArrayOut, bool shouldClamp, bool shouldRescale, bool shouldSort, bool callDataChanged);
 
 
 	// get attribute: -------------------
-	inline float getX(unsigned int locationIn)
+	inline float getX(unsigned int pointLocation)
 	{
-		return m_dataArray[locationIn].m_x;
+		return m_dataArray[pointLocation].m_x;
 	}
-	inline float getY(unsigned int locationIn)
+	inline float getY(unsigned int pointLocation)
 	{
-		return m_dataArray[locationIn].m_y;
+		return m_dataArray[pointLocation].m_y;
 	}
-	inline float getC(unsigned int locationIn)
+	inline float getC(unsigned int pointLocation)
 	{
-		return m_dataArray[locationIn].m_c;
+		return m_dataArray[pointLocation].m_c;
 	}
-	inline float getValA(unsigned int locationIn)
+	inline float getValA(unsigned int pointLocation)
 	{
-		return m_dataArray[locationIn].m_valA;
+		return m_dataArray[pointLocation].m_valA;
 	}
-	inline float getValB(unsigned int locationIn)
+	inline float getValB(unsigned int pointLocation)
 	{
-		return m_dataArray[locationIn].m_valB;
+		return m_dataArray[pointLocation].m_valB;
 	}
-	inline unsigned int getType(unsigned int locationIn)
+	inline unsigned int getType(unsigned int pointLocation)
 	{
-		return m_dataArray[locationIn].m_type;
+		return m_dataArray[pointLocation].m_type;
 	}
 	// returns attribLocation: 0 = m_y, 1 = m_c, 2 = m_valA, 3 = m_valB (int VectorGraphPoint)
-	unsigned int getAutomatedAttribLocation(unsigned int locationIn);
-	unsigned int getEffectedAttribLocation(unsigned int locationIn);
+	unsigned int getAutomatedAttribLocation(unsigned int pointLocation);
+	unsigned int getEffectedAttribLocation(unsigned int pointLocation);
 	// returns true when m_effectOnlyPoints is true or
 	// when getEffectedAttribLocation > 0 (y is uneffected)
 	// -> when the current point CAN effect lines before it
-	bool getEffectOnlyPoints(unsigned int locationIn);
-	// returns if the effectNumberIn-th effect is active
-	bool getEffect(unsigned int locationIn, unsigned int effectNumberIn);
+	bool getEffectOnlyPoints(unsigned int pointLocation);
+	// returns if the effectId-th effect is active
+	bool getEffect(unsigned int pointLocation, unsigned int effectId);
 	// true when the automationModel's value changed since last check
-	bool getIsAutomationValueChanged(unsigned int locationIn);
+	bool getIsAutomationValueChanged(unsigned int pointLocation);
 	// can return nullptr
-	inline FloatModel* getAutomationModel(unsigned int locationIn);
+	inline FloatModel* getAutomationModel(unsigned int pointLocation);
 
 
 	// get: -------------------
 	// returns -1 when position is not found
-	int getLocation(float xIn);
+	int getLocation(float searchX);
 	// gets the nearest data location to the position,
-	// foundOut is true when the nearest position = posIn,
+	// foundOut is true when the nearest position = searchXIn,
 	// reurns -1 when search failed
-	int getNearestLocation(float xIn, bool* foundOut, bool* isBeforeOut);
+	int getNearestLocation(float searchXIn, bool* foundOut, bool* isBeforeOut);
 
 
 	// returns the latest updated graph values
-	// countIn is the retuned vector's size
-	void getSamples(unsigned int countIn, std::vector<float>* sampleBufferOut);
+	// targetSizeIn is the retuned vector's size
+	void getSamples(unsigned int targetSizeIn, std::vector<float>* sampleBufferOut);
 	// returns m_bakedSamples without updating
 	void getLastSamples(std::vector<float>* sampleBufferOut);
 	std::vector<int> getEffectorArrayLocations();
@@ -458,33 +458,34 @@ public:
 	// rescaleIn -> scale input positions
 	// sortIn -> sort input positions
 	// callDataChangedIn -> call dataChanged() after -> paintEvent()
-	void setDataArray(std::vector<std::pair<float, float>>* dataArrayIn, bool isCurvedIn, bool clearIn, bool clampIn, bool rescaleIn, bool sortIn, bool callDataChangedIn);
-	void setDataArray(std::vector<float>* dataArrayIn, bool isCurvedIn, bool clearIn, bool clampIn, bool rescaleIn, bool callDataChangedIn);
-	void setDataArray(float* dataArrayIn, unsigned int sizeIn, bool isCurvedIn, bool clearIn, bool clampIn, bool rescaleIn, bool callDataChangedIn);
+	void setDataArray(std::vector<std::pair<float, float>>* dataArrayIn, bool shouldCurve, bool shouldClear, bool shouldClamp, bool shouldRescale, bool shouldSort, bool callDataChanged);
+	void setDataArray(std::vector<float>* dataArrayIn, bool shouldCurve, bool shouldClear, bool shouldClamp, bool shouldRescale, bool callDataChanged);
+	void setDataArray(float* dataArrayIn, unsigned int sizeIn, bool shouldCurve, bool shouldClear, bool shouldClamp, bool shouldRescale, bool callDataChanged);
 
 
 	// set attribute: -------------------
 	// sets position when m_isFixedX is disabled, returns final location
-	unsigned int setX(unsigned int locationIn, float xIn);
+	unsigned int setX(unsigned int pointLocation, float newX);
 	// sets value when m_isFixedY is disabled
-	void setY(unsigned int locationIn, float yIn);
+	void setY(unsigned int pointLocation, float newY);
 	// sets value when m_isEditableAttrib is enabled
-	void setC(unsigned int locationIn, float cIn);
+	void setC(unsigned int pointLocation, float newC);
 	// sets value when m_isEditableAttrib is enabled
-	void setValA(unsigned int locationIn, float valueIn);
+	void setValA(unsigned int pointLocation, float fValue);
 	// sets value when m_isEditableAttrib is enabled
-	void setValB(unsigned int locationIn, float valueIn);
+	void setValB(unsigned int pointLocation, float fValue);
 	// sets value when m_isEditableAttrib is enabled
-	void setType(unsigned int locationIn, unsigned int typeIn);
-	// sets attribute settings when m_isEditableAttrib and m_isAutomatableEffectable is enabled
-	void setAutomatedAttrib(unsigned int locationIn, unsigned int attribLocationIn);
-	void setEffectedAttrib(unsigned int locationIn, unsigned int attribLocationIn);
-	void setEffectOnlyPoints(unsigned int locationIn, bool boolIn);
-	void setEffect(unsigned int locationIn, unsigned int effectNumberIn, bool boolIn);
-	// if isAutomatedIn is true then make a new FloatModel and connect it, else delete
+	void setType(unsigned int pointLocation, unsigned int newType);
+	// sets what attribute gets automated when m_isEditableAttrib and m_isAutomatableEffectable is enabled
+	void setAutomatedAttrib(unsigned int pointLocation, unsigned int attribLocation);
+	// sets what attribute gets effected when m_isEditableAttrib and m_isAutomatableEffectable is enabled
+	void setEffectedAttrib(unsigned int pointLocation, unsigned int attribLocation);
+	void setEffectOnlyPoints(unsigned int pointLocation, bool bValue);
+	void setEffect(unsigned int pointLocation, unsigned int effectId, bool bValue);
+	// if bValue is true then make a new FloatModel and connect it, else delete
 	// the currently used FloatModel
 	// runs if m_isAutomatableEffectable is enabled
-	void setAutomated(unsigned int locationIn, bool isAutomatedIn);
+	void setAutomated(unsigned int pointLocation, bool bValue);
 
 
 // signals: // not qt
@@ -500,7 +501,7 @@ protected:
 	// that are not used by points (there should be 0 cases like this)
 	void delUnusedAutomation();
 	QString getSavedDataArray();
-	void loadDataArray(QString dataIn, unsigned int sizeIn);
+	void loadDataArray(QString data, unsigned int arraySize);
 private:
 	class VectorGraphPoint
 	{
@@ -529,10 +530,10 @@ private:
 			m_bufferedAutomationValue = 0.0f;
 			m_automationModel = -1;
 		}
-		inline VectorGraphPoint(float xIn, float yIn)
+		inline VectorGraphPoint(float x, float y)
 		{
-			m_x = xIn;
-			m_y = yIn;
+			m_x = x;
+			m_y = y;
 			m_c = 0.0f;
 			m_valA = 0.0f;
 			m_valB = 0.0f;
@@ -601,50 +602,50 @@ private:
 		int m_automationModel;
 	};
 	// deletes the point's automation model
-	// if locationIn == point location
-	void delAutomationModel(unsigned int modelLocationIn, bool callDataChangedIn);
+	// if modelLocation == point location
+	void delAutomationModel(unsigned int modelLocation, bool callDataChanged);
 	// swapping values, "slide" moves the values (between) once left or right
 	// handle m_isFixedEndPoints when using this
-	void swap(unsigned int locationAIn, unsigned int locationBIn, bool slide);
+	void swap(unsigned int pointLocationA, unsigned int pointLocationB, bool slide);
 	// returns the curve value at a given x coord, does clamp
-	float processCurve(float valueBeforeIn, float valueAfterIn, float curveIn, float xIn);
+	float processCurve(float yBefore, float yAfter, float curve, float xIn);
 	// applys the effect on a given value, does clamp
-	float processEffect(unsigned int locationIn, float attribValueIn, unsigned int attribLocationIn, float effectValueIn);
+	float processEffect(unsigned int pointLocation, float attribValue, unsigned int attribLocation, float effectValue);
 	// returns a VectorGraphPoint with modified attributes, does clamp
-	float processAutomation(float attribValueIn, unsigned int locationIn, unsigned int attribLocationIn);
+	float processAutomation(unsigned int pointLocation, float attribValue, unsigned int attribLocation);
 
 	// line effects / types, m_type is used for this
-	// valA: amp, valB: freq, fadeInStartIn: from what xIn value should the line type fade out
-	//float processLineTypeSine(float xIn, float valAIn, float valBIn, float fadeInStartIn);
-	std::vector<float> processLineTypeArraySine(std::vector<float>* xIn, unsigned int startIn, unsigned int endIn,
-		float valAIn, float valBIn, float fadeInStartIn);
-	// curveIn: phase
-	//float processLineTypeSineB(float xIn, float valAIn, float valBIn, float curveIn, float fadeInStartIn);
-	std::vector<float> processLineTypeArraySineB(std::vector<float>* xIn, unsigned int startIn, unsigned int endIn,
-		float valAIn, float valBIn, float curveIn, float fadeInStartIn);
+	// valA: amp, valB: freq, fadeInStartLoc: from what xIn value should the line type fade out
+	//float processLineTypeSine(float xIn, float valA, float valB, float fadeInStartLoc);
+	std::vector<float> processLineTypeArraySine(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
+		float valA, float valB, float fadeInStartLoc);
+	// curve: phase
+	//float processLineTypeSineB(float xIn, float valA, float valB, float curve, float fadeInStartLoc);
+	std::vector<float> processLineTypeArraySineB(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
+		float valA, float valB, float curve, float fadeInStartLoc);
 	// valA: amp, valB: x coord, curve: width
-	//float processLineTypePeak(float xIn, float valAIn, float valBIn, float curveIn, float fadeInStartIn);
-	std::vector<float> processLineTypeArrayPeak(std::vector<float>* xIn, unsigned int startIn, unsigned int endIn,
-		float valAIn, float valBIn, float curveIn, float fadeInStartIn);
+	//float processLineTypePeak(float xIn, float valA, float valB, float curve, float fadeInStartLoc);
+	std::vector<float> processLineTypeArrayPeak(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
+		float valA, float valB, float curve, float fadeInStartLoc);
 	// y: calculate steps from, valA: y count, valB: curve
-	//float processLineTypeSteps(float xIn, float yIn, float valAIn, float valBIn, float fadeInStartIn);
-	std::vector<float> processLineTypeArraySteps(std::vector<float>* xIn, unsigned int startIn, unsigned int endIn,
-		std::vector<float>* yIn, float valAIn, float valBIn, float fadeInStartIn);
-	// valA: amp, valB: random number count, curveIn: seed
-	//float processLineTypeRandom(float xIn, float valAIn, float valBIn, float curveIn, float fadeInStartIn);
-	std::vector<float> processLineTypeArrayRandom(std::vector<float>* xIn, unsigned int startIn, unsigned int endIn,
-		float valAIn, float valBIn, float curveIn, float fadeInStartIn);
+	//float processLineTypeSteps(float xIn, float yIn, float valA, float valBIn, float fadeInStartLoc);
+	std::vector<float> processLineTypeArraySteps(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
+		std::vector<float>* yArray, float valA, float valB, float fadeInStartLoc);
+	// valA: amp, valB: random number count, curve: seed
+	//float processLineTypeRandom(float xIn, float valA, float valB, float curve, float fadeInStartLoc);
+	std::vector<float> processLineTypeArrayRandom(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
+		float valA, float valB, float curve, float fadeInStartLoc);
 
 	// updating
 	// adds the points that are
 	// effected by the effector's values changing
 	// ONLY WORKS IN SORTED ARRAYS
-	void getUpdatingFromEffector(std::vector<unsigned int>* updatingValuesIn);
-	// if locationIn >= 0 -> adds the location to m_needsUpdating
+	void getUpdatingFromEffector(std::vector<unsigned int>* updatingPointLocations);
+	// if pointLocation >= 0 -> adds the location to m_needsUpdating
 	// else it will update the whole m_dataArray and m_bakedSamples
 	// changes in the size of m_dataArray (addtition, deletion, ect.)
 	// should to cause a full update
-	void getUpdatingFromPoint(int locationIn);
+	void getUpdatingFromPoint(int pointLocation);
 	// adds the points that are changed because their
 	// automation is changed
 	void getUpdatingFromAutomation();
@@ -653,13 +654,13 @@ private:
 	void getUpdatingOriginals();
 
 	// real getSamples processing
-	void getSamples(unsigned int countIn, bool* isChangedOut, std::vector<unsigned int>* updatingValuesOut, std::vector<float>* sampleBufferOut);
+	void getSamples(unsigned int targetSizeIn, bool* isChangedOut, std::vector<unsigned int>* updatingValuesOut, std::vector<float>* sampleBufferOut);
 	// gets every m_needsUpdating point's line's start and end effector point's location in the effector dataArray
 	// .first = start, .second = line end location (effector dataArray)
-	//void getSamplesLocations(VectorGraphDataArray* effectorIn, std::vector<std::pair<unsigned int, unsigned int>>* effectorDataOut);
-	void getSamplesUpdateLines(VectorGraphDataArray* effectorIn, std::vector<float>* effectorOutputIn,
-		std::vector<float>* outputXLocationsIn, unsigned int iIn, float stepSizeIn);
-	bool isEffectedPoint(unsigned int locationIn);
+	//void getSamplesLocations(VectorGraphDataArray* effector, std::vector<std::pair<unsigned int, unsigned int>>* effectorDataOut);
+	void getSamplesUpdateLines(VectorGraphDataArray* effector, std::vector<float>* effectorSamples,
+		std::vector<float>* outputXLocations, unsigned int iIn, float stepSize);
+	bool isEffectedPoint(unsigned int pointLocation);
 
 	// checks m_isFixedEndPoints, does not call dataChanged()
 	void formatDataArrayEndPoints();
