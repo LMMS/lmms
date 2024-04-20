@@ -34,16 +34,22 @@ class ColorHelper
 public:
 	static QColor interpolateInRgb(const QColor& a, const QColor& b, float t)
 	{
-		qreal ar, ag, ab, aa;
+		#if (QT_VERSION > QT_VERSION_CHECK(6, 0, 0))
+		using colorType = float;
+		#else
+		using colorType = qreal;
+		#endif
+
+		colorType ar, ag, ab, aa;
 		a.getRgbF(&ar, &ag, &ab, &aa);
 
-		qreal br, bg, bb, ba;
+		colorType br, bg, bb, ba;
 		b.getRgbF(&br, &bg, &bb, &ba);
 
-		const float interH = lerp(ar, br, t);
-		const float interS = lerp(ag, bg, t);
-		const float interV = lerp(ab, bb, t);
-		const float interA = lerp(aa, ba, t);
+		const colorType interH = lerp(ar, br, t);
+		const colorType interS = lerp(ag, bg, t);
+		const colorType interV = lerp(ab, bb, t);
+		const colorType interA = lerp(aa, ba, t);
 
 		return QColor::fromRgbF(interH, interS, interV, interA);
 	}
