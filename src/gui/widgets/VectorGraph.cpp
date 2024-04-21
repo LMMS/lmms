@@ -3168,7 +3168,7 @@ float VectorGraphDataArray::processEffect(unsigned int pointLocation, float attr
 			// power
 			output = std::pow(output, effectValue);
 		}
-		else if (getEffect(pointLocation, 5) == true && output > 0.0f && effectValue != 0.0f)
+		else if (getEffect(pointLocation, 5) == true && output > 0.0f && effectValue > 0.0f)
 		{
 			// log
 			output = std::log(output) / std::log(effectValue);
