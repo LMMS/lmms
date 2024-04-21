@@ -89,9 +89,7 @@ public:
 
 	virtual void stopProcessing();
 
-	virtual void applyQualitySettings();
-
-
+	void applyQualitySettings();
 
 protected:
 	// subclasses can re-implement this for being used in conjunction with
@@ -128,8 +126,6 @@ protected:
 	{
 		return m_audioEngine;
 	}
-
-	bool hqAudio() const;
 
 	static void stopProcessingThread( QThread * thread );
 
