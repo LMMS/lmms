@@ -361,7 +361,7 @@ int main( int argc, char * * argv )
 			new QCoreApplication( argc, argv ) :
 					new gui::MainApplication(argc, argv);
 
-	AudioEngine::qualitySettings qs( AudioEngine::qualitySettings::Mode::HighQuality );
+	AudioEngine::qualitySettings qs(AudioEngine::qualitySettings::Mode::Draft);
 	OutputSettings os( 44100, OutputSettings::BitRateSettings(160, false), OutputSettings::BitDepth::Depth16Bit, OutputSettings::StereoMode::JointStereo );
 	ProjectRenderer::ExportFileFormat eff = ProjectRenderer::ExportFileFormat::Wave;
 

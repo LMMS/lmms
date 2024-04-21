@@ -322,19 +322,6 @@ QString SongEditor::getSnapSizeString() const
 	}
 }
 
-
-
-
-void SongEditor::setHighQuality( bool hq )
-{
-	Engine::audioEngine()->changeQuality( AudioEngine::qualitySettings(
-			hq ? AudioEngine::qualitySettings::Mode::HighQuality :
-				AudioEngine::qualitySettings::Mode::Draft ) );
-}
-
-
-
-
 void SongEditor::scrolled( int new_pos )
 {
 	update();
