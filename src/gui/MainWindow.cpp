@@ -324,10 +324,7 @@ void MainWindow::finalize()
 					SLOT(onExportProjectMidi()),
 					Qt::CTRL + Qt::Key_M );
 
-// Prevent dangling separator at end of menu per https://bugreports.qt.io/browse/QTBUG-40071
-#if !(defined(LMMS_BUILD_APPLE) && (QT_VERSION < 0x050600))
 	project_menu->addSeparator();
-#endif
 	project_menu->addAction( embed::getIconPixmap( "exit" ), tr( "&Quit" ),
 					qApp, SLOT(closeAllWindows()),
 					Qt::CTRL + Qt::Key_Q );
@@ -400,10 +397,7 @@ void MainWindow::finalize()
 							this, SLOT(help()));
 	}
 
-// Prevent dangling separator at end of menu per https://bugreports.qt.io/browse/QTBUG-40071
-#if !(defined(LMMS_BUILD_APPLE) && (QT_VERSION < 0x050600))
 	help_menu->addSeparator();
-#endif
 	help_menu->addAction( embed::getIconPixmap( "icon_small" ), tr( "About" ),
 				  this, SLOT(aboutLMMS()));
 
@@ -1108,8 +1102,7 @@ void MainWindow::updateViewMenu()
 	// Here we should put all look&feel -stuff from configmanager
 	// that is safe to change on the fly. There is probably some
 	// more elegant way to do this.
-	QAction *qa;
-	qa = new QAction(tr( "Volume as dBFS" ), this);
+	auto qa = new QAction(tr("Volume as dBFS"), this);
 	qa->setData("displaydbfs");
 	qa->setCheckable( true );
 	qa->setChecked( ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() );

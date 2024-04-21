@@ -218,7 +218,6 @@ jobs:
     name: msvc-${{ matrix.arch }}
     runs-on: windows-2019
     env:
-      qt-version: '5.15.2'
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
     steps:
@@ -246,22 +245,21 @@ jobs:
           path: ~\AppData\Local\ccache
       - name: Install tools
         run: choco install ccache
-      - name: Install 64-bit Qt
-        if: matrix.arch == 'x64'
+      - name: Install Qt
         uses: jurplel/install-qt-action@b3ea5275e37b734d027040e2c7fe7a10ea2ef946
         with:
-          version: ${{ env.qt-version }}
-          arch: win64_msvc2019_64
+          version: '5.15.2'
+          arch: |-
+            ${{
+              fromJSON('
+                {
+                  "x86": "win32_msvc2019",
+                  "x64": "win64_msvc2019_64"
+                }
+              ')[matrix.arch]
+            }}
           archives: qtbase qtsvg qttools
           cache: true
-      - name: Install 32-bit Qt
-        uses: jurplel/install-qt-action@b3ea5275e37b734d027040e2c7fe7a10ea2ef946
-        with:
-          version: ${{ env.qt-version }}
-          arch: win32_msvc2019
-          archives: qtbase qtsvg qttools
-          cache: true
-          set-env: ${{ matrix.arch == 'x86' }}
       - name: Set up build environment
         uses: ilammy/msvc-dev-cmd@cec98b9d092141f74527d0afa6feb2af698cfe89
         with:

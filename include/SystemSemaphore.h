@@ -1,9 +1,7 @@
 /*
- * CrossoverEQControlDialog.h - A native 4-band Crossover Equalizer 
- * good for simulating tonestacks or simple peakless (flat-band) equalization
+ * SystemSemaphore.h
  *
- * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
- * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2024 Dominic Clark
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -21,35 +19,43 @@
  * License along with this program (see COPYING); if not, write to the
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301 USA.
- *
  */
 
-#ifndef CROSSOVEREQ_CONTROL_DIALOG_H
-#define CROSSOVEREQ_CONTROL_DIALOG_H
+#ifndef LMMS_SYSTEM_SEMAPHORE_H
+#define LMMS_SYSTEM_SEMAPHORE_H
 
-#include "EffectControlDialog.h"
+#include <memory>
+#include <string>
 
-namespace lmms
+namespace lmms {
+
+namespace detail {
+
+class SystemSemaphoreImpl;
+
+} // namespace detail
+
+class SystemSemaphore
 {
-
-
-class CrossoverEQControls;
-
-
-namespace gui
-{
-
-class CrossoverEQControlDialog : public EffectControlDialog
-{
-	Q_OBJECT
 public:
-	CrossoverEQControlDialog( CrossoverEQControls * controls );
-	~CrossoverEQControlDialog() override = default;
+	SystemSemaphore() noexcept;
+	SystemSemaphore(std::string key, unsigned int value);
+	explicit SystemSemaphore(std::string key);
+	~SystemSemaphore();
+
+	SystemSemaphore(SystemSemaphore&& other) noexcept;
+	auto operator=(SystemSemaphore&& other) noexcept -> SystemSemaphore&;
+
+	auto acquire() noexcept -> bool;
+	auto release() noexcept -> bool;
+
+	auto key() const noexcept -> const std::string& { return m_key; }
+
+private:
+	std::string m_key;
+	std::unique_ptr<detail::SystemSemaphoreImpl> m_impl;
 };
-
-
-} // namespace gui
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_SYSTEM_SEMAPHORE_H
