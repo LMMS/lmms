@@ -49,7 +49,7 @@ void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const Q
 	const auto color = painter.pen().color();
 	const auto rmsColor = color.lighter(123);
 	
-	constexpr size_t maxFramesPerPixel = 16;
+	constexpr size_t maxFramesPerPixel = 24;
 	
 	const size_t frameStepSize = std::max<size_t>(framesPerPixel / maxFramesPerPixel, 1);
 	
