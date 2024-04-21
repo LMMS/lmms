@@ -168,11 +168,6 @@ public:
 		return Flag::IsSingleStreamed;
 	}
 
-	f_cnt_t desiredReleaseFrames() const override
-	{
-		return 0; //4048;
-	}
-
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 private:

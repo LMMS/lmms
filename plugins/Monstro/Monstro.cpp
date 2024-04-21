@@ -1326,12 +1326,11 @@ QString MonstroInstrument::nodeName() const
 	return monstro_plugin_descriptor.name;
 }
 
-
-f_cnt_t MonstroInstrument::desiredReleaseFrames() const
+float MonstroInstrument::desiredReleaseTimeMs() const
 {
-	return qMax( 64, qMax( m_env1_relF, m_env2_relF ) );
+	const auto maxEnvelope = std::max(m_env1_rel, m_env2_rel);
+	return std::max(1.5f, maxEnvelope);
 }
-
 
 gui::PluginView* MonstroInstrument::instantiateView( QWidget * _parent )
 {

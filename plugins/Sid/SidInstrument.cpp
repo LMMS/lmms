@@ -221,22 +221,16 @@ QString SidInstrument::nodeName() const
 }
 
 
-
-
-f_cnt_t SidInstrument::desiredReleaseFrames() const
+float SidInstrument::desiredReleaseTimeMs() const
 {
-	const float samplerate = Engine::audioEngine()->processingSampleRate();
 	int maxrel = 0;
 	for (const auto& voice : m_voice)
 	{
-		if( maxrel < voice->m_releaseModel.value() )
-			maxrel = (int)voice->m_releaseModel.value();
+		maxrel = std::max(maxrel, static_cast<int>(voice->m_releaseModel.value()));
 	}
 
-	return f_cnt_t( float(relTime[maxrel])*samplerate/1000.0 );
+	return computeReleaseTimeMsByFrameCount(relTime[maxrel]);
 }
-
-
 
 
 static int sid_fillbuffer(unsigned char* sidreg, reSID::SID *sid, int tdelta, short *ptr, int samples)

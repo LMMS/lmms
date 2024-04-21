@@ -195,7 +195,16 @@ void Instrument::applyRelease( sampleFrame * buf, const NotePlayHandle * _n )
 	}
 }
 
+float Instrument::computeReleaseTimeMsByFrameCount(f_cnt_t frames) const
+{
+	return frames / getSampleRate() * 1000.;
+}
 
+
+sample_rate_t Instrument::getSampleRate() const
+{
+	return Engine::audioEngine()->processingSampleRate();
+}
 
 
 QString Instrument::fullDisplayName() const
