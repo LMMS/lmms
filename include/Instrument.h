@@ -94,17 +94,17 @@ public:
 	virtual f_cnt_t beatLen( NotePlayHandle * _n ) const;
 
 
-	// Some instruments need a certain release time even
-	// if no envelope is active - such instruments can re-implement this
-	// method for returning the time in milliseconds they at least like
-	// to have for the  release stage.
+	// This method can be overridden by instruments that need a certain
+	// release time even if no envelope is active. It returns the time
+	// in milliseconds that these instruments would like to have for
+	// their release stage.
 	virtual float desiredReleaseTimeMs() const
 	{
 		return 0.f;
 	}
 
-	// Converts the desigred release time in milliseconds to the corresponding
-	// number of frames.
+	// Converts the desired release time in milliseconds to the corresponding
+	// number of frames depending on the sample rate.
 	f_cnt_t desiredReleaseFrames() const
 	{
 		const sample_rate_t sampleRate = getSampleRate();
