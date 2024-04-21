@@ -245,30 +245,16 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 
 void MidiClipView::mousePressEvent(QMouseEvent * _me)
 {
-	int const x = _me->x();
-	int const y = _me->y();
+	const auto optionalStep = getStep(_me->pos());
 
 	bool const displayPattern = fixedClips() || (pixelsPerBar() >= 96 && m_legacySEPattern);
 	bool const isBeatClip = m_clip->m_clipType == MidiClip::Type::BeatClip;
-	bool const mouseClickedWithinHeight = BeatStepButtonOffset < y && y < rect().height() - BeatStepButtonOffset;
 
-	if (_me->button() == Qt::LeftButton && isBeatClip && displayPattern && mouseClickedWithinHeight)
+	if (_me->button() == Qt::LeftButton && isBeatClip && displayPattern && optionalStep.has_value())
 	{
 		// Left mouse button pressed in pattern mode
 
-		// Get the step number that was clicked on. Do calculations in floats to prevent rounding errors.
-		float const tmp = ((float(x) - BORDER_WIDTH) * float(m_clip->m_steps)) / float(width() - BORDER_WIDTH * 2);
-
-		int const step(tmp);
-
-		//	debugging to ensure we get the correct step...
-		//		qDebug( "Step (%f) %d", tmp, step );
-
-		if (step >= m_clip->m_steps)
-		{
-			qDebug("Something went wrong in clip.cpp: step %d doesn't exist in clip!", step);
-			return;
-		}
+		const int step = optionalStep.value();
 
 		Note* n = m_clip->noteAtStep(step);
 
@@ -317,21 +303,13 @@ void MidiClipView::mouseDoubleClickEvent(QMouseEvent *_me)
 
 void MidiClipView::wheelEvent(QWheelEvent * we)
 {
+	const auto optionalStep = getStep(we->pos());
+
 	if(m_clip->m_clipType == MidiClip::Type::BeatClip &&
 				(fixedClips() || pixelsPerBar() >= 96) &&
-				position(we).y() > height() - m_stepBtnOff.height())
+				optionalStep.has_value())
 	{
-//	get the step number that was wheeled on and
-//	do calculations in floats to prevent rounding errors...
-		float tmp = ((float(position(we).x()) - BORDER_WIDTH) *
-				float(m_clip -> m_steps)) / float(width() - BORDER_WIDTH*2);
-
-		int step = int( tmp );
-
-		if( step >= m_clip->m_steps )
-		{
-			return;
-		}
+		const int step = optionalStep.value();
 
 		Note * n = m_clip->noteAtStep( step );
 		if(!n && we->angleDelta().y() > 0)
@@ -668,6 +646,25 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	}
 
 	painter.drawPixmap( 0, 0, m_paintPixmap );
+}
+
+std::optional<int> MidiClipView::getStep(const QPoint& point) const
+{
+	const auto x = point.x();
+	const auto y = point.y();
+
+	bool const mouseClickedWithinHeight = BeatStepButtonOffset < y && y < height() - BeatStepButtonOffset;
+
+	int const step = (x - BORDER_WIDTH) * m_clip->m_steps / (width() - BORDER_WIDTH * 2);
+
+	if (mouseClickedWithinHeight && step >= 0 && step < m_clip->m_steps)
+	{
+		return std::optional<int>(step);
+	}
+
+	qDebug("Something went wrong in clip.cpp: step %d doesn't exist in clip!", step);
+
+	return std::optional<int>();
 }
 
 

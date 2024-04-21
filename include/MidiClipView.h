@@ -85,6 +85,8 @@ protected:
 	void paintEvent( QPaintEvent * pe ) override;
 	void wheelEvent( QWheelEvent * _we ) override;
 
+private:
+	std::optional<int> getStep(const QPoint& point) const;
 
 private:
 	QPixmap m_stepBtnOn0 = embed::getIconPixmap("step_btn_on_0");
