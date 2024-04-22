@@ -441,11 +441,15 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 		// scale step graphics to fit the beat clip length
 		int const stepWidth = w / steps;
+		// Make sure that the pixmaps will be at least 24 pixels wide.
+		// There are artifacts if SVGs are rendered into very small pixmaps.
+		int const sourcePixmapWidth = std::max(stepWidth, 24);
 		int const stepHeight = std::max(24, rect().height() - 2 * BeatStepButtonOffset);
-		QPixmap const stepon0 = embed::getIconPixmap("step_btn_on_0", stepWidth, stepHeight);
-		QPixmap const stepon200 = embed::getIconPixmap("step_btn_on_200", stepWidth, stepHeight);
-		QPixmap const stepoff = embed::getIconPixmap("step_btn_off", stepWidth, stepHeight);
-		QPixmap const stepoffl = embed::getIconPixmap("step_btn_off_light", stepWidth, stepHeight);
+
+		QPixmap const stepon0 = embed::getIconPixmap("step_btn_on_0", sourcePixmapWidth, stepHeight);
+		QPixmap const stepon200 = embed::getIconPixmap("step_btn_on_200", sourcePixmapWidth, stepHeight);
+		QPixmap const stepoff = embed::getIconPixmap("step_btn_off", sourcePixmapWidth, stepHeight);
+		QPixmap const stepoffl = embed::getIconPixmap("step_btn_off_light", sourcePixmapWidth, stepHeight);
 
 		for (int it = 0; it < steps; it++)	// go through all the steps in the beat clip
 		{
@@ -455,22 +459,25 @@ void MidiClipView::paintEvent( QPaintEvent * )
 			const int x = BORDER_WIDTH + static_cast<int>(it * w / steps);
 			const int y = BeatStepButtonOffset;
 
+			QRect target(x, y, stepWidth, stepHeight);
+			QRect source(0, 0, sourcePixmapWidth, stepHeight);
+
 			if (n)
-			{
+			{	
 				const int vol = n->getVolume();
-				p.drawPixmap(x, y, stepoffl);
-				p.drawPixmap(x, y, stepon0);
+				p.drawPixmap(target, stepoffl, source);
+				p.drawPixmap(target, stepon0, source);
 				p.setOpacity(std::sqrt(vol / 200.0));
-				p.drawPixmap(x, y, stepon200);
+				p.drawPixmap(target, stepon200, source);
 				p.setOpacity(1);
 			}
 			else if ((it / 4) % 2)
 			{
-				p.drawPixmap(x, y, stepoffl);
+				p.drawPixmap(target, stepoffl, source);
 			}
 			else
 			{
-				p.drawPixmap(x, y, stepoff);
+				p.drawPixmap(target, stepoff, source);
 			}
 		} // end for loop
 
