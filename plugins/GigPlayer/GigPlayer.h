@@ -42,6 +42,7 @@
 #include <vector>
 #include <list>
 
+#include "lmms_gig.h"
 
 class QLabel;
 
