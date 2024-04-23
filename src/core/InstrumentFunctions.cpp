@@ -401,9 +401,9 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 
 		// for sort mode, we combine all of the chord's keys for every
 		// currently playing note in an arrray, sort it and play it
-		// sortOffset offsets range to account for
+		// offsetRange offsets range to account for
 		// the arp getting bigger if arpmode = sort
-		int sortOffset = 0;
+		int offsetRange = range;
 		// this array will contain the combined, sorted keys
 		std::vector<int> noteKeysArray(total_chord_size);
 		if (static_cast<ArpMode>(m_arpModeModel.value()) == ArpMode::Sort)
@@ -436,8 +436,8 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 			std::sort(noteKeysArray.begin(), noteKeysArray.end(), std::less{});
 
 			// we need to account for a bigger arp
-			// sortOffset will make range greater
-			sortOffset = total_range - range;
+			// offsetRange will make range greater
+			offsetRange = total_range;
 		}
 
 		// Skip notes randomly
@@ -469,27 +469,27 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		// process according to arpeggio-direction...
 		if (dir == ArpDirection::Up || dir == ArpDirection::Down)
 		{
-			cur_arp_idx = (cur_frame / arp_frames) % (range + sortOffset);
+			cur_arp_idx = (cur_frame / arp_frames) % offsetRange;
 		}
 		else if ((dir == ArpDirection::UpAndDown || dir == ArpDirection::DownAndUp) &&
-			(range + sortOffset) > 1)
+			offsetRange > 1)
 		{
 			// imagine, we had to play the arp once up and then
 			// once down -> makes 2 * range possible notes...
 			// because we don't play the lower and upper notes
 			// twice, we have to subtract 2
-			cur_arp_idx = (cur_frame / arp_frames) % ((range + sortOffset) * 2 - (2 * static_cast<int>(m_arpRepeatsModel.value())));
+			cur_arp_idx = (cur_frame / arp_frames) % (offsetRange * 2 - (2 * static_cast<int>(m_arpRepeatsModel.value())));
 			// if greater than range, we have to play down...
 			// looks like the code for arp_dir==DOWN... :)
-			if (cur_arp_idx >= (range + sortOffset))
+			if (cur_arp_idx >= offsetRange)
 			{
-				cur_arp_idx = (range + sortOffset) - cur_arp_idx % (range + sortOffset - 1) - static_cast<int>(m_arpRepeatsModel.value());
+				cur_arp_idx = offsetRange - cur_arp_idx % (offsetRange - 1) - static_cast<int>(m_arpRepeatsModel.value());
 			}
 		}
 		else if( dir == ArpDirection::Random )
 		{
 			// just pick a random chord-index
-			cur_arp_idx = (int)((range + sortOffset) * ((float) rand() / (float) RAND_MAX));
+			cur_arp_idx = static_cast<int>(offsetRange * static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
 		}
 
 		// Divide cur_arp_idx with wanted repeats. The repeat feature will not affect random notes.
@@ -499,13 +499,13 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		if( m_arpCycleModel.value() && dir != ArpDirection::Random )
 		{
 			cur_arp_idx *= m_arpCycleModel.value() + 1;
-			cur_arp_idx %= static_cast<int>((range + sortOffset) / m_arpRepeatsModel.value());
+			cur_arp_idx %= static_cast<int>(offsetRange / m_arpRepeatsModel.value());
 		}
 
 		// If ArpDirection::Down or ArpDirection::DownAndUp, invert the final range.
 		if (dir == ArpDirection::Down || dir == ArpDirection::DownAndUp)
 		{
-			cur_arp_idx = static_cast<int>((range + sortOffset) / m_arpRepeatsModel.value()) - cur_arp_idx - 1;
+			cur_arp_idx = static_cast<int>(offsetRange / m_arpRepeatsModel.value()) - cur_arp_idx - 1;
 		}
 
 		// now calculate final key for our arp-note
