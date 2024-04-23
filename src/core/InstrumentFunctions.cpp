@@ -433,10 +433,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 			}
 
 			// sorting:
-			std::sort(noteKeysArray.begin(), noteKeysArray.end(), [](int a, int b)
-			{
-				return a < b;
-			});
+			std::sort(noteKeysArray.begin(), noteKeysArray.end(), std::less{});
 
 			// we need to account for a bigger arp
 			// sortOffset will make range greater
