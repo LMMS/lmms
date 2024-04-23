@@ -637,4 +637,19 @@ BoolModel *Track::getMutedModel()
 	return &m_mutedModel;
 }
 
+void Track::setName(const QString& newName)
+{
+	if (m_name != newName)
+	{
+		m_name = newName;
+
+		if (auto song = Engine::getSong())
+		{
+			song->setModified();
+		}
+		
+		emit nameChanged();
+	}
+}
+
 } // namespace lmms

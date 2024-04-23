@@ -1,4 +1,4 @@
-IF(NOT LMMS_SUPPORT_VST)
+if(NOT LMMS_HAVE_VST)
 	RETURN()
 ENDIF()
 
@@ -47,11 +47,11 @@ foreach(var ${export_variables})
 endforeach()
 
 # build 32 bit version of RemoteVstPlugin
-IF(WANT_VST_32)
+if(LMMS_HAVE_VST_32)
 	INCLUDE("${CMAKE_CURRENT_LIST_DIR}/RemoteVstPlugin32.cmake")
 ENDIF()
 # build 64 bit version of RemoteVstPlugin
-IF(WANT_VST_64)
+if(LMMS_HAVE_VST_64)
 	INCLUDE("${CMAKE_CURRENT_LIST_DIR}/RemoteVstPlugin64.cmake")
 ENDIF()
 

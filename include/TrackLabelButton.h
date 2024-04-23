@@ -55,9 +55,11 @@ protected:
 	void mousePressEvent( QMouseEvent * _me ) override;
 	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
 	void mouseReleaseEvent( QMouseEvent * _me ) override;
-	void paintEvent( QPaintEvent * _pe ) override;
+	void paintEvent(QPaintEvent* pe) override;
 	void resizeEvent( QResizeEvent * _re ) override;
 
+private:
+	bool isInCompactMode() const;
 
 private:
 	TrackView * m_trackView;

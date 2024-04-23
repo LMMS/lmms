@@ -37,7 +37,6 @@
 #include "LcdSpinBox.h"
 #include "MainWindow.h"
 #include "MidiJack.h"
-#include "gui_templates.h"
 
 namespace lmms
 {
@@ -344,13 +343,12 @@ int AudioJack::processCallback(jack_nframes_t nframes)
 	while (done < nframes && !m_stopped)
 	{
 		jack_nframes_t todo = std::min<jack_nframes_t>(nframes - done, m_framesToDoInCurBuf - m_framesDoneInCurBuf);
-		const float gain = audioEngine()->masterGain();
 		for (int c = 0; c < channels(); ++c)
 		{
 			jack_default_audio_sample_t* o = m_tempOutBufs[c];
 			for (jack_nframes_t frame = 0; frame < todo; ++frame)
 			{
-				o[done + frame] = m_outBuf[m_framesDoneInCurBuf + frame][c] * gain;
+				o[done + frame] = m_outBuf[m_framesDoneInCurBuf + frame][c];
 			}
 		}
 		done += todo;

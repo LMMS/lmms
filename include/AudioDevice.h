@@ -96,11 +96,7 @@ public:
 protected:
 	// subclasses can re-implement this for being used in conjunction with
 	// processNextBuffer()
-	virtual void writeBuffer( const surroundSampleFrame * /* _buf*/,
-						const fpp_t /*_frames*/,
-						const float /*_master_gain*/ )
-	{
-	}
+	virtual void writeBuffer(const surroundSampleFrame* /* _buf*/, const fpp_t /*_frames*/) {}
 
 	// called by according driver for fetching new sound-data
 	fpp_t getNextBuffer( surroundSampleFrame * _ab );
@@ -109,7 +105,6 @@ protected:
 	// returns num of bytes in outbuf
 	int convertToS16( const surroundSampleFrame * _ab,
 						const fpp_t _frames,
-						const float _master_gain,
 						int_sample_t * _output_buffer,
 						const bool _convert_endian = false );
 

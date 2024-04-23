@@ -356,9 +356,7 @@ int main( int argc, char * * argv )
 	// don't let OS steal the menu bar. FIXME: only effective on Qt4
 	QCoreApplication::setAttribute( Qt::AA_DontUseNativeMenuBar );
 #endif
-#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
 	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-#endif
 	QCoreApplication * app = coreOnly ?
 			new QCoreApplication( argc, argv ) :
 					new gui::MainApplication(argc, argv);
@@ -906,19 +904,13 @@ int main( int argc, char * * argv )
 			mb.setWindowIcon( embed::getIconPixmap( "icon_small" ) );
 			mb.setWindowFlags( Qt::WindowCloseButtonHint );
 
-			QPushButton * recover;
-			QPushButton * discard;
-			QPushButton * exit;
-
 			// setting all buttons to the same roles allows us
 			// to have a custom layout
-			discard = mb.addButton( MainWindow::tr( "Discard" ),
-								QMessageBox::AcceptRole );
-			recover = mb.addButton( MainWindow::tr( "Recover" ),
-								QMessageBox::AcceptRole );
+			auto discard = mb.addButton(MainWindow::tr("Discard"), QMessageBox::AcceptRole);
+			auto recover = mb.addButton(MainWindow::tr("Recover"), QMessageBox::AcceptRole);
 
 			// have a hidden exit button
-			exit = mb.addButton( "", QMessageBox::RejectRole);
+			auto exit = mb.addButton("", QMessageBox::RejectRole);
 			exit->setVisible(false);
 
 			// set icons

@@ -35,7 +35,6 @@
 #include "LcdSpinBox.h"
 #include "AudioEngine.h"
 #include "Engine.h"
-#include "gui_templates.h"
 
 #include "ConfigManager.h"
 
@@ -167,8 +166,7 @@ void AudioSndio::run()
 			break;
 		}
 
-		uint bytes = convertToS16( temp, frames,
-		    audioEngine()->masterGain(), outbuf, m_convertEndian );
+		uint bytes = convertToS16(temp, frames, outbuf, m_convertEndian);
 		if( sio_write( m_hdl, outbuf, bytes ) != bytes )
 		{
 			break;
