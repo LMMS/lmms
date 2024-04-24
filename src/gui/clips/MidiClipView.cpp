@@ -245,7 +245,6 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 
 void MidiClipView::mousePressEvent( QMouseEvent * _me )
 {
-
 	const auto pos = position(_me);
 
 	bool displayPattern = fixedClips() || (pixelsPerBar() >= 96 && m_legacySEPattern);
