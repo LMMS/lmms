@@ -518,8 +518,9 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		else
 		{
 			// if we are sorting, we already have the base note key and the chord key
-			sub_note_key = noteKeysArray[cur_arp_idx % total_chord_size] + (cur_arp_idx / total_chord_size) *
-							KeysPerOctave;
+			// getting the mod and div of cur_arp_idx and total_chord_size
+			auto divResult = std::div(cur_arp_idx, total_chord_size);
+			sub_note_key = noteKeysArray[divResult.rem] + divResult.quot * KeysPerOctave;
 			// limiting the played key so it does not get out of NumKeys range
 			if (sub_note_key >= NumKeys)
 			{
