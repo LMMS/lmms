@@ -234,8 +234,9 @@ void SlicerT::findSlices()
 
 	for (float& sliceValue : m_slicePoints)
 	{
-		int closestZeroCrossing = *std::lower_bound(zeroCrossings.begin(), zeroCrossings.end(), sliceValue);
-		if (std::abs(sliceValue - closestZeroCrossing) < windowSize) { sliceValue = closestZeroCrossing; }
+		auto closestZeroCrossing = std::lower_bound(zeroCrossings.begin(), zeroCrossings.end(), sliceValue);
+		if (closestZeroCrossing == zeroCrossings.end()) { continue; }
+		if (std::abs(sliceValue - *closestZeroCrossing) < windowSize) { sliceValue = *closestZeroCrossing; }
 	}
 
 	float beatsPerMin = m_originalBPM.value() / 60.0f;
