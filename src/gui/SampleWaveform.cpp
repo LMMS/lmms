@@ -28,21 +28,21 @@ namespace lmms::gui {
 
 void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const QRect& rect)
 {
-	const int x = rect.x();
-	const int height = rect.height();
-	const int width = rect.width();
-	const int centerY = rect.center().y();
+	const auto x = rect.x();
+	const auto height = rect.height();
+	const auto width = rect.width();
+	const auto centerY = rect.center().y();
 
-	const int halfHeight = height / 2;
+	const auto halfHeight = height / 2;
 
 	const auto color = painter.pen().color();
 	const auto rmsColor = color.lighter(123);
 
-	const float framesPerPixel = std::max<float>(1.0f, static_cast<float>(parameters.size) / width);
+	const auto framesPerPixel = std::max<float>(1.0f, static_cast<float>(parameters.size) / width);
 
 	constexpr auto maxFramesPerPixel = 512.0f;
-	const float resolution = std::max<float>(1.0f, static_cast<float>(framesPerPixel / maxFramesPerPixel));
-	const float framesPerResolution = framesPerPixel / resolution;
+	const auto resolution = std::max<float>(1.0f, framesPerPixel / maxFramesPerPixel);
+	const auto  framesPerResolution = framesPerPixel / resolution;
 
 	const size_t numPixels = std::min<size_t>(parameters.size, width);
 	auto min = std::vector<float>(numPixels, 1);
@@ -55,7 +55,7 @@ void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const Q
 
 	for (int i = 0; i < maxFrames; i += resolution)
 	{
-		pixelIndex = static_cast<int>(i / framesPerPixel);
+		pixelIndex = i / framesPerPixel;
 		const int frameIndex = !parameters.reversed ? i : maxFrames - i;
 
 		const auto& frame = parameters.buffer[frameIndex];
