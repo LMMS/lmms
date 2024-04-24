@@ -26,6 +26,7 @@
 
 #include <QApplication>
 #include <QMenu>
+#include <QMessageBox>
 #include <QPainter>
 
 #include "GuiApplication.h"
@@ -183,16 +184,26 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 {
 	QString af = SampleLoader::openAudioFile();
 
-	if ( af.isEmpty() ) {} //Don't do anything if no file is loaded
-	else if (af == m_clip->m_sample.sampleFile())
-	{	//Instead of reloading the existing file, just reset the size
+	// Don't do anything if no file is loaded
+	if (af.isEmpty()) { return; }
+	
+	if (af == m_clip->m_sample.sampleFile())
+	{
+		// Don't reload the same file again. Just reset the size.
 		int length = static_cast<int>(m_clip->m_sample.sampleSize() / Engine::framesPerTick());
 		m_clip->changeLength(length);
 	}
 	else
-	{	//Otherwise load the new file as ususal
-		m_clip->setSampleFile( af );
-		Engine::getSong()->setModified();
+	{
+		// Load the new file and set it for the clip
+		auto sampleBuffer = SampleLoader::createBufferFromFile(af);
+		if (sampleBuffer != SampleBuffer::emptyBuffer())
+		{
+			m_clip->setSampleBuffer(sampleBuffer);
+
+			// TODO Why do we have to do this here? This should happen in the core...
+			Engine::getSong()->setModified();
+		}
 	}
 }
 
