@@ -69,9 +69,9 @@ public:
 		return Flag::IsNotBendable;
 	}
 
-	f_cnt_t desiredReleaseFrames() const override
+	float desiredReleaseTimeMs() const override
 	{
-		return( 512 );
+		return 12.f;
 	}
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;

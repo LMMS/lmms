@@ -34,6 +34,9 @@
 #include "Plugin.h"
 #include "TimePos.h"
 
+#include <cmath>
+
+
 namespace lmms
 {
 
@@ -91,14 +94,25 @@ public:
 	virtual f_cnt_t beatLen( NotePlayHandle * _n ) const;
 
 
-	// some instruments need a certain number of release-frames even
-	// if no envelope is active - such instruments can re-implement this
-	// method for returning how many frames they at least like to have for
-	// release
-	virtual f_cnt_t desiredReleaseFrames() const
+	// This method can be overridden by instruments that need a certain
+	// release time even if no envelope is active. It returns the time
+	// in milliseconds that these instruments would like to have for
+	// their release stage.
+	virtual float desiredReleaseTimeMs() const
 	{
-		return 0;
+		return 0.f;
 	}
+
+	// Converts the desired release time in milliseconds to the corresponding
+	// number of frames depending on the sample rate.
+	f_cnt_t desiredReleaseFrames() const
+	{
+		const sample_rate_t sampleRate = getSampleRate();
+
+		return static_cast<f_cnt_t>(std::ceil(desiredReleaseTimeMs() * sampleRate / 1000.f));
+	}
+
+	sample_rate_t getSampleRate() const;
 
 	virtual Flags flags() const
 	{
@@ -141,6 +155,8 @@ protected:
 	// notes - method does this only if really less or equal
 	// desiredReleaseFrames() frames are left
 	void applyRelease( sampleFrame * buf, const NotePlayHandle * _n );
+
+	float computeReleaseTimeMsByFrameCount(f_cnt_t frames) const;
 
 
 private:
