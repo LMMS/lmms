@@ -165,7 +165,7 @@ TARGET_COMPILE_DEFINITIONS(RemoteZynAddSubFx PRIVATE BUILD_REMOTE_PLUGIN_CLIENT)
 
 # Workaround for a build fail on MSVC with Qt 6
 IF(MSVC)
-	TARGET_COMPILE_OPTIONS(lmmsobjs PUBLIC "/Zc:__cplusplus" "/permissive-")
+	TARGET_COMPILE_OPTIONS(RemoteZynAddSubFx PUBLIC "/Zc:__cplusplus" "/permissive-")
 ENDIF()
 
 IF(LMMS_BUILD_WIN32)
