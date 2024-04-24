@@ -123,6 +123,11 @@ target_link_libraries(ZynAddSubFxCore INTERFACE
 	ZLIB::ZLIB
 )
 
+# Workaround for a build fail on MSVC with Qt 6
+IF(MSVC)
+	TARGET_COMPILE_OPTIONS(ZynAddSubFxCoreObjs PUBLIC "/Zc:__cplusplus" "/permissive-")
+ENDIF()
+
 LINK_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}/..")
 IF(LMMS_BUILD_LINUX)
 	LINK_LIBRARIES(-Wl,--enable-new-dtags)
