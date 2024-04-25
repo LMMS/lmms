@@ -17,8 +17,8 @@ if(LMMS_HAVE_GIG)
 	build_plugin(gigplayer
 		GigPlayer.cpp GigPlayer.h PatchesDialog.cpp PatchesDialog.h PatchesDialog.ui
 		MOCFILES GigPlayer.h PatchesDialog.h
-		UICFILES PatchesDialog.ui
 		EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.png"
 	)
+	set_target_properties(gigplayer PROPERTIES AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR})
 	target_link_libraries(gigplayer SampleRate::samplerate)
 endif(LMMS_HAVE_GIG)
