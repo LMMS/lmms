@@ -29,6 +29,7 @@
 
 #include "LcdSpinBox.h"
 #include "CaptionMenu.h"
+#include "DeprecationHelper.h"
 
 
 namespace lmms::gui
@@ -78,9 +79,11 @@ void LcdSpinBox::contextMenuEvent(QContextMenuEvent* event)
 
 void LcdSpinBox::mousePressEvent( QMouseEvent* event )
 {
+	const auto pos = position(event);
+
 	if( event->button() == Qt::LeftButton &&
 		! ( event->modifiers() & Qt::ControlModifier ) &&
-						event->y() < cellHeight() + 2  )
+						pos.y() < cellHeight() + 2  )
 	{
 		m_mouseMoving = true;
 		m_lastMousePos = event->globalPos();

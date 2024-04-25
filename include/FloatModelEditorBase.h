@@ -81,7 +81,12 @@ protected:
 	void paintEvent(QPaintEvent * me) override;
 	void wheelEvent(QWheelEvent * me) override;
 
+	// Todo : cleanup once we drop QT5 support
+	#if (QT_VERSION > QT_VERSION_CHECK(6, 0, 0))
+	void enterEvent(QEnterEvent *event) override;
+	#else
 	void enterEvent(QEvent *event) override;
+	#endif
 	void leaveEvent(QEvent *event) override;
 
 	virtual float getValue(const QPoint & p);
