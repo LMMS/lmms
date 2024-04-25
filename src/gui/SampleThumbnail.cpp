@@ -289,7 +289,7 @@ void SampleThumbnailListManager::visualize(
 	qDebug("Using thumbnail of size: %lu", thumbnail.size());
 	
 	const float thumbnailSize = static_cast<float>(thumbnail.size());
-	const long tS = thumbnail.size();
+	const long tS = thumbnail.size()-1;
 	//~ const float xThumbnail = (x - parameters.offset_start) * thumbnailSize / width;
 	
 	const long bound = std::min<long>(width, parameters.pixelsTillSampleEnd);
