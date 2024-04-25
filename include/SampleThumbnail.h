@@ -25,10 +25,9 @@
 #ifndef LMMS_SAMPLE_THUMBNAIL_H
 #define LMMS_SAMPLE_THUMBNAIL_H
 
-#define MIN_THUMBNAIL_SIZE  32
-#define MAX_THUMBNAIL_SIZE  32768
-
-#define THUMBNAIL_SIZE_DIVISOR 2
+constexpr unsigned long long MIN_THUMBNAIL_SIZE = 32;
+constexpr unsigned long long MAX_THUMBNAIL_SIZE = 32768;
+constexpr unsigned long long THUMBNAIL_SIZE_DIVISOR = 2;
 
 #include<vector>
 #include<memory>
@@ -73,18 +72,19 @@ struct SampleThumbnailBit {
 };
 
 using SampleThumbnail = std::vector<SampleThumbnailBit>;
-using SharedSampleThumbnail = std::shared_ptr< std::vector<SampleThumbnail> >;
+using SampleThumbnailList = std::vector<SampleThumbnail>;
+using SharedSampleThumbnailList = std::shared_ptr< SampleThumbnailList >;
 
-static std::map<const std::shared_ptr<const SampleBuffer> , SharedSampleThumbnail> SAMPLE_THUMBNAIL_MAP;
+static std::map<const std::shared_ptr<const SampleBuffer> , SharedSampleThumbnailList> SAMPLE_THUMBNAIL_MAP;
 
-class LMMS_EXPORT SampleThumbnailList {
+class LMMS_EXPORT SampleThumbnailListManager {
 private:
-	SharedSampleThumbnail list;
+	SharedSampleThumbnailList list;
 
 public:
-	SampleThumbnailList();
+	SampleThumbnailListManager();
 
-	SampleThumbnailList(const Sample& inputSample);
+	SampleThumbnailListManager(const Sample& inputSample);
 
 	void visualize(SampleThumbnailVisualizeParameters parameters, QPainter& painter, const QRect& rect);
 };

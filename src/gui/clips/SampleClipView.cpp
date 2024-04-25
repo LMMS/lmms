@@ -46,7 +46,7 @@ namespace lmms::gui
 SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 	ClipView( _clip, _tv ),
 	m_clip( _clip ),
-	thumbnaillist(  SampleThumbnailList() ),
+	thumbnaillist(  SampleThumbnailListManager() ),
 	m_paintPixmap()
 {
 	// update UI and tooltip
@@ -64,7 +64,7 @@ void SampleClipView::updateSample()
 {
 	update();
 	
-	thumbnaillist = SampleThumbnailList(m_clip->m_sample);
+	thumbnaillist = SampleThumbnailListManager(m_clip->m_sample);
 	
 	// set tooltip to filename so that user can see what sample this
 	// sample-clip contains

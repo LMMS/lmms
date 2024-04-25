@@ -91,12 +91,12 @@ SampleThumbnailBit SampleThumbnailBit::linear(const SampleThumbnailBit& other, f
 	return o;
 }
 
-SampleThumbnailList::SampleThumbnailList()
+SampleThumbnailListManager::SampleThumbnailListManager()
 {
-	this->list = std::make_shared< std::vector<SampleThumbnail> >( std::vector<SampleThumbnail>() );
+	this->list = std::make_shared< SampleThumbnailList >( SampleThumbnailList() );
 }
 
-SampleThumbnailList::SampleThumbnailList(const Sample& inputSample)
+SampleThumbnailListManager::SampleThumbnailListManager(const Sample& inputSample)
 {
 	const auto sampleBufferSize = inputSample.sampleSize();
 	const auto& buffer = inputSample.data();
@@ -116,10 +116,10 @@ SampleThumbnailList::SampleThumbnailList(const Sample& inputSample)
 	
 	qDebug("Generating new thumbnails...");
 	
-	this->list = std::make_shared<std::vector<SampleThumbnail>>( std::vector<SampleThumbnail>() );
+	this->list = std::make_shared<SampleThumbnailList>( SampleThumbnailList() );
 	
 	SAMPLE_THUMBNAIL_MAP.insert(
-		std::pair<const std::shared_ptr<const SampleBuffer>, SharedSampleThumbnail>
+		std::pair<const std::shared_ptr<const SampleBuffer>, SharedSampleThumbnailList>
 		(
 			samplePtr,
 			this->list
@@ -213,30 +213,29 @@ SampleThumbnailList::SampleThumbnailList(const Sample& inputSample)
 	}
 }
 
-void SampleThumbnailList::visualize(
+void SampleThumbnailListManager::visualize(
 	SampleThumbnailVisualizeParameters parameters, 
 	QPainter& painter, 
 	const QRect& rect
 ) {
-	const auto x = rect.x();
-	const auto height = rect.height();
-	const auto width = rect.width();
-	const auto centerY = rect.center().y();
+	const int x = rect.x();
+	const int height = rect.height();
+	const int width = rect.width();
+	const int centerY = rect.center().y();
 	
 	const auto color = painter.pen().color();
 	const auto rmsColor = color.lighter(123);
 	//qDebug("offset_end %d", parameters.offset_end);
 
-	const auto halfHeight = height / 2;
+	const int halfHeight = height / 2;
 	
-	const auto scalingFactor = 
+	const float scalingFactor = 
 		halfHeight * parameters.amplification 
 		// static_cast<float>(parameters.numChannels)
 	;
 	
-	int last = this->list->size()-1;
-	
-	int setIndex = 0;
+	size_t last = this->list->size()-1;
+	size_t setIndex = 0;
 	while (setIndex < last && (*this->list)[setIndex].size() > width)
 	{
 		setIndex++;
@@ -250,7 +249,8 @@ void SampleThumbnailList::visualize(
 	
 	const size_t bound = std::min<size_t>(width, parameters.offset_end);
 	
-	for (size_t pixelIndex = 0; pixelIndex < bound; pixelIndex++) {
+	for (size_t pixelIndex = 0; pixelIndex < bound; pixelIndex++) 
+	{
 		float thumbnailIndex = thumbnailSize * pixelIndex / width; 
 		float thumbnailIndexNext = 0.0;
 		
@@ -265,29 +265,29 @@ void SampleThumbnailList::visualize(
 		{	
 			thumbnailIndexNext = std::ceil(thumbnailIndex);	
 		}
-				
+		
 		float t = thumbnailIndexNext - thumbnailIndex;
 		
 		size_t tI = thumbnailIndex;
 		size_t tIN = thumbnailIndexNext;
 		
-		if (tIN >= thumbnail.size()) tIN = thumbnail.size()-1;
+		if (tIN >= tS) tIN = thumbnail.size()-1;
 		
 		const auto thumbnailBit = 
 			thumbnail[tI]
 			.linear(thumbnail[tIN], t)
 		;
 		
-		const auto lengthY1 = thumbnailBit.max * scalingFactor;
-		const auto lengthY2 = thumbnailBit.min * scalingFactor;
+		const int lengthY1 = thumbnailBit.max * scalingFactor;
+		const int lengthY2 = thumbnailBit.min * scalingFactor;
 		
-		const auto lineY1 = centerY - lengthY1;
-		const auto lineY2 = centerY - lengthY2;
-		const auto lineX = pixelIndex + x;
+		const int lineY1 = centerY - lengthY1;
+		const int lineY2 = centerY - lengthY2;
+		const int lineX = pixelIndex + x;
 		painter.drawLine(lineX, lineY1, lineX, lineY2);
 		
-		const auto rmsLineY1 = centerY - thumbnailBit.maxRMS * scalingFactor;
-		const auto rmsLineY2 = centerY - thumbnailBit.minRMS * scalingFactor;
+		const int rmsLineY1 = centerY - thumbnailBit.maxRMS * scalingFactor;
+		const int rmsLineY2 = centerY - thumbnailBit.minRMS * scalingFactor;
 
 		painter.setPen(rmsColor);
 		painter.drawLine(lineX, rmsLineY1, lineX, rmsLineY2);
