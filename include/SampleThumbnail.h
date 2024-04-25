@@ -44,15 +44,13 @@ namespace lmms {
 
 struct SampleThumbnailVisualizeParameters
 {
-	size_t numChannels;
 	float amplification;
 	bool reversed;
-	float offset_start;
-	float offset_end;
+	float pixelsTillSampleEnd;
 };
 
-struct SampleThumbnailBit {
-
+struct SampleThumbnailBit 
+{
 	float max;
 	float min;
 	float maxRMS;
@@ -74,10 +72,19 @@ struct SampleThumbnailBit {
 using SampleThumbnail = std::vector<SampleThumbnailBit>;
 using SampleThumbnailList = std::vector<SampleThumbnail>;
 using SharedSampleThumbnailList = std::shared_ptr< SampleThumbnailList >;
+using SampleBufferSharedPtrVec = std::vector< std::shared_ptr<const SampleBuffer> >;
 
-static std::map<const std::shared_ptr<const SampleBuffer> , SharedSampleThumbnailList> SAMPLE_THUMBNAIL_MAP;
+// SharedSampleThumbnailList and SampleBufferSharedPtrVec
+struct SSTLandSBSPV 
+{
+	SharedSampleThumbnailList sharedSampleList;
+	SampleBufferSharedPtrVec vectorPtr;
+};
 
-class LMMS_EXPORT SampleThumbnailListManager {
+static std::map<const QString, SSTLandSBSPV> SAMPLE_THUMBNAIL_MAP;
+
+class LMMS_EXPORT SampleThumbnailListManager 
+{
 private:
 	SharedSampleThumbnailList list;
 
@@ -86,15 +93,12 @@ public:
 
 	SampleThumbnailListManager(const Sample& inputSample);
 
+	bool selectFromGlobalThumbnailMap(const Sample& inputSample); 
+	
+	void cleanUpGlobalThumbnailMap();
+	
 	void visualize(SampleThumbnailVisualizeParameters parameters, QPainter& painter, const QRect& rect);
 };
-
-//~ struct SampleThumbnailSetPair {
-	//~ SampleBuffer* samplePtr;
-	//~ std::shared_ptr< std::vector<SampleThumbnail> > thumbnailSetPtr;
-//~ };
-
-
 	
 }
 

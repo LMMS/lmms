@@ -23,6 +23,7 @@
  */
 
 #include "SampleThumbnail.h"
+#include "PathUtil.h"
 
 namespace lmms {
 
@@ -96,60 +97,99 @@ SampleThumbnailListManager::SampleThumbnailListManager()
 	this->list = std::make_shared< SampleThumbnailList >( SampleThumbnailList() );
 }
 
-SampleThumbnailListManager::SampleThumbnailListManager(const Sample& inputSample)
+bool SampleThumbnailListManager::selectFromGlobalThumbnailMap(
+	const Sample& inputSample
+)
 {
-	const auto sampleBufferSize = inputSample.sampleSize();
-	const auto& buffer = inputSample.data();
-	
 	const auto samplePtr = inputSample.buffer();
+	const QString name = inputSample.sampleFile();
+	
 	const auto end = SAMPLE_THUMBNAIL_MAP.end();
-	
 	auto list = SAMPLE_THUMBNAIL_MAP.begin();
-	while (list != end && list->first.get() != samplePtr.get()) list++; 
 	
-	if (list != end) 
+	while (list != end && list->first != name) list++; 
+	
+	if (list == end)
 	{
-		this->list = list->second;
-		
-		return;
-	}
-	
-	qDebug("Generating new thumbnails...");
-	
-	this->list = std::make_shared<SampleThumbnailList>( SampleThumbnailList() );
-	
-	SAMPLE_THUMBNAIL_MAP.insert(
-		std::pair<const std::shared_ptr<const SampleBuffer>, SharedSampleThumbnailList>
-		(
-			samplePtr,
-			this->list
-		)
-	);
-	
-	// Clean up SAMPLE_THUMBNAIL_MAP
-	{
-		auto start = SAMPLE_THUMBNAIL_MAP.begin();
-		while (start != SAMPLE_THUMBNAIL_MAP.end()) 
-		{
-			if (start->first.use_count() == 1) 
-			{
-				qDebug("Deleting an unusued thumbnail...");
-				SAMPLE_THUMBNAIL_MAP.erase(start);
-				start = SAMPLE_THUMBNAIL_MAP.begin();
-				continue;
-			}
+		this->list = std::make_shared< SampleThumbnailList >( SampleThumbnailList() );
 			
-			start++;
+		qDebug("Generating thumbnails for file: %s", qUtf8Printable(name));
+		
+		SAMPLE_THUMBNAIL_MAP.insert(
+			std::pair<const QString, SSTLandSBSPV>
+			(
+				name,
+				SSTLandSBSPV {
+					this->list,
+					SampleBufferSharedPtrVec{ samplePtr }
+				}
+			)
+		);
+		
+		return false;
+	}
+	else
+	{
+		this->list = list->second.sharedSampleList;
+		
+		list->second.vectorPtr.push_back(samplePtr);
+		
+		return true;
+	}
+}
+
+void SampleThumbnailListManager::cleanUpGlobalThumbnailMap()
+{
+	auto map = SAMPLE_THUMBNAIL_MAP.begin();
+	while (map != SAMPLE_THUMBNAIL_MAP.end()) 
+	{
+		SampleBufferSharedPtrVec& vec = map->second.vectorPtr;
+		auto ptr = vec.end();
+		for (;;)
+		{
+			ptr = std::find_if(
+				vec.begin(),
+				vec.end(), 
+				[](const auto& a) -> bool { return a.use_count() == 1; } 
+			);
+			
+			if (ptr == vec.end()) { break; }
+			
+			qDebug("Erasing a shared_ptr");
+			
+			vec.erase(ptr); 
 		}
+		
+		if (vec.empty()) 
+		{
+			qDebug("Deleting an orphaned thumbnaillist...");
+			SAMPLE_THUMBNAIL_MAP.erase(map);
+			map = SAMPLE_THUMBNAIL_MAP.begin();
+			continue;
+		}
+		
+		map++;
 	}
 	
 	qDebug("Now holding %lu thumbnaillists", SAMPLE_THUMBNAIL_MAP.size());
+}
+
+SampleThumbnailListManager::SampleThumbnailListManager(const Sample& inputSample)
+{
+	if (selectFromGlobalThumbnailMap(inputSample)) { return; }
+	
+	cleanUpGlobalThumbnailMap();
+	
+	const auto sampleBufferSize = inputSample.sampleSize();
+	const auto& buffer = inputSample.data();
 	
 	const size_t maxResoThumbnailSize = 
-		std::min<size_t>(
-			sampleBufferSize,
+		std::max<size_t>(
+			std::min<size_t>(sampleBufferSize, 1),
 			MAX_THUMBNAIL_SIZE
 		);
+		
+	qDebug("Sample to be prepared is of size: %lu", sampleBufferSize);
 	
 	auto& thumbnaillist = *this->list;
 	
@@ -171,7 +211,7 @@ SampleThumbnailListManager::SampleThumbnailListManager(const Sample& inputSample
 				
 		auto& bit = maxResoThumbnail[sampleThumbnailIndex];
 		
-		rms = rms*0.5 + std::abs(bit.max + bit.min)*0.5;
+		rms = rms*0.8 + std::abs(bit.max + bit.min)*0.1;
 		
 		bit.maxRMS = std::clamp( rms, bit.min, bit.max);
 		bit.minRMS = std::clamp(-rms, bit.min, bit.max);
@@ -183,7 +223,7 @@ SampleThumbnailListManager::SampleThumbnailListManager(const Sample& inputSample
 	
 	for (
 		size_t thumbnailSize = maxResoThumbnailSize / THUMBNAIL_SIZE_DIVISOR; 
-		thumbnailSize >= MIN_THUMBNAIL_SIZE; 
+		thumbnailSize >= MIN_THUMBNAIL_SIZE;
 		thumbnailSize /= THUMBNAIL_SIZE_DIVISOR
 	)
 	{
@@ -193,7 +233,7 @@ SampleThumbnailListManager::SampleThumbnailListManager(const Sample& inputSample
 		
 		SampleThumbnail thumbnail = std::vector(thumbnailSize, lmms::SampleThumbnailBit());
 		
-		qDebug("Size %lu", thumbnailSize);
+		qDebug("Size %lu", thumbnail.size());
 		
 		for (const auto& biggerBit: biggerThumbnail) 
 		{
@@ -219,6 +259,9 @@ void SampleThumbnailListManager::visualize(
 	const QRect& rect
 ) {
 	const int x = rect.x();
+	// Prevent unnecessary out of bounds drawing.
+	const int absXOr0 = (x < 0) ? ( -x ) : ( 0 );
+	
 	const int height = rect.height();
 	const int width = rect.width();
 	const int centerY = rect.center().y();
@@ -234,8 +277,8 @@ void SampleThumbnailListManager::visualize(
 		// static_cast<float>(parameters.numChannels)
 	;
 	
-	size_t last = this->list->size()-1;
-	size_t setIndex = 0;
+	long last = this->list->size()-1;
+	long setIndex = 0;
 	while (setIndex < last && (*this->list)[setIndex].size() > width)
 	{
 		setIndex++;
@@ -243,40 +286,26 @@ void SampleThumbnailListManager::visualize(
 	
 	const auto& thumbnail = (*this->list)[setIndex];
 	
+	qDebug("Using thumbnail of size: %lu", thumbnail.size());
+	
 	const float thumbnailSize = static_cast<float>(thumbnail.size());
-	const size_t tS = thumbnail.size();
-	// const float xThumbnail = (x - parameters.offset_start) * thumbnailSize / width;
+	const long tS = thumbnail.size();
+	//~ const float xThumbnail = (x - parameters.offset_start) * thumbnailSize / width;
 	
-	const size_t bound = std::min<size_t>(width, parameters.offset_end);
+	const long bound = std::min<long>(width, parameters.pixelsTillSampleEnd);
 	
-	for (size_t pixelIndex = 0; pixelIndex < bound; pixelIndex++) 
+	const float ratio = thumbnailSize / static_cast<float>(width);
+	
+	long tI = 0;
+	// Don't draw out of bounds.
+	long pixelIndex = absXOr0;
+	do 
 	{
-		float thumbnailIndex = thumbnailSize * pixelIndex / width; 
-		float thumbnailIndexNext = 0.0;
+		tI = static_cast<long>(pixelIndex * ratio);
 		
-		if (thumbnailIndex >= thumbnailSize || thumbnailIndex < 0) continue;
-		
-		if (parameters.reversed)
-		{
-			thumbnailIndexNext = thumbnailSize - thumbnailIndex;
-			thumbnailIndex = std::floor(thumbnailIndexNext);
-		} 
-		else
-		{	
-			thumbnailIndexNext = std::ceil(thumbnailIndex);	
-		}
-		
-		float t = thumbnailIndexNext - thumbnailIndex;
-		
-		size_t tI = thumbnailIndex;
-		size_t tIN = thumbnailIndexNext;
-		
-		if (tIN >= tS) tIN = thumbnail.size()-1;
-		
-		const auto thumbnailBit = 
-			thumbnail[tI]
-			.linear(thumbnail[tIN], t)
-		;
+		const auto thumbnailBit = thumbnail[
+			(parameters.reversed) ? ( tS - tI ) : ( tI )
+		];
 		
 		const int lengthY1 = thumbnailBit.max * scalingFactor;
 		const int lengthY2 = thumbnailBit.min * scalingFactor;
@@ -292,7 +321,11 @@ void SampleThumbnailListManager::visualize(
 		painter.setPen(rmsColor);
 		painter.drawLine(lineX, rmsLineY1, lineX, rmsLineY2);
 		painter.setPen(color);
-	}
+		
+		pixelIndex++;
+	
+	} while (pixelIndex <= bound && tI < tS);
+	
 }
 
 }
