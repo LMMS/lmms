@@ -60,7 +60,7 @@ InstrumentTuningView::InstrumentTuningView(InstrumentTrack *it, QWidget *parent)
 
 	auto tlabel = new QLabel(tr("Enables the use of global transposition"));
 	tlabel->setWordWrap(true);
-	tlabel->setFont(pointSize(tlabel->font(), 8));
+	tlabel->setFont(adjustedToPixelSize(tlabel->font(), 10));
 	masterPitchLayout->addWidget(tlabel);
 
 	// Microtuner settings

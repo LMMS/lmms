@@ -1,9 +1,6 @@
-/*
- * CrossoverEQControlDialog.h - A native 4-band Crossover Equalizer 
- * good for simulating tonestacks or simple peakless (flat-band) equalization
+/* ColorHelper.h - Helper methods for color related algorithms, etc.
  *
- * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
- * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2024- Michael Gregorius
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -24,32 +21,34 @@
  *
  */
 
-#ifndef CROSSOVEREQ_CONTROL_DIALOG_H
-#define CROSSOVEREQ_CONTROL_DIALOG_H
+#ifndef LMMS_GUI_COLOR_HELPER_H
+#define LMMS_GUI_COLOR_HELPER_H
 
-#include "EffectControlDialog.h"
+#include <QColor>
 
-namespace lmms
+namespace lmms::gui
 {
 
-
-class CrossoverEQControls;
-
-
-namespace gui
+class ColorHelper
 {
-
-class CrossoverEQControlDialog : public EffectControlDialog
-{
-	Q_OBJECT
 public:
-	CrossoverEQControlDialog( CrossoverEQControls * controls );
-	~CrossoverEQControlDialog() override = default;
+	static QColor interpolateInRgb(const QColor& a, const QColor& b, float t)
+	{
+		qreal ar, ag, ab, aa;
+		a.getRgbF(&ar, &ag, &ab, &aa);
+
+		qreal br, bg, bb, ba;
+		b.getRgbF(&br, &bg, &bb, &ba);
+
+		const float interH = lerp(ar, br, t);
+		const float interS = lerp(ag, bg, t);
+		const float interV = lerp(ab, bb, t);
+		const float interA = lerp(aa, ba, t);
+
+		return QColor::fromRgbF(interH, interS, interV, interA);
+	}
 };
 
+} // namespace lmms::gui
 
-} // namespace gui
-
-} // namespace lmms
-
-#endif
+#endif // LMMS_GUI_COLOR_HELPER_H

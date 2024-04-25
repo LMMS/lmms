@@ -44,7 +44,6 @@
 #include "GroupBox.h"
 #include "MixerChannelLcdSpinBox.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
 #include "Instrument.h"
 #include "InstrumentFunctions.h"
 #include "InstrumentFunctionViews.h"
@@ -93,12 +92,8 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	vlayout->setContentsMargins(0, 0, 0, 0);
 	vlayout->setSpacing( 0 );
 
-	auto generalSettingsWidget = new TabWidget(tr("GENERAL SETTINGS"), this);
-
+	auto generalSettingsWidget = new QWidget(this);
 	auto generalSettingsLayout = new QVBoxLayout(generalSettingsWidget);
-
-	generalSettingsLayout->setContentsMargins( 8, 18, 8, 8 );
-	generalSettingsLayout->setSpacing( 6 );
 
 	auto nameAndChangeTrackWidget = new QWidget(generalSettingsWidget);
 	auto nameAndChangeTrackLayout = new QHBoxLayout(nameAndChangeTrackWidget);
@@ -107,7 +102,6 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 	// setup line edit for changing instrument track name
 	m_nameLineEdit = new QLineEdit;
-	m_nameLineEdit->setFont(pointSize(m_nameLineEdit->font(), 9));
 	connect( m_nameLineEdit, SIGNAL( textChanged( const QString& ) ),
 				this, SLOT( textChanged( const QString& ) ) );
 

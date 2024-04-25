@@ -157,7 +157,7 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase) :
 		m_toggleUIButton->setCheckable(true);
 		m_toggleUIButton->setChecked(false);
 		m_toggleUIButton->setIcon(embed::getIconPixmap("zoom"));
-		m_toggleUIButton->setFont(pointSize(m_toggleUIButton->font(), 8));
+		m_toggleUIButton->setFont(adjustedToPixelSize(m_toggleUIButton->font(), 8));
 		btnBox->addWidget(m_toggleUIButton, 0);
 	}
 	btnBox->addStretch(1);
