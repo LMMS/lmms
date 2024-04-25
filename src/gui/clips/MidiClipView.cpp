@@ -245,16 +245,18 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 
 void MidiClipView::mousePressEvent( QMouseEvent * _me )
 {
+	const auto pos = position(_me);
+
 	bool displayPattern = fixedClips() || (pixelsPerBar() >= 96 && m_legacySEPattern);
 	if (_me->button() == Qt::LeftButton && m_clip->m_clipType == MidiClip::Type::BeatClip && displayPattern
-		&& _me->y() > BeatStepButtonOffset && _me->y() < BeatStepButtonOffset + m_stepBtnOff.height())
+		&& pos.y() > BeatStepButtonOffset && pos.y() < BeatStepButtonOffset + m_stepBtnOff.height())
 
 	// when mouse button is pressed in pattern mode
 
 	{
 //	get the step number that was clicked on and
 //	do calculations in floats to prevent rounding errors...
-		float tmp = ( ( float(_me->x()) - BORDER_WIDTH ) *
+		float tmp = ( ( float(pos.x()) - BORDER_WIDTH ) *
 				float( m_clip -> m_steps ) ) / float(width() - BORDER_WIDTH*2);
 
 		int step = int( tmp );
