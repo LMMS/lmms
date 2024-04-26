@@ -140,9 +140,23 @@ bool SampleThumbnailListManager::selectFromGlobalThumbnailMap(
 
 void SampleThumbnailListManager::cleanUpGlobalThumbnailMap()
 {
+	// This code looks complicated because of the way LMMS behaves.
+	// When you open a project in LMMS, the clips that contain the same
+	// audio file end up getting their own samples (and therefore 
+	// sampleBuffers). Thus, we need to track 2 things:
+	//
+	// 1. The name of the sampleBuffer, to avoid making duplicates.
+	//
+	// 2. A vector of shared_ptrs to the sampleBuffers constructed from
+	// the sample audio file. When this vector goes empty. The sample 
+	// has gone out of use, and we can then delete the associated with 
+	// this audio file.
+	
 	auto map = SAMPLE_THUMBNAIL_MAP.begin();
 	while (map != SAMPLE_THUMBNAIL_MAP.end()) 
 	{
+		
+		// Find an erase all orphaned sampleBuffers
 		SampleBufferSharedPtrVec& vec = map->second.vectorPtr;
 		auto ptr = vec.end();
 		for (;;)
@@ -160,6 +174,9 @@ void SampleThumbnailListManager::cleanUpGlobalThumbnailMap()
 			vec.erase(ptr); 
 		}
 		
+		
+		// all shared pointers are orphaned a.k.a the sample is out of 
+		// use
 		if (vec.empty()) 
 		{
 			qDebug("Deleting an orphaned thumbnaillist...");
@@ -183,35 +200,37 @@ SampleThumbnailListManager::SampleThumbnailListManager(const Sample& inputSample
 	const auto sampleBufferSize = inputSample.sampleSize();
 	const auto& buffer = inputSample.data();
 	
-	const size_t maxResoThumbnailSize = 
+	const size_t firstThumbnailSize = 
 		std::max<size_t>(
 			std::min<size_t>(sampleBufferSize, 1),
 			MAX_THUMBNAIL_SIZE
 		);
 		
 	qDebug("Sample to be prepared is of size: %lu", sampleBufferSize);
+	qDebug("Max thumbnail size: %lu", firstThumbnailSize); 
 	
 	auto& thumbnaillist = *this->list;
 	
-	SampleThumbnail maxResoThumbnail = std::vector(maxResoThumbnailSize, lmms::SampleThumbnailBit());
+	SampleThumbnail firstThumbnail = std::vector(firstThumbnailSize, lmms::SampleThumbnailBit());
 	
 	size_t sampleFrameIndex = 0;
 	
 	float rms = 0.0;
 	
+	// Prepare the first thumbnail with the largest size.
 	for (; sampleFrameIndex < sampleBufferSize; sampleFrameIndex++)
 	{
 		size_t sampleThumbnailIndex = 
 			sampleFrameIndex *
-			maxResoThumbnailSize / 
+			firstThumbnailSize / 
 			sampleBufferSize
 		;
 		
 		const auto& frame = buffer[sampleFrameIndex];
 				
-		auto& bit = maxResoThumbnail[sampleThumbnailIndex];
+		auto& bit = firstThumbnail[sampleThumbnailIndex];
 		
-		rms = rms*0.8 + std::abs(bit.max + bit.min)*0.1;
+		rms = rms*0.85 + std::abs(bit.max + bit.min)*0.1;
 		
 		bit.maxRMS = std::clamp( rms, bit.min, bit.max);
 		bit.minRMS = std::clamp(-rms, bit.min, bit.max);
@@ -219,10 +238,12 @@ SampleThumbnailListManager::SampleThumbnailListManager(const Sample& inputSample
 		bit.mergeFrame(frame);
 	}
 	
-	thumbnaillist.push_back(maxResoThumbnail);
+	thumbnaillist.push_back(firstThumbnail);
 	
+	// Generate the remaining thumbnails using the first one, each one
+	// is half the size of the previous.
 	for (
-		size_t thumbnailSize = maxResoThumbnailSize / THUMBNAIL_SIZE_DIVISOR; 
+		size_t thumbnailSize = firstThumbnailSize / THUMBNAIL_SIZE_DIVISOR; 
 		thumbnailSize >= MIN_THUMBNAIL_SIZE;
 		thumbnailSize /= THUMBNAIL_SIZE_DIVISOR
 	)
@@ -286,7 +307,7 @@ void SampleThumbnailListManager::visualize(
 	
 	const auto& thumbnail = (*this->list)[setIndex];
 	
-	qDebug("Using thumbnail of size: %lu", thumbnail.size());
+	//~ qDebug("Using thumbnail of size: %lu", thumbnail.size());
 	
 	const float thumbnailSize = static_cast<float>(thumbnail.size());
 	const long tS = thumbnail.size()-1;
