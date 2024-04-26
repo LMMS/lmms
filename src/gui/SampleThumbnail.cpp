@@ -149,14 +149,13 @@ void SampleThumbnailListManager::cleanUpGlobalThumbnailMap()
 	//
 	// 2. A vector of shared_ptrs to the sampleBuffers constructed from
 	// the sample audio file. When this vector goes empty. The sample 
-	// has gone out of use, and we can then delete the associated with 
-	// this audio file.
+	// has gone out of use, and we can then delete the thumbnail  
+	// associated with this audio file.
 	
 	auto map = SAMPLE_THUMBNAIL_MAP.begin();
 	while (map != SAMPLE_THUMBNAIL_MAP.end()) 
 	{
-		
-		// Find an erase all orphaned sampleBuffers
+		// Find and erase all orphaned sampleBuffers
 		SampleBufferSharedPtrVec& vec = map->second.vectorPtr;
 		auto ptr = vec.end();
 		for (;;)
