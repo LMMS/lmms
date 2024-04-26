@@ -111,6 +111,7 @@ public:
 		enum class Mode
 		{
 			Draft,
+			HighQuality,
 			FinalMix
 		} ;
 
@@ -140,6 +141,11 @@ public:
 				case Mode::Draft:
 					interpolation = Interpolation::Linear;
 					oversampling = Oversampling::None;
+					break;
+				case Mode::HighQuality:
+					interpolation =
+						Interpolation::SincFastest;
+					oversampling = Oversampling::X2;
 					break;
 				case Mode::FinalMix:
 					interpolation = Interpolation::SincBest;
