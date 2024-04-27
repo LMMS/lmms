@@ -73,6 +73,19 @@ public:
 		return "eldata";
 	}
 
+private:
+	const EnvelopeAndLfoParameters* getEnvelopeAndLfoParameters(Target target) const;
+	EnvelopeAndLfoParameters* getEnvelopeAndLfoParameters(Target target);
+
+	const EnvelopeAndLfoParameters* getVolumeParameters() const;
+	EnvelopeAndLfoParameters* getVolumeParameters();
+
+	const EnvelopeAndLfoParameters* getCutoffParameters() const;
+	EnvelopeAndLfoParameters* getCutoffParameters();
+
+	const EnvelopeAndLfoParameters* getResonanceParameters() const;
+	EnvelopeAndLfoParameters* getResonanceParameters();
+
 
 private:
 	EnvelopeAndLfoParameters * m_envLfoParameters[NumTargets];

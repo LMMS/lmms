@@ -119,7 +119,7 @@ float InstrumentSoundShaping::volumeLevel( NotePlayHandle* n, const f_cnt_t fram
 	}
 
 	float level;
-	m_envLfoParameters[static_cast<std::size_t>(Target::Volume)]->fillLevel( &level, frame, envReleaseBegin, 1 );
+	getVolumeParameters()->fillLevel(&level, frame, envReleaseBegin, 1);
 
 	return level;
 }
@@ -148,6 +148,9 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 
 	// only use filter, if it is really needed
 
+	auto cutoffParameters = getCutoffParameters();
+	auto resonanceParameters = getResonanceParameters();
+
 	if( m_filterEnabledModel.value() )
 	{
 		QVarLengthArray<float> cutBuffer(frames);
@@ -162,20 +165,20 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 		}
 		n->m_filter->setFilterType( static_cast<BasicFilters<>::FilterType>(m_filterModel.value()) );
 
-		if( m_envLfoParameters[static_cast<std::size_t>(Target::Cut)]->isUsed() )
+		if (cutoffParameters->isUsed())
 		{
-			m_envLfoParameters[static_cast<std::size_t>(Target::Cut)]->fillLevel( cutBuffer.data(), envTotalFrames, envReleaseBegin, frames );
+			cutoffParameters->fillLevel(cutBuffer.data(), envTotalFrames, envReleaseBegin, frames);
 		}
-		if( m_envLfoParameters[static_cast<std::size_t>(Target::Resonance)]->isUsed() )
+
+		if (resonanceParameters->isUsed() )
 		{
-			m_envLfoParameters[static_cast<std::size_t>(Target::Resonance)]->fillLevel( resBuffer.data(), envTotalFrames, envReleaseBegin, frames );
+			resonanceParameters->fillLevel(resBuffer.data(), envTotalFrames, envReleaseBegin, frames);
 		}
 
 		const float fcv = m_filterCutModel.value();
 		const float frv = m_filterResModel.value();
 
-		if( m_envLfoParameters[static_cast<std::size_t>(Target::Cut)]->isUsed() &&
-			m_envLfoParameters[static_cast<std::size_t>(Target::Resonance)]->isUsed() )
+		if (cutoffParameters->isUsed() && resonanceParameters->isUsed())
 		{
 			for( fpp_t frame = 0; frame < frames; ++frame )
 			{
@@ -196,7 +199,7 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 				buffer[frame][1] = n->m_filter->update( buffer[frame][1], 1 );
 			}
 		}
-		else if( m_envLfoParameters[static_cast<std::size_t>(Target::Cut)]->isUsed() )
+		else if(cutoffParameters->isUsed())
 		{
 			for( fpp_t frame = 0; frame < frames; ++frame )
 			{
@@ -213,7 +216,7 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 				buffer[frame][1] = n->m_filter->update( buffer[frame][1], 1 );
 			}
 		}
-		else if( m_envLfoParameters[static_cast<std::size_t>(Target::Resonance)]->isUsed() )
+		else if(resonanceParameters->isUsed() )
 		{
 			for( fpp_t frame = 0; frame < frames; ++frame )
 			{
@@ -241,10 +244,12 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 		}
 	}
 
-	if( m_envLfoParameters[static_cast<std::size_t>(Target::Volume)]->isUsed() )
+	auto volumeParameters = getVolumeParameters();
+
+	if (volumeParameters->isUsed())
 	{
 		QVarLengthArray<float> volBuffer(frames);
-		m_envLfoParameters[static_cast<std::size_t>(Target::Volume)]->fillLevel( volBuffer.data(), envTotalFrames, envReleaseBegin, frames );
+		volumeParameters->fillLevel(volBuffer.data(), envTotalFrames, envReleaseBegin, frames);
 
 		for( fpp_t frame = 0; frame < frames; ++frame )
 		{
@@ -275,7 +280,7 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 
 f_cnt_t InstrumentSoundShaping::envFrames( const bool _only_vol ) const
 {
-	f_cnt_t ret_val = m_envLfoParameters[static_cast<std::size_t>(Target::Volume)]->PAHD_Frames();
+	f_cnt_t ret_val = getVolumeParameters()->PAHD_Frames();
 
 	if( _only_vol == false )
 	{
@@ -308,9 +313,11 @@ f_cnt_t InstrumentSoundShaping::releaseFrames() const
 		return ret_val;
 	}
 
-	if( m_envLfoParameters[static_cast<std::size_t>(Target::Volume)]->isUsed() )
+	auto volumeParameters = getVolumeParameters();
+
+	if (volumeParameters->isUsed() )
 	{
-		return m_envLfoParameters[static_cast<std::size_t>(Target::Volume)]->releaseFrames();
+		return volumeParameters->releaseFrames();
 	}
 
 	for( int i = static_cast<std::size_t>(Target::Volume)+1; i < NumTargets; ++i )
@@ -371,8 +378,44 @@ void InstrumentSoundShaping::loadSettings( const QDomElement & _this )
 	}
 }
 
+const EnvelopeAndLfoParameters* InstrumentSoundShaping::getEnvelopeAndLfoParameters(Target target) const
+{
+	return m_envLfoParameters[static_cast<std::size_t>(target)];
+}
 
+EnvelopeAndLfoParameters* InstrumentSoundShaping::getEnvelopeAndLfoParameters(Target target)
+{
+	return m_envLfoParameters[static_cast<std::size_t>(target)];
+}
 
+const EnvelopeAndLfoParameters* InstrumentSoundShaping::getVolumeParameters() const
+{
+	return m_envLfoParameters[static_cast<std::size_t>(Target::Volume)];
+}
 
+EnvelopeAndLfoParameters* InstrumentSoundShaping::getVolumeParameters()
+{
+	return m_envLfoParameters[static_cast<std::size_t>(Target::Volume)];
+}
+
+const EnvelopeAndLfoParameters* InstrumentSoundShaping::getCutoffParameters() const
+{
+	return m_envLfoParameters[static_cast<std::size_t>(Target::Cut)];
+}
+
+EnvelopeAndLfoParameters* InstrumentSoundShaping::getCutoffParameters()
+{
+	return m_envLfoParameters[static_cast<std::size_t>(Target::Cut)];
+}
+
+const EnvelopeAndLfoParameters* InstrumentSoundShaping::getResonanceParameters() const
+{
+	return m_envLfoParameters[static_cast<std::size_t>(Target::Resonance)];
+}
+
+EnvelopeAndLfoParameters* InstrumentSoundShaping::getResonanceParameters()
+{
+	return m_envLfoParameters[static_cast<std::size_t>(Target::Resonance)];
+}
 
 } // namespace lmms
