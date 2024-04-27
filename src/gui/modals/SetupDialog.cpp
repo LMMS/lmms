@@ -142,8 +142,6 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			"ui", "disableautoquit", "1").toInt()),
 	m_NaNHandler(ConfigManager::inst()->value(
 			"app", "nanhandler", "1").toInt()),
-	m_hqAudioDev(ConfigManager::inst()->value(
-			"audioengine", "hqaudio").toInt()),
 	m_bufferSize(ConfigManager::inst()->value(
 			"audioengine", "framesperaudiobuffer").toInt()),
 	m_midiAutoQuantize(ConfigManager::inst()->value(
@@ -560,10 +558,6 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	// audio_layout->addWidget(useNaNHandler);
 	// useNaNHandler->setChecked(m_NaNHandler);
 
-	// HQ mode checkbox
-	auto hqaudio = addCheckBox(tr("HQ mode for output audio device"), audioInterfaceBox, nullptr,
-		m_hqAudioDev, SLOT(toggleHQAudioDev(bool)), false);
-
 	// Buffer size group
 	QGroupBox * bufferSizeBox = new QGroupBox(tr("Buffer size"), audio_w);
 	QVBoxLayout * bufferSizeLayout = new QVBoxLayout(bufferSizeBox);
@@ -605,7 +599,6 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	// Audio layout ordering.
 	audio_layout->addWidget(audioInterfaceBox);
 	audio_layout->addWidget(as_w);
-	audio_layout->addWidget(hqaudio);
 	audio_layout->addWidget(bufferSizeBox);
 	audio_layout->addStretch();
 
@@ -970,8 +963,6 @@ void SetupDialog::accept()
 					m_audioIfaceNames[m_audioInterfaces->currentText()]);
 	ConfigManager::inst()->setValue("app", "nanhandler",
 					QString::number(m_NaNHandler));
-	ConfigManager::inst()->setValue("audioengine", "hqaudio",
-					QString::number(m_hqAudioDev));
 	ConfigManager::inst()->setValue("audioengine", "framesperaudiobuffer",
 					QString::number(m_bufferSize));
 	ConfigManager::inst()->setValue("audioengine", "mididev",
@@ -1173,17 +1164,6 @@ void SetupDialog::toggleDisableAutoQuit(bool enabled)
 {
 	m_disableAutoQuit = enabled;
 }
-
-
-
-
-// Audio settings slots.
-
-void SetupDialog::toggleHQAudioDev(bool enabled)
-{
-	m_hqAudioDev = enabled;
-}
-
 
 void SetupDialog::audioInterfaceChanged(const QString & iface)
 {

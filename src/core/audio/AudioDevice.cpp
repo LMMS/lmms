@@ -250,13 +250,4 @@ void AudioDevice::clearS16Buffer( int_sample_t * _outbuf, const fpp_t _frames )
 	memset( _outbuf, 0,  _frames * channels() * BYTES_PER_INT_SAMPLE );
 }
 
-
-
-
-bool AudioDevice::hqAudio() const
-{
-	return ConfigManager::inst()->value( "audioengine", "hqaudio" ).toInt();
-}
-
-
 } // namespace lmms

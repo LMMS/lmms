@@ -93,7 +93,6 @@ private:
 
 	void startProcessing() override;
 	void stopProcessing() override;
-	void applyQualitySettings() override;
 
 	void registerPort(AudioPort* port) override;
 	void unregisterPort(AudioPort* port) override;

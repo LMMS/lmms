@@ -254,41 +254,6 @@ void AudioOss::stopProcessing()
 	stopProcessingThread( this );
 }
 
-
-
-
-void AudioOss::applyQualitySettings()
-{
-	if( hqAudio() )
-	{
-		setSampleRate( Engine::audioEngine()->processingSampleRate() );
-
-		unsigned int value = sampleRate();
-		if ( ioctl( m_audioFD, SNDCTL_DSP_SPEED, &value ) < 0 )
-		{
-			perror( "SNDCTL_DSP_SPEED" );
-			printf( "Couldn't set audio frequency\n" );
-			return;
-		}
-		if( value != sampleRate() )
-		{
-			value = audioEngine()->baseSampleRate();
-			if ( ioctl( m_audioFD, SNDCTL_DSP_SPEED, &value ) < 0 )
-			{
-				perror( "SNDCTL_DSP_SPEED" );
-				printf( "Couldn't set audio frequency\n" );
-				return;
-			}
-			setSampleRate( value );
-		}
-	}
-
-	AudioDevice::applyQualitySettings();
-}
-
-
-
-
 void AudioOss::run()
 {
 	auto temp = new surroundSampleFrame[audioEngine()->framesPerPeriod()];
