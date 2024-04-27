@@ -26,13 +26,13 @@
 #define LMMS_INSTRUMENT_SOUND_SHAPING_H
 
 #include "ComboBoxModel.h"
+#include "EnvelopeAndLfoParameters.h"
 
 namespace lmms
 {
 
 
 class InstrumentTrack;
-class EnvelopeAndLfoParameters;
 class NotePlayHandle;
 
 namespace gui
@@ -51,14 +51,14 @@ public:
 	void processAudioBuffer( sampleFrame * _ab, const fpp_t _frames,
 							NotePlayHandle * _n );
 
-	enum class Target
-	{
-		Volume,
-		Cut,
-		Resonance,
-		Count
-	} ;
-	constexpr static auto NumTargets = static_cast<std::size_t>(Target::Count);
+	const EnvelopeAndLfoParameters* getVolumeParameters() const;
+	EnvelopeAndLfoParameters* getVolumeParameters();
+
+	const EnvelopeAndLfoParameters* getCutoffParameters() const;
+	EnvelopeAndLfoParameters* getCutoffParameters();
+
+	const EnvelopeAndLfoParameters* getResonanceParameters() const;
+	EnvelopeAndLfoParameters* getResonanceParameters();
 
 	f_cnt_t envFrames( const bool _only_vol = false ) const;
 	f_cnt_t releaseFrames() const;
@@ -74,33 +74,26 @@ public:
 	}
 
 private:
-	const EnvelopeAndLfoParameters* getEnvelopeAndLfoParameters(Target target) const;
-	EnvelopeAndLfoParameters* getEnvelopeAndLfoParameters(Target target);
-
-	const EnvelopeAndLfoParameters* getVolumeParameters() const;
-	EnvelopeAndLfoParameters* getVolumeParameters();
-
-	const EnvelopeAndLfoParameters* getCutoffParameters() const;
-	EnvelopeAndLfoParameters* getCutoffParameters();
-
-	const EnvelopeAndLfoParameters* getResonanceParameters() const;
-	EnvelopeAndLfoParameters* getResonanceParameters();
-
+	QString getVolumeNodeName() const;
+	QString getCutoffNodeName() const;
+	QString getResonanceNodeName() const;
 
 private:
-	EnvelopeAndLfoParameters * m_envLfoParameters[NumTargets];
 	InstrumentTrack * m_instrumentTrack;
+
+	EnvelopeAndLfoParameters m_volumeParameters;
+	EnvelopeAndLfoParameters m_cutoffParameters;
+	EnvelopeAndLfoParameters m_resonanceParameters;
 
 	BoolModel m_filterEnabledModel;
 	ComboBoxModel m_filterModel;
 	FloatModel m_filterCutModel;
 	FloatModel m_filterResModel;
 
-	static const char *const targetNames[NumTargets][3];
+	static const char *const targetNames[3][3];
 
 
 	friend class gui::InstrumentSoundShapingView;
-
 } ;
 
 

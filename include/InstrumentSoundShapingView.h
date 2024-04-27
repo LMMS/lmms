@@ -58,7 +58,7 @@ private:
 
 	InstrumentSoundShaping * m_ss = nullptr;
 	TabWidget * m_targetsTabWidget;
-	EnvelopeAndLfoView * m_envLfoViews[InstrumentSoundShaping::NumTargets];
+	EnvelopeAndLfoView * m_envLfoViews[3];
 
 	// filter-stuff
 	GroupBox * m_filterGroupBox;

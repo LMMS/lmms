@@ -48,7 +48,7 @@ InstrumentSoundShapingView::InstrumentSoundShapingView(QWidget* parent) :
 
 	m_targetsTabWidget = new TabWidget(tr("TARGET"), this);
 
-	for (int i = 0; i < InstrumentSoundShaping::NumTargets; ++i)
+	for (int i = 0; i < 3; ++i)
 	{
 		m_envLfoViews[i] = new EnvelopeAndLfoView(m_targetsTabWidget);
 		m_targetsTabWidget->addTab(m_envLfoViews[i],
@@ -115,10 +115,10 @@ void InstrumentSoundShapingView::modelChanged()
 	m_filterComboBox->setModel( &m_ss->m_filterModel );
 	m_filterCutKnob->setModel( &m_ss->m_filterCutModel );
 	m_filterResKnob->setModel( &m_ss->m_filterResModel );
-	for( int i = 0; i < InstrumentSoundShaping::NumTargets; ++i )
-	{
-		m_envLfoViews[i]->setModel( m_ss->m_envLfoParameters[i] );
-	}
+
+	m_envLfoViews[0]->setModel(m_ss->getVolumeParameters());
+	m_envLfoViews[1]->setModel(m_ss->getCutoffParameters());
+	m_envLfoViews[2]->setModel(m_ss->getResonanceParameters());
 }
 
 
