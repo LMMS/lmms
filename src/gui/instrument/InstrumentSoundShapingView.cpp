@@ -116,9 +116,9 @@ void InstrumentSoundShapingView::modelChanged()
 	m_filterCutKnob->setModel( &m_ss->m_filterCutModel );
 	m_filterResKnob->setModel( &m_ss->m_filterResModel );
 
-	m_envLfoViews[0]->setModel(m_ss->getVolumeParameters());
-	m_envLfoViews[1]->setModel(m_ss->getCutoffParameters());
-	m_envLfoViews[2]->setModel(m_ss->getResonanceParameters());
+	m_envLfoViews[0]->setModel(&m_ss->getVolumeParameters());
+	m_envLfoViews[1]->setModel(&m_ss->getCutoffParameters());
+	m_envLfoViews[2]->setModel(&m_ss->getResonanceParameters());
 }
 
 

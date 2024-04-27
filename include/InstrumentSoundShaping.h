@@ -51,14 +51,14 @@ public:
 	void processAudioBuffer( sampleFrame * _ab, const fpp_t _frames,
 							NotePlayHandle * _n );
 
-	const EnvelopeAndLfoParameters* getVolumeParameters() const;
-	EnvelopeAndLfoParameters* getVolumeParameters();
+	const EnvelopeAndLfoParameters& getVolumeParameters() const;
+	EnvelopeAndLfoParameters& getVolumeParameters();
 
-	const EnvelopeAndLfoParameters* getCutoffParameters() const;
-	EnvelopeAndLfoParameters* getCutoffParameters();
+	const EnvelopeAndLfoParameters& getCutoffParameters() const;
+	EnvelopeAndLfoParameters& getCutoffParameters();
 
-	const EnvelopeAndLfoParameters* getResonanceParameters() const;
-	EnvelopeAndLfoParameters* getResonanceParameters();
+	const EnvelopeAndLfoParameters& getResonanceParameters() const;
+	EnvelopeAndLfoParameters& getResonanceParameters();
 
 	f_cnt_t envFrames( const bool _only_vol = false ) const;
 	f_cnt_t releaseFrames() const;

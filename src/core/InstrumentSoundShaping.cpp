@@ -111,7 +111,7 @@ float InstrumentSoundShaping::volumeLevel( NotePlayHandle* n, const f_cnt_t fram
 	}
 
 	float level;
-	getVolumeParameters()->fillLevel(&level, frame, envReleaseBegin, 1);
+	getVolumeParameters().fillLevel(&level, frame, envReleaseBegin, 1);
 
 	return level;
 }
@@ -140,8 +140,8 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 
 	// only use filter, if it is really needed
 
-	auto cutoffParameters = getCutoffParameters();
-	auto resonanceParameters = getResonanceParameters();
+	auto& cutoffParameters = getCutoffParameters();
+	auto& resonanceParameters = getResonanceParameters();
 
 	if( m_filterEnabledModel.value() )
 	{
@@ -157,20 +157,20 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 		}
 		n->m_filter->setFilterType( static_cast<BasicFilters<>::FilterType>(m_filterModel.value()) );
 
-		if (cutoffParameters->isUsed())
+		if (cutoffParameters.isUsed())
 		{
-			cutoffParameters->fillLevel(cutBuffer.data(), envTotalFrames, envReleaseBegin, frames);
+			cutoffParameters.fillLevel(cutBuffer.data(), envTotalFrames, envReleaseBegin, frames);
 		}
 
-		if (resonanceParameters->isUsed() )
+		if (resonanceParameters.isUsed() )
 		{
-			resonanceParameters->fillLevel(resBuffer.data(), envTotalFrames, envReleaseBegin, frames);
+			resonanceParameters.fillLevel(resBuffer.data(), envTotalFrames, envReleaseBegin, frames);
 		}
 
 		const float fcv = m_filterCutModel.value();
 		const float frv = m_filterResModel.value();
 
-		if (cutoffParameters->isUsed() && resonanceParameters->isUsed())
+		if (cutoffParameters.isUsed() && resonanceParameters.isUsed())
 		{
 			for( fpp_t frame = 0; frame < frames; ++frame )
 			{
@@ -191,7 +191,7 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 				buffer[frame][1] = n->m_filter->update( buffer[frame][1], 1 );
 			}
 		}
-		else if(cutoffParameters->isUsed())
+		else if(cutoffParameters.isUsed())
 		{
 			for( fpp_t frame = 0; frame < frames; ++frame )
 			{
@@ -208,7 +208,7 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 				buffer[frame][1] = n->m_filter->update( buffer[frame][1], 1 );
 			}
 		}
-		else if(resonanceParameters->isUsed() )
+		else if(resonanceParameters.isUsed() )
 		{
 			for( fpp_t frame = 0; frame < frames; ++frame )
 			{
@@ -236,12 +236,12 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 		}
 	}
 
-	auto volumeParameters = getVolumeParameters();
+	auto& volumeParameters = getVolumeParameters();
 
-	if (volumeParameters->isUsed())
+	if (volumeParameters.isUsed())
 	{
 		QVarLengthArray<float> volBuffer(frames);
-		volumeParameters->fillLevel(volBuffer.data(), envTotalFrames, envReleaseBegin, frames);
+		volumeParameters.fillLevel(volBuffer.data(), envTotalFrames, envReleaseBegin, frames);
 
 		for( fpp_t frame = 0; frame < frames; ++frame )
 		{
@@ -272,20 +272,20 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 
 f_cnt_t InstrumentSoundShaping::envFrames( const bool _only_vol ) const
 {
-	f_cnt_t ret_val = getVolumeParameters()->PAHD_Frames();
+	f_cnt_t ret_val = getVolumeParameters().PAHD_Frames();
 
 	if (!_only_vol)
 	{
-		auto cutoffParameters = getCutoffParameters();
-		if (cutoffParameters->isUsed())
+		auto& cutoffParameters = getCutoffParameters();
+		if (cutoffParameters.isUsed())
 		{
-			ret_val = std::max(ret_val, cutoffParameters->PAHD_Frames());
+			ret_val = std::max(ret_val, cutoffParameters.PAHD_Frames());
 		}
 
-		auto resonanceParameters = getResonanceParameters();
-		if (resonanceParameters->isUsed())
+		auto& resonanceParameters = getResonanceParameters();
+		if (resonanceParameters.isUsed())
 		{
-			ret_val = std::max(ret_val, resonanceParameters->PAHD_Frames());
+			ret_val = std::max(ret_val, resonanceParameters.PAHD_Frames());
 		}
 	}
 
@@ -309,32 +309,32 @@ f_cnt_t InstrumentSoundShaping::releaseFrames() const
 		return ret_val;
 	}
 
-	auto volumeParameters = getVolumeParameters();
+	auto& volumeParameters = getVolumeParameters();
 
-	if (volumeParameters->isUsed() )
+	if (volumeParameters.isUsed() )
 	{
-		return volumeParameters->releaseFrames();
+		return volumeParameters.releaseFrames();
 	}
 
-	auto cutoffParameters = getCutoffParameters();
-	if (cutoffParameters->isUsed())
+	auto& cutoffParameters = getCutoffParameters();
+	if (cutoffParameters.isUsed())
 	{
-		ret_val = std::max(ret_val, cutoffParameters->releaseFrames());
+		ret_val = std::max(ret_val, cutoffParameters.releaseFrames());
 	}
 
-	auto resonanceParameters = getResonanceParameters();
-	if (resonanceParameters->isUsed())
+	auto& resonanceParameters = getResonanceParameters();
+	if (resonanceParameters.isUsed())
 	{
-		ret_val = std::max(ret_val, resonanceParameters->releaseFrames());
+		ret_val = std::max(ret_val, resonanceParameters.releaseFrames());
 	}
 
 	return ret_val;
 }
 
 
-static void saveEnvelopeAndLFOParameters(EnvelopeAndLfoParameters* p, const QString & tagName, QDomDocument & _doc, QDomElement & _this)
+static void saveEnvelopeAndLFOParameters(EnvelopeAndLfoParameters& p, const QString & tagName, QDomDocument & _doc, QDomElement & _this)
 {
-	p->saveState(_doc, _this).setTagName(tagName);
+	p.saveState(_doc, _this).setTagName(tagName);
 }
 
 void InstrumentSoundShaping::saveSettings( QDomDocument & _doc, QDomElement & _this )
@@ -367,15 +367,15 @@ void InstrumentSoundShaping::loadSettings( const QDomElement & _this )
 			const auto nodeName = node.nodeName();
 			if (nodeName == getVolumeNodeName())
 			{
-				getVolumeParameters()->restoreState(node.toElement());
+				getVolumeParameters().restoreState(node.toElement());
 			}
 			else if (nodeName == getCutoffNodeName())
 			{
-				getCutoffParameters()->restoreState(node.toElement());
+				getCutoffParameters().restoreState(node.toElement());
 			}
 			else if (nodeName == getResonanceNodeName())
 			{
-				getResonanceParameters()->restoreState(node.toElement());
+				getResonanceParameters().restoreState(node.toElement());
 			}
 		}
 
@@ -383,49 +383,49 @@ void InstrumentSoundShaping::loadSettings( const QDomElement & _this )
 	}
 }
 
-const EnvelopeAndLfoParameters* InstrumentSoundShaping::getVolumeParameters() const
+const EnvelopeAndLfoParameters& InstrumentSoundShaping::getVolumeParameters() const
 {
-	return &m_volumeParameters;
+	return m_volumeParameters;
 }
 
-EnvelopeAndLfoParameters* InstrumentSoundShaping::getVolumeParameters()
+EnvelopeAndLfoParameters& InstrumentSoundShaping::getVolumeParameters()
 {
-	return &m_volumeParameters;
+	return m_volumeParameters;
 }
 
-const EnvelopeAndLfoParameters* InstrumentSoundShaping::getCutoffParameters() const
+const EnvelopeAndLfoParameters& InstrumentSoundShaping::getCutoffParameters() const
 {
-	return &m_cutoffParameters;
+	return m_cutoffParameters;
 }
 
-EnvelopeAndLfoParameters* InstrumentSoundShaping::getCutoffParameters()
+EnvelopeAndLfoParameters& InstrumentSoundShaping::getCutoffParameters()
 {
-	return &m_cutoffParameters;
+	return m_cutoffParameters;
 }
 
-const EnvelopeAndLfoParameters* InstrumentSoundShaping::getResonanceParameters() const
+const EnvelopeAndLfoParameters& InstrumentSoundShaping::getResonanceParameters() const
 {
-	return &m_resonanceParameters;
+	return m_resonanceParameters;
 }
 
-EnvelopeAndLfoParameters* InstrumentSoundShaping::getResonanceParameters()
+EnvelopeAndLfoParameters& InstrumentSoundShaping::getResonanceParameters()
 {
-	return &m_resonanceParameters;
+	return m_resonanceParameters;
 }
 
 QString InstrumentSoundShaping::getVolumeNodeName() const
 {
-	getVolumeParameters()->nodeName() + QString(targetNames[0][1]).toLower();
+	return getVolumeParameters().nodeName() + QString(targetNames[0][1]).toLower();
 }
 
 QString InstrumentSoundShaping::getCutoffNodeName() const
 {
-	getCutoffParameters()->nodeName() + QString(targetNames[1][1]).toLower();
+	return getCutoffParameters().nodeName() + QString(targetNames[1][1]).toLower();
 }
 
 QString InstrumentSoundShaping::getResonanceNodeName() const
 {
-	getResonanceParameters()->nodeName() + QString(targetNames[2][1]).toLower();
+	return getResonanceParameters().nodeName() + QString(targetNames[2][1]).toLower();
 }
 
 } // namespace lmms
