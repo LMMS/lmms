@@ -131,10 +131,3 @@ SET(LMMS_SRCS
 	PARENT_SCOPE
 )
 
-set(LMMS_UIS
-	${LMMS_UIS}
-	gui/modals/about_dialog.ui
-	gui/modals/export_project.ui
-
-	PARENT_SCOPE
-)
