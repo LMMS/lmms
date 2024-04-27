@@ -122,7 +122,7 @@ struct Sf2PluginData
 
 
 Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
-	Instrument( _instrument_track, &sf2player_plugin_descriptor ),
+	Instrument(_instrument_track, &sf2player_plugin_descriptor, nullptr, Flag::IsSingleStreamed),
 	m_srcState( nullptr ),
 	m_synth(nullptr),
 	m_font( nullptr ),

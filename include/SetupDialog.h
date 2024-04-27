@@ -102,7 +102,6 @@ private slots:
 
 	// Audio settings widget.
 	void audioInterfaceChanged(const QString & driver);
-	void toggleHQAudioDev(bool enabled);
 	void updateBufferSizeWarning(int value);
 	void setBufferSize(int value);
 	void resetBufferSize();
@@ -180,7 +179,6 @@ private:
 	AswMap m_audioIfaceSetupWidgets;
 	trMap m_audioIfaceNames;
 	bool m_NaNHandler;
-	bool m_hqAudioDev;
 	int m_bufferSize;
 	QSlider * m_bufferSizeSlider;
 	QLabel * m_bufferSizeLbl;
