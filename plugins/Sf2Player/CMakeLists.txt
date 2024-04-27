@@ -6,5 +6,5 @@ if(LMMS_HAVE_FLUIDSYNTH)
 		MOCFILES Sf2Player.h PatchesDialog.h
 		EMBEDDED_RESOURCES *.png
 	)
-	target_link_libraries(sf2player fluidsynth SampleRate::samplerate)	
+	target_link_libraries(sf2player fluidsynth SampleRate::samplerate)
 endif()
