@@ -1,6 +1,7 @@
 if(LMMS_HAVE_GIG)
 	INCLUDE(BuildPlugin)
 	INCLUDE_DIRECTORIES(${GIG_INCLUDE_DIRS})
+	SET(CMAKE_AUTOUIC ON)
 
 	# Required for not crashing loading files with libgig
 	SET(GCC_COVERAGE_COMPILE_FLAGS "-fexceptions")
@@ -19,6 +20,5 @@ if(LMMS_HAVE_GIG)
 		MOCFILES GigPlayer.h PatchesDialog.h
 		EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.png"
 	)
-	set_target_properties(gigplayer PROPERTIES AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR})
 	target_link_libraries(gigplayer SampleRate::samplerate)
 endif(LMMS_HAVE_GIG)
