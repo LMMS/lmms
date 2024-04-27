@@ -128,7 +128,6 @@ void SampleClipView::dropEvent( QDropEvent * _de )
 		m_clip->updateLength();
 		update();
 		_de->accept();
-		Engine::getSong()->setModified();
 	}
 	else
 	{
@@ -190,8 +189,7 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 	if (af == m_clip->m_sample.sampleFile())
 	{
 		// Don't reload the same file again. Just reset the size.
-		int length = static_cast<int>(m_clip->m_sample.sampleSize() / Engine::framesPerTick());
-		m_clip->changeLength(length);
+		m_clip->changeLengthToSampleLength();
 	}
 	else
 	{
@@ -200,9 +198,6 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 		if (sampleBuffer != SampleBuffer::emptyBuffer())
 		{
 			m_clip->setSampleBuffer(sampleBuffer);
-
-			// TODO Why do we have to do this here? This should happen in the core...
-			Engine::getSong()->setModified();
 		}
 	}
 }

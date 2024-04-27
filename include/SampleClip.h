@@ -55,6 +55,7 @@ public:
 	SampleClip& operator=( const SampleClip& that ) = delete;
 
 	void changeLength( const TimePos & _length ) override;
+	void changeLengthToSampleLength();
 	const QString& sampleFile() const;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;

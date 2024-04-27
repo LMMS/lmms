@@ -112,6 +112,11 @@ void SampleClip::changeLength( const TimePos & _length )
 	Clip::changeLength(std::max(static_cast<int>(_length), 1));
 }
 
+void SampleClip::changeLengthToSampleLength()
+{
+	int length = static_cast<int>(m_sample.sampleSize() / Engine::framesPerTick());
+	changeLength(length);
+}
 
 
 
@@ -129,6 +134,8 @@ void SampleClip::setSampleBuffer(std::shared_ptr<const SampleBuffer> sb)
 	updateLength();
 
 	emit sampleChanged();
+
+	Engine::getSong()->setModified();
 }
 
 void SampleClip::setSampleFile(const QString& sf)
@@ -210,6 +217,8 @@ void SampleClip::setIsPlaying(bool isPlaying)
 void SampleClip::updateLength()
 {
 	emit sampleChanged();
+
+	Engine::getSong()->setModified();
 }
 
 
