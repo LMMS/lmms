@@ -220,7 +220,6 @@ private:
 	int   vcf_envpos;       // Update counter. Updates when >= ENVINC
 
 	float vca_attack,       // Amp attack
-	      vca_decay,        // Amp decay
 	      vca_a0,           // Initial amplifier coefficient
 	      vca_a;            // Amplifier coefficient.
 

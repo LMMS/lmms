@@ -268,6 +268,16 @@ float Lb302Filter3Pole::process(const float& samp)
 // LBSynth
 //
 
+static float computeDecayFactor(float decayTimeInSeconds, float targetedAttenuation)
+{
+	// This is the number of samples that correspond to the decay time in seconds
+	auto samplesNeededForDecay = decayTimeInSeconds * Engine::audioEngine()->processingSampleRate();
+
+	// This computes the factor that's needed to make a signal with a value of 1 decay to the
+	// targeted attenuation over the time in number of samples.
+	return std::pow(targetedAttenuation, 1. / samplesNeededForDecay);
+}
+
 Lb302Synth::Lb302Synth( InstrumentTrack * _instrumentTrack ) :
 	Instrument(_instrumentTrack, &lb302_plugin_descriptor, nullptr, Flag::IsSingleStreamed),
 	vcf_cut_knob( 0.75f, 0.0f, 1.5f, 0.005f, this, tr( "VCF Cutoff Frequency" ) ),
@@ -282,7 +292,6 @@ Lb302Synth::Lb302Synth( InstrumentTrack * _instrumentTrack ) :
 	deadToggle( false, this, tr( "Dead" ) ),
 	db24Toggle( false, this, tr( "24dB/oct Filter" ) ),
 	vca_attack(1.0 - 0.96406088),
-	vca_decay(0.99897516),
 	vca_a0(0.5),
 	vca_a(0.),
 	vca_mode(VcaMode::NeverPlayed)
@@ -481,6 +490,14 @@ int Lb302Synth::process(sampleFrame *outbuf, const int size)
 	// TODO: NORMAL RELEASE
 	// vca_mode = 1;
 
+	// Note: this has to be computed during processing and cannot be initialized
+	// in the constructor because it's dependent on the sample rate and that might
+	// change during rendering!
+	//
+	// At 44.1 kHz this will compute something very close to the previously
+	// hard coded value of 0.99897516.
+	auto decay = computeDecayFactor(0.245260770975f, 1.f / 65536.f);
+
 	for( int i=0; i<size; i++ ) 
 	{
 		// start decay if we're past release
@@ -635,7 +652,7 @@ int Lb302Synth::process(sampleFrame *outbuf, const int size)
 				vca_mode = VcaMode::Idle;
 		}
 		else if(vca_mode == VcaMode::Decay) {
-			vca_a *= vca_decay;
+			vca_a *= decay;
 
 			// the following line actually speeds up processing
 			if(vca_a < (1/65536.0)) {
