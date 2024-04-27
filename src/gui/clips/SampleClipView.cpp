@@ -26,7 +26,6 @@
 
 #include <QApplication>
 #include <QMenu>
-#include <QMessageBox>
 #include <QPainter>
 
 #include "GuiApplication.h"
