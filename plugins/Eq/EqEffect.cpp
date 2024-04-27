@@ -66,7 +66,7 @@ EqEffect::EqEffect( Model *parent, const Plugin::Descriptor::SubPluginFeatures::
 
 bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 {
-	const int sampleRate = Engine::audioEngine()->processingSampleRate();
+	const int sampleRate = Engine::audioEngine()->outputSampleRate();
 
 	//wet/dry controls
 	const float dry = dryLevel();

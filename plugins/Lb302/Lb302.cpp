@@ -72,7 +72,7 @@ namespace lmms
 {
 
 
-//#define engine::audioEngine()->processingSampleRate() 44100.0f
+//#define engine::audioEngine()->outputSampleRate() 44100.0f
 const float sampleRateCutoff = 44100.0f;
 
 extern "C"
@@ -111,8 +111,8 @@ void Lb302Filter::recalc()
 {
 	vcf_e1 = exp(6.109 + 1.5876*(fs->envmod) + 2.1553*(fs->cutoff) - 1.2*(1.0-(fs->reso)));
 	vcf_e0 = exp(5.613 - 0.8*(fs->envmod) + 2.1553*(fs->cutoff) - 0.7696*(1.0-(fs->reso)));
-	vcf_e0*=M_PI/Engine::audioEngine()->processingSampleRate();
-	vcf_e1*=M_PI/Engine::audioEngine()->processingSampleRate();
+	vcf_e0*=M_PI/Engine::audioEngine()->outputSampleRate();
+	vcf_e1*=M_PI/Engine::audioEngine()->outputSampleRate();
 	vcf_e1 -= vcf_e0;
 
 	vcf_rescoeff = exp(-1.20 + 3.455*(fs->reso));
@@ -233,7 +233,7 @@ void Lb302Filter3Pole::envRecalc()
 
 #ifdef LB_24_IGNORE_ENVELOPE
 	// kfcn = fs->cutoff;
-	kfcn = 2.0 * kfco / Engine::audioEngine()->processingSampleRate();
+	kfcn = 2.0 * kfco / Engine::audioEngine()->outputSampleRate();
 #else
 	kfcn = w;
 #endif
@@ -405,7 +405,7 @@ void Lb302Synth::filterChanged()
 
 	float d = 0.2 + (2.3*vcf_dec_knob.value());
 
-	d *= Engine::audioEngine()->processingSampleRate(); // d *= smpl rate
+	d *= Engine::audioEngine()->outputSampleRate(); // d *= smpl rate
 	fs.envdecay = pow(0.1, 1.0/d * ENVINC);    // decay is 0.1 to the 1/d * ENVINC
 	                                           // vcf_envdecay is now adjusted for both
 	                                           // sampling rate and ENVINC
@@ -439,7 +439,7 @@ void Lb302Synth::recalcFilter()
 	// THIS IS OLD 3pole/24dB code, I may reintegrate it.  Don't need it
 	// right now.   Should be toggled by LB_24_RES_TRICK at the moment.
 
-	/*kfcn = 2.0 * (((vcf_cutoff*3000))) / engine::audioEngine()->processingSampleRate();
+	/*kfcn = 2.0 * (((vcf_cutoff*3000))) / engine::audioEngine()->outputSampleRate();
 	kp   = ((-2.7528*kfcn + 3.0429)*kfcn + 1.718)*kfcn - 0.9984;
 	kp1  = kp+1.0;
 	kp1h = 0.5*kp1;
@@ -450,12 +450,12 @@ void Lb302Synth::recalcFilter()
 }
 
 inline float GET_INC(float freq) {
-	return freq/Engine::audioEngine()->processingSampleRate();  // TODO: Use actual sampling rate.
+	return freq/Engine::audioEngine()->outputSampleRate();  // TODO: Use actual sampling rate.
 }
 
 int Lb302Synth::process(sampleFrame *outbuf, const int size)
 {
-	const float sampleRatio = 44100.f / Engine::audioEngine()->processingSampleRate();
+	const float sampleRatio = 44100.f / Engine::audioEngine()->outputSampleRate();
 
 	// Hold on to the current VCF, and use it throughout this period
 	Lb302Filter *filter = vcf.loadAcquire();
@@ -631,7 +631,7 @@ int Lb302Synth::process(sampleFrame *outbuf, const int size)
 		// Handle Envelope
 		if(vca_mode==VcaMode::Attack) {
 			vca_a+=(vca_a0-vca_a)*vca_attack;
-			if(sample_cnt>=0.5*Engine::audioEngine()->processingSampleRate())
+			if(sample_cnt>=0.5*Engine::audioEngine()->outputSampleRate())
 				vca_mode = VcaMode::Idle;
 		}
 		else if(vca_mode == VcaMode::Decay) {

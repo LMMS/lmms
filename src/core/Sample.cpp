@@ -124,7 +124,7 @@ bool Sample::play(sampleFrame* dst, PlaybackState* state, size_t numFrames, floa
 	const auto pastBounds = state->m_frameIndex >= m_endFrame || (state->m_frameIndex < 0 && state->m_backwards);
 	if (loopMode == Loop::Off && pastBounds) { return false; }
 
-	const auto outputSampleRate = Engine::audioEngine()->processingSampleRate() * m_frequency / desiredFrequency;
+	const auto outputSampleRate = Engine::audioEngine()->outputSampleRate() * m_frequency / desiredFrequency;
 	const auto inputSampleRate = m_buffer->sampleRate();
 	const auto resampleRatio = outputSampleRate / inputSampleRate;
 	const auto marginSize = s_interpolationMargins[state->resampler().interpolationMode()];

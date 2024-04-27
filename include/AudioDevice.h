@@ -89,8 +89,6 @@ public:
 
 	virtual void stopProcessing();
 
-	void applyQualitySettings();
-
 protected:
 	// subclasses can re-implement this for being used in conjunction with
 	// processNextBuffer()
@@ -109,13 +107,6 @@ protected:
 	// clear given signed-int-16-buffer
 	void clearS16Buffer( int_sample_t * _outbuf,
 							const fpp_t _frames );
-
-	// resample given buffer from samplerate _src_sr to samplerate _dst_sr
-	fpp_t resample( const surroundSampleFrame * _src,
-					const fpp_t _frames,
-					surroundSampleFrame * _dst,
-					const sample_rate_t _src_sr,
-					const sample_rate_t _dst_sr );
 
 	inline void setSampleRate( const sample_rate_t _new_sr )
 	{
@@ -141,9 +132,6 @@ private:
 	bool m_inProcess;
 
 	QMutex m_devMutex;
-
-	SRC_DATA m_srcData;
-	SRC_STATE * m_srcState;
 
 	surroundSampleFrame * m_buffer;
 
