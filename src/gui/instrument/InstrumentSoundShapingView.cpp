@@ -39,6 +39,15 @@
 namespace lmms::gui
 {
 
+// names for env- and lfo-targets - first is name being displayed to user
+// and second one is used internally, e.g. for saving/restoring settings
+const char *const InstrumentSoundShapingView::targetNames[3] =
+{
+	QT_TRANSLATE_NOOP("InstrumentSoundShaping", "VOLUME"),
+	QT_TRANSLATE_NOOP("InstrumentSoundShaping", "CUTOFF"),
+	QT_TRANSLATE_NOOP("InstrumentSoundShaping", "RESO")
+};
+
 InstrumentSoundShapingView::InstrumentSoundShapingView(QWidget* parent) :
 	QWidget(parent),
 	ModelView(nullptr, this)
@@ -52,7 +61,7 @@ InstrumentSoundShapingView::InstrumentSoundShapingView(QWidget* parent) :
 	{
 		m_envLfoViews[i] = new EnvelopeAndLfoView(m_targetsTabWidget);
 		m_targetsTabWidget->addTab(m_envLfoViews[i],
-			tr(InstrumentSoundShaping::targetNames[i][0]), nullptr);
+			tr(InstrumentSoundShapingView::targetNames[i]), nullptr);
 	}
 
 	mainLayout->addWidget(m_targetsTabWidget, 1);

@@ -68,7 +68,8 @@ private:
 
 	QLabel* m_singleStreamInfoLabel;
 
-} ;
+	static const char *const targetNames[3];
+};
 
 
 } // namespace lmms::gui

@@ -78,9 +78,6 @@ public:
 		return "eldata";
 	}
 
-public:
-	static const char *const targetNames[3][3];
-
 private:
 	QString getVolumeNodeName() const;
 	QString getCutoffNodeName() const;

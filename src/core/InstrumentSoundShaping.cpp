@@ -42,20 +42,6 @@ const float RES_MULTIPLIER = 2.0f;
 const float RES_PRECISION = 1000.0f;
 
 
-// names for env- and lfo-targets - first is name being displayed to user
-// and second one is used internally, e.g. for saving/restoring settings
-const char *const InstrumentSoundShaping::targetNames[3][3] =
-{
-	{ QT_TRANSLATE_NOOP("InstrumentSoundShaping", "VOLUME"), "vol",
-			QT_TRANSLATE_NOOP("InstrumentSoundShaping", "Volume") },
-	{ QT_TRANSLATE_NOOP("InstrumentSoundShaping", "CUTOFF"), "cut",
-			QT_TRANSLATE_NOOP("InstrumentSoundShaping", "Cutoff frequency") },
-	{ QT_TRANSLATE_NOOP("InstrumentSoundShaping", "RESO"), "res",
-			QT_TRANSLATE_NOOP("InstrumentSoundShaping", "Resonance") }
-} ;
- 
-
-
 InstrumentSoundShaping::InstrumentSoundShaping(
 					InstrumentTrack * _instrument_track ) :
 	Model( _instrument_track, tr( "Envelopes/LFOs" ) ),
@@ -68,9 +54,9 @@ InstrumentSoundShaping::InstrumentSoundShaping(
 	m_filterCutModel( 14000.0, 1.0, 14000.0, 1.0, this, tr( "Cutoff frequency" ) ),
 	m_filterResModel( 0.5, BasicFilters<>::minQ(), 10.0, 0.01, this, tr( "Q/Resonance" ) )
 {
-	m_volumeParameters.setDisplayName(tr(targetNames[0][2]));
-	m_cutoffParameters.setDisplayName(tr(targetNames[1][2]));
-	m_resonanceParameters.setDisplayName(tr(targetNames[2][2]));
+	m_volumeParameters.setDisplayName(tr("Volume"));
+	m_cutoffParameters.setDisplayName(tr("Cutoff frequency"));
+	m_resonanceParameters.setDisplayName(tr("Resonance"));
 
 	m_filterModel.addItem( tr( "Low-pass" ), std::make_unique<PixmapLoader>( "filter_lp" ) );
 	m_filterModel.addItem( tr( "Hi-pass" ), std::make_unique<PixmapLoader>( "filter_hp" ) );
@@ -415,17 +401,17 @@ EnvelopeAndLfoParameters& InstrumentSoundShaping::getResonanceParameters()
 
 QString InstrumentSoundShaping::getVolumeNodeName() const
 {
-	return getVolumeParameters().nodeName() + QString(targetNames[0][1]).toLower();
+	return getVolumeParameters().nodeName() + "vol";
 }
 
 QString InstrumentSoundShaping::getCutoffNodeName() const
 {
-	return getCutoffParameters().nodeName() + QString(targetNames[1][1]).toLower();
+	return getCutoffParameters().nodeName() + "cut";
 }
 
 QString InstrumentSoundShaping::getResonanceNodeName() const
 {
-	return getResonanceParameters().nodeName() + QString(targetNames[2][1]).toLower();
+	return getResonanceParameters().nodeName() + "res";
 }
 
 } // namespace lmms
