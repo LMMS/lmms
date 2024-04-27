@@ -60,6 +60,11 @@ public:
 	const EnvelopeAndLfoParameters& getResonanceParameters() const;
 	EnvelopeAndLfoParameters& getResonanceParameters();
 
+	BoolModel& getFilterEnabledModel() { return m_filterEnabledModel; }
+	ComboBoxModel& getFilterModel() { return m_filterModel; }
+	FloatModel& getFilterCutModel() { return m_filterCutModel; }
+	FloatModel& getFilterResModel() { return m_filterResModel; }
+
 	f_cnt_t envFrames( const bool _only_vol = false ) const;
 	f_cnt_t releaseFrames() const;
 
@@ -72,6 +77,9 @@ public:
 	{
 		return "eldata";
 	}
+
+public:
+	static const char *const targetNames[3][3];
 
 private:
 	QString getVolumeNodeName() const;
@@ -89,12 +97,7 @@ private:
 	ComboBoxModel m_filterModel;
 	FloatModel m_filterCutModel;
 	FloatModel m_filterResModel;
-
-	static const char *const targetNames[3][3];
-
-
-	friend class gui::InstrumentSoundShapingView;
-} ;
+};
 
 
 } // namespace lmms

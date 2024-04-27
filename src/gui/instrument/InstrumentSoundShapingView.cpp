@@ -111,10 +111,10 @@ void InstrumentSoundShapingView::setFunctionsHidden( bool hidden )
 void InstrumentSoundShapingView::modelChanged()
 {
 	m_ss = castModel<InstrumentSoundShaping>();
-	m_filterGroupBox->setModel( &m_ss->m_filterEnabledModel );
-	m_filterComboBox->setModel( &m_ss->m_filterModel );
-	m_filterCutKnob->setModel( &m_ss->m_filterCutModel );
-	m_filterResKnob->setModel( &m_ss->m_filterResModel );
+	m_filterGroupBox->setModel(&m_ss->getFilterEnabledModel());
+	m_filterComboBox->setModel(&m_ss->getFilterModel());
+	m_filterCutKnob->setModel(&m_ss->getFilterCutModel());
+	m_filterResKnob->setModel(&m_ss->getFilterResModel());
 
 	m_envLfoViews[0]->setModel(&m_ss->getVolumeParameters());
 	m_envLfoViews[1]->setModel(&m_ss->getCutoffParameters());
