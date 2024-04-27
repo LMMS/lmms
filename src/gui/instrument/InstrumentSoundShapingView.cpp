@@ -39,15 +39,6 @@
 namespace lmms::gui
 {
 
-// names for env- and lfo-targets - first is name being displayed to user
-// and second one is used internally, e.g. for saving/restoring settings
-const char *const InstrumentSoundShapingView::targetNames[3] =
-{
-	QT_TRANSLATE_NOOP("InstrumentSoundShaping", "VOLUME"),
-	QT_TRANSLATE_NOOP("InstrumentSoundShaping", "CUTOFF"),
-	QT_TRANSLATE_NOOP("InstrumentSoundShaping", "RESO")
-};
-
 InstrumentSoundShapingView::InstrumentSoundShapingView(QWidget* parent) :
 	QWidget(parent),
 	ModelView(nullptr, this)
@@ -57,12 +48,13 @@ InstrumentSoundShapingView::InstrumentSoundShapingView(QWidget* parent) :
 
 	m_targetsTabWidget = new TabWidget(tr("TARGET"), this);
 
-	for (int i = 0; i < 3; ++i)
-	{
-		m_envLfoViews[i] = new EnvelopeAndLfoView(m_targetsTabWidget);
-		m_targetsTabWidget->addTab(m_envLfoViews[i],
-			tr(InstrumentSoundShapingView::targetNames[i]), nullptr);
-	}
+	m_volumeView = new EnvelopeAndLfoView(m_targetsTabWidget);
+	m_cutoffView = new EnvelopeAndLfoView(m_targetsTabWidget);
+	m_resonanceView = new EnvelopeAndLfoView(m_targetsTabWidget);
+
+	m_targetsTabWidget->addTab(m_volumeView, tr("VOLUME"), nullptr);
+	m_targetsTabWidget->addTab(m_cutoffView, tr("CUTOFF"), nullptr);
+	m_targetsTabWidget->addTab(m_resonanceView, tr("RESO"), nullptr);
 
 	mainLayout->addWidget(m_targetsTabWidget, 1);
 
@@ -125,9 +117,9 @@ void InstrumentSoundShapingView::modelChanged()
 	m_filterCutKnob->setModel(&m_ss->getFilterCutModel());
 	m_filterResKnob->setModel(&m_ss->getFilterResModel());
 
-	m_envLfoViews[0]->setModel(&m_ss->getVolumeParameters());
-	m_envLfoViews[1]->setModel(&m_ss->getCutoffParameters());
-	m_envLfoViews[2]->setModel(&m_ss->getResonanceParameters());
+	m_volumeView->setModel(&m_ss->getVolumeParameters());
+	m_cutoffView->setModel(&m_ss->getCutoffParameters());
+	m_resonanceView->setModel(&m_ss->getResonanceParameters());
 }
 
 
