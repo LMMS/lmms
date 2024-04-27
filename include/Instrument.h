@@ -115,11 +115,6 @@ public:
 
 	sample_rate_t getSampleRate() const;
 
-	Flags flags() const
-	{
-		return m_flags;
-	}
-
 	bool isSingleStreamed() const
 	{
 		return m_flags.testFlag(Instrument::Flag::IsSingleStreamed);
