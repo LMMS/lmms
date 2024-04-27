@@ -37,9 +37,11 @@ namespace lmms
 
 Instrument::Instrument(InstrumentTrack * _instrument_track,
 			const Descriptor * _descriptor,
-			const Descriptor::SubPluginFeatures::Key *key) :
+			const Descriptor::SubPluginFeatures::Key *key,
+			Flags flags) :
 	Plugin(_descriptor, nullptr/* _instrument_track*/, key),
-	m_instrumentTrack( _instrument_track )
+	m_instrumentTrack( _instrument_track ),
+	m_flags(flags)
 {
 }
 

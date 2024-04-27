@@ -80,11 +80,6 @@ public:
 
 	QString nodeName() const override;
 
-	Flags flags() const override
-	{
-		return Flag::IsSingleStreamed;
-	}
-
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
 	
 	QString getCurrentPatchName();
