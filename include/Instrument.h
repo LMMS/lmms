@@ -120,6 +120,21 @@ public:
 		return m_flags;
 	}
 
+	bool isSingleStreamed() const
+	{
+		return m_flags.testFlag(Instrument::Flag::IsSingleStreamed);
+	}
+
+	bool isMidiBased() const
+	{
+		return m_flags.testFlag(Instrument::Flag::IsMidiBased);
+	}
+
+	bool isBendable() const
+	{
+		return !m_flags.testFlag(Instrument::Flag::IsNotBendable);
+	}
+
 	// sub-classes can re-implement this for receiving all incoming
 	// MIDI-events
 	inline virtual bool handleMidiEvent( const MidiEvent&, const TimePos& = TimePos(), f_cnt_t offset = 0 )
