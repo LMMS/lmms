@@ -259,11 +259,6 @@ public:
 
 	QString nodeName() const override;
 
-	Flags flags() const override
-	{
-		return Flag::IsSingleStreamed | Flag::IsNotBendable;
-	}
-
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 	QString getCurrentPatchName();

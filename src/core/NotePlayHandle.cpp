@@ -109,7 +109,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 		m_instrumentTrack->midiNoteOn( *this );
 	}
 
-	if(m_instrumentTrack->instrument() && m_instrumentTrack->instrument()->flags() & Instrument::Flag::IsSingleStreamed )
+	if (m_instrumentTrack->instrument() && m_instrumentTrack->instrument()->isSingleStreamed())
 	{
 		setUsesBuffer( false );
 	}

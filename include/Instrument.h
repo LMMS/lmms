@@ -62,7 +62,8 @@ public:
 
 	Instrument(InstrumentTrack * _instrument_track,
 			const Descriptor * _descriptor,
-			const Descriptor::SubPluginFeatures::Key * key = nullptr);
+			const Descriptor::SubPluginFeatures::Key * key = nullptr,
+			Flags flags = Flag::NoFlags);
 	~Instrument() override = default;
 
 	// --------------------------------------------------------------------
@@ -114,9 +115,19 @@ public:
 
 	sample_rate_t getSampleRate() const;
 
-	virtual Flags flags() const
+	bool isSingleStreamed() const
 	{
-		return Flag::NoFlags;
+		return m_flags.testFlag(Instrument::Flag::IsSingleStreamed);
+	}
+
+	bool isMidiBased() const
+	{
+		return m_flags.testFlag(Instrument::Flag::IsMidiBased);
+	}
+
+	bool isBendable() const
+	{
+		return !m_flags.testFlag(Instrument::Flag::IsNotBendable);
 	}
 
 	// sub-classes can re-implement this for receiving all incoming
@@ -161,8 +172,8 @@ protected:
 
 private:
 	InstrumentTrack * m_instrumentTrack;
-
-} ;
+	Flags m_flags;
+};
 
 
 LMMS_DECLARE_OPERATORS_FOR_FLAGS(Instrument::Flag)

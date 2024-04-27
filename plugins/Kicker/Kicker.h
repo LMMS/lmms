@@ -64,11 +64,6 @@ public:
 
 	QString nodeName() const override;
 
-	Flags flags() const override
-	{
-		return Flag::IsNotBendable;
-	}
-
 	float desiredReleaseTimeMs() const override
 	{
 		return 12.f;
