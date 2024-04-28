@@ -37,6 +37,13 @@
 
 namespace lmms::gui
 {
+// for Qt 6, there's a signature change in nativeEventFilter, to clean once 
+// Qt 5 support is dropped
+#if (QT_VERSION >= QT_VERSION_CHECK(6,0,0))
+using filterResult = quintptr;
+#else
+using filterResult = long;
+#endif
 
 
 #if defined(LMMS_BUILD_WIN32)
@@ -49,8 +56,7 @@ public:
 	MainApplication(int& argc, char** argv);
 	bool event(QEvent* event) override;
 #ifdef LMMS_BUILD_WIN32
-	bool nativeEventFilter(const QByteArray& eventType, void* message,
-				long* result);
+	bool nativeEventFilter(const QByteArray& eventType, void* message, filterResult* result);
 #endif
 	inline QString& queuedFile()
 	{
