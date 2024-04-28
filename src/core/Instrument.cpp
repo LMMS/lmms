@@ -37,9 +37,11 @@ namespace lmms
 
 Instrument::Instrument(InstrumentTrack * _instrument_track,
 			const Descriptor * _descriptor,
-			const Descriptor::SubPluginFeatures::Key *key) :
+			const Descriptor::SubPluginFeatures::Key *key,
+			Flags flags) :
 	Plugin(_descriptor, nullptr/* _instrument_track*/, key),
-	m_instrumentTrack( _instrument_track )
+	m_instrumentTrack( _instrument_track ),
+	m_flags(flags)
 {
 }
 
@@ -195,7 +197,16 @@ void Instrument::applyRelease( sampleFrame * buf, const NotePlayHandle * _n )
 	}
 }
 
+float Instrument::computeReleaseTimeMsByFrameCount(f_cnt_t frames) const
+{
+	return frames / getSampleRate() * 1000.;
+}
 
+
+sample_rate_t Instrument::getSampleRate() const
+{
+	return Engine::audioEngine()->processingSampleRate();
+}
 
 
 QString Instrument::fullDisplayName() const

@@ -159,7 +159,6 @@ void ProjectRenderer::startProcessing()
 
 void ProjectRenderer::run()
 {
-	MemoryManager::ThreadGuard mmThreadGuard; Q_UNUSED(mmThreadGuard);
 #if 0
 #if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_FREEBSD)
 #ifdef LMMS_HAVE_SCHED_H

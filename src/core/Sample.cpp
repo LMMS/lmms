@@ -24,8 +24,7 @@
 
 #include "Sample.h"
 
-#include <QPainter>
-#include <QRect>
+#include <cassert>
 
 namespace lmms {
 
@@ -47,7 +46,7 @@ Sample::Sample(const QByteArray& base64, int sampleRate)
 {
 }
 
-Sample::Sample(const sampleFrame* data, int numFrames, int sampleRate)
+Sample::Sample(const sampleFrame* data, size_t numFrames, int sampleRate)
 	: m_buffer(std::make_shared<SampleBuffer>(data, numFrames, sampleRate))
 	, m_startFrame(0)
 	, m_endFrame(m_buffer->size())
@@ -117,57 +116,39 @@ auto Sample::operator=(Sample&& other) -> Sample&
 	return *this;
 }
 
-bool Sample::play(sampleFrame* dst, PlaybackState* state, int numFrames, float desiredFrequency, Loop loopMode)
+bool Sample::play(sampleFrame* dst, PlaybackState* state, size_t numFrames, float desiredFrequency, Loop loopMode) const
 {
-	if (numFrames <= 0 || desiredFrequency <= 0) { return false; }
+	assert(numFrames > 0);
+	assert(desiredFrequency > 0);
 
-	auto resampleRatio = static_cast<float>(Engine::audioEngine()->processingSampleRate()) / m_buffer->sampleRate();
-	resampleRatio *= frequency() / desiredFrequency;
+	const auto pastBounds = state->m_frameIndex >= m_endFrame || (state->m_frameIndex < 0 && state->m_backwards);
+	if (loopMode == Loop::Off && pastBounds) { return false; }
 
-	auto playBuffer = std::vector<sampleFrame>(numFrames / resampleRatio);
-	if (!typeInfo<float>::isEqual(resampleRatio, 1.0f))
-	{
-		playBuffer.resize(playBuffer.size() + s_interpolationMargins[state->resampler().interpolationMode()]);
-	}
+	const auto outputSampleRate = Engine::audioEngine()->processingSampleRate() * m_frequency / desiredFrequency;
+	const auto inputSampleRate = m_buffer->sampleRate();
+	const auto resampleRatio = outputSampleRate / inputSampleRate;
+	const auto marginSize = s_interpolationMargins[state->resampler().interpolationMode()];
 
-	const auto start = startFrame();
-	const auto end = endFrame();
-	const auto loopStart = loopStartFrame();
-	const auto loopEnd = loopEndFrame();
+	state->m_frameIndex = std::max<int>(m_startFrame, state->m_frameIndex);
 
-	switch (loopMode)
-	{
-	case Loop::Off:
-		state->m_frameIndex = std::clamp(state->m_frameIndex, start, end);
-		if (state->m_frameIndex == end) { return false; }
-		break;
-	case Loop::On:
-		state->m_frameIndex = std::clamp(state->m_frameIndex, start, loopEnd);
-		if (state->m_frameIndex == loopEnd) { state->m_frameIndex = loopStart; }
-		break;
-	case Loop::PingPong:
-		state->m_frameIndex = std::clamp(state->m_frameIndex, start, loopEnd);
-		if (state->m_frameIndex == loopEnd)
-		{
-			state->m_frameIndex = loopEnd - 1;
-			state->m_backwards = true;
-		}
-		else if (state->m_frameIndex <= loopStart && state->m_backwards)
-		{
-			state->m_frameIndex = loopStart;
-			state->m_backwards = false;
-		}
-		break;
-	}
+	auto playBuffer = std::vector<sampleFrame>(numFrames / resampleRatio + marginSize);
+	playRaw(playBuffer.data(), playBuffer.size(), state, loopMode);
 
-	playSampleRange(state, playBuffer.data(), playBuffer.size());
-
-	const auto result
+	const auto resampleResult
 		= state->resampler().resample(&playBuffer[0][0], playBuffer.size(), &dst[0][0], numFrames, resampleRatio);
-	if (result.error != 0) { return false; }
+	advance(state, resampleResult.inputFramesUsed, loopMode);
 
-	state->m_frameIndex += (state->m_backwards ? -1 : 1) * result.inputFramesUsed;
-	amplifySampleRange(dst, result.outputFramesGenerated);
+	const auto outputFrames = resampleResult.outputFramesGenerated;
+	if (outputFrames < numFrames) { std::fill_n(dst + outputFrames, numFrames - outputFrames, sampleFrame{}); }
+
+	if (!typeInfo<float>::isEqual(m_amplification, 1.0f))
+	{
+		for (int i = 0; i < numFrames; ++i)
+		{
+			dst[i][0] *= m_amplification;
+			dst[i][1] *= m_amplification;
+		}
+	}
 
 	return true;
 }
@@ -187,44 +168,80 @@ void Sample::setAllPointFrames(int startFrame, int endFrame, int loopStartFrame,
 	setLoopEndFrame(loopEndFrame);
 }
 
-void Sample::playSampleRange(PlaybackState* state, sampleFrame* dst, size_t numFrames) const
+void Sample::playRaw(sampleFrame* dst, size_t numFrames, const PlaybackState* state, Loop loopMode) const
 {
-	auto framesToCopy = 0;
-	if (state->m_backwards)
+	auto index = state->m_frameIndex;
+	auto backwards = state->m_backwards;
+
+	for (size_t i = 0; i < numFrames; ++i)
 	{
-		framesToCopy = std::min<int>(state->m_frameIndex - startFrame(), numFrames);
-		copyBufferBackward(dst, state->m_frameIndex, framesToCopy);
-	}
-	else
-	{
-		framesToCopy = std::min<int>(endFrame() - state->m_frameIndex, numFrames);
-		copyBufferForward(dst, state->m_frameIndex, framesToCopy);
-	}
+		switch (loopMode)
+		{
+		case Loop::Off:
+			if (index < 0 || index >= m_endFrame) { return; }
+			break;
+		case Loop::On:
+			if (index < m_loopStartFrame && backwards) { index = m_loopEndFrame - 1; }
+			else if (index >= m_loopEndFrame) { index = m_loopStartFrame; }
+			break;
+		case Loop::PingPong:
+			if (index < m_loopStartFrame && backwards)
+			{
+				index = m_loopStartFrame;
+				backwards = false;
+			}
+			else if (index >= m_loopEndFrame)
+			{
+				index = m_loopEndFrame - 1;
+				backwards = true;
+			}
+			break;
+		default:
+			break;
+		}
 
-	if (framesToCopy < numFrames) { std::fill_n(dst + framesToCopy, numFrames - framesToCopy, sampleFrame{0, 0}); }
-}
-
-void Sample::copyBufferForward(sampleFrame* dst, int initialPosition, int advanceAmount) const
-{
-	reversed() ? std::copy_n(m_buffer->rbegin() + initialPosition, advanceAmount, dst)
-			   : std::copy_n(m_buffer->begin() + initialPosition, advanceAmount, dst);
-}
-
-void Sample::copyBufferBackward(sampleFrame* dst, int initialPosition, int advanceAmount) const
-{
-	reversed() ? std::reverse_copy(
-		m_buffer->rbegin() + initialPosition - advanceAmount, m_buffer->rbegin() + initialPosition, dst)
-			   : std::reverse_copy(
-				   m_buffer->begin() + initialPosition - advanceAmount, m_buffer->begin() + initialPosition, dst);
-}
-
-void Sample::amplifySampleRange(sampleFrame* src, int numFrames) const
-{
-	const auto amplification = m_amplification.load(std::memory_order_relaxed);
-	for (int i = 0; i < numFrames; ++i)
-	{
-		src[i][0] *= amplification;
-		src[i][1] *= amplification;
+		dst[i] = m_buffer->data()[m_reversed ? m_buffer->size() - index - 1 : index];
+		backwards ? --index : ++index;
 	}
 }
+
+void Sample::advance(PlaybackState* state, size_t advanceAmount, Loop loopMode) const
+{
+	state->m_frameIndex += (state->m_backwards ? -1 : 1) * advanceAmount;
+	if (loopMode == Loop::Off) { return; }
+
+	const auto distanceFromLoopStart = std::abs(state->m_frameIndex - m_loopStartFrame);
+	const auto distanceFromLoopEnd = std::abs(state->m_frameIndex - m_loopEndFrame);
+	const auto loopSize = m_loopEndFrame - m_loopStartFrame;
+	if (loopSize == 0) { return; }
+
+	switch (loopMode)
+	{
+	case Loop::On:
+		if (state->m_frameIndex < m_loopStartFrame && state->m_backwards)
+		{
+			state->m_frameIndex = m_loopEndFrame - 1 - distanceFromLoopStart % loopSize;
+		}
+		else if (state->m_frameIndex >= m_loopEndFrame)
+		{
+			state->m_frameIndex = m_loopStartFrame + distanceFromLoopEnd % loopSize;
+		}
+		break;
+	case Loop::PingPong:
+		if (state->m_frameIndex < m_loopStartFrame && state->m_backwards)
+		{
+			state->m_frameIndex = m_loopStartFrame + distanceFromLoopStart % loopSize;
+			state->m_backwards = false;
+		}
+		else if (state->m_frameIndex >= m_loopEndFrame)
+		{
+			state->m_frameIndex = m_loopEndFrame - 1 - distanceFromLoopEnd % loopSize;
+			state->m_backwards = true;
+		}
+		break;
+	default:
+		break;
+	}
+}
+
 } // namespace lmms

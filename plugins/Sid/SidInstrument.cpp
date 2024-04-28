@@ -221,44 +221,35 @@ QString SidInstrument::nodeName() const
 }
 
 
-
-
-f_cnt_t SidInstrument::desiredReleaseFrames() const
+float SidInstrument::desiredReleaseTimeMs() const
 {
-	const float samplerate = Engine::audioEngine()->processingSampleRate();
 	int maxrel = 0;
 	for (const auto& voice : m_voice)
 	{
-		if( maxrel < voice->m_releaseModel.value() )
-			maxrel = (int)voice->m_releaseModel.value();
+		maxrel = std::max(maxrel, static_cast<int>(voice->m_releaseModel.value()));
 	}
 
-	return f_cnt_t( float(relTime[maxrel])*samplerate/1000.0 );
+	return computeReleaseTimeMsByFrameCount(relTime[maxrel]);
 }
-
-
 
 
 static int sid_fillbuffer(unsigned char* sidreg, reSID::SID *sid, int tdelta, short *ptr, int samples)
 {
-  int tdelta2;
-  int result;
   int total = 0;
-  int c;
 //  customly added
   int residdelay = 0;
 
   int badline = rand() % NUMSIDREGS;
 
-  for (c = 0; c < NUMSIDREGS; c++)
+  for (int c = 0; c < NUMSIDREGS; c++)
   {
     unsigned char o = sidorder[c];
 
   	// Extra delay for loading the waveform (and mt_chngate,x)
   	if ((o == 4) || (o == 11) || (o == 18))
   	{
-  	  tdelta2 = SIDWAVEDELAY;
-      result = sid->clock(tdelta2, ptr, samples);
+  	  int tdelta2 = SIDWAVEDELAY;
+      int result = sid->clock(tdelta2, ptr, samples);
       total += result;
       ptr += result;
       samples -= result;
@@ -268,8 +259,8 @@ static int sid_fillbuffer(unsigned char* sidreg, reSID::SID *sid, int tdelta, sh
     // Possible random badline delay once per writing
     if ((badline == c) && (residdelay))
   	{
-      tdelta2 = residdelay;
-      result = sid->clock(tdelta2, ptr, samples);
+      int tdelta2 = residdelay;
+      int result = sid->clock(tdelta2, ptr, samples);
       total += result;
       ptr += result;
       samples -= result;
@@ -278,14 +269,14 @@ static int sid_fillbuffer(unsigned char* sidreg, reSID::SID *sid, int tdelta, sh
 
     sid->write(o, sidreg[o]);
 
-    tdelta2 = SIDWRITEDELAY;
-    result = sid->clock(tdelta2, ptr, samples);
+    int tdelta2 = SIDWRITEDELAY;
+    int result = sid->clock(tdelta2, ptr, samples);
     total += result;
     ptr += result;
     samples -= result;
     tdelta -= SIDWRITEDELAY;
   }
-  result = sid->clock(tdelta, ptr, samples);
+  int result = sid->clock(tdelta, ptr, samples);
   total += result;
 
   return total;

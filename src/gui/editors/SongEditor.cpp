@@ -142,17 +142,6 @@ SongEditor::SongEditor( Song * song ) :
 
 	int tempoSpinBoxCol = getGUI()->mainWindow()->addWidgetToToolBar( m_tempoSpinBox, 0 );
 
-#if 0
-	toolButton * hq_btn = new toolButton( embed::getIconPixmap( "hq_mode" ),
-						tr( "High quality mode" ),
-						nullptr, nullptr, tb );
-	hq_btn->setCheckable( true );
-	connect( hq_btn, SIGNAL(toggled(bool)),
-			this, SLOT(setHighQuality(bool)));
-	hq_btn->setFixedWidth( 42 );
-	getGUI()->mainWindow()->addWidgetToToolBar( hq_btn, 1, col );
-#endif
-
 	getGUI()->mainWindow()->addWidgetToToolBar( new TimeDisplayWidget, 1, tempoSpinBoxCol );
 
 	getGUI()->mainWindow()->addSpacingToToolBar( 10 );
@@ -332,19 +321,6 @@ QString SongEditor::getSnapSizeString() const
 		return QString("1 Bar");
 	}
 }
-
-
-
-
-void SongEditor::setHighQuality( bool hq )
-{
-	Engine::audioEngine()->changeQuality( AudioEngine::qualitySettings(
-			hq ? AudioEngine::qualitySettings::Mode::HighQuality :
-				AudioEngine::qualitySettings::Mode::Draft ) );
-}
-
-
-
 
 void SongEditor::scrolled( int new_pos )
 {
@@ -774,17 +750,9 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 
 void SongEditor::updatePosition( const TimePos & t )
 {
-	int widgetWidth, trackOpWidth;
-	if( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
-	{
-		widgetWidth = DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT;
-		trackOpWidth = TRACK_OP_WIDTH_COMPACT;
-	}
-	else
-	{
-		widgetWidth = DEFAULT_SETTINGS_WIDGET_WIDTH;
-		trackOpWidth = TRACK_OP_WIDTH;
-	}
+	const bool compactTrackButtons = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt();
+	const auto widgetWidth = compactTrackButtons ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT : DEFAULT_SETTINGS_WIDGET_WIDTH;
+	const auto trackOpWidth = compactTrackButtons ? TRACK_OP_WIDTH_COMPACT : TRACK_OP_WIDTH;
 
 	if( ( m_song->isPlaying() && m_song->m_playMode == Song::PlayMode::Song
 		  && m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Enabled) ||

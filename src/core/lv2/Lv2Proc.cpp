@@ -425,12 +425,8 @@ void Lv2Proc::handleMidiInputEvent(const MidiEvent &event, const TimePos &time, 
 
 AutomatableModel *Lv2Proc::modelAtPort(const QString &uri)
 {
-	// unused currently
-	AutomatableModel *mod;
-	auto itr = m_connectedModels.find(uri.toUtf8().data());
-	if (itr != m_connectedModels.end()) { mod = itr->second; }
-	else { mod = nullptr; }
-	return mod;
+	const auto itr = m_connectedModels.find(uri.toUtf8().data());
+	return itr != m_connectedModels.end() ? itr->second : nullptr;
 }
 
 
@@ -467,7 +463,7 @@ void Lv2Proc::initPlugin()
 			<< "(URI:"
 			<< lilv_node_as_uri(lilv_plugin_get_uri(m_plugin))
 			<< ")";
-		m_valid = false;
+		throw std::runtime_error("Failed to create Lv2 processor");
 	}
 }
 
@@ -476,16 +472,12 @@ void Lv2Proc::initPlugin()
 
 void Lv2Proc::shutdownPlugin()
 {
-	if (m_valid)
-	{
-		lilv_instance_deactivate(m_instance);
-		lilv_instance_free(m_instance);
-		m_instance = nullptr;
+	lilv_instance_deactivate(m_instance);
+	lilv_instance_free(m_instance);
+	m_instance = nullptr;
 
-		m_features.clear();
-		m_options.clear();
-	}
-	m_valid = true;
+	m_features.clear();
+	m_options.clear();
 }
 
 

@@ -65,7 +65,8 @@ f_cnt_t AudioFileProcessorWaveView::range() const
 	return m_to - m_from;
 }
 
-AudioFileProcessorWaveView::AudioFileProcessorWaveView(QWidget * parent, int w, int h, Sample const * buf) :
+AudioFileProcessorWaveView::AudioFileProcessorWaveView(QWidget* parent, int w, int h, Sample const* buf,
+	knob* start, knob* end, knob* loop) :
 	QWidget(parent),
 	m_sample(buf),
 	m_graph(QPixmap(w - 2 * s_padding, h - 2 * s_padding)),
@@ -74,9 +75,9 @@ AudioFileProcessorWaveView::AudioFileProcessorWaveView(QWidget * parent, int w, 
 	m_last_from(0),
 	m_last_to(0),
 	m_last_amp(0),
-	m_startKnob(0),
-	m_endKnob(0),
-	m_loopKnob(0),
+	m_startKnob(start),
+	m_endKnob(end),
+	m_loopKnob(loop),
 	m_isDragging(false),
 	m_reversed(false),
 	m_framesPlayed(0),
@@ -84,6 +85,8 @@ AudioFileProcessorWaveView::AudioFileProcessorWaveView(QWidget * parent, int w, 
 {
 	setFixedSize(w, h);
 	setMouseTracking(true);
+
+	configureKnobRelationsAndWaveViews();
 
 	updateSampleRange();
 
@@ -270,7 +273,7 @@ void AudioFileProcessorWaveView::paintEvent(QPaintEvent * pe)
 	p.fillRect(s_padding, s_padding, m_graph.width(), 14, g);
 
 	p.setPen(QColor(255, 255, 255));
-	p.setFont(pointSize<8>(font()));
+	p.setFont(adjustedToPixelSize(font(), 8));
 
 	QString length_text;
 	const int length = m_sample->sampleDuration().count();
@@ -351,32 +354,21 @@ void AudioFileProcessorWaveView::zoom(const bool out)
 	const double comp_ratio = double(qMin(d_from, d_to))
 								/ qMax(1, qMax(d_from, d_to));
 
-	f_cnt_t new_from;
-	f_cnt_t new_to;
+	const auto boundedFrom = std::clamp(m_from + step_from, 0, start);
+	const auto boundedTo = std::clamp(m_to + step_to, end, frames);
 
-	if ((out && d_from < d_to) || (! out && d_to < d_from))
-	{
-		new_from = qBound(0, m_from + step_from, start);
-		new_to = qBound(
-			end,
-			m_to + f_cnt_t(step_to * (new_from == m_from ? 1 : comp_ratio)),
-			frames
-		);
-	}
-	else
-	{
-		new_to = qBound(end, m_to + step_to, frames);
-		new_from = qBound(
-			0,
-			m_from + f_cnt_t(step_from * (new_to == m_to ? 1 : comp_ratio)),
-			start
-		);
-	}
+	const auto toStep = static_cast<f_cnt_t>(step_from * (boundedTo == m_to ? 1 : comp_ratio));
+	const auto newFrom
+		= (out && d_from < d_to) || (!out && d_to < d_from) ? boundedFrom : std::clamp(m_from + toStep, 0, start);
 
-	if (static_cast<double>(new_to - new_from) / m_sample->sampleRate() > 0.05)
+	const auto fromStep = static_cast<f_cnt_t>(step_to * (boundedFrom == m_from ? 1 : comp_ratio));
+	const auto newTo
+		= (out && d_from < d_to) || (!out && d_to < d_from) ? std::clamp(m_to + fromStep, end, frames) : boundedTo;
+
+	if (static_cast<double>(newTo - newFrom) / m_sample->sampleRate() > 0.05)
 	{
-		setFrom(new_from);
-		setTo(new_to);
+		setFrom(newFrom);
+		setTo(newTo);
 	}
 }
 
@@ -397,21 +389,6 @@ void AudioFileProcessorWaveView::slide(int px)
 	setFrom(m_from + step);
 	setTo(m_to + step);
 	slideSampleByFrames(step);
-}
-
-void AudioFileProcessorWaveView::setKnobs(knob * start, knob * end, knob * loop)
-{
-	m_startKnob = start;
-	m_endKnob = end;
-	m_loopKnob = loop;
-
-	m_startKnob->setWaveView(this);
-	m_startKnob->setRelatedKnob(m_endKnob);
-
-	m_endKnob->setWaveView(this);
-	m_endKnob->setRelatedKnob(m_startKnob);
-
-	m_loopKnob->setWaveView(this);
 }
 
 void AudioFileProcessorWaveView::slideSamplePointByPx(Point point, int px)
@@ -509,6 +486,17 @@ void AudioFileProcessorWaveView::updateCursor(QMouseEvent * me)
 		setCursor(Qt::ClosedHandCursor);
 	else
 		setCursor(Qt::OpenHandCursor);
+}
+
+void AudioFileProcessorWaveView::configureKnobRelationsAndWaveViews()
+{
+	m_startKnob->setWaveView(this);
+	m_startKnob->setRelatedKnob(m_endKnob);
+
+	m_endKnob->setWaveView(this);
+	m_endKnob->setRelatedKnob(m_startKnob);
+
+	m_loopKnob->setWaveView(this);
 }
 
 void AudioFileProcessorWaveView::knob::slideTo(double v, bool check_bound)

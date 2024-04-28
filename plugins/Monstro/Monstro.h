@@ -173,7 +173,6 @@ class ComboBox;
 
 class MonstroSynth
 {
-	MM_OPERATORS
 public:
 	MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph );
 	virtual ~MonstroSynth() = default;
@@ -367,7 +366,7 @@ public:
 
 	QString nodeName() const override;
 
-	f_cnt_t desiredReleaseFrames() const override;
+	float desiredReleaseTimeMs() const override;
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
 

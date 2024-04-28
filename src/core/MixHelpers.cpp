@@ -178,6 +178,15 @@ struct AddSwappedMultipliedOp
 	const float m_coeff;
 };
 
+void multiply(sampleFrame* dst, float coeff, int frames)
+{
+	for (int i = 0; i < frames; ++i)
+	{
+		dst[i][0] *= coeff;
+		dst[i][1] *= coeff;
+	}
+}
+
 void addSwappedMultiplied( sampleFrame* dst, const sampleFrame* src, float coeffSrc, int frames )
 {
 	run<>( dst, src, frames, AddSwappedMultipliedOp(coeffSrc) );

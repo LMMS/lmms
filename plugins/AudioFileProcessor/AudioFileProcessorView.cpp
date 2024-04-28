@@ -134,7 +134,6 @@ AudioFileProcessorView::AudioFileProcessorView(Instrument* instrument,
 // interpolation selector
 	m_interpBox = new ComboBox(this);
 	m_interpBox->setGeometry(142, 62, 82, ComboBox::DEFAULT_HEIGHT);
-	m_interpBox->setFont(pointSize<8>(m_interpBox->font()));
 
 // wavegraph
 	m_waveView = 0;
@@ -184,12 +183,12 @@ void AudioFileProcessorView::newWaveView()
 		delete m_waveView;
 		m_waveView = 0;
 	}
-	m_waveView = new AudioFileProcessorWaveView(this, 245, 75, &castModel<AudioFileProcessor>()->sample());
-	m_waveView->move(2, 172);
-	m_waveView->setKnobs(
+	m_waveView = new AudioFileProcessorWaveView(this, 245, 75, &castModel<AudioFileProcessor>()->sample(),
 		dynamic_cast<AudioFileProcessorWaveView::knob*>(m_startKnob),
 		dynamic_cast<AudioFileProcessorWaveView::knob*>(m_endKnob),
 		dynamic_cast<AudioFileProcessorWaveView::knob*>(m_loopKnob));
+	m_waveView->move(2, 172);
+	
 	m_waveView->show();
 }
 
@@ -228,7 +227,7 @@ void AudioFileProcessorView::paintEvent(QPaintEvent*)
 
 	int idx = a->sample().sampleFile().length();
 
-	p.setFont(pointSize<8>(font()));
+	p.setFont(adjustedToPixelSize(font(), 8));
 
 	QFontMetrics fm(p.font());
 
