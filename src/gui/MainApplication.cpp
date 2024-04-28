@@ -85,8 +85,16 @@ bool MainApplication::event(QEvent* event)
 	}
 }
 
+// for Qt 6, there's a signature change in nativeEventFilter, to clean once 
+// Qt 5 support is dropped
+#if (QT_VERSION >= QT_VERSION_CHECK(6,0,0))
+using filterResult = quintptr;
+#else
+using filterResult = long;
+#endif
+
 #ifdef LMMS_BUILD_WIN32
-bool MainApplication::nativeEventFilter(const QByteArray& eventType, void* message, long* result)
+bool MainApplication::nativeEventFilter(const QByteArray& eventType, void* message, filterResult* result)
 {
 	if (eventType != "windows_generic_MSG") { return false; }
 
