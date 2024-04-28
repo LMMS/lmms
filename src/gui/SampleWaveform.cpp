@@ -67,10 +67,12 @@ void SampleWaveform::visualize(Parameters parameters, QPainter& painter, const Q
 		squared[pixelIndex] += value * value;
 	}
 	
-	for (; pixelIndex < numPixels; pixelIndex++)
+	while (pixelIndex < numPixels)
 	{
 		max[pixelIndex] = 0.0;
 		min[pixelIndex] = 0.0;
+		
+		pixelIndex++;
 	}
 
 	for (int i = 0; i < numPixels; i++)
