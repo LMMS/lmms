@@ -125,6 +125,11 @@ const QString& SampleClip::sampleFile() const
 	return m_sample.sampleFile();
 }
 
+bool SampleClip::hasSampleFileLoaded(const QString & filename) const
+{
+	return m_sample.sampleFile() == filename;
+}
+
 void SampleClip::setSampleBuffer(std::shared_ptr<const SampleBuffer> sb)
 {
 	{

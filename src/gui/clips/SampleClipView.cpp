@@ -180,20 +180,17 @@ void SampleClipView::mouseReleaseEvent(QMouseEvent *_me)
 
 void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 {
-	QString af = SampleLoader::openAudioFile();
+	const QString selectedAudioFile = SampleLoader::openAudioFile();
 
-	// Don't do anything if no file is loaded
-	if (af.isEmpty()) { return; }
+	if (selectedAudioFile.isEmpty()) { return; }
 	
-	if (af == m_clip->m_sample.sampleFile())
+	if (m_clip->hasSampleFileLoaded(selectedAudioFile))
 	{
-		// Don't reload the same file again. Just reset the size.
 		m_clip->changeLengthToSampleLength();
 	}
 	else
 	{
-		// Load the new file and set it for the clip
-		auto sampleBuffer = SampleLoader::createBufferFromFile(af);
+		auto sampleBuffer = SampleLoader::createBufferFromFile(selectedAudioFile);
 		if (sampleBuffer != SampleBuffer::emptyBuffer())
 		{
 			m_clip->setSampleBuffer(sampleBuffer);
