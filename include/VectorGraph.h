@@ -305,8 +305,6 @@ public:
 	virtual void loadSettings(const QDomElement& element, const QString& name);
 	virtual void saveSettings(QDomDocument& doc, QDomElement& element);
 	virtual void loadSettings(const QDomElement& element);
-	// read locations from saved data attributes unused but implemeted
-	//int readLoc(unsigned int start, QString data);
 	void lockGetSamplesAccess();
 	void unlockGetSamplesAccess();
 	void lockBakedSamplesAccess();
@@ -613,23 +611,18 @@ private:
 
 	// line types, m_type is used for this
 	// valA: amp, valB: freq, fadeInStartLoc: from what xIn value should the line type fade out
-	//float processLineTypeSine(float xIn, float valA, float valB, float fadeInStartLoc);
 	std::vector<float> processLineTypeArraySine(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
 		float valA, float valB, float fadeInStartLoc);
 	// curve: phase
-	//float processLineTypeSineB(float xIn, float valA, float valB, float curve, float fadeInStartLoc);
 	std::vector<float> processLineTypeArraySineB(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
 		float valA, float valB, float curve, float fadeInStartLoc);
 	// valA: amp, valB: x coord, curve: width
-	//float processLineTypePeak(float xIn, float valA, float valB, float curve, float fadeInStartLoc);
 	std::vector<float> processLineTypeArrayPeak(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
 		float valA, float valB, float curve, float fadeInStartLoc);
 	// y: calculate steps from, valA: y count, valB: curve
-	//float processLineTypeSteps(float xIn, float yIn, float valA, float valBIn, float fadeInStartLoc);
 	std::vector<float> processLineTypeArraySteps(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
 		std::vector<float>* yArray, float valA, float valB, float fadeInStartLoc);
 	// valA: amp, valB: random number count, curve: seed
-	//float processLineTypeRandom(float xIn, float valA, float valB, float curve, float fadeInStartLoc);
 	std::vector<float> processLineTypeArrayRandom(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
 		float valA, float valB, float curve, float fadeInStartLoc);
 
@@ -652,9 +645,7 @@ private:
 
 	// real getSamples processing
 	void getSamples(unsigned int targetSizeIn, bool* isChangedOut, std::vector<unsigned int>* updatingValuesOut, std::vector<float>* sampleBufferOut);
-	// gets every m_needsUpdating point's line's start and end effector point's location in the effector dataArray
-	// .first = start, .second = line end location (effector dataArray)
-	//void getSamplesLocations(VectorGraphDataArray* effector, std::vector<std::pair<unsigned int, unsigned int>>* effectorDataOut);
+	// redraw lines
 	void getSamplesUpdateLines(VectorGraphDataArray* effector, std::vector<float>* effectorSamples,
 		std::vector<float>* outputXLocations, unsigned int iIn, float stepSize);
 	bool isEffectedPoint(unsigned int pointLocation);
