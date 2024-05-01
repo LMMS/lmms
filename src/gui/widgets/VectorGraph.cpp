@@ -3200,26 +3200,27 @@ float VectorGraphDataArray::processAutomation(unsigned int pointLocation, float 
 	return output;
 }
 
-std::vector<float> VectorGraphDataArray::processLineTypeArraySine(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
+void VectorGraphDataArray::processLineTypeArraySine(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
 	float sineAmp, float sineFreq, float fadeInStartLoc)
 {
-	return VectorGraphDataArray::processLineTypeArraySineB(xArray, startLoc, endLoc,
+	processLineTypeArraySineB(samplesOut, xArray, startLoc, endLoc,
 		sineAmp, sineFreq, 0.0f, fadeInStartLoc);
 }
-std::vector<float> VectorGraphDataArray::processLineTypeArraySineB(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
+void VectorGraphDataArray::processLineTypeArraySineB(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
 	float sineAmp, float sineFreq, float sinePhase, float fadeInStartLoc)
 {
+	float startLocVal = samplesOut->operator[](startLoc);
+	float endLocVal = samplesOut->operator[](endLoc > 0 ? endLoc - 1 : 0);
 	int count = static_cast<int>(endLoc) - static_cast<int>(startLoc);
 	if (count < 0)
 	{
 		count = 0;
 	}
 	float tValB = 0.001f + ((sineFreq + 1.0f) / 2.0f) * 0.999f;
-	std::vector<float> output(count);
 	// calculating how many samples are needed to 1 complete wave
 	// we have "count" amount of samples and "tValB * 100.0f" amount of waves
 	int end = static_cast<int>(std::floor(count / (tValB * 100.0f)));
-	//qDebug("sineB_1, %f, %d", (count / (tValB * 100.0f)), end);
+	qDebug("sineB_1, %f, %d", (count / (tValB * 100.0f)), end);
 	if (count <= 0)
 	{
 		end = 0;
@@ -3228,93 +3229,98 @@ std::vector<float> VectorGraphDataArray::processLineTypeArraySineB(std::vector<f
 	{
 		end = end > count ? count : end + 1;
 	}
+	std::vector<float> oneWave(end);
 
 	// calculate 1 wave of sine
 	for (unsigned int i = 0; i < end; i++)
 	{
 		// 628.318531f = 100.0f * 2.0f * pi
 		// (1 sine wave is 2pi long and we have 1 * 100 * sineFreq waves)
-		output[i] = sineAmp * std::sin(
+		oneWave[i] = sineAmp * std::sin(
 			xArray->operator[](startLoc + i) * 628.318531f * tValB + sinePhase * 100.0f);
 	}
 	//qDebug("sineB_2");
 	// copy the first wave until the end
-	for (unsigned int i = end; i < count; i++)
+	for (int i = 0; i < count; i += end)
 	{
-		//qDebug("sineB_2.5: i: %d, %d, %d", (i - end), end, i);
-		output[i] =	output[i - end];
+		//qDebug("sineB_2.4: i: %d, end: %d count - i: %d, count: %d", i, end, count - i, count);
+		int endB = i + end >= count ? count - i : end;
+		for (unsigned int j = 0; j < endB; j++)
+		{
+			//qDebug("sineB_2.5: i: %d, %d, %d", endB, j, i + j);
+			samplesOut->operator[](startLoc + j + i) += oneWave[j];
+		}
 	}
+
 	//qDebug("sineB_3");
 	// fade in
-	for (unsigned int i = 0; i < count; i++)
+	for (unsigned int i = startLoc; i < endLoc; i++)
 	{
-		float x = xArray->operator[](startLoc + i);
-		if (x > fadeInStartLoc)
+		float x = xArray->operator[](i) / fadeInStartLoc;
+		if (x > 1.0f)
 		{
 			break;
 		}
-		output[i] = output[i] * x / fadeInStartLoc;
+		samplesOut->operator[](i) = samplesOut->operator[](i) * x + startLocVal * (1.0f - x);
 	}
-	//qDebug("sineB_4");
 	// fade out
-	for (unsigned int i = count - 1; i >= 0; i--)
+	for (unsigned int i = endLoc - 1; i > startLoc; i--)
 	{
-		float x = 1.0f - xArray->operator[](startLoc + i);
-		if (x > fadeInStartLoc)
+		float x = (1.0f - xArray->operator[](i)) / fadeInStartLoc;
+		if (x > 1.0f)
 		{
 			break;
 		}
-		output[i] = output[i] * x / fadeInStartLoc;
+		samplesOut->operator[](i) = samplesOut->operator[](i) * x + endLocVal * (1.0f - x);
 	}
-	//qDebug("sineB_5");
-	return output;
 }
-std::vector<float> VectorGraphDataArray::processLineTypeArrayPeak(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
+void VectorGraphDataArray::processLineTypeArrayPeak(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
 	float peakAmp, float peakX, float peakWidth, float fadeInStartLoc)
 {
+	float startLocVal = samplesOut->operator[](startLoc);
+	float endLocVal = samplesOut->operator[](endLoc > 0 ? endLoc - 1 : 0);
 	int count = static_cast<int>(endLoc) - static_cast<int>(startLoc);
 	if (count < 0)
 	{
 		count = 0;
 	}
-	std::vector<float> output(count);
 	for (unsigned int i = 0; i < count; i++)
 	{
-		output[i] = std::pow((peakWidth + 1.0f) * 0.2f + 0.01f,
+		samplesOut->operator[](startLoc + i) += std::pow((peakWidth + 1.0f) * 0.2f + 0.01f,
 			std::abs(xArray->operator[](startLoc + i) - (peakX + 1.0f) * 0.5f) * 10.0f) * peakAmp;
 	}
+
 	// fade in
-	for (unsigned int i = 0; i < count; i++)
+	for (unsigned int i = startLoc; i < endLoc; i++)
 	{
-		float x = xArray->operator[](startLoc + i);
-		if (x > fadeInStartLoc)
+		float x = xArray->operator[](i) / fadeInStartLoc;
+		if (x > 1.0f)
 		{
 			break;
 		}
-		output[i] = output[i] * x / fadeInStartLoc;
+		samplesOut->operator[](i) = samplesOut->operator[](i) * x + startLocVal * (1.0f - x);
 	}
 	// fade out
-	for (unsigned int i = count - 1; i >= 0; i--)
+	for (unsigned int i = endLoc - 1; i > startLoc; i--)
 	{
-		float x = 1.0f - xArray->operator[](startLoc + i);
-		if (x > fadeInStartLoc)
+		float x = (1.0f - xArray->operator[](i)) / fadeInStartLoc;
+		if (x > 1.0f)
 		{
 			break;
 		}
-		output[i] = output[i] * x / fadeInStartLoc;
+		samplesOut->operator[](i) = samplesOut->operator[](i) * x + endLocVal * (1.0f - x);
 	}
-	return output;
 }
-// y: calculate steps from, valA: y count, valB: curve
-std::vector<float> VectorGraphDataArray::processLineTypeArraySteps(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
+void VectorGraphDataArray::processLineTypeArraySteps(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
 	std::vector<float>* yArray, float stepCount, float stepCurve, float fadeInStartLoc)
 {
+	float startLocVal = samplesOut->operator[](startLoc);
+	float endLocVal = samplesOut->operator[](endLoc > 0 ? endLoc - 1 : 0);
 	int count = static_cast<int>(endLoc) - static_cast<int>(startLoc);
 	if (count < 0)
 	{
 		count = 0;
 	}
-	std::vector<float> output(count);
 
 	float stepCountB = (1.0f + stepCount) / 2.0f * 19.0f + 1.0f;
 	//qDebug("stepsA - stepCount = %f", stepCount);
@@ -3323,33 +3329,31 @@ std::vector<float> VectorGraphDataArray::processLineTypeArraySteps(std::vector<f
 		float y = yArray->operator[](startLoc + i) + 1.0f;
 		float diff = std::round(y * stepCountB) - y * stepCountB;
 		float smooth = 1.0f - std::abs(diff) * (1.0f - (stepCurve + 1.0f) / 2.0f) * 2.0f;
-		output[i] = diff / stepCountB * smooth;
+		samplesOut->operator[](startLoc + i) += diff / stepCountB * smooth;
 	}
 
 	// fade in
-	for (unsigned int i = 0; i < count; i++)
+	for (unsigned int i = startLoc; i < endLoc; i++)
 	{
-		float x = xArray->operator[](startLoc + i);
-		if (x > fadeInStartLoc)
+		float x = xArray->operator[](i) / fadeInStartLoc;
+		if (x > 1.0f)
 		{
 			break;
 		}
-		output[i] = output[i] * x / fadeInStartLoc;
+		samplesOut->operator[](i) = samplesOut->operator[](i) * x + startLocVal * (1.0f - x);
 	}
 	// fade out
-	for (unsigned int i = count - 1; i >= 0; i--)
+	for (unsigned int i = endLoc - 1; i > startLoc; i--)
 	{
-		float x = 1.0f - xArray->operator[](startLoc + i);
-		if (x > fadeInStartLoc)
+		float x = (1.0f - xArray->operator[](i)) / fadeInStartLoc;
+		if (x > 1.0f)
 		{
 			break;
 		}
-		output[i] = output[i] * x / fadeInStartLoc;
+		samplesOut->operator[](i) = samplesOut->operator[](i) * x + endLocVal * (1.0f - x);
 	}
-	return output;
 }
-// valA: amp, valB: random number count, curve: seed
-std::vector<float> VectorGraphDataArray::processLineTypeArrayRandom(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
+void VectorGraphDataArray::processLineTypeArrayRandom(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
 	float randomAmp, float randomCount, float randomSeed, float fadeInStartLoc)
 {
 	int count = static_cast<int>(endLoc) - static_cast<int>(startLoc);
@@ -3357,7 +3361,6 @@ std::vector<float> VectorGraphDataArray::processLineTypeArrayRandom(std::vector<
 	{
 		count = 0;
 	}
-	std::vector<float> output(count);
 	std::vector<float> randomValues(static_cast<int>(50.0f * (randomCount + 1.0f)) * 2);
 
 	float blend = 10.0f + randomSeed * 10.0f;
@@ -3386,12 +3389,10 @@ std::vector<float> VectorGraphDataArray::processLineTypeArrayRandom(std::vector<
 		{
 			float randomValueX = xArray->operator[](startLoc + i) * size;
 			float randomValueLocation = std::floor(randomValueX);
-			output[i] = -((randomValueX - randomValueLocation) - 1.0f) * (randomValueX - randomValueLocation) * 4.0f *
+			samplesOut->operator[](startLoc + i) += -((randomValueX - randomValueLocation) - 1.0f) * (randomValueX - randomValueLocation) * 4.0f *
 				(randomValues[static_cast<int>(randomValueLocation)] * (1.0f - blend)  + randomValues[static_cast<int>(randomValueLocation + size)] * blend) * randomAmp;
 		}
 	}
-
-	return output;
 }
 
 void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* updatingPointLocations)
@@ -3814,11 +3815,7 @@ qDebug("getSamplesD8 [%d] start: %d, end: %d, type: %d,      ---       %f, %f, %
 			m_updatingBakedSamples[j] = processCurve(curY, nextY, curC, outputXLocations->operator[](j));
 		}
 		// line type
-		std::vector<float> lineTypeOutput = processLineTypeArraySine(outputXLocations, start, end, curValA, curValB, fadeInStart);
-		for (int j = start; j < end; j++)
-		{
-			m_updatingBakedSamples[j] = m_updatingBakedSamples[j] + lineTypeOutput[j - start];
-		}
+		processLineTypeArraySine(&m_updatingBakedSamples, outputXLocations, start, end, curValA, curValB, fadeInStart);
 	}
 	else if (type == 2)
 	{
@@ -3828,11 +3825,7 @@ qDebug("getSamplesD8 [%d] start: %d, end: %d, type: %d,      ---       %f, %f, %
 			m_updatingBakedSamples[j] = processCurve(curY, nextY, 0.0f, outputXLocations->operator[](j));
 		}
 		// line type
-		std::vector<float> lineTypeOutput = processLineTypeArraySineB(outputXLocations, start, end, curValA, curValB, curC, fadeInStart);
-		for (int j = start; j < end; j++)
-		{
-			m_updatingBakedSamples[j] = m_updatingBakedSamples[j] + lineTypeOutput[j - start];
-		}
+		processLineTypeArraySineB(&m_updatingBakedSamples, outputXLocations, start, end, curValA, curValB, curC, fadeInStart);
 	}
 	else if (type == 3)
 	{
@@ -3842,11 +3835,7 @@ qDebug("getSamplesD8 [%d] start: %d, end: %d, type: %d,      ---       %f, %f, %
 			m_updatingBakedSamples[j] = processCurve(curY, nextY, 0.0f, outputXLocations->operator[](j));
 		}
 		// line type
-		std::vector<float> lineTypeOutput = processLineTypeArrayPeak(outputXLocations, start, end, curValA, curValB, curC, fadeInStart);
-		for (int j = start; j < end; j++)
-		{
-			m_updatingBakedSamples[j] = m_updatingBakedSamples[j] + lineTypeOutput[j - start];
-		}
+		processLineTypeArrayPeak(&m_updatingBakedSamples, outputXLocations, start, end, curValA, curValB, curC, fadeInStart);
 	}
 	else if (type == 4)
 	{
@@ -3856,11 +3845,7 @@ qDebug("getSamplesD8 [%d] start: %d, end: %d, type: %d,      ---       %f, %f, %
 			m_updatingBakedSamples[j] = processCurve(curY, nextY, curC, outputXLocations->operator[](j));
 		}
 		// line type
-		std::vector<float> lineTypeOutput = processLineTypeArraySteps(outputXLocations, start, end, &m_updatingBakedSamples, curValA, curValB, fadeInStart);
-		for (int j = start; j < end; j++)
-		{
-			m_updatingBakedSamples[j] = m_updatingBakedSamples[j] + lineTypeOutput[j - start];
-		}
+		processLineTypeArraySteps(&m_updatingBakedSamples, outputXLocations, start, end, &m_updatingBakedSamples, curValA, curValB, fadeInStart);
 	}
 	else if (type == 5)
 	{
@@ -3870,11 +3855,7 @@ qDebug("getSamplesD8 [%d] start: %d, end: %d, type: %d,      ---       %f, %f, %
 			m_updatingBakedSamples[j] = processCurve(curY, nextY, 0.0f, outputXLocations->operator[](j));
 		}
 		// line type
-		std::vector<float> lineTypeOutput = processLineTypeArrayRandom(outputXLocations, start, end, curValA, curValB, curC, fadeInStart);
-		for (int j = start; j < end; j++)
-		{
-			m_updatingBakedSamples[j] = m_updatingBakedSamples[j] + lineTypeOutput[j - start];
-		}
+		processLineTypeArrayRandom(&m_updatingBakedSamples, outputXLocations, start, end, curValA, curValB, curC, fadeInStart);
 	}
 	if (effector != nullptr && getEffectOnlyPoints(m_needsUpdating[pointLocation]) == false)
 	{
