@@ -84,7 +84,7 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_mixerRename      ,   &DataFile::upgrade_bbTcoRename,
 	&DataFile::upgrade_sampleAndHold    ,   &DataFile::upgrade_midiCCIndexing,
 	&DataFile::upgrade_loopsRename      ,   &DataFile::upgrade_noteTypes,
-	&DataFile::upgrade_fixCMTDelays
+	&DataFile::upgrade_fixCMTDelays     ,   &DataFile::upgrade_fixBassLoopsTypo,
 };
 
 // Vector of all versions that have upgrade routines.
@@ -637,6 +637,32 @@ void DataFile::cleanMetaNodes( QDomElement _de )
 			}
 		}
 		node = node.nextSibling();
+	}
+}
+
+void DataFile::mapSrcAttributeInElementsWithResources(const QMap<QString, QString>& map)
+{
+	for (const auto& [elem, srcAttrs] : ELEMENTS_WITH_RESOURCES)
+	{
+		auto elements = elementsByTagName(elem);
+
+		for (const auto& srcAttr : srcAttrs)
+		{
+			for (int i = 0; i < elements.length(); ++i)
+			{
+				auto item = elements.item(i).toElement();
+
+				if (item.isNull() || !item.hasAttribute(srcAttr)) { continue; }
+
+				const QString srcVal = item.attribute(srcAttr);
+
+				const auto it = map.constFind(srcVal);
+				if (it != map.constEnd())
+				{
+					item.setAttribute(srcAttr, *it);
+				}
+			}
+		}
 	}
 }
 
@@ -1910,7 +1936,7 @@ static QMap<QString, QString> buildReplacementMap()
 	{
 		const QString original = prefix + originalName + "." + extension;
 		const QString replacement = prefix + originalName + " - " + bpm + " BPM." + extension;
-		
+
 		namesToNamesWithBPMsMap.insert(original, replacement);
 	};
 
@@ -1928,29 +1954,7 @@ void DataFile::upgrade_loopsRename()
 {
 	static const QMap<QString, QString> namesToNamesWithBPMsMap = buildReplacementMap();
 
-	// Replace loop sample names
-	for (const auto& [elem, srcAttrs] : ELEMENTS_WITH_RESOURCES)
-	{
-		auto elements = elementsByTagName(elem);
-
-		for (const auto& srcAttr : srcAttrs)
-		{
-			for (int i = 0; i < elements.length(); ++i)
-			{
-				auto item = elements.item(i).toElement();
-
-				if (item.isNull() || !item.hasAttribute(srcAttr)) { continue; }
-
-				const QString srcVal = item.attribute(srcAttr);
-
-				const auto it = namesToNamesWithBPMsMap.constFind(srcVal);
-				if (it != namesToNamesWithBPMsMap.constEnd())
-				{
-					item.setAttribute(srcAttr, *it);
-				}
-			}
-		}
-	}
+	mapSrcAttributeInElementsWithResources(namesToNamesWithBPMsMap);
 }
 
 //! Update MIDI CC indexes, so that they are counted from 0. Older releases of LMMS
@@ -1973,6 +1977,24 @@ void DataFile::upgrade_midiCCIndexing()
 			}
 		}
 	}
+}
+
+void DataFile::upgrade_fixBassLoopsTypo()
+{
+	static const QMap<QString, QString> replacementMap = {
+		{ "bassloopes/briff01.ogg", "bassloops/briff01 - 140 BPM.ogg" },
+		{ "bassloopes/rave_bass01.ogg", "bassloops/rave_bass01 - 180 BPM.ogg" },
+		{ "bassloopes/rave_bass02.ogg", "bassloops/rave_bass02 - 180 BPM.ogg" },
+		{ "bassloopes/tb303_01.ogg","bassloops/tb303_01 - 123 BPM.ogg" },
+		{ "bassloopes/techno_bass01.ogg", "bassloops/techno_bass01 - 140 BPM.ogg" },
+		{ "bassloopes/techno_bass02.ogg", "bassloops/techno_bass02 - 140 BPM.ogg" },
+		{ "bassloopes/techno_synth01.ogg", "bassloops/techno_synth01 - 140 BPM.ogg" },
+		{ "bassloopes/techno_synth02.ogg", "bassloops/techno_synth02 - 140 BPM.ogg" },
+		{ "bassloopes/techno_synth03.ogg", "bassloops/techno_synth03 - 130 BPM.ogg" },
+		{ "bassloopes/techno_synth04.ogg", "bassloops/techno_synth04 - 140 BPM.ogg" }
+	};
+
+	mapSrcAttributeInElementsWithResources(replacementMap);
 }
 
 void DataFile::upgrade()
