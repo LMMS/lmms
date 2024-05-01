@@ -1932,21 +1932,6 @@ void VectorGraphModel::loadSettings(const QDomElement& element)
 {
 	loadSettings(element, QString(""));
 }
-/*
-int VectorGraphModel::readLoc(unsigned int start, QString data)
-{
-	int output = -1;
-	for (unsigned int i = start; i < data.size(); i++)
-	{
-		if (data[i] == QString("-"))
-		{
-			output = data.left(i - 1).toInt();
-			break;
-		}
-	}
-	return output;
-}
-*/
 
 // VectorGraphDataArray ------
 
@@ -3211,13 +3196,6 @@ float VectorGraphDataArray::processAutomation(unsigned int pointLocation, float 
 	return output;
 }
 
-// line type effects:
-/*
-float VectorGraphDataArray::processLineTypeSine(float xIn, float valA, float valB, float fadeInStartLoc)
-{
-	return processLineTypeSineB(xIn, valA, valB, 0.0f, fadeInStartLoc);
-}
-*/
 // valA: amp, valB: freq, fadeInStartLoc: from what xIn value should the line type fade out
 std::vector<float> VectorGraphDataArray::processLineTypeArraySine(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
 	float valA, float valB, float fadeInStartLoc)
@@ -3225,26 +3203,6 @@ std::vector<float> VectorGraphDataArray::processLineTypeArraySine(std::vector<fl
 	return VectorGraphDataArray::processLineTypeArraySineB(xArray, startLoc, endLoc,
 		valA, valB, 0.0f, fadeInStartLoc);
 }
-/*
-float VectorGraphDataArray::processLineTypeSineB(float xIn, float valA, float valB, float curve, float fadeInStartLoc)
-{
-	// sine
-	// 628.318530718f = 100.0f * 2.0f * pi
-	float output = valA * std::sin(xIn * 628.318530718f * valB + curve * 100.0f);
-	
-	// fade in
-	if (xIn < fadeInStartLoc)
-	{
-		output = output * xIn / fadeInStartLoc;
-	}
-	// fade out
-	if (xIn > 1.0f - fadeInStartLoc)
-	{
-		output = output * (1.0f - xIn) / fadeInStartLoc;
-	}
-	return output;
-}
-*/
 // valA: amp, valB: freq, curve: phase
 std::vector<float> VectorGraphDataArray::processLineTypeArraySineB(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
 	float valA, float valB, float curve, float fadeInStartLoc)
@@ -3309,26 +3267,6 @@ std::vector<float> VectorGraphDataArray::processLineTypeArraySineB(std::vector<f
 	//qDebug("sineB_5");
 	return output;
 }
-/*
-float VectorGraphDataArray::processLineTypePeak(float xIn, float valA, float valB, float curve, float fadeInStartLoc)
-{
-	// peak
-	float output = std::pow((curve + 1.0f) * 0.2f + 0.01f, std::abs(xIn - (valB + 1.0f) * 0.5f) * 10.0f) * valA;
-
-	// fade in
-	if (xIn < fadeInStartLoc)
-	{
-		output = output * xIn / fadeInStartLoc;
-	}
-	// fade out
-	if (xIn > 1.0f - fadeInStartLoc)
-	{
-		output = output * (1.0f - xIn) / fadeInStartLoc;
-	}
-	return output;
-}
-*/
-
 // valA: amp, valB: x coord, curve: width
 std::vector<float> VectorGraphDataArray::processLineTypeArrayPeak(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
 	float valA, float valB, float curve, float fadeInStartLoc)
@@ -3366,11 +3304,6 @@ std::vector<float> VectorGraphDataArray::processLineTypeArrayPeak(std::vector<fl
 	}
 	return output;
 }
-/*
-float VectorGraphDataArray::processLineTypeSteps(float xIn, float yIn, float valA, float valB, float fadeInStartLoc)
-{
-}
-*/
 // y: calculate steps from, valA: y count, valB: curve
 std::vector<float> VectorGraphDataArray::processLineTypeArraySteps(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
 	std::vector<float>* yArray, float valA, float valB, float fadeInStartLoc)
@@ -3414,11 +3347,6 @@ std::vector<float> VectorGraphDataArray::processLineTypeArraySteps(std::vector<f
 	}
 	return output;
 }
-/*
-float VectorGraphDataArray::processLineTypeRandom(float xIn, float valA, float valB, float curve, float fadeInStartLoc)
-{
-}
-*/
 // valA: amp, valB: random number count, curve: seed
 std::vector<float> VectorGraphDataArray::processLineTypeArrayRandom(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
 		float valA, float valB, float curve, float fadeInStartLoc)
@@ -3759,15 +3687,6 @@ void VectorGraphDataArray::getSamples(unsigned int targetSizeIn, bool* isChanged
 			effector = m_parent->getDataArray(m_effectorLocation);
 		}
 
-		// m_dataArray[i] location in effecor m_dataArray, next location in effecor m_dataArray,
-		//std::vector<std::pair<unsigned int, unsigned int>> effectorData;
-		//getSamplesLocations(effector, &effectorData);
-		/*
-		for (unsigned int j = 0; j < effectorData.size(); j++)
-		{
-			qDebug("getSamplesB6.4, [%d] %d, %d", j, effectorData[j].first, effectorData[j].second);
-		}
-		*/
 		qDebug("getSamplesB6, updatingsize: %ld", m_needsUpdating.size());
 
 		// calculate final lines
@@ -3806,63 +3725,6 @@ void VectorGraphDataArray::getSamples(unsigned int targetSizeIn, bool* isChanged
 	m_isDataChanged = false;
 	qDebug("getSamplesB9");
 }
-// unused function, might be useful later
-/*
-void VectorGraphDataArray::getSamplesLocations(VectorGraphDataArray* effectorIn, std::vector<std::pair<unsigned int, unsigned int>>* effectorDataOut)
-{
-	if (effectorIn != nullptr)
-	{
-		effectorDataOut->resize(m_needsUpdating.size());
-		for (unsigned int i = 0; i < m_needsUpdating.size(); i++)
-		{
-			bool found = false;
-			bool isBefore = false;
-			int curLocation = effectorIn->getNearestLocation(m_dataArray[m_needsUpdating[i]].m_x, &found, &isBefore);
-			if (curLocation >= 0)
-			{
-				curLocation = isBefore == false ? (curLocation > 0 ? curLocation - 1 : curLocation) : curLocation;
-				// location
-				effectorDataOut->operator[](i).first = curLocation;
-qDebug("getSamplesC5.1, [%d] set to: %d", i, curLocation);
-				// next location
-				effectorDataOut->operator[](i).second = curLocation;
-				// if the location of this is the next location for before this
-				if (i > 0 && m_needsUpdating[i - 1] == m_needsUpdating[i] - 1)
-				{
-qDebug("getSamplesC5.2, [%d - 1] changed to: %d", i, curLocation);
-					effectorDataOut->operator[](i- 1).second = curLocation;
-				}
-			}
-		}
-qDebug("getSamplesC5");
-		// getting the missing next location values
-		for (unsigned int i = 0; i < m_needsUpdating.size(); i++)
-		{
-			// if there is a gap in m_needsUpdating
-			// (next needsUpdating point is not the point after this one in m_dataArray)
-			if (i + 1 < m_needsUpdating.size() && m_needsUpdating[i] + 1 < m_dataArray.size() &&
-				m_needsUpdating[i + 1] != m_needsUpdating[i] + 1)
-			{
-				bool found = false;
-				bool isBefore = false;
-				int curLocation = effectorIn->getNearestLocation(m_dataArray[m_needsUpdating[i] + 1].m_x, &found, &isBefore);
-				if (curLocation >= 0)
-				{
-					curLocation = isBefore == false ? (curLocation > 0 ? curLocation - 1 : curLocation) : curLocation;
-					// next location
-qDebug("getSamplesC5.3, [%d] set after to: %d", i, curLocation);
-					effectorDataOut->operator[](i).second = curLocation;
-				}
-			}
-		}
-		// getting the last updated point's next location value
-		if (m_needsUpdating[m_needsUpdating.size() - 1] + 1 >= m_dataArray.size())
-		{
-			effectorDataOut->operator[](m_needsUpdating.size() - 1).second = effectorIn->size() - 1;
-		}
-	}
-}
-*/
 void VectorGraphDataArray::getSamplesUpdateLines(VectorGraphDataArray* effector, std::vector<float>* effectorSamples,
 	std::vector<float>* outputXLocations, unsigned int iIn, float stepSize)
 {
