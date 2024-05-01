@@ -547,65 +547,22 @@ private:
 	public:
 		inline VectorGraphPoint()
 		{
-			m_x = 0.0f;
-			m_y = 0.0f;
-			m_c = 0.0f;
-			m_valA = 0.0f;
-			m_valB = 0.0f;
-			m_type = 0;
-			m_automatedEffectedAttribLocations = 0;
-
-			m_effectOnlyPoints = false;
-			m_effectAdd = false;
-			m_effectSubtract = false;
-			m_effectMultiply = false;
-			m_effectDivide = false;
-			m_effectPower = false;
-			m_effectLog = false;
-			m_effectSine = false;
-			m_effectClampLower = false;
-			m_effectClampUpper = false;
-
-			m_bufferedAutomationValue = 0.0f;
-			m_automationModel = -1;
 		}
 		inline VectorGraphPoint(float x, float y)
 		{
 			m_x = x;
 			m_y = y;
-			m_c = 0.0f;
-			m_valA = 0.0f;
-			m_valB = 0.0f;
-			m_type = 0;
-			m_automatedEffectedAttribLocations = 0;
-
-			m_effectOnlyPoints = false;
-			m_effectAdd = false;
-			m_effectSubtract = false;
-			m_effectMultiply = false;
-			m_effectDivide = false;
-			m_effectPower = false;
-			m_effectLog = false;
-			m_effectSine = false;
-			m_effectClampLower = false;
-			m_effectClampUpper = false;
-
-			m_bufferedAutomationValue = 0.0f;
-			m_automationModel = -1;
-		}
-		inline ~VectorGraphPoint()
-		{
 		}
 		// 0 - 1
-		float m_x;
-		// 0 (or -1) - 1, getAutomatedAttrib() -> 0
-		float m_y;
+		float m_x = 0.0f;
+		// -1 - 1, getAutomatedAttrib() -> 0
+		float m_y = 0.0f;
 		// curve, -1 - 1, getAutomatedAttrib() -> 1
-		float m_c;
+		float m_c = 0.0f;
 		// valueA, -1 - 1, getAutomatedAttrib() -> 2
-		float m_valA;
+		float m_valA = 0.0f;
 		// valueB, -1 - 1, getAutomatedAttrib() -> 3
-		float m_valB;
+		float m_valB = 0.0f;
 		// line type:
 		// 0 - none
 		// 1 - sine
@@ -613,32 +570,32 @@ private:
 		// 3 - peak
 		// 4 - steps
 		// 5 - random
-		unsigned int m_type;
+		unsigned int m_type = 0;
 		// the automated attrib location and
 		// the effected attrib location is
 		// stored here
 		// use getAutomatedAttrib or getEffectedAttrib to get it
-		unsigned int m_automatedEffectedAttribLocations;
+		unsigned int m_automatedEffectedAttribLocations = 0;
 
-		// if the point's line should effect only points
+		// if the point's line should effect only pointss
 		// getEffectOnlyPoints() will return true when
 		// effected attrib location > 0
-		bool m_effectOnlyPoints;
+		bool m_effectOnlyPoints = false;
 
-		bool m_effectAdd;
-		bool m_effectSubtract;
-		bool m_effectMultiply;
-		bool m_effectDivide;
-		bool m_effectPower;
-		bool m_effectLog;
-		bool m_effectSine;
-		bool m_effectClampLower;
-		bool m_effectClampUpper;
+		bool m_effectAdd = false;
+		bool m_effectSubtract = false;
+		bool m_effectMultiply = false;
+		bool m_effectDivide = false;
+		bool m_effectPower = false;
+		bool m_effectLog = false;
+		bool m_effectSine = false;
+		bool m_effectClampLower = false;
+		bool m_effectClampUpper = false;
 
-		// stores m_automationModel->value(), used in updating
-		float m_bufferedAutomationValue;
-		// automation: connecting to floatmodels, -1 when it isn't conntected'
-		int m_automationModel;
+		// stores m_automationModel->value(), used in getSamples() when updating
+		float m_bufferedAutomationValue = 0.0f;
+		// automation: connecting to floatmodels, -1 when it isn't conntected
+		int m_automationModel = -1;
 	};
 	// deletes the point's automation model
 	// if modelLocation == point location
