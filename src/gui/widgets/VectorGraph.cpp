@@ -3200,23 +3200,21 @@ float VectorGraphDataArray::processAutomation(unsigned int pointLocation, float 
 	return output;
 }
 
-// valA: amp, valB: freq, fadeInStartLoc: from what x relative position should the line type fade out
 std::vector<float> VectorGraphDataArray::processLineTypeArraySine(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
-	float valA, float valB, float fadeInStartLoc)
+	float sineAmp, float sineFreq, float fadeInStartLoc)
 {
 	return VectorGraphDataArray::processLineTypeArraySineB(xArray, startLoc, endLoc,
-		valA, valB, 0.0f, fadeInStartLoc);
+		sineAmp, sineFreq, 0.0f, fadeInStartLoc);
 }
-// valA: amp, valB: freq, curve: phase
 std::vector<float> VectorGraphDataArray::processLineTypeArraySineB(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
-	float valA, float valB, float curve, float fadeInStartLoc)
+	float sineAmp, float sineFreq, float sinePhase, float fadeInStartLoc)
 {
 	int count = static_cast<int>(endLoc) - static_cast<int>(startLoc);
 	if (count < 0)
 	{
 		count = 0;
 	}
-	float tValB = 0.001f + ((valB + 1.0f) / 2.0f) * 0.999f;
+	float tValB = 0.001f + ((sineFreq + 1.0f) / 2.0f) * 0.999f;
 	std::vector<float> output(count);
 	// calculating how many samples are needed to 1 complete wave
 	// we have "count" amount of samples and "tValB * 100.0f" amount of waves
@@ -3235,9 +3233,9 @@ std::vector<float> VectorGraphDataArray::processLineTypeArraySineB(std::vector<f
 	for (unsigned int i = 0; i < end; i++)
 	{
 		// 628.318531f = 100.0f * 2.0f * pi
-		// (1 sine wave is 2pi long and we have 1 * 100 * valB waves)
-		output[i] = valA * std::sin(
-			xArray->operator[](startLoc + i) * 628.318531f * tValB + curve * 100.0f);
+		// (1 sine wave is 2pi long and we have 1 * 100 * sineFreq waves)
+		output[i] = sineAmp * std::sin(
+			xArray->operator[](startLoc + i) * 628.318531f * tValB + sinePhase * 100.0f);
 	}
 	//qDebug("sineB_2");
 	// copy the first wave until the end
@@ -3271,9 +3269,8 @@ std::vector<float> VectorGraphDataArray::processLineTypeArraySineB(std::vector<f
 	//qDebug("sineB_5");
 	return output;
 }
-// valA: amp, valB: x coord, curve: width
 std::vector<float> VectorGraphDataArray::processLineTypeArrayPeak(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
-	float valA, float valB, float curve, float fadeInStartLoc)
+	float peakAmp, float peakX, float peakWidth, float fadeInStartLoc)
 {
 	int count = static_cast<int>(endLoc) - static_cast<int>(startLoc);
 	if (count < 0)
@@ -3283,8 +3280,8 @@ std::vector<float> VectorGraphDataArray::processLineTypeArrayPeak(std::vector<fl
 	std::vector<float> output(count);
 	for (unsigned int i = 0; i < count; i++)
 	{
-		output[i] = std::pow((curve + 1.0f) * 0.2f + 0.01f,
-			std::abs(xArray->operator[](startLoc + i) - (valB + 1.0f) * 0.5f) * 10.0f) * valA;
+		output[i] = std::pow((peakWidth + 1.0f) * 0.2f + 0.01f,
+			std::abs(xArray->operator[](startLoc + i) - (peakX + 1.0f) * 0.5f) * 10.0f) * peakAmp;
 	}
 	// fade in
 	for (unsigned int i = 0; i < count; i++)
@@ -3310,7 +3307,7 @@ std::vector<float> VectorGraphDataArray::processLineTypeArrayPeak(std::vector<fl
 }
 // y: calculate steps from, valA: y count, valB: curve
 std::vector<float> VectorGraphDataArray::processLineTypeArraySteps(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
-	std::vector<float>* yArray, float valA, float valB, float fadeInStartLoc)
+	std::vector<float>* yArray, float stepCount, float stepCurve, float fadeInStartLoc)
 {
 	int count = static_cast<int>(endLoc) - static_cast<int>(startLoc);
 	if (count < 0)
@@ -3319,14 +3316,14 @@ std::vector<float> VectorGraphDataArray::processLineTypeArraySteps(std::vector<f
 	}
 	std::vector<float> output(count);
 
-	float stepCount = (1.0f + valA) / 2.0f * 19.0f + 1.0f;
+	float stepCountB = (1.0f + stepCount) / 2.0f * 19.0f + 1.0f;
 	//qDebug("stepsA - stepCount = %f", stepCount);
 	for (unsigned int i = 0; i < count; i++)
 	{
 		float y = yArray->operator[](startLoc + i) + 1.0f;
-		float diff = std::round(y * stepCount) - y * stepCount;
-		float smooth = 1.0f - std::abs(diff) * (1.0f - (valB + 1.0f) / 2.0f) * 2.0f;
-		output[i] = diff / stepCount * smooth;
+		float diff = std::round(y * stepCountB) - y * stepCountB;
+		float smooth = 1.0f - std::abs(diff) * (1.0f - (stepCurve + 1.0f) / 2.0f) * 2.0f;
+		output[i] = diff / stepCountB * smooth;
 	}
 
 	// fade in
@@ -3353,7 +3350,7 @@ std::vector<float> VectorGraphDataArray::processLineTypeArraySteps(std::vector<f
 }
 // valA: amp, valB: random number count, curve: seed
 std::vector<float> VectorGraphDataArray::processLineTypeArrayRandom(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
-		float valA, float valB, float curve, float fadeInStartLoc)
+	float randomAmp, float randomCount, float randomSeed, float fadeInStartLoc)
 {
 	int count = static_cast<int>(endLoc) - static_cast<int>(startLoc);
 	if (count < 0)
@@ -3361,12 +3358,12 @@ std::vector<float> VectorGraphDataArray::processLineTypeArrayRandom(std::vector<
 		count = 0;
 	}
 	std::vector<float> output(count);
-	std::vector<float> randomValues(static_cast<int>(50.0f * (valB + 1.0f)) * 2);
+	std::vector<float> randomValues(static_cast<int>(50.0f * (randomCount + 1.0f)) * 2);
 
-	float blend = 10.0f + curve * 10.0f;
-	int randomSeed = static_cast<int>(blend);
-	blend = blend - randomSeed;
-	std::srand(randomSeed);
+	float blend = 10.0f + randomSeed * 10.0f;
+	int randomSeedB = static_cast<int>(blend);
+	blend = blend - randomSeedB;
+	std::srand(randomSeedB);
 
 	// getting the random values
 	// generating 2 seeds and blending in between them
@@ -3374,7 +3371,7 @@ std::vector<float> VectorGraphDataArray::processLineTypeArrayRandom(std::vector<
 	{
 		randomValues[i] = std::fmod((static_cast<float>(rand()) / 10000.0f), 2.0f) - 1.0f;
 	}
-	std::srand(randomSeed + 1);
+	std::srand(randomSeedB + 1);
 	for (unsigned int i = randomValues.size() / 2; i < randomValues.size(); i++)
 	{
 		randomValues[i] = std::fmod((static_cast<float>(rand()) / 10000.0f), 2.0f) - 1.0f;
@@ -3390,7 +3387,7 @@ std::vector<float> VectorGraphDataArray::processLineTypeArrayRandom(std::vector<
 			float randomValueX = xArray->operator[](startLoc + i) * size;
 			float randomValueLocation = std::floor(randomValueX);
 			output[i] = -((randomValueX - randomValueLocation) - 1.0f) * (randomValueX - randomValueLocation) * 4.0f *
-				(randomValues[static_cast<int>(randomValueLocation)] * (1.0f - blend)  + randomValues[static_cast<int>(randomValueLocation + size)] * blend) * valA;
+				(randomValues[static_cast<int>(randomValueLocation)] * (1.0f - blend)  + randomValues[static_cast<int>(randomValueLocation + size)] * blend) * randomAmp;
 		}
 	}
 
