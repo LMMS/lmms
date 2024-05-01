@@ -26,6 +26,7 @@
 #define LMMS_GUI_VECTORGRAPH_H
 
 #include <vector>
+#include <array>
 #include <QPainterPath>
 #include <QWidget>
 #include <QCursor>
@@ -210,9 +211,29 @@ private:
 	unsigned int m_controlDisplayCount;
 	unsigned int m_controlDisplayPage;
 	bool m_isEditingActive;
-	std::vector<QString> m_controlText;
-	std::vector<QString> m_controlLineEffectText;
-	std::vector<bool> m_controlIsFloat;
+	std::array<QString, 19> m_controlText =
+	{
+		tr("x coordinate"), tr("y coordinate"), tr("curve"), tr("1. attribute value"),
+		tr("2. attribute value"), tr("switch graph line type"), tr("switch graph automated value"),
+		tr("switch graph effected value"), tr("can only effect graph points"), tr("\"add\" effect"), tr("\"subtract\" effect"),
+		tr("\"multiply\" effect"), tr("\"divide\" effect"), tr("\"power\" effect"), tr("\"log\" effect"),
+		tr("\"sine\" effect"), tr("\"clamp lower\" effect"), tr("\"clamp upper\" effect")
+	};
+	std::array<QString, 6> m_controlLineEffectText = {
+		tr("none"),
+		tr("sine"),
+		tr("phase changable sine"),
+		tr("peak"),
+		tr("steps"),
+		tr("random")
+	};
+	std::array<bool, 19> m_controlIsFloat = {
+		true, true, true, true,
+		true, false, false,
+		false, false, false, false,
+		false, false, false, false,
+		false, false, false
+	};
 
 	std::pair<int, int> m_lastTrackPoint;
 	std::pair<int, int> m_lastScndTrackPoint;
