@@ -185,9 +185,9 @@ void VectorGraphView::setIsSimplified(bool isSimplified)
 	m_isSimplified = isSimplified;
 }
 
-std::pair<float, float> VectorGraphView::getSelectedData()
+PointF VectorGraphView::getSelectedData()
 {
-	std::pair<float, float> output(-1.0f, 0.00);
+	PointF output(-1.0f, 0.00);
 	if (m_isSelected == true)
 	{
 		output.first = model()->getDataArray(m_selectedArray)->getX(m_selectedLocation);
@@ -203,7 +203,7 @@ int VectorGraphView::getLastSelectedArray()
 	}
 	return -1;
 }
-void VectorGraphView::setSelectedData(std::pair<float, float> data)
+void VectorGraphView::setSelectedData(PointF data)
 {
 	if (m_isSelected == true)
 	{
@@ -323,7 +323,7 @@ void VectorGraphView::mouseMoveEvent(QMouseEvent* me)
 				if (m_isCurveSelected == false)
 				{
 					// dragging point
-					std::pair<float, float> convertedCoords = mapMousePos(x, m_graphHeight - y);
+					PointF convertedCoords = mapMousePos(x, m_graphHeight - y);
 					convertedCoords.first = std::clamp(convertedCoords.first, 0.0f, 1.0f);
 					convertedCoords.second = std::clamp(convertedCoords.second, -1.0f, 1.0f);
 					setSelectedData(convertedCoords);
@@ -331,7 +331,7 @@ void VectorGraphView::mouseMoveEvent(QMouseEvent* me)
 				else if (model()->getDataArray(m_selectedArray)->getIsEditableAttrib() == true)
 				{
 					// dragging curve
-					std::pair<float, float> convertedCoords = mapMousePos(x - m_lastTrackPoint.first, m_graphHeight - y + m_lastTrackPoint.second);
+					PointF convertedCoords = mapMousePos(x - m_lastTrackPoint.first, m_graphHeight - y + m_lastTrackPoint.second);
 					float curveValue = convertedCoords.second + convertedCoords.first * 0.1f;
 					curveValue = std::clamp(curveValue, -1.0f, 1.0f);
 					model()->getDataArray(m_selectedArray)->setC(m_selectedLocation, curveValue);
@@ -511,7 +511,7 @@ void VectorGraphView::mouseDoubleClickEvent(QMouseEvent * me)
 		if (m_isSelected == true && me->button() == Qt::LeftButton)
 		{
 			// display dialog
-			std::pair<float, float> curData = showCoordInputDialog();
+			PointF curData = showCoordInputDialog();
 			// change data
 			setSelectedData(curData);
 		}
@@ -924,10 +924,10 @@ void VectorGraphView::removeController()
 	removeAutomation();
 }
 
-std::pair<float, float> VectorGraphView::mapMousePos(int x, int y)
+PointF VectorGraphView::mapMousePos(int x, int y)
 {
 	// mapping the position to 0 - 1, -1 - 1 using qWidget width and height
-	return std::pair<float, float>(
+	return PointF(
 		static_cast<float>(x / (float)width()),
 		static_cast<float>(y) * 2.0f / static_cast<float>(m_graphHeight) - 1.0f);
 }
@@ -947,9 +947,9 @@ std::pair<int, int> VectorGraphView::mapDataPos(float x, float y, bool isNonNega
 			static_cast<int>((y + 1.0f) * static_cast<float>(m_graphHeight) / 2.0f));
 	}
 }
-std::pair<float, float> VectorGraphView::mapDataCurvePosF(float xA, float yA, float xB, float yB, float curve)
+PointF VectorGraphView::mapDataCurvePosF(float xA, float yA, float xB, float yB, float curve)
 {
-	return std::pair<float, float>(
+	return PointF(
 		(xA + xB) / 2.0f,
 		yA + (curve / 2.0f + 0.5f) * (yB - yA));
 }
@@ -978,7 +978,7 @@ bool VectorGraphView::addPoint(unsigned int arrayLocation, int mouseX, int mouse
 	// mouseY is calculated like this:
 	// m_graphHeight - y
 	bool output = false;
-	std::pair<float, float> curMouseCoords = mapMousePos(mouseX, mouseY);
+	PointF curMouseCoords = mapMousePos(mouseX, mouseY);
 	curMouseCoords.first = std::clamp(curMouseCoords.first, 0.0f, 1.0f);
 	curMouseCoords.second = std::clamp(curMouseCoords.second, -1.0f, 1.0f);
 	int location = model()->getDataArray(arrayLocation)->add(curMouseCoords.first);
@@ -1115,7 +1115,7 @@ void VectorGraphView::processControlWindowPressed(int mouseX, int mouseY, bool i
 					m_lastTrackPoint.second = curY;
 	qDebug("get last value: %d, lasttrack: %d, x: %d, y: %d, x2: %d, y2: %d, location: %d", m_lastScndTrackPoint.first, m_lastScndTrackPoint.second, curX, (curY), m_lastTrackPoint.first, m_lastTrackPoint.second, pressLocation);
 				}
-				std::pair<float, float> convertedCoords = mapMousePos(0,
+				PointF convertedCoords = mapMousePos(0,
 					m_lastScndTrackPoint.first + static_cast<int>(curY - m_lastTrackPoint.second) / 2);
 				qDebug("dragging ... %d, %f", (m_lastScndTrackPoint.first + static_cast<int>(curY - m_lastTrackPoint.second) / 2), convertedCoords.second);
 				setInputAttribValue(location, convertedCoords.second, false);
@@ -1431,9 +1431,9 @@ void VectorGraphView::addDefaultActions(QMenu* menu, QString controlDisplayText)
 	}
 }
 
-std::pair<float, float> VectorGraphView::showCoordInputDialog()
+PointF VectorGraphView::showCoordInputDialog()
 {
-	std::pair<float, float> curData(0.0f, 0.0f);
+	PointF curData(0.0f, 0.0f);
 	if (m_isSelected == true)
 	{
 		curData = getSelectedData();
@@ -1562,7 +1562,7 @@ int VectorGraphView::searchForData(int mouseX, int mouseY, float maxDistance, Ve
 	maxDistance = maxDistance * 2.0f;
 	qDebug("searchData");
 
-	std::pair<float, float> transformedMouse = mapMousePos(mouseX, mouseY);
+	PointF transformedMouse = mapMousePos(mouseX, mouseY);
 
 	// unused bool
 	bool found = false;
@@ -1588,7 +1588,7 @@ int VectorGraphView::searchForData(int mouseX, int mouseY, float maxDistance, Ve
 			}
 			if (location - curvedBefore < dataArray->size()  - 1)
 			{
-				std::pair<float, float> curvedDataCoords = mapDataCurvePosF(
+				PointF curvedDataCoords = mapDataCurvePosF(
 					dataArray->getX(location - curvedBefore), dataArray->getY(location - curvedBefore),
 					dataArray->getX(location - curvedBefore + 1), dataArray->getY(location - curvedBefore + 1),
 					dataArray->getC(location - curvedBefore));
@@ -1650,7 +1650,7 @@ int VectorGraphView::searchForData(int mouseX, int mouseY, float maxDistance, Ve
 						{
 							if (dataArray->size() - 1 > i)
 							{
-								std::pair<float, float> curvedDataCoords = mapDataCurvePosF(
+								PointF curvedDataCoords = mapDataCurvePosF(
 									dataArray->getX(i), dataArray->getY(i), dataArray->getX(i + 1), dataArray->getY(i + 1),
 									dataArray->getC(i));
 								dataX = curvedDataCoords.first;
@@ -2315,7 +2315,7 @@ void VectorGraphDataArray::deletePoint(unsigned int pointLocation)
 	}
 }
 
-void VectorGraphDataArray::formatArray(std::vector<std::pair<float, float>>* dataArrayOut, bool shouldClamp, bool shouldRescale, bool shouldSort, bool callDataChanged)
+void VectorGraphDataArray::formatArray(std::vector<PointF>* dataArrayOut, bool shouldClamp, bool shouldRescale, bool shouldSort, bool callDataChanged)
 {
 	if (shouldRescale == true)
 	{
@@ -2393,7 +2393,7 @@ void VectorGraphDataArray::formatArray(std::vector<std::pair<float, float>>* dat
 	if (shouldSort == true)
 	{
 		std::sort(dataArrayOut->begin(), dataArrayOut->end(),
-			[](std::pair<float, float> a, std::pair<float, float> b)
+			[](PointF a, PointF b)
 			{
 				return a.first < b.first;
 			});
@@ -2524,7 +2524,7 @@ std::vector<int> VectorGraphDataArray::getEffectorArrayLocations()
 	return output;
 }
 
-void VectorGraphDataArray::setDataArray(std::vector<std::pair<float, float>>* inputDataArray,
+void VectorGraphDataArray::setDataArray(std::vector<PointF>* inputDataArray,
 	bool shouldCurve, bool shouldClear, bool shouldClamp, bool shouldRescale, bool shouldSort, bool callDataChanged)
 {
 	qDebug("setDataArray size: %ld", inputDataArray->size());
@@ -2584,7 +2584,7 @@ void VectorGraphDataArray::setDataArray(std::vector<std::pair<float, float>>* in
 void VectorGraphDataArray::setDataArray(std::vector<float>* inputDataArray,
 	bool shouldCurve, bool shouldClear, bool shouldClamp, bool shouldRescale, bool callDataChanged)
 {
-	std::vector<std::pair<float, float>> convertedDataArray(inputDataArray->size());
+	std::vector<PointF> convertedDataArray(inputDataArray->size());
 	float stepSize = 1.0f / static_cast<float>(convertedDataArray.size());
 	for (unsigned int i = 0; i < inputDataArray->size(); i++)
 	{
@@ -2596,7 +2596,7 @@ void VectorGraphDataArray::setDataArray(std::vector<float>* inputDataArray,
 void VectorGraphDataArray::setDataArray(float* inputDataArray, unsigned int size,
 	bool shouldCurve, bool shouldClear, bool shouldClamp, bool shouldRescale, bool callDataChanged)
 {
-	std::vector<std::pair<float, float>> convertedDataArray(size);
+	std::vector<PointF> convertedDataArray(size);
 	float stepSize = 1.0f / static_cast<float>(size);
 	for (unsigned int i = 0; i < size; i++)
 	{
