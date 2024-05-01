@@ -46,6 +46,8 @@ class VectorGraphModel;
 class VectorGraphDataArray;
 class FloatModel;
 
+using PointF = std::pair<float, float>;
+
 namespace gui
 {
 class LMMS_EXPORT VectorGraphView : public QWidget, public ModelView
@@ -86,11 +88,11 @@ public:
 	void setIsSimplified(bool isSimplified);
 
 	// returns -1.0f at .first when nothing is selected
-	std::pair<float, float> getSelectedData();
+	PointF getSelectedData();
 	// returns -1 it can not return an array location
 	int getLastSelectedArray();
 	// sets the position of the currently selected point
-	void setSelectedData(std::pair<float, float> data);
+	void setSelectedData(PointF data);
 	// sets the background pixmap
 	void setBackground(const QPixmap backgound);
 	
@@ -125,9 +127,9 @@ private:
 
 	// utility
 	// calculate graph coords from screen space coords
-	std::pair<float, float> mapMousePos(int x, int y);
+	PointF mapMousePos(int x, int y);
 	// calculate gui curve point's position
-	std::pair<float, float> mapDataCurvePosF(float xA, float yA, float xB, float yB, float curve);
+	PointF mapDataCurvePosF(float xA, float yA, float xB, float yB, float curve);
 	std::pair<int, int> mapDataCurvePos(int xA, int yA, int xB, int yB, float curve);
 	// calculate screen space coords from graph coords
 	// isNonNegative can only be true when graph line / getSamples() is mapped
@@ -164,7 +166,7 @@ private:
 	void addDefaultActions(QMenu* menu, QString controlDisplayText);
 
 	// inputDialog
-	std::pair<float, float> showCoordInputDialog();
+	PointF showCoordInputDialog();
 	float showInputDialog(float curInputValue);
 
 	// selection
@@ -411,7 +413,7 @@ public:
 	// clamps down the values to 0 - 1, -1 - 1
 	// sorts array, removes duplicated x positions, calls dataChanged() if callDataChanged
 	// clamp: should clamp, sort: should sort
-	void formatArray(std::vector<std::pair<float, float>>* dataArrayOut, bool shouldClamp, bool shouldRescale, bool shouldSort, bool callDataChanged);
+	void formatArray(std::vector<PointF>* dataArrayOut, bool shouldClamp, bool shouldRescale, bool shouldSort, bool callDataChanged);
 
 
 	// get attribute: -------------------
@@ -480,7 +482,8 @@ public:
 	// rescale -> scale input positions
 	// sort -> sort input positions
 	// callDataChanged -> call dataChanged() after -> paintEvent()
-	void setDataArray(std::vector<std::pair<float, float>>* inputDataArray, bool shouldCurve, bool shouldClear, bool shouldClamp, bool shouldRescale, bool shouldSort, bool callDataChanged);
+	// PointF = std::pair<float, float>
+	void setDataArray(std::vector<PointF>* inputDataArray, bool shouldCurve, bool shouldClear, bool shouldClamp, bool shouldRescale, bool shouldSort, bool callDataChanged);
 	void setDataArray(std::vector<float>* inputDataArray, bool shouldCurve, bool shouldClear, bool shouldClamp, bool shouldRescale, bool callDataChanged);
 	void setDataArray(float* inputDataArray, unsigned int size, bool shouldCurve, bool shouldClear, bool shouldClamp, bool shouldRescale, bool callDataChanged);
 
