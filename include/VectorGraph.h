@@ -611,18 +611,20 @@ private:
 
 	// line types, m_type is used for this
 	// fadeInStartLoc: from what relative x value should the line type fade out
-	std::vector<float> processLineTypeArraySine(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
+	// linking: valA: sineAmp, valB: sineFreq
+	void processLineTypeArraySine(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
 		float sineAmp, float sineFreq, float fadeInStartLoc);
-	std::vector<float> processLineTypeArraySineB(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
+	// linking: valA: sineAmp, valB: sineFreq, curve: sinePhase
+	void processLineTypeArraySineB(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
 		float sineAmp, float sineFreq, float sinePhase, float fadeInStartLoc);
-	// valA: amp, valB: x coord, curve: width
-	std::vector<float> processLineTypeArrayPeak(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
+	// linking: valA: amp, valB: x coord, curve: width
+	void processLineTypeArrayPeak(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
 		float peakAmp, float peakX, float peakWidth, float fadeInStartLoc);
-	// y: calculate steps from, valA: y count, valB: curve
-	std::vector<float> processLineTypeArraySteps(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
+	// linking: y: yArray, valA: stepCount, valB: stepCurve
+	void processLineTypeArraySteps(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
 		std::vector<float>* yArray, float stepCount, float stepCurve, float fadeInStartLoc);
-	// valA: amp, valB: random number count, curve: seed
-	std::vector<float> processLineTypeArrayRandom(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
+	// linking: valA: randomAmp, valB: randomCount, curve: randomSeed
+	void processLineTypeArrayRandom(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
 		float randomAmp, float randomCount, float randomSeed, float fadeInStartLoc);
 
 	// updating
