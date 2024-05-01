@@ -197,7 +197,7 @@ private:
 	// if m_isLastSelectedArray == true then
 	// m_selectedArray can be used
 	// else if m_isSelected == false then
-	// m_selectedLocation amd m_selectedArray should not be used
+	// m_selectedLocation and m_selectedArray should not be used
 	unsigned int m_selectedLocation;
 	unsigned int m_selectedArray;
 	bool m_isSelected;
@@ -389,16 +389,19 @@ public:
 
 
 	// array: -------------------
-	// returns the location of added/found point, -1 if not found or can not be added
+	// checks m_isFixedSize (== false) and m_maxLength
+	// returns the location of added point, -1 if not found or can not be added
+	// returns the location of found point if there is a point already at newX
 	int add(float newX);
-	// deletes the point in pointLocation location if m_isFixedSize is disabled
+	// checks m_isFixedSize (== false)
+	// deletes the point in pointLocation location
 	void del(unsigned int pointLocation);
 	// clears m_dataArray without any checks
 	inline void clear()
 	{
 		m_dataArray.clear();
 		m_needsUpdating.clear();
-		// m_automationModelArray sould not be cleared without destruction
+		// m_automationModelArray should not be cleared without FloatModel destruction
 		clearedEvent();
 		getUpdatingFromPoint(-1);
 		dataChanged();
@@ -408,7 +411,7 @@ public:
 		return m_dataArray.size();
 	}
 	// clamps down the values to 0 - 1, -1 - 1
-	// sorts array, removes duplicated positions, calls dataChanged() if callDataChanged
+	// sorts array, removes duplicated x positions, calls dataChanged() if callDataChanged
 	// clamp: should clamp, sort: should sort
 	void formatArray(std::vector<std::pair<float, float>>* dataArrayOut, bool shouldClamp, bool shouldRescale, bool shouldSort, bool callDataChanged);
 
@@ -485,27 +488,40 @@ public:
 
 
 	// set attribute: -------------------
-	// sets position when m_isFixedX is disabled, returns final location
+	// checks m_isFixedX (== false)
+	// sets x position, returns final location
+	// returns the location of found point if there is a point already at newX
 	unsigned int setX(unsigned int pointLocation, float newX);
-	// sets value when m_isFixedY is disabled
+	// checks m_isFixedY (== false)
+	// sets y position
 	void setY(unsigned int pointLocation, float newY);
-	// sets value when m_isEditableAttrib is enabled
+	// checks m_isEditableAttrib
+	// sets curve
 	void setC(unsigned int pointLocation, float newC);
-	// sets value when m_isEditableAttrib is enabled
+	// checks m_isEditableAttrib
+	// sets 1. attribute value
 	void setValA(unsigned int pointLocation, float fValue);
-	// sets value when m_isEditableAttrib is enabled
+	// checks m_isEditableAttrib
+	// sets 2. attribute value
 	void setValB(unsigned int pointLocation, float fValue);
-	// sets value when m_isEditableAttrib is enabled
+	// checks m_isEditableAttrib
+	// sets line type
 	void setType(unsigned int pointLocation, unsigned int newType);
-	// sets what attribute gets automated when m_isEditableAttrib and m_isAutomatableEffectable is enabled
+	// checks m_isAutomatableEffectable and m_isEditableAttrib
+	// sets what attribute gets automated (by point's FloatModel)
 	void setAutomatedAttrib(unsigned int pointLocation, unsigned int attribLocation);
-	// sets what attribute gets effected when m_isEditableAttrib and m_isAutomatableEffectable is enabled
+	// checks m_isAutomatableEffectable and m_isEditableAttrib
+	// sets what attribute gets effected (by effector array)
 	void setEffectedAttrib(unsigned int pointLocation, unsigned int attribLocation);
+	// checks m_isAutomatableEffectable and m_isEditableAttrib
+	// if bValue is true then the effector array will not effect the line's individual samples
 	void setEffectOnlyPoints(unsigned int pointLocation, bool bValue);
+	// checks m_isAutomatableEffectable and m_isEditableAttrib
+	// sets the point's effect type
 	void setEffect(unsigned int pointLocation, unsigned int effectId, bool bValue);
+	// checks m_isAutomatableEffectable
 	// if bValue is true then make a new FloatModel and connect it, else delete
 	// the currently used FloatModel
-	// runs if m_isAutomatableEffectable is enabled
 	void setAutomated(unsigned int pointLocation, bool bValue);
 
 
@@ -521,7 +537,9 @@ protected:
 	// delete automationModels in m_automationModelArray
 	// that are not used by points (there should be 0 cases like this)
 	void delUnusedAutomation();
+	// encodes m_dataArray to QString
 	QString getSavedDataArray();
+	// decodes and sets m_dataArray from QString
 	void loadDataArray(QString data, unsigned int arraySize);
 private:
 	class VectorGraphPoint
@@ -630,12 +648,13 @@ private:
 	void swap(unsigned int pointLocationA, unsigned int pointLocationB, bool slide);
 	// returns the curve value at a given x coord, does clamp
 	float processCurve(float yBefore, float yAfter, float curve, float xIn);
-	// applys the effect on a given value, does clamp
+	// returns effected attribute value from base attribValue (input attribute value), does clamp
+	// this function applies the point Effects (like m_effectAdd) based on attribValue and effectValue
 	float processEffect(unsigned int pointLocation, float attribValue, unsigned int attribLocation, float effectValue);
-	// returns a VectorGraphPoint with modified attributes, does clamp
+	// returns automated attribute value from base attribValue (input attribute value), does clamp
 	float processAutomation(unsigned int pointLocation, float attribValue, unsigned int attribLocation);
 
-	// line effects / types, m_type is used for this
+	// line types, m_type is used for this
 	// valA: amp, valB: freq, fadeInStartLoc: from what xIn value should the line type fade out
 	//float processLineTypeSine(float xIn, float valA, float valB, float fadeInStartLoc);
 	std::vector<float> processLineTypeArraySine(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
@@ -692,7 +711,7 @@ private:
 	bool m_isFixedX;
 	// can the values be changed
 	bool m_isFixedY;
-	// if true then it makes the last position coordinate 1, 1, the first point coordinate to -1 (ot 0), 0
+	// if true then it makes the last point coordinate 1, 1, the first point coordinate -1, 0
 	bool m_isFixedEndPoints;
 	// can VectorGraphView select this
 	bool m_isSelectable;
@@ -726,15 +745,17 @@ private:
 
 	// baking
 
-	// getSamples() will return m_bakedSamples if a line is unchanged
-	// else it will recalculate the line's values, update m_bakedSamples
+	// getSamples() will return m_bakedSamples if lines are unchanged
+	// else it will recalculate the changed line's values, update m_bakedSamples
 	// getSamples() needs to know where did lines change so it updates
 	// m_needsUpdating by running getUpdatingFromEffector()
-	// if m_isDataChanged is true, then getSamples adds all the points
-	// to m_needsUpdating before running
+	// if m_isDataChanged is true, then getSamples recalculates all the lines/samples
 	// getSamples() clears m_needsUpdating after it has run
-	// every change is only applyed to the point's line (line started by the point)
-	// changes in position will cause multiple points to update
+	// updating a line means recalculating m_bakedSamples in getSamples()
+	// based on the changed points (stored in m_needsUpdating)
+	// changes in a point will causes its line to update (line started by the point)
+	// changes in position needs to cause multiple lines to update
+	// addition or deletion needs to cause all the lines to update
 
 	// if we want to update all (the full line in getSamples())
 	bool m_isDataChanged;
