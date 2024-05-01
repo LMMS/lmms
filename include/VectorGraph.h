@@ -63,7 +63,7 @@ class LMMS_EXPORT VectorGraphView : public QWidget, public ModelView
 	Q_PROPERTY(int fontSize MEMBER m_fontSize)
 public:
 
-	VectorGraphView(QWidget * parent, int widthIn, int heightIn, unsigned int pointSize,
+	VectorGraphView(QWidget* parent, int widgetWidth, int widgetHeight, unsigned int pointSize,
 		unsigned int controlHeight, unsigned int controlDisplayCount, bool shouldApplyDefaultVectorGraphColors);
 	~VectorGraphView();
 
@@ -211,7 +211,7 @@ private:
 	unsigned int m_controlDisplayCount;
 	unsigned int m_controlDisplayPage;
 	bool m_isEditingActive;
-	std::array<QString, 19> m_controlText =
+	std::array<QString, 18> m_controlText =
 	{
 		tr("x coordinate"), tr("y coordinate"), tr("curve"), tr("1. attribute value"),
 		tr("2. attribute value"), tr("switch graph line type"), tr("switch graph automated value"),
@@ -227,7 +227,7 @@ private:
 		tr("steps"),
 		tr("random")
 	};
-	std::array<bool, 19> m_controlIsFloat = {
+	std::array<bool, 18> m_controlIsFloat = {
 		true, true, true, true,
 		true, false, false,
 		false, false, false, false,
@@ -257,7 +257,7 @@ class LMMS_EXPORT VectorGraphModel : public Model, public JournallingObject
 {
 Q_OBJECT
 public:
-	VectorGraphModel(unsigned int arrayMaxLength, Model* parentIn, bool defaultConstructed);
+	VectorGraphModel(unsigned int arrayMaxLength, Model* parent, bool defaultConstructed);
 	~VectorGraphModel();
 
 	inline size_t getDataArraySize()
@@ -343,10 +343,10 @@ public:
 	VectorGraphDataArray(
 	bool isFixedSize, bool isFixedX, bool isFixedY, bool isNonNegative,
 	bool isFixedEndPoints, bool isSelectable, bool isEditableAttrib, bool isAutomatableEffectable,
-	bool isSaveable, VectorGraphModel* parentIn, int arrayId);
+	bool isSaveable, VectorGraphModel* parent, int arrayId);
 	~VectorGraphDataArray();
 
-	void updateConnections(VectorGraphModel* parentIn);
+	void updateConnections(VectorGraphModel* parent);
 
 	// see descriptions in privete
 	void setIsFixedSize(bool bValue);
@@ -393,7 +393,7 @@ public:
 	int add(float newX);
 	// checks m_isFixedSize (== false)
 	// deletes the point in pointLocation location
-	void del(unsigned int pointLocation);
+	void deletePoint(unsigned int pointLocation);
 	// clears m_dataArray without any checks
 	inline void clear()
 	{
@@ -474,15 +474,15 @@ public:
 	// set: -------------------
 	// sets / adds m_dataArray points
 	// .first = x, .second = y coords
-	// isCurvedIn -> should set curve automatically
-	// clearIn -> clear m_dataArray before setting
-	// clampIn -> clamp input positions
-	// rescaleIn -> scale input positions
-	// sortIn -> sort input positions
-	// callDataChangedIn -> call dataChanged() after -> paintEvent()
-	void setDataArray(std::vector<std::pair<float, float>>* dataArrayIn, bool shouldCurve, bool shouldClear, bool shouldClamp, bool shouldRescale, bool shouldSort, bool callDataChanged);
-	void setDataArray(std::vector<float>* dataArrayIn, bool shouldCurve, bool shouldClear, bool shouldClamp, bool shouldRescale, bool callDataChanged);
-	void setDataArray(float* dataArrayIn, unsigned int sizeIn, bool shouldCurve, bool shouldClear, bool shouldClamp, bool shouldRescale, bool callDataChanged);
+	// isCurved -> should set curve automatically
+	// clear -> clear m_dataArray before setting
+	// clamp -> clamp input positions
+	// rescale -> scale input positions
+	// sort -> sort input positions
+	// callDataChanged -> call dataChanged() after -> paintEvent()
+	void setDataArray(std::vector<std::pair<float, float>>* inputDataArray, bool shouldCurve, bool shouldClear, bool shouldClamp, bool shouldRescale, bool shouldSort, bool callDataChanged);
+	void setDataArray(std::vector<float>* inputDataArray, bool shouldCurve, bool shouldClear, bool shouldClamp, bool shouldRescale, bool callDataChanged);
+	void setDataArray(float* inputDataArray, unsigned int size, bool shouldCurve, bool shouldClear, bool shouldClamp, bool shouldRescale, bool callDataChanged);
 
 
 	// set attribute: -------------------
@@ -534,7 +534,7 @@ protected:
 	std::vector<FloatModel*>* getAutomationModelArray();
 	// delete automationModels in m_automationModelArray
 	// that are not used by points (there should be 0 cases like this)
-	void delUnusedAutomation();
+	void deleteUnusedAutomation();
 	// encodes m_dataArray to QString
 	QString getSavedDataArray();
 	// decodes and sets m_dataArray from QString
@@ -597,10 +597,10 @@ private:
 	};
 	// deletes the point's automation model
 	// if modelLocation == point location
-	void delAutomationModel(unsigned int modelLocation, bool callDataChanged);
-	// swapping values, "slide" moves the values (between) once left or right
+	void deleteAutomationModel(unsigned int modelLocation, bool callDataChanged);
+	// swapping values, "shouldShiftBetween" moves the values (between) once left or right to keep the order
 	// handle m_isFixedEndPoints when using this
-	void swap(unsigned int pointLocationA, unsigned int pointLocationB, bool slide);
+	void swap(unsigned int pointLocationA, unsigned int pointLocationB, bool shouldShiftBetween);
 	// returns the curve value at a given x coord, does clamp
 	float processCurve(float yBefore, float yAfter, float curve, float xIn);
 	// returns effected attribute value from base attribValue (input attribute value), does clamp
@@ -610,7 +610,7 @@ private:
 	float processAutomation(unsigned int pointLocation, float attribValue, unsigned int attribLocation);
 
 	// line types, m_type is used for this
-	// valA: amp, valB: freq, fadeInStartLoc: from what xIn value should the line type fade out
+	// valA: amp, valB: freq, fadeInStartLoc: from what relative x value should the line type fade out
 	std::vector<float> processLineTypeArraySine(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
 		float valA, float valB, float fadeInStartLoc);
 	// curve: phase
@@ -647,7 +647,7 @@ private:
 	void getSamples(unsigned int targetSizeIn, bool* isChangedOut, std::vector<unsigned int>* updatingValuesOut, std::vector<float>* sampleBufferOut);
 	// redraw lines
 	void getSamplesUpdateLines(VectorGraphDataArray* effector, std::vector<float>* effectorSamples,
-		std::vector<float>* outputXLocations, unsigned int iIn, float stepSize);
+		std::vector<float>* outputXLocations, unsigned int pointLocation, float stepSize);
 	bool isEffectedPoint(unsigned int pointLocation);
 
 	// checks m_isFixedEndPoints, does not call dataChanged()
