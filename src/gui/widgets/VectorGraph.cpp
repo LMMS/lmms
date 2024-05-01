@@ -22,11 +22,13 @@
  *
  */
 
+#include "VectorGraph.h"
+
 #include <vector>
+#include <array>
 #include <cmath> // sine
 #include <algorithm> // sort
 #include <cstdlib> // rand
-#include <cstdint> // unintptr_t
 #include <QPainter>
 #include <QPainterPath>
 #include <QMouseEvent>
@@ -35,7 +37,6 @@
 #include <QMutex> // locking when getSamples
 
 
-#include "VectorGraph.h"
 #include "StringPairDrag.h"
 #include "CaptionMenu.h" // context menu
 #include "embed.h" // context menu
@@ -66,7 +67,7 @@ VectorGraphView::VectorGraphView(QWidget * parent, int widthIn, int heightIn, un
 
 	m_pointSize = pointSize;
 	// gets set in style
-	//m_fontSize = 12;
+	//m_fontSize = 12; // set in css
 	m_isSimplified = false;
 	m_isDefaultColorsApplyed = false;
 	//m_background;
@@ -83,28 +84,10 @@ VectorGraphView::VectorGraphView(QWidget * parent, int widthIn, int heightIn, un
 	m_controlDisplayCount = controlDisplayCount;
 	m_controlDisplayPage = 0;
 	m_isEditingActive = false;
-	m_controlText = {
-		tr("x coordinate"), tr("y coordinate"), tr("curve"), tr("1. attribute value"),
-		tr("2. attribute value"), tr("switch graph line type"), tr("switch graph automated value"),
-		tr("switch graph effected value"), tr("can only effect graph points"), tr("\"add\" effect"), tr("\"subtract\" effect"),
-		tr("\"multiply\" effect"), tr("\"divide\" effect"), tr("\"power\" effect"), tr("\"log\" effect"),
-		tr("\"sine\" effect"), tr("\"clamp lower\" effect"), tr("\"clamp upper\" effect")
-	};
-	m_controlLineEffectText = {
-		tr("none"),
-		tr("sine"),
-		tr("phase changable sine"),
-		tr("peak"),
-		tr("steps"),
-		tr("random")
-	};
-	m_controlIsFloat = {
-		true, true, true, true,
-		true, false, false,
-		false, false, false, false,
-		false, false, false, false,
-		false, false, false
-	};
+	// set in .h
+	//m_controlText
+	//m_controlLineEffectText
+	//m_controlIsFloat
 
 	m_lastTrackPoint.first = -1;
 	m_lastTrackPoint.second = 0;
@@ -127,9 +110,6 @@ VectorGraphView::VectorGraphView(QWidget * parent, int widthIn, int heightIn, un
 VectorGraphView::~VectorGraphView()
 {
 	qDebug("VectorGraphView dstc");
-	m_controlText.clear();
-	m_controlIsFloat.clear();
-	m_controlLineEffectText.clear();
 	qDebug("VectorGraphView dstc end");
 }
 
