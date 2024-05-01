@@ -75,7 +75,7 @@ private slots:
 	void vectorGraphChanged();
 signals:
 	// connected to dataArrayChanged()
-	// shouldUseGetLastValuesIn: when the graph is redrawn
+	// shouldUseGetLastValues: when the graph is redrawn
 	// should it use the last updated values instead of updating again
 	void vectorGraphUpdateView(bool shouldUseGetLastValues);
 private:
