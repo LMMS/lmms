@@ -128,7 +128,7 @@ private:
 	std::pair<float, float> mapMousePos(int x, int y);
 	// calculate gui curve point's position
 	std::pair<float, float> mapDataCurvePosF(float xA, float yA, float xB, float yB, float curve);
-	std::pair<int, int>mapDataCurvePos(int xA, int yA, int xB, int yB, float curve);
+	std::pair<int, int> mapDataCurvePos(int xA, int yA, int xB, int yB, float curve);
 	// calculate screen space coords from graph coords
 	// isNonNegative can only be true when graph line / getSamples() is mapped
 	std::pair<int, int> mapDataPos(float x, float y, bool isNonNegative);
@@ -610,25 +610,24 @@ private:
 	float processAutomation(unsigned int pointLocation, float attribValue, unsigned int attribLocation);
 
 	// line types, m_type is used for this
-	// valA: amp, valB: freq, fadeInStartLoc: from what relative x value should the line type fade out
+	// fadeInStartLoc: from what relative x value should the line type fade out
 	std::vector<float> processLineTypeArraySine(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
-		float valA, float valB, float fadeInStartLoc);
-	// curve: phase
+		float sineAmp, float sineFreq, float fadeInStartLoc);
 	std::vector<float> processLineTypeArraySineB(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
-		float valA, float valB, float curve, float fadeInStartLoc);
+		float sineAmp, float sineFreq, float sinePhase, float fadeInStartLoc);
 	// valA: amp, valB: x coord, curve: width
 	std::vector<float> processLineTypeArrayPeak(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
-		float valA, float valB, float curve, float fadeInStartLoc);
+		float peakAmp, float peakX, float peakWidth, float fadeInStartLoc);
 	// y: calculate steps from, valA: y count, valB: curve
 	std::vector<float> processLineTypeArraySteps(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
-		std::vector<float>* yArray, float valA, float valB, float fadeInStartLoc);
+		std::vector<float>* yArray, float stepCount, float stepCurve, float fadeInStartLoc);
 	// valA: amp, valB: random number count, curve: seed
 	std::vector<float> processLineTypeArrayRandom(std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
-		float valA, float valB, float curve, float fadeInStartLoc);
+		float randomAmp, float randomCount, float randomSeed, float fadeInStartLoc);
 
 	// updating
-	// adds the points that are
-	// effected by the effector's values changing
+	// adds the m_dataArray points that are
+	// effected by the changed effector array points.
 	// ONLY WORKS IN SORTED ARRAYS
 	void getUpdatingFromEffector(std::vector<unsigned int>* updatingPointLocations);
 	// if pointLocation >= 0 -> adds the location to m_needsUpdating
