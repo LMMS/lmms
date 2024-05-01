@@ -218,6 +218,11 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 	return isRunning();
 }
 
+void DualFilterEffect::onEnabledChanged()
+{
+	m_filter1->clearHistory();
+	m_filter2->clearHistory();
+}
 
 
 
