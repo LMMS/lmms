@@ -1874,7 +1874,7 @@ void DataFile::upgrade_sampleAndHold()
 // Change loops' filenames in <sampleclip>s
 void DataFile::upgrade_loopsRename()
 {
-	auto createEntry = [this](const QString& originalName, const QString& bpm, const QString& extension = "ogg")
+	auto createEntry = [](const QString& originalName, const QString& bpm, const QString& extension = "ogg")
 	{
 		const QString replacement = originalName + " - " + bpm + " BPM." + extension;
 		return std::pair{originalName + "." + extension, replacement};
