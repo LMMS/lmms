@@ -116,13 +116,10 @@ bool SampleThumbnailListManager::selectFromGlobalThumbnailMap(
 		qDebug("Generating thumbnails for file: %s", qUtf8Printable(name));
 		
 		SAMPLE_THUMBNAIL_MAP.insert(
-			std::pair<const QString, SSTLandSBSPV>
+			std::pair<const QString, SharedSampleThumbnailList>
 			(
 				name,
-				SSTLandSBSPV {
-					this->list,
-					SampleBufferSharedPtrVec{ samplePtr }
-				}
+				this->list
 			)
 		);
 		
@@ -130,53 +127,20 @@ bool SampleThumbnailListManager::selectFromGlobalThumbnailMap(
 	}
 	else
 	{
-		this->list = list->second.sharedSampleList;
-		
-		list->second.vectorPtr.push_back(samplePtr);
-		
+		this->list = list->second;
+				
 		return true;
 	}
 }
 
 void SampleThumbnailListManager::cleanUpGlobalThumbnailMap()
 {
-	// This code looks complicated because of the way LMMS behaves.
-	// When you open a project in LMMS, the clips that contain the same
-	// audio file end up getting their own samples (and therefore 
-	// sampleBuffers). Thus, we need to track 2 things:
-	//
-	// 1. The name of the sampleBuffer, to avoid making duplicates.
-	//
-	// 2. A vector of shared_ptrs to the sampleBuffers constructed from
-	// the sample audio file. When this vector goes empty. The sample 
-	// has gone out of use, and we can then delete the thumbnail  
-	// associated with this audio file.
-	
 	auto map = SAMPLE_THUMBNAIL_MAP.begin();
 	while (map != SAMPLE_THUMBNAIL_MAP.end()) 
-	{
-		// Find and erase all orphaned sampleBuffers
-		SampleBufferSharedPtrVec& vec = map->second.vectorPtr;
-		auto ptr = vec.end();
-		for (;;)
-		{
-			ptr = std::find_if(
-				vec.begin(),
-				vec.end(), 
-				[](const auto& a) -> bool { return a.use_count() == 1; } 
-			);
-			
-			if (ptr == vec.end()) { break; }
-			
-			qDebug("Erasing a shared_ptr");
-			
-			vec.erase(ptr); 
-		}
-		
-		
-		// all shared pointers are orphaned a.k.a the sample is out of 
-		// use
-		if (vec.empty()) 
+	{		
+		// All instances of SampleThumbnailListManager are destroyed,
+		// a.k.a sample goes out of use
+		if (map->second.use_count() == 1) 
 		{
 			qDebug("Deleting an orphaned thumbnaillist...");
 			SAMPLE_THUMBNAIL_MAP.erase(map);

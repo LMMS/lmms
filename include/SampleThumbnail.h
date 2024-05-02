@@ -72,16 +72,8 @@ struct SampleThumbnailBit
 using SampleThumbnail = std::vector<SampleThumbnailBit>;
 using SampleThumbnailList = std::vector<SampleThumbnail>;
 using SharedSampleThumbnailList = std::shared_ptr< SampleThumbnailList >;
-using SampleBufferSharedPtrVec = std::vector< std::shared_ptr<const SampleBuffer> >;
 
-// SharedSampleThumbnailList and SampleBufferSharedPtrVec
-struct SSTLandSBSPV 
-{
-	SharedSampleThumbnailList sharedSampleList;
-	SampleBufferSharedPtrVec vectorPtr;
-};
-
-static std::map<const QString, SSTLandSBSPV> SAMPLE_THUMBNAIL_MAP;
+static std::map<const QString, SharedSampleThumbnailList> SAMPLE_THUMBNAIL_MAP;
 
 class LMMS_EXPORT SampleThumbnailListManager 
 {
