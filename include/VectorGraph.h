@@ -613,22 +613,22 @@ private:
 	float processAutomation(unsigned int pointLocation, float attribValue, unsigned int attribLocation);
 
 	// line types, m_type is used for this
-	// fadeInStartLoc: from what relative x value should the line type fade out
+	// fadeInStartVal: from what relative x value should the line type fade out
 	// linking: valA: sineAmp, valB: sineFreq
 	void processLineTypeArraySine(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
-		float sineAmp, float sineFreq, float fadeInStartLoc);
+		float sineAmp, float sineFreq, float fadeInStartVal);
 	// linking: valA: sineAmp, valB: sineFreq, curve: sinePhase
 	void processLineTypeArraySineB(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
-		float sineAmp, float sineFreq, float sinePhase, float fadeInStartLoc);
+		float sineAmp, float sineFreq, float sinePhase, float fadeInStartVal);
 	// linking: valA: amp, valB: x coord, curve: width
 	void processLineTypeArrayPeak(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
-		float peakAmp, float peakX, float peakWidth, float fadeInStartLoc);
+		float peakAmp, float peakX, float peakWidth, float fadeInStartVal);
 	// linking: y: yArray, valA: stepCount, valB: stepCurve
 	void processLineTypeArraySteps(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
-		std::vector<float>* yArray, float stepCount, float stepCurve, float fadeInStartLoc);
+		std::vector<float>* yArray, float stepCount, float stepCurve, float fadeInStartVal);
 	// linking: valA: randomAmp, valB: randomCount, curve: randomSeed
 	void processLineTypeArrayRandom(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
-		float randomAmp, float randomCount, float randomSeed, float fadeInStartLoc);
+		float randomAmp, float randomCount, float randomSeed, float fadeInStartVal);
 
 	// updating
 	// adds the m_dataArray points that are

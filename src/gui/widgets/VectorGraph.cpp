@@ -3109,13 +3109,13 @@ float VectorGraphDataArray::processAutomation(unsigned int pointLocation, float 
 }
 
 void VectorGraphDataArray::processLineTypeArraySine(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
-	float sineAmp, float sineFreq, float fadeInStartLoc)
+	float sineAmp, float sineFreq, float fadeInStartVal)
 {
 	processLineTypeArraySineB(samplesOut, xArray, startLoc, endLoc,
-		sineAmp, sineFreq, 0.0f, fadeInStartLoc);
+		sineAmp, sineFreq, 0.0f, fadeInStartVal);
 }
 void VectorGraphDataArray::processLineTypeArraySineB(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
-	float sineAmp, float sineFreq, float sinePhase, float fadeInStartLoc)
+	float sineAmp, float sineFreq, float sinePhase, float fadeInStartVal)
 {
 	float startLocVal = (*samplesOut)[startLoc];
 	float endLocVal = (*samplesOut)[endLoc > 0 ? endLoc - 1 : 0];
@@ -3137,7 +3137,8 @@ void VectorGraphDataArray::processLineTypeArraySineB(std::vector<float>* samples
 	{
 		end = end > count ? count : end + 1;
 	}
-	std::vector<float> oneWave(end);
+	// allocate 1 part of a sine wave on the stack
+	float oneWave[end];
 
 	// calculate 1 wave of sine
 	for (unsigned int i = 0; i < end; i++)
@@ -3162,28 +3163,21 @@ void VectorGraphDataArray::processLineTypeArraySineB(std::vector<float>* samples
 
 	//qDebug("sineB_3");
 	// fade in
-	for (unsigned int i = startLoc; i < endLoc; i++)
+	unsigned int fadeInEndLoc = static_cast<unsigned int>(fadeInStartVal * static_cast<float>(count));
+	for (unsigned int i = startLoc; i < startLoc + fadeInEndLoc; i++)
 	{
-		float x = (*xArray)[i] / fadeInStartLoc;
-		if (x > 1.0f)
-		{
-			break;
-		}
+		float x = (*xArray)[i] / fadeInStartVal;
 		(*samplesOut)[i] = (*samplesOut)[i] * x + startLocVal * (1.0f - x);
 	}
 	// fade out
-	for (unsigned int i = endLoc - 1; i > startLoc; i--)
+	for (unsigned int i = endLoc - 1; i > endLoc - fadeInEndLoc; i--)
 	{
-		float x = (1.0f - (*xArray)[i]) / fadeInStartLoc;
-		if (x > 1.0f)
-		{
-			break;
-		}
+		float x = (1.0f - (*xArray)[i]) / fadeInStartVal;
 		(*samplesOut)[i] = (*samplesOut)[i] * x + endLocVal * (1.0f - x);
 	}
 }
 void VectorGraphDataArray::processLineTypeArrayPeak(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
-	float peakAmp, float peakX, float peakWidth, float fadeInStartLoc)
+	float peakAmp, float peakX, float peakWidth, float fadeInStartVal)
 {
 	float startLocVal = (*samplesOut)[startLoc];
 	float endLocVal = (*samplesOut)[endLoc > 0 ? endLoc - 1 : 0];
@@ -3199,28 +3193,21 @@ void VectorGraphDataArray::processLineTypeArrayPeak(std::vector<float>* samplesO
 	}
 
 	// fade in
-	for (unsigned int i = startLoc; i < endLoc; i++)
+	unsigned int fadeInEndLoc = static_cast<unsigned int>(fadeInStartVal * static_cast<float>(count));
+	for (unsigned int i = startLoc; i < startLoc + fadeInEndLoc; i++)
 	{
-		float x = (*xArray)[i] / fadeInStartLoc;
-		if (x > 1.0f)
-		{
-			break;
-		}
+		float x = (*xArray)[i] / fadeInStartVal;
 		(*samplesOut)[i] = (*samplesOut)[i] * x + startLocVal * (1.0f - x);
 	}
 	// fade out
-	for (unsigned int i = endLoc - 1; i > startLoc; i--)
+	for (unsigned int i = endLoc - 1; i > endLoc - fadeInEndLoc; i--)
 	{
-		float x = (1.0f - (*xArray)[i]) / fadeInStartLoc;
-		if (x > 1.0f)
-		{
-			break;
-		}
+		float x = (1.0f - (*xArray)[i]) / fadeInStartVal;
 		(*samplesOut)[i] = (*samplesOut)[i] * x + endLocVal * (1.0f - x);
 	}
 }
 void VectorGraphDataArray::processLineTypeArraySteps(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
-	std::vector<float>* yArray, float stepCount, float stepCurve, float fadeInStartLoc)
+	std::vector<float>* yArray, float stepCount, float stepCurve, float fadeInStartVal)
 {
 	float startLocVal = (*samplesOut)[startLoc];
 	float endLocVal = (*samplesOut)[endLoc > 0 ? endLoc - 1 : 0];
@@ -3241,28 +3228,21 @@ void VectorGraphDataArray::processLineTypeArraySteps(std::vector<float>* samples
 	}
 
 	// fade in
-	for (unsigned int i = startLoc; i < endLoc; i++)
+	unsigned int fadeInEndLoc = static_cast<unsigned int>(fadeInStartVal * static_cast<float>(count));
+	for (unsigned int i = startLoc; i < startLoc + fadeInEndLoc; i++)
 	{
-		float x = (*xArray)[i] / fadeInStartLoc;
-		if (x > 1.0f)
-		{
-			break;
-		}
+		float x = (*xArray)[i] / fadeInStartVal;
 		(*samplesOut)[i] = (*samplesOut)[i] * x + startLocVal * (1.0f - x);
 	}
 	// fade out
-	for (unsigned int i = endLoc - 1; i > startLoc; i--)
+	for (unsigned int i = endLoc - 1; i > endLoc - fadeInEndLoc; i--)
 	{
-		float x = (1.0f - (*xArray)[i]) / fadeInStartLoc;
-		if (x > 1.0f)
-		{
-			break;
-		}
+		float x = (1.0f - (*xArray)[i]) / fadeInStartVal;
 		(*samplesOut)[i] = (*samplesOut)[i] * x + endLocVal * (1.0f - x);
 	}
 }
 void VectorGraphDataArray::processLineTypeArrayRandom(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
-	float randomAmp, float randomCount, float randomSeed, float fadeInStartLoc)
+	float randomAmp, float randomCount, float randomSeed, float fadeInStartVal)
 {
 	int count = static_cast<int>(endLoc) - static_cast<int>(startLoc);
 	if (count < 0)
