@@ -117,17 +117,17 @@ Effect::ProcessStatus WaveShaperEffect::processImpl(SampleFrame* buf, const fpp_
 
 			if( lookup < 1 )
 			{
-				s[i] = frac * graphSamples->operator[](0) * posneg;
+				s[i] = frac * (*graphSamples)[0] * posneg;
 			}
 			else if( lookup < 200 )
 			{
-				s[i] = linearInterpolate(graphSamples->operator[](lookup - 1),
-						graphSamples->operator[](lookup), frac)
+				s[i] = linearInterpolate((*graphSamples)[lookup - 1],
+						(*graphSamples)[lookup], frac)
 						* posneg;
 			}
 			else
 			{
-				s[i] *= graphSamples->operator[](199);
+				s[i] *= (*graphSamples)[199];
 			}
 		}
 
