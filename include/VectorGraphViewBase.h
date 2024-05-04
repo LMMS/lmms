@@ -51,6 +51,7 @@ public:
 
 protected slots:
 	virtual void contextMenuRemoveAutomation() = 0;
+	virtual void contextMenuExecConnectionDialog();
 protected:
 	void showHintText(QWidget* thisWidget, QString hintText, int msecBeforeDesplay, int msecDisplayTime);
 	void hideHintText();
@@ -63,12 +64,11 @@ protected:
 	std::pair<float, float> showCoordInputDialog(std::pair<float, float> pointPosition);
 	float showInputDialog(float curInputValue);
 
-private slots:
-	void contextMenuExecConnectionDialog(FloatModel* automationModel);
 private:
-	void addDefaultActions(QMenu* menu, FloatModel* automationModel,  QString controlDisplayText);
+	void addDefaultActions(QMenu* menu,  QString controlDisplayText);
 
 	SimpleTextFloat* m_hintText;
+	FloatModel* m_curAutomationModel;
 };
 } // namespace gui
 } // namespace lmms
