@@ -33,6 +33,7 @@
 #include <QMenu>
 #include <QMutex>
 
+#include "VectorGraphViewBase.h"
 #include "Model.h"
 #include "ModelView.h"
 #include "lmms_basics.h"
@@ -42,6 +43,7 @@
 namespace lmms
 {
 
+//class VectorGraphViewBase;
 class VectorGraphModel;
 class VectorGraphDataArray;
 class FloatModel;
@@ -50,7 +52,7 @@ using PointF = std::pair<float, float>;
 
 namespace gui
 {
-class LMMS_EXPORT VectorGraphView : public QWidget, public ModelView
+class LMMS_EXPORT VectorGraphView : public VectorGraphViewBase, public ModelView
 {
 	Q_OBJECT
 	// set default VectorGraph css colors and styles
@@ -78,10 +80,12 @@ public:
 	void setControlHeight(unsigned int controlHeight);
 	void setControlDisplayCount(unsigned int controlDisplayCount);
 
+
 	inline VectorGraphModel* model()
 	{
 		return castModel<VectorGraphModel>();
 	}
+
 
 	// draws estimated line, does not call getSamples()
 	// does not fill graphs with VectorGraphDataArray FillColor
@@ -116,9 +120,7 @@ protected slots:
 	void updateGraph(bool shouldUseGetLastSamples);
 	void updateDefaultColors();
 
-	void execConnectionDialog();
-	void removeAutomation();
-	void removeController();
+	void contextMenuRemoveAutomation();
 private:
 	void paintGraph(QPainter* p, unsigned int arrayLocation, std::vector<float>* sampleBuffer);
 	void paintEditing(QPainter* p);
@@ -162,12 +164,6 @@ private:
 	QColor getFillColorFromBaseColor(QColor baseColor);
 	// cuts the string to displayedLength(in px) size (estimated)
 	QString getTextFromDisplayLength(QString text, unsigned int displayLength);
-	// context menu actions
-	void addDefaultActions(QMenu* menu, QString controlDisplayText);
-
-	// inputDialog
-	PointF showCoordInputDialog();
-	float showInputDialog(float curInputValue);
 
 	// selection
 	// searches VectorGraphDataArray-s to select
