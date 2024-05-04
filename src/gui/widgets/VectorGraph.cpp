@@ -650,7 +650,7 @@ void VectorGraphView::paintGraph(QPainter* p, unsigned int arrayLocation, std::v
 			{
 				// if nonNegative then only the dataArray output (getDataValues)
 				// is bigger than 0 so it matters only here
-				posB = mapDataPos(0, sampleBuffer->operator[](j), dataArray->getIsNonNegative());
+				posB = mapDataPos(0, (*sampleBuffer)[j], dataArray->getIsNonNegative());
 				posB.first = static_cast<int>((j * width()) / static_cast<float>(sampleBuffer->size()));
 	
 				if (posA.first != posB.first)
@@ -928,7 +928,7 @@ PointF VectorGraphView::mapMousePos(int x, int y)
 {
 	// mapping the position to 0 - 1, -1 - 1 using qWidget width and height
 	return PointF(
-		static_cast<float>(x / (float)width()),
+		static_cast<float>(x / static_cast<float>(width())),
 		static_cast<float>(y) * 2.0f / static_cast<float>(m_graphHeight) - 1.0f);
 }
 std::pair<int, int> VectorGraphView::mapDataPos(float x, float y, bool isNonNegative)
@@ -1836,7 +1836,7 @@ void VectorGraphModel::saveSettings(QDomDocument& doc, QDomElement& element, con
 			{
 				qDebug("saveSettings saved automatinModel %d, %d", i, j);
 				QString readLocationB = QString::number(j) + "-";
-				automationModels->operator[](j)->saveSettings(doc, me, readLocation + readLocationB + "AutomationModel");
+				(*automationModels)[j]->saveSettings(doc, me, readLocation + readLocationB + "AutomationModel");
 			}
 		}
 	}
@@ -2326,21 +2326,21 @@ void VectorGraphDataArray::formatArray(std::vector<PointF>* dataArrayOut, bool s
 		float maxY = 1.0f;
 		for (unsigned int i = 0; i < dataArrayOut->size(); i++)
 		{
-			if (dataArrayOut->operator[](i).first < minX)
+			if ((*dataArrayOut)[i].first < minX)
 			{
-				minX = dataArrayOut->operator[](i).first;
+				minX = (*dataArrayOut)[i].first;
 			}
-			if (dataArrayOut->operator[](i).first > maxX)
+			if ((*dataArrayOut)[i].first > maxX)
 			{
-				maxX = dataArrayOut->operator[](i).first;
+				maxX = (*dataArrayOut)[i].first;
 			}
-			if (dataArrayOut->operator[](i).second < minY)
+			if ((*dataArrayOut)[i].second < minY)
 			{
-				minY = dataArrayOut->operator[](i).second;
+				minY = (*dataArrayOut)[i].second;
 			}
-			if (dataArrayOut->operator[](i).second > maxY)
+			if ((*dataArrayOut)[i].second > maxY)
 			{
-				maxY = dataArrayOut->operator[](i).second;
+				maxY = (*dataArrayOut)[i].second;
 			}
 		}
 		//qDebug("formatArray 1: minx: %f maxx: %f miny: %f maxy: %f", minX, maxX, minY, maxY);
@@ -2353,14 +2353,14 @@ void VectorGraphDataArray::formatArray(std::vector<PointF>* dataArrayOut, bool s
 		{
 			for (unsigned int i = 0; i < dataArrayOut->size(); i++)
 			{
-				dataArrayOut->operator[](i).first = (dataArrayOut->operator[](i).first + minX) / maxX;
+				(*dataArrayOut)[i].first = ((*dataArrayOut)[i].first + minX) / maxX;
 			}
 		}
 		if (minY != -1.0f || maxY != 1.0f)
 		{
 			for (unsigned int i = 0; i < dataArrayOut->size(); i++)
 			{
-				dataArrayOut->operator[](i).second = (dataArrayOut->operator[](i).second + minY) / maxY - 1.0f;
+				(*dataArrayOut)[i].second = ((*dataArrayOut)[i].second + minY) / maxY - 1.0f;
 			}
 		}
 	}
@@ -2369,21 +2369,21 @@ void VectorGraphDataArray::formatArray(std::vector<PointF>* dataArrayOut, bool s
 		// clamp
 		for (unsigned int i = 0; i < dataArrayOut->size(); i++)
 		{
-			if (dataArrayOut->operator[](i).first < 0.0f)
+			if ((*dataArrayOut)[i].first < 0.0f)
 			{
-				dataArrayOut->operator[](i).first = 0.0f;
+				(*dataArrayOut)[i].first = 0.0f;
 			}
-			if (dataArrayOut->operator[](i).first > 1.0f)
+			if ((*dataArrayOut)[i].first > 1.0f)
 			{
-				dataArrayOut->operator[](i).first = 1.0f;
+				(*dataArrayOut)[i].first = 1.0f;
 			}
-			if (dataArrayOut->operator[](i).second < -1.0f)
+			if ((*dataArrayOut)[i].second < -1.0f)
 			{
-				dataArrayOut->operator[](i).second = -1.0f;
+				(*dataArrayOut)[i].second = -1.0f;
 			}
-			if (dataArrayOut->operator[](i).second > 1.0f)
+			if ((*dataArrayOut)[i].second > 1.0f)
 			{
-				dataArrayOut->operator[](i).second = 1.0f;
+				(*dataArrayOut)[i].second = 1.0f;
 			}
 		}
 		formatDataArrayEndPoints();
@@ -2403,17 +2403,17 @@ void VectorGraphDataArray::formatArray(std::vector<PointF>* dataArrayOut, bool s
 	float lastPos = -1.0f;
 	if (dataArrayOut->size() > 0)
 	{
-		lastPos = dataArrayOut->operator[](0).first;
+		lastPos = (*dataArrayOut)[0].first;
 	}
 	for (unsigned int i = 1; i < dataArrayOut->size(); i++)
 	{
-		if (dataArrayOut->operator[](i).first == lastPos)
+		if ((*dataArrayOut)[i].first == lastPos)
 		{
 			deletePoint(i);
 		}
 		else
 		{
-			lastPos = dataArrayOut->operator[](i).first;
+			lastPos = (*dataArrayOut)[i].first;
 		}
 	}
 	// calling clearedEvent is not needed
@@ -2545,9 +2545,9 @@ void VectorGraphDataArray::setDataArray(std::vector<PointF>* inputDataArray,
 	bool isNegativeBefore = false;
 	for (unsigned int i = 0; i < m_dataArray.size(); i++)
 	{
-		//qDebug("setDataArray 1, x: %f, y: %f", inputDataArray->operator[](i).first, inputDataArray->operator[](i).second);
-		m_dataArray[i].m_x = inputDataArray->operator[](i).first;
-		m_dataArray[i].m_y = inputDataArray->operator[](i).second;
+		//qDebug("setDataArray 1, x: %f, y: %f", (*inputDataArray)[i].first, (*inputDataArray)[i].second);
+		m_dataArray[i].m_x = (*inputDataArray)[i].first;
+		m_dataArray[i].m_y = (*inputDataArray)[i].second;
 		// calculating curves
 		if (shouldCurve == true && i > 0)
 		{
@@ -2589,7 +2589,7 @@ void VectorGraphDataArray::setDataArray(std::vector<float>* inputDataArray,
 	for (unsigned int i = 0; i < inputDataArray->size(); i++)
 	{
 		convertedDataArray[i].first = i * stepSize;
-		convertedDataArray[i].second = inputDataArray->operator[](i);
+		convertedDataArray[i].second = (*inputDataArray)[i];
 	}
 	setDataArray(&convertedDataArray, shouldCurve, shouldClear, shouldClamp, shouldRescale, false, callDataChanged);
 }
@@ -3209,8 +3209,8 @@ void VectorGraphDataArray::processLineTypeArraySine(std::vector<float>* samplesO
 void VectorGraphDataArray::processLineTypeArraySineB(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
 	float sineAmp, float sineFreq, float sinePhase, float fadeInStartLoc)
 {
-	float startLocVal = samplesOut->operator[](startLoc);
-	float endLocVal = samplesOut->operator[](endLoc > 0 ? endLoc - 1 : 0);
+	float startLocVal = (*samplesOut)[startLoc];
+	float endLocVal = (*samplesOut)[endLoc > 0 ? endLoc - 1 : 0];
 	int count = static_cast<int>(endLoc) - static_cast<int>(startLoc);
 	if (count < 0)
 	{
@@ -3237,7 +3237,7 @@ void VectorGraphDataArray::processLineTypeArraySineB(std::vector<float>* samples
 		// 628.318531f = 100.0f * 2.0f * pi
 		// (1 sine wave is 2pi long and we have 1 * 100 * sineFreq waves)
 		oneWave[i] = sineAmp * std::sin(
-			xArray->operator[](startLoc + i) * 628.318531f * tValB + sinePhase * 100.0f);
+			(*xArray)[startLoc + i] * 628.318531f * tValB + sinePhase * 100.0f);
 	}
 	//qDebug("sineB_2");
 	// copy the first wave until the end
@@ -3248,7 +3248,7 @@ void VectorGraphDataArray::processLineTypeArraySineB(std::vector<float>* samples
 		for (unsigned int j = 0; j < endB; j++)
 		{
 			//qDebug("sineB_2.5: i: %d, %d, %d", endB, j, i + j);
-			samplesOut->operator[](startLoc + j + i) += oneWave[j];
+			(*samplesOut)[startLoc + j + i] += oneWave[j];
 		}
 	}
 
@@ -3256,29 +3256,29 @@ void VectorGraphDataArray::processLineTypeArraySineB(std::vector<float>* samples
 	// fade in
 	for (unsigned int i = startLoc; i < endLoc; i++)
 	{
-		float x = xArray->operator[](i) / fadeInStartLoc;
+		float x = (*xArray)[i] / fadeInStartLoc;
 		if (x > 1.0f)
 		{
 			break;
 		}
-		samplesOut->operator[](i) = samplesOut->operator[](i) * x + startLocVal * (1.0f - x);
+		(*samplesOut)[i] = (*samplesOut)[i] * x + startLocVal * (1.0f - x);
 	}
 	// fade out
 	for (unsigned int i = endLoc - 1; i > startLoc; i--)
 	{
-		float x = (1.0f - xArray->operator[](i)) / fadeInStartLoc;
+		float x = (1.0f - (*xArray)[i]) / fadeInStartLoc;
 		if (x > 1.0f)
 		{
 			break;
 		}
-		samplesOut->operator[](i) = samplesOut->operator[](i) * x + endLocVal * (1.0f - x);
+		(*samplesOut)[i] = (*samplesOut)[i] * x + endLocVal * (1.0f - x);
 	}
 }
 void VectorGraphDataArray::processLineTypeArrayPeak(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
 	float peakAmp, float peakX, float peakWidth, float fadeInStartLoc)
 {
-	float startLocVal = samplesOut->operator[](startLoc);
-	float endLocVal = samplesOut->operator[](endLoc > 0 ? endLoc - 1 : 0);
+	float startLocVal = (*samplesOut)[startLoc];
+	float endLocVal = (*samplesOut)[endLoc > 0 ? endLoc - 1 : 0];
 	int count = static_cast<int>(endLoc) - static_cast<int>(startLoc);
 	if (count < 0)
 	{
@@ -3286,36 +3286,36 @@ void VectorGraphDataArray::processLineTypeArrayPeak(std::vector<float>* samplesO
 	}
 	for (unsigned int i = 0; i < count; i++)
 	{
-		samplesOut->operator[](startLoc + i) += std::pow((peakWidth + 1.0f) * 0.2f + 0.01f,
-			std::abs(xArray->operator[](startLoc + i) - (peakX + 1.0f) * 0.5f) * 10.0f) * peakAmp;
+		(*samplesOut)[startLoc + i] += std::pow((peakWidth + 1.0f) * 0.2f + 0.01f,
+			std::abs((*xArray)[startLoc + i] - (peakX + 1.0f) * 0.5f) * 10.0f) * peakAmp;
 	}
 
 	// fade in
 	for (unsigned int i = startLoc; i < endLoc; i++)
 	{
-		float x = xArray->operator[](i) / fadeInStartLoc;
+		float x = (*xArray)[i] / fadeInStartLoc;
 		if (x > 1.0f)
 		{
 			break;
 		}
-		samplesOut->operator[](i) = samplesOut->operator[](i) * x + startLocVal * (1.0f - x);
+		(*samplesOut)[i] = (*samplesOut)[i] * x + startLocVal * (1.0f - x);
 	}
 	// fade out
 	for (unsigned int i = endLoc - 1; i > startLoc; i--)
 	{
-		float x = (1.0f - xArray->operator[](i)) / fadeInStartLoc;
+		float x = (1.0f - (*xArray)[i]) / fadeInStartLoc;
 		if (x > 1.0f)
 		{
 			break;
 		}
-		samplesOut->operator[](i) = samplesOut->operator[](i) * x + endLocVal * (1.0f - x);
+		(*samplesOut)[i] = (*samplesOut)[i] * x + endLocVal * (1.0f - x);
 	}
 }
 void VectorGraphDataArray::processLineTypeArraySteps(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
 	std::vector<float>* yArray, float stepCount, float stepCurve, float fadeInStartLoc)
 {
-	float startLocVal = samplesOut->operator[](startLoc);
-	float endLocVal = samplesOut->operator[](endLoc > 0 ? endLoc - 1 : 0);
+	float startLocVal = (*samplesOut)[startLoc];
+	float endLocVal = (*samplesOut)[endLoc > 0 ? endLoc - 1 : 0];
 	int count = static_cast<int>(endLoc) - static_cast<int>(startLoc);
 	if (count < 0)
 	{
@@ -3326,31 +3326,31 @@ void VectorGraphDataArray::processLineTypeArraySteps(std::vector<float>* samples
 	//qDebug("stepsA - stepCount = %f", stepCount);
 	for (unsigned int i = 0; i < count; i++)
 	{
-		float y = yArray->operator[](startLoc + i) + 1.0f;
+		float y = (*yArray)[startLoc + i] + 1.0f;
 		float diff = std::round(y * stepCountB) - y * stepCountB;
 		float smooth = 1.0f - std::abs(diff) * (1.0f - (stepCurve + 1.0f) / 2.0f) * 2.0f;
-		samplesOut->operator[](startLoc + i) += diff / stepCountB * smooth;
+		(*samplesOut)[startLoc + i] += diff / stepCountB * smooth;
 	}
 
 	// fade in
 	for (unsigned int i = startLoc; i < endLoc; i++)
 	{
-		float x = xArray->operator[](i) / fadeInStartLoc;
+		float x = (*xArray)[i] / fadeInStartLoc;
 		if (x > 1.0f)
 		{
 			break;
 		}
-		samplesOut->operator[](i) = samplesOut->operator[](i) * x + startLocVal * (1.0f - x);
+		(*samplesOut)[i] = (*samplesOut)[i] * x + startLocVal * (1.0f - x);
 	}
 	// fade out
 	for (unsigned int i = endLoc - 1; i > startLoc; i--)
 	{
-		float x = (1.0f - xArray->operator[](i)) / fadeInStartLoc;
+		float x = (1.0f - (*xArray)[i]) / fadeInStartLoc;
 		if (x > 1.0f)
 		{
 			break;
 		}
-		samplesOut->operator[](i) = samplesOut->operator[](i) * x + endLocVal * (1.0f - x);
+		(*samplesOut)[i] = (*samplesOut)[i] * x + endLocVal * (1.0f - x);
 	}
 }
 void VectorGraphDataArray::processLineTypeArrayRandom(std::vector<float>* samplesOut, std::vector<float>* xArray, unsigned int startLoc, unsigned int endLoc,
@@ -3387,9 +3387,9 @@ void VectorGraphDataArray::processLineTypeArrayRandom(std::vector<float>* sample
 		float size = static_cast<float>(randomValues.size() / 2);
 		for (unsigned int i = 0; i < count; i++)
 		{
-			float randomValueX = xArray->operator[](startLoc + i) * size;
+			float randomValueX = (*xArray)[startLoc + i] * size;
 			float randomValueLocation = std::floor(randomValueX);
-			samplesOut->operator[](startLoc + i) += -((randomValueX - randomValueLocation) - 1.0f) * (randomValueX - randomValueLocation) * 4.0f *
+			(*samplesOut)[startLoc + i] += -((randomValueX - randomValueLocation) - 1.0f) * (randomValueX - randomValueLocation) * 4.0f *
 				(randomValues[static_cast<int>(randomValueLocation)] * (1.0f - blend)  + randomValues[static_cast<int>(randomValueLocation + size)] * blend) * randomAmp;
 		}
 	}
@@ -3409,15 +3409,15 @@ void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* up
 			// we can not skip gaps because
 			// every updatingPointLocations point effects their line only
 			// (the line that starts with the point)
-			if (updatingPointLocations->operator[](updatingEnd) + 1 >=
-					updatingPointLocations->operator[](j))
+			if ((*updatingPointLocations)[updatingEnd] + 1 >=
+					(*updatingPointLocations)[j])
 			{
 				updatingEnd = j;
 				qDebug("getUpdatingFromEffector new updatingEnd: %d, i: %d", updatingEnd, i);
 			}
 			else
 			{
-				qDebug("getUpdatingFromEffector updatingEnd %d brake: %d < %d [j = %d]", updatingEnd, (updatingPointLocations->operator[](updatingEnd) + 1), updatingPointLocations->operator[](j), j);
+				qDebug("getUpdatingFromEffector updatingEnd %d brake: %d < %d [j = %d]", updatingEnd, ((*updatingPointLocations)[updatingEnd] + 1), (*updatingPointLocations)[j], j);
 				break;
 			}
 		}
@@ -3432,7 +3432,7 @@ void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* up
 		// translating the effector data array locations to m_dataArray locations
 		bool found = false;
 		bool isBefore = false;
-		int locationBefore = getNearestLocation(effector->getX(updatingPointLocations->operator[](i)), &found, &isBefore);
+		int locationBefore = getNearestLocation(effector->getX((*updatingPointLocations)[i]), &found, &isBefore);
 		qDebug("getUpdatingFromEffector getNearestLocation before: %d, i: %d", locationBefore, i);
 		if (isBefore == false && locationBefore >= 0 && getEffectOnlyPoints(locationBefore) == true)
 		{
@@ -3448,8 +3448,8 @@ void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* up
 		locationBefore = locationBefore < 0 ? 0 :
 			m_dataArray.size() - 1 < locationBefore ? m_dataArray.size() - 1 : locationBefore;
 		isBefore = false;
-		int locationAfter = getNearestLocation(effector->getX(updatingPointLocations->operator[](updatingEnd) + updatingEndSlide), &found, &isBefore);
-		qDebug("getUpdatingFromEffector getNearestLocation after: %d, updatingEnd: %d (+ %d), ex: %f, dx: %f", locationAfter, updatingEnd, updatingEndSlide, effector->getX(updatingPointLocations->operator[](updatingEnd) + updatingEndSlide), m_dataArray[locationAfter].m_x);
+		int locationAfter = getNearestLocation(effector->getX((*updatingPointLocations)[updatingEnd] + updatingEndSlide), &found, &isBefore);
+		qDebug("getUpdatingFromEffector getNearestLocation after: %d, updatingEnd: %d (+ %d), ex: %f, dx: %f", locationAfter, updatingEnd, updatingEndSlide, effector->getX((*updatingPointLocations)[updatingEnd] + updatingEndSlide), m_dataArray[locationAfter].m_x);
 		if (isBefore == false)
 		{
 			qDebug("getUpdatingFromEffector locationAfter = %d - 1", locationAfter);
@@ -3457,14 +3457,14 @@ void VectorGraphDataArray::getUpdatingFromEffector(std::vector<unsigned int>* up
 			locationAfter--;
 		}
 		// updating everything before if i -> 0
-		if (updatingPointLocations->operator[](i) == 0)
+		if ((*updatingPointLocations)[i] == 0)
 		{
 			qDebug("getUpdatingFromEffector updating everything before");
 			locationBefore = 0;
 		}
 		// if updatingEnd is the last point in effecor, then
 		// update everithing after
-		if (updatingPointLocations->operator[](updatingEnd) + updatingEndSlide + 1 >= effector->size())
+		if ((*updatingPointLocations)[updatingEnd] + updatingEndSlide + 1 >= effector->size())
 		{
 			qDebug("getUpdatingFromEffector updating everything after");
 			locationAfter = m_dataArray.size() - 1;
@@ -3735,8 +3735,8 @@ void VectorGraphDataArray::getSamplesUpdateLines(VectorGraphDataArray* effector,
 		(std::ceil(m_dataArray[m_needsUpdating[pointLocation]].m_x / stepSize));
 	qDebug("getSamplesD6.2  effectYlocation: %d, %ld", effectYLocation, effectorSamples->size());
 	// current effector output Y near m_needsUpdating[pointLocation] point
-	float curEffectY = effectorSamples->operator[](effectYLocation);
-	float nextEffectY = effectorSamples->operator[](effectYLocation);
+	float curEffectY = (*effectorSamples)[effectYLocation];
+	float nextEffectY = (*effectorSamples)[effectYLocation];
 
 	// getting the final automatable / effectable point values
 	float curY = processAutomation(m_needsUpdating[pointLocation], m_dataArray[m_needsUpdating[pointLocation]].m_y, 0);
@@ -3771,7 +3771,7 @@ void VectorGraphDataArray::getSamplesUpdateLines(VectorGraphDataArray* effector,
 			((getEffectOnlyPoints(m_needsUpdating[pointLocation]) == true && isEffectedPoint(m_needsUpdating[pointLocation]) == true) ||
 			isEffectedPoint(m_needsUpdating[pointLocation]) == false))
 		{
-			nextEffectY = effectorSamples->operator[](effectYLocation);
+			nextEffectY = (*effectorSamples)[effectYLocation];
 			nextY = processEffect(m_needsUpdating[pointLocation] + 1, nextY, 0, nextEffectY);
 		}
 	}
@@ -3803,7 +3803,7 @@ qDebug("getSamplesD8 [%d] start: %d, end: %d, type: %d,      ---       %f, %f, %
 		// calculate curve
 		for (int j = start; j < end; j++)
 		{
-			m_updatingBakedSamples[j] = processCurve(curY, nextY, curC, outputXLocations->operator[](j));
+			m_updatingBakedSamples[j] = processCurve(curY, nextY, curC, (*outputXLocations)[j]);
 		}
 		// no line type
 	}
@@ -3812,7 +3812,7 @@ qDebug("getSamplesD8 [%d] start: %d, end: %d, type: %d,      ---       %f, %f, %
 		// curve
 		for (int j = start; j < end; j++)
 		{
-			m_updatingBakedSamples[j] = processCurve(curY, nextY, curC, outputXLocations->operator[](j));
+			m_updatingBakedSamples[j] = processCurve(curY, nextY, curC, (*outputXLocations)[j]);
 		}
 		// line type
 		processLineTypeArraySine(&m_updatingBakedSamples, outputXLocations, start, end, curValA, curValB, fadeInStart);
@@ -3822,7 +3822,7 @@ qDebug("getSamplesD8 [%d] start: %d, end: %d, type: %d,      ---       %f, %f, %
 		// curve
 		for (int j = start; j < end; j++)
 		{
-			m_updatingBakedSamples[j] = processCurve(curY, nextY, 0.0f, outputXLocations->operator[](j));
+			m_updatingBakedSamples[j] = processCurve(curY, nextY, 0.0f, (*outputXLocations)[j]);
 		}
 		// line type
 		processLineTypeArraySineB(&m_updatingBakedSamples, outputXLocations, start, end, curValA, curValB, curC, fadeInStart);
@@ -3832,7 +3832,7 @@ qDebug("getSamplesD8 [%d] start: %d, end: %d, type: %d,      ---       %f, %f, %
 		// curve
 		for (int j = start; j < end; j++)
 		{
-			m_updatingBakedSamples[j] = processCurve(curY, nextY, 0.0f, outputXLocations->operator[](j));
+			m_updatingBakedSamples[j] = processCurve(curY, nextY, 0.0f, (*outputXLocations)[j]);
 		}
 		// line type
 		processLineTypeArrayPeak(&m_updatingBakedSamples, outputXLocations, start, end, curValA, curValB, curC, fadeInStart);
@@ -3842,7 +3842,7 @@ qDebug("getSamplesD8 [%d] start: %d, end: %d, type: %d,      ---       %f, %f, %
 		// curve
 		for (int j = start; j < end; j++)
 		{
-			m_updatingBakedSamples[j] = processCurve(curY, nextY, curC, outputXLocations->operator[](j));
+			m_updatingBakedSamples[j] = processCurve(curY, nextY, curC, (*outputXLocations)[j]);
 		}
 		// line type
 		processLineTypeArraySteps(&m_updatingBakedSamples, outputXLocations, start, end, &m_updatingBakedSamples, curValA, curValB, fadeInStart);
@@ -3852,7 +3852,7 @@ qDebug("getSamplesD8 [%d] start: %d, end: %d, type: %d,      ---       %f, %f, %
 		// curve
 		for (int j = start; j < end; j++)
 		{
-			m_updatingBakedSamples[j] = processCurve(curY, nextY, 0.0f, outputXLocations->operator[](j));
+			m_updatingBakedSamples[j] = processCurve(curY, nextY, 0.0f, (*outputXLocations)[j]);
 		}
 		// line type
 		processLineTypeArrayRandom(&m_updatingBakedSamples, outputXLocations, start, end, curValA, curValB, curC, fadeInStart);
@@ -3866,7 +3866,7 @@ qDebug("getSamplesD8 [%d] start: %d, end: %d, type: %d,      ---       %f, %f, %
 		qDebug("getSamples run prucessEffect run prucessEffect run prucessEffect run prucessEffect");
 		for (int j = startB; j < endB; j++)
 		{
-			m_updatingBakedSamples[j] = processEffect(m_needsUpdating[pointLocation], m_updatingBakedSamples[j], 0, effectorSamples->operator[](j));
+			m_updatingBakedSamples[j] = processEffect(m_needsUpdating[pointLocation], m_updatingBakedSamples[j], 0, (*effectorSamples)[j]);
 		}
 	}
 	// clamp
