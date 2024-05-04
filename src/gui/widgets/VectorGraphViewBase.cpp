@@ -59,7 +59,7 @@ VectorGraphViewBase::~VectorGraphViewBase()
 void VectorGraphViewBase::showHintText(QWidget* thisWidget, QString hintText, int msecBeforeDisplay, int msecDisplayTime)
 {
 	m_hintText->setText(hintText);
-	m_hintText->moveGlobal(thisWidget, QPoint(width() + 2, 0));
+	m_hintText->moveGlobal(thisWidget, QPoint(0, 0));
 	m_hintText->showWithDelay(msecBeforeDisplay, msecDisplayTime);
 }
 void VectorGraphViewBase::hideHintText()
