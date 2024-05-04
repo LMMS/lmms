@@ -115,6 +115,8 @@ protected:
 	void mouseMoveEvent(QMouseEvent* me) override;
 	void mouseReleaseEvent(QMouseEvent* me) override;
 	void mouseDoubleClickEvent(QMouseEvent* me) override;
+
+	void leaveEvent(QEvent *event) override;
 protected slots:
 	void updateGraph();
 	void updateGraph(bool shouldUseGetLastSamples);
@@ -164,6 +166,8 @@ private:
 	QColor getFillColorFromBaseColor(QColor baseColor);
 	// cuts the string to displayedLength(in px) size (estimated)
 	QString getTextFromDisplayLength(QString text, unsigned int displayLength);
+	// outputs m_controlText for the line type or the switch autmated location or effected location control
+	QString getTextForAutomatableEffectableOrType(unsigned int controlLocation);
 
 	// selection
 	// searches VectorGraphDataArray-s to select
@@ -217,7 +221,7 @@ private:
 		tr("\"multiply\" effect"), tr("\"divide\" effect"), tr("\"power\" effect"), tr("\"log\" effect"),
 		tr("\"sine\" effect"), tr("\"clamp lower\" effect"), tr("\"clamp upper\" effect")
 	};
-	std::array<QString, 6> m_controlLineEffectText = {
+	std::array<QString, 6> m_controlLineTypeText = {
 		tr("none"),
 		tr("sine"),
 		tr("phase changable sine"),

@@ -88,7 +88,7 @@ VectorGraphView::VectorGraphView(QWidget * parent, int widgetWidth, int widgetHe
 	m_isEditingActive = false;
 	// set in .h
 	//m_controlText
-	//m_controlLineEffectText
+	//m_controlLineTypeText
 	//m_controlIsFloat
 
 	m_lastTrackPoint.first = -1;
@@ -530,6 +530,10 @@ void VectorGraphView::mouseDoubleClickEvent(QMouseEvent * me)
 			}
 		}
 	}
+}
+void VectorGraphView::leaveEvent(QEvent *event)
+{
+	hideHintText();
 }
 
 void VectorGraphView::paintEvent(QPaintEvent* pe)
@@ -1015,6 +1019,7 @@ void VectorGraphView::processControlWindowPressed(int mouseX, int mouseY, bool i
 				m_controlDisplayPage = 0;
 			}
 			qDebug("mouseRelease controlPage: %d", m_controlDisplayPage);
+			hideHintText();
 		}
 		else if (pressLocation >= 0 && location < m_controlText.size())
 		{
@@ -1026,15 +1031,7 @@ void VectorGraphView::processControlWindowPressed(int mouseX, int mouseY, bool i
 				// if the right mouse button was pressed
 				// get context menu input text
 				QString controlDisplayText = m_controlText[location];
-				if (location == 5)
-				{
-					bool isTrue = false;
-					int typeVal = static_cast<int>(getInputAttribValue(location, &isTrue));
-					if (typeVal < m_controlLineEffectText.size())
-					{
-						controlDisplayText = controlDisplayText + QString(" (") + m_controlLineEffectText[typeVal] + QString(")");
-					}
-				}
+				controlDisplayText = controlDisplayText + getTextForAutomatableEffectableOrType(location);
 
 				// getting the currently selected point's FloatModel
 				model()->getDataArray(m_selectedArray)->setAutomated(m_selectedLocation, true);
@@ -1056,6 +1053,12 @@ void VectorGraphView::processControlWindowPressed(int mouseX, int mouseY, bool i
 					curBoolValue = !curBoolValue;
 				}
 				setInputAttribValue(location, 0.0f, curBoolValue);
+
+
+				// hint text
+				QString hintText = m_controlText[location];
+				hintText = hintText + getTextForAutomatableEffectableOrType(location);
+				showHintText(widget(), hintText, 5, 3500);
 			}
 			else if (isDragging == true && m_controlIsFloat[location] == true)
 			{
@@ -1077,6 +1080,10 @@ void VectorGraphView::processControlWindowPressed(int mouseX, int mouseY, bool i
 					m_lastScndTrackPoint.first + static_cast<int>(curY - m_lastTrackPoint.second) / 2);
 				qDebug("dragging ... %d, %f", (m_lastScndTrackPoint.first + static_cast<int>(curY - m_lastTrackPoint.second) / 2), convertedCoords.second);
 				setInputAttribValue(location, convertedCoords.second, false);
+
+
+				// hint text
+				showHintText(widget(), m_controlText[location], 5, 3500);
 			}
 		}
 	}
@@ -1346,6 +1353,27 @@ QString VectorGraphView::getTextFromDisplayLength(QString text, unsigned int dis
 	else
 	{
 		output = text;
+	}
+	return output;
+}
+QString VectorGraphView::getTextForAutomatableEffectableOrType(unsigned int controlLocation)
+{
+	QString output;
+	if (controlLocation >= 0 && controlLocation <= 7)
+	{
+		bool isTrue = false;
+		int typeVal = static_cast<int>(getInputAttribValue(controlLocation, &isTrue));
+		if (controlLocation == 5)
+		{
+			if (typeVal < m_controlLineTypeText.size())
+			{
+				output = QString(" (") + m_controlLineTypeText[typeVal] + QString(")");
+			}
+		}
+		else
+		{
+			output = QString(tr(" (controls: ")) + m_controlText[1 + typeVal] + QString(")");
+		}
 	}
 	return output;
 }
