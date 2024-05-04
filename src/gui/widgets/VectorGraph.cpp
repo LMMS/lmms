@@ -37,6 +37,7 @@
 #include <QMutex> // locking when getSamples
 
 
+#include "VectorGraphViewBase.h"
 #include "StringPairDrag.h"
 #include "CaptionMenu.h" // context menu
 #include "embed.h" // context menu
@@ -57,7 +58,8 @@ namespace gui
 {
 VectorGraphView::VectorGraphView(QWidget * parent, int widgetWidth, int widgetHeight, unsigned int pointSize,
 	unsigned int controlHeight, unsigned int controlDisplayCount, bool shouldApplyDefaultVectorGraphColors) :
-		QWidget(parent),
+		VectorGraphViewBase(parent),
+		//QWidget(parent),
 		ModelView(new VectorGraphModel(2048, nullptr, false), this)
 {
 	resize(widgetWidth, widgetHeight);
@@ -235,16 +237,11 @@ void VectorGraphView::mousePressEvent(QMouseEvent* me)
 	if(me->button() == Qt::LeftButton && me->modifiers() & Qt::ControlModifier && m_isSelected == true)
 	{
 			qDebug("mousePress automation started");
-		// connect to automation
+		// connect to AutomationTrack
 		model()->getDataArray(m_selectedArray)->setAutomated(m_selectedLocation, true);
 		FloatModel* curFloatModel = model()->getDataArray(m_selectedArray)->getAutomationModel(m_selectedLocation);
-		// check if setAutomated is failed (like when isAutomatableEffecable is not enabled)
-		if (curFloatModel != nullptr)
-		{
-			qDebug("mousePress automation sent");
-			new gui::StringPairDrag("automatable_model", QString::number(curFloatModel->id()), QPixmap(), widget());
-			me->accept();
-		}
+		// (VectorGraphViewBase method:)
+		connectToAutomationTrack(me, curFloatModel, widget());
 	}
 	else
 	{
@@ -511,7 +508,7 @@ void VectorGraphView::mouseDoubleClickEvent(QMouseEvent * me)
 		if (m_isSelected == true && me->button() == Qt::LeftButton)
 		{
 			// display dialog
-			PointF curData = showCoordInputDialog();
+			PointF curData = showCoordInputDialog(getSelectedData());
 			// change data
 			setSelectedData(curData);
 		}
@@ -873,55 +870,13 @@ void VectorGraphView::updateDefaultColors()
 		applyDefaultColors();
 	}
 }
-void VectorGraphView::execConnectionDialog()
-{
-	if (m_isSelected == true)
-	{
-		model()->getDataArray(m_selectedArray)->setAutomated(m_selectedLocation, true);
-		FloatModel* curAutomationModel = model()->getDataArray(m_selectedArray)->getAutomationModel(m_selectedLocation);
-		gui::ControllerConnectionDialog dialog(getGUI()->mainWindow(), curAutomationModel);
-
-		if (dialog.exec() == 1)
-		{
-			// Actually chose something
-			if (curAutomationModel != nullptr && dialog.chosenController() != nullptr)
-			{
-				// Update
-				if (curAutomationModel->controllerConnection() != nullptr)
-				{
-					curAutomationModel->controllerConnection()->setController(dialog.chosenController());
-				}
-				else
-				{
-					// New
-					auto cc = new ControllerConnection(dialog.chosenController());
-					curAutomationModel->setControllerConnection(cc);
-				}
-			}
-			else
-			{
-				// no controller, so delete existing connection
-				removeController();
-			}
-		}
-		else
-		{
-			// did not return 1 -> delete the created floatModel
-			removeController();
-		}
-	}
-}
-void VectorGraphView::removeAutomation()
+void VectorGraphView::contextMenuRemoveAutomation()
 {
 	if (m_isSelected == true)
 	{
 		// deleting the floatmodel will delete the connecitons
 		model()->getDataArray(m_selectedArray)->setAutomated(m_selectedLocation, false);
 	}
-}
-void VectorGraphView::removeController()
-{
-	removeAutomation();
 }
 
 PointF VectorGraphView::mapMousePos(int x, int y)
@@ -1080,10 +1035,13 @@ void VectorGraphView::processControlWindowPressed(int mouseX, int mouseY, bool i
 						controlDisplayText = controlDisplayText + QString(" (") + m_controlLineEffectText[typeVal] + QString(")");
 					}
 				}
+
+				// getting the currently selected point's FloatModel
+				model()->getDataArray(m_selectedArray)->setAutomated(m_selectedLocation, true);
+				FloatModel* curAutomationModel = model()->getDataArray(m_selectedArray)->getAutomationModel(m_selectedLocation);
+
 				// show context menu
-				CaptionMenu contextMenu(model()->displayName() + QString(" - ") + controlDisplayText);
-				addDefaultActions(&contextMenu, m_controlText[location]);
-				contextMenu.exec(QCursor::pos());
+				showContextMenu(QCursor::pos(), curAutomationModel, model()->displayName(), controlDisplayText);
 			}
 			else if (isDragging == false && m_controlIsFloat[location] == false)
 			{
@@ -1389,91 +1347,6 @@ QString VectorGraphView::getTextFromDisplayLength(QString text, unsigned int dis
 	{
 		output = text;
 	}
-	return output;
-}
-void VectorGraphView::addDefaultActions(QMenu* menu, QString controlDisplayText)
-{
-	// context menu settings
-	menu->addAction(embed::getIconPixmap("reload"),
-		tr("name: ") + controlDisplayText,
-		this, SLOT(updateGraph()));
-	menu->addAction(embed::getIconPixmap("reload"),
-		tr("remove automation"),
-		this, SLOT(removeAutomation()));
-	menu->addSeparator();
-
-	model()->getDataArray(m_selectedArray)->setAutomated(m_selectedLocation, true);
-	FloatModel* curAutomationModel = model()->getDataArray(m_selectedArray)->getAutomationModel(m_selectedLocation);
-	QString controllerTxt;
-
-	menu->addAction(embed::getIconPixmap("controller"),
-		tr("Connect to controller..."),
-		this, SLOT(execConnectionDialog()));
-	if(curAutomationModel != nullptr && curAutomationModel->controllerConnection() != nullptr)
-	{
-		
-		Controller* cont = curAutomationModel->controllerConnection()->getController();
-		if(cont)
-		{
-			controllerTxt = AutomatableModel::tr( "Connected to %1" ).arg( cont->name() );
-		}
-		else
-		{
-			controllerTxt = AutomatableModel::tr( "Connected to controller" );
-		}
-
-
-		QMenu* contMenu = menu->addMenu(embed::getIconPixmap("controller"), controllerTxt);
-
-		contMenu->addAction(embed::getIconPixmap("cancel"),
-			tr("Remove connection"),
-			this, SLOT(removeAutomation()));
-	}
-}
-
-PointF VectorGraphView::showCoordInputDialog()
-{
-	PointF curData(0.0f, 0.0f);
-	if (m_isSelected == true)
-	{
-		curData = getSelectedData();
-
-		// show position input dialog
-		bool ok;
-		double changedX = QInputDialog::getDouble(this, tr("Set value"),
-			tr("Please enter a new value between 0 and 100"),
-			static_cast<double>(curData.first * 100.0f),
-			0.0, 100.0, 2, &ok);
-		if (ok == true)
-		{
-			curData.first = static_cast<float>(changedX) / 100.0f;
-		}
-
-		double changedY = QInputDialog::getDouble(this, tr("Set value"),
-			tr("Please enter a new value between -100 and 100"),
-			static_cast<double>(curData.second * 100.0f),
-			-100.0, 100.0, 2, &ok);
-		if (ok == true)
-		{
-			curData.second = static_cast<float>(changedY) / 100.0f;
-		}
-	}
-	return curData;
-}
-float VectorGraphView::showInputDialog(float curInputValue)
-{
-	float output = 0.0f;
-
-	bool ok;
-	double changedPos = QInputDialog::getDouble(this, tr("Set value"),
-		tr("Please enter a new value between -100 and 100"),
-		static_cast<double>(curInputValue * 100.0f),
-		-100.0, 100.0, 2, &ok);
-	if (ok == true)
-	{
-		output = static_cast<float>(changedPos) / 100.0f;
-	}
-
 	return output;
 }
 
